@@ -249,7 +249,7 @@ void aodv_packet_writer_init(write_packet_func_ptr ptr)
     rfc5444_writer_register_msgcontentprovider(&writer, &_rerr_message_content_provider,
                                                _rerr_addrtlvs, ARRAYSIZE(_rerr_addrtlvs));
 
-    /* register rreq and rrep messages with 16 byte (ipv6) addresses.
+    /* register rreq and rrep messages with 16 byte (ipv6_legacy) addresses.
      * AddPacketHeader & addMessageHeader callbacks are triggered here. */
     _rreq_msg = rfc5444_writer_register_message(&writer, RFC5444_MSGTYPE_RREQ,
                                                 false, RFC5444_MAX_ADDRLEN);

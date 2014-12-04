@@ -7,7 +7,7 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  *
- * @ingroup sixlowpan
+ * @ingroup sixlowpan_legacy
  * @{
  * @file    sixlowborder.h
  * @brief   header for 6lowpan border router
@@ -18,8 +18,8 @@
 
 /* 6LoWPAN Border Router header file */
 
-#ifndef _SIXLOWPAN_BORDER_H
-#define _SIXLOWPAN_BORDER_H
+#ifndef _SIXLOWPAN_LEGACY_BORDER_H
+#define _SIXLOWPAN_LEGACY_BORDER_H
 
 #include <stdint.h>
 
@@ -33,7 +33,7 @@
 extern "C" {
 #endif
 
-extern ipv6_addr_t *abr_addr;
+extern ipv6_legacy_addr_t *abr_addr;
 
 kernel_pid_t border_get_serial_reader(void);
 
@@ -46,4 +46,4 @@ void border_process_lowpan(void);
 }
 #endif
 
-#endif /* _SIXLOWPAN_BORDER_H*/
+#endif /* _SIXLOWPAN_LEGACY_BORDER_H*/

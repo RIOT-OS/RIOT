@@ -47,10 +47,10 @@ void rpl_init_root_mode(void);
  * This function initializes all basic RPL mode resources. For this mode this includes only acquiring the own
  * address.
  *
- * @param[in] my_ipv6_address       Own IPv6 address as assigned by RPL core-initialization.
+ * @param[in] my_ipv6_legacy_address       Own IPv6 address as assigned by RPL core-initialization.
  *
  */
-void rpl_init_mode(ipv6_addr_t *my_ipv6_address);
+void rpl_init_mode(ipv6_legacy_addr_t *my_ipv6_legacy_address);
 
 /**
  * @brief Sends a DIO-message to a given destination
@@ -60,7 +60,7 @@ void rpl_init_mode(ipv6_addr_t *my_ipv6_address);
  * @param[in] destination           IPv6-address of the destination of the DIO. Should be a direct neighbor or multicast address.
  *
  */
-void rpl_send_DIO_mode(ipv6_addr_t *destination);
+void rpl_send_DIO_mode(ipv6_legacy_addr_t *destination);
 
 /**
  * @brief Returns whether a node is root or not
@@ -85,7 +85,7 @@ uint8_t rpl_is_root_mode(void);
  * @param[in] start_index           Describes whether a DAO must be split because of too many routing entries.
  *
  */
-void rpl_send_DAO_mode(ipv6_addr_t *destination, uint8_t lifetime, bool default_lifetime, uint8_t start_index);
+void rpl_send_DAO_mode(ipv6_legacy_addr_t *destination, uint8_t lifetime, bool default_lifetime, uint8_t start_index);
 
 /**
  * @brief Sends a DIS-message to a given destination
@@ -95,7 +95,7 @@ void rpl_send_DAO_mode(ipv6_addr_t *destination, uint8_t lifetime, bool default_
  * @param[in] destination           IPv6-address of the destination of the DIS. Should be a direct neighbor.
  *
  */
-void rpl_send_DIS_mode(ipv6_addr_t *destination);
+void rpl_send_DIS_mode(ipv6_legacy_addr_t *destination);
 
 /**
  * @brief Sends a DAO acknowledgment-message to a given destination
@@ -105,7 +105,7 @@ void rpl_send_DIS_mode(ipv6_addr_t *destination);
  * @param[in] destination           IPv6-address of the destination of the DAO_ACK. Should be a direct neighbor.
  *
  */
-void rpl_send_DAO_ACK_mode(ipv6_addr_t *destination);
+void rpl_send_DAO_ACK_mode(ipv6_legacy_addr_t *destination);
 
 /**
  * @brief Receives a DIO message
@@ -144,7 +144,7 @@ void rpl_recv_dao_ack_mode(void);
  *
  * This function sends any RPl related messages to a given destination. This implementation should be equal
  * for all modes and therefore should not be altered. Every mode related RPL-sending function calls this for
- * relaying it in lower layers to sixlowpan. Because send-functions are wrapped by a mutex in rpl.c, the same
+ * relaying it in lower layers to sixlowpan_legacy. Because send-functions are wrapped by a mutex in rpl.c, the same
  * mutex applies here.
  *
  * @param[in] destination           IPv6-address of the destination of the message.
@@ -153,7 +153,7 @@ void rpl_recv_dao_ack_mode(void);
  * @param[in] next_header           Index to next header in message.
  *
  */
-void rpl_send(ipv6_addr_t *destination, uint8_t *payload, uint16_t p_len, uint8_t next_header);
+void rpl_send(ipv6_legacy_addr_t *destination, uint8_t *payload, uint16_t p_len, uint8_t next_header);
 
 #ifdef __cplusplus
 }

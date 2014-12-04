@@ -55,8 +55,8 @@
 #include "rtc.h"
 #endif
 
-#ifdef MODULE_SIXLOWPAN
-#include "sixlowpan.h"
+#ifdef MODULE_SIXLOWPAN_LEGACY
+#include "sixlowpan_legacy.h"
 #endif
 
 #ifdef MODULE_UDP
@@ -65,6 +65,14 @@
 
 #ifdef MODULE_TCP
 #include "tcp.h"
+#endif
+
+#ifdef MODULE_BASIC_MAC
+#include "basic_mac.h"
+#endif
+
+#ifdef MODULE_IPV6_IF
+#include "ipv6/if.h"
 #endif
 
 #ifdef MODULE_NET_IF
@@ -245,13 +253,21 @@ void auto_init(void)
     DEBUG("Auto init net_if module.\n");
     l2_ping_init();
 #endif
+#ifdef MODULE_BASIC_MAC
+    DEBUG("Auto init basic_mac module.\n");
+    basic_mac_init_module();
+#endif
+#ifdef MODULE_IPV6_IF
+    DEBUG("Auto init ipv6_if module.\n");
+    ipv6_if_init();
+#endif
 #ifdef MODULE_NET_IF
     DEBUG("Auto init net_if module.\n");
     auto_init_net_if();
 #endif
-#ifdef MODULE_SIXLOWPAN
+#ifdef MODULE_SIXLOWPAN_LEGACY
     DEBUG("Auto init 6LoWPAN module.\n");
-    sixlowpan_lowpan_init();
+    sixlowpan_legacy_lowpan_init();
 #endif
 #ifdef MODULE_PROFILING
     extern void profiling_init(void);

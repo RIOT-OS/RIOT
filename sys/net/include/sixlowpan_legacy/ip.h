@@ -7,12 +7,12 @@
  */
 
 /**
- * @defgroup    net_sixlowpan_ip IPv6
- * @ingroup     net_sixlowpan
+ * @defgroup    net_sixlowpan_legacy_ip IPv6
+ * @ingroup     net_sixlowpan_legacy
  * @brief       Internet Protocol version 6
  * @{
  *
- * @file        include/sixlowpan/ip.h
+ * @file        include/sixlowpan_legacy/ip.h
  * @brief       6LoWPAN constants, data structs, and prototypes for network layer
  *
  * @author      Stephan Zeisberg <zeisberg@mi.fu-berlin.de>
@@ -21,15 +21,15 @@
  * @author      Oliver Gesch <oliver.gesch@googlemail.com>
  */
 
-#ifndef SIXLOWPAN_IP_H
-#define SIXLOWPAN_IP_H
+#ifndef SIXLOWPAN_LEGACY_IP_H
+#define SIXLOWPAN_LEGACY_IP_H
 
 #include <stdint.h>
 
 #include "inet_ntop.h"
 #include "net_if.h"
 #include "net_help.h"
-#include "sixlowpan/types.h"
+#include "sixlowpan_legacy/types.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -38,60 +38,60 @@ extern "C" {
 /**
  * @brief   IPv6 maximum transmission unit.
  */
-#define IPV6_MTU                (256)
+#define IPV6_LEGACY_MTU                (256)
 
 /**
  * @brief   Length of an IPv6 address in byte.
  */
-#define IPV6_ADDR_LEN           (16)
+#define IPV6_LEGACY_ADDR_LEN           (16)
 
 /**
  * @brief   Length of an IPv6 address in bit.
  */
-#define IPV6_ADDR_BIT_LEN       (128)
+#define IPV6_LEGACY_ADDR_BIT_LEN       (128)
 
 /**
  * @brief   Maximum length of an IPv6 address represented as string.
  */
-#define IPV6_MAX_ADDR_STR_LEN   (40)
+#define IPV6_LEGACY_MAX_ADDR_STR_LEN   (40)
 
 /**
  * @brief   L4 protocol number for TCP.
  */
-#define IPV6_PROTO_NUM_TCP          (6)
+#define IPV6_LEGACY_PROTO_NUM_TCP          (6)
 
 /**
  * @brief   L4 protocol number for UDP.
  */
-#define IPV6_PROTO_NUM_UDP          (17)
+#define IPV6_LEGACY_PROTO_NUM_UDP          (17)
 
 /**
 * @brief  Next header value for source routing
 * @see <a href="http://tools.ietf.org/html/rfc5095#section-1">
  */
-#define IPV6_PROTO_NUM_SRH          (43)
+#define IPV6_LEGACY_PROTO_NUM_SRH          (43)
 
 /**
  * @brief   L4 protocol number for ICMPv6.
  */
-#define IPV6_PROTO_NUM_ICMPV6       (58)
+#define IPV6_LEGACY_PROTO_NUM_ICMPV6       (58)
 
 /**
  * @brief   L4 protocol number for no L4 protocol in IPv6.
  */
-#define IPV6_PROTO_NUM_NONE         (59)
+#define IPV6_LEGACY_PROTO_NUM_NONE         (59)
 
 /**
  * @brief   L4 protocol number for IPv6 destination options.
  */
-#define IPV6_PROTO_NUM_IPV6_OPTS    (60)
+#define IPV6_LEGACY_PROTO_NUM_IPV6_LEGACY_OPTS    (60)
 
 /**
  * @brief message type for notification
  *
- * @see ipv6_register_packet_handler()
+ * @see ipv6_legacy_register_packet_handler()
  */
-#define IPV6_PACKET_RECEIVED        (UPPER_LAYER_2)
+#define IPV6_LEGACY_PACKET_RECEIVED        (UPPER_LAYER_2)
 
 /**
  * @brief   Get IPv6 send/receive buffer.
@@ -100,7 +100,7 @@ extern "C" {
  * @note    To be deleted in later releases. Here only because it is
  *          used by the rpl module.
  */
-ipv6_hdr_t *ipv6_get_buf(void);
+ipv6_legacy_hdr_t *ipv6_legacy_get_buf(void);
 
 /**
  * @brief   Send IPv6 packet to dest.
@@ -117,8 +117,8 @@ ipv6_hdr_t *ipv6_get_buf(void);
  *                           In case of reactive routing: routing
  *                           is going to try to find a route
  */
-int ipv6_sendto(const ipv6_addr_t *dest, uint8_t next_header,
-                const uint8_t *payload, uint16_t payload_length, ipv6_addr_t *next_hop);
+int ipv6_legacy_sendto(const ipv6_legacy_addr_t *dest, uint8_t next_header,
+                const uint8_t *payload, uint16_t payload_length, ipv6_legacy_addr_t *next_hop);
 
 /**
  * @brief   Send an IPv6 packet defined by its header.
@@ -135,28 +135,28 @@ int ipv6_sendto(const ipv6_addr_t *dest, uint8_t next_header,
  *                              In case of reactive routing: routing is going
  *                              to try to find a route
  */
-int ipv6_send_packet(ipv6_hdr_t *packet, ipv6_addr_t *next_hop);
+int ipv6_legacy_send_packet(ipv6_legacy_hdr_t *packet, ipv6_legacy_addr_t *next_hop);
 
 /**
  * @brief   Determines if node is a router.
  *
  * @return  1 if node is router, 0 otherwise.
  */
-uint8_t ipv6_is_router(void);
+uint8_t ipv6_legacy_is_router(void);
 
 /**
  * @brief   Sets the default hop limit to use with IPv6 packets.
  *
  * @param[in] hop_limit The hop limit to set the default hop limit to.
  */
-void ipv6_set_default_hop_limit(uint8_t hop_limit);
+void ipv6_legacy_set_default_hop_limit(uint8_t hop_limit);
 
 /**
  * @brief   Gets the default hop limit that is used for IPv6 packets.
  *
  * @return  The current default hop limit for IPv6 packets.
  */
-uint8_t ipv6_get_default_hop_limit(void);
+uint8_t ipv6_legacy_get_default_hop_limit(void);
 
 /**
  * @brief   Registers a handler thread for incoming IP packets.
@@ -166,7 +166,7 @@ uint8_t ipv6_get_default_hop_limit(void);
  * @return  0 on success, ENOMEN if maximum number of registrable
  *          threads is exceeded.
  */
-uint8_t ipv6_register_packet_handler(kernel_pid_t pid);
+uint8_t ipv6_legacy_register_packet_handler(kernel_pid_t pid);
 
 /**
  * @brief   Registers a handler thread for L4 protocol.
@@ -174,24 +174,24 @@ uint8_t ipv6_register_packet_handler(kernel_pid_t pid);
  * @param[in] next_header   Next header ID of the L4 protocol.
  * @param[in] pid           PID of the handler thread
  */
-void ipv6_register_next_header_handler(uint8_t next_header, kernel_pid_t pid);
+void ipv6_legacy_register_next_header_handler(uint8_t next_header, kernel_pid_t pid);
 
 /**
  * @brief   Registers a handler thread for RPL options
  *
  * @param[in] pid   PID of the handler thread.
  */
-void ipv6_register_rpl_handler(kernel_pid_t pid);
+void ipv6_legacy_register_rpl_handler(kernel_pid_t pid);
 
 /**
- * @brief   Sets the first 64 bit of *ipv6_addr* to link local prefix.
+ * @brief   Sets the first 64 bit of *ipv6_legacy_addr* to link local prefix.
  *
- * @param[in,out] ipv6_addr The address to set.
+ * @param[in,out] ipv6_legacy_addr The address to set.
  */
-static inline void ipv6_addr_set_link_local_prefix(ipv6_addr_t *ipv6_addr)
+static inline void ipv6_legacy_addr_set_link_local_prefix(ipv6_legacy_addr_t *ipv6_legacy_addr)
 {
-    ipv6_addr->uint32[0] = HTONL(0xfe800000);
-    ipv6_addr->uint32[1] = 0;
+    ipv6_legacy_addr->uint32[0] = HTONL(0xfe800000);
+    ipv6_legacy_addr->uint32[1] = 0;
 }
 
 /**
@@ -208,7 +208,7 @@ static inline void ipv6_addr_set_link_local_prefix(ipv6_addr_t *ipv6_addr)
  * @param[in]   addr6   The seventh 16 bit of the new address.
  * @param[in]   addr7   The eighth 16 bit of the new address.
  */
-void ipv6_addr_init(ipv6_addr_t *out, uint16_t addr0, uint16_t addr1,
+void ipv6_legacy_addr_init(ipv6_legacy_addr_t *out, uint16_t addr0, uint16_t addr1,
                     uint16_t addr2, uint16_t addr3, uint16_t addr4,
                     uint16_t addr5, uint16_t addr6, uint16_t addr7);
 
@@ -220,13 +220,13 @@ void ipv6_addr_init(ipv6_addr_t *out, uint16_t addr0, uint16_t addr1,
  * @param[out]  out     Address to be set.
  * @param[in]   if_id   The interface to take the EUI-64 from.
  * @param[in]   prefix  64-bit network prefix to be used for *out*
- *                      (only the first 64 bit of the ipv6_addr_t type
+ *                      (only the first 64 bit of the ipv6_legacy_addr_t type
  *                      are copied to *out*)
  *
  * @return  The Address to be set on success, NULL on error.
  */
-ipv6_addr_t *ipv6_addr_set_by_eui64(ipv6_addr_t *out, int if_id,
-                                    const ipv6_addr_t *prefix);
+ipv6_legacy_addr_t *ipv6_legacy_addr_set_by_eui64(ipv6_legacy_addr_t *out, int if_id,
+                                    const ipv6_legacy_addr_t *prefix);
 
 /**
  * @brief   Sets IPv6 address *out* with the first *bits* bit taken
@@ -237,104 +237,104 @@ ipv6_addr_t *ipv6_addr_set_by_eui64(ipv6_addr_t *out, int if_id,
  * @param[in]   bits    Bits to be copied from *prefix* to *out*
  *                      (set to 128 when greater than 128).
  */
-void ipv6_addr_init_prefix(ipv6_addr_t *out, const ipv6_addr_t *prefix,
+void ipv6_legacy_addr_init_prefix(ipv6_legacy_addr_t *out, const ipv6_legacy_addr_t *prefix,
                            uint8_t bits);
 
 /**
- * @brief   Set *ipv6_addr* to the loopback address.
+ * @brief   Set *ipv6_legacy_addr* to the loopback address.
  *
  * @see <a href="http://tools.ietf.org/html/rfc4291">
  *          RFC 4291
  *      </a>
  *
- * @param[out] ipv6_addr    Is set to the loopback address.
+ * @param[out] ipv6_legacy_addr    Is set to the loopback address.
  */
-static inline void ipv6_addr_set_loopback_addr(ipv6_addr_t *ipv6_addr)
+static inline void ipv6_legacy_addr_set_loopback_addr(ipv6_legacy_addr_t *ipv6_legacy_addr)
 {
-    ipv6_addr->uint32[0] = 0;
-    ipv6_addr->uint32[1] = 0;
-    ipv6_addr->uint32[2] = 0;
-    ipv6_addr->uint32[3] = HTONL(1);
+    ipv6_legacy_addr->uint32[0] = 0;
+    ipv6_legacy_addr->uint32[1] = 0;
+    ipv6_legacy_addr->uint32[2] = 0;
+    ipv6_legacy_addr->uint32[3] = HTONL(1);
 }
 
 /**
- * @brief   Set *ipv6_addr* to a link-local all routers multicast
+ * @brief   Set *ipv6_legacy_addr* to a link-local all routers multicast
  *          address (ff02::/16 prefix).
  *
  * @see <a href="http://tools.ietf.org/html/rfc4291">
  *          RFC 4291
  *      </a>
  *
- * @param[out] ipv6_addr    Is set to a link-local all routers multicast
+ * @param[out] ipv6_legacy_addr    Is set to a link-local all routers multicast
  *                          address.
  */
-static inline void ipv6_addr_set_all_routers_addr(ipv6_addr_t *ipv6_addr)
+static inline void ipv6_legacy_addr_set_all_routers_addr(ipv6_legacy_addr_t *ipv6_legacy_addr)
 {
-    ipv6_addr->uint32[0] = HTONL(0xff020000);
-    ipv6_addr->uint32[1] = 0;
-    ipv6_addr->uint32[2] = 0;
-    ipv6_addr->uint32[3] = HTONL(2);
+    ipv6_legacy_addr->uint32[0] = HTONL(0xff020000);
+    ipv6_legacy_addr->uint32[1] = 0;
+    ipv6_legacy_addr->uint32[2] = 0;
+    ipv6_legacy_addr->uint32[3] = HTONL(2);
 }
 
 /**
- * @brief   Set *ipv6_addr* to a link-local all nodes multicast address
+ * @brief   Set *ipv6_legacy_addr* to a link-local all nodes multicast address
  *          (ff02::/16 prefix).
  *
  * @see <a href="http://tools.ietf.org/html/rfc4291">
  *          RFC 4291
  *      </a>
  *
- * @param[out] ipv6_addr    Is set to a link-local all nodes multicast
+ * @param[out] ipv6_legacy_addr    Is set to a link-local all nodes multicast
  *                          address.
  */
-static inline void ipv6_addr_set_all_nodes_addr(ipv6_addr_t *ipv6_addr)
+static inline void ipv6_legacy_addr_set_all_nodes_addr(ipv6_legacy_addr_t *ipv6_legacy_addr)
 {
-    ipv6_addr->uint32[0] = HTONL(0xff020000);
-    ipv6_addr->uint32[1] = 0;
-    ipv6_addr->uint32[2] = 0;
-    ipv6_addr->uint32[3] = HTONL(1);
+    ipv6_legacy_addr->uint32[0] = HTONL(0xff020000);
+    ipv6_legacy_addr->uint32[1] = 0;
+    ipv6_legacy_addr->uint32[2] = 0;
+    ipv6_legacy_addr->uint32[3] = HTONL(1);
 }
 
 /**
- * @brief   Set *ipv6_addr_out* to the solicited-node multicast address
- *          computed from *ipv6_addr_in*.
+ * @brief   Set *ipv6_legacy_addr_out* to the solicited-node multicast address
+ *          computed from *ipv6_legacy_addr_in*.
  *
  * @see <a href="http://tools.ietf.org/html/rfc4291">
  *          RFC 4291
  *      </a>
  *
- * @param[out]  ipv6_addr_out   Is set to solicited-node address of
+ * @param[out]  ipv6_legacy_addr_out   Is set to solicited-node address of
  *                              this node.
- * @param[in]   ipv6_addr_in    The IPv6 address the solicited-node
+ * @param[in]   ipv6_legacy_addr_in    The IPv6 address the solicited-node
  *                              address.
  */
-static inline void ipv6_addr_set_solicited_node_addr(ipv6_addr_t *ipv6_addr_out,
-        const ipv6_addr_t *ipv6_addr_in)
+static inline void ipv6_legacy_addr_set_solicited_node_addr(ipv6_legacy_addr_t *ipv6_legacy_addr_out,
+        const ipv6_legacy_addr_t *ipv6_legacy_addr_in)
 {
     /* copy only the last 24-bit of the ip-address that is beeing resolved */
-    ipv6_addr_out->uint32[0] = HTONL(0xff020000);
-    ipv6_addr_out->uint32[1] = 0;
-    ipv6_addr_out->uint32[2] = HTONL(1);
-    ipv6_addr_out->uint8[12] = 0xff;
-    ipv6_addr_out->uint8[13] = ipv6_addr_in->uint8[13];
-    ipv6_addr_out->uint16[7] = ipv6_addr_in->uint16[7];
+    ipv6_legacy_addr_out->uint32[0] = HTONL(0xff020000);
+    ipv6_legacy_addr_out->uint32[1] = 0;
+    ipv6_legacy_addr_out->uint32[2] = HTONL(1);
+    ipv6_legacy_addr_out->uint8[12] = 0xff;
+    ipv6_legacy_addr_out->uint8[13] = ipv6_legacy_addr_in->uint8[13];
+    ipv6_legacy_addr_out->uint16[7] = ipv6_legacy_addr_in->uint16[7];
 }
 
 /**
  * @brief   Converts IPv6 address into string.
  *
  * @param[out]  addr_str    The IPv6 address as string. Must allocate
- *                          at least IPV6_MAX_ADDR_STR_LEN byte (40
+ *                          at least IPV6_LEGACY_MAX_ADDR_STR_LEN byte (40
  *                          byte).
  * @param[in]   str_len     The maximum length available to *addr_str*.
- * @param[in]   ipv6_addr   IPv6 address to be converted.
+ * @param[in]   ipv6_legacy_addr   IPv6 address to be converted.
  *
  * @return  Pointer to addr_str.
  */
-static inline const char *ipv6_addr_to_str(char *addr_str, uint8_t str_len,
-        const ipv6_addr_t *ipv6_addr)
+static inline const char *ipv6_legacy_addr_to_str(char *addr_str, uint8_t str_len,
+        const ipv6_legacy_addr_t *ipv6_legacy_addr)
 {
-    return inet_ntop(AF_INET6, ipv6_addr, addr_str, (size_t)str_len);
+    return inet_ntop(AF_INET6, ipv6_legacy_addr, addr_str, (size_t)str_len);
 }
 
 /**
@@ -345,7 +345,7 @@ static inline const char *ipv6_addr_to_str(char *addr_str, uint8_t str_len,
  *
  * @return  1 if *a* and *b* are equal, 0 otherwise.
  */
-static inline int ipv6_addr_is_equal(const ipv6_addr_t *a, const ipv6_addr_t *b)
+static inline int ipv6_legacy_addr_is_equal(const ipv6_legacy_addr_t *a, const ipv6_legacy_addr_t *b)
 {
     return (a->uint32[0] == b->uint32[0]) &&
            (a->uint32[1] == b->uint32[1]) &&
@@ -354,133 +354,133 @@ static inline int ipv6_addr_is_equal(const ipv6_addr_t *a, const ipv6_addr_t *b)
 }
 
 /**
- * @brief   Checks if *ipv6_addr* is unspecified (all zero).
+ * @brief   Checks if *ipv6_legacy_addr* is unspecified (all zero).
  *
  * @see <a href="http://tools.ietf.org/html/rfc4291">
  *          RFC 4291
  *      </a>
  *
- * @param[in] ipv6_addr An IPv6 address.
+ * @param[in] ipv6_legacy_addr An IPv6 address.
  *
- * @return  1 if *ipv6_addr* is unspecified address, 0 otherwise.
+ * @return  1 if *ipv6_legacy_addr* is unspecified address, 0 otherwise.
  */
-static inline int ipv6_addr_is_unspecified(const ipv6_addr_t *ipv6_addr)
+static inline int ipv6_legacy_addr_is_unspecified(const ipv6_legacy_addr_t *ipv6_legacy_addr)
 {
-    return (ipv6_addr->uint32[0] == 0) &&
-           (ipv6_addr->uint32[1] == 0) &&
-           (ipv6_addr->uint32[2] == 0) &&
-           (ipv6_addr->uint32[3] == 0);
+    return (ipv6_legacy_addr->uint32[0] == 0) &&
+           (ipv6_legacy_addr->uint32[1] == 0) &&
+           (ipv6_legacy_addr->uint32[2] == 0) &&
+           (ipv6_legacy_addr->uint32[3] == 0);
 }
 
 /**
- * @brief   Check if *ipv6_addr* is a multicast address.
+ * @brief   Check if *ipv6_legacy_addr* is a multicast address.
  *
  * @see <a href="http://tools.ietf.org/html/rfc4291">
  *          RFC 4291
  *      </a>
  *
- * @param[in] ipv6_addr     An IPv6 address.
+ * @param[in] ipv6_legacy_addr     An IPv6 address.
  *
- * @return  1 if *ipv6_addr* is multicast address, 0 otherwise.
+ * @return  1 if *ipv6_legacy_addr* is multicast address, 0 otherwise.
  */
-static inline int ipv6_addr_is_multicast(const ipv6_addr_t *ipv6_addr)
+static inline int ipv6_legacy_addr_is_multicast(const ipv6_legacy_addr_t *ipv6_legacy_addr)
 {
-    return (ipv6_addr->uint8[0] == 0xff);
+    return (ipv6_legacy_addr->uint8[0] == 0xff);
 }
 
 /**
- * @brief   Checks if *ipv6_addr* is a loopback address.
+ * @brief   Checks if *ipv6_legacy_addr* is a loopback address.
  *
  * @see <a href="http://tools.ietf.org/html/rfc4291">
  *          RFC 4291
  *      </a>
  *
- * @param[in] ipv6_addr An IPv6 address.
+ * @param[in] ipv6_legacy_addr An IPv6 address.
  *
- * @return  1 if *ipv6_addr* is loopback address, 0 otherwise.
+ * @return  1 if *ipv6_legacy_addr* is loopback address, 0 otherwise.
  */
-static inline int ipv6_addr_is_loopback(const ipv6_addr_t *ipv6_addr)
+static inline int ipv6_legacy_addr_is_loopback(const ipv6_legacy_addr_t *ipv6_legacy_addr)
 {
-    return ipv6_addr->uint32[0] == 0 &&
-           ipv6_addr->uint32[1] == 0 &&
-           ipv6_addr->uint32[2] == 0 &&
-           NTOHL(ipv6_addr->uint32[3]) == 1;
+    return ipv6_legacy_addr->uint32[0] == 0 &&
+           ipv6_legacy_addr->uint32[1] == 0 &&
+           ipv6_legacy_addr->uint32[2] == 0 &&
+           NTOHL(ipv6_legacy_addr->uint32[3]) == 1;
 }
 
 /**
- * @brief   Check if *ipv6_addr* is a link-local address.
+ * @brief   Check if *ipv6_legacy_addr* is a link-local address.
  *
  * @see <a href="http://tools.ietf.org/html/rfc4291">
  *          RFC 4291
  *      </a>
  *
- * @param[in] ipv6_addr     An IPv6 address.
+ * @param[in] ipv6_legacy_addr     An IPv6 address.
  *
- * @return  1 if *ipv6_addr* is link-local address, 0 otherwise.
+ * @return  1 if *ipv6_legacy_addr* is link-local address, 0 otherwise.
  */
-static inline int ipv6_addr_is_link_local(const ipv6_addr_t *ipv6_addr)
+static inline int ipv6_legacy_addr_is_link_local(const ipv6_legacy_addr_t *ipv6_legacy_addr)
 {
-    return ((ipv6_addr->uint32[0] == HTONL(0xfe800000)) &&
-            (ipv6_addr->uint32[1] == 0)) ||
-           (ipv6_addr_is_multicast(ipv6_addr) &&
-            (ipv6_addr->uint8[1] & 0x0f) == 2);
+    return ((ipv6_legacy_addr->uint32[0] == HTONL(0xfe800000)) &&
+            (ipv6_legacy_addr->uint32[1] == 0)) ||
+           (ipv6_legacy_addr_is_multicast(ipv6_legacy_addr) &&
+            (ipv6_legacy_addr->uint8[1] & 0x0f) == 2);
 }
 
 /**
- * @brief   Check if *ipv6_addr* is unique local unicast address.
+ * @brief   Check if *ipv6_legacy_addr* is unique local unicast address.
  *
  * @see <a href="http://tools.ietf.org/html/rfc4193">
  *          RFC 4193
  *      </a>
  *
- * @param[in] ipv6_addr     An IPv6 address.
+ * @param[in] ipv6_legacy_addr     An IPv6 address.
  *
- * @return  1 if *ipv6_addr* is unique local unicast address,
+ * @return  1 if *ipv6_legacy_addr* is unique local unicast address,
  *          0 otherwise.
  */
-static inline int ipv6_addr_is_unique_local_unicast(const ipv6_addr_t *ipv6_addr)
+static inline int ipv6_legacy_addr_is_unique_local_unicast(const ipv6_legacy_addr_t *ipv6_legacy_addr)
 {
-    return ((ipv6_addr->uint8[0] == 0xfc) || (ipv6_addr->uint8[0] == 0xfd));
+    return ((ipv6_legacy_addr->uint8[0] == 0xfc) || (ipv6_legacy_addr->uint8[0] == 0xfd));
 }
 
 /**
- * @brief   Check if *ipv6_addr* is solicited-node multicast address.
+ * @brief   Check if *ipv6_legacy_addr* is solicited-node multicast address.
  *
  * @see <a href="http://tools.ietf.org/html/rfc4291">
  *          RFC 4291
  *      </a>
  *
- * @param[in] ipv6_addr     An IPv6 address.
+ * @param[in] ipv6_legacy_addr     An IPv6 address.
  *
- * @return  1 if *ipv6_addr* is solicited-node multicast address,
+ * @return  1 if *ipv6_legacy_addr* is solicited-node multicast address,
  *          0 otherwise.
  */
-static inline int ipv6_addr_is_solicited_node(const ipv6_addr_t *ipv6_addr)
+static inline int ipv6_legacy_addr_is_solicited_node(const ipv6_legacy_addr_t *ipv6_legacy_addr)
 {
-    return (ipv6_addr->uint32[0] == HTONL(0xff020000)) &&
-           (ipv6_addr->uint32[1] == 0) &&
-           (ipv6_addr->uint32[2] == HTONL(1)) &&
-           (ipv6_addr->uint8[12] == 0xff);
+    return (ipv6_legacy_addr->uint32[0] == HTONL(0xff020000)) &&
+           (ipv6_legacy_addr->uint32[1] == 0) &&
+           (ipv6_legacy_addr->uint32[2] == HTONL(1)) &&
+           (ipv6_legacy_addr->uint8[12] == 0xff);
 }
 
 /**
  * @brief   Get pointer to potential EUI-64 bit of the IPv6 address.
  *
- * @param[in] ipv6_addr     An IPv6 address of this node.
+ * @param[in] ipv6_legacy_addr     An IPv6 address of this node.
  * @param[in] prefix_len    Length of the prefix. Only multiples of 8 are
  *                          possible.
  *
  * @return  The IID (as EUI-64) of this node.
  */
-static inline net_if_eui64_t *ipv6_addr_get_iid(const ipv6_addr_t *ipv6_addr,
+static inline net_if_eui64_t *ipv6_legacy_addr_get_iid(const ipv6_legacy_addr_t *ipv6_legacy_addr,
         uint8_t prefix_len)
 {
-    return ((net_if_eui64_t *) &ipv6_addr->uint8[prefix_len / 8]);
+    return ((net_if_eui64_t *) &ipv6_legacy_addr->uint8[prefix_len / 8]);
 }
 
 /*
- * TODO to wrap sixlowpan initialisations
- * int ipv6_iface_init(transceiver_type_t trans, ..);
+ * TODO to wrap sixlowpan_legacy initialisations
+ * int ipv6_legacy_iface_init(transceiver_type_t trans, ..);
  */
 
 /**
@@ -506,7 +506,7 @@ static inline net_if_eui64_t *ipv6_addr_get_iid(const ipv6_addr_t *ipv6_addr,
  *
  * @return 1 on success, 0 on failure.
  */
-int ipv6_net_if_add_addr(int if_id, const ipv6_addr_t *addr,
+int ipv6_legacy_net_if_add_addr(int if_id, const ipv6_legacy_addr_t *addr,
                          ndp_addr_state_t state, uint32_t val_ltime,
                          uint32_t pref_ltime, uint8_t is_anycast);
 
@@ -524,7 +524,7 @@ int ipv6_net_if_add_addr(int if_id, const ipv6_addr_t *addr,
  * @param[in]   dest    The destination address for a packet we search
  *                      the source address for.
  */
-void ipv6_net_if_get_best_src_addr(ipv6_addr_t *src, const ipv6_addr_t *dest);
+void ipv6_legacy_net_if_get_best_src_addr(ipv6_legacy_addr_t *src, const ipv6_legacy_addr_t *dest);
 
 /**
  * @brief   Registers a function that decides how to route incomming
@@ -538,7 +538,7 @@ void ipv6_net_if_get_best_src_addr(ipv6_addr_t *src, const ipv6_addr_t *dest);
  *
  * @param   next_hop    function that returns the next hop to reach dest
  */
-void ipv6_iface_set_routing_provider(ipv6_addr_t *(*next_hop)(ipv6_addr_t *dest));
+void ipv6_legacy_iface_set_routing_provider(ipv6_legacy_addr_t *(*next_hop)(ipv6_legacy_addr_t *dest));
 
 /**
  * @brief   Registers a function that decides if a node in a RPL-network is actually the
@@ -546,7 +546,7 @@ void ipv6_iface_set_routing_provider(ipv6_addr_t *(*next_hop)(ipv6_addr_t *dest)
  *          Only used in RPL non-storing mode by now.
  *
  */
-void ipv6_iface_set_srh_indicator(uint8_t (*srh_indi)(void));
+void ipv6_legacy_iface_set_srh_indicator(uint8_t (*srh_indi)(void));
 
 /**
  * @brief Calculates the IPv6 upper-layer checksum.
@@ -554,18 +554,18 @@ void ipv6_iface_set_srh_indicator(uint8_t (*srh_indi)(void));
  * @see <a href="http://tools.ietf.org/html/rfc2460#section-8.1">
  *          RFC 2460, section 8.1
  *      </a>
- * @param[in] ipv6_header   Pointer to the IPv6 header of the packet.
+ * @param[in] ipv6_legacy_header   Pointer to the IPv6 header of the packet.
  * @param[in] buf           Pointer to the upper-layer payload of the IP datagram.
  * @param[in] len           The length of the upper-layer header and data.
  * @param[in] proto         Upper-layer protocol number according to RFC1700.
  *
  * @return The IPv6 upper-layer checksum.
  */
-uint16_t ipv6_csum(ipv6_hdr_t *ipv6_header, uint8_t *buf, uint16_t len, uint8_t proto);
+uint16_t ipv6_legacy_csum(ipv6_legacy_hdr_t *ipv6_legacy_header, uint8_t *buf, uint16_t len, uint8_t proto);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* SIXLOWPAN_IP_H */
+#endif /* SIXLOWPAN_LEGACY_IP_H */
 /** @} */

@@ -30,7 +30,7 @@
 #include "thread.h"
 #include "transceiver.h"
 
-#include "sixlowpan/ip.h"
+#include "sixlowpan_legacy/ip.h"
 #include "ieee802154_frame.h"
 #include "etx_beaconing.h"
 
@@ -50,7 +50,7 @@
 /* prototytpes */
 static uint8_t etx_count_packet_tx(etx_neighbor_t *candidate);
 static void etx_set_packets_received(void);
-static bool etx_equal_id(ipv6_addr_t *id1, ipv6_addr_t *id2);
+static bool etx_equal_id(ipv6_legacy_addr_t *id1, ipv6_legacy_addr_t *id2);
 
 static void *etx_beacon(void *);
 static void *etx_clock(void *);
@@ -110,7 +110,7 @@ transceiver_command_t tcmd;
 //Message to send probes with
 msg_t mesg;
 
-static ipv6_addr_t *own_address;
+static ipv6_legacy_addr_t *own_address;
 
 static etx_probe_t *etx_get_send_buf(void)
 {
@@ -137,14 +137,14 @@ void etx_show_candidates(void)
                "\t cur_etx:%f\n"
                "\t packets_rx:%d\n"
                "\t packets_tx:%d\n"
-               "\t used:%d\n", candidate->addr.uint8[ETX_IPV6_LAST_BYTE],
+               "\t used:%d\n", candidate->addr.uint8[ETX_IPV6_LEGACY_LAST_BYTE],
                candidate->cur_etx, candidate->packets_rx,
                etx_count_packet_tx(candidate),
                candidate->used);
     }
 }
 
-void etx_init_beaconing(ipv6_addr_t *address)
+void etx_init_beaconing(ipv6_legacy_addr_t *address)
 {
     own_address = address;
     //set code
@@ -188,7 +188,7 @@ static void *etx_beacon(void *arg)
         for (uint8_t i = 0; i < ETX_BEST_CANDIDATES; i++) {
             if (candidates[i].used != 0) {
                 packet->data[i * ETX_TUPLE_SIZE] =
-                    candidates[i].addr.uint8[ETX_IPV6_LAST_BYTE];
+                    candidates[i].addr.uint8[ETX_IPV6_LEGACY_LAST_BYTE];
                 packet->data[i * ETX_TUPLE_SIZE + ETX_PKT_REC_OFFSET] =
                     etx_count_packet_tx(&candidates[i]);
                 p_length = p_length + ETX_PKT_HDR_LEN;
@@ -199,7 +199,7 @@ static void *etx_beacon(void *arg)
         /* will be send broadcast, so if_id and destination address will be
          * ignored (see documentation)
          */
-        sixlowpan_mac_send_ieee802154_frame(0, NULL, 8, &etx_send_buf[0],
+        sixlowpan_legacy_mac_send_ieee802154_frame(0, NULL, 8, &etx_send_buf[0],
                                             ETX_DATA_MAXLEN + ETX_PKT_HDR_LEN, 1);
         DEBUG("sent beacon!\n");
         etx_set_packets_received();
@@ -220,7 +220,7 @@ static void *etx_beacon(void *arg)
     return NULL;
 }
 
-etx_neighbor_t *etx_find_candidate(ipv6_addr_t *address)
+etx_neighbor_t *etx_find_candidate(ipv6_legacy_addr_t *address)
 {
     /*
      * find the candidate with address address and returns it, or returns NULL
@@ -273,7 +273,7 @@ static void *etx_clock(void *arg)
     return NULL;
 }
 
-double etx_get_metric(ipv6_addr_t *address)
+double etx_get_metric(ipv6_legacy_addr_t *address)
 {
     etx_neighbor_t *candidate = etx_find_candidate(address);
 
@@ -292,7 +292,7 @@ double etx_get_metric(ipv6_addr_t *address)
     return 0;
 }
 
-etx_neighbor_t *etx_add_candidate(ipv6_addr_t *address)
+etx_neighbor_t *etx_add_candidate(ipv6_legacy_addr_t *address)
 {
     DEBUG("add candidate\n");
     /*
@@ -340,7 +340,7 @@ etx_neighbor_t *etx_add_candidate(ipv6_addr_t *address)
     return NULL ;
 }
 
-void etx_handle_beacon(ipv6_addr_t *candidate_address)
+void etx_handle_beacon(ipv6_legacy_addr_t *candidate_address)
 {
     /*
      * Handle the ETX probe that has been received and update all infos.
@@ -352,7 +352,7 @@ void etx_handle_beacon(ipv6_addr_t *candidate_address)
         "\tPackage Option:%x\n"
         "\t   Data Length:%u\n"
         "\tSource Address:%d\n\n", etx_rec_buf[ETX_PKT_OPT], etx_rec_buf[ETX_PKT_LEN],
-        candidate_address->uint8[ETX_IPV6_LAST_BYTE]);
+        candidate_address->uint8[ETX_IPV6_LEGACY_LAST_BYTE]);
 
     etx_neighbor_t *candidate = etx_find_candidate(candidate_address);
 
@@ -381,7 +381,7 @@ void etx_handle_beacon(ipv6_addr_t *candidate_address)
               rec_pkt->data[i * ETX_TUPLE_SIZE + ETX_PKT_REC_OFFSET]);
 
         if (rec_pkt->data[i * ETX_TUPLE_SIZE]
-            == own_address->uint8[ETX_IPV6_LAST_BYTE]) {
+            == own_address->uint8[ETX_IPV6_LEGACY_LAST_BYTE]) {
 
             candidate->packets_rx = rec_pkt->data[i * ETX_TUPLE_SIZE
                                                   + ETX_PKT_REC_OFFSET];
@@ -403,11 +403,11 @@ static void *etx_radio(void *arg)
 
     msg_init_queue(msg_que, ETX_RCV_QUEUE_SIZE);
 
-    ipv6_addr_t ll_address;
-    ipv6_addr_t candidate_addr;
+    ipv6_legacy_addr_t ll_address;
+    ipv6_legacy_addr_t candidate_addr;
 
-    ipv6_addr_set_link_local_prefix(&ll_address);
-    ipv6_net_if_get_best_src_addr(&candidate_addr, &ll_address);
+    ipv6_legacy_addr_set_link_local_prefix(&ll_address);
+    ipv6_legacy_net_if_get_best_src_addr(&candidate_addr, &ll_address);
 
     while (1) {
         msg_receive(&m);
@@ -424,7 +424,7 @@ static void *etx_radio(void *arg)
                 //create IPv6 address from radio packet
                 //we can do the cast here since rpl nodes can only have addr
                 //up to 8 bits
-                candidate_addr.uint8[ETX_IPV6_LAST_BYTE] = (uint8_t) p->src;
+                candidate_addr.uint8[ETX_IPV6_LEGACY_LAST_BYTE] = (uint8_t) p->src;
                 //handle the beacon
                 mutex_lock(&etx_mutex);
                 etx_handle_beacon(&candidate_addr);
@@ -486,7 +486,7 @@ void etx_update(etx_neighbor_t *candidate)
         "\n"
         "Received Packets: %d\n"
         "Sent Packets    : %d\n\n",
-        candidate->cur_etx, candidate->addr.uint8[ETX_IPV6_LAST_BYTE],
+        candidate->cur_etx, candidate->addr.uint8[ETX_IPV6_LEGACY_LAST_BYTE],
         d_f, d_r, candidate->packets_rx, etx_count_packet_tx(candidate));
 }
 
@@ -552,7 +552,7 @@ static void etx_set_packets_received(void)
     }
 }
 
-bool etx_equal_id(ipv6_addr_t *id1, ipv6_addr_t *id2)
+bool etx_equal_id(ipv6_legacy_addr_t *id1, ipv6_legacy_addr_t *id2)
 {
     for (uint8_t i = 0; i < 4; i++) {
         if (id1->uint32[i] != id2->uint32[i]) {

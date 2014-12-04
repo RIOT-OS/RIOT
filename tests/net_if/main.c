@@ -33,14 +33,14 @@ int main(void)
     net_if_addr_t addr1 = {
         .addr_next = NULL,
         .addr_prev = NULL,
-        .addr_protocol = NET_IF_L3P_IPV6_MULTICAST,
+        .addr_protocol = NET_IF_L3P_IPV6_LEGACY_MULTICAST,
         .addr_data = (void *)addr1_data,
         .addr_len = (strlen(addr1_data) + 1) * 8
     };
     net_if_addr_t addr2 = {
         .addr_next = NULL,
         .addr_prev = NULL,
-        .addr_protocol = NET_IF_L3P_IPV6_PREFIX,
+        .addr_protocol = NET_IF_L3P_IPV6_LEGACY_PREFIX,
         .addr_data = (void *)addr2_data,
         .addr_len = (strlen(addr2_data) + 1) * 8
     };
@@ -138,7 +138,7 @@ int test_net_if_initialization(int iface)
 
 int test_net_if_get_add_l3p_types(int iface)
 {
-    if (net_if_add_l3p_types(iface + 1, NET_IF_L3P_IPV6_UNICAST)) {
+    if (net_if_add_l3p_types(iface + 1, NET_IF_L3P_IPV6_LEGACY_UNICAST)) {
         printf("FAILED: expected net_if_add_l3p_types to fail for iface %d.\n",
                iface + 1);
         return 0;
@@ -151,24 +151,24 @@ int test_net_if_get_add_l3p_types(int iface)
     }
 
 
-    if (!net_if_add_l3p_types(iface, NET_IF_L3P_IPV6_UNICAST)) {
+    if (!net_if_add_l3p_types(iface, NET_IF_L3P_IPV6_LEGACY_UNICAST)) {
         printf("FAILED: expected net_if_add_l3p_types to succeed for iface %d and no type\n",
                iface);
         return 0;
     }
 
-    if (!(net_if_get_l3p_types(iface) & NET_IF_L3P_IPV6_UNICAST)) {
+    if (!(net_if_get_l3p_types(iface) & NET_IF_L3P_IPV6_LEGACY_UNICAST)) {
         printf("FAILED: L3 type IPv6 unicast expected on interface %d.\n", iface);
         return 0;
     }
 
-    if (net_if_get_l3p_types(iface) & ~NET_IF_L3P_IPV6_UNICAST) {
+    if (net_if_get_l3p_types(iface) & ~NET_IF_L3P_IPV6_LEGACY_UNICAST) {
         printf("FAILED: L3 type other than IPv6 unicast not expected on interface %d.\n",
                iface);
         return 0;
     }
 
-    if (net_if_del_l3p_types(iface + 1, NET_IF_L3P_IPV6_UNICAST)) {
+    if (net_if_del_l3p_types(iface + 1, NET_IF_L3P_IPV6_LEGACY_UNICAST)) {
         printf("FAILED: expected net_if_del_l3p_types to fail for iface %d.\n",
                iface + 1);
         return 0;
@@ -180,7 +180,7 @@ int test_net_if_get_add_l3p_types(int iface)
         return 0;
     }
 
-    if (!net_if_del_l3p_types(iface, NET_IF_L3P_IPV6_UNICAST)) {
+    if (!net_if_del_l3p_types(iface, NET_IF_L3P_IPV6_LEGACY_UNICAST)) {
         printf("FAILED: expected net_if_del_l3p_types to succeed for iface %d and no type\n",
                iface);
         return 0;
@@ -217,12 +217,12 @@ int test_net_if_add_address(int iface, net_if_addr_t *addr1,
         return 0;
     }
 
-    if (!(net_if_get_l3p_types(iface) & NET_IF_L3P_IPV6_MULTICAST)) {
+    if (!(net_if_get_l3p_types(iface) & NET_IF_L3P_IPV6_LEGACY_MULTICAST)) {
         printf("FAILED: L3 type IPv6 multicast expected on interface %d.\n", iface);
         return 0;
     }
 
-    if (net_if_get_l3p_types(iface) & ~NET_IF_L3P_IPV6_MULTICAST) {
+    if (net_if_get_l3p_types(iface) & ~NET_IF_L3P_IPV6_LEGACY_MULTICAST) {
         printf("FAILED: L3 type other than IPv6 multicast not expected on interface %d.\n",
                iface);
         return 0;
@@ -233,17 +233,17 @@ int test_net_if_add_address(int iface, net_if_addr_t *addr1,
         return 0;
     }
 
-    if (!(net_if_get_l3p_types(iface) & NET_IF_L3P_IPV6_MULTICAST)) {
+    if (!(net_if_get_l3p_types(iface) & NET_IF_L3P_IPV6_LEGACY_MULTICAST)) {
         printf("FAILED: L3 type IPv6 multcast expected on interface %d.\n", iface);
         return 0;
     }
 
-    if (!(net_if_get_l3p_types(iface) & NET_IF_L3P_IPV6_PREFIX)) {
+    if (!(net_if_get_l3p_types(iface) & NET_IF_L3P_IPV6_LEGACY_PREFIX)) {
         printf("FAILED: L3 type IPv6 prefix expected on interface %d.\n", iface);
         return 0;
     }
 
-    if (net_if_get_l3p_types(iface) & ~(NET_IF_L3P_IPV6_MULTICAST | NET_IF_L3P_IPV6_PREFIX)) {
+    if (net_if_get_l3p_types(iface) & ~(NET_IF_L3P_IPV6_LEGACY_MULTICAST | NET_IF_L3P_IPV6_LEGACY_PREFIX)) {
         printf("FAILED: L3 type other than IPv6 multicast and IPv6 prefix not expected on interface %d.\n",
                iface);
         return 0;

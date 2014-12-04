@@ -19,7 +19,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "sixlowpan.h"
+#include "sixlowpan_legacy.h"
 #include "thread.h"
 #include "vtimer.h"
 

@@ -7,7 +7,7 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  *
- * @ingroup sixlowpan
+ * @ingroup sixlowpan_legacy
  * @{
  * @file    sixlownd.c
  * @brief   6lowpan neighbor discovery functions
@@ -25,7 +25,7 @@
 #include "vtimer.h"
 #include "mutex.h"
 #include "net_if.h"
-#include "sixlowpan/error.h"
+#include "sixlowpan_legacy/error.h"
 
 #include "ip.h"
 #include "icmp.h"
@@ -38,7 +38,7 @@
 #endif
 #include "debug.h"
 
-#define LLHDR_ICMPV6HDR_LEN             (LL_HDR_LEN + IPV6_HDR_LEN + ICMPV6_HDR_LEN)
+#define LLHDR_ICMPV6HDR_LEN             (LL_HDR_LEN + IPV6_LEGACY_HDR_LEN + ICMPV6_HDR_LEN)
 #define ND_HOPLIMIT                     (0xFF)
 
 /* parameter problem [rfc4443] */
@@ -97,7 +97,7 @@
 #define PREFIX_BUF_LEN                  (NET_IF_MAX * OPT_PI_LIST_LEN)
 
 /* extern variables */
-uint8_t ipv6_ext_hdr_len = 0;
+uint8_t ipv6_legacy_ext_hdr_len = 0;
 
 /* counter */
 uint8_t abr_count = 0;
@@ -112,12 +112,12 @@ ndp_a6br_cache_t abr_cache[ABR_CACHE_SIZE];
 ndp_neighbor_cache_t nbr_cache[NBR_CACHE_SIZE];
 ndp_default_router_list_t def_rtr_lst[DEF_RTR_LST_SIZE];
 ndp_prefix_info_t prefix_info_buf[PREFIX_BUF_LEN];
-uint8_t prefix_buf[sizeof(ipv6_addr_t) * PREFIX_BUF_LEN];
+uint8_t prefix_buf[sizeof(ipv6_legacy_addr_t) * PREFIX_BUF_LEN];
 
 /* pointer */
 static uint8_t *llao;
 
-static ipv6_hdr_t *ipv6_buf;
+static ipv6_legacy_hdr_t *ipv6_legacy_buf;
 static icmpv6_hdr_t *icmp_buf;
 static icmpv6_router_adv_hdr_t *rtr_adv_buf;
 static icmpv6_neighbor_sol_hdr_t *nbr_sol_buf;
@@ -135,7 +135,7 @@ ndp_neighbor_cache_t *nbr_entry;
 ndp_default_router_list_t *def_rtr_entry;
 
 /* elements */
-//ipv6_addr_t tmpaddr;
+//ipv6_legacy_addr_t tmpaddr;
 
 uint8_t recvd_cids[NDP_6LOWPAN_CONTEXT_MAX];
 uint8_t icmpv6_opt_hdr_len = 0;
@@ -143,7 +143,7 @@ uint8_t recvd_cids_len = 0;
 ndp_prefix_info_t *recvd_prefixes[PREFIX_BUF_LEN];
 uint8_t recvd_pref_len = 0;
 
-void def_rtr_lst_add(ipv6_addr_t *ipaddr, uint32_t rtr_ltime);
+void def_rtr_lst_add(ipv6_legacy_addr_t *ipaddr, uint32_t rtr_ltime);
 void def_rtr_lst_rem(ndp_default_router_list_t *entry);
 
 /**
@@ -238,82 +238,82 @@ static icmpv6_ndp_opt_aro_t *get_opt_aro_buf(uint8_t ext_len, uint8_t opt_len)
     return ((icmpv6_ndp_opt_aro_t *) &buffer[LLHDR_ICMPV6HDR_LEN + ext_len + opt_len]);
 }
 
-void icmpv6_send_echo_request(ipv6_addr_t *destaddr, uint16_t id, uint16_t seq, uint8_t *data, size_t data_len)
+void icmpv6_send_echo_request(ipv6_legacy_addr_t *destaddr, uint16_t id, uint16_t seq, uint8_t *data, size_t data_len)
 {
     uint16_t packet_length;
 
-    ipv6_buf = ipv6_get_buf();
-    icmp_buf = get_icmpv6_buf(ipv6_ext_hdr_len);
-    icmpv6_echo_request_hdr_t *echo_buf = get_echo_req_buf(ipv6_ext_hdr_len);
+    ipv6_legacy_buf = ipv6_legacy_get_buf();
+    icmp_buf = get_icmpv6_buf(ipv6_legacy_ext_hdr_len);
+    icmpv6_echo_request_hdr_t *echo_buf = get_echo_req_buf(ipv6_legacy_ext_hdr_len);
     uint8_t *echo_data_buf = ((uint8_t *)echo_buf) + sizeof(icmpv6_echo_request_hdr_t);
 
     icmp_buf->type = ICMPV6_TYPE_ECHO_REQUEST;
     icmp_buf->code = 0;
-    ipv6_buf->version_trafficclass = IPV6_VER;
-    ipv6_buf->trafficclass_flowlabel = 0;
-    ipv6_buf->flowlabel = 0;
-    ipv6_buf->nextheader = IPV6_PROTO_NUM_ICMPV6;
-    ipv6_buf->hoplimit = ipv6_get_default_hop_limit();
+    ipv6_legacy_buf->version_trafficclass = IPV6_LEGACY_VER;
+    ipv6_legacy_buf->trafficclass_flowlabel = 0;
+    ipv6_legacy_buf->flowlabel = 0;
+    ipv6_legacy_buf->nextheader = IPV6_LEGACY_PROTO_NUM_ICMPV6;
+    ipv6_legacy_buf->hoplimit = ipv6_legacy_get_default_hop_limit();
 
-    memcpy(&ipv6_buf->destaddr, destaddr, sizeof(ipv6_addr_t));
-    ipv6_net_if_get_best_src_addr(&ipv6_buf->srcaddr, &ipv6_buf->destaddr);
+    memcpy(&ipv6_legacy_buf->destaddr, destaddr, sizeof(ipv6_legacy_addr_t));
+    ipv6_legacy_net_if_get_best_src_addr(&ipv6_legacy_buf->srcaddr, &ipv6_legacy_buf->destaddr);
     echo_buf->id = HTONS(id);
     echo_buf->seq = HTONS(seq);
 
     memcpy(echo_data_buf, data, data_len);
-    packet_length = IPV6_HDR_LEN + ICMPV6_HDR_LEN + ipv6_ext_hdr_len +
+    packet_length = IPV6_LEGACY_HDR_LEN + ICMPV6_HDR_LEN + ipv6_legacy_ext_hdr_len +
                     ECHO_REQ_LEN + data_len;
 
-    ipv6_buf->length = HTONS(packet_length - IPV6_HDR_LEN);
+    ipv6_legacy_buf->length = HTONS(packet_length - IPV6_LEGACY_HDR_LEN);
 
-    icmp_buf->checksum = icmpv6_csum(ipv6_buf, icmp_buf);
+    icmp_buf->checksum = icmpv6_csum(ipv6_legacy_buf, icmp_buf);
 
 #ifdef DEBUG_ENABLED
-    char addr_str[IPV6_MAX_ADDR_STR_LEN];
+    char addr_str[IPV6_LEGACY_MAX_ADDR_STR_LEN];
     printf("INFO: send echo request (id = %04x, seq = %d, data_len = %zu) to: %s\n",
-           id, seq, data_len, ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
-                   &ipv6_buf->destaddr));
+           id, seq, data_len, ipv6_legacy_addr_to_str(addr_str, IPV6_LEGACY_MAX_ADDR_STR_LEN,
+                   &ipv6_legacy_buf->destaddr));
 #endif
-    ipv6_send_packet(ipv6_buf, NULL);
+    ipv6_legacy_send_packet(ipv6_legacy_buf, NULL);
 }
 
-void icmpv6_send_echo_reply(ipv6_addr_t *destaddr, uint16_t id, uint16_t seq, uint8_t *data, size_t data_len)
+void icmpv6_send_echo_reply(ipv6_legacy_addr_t *destaddr, uint16_t id, uint16_t seq, uint8_t *data, size_t data_len)
 {
     uint16_t packet_length;
 
-    ipv6_buf = ipv6_get_buf();
-    icmp_buf = get_icmpv6_buf(ipv6_ext_hdr_len);
-    icmpv6_echo_reply_hdr_t *echo_buf = get_echo_repl_buf(ipv6_ext_hdr_len);
+    ipv6_legacy_buf = ipv6_legacy_get_buf();
+    icmp_buf = get_icmpv6_buf(ipv6_legacy_ext_hdr_len);
+    icmpv6_echo_reply_hdr_t *echo_buf = get_echo_repl_buf(ipv6_legacy_ext_hdr_len);
     uint8_t *echo_data_buf = ((uint8_t *)echo_buf) + sizeof(icmpv6_echo_reply_hdr_t);
 
     icmp_buf->type = ICMPV6_TYPE_ECHO_REPLY;
     icmp_buf->code = 0;
-    ipv6_buf->version_trafficclass = IPV6_VER;
-    ipv6_buf->trafficclass_flowlabel = 0;
-    ipv6_buf->flowlabel = 0;
-    ipv6_buf->nextheader = IPV6_PROTO_NUM_ICMPV6;
-    ipv6_buf->hoplimit = ipv6_get_default_hop_limit();
+    ipv6_legacy_buf->version_trafficclass = IPV6_LEGACY_VER;
+    ipv6_legacy_buf->trafficclass_flowlabel = 0;
+    ipv6_legacy_buf->flowlabel = 0;
+    ipv6_legacy_buf->nextheader = IPV6_LEGACY_PROTO_NUM_ICMPV6;
+    ipv6_legacy_buf->hoplimit = ipv6_legacy_get_default_hop_limit();
 
-    memcpy(&ipv6_buf->destaddr, destaddr, sizeof(ipv6_addr_t));
-    ipv6_net_if_get_best_src_addr(&ipv6_buf->srcaddr, &ipv6_buf->destaddr);
+    memcpy(&ipv6_legacy_buf->destaddr, destaddr, sizeof(ipv6_legacy_addr_t));
+    ipv6_legacy_net_if_get_best_src_addr(&ipv6_legacy_buf->srcaddr, &ipv6_legacy_buf->destaddr);
     echo_buf->id = HTONS(id);
     echo_buf->seq = HTONS(seq);
 
     memcpy(echo_data_buf, data, data_len);
-    packet_length = IPV6_HDR_LEN + ICMPV6_HDR_LEN + ipv6_ext_hdr_len +
+    packet_length = IPV6_LEGACY_HDR_LEN + ICMPV6_HDR_LEN + ipv6_legacy_ext_hdr_len +
                     ECHO_REPL_LEN + data_len;
 
-    ipv6_buf->length = HTONS(packet_length - IPV6_HDR_LEN);
+    ipv6_legacy_buf->length = HTONS(packet_length - IPV6_LEGACY_HDR_LEN);
 
-    icmp_buf->checksum = icmpv6_csum(ipv6_buf, icmp_buf);
+    icmp_buf->checksum = icmpv6_csum(ipv6_legacy_buf, icmp_buf);
 
 #ifdef DEBUG_ENABLED
-    char addr_str[IPV6_MAX_ADDR_STR_LEN];
+    char addr_str[IPV6_LEGACY_MAX_ADDR_STR_LEN];
     printf("INFO: send echo reply (id = %04x, seq = %d, data_len = %zu) to: %s\n",
-           id, seq, data_len, ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
-                   &ipv6_buf->destaddr));
+           id, seq, data_len, ipv6_legacy_addr_to_str(addr_str, IPV6_LEGACY_MAX_ADDR_STR_LEN,
+                   &ipv6_legacy_buf->destaddr));
 #endif
-    ipv6_send_packet(ipv6_buf, NULL);
+    ipv6_legacy_send_packet(ipv6_legacy_buf, NULL);
 }
 
 /* send router solicitation message - RFC4861 section 4.1 */
@@ -321,70 +321,70 @@ void icmpv6_send_router_sol(uint8_t sllao)
 {
     uint16_t packet_length;
 
-    ipv6_buf = ipv6_get_buf();
-    icmp_buf = get_icmpv6_buf(ipv6_ext_hdr_len);
+    ipv6_legacy_buf = ipv6_legacy_get_buf();
+    icmp_buf = get_icmpv6_buf(ipv6_legacy_ext_hdr_len);
 
     icmp_buf->type = ICMPV6_TYPE_ROUTER_SOL;
     icmp_buf->code = 0;
-    ipv6_buf->version_trafficclass = IPV6_VER;
-    ipv6_buf->trafficclass_flowlabel = 0;
-    ipv6_buf->flowlabel = 0;
-    ipv6_buf->nextheader = IPV6_PROTO_NUM_ICMPV6;
-    ipv6_buf->hoplimit = ND_HOPLIMIT;
+    ipv6_legacy_buf->version_trafficclass = IPV6_LEGACY_VER;
+    ipv6_legacy_buf->trafficclass_flowlabel = 0;
+    ipv6_legacy_buf->flowlabel = 0;
+    ipv6_legacy_buf->nextheader = IPV6_LEGACY_PROTO_NUM_ICMPV6;
+    ipv6_legacy_buf->hoplimit = ND_HOPLIMIT;
 
-    ipv6_addr_set_all_routers_addr(&ipv6_buf->destaddr);
-    //iface_find_src_ipaddr(&ipv6_buf->srcaddr, NDP_ADDR_STATE_PREFERRED,
-    /*                      IPV6_ADDR_TYPE_MULTICAST); */
+    ipv6_legacy_addr_set_all_routers_addr(&ipv6_legacy_buf->destaddr);
+    //iface_find_src_ipaddr(&ipv6_legacy_buf->srcaddr, NDP_ADDR_STATE_PREFERRED,
+    /*                      IPV6_LEGACY_ADDR_TYPE_MULTICAST); */
 
-    ipv6_net_if_get_best_src_addr(&(ipv6_buf->srcaddr), &(ipv6_buf->destaddr));
+    ipv6_legacy_net_if_get_best_src_addr(&(ipv6_legacy_buf->srcaddr), &(ipv6_legacy_buf->destaddr));
 
     icmpv6_opt_hdr_len = RTR_SOL_LEN;
 
     if (sllao == OPT_SLLAO) {
-        opt_stllao_buf = get_opt_stllao_buf(ipv6_ext_hdr_len, icmpv6_opt_hdr_len);
+        opt_stllao_buf = get_opt_stllao_buf(ipv6_legacy_ext_hdr_len, icmpv6_opt_hdr_len);
         int if_id = 0;  // TODO get this somehow
 
         if (net_if_get_src_address_mode(if_id) == NET_IF_TRANS_ADDR_M_LONG) {
             icmpv6_ndp_set_sllao(opt_stllao_buf, if_id, NDP_OPT_SLLAO_TYPE, 2);
-            packet_length = IPV6_HDR_LEN + ICMPV6_HDR_LEN + ipv6_ext_hdr_len +
+            packet_length = IPV6_LEGACY_HDR_LEN + ICMPV6_HDR_LEN + ipv6_legacy_ext_hdr_len +
                             RTR_SOL_LEN + OPT_STLLAO_MAX_LEN;
         }
         else {
             icmpv6_ndp_set_sllao(opt_stllao_buf, if_id, NDP_OPT_SLLAO_TYPE, 1);
-            packet_length = IPV6_HDR_LEN + ICMPV6_HDR_LEN + ipv6_ext_hdr_len +
+            packet_length = IPV6_LEGACY_HDR_LEN + ICMPV6_HDR_LEN + ipv6_legacy_ext_hdr_len +
                             RTR_SOL_LEN + OPT_STLLAO_MIN_LEN;
         }
     }
     else {
-        packet_length = IPV6_HDR_LEN + ICMPV6_HDR_LEN + ipv6_ext_hdr_len +
+        packet_length = IPV6_LEGACY_HDR_LEN + ICMPV6_HDR_LEN + ipv6_legacy_ext_hdr_len +
                         RTR_SOL_LEN;
     }
 
-    ipv6_buf->length = HTONS(packet_length - IPV6_HDR_LEN);
+    ipv6_legacy_buf->length = HTONS(packet_length - IPV6_LEGACY_HDR_LEN);
 
-    icmp_buf->checksum = icmpv6_csum(ipv6_buf, icmp_buf);
+    icmp_buf->checksum = icmpv6_csum(ipv6_legacy_buf, icmp_buf);
 
 #ifdef DEBUG_ENABLED
-    char addr_str[IPV6_MAX_ADDR_STR_LEN];
+    char addr_str[IPV6_LEGACY_MAX_ADDR_STR_LEN];
     printf("INFO: send router solicitation to: %s\n",
-           ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
-                            &ipv6_buf->destaddr));
+           ipv6_legacy_addr_to_str(addr_str, IPV6_LEGACY_MAX_ADDR_STR_LEN,
+                            &ipv6_legacy_buf->destaddr));
 #endif
-    ipv6_send_packet(ipv6_buf, NULL);
+    ipv6_legacy_send_packet(ipv6_legacy_buf, NULL);
 }
 
 void recv_echo_req(void)
 {
-    ipv6_buf = ipv6_get_buf();
-    icmpv6_echo_request_hdr_t *echo_buf = get_echo_req_buf(ipv6_ext_hdr_len);
+    ipv6_legacy_buf = ipv6_legacy_get_buf();
+    icmpv6_echo_request_hdr_t *echo_buf = get_echo_req_buf(ipv6_legacy_ext_hdr_len);
     uint8_t *echo_data_buf = ((uint8_t *)echo_buf) + sizeof(icmpv6_echo_reply_hdr_t);
-    size_t data_len = NTOHS(ipv6_buf->length) - ICMPV6_HDR_LEN - ECHO_REQ_LEN;
+    size_t data_len = NTOHS(ipv6_legacy_buf->length) - ICMPV6_HDR_LEN - ECHO_REQ_LEN;
 
 #ifdef DEBUG_ENABLED
-    char addr_str[IPV6_MAX_ADDR_STR_LEN];
+    char addr_str[IPV6_LEGACY_MAX_ADDR_STR_LEN];
     printf("INFO: received echo request from: %s\n",
-           ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
-                            &ipv6_buf->srcaddr));
+           ipv6_legacy_addr_to_str(addr_str, IPV6_LEGACY_MAX_ADDR_STR_LEN,
+                            &ipv6_legacy_buf->srcaddr));
     printf("\n");
     printf("id = 0x%04x, seq = %d, data_len = %zu\n", NTOHS(echo_buf->id),
            NTOHS(echo_buf->seq), data_len);
@@ -398,22 +398,22 @@ void recv_echo_req(void)
     }
 
 #endif
-    icmpv6_send_echo_reply(&ipv6_buf->srcaddr, NTOHS(echo_buf->id),
+    icmpv6_send_echo_reply(&ipv6_legacy_buf->srcaddr, NTOHS(echo_buf->id),
                            NTOHS(echo_buf->seq), echo_data_buf, data_len);
 }
 
 void recv_echo_repl(void)
 {
 #ifdef DEBUG_ENABLED
-    ipv6_buf = ipv6_get_buf();
-    icmpv6_echo_reply_hdr_t *echo_buf = get_echo_repl_buf(ipv6_ext_hdr_len);
+    ipv6_legacy_buf = ipv6_legacy_get_buf();
+    icmpv6_echo_reply_hdr_t *echo_buf = get_echo_repl_buf(ipv6_legacy_ext_hdr_len);
     uint8_t *echo_data_buf = ((uint8_t *)echo_buf) + sizeof(icmpv6_echo_reply_hdr_t);
-    size_t data_len = NTOHS(ipv6_buf->length) - ICMPV6_HDR_LEN - ECHO_REPL_LEN;
-    char addr_str[IPV6_MAX_ADDR_STR_LEN];
+    size_t data_len = NTOHS(ipv6_legacy_buf->length) - ICMPV6_HDR_LEN - ECHO_REPL_LEN;
+    char addr_str[IPV6_LEGACY_MAX_ADDR_STR_LEN];
 
     printf("INFO: received echo reply from: %s\n",
-           ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
-                            &ipv6_buf->srcaddr));
+           ipv6_legacy_addr_to_str(addr_str, IPV6_LEGACY_MAX_ADDR_STR_LEN,
+                            &ipv6_legacy_buf->srcaddr));
     printf("\n");
     printf("id = 0x%04x, seq = %d, data_len = %zu\n", NTOHS(echo_buf->id),
            NTOHS(echo_buf->seq), data_len);
@@ -431,18 +431,18 @@ void recv_echo_repl(void)
 void recv_rtr_sol(void)
 {
     icmpv6_opt_hdr_len = RTR_SOL_LEN;
-    ipv6_buf = ipv6_get_buf();
+    ipv6_legacy_buf = ipv6_legacy_get_buf();
 
     /* check if source option is set*/
     if (opt_stllao_buf->type == NDP_OPT_SLLAO_TYPE) {
-        opt_stllao_buf = get_opt_stllao_buf(ipv6_ext_hdr_len, icmpv6_opt_hdr_len);
+        opt_stllao_buf = get_opt_stllao_buf(ipv6_legacy_ext_hdr_len, icmpv6_opt_hdr_len);
         llao = (uint8_t *)opt_stllao_buf;
         icmpv6_opt_hdr_len += (opt_stllao_buf->length) << 3;
     }
 
     if (llao != NULL) {
         uint8_t lladdr_len;
-        nbr_entry = ndp_neighbor_cache_search(&ipv6_buf->srcaddr);
+        nbr_entry = ndp_neighbor_cache_search(&ipv6_legacy_buf->srcaddr);
 
         if (opt_stllao_buf->length == 2) {
             lladdr_len = 8;
@@ -472,7 +472,7 @@ void recv_rtr_sol(void)
         }
         else {
             /* nothing found, add neigbor into cache*/
-            ndp_neighbor_cache_add(if_id, &ipv6_buf->srcaddr, &llao[2], lladdr_len,
+            ndp_neighbor_cache_add(if_id, &ipv6_legacy_buf->srcaddr, &llao[2], lladdr_len,
                                    0, NDP_NCE_STATUS_STALE, NDP_NCE_TYPE_TENTATIVE,
                                    NBR_CACHE_LTIME_TEN);
         }
@@ -480,10 +480,10 @@ void recv_rtr_sol(void)
 
     /* send solicited router advertisment */
     if (abr_count > 0) {
-        icmpv6_send_router_adv(&ipv6_buf->srcaddr, 0, 0, OPT_PI, OPT_6CO, OPT_ABRO);
+        icmpv6_send_router_adv(&ipv6_legacy_buf->srcaddr, 0, 0, OPT_PI, OPT_6CO, OPT_ABRO);
     }
     else {
-        icmpv6_send_router_adv(&ipv6_buf->srcaddr, 0, 0, OPT_PI, 0, 0);
+        icmpv6_send_router_adv(&ipv6_legacy_buf->srcaddr, 0, 0, OPT_PI, 0, 0);
     }
 }
 
@@ -511,7 +511,7 @@ void get_opt_6co_flags(uint8_t *compression_flag, uint8_t *cid, uint8_t flags)
 
 lowpan_context_t *abr_get_context(ndp_a6br_cache_t *abr, uint8_t cid);
 
-void icmpv6_send_router_adv(ipv6_addr_t *addr, uint8_t sllao, uint8_t mtu, uint8_t pi,
+void icmpv6_send_router_adv(ipv6_legacy_addr_t *addr, uint8_t sllao, uint8_t mtu, uint8_t pi,
                             uint8_t sixco, uint8_t abro)
 {
     int if_id = 0;      // TODO: get this somehow
@@ -519,31 +519,31 @@ void icmpv6_send_router_adv(ipv6_addr_t *addr, uint8_t sllao, uint8_t mtu, uint8
     lowpan_context_t *contexts = NULL;
 
     ndp_a6br_cache_t *msg_abr = NULL;
-    ipv6_buf = ipv6_get_buf();
-    icmp_buf = get_icmpv6_buf(ipv6_ext_hdr_len);
+    ipv6_legacy_buf = ipv6_legacy_get_buf();
+    icmp_buf = get_icmpv6_buf(ipv6_legacy_ext_hdr_len);
 
-    ipv6_buf->version_trafficclass = IPV6_VER;
-    ipv6_buf->trafficclass_flowlabel = 0;
-    ipv6_buf->flowlabel = 0;
-    ipv6_buf->nextheader = IPV6_PROTO_NUM_ICMPV6;
-    ipv6_buf->hoplimit = ND_HOPLIMIT;
+    ipv6_legacy_buf->version_trafficclass = IPV6_LEGACY_VER;
+    ipv6_legacy_buf->trafficclass_flowlabel = 0;
+    ipv6_legacy_buf->flowlabel = 0;
+    ipv6_legacy_buf->nextheader = IPV6_LEGACY_PROTO_NUM_ICMPV6;
+    ipv6_legacy_buf->hoplimit = ND_HOPLIMIT;
 
     if (addr == NULL) {
         /* not solicited */
-        ipv6_addr_set_all_nodes_addr(&ipv6_buf->destaddr);
+        ipv6_legacy_addr_set_all_nodes_addr(&ipv6_legacy_buf->destaddr);
     }
     else {
-        memcpy(&ipv6_buf->destaddr, addr, 16);
+        memcpy(&ipv6_legacy_buf->destaddr, addr, 16);
     }
 
-    ipv6_net_if_get_best_src_addr(&(ipv6_buf->srcaddr), &(ipv6_buf->destaddr));
+    ipv6_legacy_net_if_get_best_src_addr(&(ipv6_legacy_buf->srcaddr), &(ipv6_legacy_buf->destaddr));
 
     icmp_buf->type = ICMPV6_TYPE_ROUTER_ADV;
     icmp_buf->code = 0;
 
     //TODO: gethoplimit func, set current ttl
 
-    rtr_adv_buf = get_rtr_adv_buf(ipv6_ext_hdr_len);
+    rtr_adv_buf = get_rtr_adv_buf(ipv6_legacy_ext_hdr_len);
     rtr_adv_buf->hoplimit = MULTIHOP_HOPLIMIT;
     /* set M and O flag, last 6 bits are zero */
     rtr_adv_buf->autoconfig_flags = ICMPV6_ROUTER_ADV_FLAG_MANAGED | ICMPV6_ROUTER_ADV_FLAG_OTHER;
@@ -552,11 +552,11 @@ void icmpv6_send_router_adv(ipv6_addr_t *addr, uint8_t sllao, uint8_t mtu, uint8
     rtr_adv_buf->retrans_timer = 0;
     icmpv6_opt_hdr_len = RTR_ADV_LEN;
 
-    packet_length = IPV6_HDR_LEN + ICMPV6_HDR_LEN + RTR_ADV_LEN;
+    packet_length = IPV6_LEGACY_HDR_LEN + ICMPV6_HDR_LEN + RTR_ADV_LEN;
 
     if (sllao == OPT_SLLAO) {
         /* set link layer address option */
-        opt_stllao_buf = get_opt_stllao_buf(ipv6_ext_hdr_len, icmpv6_opt_hdr_len);
+        opt_stllao_buf = get_opt_stllao_buf(ipv6_legacy_ext_hdr_len, icmpv6_opt_hdr_len);
 
         if (net_if_get_src_address_mode(if_id) == NET_IF_TRANS_ADDR_M_LONG) {
             icmpv6_ndp_set_sllao(opt_stllao_buf, if_id, NDP_OPT_SLLAO_TYPE, 2);
@@ -572,7 +572,7 @@ void icmpv6_send_router_adv(ipv6_addr_t *addr, uint8_t sllao, uint8_t mtu, uint8
 
     if (mtu == OPT_MTU) {
         /* set MTU options */
-        opt_mtu_buf = get_opt_mtu_buf(ipv6_ext_hdr_len, icmpv6_opt_hdr_len);
+        opt_mtu_buf = get_opt_mtu_buf(ipv6_legacy_ext_hdr_len, icmpv6_opt_hdr_len);
         opt_mtu_buf->type = OPT_MTU_TYPE;
         opt_mtu_buf->length = OPT_MTU_LEN;
         opt_mtu_buf->reserved = 0;
@@ -587,12 +587,12 @@ void icmpv6_send_router_adv(ipv6_addr_t *addr, uint8_t sllao, uint8_t mtu, uint8
         /* set authoritive border router option */
         if (abr_count > 0) {
             msg_abr = ndp_a6br_cache_get_most_current();
-            opt_abro_buf = get_opt_abro_buf(ipv6_ext_hdr_len, icmpv6_opt_hdr_len);
+            opt_abro_buf = get_opt_abro_buf(ipv6_legacy_ext_hdr_len, icmpv6_opt_hdr_len);
             opt_abro_buf->type = OPT_ABRO_TYPE;
             opt_abro_buf->length = OPT_ABRO_LEN;
             opt_abro_buf->version = HTONS(msg_abr->version);
             opt_abro_buf->reserved = 0;
-            memcpy(&(opt_abro_buf->addr), &(msg_abr->abr_addr), sizeof(ipv6_addr_t));
+            memcpy(&(opt_abro_buf->addr), &(msg_abr->abr_addr), sizeof(ipv6_legacy_addr_t));
         }
     }
 
@@ -623,7 +623,7 @@ void icmpv6_send_router_adv(ipv6_addr_t *addr, uint8_t sllao, uint8_t mtu, uint8
         }
 
         for (int i = 0; i < contexts_len; i++) {
-            opt_6co_hdr_buf = get_opt_6co_hdr_buf(ipv6_ext_hdr_len, icmpv6_opt_hdr_len);
+            opt_6co_hdr_buf = get_opt_6co_hdr_buf(ipv6_legacy_ext_hdr_len, icmpv6_opt_hdr_len);
             opt_6co_hdr_buf->type = OPT_6CO_TYPE;
 
             if (contexts[i].length > 64) {
@@ -641,7 +641,7 @@ void icmpv6_send_router_adv(ipv6_addr_t *addr, uint8_t sllao, uint8_t mtu, uint8
             icmpv6_opt_hdr_len += OPT_6CO_HDR_LEN;
             packet_length += OPT_6CO_HDR_LEN;
             /* attach prefixes */
-            opt_6co_prefix_buf = get_opt_6co_prefix_buf(ipv6_ext_hdr_len, icmpv6_opt_hdr_len);
+            opt_6co_prefix_buf = get_opt_6co_prefix_buf(ipv6_legacy_ext_hdr_len, icmpv6_opt_hdr_len);
 
             if (opt_6co_hdr_buf->c_length > 64) {
                 memset((void *)opt_6co_prefix_buf, 0, 16);
@@ -670,10 +670,10 @@ void icmpv6_send_router_adv(ipv6_addr_t *addr, uint8_t sllao, uint8_t mtu, uint8
 
         /* set prefix option */
         while (net_if_iter_addresses(if_id, (net_if_addr_t **) &prefix)) {
-            if (prefix->prefix_protocol & NET_IF_L3P_IPV6_PREFIX &&
+            if (prefix->prefix_protocol & NET_IF_L3P_IPV6_LEGACY_PREFIX &&
                 prefix->inuse && prefix->advertisable) {
-                opt_pi_buf = get_opt_pi_buf(ipv6_ext_hdr_len, icmpv6_opt_hdr_len);
-                memset(&opt_pi_buf->addr, 0, sizeof(ipv6_addr_t));
+                opt_pi_buf = get_opt_pi_buf(ipv6_legacy_ext_hdr_len, icmpv6_opt_hdr_len);
+                memset(&opt_pi_buf->addr, 0, sizeof(ipv6_legacy_addr_t));
                 memcpy(&opt_pi_buf->addr, &prefix->prefix_data, prefix->prefix_len);
                 opt_pi_buf->type = OPT_PI_TYPE;
                 opt_pi_buf->length = OPT_PI_LEN;
@@ -688,18 +688,18 @@ void icmpv6_send_router_adv(ipv6_addr_t *addr, uint8_t sllao, uint8_t mtu, uint8
         }
     }
 
-    ipv6_buf->length = HTONS(packet_length - IPV6_HDR_LEN);
+    ipv6_legacy_buf->length = HTONS(packet_length - IPV6_LEGACY_HDR_LEN);
 
     /* calculate checksum */
-    icmp_buf->checksum = icmpv6_csum(ipv6_buf, icmp_buf);
+    icmp_buf->checksum = icmpv6_csum(ipv6_legacy_buf, icmp_buf);
 
 #ifdef DEBUG_ENABLED
-    char addr_str[IPV6_MAX_ADDR_STR_LEN];
+    char addr_str[IPV6_LEGACY_MAX_ADDR_STR_LEN];
     printf("INFO: send router advertisement to: %s\n",
-           ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
-                            &ipv6_buf->destaddr));
+           ipv6_legacy_addr_to_str(addr_str, IPV6_LEGACY_MAX_ADDR_STR_LEN,
+                            &ipv6_legacy_buf->destaddr));
 #endif
-    ipv6_send_packet(ipv6_buf, NULL);
+    ipv6_legacy_send_packet(ipv6_legacy_buf, NULL);
 }
 
 void recv_rtr_adv(void)
@@ -709,42 +709,42 @@ void recv_rtr_adv(void)
     int8_t abro_found = 0;
     int16_t abro_version = 0;    /* later replaced, just to supress warnings */
     uint16_t packet_length;
-    ipv6_addr_t abro_addr;
+    ipv6_legacy_addr_t abro_addr;
 
-    ipv6_buf = ipv6_get_buf();
-    packet_length = IPV6_HDR_LEN + NTOHS(ipv6_buf->length);
+    ipv6_legacy_buf = ipv6_legacy_get_buf();
+    packet_length = IPV6_LEGACY_HDR_LEN + NTOHS(ipv6_legacy_buf->length);
     icmpv6_opt_hdr_len = RTR_ADV_LEN;
-    rtr_adv_buf = get_rtr_adv_buf(ipv6_ext_hdr_len);
-    ipv6_addr_t newaddr;
+    rtr_adv_buf = get_rtr_adv_buf(ipv6_legacy_ext_hdr_len);
+    ipv6_legacy_addr_t newaddr;
     recvd_cids_len = 0;
 
     /* update interface reachable time and retrans timer */
     if (rtr_adv_buf->reachable_time != 0) {
-        ipv6_net_if_ext_t *iface;
+        ipv6_legacy_net_if_ext_t *iface;
 
-        iface = ipv6_net_if_get_ext(if_id);
+        iface = ipv6_legacy_net_if_get_ext(if_id);
         if (iface) {
             iface->adv_reachable_time = NTOHL(rtr_adv_buf->reachable_time);
         }
     }
 
     if (rtr_adv_buf->retrans_timer != 0) {
-        ipv6_net_if_ext_t *iface;
+        ipv6_legacy_net_if_ext_t *iface;
 
-        iface = ipv6_net_if_get_ext(if_id);
+        iface = ipv6_legacy_net_if_get_ext(if_id);
         if (iface) {
             iface->adv_retrans_timer = NTOHL(rtr_adv_buf->retrans_timer);
         }
     }
 
-    def_rtr_entry = ndp_default_router_list_search(&ipv6_buf->srcaddr);
+    def_rtr_entry = ndp_default_router_list_search(&ipv6_legacy_buf->srcaddr);
 
     if (rtr_adv_buf->router_lifetime != 0) {
         if (def_rtr_entry != NULL) {
             set_remaining_time(&(def_rtr_entry->inval_time), HTONL(rtr_adv_buf->router_lifetime));
         }
         else {
-            def_rtr_lst_add(&(ipv6_buf->srcaddr), HTONL(rtr_adv_buf->router_lifetime));
+            def_rtr_lst_add(&(ipv6_legacy_buf->srcaddr), HTONL(rtr_adv_buf->router_lifetime));
             trigger_ns = 1;
         }
     }
@@ -758,8 +758,8 @@ void recv_rtr_adv(void)
     mutex_lock(&lowpan_context_mutex);
 
     /* read options */
-    while (packet_length > IPV6_HDR_LEN + ICMPV6_HDR_LEN + icmpv6_opt_hdr_len) {
-        opt_buf = get_opt_buf(ipv6_ext_hdr_len, icmpv6_opt_hdr_len);
+    while (packet_length > IPV6_LEGACY_HDR_LEN + ICMPV6_HDR_LEN + icmpv6_opt_hdr_len) {
+        opt_buf = get_opt_buf(ipv6_legacy_ext_hdr_len, icmpv6_opt_hdr_len);
 
         switch (opt_buf->type) {
             case (NDP_OPT_SLLAO_TYPE): {
@@ -772,10 +772,10 @@ void recv_rtr_adv(void)
 
             /* rfc 4862 section 5.5.3 */
             case (OPT_PI_TYPE): {
-                opt_pi_buf = get_opt_pi_buf(ipv6_ext_hdr_len, icmpv6_opt_hdr_len);
+                opt_pi_buf = get_opt_pi_buf(ipv6_legacy_ext_hdr_len, icmpv6_opt_hdr_len);
 
                 /* crazy condition, read 5.5.3a-b-c for further information */
-                if (ipv6_addr_is_link_local(&opt_pi_buf->addr) ||
+                if (ipv6_legacy_addr_is_link_local(&opt_pi_buf->addr) ||
                     (HTONL(opt_pi_buf->pref_ltime) >
                      HTONL(opt_pi_buf->val_ltime))) {
                     break;
@@ -787,19 +787,19 @@ void recv_rtr_adv(void)
                     }
 
                     if (opt_pi_buf->l_a_reserved1 & ICMPV6_NDP_OPT_PI_FLAG_AUTONOM) {
-                        ipv6_net_if_hit_t addr_hit;
+                        ipv6_legacy_net_if_hit_t addr_hit;
 
-                        if (!ipv6_net_if_addr_prefix_eq(&addr_hit, &opt_pi_buf->addr)) {
+                        if (!ipv6_legacy_net_if_addr_prefix_eq(&addr_hit, &opt_pi_buf->addr)) {
                             /* 5.5.3d */
                             if (opt_pi_buf->val_ltime != 0) {
                                 /* iid will also be added here */
-                                ipv6_addr_set_by_eui64(&newaddr, if_id,
+                                ipv6_legacy_addr_set_by_eui64(&newaddr, if_id,
                                                        &opt_pi_buf->addr);
                                 /* add into address list
                                 * TODO: duplicate address detection is not
                                 *       implementet yet, so all new addresse will
                                 *       be added with state PREFFERED */
-                                ipv6_net_if_add_addr(if_id, &newaddr,
+                                ipv6_legacy_net_if_add_addr(if_id, &newaddr,
                                                      NDP_ADDR_STATE_PREFERRED,
                                                      opt_pi_buf->val_ltime,
                                                      opt_pi_buf->pref_ltime, 0);
@@ -839,14 +839,14 @@ void recv_rtr_adv(void)
                 uint8_t comp;
                 uint8_t num;
 
-                opt_6co_hdr_buf = get_opt_6co_hdr_buf(ipv6_ext_hdr_len, icmpv6_opt_hdr_len);
+                opt_6co_hdr_buf = get_opt_6co_hdr_buf(ipv6_legacy_ext_hdr_len, icmpv6_opt_hdr_len);
 
                 get_opt_6co_flags(&comp, &num, opt_6co_hdr_buf->c_flags);
 
-                ipv6_addr_t prefix;
+                ipv6_legacy_addr_t prefix;
                 memset(&prefix, 0, 16);
 
-                opt_6co_prefix_buf = get_opt_6co_prefix_buf(ipv6_ext_hdr_len, icmpv6_opt_hdr_len + OPT_6CO_HDR_LEN);
+                opt_6co_prefix_buf = get_opt_6co_prefix_buf(ipv6_legacy_ext_hdr_len, icmpv6_opt_hdr_len + OPT_6CO_HDR_LEN);
 
                 memcpy(&prefix, opt_6co_prefix_buf, opt_6co_hdr_buf->c_length);
 
@@ -863,10 +863,10 @@ void recv_rtr_adv(void)
             }
 
             case (OPT_ABRO_TYPE): {
-                opt_abro_buf = get_opt_abro_buf(ipv6_ext_hdr_len, icmpv6_opt_hdr_len);
+                opt_abro_buf = get_opt_abro_buf(ipv6_legacy_ext_hdr_len, icmpv6_opt_hdr_len);
                 abro_found = 1;
                 abro_version = HTONS(opt_abro_buf->version);
-                memcpy(&(abro_addr), &(opt_abro_buf->addr), sizeof(ipv6_addr_t));
+                memcpy(&(abro_addr), &(opt_abro_buf->addr), sizeof(ipv6_legacy_addr_t));
                 break;
             }
 
@@ -897,54 +897,54 @@ void recv_rtr_adv(void)
          * containing its tentative global IPv6 address to register
          *
          * if new address was configured, set src to newaddr(gp16) */
-        icmpv6_send_neighbor_sol(&newaddr, &(ipv6_buf->srcaddr), &(ipv6_buf->srcaddr), OPT_SLLAO, OPT_ARO);
+        icmpv6_send_neighbor_sol(&newaddr, &(ipv6_legacy_buf->srcaddr), &(ipv6_legacy_buf->srcaddr), OPT_SLLAO, OPT_ARO);
     }
 }
 
-void icmpv6_send_neighbor_sol(ipv6_addr_t *src, ipv6_addr_t *dest, ipv6_addr_t *targ,
+void icmpv6_send_neighbor_sol(ipv6_legacy_addr_t *src, ipv6_legacy_addr_t *dest, ipv6_legacy_addr_t *targ,
                               uint8_t sllao, uint8_t aro)
 {
     uint16_t packet_length;
     int if_id = 0;          // TODO: get this somehow
-    ipv6_net_if_hit_t hit;
+    ipv6_legacy_net_if_hit_t hit;
 
-    ipv6_buf = ipv6_get_buf();
-    ipv6_buf->version_trafficclass = IPV6_VER;
-    ipv6_buf->trafficclass_flowlabel = 0;
-    ipv6_buf->flowlabel = 0;
-    ipv6_buf->nextheader = IPV6_PROTO_NUM_ICMPV6;
-    ipv6_buf->hoplimit = ND_HOPLIMIT;
+    ipv6_legacy_buf = ipv6_legacy_get_buf();
+    ipv6_legacy_buf->version_trafficclass = IPV6_LEGACY_VER;
+    ipv6_legacy_buf->trafficclass_flowlabel = 0;
+    ipv6_legacy_buf->flowlabel = 0;
+    ipv6_legacy_buf->nextheader = IPV6_LEGACY_PROTO_NUM_ICMPV6;
+    ipv6_legacy_buf->hoplimit = ND_HOPLIMIT;
 
     if (dest == NULL) {
-        ipv6_addr_set_solicited_node_addr(&(ipv6_buf->destaddr), targ);
+        ipv6_legacy_addr_set_solicited_node_addr(&(ipv6_legacy_buf->destaddr), targ);
     }
     else {
-        memcpy(&(ipv6_buf->destaddr.uint8[0]), &(dest->uint8[0]), 16);
+        memcpy(&(ipv6_legacy_buf->destaddr.uint8[0]), &(dest->uint8[0]), 16);
     }
 
-    ipv6_ext_hdr_len = 0;
-    icmp_buf = get_icmpv6_buf(ipv6_ext_hdr_len);
+    ipv6_legacy_ext_hdr_len = 0;
+    icmp_buf = get_icmpv6_buf(ipv6_legacy_ext_hdr_len);
     icmp_buf->type = ICMPV6_TYPE_NEIGHBOR_SOL;
     icmp_buf->code = 0;
 
-    nbr_sol_buf = get_nbr_sol_buf(ipv6_ext_hdr_len);
+    nbr_sol_buf = get_nbr_sol_buf(ipv6_legacy_ext_hdr_len);
     nbr_sol_buf->reserved = 0;
     memcpy(&(nbr_sol_buf->target_addr), targ, 16);
     icmpv6_opt_hdr_len = NBR_SOL_LEN;
 
-    packet_length = IPV6_HDR_LEN + ICMPV6_HDR_LEN + NBR_SOL_LEN;
+    packet_length = IPV6_LEGACY_HDR_LEN + ICMPV6_HDR_LEN + NBR_SOL_LEN;
 
-    if (!ipv6_net_if_addr_match(&hit, targ)) {
+    if (!ipv6_legacy_net_if_addr_match(&hit, targ)) {
         if (src == NULL) {
-            ipv6_net_if_get_best_src_addr(&(ipv6_buf->srcaddr), &(ipv6_buf->destaddr));
+            ipv6_legacy_net_if_get_best_src_addr(&(ipv6_legacy_buf->srcaddr), &(ipv6_legacy_buf->destaddr));
         }
         else {
-            memcpy(&(ipv6_buf->srcaddr), src, 16);
+            memcpy(&(ipv6_legacy_buf->srcaddr), src, 16);
         }
 
         if (sllao == OPT_SLLAO) {
             /* set sllao option */
-            opt_stllao_buf = get_opt_stllao_buf(ipv6_ext_hdr_len, icmpv6_opt_hdr_len);
+            opt_stllao_buf = get_opt_stllao_buf(ipv6_legacy_ext_hdr_len, icmpv6_opt_hdr_len);
 
             if (net_if_get_src_address_mode(if_id) == NET_IF_TRANS_ADDR_M_LONG) {
                 icmpv6_ndp_set_sllao(opt_stllao_buf, if_id, NDP_OPT_SLLAO_TYPE, 2);
@@ -961,7 +961,7 @@ void icmpv6_send_neighbor_sol(ipv6_addr_t *src, ipv6_addr_t *dest, ipv6_addr_t *
 
     if (aro == OPT_ARO) {
         /* set aro option */
-        opt_aro_buf = get_opt_aro_buf(ipv6_ext_hdr_len, icmpv6_opt_hdr_len);
+        opt_aro_buf = get_opt_aro_buf(ipv6_legacy_ext_hdr_len, icmpv6_opt_hdr_len);
         opt_aro_buf->type = OPT_ARO_TYPE;
         opt_aro_buf->length = OPT_ARO_LEN;
         opt_aro_buf->status = 0;
@@ -980,36 +980,36 @@ void icmpv6_send_neighbor_sol(ipv6_addr_t *src, ipv6_addr_t *dest, ipv6_addr_t *
         packet_length += OPT_ARO_HDR_LEN;
     }
 
-    ipv6_buf->length = HTONS(packet_length - IPV6_HDR_LEN);
+    ipv6_legacy_buf->length = HTONS(packet_length - IPV6_LEGACY_HDR_LEN);
 
-    icmp_buf->checksum = icmpv6_csum(ipv6_buf, icmp_buf);
+    icmp_buf->checksum = icmpv6_csum(ipv6_legacy_buf, icmp_buf);
 
 #ifdef DEBUG_ENABLED
-    char addr_str[IPV6_MAX_ADDR_STR_LEN];
+    char addr_str[IPV6_LEGACY_MAX_ADDR_STR_LEN];
     printf("INFO: send neighbor solicitation to: %s\n",
-           ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
-                            &ipv6_buf->destaddr));
+           ipv6_legacy_addr_to_str(addr_str, IPV6_LEGACY_MAX_ADDR_STR_LEN,
+                            &ipv6_legacy_buf->destaddr));
 #endif
-    ipv6_send_packet(ipv6_buf, NULL);
+    ipv6_legacy_send_packet(ipv6_legacy_buf, NULL);
 }
 
 void recv_nbr_sol(void)
 {
     int if_id = 0;  // TODO, get this somehow
-    ipv6_buf = ipv6_get_buf();
+    ipv6_legacy_buf = ipv6_legacy_get_buf();
     llao = NULL;
     icmpv6_opt_hdr_len = NBR_SOL_LEN;
 
     uint8_t send_na = 0;
     uint8_t sllao_set = 0;
-    uint16_t packet_length = IPV6_HDR_LEN + NTOHS(ipv6_buf->length);
+    uint16_t packet_length = IPV6_LEGACY_HDR_LEN + NTOHS(ipv6_legacy_buf->length);
 
     /* check whick options are set, we need that because an aro
      * option condition is that a sllao option is set. thus that we don't
      * know which option comes first we need to this here */
 
-    while (packet_length > IPV6_HDR_LEN + ICMPV6_HDR_LEN + icmpv6_opt_hdr_len) {
-        opt_buf = get_opt_buf(ipv6_ext_hdr_len, icmpv6_opt_hdr_len);
+    while (packet_length > IPV6_LEGACY_HDR_LEN + ICMPV6_HDR_LEN + icmpv6_opt_hdr_len) {
+        opt_buf = get_opt_buf(ipv6_legacy_ext_hdr_len, icmpv6_opt_hdr_len);
 
         if (opt_buf->type == NDP_OPT_SLLAO_TYPE) {
             sllao_set = 1;
@@ -1020,18 +1020,18 @@ void recv_nbr_sol(void)
 
     icmpv6_opt_hdr_len = NBR_SOL_LEN;
 
-    while (packet_length > IPV6_HDR_LEN + ICMPV6_HDR_LEN + icmpv6_opt_hdr_len) {
-        opt_buf = get_opt_buf(ipv6_ext_hdr_len, icmpv6_opt_hdr_len);
+    while (packet_length > IPV6_LEGACY_HDR_LEN + ICMPV6_HDR_LEN + icmpv6_opt_hdr_len) {
+        opt_buf = get_opt_buf(ipv6_legacy_ext_hdr_len, icmpv6_opt_hdr_len);
 
         switch (opt_buf->type) {
             case (NDP_OPT_SLLAO_TYPE): {
-                opt_stllao_buf = get_opt_stllao_buf(ipv6_ext_hdr_len,
+                opt_stllao_buf = get_opt_stllao_buf(ipv6_legacy_ext_hdr_len,
                                                     icmpv6_opt_hdr_len);
                 llao = (uint8_t *)opt_stllao_buf;
 
                 if (llao != NULL &&
-                    !(ipv6_addr_is_unspecified(&ipv6_buf->srcaddr))) {
-                    nbr_entry = ndp_neighbor_cache_search(&(ipv6_buf->srcaddr));
+                    !(ipv6_legacy_addr_is_unspecified(&ipv6_legacy_buf->srcaddr))) {
+                    nbr_entry = ndp_neighbor_cache_search(&(ipv6_legacy_buf->srcaddr));
 
                     if (nbr_entry != NULL) {
                         switch (opt_stllao_buf->length) {
@@ -1072,7 +1072,7 @@ void recv_nbr_sol(void)
                     else {
                         switch (opt_stllao_buf->length) {
                             case (1): {
-                                ndp_neighbor_cache_add(if_id, &ipv6_buf->srcaddr,
+                                ndp_neighbor_cache_add(if_id, &ipv6_legacy_buf->srcaddr,
                                                        &llao[2], 2, 0,
                                                        NDP_NCE_STATUS_STALE,
                                                        NDP_NCE_TYPE_TENTATIVE,
@@ -1082,7 +1082,7 @@ void recv_nbr_sol(void)
                             }
 
                             case (2): {
-                                ndp_neighbor_cache_add(if_id, &ipv6_buf->srcaddr,
+                                ndp_neighbor_cache_add(if_id, &ipv6_legacy_buf->srcaddr,
                                                        &llao[2], 8, 0,
                                                        NDP_NCE_STATUS_STALE,
                                                        NDP_NCE_TYPE_TENTATIVE,
@@ -1102,20 +1102,20 @@ void recv_nbr_sol(void)
             case (OPT_ARO_TYPE): {
                 /* check if sllao option is set, and if address src address
                  * isn't unspecified - draft-ietf-6lowpan-nd-15#section-6.5 */
-                if (!(ipv6_addr_is_unspecified(&ipv6_buf->srcaddr)) &&
+                if (!(ipv6_legacy_addr_is_unspecified(&ipv6_legacy_buf->srcaddr)) &&
                     sllao_set == 1) {
                     uint8_t aro_state = NDP_OPT_ARO_STATE_SUCCESS;
-                    opt_aro_buf = get_opt_aro_buf(ipv6_ext_hdr_len,
+                    opt_aro_buf = get_opt_aro_buf(ipv6_legacy_ext_hdr_len,
                                                   icmpv6_opt_hdr_len);
 
                     if ((opt_aro_buf->length == 2) &&
                         (opt_aro_buf->status == 0)) {
                         /* check neighbor cache for duplicates */
-                        nbr_entry = ndp_neighbor_cache_search(&(ipv6_buf->srcaddr));
+                        nbr_entry = ndp_neighbor_cache_search(&(ipv6_legacy_buf->srcaddr));
 
                         if (nbr_entry == NULL) {
                             /* create neighbor cache */
-                            aro_state = ndp_neighbor_cache_add(if_id, &ipv6_buf->srcaddr,
+                            aro_state = ndp_neighbor_cache_add(if_id, &ipv6_legacy_buf->srcaddr,
                                                                &(opt_aro_buf->eui64), 8, 0,
                                                                NDP_NCE_STATUS_STALE, NDP_NCE_TYPE_TENTATIVE,
                                                                opt_aro_buf->reg_ltime);
@@ -1133,7 +1133,7 @@ void recv_nbr_sol(void)
                                     nbr_entry->state = NDP_NCE_STATUS_STALE;
                                     nbr_entry->isrouter = 0;
                                     memcpy(&(nbr_entry->addr.uint8[0]),
-                                           &(ipv6_buf->srcaddr.uint8[0]), 16);
+                                           &(ipv6_legacy_buf->srcaddr.uint8[0]), 16);
                                 }
 
                                 aro_state = NDP_OPT_ARO_STATE_SUCCESS;
@@ -1158,19 +1158,19 @@ void recv_nbr_sol(void)
         icmpv6_opt_hdr_len += (opt_buf->length * 8);
     }
 
-    ipv6_net_if_hit_t alist_targ, alist_dest;
+    ipv6_legacy_net_if_hit_t alist_targ, alist_dest;
 
-    nbr_sol_buf = get_nbr_sol_buf(ipv6_ext_hdr_len);
+    nbr_sol_buf = get_nbr_sol_buf(ipv6_legacy_ext_hdr_len);
 
-    if (ipv6_net_if_addr_match(&alist_targ, &nbr_sol_buf->target_addr) != NULL) {
-        ipv6_net_if_addr_match(&alist_dest, &ipv6_buf->destaddr);
+    if (ipv6_legacy_net_if_addr_match(&alist_targ, &nbr_sol_buf->target_addr) != NULL) {
+        ipv6_legacy_net_if_addr_match(&alist_dest, &ipv6_legacy_buf->destaddr);
 
         if ((memcmp(alist_targ.addr->addr_data, alist_dest.addr->addr_data, 16) == 0) ||
-            ipv6_addr_is_solicited_node(&ipv6_buf->destaddr)) {
-            memcpy(&(ipv6_buf->destaddr.uint8[0]),
-                   &(ipv6_buf->srcaddr.uint8[0]), sizeof(ipv6_addr_t));
-            memcpy(&(ipv6_buf->srcaddr.uint8[0]),
-                   &(nbr_sol_buf->target_addr.uint8[0]), sizeof(ipv6_addr_t));
+            ipv6_legacy_addr_is_solicited_node(&ipv6_legacy_buf->destaddr)) {
+            memcpy(&(ipv6_legacy_buf->destaddr.uint8[0]),
+                   &(ipv6_legacy_buf->srcaddr.uint8[0]), sizeof(ipv6_legacy_addr_t));
+            memcpy(&(ipv6_legacy_buf->srcaddr.uint8[0]),
+                   &(nbr_sol_buf->target_addr.uint8[0]), sizeof(ipv6_legacy_addr_t));
             send_na = 1;
         }
     }
@@ -1178,48 +1178,48 @@ void recv_nbr_sol(void)
     if (send_na) {
         /* solicited na */
         uint8_t flags = (ICMPV6_NEIGHBOR_ADV_FLAG_OVERRIDE | ICMPV6_NEIGHBOR_ADV_FLAG_SOLICITED);
-        icmpv6_send_neighbor_adv(&(ipv6_buf->srcaddr), &(ipv6_buf->destaddr),
+        icmpv6_send_neighbor_adv(&(ipv6_legacy_buf->srcaddr), &(ipv6_legacy_buf->destaddr),
                                  alist_targ.addr->addr_data, flags, 0, OPT_ARO);
     }
 }
 
-void icmpv6_send_neighbor_adv(ipv6_addr_t *src, ipv6_addr_t *dst, ipv6_addr_t *tgt,
+void icmpv6_send_neighbor_adv(ipv6_legacy_addr_t *src, ipv6_legacy_addr_t *dst, ipv6_legacy_addr_t *tgt,
                               uint8_t rso, uint8_t sllao, uint8_t aro)
 {
     int if_id = 0;              // TODO: get this somehow
     uint16_t packet_length;
 
-    ipv6_buf = ipv6_get_buf();
-    ipv6_buf->version_trafficclass = IPV6_VER;
-    ipv6_buf->trafficclass_flowlabel = 0;
-    ipv6_buf->flowlabel = 0;
-    ipv6_buf->nextheader = IPV6_PROTO_NUM_ICMPV6;
-    ipv6_buf->hoplimit = ND_HOPLIMIT;
+    ipv6_legacy_buf = ipv6_legacy_get_buf();
+    ipv6_legacy_buf->version_trafficclass = IPV6_LEGACY_VER;
+    ipv6_legacy_buf->trafficclass_flowlabel = 0;
+    ipv6_legacy_buf->flowlabel = 0;
+    ipv6_legacy_buf->nextheader = IPV6_LEGACY_PROTO_NUM_ICMPV6;
+    ipv6_legacy_buf->hoplimit = ND_HOPLIMIT;
 
-    ipv6_ext_hdr_len = 0;
-    icmp_buf = get_icmpv6_buf(ipv6_ext_hdr_len);
+    ipv6_legacy_ext_hdr_len = 0;
+    icmp_buf = get_icmpv6_buf(ipv6_legacy_ext_hdr_len);
     icmp_buf->type = ICMPV6_TYPE_NEIGHBOR_ADV;
     icmp_buf->code = 0;
 
-    if (&ipv6_buf->destaddr != dst) {
-        memcpy(&(ipv6_buf->destaddr.uint8[0]), &(dst->uint8[0]), 16);
+    if (&ipv6_legacy_buf->destaddr != dst) {
+        memcpy(&(ipv6_legacy_buf->destaddr.uint8[0]), &(dst->uint8[0]), 16);
     }
 
-    if (&ipv6_buf->srcaddr != src) {
-        memcpy(&(ipv6_buf->srcaddr.uint8[0]), &(src->uint8[0]), 16);
+    if (&ipv6_legacy_buf->srcaddr != src) {
+        memcpy(&(ipv6_legacy_buf->srcaddr.uint8[0]), &(src->uint8[0]), 16);
     }
 
-    nbr_adv_buf = get_nbr_adv_buf(ipv6_ext_hdr_len);
+    nbr_adv_buf = get_nbr_adv_buf(ipv6_legacy_ext_hdr_len);
     nbr_adv_buf->rso = rso;
 
     memset(&(nbr_adv_buf->reserved[0]), 0, 3);
     memcpy(&(nbr_adv_buf->target_addr.uint8[0]), &(tgt->uint8[0]), 16);
 
-    packet_length = IPV6_HDR_LEN + ICMPV6_HDR_LEN + NBR_ADV_LEN;
+    packet_length = IPV6_LEGACY_HDR_LEN + ICMPV6_HDR_LEN + NBR_ADV_LEN;
 
     if (sllao == OPT_SLLAO) {
         /* set sllao option */
-        opt_stllao_buf = get_opt_stllao_buf(ipv6_ext_hdr_len, icmpv6_opt_hdr_len);
+        opt_stllao_buf = get_opt_stllao_buf(ipv6_legacy_ext_hdr_len, icmpv6_opt_hdr_len);
 
         if (net_if_get_src_address_mode(if_id) == NET_IF_TRANS_ADDR_M_LONG) {
             icmpv6_ndp_set_sllao(opt_stllao_buf, if_id, NDP_OPT_SLLAO_TYPE, 2);
@@ -1235,7 +1235,7 @@ void icmpv6_send_neighbor_adv(ipv6_addr_t *src, ipv6_addr_t *dst, ipv6_addr_t *t
 
     if (aro == OPT_ARO) {
         /* set aro option */
-        opt_aro_buf = get_opt_aro_buf(ipv6_ext_hdr_len, icmpv6_opt_hdr_len);
+        opt_aro_buf = get_opt_aro_buf(ipv6_legacy_ext_hdr_len, icmpv6_opt_hdr_len);
         opt_aro_buf->type = OPT_ARO_TYPE;
         opt_aro_buf->length = OPT_ARO_LEN;
         opt_aro_buf->status = 0;    /* TODO */
@@ -1254,35 +1254,35 @@ void icmpv6_send_neighbor_adv(ipv6_addr_t *src, ipv6_addr_t *dst, ipv6_addr_t *t
         packet_length += OPT_ARO_HDR_LEN;
     }
 
-    ipv6_buf->length = HTONS(packet_length - IPV6_HDR_LEN);
+    ipv6_legacy_buf->length = HTONS(packet_length - IPV6_LEGACY_HDR_LEN);
 
-    icmp_buf->checksum = icmpv6_csum(ipv6_buf, icmp_buf);
+    icmp_buf->checksum = icmpv6_csum(ipv6_legacy_buf, icmp_buf);
 
 #ifdef DEBUG_ENABLED
-    char addr_str[IPV6_MAX_ADDR_STR_LEN];
+    char addr_str[IPV6_LEGACY_MAX_ADDR_STR_LEN];
     printf("INFO: send neighbor advertisement to: %s\n",
-           ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
-                            &ipv6_buf->destaddr));
+           ipv6_legacy_addr_to_str(addr_str, IPV6_LEGACY_MAX_ADDR_STR_LEN,
+                            &ipv6_legacy_buf->destaddr));
 #endif
-    ipv6_send_packet(ipv6_buf, NULL);
+    ipv6_legacy_send_packet(ipv6_legacy_buf, NULL);
 }
 
 void recv_nbr_adv(void)
 {
-    ipv6_buf = ipv6_get_buf();
-    uint16_t packet_length = IPV6_HDR_LEN + NTOHS(ipv6_buf->length);
+    ipv6_legacy_buf = ipv6_legacy_get_buf();
+    uint16_t packet_length = IPV6_LEGACY_HDR_LEN + NTOHS(ipv6_legacy_buf->length);
     icmpv6_opt_hdr_len = NBR_ADV_LEN;
     llao = NULL;
     nbr_entry = NULL;
-    nbr_adv_buf = get_nbr_adv_buf(ipv6_ext_hdr_len);
+    nbr_adv_buf = get_nbr_adv_buf(ipv6_legacy_ext_hdr_len);
 
     /* check if options are present */
-    while (packet_length > IPV6_HDR_LEN + ICMPV6_HDR_LEN + icmpv6_opt_hdr_len) {
-        opt_buf = get_opt_buf(ipv6_ext_hdr_len, icmpv6_opt_hdr_len);
+    while (packet_length > IPV6_LEGACY_HDR_LEN + ICMPV6_HDR_LEN + icmpv6_opt_hdr_len) {
+        opt_buf = get_opt_buf(ipv6_legacy_ext_hdr_len, icmpv6_opt_hdr_len);
 
         switch (opt_buf->type) {
             case (NDP_OPT_TLLAO_TYPE): {
-                llao = (uint8_t *)get_opt_stllao_buf(ipv6_ext_hdr_len,
+                llao = (uint8_t *)get_opt_stllao_buf(ipv6_legacy_ext_hdr_len,
                                                      icmpv6_opt_hdr_len);
                 break;
             }
@@ -1295,9 +1295,9 @@ void recv_nbr_adv(void)
         icmpv6_opt_hdr_len += (opt_buf->length * 8);
     }
 
-    ipv6_net_if_hit_t hit;
+    ipv6_legacy_net_if_hit_t hit;
 
-    if (ipv6_net_if_addr_match(&hit, &nbr_adv_buf->target_addr) == NULL) {
+    if (ipv6_legacy_net_if_addr_match(&hit, &nbr_adv_buf->target_addr) == NULL) {
         nbr_entry = ndp_neighbor_cache_search(&nbr_adv_buf->target_addr);
 
         if (nbr_entry != NULL) {
@@ -1429,68 +1429,68 @@ void icmpv6_ndp_set_sllao(icmpv6_ndp_opt_stllao_t *sllao, int if_id,
     }
 }
 
-uint16_t icmpv6_csum(ipv6_hdr_t *ipv6_buf, icmpv6_hdr_t *icmpv6_buf)
+uint16_t icmpv6_csum(ipv6_legacy_hdr_t *ipv6_legacy_buf, icmpv6_hdr_t *icmpv6_buf)
 {
     uint16_t sum;
-    uint16_t len = NTOHS(ipv6_buf->length);
+    uint16_t len = NTOHS(ipv6_legacy_buf->length);
 
     icmpv6_buf->checksum = 0;
-    sum = len + IPV6_PROTO_NUM_ICMPV6;
+    sum = len + IPV6_LEGACY_PROTO_NUM_ICMPV6;
 
-    sum = net_help_csum(sum, (uint8_t *)&ipv6_buf->srcaddr, 2 * sizeof(ipv6_addr_t));
+    sum = net_help_csum(sum, (uint8_t *)&ipv6_legacy_buf->srcaddr, 2 * sizeof(ipv6_legacy_addr_t));
     sum = net_help_csum(sum, (uint8_t *)icmpv6_buf, len);
 
     return (sum == 0) ? 0 : ~HTONS(sum);
 }
 
 
-void icmpv6_send_parameter_prob(ipv6_addr_t *src, ipv6_addr_t *dest,
+void icmpv6_send_parameter_prob(ipv6_legacy_addr_t *src, ipv6_legacy_addr_t *dest,
                                 uint8_t code, uint32_t pointer,
                                 uint8_t *packet, uint8_t packet_len)
 {
-    uint16_t packet_length = IPV6_HDR_LEN + ICMPV6_HDR_LEN + PARA_PROB_LEN;
+    uint16_t packet_length = IPV6_LEGACY_HDR_LEN + ICMPV6_HDR_LEN + PARA_PROB_LEN;
     icmpv6_parameter_prob_hdr_t *para_prob_buf;
 
-    memcpy(&(ipv6_buf[packet_length]), packet, min(IPV6_MTU - packet_length, packet_len));
+    memcpy(&(ipv6_legacy_buf[packet_length]), packet, min(IPV6_LEGACY_MTU - packet_length, packet_len));
 
-    ipv6_buf = ipv6_get_buf();
-    ipv6_buf->version_trafficclass = IPV6_VER;
-    ipv6_buf->trafficclass_flowlabel = 0;
-    ipv6_buf->flowlabel = 0;
-    ipv6_buf->nextheader = IPV6_PROTO_NUM_ICMPV6;
-    ipv6_buf->hoplimit = ND_HOPLIMIT;
+    ipv6_legacy_buf = ipv6_legacy_get_buf();
+    ipv6_legacy_buf->version_trafficclass = IPV6_LEGACY_VER;
+    ipv6_legacy_buf->trafficclass_flowlabel = 0;
+    ipv6_legacy_buf->flowlabel = 0;
+    ipv6_legacy_buf->nextheader = IPV6_LEGACY_PROTO_NUM_ICMPV6;
+    ipv6_legacy_buf->hoplimit = ND_HOPLIMIT;
 
-    ipv6_ext_hdr_len = 0;
-    icmp_buf = get_icmpv6_buf(ipv6_ext_hdr_len);
+    ipv6_legacy_ext_hdr_len = 0;
+    icmp_buf = get_icmpv6_buf(ipv6_legacy_ext_hdr_len);
     icmp_buf->type = ICMPV6_TYPE_PARAMETER_PROB;
     icmp_buf->code = code;
 
-    memcpy(&(ipv6_buf->destaddr.uint8[0]), &(dest->uint8[0]), 16);
-    memcpy(&(ipv6_buf->srcaddr.uint8[0]), &(src->uint8[0]), 16);
+    memcpy(&(ipv6_legacy_buf->destaddr.uint8[0]), &(dest->uint8[0]), 16);
+    memcpy(&(ipv6_legacy_buf->srcaddr.uint8[0]), &(src->uint8[0]), 16);
 
-    para_prob_buf = get_para_prob_buf(ipv6_ext_hdr_len);
+    para_prob_buf = get_para_prob_buf(ipv6_legacy_ext_hdr_len);
 
     para_prob_buf->pointer = pointer;
 
-    packet_length += min(IPV6_MTU - packet_length, packet_len);
+    packet_length += min(IPV6_LEGACY_MTU - packet_length, packet_len);
 
-    ipv6_buf->length = HTONS(packet_length - IPV6_HDR_LEN);
+    ipv6_legacy_buf->length = HTONS(packet_length - IPV6_LEGACY_HDR_LEN);
 
-    icmp_buf->checksum = icmpv6_csum(ipv6_buf, icmp_buf);
+    icmp_buf->checksum = icmpv6_csum(ipv6_legacy_buf, icmp_buf);
 
 #ifdef DEBUG_ENABLED
-    char addr_str[IPV6_MAX_ADDR_STR_LEN];
+    char addr_str[IPV6_LEGACY_MAX_ADDR_STR_LEN];
     printf("INFO: send parameter problem to: %s\n",
-           ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
-                            &ipv6_buf->destaddr));
+           ipv6_legacy_addr_to_str(addr_str, IPV6_LEGACY_MAX_ADDR_STR_LEN,
+                            &ipv6_legacy_buf->destaddr));
 #endif
-    ipv6_send_packet(ipv6_buf, NULL);
+    ipv6_legacy_send_packet(ipv6_legacy_buf, NULL);
 }
 
 //------------------------------------------------------------------------------
 /* neighbor cache functions */
 
-ndp_neighbor_cache_t *ndp_neighbor_cache_search(ipv6_addr_t *ipaddr)
+ndp_neighbor_cache_t *ndp_neighbor_cache_search(ipv6_legacy_addr_t *ipaddr)
 {
     int i;
 
@@ -1503,7 +1503,7 @@ ndp_neighbor_cache_t *ndp_neighbor_cache_search(ipv6_addr_t *ipaddr)
     return NULL;
 }
 
-ndp_neighbor_cache_t *ndp_get_ll_address(ipv6_addr_t *ipaddr)
+ndp_neighbor_cache_t *ndp_get_ll_address(ipv6_legacy_addr_t *ipaddr)
 {
     ndp_neighbor_cache_t *nce = ndp_neighbor_cache_search(ipaddr);
 
@@ -1516,14 +1516,14 @@ ndp_neighbor_cache_t *ndp_get_ll_address(ipv6_addr_t *ipaddr)
     return nce;
 }
 
-int ndp_addr_is_on_link(ipv6_addr_t *dest_addr)
+int ndp_addr_is_on_link(ipv6_legacy_addr_t *dest_addr)
 {
     int if_id = -1;
 
     if ((ndp_neighbor_cache_search(dest_addr))) {
 #ifdef DEBUG_ENABLED
-        char addr_str[IPV6_MAX_ADDR_STR_LEN];
-        DEBUG("INFO: %s is in nbr cache\n", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, dest_addr));
+        char addr_str[IPV6_LEGACY_MAX_ADDR_STR_LEN];
+        DEBUG("INFO: %s is in nbr cache\n", ipv6_legacy_addr_to_str(addr_str, IPV6_LEGACY_MAX_ADDR_STR_LEN, dest_addr));
 #endif
         return 1;
     }
@@ -1544,7 +1544,7 @@ int ndp_addr_is_on_link(ipv6_addr_t *dest_addr)
     return 0;
 }
 
-uint8_t ndp_neighbor_cache_add(int if_id, const ipv6_addr_t *ipaddr,
+uint8_t ndp_neighbor_cache_add(int if_id, const ipv6_legacy_addr_t *ipaddr,
                                const void *lladdr, uint8_t lladdr_len,
                                uint8_t isrouter, ndp_nce_state_t state,
                                ndp_nce_type_t type, uint16_t ltime)
@@ -1587,7 +1587,7 @@ void nbr_cache_auto_rem(void)
     }
 }
 
-uint8_t ndp_neighbor_cache_remove(const ipv6_addr_t *ipaddr)
+uint8_t ndp_neighbor_cache_remove(const ipv6_legacy_addr_t *ipaddr)
 {
     int i;
     uint8_t removed = 0;
@@ -1646,7 +1646,7 @@ ndp_a6br_cache_t *ndp_a6br_cache_get_oldest(void)
     return abr;
 }
 
-ndp_a6br_cache_t *abr_get_version(uint16_t version, ipv6_addr_t *abr_addr)
+ndp_a6br_cache_t *abr_get_version(uint16_t version, ipv6_legacy_addr_t *abr_addr)
 {
     int i = 0;
 
@@ -1671,7 +1671,7 @@ lowpan_context_t *abr_get_context(ndp_a6br_cache_t *abr, uint8_t cid)
     return lowpan_context_num_lookup(abr->cids[cid]);
 }
 
-ndp_a6br_cache_t *abr_add_context(uint16_t version, ipv6_addr_t *abr_addr,
+ndp_a6br_cache_t *abr_add_context(uint16_t version, ipv6_legacy_addr_t *abr_addr,
                                   uint8_t cid)
 {
     ndp_a6br_cache_t *abr = abr_get_version(version, abr_addr);
@@ -1685,7 +1685,7 @@ ndp_a6br_cache_t *abr_add_context(uint16_t version, ipv6_addr_t *abr_addr,
         }
 
         abr->version = version;
-        memcpy(&(abr->abr_addr), abr_addr, sizeof(ipv6_addr_t));
+        memcpy(&(abr->abr_addr), abr_addr, sizeof(ipv6_legacy_addr_t));
         memset(abr->cids, 0xFF, NDP_6LOWPAN_CONTEXT_MAX);
     }
 
@@ -1706,7 +1706,7 @@ void abr_remove_context(uint8_t cid)
 //------------------------------------------------------------------------------
 /* default router list functions */
 
-ndp_default_router_list_t *ndp_default_router_list_search(ipv6_addr_t *ipaddr)
+ndp_default_router_list_t *ndp_default_router_list_search(ipv6_legacy_addr_t *ipaddr)
 {
     int i;
 
@@ -1720,7 +1720,7 @@ ndp_default_router_list_t *ndp_default_router_list_search(ipv6_addr_t *ipaddr)
     return NULL;
 }
 
-void def_rtr_lst_add(ipv6_addr_t *ipaddr, uint32_t rtr_ltime)
+void def_rtr_lst_add(ipv6_legacy_addr_t *ipaddr, uint32_t rtr_ltime)
 {
     if (def_rtr_count == DEF_RTR_LST_SIZE) {
         DEBUG("ERROR: default router list full\n");
@@ -1755,7 +1755,7 @@ void def_rtr_lst_rem(ndp_default_router_list_t *entry)
 //------------------------------------------------------------------------------
 /* prefix information functions */
 
-int ndp_add_prefix_info(int if_id, const ipv6_addr_t *prefix,
+int ndp_add_prefix_info(int if_id, const ipv6_legacy_addr_t *prefix,
                         uint8_t prefix_len, uint32_t valid_lifetime,
                         uint32_t preferred_lifetime, uint8_t advertisable,
                         uint8_t flags)
@@ -1788,11 +1788,11 @@ int ndp_add_prefix_info(int if_id, const ipv6_addr_t *prefix,
         memcpy(&prefix_buf[prefix_buf_count], prefix, (prefix_len / 8) + 1);
     }
 
-    prefix_info->prefix_data = (ipv6_addr_t *) &prefix_buf[prefix_buf_count];
+    prefix_info->prefix_data = (ipv6_legacy_addr_t *) &prefix_buf[prefix_buf_count];
     prefix_buf_count += prefix_len;
 
     prefix_info->prefix_len = prefix_len;
-    prefix_info->prefix_protocol = NET_IF_L3P_IPV6_PREFIX;
+    prefix_info->prefix_protocol = NET_IF_L3P_IPV6_LEGACY_PREFIX;
     prefix_info->inuse = 1;
     prefix_info->advertisable = advertisable;
     prefix_info->flags = 0xc0 & flags;
@@ -1808,7 +1808,7 @@ int ndp_add_prefix_info(int if_id, const ipv6_addr_t *prefix,
     return SIXLOWERROR_SUCCESS;
 }
 
-ndp_prefix_info_t *ndp_prefix_info_search(int if_id, const ipv6_addr_t *addr,
+ndp_prefix_info_t *ndp_prefix_info_search(int if_id, const ipv6_legacy_addr_t *addr,
         uint8_t up_to)
 {
     uint8_t best_match = 0;
@@ -1819,7 +1819,7 @@ ndp_prefix_info_t *ndp_prefix_info_search(int if_id, const ipv6_addr_t *addr,
     }
 
     while (net_if_iter_addresses(if_id, (net_if_addr_t **) &prefix)) {
-        if (prefix->prefix_protocol & NET_IF_L3P_IPV6_PREFIX) {
+        if (prefix->prefix_protocol & NET_IF_L3P_IPV6_LEGACY_PREFIX) {
             uint8_t match = 0, len = min(up_to, prefix->prefix_len);
             uint8_t byte_len = (len / 8);
 
@@ -1852,7 +1852,7 @@ ndp_prefix_info_t *ndp_prefix_info_search(int if_id, const ipv6_addr_t *addr,
     return tmp;
 }
 
-ndp_prefix_info_t *ndp_prefix_info_match(int if_id, const ipv6_addr_t *prefix,
+ndp_prefix_info_t *ndp_prefix_info_match(int if_id, const ipv6_legacy_addr_t *prefix,
         uint8_t prefix_len)
 {
     ndp_prefix_info_t *res = ndp_prefix_info_search(if_id, prefix,

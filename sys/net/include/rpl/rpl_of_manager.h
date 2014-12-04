@@ -29,7 +29,7 @@ extern "C" {
  * @brief Initialization of Manager and of-functions.
  * @param[in]   my_address Own address for initialization of beaconing
 */
-void rpl_of_manager_init(ipv6_addr_t *my_address);
+void rpl_of_manager_init(ipv6_legacy_addr_t *my_address);
 
 /**
  * @brief Returns objective function with a given cope point

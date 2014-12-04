@@ -35,7 +35,7 @@ extern "C" {
 
 /*
  * Protocols (RFC 1700) TODO: may be deleted due to some double definition
- *                            in sys/net/sixlowpan/include/sixlowpan/ip.h
+ *                            in sys/net/sixlowpan_legacy/include/sixlowpan_legacy/ip.h
  */
 #define IPPROTO_IP              (0)               ///<  dummy for IP
 #define IPPROTO_HOPOPTS         (0)               ///<  IP6 hop-by-hop options
@@ -79,7 +79,7 @@ extern "C" {
 #define IPPROTO_CMTP            (38)              ///<  Control Message Transport
 #define IPPROTO_TPXX            (39)              ///<  TP++ Transport
 #define IPPROTO_IL              (40)              ///<  IL transport protocol
-#define IPPROTO_IPV6            (41)              ///<  IP6 header
+#define IPPROTO_IPV6_LEGACY            (41)              ///<  IP6 header
 #define IPPROTO_SDRP            (42)              ///<  Source Demand Routing
 #define IPPROTO_ROUTING         (43)              ///<  IP6 routing header
 #define IPPROTO_FRAGMENT        (44)              ///<  IP6 fragmentation header

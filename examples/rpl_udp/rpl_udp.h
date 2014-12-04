@@ -99,7 +99,7 @@ void *rpl_udp_monitor(void *arg);
 extern radio_address_t id;
 
 /** @brief Char array for IP address printing */
-extern char addr_str[IPV6_MAX_ADDR_STR_LEN];
+extern char addr_str[IPV6_LEGACY_MAX_ADDR_STR_LEN];
 
 #ifdef __cplusplus
 }

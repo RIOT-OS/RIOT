@@ -18,7 +18,7 @@
 #ifndef UDP_H_
 #define UDP_H_
 
-#include "ipv6.h"
+#include "ipv6_legacy.h"
 #include "socket_base/types.h"
 
 #ifdef __cplusplus

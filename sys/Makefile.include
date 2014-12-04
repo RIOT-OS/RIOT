@@ -1,3 +1,6 @@
+ifneq (,$(filter basic_mac,$(USEMODULE)))
+    USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/include
+endif
 ifneq (,$(filter transport_layer,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/include
 endif
@@ -31,7 +34,22 @@ endif
 ifneq (,$(filter protocol_multiplex,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/include
 endif
-ifneq (,$(filter sixlowpan,$(USEMODULE)))
+ifneq (,$(filter sixlowpan_legacy,$(USEMODULE)))
+    USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/include
+endif
+ifneq (,$(filter sixlowpan_hc,$(USEMODULE)))
+    USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/include
+endif
+ifneq (,$(filter sixlowpan_iphc_cbuf,$(USEMODULE)))
+    USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/include
+endif
+ifneq (,$(filter ipv6,$(USEMODULE)))
+    USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/include
+endif
+ifneq (,$(filter ipv6_addr,$(USEMODULE)))
+    USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/include
+endif
+ifneq (,$(filter ipv6_if,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/include
 endif
 ifneq (,$(filter rpl,$(USEMODULE)))

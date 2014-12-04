@@ -7,13 +7,13 @@
  */
 
 /**
- * @addtogroup    net_sixlowpan_ndp Neighbor discovery
- * @ingroup     net_sixlowpan
+ * @addtogroup    net_sixlowpan_legacy_ndp Neighbor discovery
+ * @ingroup     net_sixlowpan_legacy
  * @brief       Internet Control Message Protocol version 6
  *
  * @{
  *
- * @file        include/sixlowpan/icmp.h
+ * @file        include/sixlowpan_legacy/icmp.h
  * @brief       6LoWPAN ICMP related header
  *
  * @author      Stephan Zeisberg <zeisberg@mi.fu-berlin.de>
@@ -22,13 +22,13 @@
  * @author      Oliver Gesch <oliver.gesch@googlemail.com>
  */
 
-#ifndef SIXLOWPAN_ICMP_H
-#define SIXLOWPAN_ICMP_H
+#ifndef SIXLOWPAN_LEGACY_ICMP_H
+#define SIXLOWPAN_LEGACY_ICMP_H
 
 #include <stddef.h>
 #include <stdint.h>
 
-#include "sixlowpan/types.h"
+#include "sixlowpan_legacy/types.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -129,7 +129,7 @@ extern "C" {
  *          RFC 4443, section 3.4
  *      </a>
  */
-#define ICMPV6_PARAMETER_PROB_CODE_IPV6_OPT_UNREC   (2)
+#define ICMPV6_PARAMETER_PROB_CODE_IPV6_LEGACY_OPT_UNREC   (2)
 
 /**
  * @brief Send ICMPv6 parameter problem message.
@@ -143,7 +143,7 @@ extern "C" {
  * @param[in] packet        Data payload for echo request.
  * @param[in] packet_len    Length of data payload.
  */
-void icmpv6_send_parameter_prob(ipv6_addr_t *src, ipv6_addr_t *dest,
+void icmpv6_send_parameter_prob(ipv6_legacy_addr_t *src, ipv6_legacy_addr_t *dest,
                                 uint8_t code, uint32_t pointer,
                                 uint8_t *packet, uint8_t packet_len);
 
@@ -156,7 +156,7 @@ void icmpv6_send_parameter_prob(ipv6_addr_t *src, ipv6_addr_t *dest,
  * @param[in] data      Data payload for echo request.
  * @param[in] data_len  Length of data payload.
  */
-void icmpv6_send_echo_request(ipv6_addr_t *destaddr, uint16_t id,
+void icmpv6_send_echo_request(ipv6_legacy_addr_t *destaddr, uint16_t id,
                               uint16_t seq, uint8_t *data,
                               size_t data_len);
 
@@ -169,7 +169,7 @@ void icmpv6_send_echo_request(ipv6_addr_t *destaddr, uint16_t id,
  * @param[in] data      Data payload for echo reply.
  * @param[in] data_len  Length of data payload.
  */
-void icmpv6_send_echo_reply(ipv6_addr_t *destaddr, uint16_t id,
+void icmpv6_send_echo_reply(ipv6_legacy_addr_t *destaddr, uint16_t id,
                             uint16_t seq, uint8_t *data, size_t data_len);
 
 /**
@@ -200,7 +200,7 @@ void icmpv6_send_router_sol(uint8_t sllao);
  *                      router option. If *abro* == OPT_ABRO add it,
  *                      else not.
  */
-void icmpv6_send_router_adv(ipv6_addr_t *addr, uint8_t sllao,
+void icmpv6_send_router_adv(ipv6_legacy_addr_t *addr, uint8_t sllao,
                             uint8_t mtu, uint8_t pi, uint8_t sixco,
                             uint8_t abro);
 
@@ -217,8 +217,8 @@ void icmpv6_send_router_adv(ipv6_addr_t *addr, uint8_t sllao,
  * @param[in] aro       Flag to include address registration option. If
  *                      *aro* == OPT_ARO add it, else not.
  */
-void icmpv6_send_neighbor_sol(ipv6_addr_t *src, ipv6_addr_t *dest,
-                              ipv6_addr_t *targ, uint8_t slloa,
+void icmpv6_send_neighbor_sol(ipv6_legacy_addr_t *src, ipv6_legacy_addr_t *dest,
+                              ipv6_legacy_addr_t *targ, uint8_t slloa,
                               uint8_t aro);
 
 /**
@@ -235,25 +235,25 @@ void icmpv6_send_neighbor_sol(ipv6_addr_t *src, ipv6_addr_t *dest,
  * @param[in] aro       Flag to include address registration option. If
  *                      *aro* == OPT_ARO add it, else not.
  */
-void icmpv6_send_neighbor_adv(ipv6_addr_t *src, ipv6_addr_t *dst,
-                              ipv6_addr_t *tgt, uint8_t rso,
+void icmpv6_send_neighbor_adv(ipv6_legacy_addr_t *src, ipv6_legacy_addr_t *dst,
+                              ipv6_legacy_addr_t *tgt, uint8_t rso,
                               uint8_t sllao, uint8_t aro);
 
 /**
  * @brief Calculates the checksum for ICMPv6 packets.
  *
- * @param[in] ipv6_buf      The initialized IPv6 header of the packet.
+ * @param[in] ipv6_legacy_buf      The initialized IPv6 header of the packet.
  * @param[in] icmpv6_buf    The initialized ICMPv6_header of the packet
  *                          (except checksum, payload is expected directly
  *                          after the packet header in memory).
  *
  * @return The internet checksum of the given ICMPv6 packet.
  */
-uint16_t icmpv6_csum(ipv6_hdr_t *ipv6_buf, icmpv6_hdr_t *icmpv6_buf);
+uint16_t icmpv6_csum(ipv6_legacy_hdr_t *ipv6_legacy_buf, icmpv6_hdr_t *icmpv6_buf);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* SIXLOWPAN_ICMP_H */
+#endif /* SIXLOWPAN_LEGACY_ICMP_H */
 /** @} */

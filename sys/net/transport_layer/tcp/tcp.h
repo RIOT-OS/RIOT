@@ -17,7 +17,7 @@
 #ifndef TCP_H_
 #define TCP_H_
 
-#include "ipv6.h"
+#include "ipv6_legacy.h"
 #include "socket_base/types.h"
 #include "socket.h"
 

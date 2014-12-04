@@ -7,7 +7,7 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  *
- * @ingroup sixlowpan
+ * @ingroup sixlowpan_legacy
  * @{
  * @file    bordermultiplex.c
  * @brief   multiplexiing border router information
@@ -20,7 +20,7 @@
 #include <string.h>
 
 #include "board_uart0.h"
-#include "sixlowpan/error.h"
+#include "sixlowpan_legacy/error.h"
 
 #include "flowcontrol.h"
 #include "lowpan.h"
@@ -46,9 +46,9 @@ void demultiplex(border_packet_t *packet)
             border_l3_header_t *l3_header_buf = (border_l3_header_t *)packet;
 
             switch (l3_header_buf->ethertype) {
-                case (BORDER_ETHERTYPE_IPV6): {
-                    ipv6_hdr_t *ipv6_buf = (ipv6_hdr_t *)(((unsigned char *)packet) + sizeof(border_l3_header_t));
-                    ipv6_send_packet(ipv6_buf, NULL);
+                case (BORDER_ETHERTYPE_IPV6_LEGACY): {
+                    ipv6_legacy_hdr_t *ipv6_legacy_buf = (ipv6_legacy_hdr_t *)(((unsigned char *)packet) + sizeof(border_l3_header_t));
+                    ipv6_legacy_send_packet(ipv6_legacy_buf, NULL);
                     break;
                 }
 
@@ -66,8 +66,8 @@ void demultiplex(border_packet_t *packet)
             switch (conf_header_buf->conftype) {
                 case (BORDER_CONF_CONTEXT): {
                     border_context_packet_t *context = (border_context_packet_t *)packet;
-                    ipv6_addr_t target_addr;
-                    ipv6_addr_set_all_nodes_addr(&target_addr);
+                    ipv6_legacy_addr_t target_addr;
+                    ipv6_legacy_addr_set_all_nodes_addr(&target_addr);
                     mutex_lock(&lowpan_context_mutex);
                     lowpan_context_update(
                         context->context.cid,
@@ -102,20 +102,20 @@ void demultiplex(border_packet_t *packet)
     }
 }
 
-void multiplex_send_ipv6_over_uart(ipv6_hdr_t *packet)
+void multiplex_send_ipv6_legacy_over_uart(ipv6_legacy_hdr_t *packet)
 {
     border_l3_header_t *serial_buf;
 
     serial_buf = (border_l3_header_t *)get_serial_out_buffer(0);
     serial_buf->empty = 0;
     serial_buf->type = BORDER_PACKET_L3_TYPE;
-    serial_buf->ethertype = BORDER_ETHERTYPE_IPV6;
-    memcpy(get_serial_in_buffer(0) + sizeof(border_l3_header_t), packet, IPV6_HDR_LEN + packet->length);
+    serial_buf->ethertype = BORDER_ETHERTYPE_IPV6_LEGACY;
+    memcpy(get_serial_in_buffer(0) + sizeof(border_l3_header_t), packet, IPV6_LEGACY_HDR_LEN + packet->length);
 
     flowcontrol_send_over_uart((border_packet_t *) serial_buf, sizeof(border_l3_header_t));
 }
 
-void multiplex_send_addr_over_uart(ipv6_addr_t *addr)
+void multiplex_send_addr_over_uart(ipv6_legacy_addr_t *addr)
 {
     border_addr_packet_t *serial_buf;
 
@@ -123,7 +123,7 @@ void multiplex_send_addr_over_uart(ipv6_addr_t *addr)
     serial_buf->empty = 0;
     serial_buf->type = BORDER_PACKET_CONF_TYPE;
     serial_buf->conftype = BORDER_CONF_IPADDR;
-    memcpy(&serial_buf->addr, addr, sizeof(ipv6_addr_t));
+    memcpy(&serial_buf->addr, addr, sizeof(ipv6_legacy_addr_t));
 
     flowcontrol_send_over_uart((border_packet_t *) serial_buf, sizeof(border_addr_packet_t));
 }

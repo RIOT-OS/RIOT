@@ -1,0 +1,4 @@
+USEMODULE += netapi
+USEMODULE += basic_mac
+USEMODULE += netdev_dummy
+USEMODULE += vtimer

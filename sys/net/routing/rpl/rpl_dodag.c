@@ -27,7 +27,7 @@
 
 #define ENABLE_DEBUG (0)
 #if ENABLE_DEBUG
-char addr_str[IPV6_MAX_ADDR_STR_LEN];
+char addr_str[IPV6_LEGACY_MAX_ADDR_STR_LEN];
 #endif
 #include "debug.h"
 
@@ -78,7 +78,7 @@ rpl_instance_t *rpl_get_my_instance(void)
     return NULL;
 }
 
-rpl_dodag_t *rpl_new_dodag(uint8_t instanceid, ipv6_addr_t *dodagid)
+rpl_dodag_t *rpl_new_dodag(uint8_t instanceid, ipv6_legacy_addr_t *dodagid)
 {
     rpl_instance_t *inst;
     inst = rpl_get_instance(instanceid);
@@ -107,7 +107,7 @@ rpl_dodag_t *rpl_new_dodag(uint8_t instanceid, ipv6_addr_t *dodagid)
 
 }
 
-rpl_dodag_t *rpl_get_dodag(ipv6_addr_t *id)
+rpl_dodag_t *rpl_get_dodag(ipv6_legacy_addr_t *id)
 {
     for (int i = 0; i < RPL_MAX_DODAGS; i++) {
         if (dodags[i].used && (rpl_equal_id(&dodags[i].dodag_id, id))) {
@@ -139,7 +139,7 @@ void rpl_leave_dodag(rpl_dodag_t *dodag)
     rpl_delete_all_parents();
 }
 
-bool rpl_equal_id(ipv6_addr_t *id1, ipv6_addr_t *id2)
+bool rpl_equal_id(ipv6_legacy_addr_t *id1, ipv6_legacy_addr_t *id2)
 {
     for (uint8_t i = 0; i < 2; i++) {
         DEBUGF("ID1: %d ID2: %d\n", id1->uint8[12 + i], id2->uint8[12 + i]);
@@ -153,7 +153,7 @@ bool rpl_equal_id(ipv6_addr_t *id1, ipv6_addr_t *id2)
 
 }
 
-rpl_parent_t *rpl_new_parent(rpl_dodag_t *dodag, ipv6_addr_t *address, uint16_t rank)
+rpl_parent_t *rpl_new_parent(rpl_dodag_t *dodag, ipv6_legacy_addr_t *address, uint16_t rank)
 {
     rpl_parent_t *parent;
     rpl_parent_t *end;
@@ -176,7 +176,7 @@ rpl_parent_t *rpl_new_parent(rpl_dodag_t *dodag, ipv6_addr_t *address, uint16_t 
     return rpl_new_parent(dodag, address, rank);
 }
 
-rpl_parent_t *rpl_find_parent(ipv6_addr_t *address)
+rpl_parent_t *rpl_find_parent(ipv6_legacy_addr_t *address)
 {
     rpl_parent_t *parent;
     rpl_parent_t *end;
@@ -319,7 +319,7 @@ void rpl_parent_update(rpl_parent_t *parent)
     }
 }
 
-void rpl_join_dodag(rpl_dodag_t *dodag, ipv6_addr_t *parent, uint16_t parent_rank)
+void rpl_join_dodag(rpl_dodag_t *dodag, ipv6_legacy_addr_t *parent, uint16_t parent_rank)
 {
     rpl_dodag_t *my_dodag;
     rpl_parent_t *preferred_parent;
@@ -362,7 +362,7 @@ void rpl_join_dodag(rpl_dodag_t *dodag, ipv6_addr_t *parent, uint16_t parent_ran
     DEBUG("\tdefault_lifetime:\t%02X\n", my_dodag->default_lifetime);
     DEBUG("\tgrounded:\t%02X\n", my_dodag->grounded);
     DEBUG("\tmy_preferred_parent:\t%s\n",
-          ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
+          ipv6_legacy_addr_to_str(addr_str, IPV6_LEGACY_MAX_ADDR_STR_LEN,
                            &my_dodag->my_preferred_parent->addr));
     DEBUG("\tmy_preferred_parent rank\t%02X\n", my_dodag->my_preferred_parent->rank);
     DEBUG("\tmy_preferred_parent lifetime\t%04X\n", my_dodag->my_preferred_parent->lifetime);
@@ -371,7 +371,7 @@ void rpl_join_dodag(rpl_dodag_t *dodag, ipv6_addr_t *parent, uint16_t parent_ran
     delay_dao();
 }
 
-void rpl_global_repair(rpl_dodag_t *dodag, ipv6_addr_t *p_addr, uint16_t rank)
+void rpl_global_repair(rpl_dodag_t *dodag, ipv6_legacy_addr_t *p_addr, uint16_t rank)
 {
     DEBUGF("[INFO] Global repair started\n");
     rpl_dodag_t *my_dodag = rpl_get_my_dodag();
@@ -420,7 +420,7 @@ void rpl_local_repair(void)
 
 }
 
-ipv6_addr_t *rpl_get_my_preferred_parent(void)
+ipv6_legacy_addr_t *rpl_get_my_preferred_parent(void)
 {
     rpl_dodag_t *my_dodag = rpl_get_my_dodag();
 

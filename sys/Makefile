@@ -16,6 +16,9 @@ endif
 ifneq (,$(filter l2_ping,$(USEMODULE)))
     DIRS += net/link_layer/ping
 endif
+ifneq (,$(filter basic_mac,$(USEMODULE)))
+    DIRS += net/link_layer/basic_mac
+endif
 ifneq (,$(filter transport_layer,$(USEMODULE)))
 	USEMODULE += udp
 	USEMODULE += tcp
@@ -35,11 +38,29 @@ endif
 ifneq (,$(filter protocol_multiplex,$(USEMODULE)))
     DIRS += net/link_layer/protocol-multiplex
 endif
-ifneq (,$(filter sixlowpan,$(USEMODULE)))
-    DIRS += net/network_layer/sixlowpan
+ifneq (,$(filter sixlowpan_legacy,$(USEMODULE)))
+    DIRS += net/network_layer/sixlowpan_legacy
 endif
 ifneq (,$(filter sixlowborder,$(USEMODULE)))
-    DIRS += net/network_layer/sixlowpan/border
+    DIRS += net/network_layer/sixlowpan_legacy/border
+endif
+ifneq (,$(filter sixlowpan,$(USEMODULE)))
+    DIRS += net/link_layer/sixlowpan
+endif
+ifneq (,$(filter sixlowpan_hc,$(USEMODULE)))
+    DIRS += net/link_layer/sixlowpan/hc
+endif
+ifneq (,$(filter sixlowpan_iphc_cbuf,$(USEMODULE)))
+    DIRS += net/link_layer/sixlowpan/iphc_cbuf
+endif
+ifneq (,$(filter ipv6,$(USEMODULE)))
+    DIRS += net/network_layer/ipv6
+endif
+ifneq (,$(filter ipv6_addr,$(USEMODULE)))
+    DIRS += net/network_layer/ipv6/addr
+endif
+ifneq (,$(filter ipv6_if,$(USEMODULE)))
+    DIRS += net/network_layer/ipv6/if
 endif
 ifneq (,$(filter rpl,$(USEMODULE)))
     DIRS += net/routing/rpl

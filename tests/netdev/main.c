@@ -628,7 +628,7 @@ static int check_protocol(void)
                     puts("Got protocol: 6LoWPAN");
                     return 1;
 
-                case NETDEV_PROTO_IPV6:
+                case NETDEV_PROTO_IPV6_LEGACY:
                     puts("Got protocol: IPv6");
                     return 1;
 

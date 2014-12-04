@@ -7,7 +7,7 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  *
- * @ingroup sixlowpan
+ * @ingroup sixlowpan_legacy
  * @{
  * @file    serialnumber.c
  * @brief   serial number arithmetics (corresponding RFC1982) for version field in ABRO

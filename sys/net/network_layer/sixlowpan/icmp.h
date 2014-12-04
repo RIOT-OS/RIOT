@@ -9,9 +9,9 @@
  */
 
 /**
- * @ingroup net_sixlowpan
+ * @ingroup net_sixlowpan_legacy
  * @{
- * @file    sixlowpan/icmp.h
+ * @file    sixlowpan_legacy/icmp.h
  * @brief   6lowpan neighbor discovery constants, data structs, and prototypes
  * @author  Stephan Zeisberg <zeisberg@mi.fu-berlin.de>
  * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
@@ -19,15 +19,15 @@
  * @}
  */
 
-#ifndef _SIXLOWPAN_ICMP_H
-#define _SIXLOWPAN_ICMP_H
+#ifndef _SIXLOWPAN_LEGACY_ICMP_H
+#define _SIXLOWPAN_LEGACY_ICMP_H
 
 #include <stdint.h>
 
 #include "vtimer.h"
-#include "sixlowpan/icmp.h"
-#include "sixlowpan/ndp.h"
-#include "sixlowpan/types.h"
+#include "sixlowpan_legacy/icmp.h"
+#include "sixlowpan_legacy/ndp.h"
+#include "sixlowpan_legacy/types.h"
 
 #include "lowpan.h"
 #include "ip.h"
@@ -59,7 +59,7 @@ void recv_nbr_adv(void);
 void recv_nbr_sol(void);
 
 void nbr_cache_auto_rem(void);
-ndp_a6br_cache_t *abr_add_context(uint16_t version, ipv6_addr_t *abr_addr,
+ndp_a6br_cache_t *abr_add_context(uint16_t version, ipv6_legacy_addr_t *abr_addr,
                                   uint8_t cid);
 void abr_remove_context(uint8_t cid);
 
@@ -67,4 +67,4 @@ void abr_remove_context(uint8_t cid);
 }
 #endif
 
-#endif /* _SIXLOWPAN_ICMP_H*/
+#endif /* _SIXLOWPAN_LEGACY_ICMP_H*/

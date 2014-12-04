@@ -24,7 +24,7 @@
 
 #include <stdint.h>
 
-#include "ipv6.h"
+#include "ipv6_legacy.h"
 
 #include "socket_base/in.h"
 
@@ -182,7 +182,7 @@ typedef struct __attribute__((packed)) {
     uint8_t     sin6_family;    ///< set to AF_INET6
     uint16_t    sin6_port;      ///< transport layer port number
     uint32_t    sin6_flowinfo;  ///< IPv6 flow information
-    ipv6_addr_t sin6_addr;      ///< IPv6 address
+    ipv6_legacy_addr_t sin6_addr;      ///< IPv6 address
 } sockaddr6_t;
 
 /**
