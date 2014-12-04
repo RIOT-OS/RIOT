@@ -34,6 +34,9 @@ typedef struct {
     unsigned int mask;          /**< Size of buffer -1, i.e. mask of the bits */
 } cib_t;
 
+/**
+ * @brief   Initialize cib_t to a given size.
+ */
 #define CIB_INIT(SIZE) { 0, 0, (SIZE) - 1 }
 
 /**
