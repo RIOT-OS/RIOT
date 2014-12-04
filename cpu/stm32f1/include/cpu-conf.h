@@ -20,8 +20,8 @@
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef CPUCONF_H_
-#define CPUCONF_H_
+#ifndef __CPU_CONF_H
+#define __CPU_CONF_H
 
 #include "stm32f10x.h"
 
@@ -56,12 +56,12 @@ extern "C" {
 /** @} */
 
 /**
- * @name Length for reading CPU_ID
+ * @brief Length for reading CPU_ID
  */
 #define CPUID_ID_LEN                    (12)
 
 /**
- * @name Definition of different panic modes
+ * @brief Definition of different panic modes
  */
 typedef enum {
     HARD_FAULT,

@@ -33,12 +33,12 @@ extern "C" {
 #endif
 
 /**
- * @name The nominal CPU core clock in this board
+ * @brief The nominal CPU core clock in this board
  */
 #define F_CPU               (96000000)
 
 /**
- * @name Assign the peripheral timer to be used as hardware timer
+ * @brief Assign the peripheral timer to be used as hardware timer
  */
 #define HW_TIMER            TIMER_0
 
@@ -89,7 +89,7 @@ extern "C" {
 /** @} */
 
 /**
- * @name define radio packet length
+ * @brief define radio packet length
  */
 typedef uint8_t radio_packet_length_t;
 

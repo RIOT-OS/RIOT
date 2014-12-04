@@ -115,9 +115,9 @@ typedef union x86_rtc_data {
  * You must not call this function on your own accord.
  *
  * The RTC subsystem will refuse to work if the CMOS says that
- * <li>there was a power loss,
- * <li>the stored time is invalid (i.e. February 30), or
- * <li>the CMOS had a checksum failure.
+ * @li there was a power loss,
+ * @li the stored time is invalid (i.e. February 30), or
+ * @li the CMOS had a checksum failure.
  */
 void x86_init_rtc(void);
 

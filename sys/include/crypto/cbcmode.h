@@ -10,7 +10,7 @@
  * @ingroup     sys_crypto
  * @{
  *
- * @file        cbcmode.h
+ * @file
  * @brief       Headers of the implementation of the CBC Mode of Operation
  *
  * Implementation of the CBC Mode of Operation with Ciphertext-Stealing for encryption.
@@ -71,7 +71,6 @@ enum {
 
 
 /**
- * @struct CBCModeContext CBCMode.c "CBCMode.c"
  * @brief   The context for processing the en-/decryption in the CBC-Mode with
  *          CTS
  *
@@ -128,7 +127,7 @@ int block_cipher_mode_init(CipherModeContext *context, uint8_t key_size,
  *                        invocations of this module which use this particular
  *                        key. It also contains the opaque context for the
  *                        underlying BlockCipher as well.
- * @param   keySize       key size in bytes.
+ * @param   key_size      key size in bytes.
  * @param   key           pointer to the key.
  * @param   cipher_index  the index of the cipher-algorithm to init in the
  *                        (cipher-)archive
@@ -142,7 +141,7 @@ int block_cipher_mode_init0(CipherModeContext *context, uint8_t key_size,
                             uint8_t *key, uint8_t cipher_index);
 
 /**
- * @brief   prints the debug-messages passed by ::dumpBuffer
+ * @brief   prints the debug-messages passed by @ref dump_buffer
  *
  * @param   mode      the mode of the debug-message
  * @param   format    pointer to the message

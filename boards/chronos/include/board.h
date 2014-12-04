@@ -18,8 +18,8 @@
  * @author      unknwon
  */
 
-#ifndef _MSB_BOARD_H
-#define _MSB_BOARD_H
+#ifndef _CHRONOS_BOARD_H
+#define _CHRONOS_BOARD_H
 
 #include <stdint.h>
 
@@ -44,4 +44,5 @@ typedef uint8_t radio_packet_length_t;
 }
 #endif
 
-#endif // _MSB_BOARD_H
+#endif /* _CHRONOS_BOARD_H */
+/** @} */

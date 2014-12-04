@@ -153,7 +153,7 @@ typedef struct {
  *
  * @param size        size of the bit array in the filter
  * @param num_hashes  the number of hash functions
- * @param functions   varg function pointers, use hashfp_t
+ * @param ...         varg function pointers, use hashfp_t
  *
  * @return An allocated bloom filter
  *
@@ -176,7 +176,7 @@ void bloom_del(bloom_t *bloom);
  * Once a string has been added to the filter, it cannot be "removed"!
  *
  * @param bloom  Bloom filter
- * @param s      string to add
+ * @param buf    string to add
  * @return       nothing
  *
  */
@@ -212,7 +212,7 @@ void bloom_add(bloom_t *bloom, const uint8_t *buf, size_t len);
  * can only speak a qualified YES.
  *
  * @param bloom  Bloom filter
- * @param s      string to check
+ * @param buf    string to check
  * @return       false if string does not exist in the filter
  * @return       true if string is may be in the filter
  *

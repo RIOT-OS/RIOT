@@ -288,7 +288,7 @@ size_t cbor_serialize_map(cbor_stream_t *s, size_t map_length);
  * offset += cbor_deserialize_byte_string(&stream, offset, value2, sizeof(value)); // read value 2
  * @endcode
  *
- * @param array_length Where the array length is stored
+ * @param map_length Where the array length is stored
  */
 size_t cbor_deserialize_map(const cbor_stream_t *s, size_t offset, size_t *map_length);
 

@@ -218,8 +218,8 @@ typedef struct {
  *                      call. It should be passed to future invocations of
  *                      this module
  *                      which use this particular key.
- * @param   blockSize   size of the block in bytes.
- * @param   keySize     key size in bytes
+ * @param   block_size  size of the block in bytes.
+ * @param   key_size    key size in bytes
  * @param   key         pointer to the key
  *
  * @return  Whether initialization was successful. The command may be
@@ -233,7 +233,7 @@ int twofish_init(cipher_context_t *context, uint8_t block_size, uint8_t key_size
  *
  * @param   context     the CipherContext-struct to save the updated key in
  * @param   key         a pointer to the secret key
- * @param   keysize     the length of the secret key
+ * @param   key_size    the length of the secret key
  *
  * @return SUCCESS
  */

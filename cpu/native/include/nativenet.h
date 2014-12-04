@@ -1,4 +1,4 @@
-/**
+/*
  * nativenet transceiver interface
  *
  * A configurable transceiver for the native port.
@@ -16,7 +16,7 @@
  */
 
 /**
- * @defgroup    native_net
+ * @defgroup    native_net Native network interface
  * @ingroup     native_cpu
  * @{
  * @author  Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
@@ -62,7 +62,7 @@ extern "C" {
 extern const netdev_driver_t nativenet_driver;
 
 /**
- * @brief   Default @netdev API device
+ * @brief   Default @ref netdev API device
  */
 extern netdev_t nativenet_default_dev;
 
@@ -144,7 +144,7 @@ int16_t nativenet_get_channel(void);
 /**
  * Set transceiver pan
  *
- * @param channel the pan
+ * @param pan the pan
  * @return the pan
  */
 uint16_t nativenet_set_pan(uint16_t pan);

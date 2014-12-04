@@ -69,9 +69,7 @@ typedef struct {
 
 
 /**
- * @struct BlockCipherInterface_t
  * @brief   BlockCipher-Interface for the Cipher-Algorithms
- * @typedef BlockCipherInterface_t
  */
 typedef struct {
     char name[10];
@@ -101,8 +99,6 @@ typedef struct CipherModeContext {
 
 /**
  * @brief       struct for an archive of all available ciphers
- * @struct      BlockCipher_Archive_t CipherManager.h "ciphers/CipherManager.h"
- * @typedef     BlockCipher_Archive_t
  */
 typedef struct {
         // the number of available ciphers

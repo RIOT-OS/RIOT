@@ -11,16 +11,11 @@
  * @defgroup    mc1322x Freescale MC1322x
  * @ingroup     cpu
  * @brief       Freescale MC1322x specific code
+ * @{
  */
 
 #ifndef CPU_H
 #define CPU_H
-
-/**
- * @defgroup    mc1322x     Freescale mc1322x
- * @ingroup     cpu
- * @{
- */
 
 #include <stdbool.h>
 #include "arm_cpu.h"

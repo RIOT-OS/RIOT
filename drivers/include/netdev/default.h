@@ -23,8 +23,6 @@
 #include "netdev/base.h"
 
 /**
- * @def     NETDEV_DEFAULT
- *
  * @brief   Default device as a pointer of netdev_t.
  */
 #ifdef MODULE_AT86RF231
@@ -62,3 +60,4 @@ extern "C" {
 #endif /* MODULE_NATIVENET */
 
 #endif /* __NETDEV_DEFAULT_H_ */
+/** @} */
