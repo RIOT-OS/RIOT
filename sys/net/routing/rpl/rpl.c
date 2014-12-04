@@ -119,7 +119,7 @@ uint8_t rpl_init(int if_id)
 
     /* initialize objective function manager */
     rpl_of_manager_init(&my_address);
-	rpl_init_mode(&my_address);
+    rpl_init_mode(&my_address);
     return SIXLOWERROR_SUCCESS;
 }
 
