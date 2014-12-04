@@ -1,4 +1,4 @@
-ifneq (,$(filter basic_mac,$(USEMODULE)))
+ifneq (,$(filter nomac,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/include
 endif
 ifneq (,$(filter transport_layer,$(USEMODULE)))

@@ -67,8 +67,8 @@
 #include "tcp.h"
 #endif
 
-#ifdef MODULE_BASIC_MAC
-#include "basic_mac.h"
+#ifdef MODULE_NOMAC
+#include "nomac.h"
 #endif
 
 #ifdef MODULE_NET_IF
@@ -249,9 +249,9 @@ void auto_init(void)
     DEBUG("Auto init net_if module.\n");
     l2_ping_init();
 #endif
-#ifdef MODULE_BASIC_MAC
-    DEBUG("Auto init basic_mac module.\n");
-    basic_mac_init_module();
+#ifdef MODULE_NOMAC
+    DEBUG("Auto init nomac module.\n");
+    nomac_init_module();
 #endif
 #ifdef MODULE_NET_IF
     DEBUG("Auto init net_if module.\n");

@@ -13,7 +13,7 @@
 #include "netdev/base.h"
 #include "thread.h"
 
-#include "basic_mac.h"
+#include "nomac.h"
 
 #ifdef MODULE_NETDEV_DUMMY
 #include "netdev_dummy.h"
@@ -22,16 +22,15 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-#define BASIC_MAC_MSG_QUEUE_SIZE    (16)
+#define NOMAC_MSG_QUEUE_SIZE    (16)
 
 static struct {
     kernel_pid_t registrar_pid; /**< Thread recipient is registered to */
     kernel_pid_t recipient_pid; /**< Registered recipient thread */
-} _basic_mac_registry[BASIC_MAC_REGISTRY_SIZE];
+} _nomac_registry[NOMAC_REGISTRY_SIZE];
 
-static int _basic_mac_recv_cb(netdev_t *dev, void *src, size_t src_len,
-                              void *dest, size_t dest_len, void *payload,
-                              size_t payload_len)
+static int _nomac_recv_cb(netdev_t *dev, void *src, size_t src_len, void *dest,
+                          size_t dest_len, void *payload, size_t payload_len)
 {
     (void)dev;
     kernel_pid_t current_pid = thread_getpid();
@@ -49,8 +48,8 @@ static int _basic_mac_recv_cb(netdev_t *dev, void *src, size_t src_len,
     msg_pkt.type = NETAPI_MSG_TYPE;
     msg_pkt.content.ptr = (char *)(&packet);
 
-    for (unsigned int i = 0; i < BASIC_MAC_REGISTRY_SIZE; i++) {
-        if (_basic_mac_registry[i].registrar_pid == current_pid) {
+    for (unsigned int i = 0; i < NOMAC_REGISTRY_SIZE; i++) {
+        if (_nomac_registry[i].registrar_pid == current_pid) {
             offset = 0;
 
             while (offset < payload_len) {
@@ -59,7 +58,7 @@ static int _basic_mac_recv_cb(netdev_t *dev, void *src, size_t src_len,
                 packet.data_len = payload_len - offset;
 
                 msg_send_receive(&msg_pkt, &msg_ack,
-                                 _basic_mac_registry[i].recipient_pid);
+                                 _nomac_registry[i].recipient_pid);
                 ack = (netapi_ack_t *)(msg_ack.content.ptr);
 
                 if ((msg_ack.type == NETAPI_MSG_TYPE) &&
@@ -71,8 +70,8 @@ static int _basic_mac_recv_cb(netdev_t *dev, void *src, size_t src_len,
                     else {
                         DEBUG("Error code received for registrar \"%s\" with "
                               "recipient \"%s\": %d",
-                              thread_getname(_basic_mac_registry[i].registrar_pid),
-                              thread_getname(_basic_mac_registry[i].recipient_pid),
+                              thread_getname(_nomac_registry[i].registrar_pid),
+                              thread_getname(_nomac_registry[i].recipient_pid),
                               -ack->result);
 
                         return ack->result;
@@ -82,8 +81,8 @@ static int _basic_mac_recv_cb(netdev_t *dev, void *src, size_t src_len,
                     DEBUG("Unexpected msg instead of ACK. Abort for registrar "
                           "\"%s\" with recipient \"%s\": msg.type = %d, "
                           "ack->type = %d, ack->orig = %d",
-                          thread_getname(_basic_mac_registry[i].registrar_pid),
-                          thread_getname(_basic_mac_registry[i].recipient_pid),
+                          thread_getname(_nomac_registry[i].registrar_pid),
+                          thread_getname(_nomac_registry[i].recipient_pid),
                           msg_ack->type, ack->type, ack->orig);
 
                     return -ENOMSG;
@@ -96,25 +95,25 @@ static int _basic_mac_recv_cb(netdev_t *dev, void *src, size_t src_len,
     return payload_len;
 }
 
-static inline int _basic_mac_send(netdev_t *dev, netapi_snd_pkt_t *pkt)
+static inline int _nomac_send(netdev_t *dev, netapi_snd_pkt_t *pkt)
 {
     return dev->driver->send_data(dev, pkt->dest, pkt->dest_len, pkt->ulh,
                                   pkt->data, pkt->data_len);
 }
 
-static int _basic_mac_get_registry(netapi_conf_t *conf)
+static int _nomac_get_registry(netapi_conf_t *conf)
 {
     kernel_pid_t current_pid = thread_getpid();
-    kernel_pid_t registry[BASIC_MAC_REGISTRY_SIZE];
+    kernel_pid_t registry[NOMAC_REGISTRY_SIZE];
     uint8_t size = 0;
 
-    for (int i = 0; i < BASIC_MAC_REGISTRY_SIZE; i++) {
+    for (int i = 0; i < NOMAC_REGISTRY_SIZE; i++) {
         if ((size * sizeof(kernel_pid_t)) > (conf->data_len)) {
             return -EOVERFLOW;
         }
 
-        if (_basic_mac_registry[i].registrar_pid == current_pid) {
-            registry[size++] = _basic_mac_registry[i].recipient_pid;
+        if (_nomac_registry[i].registrar_pid == current_pid) {
+            registry[size++] = _nomac_registry[i].recipient_pid;
         }
     }
 
@@ -124,27 +123,28 @@ static int _basic_mac_get_registry(netapi_conf_t *conf)
     return 0;
 }
 
-static int _basic_mac_get_option(netdev_t *dev, netapi_conf_t *conf)
+static int _nomac_get_option(netdev_t *dev, netapi_conf_t *conf)
 {
     int res;
 
-    switch ((basic_mac_conf_type_t)conf->param) {
-        case BASIC_MAC_PROTO:
-        case BASIC_MAC_CHANNEL:
-        case BASIC_MAC_ADDRESS:
-        case BASIC_MAC_NID:
-        case BASIC_MAC_MAX_PACKET_SIZE:
-        case BASIC_MAC_ADDRESS2:
-            if ((res = dev->driver->get_option(dev, (netdev_opt_t)conf->param, conf->data,
-                                               &(conf->data_len))) == 0) {
+    switch ((nomac_conf_type_t)conf->param) {
+        case NOMAC_PROTO:
+        case NOMAC_CHANNEL:
+        case NOMAC_ADDRESS:
+        case NOMAC_NID:
+        case NOMAC_MAX_PACKET_SIZE:
+        case NOMAC_ADDRESS2:
+            if ((res = dev->driver->get_option(dev, (netdev_opt_t)conf->param,
+                                               conf->data, &(conf->data_len))
+                ) == 0) {
                 return (int)conf->data_len;
             }
             else {
                 return res;
             }
 
-        case BASIC_MAC_REGISTRY:
-            return _basic_mac_get_registry(conf);
+        case NOMAC_REGISTRY:
+            return _nomac_get_registry(conf);
 
         default:
             break;
@@ -153,14 +153,14 @@ static int _basic_mac_get_option(netdev_t *dev, netapi_conf_t *conf)
     return -ENOTSUP;
 }
 
-static int _basic_mac_set_option(netdev_t *dev, netapi_conf_t *conf)
+static int _nomac_set_option(netdev_t *dev, netapi_conf_t *conf)
 {
-    switch ((basic_mac_conf_type_t)(conf->param)) {
-        case BASIC_MAC_PROTO:
-        case BASIC_MAC_CHANNEL:
-        case BASIC_MAC_ADDRESS:
-        case BASIC_MAC_NID:
-        case BASIC_MAC_ADDRESS2:
+    switch ((nomac_conf_type_t)(conf->param)) {
+        case NOMAC_PROTO:
+        case NOMAC_CHANNEL:
+        case NOMAC_ADDRESS:
+        case NOMAC_NID:
+        case NOMAC_ADDRESS2:
             return dev->driver->set_option(dev, (netdev_opt_t)conf->param,
                                            conf->data, conf->data_len);
 
@@ -171,17 +171,17 @@ static int _basic_mac_set_option(netdev_t *dev, netapi_conf_t *conf)
     return -ENOTSUP;
 }
 
-static void *_basic_mac_runner(void *args)
+static void *_nomac_runner(void *args)
 {
     netdev_t *dev = (netdev_t *)args;
-    msg_t msg_cmd, msg_ack, msg_queue[BASIC_MAC_MSG_QUEUE_SIZE];
+    msg_t msg_cmd, msg_ack, msg_queue[NOMAC_MSG_QUEUE_SIZE];
 
     netapi_cmd_t *cmd;
     netapi_ack_t *ack;
 
     msg_ack.type = NETAPI_MSG_TYPE;
 
-    msg_init_queue(msg_queue, BASIC_MAC_MSG_QUEUE_SIZE);
+    msg_init_queue(msg_queue, NOMAC_MSG_QUEUE_SIZE);
 
     while (1) {
         msg_receive(&msg_cmd);
@@ -196,29 +196,29 @@ static void *_basic_mac_runner(void *args)
 
             switch (cmd->type) {
                 case NETAPI_CMD_SND:
-                    ack->result = _basic_mac_send(dev, (netapi_snd_pkt_t *)cmd);
+                    ack->result = _nomac_send(dev, (netapi_snd_pkt_t *)cmd);
 
                     break;
 
                 case NETAPI_CMD_GET:
-                    ack->result = _basic_mac_get_option(dev,
-                                                        (netapi_conf_t *)cmd);
+                    ack->result = _nomac_get_option(dev,
+                                                    (netapi_conf_t *)cmd);
                     break;
 
                 case NETAPI_CMD_SET:
-                    ack->result = _basic_mac_set_option(dev,
-                                                        (netapi_conf_t *)cmd);
+                    ack->result = _nomac_set_option(dev,
+                                                    (netapi_conf_t *)cmd);
                     break;
 
                 case NETAPI_CMD_REG:
                     ack->result = -ENOBUFS;
 
-                    for (int i = 0; i < BASIC_MAC_REGISTRY_SIZE; i++) {
-                        if (_basic_mac_registry[i].registrar_pid == KERNEL_PID_UNDEF) {
+                    for (int i = 0; i < NOMAC_REGISTRY_SIZE; i++) {
+                        if (_nomac_registry[i].registrar_pid == KERNEL_PID_UNDEF) {
                             netapi_reg_t *reg = (netapi_reg_t *)cmd;
 
-                            _basic_mac_registry[i].registrar_pid = thread_getpid();
-                            _basic_mac_registry[i].recipient_pid = reg->reg_pid;
+                            _nomac_registry[i].registrar_pid = thread_getpid();
+                            _nomac_registry[i].recipient_pid = reg->reg_pid;
                             ack->result = NETAPI_STATUS_OK;
 
                             break;
@@ -230,12 +230,12 @@ static void *_basic_mac_runner(void *args)
                 case NETAPI_CMD_UNREG:
                     ack->result = NETAPI_STATUS_OK;
 
-                    for (int i = 0; i < BASIC_MAC_REGISTRY_SIZE; i++) {
+                    for (int i = 0; i < NOMAC_REGISTRY_SIZE; i++) {
                         netapi_reg_t *reg = (netapi_reg_t *)cmd;
 
-                        if (_basic_mac_registry[i].registrar_pid == thread_getpid() &&
-                            _basic_mac_registry[i].recipient_pid == reg->reg_pid) {
-                            _basic_mac_registry[i].recipient_pid = KERNEL_PID_UNDEF;
+                        if (_nomac_registry[i].registrar_pid == thread_getpid() &&
+                            _nomac_registry[i].recipient_pid == reg->reg_pid) {
+                            _nomac_registry[i].recipient_pid = KERNEL_PID_UNDEF;
 
                             break;
                         }
@@ -272,26 +272,26 @@ static void *_basic_mac_runner(void *args)
     return NULL;
 }
 
-void basic_mac_init_module(void)
+void nomac_init_module(void)
 {
-    for (int i = 0; i < BASIC_MAC_REGISTRY_SIZE; i++) {
-        _basic_mac_registry[i].registrar_pid = KERNEL_PID_UNDEF;
-        _basic_mac_registry[i].recipient_pid = KERNEL_PID_UNDEF;
+    for (int i = 0; i < NOMAC_REGISTRY_SIZE; i++) {
+        _nomac_registry[i].registrar_pid = KERNEL_PID_UNDEF;
+        _nomac_registry[i].recipient_pid = KERNEL_PID_UNDEF;
     }
 }
 
-kernel_pid_t basic_mac_init(char *stack, int stacksize, char priority,
-                            const char *name, netdev_t *dev)
+kernel_pid_t nomac_init(char *stack, int stacksize, char priority,
+                        const char *name, netdev_t *dev)
 {
-    dev->driver->add_receive_data_callback(dev, _basic_mac_recv_cb);
+    dev->driver->add_receive_data_callback(dev, _nomac_recv_cb);
 
     return thread_create(stack, stacksize, priority, CREATE_STACKTEST,
-                         _basic_mac_runner, (void *)dev, name);
+                         _nomac_runner, (void *)dev, name);
 }
 
 #ifdef MODULE_NETDEV_DUMMY
-void basic_mac_update_callback(netdev_t *dev)
+void nomac_update_callback(netdev_t *dev)
 {
-    dev->driver->add_receive_data_callback(dev, _basic_mac_recv_cb);
+    dev->driver->add_receive_data_callback(dev, _nomac_recv_cb);
 }
 #endif

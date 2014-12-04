@@ -10,13 +10,13 @@
  * @addtogroup  unittests
  * @{
  *
- * @file        tests-basic_mac.h
- * @brief       Unittests for the ``basic_mac`` module
+ * @file        tests-nomac.h
+ * @brief       Unittests for the ``nomac`` module
  *
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef __TESTS_BASIC_MAC_H_
-#define __TESTS_BASIC_MAC_H_
+#ifndef __TESTS_NOMAC_H_
+#define __TESTS_NOMAC_H_
 
 #include "../unittests.h"
 
@@ -27,7 +27,7 @@ extern "C" {
 /**
  * @brief   The entry point of this test suite.
  */
-void tests_basic_mac(void);
+void tests_nomac(void);
 
 #ifdef __cplusplus
 }
