@@ -114,7 +114,7 @@ void native_print_signals(void)
     }
 
     if (sigprocmask(SIG_SETMASK, NULL, &q) == -1) {
-        err(EXIT_FAILURE, "native_print_signals(): sigprocmask");
+        err(EXIT_FAILURE, "native_print_signals: sigprocmask");
     }
 
     for (int i = 1; i < (NSIG); i++) {
@@ -150,7 +150,7 @@ unsigned disableIRQ(void)
     }
 
     if (sigprocmask(SIG_SETMASK, &_native_sig_set_dint, NULL) == -1) {
-        err(EXIT_FAILURE, "disableIRQ(): sigprocmask()");
+        err(EXIT_FAILURE, "disableIRQ: sigprocmask");
     }
 
     prev_state = native_interrupts_enabled;
@@ -181,7 +181,7 @@ unsigned enableIRQ(void)
     DEBUG("enableIRQ()\n");
 
     if (sigprocmask(SIG_SETMASK, &_native_sig_set, NULL) == -1) {
-        err(EXIT_FAILURE, "enableIRQ(): sigprocmask()");
+        err(EXIT_FAILURE, "enableIRQ: sigprocmask");
     }
 
     prev_state = native_interrupts_enabled;
@@ -209,7 +209,7 @@ void restoreIRQ(unsigned state)
 
 int inISR(void)
 {
-    DEBUG("inISR(): %i\n", _native_in_isr);
+    DEBUG("inISR: %i\n", _native_in_isr);
     return _native_in_isr;
 }
 
@@ -238,7 +238,7 @@ int _native_popsig(void)
     }
 
     if (nread == -1) {
-        err(EXIT_FAILURE, "_native_popsig(): real_read()");
+        err(EXIT_FAILURE, "_native_popsig: real_read");
     }
 
     return sig;
@@ -257,18 +257,18 @@ void native_irq_handler(void)
         _native_sigpend--;
 
         if (native_irq_handlers[sig] != NULL) {
-            DEBUG("calling interrupt handler for %i\n", sig);
+            DEBUG("native_irq_handler: calling interrupt handler for %i\n", sig);
             native_irq_handlers[sig]();
         }
         else if (sig == SIGUSR1) {
-            warnx("ignoring SIGUSR1");
+            warnx("native_irq_handler: ignoring SIGUSR1");
         }
         else {
             errx(EXIT_FAILURE, "XXX: no handler for signal %i\nXXX: this should not have happened!\n", sig);
         }
     }
 
-    DEBUG("native_irq_handler(): return\n");
+    DEBUG("native_irq_handler: return\n");
     cpu_switch_context_exit();
 }
 
@@ -287,7 +287,7 @@ void native_isr_entry(int sig, siginfo_t *info, void *context)
 
     /* save the signal */
     if (real_write(_sig_pipefd[1], &sig, sizeof(int)) == -1) {
-        err(EXIT_FAILURE, "native_isr_entry(): real_write()");
+        err(EXIT_FAILURE, "native_isr_entry: real_write()");
     }
     _native_sigpend++;
     //real_write(STDOUT_FILENO, "sigpend\n", 8);
@@ -314,7 +314,7 @@ void native_isr_entry(int sig, siginfo_t *info, void *context)
     }
 
     if (_native_in_syscall != 0) {
-        DEBUG("\n\n\t\treturn to syscall\n\n");
+        DEBUG("\n\n\t\tnative_isr_entry: return to syscall\n\n");
         return;
     }
 
@@ -324,7 +324,7 @@ void native_isr_entry(int sig, siginfo_t *info, void *context)
     makecontext(&native_isr_context, native_irq_handler, 0);
     _native_cur_ctx = (ucontext_t *)sched_active_thread->sp;
 
-    DEBUG("\n\n\t\treturn to _native_sig_leave_tramp\n\n");
+    DEBUG("\n\n\t\tnative_isr_entry: return to _native_sig_leave_tramp\n\n");
     /* disable interrupts in context */
     isr_set_sigmask((ucontext_t *)context);
     _native_in_isr = 1;
@@ -359,7 +359,7 @@ void native_isr_entry(int sig, siginfo_t *info, void *context)
  */
 int register_interrupt(int sig, _native_callback_t handler)
 {
-    DEBUG("register_interrupt()\n");
+    DEBUG("register_interrupt\n");
 
     _native_syscall_enter();
     if (sigdelset(&_native_sig_set, sig)) {
@@ -390,7 +390,7 @@ int register_interrupt(int sig, _native_callback_t handler)
  */
 int unregister_interrupt(int sig)
 {
-    DEBUG("XXX: unregister_interrupt()\n");
+    DEBUG("unregister_interrupt\n");
 
     _native_syscall_enter();
     if (sigaddset(&_native_sig_set, sig) == -1) {
@@ -412,7 +412,7 @@ int unregister_interrupt(int sig)
     for (int i = 0; i < 255; i++) {
         if (native_irq_handlers[i] != NULL) {
             if (sigaction(sig, &sa, NULL)) {
-                err(EXIT_FAILURE, "register_interrupt: sigaction");
+                err(EXIT_FAILURE, "unregister_interrupt: sigaction");
             }
         }
     }
@@ -439,7 +439,7 @@ static void native_shutdown(int sig, siginfo_t *info, void *context)
 void native_interrupt_init(void)
 {
     struct sigaction sa;
-    DEBUG("XXX: native_interrupt_init()\n");
+    DEBUG("native_interrupt_init\n");
 
     VALGRIND_STACK_REGISTER(__isr_stack, __isr_stack + sizeof(__isr_stack));
     VALGRIND_DEBUG("VALGRIND_STACK_REGISTER(%p, %p)\n", __isr_stack, (void*)((int)__isr_stack + sizeof(__isr_stack)));
@@ -461,12 +461,12 @@ void native_interrupt_init(void)
 
     /* get current process interrupt masks */
     if (sigprocmask(SIG_SETMASK, NULL, &_native_sig_set) == -1) {
-        err(EXIT_FAILURE, "native_interrupt_init(): sigprocmask");
+        err(EXIT_FAILURE, "native_interrupt_init: sigprocmask");
     }
     /* we need to disable all signals during our signal handler as it
      * can not cope with interrupted signals ... */
     if (sigfillset(&_native_sig_set_dint) == -1) {
-        err(EXIT_FAILURE, "native_isr_entry(): sigfillset");
+        err(EXIT_FAILURE, "native_interrupt_init: sigfillset");
     }
 
     /* SIGUSR1 is intended for debugging purposes and shall always be
@@ -484,7 +484,7 @@ void native_interrupt_init(void)
     }
 
     if (getcontext(&native_isr_context) == -1) {
-        err(EXIT_FAILURE, "native_isr_entry(): getcontext()");
+        err(EXIT_FAILURE, "native_interrupt_init: getcontext");
     }
 
     native_isr_context.uc_stack.ss_sp = __isr_stack;
@@ -498,7 +498,7 @@ void native_interrupt_init(void)
     sigstk.ss_flags = 0;
 
     if (sigaltstack(&sigstk, NULL) < 0) {
-        err(EXIT_FAILURE, "main: sigaltstack");
+        err(EXIT_FAILURE, "native_interrupt_init: sigaltstack");
     }
 
     makecontext(&native_isr_context, native_irq_handler, 0);
@@ -506,7 +506,7 @@ void native_interrupt_init(void)
     _native_in_syscall = 0;
 
     if (real_pipe(_sig_pipefd) == -1) {
-        err(EXIT_FAILURE, "native_interrupt_init(): pipe()");
+        err(EXIT_FAILURE, "native_interrupt_init: pipe");
     }
 
     /* allow for ctrl+c to shut down gracefully always */
