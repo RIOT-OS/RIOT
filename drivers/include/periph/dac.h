@@ -53,7 +53,7 @@ typedef enum {
 } dac_t;
 
 /**
- * @breif Possilbe DAC precision settings
+ * @brief Possilbe DAC precision settings
  */
 typedef enum {
     DAC_RES_6BIT = 0,      /**< DAC precision: 6 bit */
