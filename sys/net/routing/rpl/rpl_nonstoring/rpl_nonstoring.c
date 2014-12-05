@@ -285,6 +285,8 @@ void rpl_send_DIO_mode(ipv6_addr_t *destination)
 
 void rpl_send_DAO_mode(ipv6_addr_t *destination, uint8_t lifetime, bool default_lifetime, uint8_t start_index)
 {
+    (void) start_index;
+
     if (i_am_root) {
         return;
     }
