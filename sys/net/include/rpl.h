@@ -47,9 +47,6 @@ extern "C" {
 extern kernel_pid_t rpl_process_pid;
 extern uint8_t rpl_max_routing_entries;
 
-/* needed for receiving messages with ICMP-code 155. Received via IPC from ipv6.c */
-extern mutex_t rpl_recv_mutex;
-
 /* needed for sending RPL-messages */
 extern mutex_t rpl_send_mutex;
 

@@ -54,7 +54,6 @@ char addr_str[IPV6_MAX_ADDR_STR_LEN];
 
 /* global variables */
 kernel_pid_t rpl_process_pid = KERNEL_PID_UNDEF;
-mutex_t rpl_recv_mutex = MUTEX_INIT;
 mutex_t rpl_send_mutex = MUTEX_INIT;
 msg_t rpl_msg_queue[RPL_PKT_RECV_BUF_SIZE];
 char rpl_process_buf[RPL_PROCESS_STACKSIZE];
@@ -163,7 +162,6 @@ void *rpl_process(void *arg)
 
     while (1) {
         msg_receive(&m_recv);
-        mutex_lock(&rpl_recv_mutex);
 
         /* differentiate packet types */
         ipv6_buf = ((ipv6_hdr_t *)m_recv.content.ptr);
@@ -179,30 +177,25 @@ void *rpl_process(void *arg)
             switch (icmp_buf->code) {
                 case (ICMP_CODE_DIS): {
                     rpl_recv_DIS();
-                    mutex_unlock(&rpl_recv_mutex);
                     break;
                 }
 
                 case (ICMP_CODE_DIO): {
                     rpl_recv_DIO();
-                    mutex_unlock(&rpl_recv_mutex);
                     break;
                 }
 
                 case (ICMP_CODE_DAO): {
                     rpl_recv_DAO();
-                    mutex_unlock(&rpl_recv_mutex);
                     break;
                 }
 
                 case (ICMP_CODE_DAO_ACK): {
                     rpl_recv_DAO_ACK();
-                    mutex_unlock(&rpl_recv_mutex);
                     break;
                 }
 
                 default:
-                    mutex_unlock(&rpl_recv_mutex);
                     break;
             }
         }
@@ -238,7 +231,6 @@ void *rpl_process(void *arg)
                 }
             }
 
-            mutex_unlock(&rpl_recv_mutex);
         }
 
 #endif
