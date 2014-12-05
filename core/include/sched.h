@@ -115,8 +115,8 @@ void sched_set_status(tcb_t *process, unsigned int status);
 
 /**
  * @brief   Compare thread priorities and yield() (or set
- *          sched_context_switch_request if inISR()) when other_prio is higher
- *          (has a lower value) than the current thread's priority
+ *          @ref sched_context_switch_request if inISR()) when @p other_prio is
+ *          higher (has a lower value) than the current thread's priority
  *
  * @param[in]   other_prio      The priority of the target thread
  */
