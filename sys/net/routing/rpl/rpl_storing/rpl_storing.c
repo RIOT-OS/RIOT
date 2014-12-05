@@ -679,7 +679,7 @@ void rpl_recv_DAO_mode(void)
                     break;
                 }
 
-                len += rpl_opt_target_buf->length + 2;
+                len += rpl_opt_target_buf->length;
                 rpl_opt_transit_buf = get_rpl_opt_transit_buf(len);
 
                 if (rpl_opt_transit_buf->type != RPL_OPT_TRANSIT) {
