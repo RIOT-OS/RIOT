@@ -32,12 +32,8 @@
 #include "vtimer.h"
 #include "thread.h"
 
-#define TRICKLE_STACKSIZE (KERNEL_CONF_STACKSIZE_MAIN)
-#define TRICKLE_PKT_RECV_BUF_SIZE 16
-
-#define TRICKLE_CODE_INTERVAL   0x1
-#define TRICKLE_CODE_CALLBACK   0x2
-#define TRICKLE_CODE_STOP       0x3
+#define TRICKLE_STACKSIZE (KERNEL_CONF_STACKSIZE_DEFAULT)
+#define TRICKLE_PKT_RECV_BUF_SIZE 8
 
 typedef struct {
     void (*func)(void *);
@@ -51,17 +47,19 @@ typedef struct {
     uint32_t I;
     uint32_t t;
     uint16_t c;
-    uint8_t code;
-    timex_t wakeup_time;
-    vtimer_t wakeup_timer;
+    kernel_pid_t pid;
     trickle_callback_t callback;
 } trickle_t;
 
-void reset_trickletimer(trickle_t *trickle);
-void start_trickle(trickle_t *trickle, uint32_t Imin, uint8_t Imax, uint8_t k);
-void stop_trickle(trickle_t *trickle);
+void reset_trickletimer(trickle_t *trickle, void *msg_interval, timex_t *msg_interval_time, vtimer_t *msg_interval_timer,
+        void *msg_callback, timex_t *msg_callback_time, vtimer_t *msg_callback_timer);
+void start_trickle(kernel_pid_t pid, trickle_t *trickle, void *msg_interval, timex_t *msg_interval_time, vtimer_t *msg_interval_timer,
+        void *msg_callback, timex_t *msg_callback_time, vtimer_t *msg_callback_timer, uint32_t Imin, uint8_t Imax, uint8_t k);
+void stop_trickle(vtimer_t *msg_interval_timer, vtimer_t *msg_callback_timer);
 void trickle_increment_counter(trickle_t *trickle);
-int trickle_init(void);
+void trickle_interval(trickle_t *trickle, void *msg_interval, timex_t *msg_interval_time, vtimer_t *msg_interval_timer,
+        void *msg_callback, timex_t *msg_callback_time, vtimer_t *msg_callback_timer);
+void trickle_callback(trickle_t *trickle);
 
 #ifdef __cplusplus
 }

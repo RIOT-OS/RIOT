@@ -52,7 +52,6 @@ void rpl_local_repair(void);
 uint16_t rpl_calc_rank(uint16_t abs_rank, uint16_t minhoprankincrease);
 void dao_ack_received(rpl_dodag_t *dodag);
 void delay_dao(rpl_dodag_t *dodag);
-void rpl_trickle_send_dio(void *);
 
 #ifdef __cplusplus
 }

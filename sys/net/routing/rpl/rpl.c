@@ -52,17 +52,16 @@ char addr_str[IPV6_MAX_ADDR_STR_LEN];
 
 /* global variables */
 kernel_pid_t rpl_process_pid = KERNEL_PID_UNDEF;
+kernel_pid_t rpl_update_pid = KERNEL_PID_UNDEF;
 mutex_t rpl_send_mutex = MUTEX_INIT;
 msg_t rpl_msg_queue[RPL_PKT_RECV_BUF_SIZE];
 char rpl_process_buf[RPL_PROCESS_STACKSIZE];
+msg_t rpl_update_msg_queue[RPL_UPDATE_PKT_RECV_BUF_SIZE];
 uint8_t rpl_buffer[BUFFER_SIZE - LL_HDR_LEN];
-char routing_table_buf[RT_STACKSIZE];
-kernel_pid_t rt_timer_over_pid = KERNEL_PID_UNDEF;
-vtimer_t rt_timer;
-timex_t rt_time;
+char rpl_update_buf[RPL_UPDATE_STACKSIZE];
 ipv6_addr_t mcast;
 
-static void *rt_timer_over(void *arg);
+static void *rpl_update_thread(void *arg);
 
 #if RPL_DEFAULT_MOP == RPL_NON_STORING_MODE
 uint8_t srh_buffer[BUFFER_SIZE];
@@ -124,11 +123,11 @@ uint8_t rpl_init(int if_id)
 
     /* initialize objective function manager */
     rpl_of_manager_init(&my_address);
-	rpl_init_mode(&my_address);
+    rpl_init_mode(&my_address);
 
-    rt_timer_over_pid = thread_create(routing_table_buf, RT_STACKSIZE,
-                                      PRIORITY_MAIN - 1, CREATE_STACKTEST,
-                                      rt_timer_over, NULL, "rt_timer_over");
+    rpl_update_pid = thread_create(rpl_update_buf, RPL_UPDATE_STACKSIZE,
+                                       PRIORITY_MAIN - 1, CREATE_STACKTEST,
+                                       rpl_update_thread, NULL, "rpl_update");
     return SIXLOWERROR_SUCCESS;
 }
 
@@ -320,52 +319,116 @@ void rpl_recv_DAO_ACK(void)
     rpl_recv_dao_ack_mode();
 }
 
-/**************************************************************/
-/**************************************************************/
-
-/******************************************************************************/
-/* Routing related functions are obsolete and will be replaced in near future */
-/******************************************************************************/
-
-void *rt_timer_over(void *arg)
-{
-    (void) arg;
-
+void rpl_update_routing_table(rpl_dodag_t *my_dodag) {
     rpl_routing_entry_t *rt;
+    if (my_dodag != NULL) {
+        rt = rpl_get_routing_table();
 
-    while (1) {
-        rpl_dodag_t *my_dodag = rpl_get_my_dodag();
-
-        if (my_dodag != NULL) {
-            rt = rpl_get_routing_table();
-
-            for (uint8_t i = 0; i < rpl_max_routing_entries; i++) {
-                if (rt[i].used) {
-                    if (rt[i].lifetime <= 1) {
-                        memset(&rt[i], 0, sizeof(rt[i]));
-                    }
-                    else {
-                        rt[i].lifetime--;
-                    }
-                }
-            }
-
-            /* Parent is NULL for root too */
-            if (my_dodag->my_preferred_parent != NULL) {
-                if (my_dodag->my_preferred_parent->lifetime <= 1) {
-                    DEBUGF("parent lifetime timeout\n");
-                    rpl_parent_update(NULL);
+        for (uint8_t i = 0; i < rpl_max_routing_entries; i++) {
+            if (rt[i].used) {
+                if (rt[i].lifetime <= 1) {
+                    memset(&rt[i], 0, sizeof(rt[i]));
                 }
                 else {
-                    my_dodag->my_preferred_parent->lifetime--;
+                    rt[i].lifetime--;
                 }
             }
         }
 
-        /* Wake up every second */
-        vtimer_usleep(1000000);
+        /* Parent is NULL for root too */
+        if (my_dodag->my_preferred_parent != NULL) {
+            if (my_dodag->my_preferred_parent->lifetime <= 1) {
+                DEBUGF("parent lifetime timeout\n");
+                rpl_parent_update(NULL);
+            }
+            else {
+                my_dodag->my_preferred_parent->lifetime--;
+            }
+        }
     }
 
+    my_dodag->rt_msg.time = timex_set(0, 1000000);
+    vtimer_remove(&my_dodag->rt_msg.timer);
+    my_dodag->rt_msg.content = (void *) my_dodag;
+    my_dodag->rt_msg.code = RPL_MSG_TYPE_ROUTING_ENTRY_UPDATE;
+    vtimer_set_msg(&my_dodag->rt_msg.timer, my_dodag->rt_msg.time, rpl_update_pid, &my_dodag->rt_msg);
+}
+
+void delay_dao(rpl_dodag_t *dodag)
+{
+    dodag->dao_msg.time = timex_set(DEFAULT_DAO_DELAY, 0);
+    dodag->dao_counter = 0;
+    dodag->ack_received = false;
+    vtimer_remove(&dodag->dao_msg.timer);
+    dodag->dao_msg.content = (void *) dodag;
+    dodag->dao_msg.code = RPL_MSG_TYPE_DAO_HANDLE;
+    vtimer_set_msg(&dodag->dao_msg.timer, dodag->dao_msg.time, rpl_update_pid, &dodag->dao_msg);
+}
+
+/* This function is used for regular update of the routes. The Timer can be overwritten, as the normal delay_dao function gets called */
+void long_delay_dao(rpl_dodag_t *dodag)
+{
+    dodag->dao_msg.time = timex_set(REGULAR_DAO_INTERVAL, 0);
+    dodag->dao_counter = 0;
+    dodag->ack_received = false;
+    vtimer_remove(&dodag->dao_msg.timer);
+    dodag->dao_msg.code = RPL_MSG_TYPE_DAO_HANDLE;
+    vtimer_set_msg(&dodag->dao_msg.timer, dodag->dao_msg.time, rpl_update_pid, &dodag->dao_msg);
+}
+
+void dao_ack_received(rpl_dodag_t *dodag)
+{
+    dodag->ack_received = true;
+    long_delay_dao(dodag);
+}
+
+void dao_handle_send(rpl_dodag_t *dodag) {
+    if ((dodag->ack_received == false) && (dodag->dao_counter < DAO_SEND_RETRIES)) {
+        dodag->dao_counter++;
+        rpl_send_DAO(NULL, 0, true, 0);
+        dodag->dao_msg.time = timex_set(DEFAULT_WAIT_FOR_DAO_ACK, 0);
+        vtimer_remove(&dodag->dao_msg.timer);
+        dodag->dao_msg.code = RPL_MSG_TYPE_DAO_HANDLE;
+        vtimer_set_msg(&dodag->dao_msg.timer, dodag->dao_msg.time, rpl_update_pid, &dodag->dao_msg);
+    }
+    else if (dodag->ack_received == false) {
+        long_delay_dao(dodag);
+    }
+}
+
+void *rpl_update_thread(void *arg)
+{
+    (void) arg;
+
+    msg_t m_recv;
+    msg_init_queue(rpl_update_msg_queue, RPL_UPDATE_PKT_RECV_BUF_SIZE);
+    rpl_dodag_t *dodag;
+
+    while (1) {
+        msg_receive(&m_recv);
+        rpl_msg_type_t *msg = (rpl_msg_type_t *) m_recv.content.ptr;
+
+        switch (msg->code) {
+            case RPL_MSG_TYPE_DAO_HANDLE:
+                dao_handle_send((rpl_dodag_t *) msg->content);
+                break;
+            case RPL_MSG_TYPE_ROUTING_ENTRY_UPDATE:
+                rpl_update_routing_table((rpl_dodag_t *) msg->content);
+                break;
+            case RPL_MSG_TYPE_TRICKLE_INTERVAL:
+                dodag = (rpl_dodag_t *) msg->content;
+                trickle_interval(&dodag->trickle, &dodag->trickle_msg_interval, &dodag->trickle_msg_interval.time, &dodag->trickle_msg_interval.timer,
+                        &dodag->trickle_msg_callback, &dodag->trickle_msg_callback.time, &dodag->trickle_msg_callback.timer);
+                break;
+            case RPL_MSG_TYPE_TRICKLE_CALLBACK:
+                dodag = (rpl_dodag_t *) msg->content;
+                trickle_callback(&dodag->trickle);
+                break;
+            default:
+                break;
+        }
+
+    }
     return NULL;
 }
 
