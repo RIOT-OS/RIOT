@@ -19,7 +19,9 @@
 #include "byteorder.h"
 #include "kernel.h"
 #include "kernel_types.h"
+#include "pktqueue.h"
 #include "net_help.h"
+#include "vtimer.h"
 
 #include "ipv6.h"
 #include "ipv6/addr.h"
@@ -36,19 +38,42 @@ char addr_str[IPV6_MAX_ADDR_STR_LEN];
 #include "debug.h"
 
 #define _IPV6_STACKSIZE         (KERNEL_CONF_STACKSIZE_DEFAULT)
-#define _IPV6_REGISTRY_SIZE     (4)
-#define _IPV6_MSG_QUEUE_SIZE    (32)
+#define _IPV6_REGISTRY_SIZE         (4)
+#define _IPV6_MSG_QUEUE_SIZE        (8)
+#define _IPV6_PKTQUEUE_SIZE         (8)
+
+#define _IPV6_MSG_HANDLE_PKTQUEUE       (0x020a)
+
+#define _IPV6_PKTQUEUE_PRIORITY_HIGH    (0)
+#define _IPV6_PKTQUEUE_PRIORITY_NORMAL  (1)
+#define _IPV6_PKTQUEUE_PRIORITY_PENDING (2)
+#define _IPV6_PKTQUEUE_MAX_TRIES        (4)
+#define _IPV6_PKTQUEUE_DEFAULT_INTERVAL (500)
 
 typedef struct {
     uint16_t next_header;   /* 16-bit to include ANY */
     kernel_pid_t pid;
 } _registry_t;  /* type for checksum receiver registry */
 
+typedef struct {
+    netdev_hlist_t *next_headers;
+    void *payload;
+    size_t payload_len;
+    ipv6_addr_t *next_hop;
+    uint8_t tries;
+} _ipv6_pkt_t;  /* type to store ipv6 packet in queue */
+
 kernel_pid_t ipv6_pid = KERNEL_PID_UNDEF;
 
 static _registry_t _registry[_IPV6_REGISTRY_SIZE];
 static char _ipv6_stack[_IPV6_STACKSIZE];
 static uint8_t _ipv6_default_hop_limit = IPV6_MULTIHOP_HOP_LIMIT;
+static pktqueue_t pktqueue = PKTQUEUE_INIT;
+static pktqueue_node_t pktqueue_nodes[_IPV6_PKTQUEUE_SIZE];
+static msg_t handle_pktqueue_signal = { 0, _IPV6_MSG_HANDLE_PKTQUEUE, 0 };
+static vtimer_t pktqueue_timer;
+
+_ipv6_pkt_t pktqueue_nodes_data[_IPV6_PKTQUEUE_SIZE];
 
 #ifdef MODULE_IPV6_ROUTER
 
@@ -149,6 +174,109 @@ uint16_t ipv6_pseudo_hdr_csum(const ipv6_hdr_t *ipv6_hdr, uint32_t ul_packet_len
     return sum;
 }
 
+static pktqueue_node_t *_init_queue_node(const ipv6_hdr_t *ipv6_hdr,
+        netdev_hlist_t *next_header,
+        void *payload, size_t payload_len,
+        ipv6_addr_t *next_hop, uint32_t priority)
+{
+    int i;
+
+    for (i = 0; i < _IPV6_PKTQUEUE_SIZE; i++) {
+        netdev_hlist_t *ipv6_hdr_node;
+
+        if (pktqueue_nodes[i].data != NULL) {
+            continue;
+        }
+
+        ipv6_hdr_node = pktbuf_alloc(sizeof(netdev_hlist_t));
+
+        ipv6_hdr_node->protocol = NETDEV_PROTO_IPV6;
+        ipv6_hdr_node->header = ipv6_hdr;
+        ipv6_hdr_node->header_len = sizeof(ipv6_hdr_t);
+
+        netdev_hlist_add(&next_headers, ipv6_hdr_node);
+
+        pktqueue_nodes_data[i].next_headers = next_headers;
+        pktqueue_nodes_data[i].payload = payload;
+        pktqueue_nodes_data[i].payload_len = payload_len;
+        pktqueue_nodes_data[i].next_hop = next_hop;
+        pktqueue_nodes_data[i].tries = tries;
+
+        pktqueue_nodes[i].priority = priority;
+        pktqueue_nodes[i].data = &(pktqueue_nodes_data[i]);
+
+        return &(pktqueue_nodes[i]);
+    }
+
+    return NULL;
+}
+
+static int _queue_packet(const ipv6_hdr_t *ipv6_hdr, netdev_hlist_t *next_headers,
+                         void *payload, size_t payload_len,
+                         ipv6_addr_t *next_hop, uint32_t priority)
+{
+    pktqueue_node_t *node;
+
+    if (thread_getpid() != ipv6_pid) {
+        return -EACCES;
+    }
+
+    node = _init_queue_node(ipv6_hdr, next_headers, payload, payload_len,
+                            next_hop, priority);
+
+    if (node == NULL) {
+        return -ENOBUFS;
+    }
+
+    pktqueue_add(&pktqueue, node);
+
+    msg_send_to_self(&_handle_pktqueue_signal);
+
+    return netdev_get_hlist_len(next_headers) + payload_len;
+}
+
+int ipv6_send_packet_over_next_hop(const ipv6_hdr_t *ipv6_hdr,
+                                   netdev_hlist_t *next_headers,
+                                   void *payload, size_t payload_len,
+                                   ipv6_addr_t *next_hop)
+{
+    return _queue_packet(ipv6_hdr, next_headers, payload, payload_len,
+                         next_hop, _IPV6_PKTQUEUE_PRIORITY_NORMAL);
+}
+
+int ipv6_send_packet_high_priority_over_next_hop(const ipv6_hdr_t *ipv6_hdr,
+        netdev_hlist_t *next_headers,
+        void *payload, size_t payload_len,
+        ipv6_addr_t *next_hop)
+{
+    return _queue_packet(ipv6_hdr, next_headers, payload, payload_len,
+                         next_hop, _IPV6_PKTQUEUE_PRIORITY_HIGH);
+}
+
+static void _transfer_snd(_ipv6_pkt_t *ipv6_pkt)
+{
+
+}
+
+static void _schedule_next_send(void)
+{
+    timex_t interval = { 0, _IPV6_PKTQUEUE_DEFAULT_INTERVAL };
+
+    vtimer_set_msg(&pktqueue_timer, interval, ipv6_pid, &handle_pktqueue_signal)
+}
+
+static void _handle_pktqueue(void)
+{
+    pktqueue_node_t *next = pktqueue_remove_head(&pktqueue);
+    _ipv6_pkt_t *ipv6_pkt = (_ipv6_pkt_t)next->data;
+
+    _transfer_snd(ipv6_pkt);
+
+    if (pktqueue_get_head(&pktqueue) != NULL) {
+        _schedule_next_send();
+    }
+}
+
 static int _get_option(netapi_conf_t *conf)
 {
     switch ((ipv6_conf_t)conf->param) {
@@ -247,82 +375,95 @@ static void *_control(void *args)
 
         msg_receive(&msg_cmd);
 
-        if (msg_cmd.type != NETAPI_MSG_TYPE) {
-            msg_ack.type = 0;
-            msg_reply(&msg_cmd, &msg_ack);
-        }
+        switch (msg_cmd.type) {
+            case MSG_TIMER:
+                msg_send_to_self((msg_t *)msg.content.ptr);
 
-        msg_ack.type = NETAPI_MSG_TYPE;
+            case _IPV6_MSG_HANDLE_PKTQUEUE:
+                _handle_pktqueue();
 
-        cmd = (netapi_cmd_t *)msg_cmd.content.ptr;
+            case NETAPI_MSG_TYPE:
+                msg_ack.type = NETAPI_MSG_TYPE;
 
-        ack = cmd->ack;
-        ack->type = NETAPI_CMD_ACK;
-        ack->orig = cmd->type;
+                cmd = (netapi_cmd_t *)msg_cmd.content.ptr;
 
-        msg_ack.content.ptr = (char *)ack;
+                ack = cmd->ack;
+                ack->type = NETAPI_CMD_ACK;
+                ack->orig = cmd->type;
 
-        switch (cmd->type) {
-            case NETAPI_CMD_RCV:
-                break;
+                msg_ack.content.ptr = (char *)ack;
 
-            case NETAPI_CMD_SND:
-                break;
+                switch (cmd->type) {
+                    case NETAPI_CMD_RCV:
+                        break;
 
-            case NETAPI_CMD_GET:
-                ack->result = _get_option((netapi_conf_t *)cmd);
+                    case NETAPI_CMD_SND:
+                        break;
 
-                break;
-
-            case NETAPI_CMD_SET:
-                ack->result = _set_option((netapi_conf_t *)cmd);
-
-                break;
-
-            case NETAPI_CMD_REG:
-                DEBUG("Received registration command from %d\n" msg_cmd.sender_pid);
-
-                ack->result = -ENOBUFS;
-
-                for (unsigned int i = 0; i < _IPV6_REGISTRY_SIZE; i++) {
-                    if (registry[i].pid = KERNEL_PID_UNDEF) {
-                        registry[i].next_header = ((netapi_reg_t *)cmd)->demux_ctx;
-                        registry[i].pid = ((netapi_reg_t *)cmd)->reg_pid;
-                        ack->result = NETAPI_STATUS_OK;
-                    }
-                }
-
-                break;
-
-            case NETAPI_CMD_UNREG:
-                DEBUG("Received unregistration command from %d\n", msg_cmd.sender_pid);
-
-                ack->result = NETAPI_STATUS_OK;
-
-                for (unsigned int i = 0; i < _REGISTRY_SIZE; i++) {
-                    if (registry[i] == ((netapi_reg_t *)cmd)->reg_pid) {
-                        registry[i].pid = KERNEL_PID_UNDEF;
+                    case NETAPI_CMD_GET:
+                        ack->result = _get_option((netapi_conf_t *)cmd);
 
                         break;
-                    }
+
+                    case NETAPI_CMD_SET:
+                        ack->result = _set_option((netapi_conf_t *)cmd);
+
+                        break;
+
+                    case NETAPI_CMD_REG:
+                        DEBUG("Received registration command from %d\n" msg_cmd.sender_pid);
+
+                        ack->result = -ENOBUFS;
+
+                        for (unsigned int i = 0; i < _IPV6_REGISTRY_SIZE; i++) {
+                            if (registry[i].pid = KERNEL_PID_UNDEF) {
+                                registry[i].next_header = ((netapi_reg_t *)cmd)->demux_ctx;
+                                registry[i].pid = ((netapi_reg_t *)cmd)->reg_pid;
+                                ack->result = NETAPI_STATUS_OK;
+                            }
+                        }
+
+                        break;
+
+                    case NETAPI_CMD_UNREG:
+                        DEBUG("Received unregistration command from %d\n", msg_cmd.sender_pid);
+
+                        ack->result = NETAPI_STATUS_OK;
+
+                        for (unsigned int i = 0; i < _REGISTRY_SIZE; i++) {
+                            if (registry[i] == ((netapi_reg_t *)cmd)->reg_pid) {
+                                registry[i].pid = KERNEL_PID_UNDEF;
+
+                                break;
+                            }
+                        }
+
+                        break;
+
+                    default:
+                        DEBUG("Received unknown command from %d\n", msg_cmd.sender_pid);
+
+                        ack->result = -ENOTSUP;
+
+                        break;
+                }
+
+                if (!replied) {
+                    msg_reply(&msg_cmd, &msg_ack);
+                }
+                else {
+                    replied = 0;
                 }
 
                 break;
 
             default:
-                DEBUG("Received unknown command from %d\n", msg_cmd.sender_pid);
-
-                ack->result = -ENOTSUP;
+                msg_ack.type = 0;
+                msg_reply(&msg_cmd, &msg_ack);
 
                 break;
         }
 
-        if (!replied) {
-            msg_reply(&msg_cmd, &msg_ack);
-        }
-        else {
-            replied = 0;
-        }
     }
 
     return NULL;

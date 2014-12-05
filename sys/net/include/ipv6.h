@@ -359,6 +359,7 @@ typedef struct __attribute__((packed)) {
                                       *  4-bit, expressing the number of octets
                                       *  used for paddingafter addresses
                                       *  + 20 bit reseveved */
+    ipv6_addr_t route[];            /**< Route to take for the IPv6 packet. */
 } ipv6_srh_t;
 
 /**
@@ -528,6 +529,7 @@ static inline int ipv6_register_routing_provider(ipv6_routing_provider_t rp)
  *
  * @return  total length of transmitted data, on success.
  * @return  -EHOSTUNREACH, if no route to the given dest could be obtained.
+ * @return  -ENOBUFS, if send queue is full.
  * @return  -EINPROGRESS, In case of reactive routing: routing is going to try
  *          to find a route.
  */
@@ -539,7 +541,8 @@ static inline int ipv6_sendto(const ipv6_addr_t *dest, netdev_hlist_t *next_head
 }
 
 /**
- * @brief   IPv6 internal function to send a packet.
+ * @brief   IPv6 internal function to put a packet in the queue and send it
+ *          if possible to *ipv6_hdr_t::destaddr* over *next_hop*.
  *
  * @internal
  *
@@ -549,18 +552,52 @@ static inline int ipv6_sendto(const ipv6_addr_t *dest, netdev_hlist_t *next_head
  * @param[in] next_headers  List of next headers.
  * @param[in] payload       Payload of the packet.
  * @param[in] payload_len   Length of *payload*.
+ * @param[in] next_hop      IPv6 address of the next node this packet shall
+ *                          be send over to *ipv6_hdr*.
  *
  * @return  total length of transmitted data, on success.
  * @return  -EHOSTUNREACH, if no route to the given dest could be obtained.
  * @return  -EINPROGRESS, In case of reactive routing: routing is going to try
  *          to find a route.
+ * @return  -ENOBUFS, if send queue is full.
  * @return  -EACCES, caller PID was not ipv6_pid.
  */
-int ipv6_send_packet(const ipv6_hdr_t *ipv6_hdr, netdev_hlist_t *next_headers,
-                     void *payload, size_t payload_len);
+int ipv6_send_packet_over_next_hop(const ipv6_hdr_t *ipv6_hdr,
+                                   netdev_hlist_t *next_headers,
+                                   void *payload, size_t payload_len,
+                                   ipv6_addr_t *next_hop);
 
 /**
- * @brief   IPv6 internal function to send a packet with highest priority.
+ * @brief   IPv6 internal function to put a packet in the queue at highest
+ *          priority and send it if possible to *ipv6_hdr_t::destaddr* over
+ *          *next_hop* with highest priority.
+ *
+ * @internal
+ *
+ * @note    MUST be called from within the IPv6 control thread.
+ *
+ * @param[in] ipv6_hdr      The IPv6 header.
+ * @param[in] next_headers  List of next headers.
+ * @param[in] payload       Payload of the packet.
+ * @param[in] payload_len   Length of *payload*.
+ * @param[in] next_hop      IPv6 address of the next node this packet shall
+ *                          be send over to *ipv6_hdr*.
+ *
+ * @return  total length of transmitted data, on success.
+ * @return  -EHOSTUNREACH, if no route to the given dest could be obtained.
+ * @return  -EINPROGRESS, In case of reactive routing: routing is going to try
+ *          to find a route.
+ * @return  -ENOBUFS, if send queue is full.
+ * @return  -EACCES, caller PID was not ipv6_pid.
+ */
+int ipv6_send_packet_high_priority_over_next_hop(const ipv6_hdr_t *ipv6_hdr,
+        netdev_hlist_t *next_headers,
+        void *payload, size_t payload_len,
+        ipv6_addr_t *next_hop);
+
+/**
+ * @brief   IPv6 internal function to put a packet in the queue and send it
+ *          if possible.
  *
  * @internal
  *
@@ -575,11 +612,44 @@ int ipv6_send_packet(const ipv6_hdr_t *ipv6_hdr, netdev_hlist_t *next_headers,
  * @return  -EHOSTUNREACH, if no route to the given dest could be obtained.
  * @return  -EINPROGRESS, In case of reactive routing: routing is going to try
  *          to find a route.
+ * @return  -ENOBUFS, if send queue is full.
+ * @return  -EACCES, caller PID was not ipv6_pid.
+ */
+static inline int ipv6_send_packet(const ipv6_hdr_t *ipv6_hdr,
+                                   netdev_hlist_t *next_headers,
+                                   void *payload, size_t payload_len)
+{
+    return ipv6_send_packet_over_next_hop(ipv6_hdr, next_headers, payload,
+                                          payload_len, NULL);
+}
+
+/**
+ * @brief   IPv6 internal function to put a packet in the queue at highest
+ *          priority and send it if possible.
+ *
+ * @internal
+ *
+ * @note    MUST be called from within the IPv6 control thread.
+ *
+ * @param[in] ipv6_hdr      The IPv6 header.
+ * @param[in] next_headers  List of next headers.
+ * @param[in] payload       Payload of the packet.
+ * @param[in] payload_len   Length of *payload*.
+ *
+ * @return  total length of transmitted data, on success.
+ * @return  -EHOSTUNREACH, if no route to the given dest could be obtained.
+ * @return  -EINPROGRESS, In case of reactive routing: routing is going to try
+ *          to find a route.
+ * @return  -ENOBUFS, if send queue is full.
  * @return  -EACCES, caller PID was not ipv6_pid.
  */
 int ipv6_send_packet_high_priority(const ipv6_hdr_t *ipv6_hdr,
                                    netdev_hlist_t *next_headers,
-                                   void *payload, size_t payload_len);
+                                   void *payload, size_t payload_len)
+{
+    return ipv6_send_packet_high_priority_over_next_hop(ipv6_hdr, next_headers,
+            payload, payload_len, NULL);
+}
 
 /**
  * @brief   Sets the default hop limit to use with IPv6 packets.

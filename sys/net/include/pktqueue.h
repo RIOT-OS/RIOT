@@ -53,7 +53,7 @@ typedef struct {
 /**
  * @brief   Static initializer for pktqueue_node_t
  */
-#define PKTQUEUE_NODE_INIT { NULL, NULL, 0 }
+#define PKTQUEUE_NODE_INIT { NULL, 0, NULL }
 
 /**
  * @brief   Initializes a packet queue node.
