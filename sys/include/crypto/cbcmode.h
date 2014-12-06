@@ -77,22 +77,22 @@ enum {
  * @param   spill1  test1
  */
 typedef struct CBCModeContext {
-        // Spill-Block 1 for temporary usage
+    /** Spill-Block 1 for temporary usage */
     uint8_t spill1 [CBCMODE_MAX_BLOCK_SIZE ];
-    // Spill-Block 2 for temporary usage
+    /** Spill-Block 2 for temporary usage */
     uint8_t spill2 [CBCMODE_MAX_BLOCK_SIZE ];
-    // the blocksize currently used
+    /** the blocksize currently used */
     uint8_t bsize;
-    // how many more bytes of ciphertext do we need to recv
+    /** how many more bytes of ciphertext do we need to recv */
     uint16_t remaining;
-    // how many bytes of plaintext we've deciphered.
+    /** how many bytes of plaintext we've deciphered. */
     uint16_t completed;
-    // TRUE iff spill1 is the accumulator and spill2 holds prev cipher text.
-    // false o.w.
+    /** TRUE iff spill1 is the accumulator and spill2 holds prev cipher text. */
+    /** false o.w. */
     uint8_t accum;
-    // into the accumulator
+    /** into the accumulator */
     uint8_t offset;
-    // state enum
+    /** state enum */
     uint8_t state;
 } /*__attribute__ ((packed)) */ CBCModeContext;
 
@@ -166,6 +166,7 @@ void dump_buffer(char *bufName, uint8_t *buf, uint8_t size);
  *          cipher buffer are the same. (they may either be the same or
  *          non-overlapping. partial overlaps are not supported).
  *
+ * @param   context       context object for this encryption
  * @param   plain_blocks  a plaintext block numBlocks, where each block is of
  *                        blockSize bytes
  * @param   cipher_blocks an array of numBlocks * blockSize bytes to hold the
@@ -190,6 +191,7 @@ int block_cipher_mode_encrypt(CipherModeContext *context, uint8_t *plain_blocks,
  *          cipher buffer are the same. (they may either be the same or
  *          non-overlapping. partial overlaps are not supported).
  *
+ * @param   context        context object for this decryption
  * @param   cipher_blocks  an array of num_bytes * blockSize bytes that holds
  *                         the cipher text
  * @param   plain_blocks   an array of num_bytes * blockSize bytes to hold the

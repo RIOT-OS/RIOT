@@ -198,15 +198,15 @@ extern "C" {
 /**
  * @brief  Structure for an expanded Twofish key.
  *
- * @param   s   contains the key-dependent S-boxes composed with the MDS
- *              matrix;
- * @param   w   contains the eight "whitening" subkeys, K[0] through K[7].
- * @param   k   holds the remaining, "round" subkeys.
- *
  * Note that k[i] corresponds to what the Twofish paper calls K[i+8].
  */
 typedef struct {
-    uint32_t s[4][256], w[8], k[32];
+ /** contains the key-dependent S-boxes composed with the MDS matrix */
+    uint32_t s[4][256],
+ /** contains the eight "whitening" subkeys, K[0] through K[7] */
+    w[8],
+ /** holds the remaining, "round" subkeys */
+    k[32];
 } twofish_context_t;
 
 
