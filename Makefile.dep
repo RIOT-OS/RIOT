@@ -48,7 +48,6 @@ ifneq (,$(filter sixlowpan,$(USEMODULE)))
 endif
 
 ifneq (,$(filter slip,$(USEMODULE)))
-    USEMODULE += lib
     USEMODULE += pktbuf
     ifeq (,$(filter $(BOARD),arduino-due iot-lab_M3 pca10000 pca10005 stm32f0discovery stm32f3discovery stm32f4discovery))
         USEMODULE += posix
