@@ -11,7 +11,7 @@
  * @ingroup     drivers_cc110x
  * @{
  *
- * @file        cc110x-reg.h
+ * @file
  * @brief       Access to CC110X registers
  *
  * @author      Oliver Hahm <oliver.hahm@inria.fr>

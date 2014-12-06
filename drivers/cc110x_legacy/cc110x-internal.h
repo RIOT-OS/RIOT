@@ -11,7 +11,7 @@
  * @ingroup     drivers_cc110x_legacy
  * @{
  *
- * @file        cc110x-internal.h
+ * @file
  * @brief       Driver internal constants for 110x chip configuration
  *
  * @author      Thomas Hillebrandt <hillebra@inf.fu-berlin.de>

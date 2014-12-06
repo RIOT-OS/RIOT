@@ -11,7 +11,7 @@
  * @ingroup     sys
  * @{
  *
- * @file        transceiver.h
+ * @file
  * @brief       Transceiver library
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  */
