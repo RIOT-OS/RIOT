@@ -123,7 +123,7 @@ void SysTick_Handler(void);      /**< SysTick handler */
 
 typedef volatile uint32_t cc2538_reg_t; /**< Least-significant 32 bits of the IEEE address */
 
-/** @addtogroup Peripheral_memory_map
+/** @addtogroup cpu_specific_Peripheral_memory_map
   * @{
   */
 
