@@ -115,6 +115,8 @@ extern netdev_t cc2420_netdev;  /**< netdev representation of this driver */
 
 /**
  * @brief Initialize the CC2420 transceiver.
+ *
+ * @param[in] dev       An IEEE 802.15.4 network device.
  */
 int cc2420_initialize(netdev_t *dev);
 
@@ -255,6 +257,8 @@ int cc2420_get_tx_power(void);
  * @brief Checks if the radio medium is available/clear to send
  *         ("Clear Channel Assessment" a.k.a. CCA).
  *
+ * @param[in] dev   An IEEE 802.15.4 network device.
+ *
  * @return a 1 value if radio medium is clear (available),
  *         a 0 value otherwise.
  *
@@ -277,49 +281,49 @@ void cc2420_rx_irq(void);
  * @brief Sets the function called back when a packet is received.
  *        (Low-level mechanism, parallel to the `transceiver` module).
  *
- * @param[in] recv_cb callback function for 802.15.4 packet arrival
+ * @param[in] dev       An IEEE 802.15.4 network device.
+ * @param[in] recv_cb   callback function for 802.15.4 packet arrival
  *
  * @return  0 on success
  * @return  -ENODEV if *dev* is not recognized
  * @return  -ENOBUFS, if maximum number of registable callbacks is exceeded
  */
-int cc2420_add_raw_recv_callback(netdev_t *dev,
-                                 netdev_802154_raw_packet_cb_t recv_cb);
+int cc2420_add_raw_recv_callback(netdev_t *dev, netdev_802154_raw_packet_cb_t recv_cb);
 
 /**
  * @brief Unsets the function called back when a packet is received.
  *        (Low-level mechanism, parallel to the `transceiver` module).
  *
- * @param[in] recv_cb callback function to unset
+ * @param[in] dev       An IEEE 802.15.4 network device.
+ * @param[in] recv_cb   callback function to unset
  *
  * @return  0 on success
  * @return  -ENODEV if *dev* is not recognized
  */
-int cc2420_rem_raw_recv_callback(netdev_t *dev,
-                                 netdev_802154_raw_packet_cb_t recv_cb);
+int cc2420_rem_raw_recv_callback(netdev_t *dev, netdev_802154_raw_packet_cb_t recv_cb);
 
 /**
  * @brief Sets a function called back when a data packet is received.
  *
- * @param[in] recv_cb callback function for 802.15.4 data packet arrival
+ * @param[in] dev       An IEEE 802.15.4 network device.
+ * @param[in] recv_cb   callback function for 802.15.4 data packet arrival
  *
  * @return  0 on success
  * @return  -ENODEV if *dev* is not recognized
  * @return  -ENOBUFS, if maximum number of registable callbacks is exceeded
  */
-int cc2420_add_data_recv_callback(netdev_t *dev,
-                                  netdev_rcv_data_cb_t recv_cb);
+int cc2420_add_data_recv_callback(netdev_t *dev, netdev_rcv_data_cb_t recv_cb);
 
 /**
  * @brief Unsets a function called back when a data packet is received.
  *
- * @param[in] recv_cb callback function to unset
+ * @param[in] dev       An IEEE 802.15.4 network device.
+ * @param[in] recv_cb   callback function to unset
  *
  * @return  0 on success
  * @return  -ENODEV if *dev* is not recognized
  */
-int cc2420_rem_data_recv_callback(netdev_t *dev,
-                                  netdev_rcv_data_cb_t recv_cb);
+int cc2420_rem_data_recv_callback(netdev_t *dev, netdev_rcv_data_cb_t recv_cb);
 
 /**
  * @brief RX handler, process data from the RX FIFO.
@@ -330,39 +334,42 @@ void cc2420_rx_handler(void);
 /**
  * @brief Prepare the CC2420 TX buffer to send with the given packet.
  *
- * @param[in] kind Kind of packet to transmit.
- * @param[in] dest Address of the node to which the packet is sent.
+ * @param[in] dev           An IEEE 802.15.4 network device.
+ * @param[in] kind          Kind of packet to transmit.
+ * @param[in] dest          Address of the node to which the packet is sent.
  * @param[in] use_long_addr 1 to use the 64-bit address mode
  *                          with *dest* param; 0 to use
  *                          "short" PAN-centric mode.
- * @param[in] wants_ack 1 to request an acknowledgement
- *                      from the receiving node for this packet;
- *                      0 otherwise.
+ * @param[in] wants_ack     1 to request an acknowledgement
+ *                          from the receiving node for this packet;
+ *                          0 otherwise.
  * @param[in] upper_layer_hdrs  header data from higher network layers from
  *                              highest to lowest layer. Must be prepended to
  *                              the data stream by the network device. May be
  *                              NULL if there are none.
- * @param[in] buf Pointer to the buffer containing the payload
- *                of the 802.15.4 packet to transmit.
- *                The frame header (i.e.: FCS, sequence number,
- *                src and dest PAN and addresses) is inserted
- *                using values in accord with *kind* parameter
- *                and transceiver configuration.
- * @param[in] len Length (in bytes) of the outgoing packet payload.
+ * @param[in] buf           Pointer to the buffer containing the payload
+ *                          of the 802.15.4 packet to transmit.
+ *                          The frame header (i.e.: FCS, sequence number,
+ *                          src and dest PAN and addresses) is inserted
+ *                          using values in accord with *kind* parameter
+ *                          and transceiver configuration.
+ * @param[in] len           Length (in bytes) of the outgoing packet payload.
  *
  * @return @ref netdev_802154_tx_status_t
  */
 netdev_802154_tx_status_t cc2420_load_tx_buf(netdev_t *dev,
-                                             netdev_802154_pkt_kind_t kind,
-                                             netdev_802154_node_addr_t *dest,
-                                             int use_long_addr,
-                                             int wants_ack,
-                                             netdev_hlist_t *upper_layer_hdrs,
-                                             void *buf,
-                                             unsigned int len);
+        netdev_802154_pkt_kind_t kind,
+        netdev_802154_node_addr_t *dest,
+        int use_long_addr,
+        int wants_ack,
+        netdev_hlist_t *upper_layer_hdrs,
+        void *buf,
+        unsigned int len);
 
 /**
  * @brief Transmit the data loaded into the CC2420 TX buffer.
+ *
+ * @param[in] dev       An IEEE 802.15.4 network device.
  *
  * @return @ref netdev_802154_tx_status_t
  */

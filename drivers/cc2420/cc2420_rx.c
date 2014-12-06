@@ -130,7 +130,7 @@ void cc2420_rx_handler(void)
     }
 
     /* low-level reception mechanism (for MAC layer, among others) */
-    if (recv_func.type == CC2420_CB_TYPE_RAW && recv_func.cb.raw != NULL) {
+    if ((recv_func.type == CC2420_CB_TYPE_RAW) && (recv_func.cb.raw != NULL)) {
         recv_func.cb.raw(NULL, buf, pkt_len - 2, pkt_rssi, pkt_lqi, crc_ok);
     }
 
@@ -144,14 +144,13 @@ void cc2420_rx_handler(void)
                           cc2420_rx_buffer[rx_buffer_next].length);
 
     /* low-level data reception mechanism */
-    if (recv_func.type == CC2420_CB_TYPE_DATA && recv_func.cb.data != NULL &&
-        cc2420_rx_buffer[rx_buffer_next].frame.fcf.frame_type == 1) {
+    if ((recv_func.type == CC2420_CB_TYPE_DATA) && (recv_func.cb.data != NULL) &&
+        (cc2420_rx_buffer[rx_buffer_next].frame.fcf.frame_type == IEEE_802154_DATA_FRAME)) {
         recv_func.cb.data(NULL, cc2420_rx_buffer[rx_buffer_next].frame.src_addr,
-                          (cc2420_rx_buffer[rx_buffer_next].frame.fcf.src_addr_m == 2) ? 2 : 8,
+                          (cc2420_rx_buffer[rx_buffer_next].frame.fcf.src_addr_m == IEEE_802154_SHORT_ADDR_M) ? 2 : 8,
                           cc2420_rx_buffer[rx_buffer_next].frame.dest_addr,
-                          (cc2420_rx_buffer[rx_buffer_next].frame.fcf.dest_addr_m == 2) ? 2 : 8,
-                          cc2420_rx_buffer[rx_buffer_next].frame.payload,
-                          cc2420_rx_buffer[rx_buffer_next].frame.payload_len);
+                          (cc2420_rx_buffer[rx_buffer_next].frame.fcf.dest_addr_m == IEEE_802154_SHORT_ADDR_M) ? 2 : 8,
+                          cc2420_rx_buffer[rx_buffer_next].frame.payload, cc2420_rx_buffer[rx_buffer_next].frame.payload_len);
     }
 
     /* follow-up to transceiver module if adequate */

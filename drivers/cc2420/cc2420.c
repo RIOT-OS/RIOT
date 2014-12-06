@@ -90,7 +90,7 @@ int cc2420_initialize(netdev_t *dev)
 void cc2420_init(kernel_pid_t tpid)
 {
     transceiver_pid = tpid;
-    cc2420_initialize(NULL); /* TODO */
+    cc2420_initialize(NULL); /* TODO: actually use netdev */
 }
 #endif
 

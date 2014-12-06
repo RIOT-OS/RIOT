@@ -54,7 +54,13 @@ netdev_802154_tx_status_t cc2420_load_tx_buf(netdev_t *dev,
             break;
 
         default:
-            return NETDEV_802154_TX_STATUS_INVALID_PARAM;
+            hdr[0] = kind;
+
+            if (kind > NETDEV_802154_PKT_KIND_ACK) {
+                return NETDEV_802154_TX_STATUS_INVALID_PARAM;
+            }
+
+            break;
     }
 
     if (wants_ack) {
@@ -220,8 +226,9 @@ netdev_802154_tx_status_t cc2420_transmit_tx_buf(netdev_t *dev)
         cc2420_read_fifo(ackbuf, ACK_LENGTH);
 
         if (ackbuf[0] == 0x02  /* ack packet in buffer */
-             && (ackbuf[2] == sequence_nr - 1)) /* correct sequence number */
+            && (ackbuf[2] == sequence_nr - 1)) { /* correct sequence number */
             return NETDEV_802154_TX_STATUS_OK;
+        }
     }
 
     return NETDEV_802154_TX_STATUS_NOACK;
