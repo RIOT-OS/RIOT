@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroupgroup  netdev
+ * @addtogroup  netdev
  *
  * @{
  * @file

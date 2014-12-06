@@ -8,8 +8,9 @@
 
 /**
  * @defgroup radio_driver IEEE 802.15.4 radio driver interface
- * @brief API definitions for 802.15.4 radio transceivers' drivers
  * @ingroup drivers
+ *
+ * @brief API definitions for 802.15.4 radio transceivers' drivers
  *
  * @{
  * @file

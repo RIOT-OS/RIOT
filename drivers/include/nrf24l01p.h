@@ -9,6 +9,9 @@
 /**
  * @defgroup    drivers_nrf24l01p NRF24L01+ Driver Interface
  * @ingroup     drivers
+ *
+ * @brief       Low-level driver for nrf24l01+ transceiver
+ *
  * @{
  * @file
  *
