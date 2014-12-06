@@ -64,7 +64,8 @@ enum OPERATION_MODES {
     LM75A_INTERRUPT_MODE
 };
 
-/** @name Common definitions for LMA75A
+/**
+ * @name Common definitions for LMA75A
  * @{
  */
 #define LM75A_BIT0                      0x0
