@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     cpu_atmega
+ * @ingroup     cpu_atmega_common
  * @brief       Common implementations and headers for ATmega family based micro-controllers
  * @{
  *
