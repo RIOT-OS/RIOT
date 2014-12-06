@@ -60,9 +60,9 @@ void thread_sleep(void)
         return;
     }
 
-    dINT();
+    unsigned state = disableIRQ();
     sched_set_status((tcb_t *)sched_active_thread, STATUS_SLEEPING);
-    eINT();
+    restoreIRQ(state);
     thread_yield_higher();
 }
 
@@ -165,9 +165,7 @@ kernel_pid_t thread_create(char *stack, int stacksize, char priority, int flags,
     }
 #endif
 
-    if (!inISR()) {
-        dINT();
-    }
+    unsigned state = disableIRQ();
 
     kernel_pid_t pid = KERNEL_PID_UNDEF;
     for (kernel_pid_t i = KERNEL_PID_FIRST; i <= KERNEL_PID_LAST; ++i) {
@@ -179,9 +177,7 @@ kernel_pid_t thread_create(char *stack, int stacksize, char priority, int flags,
     if (pid == KERNEL_PID_UNDEF) {
         DEBUG("thread_create(): too many threads!\n");
 
-        if (!inISR()) {
-            eINT();
-        }
+        restoreIRQ(state);
 
         return -EOVERFLOW;
     }
@@ -212,7 +208,7 @@ kernel_pid_t thread_create(char *stack, int stacksize, char priority, int flags,
 
     sched_num_threads++;
 
-    DEBUG("Created thread %s. PID: %" PRIkernel_pid ". Priority: %u. StackPtr: %x \n", name, cb->pid, priority, cb->stack_start);
+    DEBUG("Created thread %s. PID: %" PRIkernel_pid ". Priority: %u.\n", name, cb->pid, priority);
 
     if (flags & CREATE_SLEEPING) {
         sched_set_status(cb, STATUS_SLEEPING);
@@ -221,19 +217,13 @@ kernel_pid_t thread_create(char *stack, int stacksize, char priority, int flags,
         sched_set_status(cb, STATUS_PENDING);
 
         if (!(flags & CREATE_WOUT_YIELD)) {
-            if (!inISR()) {
-                eINT();
-                sched_switch(priority);
-            }
-            else {
-                sched_context_switch_request = 1;
-            }
+            restoreIRQ(state);
+            sched_switch(priority);
+            return pid;
         }
     }
 
-    if (!inISR() && sched_active_thread != NULL) {
-        eINT();
-    }
+    restoreIRQ(state);
 
     return pid;
 }

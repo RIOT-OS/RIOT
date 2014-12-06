@@ -46,13 +46,10 @@ int getAdcValue(void)
     uint16_t count = 0;  
 
     activateRelayCtrl();
-    while( count < accumulateNum/*+20*/)
+    while( count < accumulateNum)
     {
-        result = adc_sample(dev, 0);
-       // if(count > 20) // filter first 20 measurements out
-        //{        
-            resultAccum += result;
-        //}
+        result = adc_sample(dev, 0);       
+        resultAccum += result;
         count++;
     } 
     deactivateRelayCtrl();
@@ -83,3 +80,8 @@ double getBatteryValueFromAdcInput(int adcValue)
 {
     return 0.0;
 };
+
+void setWeightTara(void)
+{
+    
+}

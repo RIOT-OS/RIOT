@@ -1112,7 +1112,7 @@ uint8_t lowpan_iphc_encoding(int if_id, const uint8_t *dest, int dest_len,
             else if (dest_len == 2 &&
                      ipv6_buf->destaddr.uint32[2] == HTONL(0x000000ff) &&
                      ipv6_buf->destaddr.uint16[6] == HTONS(0xfe00) &&
-                     ipv6_buf->destaddr.uint16[7] == destination) {
+                     ipv6_buf->destaddr.uint16[7] == HTONS(destination)) {
                 /* 0 bits. The address is derived using context information
                  * and possibly the link-layer addresses.*/
                 lowpan_iphc[1] |= 0x03;

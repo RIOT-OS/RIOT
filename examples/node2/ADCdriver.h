@@ -11,7 +11,7 @@ void adcSetup(void);
 int getAdcValue(void);
 uint32_t getWeightValueFromAdcInput(uint32_t);
 double getBatteryValueFromAdcInput(int);
-
+void setWeightTara(void);
 #ifdef __cplusplus
 }
 #endif
