@@ -21,9 +21,6 @@
 #include "slip.h"
 
 #define ENABLE_DEBUG    (0)
-#if ENABLE_DEBUG
-#define DEBUG_ENABLED
-#endif
 #include "debug.h"
 
 #define _SLIP_END         ((uint8_t)0xC0)
@@ -176,18 +173,16 @@ static void _slip_receive(msg_t *uart_msg, _uart_ctx_t *ctx)
                         offset += (ack->result);
                     }
                     else {
-                        DEBUG("Error code received from \"%s\": %d",
-                              thread_getname(ctx->registry[i]),
-                              -ack->result);
+                        DEBUG("Error code received from %d: %d",
+                              ctx->registry[i], -ack->result);
 
                         return;
                     }
                 }
                 else {
-                    DEBUG("Unexpected msg instead of ACK. Abort for \"%s\": "
+                    DEBUG("Unexpected msg instead of ACK. Abort for %d: "
                           "msg.type = %d, ack->type = %d, ack->orig = %d",
-                          thread_getname(ctx->registry[i], l3_ack->type,
-                                         ack->type, ack - orig));
+                          ctx->registry[i], l3_ack->type, ack->type, ack - orig);
                     return;
                 }
             }
@@ -305,35 +300,31 @@ static void _slip_handle_cmd(uart_t uart, msg_t *msg_cmd)
             }
 
         case NETAPI_CMD_REG:
-            do {
+            ack->result = -ENOBUFS;
+
+            for (int i = 0; i < _SLIP_REGISTRY_SIZE; i++) {
                 netapi_reg_t *reg = (netapi_reg_t *)cmd;
 
-                ack->result = -ENOBUFS;
-
-                for (int i = 0; i < _SLIP_REGISTRY_SIZE; i++) {
-                    if (_uart_ctx[uart].registry[i] == KERNEL_PID_UNDEF) {
-                        _uart_ctx[uart].registry[i] = reg->reg_pid;
-                        ack->result = NETAPI_STATUS_OK;
-                        break;
-                    }
+                if (_uart_ctx[uart].registry[i] == KERNEL_PID_UNDEF) {
+                    _uart_ctx[uart].registry[i] = reg->reg_pid;
+                    ack->result = NETAPI_STATUS_OK;
+                    break;
                 }
-            } while (0);
+            }
 
             break;
 
         case NETAPI_CMD_UNREG:
-            do {
+            ack->result = NETAPI_STATUS_OK;
+
+            for (int i = 0; i < _SLIP_REGISTRY_SIZE; i++) {
                 netapi_reg_t *reg = (netapi_reg_t *)cmd;
 
-                ack->result = NETAPI_STATUS_OK;
-
-                for (int i = 0; i < _SLIP_REGISTRY_SIZE; i++) {
-                    if (_uart_ctx[uart].registry[i] == reg->reg_pid) {
-                        _uart_ctx[uart].registry[i] = KERNEL_PID_UNDEF;
-                        break;
-                    }
+                if (_uart_ctx[uart].registry[i] == reg->reg_pid) {
+                    _uart_ctx[uart].registry[i] = KERNEL_PID_UNDEF;
+                    break;
                 }
-            } while (0);
+            }
 
             break;
 

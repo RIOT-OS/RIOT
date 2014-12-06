@@ -11,7 +11,7 @@
  * @ingroup     net
  * @{
  *
- * @file        slip.h
+ * @file
  * @brief       Provides a SLIP interface over UART.
  * @see         <a href="https://www.ietf.org/rfc/rfc1055">RFC 1055</a>
  *
@@ -42,7 +42,7 @@ typedef uint8_t uart_t;
 #endif
 
 /**
- * Initializes a new @ref slip control thread for UART device *uart*. If
+ * Initializes a new @ref slip control thread for UART device @p uart. If
  * the board does not support the uart_t type it falls back to using
  * board_uart0.h
  *
