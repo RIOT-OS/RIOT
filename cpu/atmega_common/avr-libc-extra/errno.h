@@ -33,9 +33,10 @@
 #define __ERRNO_H_ 1
 
 /**
- * @file
+ *  @addtogroup cpu_atmega_common
  *
- *  @defgroup avr_errno <errno.h>: System Errors
+ *  @{
+ *  @file
  *
  *  @code #include <errno.h>@endcode
  *
@@ -60,14 +61,14 @@ extern int errno;
 }
 #endif
 
-/** \ingroup avr_errno
-    \def EDOM
+/**
+    @def EDOM
 
     Domain error. */
 #define EDOM       33
 
-/** \ingroup avr_errno
-    \def ERANGE
+/**
+    @def ERANGE
 
     Range error. */
 #define ERANGE     34
@@ -148,5 +149,6 @@ extern int errno;
 #define EINVAL 22 /* Invalid argument */
 #define EOVERFLOW 75 /* Value too large for defined data type */
 
-/* \endcond */
+/** @} */
+
 #endif

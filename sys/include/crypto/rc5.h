@@ -60,7 +60,9 @@ extern "C" {
  * @brief the cipher_context_t adapted for RC5
  */
 typedef struct {
+    /** @cond INTERNAL */
     uint32_t skey [2 * (RC5_ROUNDS + 1)];
+    /** @endcond */
 } rc5_context_t;
 
 /**
