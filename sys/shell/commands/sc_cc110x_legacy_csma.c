@@ -23,7 +23,7 @@
 #include "cc110x_legacy_csma.h"
 
 
-void _cc110x_get_set_address_handler(int argc, char **argv)
+int _cc110x_get_set_address_handler(int argc, char **argv)
 {
     if (argc > 1) {
         int16_t a = atoi(argv[1]);
@@ -33,17 +33,23 @@ void _cc110x_get_set_address_handler(int argc, char **argv)
 
         if (cc1100_get_address() == (radio_address_t)a) {
             puts("[OK]");
+
+            return 0;
         }
         else {
             puts("Error!");
+
+            return 1;
         }
     }
     else {
         printf("[cc1100] Got address: %i\n", cc1100_get_address());
+
+        return 0;
     }
 }
 
-void _cc110x_get_set_channel_handler(int argc, char **argv)
+int _cc110x_get_set_channel_handler(int argc, char **argv)
 {
     if (argc > 1) {
         int16_t a = atoi(argv[1]);
@@ -53,12 +59,18 @@ void _cc110x_get_set_channel_handler(int argc, char **argv)
 
         if (cc1100_get_channel() == a) {
             puts("OK");
+
+            return 0;
         }
         else {
             puts("Error!");
+
+            return 1;
         }
     }
     else {
         printf("[cc1100] Got address: %i\n", cc1100_get_channel());
+        
+        return 0;
     }
 }

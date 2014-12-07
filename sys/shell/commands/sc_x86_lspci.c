@@ -34,7 +34,7 @@
 
 #include <stdio.h>
 
-extern void _x86_lspci(int argc, char **argv)
+extern int _x86_lspci(int argc, char **argv)
 {
     (void) argc;
     (void) argv;
@@ -60,4 +60,6 @@ extern void _x86_lspci(int argc, char **argv)
                vendor_name, device_name,
                baseclass_name, subclass_name, d->class.revision_id);
     }
+
+    return 0;
 }

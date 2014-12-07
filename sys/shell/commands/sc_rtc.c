@@ -22,7 +22,7 @@
 #ifdef MODULE_RTC
 #include "rtc.h"
 
-static void _gettime_handler(void)
+static int _gettime_handler(void)
 {
     struct tm now;
     rtc_get_localtime(&now);
@@ -30,9 +30,11 @@ static void _gettime_handler(void)
     /* cppcheck: see man 3 asctime: obsoleted by POSIX.1-2008 */
     /* cppcheck-suppress obsoleteFunctionsasctime */
     printf("%s", asctime(&now));
+
+    return 0;
 }
 
-static void _settime_handler(char **argv)
+static int _settime_handler(char **argv)
 {
     do {
         short i1, i2, i3;
@@ -57,19 +59,20 @@ static void _settime_handler(char **argv)
 
         rtc_set_localtime(&now);
         puts("OK");
-        return;
+        return 0;
     } while (0);
 
     printf("Usage: %s YYYY-MM-DD hh:mm:ss\n", argv[0]);
+    return 1;
 }
 
-void _date_handler(int argc, char **argv)
+int _date_handler(int argc, char **argv)
 {
     if (argc != 3) {
-        _gettime_handler();
+        return _gettime_handler();
     }
     else {
-        _settime_handler(argv);
+        return _settime_handler(argv);
     }
 }
 

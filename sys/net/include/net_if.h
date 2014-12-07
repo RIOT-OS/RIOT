@@ -442,7 +442,7 @@ int net_if_set_eui64(int if_id, net_if_eui64_t *eui64);
  * Sets the address of the transceiver associated with the given interface.
  *
  * @pre     Transceivers of this interface has to be initialized and
- *          transceiver thread has to be started.
+ *          transceiver thread ha/s to be started.
  *
  * @param[in]  if_id    The interface's ID
  * @param[in]  addr     The new hardware address
