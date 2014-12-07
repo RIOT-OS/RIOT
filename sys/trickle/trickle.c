@@ -83,6 +83,7 @@ void start_trickle(kernel_pid_t pid, trickle_t *trickle, void *msg_interval, tim
     trickle->Imin = Imin;
     trickle->Imax = Imax;
     trickle->I = trickle->Imin + (rand() % (4 * trickle->Imin));
+    trickle->pid = pid;
 
     trickle_interval(trickle, msg_interval, msg_interval_time, msg_interval_timer, msg_callback, msg_callback_time, msg_callback_timer);
 }

@@ -32,9 +32,6 @@
 #include "vtimer.h"
 #include "thread.h"
 
-#define TRICKLE_STACKSIZE (KERNEL_CONF_STACKSIZE_DEFAULT)
-#define TRICKLE_PKT_RECV_BUF_SIZE 8
-
 typedef struct {
     void (*func)(void *);
     void *args;
