@@ -18,11 +18,15 @@
 #include <stdint.h>
 #include <string.h>
 
+#include "kernel_types.h"
 #include "netdev/base.h"
+#include "msg.h"
+#include "thread.h"
 
 #include "netdev_dummy.h"
 
 #define _NETDEV_MORE(dev) ((_ut_dev_internal *)(dev->more))
+#define _NETDEV_EVENT_RX  (1725697577)
 
 typedef struct {
     char dst[UNITTESTS_NETDEV_DUMMY_MAX_LONG_ADDR_LEN];
@@ -44,6 +48,7 @@ typedef struct {
     _unittest_test_buffer rx_buffer;
     _unittest_test_buffer tx_buffer;
     uint32_t last_event;
+    kernel_pid_t event_handler;
 } _ut_dev_internal;
 
 netdev_t unittest_netdev_dummy_devs[UNITTESTS_NETDEV_DUMMY_MAX_DEV];
@@ -586,6 +591,29 @@ static void _event(netdev_t *dev, uint32_t event_type)
     }
 
     _NETDEV_MORE(dev)->last_event = event_type;
+
+    if (event_type == _NETDEV_EVENT_RX) {
+        for (int j = 0; j < UNITTESTS_NETDEV_DUMMY_MAX_CB; j++) {
+            if (_NETDEV_MORE(dev)->callbacks[j] != 0) {
+                _NETDEV_MORE(dev)->callbacks[j](dev,
+                          _NETDEV_MORE(dev)->rx_buffer.src,
+                          _NETDEV_MORE(dev)->rx_buffer.src_len,
+                          _NETDEV_MORE(dev)->rx_buffer.dst,
+                          _NETDEV_MORE(dev)->rx_buffer.dst_len,
+                          _NETDEV_MORE(dev)->rx_buffer.data,
+                          _NETDEV_MORE(dev)->rx_buffer.data_len);
+            }
+        }
+    }
+}
+
+static void _set_event_handler(netdev_t *dev, kernel_pid_t event_handler)
+{
+    if (_find_dev(dev) < 0) {
+        return;
+    }
+
+    _NETDEV_MORE(dev)->event_handler = event_handler;
 }
 
 const netdev_driver_t unittest_netdev_dummy_driver = {
@@ -598,6 +626,7 @@ const netdev_driver_t unittest_netdev_dummy_driver = {
     _get_state,
     _set_state,
     _event,
+    _set_event_handler,
 };
 
 int unittest_netdev_dummy_fire_rcv_event(netdev_t *dev, void *src,
@@ -608,43 +637,38 @@ int unittest_netdev_dummy_fire_rcv_event(netdev_t *dev, void *src,
         return -ENODEV;
     }
 
-    if ((src_len != UNITTESTS_NETDEV_DUMMY_MAX_LONG_ADDR_LEN &&
-         src_len != UNITTESTS_NETDEV_DUMMY_MAX_ADDR_LEN) ||
-        (dest_len != UNITTESTS_NETDEV_DUMMY_MAX_LONG_ADDR_LEN &&
-         dest_len != UNITTESTS_NETDEV_DUMMY_MAX_ADDR_LEN)) {
-        return -EAFNOSUPPORT;
-    }
+    if (_NETDEV_MORE(dev)->event_handler != KERNEL_PID_UNDEF) {
+        msg_t msg;
 
-    if (data_len > UNITTESTS_NETDEV_DUMMY_MAX_PACKET) {
-        return -EMSGSIZE;
-    }
-
-    if (src == NULL || dest == NULL || (data == NULL && data_len != 0)) {
-        return -EINVAL;
-    }
-
-    _NETDEV_MORE(dev)->rx_buffer.src_len = src_len;
-    _NETDEV_MORE(dev)->rx_buffer.dst_len = dest_len;
-    _NETDEV_MORE(dev)->rx_buffer.data_len = data_len;
-
-    memcpy(_NETDEV_MORE(dev)->rx_buffer.dst, dest, dest_len);
-    memcpy(_NETDEV_MORE(dev)->rx_buffer.src, src, src_len);
-    memcpy(_NETDEV_MORE(dev)->rx_buffer.data, data, data_len);
-
-    for (int j = 0; j < UNITTESTS_NETDEV_DUMMY_MAX_CB; j++) {
-        if (_NETDEV_MORE(dev)->callbacks[j] != 0) {
-            int res = _NETDEV_MORE(dev)->callbacks[j](dev,
-                      _NETDEV_MORE(dev)->rx_buffer.src,
-                      _NETDEV_MORE(dev)->rx_buffer.src_len,
-                      _NETDEV_MORE(dev)->rx_buffer.dst,
-                      _NETDEV_MORE(dev)->rx_buffer.dst_len,
-                      _NETDEV_MORE(dev)->rx_buffer.data,
-                      _NETDEV_MORE(dev)->rx_buffer.data_len);
-
-            if (res < 0) {
-                return -ECANCELED;
-            }
+        if ((src_len != UNITTESTS_NETDEV_DUMMY_MAX_LONG_ADDR_LEN &&
+             src_len != UNITTESTS_NETDEV_DUMMY_MAX_ADDR_LEN) ||
+            (dest_len != UNITTESTS_NETDEV_DUMMY_MAX_LONG_ADDR_LEN &&
+             dest_len != UNITTESTS_NETDEV_DUMMY_MAX_ADDR_LEN)) {
+            return -EAFNOSUPPORT;
         }
+
+        if (data_len > UNITTESTS_NETDEV_DUMMY_MAX_PACKET) {
+            return -EMSGSIZE;
+        }
+
+        if (src == NULL || dest == NULL || (data == NULL && data_len != 0)) {
+            return -EINVAL;
+        }
+
+        _NETDEV_MORE(dev)->rx_buffer.src_len = src_len;
+        _NETDEV_MORE(dev)->rx_buffer.dst_len = dest_len;
+        _NETDEV_MORE(dev)->rx_buffer.data_len = data_len;
+
+        memcpy(_NETDEV_MORE(dev)->rx_buffer.dst, dest, dest_len);
+        memcpy(_NETDEV_MORE(dev)->rx_buffer.src, src, src_len);
+        memcpy(_NETDEV_MORE(dev)->rx_buffer.data, data, data_len);
+
+        msg.type = NETDEV_MSG_EVENT_TYPE;
+        msg.content.value = _NETDEV_EVENT_RX;
+
+        msg_send_int(&msg, _NETDEV_MORE(dev)->event_handler);
+
+        thread_yield_higher();
     }
 
     return 0;
