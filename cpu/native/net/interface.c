@@ -35,6 +35,8 @@
 #include "nativenet_internal.h"
 #include "cpu.h"
 
+#define _NATIVENET_NETDEV_RCV_EVENT (362811672) /* magic number ;-) */
+
 static _native_callback_t _nativenet_callbacks[255];
 
 struct rx_buffer_s _nativenet_rx_buffer[RX_BUF_SIZE];
@@ -55,6 +57,7 @@ int _nativenet_init(netdev_t *dev)
     _NATIVENET_DEV_MORE(dev)->_channel = 0;
     _NATIVENET_DEV_MORE(dev)->_pan_id = 0;
     _NATIVENET_DEV_MORE(dev)->_is_monitoring = 0;
+    _NATIVENET_DEV_MORE(dev)->_event_handler = KERNEL_PID_UNDEF;
     memset(_NATIVENET_DEV_MORE(dev)->_callbacks, 0,
            sizeof((_NATIVENET_DEV_MORE(dev)->_callbacks)));
 
@@ -227,17 +230,16 @@ void _nativenet_handle_packet(radio_packet_t *packet)
         notified = 1;
     }
 
-    for (int i = 0; i < NATIVENET_DEV_CB_MAX; i++) {
-        if (_NATIVENET_DEV_MORE(dev)->_callbacks[i]) {
-            _NATIVENET_DEV_MORE(dev)->_callbacks[i]((netdev_t *)dev,
-                                                    &(_nativenet_rx_buffer[rx_buffer_next].packet.src),
-                                                    sizeof(uint16_t),
-                                                    &(_nativenet_rx_buffer[rx_buffer_next].packet.dst),
-                                                    sizeof(uint16_t),
-                                                    &(_nativenet_rx_buffer[rx_buffer_next].data),
-                                                    (size_t)_nativenet_rx_buffer[rx_buffer_next].packet.length);
-            notified = 1;
-        }
+    if (_NATIVENET_DEV_MORE(dev)->_event_handler != KERNEL_PID_UNDEF) {
+        DEBUG("_nativenet_handle_packet: notifying netdev event handler (pid = %d)!\n",
+              _NATIVENET_DEV_MORE(dev)->_event_handler);
+        msg_t m;
+        m.type = NETDEV_MSG_EVENT_TYPE;
+        m.content.value = _NATIVENET_NETDEV_RCV_EVENT;
+
+        msg_send_int(&m, _NATIVENET_DEV_MORE(dev)->_event_handler);
+
+        notified = 1;
     }
 
     if (!notified) {
@@ -588,8 +590,31 @@ int _nativenet_set_state(netdev_t *dev, netdev_state_t state)
 
 void _nativenet_event(netdev_t *dev, uint32_t event_type)
 {
-    (void)dev;
-    (void)event_type;
+    void *data;
+
+    switch (event_type) {
+        case _NATIVENET_NETDEV_RCV_EVENT:
+            data = pktbuf_insert(_nativenet_rx_buffer[rx_buffer_next].data,
+                                 (size_t)_nativenet_rx_buffer[rx_buffer_next].packet.length)
+            for (int i = 0; i < NATIVENET_DEV_CB_MAX; i++) {
+                if (_NATIVENET_DEV_MORE(dev)->_callbacks[i]) {
+                    _NATIVENET_DEV_MORE(dev)->_callbacks[i]((netdev_t *)dev,
+                                                            &(_nativenet_rx_buffer[rx_buffer_next].packet.src), sizeof(uint16_t),
+                                                            &(_nativenet_rx_buffer[rx_buffer_next].packet.dst), sizeof(uint16_t), data,
+                                                            (size_t)_nativenet_rx_buffer[rx_buffer_next].packet.length);
+                }
+            }
+
+            break;
+
+        default:
+            break;
+    }
+}
+
+void _nativenet_set_event_handler(netdev_t *dev, kernel_pid_t event_handler)
+{
+    _NATIVENET_DEV_MORE(dev)->_event_handler = event_handler;
 }
 
 const netdev_driver_t nativenet_driver = {
