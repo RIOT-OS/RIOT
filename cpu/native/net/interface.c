@@ -43,6 +43,7 @@ struct rx_buffer_s _nativenet_rx_buffer[RX_BUF_SIZE];
 static volatile uint8_t rx_buffer_next;
 
 static kernel_pid_t _native_net_tpid = KERNEL_PID_UNDEF;
+static int _netdev_event_pos = -1;
 
 /************************************************************************/
 /* nativenet.h **********************************************************/
@@ -236,6 +237,7 @@ void _nativenet_handle_packet(radio_packet_t *packet)
         msg_t m;
         m.type = NETDEV_MSG_EVENT_TYPE;
         m.content.value = _NATIVENET_NETDEV_RCV_EVENT;
+        _netdev_event_pos = rx_buffer_next;
 
         msg_send_int(&m, _NATIVENET_DEV_MORE(dev)->_event_handler);
 
@@ -590,20 +592,23 @@ int _nativenet_set_state(netdev_t *dev, netdev_state_t state)
 
 void _nativenet_event(netdev_t *dev, uint32_t event_type)
 {
-    void *data;
-
     switch (event_type) {
         case _NATIVENET_NETDEV_RCV_EVENT:
-            data = pktbuf_insert(_nativenet_rx_buffer[rx_buffer_next].data,
-                                 (size_t)_nativenet_rx_buffer[rx_buffer_next].packet.length)
+            if (_netdev_event_pos < 0) {
+                return;
+            }
+
             for (int i = 0; i < NATIVENET_DEV_CB_MAX; i++) {
                 if (_NATIVENET_DEV_MORE(dev)->_callbacks[i]) {
                     _NATIVENET_DEV_MORE(dev)->_callbacks[i]((netdev_t *)dev,
-                                                            &(_nativenet_rx_buffer[rx_buffer_next].packet.src), sizeof(uint16_t),
-                                                            &(_nativenet_rx_buffer[rx_buffer_next].packet.dst), sizeof(uint16_t), data,
-                                                            (size_t)_nativenet_rx_buffer[rx_buffer_next].packet.length);
+                                                            &(_nativenet_rx_buffer[_netdev_event_pos].packet.src), sizeof(uint16_t),
+                                                            &(_nativenet_rx_buffer[_netdev_event_pos].packet.dst), sizeof(uint16_t),
+                                                            _nativenet_rx_buffer[_netdev_event_pos].data,
+                                                            (size_t)_nativenet_rx_buffer[_netdev_event_pos].packet.length);
                 }
             }
+
+            _netdev_event_pos = -1;
 
             break;
 
