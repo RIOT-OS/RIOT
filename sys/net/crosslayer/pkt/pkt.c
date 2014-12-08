@@ -14,7 +14,7 @@
 
 #include "pkt.h"
 
-size_t pkt_total_header_len(const pkt_t *pkt)
+pktsize_t pkt_total_header_len(const pkt_t *pkt)
 {
     pkt_hlist_t *ptr = pkt->headers;
     size_t length = 0;

@@ -71,6 +71,21 @@ typedef enum {
 } pkt_proto_t;
 
 /**
+ * @brief   Type to define payload size of a packet
+ */
+typedef uint16_t pktsize_t;
+
+/**
+ * @brief   Macro for pktsize_t printing formatter
+ */
+#define PRIpktsize  (PRIu16)
+
+/**
+ * @brief   Maximum value for packet size
+ */
+#define PKTSIZE_MAX (UINT16_MAX)
+
+/**
  * @brief   Circular list type to store a number of protocol headers of
  *          unspecified type to work with @ref clist.h.
  *
@@ -93,7 +108,7 @@ typedef struct __attribute__((packed)) pkt_hlist_t {
 typedef struct __attribute__((packed)) {
     pkt_hlist_t *headers;   /**< network protocol headers of the packet. */
     void *payload;          /**< payload of the packet. */
-    size_t payload_len;     /**< length of pkt_t::payload. */
+    pktsize_t payload_len;  /**< length of pkt_t::payload. */
 } pkt_t;
 
 /**
@@ -103,14 +118,14 @@ typedef struct __attribute__((packed)) {
  *
  * @return  Length in number of bytes of all headers in pkt::headers.
  */
-size_t pkt_total_header_len(const pkt_t *pkt);
+pktsize_t pkt_total_header_len(const pkt_t *pkt);
 
 /**
  * @brief   Calculate total length of the packet.
  *
  * @return  Total length of the packet in number of bytes
  */
-static inline size_t pkt_total_len(const pkt_t *pkt)
+static inline pktsize_t pkt_total_len(const pkt_t *pkt)
 {
     return pkt_total_header_len(pkt) + pkt->payload_len;
 }
@@ -124,14 +139,17 @@ static inline size_t pkt_total_len(const pkt_t *pkt)
  */
 static inline void pkt_hlist_advance(pkt_hlist_t **list)
 {
-    clist_advance((clist_node_t **)list);
+    if (list != NULL && *list != NULL) {
+        clist_advance((clist_node_t **)list);
+    }
 }
 
 /**
  * @brief Add *header* to the start of headers of *pkt*
  *
- * @param[in,out] pkt   The packet to add *header* to
- * @param[in] header    The header to add to the list of headers of *pkt*
+ * @param[in,out] pkt   The packet to add *header* to. May not be NULL.
+ * @param[in] header    The header to add to the list of headers of *pkt*.
+ *                      May not be NULL.
  */
 static inline void pkt_add_header(pkt_t *pkt, pkt_hlist_t *header)
 {
@@ -140,16 +158,31 @@ static inline void pkt_add_header(pkt_t *pkt, pkt_hlist_t *header)
 }
 
 /**
- * @brief Removes *node* from list *list*
+ * @brief Removes @p header from packet @p pkt
  *
  * @see clist_remove
  *
- * @param[in,out] pkt   The packet to remove *header* from
- * @param[in] header    The header to remove from the list of headers of *pkt*
+ * @param[in,out] pkt   The packet to remove *header* from. May not be NULL.
+ * @param[in] header    The header to remove from the list of headers of *pkt*.
+ *                      May not be NULL.
  */
 static inline void pkt_remove_header(pkt_t *pkt, pkt_hlist_t *header)
 {
     clist_remove((clist_node_t **)(&(pkt->headers)), (clist_node_t *)header);
+}
+
+/**
+ * @brief Removes first (lowest layer) header from packet @p pkt and returns it.
+ *
+ * @see clist_removee
+ *
+ * @param[in,out] pkt   The packet to remove *header* from. May not be NULL.
+ */
+static inline pkt_hlist_t *pkt_remove_first_header(pkt_t *pkt)
+{
+    pkt_hlist_t *first = pkt->headers;
+    pkt_remove_header(pkt, pkt->headers);
+    return first;
 }
 
 #ifdef __cplusplus
