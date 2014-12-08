@@ -147,10 +147,13 @@ typedef struct {
 typedef struct rpl_dodag_t {
     rpl_instance_t *instance;
     ipv6_addr_t dodag_id;
-    uint8_t used;
+    uint8_t used        :1;
+    uint8_t joined      :1;
+    uint8_t grounded    :1;
+    uint8_t node_status :2; /* NORMAL_NODE, ROOT_NODE, LEAF_NODE */
+    uint8_t prf         :3; /* RFC6550, Page 40: DODAGPreference (Prf): A 3-bit unsigned integer */
     uint8_t mop;
     uint8_t dtsn;
-    uint8_t prf;
     uint8_t dio_interval_doubling;
     uint8_t dio_min;
     uint8_t dio_redundancy;
@@ -159,12 +162,9 @@ typedef struct rpl_dodag_t {
     uint8_t default_lifetime;
     uint16_t lifetime_unit;
     uint8_t version;
-    uint8_t grounded;
     uint16_t my_rank;
-    uint8_t node_status;
     uint8_t dao_seq;
     uint16_t min_rank;
-    uint8_t joined;
     rpl_parent_t *my_preferred_parent;
     struct rpl_of_t *of;
 } rpl_dodag_t;
