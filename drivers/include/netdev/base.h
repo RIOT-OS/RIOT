@@ -24,6 +24,7 @@
 #include <stdlib.h>
 
 #include "clist.h"
+#include "kernel_types.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -332,6 +333,11 @@ typedef struct {
      *                          of the received message
      */
     void (*event)(netdev_t *dev, uint32_t event_type);
+
+    /**
+     * @brief   Overrides event handler for @p dev
+     */
+    void (*set_event_handler)(netdev_t *dev, kernel_pid_t event_handler);
 } netdev_driver_t;
 
 /**

@@ -598,6 +598,7 @@ const netdev_driver_t unittest_netdev_dummy_driver = {
     _get_state,
     _set_state,
     _event,
+    NULL,
 };
 
 int unittest_netdev_dummy_fire_rcv_event(netdev_t *dev, void *src,
