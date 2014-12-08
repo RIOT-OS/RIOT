@@ -1,6 +1,6 @@
 include $(RIOTBOARD)/$(BOARD)/Makefile.dep
 ## the cpu to build for
-export CPU = msp430x16x
+export CPU = msp430fxyz
 export MCU = msp430f1611
 
 # toolchain config

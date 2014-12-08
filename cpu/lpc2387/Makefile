@@ -2,7 +2,7 @@ MODULE =cpu
 
 include $(RIOTCPU)/$(CPU)/Makefile.include
 
-DIRS = $(RIOTCPU)/arm7_common $(RIOTCPU)/lpc_common periph
+DIRS = $(RIOTCPU)/arm7_common periph
 
 ifneq (,$(filter gpioint,$(USEMODULE)))
 	DIRS += gpioint
