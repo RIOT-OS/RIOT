@@ -28,6 +28,9 @@
 #endif
 
 #include "net_help.h"
+#include "msg.h"
+#include "thread.h"
+
 #include "netdev/base.h"
 #include "netdev/default.h"
 
@@ -1010,6 +1013,7 @@ static int init_receiver_callback(void)
 int main(void)
 {
     int init_res;
+    msg_t msg;
 
     puts("\nRIOT netdev test");
     dev = NETDEV_DEFAULT;
@@ -1135,6 +1139,16 @@ int main(void)
     }
 
 #endif
+
+    dev->driver->set_event_handler(dev, thread_getpid());
+
+    while (1) {
+        msg_receive(&msg);
+
+        if (msg.type == NETDEV_MSG_EVENT_TYPE) {
+            dev->driver->event(dev, msg.content.value);
+        }
+    }
 
     return 0;
 }
