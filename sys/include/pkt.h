@@ -24,11 +24,13 @@
 #ifndef __PKT_H_
 #define __PKT_H_
 
+#include <inttypes.h>
+
+#include "clist.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include "clist.h"
 
 /**
  * @brief   Definition of protocol families to determine the type of the packet or which protocols a network device (see @ref netdev) or protocol layer (see @ref netapi) can handle
@@ -74,11 +76,11 @@ typedef enum {
  *
  * @extends clist_node_t
  */
-typedef struct __attribute__((packed)) netdev_hlist_t {
+typedef struct __attribute__((packed)) pkt_hlist_t {
     struct pkt_hlist_t *next;   /**< next element in list. */
     struct pkt_hlist_t *prev;   /**< previous element in list. */
     pkt_proto_t protocol;       /**< protocol of the header. */
-    void *header;               /**< the header stored in here. */
+    void *header_data;          /**< the data of the header */
     uint8_t header_len;         /**< the length of the header in byte. */
 } pkt_hlist_t;
 
@@ -96,7 +98,7 @@ typedef struct __attribute__((packed)) {
 
 /**
  * @brief   Helper function to calculate the total length of the headers of *pkt*.
- *
+ *_
  * @param[in]   pkt   A network packet.
  *
  * @return  Length in number of bytes of all headers in pkt::headers.
@@ -104,7 +106,9 @@ typedef struct __attribute__((packed)) {
 size_t pkt_total_header_len(const pkt_t *pkt);
 
 /**
- * @brief   Calculate total length of tha packet.
+ * @brief   Calculate total length of the packet.
+ *
+ * @return  Total length of the packet in number of bytes
  */
 static inline size_t pkt_total_len(const pkt_t *pkt)
 {
@@ -132,7 +136,7 @@ static inline void pkt_hlist_advance(pkt_hlist_t **list)
 static inline void pkt_add_header(pkt_t *pkt, pkt_hlist_t *header)
 {
     clist_add((clist_node_t **)(&(pkt->headers)), (clist_node_t *)header);
-    *(pkt->headers) = header;
+    pkt->headers = header;
 }
 
 /**
