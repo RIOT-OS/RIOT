@@ -64,6 +64,10 @@
 #include "ieee802154_frame.h"
 #endif
 
+#ifdef MODULE_NRF51
+#include "nrf51.h"
+#endif
+
 #define ENABLE_DEBUG (0)
 #if ENABLE_DEBUG
 #undef TRANSCEIVER_STACK_SIZE
@@ -130,6 +134,9 @@ void receive_mc1322x_packet(ieee802154_packet_t *trans_p);
 #ifdef MODULE_AT86RF231
 void receive_at86rf231_packet(ieee802154_packet_t *trans_p);
 #endif
+#ifdef MODULE_NRF51
+void receive_nrf51_packet(radio_packet_t *trans_p);
+#endif
 static int8_t send_packet(transceiver_type_t t, void *pkt);
 static int32_t get_channel(transceiver_type_t t);
 static int32_t set_channel(transceiver_type_t t, void *channel);
@@ -175,7 +182,8 @@ void transceiver_init(transceiver_type_t t)
     }
 
     /* check if a non defined bit is set */
-    if (t & ~(TRANSCEIVER_CC1100 | TRANSCEIVER_CC2420 | TRANSCEIVER_MC1322X | TRANSCEIVER_NATIVE | TRANSCEIVER_AT86RF231)) {
+    if (t & ~(TRANSCEIVER_CC1100 | TRANSCEIVER_CC2420 | TRANSCEIVER_MC1322X | TRANSCEIVER_NATIVE \
+              | TRANSCEIVER_AT86RF231 | TRANSCEIVER_NRF51)) {
         puts("Invalid transceiver type");
     }
     else {
@@ -218,6 +226,13 @@ kernel_pid_t transceiver_start(void)
     else if (transceivers & TRANSCEIVER_AT86RF231) {
         DEBUG("transceiver: Transceiver started for AT86RF231\n");
         at86rf231_init(transceiver_pid);
+    }
+
+#endif
+#ifdef MODULE_NRF51
+    else if (transceivers & TRANSCEIVER_NRF51) {
+        DEBUG("transceiver: Transceiver started for NRF51\n");
+        nrf51_init_transceiver(transceiver_pid);
     }
 
 #endif
@@ -301,6 +316,7 @@ static void *run(void *arg)
             case RCV_PKT_MC1322X:
             case RCV_PKT_NATIVE:
             case RCV_PKT_AT86RF231:
+            case RCV_PKT_NRF51:
                 receive_packet(m.type, m.content.value);
                 break;
 
@@ -420,6 +436,10 @@ static void receive_packet(uint16_t type, uint8_t pos)
             t = TRANSCEIVER_AT86RF231;
             break;
 
+        case RCV_PKT_NRF51:
+            t = TRANSCEIVER_NRF51;
+            break;
+
         default:
             t = TRANSCEIVER_NONE;
             break;
@@ -470,6 +490,12 @@ static void receive_packet(uint16_t type, uint8_t pos)
 #ifdef MODULE_AT86RF231
             ieee802154_packet_t *trans_p = &(transceiver_buffer[transceiver_buffer_pos]);
             receive_at86rf231_packet(trans_p);
+#endif
+        }
+        else if (type == RCV_PKT_NRF51) {
+#ifdef MODULE_NRF51
+            radio_packet_t *trans_p = &(transceiver_buffer[transceiver_buffer_pos]);
+            receive_nrf51_packet(trans_p);
 #endif
         }
         else if (type == RCV_PKT_NATIVE) {
@@ -710,6 +736,25 @@ void receive_at86rf231_packet(ieee802154_packet_t *trans_p)
     DEBUG("Content: %s\n", trans_p->frame.payload);
 }
 #endif
+
+#ifdef MODULE_NRF51
+void receive_nrf51_packet(radio_packet_t *trans_p)
+{
+    unsigned state;
+
+    DEBUG("transceiver: Handling NRF51 packet\n");
+    state = disableIRQ();
+    nrf51_packet_t *p = &nrf51_rx_buf[rx_buffer_pos];
+
+    trans_p->dst = nrf51_get_address();
+    trans_p->length = p->length;
+    trans_p->data = (uint8_t *) &(data_buffer[transceiver_buffer_pos * PAYLOAD_SIZE]);
+    memcpy(&(data_buffer[transceiver_buffer_pos * PAYLOAD_SIZE]), p->payload, p->length);
+
+    restoreIRQ(state);
+}
+#endif
+
 /*------------------------------------------------------------------------------------*/
 /*
  * @brief Sends a radio packet to the receiver
@@ -807,6 +852,12 @@ static int8_t send_packet(transceiver_type_t t, void *pkt)
             res = at86rf231_send(&at86rf231_pkt);
             break;
 #endif
+#ifdef MODULE_NRF51
+
+        case TRANSCEIVER_NRF51:
+            res = nrf51_send((uint16_t)p->dst, p->data, p->length);
+            break;
+#endif
 
         default:
             puts("Unknown transceiver");
@@ -861,6 +912,11 @@ static int32_t set_channel(transceiver_type_t t, void *channel)
         case TRANSCEIVER_AT86RF231:
             return at86rf231_set_channel(c);
 #endif
+#ifdef MODULE_NRF51
+
+        case TRANSCEIVER_NRF51:
+            return nrf51_set_channel(c);
+#endif
 
         default:
             return -1;
@@ -905,6 +961,11 @@ static int32_t get_channel(transceiver_type_t t)
 
         case TRANSCEIVER_AT86RF231:
             return at86rf231_get_channel();
+#endif
+#ifdef MODULE_NRF51
+
+        case TRANSCEIVER_NRF51:
+            return (int32_t)nrf51_get_channel();
 #endif
 
         default:
@@ -1030,6 +1091,11 @@ static radio_address_t get_address(transceiver_type_t t)
         case TRANSCEIVER_AT86RF231:
             return at86rf231_get_address();
 #endif
+#ifdef MODULE_NRF51
+
+        case TRANSCEIVER_NRF51:
+            return nrf51_get_address();
+#endif
 
         default:
             return 0; /* XXX see TODO above */
@@ -1080,6 +1146,11 @@ static radio_address_t set_address(transceiver_type_t t, void *address)
 
         case TRANSCEIVER_AT86RF231:
             return at86rf231_set_address(addr);
+#endif
+#ifdef MODULE_NRF51
+
+        case TRANSCEIVER_NRF51:
+            return (radio_address_t)nrf51_set_address(addr);
 #endif
 
         default:

@@ -54,6 +54,11 @@
 #define TEXT_SIZE           AT86RF231_MAX_DATA_LENGTH
 #define _TC_TYPE            TRANSCEIVER_AT86RF231
 
+#elif defined( MODULE_NRF51 )
+#include "nrf51.h"
+#define TEXT_SIZE           NRF51_CONF_MAX_PAYLOAD_LENGTH
+#define _TC_TYPE            TRANSCEIVER_NRF51
+
 #elif defined( MODULE_NATIVENET )
 #include "nativenet.h"
 #define TEXT_SIZE           NATIVE_MAX_DATA_LENGTH

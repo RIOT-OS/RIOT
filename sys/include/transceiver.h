@@ -84,6 +84,13 @@
 #endif
 #endif
 
+#ifdef MODULE_NRF51
+#include "nrf51.h"
+#ifndef TRANSCEIVER_DEFAULT
+#define TRANSCEIVER_DEFAULT TRANSCEIVER_NRF51
+#endif
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -126,6 +133,12 @@ extern "C" {
 #define PAYLOAD_SIZE  (AT86RF231_MAX_DATA_LENGTH)
 #endif
 #endif
+#ifdef MODULE_NRF51
+#if (MODULE_NRF51_MAX_DATA_LENGTH > PAYLOAD_SIZE)
+#undef PAYLOAD_SIZE
+#define PAYLOAD_SIZE  (NRF51_CONF_MAX_PAYLOAD_LENGTH)
+#endif
+#endif
 #ifdef MODULE_MC1322X
 #if (MACA_MAX_PAYLOAD_SIZE > PAYLOAD_SIZE)
 #undef PAYLOAD_SIZE
@@ -143,7 +156,7 @@ extern "C" {
  */
 
 /**
- * @brief The maximum of threads to register 
+ * @brief The maximum of threads to register
  */
 #define TRANSCEIVER_MAX_REGISTERED  (4)
 
@@ -172,6 +185,17 @@ extern "C" {
 /**
  * @}
  */
+<<<<<<< HEAD
+=======
+#define TRANSCEIVER_NONE        (0x0)       ///< Invalid
+#define TRANSCEIVER_CC1100      (0x01)      ///< CC110X transceivers
+#define TRANSCEIVER_CC1020      (0x02)      ///< CC1020 transceivers
+#define TRANSCEIVER_CC2420      (0x04)      ///< CC2420 transceivers
+#define TRANSCEIVER_MC1322X     (0x08)      ///< MC1322X transceivers
+#define TRANSCEIVER_NATIVE      (0x10)      ///< NATIVE transceivers
+#define TRANSCEIVER_AT86RF231   (0x20)      ///< AT86RF231 transceivers
+#define TRANSCEIVER_NRF51       (0x40)      ///< NRF51 transceivers
+>>>>>>> sys: added NRF51 radio to the transceiver
 
 /**
  * @brief Data type for transceiver specification
@@ -194,6 +218,7 @@ enum transceiver_msg_type_t {
     RCV_PKT_MC1322X,       /**< packet was received by mc1322x transceiver */
     RCV_PKT_NATIVE,        /**< packet was received by native transceiver */
     RCV_PKT_AT86RF231,     /**< packet was received by AT86RF231 transceiver */
+    RCV_PKT_NRF51,         /**< packet was received by NRF51 transceiver */
 
     /* Message types for transceiver <-> upper layer communication */
     PKT_PENDING,    /**< packet pending in transceiver buffer */
@@ -207,7 +232,7 @@ enum transceiver_msg_type_t {
     SET_ADDRESS,    /**< Set the radio address */
     GET_LONG_ADDR,  /**< Get the long radio address, if existing */
     SET_LONG_ADDR,  /**< Set the long radio address, if supported by hardware */
-    SET_MONITOR,    /**< Set transceiver to monitor mode (disable address 
+    SET_MONITOR,    /**< Set transceiver to monitor mode (disable address
                          checking) */
     GET_PAN,        /**< Get current pan */
     SET_PAN,        /**< Set a new pan */
@@ -230,7 +255,7 @@ enum transceiver_msg_type_t {
  * @brief Manage registered threads per transceiver
  */
 typedef struct {
-    transceiver_type_t transceivers;   /**< the tranceivers the thread is 
+    transceiver_type_t transceivers;   /**< the tranceivers the thread is
                                             registered for */
     kernel_pid_t pid;                  /**< the thread's pid */
 } registered_t;
@@ -249,7 +274,7 @@ typedef struct {
 extern volatile kernel_pid_t transceiver_pid;
 
 /**
- * @brief An array of ignored link layer addresses 
+ * @brief An array of ignored link layer addresses
  */
 extern radio_address_t transceiver_ignored_addr[TRANSCEIVER_MAX_IGNORED_ADDR];
 

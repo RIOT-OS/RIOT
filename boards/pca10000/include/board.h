@@ -72,6 +72,17 @@ extern "C" {
 #define LED_BLUE_TOGGLE     (NRF_GPIO->OUT ^= LED_BLUE_PIN)
 /** @} */
 
+/**
+ * @name Define the transceiver buffer size
+ */
+#ifdef MODULE_TRANSCEIVER
+#define TRANSCEIVER_BUFFER_SIZE     (3U)
+#endif
+
+/**
+ * Define the type for the radio packet length for the transceiver
+ */
+typedef uint8_t radio_packet_length_t;
 
 /**
  * @brief Initialize board specific hardware, including clock, LEDs and std-IO
