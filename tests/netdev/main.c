@@ -39,6 +39,7 @@
 
 static size_t dev_address_len = 0;
 static netdev_t *dev = NULL;
+static kernel_pid_t main_pid = KERNEL_PID_UNDEF;
 
 /***********************************
  * test channel                    *
@@ -883,6 +884,12 @@ static int test_callback(netdev_t *rcv_dev, void *src, size_t src_len,
         return -EINVAL;
     }
 
+    if (main_pid != thread_getpid()) {
+        printf("cb: Caller process PID not as expected: %" PRIkernel_pid " != %" PRIkernel_pid "\n",
+               thread_getpid(), main_pid);
+        return -EACCES;
+    }
+
     switch (dev_address_len) {
         case 1:
             exp_src[0] = NETDEV_TEST_SENDER;
@@ -1140,7 +1147,8 @@ int main(void)
 
 #endif
 
-    dev->driver->set_event_handler(dev, thread_getpid());
+    main_pid = thread_getpid();
+    dev->driver->set_event_handler(dev, main_pid);
 
     while (1) {
         msg_receive(&msg);
