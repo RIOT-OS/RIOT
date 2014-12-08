@@ -14,6 +14,7 @@
 #include "cc2420_settings.h"
 #include "cc2420_arch.h"
 #include "hwtimer.h"
+#include "kernel_types.h"
 #include "netdev/802154.h"
 #include "netdev/base.h"
 #include "transceiver.h"
@@ -28,8 +29,14 @@
 /* startup timeout (2 ms) in 16MHz-clock cycles */
 #define CC2420_STARTUP_TIMEOUT  32000U
 
+/* event type to signalize receive event */
+#define CC2420_NETDEV_EVENT_RX  (3452342219)
+
 /* default source address length for sending in number of byte */
 static size_t _default_src_addr_len = 2;
+
+/* TODO: allow for multiple devices */
+static kernel_pid_t cc2420_netdev_event_handler = KERNEL_PID_UNDEF;
 
 /* implementation of driver's functions */
 
@@ -149,13 +156,36 @@ void cc2420_rxoverflow_irq(void)
 
 void cc2420_rx_irq(void)
 {
+#ifdef MODULE_TRANSCEIVER
     cc2420_rx_handler();
+#else
+    msg_t msg;
+    msg.type = NETDEV_MSG_EVENT_TYPE;
+    msg.content.value = CC2420_NETDEV_EVENT_RX;
+    msg_send_int(&msg, cc2420_netdev_event_handler);
+#endif
 }
 
 void cc2420_event(netdev_t *dev, uint32_t event_type)
 {
     (void)dev;
-    (void)event_type;
+
+    switch (event_type) {
+        case CC2420_NETDEV_EVENT_RX:
+            cc2420_rx_handler();
+
+            break;
+
+        default:
+
+            break;
+    }
+}
+
+void cc2420_set_event_handler(netdev_t *dev, kernel_pid_t event_handler)
+{
+    (void)dev;
+    cc2420_netdev_event_handler = event_handler;
 }
 
 void cc2420_set_monitor(int mode)
@@ -746,6 +776,7 @@ const netdev_802154_driver_t cc2420_driver = {
     cc2420_get_state,
     cc2420_set_state,
     cc2420_event,
+    cc2420_set_event_handler,
     cc2420_load_tx_buf,
     cc2420_transmit_tx_buf,
     netdev_802154_send,
