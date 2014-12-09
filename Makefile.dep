@@ -32,6 +32,7 @@ ifneq (,$(filter sixlowborder,$(USEMODULE)))
 endif
 
 ifneq (,$(filter rpl,$(USEMODULE)))
+	USEMODULE += trickle
 	USEMODULE += routing
 endif
 

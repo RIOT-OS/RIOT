@@ -144,6 +144,12 @@ static inline bool RPL_COUNTER_GREATER_THAN(uint8_t A, uint8_t B)
 #define RPL_GROUNDED_SHIFT 7
 #define RPL_DEFAULT_OCP 0
 
+/* stack sizes */
+#define RPL_UPDATE_STACKSIZE (KERNEL_CONF_STACKSIZE_DEFAULT)
+
+/* msg queue sizes */
+#define RPL_UPDATE_PKT_RECV_BUF_SIZE RPL_MAX_DODAGS
+
 #ifdef __cplusplus
 }
 #endif

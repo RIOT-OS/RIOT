@@ -45,6 +45,7 @@ extern "C" {
 
 /* global variables */
 extern kernel_pid_t rpl_process_pid;
+extern kernel_pid_t rpl_update_pid;
 extern uint8_t rpl_max_routing_entries;
 
 /* needed for sending RPL-messages */

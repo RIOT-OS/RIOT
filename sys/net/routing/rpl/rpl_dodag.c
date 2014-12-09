@@ -31,9 +31,15 @@ char addr_str[IPV6_MAX_ADDR_STR_LEN];
 #endif
 #include "debug.h"
 
+kernel_pid_t rpl_update_pid;
 rpl_instance_t instances[RPL_MAX_INSTANCES];
 rpl_dodag_t dodags[RPL_MAX_DODAGS];
 rpl_parent_t parents[RPL_MAX_PARENTS];
+
+void rpl_trickle_send_dio(void *args) {
+    ipv6_addr_t *mcast = (ipv6_addr_t *) args;
+    rpl_send_DIO(mcast);
+}
 
 void rpl_instances_init(void)
 {
@@ -98,6 +104,18 @@ rpl_dodag_t *rpl_new_dodag(uint8_t instanceid, ipv6_addr_t *dodagid)
             dodag->instance = inst;
             dodag->my_rank = INFINITE_RANK;
             dodag->used = 1;
+            dodag->ack_received = true;
+            dodag->dao_counter = 0;
+            dodag->trickle.callback.func = &rpl_trickle_send_dio;
+            dodag->trickle.callback.args = (void *) &mcast;
+            dodag->dao_msg.content = (void *) dodag;
+            dodag->dao_msg.code = RPL_MSG_TYPE_DAO_HANDLE;
+            dodag->rt_msg.content = (void *) dodag;
+            dodag->rt_msg.code = RPL_MSG_TYPE_ROUTING_ENTRY_UPDATE;
+            dodag->trickle_msg_interval.code = RPL_MSG_TYPE_TRICKLE_INTERVAL;
+            dodag->trickle_msg_interval.content = (void *) dodag;
+            dodag->trickle_msg_callback.code = RPL_MSG_TYPE_TRICKLE_CALLBACK;
+            dodag->trickle_msg_callback.content = (void *) dodag;
             memcpy(&dodag->dodag_id, dodagid, sizeof(*dodagid));
             return dodag;
         }
@@ -137,6 +155,7 @@ void rpl_leave_dodag(rpl_dodag_t *dodag)
     dodag->joined = 0;
     dodag->my_preferred_parent = NULL;
     rpl_delete_all_parents();
+    stop_trickle(&dodag->trickle_msg_interval.timer, &dodag->trickle_msg_callback.timer);
 }
 
 bool rpl_equal_id(ipv6_addr_t *id1, ipv6_addr_t *id2)
@@ -279,10 +298,12 @@ rpl_parent_t *rpl_find_preferred_parent(void)
         my_dodag->my_preferred_parent = best;
 
         if (my_dodag->mop != RPL_NO_DOWNWARD_ROUTES) {
-            delay_dao();
+            delay_dao(my_dodag);
         }
 
-        reset_trickletimer();
+        reset_trickletimer(&my_dodag->trickle,
+                &my_dodag->trickle_msg_interval, &my_dodag->trickle_msg_interval.time, &my_dodag->trickle_msg_interval.timer,
+                &my_dodag->trickle_msg_callback, &my_dodag->trickle_msg_callback.time, &my_dodag->trickle_msg_callback.timer);
     }
 
     return best;
@@ -315,7 +336,9 @@ void rpl_parent_update(rpl_parent_t *parent)
             my_dodag->min_rank = my_dodag->my_rank;
         }
 
-        reset_trickletimer();
+        reset_trickletimer(&my_dodag->trickle,
+                &my_dodag->trickle_msg_interval, &my_dodag->trickle_msg_interval.time, &my_dodag->trickle_msg_interval.timer,
+                &my_dodag->trickle_msg_callback, &my_dodag->trickle_msg_callback.time, &my_dodag->trickle_msg_callback.timer);
     }
 }
 
@@ -367,8 +390,13 @@ void rpl_join_dodag(rpl_dodag_t *dodag, ipv6_addr_t *parent, uint16_t parent_ran
     DEBUG("\tmy_preferred_parent rank\t%02X\n", my_dodag->my_preferred_parent->rank);
     DEBUG("\tmy_preferred_parent lifetime\t%04X\n", my_dodag->my_preferred_parent->lifetime);
 
-    start_trickle(my_dodag->dio_min, my_dodag->dio_interval_doubling, my_dodag->dio_redundancy);
-    delay_dao();
+    start_trickle(rpl_update_pid, &my_dodag->trickle,
+            &my_dodag->trickle_msg_interval, &my_dodag->trickle_msg_interval.time, &my_dodag->trickle_msg_interval.timer,
+            &my_dodag->trickle_msg_callback, &my_dodag->trickle_msg_callback.time, &my_dodag->trickle_msg_callback.timer,
+            (1 << my_dodag->dio_min), my_dodag->dio_interval_doubling, my_dodag->dio_redundancy);
+    delay_dao(my_dodag);
+    vtimer_remove(&my_dodag->rt_msg.timer);
+    vtimer_set_msg(&my_dodag->rt_msg.timer, my_dodag->rt_msg.time, rpl_update_pid, &my_dodag->rt_msg);
 }
 
 void rpl_global_repair(rpl_dodag_t *dodag, ipv6_addr_t *p_addr, uint16_t rank)
@@ -395,8 +423,10 @@ void rpl_global_repair(rpl_dodag_t *dodag, ipv6_addr_t *p_addr, uint16_t rank)
         my_dodag->my_rank = my_dodag->of->calc_rank(my_dodag->my_preferred_parent,
                             my_dodag->my_rank);
         my_dodag->min_rank = my_dodag->my_rank;
-        reset_trickletimer();
-        delay_dao();
+        reset_trickletimer(&my_dodag->trickle,
+                &my_dodag->trickle_msg_interval, &my_dodag->trickle_msg_interval.time, &my_dodag->trickle_msg_interval.timer,
+                &my_dodag->trickle_msg_callback, &my_dodag->trickle_msg_callback.time, &my_dodag->trickle_msg_callback.timer);
+        delay_dao(my_dodag);
     }
 
     DEBUGF("Migrated to DODAG Version %d. My new Rank: %d\n", my_dodag->version,
@@ -416,7 +446,9 @@ void rpl_local_repair(void)
     my_dodag->my_rank = INFINITE_RANK;
     my_dodag->dtsn++;
     rpl_delete_all_parents();
-    reset_trickletimer();
+    reset_trickletimer(&my_dodag->trickle,
+            &my_dodag->trickle_msg_interval, &my_dodag->trickle_msg_interval.time, &my_dodag->trickle_msg_interval.timer,
+            &my_dodag->trickle_msg_callback, &my_dodag->trickle_msg_callback.time, &my_dodag->trickle_msg_callback.timer);
 
 }
 

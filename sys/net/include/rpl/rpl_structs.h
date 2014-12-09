@@ -18,15 +18,16 @@
  * @}
  */
 
-#include <string.h>
-#include "ipv6.h"
-
 #ifndef RPL_STRUCTS_H_INCLUDED
 #define RPL_STRUCTS_H_INCLUDED
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#include <string.h>
+#include "ipv6.h"
+#include "trickle.h"
 
 /* Modes of Operation */
 
@@ -122,6 +123,17 @@ typedef struct __attribute__((packed)) {
     ipv6_addr_t parent;
 } rpl_opt_transit_t;
 
+typedef struct {
+#define RPL_MSG_TYPE_DAO_HANDLE                 1
+#define RPL_MSG_TYPE_ROUTING_ENTRY_UPDATE       2
+#define RPL_MSG_TYPE_TRICKLE_INTERVAL           3
+#define RPL_MSG_TYPE_TRICKLE_CALLBACK           4
+    uint8_t code;
+    void *content;
+    timex_t time;
+    vtimer_t timer;
+} rpl_msg_type_t;
+
 struct rpl_dodag_t;
 
 typedef struct {
@@ -167,6 +179,13 @@ typedef struct rpl_dodag_t {
     uint8_t joined;
     rpl_parent_t *my_preferred_parent;
     struct rpl_of_t *of;
+    trickle_t trickle;
+    bool ack_received;
+    uint8_t dao_counter;
+    rpl_msg_type_t dao_msg;
+    rpl_msg_type_t rt_msg;
+    rpl_msg_type_t trickle_msg_interval;
+    rpl_msg_type_t trickle_msg_callback;
 } rpl_dodag_t;
 
 typedef struct rpl_of_t {

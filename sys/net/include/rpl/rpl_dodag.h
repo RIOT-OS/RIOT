@@ -26,6 +26,8 @@
 extern "C" {
 #endif
 
+extern ipv6_addr_t mcast;
+
 void rpl_instances_init(void);
 rpl_instance_t *rpl_new_instance(uint8_t instanceid);
 rpl_instance_t *rpl_get_instance(uint8_t instanceid);
@@ -48,6 +50,8 @@ void rpl_parent_update(rpl_parent_t *parent);
 void rpl_global_repair(rpl_dodag_t *dodag, ipv6_addr_t *p_addr, uint16_t rank);
 void rpl_local_repair(void);
 uint16_t rpl_calc_rank(uint16_t abs_rank, uint16_t minhoprankincrease);
+void dao_ack_received(rpl_dodag_t *dodag);
+void delay_dao(rpl_dodag_t *dodag);
 
 #ifdef __cplusplus
 }

@@ -215,8 +215,13 @@ void rpl_init_root_mode(void)
         return;
     }
 
+    start_trickle(rpl_update_pid, &dodag->trickle,
+            &dodag->trickle_msg_interval, &dodag->trickle_msg_interval.time, &dodag->trickle_msg_interval.timer,
+            &dodag->trickle_msg_callback, &dodag->trickle_msg_callback.time, &dodag->trickle_msg_callback.timer,
+            (1 << dodag->dio_min), dodag->dio_interval_doubling, dodag->dio_redundancy);
+    vtimer_remove(&dodag->rt_msg.timer);
+    vtimer_set_msg(&dodag->rt_msg.timer, dodag->rt_msg.time, rpl_update_pid, &dodag->rt_msg);
     DEBUGF("Root init finished.\n");
-    start_trickle(dodag->dio_min, dodag->dio_interval_doubling, dodag->dio_redundancy);
 }
 
 uint8_t rpl_is_root_mode(void)
@@ -550,7 +555,9 @@ void rpl_recv_DIO_mode(void)
             if (my_dodag->my_rank == ROOT_RANK) {
                 DEBUGF("[Warning] Inconsistent Dodag Version\n");
                 my_dodag->version = RPL_COUNTER_INCREMENT(dio_dodag.version);
-                reset_trickletimer();
+                reset_trickletimer(&my_dodag->trickle,
+                        &my_dodag->trickle_msg_interval, &my_dodag->trickle_msg_interval.time, &my_dodag->trickle_msg_interval.timer,
+                        &my_dodag->trickle_msg_callback, &my_dodag->trickle_msg_callback.time, &my_dodag->trickle_msg_callback.timer);
             }
             else {
                 DEBUGF("my dodag has no preferred_parent yet - seems to be odd since I have a parent.\n");
@@ -560,20 +567,24 @@ void rpl_recv_DIO_mode(void)
             return;
         }
         else if (RPL_COUNTER_GREATER_THAN(my_dodag->version, dio_dodag.version)) {
-            reset_trickletimer();
+            reset_trickletimer(&my_dodag->trickle,
+                    &my_dodag->trickle_msg_interval, &my_dodag->trickle_msg_interval.time, &my_dodag->trickle_msg_interval.timer,
+                    &my_dodag->trickle_msg_callback, &my_dodag->trickle_msg_callback.time, &my_dodag->trickle_msg_callback.timer);
             return;
         }
     }
 
     /* version matches, DODAG matches */
     if (rpl_dio_buf->rank == INFINITE_RANK) {
-        reset_trickletimer();
+        reset_trickletimer(&my_dodag->trickle,
+                &my_dodag->trickle_msg_interval, &my_dodag->trickle_msg_interval.time, &my_dodag->trickle_msg_interval.timer,
+                &my_dodag->trickle_msg_callback, &my_dodag->trickle_msg_callback.time, &my_dodag->trickle_msg_callback.timer);
     }
 
     /* We are root, all done!*/
     if (my_dodag->my_rank == ROOT_RANK) {
         if (rpl_dio_buf->rank != INFINITE_RANK) {
-            trickle_increment_counter();
+            trickle_increment_counter(&my_dodag->trickle);
         }
 
         return;
@@ -594,7 +605,7 @@ void rpl_recv_DIO_mode(void)
     }
     else {
         /* DIO OK */
-        trickle_increment_counter();
+        trickle_increment_counter(&my_dodag->trickle);
     }
 
     /* update parent rank */
@@ -606,7 +617,7 @@ void rpl_recv_DIO_mode(void)
     }
     else if (rpl_equal_id(&parent->addr, &my_dodag->my_preferred_parent->addr) &&
             (parent->dtsn != rpl_dio_buf->dtsn)) {
-        delay_dao();
+        delay_dao(my_dodag);
     }
 
     parent->dtsn = rpl_dio_buf->dtsn;
@@ -701,7 +712,7 @@ void rpl_recv_DAO_mode(void)
 
     if (increment_seq) {
         RPL_COUNTER_INCREMENT(my_dodag->dao_seq);
-        delay_dao();
+        delay_dao(my_dodag);
     }
 }
 
@@ -790,7 +801,7 @@ void rpl_recv_dao_ack_mode(void)
         return;
     }
 
-    dao_ack_received();
+    dao_ack_received(my_dodag);
 
 }
 
