@@ -127,8 +127,21 @@ static inline bool RPL_COUNTER_GREATER_THAN(uint8_t A, uint8_t B)
 #define RPL_MAX_DODAGS 3
 #define RPL_MAX_INSTANCES 1
 #define RPL_MAX_PARENTS 5
-#define RPL_MAX_ROUTING_ENTRIES_STORING 128
-#define RPL_MAX_ROUTING_ENTRIES_NON_STORING 128
+#ifndef RPL_MAX_ROUTING_ENTRIES
+    #if (RPL_DEFAULT_MOP == RPL_NO_DOWNWARD_ROUTES)
+    #    define RPL_MAX_ROUTING_ENTRIES (128)
+    #elif (RPL_DEFAULT_MOP == RPL_NON_STORING_MODE)
+        #ifdef RPL_NODE_IS_ROOT
+        #    define RPL_MAX_ROUTING_ENTRIES (128)
+        #else
+        #    define RPL_MAX_ROUTING_ENTRIES (0)
+        #endif
+    #elif (RPL_DEFAULT_MOP == RPL_STORING_MODE_NO_MC)
+    #    define RPL_MAX_ROUTING_ENTRIES (128)
+    #else // RPL_DEFAULT_MOP == RPL_STORING_MODE_MC
+    #    define RPL_MAX_ROUTING_ENTRIES (128)
+    #endif
+#endif
 #define RPL_MAX_SRH_PATH_LENGTH 10;
 #define RPL_SRH_ENTRIES 15
 #define RPL_ROOT_RANK 256
