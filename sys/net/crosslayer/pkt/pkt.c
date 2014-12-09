@@ -14,21 +14,58 @@
 
 #include "pkt.h"
 
-pktsize_t pkt_total_header_len(const pkt_t *pkt)
+pktsize_t pkt_hlist_len(pkt_hlist_t *list)
 {
-    pkt_hlist_t *ptr = pkt->headers;
-    size_t length = 0;
+    pktsize_t len = 0;
 
-    if (ptr == NULL) {
-        return 0;
+    while (list) {
+        len += list->header_len;
+        pkt_hlist_advance(&list);
     }
 
-    do {
-        length += (size_t)ptr->header_len;
-        pkt_hlist_advance(&ptr);
-    } while (ptr != pkt->headers);
+    return len;
+}
 
-    return length;
+pkt_hlist_t *pkt_hlist_remove_first(pkt_hlist_t **list)
+{
+    pkt_hlist_t *res;
+
+    if (list == NULL) {
+        return NULL;
+    }
+
+    res = *list;
+    *list = res->next;
+    res->next = NULL;
+
+    return res;
+}
+
+void pkt_hlist_remove(pkt_hlist_t **list, pkt_hlist_t *header)
+{
+    if (list == NULL || *list == NULL || header == NULL) {
+        return;
+    }
+
+    if ((*list) == header) {
+        pkt_hlist_remove_first(list);
+    }
+    else {
+        pkt_hlist_t *ptr = (*list)->next, *prev = *list;
+
+        pkt_hlist_advance(&ptr);
+
+        while (ptr != NULL) {
+            if (ptr == header) {
+                prev->next = ptr->next;
+                ptr->next = NULL;
+            }
+
+            pkt_hlist_advance(&ptr);
+            pkt_hlist_advance(&prev);
+        }
+    }
+
 }
 
 /** @} */

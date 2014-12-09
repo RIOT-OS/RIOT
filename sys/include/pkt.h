@@ -89,14 +89,16 @@ typedef uint16_t pktsize_t;
  * @brief   Circular list type to store a number of protocol headers of
  *          unspecified type to work with @ref clist.h.
  *
- * @extends clist_node_t
+ * @note    This type implements its own list implementation because of the way
+ *          it is stored in the packet buffer.
  */
-typedef struct __attribute__((packed)) pkt_hlist_t {
-    struct pkt_hlist_t *next;   /**< next element in list. */
-    struct pkt_hlist_t *prev;   /**< previous element in list. */
-    pkt_proto_t protocol;       /**< protocol of the header. */
+typedef struct __attribute__((packed)) pkt_hlist_t {    /* packed to be aligned
+                                                         * correctly in static
+                                                         * packet buffer */
+    pktsize_t header_len;       /**< the length of the header in byte. */
     void *header_data;          /**< the data of the header */
-    uint8_t header_len;         /**< the length of the header in byte. */
+    pkt_proto_t header_proto;   /**< protocol of the header. */
+    struct pkt_hlist_t *next;   /**< next element in list. */
 } pkt_hlist_t;
 
 /**
@@ -105,20 +107,89 @@ typedef struct __attribute__((packed)) pkt_hlist_t {
  * @note    This type has not an initializer on purpose. Please use @ref pktbuf
  *          as factory.
  */
-typedef struct __attribute__((packed)) {
-    pkt_hlist_t *headers;   /**< network protocol headers of the packet. */
-    void *payload;          /**< payload of the packet. */
-    pktsize_t payload_len;  /**< length of pkt_t::payload. */
+typedef struct __attribute__((packed)) {    /* packed to be aligned correctly
+                                             * in static packet buffer */
+    pktsize_t payload_len;      /**< length of pkt_t::payload. */
+    void *payload;              /**< payload of the packet. */
+    pkt_proto_t payload_proto;  /**< protocol of pkt_t::payload, if any */
+    pkt_hlist_t *headers;       /**< network protocol headers of the packet. */
 } pkt_t;
 
 /**
+ * @brief Calculates total length of a list of headers.
+ *
+ * @param[in] list  list of headers.
+ *
+ * @note    The pkt_hlist_t type implements its own list implementation because
+ *          of the way it is stored in the packet buffer.
+ *
+ * @return  length of the list of headers.
+ */
+pktsize_t pkt_hlist_len(pkt_hlist_t *list);
+
+/**
+ * @brief Advance the header list
+ *
+ * @param[in,out] list  The list to work upon.
+ *
+ * @return  The next element in @p list
+ * @return  NULL if list reached its end
+ */
+static inline pkt_hlist_t *pkt_hlist_advance(pkt_hlist_t **list)
+{
+    if (list != NULL && *list != NULL) {
+        *list = (*list)->next;
+        return *list;
+    }
+
+    return NULL;
+}
+
+/**
+ * @brief Adds a new header to a header list.
+ *
+ * @param[in,out] list  The list add the @p header to.
+ * @param[in] header    The header to add to @p list.
+ */
+static inline void pkt_hlist_add(pkt_hlist_t **list, pkt_hlist_t *header)
+{
+    if (header == NULL || list == NULL) {
+        return;
+    }
+
+    header->next = (*list);
+    *list = header;
+}
+
+/**
+ * @brief Removes and return first header from a header list.
+ *
+ * @param[in,out] list  The list remove the @p header from.
+ *
+ * @return The first header in @p list.
+ * @return NULL if @p list is empty
+ */
+pkt_hlist_t *pkt_hlist_remove_first(pkt_hlist_t **list);
+
+/**
+ * @brief Removes a header from a header list.
+ *
+ * @param[in,out] list  The list remove the @p header from.
+ * @param[in] header    The header to remove from @p list.
+ */
+void pkt_hlist_remove(pkt_hlist_t **list, pkt_hlist_t *header);
+
+/**
  * @brief   Helper function to calculate the total length of the headers of *pkt*.
- *_
+ *
  * @param[in]   pkt   A network packet.
  *
  * @return  Length in number of bytes of all headers in pkt::headers.
  */
-pktsize_t pkt_total_header_len(const pkt_t *pkt);
+static inline pktsize_t pkt_total_header_len(const pkt_t *pkt)
+{
+    return pkt_hlist_len(pkt->headers);
+}
 
 /**
  * @brief   Calculate total length of the packet.
@@ -131,58 +202,37 @@ static inline pktsize_t pkt_total_len(const pkt_t *pkt)
 }
 
 /**
- * @brief Advance the header list
+ * @brief Adds @p header to packet @p pkt.
  *
- * @see clist_advance
- *
- * @param[in,out] list  The list to work upon.
- */
-static inline void pkt_hlist_advance(pkt_hlist_t **list)
-{
-    if (list != NULL && *list != NULL) {
-        clist_advance((clist_node_t **)list);
-    }
-}
-
-/**
- * @brief Add *header* to the start of headers of *pkt*
- *
- * @param[in,out] pkt   The packet to add *header* to. May not be NULL.
- * @param[in] header    The header to add to the list of headers of *pkt*.
- *                      May not be NULL.
+ * @param[in,out] pkt   The packet to add @p header to
+ * @param[in] header    The header to add to the list of headers of @p pkt.
  */
 static inline void pkt_add_header(pkt_t *pkt, pkt_hlist_t *header)
 {
-    clist_add((clist_node_t **)(&(pkt->headers)), (clist_node_t *)header);
-    pkt->headers = header;
+    pkt_hlist_add(&(pkt->headers), header);
 }
 
 /**
- * @brief Removes @p header from packet @p pkt
+ * @brief Removes @p header from packet @p pkt.
  *
- * @see clist_remove
- *
- * @param[in,out] pkt   The packet to remove *header* from. May not be NULL.
- * @param[in] header    The header to remove from the list of headers of *pkt*.
- *                      May not be NULL.
+ * @param[in,out] pkt   The packet to remove @p header from. May not be NULL.
+ * @param[in] header    The header to remove from the list of headers of @p pkt.
  */
 static inline void pkt_remove_header(pkt_t *pkt, pkt_hlist_t *header)
 {
-    clist_remove((clist_node_t **)(&(pkt->headers)), (clist_node_t *)header);
+    pkt_hlist_remove(&(pkt->headers), header);
 }
 
 /**
  * @brief Removes first (lowest layer) header from packet @p pkt and returns it.
  *
- * @see clist_removee
- *
  * @param[in,out] pkt   The packet to remove *header* from. May not be NULL.
+ *
+ * @return  The (previously) first header of *pkt*.
  */
 static inline pkt_hlist_t *pkt_remove_first_header(pkt_t *pkt)
 {
-    pkt_hlist_t *first = pkt->headers;
-    pkt_remove_header(pkt, pkt->headers);
-    return first;
+    return pkt_hlist_remove_first(&pkt);
 }
 
 #ifdef __cplusplus
