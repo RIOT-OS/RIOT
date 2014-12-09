@@ -63,9 +63,9 @@ static ringbuffer_t rx_buf;
  */
 void rx_cb(void *arg, char data)
 {
-#ifndef MODULE_UART0
     (void)arg;
 
+#ifndef MODULE_UART0
     ringbuffer_add_one(&rx_buf, data);
     mutex_unlock(&uart_rx_mutex);
 #else
