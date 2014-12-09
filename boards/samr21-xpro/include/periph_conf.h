@@ -259,7 +259,7 @@ extern "C" {
 #define ADC_0_ACCUM_512                    ADC_AVGCTRL_SAMPLENUM_512
 #define ADC_0_ACCUM_1024                   ADC_AVGCTRL_SAMPLENUM_1024
 /* Use this to define the value used */
-#define ADC_0_ACCUM_DEFAULT                ADC_0_ACCUM_1024 
+#define ADC_0_ACCUM_DEFAULT                ADC_AVGCTRL_SAMPLENUM_1024 
 
 /* ADC 0 DEVIDE RESULT */
 #define ADC_0_DIV_RES_DISABLE              0

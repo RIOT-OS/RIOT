@@ -11,9 +11,8 @@
  * @{
  *
  * @file
- * @brief UDP RPL example application
+ * @brief Node application
  *
- * @author      Oliver Hahm <oliver.hahm@inria.fr>
  *
  * @}
  */
@@ -27,9 +26,9 @@ extern "C"{
 #include "board_uart0.h"
 #include "udp.h"
 #include "periph/gpio.h" 
-#include "rpl_udp.h"
+#include "node.h"
 #include "configuration.h"
-#include "ADCdriver.h" 
+#include "sensor_driver.h" 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 }
@@ -58,7 +57,7 @@ int main(void)
     adcSetup();
     gpio_init_int(GPIO_3, GPIO_PULLUP, GPIO_FALLING, (gpio_cb_t)node_testsms_callback, NULL); /* TESTSMS */
     gpio_init_int(GPIO_9, GPIO_PULLUP, GPIO_FALLING, (gpio_cb_t)node_tara_callback, NULL); /* TARA */
-    rpl_udp_init_node_standalone();
+    udp_init_node_standalone();
 
     udp_node_thread_pid = thread_create(udp_node_stack_buffer,
                                                        sizeof(udp_node_stack_buffer),
@@ -70,9 +69,9 @@ int main(void)
     payload_thread_pid = thread_create(payload_buffer,
                                                    sizeof(payload_buffer),
                                                    PRIORITY_MAIN -2, CREATE_STACKTEST,
-                                                   payload_node_thread,
+                                                   node_payload_thread,
                                                    NULL,
-                                                   "payload_node_thread");
+                                                   "node_payload_thread");
 
 
     //thread_wakeup(udp_node_thread_pid);

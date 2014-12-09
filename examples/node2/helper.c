@@ -27,7 +27,7 @@
 #include "ieee802154_frame.h"
 #include "rpl/rpl_structs.h"
 
-#include "rpl_udp.h"
+#include "node.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"

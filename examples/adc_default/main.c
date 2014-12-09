@@ -26,6 +26,8 @@
 #include "periph/gpio.h" 
 #include "vtimer.h"
 void handle_init_response( int );
+//double ExponentialADC(double alpha, double now, double past);
+uint32_t ExponentialADC(double alpha, double now, double past);
 
 int main(void)
 {
@@ -34,10 +36,10 @@ int main(void)
 	dev = ADC_0;
 	adc_precision_t pre;
 	pre = ADC_RES_16BIT; // 6BIT & 14BIT is not valid
-	int result = 0;
+	int result0 = 0;
 	uint32_t resultAccum = 0;
-    uint16_t count = 0;
-    uint16_t accumulateNum = 500;
+    uint32_t count = 0;
+    uint16_t accumulateNum = 100;
 
 	int response = adc_init(dev, pre);
 	handle_init_response(response);
@@ -46,31 +48,63 @@ int main(void)
   	gpio_set(GPIO_0);
   	usleep(100000);
    
-    while( count < accumulateNum/*+20*/)
+
+    int result0 = 0;
+    uint32_t resultAccum = 0;
+    uint32_t count = 0;
+    uint16_t accumulateNum = 100;
+    while( count < accumulateNum)
     {
-        result = adc_sample(dev, 0);
-       // if(count > 20) // filter first 20 measurements out
-        //{        
-            resultAccum += result;
-        //}
+        result0 = adc_sample(dev, 0);      
+        resultAccum += result0;
         count++;
-    } 
+    }
     gpio_clear(GPIO_0);
     resultAccum = (uint32_t)(resultAccum/accumulateNum); 
-    printf("%d\n", resultAccum); 
+    printf("\n\n\n\tFirst result: %d\n", resultAccum); 
 
-    while(1)
+    // while (count < 1000000)
+    // {
+    //     result = adc_sample(dev, 0);
+    //     printf("%d\n", result); 
+    //     count++;
+    // }
+
+
+    count = 0;
+    double result = 0;
+    double const alpha = 0.1;
+    double past = 0.0;
+    gpio_set(GPIO_0);
+    usleep(100000);
+    while(count < 100)
     {
-    	//result = adc_sample(dev, 2); //pin 6
-    	//printf("Result: " );
-    	//printf("PIN6: %d\n", result);   
-
-    	//result = adc_sample(dev, 0); // pin 5
-    	//printf("Result: " );
-    	//printf("%d\n", result);  	
+        if(count == 0)
+        {
+            double temp = (double) adc_sample(dev, 0);
+            result = ExponentialADC(alpha,temp, temp);
+            past = result;
+        }
+        double now = (double) adc_sample(dev, 0);
+        result = ExponentialADC(alpha, now, past);
+        past = result;
+        count++;
     }
+
+
+    printf("\n\n\n\tSecond result: %d\n\n\n", (uint16_t)result);
+
+    printf("\n\n\t\tDONE!\n\n\n"); 
+    while(1)
+    {}
     
     return 0;
+}
+
+uint32_t ExponentialADC(double alpha, double now, double past)
+{
+    return (uint32_t)((alpha*now)+(1-alpha)*past);
+
 }
 
 void handle_init_response( int response)
