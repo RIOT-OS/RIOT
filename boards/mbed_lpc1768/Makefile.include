@@ -23,7 +23,7 @@ export LINK = $(PREFIX)gcc
 export SIZE = $(PREFIX)size
 export OBJCOPY = $(PREFIX)objcopy
 export TERMPROG = $(RIOTBASE)/dist/tools/pyterm/pyterm
-export FLASHER =
+export FLASHER = $(RIOTBOARD)/$(BOARD)/dist/flash.sh
 export DEBUGGER =
 export DEBUGSERVER =
 
