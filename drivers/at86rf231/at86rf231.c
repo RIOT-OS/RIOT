@@ -729,6 +729,7 @@ const netdev_802154_driver_t at86rf231_driver = {
     .get_state = at86rf231_get_state,
     .set_state = at86rf231_set_state,
     .event = at86rf231_event,
+    .set_event_handler = NULL,
     .load_tx = at86rf231_load_tx_buf,
     .transmit = at86rf231_transmit_tx_buf,
     .send = netdev_802154_send,
