@@ -65,7 +65,7 @@ typedef enum {
     /**
      * @brief   CC110x frame format protocol
      *
-     * @detail  Sends frames as defined by cc110x_packet_t.
+     * @details Sends frames as defined by cc110x_packet_t.
      */
     PKT_PROTO_CC110X        = 0x0008,
 } pkt_proto_t;
