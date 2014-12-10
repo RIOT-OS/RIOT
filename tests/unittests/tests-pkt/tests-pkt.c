@@ -19,132 +19,11 @@
 
 #include "tests-pkt.h"
 
-static void test_pkt_total_header_len__headers_NULL(void)
-{
-    pkt_t pkt = { NULL, NULL, 0 };
+#define _INIT_ELEM(len, data, next) \
+    { (len), (data), PKT_PROTO_UNKNOWN, (next) }
+#define _INIT_ELEM_STATIC_DATA(data, next) _INIT_ELEM(sizeof(data), data, next)
 
-    TEST_ASSERT_EQUAL_INT(0, pkt_total_header_len(&pkt));
-}
-
-static void test_pkt_total_header_len__1_header__hdata_NULL__hlen_0(void)
-{
-    pkt_hlist_t hdr = { NULL, NULL, PKT_PROTO_UNKNOWN, NULL, 0};
-    pkt_t pkt = { &hdr, NULL, 0 };
-
-    hdr.next = &hdr;
-    hdr.prev = &hdr;
-
-    TEST_ASSERT_EQUAL_INT(0, pkt_total_header_len(&pkt));
-}
-
-static void test_pkt_total_header_len__1_header__hdata_NULL__hlen_MAX(void)
-{
-    pkt_hlist_t hdr = { NULL, NULL, PKT_PROTO_UNKNOWN, NULL, UINT8_MAX };
-    pkt_t pkt = { &hdr, NULL, 0 };
-
-    hdr.next = &hdr;
-    hdr.prev = &hdr;
-
-    TEST_ASSERT_EQUAL_INT(UINT8_MAX, pkt_total_header_len(&pkt));
-}
-
-static void test_pkt_total_header_len__1_header__hdata_NULL__hlen_value(void)
-{
-    pkt_hlist_t hdr = { NULL, NULL, PKT_PROTO_UNKNOWN, NULL, TEST_UINT8 };
-    pkt_t pkt = { &hdr, NULL, 0 };
-
-    hdr.next = &hdr;
-    hdr.prev = &hdr;
-
-    TEST_ASSERT_EQUAL_INT(TEST_UINT8, pkt_total_header_len(&pkt));
-}
-
-static void test_pkt_total_header_len__1_header__hdata_value__hlen_value(void)
-{
-    pkt_hlist_t hdr = { NULL, NULL, PKT_PROTO_UNKNOWN, TEST_STRING8,
-                        sizeof(TEST_STRING8) };
-    pkt_t pkt = { &hdr, NULL, 0 };
-
-    hdr.next = &hdr;
-    hdr.prev = &hdr;
-
-    TEST_ASSERT_EQUAL_INT(sizeof(TEST_STRING8), pkt_total_header_len(&pkt));
-}
-
-static void test_pkt_total_header_len__2_headers__hdata_value__hlen_value(void)
-{
-    pkt_hlist_t hdr1 = { NULL, NULL, PKT_PROTO_UNKNOWN, TEST_STRING8,
-                         sizeof(TEST_STRING8) };
-    pkt_hlist_t hdr2 = { NULL, NULL, PKT_PROTO_UNKNOWN, TEST_STRING12,
-                         sizeof(TEST_STRING12) };
-    pkt_t pkt = { &hdr1, NULL, 0 };
-
-    hdr1.next = &hdr2;
-    hdr1.prev = &hdr2;
-    hdr2.next = &hdr1;
-    hdr2.prev = &hdr1;
-
-    TEST_ASSERT_EQUAL_INT(sizeof(TEST_STRING8) + sizeof(TEST_STRING12),
-                          pkt_total_header_len(&pkt));
-}
-
-static void test_pkt_total_len__headers_NULL__payload_len_0(void)
-{
-    pkt_t pkt = { NULL, NULL, 0 };
-
-    TEST_ASSERT_EQUAL_INT(0, pkt_total_len(&pkt));
-}
-
-static void test_pkt_total_len__headers_NULL__payload_len_MAX(void)
-{
-    pkt_t pkt = { NULL, NULL, PKTSIZE_MAX };
-
-    TEST_ASSERT_EQUAL_INT(PKTSIZE_MAX, pkt_total_len(&pkt));
-}
-
-static void test_pkt_total_len__headers_NULL__payload_len_value(void)
-{
-    pkt_t pkt = { NULL, NULL, TEST_UINT16 };
-
-    TEST_ASSERT_EQUAL_INT(TEST_UINT16, pkt_total_len(&pkt));
-}
-
-static void test_pkt_total_len__1_header__payload_len_0(void)
-{
-    pkt_hlist_t hdr = { NULL, NULL, PKT_PROTO_UNKNOWN, TEST_STRING8,
-                        sizeof(TEST_STRING8) };
-    pkt_t pkt = { &hdr, NULL, 0 };
-
-    hdr.next = &hdr;
-    hdr.prev = &hdr;
-
-    TEST_ASSERT_EQUAL_INT(sizeof(TEST_STRING8), pkt_total_len(&pkt));
-}
-
-static void test_pkt_total_len__1_header__payload_len_MAX(void)
-{
-    pkt_hlist_t hdr = { NULL, NULL, PKT_PROTO_UNKNOWN, TEST_STRING8,
-                        sizeof(TEST_STRING8) };
-    pkt_t pkt = { &hdr, NULL, PKTSIZE_MAX };
-
-    hdr.next = &hdr;
-    hdr.prev = &hdr;
-
-    TEST_ASSERT_EQUAL_INT(sizeof(TEST_STRING8) - 1, pkt_total_len(&pkt));
-    /* size should overflow */
-}
-
-static void test_pkt_total_len__1_header__payload_len_value(void)
-{
-    pkt_hlist_t hdr = { NULL, NULL, PKT_PROTO_UNKNOWN, TEST_STRING8,
-                        sizeof(TEST_STRING8) };
-    pkt_t pkt = { &hdr, NULL, TEST_UINT16 };
-
-    hdr.next = &hdr;
-    hdr.prev = &hdr;
-
-    TEST_ASSERT_EQUAL_INT(sizeof(TEST_STRING8) + TEST_UINT16, pkt_total_len(&pkt));
-}
+#define TEST_PKTSIZE    (TEST_UINT16)
 
 static void test_pkt_hlist_advance__NULL(void)
 {
@@ -157,118 +36,251 @@ static void test_pkt_hlist_advance__NULL(void)
 
 static void test_pkt_hlist_advance__ptr_NULL(void)
 {
-    pkt_hlist_t *ptr_list = NULL;
-    pkt_hlist_t **list = &ptr_list;
+    pkt_hlist_t *list = NULL;
 
-    pkt_hlist_advance(list);
+    pkt_hlist_advance(&list);
 
-    TEST_ASSERT_NULL(ptr_list);
-    TEST_ASSERT(list == &ptr_list);
+    TEST_ASSERT_NULL(list);
 }
 
 static void test_pkt_hlist_advance__1_elem(void)
 {
-    pkt_hlist_t hdr = { NULL, NULL, PKT_PROTO_UNKNOWN, NULL, 0 };
-    pkt_hlist_t *ptr_list = &hdr;
-    pkt_hlist_t **list = &ptr_list;
+    pkt_hlist_t hdr = _INIT_ELEM(0, NULL, NULL);
+    pkt_hlist_t *list = &hdr;
 
-    hdr.next = &hdr;
-    hdr.prev = &hdr;
+    pkt_hlist_advance(&list);
 
-    pkt_hlist_advance(list);
-
-    TEST_ASSERT_NOT_NULL(ptr_list);
-    TEST_ASSERT(list == &ptr_list);
-    TEST_ASSERT(ptr_list == &hdr);
+    TEST_ASSERT_NULL(list);
 }
 
 static void test_pkt_hlist_advance__2_elem(void)
 {
-    pkt_hlist_t hdr1 = { NULL, NULL, PKT_PROTO_UNKNOWN, NULL, 0 };
-    pkt_hlist_t hdr2 = { NULL, NULL, PKT_PROTO_UNKNOWN, NULL, 0 };
-    pkt_hlist_t *ptr_list = &hdr1;
-    pkt_hlist_t **list = &ptr_list;
+    pkt_hlist_t hdr1 = _INIT_ELEM(0, NULL, NULL);
+    pkt_hlist_t hdr2 = _INIT_ELEM(0, NULL, &hdr1);
+    pkt_hlist_t *list = &hdr2;
 
-    hdr1.next = &hdr2;
-    hdr1.prev = &hdr2;
-    hdr2.next = &hdr1;
-    hdr2.prev = &hdr1;
+    pkt_hlist_advance(&list);
 
-    pkt_hlist_advance(list);
+    TEST_ASSERT_NOT_NULL(list);
+    TEST_ASSERT(&hdr1 == list);
 
-    TEST_ASSERT_NOT_NULL(ptr_list);
-    TEST_ASSERT(list == &ptr_list);
-    TEST_ASSERT(ptr_list == &hdr2);
+    pkt_hlist_advance(&list);
 
-    pkt_hlist_advance(list);
+    TEST_ASSERT_NULL(list);
+}
 
-    TEST_ASSERT(ptr_list == &hdr1);
+static void test_pkt_total_header_len__headers_NULL(void)
+{
+    pkt_t pkt = _INIT_ELEM(0, NULL, NULL);
+
+    TEST_ASSERT_EQUAL_INT(0, pkt_total_header_len(&pkt));
+}
+
+static void test_pkt_total_header_len__1_header__hdata_NULL__hlen_0(void)
+{
+    pkt_hlist_t hdr = _INIT_ELEM(0, NULL, NULL);
+    pkt_t pkt = _INIT_ELEM(0, NULL, &hdr);
+
+    TEST_ASSERT_EQUAL_INT(0, pkt_total_header_len(&pkt));
+}
+
+static void test_pkt_total_header_len__1_header__hdata_NULL__hlen_MAX(void)
+{
+    pkt_hlist_t hdr = _INIT_ELEM(PKTSIZE_MAX, NULL, NULL);
+    pkt_t pkt = _INIT_ELEM(0, NULL, &hdr);
+
+    TEST_ASSERT_EQUAL_INT(PKTSIZE_MAX, pkt_total_header_len(&pkt));
+}
+
+static void test_pkt_total_header_len__1_header__hdata_NULL__hlen_value(void)
+{
+    pkt_hlist_t hdr = _INIT_ELEM(TEST_UINT16, NULL, NULL);
+    pkt_t pkt = _INIT_ELEM(0, NULL, &hdr);
+
+    TEST_ASSERT_EQUAL_INT(TEST_PKTSIZE, pkt_total_header_len(&pkt));
+}
+
+static void test_pkt_total_header_len__1_header__hdata_value__hlen_value(void)
+{
+    pkt_hlist_t hdr = _INIT_ELEM_STATIC_DATA(TEST_STRING8, NULL);
+    pkt_t pkt = _INIT_ELEM(0, NULL, &hdr);
+
+    TEST_ASSERT_EQUAL_INT(sizeof(TEST_STRING8), pkt_total_header_len(&pkt));
+}
+
+static void test_pkt_total_header_len__2_headers__hdata_value__hlen_value(void)
+{
+    pkt_hlist_t hdr1 = _INIT_ELEM_STATIC_DATA(TEST_STRING8, NULL);
+    pkt_hlist_t hdr2 = _INIT_ELEM_STATIC_DATA(TEST_STRING12, &hdr1);
+    pkt_t pkt = _INIT_ELEM(0, NULL, &hdr2);
+
+    TEST_ASSERT_EQUAL_INT(sizeof(TEST_STRING8) + sizeof(TEST_STRING12),
+                          pkt_total_header_len(&pkt));
+}
+
+static void test_pkt_total_len__headers_NULL__payload_len_0(void)
+{
+    pkt_t pkt = _INIT_ELEM(0, NULL, NULL);
+
+    TEST_ASSERT_EQUAL_INT(0, pkt_total_len(&pkt));
+}
+
+static void test_pkt_total_len__headers_NULL__payload_len_MAX(void)
+{
+    pkt_t pkt = _INIT_ELEM(PKTSIZE_MAX, NULL, NULL);
+
+    TEST_ASSERT_EQUAL_INT(PKTSIZE_MAX, pkt_total_len(&pkt));
+}
+
+static void test_pkt_total_len__headers_NULL__payload_len_value(void)
+{
+    pkt_t pkt = _INIT_ELEM(TEST_PKTSIZE, NULL, NULL);
+
+    TEST_ASSERT_EQUAL_INT(TEST_PKTSIZE, pkt_total_len(&pkt));
+}
+
+static void test_pkt_total_len__1_header__payload_len_0(void)
+{
+    pkt_hlist_t hdr = _INIT_ELEM_STATIC_DATA(TEST_STRING8, NULL);
+    pkt_t pkt = _INIT_ELEM(0, NULL, &hdr);
+
+    TEST_ASSERT_EQUAL_INT(sizeof(TEST_STRING8), pkt_total_len(&pkt));
+}
+
+static void test_pkt_total_len__1_header__payload_len_MAX(void)
+{
+    pkt_hlist_t hdr = _INIT_ELEM_STATIC_DATA(TEST_STRING8, NULL);
+    pkt_t pkt = _INIT_ELEM(PKTSIZE_MAX, NULL, &hdr);
+
+    TEST_ASSERT_EQUAL_INT(sizeof(TEST_STRING8) - 1, pkt_total_len(&pkt));
+    /* size should overflow */
+}
+
+static void test_pkt_total_len__1_header__payload_len_value(void)
+{
+    pkt_hlist_t hdr = _INIT_ELEM_STATIC_DATA(TEST_STRING8, NULL);
+    pkt_t pkt = _INIT_ELEM(TEST_PKTSIZE, NULL, &hdr);
+
+    TEST_ASSERT_EQUAL_INT(sizeof(TEST_STRING8) + TEST_PKTSIZE, pkt_total_len(&pkt));
 }
 
 static void test_pkt_add_header(void)
 {
-    pkt_hlist_t hdr1 = { NULL, NULL, PKT_PROTO_UNKNOWN, NULL, 0 };
-    pkt_hlist_t hdr2 = { NULL, NULL, PKT_PROTO_UNKNOWN, NULL, 0 };
-    pkt_t pkt = { NULL, NULL, 0 };
+    pkt_hlist_t hdr1 = _INIT_ELEM(0, NULL, NULL);
+    pkt_hlist_t hdr2 = _INIT_ELEM(0, NULL, NULL);
+    pkt_t pkt = _INIT_ELEM(0, NULL, NULL);
 
     pkt_add_header(&pkt, &hdr1);
 
-    TEST_ASSERT(pkt.headers == &hdr1);
-    TEST_ASSERT(pkt.headers->next == &hdr1);
-    TEST_ASSERT(pkt.headers->prev == &hdr1);
+    TEST_ASSERT(&hdr1 == pkt.headers);
+    TEST_ASSERT_NULL(pkt.headers->next);
 
     pkt_add_header(&pkt, &hdr2);
 
-    TEST_ASSERT(pkt.headers == &hdr2);
-    TEST_ASSERT(pkt.headers->next == &hdr1);
-    TEST_ASSERT(pkt.headers->prev == &hdr1);
-    TEST_ASSERT(pkt.headers->next->next == &hdr2);
-    TEST_ASSERT(pkt.headers->prev->prev == &hdr2);
+    TEST_ASSERT(&hdr2 == pkt.headers);
+    TEST_ASSERT(&hdr1 == pkt.headers->next);
+    TEST_ASSERT_NULL(pkt.headers->next->next);
 }
 
-static void test_pkt_remove_header(void)
+static void test_pkt_add_header__NULL(void)
 {
-    pkt_hlist_t hdr1 = { NULL, NULL, PKT_PROTO_UNKNOWN, NULL, 0 };
-    pkt_hlist_t hdr2 = { NULL, NULL, PKT_PROTO_UNKNOWN, NULL, 0 };
-    pkt_t pkt = { NULL, NULL, 0 };
+    pkt_hlist_t hdr1 = _INIT_ELEM(0, NULL, NULL);
+    pkt_hlist_t hdr2 = _INIT_ELEM(0, NULL, NULL);
+    pkt_t pkt = _INIT_ELEM(0, NULL, NULL);
+
+    pkt_add_header(&pkt, &hdr1);
+    pkt_add_header(&pkt, &hdr2);
+    pkt_add_header(&pkt, NULL);
+
+    TEST_ASSERT(&hdr2 == pkt.headers);
+    TEST_ASSERT(&hdr1 == pkt.headers->next);
+    TEST_ASSERT_NULL(pkt.headers->next->next);
+}
+
+static void test_pkt_remove_header__NULL(void)
+{
+    pkt_hlist_t hdr1 = _INIT_ELEM(0, NULL, NULL);
+    pkt_hlist_t hdr2 = _INIT_ELEM(0, NULL, NULL);
+    pkt_t pkt = _INIT_ELEM(0, NULL, NULL);
+
+    pkt_add_header(&pkt, &hdr1);
+    pkt_add_header(&pkt, &hdr2);
+    pkt_remove_header(&pkt, NULL);
+
+    TEST_ASSERT(&hdr2 == pkt.headers);
+    TEST_ASSERT(&hdr1 == pkt.headers->next);
+    TEST_ASSERT_NULL(pkt.headers->next->next);
+}
+
+static void test_pkt_remove_header__1st_header_first(void)
+{
+    pkt_hlist_t hdr1 = _INIT_ELEM(0, NULL, NULL);
+    pkt_hlist_t hdr2 = _INIT_ELEM(0, NULL, NULL);
+    pkt_t pkt = _INIT_ELEM(0, NULL, NULL);
+
+    pkt_add_header(&pkt, &hdr1);
+    pkt_add_header(&pkt, &hdr2);
+    pkt_remove_header(&pkt, &hdr2);
+
+    TEST_ASSERT(&hdr1 == pkt.headers);
+    TEST_ASSERT_NULL(pkt.headers->next);
+
+    pkt_remove_header(&pkt, &hdr1);
+
+    TEST_ASSERT_NULL(pkt.headers);
+}
+
+static void test_pkt_remove_header__nth_header_first(void)
+{
+    pkt_hlist_t hdr1 = _INIT_ELEM(0, NULL, NULL);
+    pkt_hlist_t hdr2 = _INIT_ELEM(0, NULL, NULL);
+    pkt_t pkt = _INIT_ELEM(0, NULL, NULL);
 
     pkt_add_header(&pkt, &hdr1);
     pkt_add_header(&pkt, &hdr2);
     pkt_remove_header(&pkt, &hdr1);
 
-    TEST_ASSERT(pkt.headers == &hdr2);
-    TEST_ASSERT(pkt.headers->next == &hdr2);
-    TEST_ASSERT(pkt.headers->prev == &hdr2);
-
-    pkt_remove_header(&pkt, &hdr1);
-
-    TEST_ASSERT(pkt.headers == &hdr2);
-    TEST_ASSERT(pkt.headers->next == &hdr2);
-    TEST_ASSERT(pkt.headers->prev == &hdr2);
+    TEST_ASSERT(&hdr2 == pkt.headers);
+    TEST_ASSERT_NULL(pkt.headers->next);
 
     pkt_remove_header(&pkt, &hdr2);
 
     TEST_ASSERT_NULL(pkt.headers);
 }
 
+static void test_pkt_remove_first_header__pkt_NULL(void)
+{
+    TEST_ASSERT_NULL(pkt_remove_first_header(NULL));
+}
+
+static void test_pkt_remove_first_header__hdr_empty(void)
+{
+    pkt_t pkt = _INIT_ELEM(0, NULL, NULL);
+
+    TEST_ASSERT_NULL(pkt_remove_first_header(&pkt));
+}
+
 static void test_pkt_remove_first_header(void)
 {
-    pkt_hlist_t hdr1 = { NULL, NULL, PKT_PROTO_UNKNOWN, NULL, 0 };
-    pkt_hlist_t hdr2 = { NULL, NULL, PKT_PROTO_UNKNOWN, NULL, 0 };
-    pkt_t pkt = { NULL, NULL, 0 };
+    pkt_hlist_t hdr1 = _INIT_ELEM(0, NULL, NULL);
+    pkt_hlist_t hdr2 = _INIT_ELEM(0, NULL, NULL);
+    pkt_t pkt = _INIT_ELEM(0, NULL, NULL);
 
     pkt_add_header(&pkt, &hdr1);
     pkt_add_header(&pkt, &hdr2);
-    pkt_remove_first_header(&pkt);
 
-    TEST_ASSERT(pkt.headers == &hdr1);
-    TEST_ASSERT(pkt.headers->next == &hdr1);
-    TEST_ASSERT(pkt.headers->prev == &hdr1);
+    TEST_ASSERT(&hdr2 == pkt_remove_first_header(&pkt));
+    TEST_ASSERT(&hdr1 == pkt.headers);
+    TEST_ASSERT_NULL(pkt.headers->next);
 }
 
 Test *tests_pkt_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
+        new_TestFixture(test_pkt_hlist_advance__NULL),
+        new_TestFixture(test_pkt_hlist_advance__ptr_NULL),
+        new_TestFixture(test_pkt_hlist_advance__1_elem),
+        new_TestFixture(test_pkt_hlist_advance__2_elem),
         new_TestFixture(test_pkt_total_header_len__headers_NULL),
         new_TestFixture(test_pkt_total_header_len__1_header__hdata_NULL__hlen_0),
         new_TestFixture(test_pkt_total_header_len__1_header__hdata_NULL__hlen_MAX),
@@ -281,12 +293,13 @@ Test *tests_pkt_tests(void)
         new_TestFixture(test_pkt_total_len__1_header__payload_len_0),
         new_TestFixture(test_pkt_total_len__1_header__payload_len_MAX),
         new_TestFixture(test_pkt_total_len__1_header__payload_len_value),
-        new_TestFixture(test_pkt_hlist_advance__NULL),
-        new_TestFixture(test_pkt_hlist_advance__ptr_NULL),
-        new_TestFixture(test_pkt_hlist_advance__1_elem),
-        new_TestFixture(test_pkt_hlist_advance__2_elem),
         new_TestFixture(test_pkt_add_header),
-        new_TestFixture(test_pkt_remove_header),
+        new_TestFixture(test_pkt_add_header__NULL),
+        new_TestFixture(test_pkt_remove_header__NULL),
+        new_TestFixture(test_pkt_remove_header__1st_header_first),
+        new_TestFixture(test_pkt_remove_header__nth_header_first),
+        new_TestFixture(test_pkt_remove_first_header__pkt_NULL),
+        new_TestFixture(test_pkt_remove_first_header__hdr_empty),
         new_TestFixture(test_pkt_remove_first_header),
     };
 
