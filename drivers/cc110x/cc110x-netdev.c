@@ -24,9 +24,12 @@
 
 #include "periph/gpio.h"
 #include "netdev/base.h"
+#include "kernel_types.h"
+#include "cpu-conf.h"
 
 #ifdef MODULE_NETDEV_BASE
-extern netdev_rcv_data_cb_t cc110x_recv_cb;
+kernel_pid_t cc110x_netdev_event_handler = KERNEL_PID_UNDEF;
+static netdev_rcv_data_cb_t cc110x_recv_cb = NULL;
 
 int _cc110x_send_data(netdev_t *dev, void *dest, size_t dest_len,
         netdev_hlist_t *upper_layer_hdrs, void *data, size_t data_len)
@@ -232,7 +235,30 @@ int _cc110x_set_state(netdev_t *dev, netdev_state_t state)
 void _cc110x_event(netdev_t *dev, uint32_t event_type)
 {
     (void)dev;
-    (void)event_type;
+
+    switch (event_type) {
+        case CC110X_NETDEV_EVENT_RX:
+            /* Call recv cb if registered */
+            if (cc110x_recv_cb != NULL) {
+                cc110x_packet_t p = cc110x_rx_buffer[rx_buffer_to_read].packet;
+                cc110x_recv_cb(&cc110x_dev, &p.phy_src, sizeof(uint8_t), &p.address,
+                        sizeof(uint8_t), p.data, p.length - CC1100_HEADER_LENGTH);
+            }
+
+            /* Increment counter to next packet in array*/
+            if (++rx_buffer_to_read == RX_BUF_SIZE) {
+                rx_buffer_to_read = 0;
+            }
+            break;
+        default:
+            break;
+    }
+}
+
+void _cc110x_set_event_handler(netdev_t *dev, kernel_pid_t event_handler)
+{
+    (void)dev;
+    cc110x_netdev_event_handler = event_handler;
 }
 
 const netdev_driver_t cc110x_net_driver = {
@@ -245,7 +271,7 @@ const netdev_driver_t cc110x_net_driver = {
     _cc110x_get_state,
     _cc110x_set_state,
     _cc110x_event,
-    NULL,
+    _cc110x_set_event_handler,
 };
 
 netdev_t cc110x_dev = {NETDEV_TYPE_BASE, &cc110x_net_driver, 0};

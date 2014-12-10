@@ -36,20 +36,20 @@ extern "C" {
 
 #define CC1100_MAX_DATA_LENGTH (58)
 
-#define CC1100_HEADER_LENGTH   (3)              ///< Header covers SRC, DST and FLAGS
+#define CC1100_HEADER_LENGTH   (3)              /**< Header covers SRC, DST and FLAGS */
 
-#define CC1100_BROADCAST_ADDRESS (0x00)         ///< CC1100 broadcast address
+#define CC1100_BROADCAST_ADDRESS (0x00)         /**< CC1100 broadcast address */
 
-#define MAX_UID                  (0xFF)         ///< Maximum UID of a node is 255
-#define MIN_UID                  (0x01)         ///< Minimum UID of a node is 1
+#define MAX_UID                  (0xFF)         /**< Maximum UID of a node is 255 */
+#define MIN_UID                  (0x01)         /**< Minimum UID of a node is 1 */
 
-#define MIN_CHANNR                  (0)         ///< Minimum channel number
-#define MAX_CHANNR                 (24)         ///< Maximum channel number
+#define MIN_CHANNR                  (0)         /**< Minimum channel number */
+#define MAX_CHANNR                 (24)         /**< Maximum channel number */
 
-#define MIN_OUTPUT_POWER            (0)         ///< Minimum output power value
-#define MAX_OUTPUT_POWER           (11)         ///< Maximum output power value
+#define MIN_OUTPUT_POWER            (0)         /**< Minimum output power value */
+#define MAX_OUTPUT_POWER           (11)         /**< Maximum output power value */
 
-#define PACKET_LENGTH               (0x3E)      ///< Packet length = 62 Bytes.
+#define PACKET_LENGTH               (0x3E)      /**< Packet length = 62 Bytes. */
 #define CC1100_SYNC_WORD_TX_TIME   (90000)      // loop count (max. timeout ~ 15 ms) to wait for
                                                 // sync word to be transmitted (GDO2 from low to high)
 /**
@@ -64,7 +64,7 @@ extern "C" {
 
 /** @} */
 
-extern volatile cc110x_flags rflags;            ///< Radio flags
+extern volatile cc110x_flags rflags;            /**< Radio flags */
 extern char cc110x_conf[];
 
 /**
@@ -92,11 +92,11 @@ Notes:
  */
 typedef struct __attribute__((packed))
 {
-    uint8_t length;                         ///< Length of the packet (without length byte)
-    uint8_t address;                        ///< Destination address
-    uint8_t phy_src;                        ///< Source address (physical source)
-    uint8_t flags;                          ///< Flags
-    uint8_t data[CC1100_MAX_DATA_LENGTH];   ///< Data (high layer protocol)
+    uint8_t length;                         /**< Length of the packet (without length byte) */
+    uint8_t address;                        /**< Destination address */
+    uint8_t phy_src;                        /**< Source address (physical source) */
+    uint8_t flags;                          /**< Flags */
+    uint8_t data[CC1100_MAX_DATA_LENGTH];   /**< Data (high layer protocol) */
 }
 cc110x_packet_t;
 
@@ -107,16 +107,17 @@ typedef struct {
 } rx_buffer_t;
 
 enum radio_mode {
-    RADIO_MODE_GET  = -1,                   ///< leave mode unchanged
-    RADIO_MODE_OFF  = 0,                    ///< turn radio off
-    RADIO_MODE_ON   = 1                     ///< turn radio on
+    RADIO_MODE_GET  = -1,                   /**< leave mode unchanged */
+    RADIO_MODE_OFF  = 0,                    /**< turn radio off */
+    RADIO_MODE_ON   = 1                     /**< turn radio on */
 };
 
 extern rx_buffer_t cc110x_rx_buffer[];
 
-extern volatile uint8_t rx_buffer_next;     ///< Next packet in RX queue
+extern volatile uint8_t rx_buffer_next;     /**< Next packet in RX queue */
+extern volatile uint8_t rx_buffer_to_read;  /**< Next packet to read by recv cb */
 
-extern volatile uint8_t radio_state;        ///< Radio state
+extern volatile uint8_t radio_state;        /**< Radio state */
 extern cc110x_statistic_t cc110x_statistic;
 
 #ifdef MODULE_TRANSCEIVER
