@@ -30,7 +30,7 @@ pkt_hlist_t *pkt_hlist_remove_first(pkt_hlist_t **list)
 {
     pkt_hlist_t *res;
 
-    if (list == NULL) {
+    if (list == NULL || *list == NULL) {
         return NULL;
     }
 
@@ -52,8 +52,6 @@ void pkt_hlist_remove(pkt_hlist_t **list, pkt_hlist_t *header)
     }
     else {
         pkt_hlist_t *ptr = (*list)->next, *prev = *list;
-
-        pkt_hlist_advance(&ptr);
 
         while (ptr != NULL) {
             if (ptr == header) {

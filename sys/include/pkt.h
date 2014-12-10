@@ -166,8 +166,8 @@ static inline void pkt_hlist_add(pkt_hlist_t **list, pkt_hlist_t *header)
  *
  * @param[in,out] list  The list remove the @p header from.
  *
- * @return The first header in @p list.
- * @return NULL if @p list is empty
+ * @return The previously first header in @p list.
+ * @return NULL if @p list is empty (aka `== NULL`)
  */
 pkt_hlist_t *pkt_hlist_remove_first(pkt_hlist_t **list);
 
@@ -181,6 +181,8 @@ void pkt_hlist_remove(pkt_hlist_t **list, pkt_hlist_t *header);
 
 /**
  * @brief   Helper function to calculate the total length of the headers of *pkt*.
+ *
+ * @note    Wrapper function for @ref pkt_hlist_len()
  *
  * @param[in]   pkt   A network packet.
  *
@@ -204,35 +206,54 @@ static inline pktsize_t pkt_total_len(const pkt_t *pkt)
 /**
  * @brief Adds @p header to packet @p pkt.
  *
+ * @note    Wrapper function for @ref pkt_hlist_add()
+ *
  * @param[in,out] pkt   The packet to add @p header to
  * @param[in] header    The header to add to the list of headers of @p pkt.
  */
 static inline void pkt_add_header(pkt_t *pkt, pkt_hlist_t *header)
 {
+    if (pkt == NULL) {
+        return;
+    }
+
     pkt_hlist_add(&(pkt->headers), header);
 }
 
 /**
  * @brief Removes @p header from packet @p pkt.
  *
+ * @note    Wrapper function for @ref pkt_hlist_remove()
+ *
  * @param[in,out] pkt   The packet to remove @p header from. May not be NULL.
  * @param[in] header    The header to remove from the list of headers of @p pkt.
  */
 static inline void pkt_remove_header(pkt_t *pkt, pkt_hlist_t *header)
 {
+    if (pkt == NULL) {
+        return;
+    }
+
     pkt_hlist_remove(&(pkt->headers), header);
 }
 
 /**
  * @brief Removes first (lowest layer) header from packet @p pkt and returns it.
  *
- * @param[in,out] pkt   The packet to remove *header* from. May not be NULL.
+ * @note    Wrapper function for @ref pkt_hlist_remove_first()
  *
- * @return  The (previously) first header of *pkt*.
+ * @param[in,out] pkt   The packet to remove *header* from.
+ *
+ * @return The previously first header of @p pkt.
+ * @return NULL if  @p pkt is empty (aka `== NULL`)
  */
 static inline pkt_hlist_t *pkt_remove_first_header(pkt_t *pkt)
 {
-    return pkt_hlist_remove_first(&pkt);
+    if (pkt == NULL) {
+        return NULL;
+    }
+
+    return pkt_hlist_remove_first(&(pkt->headers));
 }
 
 #ifdef __cplusplus
