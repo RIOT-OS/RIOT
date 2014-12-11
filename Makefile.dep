@@ -112,6 +112,10 @@ ifneq (,$(filter netdev_802154,$(USEMODULE)))
 	USEMODULE += netdev_base
 endif
 
+ifneq (,$(filter pktbuf,$(USEMODULE)))
+	USEMODULE += pkt
+endif
+
 ifneq (,$(filter rgbled,$(USEMODULE)))
 	USEMODULE += color
 endif
