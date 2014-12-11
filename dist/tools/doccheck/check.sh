@@ -36,7 +36,7 @@ else
     git diff ${WARN_DIFFFILTER} --name-only $(git merge-base ${BRANCH} HEAD) | grep -E '\.([sSchp]|cpp)$' | sort | uniq > ${TMP_WARN}
 fi
 
-make doc 2>&1 | grep '^\/.*warning' | sed "s#${PWD}/\([^:]*\).*#\1#" | sort | uniq > ${TMP_DOC}
+make doc 2>&1 | grep '.*warning' | sed "s#.*${PWD}/\([^:]*\).*#\1#" | sort | uniq > ${TMP_DOC}
 
 WARNINGS=$(comm -1 -2 ${TMP_WARN} ${TMP_DOC})
 ERRORS=$(comm -1 -2 ${TMP_ERR} ${TMP_DOC})
