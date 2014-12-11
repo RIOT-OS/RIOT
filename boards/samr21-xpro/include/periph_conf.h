@@ -92,6 +92,14 @@ extern "C" {
 /** @} */
 
 /**
+ * @name RTC configuration
+ * @{
+ */
+#define RTC_NUMOF           (1U)
+#define RTC_DEV             RTC->MODE2
+/** @} */
+
+/**
  * @name GPIO configuration
  * @{
  */
