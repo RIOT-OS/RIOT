@@ -175,7 +175,7 @@ distclean:
 flash: all
 	$(FLASHER) $(FFLAGS)
 
-term:
+term: $(filter flash, $(MAKECMDGOALS))
 	$(TERMPROG) $(TERMFLAGS)
 
 doc:
