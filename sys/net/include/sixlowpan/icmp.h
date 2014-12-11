@@ -218,15 +218,15 @@ void icmpv6_send_router_adv(ipv6_addr_t *addr, uint8_t sllao,
  *                      *aro* == OPT_ARO add it, else not.
  */
 void icmpv6_send_neighbor_sol(ipv6_addr_t *src, ipv6_addr_t *dest,
-                              ipv6_addr_t *targ, uint8_t slloa,
+                              ipv6_addr_t *targ, uint8_t sllao,
                               uint8_t aro);
 
 /**
  * @brief Send ICMPv6 neighbor advertisement.
  *
  * @param[in] src       Source address for IPv6 header.
- * @param[in] dest      Destination address for IPv6 header.
- * @param[in] targ      Value for target address field of neighbor
+ * @param[in] dst       Destination address for IPv6 header.
+ * @param[in] tgt       Value for target address field of neighbor
  *                      advertisement.
  * @param[in] rso       Value for flags field of neighbor advertisement.
  * @param[in] sllao     Flag to include source link-layer address

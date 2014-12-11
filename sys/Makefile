@@ -13,6 +13,9 @@ endif
 ifneq (,$(filter net_if,$(USEMODULE)))
     DIRS += net/link_layer/net_if
 endif
+ifneq (,$(filter l2_ping,$(USEMODULE)))
+    DIRS += net/link_layer/ping
+endif
 ifneq (,$(filter transport_layer,$(USEMODULE)))
 	USEMODULE += udp
 	USEMODULE += tcp
@@ -43,6 +46,9 @@ ifneq (,$(filter rpl,$(USEMODULE)))
 endif
 ifneq (,$(filter routing,$(USEMODULE)))
 	DIRS += net/routing
+endif
+ifneq (,$(filter aodvv2,$(USEMODULE)))
+    DIRS += net/routing/aodvv2
 endif
 ifneq (,$(filter ieee802154,$(USEMODULE)))
     DIRS += net/link_layer/ieee802154

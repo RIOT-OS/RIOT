@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    oneway_malloc
+ * @defgroup    oneway_malloc Oneway malloc implementation
  * @ingroup     sys
  * @{
  * @file        malloc.h

@@ -128,8 +128,9 @@ typedef enum {
  *          but interpret them **always optimisticly**.
  *
  *          A protocol should at least always answer with an acknowledgement of
- *          result @netapi NETAPI_STATUS_OK if the operation was successfull or
- *          with errno -ENOTSUP if the operation is not supported.
+ *          result @ref netapi NETAPI_STATUS_OK if the operation was
+ *          successfull or with errno -ENOTSUP if the operation is not
+ *          supported.
  */
 typedef enum {
     /**

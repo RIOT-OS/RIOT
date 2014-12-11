@@ -290,7 +290,7 @@ int send_tcp(socket_internal_t *current_socket, tcp_hdr_t *current_tcp_packet,
     switch_tcp_packet_byte_order(current_tcp_packet);
     return ipv6_sendto(&current_tcp_socket->foreign_address.sin6_addr,
                        IPPROTO_TCP, (uint8_t *)(current_tcp_packet),
-                       header_length * 4 + payload_length);
+                       header_length * 4 + payload_length, NULL);
 #endif
 }
 

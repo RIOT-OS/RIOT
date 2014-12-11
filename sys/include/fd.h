@@ -96,3 +96,4 @@ void fd_destroy(int fd);
 #endif
 
 #endif /* FD_H */
+/** @} */

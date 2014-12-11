@@ -38,10 +38,6 @@ extern void _heap_handler(int argc, char **argv);
 extern void _ps_handler(int argc, char **argv);
 #endif
 
-#ifdef MODULE_RTC
-extern void _date_handler(int argc, char **argv);
-#endif
-
 #ifdef MODULE_SHT11
 extern void _get_temperature_handler(int argc, char **argv);
 extern void _get_humidity_handler(int argc, char **argv);
@@ -74,6 +70,10 @@ extern void _get_current_handler(int argc, char **argv);
 extern void _reset_current_handler(int argc, char **argv);
 #endif
 
+#if FEATURE_PERIPH_RTC
+extern void _rtc_handler(int argc, char **argv);
+#endif
+
 #ifdef CPU_X86
 extern void _x86_lspci(int argc, char **argv);
 #endif
@@ -83,7 +83,7 @@ extern void _x86_lspci(int argc, char **argv);
 #ifdef DBG_IGNORE
 #define _TC_IGN
 #endif
-#if (defined(MODULE_CC110X_LEGACY) || defined(MODULE_CC2420) || defined(MODULE_AT86RF231) || defined(MODULE_NATIVENET))
+#if (defined(MODULE_CC110X) || defined(MODULE_CC110X_LEGACY) || defined(MODULE_CC2420) || defined(MODULE_AT86RF231) || defined(MODULE_NATIVENET))
 #define _TC_ADDR
 #define _TC_CHAN
 #define _TC_MON
@@ -124,6 +124,12 @@ extern void _transceiver_set_ignore_handler(int argc, char **argv);
 #endif
 #endif
 
+#ifdef MODULE_L2_PING
+extern void _l2_ping_req_handler(int argc, char **argv);
+extern void _l2_ping_probe_handler(int argc, char **argv);
+extern void _l2_ping_get_probe_handler(int argc, char **argv);
+#endif
+
 #ifdef MODULE_NET_IF
 extern void _net_if_ifconfig(int argc, char **argv);
 #endif
@@ -155,9 +161,6 @@ const shell_command_t _shell_command_list[] = {
 #endif
 #ifdef MODULE_PS
     {"ps", "Prints information about running threads.", _ps_handler},
-#endif
-#ifdef MODULE_RTC
-    {"date", "Gets or sets current date and time.", _date_handler},
 #endif
 #ifdef MODULE_SHT11
     {"temp", "Prints measured temperature.", _get_temperature_handler},
@@ -213,6 +216,11 @@ const shell_command_t _shell_command_list[] = {
     {"chan", "Gets or sets the channel for the CC1100 transceiver", _cc110x_get_set_channel_handler},
 #endif
 #endif
+#ifdef MODULE_L2_PING
+    {"l2_ping", "Sends link layer ping requests", _l2_ping_req_handler},
+    {"l2_probe", "Sends link layer probes", _l2_ping_probe_handler},
+    {"l2_probe_stats", "Get statistics about received probes", _l2_ping_get_probe_handler},
+#endif
 #ifdef MODULE_NET_IF
     {"ifconfig", "Configures a network interface", _net_if_ifconfig},
 #endif
@@ -229,6 +237,9 @@ const shell_command_t _shell_command_list[] = {
 #ifdef MODULE_RANDOM
     { "mersenne_init", "initializes the PRNG", _mersenne_init },
     { "mersenne_get", "returns 32 bit of pseudo randomness", _mersenne_get },
+#endif
+#if FEATURE_PERIPH_RTC
+    {"rtc", "control RTC peripheral interface",  _rtc_handler},
 #endif
 #ifdef CPU_X86
     {"lspci", "Lists PCI devices", _x86_lspci},

@@ -7,7 +7,7 @@
  */
 
 /**
- * @addtogroup      cpu_cc2538_definitions
+ * @ingroup         cpu_cc2538_definitions
  * @{
  *
  * @file            cc2538.h
@@ -99,7 +99,7 @@ void SVC_Handler(void);          /**< SVC handler */
 void DebugMon_Handler(void);     /**< Debug monitor handler */
 void PendSV_Handler(void);       /**< PendSV handler */
 void SysTick_Handler(void);      /**< SysTick handler */
-/* @} */
+/** @} */
 
 /**
  * @brief Configuration of the Cortex-M3 Processor and Core Peripherals

@@ -8,7 +8,7 @@
 
 #ifndef CC430_RTC_H
 #define CC430_RTC_H
-#include "rtc.h"
+#include "periph/rtc.h"
 #include "time.h"
 
 #ifdef __cplusplus
@@ -38,18 +38,6 @@ typedef enum {
     RTC_ALARM_DOW      = 0x04,      ///< Alarm mask for Day of Week
     RTC_ALARM_DOM      = 0x08       ///< Alarm mask for Day of Month
 } rtc_alarm_mask_t;
-
-/**
- * @brief   Sets the alarm
- * @internal
- * @param[in]   localt  Alarm time
- * @param[in]   mask    Sets the registers to poll for the alarm
- *
- * To disable the alarm set mask to RTC_ALARM_DISABLED.
- *
- * @see ::rtc_alarm_mask
- */
-void rtc_set_alarm(struct tm *localti, rtc_alarm_mask_t mask);
 
 /**
  * @brief   Resets any set alarm

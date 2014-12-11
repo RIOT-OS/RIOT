@@ -10,8 +10,8 @@
  * @defgroup    driver_periph_gpio GPIO
  * @ingroup     driver_periph
  * @brief       Low-level GPIO peripheral driver
- * @{
  *
+ * @{
  * @file
  * @brief       Low-level GPIO peripheral driver interface definitions
  *

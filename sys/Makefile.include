@@ -15,6 +15,7 @@ ifneq (,$(filter netapi,$(USEMODULE)))
 endif
 ifneq (,$(filter net_help,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/include
+    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/cc110x
     USEMODULE_INCLUDES += $(RIOTBASE)/drivers/cc110x_legacy_csma
     USEMODULE_INCLUDES += $(RIOTBASE)/drivers/cc110x_legacy/include
 endif
@@ -38,6 +39,9 @@ ifneq (,$(filter rpl,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/routing/rpl
 endif
 ifneq (,$(filter ieee802154,$(USEMODULE)))
+    USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/include
+endif
+ifneq (,$(filter l2_ping,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/include
 endif
 ifneq (,$(filter ccn_lite,$(USEMODULE)))

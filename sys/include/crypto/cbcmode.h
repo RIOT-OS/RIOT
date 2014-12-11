@@ -10,7 +10,7 @@
  * @ingroup     sys_crypto
  * @{
  *
- * @file        cbcmode.h
+ * @file
  * @brief       Headers of the implementation of the CBC Mode of Operation
  *
  * Implementation of the CBC Mode of Operation with Ciphertext-Stealing for encryption.
@@ -71,29 +71,28 @@ enum {
 
 
 /**
- * @struct CBCModeContext CBCMode.c "CBCMode.c"
  * @brief   The context for processing the en-/decryption in the CBC-Mode with
  *          CTS
  *
  * @param   spill1  test1
  */
 typedef struct CBCModeContext {
-        // Spill-Block 1 for temporary usage
+    /** Spill-Block 1 for temporary usage */
     uint8_t spill1 [CBCMODE_MAX_BLOCK_SIZE ];
-    // Spill-Block 2 for temporary usage
+    /** Spill-Block 2 for temporary usage */
     uint8_t spill2 [CBCMODE_MAX_BLOCK_SIZE ];
-    // the blocksize currently used
+    /** the blocksize currently used */
     uint8_t bsize;
-    // how many more bytes of ciphertext do we need to recv
+    /** how many more bytes of ciphertext do we need to recv */
     uint16_t remaining;
-    // how many bytes of plaintext we've deciphered.
+    /** how many bytes of plaintext we've deciphered. */
     uint16_t completed;
-    // TRUE iff spill1 is the accumulator and spill2 holds prev cipher text.
-    // false o.w.
+    /** TRUE iff spill1 is the accumulator and spill2 holds prev cipher text. */
+    /** false o.w. */
     uint8_t accum;
-    // into the accumulator
+    /** into the accumulator */
     uint8_t offset;
-    // state enum
+    /** state enum */
     uint8_t state;
 } /*__attribute__ ((packed)) */ CBCModeContext;
 
@@ -128,7 +127,7 @@ int block_cipher_mode_init(CipherModeContext *context, uint8_t key_size,
  *                        invocations of this module which use this particular
  *                        key. It also contains the opaque context for the
  *                        underlying BlockCipher as well.
- * @param   keySize       key size in bytes.
+ * @param   key_size      key size in bytes.
  * @param   key           pointer to the key.
  * @param   cipher_index  the index of the cipher-algorithm to init in the
  *                        (cipher-)archive
@@ -142,7 +141,7 @@ int block_cipher_mode_init0(CipherModeContext *context, uint8_t key_size,
                             uint8_t *key, uint8_t cipher_index);
 
 /**
- * @brief   prints the debug-messages passed by ::dumpBuffer
+ * @brief   prints the debug-messages passed by @ref dump_buffer
  *
  * @param   mode      the mode of the debug-message
  * @param   format    pointer to the message
@@ -167,6 +166,7 @@ void dump_buffer(char *bufName, uint8_t *buf, uint8_t size);
  *          cipher buffer are the same. (they may either be the same or
  *          non-overlapping. partial overlaps are not supported).
  *
+ * @param   context       context object for this encryption
  * @param   plain_blocks  a plaintext block numBlocks, where each block is of
  *                        blockSize bytes
  * @param   cipher_blocks an array of numBlocks * blockSize bytes to hold the
@@ -191,6 +191,7 @@ int block_cipher_mode_encrypt(CipherModeContext *context, uint8_t *plain_blocks,
  *          cipher buffer are the same. (they may either be the same or
  *          non-overlapping. partial overlaps are not supported).
  *
+ * @param   context        context object for this decryption
  * @param   cipher_blocks  an array of num_bytes * blockSize bytes that holds
  *                         the cipher text
  * @param   plain_blocks   an array of num_bytes * blockSize bytes to hold the

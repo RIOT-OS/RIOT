@@ -1,1 +1,1 @@
-FEATURES_PROVIDED += periph_gpio cpp periph_uart periph_timer
+FEATURES_PROVIDED += periph_gpio cpp periph_uart periph_timer periph_i2c periph_rtc

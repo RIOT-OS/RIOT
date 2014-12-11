@@ -29,7 +29,11 @@
 extern "C" {
 #endif
 
-// mspgcc bug : PRIxxx macros not defined before mid-2011 versions
+/**
+ * @brief Formater for unsigned 32 bit values
+ *
+ *        mspgcc bug : PRIxxx macros not defined before mid-2011 versions
+ */
 #ifndef PRIu32
 #define PRIu32 "lu"
 #endif

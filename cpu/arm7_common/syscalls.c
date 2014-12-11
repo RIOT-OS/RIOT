@@ -31,7 +31,7 @@
 #include "kernel.h"
 #include "irq.h"
 #if defined MODULE_RTC
-#include "rtc.h"
+#include "periph/rtc.h"
 #elif defined MODULE_VTIMER
 #include "vtimer.h"
 #endif
@@ -213,6 +213,7 @@ pid_t _getpid(void)
     return (pid_t) sched_active_pid;
 }
 /*---------------------------------------------------------------------------*/
+__attribute__ ((weak))
 int _kill_r(struct _reent *r, int pid, int sig)
 {
     (void) pid;
@@ -224,3 +225,18 @@ int _kill_r(struct _reent *r, int pid, int sig)
 
 void _init(void) {}
 void _fini(void) {}
+
+/**
+ * @brief Send a signal to a thread
+ *
+ * @param[in] pid the pid to send to
+ * @param[in] sig the signal to send
+ *
+ * @return TODO
+ */
+__attribute__ ((weak))
+int _kill(int pid, int sig)
+{
+    errno = ESRCH;                         /* not implemented yet */
+    return -1;
+}

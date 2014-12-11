@@ -78,6 +78,13 @@ Test *tests_core_priority_queue_tests(void);
  */
 Test *tests_core_byteorder_tests(void);
 
+/**
+ * @brief   Generates tests for ringbuffer.h
+ *
+ * @return  embUnit tests if successful, NULL if not.
+ */
+Test *tests_core_ringbuffer_tests(void);
+
 #ifdef __cplusplus
 }
 #endif

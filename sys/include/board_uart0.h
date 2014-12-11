@@ -27,15 +27,43 @@
 extern "C" {
 #endif
 
+/**
+ * @brief Process identifier for the UART0 module.
+ */
 extern kernel_pid_t uart0_handler_pid;
 
+/**
+ * @brief Initialize and starts the UART0 handler.
+ */
 void board_uart0_init(void);
+
+/**
+ * @brief To be called from the uart interrupt handler for every incoming
+ *        character.
+ *
+ * @param[in] c The received character.
+ */
 void uart0_handle_incoming(int c);
+
+/**
+ * @brief Notify the chardev thread that new characters are available in the
+ *        ringbuffer.
+ */
 void uart0_notify_thread(void);
 
+/**
+ * @brief Reads one character from the ringbuffer.
+ *
+ * @returns The first available character from the ringbuffer.
+ */
 int uart0_readc(void);
+
+/**
+ * @brief Wrapper to putchar.
+ *
+ * @param[in] c The character to put on the UART.
+ */
 void uart0_putc(int c);
-int uart0_puts(char *astring, int length);
 
 #ifdef __cplusplus
 }

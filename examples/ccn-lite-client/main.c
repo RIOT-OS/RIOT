@@ -33,7 +33,7 @@
 #include "ps.h"
 #include "ltc4150.h"
 
-#define ENABLE_DEBUG (1)
+#define ENABLE_DEBUG (0)
 #include "debug.h"
 
 #include "ccn_lite/ccnl-riot.h"
@@ -73,7 +73,7 @@ static void riot_ccn_appserver(int argc, char **argv)
     _appserver_pid = thread_create(
             appserver_stack, sizeof(appserver_stack),
             PRIORITY_MAIN - 1, CREATE_STACKTEST,
-            ccnl_riot_appserver_start, (void *) _relay_pid, "appserver");
+            ccnl_riot_appserver_start, (void *) &_relay_pid, "appserver");
     DEBUG("ccn-lite appserver on thread_id %" PRIkernel_pid "...\n", _appserver_pid);
 }
 #endif

@@ -29,17 +29,18 @@ extern "C" {
  */
 #define TIMER_NUMOF         (1U)
 #define TIMER_0_EN          1
-#define TIMER_1_EN          0
 #define TIMER_IRQ_PRIO      1
 
 /* Timer 0 configuration */
-#define TIMER_0_DEV         LPC_TIMER0
+#define TIMER_0_DEV         LPC_TIM0
 #define TIMER_0_CHANNELS    4
-#define TIMER_0_PRESCALER   (67U)
+#define TIMER_0_PRESCALER   (95U)
 #define TIMER_0_MAX_VALUE   (0xffffffff)
-#define TIMER_0_CLKEN()
+#define TIMER_0_CLKEN()     (LPC_SC->PCONP |= (1 << 1))
+#define TIMER_0_CLKDIS()    (LPC_SC->PCONP &= ~(1 << 1))
+#define TIMER_0_PLKSEL()    (LPC_SC->PCLKSEL0 |= (1 << 2))
 #define TIMER_0_ISR         isr_timer0
-#define TIMER_0_IRQ_CHAN    TIMER0_IRQn
+#define TIMER_0_IRQ         TIMER0_IRQn
 /** @} */
 
 /**
@@ -52,16 +53,17 @@ extern "C" {
 #define UART_IRQ_PRIO       1
 
 /* UART 0 device configuration */
-#define UART_0_DEV          LPC_UART2
-#define UART_0_CLKEN()
-#define UART_0_IRQ          UART0_IRQn
-#define UART_0_ISR          isr_uart0
+#define UART_0_DEV          LPC_UART3
+#define UART_0_CLKEN()      (LPC_SC->PCONP |= (1 << 25))
+#define UART_0_CLKDIS()     (LPC_SC->PCONP &= ~(1 << 25))
+#define UART_0_IRQ          UART3_IRQn
+#define UART_0_ISR          isr_uart3
 /* UART 0 pin configuration */
-#define UART_0_PORT
-#define UART_0_PORT_CLKEN()
-#define UART_0_RX_PIN
-#define UART_0_TX_PIN
-#define UART_0_AF
+#define UART_0_PINSEL       (LPC_PINCON->PINSEL0)
+#define UART_0_PINMODE      (LPC_PINCON->PINMODE0)
+#define UART_0_RX_PIN       (0)
+#define UART_0_TX_PIN       (1)
+#define UART_0_AF           (2)
 /** @} */
 
 #ifdef __cplusplus

@@ -20,7 +20,7 @@
 #include <time.h>
 #include "mutex.h"
 
-#if defined(CPU_CC430) || defined(CPU_MSP430X16X)
+#if defined(CPU_CC430) || defined(CPU_MSP430FXYZ)
 #   include "msp430_types.h"
 #endif
 
@@ -32,11 +32,16 @@ extern "C" {
  * @note condition attributes are currently NOT USED in RIOT condition variables
  */
 typedef struct pthread_condattr_t {
+    /** dumdidum */
     int __dummy;
 } pthread_condattr_t;
 
+/**
+ * @brief Condition variable
+ *
+ * @warning fields are managed by cv functions, don't touch
+ */
 typedef struct pthread_cond_t {
-    /* fields are managed by cv functions, don't touch */
     priority_queue_t queue; /**< Threads currently waiting to be signaled. */
 } pthread_cond_t;
 

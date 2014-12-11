@@ -166,3 +166,4 @@ extern cc2538_uart_t * const UART1;       /**< UART1 Instance */
 #endif
 
 #endif /* CC2538_UART_H */
+/** @} */

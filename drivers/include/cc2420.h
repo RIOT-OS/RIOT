@@ -73,7 +73,9 @@ Frame type value:
        011 | MAC command
        1xx | Reserved
   </pre>
-*/
+
+  *  This corresponds to IEEE 802.15.4 frame format.
+  */
 
 #ifndef CC2420_H
 #define CC2420_H

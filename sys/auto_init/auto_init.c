@@ -52,7 +52,7 @@
 #endif
 
 #ifdef MODULE_RTC
-#include "rtc.h"
+#include "periph/rtc.h"
 #endif
 
 #ifdef MODULE_SIXLOWPAN
@@ -78,10 +78,11 @@
 #include "periph/cpuid.h"
 #endif
 
-#define ENABLE_DEBUG (0)
-#if ENABLE_DEBUG
-#define DEBUG_ENABLED
+#ifdef MODULE_L2_PING
+#include "l2_ping.h"
 #endif
+
+#define ENABLE_DEBUG (0)
 #include "debug.h"
 
 #ifndef CONF_RADIO_ADDR
@@ -102,7 +103,7 @@ void auto_init_net_if(void)
 #ifdef MODULE_CC1020
     transceivers |= TRANSCEIVER_CC1020;
 #endif
-#if MODULE_CC110X_LEGACY_CSMA || MODULE_CC110X_LEGACY
+#if (defined(MODULE_CC110X) || defined(MODULE_CC110X_LEGACY) || defined(MODULE_CC110X_LEGACY_CSMA))
     transceivers |= TRANSCEIVER_CC1100;
 #endif
 #ifdef MODULE_CC2420
@@ -141,7 +142,7 @@ void auto_init_net_if(void)
         memcpy(&(eui64.uint32[1]), &hash_l, sizeof(uint32_t));
         net_if_set_eui64(iface, &eui64);
 
-#ifdef DEBUG_ENABLED
+#if ENABLE_DEBUG
         DEBUG("Auto init radio long address on interface %d to ", iface);
 
         for (size_t i = 0; i < 8; i++) {
@@ -149,10 +150,10 @@ void auto_init_net_if(void)
         }
 
         DEBUG("\n");
-#endif /* DEBUG_ENABLED */
+#endif /* ENABLE_DEBUG */
 
 #undef CONF_RADIO_ADDR
-#if defined(MODULE_CC110X_LEGACY_CSMA) || defined(MODULE_CC110X_LEGACY)
+#if (defined(MODULE_CC110X) || defined(MODULE_CC110X_LEGACY) || defined(MODULE_CC110X_LEGACY_CSMA))
         uint8_t hwaddr = (uint8_t)((hash_l ^ hash_h) ^ ((hash_l ^ hash_h) >> 24));
         /* do not combine more parts to keep the propability low that it just
          * becomes 0xff */
@@ -213,7 +214,6 @@ void auto_init(void)
 #ifdef MODULE_RTC
     DEBUG("Auto init rtc module.\n");
     rtc_init();
-    rtc_enable();
 #endif
 #ifdef MODULE_SHT11
     DEBUG("Auto init SHT11 module.\n");
@@ -236,6 +236,10 @@ void auto_init(void)
 #ifdef MODULE_MCI
     DEBUG("Auto init mci module.\n");
     MCI_initialize();
+#endif
+#ifdef MODULE_L2_PING
+    DEBUG("Auto init net_if module.\n");
+    l2_ping_init();
 #endif
 #ifdef MODULE_NET_IF
     DEBUG("Auto init net_if module.\n");

@@ -23,9 +23,6 @@
 #include "netapi.h"
 
 #define ENABLE_DEBUG    (0)
-#if ENABLE_DEBUG
-#define DEBUG_ENABLED
-#endif
 #include "debug.h"
 
 int netapi_send_command(kernel_pid_t pid, netapi_cmd_t *cmd)

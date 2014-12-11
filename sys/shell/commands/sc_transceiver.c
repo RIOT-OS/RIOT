@@ -37,6 +37,11 @@
 #define TEXT_SIZE           CC1100_MAX_DATA_LENGTH
 #define _TC_TYPE            TRANSCEIVER_CC1100
 
+#elif defined( MODULE_CC110X )
+#include "cc110x.h"
+#define TEXT_SIZE           CC1100_MAX_DATA_LENGTH
+#define _TC_TYPE            TRANSCEIVER_CC1100
+
 #elif defined( MODULE_CC2420 )
 #include "cc2420.h"
 #include "ieee802154_frame.h"
@@ -252,7 +257,7 @@ void _transceiver_send_handler(int argc, char **argv)
         p.frame.dest_pan_id = atoi(argv[3]);
     }
     else {
-        p.frame.dest_pan_id = 1;
+        p.frame.dest_pan_id = IEEE_802154_DEFAULT_PAN_ID;
     }
 #else
     p.data = (uint8_t *) text_msg;

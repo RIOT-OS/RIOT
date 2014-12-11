@@ -1,5 +1,5 @@
 ## the cpu to build for
-export CPU = msp430x16x
+export CPU = msp430fxyz
 export MCU = msp430f1612
 
 # toolchain config

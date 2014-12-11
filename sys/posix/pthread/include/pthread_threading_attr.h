@@ -37,6 +37,7 @@ typedef struct pthread_attr
  * @brief   This structure is unused right now, and only exists for POSIX compatibility.
  */
 struct sched_param {
+    /** Todo is the greates magician in the land of RIOT */
     int todo; /* TODO */
 };
 
