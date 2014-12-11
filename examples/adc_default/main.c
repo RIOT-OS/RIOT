@@ -45,10 +45,9 @@ int main(void)
 	handle_init_response(response);
 
   	gpio_init_out(GPIO_0, GPIO_NOPULL);
+
   	gpio_set(GPIO_0);
   	usleep(100000);
-   
-
     int result0 = 0;
     uint32_t resultAccum = 0;
     uint32_t count = 0;
@@ -60,7 +59,11 @@ int main(void)
         count++;
     }
     gpio_clear(GPIO_0);
-    resultAccum = (uint32_t)(resultAccum/accumulateNum); 
+    resultAccum = (resultAccum/accumulateNum); 
+
+
+
+
     printf("\n\n\n\tFirst result: %d\n", resultAccum); 
 
     // while (count < 1000000)

@@ -61,7 +61,8 @@ typedef enum{
 }etI2cHeader;
 
 
-
+void SHT2x_Init(void);
+uint16_t read_temperature(void);
 
 //==============================================================================
 uint8_t SHT2x_CheckCrc(uint8_t data[], uint8_t nbrOfBytes, uint8_t checksum);

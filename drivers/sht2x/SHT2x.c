@@ -15,6 +15,51 @@
 #include "hwtimer.h"
 #define ENABLE_DEBUG    (1)
 #include "debug.h"
+
+#define SHT21_ONCHIP_HEATER_DISABLE     ( 0 << 2 )
+#define SHT21_BATTERY_ABOVE_2V25        ( 0 << 6 )
+#define SHT21_OTP_RELOAD_DISABLE        ( 1 << 1 )
+#define SHT21_USER_REG_RESERVED_BITS    ( 0x38 )
+#define SHT21_USER_CONFIG               ( SHT2x_RES_8_12BIT | \
+                                          SHT21_ONCHIP_HEATER_DISABLE | \
+                                          SHT21_BATTERY_ABOVE_2V25 | \
+                                          SHT21_OTP_RELOAD_DISABLE )
+
+void SHT2x_Init(void)
+{
+    char config[2];
+
+    config[0] = USER_REG_W;
+    config[1] = 0;
+
+    // Read the current configuration according to the datasheet (pag. 9, fig. 18)
+    
+    i2c_write_byte(I2C_0, I2C_ADR_W, USER_REG_R);
+    i2c_read_byte(I2C_0, I2C_ADR_R, &config[1]);
+
+    // Clean all the configuration bits except those reserved
+    config[1] &= SHT21_USER_REG_RESERVED_BITS;
+
+    // Set the configuration bits without changing those reserved
+    config[1] |= SHT21_USER_CONFIG;
+
+    i2c_write_bytes(I2C_0, I2C_ADR_W, config, sizeof(config));
+}
+
+uint16_t read_temperature(void)
+{
+    char sht21_temperature[2];
+    uint16_t temperature;
+
+    // Read the current temperature according to the datasheet (pag. 8, fig. 15)
+    i2c_write_byte(I2C_0, I2C_ADR_W, TRIG_T_MEASUREMENT_HM);
+    i2c_read_bytes(I2C_0, I2C_ADR_R, sht21_temperature, sizeof(sht21_temperature));
+    
+    temperature = (sht21_temperature[1] << 8) | sht21_temperature[0];
+    
+    return temperature;
+}
+
 //==============================================================================
 uint8_t SHT2x_CheckCrc(uint8_t data[], uint8_t nbrOfBytes, uint8_t checksum)
 //==============================================================================

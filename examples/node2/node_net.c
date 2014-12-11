@@ -147,7 +147,7 @@ void udp_init_node_standalone(void)//int argc, char **argv)
         DEBUG("Can not add all nodes address to interface %d\n", 0);
         return;
     }
-    //ipv6_init_as_router();
+
     ipv6_addr_init(&tmp, 0xabcd, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, id);
     ipv6_net_if_add_addr(0, &tmp, NDP_ADDR_STATE_PREFERRED, 0, 0, 0);
     /* set channel to 10 */

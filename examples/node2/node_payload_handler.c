@@ -81,12 +81,13 @@ void *node_payload_thread(void *arg)
     return NULL;
 }
 
+ipv6_addr_t ipaddr;
 /* UDP send payload */
 void udp_send_payload(int cmd)//int argc, char **argv)
 {
     int sock;
     sockaddr6_t sa;
-    ipv6_addr_t ipaddr;
+    //ipv6_addr_t ipaddr;
     rpl_dodag_t *mydodag;
     int bytes_sent;
     char buffer[64];    
@@ -98,16 +99,23 @@ void udp_send_payload(int cmd)//int argc, char **argv)
         DEBUG("Not part of a dodag\n");
         return;
     }
-  
-   ipv6_addr_init(&ipaddr, 
-        HTONS((&mydodag->dodag_id)->uint16[0]), 
-        HTONS((&mydodag->dodag_id)->uint16[1]), 
-        HTONS((&mydodag->dodag_id)->uint16[2]),
-        HTONS((&mydodag->dodag_id)->uint16[3]), 
-        HTONS((&mydodag->dodag_id)->uint16[4]), 
-        HTONS((&mydodag->dodag_id)->uint16[5]),
-        HTONS((&mydodag->dodag_id)->uint16[6]),
-        HTONS((&mydodag->dodag_id)->uint16[7]));
+    if ((&mydodag->dodag_id) == NULL) {
+        DEBUG("\ndodag_id == null\n");
+        return;
+    }
+
+    if(ipaddr == NULL)
+    {
+        ipv6_addr_init(&ipaddr, 
+            HTONS((&mydodag->dodag_id)->uint16[0]), 
+            HTONS((&mydodag->dodag_id)->uint16[1]), 
+            HTONS((&mydodag->dodag_id)->uint16[2]),
+            HTONS((&mydodag->dodag_id)->uint16[3]), 
+            HTONS((&mydodag->dodag_id)->uint16[4]), 
+            HTONS((&mydodag->dodag_id)->uint16[5]),
+            HTONS((&mydodag->dodag_id)->uint16[6]),
+            HTONS((&mydodag->dodag_id)->uint16[7]));   
+    }
 
     switch(cmd)
     {
@@ -140,15 +148,24 @@ void udp_send_payload(int cmd)//int argc, char **argv)
     
     memset(&sa, 0, sizeof(sa));    
     sa.sin6_family = AF_INET;
-    memcpy(&sa.sin6_addr, &ipaddr, 16);
-    sa.sin6_port = HTONS(SERVER_PORT);
+    DEBUG("\n BEFORE memcpy &mydodag->dodag_id \n");
+    if(&mydodag->dodag_id)
+    {
+        //memcpy(&sa.sin6_addr, &mydodag->dodag_id, 16);
+        memcpy(&sa.sin6_addr, &ipaddr, 16);
+    }
+    else
+    {
+        DEBUG("\n memcpy &mydodag->dodag_id DEAD!\n");
+        return;
+    }
 
-    DEBUG("\n\n 1\n\n");
+    //memcpy(&sa.sin6_addr, &ipaddr, 16);
+    sa.sin6_port = HTONS(SERVER_PORT);
 
     if(strlen(payload) > 0)
     {   
         bytes_sent = socket_base_sendto(sock, (char *)payload, strlen(payload) + 1, 0, &sa, sizeof(sa));
-        DEBUG("\n\n 2\n\n");
         if (bytes_sent < 0) 
         {
             DEBUG("Error sending packet!\n");
@@ -159,7 +176,6 @@ void udp_send_payload(int cmd)//int argc, char **argv)
                    bytes_sent, ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
                                                 &ipaddr));
         }
-        DEBUG("\n\n 3\n\n");
         socket_base_close(sock);
     }
     else
@@ -177,11 +193,11 @@ void getWeightPayload(char* _p)
 
     uint32_t adcValue = getAdcValue();
     result = getWeightValueFromAdcInput(adcValue);
-    DEBUG("\n\nadcValue: %d \n\n", adcValue);
-    DEBUG("result: %d \n", result);
+    DEBUG("\n\nadcValue: %d \n\n", (int)adcValue);
+    DEBUG("result: %d \n", (int)result);
 
-    int len = sprintf(&weightStr, "%d", result);
-    int len2 = sprintf(&hwIdStr, "%d", id);
+    sprintf(&weightStr, "%d", (int)result);
+    sprintf(&hwIdStr, "%d", (int)id);
 
     strcpy(_p, PutData0);
     strcat(_p, PutData1);
@@ -203,11 +219,11 @@ void getBatteryPayload(char* _p)
 
     uint32_t adcValue = getAdcValue();
     result = getWeightValueFromAdcInput(adcValue); // TODO:
-    DEBUG("\n\nadcValue: %d \n\n", adcValue);
-    DEBUG("result: %d \n", result);
+    DEBUG("\n\nadcValue: %d \n\n", (int)adcValue);
+    DEBUG("result: %d \n", (int)result);
 
-    int len = sprintf(&weightStr, "%d", result);
-    int len2 = sprintf(&hwIdStr, "%d", id);
+    sprintf(&weightStr, "%d", (int)result);
+    sprintf(&hwIdStr, "%d", (int)id);
 
     strcpy(_p, PutData0);
     strcat(_p, PutData1);
@@ -229,11 +245,11 @@ void getTemperaturePayload(char* _p)
 
     uint32_t adcValue = getAdcValue();
     result = getWeightValueFromAdcInput(adcValue); // TODO:
-    DEBUG("\n\nadcValue: %d \n\n", adcValue);
-    DEBUG("result: %d \n", result);
+    DEBUG("\n\nadcValue: %d \n\n", (int)adcValue);
+    DEBUG("result: %d \n", (int)result);
 
-    int len = sprintf(&weightStr, "%d", result);
-    int len2 = sprintf(&hwIdStr, "%d", id);
+    sprintf(&weightStr, "%d", (int)result);
+    sprintf(&hwIdStr, "%d", (int)id);
 
     strcpy(_p, PutData0);
     strcat(_p, PutData1);
@@ -255,11 +271,11 @@ void getHumidityPayload(char* _p)
 
     uint32_t adcValue = getAdcValue();
     result = getWeightValueFromAdcInput(adcValue); // TODO:
-    DEBUG("\n\nadcValue: %d \n\n", adcValue);
-    DEBUG("result: %d \n", result);
+    DEBUG("\n\nadcValue: %d \n\n", (int)adcValue);
+    DEBUG("result: %d \n", (int)result);
 
-    int len = sprintf(&weightStr, "%d", result);
-    int len2 = sprintf(&hwIdStr, "%d", id);
+    sprintf(&weightStr, "%d", (int)result);
+    sprintf(&hwIdStr, "%d", (int)id);
 
     strcpy(_p, PutData0);
     strcat(_p, PutData1);
@@ -276,7 +292,7 @@ void getHumidityPayload(char* _p)
 void getTestSmsPayload(char* _p) // PINA19
 {    
     char hwIdStr[6];
-    int len2 = sprintf(&hwIdStr, "%d", id);
+    sprintf(&hwIdStr, "%d", (int)id);
 
     strcpy(_p, cmdTestSms0);
     strcat(_p, cmdTestSms1);

@@ -56,12 +56,13 @@ int main(void)
 
 	uint8_t m[2];
 	uint16_t result = 0;
+	SHT2x_Init();
 	//SHT2x_SoftReset();
-	hwtimer_wait(HWTIMER_TICKS_TO_US(16000));
-	error = SHT2x_MeasureHM(TEMP, m);
+	//hwtimer_wait(HWTIMER_TICKS_TO_US(16000));
+	//error = SHT2x_MeasureHM(TEMP, m);
 
 	//error = SHT2x_MeasurePoll(TEMP, m);
-	result = ((uint16_t)m[0] << 8) | m[1];
+	result = read_temperature();// ((uint16_t)m[0] << 8) | m[1];
 
 	printf("I2C data is getting ready!\n" );
 	printf("\n\n\tData: %d\n Error: %d\n", result, error );

@@ -59,9 +59,7 @@ int getAdcValue(void)
         count++;
     } 
     deactivateRelayCtrl();
-
     resultAccum = (uint32_t)(resultAccum/accumulateNum); 
-
     return resultAccum;
 };
 

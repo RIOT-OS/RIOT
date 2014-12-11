@@ -18,7 +18,7 @@
 
 /* Node UDP Stack Buffer size */
 #define udp_stack_buffer 1664
-#define payload_thread_buffer 512
+#define payload_thread_buffer 512+256
 #define MSG_RCV_BUFFER_SIZE 64
 
 /* Sleep definitions for transmission interval */
