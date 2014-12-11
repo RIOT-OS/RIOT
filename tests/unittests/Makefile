@@ -7,6 +7,7 @@ BOARD_INSUFFICIENT_RAM := chronos msb-430 msb-430h redbee-econotag stm32f0discov
 USEMODULE += embunit
 
 # Some randomly generated but still deterministic values for testing
+CFLAGS += -DTEST_STRING4="\"J&(d\""
 CFLAGS += -DTEST_STRING8="\"o<\\\\rrB/q\""
 CFLAGS += -DTEST_STRING12="\"50U'HLKC3_ft\""
 CFLAGS += -DTEST_STRING16="\"nvxuO*6o3C=a6g7]\""

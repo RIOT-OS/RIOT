@@ -34,9 +34,9 @@ extern "C" {
 #define UART0_BUFSIZE                   (32)
 #endif
 
-#ifndef PKTBUF_SIZE
-#define PKTBUF_SIZE                     (2560) /*  TODO: Make this value
-                                                   overall MTU dependent */
+#ifndef NG_PKTBUF_SIZE
+#define NG_PKTBUF_SIZE                  (2560)    /* TODO: Make this value
+                                                   * overall MTU dependent */
 #endif
 /** @} */
 

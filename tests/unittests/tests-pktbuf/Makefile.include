@@ -1,1 +1,1 @@
-USEMODULE += pktbuf
+USEMODULE += ng_pktbuf

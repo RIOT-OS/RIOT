@@ -1,9 +1,6 @@
 ifneq (,$(filter pkt,$(USEMODULE)))
     DIRS += net/crosslayer/pkt
 endif
-ifneq (,$(filter pktbuf,$(USEMODULE)))
-    DIRS += net/crosslayer/pktbuf
-endif
 ifneq (,$(filter pnet,$(USEMODULE)))
     DIRS += posix/pnet
 endif
@@ -73,6 +70,9 @@ ifneq (,$(filter ng_netif,$(USEMODULE)))
 endif
 ifneq (,$(filter ng_netreg,$(USEMODULE)))
     DIRS += net/crosslayer/ng_netreg
+endif
+ifneq (,$(filter ng_pktbuf,$(USEMODULE)))
+    DIRS += net/crosslayer/ng_pktbuf
 endif
 ifneq (,$(filter netapi,$(USEMODULE)))
     DIRS += net/crosslayer/netapi

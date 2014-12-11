@@ -21,7 +21,7 @@
 #include "tests-pkt.h"
 
 #define _INIT_ELEM(len, data, next) \
-    { (next), (data), (len), NG_NETTYPE_UNDEF }
+    { 1, (next), (data), (len), NG_NETTYPE_UNDEF }
 #define _INIT_ELEM_STATIC_DATA(data, next) _INIT_ELEM(sizeof(data), data, next)
 
 static void test_pkt_len__NULL(void)
