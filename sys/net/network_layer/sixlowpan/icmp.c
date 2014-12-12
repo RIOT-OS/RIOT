@@ -613,8 +613,17 @@ void icmpv6_send_router_adv(ipv6_addr_t *addr, uint8_t sllao, uint8_t mtu, uint8
                 }
             }
 
-            contexts = (lowpan_context_t *)malloc(contexts_len * sizeof(lowpan_context_t));
-            memcpy(contexts, c_tmp, contexts_len);
+            if (contexts_len > 0) {
+                contexts = (lowpan_context_t *)malloc(contexts_len * sizeof(lowpan_context_t));
+
+                if (contexts == NULL) {
+                    DEBUG("icmpv6_send_router_adv: no memory left");
+                    contexts_len = 0; /* HACK to skip over for loop below */
+                }
+                else {
+                    memcpy(contexts, c_tmp, contexts_len);
+                }
+            }
         }
 
         for (int i = 0; i < contexts_len; i++) {
