@@ -329,13 +329,6 @@ void rpl_join_dodag(rpl_dodag_t *dodag, ipv6_addr_t *parent, uint16_t parent_ran
         return;
     }
 
-    preferred_parent = rpl_new_parent(dodag, parent, parent_rank);
-
-    if (preferred_parent == NULL) {
-        rpl_del_dodag(my_dodag);
-        return;
-    }
-
     my_dodag->instance->joined = 1;
     my_dodag->of = dodag->of;
     my_dodag->mop = dodag->mop;
@@ -351,6 +344,14 @@ void rpl_join_dodag(rpl_dodag_t *dodag, ipv6_addr_t *parent, uint16_t parent_ran
     my_dodag->version = dodag->version;
     my_dodag->grounded = dodag->grounded;
     my_dodag->joined = 1;
+
+    preferred_parent = rpl_new_parent(my_dodag, parent, parent_rank);
+
+    if (preferred_parent == NULL) {
+        rpl_del_dodag(my_dodag);
+        return;
+    }
+
     my_dodag->my_preferred_parent = preferred_parent;
     my_dodag->node_status = (uint8_t) NORMAL_NODE;
     my_dodag->my_rank = dodag->of->calc_rank(preferred_parent, dodag->my_rank);
