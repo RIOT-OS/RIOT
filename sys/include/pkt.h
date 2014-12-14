@@ -78,7 +78,7 @@ typedef uint16_t pktsize_t;
 /**
  * @brief   Macro for pktsize_t printing formatter
  */
-#define PRIpktsize  (PRIu16)
+#define PRIpktsize  PRIu16
 
 /**
  * @brief   Maximum value for packet size
@@ -180,7 +180,8 @@ pkt_hlist_t *pkt_hlist_remove_first(pkt_hlist_t **list);
 void pkt_hlist_remove(pkt_hlist_t **list, pkt_hlist_t *header);
 
 /**
- * @brief   Helper function to calculate the total length of the headers of *pkt*.
+ * @brief   Helper function to calculate the total length of the headers of
+ *          @p pkt.
  *
  * @note    Wrapper function for @ref pkt_hlist_len()
  *
@@ -242,7 +243,7 @@ static inline void pkt_remove_header(pkt_t *pkt, pkt_hlist_t *header)
  *
  * @note    Wrapper function for @ref pkt_hlist_remove_first()
  *
- * @param[in,out] pkt   The packet to remove *header* from.
+ * @param[in,out] pkt   The packet to remove @p header from.
  *
  * @return The previously first header of @p pkt.
  * @return NULL if  @p pkt is empty (aka `== NULL`)
