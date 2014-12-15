@@ -23,6 +23,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "periph/rtc.h"
 
@@ -45,21 +46,20 @@ static int dow(int year, int month, int day)
 static int _parse_time(char **argv, struct tm *time)
 {
     short i1, i2, i3;
+    char *end;
 
-    if(sscanf(argv[0], "%6hd-%6hd-%6hd", &i1, &i2, &i3) != 3) {
-        puts("could not parse date");
-        return -1;
-    }
+    i1 = strtol(argv[0], &end, 10);
+    i2 = strtol(end + 1, &end, 10);
+    i3 = strtol(end + 1, &end, 10);
 
     time->tm_year = i1 - 1900;
     time->tm_mon = i2 - 1;
     time->tm_mday = i3;
     time->tm_wday = dow(i1, i2, i3);
 
-    if(sscanf(argv[1], "%6hd:%6hd:%6hd", &i1, &i2, &i3) != 3) {
-        puts("could not parse time");
-        return -1;
-    }
+    i1 = strtol(argv[1], &end, 10);
+    i2 = strtol(end + 1, &end, 10);
+    i3 = strtol(end + 1, &end, 10);
 
     time->tm_hour = i1;
     time->tm_min = i2;
@@ -70,13 +70,19 @@ static int _parse_time(char **argv, struct tm *time)
     return 0;
 }
 
+static void _print_time(struct tm *time)
+{
+    printf("%04i-%02i-%02i %02i:%02i:%02i\n",
+            time->tm_year + 1900, time->tm_mon + 1, time->tm_mday,
+            time->tm_hour, time->tm_min, time->tm_sec
+          );
+}
+
 static void _rtc_getalarm(void)
 {
-    struct tm now;
-    if (rtc_get_alarm(&now) == 0) {
-        /* cppcheck: see man 3 asctime: obsoleted by POSIX.1-2008 */
-        /* cppcheck-suppress obsoleteFunctionsasctime */
-        printf("%s", asctime(&now));
+    struct tm t;
+    if (rtc_get_alarm(&t) == 0) {
+        _print_time(&t);
     }
     else {
         puts("rtc: error getting alarm");
@@ -96,11 +102,9 @@ static void _rtc_setalarm(char **argv)
 
 static void _rtc_gettime(void)
 {
-    struct tm now;
-    if (rtc_get_time(&now) == 0) {
-        /* cppcheck: see man 3 asctime: obsoleted by POSIX.1-2008 */
-        /* cppcheck-suppress obsoleteFunctionsasctime */
-        printf("%s", asctime(&now));
+    struct tm t;
+    if (rtc_get_time(&t) == 0) {
+        _print_time(&t);
     }
     else {
         puts("rtc: error getting time");
