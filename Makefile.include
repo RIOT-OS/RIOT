@@ -21,6 +21,9 @@ COLOR_RED    :=
 COLOR_PURPLE :=
 COLOR_RESET  :=
 COLOR_ECHO   := /bin/echo
+
+OS := $(shell uname)
+
 ifeq (, ${JENKINS_URL})
   ifeq (0,  $(shell tput colors 2>&1 > /dev/null; echo $$?))
     COLOR_GREEN  := \033[1;32m
