@@ -31,8 +31,6 @@ endif
         info-buildsizes-diff info-build info-boards-supported \
         info-features-missing info-boards-features-missing
 
-OS := $(shell uname)
-
 buildtest:
 	@ \
 	BUILDTESTOK=true; \
