@@ -17,7 +17,6 @@
 #ifndef NATIVENET_INTERNAL_H
 #define NATIVENET_INTERNAL_H
 
-#include "kernel_types.h"
 #include "tap.h"
 
 #ifdef __cplusplus
@@ -92,14 +91,14 @@ typedef struct {
     uint8_t _is_monitoring;
 
     /**
-     * @brief   Thread that handles incoming events
-     */
-    kernel_pid_t _event_handler;
-
-    /**
      * @brief   Receive data callbacks for this device
      */
     netdev_rcv_data_cb_t _callbacks[NATIVENET_DEV_CB_MAX];
+
+    /**
+     * @brief   Position in RX buffer on RX event
+     */
+    int _rx_pos;
 } _nativenet_netdev_more_t;
 
 /* internal counterpart to nativenet_default_dev */
