@@ -83,9 +83,6 @@
 #endif
 
 #define ENABLE_DEBUG (0)
-#if ENABLE_DEBUG
-#define DEBUG_ENABLED
-#endif
 #include "debug.h"
 
 #ifndef CONF_RADIO_ADDR
@@ -144,7 +141,7 @@ void auto_init_net_if(void)
         memcpy(&(eui64.uint32[1]), &hash_l, sizeof(uint32_t));
         net_if_set_eui64(iface, &eui64);
 
-#ifdef DEBUG_ENABLED
+#if ENABLE_DEBUG
         DEBUG("Auto init radio long address on interface %d to ", iface);
 
         for (size_t i = 0; i < 8; i++) {
@@ -152,7 +149,7 @@ void auto_init_net_if(void)
         }
 
         DEBUG("\n");
-#endif /* DEBUG_ENABLED */
+#endif /* ENABLE_DEBUG */
 
 #undef CONF_RADIO_ADDR
 #if (defined(MODULE_CC110X) || defined(MODULE_CC110X_LEGACY) || defined(MODULE_CC110X_LEGACY_CSMA))

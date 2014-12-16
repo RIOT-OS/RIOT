@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 René Kijewski
+ * Copyright (C) 2014 Philipp Rosenkranz
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -10,13 +10,13 @@
  * @addtogroup  unittests
  * @{
  *
- * @file        tests-lib.h
- * @brief       Unittests for the ``lib`` sysmodule
+ * @file        tests-bloom.h
+ * @brief       Unittests for the ``bloom`` module
  *
- * @author      René Kijewski <rene.kijewski@fu-berlin.de>
+ * @author      Philipp Rosenkranz <philipp.rosenkranz@fu-berlin.de>
  */
-#ifndef __TESTS_CORE_H_
-#define __TESTS_CORE_H_
+#ifndef __TESTS_BLOOM_H_
+#define __TESTS_BLOOM_H_
 
 #include "../unittests.h"
 
@@ -27,18 +27,18 @@ extern "C" {
 /**
  * @brief   The entry point of this test suite.
  */
-void tests_lib(void);
+void tests_bloom(void);
 
 /**
- * @brief   Generates tests ringbuffer.h
+ * @brief   Generates tests for bloom
  *
  * @return  embUnit tests if successful, NULL if not.
  */
-Test *tests_lib_ringbuffer_tests(void);
+Test *tests_bloom_tests(void);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __TESTS_CORE_H_ */
+#endif /* __TESTS_BLOOM_H_ */
 /** @} */

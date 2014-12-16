@@ -27,7 +27,7 @@
  extern "C" {
 #endif
 
-#ifdef DEBUG_ENABLED
+#if ENABLE_DEBUG
 #define ENABLE_AODV_DEBUG (1)
 #endif
 

@@ -8,7 +8,7 @@
 
 /**
  * @{
- * @file    tcp_hc.c
+ * @file
  * @author  Oliver Gesch <oliver.gesch@googlemail.com>
  */
 #ifndef TCP_HC_H_

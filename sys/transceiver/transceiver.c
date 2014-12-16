@@ -592,7 +592,7 @@ void receive_cc2420_packet(ieee802154_packet_t *trans_p)
     trans_p->frame.payload_len = p->frame.payload_len;
     eINT();
 
-#ifdef DEBUG_ENABLED
+#if ENABLE_DEBUG
 
     if (trans_p->frame.fcf.dest_addr_m == IEEE_802154_SHORT_ADDR_M) {
         if (trans_p->frame.fcf.src_addr_m == IEEE_802154_SHORT_ADDR_M) {
@@ -685,7 +685,7 @@ void receive_at86rf231_packet(ieee802154_packet_t *trans_p)
     trans_p->frame.payload_len = p->frame.payload_len;
     eINT();
 
-#ifdef DEBUG_ENABLED
+#if ENABLE_DEBUG
 
     if (trans_p->frame.fcf.dest_addr_m == IEEE_802154_SHORT_ADDR_M) {
         if (trans_p->frame.fcf.src_addr_m == IEEE_802154_SHORT_ADDR_M) {
@@ -729,7 +729,7 @@ static int8_t send_packet(transceiver_type_t t, void *pkt)
 #if MODULE_AT86RF231 || MODULE_CC2420 || MODULE_MC1322X
     ieee802154_packet_t *p = (ieee802154_packet_t *)pkt;
     DEBUG("transceiver: Send packet to ");
-#ifdef DEBUG_ENABLED
+#if ENABLE_DEBUG
 
     for (size_t i = 0; i < 8; i++) {
         printf("%02x ", p->frame.dest_addr[i]);

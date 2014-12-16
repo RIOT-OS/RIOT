@@ -37,7 +37,7 @@ static void _write_packet(struct rfc5444_writer *wr __attribute__ ((unused)),
                           struct rfc5444_writer_target *iface __attribute__((unused)),
                           void *buffer, size_t length);
 
-#ifdef DEBUG_ENABLED
+#if ENABLE_DEBUG
 char addr_str[IPV6_MAX_ADDR_STR_LEN];
 static struct netaddr_str nbuf;
 #endif

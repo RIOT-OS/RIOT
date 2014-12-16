@@ -10,8 +10,8 @@
  * @defgroup    driver_periph_dac DAC
  * @ingroup     driver_periph
  * @brief       Low-level DAC peripheral driver
- * @{
  *
+ * @{
  * @file
  * @brief       Low-level DAC peripheral driver interface definitions
  *
@@ -28,15 +28,15 @@
 extern "C" {
 #endif
 
-/* guard file in case no ADC device is defined */
+/* guard file in case no DAC device is defined */
 #if DAC_NUMOF
 
 /**
-  * @brief Definition avialable DAC devices
-  *
-  * Each DAC device is based on a hardware DAC which can have one or more
-  * independet channels.
-  */
+ * @brief Definition avialable DAC devices
+ *
+ * Each DAC device is based on a hardware DAC which can have one or more
+ * independet channels.
+ */
 typedef enum {
 #if DAC_0_EN
     DAC_0 = 0,             /**< DAC device 0 */
@@ -53,7 +53,7 @@ typedef enum {
 } dac_t;
 
 /**
- * @breif Possilbe DAC precision settings
+ * @brief Possilbe DAC precision settings
  */
 typedef enum {
     DAC_RES_6BIT = 0,      /**< DAC precision: 6 bit */

@@ -9,7 +9,7 @@
  *
  * @ingroup sixlowpan
  * @{
- * @file    sixlowborder.h
+ * @file
  * @brief   header for 6lowpan border router
  * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
  * @author  Oliver Hahm <oliver.hahm@inria.fr>

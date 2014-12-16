@@ -114,7 +114,7 @@ static int set_timeout(vtimer_t *timeout, timex_t val, void *args)
     vtimer_remove(timeout);
 
     timex_normalize(&val);
-    return vtimer_set_msg(timeout, val, sending_slot_pid, args);
+    return vtimer_set_msg(timeout, val, sending_slot_pid, MSG_TIMER, args);
 }
 
 static int in_window(uint8_t seq_num, uint8_t min, uint8_t max)

@@ -31,7 +31,7 @@ extern "C" {
  */
 #define PTHREAD_PROCESS_SHARED (0)
 /**
- * @def     PTHREAD_PROCESS_SHARED
+ * @def     PTHREAD_PROCESS_PRIVATE
  * @brief   Don't share the structure with child processes.
  * @note    RIOT is a single-process OS.
  *          Setting the value of `pshared` does not change anything.

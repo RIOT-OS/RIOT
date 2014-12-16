@@ -24,14 +24,11 @@
 #include "net_help.h"
 
 #define ENABLE_DEBUG    (0)
-#if ENABLE_DEBUG
-#define DEBUG_ENABLED
-#endif
 #include "debug.h"
 
 net_if_t interfaces[NET_IF_MAX];
 
-#ifdef DEBUG_ENABLED
+#if ENABLE_DEBUG
 void print_addr_hex(net_if_addr_t *addr)
 {
     int i;

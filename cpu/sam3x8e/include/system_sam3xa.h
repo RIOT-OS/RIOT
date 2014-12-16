@@ -40,7 +40,7 @@
 #ifndef SYSTEM_SAM3X_H_INCLUDED
 #define SYSTEM_SAM3X_H_INCLUDED
 
-/* @cond 0 */
+/* @cond @false */
 /**INDENT-OFF**/
 /**INDENT-ON**/
 /* @endcond */
@@ -70,7 +70,7 @@ void SystemCoreClockUpdate(void);
  */
 void system_init_flash(uint32_t dw_clk);
 
-/* @cond 0 */
+/* @cond @false */
 /**INDENT-OFF**/
 #ifdef __cplusplus
 }

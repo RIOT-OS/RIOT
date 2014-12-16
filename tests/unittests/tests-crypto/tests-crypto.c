@@ -1,14 +1,14 @@
 /*
- * Copyright (C) 2014 René Kijewski
+ * Copyright (C) 2014 Philipp Rosenkranz
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  */
 
-#include "tests-lib.h"
+#include "tests-crypto.h"
 
-void tests_lib(void)
+void tests_crypto(void)
 {
-    TESTS_RUN(tests_lib_ringbuffer_tests());
+    TESTS_RUN(tests_crypto_sha256_tests());
 }

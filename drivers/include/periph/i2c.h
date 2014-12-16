@@ -10,8 +10,8 @@
  * @defgroup    driver_periph_i2c I2C
  * @ingroup     driver_periph
  * @brief       Low-level I2C peripheral driver
- * @{
  *
+ * @{
  * @file
  * @brief       Low-level I2C peripheral driver interface definition
  *

@@ -17,7 +17,8 @@
  */
 
 /**
- * @addtogroup  sys
+ * @defgroup    sys_pipe Pipe IPC
+ * @ingroup     sys
  * @{
  * @file
  *

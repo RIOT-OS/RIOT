@@ -53,7 +53,6 @@ char addr_str[IPV6_MAX_ADDR_STR_LEN];
 
 /* global variables */
 kernel_pid_t rpl_process_pid = KERNEL_PID_UNDEF;
-mutex_t rpl_recv_mutex = MUTEX_INIT;
 mutex_t rpl_send_mutex = MUTEX_INIT;
 msg_t rpl_msg_queue[RPL_PKT_RECV_BUF_SIZE];
 char rpl_process_buf[RPL_PROCESS_STACKSIZE];
@@ -65,10 +64,9 @@ uint8_t srh_send_buffer[BUFFER_SIZE];
 ipv6_addr_t *down_next_hop;
 ipv6_srh_t *srh_header;
 msg_t srh_m_send, srh_m_recv;
-rpl_routing_entry_t rpl_routing_table[RPL_MAX_ROUTING_ENTRIES_NON_STORING];
-#else
-rpl_routing_entry_t rpl_routing_table[RPL_MAX_ROUTING_ENTRIES_STORING];
 #endif
+
+rpl_routing_entry_t rpl_routing_table[RPL_MAX_ROUTING_ENTRIES];
 
 uint8_t rpl_max_routing_entries;
 ipv6_addr_t my_address;
@@ -82,16 +80,8 @@ uint8_t rpl_init(int if_id)
     rpl_instances_init();
 
     /* initialize routing table */
+    rpl_max_routing_entries = RPL_MAX_ROUTING_ENTRIES;
     rpl_clear_routing_table();
-
-    if (RPL_DEFAULT_MOP == RPL_STORING_MODE_NO_MC) {
-        rpl_max_routing_entries = RPL_MAX_ROUTING_ENTRIES_STORING;
-        rpl_clear_routing_table();
-    }
-    else {
-        rpl_max_routing_entries = RPL_MAX_ROUTING_ENTRIES_NON_STORING;
-        rpl_clear_routing_table();
-    }
 
     if (rpl_routing_table == NULL) {
         DEBUGF("Routing table init failed!\n");
@@ -122,12 +112,23 @@ uint8_t rpl_init(int if_id)
 
     /* initialize objective function manager */
     rpl_of_manager_init(&my_address);
-	rpl_init_mode(&my_address);
+    rpl_init_mode(&my_address);
     return SIXLOWERROR_SUCCESS;
 }
 
 void rpl_init_root(void)
 {
+#if (RPL_DEFAULT_MOP == RPL_NON_STORING_MODE)
+#ifndef RPL_NODE_IS_ROOT
+puts("\n############################## ERROR ###############################");
+puts("This configuration has NO ROUTING TABLE available for the root node!");
+puts("The root will NOT be INITIALIZED.");
+puts("Please build the binary for root in non-storing MOP with:");
+puts("\t\t'make RPL_NODE_IS_ROOT=1'");
+puts("############################## ERROR ###############################\n");
+return;
+#endif
+#endif
     rpl_init_root_mode();
 }
 
@@ -166,7 +167,6 @@ void *rpl_process(void *arg)
 
     while (1) {
         msg_receive(&m_recv);
-        mutex_lock(&rpl_recv_mutex);
 
         /* differentiate packet types */
         ipv6_buf = ((ipv6_hdr_t *)m_recv.content.ptr);
@@ -182,30 +182,25 @@ void *rpl_process(void *arg)
             switch (icmp_buf->code) {
                 case (ICMP_CODE_DIS): {
                     rpl_recv_DIS();
-                    mutex_unlock(&rpl_recv_mutex);
                     break;
                 }
 
                 case (ICMP_CODE_DIO): {
                     rpl_recv_DIO();
-                    mutex_unlock(&rpl_recv_mutex);
                     break;
                 }
 
                 case (ICMP_CODE_DAO): {
                     rpl_recv_DAO();
-                    mutex_unlock(&rpl_recv_mutex);
                     break;
                 }
 
                 case (ICMP_CODE_DAO_ACK): {
                     rpl_recv_DAO_ACK();
-                    mutex_unlock(&rpl_recv_mutex);
                     break;
                 }
 
                 default:
-                    mutex_unlock(&rpl_recv_mutex);
                     break;
             }
         }
@@ -241,7 +236,6 @@ void *rpl_process(void *arg)
                 }
             }
 
-            mutex_unlock(&rpl_recv_mutex);
         }
 
 #endif

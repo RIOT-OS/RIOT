@@ -11,7 +11,7 @@
  * @brief       Routing Protocol for Low power and Lossy Networks
  * @{
  *
- * @file        rpl_mode.h
+ * @file
  * @brief       RPL storing-mode header
  *
  * Header which includes all mode related RPL-functions. All functions are mandatory for any
@@ -149,7 +149,7 @@ void rpl_recv_dao_ack_mode(void);
  *
  * @param[in] destination           IPv6-address of the destination of the message.
  * @param[in] payload               Payload of the message.
- * @param[in] len                   Length of the message
+ * @param[in] p_len                 Length of the message
  * @param[in] next_header           Index to next header in message.
  *
  */

@@ -100,86 +100,6 @@ extern "C" {
 
 
 
-
-/**
- * @ I2C Configuration
- * @{
- */
-//#define I2C_NUMOF    (1U)
-//#define I2C_0_EN    (1)
-
-/* I2C device configuration */
-
-
-/**
- * @name I2C configuration
- * @{
- */
-#define I2C_NUMOF          (1U)
-#define I2C_0_EN           1
-#define I2C_1_EN           0
-#define I2C_2_EN           0
-#define I2C_3_EN           0
-#define I2C_IRQ_PRIO       1
-
-#define I2C_0_DEV       SERCOM3->I2CM
-#define I2C_0_IRQ       SERCOM3_IRQn
-#define I2C_0_ISR       isr_sercom2
-/* I2C 0 pin configuration */
-#define I2C_0_PORT    (PORT->Group[0])
-#define I2C_SDA          PIN_PA16
-#define I2C_SCL             PIN_PA17
-#define I2C_0_PINS    (PORT_PA16 | PORT_PA17)
-#define I2C_0_REF_F      (8000000UL) // Default Clock Source on reset OSC8M - 8MHz 
-
-
-//#define I2C_0_DEV    SERCOM3->I2CM//SERCOM1->I2CM
-
-/* I2C Default values*/
-#define I2C_0_F_REF                                 F_REF
-#define I2C_0_CLK_SOURCE                            0
-#define I2C_0_RUN_IN_STANDBY                        0
-#define I2C_0_START_HOLD_TIME                        SERCOM_I2CM_CTRLA_SDAHOLD(2) //I2C_MASTER_START_HOLD_TIME_300NS_600NS
-#define I2C_BUFFER_TIMEOUT                            65535
-#define I2C_UNKNOWN_BUS_STATE_TIMEOUT                65535
-#define I2C_SCL_LOW_TIMEOUT                            0
-#define I2C_INACTIVE_TIMEOUT                        SERCOM_I2CM_CTRLA_INACTOUT(0) // I2C_MASTER_INACTIVE_TIMEOUT_DISABLED
-
-
-/*I2C pinmux*/
-#define I2C_PINMUX_DEV                                (PORT->Group[0])
-#define I2C_PINMUX_PAD0_PIN                         PIN_PA16
-#define I2C_PINMUX_PAD0_MUXPOSITION                    (I2C_PINMUX_PAD0_PIN & 0xFFFF)
-#define I2C_PINMUX_PAD1_PIN                            PIN_PA17
-#define I2C_PINMUX_PAD1_MUXPOSITION                    (I2C_PINMUX_PAD1_PIN & 0xFFFF)
-
-//#define I2C_0_PINS         (PORT_PA16 | PORT_PA17)
-
-#define I2C_PINMUX_MUXPOSITION                        (1 << 7) //SYSTEM_PINMUX_GPIO    
-#define I2C_PINMUX_DIRECTION                        2 //SYSTEM_PINMUX_PIN_DIR_OUTPUT_WITH_READBACK//0 //SYSTEM_PINMUX_PIN_DIR_INPUT
-#define I2C_PINMUX_INPUT_PULL                        1 //SYSTEM_PINMUX_PIN_PULL_UP
-#define I2C_PINMUX_POWERSAVE                        0
-
-#define FEATURE_I2C_FAST_MODE_PLUS_AND_HIGH_SPEED    0 //1
-#define FEATURE_I2C_SCL_STRETCH_MODE                 0 //1
-#define FEATURE_I2C_SCL_EXTEND_TIMEOUT                 0 //1
-
-#ifdef FEATURE_I2C_SCL_STRETCH_MODE
-#define I2C_scl_stretch_only_after_ack_bit             0
-#endif
-#ifdef FEATURE_I2C_SCL_EXTEND_TIMEOUT
-#define I2C_slave_scl_low_extend_timeout             0
-#define I2C_master_scl_low_extend_timeout             0
-#endif
-#define I2C_0_BAUDRATE                                100 // 100KHz
-#define I2C_0_TRANSFER_SPEED                        SERCOM_I2CM_CTRLA_SPEED(0) //I2C_MASTER_SPEED_STANDARD_AND_FAST
-#ifdef FEATURE_I2C_FAST_MODE_PLUS_AND_HIGH_SPEED
-#define I2C_0_HS_BAUDRATE                            3400
-#endif     
-
-
-/** @} */
-
 /**
  * @ ADC Configuration
  * @{
@@ -342,6 +262,28 @@ extern "C" {
 /** @} */
 
 /**
+ * @name I2C configuration
+ * @{
+ */
+#define I2C_NUMOF          (1U)
+#define I2C_0_EN            1
+#define I2C_1_EN            0
+#define I2C_2_EN            0
+#define I2C_3_EN            0
+#define I2C_IRQ_PRIO        1
+
+#define I2C_0_DEV           SERCOM3->I2CM
+#define I2C_0_IRQ           SERCOM3_IRQn
+#define I2C_0_ISR           isr_sercom3
+/* I2C 0 pin configuration */
+#define I2C_0_PORT          (PORT->Group[0])
+#define I2C_SDA             PIN_PA16
+#define I2C_SCL             PIN_PA17
+#define I2C_0_PINS          (PORT_PA16 | PORT_PA17)
+/* Default Clock Source on reset OSC8M - 8MHz */
+#define I2C_0_REF_F         (8000000UL)
+
+/**
  * @name Random Number Generator configuration
  * @{
  */
@@ -385,7 +327,7 @@ extern "C" {
 /* GPIO channel 2 config */
 #define GPIO_2_DEV         //PORT->Group[0]
 #define GPIO_2_PIN         //(15)
-#define GPIO_2_EXTINT      //(15)
+#define GPIO_2_EXTINT       15
 /* GPIO channel 3 config */
 #define GPIO_3_DEV         PORT->Group[0]
 #define GPIO_3_PIN         (19)

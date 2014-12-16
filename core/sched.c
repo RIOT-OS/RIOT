@@ -172,7 +172,7 @@ NORETURN void sched_task_exit(void)
 {
     DEBUG("sched_task_exit: ending thread %" PRIkernel_pid "...\n", sched_active_thread->pid);
 
-    dINT();
+    (void) disableIRQ();
     sched_threads[sched_active_pid] = NULL;
     sched_num_threads--;
 

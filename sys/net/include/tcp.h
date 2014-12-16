@@ -46,3 +46,4 @@ int tcp_init_transport_layer(void);
 #endif
 
 #endif /* TCP_H */
+/** @} */

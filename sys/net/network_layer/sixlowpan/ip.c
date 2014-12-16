@@ -36,7 +36,6 @@
 
 #define ENABLE_DEBUG    (0)
 #if ENABLE_DEBUG
-#define DEBUG_ENABLED
 char addr_str[IPV6_MAX_ADDR_STR_LEN];
 #endif
 #include "debug.h"
@@ -110,11 +109,12 @@ int ipv6_send_packet(ipv6_hdr_t *packet, ipv6_addr_t *next_hop)
 
         if (next_hop == NULL) {
             DEBUG("Trying to find the next hop for %s\n", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, &packet->destaddr));
-            ipv6_addr_t *dest = ip_get_next_hop(&packet->destaddr);
 
             if (ip_get_next_hop == NULL) {
                 return -1;
             }
+
+            ipv6_addr_t *dest = ip_get_next_hop(&packet->destaddr);
 
             if (dest == NULL) {
                 return -1;

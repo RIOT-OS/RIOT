@@ -90,7 +90,7 @@ int reboot_arch(int mode)
  */
 void thread_print_stack(void)
 {
-    DEBUG("XXX: thread_print_stack()\n");
+    DEBUG("thread_print_stack\n");
     return;
 }
 
@@ -102,7 +102,7 @@ char *thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_sta
     VALGRIND_STACK_REGISTER(stack_start, (char *) stack_start + stacksize);
     VALGRIND_DEBUG("VALGRIND_STACK_REGISTER(%p, %p)\n", stack_start, (void*)((int)stack_start + stacksize));
 
-    DEBUG("thread_stack_init()\n");
+    DEBUG("thread_stack_init\n");
 
     stk = (unsigned int *)stack_start;
 
@@ -116,7 +116,7 @@ char *thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_sta
 #endif
 
     if (getcontext(p) == -1) {
-        err(EXIT_FAILURE, "thread_stack_init(): getcontext()");
+        err(EXIT_FAILURE, "thread_stack_init: getcontext");
     }
 
     p->uc_stack.ss_sp = stk;
@@ -125,7 +125,7 @@ char *thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_sta
     p->uc_link = &end_context;
 
     if (sigemptyset(&(p->uc_sigmask)) == -1) {
-        err(EXIT_FAILURE, "thread_stack_init(): sigemptyset()");
+        err(EXIT_FAILURE, "thread_stack_init: sigemptyset");
     }
 
     makecontext(p, (void (*)(void)) task_func, 1, arg);
@@ -137,21 +137,21 @@ void isr_cpu_switch_context_exit(void)
 {
     ucontext_t *ctx;
 
-    DEBUG("XXX: isr_cpu_switch_context_exit()\n");
+    DEBUG("isr_cpu_switch_context_exit\n");
     if ((sched_context_switch_request == 1) || (sched_active_thread == NULL)) {
         sched_run();
     }
 
-    DEBUG("XXX: isr_cpu_switch_context_exit(): calling setcontext(%" PRIkernel_pid ")\n\n", sched_active_pid);
+    DEBUG("isr_cpu_switch_context_exit: calling setcontext(%" PRIkernel_pid ")\n\n", sched_active_pid);
     ctx = (ucontext_t *)(sched_active_thread->sp);
 
     /* the next context will have interrupts enabled due to ucontext */
-    DEBUG("XXX: isr_cpu_switch_context_exit: native_interrupts_enabled = 1;\n");
+    DEBUG("isr_cpu_switch_context_exit: native_interrupts_enabled = 1;\n");
     native_interrupts_enabled = 1;
     _native_in_isr = 0;
 
     if (setcontext(ctx) == -1) {
-        err(EXIT_FAILURE, "isr_cpu_switch_context_exit(): setcontext():");
+        err(EXIT_FAILURE, "isr_cpu_switch_context_exit: setcontext");
     }
     errx(EXIT_FAILURE, "2 this should have never been reached!!");
 }
@@ -160,7 +160,7 @@ void cpu_switch_context_exit(void)
 {
 #ifdef NATIVE_AUTO_EXIT
     if (sched_num_threads <= 1) {
-        DEBUG("cpu_switch_context_exit(): last task has ended. exiting.\n");
+        DEBUG("cpu_switch_context_exit: last task has ended. exiting.\n");
         real_exit(EXIT_SUCCESS);
     }
 #endif
@@ -185,16 +185,16 @@ void cpu_switch_context_exit(void)
 
 void isr_thread_yield(void)
 {
-    DEBUG("isr_thread_yield()\n");
+    DEBUG("isr_thread_yield\n");
 
     sched_run();
     ucontext_t *ctx = (ucontext_t *)(sched_active_thread->sp);
-    DEBUG("isr_thread_yield(): switching to(%" PRIkernel_pid ")\n\n", sched_active_pid);
+    DEBUG("isr_thread_yield: switching to(%" PRIkernel_pid ")\n\n", sched_active_pid);
 
     native_interrupts_enabled = 1;
     _native_in_isr = 0;
     if (setcontext(ctx) == -1) {
-        err(EXIT_FAILURE, "isr_thread_yield(): setcontext()");
+        err(EXIT_FAILURE, "isr_thread_yield: setcontext");
     }
 }
 
@@ -221,7 +221,7 @@ void thread_yield_higher(void)
 void native_cpu_init(void)
 {
     if (getcontext(&end_context) == -1) {
-        err(EXIT_FAILURE, "end_context(): getcontext()");
+        err(EXIT_FAILURE, "native_cpu_init: getcontext");
     }
 
     end_context.uc_stack.ss_sp = __end_stack;

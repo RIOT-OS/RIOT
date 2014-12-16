@@ -187,12 +187,10 @@ void lm75A_reset(void);
  *              This function prints the values of all registers over
  *              the rs232 interface.
  *
- * @param[in] external_interr_handler   pointer to an external task handler
- *                                      which is performed, if an external
- *                                      interrupt is occurred and the external
- *                                      subroutine is leaved. This parameter
- *                                      is optional, the NULL-value can be
- *                                      entered.
+ * @param[in] extern_interrupt_task  pointer to an external task handler that
+ *                                   is executed, if an external interrupt
+ *                                   occurrs left. This is an optional
+ *                                   parameter therefore NULL is a legal value.
  */
 void lm75A_start_sensor_sampling(void (*extern_interrupt_task)(void));
 

@@ -1,6 +1,7 @@
 INCLUDES += -I$(RIOTCPU)/lpc2387/include
 
 include $(RIOTCPU)/arm7_common/Makefile.include
-include $(RIOTCPU)/lpc_common/Makefile.include
 
-export USEMODULE += arm7_common lpc_common periph
+export UNDEF += $(BINDIR)cpu/lpc_syscalls.o
+
+export USEMODULE += arm7_common periph

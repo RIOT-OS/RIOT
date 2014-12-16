@@ -22,7 +22,7 @@
 #include "ringbuffer.h"
 #include "mutex.h"
 
-#include "tests-lib.h"
+#include "tests-core.h"
 
 /* (ITERATIONS * (BUF_SIZE + 1)) needs to be <= 127! Otherwise `char` overflows. */
 #define ITERATIONS 15
@@ -106,7 +106,7 @@ static void *run_get(void *arg)
     return NULL;
 }
 
-static void tests_lib_ringbuffer(void)
+static void tests_core_ringbuffer(void)
 {
     pid_add = sched_active_pid;
     pid_get = thread_create(stack_get, sizeof (stack_get),
@@ -115,10 +115,10 @@ static void tests_lib_ringbuffer(void)
     run_add();
 }
 
-Test *tests_lib_ringbuffer_tests(void)
+Test *tests_core_ringbuffer_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
-        new_TestFixture(tests_lib_ringbuffer),
+        new_TestFixture(tests_core_ringbuffer),
     };
 
     EMB_UNIT_TESTCALLER(ringbuffer_tests, NULL, NULL, fixtures);

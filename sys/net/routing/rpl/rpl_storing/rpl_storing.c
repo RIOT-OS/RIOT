@@ -28,7 +28,6 @@
 
 #define ENABLE_DEBUG    (0)
 #if ENABLE_DEBUG
-#define DEBUG_ENABLED
 char addr_str_mode[IPV6_MAX_ADDR_STR_LEN];
 #endif
 #include "debug.h"
@@ -680,7 +679,7 @@ void rpl_recv_DAO_mode(void)
                     break;
                 }
 
-                len += rpl_opt_target_buf->length + 2;
+                len += rpl_opt_target_buf->length;
                 rpl_opt_transit_buf = get_rpl_opt_transit_buf(len);
 
                 if (rpl_opt_transit_buf->type != RPL_OPT_TRANSIT) {
@@ -693,8 +692,8 @@ void rpl_recv_DAO_mode(void)
                 /* route lifetime seconds = (DAO lifetime) * (Unit Lifetime) */
 
                 DEBUG("Adding routing information: Target: %s, Source: %s, Lifetime: %u\n",
-                      ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, &rpl_opt_target_buf->target),
-                      ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, &ipv6_buf->srcaddr),
+                      ipv6_addr_to_str(addr_str_mode, IPV6_MAX_ADDR_STR_LEN, &rpl_opt_target_buf->target),
+                      ipv6_addr_to_str(addr_str_mode, IPV6_MAX_ADDR_STR_LEN, &ipv6_buf->srcaddr),
                       (rpl_opt_transit_buf->path_lifetime * my_dodag->lifetime_unit));
                 rpl_add_routing_entry(&rpl_opt_target_buf->target, &ipv6_buf->srcaddr,
                         rpl_opt_transit_buf->path_lifetime * my_dodag->lifetime_unit);
@@ -851,7 +850,7 @@ void rpl_send(ipv6_addr_t *destination, uint8_t *payload, uint16_t p_len, uint8_
 
         if (next_hop == NULL) {
             if (i_am_root) {
-                DEBUGF("[Error] destination unknown: %s\n", ipv6_addr_to_str(addr_str,
+                DEBUGF("[Error] destination unknown: %s\n", ipv6_addr_to_str(addr_str_mode,
                         IPV6_MAX_ADDR_STR_LEN, &ipv6_send_buf->destaddr));
                 return;
             }

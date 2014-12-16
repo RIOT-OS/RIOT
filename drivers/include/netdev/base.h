@@ -60,14 +60,14 @@ typedef enum {
     /**
      * @brief   Radio frame protocol
      *
-     * @detail  Sends frames as defined by radio_packet_t.
+     * @details Sends frames as defined by radio_packet_t.
      */
     NETDEV_PROTO_RADIO          = 0x0001,
 
     /**
      * @brief   IEEE 802.15.4
      *
-     * @detail  Sends frames as defined by ieee802154_frame_t
+     * @details Sends frames as defined by ieee802154_frame_t
      */
     NETDEV_PROTO_802154         = 0x0002,
     NETDEV_PROTO_6LOWPAN        = 0x0003,   /**< 6LoWPAN. */
@@ -92,7 +92,7 @@ typedef enum {
     /**
      * @brief   Communication type for the device as defined by @ref netdev_proto_t
      *
-     * @detail  If a driver does not support the type (but the setting of the
+     * @details If a driver does not support the type (but the setting of the
      *          option is supported) it @ref netdev_driver_t::set_option() shall result
      *          with -EPROTONOSUPPORT.
      *
@@ -120,9 +120,9 @@ typedef enum {
                                          EUI-64 in IEEE 802.15.4) */
 
     /**
-     * @brief   Last value for @netdev_opt_t defined here
+     * @brief   Last value for @ref netdev_opt_t defined here
      *
-     * @detail  Specific devices or modules like @ref netapi that utilize these
+     * @details Specific devices or modules like @ref netapi that utilize these
      *          values to may define higher values, but they must be greater
      *          or equal to @ref NETDEV_OPT_LAST.
      */
@@ -192,7 +192,7 @@ typedef int (*netdev_rcv_data_cb_t)(netdev_t *dev, void *src, size_t src_len,
 /**
  * @brief   Network device API definition.
  *
- * @details  This is a set of functions that must be implemented by any driver
+ * @details This is a set of functions that must be implemented by any driver
  *           for a network device.
  */
 typedef struct {
@@ -328,7 +328,7 @@ typedef struct {
      *
      * @param[in] dev           the network device that fired the event.
      * @param[in] event_type    Event type. Values are free to choose for the
-     *                          driver. Must be given in the @ref msg_t::content::value
+     *                          driver. Must be given in the @ref msg_t::value
      *                          of the received message
      */
     void (*event)(netdev_t *dev, uint32_t event_type);

@@ -37,9 +37,9 @@ extern "C" {
 
 #ifndef PKTBUF_SIZE
 /**
- * @brief Maximum size of the packet buffer.
+ * @brief   Maximum size of the packet buffer.
  *
- * @detail  The rational here is to have at least space for 4 full-MTU IPv6
+ * @details The rational here is to have at least space for 4 full-MTU IPv6
  *          packages (2 incoming, 2 outgoing; 2 * 2 * 1280 B = 5 KiB) +
  *          Meta-Data (roughly estimated to 1 KiB; might be smaller)
  */
@@ -63,7 +63,7 @@ void *pktbuf_alloc(size_t size);
  * @brief   Reallocates new space in the packet buffer, without changing the
  *          content.
  *
- * @datail  If enough memory is available behind it or *size* is smaller than
+ * @details If enough memory is available behind it or *size* is smaller than
  *          the original size the packet will not be moved. Otherwise, it will
  *          be moved. If no space is available nothing happens.
  *
@@ -95,7 +95,7 @@ void *pktbuf_insert(const void *data, size_t size);
 /**
  * @brief   Copies packet data into the packet buffer, safely.
  *
- * @detail  Use this instead of memcpy, since it is thread-safe and checks if
+ * @details Use this instead of memcpy, since it is thread-safe and checks if
  *          *pkt* is
  *
  *          -# in the buffer at all
@@ -118,7 +118,7 @@ int pktbuf_copy(void *pkt, const void *data, size_t data_len);
 /**
  * @brief   Marks the data as being processed.
  *
- * @detail  Internally this increments just a counter on the data.
+ * @details Internally this increments just a counter on the data.
  *          @ref pktbuf_release() decrements it. If the counter is <=0 the
  *          reserved data block in the buffer will be made available again.
  *
@@ -131,7 +131,7 @@ void pktbuf_hold(const void *pkt);
  *
  * @param[in] pkt   The packet you want mark as not being processed anymore.
  *
- * @detail  Internally this decrements just a counter on the data.
+ * @details Internally this decrements just a counter on the data.
  *          @ref pktbuf_hold() increments and any allocation
  *          operation initializes it. If the counter is <=0 the reserved data
  *          block in the buffer will be made available again.
