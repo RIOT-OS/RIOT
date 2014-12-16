@@ -14,8 +14,8 @@
  *
  * @author Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
  *
- * @ingroup native_cpu
- * @defgroup native_rtc
+ * @ingroup _native_cpu
+ * @defgroup _native_rtc
  * @file
  */
 
@@ -32,21 +32,21 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-static int native_rtc_initialized = 0;
-static int native_rtc_powered = 0;
-static struct tm native_rtc_alarm;
-static rtc_alarm_cb_t native_rtc_alarm_callback;
-static void *native_rtc_alarm_argument;
+static int _native_rtc_initialized = 0;
+static int _native_rtc_powered = 0;
+static struct tm _native_rtc_alarm;
+static rtc_alarm_cb_t _native_rtc_alarm_callback;
+static void *_native_rtc_alarm_argument;
 
 void rtc_init(void)
 {
     DEBUG("rtc_init\n");
 
-    memset(&native_rtc_alarm, 0, sizeof(native_rtc_alarm));
-    native_rtc_alarm_callback = NULL;
-    native_rtc_alarm_argument = NULL;
+    memset(&_native_rtc_alarm, 0, sizeof(_native_rtc_alarm));
+    _native_rtc_alarm_callback = NULL;
+    _native_rtc_alarm_argument = NULL;
 
-    native_rtc_initialized = 1;
+    _native_rtc_initialized = 1;
     printf("Native RTC initialized.\n");
 
     rtc_poweron();
@@ -56,26 +56,26 @@ void rtc_poweron(void)
 {
     DEBUG("rtc_poweron\n");
 
-    if (!native_rtc_initialized) {
+    if (!_native_rtc_initialized) {
         warnx("rtc_poweron: not initialized");
         return;
     }
 
-    native_rtc_powered = 1;
+    _native_rtc_powered = 1;
 }
 
 void rtc_poweroff(void)
 {
     DEBUG("rtc_poweroff()\n");
 
-    if (!native_rtc_initialized) {
+    if (!_native_rtc_initialized) {
         warnx("rtc_poweroff: not initialized");
     }
-    if (!native_rtc_powered) {
+    if (!_native_rtc_powered) {
         warnx("rtc_poweroff: not powered on");
     }
 
-    native_rtc_powered = 0;
+    _native_rtc_powered = 0;
 }
 
 /* TODO: implement time setting using a delta */
@@ -85,11 +85,11 @@ int rtc_set_time(struct tm *ttime)
 
     DEBUG("rtc_set_time()\n");
 
-    if (!native_rtc_initialized) {
+    if (!_native_rtc_initialized) {
         warnx("rtc_set_time: not initialized");
         return -1;
     }
-    if (!native_rtc_powered) {
+    if (!_native_rtc_powered) {
         warnx("rtc_set_time: not powered on");
         return -1;
     }
@@ -103,11 +103,11 @@ int rtc_get_time(struct tm *ttime)
 {
     time_t t;
 
-    if (!native_rtc_initialized) {
+    if (!_native_rtc_initialized) {
         warnx("rtc_get_time: not initialized");
         return -1;
     }
-    if (!native_rtc_powered) {
+    if (!_native_rtc_powered) {
         warnx("rtc_get_time: not powered on");
         return -1;
     }
@@ -130,16 +130,16 @@ int rtc_set_alarm(struct tm *time, rtc_alarm_cb_t cb, void *arg)
     (void) cb;
     (void) arg;
 
-    if (!native_rtc_initialized) {
+    if (!_native_rtc_initialized) {
         warnx("rtc_set_alarm: not initialized");
         return -1;
     }
-    if (!native_rtc_powered) {
+    if (!_native_rtc_powered) {
         warnx("rtc_set_alarm: not powered on");
         return -1;
     }
 
-    memcpy(&native_rtc_alarm, time, sizeof(native_rtc_alarm));
+    memcpy(&_native_rtc_alarm, time, sizeof(_native_rtc_alarm));
 
     warnx("rtc_set_alarm: not implemented");
 
@@ -150,16 +150,16 @@ int rtc_get_alarm(struct tm *time)
 {
     (void) time;
 
-    if (!native_rtc_initialized) {
+    if (!_native_rtc_initialized) {
         warnx("rtc_get_alarm: not initialized");
         return -1;
     }
-    if (!native_rtc_powered) {
+    if (!_native_rtc_powered) {
         warnx("rtc_get_alarm: not powered on");
         return -1;
     }
 
-    memcpy(time, &native_rtc_alarm, sizeof(native_rtc_alarm));
+    memcpy(time, &_native_rtc_alarm, sizeof(_native_rtc_alarm));
 
     return 0;
 }
@@ -170,12 +170,12 @@ void rtc_clear_alarm(void)
 {
     DEBUG("rtc_clear_alarm()\n");
 
-    if (!native_rtc_initialized) {
+    if (!_native_rtc_initialized) {
         warnx("rtc_clear_alarm: not initialized");
     }
-    if (!native_rtc_powered) {
+    if (!_native_rtc_powered) {
         warnx("rtc_clear_alarm: not powered on");
     }
 
-    memset(&native_rtc_alarm, 0, sizeof(native_rtc_alarm));
+    memset(&_native_rtc_alarm, 0, sizeof(_native_rtc_alarm));
 }
