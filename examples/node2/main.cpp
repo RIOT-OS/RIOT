@@ -67,22 +67,20 @@ int main(void)
                                                        "node_udp_thread");
 
     payload_thread_pid = thread_create(payload_buffer,
-                                                   sizeof(payload_buffer),
-                                                   PRIORITY_MAIN -2, CREATE_STACKTEST,
-                                                   node_payload_thread,
-                                                   NULL,
-                                                   "node_payload_thread");
+                                                       sizeof(payload_buffer),
+                                                       PRIORITY_MAIN -2, CREATE_STACKTEST,
+                                                       node_payload_thread,
+                                                       NULL,
+                                                       "node_payload_thread");
 
 
     //thread_wakeup(udp_node_thread_pid);
-    shell_t shell;
-    shell_init(&shell, NULL, UART0_BUFSIZE, uart0_readc, uart0_putc);
+    //shell_t shell;
+    //shell_init(&shell, NULL, UART0_BUFSIZE, uart0_readc, uart0_putc);
 
-    shell_run(&shell);
+    //shell_run(&shell);
 
-    while(1){
-      
-    };
+    while(1){};
 
     return 0;
 }

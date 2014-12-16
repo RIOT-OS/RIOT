@@ -30,7 +30,7 @@
 #include "node.h"
 #include "sensor_driver.h"
 #include "configuration.h" 
-#define ENABLE_DEBUG    (1)
+#define ENABLE_DEBUG    (0)
 #include "debug.h"
 #define SERVER_PORT     (0xFF01)
 
@@ -82,9 +82,6 @@ void *node_payload_thread(void *arg)
             DEBUG("%s\n", "node_payload_thread: msg_send == 0. ");
             sleep(SLEEP_SECONDS);
         }
-        //  for(int i = 0; i < 10; i++){
-        //  vtimer_usleep(500000);
-        // }
     }
     return NULL;
 }
