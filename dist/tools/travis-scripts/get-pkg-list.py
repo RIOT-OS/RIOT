@@ -29,6 +29,10 @@ known_mcu_groups = arm_mcu_groups + msp_mcu_groups + x86_mcu_groups + \
     avr8_mcu_groups + static_tests_groups
 
 common_pkgs = ["pcregrep", "libpcre3", "python3"]
+
+# testing the relic pkg and its RIOT specific unit test requires cmake
+common_pkgs = common_pkgs + ["cmake"]
+
 arm_pkgs = ["gcc-arm-none-eabi"]
 msp_pkgs = ["gcc-msp430"]
 x86_pkgs = ["qemu-system-x86", "g++-multilib", "gcc-multilib",

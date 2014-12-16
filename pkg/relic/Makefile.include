@@ -1,0 +1,1 @@
+INCLUDES += -I$(RIOTBASE)/pkg/relic/relic/$(BOARD)/include
