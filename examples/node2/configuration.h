@@ -22,7 +22,7 @@
 #define MSG_RCV_BUFFER_SIZE 64
 
 /* Sleep definitions for transmission interval */
-#define SLEEP_SECONDS 10 // 5 seconds
+#define SLEEP_SECONDS 45
 /*^^^^^^^^^^^ Transmission Settings ^^^^^^^^^^^*/
 
 /*----------- ADC Weight Settings -----------*/

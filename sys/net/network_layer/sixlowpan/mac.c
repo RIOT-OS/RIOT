@@ -285,9 +285,11 @@ int sixlowpan_mac_send_data(int if_id,
 {
 
     if (mcast) {
+        printf("%s\n", "\n sixlowpan_mac_send_data mcast \n");
         return net_if_send_packet_broadcast(IEEE_802154_SHORT_ADDR_M,
                                             payload,
                                             payload_len);
+
     }
     else {
         if (dest_len == 8) {
@@ -310,6 +312,7 @@ int sixlowpan_mac_send_ieee802154_frame(int if_id,
 {
     if (net_if_get_interface(if_id) &&
         net_if_get_interface(if_id)->transceivers & IEEE802154_TRANSCEIVER) {
+        
         return sixlowpan_mac_send_data(if_id, dest, dest_len, payload,
                                        payload_len, mcast);
     }

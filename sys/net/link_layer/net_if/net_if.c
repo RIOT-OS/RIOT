@@ -266,7 +266,6 @@ uint32_t net_if_transceiver_get_set_handler(int if_id, uint16_t op_type,
     msg.content.ptr = (char *)&tcmd;
     msg.type = op_type;
     msg_send_receive(&msg, &msg, transceiver_pid);
-
     return msg.content.value;
 }
 
@@ -347,8 +346,6 @@ int net_if_send_packet(int if_id, uint16_t target, const void *payload,
         p.dst = target;
         response = net_if_transceiver_get_set_handler(if_id, SND_PKT, (void *)&p);
     }
-
-    DEBUG("\n\nnet_if_send_packet END\n\n");
     return (response > payload_len) ? (int)payload_len : (int)response;
 }
 

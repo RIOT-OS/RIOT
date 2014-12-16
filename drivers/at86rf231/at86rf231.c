@@ -137,7 +137,10 @@ int at86rf231_on(void)
 
     /* change into reception mode */
     at86rf231_switch_to_rx();
-
+    #ifdef AT86RF233
+    at86rf231_reg_write(AT86RF233_TRX_RPC, AT86RF233_TRX_RPC_EN);
+    #endif
+    at86rf231_reg_write(AT86RF231_REG__TRX_CTRL_2, AT86RF231_TRX_CTRL_2_MASK__RX_SAFE_MODE);
     return 1;
 }
 

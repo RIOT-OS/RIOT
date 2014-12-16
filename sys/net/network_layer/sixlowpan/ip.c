@@ -148,7 +148,6 @@ int ipv6_send_packet(ipv6_hdr_t *packet, ipv6_addr_t *next_hop)
                 /* return -1; */
             }
         }
-
         return length;
     }
 }

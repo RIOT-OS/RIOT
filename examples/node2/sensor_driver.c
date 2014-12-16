@@ -89,7 +89,19 @@ uint32_t getWeightValueFromAdcInput(uint32_t adcValue)
 double getBatteryValueFromAdcInput(int adcValue)
 {
     DEBUG("\nNot implemented!\n");
-    return 0.0;
+    return 99.0;
+};
+
+double getTemperatureValueFromI2cInput(int i2cValue)
+{
+    DEBUG("\nNot implemented!\n");
+    return 34.0;
+};
+
+double getHumidityValueFromI2cInput(int i2cValue)
+{
+    DEBUG("\nNot implemented!\n");
+    return 65.0;
 };
 
 void setWeightTara(void)

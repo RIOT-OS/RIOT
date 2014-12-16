@@ -815,7 +815,6 @@ static int8_t send_packet(transceiver_type_t t, void *pkt)
             puts("Unknown transceiver");
             break;
     }
-
     return res;
 }
 

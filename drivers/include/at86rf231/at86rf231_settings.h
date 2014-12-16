@@ -249,6 +249,17 @@ enum at86rf231_csma_seed_1 {
     AT86RF231_CSMA_SEED_1__AACK_I_AM_COORD = 0x08,
 };
 
+#define AT86RF233 //DEFINE ELSEWHERE 
+#ifdef AT86RF233
+/* 233 Options */
+enum at86rf233_register {
+    AT86RF233_TRX_RPC = 0x16,
+};
+enum at86rf233_trx_rpc {
+    AT86RF233_TRX_RPC_EN = 0xff//(1 << 5)
+};
+#endif
+
 #ifdef __cplusplus
 }
 #endif

@@ -199,7 +199,6 @@ int32_t udp_sendto(int s, const void *buf, uint32_t len, int flags,
                                        (uint8_t *) current_udp_packet,
                                        UDP_HDR_LEN + len,
                                        IPPROTO_UDP);
-
         return ipv6_sendto(&to->sin6_addr, IPPROTO_UDP,
                            (uint8_t *)(current_udp_packet),
                            NTOHS(current_udp_packet->length), NULL);
