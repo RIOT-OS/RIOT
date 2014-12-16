@@ -51,7 +51,7 @@ static void *_event_handler(void *args)
 
     (void)args;
 
-    dev->driver->set_event_handler(dev, thread_getpid());
+    dev->driver->init(dev);
 
     while (msg.type != NETDEV_MSG_EVENT_TYPE) {
         msg_receive(&msg);
@@ -73,10 +73,10 @@ static void *_event_handler(void *args)
 static void set_up(void)
 {
     unittest_netdev_dummy_init();
-    dev->driver->init(dev);
     event_handler = thread_create(event_handler_stack, sizeof(event_handler_stack),
                                   PRIORITY_MAIN - 1, CREATE_STACKTEST, _event_handler, NULL,
                                   "netdev_dummy_event_handler");
+    thread_yield_higher();
 }
 
 static void tear_down(void)

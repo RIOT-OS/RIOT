@@ -48,7 +48,6 @@ typedef struct {
     _unittest_test_buffer rx_buffer;
     _unittest_test_buffer tx_buffer;
     uint32_t last_event;
-    kernel_pid_t event_handler;
 } _ut_dev_internal;
 
 netdev_t unittest_netdev_dummy_devs[UNITTESTS_NETDEV_DUMMY_MAX_DEV];
@@ -76,6 +75,8 @@ static int _init(netdev_t *dev)
         return -ENODEV;
     }
 
+    dev->type = NETDEV_TYPE_BASE;
+    dev->event_handler = thread_getpid();
     _NETDEV_MORE(dev)->channel = 0;
     _NETDEV_MORE(dev)->nid = 0;
     _NETDEV_MORE(dev)->state = 0;
@@ -607,15 +608,6 @@ static void _event(netdev_t *dev, uint32_t event_type)
     }
 }
 
-static void _set_event_handler(netdev_t *dev, kernel_pid_t event_handler)
-{
-    if (_find_dev(dev) < 0) {
-        return;
-    }
-
-    _NETDEV_MORE(dev)->event_handler = event_handler;
-}
-
 const netdev_driver_t unittest_netdev_dummy_driver = {
     _init,
     _send_data,
@@ -626,7 +618,6 @@ const netdev_driver_t unittest_netdev_dummy_driver = {
     _get_state,
     _set_state,
     _event,
-    _set_event_handler,
 };
 
 int unittest_netdev_dummy_fire_rcv_event(netdev_t *dev, void *src,
@@ -637,7 +628,7 @@ int unittest_netdev_dummy_fire_rcv_event(netdev_t *dev, void *src,
         return -ENODEV;
     }
 
-    if (_NETDEV_MORE(dev)->event_handler != KERNEL_PID_UNDEF) {
+    if (dev->event_handler != KERNEL_PID_UNDEF) {
         msg_t msg;
 
         if ((src_len != UNITTESTS_NETDEV_DUMMY_MAX_LONG_ADDR_LEN &&
@@ -666,7 +657,7 @@ int unittest_netdev_dummy_fire_rcv_event(netdev_t *dev, void *src,
         msg.type = NETDEV_MSG_EVENT_TYPE;
         msg.content.value = _NETDEV_EVENT_RX;
 
-        msg_send_int(&msg, _NETDEV_MORE(dev)->event_handler);
+        msg_send_int(&msg, dev->event_handler);
 
         thread_yield_higher();
     }
@@ -714,7 +705,6 @@ void unittest_netdev_dummy_init(void)
 {
     for (int i = 0; i < UNITTESTS_NETDEV_DUMMY_MAX_DEV; i++) {
         netdev_t *dev = &(unittest_netdev_dummy_devs[i]);
-        dev->type = NETDEV_TYPE_BASE;
         dev->driver = &unittest_netdev_dummy_driver;
         dev->more = &(_netdevs_internal[i]);
     }
