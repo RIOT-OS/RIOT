@@ -15,9 +15,15 @@
  * @file
  * @brief       Low-level I2C peripheral driver interface definition
  *
- *              The I2C signal lines SDA/SCL need external pull-up resistors which connect 
- *              the lines to the positive voltage supply Vcc. The minimum and maximum 
- *              resistances are computed by:
+ *              The I2C signal lines SDA/SCL need external pull-up resistors which connect
+ *              the lines to the positive voltage supply Vcc. The I2C driver implementation
+ *              should enable the pin's internal pull-up resistors. There are however some
+ *              use cases for which the internal pull resistors are not strong enough and the
+ *              I2C bus will show faulty behavior. This can for example happen when connecting
+ *              a logic analyzer which will raise the capacitance of the bus. In this case you
+ *              should make sure you connect external pull-up resistors to both I2C bus lines.
+ *
+ *              The minimum and maximum resistances are computed by:
  *              \f{eqnarray*}{
  *              R_{min} &=& \frac{V_{DD} - V_{OL(max)}} {I_{OL}}\\
  *              R_{max} &=& \frac{t_r} {(0.8473 \cdot C_b)}
@@ -36,7 +42,7 @@
  *              For more details refer to section 7.1 in:<br>
  *              http://www.nxp.com/documents/user_manual/UM10204.pdf
  *
- * @note        The current version of this interface only supports the 
+ * @note        The current version of this interface only supports the
                 7-bit addressing mode.
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
