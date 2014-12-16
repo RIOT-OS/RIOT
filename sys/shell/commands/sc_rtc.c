@@ -45,26 +45,28 @@ static int dow(int year, int month, int day)
 
 static int _parse_time(char **argv, struct tm *time)
 {
-    short i1, i2, i3;
+    short i;
     char *end;
 
-    i1 = strtol(argv[0], &end, 10);
-    i2 = strtol(end + 1, &end, 10);
-    i3 = strtol(end + 1, &end, 10);
+    i = strtol(argv[0], &end, 10);
+    time->tm_year = i - 1900;
 
-    time->tm_year = i1 - 1900;
-    time->tm_mon = i2 - 1;
-    time->tm_mday = i3;
-    time->tm_wday = dow(i1, i2, i3);
+    i = strtol(end + 1, &end, 10);
+    time->tm_mon = i - 1;
 
-    i1 = strtol(argv[1], &end, 10);
-    i2 = strtol(end + 1, &end, 10);
-    i3 = strtol(end + 1, &end, 10);
+    i = strtol(end + 1, &end, 10);
+    time->tm_mday = i;
 
-    time->tm_hour = i1;
-    time->tm_min = i2;
-    time->tm_sec = i3;
+    i = strtol(argv[1], &end, 10);
+    time->tm_hour = i;
 
+    i = strtol(end + 1, &end, 10);
+    time->tm_min = i;
+
+    i = strtol(end + 1, &end, 10);
+    time->tm_sec = i;
+
+    time->tm_wday = dow(time->tm_year + 1900, time->tm_mon + 1, time->tm_mday);
     time->tm_isdst = -1; /* undefined */
 
     return 0;
