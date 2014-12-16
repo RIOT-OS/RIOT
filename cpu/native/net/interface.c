@@ -53,6 +53,10 @@ _nativenet_netdev_more_t _nativenet_default_dev_more;
 
 int _nativenet_init(netdev_t *dev)
 {
+    if (dev == NULL) {
+        return -ENODEV;
+    }
+
 #ifdef MODULE_NETDEV_BASE
 
     if (dev->driver != &nativenet_driver) {
