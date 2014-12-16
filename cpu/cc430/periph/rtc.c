@@ -8,8 +8,8 @@
  */
 
 /**
- * @ingroup rtc
- * @file        cc430-rtc.c
+ * @ingroup driver_periph_rtc
+ * @file
  * @brief       CC430 real time clock implementation
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  */
@@ -20,50 +20,44 @@
 #include "cpu.h"
 #include "cc430-rtc.h"
 
-//static volatile time_t epoch;
+/* Alarm callback */
+static rtc_alarm_cb_t _cb;
+
+/* Argument to alarm callback */
+static void *_cb_arg;
+
 static struct tm time_to_set;
 static int set_time = 0;
 kernel_pid_t rtc_second_pid = KERNEL_PID_UNDEF;
 
-/*---------------------------------------------------------------------------*/
 void rtc_init(void)
 {
     /* Set to calendar mode */
     RTCCTL1 |= RTCMODE_H;
 }
 
-/*---------------------------------------------------------------------------*/
-void rtc_enable(void)
+void rtc_poweron(void)
 {
     /* Set RTC operational */
     RTCCTL1 &= ~RTCHOLD_H;
 }
-/*---------------------------------------------------------------------------*/
-void rtc_disable(void)
+void rtc_poweroff(void)
 {
     /* Stop RTC */
     RTCCTL1 |= RTCHOLD_H;
 }
-/*---------------------------------------------------------------------------*/
-void rtc_set_localtime(struct tm *localt)
+
+int rtc_set_time(struct tm *localt)
 {
     if (localt == NULL) {
-        return;
+        return -1;
     }
 
     /* copy time to be set */
     memcpy(&time_to_set, localt, sizeof(struct tm));
     set_time = 1;
+    return 0;
 }
-
-/*---------------------------------------------------------------------------
-void rtc_set(time_t time) {
-    struct tm* localt;
-    localt = localtime(&time);                      // convert seconds to broken-down time
-    rtc_set_localtime(localt);
-    epoch = time - localt->tm_sec - localt->tm_min * 60;
-}
-*/
 
 /*---------------------------------------------------------------------------
 time_t rtc_time(void) {
@@ -74,15 +68,15 @@ time_t rtc_time(void) {
     return sec;
 }
 */
-/*---------------------------------------------------------------------------*/
-void rtc_get_localtime(struct tm *localt)
+
+int rtc_get_time(struct tm *localt)
 {
     uint8_t success = 0;
     uint8_t i;
     uint16_t tmpyear;
 
     if (localt == NULL) {
-        return;
+        return -1;
     }
 
     while (!success) {
@@ -129,36 +123,53 @@ void rtc_get_localtime(struct tm *localt)
             }
         }
     }
+
+    return 0;
 }
 
-/*---------------------------------------------------------------------------*/
-void rtc_set_alarm(struct tm *localt, rtc_alarm_mask_t mask)
+int rtc_set_alarm(struct tm *localt, rtc_alarm_cb_t cb, void *arg)
 {
-    if (mask & RTC_ALARM_MIN) {
+    if (localt != NULL) {
         RTCAMIN = localt->tm_min;
         RTCAMIN |= BIT7;
-    }
-
-    if (mask & RTC_ALARM_HOUR) {
         RTCAHOUR = localt->tm_hour;
         RTCAHOUR |= BIT7;
-    }
-
-    if (mask & RTC_ALARM_DOW) {
         RTCADOW = localt->tm_wday;
         RTCADOW |= BIT7;
-    }
-
-    if (mask & RTC_ALARM_DOM) {
         RTCADAY = localt->tm_mday;
         RTCADAY |= BIT7;
+
+        RTCCTL0 |= RTCAIE;
+        return 0;
     }
 
-    RTCCTL0 |= RTCAIE;
+    else if (cb == NULL) {
+        return -1;
+    }
+
+    return -2;
 }
 
-/*---------------------------------------------------------------------------*/
-void rtc_remove_alarm(void)
+int rtc_get_alarm(struct tm *localt)
+{
+     if (localt != NULL) {
+        localt->tm_sec = -1;
+        localt->tm_min = RTCAMIN;
+        localt->tm_hour = RTCAHOUR;
+        localt->tm_mday = -1;
+        localt->tm_wday = RTCADOW;
+        localt->tm_yday = -1;
+        localt->tm_mon = - 1;
+        localt->tm_year = -1;
+        localt->tm_isdst = -1; /* not available */
+
+        return 0;
+    }
+
+    return -1;
+}
+
+void rtc_clear_alarm(void)
 {
     /* reset all AE bits */
     RTCAHOUR &= ~BIT7;
@@ -169,7 +180,7 @@ void rtc_remove_alarm(void)
     /* reset alarm interrupt enable */
     RTCCTL0 &= ~RTCAIE;
 }
-/*---------------------------------------------------------------------------*/
+
 interrupt(RTC_VECTOR) __attribute__((naked)) rtc_isr(void)
 {
     __enter_isr();
@@ -194,12 +205,15 @@ interrupt(RTC_VECTOR) __attribute__((naked)) rtc_isr(void)
 
         if (rtc_second_pid != KERNEL_PID_UNDEF) {
             static msg_t m;
-            m.type = RTC_SECOND;
+            m.type = RTCSEC;
             msg_send_int(&m, rtc_second_pid);
         }
     }
     /* RTC alarm */
     else if (RTCIV == RTC_RTCAIFG) {
+        if (_cb) {
+            _cb(_cb_arg);
+        }
     }
 
     __exit_isr();

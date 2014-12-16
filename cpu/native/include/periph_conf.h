@@ -27,6 +27,13 @@
 #define RANDOM_NUMOF        (1U)
 /** @} */
 
+/**
+ * @name RealTime Clock configuration
+ * @{
+ */
+#define RTC_NUMOF (1)
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif

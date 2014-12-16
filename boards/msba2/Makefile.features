@@ -1,1 +1,1 @@
-FEATURES_PROVIDED += transceiver periph_pwm cpp
+FEATURES_PROVIDED += transceiver periph_pwm periph_rtc cpp
