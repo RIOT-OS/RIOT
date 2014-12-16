@@ -24,12 +24,13 @@
 #include <string.h>
 #include <err.h>
 
-#include "debug.h"
-
 #include "periph/rtc.h"
 #include "cpu.h"
 
 #include "native_internal.h"
+
+#define ENABLE_DEBUG (0)
+#include "debug.h"
 
 static int native_rtc_initialized = 0;
 static int native_rtc_powered = 0;
