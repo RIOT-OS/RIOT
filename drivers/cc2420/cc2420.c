@@ -17,6 +17,7 @@
 #include "kernel_types.h"
 #include "netdev/802154.h"
 #include "netdev/base.h"
+#include "thread.h"
 #include "transceiver.h"
 
 #define ENABLE_DEBUG    (0)
@@ -35,13 +36,18 @@
 /* default source address length for sending in number of byte */
 static size_t _default_src_addr_len = 2;
 
-/* TODO: allow for multiple devices */
-static kernel_pid_t cc2420_netdev_event_handler = KERNEL_PID_UNDEF;
-
 /* implementation of driver's functions */
 
 int cc2420_initialize(netdev_t *dev)
 {
+    if (dev == NULL || dev->driver != ((netdev_driver_t *)(&cc2420_driver))) {
+        return -ENODEV;
+    }
+
+    dev->type = NETDEV_TYPE_802154;
+    dev->more = NULL;
+    dev->event_handler = thread_getpid();
+
     cc2420_spi_init();
     hwtimer_wait(CC2420_WAIT_TIME);
     cc2420_reset();
@@ -97,7 +103,7 @@ int cc2420_initialize(netdev_t *dev)
 void cc2420_init(kernel_pid_t tpid)
 {
     transceiver_pid = tpid;
-    cc2420_initialize(NULL); /* TODO: actually use netdev */
+    cc2420_initialize(&cc2420_netdev);
 }
 #endif
 
@@ -162,7 +168,7 @@ void cc2420_rx_irq(void)
     msg_t msg;
     msg.type = NETDEV_MSG_EVENT_TYPE;
     msg.content.value = CC2420_NETDEV_EVENT_RX;
-    msg_send_int(&msg, cc2420_netdev_event_handler);
+    msg_send_int(&msg, cc2420_netdev.event_handler);
 #endif
 }
 
@@ -180,12 +186,6 @@ void cc2420_event(netdev_t *dev, uint32_t event_type)
 
             break;
     }
-}
-
-void cc2420_set_event_handler(netdev_t *dev, kernel_pid_t event_handler)
-{
-    (void)dev;
-    cc2420_netdev_event_handler = event_handler;
 }
 
 void cc2420_set_monitor(int mode)
@@ -776,7 +776,6 @@ const netdev_802154_driver_t cc2420_driver = {
     cc2420_get_state,
     cc2420_set_state,
     cc2420_event,
-    cc2420_set_event_handler,
     cc2420_load_tx_buf,
     cc2420_transmit_tx_buf,
     netdev_802154_send,
@@ -785,4 +784,4 @@ const netdev_802154_driver_t cc2420_driver = {
     cc2420_channel_clear,
 };
 
-netdev_t cc2420_netdev = { NETDEV_TYPE_802154, (netdev_driver_t *) &cc2420_driver, NULL };
+netdev_t cc2420_netdev = { NETDEV_TYPE_802154, (netdev_driver_t *) &cc2420_driver, KERNEL_PID_UNDEF, NULL };
