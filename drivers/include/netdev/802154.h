@@ -212,11 +212,6 @@ typedef struct {
     void (*event)(netdev_t *dev, uint32_t event_type);
 
     /**
-     * @see netdev_driver_t::set_event_handler
-     */
-    void (*set_event_handler)(netdev_t *dev, kernel_pid_t event_handler);
-
-    /**
      * @brief Load the transceiver TX buffer with the given
      *        IEEE 802.15.4 packet.
      *

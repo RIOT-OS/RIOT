@@ -200,6 +200,10 @@ typedef struct {
     /**
      * @brief Initialize a given network device.
      *
+     * @details While netdev_t::driver must always be initialized statically
+     *          all other members of netdev_t shall always be set in
+     *          netdev_driver_t::init().
+     *
      * @param[in] dev           the device to initialize
      *
      * @return  0 on success
@@ -333,11 +337,6 @@ typedef struct {
      *                          of the received message
      */
     void (*event)(netdev_t *dev, uint32_t event_type);
-
-    /**
-     * @brief   Overrides event handler for @p dev
-     */
-    void (*set_event_handler)(netdev_t *dev, kernel_pid_t event_handler);
 } netdev_driver_t;
 
 /**
@@ -349,6 +348,8 @@ typedef struct {
 struct netdev_t {
     netdev_type_t type;                 /**< The type of this device */
     const netdev_driver_t *driver;      /**< The driver for this device */
+    kernel_pid_t event_handler;         /**< Thread that gets to be notified on
+                                             a hardware event. */
     void *more;                         /**< Pointer to device dependent
                                              additional information. E.g. the
                                              low-level device(s) to
