@@ -257,7 +257,7 @@ void _transceiver_send_handler(int argc, char **argv)
         p.frame.dest_pan_id = atoi(argv[3]);
     }
     else {
-        p.frame.dest_pan_id = 1;
+        p.frame.dest_pan_id = IEEE_802154_DEFAULT_PAN_ID;
     }
 #else
     p.data = (uint8_t *) text_msg;
