@@ -22,7 +22,6 @@
 
 #include <stdint.h>
 
-#include "kernel_types.h"
 #include "netdev/base.h"
 
 #ifdef __cplusplus

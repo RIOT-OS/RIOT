@@ -245,7 +245,6 @@ const netdev_driver_t cc110x_net_driver = {
     _cc110x_get_state,
     _cc110x_set_state,
     _cc110x_event,
-    NULL,
 };
 
 netdev_t cc110x_dev = {NETDEV_TYPE_BASE, &cc110x_net_driver, 0};
