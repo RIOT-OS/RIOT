@@ -78,11 +78,11 @@ typedef enum __attribute__((packed)) {
  */
 typedef struct __attribute__((packed)) ndp_prefix_info_t {
     /**
-     * @brief The next on the interface. Intialise with NULL
+     * @brief The next on the interface. Initialize with NULL
      */
     struct ndp_prefix_info_t *addr_next;
     /**
-     * @brief The prev address on the interface. Initialise with NULL
+     * @brief The prev address on the interface. Initialize with NULL
      */
     struct ndp_prefix_info_t *addr_prev;
     /**
