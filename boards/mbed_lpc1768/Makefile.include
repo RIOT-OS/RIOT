@@ -4,7 +4,7 @@ export CPU = lpc1768
 #define the default port depending on the host OS
 OS := $(shell uname)
 ifeq ($(OS),Linux)
-  PORT ?= /dev/ttyUSB0
+  PORT ?= /dev/ttyACM0
 else ifeq ($(OS),Darwin)
   PORT ?= $(shell ls -1 /dev/tty.SLAB_USBtoUART* | head -n 1)
 else
