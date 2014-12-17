@@ -30,12 +30,12 @@ extern "C" {
 /**
  * Define the nominal CPU core clock in this board
  */
-#define F_CPU               (48000000UL)
+#define F_CPU               (8000000UL)
 
 /**
  * Assign the hardware timer
  */
-#define HW_TIMER            TIMER_0
+#define HW_TIMER            TIMER_1
 
 /**
 * @name AT86RF231 config
