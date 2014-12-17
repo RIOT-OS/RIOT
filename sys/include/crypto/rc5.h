@@ -60,9 +60,7 @@ extern "C" {
  * @brief the cipher_context_t adapted for RC5
  */
 typedef struct {
-    /** @cond INTERNAL */
     uint32_t skey [2 * (RC5_ROUNDS + 1)];
-    /** @endcond */
 } rc5_context_t;
 
 /**
@@ -93,13 +91,13 @@ int rc5_init(cipher_context_t *context, uint8_t blockSize, uint8_t keySize,
  *         1776 cycles (avg case)
  *
  * @param   context       the cipher_context_t-struct to save the updated key in
- * @param   plain_block   a plaintext block of blockSize
- * @param   cipher_block  the resulting ciphertext block of blockSize
+ * @param   plainBlock    a plaintext block of blockSize
+ * @param   cipherBlock   the resulting ciphertext block of blockSize
  *
  * @return  Whether the encryption was successful. Possible failure reasons
  *          include not calling init().
  */
-int rc5_encrypt(cipher_context_t *context, uint8_t *plain_block, uint8_t *cipher_block);
+int rc5_encrypt(cipher_context_t *context, uint8_t *block, uint8_t *cipherBlock);
 
 /**
  * @brief   Decrypts a single block (of blockSize) using the key and the

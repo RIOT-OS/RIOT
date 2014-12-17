@@ -28,7 +28,7 @@ extern "C" {
 #endif
 
 /**
- * @brief Descriptor struct for a servo
+ * @name Descriptor struct for a servo
  */
 typedef struct {
     pwm_t device;       /**< the PWM device driving the servo */

@@ -78,6 +78,7 @@
                 __FILE__, __LINE__, __func__); \
         DEBUG_PRINT(__VA_ARGS__); \
     } while (0)
+#undef ENABLE_DEBUG
 #else
 #define DEBUG(...)
 #define DEBUGF(...)

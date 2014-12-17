@@ -17,7 +17,7 @@
  */
 
 /**
- * @ingroup     sys_pipe
+ * @ingroup     sys
  * @{
  * @file
  * @brief       Implementation for dynamically allocated pipes.

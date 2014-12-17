@@ -1,21 +1,9 @@
 /*
- * Copyright (C) 2013 Stephan Arndt <arndtste@zedat.fu-berlin.de>
+ * Copyright (C) 2014  Oliver Hahm <oliver.hahm@inria.fr>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
- */
-
-/**
- * @ingroup     rpl
- * @{
- * @file        of_mrhof.h
- * @brief       Objective Function MRHOF.
- *
- * Header-file, which defines all functions for the implementation of Objective Function MRHOF.
- *
- * @author      Eric Engel <eric.engel@fu-berlin.de>
- * @}
  */
 
 #ifndef OF_MRHOF_H

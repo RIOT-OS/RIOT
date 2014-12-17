@@ -29,6 +29,10 @@ __native_sig_leave_tramp:
 
     ret
 #elif __arm__
+.extern _native_saved_eip
+.extern _native_isr_ctx
+.extern _native_cur_ctx
+.extern _native_in_isr
 
 .globl _native_sig_leave_tramp
 _native_sig_leave_tramp:
@@ -66,6 +70,11 @@ _native_sig_leave_tramp:
     ldmia   sp!, {pc}
 
 #else
+.extern $_native_saved_eip
+.extern $_native_isr_ctx
+.extern $_native_cur_ctx
+.extern $_native_in_isr
+
 .globl _native_sig_leave_tramp
 
 _native_sig_leave_tramp:

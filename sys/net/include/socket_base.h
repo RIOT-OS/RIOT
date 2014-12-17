@@ -46,4 +46,3 @@ extern "C" {
 #endif
 
 #endif /* SOCKET_BASE_H */
-/** @} */

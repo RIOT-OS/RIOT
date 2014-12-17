@@ -56,6 +56,8 @@ extern "C" {
 #define CC1100_RADIO_MODE CC1100_MODE_CONSTANT_RX
 #endif
 
+/// CC1100 radio interface
+extern const radio_t radio_cc1100;
 
 /**
  * @brief   Initialize radio layer.

@@ -37,7 +37,6 @@ USEMODULE += vtimer
 USEMODULE += defaulttransceiver
 
 FEATURES_OPTIONAL += transceiver
-FEATURES_OPTIONAL += periph_rtc
 
 ifneq (,$(filter msb-430,$(BOARD)))
 	USEMODULE += sht11
@@ -45,12 +44,14 @@ endif
 ifneq (,$(filter msba2,$(BOARD)))
 	USEMODULE += sht11
 	USEMODULE += ltc4150
+	USEMODULE += rtc
 	USEMODULE += mci
 	USEMODULE += config
 	USEMODULE += random
 endif
 ifneq (,$(filter native,$(BOARD)))
 	USEMODULE += ltc4150
+	USEMODULE += rtc
 	USEMODULE += config
 	USEMODULE += random
 endif

@@ -14,7 +14,6 @@
  * @brief Hwtimer test application
  *
  * @author      Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
- * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
  * @}
  */
@@ -27,10 +26,6 @@
 int main(void)
 {
     puts("This is just a functionality test for hwtimer_spin.");
-
-    puts("\nYou should see the message \"success\" after a while if"
-            " this test was successful.");
-    puts("If you do not see that message, something went wrong.\n");
 
     for (unsigned long r = 10000; r > 0; r--) {
         for (unsigned long i = HWTIMER_SPIN_BARRIER; i > 0; i--) {

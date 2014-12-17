@@ -97,6 +97,21 @@ volatile cc1100_flags rflags;       ///< Radio control flags
 static uint8_t radio_address;       ///< Radio address
 static uint8_t radio_channel;       ///< Radio channel number
 
+const radio_t radio_cc1100 = {      ///< Radio driver API
+    "CC1100",
+    CC1100_BROADCAST_ADDRESS,
+    MAX_OUTPUT_POWER,
+    cc1100_get_avg_transmission_duration,
+    cc1100_get_address,
+    cc1100_set_address,
+    cc1100_set_output_power,
+    cc1100_set_packet_monitor,
+    cc1100_set_packet_handler,
+    cc1100_send_csmaca,
+    cc1100_print_statistic,
+    cc1100_print_config
+};
+
 /*---------------------------------------------------------------------------*/
 //                   Data structures for mode control
 /*---------------------------------------------------------------------------*/

@@ -26,10 +26,6 @@
 
 #include "cc2538.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /**
  * @brief RF Core component registers
  */
@@ -220,10 +216,6 @@ enum {
     ISNACK         = 0xe8,                /**< Abort sending of acknowledge frame */
     ISCLEAR        = 0xff,                /**< Clear CSP program memory, reset program counter */
 };
-
-#ifdef __cplusplus
-} /* extern "C" */
-#endif
 
 #endif /* CC2538_RFCORE_H */
 

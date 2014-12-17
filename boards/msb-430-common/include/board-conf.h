@@ -34,4 +34,3 @@ extern "C" {
 #endif
 
 #endif /* BOARD-CONF_H */
-/** @} */

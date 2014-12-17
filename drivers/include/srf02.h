@@ -35,36 +35,30 @@
 extern "C" {
 #endif
 
-/** @brief The sensors default I2C address */
+/* define the SRF02 registers*/
 #define SRF02_DEFAULT_ADDR                  112
-
-/** @brief The command register which defines measurement mode */
 #define SRF02_COMMAND_REG                   0x0
-
-/** @brief The upper measurement byte */
 #define SRF02_RANGE_HIGH_BYTE               0x2
-
-/** @brief The lower measurement byte */
 #define SRF02_RANGE_LOW_BYTE                0x3
 
 /**
  * @brief Device descriptor for SRF02 sensors
  */
 typedef struct {
-    i2c_t i2c;               /**< I2C device the sensor is connected to */
-    uint8_t addr;            /**< I2C bus address of the sensor */
+    i2c_t i2c;
+    uint8_t addr;
 } srf02_t;
 
 /**
  * @brief Possible measurement modes for the SRF02 sensor
  */
 typedef enum {
-    SRF02_MODE_REAL_INCH = 0x50,                   /**< result in inches */
-    SRF02_MODE_REAL_CM =   0x51,                   /**< result in centimeters */
-    SRF02_REAL_RANGING_MODE_MICRO_SEC = 0x52,      /**< result in microseconds */
-    SRF02_FAKE_RANGING_MODE_INCH =      0x56,      /**< synchronous measurement in inches */
-    SRF02_FAKE_RANGING_MODE_CM =        0x57,      /**< synchronous measurement in centimeters */
-    SRF02_FAKE_RANGING_MODE_MICRO_SEC = 0x58       /**< synchronous measurement in microseconds */
+    SRF02_MODE_REAL_INCH = 0x50,
+    SRF02_MODE_REAL_CM =   0x51,
+    SRF02_REAL_RANGING_MODE_MICRO_SEC = 0x52,
+    SRF02_FAKE_RANGING_MODE_INCH =      0x56,
+    SRF02_FAKE_RANGING_MODE_CM =        0x57,
+    SRF02_FAKE_RANGING_MODE_MICRO_SEC = 0x58
 }srf02_mode_t;
 
 /**

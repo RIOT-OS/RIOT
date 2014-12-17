@@ -86,7 +86,6 @@ void *udp_packet_handler(void *arg)
 
             if (udp_socket != NULL) {
                 m_send_udp.content.ptr = (char *)ipv6_header;
-
                 msg_send_receive(&m_send_udp, &m_recv_udp, udp_socket->recv_pid);
             }
             else {
@@ -202,7 +201,7 @@ int32_t udp_sendto(int s, const void *buf, uint32_t len, int flags,
 
         return ipv6_sendto(&to->sin6_addr, IPPROTO_UDP,
                            (uint8_t *)(current_udp_packet),
-                           NTOHS(current_udp_packet->length), NULL);
+                           NTOHS(current_udp_packet->length));
     }
     else {
         return -1;

@@ -85,10 +85,8 @@ typedef struct __attribute__((packed)) {
     uint8_t routing_type;           /**< identify srh-variant. */
     uint8_t segments_left;          /**< remaining route segments before reaching destination. */
     unsigned int cmpri:4, cmpre:4;  /**< 4+4 bit, expressing prefix octets from each/last segment. */
-    unsigned pad :4;                /**< number of octets used for padding after adresses. */
-    unsigned reserved :10;          /**< reserved. Set to 0. */
-    unsigned reserved2 :10;         /**< reserved. Set to 0. */
-    ipv6_addr_t route[];
+    unsigned long pad:4;            /**< number of octets used for padding after adresses. */
+    unsigned long reserved:20;      /**< reserved. Set to 0. */
 } ipv6_srh_t;
 
 /**

@@ -191,7 +191,7 @@ char *cc1100_mode_to_text(uint8_t mode);
 /**
  * @brief   Convert radio state to textual representation.
  *
- * @param   state The radio state to convert.
+ * @param   mode The radio state to convert.
  *
  * @return  Textual representation of radio state.
  */

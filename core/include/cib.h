@@ -22,84 +22,55 @@
 #define __CIB_H
 
 #ifdef __cplusplus
-extern "C" {
+ extern "C" {
 #endif
 
 /**
  * @brief circular integer buffer structure
  */
-typedef struct {
-    unsigned int read_count;    /**< number of (successful) read accesses */
-    unsigned int write_count;   /**< number of (successful) write accesses */
-    unsigned int mask;          /**< Size of buffer -1, i.e. mask of the bits */
+typedef struct cib_t {
+    unsigned int read_count;    /**< count read accesses  */
+    unsigned int write_count;   /**< count write accesses */
+    unsigned int complement;    /**< hold complement      */
 } cib_t;
-
-/**
- * @brief   Initialize cib_t to a given size.
- */
-#define CIB_INIT(SIZE) { 0, 0, (SIZE) - 1 }
 
 /**
  * @brief Initialize cib_t to 0 and set size.
  *
  * @param[out] cib      Buffer to initialize.
  *                      Must not be NULL.
- * @param[in]  size     Size of the buffer, must not exceed MAXINT/2.
+ * @param[in]  size     Size of the buffer.
  */
-static inline void cib_init(cib_t *__restrict cib, unsigned int size)
-{
-    cib_t c = CIB_INIT(size);
-    *cib = c;
-}
-
-/**
- * @brief Calculates difference between cib_put() and cib_get() accesses.
- *
- * @param[in] cib       the cib_t to check.
- *                      Must not be NULL.
- * @return How often cib_get() can be called before the CIB is empty.
- */
-static inline unsigned int cib_avail(cib_t *__restrict cib)
-{
-    return cib->write_count - cib->read_count;
-}
+void cib_init(cib_t *cib, unsigned int size);
 
 /**
  * @brief Get the index of the next item in buffer.
  *
  * @param[in,out] cib   corresponding *cib* to buffer.
  *                      Must not be NULL.
- * @return index of next item, -1 if the buffer is empty
+ * @return index of next item, -1 on error.
  */
-static inline int cib_get(cib_t *__restrict cib)
-{
-    unsigned int avail = cib_avail(cib);
-
-    if (avail > 0) {
-        return (int) (cib->read_count++ & cib->mask);
-    }
-
-    return -1;
-}
+int cib_get(cib_t *cib);
 
 /**
  * @brief Get index for item in buffer to put to.
  *
  * @param[in,out] cib   corresponding *cib* to buffer.
  *                      Must not be NULL.
- * @return index of item to put to, -1 if the buffer is full
+ * @return index of item to put to, -1 on error.
  */
-static inline int cib_put(cib_t *__restrict cib)
-{
-    unsigned int avail = cib_avail(cib);
+int cib_put(cib_t *cib);
 
-    /* We use a signed compare, because the mask is -1u for an empty CIB. */
-    if ((int) avail <= (int) cib->mask) {
-        return (int) (cib->write_count++ & cib->mask);
-    }
-
-    return -1;
-}
+/**
+ * @brief Calculates difference between cib_put() and cib_get() accesses.
+ *
+ * @param[in] cib       the cib_t to check.
+ *                      Must not be NULL.
+ * @return Negative number for #cib_get > #cib_put
+ * @return 0 for #cib_get == #cib_put
+ * @return positive number for #cib_get < #cib_put
+ */
+int cib_avail(cib_t *cib);
 
 #ifdef __cplusplus
 }

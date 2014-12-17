@@ -5,7 +5,6 @@ export CPU = lpc2387
 export PREFIX = arm-none-eabi-
 #export PREFIX = arm-elf-
 export CC = $(PREFIX)gcc
-export CXX = $(PREFIX)g++
 export AR = $(PREFIX)ar
 export CFLAGS += -O2 -Wall -Wstrict-prototypes -mcpu=arm7tdmi-s -gdwarf-2
 export ASFLAGS = -gdwarf-2 -mcpu=arm7tdmi-s
@@ -16,10 +15,6 @@ export OBJCOPY = $(PREFIX)objcopy
 FLASHER = lpc2k_pgm
 TERMPROG ?= $(RIOTBASE)/dist/tools/pyterm/pyterm
 LINKFLAGS += -gdwarf-2 -mcpu=arm7tdmi-s -static -lgcc -nostartfiles -T$(RIOTBASE)/cpu/$(CPU)/linkerscript.x
-
-# unwanted (CXXUWFLAGS) and extra (CXXEXFLAGS) flags for c++
-export CXXUWFLAGS +=
-export CXXEXFLAGS +=
 
 ifeq ($(strip $(PORT)),)
 	export PORT = /dev/ttyUSB0

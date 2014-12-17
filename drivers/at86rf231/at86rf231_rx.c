@@ -27,6 +27,9 @@
 #include "msg.h"
 
 #define ENABLE_DEBUG (0)
+#if ENABLE_DEBUG
+#define DEBUG_ENABLED
+#endif
 #include "debug.h"
 
 at86rf231_packet_t at86rf231_rx_buffer[AT86RF231_RX_BUF_SIZE];
@@ -62,7 +65,7 @@ void at86rf231_rx_handler(void)
         return;
     }
 
-#if ENABLE_DEBUG
+#ifdef DEBUG_ENABLED
     DEBUG("pkg: ");
     for (int i = 1; i < at86rf231_rx_buffer[rx_buffer_next].length; i++) {
         DEBUG("%x ", buf[i]);
@@ -76,7 +79,7 @@ void at86rf231_rx_handler(void)
 
     /* if packet is no ACK */
     if (at86rf231_rx_buffer[rx_buffer_next].frame.fcf.frame_type != IEEE_802154_ACK_FRAME) {
-#if ENABLE_DEBUG
+#ifdef DEBUG_ENABLED
         ieee802154_frame_print_fcf_frame(&at86rf231_rx_buffer[rx_buffer_next].frame);
 #endif
         if (at86rf231_raw_packet_cb != NULL) {
@@ -96,7 +99,7 @@ void at86rf231_rx_handler(void)
     }
     else {
         /* This should not happen, ACKs are consumed by hardware */
-#if ENABLE_DEBUG
+#ifdef DEBUG_ENABLED
         DEBUG("GOT ACK for SEQ %u\n", at86rf231_rx_buffer[rx_buffer_next].frame.seq_nr);
         ieee802154_frame_print_fcf_frame(&at86rf231_rx_buffer[rx_buffer_next].frame);
 #endif

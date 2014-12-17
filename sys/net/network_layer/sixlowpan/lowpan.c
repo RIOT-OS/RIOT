@@ -48,6 +48,7 @@
 
 #define ENABLE_DEBUG    (0)
 #if ENABLE_DEBUG
+#define DEBUG_ENABLED
 char addr_str[IPV6_MAX_ADDR_STR_LEN];
 #endif
 #include "debug.h"
@@ -171,7 +172,7 @@ int sixlowpan_lowpan_sendto(int if_id, const void *dest, int dest_len,
     /* check if packet needs to be fragmented */
     DEBUG("sixlowpan_lowpan_sendto(%d, dest, %d, data, %"PRIu16")\n",
           if_id, dest_len, data_len);
-#if ENABLE_DEBUG
+#ifdef DEBUG_ENABLED
     DEBUG("dest: ");
 
     if (dest_len == 8) {
@@ -298,7 +299,7 @@ void sixlowpan_lowpan_set_iphc_status(
     iphc_status = status;
 }
 
-#if ENABLE_DEBUG
+#ifdef DEBUG_ENABLED
 void print_long_local_addr(net_if_eui64_t *saddr)
 {
     printf("%02x%02x:%02x%02x:%02x%02x:%02x%02x\n",

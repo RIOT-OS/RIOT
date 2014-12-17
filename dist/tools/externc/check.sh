@@ -1,12 +1,5 @@
 #!/bin/sh
 
-# Copyright 2014 Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
-# Copyright 2014 DangNhat Pham-Huu <51002279@hcmut.edu.vn>
-#
-# This file is subject to the terms and conditions of the GNU Lesser
-# General Public License v2.1. See the file LICENSE in the top level
-# directory for more details.
-
 # customizable
 CHECKROOT=$(dirname "${0}")
 

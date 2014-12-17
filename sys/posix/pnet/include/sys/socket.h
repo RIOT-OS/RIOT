@@ -211,7 +211,7 @@ int accept(int socket, struct sockaddr *__restrict address,
 
 /**
  * @brief   Bind a name to a socket.
- * @details The bind() function shall assign a local socket address *address*
+ * @detail  The bind() function shall assign a local socket address *address*
  *          to a socket identified by descriptor socket that has no local
  *          socket address assigned. Sockets created with the socket() function
  *          are initially unnamed; they are identified only by their address
@@ -238,7 +238,7 @@ int bind(int socket, const struct sockaddr *address,
 
 /**
  * @brief   Connect a socket.
- * @details The connect() function shall attempt to make a connection on a
+ * @detail  The connect() function shall attempt to make a connection on a
  *          connection-mode socket or to set or reset the peer address of a
  *          connectionless-mode socket.
  *
@@ -306,7 +306,7 @@ int listen(int socket, int backlog);
 
 /**
  * @brief   Receive a message from a connected socket.
- * @details Shall receive a message from a connection-mode or
+ * @detail  Shall receive a message from a connection-mode or
  *          connectionless-mode socket. It is normally used with connected
  *          sockets because it does not permit the application to retrieve the
  *          source address of received data.
@@ -331,7 +331,7 @@ ssize_t recv(int socket, void *buffer, size_t length, int flags);
 
 /**
  * @brief   Receive a message from a socket.
- * @details The recvfrom() function shall receive a message from a
+ * @detail  The recvfrom() function shall receive a message from a
  *          connection-mode or connectionless-mode socket. It is normally used
  *          with connectionless-mode sockets because it permits the application
  *          to retrieve the source address of received data.
@@ -369,7 +369,7 @@ ssize_t recvfrom(int socket, void *__restrict buffer, size_t length, int flags,
 
 /**
  * @brief   Send a message on a socket.
- * @details Shall initiate transmission of a message from the specified socket
+ * @detail  Shall initiate transmission of a message from the specified socket
  *          to its peer. The send() function shall send a message only when the
  *          socket is connected. If the socket is a connectionless-mode socket,
  *          the message shall be sent to the pre-specified peer address.
@@ -392,7 +392,7 @@ ssize_t send(int socket, const void *buffer, size_t length, int flags);
 
 /**
  * @brief   Send a message on a socket.
- * @details Shall send a message through a connection-mode or
+ * @detail  Shall send a message through a connection-mode or
  *          connectionless-mode socket. If the socket is a connectionless-mode
  *          socket, the message shall be sent to the address specified by
  *          *dest_addr* if no pre-specified peer address has been set. If a
@@ -406,7 +406,7 @@ ssize_t send(int socket, const void *buffer, size_t length, int flags);
  *      </a>
  *
  * @param[in] socket    Specifies the socket file descriptor.
- * @param[in] message   Points to the buffer containing the message to send.
+ * @param[in] buffer    Points to the buffer containing the message to send.
  * @param[in] length    Specifies the length of the message in bytes.
  * @param[in] flags     Specifies the type of message reception. Support
  *                      for values other than 0 is not implemented yet.
@@ -447,16 +447,16 @@ int setsockopt(int socket, int level, int option_name, const void *option_value,
 
 /**
  * @brief   Create an endpoint for communication.
- * @details Shall create an unbound socket in a communications domain, and
+ * @detail  Shall create an unbound socket in a communications domain, and
  *          return a file descriptor that can be used in later function calls
  *          that operate on sockets.
  *
  * @param[in] domain    Specifies the communications domain in which a socket
  *                      is to be created. Valid values are prefixed with ``AF_`
- *                      and defined in @ref socket.h.
+ *                      and defined in @ref transport_layer/socket.h.
  * @param[in] type      Specifies the type of socket to be created. Valued
  *                      values are prefixed with ``SOCK_`` and defined in
- *                      @ref socket.h.
+ *                      @ref transport_layer/socket.h.
  * @param[in] protocol  Specifies a particular protocol to be used with the
  *                      socket. Specifying a protocol of 0 causes socket() to
  *                      use an unspecified default protocol appropriate for

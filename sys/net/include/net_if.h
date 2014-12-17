@@ -352,8 +352,8 @@ int net_if_send_packet_long(int if_id, net_if_eui64_t *target,
  *                                  the destination broadcast address. Choose
  *                                  NET_IF_TRANS_ADDR_M_SHORT if you are not
  *                                  sure
- * @param[in] payload               The packet to send
- * @param[in] payload_len           The length of the packet's data in byte,
+ * @param[in] packet_data           The packet to send
+ * @param[in] packet_len            The length of the packet's data in byte,
  *                                  negative number on error.
  *
  * @return The number of bytes send on success, negative value on failure
@@ -402,7 +402,7 @@ int net_if_get_eui64(net_if_eui64_t *eui64, int if_id, int force_generation);
 
 /**
  * @brief   Parses a string to an EUI-64.
- * @details The parsing will be back to front, every non-hexadecimal character
+ * @detail  The parsing will be back to front, every non-hexadecimal character
  *          and every hexadecimal character beyond the count of 8 will be
  *          ignored
  *

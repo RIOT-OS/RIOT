@@ -132,32 +132,28 @@ extern "C" {
 #endif
 
 /**
- * @brief hash function to use in thee filter
+ * hashfp_t  hash function to use in thee filter
  */
 typedef uint32_t (*hashfp_t)(const uint8_t *, int len);
 
 /**
- * @brief bloom_t bloom filter object
+ * bloom_t bloom filter object
  */
 typedef struct {
-    /** number of bytes in the bloom array */
     size_t m;
-    /** number of hash functions */
     size_t k;
-    /** the bloom array */
     uint8_t *a;
-    /** the hash functions */
     hashfp_t *hash;
 } bloom_t;
 
 /**
- * @brief Allocate and return a pointer to a new Bloom filter.
+ * bloom_new  Allocate and return a pointer to a new Bloom filter.
  *
  * For best results, make 'size' a power of 2.
  *
  * @param size        size of the bit array in the filter
  * @param num_hashes  the number of hash functions
- * @param ...         varg function pointers, use hashfp_t
+ * @param functions   varg function pointers, use hashfp_t
  *
  * @return An allocated bloom filter
  *
@@ -165,7 +161,7 @@ typedef struct {
 bloom_t *bloom_new(size_t size, size_t num_hashes, ...);
 
 /**
- * @brief Delete a Bloom filter.
+ * bloom_del  Delete a Bloom filter.
  *
  * @param bloom The condemned
  * @return nothing
@@ -174,21 +170,20 @@ bloom_t *bloom_new(size_t size, size_t num_hashes, ...);
 void bloom_del(bloom_t *bloom);
 
 /**
- * @brief Add a string to a Bloom filter.
+ * bloom_add  Add a string to a Bloom filter.
  *
  * CAVEAT
  * Once a string has been added to the filter, it cannot be "removed"!
  *
  * @param bloom  Bloom filter
- * @param buf    string to add
- * @param len    the length of the string @p buf
+ * @param s      string to add
  * @return       nothing
  *
  */
 void bloom_add(bloom_t *bloom, const uint8_t *buf, size_t len);
 
 /**
- * @brief Determine if a string is in the Bloom filter.
+ * bloom_check  Determine if a string is in the Bloom filter.
  *
  * The string 's' is hashed once for each of the 'k' hash functions, as
  * though we were planning to add it to the filter. Instead of adding it
@@ -217,10 +212,7 @@ void bloom_add(bloom_t *bloom, const uint8_t *buf, size_t len);
  * can only speak a qualified YES.
  *
  * @param bloom  Bloom filter
- * @param buf    string to check
- * @param len    the length of the string @p buf
- *
- *
+ * @param s      string to check
  * @return       false if string does not exist in the filter
  * @return       true if string is may be in the filter
  *

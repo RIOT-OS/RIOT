@@ -28,9 +28,6 @@ extern "C" {
 #define PTHREAD_CANCEL_DEFERRED     0
 #define PTHREAD_CANCEL_ASYNCHRONOUS 1
 
-/**
- * @brief Thread exit status after a canceled thread has terminated.
- */
 #define PTHREAD_CANCELED ((void *) -2)
 
 /**

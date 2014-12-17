@@ -10,7 +10,7 @@
  * @ingroup     board_fox
  * @{
  *
- * @file
+ * @file        periph_conf.h
  * @brief       Peripheral MCU configuration for the fox board
  *
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>

@@ -12,7 +12,7 @@
  * @brief   IEEE802.15.4 adapaption layer
  * @{
  *
- * @file
+ * @file    ieee802154/ieee802154_frame.h
  * @brief   IEEE 802.14.4 framing data structs and prototypes
  *
  * @author  Stephan Zeisberg <zeisberg@mi.fu-berlin.de>
@@ -47,12 +47,6 @@ typedef enum __attribute__((packed)) {
 #define IEEE_802154_SHORT_MCAST_ADDR    (0xffff)
 #define IEEE_802154_LONG_MCAST_ADDR     {{0xff, 0xff, 0xff, 0xff, 0xff, 0xff, \
                                           0xff, 0xff}}
-
-/**
- * @brief The default PAN id to use if not specified otherwise by upper layers
- */
-#define IEEE_802154_DEFAULT_PAN_ID      (1)
-
 /**
  * @brief   Transform 16-bit number from network order (big-endian) to
  *          little-endian byte order (as used by IEEE 802.15.4).

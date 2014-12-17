@@ -99,7 +99,7 @@ uint32_t sdbm_hash(const uint8_t *buf, size_t len);
 uint32_t kr_hash(const uint8_t *buf, size_t len);
 
 /**
- * @brief sax_hash
+ * @bief sax_hash
  *
  * Shift, Add, XOR
  *

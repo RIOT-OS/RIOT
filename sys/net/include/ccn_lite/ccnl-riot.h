@@ -68,10 +68,7 @@ extern "C" {
  */
 #  define CCNL_RIOT_CHUNK_SIZE (90)
 #else
-/* XXX: For (at least) IEEE 802.15.4 radios (PAYLOAD_SIZE - CCNL_HEADER_SIZE)
- * is one byte too big for transmission. Therefore, we subtract one byte more.
- */
-#  define CCNL_RIOT_CHUNK_SIZE (PAYLOAD_SIZE - CCNL_HEADER_SIZE - 1)
+#  define CCNL_RIOT_CHUNK_SIZE (PAYLOAD_SIZE - CCNL_HEADER_SIZE)
 #endif
 
 /**

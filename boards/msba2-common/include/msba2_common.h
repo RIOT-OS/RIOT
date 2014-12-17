@@ -12,7 +12,7 @@
  * @brief       Common files for all MSB-A2 based boards
  * @{
  *
- * @file
+ * @files       msba2-common.h
  * @brief       MSB-A2 Common Board Definitions
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>

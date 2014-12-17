@@ -17,5 +17,4 @@ void tests_core(void)
     TESTS_RUN(tests_core_lifo_tests());
     TESTS_RUN(tests_core_priority_queue_tests());
     TESTS_RUN(tests_core_byteorder_tests());
-    TESTS_RUN(tests_core_ringbuffer_tests());
 }

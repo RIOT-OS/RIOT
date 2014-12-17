@@ -31,7 +31,7 @@ extern "C" {
 #include "periph/i2c.h"
 
  /**
-  * @brief The sensors default I2C address
+  * @name The sensors default I2C address
   */
 #define LPS331AP_DEFAULT_ADDRESS        0x5c
 

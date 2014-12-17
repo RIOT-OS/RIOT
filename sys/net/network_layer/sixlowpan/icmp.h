@@ -11,7 +11,7 @@
 /**
  * @ingroup net_sixlowpan
  * @{
- * @file
+ * @file    sixlowpan/icmp.h
  * @brief   6lowpan neighbor discovery constants, data structs, and prototypes
  * @author  Stephan Zeisberg <zeisberg@mi.fu-berlin.de>
  * @author  Martin Lenders <mlenders@inf.fu-berlin.de>

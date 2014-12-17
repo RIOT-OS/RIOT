@@ -40,4 +40,3 @@ typedef uint8_t radio_packet_length_t;
 #endif
 
 #endif
-/** @} */

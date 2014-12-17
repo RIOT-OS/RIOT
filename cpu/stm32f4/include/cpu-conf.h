@@ -53,16 +53,6 @@
 #endif
 /** @} */
 
-/**
- * @name CC110X buffer size definitions for the stm32f4
- * @{
- */
-#ifdef MODULE_CC110X
-#define TRANSCEIVER_BUFFER_SIZE         (10)
-#define RX_BUF_SIZE                     (10)
-#endif
-/** @} */
-
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -11,9 +11,8 @@
  * @{
  */
 
-#include <stdint.h>
 #include "cpu.h"
-#include "irq.h"
+#include <stdint.h>
 #include "VIC.h"
 
 void lpc2387_pclk_scale(uint32_t source, uint32_t target, uint32_t *pclksel, uint32_t *prescale)
@@ -83,16 +82,6 @@ bool install_irq(int IntNumber, void (*HandlerAddr)(void), int Priority)
         VICIntEnable = 1 << IntNumber;  /* Enable Interrupt */
         return(true);
     }
-}
-
-__attribute__((naked,noreturn)) void arm_reset(void)
-{
-    disableIRQ();
-    WDTC = 0x0FFFF;
-    WDMOD = 0x03;
-    WDFEED= 0xAA;
-    WDFEED= 0x55;
-    while(1);
 }
 
 /** @} */

@@ -96,13 +96,6 @@ SECTIONS
     } > rom
     PROVIDE_HIDDEN (__exidx_end = .);
 
-    /* exception handling */
-    . = ALIGN(4);
-    .eh_frame :
-    {
-        KEEP (*(.eh_frame))
-    } > rom
-
     . = ALIGN(4);
     _etext = .;
 

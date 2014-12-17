@@ -55,7 +55,7 @@ BASELIBS += $(UNIT_TESTS:%=$(BINDIR)%.a)
 
 include $(RIOTBASE)/Makefile.include
 
-ifeq (,$(filter msp430fxyz,$(CPU)))
+ifeq (,$(filter msp430x16x,$(CPU)))
     CFLAGS += -DTEST_INT=TEST_INT32
 else
     CFLAGS += -DTEST_INT=TEST_INT16

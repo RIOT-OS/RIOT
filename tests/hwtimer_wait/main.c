@@ -30,7 +30,7 @@ int main(void)
     puts("When the race condition is hit, the timer will wait for a very very long time.");
 
     long iterations = 10000;
-    long start_duration = (HWTIMER_SPIN_BARRIER + 1) << 5;
+    long start_duration = 256;
     long duration = iterations * start_duration * 2L;
 
     printf("The test should take about %li sec.\n", (HWTIMER_TICKS_TO_US(duration)/1000000));

@@ -55,10 +55,6 @@ extern "C" {
  */
 int close(int fildes);
 
-/**
- * @name Microseconds data type
- * @{
- */
 #ifndef __USECONDS_T_TYPE
 #if !(defined(__MACH__) || defined(__FreeBSD__))
 typedef unsigned long __USECONDS_T_TYPE;
@@ -70,7 +66,6 @@ typedef __darwin_useconds_t __useconds_t;
 #endif
 #endif
 typedef __useconds_t useconds_t;
-/** @} */
 
 /**
  * @brief the caller will sleep for given amount of micro seconds

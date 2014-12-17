@@ -26,7 +26,7 @@
 
 // riot
 #include "thread.h"
-#include "periph/rtc.h"
+#include "rtc.h"
 
 // ccn
 #include "ccn_lite/ccnl-riot.h"

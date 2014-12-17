@@ -1,0 +1,3 @@
+INCLUDES += -I$(RIOTCPU)/lpc_common/include
+
+export UNDEF += $(BINDIR)lpc_common/lpc_syscalls.o

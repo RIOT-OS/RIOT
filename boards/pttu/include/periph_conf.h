@@ -45,11 +45,6 @@ extern "C" {
 #define PWM_0_CH2_PIN       (4)
 #define PWM_0_FUNC          (1)
 
-/**
- * @brief Real Time Clock configuration
- */
-#define RTC_NUMOF           (1)
-
 #ifdef __cplusplus
 }
 #endif

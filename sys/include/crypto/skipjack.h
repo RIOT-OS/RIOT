@@ -89,9 +89,10 @@ extern "C" {
 
 /**
  * @brief The cipher_context_t adapted for SkipJack
+ * @typedef skipjack_context_t
  */
 typedef struct {
-    /** 2 times keysize. makes unrolling keystream easier / efficient */
+        // 2 times keysize. makes unrolling keystream easier / efficient
     uint8_t skey [ 20 ];
 } skipjack_context_t;
 

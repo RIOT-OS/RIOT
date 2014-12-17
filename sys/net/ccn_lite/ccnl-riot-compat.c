@@ -53,15 +53,11 @@ int riot_send_transceiver(uint8_t *buf, uint16_t size, uint16_t to)
     }
 
 #if MODULE_AT86RF231 || MODULE_CC2420 || MODULE_MC1322X
-    memset(&p, 0, sizeof(ieee802154_packet_t));
     p.frame.payload_len = size;
-    p.frame.fcf.frame_type = IEEE_802154_DATA_FRAME;
     p.frame.fcf.dest_addr_m = IEEE_802154_SHORT_ADDR_M;
-    p.frame.fcf.src_addr_m = IEEE_802154_SHORT_ADDR_M;
-    p.frame.dest_addr[1] = (to & 0xff);
-    p.frame.dest_addr[0] = (to >> 8);
+    memset(p.frame.dest_addr, 0, sizeof(p.frame.dest_addr));
+    memcpy(&(p.frame.dest_addr[6]), &to, sizeof(uint16_t));
     p.frame.payload = buf;
-    p.frame.dest_pan_id = IEEE_802154_DEFAULT_PAN_ID;
 #else
     p.length = size;
     p.dst = (to == RIOT_BROADCAST) ? 0 : to;

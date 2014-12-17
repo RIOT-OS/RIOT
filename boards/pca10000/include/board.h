@@ -34,7 +34,7 @@ extern "C" {
 #define F_CPU               (16000000UL)
 
 /**
- * @brief Assign the hardware timer
+ * @name Assign the hardware timer
  */
 #define HW_TIMER            TIMER_0
 
@@ -70,7 +70,6 @@ extern "C" {
 #define LED_BLUE_ON         (NRF_GPIO->OUTCLR = LED_BLUE_PIN)
 #define LED_BLUE_OFF        (NRF_GPIO->OUTSET = LED_BLUE_PIN)
 #define LED_BLUE_TOGGLE     (NRF_GPIO->OUT ^= LED_BLUE_PIN)
-/** @} */
 
 
 /**

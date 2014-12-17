@@ -10,14 +10,14 @@
  * @defgroup    driver_periph_spi SPI
  * @ingroup     driver_periph
  * @brief       Low-level SPI peripheral driver
+ * @{
+ *
+ * @file
+ * @brief       Low-level SPI peripheral driver interface definitions
  *
  * The current design of this interface targets implementations that use the SPI in blocking mode.
  *
  * TODO: add means for asynchronous SPI usage
- *
- * @{
- * @file
- * @brief       Low-level SPI peripheral driver interface definitions
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */

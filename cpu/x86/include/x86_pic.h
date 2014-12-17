@@ -140,7 +140,7 @@ typedef void (*x86_irq_handler_t)(uint8_t irq_num);
  * The PIC default handler will still send an EOI.
  * Especially the keyboard controller does not like it,
  * if it is told that everything was done but it wasn't.
- * A raised #X86_INT_GP might be the least of your problems.
+ * A raised #GP might be the least of your problems.
  */
 void x86_pic_set_handler(unsigned irq, x86_irq_handler_t handler);
 

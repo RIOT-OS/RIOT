@@ -270,8 +270,8 @@ int32_t socket_base_send(int s, const void *buf, uint32_t len, int flags);
  * @param[in] len       Length of buffer.
  * @param[in] flags     Flags for possible later implementations (currently
  *                      unused).
- * @param[in] to        IPv6 Address to send data to.
- * @param[in] tolen     Length of address in *to* in byte (always 16).
+ * @param[in] from      IPv6 Address to send data to.
+ * @param[in] fromlen   Length of address in *from* in byte (always 16).
  *
  * @return Number of send bytes, -1 on error.
  */

@@ -1,1 +1,1 @@
-FEATURES_PROVIDED += transceiver periph_rtc
+FEATURES_PROVIDED += transceiver

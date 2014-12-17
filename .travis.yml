@@ -32,7 +32,6 @@ install:
             binutils-avr \
             avr-libc \
             cppcheck \
-            doxygen
     - git config --global user.email "travis@example.com"
     - git config --global user.name "Travis CI"
 
@@ -47,8 +46,6 @@ script:
     - ./dist/tools/licenses/check.sh master --diff-filter=MR --error-exitcode=0 || exit
     - ./dist/tools/licenses/check.sh master --diff-filter=AC || exit
 
-    - ./dist/tools/doccheck/check.sh master || exit
-
     - ./dist/tools/externc/check.sh master || exit
 
 # TODO:
@@ -62,7 +59,6 @@ script:
     - make -C ./tests/unittests all test BOARD=qemu-i386 || exit
 
     - ./dist/tools/compile_test/compile_test.py
-    - ./dist/tools/pr_check/pr_check.sh riot/master
 
 notifications:
     email: false

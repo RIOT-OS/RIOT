@@ -10,7 +10,7 @@
  * @ingroup     board_spark-core
  * @{
  *
- * @file
+ * @file        periph_conf.h
  * @brief       Peripheral MCU configuration for the spark-core board
  *
  * @author      Christian Mehlis <mehlis@inf.fu-berlin.de>

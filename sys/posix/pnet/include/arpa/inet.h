@@ -66,7 +66,7 @@ struct in_addr {
  *          The Open Group Base Specification Issue 7, htons
  *      </a>
  *
- * @param[in] hostshort A 16 bit number.
+ * @param[in] hostlong  A 16 bit number.
  * @return              The argument value converted from host to network byte
  *                      order.
  */
@@ -79,7 +79,7 @@ struct in_addr {
  *          The Open Group Base Specification Issue 7, ntohl
  *      </a>
  *
- * @param[in] netlong   A 32-bit integer number.
+ * @param[in] hostlong  A 32-bit integer number.
  * @return              The argument value converted from network to host byte
  *                      order.
  */
@@ -92,7 +92,7 @@ struct in_addr {
  *          The Open Group Base Specification Issue 7, ntohs
  *      </a>
  *
- * @param[in] netshort  A 16-bit integer number.
+ * @param[in] hostlong  A 16-bit integer number.
  * @return              The argument value converted from network to host byte
  *                      order.
  */

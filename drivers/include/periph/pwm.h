@@ -10,8 +10,8 @@
  * @defgroup    driver_periph_pwm PWM
  * @ingroup     driver_periph
  * @brief       Low-level PWM peripheral driver
- *
  * @{
+ *
  * @file
  * @brief       Low-level PWM peripheral driver interface definitions
  *

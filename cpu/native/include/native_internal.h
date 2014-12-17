@@ -11,7 +11,8 @@
  */
 
 /**
- * @addtogroup    native_cpu
+ * @ingroup arch
+ * @defgroup    native_cpu  Native CPU
  * @{
  * @author  Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
  */

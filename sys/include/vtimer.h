@@ -32,13 +32,10 @@
 extern "C" {
 #endif
 
-/**
- * @brief IPC message type for vtimer msg callback
- */
 #define MSG_TIMER 12345
 
 /**
- * @brief A vtimer object.
+ * A vtimer object.
  *
  * This structure is used for declaring a vtimer. This should not be used by
  * programmers, use the vtimer_set_*-functions instead.
@@ -46,17 +43,10 @@ extern "C" {
  * \hideinitializer
  */
 typedef struct vtimer_t {
-    /** entry in vtimer's internal priority queue */
     priority_queue_node_t priority_queue_entry;
-    /** the absoule point in time when the timer expires */
     timex_t absolute;
-    /** the action to perform when timer fires */
     void (*action)(struct vtimer_t *timer);
-    /** value for msg_t.type */
-    uint16_t type;
-    /** optional argument for vtimer_t::action */
     void *arg;
-    /** optional process id for vtimer_t::action to act on */
     kernel_pid_t pid;
 } vtimer_t;
 
@@ -104,16 +94,14 @@ int vtimer_sleep(timex_t time);
  * @param[in]   t           pointer to preinitialised vtimer_t
  * @param[in]   interval    vtimer timex_t interval
  * @param[in]   pid         process id
- * @param[in]   type        value for the msg_t type
  * @param[in]   ptr         message value
  * @return      0 on success, < 0 on error
  */
-int vtimer_set_msg(vtimer_t *t, timex_t interval, kernel_pid_t pid, uint16_t type, void *ptr);
+int vtimer_set_msg(vtimer_t *t, timex_t interval, kernel_pid_t pid, void *ptr);
 
 /**
  * @brief   set a vtimer with wakeup event
  * @param[in]   t           pointer to preinitialised vtimer_t
- * @param[in]   interval    the interval after which the timer shall fire
  * @param[in]   pid         process id
  * @return      0 on success, < 0 on error
  */

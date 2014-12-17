@@ -29,7 +29,7 @@ extern "C" {
 #endif
 
 /**
- * @brief Descriptor struct for rgbleds
+ * @name Descriptor struct for rgbleds
  */
 typedef struct {
     pwm_t device;

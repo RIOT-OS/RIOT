@@ -31,45 +31,23 @@
 extern "C" {
 #endif
 
-/** @brief The sensors default I2C address */
+/* define the SRF02 registers*/
 #define SRF08_DEFAULT_ADDR              112
-
-
-/** @brief The sensors command register (write) */
 #define SRF08_COMMAND_REG               0x0
-
-/** @brief Max. gain register (write) */
+#define SRF08_RANGE_HIGH_BYTE           0x2
+#define SRF08_RANGE_LOW_BYTE            0x3
+#define SRF08_REAL_RANGING_MODE_CM      0x51
+#define SRF08_RANGE_REG                 0x2
 #define SRF08_GAIN_REG                  0x1
 
-/** @brief The sensors range register (write) */
-#define SRF08_RANGE_REG                 0x2
-
-/** @brief The upper measurement byte (read) */
-#define SRF08_RANGE_HIGH_BYTE           0x2
-
-/** @brief The lower measurement byte (read)*/
-#define SRF08_RANGE_LOW_BYTE            0x3
-
-
-/** @brief Measure in inch mode */
-#define SRF08_REAL_RANGING_MODE_CM      0x50
-
-/** @brief Measure in cm mode */
-#define SRF08_REAL_RANGING_MODE_CM      0x51
-
-/** @brief Measure in micro-seconds mode */
-#define SRF08_REAL_RANGING_MODE_CM      0x52
-
-
-/** @brief Number of highest register */
 #define SRF08_MAX_REGISTER_NUMBER       35
-
-/** @brief Maximum number of echos from more distant objects */
 #define SRF08_MAX_ECHO_NUMBER           17
 
-
-/** @brief Define the used I2C Interface */
-#define SRF08_I2C_INTERFACE I2C2        /* P0.10 SDA2, P0.11 SCL2 */
+/* Define the used I2C Interface */
+//#define I2C_INTERFACE I2C0            // P0.27 SDA0, P0.28 SCL0
+//#define I2C_INTERFACE I2C1_0          // P0.0  SDA1, P0.1  SCL1
+//#define I2C_INTERFACE I2C1_1          // P0.19 SDA1, P0.20 SCL1
+#define SRF08_I2C_INTERFACE I2C2        // P0.10 SDA2, P0.11 SCL2
 
 
 /**

@@ -1,5 +1,7 @@
 /**
- * Copyright (C) 2013, 2014  INRIA.
+ * RPL dodag implementation
+ *
+ * Copyright (C) 2013  INRIA.
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -7,13 +9,9 @@
  *
  * @ingroup rpl
  * @{
- *
- * @file        rpl_dodag.c
- * @brief       RPL DODAG
- *
- * Implementation of a DODAG for usage with RPL.
- *
- * @author      Eric Engel <eric.engel@fu-berlin.de>
+ * @file    rpl_dodag.c
+ * @brief   RPL dodag functions
+ * @author  Eric Engel <eric.engel@fu-berlin.de>
  * @}
  */
 
@@ -141,10 +139,8 @@ void rpl_leave_dodag(rpl_dodag_t *dodag)
 
 bool rpl_equal_id(ipv6_addr_t *id1, ipv6_addr_t *id2)
 {
-    for (uint8_t i = 0; i < 2; i++) {
-        DEBUGF("ID1: %d ID2: %d\n", id1->uint8[12 + i], id2->uint8[12 + i]);
-
-        if (id1->uint8[14 + i] != id2->uint8[14 + i]) {
+    for (uint8_t i = 0; i < 4; i++) {
+        if (id1->uint32[i] != id2->uint32[i]) {
             return false;
         }
     }
@@ -273,7 +269,7 @@ rpl_parent_t *rpl_find_preferred_parent(void)
     if (!rpl_equal_id(&my_dodag->my_preferred_parent->addr, &best->addr)) {
         if (my_dodag->mop != RPL_NO_DOWNWARD_ROUTES) {
             /* send DAO with ZERO_LIFETIME to old parent */
-            rpl_send_DAO(&my_dodag->my_preferred_parent->addr, 0, false, 0);
+            send_DAO(&my_dodag->my_preferred_parent->addr, 0, false, 0);
         }
 
         my_dodag->my_preferred_parent = best;

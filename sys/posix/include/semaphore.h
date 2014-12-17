@@ -20,13 +20,8 @@ extern "C" {
 /** Value returned if `sem_open' failed.  */
 #define SEM_FAILED      ((sem_t *) 0)
 
-/**
- * @brief Semaphore struct
- */
 typedef struct sem {
-    /** the value of the semaphore */
     volatile unsigned int value;
-    /** list of threads waiting for the semaphore */
     priority_queue_t queue;
 } sem_t;
 

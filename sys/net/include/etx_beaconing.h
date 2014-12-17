@@ -6,17 +6,6 @@
  * directory for more details.
  */
 
-/**
- * @ingroup     rpl
- * @{
- * @file        etx_beaconing.h
- *
- * Header-file, which includes all constants and functions used for ETX-based beaconing.
- *
- * @author  Stephan Arndt <arndtste@zedat.fu-berlin.de>
- * @}
- */
-
 #ifndef ETX_BEACONING_H_
 #define ETX_BEACONING_H_
 #include <stdint.h>

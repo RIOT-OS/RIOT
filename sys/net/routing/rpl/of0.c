@@ -1,20 +1,17 @@
-/*
- * Copyright (C) 2014 Oliver Hahm <oliver.hahm@inria.fr>
+/**
+ * Objective function 0 for RPL implementation
+ *
+ * Copyright (C) 2013  INRIA.
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
- */
-
-/**
- * @ingroup     rpl
+ *
+ * @ingroup rpl
  * @{
- * @file        of0.c
- * @brief       Objective Function Zero.
- *
- * Implementation of Objective Function Zero.
- *
- * @author      Eric Engel <eric.engel@fu-berlin.de>
+ * @file    of0.c
+ * @brief   RPL objective function 0
+ * @author  Eric Engel <eric.engel@fu-berlin.de>
  * @}
  */
 

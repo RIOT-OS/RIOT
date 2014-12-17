@@ -21,7 +21,7 @@
 #include "msg.h"
 
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG (1)
 #include "debug.h"
 
 
@@ -616,10 +616,6 @@ int nrf24l01p_set_power(nrf24l01p_t *dev, int *pwr)
     char rf_setup;
 
     nrf24l01p_read_reg(dev, REG_RF_SETUP, &rf_setup);
-
-    if (pwr == NULL) {
-        return -1;
-    }
 
     if (*pwr >= -3) {
         rf_setup &= ~(3 << 1);

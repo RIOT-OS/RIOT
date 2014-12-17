@@ -1,3 +1,2 @@
 FEATURES_PROVIDED += transceiver periph_cpuid cpp
 FEATURES_PROVIDED += periph_random
-FEATURES_PROVIDED += periph_rtc

@@ -25,13 +25,6 @@
 /* supported transceivers *
  * NOTE: necessary to include here again due to
  * https://github.com/RIOT-OS/RIOT/issues/117 */
-#ifdef MODULE_CC110X
-#include "cc110x.h"
-#ifndef TRANSCEIVER_DEFAULT
-#define TRANSCEIVER_DEFAULT TRANSCEIVER_CC1100
-#endif
-#endif
-
 #ifdef MODULE_CC110X_LEGACY_CSMA
 #include "cc110x_legacy_csma.h"
 #ifndef TRANSCEIVER_DEFAULT
@@ -88,17 +81,11 @@
 extern "C" {
 #endif
 
-/**
- * @brief Stack size for transceiver thread
- */
+/* Stack size for transceiver thread */
 #ifndef TRANSCEIVER_STACK_SIZE
 #define TRANSCEIVER_STACK_SIZE      (KERNEL_CONF_STACKSIZE_DEFAULT)
 #endif
 
-/**
- * @name Defines the upper payload limit for all available transceivers
- * @{
- */
 #ifndef PAYLOAD_SIZE
 #define PAYLOAD_SIZE  (0)
 #endif
@@ -108,7 +95,7 @@ extern "C" {
 #define PAYLOAD_SIZE (CC1100_MAX_DATA_LENGTH)
 #endif
 #endif
-#if (defined(MODULE_CC110X) || defined(MODULE_CC110X_LEGACY))
+#ifdef MODULE_CC110X_LEGACY
 #if (CC1100_MAX_DATA_LENGTH > PAYLOAD_SIZE)
 #undef PAYLOAD_SIZE
 #define PAYLOAD_SIZE (CC1100_MAX_DATA_LENGTH)
@@ -138,40 +125,26 @@ extern "C" {
 #define PAYLOAD_SIZE (NATIVE_MAX_DATA_LENGTH)
 #endif
 #endif
-/**
- * @}
- */
-
-/**
- * @brief The maximum of threads to register 
- */
+/* The maximum of threads to register */
 #define TRANSCEIVER_MAX_REGISTERED  (4)
 
-/**
- * @brief The size of the message queue between driver and transceiver (must be
- *        power of two
- */
+/* The size of the message queue between driver and transceiver (must be power
+ * of two */
 #define TRANSCEIVER_MSG_BUFFER_SIZE     (32)
 
-/**
- * @brief The maximum number of ignored addresses
- */
+/** The maximum number of ignored addresses */
 #define TRANSCEIVER_MAX_IGNORED_ADDR     (10)
 
 /**
- * @name All supported transceivers
- * @{
+ * @brief All supported transceivers
  */
-#define TRANSCEIVER_NONE        (0x0)       /**< Invalid */
-#define TRANSCEIVER_CC1100      (0x01)      /**< CC110X transceivers */
-#define TRANSCEIVER_CC1020      (0x02)      /**< CC1020 transceivers */
-#define TRANSCEIVER_CC2420      (0x04)      /**< CC2420 transceivers */
-#define TRANSCEIVER_MC1322X     (0x08)      /**< MC1322X transceivers */
-#define TRANSCEIVER_NATIVE      (0x10)      /**< NATIVE transceivers */
-#define TRANSCEIVER_AT86RF231   (0x20)      /**< AT86RF231 transceivers */
-/**
- * @}
- */
+#define TRANSCEIVER_NONE        (0x0)       ///< Invalid
+#define TRANSCEIVER_CC1100      (0x01)      ///< CC110X transceivers
+#define TRANSCEIVER_CC1020      (0x02)      ///< CC1020 transceivers
+#define TRANSCEIVER_CC2420      (0x04)      ///< CC2420 transceivers
+#define TRANSCEIVER_MC1322X     (0x08)      ///< MC1322X transceivers
+#define TRANSCEIVER_NATIVE      (0x10)      ///< NATIVE transceivers
+#define TRANSCEIVER_AT86RF231   (0x20)      ///< AT86RF231 transceivers
 
 /**
  * @brief Data type for transceiver specification
@@ -188,69 +161,60 @@ typedef uint64_t transceiver_eui64_t;
  */
 enum transceiver_msg_type_t {
     /* Message types for driver <-> transceiver communication */
-    RCV_PKT_CC1020,        /**< packet was received by CC1020 transceiver */
-    RCV_PKT_CC1100,        /**< packet was received by CC1100 transceiver */
-    RCV_PKT_CC2420,        /**< packet was received by CC2420 transceiver */
-    RCV_PKT_MC1322X,       /**< packet was received by mc1322x transceiver */
-    RCV_PKT_NATIVE,        /**< packet was received by native transceiver */
-    RCV_PKT_AT86RF231,     /**< packet was received by AT86RF231 transceiver */
+    RCV_PKT_CC1020,        ///< packet was received by CC1020 transceiver
+    RCV_PKT_CC1100,        ///< packet was received by CC1100 transceiver
+    RCV_PKT_CC2420,        ///< packet was received by CC2420 transceiver
+    RCV_PKT_MC1322X,       ///< packet was received by mc1322x transceiver
+    RCV_PKT_NATIVE,        ///< packet was received by native transceiver
+    RCV_PKT_AT86RF231,     ///< packet was received by AT86RF231 transceiver
 
     /* Message types for transceiver <-> upper layer communication */
-    PKT_PENDING,    /**< packet pending in transceiver buffer */
-    SND_PKT,        /**< request for sending a packet */
-    SND_ACK,        /**< request for sending an acknowledgement */
-    SWITCH_RX,      /**< switch transceiver to RX sate */
-    POWERDOWN,      /**< power down transceiver */
-    GET_CHANNEL,    /**< Get current channel */
-    SET_CHANNEL,    /**< Set a new channel */
-    GET_ADDRESS,    /**< Get the radio address */
-    SET_ADDRESS,    /**< Set the radio address */
-    GET_LONG_ADDR,  /**< Get the long radio address, if existing */
-    SET_LONG_ADDR,  /**< Set the long radio address, if supported by hardware */
-    SET_MONITOR,    /**< Set transceiver to monitor mode (disable address 
-                         checking) */
-    GET_PAN,        /**< Get current pan */
-    SET_PAN,        /**< Set a new pan */
+    PKT_PENDING,    ///< packet pending in transceiver buffer
+    SND_PKT,        ///< request for sending a packet
+    SND_ACK,        ///< request for sending an acknowledgement
+    SWITCH_RX,      ///< switch transceiver to RX sate
+    POWERDOWN,      ///< power down transceiver
+    GET_CHANNEL,    ///< Get current channel
+    SET_CHANNEL,    ///< Set a new channel
+    GET_ADDRESS,    ///< Get the radio address
+    SET_ADDRESS,    ///< Set the radio address
+    GET_LONG_ADDR,  ///< Get the long radio address, if existing
+    SET_LONG_ADDR,  ///< Set the long radio address, if supported by hardware
+    SET_MONITOR,    ///< Set transceiver to monitor mode (disable address checking)
+    GET_PAN,        ///< Get current pan
+    SET_PAN,        ///< Set a new pan
 
     /* debug message types */
-    DBG_IGN,        /**< add a physical address to the ignore list */
+    DBG_IGN,        ///< add a physical address to the ignore list
 
     /* Error messages */
-    ENOBUFFER,      /**< No buffer left */
+    ENOBUFFER,      ///< No buffer left
 
     /* reserve message types for higher layer notifications */
-    UPPER_LAYER_1,  /**< reserved */
-    UPPER_LAYER_2,  /**< reserved */
-    UPPER_LAYER_3,  /**< reserved */
-    UPPER_LAYER_4,  /**< reserved */
-    UPPER_LAYER_5,  /**< reserved */
+    UPPER_LAYER_1,  ///< reserved
+    UPPER_LAYER_2,  ///< reserved
+    UPPER_LAYER_3,  ///< reserved
+    UPPER_LAYER_4,  ///< reserved
+    UPPER_LAYER_5,  ///< reserved
 };
 
 /**
  * @brief Manage registered threads per transceiver
  */
 typedef struct {
-    transceiver_type_t transceivers;   /**< the tranceivers the thread is 
-                                            registered for */
-    kernel_pid_t pid;                  /**< the thread's pid */
+    transceiver_type_t transceivers;   ///< the tranceivers the thread is registered for
+    kernel_pid_t pid;                  ///< the thread's pid
 } registered_t;
 
-/**
- * @brief Transceiver command struct
- */
 typedef struct {
-    transceiver_type_t transceivers; /**< Bitfield of targeted transceivers */
-    void *data; /**< The payload of the command */
+    transceiver_type_t transceivers;
+    void *data;
 } transceiver_command_t;
 
-/**
- * @brief The transceiver thread's pid
- */
+/* The transceiver thread's pid */
 extern volatile kernel_pid_t transceiver_pid;
 
-/**
- * @brief An array of ignored link layer addresses 
- */
+/** An array of ignored link layer addresses */
 extern radio_address_t transceiver_ignored_addr[TRANSCEIVER_MAX_IGNORED_ADDR];
 
 /**

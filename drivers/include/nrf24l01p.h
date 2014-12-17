@@ -139,7 +139,7 @@ int nrf24l01p_read_reg(nrf24l01p_t *dev, char reg, char *answer);
 *
 * @param[in] dev    Transceiver device to use.
 * @param[in] reg    Register address to write to.
-* @param[in] write  Byte to write.
+* @param[in] answer Byte to write.
 *
 * @return           1 on success.
 * @return           -1 on error.
@@ -155,7 +155,7 @@ int nrf24l01p_write_reg(nrf24l01p_t *dev, char reg, char write);
 * @param[in] dev    Transceiver device to use.
 * @param[in] spi    SPI device to use.
 * @param[in] ce     GPIO pin to use for chip enable.
-* @param[in] csn    GPIO pin to use for chip select.
+* @param[in] cs     GPIO pin to use for chip select.
 * @param[in] irq    GPIO pin to use for interrupt request.
 *
 * @return           1 on success.
