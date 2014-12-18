@@ -36,13 +36,38 @@ extern "C" {
 
 #define NDP_6LOWPAN_CONTEXT_MAX         (16)
 
-#define NDP_OPT_SLLAO_TYPE                  (1)
-#define NDP_OPT_TLLAO_TYPE                  (2)
-#define NDP_OPT_PI_VLIFETIME_INFINITE       (0xffffffff)
-#define NDP_OPT_PI_PLIFETIME_INFINITE       (0xffffffff)
-#define NDP_OPT_ARO_STATE_SUCCESS           (0)
-#define NDP_OPT_ARO_STATE_DUP_ADDR          (1)
-#define NDP_OPT_ARO_STATE_NBR_CACHE_FULL    (2)
+#define NDP_OPT_SLLAO_TYPE                 	(1)
+#define NDP_OPT_TLLAO_TYPE                 	(2)
+#define NDP_OPT_PI_VLIFETIME_INFINITE      	(0xffffffff)
+#define NDP_OPT_PI_PLIFETIME_INFINITE      	(0xffffffff)
+#define NDP_OPT_ARO_STATE_SUCCESS          	(0)
+#define NDP_OPT_ARO_STATE_DUP_ADDR         	(1)
+#define NDP_OPT_ARO_STATE_NBR_CACHE_FULL   	(2)
+
+/**
+ * @brief   The retransmission timeout for neighbor cache entry in millisecronds.
+ *
+ * @see <a href="http://tools.ietf.org/html/rfc4861#section-4.2">
+ *          RFC 4861, section 4.2
+ *      </a>.
+ */
+#define NDP_RA_RETRANSMISSION_TIMEOUT_DEFAULT   (50)
+#define NDP_NS_RETRANSMISSION_RETRIES           (5)
+
+/**
+ * @brief   The reachability timeout for neighbor cache entries in milliseconds.
+ *          After this timeframe a NCE changes state from REACHABLE to STALE
+ *
+ * @see <a href="http://tools.ietf.org/html/rfc4861#section-4.2">
+ *          RFC 4861, section 4.2
+ *      </a>.
+ */
+#define NDP_RA_REACHABILITY_TIMEOUT_DEFAULT     (10000)
+
+/**
+ * @brief   The maximum length of a link-layer address in the neighbor cache.
+ */
+#define NDP_NCE_MAX_LLADDR_LEN                  (8)
 
 /**
  * @brief   Neighbor cache entry state according to
@@ -122,15 +147,15 @@ typedef struct __attribute__((packed)) {
  */
 typedef struct __attribute__((packed)) {
     int if_id;                  ///< Interface the IPv6 address is reachable
-    ///< over
+                                ///< over
     ndp_nce_type_t type;        ///< Type of neighbor cache entry.
     ndp_nce_state_t state;      ///< State of neighbor cache entry.
     uint8_t isrouter;           ///< Flag to signify that this neighbor
-    ///< is a router.
+                                ///< is a router.
     ipv6_addr_t addr;           ///< IPv6 address of the neighbor.
-    uint8_t lladdr[8];          ///< Link-layer address of the neighbor
+    uint8_t lladdr[NDP_NCE_MAX_LLADDR_LEN]; ///< Link-layer address of the neighbor
     uint8_t lladdr_len;         ///< Length of link-layer address of the
-    ///< neighbor
+                                ///< neighbor
     timex_t ltime;              ///< lifetime of entry.
 } ndp_neighbor_cache_t;
 
@@ -147,6 +172,8 @@ typedef struct __attribute__((packed)) {
 } ndp_a6br_cache_t;
 
 ndp_default_router_list_t *ndp_default_router_list_search(ipv6_addr_t *ipaddr);
+void ndp_neighbor_cache_clear(void);
+int ndp_state_change_on_upper_layer_reachability_conf(ndp_nce_type_t *nce);
 uint8_t ndp_neighbor_cache_add(int if_id, const ipv6_addr_t *ipaddr,
                                const void *lladdr, uint8_t lladdr_len,
                                uint8_t isrouter, ndp_nce_state_t state,
@@ -163,7 +190,7 @@ uint8_t ndp_neighbor_cache_add(int if_id, const ipv6_addr_t *ipaddr,
 uint8_t ndp_neighbor_cache_remove(const ipv6_addr_t *ipaddr);
 
 ndp_neighbor_cache_t *ndp_neighbor_cache_search(ipv6_addr_t *ipaddr);
-ndp_neighbor_cache_t *ndp_get_ll_address(ipv6_addr_t *ipaddr);
+ndp_neighbor_cache_t *ndp_get_ll_address(ipv6_addr_t *ipaddr, ipv6_hdr_t *packet);
 int ndp_addr_is_on_link(ipv6_addr_t *dest_addr);
 
 /**

@@ -438,16 +438,10 @@ void recv_rtr_sol(void)
     }
 
     if (llao != NULL) {
-        uint8_t lladdr_len;
+        int lladdr_len;
         nbr_entry = ndp_neighbor_cache_search(&ipv6_buf->srcaddr);
 
-        if (opt_stllao_buf->length == 2) {
-            lladdr_len = 8;
-        }
-        else if (opt_stllao_buf->length == 1) {
-            lladdr_len = 2;
-        }
-        else {
+        if ((lladdr_len = ndp_get_link_layer_address_len_from_llao(opt_stllao_buf)) == 0) {
             DEBUG("Unknown length for S/TLLAO: %d * 8 Bytes.\n", opt_stllao_buf->length);
             return;
         }
@@ -1562,7 +1556,11 @@ uint8_t ndp_neighbor_cache_add(int if_id, const ipv6_addr_t *ipaddr,
 
     nbr_cache[nbr_count].if_id = if_id;
     memcpy(&(nbr_cache[nbr_count].addr), ipaddr, 16);
-    memcpy(&(nbr_cache[nbr_count].lladdr), lladdr, lladdr_len);
+
+    if (lladdr != NULL) {
+        memcpy(&(nbr_cache[nbr_count].lladdr), lladdr, lladdr_len);
+    }
+
     nbr_cache[nbr_count].lladdr_len = lladdr_len;
     nbr_cache[nbr_count].isrouter = isrouter;
     nbr_cache[nbr_count].state = state;
