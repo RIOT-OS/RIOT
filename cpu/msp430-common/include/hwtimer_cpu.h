@@ -34,7 +34,7 @@ extern "C" {
 #endif
 
 #define HWTIMER_SPEED  (F_RC_OSCILLATOR)
-#define HWTIMER_MAXTICKS (0xFFFFFFFF)
+#define HWTIMER_MAXTICKS (0x0000FFFF)
 
 #ifdef __cplusplus
 }
