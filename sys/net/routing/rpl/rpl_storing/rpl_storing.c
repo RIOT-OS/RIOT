@@ -330,15 +330,15 @@ void rpl_send_DAO_mode(ipv6_addr_t *destination, uint8_t lifetime, bool default_
             rpl_send_opt_target_buf->prefix_length = RPL_DODAG_ID_LEN;
             memcpy(&rpl_send_opt_target_buf->target, &rpl_get_routing_table()[i].address,
                     sizeof(ipv6_addr_t));
-            opt_len += RPL_OPT_TARGET_LEN;
+            opt_len += RPL_OPT_TARGET_LEN_WITH_OPT_LEN;
             rpl_send_opt_transit_buf = get_rpl_send_opt_transit_buf(DAO_BASE_LEN + opt_len);
             rpl_send_opt_transit_buf->type = RPL_OPT_TRANSIT;
-            rpl_send_opt_transit_buf->length = RPL_OPT_TRANSIT_LEN;
+            rpl_send_opt_transit_buf->length = (RPL_OPT_TRANSIT_LEN - sizeof(ipv6_addr_t));
             rpl_send_opt_transit_buf->e_flags = 0x00;
             rpl_send_opt_transit_buf->path_control = 0x00; /* not used */
             rpl_send_opt_transit_buf->path_sequence = 0x00; /* not used */
             rpl_send_opt_transit_buf->path_lifetime = lifetime;
-            opt_len += RPL_OPT_TRANSIT_LEN;
+            opt_len += (RPL_OPT_TRANSIT_LEN_WITH_OPT_LEN - sizeof(ipv6_addr_t));
             rpl_send_opt_target_buf = get_rpl_send_opt_target_buf(DAO_BASE_LEN + opt_len);
             entries++;
         }
@@ -357,16 +357,16 @@ void rpl_send_DAO_mode(ipv6_addr_t *destination, uint8_t lifetime, bool default_
     rpl_send_opt_target_buf->flags = 0x00;
     rpl_send_opt_target_buf->prefix_length = RPL_DODAG_ID_LEN;
     memcpy(&rpl_send_opt_target_buf->target, &my_address, sizeof(ipv6_addr_t));
-    opt_len += RPL_OPT_TARGET_LEN;
+    opt_len += RPL_OPT_TARGET_LEN_WITH_OPT_LEN;
 
     rpl_send_opt_transit_buf = get_rpl_send_opt_transit_buf(DAO_BASE_LEN + opt_len);
     rpl_send_opt_transit_buf->type = RPL_OPT_TRANSIT;
-    rpl_send_opt_transit_buf->length = RPL_OPT_TRANSIT_LEN;
+    rpl_send_opt_transit_buf->length = (RPL_OPT_TRANSIT_LEN - sizeof(ipv6_addr_t));
     rpl_send_opt_transit_buf->e_flags = 0x00;
     rpl_send_opt_transit_buf->path_control = 0x00;
     rpl_send_opt_transit_buf->path_sequence = 0x00;
     rpl_send_opt_transit_buf->path_lifetime = lifetime;
-    opt_len += RPL_OPT_TRANSIT_LEN;
+    opt_len += (RPL_OPT_TRANSIT_LEN_WITH_OPT_LEN - sizeof(ipv6_addr_t));
 
     uint16_t plen = ICMPV6_HDR_LEN + DAO_BASE_LEN + opt_len;
     rpl_send(destination, (uint8_t *)icmp_send_buf, plen, IPV6_PROTO_NUM_ICMPV6);
@@ -664,12 +664,12 @@ void rpl_recv_DAO_mode(void)
             }
 
             case (RPL_OPT_PADN): {
-                len += rpl_opt_buf->length;
+                len += (rpl_opt_buf->length + RPL_OPT_LEN);
                 break;
             }
 
             case (RPL_OPT_DAG_METRIC_CONTAINER): {
-                len += rpl_opt_buf->length;
+                len += (rpl_opt_buf->length + RPL_OPT_LEN);
                 break;
             }
 
@@ -681,7 +681,7 @@ void rpl_recv_DAO_mode(void)
                     break;
                 }
 
-                len += rpl_opt_target_buf->length;
+                len += (rpl_opt_target_buf->length + RPL_OPT_LEN);
                 rpl_opt_transit_buf = get_rpl_opt_transit_buf(len);
 
                 if (rpl_opt_transit_buf->type != RPL_OPT_TRANSIT) {
@@ -690,7 +690,7 @@ void rpl_recv_DAO_mode(void)
                     break;
                 }
 
-                len += rpl_opt_transit_buf->length;
+                len += (rpl_opt_transit_buf->length + RPL_OPT_LEN);
                 /* route lifetime seconds = (DAO lifetime) * (Unit Lifetime) */
 
 #if RPL_MAX_ROUTING_ENTRIES != 0
@@ -706,12 +706,12 @@ void rpl_recv_DAO_mode(void)
             }
 
             case (RPL_OPT_TRANSIT): {
-                len += rpl_opt_buf->length;
+                len += (rpl_opt_buf->length + RPL_OPT_LEN);
                 break;
             }
 
             case (RPL_OPT_TARGET_DESC): {
-                len += rpl_opt_buf->length;
+                len += (rpl_opt_buf->length + RPL_OPT_LEN);
                 break;
             }
 
