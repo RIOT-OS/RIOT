@@ -238,22 +238,6 @@ int msg_reply(msg_t *m, msg_t *reply)
     return 1;
 }
 
-int msg_reply_int(msg_t *m, msg_t *reply)
-{
-    tcb_t *target = (tcb_t*) sched_threads[m->sender_pid];
-
-    if (target->status != STATUS_REPLY_BLOCKED) {
-        DEBUG("msg_reply_int(): %s: Target \"%s\" not waiting for reply.", sched_active_thread->name, target->name);
-        return -1;
-    }
-
-    msg_t *target_message = (msg_t*) target->wait_data;
-    *target_message = *reply;
-    sched_set_status(target, STATUS_PENDING);
-    sched_context_switch_request = 1;
-    return 1;
-}
-
 int msg_try_receive(msg_t *m)
 {
     return _msg_receive(m, 0);
