@@ -121,7 +121,7 @@ static int _msg_send(msg_t *m, kernel_pid_t target_pid, bool block, unsigned sta
 
         priority_queue_add(&(target->msg_waiters), &n);
 
-        sched_active_thread->wait_data = (void*) m;
+        sched_active_thread->wait_data = m;
 
         int newstatus;
 
@@ -142,7 +142,7 @@ static int _msg_send(msg_t *m, kernel_pid_t target_pid, bool block, unsigned sta
     else {
         DEBUG("msg_send: %s: Direct msg copy from %" PRIkernel_pid " to %" PRIkernel_pid ".\n", sched_active_thread->name, thread_getpid(), target_pid);
         /* copy msg to target */
-        msg_t *target_message = (msg_t*) target->wait_data;
+        msg_t *target_message = target->wait_data;
         *target_message = *m;
         sched_set_status(target, STATUS_PENDING);
 
@@ -185,7 +185,7 @@ int msg_send_int(msg_t *m, kernel_pid_t target_pid)
 
 
         /* copy msg to target */
-        msg_t *target_message = (msg_t*) target->wait_data;
+        msg_t *target_message = target->wait_data;
         *target_message = *m;
         sched_set_status(target, STATUS_PENDING);
 
@@ -203,7 +203,7 @@ int msg_send_receive(msg_t *m, msg_t *reply, kernel_pid_t target_pid)
     unsigned state = disableIRQ();
     tcb_t *me = (tcb_t*) sched_threads[sched_active_pid];
     sched_set_status(me, STATUS_REPLY_BLOCKED);
-    me->wait_data = (void*) reply;
+    me->wait_data = reply;
 
     /* msg_send blocks until reply received */
     return _msg_send(m, target_pid, true, state);
@@ -228,7 +228,7 @@ int msg_reply(msg_t *m, msg_t *reply)
 
     DEBUG("msg_reply(): %s: Direct msg copy.\n", sched_active_thread->name);
     /* copy msg to target */
-    msg_t *target_message = (msg_t*) target->wait_data;
+    msg_t *target_message = target->wait_data;
     *target_message = *reply;
     sched_set_status(target, STATUS_PENDING);
     uint16_t target_prio = target->priority;
@@ -272,7 +272,7 @@ static int _msg_receive(msg_t *m, int block)
         *m = me->msg_array[queue_index];
     }
     else {
-        me->wait_data = (void *) m;
+        me->wait_data = m;
     }
 
     priority_queue_node_t *node = priority_queue_remove_head(&(me->msg_waiters));
@@ -307,7 +307,7 @@ static int _msg_receive(msg_t *m, int block)
         }
 
         /* copy msg */
-        msg_t *sender_msg = (msg_t*) sender->wait_data;
+        msg_t *sender_msg = sender->wait_data;
         *m = *sender_msg;
 
         /* remove sender from queue */
