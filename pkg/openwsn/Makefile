@@ -25,7 +25,7 @@ clean::
 	@echo "Cleaning up OpenWSN package..."
 	@cd "$(PKG_DIR)" 2> /dev/null > /dev/null && \
 		git clean -x -f && \
-		git am --abort && \
+		git am --abort ; \
 		git reset --hard "$(PKG_VERSION)" && \
 		$(MAKE) patch || true
 
