@@ -262,7 +262,7 @@ void rpl_send_DIO_mode(ipv6_addr_t *destination)
     /* DODAG configuration option */
     rpl_send_opt_dodag_conf_buf = get_rpl_send_opt_dodag_conf_buf(DIO_BASE_LEN);
     rpl_send_opt_dodag_conf_buf->type = RPL_OPT_DODAG_CONF;
-    rpl_send_opt_dodag_conf_buf->length = RPL_OPT_DODAG_CONF_LEN;
+    rpl_send_opt_dodag_conf_buf->length = (RPL_OPT_DODAG_CONF_LEN - RPL_OPT_LEN);
     rpl_send_opt_dodag_conf_buf->flags_a_pcs = 0;
     rpl_send_opt_dodag_conf_buf->DIOIntDoubl = mydodag->dio_interval_doubling;
     rpl_send_opt_dodag_conf_buf->DIOIntMin = mydodag->dio_min;
@@ -499,7 +499,7 @@ void rpl_recv_DIO_mode(void)
             case (RPL_OPT_DODAG_CONF): {
                 has_dodag_conf_opt = 1;
 
-                if (rpl_opt_buf->length != RPL_OPT_DODAG_CONF_LEN) {
+                if (rpl_opt_buf->length != (RPL_OPT_DODAG_CONF_LEN - RPL_OPT_LEN)) {
                     DEBUGF("DODAG configuration is malformed.\n");
                     /* error malformed */
                     return;
@@ -519,7 +519,7 @@ void rpl_recv_DIO_mode(void)
             }
 
             case (RPL_OPT_PREFIX_INFO): {
-                if (rpl_opt_buf->length != RPL_OPT_PREFIX_INFO_LEN) {
+                if (rpl_opt_buf->length != (RPL_OPT_PREFIX_INFO_LEN - RPL_OPT_LEN)) {
                     /* error malformed */
                     return;
                 }
