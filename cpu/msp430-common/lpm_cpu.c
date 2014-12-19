@@ -33,10 +33,10 @@
 /* Initialise the MSP430 power-saving mechanisms. */
 void lpm_init(void)
 {
-    // nothing to initialize on MSP430s: everything is done by fiddling
-    //  with 4 bits of the status register (SR).
+    /* nothing to initialize on MSP430s: everything is done by fiddling
+       with 4 bits of the status register (SR). */
 
-    // just ensure MCU is fully up and running at start
+    /* just ensure MCU is fully up and running at start */
     lpm_awake();
 }
 
@@ -45,33 +45,44 @@ enum lpm_mode lpm_set(enum lpm_mode target)
 {
     enum lpm_mode last_mode = lpm_get();
 
+    /* ensure that interrupts are enabled before going to sleep,
+       or we're bound to hang our MCU! */
+    if (target != LPM_ON) {
+        if ((__read_status_register() & GIE) == 0) {
+            printf("WARNING: entering low-power mode with interrupts disabled!\n");
+            printf("         Forcing GIE bit to 1!\n\n");
+            __bis_status_register(GIE);
+        }
+    }
+
     switch (target)
     {
     case LPM_ON:
-        // fully running MCU
+        /* fully running MCU */
         __bic_status_register(CPUOFF | OSCOFF | SCG0 | SCG1);
         break;
     case LPM_IDLE:
-        // lightest mode => LPM0 mode of MSP430
+        /* lightest mode => LPM0 mode of MSP430 */
         __bic_status_register(OSCOFF | SCG0 | SCG1);
-        // only stops CPU block
+        /* only stops CPU block */
         __bis_status_register(CPUOFF);
         break;
     case LPM_SLEEP:
-        // mid-level mode => LPM1 mode of MSP430
+        /* mid-level mode => LPM1 mode of MSP430 */
         __bic_status_register(OSCOFF | SCG1);
-        // stops CPU and master clock blocks
+        /* stops CPU and master clock blocks */
         __bis_status_register(CPUOFF | SCG0);
         break;
     case LPM_POWERDOWN:
-        // deep-level mode => LPM3 mode of MSP430
+        /* deep-level mode => LPM3 mode of MSP430 */
         __bic_status_register(OSCOFF);
-        // stops all blocks except auxiliary clock (timers)
+        /* stops all blocks except auxiliary clock (timers) */
         __bis_status_register(CPUOFF | SCG0 | SCG1);
         break;
     case LPM_OFF:
-        // MCU totally down (LPM4), only RESET or NMI can resume execution
-        __bis_status_register(CPUOFF | OSCOFF | SCG0 | SCG1);  // all blocks off
+        /* MCU totally down (LPM4), only RESET or NMI can resume execution */
+        __bis_status_register(CPUOFF | OSCOFF | SCG0 | SCG1);
+                               /* all blocks off */
         break;
     default:
         printf("ERROR: trying to set an invalid low-power mode!\n");
@@ -90,20 +101,20 @@ enum lpm_mode lpm_get(void)
 
     unsigned int current_sr = __read_status_register();
     switch (current_sr & LPM_MASK_SR) {
-    case CPUOFF + OSCOFF + SCG0 + SCG1:   // MSP430's LPM4
+    case CPUOFF + OSCOFF + SCG0 + SCG1:   /* MSP430's LPM4 */
         current_mode = LPM_OFF;
         break;
-    case CPUOFF + SCG0 + SCG1:   // MSP430's LPM3
-    case CPUOFF + SCG1:   // MSP430's LPM2
+    case CPUOFF + SCG0 + SCG1:   /* MSP430's LPM3 */
+    case CPUOFF + SCG1:   /* MSP430's LPM2 */
         current_mode = LPM_POWERDOWN;
         break;
-    case CPUOFF + SCG0:   // MSP430's LPM1
+    case CPUOFF + SCG0:   /* MSP430's LPM1 */
         current_mode = LPM_SLEEP;
         break;
-    case CPUOFF:   // MSP430's LPM1
+    case CPUOFF:   /* MSP430's LPM1 */
         current_mode = LPM_IDLE;
         break;
-    case 0:   // MSP430 active
+    case 0:   /* MSP430 active */
         current_mode = LPM_ON;
         break;
     }
@@ -114,7 +125,7 @@ enum lpm_mode lpm_get(void)
 /* resume the MSP430 MCU */
 inline void lpm_awake(void)
 {
-    // disable all power savings mechanisms
+    /* disable all power savings mechanisms */
     __bic_status_register(CPUOFF | OSCOFF | SCG0 | SCG1);
 }
 
