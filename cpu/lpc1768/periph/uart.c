@@ -88,11 +88,9 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
                 return -2;
             }
 
-            /* power on UART device */
+            /* power on UART device and select peripheral clock */
             UART_0_CLKEN();
-            /* set peripheral clock to CCLK / 4 */
-            LPC_SC->PCLKSEL1 &= (0x3 << 18);
-
+            UART_0_CLKSEL();
             /* set mode to 8N1 and enable access to divisor latch */
             UART_0_DEV->LCR = ((0x3 << 0) | (1 << 7));
             /* set baud rate registers (fixed for now) */
@@ -121,10 +119,9 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
                 return -2;
             }
 
-            /* power on UART device */
+            /* power on UART device and select peripheral clock */
             UART_1_CLKEN();
-            /* set peripheral clock to CCLK / 4 */
-            LPC_SC->PCLKSEL1 &= (0x3 << 18);
+            UART_1_CLKSEL();
             /* set mode to 8N1 and enable access to divisor latch */
             UART_1_DEV->LCR = ((0x3 << 0) | (1 << 7));
             /* set baud rate registers (fixed for now) */
