@@ -28,12 +28,81 @@ cc2420_packet_t cc2420_rx_buffer[CC2420_RX_BUF_SIZE];
 volatile uint8_t rx_buffer_next;  /* index of next free cell in RX buffer */
 
 /* pointer to the callback low-level function for packet reception */
-static receive_802154_packet_callback_t recv_func = NULL;
+typedef struct {
+    enum { CC2420_CB_TYPE_NONE = 0, CC2420_CB_TYPE_RAW, CC2420_CB_TYPE_DATA } type;
+    union {
+        netdev_802154_raw_packet_cb_t raw;
+        netdev_rcv_data_cb_t data;
+    } cb;
+} cc2420_callback_t;
 
+static cc2420_callback_t recv_func = {0, {NULL}};
 
-void cc2420_set_recv_callback(receive_802154_packet_callback_t recv_cb)
+int cc2420_add_raw_recv_callback(netdev_t *dev, netdev_802154_raw_packet_cb_t recv_cb)
 {
-    recv_func = recv_cb;
+    /* XXX: first check only for backwards compatibility with transceiver
+     *      (see cc2420_init) remove when adapter for transceiver exists */
+    if (dev != &cc2420_netdev) {
+        return -ENODEV;
+    }
+
+    if (recv_func.cb.raw != NULL) {
+        return -ENOBUFS;
+    }
+
+    recv_func.type = CC2420_CB_TYPE_RAW;
+    recv_func.cb.raw = recv_cb;
+
+    return 0;
+}
+
+int cc2420_rem_raw_recv_callback(netdev_t *dev, netdev_802154_raw_packet_cb_t recv_cb)
+{
+    /* XXX: first check only for backwards compatibility with transceiver
+     *      (see cc2420_init) remove when adapter for transceiver exists */
+    if (dev != &cc2420_netdev) {
+        return -ENODEV;
+    }
+
+    if (recv_func.cb.raw == recv_cb) {
+        recv_func.cb.raw = NULL;
+    }
+
+    return 0;
+}
+
+int cc2420_add_data_recv_callback(netdev_t *dev, netdev_rcv_data_cb_t recv_cb)
+{
+    /* XXX: first check only for backwards compatibility with transceiver
+     *      (see cc2420_init) remove when adapter for transceiver exists */
+    if (dev != &cc2420_netdev) {
+        return -ENODEV;
+    }
+
+    if (recv_func.cb.data != NULL) {
+        return -ENOBUFS;
+    }
+
+    recv_func.type = CC2420_CB_TYPE_DATA;
+    recv_func.cb.data = recv_cb;
+
+    return 0;
+}
+
+int cc2420_rem_data_recv_callback(netdev_t *dev, netdev_rcv_data_cb_t recv_cb)
+{
+    /* XXX: first check only for backwards compatibility with transceiver
+     *      (see cc2420_init) remove when adapter for transceiver exists */
+    if (dev != &cc2420_netdev) {
+        return -ENODEV;
+    }
+
+
+    if (recv_func.cb.data == recv_cb) {
+        recv_func.cb.data = NULL;
+    }
+
+    return 0;
 }
 
 void cc2420_rx_handler(void)
@@ -54,14 +123,15 @@ void cc2420_rx_handler(void)
     cc2420_read_fifo(&pkt_lqi, 1);
     crc_ok = ((pkt_lqi & 0x80) != 0);
     pkt_lqi &= 0x7F;
+
     if (!crc_ok) {
         DEBUG("Got packet with invalid crc.\n");
         return;
     }
 
     /* low-level reception mechanism (for MAC layer, among others) */
-    if (recv_func != NULL) {
-        recv_func(buf, pkt_len - 2, pkt_rssi, pkt_lqi, crc_ok);
+    if ((recv_func.type == CC2420_CB_TYPE_RAW) && (recv_func.cb.raw != NULL)) {
+        recv_func.cb.raw(NULL, buf, pkt_len - 2, pkt_rssi, pkt_lqi, crc_ok);
     }
 
     /* decode received packet */
@@ -73,11 +143,23 @@ void cc2420_rx_handler(void)
                           &cc2420_rx_buffer[rx_buffer_next].frame,
                           cc2420_rx_buffer[rx_buffer_next].length);
 
+    /* low-level data reception mechanism */
+    if ((recv_func.type == CC2420_CB_TYPE_DATA) && (recv_func.cb.data != NULL) &&
+        (cc2420_rx_buffer[rx_buffer_next].frame.fcf.frame_type == IEEE_802154_DATA_FRAME)) {
+        recv_func.cb.data(NULL, cc2420_rx_buffer[rx_buffer_next].frame.src_addr,
+                          (cc2420_rx_buffer[rx_buffer_next].frame.fcf.src_addr_m == IEEE_802154_SHORT_ADDR_M) ? 2 : 8,
+                          cc2420_rx_buffer[rx_buffer_next].frame.dest_addr,
+                          (cc2420_rx_buffer[rx_buffer_next].frame.fcf.dest_addr_m == IEEE_802154_SHORT_ADDR_M) ? 2 : 8,
+                          cc2420_rx_buffer[rx_buffer_next].frame.payload, cc2420_rx_buffer[rx_buffer_next].frame.payload_len);
+    }
+
     /* follow-up to transceiver module if adequate */
     if (cc2420_rx_buffer[rx_buffer_next].frame.fcf.frame_type != IEEE_802154_ACK_FRAME) {
 #if ENABLE_DEBUG
         ieee802154_frame_print_fcf_frame(&cc2420_rx_buffer[rx_buffer_next].frame);
 #endif
+
+#ifdef MODULE_TRANSCEIVER
 
         /* notify transceiver thread if any */
         if (transceiver_pid != KERNEL_PID_UNDEF) {
@@ -86,6 +168,8 @@ void cc2420_rx_handler(void)
             m.content.value = rx_buffer_next;
             msg_send_int(&m, transceiver_pid);
         }
+
+#endif
     }
 
 #if ENABLE_DEBUG

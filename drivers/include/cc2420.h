@@ -80,13 +80,11 @@ Frame type value:
 #ifndef CC2420_H
 #define CC2420_H
 
-#include <stdbool.h>
-
 #include "kernel_types.h"
 #include "ieee802154_frame.h"
 #include "cc2420_settings.h"
 
-#include "radio_driver.h"
+#include "netdev/802154.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -109,15 +107,20 @@ typedef struct __attribute__ ((packed)) {
     ieee802154_frame_t frame;   /** < the ieee802154 frame */
     int8_t rssi;                /** < the rssi value */
     uint8_t lqi;                /** < the link quality indicator */
-    bool crc;                   /** < 1 if crc was successfull, 0 otherwise */
+    int crc;                    /** < 1 if crc was successfull, 0 otherwise */
     /* @} */
 } cc2420_packet_t;
 
+extern netdev_t cc2420_netdev;  /**< netdev representation of this driver */
+
 /**
  * @brief Initialize the CC2420 transceiver.
+ *
+ * @param[in] dev       An IEEE 802.15.4 network device.
  */
-void cc2420_initialize(void);
+int cc2420_initialize(netdev_t *dev);
 
+#ifdef MODULE_TRANSCEIVER
 /**
  * @brief Init the CC2420 for use with RIOT's transceiver module.
  *
@@ -125,13 +128,14 @@ void cc2420_initialize(void);
  */
 
 void cc2420_init(kernel_pid_t tpid);
+#endif
 
 /**
  * @brief Turn CC2420 on.
  *
- * @return true if the radio was correctly turned on; false otherwise.
+ * @return 1 if the radio was correctly turned on; 0 otherwise.
  */
-bool cc2420_on(void);
+int cc2420_on(void);
 
 /**
  * @brief Turn CC2420 off.
@@ -141,9 +145,9 @@ void cc2420_off(void);
 /**
  * @brief Indicate if the CC2420 is on.
  *
- * @return true if the radio transceiver is on (active); false otherwise.
+ * @return 1 if the radio transceiver is on (active); 0 otherwise.
  */
-bool cc2420_is_on(void);
+int cc2420_is_on(void);
 
 /**
  * @brief Switches the CC2420 into receive mode.
@@ -154,18 +158,18 @@ void cc2420_switch_to_rx(void);
  * @brief Turns monitor (promiscuous) mode on or off.
  *
  * @param[in] mode The desired mode:
- *                 true for monitor (promiscuous) mode;
- *                 false for normal (auto address-decoding) mode.
+ *                 1 for monitor (promiscuous) mode;
+ *                 0 for normal (auto address-decoding) mode.
  */
-void cc2420_set_monitor(bool mode);
+void cc2420_set_monitor(int mode);
 
 /**
  * @brief Indicate if the CC2420 is in monitor (promiscuous) mode.
  *
- * @return true if the transceiver is in monitor (promiscuous) mode;
- *         false if it is in normal (auto address-decoding) mode.
+ * @return 1 if the transceiver is in monitor (promiscuous) mode;
+ *         0 if it is in normal (auto address-decoding) mode.
  */
-bool cc2420_get_monitor(void);
+int cc2420_get_monitor(void);
 
 /**
  * @brief Set the channel of the CC2420.
@@ -253,11 +257,13 @@ int cc2420_get_tx_power(void);
  * @brief Checks if the radio medium is available/clear to send
  *         ("Clear Channel Assessment" a.k.a. CCA).
  *
- * @return a `true` value if radio medium is clear (available),
- *         a `false` value otherwise.
+ * @param[in] dev   An IEEE 802.15.4 network device.
+ *
+ * @return a 1 value if radio medium is clear (available),
+ *         a 0 value otherwise.
  *
  */
-bool cc2420_channel_clear(void);
+int cc2420_channel_clear(netdev_t *dev);
 
 /**
  * @brief Interrupt handler, gets fired when a RX overflow happens.
@@ -275,10 +281,49 @@ void cc2420_rx_irq(void);
  * @brief Sets the function called back when a packet is received.
  *        (Low-level mechanism, parallel to the `transceiver` module).
  *
- * @param[in] recv_cb callback function for 802.15.4 packet arrival;
- *                    pass `NULL` to deactivate packet reception.
+ * @param[in] dev       An IEEE 802.15.4 network device.
+ * @param[in] recv_cb   callback function for 802.15.4 packet arrival
+ *
+ * @return  0 on success
+ * @return  -ENODEV if *dev* is not recognized
+ * @return  -ENOBUFS, if maximum number of registable callbacks is exceeded
  */
-void cc2420_set_recv_callback(receive_802154_packet_callback_t recv_cb);
+int cc2420_add_raw_recv_callback(netdev_t *dev, netdev_802154_raw_packet_cb_t recv_cb);
+
+/**
+ * @brief Unsets the function called back when a packet is received.
+ *        (Low-level mechanism, parallel to the `transceiver` module).
+ *
+ * @param[in] dev       An IEEE 802.15.4 network device.
+ * @param[in] recv_cb   callback function to unset
+ *
+ * @return  0 on success
+ * @return  -ENODEV if *dev* is not recognized
+ */
+int cc2420_rem_raw_recv_callback(netdev_t *dev, netdev_802154_raw_packet_cb_t recv_cb);
+
+/**
+ * @brief Sets a function called back when a data packet is received.
+ *
+ * @param[in] dev       An IEEE 802.15.4 network device.
+ * @param[in] recv_cb   callback function for 802.15.4 data packet arrival
+ *
+ * @return  0 on success
+ * @return  -ENODEV if *dev* is not recognized
+ * @return  -ENOBUFS, if maximum number of registable callbacks is exceeded
+ */
+int cc2420_add_data_recv_callback(netdev_t *dev, netdev_rcv_data_cb_t recv_cb);
+
+/**
+ * @brief Unsets a function called back when a data packet is received.
+ *
+ * @param[in] dev       An IEEE 802.15.4 network device.
+ * @param[in] recv_cb   callback function to unset
+ *
+ * @return  0 on success
+ * @return  -ENODEV if *dev* is not recognized
+ */
+int cc2420_rem_data_recv_callback(netdev_t *dev, netdev_rcv_data_cb_t recv_cb);
 
 /**
  * @brief RX handler, process data from the RX FIFO.
@@ -289,70 +334,46 @@ void cc2420_rx_handler(void);
 /**
  * @brief Prepare the CC2420 TX buffer to send with the given packet.
  *
- * @param[in] kind Kind of packet to transmit.
- * @param[in] dest Address of the node to which the packet is sent.
- * @param[in] use_long_addr `true` to use the 64-bit address mode
- *                          with `dest` param; `false` to use
+ * @param[in] dev           An IEEE 802.15.4 network device.
+ * @param[in] kind          Kind of packet to transmit.
+ * @param[in] dest          Address of the node to which the packet is sent.
+ * @param[in] use_long_addr 1 to use the 64-bit address mode
+ *                          with *dest* param; 0 to use
  *                          "short" PAN-centric mode.
- * @param[in] wants_ack `true` to request an acknowledgement
- *                      from the receiving node for this packet;
- *                      `false` otherwise.
- * @param[in] buf Pointer to the buffer containing the payload
- *                of the 802.15.4 packet to transmit.
- *                The frame header (i.e.: FCS, sequence number,
- *                src and dest PAN and addresses) is inserted
- *                using values in accord with `kind` parameter
- *                and transceiver configuration.
- * @param[in] len Length (in bytes) of the outgoing packet payload.
+ * @param[in] wants_ack     1 to request an acknowledgement
+ *                          from the receiving node for this packet;
+ *                          0 otherwise.
+ * @param[in] upper_layer_hdrs  header data from higher network layers from
+ *                              highest to lowest layer. Must be prepended to
+ *                              the data stream by the network device. May be
+ *                              NULL if there are none.
+ * @param[in] buf           Pointer to the buffer containing the payload
+ *                          of the 802.15.4 packet to transmit.
+ *                          The frame header (i.e.: FCS, sequence number,
+ *                          src and dest PAN and addresses) is inserted
+ *                          using values in accord with *kind* parameter
+ *                          and transceiver configuration.
+ * @param[in] len           Length (in bytes) of the outgoing packet payload.
  *
- * @return `true` if the transceiver TX buffer was loaded correctly;
- *         `false` otherwise (transceiver error).
+ * @return @ref netdev_802154_tx_status_t
  */
-radio_tx_status_t cc2420_load_tx_buf(ieee802154_packet_kind_t kind,
-                                     ieee802154_node_addr_t dest,
-                                     bool use_long_addr,
-                                     bool wants_ack,
-                                     void *buf,
-                                     unsigned int len);
+netdev_802154_tx_status_t cc2420_load_tx_buf(netdev_t *dev,
+        netdev_802154_pkt_kind_t kind,
+        netdev_802154_node_addr_t *dest,
+        int use_long_addr,
+        int wants_ack,
+        netdev_hlist_t *upper_layer_hdrs,
+        void *buf,
+        unsigned int len);
 
 /**
  * @brief Transmit the data loaded into the CC2420 TX buffer.
  *
- * @return The outcome of this packet's transmission.
- *         @see radio_tx_status_t
- */
-radio_tx_status_t cc2420_transmit_tx_buf(void);
-
-/**
- * @brief Transmit the given IEEE 802.15.4 packet,
- *        by calling successively functions`load_tx()`
- *        and `transmit()`.
+ * @param[in] dev       An IEEE 802.15.4 network device.
  *
- * @param[in] kind Kind of packet to transmit.
- * @param[in] dest Address of the node to which the packet is sent.
- * @param[in] use_long_addr `true` to use the 64-bit address mode
- *                          with `dest` param; `false` to use
- *                          "short" PAN-centric mode.
- * @param[in] wants_ack `true` to request an acknowledgement
- *                      from the receiving node for this packet;
- *                      `false` otherwise.
- * @param[in] buf Pointer to the buffer containing the payload
- *                of the 802.15.4 packet to transmit.
- *                The frame header (i.e.: FCS, sequence number,
- *                src and dest PAN and addresses) is inserted
- *                using values in accord with `kind` parameter
- *                and transceiver configuration.
- * @param[in] len Length (in bytes) of the outgoing packet payload.
- *
- * @return The outcome of this packet's transmission.
- *         @see radio_tx_status_t
+ * @return @ref netdev_802154_tx_status_t
  */
-radio_tx_status_t cc2420_do_send(ieee802154_packet_kind_t kind,
-                                 ieee802154_node_addr_t dest,
-                                 bool use_long_addr,
-                                 bool wants_ack,
-                                 void *buf,
-                                 unsigned int len);
+netdev_802154_tx_status_t cc2420_transmit_tx_buf(netdev_t *dev);
 
 /**
  * @brief Send function, sends a cc2420_packet_t over the air.
@@ -373,34 +394,10 @@ extern cc2420_packet_t cc2420_rx_buffer[CC2420_RX_BUF_SIZE];
 /** Utility macro: get CC2420's status byte */
 #define cc2420_status_byte() cc2420_strobe(NOBYTE)
 
-
-/* setter functions wrappers, to maintain compatibility with both
-   ieee802154_radio_driver_t and transceiver module */
-
-static inline void do_set_channel(unsigned int chan) {
-    cc2420_set_channel(chan);
-}
-
-static inline void do_set_address(uint16_t addr) {
-    cc2420_set_address(addr);
-}
-
-static inline void do_set_long_address(uint64_t addr) {
-    cc2420_set_address_long(addr);
-}
-
-static inline void do_set_pan_id(uint16_t pan) {
-    cc2420_set_pan(pan);
-}
-
-static inline void do_set_tx_power(int pow) {
-    cc2420_set_tx_power(pow);
-}
-
 /**
  * CC2420 low-level radio driver definition.
  */
-extern const ieee802154_radio_driver_t cc2420_radio_driver;
+extern const netdev_802154_driver_t cc2420_driver;
 
 #ifdef __cplusplus
 }
