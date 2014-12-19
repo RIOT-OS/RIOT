@@ -54,6 +54,7 @@ extern "C" {
 
 /* UART 0 device configuration */
 #define UART_0_DEV          LPC_UART0
+#define UART_0_CLKSEL()     (LPC_SC->PCLKSEL0 &= ~(0x3 << 6))       /* PCLK := CCLK / 4 */
 #define UART_0_CLKEN()      (LPC_SC->PCONP |= (1 << 3))
 #define UART_0_CLKDIS()     (LPC_SC->PCONP &= ~(1 << 3))
 #define UART_0_IRQ          UART0_IRQn
@@ -69,6 +70,7 @@ extern "C" {
 
 /* UART 1 device configuration */
 #define UART_1_DEV          LPC_UART3
+#define UART_1_CLKSEL()     (LPC_SC->PCLKSEL1 &= ~(0x3 << 18))      /* PCLK := CCLK / 4 */
 #define UART_1_CLKEN()      (LPC_SC->PCONP |= (1 << 25))
 #define UART_1_CLKDIS()     (LPC_SC->PCONP &= ~(1 << 25))
 #define UART_1_IRQ          UART3_IRQn
