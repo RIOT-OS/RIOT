@@ -18,6 +18,7 @@
 
 import atexit
 import os
+import re
 import readline
 import socket
 import signal
@@ -27,16 +28,25 @@ import termios
 import threading
 
 from datetime import datetime
-from distutils.util import split_quoted
+from shlex import split
 from time import time
 
+try:
+    from shlex import quote
+except ImportError:
+    from pipes import quote
+
+def join_quoted(args):
+    return ' '.join(quote(arg) for arg in args)
+
+
+_null = open(os.devnull, 'wb', 0)
 
 def get_timestamp():
     return datetime.fromtimestamp(time()).strftime('%Y-%m-%d %H:%M:%S.%f')
 
 def popen(args, **kw):
-    null = open(os.devnull, 'wb', 0)
-    return subprocess.Popen(args, stdin=null, stdout=null, stderr=null, **kw)
+    return subprocess.Popen(args, stdin=_null, stdout=_null, stderr=_null, **kw)
 
 def main(QEMU, BINDIRBASE, HEXFILE, DEBUGGER=None):
     def run_shell():
@@ -54,12 +64,19 @@ def main(QEMU, BINDIRBASE, HEXFILE, DEBUGGER=None):
 
     def read_terminal():
         for line in client_file:
-            print('{}: {}'.format(get_timestamp(), line.decode('UTF-8', 'replace').rstrip("\r\n")))
+            sys.stderr.write(get_timestamp() + ': ')
+            sys.stderr.flush()
+            sys.stdout.write(line.decode('UTF-8', 'replace').rstrip('\r\n') + '\n')
+            sys.stdout.flush()
 
     if isinstance(QEMU, str):
-        QEMU = split_quoted(QEMU)
+        QEMU = split(QEMU)
     if DEBUGGER and isinstance(DEBUGGER, str):
-        DEBUGGER = split_quoted(DEBUGGER)
+        DEBUGGER = split(DEBUGGER)
+
+    qemu_version = subprocess.check_output(QEMU + ['-version'], stdin=_null, stderr=_null)
+    qemu_version = re.match(br'.*version ((?:\d+\.?)+).*', qemu_version).group(1).split(b'.')
+    qemu_version = list(int(v) for v in qemu_version)
 
     histfile = os.path.join(BINDIRBASE, '.qemu-term.hist')
     try:
@@ -81,10 +98,15 @@ def main(QEMU, BINDIRBASE, HEXFILE, DEBUGGER=None):
             '-monitor', '/dev/null',
             '-kernel', HEXFILE,
         ]
+        if qemu_version >= [2, 1]:
+            args += ['-m', 'size=512']
+        else:
+            args += ['-m', '512m']
         if DEBUGGER:
             args += ['-s', '-S']
 
         try:
+            sys.stderr.write('Starting QEMU: {}\n\n'.format(join_quoted(args)))
             qemu = popen(args)
 
             if DEBUGGER:
@@ -101,7 +123,7 @@ def main(QEMU, BINDIRBASE, HEXFILE, DEBUGGER=None):
             try:
                 result = qemu.wait() and result
             except KeyboardInterrupt:
-                print('Interrupted ...')
+                sys.stderr.write('\nInterrupted ...\n')
                 result = 0
         finally:
             try:
@@ -122,7 +144,7 @@ def main(QEMU, BINDIRBASE, HEXFILE, DEBUGGER=None):
 
 
 if __name__ == '__main__':
-    print("Type 'exit' to exit.")
+    sys.stderr.write("Type 'exit' to exit.\n")
 
     atexit.register(termios.tcsetattr, 0, termios.TCSAFLUSH, termios.tcgetattr(0))
 
