@@ -105,9 +105,9 @@ endif
 BOARDDEF := $(shell echo $(BOARD) | tr 'a-z' 'A-Z' | tr '-' '_')
 CPUDEF := $(shell echo $(CPU) | tr 'a-z' 'A-Z' | tr '-' '_')
 MCUDEF := $(shell echo $(MCU) | tr 'a-z' 'A-Z' | tr '-' '_')
-CFLAGS += -DBOARD_$(BOARDDEF)='"$(BOARD)"' -DRIOT_BOARD=BOARD_$(BOARDDEF)
-CFLAGS += -DCPU_$(CPUDEF)='"$(CPU)"' -DRIOT_CPU=CPU_$(CPUDEF)
-CFLAGS += -DMCU_$(MCUDEF)='"$(MCU)"' -DRIOT_MCU=MCU_$(MCUDEF)
+CFLAGS += -DBOARD_$(BOARDDEF)=\"$(BOARD)\" -DRIOT_BOARD=BOARD_$(BOARDDEF)
+CFLAGS += -DCPU_$(CPUDEF)=\"$(CPU)\" -DRIOT_CPU=CPU_$(CPUDEF)
+CFLAGS += -DMCU_$(MCUDEF)=\"$(MCU)\" -DRIOT_MCU=MCU_$(MCUDEF)
 
 # OSX fails to create empty archives. Provide a wrapper to catch that error.
 ifneq (0, $(shell mkdir -p $(BINDIR); $(AR) -rc $(BINDIR)empty-archive.a 2> /dev/null; echo $$?))
@@ -131,7 +131,7 @@ ifeq ($(origin RIOT_VERSION), undefined)
     RIOT_VERSION := UNKNOWN (builddir: $(RIOTBASE))
   endif
 endif
-export CFLAGS += -DRIOT_VERSION='"$(RIOT_VERSION)"'
+export CFLAGS += -DRIOT_VERSION=\"$(RIOT_VERSION)\"
 
 # the binaries to link
 BASELIBS += $(BINDIR)$(BOARD)_base.a
