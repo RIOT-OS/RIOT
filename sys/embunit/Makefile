@@ -1,5 +1,5 @@
 MODULE = embunit
 
-INCLUDES += -I$(RIOTBASE)/tests/unittests/embunit
+INCLUDES += -I$(RIOTBASE)/sys/include/embUnit
 
 include $(RIOTBASE)/Makefile.base

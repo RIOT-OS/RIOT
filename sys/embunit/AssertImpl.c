@@ -32,7 +32,7 @@
  *
  * $Id: AssertImpl.c,v 1.5 2004/02/10 16:15:25 arms22 Exp $
  */
-#include "config.h"
+#include "embUnit_config.h"
 #include "stdImpl.h"
 #include "AssertImpl.h"
 

@@ -40,55 +40,55 @@ static char *stylesheet_;
 static void XMLOutputter_printHeader(OutputterRef self)
 {
     (void)self;
-    fprintf(stdout,"<?xml version=\"1.0\" encoding='shift_jis' standalone='yes' ?>\n");
+    printf("<?xml version=\"1.0\" encoding='shift_jis' standalone='yes' ?>\n");
     if (stylesheet_)
-    fprintf(stdout,"<?xml-stylesheet type=\"text/xsl\" href=\"%s\" ?>\n",stylesheet_);
-    fprintf(stdout,"<TestRun>\n");
+    printf("<?xml-stylesheet type=\"text/xsl\" href=\"%s\" ?>\n",stylesheet_);
+    printf("<TestRun>\n");
 }
 
 static void XMLOutputter_printStartTest(OutputterRef self,TestRef test)
 {
     (void)self;
-    fprintf(stdout,"<%s>\n",Test_name(test));
+    printf("<%s>\n",Test_name(test));
 }
 
 static void XMLOutputter_printEndTest(OutputterRef self,TestRef test)
 {
     (void)self;
-    fprintf(stdout,"</%s>\n",Test_name(test));
+    printf("</%s>\n",Test_name(test));
 }
 
 static void XMLOutputter_printSuccessful(OutputterRef self,TestRef test,int runCount)
 {
     (void)self;
-    fprintf(stdout,"<Test id=\"%d\">\n",runCount);
-    fprintf(stdout,"<Name>%s</Name>\n",Test_name(test));
-    fprintf(stdout,"</Test>\n");
+    printf("<Test id=\"%d\">\n",runCount);
+    printf("<Name>%s</Name>\n",Test_name(test));
+    printf("</Test>\n");
 }
 
 static void XMLOutputter_printFailure(OutputterRef self,TestRef test,char *msg,int line,char *file,int runCount)
 {
     (void)self;
-    fprintf(stdout,"<FailedTest id=\"%d\">\n",runCount);
-    fprintf(stdout,"<Name>%s</Name>\n",Test_name(test));
-    fprintf(stdout,"<Location>\n");
-    fprintf(stdout,"<File>%s</File>\n",file);
-    fprintf(stdout,"<Line>%d</Line>\n",line);
-    fprintf(stdout,"</Location>\n");
-    fprintf(stdout,"<Message>%s</Message>\n",msg);
-    fprintf(stdout,"</FailedTest>\n");
+    printf("<FailedTest id=\"%d\">\n",runCount);
+    printf("<Name>%s</Name>\n",Test_name(test));
+    printf("<Location>\n");
+    printf("<File>%s</File>\n",file);
+    printf("<Line>%d</Line>\n",line);
+    printf("</Location>\n");
+    printf("<Message>%s</Message>\n",msg);
+    printf("</FailedTest>\n");
 }
 
 static void XMLOutputter_printStatistics(OutputterRef self,TestResultRef result)
 {
     (void)self;
-    fprintf(stdout,"<Statistics>\n");
-    fprintf(stdout,"<Tests>%d</Tests>\n",result->runCount);
+    printf("<Statistics>\n");
+    printf("<Tests>%d</Tests>\n",result->runCount);
     if (result->failureCount) {
-    fprintf(stdout,"<Failures>%d</Failures>\n",result->failureCount);
+    printf("<Failures>%d</Failures>\n",result->failureCount);
     }
-    fprintf(stdout,"</Statistics>\n");
-    fprintf(stdout,"</TestRun>\n");
+    printf("</Statistics>\n");
+    printf("</TestRun>\n");
 }
 
 static const OutputterImplement XMLOutputterImplement = {

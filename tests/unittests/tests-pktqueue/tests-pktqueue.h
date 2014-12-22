@@ -18,7 +18,7 @@
 #ifndef __TESTS_PKTQUEUE_H_
 #define __TESTS_PKTQUEUE_H_
 
-#include "../unittests.h"
+#include "embUnit.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -28,7 +28,6 @@ extern "C" {
  * @brief   The entry point of this test suite.
  */
 void tests_pktqueue(void);
-
 
 #ifdef __cplusplus
 }

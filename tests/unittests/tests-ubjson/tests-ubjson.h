@@ -29,13 +29,9 @@
 #ifndef TESTS__UBJSON_H__
 #define TESTS__UBJSON_H__
 
-#include "../unittests.h"
-#include "msg.h"
-#include "kernel_macros.h"
-#include "irq.h"
+#include "embUnit.h"
 
 #include "ubjson.h"
-#include "pipe.h"
 
 #ifdef __cplusplus
 extern "C" {

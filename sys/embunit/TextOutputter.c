@@ -30,63 +30,64 @@
  * use or other dealings in this Software without prior written
  * authorization of the copyright holder.
  *
- * $Id: CompilerOutputter.c,v 1.2 2003/09/06 13:28:27 arms22 Exp $
+ * $Id: TextOutputter.c,v 1.4 2003/09/06 13:28:27 arms22 Exp $
  */
 #include <stdio.h>
-#include "CompilerOutputter.h"
+#include "TextOutputter.h"
 
-static void CompilerOutputter_printHeader(OutputterRef self,TestRef test)
+static void TextOutputter_printHeader(OutputterRef self)
+{
+    (void)self;
+}
+
+static void TextOutputter_printStartTest(OutputterRef self,TestRef test)
+{
+    (void)self;
+    printf("- %s\n",Test_name(test));
+}
+
+static void TextOutputter_printEndTest(OutputterRef self,TestRef test)
 {
     (void)self;
     (void)test;
 }
 
-static void CompilerOutputter_printStartTest(OutputterRef self,TestRef test)
+static void TextOutputter_printSuccessful(OutputterRef self,TestRef test,int runCount)
 {
     (void)self;
-    (void)test;
+    printf("%d) OK %s\n", runCount, Test_name(test));
 }
 
-static void CompilerOutputter_printEndTest(OutputterRef self,TestRef test)
+static void TextOutputter_printFailure(OutputterRef self,TestRef test,char *msg,int line,char *file,int runCount)
 {
     (void)self;
-    (void)test;
+    printf("%d) NG %s (%s %d) %s\n", runCount, Test_name(test), file, line, msg);
 }
 
-static void CompilerOutputter_printSuccessful(OutputterRef self,TestRef test,int runCount)
+static void TextOutputter_printStatistics(OutputterRef self,TestResultRef result)
 {
     (void)self;
-    (void)test;
-    (void)runCount;
+    if (result->failureCount) {
+        printf("\nrun %d failures %d\n",result->runCount,result->failureCount);
+    } else {
+        printf("\nOK (%d tests)\n",result->runCount);
+    }
 }
 
-static void CompilerOutputter_printFailure(OutputterRef self,TestRef test,char *msg,int line,char *file,int runCount)
-{
-    (void)self;
-    (void)runCount;
-    fprintf(stdout,"%s %d: %s: %s\n", file, line, Test_name(test), msg);
-}
-
-static void CompilerOutputter_printStatistics(OutputterRef self,TestResultRef result)
-{
-    (void)self;
-    (void)result;
-}
-
-static const OutputterImplement CompilerOutputterImplement = {
-    (OutputterPrintHeaderFunction)      CompilerOutputter_printHeader,
-    (OutputterPrintStartTestFunction)   CompilerOutputter_printStartTest,
-    (OutputterPrintEndTestFunction)     CompilerOutputter_printEndTest,
-    (OutputterPrintSuccessfulFunction)  CompilerOutputter_printSuccessful,
-    (OutputterPrintFailureFunction)     CompilerOutputter_printFailure,
-    (OutputterPrintStatisticsFunction)  CompilerOutputter_printStatistics,
+static const OutputterImplement TextOutputterImplement = {
+    (OutputterPrintHeaderFunction)      TextOutputter_printHeader,
+    (OutputterPrintStartTestFunction)   TextOutputter_printStartTest,
+    (OutputterPrintEndTestFunction)     TextOutputter_printEndTest,
+    (OutputterPrintSuccessfulFunction)  TextOutputter_printSuccessful,
+    (OutputterPrintFailureFunction)     TextOutputter_printFailure,
+    (OutputterPrintStatisticsFunction)  TextOutputter_printStatistics,
 };
 
-static const Outputter CompilerOutputter = {
-    (OutputterImplementRef)&CompilerOutputterImplement,
+static const Outputter TextOutputter = {
+    (OutputterImplementRef)&TextOutputterImplement,
 };
 
-OutputterRef CompilerOutputter_outputter(void)
+OutputterRef TextOutputter_outputter(void)
 {
-    return (OutputterRef)&CompilerOutputter;
+    return (OutputterRef)&TextOutputter;
 }

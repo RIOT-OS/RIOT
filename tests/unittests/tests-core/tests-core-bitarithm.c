@@ -9,7 +9,7 @@
 #include <limits.h>
 #include <stdint.h>
 
-#include "embUnit/embUnit.h"
+#include "embUnit.h"
 
 #include "bitarithm.h"
 
