@@ -9,10 +9,11 @@
 /**
  * @defgroup    drivers_nrf24l01p NRF24L01+ Driver Interface
  * @ingroup     drivers
- * @{
  *
- * @file        
  * @brief       Low-level driver for nrf24l01+ transceiver
+ *
+ * @{
+ * @file
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
