@@ -141,16 +141,8 @@ void rpl_leave_dodag(rpl_dodag_t *dodag)
 
 bool rpl_equal_id(ipv6_addr_t *id1, ipv6_addr_t *id2)
 {
-    for (uint8_t i = 0; i < 2; i++) {
-        DEBUGF("ID1: %d ID2: %d\n", id1->uint8[12 + i], id2->uint8[12 + i]);
-
-        if (id1->uint8[14 + i] != id2->uint8[14 + i]) {
-            return false;
-        }
-    }
-
-    return true;
-
+    return (id1->uint8[14] == id2->uint8[14])
+        && (id1->uint8[15] == id2->uint8[15]);
 }
 
 rpl_parent_t *rpl_new_parent(rpl_dodag_t *dodag, ipv6_addr_t *address, uint16_t rank)
