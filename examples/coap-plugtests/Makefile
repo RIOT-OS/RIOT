@@ -22,6 +22,18 @@ CFLAGS += -DSCHEDSTATISTICS
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
 
+# assert.h missing
+BOARD_BL_ASSERT := chronos msb-430h telosb wsn430-v1_3b wsn430-v1_4 z1
+# 'sysconfig' undeclared
+BOARD_BL_SYSCONFIG := samr21-xpro fox iot-lab_M3
+
+BOARD_BLACKLIST := $(BOARD_BL_ASSERT) $(BOARD_BL_SYSCONFIG)
+
+# undefined reference to `_gettimeofday'`
+BOARD_LD_ERROR := redbee-econotag msba2 msbiot avsextrem
+
+BOARD_INSUFFICIENT_RAM := $(BOARD_LD_ERROR)
+
 # Modules to include:
 
 USEMODULE += uart0
