@@ -1,1 +1,4 @@
-USEMODULE += ng_pktbuf
+USEMODULE += pktbuf
+
+# too little RAM or ROM
+BOARD_BLACKLIST += stm32f0discovery
