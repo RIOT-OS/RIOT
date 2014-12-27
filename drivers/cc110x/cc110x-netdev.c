@@ -42,7 +42,7 @@ int _cc110x_send_data(netdev_t *dev, void *dest, size_t dest_len,
     if (dest_len > sizeof(uint8_t)) {
         return -EAFNOSUPPORT;
     }
-    if ((sizeof(tx_buffer) + CC1100_HEADER_LENGTH + 1) > PACKET_LENGTH) {
+    if ((sizeof(tx_buffer) + CC1100_HEADER_LENGTH) > PACKET_LENGTH) {
         return -EMSGSIZE;
     }
 

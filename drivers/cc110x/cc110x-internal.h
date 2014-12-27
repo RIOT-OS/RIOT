@@ -64,8 +64,8 @@ extern "C" {
 #define GDO0                (0x01)      ///< Bitmask (=00000001) for reading GDO0 (current value on GDO0 pin) in PKTSTATUS status register.
 #define TXFIFO_UNDERFLOW    (0x80)      ///< Bitmask (=10000000) for reading TXFIFO_UNDERFLOW in TXBYTES status register.
 #define BYTES_IN_TXFIFO     (0x7F)      ///< Bitmask (=01111111) for reading NUM_TXBYTES in TXBYTES status register.
-#define RXFIFO_OVERFLOW     (0xBF)      ///< Bitmask (=10000000) for reading RXFIFO_OVERFLOW in RXBYTES status register.
-#define BYTES_IN_RXFIFO     (0xFF)      ///< Bitmask (=01111111) for reading NUM_RXBYTES in RXBYTES status register.
+#define RXFIFO_OVERFLOW     (0x80)      ///< Bitmask (=10000000) for reading RXFIFO_OVERFLOW in RXBYTES status register.
+#define BYTES_IN_RXFIFO     (0x7F)      ///< Bitmask (=01111111) for reading NUM_RXBYTES in RXBYTES status register.
 /** @} */
 
 /**

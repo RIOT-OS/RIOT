@@ -50,7 +50,7 @@ extern "C" {
 #define CC110X_GDO1         GPIO_2
 #define CC110X_GDO2         GPIO_12
 
-typedef uint8_t radio_packet_length_t;
+typedef uint16_t radio_packet_length_t;
 /** @} */
 
 /**
