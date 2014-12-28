@@ -1,0 +1,23 @@
+From d6c1cb4244c72a8fa7d5a8550c8193700cd0de03 Mon Sep 17 00:00:00 2001
+From: Frank Holtz <frank-riot2015@holtznet.de>
+Date: Sat, 27 Dec 2014 19:57:01 +0100
+Subject: [PATCH 1/2] Add RIOT Makefile
+
+---
+ Makefile | 4 ++++
+ 1 file changed, 4 insertions(+)
+ create mode 100644 Makefile
+
+diff --git a/Makefile b/Makefile
+new file mode 100644
+index 0000000..33c8152
+--- /dev/null
++++ b/Makefile
+@@ -0,0 +1,4 @@
++MODULE:=$(shell basename $(CURDIR))
++INCLUDES += -I$(RIOTBASE) -I$(RIOTBASE)/sys/include -I$(RIOTBASE)/core/include -I$(RIOTBASE)/drivers/include -I$(RIOTCPU)/$(CPU)/include
++
++include $(RIOTBASE)/Makefile.base
+-- 
+1.8.3.1
+
