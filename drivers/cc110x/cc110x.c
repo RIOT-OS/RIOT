@@ -64,6 +64,9 @@ void cc110x_init(kernel_pid_t tpid)
 int cc110x_initialize(netdev_t *dev)
 {
     rx_buffer_next = 0;
+#ifdef MODULE_NETDEV_BASE
+    rx_buffer_to_read = 0;
+#endif
 
     /* Configure chip-select */
     gpio_init_out(CC110X_CS, GPIO_NOPULL);

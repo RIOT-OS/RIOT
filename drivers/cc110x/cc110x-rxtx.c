@@ -36,7 +36,8 @@
 #ifdef MODULE_NETDEV_BASE
 #include "netdev/base.h"
 
-netdev_rcv_data_cb_t cc110x_recv_cb = NULL;
+extern kernel_pid_t cc110x_netdev_event_handler;
+volatile uint8_t rx_buffer_to_read;
 #endif
 
 /* Internal function prototypes */
@@ -89,10 +90,11 @@ void cc110x_rx_handler(void *args)
 #endif
 
 #ifdef MODULE_NETDEV_BASE
-        if (cc110x_recv_cb != NULL) {
-            cc110x_packet_t p = cc110x_rx_buffer[rx_buffer_next].packet;
-            cc110x_recv_cb(&cc110x_dev, &p.phy_src, sizeof(uint8_t), &p.address,
-                    sizeof(uint8_t), p.data, p.length - CC1100_HEADER_LENGTH);
+        if (cc110x_netdev_event_handler != KERNEL_PID_UNDEF) {
+            msg_t m;
+            m.type = NETDEV_MSG_EVENT_TYPE;
+            m.content.value = CC110X_NETDEV_EVENT_RX;
+            msg_send_int(&m, cc110x_netdev_event_handler);
         }
 #endif
 

@@ -602,6 +602,7 @@ const netdev_driver_t nativenet_driver = {
     _nativenet_get_state,
     _nativenet_set_state,
     _nativenet_event,
+    NULL,
 };
 
 _nativenet_netdev_more_t _nativenet_default_dev_more;
