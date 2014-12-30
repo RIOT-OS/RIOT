@@ -97,6 +97,8 @@ include $(RIOTBOARD)/$(BOARD)/Makefile.include
 include $(RIOTCPU)/$(CPU)/Makefile.include
 include $(RIOTBASE)/Makefile.dep
 
+USEMODULE += $(filter-out $(DISABLE_MODULE), $(DEFAULT_MODULE))
+
 ifeq ($(strip $(MCU)),)
 	MCU = $(CPU)
 endif
