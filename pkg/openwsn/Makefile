@@ -1,26 +1,36 @@
-PKG_NAME=RB
-PKG_URL=https://codeload.github.com/openwsn-berkeley/openwsn-fw
-PKG_VERSION=1.4
-PKG_EXT=zip
+PKG_NAME=openwsn
+PKG_URL=https://github.com/openwsn-berkeley/openwsn-fw.git
+PKG_VERSION=ff25e5d0ae5d344ed793a724d60532fb917bf1f8
+PKG_DIR=$(CURDIR)/$(PKG_NAME)
 
-.PHONY: all clean
+ifneq ($(RIOTBOARD),)
+include $(RIOTBOARD)/$(BOARD)/Makefile.include
+endif
 
-all: $(CURDIR)/$(PKG_NAME)-$(PKG_VERSION)/
-	$(info *INFO* Building OpenWSN pkg)
-	make -C $(CURDIR)/$(PKG_NAME)-$(PKG_VERSION)
+.PHONY: all clean patch reset
 
-$(CURDIR)/$(PKG_NAME)-$(PKG_VERSION)/: $(CURDIR)/$(PKG_NAME)-$(PKG_VERSION).$(PKG_EXT)
-	$(AD)rm -rf $(CURDIR)/$(PKG_NAME)-$(PKG_VERSION)
-	$(AD)$(UNZIP_HERE) $< -d $(PKG_NAME)-$(PKG_VERSION)
-	$(AD)cd $@ && sh $(CURDIR)/structure_changes.sh
-	$(AD)cd $@ && sh $(CURDIR)/apply_patches.sh
+all: patch
+	"$(MAKE)" -C $(PKG_DIR)
 
-$(CURDIR)/$(PKG_NAME)-$(PKG_VERSION).$(PKG_EXT):
-	# Get PKG_VERSION of package from PKG_URL
-	$(AD)$(DOWNLOAD_TO_FILE) $@ $(PKG_URL)/$(PKG_EXT)/$(PKG_NAME)-$(PKG_VERSION)
+patch: $(PKG_DIR)/Makefile
+
+$(PKG_DIR)/Makefile: $(PKG_DIR)/.git/config
+	cd "$(PKG_DIR)" && git am --ignore-whitespace $(CURDIR)/*.patch
+
+$(PKG_DIR)/.git/config:
+	test -d "$(PKG_DIR)" || git clone "$(PKG_URL)" "$(PKG_DIR)"; \
+		cd "$(PKG_DIR)" && git checkout -f "$(PKG_VERSION)"
 
 clean::
-	rm -rf $(CURDIR)/$(PKG_NAME)-$(PKG_VERSION)
+	@echo "Cleaning up OpenWSN package..."
+	@cd "$(PKG_DIR)" 2> /dev/null > /dev/null && \
+		git clean -x -f && \
+		git am --abort ; \
+		git reset --hard "$(PKG_VERSION)" && \
+		$(MAKE) patch || true
 
 distclean::
-	rm -f $(CURDIR)/$(PKG_NAME)-$(PKG_VERSION).$(PKG_EXT)
+	rm -rf "$(PKG_DIR)"
+
+Makefile.include:
+	@true
