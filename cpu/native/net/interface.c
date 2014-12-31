@@ -606,7 +606,7 @@ const netdev_driver_t nativenet_driver = {
 
 _nativenet_netdev_more_t _nativenet_default_dev_more;
 netdev_t nativenet_default_dev = {NETDEV_TYPE_BASE, &nativenet_driver,
-                                  &_nativenet_default_dev_more
+                                  KERNEL_PID_UNDEF, &_nativenet_default_dev_more
                                  };
 #else
 _nativenet_netdev_more_t _nativenet_default_dev_more;
