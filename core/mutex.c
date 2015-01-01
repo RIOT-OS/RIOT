@@ -84,24 +84,30 @@ static void mutex_wait(struct mutex_t *mutex)
 
 void mutex_unlock(struct mutex_t *mutex)
 {
-    DEBUG("%s: unlocking mutex. val: %u pid: %" PRIkernel_pid "\n", sched_active_thread->name, mutex->val, sched_active_pid);
     unsigned irqstate = disableIRQ();
+    DEBUG("mutex_unlock(): val: %u pid: %" PRIkernel_pid "\n", mutex->val, sched_active_pid);
 
-    if (mutex->val != 0) {
-        priority_queue_node_t *next = priority_queue_remove_head(&(mutex->queue));
-        if (next) {
-            tcb_t *process = (tcb_t *) next->data;
-            DEBUG("%s: waking up waiter.\n", process->name);
-            sched_set_status(process, STATUS_PENDING);
-
-            sched_switch(process->priority);
-        }
-        else {
-            mutex->val = 0;
-        }
+    if (mutex->val == 0) {
+        /* the mutex was not locked */
+        restoreIRQ(irqstate);
+        return;
     }
 
+    priority_queue_node_t *next = priority_queue_remove_head(&(mutex->queue));
+    if (!next) {
+        /* the mutex was locked and no thread was waiting for it */
+        mutex->val = 0;
+        restoreIRQ(irqstate);
+        return;
+    }
+
+    tcb_t *process = (tcb_t *) next->data;
+    DEBUG("mutex_unlock: waking up waiting thread %" PRIkernel_pid "\n", process->pid);
+    sched_set_status(process, STATUS_PENDING);
+
+    uint16_t process_priority = process->priority;
     restoreIRQ(irqstate);
+    sched_switch(process_priority);
 }
 
 void mutex_unlock_and_sleep(struct mutex_t *mutex)
