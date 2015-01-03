@@ -44,6 +44,7 @@ char **_native_argv;
 pid_t _native_pid;
 pid_t _native_id;
 const char *_native_unix_socket_path = NULL;
+const char *_native_flash_emulation_file_path = NULL;
 
 /**
  * initialize _native_null_in_pipe to allow for reading from stdin
@@ -200,6 +201,12 @@ void usage_exit(void)
 -r          replay missed output when (re-)attaching to socket\n\
             (implies -o)\n");
 #endif
+
+#ifdef FEATURE_PERIPH_FLASH
+    real_printf("\
+-F <path>   Path to a file where simulated flash are stored permantenty\n");
+#endif
+
     real_printf("\
 -i <id>     specify instance id (set by config module)\n\
 -d          daemonize\n\
@@ -314,6 +321,17 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
             /* parse optional path */
             if ((argp + 1 < argc) && (argv[argp + 1][0] != '-')) {
                 _native_unix_socket_path = argv[++argp];
+            }
+        }
+#endif
+#ifdef FEATURE_PERIPH_FLASH
+        else if (strcmp("-F", arg) == 0) {
+            /* parse optional path */
+            if ((argp + 1 < argc) && (argv[argp + 1][0] != '-')) {
+                _native_flash_emulation_file_path = argv[++argp];
+            }
+            else {
+                usage_exit();
             }
         }
 #endif
