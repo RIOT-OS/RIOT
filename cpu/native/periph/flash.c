@@ -141,17 +141,6 @@ uint8_t flash_init(void)
     return FLASH_ERROR_SUCCESS;
 }
 
-/**
- * @brief Translates an address to page number
- *
- * This function is needed to calculate the page number
- * for erase operation
- *
- * @param[in]  address Pointer/Memory address
- * @param[out] offset  Address location in page
- *
- * @return             Flash page number
- */
 flash_page_number_t flash_get_page_number(void *address, flash_page_size_t *page_offset)
 {
     flash_page_number_t page_number = (flash_page_number_t)(((uint8_t *)address -
@@ -166,44 +155,11 @@ flash_page_number_t flash_get_page_number(void *address, flash_page_size_t *page
     return page_number;
 }
 
-/**
- * @brief Translates an page number to pointer
- *
- * This function is needed to calculate the memory address
- * of an flash page
- *
- * @param[in] page     Page number
- *
- * @return             Pointer to page or NULL
- */
 void *flash_get_address(flash_page_number_t page)
 {
     return (void *)&_native_flash_content[page * FLASH_PAGE_SIZE];
 }
 
-/**
- * @brief Write data to flash
- *
- * This function works like memcpy. It can be used to write
- * a part of a flash page or an single flash page or multiple
- * flash pages at once. Written data are reread to check if
- * data are stored correctly.
- *
- * The return code should by checked to handle errors.
- *
- * @param[in] dest   Address of flash memory page
- * @param[in] src    Address of source data
- * @param[in] n      Number of bytes to write
- *
- * @return    FLASH_ERROR_SUCCESS
- * @return    FLASH_ERROR_BROWNOUT
- * @return    FLASH_ERROR_FB_CONFIG
- * @return    FLASH_ERROR_LOCKED
- * @return    FLASH_ERROR_TIMEOUT
- * @return    FLASH_ERROR_ALIGNMENT
- * @return    FLASH_ERROR_VERIFY
- * @return    FLASH_ERROR_ADDR_RANGE
- */
 uint8_t flash_memcpy(void *dest, const void *src, size_t n)
 {
     /* Check alignment */
@@ -221,27 +177,6 @@ uint8_t flash_memcpy(void *dest, const void *src, size_t n)
     return (ret);
 }
 
-/**
- * @brief Write data to flash without checks
- *
- * This function works like memcpy. It can be used to write
- * a part of a flash page or an single flash page or multiple
- * flash pages at once.
- *
- * The return code should by checked to handle errors.
- *
- * @param[in] dest   Address of flash memory page
- * @param[in] src    Address of source data
- * @param[in] n      Number of bytes to write
- *
- * @return    FLASH_ERROR_SUCCESS
- * @return    FLASH_ERROR_BROWNOUT
- * @return    FLASH_ERROR_FB_CONFIG
- * @return    FLASH_ERROR_LOCKED
- * @return    FLASH_ERROR_TIMEOUT
- * @return    FLASH_ERROR_ALIGNMENT
- * @return    FLASH_ERROR_ADDR_RANGE
- */
 uint8_t flash_memcpy_fast(void *dest, const void *src, size_t n)
 {
     /* Check memory range */
@@ -264,18 +199,6 @@ uint8_t flash_memcpy_fast(void *dest, const void *src, size_t n)
     return flash_write_page_to_file(page_num, num_pages);
 }
 
-/**
- * @brief Erase an flash page by page number
- *
- * @param[in] page     Page number
- *
- * @return    FLASH_ERROR_SUCCESS
- * @return    FLASH_ERROR_BROWNOUT
- * @return    FLASH_ERROR_FB_CONFIG
- * @return    FLASH_ERROR_LOCKED
- * @return    FLASH_ERROR_TIMEOUT
- * @return    FLASH_ERROR_ADDR_RANGE
- */
 uint8_t flash_erase_page(flash_page_number_t page)
 {
     /* check argument */
@@ -297,18 +220,6 @@ uint8_t flash_erase_page(flash_page_number_t page)
     return (flash_write_page_to_file(page, 1));
 }
 
-/**
- * @brief Erase an flash page by address
- *
- * @param[in] address  Page address
- *
- * @return    FLASH_ERROR_SUCCESS
- * @return    FLASH_ERROR_BROWNOUT
- * @return    FLASH_ERROR_FB_CONFIG
- * @return    FLASH_ERROR_LOCKED
- * @return    FLASH_ERROR_TIMEOUT
- * @return    FLASH_ERROR_ADDR_RANGE
- */
 uint8_t flash_erase_page_by_address(void *address)
 {
     if (flash_check_address(address) > FLASH_ERROR_SUCCESS) {
