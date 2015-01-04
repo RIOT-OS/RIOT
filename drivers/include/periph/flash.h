@@ -100,7 +100,7 @@ uint8_t flash_init(void);
  * for erase operation
  *
  * @param[in]  address Pointer/Memory address
- * @param[out] offset  Address location in page or NULL
+ * @param[out] page_offset  Address location in page or NULL
  *
  * @return             Flash page number
  */
