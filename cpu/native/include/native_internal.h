@@ -64,6 +64,7 @@ typedef void (*_native_callback_t)(void);
 void native_cpu_init(void);
 void native_interrupt_init(void);
 extern void native_hwtimer_pre_init(void);
+void _native_flash_init(void);
 
 void native_irq_handler(void);
 extern void _native_sig_leave_tramp(void);
@@ -84,6 +85,8 @@ extern void (*real_free)(void *ptr);
 extern void* (*real_calloc)(size_t nmemb, size_t size);
 extern void* (*real_malloc)(size_t size);
 extern void* (*real_realloc)(void *ptr, size_t size);
+extern void* (*real_mmap)(void *addr, size_t length, int prot, int flags,
+        int fd, off_t offset);
 extern void (*real_freeaddrinfo)(struct addrinfo *res);
 extern void (*real_freeifaddrs)(struct ifaddrs *ifa);
 extern void (*real_srandom)(unsigned int seed);
@@ -105,6 +108,7 @@ extern int (*real_getifaddrs)(struct ifaddrs **ifap);
 extern int (*real_getpid)(void);
 extern int (*real_ioctl)(int fildes, int request, ...);
 extern int (*real_listen)(int socket, int backlog);
+extern int (*real_munmap)(void *addr, size_t length);
 extern int (*real_open)(const char *path, int oflag, ...);
 extern int (*real_pause)(void);
 extern int (*real_pipe)(int[2]);
@@ -147,8 +151,11 @@ extern char **_native_argv;
 extern pid_t _native_pid;
 extern pid_t _native_id;
 extern const char *_native_unix_socket_path;
-extern const char *_native_flash_emulation_file_path;
+
+extern const char *_native_flash_path;
+extern uint8_t *_native_flash_memory;
 extern int _native_flash_fd;
+extern size_t _native_flash_size;
 
 #ifdef MODULE_UART0
 #include <sys/select.h>

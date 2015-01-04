@@ -40,6 +40,7 @@
 #endif
 
 #include <stdlib.h>
+#include <sys/mman.h>
 
 #include "kernel_internal.h"
 #include "kernel.h"
@@ -79,6 +80,7 @@ int reboot_arch(int mode)
 #endif
 #ifdef FEATURE_PERIPH_FLASH
     if (_native_flash_fd != -1) {
+        real_munmap(_native_flash_memory, _native_flash_size);
         real_close(_native_flash_fd);
     }
 #endif

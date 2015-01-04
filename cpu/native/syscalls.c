@@ -57,6 +57,8 @@ void (*real_free)(void *ptr);
 void* (*real_malloc)(size_t size);
 void* (*real_calloc)(size_t nmemb, size_t size);
 void* (*real_realloc)(void *ptr, size_t size);
+void* (*real_mmap)(void *addr, size_t length, int prot, int flags,
+        int fd, off_t offset);
 void (*real_freeaddrinfo)(struct addrinfo *res);
 void (*real_freeifaddrs)(struct ifaddrs *ifa);
 void (*real_srandom)(unsigned int seed);
@@ -75,6 +77,7 @@ int (*real_feof)(FILE *stream);
 int (*real_ferror)(FILE *stream);
 int (*real_listen)(int socket, int backlog);
 int (*real_ioctl)(int fildes, int request, ...);
+int (*real_munmap)(void *addr, size_t length);
 int (*real_open)(const char *path, int oflag, ...);
 int (*real_pause)(void);
 int (*real_pipe)(int[2]);
@@ -406,6 +409,8 @@ void _native_init_syscalls(void)
     *(void **)(&real_execve) = dlsym(RTLD_NEXT, "execve");
     *(void **)(&real_ioctl) = dlsym(RTLD_NEXT, "ioctl");
     *(void **)(&real_listen) = dlsym(RTLD_NEXT, "listen");
+    *(void **)(&real_mmap) = dlsym(RTLD_NEXT, "mmap");
+    *(void **)(&real_munmap) = dlsym(RTLD_NEXT, "munmap");
     *(void **)(&real_open) = dlsym(RTLD_NEXT, "open");
     *(void **)(&real_pause) = dlsym(RTLD_NEXT, "pause");
     *(void **)(&real_fopen) = dlsym(RTLD_NEXT, "fopen");
