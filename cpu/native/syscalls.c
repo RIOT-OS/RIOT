@@ -378,6 +378,7 @@ void _native_init_syscalls(void)
     *(void **)(&real_read) = dlsym(RTLD_NEXT, "read");
     *(void **)(&real_write) = dlsym(RTLD_NEXT, "write");
     *(void **)(&real_malloc) = dlsym(RTLD_NEXT, "malloc");
+    *(void **)(&real_calloc) = dlsym(RTLD_NEXT, "calloc");
     *(void **)(&real_realloc) = dlsym(RTLD_NEXT, "realloc");
     *(void **)(&real_exit) = dlsym(RTLD_NEXT, "exit");
     *(void **)(&real_free) = dlsym(RTLD_NEXT, "free");
