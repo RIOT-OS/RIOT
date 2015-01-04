@@ -119,6 +119,7 @@ extern int (*real_unlink)(const char *);
 extern long int (*real_random)(void);
 extern const char* (*real_gai_strerror)(int errcode);
 extern FILE* (*real_fopen)(const char *path, const char *mode);
+extern off_t (*real_lseek)(int fd, off_t offset, int whence);
 
 #ifdef __MACH__
 #else
@@ -146,6 +147,8 @@ extern char **_native_argv;
 extern pid_t _native_pid;
 extern pid_t _native_id;
 extern const char *_native_unix_socket_path;
+extern const char *_native_flash_emulation_file_path;
+extern int _native_flash_fd;
 
 #ifdef MODULE_UART0
 #include <sys/select.h>

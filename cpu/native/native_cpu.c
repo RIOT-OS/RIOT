@@ -77,6 +77,11 @@ int reboot_arch(int mode)
         real_close(_native_tap_fd);
     }
 #endif
+#ifdef FEATURE_PERIPH_FLASH
+    if (_native_flash_fd != -1) {
+        real_close(_native_flash_fd);
+    }
+#endif
 
     if (real_execve(_native_argv[0], _native_argv, NULL) == -1) {
         err(EXIT_FAILURE, "reboot: execve");

@@ -204,7 +204,7 @@ void usage_exit(void)
 
 #ifdef FEATURE_PERIPH_FLASH
     real_printf("\
--F <path>   Path to a file where simulated flash are stored permantenty\n");
+-f <path>   Path to a file where simulated flash is stored permanently\n");
 #endif
 
     real_printf("\
@@ -325,7 +325,7 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
         }
 #endif
 #ifdef FEATURE_PERIPH_FLASH
-        else if (strcmp("-F", arg) == 0) {
+        else if (strcmp("-f", arg) == 0) {
             /* parse optional path */
             if ((argp + 1 < argc) && (argv[argp + 1][0] != '-')) {
                 _native_flash_emulation_file_path = argv[++argp];

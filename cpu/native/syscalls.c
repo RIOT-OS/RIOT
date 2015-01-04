@@ -87,6 +87,7 @@ int (*real_unlink)(const char *);
 long int (*real_random)(void);
 const char* (*real_gai_strerror)(int errcode);
 FILE* (*real_fopen)(const char *path, const char *mode);
+off_t (*real_lseek)(int fd, off_t offset, int whence);
 
 #ifdef __MACH__
 #else
@@ -412,6 +413,7 @@ void _native_init_syscalls(void)
     *(void **)(&real_feof) = dlsym(RTLD_NEXT, "feof");
     *(void **)(&real_ferror) = dlsym(RTLD_NEXT, "ferror");
     *(void **)(&real_clearerr) = dlsym(RTLD_NEXT, "clearerr");
+    *(void **)(&real_lseek) = dlsym(RTLD_NEXT, "lseek");
 #ifdef __MACH__
 #else
     *(void **)(&real_clock_gettime) = dlsym(RTLD_NEXT, "clock_gettime");
