@@ -69,16 +69,13 @@ extern "C" {
 #endif
 
 /**
- * @name CPU Flash configuration (file simulation)
+ * @name CPU Flash configuration
  * @{
  */
-#define FLASH_PAGE_SIZE         (1024)  /**< Page size of flash memory */
-#define FLASH_NUM_PAGES         (256)   /**< Number of flash pages */
-#define FLASH_START_ADDRESS     (0x0)   /**< Starting address to calculate end of flash */
-#define FLASH_WRITE_ALIGN       (4)     /**< number of bytes must be written at once */
-#define FLASH_WRITES_PER_WORD   (2)     /**< how often a word can overwritten without flash erase */
-#define FLASH_ERASE_CYCLES      (20000) /**< Flash erase cycles described in datasheet */
-#define FLASH_ERASED_BIT_VALUE  (0)     /**< Value of erased bits 0|1 */
+#define FLASH_PAGE_SIZE         (1024)  /**< page size of flash memory */
+#define FLASH_NUM_PAGES         (256)   /**< number of flash pages */
+#define FLASH_WRITE_ALIGN       (4)     /**< number of bytes which must be written at once */
+#define FLASH_ERASED_BIT_VALUE  (0x00)  /**< value of erased bits */
 /* @} */
 
 #ifdef __cplusplus
