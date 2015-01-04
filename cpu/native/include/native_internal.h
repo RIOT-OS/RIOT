@@ -153,7 +153,7 @@ extern pid_t _native_id;
 extern const char *_native_unix_socket_path;
 
 extern const char *_native_flash_path;
-extern uint8_t *_native_flash_memory;
+extern volatile uint8_t *_native_flash_memory;
 extern int _native_flash_fd;
 extern size_t _native_flash_size;
 

@@ -42,7 +42,7 @@
 #include "debug.h"
 
 int _native_flash_fd = -1;
-uint8_t *_native_flash_memory = NULL;
+volatile uint8_t *_native_flash_memory = NULL;
 size_t _native_flash_size = (FLASH_NUM_PAGES * FLASH_PAGE_SIZE);
 
 

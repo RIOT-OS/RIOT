@@ -80,7 +80,8 @@ int reboot_arch(int mode)
 #endif
 #ifdef FEATURE_PERIPH_FLASH
     if (_native_flash_fd != -1) {
-        real_munmap(_native_flash_memory, _native_flash_size);
+        /* casting to discard volatile */
+        real_munmap((void *)_native_flash_memory, _native_flash_size);
         real_close(_native_flash_fd);
     }
 #endif
