@@ -33,14 +33,14 @@ extern "C" {
  *
  */
 enum flash_errors {
-    FLASH_ERROR_SUCCESS	= 0,  /**< Success */
-    FLASH_ERROR_BROWNOUT	= 1,  /**< Voltage to low */
-    FLASH_ERROR_FB_CONFIG	= 2,  /**< Forbidden by MCU configuration/flags */
-    FLASH_ERROR_LOCKED	= 3,  /**< Page or flash is locked by other operation */
-    FLASH_ERROR_TIMEOUT	= 4,  /**< Timeout */
+    FLASH_ERROR_SUCCESS         = 0,  /**< Success */
+    FLASH_ERROR_BROWNOUT        = 1,  /**< Voltage to low */
+    FLASH_ERROR_FB_CONFIG       = 2,  /**< Forbidden by MCU configuration/flags */
+    FLASH_ERROR_LOCKED          = 3,  /**< Page or flash is locked by other operation */
+    FLASH_ERROR_TIMEOUT         = 4,  /**< Timeout */
     FLASH_ERROR_ALIGNMENT	= 5,  /**< Misalligned access */
-    FLASH_ERROR_VERIFY	= 6,  /**< Data not written correctly */
-    FLASH_ERROR_ADDR_RANGE	= 7,  /**< Address out of flash area */
+    FLASH_ERROR_VERIFY          = 6,  /**< Data not written correctly */
+    FLASH_ERROR_ADDR_RANGE      = 7,  /**< Address out of flash area */
 };
 
 /**
@@ -86,8 +86,6 @@ typedef uint64_t flash_data_word_t;
  * @brief Initialize flash memory access
  *
  * If needed flash memory initialization can be performed.
- * In native mode a file is loaded into memory to simulate
- * flash.
  *
  * @return	Error Code
  */
