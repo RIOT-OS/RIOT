@@ -258,7 +258,7 @@ void _nativenet_handle_packet(radio_packet_t *packet)
         notified = 1;
     }
     else {
-        DEBUG("_nativenet_handle_packet: no event handler registered\n")
+        DEBUG("_nativenet_handle_packet: no event handler registered\n");
     }
 
     if (!notified) {
