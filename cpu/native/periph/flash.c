@@ -139,11 +139,7 @@ uint8_t flash_erase_page(flash_page_number_t page)
     DEBUG("Erase page %d\n", page);
 
     for (ssize_t i = page * FLASH_PAGE_SIZE; i < ((page + 1) * FLASH_PAGE_SIZE); i++) {
-#if FLASH_ERASED_BIT_VALUE == 0
-        _native_flash_memory[i] = 0;
-#else
-        _native_flash_memory[i] = 0xff;
-#endif
+        _native_flash_memory[i] = FLASH_ERASED_WORD_VALUE;
     }
 
     return FLASH_ERROR_SUCCESS;
@@ -234,6 +230,6 @@ void _native_flash_init(void)
     }
 
     /* initialize [remaining] memory area */
-    memset((void *)(_native_flash_memory + init_start), FLASH_ERASED_BIT_VALUE,
+    memset((void *)(_native_flash_memory + init_start), FLASH_ERASED_WORD_VALUE,
             init_length);
 }
