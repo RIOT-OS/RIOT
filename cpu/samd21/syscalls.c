@@ -44,8 +44,9 @@
 /**
  * manage the heap
  */
-extern uint32_t _end;                       /* address of last used memory cell */
-caddr_t heap_top = (caddr_t)&_end + 4;
+extern char _sheap;                 /* start of the heap */
+extern char _eheap;                 /* end of the heap */
+caddr_t heap_top = (caddr_t)&_sheap + 4;
 
 #ifndef MODULE_UART0
 /**
@@ -115,18 +116,25 @@ void _exit(int n)
  *
  * The current heap implementation is very rudimentary, it is only able to allocate
  * memory. But it does not
- * - check if the returned address is valid (no check if the memory very exists)
  * - have any means to free memory again
  *
- * TODO: check if the requested memory is really available
- *
- * @return [description]
+ * @return    Upon successful completion, sbrk() returns the prior break value.
+ *            Otherwise, it returns (void *)-1 and sets errno to indicate the error.
  */
-caddr_t _sbrk_r(struct _reent *r, size_t incr)
+caddr_t _sbrk_r(struct _reent *r, ptrdiff_t incr)
 {
     unsigned int state = disableIRQ();
     caddr_t res = heap_top;
-    heap_top += incr;
+
+    if (((incr > 0) && ((heap_top + incr > &_eheap) || (heap_top + incr < res))) ||
+        ((incr < 0) && ((heap_top + incr < &_sheap) || (heap_top + incr > res)))) {
+        r->_errno = ENOMEM;
+        res = (void *) -1;
+    }
+    else {
+        heap_top += incr;
+    }
+
     restoreIRQ(state);
     return res;
 }
