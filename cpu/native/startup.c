@@ -44,7 +44,7 @@ char **_native_argv;
 pid_t _native_pid;
 pid_t _native_id;
 const char *_native_unix_socket_path = NULL;
-const char *_native_flash_emulation_file_path = NULL;
+const char *_native_flash_path = NULL;
 
 /**
  * initialize _native_null_in_pipe to allow for reading from stdin
@@ -204,7 +204,7 @@ void usage_exit(void)
 
 #ifdef FEATURE_PERIPH_FLASH
     real_printf("\
--F <path>   Path to a file where simulated flash are stored permantenty\n");
+-f <path>   Path to a file where simulated flash is stored permanently\n");
 #endif
 
     real_printf("\
@@ -325,10 +325,10 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
         }
 #endif
 #ifdef FEATURE_PERIPH_FLASH
-        else if (strcmp("-F", arg) == 0) {
+        else if (strcmp("-f", arg) == 0) {
             /* parse optional path */
             if ((argp + 1 < argc) && (argv[argp + 1][0] != '-')) {
-                _native_flash_emulation_file_path = argv[++argp];
+                _native_flash_path = argv[++argp];
             }
             else {
                 usage_exit();
@@ -357,6 +357,9 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
     native_interrupt_init();
 #ifdef MODULE_NATIVENET
     tap_init(argv[1]);
+#endif
+#ifdef FEATURE_PERIPH_FLASH
+    _native_flash_init();
 #endif
 
     board_init();
