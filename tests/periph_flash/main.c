@@ -53,13 +53,7 @@ int main(void)
     counter = 0;
 
     for (flash_page_size_t i = 0; i < FLASH_PAGE_SIZE; i++) {
-#if FLASH_ERASED_BIT_VALUE==0
-
-        if (flashpage[i] == 0x00) {
-#else
-
-        if (flashpage[i] == 0xff) {
-#endif
+        if (flashpage[i] == FLASH_ERASED_WORD_VALUE) {
             counter++;
         }
     }
