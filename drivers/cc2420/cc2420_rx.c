@@ -31,6 +31,11 @@ volatile uint8_t rx_buffer_next;  /* index of next free cell in RX buffer */
 static receive_802154_packet_callback_t recv_func = NULL;
 
 
+receive_802154_packet_callback_t cc2420_get_recv_callback(void)
+{
+    return recv_func;
+}
+
 void cc2420_set_recv_callback(receive_802154_packet_callback_t recv_cb)
 {
     recv_func = recv_cb;
