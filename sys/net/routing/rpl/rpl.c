@@ -426,7 +426,7 @@ void rpl_add_srh_entry(ipv6_addr_t *child, ipv6_addr_t *parent, uint16_t lifetim
     /* This maybe a bit confusing since the root also using the standard routing table, but in this case
      * the code stays cleaner - especially for rt_over_timer from trickle.c. Just keep in mind that
      * address is now child (unique, iteration variable) and parent is now next_hop. The whole routing table
-     * transforms to a list of childs and their parents, so that route aggregation can be done properly.
+     * transforms to a list of children and their parents, so that route aggregation can be done properly.
      */
     DEBUGF("Adding source-routing entry child: %s\n", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, child));
     DEBUGF("Adding source-routing entry parent: %s\n", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, parent));
