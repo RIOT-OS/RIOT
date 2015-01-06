@@ -130,7 +130,7 @@ ifeq ($(origin RIOT_VERSION), undefined)
       RIOT_VERSION := $(GIT_STRING)-$(GIT_BRANCH)
     endif
   else
-    RIOT_VERSION := UNKNOWN (builddir: $(RIOTBASE))
+    RIOT_VERSION := "UNKNOWN (builddir: $(RIOTBASE))"
   endif
 endif
 export CFLAGS += -DRIOT_VERSION=\"$(RIOT_VERSION)\"
