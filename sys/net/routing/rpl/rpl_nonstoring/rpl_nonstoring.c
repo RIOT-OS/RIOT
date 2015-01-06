@@ -676,7 +676,7 @@ void rpl_recv_DAO_mode(void)
                         &rpl_opt_target_buf->target));
                 DEBUGF("Transit: %s\n", ipv6_addr_to_str(addr_str_mode, IPV6_MAX_ADDR_STR_LEN,
                         &rpl_opt_transit_buf->parent));
-#if (RPL_DEFAULT_MOP == RPL_NON_STORING_MODE) && (RPL_MAX_ROUTING_ENTRIES != 0)
+#if (RPL_DEFAULT_MOP == RPL_MOP_NON_STORING_MODE) && (RPL_MAX_ROUTING_ENTRIES != 0)
                 rpl_add_srh_entry(&rpl_opt_target_buf->target, &rpl_opt_transit_buf->parent,
                         rpl_opt_transit_buf->path_lifetime * my_dodag->lifetime_unit);
 #endif
@@ -826,4 +826,3 @@ void rpl_send(ipv6_addr_t *destination, uint8_t *payload, uint16_t p_len, uint8_
 
     ipv6_send_packet(ipv6_send_buf, NULL);
 }
-
