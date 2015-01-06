@@ -17,12 +17,11 @@
  * @author      Lotte Steenbrink <lotte.steenbrink@fu-berlin.de>
  */
 
-#include "debug.h"
-
 #include "routingtable.h"
 #include "aodv_debug.h"
 
 #define ENABLE_DEBUG (0)
+#include "debug.h"
 
 /* helper functions */
 static void _reset_entry_if_stale(uint8_t i);
