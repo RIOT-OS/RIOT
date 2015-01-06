@@ -537,7 +537,8 @@ void rpl_remove_srh_header(ipv6_hdr_t *ipv6_header, const void *buf, uint8_t nex
     DEBUGF("Source routing header extraction finished.\n");
     DEBUGF("Dest is now: %s\n", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, &temp_ipv6_header->destaddr));
     srh_m_send.content.ptr = (char *) srh_send_buffer;
-    DEBUGF("Return from relay: %d\n", msg_send_receive(&srh_m_send, &srh_m_recv, ip_process_pid));
+    int ret = msg_send_receive(&srh_m_send, &srh_m_recv, ip_process_pid);
+    DEBUGF("Return from relay: %d\n", ret);
 }
 
 int rpl_srh_sendto(const void *buf, uint16_t len, ipv6_addr_t *src, ipv6_addr_t *dest, ipv6_srh_t *srh_header, uint8_t srh_length)
