@@ -38,7 +38,7 @@ static ipv6_addr_t my_address;
 /* Identification variables */
 static char i_am_root;
 
-/* in send buffer we need space fpr LL_HDR */
+/* in send buffer we need space for LL_HDR */
 static uint8_t rpl_send_buffer[BUFFER_SIZE];
 
 /* SEND BUFFERS */
@@ -580,7 +580,7 @@ void rpl_recv_DIO_mode(void)
             return;
         }
         else if (RPL_COUNTER_GREATER_THAN(my_dodag->version, dio_dodag.version)) {
-            /* ein Knoten hat noch eine kleinere Versionsnummer -> mehr DIOs senden */
+            /* lower version number detected -> send more DIOs */
             reset_trickletimer();
             return;
         }
