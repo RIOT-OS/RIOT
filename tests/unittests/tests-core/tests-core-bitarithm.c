@@ -7,8 +7,9 @@
  */
 
 #include <limits.h>
+#include <stdint.h>
 
-#include "embUnit/embUnit.h"
+#include "embUnit.h"
 
 #include "bitarithm.h"
 
@@ -153,14 +154,14 @@ static void test_bitarithm_msb_limit(void)
 
 static void test_bitarithm_msb_random(void)
 {
-    TEST_ASSERT_EQUAL_INT(2, bitarithm_msb(4)); /* randomized by fair
+    TEST_ASSERT_EQUAL_INT(4, bitarithm_msb(19)); /* randomized by fair
                                                            dice roll ;-) */
 }
 
-static void test_bitarithm_msb_all(void)
+static void test_bitarithm_msb_16bit(void)
 {
-    for (unsigned shift = 0; shift < sizeof(unsigned) * 8 - 1; ++shift) {
-        TEST_ASSERT_EQUAL_INT(shift, bitarithm_msb(1 << shift));
+    for (unsigned i = 1; i < UINT16_MAX; i++) {
+        TEST_ASSERT_EQUAL_INT(((sizeof(unsigned) * 8) - __builtin_clz(i) - 1), bitarithm_msb(i));
     }
 }
 
@@ -177,14 +178,14 @@ static void test_bitarithm_lsb_limit(void)
 
 static void test_bitarithm_lsb_random(void)
 {
-    TEST_ASSERT_EQUAL_INT(3, bitarithm_lsb(8)); /* randomized by fair
+    TEST_ASSERT_EQUAL_INT(3, bitarithm_lsb(24)); /* randomized by fair
                                                           dice roll ;-) */
 }
 
 static void test_bitarithm_lsb_all(void)
 {
-    for (unsigned shift = 0; shift < sizeof(unsigned) * 8 - 1; ++shift) {
-        TEST_ASSERT_EQUAL_INT(shift, bitarithm_lsb(1u << shift));
+    for (unsigned i = 1; i < UINT16_MAX; i++) {
+        TEST_ASSERT_EQUAL_INT(__builtin_ctz(i), bitarithm_lsb(i));
     }
 }
 
@@ -232,7 +233,7 @@ Test *tests_core_bitarithm_tests(void)
         new_TestFixture(test_bitarithm_msb_one),
         new_TestFixture(test_bitarithm_msb_limit),
         new_TestFixture(test_bitarithm_msb_random),
-        new_TestFixture(test_bitarithm_msb_all),
+        new_TestFixture(test_bitarithm_msb_16bit),
 
         new_TestFixture(test_bitarithm_lsb_one),
         new_TestFixture(test_bitarithm_lsb_limit),

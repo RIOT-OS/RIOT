@@ -44,6 +44,10 @@
 #ifndef _SAMR21_RFCTRL_INSTANCE_
 #define _SAMR21_RFCTRL_INSTANCE_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ========== Register definition for RFCTRL peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
 #define REG_RFCTRL_FECFG           (0x42005400U) /**< \brief (RFCTRL) Front-end control bus configuration */
@@ -53,5 +57,9 @@
 
 /* ========== Instance parameters for RFCTRL peripheral ========== */
 #define RFCTRL_FBUSMSB              5
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAMR21_RFCTRL_INSTANCE_ */

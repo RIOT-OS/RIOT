@@ -20,10 +20,14 @@
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef CPUCONF_H_
-#define CPUCONF_H_
+#ifndef __CPU_CONF_H
+#define __CPU_CONF_H
 
 #include "stm32f10x.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * @name Kernel configuration
@@ -52,12 +56,12 @@
 /** @} */
 
 /**
- * @name Length for reading CPU_ID
+ * @brief Length for reading CPU_ID
  */
 #define CPUID_ID_LEN                    (12)
 
 /**
- * @name Definition of different panic modes
+ * @brief Definition of different panic modes
  */
 typedef enum {
     HARD_FAULT,
@@ -70,6 +74,10 @@ typedef enum {
 void cpu_clock_scale(uint32_t source, uint32_t target, uint32_t *prescale);
 
 #define TRANSCEIVER_BUFFER_SIZE (3)
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __CPU_CONF_H */
 /** @} */

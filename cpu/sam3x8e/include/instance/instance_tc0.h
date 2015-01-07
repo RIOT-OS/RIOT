@@ -30,6 +30,10 @@
 #ifndef _SAM3XA_TC0_INSTANCE_
 #define _SAM3XA_TC0_INSTANCE_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ========== Register definition for TC0 peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
 #define REG_TC0_CCR0           (0x40080000U) /**< \brief (TC0) Channel Control Register (channel = 0) */
@@ -116,5 +120,9 @@
 #define REG_TC0_FMR   (*(RwReg*)0x400800D8U) /**< \brief (TC0) Fault Mode Register */
 #define REG_TC0_WPMR  (*(RwReg*)0x400800E4U) /**< \brief (TC0) Write Protect Mode Register */
 #endif /* (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAM3XA_TC0_INSTANCE_ */

@@ -30,6 +30,10 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief   Initialize the Programmable Interrupt Controller.
  *
@@ -136,7 +140,7 @@ typedef void (*x86_irq_handler_t)(uint8_t irq_num);
  * The PIC default handler will still send an EOI.
  * Especially the keyboard controller does not like it,
  * if it is told that everything was done but it wasn't.
- * A raised #GP might be the least of your problems.
+ * A raised #X86_INT_GP might be the least of your problems.
  */
 void x86_pic_set_handler(unsigned irq, x86_irq_handler_t handler);
 
@@ -162,6 +166,10 @@ void x86_pic_enable_irq(unsigned num);
  * This function should only be called by other subsystems like the PCI subsystem.
  */
 void x86_pic_disable_irq(unsigned num);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

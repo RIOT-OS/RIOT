@@ -18,7 +18,7 @@
 #ifndef __TESTS_CORE_H_
 #define __TESTS_CORE_H_
 
-#include "../unittests.h"
+#include "embUnit.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -77,6 +77,13 @@ Test *tests_core_priority_queue_tests(void);
  * @return  embUnit tests if successful, NULL if not.
  */
 Test *tests_core_byteorder_tests(void);
+
+/**
+ * @brief   Generates tests for ringbuffer.h
+ *
+ * @return  embUnit tests if successful, NULL if not.
+ */
+Test *tests_core_ringbuffer_tests(void);
 
 #ifdef __cplusplus
 }

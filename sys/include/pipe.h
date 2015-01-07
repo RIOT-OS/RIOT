@@ -17,14 +17,17 @@
  */
 
 /**
- * @addtogroup  sys
- * @{
- * @file
+ * @defgroup    sys_pipe Pipe IPC
+ * @ingroup     sys
  *
  * @brief       Generic pipe implementation.
  * @details     This pipe implementation is a tight wrapper around a ringbuffer.
  *              It sends the calling thread to sleep if the ringbuffer is full
  *              or empty, respectively. It can be used in ISRs, too.
+ *
+ *
+ * @{
+ * @file
  *
  * @author      René Kijewski <rene.kijewski@fu-berlin.de>
  */

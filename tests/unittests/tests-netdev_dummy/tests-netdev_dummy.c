@@ -12,7 +12,7 @@
 
 #include "clist.h"
 
-#include "embUnit/embUnit.h"
+#include "embUnit.h"
 
 #include "netdev_dummy.h"
 
@@ -158,7 +158,7 @@ static void test_netdev_dummy_send_data_no_ulhs(void)
 #if UNITTESTS_NETDEV_DUMMY_MAX_PACKET > 4
 static void test_netdev_dummy_send_data_with_ulhs(void)
 {
-    netdev_hlist_t hlist_node = {NULL, NULL, TEST_STRING8, 4};
+    netdev_hlist_t hlist_node = {NULL, NULL, NETDEV_PROTO_UNKNOWN, TEST_STRING8, 4};
     netdev_hlist_t *hlist = NULL;
     char dest[] = TEST_STRING64;
     size_t dest_len = UNITTESTS_NETDEV_DUMMY_MAX_ADDR_LEN;

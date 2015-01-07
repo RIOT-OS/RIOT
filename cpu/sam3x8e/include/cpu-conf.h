@@ -20,6 +20,9 @@
 
 #include "sam3x8e.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * @name Kernel configuration
@@ -47,6 +50,9 @@
 #endif
 /** @} */
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __CPU_CONF_H */
 /** @} */

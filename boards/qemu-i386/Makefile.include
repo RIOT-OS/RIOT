@@ -3,7 +3,7 @@ include $(RIOTBOARD)/x86-multiboot-common/Makefile.include
 CFLAGS += -march=i686 -mtune=i686
 CFLAGS += -I$(RIOTBOARD)/qemu-i386/include
 
-TERMPROG = exec $(RIOTBOARD)/qemu-i386/dist/term.py "qemu-system-i386 -m 512m" $(BINDIRBASE) $(HEXFILE)
+TERMPROG = exec $(RIOTBOARD)/qemu-i386/dist/term.py qemu-system-i386 $(BINDIRBASE) $(HEXFILE)
 
 FLASHER = true
 

@@ -19,7 +19,7 @@
 #ifndef __TESTS_TIMEX_H_
 #define __TESTS_TIMEX_H_
 
-#include "../unittests.h"
+#include "embUnit.h"
 
 #ifdef __cplusplus
 extern "C" {

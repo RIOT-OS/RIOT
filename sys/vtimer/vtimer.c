@@ -41,6 +41,8 @@
 #define SECONDS_PER_TICK (4096U)
 #define MICROSECONDS_PER_TICK (4096UL * 1000000)
 
+void _gettimeofday(void)           __attribute__ ((weak, alias("vtimer_gettimeofday")));
+
 static void vtimer_callback(void *ptr);
 static void vtimer_callback_tick(vtimer_t *timer);
 static void vtimer_callback_msg(vtimer_t *timer);
@@ -158,7 +160,7 @@ void vtimer_callback_tick(vtimer_t *timer)
 static void vtimer_callback_msg(vtimer_t *timer)
 {
     msg_t msg;
-    msg.type = MSG_TIMER;
+    msg.type = timer->type;
     msg.content.value = (unsigned int) timer->arg;
     msg_send_int(&msg, timer->pid);
 }
@@ -383,9 +385,10 @@ int vtimer_remove(vtimer_t *t)
     return 0;
 }
 
-int vtimer_set_msg(vtimer_t *t, timex_t interval, kernel_pid_t pid, void *ptr)
+int vtimer_set_msg(vtimer_t *t, timex_t interval, kernel_pid_t pid, uint16_t type, void *ptr)
 {
     t->action = vtimer_callback_msg;
+    t->type = type;
     t->arg = ptr;
     t->absolute = interval;
     t->pid = pid;
@@ -399,7 +402,7 @@ int vtimer_msg_receive_timeout(msg_t *m, timex_t timeout) {
     timeout_message.content.ptr = (char *) &timeout_message;
 
     vtimer_t t;
-    vtimer_set_msg(&t, timeout, sched_active_pid, &timeout_message);
+    vtimer_set_msg(&t, timeout, sched_active_pid, MSG_TIMER, &timeout_message);
     msg_receive(m);
     if (m->type == MSG_TIMER && m->content.ptr == (char *) &timeout_message) {
         /* we hit the timeout */

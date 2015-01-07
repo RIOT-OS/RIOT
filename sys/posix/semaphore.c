@@ -47,7 +47,8 @@ int sem_init(sem_t *sem, int pshared, unsigned int value)
 int sem_destroy(sem_t *sem)
 {
     if (sem->queue.first) {
-        DEBUG("%s: tried to destroy active semaphore.\n", sched_active_thread->name);
+        DEBUG("sem_destroy: %" PRIkernel_pid ": tried to destroy active semaphore.\n",
+              sched_active_thread->pid);
         return -1;
     }
     return 0;
@@ -72,44 +73,35 @@ int sem_unlink(const char *name)
     return -1;
 }
 
-static void sem_thread_blocked(sem_t *sem)
-{
-    /* I'm going blocked */
-    sched_set_status((tcb_t*) sched_active_thread, STATUS_MUTEX_BLOCKED);
-
-    priority_queue_node_t n;
-    n.priority = (uint32_t) sched_active_thread->priority;
-    n.data = (size_t) sched_active_thread;
-    n.next = NULL;
-
-    DEBUG("%s: Adding node to mutex queue: prio: %" PRIu32 "\n",
-          sched_active_thread->name, n.priority);
-
-    /* add myself to the waiters queue */
-    priority_queue_add(&sem->queue, &n);
-
-    /* scheduler should schedule an other thread, that unlocks the
-     * mutex in the future, when this happens I get scheduled again
-     */
-    thread_yield_higher();
-}
-
 int sem_wait(sem_t *sem)
 {
-    unsigned old_state = disableIRQ();
     while (1) {
+        unsigned old_state = disableIRQ();
+
         unsigned value = sem->value;
-        if (value == 0) {
-            sem_thread_blocked(sem);
-            continue;
-        }
-        else {
+        if (value != 0) {
             sem->value = value - 1;
-            break;
+            restoreIRQ(old_state);
+            return 1;
         }
+
+        /* I'm going blocked */
+        priority_queue_node_t n;
+        n.priority = (uint32_t) sched_active_thread->priority;
+        n.data = (uintptr_t) sched_active_thread;
+        n.next = NULL;
+        priority_queue_add(&sem->queue, &n);
+
+        DEBUG("sem_wait: %" PRIkernel_pid ": Adding node to mutex queue: prio: %" PRIu32 "\n",
+              sched_active_thread->pid, sched_active_thread->priority);
+
+        /* scheduler should schedule an other thread, that unlocks the
+         * mutex in the future, when this happens I get scheduled again
+         */
+        sched_set_status((tcb_t*) sched_active_thread, STATUS_MUTEX_BLOCKED);
+        restoreIRQ(old_state);
+        thread_yield_higher();
     }
-    restoreIRQ(old_state);
-    return 1;
 }
 
 int sem_timedwait(sem_t *sem, const struct timespec *abstime)
@@ -145,12 +137,18 @@ int sem_post(sem_t *sem)
     priority_queue_node_t *next = priority_queue_remove_head(&sem->queue);
     if (next) {
         tcb_t *next_process = (tcb_t*) next->data;
-        DEBUG("%s: waking up %s\n", sched_active_thread->name, next_process->name);
+        DEBUG("sem_post: %" PRIkernel_pid ": waking up %" PRIkernel_pid "\n",
+              sched_active_thread->pid, next_process->pid);
         sched_set_status(next_process, STATUS_PENDING);
-        sched_switch(next_process->priority);
+
+        uint16_t prio = next_process->priority;
+        restoreIRQ(old_state);
+        sched_switch(prio);
+    }
+    else {
+        restoreIRQ(old_state);
     }
 
-    restoreIRQ(old_state);
     return 1;
 }
 

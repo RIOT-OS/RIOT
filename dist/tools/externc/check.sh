@@ -1,5 +1,12 @@
 #!/bin/sh
 
+# Copyright 2014 Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+# Copyright 2014 DangNhat Pham-Huu <51002279@hcmut.edu.vn>
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
 # customizable
 CHECKROOT=$(dirname "${0}")
 
@@ -21,9 +28,11 @@ else
     FILES="$(git diff --diff-filter=${DIFFFILTER} --name-only ${BRANCH} | grep -E '\.h$')"
 fi
 
+FILES=$(echo "${FILES}" | grep -v -E '^(dist/tools|boards/msba2-common/tools/)')
+
 # check files
 for FILE in ${FILES}; do
-    if head -100 "${ROOT}/${FILE}" \
+    if cat "${ROOT}/${FILE}" \
         | sed -e 's/$/ /' \
         | tr -d '\r\n' \
         | sed -e 's/  */ /g' \

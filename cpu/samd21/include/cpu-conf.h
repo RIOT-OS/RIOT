@@ -20,6 +20,9 @@
 
 #include "samd21.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * @name Kernel configuration
@@ -30,7 +33,7 @@
 #define KERNEL_CONF_STACKSIZE_PRINTF    (512)
 
 #ifndef KERNEL_CONF_STACKSIZE_DEFAULT
-#define KERNEL_CONF_STACKSIZE_DEFAULT   (512)
+#define KERNEL_CONF_STACKSIZE_DEFAULT   (1024)
 #endif
 
 #define KERNEL_CONF_STACKSIZE_IDLE      (256)
@@ -47,6 +50,10 @@
 #endif
 /** @} */
 
+#define TRANSCEIVER_BUFFER_SIZE (3)
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __CPU_CONF_H */
 /** @} */

@@ -7,7 +7,7 @@
  */
 
 /**
- * @addtogroup      cpu_cc2538_definitions
+ * @ingroup         cpu_cc2538_definitions
  * @{
  *
  * @file            cc2538.h
@@ -99,7 +99,7 @@ void SVC_Handler(void);          /**< SVC handler */
 void DebugMon_Handler(void);     /**< Debug monitor handler */
 void PendSV_Handler(void);       /**< PendSV handler */
 void SysTick_Handler(void);      /**< SysTick handler */
-/* @} */
+/** @} */
 
 /**
  * @brief Configuration of the Cortex-M3 Processor and Core Peripherals
@@ -123,7 +123,7 @@ void SysTick_Handler(void);      /**< SysTick handler */
 
 typedef volatile uint32_t cc2538_reg_t; /**< Least-significant 32 bits of the IEEE address */
 
-/** @addtogroup Peripheral_memory_map
+/** @addtogroup cpu_specific_Peripheral_memory_map
   * @{
   */
 

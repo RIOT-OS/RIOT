@@ -18,7 +18,7 @@
 #ifndef __TESTS_PKTBUF_H_
 #define __TESTS_PKTBUF_H_
 
-#include "../unittests.h"
+#include "embUnit.h"
 
 #ifdef __cplusplus
 extern "C" {

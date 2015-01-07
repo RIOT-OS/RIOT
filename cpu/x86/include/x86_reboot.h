@@ -30,6 +30,10 @@
 
 #include "kernel.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief   Prototype for a x86 reboot function.
  *
@@ -83,6 +87,10 @@ bool x86_shutdown(void);
  * @brief   Function to call on x86_shutdown()
  */
 void x86_set_shutdown_fun(x86_shutdown_t fun);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

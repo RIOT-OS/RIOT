@@ -139,7 +139,7 @@ void schedule_timer(void)
         null_timer.it_interval.tv_usec = 0;
         null_timer.it_value.tv_sec = 0;
         null_timer.it_value.tv_usec = 0;
-        if (setitimer(ITIMER_REAL, &null_timer, NULL) == -1) {
+        if (real_setitimer(ITIMER_REAL, &null_timer, NULL) == -1) {
             err(EXIT_FAILURE, "schedule_timer: setitimer");
         }
         return;
@@ -172,7 +172,7 @@ void schedule_timer(void)
     }
 
     _native_syscall_enter();
-    if (setitimer(ITIMER_REAL, &result, NULL) == -1) {
+    if (real_setitimer(ITIMER_REAL, &result, NULL) == -1) {
         err(EXIT_FAILURE, "schedule_timer: setitimer");
     }
     else {
@@ -283,7 +283,7 @@ unsigned long hwtimer_arch_now(void)
     t.tv_nsec = mts.tv_nsec;
 #else
 
-    if (clock_gettime(CLOCK_MONOTONIC, &t) == -1) {
+    if (real_clock_gettime(CLOCK_MONOTONIC, &t) == -1) {
         err(EXIT_FAILURE, "hwtimer_arch_now: clock_gettime");
     }
 

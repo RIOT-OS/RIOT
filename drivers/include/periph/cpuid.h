@@ -9,10 +9,13 @@
 /**
  * @defgroup    driver_periph_cpuid CPUID
  * @ingroup     driver_periph
- * @{
+ * @brief       Low-level CPU ID peripheral driver
  *
+ * Provides access the CPU's serial number
+ *
+ * @{
  * @file
- * @brief       Provides access the CPU's serial number
+ * @brief       Low-level CPUID peripheral driver interface definitions
  *
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */

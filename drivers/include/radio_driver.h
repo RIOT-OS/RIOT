@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2014 INRIA
  *
  * This file is subject to the terms and conditions of the GNU Lesser
@@ -7,10 +7,13 @@
  */
 
 /**
+ * @defgroup radio_driver IEEE 802.15.4 radio driver interface
  * @ingroup drivers
- * @{
- * @file  radio_driver.h
+ *
  * @brief API definitions for 802.15.4 radio transceivers' drivers
+ *
+ * @{
+ * @file
  * @author Kévin Roussel <Kevin.Roussel@inria.fr>
  *
  */

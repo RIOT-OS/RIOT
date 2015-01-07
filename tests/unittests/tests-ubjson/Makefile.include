@@ -1,0 +1,2 @@
+USEMODULE += ubjson
+USEMODULE += pipe

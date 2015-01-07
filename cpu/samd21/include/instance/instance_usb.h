@@ -44,6 +44,10 @@
 #ifndef _SAMR21_USB_INSTANCE_
 #define _SAMR21_USB_INSTANCE_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ========== Register definition for USB peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
 #define REG_USB_CTRLA              (0x41005000U) /**< \brief (USB) Control A */
@@ -338,5 +342,9 @@
 #define USB_EPT_NUM                 8
 #define USB_GCLK_ID                 6
 #define USB_PIPE_NUM                8
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAMR21_USB_INSTANCE_ */

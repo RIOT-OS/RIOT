@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     sys_posix
+ * @ingroup     posix
  * @{
  *
  * @file    strings.h
@@ -73,6 +73,7 @@ int strncasecmp(const char *s1, const char *s2, size_t n);
  * @param[in] s1    a string.
  * @param[in] s2    another string.
  * @param[in] n     number of bytes to be compared
+ * @param[in] l     locale, not used in RIOT
  *
  * @return  A value greater 0 if, ignoring the case of the character, *s1* is
  *          greater than *s2* up to n bytes, less than 0 if smaller, and 0 if
@@ -109,6 +110,7 @@ int strncasecmp(const char *s1, const char *s2, size_t n);
  *
  * @param[in] s1    a string.
  * @param[in] s2    another string.
+ * @param[in] l     locale, not used in RIOT
  *
  * @return  A value greater 0 if, ignoring the case of the character, *s1* is
  *          greater than *s2*, less than 0 if smaller, and 0 if equal

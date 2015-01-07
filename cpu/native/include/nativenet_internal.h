@@ -19,6 +19,10 @@
 
 #include "tap.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define NNEV_PWRDWN     0x01
 #define NNEV_PWRUP      0x02
 #define NNEV_MONITOR    0x03
@@ -97,4 +101,9 @@ extern _nativenet_netdev_more_t _nativenet_default_dev_more;
 
 void _nativenet_handle_packet(radio_packet_t *packet);
 int8_t send_buf(radio_packet_t *packet);
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif /* NATIVENET_INTERNAL_H */

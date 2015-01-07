@@ -1,0 +1,3 @@
+INCLUDES += -I$(RIOTBASE)/cpu/arm7_common/include/
+
+export UNDEF += $(BINDIR)arm7_common/syscalls.o

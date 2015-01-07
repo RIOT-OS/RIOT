@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     cpu_atmega
+ * @ingroup     cpu_atmega_common
  * @brief       Common implementations and headers for ATmega family based micro-controllers
  * @{
  *
@@ -33,6 +33,11 @@
  * TODO: remove once core was adjusted
  */
 #include "irq.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define eINT            enableIRQ
 #define dINT            disableIRQ
 
@@ -41,6 +46,9 @@
  */
 void cpu_init(void);
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __ATMEGA_COMMON_H */
 /** @} */

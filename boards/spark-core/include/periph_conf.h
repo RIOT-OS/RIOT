@@ -10,7 +10,7 @@
  * @ingroup     board_spark-core
  * @{
  *
- * @file        periph_conf.h
+ * @file
  * @brief       Peripheral MCU configuration for the spark-core board
  *
  * @author      Christian Mehlis <mehlis@inf.fu-berlin.de>
@@ -88,7 +88,7 @@
 #define UART_0_CLKEN()      (RCC->APB1ENR |= RCC_APB1ENR_USART2EN)
 #define UART_0_IRQ          USART2_IRQn
 #define UART_0_ISR          isr_usart2
-#define UART_0_BUS_FREQ     (72000000/4)
+#define UART_0_BUS_FREQ     (CLOCK_CORECLOCK/2)
 /* UART 0 pin configuration */
 #define UART_0_PORT         GPIOA
 #define UART_0_PORT_CLKEN() (RCC->APB2ENR |= RCC_APB2ENR_IOPAEN)

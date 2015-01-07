@@ -51,10 +51,15 @@ typedef uint8_t u8;
 #define AES_BLOCK_SIZE    16
 #define AES_KEY_SIZE      16
 
-
+/**
+ * @brief AES key
+ * @see cipher_context_t
+ */
 struct aes_key_st {
+    /** @cond INTERNAL */
     uint32_t rd_key[4 * (AES_MAXNR + 1)];
     int rounds;
+    /** @endcond */
 };
 
 typedef struct aes_key_st AES_KEY;
@@ -63,6 +68,7 @@ typedef struct aes_key_st AES_KEY;
  * @brief the cipher_context_t-struct adapted for AES
  */
 typedef struct {
+    /** context data buffer */
     uint32_t context[(4 * (AES_MAXNR + 1)) + 1];
 } aes_context_t;
 
@@ -100,12 +106,12 @@ int aes_setup_key(cipher_context_t *context, uint8_t *key, uint8_t keysize);
  *          plainBlock to one blocksize long block of ciphertext which will be
  *          written to the the memory-area pointed to by cipherBlock
  *
- * @param       context      the cipher_context_t-struct to use for this
- *                           encryption
- * @param       plainBlock   a pointer to the plaintext-block (of size
- *                           blocksize)
- * @param       cipherBlock  a pointer to the place where the ciphertext will
- *                           be stored
+ * @param       context       the cipher_context_t-struct to use for this
+ *                            encryption
+ * @param       plain_block   a pointer to the plaintext-block (of size
+ *                            blocksize)
+ * @param       cipher_block  a pointer to the place where the ciphertext will
+ *                            be stored
  *
  * @return  1 or result of aes_set_encrypt_key if it failed
  */
@@ -118,14 +124,15 @@ int aes_encrypt(cipher_context_t *context, uint8_t *plain_block,
  *          cipherBlock to one blocksize long block of plaintext and stores
  *          the plaintext in the memory-area pointed to by plainBlock
  *
- * @param       context      the cipher_context_t-struct to use for this
- *                           decryption
- * @param       cipherBlock  a pointer to the ciphertext-block (of size
- *                           blocksize) to be decrypted
- * @param       plainBlock   a pointer to the place where the decrypted
- *                           plaintext will be stored
+ * @param       context       the cipher_context_t-struct to use for this
+ *                            decryption
+ * @param       cipher_block  a pointer to the ciphertext-block (of size
+ *                            blocksize) to be decrypted
+ * @param       plain_block   a pointer to the place where the decrypted
+ *                            plaintext will be stored
  *
- * @return  1 or result of ::aes_set_decrypt_key if it failed
+ * @return  1 or negative value if cipher key cannot be expanded into
+ *          decryption key schedule
  */
 int aes_decrypt(cipher_context_t *context, uint8_t *cipher_block,
                 uint8_t *plain_block);

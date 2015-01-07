@@ -44,6 +44,10 @@
 #ifndef _SAMR21_I2S_INSTANCE_
 #define _SAMR21_I2S_INSTANCE_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ========== Register definition for I2S peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
 #define REG_I2S_CTRLA              (0x42005000U) /**< \brief (I2S) Control A */
@@ -90,5 +94,9 @@
 #define I2S_GCLK_ID_SIZE            2
 #define I2S_MAX_SLOTS               8
 #define I2S_SER_NUM                 2
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAMR21_I2S_INSTANCE_ */

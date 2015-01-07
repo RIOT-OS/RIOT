@@ -144,7 +144,7 @@ void uart_init(volatile struct UART_struct *uart, uint32_t baudrate)
 
 }
 
-static inline uint32_t uart0_puts(uint8_t *astring, uint32_t length)
+int uart0_puts(uint8_t *astring, uint32_t length)
 {
     uint32_t i = 0;
 
@@ -170,12 +170,6 @@ void stdio_flush(void)
 
     ITC->INTENABLEbits.UART1 = 1;
     ITC->INTENABLEbits.UART2 = 1;
-}
-
-
-int fw_puts(char *astring, int length)
-{
-    return uart0_puts((uint8_t *) astring, (uint32_t) length);
 }
 
 void bl_uart_init(void)

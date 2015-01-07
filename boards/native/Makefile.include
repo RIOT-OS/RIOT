@@ -19,8 +19,15 @@ export SIZE ?= $(PREFIX)size
 ifneq ($(shell uname -s),Darwin)
 export OBJCOPY ?= $(PREFIX)objcopy
 else
-export OBJCOPY ?= $(PREFIX)gobjcopy
+ifeq (0,$(shell which gobjcopy 2>&1 > /dev/null ; echo $$?))
+export OBJCOPY ?= gobjcopy
 export OFLAGS ?= -O ihex
+else
+# If gobjcopy is not available, just create an empty file. The hexfile
+# is not used for native anyways.
+export OBJCOPY ?= touch
+export OFLAGS =
+endif
 endif
 
 export DEBUGGER = gdb
@@ -87,6 +94,11 @@ all-gprof: export CFLAGS += -pg
 all-gprof: export LINKFLAGS += -pg
 
 export INCLUDES += $(NATIVEINCLUDES)
+
+# workaround for https://gcc.gnu.org/bugzilla/show_bug.cgi?id=52624
+ifneq ($(shell gcc --version | head -1 | grep -E ' (4.6|4.7)'),)
+	export CFLAGS += -DHAVE_NO_BUILTIN_BSWAP16
+endif
 
 # backward compatability with glibc <= 2.17 for native
 ifeq ($(CPU),native)

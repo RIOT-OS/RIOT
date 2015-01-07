@@ -2,10 +2,9 @@
  * nvm.h - non-volatile memory specific definitions
  * Copyright (C) 2013 Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  *
- * This source code is licensed under the GNU General Public License,
- * Version 3.  See the file LICENSE for more details.
- *
- * This file is part of RIOT.
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 #ifndef NVM_H

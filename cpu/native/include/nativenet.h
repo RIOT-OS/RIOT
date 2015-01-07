@@ -1,4 +1,4 @@
-/**
+/*
  * nativenet transceiver interface
  *
  * A configurable transceiver for the native port.
@@ -8,7 +8,7 @@
  * The effect of calls like nativenet_set_channel depend on the
  * network layer.
  *
- * Copyright (C) 2013 Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ * Copyright (C) 2013, 2014 Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -16,7 +16,7 @@
  */
 
 /**
- * @defgroup    native_net
+ * @defgroup    native_net Native network interface
  * @ingroup     native_cpu
  * @{
  * @author  Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
@@ -31,8 +31,12 @@
 #include "kernel_types.h"
 #include "netdev/base.h"
 
+#ifndef RX_BUF_SIZE
 #define RX_BUF_SIZE (10)
-#define TRANSCEIVER_BUFFER_SIZE (3)
+#endif
+#ifndef TRANSCEIVER_BUFFER_SIZE
+#define TRANSCEIVER_BUFFER_SIZE (10)
+#endif
 
 /**
  * @brief   Number of registrable netdev_rcv_data_cb_t callbacks per nativenet
@@ -42,6 +46,11 @@
 
 #ifndef NATIVE_MAX_DATA_LENGTH
 #include "tap.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifdef MODULE_SIXLOWPAN
 #define NATIVE_MAX_DATA_LENGTH (127)
 #else
@@ -57,7 +66,7 @@
 extern const netdev_driver_t nativenet_driver;
 
 /**
- * @brief   Default @netdev API device
+ * @brief   Default @ref netdev API device
  */
 extern netdev_t nativenet_default_dev;
 
@@ -139,7 +148,7 @@ int16_t nativenet_get_channel(void);
 /**
  * Set transceiver pan
  *
- * @param channel the pan
+ * @param pan the pan
  * @return the pan
  */
 uint16_t nativenet_set_pan(uint16_t pan);
@@ -155,5 +164,10 @@ uint16_t nativenet_get_pan(void);
  * Enable transceiver rx mode
  */
 void nativenet_switch_to_rx(void);
+
+#ifdef __cplusplus
+}
+#endif
+
 /** @} */
 #endif /* NATIVENET_H */

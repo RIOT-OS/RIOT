@@ -30,6 +30,10 @@
 #ifndef _SAM3XA_DMAC_INSTANCE_
 #define _SAM3XA_DMAC_INSTANCE_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ========== Register definition for DMAC peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
 #define REG_DMAC_GCFG            (0x400C4000U) /**< \brief (DMAC) DMAC Global Configuration Register */
@@ -134,5 +138,9 @@
 #define REG_DMAC_WPMR   (*(RwReg*)0x400C41E4U) /**< \brief (DMAC) DMAC Write Protect Mode Register */
 #define REG_DMAC_WPSR   (*(RoReg*)0x400C41E8U) /**< \brief (DMAC) DMAC Write Protect Status Register */
 #endif /* (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAM3XA_DMAC_INSTANCE_ */

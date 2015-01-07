@@ -39,6 +39,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 static inline void __attribute__((always_inline)) dINT(void)
 {
     asm volatile ("cli");
@@ -67,13 +71,13 @@ static inline void __attribute__((always_inline, noreturn)) x86_hlt(void)
  * @brief   Initialize subsystems and run kernel.
  *
  * Called by the board specific startup code.
- * <li>The .bss has to be cleared before.
- * <li>The stack has to be set up, probably somewhere in the low memory.
- * <li>The A20 line has to be activated, because all the code is beyong 1MB.
- * <li>Paging must be disabled.
- * <li>The SS, DS, and CS must span the whole 4GB of RAM.
- * <li>32 bit protected mode must be entered.
- * <li>Interrupts must be disabled.
+ * @li The .bss has to be cleared before.
+ * @li The stack has to be set up, probably somewhere in the low memory.
+ * @li The A20 line has to be activated, because all the code is beyond 1MB.
+ * @li Paging must be disabled.
+ * @li The SS, DS, and CS must span the whole 4GB of RAM.
+ * @li 32 bit protected mode must be entered.
+ * @li Interrupts must be disabled.
  */
 void x86_startup(void) NORETURN;
 
@@ -86,8 +90,8 @@ void x86_startup(void) NORETURN;
  * Interrupts may be enabled during the course of this function call.
  *
  * Probably most of the board specific initialization should be done in auto_init():
- * <li>You must not spawn thread_create() in this function.
- * <li>The hwtimer is not set up properly at this point of executation.
+ * @li You must not spawn thread_create() in this function.
+ * @li The hwtimer is not set up properly at this point of executation.
  */
 void x86_init_board(void);
 
@@ -115,6 +119,10 @@ void x86_init_board(void);
  * The regions are expected to contain memory that lies inside the elf sections.
  */
 bool x86_get_memory_region(uint64_t *start, uint64_t *len, unsigned long *cnt);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

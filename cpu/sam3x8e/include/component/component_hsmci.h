@@ -30,6 +30,10 @@
 #ifndef _SAM3XA_HSMCI_COMPONENT_
 #define _SAM3XA_HSMCI_COMPONENT_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ============================================================================= */
 /**  SOFTWARE API DEFINITION FOR High Speed MultiMedia Card Interface */
 /* ============================================================================= */
@@ -338,5 +342,8 @@ typedef struct {
 
 /*@}*/
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAM3XA_HSMCI_COMPONENT_ */

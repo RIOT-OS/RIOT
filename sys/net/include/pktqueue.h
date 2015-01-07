@@ -13,7 +13,7 @@
  * @{
  *
  * @file        pktqueue.h
- * @brief       Pointer-centric wrapper for @ref priority_queue
+ * @brief       Pointer-centric wrapper for @ref priority_queue_t
  *
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
@@ -37,8 +37,8 @@ extern "C" {
  */
 typedef struct pktqueue_node_t {
     struct pktqueue_node_t *next;   /**< next node in queue */
-    void *data;                     /**< pointer to the data */
     uint32_t priority;              /**< priority of the node */
+    void *data;                     /**< pointer to the data */
 } pktqueue_node_t;
 
 /**
@@ -87,7 +87,7 @@ static inline void pktqueue_init(pktqueue_t *queue)
 /**
  * @brief get the packet queue's head without removing it
  *
- * @param[out]  root    the queue
+ * @param[out] queue    the queue
  *
  * @return              the head
  */
@@ -99,7 +99,7 @@ static inline pktqueue_node_t *pktqueue_get_head(pktqueue_t *queue)
 /**
  * @brief remove the packet queue's head
  *
- * @param[in]  root     the queue
+ * @param[in]  queue    the queue
  *
  * @return              the old head
  */

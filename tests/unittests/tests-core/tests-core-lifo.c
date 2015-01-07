@@ -6,7 +6,7 @@
  * directory for more details.
  */
 
-#include "embUnit/embUnit.h"
+#include "embUnit.h"
 
 #include "lifo.h"
 

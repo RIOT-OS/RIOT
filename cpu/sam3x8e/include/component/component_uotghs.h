@@ -30,6 +30,10 @@
 #ifndef _SAM3XA_UOTGHS_COMPONENT_
 #define _SAM3XA_UOTGHS_COMPONENT_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ============================================================================= */
 /**  SOFTWARE API DEFINITION FOR USB On-The-Go Interface */
 /* ============================================================================= */
@@ -935,5 +939,8 @@ typedef struct {
 
 /*@}*/
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAM3XA_UOTGHS_COMPONENT_ */

@@ -126,7 +126,7 @@ void create_usage(void)
 #ifdef MODULE_CC1020
          "        * cc1020\n"
 #endif
-#if MODULE_CC110X_LEGACY_CSMA || MODULE_CC110X_LEGACY
+#if MODULE_CC110X || MODULE_CC110X_LEGACY || MODULE_CC110X_LEGACY_CSMA
          "        * cc1100\n"
 #endif
 #ifdef MODULE_CC2420

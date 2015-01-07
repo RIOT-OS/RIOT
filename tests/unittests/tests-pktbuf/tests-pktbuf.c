@@ -14,7 +14,7 @@
 #include <errno.h>
 #include <stdint.h>
 
-#include "embUnit/embUnit.h"
+#include "embUnit.h"
 
 #include "pktbuf.h"
 

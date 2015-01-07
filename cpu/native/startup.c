@@ -80,14 +80,14 @@ void _native_log_stdout(char *stdouttype)
         return;
     }
     else if (strcmp(stdouttype, "null") == 0) {
-        if ((stdout_outfile = open("/dev/null", O_WRONLY)) == -1) {
+        if ((stdout_outfile = real_open("/dev/null", O_WRONLY)) == -1) {
             err(EXIT_FAILURE, "_native_log_stdout: open");
         }
     }
     else if (strcmp(stdouttype, "file") == 0) {
         char stdout_logname[255];
         snprintf(stdout_logname, sizeof(stdout_logname), "/tmp/riot.stdout.%d", _native_pid);
-        if ((stdout_outfile = creat(stdout_logname, 0666)) == -1) {
+        if ((stdout_outfile = real_creat(stdout_logname, 0666)) == -1) {
             err(EXIT_FAILURE, "_native_log_stdout: open");
         }
     }
@@ -115,14 +115,14 @@ void _native_log_stderr(char *stderrtype)
         return;
     }
     else if (strcmp(stderrtype, "null") == 0) {
-        if ((stderr_outfile = open("/dev/null", O_WRONLY)) == -1) {
+        if ((stderr_outfile = real_open("/dev/null", O_WRONLY)) == -1) {
             err(EXIT_FAILURE, "_native_log_stderr: open");
         }
     }
     else if (strcmp(stderrtype, "file") == 0) {
         char stderr_logname[255];
         snprintf(stderr_logname, sizeof(stderr_logname), "/tmp/riot.stderr.%d", _native_pid);
-        if ((stderr_outfile = creat(stderr_logname, 0666)) == -1) {
+        if ((stderr_outfile = real_creat(stderr_logname, 0666)) == -1) {
             err(EXIT_FAILURE, "_native_log_stderr: open");
         }
     }
@@ -143,7 +143,7 @@ void daemonize(void)
 
     if (_native_pid > 0) {
         real_printf("RIOT pid: %d\n", _native_pid);
-        exit(EXIT_SUCCESS);
+        real_exit(EXIT_SUCCESS);
     }
     else {
         _native_pid = real_getpid();
@@ -211,7 +211,7 @@ void usage_exit(void)
 
     real_printf("\n\
 The order of command line arguments matters.\n");
-    exit(EXIT_FAILURE);
+    real_exit(EXIT_FAILURE);
 
 }
 

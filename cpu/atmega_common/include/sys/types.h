@@ -12,7 +12,15 @@
 #ifndef AVR_TYPES_H
 #define AVR_TYPES_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef int16_t suseconds_t;
 typedef signed int ssize_t;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* ifndef AVR_TYPES_H */

@@ -30,6 +30,10 @@
 #ifndef _SAM3XA_TWI_COMPONENT_
 #define _SAM3XA_TWI_COMPONENT_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ============================================================================= */
 /**  SOFTWARE API DEFINITION FOR Two-wire Interface */
 /* ============================================================================= */
@@ -214,5 +218,8 @@ typedef struct {
 
 /*@}*/
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAM3XA_TWI_COMPONENT_ */

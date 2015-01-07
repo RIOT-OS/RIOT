@@ -1,5 +1,4 @@
-# Provide a shallow sanity check. You cannot call `make` in a module directory.
-export __RIOTBUILD_FLAG := RIOT
+all:
 
 # set undefined variables
 RIOTBASE ?= $(shell dirname "$(lastword $(MAKEFILE_LIST))")
@@ -12,7 +11,33 @@ RIOTBOARD ?= $(RIOTBASE)/boards
 RIOTBOARD := $(abspath $(RIOTBOARD))
 
 BINDIRBASE ?= $(CURDIR)/bin
-BINDIR ?= $(abspath $(BINDIRBASE)/$(BOARD))/
+BINDIRBASE := $(abspath $(BINDIRBASE))
+
+BINDIR ?= $(BINDIRBASE)/$(BOARD)
+BINDIR := $(abspath $(BINDIR))/
+
+COLOR_GREEN  :=
+COLOR_RED    :=
+COLOR_PURPLE :=
+COLOR_RESET  :=
+COLOR_ECHO   := /bin/echo
+
+OS := $(shell uname)
+
+ifeq (, ${JENKINS_URL})
+  ifeq (0,  $(shell tput colors 2>&1 > /dev/null; echo $$?))
+    COLOR_GREEN  := \033[1;32m
+    COLOR_RED    := \033[1;31m
+    COLOR_PURPLE := \033[1;35m
+    COLOR_RESET  := \033[0m
+    ifeq ($(OS),Darwin)
+      COLOR_ECHO   := echo -e
+      SHELL=bash
+    else
+      COLOR_ECHO   := /bin/echo -e
+    endif
+  endif
+endif
 
 ifeq ($(QUIET),1)
 	AD=@
@@ -21,7 +46,13 @@ else
 	AD=
 endif
 
+ifneq (10,$(if ${RIOT_VERSION},1,0)$(if ${__RIOTBUILD_FLAG},1,0))
+
+# Provide a shallow sanity check. You cannot call `make` in a module directory.
+export __RIOTBUILD_FLAG := RIOT
+
 BOARD := $(strip $(BOARD))
+APPLICATION := $(strip $(APPLICATION))
 
 # provide common external programs for `Makefile.include`s
 
@@ -66,6 +97,8 @@ include $(RIOTBOARD)/$(BOARD)/Makefile.include
 include $(RIOTCPU)/$(CPU)/Makefile.include
 include $(RIOTBASE)/Makefile.dep
 
+USEMODULE += $(filter-out $(DISABLE_MODULE), $(DEFAULT_MODULE))
+
 ifeq ($(strip $(MCU)),)
 	MCU = $(CPU)
 endif
@@ -74,9 +107,9 @@ endif
 BOARDDEF := $(shell echo $(BOARD) | tr 'a-z' 'A-Z' | tr '-' '_')
 CPUDEF := $(shell echo $(CPU) | tr 'a-z' 'A-Z' | tr '-' '_')
 MCUDEF := $(shell echo $(MCU) | tr 'a-z' 'A-Z' | tr '-' '_')
-CFLAGS += -DBOARD_$(BOARDDEF)='"$(BOARD)"' -DRIOT_BOARD=BOARD_$(BOARDDEF)
-CFLAGS += -DCPU_$(CPUDEF)='"$(CPU)"' -DRIOT_CPU=CPU_$(CPUDEF)
-CFLAGS += -DMCU_$(MCUDEF)='"$(MCU)"' -DRIOT_MCU=MCU_$(MCUDEF)
+CFLAGS += -DBOARD_$(BOARDDEF)=\"$(BOARD)\" -DRIOT_BOARD=BOARD_$(BOARDDEF)
+CFLAGS += -DCPU_$(CPUDEF)=\"$(CPU)\" -DRIOT_CPU=CPU_$(CPUDEF)
+CFLAGS += -DMCU_$(MCUDEF)=\"$(MCU)\" -DRIOT_MCU=MCU_$(MCUDEF)
 
 # OSX fails to create empty archives. Provide a wrapper to catch that error.
 ifneq (0, $(shell mkdir -p $(BINDIR); $(AR) -rc $(BINDIR)empty-archive.a 2> /dev/null; echo $$?))
@@ -97,10 +130,10 @@ ifeq ($(origin RIOT_VERSION), undefined)
       RIOT_VERSION := $(GIT_STRING)-$(GIT_BRANCH)
     endif
   else
-    RIOT_VERSION := UNKNOWN (builddir: $(RIOTBASE))
+    RIOT_VERSION := "UNKNOWN (builddir: $(RIOTBASE))"
   endif
 endif
-export CFLAGS += -DRIOT_VERSION='"$(RIOT_VERSION)"'
+export CFLAGS += -DRIOT_VERSION=\"$(RIOT_VERSION)\"
 
 # the binaries to link
 BASELIBS += $(BINDIR)$(BOARD)_base.a
@@ -134,7 +167,8 @@ endif
 endif
 
 ..build-message:
-	@echo "Building application $(APPLICATION) for $(BOARD) w/ MCU $(MCU)."
+	@$(COLOR_ECHO) '${COLOR_GREEN}Building application "$(APPLICATION)" for "$(BOARD)" with MCU "$(MCU)".${COLOR_RESET}'
+	@$(COLOR_ECHO)
 
 # add extra include paths for packages in $(USEMODULE)
 export USEMODULE_INCLUDES =
@@ -171,19 +205,10 @@ distclean:
 	-@for i in $(USEPKG) ; do "$(MAKE)" -C $(RIOTBASE)/pkg/$$i distclean ; done
 	-@rm -rf $(BINDIRBASE)
 
-flash: $(filter all all-%, $(MAKECMDGOALS))
-	@if [ ! -f $${HEXFILE} ]; then \
-		echo ""; \
-		echo ""; \
-		echo "You need to create a hex file before you can flash it."; \
-		echo "Unless you know otherwise, 'make all' usually does what you want."; \
-		echo ""; \
-		echo ""; \
-		exit 1; \
-	fi
+flash: all
 	$(FLASHER) $(FFLAGS)
 
-term:
+term: $(filter flash, $(MAKECMDGOALS))
 	$(TERMPROG) $(TERMFLAGS)
 
 doc:
@@ -212,7 +237,6 @@ include $(RIOTBASE)/Makefile.vars
 
 # Warn if the selected board and drivers don't provide all needed featues:
 ifneq (, $(filter all, $(if $(MAKECMDGOALS), $(MAKECMDGOALS), all)))
-
   EXPECT_ERRORS :=
 
   # Test if there where dependencies against a module in DISABLE_MODULE.
@@ -248,4 +272,33 @@ ifneq (, $(filter all, $(if $(MAKECMDGOALS), $(MAKECMDGOALS), all)))
   ifneq (, $(EXPECT_ERRORS))
     $(shell $(COLOR_ECHO) "\n\n$(COLOR_RED)EXPECT ERRORS!$(COLOR_RESET)\n\n" 1>&2)
   endif
+endif
+
+else # RIOT_VERSION
+
+  export __RIOTBUILD_FLAG := RIOT
+
+  NUM_RIOT_VERSION := $(shell cd $(RIOTBASE) && git rev-parse --verify --short "$(RIOT_VERSION)" 2>/dev/null)
+  ifeq (, ${NUM_RIOT_VERSION})
+    $(error The supplied RIOT_VERSION=$(RIOT_VERSION) is invalid!)
+  endif
+
+  all $(filter-out clean, ${MAKECMDGOALS}): ..delegate
+  ifneq (, $(filter clean, $(MAKECMDGOALS)))
+    all $(filter-out clean, ${MAKECMDGOALS}): clean
+  endif
+
+  clean:
+	-$(AD)rm -rf $(BINDIR)
+
+  $(BINDIR)riot-version/$(NUM_RIOT_VERSION)/Makefile.include:
+	$(AD)rm -rf $(@D)
+	$(AD)mkdir -p $(@D)
+	$(AD)cd $(RIOTBASE) && git archive --format=tar $(NUM_RIOT_VERSION) | ( cd $(@D) && tar x 1>&2 )
+
+  ..delegate: $(BINDIR)riot-version/$(NUM_RIOT_VERSION)/Makefile.include
+	@$(COLOR_ECHO) '$(COLOR_GREEN)Using RIOT_VERSION=${NUM_RIOT_VERSION}$(COLOR_RESET)' 1>&2
+	@$(COLOR_ECHO)
+	$(MAKE) RIOTBASE=$(<D) $(filter-out clean, ${MAKECMDGOALS})
+
 endif

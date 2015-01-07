@@ -28,12 +28,16 @@
 #ifndef CPU__X86__VIDEORAM_H__
 #define CPU__X86__VIDEORAM_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief   Print out a single character on the graphical device.
  *
  * This method can be used before the UART system was initialized.
  *
- * Special charactes that are understood: '\n' and '\r'.
+ * Special characters that are understood: '\\n' and '\\r'.
  * Use DOS newlines.
  */
 void videoram_putc(char c);
@@ -56,6 +60,10 @@ void videoram_puts(const char *s);
  * @brief   Print out a hexadecimal number on the graphical device, including "0x" at the start.
  */
 void videoram_put_hex(unsigned long v);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

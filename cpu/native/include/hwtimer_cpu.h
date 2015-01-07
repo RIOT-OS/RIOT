@@ -17,8 +17,16 @@
 #ifndef HWTIMER_CPU_H_
 #define HWTIMER_CPU_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define HWTIMER_MAXTIMERS 4
 #define HWTIMER_SPEED 1000000
 #define HWTIMER_MAXTICKS (0xFFFFFFFF)
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* HWTIMER_CPU_H_ */

@@ -14,6 +14,10 @@
 #include "lpc23xx.h"
 #include "bitarithm.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define F_CCO                   288000000
 #define CL_CPU_DIV              4                                   ///< CPU clock divider
 #define F_CPU                   (F_CCO / CL_CPU_DIV)                ///< CPU target speed in Hz
@@ -207,5 +211,9 @@
 #define TXCTCR         0x70
 /** @} */
 /** @} */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // __LPC2387_H

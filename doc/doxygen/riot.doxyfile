@@ -756,9 +756,9 @@ WARN_LOGFILE           =
 INPUT                  = ../../core \
                          ../../cpu \
                          ../../boards \
+                         ../../drivers \
                          ../../sys \
-                         src/ \
-                         ../../drivers
+                         src/
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses
@@ -818,7 +818,14 @@ EXCLUDE_PATTERNS       = */board/*/tools/* \
                          */cpu/cortex-*_common/include/core_cm*.h \
                          */cpu/cortex-*_common/include/core_cmInstr.h \
                          */cpu/cortex-*_common/include/core_cmFunc.h \
-                         */cpu/stm32f*/include/stm32f*
+                         */cpu/stm32f*/include/stm32f* \
+                         */drivers/nrf24l01p/include/nrf24l01p_settings.h \
+                         */cpu/nrf51822/include/nrf51.h \
+                         */cpu/lpc1768/include/LPC17xx.h \
+                         */boards/*/include/periph_conf.h \
+                         */cpu/x86/include/x86_pci.h \
+                         */cpu/sam3x8e/include/sam3x8e.h \
+
 
 # The EXCLUDE_SYMBOLS tag can be used to specify one or more symbol names
 # (namespaces, classes, functions, etc.) that should be excluded from the
@@ -1973,6 +1980,7 @@ INCLUDE_FILE_PATTERNS  =
 PREDEFINED             = __attribute__(x)= \
                          ADC_NUMOF \
                          CPUID_ID_LEN \
+                         DAC_NUMOF \
                          GPIO_NUMOF \
                          I2C_NUMOF \
                          PWM_NUMOF \

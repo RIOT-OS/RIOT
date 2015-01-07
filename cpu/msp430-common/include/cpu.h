@@ -31,13 +31,17 @@
 #include "msp430_types.h"
 #include "cpu-conf.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define WORDSIZE 16
 
 extern volatile int __inISR;
 extern char __isr_stack[MSP430_ISR_STACK_SIZE];
 
-//#define eINT()  eint()
-//#define dINT()  dint()
+/*#define eINT()  eint() */
+/*#define dINT()  dint() */
 
 inline void __save_context_isr(void)
 {
@@ -121,19 +125,31 @@ inline void __restore_context(unsigned int irqen)
 
 inline void eINT(void)
 {
-    //    puts("+");
-    eint();
+    /*    puts("+"); */
+/*    eint();   // problem with MSPGCC intrinsics? */
+    __asm__ __volatile__("bis  %0, r2" : : "i"(GIE));
+    __asm__ __volatile__("nop");
+       /* this NOP is needed to handle a "delay slot" that all MSP430 MCUs
+          impose silently after messing with the GIE bit, DO NOT REMOVE IT! */
 }
 
 inline void dINT(void)
 {
-    //    puts("-");
-    dint();
+    /*    puts("-"); */
+/*    dint();   // problem with MSPGCC intrinsics? */
+    __asm__ __volatile__("bic  %0, r2" : : "i"(GIE));
+    __asm__ __volatile__("nop");
+       /* this NOP is needed to handle a "delay slot" that all MSP430 MCUs
+          impose silently after messing with the GIE bit, DO NOT REMOVE IT! */
 }
 
 int inISR(void);
 
 void msp430_cpu_init(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 /** @} */
 #endif // _CPU_H

@@ -47,6 +47,13 @@ ifneq (,$(filter sixlowpan,$(USEMODULE)))
 	USEMODULE += vtimer
 endif
 
+ifneq (,$(filter aodvv2,$(USEMODULE)))
+        USEMODULE += vtimer
+        USEMODULE += sixlowpan
+        USEMODULE += oonf_common
+        USEMODULE += oonf_rfc5444
+endif
+
 ifneq (,$(filter uart0,$(USEMODULE)))
 	USEMODULE += posix
 endif
@@ -65,6 +72,10 @@ ifneq (,$(filter cc110x%,$(USEMODULE)))
 	USEMODULE += vtimer
 endif
 
+ifneq (,$(filter cc110x,$(USEMODULE)))
+    USEMODULE += transceiver
+endif
+
 ifneq (,$(filter cc110x_legacy,$(USEMODULE)))
 	USEMODULE += transceiver
 endif
@@ -77,6 +88,10 @@ endif
 ifneq (,$(filter at86rf231,$(USEMODULE)))
 	USEMODULE += netdev_802154
 	USEMODULE += ieee802154
+endif
+
+ifneq (,$(filter l2_ping,$(USEMODULE)))
+	USEMODULE += vtimer
 endif
 
 ifneq (,$(filter vtimer,$(USEMODULE)))

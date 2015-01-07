@@ -7,7 +7,7 @@
  */
 #include <string.h>
 
-#include "embUnit/embUnit.h"
+#include "embUnit.h"
 
 #include "priority_queue.h"
 

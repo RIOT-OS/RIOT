@@ -7,21 +7,18 @@
  */
 
 /**
- * @defgroup    net_rpl RPL
- * @ingroup     net
- * @brief       Routing Protocol for Low power and Lossy Networks
- *
- * Header which includes all core RPL-functions. Normally it shouldn't be necessary to
- * modify this file.
- *
+ * @ingroup     rpl
  * @{
  *
  * @file        rpl.h
  * @brief       RPL header. Declaration of global variables and functions needed for
- * core functionality of RPL.
+ *              core functionality of RPL.
  *
- * @author  Eric Engel <eric.engel@fu-berlin.de>
- * @author  Fabian Brandt <fabianbr@zedat.fu-berlin.de>
+ * Header which includes all core RPL-functions. Normally it shouldn't be necessary to
+ * modify this file.
+ *
+ * @author      Eric Engel <eric.engel@fu-berlin.de>
+ * @author      Fabian Brandt <fabianbr@zedat.fu-berlin.de>
  */
 
 #ifndef __RPL_H
@@ -34,6 +31,7 @@
 #include <transceiver.h>
 #include "ipv6.h"
 #include "rpl/rpl_dodag.h"
+#include "rpl/rpl_of_manager.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -43,15 +41,11 @@ extern "C" {
 #define CC1100_RADIO_MODE CC1100_MODE_WOR
 
 #define RPL_PKT_RECV_BUF_SIZE 16
-#define RPL_PROCESS_STACKSIZE KERNEL_CONF_STACKSIZE_DEFAULT
+#define RPL_PROCESS_STACKSIZE KERNEL_CONF_STACKSIZE_MAIN
 
 /* global variables */
-extern rpl_of_t *rpl_objective_functions[NUMBER_IMPLEMENTED_OFS];
-extern rpl_routing_entry_t rpl_routing_table[RPL_MAX_ROUTING_ENTRIES];
 extern kernel_pid_t rpl_process_pid;
-
-/* needed for receiving messages with ICMP-code 155. Received via IPC from ipv6.c */
-extern mutex_t rpl_recv_mutex;
+extern uint8_t rpl_max_routing_entries;
 
 /* needed for sending RPL-messages */
 extern mutex_t rpl_send_mutex;
@@ -76,18 +70,6 @@ extern uint8_t rpl_buffer[BUFFER_SIZE - LL_HDR_LEN];
 uint8_t rpl_init(int if_id);
 
 /**
- * @brief Get entry point for default objective function.
- *
- * This function is obsolete in rpl.h and will be moved shortly.
- *
- * @param[in] ocp               Objective code point for desired objective function
- *
- * @return Implementation of objective function
- *
- * */
-rpl_of_t *rpl_get_of_for_ocp(uint16_t ocp);
-
-/**
  * @brief Initialization of RPL-root.
  *
  * This function initializes all RPL resources to act as a root node.
@@ -107,7 +89,7 @@ void rpl_init_root(void);
  * @param[in] destination       IPv6-address of the destination of the DIO. Should be a direct neighbor.
  *
  */
-void send_DIO(ipv6_addr_t *destination);
+void rpl_send_DIO(ipv6_addr_t *destination);
 
 /**
  * @brief Sends a DAO-message to a given destination
@@ -122,7 +104,7 @@ void send_DIO(ipv6_addr_t *destination);
  * @param[in] start_index       Describes whether a DAO must be split because of too many routing entries.
  *
  */
-void send_DAO(ipv6_addr_t *destination, uint8_t lifetime, bool default_lifetime, uint8_t start_index);
+void rpl_send_DAO(ipv6_addr_t *destination, uint8_t lifetime, bool default_lifetime, uint8_t start_index);
 
 /**
  * @brief Sends a DIS-message to a given destination
@@ -134,7 +116,7 @@ void send_DAO(ipv6_addr_t *destination, uint8_t lifetime, bool default_lifetime,
  * @param[in] destination       IPv6-address of the destination of the DIS. Should be a direct neighbor or multicast-address.
  *
  */
-void send_DIS(ipv6_addr_t *destination);
+void rpl_send_DIS(ipv6_addr_t *destination);
 
 /**
  * @brief Sends a DAO acknowledgment-message to a given destination
@@ -146,7 +128,7 @@ void send_DIS(ipv6_addr_t *destination);
  * @param[in] destination       IPv6-address of the destination of the DAO_ACK. Should be a direct neighbor.
  *
  */
-void send_DAO_ACK(ipv6_addr_t *destination);
+void rpl_send_DAO_ACK(ipv6_addr_t *destination);
 
 /**
  * @brief Receives a DIO message
@@ -155,7 +137,7 @@ void send_DAO_ACK(ipv6_addr_t *destination);
  * this function just calls the receiving function of the chosen mode.
  *
  */
-void recv_rpl_DIO(void);
+void rpl_recv_DIO(void);
 
 /**
  * @brief Receives a DAO message
@@ -164,7 +146,7 @@ void recv_rpl_DIO(void);
  * this function just calls the receiving function of the chosen mode.
  *
  */
-void recv_rpl_DAO(void);
+void rpl_recv_DAO(void);
 
 /**
  * @brief Receives a DIS message
@@ -173,7 +155,7 @@ void recv_rpl_DAO(void);
  * this function just calls the receiving function of the chosen mode.
  *
  */
-void recv_rpl_DIS(void);
+void rpl_recv_DIS(void);
 
 /**
  * @brief Receives a DAO acknowledgment message
@@ -182,7 +164,7 @@ void recv_rpl_DIS(void);
  * this function just calls the receiving function of the chosen mode.
  *
  */
-void recv_rpl_DAO_ACK(void);
+void rpl_recv_DAO_ACK(void);
 
 /**
  * @brief Initialization of RPl-root.
@@ -267,9 +249,64 @@ void rpl_clear_routing_table(void);
  * */
 rpl_routing_entry_t *rpl_get_routing_table(void);
 
+/**
+ * @brief Returns the network status of the actual node
+ *
+ * @return 1 if root, 0 otherwise
+ *
+ * */
+uint8_t rpl_is_root(void);
+
+#if RPL_DEFAULT_MOP == RPL_NON_STORING_MODE
+
+/**
+ * @brief Adds one pair of child and its parent to the source routing table
+ *
+ * @deprecated This function is obsolete and will be removed shortly. This will be replaced with a
+ * common routing information base.
+ *
+ * @param[in] child                  Child IPv6-address
+ * @param[in] parent                 Parent IPv6-address
+ * @param[in] lifetime               Lifetime of the relation
+ *
+ * */
+void rpl_add_srh_entry(ipv6_addr_t *child, ipv6_addr_t *parent, uint16_t lifetime);
+
+/**
+ * @brief Constructs a source routing header based on an original IPv6-header
+ *
+ * @param[in] act_ipv6_hdr                  Pointer to original IPv6-packet header
+ * @return Source routing header or NULL
+ *
+ * */
+ipv6_srh_t *rpl_get_srh_header(ipv6_hdr_t *act_ipv6_hdr);
+
+/**
+ * @brief Manages sending an SRH-header integrated in an original IPv6-package to the next hop.
+ *
+ * @param[in] buf                  Pointer to original payload
+ * @param[in] len                  Length of the original payload
+ * @param[in] src                  Original source address
+ * @param[in] dest                 Destination address
+ * @param[in] srh_header           Pre-build source routing header
+ * @param[in] srh_length           Length of the pre-built source routing header
+ * @return                         Status of sending progress
+ * */
+int rpl_srh_sendto(const void *buf, uint16_t len, ipv6_addr_t *src, ipv6_addr_t *dest, ipv6_srh_t *srh_header, uint8_t srh_length);
+
+/**
+ * @brief Sends IPC-message to the service, which is indicated by the next-header-field in the source routing header
+ *
+ * @param[in] ipv6_header          Actual IPv6-header
+ * @return IPv6-address of the next-hop. Is NULL on error occurrence.
+ *
+ * */
+void rpl_remove_srh_header(ipv6_hdr_t *ipv6_header, const void *buf, uint8_t nextheader);
+
+#endif /* RPL_DEFAULT_MOP == RPL_NON_STORING_MODE */
+
 #ifdef __cplusplus
 }
 #endif
-
 /** @} */
 #endif /* __RPL_H */

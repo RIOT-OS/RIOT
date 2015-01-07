@@ -44,6 +44,10 @@
 #ifndef _SAMR21_DMAC_INSTANCE_
 #define _SAMR21_DMAC_INSTANCE_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ========== Register definition for DMAC peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
 #define REG_DMAC_CTRL              (0x41004800U) /**< \brief (DMAC) Control */
@@ -103,5 +107,9 @@
 #define DMAC_LVL_NUM                4
 #define DMAC_TRIG_BITS              len(bin(DMAC_TRIG_NUM - 1))-2
 #define DMAC_TRIG_NUM               45
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAMR21_DMAC_INSTANCE_ */

@@ -30,6 +30,10 @@
 #ifndef _SAM3XA_MATRIX_INSTANCE_
 #define _SAM3XA_MATRIX_INSTANCE_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ========== Register definition for MATRIX peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
 #define REG_MATRIX_MCFG             (0x400E0400U) /**< \brief (MATRIX) Master Configuration Register */
@@ -64,5 +68,9 @@
 #define REG_MATRIX_WPMR    (*(RwReg*)0x400E05E4U) /**< \brief (MATRIX) Write Protect Mode Register */
 #define REG_MATRIX_WPSR    (*(RoReg*)0x400E05E8U) /**< \brief (MATRIX) Write Protect Status Register */
 #endif /* (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAM3XA_MATRIX_INSTANCE_ */

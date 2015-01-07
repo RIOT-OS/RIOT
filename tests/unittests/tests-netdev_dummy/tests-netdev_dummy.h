@@ -18,7 +18,7 @@
 #ifndef __TESTS_NETDEV_DUMMY_H_
 #define __TESTS_NETDEV_DUMMY_H_
 
-#include "../unittests.h"
+#include "embUnit.h"
 
 #ifdef __cplusplus
 extern "C" {

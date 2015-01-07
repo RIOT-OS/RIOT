@@ -96,7 +96,7 @@ extern "C" {
 
 socket_internal_t *socket_base_get_socket(int s);
 uint16_t socket_base_get_free_source_port(uint8_t protocol);
-int socket_base_exists_socket(int socket);
+bool socket_base_exists_socket(int socket);
 int socket_base_socket(int domain, int type, int protocol);
 void socket_base_print_sockets(void);
 

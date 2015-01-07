@@ -33,6 +33,10 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief   Initialize interrupts.
  *
@@ -75,7 +79,7 @@ enum x86_eflags {
     X86_AF     = 1 << 4,  /**< adjust */
     X86_ZF     = 1 << 6,  /**< zero */
     X86_SF     = 1 << 7,  /**< signed */
-    X86_TF     = 1 << 8,  /**< singled step (throw #DB after each instruction) */
+    X86_TF     = 1 << 8,  /**< singled step (throw #X86_INT_DB after each instruction) */
     X86_IF     = 1 << 9,  /**< interrupts enabled */
     X86_DF     = 1 << 10, /**< direction (0 = movs increses addresses, 1 = movs decreases addresses) */
     X86_OF     = 1 << 11, /**< overflow */
@@ -151,6 +155,10 @@ static inline void __attribute__((always_inline)) x86_restore_flags(unsigned lon
  * @brief   Print saved general purposed registers.
  */
 void x86_print_registers(struct x86_pushad *orig_ctx, unsigned long error_code);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

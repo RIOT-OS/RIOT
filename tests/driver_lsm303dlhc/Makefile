@@ -31,5 +31,17 @@ else
   # set random default
   CFLAGS += -DTEST_LSM303DLHC_ACC_ADDR=25
 endif
+ifneq (,$(TEST_LSM303DLHC_ACC_PIN))
+  CFLAGS += -DTEST_LSM303DLHC_ACC_PIN=$(TEST_LSM303DLHC_ACC_PIN)
+else
+  # set random default
+  CFLAGS += -DTEST_LSM303DLHC_ACC_PIN=GPIO_0
+endif
+ifneq (,$(TEST_LSM303DLHC_MAG_PIN))
+  CFLAGS += -DTEST_LSM303DLHC_MAG_PIN=$(TEST_LSM303DLHC_MAG_PIN)
+else
+  # set random default
+  CFLAGS += -DTEST_LSM303DLHC_MAG_PIN=GPIO_1
+endif
 
 include $(RIOTBASE)/Makefile.include

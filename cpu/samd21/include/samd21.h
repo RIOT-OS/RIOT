@@ -55,12 +55,13 @@
 */
 /*@{*/
 
+#if !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
+#include <stdint.h>
+
 #ifdef __cplusplus
  extern "C" {
 #endif
 
-#if !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
-#include <stdint.h>
 #ifndef __cplusplus
 typedef volatile const uint32_t RoReg;   /**< Read only 32-bit register (volatile const unsigned int) */
 typedef volatile const uint16_t RoReg16; /**< Read only 16-bit register (volatile const unsigned int) */
@@ -236,6 +237,10 @@ void I2S_Handler                 ( void );
 /**
  * \brief CMSIS includes
  */
+
+#ifdef __cplusplus
+}
+#endif
 
 #include <core_cm0plus.h>
 #if !defined DONT_USE_CMSIS_INIT
@@ -541,11 +546,6 @@ void I2S_Handler                 ( void );
 /* ************************************************************************** */
 /**  ELECTRICAL DEFINITIONS FOR SAMR21G18A */
 /* ************************************************************************** */
-
-
-#ifdef __cplusplus
-}
-#endif
 
 /*@}*/
 

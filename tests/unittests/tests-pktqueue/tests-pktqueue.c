@@ -13,7 +13,7 @@
  */
 #include <string.h>
 
-#include "embUnit/embUnit.h"
+#include "embUnit.h"
 
 #include "pktqueue.h"
 
@@ -93,12 +93,12 @@ static void test_pktqueue_add_two_equal(void)
     pktqueue_add(root, elem1);
     pktqueue_add(root, elem2);
 
-    TEST_ASSERT(root->first == elem2);
-    TEST_ASSERT(((void *)4356) == root->first->data);
+    TEST_ASSERT(root->first == elem1);
+    TEST_ASSERT(((void *)27088) == root->first->data);
     TEST_ASSERT_EQUAL_INT(14202, root->first->priority);
 
-    TEST_ASSERT(root->first->next == elem1);
-    TEST_ASSERT(((void *)27088) == root->first->next->data);
+    TEST_ASSERT(root->first->next == elem2);
+    TEST_ASSERT(((void *)4356) == root->first->next->data);
     TEST_ASSERT_EQUAL_INT(14202, root->first->next->priority);
 
     TEST_ASSERT_NULL(root->first->next->next);

@@ -31,28 +31,6 @@ endif
         info-buildsizes-diff info-build info-boards-supported \
         info-features-missing info-boards-features-missing
 
-OS := $(shell uname)
-
-COLOR_GREEN  :=
-COLOR_RED    :=
-COLOR_PURPLE :=
-COLOR_RESET  :=
-COLOR_ECHO   := /bin/echo
-ifeq (, ${JENKINS_URL})
-  ifeq (0,  $(shell tput colors 2>&1 > /dev/null; echo $$?))
-    COLOR_GREEN  := \033[1;32m
-    COLOR_RED    := \033[1;31m
-    COLOR_PURPLE := \033[1;35m
-    COLOR_RESET  := \033[0m
-    ifeq ($(OS),Darwin)
-      COLOR_ECHO   := echo -e
-      SHELL=bash
-    else
-      COLOR_ECHO   := /bin/echo -e
-    endif
-  endif
-endif
-
 buildtest:
 	@ \
 	BUILDTESTOK=true; \
@@ -202,8 +180,9 @@ info-build:
 	@echo 'FLASHER: $(FLASHER)'
 	@echo 'FFLAGS:  $(FFLAGS)'
 	@echo ''
-	@echo 'TERMPROG: $(TERMPROG)'
-	@echo 'PORT:     $(PORT)'
+	@echo 'TERMPROG:  $(TERMPROG)'
+	@echo 'TERMFLAGS: $(TERMFLAGS)'
+	@echo 'PORT:      $(PORT)'
 	@echo ''
 	@echo 'DEBUGGER:       $(DEBUGGER)'
 	@echo 'DEBUGGER_FLAGS: $(DEBUGGER_FLAGS)'

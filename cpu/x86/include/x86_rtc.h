@@ -36,6 +36,10 @@
 
 #include <stdbool.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief   A timestamp.
  *
@@ -111,9 +115,9 @@ typedef union x86_rtc_data {
  * You must not call this function on your own accord.
  *
  * The RTC subsystem will refuse to work if the CMOS says that
- * <li>there was a power loss,
- * <li>the stored time is invalid (i.e. February 30), or
- * <li>the CMOS had a checksum failure.
+ * @li there was a power loss,
+ * @li the stored time is invalid (i.e. February 30), or
+ * @li the CMOS had a checksum failure.
  */
 void x86_init_rtc(void);
 
@@ -205,6 +209,10 @@ void x86_rtc_set_periodic_callback(x86_rtc_callback_t cb);
  * because the hwtimer subsystem gets set up before the message system works.
  */
 void x86_rtc_set_update_callback(x86_rtc_callback_t cb);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 
