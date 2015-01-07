@@ -123,7 +123,7 @@ int rtc_set_alarm(struct tm *time, rtc_alarm_cb_t cb, void *arg)
                 | RTC_MODE2_ALARM_DAY(time->tm_mday)
                 | RTC_MODE2_ALARM_HOUR(time->tm_hour)
                 | RTC_MODE2_ALARM_MINUTE(time->tm_min)
-                | RTC_MODE2_ALARM_SECOND(time->tm_sec - 1);
+                | RTC_MODE2_ALARM_SECOND(time->tm_sec);
         rtcMode2->Mode2Alarm[0].MASK.reg = RTC_MODE2_MASK_SEL(6);
     }
     while (rtcMode2->STATUS.bit.SYNCBUSY);
