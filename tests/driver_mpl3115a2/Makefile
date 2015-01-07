@@ -1,0 +1,20 @@
+APPLICATION = driver_mpl3115a2
+include ../Makefile.tests_common
+
+FEATURES_REQUIRED = periph_i2c
+
+USEMODULE += mpl3115a2
+USEMODULE += vtimer
+
+ifneq (,$(TEST_MPL3115A2_I2C))
+  CFLAGS += -DTEST_MPL3115A2_I2C=$(TEST_MPL3115A2_I2C)
+else
+  CFLAGS += -DTEST_MPL3115A2_I2C=I2C_0
+endif
+ifneq (,$(TEST_MPL3115A2_ADDR))
+  CFLAGS += -DTEST_MPL3115A2_ADDR=$(TEST_MPL3115A2_ADDR)
+else
+  CFLAGS += -DTEST_MPL3115A2_ADDR=0x60
+endif
+
+include $(RIOTBASE)/Makefile.include
