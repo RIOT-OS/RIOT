@@ -163,7 +163,7 @@ SECTIONS
 	{
 		. = ALIGN(4);					/* ensure data is aligned so relocation can use 4-byte operations */
 		_data = .;						/* create a global symbol marking the start of the .data section  */
-		*(.data)						/* all .data sections  */
+		*(.data .data.*)				/* all .data sections  */
 		*(.gnu.linkonce.d*)
         . = ALIGN(4);
         /* preinit data */
