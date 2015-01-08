@@ -10,7 +10,7 @@
  * @ingroup     drivers_nrf24l01p
  * @{
  *
- * @file        nrf24l01p.c
+ * @file
  * @brief       Low-level driver for nrf24l01+ transceiver
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
@@ -41,13 +41,19 @@ extern "C" {
 
 #define NRFL01P_RX_BUF_SIZE         4
 
-#define DELAY_CS_TOGGLE_TICKS               1
-#define DELAY_AFTER_FUNC_TICKS              1
+#define DELAY_CS_TOGGLE_TICKS               2
+#define DELAY_AFTER_FUNC_TICKS              2
 #define DELAY_CE_HIGH_US                    HWTIMER_TICKS(15)
 #define DELAY_CHANGE_PWR_MODE_US            HWTIMER_TICKS(1500)
 #define DELAY_CHANGE_TXRX_US                HWTIMER_TICKS(130)
 #define DELAY_CE_START_US                   HWTIMER_TICKS(5)
 #define DELAY_AFTER_TX_PACKET               HWTIMER_TICKS(1500)
+/* 
+ * This is the time which is needed to physically transmit the data.
+ * Compare nrf24l01+ pruduct specification p.42. It is computed just 
+ * for this setup
+ */
+#define DELAY_DATA_ON_AIR                   HWTIMER_TICKS(1300)
 
 
 #define CMD_R_REGISTER          0x00

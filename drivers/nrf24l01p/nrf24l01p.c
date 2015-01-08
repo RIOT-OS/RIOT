@@ -775,7 +775,7 @@ int nrf24l01p_off(nrf24l01p_t *dev)
     hwtimer_spin(DELAY_CS_TOGGLE_TICKS);
     gpio_set(dev->cs);
 
-    hwtimer_spin(DELAY_CHANGE_TXRX_US);
+    hwtimer_wait(DELAY_CHANGE_PWR_MODE_US);
 
     return status;
 }
@@ -786,7 +786,7 @@ void nrf24l01p_transmit(nrf24l01p_t *dev)
     hwtimer_wait(DELAY_CE_HIGH_US); /* at least 10 us high */
     gpio_clear(dev->ce);
 
-    hwtimer_spin(DELAY_CE_START_US);
+    hwtimer_spin(DELAY_CHANGE_TXRX_US);
 }
 
 int nrf24l01p_read_payload(nrf24l01p_t *dev, char *answer, unsigned int size)

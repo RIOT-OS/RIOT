@@ -20,10 +20,6 @@
 #ifndef __NETDEV_DEFAULT_H_
 #define __NETDEV_DEFAULT_H_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "netdev/base.h"
 
 /**
@@ -36,10 +32,17 @@ extern "C" {
 
 #include "nativenet.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #ifndef NETDEV_DEFAULT
 #define NETDEV_DEFAULT   (&nativenet_default_dev)
 #endif /* NETDEV_DEFAULT */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* MODULE_NATIVENET */
 
@@ -50,9 +53,5 @@ extern "C" {
 #define NETDEV_DEFAULT   ((netdev_t *)(&nrf24l01p_netdev))
 #endif /* NETDEV_DEFAULT */
 #endif /* MODULE_NRF24L01P */
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* __NETDEV_DEFAULT_H_ */

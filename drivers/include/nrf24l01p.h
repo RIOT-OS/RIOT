@@ -11,7 +11,7 @@
  * @ingroup     drivers
  * @{
  *
- * @file        nrf24l01p.h
+ * @file
  * @brief       Low-level driver for nrf24l01+ transceiver
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
@@ -36,6 +36,14 @@ extern "C" {
 #include "netdev/base.h"
 #endif
 
+/**
+ * @brief Switch between virtual TX and RX netdev device
+ */
+typedef enum {
+    NETDEV_NRF24L01P_RX       /**< selects RX address register */
+    NETDEV_NRF24L01P_TX,      /**< selects TX address register */
+    NETDEV_NRF24L01P_UNINED,      /**< netdev device type undefined */
+} netdev_nrf24l01p_type_t;
 
 /**
  * @brief Structure that represents the hardware setup of the nrf24l01+ transceiver.
