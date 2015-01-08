@@ -170,8 +170,6 @@ void rpl_init_root_mode(void)
     rpl_instance_t *inst;
     rpl_dodag_t *dodag;
 
-    rpl_get_of_for_ocp(0);
-
     inst = rpl_new_instance(RPL_DEFAULT_INSTANCE);
 
     if (inst == NULL) {
