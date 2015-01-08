@@ -30,60 +30,59 @@ SECTIONS
 {
 	.text :								/* collect all sections that should go into FLASH after startup  */
 	{
-		*(.vectors)						/* Exception Vectors and branch table >= 64 bytes */
+		KEEP(*(.vectors))				/* Exception Vectors and branch table >= 64 bytes */
 		. = ALIGN(64);
-	    *(.init)
-	    *(.init0)  						/* Start here after reset.  */
-	    *(.init1)
-	    *(.init2) 						/* Copy data loop  */
-	    *(.init3)
-	    *(.init4)  						/* Clear bss  */
-	    *(.init5)
-	    *(.init6)  						/* C++ constructors.  */
-	    *(.init7)
-	    *(.init8)
-	    *(.init9) 						/* Call main().  */
-
+		KEEP(*(.init))
+		KEEP(*(.init0))					/* Start here after reset.  */
+		KEEP(*(.init1))
+		KEEP(*(.init2))					/* Copy data loop  */
+		KEEP(*(.init3))
+		KEEP(*(.init4))					/* Clear bss  */
+		KEEP(*(.init5))
+		KEEP(*(.init6))					/* C++ constructors.  */
+		KEEP(*(.init7))
+		KEEP(*(.init8))
+		KEEP(*(.init9))					/* Call main().  */
 		*(.text)						/* all .text sections (code)  */
 		*(.text.*)
 		*(.gnu.linkonce.t.*)
 
 		. = ALIGN(4);
 		__commands_start = .;
-		*(.commands)					/* command table */
+		KEEP(*(.commands))				/* command table */
 		__commands_end = .;
 		. = ALIGN(4);
 		__cfgspec_start = .;
-		*(.cfgspec)						/* configuration spec table */
+		KEEP(*(.cfgspec))				/* configuration spec table */
 		__cfgspec_end = .;
 		. = ALIGN(4);
 
 		__ctors_start = .;
-        	PROVIDE (_os_ctor_start = .);
-        	*(.ctors);
-        	KEEP (*(.init_array))
-        	PROVIDE (_os_ctor_end = .);
+        	PROVIDE(_os_ctor_start = .);
+        	KEEP(*(.ctors));
+        	KEEP(*(.init_array))
+        	PROVIDE(_os_ctor_end = .);
 		__ctors_end = .;
-	        *(.dtors);
+	        KEEP(*(.dtors));
 	        LONG (0);
 
 
 		*(.rodata .rodata.*)			/* all .rodata sections (constants, strings, etc.)  */
 		*(.gnu.linkonce.r.*)
-		*(.glue_7)						/* all .glue_7 sections  (no idea what these are) */
-		*(.glue_7t)						/* all .glue_7t sections (no idea what these are) */
+		*(.glue_7)						/* all .glue_7 sections, see https://gcc.gnu.org/ml/gcc-help/2009-03/msg00306.html */
+		*(.glue_7t)						/* all .glue_7t sections */
 
-		*(.fini9)
-		*(.fini8)
-		*(.fini7)
-		*(.fini6)						/* C++ destructors.  */
-		*(.fini5)
-		*(.fini4)
-		*(.fini3)
-		*(.fini2)
-		*(.fini1)
-		*(.fini0)						/* Infinite loop after program termination.  */
-		*(.fini)
+		KEEP(*(.fini9))
+		KEEP(*(.fini8))
+		KEEP(*(.fini7))
+		KEEP(*(.fini6))						/* C++ destructors.  */
+		KEEP(*(.fini5))
+		KEEP(*(.fini4))
+		KEEP(*(.fini3))
+		KEEP(*(.fini2))
+		KEEP(*(.fini1))
+		KEEP(*(.fini0))						/* Infinite loop after program termination.  */
+		KEEP(*(.fini))
 
 		*(.gcc_except_table)
 
@@ -164,7 +163,7 @@ SECTIONS
 	{
 		. = ALIGN(4);					/* ensure data is aligned so relocation can use 4-byte operations */
 		_data = .;						/* create a global symbol marking the start of the .data section  */
-		*(.data)						/* all .data sections  */
+		*(.data .data.*)				/* all .data sections  */
 		*(.gnu.linkonce.d*)
         . = ALIGN(4);
         /* preinit data */
