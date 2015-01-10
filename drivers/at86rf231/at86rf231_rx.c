@@ -36,16 +36,17 @@ extern netdev_802154_raw_packet_cb_t at86rf231_raw_packet_cb;
 
 void at86rf231_rx_handler(void)
 {
-    uint8_t lqi, fcs_rssi;
-    /* read packet length */
-    at86rf231_read_fifo(&at86rf231_rx_buffer[rx_buffer_next].length, 1);
+    uint8_t lqi, fcs_rssi, length;
+    /* read packet length (PHR) */
+    at86rf231_read_fifo(&length, 1);
+    at86rf231_rx_buffer[rx_buffer_next].length = length;
 
     /* read psdu, read packet with length as first byte and lqi as last byte. */
     uint8_t *buf = buffer[rx_buffer_next];
-    at86rf231_read_fifo(buf, at86rf231_rx_buffer[rx_buffer_next].length);
+    at86rf231_read_fifo(buf, length + 2);
 
     /* read lqi which is appended after the psdu */
-    lqi = buf[at86rf231_rx_buffer[rx_buffer_next].length - 1];
+    lqi = buf[length + 1];
 
     /* read fcs and rssi, from a register */
     fcs_rssi = at86rf231_reg_read(AT86RF231_REG__PHY_RSSI);
