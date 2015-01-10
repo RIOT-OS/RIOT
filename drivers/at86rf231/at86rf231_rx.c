@@ -43,10 +43,11 @@ void at86rf231_rx_handler(void)
 
     /* read psdu, read packet with length as first byte and lqi as last byte. */
     uint8_t *buf = buffer[rx_buffer_next];
-    at86rf231_read_fifo(buf, length + 2);
+    at86rf231_read_fifo(buf, length + 3);
 
     /* read lqi which is appended after the psdu */
     lqi = buf[length + 1];
+    uint8_t ed = buf[length + 2];
 
     /* read fcs and rssi, from a register */
     fcs_rssi = at86rf231_reg_read(AT86RF231_REG__PHY_RSSI);
@@ -54,7 +55,7 @@ void at86rf231_rx_handler(void)
     /* build package */
     at86rf231_rx_buffer[rx_buffer_next].lqi = lqi;
     /* RSSI has no meaning here, it should be read during packet reception. */
-    at86rf231_rx_buffer[rx_buffer_next].rssi = fcs_rssi & 0x1F;  /* bit[4:0] */
+    at86rf231_rx_buffer[rx_buffer_next].rssi = ed;
     /* bit7, boolean, 1 FCS valid, 0 FCS not valid */
     at86rf231_rx_buffer[rx_buffer_next].crc = (fcs_rssi >> 7) & 0x01;
 
