@@ -34,6 +34,7 @@
 #include <sys/time.h>
 #endif
 #include <ifaddrs.h>
+#include <poll.h>
 
 #include "kernel.h"
 #include "cpu.h"
@@ -79,6 +80,7 @@ int (*real_ioctl)(int fildes, int request, ...);
 int (*real_open)(const char *path, int oflag, ...);
 int (*real_pause)(void);
 int (*real_pipe)(int[2]);
+int (*real_poll)(struct pollfd *fds, nfds_t nfds, int timeout);
 int (*real_select)(int nfds, ...);
 int (*real_setitimer)(int which, const struct itimerval
         *restrict value, struct itimerval *restrict ovalue);
@@ -394,6 +396,7 @@ void _native_init_syscalls(void)
     *(void **)(&real_getifaddrs) = dlsym(RTLD_NEXT, "getifaddrs");
     *(void **)(&real_getpid) = dlsym(RTLD_NEXT, "getpid");
     *(void **)(&real_pipe) = dlsym(RTLD_NEXT, "pipe");
+    *(void **)(&real_poll) = dlsym(RTLD_NEXT, "poll");
     *(void **)(&real_close) = dlsym(RTLD_NEXT, "close");
     *(void **)(&real_creat) = dlsym(RTLD_NEXT, "creat");
     *(void **)(&real_fork) = dlsym(RTLD_NEXT, "fork");

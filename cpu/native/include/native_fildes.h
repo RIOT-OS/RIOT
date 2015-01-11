@@ -78,3 +78,10 @@ int _native_fd_set_handler(_native_fd_t fd, _native_fd_event_t event, _native_ca
  * @return 0 on success, -1 otherwise
  */
 int _native_fd_close_all(void);
+
+/**
+ * Initialize the native file descriptor infrastructure
+ *
+ * @note needs interrupts working
+ */
+void _native_fd_init(void);

@@ -53,6 +53,7 @@
 #include "nativenet.h"
 #include "nativenet_internal.h"
 #include "native_internal.h"
+#include "native_fildes.h"
 
 #include "hwtimer.h"
 #include "timex.h"
@@ -325,7 +326,8 @@ int tap_init(char *name)
     eui_64[7] = _native_tap_mac[5];
 
     /* configure signal handler for fds */
-    register_interrupt(SIGIO, _native_handle_tap_input);
+    _native_fd_t fd = _native_fd_add(_native_tap_fd);
+    _native_fd_set_handler(fd, _ev_pollin, _native_handle_tap_input);
 
 #ifdef __MACH__
     /* tuntap signalled IO is not working in OSX,

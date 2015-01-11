@@ -46,6 +46,7 @@
 #include <ifaddrs.h>
 #include <time.h>
 #include <sys/time.h>
+#include <poll.h>
 
 #include "kernel_types.h"
 
@@ -109,6 +110,7 @@ extern int (*real_listen)(int socket, int backlog);
 extern int (*real_open)(const char *path, int oflag, ...);
 extern int (*real_pause)(void);
 extern int (*real_pipe)(int[2]);
+extern int (*real_poll)(struct pollfd *fds, nfds_t nfds, int timeout);
 /* The ... is a hack to save includes: */
 extern int (*real_select)(int nfds, ...);
 extern int (*real_setitimer)(int which, const struct itimerval

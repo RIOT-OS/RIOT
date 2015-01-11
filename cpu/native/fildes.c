@@ -27,7 +27,7 @@
 #include "native_internal.h"
 #include "native_fildes.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG (1)
 #include "debug.h"
 
 #define NATIVE_MAX_POLLFDS  (32)
@@ -61,6 +61,7 @@ static volatile unsigned _native_nfds;
  *******************************************************************************/
 
 static int add_fd_to_pfd(_native_fd_t nfd);
+static void _native_fd_signal_handler(void);
 
 /********************************************************************************
  * "public" API implementation
@@ -85,6 +86,7 @@ _native_fd_t _native_fd_add(int fd)
     _native_fds[nfd].events = 0;
     memset(&_native_fds[nfd].handlers, 0x0,
             sizeof(_native_fds[nfd].handlers));
+    _native_fds[nfd].pf_idx = -1;
 
     /* leave critical section */
     restoreIRQ(state);
@@ -123,7 +125,35 @@ int _native_fd_set_handler(_native_fd_t fd, _native_fd_event_t event, _native_ca
 
     /* configure the structs */
     _native_fds[fd].handlers[event] = handler;
-    _native_fds[fd].events |= event;
+    switch (event) {
+        case _ev_pollin:
+            _native_fds[fd].events |= POLLIN;
+            break;
+        case _ev_pollrdnorm:
+            _native_fds[fd].events |= POLLRDNORM;
+            break;
+        case _ev_pollrdband:
+            _native_fds[fd].events |= POLLRDBAND;
+            break;
+        case _ev_pollpri:
+            _native_fds[fd].events |= POLLPRI;
+            break;
+        case _ev_pollout:
+            _native_fds[fd].events |= POLLOUT;
+            break;
+        case _ev_pollwrband:
+            _native_fds[fd].events |= POLLWRBAND;
+            break;
+        case _ev_pollerr:
+            _native_fds[fd].events |= POLLERR;
+            break;
+        case _ev_pollhup:
+            _native_fds[fd].events |= POLLHUP;
+            break;
+        case _ev_pollnval:
+            _native_fds[fd].events |= POLLNVAL;
+            break;
+    }
 
     if (add_fd_to_pfd(fd) != 0) {
         errx(EXIT_FAILURE, "_native_pfd_set_handler: kaputt\n");
@@ -145,12 +175,93 @@ int _native_fd_close_all(void)
     return ret;
 }
 
+void _native_fd_init(void)
+{
+    printf("_native_fd_init\n");
+    register_interrupt(SIGIO, _native_fd_signal_handler);
+}
+
 /********************************************************************************
  * internal API implementation
  *******************************************************************************/
 
+static void _native_handle_events(int pfd)
+{
+    int fd = -1;
+
+    for (unsigned i = 0; i < _native_nfds; i++) {
+        if (_native_fds[i].pf_idx == pfd) {
+            fd = i;
+            break;
+        }
+    }
+    if (fd == -1) {
+        errx(EXIT_FAILURE, "_native_handle_events: internal error");
+    }
+
+    printf("_native_handle_events\n");
+
+    short revent = _native_pfds[pfd].revents;
+    _native_callback_t *handlers = _native_fds[fd].handlers;
+
+    if (revent & POLLIN) {
+        printf("handling _ev_pollin\n");
+        handlers[_ev_pollin]();
+    }
+    if (revent & POLLRDNORM) {
+        printf("handling _ev_pollrdnorm\n");
+        handlers[_ev_pollrdnorm]();
+    }
+    if (revent & POLLRDBAND) {
+        printf("handling _ev_pollrdband\n");
+        handlers[_ev_pollrdband]();
+    }
+    if (revent & POLLPRI) {
+        printf("handling _ev_pollpri\n");
+        handlers[_ev_pollpri]();
+    }
+    if (revent & POLLOUT) {
+        printf("handling _ev_pollout\n");
+        handlers[_ev_pollout]();
+    }
+    if (revent & POLLWRBAND) {
+        printf("handling _ev_pollwrband\n");
+        handlers[_ev_pollwrband]();
+    }
+    if (revent & POLLERR) {
+        printf("handling _ev_pollerr\n");
+        handlers[_ev_pollerr]();
+    }
+    if (revent & POLLHUP) {
+        printf("handling _ev_pollhup\n");
+        handlers[_ev_pollhup]();
+    }
+    if (revent & POLLNVAL) {
+        printf("handling _ev_pollnval\n");
+        handlers[_ev_pollnval]();
+    }
+}
+
+static void _native_fd_signal_handler(void)
+{
+    printf("_native_fd_signal_handler checking %lu pfds\n", (unsigned long) _native_npfds);
+
+    int ready = real_poll(_native_pfds, _native_npfds, 0);
+    if (ready == -1) {
+        err(EXIT_FAILURE, "_native_fd_signal_handler: poll");
+    }
+    printf("_native_fd_signal_handler: %i ready\n", ready);
+
+    for (unsigned i = 0; i < _native_npfds; i++) {
+        if (_native_pfds[i].revents) {
+            _native_handle_events(i);
+        }
+    }
+}
+
 static int add_fd_to_pfd(_native_fd_t nfd)
 {
+    printf("add_fd_to_pfd\n");
     unsigned state = disableIRQ();
 
     int idx = _native_fds[nfd].pf_idx;
@@ -165,6 +276,8 @@ static int add_fd_to_pfd(_native_fd_t nfd)
         idx = _native_npfds++;
 
         _native_fds[nfd].pf_idx = idx;
+
+        printf("add_fd_to_pfd: now handling %lu pfds\n", (unsigned long) _native_npfds);
     }
 
     _native_pfds[idx].fd = _native_fds[nfd].fd;

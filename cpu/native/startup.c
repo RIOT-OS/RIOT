@@ -368,6 +368,7 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
     native_hwtimer_pre_init();
     native_cpu_init();
     native_interrupt_init();
+    _native_fd_init();
 #ifdef MODULE_NATIVENET
     tap_init(argv[1]);
 #endif
