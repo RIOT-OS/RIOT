@@ -13,6 +13,9 @@ OUTPUT="${CHECKROOT}/out"
 UNKNOWN="${OUTPUT}/unknown"
 TMP="${CHECKROOT}/.tmp"
 
+# Needed for compatibility with BSD sed
+TAB_CHAR="$(printf '\t')"
+
 # prepare
 ROOT=$(git rev-parse --show-toplevel)
 LICENSES=$(ls "${LICENSEDIR}")
@@ -63,7 +66,7 @@ fi
 # categorize files
 for FILE in ${FILES}; do
     FAIL=1
-    head -100 "${ROOT}/${FILE}" | sed -e 's/[\/\*\t]/ /g' -e 's/$/ /' | tr -d '\r\n' | sed -e 's/  */ /g' > "${TMP}"
+    head -100 "${ROOT}/${FILE}" | sed -e 's/[\/\*'"${TAB_CHAR}"']/ /g' -e 's/$/ /' | tr -d '\r\n' | sed -e 's/  */ /g' > "${TMP}"
     for LICENSE in ${LICENSES}; do
         if pcregrep -q -f "${LICENSEDIR}/${LICENSE}" "${TMP}"; then
             echo "${FILE}" >> "${OUTPUT}/${LICENSE}"
