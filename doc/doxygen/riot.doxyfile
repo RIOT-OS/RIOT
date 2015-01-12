@@ -825,6 +825,7 @@ EXCLUDE_PATTERNS       = */board/*/tools/* \
                          */boards/*/include/periph_conf.h \
                          */cpu/x86/include/x86_pci.h \
                          */cpu/sam3x8e/include/sam3x8e.h \
+                         */cpu/stm32l1/include/stm32l1xx.h \
 
 
 # The EXCLUDE_SYMBOLS tag can be used to specify one or more symbol names
