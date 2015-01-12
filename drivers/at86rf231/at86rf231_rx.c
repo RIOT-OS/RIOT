@@ -53,7 +53,7 @@ void at86rf231_rx_handler(void)
     /* build package */
     at86rf231_rx_buffer[rx_buffer_next].lqi = lqi;
     /* RSSI has no meaning here, it should be read during packet reception. */
-    at86rf231_rx_buffer[rx_buffer_next].rssi = fcs_rssi & 0x0F;  // bit[4:0]
+    at86rf231_rx_buffer[rx_buffer_next].rssi = fcs_rssi & 0x1F;  /* bit[4:0] */
     /* bit7, boolean, 1 FCS valid, 0 FCS not valid */
     at86rf231_rx_buffer[rx_buffer_next].crc = (fcs_rssi >> 7) & 0x01;
 
