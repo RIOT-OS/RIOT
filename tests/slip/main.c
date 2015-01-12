@@ -20,11 +20,11 @@
  */
 
 #include <errno.h>
-#include <stdio.h>
 
-#include "ipv6.h"
+#include "board.h"
 #include "kernel.h"
 #include "netapi.h"
+#include "netdev/base.h"
 #include "periph/uart.h"
 #include "pktbuf.h"
 #include "ringbuffer.h"
@@ -38,39 +38,24 @@
 static char inbuf_mem[INBUF_SIZE], reader_stack[READER_STACK_SIZE];
 static ringbuffer_t inbuf = RINGBUFFER_INIT(inbuf_mem);
 static kernel_pid_t slip_pid;
-static netdev_hlist_t ulhs = {NULL, NULL, NULL, 0};
 
-static void answer_icmp_echo(ipv6_hdr_t *ipv6_pkt, size_t size)
+static void blink_led(uint8_t *data, size_t data_len)
 {
-    icmpv6_hdr_t *data;
-
-    if ((ipv6_pkt->version_trafficclass >> 4) != 6 ||
-        ipv6_pkt->nextheader != IPV6_PROTO_NUM_ICMPV6 ||
-        sizeof(ipv6_hdr_t) + ipv6_pkt->length > size) {
-        printf("ipv6 wrong\n");
-        return;
+    for (size_t i = 0; i < data_len; i++) {
+        if (data[i] > 127) {
+            LED_RED_ON;
+            LED_GREEN_ON;
+        }
+        else {
+            LED_RED_OFF;
+            LED_GREEN_OFF;
+        }
     }
+}
 
-    ulhs.header = ipv6_pkt;
-    ulhs.header_len = sizeof(ipv6_hdr_t);
-
-    data = (icmpv6_hdr_t *)(ipv6_pkt + 1);
-
-    if (data->type != ICMPV6_TYPE_ECHO_REQUEST) {
-        printf("icmpv6 wrong\n");
-        return;
-    }
-
-    printf("swap addresses\n");
-
-    for (uint8_t i = 0; i < sizeof(ipv6_addr_t) / 4; i++) {
-        uint32_t tmp;
-        tmp = ipv6_pkt->srcaddr.uint32[i];
-        ipv6_pkt->srcaddr.uint32[i] = ipv6_pkt->destaddr.uint32[i];
-        ipv6_pkt->destaddr.uint32[i] = tmp;
-    }
-
-    slip_send_l3_packet(slip_pid, &ulhs, data, ipv6_pkt->length);
+static inline void echo(void *data, size_t size)
+{
+    slip_send_l3_packet(slip_pid, NULL, data, size);
 }
 
 static void *reader(void *args)
@@ -88,7 +73,6 @@ static void *reader(void *args)
 
     while (1) {
         msg_receive(&msg_rcv);
-        printf("received\n");
 
         if (msg_rcv.type != NETAPI_MSG_TYPE) {
             msg_ack.type = 0;   /* Send random reply, API handles this case */
@@ -109,7 +93,8 @@ static void *reader(void *args)
         pktbuf_hold(rcv->data);
         msg_reply(&msg_rcv, &msg_ack);
 
-        answer_icmp_echo(rcv->data, rcv->data_len);
+        blink_led(rcv->data, rcv->data_len);
+        echo(rcv->data, rcv->data_len);
         pktbuf_release(rcv->data);
     }
 
@@ -128,7 +113,7 @@ int main(void)
     slip_pid = slip_init(0, 115200, &inbuf);
 #endif
 
-    netapi_register(slip_pid, reader_pid);
+    netapi_register(slip_pid, reader_pid, 0);
 
     return 0;
 }
