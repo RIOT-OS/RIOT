@@ -105,7 +105,7 @@ extern "C"
 
 #define TMP006_CCONST_A1           1.75E-3    /**< Constant \f$a_{\mathrm{1}}\f$ */
 #define TMP006_CCONST_A2           -1.678E-5  /**< Constant \f$a_{\mathrm{2}}\f$ */
-#define TMP006_CCONST_TREF         298.15     /**< Constant \f$T_{\mathrm{REF}\f$ */
+#define TMP006_CCONST_TREF         298.15     /**< Constant \f$T_{\mathrm{REF}}\f$ */
 #define TMP006_CCONST_B0           -2.94E-5   /**< Constant \f$b_{\mathrm{0}}\f$ */
 #define TMP006_CCONST_B1           -5.7E-7    /**< Constant \f$b_{\mathrm{1}}\f$ */
 #define TMP006_CCONST_B2           4.63E-9    /**< Constant \f$b_{\mathrm{2}}\f$ */
