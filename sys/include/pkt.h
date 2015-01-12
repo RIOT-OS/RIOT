@@ -109,9 +109,9 @@ typedef struct __attribute__((packed)) pkt_hlist_t {    /* packed to be aligned
  */
 typedef struct __attribute__((packed)) {    /* packed to be aligned correctly
                                              * in static packet buffer */
-    pktsize_t payload_len;      /**< length of pkt_t::payload. */
-    void *payload;              /**< payload of the packet. */
-    pkt_proto_t payload_proto;  /**< protocol of pkt_t::payload, if any */
+    pktsize_t payload_len;      /**< length of pkt_t::payload_data. */
+    void *payload_data;         /**< payload of the packet. */
+    pkt_proto_t payload_proto;  /**< protocol of pkt_t::payload_data, if any */
     pkt_hlist_t *headers;       /**< network protocol headers of the packet. */
 } pkt_t;
 
