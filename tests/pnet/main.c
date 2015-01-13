@@ -35,7 +35,7 @@
 #define R_ADDR  (1)
 #endif
 
-#define PORT    (1234)
+#define PNET_PORT    (1234)
 
 #define ERROR(...)  printf("ERROR: " __VA_ARGS__)
 
@@ -57,7 +57,7 @@ int main(void)
 
     their_addr.sin6_family = AF_INET6;
 #if R_ADDR == 1
-    their_addr.sin6_port = PORT;
+    their_addr.sin6_port = PNET_PORT;
 #else
     their_addr.sin6_port = 0;
 #endif
@@ -82,7 +82,7 @@ int main(void)
     memcpy(buffer, "Hello, World!", 14);
     memcpy(&my_addr, &in6addr_any, sizeof(my_addr));
 
-    my_addr.sin6_port = PORT;
+    my_addr.sin6_port = PNET_PORT;
 
     sockfd = socket(AF_INET6, SOCK_DGRAM, 0);
     res = bind(sockfd, (struct sockaddr *)&my_addr, sizeof(my_addr));
