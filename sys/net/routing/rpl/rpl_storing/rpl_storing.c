@@ -841,30 +841,5 @@ void rpl_send(ipv6_addr_t *destination, uint8_t *payload, uint16_t p_len, uint8_
         memcpy(p_ptr, payload, p_len);
     }
 
-    if (ipv6_addr_is_multicast(&ipv6_send_buf->destaddr)) {
-        ipv6_send_packet(ipv6_send_buf, NULL);
-    }
-    else {
-        /* find appropriate next hop before sending */
-        ipv6_addr_t *next_hop = rpl_get_next_hop(&ipv6_send_buf->destaddr);
-
-        if (next_hop == NULL) {
-            if (i_am_root) {
-                DEBUGF("[Error] destination unknown: %s\n", ipv6_addr_to_str(addr_str_mode,
-                        IPV6_MAX_ADDR_STR_LEN, &ipv6_send_buf->destaddr));
-                return;
-            }
-            else {
-                next_hop = rpl_get_my_preferred_parent();
-
-                if (next_hop == NULL) {
-                    DEBUGF("[Error] no preferred parent, dropping package\n");
-                    return;
-                }
-            }
-        }
-
-        ipv6_send_packet(ipv6_send_buf, NULL);
-    }
-
+    ipv6_send_packet(ipv6_send_buf, NULL);
 }
