@@ -66,8 +66,9 @@ ipv6_srh_t *srh_header;
 msg_t srh_m_send, srh_m_recv;
 #endif
 
+#if RPL_MAX_ROUTING_ENTRIES != 0
 rpl_routing_entry_t rpl_routing_table[RPL_MAX_ROUTING_ENTRIES];
-
+#endif
 uint8_t rpl_max_routing_entries;
 ipv6_addr_t my_address;
 
@@ -80,16 +81,10 @@ uint8_t rpl_init(int if_id)
     rpl_instances_init();
 
     /* initialize routing table */
+#if RPL_MAX_ROUTING_ENTRIES != 0
     rpl_max_routing_entries = RPL_MAX_ROUTING_ENTRIES;
     rpl_clear_routing_table();
-
-    if (rpl_routing_table == NULL) {
-        DEBUGF("Routing table init failed!\n");
-        return SIXLOWERROR_NULLPTR;
-    }
-    else {
-        DEBUGF("Routing table init finished!\n");
-    }
+#endif
 
     init_trickle();
     rpl_process_pid = thread_create(rpl_process_buf, RPL_PROCESS_STACKSIZE,
@@ -223,6 +218,7 @@ void *rpl_process(void *arg)
                     }
                 }
             }
+#if RPL_MAX_ROUTING_ENTRIES != 0
             else  {
                 srh_header = rpl_get_srh_header(ipv6_buf);
 
@@ -231,7 +227,7 @@ void *rpl_process(void *arg)
                     rpl_srh_sendto(payload, NTOHS(ipv6_buf->length), &ipv6_buf->srcaddr, &ipv6_buf->destaddr, srh_header, srh_header->hdrextlen + sizeof(ipv6_srh_t));
                 }
             }
-
+#endif
         }
 
 #endif
@@ -316,6 +312,7 @@ ipv6_addr_t *rpl_get_next_hop(ipv6_addr_t *addr)
 
     DEBUGF("Looking up the next hop to %s\n", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, addr));
 
+#if RPL_MAX_ROUTING_ENTRIES != 0
     for (uint8_t i = 0; i < rpl_max_routing_entries; i++) {
         if (rpl_routing_table[i].used) {
             DEBUGF("checking %d: %s\n", i, ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, &rpl_routing_table[i].address));
@@ -334,10 +331,14 @@ ipv6_addr_t *rpl_get_next_hop(ipv6_addr_t *addr)
             }
         }
     }
+#else
+    (void) addr;
+#endif
 
     return (rpl_get_my_preferred_parent());
 }
 
+#if RPL_MAX_ROUTING_ENTRIES != 0
 void rpl_add_routing_entry(ipv6_addr_t *addr, ipv6_addr_t *next_hop, uint16_t lifetime)
 {
     rpl_routing_entry_t *entry = rpl_find_routing_entry(addr);
@@ -359,7 +360,9 @@ void rpl_add_routing_entry(ipv6_addr_t *addr, ipv6_addr_t *next_hop, uint16_t li
         }
     }
 }
+#endif
 
+#if RPL_MAX_ROUTING_ENTRIES != 0
 void rpl_del_routing_entry(ipv6_addr_t *addr)
 {
 
@@ -372,7 +375,9 @@ void rpl_del_routing_entry(ipv6_addr_t *addr)
         }
     }
 }
+#endif
 
+#if RPL_MAX_ROUTING_ENTRIES != 0
 rpl_routing_entry_t *rpl_find_routing_entry(ipv6_addr_t *addr)
 {
 
@@ -386,7 +391,9 @@ rpl_routing_entry_t *rpl_find_routing_entry(ipv6_addr_t *addr)
 
     return NULL;
 }
+#endif
 
+#if RPL_MAX_ROUTING_ENTRIES != 0
 void rpl_clear_routing_table(void)
 {
 
@@ -394,15 +401,21 @@ void rpl_clear_routing_table(void)
         memset(&rpl_routing_table[i], 0, sizeof(rpl_routing_table[i]));
     }
 }
+#endif
 
 rpl_routing_entry_t *rpl_get_routing_table(void)
 {
+#if RPL_MAX_ROUTING_ENTRIES != 0
     return rpl_routing_table;
+#else
+    return NULL;
+#endif
 }
 
 #if RPL_DEFAULT_MOP == RPL_NON_STORING_MODE
 /* everything from here on is non-storing mode related */
 
+#if RPL_MAX_ROUTING_ENTRIES != 0
 void rpl_add_srh_entry(ipv6_addr_t *child, ipv6_addr_t *parent, uint16_t lifetime)
 {
 
@@ -440,6 +453,7 @@ void rpl_add_srh_entry(ipv6_addr_t *child, ipv6_addr_t *parent, uint16_t lifetim
         }
     }
 }
+#endif
 
 /**
  * @brief   Checks if two IPv6 host suffixes are equal.
@@ -455,6 +469,7 @@ int ipv6_suffix_is_equal(const ipv6_addr_t *a, const ipv6_addr_t *b)
            (a->uint32[3] == b->uint32[3]);
 }
 
+#if RPL_MAX_ROUTING_ENTRIES != 0
 ipv6_srh_t *rpl_get_srh_header(ipv6_hdr_t *act_ipv6_hdr)
 {
     uint8_t route_length = RPL_MAX_SRH_PATH_LENGTH;
@@ -523,6 +538,7 @@ ipv6_srh_t *rpl_get_srh_header(ipv6_hdr_t *act_ipv6_hdr)
     /* set the destination-address in ipv6-buf->destaddr, which is the pointer of child */
     return srh_header;
 }
+#endif
 
 void rpl_remove_srh_header(ipv6_hdr_t *ipv6_header, const void *buf, uint8_t nextheader)
 {

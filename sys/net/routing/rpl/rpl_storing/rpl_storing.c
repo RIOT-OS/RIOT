@@ -691,12 +691,14 @@ void rpl_recv_DAO_mode(void)
                 len += rpl_opt_transit_buf->length;
                 /* route lifetime seconds = (DAO lifetime) * (Unit Lifetime) */
 
+#if RPL_MAX_ROUTING_ENTRIES != 0
                 DEBUG("Adding routing information: Target: %s, Source: %s, Lifetime: %u\n",
                       ipv6_addr_to_str(addr_str_mode, IPV6_MAX_ADDR_STR_LEN, &rpl_opt_target_buf->target),
                       ipv6_addr_to_str(addr_str_mode, IPV6_MAX_ADDR_STR_LEN, &ipv6_buf->srcaddr),
                       (rpl_opt_transit_buf->path_lifetime * my_dodag->lifetime_unit));
                 rpl_add_routing_entry(&rpl_opt_target_buf->target, &ipv6_buf->srcaddr,
                         rpl_opt_transit_buf->path_lifetime * my_dodag->lifetime_unit);
+#endif
                 increment_seq = 1;
                 break;
             }

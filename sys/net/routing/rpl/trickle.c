@@ -246,12 +246,15 @@ static void *rt_timer_over(void *arg)
 {
     (void) arg;
 
+#if RPL_MAX_ROUTING_ENTRIES != 0
     rpl_routing_entry_t *rt;
+#endif
 
     while (1) {
         rpl_dodag_t *my_dodag = rpl_get_my_dodag();
 
         if (my_dodag != NULL) {
+#if RPL_MAX_ROUTING_ENTRIES != 0
             rt = rpl_get_routing_table();
 
             for (uint8_t i = 0; i < rpl_max_routing_entries; i++) {
@@ -264,7 +267,7 @@ static void *rt_timer_over(void *arg)
                     }
                 }
             }
-
+#endif
             /* Parent is NULL for root too */
             if (my_dodag->my_preferred_parent != NULL) {
                 if (my_dodag->my_preferred_parent->lifetime <= 1) {

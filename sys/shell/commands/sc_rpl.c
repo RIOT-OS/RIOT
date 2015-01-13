@@ -20,13 +20,15 @@
 
 #include "rpl.h"
 
+#if RPL_MAX_ROUTING_ENTRIES != 0
 static char addr_str[IPV6_MAX_ADDR_STR_LEN];
-
+#endif
 void _rpl_route_handler(int argc, char **argv)
 {
     (void) argc;
     (void) argv;
 
+#if RPL_MAX_ROUTING_ENTRIES != 0
     rpl_routing_entry_t *rtable;
     rtable = rpl_get_routing_table();
     unsigned c = 0;
@@ -48,6 +50,8 @@ void _rpl_route_handler(int argc, char **argv)
     }
     puts("--------------------------------------------------------------------");
     printf(" %u routing table entries\n", c);
-
+#else
+    puts("No routing table available");
+#endif
     puts("$");
 }
