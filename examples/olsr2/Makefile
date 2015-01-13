@@ -1,7 +1,7 @@
-export APPLICATION = olsr_node
+APPLICATION = olsr_node
 
-export BOARD ?= native
-export RIOTBASE ?= $(CURDIR)/../..
+BOARD ?= native
+RIOTBASE ?= $(CURDIR)/../..
 
 # other toolchains lack assert.h used by oonf_api
 BOARD_WHITELIST := avsextrem msba2 native
@@ -16,7 +16,7 @@ QUIET ?= 1
 
 USEPKG += oonf_api
 
-export CFLAGS += -DRIOT -DENABLE_NAME
+CFLAGS += -DRIOT -DENABLE_NAME
 
 # Modules to include. 
 USEMODULE += rtc
