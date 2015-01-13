@@ -20,7 +20,7 @@
 #include "tests-pkt.h"
 
 #define _INIT_ELEM(len, data, next) \
-    { (len), (data), PKT_PROTO_UNKNOWN, (next) }
+    { (next), (data), (len), PKT_PROTO_UNKNOWN }
 #define _INIT_ELEM_STATIC_DATA(data, next) _INIT_ELEM(sizeof(data), data, next)
 
 #define TEST_PKTSIZE    (TEST_UINT16)
