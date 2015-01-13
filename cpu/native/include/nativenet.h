@@ -51,7 +51,7 @@
 extern "C" {
 #endif
 
-#ifdef MODULE_SIXLOWPAN
+#ifdef MODULE_SIXLOWPAN_LEGACY
 #define NATIVE_MAX_DATA_LENGTH (127)
 #else
 #define NATIVE_MAX_DATA_LENGTH (TAP_MAX_DATA)

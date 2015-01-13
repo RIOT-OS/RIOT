@@ -14,7 +14,7 @@
 #ifndef TCP_HC_H_
 #define TCP_HC_H_
 
-#include "sixlowpan.h"
+#include "sixlowpan_legacy.h"
 
 #include "socket_base/socket.h"
 

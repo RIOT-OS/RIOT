@@ -97,7 +97,7 @@ void udp_send(int argc, char **argv)
 {
     int sock;
     sockaddr6_t sa;
-    ipv6_addr_t ipaddr;
+    ipv6_legacy_addr_t ipaddr;
     int bytes_sent;
     int address;
     char text[5];
@@ -122,10 +122,10 @@ void udp_send(int argc, char **argv)
     memset(&sa, 0, sizeof(sa));
 
     if (address) {
-        ipv6_addr_init(&ipaddr, 0xabcd, 0x0, 0x0, 0x0, 0x0, 0x00ff, 0xfe00, (uint16_t)address);
+        ipv6_legacy_addr_init(&ipaddr, 0xabcd, 0x0, 0x0, 0x0, 0x0, 0x00ff, 0xfe00, (uint16_t)address);
     }
     else {
-        ipv6_addr_set_all_nodes_addr(&ipaddr);
+        ipv6_legacy_addr_set_all_nodes_addr(&ipaddr);
     }
 
     sa.sin6_family = AF_INET;

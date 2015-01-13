@@ -20,8 +20,8 @@
 #ifndef AODV_H_
 #define AODV_H_
 
-#include <sixlowpan/ip.h>
-#include "sixlowpan.h"
+#include <sixlowpan_legacy/ip.h>
+#include "sixlowpan_legacy.h"
 #include "kernel.h"
 #include "udp.h"
 #include "socket_base/socket.h"
@@ -96,7 +96,7 @@ struct msg_container
  * @return          Address of the next hop towards dest if there is any,
  *                  NULL if there is none (yet)
  */
-ipv6_addr_t *aodv_get_next_hop(ipv6_addr_t *dest);
+ipv6_legacy_addr_t *aodv_get_next_hop(ipv6_addr_t *dest);
 
 /**
  * @brief   Dispatch a RREQ

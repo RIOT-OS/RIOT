@@ -7,17 +7,17 @@
  */
 
 /**
- * @ingroup     net_sixlowpan_lowpan
+ * @ingroup     net_sixlowpan_legacy_lowpan
  * @{
  *
- * @file        sixlowpan/error.h
+ * @file        sixlowpan_legacy/error.h
  * @brief       6LoWPAN error codes
  *
  * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
  */
 
-#ifndef SIXLOWPAN_ERROR_H
-#define SIXLOWPAN_ERROR_H
+#ifndef SIXLOWPAN_LEGACY_ERROR_H
+#define SIXLOWPAN_LEGACY_ERROR_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -104,4 +104,4 @@ extern "C" {
 #endif
 
 /** @} */
-#endif /* SIXLOWPAN_ERROR_H */
+#endif /* SIXLOWPAN_LEGACY_ERROR_H */

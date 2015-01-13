@@ -20,7 +20,7 @@
 #ifndef ETX_BEACONING_H_
 #define ETX_BEACONING_H_
 #include <stdint.h>
-#include "sixlowpan.h"
+#include "sixlowpan_legacy.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -94,7 +94,7 @@ typedef struct __attribute__((packed)) etx_probe_t {
 } etx_probe_t;
 
 typedef struct etx_neighbor_t {
-    ipv6_addr_t addr;           //The address of this node
+    ipv6_legacy_addr_t addr;           //The address of this node
     uint8_t     tx_cur_round;   //The indicator for receiving a packet from this candidate this round
     uint8_t     packets_tx[ETX_WINDOW]; //The packets this node has transmitted TO ME
     uint8_t     packets_rx;     //The packets this node has received FROM ME

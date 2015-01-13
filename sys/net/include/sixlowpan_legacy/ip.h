@@ -7,12 +7,12 @@
  */
 
 /**
- * @defgroup    net_sixlowpan_ip IPv6
- * @ingroup     net_sixlowpan
+ * @defgroup    net_sixlowpan_legacy_ip IPv6
+ * @ingroup     net_sixlowpan_legacy
  * @brief       Internet Protocol version 6
  * @{
  *
- * @file        include/sixlowpan/ip.h
+ * @file        include/sixlowpan_legacy/ip.h
  * @brief       6LoWPAN constants, data structs, and prototypes for network layer
  *
  * @author      Stephan Zeisberg <zeisberg@mi.fu-berlin.de>
@@ -21,15 +21,15 @@
  * @author      Oliver Gesch <oliver.gesch@googlemail.com>
  */
 
-#ifndef SIXLOWPAN_IP_H
-#define SIXLOWPAN_IP_H
+#ifndef SIXLOWPAN_LEGACY_IP_H
+#define SIXLOWPAN_LEGACY_IP_H
 
 #include <stdint.h>
 
 #include "inet_ntop.h"
 #include "net_if.h"
 #include "net_help.h"
-#include "sixlowpan/types.h"
+#include "sixlowpan_legacy/types.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -102,7 +102,7 @@ extern "C" {
  * @note    To be deleted in later releases. Here only because it is
  *          used by the rpl module.
  */
-ipv6_hdr_t *ipv6_get_buf(void);
+ipv6_legacy_hdr_t *ipv6_get_buf(void);
 
 /**
  * @brief   Send IPv6 packet to dest.
@@ -192,8 +192,8 @@ void ipv6_register_rpl_handler(kernel_pid_t pid);
  */
 static inline void ipv6_addr_set_link_local_prefix(ipv6_addr_t *ipv6_addr)
 {
-    ipv6_addr->uint32[0] = HTONL(0xfe800000);
-    ipv6_addr->uint32[1] = 0;
+    ipv6_legacy_addr->uint32[0] = HTONL(0xfe800000);
+    ipv6_legacy_addr->uint32[1] = 0;
 }
 
 /**
@@ -227,7 +227,7 @@ void ipv6_addr_init(ipv6_addr_t *out, uint16_t addr0, uint16_t addr1,
  *
  * @return  The Address to be set on success, NULL on error.
  */
-ipv6_addr_t *ipv6_addr_set_by_eui64(ipv6_addr_t *out, int if_id,
+ipv6_legacy_addr_t *ipv6_addr_set_by_eui64(ipv6_addr_t *out, int if_id,
                                     const ipv6_addr_t *prefix);
 
 /**
@@ -253,10 +253,10 @@ void ipv6_addr_init_prefix(ipv6_addr_t *out, const ipv6_addr_t *prefix,
  */
 static inline void ipv6_addr_set_loopback_addr(ipv6_addr_t *ipv6_addr)
 {
-    ipv6_addr->uint32[0] = 0;
-    ipv6_addr->uint32[1] = 0;
-    ipv6_addr->uint32[2] = 0;
-    ipv6_addr->uint32[3] = HTONL(1);
+    ipv6_legacy_addr->uint32[0] = 0;
+    ipv6_legacy_addr->uint32[1] = 0;
+    ipv6_legacy_addr->uint32[2] = 0;
+    ipv6_legacy_addr->uint32[3] = HTONL(1);
 }
 
 /**
@@ -272,10 +272,10 @@ static inline void ipv6_addr_set_loopback_addr(ipv6_addr_t *ipv6_addr)
  */
 static inline void ipv6_addr_set_all_routers_addr(ipv6_addr_t *ipv6_addr)
 {
-    ipv6_addr->uint32[0] = HTONL(0xff020000);
-    ipv6_addr->uint32[1] = 0;
-    ipv6_addr->uint32[2] = 0;
-    ipv6_addr->uint32[3] = HTONL(2);
+    ipv6_legacy_addr->uint32[0] = HTONL(0xff020000);
+    ipv6_legacy_addr->uint32[1] = 0;
+    ipv6_legacy_addr->uint32[2] = 0;
+    ipv6_legacy_addr->uint32[3] = HTONL(2);
 }
 
 /**
@@ -291,10 +291,10 @@ static inline void ipv6_addr_set_all_routers_addr(ipv6_addr_t *ipv6_addr)
  */
 static inline void ipv6_addr_set_all_nodes_addr(ipv6_addr_t *ipv6_addr)
 {
-    ipv6_addr->uint32[0] = HTONL(0xff020000);
-    ipv6_addr->uint32[1] = 0;
-    ipv6_addr->uint32[2] = 0;
-    ipv6_addr->uint32[3] = HTONL(1);
+    ipv6_legacy_addr->uint32[0] = HTONL(0xff020000);
+    ipv6_legacy_addr->uint32[1] = 0;
+    ipv6_legacy_addr->uint32[2] = 0;
+    ipv6_legacy_addr->uint32[3] = HTONL(1);
 }
 
 /**
@@ -314,12 +314,12 @@ static inline void ipv6_addr_set_solicited_node_addr(ipv6_addr_t *ipv6_addr_out,
         const ipv6_addr_t *ipv6_addr_in)
 {
     /* copy only the last 24-bit of the ip-address that is being resolved */
-    ipv6_addr_out->uint32[0] = HTONL(0xff020000);
-    ipv6_addr_out->uint32[1] = 0;
-    ipv6_addr_out->uint32[2] = HTONL(1);
-    ipv6_addr_out->uint8[12] = 0xff;
-    ipv6_addr_out->uint8[13] = ipv6_addr_in->uint8[13];
-    ipv6_addr_out->uint16[7] = ipv6_addr_in->uint16[7];
+    ipv6_legacy_addr_out->uint32[0] = HTONL(0xff020000);
+    ipv6_legacy_addr_out->uint32[1] = 0;
+    ipv6_legacy_addr_out->uint32[2] = HTONL(1);
+    ipv6_legacy_addr_out->uint8[12] = 0xff;
+    ipv6_legacy_addr_out->uint8[13] = ipv6_addr_in->uint8[13];
+    ipv6_legacy_addr_out->uint16[7] = ipv6_addr_in->uint16[7];
 }
 
 /**
@@ -404,8 +404,8 @@ static inline int ipv6_addr_is_multicast(const ipv6_addr_t *ipv6_addr)
 static inline int ipv6_addr_is_loopback(const ipv6_addr_t *ipv6_addr)
 {
     return ipv6_addr->uint32[0] == 0 &&
-           ipv6_addr->uint32[1] == 0 &&
-           ipv6_addr->uint32[2] == 0 &&
+           ipv6_legacy_addr->uint32[1] == 0 &&
+           ipv6_legacy_addr->uint32[2] == 0 &&
            NTOHL(ipv6_addr->uint32[3]) == 1;
 }
 
@@ -481,7 +481,7 @@ static inline net_if_eui64_t *ipv6_addr_get_iid(const ipv6_addr_t *ipv6_addr,
 }
 
 /*
- * TODO to wrap sixlowpan initialisations
+ * TODO to wrap sixlowpan_legacy initialisations
  * int ipv6_iface_init(transceiver_type_t trans, ..);
  */
 
@@ -567,5 +567,5 @@ uint16_t ipv6_csum(ipv6_hdr_t *ipv6_header, uint8_t *buf, uint16_t len, uint8_t 
 }
 #endif
 
-#endif /* SIXLOWPAN_IP_H */
+#endif /* SIXLOWPAN_LEGACY_IP_H */
 /** @} */

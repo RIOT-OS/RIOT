@@ -23,7 +23,7 @@
 #include "msg.h"
 #include "trickle.h"
 
-#include "sixlowpan.h"
+#include "sixlowpan_legacy.h"
 #include "net_help.h"
 
 #define ENABLE_DEBUG    (0)
@@ -413,7 +413,7 @@ void rpl_send_DAO_ACK_mode(ipv6_addr_t *destination)
 
 void rpl_recv_DIO_mode(void)
 {
-    ipv6_buf = get_rpl_ipv6_buf();
+    ipv6_legacy_buf = get_rpl_ipv6_buf();
 
     rpl_dio_buf = get_rpl_dio_buf();
     DEBUGF("instance %04X ", rpl_dio_buf->rpl_instanceid);
@@ -643,7 +643,7 @@ void rpl_recv_DAO_mode(void)
         return;
     }
 
-    ipv6_buf = get_rpl_ipv6_buf();
+    ipv6_legacy_buf = get_rpl_ipv6_buf();
     rpl_dao_buf = get_rpl_dao_buf();
     DEBUG("instance %04X ", rpl_dao_buf->rpl_instanceid);
     DEBUG("sequence %04X\n", rpl_dao_buf->dao_sequence);
@@ -692,8 +692,8 @@ void rpl_recv_DAO_mode(void)
                 /* route lifetime seconds = (DAO lifetime) * (Unit Lifetime) */
 
                 DEBUG("Adding routing information: Target: %s, Source: %s, Lifetime: %u\n",
-                      ipv6_addr_to_str(addr_str_mode, IPV6_MAX_ADDR_STR_LEN, &rpl_opt_target_buf->target),
-                      ipv6_addr_to_str(addr_str_mode, IPV6_MAX_ADDR_STR_LEN, &ipv6_buf->srcaddr),
+                      ipv6_legacy_addr_to_str(addr_str_mode, IPV6_MAX_ADDR_STR_LEN, &rpl_opt_target_buf->target),
+                      ipv6_legacy_addr_to_str(addr_str_mode, IPV6_MAX_ADDR_STR_LEN, &ipv6_buf->srcaddr),
                       (rpl_opt_transit_buf->path_lifetime * my_dodag->lifetime_unit));
                 rpl_add_routing_entry(&rpl_opt_target_buf->target, &ipv6_buf->srcaddr,
                         rpl_opt_transit_buf->path_lifetime * my_dodag->lifetime_unit);
@@ -732,7 +732,7 @@ void rpl_recv_DIS_mode(void)
         return;
     }
 
-    ipv6_buf = get_rpl_ipv6_buf();
+    ipv6_legacy_buf = get_rpl_ipv6_buf();
     rpl_dis_buf = get_rpl_dis_buf();
     int len = DIS_BASE_LEN;
 
@@ -817,18 +817,18 @@ void rpl_recv_dao_ack_mode(void)
 void rpl_send(ipv6_addr_t *destination, uint8_t *payload, uint16_t p_len, uint8_t next_header)
 {
     uint8_t *p_ptr;
-    ipv6_send_buf = get_rpl_send_ipv6_buf();
+    ipv6_legacy_send_buf = get_rpl_send_ipv6_buf();
     p_ptr = get_rpl_send_payload_buf(ipv6_ext_hdr_len);
 
-    ipv6_send_buf->version_trafficclass = IPV6_VER;
-    ipv6_send_buf->trafficclass_flowlabel = 0;
-    ipv6_send_buf->flowlabel = 0;
-    ipv6_send_buf->nextheader = next_header;
-    ipv6_send_buf->hoplimit = MULTIHOP_HOPLIMIT;
-    ipv6_send_buf->length = HTONS(p_len);
+    ipv6_legacy_send_buf->version_trafficclass = IPV6_VER;
+    ipv6_legacy_send_buf->trafficclass_flowlabel = 0;
+    ipv6_legacy_send_buf->flowlabel = 0;
+    ipv6_legacy_send_buf->nextheader = next_header;
+    ipv6_legacy_send_buf->hoplimit = MULTIHOP_HOPLIMIT;
+    ipv6_legacy_send_buf->length = HTONS(p_len);
 
     memcpy(&(ipv6_send_buf->destaddr), destination, 16);
-    ipv6_net_if_get_best_src_addr(&(ipv6_send_buf->srcaddr), &(ipv6_send_buf->destaddr));
+    ipv6_legacy_net_if_get_best_src_addr(&(ipv6_send_buf->srcaddr), &(ipv6_send_buf->destaddr));
 
     icmp_send_buf = get_rpl_send_icmpv6_buf(ipv6_ext_hdr_len);
     icmp_send_buf->checksum = icmpv6_csum(ipv6_send_buf, icmp_send_buf);
@@ -842,16 +842,16 @@ void rpl_send(ipv6_addr_t *destination, uint8_t *payload, uint16_t p_len, uint8_
     }
 
     if (ipv6_addr_is_multicast(&ipv6_send_buf->destaddr)) {
-        ipv6_send_packet(ipv6_send_buf, NULL);
+        ipv6_legacy_send_packet(ipv6_send_buf, NULL);
     }
     else {
         /* find appropriate next hop before sending */
-        ipv6_addr_t *next_hop = rpl_get_next_hop(&ipv6_send_buf->destaddr);
+        ipv6_legacy_addr_t *next_hop = rpl_get_next_hop(&ipv6_send_buf->destaddr);
 
         if (next_hop == NULL) {
             if (i_am_root) {
                 DEBUGF("[Error] destination unknown: %s\n", ipv6_addr_to_str(addr_str_mode,
-                        IPV6_MAX_ADDR_STR_LEN, &ipv6_send_buf->destaddr));
+                        IPV6_LEGACY_MAX_ADDR_STR_LEN, &ipv6_send_buf->destaddr));
                 return;
             }
             else {
@@ -864,7 +864,7 @@ void rpl_send(ipv6_addr_t *destination, uint8_t *payload, uint16_t p_len, uint8_
             }
         }
 
-        ipv6_send_packet(ipv6_send_buf, NULL);
+        ipv6_legacy_send_packet(ipv6_send_buf, NULL);
     }
 
 }

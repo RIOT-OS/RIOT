@@ -28,7 +28,7 @@
 #include <unistd.h>
 
 #include "net_if.h"
-#include "sixlowpan.h"
+#include "sixlowpan_legacy.h"
 #include "ipv6.h"
 
 #ifndef R_ADDR
@@ -41,12 +41,12 @@
 
 int init_local_address(uint16_t r_addr)
 {
-    ipv6_addr_t std_addr;
-    ipv6_addr_init(&std_addr, 0xabcd, 0xef12, 0, 0, 0x1034, 0x00ff, 0xfe00,
+    ipv6_legacy_addr_t std_addr;
+    ipv6_legacy_addr_init(&std_addr, 0xabcd, 0xef12, 0, 0, 0x1034, 0x00ff, 0xfe00,
                    0);
     net_if_set_src_address_mode(0, NET_IF_TRANS_ADDR_M_SHORT);
     return net_if_set_hardware_address(0, r_addr) &&
-           sixlowpan_lowpan_init_adhoc_interface(0, &std_addr);
+           sixlowpan_legacy_lowpan_init_adhoc_interface(0, &std_addr);
 }
 
 int main(void)

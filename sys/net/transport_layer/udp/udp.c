@@ -21,7 +21,7 @@
 
 #include "ipv6.h"
 #include "msg.h"
-#include "sixlowpan.h"
+#include "sixlowpan_legacy.h"
 #include "thread.h"
 
 #include "socket_base/in.h"
@@ -76,7 +76,7 @@ void *udp_packet_handler(void *arg)
 
     while (1) {
         msg_receive(&m_recv_ip);
-        ipv6_hdr_t *ipv6_header = ((ipv6_hdr_t *)m_recv_ip.content.ptr);
+        ipv6_legacy_hdr_t *ipv6_header = ((ipv6_hdr_t *)m_recv_ip.content.ptr);
         udp_hdr_t *udp_header = ((udp_hdr_t *)(m_recv_ip.content.ptr + IPV6_HDR_LEN));
 
         uint16_t chksum = ipv6_csum(ipv6_header, (uint8_t*) udp_header, NTOHS(udp_header->length), IPPROTO_UDP);
@@ -140,14 +140,14 @@ int32_t udp_recvfrom(int s, void *buf, uint32_t len, int flags, sockaddr6_t *fro
     (void) flags;
 
     msg_t m_recv, m_send;
-    ipv6_hdr_t *ipv6_header;
+    ipv6_legacy_hdr_t *ipv6_header;
     udp_hdr_t *udp_header;
     uint8_t *payload;
     socket_base_get_socket(s)->recv_pid = thread_getpid();
 
     msg_receive(&m_recv);
 
-    ipv6_header = ((ipv6_hdr_t *)m_recv.content.ptr);
+    ipv6_legacy_header = ((ipv6_hdr_t *)m_recv.content.ptr);
     udp_header = ((udp_hdr_t *)(m_recv.content.ptr + IPV6_HDR_LEN));
     payload = (uint8_t *)(m_recv.content.ptr + IPV6_HDR_LEN + UDP_HDR_LEN);
 
@@ -180,12 +180,12 @@ int32_t udp_sendto(int s, const void *buf, uint32_t len, int flags,
         (socket_base_get_socket(s)->socket_values.foreign_address.sin6_port == 0)) {
         uint8_t send_buffer[BUFFER_SIZE];
 
-        ipv6_hdr_t *temp_ipv6_header = ((ipv6_hdr_t *)(&send_buffer));
+        ipv6_legacy_hdr_t *temp_ipv6_header = ((ipv6_hdr_t *)(&send_buffer));
         udp_hdr_t *current_udp_packet = ((udp_hdr_t *)(&send_buffer[IPV6_HDR_LEN]));
         uint8_t *payload = &send_buffer[IPV6_HDR_LEN + UDP_HDR_LEN];
 
         memcpy(&(temp_ipv6_header->destaddr), &to->sin6_addr, 16);
-        ipv6_net_if_get_best_src_addr(&(temp_ipv6_header->srcaddr), &(temp_ipv6_header->destaddr));
+        ipv6_legacy_net_if_get_best_src_addr(&(temp_ipv6_header->srcaddr), &(temp_ipv6_header->destaddr));
 
         current_udp_packet->src_port = socket_base_get_free_source_port(IPPROTO_UDP);
         current_udp_packet->dst_port = to->sin6_port;
@@ -222,7 +222,7 @@ int udp_init_transport_layer(void)
         return -1;
     }
 
-    ipv6_register_next_header_handler(IPV6_PROTO_NUM_UDP, udp_thread_pid);
+    ipv6_legacy_register_next_header_handler(IPV6_PROTO_NUM_UDP, udp_thread_pid);
 
     return 0;
 }

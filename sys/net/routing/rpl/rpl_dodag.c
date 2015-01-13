@@ -362,7 +362,7 @@ void rpl_join_dodag(rpl_dodag_t *dodag, ipv6_addr_t *parent, uint16_t parent_ran
     DEBUG("\tdefault_lifetime:\t%02X\n", my_dodag->default_lifetime);
     DEBUG("\tgrounded:\t%02X\n", my_dodag->grounded);
     DEBUG("\tmy_preferred_parent:\t%s\n",
-          ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
+          ipv6_legacy_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
                            &my_dodag->my_preferred_parent->addr));
     DEBUG("\tmy_preferred_parent rank\t%02X\n", my_dodag->my_preferred_parent->rank);
     DEBUG("\tmy_preferred_parent lifetime\t%04X\n", my_dodag->my_preferred_parent->lifetime);
@@ -420,7 +420,7 @@ void rpl_local_repair(void)
 
 }
 
-ipv6_addr_t *rpl_get_my_preferred_parent(void)
+ipv6_legacy_addr_t *rpl_get_my_preferred_parent(void)
 {
     rpl_dodag_t *my_dodag = rpl_get_my_dodag();
 

@@ -58,7 +58,7 @@ extern uint8_t rpl_buffer[BUFFER_SIZE - LL_HDR_LEN];
  * @brief Initialization of RPL.
  *
  * This function initializes all basic RPL resources such as mutex for send/receive,
- * corresponding objective functions and sixlowpan (including own address). Calls
+ * corresponding objective functions and sixlowpan_legacy (including own address). Calls
  * initialization for mode as specified by PL_DEFAULT_MOP in rpl_structs.h.
  *
  * @param[in] if_id             ID of the interface, which correspond to the network under RPL-control
@@ -170,7 +170,7 @@ void rpl_recv_DAO_ACK(void);
  * @brief Initialization of RPl-root.
  *
  * This function initializes all RPL resources especially for root purposes.
- * corresponding objective functions and sixlowpan (including own address). It also register mutexes for
+ * corresponding objective functions and sixlowpan_legacy (including own address). It also register mutexes for
  * sending and receiving RPL-based messages. Both are necessary because of parallel access from different
  * layers/modules of RIOT. May change with future structure changes.
  *
@@ -190,7 +190,7 @@ void *rpl_process(void *arg);
  * @return Next hop address
  *
  * */
-ipv6_addr_t *rpl_get_next_hop(ipv6_addr_t *addr);
+ipv6_legacy_addr_t *rpl_get_next_hop(ipv6_addr_t *addr);
 
 /**
  * @brief Adds routing entry to routing table
@@ -279,7 +279,7 @@ void rpl_add_srh_entry(ipv6_addr_t *child, ipv6_addr_t *parent, uint16_t lifetim
  * @return Source routing header or NULL
  *
  * */
-ipv6_srh_t *rpl_get_srh_header(ipv6_hdr_t *act_ipv6_hdr);
+ipv6_legacy_srh_t *rpl_get_srh_header(ipv6_hdr_t *act_ipv6_hdr);
 
 /**
  * @brief Manages sending an SRH-header integrated in an original IPv6-package to the next hop.

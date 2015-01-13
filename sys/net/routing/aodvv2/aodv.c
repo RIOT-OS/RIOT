@@ -89,7 +89,7 @@ void aodv_init(void)
                                   NULL, "_aodv_sender_thread");
 
     /* register aodv for routing */
-    ipv6_iface_set_routing_provider(aodv_get_next_hop);
+    ipv6_legacy_iface_set_routing_provider(aodv_get_next_hop);
 
 }
 
@@ -185,20 +185,20 @@ void aodv_send_rerr(struct unreachable_node unreachable_nodes[], size_t len, str
 static void _init_addresses(void)
 {
     /* init multicast address: set to to a link-local all nodes multicast address */
-    ipv6_addr_set_all_nodes_addr(&_v6_addr_mcast);
+    ipv6_legacy_addr_set_all_nodes_addr(&_v6_addr_mcast);
     AODV_DEBUG("my multicast address is: %s\n",
-          ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, &_v6_addr_mcast));
+          ipv6_legacy_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, &_v6_addr_mcast));
 
     /* get best IP for sending */
-    ipv6_net_if_get_best_src_addr(&_v6_addr_local, &_v6_addr_mcast);
+    ipv6_legacy_net_if_get_best_src_addr(&_v6_addr_local, &_v6_addr_mcast);
     AODV_DEBUG("my src address is:       %s\n",
-          ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, &_v6_addr_local));
+          ipv6_legacy_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, &_v6_addr_local));
 
     /* store src & multicast address as netaddr as well for easy interaction
      * with oonf based stuff */
-    ipv6_addr_t_to_netaddr(&_v6_addr_local, &na_local);
-    ipv6_addr_t_to_netaddr(&_v6_addr_mcast, &na_mcast);
-    ipv6_addr_set_loopback_addr(&_v6_addr_loopback);
+    ipv6_legacy_addr_t_to_netaddr(&_v6_addr_local, &na_local);
+    ipv6_legacy_addr_t_to_netaddr(&_v6_addr_mcast, &na_mcast);
+    ipv6_legacy_addr_set_loopback_addr(&_v6_addr_loopback);
 
     /* init sockaddr that write_packet will use to send data */
     sa_wp.sin6_family = AF_INET6;
@@ -286,12 +286,12 @@ static void *_aodv_receiver_thread(void *arg)
         }
 
         AODV_DEBUG("_aodv_receiver_thread() %s:",
-              ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, &_v6_addr_local));
+              ipv6_legacy_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, &_v6_addr_local));
         DEBUG(" UDP packet received from %s\n",
-              ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, &sa_rcv.sin6_addr));
+              ipv6_legacy_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, &sa_rcv.sin6_addr));
 
         struct netaddr _sender;
-        ipv6_addr_t_to_netaddr(&sa_rcv.sin6_addr, &_sender);
+        ipv6_legacy_addr_t_to_netaddr(&sa_rcv.sin6_addr, &_sender);
 
         /* We sometimes get passed our own packets. Drop them. */
         if (netaddr_cmp(&_sender, &na_local) == 0) {
@@ -307,15 +307,15 @@ static void *_aodv_receiver_thread(void *arg)
     return NULL;
 }
 
-ipv6_addr_t *aodv_get_next_hop(ipv6_addr_t *dest)
+ipv6_legacy_addr_t *aodv_get_next_hop(ipv6_addr_t *dest)
 {
     AODV_DEBUG("aodv_get_next_hop() %s:",
-          ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, &_v6_addr_local));
+          ipv6_legacy_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, &_v6_addr_local));
     DEBUG(" getting next hop for %s\n",
-          ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, dest));
+          ipv6_legacy_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, dest));
 
     struct netaddr _tmp_dest;
-    ipv6_addr_t_to_netaddr(dest, &_tmp_dest);
+    ipv6_legacy_addr_t_to_netaddr(dest, &_tmp_dest);
     timex_t now;
     struct unreachable_node unreachable_nodes[AODVV2_MAX_UNREACHABLE_NODES];
     size_t len;
@@ -357,7 +357,7 @@ ipv6_addr_t *aodv_get_next_hop(ipv6_addr_t *dest)
     }
 
     DEBUG("\t[ndp] no entry for addr %s found\n",
-          ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, dest));
+          ipv6_legacy_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, dest));
     if (rt_entry) {
         /* Case 1: Undeliverable Packet */
         int packet_indeliverable = rt_entry->state == ROUTE_STATE_BROKEN ||
@@ -372,7 +372,7 @@ ipv6_addr_t *aodv_get_next_hop(ipv6_addr_t *dest)
         }
 
         DEBUG("\tfound dest %s in routing table\n",
-              ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, dest));
+              ipv6_legacy_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, dest));
 
         vtimer_now(&now);
         rt_entry->lastUsed = now;
@@ -387,7 +387,7 @@ ipv6_addr_t *aodv_get_next_hop(ipv6_addr_t *dest)
          * use a static ipv6_addr_t.
          * The following malloc will never be free()'d. TODO: FIX THIS ASAP.
         */
-        ipv6_addr_t *next_hop = (ipv6_addr_t *) malloc(sizeof(ipv6_addr_t));
+        ipv6_legacy_addr_t *next_hop = (ipv6_addr_t *) malloc(sizeof(ipv6_addr_t));
         netaddr_to_ipv6_addr_t(&rt_entry->nextHopAddr, next_hop);
 
         return next_hop;
@@ -412,7 +412,7 @@ ipv6_addr_t *aodv_get_next_hop(ipv6_addr_t *dest)
     };
 
     DEBUG("\tNo route found towards %s, starting route discovery... \n",
-          ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, dest));
+          ipv6_legacy_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, dest));
     aodv_send_rreq(&rreq_data);
 
     return NULL;
@@ -446,7 +446,7 @@ static void _write_packet(struct rfc5444_writer *wr __attribute__ ((unused)),
         AODV_DEBUG("originating RREQ with SeqNum %d towards %s via %s; updating RREQ table...\n",
               wt->packet_data.origNode.seqnum,
               netaddr_to_string(&nbuf, &wt->packet_data.targNode.addr),
-              ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, &sa_wp.sin6_addr));
+              ipv6_legacy_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, &sa_wp.sin6_addr));
         rreqtable_is_redundant(&wt->packet_data);
     }
 

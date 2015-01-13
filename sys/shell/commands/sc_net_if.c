@@ -29,7 +29,7 @@
 #include "net_if.h"
 #include "transceiver.h"
 
-#ifndef MODULE_SIXLOWPAN
+#ifndef MODULE_SIXLOWPAN_LEGACY
 #define ADDR_REGISTERED_MAX (6)
 #define ADDRS_LEN_MAX       (16)
 
@@ -339,8 +339,8 @@ void _net_if_ifconfig_add_ipv6(int if_id, int argc, char **argv)
         type = NULL;
     }
 
-#ifdef MODULE_SIXLOWPAN
-    ipv6_addr_t ipv6_addr;
+#ifdef MODULE_SIXLOWPAN_LEGACY
+    ipv6_legacy_addr_t ipv6_addr;
     void *addr_data = &ipv6_addr;
 #else
     void *addr_data = (void *)&addrs[addr_registered][0];
@@ -355,7 +355,7 @@ void _net_if_ifconfig_add_ipv6(int if_id, int argc, char **argv)
         return;
     }
 
-#ifdef MODULE_SIXLOWPAN
+#ifdef MODULE_SIXLOWPAN_LEGACY
 
     if (addr.addr_protocol & NET_IF_L3P_IPV6_PREFIX) {
         if (ndp_add_prefix_info(if_id, &ipv6_addr, addr.addr_len,
@@ -457,7 +457,7 @@ void _net_if_ifconfig_create(char *transceivers_str)
 
 static inline int _is_multicast(uint8_t *addr)
 {
-#ifdef MODULE_SIXLOWPAN
+#ifdef MODULE_SIXLOWPAN_LEGACY
     return ipv6_addr_is_multicast((ipv6_addr_t *) addr);
 #else
     return *addr == 0xff;
@@ -466,7 +466,7 @@ static inline int _is_multicast(uint8_t *addr)
 
 static inline int _is_link_local(uint8_t *addr)
 {
-#ifdef MODULE_SIXLOWPAN
+#ifdef MODULE_SIXLOWPAN_LEGACY
     return ipv6_addr_is_link_local((ipv6_addr_t *) addr);
 #else
     return (addr[0] == 0xfe && addr[1] == 0x80) ||
@@ -627,13 +627,13 @@ void _net_if_ifconfig_list(int if_id)
             puts("\n");
         }
 
-#ifdef MODULE_SIXLOWPAN
+#ifdef MODULE_SIXLOWPAN_LEGACY
         if (addr_ptr->addr_protocol & NET_IF_L3P_IPV6) {
             char addr_str[IPV6_MAX_ADDR_STR_LEN];
             printf("            inet6 addr: ");
 
             if (inet_ntop(AF_INET6, addr_ptr->addr_data, addr_str,
-                          IPV6_MAX_ADDR_STR_LEN)) {
+                          IPV6_LEGACY_MAX_ADDR_STR_LEN)) {
                 printf("%s/%d", addr_str, addr_ptr->addr_len);
                 printf("  scope: ");
 

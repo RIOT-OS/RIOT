@@ -10,8 +10,8 @@
  * Header file for serial number arithmetics [RFC1982]
  */
 
-#ifndef _SIXLOWPAN_SERIALNUMBER_H
-#define _SIXLOWPAN_SERIALNUMBER_H
+#ifndef _SIXLOWPAN_LEGACY_SERIALNUMBER_H
+#define _SIXLOWPAN_LEGACY_SERIALNUMBER_H
 #include <stdint.h>
 
 #ifdef __cplusplus
@@ -95,4 +95,4 @@ serial_comp_res_t serial_comp32(uint32_t s1, uint32_t s2);
 }
 #endif
 
-#endif /* _SIXLOWPAN_SERIALNUMBER_H*/
+#endif /* _SIXLOWPAN_LEGACY_SERIALNUMBER_H*/

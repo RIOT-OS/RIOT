@@ -7,10 +7,10 @@
  */
 
 /**
- * @ingroup     net_sixlowpan_lowpan
+ * @ingroup     net_sixlowpan_legacy_lowpan
  * @{
  *
- * @file        sixlowpan/mac.h
+ * @file        sixlowpan_legacy/mac.h
  * @brief       6LoWPAN data structs, and prototypes for MAC layer
  *
  * @author      Stephan Zeisberg <zeisberg@mi.fu-berlin.de>
@@ -19,14 +19,14 @@
  * @author      Oliver Gesch <oliver.gesch@googlemail.com>
  */
 
-#ifndef SIXLOWPAN_MAC_H
-#define SIXLOWPAN_MAC_H
+#ifndef SIXLOWPAN_LEGACY_MAC_H
+#define SIXLOWPAN_LEGACY_MAC_H
 
 #include <stdint.h>
 
 #include "transceiver.h"
 
-#include "sixlowpan/types.h"
+#include "sixlowpan_legacy/types.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -52,7 +52,7 @@ extern "C" {
  *
  * @return Length of transmitted data in byte
  */
-int sixlowpan_mac_send_ieee802154_frame(int if_id, const void *dest,
+int sixlowpan_legacy_mac_send_ieee802154_frame(int if_id, const void *dest,
                                         uint8_t dest_len, const void *payload, uint8_t length, uint8_t mcast);
 
 /**
@@ -60,11 +60,11 @@ int sixlowpan_mac_send_ieee802154_frame(int if_id, const void *dest,
  *
  * @return  PID of the MAC receiver thread.
  */
-kernel_pid_t sixlowpan_mac_init(void);
+kernel_pid_t sixlowpan_legacy_mac_init(void);
 
 #ifdef __cplusplus
 }
 #endif
 
 /** @} */
-#endif /* SIXLOWPAN_MAC_H */
+#endif /* SIXLOWPAN_LEGACY_MAC_H */

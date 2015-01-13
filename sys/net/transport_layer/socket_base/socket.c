@@ -158,10 +158,10 @@ void socket_base_print_socket(socket_t *current_socket)
            current_socket->type,
            current_socket->protocol);
     printf("Local address: %s\n",
-           ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
+           ipv6_legacy_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
                             &current_socket->local_address.sin6_addr));
     printf("Foreign address: %s\n",
-           ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
+           ipv6_legacy_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
                             &current_socket->foreign_address.sin6_addr));
     printf("Local Port: %u, Foreign Port: %u\n",
            NTOHS(current_socket->local_address.sin6_port),

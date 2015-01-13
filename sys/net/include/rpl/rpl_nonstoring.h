@@ -143,7 +143,7 @@ void rpl_recv_dao_ack_mode(void);
  *
  * This function sends any RPl related messages to a given destination. This implementation should be equal
  * for all modes and therefore should not be altered. Every mode related RPL-sending function calls this for
- * relaying it in lower layers to sixlowpan. Because send-functions are wrapped by a mutex in rpl.c, the same
+ * relaying it in lower layers to sixlowpan_legacy. Because send-functions are wrapped by a mutex in rpl.c, the same
  * mutex applies here.
  *
  * @param[in] destination           IPv6-address of the destination of the message.
