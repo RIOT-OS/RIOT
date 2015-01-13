@@ -23,6 +23,8 @@
 #include <stdio.h>
 #include <stdint.h>
 
+#include "pkt.h"
+
 /**
  * @brief   @ref msg_t type to transfer sixlowpan_test_exp_rcv_t types.
  */
@@ -70,27 +72,15 @@
 typedef uint32_t (*sixlowpan_test_t)(void);
 
 /**
- * @brief   Type to communicate expected test data to the test mac thread
- */
-typedef struct {
-    netdev_hlist_t *ulh;/**< Expected headers of upper layers */
-    void *dest;         /**< Expected destination address */
-    size_t dest_len;    /**< Expected destination address length */
-    void *data;         /**< Expected data */
-    size_t data_len;    /**< Expected data length */
-} sixlowpan_test_exp_snd_t;
-
-/**
- * @brief   Type to communicate expected test data to the test receiver thread
+ * @brief   Type to communicate expected test packet data to a test thread
  */
 typedef struct {
     void *src;          /**< Expected source address */
     size_t src_len;     /**< Expected source address length */
     void *dest;         /**< Expected destination address */
     size_t dest_len;    /**< Expected destination address length */
-    void *data;         /**< Expected data */
-    size_t data_len;    /**< Expected data length */
-} sixlowpan_test_exp_rcv_t;
+    pkt_t pkt;          /**< Expected packet content */
+} sixlowpan_test_exp_t;
 
 /**
  * @brief   PID for sixlowpan in these tests.
@@ -159,8 +149,8 @@ int sixlowpan_test_run(uint32_t exp, sixlowpan_test_t test, char *name);
  * @return 0 on success
  * @return test status code or errno >0 on error or failure.
  */
-uint32_t sixlowpan_test_send_test(netapi_snd_pkt_t *rcv, int num_snd,
-                                  sixlowpan_test_exp_snd_t *exp, int num_exp);
+uint32_t sixlowpan_test_send_test(netapi_pkt_t *snd, int num_snd,
+                                  sixlowpan_test_exp_t *exp, int num_exp);
 
 /**
  * @brief   Runs a test in interaction with the mockup test receiver
@@ -173,8 +163,8 @@ uint32_t sixlowpan_test_send_test(netapi_snd_pkt_t *rcv, int num_snd,
  * @return 0 on success
  * @return test status code or errno >0 on error or failure.
  */
-uint32_t sixlowpan_test_receiver_test(netapi_rcv_pkt_t *rcv, int num_rcv,
-                                      sixlowpan_test_exp_rcv_t *exp, int num_exp);
+uint32_t sixlowpan_test_receiver_test(netapi_pkt_t *rcv, int num_rcv,
+                                      sixlowpan_test_exp_t *exp, int num_exp);
 
 /**
  * @brief   Initializes test framework

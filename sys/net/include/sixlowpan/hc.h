@@ -126,29 +126,27 @@
  *          and next headers (if implemented) as defined in
  *          <a href="https://tools.ietf.org/html/rfc6282">RFC 6282</a>
  *
- * @param[out] rcv      The resulting receive command for the netapi.
+ * @param[out] rcv      The resulting receive packet command for the netapi.
  * @param[in] src       Link layer source address in network byte-order.
  * @param[in] src_len   Length of *src* in byte. Currently, the only valid
  *                      values are 1, 2 and 8.
  * @param[in] dest      Link layer destination address network byte-order.
  * @param[in] dest_len  Length of *dest* in byte. Currently, the only valid
  *                      values are 1, 2 and 8.
- * @param[in] data      Payload from link layer.
- * @param[in] data_len  Length of *data* in byte.
+ * @param[in] pkt       Packet from link layer.
  *
  * @return 0, on success
- * @return -EADDRNOTAVAIL, context encoded in given *data* was not found
+ * @return -EADDRNOTAVAIL, context encoded in given *pkt* was not found
  *                         in @ref iphc_cbuf
  * @return -EAFNOSUPPORT, *src_len* or *dest_len* was unequal to 1, 2 or 8
  * @return -EDESTADDRREQ, the compression encoding for the IPv6 destination
- *                        address in *data* was set to an illegal value
- * @return -EFAULT, *rcv*, *src*, *dest*, or *data* was NULL and DEVELHELP was defined
+ *                        address in *pkt* was set to an illegal value
+ * @return -EFAULT, *rcv*, *src*, *dest*, or *pkt* was NULL and DEVELHELP was defined
  * @return -EMSGSIZE, *data_len* is smaller then expected dispatch
- * @return -EINVAL, *data* was not HC encoded.
+ * @return -EINVAL, *pkt* was not HC encoded.
  */
-int sixlowpan_hc_decode(netapi_rcv_pkt_t *rcv, void *src, size_t src_len,
-                        void *dest, size_t dest_len, uint8_t *data,
-                        size_t data_len);
+int sixlowpan_hc_decode(netapi_pkt_t *rcv, void *src, size_t src_len, void *dest,
+                        size_t dest_len, pkt_t *pkt);
 
 /**
  * @brief   Encodes IPv6 and next headers (if implemented) into header
