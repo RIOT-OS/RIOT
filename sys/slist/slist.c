@@ -7,7 +7,7 @@
  */
 
 /**
-* @file slist.c
+* @file
 * @author   Benjamin Valentin <benpicco@zedat.fu-berlin.de>
 */
 
@@ -57,7 +57,8 @@ void *__simple_list_add_head(struct simple_list_elem **head, void *mem)
     return *head;
 }
 
-void *__simple_list_add_before(struct simple_list_elem **head, void *mem, int needle, size_t offset)
+void *__simple_list_add_before(struct simple_list_elem **head, void *mem,
+                               int needle, size_t offset)
 {
     struct simple_list_elem *_head = *head;
     struct simple_list_elem *prev = 0;
@@ -96,7 +97,8 @@ void *__simple_list_add_before(struct simple_list_elem **head, void *mem, int ne
     return _head;
 }
 
-void *__simple_list_find(struct simple_list_elem *head, void *needle, size_t offset, size_t size)
+void *__simple_list_find(struct simple_list_elem *head, void *needle,
+                         size_t offset, size_t size)
 {
     while (head != NULL) {
         void **buff = (void *) ((char *) head + offset);
@@ -115,7 +117,8 @@ void *__simple_list_find(struct simple_list_elem *head, void *needle, size_t off
     return 0;
 }
 
-void *__simple_list_find_cmp(struct simple_list_elem *head, void *needle, size_t offset, int compare(void *, void *))
+void *__simple_list_find_cmp(struct simple_list_elem *head, void *needle,
+                             size_t offset, int compare(void *, void *))
 {
     while (head != NULL) {
         void **buff = (void *) ((char *) head + offset);
@@ -130,7 +133,8 @@ void *__simple_list_find_cmp(struct simple_list_elem *head, void *needle, size_t
     return 0;
 }
 
-void *__simple_list_remove(struct simple_list_elem **head, struct simple_list_elem *node, int keep)
+void *__simple_list_remove(struct simple_list_elem **head,
+                           struct simple_list_elem *node, int keep)
 {
     struct simple_list_elem *_head = *head;
     struct simple_list_elem *prev = 0;

@@ -24,7 +24,8 @@
 #include "slist.h"
 
 int fail = 0;
-void cunit_named_check(int cond, const char *name, int line, const char *format, ...)
+void cunit_named_check(int cond, const char *name, int line,
+                       const char *format, ...)
 {
     va_list ap;
 
@@ -41,7 +42,8 @@ void cunit_named_check(int cond, const char *name, int line, const char *format,
     puts("\n");
     va_end(ap);
 }
-#define CHECK_TRUE(cond, format, args...) cunit_named_check(cond, __func__, __LINE__, format, ##args);
+#define CHECK_TRUE(cond, format, args...) \
+    cunit_named_check(cond, __func__, __LINE__, format, ##args);
 
 char foo[] = "Hello World!";
 char bar[] = "Hello CUnit!";
@@ -83,7 +85,8 @@ struct test_list *_add_test_list(struct test_list **head, char *buffer, int valu
 char *_print_result(struct test_list *result)
 {
     if (result) {
-        snprintf(print_buffer, sizeof print_buffer, "%d, %s\n", result->value, result->buffer);
+        snprintf(print_buffer, sizeof print_buffer, "%d, %s\n", result->value,
+                 result->buffer);
     }
     else {
         snprintf(print_buffer, sizeof print_buffer, "Not found\n");
@@ -99,8 +102,10 @@ int _is_equal(struct test_list *node, const int value, const char *buffer)
 
 void test_simple_list_fill(struct test_list *_head)
 {
-    CHECK_TRUE(_is_equal(_get_by_buffer(_head, bar), 42, bar), "%s", _print_result(_get_by_buffer(_head, bar)));
-    CHECK_TRUE(_is_equal(_get_by_value(_head, 23), 23, foo), "%s", _print_result(_get_by_value(_head, 23)));
+    CHECK_TRUE(_is_equal(_get_by_buffer(_head, bar), 42, bar), "%s",
+               _print_result(_get_by_buffer(_head, bar)));
+    CHECK_TRUE(_is_equal(_get_by_value(_head, 23), 23, foo), "%s",
+               _print_result(_get_by_value(_head, 23)));
 }
 
 void test_simple_list_remove(struct test_list **__head)
@@ -121,8 +126,10 @@ void test_simple_list_find(struct test_list *_head)
     CHECK_TRUE(_is_equal(simple_list_find_memcmp(_head, buffer), 42, bar), "%s",
                _print_result(simple_list_find_memcmp(_head, buffer)));
 
-    CHECK_TRUE(_is_equal(simple_list_find_cmp(_head, buffer, (int ( *)(void *, void *)) strcmp), 42, bar), "%s",
-                _print_result(simple_list_find_cmp(_head, buffer, (int ( *)(void *, void *)) strcmp)));
+    CHECK_TRUE(_is_equal(simple_list_find_cmp(_head, buffer,
+                         (int ( *)(void *, void *)) strcmp), 42, bar), "%s",
+                _print_result(simple_list_find_cmp(_head, buffer,
+                              (int ( *)(void *, void *)) strcmp)));
 }
 
 void _add_number_list(struct number_list **head, int value)
