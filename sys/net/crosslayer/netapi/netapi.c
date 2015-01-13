@@ -58,20 +58,18 @@ int netapi_send_command(kernel_pid_t pid, netapi_cmd_t *cmd)
     return ack_result;
 }
 
-int netapi_send_packet(kernel_pid_t pid, netdev_hlist_t *upper_layer_hdrs,
-                       void *addr, size_t addr_len, void *data, size_t data_len)
+int netapi_send_packet(kernel_pid_t pid, void *dest, size_t dest_len,
+                       pkt_t *pkt)
 {
-    netapi_snd_pkt_t pkt;
+    netapi_pkt_t cmd;
 
-    pkt.type = NETAPI_CMD_SND;
+    cmd.type = NETAPI_CMD_SND;
 
-    pkt.ulh = upper_layer_hdrs;
-    pkt.dest = addr;
-    pkt.dest_len = addr_len;
-    pkt.data = data;
-    pkt.data_len = data_len;
+    cmd.dest = dest;
+    cmd.dest_len = dest_len;
+    cmd.pkt = pkt;
 
-    return netapi_send_command(pid, (netapi_cmd_t *)(&pkt));
+    return netapi_send_command(pid, (netapi_cmd_t *)(&cmd));
 }
 
 static unsigned int _get_set_option(kernel_pid_t pid, netapi_cmd_type_t type,
@@ -125,21 +123,19 @@ int netapi_unregister(kernel_pid_t pid, kernel_pid_t reg_pid)
 
 #ifdef MODULE_NETDEV_DUMMY
 int netapi_fire_receive_event(kernel_pid_t pid, void *src, size_t src_len,
-                              void *dest, size_t dest_len, void *data,
-                              size_t data_len)
+                              void *dest, size_t dest_len, pkt_t *pkt)
 {
-    netapi_rcv_pkt_t pkt;
+    netapi_pkt_t cmd;
 
-    pkt.type = NETAPI_CMD_FIRE_RCV;
+    cmd.type = NETAPI_CMD_FIRE_RCV;
 
-    pkt.src = src;
-    pkt.src_len = src_len;
-    pkt.dest = dest;
-    pkt.dest_len = dest_len;
-    pkt.data = data;
-    pkt.data_len = data_len;
+    cmd.src = src;
+    cmd.src_len = src_len;
+    cmd.dest = dest;
+    cmd.dest_len = dest_len;
+    cmd.pkt = pkt;
 
-    return netapi_send_command(pid, (netapi_cmd_t *)(&pkt));
+    return netapi_send_command(pid, (netapi_cmd_t *)(&cmd));
 }
 #endif
 /**

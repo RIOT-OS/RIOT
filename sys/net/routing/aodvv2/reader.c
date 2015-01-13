@@ -325,7 +325,7 @@ static enum rfc5444_result _cb_rreq_end_callback(
         TODO evaluate that
         */
 
-        ipv6_addr_t sender_tmp;
+        ipv6_legacy_addr_t sender_tmp;
         netaddr_to_ipv6_addr_t(&packet_data.sender, &sender_tmp);
         ndp_neighbor_cache_t *ndp_nc_entry = ndp_neighbor_cache_search(&sender_tmp);
 
@@ -527,7 +527,7 @@ static enum rfc5444_result _cb_rrep_end_callback(
         TODO evaluate that
         */
 
-        ipv6_addr_t sender_tmp;
+        ipv6_legacy_addr_t sender_tmp;
         netaddr_to_ipv6_addr_t(&packet_data.sender, &sender_tmp);
         ndp_neighbor_cache_t *ndp_nc_entry = ndp_neighbor_cache_search(&sender_tmp);
 

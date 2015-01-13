@@ -39,7 +39,7 @@ typedef struct __attribute__((packed)) {
     uint8_t dtsn;
     uint8_t flags;
     uint8_t reserved;
-    ipv6_addr_t dodagid;
+    ipv6_legacy_addr_t dodagid;
 } rpl_dio_t;
 
 typedef struct __attribute__((packed)) {
@@ -66,7 +66,7 @@ typedef struct __attribute__((packed)) {
 /* DODAG ID Struct */
 /* may be present in dao or dao_ack packets */
 typedef struct __attribute__((packed)) {
-    ipv6_addr_t dodagid;
+    ipv6_legacy_addr_t dodagid;
 } dodag_id_t;
 
 /* RPL-Option Generic Format (RFC 6550 Fig. 19) */
@@ -97,7 +97,7 @@ typedef struct __attribute__((packed)) {
     uint8_t length;
     uint8_t rplinstanceid;
     uint8_t VID_Flags;
-    ipv6_addr_t dodagid;
+    ipv6_legacy_addr_t dodagid;
     uint8_t version;
 } rpl_opt_solicited_t;
 
@@ -108,7 +108,7 @@ typedef struct __attribute__((packed)) {
     uint8_t length;
     uint8_t flags;
     uint8_t prefix_length;
-    ipv6_addr_t target;
+    ipv6_legacy_addr_t target;
 } rpl_opt_target_t;
 
 /* RPL Transit-Option (RFC 6550 Fig. 26) */
@@ -119,13 +119,13 @@ typedef struct __attribute__((packed)) {
     uint8_t path_control;
     uint8_t path_sequence;
     uint8_t path_lifetime;
-    ipv6_addr_t parent;
+    ipv6_legacy_addr_t parent;
 } rpl_opt_transit_t;
 
 struct rpl_dodag_t;
 
 typedef struct {
-    ipv6_addr_t         addr;
+    ipv6_legacy_addr_t         addr;
     uint16_t            rank;
     uint8_t             dtsn;
     struct rpl_dodag_t *dodag;
@@ -146,7 +146,7 @@ typedef struct {
 //Node-internal representation of a DODAG, with nodespecific information
 typedef struct rpl_dodag_t {
     rpl_instance_t *instance;
-    ipv6_addr_t dodag_id;
+    ipv6_legacy_addr_t dodag_id;
     uint8_t used;
     uint8_t mop;
     uint8_t dtsn;
@@ -181,8 +181,8 @@ typedef struct rpl_of_t {
 } rpl_of_t;
 
 typedef struct {
-    ipv6_addr_t address;
-    ipv6_addr_t next_hop;
+    ipv6_legacy_addr_t address;
+    ipv6_legacy_addr_t next_hop;
     uint16_t lifetime;
     uint8_t used;
 } rpl_routing_entry_t;

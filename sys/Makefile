@@ -1,3 +1,6 @@
+ifneq (,$(filter pkt,$(USEMODULE)))
+    DIRS += net/crosslayer/pkt
+endif
 ifneq (,$(filter pktbuf,$(USEMODULE)))
     DIRS += net/crosslayer/pktbuf
 endif
@@ -35,11 +38,23 @@ endif
 ifneq (,$(filter protocol_multiplex,$(USEMODULE)))
     DIRS += net/link_layer/protocol-multiplex
 endif
-ifneq (,$(filter sixlowpan,$(USEMODULE)))
-    DIRS += net/network_layer/sixlowpan
+ifneq (,$(filter sixlowpan_legacy,$(USEMODULE)))
+    DIRS += net/network_layer/sixlowpan_legacy
 endif
 ifneq (,$(filter sixlowborder,$(USEMODULE)))
-    DIRS += net/network_layer/sixlowpan/border
+    DIRS += net/network_layer/sixlowpan_legacy/border
+endif
+ifneq (,$(filter sixlowpan,$(USEMODULE)))
+    DIRS += net/link_layer/sixlowpan
+endif
+ifneq (,$(filter sixlowpan_hc,$(USEMODULE)))
+    DIRS += net/link_layer/sixlowpan/hc
+endif
+ifneq (,$(filter sixlowpan_iphc_cbuf,$(USEMODULE)))
+    DIRS += net/link_layer/sixlowpan/iphc_cbuf
+endif
+ifneq (,$(filter ipv6,$(USEMODULE)))
+    # TODO
 endif
 ifneq (,$(filter rpl,$(USEMODULE)))
     DIRS += net/routing/rpl

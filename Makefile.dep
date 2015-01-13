@@ -22,13 +22,13 @@ ifneq (,$(filter tcp,$(USEMODULE)))
 endif
 
 ifneq (,$(filter socket_base,$(USEMODULE)))
-	USEMODULE += sixlowpan
+	USEMODULE += sixlowpan_legacy
 	USEMODULE += net_help
 	USEMODULE += vtimer
 endif
 
-ifneq (,$(filter sixlowborder,$(USEMODULE)))
-	USEMODULE += sixlowpan
+ifneq (,$(filter sixlowborder_legacy,$(USEMODULE)))
+	USEMODULE += sixlowpan_legacy
 endif
 
 ifneq (,$(filter rpl,$(USEMODULE)))
@@ -36,10 +36,10 @@ ifneq (,$(filter rpl,$(USEMODULE)))
 endif
 
 ifneq (,$(filter routing,$(USEMODULE)))
-	USEMODULE += sixlowpan
+	USEMODULE += sixlowpan_legacy
 endif
 
-ifneq (,$(filter sixlowpan,$(USEMODULE)))
+ifneq (,$(filter sixlowpan_legacy,$(USEMODULE)))
 	USEMODULE += ieee802154
 	USEMODULE += net_help
 	USEMODULE += net_if
@@ -47,9 +47,25 @@ ifneq (,$(filter sixlowpan,$(USEMODULE)))
 	USEMODULE += vtimer
 endif
 
+ifneq (,$(filter sixlowpan_hc,$(USEMODULE)))
+	USEMODULE += sixlowpan
+	USEMODULE += sixlowpan_iphc_cbuf
+endif
+
+ifneq (,$(filter sixlowpan_iphc_cbuf,$(USEMODULE)))
+	USEMODULE += vtimer
+endif
+
+ifneq (,$(filter sixlowpan,$(USEMODULE)))
+	USEMODULE += netapi
+	USEMODULE += netdev_base
+	USEMODULE += pktbuf
+	USEMODULE += vtimer
+endif
+
 ifneq (,$(filter aodvv2,$(USEMODULE)))
         USEMODULE += vtimer
-        USEMODULE += sixlowpan
+        USEMODULE += sixlowpan_legacy
         USEMODULE += oonf_common
         USEMODULE += oonf_rfc5444
 endif
@@ -108,8 +124,16 @@ ifneq (,$(filter ccn_lite,$(USEMODULE)))
 	USEMODULE += crypto
 endif
 
+ifneq (,$(filter netapi,$(USEMODULE)))
+	USEMODULE += pkt
+endif
+
 ifneq (,$(filter netdev_802154,$(USEMODULE)))
 	USEMODULE += netdev_base
+endif
+
+ifneq (,$(filter pktbuf,$(USEMODULE)))
+	USEMODULE += pkt
 endif
 
 ifneq (,$(filter rgbled,$(USEMODULE)))

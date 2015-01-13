@@ -35,7 +35,7 @@ extern "C" {
 
 /*
  * Protocols (RFC 1700) TODO: may be deleted due to some double definition
- *                            in sys/net/sixlowpan/include/sixlowpan/ip.h
+ *                            in sys/net/sixlowpan_legacy/include/sixlowpan_legacy/ip.h
  */
 #define IPPROTO_IP              (0)               ///<  dummy for IP
 #define IPPROTO_HOPOPTS         (0)               ///<  IP6 hop-by-hop options

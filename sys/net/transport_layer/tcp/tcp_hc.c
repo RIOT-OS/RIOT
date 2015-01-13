@@ -40,9 +40,9 @@ socket_internal_t *get_tcp_socket_by_context(ipv6_hdr_t *current_ipv6_header,
         temp_socket = socket_base_get_socket(i);
 
         if ((temp_socket != NULL) &&
-            ipv6_addr_is_equal(&temp_socket->socket_values.foreign_address.sin6_addr,
+            ipv6_legacy_addr_is_equal(&temp_socket->socket_values.foreign_address.sin6_addr,
                                &current_ipv6_header->srcaddr) &&
-            ipv6_addr_is_equal(&temp_socket->socket_values.local_address.sin6_addr,
+            ipv6_legacy_addr_is_equal(&temp_socket->socket_values.local_address.sin6_addr,
                                &current_ipv6_header->destaddr) &&
             (temp_socket->socket_values.tcp_control.tcp_context.context_id ==
              current_context)) {
@@ -73,7 +73,7 @@ void update_tcp_hc_context(bool incoming, socket_internal_t *current_socket,
 
 uint16_t compress_tcp_packet(socket_internal_t *current_socket,
                              uint8_t *current_tcp_packet,
-                             ipv6_hdr_t *temp_ipv6_header,
+                             ipv6_legacy_hdr_t *temp_ipv6_header,
                              uint8_t flags,
                              uint8_t payload_length)
 {
@@ -414,10 +414,10 @@ socket_internal_t *decompress_tcp_packet(ipv6_hdr_t *temp_ipv6_header)
     /* Full header TCP segment */
     if (*(((uint8_t *)temp_ipv6_header) + IPV6_HDR_LEN) == 0x01) {
         switch_tcp_packet_byte_order(((tcp_hdr_t *)(((uint8_t *)temp_ipv6_header) +
-                                      IPV6_HDR_LEN + 3)));
+                                      IPV6_LEGACY_HDR_LEN + 3)));
         current_socket = get_tcp_socket(temp_ipv6_header,
                                         ((tcp_hdr_t *)(((uint8_t *)temp_ipv6_header) +
-                                                IPV6_HDR_LEN + 3)));
+                                                IPV6_LEGACY_HDR_LEN + 3)));
 
         if (current_socket != NULL) {
             if (current_socket->socket_values.tcp_control.state == LISTEN) {

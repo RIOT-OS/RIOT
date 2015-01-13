@@ -7,7 +7,7 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  *
- * @ingroup sixlowpan
+ * @ingroup sixlowpan_legacy
  * @{
  * @file    ieee802154_frame.c
  * @brief   IEEE 802.14.4 framing operations

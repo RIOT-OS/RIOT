@@ -22,7 +22,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "msg.h"
-#include "sixlowpan/ip.h"
+#include "sixlowpan_legacy/ip.h"
 #include "transceiver.h"
 #include "ieee802154_frame.h"
 #include "rpl/rpl_structs.h"
@@ -63,7 +63,7 @@ void *rpl_udp_monitor(void *arg)
 
     msg_t m;
     radio_packet_t *p;
-    ipv6_hdr_t *ipv6_buf;
+    ipv6_legacy_hdr_t *ipv6_buf;
     uint8_t icmp_type, icmp_code;
     icmpv6_hdr_t *icmpv6_buf = NULL;
 
@@ -90,7 +90,7 @@ void *rpl_udp_monitor(void *arg)
             DEBUG("\n");
         }
         else if (m.type == IPV6_PACKET_RECEIVED) {
-            ipv6_buf = (ipv6_hdr_t *) m.content.ptr;
+            ipv6_legacy_buf = (ipv6_hdr_t *) m.content.ptr;
             printf("IPv6 datagram received (next header: %02X)", ipv6_buf->nextheader);
             printf(" from %s ", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
                                                  &ipv6_buf->srcaddr));
