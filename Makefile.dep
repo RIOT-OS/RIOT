@@ -124,6 +124,10 @@ ifneq (,$(filter ccn_lite,$(USEMODULE)))
 	USEMODULE += crypto
 endif
 
+ifneq (,$(filter netapi,$(USEMODULE)))
+	USEMODULE += pkt
+endif
+
 ifneq (,$(filter netdev_802154,$(USEMODULE)))
 	USEMODULE += netdev_base
 endif

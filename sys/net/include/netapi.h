@@ -55,6 +55,7 @@
 #include <stdlib.h>
 
 #include "kernel.h"
+#include "pkt.h"
 #include "netdev/base.h"
 #include "thread.h"
 
@@ -216,56 +217,34 @@ typedef struct {
 } netapi_cmd_t;
 
 /**
- * @brief   Command definition for receiving packets.
+ * @brief   Command definition for receiving and sending packets.
  * @extends netapi_cmd_t
  */
 typedef struct {
     /* cppcheck-suppress unusedStructMember because interface is not used yet */
-    netapi_cmd_type_t type;     /**< Type of the command. Must be NETAPI_CMD_RCV. */
+    netapi_cmd_type_t type;     /**< Type of the command. Must be NETAPI_CMD_RCV or NETAPI_CMD_SND. */
     netapi_ack_t *ack;          /**< Pointer to where the acknowledgement to this
                                      message is stored. Must not be NULL. */
-    void *src;                  /**< Source address for this message. */
+
+    /**
+     * @brief   Source address for this message.
+     *
+     * @details Can be NULL for sending
+     */
+    void *src;
+
+    /**
+     * @brief Length of netapi_rcv_pkt_t::src.
+     *
+     * @details Can be 0 for sending
+     */
     /* cppcheck-suppress unusedStructMember because interface is not used yet */
-    size_t src_len;             /**< Length of netapi_rcv_pkt_t::src. */
+    size_t src_len;
     void *dest;                 /**< Destination address for this message. */
     /* cppcheck-suppress unusedStructMember because interface is not used yet */
     size_t dest_len;            /**< Length of netapi_rcv_pkt_t::dest. */
-    void *data;                 /**< Data of the packet. */
-    /* cppcheck-suppress unusedStructMember because interface is not used yet */
-    size_t data_len;            /**< Buffer length of netapi_rcv_pkt_t::data
-                                 *   (set to maximum available space when sending
-                                 *   to control thread, the control thread
-                                 *   **must** check this). */
-} netapi_rcv_pkt_t;
-
-/**
- * @brief   Command definition for sending packets.
- * @extends netapi_cmd_t
- *
- * @details The netapi_snd_pkt_t::ulh will be prepended
- *          to the data stream on the lowest level (usually
- *          by the driver, but adaption layers as 6LoWPAN might
- *          also prepend headers).
- */
-typedef struct {
-    /* cppcheck-suppress unusedStructMember because interface is not used yet */
-    netapi_cmd_type_t type;     /**< Type of the command. Must be NETAPI_CMD_SND. */
-    netapi_ack_t *ack;          /**< Pointer to where the acknowledgement to this
-                                 *   message is stored. Must not be NULL. */
-    netdev_hlist_t *ulh;        /**< Headers of upper layers; lowest first, highest last.
-                                 *   May be NULL if none exist. */
-    void *dest;                 /**< Destination address for this message. */
-    /* cppcheck-suppress unusedStructMember because interface is not used yet */
-    size_t dest_len;            /**< Length of netapi_snd_pkt_t::dest. */
-    /**
-     * @brief Data of the packet (without upper layer headers).
-     *
-     * @see netapi_snd_pkt_t::upper_layer_hdrs
-     */
-    void *data;
-    /* cppcheck-suppress unusedStructMember because interface is not used yet */
-    size_t data_len;            /**< Length of netapi_snd_pkt_t::data. */
-} netapi_snd_pkt_t;
+    pkt_t *pkt;                 /**< Data of the packet. */
+} netapi_pkt_t;
 
 /**
  * @brief   Command definition for getting and setting packets.
@@ -356,59 +335,26 @@ int netapi_send_command(kernel_pid_t pid, netapi_cmd_t *cmd);
  *
  * @note    Wraps IPC call of NETAPI_CMD_SND.
  *
- * @details The upper layer information will be prepended
- *          on the lowest possible level.
+ * @details The upper layer information of *pkt* must be prepended on the
+ *          lowest possible level.
  *
  * @param[in] pid       The PID of the protocol's control thread.
- * @param[in] upper_layer_hdrs  Headers of upper layer protocols, lowest layer
- *                      first, highest layer last.
- * @param[in] addr      The address you want the data send to. If the control
+ * @param[in] dest      The address you want the data send to. If the control
  *                      thread knows for some reason where to send the data
- *                      (e.g. a connected TCP socket), *addr* may be NULL.
- * @param[in] addr_len  Length of *addr*. If the control thread knows for some
+ *                      (e.g. a connected TCP socket), *dest* may be NULL.
+ * @param[in] dest_len  Length of *dest*. If the control thread knows for some
  *                      reason where to send the data (e.g. a connected TCP
- *                      socket), *addr_len* may be 0.
- * @param[in] data      The data you want to send over the protocol layer
- *                      controled by *pid* (without upper layer protocol
- *                      information).
- * @param[in] data_len  Length of *data_len*.
- *
- * @see netapi_snd_pkt_t
- *
- * @return  result of the acknowledgement.
- * @return  -ENOMSG if wrong acknowledgement was received or was no
- *          acknowledgement at all.
- */
-int netapi_send_packet(kernel_pid_t pid, netdev_hlist_t *upper_layer_hdrs,
-                       void *addr, size_t addr_len, void *data,
-                       size_t data_len);
-
-/**
- * @brief Sends data over a protocol layer identified by *pid*.
- *
- * @note    Wraps IPC call of NETAPI_CMD_SND with `netapi_snd_pkt_t::ulh == NULL`.
- *
- * @param[in] pid       The PID of the protocol's control thread.
- * @param[in] addr      The address you want the data send to. If the control
- *                      thread knows for some reason where to send the data
- *                      (e.g. a connected TCP socket), *addr* may be NULL.
- * @param[in] addr_len  Length of *addr*. If the control thread knows for some
- *                      reason where to send the data (e.g. a connected TCP
- *                      socket), *addr_len* may be 0.
- * @param[in] data      The data you want to send over the protocol layer
+ *                      socket), *dest_len* may be 0.
+ * @param[in] pkt       The packet you want to send over the protocol layer
  *                      controled by *pid*.
- * @param[in] data_len  Length of *data_len*.
+ *
+ * @see netapi_pkt_t
  *
  * @return  result of the acknowledgement.
  * @return  -ENOMSG if wrong acknowledgement was received or was no
  *          acknowledgement at all.
  */
-static inline int netapi_send_payload(kernel_pid_t pid, void *addr,
-                                      size_t addr_len, void *data,
-                                      size_t data_len)
-{
-    return netapi_send_packet(pid, NULL, addr, addr_len, data, data_len);
-}
+int netapi_send_packet(kernel_pid_t pid, void *dest, size_t dest_len, pkt_t *pkt);
 
 /**
  * @brief Get an option of a protocol layer identified by *pid*.
@@ -524,16 +470,14 @@ static inline int netapi_unregister_current_thread(kernel_pid_t pid)
  * @param[in] src_len       Length of *src*.
  * @param[in] dest          Destination address of the received packet.
  * @param[in] dest_len      Length of *dest*.
- * @param[in] data          Content of the received packet.
- * @param[in] data_len      Length of *data*.
+ * @param[in] pkt           The received packet.
  *
  * @return  result of the acknowledgement.
  * @return  -ENOMSG if wrong acknowledgement was received or was no
  *          acknowledgement at all.
  */
 int netapi_fire_receive_event(kernel_pid_t pid, void *src, size_t src_len,
-                              void *dest, size_t dest_len, void *data,
-                              size_t data_len);
+                              void *dest, size_t dest_len, pkt_t *pkt);
 #endif /* MODULE_NETDEV_DUMMY */
 #endif /* MODULE_NETAPI */
 
