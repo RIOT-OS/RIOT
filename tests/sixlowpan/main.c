@@ -26,6 +26,7 @@
 
 #include "byteorder.h"
 #include "ipv6.h"
+#include "pkt.h"
 #include "pktbuf.h"
 #include "netapi.h"
 #include "sixlowpan.h"
@@ -40,9 +41,9 @@ static uint32_t test_nalp_received(void)
     uint16_t dest = 0xabcd;
     /* NALP (not a LoWPAN frame): any frame starting with 2 MSB = 0 */
     uint8_t data[] = {(uint8_t)(RANDOM_BYTE & (~((uint8_t)0xc0))), RANDOM_BYTE};
-    netapi_rcv_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
-                             &dest, sizeof(uint16_t), data, sizeof(data)
-                           };
+    pkt_t pkt = { NULL, data, sizeof(data), PKT_PROTO_UNKNOWN };
+    netapi_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
+                         &dest, sizeof(uint16_t), &pkt };
 
     res = netapi_send_command(sixlowpan_test_sixlowpan_pid, (netapi_cmd_t *)&rcv);
 
@@ -59,9 +60,9 @@ static uint32_t test_unsupported_address_family_uncompressed_received(void)
     uint32_t src = 0x01234567;
     uint16_t dest = 0xabcd;
     uint8_t data[] = {SIXLOWPAN_IPV6_DISPATCH, RANDOM_BYTE};
-    netapi_rcv_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint32_t),
-                             &dest, sizeof(uint16_t), data, sizeof(data)
-                           };
+    pkt_t pkt = { NULL, data, sizeof(data), PKT_PROTO_UNKNOWN };
+    netapi_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
+                         &dest, sizeof(uint16_t), &pkt };
 
     res = netapi_send_command(sixlowpan_test_sixlowpan_pid, (netapi_cmd_t *)&rcv);
 
@@ -78,12 +79,12 @@ static uint32_t test_uncompressed_unfragmented_received(void)
     uint16_t src = 0xcccc;
     uint16_t dest = 0xabcd;
     uint8_t data[] = {SIXLOWPAN_IPV6_DISPATCH, RANDOM_BYTE};
-    netapi_rcv_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
-                             &dest, sizeof(uint16_t), data, sizeof(data)
-                           };
-    sixlowpan_test_exp_rcv_t exp = { &src, sizeof(uint16_t), &dest, sizeof(uint16_t),
-                                     &(data[1]), 1
-                                   };
+    pkt_t pkt = { NULL, data, sizeof(data), PKT_PROTO_UNKNOWN };
+    netapi_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
+                         &dest, sizeof(uint16_t), &pkt };
+    sixlowpan_test_exp_t exp = { &src, sizeof(uint16_t), &dest, sizeof(uint16_t),
+                                 { NULL, &(data[1]), sizeof(data) - 1,
+                                   PKT_PROTO_UNKNOWN } };
 
     res = sixlowpan_test_receiver_test(&rcv, 1, &exp, 1);
 
@@ -100,9 +101,9 @@ static uint32_t test_unsupported_address_family_fragment_received(void)
     uint32_t src = 0x01234567;
     uint16_t dest = 0xabcd;
     uint8_t data[] = {0, 0, 0, 0, SIXLOWPAN_IPV6_DISPATCH, RANDOM_BYTE};
-    netapi_rcv_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint32_t),
-                             &dest, sizeof(uint16_t), data, sizeof(data)
-                           };
+    pkt_t pkt = { NULL, data, sizeof(data), PKT_PROTO_UNKNOWN };
+    netapi_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
+                         &dest, sizeof(uint16_t), &pkt };
 
     sixlowpan_init_frag1_dispatch(data, 2, 1);
 
@@ -121,12 +122,11 @@ static uint32_t test_first_fragment_received(void)
     uint16_t src = 0xcccc;
     uint16_t dest = 0xabcd;
     uint8_t data[] = {0, 0, 0, 0, SIXLOWPAN_IPV6_DISPATCH, 0x70};
-    netapi_rcv_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
-                             &dest, sizeof(uint16_t), data, sizeof(data)
-                           };
-    sixlowpan_test_exp_rcv_t exp = { &src, sizeof(uint16_t), &dest, sizeof(uint16_t),
-                                     &(data[5]), 1
-                                   };
+    pkt_t pkt = { NULL, data, sizeof(data), PKT_PROTO_UNKNOWN };
+    netapi_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
+                         &dest, sizeof(uint16_t), &pkt };
+    sixlowpan_test_exp_t exp = { &src, sizeof(uint16_t), &dest, sizeof(uint16_t),
+                                 { NULL, &(data[5]), sizeof(data) - 5, PKT_PROTO_UNKNOWN } };
 
     sixlowpan_init_frag1_dispatch(data, 2, 1);
 
@@ -145,10 +145,12 @@ static uint32_t test_more_fragments_first_not_8_byte_grouped_received(void)
     uint16_t src = 0xcccc;
     uint16_t dest = 0xabcd;
     uint8_t data1[] = {0, 0, 0, 0, SIXLOWPAN_IPV6_DISPATCH, RANDOM_BYTE, 0x01, 0x02, 0x03, 0x04, 0x05};
+    pkt_t pkt1 = { NULL, data1, sizeof(data1), PKT_PROTO_UNKNOWN };
 
     sixlowpan_init_frag1_dispatch(data1, sizeof(data1) + 5, 1);
 
-    netapi_rcv_pkt_t rcv1 = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t), &dest, sizeof(uint16_t), data1, sizeof(data1) };
+    netapi_pkt_t rcv1 = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t), &dest,
+                          sizeof(uint16_t), &pkt1 };
 
     res = netapi_send_command(sixlowpan_test_sixlowpan_pid, (netapi_cmd_t *)&rcv1);
 
@@ -167,6 +169,8 @@ static uint32_t test_2_fragments_received_ordered(void)
     uint8_t data1[] = {0, 0, 0, 0, SIXLOWPAN_IPV6_DISPATCH, RANDOM_BYTE, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06};
     uint8_t data2[] = {0, 0, 0, 0, 0, 0x07, 0x08, 0x09, 0x10, 0x0a, 0x0b, 0x0c, 0x0d};
     uint8_t data_exp[15];
+    pkt_t pkt1 = { NULL, data1, sizeof(data1), PKT_PROTO_UNKNOWN };
+    pkt_t pkt2 = { NULL, data2, sizeof(data2), PKT_PROTO_UNKNOWN };
 
     sixlowpan_init_frag1_dispatch(data1, 16, 1);
     sixlowpan_init_fragn_dispatch(data2, 16, 1, 1);
@@ -174,14 +178,13 @@ static uint32_t test_2_fragments_received_ordered(void)
     memcpy(data_exp, &(data1[5]), 7);
     memcpy(&(data_exp[7]), &(data2[5]), 8);
 
-    netapi_rcv_pkt_t rcv[] = {
-        { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t), &dest, sizeof(uint64_t), data1, sizeof(data1) },
-        { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t), &dest, sizeof(uint64_t), data2, sizeof(data2) },
+    netapi_pkt_t rcv[] = {
+        { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t), &dest, sizeof(uint64_t), &pkt1 },
+        { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t), &dest, sizeof(uint64_t), &pkt2 },
     };
 
-    sixlowpan_test_exp_rcv_t exp = { &src, sizeof(uint16_t), &dest, sizeof(uint64_t),
-                                     data_exp, 15
-                                   };
+    sixlowpan_test_exp_t exp = { &src, sizeof(uint16_t), &dest, sizeof(uint64_t),
+                                 { NULL, data_exp, sizeof(data_exp), PKT_PROTO_UNKNOWN } };
 
     res = sixlowpan_test_receiver_test(rcv, 2, &exp, 1);
 
@@ -200,6 +203,8 @@ static uint32_t test_2_fragments_received_unordered(void)
     uint8_t data1[] = {0, 0, 0, 0, SIXLOWPAN_IPV6_DISPATCH, RANDOM_BYTE, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06};
     uint8_t data2[] = {0, 0, 0, 0, 0, 0x07, 0x08, 0x09, 0x10, 0x0a, 0x0b, 0x0c, 0x0d};
     uint8_t data_exp[15];
+    pkt_t pkt1 = { NULL, data1, sizeof(data1), PKT_PROTO_UNKNOWN };
+    pkt_t pkt2 = { NULL, data2, sizeof(data2), PKT_PROTO_UNKNOWN };
 
     sixlowpan_init_frag1_dispatch(data1, 16, 1);
     sixlowpan_init_fragn_dispatch(data2, 16, 1, 1);
@@ -207,14 +212,13 @@ static uint32_t test_2_fragments_received_unordered(void)
     memcpy(data_exp, &(data1[5]), 7);
     memcpy(&(data_exp[7]), &(data2[5]), 8);
 
-    netapi_rcv_pkt_t rcv[] = {
-        { NETAPI_CMD_RCV, NULL, &src, sizeof(uint64_t), &dest, sizeof(uint16_t), data2, sizeof(data2) },
-        { NETAPI_CMD_RCV, NULL, &src, sizeof(uint64_t), &dest, sizeof(uint16_t), data1, sizeof(data1) },
+    netapi_pkt_t rcv[] = {
+        { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t), &dest, sizeof(uint64_t), &pkt2 },
+        { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t), &dest, sizeof(uint64_t), &pkt1 },
     };
 
-    sixlowpan_test_exp_rcv_t exp = { &src, sizeof(uint64_t), &dest, sizeof(uint16_t),
-                                     data_exp, 15
-                                   };
+    sixlowpan_test_exp_t exp = { &src, sizeof(uint16_t), &dest, sizeof(uint64_t),
+                                 { NULL, data_exp, sizeof(data_exp), PKT_PROTO_UNKNOWN } };
 
     res = sixlowpan_test_receiver_test(rcv, 2, &exp, 1);
 
@@ -233,6 +237,8 @@ static uint32_t test_2_fragments_received_ordered_last_not_full(void)
     uint8_t data1[] = {0, 0, 0, 0, SIXLOWPAN_IPV6_DISPATCH, RANDOM_BYTE, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06};
     uint8_t data2[] = {0, 0, 0, 0, 0, 0x07, 0x08, 0x09, 0x10, 0x0a};
     uint8_t data_exp[16];
+    pkt_t pkt1 = { NULL, data1, sizeof(data1), PKT_PROTO_UNKNOWN };
+    pkt_t pkt2 = { NULL, data2, sizeof(data2), PKT_PROTO_UNKNOWN };
 
     sixlowpan_init_frag1_dispatch(data1, 13, 1);
     sixlowpan_init_fragn_dispatch(data2, 13, 1, 1);
@@ -240,14 +246,13 @@ static uint32_t test_2_fragments_received_ordered_last_not_full(void)
     memcpy(data_exp, &(data1[5]), 7);
     memcpy(&(data_exp[7]), &(data2[5]), 5);
 
-    netapi_rcv_pkt_t rcv[] = {
-        { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t), &dest, sizeof(uint16_t), data1, sizeof(data1) },
-        { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t), &dest, sizeof(uint16_t), data2, sizeof(data2) },
+    netapi_pkt_t rcv[] = {
+        { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t), &dest, sizeof(uint64_t), &pkt2 },
+        { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t), &dest, sizeof(uint64_t), &pkt1 },
     };
 
-    sixlowpan_test_exp_rcv_t exp = { &src, sizeof(uint16_t), &dest, sizeof(uint16_t),
-                                     data_exp, 12
-                                   };
+    sixlowpan_test_exp_t exp = { &src, sizeof(uint16_t), &dest, sizeof(uint64_t),
+                                 { NULL, data_exp, sizeof(data_exp), PKT_PROTO_UNKNOWN } };
 
     res = sixlowpan_test_receiver_test(rcv, 2, &exp, 1);
 
@@ -265,12 +270,14 @@ static uint32_t test_more_fragments_nth_not_8_byte_grouped_received(void)
     uint16_t dest = 0xabcd;
     uint8_t data1[] = {0, 0, 0, 0, SIXLOWPAN_IPV6_DISPATCH, RANDOM_BYTE, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06};
     uint8_t data2[] = {0, 0, 0, 0, 0, 0x07, 0x08, 0x09, 0x10, 0x0a, 0x0b, 0x0c};
+    pkt_t pkt1 = { NULL, data1, sizeof(data1), PKT_PROTO_UNKNOWN };
+    pkt_t pkt2 = { NULL, data2, sizeof(data2), PKT_PROTO_UNKNOWN };
 
     sixlowpan_init_frag1_dispatch(data1, sizeof(data1) + sizeof(data2) + 3, 1);
     sixlowpan_init_fragn_dispatch(data2, sizeof(data1) + sizeof(data2) + 3, 1, 1);
 
-    netapi_rcv_pkt_t rcv1 = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t), &dest, sizeof(uint16_t), data1, sizeof(data1) };
-    netapi_rcv_pkt_t rcv2 = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t), &dest, sizeof(uint16_t), data2, sizeof(data2) };
+    netapi_pkt_t rcv1 = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t), &dest, sizeof(uint16_t), &pkt1 };
+    netapi_pkt_t rcv2 = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t), &dest, sizeof(uint16_t), &pkt2 };
 
     res = netapi_send_command(sixlowpan_test_sixlowpan_pid, (netapi_cmd_t *)&rcv1);
 
@@ -301,7 +308,7 @@ static uint32_t test_3_fragments_received_ordered(void)
     memcpy(&(data_exp[7]), &(data2[5]), 8);
     memcpy(&(data_exp[15]), &(data3[5]), 8);
 
-    netapi_rcv_pkt_t rcv[] = {
+    netapi_pkt_t rcv[] = {
         { NETAPI_CMD_RCV, NULL, &src, sizeof(uint64_t), &dest, sizeof(uint64_t), data1, sizeof(data1) },
         { NETAPI_CMD_RCV, NULL, &src, sizeof(uint64_t), &dest, sizeof(uint64_t), data2, sizeof(data2) },
         { NETAPI_CMD_RCV, NULL, &src, sizeof(uint64_t), &dest, sizeof(uint64_t), data3, sizeof(data3) },
@@ -338,7 +345,7 @@ static uint32_t test_3_fragments_received_last_2_unordered(void)
     memcpy(&(data_exp[7]), &(data2[5]), 8);
     memcpy(&(data_exp[15]), &(data3[5]), 8);
 
-    netapi_rcv_pkt_t rcv[] = {
+    netapi_pkt_t rcv[] = {
         { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t), &dest, sizeof(uint16_t), data1, sizeof(data1) },
         { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t), &dest, sizeof(uint16_t), data3, sizeof(data3) },
         { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t), &dest, sizeof(uint16_t), data2, sizeof(data2) },
@@ -379,7 +386,7 @@ static uint32_t test_4_fragments_received_2_datagrams_unordered(void)
     memcpy(&(data_exp1[7]), &(data3[5]), 8);
     memcpy(&(data_exp2[8]), &(data4[5]), 8);
 
-    netapi_rcv_pkt_t rcv[] = {
+    netapi_pkt_t rcv[] = {
         { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t), &dest, sizeof(uint16_t), data1, sizeof(data1) },
         { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t), &dest, sizeof(uint16_t), data2, sizeof(data2) },
         { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t), &dest, sizeof(uint16_t), data3, sizeof(data3) },
@@ -405,7 +412,7 @@ static uint32_t test_unsupported_address_family_send(void)
     int res;
     uint32_t dest = 0xabcdcdef;
     uint8_t data[] = {RANDOM_BYTE};
-    netapi_snd_pkt_t snd = { NETAPI_CMD_SND, NULL, NULL, &dest, sizeof(uint32_t),
+    netapi_pkt_t snd = { NETAPI_CMD_SND, NULL, NULL, &dest, sizeof(uint32_t),
                              data, sizeof(data)
                            };
 
@@ -424,8 +431,8 @@ static uint32_t test_uncompressed_unfragmented_send(void)
     uint16_t dest = 0xabcd;
     uint8_t data[] = { RANDOM_BYTE };
     uint8_t dispatch[] = { SIXLOWPAN_IPV6_DISPATCH };
-    netdev_hlist_t ulh = { NULL, NULL, NETDEV_PROTO_6LOWPAN, dispatch, sizeof(dispatch) };
-    netapi_snd_pkt_t snd = { NETAPI_CMD_SND, NULL, NULL, &dest, sizeof(uint16_t),
+    pkt_hlist_t ulh = { NULL, NULL, NETDEV_PROTO_6LOWPAN, dispatch, sizeof(dispatch) };
+    netapi_pkt_t snd = { NETAPI_CMD_SND, NULL, NULL, &dest, sizeof(uint16_t),
                              data, sizeof(data)
                            };
     sixlowpan_test_exp_snd_t exp = { &ulh, &dest, sizeof(uint16_t), data, sizeof(data) };
@@ -460,9 +467,9 @@ static uint32_t test_2_fragments_send(void)
                   "abcdefghijklmnopqrstuvwxyz0123456789";            /* A == SIXLOWPAN_IPV6_DISPATCH */
     /* cppcheck-suppress variableScope that would make it even more uglier */
     char data2[] = "\xe0\x91\0\0\x0fmnopqrstuvwxyz0123456789";       /* 0xe0: FragN dispatch */
-                                                                     /* 0x0f (15): datagram offset / 8 */
+    /* 0x0f (15): datagram offset / 8 */
 
-    netapi_snd_pkt_t snd = { NETAPI_CMD_SND, NULL, NULL, &dest, sizeof(uint16_t),
+    netapi_pkt_t snd = { NETAPI_CMD_SND, NULL, NULL, &dest, sizeof(uint16_t),
                              &(data[5]), sizeof(data) - 5
                            };
     sixlowpan_test_exp_snd_t exp[] = {
@@ -505,9 +512,10 @@ static uint32_t test_3_fragments_send(void)
                    "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
                    "ABCDEFGHIJKLMNOPQRSTUVWX";
     /* cppcheck-suppress variableScope that would make it even more uglier */
-    char data3[] = "\xe0\xfd\0\0\x1eYZ0123456789";                   /* 0x1e (30): datagram offset / 8 */
+    char data3[] =
+        "\xe0\xfd\0\0\x1eYZ0123456789";                   /* 0x1e (30): datagram offset / 8 */
 
-    netapi_snd_pkt_t snd = { NETAPI_CMD_SND, NULL, NULL, &dest, sizeof(uint16_t),
+    netapi_pkt_t snd = { NETAPI_CMD_SND, NULL, NULL, &dest, sizeof(uint16_t),
                              &(data[5]), sizeof(data) - 5
                            };
     sixlowpan_test_exp_snd_t exp[] = {
@@ -542,7 +550,7 @@ static uint32_t test_big_header_send(void)
                          "abcdefghijklmnopqrstuvwxyz0123456789"
                          "abcdefghijklmnopqrstuvwxyz0123456789"
                          "abcdefghijklmno";
-    netdev_hlist_t hlist = { NULL, NULL, NETDEV_PROTO_UNKNOWN, header_data, sizeof(header_data) };
+    pkt_hlist_t hlist = { NULL, NULL, NETDEV_PROTO_UNKNOWN, header_data, sizeof(header_data) };
     char data[] = "pqrstuvwxyz012345678";
     /* cppcheck-suppress variableScope that would make it even more uglier */
     char exp_data1[] = "\xc0\x91\0\0Amcdefbhijklgnopqrstuvwxyz0123456789" /* 0xc0: Frag1 dispatch */
@@ -550,7 +558,7 @@ static uint32_t test_big_header_send(void)
                        "abcdefghijklmnopqrstuvwxyz0123456789abcdefghijkl";    /* \0\0 (0): 16-bit datagram tag */
     /* cppcheck-suppress variableScope that would make it even more uglier */
     char exp_data2[] = "\xe0\x91\0\0\x0fmno\0pqrstuvwxyz012345678";       /* 0xe0: FragN dispatch */
-                                                                          /* 0x0f (15): datagram offset / 8 */
+    /* 0x0f (15): datagram offset / 8 */
     hlist.next = &hlist;
     hlist.prev = &hlist;
 
@@ -563,7 +571,7 @@ static uint32_t test_big_header_send(void)
 
 #endif
 
-    netapi_snd_pkt_t snd = { NETAPI_CMD_SND, NULL, &hlist, &dest, sizeof(uint16_t),
+    netapi_pkt_t snd = { NETAPI_CMD_SND, NULL, &hlist, &dest, sizeof(uint16_t),
                              data, sizeof(data)
                            };
     sixlowpan_test_exp_snd_t exp[] = {
@@ -588,8 +596,8 @@ static uint32_t test_2_big_headers_send(void)
                           "abcdefghijklmnopqrstuvwxyz0123456789"
                           "abcdefghijklmnopqrstuvwxyz0123456789"
                           "abcdefghijklmnopqrstuvwxyz0123456789";
-    netdev_hlist_t hlist1 = { NULL, NULL, NETDEV_PROTO_UNKNOWN, header_data1, sizeof(header_data1) };
-    netdev_hlist_t hlist2 = { NULL, NULL, NETDEV_PROTO_UNKNOWN, header_data1, sizeof(header_data1) };
+    pkt_hlist_t hlist1 = { NULL, NULL, NETDEV_PROTO_UNKNOWN, header_data1, sizeof(header_data1) };
+    pkt_hlist_t hlist2 = { NULL, NULL, NETDEV_PROTO_UNKNOWN, header_data1, sizeof(header_data1) };
     char data[] = "abcdefghi";
     /* cppcheck-suppress variableScope that would make it even more uglier */
     char exp_data1[] = "\xc1\x2d\0\0Aabcdefghijklgnopqrstuvwxyz0123456789" /* 0xc0: Frag1 dispatch */
@@ -601,15 +609,16 @@ static uint32_t test_2_big_headers_send(void)
                        "abcdefghijklmnopqrstuvwxyz0123456789"
                        "abcdefghijklmnopqrstuv";
     /* cppcheck-suppress variableScope that would make it even more uglier */
-    char exp_data3[] = "\xe1\x2d\0\0\x1ewxyz0123456789"                    /* 0x1e (30): datagram_offset / 8 */
-                       "abcdefghijklmnopqrstuvwxyz0123456789\0abcdefghi";
+    char exp_data3[] =
+        "\xe1\x2d\0\0\x1ewxyz0123456789"                    /* 0x1e (30): datagram_offset / 8 */
+        "abcdefghijklmnopqrstuvwxyz0123456789\0abcdefghi";
 
     hlist1.next = &hlist2;
     hlist1.prev = &hlist2;
     hlist2.next = &hlist1;
     hlist2.prev = &hlist1;
 
-    netapi_snd_pkt_t snd = { NETAPI_CMD_SND, NULL, &hlist1, &dest, sizeof(uint16_t),
+    netapi_pkt_t snd = { NETAPI_CMD_SND, NULL, &hlist1, &dest, sizeof(uint16_t),
                              data, sizeof(data)
                            };
     sixlowpan_test_exp_snd_t exp[] = {
@@ -643,7 +652,7 @@ static uint32_t test_compressed_too_short_dispatch(void)
     uint16_t src = 0xcccc;
     uint16_t dest = 0xabcd;
     uint8_t data[] = { SIXLOWPAN_IPHC1_DISPATCH };
-    netapi_rcv_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
+    netapi_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
                              &dest, sizeof(uint16_t), data, sizeof(data)
                            };
 
@@ -668,7 +677,7 @@ static uint32_t test_compressed_all_zero_received(void)
                        0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20
                      };
     ipv6_hdr_t data_exp;
-    netapi_rcv_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
+    netapi_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
                              &dest, sizeof(uint16_t), data, sizeof(data)
                            };
     sixlowpan_test_exp_rcv_t exp = { &src, sizeof(uint16_t), &dest, sizeof(uint16_t),
@@ -708,7 +717,7 @@ static uint32_t test_compressed_dscp_elided_received(void)
                        0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20
                      };
     ipv6_hdr_t data_exp;
-    netapi_rcv_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
+    netapi_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
                              &dest, sizeof(uint16_t), data, sizeof(data)
                            };
     sixlowpan_test_exp_rcv_t exp = { &src, sizeof(uint16_t), &dest, sizeof(uint16_t),
@@ -748,7 +757,7 @@ static uint32_t test_compressed_fl_elided_received(void)
                        0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20
                      };
     ipv6_hdr_t data_exp;
-    netapi_rcv_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
+    netapi_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
                              &dest, sizeof(uint16_t), data, sizeof(data)
                            };
     sixlowpan_test_exp_rcv_t exp = { &src, sizeof(uint16_t), &dest, sizeof(uint16_t),
@@ -788,7 +797,7 @@ static uint32_t test_compressed_tc_fl_elided_received(void)
                        0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20
                      };
     ipv6_hdr_t data_exp;
-    netapi_rcv_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
+    netapi_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
                              &dest, sizeof(uint16_t), data, sizeof(data)
                            };
     sixlowpan_test_exp_rcv_t exp = { &src, sizeof(uint16_t), &dest, sizeof(uint16_t),
@@ -827,7 +836,7 @@ static uint32_t test_compressed_tf_elided_hl_1_received(void)
                        0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20
                      };
     ipv6_hdr_t data_exp;
-    netapi_rcv_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
+    netapi_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
                              &dest, sizeof(uint16_t), data, sizeof(data)
                            };
     sixlowpan_test_exp_rcv_t exp = { &src, sizeof(uint16_t), &dest, sizeof(uint16_t),
@@ -866,7 +875,7 @@ static uint32_t test_compressed_tf_elided_hl_64_received(void)
                        0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20
                      };
     ipv6_hdr_t data_exp;
-    netapi_rcv_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
+    netapi_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
                              &dest, sizeof(uint16_t), data, sizeof(data)
                            };
     sixlowpan_test_exp_rcv_t exp = { &src, sizeof(uint16_t), &dest, sizeof(uint16_t),
@@ -905,7 +914,7 @@ static uint32_t test_compressed_tf_elided_hl_255_received(void)
                        0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20
                      };
     ipv6_hdr_t data_exp;
-    netapi_rcv_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
+    netapi_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
                              &dest, sizeof(uint16_t), data, sizeof(data)
                            };
     sixlowpan_test_exp_rcv_t exp = { &src, sizeof(uint16_t), &dest, sizeof(uint16_t),
@@ -945,7 +954,7 @@ static uint32_t test_compressed_iphc1_set_cid_ext_received(void)
                        0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20
                      };
     ipv6_hdr_t data_exp;
-    netapi_rcv_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
+    netapi_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
                              &dest, sizeof(uint16_t), data, sizeof(data)
                            };
     sixlowpan_test_exp_rcv_t exp = { &src, sizeof(uint16_t), &dest, sizeof(uint16_t),
@@ -979,7 +988,7 @@ static uint32_t test_compressed_iphc1_set_sam_sac_set_received_no_ctx(void)
     uint16_t dest = 0xabcd;
     /* TODO: we leave out NHC out for now => 0x1b instead of 0x1f */
     uint8_t data[] = { SIXLOWPAN_IPHC1_DISPATCH | 0x1b, 0x50 };
-    netapi_rcv_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
+    netapi_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
                              &dest, sizeof(uint16_t), data, sizeof(data)
                            };
 
@@ -1004,7 +1013,7 @@ static uint32_t test_compressed_iphc1_set_sam_sac_1_received(void)
                        0x1c, 0x1d, 0x1e, 0x1f, 0x20
                      };
     ipv6_hdr_t data_exp;
-    netapi_rcv_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
+    netapi_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
                              &dest, sizeof(uint16_t), data, sizeof(data)
                            };
     sixlowpan_test_exp_rcv_t exp = { &src, sizeof(uint16_t), &dest, sizeof(uint16_t),
@@ -1042,7 +1051,7 @@ static uint32_t test_compressed_iphc1_set_sam_sac_2_received(void)
                        0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20
                      };
     ipv6_hdr_t data_exp;
-    netapi_rcv_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
+    netapi_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
                              &dest, sizeof(uint16_t), data, sizeof(data)
                            };
     sixlowpan_test_exp_rcv_t exp = { &src, sizeof(uint16_t), &dest, sizeof(uint16_t),
@@ -1080,7 +1089,7 @@ static uint32_t test_compressed_iphc1_set_sam_sac_3_received(void)
                        0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20
                      };
     ipv6_hdr_t data_exp;
-    netapi_rcv_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
+    netapi_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
                              &dest, sizeof(uint16_t), data, sizeof(data)
                            };
     sixlowpan_test_exp_rcv_t exp = { &src, sizeof(uint16_t), &dest, sizeof(uint16_t),
@@ -1118,7 +1127,7 @@ static uint32_t test_compressed_iphc1_set_sam_sac_4_received(void)
                        0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20
                      };
     ipv6_hdr_t data_exp;
-    netapi_rcv_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
+    netapi_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
                              &dest, sizeof(uint16_t), data, sizeof(data)
                            };
     sixlowpan_test_exp_rcv_t exp = { &src, sizeof(uint16_t), &dest, sizeof(uint16_t),
@@ -1157,7 +1166,7 @@ static uint32_t test_compressed_iphc1_set_sam_sac_5_received(void)
                        0x1c, 0x1d, 0x1e, 0x1f, 0x20
                      };
     ipv6_hdr_t data_exp;
-    netapi_rcv_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
+    netapi_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
                              &dest, sizeof(uint16_t), data, sizeof(data)
                            };
     sixlowpan_test_exp_rcv_t exp = { &src, sizeof(uint16_t), &dest, sizeof(uint16_t),
@@ -1197,7 +1206,7 @@ static uint32_t test_compressed_iphc1_set_sam_sac_6_received(void)
                        0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20
                      };
     ipv6_hdr_t data_exp;
-    netapi_rcv_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
+    netapi_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
                              &dest, sizeof(uint16_t), data, sizeof(data)
                            };
     sixlowpan_test_exp_rcv_t exp = { &src, sizeof(uint16_t), &dest, sizeof(uint16_t),
@@ -1237,7 +1246,7 @@ static uint32_t test_compressed_iphc1_set_sam_sac_7_received(void)
                        0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20
                      };
     ipv6_hdr_t data_exp;
-    netapi_rcv_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint64_t),
+    netapi_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint64_t),
                              &dest, sizeof(uint16_t), data, sizeof(data)
                            };
     sixlowpan_test_exp_rcv_t exp = { &src, sizeof(uint64_t), &dest, sizeof(uint16_t),
@@ -1277,7 +1286,7 @@ static uint32_t test_compressed_iphc1_set_sam_sac_7_cid_ext_received(void)
                        0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20
                      };
     ipv6_hdr_t data_exp;
-    netapi_rcv_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
+    netapi_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
                              &dest, sizeof(uint16_t), data, sizeof(data)
                            };
     sixlowpan_test_exp_rcv_t exp = { &src, sizeof(uint16_t), &dest, sizeof(uint16_t),
@@ -1313,7 +1322,7 @@ static uint32_t test_compressed_iphc1_set_dam_dac_set_received_no_ctx(void)
     uint16_t dest = 0xabcd;
     /* TODO: we leave out NHC out for now => 0x1b instead of 0x1f */
     uint8_t data[] = { SIXLOWPAN_IPHC1_DISPATCH | 0x1b, 0x05 };
-    netapi_rcv_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
+    netapi_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
                              &dest, sizeof(uint16_t), data, sizeof(data)
                            };
 
@@ -1338,7 +1347,7 @@ static uint32_t test_compressed_iphc1_set_m_dam_dac_1_received(void)
                        0x24, 0x25, 0x26, 0x27, 0x28
                      };
     ipv6_hdr_t data_exp;
-    netapi_rcv_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
+    netapi_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
                              &dest, sizeof(uint16_t), data, sizeof(data)
                            };
     sixlowpan_test_exp_rcv_t exp = { &src, sizeof(uint16_t), &dest, sizeof(uint16_t),
@@ -1376,7 +1385,7 @@ static uint32_t test_compressed_iphc1_set_m_dam_dac_2_received(void)
                        0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20, 0xac, 0xdc
                      };
     ipv6_hdr_t data_exp;
-    netapi_rcv_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
+    netapi_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
                              &dest, sizeof(uint16_t), data, sizeof(data)
                            };
     sixlowpan_test_exp_rcv_t exp = { &src, sizeof(uint16_t), &dest, sizeof(uint16_t),
@@ -1414,7 +1423,7 @@ static uint32_t test_compressed_iphc1_set_m_dam_dac_3_received(void)
                        0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20
                      };
     ipv6_hdr_t data_exp;
-    netapi_rcv_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
+    netapi_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
                              &dest, sizeof(uint16_t), data, sizeof(data)
                            };
     sixlowpan_test_exp_rcv_t exp = { &src, sizeof(uint16_t), &dest, sizeof(uint16_t),
@@ -1448,7 +1457,7 @@ static uint32_t test_compressed_iphc1_set_m_dam_dac_4_received(void)
     uint16_t dest = 0xabcd;
     /* TODO: we leave out NHC out for now => 0x1b instead of 0x1f */
     uint8_t data[] = { SIXLOWPAN_IPHC1_DISPATCH | 0x1b, 0x04 };
-    netapi_rcv_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
+    netapi_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
                              &dest, sizeof(uint16_t), data, sizeof(data)
                            };
 
@@ -1473,7 +1482,7 @@ static uint32_t test_compressed_iphc1_set_m_dam_dac_5_received(void)
                        0x13, 0x14, 0x15, 0x00, 0x01
                      };
     ipv6_hdr_t data_exp;
-    netapi_rcv_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
+    netapi_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
                              &dest, sizeof(uint64_t), data, sizeof(data)
                            };
     sixlowpan_test_exp_rcv_t exp = { &src, sizeof(uint16_t), &dest, sizeof(uint64_t),
@@ -1513,7 +1522,7 @@ static uint32_t test_compressed_iphc1_set_m_dam_dac_6_received(void)
                        0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20, 0x14, 0x15
                      };
     ipv6_hdr_t data_exp;
-    netapi_rcv_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
+    netapi_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
                              &dest, sizeof(uint64_t), data, sizeof(data)
                            };
     sixlowpan_test_exp_rcv_t exp = { &src, sizeof(uint16_t), &dest, sizeof(uint64_t),
@@ -1553,7 +1562,7 @@ static uint32_t test_compressed_iphc1_set_m_dam_dac_7_received(void)
                        0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20
                      };
     ipv6_hdr_t data_exp;
-    netapi_rcv_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
+    netapi_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
                              &dest, sizeof(uint64_t), data, sizeof(data)
                            };
     sixlowpan_test_exp_rcv_t exp = { &src, sizeof(uint16_t), &dest, sizeof(uint64_t),
@@ -1593,7 +1602,7 @@ static uint32_t test_compressed_iphc1_set_m_dam_dac_7_cid_ext_received(void)
                        0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20
                      };
     ipv6_hdr_t data_exp;
-    netapi_rcv_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
+    netapi_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
                              &dest, sizeof(uint64_t), data, sizeof(data)
                            };
     sixlowpan_test_exp_rcv_t exp = { &src, sizeof(uint16_t), &dest, sizeof(uint64_t),
@@ -1635,7 +1644,7 @@ static uint32_t test_compressed_iphc1_set_m_dam_dac_8_received(void)
                        0x0c, 0x0d, 0x0e, 0x0f
                      };
     ipv6_hdr_t data_exp;
-    netapi_rcv_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
+    netapi_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
                              &dest, sizeof(uint16_t), data, sizeof(data)
                            };
     sixlowpan_test_exp_rcv_t exp = { &src, sizeof(uint16_t), &dest, sizeof(uint16_t),
@@ -1674,7 +1683,7 @@ static uint32_t test_compressed_iphc1_set_m_dam_dac_9_received(void)
                        0x44, 0x55, 0x66
                      };
     ipv6_hdr_t data_exp;
-    netapi_rcv_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
+    netapi_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
                              &dest, sizeof(uint16_t), data, sizeof(data)
                            };
     sixlowpan_test_exp_rcv_t exp = { &src, sizeof(uint16_t), &dest, sizeof(uint16_t),
@@ -1713,7 +1722,7 @@ static uint32_t test_compressed_iphc1_set_m_dam_dac_10_received(void)
                        0x00
                      };
     ipv6_hdr_t data_exp;
-    netapi_rcv_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
+    netapi_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
                              &dest, sizeof(uint16_t), data, sizeof(data)
                            };
     sixlowpan_test_exp_rcv_t exp = { &src, sizeof(uint16_t), &dest, sizeof(uint16_t),
@@ -1751,7 +1760,7 @@ static uint32_t test_compressed_iphc1_set_m_dam_dac_11_received(void)
                        0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20, 0xdc
                      };
     ipv6_hdr_t data_exp;
-    netapi_rcv_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
+    netapi_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
                              &dest, sizeof(uint16_t), data, sizeof(data)
                            };
     sixlowpan_test_exp_rcv_t exp = { &src, sizeof(uint16_t), &dest, sizeof(uint16_t),
@@ -1790,7 +1799,7 @@ static uint32_t test_compressed_iphc1_set_m_dam_dac_12_received(void)
                        0xcc, 0xbb, 0xaa
                      };
     ipv6_hdr_t data_exp;
-    netapi_rcv_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
+    netapi_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
                              &dest, sizeof(uint16_t), data, sizeof(data)
                            };
     sixlowpan_test_exp_rcv_t exp = { &src, sizeof(uint16_t), &dest, sizeof(uint16_t),
@@ -1826,7 +1835,7 @@ static uint32_t test_compressed_iphc1_set_m_dam_dac_13_received(void)
     uint16_t dest = 0xabcd;
     /* TODO: we leave out NHC out for now => 0x1b instead of 0x1f */
     uint8_t data[] = { SIXLOWPAN_IPHC1_DISPATCH | 0x1b, 0x0d };
-    netapi_rcv_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
+    netapi_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
                              &dest, sizeof(uint16_t), data, sizeof(data)
                            };
 
@@ -1848,7 +1857,7 @@ static uint32_t test_compressed_iphc1_set_m_dam_dac_14_received(void)
     uint16_t dest = 0xabcd;
     /* TODO: we leave out NHC out for now => 0x1b instead of 0x1f */
     uint8_t data[] = { SIXLOWPAN_IPHC1_DISPATCH | 0x1b, 0x0e };
-    netapi_rcv_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
+    netapi_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
                              &dest, sizeof(uint16_t), data, sizeof(data)
                            };
 
@@ -1870,7 +1879,7 @@ static uint32_t test_compressed_iphc1_set_m_dam_dac_15_received(void)
     uint16_t dest = 0xabcd;
     /* TODO: we leave out NHC out for now => 0x1b instead of 0x1f */
     uint8_t data[] = { SIXLOWPAN_IPHC1_DISPATCH | 0x1b, 0x0f };
-    netapi_rcv_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
+    netapi_pkt_t rcv = { NETAPI_CMD_RCV, NULL, &src, sizeof(uint16_t),
                              &dest, sizeof(uint16_t), data, sizeof(data)
                            };
 
@@ -1903,7 +1912,7 @@ static uint32_t test_2_compressed_fragments_received(void)
                            0x11, 0x12, 0x13, 0x14
                          };
 
-    netapi_rcv_pkt_t rcv[] = {
+    netapi_pkt_t rcv[] = {
         { NETAPI_CMD_RCV, NULL, &src, sizeof(uint64_t), &dest, sizeof(uint64_t), data1, sizeof(data1) },
         { NETAPI_CMD_RCV, NULL, &src, sizeof(uint64_t), &dest, sizeof(uint64_t), data2, sizeof(data2) },
     };
@@ -1947,9 +1956,9 @@ static uint32_t test_compressed_all_zero_send(void)
                            0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
                            0x20
                          };
-    netdev_hlist_t ulh = { NULL, NULL, NETDEV_PROTO_IPV6, &ipv6_hdr, sizeof(ipv6_hdr_t) };
-    netdev_hlist_t exp_ulh = { NULL, NULL, NETDEV_PROTO_6LOWPAN, dispatch, sizeof(dispatch) };
-    netapi_snd_pkt_t snd = { NETAPI_CMD_SND, NULL, &ulh, &dest, sizeof(uint16_t),
+    pkt_hlist_t ulh = { NULL, NULL, NETDEV_PROTO_IPV6, &ipv6_hdr, sizeof(ipv6_hdr_t) };
+    pkt_hlist_t exp_ulh = { NULL, NULL, NETDEV_PROTO_6LOWPAN, dispatch, sizeof(dispatch) };
+    netapi_pkt_t snd = { NETAPI_CMD_SND, NULL, &ulh, &dest, sizeof(uint16_t),
                              NULL, 0
                            };
     sixlowpan_test_exp_snd_t exp = { &exp_ulh, &dest, sizeof(uint16_t), NULL, 0 };
@@ -1997,9 +2006,9 @@ static uint32_t test_compressed_dscp_elided_send(void)
                            0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
                            0x20
                          };
-    netdev_hlist_t ulh = { NULL, NULL, NETDEV_PROTO_IPV6, &ipv6_hdr, sizeof(ipv6_hdr_t) };
-    netdev_hlist_t exp_ulh = { NULL, NULL, NETDEV_PROTO_6LOWPAN, dispatch, sizeof(dispatch) };
-    netapi_snd_pkt_t snd = { NETAPI_CMD_SND, NULL, &ulh, &dest, sizeof(uint16_t),
+    pkt_hlist_t ulh = { NULL, NULL, NETDEV_PROTO_IPV6, &ipv6_hdr, sizeof(ipv6_hdr_t) };
+    pkt_hlist_t exp_ulh = { NULL, NULL, NETDEV_PROTO_6LOWPAN, dispatch, sizeof(dispatch) };
+    netapi_pkt_t snd = { NETAPI_CMD_SND, NULL, &ulh, &dest, sizeof(uint16_t),
                              NULL, 0
                            };
     sixlowpan_test_exp_snd_t exp = { &exp_ulh, &dest, sizeof(uint16_t), NULL, 0 };
@@ -2047,9 +2056,9 @@ static uint32_t test_compressed_fl_elided_send(void)
                            0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
                            0x20
                          };
-    netdev_hlist_t ulh = { NULL, NULL, NETDEV_PROTO_IPV6, &ipv6_hdr, sizeof(ipv6_hdr_t) };
-    netdev_hlist_t exp_ulh = { NULL, NULL, NETDEV_PROTO_6LOWPAN, dispatch, sizeof(dispatch) };
-    netapi_snd_pkt_t snd = { NETAPI_CMD_SND, NULL, &ulh, &dest, sizeof(uint16_t),
+    pkt_hlist_t ulh = { NULL, NULL, NETDEV_PROTO_IPV6, &ipv6_hdr, sizeof(ipv6_hdr_t) };
+    pkt_hlist_t exp_ulh = { NULL, NULL, NETDEV_PROTO_6LOWPAN, dispatch, sizeof(dispatch) };
+    netapi_pkt_t snd = { NETAPI_CMD_SND, NULL, &ulh, &dest, sizeof(uint16_t),
                              NULL, 0
                            };
     sixlowpan_test_exp_snd_t exp = { &exp_ulh, &dest, sizeof(uint16_t), NULL, 0 };
@@ -2097,9 +2106,9 @@ static uint32_t test_compressed_tc_fl_elided_send(void)
                            0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
                            0x20
                          };
-    netdev_hlist_t ulh = { NULL, NULL, NETDEV_PROTO_IPV6, &ipv6_hdr, sizeof(ipv6_hdr_t) };
-    netdev_hlist_t exp_ulh = { NULL, NULL, NETDEV_PROTO_6LOWPAN, dispatch, sizeof(dispatch) };
-    netapi_snd_pkt_t snd = { NETAPI_CMD_SND, NULL, &ulh, &dest, sizeof(uint16_t),
+    pkt_hlist_t ulh = { NULL, NULL, NETDEV_PROTO_IPV6, &ipv6_hdr, sizeof(ipv6_hdr_t) };
+    pkt_hlist_t exp_ulh = { NULL, NULL, NETDEV_PROTO_6LOWPAN, dispatch, sizeof(dispatch) };
+    netapi_pkt_t snd = { NETAPI_CMD_SND, NULL, &ulh, &dest, sizeof(uint16_t),
                              NULL, 0
                            };
     sixlowpan_test_exp_snd_t exp = { &exp_ulh, &dest, sizeof(uint16_t), NULL, 0 };
@@ -2146,9 +2155,9 @@ static uint32_t test_compressed_tf_elided_hl_1_send(void)
                            0x0f, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
                            0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20
                          };
-    netdev_hlist_t ulh = { NULL, NULL, NETDEV_PROTO_IPV6, &ipv6_hdr, sizeof(ipv6_hdr_t) };
-    netdev_hlist_t exp_ulh = { NULL, NULL, NETDEV_PROTO_6LOWPAN, dispatch, sizeof(dispatch) };
-    netapi_snd_pkt_t snd = { NETAPI_CMD_SND, NULL, &ulh, &dest, sizeof(uint16_t),
+    pkt_hlist_t ulh = { NULL, NULL, NETDEV_PROTO_IPV6, &ipv6_hdr, sizeof(ipv6_hdr_t) };
+    pkt_hlist_t exp_ulh = { NULL, NULL, NETDEV_PROTO_6LOWPAN, dispatch, sizeof(dispatch) };
+    netapi_pkt_t snd = { NETAPI_CMD_SND, NULL, &ulh, &dest, sizeof(uint16_t),
                              NULL, 0
                            };
     sixlowpan_test_exp_snd_t exp = { &exp_ulh, &dest, sizeof(uint16_t), NULL, 0 };
@@ -2195,9 +2204,9 @@ static uint32_t test_compressed_tf_elided_hl_64_send(void)
                            0x0f, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
                            0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20
                          };
-    netdev_hlist_t ulh = { NULL, NULL, NETDEV_PROTO_IPV6, &ipv6_hdr, sizeof(ipv6_hdr_t) };
-    netdev_hlist_t exp_ulh = { NULL, NULL, NETDEV_PROTO_6LOWPAN, dispatch, sizeof(dispatch) };
-    netapi_snd_pkt_t snd = { NETAPI_CMD_SND, NULL, &ulh, &dest, sizeof(uint16_t),
+    pkt_hlist_t ulh = { NULL, NULL, NETDEV_PROTO_IPV6, &ipv6_hdr, sizeof(ipv6_hdr_t) };
+    pkt_hlist_t exp_ulh = { NULL, NULL, NETDEV_PROTO_6LOWPAN, dispatch, sizeof(dispatch) };
+    netapi_pkt_t snd = { NETAPI_CMD_SND, NULL, &ulh, &dest, sizeof(uint16_t),
                              NULL, 0
                            };
     sixlowpan_test_exp_snd_t exp = { &exp_ulh, &dest, sizeof(uint16_t), NULL, 0 };
@@ -2244,9 +2253,9 @@ static uint32_t test_compressed_tf_elided_hl_255_send(void)
                            0x0f, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
                            0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20
                          };
-    netdev_hlist_t ulh = { NULL, NULL, NETDEV_PROTO_IPV6, &ipv6_hdr, sizeof(ipv6_hdr_t) };
-    netdev_hlist_t exp_ulh = { NULL, NULL, NETDEV_PROTO_6LOWPAN, dispatch, sizeof(dispatch) };
-    netapi_snd_pkt_t snd = { NETAPI_CMD_SND, NULL, &ulh, &dest, sizeof(uint16_t),
+    pkt_hlist_t ulh = { NULL, NULL, NETDEV_PROTO_IPV6, &ipv6_hdr, sizeof(ipv6_hdr_t) };
+    pkt_hlist_t exp_ulh = { NULL, NULL, NETDEV_PROTO_6LOWPAN, dispatch, sizeof(dispatch) };
+    netapi_pkt_t snd = { NETAPI_CMD_SND, NULL, &ulh, &dest, sizeof(uint16_t),
                              NULL, 0
                            };
     sixlowpan_test_exp_snd_t exp = { &exp_ulh, &dest, sizeof(uint16_t), NULL, 0 };
@@ -2292,9 +2301,9 @@ static uint32_t test_compressed_iphc1_set_sam_sac_1_send(void)
                            0x0b, 0x0c, 0x0d, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16,
                            0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20
                          };
-    netdev_hlist_t ulh = { NULL, NULL, NETDEV_PROTO_IPV6, &ipv6_hdr, sizeof(ipv6_hdr_t) };
-    netdev_hlist_t exp_ulh = { NULL, NULL, NETDEV_PROTO_6LOWPAN, dispatch, sizeof(dispatch) };
-    netapi_snd_pkt_t snd = { NETAPI_CMD_SND, NULL, &ulh, &dest, sizeof(uint16_t),
+    pkt_hlist_t ulh = { NULL, NULL, NETDEV_PROTO_IPV6, &ipv6_hdr, sizeof(ipv6_hdr_t) };
+    pkt_hlist_t exp_ulh = { NULL, NULL, NETDEV_PROTO_6LOWPAN, dispatch, sizeof(dispatch) };
+    netapi_pkt_t snd = { NETAPI_CMD_SND, NULL, &ulh, &dest, sizeof(uint16_t),
                              NULL, 0
                            };
     sixlowpan_test_exp_snd_t exp = { &exp_ulh, &dest, sizeof(uint16_t), NULL, 0 };
@@ -2340,9 +2349,9 @@ static uint32_t test_compressed_iphc1_set_sam_sac_2_send(void)
                            0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c,
                            0x1d, 0x1e, 0x1f, 0x20
                          };
-    netdev_hlist_t ulh = { NULL, NULL, NETDEV_PROTO_IPV6, &ipv6_hdr, sizeof(ipv6_hdr_t) };
-    netdev_hlist_t exp_ulh = { NULL, NULL, NETDEV_PROTO_6LOWPAN, dispatch, sizeof(dispatch) };
-    netapi_snd_pkt_t snd = { NETAPI_CMD_SND, NULL, &ulh, &dest, sizeof(uint16_t),
+    pkt_hlist_t ulh = { NULL, NULL, NETDEV_PROTO_IPV6, &ipv6_hdr, sizeof(ipv6_hdr_t) };
+    pkt_hlist_t exp_ulh = { NULL, NULL, NETDEV_PROTO_6LOWPAN, dispatch, sizeof(dispatch) };
+    netapi_pkt_t snd = { NETAPI_CMD_SND, NULL, &ulh, &dest, sizeof(uint16_t),
                              NULL, 0
                            };
     sixlowpan_test_exp_snd_t exp = { &exp_ulh, &dest, sizeof(uint16_t), NULL, 0 };
@@ -2390,9 +2399,9 @@ static uint32_t test_compressed_iphc1_set_sam_sac_3_send(void)
                            0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e,
                            0x1f, 0x20
                          };
-    netdev_hlist_t ulh = { NULL, NULL, NETDEV_PROTO_IPV6, &ipv6_hdr, sizeof(ipv6_hdr_t) };
-    netdev_hlist_t exp_ulh = { NULL, NULL, NETDEV_PROTO_6LOWPAN, dispatch, sizeof(dispatch) };
-    netapi_snd_pkt_t snd = { NETAPI_CMD_SND, NULL, &ulh, &dest, sizeof(uint16_t),
+    pkt_hlist_t ulh = { NULL, NULL, NETDEV_PROTO_IPV6, &ipv6_hdr, sizeof(ipv6_hdr_t) };
+    pkt_hlist_t exp_ulh = { NULL, NULL, NETDEV_PROTO_6LOWPAN, dispatch, sizeof(dispatch) };
+    netapi_pkt_t snd = { NETAPI_CMD_SND, NULL, &ulh, &dest, sizeof(uint16_t),
                              NULL, 0
                            };
     sixlowpan_test_exp_snd_t exp = { &exp_ulh, &dest, sizeof(uint16_t), NULL, 0 };
@@ -2450,9 +2459,9 @@ static uint32_t test_compressed_iphc1_set_sam_sac_4_send(void)
                            0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e,
                            0x1f, 0x20
                          };
-    netdev_hlist_t ulh = { NULL, NULL, NETDEV_PROTO_IPV6, &ipv6_hdr, sizeof(ipv6_hdr_t) };
-    netdev_hlist_t exp_ulh = { NULL, NULL, NETDEV_PROTO_6LOWPAN, dispatch, sizeof(dispatch) };
-    netapi_snd_pkt_t snd = { NETAPI_CMD_SND, NULL, &ulh, &dest, sizeof(uint16_t),
+    pkt_hlist_t ulh = { NULL, NULL, NETDEV_PROTO_IPV6, &ipv6_hdr, sizeof(ipv6_hdr_t) };
+    pkt_hlist_t exp_ulh = { NULL, NULL, NETDEV_PROTO_6LOWPAN, dispatch, sizeof(dispatch) };
+    netapi_pkt_t snd = { NETAPI_CMD_SND, NULL, &ulh, &dest, sizeof(uint16_t),
                              NULL, 0
                            };
     sixlowpan_test_exp_snd_t exp = { &exp_ulh, &dest, sizeof(uint16_t), NULL, 0 };
@@ -2499,9 +2508,9 @@ static uint32_t test_compressed_iphc1_set_sam_sac_5_send(void)
                            0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e,
                            0x1f, 0x20
                          };
-    netdev_hlist_t ulh = { NULL, NULL, NETDEV_PROTO_IPV6, &ipv6_hdr, sizeof(ipv6_hdr_t) };
-    netdev_hlist_t exp_ulh = { NULL, NULL, NETDEV_PROTO_6LOWPAN, dispatch, sizeof(dispatch) };
-    netapi_snd_pkt_t snd = { NETAPI_CMD_SND, NULL, &ulh, &dest, sizeof(uint16_t),
+    pkt_hlist_t ulh = { NULL, NULL, NETDEV_PROTO_IPV6, &ipv6_hdr, sizeof(ipv6_hdr_t) };
+    pkt_hlist_t exp_ulh = { NULL, NULL, NETDEV_PROTO_6LOWPAN, dispatch, sizeof(dispatch) };
+    netapi_pkt_t snd = { NETAPI_CMD_SND, NULL, &ulh, &dest, sizeof(uint16_t),
                              NULL, 0
                            };
     sixlowpan_test_exp_snd_t exp = { &exp_ulh, &dest, sizeof(uint16_t), NULL, 0 };
@@ -2549,9 +2558,9 @@ static uint32_t test_compressed_iphc1_set_sam_sac_6_send(void)
                            0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c,
                            0x1d, 0x1e, 0x1f, 0x20
                          };
-    netdev_hlist_t ulh = { NULL, NULL, NETDEV_PROTO_IPV6, &ipv6_hdr, sizeof(ipv6_hdr_t) };
-    netdev_hlist_t exp_ulh = { NULL, NULL, NETDEV_PROTO_6LOWPAN, dispatch, sizeof(dispatch) };
-    netapi_snd_pkt_t snd = { NETAPI_CMD_SND, NULL, &ulh, &dest, sizeof(uint16_t),
+    pkt_hlist_t ulh = { NULL, NULL, NETDEV_PROTO_IPV6, &ipv6_hdr, sizeof(ipv6_hdr_t) };
+    pkt_hlist_t exp_ulh = { NULL, NULL, NETDEV_PROTO_6LOWPAN, dispatch, sizeof(dispatch) };
+    netapi_pkt_t snd = { NETAPI_CMD_SND, NULL, &ulh, &dest, sizeof(uint16_t),
                              NULL, 0
                            };
     sixlowpan_test_exp_snd_t exp = { &exp_ulh, &dest, sizeof(uint16_t), NULL, 0 };
@@ -2601,9 +2610,9 @@ static uint32_t test_compressed_iphc1_set_sam_sac_7_send(void)
                            0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d,
                            0x1e, 0x1f, 0x20
                          };
-    netdev_hlist_t ulh = { NULL, NULL, NETDEV_PROTO_IPV6, &ipv6_hdr, sizeof(ipv6_hdr_t) };
-    netdev_hlist_t exp_ulh = { NULL, NULL, NETDEV_PROTO_6LOWPAN, dispatch, sizeof(dispatch) };
-    netapi_snd_pkt_t snd = { NETAPI_CMD_SND, NULL, &ulh, &dest, sizeof(uint16_t),
+    pkt_hlist_t ulh = { NULL, NULL, NETDEV_PROTO_IPV6, &ipv6_hdr, sizeof(ipv6_hdr_t) };
+    pkt_hlist_t exp_ulh = { NULL, NULL, NETDEV_PROTO_6LOWPAN, dispatch, sizeof(dispatch) };
+    netapi_pkt_t snd = { NETAPI_CMD_SND, NULL, &ulh, &dest, sizeof(uint16_t),
                              NULL, 0
                            };
     sixlowpan_test_exp_snd_t exp = { &exp_ulh, &dest, sizeof(uint16_t), NULL, 0 };
@@ -2665,9 +2674,9 @@ static uint32_t test_compressed_iphc1_set_sam_sac_7_cid_ext_send(void)
                            0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d,
                            0x1e, 0x1f, 0x20
                          };
-    netdev_hlist_t ulh = { NULL, NULL, NETDEV_PROTO_IPV6, &ipv6_hdr, sizeof(ipv6_hdr_t) };
-    netdev_hlist_t exp_ulh = { NULL, NULL, NETDEV_PROTO_6LOWPAN, dispatch, sizeof(dispatch) };
-    netapi_snd_pkt_t snd = { NETAPI_CMD_SND, NULL, &ulh, &dest, sizeof(uint16_t),
+    pkt_hlist_t ulh = { NULL, NULL, NETDEV_PROTO_IPV6, &ipv6_hdr, sizeof(ipv6_hdr_t) };
+    pkt_hlist_t exp_ulh = { NULL, NULL, NETDEV_PROTO_6LOWPAN, dispatch, sizeof(dispatch) };
+    netapi_pkt_t snd = { NETAPI_CMD_SND, NULL, &ulh, &dest, sizeof(uint16_t),
                              NULL, 0
                            };
     sixlowpan_test_exp_snd_t exp = { &exp_ulh, &dest, sizeof(uint16_t), NULL, 0 };
@@ -2728,9 +2737,9 @@ static uint32_t test_compressed_iphc1_set_m_dam_dac_1_send(void)
                            0x1f, 0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27,
                            0x28
                          };
-    netdev_hlist_t ulh = { NULL, NULL, NETDEV_PROTO_IPV6, &ipv6_hdr, sizeof(ipv6_hdr_t) };
-    netdev_hlist_t exp_ulh = { NULL, NULL, NETDEV_PROTO_6LOWPAN, dispatch, sizeof(dispatch) };
-    netapi_snd_pkt_t snd = { NETAPI_CMD_SND, NULL, &ulh, &dest, sizeof(uint16_t),
+    pkt_hlist_t ulh = { NULL, NULL, NETDEV_PROTO_IPV6, &ipv6_hdr, sizeof(ipv6_hdr_t) };
+    pkt_hlist_t exp_ulh = { NULL, NULL, NETDEV_PROTO_6LOWPAN, dispatch, sizeof(dispatch) };
+    netapi_pkt_t snd = { NETAPI_CMD_SND, NULL, &ulh, &dest, sizeof(uint16_t),
                              NULL, 0
                            };
     sixlowpan_test_exp_snd_t exp = { &exp_ulh, &dest, sizeof(uint16_t), NULL, 0 };
@@ -2776,9 +2785,9 @@ static uint32_t test_compressed_iphc1_set_m_dam_dac_2_send(void)
                            0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e,
                            0x1f, 0x20, 0xac, 0xdc
                          };
-    netdev_hlist_t ulh = { NULL, NULL, NETDEV_PROTO_IPV6, &ipv6_hdr, sizeof(ipv6_hdr_t) };
-    netdev_hlist_t exp_ulh = { NULL, NULL, NETDEV_PROTO_6LOWPAN, dispatch, sizeof(dispatch) };
-    netapi_snd_pkt_t snd = { NETAPI_CMD_SND, NULL, &ulh, &dest, sizeof(uint16_t),
+    pkt_hlist_t ulh = { NULL, NULL, NETDEV_PROTO_IPV6, &ipv6_hdr, sizeof(ipv6_hdr_t) };
+    pkt_hlist_t exp_ulh = { NULL, NULL, NETDEV_PROTO_6LOWPAN, dispatch, sizeof(dispatch) };
+    netapi_pkt_t snd = { NETAPI_CMD_SND, NULL, &ulh, &dest, sizeof(uint16_t),
                              NULL, 0
                            };
     sixlowpan_test_exp_snd_t exp = { &exp_ulh, &dest, sizeof(uint16_t), NULL, 0 };
@@ -2824,9 +2833,9 @@ static uint32_t test_compressed_iphc1_set_m_dam_dac_3_send(void)
                            0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e,
                            0x1f, 0x20
                          };
-    netdev_hlist_t ulh = { NULL, NULL, NETDEV_PROTO_IPV6, &ipv6_hdr, sizeof(ipv6_hdr_t) };
-    netdev_hlist_t exp_ulh = { NULL, NULL, NETDEV_PROTO_6LOWPAN, dispatch, sizeof(dispatch) };
-    netapi_snd_pkt_t snd = { NETAPI_CMD_SND, NULL, &ulh, &dest, sizeof(uint16_t),
+    pkt_hlist_t ulh = { NULL, NULL, NETDEV_PROTO_IPV6, &ipv6_hdr, sizeof(ipv6_hdr_t) };
+    pkt_hlist_t exp_ulh = { NULL, NULL, NETDEV_PROTO_6LOWPAN, dispatch, sizeof(dispatch) };
+    netapi_pkt_t snd = { NETAPI_CMD_SND, NULL, &ulh, &dest, sizeof(uint16_t),
                              NULL, 0
                            };
     sixlowpan_test_exp_snd_t exp = { &exp_ulh, &dest, sizeof(uint16_t), NULL, 0 };
@@ -2873,9 +2882,9 @@ static uint32_t test_compressed_iphc1_set_m_dam_dac_5_send(void)
                            0x1f, 0x20, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x00,
                            0x01
                          };
-    netdev_hlist_t ulh = { NULL, NULL, NETDEV_PROTO_IPV6, &ipv6_hdr, sizeof(ipv6_hdr_t) };
-    netdev_hlist_t exp_ulh = { NULL, NULL, NETDEV_PROTO_6LOWPAN, dispatch, sizeof(dispatch) };
-    netapi_snd_pkt_t snd = { NETAPI_CMD_SND, NULL, &ulh, &dest, sizeof(uint64_t),
+    pkt_hlist_t ulh = { NULL, NULL, NETDEV_PROTO_IPV6, &ipv6_hdr, sizeof(ipv6_hdr_t) };
+    pkt_hlist_t exp_ulh = { NULL, NULL, NETDEV_PROTO_6LOWPAN, dispatch, sizeof(dispatch) };
+    netapi_pkt_t snd = { NETAPI_CMD_SND, NULL, &ulh, &dest, sizeof(uint64_t),
                              NULL, 0
                            };
     sixlowpan_test_exp_snd_t exp = { &exp_ulh, &dest, sizeof(uint64_t), NULL, 0 };
@@ -2923,9 +2932,9 @@ static uint32_t test_compressed_iphc1_set_m_dam_dac_6_send(void)
                            0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e,
                            0x1f, 0x20, 0x14, 0x15
                          };
-    netdev_hlist_t ulh = { NULL, NULL, NETDEV_PROTO_IPV6, &ipv6_hdr, sizeof(ipv6_hdr_t) };
-    netdev_hlist_t exp_ulh = { NULL, NULL, NETDEV_PROTO_6LOWPAN, dispatch, sizeof(dispatch) };
-    netapi_snd_pkt_t snd = { NETAPI_CMD_SND, NULL, &ulh, &dest, sizeof(uint64_t),
+    pkt_hlist_t ulh = { NULL, NULL, NETDEV_PROTO_IPV6, &ipv6_hdr, sizeof(ipv6_hdr_t) };
+    pkt_hlist_t exp_ulh = { NULL, NULL, NETDEV_PROTO_6LOWPAN, dispatch, sizeof(dispatch) };
+    netapi_pkt_t snd = { NETAPI_CMD_SND, NULL, &ulh, &dest, sizeof(uint64_t),
                              NULL, 0
                            };
     sixlowpan_test_exp_snd_t exp = { &exp_ulh, &dest, sizeof(uint64_t), NULL, 0 };
@@ -2973,9 +2982,9 @@ static uint32_t test_compressed_iphc1_set_m_dam_dac_7_send(void)
                            0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e,
                            0x1f, 0x20
                          };
-    netdev_hlist_t ulh = { NULL, NULL, NETDEV_PROTO_IPV6, &ipv6_hdr, sizeof(ipv6_hdr_t) };
-    netdev_hlist_t exp_ulh = { NULL, NULL, NETDEV_PROTO_6LOWPAN, dispatch, sizeof(dispatch) };
-    netapi_snd_pkt_t snd = { NETAPI_CMD_SND, NULL, &ulh, &dest, sizeof(uint64_t),
+    pkt_hlist_t ulh = { NULL, NULL, NETDEV_PROTO_IPV6, &ipv6_hdr, sizeof(ipv6_hdr_t) };
+    pkt_hlist_t exp_ulh = { NULL, NULL, NETDEV_PROTO_6LOWPAN, dispatch, sizeof(dispatch) };
+    netapi_pkt_t snd = { NETAPI_CMD_SND, NULL, &ulh, &dest, sizeof(uint64_t),
                              NULL, 0
                            };
     sixlowpan_test_exp_snd_t exp = { &exp_ulh, &dest, sizeof(uint64_t), NULL, 0 };
@@ -3024,9 +3033,9 @@ static uint32_t test_compressed_iphc1_set_m_dam_dac_8_send(void)
                            0x1f, 0x20, 0xff, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06,
                            0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
                          };
-    netdev_hlist_t ulh = { NULL, NULL, NETDEV_PROTO_IPV6, &ipv6_hdr, sizeof(ipv6_hdr_t) };
-    netdev_hlist_t exp_ulh = { NULL, NULL, NETDEV_PROTO_6LOWPAN, dispatch, sizeof(dispatch) };
-    netapi_snd_pkt_t snd = { NETAPI_CMD_SND, NULL, &ulh, &dest, sizeof(uint16_t),
+    pkt_hlist_t ulh = { NULL, NULL, NETDEV_PROTO_IPV6, &ipv6_hdr, sizeof(ipv6_hdr_t) };
+    pkt_hlist_t exp_ulh = { NULL, NULL, NETDEV_PROTO_6LOWPAN, dispatch, sizeof(dispatch) };
+    netapi_pkt_t snd = { NETAPI_CMD_SND, NULL, &ulh, &dest, sizeof(uint16_t),
                              NULL, 0
                            };
     sixlowpan_test_exp_snd_t exp = { &exp_ulh, &dest, sizeof(uint16_t), NULL, 0 };
@@ -3072,9 +3081,9 @@ static uint32_t test_compressed_iphc1_set_m_dam_dac_9_send(void)
                            0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e,
                            0x1f, 0x20, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66
                          };
-    netdev_hlist_t ulh = { NULL, NULL, NETDEV_PROTO_IPV6, &ipv6_hdr, sizeof(ipv6_hdr_t) };
-    netdev_hlist_t exp_ulh = { NULL, NULL, NETDEV_PROTO_6LOWPAN, dispatch, sizeof(dispatch) };
-    netapi_snd_pkt_t snd = { NETAPI_CMD_SND, NULL, &ulh, &dest, sizeof(uint16_t),
+    pkt_hlist_t ulh = { NULL, NULL, NETDEV_PROTO_IPV6, &ipv6_hdr, sizeof(ipv6_hdr_t) };
+    pkt_hlist_t exp_ulh = { NULL, NULL, NETDEV_PROTO_6LOWPAN, dispatch, sizeof(dispatch) };
+    netapi_pkt_t snd = { NETAPI_CMD_SND, NULL, &ulh, &dest, sizeof(uint16_t),
                              NULL, 0
                            };
     sixlowpan_test_exp_snd_t exp = { &exp_ulh, &dest, sizeof(uint16_t), NULL, 0 };
@@ -3120,9 +3129,9 @@ static uint32_t test_compressed_iphc1_set_m_dam_dac_10_send(void)
                            0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e,
                            0x1f, 0x20, 0xaa, 0xcc, 0xee, 0x00
                          };
-    netdev_hlist_t ulh = { NULL, NULL, NETDEV_PROTO_IPV6, &ipv6_hdr, sizeof(ipv6_hdr_t) };
-    netdev_hlist_t exp_ulh = { NULL, NULL, NETDEV_PROTO_6LOWPAN, dispatch, sizeof(dispatch) };
-    netapi_snd_pkt_t snd = { NETAPI_CMD_SND, NULL, &ulh, &dest, sizeof(uint16_t),
+    pkt_hlist_t ulh = { NULL, NULL, NETDEV_PROTO_IPV6, &ipv6_hdr, sizeof(ipv6_hdr_t) };
+    pkt_hlist_t exp_ulh = { NULL, NULL, NETDEV_PROTO_6LOWPAN, dispatch, sizeof(dispatch) };
+    netapi_pkt_t snd = { NETAPI_CMD_SND, NULL, &ulh, &dest, sizeof(uint16_t),
                              NULL, 0
                            };
     sixlowpan_test_exp_snd_t exp = { &exp_ulh, &dest, sizeof(uint16_t), NULL, 0 };
@@ -3168,9 +3177,9 @@ static uint32_t test_compressed_iphc1_set_m_dam_dac_11_send(void)
                            0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e,
                            0x1f, 0x20, 0xdc
                          };
-    netdev_hlist_t ulh = { NULL, NULL, NETDEV_PROTO_IPV6, &ipv6_hdr, sizeof(ipv6_hdr_t) };
-    netdev_hlist_t exp_ulh = { NULL, NULL, NETDEV_PROTO_6LOWPAN, dispatch, sizeof(dispatch) };
-    netapi_snd_pkt_t snd = { NETAPI_CMD_SND, NULL, &ulh, &dest, sizeof(uint16_t),
+    pkt_hlist_t ulh = { NULL, NULL, NETDEV_PROTO_IPV6, &ipv6_hdr, sizeof(ipv6_hdr_t) };
+    pkt_hlist_t exp_ulh = { NULL, NULL, NETDEV_PROTO_6LOWPAN, dispatch, sizeof(dispatch) };
+    netapi_pkt_t snd = { NETAPI_CMD_SND, NULL, &ulh, &dest, sizeof(uint16_t),
                              NULL, 0
                            };
     sixlowpan_test_exp_snd_t exp = { &exp_ulh, &dest, sizeof(uint16_t), NULL, 0 };
@@ -3216,9 +3225,9 @@ static uint32_t test_compressed_iphc1_set_m_dam_dac_12_send(void)
                            0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e,
                            0x1f, 0x20, 0xff, 0xee, 0xdd, 0xcc, 0xbb, 0xaa
                          };
-    netdev_hlist_t ulh = { NULL, NULL, NETDEV_PROTO_IPV6, &ipv6_hdr, sizeof(ipv6_hdr_t) };
-    netdev_hlist_t exp_ulh = { NULL, NULL, NETDEV_PROTO_6LOWPAN, dispatch, sizeof(dispatch) };
-    netapi_snd_pkt_t snd = { NETAPI_CMD_SND, NULL, &ulh, &dest, sizeof(uint16_t),
+    pkt_hlist_t ulh = { NULL, NULL, NETDEV_PROTO_IPV6, &ipv6_hdr, sizeof(ipv6_hdr_t) };
+    pkt_hlist_t exp_ulh = { NULL, NULL, NETDEV_PROTO_6LOWPAN, dispatch, sizeof(dispatch) };
+    netapi_pkt_t snd = { NETAPI_CMD_SND, NULL, &ulh, &dest, sizeof(uint16_t),
                              NULL, 0
                            };
     sixlowpan_test_exp_snd_t exp = { &exp_ulh, &dest, sizeof(uint16_t), NULL, 0 };
@@ -3279,13 +3288,13 @@ static uint32_t test_2_compressed_fragments_send(void)
                             'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'
                           };
     uint8_t exp_data2[] = "\xe0\x95\0\0\x0fijklmnopqrstuvwxyz0123456789";
-    netdev_hlist_t ulh = { NULL, NULL, NETDEV_PROTO_IPV6, &ipv6_hdr, sizeof(ipv6_hdr_t) };
-    netapi_snd_pkt_t snd = { NETAPI_CMD_SND, NULL, &ulh, &dest, sizeof(uint16_t),
+    pkt_hlist_t ulh = { NULL, NULL, NETDEV_PROTO_IPV6, &ipv6_hdr, sizeof(ipv6_hdr_t) };
+    netapi_pkt_t snd = { NETAPI_CMD_SND, NULL, &ulh, &dest, sizeof(uint16_t),
                              data, sizeof(data)
                            };
     sixlowpan_test_exp_snd_t exp[] = { { NULL, &dest, sizeof(uint16_t), exp_data1, sizeof(exp_data1) },
-                                       { NULL, &dest, sizeof(uint16_t), exp_data2, sizeof(exp_data2) }
-                                     };
+        { NULL, &dest, sizeof(uint16_t), exp_data2, sizeof(exp_data2) }
+    };
 
     ulh.next = &ulh;
     ulh.prev = &ulh;
@@ -3328,11 +3337,11 @@ static uint32_t test_compressed_with_other_header(void)
                            0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e,
                            0x1f, 0x20, 0xff, 0xee, 0xdd, 0xcc, 0xbb, 0xaa
                          };
-    netdev_hlist_t ulh1 = { NULL, NULL, NETDEV_PROTO_IPV6, &ipv6_hdr, sizeof(ipv6_hdr_t) };
-    netdev_hlist_t ulh2 = { NULL, NULL, NETDEV_PROTO_UNKNOWN, "abcdef", sizeof("abcdef") };
-    netdev_hlist_t exp_ulh1 = { NULL, NULL, NETDEV_PROTO_6LOWPAN, dispatch, sizeof(dispatch) };
-    netdev_hlist_t exp_ulh2 = { NULL, NULL, NETDEV_PROTO_UNKNOWN, "abcdef", sizeof("abcdef") };
-    netapi_snd_pkt_t snd = { NETAPI_CMD_SND, NULL, &ulh1, &dest, sizeof(uint16_t),
+    pkt_hlist_t ulh1 = { NULL, NULL, NETDEV_PROTO_IPV6, &ipv6_hdr, sizeof(ipv6_hdr_t) };
+    pkt_hlist_t ulh2 = { NULL, NULL, NETDEV_PROTO_UNKNOWN, "abcdef", sizeof("abcdef") };
+    pkt_hlist_t exp_ulh1 = { NULL, NULL, NETDEV_PROTO_6LOWPAN, dispatch, sizeof(dispatch) };
+    pkt_hlist_t exp_ulh2 = { NULL, NULL, NETDEV_PROTO_UNKNOWN, "abcdef", sizeof("abcdef") };
+    netapi_pkt_t snd = { NETAPI_CMD_SND, NULL, &ulh1, &dest, sizeof(uint16_t),
                              NULL, 0
                            };
     sixlowpan_test_exp_snd_t exp = { &exp_ulh1, &dest, sizeof(uint16_t), NULL, 0 };

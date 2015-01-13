@@ -42,15 +42,16 @@ static char _receiver_stack[KERNEL_CONF_STACKSIZE_DEFAULT];
 static char _mac_stack[KERNEL_CONF_STACKSIZE_DEFAULT];
 static char _sixlowpan_stack[SIXLOWPAN_CONTROL_STACKSIZE];
 
-static inline netapi_conf_t *_snd_to_conf(netapi_snd_pkt_t *snd)
+static inline netapi_conf_t *_snd_to_conf(netapi_pkt_t *snd)
 {
     return (netapi_conf_t *)snd;
 }
 
 static void *_mac(void *args)
 {
-    kernel_pid_t exp_pids[_EXP_SIZE] = { KERNEL_PID_UNDEF, KERNEL_PID_UNDEF };
-    sixlowpan_test_exp_snd_t *exp[_EXP_SIZE] = { NULL, NULL };
+    kernel_pid_t exp_pids[_EXP_SIZE] = { KERNEL_PID_UNDEF, KERNEL_PID_UNDEF,
+                                         KERNEL_PID_UNDEF };
+    sixlowpan_test_exp_t *exp[_EXP_SIZE] = { NULL, NULL, NULL };
     uint32_t exp_status = 0;
     msg_t msg, msg_rply;
     size_t src_len = 2;
@@ -67,7 +68,7 @@ static void *_mac(void *args)
 
             for (int i = 0; i < _EXP_SIZE; i++) {
                 if (exp[i] == NULL) {
-                    exp[i] = (sixlowpan_test_exp_snd_t *)(msg.content.ptr);
+                    exp[i] = (sixlowpan_test_exp_t *)(msg.content.ptr);
                     exp_pids[i] = msg.sender_pid;
                     exp_status = 0;
                     break;
@@ -77,7 +78,7 @@ static void *_mac(void *args)
 
         else if (msg.type == NETAPI_MSG_TYPE) {
             msg_t msg_ack;
-            netapi_snd_pkt_t *snd = (netapi_snd_pkt_t *)(msg.content.ptr);
+            netapi_pkt_t *snd = (netapi_pkt_t *)(msg.content.ptr);
             netapi_ack_t *ack = snd->ack;
             int exp_idx = -1;
 
@@ -158,32 +159,33 @@ static void *_mac(void *args)
 
                     for (int i = 0; i < _EXP_SIZE; i++) {
                         if (exp[i] != NULL &&
-                            snd->data_len == exp[i]->data_len &&
+                            snd->pkt->payload_len == exp[i]->pkt.payload_len &&
                             snd->dest_len == exp[i]->dest_len &&
-                            memcmp(snd->data, exp[i]->data, snd->data_len) == 0 &&
+                            memcmp(snd->pkt->payload_data, exp[i]->pkt.payload_data,
+                                   snd->pkt->payload_len) == 0 &&
                             memcmp(snd->dest, exp[i]->dest, snd->dest_len) == 0) {
                             int ulh_as_expected = 1;
-                            netdev_hlist_t *ptr_snd = snd->ulh;
-                            netdev_hlist_t *ptr_exp = exp[i]->ulh;
+                            pkt_hlist_t *ptr_snd = snd->pkt->headers;
+                            pkt_hlist_t *ptr_exp = exp[i]->pkt.headers;
 
                             if (ptr_snd != NULL && ptr_exp != NULL) {
                                 do {
                                     if (ptr_snd->header_len != ptr_exp->header_len ||
-                                        ptr_snd->protocol != ptr_exp->protocol ||
-                                        memcmp(ptr_snd->header, ptr_exp->header,
+                                        ptr_snd->header_proto != ptr_exp->header_proto ||
+                                        memcmp(ptr_snd->header_data, ptr_exp->header_data,
                                                ptr_snd->header_len) != 0) {
                                         ulh_as_expected = 0;
                                         break;
                                     }
 
-                                    netdev_hlist_advance(&ptr_snd);
-                                    netdev_hlist_advance(&ptr_exp);
-                                } while (ptr_snd != snd->ulh); /* compare until header
-                                                                * list reaches its start
-                                                                * again */
+                                    pkt_hlist_advance(&ptr_snd);
+                                    pkt_hlist_advance(&ptr_exp);
+                                } while (ptr_snd != snd->pkt->headers);
+                                /* compare until header list reaches its start again */
 
-                                if (ptr_exp != exp[i]->ulh) { /* if expected is not
-                                                               * at its start as well */
+                                if (ptr_exp != exp[i]->pkt.headers) {
+                                                            /* if expected is not
+                                                             * at its start as well */
                                     ulh_as_expected = 0;    /* test failed */
                                 }
                             }
@@ -263,7 +265,7 @@ static void *_mac(void *args)
 static void *_receiver(void *args)
 {
     kernel_pid_t exp_pids[_EXP_SIZE] = { KERNEL_PID_UNDEF, KERNEL_PID_UNDEF };
-    sixlowpan_test_exp_rcv_t *exp[_EXP_SIZE] = { NULL, NULL };
+    sixlowpan_test_exp_t *exp[_EXP_SIZE] = { NULL, NULL };
     uint32_t exp_status = 0;
     msg_t msg, msg_rply;
 
@@ -277,7 +279,7 @@ static void *_receiver(void *args)
 
             for (int i = 0; i < _EXP_SIZE; i++) {
                 if (exp[i] == NULL) {
-                    exp[i] = (sixlowpan_test_exp_rcv_t *)(msg.content.ptr);
+                    exp[i] = (sixlowpan_test_exp_t *)(msg.content.ptr);
                     exp_pids[i] = msg.sender_pid;
                     exp_status = 0;
                     break;
@@ -287,7 +289,7 @@ static void *_receiver(void *args)
 
         else if (msg.type == NETAPI_MSG_TYPE) {
             msg_t msg_ack;
-            netapi_rcv_pkt_t *rcv = (netapi_rcv_pkt_t *)(msg.content.ptr);
+            netapi_pkt_t *rcv = (netapi_pkt_t *)(msg.content.ptr);
             netapi_ack_t *ack = rcv->ack;
             int exp_idx = -1;
 
@@ -323,10 +325,11 @@ static void *_receiver(void *args)
 
                 for (int i = 0; i < _EXP_SIZE; i++) {
                     if (exp[i] != NULL &&
-                        rcv->data_len == exp[i]->data_len &&
+                        rcv->pkt->payload_len == exp[i]->pkt.payload_len &&
                         rcv->src_len == exp[i]->src_len &&
                         rcv->dest_len == exp[i]->dest_len &&
-                        memcmp(rcv->data, exp[i]->data, rcv->data_len) == 0 &&
+                        memcmp(rcv->pkt->payload_data, exp[i]->pkt.payload_data,
+                               rcv->pkt->payload_len) == 0 &&
                         memcmp(rcv->src, exp[i]->src, rcv->src_len) == 0 &&
                         memcmp(rcv->dest, exp[i]->dest, rcv->dest_len) == 0) {
                         exp_idx = i;
@@ -351,8 +354,8 @@ static void *_receiver(void *args)
     return NULL;
 }
 
-uint32_t sixlowpan_test_send_test(netapi_snd_pkt_t *snd, int num_snd,
-                                  sixlowpan_test_exp_snd_t *exp, int num_exp)
+uint32_t sixlowpan_test_send_test(netapi_pkt_t *snd, int num_snd,
+                                  sixlowpan_test_exp_t *exp, int num_exp)
 {
     msg_t msg;
 
@@ -382,8 +385,8 @@ uint32_t sixlowpan_test_send_test(netapi_snd_pkt_t *snd, int num_snd,
     return 0;
 }
 
-uint32_t sixlowpan_test_receiver_test(netapi_rcv_pkt_t *rcv, int num_rcv,
-                                      sixlowpan_test_exp_rcv_t *exp, int num_exp)
+uint32_t sixlowpan_test_receiver_test(netapi_pkt_t *rcv, int num_rcv,
+                                      sixlowpan_test_exp_t *exp, int num_exp)
 {
     msg_t msg;
 
