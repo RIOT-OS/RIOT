@@ -33,7 +33,9 @@ extern "C" {
 #endif
 
 /**
- * @brief   Definition of protocol families to determine the type of the packet or which protocols a network device (see @ref netdev) or protocol layer (see @ref netapi) can handle
+ * @brief   Definition of protocol families to determine the type of the packet
+ *          or which protocols a network device (see @ref netdev) or protocol
+ *          layer (see @ref netapi) can handle
  *
  * @note    XXX: The concrete definition of the values is necessary to work
  *          with super-flexible devices as e.g. @ref native_net. It was also
@@ -50,17 +52,12 @@ typedef enum {
      */
     PKT_PROTO_RADIO         = 0x0001,
 
-    /**
-     * @brief   IEEE 802.15.4
-     *
-     * @details Sends frames as defined by ieee802154_frame_t
-     */
-    PKT_PROTO_802154        = 0x0002,
-    PKT_PROTO_6LOWPAN       = 0x0003,   /**< 6LoWPAN. */
-    PKT_PROTO_IPV6          = 0x0004,   /**< IPv6. */
-    PKT_PROTO_UDP           = 0x0005,   /**< UDP. */
-    PKT_PROTO_TCP           = 0x0006,   /**< TCP. */
-    PKT_PROTO_CCNL          = 0x0007,   /**< CCN lite. */
+    PKT_PROTO_ETHERNET      = 0x0002,   /**< Ethernet */
+    PKT_PROTO_802154_BEACON = 0x0003,   /**< IEEE 802.15.4 beacon frame */
+    PKT_PROTO_802154_DATA   = 0x0004,   /**< IEEE 802.15.4 data frame */
+    PKT_PROTO_802154_ACK    = 0x0005,   /**< IEEE 802.15.4 acknowledgment frame */
+    PKT_PROTO_802154_MACCMD = 0x0006,   /**< IEEE 802.15.4 MAC command frame */
+    PKT_PROTO_BTLE          = 0x0007,   /**< Bluetooth Low-Energy */
 
     /**
      * @brief   CC110x frame format protocol
@@ -68,6 +65,12 @@ typedef enum {
      * @details Sends frames as defined by cc110x_packet_t.
      */
     PKT_PROTO_CC110X        = 0x0008,
+    PKT_PROTO_6LOWPAN       = 0x0009,   /**< 6LoWPAN. */
+    PKT_PROTO_IPV4          = 0x000a,   /**< IPv4. */
+    PKT_PROTO_IPV6          = 0x000b,   /**< IPv6. */
+    PKT_PROTO_UDP           = 0x000c,   /**< UDP. */
+    PKT_PROTO_TCP           = 0x000d,   /**< TCP. */
+    PKT_PROTO_CCNL          = 0x000e,   /**< CCN lite. */
 } pkt_proto_t;
 
 /**
@@ -95,10 +98,10 @@ typedef uint16_t pktsize_t;
 typedef struct __attribute__((packed)) pkt_hlist_t {    /* packed to be aligned
                                                          * correctly in static
                                                          * packet buffer */
-    pktsize_t header_len;       /**< the length of the header in byte. */
-    void *header_data;          /**< the data of the header */
-    pkt_proto_t header_proto;   /**< protocol of the header. */
     struct pkt_hlist_t *next;   /**< next element in list. */
+    void *header_data;          /**< the data of the header */
+    pktsize_t header_len;       /**< the length of the header in byte. */
+    pkt_proto_t header_proto;   /**< protocol of the header. */
 } pkt_hlist_t;
 
 /**
@@ -109,10 +112,10 @@ typedef struct __attribute__((packed)) pkt_hlist_t {    /* packed to be aligned
  */
 typedef struct __attribute__((packed)) {    /* packed to be aligned correctly
                                              * in static packet buffer */
-    pktsize_t payload_len;      /**< length of pkt_t::payload_data. */
-    void *payload_data;         /**< payload of the packet. */
-    pkt_proto_t payload_proto;  /**< protocol of pkt_t::payload_data, if any */
     pkt_hlist_t *headers;       /**< network protocol headers of the packet. */
+    void *payload_data;              /**< payload of the packet. */
+    pktsize_t payload_len;      /**< length of pkt_t::payload. */
+    pkt_proto_t payload_proto;  /**< protocol of pkt_t::payload, if any */
 } pkt_t;
 
 /**
