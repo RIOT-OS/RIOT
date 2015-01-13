@@ -2415,12 +2415,14 @@ static uint32_t test_compressed_iphc1_set_sam_sac_3_send(void)
     ipv6_hdr.destaddr.u64[1] = byteorder_htonll(0x191a1b1c1d1e1f20);
 
     if (netapi_set_option(sixlowpan_test_sixlowpan_pid,
-                          NETDEV_OPT_SRC_LEN, &src_len_mode, sizeof(size_t)) < 0) {
+                          (netapi_conf_type_t)SIXLOWPAN_CONF_SRC_LEN, &src_len_mode,
+                          sizeof(size_t)) < 0) {
         return SIXLOWPAN_TEST_SET_OPTION_ERROR;
     }
 
     if (netapi_set_option(sixlowpan_test_sixlowpan_pid,
-                          NETDEV_OPT_ADDRESS, &src, sizeof(uint16_t)) < 0) {
+                          (netapi_conf_type_t)SIXLOWPAN_CONF_ADDRESS, &src,
+                          sizeof(uint16_t)) < 0) {
         return SIXLOWPAN_TEST_SET_OPTION_ERROR;
     }
 
@@ -2626,12 +2628,14 @@ static uint32_t test_compressed_iphc1_set_sam_sac_7_send(void)
     sixlowpan_iphc_cbuf_update(0, &ipv6_hdr.srcaddr, 28, 120);
 
     if (netapi_set_option(sixlowpan_test_sixlowpan_pid,
-                          NETDEV_OPT_SRC_LEN, &src_len_mode, sizeof(size_t)) < 0) {
+                          (netapi_conf_type_t)SIXLOWPAN_CONF_SRC_LEN, &src_len_mode,
+                          sizeof(size_t)) < 0) {
         return SIXLOWPAN_TEST_SET_OPTION_ERROR;
     }
 
     if (netapi_set_option(sixlowpan_test_sixlowpan_pid,
-                          NETDEV_OPT_ADDRESS_LONG, &src, sizeof(uint64_t)) < 0) {
+                          (netapi_conf_type_t)SIXLOWPAN_CONF_ADDRESS_LONG, &src,
+                          sizeof(uint64_t)) < 0) {
         return SIXLOWPAN_TEST_SET_OPTION_ERROR;
     }
 
@@ -2688,12 +2692,14 @@ static uint32_t test_compressed_iphc1_set_sam_sac_7_cid_ext_send(void)
     sixlowpan_iphc_cbuf_update(4, &ipv6_hdr.srcaddr, 24, 120);
 
     if (netapi_set_option(sixlowpan_test_sixlowpan_pid,
-                          NETDEV_OPT_SRC_LEN, &src_len_mode, sizeof(size_t)) < 0) {
+                          (netapi_conf_type_t)SIXLOWPAN_CONF_SRC_LEN, &src_len_mode,
+                          sizeof(size_t)) < 0) {
         return SIXLOWPAN_TEST_SET_OPTION_ERROR;
     }
 
     if (netapi_set_option(sixlowpan_test_sixlowpan_pid,
-                          NETDEV_OPT_ADDRESS_LONG, &src, sizeof(uint64_t)) < 0) {
+                          (netapi_conf_type_t)SIXLOWPAN_CONF_ADDRESS_LONG, &src,
+                          sizeof(uint64_t)) < 0) {
         return SIXLOWPAN_TEST_SET_OPTION_ERROR;
     }
 
