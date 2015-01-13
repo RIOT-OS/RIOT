@@ -97,7 +97,9 @@ uint8_t rpl_init(int if_id)
     ipv6_addr_set_link_local_prefix(&ll_address);
     ipv6_net_if_get_best_src_addr(&my_address, &ll_address);
     ipv6_register_rpl_handler(rpl_process_pid);
+#if (RPL_DEFAULT_MOP == RPL_NON_STORING_MODE)
     ipv6_iface_set_srh_indicator(rpl_is_root);
+#endif
     ipv6_iface_set_routing_provider(rpl_get_next_hop);
     DEBUGF("All addresses set!\n");
 
