@@ -167,7 +167,7 @@ static void test_pktbuf_realloc_payload_nomemenough(void)
 
 static void test_pktbuf_realloc_payload_unknown_ptr(void)
 {
-    pkt_t pkt = { 4, "abcd", PKT_PROTO_UNKNOWN, NULL };
+    pkt_t pkt = { NULL, "abcd", 4, PKT_PROTO_UNKNOWN };
     pkt_t *new_pkt = pktbuf_realloc_payload(&pkt, 5);
 
     TEST_ASSERT_NOT_NULL(new_pkt);
@@ -314,7 +314,7 @@ static void test_pktbuf_add_header_einval(void)
 
 static void test_pktbuf_add_header_einval2(void)
 {
-    pkt_t pkt = { 5, "abcd", PKT_PROTO_UNKNOWN, NULL };
+    pkt_t pkt = { NULL, "abcd", 5, PKT_PROTO_UNKNOWN };
 
     TEST_ASSERT_EQUAL_INT(-EINVAL, pktbuf_add_header(&pkt, "ef", 3));
     TEST_ASSERT_EQUAL_STRING("abcd", pkt.payload_data);

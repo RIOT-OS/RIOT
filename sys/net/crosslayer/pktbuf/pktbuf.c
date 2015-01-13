@@ -29,10 +29,10 @@
 typedef struct __attribute__((packed)) _pkt_internal_t {
     struct _pkt_internal_t *next;
     uint8_t processing;
-    pktsize_t size;
-    void *data;
-    pkt_proto_t proto;
     pkt_hlist_t *header_ptr;
+    void *data;
+    pktsize_t size;
+    pkt_proto_t proto;
 } _pkt_internal_t;
 
 static uint8_t _pktbuf[PKTBUF_SIZE];
@@ -67,7 +67,7 @@ static inline _pkt_internal_t *_pkt_internal_cast(pkt_t *pkt)
  */
 static inline pkt_t *_pkt_cast(_pkt_internal_t *pkt)
 {
-    return (pkt_t *)(&(pkt->size));
+    return (pkt_t *)(&(pkt->header_ptr));
 }
 
 /**
