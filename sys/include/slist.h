@@ -28,6 +28,10 @@
 #include <stddef.h>
 #include <stdlib.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct simple_list_elem;
 
 /**
@@ -231,5 +235,9 @@ void *__simple_list_find(struct simple_list_elem *head, void *needle, size_t off
 void *__simple_list_find_cmp(struct simple_list_elem *head, void *needle, size_t offset, int compare(void *, void *));
 void *__simple_list_remove(struct simple_list_elem **head, struct simple_list_elem *node, int keep);
 void  __simple_list_clear(struct simple_list_elem **head);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* SIMPLE_LIST_H_ */

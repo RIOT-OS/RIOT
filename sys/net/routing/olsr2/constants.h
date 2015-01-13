@@ -14,6 +14,10 @@
 #ifndef OLSR2_CONSTANTS_H_
 #define OLSR2_CONSTANTS_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* The well-known UDP port for MANET as defined in RFC 5498 */
 #define MANET_PORT	269
 
@@ -52,5 +56,9 @@ enum {
     IDX_ADDRTLV_METRIC,         /* incomming link metric */
     IDX_ADDRTLV_NODE_NAME,      /* 'name' of a node from graph.gv */
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* OLSR2_CONSTANTS_H_ */

@@ -16,6 +16,10 @@
 
 #include "node.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*
  * add a node to the list of pending nodes
  */
@@ -31,5 +35,9 @@ bool remove_free_node(struct olsr_node *node);
  * try to find a route for pending nodes
  */
 void fill_routing_table(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* ROUTING_H_ */

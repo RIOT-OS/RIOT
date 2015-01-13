@@ -16,6 +16,10 @@
 
 #include "common/netaddr.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct netaddr_rc {
     struct netaddr super;
     uint8_t _refs;
@@ -31,5 +35,9 @@ void netaddr_switch(struct netaddr **old_addr, struct netaddr *new_addr);
 
 time_t time_now(void);
 void sleep_s(int secs);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

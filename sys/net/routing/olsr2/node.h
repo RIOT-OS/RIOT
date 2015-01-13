@@ -19,6 +19,10 @@
 
 #include "util.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* nodes can have a name (hostname) for easier debugging */
 #ifdef ENABLE_NAME
 extern char *olsr2_local_name;
@@ -116,5 +120,9 @@ void remove_other_route(struct olsr_node *node, struct netaddr *last_addr);
 void remove_default_node(struct olsr_node *node);
 void push_default_route(struct olsr_node *node);
 void pop_other_route(struct olsr_node *node, struct netaddr *last_addr);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* NODE_H_ */

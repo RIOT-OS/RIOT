@@ -15,6 +15,10 @@
 
 #include "sixlowpan/types.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief	Start routing using olsr2
  *		This initializes and starts all neccecary
@@ -33,4 +37,9 @@ void print_topology_set(void);
  * @brief	get the IP address of a MANET router from its hostname
  */
 ipv6_addr_t* get_ip_by_name(char* name);
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif

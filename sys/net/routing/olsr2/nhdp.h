@@ -19,6 +19,14 @@
 
 #include "node.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct olsr_node *olsr2_add_neighbor(struct netaddr *addr, metric_t metric, uint8_t vtime, char *name);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* NHDP_H_ */
