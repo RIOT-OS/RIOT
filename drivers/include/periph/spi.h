@@ -123,6 +123,28 @@ int spi_init_slave(spi_t dev, spi_conf_t conf, char (*cb)(char data));
 int spi_conf_pins(spi_t dev);
 
 /**
+ * @brief Get mutually exclusive access to the given SPI bus
+ *
+ * In case the SPI device is busy, this function will block until the bus is free again.
+ *
+ * @param[in] dev       SPI device to access
+ *
+ * @return              0 on success
+ * @return              -1 on error
+ */
+int spi_acquire(spi_t dev);
+
+/**
+ * @brief Release the given SPI device to be used by others
+ *
+ * @param[in] dev       SPI device to release
+ *
+ * @return              0 on success
+ * @return              -1 on error
+ */
+int spi_release(spi_t dev);
+
+/**
  * @brief Transfer one byte on the given SPI bus
  *
  * @param[in] dev       SPI device to use
