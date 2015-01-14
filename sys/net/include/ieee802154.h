@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2013  INRIA.
+ * Copyright (C) 2015  Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -8,19 +9,20 @@
 
 /**
  * @defgroup    net_ieee802154 IEEE802.15.4
- * @ingroup net
- * @brief   IEEE802.15.4 adapaption layer
+ * @ingroup     net
+ * @brief       IEEE802.15.4 adapaption layer
  * @{
  *
  * @file
- * @brief   IEEE 802.14.4 framing data structs and prototypes
+ * @brief       IEEE 802.14.4 framing data structs and prototypes
  *
- * @author  Stephan Zeisberg <zeisberg@mi.fu-berlin.de>
- * @author  Oliver Hahm <oliver.hahm@inria.fr>
+ * @author      Stephan Zeisberg <zeisberg@mi.fu-berlin.de>
+ * @author      Oliver Hahm <oliver.hahm@inria.fr>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef IEEE802154_IEEE802154_FRAME
-#define IEEE802154_IEEE802154_FRAME
+#ifndef __IEEE802154_FRAME_H
+#define __IEEE802154_FRAME_H
 
 #include <stdio.h>
 #include <stdint.h>
@@ -34,19 +36,53 @@ extern "C" {
 /* ...and FCS*/
 #define IEEE_802154_FCS_LEN             (2)
 
-typedef enum __attribute__((packed)) {
-    IEEE_802154_BEACON_FRAME    = 0,
-    IEEE_802154_DATA_FRAME      = 1,
-    IEEE_802154_ACK_FRAME       = 2,
-    IEEE_802154_MAC_CMD_FRAME   = 3
-} ieee802154_frame_type_t;
+/**
+ * @brief   IEEE802.15.4 FCF bitfield definitions
+ * @{
+ */
+#define IEEE_802154_FCF_TYPE_MASK       (0x0700)
+#define IEEE_802154_FCF_TYPE_POS        (8U)
+#define IEEE_802154_FCF_TYPE_BEACON     (0x0000)
+#define IEEE_802154_FCF_TYPE_DATA       (0x0100)
+#define IEEE_802154_FCF_TYPE_ACK        (0x0200)
+#define IEEE_802154_FCF_TYPE_MAC_CMD    (0x0300)
 
-#define IEEE_802154_SHORT_ADDR_M        (2)
-#define IEEE_802154_LONG_ADDR_M         (3)
+#define IEEE_802154_FCF_SEC_EN          (0x0800)
+#define IEEE_802154_FCF_SEC_EN_POS      (11U)
 
+#define IEEE_802154_FCF_FRAME_PEND      (0x1000)
+#define IEEE_802154_FCF_FRAME_PEND_POS  (12U)
+
+#define IEEE_802154_FCF_ACK_REQ         (0x2000)
+#define IEEE_802154_FCF_ACK_REQ_POS     (13U)
+
+#define IEEE_802154_FCF_PANID_COMP      (0x4000)
+#define IEEE_802154_FCF_PANID_COMP_POS  (14U)
+
+#define IEEE_802154_FCF_DST_ADDR_MASK   (0x000a)
+#define IEEE_802154_FCF_DST_ADDR_POS    (2U)
+#define IEEE_802154_FCF_DST_ADDR_EMPTY  (0x0000)
+#define IEEE_802154_FCF_DST_ADDR_SHORT  (0x0008)
+#define IEEE_802154_FCF_DST_ADDR_LONG   (0x000a)
+
+#define IEEE_802154_FCF_FRAME_VER_MASK  (0x0030)
+#define IEEE_802154_FCF_FRAME_VER_POS   (4U)
+
+#define IEEE_802154_FCF_SRC_ADDR_MASK   (0x00a0)
+#define IEEE_802154_FCF_SRC_ADDR_POS    (6U)
+#define IEEE_802154_FCF_SRC_ADDR_EMPTY  (0x0000)
+#define IEEE_802154_FCF_SRC_ADDR_SHORT  (0x0080)
+#define IEEE_802154_FCF_SRC_ADDR_LONG   (0x00a0)
+/** @} */
+
+/**
+ * @brief IEEE802.15.4 multi-cast addresses
+ * @{
+ */
 #define IEEE_802154_SHORT_MCAST_ADDR    (0xffff)
-#define IEEE_802154_LONG_MCAST_ADDR     {{0xff, 0xff, 0xff, 0xff, 0xff, 0xff, \
-                                          0xff, 0xff}}
+#define IEEE_802154_LONG_MCAST_ADDR     {{0xff, 0xff, 0xff, 0xff, \
+                                          0xff, 0xff, 0xff, 0xff}}
+/** @} */
 
 /**
  * @brief The default PAN id to use if not specified otherwise by upper layers
@@ -77,19 +113,11 @@ typedef enum __attribute__((packed)) {
  */
 #define LETOHS(a)   HTOLES(a)
 
+/**
+ * @brief   IEEE802.15.4 frame descriptor
+ */
 typedef struct __attribute__((packed)) {
-    ieee802154_frame_type_t frame_type;
-    uint8_t sec_enb;
-    uint8_t frame_pend;
-    uint8_t ack_req;
-    uint8_t panid_comp;
-    uint8_t dest_addr_m;
-    uint8_t frame_ver;
-    uint8_t src_addr_m;
-} ieee802154_frame_fcf_frame_t;
-
-typedef struct __attribute__((packed)) {
-    ieee802154_frame_fcf_frame_t fcf;
+    uint16_t fcf;
     uint8_t seq_nr;
     uint16_t dest_pan_id;
     uint8_t dest_addr[8];
@@ -116,8 +144,8 @@ typedef struct __attribute__(( packed )) {
 uint8_t ieee802154_frame_init(ieee802154_frame_t *frame, uint8_t *buf);
 uint8_t ieee802154_frame_get_hdr_len(ieee802154_frame_t *frame);
 uint8_t ieee802154_frame_read(uint8_t *buf, ieee802154_frame_t *frame, uint8_t len);
-void ieee802154_frame_print_fcf_frame(ieee802154_frame_t *frame);
 uint16_t ieee802154_frame_get_fcs(const uint8_t *frame, uint8_t frame_len);
+void ieee802154_frame_print_fcf_frame(ieee802154_frame_t *frame);
 
 #ifdef __cplusplus
 }
