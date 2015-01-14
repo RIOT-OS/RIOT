@@ -59,7 +59,10 @@ script:
     - ./dist/tools/cppcheck/check.sh master --diff-filter=AC || exit
 
     - make -C ./tests/unittests all test BOARD=native || exit
-    - make -C ./tests/unittests all test BOARD=qemu-i386 || exit
+# TODO:
+#   Reenable once https://github.com/RIOT-OS/RIOT/issues/2300 is
+#   resolved:
+#   - make -C ./tests/unittests all test BOARD=qemu-i386 || exit
 
     - ./dist/tools/compile_test/compile_test.py
     - ./dist/tools/pr_check/pr_check.sh riot/master
