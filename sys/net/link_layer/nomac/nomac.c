@@ -11,6 +11,7 @@
 #include "netapi.h"
 #include "msg.h"
 #include "netdev/base.h"
+#include "pktbuf.h"
 #include "thread.h"
 
 #include "nomac.h"
@@ -35,7 +36,7 @@ static int _nomac_recv_cb(netdev_t *dev, void *src, size_t src_len, void *dest,
     (void)dev;
     kernel_pid_t current_pid = thread_getpid();
     size_t offset;
-    netapi_rcv_pkt_t packet;
+    netapi_pkt_t packet;
     netapi_ack_t ack_mem;
     msg_t msg_pkt, msg_ack;
 
@@ -54,11 +55,17 @@ static int _nomac_recv_cb(netdev_t *dev, void *src, size_t src_len, void *dest,
 
             while (offset < payload_len) {
                 netapi_ack_t *ack;
-                packet.data = (void *)(((char *)payload) + offset);
-                packet.data_len = payload_len - offset;
+                pkt_t *pkt = pktbuf_insert(((char *)payload) + offset,
+                                           payload_len - offset);
+                /* TODO: replace line with pktbuf_hold(pkt) after merge of #2297 */
+
+                packet.pkt = pkt;
 
                 msg_send_receive(&msg_pkt, &msg_ack,
                                  _nomac_registry[i].recipient_pid);
+
+                pktbuf_release(pkt);
+
                 ack = (netapi_ack_t *)(msg_ack.content.ptr);
 
                 if ((msg_ack.type == NETAPI_MSG_TYPE) &&
@@ -95,10 +102,95 @@ static int _nomac_recv_cb(netdev_t *dev, void *src, size_t src_len, void *dest,
     return payload_len;
 }
 
-static inline int _nomac_send(netdev_t *dev, netapi_snd_pkt_t *pkt)
+/* remove after merge of #2297 */
+static int _hlist_size(pkt_t *pkt)
 {
-    return dev->driver->send_data(dev, pkt->dest, pkt->dest_len, pkt->ulh,
-                                  pkt->data, pkt->data_len);
+    pkt_hlist_t *ptr = pkt->headers;
+    int i = 0;
+
+    while (ptr) {
+        i++;
+        pkt_hlist_advance(&ptr);
+    }
+
+    return i;
+}
+
+static int _nomac_send(netdev_t *dev, netapi_pkt_t *snd)
+{
+    int result;
+    pktbuf_hold(snd->pkt);
+
+    /* TODO: remove transformation after merge of #2297 */
+
+    netdev_hlist_t *headers = NULL;
+    int hlist_size = _hlist_size(snd->pkt);
+    netdev_hlist_t hbuf[hlist_size];
+
+    if (hlist_size > 0) {
+        int i = 0;
+        pkt_hlist_t *ptr = snd->pkt->headers;
+
+        while (ptr != NULL) {
+            hbuf[i].next = NULL;
+            hbuf[i].prev = NULL;
+
+            switch (ptr->header_proto) {
+                case PKT_PROTO_RADIO:
+                    hbuf[i].protocol = NETDEV_PROTO_RADIO;
+                    break;
+
+                case PKT_PROTO_802154_DATA:
+                    hbuf[i].protocol = NETDEV_PROTO_802154;
+                    break;
+
+                case PKT_PROTO_6LOWPAN:
+                    hbuf[i].protocol = NETDEV_PROTO_6LOWPAN;
+                    break;
+
+                case PKT_PROTO_IPV6:
+                    hbuf[i].protocol = NETDEV_PROTO_IPV6;
+                    break;
+
+                case PKT_PROTO_UDP:
+                    hbuf[i].protocol = NETDEV_PROTO_UDP;
+                    break;
+
+                case PKT_PROTO_TCP:
+                    hbuf[i].protocol = NETDEV_PROTO_IPV6;
+                    break;
+
+                case PKT_PROTO_CCNL:
+                    hbuf[i].protocol = NETDEV_PROTO_CCNL;
+                    break;
+
+                case PKT_PROTO_CC110X:
+                    hbuf[i].protocol = NETDEV_PROTO_CC110X;
+                    break;
+
+                default:
+                    hbuf[i].protocol = NETDEV_PROTO_UNKNOWN;
+                    break;
+
+            }
+
+            hbuf[i].header = ptr->header_data;
+            hbuf[i].header_len = ptr->header_len;
+
+            netdev_hlist_add(&headers, &(hbuf[i++]));
+
+            pkt_hlist_advance(&ptr);
+        }
+    }
+
+    /* XXX: end of transformation */
+
+    result = dev->driver->send_data(dev, snd->dest, snd->dest_len, headers,
+                                    snd->pkt->payload_data, snd->pkt->payload_len);
+
+    pktbuf_release(snd->pkt);
+
+    return result;
 }
 
 static int _nomac_get_registry(netapi_conf_t *conf)
@@ -199,7 +291,7 @@ static void *_nomac_runner(void *args)
 
             switch (cmd->type) {
                 case NETAPI_CMD_SND:
-                    ack->result = _nomac_send(dev, (netapi_snd_pkt_t *)cmd);
+                    ack->result = _nomac_send(dev, (netapi_pkt_t *)cmd);
                     break;
 
                 case NETAPI_CMD_GET:
@@ -248,12 +340,12 @@ static void *_nomac_runner(void *args)
 
                 case NETAPI_CMD_FIRE_RCV:
                     ack->result = unittest_netdev_dummy_fire_rcv_event(dev,
-                                  ((netapi_rcv_pkt_t *)cmd)->src,
-                                  ((netapi_rcv_pkt_t *)cmd)->src_len,
-                                  ((netapi_rcv_pkt_t *)cmd)->dest,
-                                  ((netapi_rcv_pkt_t *)cmd)->dest_len,
-                                  ((netapi_rcv_pkt_t *)cmd)->data,
-                                  ((netapi_rcv_pkt_t *)cmd)->data_len);
+                                  ((netapi_pkt_t *)cmd)->src,
+                                  ((netapi_pkt_t *)cmd)->src_len,
+                                  ((netapi_pkt_t *)cmd)->dest,
+                                  ((netapi_pkt_t *)cmd)->dest_len,
+                                  ((netapi_pkt_t *)cmd)->pkt->payload_data,
+                                  ((netapi_pkt_t *)cmd)->pkt->payload_len);
                     break;
 #endif
 
