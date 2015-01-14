@@ -35,34 +35,54 @@
 #define INBUF_SIZE          (64)
 #define READER_STACK_SIZE   (KERNEL_CONF_STACKSIZE_DEFAULT)
 
+#ifndef LED_ON
+#   ifdef LED_GREEN_ON
+#       define LED_ON LED_GREEN_ON;
+#   elif defined(LED_ORANGE_ON)
+#       define LED_ON LED_ORANGE_ON;
+#   elif defined(LED_RED_ON)
+#       define LED_ON LED_RED_ON;
+#   endif
+#endif
+
+#ifndef LED_OFF
+#   ifdef LED_GREEN_OFF
+#       define LED_OFF LED_GREEN_OFF;
+#   elif defined(LED_ORANGE_OFF)
+#       define LED_OFF LED_ORANGE_OFF;
+#   elif defined(LED_RED_OFF)
+#       define LED_OFF LED_RED_OFF;
+#   endif
+#endif
+
 static char inbuf_mem[INBUF_SIZE], reader_stack[READER_STACK_SIZE];
 static ringbuffer_t inbuf = RINGBUFFER_INIT(inbuf_mem);
 static kernel_pid_t slip_pid;
 
-static void blink_led(uint8_t *data, size_t data_len)
+static void blink_led(pkt_t *pkt)
 {
-    for (size_t i = 0; i < data_len; i++) {
-        if (data[i] > 127) {
-            LED_RED_ON;
-            LED_GREEN_ON;
+    uint8_t *data = pkt->payload_data;
+
+    for (size_t i = 0; i < pkt->payload_len; i++) {
+        if (data[i] % 2) {
+            LED_ON;
         }
         else {
-            LED_RED_OFF;
-            LED_GREEN_OFF;
+            LED_OFF;
         }
     }
 }
 
-static inline void echo(void *data, size_t size)
+static inline void echo(pkt_t *pkt)
 {
-    slip_send_l3_packet(slip_pid, NULL, data, size);
+    slip_send_l3_packet(slip_pid, pkt);
 }
 
 static void *reader(void *args)
 {
     msg_t msg_rcv, msg_ack, msg_queue[MSG_QUEUE_SIZE];
 
-    netapi_rcv_pkt_t *rcv;
+    netapi_pkt_t *rcv;
     netapi_ack_t *ack;
 
     (void)args;
@@ -80,7 +100,7 @@ static void *reader(void *args)
             continue;
         }
 
-        rcv = (netapi_rcv_pkt_t *)(msg_rcv.content.ptr);
+        rcv = (netapi_pkt_t *)(msg_rcv.content.ptr);
         msg_ack.content.ptr = (char *)rcv->ack;
         ack = rcv->ack;
 
@@ -90,12 +110,12 @@ static void *reader(void *args)
             continue;
         }
 
-        pktbuf_hold(rcv->data);
+        pktbuf_hold(rcv->pkt);
         msg_reply(&msg_rcv, &msg_ack);
 
-        blink_led(rcv->data, rcv->data_len);
-        echo(rcv->data, rcv->data_len);
-        pktbuf_release(rcv->data);
+        blink_led(rcv->pkt);
+        echo(rcv->pkt);
+        pktbuf_release(rcv->pkt);
     }
 
     return NULL;

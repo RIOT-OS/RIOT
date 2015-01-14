@@ -26,6 +26,7 @@
 #include <stdint.h>
 
 #include "netapi.h"
+#include "pkt.h"
 #include "periph/uart.h"
 #include "ringbuffer.h"
 
@@ -59,22 +60,19 @@ kernel_pid_t slip_init(uart_t uart, uint32_t baudrate, ringbuffer_t *in_buf);
  * @func    slip_send_l3_packet
  * @brief   Send a layer 3 packet over the UART device
  *
- * @param[in] pid               The PID for the @ref slip control thread
- * @param[in] upper_layer_hdrs  All upper layer headers including layer 3.
- * @param[in] data              Data (*without* all upper layer headers) to send
- *                              over the UART device
- * @param[in] data_len          Length of *data*
+ * @param[in] pid               The PID for the @ref slip control thread.
+ * @param[in] pkt               Packet to send over the UART device.
+ *
+ * @return  Number of bytes transmitted.
  */
 
 #ifdef MODULE_NETAPI
-static inline int slip_send_l3_packet(kernel_pid_t pid, netdev_hlist_t *upper_layer_hdrs,
-                                      void *data, size_t data_len)
+static inline int slip_send_l3_packet(kernel_pid_t pid, pkt_t *pkt)
 {
-    return netapi_send_packet(pid, upper_layer_hdrs, NULL, 0, data, data_len);
+    return netapi_send_packet(pid, NULL, 0, pkt);
 }
 #else
-int slip_send_l3_packet(kernel_pid_t pid, netdev_hlist_t *upper_layer_hdrs,
-                        void *data, size_t data_len);
+int slip_send_l3_packet(kernel_pid_t pid, pkt_t *pkt);
 #endif
 
 #ifdef __cplusplus

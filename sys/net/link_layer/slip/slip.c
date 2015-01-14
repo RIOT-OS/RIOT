@@ -135,35 +135,35 @@ static int _slip_putc(uart_t uart, char c)
 
 static void _slip_receive(msg_t *uart_msg, _uart_ctx_t *ctx)
 {
-    netapi_rcv_pkt_t packet;
+    netapi_pkt_t rcv;
     netapi_ack_t ack_mem;
     msg_t l3_pkt, l3_ack, uart_reply;
     size_t bytes = ctx->bytes;
-    char *pkt = (char *)pktbuf_alloc(bytes);
-
-    ringbuffer_get(ctx->in_buf, pkt, bytes);
 
     msg_reply(uart_msg, &uart_reply);
 
-    packet.type = NETAPI_CMD_RCV;
-    packet.ack = &ack_mem;
-    packet.src = NULL;
-    packet.src_len = 0;
-    packet.dest = NULL;
-    packet.dest_len = 0;
+    rcv.type = NETAPI_CMD_RCV;
+    rcv.ack = &ack_mem;
+    rcv.src = NULL;
+    rcv.src_len = 0;
+    rcv.dest = NULL;
+    rcv.dest_len = 0;
     l3_pkt.type = NETAPI_MSG_TYPE;
-    l3_pkt.content.ptr = (char *)(&packet);
+    l3_pkt.content.ptr = (char *)(&rcv);
 
     for (int i = 0; i < _SLIP_REGISTRY_SIZE; i++) {
         if (ctx->registry[i] != KERNEL_PID_UNDEF) {
             size_t offset = 0;
 
             while (offset < ctx->bytes) {
-                packet.data = (void *)(pkt + offset);
-                packet.data_len = bytes - offset;
+                pkt_t *pkt = pktbuf_alloc(bytes);
+
+                ringbuffer_get(ctx->in_buf, pkt->payload_data, bytes - offset);
+                rcv.pkt = pkt;
                 netapi_ack_t *ack;
 
                 msg_send_receive(&l3_pkt, &l3_ack, ctx->registry[i]);
+                pktbuf_release(pkt);
                 ack = (netapi_ack_t *)(l3_ack.content.ptr);
 
                 if (l3_ack.type == NETAPI_MSG_TYPE &&
@@ -186,8 +186,6 @@ static void _slip_receive(msg_t *uart_msg, _uart_ctx_t *ctx)
                     return;
                 }
             }
-
-            pktbuf_release(pkt);
         }
     }
 }
@@ -227,39 +225,34 @@ static int _slip_write(uart_t uart, uint8_t *bytes, size_t len)
     return len;
 }
 
-static int _slip_send(uart_t uart, netapi_snd_pkt_t *snd)
+static int _slip_send(uart_t uart, netapi_pkt_t *snd)
 {
     int snd_byte = 0, res;
+    pkt_hlist_t *ptr = snd->pkt->headers;
 
-    if (snd->ulh != NULL) {
-        netdev_hlist_t *ptr = snd->ulh;
+    pktbuf_hold(snd->pkt);
 
-        do {
-            pktbuf_hold(ptr->header);
-
-            if ((res = _slip_write(uart, ptr->header, ptr->header_len)) < 0) {
-                return res;
-            }
-
-            pktbuf_release(ptr->header);
-            snd_byte += res;
-            netdev_hlist_advance(&ptr);
-        } while (ptr != snd->ulh);
-    }
-
-    if (snd->data != NULL) {
-        pktbuf_hold(snd->data);
-
-        if ((res = _slip_write(uart, snd->data, snd->data_len))) {
+    while (ptr) {
+        if ((res = _slip_write(uart, ptr->header_data, ptr->header_len)) < 0) {
             return res;
         }
 
-        pktbuf_release(snd->data);
+        snd_byte += res;
+        pkt_hlist_advance(&ptr);
+    }
+
+    if (snd->pkt->payload_data != NULL) {
+        if ((res = _slip_write(uart, snd->pkt->payload_data,
+                               snd->pkt->payload_len))) {
+            return res;
+        }
 
         snd_byte += res;
     }
 
     _slip_putc(uart, _SLIP_END);
+
+    pktbuf_release(snd->pkt);
 
     return snd_byte;
 }
@@ -278,7 +271,7 @@ static void _slip_handle_cmd(uart_t uart, msg_t *msg_cmd)
 
     switch (cmd->type) {
         case NETAPI_CMD_SND:
-            ack->result = _slip_send(uart, (netapi_snd_pkt_t *)cmd);
+            ack->result = _slip_send(uart, (netapi_pkt_t *)cmd);
             break;
 
         case NETAPI_CMD_GET:
@@ -405,31 +398,32 @@ kernel_pid_t slip_init(uart_t uart, uint32_t baudrate, ringbuffer_t *in_buf)
 }
 
 #ifndef MODULE_NETAPI
-int slip_send_l3_packet(kernel_pid_t pid, netdev_hlist_t *upper_layer_hdrs,
-                        void *data, size_t data_len)
+int slip_send_l3_packet(kernel_pid_t pid, pkt_t *pkt)
 {
     msg_t msg_pkt, msg_ack;
-    netapi_snd_pkt_t pkt;
+    netapi_pkt_t snd;
     netapi_ack_t ack;
     int ack_result;
 
     msg_pkt.type = NETAPI_MSG_TYPE;
-    msg_pkt.content.ptr = (char *)(&pkt);
+    msg_pkt.content.ptr = (char *)(&snd);
 
-    pkt.type = NETAPI_CMD_SND;
-    pkt.ack = &ack;
-    pkt.ulh = upper_layer_hdrs;
-    pkt.dest = NULL;
-    pkt.dest_len = 0;
-    pkt.data = data;
-    pkt.data_len = data_len;
+    pktbuf_hold(pkt);
+
+    snd.type = NETAPI_CMD_SND;
+    snd.ack = &ack;
+    snd.dest = NULL;
+    snd.dest_len = 0;
+    snd.pkt = pkt;
 
     msg_send_receive(&msg_pkt, &msg_ack, pid);
+
+    pktbuf_release(pkt);
 
     if (msg_ack.content.ptr != (char *)(&ack) ||
         msg_ack.type != NETAPI_MSG_TYPE ||
         ack.type != NETAPI_CMD_ACK ||
-        ack.orig != pkt.type) {
+        ack.orig != snd.type) {
         return -ENOMSG;
     }
 
