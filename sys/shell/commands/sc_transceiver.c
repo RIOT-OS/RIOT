@@ -256,9 +256,9 @@ int _transceiver_send_handler(int argc, char **argv)
     memset(&p, 0, sizeof(ieee802154_packet_t));
     p.frame.payload = (uint8_t*) text_msg;
     p.frame.payload_len = strlen(text_msg) + 1;
-    p.frame.fcf.frame_type = IEEE_802154_DATA_FRAME;
-    p.frame.fcf.dest_addr_m = IEEE_802154_SHORT_ADDR_M;
-    p.frame.fcf.src_addr_m = IEEE_802154_SHORT_ADDR_M;
+    p.frame.fcf = (IEEE_802154_FCF_TYPE_DATA |
+                   IEEE_802154_FCF_DST_ADDR_SHORT |
+                   IEEE_802154_FCF_SRC_ADDR_SHORT);
     short_addr = atoi(argv[1]);
     p.frame.dest_addr[1] = (short_addr&0xff);
     p.frame.dest_addr[0] = (short_addr>>8);
