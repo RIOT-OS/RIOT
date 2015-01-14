@@ -199,23 +199,22 @@ netdev_802154_tx_status_t at86rf231_transmit_tx_buf(netdev_t *dev)
 
 int16_t at86rf231_load(at86rf231_packet_t *packet)
 {
-    // Set missing frame information
-    packet->frame.fcf.frame_ver = 0;
+    /* set missing frame information */
+
+    /* set frame version to 0 */
+    packet->frame.fcf &= ~(IEEE_802154_FCF_FRAME_VER_MASK);
 
     packet->frame.src_pan_id = at86rf231_get_pan();
 
     if (packet->frame.src_pan_id == packet->frame.dest_pan_id) {
-        packet->frame.fcf.panid_comp = 1;
-    }
-    else {
-        packet->frame.fcf.panid_comp = 0;
+        packet->frame.fcf |= IEEE_802154_FCF_PANID_COMP;
     }
 
-    if (packet->frame.fcf.src_addr_m == 2) {
+    if ((packet->frame.fcf & IEEE_802154_FCF_SRC_ADDR_MASK) == IEEE_802154_FCF_SRC_ADDR_SHORT) {
         packet->frame.src_addr[0] = (uint8_t)(at86rf231_get_address() >> 8);
         packet->frame.src_addr[1] = (uint8_t)(at86rf231_get_address() & 0xFF);
     }
-    else if (packet->frame.fcf.src_addr_m == 3) {
+    else if ((packet->frame.fcf & IEEE_802154_FCF_SRC_ADDR_MASK) == IEEE_802154_FCF_SRC_ADDR_LONG) {
         packet->frame.src_addr[0] = (uint8_t)(at86rf231_get_address_long() >> 56);
         packet->frame.src_addr[1] = (uint8_t)(at86rf231_get_address_long() >> 48);
         packet->frame.src_addr[2] = (uint8_t)(at86rf231_get_address_long() >> 40);
