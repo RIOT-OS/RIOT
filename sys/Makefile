@@ -16,6 +16,9 @@ endif
 ifneq (,$(filter l2_ping,$(USEMODULE)))
     DIRS += net/link_layer/ping
 endif
+ifneq (,$(filter nomac,$(USEMODULE)))
+    DIRS += net/link_layer/nomac
+endif
 ifneq (,$(filter transport_layer,$(USEMODULE)))
 	USEMODULE += udp
 	USEMODULE += tcp
