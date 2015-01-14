@@ -7,7 +7,9 @@
  */
 
 /**
- * @addtogroup  cpu_cortex-m3
+ * @defgroup    cpu_cortexm3_common ARM Cortex-M3 common
+ * @ingroup     cpu
+ * @brief       Common implementations and headers for Cortex-M3 family based micro-controllers
  * @{
  *
  * @file
