@@ -232,7 +232,6 @@ static void test_pktbuf_copy_efault(void)
     TEST_ASSERT_EQUAL_STRING("abcd", pkt->payload_data);
     TEST_ASSERT_EQUAL_INT(5, pkt->payload_len);
 }
-#endif
 
 static void test_pktbuf_copy_einval2(void)
 {
@@ -243,6 +242,7 @@ static void test_pktbuf_copy_einval2(void)
     TEST_ASSERT_EQUAL_STRING("abcd", pkt->payload_data);
     TEST_ASSERT_EQUAL_INT(5, pkt->payload_len);
 }
+#endif
 
 static void test_pktbuf_copy_data_len_too_long(void)
 {
@@ -664,8 +664,8 @@ Test *tests_pktbuf_tests(void)
 #ifdef DEVELHELP
         new_TestFixture(test_pktbuf_copy_efault),
         new_TestFixture(test_pktbuf_copy_einval),
-#endif
         new_TestFixture(test_pktbuf_copy_einval2),
+#endif
         new_TestFixture(test_pktbuf_copy_data_len_too_long),
         new_TestFixture(test_pktbuf_copy_data_len_too_long2),
         new_TestFixture(test_pktbuf_copy_data_len_0),
