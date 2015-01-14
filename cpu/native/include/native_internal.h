@@ -145,6 +145,8 @@ extern const char *_progname;
 extern char **_native_argv;
 extern pid_t _native_pid;
 extern pid_t _native_id;
+extern unsigned _native_rng_seed;
+extern int _native_rng_mode; /**< 0 = /dev/random, 1 = random(3) */
 extern const char *_native_unix_socket_path;
 
 #ifdef MODULE_UART0
