@@ -61,7 +61,7 @@ typedef enum {
                                          EUI-64 in IEEE 802.15.4) */
     NETDEV_OPT_EN_PRELOADING,       /**< Enable pre-loading of data, transfer
                                          data to device using send_data(), send
-                                         by calling set_state(NETDEV_STATE_TX) */
+                                         by calling trigger(NETDEV_ACTION_TX) */
     NETDEV_OPT_EN_PROMISCUOUSMODE   /**< Enable promiscuous mode */
     NETDEV_OPT_EN_AUTOACK,          /**< Automatically send link-layer ACKs */
     NETDEV_OPT_RSSI,                /**< Read the RSSI value from the last transfer */
@@ -90,6 +90,17 @@ typedef enum {
 } netdev_action_t;
 
 /**
+ * TODO: document...
+ */
+typedef enum {
+    NETDEV_EVENT_RX_STARTED = 0,
+    NETDEV_EVENT_RX_COMPLETE,
+    NETDEV_EVENT_TX_STARTED,
+    NETDEV_EVENT_TX_COMPLETE
+    /* probably more? */
+} netdev_event_t;
+
+/**
  * @brief   Definition of basic network device.
  * @note    Feel free to expand if your device needs/supports more
  */
@@ -115,11 +126,12 @@ typedef enum {
 typedef struct netdev_t netdev_t;
 
 /**
- * @brief   Receive data callback for data frames from given network device.
+ * @brief   Event callback for signaling event to a MAC layer.
  *
- * @param[in] data          pointer to the received data in the packet buffer
+ * @param[in] type          type of the event
+ * @param[in] arg           event argument, can e.g. contain a pkt_t pointer
  */
-typedef void (*netdev_rcv_data_cb_t)(pkt_t *data);
+typedef void (*netdev_event_cb_t)(netdev_event_t type, void *arg);
 
 /**
  * @brief   Network device API definition.
@@ -132,10 +144,7 @@ typedef struct {
      * @brief Send data via a given network device
      *
      * @param[in] dev               the network device
-     * @param[in] dest              the (hardware) destination address for the data
-     *                              in host byte order.
-     * @param[in] dest_len          the length of *dest* in byte
-     * @param[in] data              pointer to the data to sent
+     * @param[in] pkt              pointer to the data to sent
      *
      * @return  the number of byte actually send on success
      * @return  -EAFNOSUPPORT if address of length dest_len is not supported
@@ -145,10 +154,10 @@ typedef struct {
      *          of the device *dev*
      * @return  a fitting negative other errno on other failure
      */
-    int (*send_data)(netdev_t *dev, pkt_t *data);
+    int (*send_data)(netdev_t *dev, pkt_t *pkt);
 
     /**
-     * @brief   Registers a receive data callback to a given network device.
+     * @brief   Registers an event callback to a given network device.
      *
      * @param[in] dev   the network device.
      * @param[in] cb    the callback.
@@ -157,10 +166,10 @@ typedef struct {
      * @return  -ENODEV, if *dev* is not recognized
      * @return  -ENOBUFS, if maximum number of registrable callbacks is exceeded
      */
-    int (*add_receive_data_callback)(netdev_t *dev, netdev_rcv_data_cb_t cb);
+    int (*add_event_callback)(netdev_t *dev, netdev_event_cb_t cb);
 
     /**
-     * @brief   Unregisters a receive data callback to a given network device.
+     * @brief   Unregisters an event callback to a given network device.
      *
      * @param[in] dev   the network device.
      * @param[in] cb    the callback.
@@ -168,7 +177,7 @@ typedef struct {
      * @return  0, on success
      * @return  -ENODEV, if *dev* is not recognized
      */
-    int (*rem_receive_data_callback)(netdev_t *dev, netdev_rcv_data_cb_t cb);
+    int (*rem_event_callback)(netdev_t *dev, netdev_event_cb_t cb);
 
     /**
      * @brief   Get an option value from a given network device.
@@ -246,7 +255,7 @@ typedef struct {
      *                          driver. Must be given in the @ref msg_t::value
      *                          of the received message
      */
-    void (*event)(netdev_t *dev, uint16_t event_type);
+    void (*isr_event)(netdev_t *dev, uint16_t event_type);
 } netdev_driver_t;
 
 struct netdev_t {
