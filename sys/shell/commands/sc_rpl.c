@@ -20,38 +20,38 @@
 
 #include "rpl.h"
 
-#if RPL_MAX_ROUTING_ENTRIES != 0
 static char addr_str[IPV6_MAX_ADDR_STR_LEN];
-#endif
+
 void _rpl_route_handler(int argc, char **argv)
 {
     (void) argc;
     (void) argv;
 
-#if RPL_MAX_ROUTING_ENTRIES != 0
     rpl_routing_entry_t *rtable;
     rtable = rpl_get_routing_table();
-    unsigned c = 0;
-    puts("--------------------------------------------------------------------");
-    puts("Routing table");
-    printf(" %-3s  %-18s  %-18s  %s\n", "#", "target", "next hop", "lifetime");
-    puts("--------------------------------------------------------------------");
+    if (rtable) {
+        unsigned c = 0;
+        puts("--------------------------------------------------------------------");
+        puts("Routing table");
+        printf(" %-3s  %-18s  %-18s  %s\n", "#", "target", "next hop", "lifetime");
+        puts("--------------------------------------------------------------------");
 
-    for (int i = 0; i < rpl_max_routing_entries; i++) {
-        if (rtable[i].used) {
-            c++;
-            printf(" %03d: %-18s  ", i, ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
-                                            (&rtable[i].address)));
-            printf("%-18s  ", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
-                                            (&rtable[i].next_hop)));
-            printf("%d\n", rtable[i].lifetime);
+        for (int i = 0; i < rpl_max_routing_entries; i++) {
+            if (rtable[i].used) {
+                c++;
+                printf(" %03d: %-18s  ", i, ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
+                                                (&rtable[i].address)));
+                printf("%-18s  ", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
+                                                (&rtable[i].next_hop)));
+                printf("%d\n", rtable[i].lifetime);
 
+            }
         }
+        puts("--------------------------------------------------------------------");
+        printf(" %u routing table entries\n", c);
     }
-    puts("--------------------------------------------------------------------");
-    printf(" %u routing table entries\n", c);
-#else
-    puts("No routing table available");
-#endif
+    else {
+        puts("No routing table available");
+    }
     puts("$");
 }
