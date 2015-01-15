@@ -85,22 +85,6 @@ typedef enum {
                          *   this layer to lower layer. */
     NETAPI_CMD_GET,     /**< Get an option of this layer. */
     NETAPI_CMD_SET,     /**< Set an option of this layer. */
-    /**
-     * @brief   Registers an upper layer control thread to this layer for
-     *          receiving.
-     *
-     * @details If there is no space left in the control threads registry,
-     *          the result of the acknowledgement must be errno -ENOBUFS.
-     */
-    NETAPI_CMD_REG,
-    /**
-     * @brief   Unregisteres a previously receiving upper layer control thread
-     *          to this layer.
-     *
-     * @details Control thread does not need to notify, if the thread in
-     *          question was previously known. Unknown PIDs are just ignored.
-     */
-    NETAPI_CMD_UNREG,
     NETAPI_CMD_ACK,     /**< Acknowledges to a previous command. */
 
 #ifdef MODULE_NETDEV_DUMMY  /* commands for testing */
@@ -297,30 +281,6 @@ typedef struct {
  */
 typedef uint16_t netapi_reg_demux_ctx_t;
 
-/**
- * @brief   Command definition for upper layer registration.
- * @extends netapi_cmd_t
- */
-typedef struct {
-    /* cppcheck-suppress unusedStructMember because interface is not used yet */
-    netapi_cmd_type_t type; /**< Type of the command. Must be NETAPI_CMD_REG or
-                             *   NETAPI_CMD_UNREG. */
-    netapi_ack_t *ack;      /**< Pointer to where the acknowledgement to this
-                             *   message is stored. Must not be NULL. */
-    kernel_pid_t reg_pid;   /**< The PID of the upper layer thread you want
-                             *   to (un)register. If the PID is duplicate /
-                             *   was not known it is silently ignored. */
-    /**
-     * @brief Protocol specific context information for demultiplex (e.g. next
-     *        header value in IP, port in UDP/TCP, etc).
-     *
-     * @details For NETAPI_CMD_UNREG this field is always ignored. Some protocols
-     *          might also ignore it silently on NETAPI_CMD_REG.
-     */
-    netapi_reg_demux_ctx_t demux_ctx;
-} netapi_reg_t;
-
-
 #ifdef MODULE_TRANSCEIVER
 /**
  * @brief PID for a netapi layer, when used with the transceiver module.
@@ -444,23 +404,6 @@ int netapi_set_option(kernel_pid_t pid, netapi_conf_type_t param,
                       void *data, size_t data_len);
 
 /**
- * @brief Register an upper layer control thread for reception to a protocol
- *        layer identified by *pid*.
- *
- * @note    Wraps IPC call of NETAPI_CMD_REG.
- *
- * @param[in] pid       The PID of the protocol's control thread.
- * @param[in] reg_pid   The PID of the upper layer protocol's control thread.
- * @param[in] demux_ctx Protocol specific demuxing context.
- *
- * @return  result of the acknowledgement.
- * @return  -ENOMSG if wrong acknowledgement was received or was no
- *          acknowledgement at all.
- */
-int netapi_register(kernel_pid_t pid, kernel_pid_t reg_pid,
-                    netapi_reg_demux_ctx_t demux_ctx);
-
-/**
  * @brief Registers the current thread as upper layer control thread for
  *        reception to a protocol layer identified by *pid*.
  *
@@ -478,39 +421,6 @@ static inline int netapi_register_current_thread(kernel_pid_t pid,
         netapi_reg_demux_ctx_t demux_ctx)
 {
     return netapi_register(pid, thread_getpid(), demux_ctx);
-}
-
-/**
- * @brief Unregister an upper layer control thread for reception to a protocol
- *        layer identified by *pid*.
- *
- * @note    Wraps IPC call of NETAPI_CMD_UNREG.
- *
- * @param[in] pid       The PID of the protocol's control thread.
- * @param[in] reg_pid   The PID of the upper layer protocol's control thread.
- *
- * @return  result of the acknowledgement.
- * @return  -ENOMSG if wrong acknowledgement was received or was no
- *          acknowledgement at all.
- */
-int netapi_unregister(kernel_pid_t pid, kernel_pid_t reg_pid);
-
-/**
- * @brief Unregisters the current thread as upper layer control thread for
- *        reception to a protocol layer identified by *pid*.
- *
- * @note    Wraps IPC call of NETAPI_CMD_UNREG with
- *          `netapi_reg_t::reg_pid == thread_getpid()`.
- *
- * @param[in] pid       The PID of the protocol's control thread.
- *
- * @return  result of the acknowledgement.
- * @return  -ENOMSG if wrong acknowledgement was received or was no
- *          acknowledgement at all.
- */
-static inline int netapi_unregister_current_thread(kernel_pid_t pid)
-{
-    return netapi_unregister(pid, thread_getpid());
 }
 
 #ifdef MODULE_NETDEV_DUMMY
