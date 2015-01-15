@@ -21,20 +21,8 @@
 #ifndef __NETMOD_H_
 #define __NETMOD_H_
 
-/**
- * @brief   Make sure the number of network interfaces is defined
- *
- * TODO: Clarify where this value will be defined...
- */
-#ifndef NET_CONF_NUMOF_INTERFACES /* or whatever name it will be */
-#error "netreg: The number of network interfaces is not defined!"
-#endif
-
 
 typedef enum {
-    /* virtually put the network interfaces on the first positions of this enum */
-    NETMOD_IF_NUMOF = (NET_CONF_NUMOF_INTERFACES - 1),
-
 #if MODULE_UDP
     NETMOD_UDP,
 #endif
