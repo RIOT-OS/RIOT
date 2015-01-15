@@ -45,8 +45,6 @@
 
 #define ENABLE_DEBUG (0)
 #if ENABLE_DEBUG
-#undef TRICKLE_TIMER_STACKSIZE
-#define TRICKLE_TIMER_STACKSIZE (KERNEL_CONF_STACKSIZE_MAIN)
 char addr_str[IPV6_MAX_ADDR_STR_LEN];
 #endif
 #include "debug.h"
@@ -57,6 +55,11 @@ mutex_t rpl_send_mutex = MUTEX_INIT;
 msg_t rpl_msg_queue[RPL_PKT_RECV_BUF_SIZE];
 char rpl_process_buf[RPL_PROCESS_STACKSIZE];
 uint8_t rpl_buffer[BUFFER_SIZE - LL_HDR_LEN];
+static timex_t rt_time;
+static vtimer_t rt_timer;
+
+static void _dao_handle_send(rpl_dodag_t *dodag);
+static void _rpl_update_routing_table(void);
 
 #if RPL_DEFAULT_MOP == RPL_NON_STORING_MODE
 uint8_t srh_buffer[BUFFER_SIZE];
@@ -74,7 +77,6 @@ ipv6_addr_t my_address;
 
 /* IPv6 message buffer */
 ipv6_hdr_t *ipv6_buf;
-icmpv6_hdr_t *icmp_buf;
 
 uint8_t rpl_init(int if_id)
 {
@@ -86,7 +88,6 @@ uint8_t rpl_init(int if_id)
     rpl_clear_routing_table();
 #endif
 
-    init_trickle();
     rpl_process_pid = thread_create(rpl_process_buf, RPL_PROCESS_STACKSIZE,
                                     PRIORITY_MAIN - 1, CREATE_STACKTEST,
                                     rpl_process, NULL, "rpl_process");
@@ -106,6 +107,10 @@ uint8_t rpl_init(int if_id)
     /* initialize objective function manager */
     rpl_of_manager_init(&my_address);
     rpl_init_mode(&my_address);
+
+    rt_time = timex_set(RPL_LIFETIME_STEP, 0);
+    vtimer_set_msg(&rt_timer, rt_time, rpl_process_pid, RPL_MSG_TYPE_ROUTING_ENTRY_UPDATE, NULL);
+
     return SIXLOWERROR_SUCCESS;
 }
 
@@ -133,7 +138,9 @@ uint8_t rpl_is_root(void)
 #if RPL_DEFAULT_MOP == RPL_NON_STORING_MODE
 void internal_srh_process(ipv6_srh_t *srh_header)
 {
-    /* modify it accordingly - the number of entries is not depending on padding, because there is none. */
+    /* modify it accordingly - the number of entries is not depending on padding,
+     * because there is none.
+     */
     uint8_t n = srh_header->hdrextlen /  sizeof(ipv6_addr_t);
 
     if (srh_header->segments_left > n) {
@@ -146,7 +153,8 @@ void internal_srh_process(ipv6_srh_t *srh_header)
         down_next_hop = &srh_header->route[n - segs];
         srh_header->segments_left = segs - 1;
         DEBUGF("Segments left after reduction: %d\n", srh_header->segments_left);
-        DEBUGF("Next hop is: %s\n", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, down_next_hop));
+        DEBUGF("Next hop is: %s\n",
+                ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, down_next_hop));
     }
 }
 #endif
@@ -158,81 +166,122 @@ void *rpl_process(void *arg)
     msg_t m_recv;
     msg_init_queue(rpl_msg_queue, RPL_PKT_RECV_BUF_SIZE);
 
+    rpl_dodag_t *dodag;
+    trickle_t *trickle;
+
     while (1) {
         msg_receive(&m_recv);
 
-        /* differentiate packet types */
-        ipv6_buf = ((ipv6_hdr_t *)m_recv.content.ptr);
-        memcpy(&rpl_buffer, ipv6_buf, NTOHS(ipv6_buf->length) + IPV6_HDR_LEN);
-
-        /* This is an RPL-related message. */
-        if (ipv6_buf->nextheader == IPV6_PROTO_NUM_ICMPV6) {
-            icmp_buf = ((icmpv6_hdr_t *)(m_recv.content.ptr + IPV6_HDR_LEN));
-
-            /* get code for message-interpretation and process message */
-            DEBUGF("Received RPL information of type %04X and length %u\n", icmp_buf->code, NTOHS(ipv6_buf->length));
-
-            switch (icmp_buf->code) {
-                case (ICMP_CODE_DIS): {
-                    rpl_recv_DIS();
+        if (m_recv.type > ICMP_CODE_END) {
+            switch (m_recv.type) {
+                case RPL_MSG_TYPE_DAO_HANDLE:
+                    dodag = (rpl_dodag_t *) m_recv.content.ptr;
+                    if (dodag->joined) {
+                        _dao_handle_send(dodag);
+                    }
                     break;
-                }
 
-                case (ICMP_CODE_DIO): {
-                    rpl_recv_DIO();
+                case RPL_MSG_TYPE_ROUTING_ENTRY_UPDATE:
+                    _rpl_update_routing_table();
                     break;
-                }
 
-                case (ICMP_CODE_DAO): {
-                    rpl_recv_DAO();
+                case RPL_MSG_TYPE_TRICKLE_INTERVAL:
+                    trickle = (trickle_t *) m_recv.content.ptr;
+                    if (trickle->callback.func != NULL) {
+                        trickle_interval(trickle);
+                    }
                     break;
-                }
 
-                case (ICMP_CODE_DAO_ACK): {
-                    rpl_recv_DAO_ACK();
+                case RPL_MSG_TYPE_TRICKLE_CALLBACK:
+                    trickle = (trickle_t *) m_recv.content.ptr;
+                    if (trickle->callback.func != NULL) {
+                        trickle_callback(trickle);
+                    }
                     break;
-                }
 
                 default:
                     break;
             }
+
         }
+        /* This is an RPL-related message. */
+        else {
+            /* differentiate packet types */
+            ipv6_buf = (ipv6_hdr_t *) m_recv.content.ptr;
+            memcpy(&rpl_buffer, ipv6_buf, NTOHS(ipv6_buf->length) + IPV6_HDR_LEN);
+
+            if (ipv6_buf->nextheader == IPV6_PROTO_NUM_ICMPV6) {
+
+                /* get code for message-interpretation and process message */
+                DEBUGF("Received RPL information of type %04X and length %u\n",
+                        m_recv.type, NTOHS(ipv6_buf->length));
+
+                switch (m_recv.type) {
+                    case (ICMP_CODE_DIS): {
+                        rpl_recv_DIS();
+                        break;
+                    }
+
+                    case (ICMP_CODE_DIO): {
+                        rpl_recv_DIO();
+                        break;
+                    }
+
+                    case (ICMP_CODE_DAO): {
+                        rpl_recv_DAO();
+                        break;
+                    }
+
+                    case (ICMP_CODE_DAO_ACK): {
+                        rpl_recv_DAO_ACK();
+                        break;
+                    }
+
+                    default:
+                        break;
+                }
+            }
 
 #if RPL_DEFAULT_MOP == RPL_NON_STORING_MODE
-        /* If the message is not RPL-type, it relates to non-storing mode */
-        else if (RPL_DEFAULT_MOP == RPL_NON_STORING_MODE) {
+            /* If the message is not RPL-type, it relates to non-storing mode */
+            else if (RPL_DEFAULT_MOP == RPL_NON_STORING_MODE) {
 
-            if (ipv6_buf->nextheader == IPV6_PROTO_NUM_SRH) {
-                srh_header = ((ipv6_srh_t *)(m_recv.content.ptr + IPV6_HDR_LEN));
+                if (ipv6_buf->nextheader == IPV6_PROTO_NUM_SRH) {
+                    srh_header = ((ipv6_srh_t *)(m_recv.content.ptr + IPV6_HDR_LEN));
 
-                /* if there are no segments left, the routing is finished */
-                if (srh_header->segments_left == 0) {
-                    DEBUGF("Source routing finished with next header: %02X.\n", srh_header->nextheader);
-                    DEBUGF("Size of srh: %d\n", srh_header->hdrextlen);
-                    uint8_t *payload = ((uint8_t *)(m_recv.content.ptr + IPV6_HDR_LEN + sizeof(ipv6_srh_t)+srh_header->hdrextlen));
-                    rpl_remove_srh_header(ipv6_buf, payload, srh_header->nextheader);
-                }
-                else {
-                    internal_srh_process(srh_header);
-                    if (down_next_hop != NULL) {
-                        uint8_t *payload = ((uint8_t *)(m_recv.content.ptr + IPV6_HDR_LEN));
-                        rpl_srh_sendto(payload, NTOHS(ipv6_buf->length), &ipv6_buf->srcaddr, down_next_hop, srh_header, 0);
+                    /* if there are no segments left, the routing is finished */
+                    if (srh_header->segments_left == 0) {
+                        DEBUGF("Source routing finished with next header: %02X.\n",
+                                srh_header->nextheader);
+                        DEBUGF("Size of srh: %d\n", srh_header->hdrextlen);
+                        uint8_t *payload = ((uint8_t *)(m_recv.content.ptr +
+                                    IPV6_HDR_LEN + sizeof(ipv6_srh_t)+srh_header->hdrextlen));
+                        rpl_remove_srh_header(ipv6_buf, payload, srh_header->nextheader);
+                    }
+                    else {
+                        internal_srh_process(srh_header);
+                        if (down_next_hop != NULL) {
+                            uint8_t *payload = ((uint8_t *)(m_recv.content.ptr + IPV6_HDR_LEN));
+                            rpl_srh_sendto(payload, NTOHS(ipv6_buf->length), &ipv6_buf->srcaddr,
+                                    down_next_hop, srh_header, 0);
+                        }
                     }
                 }
-            }
 #if RPL_MAX_ROUTING_ENTRIES != 0
-            else  {
-                srh_header = rpl_get_srh_header(ipv6_buf);
+                else  {
+                    srh_header = rpl_get_srh_header(ipv6_buf);
 
-                if (srh_header != NULL) {
-                    uint8_t *payload = ((uint8_t *)(m_recv.content.ptr + IPV6_HDR_LEN));
-                    rpl_srh_sendto(payload, NTOHS(ipv6_buf->length), &ipv6_buf->srcaddr, &ipv6_buf->destaddr, srh_header, srh_header->hdrextlen + sizeof(ipv6_srh_t));
+                    if (srh_header != NULL) {
+                        uint8_t *payload = ((uint8_t *)(m_recv.content.ptr + IPV6_HDR_LEN));
+                        rpl_srh_sendto(payload, NTOHS(ipv6_buf->length),
+                                &ipv6_buf->srcaddr, &ipv6_buf->destaddr, srh_header,
+                                srh_header->hdrextlen + sizeof(ipv6_srh_t));
+                    }
                 }
+#endif
             }
 #endif
         }
-
-#endif
     }
 }
 
@@ -247,7 +296,8 @@ void rpl_send_DIO(ipv6_addr_t *destination)
     mutex_unlock(&rpl_send_mutex);
 }
 
-void rpl_send_DAO(ipv6_addr_t *destination, uint8_t lifetime, bool default_lifetime, uint8_t start_index)
+void rpl_send_DAO(ipv6_addr_t *destination, uint8_t lifetime,
+        bool default_lifetime, uint8_t start_index)
 {
     if (destination) {
         DEBUGF("Send DAO to %s\n", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, destination));
@@ -272,7 +322,8 @@ void rpl_send_DIS(ipv6_addr_t *destination)
 void rpl_send_DAO_ACK(ipv6_addr_t *destination)
 {
     if (destination) {
-        DEBUGF("Send DAO ACK to %s\n", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, destination));
+        DEBUGF("Send DAO ACK to %s\n",
+                ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, destination));
     }
 
     mutex_lock(&rpl_send_mutex);
@@ -309,26 +360,109 @@ void rpl_recv_DAO_ACK(void)
     rpl_recv_dao_ack_mode();
 }
 
+void _rpl_update_routing_table(void) {
+    rpl_dodag_t *my_dodag = rpl_get_my_dodag();
+    rpl_routing_entry_t *rt;
+    if (my_dodag != NULL) {
+        rt = rpl_get_routing_table();
+
+        for (uint8_t i = 0; i < rpl_max_routing_entries; i++) {
+            if (rt[i].used) {
+                if (rt[i].lifetime <= 1) {
+                    memset(&rt[i], 0, sizeof(rt[i]));
+                }
+                else {
+                    rt[i].lifetime = rt[i].lifetime - RPL_LIFETIME_STEP;
+                }
+            }
+        }
+
+        /* Parent is NULL for root too */
+        if (my_dodag->my_preferred_parent != NULL) {
+            if (my_dodag->my_preferred_parent->lifetime <= 1) {
+                DEBUGF("parent lifetime timeout\n");
+                rpl_parent_update(NULL);
+            }
+            else {
+                my_dodag->my_preferred_parent->lifetime =
+                    my_dodag->my_preferred_parent->lifetime - RPL_LIFETIME_STEP;
+            }
+        }
+    }
+
+    vtimer_remove(&rt_timer);
+    vtimer_set_msg(&rt_timer, rt_time, rpl_process_pid, RPL_MSG_TYPE_ROUTING_ENTRY_UPDATE, NULL);
+}
+
+void rpl_delay_dao(rpl_dodag_t *dodag)
+{
+    dodag->dao_time = timex_set(DEFAULT_DAO_DELAY, 0);
+    dodag->dao_counter = 0;
+    dodag->ack_received = false;
+    vtimer_remove(&dodag->dao_timer);
+    vtimer_set_msg(&dodag->dao_timer, dodag->dao_time,
+            rpl_process_pid, RPL_MSG_TYPE_DAO_HANDLE, dodag);
+}
+
+/* This function is used for regular update of the routes.
+ * The Timer can be overwritten, as the normal delay_dao function gets called
+ */
+void long_delay_dao(rpl_dodag_t *dodag)
+{
+    dodag->dao_time = timex_set(REGULAR_DAO_INTERVAL, 0);
+    dodag->dao_counter = 0;
+    dodag->ack_received = false;
+    vtimer_remove(&dodag->dao_timer);
+    vtimer_set_msg(&dodag->dao_timer, dodag->dao_time,
+            rpl_process_pid, RPL_MSG_TYPE_DAO_HANDLE, dodag);
+}
+
+void rpl_dao_ack_received(rpl_dodag_t *dodag)
+{
+    dodag->ack_received = true;
+    long_delay_dao(dodag);
+}
+
+void _dao_handle_send(rpl_dodag_t *dodag) {
+    if ((dodag->ack_received == false) && (dodag->dao_counter < DAO_SEND_RETRIES)) {
+        dodag->dao_counter++;
+        rpl_send_DAO(NULL, 0, true, 0);
+        dodag->dao_time = timex_set(DEFAULT_WAIT_FOR_DAO_ACK, 0);
+        vtimer_remove(&dodag->dao_timer);
+        vtimer_set_msg(&dodag->dao_timer, dodag->dao_time,
+                rpl_process_pid, RPL_MSG_TYPE_DAO_HANDLE, dodag);
+    }
+    else if (dodag->ack_received == false) {
+        long_delay_dao(dodag);
+    }
+}
+
 ipv6_addr_t *rpl_get_next_hop(ipv6_addr_t *addr)
 {
 
-    DEBUGF("Looking up the next hop to %s\n", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, addr));
+    DEBUGF("Looking up the next hop to %s\n",
+            ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, addr));
 
 #if RPL_MAX_ROUTING_ENTRIES != 0
     for (uint8_t i = 0; i < rpl_max_routing_entries; i++) {
         if (rpl_routing_table[i].used) {
-            DEBUGF("checking %d: %s\n", i, ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, &rpl_routing_table[i].address));
+            DEBUGF("checking %d: %s\n", i,
+                    ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, &rpl_routing_table[i].address));
         }
 
         if ((RPL_DEFAULT_MOP == RPL_NON_STORING_MODE) && rpl_is_root()) {
             if (rpl_routing_table[i].used && rpl_equal_id(&rpl_routing_table[i].address, addr)) {
-                DEBUGF("found %d: %s\n", i, ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, &rpl_routing_table[i].address));
+                DEBUGF("found %d: %s\n", i,
+                        ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
+                            &rpl_routing_table[i].address));
                 return &rpl_routing_table[i].address;
             }
         }
         else {
             if (rpl_routing_table[i].used && rpl_equal_id(&rpl_routing_table[i].address, addr)) {
-                DEBUGF("found %d: %s\n", i, ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, &rpl_routing_table[i].next_hop));
+                DEBUGF("found %d: %s\n", i,
+                        ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
+                            &rpl_routing_table[i].next_hop));
                 return &rpl_routing_table[i].next_hop;
             }
         }
@@ -437,13 +571,16 @@ void rpl_add_srh_entry(ipv6_addr_t *child, ipv6_addr_t *parent, uint16_t lifetim
         }
     }
 
-    /* This maybe a bit confusing since the root also using the standard routing table, but in this case
-     * the code stays cleaner - especially for rt_over_timer from trickle.c. Just keep in mind that
-     * address is now child (unique, iteration variable) and parent is now next_hop. The whole routing table
-     * transforms to a list of children and their parents, so that route aggregation can be done properly.
+    /* This maybe a bit confusing since the root also using the standard routing table,
+     * but in this case the code stays cleaner - especially for rt_over_timer from trickle.c.
+     * Just keep in mind that address is now child (unique, iteration variable) and parent is
+     * now next_hop. The whole routing table transforms to a list of children and their parents,
+     * so that route aggregation can be done properly.
      */
-    DEBUGF("Adding source-routing entry child: %s\n", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, child));
-    DEBUGF("Adding source-routing entry parent: %s\n", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, parent));
+    DEBUGF("Adding source-routing entry child: %s\n",
+            ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, child));
+    DEBUGF("Adding source-routing entry parent: %s\n",
+            ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, parent));
 
     for (uint8_t i = 0; i < rpl_max_routing_entries; i++) {
         if (!rpl_routing_table[i].used) {
@@ -486,13 +623,18 @@ ipv6_srh_t *rpl_get_srh_header(ipv6_hdr_t *act_ipv6_hdr)
     DEBUGF("DESTINATION NODE: %s\n", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, actual_node));
 
     while (!(rpl_equal_id(actual_node, &my_address))) {
-        /* set check variable - this is reversed, if a child/parent-relation is found in one iteration of the routing table */
+        /* set check variable - this is reversed,
+         * if a child/parent-relation is found in one iteration of the routing table */
         traceable = 0;
 
         for (uint8_t i = 0; i < rpl_max_routing_entries; i++) {
-            if (rpl_routing_table[i].used && ipv6_suffix_is_equal(&rpl_routing_table[i].address, actual_node)) {
-                DEBUGF("[INFO] Found parent-child relation with P: %s\n", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, &rpl_routing_table[i].next_hop));
-                DEBUGF(" and C: %s\n", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, actual_node));
+            if (rpl_routing_table[i].used
+                    && ipv6_suffix_is_equal(&rpl_routing_table[i].address, actual_node)) {
+                DEBUGF("[INFO] Found parent-child relation with P: %s\n",
+                        ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
+                            &rpl_routing_table[i].next_hop));
+                DEBUGF(" and C: %s\n",
+                        ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, actual_node));
                 memcpy(&rev_route[counter], actual_node, sizeof(ipv6_addr_t));
 
                 actual_node = &rpl_routing_table[i].next_hop;
@@ -514,7 +656,9 @@ ipv6_srh_t *rpl_get_srh_header(ipv6_hdr_t *act_ipv6_hdr)
         }
     }
 
-    /* build real route based on reversed route. After building it starts with the node next to destination */
+    /* build real route based on reversed route.
+     * After building it starts with the node next to destination
+     */
     if (counter > 1) {
         for (uint8_t i = 0; i < counter-1; i++) {
             memcpy(&srh_header->route[i], &rev_route[counter-i-2], sizeof(ipv6_addr_t));
@@ -552,12 +696,14 @@ void rpl_remove_srh_header(ipv6_hdr_t *ipv6_header, const void *buf, uint8_t nex
     temp_ipv6_header->nextheader = nextheader;
     memcpy(payload, buf, msg_length);
     DEBUGF("Source routing header extraction finished.\n");
-    DEBUGF("Dest is now: %s\n", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, &temp_ipv6_header->destaddr));
+    DEBUGF("Dest is now: %s\n",
+            ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, &temp_ipv6_header->destaddr));
     srh_m_send.content.ptr = (char *) srh_send_buffer;
     msg_send_receive(&srh_m_send, &srh_m_recv, ip_process_pid);
 }
 
-int rpl_srh_sendto(const void *buf, uint16_t len, ipv6_addr_t *src, ipv6_addr_t *dest, ipv6_srh_t *srh_header, uint8_t srh_length)
+int rpl_srh_sendto(const void *buf, uint16_t len,
+        ipv6_addr_t *src, ipv6_addr_t *dest, ipv6_srh_t *srh_header, uint8_t srh_length)
 {
     ipv6_hdr_t *temp_ipv6_header = ((ipv6_hdr_t *)(&srh_send_buffer));
     ipv6_srh_t *current_packet = ((ipv6_srh_t *)(&srh_send_buffer[IPV6_HDR_LEN]));
@@ -572,6 +718,7 @@ int rpl_srh_sendto(const void *buf, uint16_t len, ipv6_addr_t *src, ipv6_addr_t 
     DEBUGF("SRH-length: %d\n", current_packet->hdrextlen);
     DEBUGF("My payload length: %d\n", plength);
 
-    return ipv6_sendto(&temp_ipv6_header->destaddr, IPV6_PROTO_NUM_SRH, (uint8_t *)current_packet, plength, &temp_ipv6_header->destaddr);
+    return ipv6_sendto(&temp_ipv6_header->destaddr, IPV6_PROTO_NUM_SRH,
+            (uint8_t *)current_packet, plength, &temp_ipv6_header->destaddr);
 }
 #endif

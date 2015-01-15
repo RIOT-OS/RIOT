@@ -18,15 +18,16 @@
  * @}
  */
 
-#include <string.h>
-#include "ipv6.h"
-
 #ifndef RPL_STRUCTS_H_INCLUDED
 #define RPL_STRUCTS_H_INCLUDED
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#include <string.h>
+#include "ipv6.h"
+#include "trickle.h"
 
 /* Modes of Operation */
 
@@ -167,6 +168,11 @@ typedef struct rpl_dodag_t {
     uint8_t joined;
     rpl_parent_t *my_preferred_parent;
     struct rpl_of_t *of;
+    trickle_t trickle;
+    bool ack_received;
+    uint8_t dao_counter;
+    timex_t dao_time;
+    vtimer_t dao_timer;
 } rpl_dodag_t;
 
 typedef struct rpl_of_t {
