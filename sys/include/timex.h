@@ -74,11 +74,11 @@ typedef struct {
  *
  * @param[in] a     First summand
  * @param[in] b     Second summand
+ * @param[out] r    Sum of first and second addend
  *
- * @return The sum of the two timestamps
  */
 /* cppcheck-suppress passedByValue */
-timex_t timex_add(const timex_t a, const timex_t b);
+void timex_add(const timex_t *a, const timex_t *b, timex_t *r);
 
 /**
  * @brief Subtracts two timestamps

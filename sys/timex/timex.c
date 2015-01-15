@@ -26,7 +26,7 @@
 
 #include "timex.h"
 
-timex_t timex_add(const timex_t a, const timex_t b)
+void timex_add(const timex_t *a, const timex_t *b, timex_t *r)
 {
 #if ENABLE_DEBUG
     if (!timex_isnormalized(&a) || !timex_isnormalized(&b)) {
@@ -34,16 +34,15 @@ timex_t timex_add(const timex_t a, const timex_t b)
     }
 #endif
 
-    timex_t result;
-    result.seconds = a.seconds + b.seconds;
-    result.microseconds = a.microseconds + b.microseconds;
+    r->seconds = a->seconds + b->seconds;
+    r->microseconds = a->microseconds + b->microseconds;
 
-    if (result.microseconds > SEC_IN_USEC) {
-        result.microseconds -= SEC_IN_USEC;
-        result.seconds++;
+    if (r->microseconds > SEC_IN_USEC) {
+        r->microseconds -= SEC_IN_USEC;
+        r->seconds++;
     }
 
-    return result;
+    return;
 }
 
 timex_t timex_set(uint32_t seconds, uint32_t microseconds)

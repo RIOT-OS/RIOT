@@ -261,7 +261,7 @@ static int vtimer_set(vtimer_t *timer)
 
     timex_t now;
     vtimer_now(&now);
-    timer->absolute = timex_add(now, timer->absolute);
+    timex_add(&now, &timer->absolute, &timer->absolute);
     normalize_to_tick(&(timer->absolute));
 
     DEBUG("vtimer_set(): Absolute: %" PRIu32 " %" PRIu32 "\n", timer->absolute.seconds, timer->absolute.microseconds);

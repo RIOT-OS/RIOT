@@ -222,7 +222,7 @@ void routingtable_fill_routing_entry_t_rreq(struct aodvv2_packet_data *packet_da
     rt_entry->seqnum = packet_data->origNode.seqnum;
     rt_entry->nextHopAddr = packet_data->sender;
     rt_entry->lastUsed = packet_data->timestamp;
-    rt_entry->expirationTime = timex_add(packet_data->timestamp, validity_t);
+    timex_add(&packet_data->timestamp, &validity_t, &rt_entry->expirationTime);
     rt_entry->metricType = packet_data->metricType;
     rt_entry->metric = packet_data->origNode.metric;
     rt_entry->state = ROUTE_STATE_ACTIVE;
@@ -235,7 +235,7 @@ void routingtable_fill_routing_entry_t_rrep(struct aodvv2_packet_data *packet_da
     rt_entry->seqnum = packet_data->targNode.seqnum;
     rt_entry->nextHopAddr = packet_data->sender;
     rt_entry->lastUsed = packet_data->timestamp;
-    rt_entry->expirationTime = timex_add(packet_data->timestamp, validity_t);
+    timex_add(&packet_data->timestamp, &validity_t, &rt_entry->expirationTime);
     rt_entry->metricType = packet_data->metricType;
     rt_entry->metric = packet_data->targNode.metric;
     rt_entry->state = ROUTE_STATE_ACTIVE;

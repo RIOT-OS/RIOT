@@ -21,9 +21,13 @@ static void test_timex_set(void)
 static void test_timex_add(void)
 {
     timex_t time;
-    time = timex_add(timex_set(100, 100), timex_set(40, 10));
+    timex_t a = timex_set(100, 100);
+    timex_t b = timex_set(40, 10);
+    timex_add(&a, &b, &time);
     TEST_ASSERT_EQUAL_INT(0, timex_cmp(time, timex_set(140, 110)));
-    time = timex_add(timex_set(100, 700000), timex_set(40, 800000));
+    a = timex_set(100, 700000);
+    b = timex_set(40, 800000);
+    timex_add(&a, &b, &time);
     TEST_ASSERT_EQUAL_INT(0, timex_cmp(time, timex_set(141, 500000)));
 }
 
