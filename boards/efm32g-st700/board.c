@@ -7,13 +7,14 @@
  */
 
 /**
- * @ingroup     board_stm32f3discovery
+ * @ingroup     board_efm32g-st700
  * @{
  *
  * @file
  * @brief       Board specific implementations for the STM32F3Discovery evaluation board
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author		Ryan Kurte <ryankurte@gmail.com>
  *
  * @}
  */
@@ -36,7 +37,7 @@ void board_init(void)
 }
 
 /**
- * @brief Initialize the boards on-board LEDs (LD3 to LD10)
+ * @brief Initialize the boards on-board LEDs
  *
  * The LED initialization is hard-coded in this function. As the LEDs are soldered
  * onto the board they are fixed to their CPU pins.

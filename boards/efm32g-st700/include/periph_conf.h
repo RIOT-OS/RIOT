@@ -7,13 +7,14 @@
  */
 
 /**
- * @ingroup     board_stm32f0discovery
+ * @ingroup     board_efm32g-st700
  * @{
  *
  * @file
  * @brief       Peripheral MCU configuration for the STM32F0discovery board
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author		Ryan Kurte <ryankurte@gmail.com>
  */
 
 #ifndef __PERIPH_CONF_H
