@@ -139,7 +139,7 @@ void routingtable_break_and_get_all_hopping_over(struct netaddr *hop,
 static void _reset_entry_if_stale(uint8_t i)
 {
     vtimer_now(&now);
-    timex_t lastUsed, expirationTime;
+    timex_t lastUsed, expirationTime, diff, sum;
 
     if (timex_cmp(routing_table[i].expirationTime, null_time) == 0) {
         return;
@@ -157,8 +157,9 @@ static void _reset_entry_if_stale(uint8_t i)
         return;
     }
 
+    timex_sub(&now, &active_interval, &diff);
     if ((state == ROUTE_STATE_ACTIVE) &&
-        (timex_cmp(timex_sub(now, active_interval), lastUsed) == 1)) {
+        (timex_cmp(diff, lastUsed) == 1)) {
         DEBUG("\t[routing] route towards %s Idle\n",
               netaddr_to_string(&nbuf, &routing_table[i].addr));
         routing_table[i].state = ROUTE_STATE_IDLE;
@@ -183,14 +184,17 @@ static void _reset_entry_if_stale(uint8_t i)
 
     /* If (Current_Time - Route.LastUsed) > (ACTIVE_INTERVAL + MAX_IDLETIME),
      * and if (Route.Timed == FALSE), set Route.State := Invalid. */
-    if ((timex_cmp(timex_sub(now, lastUsed), timex_add(active_interval, max_idletime)) > 0) &&
+    timex_sub(&now, &lastUsed, &diff);
+    timex_add(&active_interval, &max_idletime, &sum);
+    if ((timex_cmp(diff, sum) > 0) &&
         (state != ROUTE_STATE_TIMED)) {
         routing_table[i].state = ROUTE_STATE_INVALID;
     }
 
     /* After that time, old sequence number information is considered no longer
      * valid and the Invalid route MUST BE expunged */
-    if (timex_cmp(timex_sub(now, lastUsed), max_seqnum_lifetime) >= 0) {
+    timex_sub(&now, &lastUsed, &diff);
+    if (timex_cmp(diff, max_seqnum_lifetime) >= 0) {
         DEBUG("\t[routing] Expunged routing table entry for %s at %i\n",
               netaddr_to_string(&nbuf, &routing_table[i].addr), i);
         memset(&routing_table[i], 0, sizeof(routing_table[i]));

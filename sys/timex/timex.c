@@ -60,7 +60,7 @@ timex_t timex_set(uint32_t seconds, uint32_t microseconds)
     return result;
 }
 
-timex_t timex_sub(const timex_t a, const timex_t b)
+void timex_sub(const timex_t *a, const timex_t *b, timex_t *r)
 {
 #if ENABLE_DEBUG
     if (!timex_isnormalized(&a) || !timex_isnormalized(&b)) {
@@ -68,18 +68,16 @@ timex_t timex_sub(const timex_t a, const timex_t b)
     }
 #endif
 
-    timex_t result;
-
-    if (a.microseconds >= b.microseconds) {
-        result.seconds = a.seconds - b.seconds;
-        result.microseconds = a.microseconds - b.microseconds;
+    if (a->microseconds >= b->microseconds) {
+        r->seconds = a->seconds - b->seconds;
+        r->microseconds = a->microseconds - b->microseconds;
     }
     else {
-        result.seconds = a.seconds - b.seconds - 1;
-        result.microseconds = a.microseconds + SEC_IN_USEC - b.microseconds;
+        r->seconds = a->seconds - b->seconds - 1;
+        r->microseconds = a->microseconds + SEC_IN_USEC - b->microseconds;
     }
 
-    return result;
+    return;
 }
 
 int timex_cmp(const timex_t a, const timex_t b)

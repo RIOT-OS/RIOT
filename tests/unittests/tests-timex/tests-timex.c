@@ -33,11 +33,17 @@ static void test_timex_add(void)
 
 static void test_timex_sub(void)
 {
-    timex_t time;
-    time = timex_sub(timex_set(100, 100), timex_set(40, 10));
-    TEST_ASSERT_EQUAL_INT(0, timex_cmp(time, timex_set(60, 90)));
-    time = timex_sub(timex_set(100, 100), timex_set(40, 200));
-    TEST_ASSERT_EQUAL_INT(0, timex_cmp(time, timex_set(59, 999900)));
+    timex_t time, a, b;
+    a = timex_set(100, 100);
+    b = timex_set(40, 10);
+    timex_sub(&a, &b, &time);
+    a = timex_set(60,90);
+    TEST_ASSERT_EQUAL_INT(0, timex_cmp(time, a));
+    a = timex_set(100, 100);
+    b = timex_set(40, 200);
+    timex_sub(&a, &b, &time);
+    a = timex_set(59,999900);
+    TEST_ASSERT_EQUAL_INT(0, timex_cmp(time, a));
 }
 
 static void test_timex_from_uint64(void)

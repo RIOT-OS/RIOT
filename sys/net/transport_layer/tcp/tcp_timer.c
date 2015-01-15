@@ -34,16 +34,17 @@ void handle_synchro_timeout(socket_internal_t *current_socket)
     msg_t send;
 
     if (thread_getstatus(current_socket->recv_pid) == STATUS_RECEIVE_BLOCKED) {
-        timex_t now;
+        timex_t now, diff;
         vtimer_now(&now);
 
+        timex_sub(&now, &current_socket->socket_values.tcp_control.last_packet_time, &diff);
         if ((current_socket->socket_values.tcp_control.no_of_retries == 0) &&
-            (timex_uint64(timex_sub(now, current_socket->socket_values.tcp_control.last_packet_time)) > TCP_SYN_INITIAL_TIMEOUT)) {
+            (timex_uint64(diff) > TCP_SYN_INITIAL_TIMEOUT)) {
             current_socket->socket_values.tcp_control.no_of_retries++;
             socket_base_net_msg_send(&send, current_socket->recv_pid, 0, TCP_RETRY);
         }
         else if ((current_socket->socket_values.tcp_control.no_of_retries > 0) &&
-                 (timex_uint64(timex_sub(now, current_socket->socket_values.tcp_control.last_packet_time)) >
+                 (timex_uint64(diff) >
                   (current_socket->socket_values.tcp_control.no_of_retries *
                    TCP_SYN_TIMEOUT + TCP_SYN_INITIAL_TIMEOUT))) {
             current_socket->socket_values.tcp_control.no_of_retries++;
@@ -77,13 +78,14 @@ void handle_established(socket_internal_t *current_socket)
             current_timeout *= 2;
         }
 
-        timex_t now;
+        timex_t now, diff;
         vtimer_now(&now);
 
+        timex_sub(&now, &current_socket->socket_values.tcp_control.last_packet_time, &diff);
         if (current_timeout > TCP_ACK_MAX_TIMEOUT) {
             socket_base_net_msg_send(&send, current_socket->send_pid, 0, TCP_TIMEOUT);
         }
-        else if (timex_uint64(timex_sub(now, current_socket->socket_values.tcp_control.last_packet_time)) >
+        else if (timex_uint64(diff) >
                  current_timeout) {
             current_socket->socket_values.tcp_control.no_of_retries++;
             socket_base_net_msg_send(&send, current_socket->send_pid, 0, TCP_RETRY);

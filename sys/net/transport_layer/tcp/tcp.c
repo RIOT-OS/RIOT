@@ -117,14 +117,15 @@ void print_tcp_flags(tcp_hdr_t *tcp_header)
 
 void print_tcp_cb(tcp_cb_t *cb)
 {
-    timex_t now;
+    timex_t now, diff;
     vtimer_now(&now);
     printf("Send_ISS: %" PRIu32 "\nSend_UNA: %" PRIu32 "\nSend_NXT: %" PRIu32 "\nSend_WND: %u\n",
            cb->send_iss, cb->send_una, cb->send_nxt, cb->send_wnd);
     printf("Rcv_IRS: %" PRIu32 "\nRcv_NXT: %" PRIu32 "\nRcv_WND: %u\n",
            cb->rcv_irs, cb->rcv_nxt, cb->rcv_wnd);
+    timex_sub(&now, &cb->last_packet_time, &diff);
     printf("Time difference: %" PRIu64 ", No_of_retries: %u, State: %u\n\n",
-           timex_uint64(timex_sub(now, cb->last_packet_time)), cb->no_of_retries, cb->state);
+           timex_uint64(diff), cb->no_of_retries, cb->state);
 }
 
 void print_tcp_status(int in_or_out, ipv6_hdr_t *ipv6_header,
@@ -788,7 +789,9 @@ int tcp_bind_socket(int s, sockaddr6_t *name, int namelen, uint8_t pid)
 
 void calculate_rto(tcp_cb_t *tcp_control, timex_t current_time)
 {
-    double rtt = (double) timex_uint64(timex_sub(current_time, tcp_control->last_packet_time));
+    timex_t diff;
+    timex_sub(&current_time, &tcp_control->last_packet_time, &diff);
+    double rtt = (double) timex_uint64(diff);
     double srtt = tcp_control->srtt;
     double rttvar = tcp_control->rttvar;
     double rto = tcp_control->rto;

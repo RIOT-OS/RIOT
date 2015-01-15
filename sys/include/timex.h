@@ -85,11 +85,11 @@ void timex_add(const timex_t *a, const timex_t *b, timex_t *r);
  *
  * @param[in] a     The minuend
  * @param[in] b     The subtrahend
+ * @param[out] r    Difference of minuend and subtrahend
  *
- * @return The difference a - b
  */
 /* cppcheck-suppress passedByValue */
-timex_t timex_sub(const timex_t a, const timex_t b);
+void timex_sub(const timex_t *a, const timex_t *b, timex_t *r);
 
 /**
  * @brief Initializes a timex timestamp

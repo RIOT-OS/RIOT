@@ -127,7 +127,7 @@ int pthread_cond_timedwait(struct pthread_cond_t *cond, struct mutex_t *mutex, c
     vtimer_now(&now);
     then.seconds = abstime->tv_sec;
     then.microseconds = abstime->tv_nsec / 1000u;
-    reltime = timex_sub(then, now);
+    timex_sub(&then, &now, &reltime);
 
     vtimer_t timer;
     vtimer_set_wakeup(&timer, reltime, sched_active_pid);

@@ -70,7 +70,7 @@ int _l2_ping_req_handler(int argc, char **argv)
     l2_ping((radio_address_t) atoi(argv[1]), count, L2_PING_DEFAULT_INTERVAL,
             l2_payload, payload_strlen, 0);
     vtimer_now(&end);
-    period = timex_sub(end, start);
+    timex_sub(&end, &start, &period);
 
     printf("  --- ping statistics for host %" PRIu16 " ---\n", l2_ping_stats.dst);
     printf("  %" PRIu16 " packets transmitted, %" PRIu16 " received, %" PRIu16 "%% packet loss, time %" PRIu32 ".%06" PRIu32 "s\n",
@@ -126,7 +126,7 @@ int _l2_ping_probe_handler(int argc, char **argv)
     l2_ping((radio_address_t) atoi(argv[1]), count, L2_PING_DEFAULT_INTERVAL,
             l2_payload, payload_strlen, 1);
     vtimer_now(&end);
-    period = timex_sub(end, start);
+    timex_sub(&end, &start, &period);
 
     printf("  --- ping statistics for host %" PRIu16 " ---\n", l2_ping_stats.dst);
     printf("  %" PRIu16 " packets transmitted in %" PRIu32 ".%06" PRIu32 "s\n", l2_ping_stats.ping_count,

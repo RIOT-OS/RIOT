@@ -826,7 +826,10 @@ uint32_t get_remaining_time(timex_t *t)
     timex_t now;
     vtimer_now(&now);
 
-    return (timex_sub(*t, now).seconds);
+    timex_t rem;
+    timex_sub(t, &now, &rem);
+
+    return rem.seconds;
 }
 
 void set_remaining_time(timex_t *t, uint32_t time)

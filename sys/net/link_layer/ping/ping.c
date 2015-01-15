@@ -186,7 +186,8 @@ static void *l2_pkt_handler(void *unused)
 
 static void calc_rtt(void)
 {
-    timex_t rtt = timex_sub(end, start);
+    timex_t rtt;
+    timex_sub(&end, &start, &rtt);
     timex_t rtt_sum;
     timex_add(&rtt_sum, &rtt, &rtt_sum);
 
