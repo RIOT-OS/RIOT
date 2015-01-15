@@ -36,7 +36,7 @@ extern "C" {
  */
 typedef struct {
     netreg_entry_t *next;           /**< point to the next entry */
-    kernel_pid_t module_pid;        /**< the PID of the referenced module */
+    kernel_pid_t pid;        /**< the PID of the referenced module */
 } netreg_entry_t;
 
 /**
@@ -67,14 +67,43 @@ int netreg_register(netmod_t module, kernel_pid_t pid);
 int netreg_unregister(netmod_t module, kernel_pid_t pid);
 
 /**
+ * @brief   Register an interface with the given interface id (PID)
+ *
+ * @param pid [description]
+ * @return [description]
+ */
+int netreg_add_interface(kernel_pid_t pid);
+
+/**
+ * @brief   Remove the interface with the given interface id (PID)
+ *
+ * @param[in] pid           interface id
+ *
+ * @return                  0 on success
+ * @return                  -1 if device was not registered
+ */
+int netreg_remove_interface(kernel_pid_t pid);
+
+/**
  * @brief   Lookup a list of PIDs for a given protocol/interface
  *
  * @param[out] entry        head of the list of entries
  * @param[in]  module       module id to look up
  *
  * @return                  the first PID registered for the requested module
+ * @return                  KERNEL_PID_UNDEF if list for module is empty
  */
 kernel_pid_t netreg_lookup(netreg_entry_t *entry, netmod_t module);
+
+/**
+ * @brief   Get the first element from the list of registered network interfaces
+ *
+ * @param[in|out] entry     pointer to the current element in the list
+ *
+ * @return                  the PID of the first network interface
+ * @return                  KERNEL_PID_UNDEF if no device is registered
+ */
+kernel_pid_t netreg_get_interfaces(netreg_entry_t *entry);
 
 /**
  * @brief   Get the next PID in the given list

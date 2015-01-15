@@ -29,9 +29,6 @@
 
 /**
  * @brief   Compute the needed size for the registry
- *
- * The size is computed to fit one pointer and 2 netreg_entry_t for each network
- * module.
  */
 #ifndef NETREG_REGISTRY_SIZE
 #define NETREG_REGISTRY_SIZE        (5 * sizeof(void*) * NETMOD_NUMOF)
@@ -46,6 +43,11 @@ static char *buffer[NETREG_REGISTRY_SIZE];
  * @brief   Head for the list of free entries
  */
 static netreg_entry_t *next_free;
+
+/**
+ * @brief   Head of list of network interfaces
+ */
+static netreg_entry_t *interfaces = NULL;
 
 /**
  * @brief   Array holding the list heads
@@ -103,14 +105,18 @@ int netreg_unregister(netmod_t module, kernel_pid_t pid)
 {
     netreg_entry_t *tmp = modules[module];
 
-    /* see if the first entry is a hit */
-    if (tmp != NULL && tmp->module_pid == pid) {
+    /* see if list is empty or the first entry is a hit */
+    if (tmp != NULL) {
+        return -1;
+    }
+    if (tmp->pid == pid) {
         modules[module] == tmp->next;
         return 0;
     }
 
+    /* look through the list to find a fitting entry */
     while (tmp->next != NULL) {
-        if (tmp->next->module_pid == pid) {
+        if (tmp->next->pid == pid) {
             tmp->next = tmp->next->next;
             return 0;
         }
@@ -121,12 +127,68 @@ int netreg_unregister(netmod_t module, kernel_pid_t pid)
     return -1;
 }
 
+int netreg_add_interface(kernel_pid_t pid)
+{
+    netreg_entry_t *tmp = interfaces;
+
+    /* check for space */
+    if (next_free == NULL) {
+        return -1;
+    }
+
+    while (tmp != NULL) {
+        tmp = tmp->next;
+    }
+    /* allocate memory */
+    tmp = next_free;
+    next_free = next_free->next;
+    /* populate entry */
+    tmp->pid = pid;
+    tmp->next = NULL;
+    return 0;
+}
+
+int netreg_remove_interface(kernel_pid_t pid)
+{
+    netreg_entry_t *tmp = interfaces;
+
+    /* are there interfaces or is the first entry the one we are looking for? */
+    if (tmp == NULL) {
+        return -1;
+    }
+    if (tmp->pid == pid) {
+        interfaces = tmp->next;
+    }
+
+    /* look through the list */
+    while (tmp->next != NULL) {
+        if (tmp->next->pid == pid) {
+            tmp->next = tmp->next->next;
+            return 0;
+        }
+        tmp = tmp->next;
+    }
+    /* no fitting entry found */
+    return -1;
+}
+
 kernel_pid_t netreg_lookup(netreg_entry_t *entry, netmod_t module)
 {
     /* are there entries for the given module? */
     entry = modules[module];
     if (entry != NULL) {
-        return entry->module_pid;
+        return entry->pid;
+    }
+    else {
+        return KERNEL_PID_UNDEF;
+    }
+}
+
+kernel_pid_t netreg_get_interfaces(netreg_entry_t *entry)
+{
+    entry = interfaces;
+    if (entry != null) {
+        return entry->pid;
     }
     else {
         return KERNEL_PID_UNDEF;
@@ -137,7 +199,7 @@ kernel_pid_t netreg_getnext(netreg_entry_t *entry)
 {
     entry = entry->next;
     if (entry != NULL) {
-        return entry->module_pid;
+        return entry->pid;
     }
     else {
         return KERNEL_PID_UNDEF;
