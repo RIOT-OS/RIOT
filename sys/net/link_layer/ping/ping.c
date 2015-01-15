@@ -193,10 +193,10 @@ static void calc_rtt(void)
 
     l2_ping_stats.last_rtt = rtt;
     l2_ping_stats.avg_rtt = timex_from_uint64(timex_uint64(rtt_sum) / l2_ping_stats.pong_count);
-    if (timex_cmp(rtt, l2_ping_stats.max_rtt) > 0) {
+    if (timex_cmp(&rtt, &l2_ping_stats.max_rtt) > 0) {
         l2_ping_stats.max_rtt = rtt;
     }
-    if (timex_cmp(rtt, l2_ping_stats.min_rtt) < 0) {
+    if (timex_cmp(&rtt, &l2_ping_stats.min_rtt) < 0) {
         l2_ping_stats.min_rtt = rtt;
     }
 }

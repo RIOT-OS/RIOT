@@ -23,12 +23,14 @@ static void test_timex_add(void)
     timex_t time;
     timex_t a = timex_set(100, 100);
     timex_t b = timex_set(40, 10);
+    timex_t c = timex_set(140, 110);
     timex_add(&a, &b, &time);
-    TEST_ASSERT_EQUAL_INT(0, timex_cmp(time, timex_set(140, 110)));
+    TEST_ASSERT_EQUAL_INT(0, timex_cmp(&time, &c));
     a = timex_set(100, 700000);
     b = timex_set(40, 800000);
+    c = timex_set(141, 500000);
     timex_add(&a, &b, &time);
-    TEST_ASSERT_EQUAL_INT(0, timex_cmp(time, timex_set(141, 500000)));
+    TEST_ASSERT_EQUAL_INT(0, timex_cmp(&time, &c));
 }
 
 static void test_timex_sub(void)
@@ -38,12 +40,12 @@ static void test_timex_sub(void)
     b = timex_set(40, 10);
     timex_sub(&a, &b, &time);
     a = timex_set(60,90);
-    TEST_ASSERT_EQUAL_INT(0, timex_cmp(time, a));
+    TEST_ASSERT_EQUAL_INT(0, timex_cmp(&time, &a));
     a = timex_set(100, 100);
     b = timex_set(40, 200);
     timex_sub(&a, &b, &time);
     a = timex_set(59,999900);
-    TEST_ASSERT_EQUAL_INT(0, timex_cmp(time, a));
+    TEST_ASSERT_EQUAL_INT(0, timex_cmp(&time, &a));
 }
 
 static void test_timex_from_uint64(void)

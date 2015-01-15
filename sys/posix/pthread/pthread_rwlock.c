@@ -193,7 +193,7 @@ static int pthread_rwlock_timedlock(pthread_rwlock_t *rwlock,
 
     vtimer_now(&now);
 
-    if (timex_cmp(then, now) <= 0) {
+    if (timex_cmp(&then, &now) <= 0) {
         return ETIMEDOUT;
     }
     else {

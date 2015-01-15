@@ -112,7 +112,7 @@ timex_t timex_set(uint32_t seconds, uint32_t microseconds);
  * @return 1 if a is bigger
  */
 /* cppcheck-suppress passedByValue */
-int timex_cmp(const timex_t a, const timex_t b);
+int timex_cmp(const timex_t *a, const timex_t *b);
 
 /**
  * @brief Corrects timex structure so that microseconds < 1000000

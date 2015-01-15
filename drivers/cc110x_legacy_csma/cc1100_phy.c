@@ -177,7 +177,8 @@ void cc1100_phy_init(void)
     if (radio_mode == CC1100_MODE_CONSTANT_RX) {
         cc1100_watch_dog_period = timex_set(CC1100_WATCHDOG_PERIOD, 0);
 
-        if (timex_cmp(cc1100_watch_dog_period, timex_set(0, 0)) != 0) {
+        timex_t zero = timex_set(0, 0);
+        if (timex_cmp(&cc1100_watch_dog_period, &zero) != 0) {
             vtimer_set_msg(&cc1100_watch_dog, cc1100_watch_dog_period, cc1100_event_handler_pid, MSG_TIMER, NULL);
         }
     }

@@ -80,7 +80,7 @@ void timex_sub(const timex_t *a, const timex_t *b, timex_t *r)
     return;
 }
 
-int timex_cmp(const timex_t a, const timex_t b)
+int timex_cmp(const timex_t *a, const timex_t *b)
 {
 #if ENABLE_DEBUG
     if (!timex_isnormalized(&a) || !timex_isnormalized(&b)) {
@@ -88,16 +88,16 @@ int timex_cmp(const timex_t a, const timex_t b)
     }
 #endif
 
-    if (a.seconds < b.seconds) {
+    if (a->seconds < b->seconds) {
         return -1;
     }
 
-    if (a.seconds == b.seconds) {
-        if (a.microseconds < b.microseconds) {
+    if (a->seconds == b->seconds) {
+        if (a->microseconds < b->microseconds) {
             return -1;
         }
 
-        if (a.microseconds == b.microseconds) {
+        if (a->microseconds == b->microseconds) {
             return 0;
         }
     }
