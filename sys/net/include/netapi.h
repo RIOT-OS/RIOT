@@ -150,12 +150,6 @@ typedef enum {
      * @brief   Set or get default address length.
      */
     NETAPI_CONF_SRC_LEN = NETDEV_OPT_SRC_LEN,
-
-    /** @brief  Get (for setting always use NETAPI_CMD_REG and NETAPI_CMD_UNREG)
-     *          all PIDs of currently registered threads as array of
-     *          @ref kernel_pid_t.
-     */
-    NETAPI_CONF_REGISTRY = NETDEV_OPT_LAST,
 } netapi_conf_type_t;
 
 /**
