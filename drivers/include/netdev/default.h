@@ -43,6 +43,15 @@
 #endif /* NETDEV_DEFAULT */
 #endif /* MODULE_CC110X */
 
+#ifdef MODULE_KW2XRF
+#include "kw2xrf.h"
+
+#ifndef NETDEV_DEFAULT
+#define NETDEV_DEFAULT  ((netdev_t *)(&kw2xrf_netdev))
+#endif /* NETDEV_DEFAULT */
+#endif /* MODULE_KW02DRF */
+
+
 #ifdef MODULE_NATIVENET
 #include "nativenet.h"
 
