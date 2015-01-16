@@ -29,6 +29,18 @@
 #include "cpu.h"
 #include "kernel_internal.h"
 
+//TODO: Hack to fix travis build failures for other boards
+//Decide how to resolve this properly
+// 22/10/14 - ryankurte
+#ifndef SVC_ISR
+#define SVC_ISR       isr_svc  
+#endif
+
+#ifndef PEND_SV_ISR
+#define PEND_SV_ISR   isr_pendsv
+#endif
+//End hack
+
 /**
  * @name noticeable marker marking the beginning of a stack segment
  *
@@ -166,7 +178,7 @@ __attribute__((always_inline)) static __INLINE void context_restore(void)
  * @brief The svc is used for running the scheduler and scheduling a new task during start-up or
  *        after a thread has exited
  */
-__attribute__((naked)) void isr_svc(void)
+__attribute__((naked)) void SVC_ISR(void)
 {
     sched_run();
     context_restore();
@@ -175,7 +187,7 @@ __attribute__((naked)) void isr_svc(void)
 /**
  * @brief All task switching activity is carried out int the pendSV interrupt
  */
-__attribute__((naked)) void isr_pendsv(void)
+__attribute__((naked)) void PEND_SV_ISR(void)
 {
     context_save();
     sched_run();

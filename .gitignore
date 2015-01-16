@@ -13,3 +13,8 @@ cachegrind.out*
 .settings
 .idea
 /toolchain
+*.tags
+*.tags_sorted_by_file
+*.map
+*.o
+*.pdf
