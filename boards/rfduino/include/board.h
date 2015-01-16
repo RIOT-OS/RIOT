@@ -51,8 +51,6 @@ extern "C" {
  * @name Macros for controlling the on-board LEDs.
  * @{
  */
-#define LED_RED_PIN         8
-
 #define LED_RED_ON          /* not available */
 #define LED_RED_OFF         /* not available */
 #define LED_RED_TOGGLE      /* not available */
