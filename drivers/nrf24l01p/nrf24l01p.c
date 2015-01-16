@@ -189,12 +189,10 @@ int nrf24l01p_on(nrf24l01p_t *dev)
     char read;
     int status;
 
-    gpio_clear(dev->cs);
     nrf24l01p_read_reg(dev, REG_CONFIG, &read);
     hwtimer_spin(DELAY_CS_TOGGLE_TICKS);
     status = nrf24l01p_write_reg(dev, REG_CONFIG, (read | PWR_UP));
     hwtimer_spin(DELAY_CS_TOGGLE_TICKS);
-    gpio_set(dev->cs);
 
     hwtimer_wait(DELAY_CHANGE_PWR_MODE_US);
 
@@ -206,12 +204,10 @@ int nrf24l01p_off(nrf24l01p_t *dev)
     char read;
     int status;
 
-    gpio_clear(dev->cs);
     nrf24l01p_read_reg(dev, REG_CONFIG, &read);
     hwtimer_spin(DELAY_CS_TOGGLE_TICKS);
     status = nrf24l01p_write_reg(dev, REG_CONFIG, (read & ~PWR_UP));
     hwtimer_spin(DELAY_CS_TOGGLE_TICKS);
-    gpio_set(dev->cs);
 
     hwtimer_wait(DELAY_CHANGE_PWR_MODE_US);
 
