@@ -17,6 +17,7 @@
  * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
  * @author      Fabian Nack <nack@inf.fu-berlin.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Joakim Gebart <joakim.gebart@eistec.se>
  *
  * @}
  */
@@ -24,6 +25,7 @@
 
 #include "board.h"
 #include "cpu.h"
+#include "mutex.h"
 #include "periph/spi.h"
 #include "periph_conf.h"
 #include "thread.h"
@@ -56,6 +58,21 @@ static SPI_TypeDef *const spi[] = {
 static inline void irq_handler_transfer(SPI_TypeDef *spi, spi_t dev);
 
 static spi_state_t spi_config[SPI_NUMOF];
+
+/**
+ * @brief Array holding one pre-initialized mutex for each SPI device
+ */
+static mutex_t locks[] =  {
+#if SPI_0_EN
+    [SPI_0] = MUTEX_INIT,
+#endif
+#if SPI_1_EN
+    [SPI_1] = MUTEX_INIT,
+#endif
+#if SPI_2_EN
+    [SPI_2] = MUTEX_INIT
+#endif
+};
 
 int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
 {
@@ -259,6 +276,24 @@ int spi_conf_pins(spi_t dev)
         port[i]->AFR[hl] |= (af[i] << ((pin[i] - (hl * 8)) * 4));
     }
 
+    return 0;
+}
+
+int spi_acquire(spi_t dev)
+{
+    if (dev >= SPI_NUMOF) {
+        return -1;
+    }
+    mutex_lock(&locks[dev]);
+    return 0;
+}
+
+int spi_release(spi_t dev)
+{
+    if (dev >= SPI_NUMOF) {
+        return -1;
+    }
+    mutex_unlock(&locks[dev]);
     return 0;
 }
 
