@@ -76,7 +76,9 @@ int cc110x_initialize(netdev_t *dev)
 
     /* Configure SPI */
     spi_poweron(CC110X_SPI);
+    spi_acquire(CC110X_SPI);
     spi_init_master(CC110X_SPI, SPI_CONF_FIRST_RISING, SPI_SPEED_5MHZ);
+    spi_release(CC110X_SPI);
 
     /* Load driver & reset */
     power_up_reset();
