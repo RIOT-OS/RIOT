@@ -77,7 +77,6 @@ typedef struct {
  * @param[out] r    Sum of first and second addend
  *
  */
-/* cppcheck-suppress passedByValue */
 void timex_add(const timex_t *a, const timex_t *b, timex_t *r);
 
 /**
@@ -88,7 +87,6 @@ void timex_add(const timex_t *a, const timex_t *b, timex_t *r);
  * @param[out] r    Difference of minuend and subtrahend
  *
  */
-/* cppcheck-suppress passedByValue */
 void timex_sub(const timex_t *a, const timex_t *b, timex_t *r);
 
 /**
@@ -111,7 +109,6 @@ timex_t timex_set(uint32_t seconds, uint32_t microseconds);
  * @return 0 if equal
  * @return 1 if a is bigger
  */
-/* cppcheck-suppress passedByValue */
 int timex_cmp(const timex_t *a, const timex_t *b);
 
 /**
