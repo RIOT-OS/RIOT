@@ -137,6 +137,7 @@ extern "C" {
 #define SPI_0_DEV             SPI1
 #define SPI_0_CLKEN()         (RCC->APB2ENR |= RCC_APB2ENR_SPI1EN)
 #define SPI_0_CLKDIS()        (RCC->APB2ENR &= ~RCC_APB2ENR_SPI1EN)
+#define SPI_0_BUS_DIV         1   /* 1 -> SPI runs with half CPU clock, 0 -> quarter CPU clock */
 #define SPI_0_IRQ             SPI1_IRQn
 #define SPI_0_IRQ_HANDLER     isr_spi1
 /* SPI 0 pin configuration */
