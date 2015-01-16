@@ -11,22 +11,16 @@
  * @ingroup     net
  * @{
  *
- * @file    pkt.h
+ * @file
  * @brief   General definitions for network packets
- *
- * @note    This file resides in the `sys` module's include path since it is
- *          needed for network device drivers and the `sys/net` module's include
- *          path is not always included (and netdev does not necessarily needs
- *          to a compiled `pkt`).
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 #ifndef __PKT_H_
 #define __PKT_H_
 
+#include <stdlib.h>
 #include <inttypes.h>
-
-#include "clist.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -110,13 +104,75 @@ typedef struct __attribute__((packed)) pkt_hlist_t {    /* packed to be aligned
  * @note    This type has not an initializer on purpose. Please use @ref pktbuf
  *          as factory.
  */
-typedef struct __attribute__((packed)) {    /* packed to be aligned correctly
-                                             * in static packet buffer */
+typedef struct {
     pkt_hlist_t *headers;       /**< network protocol headers of the packet. */
-    void *payload_data;              /**< payload of the packet. */
+    void *payload_data;         /**< payload of the packet. */
     pktsize_t payload_len;      /**< length of pkt_t::payload. */
-    pkt_proto_t payload_proto;  /**< protocol of pkt_t::payload, if any */
 } pkt_t;
+
+/**
+ * @brief   Initializes a packet with data from the @ref pktbuf
+ *
+ * @param[out] pkt          The packet to initialize.
+ * @param[in] payload_data  Data to insert into initialized packet.
+ *                          If @p payload_data is NULL @ref pktbuf_alloc() will
+ *                          be used, otherwise @ref pktbuf_insert() to allocate
+ *                          the data. If @p payload_data is already in @ref pktbuf
+ *                          it will not be allocated again.
+ * @param[in] payload_len   Length of @p payload_data
+ *
+ * @return Copy of @p pkt on success
+ * @return NULL, if no space is left in the packet buffer or size was 0.
+ */
+pkt_t *pkt_init(pkt_t *pkt, void *payload_data, pktsize_t payload_len);
+
+/**
+ * @brief   Alias for `pkt_alloc(pkt, NULL, payload_len)`
+ *
+ * @param[out] pkt          The packet to initialize.
+ *                          If @p payload_data is NULL @ref pktbuf_alloc() will
+ *                          be used, otherwise @ref pktbuf_insert() to allocate
+ *                          the data.
+ * @param[in] payload_len   Length of @p payload_data
+ *
+ * @return Copy of @p pkt on success
+ * @return NULL, if no space is left in the packet buffer or size was 0.
+ */
+static inline pkt_t *pkt_alloc(pkt_t *pkt, pktsize_t payload_len)
+{
+    return pkt_init(pkt, NULL, payload_len);
+}
+
+/**
+ * @brief   Helper function to resize data part of @p pkt to another size
+ *          of @p payload_len, using @ref pktbuf_realloc()
+ *
+ * @param[in,out] pkt       The packet which data you want to resize.
+ * @param[in] payload_len   New length for @p pkt::payload_data
+ *
+ * @return Copy of @p pkt on success
+ * @return NULL, if no space is left in the packet buffer or size was 0.
+ *         @p pkt::payload_data will remain where it was.
+ */
+pkt_t *pkt_realloc(pkt_t *pkt, pktsize_t payload_len);
+
+/**
+ * @brief   Holds a packet in @ref pktbuf
+ *
+ * @see     @ref pktbuf_hold()
+ *
+ * @param[in] pkt   The packet to hold.
+ */
+void pkt_hold(pkt_t *pkt);
+
+/**
+ * @brief   Releases a packet in @ref pktbuf
+ *
+ * @see     @ref pktbuf_release()
+ *
+ * @param[in] pkt   The packet to release.
+ */
+void pkt_release(pkt_t *pkt);
 
 /**
  * @brief Calculates total length of a list of headers.
@@ -208,21 +264,22 @@ static inline pktsize_t pkt_total_len(const pkt_t *pkt)
 }
 
 /**
- * @brief Adds @p header to packet @p pkt.
+ * @brief Adds a header to packet @p pkt and allocates its data in @ref pktbuf.
  *
- * @note    Wrapper function for @ref pkt_hlist_add()
+ * @param[in,out] pkt       The packet to add the header to
+ * @param[in] header_data   Data to insert into the added headr.
+ *                          If @p header_data is NULL @ref pktbuf_alloc() will
+ *                          be used, otherwise @ref pktbuf_insert() to allocate
+ *                          the data. If @p header_data is already in @ref pktbuf
+ *                          it will not be allocated again.
+ * @param[in] header_len    Length of @p header_data
+ * @param[in] header_proto  Protocol of the header.
  *
- * @param[in,out] pkt   The packet to add @p header to
- * @param[in] header    The header to add to the list of headers of @p pkt.
+ * @return  -EFAULT, if @p header_data is NULL and DEVELHELP is defined.
+ * @return  -ENOMEM, if no space is left in the packet buffer or @p header_len was 0.
  */
-static inline void pkt_add_header(pkt_t *pkt, pkt_hlist_t *header)
-{
-    if (pkt == NULL) {
-        return;
-    }
-
-    pkt_hlist_add(&(pkt->headers), header);
-}
+int pkt_add_header(pkt_t *pkt, void *header_data, pktsize_t header_len,
+                   pkt_proto_t header_proto);
 
 /**
  * @brief Removes @p header from packet @p pkt.
@@ -232,14 +289,7 @@ static inline void pkt_add_header(pkt_t *pkt, pkt_hlist_t *header)
  * @param[in,out] pkt   The packet to remove @p header from. May not be NULL.
  * @param[in] header    The header to remove from the list of headers of @p pkt.
  */
-static inline void pkt_remove_header(pkt_t *pkt, pkt_hlist_t *header)
-{
-    if (pkt == NULL) {
-        return;
-    }
-
-    pkt_hlist_remove(&(pkt->headers), header);
-}
+void pkt_remove_header(pkt_t *pkt, pkt_hlist_t *header);
 
 /**
  * @brief Removes first (lowest layer) header from packet @p pkt and returns it.
@@ -253,11 +303,7 @@ static inline void pkt_remove_header(pkt_t *pkt, pkt_hlist_t *header)
  */
 static inline pkt_hlist_t *pkt_remove_first_header(pkt_t *pkt)
 {
-    if (pkt == NULL) {
-        return NULL;
-    }
-
-    return pkt_hlist_remove_first(&(pkt->headers));
+    return (pkt == NULL) ? NULL : pkt_hlist_remove_first(&(pkt->headers));
 }
 
 #ifdef __cplusplus
