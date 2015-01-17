@@ -38,7 +38,7 @@ enum flash_errors {
     FLASH_ERROR_FB_CONFIG       = 2,  /**< Forbidden by MCU configuration/flags */
     FLASH_ERROR_LOCKED          = 3,  /**< Page or flash is locked by other operation */
     FLASH_ERROR_TIMEOUT         = 4,  /**< Timeout */
-    FLASH_ERROR_ALIGNMENT	= 5,  /**< Misalligned access */
+    FLASH_ERROR_ALIGNMENT       = 5,  /**< Misalligned access */
     FLASH_ERROR_VERIFY          = 6,  /**< Data not written correctly */
     FLASH_ERROR_ADDR_RANGE      = 7,  /**< Address out of flash area */
 };
@@ -124,6 +124,8 @@ void *flash_get_address(flash_page_number_t page);
  * flash pages at once. Written data are reread to check if
  * data are stored correctly. Optionally a written word can
  * modified to set only changed bits to reach more write cycles.
+ * 
+ * This function can be used with aligned and unaligned addresses.
  *
  * The return code should by checked to handle errors.
  *
@@ -136,7 +138,6 @@ void *flash_get_address(flash_page_number_t page);
  * @return    FLASH_ERROR_FB_CONFIG
  * @return    FLASH_ERROR_LOCKED
  * @return    FLASH_ERROR_TIMEOUT
- * @return    FLASH_ERROR_ALIGNMENT
  * @return    FLASH_ERROR_VERIFY
  * @return    FLASH_ERROR_ADDR_RANGE
  */
@@ -147,24 +148,26 @@ uint8_t flash_memcpy(void *dest, const void *src, size_t n);
  *
  * This function works like memcpy. It can be used to write
  * a part of a flash page or an single flash page or multiple
- * flash pages at once. There are no alignment, address or correct
- * write checks, so write to protected flash regions or unaligned
- * writes are possible. To support all plattforms do an alignment
- * and address check by your application
+ * flash pages at once. There are no address or correct write checks,
+ * so write to protected flash regions are possible.
+ * 
+ * To support all plattforms do an alignment of src and dest addresses.
+ * 
  * This function is used by tests/periph_flash to check if
- * alignment is configurd correctly
+ * alignment check is implemented correctly
  *
  * The return code should by checked to handle errors.
  *
- * @param[in] dest   Address of flash memory page
- * @param[in] src    Address of source data
- * @param[in] n      Number of bytes to write
+ * @param[in] dest   Aligned address of flash memory page
+ * @param[in] src    Aligned address of source data
+ * @param[in] n      Aligned number of bytes to write
  *
  * @return    FLASH_ERROR_SUCCESS
  * @return    FLASH_ERROR_BROWNOUT
  * @return    FLASH_ERROR_FB_CONFIG
  * @return    FLASH_ERROR_LOCKED
  * @return    FLASH_ERROR_TIMEOUT
+ * @return    FLASH_ERROR_ALIGNMENT
  */
 uint8_t flash_memcpy_fast(void *dest, const void *src, size_t n);
 
