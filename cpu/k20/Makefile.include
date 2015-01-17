@@ -1,0 +1,35 @@
+# this CPU implementation is using the explicit core/CPU interface
+export CFLAGS += -DCOREIF_NG=1
+
+# We don't have a floating point unit
+export CFLAGS += -mcpu=cortex-m4 -msoft-float
+
+# export the peripheral drivers to be linked into the final binary
+export USEMODULE += kinetis periph
+
+# tell the build system that the CPU depends on the Cortex-M common files
+export USEMODULE += cortex-m4_common
+
+# define path to cortex-m_common and kinetis_common module, which are needed for this CPU
+export CORTEX_M4_COMMON = $(RIOTCPU)/cortex-m4_common/
+export KINETIS_COMMON = $(RIOTCPU)/kinetis_common/
+
+# Include the module Makefiles
+include $(CORTEX_M4_COMMON)Makefile.include
+include $(KINETIS_COMMON)Makefile.include
+
+
+# define the linker script to use for this CPU
+# see Makefile for the creation of this file
+export LINKERSCRIPT ?= $(BINDIR)k20_linkerscript.ld
+
+#export the CPU model
+MODEL = $(shell echo $(CPU_MODEL)|tr 'a-z' 'A-Z')
+export CFLAGS += -DCPU_MODEL_$(MODEL)
+
+# include CPU specific includes
+export INCLUDES += -I$(RIOTCPU)/$(CPU)/include
+
+# add the CPU specific system calls implementations for the linker
+export UNDEF += $(BINDIR)cpu/syscalls.o
+export UNDEF += $(BINDIR)cpu/startup.o
