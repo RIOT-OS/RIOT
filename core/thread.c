@@ -21,6 +21,7 @@
 #include <errno.h>
 #include <stdio.h>
 
+#include "assert.h"
 #include "thread.h"
 #include "irq.h"
 
@@ -102,6 +103,25 @@ void thread_yield(void)
     irq_restore(old_state);
 
     thread_yield_higher();
+}
+
+void thread_add_to_list(list_node_t *list, thread_t *thread)
+{
+    assert (thread->status < STATUS_ON_RUNQUEUE);
+
+    uint16_t my_prio = thread->priority;
+    list_node_t *new_node = (list_node_t*)&thread->rq_entry;
+
+    while (list->next) {
+        thread_t *list_entry = container_of((clist_node_t*)list->next, thread_t, rq_entry);
+        if (list_entry->priority > my_prio) {
+            break;
+        }
+        list = list->next;
+    }
+
+    new_node->next = list->next;
+    list->next = new_node;
 }
 
 #ifdef DEVELHELP

@@ -29,6 +29,7 @@
 #include "arch/thread_arch.h"
 #include "cpu_conf.h"
 #include "sched.h"
+#include "list.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -314,6 +315,21 @@ char *thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_sta
  * @brief   Prints the message queue of the current thread.
  */
 void thread_print_msg_queue(void);
+
+/**
+ * @brief Add thread to list, sorted by priority (internal)
+ *
+ * This will add @p thread to @p list sorted by the thread priority.
+ * It reuses the thread's rq_entry field.
+ * Used internally by msg and mutex implementations.
+ *
+ * @note Only use for threads *not on any runqueue* and with interrupts
+ *       disabled.
+ *
+ * @param[in] list      ptr to list root node
+ * @param[in] thread    thread to add
+ */
+void thread_add_to_list(list_node_t *list, thread_t *thread);
 
 #ifdef DEVELHELP
 /**
