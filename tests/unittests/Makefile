@@ -6,19 +6,6 @@ BOARD_INSUFFICIENT_RAM := chronos msb-430 msb-430h redbee-econotag stm32f0discov
 
 USEMODULE += embunit
 
-INCLUDES += -I$(RIOTBASE)/tests/unittests/embunit
-
-ifeq ($(OUTPUT),XML)
-	CFLAGS += -DOUTPUT=OUTPUT_XML
-	USEMODULE += embunit_textui
-else ifeq ($(OUTPUT),TEXT)
-	CFLAGS += -DOUTPUT=OUTPUT_TEXT
-	USEMODULE += embunit_textui
-else ifeq ($(OUTPUT),COMPILER)
-	CFLAGS += -DOUTPUT=OUTPUT_COMPILER
-	USEMODULE += embunit_textui
-endif
-
 # Some randomly generated but still deterministic values for testing
 CFLAGS += -DTEST_STRING8="\"o<\\\\rrB/q\""
 CFLAGS += -DTEST_STRING12="\"50U'HLKC3_ft\""

@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     net
+ * @ingroup     rpl
  * @brief       Routing Protocol for Low power and Lossy Networks
  * @{
  *

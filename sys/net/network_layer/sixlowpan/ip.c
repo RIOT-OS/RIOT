@@ -866,13 +866,14 @@ void ipv6_register_next_header_handler(uint8_t next_header, kernel_pid_t pid)
             break;
     }
 }
-#ifdef MODULE_RPL
+
 /* register routing function */
 void ipv6_iface_set_routing_provider(ipv6_addr_t *(*next_hop)(ipv6_addr_t *dest))
 {
     ip_get_next_hop = next_hop;
 }
 
+#ifdef MODULE_RPL
 /* register source-routing indicator function */
 void ipv6_iface_set_srh_indicator(uint8_t (*srh_indi)(void))
 {

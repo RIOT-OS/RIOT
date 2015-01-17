@@ -13,7 +13,7 @@
  */
 #include <string.h>
 
-#include "embUnit/embUnit.h"
+#include "embUnit.h"
 
 #include "pktqueue.h"
 

@@ -8,7 +8,7 @@
 
 #include <limits.h>
 
-#include "embUnit/embUnit.h"
+#include "embUnit.h"
 
 #include "atomic.h"
 

@@ -44,7 +44,7 @@ extern "C" {
  *                          *mcast* is 1).
  * @param[in]   dest        The destination address of the frame (will be
  *                          ignored if *mcast* is 1).
- * @param[in]   dest_len    The lengts of the destination address in byte.
+ * @param[in]   dest_len    The lengths of the destination address in byte.
  * @param[in]   payload     The payload of the frame.
  * @param[in]   length      The length of the payload.
  * @param[in]   mcast       send frame as multicast frame (*addr* and *if_id*

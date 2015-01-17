@@ -22,6 +22,8 @@
 #include "sched.h"
 #include "msg.h"
 #include "mutex.h"
+#include "pipe.h"
+#include "irq.h"
 
 static pipe_t communication_pipe;
 static ringbuffer_t pipe_rb;

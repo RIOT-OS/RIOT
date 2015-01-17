@@ -11,7 +11,7 @@
  * @ingroup     drivers_cc110x_legacy
  * @{
  *
- * @file        cc110x-config.h
+ * @file
  * @brief       Configuration parameters for the cc110x radio chip
  *
  * @author      Oliver Hahm <oliver.hahm@inria.fr>

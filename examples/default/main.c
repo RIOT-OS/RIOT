@@ -31,6 +31,10 @@
 #include "shell_commands.h"
 #include "board_uart0.h"
 
+#if FEATURE_PERIPH_RTC
+#include "periph/rtc.h"
+#endif
+
 #ifdef MODULE_LTC4150
 #include "ltc4150.h"
 #endif
@@ -153,6 +157,10 @@ int main(void)
 
 #ifdef MODULE_TRANSCEIVER
     init_transceiver();
+#endif
+
+#ifdef FEATURE_PERIPH_RTC
+    rtc_init();
 #endif
 
     (void) puts("Welcome to RIOT!");

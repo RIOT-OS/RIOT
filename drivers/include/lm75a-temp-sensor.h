@@ -36,20 +36,25 @@
 extern "C" {
 #endif
 
-/* LM75A register addresses */
-#define LM75A_ADDR                      0x49
+/**
+ * @name LM75A register addresses
+ * @{
+ */
 #define LM75A_TEMPERATURE_REG           0x0
 #define LM75A_CONFIG_REG                0x1
 #define LM75A_THYST_REG                 0x2
 #define LM75A_OVER_TEMP_REG             0x3
+/** @} */
 
-/* Define the used I2C Interface */
-#define LM75A_I2C_INTERFACE I2C_0                // P0.27 SDA0, P0.28 SCL0
-//#define LM75A_I2C_INTERFACE             I2C1_0    // P0.0  SDA1, P0.1  SCL1
+/**
+ * @brief Define the used I2C Interface
+ */
 //#define LM75A_I2C_INTERFACE I2C1_1              // P0.19 SDA1, P0.20 SCL1
 //#define LM75A_I2C_INTERFACE I2C2                // P0.10 SDA2, P0.11 SCL2
 
-/* LM75A operation modes */
+/**
+ * @brief LM75A operation modes
+ */
 enum OPERATION_MODES {
     LM75A_NORMAL_OPERATION_MODE,
     LM75A_SHUTDOWN_MODE,
@@ -57,7 +62,10 @@ enum OPERATION_MODES {
     LM75A_INTERRUPT_MODE
 };
 
-/*Common definitions for LMA75A  */
+/**
+ * @name Common definitions for LMA75A
+ * @{
+ */
 #define LM75A_BIT0                      0x0
 #define LM75A_BIT1                      0x1
 #define LM75A_BIT2                      0x2
@@ -76,34 +84,38 @@ enum OPERATION_MODES {
 #define LM75A_SIGN_BIT_MASK             (1<<LM75A_BIT10)
 #define LM75A_LSB_MASK                  0x1
 #define LM75A_EXTINT_MODE               0x1
+/** @} */
 
-/* LM75A configuration register */
+/**
+ * @name LM75A configuration register
+ * @{
+ */
 #define LM75A_ACTIVE_LOW                0
 #define LM75A_ACTIVE_HIGH               1
 #define LM75A_DEFAULT_CONFIG_VALUE      0
+/** @} */
 
-enum FAULT_QUEUE_VALUES {
-    LM75A_ONE_FAULT = 1,
-    LM75A_TWO_FAULT = 2,
-    LM75A_FOUR_FAULT = 4,
-    LM75A_SIX_FAULT = 6
-};
-
-/* LM75A default values */
+/**
+ * @brief LM75A default values
+ */
 enum DEFAULT_VALUES {
     LM75A_DEFAULT_TOS = 80,
     LM75A_DEFAULT_THYST = 75,
     LM75A_DEFAULT_OPERATION = LM75A_NORMAL_OPERATION_MODE,
     LM75A_DEFAULT_MODE = LM75A_COMPARATOR_MODE,
     LM75A_DEFAULT_POLARITY = LM75A_ACTIVE_LOW,
-    LM75A_DEFAULT_FAULT_NUM = LM75A_ONE_FAULT
+    LM75A_DEFAULT_FAULT_NUM = 1
 };
 
-/*define inter-threads messages */
+/**
+ * @name define inter-threads messages
+ * @{
+ */
 #define LM75A_EXIT_MSG                  0
 #define LM75A_SAMPLING_MSG              1
 #define LM75A_SLEEP_MSG                 2
 #define LM75A_WEAKUP_MSG                3
+/** @} */
 
 /**
  * @brief       Set the over-temperature shutdown threshold (TOS).

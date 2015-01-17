@@ -3,11 +3,4 @@ MODULE = $(APPLICATION)
 DIRS += $(RIOTCPU)/$(CPU) $(RIOTBOARD)/$(BOARD)
 DIRS += $(RIOTBASE)/core $(RIOTBASE)/drivers $(RIOTBASE)/sys
 
-ifneq (,$(filter embunit,$(USEMODULE)))
-  DIRS += $(RIOTBASE)/tests/unittests/embunit/embUnit
-endif
-ifneq (,$(filter embunit_textui,$(USEMODULE)))
-  DIRS += $(RIOTBASE)/tests/unittests/embunit/textui
-endif
-
 include $(RIOTBASE)/Makefile.base

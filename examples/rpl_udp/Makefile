@@ -34,7 +34,7 @@ ifeq ($(shell $(CC) -Wno-cpp -E - 2>/dev/null >/dev/null dev/null ; echo $$?),0)
 	endif
 endif
 
-BOARD_INSUFFICIENT_RAM := chronos msb-430h redbee-econotag telosb wsn430-v1_3b wsn430-v1_4 z1
+BOARD_INSUFFICIENT_RAM := chronos msb-430h redbee-econotag telosb wsn430-v1_3b wsn430-v1_4 z1 samr21-xpro
 
 # arduino-mega2560: time.h missing from avr-libc
 BOARD_BLACKLIST := arduino-mega2560

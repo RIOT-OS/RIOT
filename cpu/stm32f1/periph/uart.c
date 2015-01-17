@@ -286,7 +286,7 @@ void UART_1_ISR(void)
 }
 #endif
 
-static inline void irq_handler(uint8_t uartnum, USART_TypeDef *dev)
+static inline void irq_handler(uart_t uartnum, USART_TypeDef *dev)
 {
     if (dev->SR & USART_SR_RXNE) {
         char data = (char)dev->DR;

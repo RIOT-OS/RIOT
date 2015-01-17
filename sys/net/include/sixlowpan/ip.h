@@ -313,7 +313,7 @@ static inline void ipv6_addr_set_all_nodes_addr(ipv6_addr_t *ipv6_addr)
 static inline void ipv6_addr_set_solicited_node_addr(ipv6_addr_t *ipv6_addr_out,
         const ipv6_addr_t *ipv6_addr_in)
 {
-    /* copy only the last 24-bit of the ip-address that is beeing resolved */
+    /* copy only the last 24-bit of the ip-address that is being resolved */
     ipv6_addr_out->uint32[0] = HTONL(0xff020000);
     ipv6_addr_out->uint32[1] = 0;
     ipv6_addr_out->uint32[2] = HTONL(1);
@@ -520,18 +520,18 @@ int ipv6_net_if_add_addr(int if_id, const ipv6_addr_t *addr,
  *          is no suitable address attached to the interface.
  *
  * @param[out]  src     The best source address for this node (may be
- *                      all zero if ther is none).
+ *                      all zero if there is none).
  * @param[in]   dest    The destination address for a packet we search
  *                      the source address for.
  */
 void ipv6_net_if_get_best_src_addr(ipv6_addr_t *src, const ipv6_addr_t *dest);
 
 /**
- * @brief   Registers a function that decides how to route incomming
+ * @brief   Registers a function that decides how to route incoming
  *          IP packets with a destination that is not this interface.
- *          The default behaviour is to try forwarding such packets to
+ *          The default behavior is to try forwarding such packets to
  *          the neighborhood.
- *          Register a function to change the default behaviour.
+ *          Register a function to change the default behavior.
  *          Such function shall return the next hop to reach the destination
  *          of the IP packet, or NULL if no such next hop is known.
  *          In this case, the packet will be discarded.

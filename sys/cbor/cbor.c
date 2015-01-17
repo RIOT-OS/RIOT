@@ -26,7 +26,7 @@
 
 /* Automatically enable/disable ENABLE_DEBUG based on CBOR_NO_PRINT */
 #ifndef CBOR_NO_PRINT
-#define ENABLE_DEBUG 1
+#define ENABLE_DEBUG (1)
 #include "debug.h"
 #endif
 

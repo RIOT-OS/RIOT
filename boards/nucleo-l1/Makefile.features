@@ -1,0 +1,2 @@
+FEATURES_PROVIDED += periph_gpio periph_uart periph_spi periph_i2c periph_cpuid
+FEATURES_PROVIDED += cpp

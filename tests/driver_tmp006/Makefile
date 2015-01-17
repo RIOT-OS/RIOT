@@ -1,0 +1,25 @@
+APPLICATION = driver_tmp006
+include ../Makefile.tests_common
+
+FEATURES_REQUIRED = periph_i2c
+
+USEMODULE += tmp006
+USEMODULE += vtimer
+
+ifneq (,$(TEST_TMP006_I2C))
+  CFLAGS += -DTEST_TMP006_I2C=$(TEST_TMP006_I2C)
+else
+  CFLAGS += -DTEST_TMP006_I2C=I2C_0
+endif
+ifneq (,$(TEST_TMP006_ADDR))
+  CFLAGS += -DTEST_TMP006_ADDR=$(TEST_TMP006_ADDR)
+else
+  CFLAGS += -DTEST_TMP006_ADDR=0x41
+endif
+ifneq (,$(TEST_TMP006_CONFIG_CR))
+  CFLAGS += -DTEST_TMP006_CONFIG_CR=$(TEST_TMP006_CONFIG_CR)
+else
+  CFLAGS += -DTEST_TMP006_CONFIG_CR=TMP006_CONFIG_CR_DEF
+endif
+
+include $(RIOTBASE)/Makefile.include

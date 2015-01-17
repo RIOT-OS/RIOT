@@ -298,7 +298,7 @@ void sixlowpan_lowpan_set_iphc_status(
     iphc_status = status;
 }
 
-#if ENABLE_DEBUG
+
 void print_long_local_addr(net_if_eui64_t *saddr)
 {
     printf("%02x%02x:%02x%02x:%02x%02x:%02x%02x\n",
@@ -306,7 +306,7 @@ void print_long_local_addr(net_if_eui64_t *saddr)
            ((uint8_t *)saddr)[3], ((uint8_t *)saddr)[4], ((uint8_t *)saddr)[5],
            ((uint8_t *)saddr)[6], ((uint8_t *)saddr)[7]);
 }
-
+#if ENABLE_DEBUG
 void sixlowpan_lowpan_print_reassembly_buffers(void)
 {
     lowpan_reas_buf_t *temp_buffer;

@@ -6,9 +6,9 @@
  * directory for more details.
  */
 
-#include "unittests.h"
 #include "map.h"
 
+#include "embUnit.h"
 #include "lpm.h"
 
 #define UNCURRY(FUN, ARGS) FUN(ARGS)

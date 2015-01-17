@@ -17,13 +17,12 @@
  * @author      Lotte Steenbrink <lotte.steenbrink@fu-berlin.de>
  */
 
-#include "debug.h"
-
 #include "aodv.h"
 #include "aodvv2/aodvv2.h"
 #include "aodv_debug.h"
 
 #define ENABLE_DEBUG (0)
+#include "debug.h"
 
 #define UDP_BUFFER_SIZE     (128) /** with respect to IEEE 802.15.4's MTU */
 #define RCV_MSG_Q_SIZE      (32)  /* TODO: check if smaller values work, too */
@@ -294,9 +293,11 @@ static void *_aodv_receiver_thread(void *arg)
         struct netaddr _sender;
         ipv6_addr_t_to_netaddr(&sa_rcv.sin6_addr, &_sender);
 
-        /* For some reason we sometimes get passed our own packets. drop them. */
+        /* We sometimes get passed our own packets. Drop them. */
         if (netaddr_cmp(&_sender, &na_local) == 0) {
             AODV_DEBUG("received our own packet, dropping it.\n");
+        }
+        else {
             aodv_packet_reader_handle_packet((void *) buf_rcv, rcv_size, &_sender);
         }
     }
@@ -354,9 +355,9 @@ ipv6_addr_t *aodv_get_next_hop(ipv6_addr_t *dest)
         DEBUG("[aodvv2][ndp] found NC entry. Returning dest addr.\n");
         return dest;
     }
+
     DEBUG("\t[ndp] no entry for addr %s found\n",
           ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, dest));
-
     if (rt_entry) {
         /* Case 1: Undeliverable Packet */
         int packet_indeliverable = rt_entry->state == ROUTE_STATE_BROKEN ||

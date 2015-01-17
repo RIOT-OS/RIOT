@@ -46,7 +46,7 @@ timer_conf_t config[TIMER_NUMOF];
 /**
  * @brief Setup the given timer
  */
-int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
+int timer_init(tim_t dev, unsigned int us_per_ticks, void (*callback)(int))
 {
     /* configure GCLK0 to feed TC3, TC4 and TC5 */;
     GCLK->CLKCTRL.reg = (uint16_t)((GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN_GCLK0 | (TC3_GCLK_ID << GCLK_CLKCTRL_ID_Pos)));
@@ -161,7 +161,9 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
     case TIMER_UNDEFINED:
     default:
         return -1;
-    }
+}
+
+
 
 
 
@@ -224,8 +226,8 @@ unsigned int timer_read(tim_t dev)
         /* request syncronisation */
         TIMER_0_DEV.READREQ.reg = TC_READREQ_RREQ | TC_READREQ_ADDR(0x10);
         while (TIMER_0_DEV.STATUS.bit.SYNCBUSY);
-
         return TIMER_0_DEV.COUNT.reg;
+        break;
         break;
 #endif
 #if TIMER_1_EN
@@ -233,8 +235,8 @@ unsigned int timer_read(tim_t dev)
         /* request syncronisation */
         TIMER_1_DEV.READREQ.reg = TC_READREQ_RREQ | TC_READREQ_ADDR(0x10);
         while (TIMER_1_DEV.STATUS.bit.SYNCBUSY);
-
         return TIMER_1_DEV.COUNT.reg;
+        break;
         break;
 #endif
     default:
@@ -338,8 +340,7 @@ void timer_reset(tim_t dev)
 void TIMER_0_ISR(void)
 {
     if (TIMER_0_DEV.INTFLAG.bit.MC0 && TIMER_0_DEV.INTENSET.bit.MC0) {
-        if(config[TIMER_0].cb)
-        {
+        if(config[TIMER_0].cb) {
             TIMER_0_DEV.INTFLAG.bit.MC0 = 1;
             TIMER_0_DEV.INTENCLR.reg = TC_INTENCLR_MC0;
             config[TIMER_0].cb(0);            
@@ -347,8 +348,7 @@ void TIMER_0_ISR(void)
     }
 
     else if (TIMER_0_DEV.INTFLAG.bit.MC1 && TIMER_0_DEV.INTENSET.bit.MC1) {
-        if(config[TIMER_0].cb) 
-        {
+        if(config[TIMER_0].cb) {
             TIMER_0_DEV.INTFLAG.bit.MC1 = 1;
             TIMER_0_DEV.INTENCLR.reg = TC_INTENCLR_MC1;
             config[TIMER_0].cb(1);
@@ -366,21 +366,18 @@ void TIMER_0_ISR(void)
 void TIMER_1_ISR(void)
 {
     if (TIMER_1_DEV.INTFLAG.bit.MC0 && TIMER_1_DEV.INTENSET.bit.MC0) {
-        if (config[TIMER_1].cb)
-        {
+        if (config[TIMER_1].cb) {
             TIMER_1_DEV.INTFLAG.bit.MC0 = 1;
             TIMER_1_DEV.INTENCLR.reg = TC_INTENCLR_MC0;
             config[TIMER_1].cb(0);
         }
     }
     else if (TIMER_1_DEV.INTFLAG.bit.MC1 && TIMER_1_DEV.INTENSET.bit.MC1) {
-        if(config[TIMER_1].cb)
-        {
+        if(config[TIMER_1].cb) {
             TIMER_1_DEV.INTFLAG.bit.MC1 = 1;
             TIMER_1_DEV.INTENCLR.reg = TC_INTENCLR_MC1;
             config[TIMER_1].cb(1);
         }
-
     }
 
     if (sched_context_switch_request) {

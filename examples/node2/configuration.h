@@ -39,5 +39,6 @@
 
 
 extern kernel_pid_t udp_node_thread_pid;
+extern kernel_pid_t payload_thread_pid;
 
 #endif /* CONFIGURATION_H_ */

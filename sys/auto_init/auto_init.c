@@ -52,7 +52,7 @@
 #endif
 
 #ifdef MODULE_RTC
-#include "rtc.h"
+#include "periph/rtc.h"
 #endif
 
 #ifdef MODULE_SIXLOWPAN
@@ -212,7 +212,6 @@ void auto_init(void)
 #ifdef MODULE_RTC
     DEBUG("Auto init rtc module.\n");
     rtc_init();
-    rtc_enable();
 #endif
 #ifdef MODULE_SHT11
     DEBUG("Auto init SHT11 module.\n");

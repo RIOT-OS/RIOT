@@ -7,17 +7,21 @@
  */
 
 /**
- * @defgroup    oneway_malloc Oneway malloc implementation
+ * @defgroup    oneway_malloc Oneway malloc
  * @ingroup     sys
- * @{
- * @file        malloc.h
- * @brief       A malloc implementation for MSP-430 boards without free.
  *
- * @details     The toolchain of MSP-430 does not contain malloc() and friends.
- *              These functions provide the same interface as the stdlib functions,
- *              but the option to free memory.
+ * @brief       A malloc implementation without free for boards where the
+ *              toolchain does not implement dynamic memory allocation.
+ *
+ *              The toolchain of MSP-430, for example, does not contain
+ *              malloc() and friends.  These functions provide the same
+ *              interface as the stdlib functions, but the option to free
+ *              memory.
  *
  * @note        You should prefer statically allocated memory whenever possible.
+ *
+ * @{
+ * @file
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @author      René Kijewski <rene.kijewski@fu-berlin.de>

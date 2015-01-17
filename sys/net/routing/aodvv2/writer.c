@@ -22,11 +22,11 @@
 #endif
 
 #include "writer.h"
-#include "debug.h"
 
 #include "aodv_debug.h"
 
 #define ENABLE_DEBUG (0)
+#include "debug.h"
 
 static void _cb_addMessageHeader(struct rfc5444_writer *wr,
                                  struct rfc5444_writer_message *message);

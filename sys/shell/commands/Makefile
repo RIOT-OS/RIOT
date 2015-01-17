@@ -31,9 +31,6 @@ endif
 ifneq (,$(filter rpl,$(USEMODULE)))
 	SRC += sc_rpl.c
 endif
-ifneq (,$(filter rtc,$(USEMODULE)))
-	SRC += sc_rtc.c
-endif
 ifneq (,$(filter sht11,$(USEMODULE)))
 	SRC += sc_sht11.c
 endif
@@ -58,5 +55,12 @@ endif
 ifneq (,$(filter lsm303dlhc,$(USEMODULE)))
 	SRC += sc_lsm303dlhc.c
 endif
+
+# TODO
+# Conditional building not possible at the moment due to
+# https://github.com/RIOT-OS/RIOT/issues/2058
+# The implementation is guarded in the source file instead, this
+# should be changed once the issue has been resolved
+SRC += sc_rtc.c
 
 include $(RIOTBASE)/Makefile.base

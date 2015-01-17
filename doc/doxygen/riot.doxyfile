@@ -756,9 +756,9 @@ WARN_LOGFILE           =
 INPUT                  = ../../core \
                          ../../cpu \
                          ../../boards \
+                         ../../drivers \
                          ../../sys \
-                         src/ \
-                         ../../drivers
+                         src/
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses
@@ -825,6 +825,7 @@ EXCLUDE_PATTERNS       = */board/*/tools/* \
                          */boards/*/include/periph_conf.h \
                          */cpu/x86/include/x86_pci.h \
                          */cpu/sam3x8e/include/sam3x8e.h \
+                         */cpu/stm32l1/include/stm32l1xx.h \
 
 
 # The EXCLUDE_SYMBOLS tag can be used to specify one or more symbol names
@@ -1689,7 +1690,7 @@ USE_PDFLATEX           = YES
 # The default value is: NO.
 # This tag requires that the tag GENERATE_LATEX is set to YES.
 
-LATEX_BATCHMODE        = NO
+LATEX_BATCHMODE        = YES
 
 # If the LATEX_HIDE_INDICES tag is set to YES then doxygen will not include the
 # index chapters (such as File Index, Compound Index, etc.) in the output.

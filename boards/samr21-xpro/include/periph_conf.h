@@ -27,7 +27,7 @@ extern "C" {
  * @name Timer peripheral configuration
  * @{
  */
-
+#define TIMER_NUMOF        (2U)
 #define TIMER_NUMOF        (2U)
 #define TIMER_0_EN         1
 #define TIMER_1_EN         1
@@ -261,6 +261,48 @@ extern "C" {
 #define SPI_1_MOSI_PIN     (22)
 /** @} */
 
+
+/**
+ * @name SPI configuration
+ * @{
+ */
+#define SPI_NUMOF          (2)
+#define SPI_0_EN           1
+#define SPI_1_EN           1
+
+/*      SPI0             */
+#define SPI_0_DEV          SERCOM4->SPI
+#define SPI_IRQ_0          SERCOM4_IRQn
+#define SPI_0_DOPO         (1)
+#define SPI_0_DIPO         (0)
+#define SPI_0_F_REF        (8000000UL)
+
+#define SPI_0_SCLK_DEV     PORT->Group[2]
+#define SPI_0_SCLK_PIN     (18)
+
+#define SPI_0_MISO_DEV     PORT->Group[2]
+#define SPI_0_MISO_PIN     (19)
+
+#define SPI_0_MOSI_DEV     PORT->Group[1]
+#define SPI_0_MOSI_PIN     (30)
+
+/*      SPI1             */
+#define SPI_1_DEV          SERCOM5->SPI
+#define SPI_IRQ_1          SERCOM5_IRQn
+#define SPI_1_DOPO         (1)
+#define SPI_1_DIPO         (2)
+#define SPI_1_F_REF        (8000000UL)
+
+#define SPI_1_SCLK_DEV     PORT->Group[1]
+#define SPI_1_SCLK_PIN     (23)
+
+#define SPI_1_MISO_DEV     PORT->Group[1]
+#define SPI_1_MISO_PIN     (02)
+
+#define SPI_1_MOSI_DEV     PORT->Group[1]
+#define SPI_1_MOSI_PIN     (22)
+/** @} */
+
 /**
  * @name I2C configuration
  * @{
@@ -288,6 +330,14 @@ extern "C" {
  * @{
  */
 #define RANDOM_NUMOF       (0U)
+/** @} */
+
+/**
+ * @name RTC configuration
+ * @{
+ */
+#define RTC_NUMOF           (1U)
+#define RTC_DEV             RTC->MODE2
 /** @} */
 
 /**
@@ -325,9 +375,9 @@ extern "C" {
 #define GPIO_1_PIN         (28)
 #define GPIO_1_EXTINT      (8)
 /* GPIO channel 2 config */
-#define GPIO_2_DEV         //PORT->Group[0]
-#define GPIO_2_PIN         //(15)
-#define GPIO_2_EXTINT       15
+#define GPIO_2_DEV         PORT->Group[0]
+#define GPIO_2_PIN         (15)
+#define GPIO_2_EXTINT      (15)
 /* GPIO channel 3 config */
 #define GPIO_3_DEV         PORT->Group[0]
 #define GPIO_3_PIN         (19)

@@ -46,8 +46,10 @@ extern "C"{
 // shell_t shell;
 char udp_node_stack_buffer[udp_stack_buffer];
 char payload_buffer[payload_thread_buffer];
+
 kernel_pid_t udp_node_thread_pid;
 kernel_pid_t payload_thread_pid;
+
 int main(void)
 {
     /* start shell */
@@ -68,17 +70,17 @@ int main(void)
 
     payload_thread_pid = thread_create(payload_buffer,
                                                        sizeof(payload_buffer),
-                                                       PRIORITY_MAIN -2, CREATE_STACKTEST,
+                                                       PRIORITY_MAIN -2, CREATE_STACKTEST | CREATE_SLEEPING,
                                                        node_payload_thread,
                                                        NULL,
                                                        "node_payload_thread");
+  
 
+    thread_wakeup(payload_thread_pid);
+    shell_t shell;
+    shell_init(&shell, NULL, UART0_BUFSIZE, uart0_readc, uart0_putc);
 
-    //thread_wakeup(udp_node_thread_pid);
-    //shell_t shell;
-    //shell_init(&shell, NULL, UART0_BUFSIZE, uart0_readc, uart0_putc);
-
-    //shell_run(&shell);
+    shell_run(&shell);
 
     while(1){};
 

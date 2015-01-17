@@ -41,6 +41,8 @@
 #define SECONDS_PER_TICK (4096U)
 #define MICROSECONDS_PER_TICK (4096UL * 1000000)
 
+void _gettimeofday(void)           __attribute__ ((weak, alias("vtimer_gettimeofday")));
+
 static void vtimer_callback(void *ptr);
 static void vtimer_callback_tick(vtimer_t *timer);
 static void vtimer_callback_msg(vtimer_t *timer);

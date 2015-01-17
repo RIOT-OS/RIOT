@@ -30,12 +30,15 @@
 #include "node.h"
 #include "sensor_driver.h"
 #include "configuration.h" 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG    (1)
 #include "debug.h"
 #define SERVER_PORT     (0xFF01)
 
 char addr_str[IPV6_MAX_ADDR_STR_LEN];
 msg_t msg_q[MSG_RCV_BUFFER_SIZE];
+
+vtimer_t t_timer_thread_wakeup;
+timex_t t_time;
 
 /* Message types node thread communication */
 enum node_msg_type_t {
@@ -55,6 +58,7 @@ void *node_udp_thread(void *arg)
     {  
         msg_t m;
         msg_receive(&m);
+        printf("\n message received: %u\n", m.type);
         udp_send_payload(m.type);  
     }
     return NULL;
@@ -65,7 +69,13 @@ void *node_payload_thread(void *arg)
 {       
     msg_t m;
     while (1) 
-    {  
+    { 
+        t_time = timex_set(SLEEP_SECONDS, 0);
+        timex_normalize(&t_time);
+        vtimer_remove(&t_timer_thread_wakeup);
+        printf("\n PID: %u\n", payload_thread_pid);
+        vtimer_set_wakeup(&t_timer_thread_wakeup, t_time, payload_thread_pid);
+        thread_sleep();        
         m.type = WEIGHT;
         msg_send(&m, udp_node_thread_pid);
         m.type = BATTERY;
@@ -73,15 +83,9 @@ void *node_payload_thread(void *arg)
         m.type = TEMPERATURE;
         msg_send(&m, udp_node_thread_pid);
         m.type = HUMIDITY;
-        if(msg_send(&m, udp_node_thread_pid))
-        {
-            sleep(SLEEP_SECONDS);
-        }
-        else
-        {
-            DEBUG("%s\n", "node_payload_thread: msg_send == 0. ");
-            sleep(SLEEP_SECONDS);
-        }
+        msg_send(&m, udp_node_thread_pid);
+        
+        //sleep(SLEEP_SECONDS);
     }
     return NULL;
 }
@@ -90,13 +94,13 @@ void *node_payload_thread(void *arg)
 void udp_send_payload(int cmd)//int argc, char **argv)
 {
     int sock;
-    sockaddr6_t sa;
-    ipv6_addr_t ipaddr;
+    sockaddr6_t sa;    
     rpl_dodag_t *mydodag;
     int bytes_sent;
     char buffer[64];    
     char* payload = buffer;
-    
+    ipv6_addr_t ipaddr;
+
     mydodag = rpl_get_my_dodag();
 
     if (mydodag == NULL) {
@@ -151,18 +155,22 @@ void udp_send_payload(int cmd)//int argc, char **argv)
     
     memset(&sa, 0, sizeof(sa));    
     sa.sin6_family = AF_INET;
-    DEBUG("\n BEFORE memcpy &mydodag->dodag_id \n");
-    if(&mydodag->dodag_id)
+    DEBUG("\n BEFORE memcpy ipaddr\n");
+    char buf[IPV6_MAX_ADDR_STR_LEN];
+    DEBUG("ipaddr: %s\n", ipv6_addr_to_str(buf, IPV6_MAX_ADDR_STR_LEN, &ipaddr));
+    if(ipaddr.uint8)
     {
         //memcpy(&sa.sin6_addr, &mydodag->dodag_id, 16);
+        DEBUG("\nipaddr ptr: %x\n", &ipaddr);
+        DEBUG("\nsa.sin6_addr ptr: %x\n", &sa.sin6_addr);
         memcpy(&sa.sin6_addr, &ipaddr, 16);
     }
     else
     {
-        DEBUG("\n memcpy &mydodag->dodag_id DEAD!\n");
+        DEBUG("\n memcpy ipaddr DEAD!\n");
         return;
     }
-
+    DEBUG("After memcpy ipaddr");
     //memcpy(&sa.sin6_addr, &ipaddr, 16);
     sa.sin6_port = HTONS(SERVER_PORT);
 
