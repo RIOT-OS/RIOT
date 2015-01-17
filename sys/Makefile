@@ -1,3 +1,6 @@
+ifneq (,$(filter pkt,$(USEMODULE)))
+    DIRS += net/crosslayer/pkt
+endif
 ifneq (,$(filter pktbuf,$(USEMODULE)))
     DIRS += net/crosslayer/pktbuf
 endif
@@ -15,6 +18,9 @@ ifneq (,$(filter net_if,$(USEMODULE)))
 endif
 ifneq (,$(filter l2_ping,$(USEMODULE)))
     DIRS += net/link_layer/ping
+endif
+ifneq (,$(filter nomac,$(USEMODULE)))
+    DIRS += net/link_layer/nomac
 endif
 ifneq (,$(filter transport_layer,$(USEMODULE)))
 	USEMODULE += udp
@@ -64,6 +70,9 @@ ifneq (,$(filter oneway_malloc,$(USEMODULE)))
 endif
 ifneq (,$(filter netapi,$(USEMODULE)))
     DIRS += net/crosslayer/netapi
+endif
+ifneq (,$(filter trickle,$(USEMODULE)))
+    DIRS += trickle
 endif
 
 DIRS += $(dir $(wildcard $(addsuffix /Makefile, ${USEMODULE})))

@@ -31,24 +31,24 @@
 extern "C" {
 #endif
 
-#define CC1100_BROADCAST_ADDRESS (0x00) ///< CC1100 broadcast address
+#define CC1100_BROADCAST_ADDRESS (0x00) /**< CC1100 broadcast address */
 
-#define MAX_UID                  (0xFF) ///< Maximum UID of a node is 255
-#define MIN_UID                  (0x01) ///< Minimum UID of a node is 1
+#define MAX_UID                  (0xFF) /**< Maximum UID of a node is 255 */
+#define MIN_UID                  (0x01) /**< Minimum UID of a node is 1 */
 
-#define MIN_CHANNR                  (0) ///< Minimum channel number
-#define MAX_CHANNR                 (24) ///< Maximum channel number
+#define MIN_CHANNR                  (0) /**< Minimum channel number */
+#define MAX_CHANNR                 (24) /**< Maximum channel number */
 
-#define MIN_OUTPUT_POWER            (0) ///< Minimum output power value
-#define MAX_OUTPUT_POWER           (11) ///< Maximum output power value
+#define MIN_OUTPUT_POWER            (0) /**< Minimum output power value */
+#define MAX_OUTPUT_POWER           (11) /**< Maximum output power value */
 
-#define CC1100_MODE_WOR             (0) ///< Usable radio mode: Wake-On-Radio
-#define CC1100_MODE_CONSTANT_RX     (1) ///< Usable radio mode: Constant receive
+#define CC1100_MODE_WOR             (0) /**< Usable radio mode: Wake-On-Radio */
+#define CC1100_MODE_CONSTANT_RX     (1) /**< Usable radio mode: Constant receive */
 
 #define CC1100_MAX_DATA_LENGTH (58)
 
-// Define default radio mode to constant RX if no
-// application specific setting is available.
+/* Define default radio mode to constant RX if no application specific setting
+ * is available. */
 #ifndef CC1100_RADIO_MODE
 #ifdef MODULE_RPL
 #warning RPL currently works with CC1100_MODE_WOR

@@ -145,7 +145,7 @@ void free(void *ptr)
     _native_syscall_leave();
 }
 
-int _native_in_calloc;
+int _native_in_calloc = 0;
 void *calloc(size_t nmemb, size_t size)
 {
     /* dynamically load calloc when it's needed - this is necessary to
@@ -378,6 +378,7 @@ void _native_init_syscalls(void)
     *(void **)(&real_read) = dlsym(RTLD_NEXT, "read");
     *(void **)(&real_write) = dlsym(RTLD_NEXT, "write");
     *(void **)(&real_malloc) = dlsym(RTLD_NEXT, "malloc");
+    *(void **)(&real_calloc) = dlsym(RTLD_NEXT, "calloc");
     *(void **)(&real_realloc) = dlsym(RTLD_NEXT, "realloc");
     *(void **)(&real_exit) = dlsym(RTLD_NEXT, "exit");
     *(void **)(&real_free) = dlsym(RTLD_NEXT, "free");

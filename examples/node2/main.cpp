@@ -70,7 +70,7 @@ int main(void)
 
     payload_thread_pid = thread_create(payload_buffer,
                                                        sizeof(payload_buffer),
-                                                       PRIORITY_MAIN -2, CREATE_STACKTEST | CREATE_SLEEPING,
+                                                       PRIORITY_MAIN -1, CREATE_STACKTEST | CREATE_SLEEPING,
                                                        node_payload_thread,
                                                        NULL,
                                                        "node_payload_thread");

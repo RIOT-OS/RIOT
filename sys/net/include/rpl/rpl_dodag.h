@@ -26,6 +26,8 @@
 extern "C" {
 #endif
 
+void rpl_dao_ack_received(rpl_dodag_t *dodag);
+void rpl_delay_dao(rpl_dodag_t *dodag);
 void rpl_instances_init(void);
 rpl_instance_t *rpl_new_instance(uint8_t instanceid);
 rpl_instance_t *rpl_get_instance(uint8_t instanceid);

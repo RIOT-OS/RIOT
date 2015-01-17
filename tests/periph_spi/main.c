@@ -57,7 +57,7 @@ int parse_spi_dev(int argc, char **argv)
     spi_mode = SPI_CONF_FIRST_RISING;
     spi_speed = SPI_SPEED_1MHZ;
 
-    if (argc < 3 || argc > 4) {
+    if (argc < 3 || argc > 5) {
         printf("usage: %s DEV CS [MODE [SPEED]]\n", argv[0]);
         puts("        DEV is the SPI device to use:");
         for (int i = 0; i < SPI_NUMOF; i++) {
@@ -91,14 +91,14 @@ int parse_spi_dev(int argc, char **argv)
         return -1;
     }
     if (argc >= 4) {
-        spi_mode = argv[2][0] - '0';
+        spi_mode = argv[3][0] - '0';
         if (spi_mode < 0 || spi_mode > 3) {
             puts("error: invalid MODE value given");
             return -2;
         }
     }
     if (argc >= 5) {
-        spi_speed = argv[3][0] - '0';
+        spi_speed = argv[4][0] - '0';
         if (spi_speed < 0 || spi_speed > 4) {
             puts("error: invalid SPEED value given");
             return -3;
@@ -181,10 +181,12 @@ void cmd_init_master(int argc, char **argv)
     res = spi_init_master(spi_dev, spi_mode, spi_speed);
     if (res < 0) {
         printf("spi_init_master: error initializing SPI_%i device (code %i)\n", spi_dev, res);
+        return;
     }
     res = gpio_init_out(spi_cs, GPIO_PULLUP);
     if (res < 0){
         printf("gpio_init_out: error initializing GPIO_%i as CS line (code %i)\n", spi_cs, res);
+        return;
     }
     gpio_set(spi_cs);
     spi_master = 1;
@@ -203,10 +205,12 @@ void cmd_init_slave(int argc, char **argv)
     res = spi_init_slave(spi_dev, spi_mode, slave_on_data);
     if (res < 0) {
         printf("spi_init_slave: error initializing SPI_%i device (code: %i)\n", spi_dev, res);
+        return;
     }
     res = gpio_init_int(spi_cs, GPIO_NOPULL, GPIO_FALLING, slave_on_cs, 0);
     if (res < 0){
         printf("gpio_init_int: error initializing GPIO_%i as CS line (code %i)\n", spi_cs, res);
+        return;
     }
     spi_master = 0;
     printf("SPI_%i successfully initialized as slave, cs: GPIO_%i, mode: %i\n",

@@ -1,0 +1,4 @@
+USEMODULE += netapi
+USEMODULE += nomac
+USEMODULE += netdev_dummy
+USEMODULE += vtimer

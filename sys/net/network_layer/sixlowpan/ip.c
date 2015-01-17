@@ -197,9 +197,10 @@ int ipv6_sendto(const ipv6_addr_t *dest, uint8_t next_header,
     ipv6_buf->nextheader = next_header;
     ipv6_buf->hoplimit = MULTIHOP_HOPLIMIT;
     ipv6_buf->length = HTONS(payload_length);
-
+    printf("IPV6_sendto payload length: %u\n", payload_length);
     memcpy(&(ipv6_buf->destaddr), dest, 16);
     memcpy(p_ptr, payload, payload_length);
+    printf("IPV6_sendto  before");
     return ipv6_send_packet(ipv6_buf, next_hop);
 }
 
@@ -284,6 +285,7 @@ int icmpv6_demultiplex(const icmpv6_hdr_t *hdr)
             if (_rpl_process_pid != KERNEL_PID_UNDEF) {
                 msg_t m_send;
                 m_send.content.ptr = (char *) ipv6_buf;
+                m_send.type = ((icmpv6_hdr_t *)(m_send.content.ptr + IPV6_HDR_LEN))->code;
                 msg_send(&m_send, _rpl_process_pid);
             }
             else {

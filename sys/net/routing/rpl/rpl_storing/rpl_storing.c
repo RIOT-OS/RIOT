@@ -215,7 +215,9 @@ void rpl_init_root_mode(void)
     }
 
     i_am_root = 1;
-    start_trickle(dodag->dio_min, dodag->dio_interval_doubling, dodag->dio_redundancy);
+    trickle_start(rpl_process_pid, &dodag->trickle, RPL_MSG_TYPE_TRICKLE_INTERVAL,
+            RPL_MSG_TYPE_TRICKLE_CALLBACK, (1 << dodag->dio_min), dodag->dio_interval_doubling,
+            dodag->dio_redundancy);
     DEBUGF("ROOT INIT FINISHED\n");
 
 }
@@ -570,7 +572,7 @@ void rpl_recv_DIO_mode(void)
             if (my_dodag->my_rank == ROOT_RANK) {
                 DEBUGF("[Warning] Inconsistent Dodag Version\n");
                 my_dodag->version = RPL_COUNTER_INCREMENT(dio_dodag.version);
-                reset_trickletimer();
+                trickle_reset_timer(&my_dodag->trickle);
             }
             else {
                 DEBUGF("my dodag has no preferred_parent yet - seems to be odd since I have a parent.\n");
@@ -581,20 +583,20 @@ void rpl_recv_DIO_mode(void)
         }
         else if (RPL_COUNTER_GREATER_THAN(my_dodag->version, dio_dodag.version)) {
             /* lower version number detected -> send more DIOs */
-            reset_trickletimer();
+            trickle_reset_timer(&my_dodag->trickle);
             return;
         }
     }
 
     /* version matches, DODAG matches */
     if (rpl_dio_buf->rank == INFINITE_RANK) {
-        reset_trickletimer();
+        trickle_reset_timer(&my_dodag->trickle);
     }
 
     /* We are root, all done!*/
     if (my_dodag->my_rank == ROOT_RANK) {
         if (rpl_dio_buf->rank != INFINITE_RANK) {
-            trickle_increment_counter();
+            trickle_increment_counter(&my_dodag->trickle);
         }
 
         return;
@@ -615,7 +617,7 @@ void rpl_recv_DIO_mode(void)
     }
     else {
         /* DIO OK */
-        trickle_increment_counter();
+        trickle_increment_counter(&my_dodag->trickle);
     }
 
     /* update parent rank */
@@ -627,7 +629,7 @@ void rpl_recv_DIO_mode(void)
     }
     else if (rpl_equal_id(&parent->addr, &my_dodag->my_preferred_parent->addr) &&
             (parent->dtsn != rpl_dio_buf->dtsn)) {
-        delay_dao();
+        rpl_delay_dao(my_dodag);
     }
 
     parent->dtsn = rpl_dio_buf->dtsn;
@@ -691,12 +693,14 @@ void rpl_recv_DAO_mode(void)
                 len += rpl_opt_transit_buf->length;
                 /* route lifetime seconds = (DAO lifetime) * (Unit Lifetime) */
 
+#if RPL_MAX_ROUTING_ENTRIES != 0
                 DEBUG("Adding routing information: Target: %s, Source: %s, Lifetime: %u\n",
                       ipv6_addr_to_str(addr_str_mode, IPV6_MAX_ADDR_STR_LEN, &rpl_opt_target_buf->target),
                       ipv6_addr_to_str(addr_str_mode, IPV6_MAX_ADDR_STR_LEN, &ipv6_buf->srcaddr),
                       (rpl_opt_transit_buf->path_lifetime * my_dodag->lifetime_unit));
                 rpl_add_routing_entry(&rpl_opt_target_buf->target, &ipv6_buf->srcaddr,
                         rpl_opt_transit_buf->path_lifetime * my_dodag->lifetime_unit);
+#endif
                 increment_seq = 1;
                 break;
             }
@@ -720,7 +724,7 @@ void rpl_recv_DAO_mode(void)
 
     if (increment_seq) {
         RPL_COUNTER_INCREMENT(my_dodag->dao_seq);
-        delay_dao();
+        rpl_delay_dao(my_dodag);
     }
 }
 
@@ -809,7 +813,7 @@ void rpl_recv_dao_ack_mode(void)
         return;
     }
 
-    dao_ack_received();
+    rpl_dao_ack_received(my_dodag);
 
 }
 
@@ -841,30 +845,5 @@ void rpl_send(ipv6_addr_t *destination, uint8_t *payload, uint16_t p_len, uint8_
         memcpy(p_ptr, payload, p_len);
     }
 
-    if (ipv6_addr_is_multicast(&ipv6_send_buf->destaddr)) {
-        ipv6_send_packet(ipv6_send_buf, NULL);
-    }
-    else {
-        /* find appropriate next hop before sending */
-        ipv6_addr_t *next_hop = rpl_get_next_hop(&ipv6_send_buf->destaddr);
-
-        if (next_hop == NULL) {
-            if (i_am_root) {
-                DEBUGF("[Error] destination unknown: %s\n", ipv6_addr_to_str(addr_str_mode,
-                        IPV6_MAX_ADDR_STR_LEN, &ipv6_send_buf->destaddr));
-                return;
-            }
-            else {
-                next_hop = rpl_get_my_preferred_parent();
-
-                if (next_hop == NULL) {
-                    DEBUGF("[Error] no preferred parent, dropping package\n");
-                    return;
-                }
-            }
-        }
-
-        ipv6_send_packet(ipv6_send_buf, NULL);
-    }
-
+    ipv6_send_packet(ipv6_send_buf, NULL);
 }

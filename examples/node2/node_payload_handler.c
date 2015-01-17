@@ -73,7 +73,7 @@ void *node_payload_thread(void *arg)
         t_time = timex_set(SLEEP_SECONDS, 0);
         timex_normalize(&t_time);
         vtimer_remove(&t_timer_thread_wakeup);
-        printf("\n PID: %u\n", payload_thread_pid);
+        //printf("\n PID: %u\n", payload_thread_pid);
         vtimer_set_wakeup(&t_timer_thread_wakeup, t_time, payload_thread_pid);
         thread_sleep();        
         m.type = WEIGHT;
@@ -157,26 +157,34 @@ void udp_send_payload(int cmd)//int argc, char **argv)
     sa.sin6_family = AF_INET;
     DEBUG("\n BEFORE memcpy ipaddr\n");
     char buf[IPV6_MAX_ADDR_STR_LEN];
-    DEBUG("ipaddr: %s\n", ipv6_addr_to_str(buf, IPV6_MAX_ADDR_STR_LEN, &ipaddr));
+    DEBUG("\nipaddr: %s\n", ipv6_addr_to_str(buf, IPV6_MAX_ADDR_STR_LEN, &ipaddr));
     if(ipaddr.uint8)
     {
         //memcpy(&sa.sin6_addr, &mydodag->dodag_id, 16);
-        DEBUG("\nipaddr ptr: %x\n", &ipaddr);
-        DEBUG("\nsa.sin6_addr ptr: %x\n", &sa.sin6_addr);
-        memcpy(&sa.sin6_addr, &ipaddr, 16);
+        //DEBUG("\nipaddr ptr: %x\n", &ipaddr);
+        //DEBUG("\nsa.sin6_addr ptr: %x\n", &sa.sin6_addr);
+        //memcpy(&sa.sin6_addr, &ipaddr, 16);
+
+        for(int i = 0; i < 16; i++)
+        {
+            sa.sin6_addr.uint8[i] = ipaddr.uint8[i];
+        }
+        DEBUG("\nsa.sin6_addr: %s\n", ipv6_addr_to_str(buf, IPV6_MAX_ADDR_STR_LEN, &sa.sin6_addr));
     }
     else
     {
         DEBUG("\n memcpy ipaddr DEAD!\n");
         return;
     }
-    DEBUG("After memcpy ipaddr");
+    DEBUG("\nAfter for loop ipaddr\n");
     //memcpy(&sa.sin6_addr, &ipaddr, 16);
     sa.sin6_port = HTONS(SERVER_PORT);
 
     if(strlen(payload) > 0)
-    {   
+    {
+        DEBUG("\n Before socket_base_sendto \n");   
         bytes_sent = socket_base_sendto(sock, (char *)payload, strlen(payload) + 1, 0, &sa, sizeof(sa));
+        DEBUG("\n After socket_base_sendto \n");   
         if (bytes_sent < 0) 
         {
             DEBUG("Error sending packet!\n");
@@ -188,6 +196,7 @@ void udp_send_payload(int cmd)//int argc, char **argv)
                                                 &ipaddr));
         }
         socket_base_close(sock);
+        DEBUG("\n After!!! socket_base_close \n"); 
     }
     else
     {

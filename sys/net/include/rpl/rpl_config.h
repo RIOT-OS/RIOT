@@ -32,12 +32,21 @@ extern "C" {
 #define RPL_STORING_MODE_NO_MC  0x02
 #define RPL_STORING_MODE_MC     0x03
 
-/* ICMP type */
 #define RPL_SEQUENCE_WINDOW         16
-#define ICMP_CODE_DIS               0x00
-#define ICMP_CODE_DIO               0x01
-#define ICMP_CODE_DAO               0x02
-#define ICMP_CODE_DAO_ACK           0x03
+/* RPL Message type */
+enum RPL_MSG_CODE {
+    ICMP_CODE_DIS = 0,
+    ICMP_CODE_DIO,
+    ICMP_CODE_DAO,
+    ICMP_CODE_DAO_ACK,
+    /* put all ICMP codes before the end marker */
+    ICMP_CODE_END,
+    RPL_MSG_TYPE_DAO_HANDLE,
+    RPL_MSG_TYPE_ROUTING_ENTRY_UPDATE,
+    RPL_MSG_TYPE_TRICKLE_INTERVAL,
+    RPL_MSG_TYPE_TRICKLE_CALLBACK
+};
+
 /* packet base lengths */
 #define DIO_BASE_LEN                24
 #define DIS_BASE_LEN                2
@@ -147,6 +156,7 @@ static inline bool RPL_COUNTER_GREATER_THAN(uint8_t A, uint8_t B)
 #define RPL_ROOT_RANK 256
 #define RPL_DEFAULT_LIFETIME 0xff
 #define RPL_LIFETIME_UNIT 2
+#define RPL_LIFETIME_STEP 2
 #define RPL_GROUNDED 1
 #define RPL_PRF_MASK 0x7
 #define RPL_MOP_SHIFT 3
