@@ -31,11 +31,6 @@
  */
 #define KEY             (0x524e4700)
 
-void random_init(void)
-{
-    random_poweron();
-}
-
 int random_read(char *buf, unsigned int num)
 {
     /* cppcheck-suppress variableScope */

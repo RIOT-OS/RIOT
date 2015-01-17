@@ -27,7 +27,7 @@
 /* only compile this driver if enabled in the board's periph_conf.h */
 #if RANDOM_NUMOF
 
-void random_init(void)
+void random_poweron(void)
 {
     uint16_t seed = 0;
     int i;
@@ -71,8 +71,6 @@ void random_init(void)
 
     /* Turn RF off: */
     RFCORE_SFR_RFST = ISRFOFF;
-
-    random_poweron();
 }
 
 int random_read(char *buf, unsigned int num)
@@ -90,10 +88,6 @@ int random_read(char *buf, unsigned int num)
     }
 
     return count;
-}
-
-void random_poweron(void)
-{
 }
 
 void random_poweroff(void)

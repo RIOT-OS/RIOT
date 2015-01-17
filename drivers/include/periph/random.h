@@ -24,6 +24,7 @@
  * @brief       Low-level random peripheral driver interface definitions
  *
  * @author      Christian Mehlis <mehlis@inf.fu-berlin.de>
+ * @author      Frank Holtz <frank-riot2015@holtznet.de>
  */
 
 #ifndef __RANDOM_H
@@ -39,16 +40,6 @@ extern "C" {
 #if RANDOM_NUMOF
 
 /**
- * @brief Initializes the source of randomness
- *
- * In case of a hardware random number generator, this peripheral
- * is initialized and powered on. If such a device is not present,
- * it depends on the implementation how a source for randomness
- * is created and initialized.
- */
-void random_init(void);
-
-/**
  * @brief Reads num or less bytes of randomness from the source, will
  *        block until random data is available
  *
@@ -62,7 +53,14 @@ void random_init(void);
 int random_read(char *buf, unsigned int num);
 
 /**
- * @brief Power on the random number generator
+ * @brief Initializes the source of randomness
+ *
+ * In case of a hardware random number generator, this peripheral
+ * is initialized and powered on. If such a device is not present,
+ * it depends on the implementation how a source for randomness
+ * is created and initialized.
+ * 
+ * @param[in] rng_mode one of rng_modes
  */
 void random_poweron(void);
 

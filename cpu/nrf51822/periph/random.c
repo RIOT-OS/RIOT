@@ -25,12 +25,6 @@
 /* guard file in case no random device was specified */
 #if RANDOM_NUMOF
 
-void random_init(void)
-{
-    NRF_RNG->POWER = 1;
-    NRF_RNG->TASKS_START = 1;
-}
-
 int random_read(char *buf, unsigned int num)
 {
     unsigned int count = 0;
@@ -47,6 +41,7 @@ int random_read(char *buf, unsigned int num)
 void random_poweron(void)
 {
     NRF_RNG->POWER = 1;
+    NRF_RNG->TASKS_START = 1;
 }
 
 void random_poweroff(void)

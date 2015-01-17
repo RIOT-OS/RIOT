@@ -34,7 +34,7 @@ int main(void)
     printf("This test will print from 1 to %i random bytes about every second\n\n", LIMIT);
 
     puts("Initializing Random Number Generator driver.\n");
-    random_init();
+    random_poweron();
 
     while (1) {
         /* zero out buffer */
