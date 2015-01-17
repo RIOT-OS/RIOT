@@ -80,7 +80,7 @@ void *flash_get_address(flash_page_number_t page)
 uint8_t flash_memcpy(void *dest, const void *src, size_t n)
 {
     DEBUG("flash_memcpy dest=%d, src=%d, n=%d\n", (size_t)dest, (size_t)src, n);
-    
+
     /* Variables */
 
     /* temp */
@@ -96,8 +96,8 @@ uint8_t flash_memcpy(void *dest, const void *src, size_t n)
     flash_data_word_t *mydst_start =
         (flash_data_word_t *)((size_t)dest & (FLASH_ERASED_WORD_VALUE - FLASH_WRITE_ALIGN + 1));
     flash_data_word_t *mydst_end =
-        (flash_data_word_t *)((size_t)(dest + n) &
-                              (FLASH_ERASED_WORD_VALUE - FLASH_WRITE_ALIGN +1));
+        (flash_data_word_t *)((size_t)((size_t)dest + n) &
+                              (FLASH_ERASED_WORD_VALUE - FLASH_WRITE_ALIGN + 1));
 
     /* prepare src to read bytewise */
     uint8_t *mysrc = (uint8_t *)src;
@@ -116,7 +116,7 @@ uint8_t flash_memcpy(void *dest, const void *src, size_t n)
     }
 
     /* Check destination memory range: end */
-    temp = flash_check_address((uint8_t *) mydst_end-1);
+    temp = flash_check_address((uint8_t *) mydst_end - 1);
 
     if (temp > FLASH_ERROR_SUCCESS) {
         DEBUG("attemted to write beyond last address\n");
@@ -139,6 +139,7 @@ uint8_t flash_memcpy(void *dest, const void *src, size_t n)
             /* check address range */
             if ((mysrc >= (uint8_t *)src) && (n > 0)) {
                 n--;
+
                 /* for every data word byte (little endian)*/
                 switch (temp) {
                     case 0:
@@ -158,12 +159,13 @@ uint8_t flash_memcpy(void *dest, const void *src, size_t n)
                         break;
                 }
             }
+
             mysrc++;
         }
 
         /* new data -> write
          * change & to | when erased bit value is 0 */
-        if ( *i != (dstbuffer & *i)) {
+        if (*i != (dstbuffer & *i)) {
             /* write data */
             *i = dstbuffer;
 

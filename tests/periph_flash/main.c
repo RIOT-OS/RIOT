@@ -68,7 +68,7 @@ int main(void)
            "---------------------------------------------------\n");
 
     errors += print_test("Initializing flash interface\t", flash_init(), FLASH_ERROR_SUCCESS);
-    errors += print_test("Compare signature with flash\t", memcmp(flashpage+1, testsignature,
+    errors += print_test("Compare signature with flash\t", memcmp(flashpage + 1, testsignature,
                          testsignaturelen), 65535);
     errors += print_test("Erase last flash page\t\t", flash_erase_page(FLASH_NUM_PAGES - 1),
                          FLASH_ERROR_SUCCESS);
@@ -87,33 +87,33 @@ int main(void)
                          FLASH_ERROR_ADDR_RANGE);
 #endif
 #if FLASH_WRITE_ALIGN > 1
-    errors += print_test("Write test signature unaligned\t", flash_memcpy_fast(flashpage+1,
+    errors += print_test("Write test signature unaligned\t", flash_memcpy_fast(flashpage + 1,
                          testsignature, testsignaturelen), FLASH_ERROR_ALIGNMENT);
 #endif
-    errors += print_test("Write test signature flash_memcpy", flash_memcpy(flashpage+1,
+    errors += print_test("Write test signature flash_memcpy", flash_memcpy(flashpage + 1,
                          testsignature, testsignaturelen), FLASH_ERROR_SUCCESS);
-    errors += print_test("Compare signature with flash\t", memcmp(flashpage+1, testsignature,
+    errors += print_test("Compare signature with flash\t", memcmp(flashpage + 1, testsignature,
                          testsignaturelen), 0);
 
     errors += print_test("Write 1 byte flash_memcpy\t",
-                         flash_memcpy(flashpage+testsignaturelen+2,
-                         teststring, 1), FLASH_ERROR_SUCCESS);
+                         flash_memcpy(flashpage + testsignaturelen + 2,
+                                      teststring, 1), FLASH_ERROR_SUCCESS);
     errors += print_test("Compare 1 byte with flash\t",
-                         memcmp(flashpage+testsignaturelen+2, teststring, 1), 0);
+                         memcmp(flashpage + testsignaturelen + 2, teststring, 1), 0);
 
     errors += print_test("Overwrite with flash_memcpy\t",
-                         flash_memcpy(flashpage+testsignaturelen+2,
-                         teststring, strlen(teststring)), FLASH_ERROR_SUCCESS);
+                         flash_memcpy(flashpage + testsignaturelen + 2,
+                                      teststring, strlen(teststring)), FLASH_ERROR_SUCCESS);
     errors += print_test("Compare bytes with flash\t",
-                         memcmp(flashpage+testsignaturelen+2, teststring,
-                         strlen(teststring)), 0);
+                         memcmp(flashpage + testsignaturelen + 2, teststring,
+                                strlen(teststring)), 0);
 
 
     printf("\nDone with %d errors.\n\n", errors);
 
     printf("Dump top of last flash page:\n");
 
-    for (flash_page_size_t i = 0; i < 16*5; i += 16) {
+    for (flash_page_size_t i = 0; i < 16 * 5; i += 16) {
         dump_line(flashpage + i);
     }
 

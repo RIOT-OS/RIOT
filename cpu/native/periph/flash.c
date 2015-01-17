@@ -43,7 +43,7 @@
 
 int _native_flash_fd = -1;
 volatile uint8_t *_native_flash_memory = NULL;
-size_t _native_flash_size = (FLASH_NUM_PAGES * FLASH_PAGE_SIZE);
+size_t _native_flash_size = (FLASH_NUM_PAGES *FLASH_PAGE_SIZE);
 
 
 /************************************************************************/
@@ -58,7 +58,7 @@ size_t _native_flash_size = (FLASH_NUM_PAGES * FLASH_PAGE_SIZE);
 static uint8_t flash_check_address(uint8_t *address)
 {
     if ((address < _native_flash_memory)
-        || ((address >= _native_flash_memory+_native_flash_size))) {
+        || ((address >= _native_flash_memory + _native_flash_size))) {
         return FLASH_ERROR_ADDR_RANGE;
     }
 
@@ -81,9 +81,9 @@ flash_page_number_t flash_get_page_number(void *address, flash_page_size_t *page
                                       &_native_flash_memory[0]) / FLASH_PAGE_SIZE);
 
     if (page_offset != NULL) {
-        *page_offset = (flash_page_number_t) (
-                        ((uint8_t *)address - &_native_flash_memory[0])
-                        % FLASH_PAGE_SIZE);
+        *page_offset = (flash_page_number_t)(
+                           ((uint8_t *)address - &_native_flash_memory[0])
+                           % FLASH_PAGE_SIZE);
     }
 
     return page_number;
@@ -91,7 +91,7 @@ flash_page_number_t flash_get_page_number(void *address, flash_page_size_t *page
 
 void *flash_get_address(flash_page_number_t page)
 {
-    return ((void *) (_native_flash_memory + (page * FLASH_PAGE_SIZE)));
+    return ((void *)(_native_flash_memory + (page * FLASH_PAGE_SIZE)));
 }
 
 uint8_t flash_memcpy(void *dest, const void *src, size_t n)
@@ -101,33 +101,36 @@ uint8_t flash_memcpy(void *dest, const void *src, size_t n)
         DEBUG("attempted to write below first address\n");
         return FLASH_ERROR_ADDR_RANGE;
     }
+
     if (flash_check_address((((uint8_t *) dest) + n)) > FLASH_ERROR_SUCCESS) {
         DEBUG("attemted to write beyond last address\n");
         return FLASH_ERROR_ADDR_RANGE;
     }
 
     memcpy(dest, src, n);
-    
+
     return (FLASH_ERROR_SUCCESS);
 }
 
 uint8_t flash_memcpy_fast(void *dest, const void *src, size_t n)
 {
     /* Check alignment */
-    #if FLASH_WRITE_ALIGN>1
+#if FLASH_WRITE_ALIGN>1
     if ((n % FLASH_WRITE_ALIGN != 0) ||
         ((size_t)src % FLASH_WRITE_ALIGN != 0) ||
         ((size_t)dest % FLASH_WRITE_ALIGN != 0)) {
         DEBUG("Unaligned access dest=%d, src=%d, n=%d\n", (size_t)mydst, (size_t)mysrc, n);
         return FLASH_ERROR_ALIGNMENT;
     }
-    #endif
+
+#endif
 
     /* Check memory range */
     if (flash_check_address((uint8_t *) dest) > FLASH_ERROR_SUCCESS) {
         DEBUG("attempted to write below first address\n");
         return FLASH_ERROR_ADDR_RANGE;
     }
+
     if (flash_check_address((((uint8_t *) dest) + n)) > FLASH_ERROR_SUCCESS) {
         DEBUG("attemted to write beyond last address\n");
         return FLASH_ERROR_ADDR_RANGE;
@@ -181,7 +184,7 @@ void _native_flash_init(void)
 
         /* try to open [existing] file */
         if ((_native_flash_fd = real_open(_native_flash_path,
-                        O_RDWR | O_CREAT, 0600)) == -1) {
+                                          O_RDWR | O_CREAT, 0600)) == -1) {
             err(EXIT_FAILURE, "_native_flash_init: open");
         }
 
@@ -200,10 +203,12 @@ void _native_flash_init(void)
         }
 
         init_start = size;
+
         if (size < _native_flash_size) {
             init_length = _native_flash_size - size;
+
             if (real_lseek(_native_flash_fd, _native_flash_size - 1,
-                        SEEK_SET) == -1) {
+                           SEEK_SET) == -1) {
                 err(EXIT_FAILURE, "_native_flash_init: lseek");
             }
 
@@ -217,8 +222,8 @@ void _native_flash_init(void)
 
         /* try to map file into memory */
         if ((_native_flash_memory = real_mmap(NULL, _native_flash_size,
-                    PROT_READ|PROT_WRITE, MAP_SHARED, _native_flash_fd, 0)
-                    ) == MAP_FAILED) {
+                                              PROT_READ | PROT_WRITE, MAP_SHARED, _native_flash_fd, 0)
+            ) == MAP_FAILED) {
             err(EXIT_FAILURE, "_native_flash_init: mmap");
         }
 
@@ -241,5 +246,5 @@ void _native_flash_init(void)
 
     /* initialize [remaining] memory area */
     memset((void *)(_native_flash_memory + init_start), FLASH_ERASED_WORD_VALUE,
-            init_length);
+           init_length);
 }
