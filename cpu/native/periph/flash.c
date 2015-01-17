@@ -96,23 +96,33 @@ void *flash_get_address(flash_page_number_t page)
 
 uint8_t flash_memcpy(void *dest, const void *src, size_t n)
 {
-    /* Check alignment */
-#if FLASH_WRITE_ALIGN > 1
-    flash_page_size_t page_offset;
-    flash_get_page_number(dest, &page_offset);
-
-    if ((n % FLASH_WRITE_ALIGN != 0) || (page_offset % FLASH_WRITE_ALIGN != 0)) {
-        DEBUG("Unaligned access n=%d offset=%d\n", n, page_offset);
-        return FLASH_ERROR_ALIGNMENT;
+    /* Check memory range */
+    if (flash_check_address((uint8_t *) dest) > FLASH_ERROR_SUCCESS) {
+        DEBUG("attempted to write below first address\n");
+        return FLASH_ERROR_ADDR_RANGE;
     }
-#endif
+    if (flash_check_address((((uint8_t *) dest) + n)) > FLASH_ERROR_SUCCESS) {
+        DEBUG("attemted to write beyond last address\n");
+        return FLASH_ERROR_ADDR_RANGE;
+    }
 
-    uint8_t ret = flash_memcpy_fast(dest, src, n);
-    return (ret);
+    memcpy(dest, src, n);
+    
+    return (FLASH_ERROR_SUCCESS);
 }
 
 uint8_t flash_memcpy_fast(void *dest, const void *src, size_t n)
 {
+    /* Check alignment */
+    #if FLASH_WRITE_ALIGN>1
+    if ((n % FLASH_WRITE_ALIGN != 0) ||
+        ((size_t)src % FLASH_WRITE_ALIGN != 0) ||
+        ((size_t)dest % FLASH_WRITE_ALIGN != 0)) {
+        DEBUG("Unaligned access dest=%d, src=%d, n=%d\n", (size_t)mydst, (size_t)mysrc, n);
+        return FLASH_ERROR_ALIGNMENT;
+    }
+    #endif
+
     /* Check memory range */
     if (flash_check_address((uint8_t *) dest) > FLASH_ERROR_SUCCESS) {
         DEBUG("attempted to write below first address\n");
