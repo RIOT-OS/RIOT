@@ -95,9 +95,9 @@ void udp_init_node_standalone(void)//int argc, char **argv)
     m.content.ptr = (void *) &tcmd;
 
     msg_send_receive(&m, &m, transceiver_pid);
-    printf("Channel set to %u\n", RADIO_CHANNEL);
+    DEBUG("Channel set to %u\n", RADIO_CHANNEL);
 
-    puts("Transport layer initialized");
+    DEBUG("Transport layer initialized");
     /* start transceiver watchdog */
 }
 

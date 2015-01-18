@@ -30,7 +30,7 @@
 #include "node.h"
 #include "sensor_driver.h"
 #include "configuration.h" 
-#define ENABLE_DEBUG    (1)
+#define ENABLE_DEBUG    (0)
 #include "debug.h"
 #define SERVER_PORT     (0xFF01)
 
@@ -58,7 +58,7 @@ void *node_udp_thread(void *arg)
     {  
         msg_t m;
         msg_receive(&m);
-        printf("\n message received: %u\n", m.type);
+        //printf("\n message received: %u\n", m.type);
         udp_send_payload(m.type);  
     }
     return NULL;

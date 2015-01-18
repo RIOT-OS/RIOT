@@ -190,7 +190,7 @@ int32_t udp_sendto(int s, const void *buf, uint32_t len, int flags,
         current_udp_packet->src_port = socket_base_get_free_source_port(IPPROTO_UDP);
         current_udp_packet->dst_port = to->sin6_port;
         current_udp_packet->checksum = 0;
-        printf("UDP length: %u\n", len);
+        //printf("UDP length: %u\n", len);
         memcpy(payload, buf, len);
         current_udp_packet->length = HTONS(UDP_HDR_LEN + len);
         temp_ipv6_header->length = UDP_HDR_LEN + len;
@@ -199,7 +199,7 @@ int32_t udp_sendto(int s, const void *buf, uint32_t len, int flags,
                                        (uint8_t *) current_udp_packet,
                                        UDP_HDR_LEN + len,
                                        IPPROTO_UDP);
-        printf("UDP 1\n");
+        //printf("UDP 1\n");
         return ipv6_sendto(&to->sin6_addr, IPPROTO_UDP,
                            (uint8_t *)(current_udp_packet),
                            NTOHS(current_udp_packet->length), NULL);

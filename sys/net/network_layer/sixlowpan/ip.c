@@ -197,10 +197,10 @@ int ipv6_sendto(const ipv6_addr_t *dest, uint8_t next_header,
     ipv6_buf->nextheader = next_header;
     ipv6_buf->hoplimit = MULTIHOP_HOPLIMIT;
     ipv6_buf->length = HTONS(payload_length);
-    printf("IPV6_sendto payload length: %u\n", payload_length);
+    //printf("IPV6_sendto payload length: %u\n", payload_length);
     memcpy(&(ipv6_buf->destaddr), dest, 16);
     memcpy(p_ptr, payload, payload_length);
-    printf("IPV6_sendto  before");
+    //printf("IPV6_sendto  before");
     return ipv6_send_packet(ipv6_buf, next_hop);
 }
 
