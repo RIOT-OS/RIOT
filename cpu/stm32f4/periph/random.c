@@ -25,11 +25,6 @@
 /* ignore file in case no RNG device is defined */
 #if RANDOM_NUMOF
 
-void random_init(void)
-{
-    random_poweron();
-}
-
 int random_read(char *buf, unsigned int num)
 {
     /* cppcheck-suppress variableScope */

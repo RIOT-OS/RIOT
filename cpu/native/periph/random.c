@@ -48,25 +48,6 @@ unsigned _native_rng_read_hq(char *buf, unsigned num);
  * public API implementation
  **********************************************************************/
 
-void random_init(void)
-{
-    DEBUG("random_init: initializing\n");
-    switch (_native_rng_mode) {
-        case 0:
-            _native_rng_init_hq();
-            break;
-        case 1:
-            _native_rng_init_det();
-            break;
-        default:
-            err(EXIT_FAILURE, "random_init: _native_rng_mode is in invalid state %i\n",
-                   _native_rng_mode);
-            break;
-    }
-    DEBUG("random_init: powering on\n");
-    random_poweron();
-}
-
 int random_read(char *buf, unsigned int num)
 {
     if (!powered) {
@@ -94,6 +75,18 @@ int random_read(char *buf, unsigned int num)
 void random_poweron(void)
 {
     DEBUG("random_poweron: power on\n");
+    switch (_native_rng_mode) {
+        case 0:
+            _native_rng_init_hq();
+            break;
+        case 1:
+            _native_rng_init_det();
+            break;
+        default:
+            err(EXIT_FAILURE, "random_init: _native_rng_mode is in invalid state %i\n",
+                   _native_rng_mode);
+            break;
+    }
     powered = 1;
 }
 
