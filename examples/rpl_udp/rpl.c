@@ -44,7 +44,7 @@ void rpl_udp_init(int argc, char **argv)
 {
     transceiver_command_t tcmd;
     msg_t m;
-    uint32_t chan = RADIO_CHANNEL;
+    int32_t chan = 0;
 
     if (argc != 2) {
         printf("Usage: %s (r|n|h)\n", argv[0]);
@@ -69,6 +69,28 @@ void rpl_udp_init(int argc, char **argv)
 
         DEBUGF("Setting HW address to %u\n", id);
         net_if_set_hardware_address(0, id);
+
+        tcmd.transceivers = TRANSCEIVER;
+        tcmd.data = &chan;
+        m.type = GET_CHANNEL;
+        m.content.ptr = (void *) &tcmd;
+
+        msg_send_receive(&m, &m, transceiver_pid);
+        if( chan == 0 ) {
+            DEBUGF("The channel has not been set yet.");
+
+            /* try to set the channel to 10 (RADIO_CHANNEL) */
+            chan = RADIO_CHANNEL;
+        }
+
+        m.type = SET_CHANNEL;
+        msg_send_receive(&m, &m, transceiver_pid);
+        if( chan == 0 ) {
+            puts("ERROR: channel NOT set! Aborting initialization.");
+            return;
+        }
+
+        printf("Channel set to %d\n", chan);
 
         if (command != 'h') {
             DEBUGF("Initializing RPL for interface 0\n");
@@ -123,15 +145,6 @@ void rpl_udp_init(int argc, char **argv)
     if (command != 'h') {
         ipv6_init_as_router();
     }
-
-    /* set channel to 10 */
-    tcmd.transceivers = TRANSCEIVER;
-    tcmd.data = &chan;
-    m.type = SET_CHANNEL;
-    m.content.ptr = (void *) &tcmd;
-
-    msg_send_receive(&m, &m, transceiver_pid);
-    printf("Channel set to %u\n", RADIO_CHANNEL);
 
     puts("Transport layer initialized");
     /* start transceiver watchdog */
