@@ -110,7 +110,7 @@ int nrf24l01p_init(nrf24l01p_t *dev, spi_t spi, gpio_t ce, gpio_t cs, gpio_t irq
     }
 
     /* Flush RX FIFIO */
-    status = nrf24l01p_flush_tx_fifo(dev);
+    status = nrf24l01p_flush_rx_fifo(dev);
 
     if (status < 0) {
         return status;
@@ -138,7 +138,7 @@ int nrf24l01p_init(nrf24l01p_t *dev, spi_t spi, gpio_t ce, gpio_t cs, gpio_t irq
     }
 
     /* Set RF power */
-    status = nrf24l01p_set_power(dev, 0);
+    status = nrf24l01p_set_power(dev, INITIAL_RX_POWER_0dB);
 
     if (status < 0) {
         return status;
@@ -647,32 +647,28 @@ int nrf24l01p_get_status(nrf24l01p_t *dev)
     return (int)status;
 }
 
-int nrf24l01p_set_power(nrf24l01p_t *dev, int *pwr)
+int nrf24l01p_set_power(nrf24l01p_t *dev, int pwr)
 {
     char rf_setup;
 
     nrf24l01p_read_reg(dev, REG_RF_SETUP, &rf_setup);
 
-    if (pwr == NULL) {
-        return -1;
-    }
-
-    if (*pwr >= -3) {
+    if (pwr >= -3) {
         rf_setup &= ~(3 << 1);
         rf_setup |= (NRF24L01P_PWR_0DBM << 1);
     }
 
-    if (*pwr < -3) {
+    if (pwr < -3) {
         rf_setup &= ~(3 << 1);
         rf_setup |= (NRF24L01P_PWR_N6DBM << 1);
     }
 
-    if (*pwr < -9) {
+    if (pwr < -9) {
         rf_setup &= ~(3 << 1);
         rf_setup |= (NRF24L01P_PWR_N12DBM << 1);
     }
 
-    if (*pwr < -15) {
+    if (pwr < -15) {
         rf_setup &= ~(3 << 1);
     }
 
