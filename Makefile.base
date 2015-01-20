@@ -49,7 +49,7 @@ $(BINDIR)$(MODULE)/:
 $(BINDIR)$(MODULE).a $(OBJ): | $(BINDIR)$(MODULE)/
 
 $(BINDIR)$(MODULE).a: $(OBJ) | ${DIRS:%=ALL--%}
-	$(AD)$(AR) -rcs $@ $?
+	$(AD)$(AR) $(ARFLAGS) $@ $?
 
 
 CXXFLAGS = $(filter-out $(CXXUWFLAGS), $(CFLAGS)) $(CXXEXFLAGS)
