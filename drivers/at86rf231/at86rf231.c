@@ -411,7 +411,9 @@ int at86rf231_get_monitor(void)
 void at86rf231_gpio_spi_interrupts_init(void)
 {
     /* SPI init */
+    spi_acquire(AT86RF231_SPI);
     spi_init_master(AT86RF231_SPI, SPI_CONF_FIRST_RISING, SPI_SPEED);
+    spi_release(AT86RF231_SPI);
     /* IRQ0 */
     gpio_init_int(AT86RF231_INT, GPIO_NOPULL, GPIO_RISING, (gpio_cb_t)at86rf231_rx_irq, NULL);
     /* CS */

@@ -14,12 +14,15 @@
  * @brief       Low-level SPI driver implementation
  *
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
- *              Troels Hoffmeyer <troels.d.hoffmeyer@gmail.com>
+ * @author      Troels Hoffmeyer <troels.d.hoffmeyer@gmail.com>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Joakim Gebart <joakim.gebart@eistec.se>
  *
  * @}
  */
 
 #include "cpu.h"
+#include "mutex.h"
 #include "periph/gpio.h"
 #include "periph/spi.h"
 #include "periph_conf.h"
@@ -27,6 +30,21 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 #if SPI_0_EN  || SPI_1_EN
+
+/**
+ * @brief Array holding one pre-initialized mutex for each SPI device
+ */
+static mutex_t locks[] =  {
+#if SPI_0_EN
+    [SPI_0] = MUTEX_INIT,
+#endif
+#if SPI_1_EN
+    [SPI_1] = MUTEX_INIT,
+#endif
+#if SPI_2_EN
+    [SPI_2] = MUTEX_INIT
+#endif
+};
 
 int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
 {
@@ -80,7 +98,7 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
         /* Enable sercom4 in power manager */
         PM->APBCMASK.reg |= PM_APBCMASK_SERCOM4;
         GCLK->CLKCTRL.reg = (uint32_t)((GCLK_CLKCTRL_CLKEN
-                          | GCLK_CLKCTRL_GEN_GCLK0 
+                          | GCLK_CLKCTRL_GEN_GCLK0
                           | (SERCOM4_GCLK_ID_CORE << GCLK_CLKCTRL_ID_Pos)));
 
         /* Setup clock */
@@ -174,7 +192,25 @@ int spi_init_slave(spi_t dev, spi_conf_t conf, char (*cb)(char))
 }
 void spi_transmission_begin(spi_t dev, char reset_val)
 {
-    /* TODO*/ 
+    /* TODO*/
+}
+
+int spi_acquire(spi_t dev)
+{
+    if (dev >= SPI_NUMOF) {
+        return -1;
+    }
+    mutex_lock(&locks[dev]);
+    return 0;
+}
+
+int spi_release(spi_t dev)
+{
+    if (dev >= SPI_NUMOF) {
+        return -1;
+    }
+    mutex_unlock(&locks[dev]);
+    return 0;
 }
 
 int spi_transfer_byte(spi_t dev, char out, char *in)

@@ -178,7 +178,9 @@ void cmd_init_master(int argc, char **argv)
     if (parse_spi_dev(argc, argv) < 0) {
         return;
     }
+    spi_acquire(spi_dev);
     res = spi_init_master(spi_dev, spi_mode, spi_speed);
+    spi_release(spi_dev);
     if (res < 0) {
         printf("spi_init_master: error initializing SPI_%i device (code %i)\n", spi_dev, res);
         return;
@@ -202,7 +204,9 @@ void cmd_init_slave(int argc, char **argv)
     if (parse_spi_dev(argc, argv) < 0) {
         return;
     }
+    spi_acquire(spi_dev);
     res = spi_init_slave(spi_dev, spi_mode, slave_on_data);
+    spi_release(spi_dev);
     if (res < 0) {
         printf("spi_init_slave: error initializing SPI_%i device (code: %i)\n", spi_dev, res);
         return;
@@ -236,9 +240,11 @@ void cmd_transfer(int argc, char **argv)
     }
 
     /* do the actual data transfer */
+    spi_acquire(spi_dev);
     gpio_clear(spi_cs);
     res = spi_transfer_bytes(spi_dev, hello, buffer, strlen(hello));
     gpio_set(spi_cs);
+    spi_release(spi_dev);
 
     /* look at the results */
     if (res < 0) {
