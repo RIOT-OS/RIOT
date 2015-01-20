@@ -15,6 +15,7 @@
  * @brief       Driver for the TI TMP006 Infrared Thermopile Sensor.
  *
  * @author      Johann Fischer <j.fischer@phytec.de>
+ * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
  *
  * @}
  */
@@ -22,6 +23,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <math.h>
+#include "mutex.h"
 #include "periph/i2c.h"
 #include "tmp006.h"
 
@@ -58,24 +60,31 @@
 
 int tmp006_test(tmp006_t *dev)
 {
+    int status;
     char reg[2];
     uint16_t tmp;
 
-    if (i2c_read_regs(dev->i2c, dev->addr, TMP006_DEVICE_ID, reg, 2) != 2) {
+    /* Acquire exclusive access to the bus. */
+    i2c_acquire(dev->i2c);
+    status = i2c_read_regs(dev->i2c, dev->addr, TMP006_DEVICE_ID, reg, 2);
+    if (status != 2) {
+        /* Release the bus for other threads. */
+        i2c_release(dev->i2c);
         return -1;
     }
+    i2c_release(dev->i2c);
 
     tmp = ((uint16_t)reg[0] << 8) | reg[1];
 
     if (tmp != TMP006_DID_VALUE) {
         return -1;
     }
-
     return 0;
 }
 
 int tmp006_init(tmp006_t *dev, i2c_t i2c, uint8_t address, uint8_t conv_rate)
 {
+    int status;
     char reg[2];
 
     /* write device descriptor */
@@ -87,10 +96,14 @@ int tmp006_init(tmp006_t *dev, i2c_t i2c, uint8_t address, uint8_t conv_rate)
         return -1;
     }
 
+    i2c_acquire(dev->i2c);
     /* initialize the I2C bus */
-    if (i2c_init_master(i2c, I2C_SPEED) < 0) {
+    status = i2c_init_master(i2c, I2C_SPEED);
+    if (status < 0) {
+        i2c_release(dev->i2c);
         return -2;
     }
+    i2c_release(dev->i2c);
 
     if (tmp006_test(dev)) {
         return -3;
@@ -100,80 +113,107 @@ int tmp006_init(tmp006_t *dev, i2c_t i2c, uint8_t address, uint8_t conv_rate)
     reg[0] = (uint8_t)(tmp >> 8);
     reg[1] = (uint8_t)tmp;
 
-    if (i2c_write_regs(dev->i2c, dev->addr, TMP006_CONFIG, reg, 2) != 2) {
+    /* Acquire exclusive access to the bus. */
+    i2c_acquire(dev->i2c);
+    status = i2c_write_regs(dev->i2c, dev->addr, TMP006_CONFIG, reg, 2);
+    if (status != 2) {
+        i2c_release(dev->i2c);
         return -4;
     }
-
+    i2c_release(dev->i2c);
     dev->initialized = true;
-
     return 0;
 }
 
 int tmp006_reset(tmp006_t *dev)
 {
+    int status;
     char reg[2];
     uint16_t tmp = TMP006_CONFIG_RST;
     reg[0] = (uint8_t)(tmp >> 8);
     reg[1] = (uint8_t)tmp;
     dev->initialized = false;
 
-    if (i2c_write_regs(dev->i2c, dev->addr, TMP006_CONFIG, reg, 2) != 2) {
+    /* Acquire exclusive access to the bus. */
+    i2c_acquire(dev->i2c);
+    status = i2c_write_regs(dev->i2c, dev->addr, TMP006_CONFIG, reg, 2);
+    if (status != 2) {
+        i2c_release(dev->i2c);
         return -1;
     }
-
+    i2c_release(dev->i2c);
     return 0;
 }
 
 int tmp006_set_active(tmp006_t *dev)
 {
+    int status;
     char reg[2];
 
     if (dev->initialized == false) {
         return -1;
     }
 
-    if (i2c_read_regs(dev->i2c, dev->addr, TMP006_CONFIG, reg, 2) != 2) {
+    i2c_acquire(dev->i2c);
+    status = i2c_read_regs(dev->i2c, dev->addr, TMP006_CONFIG, reg, 2);
+    if (status != 2) {
+        i2c_release(dev->i2c);
         return -1;
     }
 
     reg[0] |= (uint8_t)(TMP006_CONFIG_MOD(TMP006_CONFIG_MOD_CC) >> 8);
 
-    if (i2c_write_regs(dev->i2c, dev->addr, TMP006_CONFIG, reg, 2) != 2) {
+    status = i2c_write_regs(dev->i2c, dev->addr, TMP006_CONFIG, reg, 2);
+    if (status != 2) {
+        i2c_release(dev->i2c);
         return -1;
     }
-
+    i2c_release(dev->i2c);
     return 0;
 }
 
 int tmp006_set_standby(tmp006_t *dev)
 {
+    int status;
     char reg[2];
 
-    if (i2c_read_regs(dev->i2c, dev->addr, TMP006_CONFIG, reg, 2) != 2) {
+    i2c_acquire(dev->i2c);
+    status = i2c_read_regs(dev->i2c, dev->addr, TMP006_CONFIG, reg, 2);
+    if (status != 2) {
+        i2c_release(dev->i2c);
         return -1;
     }
+    i2c_release(dev->i2c);
 
     reg[0] &= ~(uint8_t)(TMP006_CONFIG_MOD(TMP006_CONFIG_MOD_CC) >> 8);
 
-    if (i2c_write_regs(dev->i2c, dev->addr, TMP006_CONFIG, reg, 2) != 2) {
+    i2c_acquire(dev->i2c);
+    status = i2c_write_regs(dev->i2c, dev->addr, TMP006_CONFIG, reg, 2);
+    if (status != 2) {
+        i2c_release(dev->i2c);
         return -1;
     }
-
+    i2c_release(dev->i2c);
     return 0;
 }
 
 int tmp006_read(tmp006_t *dev, int16_t *rawv, int16_t *rawt, uint8_t *drdy)
 {
+    int status;
     char buf[2];
 
     if (dev->initialized == false) {
         return -1;
     }
 
+    i2c_acquire(dev->i2c);
     /* Register bytes are sent MSB first. */
-    if (i2c_read_regs(dev->i2c, dev->addr, TMP006_CONFIG, buf, 2) != 2) {
+    status = i2c_read_regs(dev->i2c, dev->addr, TMP006_CONFIG, buf, 2);
+    if (status != 2) {
+        i2c_release(dev->i2c);
         return -1;
     }
+    i2c_release(dev->i2c);
 
     *drdy = buf[1] & (uint8_t)(TMP006_CONFIG_DRDY);
 
@@ -182,18 +222,24 @@ int tmp006_read(tmp006_t *dev, int16_t *rawv, int16_t *rawt, uint8_t *drdy)
         return -1;
     }
 
-    if (i2c_read_regs(dev->i2c, dev->addr, TMP006_V_OBJECT, buf, 2) != 2) {
+    i2c_acquire(dev->i2c);
+    status = i2c_read_regs(dev->i2c, dev->addr, TMP006_V_OBJECT, buf, 2);
+    if (status != 2) {
+        i2c_release(dev->i2c);
         return -1;
     }
+    i2c_release(dev->i2c);
 
     *rawv = ((uint16_t)buf[0] << 8) | buf[1];
 
-    if (i2c_read_regs(dev->i2c, dev->addr, TMP006_T_AMBIENT, buf, 2) != 2) {
+    i2c_acquire(dev->i2c);
+    status = i2c_read_regs(dev->i2c, dev->addr, TMP006_T_AMBIENT, buf, 2);
+    if (status != 2) {
+        i2c_release(dev->i2c);
         return -1;
     }
-
+    i2c_release(dev->i2c);
     *rawt = ((uint16_t)buf[0] << 8) | buf[1];
-
     return 0;
 }
 
