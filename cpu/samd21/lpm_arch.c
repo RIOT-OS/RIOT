@@ -15,7 +15,7 @@
  * @brief       Implementation of the kernels power management interface
  *
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
- * @author      Saurabh Singh <email-missing@example.com>
+ * @author      Saurabh Singh <saurabh@cezy.co>
  *
  * @}
  */
