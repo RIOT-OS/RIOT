@@ -17,6 +17,7 @@
  *
  * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @auhtor      Thomas Eichinge <thomas.eichinger@fu-berlin.de>
  *
  * @}
  */
@@ -25,6 +26,7 @@
 
 #include "cpu.h"
 #include "irq.h"
+#include "mutex.h"
 #include "periph_conf.h"
 #include "periph/i2c.h"
 
@@ -42,6 +44,24 @@ static void _start(I2C_TypeDef *dev, uint8_t address, uint8_t rw_flag);
 static inline void _clear_addr(I2C_TypeDef *dev);
 static inline void _write(I2C_TypeDef *dev, char *data, int length);
 static inline void _stop(I2C_TypeDef *dev);
+
+/**
+ * @brief Array holding one pre-initialized mutex for each I2C device
+ */
+static mutex_t locks[] =  {
+#if I2C_0_EN
+    [I2C_0] = MUTEX_INIT,
+#endif
+#if I2C_1_EN
+    [I2C_1] = MUTEX_INIT,
+#endif
+#if I2C_2_EN
+    [I2C_2] = MUTEX_INIT
+#endif
+#if I2C_3_EN
+    [I2C_3] = MUTEX_INIT
+#endif
+};
 
 int i2c_init_master(i2c_t dev, i2c_speed_t speed)
 {
@@ -199,6 +219,24 @@ int i2c_init_slave(i2c_t dev, uint8_t address)
 {
     /* TODO: implement slave mode */
     return -1;
+}
+
+int i2c_acquire(i2c_t dev)
+{
+    if (dev >= I2C_NUMOF) {
+        return -1;
+    }
+    mutex_lock(&locks[dev]);
+    return 0;
+}
+
+int i2c_release(i2c_t dev)
+{
+    if (dev >= I2C_NUMOF) {
+        return -1;
+    }
+    mutex_unlock(&locks[dev]);
+    return 0;
 }
 
 int i2c_read_byte(i2c_t dev, uint8_t address, char *data)
