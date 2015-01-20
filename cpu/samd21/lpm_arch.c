@@ -79,12 +79,13 @@ enum lpm_mode last_mode = current_mode;
             break;
         case LPM_POWERDOWN:             /* Sleep mode Idle 2 */
             /* Idle Mode 2 */
+            current_mode = LPM_POWERDOWN;
             SCB->SCR &= ~SCB_SCR_SLEEPDEEP_Msk;
             PM->SLEEP.reg = SYSTEM_SLEEPMODE_IDLE_2;
             start_lpm();
             break;
         case LPM_OFF:                   /* Standby Mode - Potential Wake Up sources: Asynchronous */
-            current_mode = LPM_POWERDOWN;
+            current_mode = LPM_OFF;
             /* Standby Mode */
             SCB->SCR |=  SCB_SCR_SLEEPDEEP_Msk;
             start_lpm();
