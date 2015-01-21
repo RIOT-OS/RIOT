@@ -1,0 +1,2 @@
+FEATURES_PROVIDED += periph_uart
+FEATURES_PROVIDED += cpp
