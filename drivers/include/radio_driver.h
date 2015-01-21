@@ -12,6 +12,8 @@
  *
  * @brief API definitions for 802.15.4 radio transceivers' drivers
  *
+ * @deprecated THIS INTERFACE IS DEPRECATED. PLEASE USE netdev/802154.h
+ *
  * @{
  * @file
  * @author Kévin Roussel <Kevin.Roussel@inria.fr>
