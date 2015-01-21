@@ -29,6 +29,7 @@ extern "C" {
 #define INITIAL_ADDRESS_WIDTH       5
 #define NRF24L01P_MAX_DATA_LENGTH   32
 #define INITIAL_RF_CHANNEL          5
+#define INITIAL_RX_POWER_0dB        0
 
 #define DELAY_CS_TOGGLE_TICKS               2
 #define DELAY_AFTER_FUNC_TICKS              2
