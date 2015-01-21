@@ -39,7 +39,7 @@ int main(void)
         /* first call should return immediately if now wasn't initialized */
         vtimer_sleep_until(&last_wakeup, interval);
         after = hwtimer_now();
-        printf("Woke up. diff: %i.\n", after-pre);
+        printf("Woke up. diff: %"PRIu32".\n", after-pre);
     }
 
     return 0;
