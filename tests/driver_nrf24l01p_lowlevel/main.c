@@ -189,16 +189,26 @@ void cmd_its(int argc, char **argv)
 
     puts("Init Transceiver\n");
 
-    nrf24l01p_init(&nrf24l01p_0, SPI_PORT, CE_PIN, CS_PIN, IRQ_PIN);
+    /* initialize transceiver device */
+    if (nrf24l01p_init(&nrf24l01p_0, SPI_PORT, CE_PIN, CS_PIN, IRQ_PIN) < 0) {
+        puts("Error in nrf24l01p_init");
+        return;
+    }
 
     /* create thread that gets msg when data arrives */
-    thread_create(
+    if (thread_create(
         rx_handler_stack, sizeof(rx_handler_stack), PRIORITY_MAIN - 1, 0,
-        nrf24l01p_rx_handler, 0, "nrf24l01p_rx_handler");
+        nrf24l01p_rx_handler, 0, "nrf24l01p_rx_handler") < 0) {
+        puts("Error in thread_create");
+        return;
+    }
 
     /* setup device as receiver */
-    nrf24l01p_set_rxmode(&nrf24l01p_0);
-
+    if (nrf24l01p_set_rxmode(&nrf24l01p_0) < 0) {
+        puts("Error in nrf24l01p_set_rxmode");
+        return;
+    }
+    /* get and print all registers */
     cmd_print_regs(0, 0);
 }
 
@@ -220,22 +230,37 @@ void cmd_send(int argc, char **argv)
         tx_buf[i] = NRF24L01P_MAX_DATA_LENGTH - i;
     }
     /* power on the device */
-    nrf24l01p_on(&nrf24l01p_0);
+    if (nrf24l01p_on(&nrf24l01p_0) < 0) {
+        puts("Error in nrf24l01p_on");
+        return;
+    }
     /* setup device as transmitter */
-    nrf24l01p_set_txmode(&nrf24l01p_0);
+    if (nrf24l01p_set_txmode(&nrf24l01p_0) < 0) {
+        puts("Error in nrf24l01p_set_txmode");
+        return;
+    }
     /* load data to transmit into device */
-    nrf24l01p_preload(&nrf24l01p_0, tx_buf, NRF24L01P_MAX_DATA_LENGTH);
+    if (nrf24l01p_preload(&nrf24l01p_0, tx_buf, NRF24L01P_MAX_DATA_LENGTH) < 0) {
+        puts("Error in nrf24l01p_preload");
+        return;
+    }
     /* trigger transmitting */
     nrf24l01p_transmit(&nrf24l01p_0);
     /* wait while data is pysically transmitted  */
     hwtimer_wait(DELAY_DATA_ON_AIR);
-
+    /* get status of the transceiver */
     status = nrf24l01p_get_status(&nrf24l01p_0);
+    if (status < 0) {
+        puts("Error in nrf24l01p_get_status");
+    }
     if (status & TX_DS) {
         puts("Sent Packet");
     }
     /* setup device as receiver */
-    nrf24l01p_set_rxmode(&nrf24l01p_0);
+    if (nrf24l01p_set_rxmode(&nrf24l01p_0) < 0) {
+        puts("Error in nrf24l01p_set_rxmode");
+        return;
+    }
 }
 
 /**
