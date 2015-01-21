@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    board_nucleo-l1 nucleo-l1
+ * @defgroup    board_nucleo-l1 Nucleo-L1
  * @ingroup     boards
  * @brief       Board specific files for the nucleo-l1 board.
  * @{
