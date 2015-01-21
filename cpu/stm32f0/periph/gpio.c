@@ -154,6 +154,46 @@ static const IRQn_Type gpio_irq_map[GPIO_NUMOF] = {
 #endif
 };
 
+/* static clock mapping */
+static const uint8_t gpio_clock_map[GPIO_NUMOF] = {
+#if GPIO_0_EN
+    [GPIO_0] = GPIO_0_CLK,
+#endif
+#if GPIO_1_EN
+    [GPIO_1] = GPIO_1_CLK,
+#endif
+#if GPIO_2_EN
+    [GPIO_2] = GPIO_2_CLK,
+#endif
+#if GPIO_3_EN
+    [GPIO_3] = GPIO_3_CLK,
+#endif
+#if GPIO_4_EN
+    [GPIO_4] = GPIO_4_CLK,
+#endif
+#if GPIO_5_EN
+    [GPIO_5] = GPIO_5_CLK,
+#endif
+#if GPIO_6_EN
+    [GPIO_6] = GPIO_6_CLK,
+#endif
+#if GPIO_7_EN
+    [GPIO_7] = GPIO_7_CLK,
+#endif
+#if GPIO_8_EN
+    [GPIO_8] = GPIO_8_CLK,
+#endif
+#if GPIO_9_EN
+    [GPIO_9] = GPIO_9_CLK,
+#endif
+#if GPIO_10_EN
+    [GPIO_10] = GPIO_10_CLK,
+#endif
+#if GPIO_11_EN
+    [GPIO_11] = GPIO_11_CLK,
+#endif
+};
+
 int gpio_init_out(gpio_t dev, gpio_pp_t pullup)
 {
     GPIO_TypeDef *port;
@@ -165,6 +205,8 @@ int gpio_init_out(gpio_t dev, gpio_pp_t pullup)
 
     port = gpio_port_map[dev];
     pin = gpio_pin_map[dev];
+
+    RCC->AHBENR |= (1 << gpio_clock_map[dev]);
 
     port->MODER &= ~(2 << (2 * pin));           /* set pin to output mode */
     port->MODER |= (1 << (2 * pin));
@@ -188,6 +230,8 @@ int gpio_init_in(gpio_t dev, gpio_pp_t pullup)
 
     port = gpio_port_map[dev];
     pin = gpio_pin_map[dev];
+
+    RCC->AHBENR |= (1 << gpio_clock_map[dev]);
 
     port->MODER &= ~(3 << (2 * pin));           /* configure pin as input */
     port->PUPDR &= ~(3 << (2 * pin));           /* configure push-pull resistors */
