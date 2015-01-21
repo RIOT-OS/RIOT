@@ -7,9 +7,9 @@
  */
 
 /**
- * @defgroup        cpu_stm32l1 stm32l1
- * @addtogroup      cpu
+ * @defgroup        cpu_stm32l1 STM32L1
  * @brief           CPU specific implementations for the STM32F1
+ * @ingroup         cpu
  * @{
  *
  * @file
