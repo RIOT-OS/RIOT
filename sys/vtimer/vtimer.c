@@ -1,7 +1,7 @@
 /**
  * virtual timer
  *
- * Copyright (C) 2013, 2014 Freie Universität Berlin
+ * Copyright (C) 2013 - 2015 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -41,7 +41,14 @@
 #define SECONDS_PER_TICK (4096U)
 #define MICROSECONDS_PER_TICK (4096UL * 1000000)
 
+/*
+ * This is a workaround for missing support in clang on OSX,
+ * the alias is not needed in native.
+ * Compare https://github.com/RIOT-OS/RIOT/issues/2336
+ */
+#ifndef BOARD_NATIVE
 void _gettimeofday(void)           __attribute__ ((weak, alias("vtimer_gettimeofday")));
+#endif
 
 static void vtimer_callback(void *ptr);
 static void vtimer_callback_tick(vtimer_t *timer);
