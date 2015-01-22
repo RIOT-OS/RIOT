@@ -31,7 +31,7 @@
 #include "kernel.h"
 #include "thread.h"
 #include "net/ng_netconf.h"
-#include "net/ng_pktsnip.h"
+#include "net/ng_pkt.h"
 
 #ifdef __cplusplus
 extern "C" {

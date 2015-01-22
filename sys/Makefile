@@ -1,6 +1,3 @@
-ifneq (,$(filter pkt,$(USEMODULE)))
-    DIRS += net/crosslayer/pkt
-endif
 ifneq (,$(filter pktbuf,$(USEMODULE)))
     DIRS += net/crosslayer/pktbuf
 endif
