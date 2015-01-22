@@ -28,7 +28,7 @@
 #include "thread.h"
 #include "periph_conf.h"
 
-#define ENABLE_DEBUG    (1)
+#define ENABLE_DEBUG    (0)
 #include "debug.h"
 
 static uint16_t radio_pan;
@@ -90,19 +90,22 @@ static const int level_lt[29] = {
     7
 };
 
-/* implementation of driver's functions */
-
+/* Set up interrupt sources, triggered by the radio-module */
 void kw2xrf_init_interrupts(void)
 {
+    /* Clear interrupt status flags by writing ones to Interrupt Request Status Reg 1 (IRQSTS1) */
     kw2xrf_write_dreg(MKW2XDM_IRQSTS1, 0xff);
+    /* Clear Packet Buffer Underrun Error IRQ status and Wake Interrupt Status */
     kw2xrf_write_dreg(MKW2XDM_IRQSTS2, MKW2XDM_IRQSTS2_PB_ERR_IRQ
                       | MKW2XDM_IRQSTS2_WAKE_IRQ);
+    /* Clear timer interrupt flags */
     kw2xrf_write_dreg(MKW2XDM_IRQSTS3, 0x0f);
+    /* Print interrupt flag status bits  */
     DEBUG("IRQSTS1: %x\n", kw2xrf_read_dreg(MKW2XDM_IRQSTS1));
     DEBUG("IRQSTS2: %x\n", kw2xrf_read_dreg(MKW2XDM_IRQSTS2));
     DEBUG("IRQSTS3: %x\n", kw2xrf_read_dreg(MKW2XDM_IRQSTS3));
     uint8_t reg = kw2xrf_read_dreg(MKW2XDM_PHY_CTRL2);
-    //reg &= ~(MKW2XDM_PHY_CTRL2_RXMSK | MKW2XDM_PHY_CTRL2_SEQMSK);
+    /* Enable interrupt on RX operation */
     reg &= ~(MKW2XDM_PHY_CTRL2_RXMSK);
     kw2xrf_write_dreg(MKW2XDM_PHY_CTRL2, reg);
     /* activate promiscous mode for testing*/
@@ -116,27 +119,34 @@ int kw2xrf_initialize(netdev_t *dev)
     if (dev == NULL || dev->driver != ((netdev_driver_t *)(&kw2xrf_driver))) {
         return -ENODEV;
     }
-
     dev->type = NETDEV_TYPE_802154;
     dev->more = NULL;
-    //dev->event_handler = thread_getpid();
 
     kw2xrf_spi_init();
-
     if (!kw2xrf_on()) {
         core_panic(0x42, "Could not start MKW2XD radio transceiver");
     }
 
     kw2xrf_set_tx_power(0);
+
+    /* Set radio pan id. */
 #ifdef MODULE_CONFIG
     radio_pan = sysconfig.radio_pan_id;
 #else
     radio_pan = 0x0001;
 #endif
     kw2xrf_set_pan(radio_pan);
+
+    /* Set radio channel. */
+#ifdef MODULE_CONFIG
+    radio_channel = sysconfig.radio_channel;
+#else
     radio_channel = MKW2XDRF_DEFAULT_CHANNR;
+#endif    
     kw2xrf_set_channel(radio_channel);
-    DEBUG("MKW2XDRF initialized and set to channel %i and pan 0x1111\n", MKW2XDRF_DEFAULT_CHANNR);
+   
+    DEBUG("MKW2XDRF initialized and set to channel %i and pan %i.\n",
+    MKW2XDRF_DEFAULT_CHANNR, radio_pan);
 
     kw2xrf_read_iregs(MKW2XDMI_MACSHORTADDRS0_LSB, (uint8_t *)&radio_address, 2);
     kw2xrf_read_iregs(MKW2XDMI_MACLONGADDRS0_0, (uint8_t *)&radio_address_long, 8);
@@ -144,7 +154,7 @@ int kw2xrf_initialize(netdev_t *dev)
     kw2xrf_init_interrupts();
     kw2xrf_switch_to_rx();
 
-    return 1;
+    return 0;
 }
 
 int kw2xrf_on(void)
@@ -301,7 +311,6 @@ uint16_t kw2xrf_get_pan(void)
 #endif
 }
 
-
 int kw2xrf_set_channel(unsigned int ch)
 {
     radio_channel = ch;
@@ -322,7 +331,7 @@ int kw2xrf_set_channel(unsigned int ch)
     kw2xrf_write_dreg(MKW2XDM_PLL_INT0, MKW2XDM_PLL_INT0_VAL(pll_int_lt[ch]));
     kw2xrf_write_dreg(MKW2XDM_PLL_FRAC0_LSB, (uint8_t)pll_frac_lt[ch]);
     kw2xrf_write_dreg(MKW2XDM_PLL_FRAC0_MSB, (uint8_t)(pll_frac_lt[ch] >> 8));
-    return ((unsigned int) ch);
+    return ((unsigned int) radio_channel);
 }
 
 unsigned int kw2xrf_get_channel(void)
@@ -348,7 +357,11 @@ void kw2xrf_set_monitor(int mode)
 {
     uint8_t tmp;
     tmp = kw2xrf_read_dreg(MKW2XDM_PHY_CTRL4);
+    if (mode) {
     tmp |= MKW2XDM_PHY_CTRL4_PROMISCUOUS;
+    } else {
+    tmp &= ~MKW2XDM_PHY_CTRL4_PROMISCUOUS;
+    }    
     kw2xrf_write_dreg(MKW2XDM_PHY_CTRL4, tmp);
 }
 
@@ -494,7 +507,8 @@ int kw2xrf_get_option(netdev_t *dev, netdev_opt_t opt, void *value,
                 *value_len = sizeof(netdev_proto_t);
             }
 
-            *((netdev_type_t *)value) = NETDEV_PROTO_802154;
+            *((netdev_proto_t *)value) = NETDEV_PROTO_802154;
+
 
             break;
 

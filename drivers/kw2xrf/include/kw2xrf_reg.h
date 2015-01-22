@@ -166,165 +166,165 @@ enum mkw2xdrf_dregister {
 #define MKW2XDM_PWR_MODES_PMC_MODE                  (1 << 0)
 
 enum mkw2xdrf_iregister {
-    MKW2XDMI_PART_ID = 0x00,		 /* Part Identification */
-    MKW2XDMI_XTAL_TRIM = 0x01,		 /* XTAL 32 MHz Trim */
-    MKW2XDMI_MACPANID0_LSB = 0x03,	 /* MAC PAN ID for PAN0 */
-    MKW2XDMI_MACPANID0_MSB = 0x04,	 /* MAC PAN ID for PAN0 */
-    MKW2XDMI_MACSHORTADDRS0_LSB = 0x05,	 /* MAC Short Address for PAN0 */
-    MKW2XDMI_MACSHORTADDRS0_MSB = 0x06,	 /* MAC Short Address for PAN0 */
-    MKW2XDMI_MACLONGADDRS0_0 = 0x07,	 /* MAC Long Address for PAN0 */
-    MKW2XDMI_MACLONGADDRS0_1 = 0x08,	 /* MAC Long Address for PAN0 */
-    MKW2XDMI_MACLONGADDRS0_2 = 0x09,	 /* MAC Long Address for PAN0 */
-    MKW2XDMI_MACLONGADDRS0_3 = 0x0a,	 /* MAC Long Address for PAN0 */
-    MKW2XDMI_MACLONGADDRS0_4 = 0x0b,	 /* MAC Long Address for PAN0 */
-    MKW2XDMI_MACLONGADDRS0_5 = 0x0c,	 /* MAC Long Address for PAN0 */
-    MKW2XDMI_MACLONGADDRS0_6 = 0x0d,	 /* MAC Long Address for PAN0 */
-    MKW2XDMI_MACLONGADDRS0_7 = 0x0e,	 /* MAC Long Address for PAN0 */
-    MKW2XDMI_RX_FRAME_FILTER = 0x0f,	 /* Receive Frame Filter */
-    MKW2XDMI_PLL_INT1 = 0x10,		 /* Frequency Integer for PAN1 */
-    MKW2XDMI_PLL_FRAC1_LSB = 0x11,	 /* Frequency Fractional Value for PAN1 */
-    MKW2XDMI_PLL_FRAC1_MSB = 0x12,	 /* Frequency Fractional Value for PAN1 */
-    MKW2XDMI_MACPANID1_LSB = 0x13,	 /* Frequency Fractional Value for PAN1 */
-    MKW2XDMI_MACPANID1_MSB = 0x14,	 /* Frequency Fractional Value for PAN1 */
-    MKW2XDMI_MACSHORTADDRS1_LSB = 0x15,	 /* MAC Short Address for PAN1 */
-    MKW2XDMI_MACSHORTADDRS1_MSB = 0x16,	 /* MAC Short Address for PAN1 */
-    MKW2XDMI_MACLONGADDRS1_0 = 0x17,	 /* MAC Long Address for PAN1 */
-    MKW2XDMI_MACLONGADDRS1_1 = 0x18,	 /* MAC Long Address for PAN1 */
-    MKW2XDMI_MACLONGADDRS1_2 = 0x19,	 /* MAC Long Address for PAN1 */
-    MKW2XDMI_MACLONGADDRS1_3 = 0x1a,	 /* MAC Long Address for PAN1 */
-    MKW2XDMI_MACLONGADDRS1_4 = 0x1b,	 /* MAC Long Address for PAN1 */
-    MKW2XDMI_MACLONGADDRS1_5 = 0x1c,	 /* MAC Long Address for PAN1 */
-    MKW2XDMI_MACLONGADDRS1_6 = 0x1d,	 /* MAC Long Address for PAN1 */
-    MKW2XDMI_MACLONGADDRS1_7 = 0x1e,	 /* MAC Long Address for PAN1 */
-    MKW2XDMI_DUAL_PAN_CTRL = 0x1f,	 /* Dual PAN Control */
-    MKW2XDMI_DUAL_PAN_DWELL = 0x20,	 /* Channel Frequency Dwell Time */
-    MKW2XDMI_DUAL_PAN_STS = 0x21,	 /* Dual PAN Status */
-    MKW2XDMI_CCA1_THRESH = 0x22,	 /* Clear Channel Assessment 1 Threshold */
-    MKW2XDMI_CCA1_ED_OFFSET_COMP = 0x23, /* Clear Channel Assessment / ED Offset Computation */
-    MKW2XDMI_LQI_OFFSET_COMP = 0x24,	 /* LQI Offset Computation */
-    MKW2XDMI_CCA_CTRL = 0x25,		 /* CCA Control */
-    MKW2XDMI_CCA2_CORR_PEAKS = 0x26,	 /* Clear Channel Assessment 2 Threshold Peak Compare */
-    MKW2XDMI_CCA2_THRESH = 0x27,	 /* Clear Channel Assessment 2 Threshold */
-    MKW2XDMI_GPIO_DATA = 0x2a,		 /* GPIO Data */
-    MKW2XDMI_GPIO_DIR = 0x2b,		 /* GPIO Direction Control */
-    MKW2XDMI_GPIO_PUL_EN = 0x2c,	 /* GPIO Pullup Enable */
-    MKW2XDMI_GPIO_SEL = 0x2d,		 /* GPIO Pullup Select */
-    MKW2XDMI_GPIO_DS = 0x2e,		 /* GPIO Drive Strength */
-    MKW2XDMI_ANT_PAD_CTRL = 0x30,	 /* Antenna Control */
-    MKW2XDMI_MISC_PAD_CTRL = 0x31,	 /* Miscellaneous Pad Control */
-    MKW2XDMI_ANT_AGC_CTRL = 0x51,	 /* Antenna AGC and FAD Control */
-    MKW2XDMI_LPPS_CTRL = 0x56,		 /* LPPS_CTRL */
+    MKW2XDMI_PART_ID = 0x00,               /* Part Identification */
+    MKW2XDMI_XTAL_TRIM = 0x01,             /* XTAL 32 MHz Trim */
+    MKW2XDMI_MACPANID0_LSB = 0x03,         /* MAC PAN ID for PAN0 */
+    MKW2XDMI_MACPANID0_MSB = 0x04,         /* MAC PAN ID for PAN0 */
+    MKW2XDMI_MACSHORTADDRS0_LSB = 0x05,    /* MAC Short Address for PAN0 */
+    MKW2XDMI_MACSHORTADDRS0_MSB = 0x06,    /* MAC Short Address for PAN0 */
+    MKW2XDMI_MACLONGADDRS0_0 = 0x07,       /* MAC Long Address for PAN0 */
+    MKW2XDMI_MACLONGADDRS0_1 = 0x08,       /* MAC Long Address for PAN0 */
+    MKW2XDMI_MACLONGADDRS0_2 = 0x09,       /* MAC Long Address for PAN0 */
+    MKW2XDMI_MACLONGADDRS0_3 = 0x0a,       /* MAC Long Address for PAN0 */
+    MKW2XDMI_MACLONGADDRS0_4 = 0x0b,       /* MAC Long Address for PAN0 */
+    MKW2XDMI_MACLONGADDRS0_5 = 0x0c,       /* MAC Long Address for PAN0 */
+    MKW2XDMI_MACLONGADDRS0_6 = 0x0d,       /* MAC Long Address for PAN0 */
+    MKW2XDMI_MACLONGADDRS0_7 = 0x0e,       /* MAC Long Address for PAN0 */
+    MKW2XDMI_RX_FRAME_FILTER = 0x0f,       /* Receive Frame Filter */
+    MKW2XDMI_PLL_INT1 = 0x10,              /* Frequency Integer for PAN1 */
+    MKW2XDMI_PLL_FRAC1_LSB = 0x11,         /* Frequency Fractional Value for PAN1 */
+    MKW2XDMI_PLL_FRAC1_MSB = 0x12,         /* Frequency Fractional Value for PAN1 */
+    MKW2XDMI_MACPANID1_LSB = 0x13,         /* Frequency Fractional Value for PAN1 */
+    MKW2XDMI_MACPANID1_MSB = 0x14,         /* Frequency Fractional Value for PAN1 */
+    MKW2XDMI_MACSHORTADDRS1_LSB = 0x15,    /* MAC Short Address for PAN1 */
+    MKW2XDMI_MACSHORTADDRS1_MSB = 0x16,    /* MAC Short Address for PAN1 */
+    MKW2XDMI_MACLONGADDRS1_0 = 0x17,       /* MAC Long Address for PAN1 */
+    MKW2XDMI_MACLONGADDRS1_1 = 0x18,       /* MAC Long Address for PAN1 */
+    MKW2XDMI_MACLONGADDRS1_2 = 0x19,       /* MAC Long Address for PAN1 */
+    MKW2XDMI_MACLONGADDRS1_3 = 0x1a,       /* MAC Long Address for PAN1 */
+    MKW2XDMI_MACLONGADDRS1_4 = 0x1b,       /* MAC Long Address for PAN1 */
+    MKW2XDMI_MACLONGADDRS1_5 = 0x1c,       /* MAC Long Address for PAN1 */
+    MKW2XDMI_MACLONGADDRS1_6 = 0x1d,       /* MAC Long Address for PAN1 */
+    MKW2XDMI_MACLONGADDRS1_7 = 0x1e,       /* MAC Long Address for PAN1 */
+    MKW2XDMI_DUAL_PAN_CTRL = 0x1f,         /* Dual PAN Control */
+    MKW2XDMI_DUAL_PAN_DWELL = 0x20,        /* Channel Frequency Dwell Time */
+    MKW2XDMI_DUAL_PAN_STS = 0x21,          /* Dual PAN Status */
+    MKW2XDMI_CCA1_THRESH = 0x22,           /* Clear Channel Assessment 1 Threshold */
+    MKW2XDMI_CCA1_ED_OFFSET_COMP = 0x23,   /* Clear Channel Assessment / ED Offset Computation */
+    MKW2XDMI_LQI_OFFSET_COMP = 0x24,       /* LQI Offset Computation */
+    MKW2XDMI_CCA_CTRL = 0x25,              /* CCA Control */
+    MKW2XDMI_CCA2_CORR_PEAKS = 0x26,       /* Clear Channel Assessment 2 Threshold Peak Compare */
+    MKW2XDMI_CCA2_THRESH = 0x27,           /* Clear Channel Assessment 2 Threshold */
+    MKW2XDMI_GPIO_DATA = 0x2a,             /* GPIO Data */
+    MKW2XDMI_GPIO_DIR = 0x2b,              /* GPIO Direction Control */
+    MKW2XDMI_GPIO_PUL_EN = 0x2c,           /* GPIO Pullup Enable */
+    MKW2XDMI_GPIO_SEL = 0x2d,              /* GPIO Pullup Select */
+    MKW2XDMI_GPIO_DS = 0x2e,               /* GPIO Drive Strength */
+    MKW2XDMI_ANT_PAD_CTRL = 0x30,          /* Antenna Control */
+    MKW2XDMI_MISC_PAD_CTRL = 0x31,         /* Miscellaneous Pad Control */
+    MKW2XDMI_ANT_AGC_CTRL = 0x51,          /* Antenna AGC and FAD Control */
+    MKW2XDMI_LPPS_CTRL = 0x56,             /* LPPS_CTRL */
 };
 
-#define MKW2XDMI_PART_ID_MANUF_ID_MASK			0x60u
-#define MKW2XDMI_PART_ID_VERSION_MASK			0x1Cu
-#define MKW2XDMI_PART_ID_MASK_SET_MASK			0x07u
+#define MKW2XDMI_PART_ID_MANUF_ID_MASK                          0x60u
+#define MKW2XDMI_PART_ID_VERSION_MASK                           0x1Cu
+#define MKW2XDMI_PART_ID_MASK_SET_MASK                          0x07u
 
-#define MKW2XDMI_RX_FRAME_FILTER_FRM_VER_MASK		0xC0u
-#define MKW2XDMI_RX_FRAME_FILTER_FRM_VER_SHIFT		6
-#define MKW2XDMI_RX_FRAME_FILTER_FRM_VER(x)             (((uint8_t)(((uint8_t)(x))<<MKW2XDMI_RX_FRAME_FILTER_FRM_VER_SHIFT))&MKW2XDMI_RX_FRAME_FILTER_FRM_VER_MASK)
-#define MKW2XDMI_RX_FRAME_FILTER_ACTIVE_PROMISCUOUS	(1 << 5)
-#define MKW2XDMI_RX_FRAME_FILTER_NS_FT			(1 << 4)
-#define MKW2XDMI_RX_FRAME_FILTER_CMD_FT			(1 << 3)
-#define MKW2XDMI_RX_FRAME_FILTER_ACK_FT			(1 << 2)
-#define MKW2XDMI_RX_FRAME_FILTER_DATA_FT		(1 << 1)
-#define MKW2XDMI_RX_FRAME_FILTER_BEACON_FT		(1 << 0)
+#define MKW2XDMI_RX_FRAME_FILTER_FRM_VER_MASK                   0xC0u
+#define MKW2XDMI_RX_FRAME_FILTER_FRM_VER_SHIFT                  6
+#define MKW2XDMI_RX_FRAME_FILTER_FRM_VER(x)                     (((uint8_t)(((uint8_t)(x))<<MKW2XDMI_RX_FRAME_FILTER_FRM_VER_SHIFT))&MKW2XDMI_RX_FRAME_FILTER_FRM_VER_MASK)
+#define MKW2XDMI_RX_FRAME_FILTER_ACTIVE_PROMISCUOUS             (1 << 5)
+#define MKW2XDMI_RX_FRAME_FILTER_NS_FT                          (1 << 4)
+#define MKW2XDMI_RX_FRAME_FILTER_CMD_FT                         (1 << 3)
+#define MKW2XDMI_RX_FRAME_FILTER_ACK_FT                         (1 << 2)
+#define MKW2XDMI_RX_FRAME_FILTER_DATA_FT                        (1 << 1)
+#define MKW2XDMI_RX_FRAME_FILTER_BEACON_FT                      (1 << 0)
 
-#define MKW2XDMI_PLL_INT1_MASK				0x1Fu
+#define MKW2XDMI_PLL_INT1_MASK                                  0x1Fu
+ 
+#define MKW2XDMI_DUAL_PAN_CTRL_DUAL_PAN_SAM_LVL_MASK            0xF0
+#define MKW2XDMI_DUAL_PAN_CTRL_DUAL_PAN_SAM_LVL_SHIFT           4
+#define MKW2XDMI_DUAL_PAN_CTRL_DUAL_PAN_SAM_LVL(x)              (((uint8_t)(((uint8_t)(x))<<MKW2XDMI_DUAL_PAN_CTRL_DUAL_PAN_SAM_LVL_SHIFT))&MKW2XDMI_DUAL_PAN_CTRL_DUAL_PAN_SAM_LVL_MASK)
+#define MKW2XDMI_DUAL_PAN_CTRL_CURRENT_NETWORK                 (1 << 3)
+#define MKW2XDMI_DUAL_PAN_CTRL_PANCORDNTR1                     (1 << 2)
+#define MKW2XDMI_DUAL_PAN_CTRL_DUAL_PAN_AUTO                   (1 << 1)
+#define MKW2XDMI_DUAL_PAN_CTRL_ACTIVE_NETWORK                  (1 << 0)
 
-#define MKW2XDMI_DUAL_PAN_CTRL_DUAL_PAN_SAM_LVL_MASK	0xF0
-#define MKW2XDMI_DUAL_PAN_CTRL_DUAL_PAN_SAM_LVL_SHIFT	4
-#define MKW2XDMI_DUAL_PAN_CTRL_DUAL_PAN_SAM_LVL(x)      (((uint8_t)(((uint8_t)(x))<<MKW2XDMI_DUAL_PAN_CTRL_DUAL_PAN_SAM_LVL_SHIFT))&MKW2XDMI_DUAL_PAN_CTRL_DUAL_PAN_SAM_LVL_MASK)
-#define MKW2XDMI_DUAL_PAN_CTRL_CURRENT_NETWORK		(1 << 3)
-#define MKW2XDMI_DUAL_PAN_CTRL_PANCORDNTR1		(1 << 2)
-#define MKW2XDMI_DUAL_PAN_CTRL_DUAL_PAN_AUTO		(1 << 1)
-#define MKW2XDMI_DUAL_PAN_CTRL_ACTIVE_NETWORK		(1 << 0)
+#define MKW2XDMI_DUAL_PAN_STS_RECD_ON_PAN1                     (1 << 7)
+#define MKW2XDMI_DUAL_PAN_STS_RECD_ON_PAN0                     (1 << 6)
+#define MKW2XDMI_DUAL_PAN_STS_DUAL_PAN_REMAIN_MASK             0x3Fu
 
-#define MKW2XDMI_DUAL_PAN_STS_RECD_ON_PAN1		(1 << 7)
-#define MKW2XDMI_DUAL_PAN_STS_RECD_ON_PAN0		(1 << 6)
-#define MKW2XDMI_DUAL_PAN_STS_DUAL_PAN_REMAIN_MASK      0x3Fu
+#define MKW2XDMI_CCA_CTRL_AGC_FRZ_EN                           (1 << 6)
+#define MKW2XDMI_CCA_CTRL_CONT_RSSI_EN                         (1 << 5)
+#define MKW2XDMI_CCA_CTRL_QI_RSSI_NOT_CORR                     (1 << 4)
+#define MKW2XDMI_CCA_CTRL_CCA3_AND_NOT_OR                      (1 << 3)
+#define MKW2XDMI_CCA_CTRL_OWER_COMP_EN_LQI                     (1 << 2)
+#define MKW2XDMI_CCA_CTRL_OWER_COMP_EN_ED                      (1 << 1)
+#define MKW2XDMI_CCA_CTRL_OWER_COMP_EN_CCA1                    (1 << 0)
 
-#define MKW2XDMI_CCA_CTRL_AGC_FRZ_EN			(1 << 6)
-#define MKW2XDMI_CCA_CTRL_CONT_RSSI_EN			(1 << 5)
-#define MKW2XDMI_CCA_CTRL_QI_RSSI_NOT_CORR		(1 << 4)
-#define MKW2XDMI_CCA_CTRL_CCA3_AND_NOT_OR		(1 << 3)
-#define MKW2XDMI_CCA_CTRL_OWER_COMP_EN_LQI		(1 << 2)
-#define MKW2XDMI_CCA_CTRL_OWER_COMP_EN_ED		(1 << 1)
-#define MKW2XDMI_CCA_CTRL_OWER_COMP_EN_CCA1		(1 << 0)
+#define MKW2XDMI_CCA2_CORR_PEAKS_CCA2_MIN_NUM_CORR_TH_MASK     0x70u
+#define MKW2XDMI_CCA2_CORR_PEAKS_CCA2_MIN_NUM_CORR_TH_SHIFT    4
+#define MKW2XDMI_CCA2_CORR_PEAKS_CCA2_MIN_NUM_CORR_TH(x)       (((uint8_t)(((uint8_t)(x))<<MKW2XDMI_CCA2_CORR_PEAKS_CCA2_MIN_NUM_CORR_TH_SHIFT))&MKW2XDMI_CCA2_CORR_PEAKS_CCA2_MIN_NUM_CORR_TH_MASK)
+#define MKW2XDMI_CCA2_CORR_PEAKS_CCA2_NUM_CORR_PEAKS_MASK      0x0Fu
 
-#define MKW2XDMI_CCA2_CORR_PEAKS_CCA2_MIN_NUM_CORR_TH_MASK	0x70u
-#define MKW2XDMI_CCA2_CORR_PEAKS_CCA2_MIN_NUM_CORR_TH_SHIFT	4
-#define MKW2XDMI_CCA2_CORR_PEAKS_CCA2_MIN_NUM_CORR_TH(x)	(((uint8_t)(((uint8_t)(x))<<MKW2XDMI_CCA2_CORR_PEAKS_CCA2_MIN_NUM_CORR_TH_SHIFT))&MKW2XDMI_CCA2_CORR_PEAKS_CCA2_MIN_NUM_CORR_TH_MASK)
-#define MKW2XDMI_CCA2_CORR_PEAKS_CCA2_NUM_CORR_PEAKS_MASK	0x0Fu
+#define MKW2XDMI_GPIO_DATA8                  (1 << 7)
+#define MKW2XDMI_GPIO_DATA7                  (1 << 6)
+#define MKW2XDMI_GPIO_DATA6                  (1 << 5)
+#define MKW2XDMI_GPIO_DATA5                  (1 << 4)
+#define MKW2XDMI_GPIO_DATA4                  (1 << 3)
+#define MKW2XDMI_GPIO_DATA3                  (1 << 2)
+#define MKW2XDMI_GPIO_DATA2                  (1 << 1)
+#define MKW2XDMI_GPIO_DATA1                  (1 << 0)
 
-#define MKW2XDMI_GPIO_DATA8				(1 << 7)
-#define MKW2XDMI_GPIO_DATA7				(1 << 6)
-#define MKW2XDMI_GPIO_DATA6				(1 << 5)
-#define MKW2XDMI_GPIO_DATA5				(1 << 4)
-#define MKW2XDMI_GPIO_DATA4				(1 << 3)
-#define MKW2XDMI_GPIO_DATA3				(1 << 2)
-#define MKW2XDMI_GPIO_DATA2				(1 << 1)
-#define MKW2XDMI_GPIO_DATA1				(1 << 0)
+#define MKW2XDMI_GPIO_DIR8                   (1 << 7)
+#define MKW2XDMI_GPIO_DIR7                   (1 << 6)
+#define MKW2XDMI_GPIO_DIR6                   (1 << 5)
+#define MKW2XDMI_GPIO_DIR5                   (1 << 4)
+#define MKW2XDMI_GPIO_DIR4                   (1 << 3)
+#define MKW2XDMI_GPIO_DIR3                   (1 << 2)
+#define MKW2XDMI_GPIO_DIR2                   (1 << 1)
+#define MKW2XDMI_GPIO_DIR1                   (1 << 0)
 
-#define MKW2XDMI_GPIO_DIR8				(1 << 7)
-#define MKW2XDMI_GPIO_DIR7				(1 << 6)
-#define MKW2XDMI_GPIO_DIR6				(1 << 5)
-#define MKW2XDMI_GPIO_DIR5				(1 << 4)
-#define MKW2XDMI_GPIO_DIR4				(1 << 3)
-#define MKW2XDMI_GPIO_DIR3				(1 << 2)
-#define MKW2XDMI_GPIO_DIR2				(1 << 1)
-#define MKW2XDMI_GPIO_DIR1				(1 << 0)
+#define MKW2XDMI_GPIO_PUL_EN8                (1 << 7)
+#define MKW2XDMI_GPIO_PUL_EN7                (1 << 6)
+#define MKW2XDMI_GPIO_PUL_EN6                (1 << 5)
+#define MKW2XDMI_GPIO_PUL_EN5                (1 << 4)
+#define MKW2XDMI_GPIO_PUL_EN4                (1 << 3)
+#define MKW2XDMI_GPIO_PUL_EN3                (1 << 2)
+#define MKW2XDMI_GPIO_PUL_EN2                (1 << 1)
+#define MKW2XDMI_GPIO_PUL_EN1                (1 << 0)
 
-#define MKW2XDMI_GPIO_PUL_EN8				(1 << 7)
-#define MKW2XDMI_GPIO_PUL_EN7				(1 << 6)
-#define MKW2XDMI_GPIO_PUL_EN6				(1 << 5)
-#define MKW2XDMI_GPIO_PUL_EN5				(1 << 4)
-#define MKW2XDMI_GPIO_PUL_EN4				(1 << 3)
-#define MKW2XDMI_GPIO_PUL_EN3				(1 << 2)
-#define MKW2XDMI_GPIO_PUL_EN2				(1 << 1)
-#define MKW2XDMI_GPIO_PUL_EN1				(1 << 0)
+#define MKW2XDMI_GPIO_PUL_SEL8               (1 << 7)
+#define MKW2XDMI_GPIO_PUL_SEL7               (1 << 6)
+#define MKW2XDMI_GPIO_PUL_SEL6               (1 << 5)
+#define MKW2XDMI_GPIO_PUL_SEL5               (1 << 4)
+#define MKW2XDMI_GPIO_PUL_SEL4               (1 << 3)
+#define MKW2XDMI_GPIO_PUL_SEL3               (1 << 2)
+#define MKW2XDMI_GPIO_PUL_SEL2               (1 << 1)
+#define MKW2XDMI_GPIO_PUL_SEL1               (1 << 0)
 
-#define MKW2XDMI_GPIO_PUL_SEL8				(1 << 7)
-#define MKW2XDMI_GPIO_PUL_SEL7				(1 << 6)
-#define MKW2XDMI_GPIO_PUL_SEL6				(1 << 5)
-#define MKW2XDMI_GPIO_PUL_SEL5				(1 << 4)
-#define MKW2XDMI_GPIO_PUL_SEL4				(1 << 3)
-#define MKW2XDMI_GPIO_PUL_SEL3				(1 << 2)
-#define MKW2XDMI_GPIO_PUL_SEL2				(1 << 1)
-#define MKW2XDMI_GPIO_PUL_SEL1				(1 << 0)
+#define MKW2XDMI_GPIO_DS8                    (1 << 7)
+#define MKW2XDMI_GPIO_DS7                    (1 << 6)
+#define MKW2XDMI_GPIO_DS6                    (1 << 5)
+#define MKW2XDMI_GPIO_DS5                    (1 << 4)
+#define MKW2XDMI_GPIO_DS4                    (1 << 3)
+#define MKW2XDMI_GPIO_DS3                    (1 << 2)
+#define MKW2XDMI_GPIO_DS2                    (1 << 1)
+#define MKW2XDMI_GPIO_DS1                    (1 << 0)
 
-#define MKW2XDMI_GPIO_DS8				(1 << 7)
-#define MKW2XDMI_GPIO_DS7				(1 << 6)
-#define MKW2XDMI_GPIO_DS6				(1 << 5)
-#define MKW2XDMI_GPIO_DS5				(1 << 4)
-#define MKW2XDMI_GPIO_DS4				(1 << 3)
-#define MKW2XDMI_GPIO_DS3				(1 << 2)
-#define MKW2XDMI_GPIO_DS2				(1 << 1)
-#define MKW2XDMI_GPIO_DS1				(1 << 0)
+#define MKW2XDMI_ANT_PAD_CTRL_ANTX_POL3      (1 << 7)
+#define MKW2XDMI_ANT_PAD_CTRL_ANTX_POL2      (1 << 6)
+#define MKW2XDMI_ANT_PAD_CTRL_ANTX_POL1      (1 << 5)
+#define MKW2XDMI_ANT_PAD_CTRL_ANTX_POL0      (1 << 4)
+#define MKW2XDMI_ANT_PAD_CTRL_ANTX_CTRLMODE  (1 << 3)
+#define MKW2XDMI_ANT_PAD_CTRL_ANTX_HZ        (1 << 2)
+#define MKW2XDMI_ANT_PAD_CTRL_ANTX_EN_MASK   0x03u
+#define MKW2XDMI_ANT_PAD_CTRL_ANTX_EN(x)     (((uint8_t)(((uint8_t)(x))<<0))&MKW2XDMI_ANT_PAD_CTRL_ANTX_EN_MASK)
 
-#define MKW2XDMI_ANT_PAD_CTRL_ANTX_POL3			(1 << 7)
-#define MKW2XDMI_ANT_PAD_CTRL_ANTX_POL2			(1 << 6)
-#define MKW2XDMI_ANT_PAD_CTRL_ANTX_POL1			(1 << 5)
-#define MKW2XDMI_ANT_PAD_CTRL_ANTX_POL0			(1 << 4)
-#define MKW2XDMI_ANT_PAD_CTRL_ANTX_CTRLMODE		(1 << 3)
-#define MKW2XDMI_ANT_PAD_CTRL_ANTX_HZ			(1 << 2)
-#define MKW2XDMI_ANT_PAD_CTRL_ANTX_EN_MASK		0x03u
-#define MKW2XDMI_ANT_PAD_CTRL_ANTX_EN(x)                (((uint8_t)(((uint8_t)(x))<<0))&MKW2XDMI_ANT_PAD_CTRL_ANTX_EN_MASK)
+#define MKW2XDMI_MISC_PAD_CTRL_MISO_HIZ_EN   (1 << 3)
+#define MKW2XDMI_MISC_PAD_CTRL_IRQ_B_OD      (1 << 2)
+#define MKW2XDMI_MISC_PAD_CTRL_NON_GPIO_DS   (1 << 1)
+#define MKW2XDMI_MISC_PAD_CTRL_ANTX_CURR     (1 << 0)
 
-#define MKW2XDMI_MISC_PAD_CTRL_MISO_HIZ_EN		(1 << 3)
-#define MKW2XDMI_MISC_PAD_CTRL_IRQ_B_OD			(1 << 2)
-#define MKW2XDMI_MISC_PAD_CTRL_NON_GPIO_DS		(1 << 1)
-#define MKW2XDMI_MISC_PAD_CTRL_ANTX_CURR		(1 << 0)
+#define MKW2XDMI_ANT_AGC_CTRL_SNF_EN         (1 << 7)
+#define MKW2XDMI_ANT_AGC_CTRL_AGC_EN         (1 << 6)
+#define MKW2XDMI_ANT_AGC_CTRL_AGC_LEVEL_MASK  0x30u
+#define MKW2XDMI_ANT_AGC_CTRL_AGC_LEVEL_SHIFT 4
+#define MKW2XDMI_ANT_AGC_CTRL_AGC_LEVEL(x)   (((uint8_t)(((uint8_t)(x))<<MKW2XDMI_ANT_AGC_CTRL_AGC_LEVEL_SHIFT))&MKW2XDMI_ANT_AGC_CTRL_AGC_LEVEL_MASK)
+#define MKW2XDMI_ANT_AGC_CTRL_ANTX           (1 << 1)
+#define MKW2XDMI_ANT_AGC_CTRL_AD_EN          (1 << 0)
 
-#define MKW2XDMI_ANT_AGC_CTRL_SNF_EN			(1 << 7)
-#define MKW2XDMI_ANT_AGC_CTRL_AGC_EN			(1 << 6)
-#define MKW2XDMI_ANT_AGC_CTRL_AGC_LEVEL_MASK		0x30u
-#define MKW2XDMI_ANT_AGC_CTRL_AGC_LEVEL_SHIFT		4
-#define MKW2XDMI_ANT_AGC_CTRL_AGC_LEVEL(x)              (((uint8_t)(((uint8_t)(x))<<MKW2XDMI_ANT_AGC_CTRL_AGC_LEVEL_SHIFT))&MKW2XDMI_ANT_AGC_CTRL_AGC_LEVEL_MASK)
-#define MKW2XDMI_ANT_AGC_CTRL_ANTX			(1 << 1)
-#define MKW2XDMI_ANT_AGC_CTRL_AD_EN			(1 << 0)
-
-#define MKW2XDMI_LPPS_CTRL_LPPS_EN			(1 << 0)
+#define MKW2XDMI_LPPS_CTRL_LPPS_EN           (1 << 0)
 
 #ifdef __cplusplus
 }

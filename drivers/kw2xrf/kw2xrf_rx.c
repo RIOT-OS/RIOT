@@ -128,7 +128,11 @@ void kw2xrf_rx_handler(void)
     pkt_lqi = buf[pkt_len];
     pkt_rssi = 0;
 
-    /* low-level reception mechanism (for MAC layer, among others) */
+    /* low-level reception mechanism (for MAC layer, among others)
+    Note: CRC is checked automatically in the receiver hardware.
+    Only valid packets will trigger an rx-interrupt. 
+    Automatic checking could be switched off in PHY_CTRL2-Reg. CRC can then be found in 
+    Modem_IRQSTS2 field in Reg CRCVALID */
     if ((recv_func.type == MKW2XDRF_CB_TYPE_RAW) && (recv_func.cb.raw != NULL)) {
         recv_func.cb.raw(NULL, buf, pkt_len - 2, pkt_rssi, pkt_lqi, crc_ok);
     }
@@ -137,7 +141,8 @@ void kw2xrf_rx_handler(void)
     kw2xrf_rx_buffer[rx_buffer_next].length = pkt_len;
     kw2xrf_rx_buffer[rx_buffer_next].rssi = pkt_rssi;
     kw2xrf_rx_buffer[rx_buffer_next].lqi = pkt_lqi;
-    kw2xrf_rx_buffer[rx_buffer_next].crc = (crc_ok ? 1 : 0);
+    /* As noted above, crc is checked in hardware */
+    kw2xrf_rx_buffer[rx_buffer_next].crc = crc_ok;  
     ieee802154_frame_read(buf,
                           &kw2xrf_rx_buffer[rx_buffer_next].frame,
                           pkt_len);
@@ -146,18 +151,6 @@ void kw2xrf_rx_handler(void)
     if (kw2xrf_rx_buffer[rx_buffer_next].frame.fcf.frame_type != 2) {
 #ifdef DEBUG
         ieee802154_frame_print_fcf_frame(&kw2xrf_rx_buffer[rx_buffer_next].frame);
-#endif
-
-#ifdef MODULE_TRANSCEIVER
-
-        /* notify transceiver thread if any */
-        if (transceiver_pid != KERNEL_PID_UNDEF) {
-            msg_t m;
-            m.type = (uint16_t) RCV_PKT_MKW2XDRF;
-            m.content.value = rx_buffer_next;
-            msg_send_int(&m, transceiver_pid);
-        }
-
 #endif
     }
 
@@ -171,7 +164,6 @@ void kw2xrf_rx_handler(void)
     }
 
 #endif
-
 
 #ifdef DEBUG
     else {

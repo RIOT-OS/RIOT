@@ -153,7 +153,7 @@ uint16_t kw2xrf_get_pan(void);
  * @brief Sets the output (TX) power of the KW2XRF.
  *
  * @param[in] pow The desired TX (output) power in dBm,
- *                 valid values are -25 to 0; other values
+ *                 valid values are -35 to 8; other values
  *                 will be "saturated" into this range.
  *
  * @return The set TX (output) power after calling.

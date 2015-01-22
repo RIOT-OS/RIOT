@@ -85,11 +85,6 @@ kw2xrf_packet_t;
  */
 extern netdev_t kw2xrf_netdev;
 
-
-
-/** Utility macro: get KW2XRF's status byte. */
-#define kw2xrf_status_byte() kw2xrf_strobe(NOBYTE)
-
 /**
  * KW2XRF low-level radio driver definition.
  */
