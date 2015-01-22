@@ -37,7 +37,7 @@ export PORT      ?= /dev/ttyUSB1
 export CPU_USAGE  = -mcpu=cortex-m3
 
 export ASFLAGS   += -ggdb -g3 $(CPU_USAGE) $(FPU_USAGE) -mlittle-endian
-export CFLAGS    += $(ASFLAGS) -std=gnu99 -mthumb -mthumb-interwork -nostartfiles -Os -Wall -Wstrict-prototypes -ffunction-sections -fdata-sections -fno-builtin
+export CFLAGS    += $(ASFLAGS) -std=gnu99 -mthumb -mno-thumb-interwork -nostartfiles -Os -Wall -Wstrict-prototypes -ffunction-sections -fdata-sections -fno-builtin
 export LINKFLAGS += $(CFLAGS) -static -lgcc -T$(LINKERSCRIPT) -L$(RIOTCPU)/$(CPU)
 export OFLAGS    += -O binary --gap-fill 0xff
 export HEXFILE = $(ELFFILE:.elf=.bin)
