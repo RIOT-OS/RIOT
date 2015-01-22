@@ -70,6 +70,26 @@ extern "C" {
 #define TIMER_1_IRQ_CHAN    TIM5_IRQn
 /** @} */
 
+/**
+ * @name PWM configuration
+ * @{
+ */
+#define PWM_NUMOF           (1U)
+#define PWM_0_EN            1
+#define PWM_MAX_CHANNELS    1                   /* Increase if Timer with more channels is used */
+
+/* PWM 0 device configuration */
+#define PWM_0_DEV           TIM11
+#define PWM_0_CHANNELS      1
+#define PWM_0_CLK           (168000000U)
+#define PWM_0_CLKEN()       (RCC->APB2ENR |= RCC_APB2ENR_TIM11EN)
+#define PWM_0_CLKDIS()      (RCC->APB2ENR &= ~RCC_APB2ENR_TIM11EN)
+/* PWM 0 pin configuration */
+#define PWM_0_PORT          GPIOB
+#define PWM_0_PORT_CLKEN()  (RCC->AHB1ENR |= RCC_AHB1ENR_GPIOBEN)
+#define PWM_0_PIN_CH0       9
+#define PWM_0_PIN_AF        3
+/** @} */
 
 /**
  * @name UART configuration
