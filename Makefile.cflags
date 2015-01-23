@@ -47,3 +47,6 @@ ifeq ($(LTO),yes)
   CFLAGS += ${LTOFLAGS}
   LINKFLAGS += ${LTOFLAGS}
 endif
+
+# Forbid common symbols to prevent accidental aliasing.
+CFLAGS += -fno-common
