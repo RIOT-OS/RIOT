@@ -76,7 +76,7 @@ uint8_t rpl_max_routing_entries;
 ipv6_addr_t my_address;
 
 /* IPv6 message buffer */
-ipv6_hdr_t *ipv6_buf;
+static ipv6_hdr_t *ipv6_buf;
 
 uint8_t rpl_init(int if_id)
 {
