@@ -32,6 +32,8 @@ extern "C" {
  * @brief Initialize the KW2XRF transceiver.
  *
  * @param[in] dev The netdev network device.
+ *
+ * @return 0 if the radio was correctly initialized.
  */
 int kw2xrf_initialize(netdev_t *dev);
 

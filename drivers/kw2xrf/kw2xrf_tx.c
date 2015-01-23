@@ -43,6 +43,7 @@ netdev_802154_tx_status_t kw2xrf_load_tx_buf(netdev_t *dev,
         void *buf,
         unsigned int len)
 {
+    /* Use seperate name for hdr, with an shifted index for more intuitive addressing. */
     uint8_t pkt[MKW2XDRF_MAX_PKT_LENGTH - 1];
     uint8_t *hdr = pkt + 1;
 
@@ -144,9 +145,9 @@ netdev_802154_tx_status_t kw2xrf_load_tx_buf(netdev_t *dev,
 
     pkt[0] = size;
 
-    /* generate pkt */
+    /* generate pkt, header data is already in pkt, header data was written above to hdr[] array. */
     for (uint8_t i = 0; i < len; i++) {
-        hdr[i + idx] = ((uint8_t *)buf)[i];
+        pkt[i + idx + 1] = ((uint8_t *)buf)[i];
     }
 
     if (kw2xrf_read_dreg(MKW2XDM_SEQ_STATE)) {
@@ -157,6 +158,7 @@ netdev_802154_tx_status_t kw2xrf_load_tx_buf(netdev_t *dev,
         while (kw2xrf_read_dreg(MKW2XDM_SEQ_STATE));
     }
 
+    /* write complete packet at once, because of efficiency and the later use of dma */
     kw2xrf_write_fifo(pkt, size - 2);
 
     return NETDEV_802154_TX_STATUS_OK;
