@@ -41,12 +41,12 @@
 #define RCV_BUFFER_SIZE     (64)
 #define RADIO_STACK_SIZE    (KERNEL_CONF_STACKSIZE_DEFAULT)
 
-char radio_stack_buffer[RADIO_STACK_SIZE];
-msg_t msg_q[RCV_BUFFER_SIZE];
-uint8_t snd_buffer[NATIVE_MAX_DATA_LENGTH];
-uint8_t receiving = 1;
-unsigned int last_seq = 0, missed_cnt = 0;
-int first = -1;
+static char radio_stack_buffer[RADIO_STACK_SIZE];
+static msg_t msg_q[RCV_BUFFER_SIZE];
+static uint8_t snd_buffer[NATIVE_MAX_DATA_LENGTH];
+static uint8_t receiving = 1;
+static unsigned int last_seq = 0, missed_cnt = 0;
+static int first = -1;
 
 void *radio(void *arg)
 {
