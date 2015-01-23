@@ -53,8 +53,8 @@
 
 #ifdef MODULE_TRANSCEIVER
 
-char radio_stack_buffer[RADIO_STACK_SIZE];
-msg_t msg_q[RCV_BUFFER_SIZE];
+static char radio_stack_buffer[RADIO_STACK_SIZE];
+static msg_t msg_q[RCV_BUFFER_SIZE];
 
 void *radio(void *arg)
 {
