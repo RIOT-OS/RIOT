@@ -73,23 +73,23 @@
 
 /*------------------------------------------------------------------------------------*/
 /* used transceiver types */
-transceiver_type_t transceivers = TRANSCEIVER_NONE;
+static transceiver_type_t transceivers = TRANSCEIVER_NONE;
 
 /* registered upper layer threads */
-registered_t reg[TRANSCEIVER_MAX_REGISTERED];
+static registered_t reg[TRANSCEIVER_MAX_REGISTERED];
 
 /* packet buffers */
 #if MODULE_AT86RF231 || MODULE_CC2420 || MODULE_MC1322X
-ieee802154_packet_t transceiver_buffer[TRANSCEIVER_BUFFER_SIZE];
+static ieee802154_packet_t transceiver_buffer[TRANSCEIVER_BUFFER_SIZE];
 #else
-radio_packet_t transceiver_buffer[TRANSCEIVER_BUFFER_SIZE];
+static radio_packet_t transceiver_buffer[TRANSCEIVER_BUFFER_SIZE];
 #endif
-uint8_t data_buffer[TRANSCEIVER_BUFFER_SIZE * PAYLOAD_SIZE];
+static uint8_t data_buffer[TRANSCEIVER_BUFFER_SIZE * PAYLOAD_SIZE];
 
 /* message buffer */
-msg_t msg_buffer[TRANSCEIVER_MSG_BUFFER_SIZE];
+static msg_t msg_buffer[TRANSCEIVER_MSG_BUFFER_SIZE];
 
-uint32_t response; ///< response bytes for messages to upper layer threads
+static uint32_t response; ///< response bytes for messages to upper layer threads
 
 volatile kernel_pid_t transceiver_pid = KERNEL_PID_UNDEF; ///< the transceiver thread's pid
 
@@ -97,15 +97,15 @@ static volatile uint8_t rx_buffer_pos = 0;
 static volatile uint8_t transceiver_buffer_pos = 0;
 
 #ifdef MODULE_CC110X_LEGACY_CSMA
-void *cc1100_payload;
-int cc1100_payload_size;
-packet_info_t *cc1100_packet_info;
-uint8_t cc1100_pkt[CC1100_MAX_DATA_LENGTH];
+static void *cc1100_payload;
+static int cc1100_payload_size;
+static packet_info_t *cc1100_packet_info;
+static uint8_t cc1100_pkt[CC1100_MAX_DATA_LENGTH];
 #endif
 
 
 /* transceiver stack */
-char transceiver_stack[TRANSCEIVER_STACK_SIZE];
+static char transceiver_stack[TRANSCEIVER_STACK_SIZE];
 
 /*------------------------------------------------------------------------------------*/
 /* function prototypes */
