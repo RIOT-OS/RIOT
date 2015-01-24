@@ -9,7 +9,7 @@
  *
  * @ingroup sixlowpan
  * @{
- * @file    sixlowip.c
+ * @file
  * @brief   6lowpan IP layer functions
  * @author  Stephan Zeisberg <zeisberg@mi.fu-berlin.de>
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
@@ -45,7 +45,7 @@ static char addr_str[IPV6_MAX_ADDR_STR_LEN];
 #define IPV6_NET_IF_ADDR_BUFFER_LEN (NET_IF_MAX * IPV6_NET_IF_ADDR_LIST_LEN)
 
 static uint8_t ip_send_buffer[BUFFER_SIZE];
-uint8_t buffer[BUFFER_SIZE];
+uint8_t sixlowpan_buffer[BUFFER_SIZE];
 static msg_t ip_msg_queue[IP_PKT_RECV_BUF_SIZE];
 static ipv6_hdr_t *ipv6_buf;
 static icmpv6_hdr_t *icmp_buf;
@@ -162,17 +162,17 @@ uint8_t *get_payload_buf_send(uint8_t ext_len)
 
 ipv6_hdr_t *ipv6_get_buf(void)
 {
-    return ((ipv6_hdr_t *) &buffer[LL_HDR_LEN]);
+    return ((ipv6_hdr_t *) &sixlowpan_buffer[LL_HDR_LEN]);
 }
 
 icmpv6_hdr_t *get_icmpv6_buf(uint8_t ext_len)
 {
-    return ((icmpv6_hdr_t *) &buffer[LLHDR_IPV6HDR_LEN + ext_len]);
+    return ((icmpv6_hdr_t *) &sixlowpan_buffer[LLHDR_IPV6HDR_LEN + ext_len]);
 }
 
 uint8_t *get_payload_buf(uint8_t ext_len)
 {
-    return &(buffer[LLHDR_IPV6HDR_LEN + ext_len]);
+    return &(sixlowpan_buffer[LLHDR_IPV6HDR_LEN + ext_len]);
 }
 
 int ipv6_sendto(const ipv6_addr_t *dest, uint8_t next_header,
