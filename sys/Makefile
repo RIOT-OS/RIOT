@@ -13,6 +13,21 @@ endif
 ifneq (,$(filter shell_commands,$(USEMODULE)))
     DIRS += shell/commands
 endif
+ifneq (,$(filter slist,$(USEMODULE)))
+    DIRS += slist
+endif
+ifneq (,$(filter timex,$(USEMODULE)))
+    DIRS += timex
+endif
+ifneq (,$(filter transceiver,$(USEMODULE)))
+    DIRS += transceiver
+endif
+ifneq (,$(filter uart0,$(USEMODULE)))
+    DIRS += uart0
+endif
+ifneq (,$(filter vtimer,$(USEMODULE)))
+    DIRS += vtimer
+endif
 ifneq (,$(filter net_if,$(USEMODULE)))
     DIRS += net/link_layer/net_if
 endif
@@ -49,6 +64,9 @@ ifneq (,$(filter sixlowborder,$(USEMODULE)))
 endif
 ifneq (,$(filter rpl,$(USEMODULE)))
     DIRS += net/routing/rpl
+endif
+ifneq (,$(filter olsr2,$(USEMODULE)))
+    DIRS += net/routing/olsr2
 endif
 ifneq (,$(filter routing,$(USEMODULE)))
 	DIRS += net/routing
