@@ -44,12 +44,12 @@ char addr_str[IPV6_MAX_ADDR_STR_LEN];
 #define LLHDR_IPV6HDR_LEN           (LL_HDR_LEN + IPV6_HDR_LEN)
 #define IPV6_NET_IF_ADDR_BUFFER_LEN (NET_IF_MAX * IPV6_NET_IF_ADDR_LIST_LEN)
 
-uint8_t ip_send_buffer[BUFFER_SIZE];
+static uint8_t ip_send_buffer[BUFFER_SIZE];
 uint8_t buffer[BUFFER_SIZE];
-msg_t ip_msg_queue[IP_PKT_RECV_BUF_SIZE];
-ipv6_hdr_t *ipv6_buf;
-icmpv6_hdr_t *icmp_buf;
-uint8_t *nextheader;
+static msg_t ip_msg_queue[IP_PKT_RECV_BUF_SIZE];
+static ipv6_hdr_t *ipv6_buf;
+static icmpv6_hdr_t *icmp_buf;
+static uint8_t *nextheader;
 
 kernel_pid_t udp_packet_handler_pid = KERNEL_PID_UNDEF;
 kernel_pid_t tcp_packet_handler_pid = KERNEL_PID_UNDEF;
