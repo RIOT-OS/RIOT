@@ -49,7 +49,7 @@ netdev_802154_tx_status_t kw2xrf_transmit_tx_buf(netdev_t *dev);
 /**
  * @brief Turn KW2XRF on.
  *
- * @return 1 if the radio was correctly turned on; 0 otherwise.
+ * @return 0 if the radio was correctly turned on.
  */
 int kw2xrf_on(void);
 
@@ -175,8 +175,8 @@ int kw2xrf_get_tx_power(void);
  *
  * @param[in] dev   An IEEE 802.15.4 network device.
  *
- * @return a 1 value if radio medium is clear (available),
- *         a 0 value otherwise.
+ * @return a 0 value if radio medium is clear (available),
+ *         a error-value otherwise.
  *
  */
 int kw2xrf_channel_clear(netdev_t *dev);

@@ -123,7 +123,7 @@ int kw2xrf_initialize(netdev_t *dev)
     dev->more = NULL;
 
     kw2xrf_spi_init();
-    if (!kw2xrf_on()) {
+    if (!(kw2xrf_on() == 0)) {
         core_panic(0x42, "Could not start MKW2XD radio transceiver");
     }
 
@@ -164,7 +164,7 @@ int kw2xrf_on(void)
     tmp = kw2xrf_read_dreg(MKW2XDM_CLK_OUT_CTRL);
 
     if (tmp != 0x8Bu) {
-        return 0;
+        return -1;
     }
 
     DEBUG("SEQ_STATE: %x\n", kw2xrf_read_dreg(MKW2XDM_SEQ_STATE));
@@ -176,7 +176,7 @@ int kw2xrf_on(void)
     /* abort any ongoing sequence */
     kw2xrf_write_dreg(MKW2XDM_PHY_CTRL1, MKW2XDM_PHY_CTRL1_XCVSEQ(0));
 
-    return 1;
+    return 0;
 }
 
 void kw2xrf_off(void)
@@ -409,7 +409,7 @@ inline int kw2xrf_channel_clear(netdev_t *dev)
         return -ENODEV;
     }
 
-    return 1;
+    return 0;
 }
 
 int kw2xrf_get_option(netdev_t *dev, netdev_opt_t opt, void *value,

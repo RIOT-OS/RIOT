@@ -167,7 +167,7 @@ netdev_802154_tx_status_t kw2xrf_load_tx_buf(netdev_t *dev,
 netdev_802154_tx_status_t kw2xrf_transmit_tx_buf(netdev_t *dev)
 {
     /* check if channel clear */
-    if (!kw2xrf_channel_clear(dev)) {
+    if (!(kw2xrf_channel_clear(dev) == 0)) {
         return NETDEV_802154_TX_STATUS_MEDIUM_BUSY;
     }
 
