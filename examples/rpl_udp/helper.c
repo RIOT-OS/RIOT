@@ -37,7 +37,7 @@
 
 extern uint8_t ipv6_ext_hdr_len;
 
-msg_t msg_q[RCV_BUFFER_SIZE];
+static msg_t msg_q[RCV_BUFFER_SIZE];
 
 void rpl_udp_set_id(int argc, char **argv)
 {
@@ -121,7 +121,7 @@ void *rpl_udp_monitor(void *arg)
     return NULL;
 }
 
-transceiver_command_t tcmd;
+static transceiver_command_t tcmd;
 
 void rpl_udp_ignore(int argc, char **argv)
 {

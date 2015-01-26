@@ -45,10 +45,10 @@
 
 #define DEFAULT_IEEE_802154_PAN_ID  (0x1234)
 
-char radio_stack_buffer[RADIO_STACK_SIZE];
-msg_t msg_q[RADIO_RCV_BUF_SIZE];
+static char radio_stack_buffer[RADIO_STACK_SIZE];
+static msg_t msg_q[RADIO_RCV_BUF_SIZE];
 
-uint8_t lowpan_mac_buf[PAYLOAD_SIZE];
+static uint8_t lowpan_mac_buf[PAYLOAD_SIZE];
 static uint8_t macdsn;
 
 static inline void mac_frame_short_to_eui64(net_if_eui64_t *eui64,
