@@ -13,6 +13,9 @@
  * @brief       Random number generator
  */
 
+#ifndef RANDOM_H
+#define RANDOM_H
+
 #include <inttypes.h>
 
 #ifdef __cplusplus
@@ -80,3 +83,5 @@ double genrand_res53(void);
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* RANDOM_H */
