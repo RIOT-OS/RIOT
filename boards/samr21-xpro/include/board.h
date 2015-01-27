@@ -50,7 +50,7 @@ extern "C" {
 #define AT86RF231_SPI_SPEED SPI_SPEED_1MHZ
 
 /*Thread optimization for samr21*/
-#define RADIO_STACK_SIZE            (1024)
+#define RADIO_STACK_SIZE                (1024)
 #define RPL_PROCESS_STACKSIZE           (1024)
 
 /*samr21 is very memory constrained and does not run with the default RPL_MAX_ROUTING_ENTRIES (= 128)*/
