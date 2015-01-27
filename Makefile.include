@@ -486,3 +486,6 @@ endif
 
 # Include desvirt Makefile
 include $(RIOTBASE)/dist/tools/desvirt/Makefile.desvirt
+
+# include bindist target
+include $(RIOTBASE)/Makefile.bindist
