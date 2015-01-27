@@ -15,7 +15,11 @@ extern "C" {
 
 #define APP_VERSION "1.2"
 
+#ifdef MODULE_AT86RF231
+#define RADIO_CHANNEL   (12)
+#else
 #define RADIO_CHANNEL   (10)
+#endif
 
 #define MONITOR_STACK_SIZE  (KERNEL_CONF_STACKSIZE_MAIN)
 #define RCV_BUFFER_SIZE     (32)
