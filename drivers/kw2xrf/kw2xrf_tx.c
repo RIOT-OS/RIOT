@@ -16,6 +16,7 @@
  * @author      Jonas Remmert <j.remmert@phytec.de>
  */
 #include <stdio.h>
+#include <string.h>
 
 #include "kw2xrf.h"
 #include "kw2xrf_reg.h"
@@ -43,9 +44,16 @@ netdev_802154_tx_status_t kw2xrf_load_tx_buf(netdev_t *dev,
         void *buf,
         unsigned int len)
 {
+    
+    netdev_hlist_t *ulhdrs_ptr = upper_layer_hdrs;
+    
     /* Use seperate name for hdr, with an shifted index for more intuitive addressing. */
     uint8_t pkt[MKW2XDRF_MAX_PKT_LENGTH - 1];
     uint8_t *hdr = pkt + 1;
+        
+    if (dev != &kw2xrf_netdev) {
+        return -ENODEV;
+    }
 
     /* FCS : frame version 0, we don't manage security,
        nor batchs of packets */
@@ -136,15 +144,22 @@ netdev_802154_tx_status_t kw2xrf_load_tx_buf(netdev_t *dev,
         hdr[idx++] = (uint8_t)(src_addr >> 8);
     }
 
-    /* total frame size */
-    uint8_t size = idx + len + 2;
+    /* Prepend upper layer headers  */
+    if (upper_layer_hdrs) {
+        do {
+            memcpy(&(pkt[idx + 1]), ulhdrs_ptr->header, ulhdrs_ptr->header_len);
+            idx += ulhdrs_ptr->header_len;
+            netdev_hlist_advance(&ulhdrs_ptr);
+        } while (ulhdrs_ptr != upper_layer_hdrs);
+    }
 
+    /* total frame size, extra 2 for FCS, 1 for size in  pkt[0] */
+    uint8_t size = idx + len + 3;
     if (size > MKW2XDRF_MAX_PKT_LENGTH) {
         return NETDEV_802154_TX_STATUS_PACKET_TOO_LONG;
     }
-
     pkt[0] = size;
-
+    
     /* generate pkt, header data is already in pkt, header data was written above to hdr[] array. */
     for (uint8_t i = 0; i < len; i++) {
         pkt[i + idx + 1] = ((uint8_t *)buf)[i];

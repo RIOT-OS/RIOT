@@ -58,6 +58,7 @@ extern "C" {
 
 #define MKW2XDRF_RX_BUF_SIZE       3        /**< Max buffer size of kw2xrf rx buffer. */
 
+#define MKW2XDRF_HEADER_LENGTH     3        /**< Physical-layer header lengh. */
 #define MKW2XDRF_MAX_PKT_LENGTH    127      /**< Max packet length for kw2xrf device. */
 #define MKW2XDRF_MAX_DATA_LENGTH   118      /**< Max data length in packet for kw2xrf device. */
 

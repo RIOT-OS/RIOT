@@ -203,7 +203,7 @@ radio_packet_length_t kw2xrf_write_fifo(uint8_t *data, radio_packet_length_t len
 
     KW2XDRF_SPI->POPR;
 
-    for (i = 0; i < (length - 1); i++) {
+    for (i = 0; i < length; i++) {
         while (!(KW2XDRF_SPI->SR & SPI_SR_TFFF_MASK));
 
         KW2XDRF_SPI->PUSHR = SPI_PUSHR_CTAS(0)
