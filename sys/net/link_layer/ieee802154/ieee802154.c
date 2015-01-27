@@ -241,7 +241,7 @@ uint16_t ieee802154_frame_get_fcs(const uint8_t *frame, uint8_t frame_len)
 
 void ieee802154_frame_print_fcf_frame(ieee802154_frame_t *frame)
 {
-    printf("frame type: %03x\n"
+    printf("frame type: %02x\n"
            "security enabled: %02x\n"
            "frame pending: %02x\n"
            "ack requested: %02x\n"
