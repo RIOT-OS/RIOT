@@ -21,8 +21,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef __IEEE802154_FRAME_H
-#define __IEEE802154_FRAME_H
+#ifndef IEEE802154_IEEE802154_H_
+#define IEEE802154_IEEE802154_H_
 
 #include <stdio.h>
 #include <stdint.h>
@@ -92,24 +92,32 @@ extern "C" {
 /**
  * @brief   Transform 16-bit number from network order (big-endian) to
  *          little-endian byte order (as used by IEEE 802.15.4).
+ *
+ * @NOTE    TODO: remove and use macros from /core/include/byteorder.h
  */
 #define NTOLES(a)   (((a) >> 8) | (((a) & 0x00ff) << 8))
 
 /**
  * @brief   Transform 16-bit number from little-endian byte order to network
  *          order (big-endian).
+ *
+ * @NOTE    TODO: remove and use macros from /core/include/byteorder.h
  */
 #define LETONS(a)   NTOLES(a)
 
 /**
  * @brief   Transform 16-bit number from host byte order to little-endian byte
  *          order (as used by IEEE 802.15.4).
+ *
+ * @NOTE    TODO: remove and use macros from /core/include/byteorder.h
  */
 #define HTOLES(a)   a
 
 /**
  * @brief   Transform 16-bit number from little-endian byte order to host byte
  *          order.
+ *
+ * @NOTE    TODO: remove and use macros from /core/include/byteorder.h
  */
 #define LETOHS(a)   HTOLES(a)
 
@@ -117,14 +125,14 @@ extern "C" {
  * @brief   IEEE802.15.4 frame descriptor
  */
 typedef struct __attribute__((packed)) {
-    uint16_t fcf;
-    uint8_t seq_nr;
-    uint16_t dest_pan_id;
-    uint8_t dest_addr[8];
-    uint16_t src_pan_id;
-    uint8_t src_addr[8];
-    uint8_t *payload;
-    uint8_t payload_len;
+    uint16_t fcf;               /**< frame control field */
+    uint8_t seq_nr;             /**< sequence number */
+    uint16_t dest_pan_id;       /**< destination PAN id */
+    uint8_t dest_addr[8];       /**< destination address */
+    uint16_t src_pan_id;        /**< source PAN id */
+    uint8_t src_addr[8];        /**< source address */
+    uint8_t *payload;           /**< payload pointer */
+    uint8_t payload_len;        /**< size of payload in byte */
 } ieee802154_frame_t;
 
 /**
@@ -141,15 +149,63 @@ typedef struct __attribute__(( packed )) {
     /* @} */
 } ieee802154_packet_t;
 
+/**
+ * @brief   Convert the given frame data-structure to raw binary data
+ *
+ * @note    The function asserts that the given buffer is large enough to hold
+ *          the raw header
+ *
+ * @param[in]  frame            frame to convert
+ * @param[out] buf              memory to save raw frame to
+ *
+ * @return                      the actual size of the raw header in byte
+ */
 uint8_t ieee802154_frame_init(ieee802154_frame_t *frame, uint8_t *buf);
-uint8_t ieee802154_frame_get_hdr_len(ieee802154_frame_t *frame);
+
+/**
+ * @brief   Populate the given frame data-structure by extracting its members
+ *          from the given data buffer
+ *
+ * @note    The function asserts that the buffer is of sufficient size!
+ *
+ * @param[out] frame            frame struct to populate
+ * @param[in]  buf              raw frame in binary form
+ * @param[in]  len              the size of the ieee802154 packet including
+ *                              payload and checksum
+ *
+ * @return                      the raw size of the header in byte
+ */
 uint8_t ieee802154_frame_read(uint8_t *buf, ieee802154_frame_t *frame, uint8_t len);
+
+/**
+ * @brief   Get the actual length of the IEEE802.15.4 frame in byte
+ *
+ * @param[in] frame             frame to analyze
+ *
+ * @return                      the header's raw size in byte
+ */
+uint8_t ieee802154_frame_get_hdr_len(ieee802154_frame_t *frame);
+
+/**
+ * @brief   Calculate the checksum for the given IEEE802.15.4 frame
+ *
+ * @param[in] frame             the raw frame (header + payload)
+ * @param[in] frame_len         the size of the raw frame
+ *
+ * @return                      the checksum of the given frame
+ */
 uint16_t ieee802154_frame_get_fcs(const uint8_t *frame, uint8_t frame_len);
+
+/**
+ * @brief   Print the given IEEE802.15.4 frame header
+ *
+ * @param[in] frame             IEEE802.15.4 frame header to print
+ */
 void ieee802154_frame_print_fcf_frame(ieee802154_frame_t *frame);
 
 #ifdef __cplusplus
 }
 #endif
 
+#endif /* IEEE802154_IEEE802154_H_ */
 /** @} */
-#endif /* IEEE802154_IEEE802154_FRAME */
