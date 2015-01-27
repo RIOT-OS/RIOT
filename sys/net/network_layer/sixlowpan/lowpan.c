@@ -42,7 +42,7 @@
 #include "ip.h"
 #include "icmp.h"
 
-#include "ieee802154_frame.h"
+#include "ieee802154.h"
 #include "socket_base/in.h"
 #include "net_help.h"
 

@@ -39,8 +39,8 @@
 #include "ltc4150.h"
 #endif
 
-#if MODULE_AT86RF231 || MODULE_CC2420 || MODULE_MC1322X
-#include "ieee802154_frame.h"
+#if MODULE_AT86RF231 || MODULE_CC2420 || MODULE_MC1P322X
+#include "ieee802154.h"
 #endif
 
 #ifdef MODULE_TRANSCEIVER

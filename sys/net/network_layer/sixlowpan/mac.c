@@ -33,7 +33,7 @@
 #include "ip.h"
 #include "icmp.h"
 #include "lowpan.h"
-#include "ieee802154_frame.h"
+#include "ieee802154.h"
 #include "net_help.h"
 
 #define ENABLE_DEBUG    (0)

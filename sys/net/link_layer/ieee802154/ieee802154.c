@@ -16,7 +16,9 @@
  * @}
  */
 
-#include "ieee802154_frame.h"
+#include <string.h>
+
+#include "ieee802154.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"

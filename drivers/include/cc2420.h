@@ -83,7 +83,7 @@ Frame type value:
 #include <stdbool.h>
 
 #include "kernel_types.h"
-#include "ieee802154_frame.h"
+#include "ieee802154.h"
 #include "cc2420_settings.h"
 
 #include "radio_driver.h"

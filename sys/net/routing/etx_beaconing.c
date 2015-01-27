@@ -31,7 +31,7 @@
 #include "transceiver.h"
 
 #include "sixlowpan/ip.h"
-#include "ieee802154_frame.h"
+#include "ieee802154.h"
 #include "etx_beaconing.h"
 
 #define ENABLE_DEBUG (0)

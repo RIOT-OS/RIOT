@@ -15,7 +15,7 @@
 #include <string.h>
 
 #include "clist.h"
-#include "ieee802154_frame.h"
+#include "ieee802154.h"
 #include "msg.h"
 #include "mutex.h"
 #include "transceiver.h"

@@ -47,13 +47,13 @@
 
 #elif defined( MODULE_CC2420 )
 #include "cc2420.h"
-#include "ieee802154_frame.h"
+#include "ieee802154.h"
 #define TEXT_SIZE           CC2420_MAX_DATA_LENGTH
 #define _TC_TYPE            TRANSCEIVER_CC2420
 
 #elif defined( MODULE_AT86RF231 )
 #include "at86rf231.h"
-#include "ieee802154_frame.h"
+#include "ieee802154.h"
 #define TEXT_SIZE           AT86RF231_MAX_DATA_LENGTH
 #define _TC_TYPE            TRANSCEIVER_AT86RF231
 
@@ -66,7 +66,7 @@
 #include "mc1322x.h"
 #include "maca.h"
 #include "maca_packet.h"
-#include "ieee802154_frame.h"
+#include "ieee802154.h"
 #define TEXT_SIZE           MACA_MAX_PAYLOAD_SIZE
 #define _TC_TYPE            TRANSCEIVER_MC1322X
 #endif

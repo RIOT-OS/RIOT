@@ -47,7 +47,7 @@
 #include "ccn_lite/test_data/text.txt.ccnb.h"
 
 #if MODULE_AT86RF231 || MODULE_CC2420 || MODULE_MC1322X
-#include "ieee802154_frame.h"
+#include "ieee802154.h"
 #endif
 
 /** The size of the message queue between router daemon and transceiver AND clients */

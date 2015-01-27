@@ -13,7 +13,7 @@
 #include "cc2420_spi.h"
 #include "cc2420_settings.h"
 #include "cc2420_arch.h"
-#include "ieee802154_frame.h"
+#include "ieee802154.h"
 
 #include "irq.h"
 #include "hwtimer.h"
