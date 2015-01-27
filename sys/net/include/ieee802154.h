@@ -80,8 +80,8 @@ extern "C" {
  * @{
  */
 #define IEEE_802154_SHORT_MCAST_ADDR    (0xffff)
-#define IEEE_802154_LONG_MCAST_ADDR     {{0xff, 0xff, 0xff, 0xff, \
-                                          0xff, 0xff, 0xff, 0xff}}
+#define IEEE_802154_LONG_MCAST_ADDR     {0xff, 0xff, 0xff, 0xff, \
+                                          0xff, 0xff, 0xff, 0xff}
 /** @} */
 
 /**
