@@ -1,0 +1,22 @@
+--- mutex.c	2015-01-27 08:18:55.760449705 +0100
++++ mutex.c	2015-01-27 10:48:29.836814372 +0100
+@@ -30,6 +30,9 @@
+ #include "irq.h"
+ #include "thread.h"
+
++/* [HOOK] interface */
++#include "library.h"
++
+ #define ENABLE_DEBUG    (0)
+ #include "debug.h"
+
+@@ -43,6 +46,9 @@
+
+ void mutex_lock(struct mutex_t *mutex)
+ {
++    /* [HOOK] call */
++    HOOK_library_01();
++
+     DEBUG("%s: trying to get mutex. val: %u\n", sched_active_thread->name, mutex->val);
+
+     if (atomic_set_return(&mutex->val, 1) != 0) {
