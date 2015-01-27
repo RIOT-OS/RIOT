@@ -14,7 +14,7 @@
  * @brief       Peripheral MCU configuration for the RFduino NRF51822 board
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
- * @author      Jan Wagner 
+ * @author      Jan Wagner <mail@jwagner.eu>
  */
 
 #ifndef __PERIPH_CONF_H
