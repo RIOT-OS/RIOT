@@ -21,8 +21,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef IEEE802154_IEEE802154_H_
-#define IEEE802154_IEEE802154_H_
+#ifndef IEEE802154_H_
+#define IEEE802154_H_
 
 #include <stdio.h>
 #include <stdint.h>
@@ -81,7 +81,7 @@ extern "C" {
  */
 #define IEEE_802154_SHORT_MCAST_ADDR    (0xffff)
 #define IEEE_802154_LONG_MCAST_ADDR     {0xff, 0xff, 0xff, 0xff, \
-                                          0xff, 0xff, 0xff, 0xff}
+                                         0xff, 0xff, 0xff, 0xff}
 /** @} */
 
 /**
@@ -136,17 +136,15 @@ typedef struct __attribute__((packed)) {
 } ieee802154_frame_t;
 
 /**
- * Structure to represent an IEEE 802.15.4 packet for the transceiver.
+ * @brief   Structure to represent an IEEE 802.15.4 packet for the transceiver.
  */
 typedef struct __attribute__(( packed )) {
-    /* @{ */
     uint8_t processing;         /** < internal processing state */
     uint8_t length;             /** < the length of the frame of the frame including fcs*/
     ieee802154_frame_t frame;   /** < the ieee802154 frame */
     int8_t rssi;                /** < the rssi value */
     uint8_t crc;                /** < 1 if crc was successfull, 0 otherwise */
     uint8_t lqi;                /** < the link quality indicator */
-    /* @} */
 } ieee802154_packet_t;
 
 /**
@@ -207,5 +205,5 @@ void ieee802154_frame_print_fcf_frame(ieee802154_frame_t *frame);
 }
 #endif
 
-#endif /* IEEE802154_IEEE802154_H_ */
+#endif /* IEEE802154_H_ */
 /** @} */
