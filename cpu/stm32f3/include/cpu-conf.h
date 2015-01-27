@@ -24,6 +24,9 @@
 #ifdef CPU_MODEL_STM32F303VC
 #include "stm32f303xc.h"
 #endif
+#ifdef CPU_MODEL_STM32F334R8
+#include "stm32f334x8.h"
+#endif
 
 /**
  * @name Kernel configuration
