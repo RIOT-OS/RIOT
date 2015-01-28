@@ -34,7 +34,7 @@ export CXXUWFLAGS +=
 export CXXEXFLAGS +=
 
 # define build specific options
-export CPU_USAGE = -mcpu=cortex-m3
+export CPU_USAGE = -mcpu=cortex-m4
 export FPU_USAGE =
 export CFLAGS += -ggdb -g3 -std=gnu99 -Os -Wall -Wstrict-prototypes $(CPU_USAGE) $(FPU_USAGE) -mlittle-endian -mthumb -mthumb-interwork -nostartfiles
 export CFLAGS += -ffunction-sections -fdata-sections -fno-builtin
