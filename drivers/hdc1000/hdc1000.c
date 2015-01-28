@@ -67,9 +67,13 @@ int hdc1000_test(hdc1000_t *dev)
     char reg[2];
     uint16_t tmp;
 
+    i2c_acquire(dev->i2c);
     if (i2c_read_regs(dev->i2c, dev->addr, HDC1000_MANUFACTURER_ID, reg, 2) != 2) {
+        i2c_release(dev->i2c);
         return -1;
     }
+    i2c_release(dev->i2c);
+
     tmp = ((uint16_t)reg[0] << 8) | reg[1];
     if (tmp != HDC1000_MID_VALUE) {
         return -1;
@@ -87,10 +91,13 @@ int hdc1000_init(hdc1000_t *dev, i2c_t i2c, uint8_t address)
     dev->addr = address;
     dev->initialized = false;
 
+    i2c_acquire(dev->i2c);
     /* initialize the I2C bus */
     if (i2c_init_master(i2c, I2C_SPEED) < 0) {
+        i2c_release(dev->i2c);
         return -1;
     }
+    i2c_release(dev->i2c);
 
     if (hdc1000_test(dev)) {
         return -2;
@@ -101,11 +108,14 @@ int hdc1000_init(hdc1000_t *dev, i2c_t i2c, uint8_t address)
     reg[0] = (uint8_t)(tmp >> 8);
     reg[1] = (uint8_t)tmp;
 
+    i2c_acquire(dev->i2c);
     if (i2c_write_regs(dev->i2c, dev->addr, HDC1000_CONFG, reg, 2) != 2) {
+        i2c_release(dev->i2c);
         return -3;
     }
     dev->initialized = true;
 
+    i2c_release(dev->i2c);
     return 0;
 }
 
@@ -117,9 +127,13 @@ int hdc1000_reset(hdc1000_t *dev)
     reg[1] = (uint8_t)tmp;
     dev->initialized = false;
 
+    i2c_acquire(dev->i2c);
     if (i2c_write_regs(dev->i2c, dev->addr, HDC1000_CONFG, reg, 2) != 2) {
+        i2c_release(dev->i2c);
         return -1;
     }
+
+    i2c_release(dev->i2c);
     return 0;
 }
 
@@ -128,13 +142,18 @@ int hdc1000_startmeasure(hdc1000_t *dev)
     if (dev->initialized == false) {
         return -1;
     }
+
+    i2c_acquire(dev->i2c);
     /* Trigger the measurements by executing a write access
      * to the address 0x00 (HDC1000_TEMPERATURE).
      * Conversion Time is 6.50ms by 14 bit resolution.
      */
     if (i2c_write_bytes(dev->i2c, dev->addr, HDC1000_TEMPERATURE, 1) != 1) {
+        i2c_release(dev->i2c);
         return -1;
     }
+
+    i2c_release(dev->i2c);
     return 0;
 }
 
@@ -145,13 +164,17 @@ int hdc1000_read(hdc1000_t *dev, uint16_t *rawtemp, uint16_t *rawhum)
     if (dev->initialized == false) {
         return -1;
     }
+
+    i2c_acquire(dev->i2c);
     if (i2c_read_bytes(dev->i2c, dev->addr, buf, 4) != 4) {
+        i2c_release(dev->i2c);
         return -1;
     }
     /* Register bytes are sent MSB first. */
     *rawtemp = ((uint16_t)buf[0] << 8) | buf[1];
     *rawhum = ((uint16_t)buf[2] << 8) | buf[3];
   
+    i2c_release(dev->i2c);
     return 0;
 }
 
