@@ -147,7 +147,7 @@ uint16_t kw2xrf_set_pan(uint16_t pan);
 /**
  * @brief Gets the current IEEE long address of the KW2XRF.
  *
- * @return The current IEEE long address.
+ * @return The current pan ID.
  */
 uint16_t kw2xrf_get_pan(void);
 

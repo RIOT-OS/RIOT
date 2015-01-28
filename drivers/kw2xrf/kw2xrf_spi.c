@@ -22,7 +22,6 @@
 #include "kw2xrf_internal.h"
 
 #include "cpu-conf.h"
-#include "periph/gpio.h"
 #include "irq.h"
 
 /* SPI1 connected to the modem (ieee802.15.4 radio) */
@@ -64,15 +63,10 @@ void kw2xrf_spi_init(void)
                        | SPI_MCR_CLR_RXF_MASK;
 
     KW2XDRF_SPI->RSER = (uint32_t)0;
-
-    /* set up IRQ */
-    gpio_init_int(GPIO_KW2XDRF, GPIO_NOPULL, GPIO_FALLING, &kw2xrf_rx_irq, NULL);
 }
 
 void kw2xrf_write_dreg(uint8_t addr, uint8_t value)
 {
-    unsigned int cpsr = disableIRQ();
-
     while (!(KW2XDRF_SPI->SR & SPI_SR_TFFF_MASK));
 
     KW2XDRF_SPI->PUSHR = SPI_PUSHR_CTAS(1)
@@ -82,12 +76,10 @@ void kw2xrf_write_dreg(uint8_t addr, uint8_t value)
     while (!(KW2XDRF_SPI->SR & SPI_SR_RXCTR_MASK));
 
     KW2XDRF_SPI->POPR;
-    restoreIRQ(cpsr);
 }
 
 uint8_t kw2xrf_read_dreg(uint8_t addr)
 {
-    unsigned int cpsr = disableIRQ();
     addr |= MKW2XDRF_REG_READ;
 
     while (!(KW2XDRF_SPI->SR & SPI_SR_TFFF_MASK));
@@ -98,14 +90,12 @@ uint8_t kw2xrf_read_dreg(uint8_t addr)
 
     while (!(KW2XDRF_SPI->SR & SPI_SR_RXCTR_MASK));
 
-    restoreIRQ(cpsr);
     return (uint8_t)KW2XDRF_SPI->POPR;
 }
 
 void kw2xrf_write_iregs(uint8_t addr, uint8_t *buf, uint8_t length)
 {
     uint8_t i;
-    unsigned int cpsr = disableIRQ();
 
     while (KW2XDRF_SPI->SR & SPI_SR_TXCTR_MASK);
 
@@ -140,14 +130,12 @@ void kw2xrf_write_iregs(uint8_t addr, uint8_t *buf, uint8_t length)
     while (!(KW2XDRF_SPI->SR & SPI_SR_RXCTR_MASK));
 
     KW2XDRF_SPI->POPR;
-    restoreIRQ(cpsr);
 }
 
 void kw2xrf_read_iregs(uint8_t addr, uint8_t *buf, uint8_t length)
 {
     uint16_t iaddr = ((uint16_t)(MKW2XDM_IAR_INDEX | MKW2XDRF_REG_READ) << 8) | addr;
     uint8_t i;
-    unsigned int cpsr = disableIRQ();
 
     while (KW2XDRF_SPI->SR & SPI_SR_TXCTR_MASK);
 
@@ -182,7 +170,6 @@ void kw2xrf_read_iregs(uint8_t addr, uint8_t *buf, uint8_t length)
     while (!(KW2XDRF_SPI->SR & SPI_SR_RXCTR_MASK));
 
     buf[i] = (uint8_t)KW2XDRF_SPI->POPR;
-    restoreIRQ(cpsr);
 }
 
 /* read / write packet buffer */
@@ -190,7 +177,6 @@ void kw2xrf_read_iregs(uint8_t addr, uint8_t *buf, uint8_t length)
 radio_packet_length_t kw2xrf_write_fifo(uint8_t *data, radio_packet_length_t length)
 {
     radio_packet_length_t i;
-    unsigned int cpsr = disableIRQ();
 
     while (KW2XDRF_SPI->SR & SPI_SR_TXCTR_MASK);
 
@@ -227,14 +213,12 @@ radio_packet_length_t kw2xrf_write_fifo(uint8_t *data, radio_packet_length_t len
     KW2XDRF_SPI->POPR;
     i++;
 
-    restoreIRQ(cpsr);
     return i;
 }
 
 radio_packet_length_t kw2xrf_read_fifo(uint8_t *data, radio_packet_length_t length)
 {
     radio_packet_length_t i;
-    unsigned int cpsr = disableIRQ();
 
     while (KW2XDRF_SPI->SR & SPI_SR_TXCTR_MASK);
 
@@ -271,7 +255,6 @@ radio_packet_length_t kw2xrf_read_fifo(uint8_t *data, radio_packet_length_t leng
     data[i] = (uint8_t)KW2XDRF_SPI->POPR;
     i++;
 
-    restoreIRQ(cpsr);
     return i;
 }
 /** @} */

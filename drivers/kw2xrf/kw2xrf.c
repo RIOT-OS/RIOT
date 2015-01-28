@@ -27,24 +27,28 @@
 #include "netdev/base.h"
 #include "thread.h"
 #include "periph_conf.h"
+#include "periph/gpio.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
+/* Private member variables, can be accessed via get/set_option of netdev interface */
 static uint16_t radio_pan;
 static uint8_t  radio_channel;
 static uint16_t radio_address;
 static uint64_t radio_address_long;
 
-#define MKW2XDRF_OUTPUT_POWER_MAX  8
-#define MKW2XDRF_OUTPUT_POWER_MIN  (-35)
+#define MKW2XDRF_OUTPUT_POWER_MAX  8        /**< Maximum output power of the kw2x-rf radio in dBm */
+#define MKW2XDRF_OUTPUT_POWER_MIN  (-35)    /**< Minimum output power of the kw2x-rf radio in dBm */
 
-#define MKW2XDRF_PA_RANGE_MAX      31
-#define MKW2XDRF_PA_RANGE_MIN      3
-
-/* event type to signalize receive event */
-/* TODO: Event_Nr used from cc2420 driver */
-#define MKW2XDRF_NETDEV_EVENT_RX  (3452342219)
+/* Modem_PA_PWR Register (PA Power Control) has a valid range from 3-31 */
+#define MKW2XDRF_PA_RANGE_MAX      31       /**< Maximum value of PA Power Control Register */
+#define MKW2XDRF_PA_RANGE_MIN      3        /**< Minimum value of PA Power Control Register */
+                                            
+/* Event type to signalize receive event. As in the netdev-interface described,
+   event-types for the netdev_driver_t::event-function are free to choose and 
+   therefore defined in this place. */
+#define MKW2XDRF_NETDEV_EVENT_RX  (0x0001)
 
 /* default source address length for sending in number of byte */
 static size_t _default_src_addr_len = 2;
@@ -93,6 +97,9 @@ static const int level_lt[29] = {
 /* Set up interrupt sources, triggered by the radio-module */
 void kw2xrf_init_interrupts(void)
 {
+    /* set up GPIO-pin used for IRQ */
+    gpio_init_int(GPIO_KW2XDRF, GPIO_NOPULL, GPIO_FALLING, &kw2xrf_rx_irq, NULL);
+    
     /* Clear interrupt status flags by writing ones to Interrupt Request Status Reg 1 (IRQSTS1) */
     kw2xrf_write_dreg(MKW2XDM_IRQSTS1, 0xff);
     /* Clear Packet Buffer Underrun Error IRQ status and Wake Interrupt Status */
@@ -133,7 +140,7 @@ int kw2xrf_initialize(netdev_t *dev)
 #ifdef MODULE_CONFIG
     radio_pan = sysconfig.radio_pan_id;
 #else
-    radio_pan = 0x0001;
+    radio_pan = MKW2XDRF_DEFAULT_RADIO_PAN;
 #endif
     kw2xrf_set_pan(radio_pan);
 
