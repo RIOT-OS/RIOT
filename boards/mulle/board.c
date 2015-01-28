@@ -26,6 +26,16 @@
 #include "periph/gpio.h"
 #include "periph/uart.h"
 #include "periph/rtt.h"
+#include "periph/spi.h"
+#include "nvram-spi.h"
+
+static nvram_t mulle_nvram_dev;
+nvram_t *mulle_nvram = &mulle_nvram_dev;
+static nvram_spi_params_t nvram_spi_params = {
+        .spi = MULLE_NVRAM_SPI_DEV,
+        .cs = MULLE_NVRAM_SPI_CS,
+        .address_count = MULLE_NVRAM_SPI_ADDRESS_COUNT,
+};
 
 /**
  * @brief Initialize the boards on-board LEDs
@@ -50,9 +60,12 @@ static inline void set_safe_clock_dividers(void);
 /** @brief Set the FLL source clock to RTC32k */
 static inline void set_fll_source(void);
 
+static void increase_boot_count(void);
+static int mulle_nvram_init(void);
 
 void board_init(void)
 {
+    int status;
     /* initialize the boards LEDs, this is done first for debugging purposes */
     leds_init();
 
@@ -60,6 +73,12 @@ void board_init(void)
     power_pins_init();
 
     /* Turn on Vperiph for peripherals */
+    /*
+     * By turning on Vperiph first, and before waiting for the clocks to
+     * stabilize, we will have used enough time to have let the FRAM start up
+     * properly when we want to access it later without having to add any extra
+     * delays.
+     */
     gpio_set(MULLE_POWER_VPERIPH);
 
     /* Turn on AVDD for reading voltages */
@@ -98,6 +117,17 @@ void board_init(void)
 
     /* initialize the CPU */
     cpu_init();
+
+    LED_YELLOW_ON;
+
+    /* Initialize NVRAM */
+    status = mulle_nvram_init();
+    if (status == 0) {
+        /* Increment boot counter */
+        increase_boot_count();
+    }
+
+    LED_GREEN_ON;
 }
 
 /**
@@ -167,4 +197,58 @@ static inline void set_fll_source(void)
 #else
 #error Unknown K60 CPU revision
 #endif
+}
+
+static int mulle_nvram_init(void)
+{
+    union {
+        uint32_t u32;
+        uint8_t  u8[sizeof(uint32_t)];
+    } rec;
+    rec.u32 = 0;
+
+    if (spi_init_master(MULLE_NVRAM_SPI_DEV, SPI_CONF_FIRST_RISING, SPI_SPEED_5MHZ) != 0) {
+        return -1;
+    }
+
+    if (nvram_spi_init(mulle_nvram, &nvram_spi_params, MULLE_NVRAM_CAPACITY) != 0) {
+        return -2;
+    }
+
+    if (mulle_nvram->read(mulle_nvram, &rec.u8[0], MULLE_NVRAM_MAGIC, sizeof(rec.u32)) != sizeof(rec.u32)) {
+        return -3;
+    }
+
+    if (rec.u32 != MULLE_NVRAM_MAGIC_EXPECTED) {
+        int i;
+        union {
+            uint64_t u64;
+            uint8_t  u8[sizeof(uint64_t)];
+        } zero;
+        zero.u64 = 0;
+        for (i = 0; i < MULLE_NVRAM_CAPACITY; i += sizeof(zero)) {
+            if (mulle_nvram->write(mulle_nvram, &zero.u8[0], i, sizeof(zero.u64)) != sizeof(zero.u64)) {
+                return -4;
+            }
+        }
+        rec.u32 = MULLE_NVRAM_MAGIC_EXPECTED;
+        if (mulle_nvram->write(mulle_nvram, &rec.u8[0], MULLE_NVRAM_MAGIC, sizeof(rec.u32)) != sizeof(rec.u32)) {
+            return -5;
+        }
+    }
+    return 0;
+}
+
+static void increase_boot_count(void)
+{
+    union {
+        uint32_t u32;
+        uint8_t  u8[sizeof(uint32_t)];
+    } rec;
+    rec.u32 = 0;
+    if (mulle_nvram->read(mulle_nvram, &rec.u8[0], MULLE_NVRAM_BOOT_COUNT, sizeof(rec.u32)) != sizeof(rec.u32)) {
+        return;
+    }
+    ++rec.u32;
+    mulle_nvram->write(mulle_nvram, &rec.u8[0], MULLE_NVRAM_BOOT_COUNT, sizeof(rec.u32));
 }
