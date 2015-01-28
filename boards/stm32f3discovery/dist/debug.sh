@@ -5,6 +5,11 @@ if [ ! -f "$2" ]; then
     exit 1
 fi
 
+# if GDB_PORT does not exist or holds empty string
+if [ -z ${GDB_PORT} ]; then
+    GDB_PORT=0
+fi
+
 echo "##"
 echo "## Debugging $2"
 echo "##"
@@ -12,6 +17,7 @@ echo "##"
 openocd -f "board/stm32f3discovery.cfg" \
     -c "tcl_port 6333" \
     -c "telnet_port 4444" \
+    -c "gdb_port ${GDB_PORT}"
     -c "init" \
     -c "targets" \
     -c "reset halt" \
