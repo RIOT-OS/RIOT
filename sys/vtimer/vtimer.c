@@ -423,11 +423,11 @@ int vtimer_msg_receive_timeout(msg_t *m, timex_t timeout) {
 
 #if ENABLE_DEBUG
 
-void vtimer_print_short_queue(){
+void vtimer_print_short_queue(void){
     priority_queue_print(&shortterm_priority_queue_root);
 }
 
-void vtimer_print_long_queue(){
+void vtimer_print_long_queue(void){
     priority_queue_print(&longterm_priority_queue_root);
 }
 

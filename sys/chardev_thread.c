@@ -107,7 +107,7 @@ void chardev_loop(ringbuffer_t *rb)
             DEBUG("Data is available\n");
             unsigned state = disableIRQ();
             int nbytes = min(r->nbytes, rb->avail);
-            DEBUG("uart0_thread [%i]: sending %i bytes received from %" PRIkernel_pid " to pid %" PRIkernel_pid "\n", pid, nbytes, m.sender_pid, reader_pid);
+            DEBUG("uart0_thread [%i]: sending %i bytes received from %" PRIkernel_pid " to pid %" PRIkernel_pid "\n", thread_getpid(), nbytes, m.sender_pid, reader_pid);
             ringbuffer_get(rb, r->buffer, nbytes);
             r->nbytes = nbytes;
 

@@ -123,7 +123,7 @@ static inline void timex_normalize(timex_t *time)
  * @return true for a normalized timex_t
  * @return false otherwise
  */
-static inline int timex_isnormalized(timex_t *time)
+static inline int timex_isnormalized(const timex_t *time)
 {
     return (time->microseconds < SEC_IN_USEC);
 }
