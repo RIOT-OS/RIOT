@@ -54,6 +54,15 @@ typedef uint8_t radio_packet_length_t;
 /** @} */
 
 /**
+ * @name Configure connected MPU-9150 device
+ * @{
+ */
+#define MPU9150_I2C         I2C_0
+#define MPU9150_HW_ADDR     (0x68)
+#define MPU9150_COMP_ADDR   (0x0E)
+/** @} */
+
+/**
  * @name Define UART device and baudrate for stdio
  * @{
  */

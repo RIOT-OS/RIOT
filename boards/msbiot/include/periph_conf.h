@@ -176,6 +176,33 @@ extern "C" {
 /** @} */
 
 /**
+ * @name I2C configuration
+ * @{
+ */
+#define I2C_NUMOF           (1U)
+#define I2C_0_EN            1
+#define I2C_IRQ_PRIO        1
+#define I2C_APBCLK          (42000000U)
+
+/* I2C 0 device configuration */
+#define I2C_0_DEV           I2C1
+#define I2C_0_CLKEN()       (RCC->APB1ENR |= RCC_APB1ENR_I2C1EN)
+#define I2C_0_CLKDIS()      (RCC->APB1ENR &= ~(RCC_APB1ENR_I2C1EN))
+#define I2C_0_EVT_IRQ       I2C1_EV_IRQn
+#define I2C_0_EVT_ISR       isr_i2c1_ev
+#define I2C_0_ERR_IRQ       I2C1_ER_IRQn
+#define I2C_0_ERR_ISR       isr_i2c1_er
+/* I2C 0 pin configuration */
+#define I2C_0_SCL_PORT      GPIOB
+#define I2C_0_SCL_PIN       6
+#define I2C_0_SCL_AF        4
+#define I2C_0_SCL_CLKEN()   (RCC->AHB1ENR |= RCC_AHB1ENR_GPIOBEN)
+#define I2C_0_SDA_PORT      GPIOB
+#define I2C_0_SDA_PIN       7
+#define I2C_0_SDA_AF        4
+#define I2C_0_SDA_CLKEN()   (RCC->AHB1ENR |= RCC_AHB1ENR_GPIOBEN)
+
+/**
  * @name GPIO configuration
  * @{
  */
