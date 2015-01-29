@@ -353,6 +353,30 @@ typedef struct {
      */
 } fs_op_table_t;
 
+
+/**
+ * @brief      Mounts the given |device| at |mount_point|.
+ * @param[in]  mount_point Path where the device should be mounted
+ * @param[in]  device      Device to be mounted
+ *                         TODO: What kind of value is this
+ * @param[in]  type        The desired file system
+ * @return 0, on success
+ * @return -ENAMETOOLONG, if the given mount point exceeds the maximum length
+ * @return -ENOMEM, if more than FS_TABLE_SIZE filesystems are mounted
+ */
+int fs_mount(const char *mount_point, int device, fs_type_t type);
+
+/**
+ * @brief   Unmounts the filesystem at the given path OR unmounts the given device
+ * @param  mount_point Path to be unmounted
+ * @param  device      Device to be unmounted
+ *                     TODO: What kind of value is this
+ * @return 0, on success
+ * @return ENOENT, TODO
+ * @return EINVAL, TODO
+ */
+int fs_unmount(const char *mount_point, int device);
+
 /**
  * @brief   The operation table for various file systems
  * @internal
