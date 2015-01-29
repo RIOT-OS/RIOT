@@ -55,7 +55,7 @@ int fs_mount(const char *mount_point, int device, fs_type_t type)
     fs_table[i].device = device;
     fs_table[i].type = type;
 
-    int 1;
+    return 0;
 }
 
 int fs_unmount(const char *mount_point, int device)
