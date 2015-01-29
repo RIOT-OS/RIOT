@@ -41,7 +41,7 @@
 typedef int fid_t;
 
 typedef enum {
-    FS_NONE = 0;
+    FS_NONE = 0
 } fs_type_t;
 
 /**
@@ -67,12 +67,12 @@ typedef struct {
  * @brief   Operation type for fs_op_table_t::flock()
  */
 typedef enum {
-    FS_LOCK_SH = 0; /**< Place a shared lock. More then one thread may hold a
+    FS_LOCK_SH = 0, /**< Place a shared lock. More then one thread may hold a
                          shared lock for a given file at a given time */
-    FS_LOCK_EX;     /**< Place an exclusive lock. Only one thread may hold an
+    FS_LOCK_EX,     /**< Place an exclusive lock. Only one thread may hold an
                          exclusive lock for a given file at given time */
-    FS_LOCK_UN;     /**< Remove an existing lock held by this process */
-} fs_lock_op_t
+    FS_LOCK_UN     /**< Remove an existing lock held by this process */
+} fs_lock_op_t;
 
 /**
  * @brief   Table of operations for a filesystem
@@ -374,6 +374,6 @@ extern const fs_op_table_t fs_op_table[1];
  * @return  Filesystem table entry for the filesystem the file referenced by
  *          pathname is in. NULL if no entry is found.
  */
-fs_table_t *fs_search_entry(const char *pathname);
+static fs_table_t *fs_search_entry(const char *pathname);
 
 #endif /* __FS_H_ */
