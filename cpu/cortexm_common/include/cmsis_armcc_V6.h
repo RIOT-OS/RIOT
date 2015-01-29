@@ -35,6 +35,9 @@
 #ifndef __CMSIS_ARMCC_V6_H
 #define __CMSIS_ARMCC_V6_H
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
 
 /* ###########################  Core Function Access  ########################### */
 /** \ingroup  CMSIS_Core_FunctionInterface
@@ -1796,5 +1799,8 @@ __attribute__((always_inline)) __STATIC_INLINE uint32_t __SMMLA (int32_t op1, in
 #endif /* (__ARM_FEATURE_DSP == 1U) */
 /*@} end of group CMSIS_SIMD_intrinsics */
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __CMSIS_ARMCC_V6_H */

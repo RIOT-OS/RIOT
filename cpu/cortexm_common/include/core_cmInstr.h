@@ -41,6 +41,9 @@
 #ifndef __CORE_CMINSTR_H
 #define __CORE_CMINSTR_H
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
 
 /* ##########################  Core Instruction Access  ######################### */
 /** \defgroup CMSIS_Core_InstructionInterface CMSIS Core Instruction Interface
@@ -83,5 +86,9 @@
 #endif
 
 /*@}*/ /* end of group CMSIS_Core_InstructionInterface */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __CORE_CMINSTR_H */

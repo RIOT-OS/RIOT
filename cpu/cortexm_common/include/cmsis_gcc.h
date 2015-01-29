@@ -35,6 +35,10 @@
 #ifndef __CMSIS_GCC_H
 #define __CMSIS_GCC_H
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 /* ignore some GCC warnings */
 #if defined ( __GNUC__ )
 #pragma GCC diagnostic push
@@ -1368,6 +1372,10 @@ __attribute__( ( always_inline ) ) __STATIC_INLINE uint32_t __SMMLA (int32_t op1
 
 #if defined ( __GNUC__ )
 #pragma GCC diagnostic pop
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif /* __CMSIS_GCC_H */

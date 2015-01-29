@@ -35,6 +35,9 @@
 #ifndef __CMSIS_ARMCC_H
 #define __CMSIS_ARMCC_H
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
 
 #if defined(__ARMCC_VERSION) && (__ARMCC_VERSION < 400677)
   #error "Please use ARM Compiler Toolchain V4.0.677 or later!"
@@ -730,5 +733,8 @@ __attribute__((section(".rrx_text"))) __STATIC_INLINE __ASM uint32_t __RRX(uint3
 #endif /* (__CORTEX_M >= 0x04) */
 /*@} end of group CMSIS_SIMD_intrinsics */
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __CMSIS_ARMCC_H */
