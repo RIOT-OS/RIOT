@@ -3,6 +3,8 @@ doc/doxygen/html
 doc/doxygen/latex
 doc/doxygen/man
 doc/doxygen/*.log
+doc/doxygen/*.db
+doc/doxygen/*.tmp
 *bin
 *~
 *.orig
