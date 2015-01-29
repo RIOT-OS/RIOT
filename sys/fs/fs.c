@@ -9,7 +9,6 @@
 #include <string.h>
 
 #include "fs.h"
-#include "scfs.h"
 
 static fs_table_t fs_table[FS_TABLE_SIZE];
 
