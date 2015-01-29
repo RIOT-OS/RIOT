@@ -41,7 +41,8 @@
 typedef int fid_t;
 
 typedef enum {
-    FS_NONE = 0
+    FS_NONE = 0,
+    FS_NATIVE = 1
 } fs_type_t;
 
 /**
