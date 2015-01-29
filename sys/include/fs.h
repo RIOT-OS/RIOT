@@ -39,8 +39,17 @@
  */
 #define FS_FILE_INFO_EXT_SIZE (2)
 
+
+/**
+ * @brief File ID
+ * TODO: Expand
+ */
 typedef int fid_t;
 
+/**
+ * TODO: Is type the implementation, e.g. FAT or CFS?
+ * Or are we talking about some other "type" here?
+ */
 typedef enum {
     FS_NONE = 0,
     FS_NATIVE = 1
@@ -302,7 +311,7 @@ typedef struct {
     /**
      * @brief   Opens a file.
      *
-     * Flags can be passed via *info*::flags
+     * Flags can be passed via fs_file_info_t::flags
      *
      * @param[in] path      Path to the file.
      * @param[in,out] info  File information handed by filesystem API
@@ -335,10 +344,10 @@ typedef struct {
     int (*read)(const char *path, char *buf, size_t size, off_t offset,
                 fs_file_info_t *info);
 
-    int (*readdir)(const char *path, void *); // TODO
 
-    /**
+    /*
      * TODO
+    int (*readdir)(const char *path, void *);
     int (*readlink)(const char *, char *, size_t);
     int (*release)(const char *);
     int (*releasedir)(const char *);
@@ -402,4 +411,6 @@ extern const fs_op_table_t fs_op_table[1];
  */
 static fs_table_t *fs_search_entry(const char *pathname);
 
+
+/**  * @} */
 #endif /* __FS_H_ */
