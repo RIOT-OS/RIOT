@@ -37,7 +37,8 @@ int fs_mount(const char *mount_point, int device, fs_type_t type)
         return -ENAMETOOLONG;
     }
 
-    for (int i = 0; fs_table[i].type != FS_NONE && i < FS_TABLE_SIZE; i++);
+    int i = 0;
+    for (i = 0; fs_table[i].type != FS_NONE && i < FS_TABLE_SIZE; i++);
 
     if (i == FS_TABLE_SIZE) {
         errno = ENOMEM;
