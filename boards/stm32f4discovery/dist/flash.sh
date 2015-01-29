@@ -9,7 +9,6 @@ openocd -f "board/stm32f4discovery.cfg" \
     -c "reset" \
     -c "halt" \
     -c "flash protect 0 0 11 off" \
-    -c "flash erase_address 0x08000000 0x100000" \
     -c "flash write_image erase $1 0 ihex" \
     -c "verify_image $1" \
     -c "reset run"\
