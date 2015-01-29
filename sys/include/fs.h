@@ -20,7 +20,8 @@
  */
 #ifndef __FS_H_
 #define __FS_H_
-#include <types.h>
+#include <stdint.h>
+#include <sys/stat.h>
 
 /**
  * @brief Allowed length of a mount point
