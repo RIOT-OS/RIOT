@@ -23,7 +23,6 @@
 
 #include <stdint.h>
 #include <stdio.h>
-#include "mutex.h"
 #include "hwtimer.h"
 #include "srf02.h"
 #include "periph/i2c.h"

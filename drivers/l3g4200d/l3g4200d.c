@@ -21,7 +21,6 @@
 
 #include <stdint.h>
 
-#include "mutex.h"
 #include "l3g4200d.h"
 #include "l3g4200d-regs.h"
 #include "periph/i2c.h"

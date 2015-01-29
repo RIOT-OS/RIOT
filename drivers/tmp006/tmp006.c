@@ -23,7 +23,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <math.h>
-#include "mutex.h"
 #include "periph/i2c.h"
 #include "tmp006.h"
 

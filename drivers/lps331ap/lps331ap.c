@@ -25,7 +25,6 @@
 
 #include <stdint.h>
 
-#include "mutex.h"
 #include "periph/i2c.h"
 #include "lps331ap.h"
 #include "lps331ap-internal.h"

@@ -19,7 +19,6 @@
  * @}
  */
 
-#include "mutex.h"
 #include "lsm303dlhc.h"
 #include "lsm303dlhc-internal.h"
 

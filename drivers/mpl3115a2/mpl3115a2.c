@@ -22,7 +22,6 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-#include "mutex.h"
 #include "periph/i2c.h"
 #include "mpl3115a2.h"
 #include "mpl3115a2_reg.h"
