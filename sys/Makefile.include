@@ -25,6 +25,9 @@ endif
 ifneq (,$(filter net_if,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/include
 endif
+ifneq (,$(filter pkt,$(USEMODULE)))
+    USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/include
+endif
 ifneq (,$(filter pktbuf,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/include
 endif

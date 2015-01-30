@@ -105,6 +105,10 @@ ifneq (,$(filter net_if,$(USEMODULE)))
 	USEMODULE += hashes
 endif
 
+ifneq (,$(filter pkt,$(USEMODULE)))
+	USEMODULE += pktbuf
+endif
+
 ifneq (,$(filter ccn_lite,$(USEMODULE)))
 	USEMODULE += crypto
 endif
