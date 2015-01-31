@@ -519,12 +519,12 @@ void rpl_recv_DIO_mode(void)
             }
 
             case (RPL_OPT_PREFIX_INFO): {
-                if (rpl_opt_buf->length != (RPL_OPT_PREFIX_INFO_LEN - RPL_OPT_LEN)) {
+                if (rpl_opt_buf->length != RPL_OPT_PREFIX_INFO_LEN) {
                     /* error malformed */
                     return;
                 }
 
-                len += RPL_OPT_PREFIX_INFO_LEN;
+                len += RPL_OPT_PREFIX_INFO_LEN_WITH_OPT_LEN;
                 break;
             }
 

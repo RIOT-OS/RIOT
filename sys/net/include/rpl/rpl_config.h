@@ -57,7 +57,8 @@ enum RPL_MSG_CODE {
 #define RPL_OPT_LEN                             2
 #define RPL_OPT_DODAG_CONF_LEN                  14
 #define RPL_OPT_DODAG_CONF_LEN_WITH_OPT_LEN     (RPL_OPT_DODAG_CONF_LEN + RPL_OPT_LEN)
-#define RPL_OPT_PREFIX_INFO_LEN                 32
+#define RPL_OPT_PREFIX_INFO_LEN                 30
+#define RPL_OPT_PREFIX_INFO_LEN_WITH_OPT_LEN    (RPL_OPT_PREFIX_INFO_LEN + RPL_OPT_LEN)
 #define RPL_OPT_SOLICITED_INFO_LEN              21
 #define RPL_OPT_TARGET_LEN                      20
 #define RPL_OPT_TRANSIT_LEN                     22
