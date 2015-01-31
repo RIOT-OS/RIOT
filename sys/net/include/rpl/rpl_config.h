@@ -48,18 +48,19 @@ enum RPL_MSG_CODE {
 };
 
 /* packet base lengths */
-#define DIO_BASE_LEN                24
-#define DIS_BASE_LEN                2
-#define DAO_BASE_LEN                4
-#define DAO_D_LEN                   24
-#define DAO_ACK_LEN                 4
-#define DAO_ACK_D_LEN               24
-#define RPL_OPT_LEN                 2
-#define RPL_OPT_DODAG_CONF_LEN      16
-#define RPL_OPT_PREFIX_INFO_LEN     32
-#define RPL_OPT_SOLICITED_INFO_LEN  21
-#define RPL_OPT_TARGET_LEN          20
-#define RPL_OPT_TRANSIT_LEN         22
+#define DIO_BASE_LEN                            24
+#define DIS_BASE_LEN                            2
+#define DAO_BASE_LEN                            4
+#define DAO_D_LEN                               24
+#define DAO_ACK_LEN                             4
+#define DAO_ACK_D_LEN                           24
+#define RPL_OPT_LEN                             2
+#define RPL_OPT_DODAG_CONF_LEN                  14
+#define RPL_OPT_DODAG_CONF_LEN_WITH_OPT_LEN     (RPL_OPT_DODAG_CONF_LEN + RPL_OPT_LEN)
+#define RPL_OPT_PREFIX_INFO_LEN                 32
+#define RPL_OPT_SOLICITED_INFO_LEN              21
+#define RPL_OPT_TARGET_LEN                      20
+#define RPL_OPT_TRANSIT_LEN                     22
 
 /* message options */
 #define RPL_OPT_PAD1                 0
