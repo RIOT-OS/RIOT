@@ -62,7 +62,9 @@ static void _dao_handle_send(rpl_dodag_t *dodag);
 static void _rpl_update_routing_table(void);
 
 #if RPL_DEFAULT_MOP == RPL_NON_STORING_MODE
+#if RPL_MAX_ROUTING_ENTRIES != 0
 static uint8_t srh_buffer[BUFFER_SIZE];
+#endif
 static uint8_t srh_send_buffer[BUFFER_SIZE];
 static ipv6_addr_t *down_next_hop;
 static ipv6_srh_t *srh_header;
