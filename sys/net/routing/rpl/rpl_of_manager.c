@@ -29,7 +29,7 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-rpl_of_t *objective_functions[NUMBER_IMPLEMENTED_OFS];
+static rpl_of_t *objective_functions[NUMBER_IMPLEMENTED_OFS];
 
 void rpl_of_manager_init(ipv6_addr_t *my_address)
 {
