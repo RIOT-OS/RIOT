@@ -59,7 +59,7 @@ void random_init(void);
  * @return          the number of bytes written to buf
  * @return          0 on error
  */
-int random_read(char *buf, unsigned int num);
+int random_read(unsigned char *buf, unsigned int num);
 
 /**
  * @brief Power on the random number generator

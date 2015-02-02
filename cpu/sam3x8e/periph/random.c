@@ -36,7 +36,7 @@ void random_init(void)
     random_poweron();
 }
 
-int random_read(char *buf, unsigned int num)
+int random_read(unsigned char *buf, unsigned int num)
 {
     /* cppcheck-suppress variableScope */
     uint32_t tmp;
@@ -49,7 +49,7 @@ int random_read(char *buf, unsigned int num)
         tmp = TRNG->TRNG_ODATA;
         /* extract copy bytes to result */
         for (int i = 0; i < 4 && count < num; i++) {
-            buf[count++] = (char)tmp;
+            buf[count++] = (unsigned char)tmp;
             tmp = tmp >> 8;
         }
     }

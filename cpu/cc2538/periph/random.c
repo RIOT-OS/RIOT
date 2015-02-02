@@ -75,7 +75,7 @@ void random_init(void)
     random_poweron();
 }
 
-int random_read(char *buf, unsigned int num)
+int random_read(unsigned char *buf, unsigned int num)
 {
     int count;
 

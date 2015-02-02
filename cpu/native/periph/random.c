@@ -42,8 +42,8 @@ static int dev_random = -1;
  */
 void _native_rng_init_det(void);
 void _native_rng_init_hq(void);
-unsigned _native_rng_read_det(char *buf, unsigned num);
-unsigned _native_rng_read_hq(char *buf, unsigned num);
+unsigned _native_rng_read_det(unsigned char *buf, unsigned num);
+unsigned _native_rng_read_hq(unsigned char *buf, unsigned num);
 
 /**********************************************************************
  * public API implementation
@@ -71,7 +71,7 @@ void random_init(void)
     random_poweron();
 }
 
-int random_read(char *buf, unsigned int num)
+int random_read(unsigned char *buf, unsigned int num)
 {
     if (!initialized) {
         warnx("random_read: random device not initialized, failing\n");
@@ -145,19 +145,19 @@ void _native_rng_init_hq(void)
     _native_syscall_leave();
 }
 
-unsigned _native_rng_read_det(char *buf, unsigned num)
+unsigned _native_rng_read_det(unsigned char *buf, unsigned num)
 {
     DEBUG("_native_rng_read_det\n");
     for (unsigned i = 0; i < num; i++) {
         _native_syscall_enter();
-        buf[i] = (char)real_random();
+        buf[i] = (unsigned char)real_random();
         _native_syscall_leave();
     }
 
     return num;
 }
 
-unsigned _native_rng_read_hq(char *buf, unsigned num)
+unsigned _native_rng_read_hq(unsigned char *buf, unsigned num)
 {
     DEBUG("_native_rng_read_hq\n");
     unsigned offset = 0;
