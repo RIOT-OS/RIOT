@@ -66,6 +66,7 @@ Init your RPL node either as root (`r`), as node router (`n`), or as non-routing
 	Transport layer initialized
 
 or
+
 	> init n
 	init n
 	INFO: Initialize as node on address 2
@@ -74,6 +75,7 @@ or
 	Transport layer initialized
 
 or
+
 	> init h
 	init h
 	INFO: Initialize as non-routing node on address 3
