@@ -31,9 +31,9 @@ char addr_str[IPV6_MAX_ADDR_STR_LEN];
 #endif
 #include "debug.h"
 
-rpl_instance_t instances[RPL_MAX_INSTANCES];
-rpl_dodag_t dodags[RPL_MAX_DODAGS];
-rpl_parent_t parents[RPL_MAX_PARENTS];
+static rpl_instance_t instances[RPL_MAX_INSTANCES];
+static rpl_dodag_t dodags[RPL_MAX_DODAGS];
+static rpl_parent_t parents[RPL_MAX_PARENTS];
 
 void rpl_trickle_send_dio(void *args) {
     (void) args;
