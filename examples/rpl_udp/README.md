@@ -4,9 +4,9 @@ First switch to this application directory:
 	cd RIOT/examples/rpl_udp
 
 #### Parameterizing the build
-The build system provides two specific parameters for the RPL module.  
+The build system provides two specific parameters for the RPL module.
 These parameters are:
- * `RPL_MAX_ROUTING_ENTRIES` sets the desired maximum number of entries for the RPL routing table. _If this parameter is not provided, a [default](https://github.com/RIOT-OS/RIOT/blob/master/sys/net/include/rpl/rpl_config.h#L130) value is used._
+ * `RPL_MAX_ROUTING_ENTRIES` sets the desired maximum number of entries for the RPL routing table. _If this parameter is not provided, a [default](https://github.com/RIOT-OS/RIOT/blob/master/sys/net/include/rpl/rpl_config.h#L139) value is used._
  * `RPL_NODE_IS_ROOT` indicating the build is specifically for a root node. This parameter is **only required** for using [`RPL_NON_STORING_MODE`](https://github.com/RIOT-OS/RIOT/blob/master/sys/net/include/rpl/rpl_config.h#L31) MOP to initialize a RPL routing table. The parameter is ignored in all other cases. _For non-storing MOP a node does not require to provide a routing table._
 
 #### Compiling the executable
@@ -30,17 +30,17 @@ builds the project and creates `103` entries for the RPL routing table for the r
 
 	../../cpu/native/tapsetup.sh create 2
 
-The `2` corresponds to the number of _virtual_ nodes to be started.  
-The tap devices are bound to the _virtual_ native node on starting the created executable `rpl_udp.elf`.  
+The `2` corresponds to the number of _virtual_ nodes to be started.
+The tap devices are bound to the _virtual_ native node on starting the created executable `rpl_udp.elf`.
 
 #### _[native only]_ Starting _virtual_ nodes
 Run the first node
 
 	make term
 
-This starts the executable binding a _virtual_ node to the first tap device `tap0`.  
+This starts the executable binding a _virtual_ node to the first tap device `tap0`.
 
-**Further nodes must be bound to tap devices manually.**  
+**Further nodes must be bound to tap devices manually.**
 For the second node it would be:
 
 	make term PORT=tap1
@@ -66,6 +66,7 @@ Init your RPL node either as root (`r`), as node router (`n`), or as non-routing
 	Transport layer initialized
 
 or
+
 	> init n
 	init n
 	INFO: Initialize as node on address 2
@@ -74,6 +75,7 @@ or
 	Transport layer initialized
 
 or
+
 	> init h
 	init h
 	INFO: Initialize as non-routing node on address 3
