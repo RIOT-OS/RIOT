@@ -274,7 +274,7 @@ void rpl_send_DIO_mode(ipv6_addr_t *destination)
     rpl_send_opt_dodag_conf_buf->default_lifetime = mydodag->default_lifetime;
     rpl_send_opt_dodag_conf_buf->lifetime_unit = mydodag->lifetime_unit;
 
-    opt_hdr_len += RPL_OPT_DODAG_CONF_LEN;
+    opt_hdr_len += RPL_OPT_DODAG_CONF_LEN_WITH_OPT_LEN;
 
     uint16_t plen = ICMPV6_HDR_LEN + DIO_BASE_LEN + opt_hdr_len;
     rpl_send(destination, (uint8_t *)icmp_send_buf, plen, IPV6_PROTO_NUM_ICMPV6);
@@ -514,7 +514,7 @@ void rpl_recv_DIO_mode(void)
                 dio_dodag.default_lifetime = rpl_opt_dodag_conf_buf->default_lifetime;
                 dio_dodag.lifetime_unit = rpl_opt_dodag_conf_buf->lifetime_unit;
                 dio_dodag.of = (struct rpl_of_t *) rpl_get_of_for_ocp(rpl_opt_dodag_conf_buf->ocp);
-                len += RPL_OPT_DODAG_CONF_LEN;
+                len += RPL_OPT_DODAG_CONF_LEN_WITH_OPT_LEN;
                 break;
             }
 
@@ -524,7 +524,7 @@ void rpl_recv_DIO_mode(void)
                     return;
                 }
 
-                len += RPL_OPT_PREFIX_INFO_LEN;
+                len += RPL_OPT_PREFIX_INFO_LEN_WITH_OPT_LEN;
                 break;
             }
 
