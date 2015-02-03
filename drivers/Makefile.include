@@ -40,3 +40,6 @@ endif
 ifneq (,$(filter mpu9150,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/drivers/mpu9150/include
 endif
+ifneq (,$(filter ina220,$(USEMODULE)))
+    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/ina220/include
+endif
