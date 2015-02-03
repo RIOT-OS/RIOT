@@ -149,7 +149,7 @@ static rpl_dao_t *get_rpl_dao_buf(void)
 
 static rpl_dao_ack_t *get_rpl_dao_ack_buf(void)
 {
-    return ((rpl_dao_ack_t *) & (buffer[(LL_HDR_LEN + IPV6_HDR_LEN + ICMPV6_HDR_LEN)]));
+    return ((rpl_dao_ack_t *) & (rpl_buffer[(IPV6_HDR_LEN + ICMPV6_HDR_LEN)]));
 }
 
 static rpl_dis_t *get_rpl_dis_buf(void)
