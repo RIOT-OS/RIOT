@@ -60,8 +60,10 @@ enum RPL_MSG_CODE {
 #define RPL_OPT_PREFIX_INFO_LEN                 30
 #define RPL_OPT_PREFIX_INFO_LEN_WITH_OPT_LEN    (RPL_OPT_PREFIX_INFO_LEN + RPL_OPT_LEN)
 #define RPL_OPT_SOLICITED_INFO_LEN              21
-#define RPL_OPT_TARGET_LEN                      20
-#define RPL_OPT_TRANSIT_LEN                     22
+#define RPL_OPT_TARGET_LEN                      18
+#define RPL_OPT_TARGET_LEN_WITH_OPT_LEN         (RPL_OPT_TARGET_LEN + RPL_OPT_LEN)
+#define RPL_OPT_TRANSIT_LEN                     20
+#define RPL_OPT_TRANSIT_LEN_WITH_OPT_LEN        (RPL_OPT_TRANSIT_LEN + RPL_OPT_LEN)
 
 /* message options */
 #define RPL_OPT_PAD1                 0

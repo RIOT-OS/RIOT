@@ -331,7 +331,7 @@ void rpl_send_DAO_mode(ipv6_addr_t *destination, uint8_t lifetime, bool default_
     memcpy(&rpl_send_opt_target_buf->target, &my_address, sizeof(ipv6_addr_t));
 
     /* 18+2=20 bytes for one target-option */
-    opt_len += RPL_OPT_TARGET_LEN;
+    opt_len += RPL_OPT_TARGET_LEN_WITH_OPT_LEN;
 
     /* add parent */
     rpl_send_opt_transit_buf = get_rpl_send_opt_transit_buf(DAO_BASE_LEN + opt_len);
@@ -349,7 +349,7 @@ void rpl_send_DAO_mode(ipv6_addr_t *destination, uint8_t lifetime, bool default_
            ipv6_addr_to_str(addr_str_mode, IPV6_MAX_ADDR_STR_LEN, destination));
 
     /* 4+2=6 byte for one transit-option */
-    opt_len += RPL_OPT_TRANSIT_LEN;
+    opt_len += RPL_OPT_TRANSIT_LEN_WITH_OPT_LEN;
 
     uint16_t plen = ICMPV6_HDR_LEN + DAO_BASE_LEN + opt_len;
     rpl_send(destination, (uint8_t *)icmp_send_buf, plen, IPV6_PROTO_NUM_ICMPV6);
@@ -644,12 +644,12 @@ void rpl_recv_DAO_mode(void)
             }
 
             case (RPL_OPT_PADN): {
-                len += rpl_opt_buf->length;
+                len += (rpl_opt_buf->length + RPL_OPT_LEN);
                 break;
             }
 
             case (RPL_OPT_DAG_METRIC_CONTAINER): {
-                len += rpl_opt_buf->length;
+                len += (rpl_opt_buf->length + RPL_OPT_LEN);
                 break;
             }
 
@@ -661,7 +661,7 @@ void rpl_recv_DAO_mode(void)
                     break;
                 }
 
-                len += rpl_opt_target_buf->length;
+                len += (rpl_opt_target_buf->length + RPL_OPT_LEN);
                 rpl_opt_transit_buf = get_rpl_opt_transit_buf(len);
 
                 if (rpl_opt_transit_buf->type != RPL_OPT_TRANSIT) {
@@ -670,7 +670,7 @@ void rpl_recv_DAO_mode(void)
                     break;
                 }
 
-                len += rpl_opt_transit_buf->length;
+                len += (rpl_opt_transit_buf->length + RPL_OPT_LEN);
                 /* route lifetime seconds = (DAO lifetime) * (Unit Lifetime) */
                 DEBUGF("Target: %s\n", ipv6_addr_to_str(addr_str_mode, IPV6_MAX_ADDR_STR_LEN,
                         &rpl_opt_target_buf->target));
@@ -685,12 +685,12 @@ void rpl_recv_DAO_mode(void)
             }
 
             case (RPL_OPT_TRANSIT): {
-                len += rpl_opt_buf->length;
+                len += (rpl_opt_buf->length + RPL_OPT_LEN);
                 break;
             }
 
             case (RPL_OPT_TARGET_DESC): {
-                len += rpl_opt_buf->length;
+                len += (rpl_opt_buf->length + RPL_OPT_LEN);
                 break;
             }
 
