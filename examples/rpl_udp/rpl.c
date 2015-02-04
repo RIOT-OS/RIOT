@@ -90,7 +90,7 @@ void rpl_udp_init(int argc, char **argv)
             return;
         }
 
-        printf("Channel set to %d\n", chan);
+        printf("Channel set to %" PRIi32 "\n", chan);
 
         if (command != 'h') {
             DEBUGF("Initializing RPL for interface 0\n");
