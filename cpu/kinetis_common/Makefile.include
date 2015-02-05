@@ -1,2 +1,5 @@
 # include module specific includes
 export INCLUDES += -I$(RIOTCPU)/kinetis_common/include
+
+# Add search path for linker scripts
+export LINKFLAGS += -L$(RIOTCPU)/kinetis_common/ldscripts
