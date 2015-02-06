@@ -74,6 +74,9 @@ endif
 ifneq (,$(filter trickle,$(USEMODULE)))
     DIRS += trickle
 endif
+ifneq (,$(filter ng_netapi,$(USEMODULE)))
+    DIRS += net/crosslayer/ng_netapi
+endif
 
 DIRS += $(dir $(wildcard $(addsuffix /Makefile, ${USEMODULE})))
 
