@@ -46,7 +46,7 @@
 #include "ccnl-riot-compat.h"
 #include "ccn_lite/test_data/text.txt.ccnb.h"
 
-#if MODULE_AT86RF231 || MODULE_CC2420 || MODULE_MC1322X
+#if MODULE_AT86RF231 || MODULE_CC2420 || MODULE_MC1322X || MODULE_KW2XRF
 #include "ieee802154_frame.h"
 #endif
 
@@ -313,7 +313,7 @@ int ccnl_io_loop(struct ccnl_relay_s *ccnl)
     }
 
     msg_t in;
-#if MODULE_AT86RF231 || MODULE_CC2420 || MODULE_MC1322X
+#if MODULE_AT86RF231 || MODULE_CC2420 || MODULE_MC1322X || MODULE_KW2XRF
     ieee802154_packet_t *p;
 #else
     radio_packet_t *p;
@@ -328,7 +328,7 @@ int ccnl_io_loop(struct ccnl_relay_s *ccnl)
         switch (in.type) {
             case PKT_PENDING:
                 /* msg from transceiver */
-#if MODULE_AT86RF231 || MODULE_CC2420 || MODULE_MC1322X
+#if MODULE_AT86RF231 || MODULE_CC2420 || MODULE_MC1322X || MODULE_KW2XRF
                 p = (ieee802154_packet_t*) in.content.ptr;
                 DEBUGMSG(1, "\tLength:\t%u\n", p->length);
                 DEBUGMSG(1, "\tSrc:\t%u\n",
@@ -343,7 +343,7 @@ int ccnl_io_loop(struct ccnl_relay_s *ccnl)
 #endif
 
                 /* p->src must be > 0 */
-#if MODULE_AT86RF231 || MODULE_CC2420 || MODULE_MC1322X
+#if MODULE_AT86RF231 || MODULE_CC2420 || MODULE_MC1322X || MODULE_KW2XRF
                 if ((!(p->frame.src_addr[0])) | (p->frame.src_addr[1] << 8)) {
                     p->frame.src_addr[0] = RIOT_BROADCAST >> 8;
                     p->frame.src_addr[1] = RIOT_BROADCAST && 0xFF;
@@ -354,7 +354,7 @@ int ccnl_io_loop(struct ccnl_relay_s *ccnl)
                 }
 #endif
 
-#if MODULE_AT86RF231 || MODULE_CC2420 || MODULE_MC1322X
+#if MODULE_AT86RF231 || MODULE_CC2420 || MODULE_MC1322X || MODULE_KW2XRF
                 ccnl_core_RX(ccnl, RIOT_TRANS_IDX,
                              (unsigned char *) p->frame.payload,
                              (int) p->frame.payload_len,
