@@ -82,6 +82,29 @@ typedef struct __attribute__((packed))
     /** @} */
 } at86rf231_packet_t;
 
+/**
+ * @brief Device descriptor for at86rf231 devices.
+ */
+typedef struct __attribute__((packed)) {
+    kernel_pid_t pid;
+    netdev_driver_t *driver;
+    netdev_rcv_data_cb_t rcv_cb;
+    spi_t spi;
+    gpio_t cs;
+    gpio_t extint;
+    gpio_t reset;
+    gpio_t sleep;
+    uint8_t options;
+    uint16_t pan;
+    uint8_t channel;
+    uint16_t addr;
+    uint64_t addr_long;
+    uint8_t rssi;
+    uint8_t lqi;
+    static uint8_t sequence_nr;
+    static uint8_t wait_for_ack;
+} at86rf231_t;
+
 extern netdev_t at86rf231_netdev;   /**< netdev representation of this driver */
 
 /**
