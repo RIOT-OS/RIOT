@@ -138,6 +138,9 @@ void create_usage(void)
 #ifdef MODULE_NATIVENET
          "        * native\n"
 #endif
+#ifdef MODULE_KW2XRF
+         "        * kw2xrf\n"
+#endif
         );
 }
 
@@ -432,6 +435,9 @@ void _net_if_ifconfig_create(char *transceivers_str)
         else if (strcasecmp(transceiver_str, "native") == 0) {
             transceivers |= TRANSCEIVER_NATIVE;
         }
+        if (strcasecmp(transceiver_str, "k2xrf") == 0) {
+            transceivers |= TRANSCEIVER_KW2XRF;
+        }
         else {
             create_usage();
             return;
@@ -615,6 +621,9 @@ void _net_if_ifconfig_list(int if_id)
 
     if (transceivers & TRANSCEIVER_NATIVE) {
         puts("             * native");
+    }
+    if (transceivers & TRANSCEIVER_KW2XRF) {
+        puts("             * kw2xrf");
     }
 
     while (net_if_iter_addresses(if_id, &addr_ptr)) {
