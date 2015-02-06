@@ -17,15 +17,21 @@
 #include "netdev_dummy.h"
 
 #include "tests-netdev_dummy.h"
+#include "thread.h"
+
+#define EVENT_HANDLER_STACKSIZE         (KERNEL_CONF_STACKSIZE_DEFAULT)
+#define NETDEV_DUMMY_EVENT_HANDLER_QUIT (0xfe34)
 
 static netdev_t *dev = &(unittest_netdev_dummy_devs[0]);
 static char received_data[UNITTESTS_NETDEV_DUMMY_MAX_PACKET];
 static char received_src[UNITTESTS_NETDEV_DUMMY_MAX_LONG_ADDR_LEN];
 static char received_dst[UNITTESTS_NETDEV_DUMMY_MAX_LONG_ADDR_LEN];
 static size_t received_data_len = 0, received_src_len = 0, received_dst_len = 0;
+static char event_handler_stack[EVENT_HANDLER_STACKSIZE];
+static kernel_pid_t event_handler = KERNEL_PID_UNDEF;
 
-#define OPTION_NUMBER   (6)
-#define RANDOM_OPTION   (TEST_UINT8 % OPTION_NUMBER) + 1
+#define OPTION_NUMBER           (6)
+#define RANDOM_OPTION           (TEST_UINT8 % OPTION_NUMBER) + 1
 
 static void _reset_received(void)
 {
@@ -37,15 +43,51 @@ static void _reset_received(void)
     received_dst_len = 0;
 }
 
+static void *_event_handler(void *args)
+{
+    msg_t msg;
+
+    msg.type = 0;
+
+    (void)args;
+
+    dev->driver->init(dev);
+
+    while (msg.type != NETDEV_MSG_EVENT_TYPE) {
+        msg_receive(&msg);
+
+        switch (msg.type) {
+            case NETDEV_MSG_EVENT_TYPE:
+                dev->driver->event(dev, msg.content.value);
+
+                break;
+
+            case NETDEV_DUMMY_EVENT_HANDLER_QUIT:
+                return NULL;
+        }
+    }
+
+    return NULL;
+}
+
 static void set_up(void)
 {
     unittest_netdev_dummy_init();
-    dev->driver->init(dev);
+    event_handler = thread_create(event_handler_stack, sizeof(event_handler_stack),
+                                  PRIORITY_MAIN - 1, CREATE_STACKTEST, _event_handler, NULL,
+                                  "netdev_dummy_event_handler");
+    thread_yield_higher();
 }
 
 static void tear_down(void)
 {
+    msg_t msg;
+
+    msg.type = NETDEV_DUMMY_EVENT_HANDLER_QUIT;
+
     _reset_received();
+    msg_send(&msg, event_handler);
+    thread_yield_higher();
 }
 
 /* callback for callback tests */
@@ -66,20 +108,6 @@ int _fill_received(netdev_t *dev_rcv, void *src, size_t src_len, void *dest,
     received_data_len = payload_len;
 
     return 0;
-}
-
-/* callback for callback tests */
-int _always_wrong(netdev_t *dev_rcv, void *src, size_t src_len, void *dest,
-                  size_t dest_len, void *payload, size_t payload_len)
-{
-    (void)dev_rcv;
-    (void)src;
-    (void)src_len;
-    (void)dest;
-    (void)dest_len;
-    (void)payload;
-    (void)payload_len;
-    return -1;
 }
 
 /*********************************************
@@ -294,39 +322,6 @@ static void test_netdev_dummy_rem_cb_successful(void)
     for (int i = 0; i < UNITTESTS_NETDEV_DUMMY_MAX_PACKET; i++) {
         TEST_ASSERT_EQUAL_INT(0, received_data[i]);
     }
-}
-
-static void test_netdev_dummy_rem_cb_multiple_added(void)
-{
-    char src[] = TEST_STRING64;
-    size_t src_len = UNITTESTS_NETDEV_DUMMY_MAX_ADDR_LEN;
-    char dest[] = TEST_STRING64;
-    size_t dest_len = UNITTESTS_NETDEV_DUMMY_MAX_ADDR_LEN;
-    char data[] = TEST_STRING8;
-#if UNITTESTS_NETDEV_DUMMY_MAX_PACKET < 8
-    size_t data_len = UNITTESTS_NETDEV_DUMMY_MAX_PACKET;
-#else
-    size_t data_len = 8;
-#endif
-    TEST_ASSERT_EQUAL_INT(0, dev->driver->add_receive_data_callback(dev,
-                          _fill_received));
-    TEST_ASSERT_EQUAL_INT(0, unittest_netdev_dummy_fire_rcv_event(dev, src,
-                          src_len, dest, dest_len, data, data_len));
-    _reset_received();
-    TEST_ASSERT_EQUAL_INT(0, dev->driver->add_receive_data_callback(dev,
-                          _always_wrong));
-    TEST_ASSERT_EQUAL_INT(-ECANCELED, unittest_netdev_dummy_fire_rcv_event(
-                              dev, src, src_len, dest, dest_len, data, data_len));
-    TEST_ASSERT_EQUAL_INT(0, dev->driver->rem_receive_data_callback(dev,
-                          _always_wrong));
-    TEST_ASSERT_EQUAL_INT(0, unittest_netdev_dummy_fire_rcv_event(dev, src,
-                          src_len, dest, dest_len, data, data_len));
-    TEST_ASSERT_EQUAL_INT(src_len, received_src_len);
-    TEST_ASSERT_EQUAL_INT(0, memcmp(received_src, src, src_len));
-    TEST_ASSERT_EQUAL_INT(dest_len, received_dst_len);
-    TEST_ASSERT_EQUAL_INT(0, memcmp(received_dst, dest, dest_len));
-    TEST_ASSERT_EQUAL_INT(data_len, received_data_len);
-    TEST_ASSERT_EQUAL_INT(0, memcmp(received_data, data, data_len));
 }
 
 /*********************************************
@@ -861,24 +856,6 @@ static void test_netdev_dummy_fire_rcv_event_no_cb(void)
                           src_len, dest, dest_len, data, data_len));
 }
 
-static void test_netdev_dummy_fire_rcv_event_failing_cb(void)
-{
-    char src[] = TEST_STRING64;
-    size_t src_len = UNITTESTS_NETDEV_DUMMY_MAX_ADDR_LEN;
-    char dest[] = TEST_STRING64;
-    size_t dest_len = UNITTESTS_NETDEV_DUMMY_MAX_ADDR_LEN;
-    char data[] = TEST_STRING8;
-#if UNITTESTS_NETDEV_DUMMY_MAX_PACKET < 8
-    size_t data_len = UNITTESTS_NETDEV_DUMMY_MAX_PACKET;
-#else
-    size_t data_len = 8;
-#endif
-    TEST_ASSERT_EQUAL_INT(0, dev->driver->add_receive_data_callback(dev,
-                          _always_wrong));
-    TEST_ASSERT_EQUAL_INT(-ECANCELED, unittest_netdev_dummy_fire_rcv_event(
-                              dev, src, src_len, dest, dest_len, data, data_len));
-}
-
 /***********************************************
  * unittest_netdev_dummy_get_last_event tests *
  ***********************************************/
@@ -919,7 +896,6 @@ Test *tests_netdev_dummy_tests(void)
         new_TestFixture(test_netdev_dummy_rem_cb_dev_wrong),
         new_TestFixture(test_netdev_dummy_rem_cb_unknown_cb),
         new_TestFixture(test_netdev_dummy_rem_cb_successful),
-        new_TestFixture(test_netdev_dummy_rem_cb_multiple_added),
         /* driver::get_option tests */
         new_TestFixture(test_netdev_dummy_get_option_dev_null),
         new_TestFixture(test_netdev_dummy_get_option_dev_wrong),
@@ -970,7 +946,6 @@ Test *tests_netdev_dummy_tests(void)
         new_TestFixture(test_netdev_dummy_fire_rcv_event_dest_too_long),
         new_TestFixture(test_netdev_dummy_fire_rcv_event_dest_null),
         new_TestFixture(test_netdev_dummy_fire_rcv_event_no_cb),
-        new_TestFixture(test_netdev_dummy_fire_rcv_event_failing_cb),
         /* unittest_netdev_dummy_get_last_event tests */
         new_TestFixture(test_netdev_dummy_last_event_dev_null),
         new_TestFixture(test_netdev_dummy_last_event_dev_wrong),
