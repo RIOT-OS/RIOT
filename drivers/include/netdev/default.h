@@ -49,7 +49,7 @@
 #ifndef NETDEV_DEFAULT
 #define NETDEV_DEFAULT  ((netdev_t *)(&kw2xrf_netdev))
 #endif /* NETDEV_DEFAULT */
-#endif /* MODULE_KW02DRF */
+#endif /* MODULE_KW2XRF */
 
 
 #ifdef MODULE_NATIVENET
