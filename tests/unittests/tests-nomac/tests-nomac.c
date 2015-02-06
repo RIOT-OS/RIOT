@@ -12,6 +12,7 @@
 #include "clist.h"
 #include "nomac.h"
 #include "netdev_dummy.h"
+#include "pktbuf.h"
 #include "thread.h"
 #include "vtimer.h"
 
@@ -53,7 +54,7 @@ static void _reset_received(void)
     received_dst_len = 0;
 }
 
-static void _fill_received(netapi_rcv_pkt_t *rcv)
+static void _fill_received(netapi_pkt_t *rcv)
 {
     netapi_ack_t *ack = rcv->ack;
     ack->type = NETAPI_CMD_ACK;
@@ -68,8 +69,8 @@ static void _fill_received(netapi_rcv_pkt_t *rcv)
     received_src_len = rcv->src_len;
     memcpy(received_dst, rcv->dest, rcv->dest_len);
     received_dst_len = rcv->dest_len;
-    memcpy(received_data, rcv->data, rcv->data_len);
-    received_data_len = rcv->data_len;
+    memcpy(received_data, rcv->pkt->payload_data, rcv->pkt->payload_len);
+    received_data_len = rcv->pkt->payload_len;
 
     ack->result = received_data_len;
     return;
@@ -79,7 +80,7 @@ static void *test_nomac_receive_thread(void *args)
 {
     msg_t msg_rcv, msg_ack, done;
 
-    netapi_rcv_pkt_t *rcv;
+    netapi_pkt_t *rcv;
 
     (void)args;
 
@@ -97,7 +98,7 @@ static void *test_nomac_receive_thread(void *args)
         return NULL;
     }
 
-    rcv = (netapi_rcv_pkt_t *)(msg_rcv.content.ptr);
+    rcv = (netapi_pkt_t *)(msg_rcv.content.ptr);
     msg_ack.content.ptr = (char *)rcv->ack;
 
     _fill_received(rcv);
@@ -129,6 +130,7 @@ static void set_up_with_thread(void)
 static void tear_down(void)
 {
     _reset_received();
+    pktbuf_reset();
     nomac_receiver = KERNEL_PID_UNDEF;
 }
 
@@ -147,18 +149,22 @@ static void test_nomac_send_data_dest_too_long(void)
 {
     char dest[] = TEST_STRING8;
     char data[] = TEST_STRING64;
-    TEST_ASSERT_EQUAL_INT(-EAFNOSUPPORT, netapi_send_payload(nomac_pid, dest,
+    pkt_t *pkt = pktbuf_insert(data, 1);
+
+
+    TEST_ASSERT_EQUAL_INT(-EAFNOSUPPORT, netapi_send_packet(nomac_pid, dest,
                           UNITTESTS_NETDEV_DUMMY_MAX_LONG_ADDR_LEN + TEST_UINT8,
-                          data, 1));
+                          pkt));
 }
 
 static void test_nomac_send_data_data_too_long(void)
 {
     char dest[] = TEST_STRING8;
     char data[] = TEST_STRING64;
-    TEST_ASSERT_EQUAL_INT(-EMSGSIZE, netapi_send_payload(nomac_pid, dest,
-                          UNITTESTS_NETDEV_DUMMY_MAX_LONG_ADDR_LEN, data,
-                          UNITTESTS_NETDEV_DUMMY_MAX_PACKET + TEST_UINT8));
+    pkt_t *pkt = pktbuf_insert(data, UNITTESTS_NETDEV_DUMMY_MAX_PACKET + TEST_UINT8);
+
+    TEST_ASSERT_EQUAL_INT(-EMSGSIZE, netapi_send_packet(nomac_pid, dest,
+                          UNITTESTS_NETDEV_DUMMY_MAX_LONG_ADDR_LEN, pkt));
 }
 
 static void test_nomac_send_data_send(void)
@@ -167,12 +173,15 @@ static void test_nomac_send_data_send(void)
     size_t dest_len = UNITTESTS_NETDEV_DUMMY_MAX_ADDR_LEN;
     char data[] = TEST_STRING8;
 #if UNITTESTS_NETDEV_DUMMY_MAX_PACKET < 8
-    size_t data_len = UNITTESTS_NETDEV_DUMMY_MAX_PACKET;
+    pktsize_t data_len = UNITTESTS_NETDEV_DUMMY_MAX_PACKET;
 #else
-    size_t data_len = 8;
+    pktsize_t data_len = 8;
 #endif
-    TEST_ASSERT_EQUAL_INT((int)data_len, netapi_send_payload(nomac_pid,
-                          dest, dest_len, data, data_len));
+    pkt_t *pkt = pktbuf_insert(data, data_len);
+
+
+    TEST_ASSERT_EQUAL_INT((int)data_len, netapi_send_packet(nomac_pid,
+                          dest, dest_len, pkt));
     TEST_ASSERT_EQUAL_INT(0, unittest_netdev_dummy_check_transmitted(dev,
                           dest, dest_len, data, data_len));
 }
@@ -180,25 +189,25 @@ static void test_nomac_send_data_send(void)
 #if UNITTESTS_NETDEV_DUMMY_MAX_PACKET > 4
 static void test_nomac_send_data_send2(void)
 {
-    netdev_hlist_t hlist_node = {NULL, NULL, NETDEV_PROTO_UNKNOWN, TEST_STRING8, 4};
-    netdev_hlist_t *hlist = NULL;
     char dest[] = TEST_STRING64;
     size_t dest_len = UNITTESTS_NETDEV_DUMMY_MAX_ADDR_LEN;
     char data[] = TEST_STRING16;
 #if UNITTESTS_NETDEV_DUMMY_MAX_PACKET < 12
-    size_t data_len = UNITTESTS_NETDEV_DUMMY_MAX_PACKET - 4;
+    pktsize_t data_len = UNITTESTS_NETDEV_DUMMY_MAX_PACKET - 4;
     char expected[UNITTESTS_NETDEV_DUMMY_MAX_PACKET];
 #else
-    size_t data_len = 8;
+    pktsize_t data_len = 8;
     char expected[12];
 #endif
+    pkt_t *pkt = pktbuf_insert(data, data_len);
 
     memcpy(expected, TEST_STRING8, 4);
     memcpy(&(expected[4]), TEST_STRING16, data_len);
 
-    clist_add((clist_node_t **)&hlist, (clist_node_t *)&hlist_node);
+    pktbuf_add_header(pkt, TEST_STRING8, 4);
+
     TEST_ASSERT_EQUAL_INT((int)sizeof(expected), netapi_send_packet(nomac_pid,
-                          hlist, dest, dest_len, data, data_len));
+                          dest, dest_len, pkt));
     TEST_ASSERT_EQUAL_INT(0, unittest_netdev_dummy_check_transmitted(dev,
                           dest, dest_len, expected, data_len + 4));
 }
@@ -226,15 +235,16 @@ static void test_nomac_register(void)
     size_t dest_len = UNITTESTS_NETDEV_DUMMY_MAX_ADDR_LEN;
     char data[] = TEST_STRING8;
 #if UNITTESTS_NETDEV_DUMMY_MAX_PACKET < 8
-    size_t data_len = UNITTESTS_NETDEV_DUMMY_MAX_PACKET;
+    pktsize_t data_len = UNITTESTS_NETDEV_DUMMY_MAX_PACKET;
 #else
-    size_t data_len = 8;
+    pktsize_t data_len = 8;
 #endif
     int res;
+    pkt_t *pkt = pktbuf_insert(data, data_len);
 
     TEST_ASSERT(nomac_receiver != KERNEL_PID_UNDEF);
     TEST_ASSERT_EQUAL_INT(0, netapi_register(nomac_pid, nomac_receiver, 0));
-    res = netapi_fire_receive_event(nomac_pid, src, src_len, dest, dest_len, data, data_len);
+    res = netapi_fire_receive_event(nomac_pid, src, src_len, dest, dest_len, pkt);
     TEST_ASSERT_EQUAL_INT(0, res);
 
     msg_receive(&done);
