@@ -257,7 +257,7 @@ rpl_routing_entry_t *rpl_get_routing_table(void);
  * */
 uint8_t rpl_is_root(void);
 
-#if RPL_DEFAULT_MOP == RPL_NON_STORING_MODE
+#if RPL_DEFAULT_MOP == RPL_MOP_NON_STORING_MODE
 
 /**
  * @brief Adds one pair of child and its parent to the source routing table
@@ -303,7 +303,7 @@ int rpl_srh_sendto(const void *buf, uint16_t len, ipv6_addr_t *src, ipv6_addr_t 
  * */
 void rpl_remove_srh_header(ipv6_hdr_t *ipv6_header, const void *buf, uint8_t nextheader);
 
-#endif /* RPL_DEFAULT_MOP == RPL_NON_STORING_MODE */
+#endif /* RPL_DEFAULT_MOP == RPL_MOP_NON_STORING_MODE */
 
 #ifdef __cplusplus
 }

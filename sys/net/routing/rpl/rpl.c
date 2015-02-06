@@ -35,9 +35,9 @@
 #include "sixlowpan.h"
 #include "net_help.h"
 
-#if RPL_DEFAULT_MOP == RPL_STORING_MODE_NO_MC
+#if RPL_DEFAULT_MOP == RPL_MOP_STORING_MODE_NO_MC
 #include "rpl/rpl_storing.h"
-#elif RPL_DEFAULT_MOP == RPL_NON_STORING_MODE
+#elif RPL_DEFAULT_MOP == RPL_MOP_NON_STORING_MODE
 #include "rpl/rpl_nonstoring.h"
 #else
 #include "rpl/rpl_storing.h"
@@ -61,7 +61,7 @@ static vtimer_t rt_timer;
 static void _dao_handle_send(rpl_dodag_t *dodag);
 static void _rpl_update_routing_table(void);
 
-#if RPL_DEFAULT_MOP == RPL_NON_STORING_MODE
+#if RPL_DEFAULT_MOP == RPL_MOP_NON_STORING_MODE
 #if RPL_MAX_ROUTING_ENTRIES != 0
 static uint8_t srh_buffer[BUFFER_SIZE];
 #endif
@@ -100,7 +100,7 @@ uint8_t rpl_init(int if_id)
     ipv6_addr_set_link_local_prefix(&ll_address);
     ipv6_net_if_get_best_src_addr(&my_address, &ll_address);
     ipv6_register_rpl_handler(rpl_process_pid);
-#if (RPL_DEFAULT_MOP == RPL_NON_STORING_MODE)
+#if (RPL_DEFAULT_MOP == RPL_MOP_NON_STORING_MODE)
     ipv6_iface_set_srh_indicator(rpl_is_root);
 #endif
     ipv6_iface_set_routing_provider(rpl_get_next_hop);
@@ -118,7 +118,7 @@ uint8_t rpl_init(int if_id)
 
 void rpl_init_root(void)
 {
-#if (RPL_DEFAULT_MOP == RPL_NON_STORING_MODE)
+#if (RPL_DEFAULT_MOP == RPL_MOP_NON_STORING_MODE)
 #ifndef RPL_NODE_IS_ROOT
 puts("\n############################## ERROR ###############################");
 puts("This configuration has NO ROUTING TABLE available for the root node!");
@@ -137,7 +137,7 @@ uint8_t rpl_is_root(void)
     return rpl_is_root_mode();
 }
 
-#if RPL_DEFAULT_MOP == RPL_NON_STORING_MODE
+#if (RPL_DEFAULT_MOP == RPL_MOP_NON_STORING_MODE)
 void internal_srh_process(ipv6_srh_t *srh_header)
 {
     /* modify it accordingly - the number of entries is not depending on padding,
@@ -244,9 +244,9 @@ void *rpl_process(void *arg)
                 }
             }
 
-#if RPL_DEFAULT_MOP == RPL_NON_STORING_MODE
+#if RPL_DEFAULT_MOP == RPL_MOP_NON_STORING_MODE
             /* If the message is not RPL-type, it relates to non-storing mode */
-            else if (RPL_DEFAULT_MOP == RPL_NON_STORING_MODE) {
+            else if (RPL_DEFAULT_MOP == RPL_MOP_NON_STORING_MODE) {
 
                 if (ipv6_buf->nextheader == IPV6_PROTO_NUM_SRH) {
                     srh_header = ((ipv6_srh_t *)(m_recv.content.ptr + IPV6_HDR_LEN));
@@ -452,7 +452,7 @@ ipv6_addr_t *rpl_get_next_hop(ipv6_addr_t *addr)
                     ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, &rpl_routing_table[i].address));
         }
 
-        if ((RPL_DEFAULT_MOP == RPL_NON_STORING_MODE) && rpl_is_root()) {
+        if ((RPL_DEFAULT_MOP == RPL_MOP_NON_STORING_MODE) && rpl_is_root()) {
             if (rpl_routing_table[i].used && rpl_equal_id(&rpl_routing_table[i].address, addr)) {
                 DEBUGF("found %d: %s\n", i,
                         ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
@@ -550,7 +550,7 @@ rpl_routing_entry_t *rpl_get_routing_table(void)
 #endif
 }
 
-#if RPL_DEFAULT_MOP == RPL_NON_STORING_MODE
+#if RPL_DEFAULT_MOP == RPL_MOP_NON_STORING_MODE
 /* everything from here on is non-storing mode related */
 
 #if RPL_MAX_ROUTING_ENTRIES != 0

@@ -27,10 +27,10 @@ extern "C" {
 #endif
 
 /*  Default values */
-#define RPL_NO_DOWNWARD_ROUTES  0x00
-#define RPL_NON_STORING_MODE    0x01
-#define RPL_STORING_MODE_NO_MC  0x02
-#define RPL_STORING_MODE_MC     0x03
+#define RPL_MOP_NO_DOWNWARD_ROUTES  0x00
+#define RPL_MOP_NON_STORING_MODE    0x01
+#define RPL_MOP_STORING_MODE_NO_MC  0x02
+#define RPL_MOP_STORING_MODE_MC     0x03
 
 #define RPL_SEQUENCE_WINDOW         16
 /* RPL Message type */
@@ -112,8 +112,9 @@ static inline bool RPL_COUNTER_GREATER_THAN(uint8_t A, uint8_t B)
 #define METRIC_ETX 1
 
 /*  RPL Constants and Variables */
-
-#define RPL_DEFAULT_MOP RPL_STORING_MODE_NO_MC
+#ifndef RPL_DEFAULT_MOP
+#   define RPL_DEFAULT_MOP RPL_MOP_STORING_MODE_NO_MC
+#endif
 #define BASE_RANK 0
 #define INFINITE_RANK 0xFFFF
 #define RPL_DEFAULT_INSTANCE 0
@@ -141,17 +142,17 @@ static inline bool RPL_COUNTER_GREATER_THAN(uint8_t A, uint8_t B)
 #define RPL_MAX_INSTANCES 1
 #define RPL_MAX_PARENTS 5
 #ifndef RPL_MAX_ROUTING_ENTRIES
-    #if (RPL_DEFAULT_MOP == RPL_NO_DOWNWARD_ROUTES)
+    #if (RPL_DEFAULT_MOP == RPL_MOP_NO_DOWNWARD_ROUTES)
     #    define RPL_MAX_ROUTING_ENTRIES (128)
-    #elif (RPL_DEFAULT_MOP == RPL_NON_STORING_MODE)
+    #elif (RPL_DEFAULT_MOP == RPL_MOP_NON_STORING_MODE)
         #ifdef RPL_NODE_IS_ROOT
         #    define RPL_MAX_ROUTING_ENTRIES (128)
         #else
         #    define RPL_MAX_ROUTING_ENTRIES (0)
         #endif
-    #elif (RPL_DEFAULT_MOP == RPL_STORING_MODE_NO_MC)
+    #elif (RPL_DEFAULT_MOP == RPL_MOP_STORING_MODE_NO_MC)
     #    define RPL_MAX_ROUTING_ENTRIES (128)
-    #else // RPL_DEFAULT_MOP == RPL_STORING_MODE_MC
+    #else // RPL_DEFAULT_MOP == RPL_MOP_STORING_MODE_MC
     #    define RPL_MAX_ROUTING_ENTRIES (128)
     #endif
 #endif

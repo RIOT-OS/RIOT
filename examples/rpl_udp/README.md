@@ -3,26 +3,28 @@ First switch to this application directory:
 
 	cd RIOT/examples/rpl_udp
 
-#### Parameterizing the build
-The build system provides two specific parameters for the RPL module.
+The build system provides three specific parameters for the RPL module.
 These parameters are:
- * `RPL_MAX_ROUTING_ENTRIES` sets the desired maximum number of entries for the RPL routing table. _If this parameter is not provided, a [default](https://github.com/RIOT-OS/RIOT/blob/master/sys/net/include/rpl/rpl_config.h#L139) value is used._
- * `RPL_NODE_IS_ROOT` indicating the build is specifically for a root node. This parameter is **only required** for using [`RPL_NON_STORING_MODE`](https://github.com/RIOT-OS/RIOT/blob/master/sys/net/include/rpl/rpl_config.h#L31) MOP to initialize a RPL routing table. The parameter is ignored in all other cases. _For non-storing MOP a node does not require to provide a routing table._
+ * `RPL_MOP` sets the _mode of operation_ (MOP) of RPL. _The default value is used if this variable is not set._
+ * `RPL_MAX_ROUTING_ENTRIES` sets the desired maximum number of entries for the RPL routing table. _If this parameter is not provided, a default value is used._
+ * `RPL_NODE_IS_ROOT` indicating the build is specifically for a root node. This parameter is **only required** for using `RPL_MOP_NON_STORING_MODE` MOP to initialize a RPL routing table. The parameter is ignored in all other cases. _For non-storing MOP a node does not require to provide a routing table._
+
+These RPL build parameters and their according _default_ values are used in the [`rpl_config.h`](https://github.com/RIOT-OS/RIOT/blob/master/sys/net/include/rpl/rpl_config.h).
 
 #### Compiling the executable
-**example for [`RPL_STORING_MODE_NO_MC`](https://github.com/RIOT-OS/RIOT/blob/master/sys/net/include/rpl/rpl_config.h#L139):**
+**example for `RPL_MOP_STORING_MODE_MC`:**
 
-	make
+	make RPL_MOP=RPL_MOP_STORING_MODE_MC
 
 builds the project and creates `128` entries for the RPL routing table by default.
 
-	make RPL_MAX_ROUTING_ENTRIES=103
+	make RPL_MOP=RPL_MOP_STORING_MODE_MC RPL_MAX_ROUTING_ENTRIES=103
 
 builds the project and creates `103` entries for the RPL routing table **overwriting** the default value.
 
-**example for [`RPL_NON_STORING_MODE`](https://github.com/RIOT-OS/RIOT/blob/master/sys/net/include/rpl/rpl_config.h#L133):**
+**example for `RPL_MOP_NON_STORING_MODE`:**
 
-	make RPL_MAX_ROUTING_ENTRIES=103 RPL_NODE_IS_ROOT=1
+	make RPL_MOP=RPL_MOP_NON_STORING_MODE RPL_MAX_ROUTING_ENTRIES=103 RPL_NODE_IS_ROOT=1
 
 builds the project and creates `103` entries for the RPL routing table for the root node.
 
