@@ -1,3 +1,4 @@
 # Enable this after fixing https://github.com/RIOT-OS/RIOT/issues/659
 #FEATURES_PROVIDED += transceiver
 FEATURES_PROVIDED += periph_rtc
+FEATURES_MCU_GROUP = arm7

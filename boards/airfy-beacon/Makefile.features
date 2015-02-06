@@ -1,2 +1,3 @@
 FEATURES_PROVIDED += cpp
 FEATURES_PROVIDED += periph_uart periph_gpio periph_random periph_rtt periph_cpuid
+FEATURES_MCU_GROUP = cortex_m0
