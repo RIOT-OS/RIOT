@@ -5,8 +5,8 @@ First switch to this application directory:
 
 The build system provides three specific parameters for the RPL module.
 These parameters are:
- * `RPL_MOP` sets the _mode of operation_ (MOP) of RPL. _The default value is used if this variable is not set._
- * `RPL_MAX_ROUTING_ENTRIES` sets the desired maximum number of entries for the RPL routing table. _If this parameter is not provided, a default value is used._
+ * `RPL_MOP` sets the _mode of operation_ (MOP) of RPL. _The default value (`0x02`) is used if this variable is not set._
+ * `RPL_MAX_ROUTING_ENTRIES` sets the desired maximum number of entries for the RPL routing table. _If this parameter is not provided, a default value (`128`) is used._
  * `RPL_NODE_IS_ROOT` indicating the build is specifically for a root node. This parameter is **only required** for using `RPL_MOP_NON_STORING_MODE` MOP to initialize a RPL routing table. The parameter is ignored in all other cases. _For non-storing MOP a node does not require to provide a routing table._
 
 These RPL build parameters and their according _default_ values are used in the [`rpl_config.h`](https://github.com/RIOT-OS/RIOT/blob/master/sys/net/include/rpl/rpl_config.h).
