@@ -34,6 +34,9 @@
 #include "nativenet.h"
 #include "nativenet_internal.h"
 #include "cpu.h"
+#include "thread.h"
+
+#define _NATIVENET_NETDEV_RCV_EVENT (362811672) /* magic number ;-) */
 
 static _native_callback_t _nativenet_callbacks[255];
 
@@ -42,19 +45,34 @@ static volatile uint8_t rx_buffer_next;
 
 static kernel_pid_t _native_net_tpid = KERNEL_PID_UNDEF;
 
+_nativenet_netdev_more_t _nativenet_default_dev_more;
+
 /************************************************************************/
 /* nativenet.h **********************************************************/
 /************************************************************************/
 
 int _nativenet_init(netdev_t *dev)
 {
-    if ((dev->type != NETDEV_TYPE_BASE) || (dev->more == NULL)) {
+    if (dev == NULL) {
         return -ENODEV;
     }
+
+#ifdef MODULE_NETDEV_BASE
+
+    if (dev->driver != &nativenet_driver) {
+        return -ENODEV;
+    }
+
+#endif
+
+    dev->type = NETDEV_TYPE_BASE;
+    dev->event_handler = thread_getpid();
+    dev->more = (void *)(&_nativenet_default_dev_more);
 
     _NATIVENET_DEV_MORE(dev)->_channel = 0;
     _NATIVENET_DEV_MORE(dev)->_pan_id = 0;
     _NATIVENET_DEV_MORE(dev)->_is_monitoring = 0;
+    _NATIVENET_DEV_MORE(dev)->_rx_pos = -1;
     memset(_NATIVENET_DEV_MORE(dev)->_callbacks, 0,
            sizeof((_NATIVENET_DEV_MORE(dev)->_callbacks)));
 
@@ -227,17 +245,20 @@ void _nativenet_handle_packet(radio_packet_t *packet)
         notified = 1;
     }
 
-    for (int i = 0; i < NATIVENET_DEV_CB_MAX; i++) {
-        if (_NATIVENET_DEV_MORE(dev)->_callbacks[i]) {
-            _NATIVENET_DEV_MORE(dev)->_callbacks[i]((netdev_t *)dev,
-                                                    &(_nativenet_rx_buffer[rx_buffer_next].packet.src),
-                                                    sizeof(uint16_t),
-                                                    &(_nativenet_rx_buffer[rx_buffer_next].packet.dst),
-                                                    sizeof(uint16_t),
-                                                    &(_nativenet_rx_buffer[rx_buffer_next].data),
-                                                    (size_t)_nativenet_rx_buffer[rx_buffer_next].packet.length);
-            notified = 1;
-        }
+    if (dev->event_handler != KERNEL_PID_UNDEF) {
+        DEBUG("_nativenet_handle_packet: notifying netdev event handler (pid = %d)!\n",
+              dev->event_handler);
+        msg_t m;
+        m.type = NETDEV_MSG_EVENT_TYPE;
+        m.content.value = _NATIVENET_NETDEV_RCV_EVENT;
+        _NATIVENET_DEV_MORE(dev)->_rx_pos = rx_buffer_next;
+
+        msg_send_int(&m, dev->event_handler);
+
+        notified = 1;
+    }
+    else {
+        DEBUG("_nativenet_handle_packet: no event handler registered\n");
     }
 
     if (!notified) {
@@ -588,8 +609,32 @@ int _nativenet_set_state(netdev_t *dev, netdev_state_t state)
 
 void _nativenet_event(netdev_t *dev, uint32_t event_type)
 {
-    (void)dev;
-    (void)event_type;
+    switch (event_type) {
+        case _NATIVENET_NETDEV_RCV_EVENT:
+            if (_NATIVENET_DEV_MORE(dev)->_rx_pos < 0) {
+                return;
+            }
+
+            for (int i = 0; i < NATIVENET_DEV_CB_MAX; i++) {
+                int rx_pos = _NATIVENET_DEV_MORE(dev)->_rx_pos;
+                if (_NATIVENET_DEV_MORE(dev)->_callbacks[i]) {
+                    _NATIVENET_DEV_MORE(dev)->_callbacks[i]((netdev_t *)dev,
+                            &(_nativenet_rx_buffer[rx_pos].packet.src),
+                            sizeof(uint16_t),
+                            &(_nativenet_rx_buffer[rx_pos].packet.dst),
+                            sizeof(uint16_t),
+                            _nativenet_rx_buffer[rx_pos].data,
+                            (size_t)_nativenet_rx_buffer[rx_pos].packet.length);
+                }
+            }
+
+            _NATIVENET_DEV_MORE(dev)->_rx_pos = -1;
+
+            break;
+
+        default:
+            break;
+    }
 }
 
 const netdev_driver_t nativenet_driver = {
@@ -604,15 +649,9 @@ const netdev_driver_t nativenet_driver = {
     _nativenet_event,
 };
 
-_nativenet_netdev_more_t _nativenet_default_dev_more;
-netdev_t nativenet_default_dev = {NETDEV_TYPE_BASE, &nativenet_driver,
-                                  &_nativenet_default_dev_more
-                                 };
+netdev_t nativenet_default_dev = { NETDEV_TYPE_UNKNOWN, &nativenet_driver, 0, NULL };
 #else
-_nativenet_netdev_more_t _nativenet_default_dev_more;
-netdev_t nativenet_default_dev = {NETDEV_TYPE_BASE, NULL,
-                                  &_nativenet_default_dev_more
-                                 };
+netdev_t nativenet_default_dev = { NETDEV_TYPE_UNKNOWN, NULL, 0, NULL };
 #endif /* MODULE_NETDEV_BASE */
 
 /** @} */

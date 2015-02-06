@@ -94,6 +94,11 @@ typedef struct {
      * @brief   Receive data callbacks for this device
      */
     netdev_rcv_data_cb_t _callbacks[NATIVENET_DEV_CB_MAX];
+
+    /**
+     * @brief   Position in RX buffer on RX event
+     */
+    int _rx_pos;
 } _nativenet_netdev_more_t;
 
 /* internal counterpart to nativenet_default_dev */
