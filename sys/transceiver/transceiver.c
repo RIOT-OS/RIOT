@@ -64,6 +64,11 @@
 #include "ieee802154_frame.h"
 #endif
 
+#ifdef MODULE_KW2XRF
+#include "kw2xrf.h"
+#include "ieee802154_frame.h"
+#endif
+
 #define ENABLE_DEBUG (0)
 #if ENABLE_DEBUG
 #undef TRANSCEIVER_STACK_SIZE
@@ -79,7 +84,7 @@ static transceiver_type_t transceivers = TRANSCEIVER_NONE;
 static registered_t reg[TRANSCEIVER_MAX_REGISTERED];
 
 /* packet buffers */
-#if MODULE_AT86RF231 || MODULE_CC2420 || MODULE_MC1322X
+#if MODULE_AT86RF231 || MODULE_CC2420 || MODULE_MC1322X || MODULE_KW2XRF
 static ieee802154_packet_t transceiver_buffer[TRANSCEIVER_BUFFER_SIZE];
 #else
 static radio_packet_t transceiver_buffer[TRANSCEIVER_BUFFER_SIZE];
@@ -130,6 +135,9 @@ void receive_mc1322x_packet(ieee802154_packet_t *trans_p);
 #ifdef MODULE_AT86RF231
 void receive_at86rf231_packet(ieee802154_packet_t *trans_p);
 #endif
+#ifdef MODULE_KW2XRF
+void receive_kw2xrf_packet(ieee802154_packet_t *trans_p);
+#endif
 static int8_t send_packet(transceiver_type_t t, void *pkt);
 static int32_t get_channel(transceiver_type_t t);
 static int32_t set_channel(transceiver_type_t t, void *channel);
@@ -175,7 +183,7 @@ void transceiver_init(transceiver_type_t t)
     }
 
     /* check if a non defined bit is set */
-    if (t & ~(TRANSCEIVER_CC1100 | TRANSCEIVER_CC2420 | TRANSCEIVER_MC1322X | TRANSCEIVER_NATIVE | TRANSCEIVER_AT86RF231)) {
+    if (t & ~(TRANSCEIVER_CC1100 | TRANSCEIVER_CC2420 | TRANSCEIVER_MC1322X | TRANSCEIVER_NATIVE | TRANSCEIVER_AT86RF231 | TRANSCEIVER_KW2XRF)) {
         puts("Invalid transceiver type");
     }
     else {
@@ -218,6 +226,13 @@ kernel_pid_t transceiver_start(void)
     else if (transceivers & TRANSCEIVER_AT86RF231) {
         DEBUG("transceiver: Transceiver started for AT86RF231\n");
         at86rf231_init(transceiver_pid);
+    }
+
+#endif
+#ifdef MODULE_KW2XRF
+    else if (transceivers & TRANSCEIVER_KW2XRF) {
+        DEBUG("transceiver: Transceiver started for KW2XRF\n");
+        kw2xrf_init(transceiver_pid);
     }
 
 #endif
@@ -301,6 +316,7 @@ static void *run(void *arg)
             case RCV_PKT_MC1322X:
             case RCV_PKT_NATIVE:
             case RCV_PKT_AT86RF231:
+            case RCV_PKT_KW2XRF:
                 receive_packet(m.type, m.content.value);
                 break;
 
@@ -420,6 +436,10 @@ static void receive_packet(uint16_t type, uint8_t pos)
             t = TRANSCEIVER_AT86RF231;
             break;
 
+        case RCV_PKT_KW2XRF:
+            t = TRANSCEIVER_KW2XRF;
+            break;
+
         default:
             t = TRANSCEIVER_NONE;
             break;
@@ -472,6 +492,12 @@ static void receive_packet(uint16_t type, uint8_t pos)
             receive_at86rf231_packet(trans_p);
 #endif
         }
+        else if (type == RCV_PKT_KW2XRF) {
+#ifdef MODULE_KW2XRF
+            ieee802154_packet_t *trans_p = &(transceiver_buffer[transceiver_buffer_pos]);
+            receive_kw2xrf_packet(trans_p);
+#endif
+        }
         else if (type == RCV_PKT_NATIVE) {
 #ifdef MODULE_NATIVENET
             radio_packet_t *trans_p = &(transceiver_buffer[transceiver_buffer_pos]);
@@ -485,7 +511,7 @@ static void receive_packet(uint16_t type, uint8_t pos)
 
 #ifdef DBG_IGNORE
 
-#if MODULE_AT86RF231 || MODULE_CC2420 || MODULE_MC1322X
+#if MODULE_AT86RF231 || MODULE_CC2420 || MODULE_MC1322X || MODULE_KW2XRF
         radio_address_t short_addr;
         short_addr = (transceiver_buffer[transceiver_buffer_pos].frame.src_addr[1] << 8)
             | transceiver_buffer[transceiver_buffer_pos].frame.src_addr[0];
@@ -710,6 +736,48 @@ void receive_at86rf231_packet(ieee802154_packet_t *trans_p)
     DEBUG("Content: %s\n", trans_p->frame.payload);
 }
 #endif
+
+#ifdef MODULE_KW2XRF
+void receive_kw2xrf_packet(ieee802154_packet_t *trans_p)
+{
+    DEBUG("transceiver: Handling KW2XRF packet\n");
+    dINT();
+    kw2xrf_packet_t *p = &kw2xrf_rx_buffer[rx_buffer_pos];
+    trans_p->length = p->length;
+    memcpy(&trans_p->frame, &p->frame, sizeof(ieee802154_frame_t));
+    trans_p->rssi = p->rssi;
+    trans_p->crc = p->crc;
+    trans_p->lqi = p->lqi;
+    memcpy(&data_buffer[transceiver_buffer_pos * MKW2XDRF_MAX_DATA_LENGTH],
+           p->frame.payload, p->frame.payload_len);
+    trans_p->frame.payload = (uint8_t *) & (data_buffer[transceiver_buffer_pos * MKW2XDRF_MAX_DATA_LENGTH]);
+    eINT();
+
+#ifdef DEBUG_ENABLED
+
+    DEBUG("Packet %p, size: %u:\n", trans_p, trans_p->frame.payload_len);
+    if (trans_p->frame.fcf.src_addr_m == IEEE_802154_SHORT_ADDR_M) {
+        DEBUG("\tfrom %" PRIx16 "\n", *((uint16_t *) &trans_p->frame.src_addr[0])); 
+    }
+
+    if (trans_p->frame.fcf.src_addr_m == IEEE_802154_LONG_ADDR_M) {
+        DEBUG("\tfrom %016" PRIx64 "\n", *((uint64_t *) &trans_p->frame.src_addr[0]));
+    }
+
+    if (trans_p->frame.fcf.dest_addr_m == IEEE_802154_SHORT_ADDR_M) {
+        DEBUG("\tto %" PRIx16 "\n", *((uint16_t *) &trans_p->frame.dest_addr[0])); 
+    }
+
+    if (trans_p->frame.fcf.dest_addr_m == IEEE_802154_LONG_ADDR_M) {
+        DEBUG("\tto %016" PRIx64 "\n", *((uint64_t *) &trans_p->frame.dest_addr[0]));
+    }
+
+#endif
+    trans_p->frame.payload = (uint8_t *) &(data_buffer[transceiver_buffer_pos * MKW2XDRF_MAX_DATA_LENGTH]);
+    trans_p->frame.payload_len = p->frame.payload_len;
+    DEBUG("transceiver: Content: %s\n", trans_p->frame.payload);
+}
+#endif
 /*------------------------------------------------------------------------------------*/
 /*
  * @brief Sends a radio packet to the receiver
@@ -723,7 +791,7 @@ void receive_at86rf231_packet(ieee802154_packet_t *trans_p)
 static int8_t send_packet(transceiver_type_t t, void *pkt)
 {
     int8_t res = -1;
-#if MODULE_AT86RF231 || MODULE_CC2420 || MODULE_MC1322X
+#if MODULE_AT86RF231 || MODULE_CC2420 || MODULE_MC1322X || MODULE_KW2XRF
     ieee802154_packet_t *p = (ieee802154_packet_t *)pkt;
     DEBUG("transceiver: Send packet to ");
 #if ENABLE_DEBUG
@@ -757,6 +825,10 @@ static int8_t send_packet(transceiver_type_t t, void *pkt)
 
 #ifdef MODULE_AT86RF231
     at86rf231_packet_t at86rf231_pkt;
+#endif
+
+#ifdef MODULE_KW2XRF
+    kw2xrf_packet_t kw2xrf_pkt;
 #endif
 
     switch (t) {
@@ -805,6 +877,14 @@ static int8_t send_packet(transceiver_type_t t, void *pkt)
             memcpy(&at86rf231_pkt.frame, &p->frame, sizeof(ieee802154_frame_t));
             at86rf231_pkt.length = p->frame.payload_len + IEEE_802154_FCS_LEN;
             res = at86rf231_send(&at86rf231_pkt);
+            break;
+#endif
+#ifdef MODULE_KW2XRF
+
+        case TRANSCEIVER_KW2XRF:
+            memcpy(&kw2xrf_pkt.frame, &p->frame, sizeof(ieee802154_frame_t));
+            kw2xrf_pkt.length = p->frame.payload_len + IEEE_802154_FCS_LEN;
+            res = kw2xrf_send(&kw2xrf_pkt);
             break;
 #endif
 
@@ -861,6 +941,11 @@ static int32_t set_channel(transceiver_type_t t, void *channel)
         case TRANSCEIVER_AT86RF231:
             return at86rf231_set_channel(c);
 #endif
+#ifdef MODULE_KW2XRF
+
+        case TRANSCEIVER_KW2XRF:
+            return kw2xrf_set_channel(c);
+#endif
 
         default:
             return -1;
@@ -906,6 +991,11 @@ static int32_t get_channel(transceiver_type_t t)
         case TRANSCEIVER_AT86RF231:
             return at86rf231_get_channel();
 #endif
+#ifdef MODULE_KW2XRF
+
+        case TRANSCEIVER_KW2XRF:
+            return kw2xrf_get_channel();
+#endif
 
         default:
             return -1;
@@ -946,7 +1036,11 @@ static int32_t set_pan(transceiver_type_t t, void *pan)
         case TRANSCEIVER_MC1322X:
             return maca_set_pan(c);
 #endif
+#ifdef MODULE_KW2XRF
 
+        case TRANSCEIVER_KW2XRF:
+            return kw2xrf_set_pan(c);
+#endif
         default:
             /* get rid of compiler warning about unused variable */
             (void) c;
@@ -983,6 +1077,11 @@ static int32_t get_pan(transceiver_type_t t)
 
         case TRANSCEIVER_MC1322X:
             return maca_get_pan();
+#endif
+#ifdef MODULE_KW2XRF
+
+        case TRANSCEIVER_KW2XRF:
+            return kw2xrf_get_pan();
 #endif
 
         default:
@@ -1029,6 +1128,11 @@ static radio_address_t get_address(transceiver_type_t t)
 
         case TRANSCEIVER_AT86RF231:
             return at86rf231_get_address();
+#endif
+#ifdef MODULE_KW2XRF
+
+        case TRANSCEIVER_KW2XRF:
+            return kw2xrf_get_address();
 #endif
 
         default:
@@ -1081,6 +1185,11 @@ static radio_address_t set_address(transceiver_type_t t, void *address)
         case TRANSCEIVER_AT86RF231:
             return at86rf231_set_address(addr);
 #endif
+#ifdef MODULE_KW2XRF
+
+        case TRANSCEIVER_KW2XRF:
+            return kw2xrf_set_address(addr);
+#endif
 
         default:
             return 0; /* XXX see TODO above */
@@ -1106,6 +1215,11 @@ static transceiver_eui64_t get_long_addr(transceiver_type_t t)
 
         case TRANSCEIVER_AT86RF231:
             return at86rf231_get_address_long();
+#endif
+#ifdef MODULE_KW2XRF
+
+        case TRANSCEIVER_KW2XRF:
+            return kw2xrf_get_address_long();
 #endif
 
         default:
@@ -1135,6 +1249,11 @@ static transceiver_eui64_t set_long_addr(transceiver_type_t t, void *address)
 
         case TRANSCEIVER_AT86RF231:
             return at86rf231_set_address_long(addr);
+#endif
+#ifdef MODULE_KW2XRF
+
+        case TRANSCEIVER_KW2XRF:
+            return kw2xrf_set_address_long(addr);
 #endif
 
         default:
@@ -1176,6 +1295,11 @@ static void set_monitor(transceiver_type_t t, void *mode)
 
         case TRANSCEIVER_AT86RF231:
             at86rf231_set_monitor(*((uint8_t *) mode));
+#endif
+#ifdef MODULE_KW2XRF
+
+        case TRANSCEIVER_KW2XRF:
+            kw2xrf_set_monitor(*((uint8_t *) mode));
 #endif
 
         default:
@@ -1250,6 +1374,11 @@ static void switch_to_rx(transceiver_type_t t)
 
         case TRANSCEIVER_AT86RF231:
             at86rf231_switch_to_rx();
+#endif
+#ifdef MODULE_KW2XRF
+
+        case TRANSCEIVER_KW2XRF:
+            kw2xrf_switch_to_rx();
 #endif
 
         default:

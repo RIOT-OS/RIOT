@@ -317,7 +317,7 @@ int net_if_send_packet(int if_id, uint16_t target, const void *payload,
         return -1;
     }
 
-    if (interfaces[if_id].transceivers & (TRANSCEIVER_CC2420 | TRANSCEIVER_AT86RF231 | TRANSCEIVER_MC1322X)) {
+    if (interfaces[if_id].transceivers & (TRANSCEIVER_CC2420 | TRANSCEIVER_AT86RF231 | TRANSCEIVER_MC1322X | TRANSCEIVER_KW2XRF)) {
         ieee802154_packet_t p;
 
         memset(&p, 0, sizeof(ieee802154_packet_t));
@@ -364,7 +364,8 @@ int net_if_send_packet_long(int if_id, net_if_eui64_t *target,
 
     if (interfaces[if_id].transceivers & (TRANSCEIVER_CC2420 |
                                           TRANSCEIVER_AT86RF231 |
-                                          TRANSCEIVER_MC1322X)) {
+                                          TRANSCEIVER_MC1322X |
+                                          TRANSCEIVER_KW2XRF)) {
         ieee802154_packet_t p;
         memset(&p, 0, sizeof(ieee802154_packet_t));
         p.frame.payload = (uint8_t *)payload;

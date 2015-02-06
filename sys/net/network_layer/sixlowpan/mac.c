@@ -67,6 +67,7 @@ static void *recv_ieee802154_frame(void *arg)
     msg_t m;
 #if (defined(MODULE_AT86RF231) | \
      defined(MODULE_CC2420) | \
+     defined(MODULE_KW2XRF) | \
      defined(MODULE_MC1322X))
     ieee802154_packet_t *p;
 #else
@@ -85,6 +86,7 @@ static void *recv_ieee802154_frame(void *arg)
         if (m.type == PKT_PENDING) {
 #if (defined(MODULE_AT86RF231) | \
      defined(MODULE_CC2420) | \
+     defined(MODULE_KW2XRF) | \
      defined(MODULE_MC1322X))
             p = (ieee802154_packet_t *) m.content.ptr;
             memcpy(&frame, &p->frame, sizeof(ieee802154_frame_t));

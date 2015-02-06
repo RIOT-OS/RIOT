@@ -119,6 +119,9 @@ void auto_init_net_if(void)
 #ifdef MODULE_NATIVENET
     transceivers |= TRANSCEIVER_NATIVE;
 #endif
+#ifdef MODULE_KW2XRF
+    transceivers |= TRANSCEIVER_KW2XRF;
+#endif
     net_if_init();
 
     if (transceivers != 0) {
