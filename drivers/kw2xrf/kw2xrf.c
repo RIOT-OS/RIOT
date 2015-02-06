@@ -28,6 +28,7 @@
 #include "thread.h"
 #include "periph_conf.h"
 #include "periph/gpio.h"
+#include "transceiver.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
@@ -120,6 +121,14 @@ void kw2xrf_init_interrupts(void)
     reg |= MKW2XDM_PHY_CTRL4_PROMISCUOUS;
     kw2xrf_write_dreg(MKW2XDM_PHY_CTRL4, reg);
 }
+
+#ifdef MODULE_TRANSCEIVER
+void kw2xrf_init(kernel_pid_t tpid)
+{
+    transceiver_pid = tpid;
+    kw2xrf_initialize(&kw2xrf_netdev);
+}
+#endif
 
 int kw2xrf_initialize(netdev_t *dev)
 {

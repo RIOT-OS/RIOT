@@ -165,6 +165,16 @@ void kw2xrf_rx_handler(void)
 
 #endif
 
+#ifdef MODULE_TRANSCEIVER
+        /* notify transceiver thread if any */
+        if (transceiver_pid != KERNEL_PID_UNDEF) {
+            msg_t m;
+            m.type = (uint16_t) RCV_PKT_KW2XRF;
+            m.content.value = rx_buffer_next;
+            msg_send_int(&m, transceiver_pid);
+        }
+#endif
+
 #ifdef DEBUG
     else {
         DEBUG("GOT ACK for SEQ %u\n", kw2xrf_rx_buffer[rx_buffer_next].frame.seq_nr);
