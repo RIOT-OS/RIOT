@@ -351,7 +351,7 @@ int test_net_if_get_set_pan_id(int iface)
         return 0;
     }
 
-#if MODULE_AT86RF231 || MODULE_CC2420 || MODULE_MC1322X
+#if MODULE_AT86RF231 || MODULE_CC2420 || MODULE_MC1322X || MODULE_KW2XRF
     int32_t res = net_if_get_pan_id(iface);
     if (res < 0) {
         printf("FAILED: net_if_get_pan_id(%d) failed\n", iface);
@@ -400,7 +400,7 @@ int test_net_if_get_set_eui64(int iface, net_if_eui64_t *eui64,
         return 0;
     }
 
-#if MODULE_AT86RF231 || MODULE_CC2420 || MODULE_MC1322X
+#if MODULE_AT86RF231 || MODULE_CC2420 || MODULE_MC1322X || MODULE_KW2XRF
     eui64->uint8[0] = 0x11;
     eui64->uint8[1] = 0x22;
     eui64->uint8[2] = 0x33;
