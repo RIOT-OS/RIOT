@@ -55,6 +55,15 @@ extern "C" {
  */
 #define CPUID_ID_LEN                    (8)
 
+/**
+ * @brief Definition of different panic modes
+ */
+typedef enum {
+    HARD_FAULT,             /**< hard fault */
+    NMI_HANDLER,            /**< non maskable interrupt */
+    DUMMY_HANDLER           /**< dummy interrupt handler */
+} panic_t;
+
 #ifdef __cplusplus
 }
 #endif
