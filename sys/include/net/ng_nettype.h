@@ -51,7 +51,6 @@ typedef enum {
     /**
      * @{
      * @name Transport layer
-     *
      */
 #ifdef MODULE_NG_TCP
     NG_NETTYPE_TCP,             /**< Protocol is TCP */
@@ -62,6 +61,15 @@ typedef enum {
     /**
      * @}
      */
+
+
+    /**
+     * @{
+     * @name Testing
+     */
+#ifdef TEST_SUITES
+    NG_NETTYPE_TEST,
+#endif
 
     NG_NETTYPE_NUMOF,           /**< maximum number of available protocols */
 } ng_nettype_t;
