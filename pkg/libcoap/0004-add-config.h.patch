@@ -1,64 +1,54 @@
-From 8be22676f13bd7d254378e2c04119e1632ed55d7 Mon Sep 17 00:00:00 2001
-From: Martin Lenders <mail@martin-lenders.de>
-Date: Thu, 31 Oct 2013 14:02:07 +0100
-Subject: [PATCH 2/4] Add config.h
+From 9d59097b4e66af0457dad546a95b5fd3130ee756 Mon Sep 17 00:00:00 2001
+From: Sebastian Sontberg <sebastian@sontberg.de>
+Date: Thu, 18 Dec 2014 02:54:49 +0100
+Subject: [PATCH 4/4] add config.h
 
 ---
- config.h | 131 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 131 insertions(+)
+ config.h | 126 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 126 insertions(+)
  create mode 100644 config.h
 
 diff --git a/config.h b/config.h
 new file mode 100644
-index 0000000..8915dd3
+index 0000000..575ac95
 --- /dev/null
 +++ b/config.h
-@@ -0,0 +1,131 @@
-+/* config.h.  Generated from config.h.in by configure.  */
-+/* config.h.in.  Generated from configure.in by autoheader.  */
+@@ -0,0 +1,126 @@
++#include "net_help.h"
 +
-+/* Define if building universal (internal helper macro) */
-+/* #undef AC_APPLE_UNIVERSAL_BUILD */
-+
-+/* Define to 1 if you have the <arpa/inet.h> header file. */
-+#define HAVE_ARPA_INET_H 1
++#define	htons(hostshort) HTONS(hostshort)
++#define ntohs(netshort) NTOHS(netshort)
 +
 +/* Define to 1 if you have the <assert.h> header file. */
 +#define HAVE_ASSERT_H 1
 +
-+/* Define to 1 if you have the `getaddrinfo' function. */
-+/* #undef HAVE_GETADDRINFO */
-+
 +/* Define to 1 if you have the <inttypes.h> header file. */
 +#define HAVE_INTTYPES_H 1
 +
-+/* Define to 1 if you have the `coap' library (-lcoap). */
-+/* #undef HAVE_LIBCOAP */
-+
-+/* Define to 1 if you have the <limits.h> header file. */
-+/* #undef HAVE_LIMITS_H */
++#ifndef UINT_MAX
++#define UINT_MAX ((unsigned) -1ul)
++#endif
 +
 +/* Define to 1 if your system has a GNU libc compatible `malloc' function, and
 +   to 0 otherwise. */
 +#define HAVE_MALLOC 0
 +
-+/* Define to 1 if you have the <memory.h> header file. */
 +/* #undef HAVE_MEMORY_H */
 +
-+/* Define to 1 if you have the `memset' function. */
 +#define HAVE_MEMSET 1
 +
 +/* Define to 1 if you have the <netdb.h> header file. */
 +/* #undef HAVE_NETDB_H */
 +
 +/* Define to 1 if you have the <netinet/in.h> header file. */
-+#define HAVE_NETINET_IN_H 1
++/* #define HAVE_NETINET_IN_H 1 */
++
 +
 +/* Define to 1 if you have the `select' function. */
 +/* #undef HAVE_SELECT */
 +
 +/* Define to 1 if you have the `socket' function. */
-+#define HAVE_SOCKET 1
++/* #define HAVE_SOCKET 1 */
 +
 +/* Define to 1 if you have the <stdint.h> header file. */
 +#define HAVE_STDINT_H 1
@@ -82,7 +72,7 @@ index 0000000..8915dd3
 +#define HAVE_STRRCHR 1
 +
 +/* Define to 1 if you have the <sys/socket.h> header file. */
-+#define HAVE_SYS_SOCKET_H 1
++/* #define HAVE_SYS_SOCKET_H 1 */
 +
 +/* Define to 1 if you have the <sys/stat.h> header file. */
 +/* #undef HAVE_SYS_STAT_H */
@@ -145,6 +135,11 @@ index 0000000..8915dd3
 +/* #undef ssize_t */
 +
 +#define WITH_POSIX 1
---
-1.8.3.2
++#define WITH_RIOT 1
++
++#define CUSTOM_COAP_NETWORK_ENDPOINT
++#define CUSTOM_COAP_NETWORK_SEND
++#define CUSTOM_COAP_NETWORK_READ
+-- 
+1.9.3
 
