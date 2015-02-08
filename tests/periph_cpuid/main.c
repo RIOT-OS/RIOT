@@ -13,7 +13,7 @@
  * @file
  * @brief GET_CPU_ID() test application
  *
- * @author Martin Lenders <mlenders@inf.fu-berlin.de>
+ * @author Martine Lenders <mlenders@inf.fu-berlin.de>
  * @author Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
  * @}

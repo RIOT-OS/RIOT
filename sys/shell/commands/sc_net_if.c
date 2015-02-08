@@ -1,7 +1,7 @@
 /*
  * Shell commands for network interfaces
  *
- * Copyright (C) 2013 Martin Lenders
+ * Copyright (C) 2013 Martine Lenders
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -13,7 +13,7 @@
  * @{
  * @file    sc_net_if.c
  * @brief   provides shell commands to configure network interfaces
- * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
+ * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  * @}
  */
 

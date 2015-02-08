@@ -37,7 +37,7 @@
  * @file        sixlowpan.h
  * @brief       6lowpan link layer and lowpan functions
  *
- * @author      Martin Lenders <mlenders@inf.fu-berlin.de>
+ * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 #ifndef SIXLOWPAN_H
 #define SIXLOWPAN_H

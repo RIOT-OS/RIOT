@@ -18,7 +18,7 @@
  *              The Open Group Base Specifications Issue 7, <sys/socket.h>
  *          </a>
  *
- * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
+ * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 #ifndef _SYS_SOCKET_H
 #define _SYS_SOCKET_H

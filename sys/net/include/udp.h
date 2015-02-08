@@ -19,7 +19,7 @@
  * @file
  * @brief   udp functions
  * @author  Oliver Gesch <oliver.gesch@googlemail.com>
- * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
+ * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  * @author  Cenk Gündoğan <cnkgndgn@gmail.com>
  */
 

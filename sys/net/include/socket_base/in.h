@@ -23,7 +23,7 @@
  *          IANA - Protocol Numbers
  *      </a>
  * @author  Oliver Gesch <oliver.gesch@googlemail.com>
- * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
+ * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 
 #ifndef SOCKET_BASE_IN_H
