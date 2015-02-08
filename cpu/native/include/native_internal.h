@@ -111,7 +111,7 @@ extern int (*real_pipe)(int[2]);
 /* The ... is a hack to save includes: */
 extern int (*real_select)(int nfds, ...);
 extern int (*real_setitimer)(int which, const struct itimerval
-        *restrict value, struct itimerval *restrict ovalue);
+        *__restrict value, struct itimerval *__restrict ovalue);
 extern int (*real_setsockopt)(int socket, ...);
 extern int (*real_socket)(int domain, int type, int protocol);
 extern int (*real_printf)(const char *format, ...);

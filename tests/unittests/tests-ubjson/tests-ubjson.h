@@ -37,8 +37,8 @@
 extern "C" {
 #endif
 
-ssize_t test_ubjson_write_fun(ubjson_cookie_t *restrict cookie, const void *buf, size_t len);
-ssize_t test_ubjson_read_fun(ubjson_cookie_t *restrict cookie, void *buf, size_t len);
+ssize_t test_ubjson_write_fun(ubjson_cookie_t *__restrict cookie, const void *buf, size_t len);
+ssize_t test_ubjson_read_fun(ubjson_cookie_t *__restrict cookie, void *buf, size_t len);
 
 void test_ubjson_test(void (*sender_fun)(void), void (*receiver_fun)(void));
 
