@@ -10,7 +10,7 @@
  * @{
  * @file    fd.c
  * @brief   Providing implementation for close for fds defined in fd.h.
- * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
+ * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  * @author  Christian Mehlis <mehlis@inf.fu-berlin.de>
  */
 #include <errno.h>

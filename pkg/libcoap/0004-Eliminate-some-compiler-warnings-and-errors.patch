@@ -1,5 +1,5 @@
 From 48906fde395dc05c18606ddf3abce5947ab6a1c6 Mon Sep 17 00:00:00 2001
-From: Martin Lenders <mail@martin-lenders.de>
+From: Martine Lenders <mlenders@inf.fu-berlin.de>
 Date: Wed, 19 Feb 2014 02:24:50 +0100
 Subject: [PATCH 4/4] Eliminate some compiler warnings and errors
 

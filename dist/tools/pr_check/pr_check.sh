@@ -1,6 +1,6 @@
 #! /bin/bash
 #
-# Copyright (C) 2014 Martin Lenders <mlenders@inf.fu-berlin.de>
+# Copyright (C) 2014 Martine Lenders <mlenders@inf.fu-berlin.de>
 #
 # This file is subject to the terms and conditions of the GNU Lesser
 # General Public License v2.1. See the file LICENSE in the top level

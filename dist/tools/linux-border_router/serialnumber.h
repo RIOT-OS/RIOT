@@ -8,7 +8,7 @@
 
 /**
  * @file    serialnumber.h
- * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
+ * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  * @brief   Serial number arithmetics after RFC 1982, section 3
  */
 

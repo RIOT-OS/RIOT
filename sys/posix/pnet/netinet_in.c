@@ -10,7 +10,7 @@
  * @{
  * @file    netinet_in.c
  * @brief   Providing values for in6addr_any and in6addr_loopback.
- * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
+ * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 #include <netinet/in.h>
 

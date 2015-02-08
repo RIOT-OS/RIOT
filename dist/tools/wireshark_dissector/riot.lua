@@ -1,7 +1,7 @@
 -- RIOT native support for Wireshark
 -- A Lua implementation for dissection of RIOT native packets in wireshark
 -- @Version: 0.0.1
--- @Author: Martin Lenders
+-- @Author: Martine Lenders
 -- @E-Mail: mlenders@inf.fu-berlin.de
 
 do

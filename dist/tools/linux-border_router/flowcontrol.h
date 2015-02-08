@@ -8,7 +8,7 @@
 
 /**
  * @file    flowcontrol.h
- * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
+ * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  * @brief   Public declarations for the flow control jobs via the
  *          serial interface for the 6LoWPAN Border Router driver.
  */

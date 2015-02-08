@@ -10,7 +10,7 @@
  * @{
  * @file    strings.c
  * @brief   Providing implementation for prototypes defined in strings.h.
- * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
+ * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 #include <strings.h>
 #include <ctype.h>

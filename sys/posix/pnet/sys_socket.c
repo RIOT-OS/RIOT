@@ -10,7 +10,7 @@
  * @{
  * @file    sys_socket.c
  * @brief   Providing implementation for POSIX socket wrapper.
- * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
+ * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 #include <errno.h>
 

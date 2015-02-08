@@ -14,7 +14,7 @@
  * @brief       6LoWPAN data structs, and prototypes for MAC layer
  *
  * @author      Stephan Zeisberg <zeisberg@mi.fu-berlin.de>
- * @author      Martin Lenders <mlenders@inf.fu-berlin.de>
+ * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  * @author      Eric Engel <eric.engel@fu-berlin.de>
  * @author      Oliver Gesch <oliver.gesch@googlemail.com>
  */

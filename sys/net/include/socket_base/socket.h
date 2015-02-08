@@ -15,7 +15,7 @@
  *          IEEE Std 1003.1, 2013 Edition - sys/socket.h
  *      </a>
  * @author  Oliver Gesch <oliver.gesch@googlemail.com>
- * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
+ * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 
 

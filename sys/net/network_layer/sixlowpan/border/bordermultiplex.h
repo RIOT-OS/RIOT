@@ -11,7 +11,7 @@
  * @{
  * @file    bordermultiplex.h
  * @brief   data structs for border router multiplexing
- * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
+ * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  * @author  Oliver Hahm <oliver.hahm@inria.fr>
  * @}
  */
