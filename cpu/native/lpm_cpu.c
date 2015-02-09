@@ -24,6 +24,9 @@
 #include <errno.h>
 #endif
 #include <err.h>
+#ifdef FEATURE_PERIPH_FLASH
+#include <sys/mman.h>
+#endif
 
 #include "lpm.h"
 #include "debug.h"
@@ -129,6 +132,13 @@ enum lpm_mode lpm_set(enum lpm_mode target)
 
         case LPM_OFF:
             printf("lpm_set(): exit()\n");
+#ifdef FEATURE_PERIPH_FLASH
+            if (_native_flash_fd != -1) {
+                /* casting to discard volatile */
+                real_munmap((void *)_native_flash_memory, _native_flash_size);
+                real_close(_native_flash_fd);
+            }
+#endif
             real_exit(EXIT_SUCCESS);
 
         default:

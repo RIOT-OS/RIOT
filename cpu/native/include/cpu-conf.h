@@ -68,6 +68,16 @@ extern "C" {
 #define CPUID_ID_LEN                    (4)
 #endif
 
+/**
+ * @name CPU Flash configuration
+ * @{
+ */
+#define FLASH_PAGE_SIZE         (1024)  /**< page size of flash memory */
+#define FLASH_NUM_PAGES         (256)   /**< number of flash pages */
+#define FLASH_WRITE_ALIGN       (4)     /**< number of bytes which must be written at once */
+#define FLASH_ERASED_WORD_VALUE (0x00)  /**< value of erased data words */
+/* @} */
+
 #ifdef __cplusplus
 }
 #endif
