@@ -249,8 +249,8 @@ void rpl_send_DIO_mode(ipv6_addr_t *destination)
     rpl_send_dio_buf->rpl_instanceid = mydodag->instance->id;
     DEBUG("instance %02X ", rpl_send_dio_buf->rpl_instanceid);
     rpl_send_dio_buf->version_number = mydodag->version;
-    rpl_send_dio_buf->rank = mydodag->my_rank;
-    DEBUG("rank %04X\n", rpl_send_dio_buf->rank);
+    rpl_send_dio_buf->rank = byteorder_htons(mydodag->my_rank);
+    DEBUG("rank %04X\n", byteorder_ntohs(rpl_send_dio_buf->rank));
     rpl_send_dio_buf->g_mop_prf = (mydodag->grounded << RPL_GROUNDED_SHIFT) |
             (mydodag->mop << RPL_MOP_SHIFT) | mydodag->prf;
     rpl_send_dio_buf->dtsn = mydodag->dtsn;
@@ -267,12 +267,12 @@ void rpl_send_DIO_mode(ipv6_addr_t *destination)
     rpl_send_opt_dodag_conf_buf->DIOIntDoubl = mydodag->dio_interval_doubling;
     rpl_send_opt_dodag_conf_buf->DIOIntMin = mydodag->dio_min;
     rpl_send_opt_dodag_conf_buf->DIORedun = mydodag->dio_redundancy;
-    rpl_send_opt_dodag_conf_buf->MaxRankIncrease = mydodag->maxrankincrease;
-    rpl_send_opt_dodag_conf_buf->MinHopRankIncrease = mydodag->minhoprankincrease;
-    rpl_send_opt_dodag_conf_buf->ocp = mydodag->of->ocp;
+    rpl_send_opt_dodag_conf_buf->MaxRankIncrease = byteorder_htons(mydodag->maxrankincrease);
+    rpl_send_opt_dodag_conf_buf->MinHopRankIncrease = byteorder_htons(mydodag->minhoprankincrease);
+    rpl_send_opt_dodag_conf_buf->ocp = byteorder_htons(mydodag->of->ocp);
     rpl_send_opt_dodag_conf_buf->reserved = 0;
     rpl_send_opt_dodag_conf_buf->default_lifetime = mydodag->default_lifetime;
-    rpl_send_opt_dodag_conf_buf->lifetime_unit = mydodag->lifetime_unit;
+    rpl_send_opt_dodag_conf_buf->lifetime_unit = byteorder_htons(mydodag->lifetime_unit);
 
     opt_hdr_len += RPL_OPT_DODAG_CONF_LEN_WITH_OPT_LEN;
 
@@ -419,7 +419,7 @@ void rpl_recv_DIO_mode(void)
 
     rpl_dio_buf = get_rpl_dio_buf();
     DEBUGF("instance %04X ", rpl_dio_buf->rpl_instanceid);
-    DEBUGF("rank %04X\n", rpl_dio_buf->rank);
+    DEBUGF("rank %04X\n", byteorder_ntohs(rpl_dio_buf->rank));
     int len = DIO_BASE_LEN;
 
     rpl_instance_t *dio_inst = rpl_get_instance(rpl_dio_buf->rpl_instanceid);
@@ -509,11 +509,11 @@ void rpl_recv_DIO_mode(void)
                 dio_dodag.dio_interval_doubling = rpl_opt_dodag_conf_buf->DIOIntDoubl;
                 dio_dodag.dio_min = rpl_opt_dodag_conf_buf->DIOIntMin;
                 dio_dodag.dio_redundancy = rpl_opt_dodag_conf_buf->DIORedun;
-                dio_dodag.maxrankincrease = rpl_opt_dodag_conf_buf->MaxRankIncrease;
-                dio_dodag.minhoprankincrease = rpl_opt_dodag_conf_buf->MinHopRankIncrease;
+                dio_dodag.maxrankincrease = byteorder_ntohs(rpl_opt_dodag_conf_buf->MaxRankIncrease);
+                dio_dodag.minhoprankincrease = byteorder_ntohs(rpl_opt_dodag_conf_buf->MinHopRankIncrease);
                 dio_dodag.default_lifetime = rpl_opt_dodag_conf_buf->default_lifetime;
-                dio_dodag.lifetime_unit = rpl_opt_dodag_conf_buf->lifetime_unit;
-                dio_dodag.of = (struct rpl_of_t *) rpl_get_of_for_ocp(rpl_opt_dodag_conf_buf->ocp);
+                dio_dodag.lifetime_unit = byteorder_ntohs(rpl_opt_dodag_conf_buf->lifetime_unit);
+                dio_dodag.of = (struct rpl_of_t *) rpl_get_of_for_ocp(byteorder_ntohs(rpl_opt_dodag_conf_buf->ocp));
                 len += RPL_OPT_DODAG_CONF_LEN_WITH_OPT_LEN;
                 break;
             }
@@ -543,7 +543,7 @@ void rpl_recv_DIO_mode(void)
             rpl_send_DIS(&ipv6_buf->srcaddr);
         }
 
-        if (rpl_dio_buf->rank < ROOT_RANK) {
+        if (byteorder_ntohs(rpl_dio_buf->rank) < ROOT_RANK) {
             DEBUGF("DIO with Rank < ROOT_RANK\n");
         }
 
@@ -555,9 +555,9 @@ void rpl_recv_DIO_mode(void)
             DEBUGF("Required objective function not supported\n");
         }
 
-        if (rpl_dio_buf->rank != INFINITE_RANK) {
+        if (byteorder_ntohs(rpl_dio_buf->rank) != INFINITE_RANK) {
             DEBUGF("Will join DODAG\n");
-            rpl_join_dodag(&dio_dodag, &ipv6_buf->srcaddr, rpl_dio_buf->rank);
+            rpl_join_dodag(&dio_dodag, &ipv6_buf->srcaddr, byteorder_ntohs(rpl_dio_buf->rank));
         }
         else {
             DEBUGF("Cannot access DODAG because of DIO with infinite rank\n");
@@ -576,7 +576,7 @@ void rpl_recv_DIO_mode(void)
             }
             else {
                 DEBUGF("my dodag has no preferred_parent yet - seems to be odd since I have a parent.\n");
-                rpl_global_repair(&dio_dodag, &ipv6_buf->srcaddr, rpl_dio_buf->rank);
+                rpl_global_repair(&dio_dodag, &ipv6_buf->srcaddr, byteorder_ntohs(rpl_dio_buf->rank));
             }
 
             return;
@@ -589,13 +589,13 @@ void rpl_recv_DIO_mode(void)
     }
 
     /* version matches, DODAG matches */
-    if (rpl_dio_buf->rank == INFINITE_RANK) {
+    if (byteorder_ntohs(rpl_dio_buf->rank) == INFINITE_RANK) {
         trickle_reset_timer(&my_dodag->trickle);
     }
 
     /* We are root, all done!*/
     if (my_dodag->my_rank == ROOT_RANK) {
-        if (rpl_dio_buf->rank != INFINITE_RANK) {
+        if (byteorder_ntohs(rpl_dio_buf->rank) != INFINITE_RANK) {
             trickle_increment_counter(&my_dodag->trickle);
         }
 
@@ -609,7 +609,7 @@ void rpl_recv_DIO_mode(void)
 
     if (parent == NULL) {
         /* add new parent candidate */
-        parent = rpl_new_parent(my_dodag, &ipv6_buf->srcaddr, rpl_dio_buf->rank);
+        parent = rpl_new_parent(my_dodag, &ipv6_buf->srcaddr, byteorder_ntohs(rpl_dio_buf->rank));
 
         if (parent == NULL) {
             return;
@@ -621,7 +621,7 @@ void rpl_recv_DIO_mode(void)
     }
 
     /* update parent rank */
-    parent->rank = rpl_dio_buf->rank;
+    parent->rank = byteorder_ntohs(rpl_dio_buf->rank);
     rpl_parent_update(parent);
 
     if (my_dodag->my_preferred_parent == NULL) {

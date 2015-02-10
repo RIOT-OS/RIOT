@@ -35,7 +35,7 @@ extern "C" {
 typedef struct __attribute__((packed)) {
     uint8_t rpl_instanceid;
     uint8_t version_number;
-    uint16_t rank;
+    network_uint16_t rank;
     uint8_t g_mop_prf;
     uint8_t dtsn;
     uint8_t flags;
@@ -84,12 +84,12 @@ typedef struct __attribute__((packed)) {
     uint8_t DIOIntDoubl;
     uint8_t DIOIntMin;
     uint8_t DIORedun;
-    uint16_t MaxRankIncrease;
-    uint16_t MinHopRankIncrease;
-    uint16_t ocp;
+    network_uint16_t MaxRankIncrease;
+    network_uint16_t MinHopRankIncrease;
+    network_uint16_t ocp;
     uint8_t reserved;
     uint8_t default_lifetime;
-    uint16_t lifetime_unit;
+    network_uint16_t lifetime_unit;
 } rpl_opt_dodag_conf_t;
 
 /* RPL Solicited Information Option (RFC 6550 Fig. 28) */
