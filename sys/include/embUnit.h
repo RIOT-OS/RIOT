@@ -9,6 +9,9 @@
 /**
  * @defgroup unittests Unittests
  * @ingroup  sys
+ *
+ * @note
+ * Please refer to https://github.com/RIOT-OS/RIOT/wiki/Testing-RIOT
  * @{
  *
  * @file
