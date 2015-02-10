@@ -1286,6 +1286,7 @@ void lowpan_iphc_decoding(uint8_t *data, uint8_t length, net_if_eui64_t *s_addr,
 
         if (con == NULL) {
             printf("ERROR: context not found\n");
+            mutex_unlock(&lowpan_context_mutex);
             return;
         }
 
@@ -1386,6 +1387,7 @@ void lowpan_iphc_decoding(uint8_t *data, uint8_t length, net_if_eui64_t *s_addr,
 
             if (con == NULL) {
                 printf("ERROR: context not found\n");
+                mutex_unlock(&lowpan_context_mutex);
                 return;
             }
 
@@ -1462,6 +1464,7 @@ void lowpan_iphc_decoding(uint8_t *data, uint8_t length, net_if_eui64_t *s_addr,
 
             if (con == NULL) {
                 printf("ERROR: context not found\n");
+                mutex_unlock(&lowpan_context_mutex);
                 return;
             }
 
