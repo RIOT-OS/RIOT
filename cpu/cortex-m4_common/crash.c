@@ -24,8 +24,10 @@
 #include "lpm.h"
 #include "crash.h"
 
+#define PANIC_STR_SIZE 80
+
 /* "public" variables holding the crash data */
-char panic_str[80];
+char panic_str[PANIC_STR_SIZE];
 int panic_code;
 
 /* flag preventing "recursive crash printing loop" */
@@ -36,7 +38,9 @@ NORETURN void core_panic(int crash_code, const char *message)
 {
     /* copy panic datas to "public" global variables */
     panic_code = crash_code;
-    strncpy(panic_str, message, 80);
+    strncpy(panic_str, message, sizeof(panic_str));
+    /* strncpy does not add any null-termination. */
+    panic_str[sizeof(panic_str)-1] = '\0';
     /* print panic message to console (if possible) */
     if (crashed == 0) {
         crashed = 1;
