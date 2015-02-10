@@ -95,7 +95,7 @@ int ng_netapi_send(kernel_pid_t pid, ng_pktsnip_t *pkt);
  *
  * @return              value returned by the ACK message
  */
-int ng_netapi_get(kernel_pid_t pid, nt_netconf_opt_t opt, uint16_t context,
+int ng_netapi_get(kernel_pid_t pid, ng_netconf_opt_t opt, uint16_t context,
                   void *data, size_t data_len);
 
 /**
