@@ -9,7 +9,7 @@
 
 /**
  * @defgroup    net_netdev Network device driver interface
- * @addtogroup  net
+ * @ingroup     net
  * @{
  *
  * @file
