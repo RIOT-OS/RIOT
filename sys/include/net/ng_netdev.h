@@ -36,7 +36,7 @@ extern "C" {
 /**
  * @brief   Type for @ref msg_t if device fired an event
  */
-#define NG_NETDEV_MSG_EVENT_TYPE        (0x0100)
+#define NG_NETDEV_MSG_TYPE_EVENT    (0x0100)
 
 /**
  * @brief   Possible event types that are send from the device driver to the
