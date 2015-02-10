@@ -220,8 +220,6 @@ int16_t kw2xrf_send(kw2xrf_packet_t *packet)
 {
     /* - FCS + one octet for FRAME_LEN */
     uint8_t pkt[MKW2XDRF_MAX_PKT_LENGTH - 1];
-    /* XXX TEST XXX */
-    //uint8_t test[11] = {10, 0x03, 0x08, 0x90, 0xff ,0xff, 0xff, 0xff, 0x07, 0x4b, 0x0c};
 
     /* Set missing frame information */
     packet->frame.fcf.frame_ver = 0;
@@ -275,23 +273,12 @@ int16_t kw2xrf_send(kw2xrf_packet_t *packet)
     kw2xrf_gen_pkt((pkt + 1), packet);
     kw2xrf_write_fifo(pkt, packet->length - 1);
 
-    /* XXX TEST XXX */
-    /*
-    kw2xrf_write_fifo(test, 9);
-    kw2xrf_read_fifo(pkt, packet->length - 1);
-    for (uint8_t i = 0; i < packet->length-1; i++) {
-    	DEBUG("tx: fifo: %d: %x\n", i, pkt[i]);
-    }
-    */
-    /* XXX TEST end XXX */
-
-    // while(13){
     kw2xrf_write_dreg(MKW2XDM_IRQSTS1, MKW2XDM_IRQSTS1_TXIRQ);
     /* programm TR sequence */
     kw2xrf_write_dreg(MKW2XDM_PHY_CTRL1, MKW2XDM_PHY_CTRL1_XCVSEQ(2));
     while (!(kw2xrf_read_dreg(MKW2XDM_IRQSTS1) & MKW2XDM_IRQSTS1_TXIRQ));
     kw2xrf_write_dreg(MKW2XDM_PHY_CTRL1, MKW2XDM_PHY_CTRL1_XCVSEQ(0));
-    //}
+    
     kw2xrf_switch_to_rx();
 
     return packet->length;
