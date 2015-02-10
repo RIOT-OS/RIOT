@@ -7,8 +7,8 @@
  */
 
 /**
- * @addtogroup unittests
- * @addtogroup sys
+ * @defgroup unittests Unittests
+ * @ingroup  sys
  * @{
  *
  * @file
