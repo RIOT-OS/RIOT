@@ -1,0 +1,11 @@
+/**
+ * @def DEVELHELP
+ * @brief   This global macro activates some behavior that helps you while
+ *          developing but is otherwise optimized out.
+ */
+
+/**
+ * @def TEST_SUITES
+ * @brief   This global macro activates functionality that is needed for
+ *          automated testing but not needed otherwise.
+ */
