@@ -122,7 +122,7 @@ typedef struct {
      *                      *value_len* is too small to store the option value
      */
     int (*get)(ng_netdev_t *dev, ng_netconf_opt_t opt,
-                      void *value, size_t *value_len);
+               void *value, size_t *value_len);
 
     /**
      * @brief   Set an option value for a given network device
