@@ -7,12 +7,11 @@
  */
 
 /**
- * @addtogroup unittests
- * @addtogroup sys
- * @{
+ * @defgroup unittests Unittests
+ * @ingroup  sys
  *
- * @file
- * @brief Common header file for unittests
+ * @note
+ * Please refer to https://github.com/RIOT-OS/RIOT/wiki/Testing-RIOT
  *
  * @author Martine Lenders <mlenders@inf.fu-berlin.de>
  */
@@ -58,7 +57,3 @@ extern "C" {
 #endif
 
 #endif
-
-/**
- * @}
- */
