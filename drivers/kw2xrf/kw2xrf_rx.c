@@ -146,26 +146,25 @@ void kw2xrf_rx_handler(void)
     ieee802154_frame_read(buf,
                           &kw2xrf_rx_buffer[rx_buffer_next].frame,
                           pkt_len);
-
-    /* follow-up to transceiver module if adequate */
-    if (kw2xrf_rx_buffer[rx_buffer_next].frame.fcf.frame_type != 2) {
-#ifdef DEBUG
-        ieee802154_frame_print_fcf_frame(&kw2xrf_rx_buffer[rx_buffer_next].frame);
-#endif
-    }
-
 #ifdef MODULE_NETDEV_BASE
 
-    //TODO: Test this!
+    /* TODO: Test this! */
     if (recv_func.cb.data != NULL) {
         kw2xrf_packet_t p = kw2xrf_rx_buffer[rx_buffer_next];
-        recv_func.cb.data(&kw2xrf_netdev, &p.frame.src_addr, sizeof(p.frame.src_addr), &p.frame.dest_addr,
-                          sizeof(p.frame.src_addr), p.frame.payload, p.frame.payload_len);
+        recv_func.cb.data(&kw2xrf_netdev, &p.frame.src_addr, sizeof(p.frame.src_addr),
+                          &p.frame.dest_addr, sizeof(p.frame.src_addr), p.frame.payload,
+                          p.frame.payload_len);
     }
 
 #endif
 
 #ifdef MODULE_TRANSCEIVER
+
+    /* follow-up to transceiver module if adequate */
+    if (kw2xrf_rx_buffer[rx_buffer_next].frame.fcf.frame_type != IEEE_802154_ACK_FRAME) {
+#if ENABLE_DEBUG
+        ieee802154_frame_print_fcf_frame(&kw2xrf_rx_buffer[rx_buffer_next].frame);
+#endif
         /* notify transceiver thread if any */
         if (transceiver_pid != KERNEL_PID_UNDEF) {
             msg_t m;
@@ -173,13 +172,13 @@ void kw2xrf_rx_handler(void)
             m.content.value = rx_buffer_next;
             msg_send_int(&m, transceiver_pid);
         }
-#endif
-
-#ifdef DEBUG
+    }
+#if ENABLE_DEBUG
     else {
         DEBUG("GOT ACK for SEQ %u\n", kw2xrf_rx_buffer[rx_buffer_next].frame.seq_nr);
         ieee802154_frame_print_fcf_frame(&kw2xrf_rx_buffer[rx_buffer_next].frame);
     }
+#endif
 
 #endif
 
