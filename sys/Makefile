@@ -86,6 +86,9 @@ endif
 ifneq (,$(filter nhdp,$(USEMODULE)))
     DIRS += net/routing/nhdp
 endif
+ifneq (,$(filter ng_nomac,$(USEMODULE)))
+    DIRS += net/link_layer/ng_nomac
+endif
 
 DIRS += $(dir $(wildcard $(addsuffix /Makefile, ${USEMODULE})))
 
