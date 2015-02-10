@@ -100,29 +100,6 @@ int netapi_set_option(kernel_pid_t pid, netapi_conf_type_t param,
     return _get_set_option(pid, NETAPI_CMD_SET, param, data, data_len);
 }
 
-static int _netapi_register_cmd(kernel_pid_t pid, netapi_cmd_type_t cmd,
-                                kernel_pid_t reg_pid, netapi_reg_demux_ctx_t demux_ctx)
-{
-    netapi_reg_t reg;
-
-    reg.type = cmd;
-    reg.reg_pid = reg_pid;
-    reg.demux_ctx = demux_ctx;
-
-    return netapi_send_command(pid, (netapi_cmd_t *)(&reg));
-}
-
-int netapi_register(kernel_pid_t pid, kernel_pid_t reg_pid,
-                    netapi_reg_demux_ctx_t demux_ctx)
-{
-    return _netapi_register_cmd(pid, NETAPI_CMD_REG, reg_pid, demux_ctx);
-}
-
-int netapi_unregister(kernel_pid_t pid, kernel_pid_t reg_pid)
-{
-    return _netapi_register_cmd(pid, NETAPI_CMD_UNREG, reg_pid, 0);
-}
-
 #ifdef MODULE_NETDEV_DUMMY
 int netapi_fire_receive_event(kernel_pid_t pid, void *src, size_t src_len,
                               void *dest, size_t dest_len, void *data,

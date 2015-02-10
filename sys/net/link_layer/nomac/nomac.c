@@ -24,116 +24,61 @@
 
 #define NOMAC_MSG_QUEUE_SIZE    (16)
 
-static struct {
-    kernel_pid_t registrar_pid; /**< Thread recipient is registered to */
-    kernel_pid_t recipient_pid; /**< Registered recipient thread */
-} _nomac_registry[NOMAC_REGISTRY_SIZE];
-
-static int _nomac_recv_cb(netdev_t *dev, void *src, size_t src_len, void *dest,
-                          size_t dest_len, void *payload, size_t payload_len)
+static int _nomac_recv_cb(netdev_event_t event, pkt_t *pkt)       /* this is the signature I
+                                                                     propose for netdev */
 {
-    (void)dev;
-    kernel_pid_t current_pid = thread_getpid();
-    size_t offset;
-    netapi_rcv_pkt_t packet;
-    netapi_ack_t ack_mem;
-    msg_t msg_pkt, msg_ack;
+    switch (event) {
+        case NETDEV_EVENT_RX_COMPLETE:
+            return _netapi_receive(pkt_t *pkt);
+            break;
+        default:
+            return -1;
+    }
+}
 
-    packet.type = NETAPI_CMD_RCV;
-    packet.ack = &ack_mem;
-    packet.src = src;
-    packet.src_len = src_len;
-    packet.dest = dest;
-    packet.dest_len = dest_len;
+static int _netapi_receive(pkt_t *pkt)
+{
+    msg_t msg_pkt;
+    netreg_t *who_to;
+    netmod_t module;
+    kernel_pid_t pid;
+
+    /* build the NETAPI packet that is send to the upper layers */
     msg_pkt.type = NETAPI_MSG_TYPE;
-    msg_pkt.content.ptr = (char *)(&packet);
+    msg_pkt.content.ptr = (char *)pkt;      /* this is how I would imagine the NETAPI call
+                                               to look like */
 
-    for (unsigned int i = 0; i < NOMAC_REGISTRY_SIZE; i++) {
-        if (_nomac_registry[i].registrar_pid == current_pid) {
-            offset = 0;
+    /* find out who to send it to */
+    module = pkt->headers->header_proto;    /* we always transfer the header of the current layer
+                                               to the next upper layer... */
+                                            /* TODO: type of header_proto in pkt_t: change to netmod_t */
 
-            while (offset < payload_len) {
-                netapi_ack_t *ack;
-                packet.data = (void *)(((char *)payload) + offset);
-                packet.data_len = payload_len - offset;
+    /* send out the NETAPI message(s) */
+    pid = netreg_lookup(who_to, module);
+    while (pid != KERNEL_PID_UNDEF) {
+        msg_send(&msg_pkt, &msg_ack, pid);
+        pid = netreg_getnext(who_to);
 
-                msg_send_receive(&msg_pkt, &msg_ack,
-                                 _nomac_registry[i].recipient_pid);
-                ack = (netapi_ack_t *)(msg_ack.content.ptr);
-
-                if ((msg_ack.type == NETAPI_MSG_TYPE) &&
-                    (ack->type == NETAPI_CMD_ACK) &&
-                    (ack->orig == NETAPI_CMD_RCV)) {
-                    if (ack->result > 0) {
-                        offset += (ack->result);
-                    }
-                    else {
-                        DEBUG("Error code received for registrar %" PRIkernel_pid
-                              " with recipient %" PRIkernel_pid ": %d",
-                              _nomac_registry[i].registrar_pid,
-                              _nomac_registry[i].recipient_pid,
-                              -(ack->result));
-
-                        return ack->result;
-                    }
-                }
-                else {
-                    DEBUG("Unexpected msg instead of ACK. Abort for registrar "
-                          "\"%s\" with recipient \"%s\": msg.type = %d, "
-                          "ack->type = %d, ack->orig = %d",
-                          thread_getname(_nomac_registry[i].registrar_pid),
-                          thread_getname(_nomac_registry[i].recipient_pid),
-                          msg_ack.type, ack->type, ack->orig);
-
-                    return -ENOMSG;
-                }
-
-            }
-        }
+        /**
+         * NOTE: no ACKing so far - as I see it right now, this is not really needed. But
+         * my brain is a wreck, so there might be a good chance I am wrong...
+         */
     }
 
-    return payload_len;
-}
-
-static inline int _nomac_send(netdev_t *dev, netapi_snd_pkt_t *pkt)
-{
-    return dev->driver->send_data(dev, pkt->dest, pkt->dest_len, pkt->ulh,
-                                  pkt->data, pkt->data_len);
-}
-
-static int _nomac_get_registry(netapi_conf_t *conf)
-{
-    kernel_pid_t current_pid = thread_getpid();
-    kernel_pid_t registry[NOMAC_REGISTRY_SIZE];
-    uint8_t size = 0;
-
-    for (int i = 0; i < NOMAC_REGISTRY_SIZE; i++) {
-        if ((size * sizeof(kernel_pid_t)) > (conf->data_len)) {
-            return -EOVERFLOW;
-        }
-
-        if (_nomac_registry[i].registrar_pid == current_pid) {
-            registry[size++] = _nomac_registry[i].recipient_pid;
-        }
-    }
-
-    conf->data_len = size * sizeof(kernel_pid_t);
-    memcpy(conf->data, registry, conf->data_len);
-
-    return 0;
+    return 0;  /* all done and good */
 }
 
 static int _nomac_get_option(netdev_t *dev, netapi_conf_t *conf)
 {
     int res;
 
-    switch ((nomac_conf_type_t)conf->param) {
-        case NOMAC_PROTO:
-        case NOMAC_CHANNEL:
-        case NOMAC_ADDRESS:
-        case NOMAC_NID:
-        case NOMAC_MAX_PACKET_SIZE:
-        case NOMAC_ADDRESS2:
+    switch (conf->param) {          /* why use nomac specifics here? Just go with NETAPI conf options... */
+        case NETAPI_CONF_PROTO:
+        case NETAPI_CONF_CARRIER:
+        case NETAPI_CONF_ADDRESS:
+        case NETAPI_CONF_SUBNETS:
+        case NETAPI_CONF_MAX_PACKET_SIZE:
+        case NETDEV_OPT_ADDRESS_LONG:
             if ((res = dev->driver->get_option(dev, (netdev_opt_t)conf->param,
                                                conf->data, &(conf->data_len))
                 ) == 0) {
@@ -142,9 +87,6 @@ static int _nomac_get_option(netdev_t *dev, netapi_conf_t *conf)
             else {
                 return res;
             }
-
-        case NOMAC_REGISTRY:
-            return _nomac_get_registry(conf);
 
         default:
             break;
@@ -155,12 +97,12 @@ static int _nomac_get_option(netdev_t *dev, netapi_conf_t *conf)
 
 static int _nomac_set_option(netdev_t *dev, netapi_conf_t *conf)
 {
-    switch ((nomac_conf_type_t)(conf->param)) {
-        case NOMAC_PROTO:
-        case NOMAC_CHANNEL:
-        case NOMAC_ADDRESS:
-        case NOMAC_NID:
-        case NOMAC_ADDRESS2:
+    switch ((nomac_conf_type_t)(conf->param)) {             /* same here... */
+        case NETAPI_CONF_PROTO:
+        case NETAPI_CONF_CARRIER:
+        case NETAPI_CONF_ADDRESS:
+        case NETAPI_CONF_SUBNETS:
+        case NETDEV_OPT_ADDRESS_LONG:
             return dev->driver->set_option(dev, (netdev_opt_t)conf->param,
                                            conf->data, conf->data_len);
 
@@ -186,6 +128,9 @@ static void *_nomac_runner(void *args)
     dev->driver->init(dev);
     dev->driver->add_receive_data_callback(dev, _nomac_recv_cb);
 
+    /* register network device with the netreg */
+    netreg_add_interface(thread_getpid());
+
     while (1) {
         msg_receive(&msg_cmd);
 
@@ -199,7 +144,7 @@ static void *_nomac_runner(void *args)
 
             switch (cmd->type) {
                 case NETAPI_CMD_SND:
-                    ack->result = _nomac_send(dev, (netapi_snd_pkt_t *)cmd);
+                    ack->result = dev->driver->send_data(dev, pkt);     /* could it look like this? */
                     break;
 
                 case NETAPI_CMD_GET:
@@ -270,14 +215,6 @@ static void *_nomac_runner(void *args)
 
     /* never reached */
     return NULL;
-}
-
-void nomac_init_module(void)
-{
-    for (int i = 0; i < NOMAC_REGISTRY_SIZE; i++) {
-        _nomac_registry[i].registrar_pid = KERNEL_PID_UNDEF;
-        _nomac_registry[i].recipient_pid = KERNEL_PID_UNDEF;
-    }
 }
 
 kernel_pid_t nomac_init(char *stack, int stacksize, char priority,
