@@ -50,12 +50,12 @@ extern "C" {
 /**
  * @brief   Message type for setting options of network modules
  */
-#define NG_NETAPI_MSG_TYPE_SETOPT       (0x0203)
+#define NG_NETAPI_MSG_TYPE_SET          (0x0203)
 
 /**
  * @brief   Message type for getting options from network modules
  */
-#define NG_NETAPI_MSG_TYPE_GETOPT       (0x0204)
+#define NG_NETAPI_MSG_TYPE_GET          (0x0204)
 
 /**
  * @brief   Message type for replying to get and set option messages
