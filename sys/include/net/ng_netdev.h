@@ -19,8 +19,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef __NETDEV_H_
-#define __NETDEV_H_
+#ifndef NG_NETDEV_H_
+#define NG_NETDEV_H_
 
 #include <errno.h>
 #include <stdint.h>
@@ -168,5 +168,5 @@ struct ng_netdev {
 }
 #endif
 
-#endif /* __NETDEV_H_ */
+#endif /* NG_NETDEV_H_ */
 /** @} */
