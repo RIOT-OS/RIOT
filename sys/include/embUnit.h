@@ -12,10 +12,6 @@
  *
  * @note
  * Please refer to https://github.com/RIOT-OS/RIOT/wiki/Testing-RIOT
- * @{
- *
- * @file
- * @brief Common header file for unittests
  *
  * @author Martine Lenders <mlenders@inf.fu-berlin.de>
  */
@@ -61,7 +57,3 @@ extern "C" {
 #endif
 
 #endif
-
-/**
- * @}
- */
