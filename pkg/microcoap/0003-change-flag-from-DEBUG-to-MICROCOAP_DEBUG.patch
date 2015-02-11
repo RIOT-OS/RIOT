@@ -1,0 +1,81 @@
+From a90622ce42cd1a816fab4d8f6829426bfc8683b2 Mon Sep 17 00:00:00 2001
+From: Lotte Steenbrink <lotte.steenbrink@fu-berlin.de>
+Date: Sun, 8 Feb 2015 15:00:01 -0800
+Subject: [PATCH] change flag from DEBUG to MICROCOAP_DEBUG
+
+---
+ coap.c |  8 ++++----
+ coap.h | 12 +++++++++++-
+ 2 files changed, 15 insertions(+), 5 deletions(-)
+
+diff --git a/coap.c b/coap.c
+index 4f30e3a..ada66c2 100644
+--- a/coap.c
++++ b/coap.c
+@@ -9,7 +9,7 @@
+ extern void endpoint_setup(void);
+ extern const coap_endpoint_t endpoints[];
+ 
+-#ifdef DEBUG
++#ifdef MICROCOAP_DEBUG
+ void coap_dumpHeader(coap_header_t *hdr)
+ {
+     printf("Header:\n");
+@@ -21,7 +21,7 @@ void coap_dumpHeader(coap_header_t *hdr)
+ }
+ #endif
+ 
+-#ifdef DEBUG
++#ifdef MICROCOAP_DEBUG
+ void coap_dump(const uint8_t *buf, size_t buflen, bool bare)
+ {
+     if (bare)
+@@ -186,7 +186,7 @@ int coap_parseOptionsAndPayload(coap_option_t *options, uint8_t *numOptions, coa
+     return 0;
+ }
+ 
+-#ifdef DEBUG
++#ifdef MICROCOAP_DEBUG
+ void coap_dumpOptions(coap_option_t *opts, size_t numopt)
+ {
+     size_t i;
+@@ -200,7 +200,7 @@ void coap_dumpOptions(coap_option_t *opts, size_t numopt)
+ }
+ #endif
+ 
+-#ifdef DEBUG
++#ifdef MICROCOAP_DEBUG
+ void coap_dumpPacket(coap_packet_t *pkt)
+ {
+     coap_dumpHeader(&pkt->hdr);
+diff --git a/coap.h b/coap.h
+index c132334..4a7adc5 100644
+--- a/coap.h
++++ b/coap.h
+@@ -145,12 +145,22 @@ typedef struct
+ 
+ 
+ ///////////////////////
++#ifdef MICROCOAP_DEBUG
+ void coap_dumpPacket(coap_packet_t *pkt);
++#else 
++#define coap_dumpPacket(pkt)
++#endif
++
++#ifdef MICROCOAP_DEBUG
++void coap_dump(const uint8_t *buf, size_t buflen, bool bare);
++#else 
++#define coap_dump(buf, buflen, bare)
++#endif
++
+ int coap_parse(coap_packet_t *pkt, const uint8_t *buf, size_t buflen);
+ int coap_buffer_to_string(char *strbuf, size_t strbuflen, const coap_buffer_t *buf);
+ const coap_option_t *coap_findOptions(const coap_packet_t *pkt, uint8_t num, uint8_t *count);
+ int coap_build(uint8_t *buf, size_t *buflen, const coap_packet_t *pkt);
+-void coap_dump(const uint8_t *buf, size_t buflen, bool bare);
+ int coap_make_response(coap_rw_buffer_t *scratch, coap_packet_t *pkt, const uint8_t *content, size_t content_len, uint8_t msgid_hi, uint8_t msgid_lo, const coap_buffer_t* tok, coap_responsecode_t rspcode, coap_content_type_t content_type);
+ int coap_handle_req(coap_rw_buffer_t *scratch, const coap_packet_t *inpkt, coap_packet_t *outpkt);
+ void coap_option_nibble(uint32_t value, uint8_t *nibble);
+-- 
+1.8.3.2
+

@@ -1,0 +1,39 @@
+From 007576627163a35881ebdf50701f94b73aa7aae7 Mon Sep 17 00:00:00 2001
+From: Martine Lenders <mail@martine-lenders.eu>
+Date: Sun, 1 Feb 2015 16:40:35 +0100
+Subject: [PATCH 2/2] Add RIOT Makefile
+
+---
+ Makefile | 22 +---------------------
+ 1 file changed, 1 insertion(+), 21 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index bb3c5fc..48422e9 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1,21 +1 @@
+-CFLAGS += -Wall -DDEBUG
+-SRC = $(wildcard *.c)
+-OBJ = $(SRC:%.c=%.o)
+-DEPS = $(SRC:%.c=%.d)
+-EXEC = coap
+-
+-all: $(EXEC)
+-
+--include $(DEPS)
+-
+-$(EXEC): $(OBJ)
+-	@$(CC) $(CFLAGS) -o $@ $^
+-
+-%.o: %.c %.d
+-	@$(CC) -c $(CFLAGS) -o $@ $<
+-
+-%.d: %.c
+-	@$(CC) -MM $(CFLAGS) $< > $@
+-
+-clean:
+-	@$(RM) $(EXEC) $(OBJ) $(DEPS)
++include $(RIOTBASE)/Makefile.base
+-- 
+1.9.1
+
