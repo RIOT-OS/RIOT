@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    net_netapi Configuration options for network APIs
+ * @defgroup    net_netconf Configuration options for network APIs
  * @ingroup     net
  * @brief       List of available configuration options for network APIs
  * @{
