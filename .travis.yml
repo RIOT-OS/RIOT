@@ -32,6 +32,7 @@ install:
             binutils-avr \
             avr-libc \
             cppcheck \
+            valgrind \
             doxygen
     - git config --global user.email "travis@example.com"
     - git config --global user.name "Travis CI"
@@ -58,7 +59,7 @@ script:
     - ./dist/tools/cppcheck/check.sh master --diff-filter=MR --error-exitcode=0 || exit
     - ./dist/tools/cppcheck/check.sh master --diff-filter=AC || exit
 
-    - make -C ./tests/unittests all test BOARD=native || exit
+    - make -C ./tests/unittests all-valgrind term-valgrind BOARD=native || exit
 # TODO:
 #   Reenable once https://github.com/RIOT-OS/RIOT/issues/2300 is
 #   resolved:
