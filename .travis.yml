@@ -33,6 +33,7 @@ install:
             avr-libc \
             cppcheck \
             valgrind \
+            libc6-dbg \
             doxygen
     - git config --global user.email "travis@example.com"
     - git config --global user.name "Travis CI"
