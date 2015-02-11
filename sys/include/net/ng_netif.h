@@ -9,8 +9,11 @@
 /**
  * @defgroup    ng_netif    Network interfaces
  * @ingroup     net
- * @brief       Abstraction layer for network interfaces (i. .e. threads for
- *              protocols that are below the network layer)
+ * @brief       Abstraction layer for network interfaces
+ *
+ * Network interfaces in this context are threads for protocols that are
+ * below the network layer.
+ *
  * @{
  *
  * @file
