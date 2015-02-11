@@ -65,6 +65,9 @@ endif
 ifneq (,$(filter oneway_malloc,$(USEMODULE)))
     DIRS += oneway-malloc
 endif
+ifneq (,$(filter ng_netif,$(USEMODULE)))
+    DIRS += net/crosslayer/ng_netif
+endif
 ifneq (,$(filter netapi,$(USEMODULE)))
     DIRS += net/crosslayer/netapi
 endif
