@@ -26,7 +26,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "net/ng_pktsnip.h"
+#include "net/ng_pkt.h"
 #include "net/ng_netconf.h"
 
 #ifdef __cplusplus

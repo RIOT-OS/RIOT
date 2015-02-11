@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Martine Lenders <mlenders@inf.fu-berlin.de>
+ * Copyright (C) 2014, 2015 Martine Lenders <mlenders@inf.fu-berlin.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for
@@ -7,24 +7,24 @@
  */
 
 /**
- * @defgroup    pktqueue Packet Queue
+ * @defgroup    ng_pktqueue Packet Queue
  * @brief       Packet wrapper for the Priority Queue
  * @ingroup     net
  * @{
  *
- * @file        pktqueue.h
- * @brief       `pkt_t`-centric wrapper for @ref priority_queue_t
+ * @file
+ * @brief       `ng_pktsnip_t`-centric wrapper for @ref priority_queue_t
  *
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 
-#ifndef __PKTQUEUE_H_
-#define __PKTQUEUE_H_
+#ifndef NG_PKTQUEUE_H_
+#define NG_PKTQUEUE_H_
 
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "pkt.h"
+#include "net/ng_pkt.h"
 #include "priority_queue.h"
 
 #ifdef __cplusplus
@@ -36,11 +36,11 @@ extern "C" {
  *
  * @extends priority_queue_node_t
  */
-typedef struct pktqueue_node_t {
-    struct pktqueue_node_t *next;   /**< next node in queue */
+typedef struct ng_pktqueue_node {
+    struct ng_pktqueue_node *next;  /**< next node in queue */
     uint32_t priority;              /**< priority of the node */
-    pkt_t *data;                    /**< pointer to the data */
-} pktqueue_node_t;
+    ng_pktsnip_t *data;             /**< pointer to the data */
+} ng_pktqueue_node_t;
 
 /**
  * @brief   data type for packet queues
@@ -48,39 +48,39 @@ typedef struct pktqueue_node_t {
  * @extends priority_queue_t
  */
 typedef struct {
-    pktqueue_node_t *first;     /**< first node in the queue */
-} pktqueue_t;
+    ng_pktqueue_node_t *first;  /**< first node in the queue */
+} ng_pktqueue_t;
 
 /**
- * @brief   Static initializer for pktqueue_node_t
+ * @brief   Static initializer for ng_pktqueue_node_t
  */
-#define PKTQUEUE_NODE_INIT { NULL, NULL, 0 }
+#define NG_PKTQUEUE_NODE_INIT { NULL, NULL, 0 }
 
 /**
  * @brief   Initializes a packet queue node.
- * @details For initialization of variables use PKTQUEUE_NODE_INIT instead.
+ * @details For initialization of variables use NG_PKTQUEUE_NODE_INIT instead.
  *          Only use this function for dynamically allocated packet queue nodes.
  *
- * @param[out] node pre-allocated pktqueue_node_t object. must not be NULL.
+ * @param[out] node pre-allocated ng_pktqueue_node_t object. must not be NULL.
  */
-static inline void pktqueue_node_init(pktqueue_node_t *node)
+static inline void ng_pktqueue_node_init(ng_pktqueue_node_t *node)
 {
     priority_queue_node_init((priority_queue_node_t *)node);
 }
 
 /**
- * @brief Static initializer for pktqueue_t.
+ * @brief Static initializer for ng_pktqueue_t.
  */
-#define PKTQUEUE_INIT PRIORITY_QUEUE_INIT
+#define NG_PKTQUEUE_INIT PRIORITY_QUEUE_INIT
 
 /**
  * @brief   Initialize a packet queue object.
- * @details For initialization of variables use PKTQUEUE_INIT
+ * @details For initialization of variables use NG_PKTQUEUE_INIT
  *          instead. Only use this function for dynamically allocated
  *          packet queues.
- * @param[out] queue    pre-allocated pktqueue_t object, must not be NULL.
+ * @param[out] queue    pre-allocated ng_pktqueue_t object, must not be NULL.
  */
-static inline void pktqueue_init(pktqueue_t *queue)
+static inline void ng_pktqueue_init(ng_pktqueue_t *queue)
 {
     priority_queue_init((priority_queue_t *)queue);
 }
@@ -92,7 +92,7 @@ static inline void pktqueue_init(pktqueue_t *queue)
  *
  * @return              the head
  */
-static inline pktqueue_node_t *pktqueue_get_head(pktqueue_t *queue)
+static inline ng_pktqueue_node_t *ng_pktqueue_get_head(ng_pktqueue_t *queue)
 {
     return queue->first;
 }
@@ -104,9 +104,9 @@ static inline pktqueue_node_t *pktqueue_get_head(pktqueue_t *queue)
  *
  * @return              the old head
  */
-static inline pktqueue_node_t *pktqueue_remove_head(pktqueue_t *queue)
+static inline ng_pktqueue_node_t *ng_pktqueue_remove_head(ng_pktqueue_t *queue)
 {
-    return (pktqueue_node_t *)priority_queue_remove_head((priority_queue_t *)queue);
+    return (ng_pktqueue_node_t *)priority_queue_remove_head((priority_queue_t *)queue);
 }
 
 /**
@@ -118,7 +118,7 @@ static inline pktqueue_node_t *pktqueue_remove_head(pktqueue_t *queue)
  * @param[in]   queue   the queue
  * @param[in]   node    the node to add
  */
-static inline void pktqueue_add(pktqueue_t *queue, pktqueue_node_t *node)
+static inline void ng_pktqueue_add(ng_pktqueue_t *queue, ng_pktqueue_node_t *node)
 {
     priority_queue_add((priority_queue_t *)queue, (priority_queue_node_t *) node);
 }
@@ -129,7 +129,7 @@ static inline void pktqueue_add(pktqueue_t *queue, pktqueue_node_t *node)
  * @param[in]   queue   the queue
  * @param[in]   node    the node to remove
  */
-static inline void pktqueue_remove(pktqueue_t *queue, pktqueue_node_t *node)
+static inline void ng_pktqueue_remove(ng_pktqueue_t *queue, ng_pktqueue_node_t *node)
 {
     priority_queue_remove((priority_queue_t *)queue, (priority_queue_node_t *) node);
 }
@@ -138,7 +138,7 @@ static inline void pktqueue_remove(pktqueue_t *queue, pktqueue_node_t *node)
 }
 #endif
 
-#endif /* __PKTQUEUE_H_ */
+#endif /* NG_PKTQUEUE_H_ */
 /**
  * @}
  */
