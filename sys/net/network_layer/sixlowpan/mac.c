@@ -136,6 +136,7 @@ static void *recv_ieee802154_frame(void *arg)
             }
             else {
                 DEBUG("Unknown IEEE 802.15.4 source address mode.\n");
+                p->processing--;
                 continue;
             }
 
