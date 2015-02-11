@@ -68,6 +68,9 @@ endif
 ifneq (,$(filter ng_ipv6_nc,$(USEMODULE)))
     DIRS += net/network_layer/ng_ipv6/nc
 endif
+ifneq (,$(filter ng_ipv6_netif,$(USEMODULE)))
+    DIRS += net/network_layer/ng_ipv6/netif
+endif
 ifneq (,$(filter ng_netapi,$(USEMODULE)))
     DIRS += net/crosslayer/ng_netapi
 endif
