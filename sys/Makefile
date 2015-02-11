@@ -68,6 +68,9 @@ endif
 ifneq (,$(filter oneway_malloc,$(USEMODULE)))
     DIRS += oneway-malloc
 endif
+ifneq (,$(filter ng_ipv6_addr,$(USEMODULE)))
+    DIRS += net/network_layer/ng_ipv6/addr
+endif
 ifneq (,$(filter ng_netif,$(USEMODULE)))
     DIRS += net/crosslayer/ng_netif
 endif
