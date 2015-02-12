@@ -74,6 +74,9 @@ endif
 ifneq (,$(filter ng_netreg,$(USEMODULE)))
     DIRS += net/crosslayer/ng_netreg
 endif
+ifneq (,$(filter ng_lomac,$(USEMODULE)))
+    DIRS += net/crosslayer/ng_lomac
+endif
 ifneq (,$(filter netapi,$(USEMODULE)))
     DIRS += net/crosslayer/netapi
 endif
