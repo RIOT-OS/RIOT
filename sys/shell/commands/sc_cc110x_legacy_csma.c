@@ -1,18 +1,21 @@
-/**
- * Shell commands for the cc110x driver without a transceiver
- *
+/*
  * Copyright (C) 2013  INRIA.
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
- *
- * @ingroup shell_commands
+ */
+
+/**
+ * @ingroup     sys_shell_commands
  * @{
- * @file    sc_cc110x_legacy_csma.c
- * @brief   provides shell commands to configure the cc110x driver
- * @author  Oliver Hahm <oliver.hahm@inria.fr>
- * @author  Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ *
+ * @file
+ * @brief       Provides shell commands to configure the cc110x driver
+ *
+ * @author      Oliver Hahm <oliver.hahm@inria.fr>
+ * @author      Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ *
  * @}
  */
 

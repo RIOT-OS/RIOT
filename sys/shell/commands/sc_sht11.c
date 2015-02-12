@@ -1,17 +1,20 @@
-/**
- * Shell commands for temperature and humidity sensor
- *
+/*
  * Copyright (C) 2013  INRIA.
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
- *
- * @ingroup shell_commands
+ */
+
+/**
+ * @ingroup     sys_shell_commands
  * @{
- * @file    sc_sht11.c
- * @brief   provides shell commands to poll sht11 sensor
- * @author  Oliver Hahm <oliver.hahm@inria.fr>
+ *
+ * @file
+ * @brief       Provides shell commands to poll sht11 sensor
+ *
+ * @author      Oliver Hahm <oliver.hahm@inria.fr>
+ *
  * @}
  */
 

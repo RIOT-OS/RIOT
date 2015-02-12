@@ -1,23 +1,22 @@
-/**
- * Provides prototypes for available shell commands
- *
+/*
  * Copyright (C) 2014  INRIA.
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
- *
- *
- *
- * @ingroup shell_commands
+ */
+
+/**
+ * @ingroup     sys_shell_commands
  * @{
- * @file    shell_commands.c
- * @brief   sets up the system shell command struct
- * @author  Oliver Hahm <oliver.hahm@inria.fr>
- * @author  Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
- * @author  Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
  *
- * @note    $Id: shell_commands.c 3855 2013-09-05 12:54:57 kasmi $
+ * @file
+ * @brief       Provides prototypes and sets up available shell commands
+ *
+ * @author      Oliver Hahm <oliver.hahm@inria.fr>
+ * @author      Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
+ * @author      Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ *
  * @}
  */
 

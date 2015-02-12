@@ -1,6 +1,4 @@
-/**
- * Shell interpreter
- *
+/*
  * Copyright (C) 2009, Freie Universitaet Berlin (FUB).
  * Copyright (C) 2013, INRIA.
  *
@@ -10,11 +8,9 @@
  */
 
 /**
- * @ingroup     shell
+ * @ingroup     sys_shell
  * @{
- */
-
-/**
+ *
  * @file
  * @brief       Implementation of a very simple command interpreter.
  *              For each command (i.e. "echo"), a handler can be specified.
@@ -24,6 +20,8 @@
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @author      René Kijewski <rene.kijewski@fu-berlin.de>
+ *
+ * @}
  */
 
 #include <string.h>
@@ -287,5 +285,3 @@ void shell_init(shell_t *shell, const shell_command_t *shell_commands,
     shell->readchar = readchar;
     shell->put_char = put_char;
 }
-
-/** @} */

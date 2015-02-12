@@ -10,6 +10,11 @@
  * @defgroup    sys_shell Shell
  * @ingroup     sys
  * @brief       Simple shell interpreter
+ *
+ * @{
+ *
+ * @file
+ * @brief       Shell interface definition
  */
 
 #ifndef __SHELL_H
@@ -93,3 +98,4 @@ void shell_run(shell_t *shell) NORETURN;
 #endif
 
 #endif /* __SHELL_H */
+/** @} */

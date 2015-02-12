@@ -17,8 +17,7 @@
  */
 
 /**
- * @ingroup     shell_commands
- * @ingroup     x86-irq
+ * @ingroup     sys_shell_commands
  * @{
  *
  * @file

@@ -7,11 +7,14 @@
  */
 
 /**
- * @ingroup shell_commands
+ * @ingroup     sys_shell_commands
  * @{
- * @file    sc_rpl.c
- * @brief   provides shell commands to manage and query RPL
- * @author  Oliver Hahm <oliver.hahm@inria.fr>
+ *
+ * @file
+ * @brief       Provides shell commands to manage and query RPL
+ *
+ * @author      Oliver Hahm <oliver.hahm@inria.fr>
+ *
  * @}
  */
 
