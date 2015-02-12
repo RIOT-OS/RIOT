@@ -43,6 +43,8 @@ static void *_lomac_thread(void *args)
 
     /* register as interface */
     ng_netif_add(thread_getpid());
+
+    /* preinitialize ACK as "I don't support anything" */
     reply.type = NG_NETAPI_MSG_TYPE_ACK;
     reply.content.value = (uint32_t)(-ENOTSUP);
 
