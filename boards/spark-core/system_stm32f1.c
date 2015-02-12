@@ -7,10 +7,10 @@
  */
 
 /**
- * @ingroup     board_iot-lab_M3
+ * @ingroup     boards_spark-core
  * @{
  *
- * @file        system_stm32f1.c
+ * @file
  * @brief       Board specific clock setup
  *
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
