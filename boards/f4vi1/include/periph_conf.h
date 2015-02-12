@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     board_f4vi1
+ * @ingroup     boards_f4vi1
  * @{
  *
  * @file
