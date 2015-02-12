@@ -82,6 +82,7 @@ typedef enum {
     NETCONF_STATE_IDLE,             /**< idle mode */
     NETCONF_STATE_RX,               /**< receive mode */
     NETCONF_STATE_TX,               /**< transmit mode */
+    NETCONF_STATE_RESET,            /**< reset mode */
     /* add other states if needed */
 } ng_netconf_state_t;
 
