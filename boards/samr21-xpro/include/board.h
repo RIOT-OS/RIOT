@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    board_samr21-xpro Atmel SAM R21 Xplained Pro
+ * @defgroup    boards_samr21-xpro Atmel SAM R21 Xplained Pro
  * @ingroup     boards
  * @brief       Support for the Atmel SAM R21 Xplained Pro board.
  * @{
@@ -39,7 +39,7 @@ extern "C" {
 
 /**
 * @name AT86RF231 config
-* @{ 
+* @{
 */
 #define AT86RF231_SPI      SPI_0
 #define AT86RF231_CS       GPIO_4
