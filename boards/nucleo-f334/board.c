@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     board_nucleo-f334
+ * @ingroup     boards_nucleo-f334
  * @{
  *
  * @file
