@@ -17,7 +17,7 @@
  */
 
 /**
- * @ingroup     x86
+ * @ingroup     boards_qemu-i386
  * @{
  *
  * @file

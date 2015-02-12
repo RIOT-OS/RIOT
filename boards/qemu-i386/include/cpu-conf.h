@@ -17,12 +17,13 @@
  */
 
 /**
- * CPU-specific defines for qemu-i386.
- *
- * @ingroup x86
+ * @ingroup     boards_qemu-i386
  * @{
+ *
  * @file
- * @author  René Kijewski <rene.kijewski@fu-berlin.de>
+ * @brief       CPU-specific defines for qemu-i386
+ *
+ * @author      René Kijewski <rene.kijewski@fu-berlin.de>
  */
 
 #ifndef __RIOT__BOARDS__QEMU_I386__CPU_CONF__H

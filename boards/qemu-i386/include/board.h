@@ -17,7 +17,9 @@
  */
 
 /**
- * @ingroup     x86
+ * @defgroup    boards_qemu-i386 qemu-i386
+ * @ingroup     boards
+ * @brief       Dummy board to run x86 port in QEMU
  * @{
  *
  * @file
