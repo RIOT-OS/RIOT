@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     board_udoo
+ * @ingroup     boards_udoo
  * @{
  *
  * @file
