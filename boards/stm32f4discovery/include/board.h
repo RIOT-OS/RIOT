@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    board_stm32f4discovery STM32F4Discovery
+ * @defgroup    boards_stm32f4discovery STM32F4Discovery
  * @ingroup     boards
  * @brief       Board specific files for the STM32F4Discovery board
  * @{

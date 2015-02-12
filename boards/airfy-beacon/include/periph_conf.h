@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     board_airfy-beacon
+ * @ingroup     boards_airfy-beacon
  * @{
  *
  * @file

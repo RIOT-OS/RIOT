@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     board_openmote
+ * @ingroup     boards_openmote
  * @{
  *
  * @file

@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     board_spark-core
+ * @ingroup     boards_spark-core
  * @{
  *
  * @file

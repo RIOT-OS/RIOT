@@ -7,10 +7,10 @@
  */
 
 /**
- * @ingroup     board_cc2538dk
+ * @ingroup     boards_cc2538dk
  * @{
  *
- * @file        board.c
+ * @file
  * @brief       Board specific implementations for the CC2538DK board
  *
  * @author      Ian Martin <ian@locicontrols.com>

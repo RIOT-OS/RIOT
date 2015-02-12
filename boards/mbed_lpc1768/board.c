@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     board_mbed_lpc1768
+ * @ingroup     boards_mbed_lpc1768
  * @{
  *
  * @file

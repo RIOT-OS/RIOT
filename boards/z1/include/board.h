@@ -11,7 +11,7 @@
 #define _Z1_BOARD_H
 
 /**
- * @defgroup    board_z1 Zolertia Z1
+ * @defgroup    boards_z1 Zolertia Z1
  * @ingroup     boards
  * @brief       Support for the Zolertia Z1 board.
  *

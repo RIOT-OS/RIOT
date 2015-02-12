@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     board_fox
+ * @ingroup     boards_fox
  * @{
  *
  * @file

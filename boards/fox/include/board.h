@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    board_fox fox
+ * @defgroup    boards_fox fox
  * @ingroup     boards
  * @brief       Board specific files for the fox board.
  * @{
