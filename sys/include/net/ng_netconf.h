@@ -91,10 +91,18 @@ typedef enum {
 typedef enum {
     NETCONF_STATE_OFF = 0,          /**< powered off */
     NETCONF_STATE_SLEEP,            /**< sleep mode */
-    NETCONF_STATE_IDLE,             /**< idle mode */
-    NETCONF_STATE_RX,               /**< receive mode */
-    NETCONF_STATE_TX,               /**< transmit mode */
-    NETCONF_STATE_RESET,            /**< reset mode */
+    NETCONF_STATE_IDLE,             /**< idle mode,
+                                     *   the device listens to receive packets */
+    NETCONF_STATE_RX,               /**< receive mode,
+                                     *   the device currently receives a packet */
+    NETCONF_STATE_TX,               /**< transmit mode,
+                                     *   set: triggers transmission of a preloaded packet
+                                     *   (see *NETCONF_OPT_PRELOADING*). The resulting
+                                     *   state of the network device is *NETCONF_STATE_IDLE*
+                                     *   get: the network device is in the process of
+                                     *   transmitting a packet */
+    NETCONF_STATE_RESET,            /**< triggers a hardware reset. The resulting
+                                     *   state of the network device is *NETCONF_STATE_IDLE* */
     /* add other states if needed */
 } ng_netconf_state_t;
 
