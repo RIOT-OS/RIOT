@@ -30,7 +30,7 @@
 
 #define _LOMAC_STACKSIZE    (KERNEL_CONF_STACKSIZE_IDLE)
 
-static kernel_pid_t _lomac_pid = KERNEL_PID_UNDEF;
+kernel_pid_t lomac_pid = KERNEL_PID_UNDEF;
 static char _lomac_stack[_LOMAC_STACKSIZE];
 static msg_t _msg_queue[NG_LOMAC_MSG_QUEUE_SIZE];
 
@@ -74,20 +74,20 @@ static void *_lomac_thread(void *args)
 
 kernel_pid_t ng_lomac_init(char priority)
 {
-    if (_lomac_pid != KERNEL_PID_UNDEF) {
+    if (lomac_pid != KERNEL_PID_UNDEF) {
         return -EEXIST;
     }
 
-    _lomac_pid = thread_create(_lomac_stack, _LOMAC_STACKSIZE, priority,
-                               CREATE_STACKTEST, _lomac_thread, NULL, "ng_lomac");
+    lomac_pid = thread_create(_lomac_stack, _LOMAC_STACKSIZE, priority,
+                              CREATE_STACKTEST, _lomac_thread, NULL, "ng_lomac");
 
-    if (_lomac_pid <= 0) {
-        kernel_pid_t res = _lomac_pid;
-        _lomac_pid = KERNEL_PID_UNDEF;
+    if (lomac_pid <= 0) {
+        kernel_pid_t res = lomac_pid;
+        lomac_pid = KERNEL_PID_UNDEF;
         return res;
     }
 
-    return _lomac_pid;
+    return lomac_pid;
 }
 
 /**
