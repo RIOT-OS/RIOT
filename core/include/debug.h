@@ -84,7 +84,7 @@
 # elif __GNUC__ >= 2
 #  define DEBUG_FUNC __FUNCTION__
 # else
-#  define DEBUF_FUNC ""
+#  define DEBUG_FUNC ""
 # endif
 
 #define DEBUG(...) DEBUG_PRINT(__VA_ARGS__)
