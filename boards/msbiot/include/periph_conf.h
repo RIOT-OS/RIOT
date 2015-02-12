@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     board_msbiot
+ * @ingroup     boards_msbiot
  * @{
  *
  * @file

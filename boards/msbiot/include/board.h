@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    board_msbiot MSB-IoT
+ * @defgroup    boards_msbiot MSB-IoT
  * @ingroup     boards
  * @brief       Board specific files for the MSB-IoT board
  * @{
