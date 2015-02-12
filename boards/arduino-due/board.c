@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     board_arduino-due
+ * @ingroup     boards_arduino-due
  * @{
  *
  * @file        board.c
