@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     board_pca10005
+ * @ingroup     boards_pca10005
  * @{
  *
  * @file
