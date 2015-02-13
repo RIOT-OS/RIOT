@@ -76,8 +76,10 @@
  * @param[in] arg       the argument to the function
  * @param[in] name      a human readable descriptor for the thread
  *
- * @return              value ``<0`` on error
- * @return              pid of newly created task, otherwise
+ * @return              PID of newly created task on success
+ * @return              -EINVAL, if @p priority is greater than or equal to
+ *                      @ref SCHED_PRIO_LEVELS
+ * @return              -EOVERFLOW, if there are too many threads running already
 */
 kernel_pid_t thread_create(char *stack,
                   int stacksize,
