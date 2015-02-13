@@ -11,7 +11,7 @@
  * @ingroup     net
  * @brief       Protocol type definitions to be used with the @ref net_ng_netapi,
  *              the @ref net_ng_netdev, the @ref net_ng_netreg, and
- *              the @ref ng_pkt
+ *              the @ref net_ng_pkt
  * @{
  *
  * @file
