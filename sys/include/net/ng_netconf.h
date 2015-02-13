@@ -7,13 +7,14 @@
  */
 
 /**
- * @defgroup    net_netconf Configuration options for network APIs
+ * @defgroup    net_ng_netconf  Configuration options for network APIs
  * @ingroup     net
- * @brief       List of available configuration options for network APIs
+ * @brief       List of available configuration options for the
+ *              @ref net_netdev and the @ref net_ng_netapi
  * @{
  *
  * @file
- * @brief       Definition of global configuration options for netdev and netapi
+ * @brief       Definition of global configuration options
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
@@ -31,36 +32,47 @@ extern "C" {
  */
 typedef enum {
     NETCONF_OPT_CHANNEL,            /**< get/set channel as uint16_t in host
-                                         byte order */
+                                     *   byte order */
     NETCONF_OPT_IS_CHANNEL_CLR,     /**< check if channel is clear */
-    NETCONF_OPT_ADDRESS,            /**< get/set link layer address in host byte
-                                         order */
-    NETCONF_OPT_ADDRESS_LONG,       /**< long link layer address in host byte
-                                         order (e.g. IEEE802.15.4 EUI-64) */
+    NETCONF_OPT_ADDRESS,            /**< get/set address in host byte order */
+
+    /**
+     * @brief    get/set long address in host byte order
+     *
+     * Examples for this include the EUI-64 in IEEE 802.15.4
+     */
+    NETCONF_OPT_ADDRESS_LONG,
     NETCONF_OPT_ADDR_LEN,           /**< get the default address length a
-                                         network device expects as uint16_t in
-                                         host byte order */
-    NETCONF_OPT_NID,                /**< get/set the network ID (e.g. PAN ID in
-                                         IEEE 802.15.4) as uint16_t in host
-                                         byte order */
+                                     *   network device expects as uint16_t in
+                                     *   host byte order */
+
+    /**
+     * @brief    get/set the network ID as uint16_t in host byte order
+     *
+     * Examples for this include the PAN ID in IEEE 802.15.4
+     */
+    NETCONF_OPT_NID,
     NETCONF_OPT_TX_POWER,           /**< get/set the output power for radio
-                                         devices in dBm as int16_t in host byte
-                                         order */
+                                     *   devices in dBm as int16_t in host byte
+                                     *   order */
     NETCONF_OPT_MAX_PACKET_SIZE,    /**< get/set the maximum packet size a
-                                         network module can handle as uint16_t
-                                         in host byte order */
-    NETCONF_OPT_PRELOADING,         /**< en/disable preloading or read the
-                                         current state. Preload using
-                                         *send_data*, send setting state to
-                                         *NETNETCONF_STATE_TX* */
+                                     *   network module can handle as uint16_t
+                                     *   in host byte order */
+    /**
+     * @brief en/disable preloading or read the current state.
+     *
+     * Preload using ng_netdev_driver_t::send_data() or ng_netapi_send()
+     * respectively, send setting state to @ref NETCONF_STATE_TX
+     */
+    NETCONF_OPT_PRELOADING,
     NETCONF_OPT_PROMISCUOUSMODE,    /**< en/disable promiscuous mode or read
-                                         the current state */
+                                     *   the current state */
     NETCONF_OPT_AUTOACK,            /**< en/disable link layer auto ACKs or read
-                                         the current state */
+                                     *   the current state */
     NETCONF_OPT_PROTO,              /**< get/set the protocol for the layer
-                                         as type *ng_nettype_t*. */
+                                     *   as type ng_nettype_t. */
     NETCONF_OPT_STATE,              /**< get/set the state of network devices as
-                                         type *net_netconf_state_t* */
+                                     *   type ng_netconf_state_t */
     /* add more options if needed */
 } ng_netconf_opt_t;
 
@@ -73,7 +85,7 @@ typedef enum {
 } ng_netconf_enable_t;
 
 /**
- * @brief   Option parameter to be used with *NETCONF_OPT_STATE* to set or get
+ * @brief   Option parameter to be used with @ref NETCONF_OPT_STATE to set or get
  *          the state of a network device or protocol implementation
  */
 typedef enum {
