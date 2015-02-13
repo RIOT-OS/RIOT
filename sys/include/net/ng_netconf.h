@@ -10,7 +10,7 @@
  * @defgroup    net_ng_netconf  Configuration options for network APIs
  * @ingroup     net
  * @brief       List of available configuration options for the
- *              @ref net_netdev and the @ref net_ng_netapi
+ *              @ref net_ng_netdev and the @ref net_ng_netapi
  * @{
  *
  * @file
