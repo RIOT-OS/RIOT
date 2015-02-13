@@ -16,10 +16,12 @@
  */
 
 #include <errno.h>
+#include <inttypes.h>
 
 #include "cpu-conf.h"
 #include "kernel_types.h"
 #include "msg.h"
+#include "net/ng_netconf.h"
 #include "net/ng_lomac.h"
 #include "net/ng_netapi.h"
 #include "net/ng_netif.h"
@@ -34,9 +36,16 @@ static kernel_pid_t _lomac_pid = KERNEL_PID_UNDEF;
 static char _lomac_stack[_LOMAC_STACKSIZE];
 static msg_t _msg_queue[NG_LOMAC_MSG_QUEUE_SIZE];
 
+/* needed to prevent type-punning warning in GCC */
+static inline void _set_max_packet_len(uint16_t *ptr)
+{
+    *ptr = UINT16_MAX;
+}
+
 static void *_lomac_thread(void *args)
 {
     msg_t msg, reply;
+    ng_netapi_opt_t *opt = NULL;
 
     (void)args;
     msg_init_queue(_msg_queue, NG_LOMAC_MSG_QUEUE_SIZE);
@@ -44,9 +53,8 @@ static void *_lomac_thread(void *args)
     /* register as interface */
     ng_netif_add(thread_getpid());
 
-    /* preinitialize ACK as "I don't support anything" */
+    /* preinitialize ACK */
     reply.type = NG_NETAPI_MSG_TYPE_ACK;
-    reply.content.value = (uint32_t)(-ENOTSUP);
 
     /* start event loop */
     while (1) {
@@ -60,7 +68,34 @@ static void *_lomac_thread(void *args)
                 break;
 
             case NG_NETAPI_MSG_TYPE_GET:
+                opt = (ng_netapi_opt_t *)msg.content.ptr;
+
+                switch (opt->opt) {
+                    case NETCONF_OPT_MAX_PACKET_SIZE:
+                        if (opt->data_len < 2) {
+                            reply.content.value = (uint32_t)(-EOVERFLOW);
+                            break;
+                        }
+                        else {
+                            opt->data_len = sizeof(uint16_t);
+                            _set_max_packet_len(opt->data);
+                            reply.content.value = opt->data_len;
+
+                            break;
+                        }
+
+                        break;
+
+                    default:
+                        reply.content.value = (uint32_t)(-ENOTSUP);
+                        break;
+                }
+
+                msg_reply(&msg, &reply);
+                break;
+
             case NG_NETAPI_MSG_TYPE_SET:
+                reply.content.value = (uint32_t)(-ENOTSUP);
                 msg_reply(&msg, &reply);
                 break;
 
