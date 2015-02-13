@@ -14,8 +14,15 @@
  * @file
  * @brief       Interface definition for the loopback MAC layer
  *
- * @details     This MAC layer triggers a receive command everytime a
- *              packet is send to it.
+ * @details     This MAC layer returns every packet that it is send through it.
+ *              The forwarding table of a higher layer can refer to this layer,
+ *              if it identifies the destination address to be of the node
+ *              itself.
+ *
+ *              This layer only understands the NG_NETAPI_MSG_TYPE_SND command and
+ *              NG_NETAPI_MSG_TYPE_GET with NETCONF_OPT_MAX_PACKET_SIZE.
+ *              Everything else will be discarded or answered with
+ *              NG_NETAPI_MSG_TYPE_ACK with -ENOTSUP.
  *
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
