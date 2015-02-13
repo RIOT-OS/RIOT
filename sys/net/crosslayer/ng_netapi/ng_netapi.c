@@ -8,7 +8,7 @@
 
 /**
  * @{
- * @ingroup     net_netapi
+ * @ingroup     net_ng_netapi
  * @file
  * @brief       This file contains a number of helper functions that provide
  *              some shortcuts for some always repeating code snippets when

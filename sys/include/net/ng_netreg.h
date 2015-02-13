@@ -13,7 +13,7 @@
  *
  * @file
  * @brief   Definitions to register network protocol PIDs to use with
- *          @ref net_netapi.
+ *          @ref net_ng_netapi.
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
