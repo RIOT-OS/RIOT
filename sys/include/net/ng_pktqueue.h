@@ -7,13 +7,13 @@
  */
 
 /**
- * @defgroup    ng_pktqueue Packet Queue
+ * @defgroup    net_ng_pktqueue Packet Queue
  * @brief       Packet wrapper for the Priority Queue
  * @ingroup     net
  * @{
  *
  * @file
- * @brief       `ng_pktsnip_t`-centric wrapper for @ref priority_queue_t
+ * @brief       ng_pktsnip_t-centric wrapper for @ref priority_queue_t
  *
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
@@ -110,7 +110,7 @@ static inline ng_pktqueue_node_t *ng_pktqueue_remove_head(ng_pktqueue_t *queue)
 }
 
 /**
- * @brief       add *node* into *queue* based on its priority
+ * @brief       add @p node into @p queue based on its priority
  *
  * @details     The new node will be appended after objects with the same
  *              priority.
@@ -124,7 +124,7 @@ static inline void ng_pktqueue_add(ng_pktqueue_t *queue, ng_pktqueue_node_t *nod
 }
 
 /**
- * @brief       remove *node* from *queue*
+ * @brief       remove @p node from @p queue
  *
  * @param[in]   queue   the queue
  * @param[in]   node    the node to remove
