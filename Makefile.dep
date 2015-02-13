@@ -48,6 +48,14 @@ ifneq (,$(filter sixlowpan,$(USEMODULE)))
 	USEMODULE += vtimer
 endif
 
+ifneq (,$(filter slip,$(USEMODULE)))
+    USEMODULE += pktbuf
+    ifeq (,$(filter $(BOARD),arduino-due iot-lab_M3 pca10000 pca10005 stm32f0discovery stm32f3discovery stm32f4discovery))
+        USEMODULE += posix
+        USEMODULE += uart0
+    endif
+endif
+
 ifneq (,$(filter aodvv2,$(USEMODULE)))
         USEMODULE += vtimer
         USEMODULE += sixlowpan
@@ -109,8 +117,20 @@ ifneq (,$(filter ccn_lite,$(USEMODULE)))
 	USEMODULE += crypto
 endif
 
+ifneq (,$(filter nomac,$(USEMODULE)))
+	USEMODULE += pktbuf
+endif
+
+ifneq (,$(filter netapi,$(USEMODULE)))
+	USEMODULE += pkt
+endif
+
 ifneq (,$(filter netdev_802154,$(USEMODULE)))
 	USEMODULE += netdev_base
+endif
+
+ifneq (,$(filter pktbuf,$(USEMODULE)))
+	USEMODULE += pkt
 endif
 
 ifneq (,$(filter rgbled,$(USEMODULE)))
