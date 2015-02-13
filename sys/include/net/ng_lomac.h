@@ -38,18 +38,13 @@ extern "C" {
 #endif
 
 /**
- * @brief   The PID to the loopback MAC layer thread.
- */
-extern kernel_pid_t lomac_pid;
-
-/**
  * @brief   Initializes the loopback MAC layer.
  *
- * @note    There can only be one loopback MAC layer.
+ * @details There can only be one loopback MAC layer.
  *
  * @param[in] priority The priority for the loopback MAC layer thread.
  *
- * @return  The PID to the loopback MAC layer thread (@ref lomac_pid).
+ * @return  The PID to the loopback MAC layer thread.
  * @return  -EEXIST, if loopback MAC layer was already initialized.
  * @return  other negative value, if thread creation failed
  *          (see @ref thread_create())
