@@ -90,6 +90,7 @@ int mpu9150_init(mpu9150_t *dev, i2c_t i2c, mpu9150_hw_addr_t hw_addr,
 
     /* Initialize magnetometer */
     if (compass_init(dev)) {
+        i2c_release(dev->i2c_dev);
         return -2;
     }
     /* Release the bus, it is acquired again inside each function */
