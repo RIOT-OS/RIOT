@@ -7,13 +7,13 @@
  */
 
 /**
- * @defgroup    ng_netreg  Network protocol registry
+ * @defgroup    net_ng_netreg  Network protocol registry
  * @ingroup     net
  * @{
  *
  * @file
  * @brief   Definitions to register network protocol PIDs to use with
- *          @ref net_netapi.
+ *          @ref net_ng_netapi.
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
@@ -30,7 +30,7 @@ extern "C" {
 #endif
 
 /**
- * @brief Number of maximum entries to @ref ng_netreg
+ * @brief Number of maximum entries to @ref net_ng_netreg
  * @def NG_NETREG_SIZE
  */
 #ifndef NG_NETREG_SIZE
@@ -38,7 +38,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   Entry to the @ref ng_netreg
+ * @brief   Entry to the @ref net_ng_netreg
  */
 typedef struct ng_netreg_entry {
     struct ng_netreg_entry *next;   /**< next element in list */

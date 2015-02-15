@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    ng_netif    Network interfaces
+ * @defgroup    net_ng_netif    Network interfaces
  * @ingroup     net
  * @brief       Abstraction layer for network interfaces
  *

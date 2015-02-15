@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    ng_pkt Packet
+ * @defgroup    net_ng_pkt Packet
  * @brief       Network packet abstraction types
  * @ingroup     net
  * @{
@@ -34,8 +34,8 @@ extern "C" {
  *          snip == (packet header || packet payload)) of a network packet
  * @details The idea behind the packet snips is that they either can represent
  *          protocol-specific headers or payload. A packet can be comprised of
- *          *n* `pktsnip_t` elements, where the first element represents the
- *          header of the lowest available network layer and the *(n - 1)*st
+ *          @f$ n @f$ pktsnip_t elements, where the first element represents the
+ *          header of the lowest available network layer and the @f$ (n - 1) @f$-st
  *          element represents the payload of the highest available layer.
  *          Use @ref sys_ut to operate on this.
  *
@@ -44,31 +44,31 @@ extern "C" {
  *                                                                  buffer
  *              +---------------------------+                      +------+
  *              | size = 14                 | data +-------------->|      |
- *              | type = PKT_PROTO_ETHERNET |------+               +------+
+ *              | type = NETTYPE_ETHERNET   |------+               +------+
  *              +---------------------------+         +----------->|      |
  *                    | next                          |            |      |
  *                    v                               |            |      |
  *              +---------------------------+         |            +------+
  *              | size = 40                 | data    |  +-------->|      |
- *              | type = PKT_PROTO_IPV6     |---------+  |         +------+
+ *              | type = NETTYPE_IPV6       |---------+  |         +------+
  *              +---------------------------+            |  +----->|      |
  *                    | next                             |  |      +------+
  *                    v                                  |  |  +-->|      |
  *              +---------------------------+            |  |  |   |      |
  *              | size = 8                  | data       |  |  |   .      .
- *              | type = PKT_PROTO_UDP      |------------+  |  |   .      .
+ *              | type = NETTYPE_UDP        |------------+  |  |   .      .
  *              +---------------------------+               |  |
  *                    | next                                |  |
  *                    v                                     |  |
  *              +---------------------------+               |  |
  *              | size = 5                  | data          |  |
- *              | type = PKT_PROTO_COAP     |---------------+  |
+ *              | type = NETTYPE_COAP       |---------------+  |
  *              +---------------------------+                  |
  *                    | next                                   |
  *                    v                                        |
  *              +---------------------------+                  |
  *              | size = 54                 | data             |
- *              | type = PKT_PROTO_UNKNOWN  |------------------+
+ *              | type = NETTYPE_UNKNOWN    |------------------+
  *              +---------------------------+
  *
  *
@@ -77,9 +77,8 @@ extern "C" {
  * @note    This type has no initializer on purpose. Please use @ref pktbuf
  *          as factory.
  */
-typedef struct __attribute__((packed)) ng_pktsnip {   /* packed to be aligned
-                                                       * correctly in the static
-                                                       * packet buffer */
+/* packed to be aligned correctly in the static packet buffer */
+typedef struct __attribute__((packed)) ng_pktsnip {
     struct ng_pktsnip *next;        /**< next snip in the packet */
     void *data;                     /**< pointer to the data of the snip */
     size_t size;                    /**< the length of the snip in byte */

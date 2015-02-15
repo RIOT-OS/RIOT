@@ -7,14 +7,14 @@
  */
 
 /**
- * @defgroup    net_netapi Generic network module interface
+ * @defgroup    net_ng_netapi   Generic network module interface
  * @ingroup     net
  * @brief       Generic interface for IPC communication between network modules
  *
  * @details     The idea of this interface is that it provides every network
  *              module with a basic set of commands to communicate with its
  *              neighboring modules. In this model every module runs in its own
- *              thread and communication is done using netapi.
+ *              thread and communication is done using the @ref net_ng_netapi.
  *
  * @{
  *
@@ -73,7 +73,7 @@ typedef struct {
 } ng_netapi_opt_t;
 
 /**
- * @brief   Shortcut function for sending *NETAPI_CMD_SND* messages
+ * @brief   Shortcut function for sending @ref NG_NETAPI_MSG_TYPE_SND messages
  *
  * @param[in] pid       PID of the targeted network module
  * @param[in] pkt       pointer into the packet buffer holding the data to send
@@ -84,8 +84,8 @@ typedef struct {
 int ng_netapi_send(kernel_pid_t pid, ng_pktsnip_t *pkt);
 
 /**
- * @brief   Shortcut function for send *NETAPI_CMD_GETOPT* messages and parsing
- *          the returned *NETAPI_CMD_ACK* message
+ * @brief   Shortcut function for sending @ref NG_NETAPI_MSG_TYPE_GET messages and
+ *          parsing the returned @ref NG_NETAPI_MSG_TYPE_ACK message
  *
  * @param[in] pid       PID of the targeted network module
  * @param[in] opt       option to get
@@ -93,23 +93,22 @@ int ng_netapi_send(kernel_pid_t pid, ng_pktsnip_t *pkt);
  * @param[in] data      pointer to buffer for reading the option's value
  * @param[in] data_len  size of the given buffer
  *
- * @return              value returned by the ACK message
+ * @return              value returned by the @ref NG_NETAPI_MSG_TYPE_ACK message
  */
 int ng_netapi_get(kernel_pid_t pid, ng_netconf_opt_t opt, uint16_t context,
                   void *data, size_t data_len);
 
 /**
- * @brief Set an option of a protocol layer identified by *pid*.
- *
- * @note    Wraps IPC call of NETAPI_CMD_SET.
+ * @brief   Shortcut function for sending @ref NG_NETAPI_MSG_TYPE_SET messages and
+ *          parsing the returned @ref NG_NETAPI_MSG_TYPE_ACK message
  *
  * @param[in] pid       PID of the targeted network module
  * @param[in] opt       option to set
  * @param[in] context   (optional) context to the given option
  * @param[in] data      data to set the given option to
- * @param[in] data_len  size of *data*
+ * @param[in] data_len  size of @p data
  *
- * @return              value returned by the ACK message
+ * @return              value returned by the @ref NG_NETAPI_MSG_TYPE_ACK message
  */
 int ng_netapi_set(kernel_pid_t pid, ng_netconf_opt_t opt, uint16_t context,
                   void *data, size_t data_len);
