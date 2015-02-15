@@ -46,6 +46,7 @@
 #include <ifaddrs.h>
 #include <time.h>
 #include <sys/time.h>
+#include <sys/stat.h>
 
 #include "kernel_types.h"
 
@@ -91,6 +92,7 @@ extern void (*real_srandom)(unsigned int seed);
 extern int (*real_accept)(int socket, ...);
 /* The ... is a hack to save includes: */
 extern int (*real_bind)(int socket, ...);
+extern int (*real_chdir)(const char *path);
 extern int (*real_close)(int);
 /* The ... is a hack to save includes: */
 extern int (*real_creat)(const char *path, ...);
@@ -112,6 +114,7 @@ extern int (*real_pipe)(int[2]);
 extern int (*real_select)(int nfds, ...);
 extern int (*real_setitimer)(int which, const struct itimerval
         *__restrict value, struct itimerval *__restrict ovalue);
+extern int (*real_setsid)(void);
 extern int (*real_setsockopt)(int socket, ...);
 extern int (*real_socket)(int domain, int type, int protocol);
 extern int (*real_printf)(const char *format, ...);
@@ -119,6 +122,7 @@ extern int (*real_unlink)(const char *);
 extern long int (*real_random)(void);
 extern const char* (*real_gai_strerror)(int errcode);
 extern FILE* (*real_fopen)(const char *path, const char *mode);
+extern mode_t (*real_umask)(mode_t cmask);
 
 #ifdef __MACH__
 #else
