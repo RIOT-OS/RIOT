@@ -33,6 +33,10 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
+#ifndef UNASSIGNED_CHANNEL
+#define UNASSIGNED_CHANNEL INT_MIN
+#endif
+
 #define TRANSCEIVER TRANSCEIVER_DEFAULT
 
 static char monitor_stack_buffer[MONITOR_STACK_SIZE];
@@ -44,7 +48,7 @@ void rpl_udp_init(int argc, char **argv)
 {
     transceiver_command_t tcmd;
     msg_t m;
-    int32_t chan = 0;
+    int32_t chan = UNASSIGNED_CHANNEL;
 
     if (argc != 2) {
         printf("Usage: %s (r|n|h)\n", argv[0]);
@@ -76,7 +80,7 @@ void rpl_udp_init(int argc, char **argv)
         m.content.ptr = (void *) &tcmd;
 
         msg_send_receive(&m, &m, transceiver_pid);
-        if( chan == 0 ) {
+        if( chan == UNASSIGNED_CHANNEL ) {
             DEBUGF("The channel has not been set yet.");
 
             /* try to set the channel to 10 (RADIO_CHANNEL) */
@@ -85,7 +89,7 @@ void rpl_udp_init(int argc, char **argv)
 
         m.type = SET_CHANNEL;
         msg_send_receive(&m, &m, transceiver_pid);
-        if( chan == 0 ) {
+        if( chan == UNASSIGNED_CHANNEL ) {
             puts("ERROR: channel NOT set! Aborting initialization.");
             return;
         }
