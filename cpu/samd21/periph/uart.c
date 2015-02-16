@@ -96,7 +96,6 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
     uint32_t uart_ref_f = 0;
     uint32_t tx_pin = 0;
     uint32_t rx_pin = 0;
-    uint32_t pins = 0;
     uint32_t HWSEL = 0;
 
 
@@ -108,7 +107,6 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
             uart_ref_f = UART_0_REF_F;
             tx_pin = UART_0_TX_PIN;
             rx_pin = UART_0_RX_PIN;
-            pins = UART_0_PINS;
             HWSEL = 0;
 
             /* Turn on power manager for sercom0 */
@@ -130,7 +128,6 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
             uart_ref_f = UART_1_REF_F;
             tx_pin = UART_1_TX_PIN;
             rx_pin = UART_1_RX_PIN;
-            pins = UART_1_PINS;
             HWSEL = (PORT_WRCONFIG_HWSEL);
 
             /* Turn on power manager for sercom5 */
@@ -169,7 +166,8 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
                                 | PORT_WRCONFIG_WRPMUX    /* PMUXn registers of the selected pins will be updated */
                                 | PORT_WRCONFIG_PMUX(0x3) /* Multiplexer peripheral function D */
                                 | PORT_WRCONFIG_PMUXEN    /* Peripheral multiplexer enable */
-                                | pins;                   /* Pinmask */
+                                | (1 << ( tx_pin % 16 ))  /* Pinmask */
+                                | (1 << ( rx_pin % 16 )); /* Pinmask */
 
     uart_dev->CTRLA.bit.ENABLE = 0; /* Disable to write, need to sync to */
     while(uart_dev->SYNCBUSY.bit.ENABLE);
