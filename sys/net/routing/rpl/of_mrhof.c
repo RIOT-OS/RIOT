@@ -28,7 +28,7 @@
 #include "debug.h"
 
 // Function Prototypes
-static uint16_t calc_rank(rpl_parent_t *, uint16_t);
+static network_uint16_t calc_rank(rpl_parent_t *, network_uint16_t);
 static rpl_parent_t *which_parent(rpl_parent_t *, rpl_parent_t *);
 static rpl_dodag_t *which_dodag(rpl_dodag_t *, rpl_dodag_t *);
 static void reset(rpl_dodag_t *);
@@ -38,7 +38,7 @@ static uint16_t cur_min_path_cost = MAX_PATH_COST;
 static rpl_parent_t *cur_preferred_parent = NULL;
 
 static rpl_of_t rpl_of_mrhof = {
-    0x1,
+    {0x0100}, /**< is HTONS(0x0001) */
     calc_rank,
     which_parent,
     which_dodag,
@@ -90,15 +90,15 @@ static uint16_t calc_path_cost(rpl_parent_t *parent)
             return MAX_PATH_COST;
         }
 
-        if (etx_value * ETX_RANK_MULTIPLIER + parent->rank
-            < parent->rank) {
+        if (etx_value * ETX_RANK_MULTIPLIER + NTOHS(parent->rank.u16)
+            < NTOHS(parent->rank.u16)) {
             //Overflow
             return MAX_PATH_COST;
         }
 
         //TODO runden
         return etx_value * ETX_RANK_MULTIPLIER
-               + parent->rank;
+               + NTOHS(parent->rank.u16);
     }
     else {
         // IMPLEMENT HANDLING OF OTHER METRICS HERE
@@ -108,9 +108,13 @@ static uint16_t calc_path_cost(rpl_parent_t *parent)
     }
 }
 
-static uint16_t calc_rank(rpl_parent_t *parent, uint16_t base_rank)
+static network_uint16_t calc_rank(rpl_parent_t *parent, network_uint16_t base_rank)
 {
     DEBUGF("calc_rank\n");
+    network_uint16_t net_inf_rank = {HTONS(INFINITE_RANK)};
+    network_uint16_t net_min_rank = {HTONS(DEFAULT_MIN_HOP_RANK_INCREASE)};
+    network_uint16_t net_inc_rank = {0x0};
+    network_uint16_t calculated_pcost = {0x0};
 
     /*
      * Return the rank for this node.
@@ -120,9 +124,9 @@ static uint16_t calc_rank(rpl_parent_t *parent, uint16_t base_rank)
      * Baserank is pretty much only used to find out if a node is a root or not.
      */
     if (parent == NULL) {
-        if (base_rank == 0) {
+        if (base_rank.u16 == 0x0) {
             //No parent, no rank, a root node would have a rank != 0
-            return INFINITE_RANK;
+            return net_inf_rank;
         }
 
         /*
@@ -131,7 +135,7 @@ static uint16_t calc_rank(rpl_parent_t *parent, uint16_t base_rank)
          * Since a recalculating node must have a parent in this implementation
          * (see rpl.c, function global_repair), we can assume this node is root.
          */
-        return DEFAULT_MIN_HOP_RANK_INCREASE;
+        return net_min_rank;
     }
     else {
         /*
@@ -139,12 +143,12 @@ static uint16_t calc_rank(rpl_parent_t *parent, uint16_t base_rank)
          * the parent and choose the maximum of that value and the advertised
          * rank of the parent + minhoprankincrease for our rank.
          */
-        uint16_t calculated_pcost = calc_path_cost(parent);
-
-        if (calculated_pcost < MAX_PATH_COST) {
-            if ((parent->rank + parent->dodag->minhoprankincrease)
-                > calculated_pcost) {
-                return parent->rank + parent->dodag->minhoprankincrease;
+         calculated_pcost.u16 = HTONS(calc_path_cost(parent));
+         net_inc_rank.u16 = (parent->rank.u16 + parent->dodag->minhoprankincrease.u16);
+        if (NTOHS(calculated_pcost.u16) < MAX_PATH_COST) {
+            if (( NTOHS(net_inc_rank.u16))
+                > NTOHS(calculated_pcost.u16)) {
+                return net_inc_rank;
             }
             else {
                 return calculated_pcost;
@@ -152,7 +156,7 @@ static uint16_t calc_rank(rpl_parent_t *parent, uint16_t base_rank)
         }
         else {
             //Path costs are greater than allowed
-            return INFINITE_RANK;
+            return net_inf_rank;
         }
     }
 }

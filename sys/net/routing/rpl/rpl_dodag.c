@@ -104,7 +104,7 @@ rpl_dodag_t *rpl_new_dodag(uint8_t instanceid, ipv6_addr_t *dodagid)
         if (dodag->used == 0) {
             memset(dodag, 0, sizeof(*dodag));
             dodag->instance = inst;
-            dodag->my_rank = INFINITE_RANK;
+            dodag->my_rank.u16 = HTONS(INFINITE_RANK);
             dodag->used = 1;
             dodag->ack_received = true;
             dodag->dao_counter = 0;
@@ -167,7 +167,7 @@ bool rpl_equal_id(ipv6_addr_t *id1, ipv6_addr_t *id2)
 
 }
 
-rpl_parent_t *rpl_new_parent(rpl_dodag_t *dodag, ipv6_addr_t *address, uint16_t rank)
+rpl_parent_t *rpl_new_parent(rpl_dodag_t *dodag, ipv6_addr_t *address, network_uint16_t rank)
 {
     rpl_parent_t *parent;
     rpl_parent_t *end;
@@ -179,7 +179,7 @@ rpl_parent_t *rpl_new_parent(rpl_dodag_t *dodag, ipv6_addr_t *address, uint16_t 
             parent->addr = *address;
             parent->rank = rank;
             parent->dodag = dodag;
-            parent->lifetime = dodag->default_lifetime * dodag->lifetime_unit;
+            parent->lifetime.u16 = HTONS(dodag->default_lifetime * NTOHS(dodag->lifetime_unit.u16));
             /* dtsn is set at the end of recv_dio function */
             parent->dtsn = 0;
             return parent;
@@ -222,9 +222,9 @@ void rpl_delete_worst_parent(void)
     uint16_t max_rank = 0x0000;
 
     for (int i = 0; i < RPL_MAX_PARENTS; i++) {
-        if (parents[i].rank > max_rank) {
+        if (NTOHS(parents[i].rank.u16) > max_rank) {
             worst = i;
-            max_rank = parents[i].rank;
+            max_rank = NTOHS(parents[i].rank.u16);
         }
     }
 
@@ -262,7 +262,7 @@ rpl_parent_t *rpl_find_preferred_parent(void)
 
     for (uint8_t i = 0; i < RPL_MAX_PARENTS; i++) {
         if (parents[i].used) {
-            if ((parents[i].rank == INFINITE_RANK) || (parents[i].lifetime <= 1)) {
+            if ((parents[i].rank.u16 == HTONS(INFINITE_RANK)) || (NTOHS(parents[i].lifetime.u16) <= 1)) {
                 DEBUG("Infinite rank, bad parent\n");
                 continue;
             }
@@ -305,7 +305,7 @@ rpl_parent_t *rpl_find_preferred_parent(void)
 void rpl_parent_update(rpl_parent_t *parent)
 {
     rpl_dodag_t *my_dodag = rpl_get_my_dodag();
-    uint16_t old_rank;
+    network_uint16_t old_rank;
 
     if (my_dodag == NULL) {
         DEBUG("Not part of a dodag - this should not happen");
@@ -316,16 +316,16 @@ void rpl_parent_update(rpl_parent_t *parent)
 
     /* update Parent lifetime */
     if (parent != NULL) {
-        parent->lifetime = my_dodag->default_lifetime * my_dodag->lifetime_unit;
+        parent->lifetime.u16 = HTONS(my_dodag->default_lifetime * NTOHS(my_dodag->lifetime_unit.u16));
     }
 
     if (rpl_find_preferred_parent() == NULL) {
         rpl_local_repair();
     }
 
-    if (rpl_calc_rank(old_rank, my_dodag->minhoprankincrease) !=
-        rpl_calc_rank(my_dodag->my_rank, my_dodag->minhoprankincrease)) {
-        if (my_dodag->my_rank < my_dodag->min_rank) {
+    if (rpl_calc_rank(old_rank, my_dodag->minhoprankincrease).u16 !=
+        rpl_calc_rank(my_dodag->my_rank, my_dodag->minhoprankincrease).u16 ) {
+        if (NTOHS(my_dodag->my_rank.u16) < NTOHS(my_dodag->min_rank.u16)) {
             my_dodag->min_rank = my_dodag->my_rank;
         }
 
@@ -333,7 +333,7 @@ void rpl_parent_update(rpl_parent_t *parent)
     }
 }
 
-void rpl_join_dodag(rpl_dodag_t *dodag, ipv6_addr_t *parent, uint16_t parent_rank)
+void rpl_join_dodag(rpl_dodag_t *dodag, ipv6_addr_t *parent, network_uint16_t parent_rank)
 {
     rpl_dodag_t *my_dodag;
     rpl_parent_t *preferred_parent;
@@ -373,14 +373,14 @@ void rpl_join_dodag(rpl_dodag_t *dodag, ipv6_addr_t *parent, uint16_t parent_ran
     my_dodag->min_rank = my_dodag->my_rank;
     DEBUG("Joint DODAG:\n");
     DEBUG("\tMOP:\t%02X\n", my_dodag->mop);
-    DEBUG("\tminhoprankincrease :\t%04X\n", my_dodag->minhoprankincrease);
+    DEBUG("\tminhoprankincrease :\t%04X\n", NTOHS(my_dodag->minhoprankincrease.u16));
     DEBUG("\tdefault_lifetime:\t%02X\n", my_dodag->default_lifetime);
     DEBUG("\tgrounded:\t%02X\n", my_dodag->grounded);
     DEBUG("\tmy_preferred_parent:\t%s\n",
           ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
                            &my_dodag->my_preferred_parent->addr));
-    DEBUG("\tmy_preferred_parent rank\t%02X\n", my_dodag->my_preferred_parent->rank);
-    DEBUG("\tmy_preferred_parent lifetime\t%04X\n", my_dodag->my_preferred_parent->lifetime);
+    DEBUG("\tmy_preferred_parent rank\t%02X\n", NTOHS(my_dodag->my_preferred_parent->rank.u16));
+    DEBUG("\tmy_preferred_parent lifetime\t%04X\n", NTOHS(my_dodag->my_preferred_parent->lifetime.u16));
 
     trickle_start(rpl_process_pid, &my_dodag->trickle, RPL_MSG_TYPE_TRICKLE_INTERVAL,
             RPL_MSG_TYPE_TRICKLE_CALLBACK, (1 << my_dodag->dio_min), my_dodag->dio_interval_doubling,
@@ -388,7 +388,7 @@ void rpl_join_dodag(rpl_dodag_t *dodag, ipv6_addr_t *parent, uint16_t parent_ran
     rpl_delay_dao(my_dodag);
 }
 
-void rpl_global_repair(rpl_dodag_t *dodag, ipv6_addr_t *p_addr, uint16_t rank)
+void rpl_global_repair(rpl_dodag_t *dodag, ipv6_addr_t *p_addr, network_uint16_t rank)
 {
     DEBUGF("[INFO] Global repair started\n");
     rpl_dodag_t *my_dodag = rpl_get_my_dodag();
@@ -405,7 +405,7 @@ void rpl_global_repair(rpl_dodag_t *dodag, ipv6_addr_t *p_addr, uint16_t rank)
 
     if (my_dodag->my_preferred_parent == NULL) {
         DEBUGF("[Error] no more parent after global repair\n");
-        my_dodag->my_rank = INFINITE_RANK;
+        my_dodag->my_rank.u16 = HTONS(INFINITE_RANK);
     }
     else {
         /* Calc new Rank */
@@ -417,7 +417,7 @@ void rpl_global_repair(rpl_dodag_t *dodag, ipv6_addr_t *p_addr, uint16_t rank)
     }
 
     DEBUGF("Migrated to DODAG Version %d. My new Rank: %d\n", my_dodag->version,
-           my_dodag->my_rank);
+           NTOHS(my_dodag->my_rank.u16));
 }
 
 void rpl_local_repair(void)
@@ -430,7 +430,7 @@ void rpl_local_repair(void)
         return;
     }
 
-    my_dodag->my_rank = INFINITE_RANK;
+    my_dodag->my_rank.u16 = HTONS(INFINITE_RANK);
     my_dodag->dtsn++;
     rpl_delete_all_parents();
     trickle_reset_timer(&my_dodag->trickle);
@@ -448,7 +448,8 @@ ipv6_addr_t *rpl_get_my_preferred_parent(void)
     return &my_dodag->my_preferred_parent->addr;
 }
 
-uint16_t rpl_calc_rank(uint16_t abs_rank, uint16_t minhoprankincrease)
+network_uint16_t rpl_calc_rank(network_uint16_t abs_rank, network_uint16_t minhoprankincrease)
 {
-    return abs_rank / minhoprankincrease;
+    network_uint16_t ret = {HTONS(NTOHS(abs_rank.u16) / NTOHS(minhoprankincrease.u16))};
+    return ret;
 }

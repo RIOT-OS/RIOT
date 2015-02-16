@@ -22,13 +22,13 @@
 #include "of0.h"
 
 //Function Prototypes
-static uint16_t calc_rank(rpl_parent_t *, uint16_t);
+static network_uint16_t calc_rank(rpl_parent_t *, network_uint16_t);
 static rpl_parent_t *which_parent(rpl_parent_t *, rpl_parent_t *);
 static rpl_dodag_t *which_dodag(rpl_dodag_t *, rpl_dodag_t *);
 static void reset(rpl_dodag_t *);
 
 static rpl_of_t rpl_of0 = {
-    0x0,
+    {0x0000},
     calc_rank,
     which_parent,
     which_dodag,
@@ -49,36 +49,42 @@ void reset(rpl_dodag_t *dodag)
     (void) dodag;
 }
 
-uint16_t calc_rank(rpl_parent_t *parent, uint16_t base_rank)
+network_uint16_t calc_rank(rpl_parent_t *parent, network_uint16_t base_rank)
 {
-    if (base_rank == 0) {
+    network_uint16_t net_inf_rank = {HTONS(INFINITE_RANK)};
+    network_uint16_t net_min_rank = {HTONS(DEFAULT_MIN_HOP_RANK_INCREASE)};
+    network_uint16_t net_inc_rank = {0x0};
+
+    if (base_rank.u16 == 0x0) {
         if (parent == NULL) {
-            return INFINITE_RANK;
+            return net_inf_rank;
         }
 
         base_rank = parent->rank;
     }
 
-    uint16_t add;
+    network_uint16_t add;
 
     if (parent != NULL) {
         add = parent->dodag->minhoprankincrease;
     }
     else {
-        add = DEFAULT_MIN_HOP_RANK_INCREASE;
+        add = net_min_rank;
     }
 
-    if (base_rank + add < base_rank) {
-        return INFINITE_RANK;
+    net_inc_rank.u16 = (base_rank.u16 + add.u16);
+
+    if ( NTOHS(net_inc_rank.u16) < NTOHS(base_rank.u16) ) {
+        return net_inf_rank;
     }
 
-    return base_rank + add;
+    return net_inc_rank;
 }
 
 /* We simply return the Parent with lower rank */
 rpl_parent_t *which_parent(rpl_parent_t *p1, rpl_parent_t *p2)
 {
-    if (p1->rank < p2->rank) {
+    if ( NTOHS(p1->rank.u16) < NTOHS(p2->rank.u16) ) {
         return p1;
     }
 

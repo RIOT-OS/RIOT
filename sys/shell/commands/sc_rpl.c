@@ -43,7 +43,7 @@ void _rpl_route_handler(int argc, char **argv)
                                                 (&rtable[i].address)));
                 printf("%-18s  ", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
                                                 (&rtable[i].next_hop)));
-                printf("%d\n", rtable[i].lifetime);
+                printf("%d\n", NTOHS(rtable[i].lifetime.u16));
 
             }
         }

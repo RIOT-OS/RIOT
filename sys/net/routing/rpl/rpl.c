@@ -370,24 +370,24 @@ void _rpl_update_routing_table(void) {
 
         for (uint8_t i = 0; i < rpl_max_routing_entries; i++) {
             if (rt[i].used) {
-                if (rt[i].lifetime <= 1) {
+                if (NTOHS(rt[i].lifetime.u16) <= 1) {
                     memset(&rt[i], 0, sizeof(rt[i]));
                 }
                 else {
-                    rt[i].lifetime = rt[i].lifetime - RPL_LIFETIME_STEP;
+                    rt[i].lifetime.u16 = rt[i].lifetime.u16 - HTONS(RPL_LIFETIME_STEP);
                 }
             }
         }
 
         /* Parent is NULL for root too */
         if (my_dodag->my_preferred_parent != NULL) {
-            if (my_dodag->my_preferred_parent->lifetime <= 1) {
+            if (NTOHS(my_dodag->my_preferred_parent->lifetime.u16) <= 1) {
                 DEBUGF("parent lifetime timeout\n");
                 rpl_parent_update(NULL);
             }
             else {
-                my_dodag->my_preferred_parent->lifetime =
-                    my_dodag->my_preferred_parent->lifetime - RPL_LIFETIME_STEP;
+                my_dodag->my_preferred_parent->lifetime.u16 =
+                    my_dodag->my_preferred_parent->lifetime.u16 - HTONS(RPL_LIFETIME_STEP);
             }
         }
     }
@@ -482,7 +482,7 @@ void rpl_add_routing_entry(ipv6_addr_t *addr, ipv6_addr_t *next_hop, uint16_t li
     rpl_routing_entry_t *entry = rpl_find_routing_entry(addr);
 
     if (entry != NULL) {
-        entry->lifetime = lifetime;
+        entry->lifetime.u16 = HTONS(lifetime);
         return;
     }
 
@@ -492,7 +492,7 @@ void rpl_add_routing_entry(ipv6_addr_t *addr, ipv6_addr_t *next_hop, uint16_t li
         if (!rpl_routing_table[i].used) {
             memcpy(&rpl_routing_table[i].address, addr, sizeof(ipv6_addr_t));
             memcpy(&rpl_routing_table[i].next_hop, next_hop, sizeof(ipv6_addr_t));
-            rpl_routing_table[i].lifetime = lifetime;
+            rpl_routing_table[i].lifetime.u16 = HTONS(lifetime);
             rpl_routing_table[i].used = 1;
             break;
         }

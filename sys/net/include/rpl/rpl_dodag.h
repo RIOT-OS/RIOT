@@ -35,9 +35,9 @@ rpl_instance_t *rpl_get_my_instance(void);
 rpl_dodag_t *rpl_new_dodag(uint8_t instanceid, ipv6_addr_t *id);
 rpl_dodag_t *rpl_get_dodag(ipv6_addr_t *id);
 rpl_dodag_t *rpl_get_my_dodag(void);
-void rpl_join_dodag(rpl_dodag_t *dodag, ipv6_addr_t *parent, uint16_t parent_rank);
+void rpl_join_dodag(rpl_dodag_t *dodag, ipv6_addr_t *parent, network_uint16_t parent_rank);
 void rpl_del_dodag(rpl_dodag_t *dodag);
-rpl_parent_t *rpl_new_parent(rpl_dodag_t *dodag, ipv6_addr_t *address, uint16_t rank);
+rpl_parent_t *rpl_new_parent(rpl_dodag_t *dodag, ipv6_addr_t *address, network_uint16_t rank);
 rpl_parent_t *rpl_find_parent(ipv6_addr_t *address);
 void rpl_leave_dodag(rpl_dodag_t *dodag);
 bool rpl_equal_id(ipv6_addr_t *id1, ipv6_addr_t *id2);
@@ -47,9 +47,9 @@ void rpl_delete_worst_parent(void);
 void rpl_delete_all_parents(void);
 rpl_parent_t *rpl_find_preferred_parent(void);
 void rpl_parent_update(rpl_parent_t *parent);
-void rpl_global_repair(rpl_dodag_t *dodag, ipv6_addr_t *p_addr, uint16_t rank);
+void rpl_global_repair(rpl_dodag_t *dodag, ipv6_addr_t *p_addr, network_uint16_t rank);
 void rpl_local_repair(void);
-uint16_t rpl_calc_rank(uint16_t abs_rank, uint16_t minhoprankincrease);
+network_uint16_t rpl_calc_rank(network_uint16_t abs_rank, network_uint16_t minhoprankincrease);
 
 #ifdef __cplusplus
 }
