@@ -44,14 +44,14 @@ void rpl_of_manager_init(ipv6_addr_t *my_address)
 }
 
 /* find implemented OF via objective code point */
-rpl_of_t *rpl_get_of_for_ocp(uint16_t ocp)
+rpl_of_t *rpl_get_of_for_ocp(network_uint16_t ocp)
 {
     for (uint16_t i = 0; i < NUMBER_IMPLEMENTED_OFS; i++) {
         if (objective_functions[i] == NULL) {
             /* fallback if something goes wrong */
             return rpl_get_of0();
         }
-        else if (ocp == objective_functions[i]->ocp) {
+        else if (byteorder_ntohs(ocp) == byteorder_ntohs(objective_functions[i]->ocp)) {
             return objective_functions[i];
         }
     }

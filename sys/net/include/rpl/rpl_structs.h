@@ -35,7 +35,7 @@ extern "C" {
 typedef struct __attribute__((packed)) {
     uint8_t rpl_instanceid;
     uint8_t version_number;
-    uint16_t rank;
+    network_uint16_t rank;
     uint8_t g_mop_prf;
     uint8_t dtsn;
     uint8_t flags;
@@ -84,12 +84,12 @@ typedef struct __attribute__((packed)) {
     uint8_t DIOIntDoubl;
     uint8_t DIOIntMin;
     uint8_t DIORedun;
-    uint16_t MaxRankIncrease;
-    uint16_t MinHopRankIncrease;
-    uint16_t ocp;
+    network_uint16_t MaxRankIncrease;
+    network_uint16_t MinHopRankIncrease;
+    network_uint16_t ocp;
     uint8_t reserved;
     uint8_t default_lifetime;
-    uint16_t lifetime_unit;
+    network_uint16_t lifetime_unit;
 } rpl_opt_dodag_conf_t;
 
 /* RPL Solicited Information Option (RFC 6550 Fig. 28) */
@@ -127,10 +127,10 @@ struct rpl_dodag_t;
 
 typedef struct {
     ipv6_addr_t         addr;
-    uint16_t            rank;
+    network_uint16_t            rank;
     uint8_t             dtsn;
     struct rpl_dodag_t *dodag;
-    uint16_t            lifetime;
+    network_uint16_t            lifetime;
     double              link_metric;
     uint8_t             link_metric_type;
     uint8_t             used;
@@ -155,16 +155,16 @@ typedef struct rpl_dodag_t {
     uint8_t dio_interval_doubling;
     uint8_t dio_min;
     uint8_t dio_redundancy;
-    uint16_t maxrankincrease;
-    uint16_t minhoprankincrease;
+    network_uint16_t maxrankincrease;
+    network_uint16_t minhoprankincrease;
     uint8_t default_lifetime;
-    uint16_t lifetime_unit;
+    network_uint16_t lifetime_unit;
     uint8_t version;
     uint8_t grounded;
-    uint16_t my_rank;
+    network_uint16_t my_rank;
     uint8_t node_status;
     uint8_t dao_seq;
-    uint16_t min_rank;
+    network_uint16_t min_rank;
     uint8_t joined;
     rpl_parent_t *my_preferred_parent;
     struct rpl_of_t *of;
@@ -176,8 +176,8 @@ typedef struct rpl_dodag_t {
 } rpl_dodag_t;
 
 typedef struct rpl_of_t {
-    uint16_t ocp;
-    uint16_t (*calc_rank)(rpl_parent_t *parent, uint16_t base_rank);
+    network_uint16_t ocp;
+    network_uint16_t (*calc_rank)(rpl_parent_t *parent, network_uint16_t base_rank);
     rpl_parent_t *(*which_parent)(rpl_parent_t *, rpl_parent_t *);
     rpl_dodag_t *(*which_dodag)(rpl_dodag_t *, rpl_dodag_t *);
     void (*reset)(rpl_dodag_t *);
@@ -189,7 +189,7 @@ typedef struct rpl_of_t {
 typedef struct {
     ipv6_addr_t address;
     ipv6_addr_t next_hop;
-    uint16_t lifetime;
+    network_uint16_t lifetime;
     uint8_t used;
 } rpl_routing_entry_t;
 

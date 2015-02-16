@@ -36,7 +36,7 @@ void rpl_of_manager_init(ipv6_addr_t *my_address);
  * @param[in]   ocp Objective code point of objective function
  * @return      Pointer of corresponding objective function implementation
 */
-rpl_of_t *rpl_get_of_for_ocp(uint16_t ocp);
+rpl_of_t *rpl_get_of_for_ocp(network_uint16_t ocp);
 
 #ifdef __cplusplus
 }

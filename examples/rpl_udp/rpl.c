@@ -171,7 +171,7 @@ void rpl_udp_dodag(int argc, char **argv)
     printf("Part of Dodag:\n");
     printf("%s\n", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
                                     (&mydodag->dodag_id)));
-    printf("my rank: %d\n", mydodag->my_rank);
+    printf("my rank: %d\n", byteorder_ntohs(mydodag->my_rank));
 
     if (!is_root) {
         printf("my preferred parent:\n");
