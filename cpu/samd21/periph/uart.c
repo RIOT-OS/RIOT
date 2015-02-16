@@ -97,6 +97,7 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
     uint32_t tx_pin = 0;
     uint32_t rx_pin = 0;
     uint32_t pins = 0;
+    uint32_t HWSEL = 0;
 
 
     switch (uart) {
@@ -108,6 +109,7 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
             tx_pin = UART_0_TX_PIN;
             rx_pin = UART_0_RX_PIN;
             pins = UART_0_PINS;
+            HWSEL = 0;
 
             /* Turn on power manager for sercom0 */
             PM->APBCMASK.reg |= PM_APBCMASK_SERCOM0;
@@ -129,6 +131,7 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
             tx_pin = UART_1_TX_PIN;
             rx_pin = UART_1_RX_PIN;
             pins = UART_1_PINS;
+            HWSEL = (PORT_WRCONFIG_HWSEL);
 
             /* Turn on power manager for sercom5 */
             PM->APBCMASK.reg |= PM_APBCMASK_SERCOM5;
@@ -161,7 +164,8 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
 
 
     /* enable PMUX for pins and set to config D. See spec p. 12 */
-    port_group->WRCONFIG.reg = PORT_WRCONFIG_WRPINCFG     /* PINCFGy registers of the selected pins will be updated */
+    port_group->WRCONFIG.reg = HWSEL                      /* Upper/lower 16 pins of PORT will be configured */
+                                | PORT_WRCONFIG_WRPINCFG  /* PINCFGy registers of the selected pins will be updated */
                                 | PORT_WRCONFIG_WRPMUX    /* PMUXn registers of the selected pins will be updated */
                                 | PORT_WRCONFIG_PMUX(0x3) /* Multiplexer peripheral function D */
                                 | PORT_WRCONFIG_PMUXEN    /* Peripheral multiplexer enable */
