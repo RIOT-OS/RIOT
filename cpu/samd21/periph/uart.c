@@ -112,9 +112,6 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
             /* Turn on power manager for sercom0 */
             PM->APBCMASK.reg |= PM_APBCMASK_SERCOM0;
 
-            /* Enable generic clock generator0 */
-            GCLK->GENCTRL.reg = (GCLK_GENCTRL_GENEN | (GCLK_CLKCTRL_ID(GCLK_CLKCTRL_GEN_GCLK0_Val)));
-
             /* configure GCLK0 to feed sercom0 */;
             GCLK->CLKCTRL.reg = (uint16_t)((GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN_GCLK0 | (SERCOM0_GCLK_ID_CORE << GCLK_CLKCTRL_ID_Pos)));
             while (GCLK->STATUS.bit.SYNCBUSY);
@@ -136,14 +133,11 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
             /* Turn on power manager for sercom5 */
             PM->APBCMASK.reg |= PM_APBCMASK_SERCOM5;
 
-            /* Enable generic clock generator1 */
-            GCLK->GENCTRL.reg = (GCLK_GENCTRL_GENEN | (GCLK_CLKCTRL_ID(GCLK_CLKCTRL_GEN_GCLK1_Val)));
-
-            /* configure GCLK1 to feed sercom5 */;
-            GCLK->CLKCTRL.reg = (uint16_t)((GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN_GCLK1 | (SERCOM5_GCLK_ID_CORE << GCLK_CLKCTRL_ID_Pos)));
+            /* configure GCLK0 to feed sercom5 */;
+            GCLK->CLKCTRL.reg = (uint16_t)((GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN_GCLK0 | (SERCOM5_GCLK_ID_CORE << GCLK_CLKCTRL_ID_Pos)));
             while (GCLK->STATUS.bit.SYNCBUSY);
 
-            GCLK->CLKCTRL.reg = (uint16_t)((GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN_GCLK1 | (SERCOM5_GCLK_ID_SLOW << GCLK_CLKCTRL_ID_Pos)));
+            GCLK->CLKCTRL.reg = (uint16_t)((GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN_GCLK0 | (SERCOM5_GCLK_ID_SLOW << GCLK_CLKCTRL_ID_Pos)));
             while (GCLK->STATUS.bit.SYNCBUSY);
 
             break;
