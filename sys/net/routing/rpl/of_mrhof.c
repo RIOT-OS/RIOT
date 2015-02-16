@@ -90,15 +90,15 @@ static uint16_t calc_path_cost(rpl_parent_t *parent)
             return MAX_PATH_COST;
         }
 
-        if (etx_value * ETX_RANK_MULTIPLIER + NTOHS(parent->rank.u16)
-            < NTOHS(parent->rank.u16)) {
+        if (etx_value * ETX_RANK_MULTIPLIER + byteorder_ntohs(parent->rank)
+            < byteorder_ntohs(parent->rank)) {
             //Overflow
             return MAX_PATH_COST;
         }
 
         //TODO runden
         return etx_value * ETX_RANK_MULTIPLIER
-               + NTOHS(parent->rank.u16);
+               + byteorder_ntohs(parent->rank);
     }
     else {
         // IMPLEMENT HANDLING OF OTHER METRICS HERE
@@ -111,8 +111,6 @@ static uint16_t calc_path_cost(rpl_parent_t *parent)
 static network_uint16_t calc_rank(rpl_parent_t *parent, network_uint16_t base_rank)
 {
     DEBUGF("calc_rank\n");
-    network_uint16_t net_inf_rank = {HTONS(INFINITE_RANK)};
-    network_uint16_t net_min_rank = {HTONS(DEFAULT_MIN_HOP_RANK_INCREASE)};
     network_uint16_t net_inc_rank = {0x0};
     network_uint16_t calculated_pcost = {0x0};
 
@@ -124,9 +122,9 @@ static network_uint16_t calc_rank(rpl_parent_t *parent, network_uint16_t base_ra
      * Baserank is pretty much only used to find out if a node is a root or not.
      */
     if (parent == NULL) {
-        if (base_rank.u16 == 0x0) {
+        if (byteorder_ntohs(base_rank) == 0x0) {
             //No parent, no rank, a root node would have a rank != 0
-            return net_inf_rank;
+            return byteorder_htons(INFINITE_RANK);
         }
 
         /*
@@ -135,7 +133,7 @@ static network_uint16_t calc_rank(rpl_parent_t *parent, network_uint16_t base_ra
          * Since a recalculating node must have a parent in this implementation
          * (see rpl.c, function global_repair), we can assume this node is root.
          */
-        return net_min_rank;
+        return byteorder_htons(DEFAULT_MIN_HOP_RANK_INCREASE);
     }
     else {
         /*
@@ -143,11 +141,11 @@ static network_uint16_t calc_rank(rpl_parent_t *parent, network_uint16_t base_ra
          * the parent and choose the maximum of that value and the advertised
          * rank of the parent + minhoprankincrease for our rank.
          */
-         calculated_pcost.u16 = HTONS(calc_path_cost(parent));
-         net_inc_rank.u16 = (parent->rank.u16 + parent->dodag->minhoprankincrease.u16);
-        if (NTOHS(calculated_pcost.u16) < MAX_PATH_COST) {
-            if (( NTOHS(net_inc_rank.u16))
-                > NTOHS(calculated_pcost.u16)) {
+         calculated_pcost = byteorder_htons(calc_path_cost(parent));
+         net_inc_rank = byteorder_htons(byteorder_ntohs(parent->rank) + byteorder_ntohs(parent->dodag->minhoprankincrease));
+        if (byteorder_ntohs(calculated_pcost) < MAX_PATH_COST) {
+            if ((byteorder_ntohs(net_inc_rank))
+                > byteorder_ntohs(calculated_pcost)) {
                 return net_inc_rank;
             }
             else {
@@ -156,7 +154,7 @@ static network_uint16_t calc_rank(rpl_parent_t *parent, network_uint16_t base_ra
         }
         else {
             //Path costs are greater than allowed
-            return net_inf_rank;
+            return byteorder_htons(INFINITE_RANK);
         }
     }
 }

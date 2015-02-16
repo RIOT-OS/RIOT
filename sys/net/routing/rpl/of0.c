@@ -51,13 +51,11 @@ void reset(rpl_dodag_t *dodag)
 
 network_uint16_t calc_rank(rpl_parent_t *parent, network_uint16_t base_rank)
 {
-    network_uint16_t net_inf_rank = {HTONS(INFINITE_RANK)};
-    network_uint16_t net_min_rank = {HTONS(DEFAULT_MIN_HOP_RANK_INCREASE)};
-    network_uint16_t net_inc_rank = {0x0};
+    network_uint16_t net_inc_rank = byteorder_htons(0x0);
 
-    if (base_rank.u16 == 0x0) {
+    if ( byteorder_ntohs(base_rank) == 0x0) {
         if (parent == NULL) {
-            return net_inf_rank;
+            return byteorder_htons(INFINITE_RANK);
         }
 
         base_rank = parent->rank;
@@ -69,13 +67,13 @@ network_uint16_t calc_rank(rpl_parent_t *parent, network_uint16_t base_rank)
         add = parent->dodag->minhoprankincrease;
     }
     else {
-        add = net_min_rank;
+        add = byteorder_htons(DEFAULT_MIN_HOP_RANK_INCREASE);
     }
 
-    net_inc_rank.u16 = (base_rank.u16 + add.u16);
+    net_inc_rank = byteorder_htons(byteorder_ntohs(base_rank) + byteorder_ntohs(add));
 
-    if ( NTOHS(net_inc_rank.u16) < NTOHS(base_rank.u16) ) {
-        return net_inf_rank;
+    if ( byteorder_ntohs(net_inc_rank) < byteorder_ntohs(base_rank) ) {
+        return byteorder_htons(INFINITE_RANK);
     }
 
     return net_inc_rank;
@@ -84,7 +82,7 @@ network_uint16_t calc_rank(rpl_parent_t *parent, network_uint16_t base_rank)
 /* We simply return the Parent with lower rank */
 rpl_parent_t *which_parent(rpl_parent_t *p1, rpl_parent_t *p2)
 {
-    if ( NTOHS(p1->rank.u16) < NTOHS(p2->rank.u16) ) {
+    if ( byteorder_ntohs(p1->rank) < byteorder_ntohs(p2->rank) ) {
         return p1;
     }
 
