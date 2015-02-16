@@ -51,7 +51,7 @@ rpl_of_t *rpl_get_of_for_ocp(network_uint16_t ocp)
             /* fallback if something goes wrong */
             return rpl_get_of0();
         }
-        else if (ocp.u16 == objective_functions[i]->ocp.u16) {
+        else if (byteorder_ntohs(ocp) == byteorder_ntohs(objective_functions[i]->ocp)) {
             return objective_functions[i];
         }
     }

@@ -530,7 +530,7 @@ void rpl_recv_DIO_mode(void)
             DEBUGF("Required objective function not supported\n");
         }
 
-        if (byteorder_ntohs(rpl_dio_buf->rank) != HTONS(INFINITE_RANK)) {
+        if (byteorder_ntohs(rpl_dio_buf->rank) != INFINITE_RANK) {
             DEBUGF("Will join DODAG\n");
             rpl_join_dodag(&dio_dodag, &ipv6_buf->srcaddr, rpl_dio_buf->rank);
             DEBUGF("Joined DODAG\n");
