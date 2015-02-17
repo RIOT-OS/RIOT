@@ -38,6 +38,7 @@
 #
 #
 # @author       Hauke Peteresen <hauke.petersen@fu-berlin.de>
+# @author       Joakim Gebart <joakim.gebart@eistec.se>
 
 # default GDB port
 _GDB_PORT=3333
@@ -45,16 +46,19 @@ _GDB_PORT=3333
 _TELNET_PORT=4444
 # default TCL port
 _TCL_PORT=6333
-# path to OpenOCD configuration file
-CONFIG=${RIOTBOARD}/${BOARD}/dist/openocd.cfg
+# default path to OpenOCD configuration file
+_OPENOCD_CONFIG=${RIOTBOARD}/${BOARD}/dist/openocd.cfg
 
 #
 # a couple of tests for certain configuration options
 #
 test_config() {
-    if [ ! -f ${CONFIG} ]; then
+    if [ -z ${OPENOCD_CONFIG} ]; then
+        OPENOCD_CONFIG=${_OPENOCD_CONFIG}
+    fi
+    if [ ! -f ${OPENOCD_CONFIG} ]; then
         echo "Error: Unable to locate OpenOCD configuration file"
-        echo "       (${CONFIG})"
+        echo "       (${OPENOCD_CONFIG})"
         exit 1
     fi
 }
@@ -100,7 +104,8 @@ do_flash() {
     test_config
     test_hexfile
     # flash device
-    openocd -f ${CONFIG} \
+    openocd -f ${OPENOCD_CONFIG} \
+            ${OPENOCD_EXTRA_INIT} \
             -c "tcl_port 0" \
             -c "telnet_port 0" \
             -c "gdb_port 0" \
@@ -117,7 +122,8 @@ do_debug() {
     test_ports
     test_tui
     # start OpenOCD as GDB server
-    openocd -f ${CONFIG} \
+    openocd -f ${OPENOCD_CONFIG} \
+            ${OPENOCD_EXTRA_INIT} \
             -c "tcl_port ${TCL_PORT}" \
             -c "telnet_port ${TELNET_PORT}" \
             -c "gdb_port ${GDB_PORT}" \
@@ -137,7 +143,8 @@ do_debugserver() {
     test_config
     test_ports
     # start OpenOCD as GDB server
-    openocd -f ${CONFIG} \
+    openocd -f ${OPENOCD_CONFIG} \
+            ${OPENOCD_EXTRA_INIT} \
             -c "tcl_port ${TCL_PORT}" \
             -c "telnet_port ${TELNET_PORT}" \
             -c "gdb_port ${GDB_PORT}" \
@@ -149,7 +156,8 @@ do_debugserver() {
 do_reset() {
     test_config
     # start OpenOCD and invoke board reset
-    openocd -f ${CONFIG} \
+    openocd -f ${OPENOCD_CONFIG} \
+            ${OPENOCD_EXTRA_INIT} \
             -c "tcl_port 0" \
             -c "telnet_port 0" \
             -c "gdb_port 0" \
@@ -179,6 +187,6 @@ case "$1" in
     do_reset
     ;;
   *)
-    echo "Usage: $0 {flash|debug|debug-server|reset} [PARAM]"
+    echo "Usage: $0 {flash|debug|debug-server|reset}"
     ;;
 esac
