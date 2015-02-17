@@ -48,11 +48,16 @@ _TELNET_PORT=4444
 _TCL_PORT=6333
 # default path to OpenOCD configuration file
 _OPENOCD_CONFIG=${RIOTBOARD}/${BOARD}/dist/openocd.cfg
+# default OpenOCD command
+_OPENOCD=openocd
 
 #
 # a couple of tests for certain configuration options
 #
 test_config() {
+    if [ -z ${OPENOCD} ]; then
+        OPENOCD=${_OPENOCD}
+    fi
     if [ -z ${OPENOCD_CONFIG} ]; then
         OPENOCD_CONFIG=${_OPENOCD_CONFIG}
     fi
@@ -104,7 +109,7 @@ do_flash() {
     test_config
     test_hexfile
     # flash device
-    openocd -f ${OPENOCD_CONFIG} \
+    ${OPENOCD} -f ${OPENOCD_CONFIG} \
             ${OPENOCD_EXTRA_INIT} \
             -c "tcl_port 0" \
             -c "telnet_port 0" \
@@ -122,7 +127,7 @@ do_debug() {
     test_ports
     test_tui
     # start OpenOCD as GDB server
-    openocd -f ${OPENOCD_CONFIG} \
+    ${OPENOCD} -f ${OPENOCD_CONFIG} \
             ${OPENOCD_EXTRA_INIT} \
             -c "tcl_port ${TCL_PORT}" \
             -c "telnet_port ${TELNET_PORT}" \
@@ -143,7 +148,7 @@ do_debugserver() {
     test_config
     test_ports
     # start OpenOCD as GDB server
-    openocd -f ${OPENOCD_CONFIG} \
+    ${OPENOCD} -f ${OPENOCD_CONFIG} \
             ${OPENOCD_EXTRA_INIT} \
             -c "tcl_port ${TCL_PORT}" \
             -c "telnet_port ${TELNET_PORT}" \
@@ -156,7 +161,7 @@ do_debugserver() {
 do_reset() {
     test_config
     # start OpenOCD and invoke board reset
-    openocd -f ${OPENOCD_CONFIG} \
+    ${OPENOCD} -f ${OPENOCD_CONFIG} \
             ${OPENOCD_EXTRA_INIT} \
             -c "tcl_port 0" \
             -c "telnet_port 0" \
