@@ -105,7 +105,7 @@ typedef struct {
      *
      * @return              0 on success
      * @return              -ENODEV if @p dev is invalid
-     * @return              -ENOPKG if callback was not registered
+     * @return              -ENOENT if callback was not registered
      */
     int (*rem_event_callback)(ng_netdev_t *dev, ng_netdev_event_cb_t cb);
 
