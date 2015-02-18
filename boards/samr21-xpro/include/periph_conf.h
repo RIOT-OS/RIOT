@@ -14,6 +14,7 @@
  * @brief       Peripheral MCU configuration for the Atmel SAM R21 Xplained Pro board
  *
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
+ * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
  */
 
 #ifndef __PERIPH_CONF_H
@@ -42,7 +43,37 @@ extern "C" {
 #define TIMER_1_CHANNELS   2
 #define TIMER_1_MAX_VALUE  (0xffffffff)
 #define TIMER_1_ISR        isr_tc4
+/** @} */
 
+/**
+ * @name PWM configuration
+ * @{
+ */
+#define PWM_NUMOF           (2U)
+#define PWM_0_EN            1
+#define PWM_1_EN            1
+#define PWM_MAX_CHANNELS    2
+
+/* PWM 0 device configuration */
+#define PWM_0_DEV           TCC0
+#define PWM_0_CHANNELS      1
+#define PWM_0_REF_F         (8000000UL)
+#define PWM_0_CLK_ID        TCC0_GCLK_ID
+#define PWM_0_PM            PM_APBCMASK_TCC0
+/* PWM 0 pin configuration */
+#define PWM_0_PORT          (PORT->Group[0])
+#define PWM_0_PIN_CH0       (8)
+
+/* PWM 1 device configuration */
+#define PWM_1_DEV           TCC1
+#define PWM_1_CHANNELS      2
+#define PWM_1_REF_F         (8000000UL)
+#define PWM_1_CLK_ID        TCC1_GCLK_ID
+#define PWM_1_PM            PM_APBCMASK_TCC1
+/* PWM 1 pin configuration */
+#define PWM_1_PORT          (PORT->Group[0])
+#define PWM_1_PIN_CH0       (6)
+#define PWM_1_PIN_CH1       (7)
 /** @} */
 
 /**
