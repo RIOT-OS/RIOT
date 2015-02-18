@@ -99,7 +99,7 @@ int8_t dac_write(dac_t dev, uint8_t channel, uint16_t value)
             /* Value out of Range */
             return -3;
         }
-        
+
         switch(channel){
             case 0:
                 dac->DHR12R1 = val;

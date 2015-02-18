@@ -19,11 +19,11 @@
  *
  *              ### WDOG Configuration Example (for periph_conf.h) ###
  *              The driver attempts to determine the type of the WDOG.
- *              Also you can force the use of advanced WDOG: 
+ *              Also you can force the use of advanced WDOG:
  *
  *                  #define KINETIS_WDOG_ADVANCED    1
  *
- *              Or the use of COP WDOG: 
+ *              Or the use of COP WDOG:
  *
  *                  #define KINETIS_WDOG_ADVANCED    0
  *

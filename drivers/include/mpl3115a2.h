@@ -10,7 +10,7 @@
  * @defgroup    drivers_mpl3115a2 MPL3115A2 Pressure Sensor
  * @ingroup     drivers
  * @brief       Driver for the Freescale MPL3115A2 pressure sensor.
- *              The driver will initialize the sensor for 
+ *              The driver will initialize the sensor for
  *              pressure measurement. The conversion duration
  *              depends on oversample ratio.
  *              After initialization and set activ the sensor
