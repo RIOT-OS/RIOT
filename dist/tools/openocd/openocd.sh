@@ -55,13 +55,13 @@ _OPENOCD=openocd
 # a couple of tests for certain configuration options
 #
 test_config() {
-    if [ -z ${OPENOCD} ]; then
+    if [ -z "${OPENOCD}" ]; then
         OPENOCD=${_OPENOCD}
     fi
-    if [ -z ${OPENOCD_CONFIG} ]; then
+    if [ -z "${OPENOCD_CONFIG}" ]; then
         OPENOCD_CONFIG=${_OPENOCD_CONFIG}
     fi
-    if [ ! -f ${OPENOCD_CONFIG} ]; then
+    if [ ! -f "${OPENOCD_CONFIG}" ]; then
         echo "Error: Unable to locate OpenOCD configuration file"
         echo "       (${OPENOCD_CONFIG})"
         exit 1
@@ -69,7 +69,7 @@ test_config() {
 }
 
 test_hexfile() {
-    if [ ! -f ${HEXFILE} ]; then
+    if [ ! -f "${HEXFILE}" ]; then
         echo "Error: Unable to locate HEXFILE"
         echo "       (${HEXFILE})"
         exit 1
@@ -77,7 +77,7 @@ test_hexfile() {
 }
 
 test_elffile() {
-    if [ ! -f ${ELFFILE} ]; then
+    if [ ! -f "${ELFFILE}" ]; then
         echo "Error: Unable to locate ELFFILE"
         echo "       (${ELFFILE})"
         exit 1
@@ -85,13 +85,13 @@ test_elffile() {
 }
 
 test_ports() {
-    if [ -z ${GDB_PORT} ]; then
+    if [ -z "${GDB_PORT}" ]; then
         GDB_PORT=${_GDB_PORT}
     fi
-    if [ -z ${TELNET_PORT} ]; then
+    if [ -z "${TELNET_PORT}" ]; then
         TELNET_PORT=${_TELNET_PORT}
     fi
-    if [ -z ${TCL_PORT} ]; then
+    if [ -z "${TCL_PORT}" ]; then
         TCL_PORT=${_TCL_PORT}
     fi
 }
@@ -109,7 +109,7 @@ do_flash() {
     test_config
     test_hexfile
     # flash device
-    ${OPENOCD} -f ${OPENOCD_CONFIG} \
+    ${OPENOCD} -f "${OPENOCD_CONFIG}" \
             ${OPENOCD_EXTRA_INIT} \
             -c "tcl_port 0" \
             -c "telnet_port 0" \
@@ -127,7 +127,7 @@ do_debug() {
     test_ports
     test_tui
     # start OpenOCD as GDB server
-    ${OPENOCD} -f ${OPENOCD_CONFIG} \
+    ${OPENOCD} -f "${OPENOCD_CONFIG}" \
             ${OPENOCD_EXTRA_INIT} \
             -c "tcl_port ${TCL_PORT}" \
             -c "telnet_port ${TELNET_PORT}" \
@@ -148,7 +148,7 @@ do_debugserver() {
     test_config
     test_ports
     # start OpenOCD as GDB server
-    ${OPENOCD} -f ${OPENOCD_CONFIG} \
+    ${OPENOCD} -f "${OPENOCD_CONFIG}" \
             ${OPENOCD_EXTRA_INIT} \
             -c "tcl_port ${TCL_PORT}" \
             -c "telnet_port ${TELNET_PORT}" \
@@ -161,7 +161,7 @@ do_debugserver() {
 do_reset() {
     test_config
     # start OpenOCD and invoke board reset
-    ${OPENOCD} -f ${OPENOCD_CONFIG} \
+    ${OPENOCD} -f "${OPENOCD_CONFIG}" \
             ${OPENOCD_EXTRA_INIT} \
             -c "tcl_port 0" \
             -c "telnet_port 0" \
