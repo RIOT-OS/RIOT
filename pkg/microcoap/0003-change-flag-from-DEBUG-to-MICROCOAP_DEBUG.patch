@@ -58,13 +58,13 @@ index c132334..4a7adc5 100644
  ///////////////////////
 +#ifdef MICROCOAP_DEBUG
  void coap_dumpPacket(coap_packet_t *pkt);
-+#else 
++#else
 +#define coap_dumpPacket(pkt)
 +#endif
 +
 +#ifdef MICROCOAP_DEBUG
 +void coap_dump(const uint8_t *buf, size_t buflen, bool bare);
-+#else 
++#else
 +#define coap_dump(buf, buflen, bare)
 +#endif
 +
