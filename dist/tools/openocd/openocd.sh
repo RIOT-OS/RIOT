@@ -6,6 +6,13 @@
 # as it depends on certain environment variables. An OpenOCD
 # configuration file must be present in a the boards dist folder.
 #
+# Global environment variables used:
+# OPENOCD:             OpenOCD command name, default: "openocd"
+# OPENOCD_CONFIG:      OpenOCD configuration file name,
+#                      default: "${RIOTBOARD}/${BOARD}/dist/openocd.cfg"
+# OPENOCD_EXTRA_INIT:  extra parameters to pass on the OpenOCD command line
+#                      before any initialization commands, default: (empty)
+#
 # The script supports the following actions:
 #
 # flash:        flash a given hexfile to the target.
@@ -38,6 +45,7 @@
 #
 #
 # @author       Hauke Peteresen <hauke.petersen@fu-berlin.de>
+# @author       Joakim Gebart <joakim.gebart@eistec.se>
 
 # default GDB port
 _GDB_PORT=3333
@@ -45,22 +53,30 @@ _GDB_PORT=3333
 _TELNET_PORT=4444
 # default TCL port
 _TCL_PORT=6333
-# path to OpenOCD configuration file
-CONFIG=${RIOTBOARD}/${BOARD}/dist/openocd.cfg
+# default path to OpenOCD configuration file
+_OPENOCD_CONFIG=${RIOTBOARD}/${BOARD}/dist/openocd.cfg
+# default OpenOCD command
+_OPENOCD=openocd
 
 #
 # a couple of tests for certain configuration options
 #
 test_config() {
-    if [ ! -f ${CONFIG} ]; then
+    if [ -z "${OPENOCD}" ]; then
+        OPENOCD=${_OPENOCD}
+    fi
+    if [ -z "${OPENOCD_CONFIG}" ]; then
+        OPENOCD_CONFIG=${_OPENOCD_CONFIG}
+    fi
+    if [ ! -f "${OPENOCD_CONFIG}" ]; then
         echo "Error: Unable to locate OpenOCD configuration file"
-        echo "       (${CONFIG})"
+        echo "       (${OPENOCD_CONFIG})"
         exit 1
     fi
 }
 
 test_hexfile() {
-    if [ ! -f ${HEXFILE} ]; then
+    if [ ! -f "${HEXFILE}" ]; then
         echo "Error: Unable to locate HEXFILE"
         echo "       (${HEXFILE})"
         exit 1
@@ -68,7 +84,7 @@ test_hexfile() {
 }
 
 test_elffile() {
-    if [ ! -f ${ELFFILE} ]; then
+    if [ ! -f "${ELFFILE}" ]; then
         echo "Error: Unable to locate ELFFILE"
         echo "       (${ELFFILE})"
         exit 1
@@ -76,13 +92,13 @@ test_elffile() {
 }
 
 test_ports() {
-    if [ -z ${GDB_PORT} ]; then
+    if [ -z "${GDB_PORT}" ]; then
         GDB_PORT=${_GDB_PORT}
     fi
-    if [ -z ${TELNET_PORT} ]; then
+    if [ -z "${TELNET_PORT}" ]; then
         TELNET_PORT=${_TELNET_PORT}
     fi
-    if [ -z ${TCL_PORT} ]; then
+    if [ -z "${TCL_PORT}" ]; then
         TCL_PORT=${_TCL_PORT}
     fi
 }
@@ -100,7 +116,8 @@ do_flash() {
     test_config
     test_hexfile
     # flash device
-    openocd -f ${CONFIG} \
+    ${OPENOCD} -f "${OPENOCD_CONFIG}" \
+            ${OPENOCD_EXTRA_INIT} \
             -c "tcl_port 0" \
             -c "telnet_port 0" \
             -c "gdb_port 0" \
@@ -117,7 +134,8 @@ do_debug() {
     test_ports
     test_tui
     # start OpenOCD as GDB server
-    openocd -f ${CONFIG} \
+    ${OPENOCD} -f "${OPENOCD_CONFIG}" \
+            ${OPENOCD_EXTRA_INIT} \
             -c "tcl_port ${TCL_PORT}" \
             -c "telnet_port ${TELNET_PORT}" \
             -c "gdb_port ${GDB_PORT}" \
@@ -137,7 +155,8 @@ do_debugserver() {
     test_config
     test_ports
     # start OpenOCD as GDB server
-    openocd -f ${CONFIG} \
+    ${OPENOCD} -f "${OPENOCD_CONFIG}" \
+            ${OPENOCD_EXTRA_INIT} \
             -c "tcl_port ${TCL_PORT}" \
             -c "telnet_port ${TELNET_PORT}" \
             -c "gdb_port ${GDB_PORT}" \
@@ -149,7 +168,8 @@ do_debugserver() {
 do_reset() {
     test_config
     # start OpenOCD and invoke board reset
-    openocd -f ${CONFIG} \
+    ${OPENOCD} -f "${OPENOCD_CONFIG}" \
+            ${OPENOCD_EXTRA_INIT} \
             -c "tcl_port 0" \
             -c "telnet_port 0" \
             -c "gdb_port 0" \
@@ -179,6 +199,6 @@ case "$1" in
     do_reset
     ;;
   *)
-    echo "Usage: $0 {flash|debug|debug-server|reset} [PARAM]"
+    echo "Usage: $0 {flash|debug|debug-server|reset}"
     ;;
 esac
