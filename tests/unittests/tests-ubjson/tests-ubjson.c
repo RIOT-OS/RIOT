@@ -90,7 +90,7 @@ void test_ubjson_test(void (*sender_fun)(void), void (*receiver_fun)(void))
                                               PRIORITY_MAIN, CREATE_WOUT_YIELD,
                                               test_ubjson_receiver_trampoline, &data, "receiver");
     TEST_ASSERT(pid_is_valid(receiver_pid));
-    
+
     sender_fun();
 
     mutex_lock(&data.mutexes[0]);

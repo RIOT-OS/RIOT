@@ -333,7 +333,7 @@ void TIMER_0_ISR(void)
         if(config[TIMER_0].cb) {
             TIMER_0_DEV.INTFLAG.bit.MC0 = 1;
             TIMER_0_DEV.INTENCLR.reg = TC_INTENCLR_MC0;
-            config[TIMER_0].cb(0);            
+            config[TIMER_0].cb(0);
         }
     }
     else if (TIMER_0_DEV.INTFLAG.bit.MC1 && TIMER_0_DEV.INTENSET.bit.MC1) {

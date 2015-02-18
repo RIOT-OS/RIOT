@@ -30,7 +30,7 @@
  *
  * Given threads with priorities A=6, B=1, and C=3, B has the highest
  * priority.
- * 
+ *
  * A higher priority means that the scheduler will run this thread
  * whenever it becomes runnable instead of a thread with a lower
  * priority.

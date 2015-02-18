@@ -12,11 +12,11 @@
  * @brief       Driver for the Freescale MAG3110 magnetometer.
  *              After initialization and set activ the magnetometer
  *              will make measurements at periodic times.
- *              The output rate and over sample ratio 
+ *              The output rate and over sample ratio
  *              can be determined by magnetometer initialization.
  *              The measured values of magnetic field strength and
  *              die temperature have uncalibrated offsets.
- *              To get correct measuremend values, the individual 
+ *              To get correct measuremend values, the individual
  *              offsets must be measured and set accordingly.
  *
  * @{
@@ -152,8 +152,8 @@ int mag3110_set_standby(mag3110_t *dev);
  *
  * @param[in]  dev          device descriptor of magnetometer
  *
- * @return                  >0 if x-, y- and z-axis new sample is ready 
- * @return                  0 if measurement is in progress 
+ * @return                  >0 if x-, y- and z-axis new sample is ready
+ * @return                  0 if measurement is in progress
  * @return                  -1 on error
  */
 int mag3110_is_ready(mag3110_t *dev);
@@ -178,7 +178,7 @@ int mag3110_read(mag3110_t *dev, int16_t *x, int16_t *y, int16_t *z, uint8_t *st
  * @brief Read die temperature.
  *
  * @param[in]  dev          device descriptor of magnetometer
- * @param[out] dtemp        die temperature 
+ * @param[out] dtemp        die temperature
  *
  * @return                  0 on success
  * @return                  -1 on error

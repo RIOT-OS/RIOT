@@ -37,9 +37,9 @@ extern "C" {
 #define DELAY_CHANGE_PWR_MODE_US            HWTIMER_TICKS(1500)
 #define DELAY_CHANGE_TXRX_US                HWTIMER_TICKS(130)
 #define DELAY_CE_START_US                   HWTIMER_TICKS(5)
-/* 
+/*
  * This is the time which is needed to physically transmit the data.
- * Compare nrf24l01+ pruduct specification p.42. It is computed just 
+ * Compare nrf24l01+ pruduct specification p.42. It is computed just
  * for this setup
  */
 #define DELAY_DATA_ON_AIR                   HWTIMER_TICKS(1300)
