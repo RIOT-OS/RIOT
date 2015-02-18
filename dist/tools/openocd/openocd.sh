@@ -6,6 +6,13 @@
 # as it depends on certain environment variables. An OpenOCD
 # configuration file must be present in a the boards dist folder.
 #
+# Global environment variables used:
+# OPENOCD:             OpenOCD command name, default: "openocd"
+# OPENOCD_CONFIG:      OpenOCD configuration file name,
+#                      default: "${RIOTBOARD}/${BOARD}/dist/openocd.cfg"
+# OPENOCD_EXTRA_INIT:  extra parameters to pass on the OpenOCD command line
+#                      before any initialization commands, default: (empty)
+#
 # The script supports the following actions:
 #
 # flash:        flash a given hexfile to the target.
