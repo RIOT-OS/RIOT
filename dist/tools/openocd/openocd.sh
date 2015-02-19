@@ -124,8 +124,7 @@ do_flash() {
             -c "init" \
             -c "targets" \
             -c "reset halt" \
-            -c "program ${HEXFILE} verify exit" \
-            -c "reset run"
+            -c "program ${HEXFILE} verify reset exit"
 }
 
 do_debug() {
