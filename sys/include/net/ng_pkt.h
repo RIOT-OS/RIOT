@@ -74,11 +74,17 @@ extern "C" {
  *
  * @note    This type implements its own list implementation because of the way
  *          it is stored in the packet buffer.
- * @note    This type has no initializer on purpose. Please use @ref pktbuf
+ * @note    This type has no initializer on purpose. Please use @ref net_ng_pktbuf
  *          as factory.
  */
 /* packed to be aligned correctly in the static packet buffer */
 typedef struct __attribute__((packed)) ng_pktsnip {
+    /**
+     * @brief   Counter of threads currently having control over this packet.
+     *
+     * @internal
+     */
+    unsigned int users;
     struct ng_pktsnip *next;        /**< next snip in the packet */
     void *data;                     /**< pointer to the data of the snip */
     size_t size;                    /**< the length of the snip in byte */
