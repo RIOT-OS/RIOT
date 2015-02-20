@@ -1,0 +1,28 @@
+From cc7dd01dfbe4669c0f7248a4b03aaf80e7acf00f Mon Sep 17 00:00:00 2001
+From: Oleg Hahm <oleg@hobbykeller.org>
+Date: Fri, 20 Feb 2015 23:48:21 +0100
+Subject: [PATCH 1/5] Add dummy parameter for util_banner
+
+---
+ include/relic_util.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/include/relic_util.h b/include/relic_util.h
+index 5e7c999..eb1288b 100644
+--- a/include/relic_util.h
++++ b/include/relic_util.h
+@@ -168,9 +168,9 @@
+  */
+ #define util_banner(L, I)													\
+ 	if (!I) {																\
+-		util_print("\n-- " L "\n");											\
++		util_print("\n-- " L "\n", NULL);									\
+ 	} else {																\
+-		util_print("\n** " L "\n\n");										\
++		util_print("\n** " L "\n\n", NULL);										\
+ 	}																		\
+ 
+ /*============================================================================*/
+-- 
+2.3.0
+

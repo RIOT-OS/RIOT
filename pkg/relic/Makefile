@@ -29,6 +29,7 @@ $(PKG_DIR)/Makefile: $(PKG_DIR)/comp-options.cmake
 $(PKG_DIR)/.git/config:
 	test -d "$(PKG_DIR)" || git clone "$(PKG_URL)" "$(PKG_DIR)"; \
 		cd "$(PKG_DIR)" && git checkout -f "$(PKG_VERSION)"
+	 cd "$(PKG_DIR)" && git am --ignore-whitespace $(CURDIR)/*.patch
 
 clean::
 	@echo "Cleaning up relic package..."

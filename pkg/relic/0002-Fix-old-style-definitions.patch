@@ -1,0 +1,558 @@
+From 370004872d8a5a93e9336e4999e0f21666da7b31 Mon Sep 17 00:00:00 2001
+From: Oleg Hahm <oleg@hobbykeller.org>
+Date: Fri, 20 Feb 2015 23:48:46 +0100
+Subject: [PATCH 2/5] Fix old style definitions
+
+---
+ src/arch/relic_arch_msp.c  |  4 ++--
+ src/eb/relic_eb_curve.c    | 12 ++++++------
+ src/eb/relic_eb_param.c    | 12 ++++++------
+ src/ed/relic_ed_param.c    |  2 +-
+ src/ed/relic_ed_util.c     |  2 +-
+ src/ep/relic_ep_curve.c    | 16 ++++++++--------
+ src/ep/relic_ep_param.c    | 18 +++++++++---------
+ src/epx/relic_ep2_curve.c  |  4 ++--
+ src/fb/relic_fb_poly.c     | 10 +++++-----
+ src/fp/relic_fp_param.c    |  4 ++--
+ src/fp/relic_fp_prime.c    | 16 ++++++++--------
+ src/rand/relic_rand_core.c |  4 ++--
+ src/relic_bench.c          | 10 +++++-----
+ src/relic_core.c           |  2 +-
+ 14 files changed, 58 insertions(+), 58 deletions(-)
+
+diff --git a/src/arch/relic_arch_msp.c b/src/arch/relic_arch_msp.c
+index bc916bb..f949bdf 100644
+--- a/src/arch/relic_arch_msp.c
++++ b/src/arch/relic_arch_msp.c
+@@ -67,7 +67,7 @@ int putchar(int c) {
+     return c;
+ }
+ 
+-unsigned long long arch_cycles() {
++unsigned long long arch_cycles(void) {
+     union cycles_t cycles;
+     cycles.e.e0 = BENCH_CYCLES_0;
+     cycles.e.e1 = BENCH_CYCLES_1;
+@@ -83,7 +83,7 @@ unsigned long long arch_cycles() {
+ 
+ volatile ull_t  __cycles = 0;
+ 
+-ull_t arch_cycles() {
++ull_t arch_cycles(void) {
+ 	return __cycles;
+ }
+ 
+diff --git a/src/eb/relic_eb_curve.c b/src/eb/relic_eb_curve.c
+index ee8ed51..60765ff 100644
+--- a/src/eb/relic_eb_curve.c
++++ b/src/eb/relic_eb_curve.c
+@@ -103,23 +103,23 @@ void eb_curve_clean(void) {
+ 	bn_clean(&(ctx->eb_h));
+ }
+ 
+-dig_t *eb_curve_get_a() {
++dig_t *eb_curve_get_a(void) {
+ 	return core_get()->eb_a;
+ }
+ 
+-int eb_curve_opt_a() {
++int eb_curve_opt_a(void) {
+ 	return core_get()->eb_opt_a;
+ }
+ 
+-dig_t *eb_curve_get_b() {
++dig_t *eb_curve_get_b(void) {
+ 	return core_get()->eb_b;
+ }
+ 
+-int eb_curve_opt_b() {
++int eb_curve_opt_b(void) {
+ 	return core_get()->eb_opt_b;
+ }
+ 
+-int eb_curve_is_kbltz() {
++int eb_curve_is_kbltz(void) {
+ 	return core_get()->eb_is_kbltz;
+ }
+ 
+@@ -135,7 +135,7 @@ void eb_curve_get_cof(bn_t h) {
+ 	bn_copy(h, &(core_get()->eb_h));
+ }
+ 
+-const eb_t *eb_curve_get_tab() {
++const eb_t *eb_curve_get_tab(void) {
+ #if defined(EB_PRECO)
+ 
+ 	/* Return a meaningful pointer. */
+diff --git a/src/eb/relic_eb_param.c b/src/eb/relic_eb_param.c
+index f66ea41..740d050 100644
+--- a/src/eb/relic_eb_param.c
++++ b/src/eb/relic_eb_param.c
+@@ -246,7 +246,7 @@
+ /* Public definitions                                                         */
+ /*============================================================================*/
+ 
+-int eb_param_get() {
++int eb_param_get(void) {
+ 	return core_get()->eb_id;
+ }
+ 
+@@ -362,7 +362,7 @@ void eb_param_set(int param) {
+ 	}
+ }
+ 
+-int eb_param_set_any() {
++int eb_param_set_any(void) {
+ 	int r0, r1;
+ 
+ 	r0 = eb_param_set_any_plain();
+@@ -375,7 +375,7 @@ int eb_param_set_any() {
+ 	return STS_OK;
+ }
+ 
+-int eb_param_set_any_plain() {
++int eb_param_set_any_plain(void) {
+ 	int r = STS_OK;
+ #if defined(EB_PLAIN)
+ #if FB_POLYN == 163
+@@ -401,7 +401,7 @@ int eb_param_set_any_plain() {
+ 	return r;
+ }
+ 
+-int eb_param_set_any_kbltz() {
++int eb_param_set_any_kbltz(void) {
+ 	int r = STS_OK;
+ #if defined(EB_KBLTZ)
+ #if FB_POLYN == 163
+@@ -425,7 +425,7 @@ int eb_param_set_any_kbltz() {
+ 	return r;
+ }
+ 
+-void eb_param_print() {
++void eb_param_print(void) {
+ 	switch (core_get()->eb_id) {
+ 		case NIST_B163:
+ 			util_banner("Curve NIST-B163:", 0);
+@@ -469,7 +469,7 @@ void eb_param_print() {
+ 	}
+ }
+ 
+-int eb_param_level() {
++int eb_param_level(void) {
+ 	switch (core_get()->eb_id) {
+ 		case NIST_B163:
+ 		case NIST_K163:
+diff --git a/src/ed/relic_ed_param.c b/src/ed/relic_ed_param.c
+index 9dca0a8..ab65585 100644
+--- a/src/ed/relic_ed_param.c
++++ b/src/ed/relic_ed_param.c
+@@ -192,7 +192,7 @@ int ed_param_get(void) {
+ 	return core_get()->ed_id;
+ }
+ 
+-int ed_param_level() {
++int ed_param_level(void) {
+ 	switch (ed_param_get()) {
+ 		case CURVE_ED25519:
+ 			return 128;
+diff --git a/src/ed/relic_ed_util.c b/src/ed/relic_ed_util.c
+index 36533d4..45f5bce 100644
+--- a/src/ed/relic_ed_util.c
++++ b/src/ed/relic_ed_util.c
+@@ -72,7 +72,7 @@ void ed_curve_get_cof(bn_t h) {
+ 	bn_copy(h, &core_get()->ed_h);
+ }
+ 
+-const ed_t *ed_curve_get_tab() {
++const ed_t *ed_curve_get_tab(void) {
+ #if defined(ED_PRECO)
+ 
+ 	/* Return a meaningful pointer. */
+diff --git a/src/ep/relic_ep_curve.c b/src/ep/relic_ep_curve.c
+index 072a8c7..b6bf45f 100644
+--- a/src/ep/relic_ep_curve.c
++++ b/src/ep/relic_ep_curve.c
+@@ -140,17 +140,17 @@ void ep_curve_clean(void) {
+ #endif
+ }
+ 
+-dig_t *ep_curve_get_b() {
++dig_t *ep_curve_get_b(void) {
+ 	return core_get()->ep_b;
+ }
+ 
+-dig_t *ep_curve_get_a() {
++dig_t *ep_curve_get_a(void) {
+ 	return core_get()->ep_a;
+ }
+ 
+ #if defined(EP_ENDOM) && (EP_MUL == LWNAF || EP_FIX == COMBS || EP_FIX == LWNAF || EP_SIM == INTER || !defined(STRIP))
+ 
+-dig_t *ep_curve_get_beta() {
++dig_t *ep_curve_get_beta(void) {
+ 	return core_get()->beta;
+ }
+ 
+@@ -170,19 +170,19 @@ void ep_curve_get_v2(bn_t v[]) {
+ 
+ #endif
+ 
+-int ep_curve_opt_a() {
++int ep_curve_opt_a(void) {
+ 	return core_get()->ep_opt_a;
+ }
+ 
+-int ep_curve_opt_b() {
++int ep_curve_opt_b(void) {
+ 	return core_get()->ep_opt_b;
+ }
+ 
+-int ep_curve_is_endom() {
++int ep_curve_is_endom(void) {
+ 	return core_get()->ep_is_endom;
+ }
+ 
+-int ep_curve_is_super() {
++int ep_curve_is_super(void) {
+ 	return core_get()->ep_is_super;
+ }
+ 
+@@ -198,7 +198,7 @@ void ep_curve_get_cof(bn_t h) {
+ 	bn_copy(h, &core_get()->ep_h);
+ }
+ 
+-const ep_t *ep_curve_get_tab() {
++const ep_t *ep_curve_get_tab(void) {
+ #if defined(EP_PRECO)
+ 
+ 	/* Return a meaningful pointer. */
+diff --git a/src/ep/relic_ep_param.c b/src/ep/relic_ep_param.c
+index 00b85d5..5db8425 100644
+--- a/src/ep/relic_ep_param.c
++++ b/src/ep/relic_ep_param.c
+@@ -446,7 +446,7 @@
+ /* Public definitions                                                         */
+ /*============================================================================*/
+ 
+-int ep_param_get() {
++int ep_param_get(void) {
+ 	return core_get()->ep_id;
+ }
+ 
+@@ -673,7 +673,7 @@ void ep_param_set(int param) {
+ 	}
+ }
+ 
+-int ep_param_set_any() {
++int ep_param_set_any(void) {
+ 	int r0, r1, r2;
+ 
+ 	r0 = ep_param_set_any_plain();
+@@ -689,7 +689,7 @@ int ep_param_set_any() {
+ 	return STS_OK;
+ }
+ 
+-int ep_param_set_any_plain() {
++int ep_param_set_any_plain(void) {
+ 	int r = STS_OK;
+ #if defined(EP_PLAIN)
+ #if FP_PRIME == 160
+@@ -727,7 +727,7 @@ int ep_param_set_any_plain() {
+ 	return r;
+ }
+ 
+-int ep_param_set_any_endom() {
++int ep_param_set_any_endom(void) {
+ 	int r = STS_OK;
+ #if defined(EP_ENDOM)
+ #if FP_PRIME == 158
+@@ -757,7 +757,7 @@ int ep_param_set_any_endom() {
+ 	return r;
+ }
+ 
+-int ep_param_set_any_super() {
++int ep_param_set_any_super(void) {
+ 	int r = STS_OK;
+ #if defined(EP_SUPER)
+ #if FP_PRIME == 1536
+@@ -771,7 +771,7 @@ int ep_param_set_any_super() {
+ 	return r;
+ }
+ 
+-int ep_param_set_any_pairf() {
++int ep_param_set_any_pairf(void) {
+ 	int type = 0, degree = 0, r = STS_OK;
+ #if defined(EP_ENDOM)
+ #if FP_PRIME == 158
+@@ -826,7 +826,7 @@ int ep_param_set_any_pairf() {
+ 	return r;
+ }
+ 
+-void ep_param_print() {
++void ep_param_print(void) {
+ 	switch (ep_param_get()) {
+ 		case SECG_P160:
+ 			util_banner("Curve SECG-P160:", 0);
+@@ -894,7 +894,7 @@ void ep_param_print() {
+ 	}
+ }
+ 
+-int ep_param_level() {
++int ep_param_level(void) {
+ 	switch (ep_param_get()) {
+ 		case BN_P158:
+ 			return 78;
+@@ -925,7 +925,7 @@ int ep_param_level() {
+ 	return 0;
+ }
+ 
+-int ep_param_embed() {
++int ep_param_embed(void) {
+ 	switch (ep_param_get()) {
+ 		case BN_P158:
+ 		case BN_P254:
+diff --git a/src/epx/relic_ep2_curve.c b/src/epx/relic_ep2_curve.c
+index 8551c43..0428258 100644
+--- a/src/epx/relic_ep2_curve.c
++++ b/src/epx/relic_ep2_curve.c
+@@ -204,7 +204,7 @@ void ep2_curve_clean(void) {
+ 	bn_clean(&(ctx->ep2_h));
+ }
+ 
+-int ep2_curve_is_twist() {
++int ep2_curve_is_twist(void) {
+ 	return core_get()->ep2_is_twist;
+ }
+ 
+@@ -239,7 +239,7 @@ void ep2_curve_get_cof(bn_t h) {
+ 
+ #if defined(EP_PRECO)
+ 
+-ep2_t *ep2_curve_get_tab() {
++ep2_t *ep2_curve_get_tab(void) {
+ #if ALLOC == AUTO
+ 	return (ep2_t *)*(core_get()->ep2_ptr);
+ #else
+diff --git a/src/fb/relic_fb_poly.c b/src/fb/relic_fb_poly.c
+index 9b1e502..6a55a9b 100644
+--- a/src/fb/relic_fb_poly.c
++++ b/src/fb/relic_fb_poly.c
+@@ -51,7 +51,7 @@
+  * @throw ERR_NO_MEMORY if there is no available memory.
+  * @throw ERR_NO_VALID if the polynomial is invalid.
+  */
+-static void find_trace() {
++static void find_trace(void) {
+ 	fb_t t0, t1;
+ 	int counter;
+ 	ctx_t *ctx = core_get();
+@@ -113,7 +113,7 @@ static void find_trace() {
+  *
+  * @throw ERR_NO_MEMORY if there is no available memory.
+  */
+-static void find_solve() {
++static void find_solve(void) {
+ 	int i, j, k, l;
+ 	fb_t t0;
+ 	ctx_t *ctx = core_get();
+@@ -157,7 +157,7 @@ static void find_solve() {
+ /**
+  * Precomputes the square root of z.
+  */
+-static void find_srz() {
++static void find_srz(void) {
+ 	ctx_t *ctx = core_get();
+ 
+ 	fb_set_dig(ctx->fb_srz, 2);
+@@ -180,7 +180,7 @@ static void find_srz() {
+ /**
+  * Finds an addition chain for (FB_BITS - 1).
+  */
+-static void find_chain() {
++static void find_chain(void) {
+ 	int i, j, k, l;
+ 	ctx_t *ctx = core_get();
+ 
+@@ -488,7 +488,7 @@ void fb_poly_get_rdc(int *a, int *b, int *c) {
+ 	*c = ctx->fb_pc;
+ }
+ 
+-const dig_t *fb_poly_get_slv() {
++const dig_t *fb_poly_get_slv(void) {
+ #if FB_SLV == QUICK || !defined(STRIP)
+ 	return (dig_t *)&(core_get()->fb_half);
+ #else
+diff --git a/src/fp/relic_fp_param.c b/src/fp/relic_fp_param.c
+index a47fbbb..d0bf197 100644
+--- a/src/fp/relic_fp_param.c
++++ b/src/fp/relic_fp_param.c
+@@ -661,7 +661,7 @@ int fp_param_set_any(void) {
+ 	return STS_OK;
+ }
+ 
+-int fp_param_set_any_dense() {
++int fp_param_set_any_dense(void) {
+ 	bn_t p;
+ 	dig_t mod8;
+ 	int result = STS_OK;
+@@ -712,7 +712,7 @@ int fp_param_set_any_pmers(void) {
+ 	return STS_OK;
+ }
+ 
+-int fp_param_set_any_tower() {
++int fp_param_set_any_tower(void) {
+ #if FP_PRIME == 158
+ 	fp_param_set(BN_158);
+ #elif FP_PRIME == 254
+diff --git a/src/fp/relic_fp_prime.c b/src/fp/relic_fp_prime.c
+index adf73b4..acdcd83 100644
+--- a/src/fp/relic_fp_prime.c
++++ b/src/fp/relic_fp_prime.c
+@@ -119,7 +119,7 @@ static void fp_prime_set(const bn_t p) {
+ /**
+  * Computes the constantes required for evaluating Frobenius maps.
+  */
+-static void fp2_calc() {
++static void fp2_calc(void) {
+ 	bn_t e;
+ 	fp2_t t0;
+ 	fp2_t t1;
+@@ -188,7 +188,7 @@ static void fp2_calc() {
+ /**
+  * Computes the constants required for evaluating Frobenius maps.
+  */
+-static void fp3_calc() {
++static void fp3_calc(void) {
+ 	bn_t e;
+ 	fp3_t t0, t1, t2;
+ 	ctx_t *ctx = core_get();
+@@ -294,7 +294,7 @@ static void fp3_calc() {
+ /* Public definitions                                                         */
+ /*============================================================================*/
+ 
+-void fp_prime_init() {
++void fp_prime_init(void) {
+ 	ctx_t *ctx = core_get();
+ 	ctx->fp_id = 0;
+ 	bn_init(&(ctx->prime), FP_DIGS);
+@@ -308,7 +308,7 @@ void fp_prime_init() {
+ #endif
+ }
+ 
+-void fp_prime_clean() {
++void fp_prime_clean(void) {
+ 	ctx_t *ctx = core_get();
+ 	ctx->fp_id = 0;
+ #if FP_RDC == QUICK || !defined(STRIP)	
+@@ -357,15 +357,15 @@ const dig_t *fp_prime_get_conv(void) {
+ #endif
+ }
+ 
+-dig_t fp_prime_get_mod8() {
++dig_t fp_prime_get_mod8(void) {
+ 	return core_get()->mod8;
+ }
+ 
+-int fp_prime_get_qnr() {
++int fp_prime_get_qnr(void) {
+ 	return core_get()->qnr;
+ }
+ 
+-int fp_prime_get_cnr() {
++int fp_prime_get_cnr(void) {
+ 	return core_get()->cnr;
+ }
+ 
+@@ -426,7 +426,7 @@ void fp_prime_set_pmers(const int *f, int len) {
+ 	}
+ }
+ 
+-void fp_prime_calc() {
++void fp_prime_calc(void) {
+ #ifdef WITH_FPX
+ 	if (fp_prime_get_qnr() != 0) {
+ 		fp2_calc();
+diff --git a/src/rand/relic_rand_core.c b/src/rand/relic_rand_core.c
+index c934083..8aa0d15 100644
+--- a/src/rand/relic_rand_core.c
++++ b/src/rand/relic_rand_core.c
+@@ -79,7 +79,7 @@
+ /* Public definitions                                                         */
+ /*============================================================================*/
+ 
+-void rand_init() {
++void rand_init(void) {
+ 	uint8_t buf[SEED_SIZE];
+ 
+ #if RAND == UDEV
+@@ -172,7 +172,7 @@ void rand_init() {
+ #endif
+ }
+ 
+-void rand_clean() {
++void rand_clean(void) {
+ 
+ #if RAND == UDEV
+ 	int *fd = (int *)&(core_get()->rand);
+diff --git a/src/relic_bench.c b/src/relic_bench.c
+index 7b56cc5..c47d500 100644
+--- a/src/relic_bench.c
++++ b/src/relic_bench.c
+@@ -115,13 +115,13 @@ void bench_overhead(void) {
+ 
+ #endif /* OVER && TIMER != NONE && BENCH > 1 */
+ 
+-void bench_reset() {
++void bench_reset(void) {
+ #if TIMER != NONE
+ 	core_get()->total = 0;
+ #endif
+ }
+ 
+-void bench_before() {
++void bench_before(void) {
+ #if OPSYS == DUINO && TIMER == HREAL
+ 	core_get()->before = micros();
+ #elif TIMER == HREAL || TIMER == HPROC || TIMER == HTHRD
+@@ -135,7 +135,7 @@ void bench_before() {
+ #endif
+ }
+ 
+-void bench_after() {
++void bench_after(void) {
+ 	ctx_t *ctx = core_get();
+ 	long long result;
+ 
+@@ -179,7 +179,7 @@ void bench_compute(int benches) {
+ #endif /* TIMER != NONE */
+ }
+ 
+-void bench_print() {
++void bench_print(void) {
+ 	ctx_t *ctx = core_get();
+ 
+ #if TIMER == POSIX || TIMER == ANSI || (OPSYS == DUINO && TIMER == HREAL)
+@@ -196,6 +196,6 @@ void bench_print() {
+ 	}
+ }
+ 
+-ull_t bench_total() {
++ull_t bench_total(void) {
+ 	return core_get()->total;
+ }
+diff --git a/src/relic_core.c b/src/relic_core.c
+index 7277288..2d2c8c7 100644
+--- a/src/relic_core.c
++++ b/src/relic_core.c
+@@ -164,7 +164,7 @@ int core_clean(void) {
+ 	return STS_OK;
+ }
+ 
+-ctx_t *core_get() {
++ctx_t *core_get(void) {
+ 	return core_ctx;
+ }
+ 
+-- 
+2.3.0
+
