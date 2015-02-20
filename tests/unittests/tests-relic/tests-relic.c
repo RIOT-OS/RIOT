@@ -39,7 +39,7 @@ static void tearDown(void)
     core_clean();
 }
 
-int tests_relic_ecdh(void)
+static void tests_relic_ecdh(void)
 {
     /*  The following is an example for doing an elliptic-curve Diffie-Hellman 
         key exchange. 
@@ -128,7 +128,6 @@ int tests_relic_ecdh(void)
 #endif
     }
 
-    return 0;
 }
 
 TestRef tests_relic_all(void)
