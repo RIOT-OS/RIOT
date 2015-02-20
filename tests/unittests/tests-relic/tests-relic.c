@@ -6,13 +6,17 @@
  * directory for more details.
  */
 
-#include "embUnit.h"
 
-#include <assert.h>
+#define TEST_RELIC_SHOW_OUTPUT (0) /**< set if encoded/decoded string is displayed */
+
+#if (TEST_RELIC_SHOW_OUTPUT == 1)
 #include <stdio.h>
+#endif
+#include <assert.h>
 #include <stdlib.h>
 
-#include <relic.h>
+#include "relic.h"
+#include "embUnit.h"
 
 void print_mem(void *mem, int len) {
   int i;
@@ -43,7 +47,9 @@ int tests_relic_ecdh(void)
 
     /* Select an elliptic curve configuration */
     if (ec_param_set_any() == STS_OK) {
+#if (TEST_RELIC_SHOW_OUTPUT == 1)
         ec_param_print();
+#endif
 
         bn_t privateA;
         ec_t publicA;
@@ -68,6 +74,7 @@ int tests_relic_ecdh(void)
         /* User A generates private/public key pair */
         TEST_ASSERT_EQUAL_INT(STS_OK, cp_ecdh_gen(privateA, publicA));
 
+#if (TEST_RELIC_SHOW_OUTPUT == 1)
         printf("User A\n");
         printf("======\n");
         printf("private key: ");
@@ -75,10 +82,12 @@ int tests_relic_ecdh(void)
         printf("\npublic key:  ");
         ec_print(publicA);
         printf("\n");
+#endif
         
         /* User B generates private/public key pair */
         TEST_ASSERT_EQUAL_INT(STS_OK, cp_ecdh_gen(privateB, publicB));
 
+#if (TEST_RELIC_SHOW_OUTPUT == 1)
         printf("User B\n");
         printf("======\n");
         printf("private key: ");
@@ -86,20 +95,25 @@ int tests_relic_ecdh(void)
         printf("\npublic key:  ");
         ec_print(publicB);
         printf("\n");
+#endif
 
         /* In a protocol you would exchange the public keys now */
 
         /* User A calculates shared secret */
         assert(cp_ecdh_key(sharedKeyA, MD_LEN, privateA, publicB) == STS_OK);
 
+#if (TEST_RELIC_SHOW_OUTPUT == 1)
         printf("\nshared key computed by user A: ");
         print_mem(sharedKeyA, MD_LEN);
+#endif
 
         /* User B calculates shared secret */
         assert(cp_ecdh_key(sharedKeyB, MD_LEN, privateB, publicA) == STS_OK);
 
+#if (TEST_RELIC_SHOW_OUTPUT == 1)
         printf("\nshared key computed by user B: ");
         print_mem(sharedKeyB, MD_LEN);
+#endif
 
         /* The secrets should be the same now */
         TEST_ASSERT_EQUAL_INT(CMP_EQ, util_cmp_const(sharedKeyA, sharedKeyB, MD_LEN));
@@ -109,7 +123,9 @@ int tests_relic_ecdh(void)
 
         bn_free(privateB);
         ec_free(publicB);
+#if (TEST_RELIC_SHOW_OUTPUT == 1)
         printf("\nRELIC EC-DH test successful\n");
+#endif
     }
 
     return 0;
