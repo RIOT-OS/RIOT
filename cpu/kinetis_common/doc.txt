@@ -14,7 +14,7 @@
  *                  #define ADC_NUMOF           (1U)
  *                  #define ADC_0_EN            1
  *                  #define ADC_MAX_CHANNELS    1
- *                  
+ *
  *                  // ADC 0 configuration
  *                  #define ADC_0_DEV           ADC0
  *                  #define ADC_0_MODULE_CLOCK  CLOCK_CORECLOCK
@@ -22,7 +22,7 @@
  *                  #define ADC_0_CLKEN()       (SIM->SCGC6 |= (SIM_SCGC6_ADC0_MASK))
  *                  #define ADC_0_CLKDIS()      (SIM->SCGC6 &= ~(SIM_SCGC6_ADC0_MASK))
  *                  #define ADC_0_PORT_CLKEN()  (SIM->SCGC5 |= (SIM_SCGC5_PORTE_MASK))
- *                  
+ *
  *                  #define ADC_0_CH5           11
  *                  #define ADC_0_CH5_PIN       1
  *                  #define ADC_0_CH5_PIN_AF    0
@@ -65,7 +65,20 @@
  *                  #define I2C_CLK                 (48e6)
  *                  #define I2C_0_EN                1
  *                  #define I2C_IRQ_PRIO            1
- *                  
+ *
+ *                  / * Low (10 kHz): MUL = 4, SCL divider = 2560, total: 10240 * /
+ *                  #define KINETIS_I2C_F_ICR_LOW        (0x3D)
+ *                  #define KINETIS_I2C_F_MULT_LOW       (2)
+ *                  / * Normal (100 kHz): MUL = 2, SCL divider = 240, total: 480 * /
+ *                  #define KINETIS_I2C_F_ICR_NORMAL     (0x1F)
+ *                  #define KINETIS_I2C_F_MULT_NORMAL    (1)
+ *                  / * Fast (400 kHz): MUL = 1, SCL divider = 128, total: 128 * /
+ *                  #define KINETIS_I2C_F_ICR_FAST       (0x17)
+ *                  #define KINETIS_I2C_F_MULT_FAST      (0)
+ *                  / * Fast plus (1000 kHz): MUL = 1, SCL divider = 48, total: 48 * /
+ *                  #define KINETIS_I2C_F_ICR_FAST_PLUS  (0x10)
+ *                  #define KINETIS_I2C_F_MULT_FAST_PLUS (0)
+ *
  *                  // I2C 0 device configuration
  *                  #define I2C_0_DEV               I2C1
  *                  #define I2C_0_CLKEN()           (SIM->SCGC4 |= (SIM_SCGC4_I2C1_MASK))
@@ -91,7 +104,7 @@
  *                  #define PWM_NUMOF           (1U)
  *                  #define PWM_0_EN            1
  *                  #define PWM_MAX_CHANNELS    2
- *                  
+ *
  *                  // PWM 0 device configuration
  *                  #define PWM_0_DEV           FTM0
  *                  #define PWM_0_CHANNELS      2
@@ -100,12 +113,12 @@
  *                  #define PWM_0_CLKDIS()      (SIM->SCGC6 &= ~(SIM_SCGC6_FTM0_MASK))
  *                  // PWM 0 pin configuration
  *                  #define PWM_0_PORT_CLKEN()  (SIM->SCGC5 |= (SIM_SCGC5_PORTD_MASK | SIM_SCGC5_PORTA_MASK))
- *                  
+ *
  *                  #define PWM_0_PIN_CH0       4
  *                  #define PWM_0_FTMCHAN_CH0   1
  *                  #define PWM_0_PORT_CH0      PORTA
  *                  #define PWM_0_PIN_AF_CH0    3
- *                  
+ *
  *                  #define PWM_0_PIN_CH1       4
  *                  #define PWM_0_FTMCHAN_CH1   4
  *                  #define PWM_0_PORT_CH1      PORTD
@@ -257,7 +270,7 @@
  * @defgroup    cpu_kinetis_common_timer Kinetis Timer
  * @ingroup     cpu_kinetis_common
  * @brief       Periodic Interrupt Timer (PIT) driver.
- *              Implementation of riot-os low level timer interface 
+ *              Implementation of riot-os low level timer interface
  *              for the Kinetis Periodic Interrupt Timer.
  *              The PIT is a count down timer, in order to use it with riot-os
  *              a count up timer will be simulated. The PIT has four channels,
@@ -275,8 +288,8 @@
  *                  #define TIMER_MAX_VALUE         (0xffffffff)
  *                  #define TIMER_CLOCK             CLOCK_CORECLOCK
  *                  #define TIMER_CLKEN()           (SIM->SCGC6 |= (SIM_SCGC6_PIT_MASK))
- *                  
- *                  // Timer 0 configuration 
+ *
+ *                  // Timer 0 configuration
  *                  #define TIMER_0_PRESCALER_CH    0
  *                  #define TIMER_0_COUNTER_CH      1
  *                  #define TIMER_0_ISR             isr_pit1
