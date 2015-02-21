@@ -154,7 +154,7 @@ LINKFLAGPREFIX ?= -Wl,
 DIRS += $(EXTERNAL_MODULE_DIRS)
 
 ## make script for your application. Build RIOT-base here!
-all: ..build-message $(USEPKG:%=${BINDIR}%.a) $(APPDEPS)
+all: ..compiler-check ..build-message $(USEPKG:%=${BINDIR}%.a) $(APPDEPS)
 	$(AD)DIRS="$(DIRS)" "$(MAKE)" -C $(CURDIR) -f $(RIOTBASE)/Makefile.application
 ifeq (,$(RIOTNOLINK))
 ifeq ($(BUILDOSXNATIVE),1)
@@ -165,6 +165,12 @@ endif
 	$(AD)$(SIZE) $(ELFFILE)
 	$(AD)$(OBJCOPY) $(OFLAGS) $(ELFFILE) $(HEXFILE)
 endif
+
+..compiler-check:
+	$(AD)command -v $(CC) >/dev/null 2>&1 || \
+		{ $(COLOR_ECHO) \
+		'${COLOR_RED} Compiler $(CC) is required but not found in PATH.  Aborting.${COLOR_RESET}'; \
+		exit 1; }
 
 ..build-message:
 	@$(COLOR_ECHO) '${COLOR_GREEN}Building application "$(APPLICATION)" for "$(BOARD)" with MCU "$(MCU)".${COLOR_RESET}'
