@@ -1233,10 +1233,7 @@ void lowpan_iphc_decoding(uint8_t *data, uint8_t length, net_if_eui64_t *s_addr,
     }
 
     /* NH: Next Header: */
-    if (lowpan_iphc[0] & SIXLOWPAN_IPHC1_NH) {
-        // TODO: next header decompression
-    }
-    else {
+    if (!(lowpan_iphc[0] & SIXLOWPAN_IPHC1_NH)) {
         ipv6_buf->nextheader = ipv6_hdr_fields[hdr_pos];
         hdr_pos++;
     }
@@ -1474,11 +1471,30 @@ void lowpan_iphc_decoding(uint8_t *data, uint8_t length, net_if_eui64_t *s_addr,
 
     uint8_t *ptr = get_payload_buf(ipv6_ext_hdr_len);
 
-    memcpy(ptr, &ipv6_hdr_fields[hdr_pos], length - hdr_pos);
+    if (lowpan_iphc[0] & SIXLOWPAN_IPHC1_NH) {
+        if ((ipv6_hdr_fields[hdr_pos] & SIXLOWPAN_NHC_UDP_MASK) == SIXLOWPAN_NHC_UDP_ID) {
+            ipv6_buf->nextheader = IPV6_PROTO_NUM_UDP;
+            /* ipv6 length */
+            ipv6_buf->length = HTONS(length - hdr_pos + 1);
+            packet_length = IPV6_HDR_LEN + ipv6_buf->length;
 
-    /* ipv6 length */
-    ipv6_buf->length = HTONS(length - hdr_pos);
-    packet_length = IPV6_HDR_LEN + ipv6_buf->length;
+            hdr_pos ++;
+            /* copy inline src_port and dst_port */
+            memcpy(ptr, &ipv6_hdr_fields[hdr_pos], 4);
+            hdr_pos += 4;
+            ptr += 4;
+            /* insert length value */
+            *((uint16_t*)ptr) = ipv6_buf->length;
+            ptr += 2;
+        }
+    }
+    else {
+        /* ipv6 length */
+        ipv6_buf->length = HTONS(length - hdr_pos);
+        packet_length = IPV6_HDR_LEN + ipv6_buf->length;
+    }
+
+    memcpy(ptr, &ipv6_hdr_fields[hdr_pos], length - hdr_pos);
 }
 
 uint8_t lowpan_context_len(void)

@@ -78,6 +78,8 @@ extern "C" {
  *      </a>
  */
 #define SIXLOWPAN_IPHC1_NH          (0x04)
+#define SIXLOWPAN_NHC_UDP_MASK      (0xF8)
+#define SIXLOWPAN_NHC_UDP_ID        (0xF0)
 
 /**
  * @brief   Flag for Context Identifier Extention (part of second byte
