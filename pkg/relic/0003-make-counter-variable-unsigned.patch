@@ -1,7 +1,7 @@
-From 299cbc4292554a5c405201d74d30d22609427103 Mon Sep 17 00:00:00 2001
+From 9c4cef8a31b8a9d6c7a2831cac159304f965eec2 Mon Sep 17 00:00:00 2001
 From: Oleg Hahm <oleg@hobbykeller.org>
 Date: Sat, 21 Feb 2015 00:15:06 +0100
-Subject: [PATCH 5/5] make counter variable unsigned
+Subject: [PATCH 3/3] make counter variable unsigned
 
 ---
  src/cp/relic_cp_bdpe.c | 3 ++-

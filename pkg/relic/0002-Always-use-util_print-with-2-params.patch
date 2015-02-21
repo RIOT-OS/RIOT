@@ -1,7 +1,7 @@
-From 72d5f687b72bdd3e2cbe3fa39221692e39ebe61c Mon Sep 17 00:00:00 2001
+From 8ee6a3e26512ac775ebfa7f71d173acde706ee88 Mon Sep 17 00:00:00 2001
 From: Oleg Hahm <oleg@hobbykeller.org>
-Date: Fri, 20 Feb 2015 23:54:37 +0100
-Subject: [PATCH 3/5] Always use util_print with 2 params
+Date: Sat, 21 Feb 2015 11:09:30 +0100
+Subject: [PATCH 2/3] Always use util_print with 2 params
 
 ---
  include/relic_test.h    |  2 +-
@@ -82,7 +82,7 @@ index f3b5eff..469c3c3 100644
  	return;
  }
 diff --git a/src/ed/relic_ed_util.c b/src/ed/relic_ed_util.c
-index 45f5bce..4865c86 100644
+index 36533d4..feb7247 100644
 --- a/src/ed/relic_ed_util.c
 +++ b/src/ed/relic_ed_util.c
 @@ -347,7 +347,7 @@ int ed_is_valid(const ed_t p) {
@@ -95,7 +95,7 @@ index 45f5bce..4865c86 100644
  			// }
  		} CATCH_ANY {
 diff --git a/src/fb/relic_fb_util.c b/src/fb/relic_fb_util.c
-index f9cb655..555f98c 100644
+index 0370af4..5cc622f 100644
 --- a/src/fb/relic_fb_util.c
 +++ b/src/fb/relic_fb_util.c
 @@ -166,10 +166,10 @@ void fb_print(const fb_t a) {
@@ -112,10 +112,10 @@ index f9cb655..555f98c 100644
  
  int fb_size_str(const fb_t a, int radix) {
 diff --git a/src/fp/relic_fp_param.c b/src/fp/relic_fp_param.c
-index d0bf197..844ee1a 100644
+index b6f1278..273b572 100644
 --- a/src/fp/relic_fp_param.c
 +++ b/src/fp/relic_fp_param.c
-@@ -739,7 +739,7 @@ int fp_param_set_any_tower(void) {
+@@ -737,7 +737,7 @@ int fp_param_set_any_tower() {
  
  void fp_param_print(void) {
  	util_banner("Prime modulus:", 0);
@@ -125,7 +125,7 @@ index d0bf197..844ee1a 100644
  	fp_print(fp_prime_get());
  #else
 diff --git a/src/fp/relic_fp_util.c b/src/fp/relic_fp_util.c
-index 52910ef..4008ef2 100644
+index d32c253..5ece340 100644
 --- a/src/fp/relic_fp_util.c
 +++ b/src/fp/relic_fp_util.c
 @@ -147,10 +147,10 @@ void fp_print(const fp_t a) {
@@ -142,10 +142,10 @@ index 52910ef..4008ef2 100644
  	} CATCH_ANY {
  		THROW(ERR_CAUGHT);
 diff --git a/src/relic_bench.c b/src/relic_bench.c
-index c47d500..e81e68b 100644
+index 7b56cc5..0f2f65f 100644
 --- a/src/relic_bench.c
 +++ b/src/relic_bench.c
-@@ -190,9 +190,9 @@ void bench_print(void) {
+@@ -190,9 +190,9 @@ void bench_print() {
  	util_print("%lld nanosec", ctx->total);
  #endif
  	if (ctx->total < 0) {
@@ -711,7 +711,7 @@ index 59a92c3..e5fbba7 100644
  	}
  	code = STS_OK;
 diff --git a/test/test_fp.c b/test/test_fp.c
-index 2ef4c20..2a6cd97 100644
+index 4fc13b7..71ba83a 100644
 --- a/test/test_fp.c
 +++ b/test/test_fp.c
 @@ -50,7 +50,7 @@ static int memory(void) {
@@ -723,7 +723,7 @@ index 2ef4c20..2a6cd97 100644
  				ERROR(end);
  				break;
  		}
-@@ -645,7 +645,7 @@ static int doubling_halving(void) {
+@@ -644,7 +644,7 @@ static int doubling_halving(void) {
  #endif
  	}
  	CATCH_ANY {
