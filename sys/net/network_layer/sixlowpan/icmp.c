@@ -1183,7 +1183,7 @@ void recv_nbr_sol(void)
         /* solicited na */
         uint8_t flags = (ICMPV6_NEIGHBOR_ADV_FLAG_OVERRIDE | ICMPV6_NEIGHBOR_ADV_FLAG_SOLICITED);
         icmpv6_send_neighbor_adv(&(ipv6_buf->srcaddr), &(ipv6_buf->destaddr),
-                                 alist_targ.addr->addr_data, flags, 0, OPT_ARO);
+                                 alist_targ.addr->addr_data, flags, OPT_TLLAO, 0);
     }
 }
 
@@ -1204,6 +1204,7 @@ void icmpv6_send_neighbor_adv(ipv6_addr_t *src, ipv6_addr_t *dst, ipv6_addr_t *t
     icmp_buf = get_icmpv6_buf(ipv6_ext_hdr_len);
     icmp_buf->type = ICMPV6_TYPE_NEIGHBOR_ADV;
     icmp_buf->code = 0;
+    icmpv6_opt_hdr_len = NBR_ADV_LEN;
 
     if (&ipv6_buf->destaddr != dst) {
         memcpy(&(ipv6_buf->destaddr.uint8[0]), &(dst->uint8[0]), 16);
@@ -1221,12 +1222,12 @@ void icmpv6_send_neighbor_adv(ipv6_addr_t *src, ipv6_addr_t *dst, ipv6_addr_t *t
 
     packet_length = IPV6_HDR_LEN + ICMPV6_HDR_LEN + NBR_ADV_LEN;
 
-    if (sllao == OPT_SLLAO) {
+    if (sllao == OPT_TLLAO) {
         /* set sllao option */
         opt_stllao_buf = get_opt_stllao_buf(ipv6_ext_hdr_len, icmpv6_opt_hdr_len);
 
         if (net_if_get_src_address_mode(if_id) == NET_IF_TRANS_ADDR_M_LONG) {
-            icmpv6_ndp_set_sllao(opt_stllao_buf, if_id, NDP_OPT_SLLAO_TYPE, 2);
+            icmpv6_ndp_set_sllao(opt_stllao_buf, if_id, NDP_OPT_TLLAO_TYPE, 2);
             icmpv6_opt_hdr_len += OPT_STLLAO_MAX_LEN;
             packet_length += OPT_STLLAO_MAX_LEN;
         }
