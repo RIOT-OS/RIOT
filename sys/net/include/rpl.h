@@ -27,7 +27,6 @@
 #include <string.h>
 #include <stdint.h>
 #include <vtimer.h>
-#include <mutex.h>
 #include <transceiver.h>
 #include "ipv6.h"
 #include "rpl/rpl_dodag.h"
@@ -46,10 +45,6 @@ extern "C" {
 /* global variables */
 extern kernel_pid_t rpl_process_pid;
 extern uint8_t rpl_max_routing_entries;
-
-/* needed for sending RPL-messages */
-extern mutex_t rpl_send_mutex;
-
 extern msg_t rpl_msg_queue[RPL_PKT_RECV_BUF_SIZE];
 extern char rpl_process_buf[RPL_PROCESS_STACKSIZE];
 extern uint8_t rpl_buffer[BUFFER_SIZE - LL_HDR_LEN];
@@ -57,7 +52,7 @@ extern uint8_t rpl_buffer[BUFFER_SIZE - LL_HDR_LEN];
 /**
  * @brief Initialization of RPL.
  *
- * This function initializes all basic RPL resources such as mutex for send/receive,
+ * This function initializes all basic RPL resources such as
  * corresponding objective functions and sixlowpan (including own address). Calls
  * initialization for mode as specified by PL_DEFAULT_MOP in rpl_structs.h.
  *
@@ -83,7 +78,7 @@ void rpl_init_root(void);
  * @brief Sends a DIO-message to a given destination
  *
  * This function sends a DIO message to a given destination. Because nodes can act
- * differently in different modes, this function just sets the mutex and call the DIO
+ * differently in different modes, this function calls the DIO
  * sending function of the chosen mode.
  *
  * @param[in] destination       IPv6-address of the destination of the DIO. Should be a direct neighbor.
@@ -95,7 +90,7 @@ void rpl_send_DIO(ipv6_addr_t *destination);
  * @brief Sends a DAO-message to a given destination
  *
  * This function sends a DAO message to a given destination. Because nodes can act
- * differently in different modes, this function just sets the mutex and call the DAO
+ * differently in different modes, this function calls the DAO
  * sending function of the chosen mode.
  *
  * @param[in] destination       IPv6-address of the destination of the DAO. Should be the preferred parent.
@@ -110,7 +105,7 @@ void rpl_send_DAO(ipv6_addr_t *destination, uint8_t lifetime, bool default_lifet
  * @brief Sends a DIS-message to a given destination
  *
  * This function sends a DIS message to a given destination or multicast-address. Because nodes can act
- * differently in different modes, this function just sets the mutex and call the DIS
+ * differently in different modes, this function calls the DIS
  * sending function of the chosen mode.
  *
  * @param[in] destination       IPv6-address of the destination of the DIS. Should be a direct neighbor or multicast-address.
@@ -122,7 +117,7 @@ void rpl_send_DIS(ipv6_addr_t *destination);
  * @brief Sends a DAO acknowledgment-message to a given destination
  *
  * This function sends a DAO_ACK message to a given destination. Because nodes can act
- * differently in different modes, this function just sets the mutex and call the DAO_ACK
+ * differently in different modes, this function calls the DAO_ACK
  * sending function of the chosen mode.
  *
  * @param[in] destination       IPv6-address of the destination of the DAO_ACK. Should be a direct neighbor.
@@ -170,10 +165,7 @@ void rpl_recv_DAO_ACK(void);
  * @brief Initialization of RPl-root.
  *
  * This function initializes all RPL resources especially for root purposes.
- * corresponding objective functions and sixlowpan (including own address). It also register mutexes for
- * sending and receiving RPL-based messages. Both are necessary because of parallel access from different
- * layers/modules of RIOT. May change with future structure changes.
- *
+ * corresponding objective functions and sixlowpan (including own address).
  * @param arg ignored
  * @returns nothing
  */

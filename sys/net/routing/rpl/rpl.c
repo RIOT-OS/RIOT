@@ -23,7 +23,6 @@
 #include <string.h>
 #include "vtimer.h"
 #include "thread.h"
-#include "mutex.h"
 
 #include "msg.h"
 #include "rpl.h"
@@ -51,7 +50,6 @@ char addr_str[IPV6_MAX_ADDR_STR_LEN];
 
 /* global variables */
 kernel_pid_t rpl_process_pid = KERNEL_PID_UNDEF;
-mutex_t rpl_send_mutex = MUTEX_INIT;
 msg_t rpl_msg_queue[RPL_PKT_RECV_BUF_SIZE];
 char rpl_process_buf[RPL_PROCESS_STACKSIZE];
 uint8_t rpl_buffer[BUFFER_SIZE - LL_HDR_LEN];
@@ -293,9 +291,7 @@ void rpl_send_DIO(ipv6_addr_t *destination)
         DEBUGF("Send DIO to %s\n", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, destination));
     }
 
-    mutex_lock(&rpl_send_mutex);
     rpl_send_DIO_mode(destination);
-    mutex_unlock(&rpl_send_mutex);
 }
 
 void rpl_send_DAO(ipv6_addr_t *destination, uint8_t lifetime,
@@ -305,9 +301,7 @@ void rpl_send_DAO(ipv6_addr_t *destination, uint8_t lifetime,
         DEBUGF("Send DAO to %s\n", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, destination));
     }
 
-    mutex_lock(&rpl_send_mutex);
     rpl_send_DAO_mode(destination, lifetime, default_lifetime, start_index);
-    mutex_unlock(&rpl_send_mutex);
 }
 
 void rpl_send_DIS(ipv6_addr_t *destination)
@@ -316,9 +310,7 @@ void rpl_send_DIS(ipv6_addr_t *destination)
         DEBUGF("Send DIS to %s\n", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, destination));
     }
 
-    mutex_lock(&rpl_send_mutex);
     rpl_send_DIS_mode(destination);
-    mutex_unlock(&rpl_send_mutex);
 }
 
 void rpl_send_DAO_ACK(ipv6_addr_t *destination)
@@ -328,9 +320,7 @@ void rpl_send_DAO_ACK(ipv6_addr_t *destination)
                 ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, destination));
     }
 
-    mutex_lock(&rpl_send_mutex);
     rpl_send_DAO_ACK_mode(destination);
-    mutex_unlock(&rpl_send_mutex);
 }
 
 void rpl_recv_DIO(void)
