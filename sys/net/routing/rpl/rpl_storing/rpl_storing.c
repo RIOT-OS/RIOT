@@ -514,6 +514,12 @@ void rpl_recv_DIO_mode(void)
                 dio_dodag.default_lifetime = rpl_opt_dodag_conf_buf->default_lifetime;
                 dio_dodag.lifetime_unit = byteorder_ntohs(rpl_opt_dodag_conf_buf->lifetime_unit);
                 dio_dodag.of = (struct rpl_of_t *) rpl_get_of_for_ocp(byteorder_ntohs(rpl_opt_dodag_conf_buf->ocp));
+                if (dio_dodag.of == NULL) {
+                    DEBUGF("[Error] OCP from DIO is not supported! ocp: %x\n",
+                    byteorder_ntohs(rpl_opt_dodag_conf_buf->ocp));
+                    return;
+                }
+
                 len += RPL_OPT_DODAG_CONF_LEN_WITH_OPT_LEN;
                 break;
             }
