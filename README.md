@@ -26,8 +26,6 @@
 
 The friendly Operating System for IoT!
 
-![Travis CI Status](https://travis-ci.org/RIOT-OS/RIOT.svg?branch=master)
-
 ## FEATURES
 RIOT OS is an operating system for Internet of Things (IoT) devices. It is based on a microkernel and designed for
 * energy efficiency
