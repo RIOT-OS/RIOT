@@ -74,9 +74,7 @@ else
 	export PORT =
 endif
 
-ifeq (,$(filter $(PORT),$(TERMFLAGS)))
-    export TERMFLAGS += $(PORT)
-endif
+export TERMFLAGS := $(PORT) $(TERMFLAGS)
 
 export ASFLAGS =
 export DEBUGGER_FLAGS = --args $(ELF) $(TERMFLAGS)
