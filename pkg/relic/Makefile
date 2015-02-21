@@ -25,7 +25,7 @@ $(PKG_DIR)/comp-options.cmake: $(PKG_DIR)/.git/config
 	cd "$(PKG_DIR)" && perl ../generate-cmake-xcompile.perl > comp-options.cmake
 
 $(PKG_DIR)/Makefile: $(PKG_DIR)/comp-options.cmake
-	cd "$(PKG_DIR)" && COMP="$(filter-out -Werror=old-style-definition -Werror=strict-prototypes, $(CFLAGS) ) " cmake -DCMAKE_TOOLCHAIN_FILE=comp-options.cmake -DCHECK=off -DTESTS=0 -DBENCH=0 -DSHLIB=off $(RELIC_CONFIG_FLAGS) .
+	cd "$(PKG_DIR)" && COMP="$(filter-out -Werror=old-style-definition -Werror=strict-prototypes, $(CFLAGS) ) " cmake -DCMAKE_TOOLCHAIN_FILE=comp-options.cmake -DCHECK=off -DTESTS=0 -DBENCH=0 -DSHLIB=off -Wno-dev $(RELIC_CONFIG_FLAGS) .
 $(PKG_DIR)/.git/config:
 	test -d "$(PKG_DIR)" || git clone "$(PKG_URL)" "$(PKG_DIR)"; \
 		cd "$(PKG_DIR)" && git checkout -f "$(PKG_VERSION)"
