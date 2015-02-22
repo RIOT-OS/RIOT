@@ -40,23 +40,17 @@ static iib_base_entry_t *iib_base_entry_head = NULL;
 
 /* Internal function prototypes */
 static void rem_link_set_entry(iib_base_entry_t *base_entry, iib_link_set_entry_t *ls_entry);
-static void cleanup_link_sets(nhdp_addr_entry_t *rem_list);
+static void cleanup_link_sets(void);
 static iib_link_set_entry_t *add_default_link_set_entry(iib_base_entry_t *base_entry, timex_t *now,
                                                         uint64_t val_time);
 static void reset_link_set_entry(iib_link_set_entry_t *ls_entry, timex_t *now, uint64_t val_time);
 static iib_link_set_entry_t *update_link_set(iib_base_entry_t *base_entry, nib_entry_t *nb_elt,
-                                             nhdp_addr_entry_t *send_list, timex_t *now,
-                                             uint64_t val_time, uint8_t sym, uint8_t lost);
+                                             timex_t *now, uint64_t val_time,
+                                             uint8_t sym, uint8_t lost);
 static void release_link_tuple_addresses(iib_link_set_entry_t *ls_entry);
 
 static int update_two_hop_set(iib_base_entry_t *base_entry, iib_link_set_entry_t *ls_entry,
-                              nhdp_addr_entry_t *th_sym_list, nhdp_addr_entry_t *th_rem_list,
                               timex_t *now, uint64_t val_time);
-static uint8_t rem_exst_th_entries(iib_base_entry_t *base_entry, iib_two_hop_set_entry_t *ts_elt,
-                                   nhdp_addr_entry_t *th_sym_list);
-static uint8_t rem_non_sym_th_entries(iib_base_entry_t *base_entry,
-                                      iib_two_hop_set_entry_t *ts_elt,
-                                      nhdp_addr_entry_t *th_rem_list);
 static int add_two_hop_entry(iib_base_entry_t *base_entry, iib_link_set_entry_t *ls_entry,
                              nhdp_addr_t *th_addr, timex_t *now, uint64_t val_time);
 static void rem_two_hop_entry(iib_base_entry_t *base_entry, iib_two_hop_set_entry_t *th_entry);
@@ -92,10 +86,8 @@ int iib_register_if(kernel_pid_t pid)
     return 0;
 }
 
-int iib_process_hello(kernel_pid_t if_pid, nib_entry_t *nb_elt, nhdp_addr_entry_t *send_list,
-                      nhdp_addr_entry_t *th_sym_list, nhdp_addr_entry_t *th_rem_list,
-                      nhdp_addr_entry_t *rem_list, uint64_t validity_time, uint8_t is_sym_nb,
-                      uint8_t is_lost)
+int iib_process_hello(kernel_pid_t if_pid, nib_entry_t *nb_elt,
+                      uint64_t validity_time, uint8_t is_sym_nb, uint8_t is_lost)
 {
     iib_base_entry_t *base_elt;
     timex_t now;
@@ -103,7 +95,7 @@ int iib_process_hello(kernel_pid_t if_pid, nib_entry_t *nb_elt, nhdp_addr_entry_
     mutex_lock(&mtx_iib_access);
 
     /* Remove link tuple addresses that are included in the Removed Addr List */
-    cleanup_link_sets(rem_list);
+    cleanup_link_sets();
 
     LL_FOREACH(iib_base_entry_head, base_elt) {
         /* Find the link set and two hop set for the interface */
@@ -116,12 +108,12 @@ int iib_process_hello(kernel_pid_t if_pid, nib_entry_t *nb_elt, nhdp_addr_entry_
         vtimer_now(&now);
 
         /* Create a new link tuple for the neighbor that originated the hello */
-        iib_link_set_entry_t *ls_entry = update_link_set(base_elt, nb_elt, send_list,
-                                         &now, validity_time, is_sym_nb, is_lost);
+        iib_link_set_entry_t *ls_entry = update_link_set(base_elt, nb_elt, &now,
+                                                         validity_time, is_sym_nb, is_lost);
 
         /* Create new two hop tuples for signaled symmetric neighbors */
         if (ls_entry) {
-            update_two_hop_set(base_elt, ls_entry, th_sym_list, th_rem_list, &now, validity_time);
+            update_two_hop_set(base_elt, ls_entry, &now, validity_time);
         }
     }
 
@@ -232,32 +224,22 @@ void iib_propagate_nb_entry_change(nib_entry_t *old_entry, nib_entry_t *new_entr
 /**
  * Remove addresses included in the Removed Address List from all existing Link Tuples
  */
-static void cleanup_link_sets(nhdp_addr_entry_t *rem_list)
+static void cleanup_link_sets(void)
 {
-    /* Check whether the Removed Address List is not empty */
-    if (!rem_list) {
-        return;
-    }
+    iib_base_entry_t *base_elt;
 
     /* Loop through all link sets */
-    iib_base_entry_t *base_elt;
     LL_FOREACH(iib_base_entry_head, base_elt) {
         /* Loop through all link tuples of the link set */
         iib_link_set_entry_t *ls_elt, *ls_tmp;
         LL_FOREACH_SAFE(base_elt->link_set_head, ls_elt, ls_tmp) {
             /* Loop through all addresses of the link tuples */
-            nhdp_addr_entry_t *lt_elt;
-            LL_FOREACH(ls_elt->address_list_head, lt_elt) {
-                /* Loop through all addresses of the Removed Addr List */
-                nhdp_addr_entry_t *rem_elt;
-                LL_FOREACH(rem_list, rem_elt) {
+            nhdp_addr_entry_t *lt_elt, *lt_tmp;
+            LL_FOREACH_SAFE(ls_elt->address_list_head, lt_elt, lt_tmp) {
+                if (NHDP_ADDR_TMP_IN_REM_LIST(lt_elt->address)) {
                     /* Remove link tuple address if included in the Removed Addr List */
-                    if (lt_elt->address == rem_elt->address) {
-                        /* Addresses are equal (same NHDP address db entry) */
-                        LL_DELETE(ls_elt->address_list_head, lt_elt);
-                        nhdp_free_addr_entry(lt_elt);
-                        break;
-                    }
+                    LL_DELETE(ls_elt->address_list_head, lt_elt);
+                    nhdp_free_addr_entry(lt_elt);
                 }
             }
 
@@ -283,12 +265,12 @@ static void cleanup_link_sets(nhdp_addr_entry_t *rem_list)
  * Update the Link Set for the receiving interface during HELLO message processing
  */
 static iib_link_set_entry_t *update_link_set(iib_base_entry_t *base_entry, nib_entry_t *nb_elt,
-                                             nhdp_addr_entry_t *send_list, timex_t *now,
-                                             uint64_t val_time, uint8_t sym, uint8_t lost)
+                                             timex_t *now, uint64_t val_time,
+                                             uint8_t sym, uint8_t lost)
 {
     iib_link_set_entry_t *ls_elt, *ls_tmp;
     iib_link_set_entry_t *matching_lt = NULL;
-    nhdp_addr_entry_t *lt_elt, *send_elt;
+    nhdp_addr_entry_t *lt_elt;
     timex_t v_time, l_hold;
     uint8_t matches = 0;
 
@@ -296,30 +278,21 @@ static iib_link_set_entry_t *update_link_set(iib_base_entry_t *base_entry, nib_e
     LL_FOREACH_SAFE(base_entry->link_set_head, ls_elt, ls_tmp) {
         /* Loop through all addresses of the link tuple */
         LL_FOREACH(ls_elt->address_list_head, lt_elt) {
-            /* Loop through all addresses of the Sending Addr List */
-            LL_FOREACH(send_list, send_elt) {
+            if (NHDP_ADDR_TMP_IN_SEND_LIST(lt_elt->address)) {
                 /* If link tuple address matches a sending addr we found a fitting tuple */
-                if (lt_elt->address == send_elt->address) {
-                    /* Addresses are equal (same NHDP address db entry) */
-                    matches++;
+                matches++;
 
-                    if (matches > 1) {
-                        /* Multiple matching link tuples, delete the previous one */
-                        if (matching_lt->last_status == IIB_LT_STATUS_SYM) {
-                            update_nb_tuple_symmetry(base_entry, matching_lt, now);
-                        }
-
-                        rem_link_set_entry(base_entry, matching_lt);
+                if (matches > 1) {
+                    /* Multiple matching link tuples, delete the previous one */
+                    if (matching_lt->last_status == IIB_LT_STATUS_SYM) {
+                        update_nb_tuple_symmetry(base_entry, matching_lt, now);
                     }
 
-                    matching_lt = ls_elt;
-                    break;
+                    rem_link_set_entry(base_entry, matching_lt);
                 }
 
-                if (matching_lt == ls_elt) {
-                    /* This link tuple is already detected as matching */
-                    break;
-                }
+                matching_lt = ls_elt;
+                break;
             }
         }
     }
@@ -350,7 +323,7 @@ static iib_link_set_entry_t *update_link_set(iib_base_entry_t *base_entry, nib_e
     l_hold = timex_from_uint64(((uint64_t)NHDP_L_HOLD_TIME_MS) * MS_IN_USEC);
 
     /* Set Sending Address List as this tuples address list */
-    matching_lt->address_list_head = nhdp_generate_new_addr_list(send_list);
+    matching_lt->address_list_head = nhdp_generate_addr_list_from_tmp(NHDP_ADDR_TMP_SEND_LIST);
 
     if (!matching_lt->address_list_head) {
         /* Insufficient memory */
@@ -520,7 +493,6 @@ static void release_link_tuple_addresses(iib_link_set_entry_t *ls_entry)
  * Update the 2-Hop Set during HELLO message processing
  */
 static int update_two_hop_set(iib_base_entry_t *base_entry, iib_link_set_entry_t *ls_entry,
-                              nhdp_addr_entry_t *th_sym_list, nhdp_addr_entry_t *th_rem_list,
                               timex_t *now, uint64_t val_time)
 {
     /* Check whether a corresponding link tuple was created */
@@ -531,7 +503,7 @@ static int update_two_hop_set(iib_base_entry_t *base_entry, iib_link_set_entry_t
     /* If the link to the neighbor is still symmetric */
     if (get_tuple_status(ls_entry, now) == IIB_LT_STATUS_SYM) {
         iib_two_hop_set_entry_t *ths_elt, *ths_tmp;
-        nhdp_addr_entry_t *sym_elt;
+        nhdp_addr_t *addr_elt;
 
         /* Loop through all the two hop tuples of the two hop set */
         LL_FOREACH_SAFE(base_entry->two_hop_set_head, ths_elt, ths_tmp) {
@@ -540,61 +512,24 @@ static int update_two_hop_set(iib_base_entry_t *base_entry, iib_link_set_entry_t
                 rem_two_hop_entry(base_entry, ths_elt);
             }
             else if (ths_elt->ls_elt == ls_entry) {
-                if (!rem_non_sym_th_entries(base_entry, ths_elt, th_rem_list)) {
-                    rem_exst_th_entries(base_entry, ths_elt, th_sym_list);
+                if (ths_elt->th_nb_addr->in_tmp_table &
+                    (NHDP_ADDR_TMP_TH_REM_LIST | NHDP_ADDR_TMP_TH_SYM_LIST)) {
+                    rem_two_hop_entry(base_entry, ths_elt);
                 }
             }
         }
 
         /* Add a new entry for every signaled symmetric neighbor address */
-        LL_FOREACH(th_sym_list, sym_elt) {
-            if (add_two_hop_entry(base_entry, ls_entry, sym_elt->address, now, val_time)) {
-                /* No more memory available, return error */
-                return -1;
+        LL_FOREACH(nhdp_get_addr_db_head(), addr_elt) {
+            if (NHDP_ADDR_TMP_IN_TH_SYM_LIST(addr_elt)) {
+                if (add_two_hop_entry(base_entry, ls_entry, addr_elt, now, val_time)) {
+                    /* No more memory available, return error */
+                    return -1;
+                }
             }
         }
     }
 
-    return 0;
-}
-
-/**
- * Remove an existing 2-Hop Tuple if its address was signalled as lost in the received HELLO
- */
-static uint8_t rem_non_sym_th_entries(iib_base_entry_t *base_entry,
-                                      iib_two_hop_set_entry_t *ts_elt,
-                                      nhdp_addr_entry_t *th_rem_list)
-{
-    nhdp_addr_entry_t *rem_elt;
-
-    /* Remove the given two hop entry if it was signaled as lost */
-    LL_FOREACH(th_rem_list, rem_elt) {
-        if (ts_elt->th_nb_addr == rem_elt->address) {
-            /* Addresses are equal (same NHDP address db entry) */
-            rem_two_hop_entry(base_entry, ts_elt);
-            return 1;
-        }
-    }
-    return 0;
-}
-
-/**
- * Remove an existing 2-Hop Tuple if it is present in the 2-Hop symmetric address
- * list of the received HELLO
- */
-static uint8_t rem_exst_th_entries(iib_base_entry_t *base_entry,
-                                   iib_two_hop_set_entry_t *ts_elt, nhdp_addr_entry_t *th_sym_list)
-{
-    nhdp_addr_entry_t *sym_elt;
-
-    /* Remove the given two hop entry if it was signaled as symmetric (new one is added) */
-    LL_FOREACH(th_sym_list, sym_elt) {
-        if (ts_elt->th_nb_addr == sym_elt->address) {
-            /* Addresses are equal (same NHDP address db entry) */
-            rem_two_hop_entry(base_entry, ts_elt);
-            return 1;
-        }
-    }
     return 0;
 }
 

@@ -37,11 +37,9 @@ static nib_entry_t *nib_entry_head = NULL;
 static nib_lost_address_entry_t *nib_lost_address_entry_head = NULL;
 
 /* Internal function prototypes */
-static nib_entry_t *add_nib_entry(nhdp_addr_entry_t *nb_list);
-static void rem_nib_entry(nib_entry_t *nib_entry, nhdp_addr_entry_t *nb_list,
-                          nhdp_addr_entry_t **out_list, timex_t *now);
-static void clear_nb_addresses(nib_entry_t *nib_entry, nhdp_addr_entry_t *nb_list,
-                               nhdp_addr_entry_t **out_list, timex_t *now);
+static nib_entry_t *add_nib_entry_for_nb_addr_list(void);
+static void rem_nib_entry(nib_entry_t *nib_entry, timex_t *now);
+static void clear_nb_addresses(nib_entry_t *nib_entry, timex_t *now);
 static int add_lost_neighbor_address(nhdp_addr_t *lost_addr, timex_t *now);
 static void rem_ln_entry(nib_lost_address_entry_t *ln_entry);
 
@@ -50,67 +48,56 @@ static void rem_ln_entry(nib_lost_address_entry_t *ln_entry);
  *                       Neighbor Information Base API                       *
  *---------------------------------------------------------------------------*/
 
-nib_entry_t *nib_process_hello(nhdp_addr_entry_t *nb_list, nhdp_addr_entry_t **out_list)
+nib_entry_t *nib_process_hello(void)
 {
     nib_entry_t *nb_match = NULL;
+    nib_entry_t *nib_elt, *nib_tmp;
     timex_t now;
+    uint8_t matches = 0;
 
     mutex_lock(&mtx_nib_access);
 
-    if (nb_list) {
-        nib_entry_t *nib_elt, *nib_tmp;
-        uint8_t matches = 0;
+    vtimer_now(&now);
 
-        vtimer_now(&now);
+    LL_FOREACH_SAFE(nib_entry_head, nib_elt, nib_tmp) {
+        nhdp_addr_entry_t *list_elt;
+        LL_FOREACH(nib_elt->address_list_head, list_elt) {
+            if (NHDP_ADDR_TMP_IN_NB_LIST(list_elt->address)) {
+                /* Matching neighbor tuple */
+                matches++;
 
-        LL_FOREACH_SAFE(nib_entry_head, nib_elt, nib_tmp) {
-            nhdp_addr_entry_t *list_elt;
-            LL_FOREACH(nib_elt->address_list_head, list_elt) {
-                nhdp_addr_entry_t *list_elt2;
-                LL_FOREACH(nb_list, list_elt2) {
-                    if (list_elt->address == list_elt2->address) {
-                        /* Addresses are equal (same NHDP address db entry) */
-                        matches++;
-
-                        if (matches > 1) {
-                            /* Multiple matching nb tuples, delete the previous one */
-                            iib_propagate_nb_entry_change(nb_match, nib_elt);
-                            rem_nib_entry(nb_match, nb_list, out_list, &now);
-                        }
-
-                        nb_match = nib_elt;
-                        break;
-                    }
+                if (matches > 1) {
+                    /* Multiple matching nb tuples, delete the previous one */
+                    iib_propagate_nb_entry_change(nb_match, nib_elt);
+                    rem_nib_entry(nb_match, &now);
                 }
 
-                if (nb_match == nib_elt) {
-                    /* This nb tuple is already detected as matching */
-                    break;
-                }
+                nb_match = nib_elt;
+                break;
             }
         }
+    }
 
-        /* Add or update nb tuple */
-        if (matches > 0) {
-            /* We found matching nb tuples, reuse the last one */
-            clear_nb_addresses(nb_match, nb_list, out_list, &now);
+    /* Add or update nb tuple */
+    if (matches > 0) {
+        /* We found matching nb tuples, reuse the last one */
+        clear_nb_addresses(nb_match, &now);
 
-            if (matches > 1) {
-                nb_match->symmetric = 0;
-            }
-
-            nb_match->address_list_head = nhdp_generate_new_addr_list(nb_list);
-
-            if (!nb_match->address_list_head) {
-                /* Insufficient memory */
-                LL_DELETE(nib_entry_head, nb_match);
-                free(nb_match);
-                nb_match = NULL;
-            }
+        if (matches > 1) {
+            nb_match->symmetric = 0;
         }
-        else {
-            nb_match = add_nib_entry(nb_list);
+
+        nb_match->address_list_head = nhdp_generate_addr_list_from_tmp(NHDP_ADDR_TMP_NB_LIST);
+
+        if (!nb_match->address_list_head) {
+            /* Insufficient memory */
+            LL_DELETE(nib_entry_head, nb_match);
+            free(nb_match);
+            nb_match = NULL;
         }
+    }
+    else {
+        nb_match = add_nib_entry_for_nb_addr_list();
     }
 
     mutex_unlock(&mtx_nib_access);
@@ -205,9 +192,9 @@ void nib_reset_nb_entry_sym(nib_entry_t *nib_entry, timex_t *now)
 /*------------------------------------------------------------------------------------*/
 
 /**
- * Add a Neighbor Tuple with the given address list
+ * Add a Neighbor Tuple for the neighbor address list
  */
-static nib_entry_t *add_nib_entry(nhdp_addr_entry_t *nb_list)
+static nib_entry_t *add_nib_entry_for_nb_addr_list(void)
 {
     nib_entry_t *new_elem;
 
@@ -218,8 +205,8 @@ static nib_entry_t *add_nib_entry(nhdp_addr_entry_t *nb_list)
         return NULL;
     }
 
-    /* Copy address list to new neighbor tuple */
-    new_elem->address_list_head = nhdp_generate_new_addr_list(nb_list);
+    /* Copy neighbor address list to new neighbor tuple */
+    new_elem->address_list_head = nhdp_generate_addr_list_from_tmp(NHDP_ADDR_TMP_NB_LIST);
 
     if (!new_elem->address_list_head) {
         /* Insufficient memory */
@@ -236,10 +223,9 @@ static nib_entry_t *add_nib_entry(nhdp_addr_entry_t *nb_list)
 /**
  * Remove a given Neighbor Tuple
  */
-static void rem_nib_entry(nib_entry_t *nib_entry, nhdp_addr_entry_t *nb_list,
-                          nhdp_addr_entry_t **out_list, timex_t *now)
+static void rem_nib_entry(nib_entry_t *nib_entry, timex_t *now)
 {
-    clear_nb_addresses(nib_entry, nb_list, out_list, now);
+    clear_nb_addresses(nib_entry, now);
     LL_DELETE(nib_entry_head, nib_entry);
     free(nib_entry);
 }
@@ -248,34 +234,27 @@ static void rem_nib_entry(nib_entry_t *nib_entry, nhdp_addr_entry_t *nb_list,
  * Clear address list of a Neighbor Tuple and add Lost Neighbor Tuple for addresses
  * no longer used by this neighbor
  */
-static void clear_nb_addresses(nib_entry_t *nib_entry, nhdp_addr_entry_t *nb_list,
-                               nhdp_addr_entry_t **out_list, timex_t *now)
+static void clear_nb_addresses(nib_entry_t *nib_entry, timex_t *now)
 {
-    nhdp_addr_entry_t *elt, *nib_elt, *nib_tmp;
+    nhdp_addr_entry_t *nib_elt, *nib_tmp;
 
     LL_FOREACH_SAFE(nib_entry->address_list_head, nib_elt, nib_tmp) {
-        uint8_t found = 0;
-
-        LL_FOREACH(nb_list, elt) {
-            /* Check whether address is still present in the new neighbor address list */
-            if (nib_elt->address == elt->address) {
-                /* Simply free the address entry */
-                nhdp_free_addr_entry(nib_elt);
-                found = 1;
-                break;
-            }
-        }
-
-        if (!found) {
+        /* Check whether address is still present in the new neighbor address list */
+        if (!NHDP_ADDR_TMP_IN_NB_LIST(nib_elt->address)) {
             /* Address is not in the newly received address list of the neighbor */
-            /* Add it to the Removed Address List (out_list) */
-            LL_PREPEND(*out_list, nib_elt);
+            /* Add it to the Removed Address List */
+            nib_elt->address->in_tmp_table |= NHDP_ADDR_TMP_REM_LIST;
+            /* Increment usage counter of address in central NHDP address storage */
+            nib_elt->address->usg_count++;
 
             if (nib_entry->symmetric) {
                 /* Additionally create a Lost Neighbor Tuple for symmetric neighbors */
                 add_lost_neighbor_address(nib_elt->address, now);
             }
         }
+
+        /* Free the address entry */
+        nhdp_free_addr_entry(nib_elt);
     }
     nib_entry->address_list_head = NULL;
 }

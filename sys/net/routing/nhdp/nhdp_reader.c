@@ -36,12 +36,6 @@
 struct rfc5444_reader reader;
 static mutex_t mtx_packet_handler = MUTEX_INIT;
 
-static nhdp_addr_entry_t *send_addr_list_head;
-static nhdp_addr_entry_t *nb_addr_list_head;
-static nhdp_addr_entry_t *th_sym_addr_list_head;
-static nhdp_addr_entry_t *th_rem_addr_list_head;
-static nhdp_addr_entry_t *rem_addr_list_head;
-
 static kernel_pid_t if_pid;
 static uint64_t val_time;
 static uint64_t int_time;
@@ -57,7 +51,6 @@ static enum rfc5444_result check_msg_validity(struct rfc5444_reader_tlvblock_con
 static enum rfc5444_result check_addr_validity(nhdp_addr_t *addr);
 static nhdp_addr_t *get_nhdp_db_addr(uint8_t *addr, uint8_t prefix);
 static void process_temp_tables(void);
-static void cleanup_temp_addr_lists(void);
 
 /* Array containing the processable message TLVs for HELLO messages */
 static struct rfc5444_reader_tlvblock_consumer_entry _nhdp_msg_tlvs[] = {
@@ -93,13 +86,6 @@ static struct rfc5444_reader_tlvblock_consumer _nhdp_address_consumer = {
 
 void nhdp_reader_init(void)
 {
-    /* Reset locally created address lists */
-    send_addr_list_head = NULL;
-    nb_addr_list_head = NULL;
-    th_sym_addr_list_head = NULL;
-    th_rem_addr_list_head = NULL;
-    rem_addr_list_head = NULL;
-
     /* Initialize reader */
     rfc5444_reader_init(&reader);
 
@@ -128,7 +114,6 @@ int nhdp_reader_handle_packet(kernel_pid_t rcvg_if_pid, void *buffer, size_t len
 
 void nhdp_reader_cleanup(void)
 {
-    cleanup_temp_addr_lists();
     rfc5444_reader_cleanup(&reader);
 }
 
@@ -145,26 +130,18 @@ static enum rfc5444_result
 _nhdp_blocktlv_address_cb(struct rfc5444_reader_tlvblock_context *cont)
 {
     uint8_t tmp_result;
-    /* Create address list entry to add it later to one of the temp address lists */
-    nhdp_addr_entry_t *current_addr = (nhdp_addr_entry_t *) malloc(sizeof(nhdp_addr_entry_t));
+
+    /* Get NHDP address for the current netaddr */
+    nhdp_addr_t *current_addr = get_nhdp_db_addr(&cont->addr._addr[0], cont->addr._prefix_len);
 
     if (!current_addr) {
         /* Insufficient memory */
         return RFC5444_DROP_MESSAGE;
     }
 
-    /* Get NHDP address for the current netaddr */
-    current_addr->address = get_nhdp_db_addr(&cont->addr._addr[0], cont->addr._prefix_len);
-
-    if (!current_addr->address) {
-        /* Insufficient memory */
-        free(current_addr);
-        return RFC5444_DROP_MESSAGE;
-    }
-
     /* Check validity of address tlvs */
-    if (check_addr_validity(current_addr->address) != RFC5444_OKAY) {
-        nhdp_free_addr_entry(current_addr);
+    if (check_addr_validity(current_addr) != RFC5444_OKAY) {
+        nhdp_decrement_addr_usage(current_addr);
         return RFC5444_DROP_MESSAGE;
     }
 
@@ -172,32 +149,20 @@ _nhdp_blocktlv_address_cb(struct rfc5444_reader_tlvblock_context *cont)
     if (_nhdp_addr_tlvs[RFC5444_ADDRTLV_LOCAL_IF].tlv) {
         switch (*_nhdp_addr_tlvs[RFC5444_ADDRTLV_LOCAL_IF].tlv->single_value) {
             case RFC5444_LOCALIF_THIS_IF:
-                LL_PREPEND(send_addr_list_head, current_addr);
-                /* Local IF marked addresses have to be added to two temp lists */
-                nhdp_addr_entry_t *sec_container =
-                    (nhdp_addr_entry_t *) malloc(sizeof(nhdp_addr_entry_t));
-
-                if (!sec_container) {
-                    return RFC5444_DROP_MESSAGE;
-                }
-
-                /* Increment usage counter of address in central NHDP address storage */
-                current_addr->address->usg_count++;
-                sec_container->address = current_addr->address;
-                LL_PREPEND(nb_addr_list_head, sec_container);
+                current_addr->in_tmp_table = NHDP_ADDR_TMP_SEND_LIST;
                 break;
 
             case RFC5444_LOCALIF_OTHER_IF:
-                LL_PREPEND(nb_addr_list_head, current_addr);
+                current_addr->in_tmp_table = NHDP_ADDR_TMP_NB_LIST;
                 break;
 
             default:
                 /* Wrong value, drop message */
-                nhdp_free_addr_entry(current_addr);
+                nhdp_decrement_addr_usage(current_addr);
                 return RFC5444_DROP_MESSAGE;
         }
     }
-    else if ((tmp_result = lib_is_reg_addr(if_pid, current_addr->address))) {
+    else if ((tmp_result = lib_is_reg_addr(if_pid, current_addr))) {
         /* The address is one of our local addresses (do not add it for processing) */
         if ((!sym) && (tmp_result == 1) && _nhdp_addr_tlvs[RFC5444_ADDRTLV_LINK_STATUS].tlv) {
             /* If address is a local address of the receiving interface, check */
@@ -216,18 +181,18 @@ _nhdp_blocktlv_address_cb(struct rfc5444_reader_tlvblock_context *cont)
 
                 default:
                     /* Wrong value, drop message */
-                    nhdp_free_addr_entry(current_addr);
+                    nhdp_decrement_addr_usage(current_addr);
                     return RFC5444_DROP_MESSAGE;
             }
         }
 
         /* Address is one of our own addresses, ignore it */
-        nhdp_free_addr_entry(current_addr);
+        nhdp_decrement_addr_usage(current_addr);
     }
     else if (_nhdp_addr_tlvs[RFC5444_ADDRTLV_LINK_STATUS].tlv) {
         switch (*_nhdp_addr_tlvs[RFC5444_ADDRTLV_LINK_STATUS].tlv->single_value) {
             case RFC5444_LINKSTATUS_SYMMETRIC:
-                LL_PREPEND(th_sym_addr_list_head, current_addr);
+                current_addr->in_tmp_table = NHDP_ADDR_TMP_TH_SYM_LIST;
                 break;
 
             case RFC5444_LINKSTATUS_HEARD:
@@ -238,39 +203,39 @@ _nhdp_blocktlv_address_cb(struct rfc5444_reader_tlvblock_context *cont)
                     && *_nhdp_addr_tlvs[RFC5444_ADDRTLV_OTHER_NEIGHB].tlv->single_value
                     == RFC5444_OTHERNEIGHB_SYMMETRIC) {
                     /* Symmetric has higher priority */
-                    LL_PREPEND(th_sym_addr_list_head, current_addr);
+                    current_addr->in_tmp_table = NHDP_ADDR_TMP_TH_SYM_LIST;
                 }
                 else {
-                    LL_PREPEND(th_rem_addr_list_head, current_addr);
+                    current_addr->in_tmp_table = NHDP_ADDR_TMP_TH_REM_LIST;
                 }
 
                 break;
 
             default:
                 /* Wrong value, drop message */
-                nhdp_free_addr_entry(current_addr);
+                nhdp_decrement_addr_usage(current_addr);
                 return RFC5444_DROP_MESSAGE;
         }
     }
     else if (_nhdp_addr_tlvs[RFC5444_ADDRTLV_OTHER_NEIGHB].tlv) {
         switch (*_nhdp_addr_tlvs[RFC5444_ADDRTLV_OTHER_NEIGHB].tlv->single_value) {
             case RFC5444_OTHERNEIGHB_SYMMETRIC:
-                LL_PREPEND(th_sym_addr_list_head, current_addr);
+                current_addr->in_tmp_table = NHDP_ADDR_TMP_TH_SYM_LIST;
                 break;
 
             case RFC5444_OTHERNEIGHB_LOST:
-                LL_PREPEND(th_rem_addr_list_head, current_addr);
+                current_addr->in_tmp_table = NHDP_ADDR_TMP_TH_REM_LIST;
                 break;
 
             default:
                 /* Wrong value, drop message */
-                nhdp_free_addr_entry(current_addr);
+                nhdp_decrement_addr_usage(current_addr);
                 return RFC5444_DROP_MESSAGE;
         }
     }
     else {
         /* Addresses without expected TLV are ignored */
-        nhdp_free_addr_entry(current_addr);
+        nhdp_decrement_addr_usage(current_addr);
         return RFC5444_DROP_ADDRESS;
     }
 
@@ -320,7 +285,7 @@ _nhdp_msg_end_cb(struct rfc5444_reader_tlvblock_context *cont __attribute__((unu
     int_time = 0ULL;
     sym = 0;
     lost = 0;
-    cleanup_temp_addr_lists();
+    nhdp_reset_addresses_tmp_usg(1);
 
     if (dropped) {
         return RFC5444_DROP_MESSAGE;
@@ -430,27 +395,9 @@ static void process_temp_tables(void)
     vtimer_now(&now);
     iib_update_lt_status(&now);
 
-    nib_elt = nib_process_hello(nb_addr_list_head, &rem_addr_list_head);
+    nib_elt = nib_process_hello();
 
     if (nib_elt) {
-        iib_process_hello(if_pid, nib_elt, send_addr_list_head, th_sym_addr_list_head,
-                          th_rem_addr_list_head, rem_addr_list_head, val_time, sym, lost);
+        iib_process_hello(if_pid, nib_elt, val_time, sym, lost);
     }
-}
-
-/**
- * Free all allocated space for the temporary address lists
- */
-static void cleanup_temp_addr_lists(void)
-{
-    nhdp_free_addr_list(send_addr_list_head);
-    nhdp_free_addr_list(nb_addr_list_head);
-    nhdp_free_addr_list(th_sym_addr_list_head);
-    nhdp_free_addr_list(th_rem_addr_list_head);
-    nhdp_free_addr_list(rem_addr_list_head);
-    send_addr_list_head = NULL;
-    nb_addr_list_head = NULL;
-    th_sym_addr_list_head = NULL;
-    th_rem_addr_list_head = NULL;
-    rem_addr_list_head = NULL;
 }
