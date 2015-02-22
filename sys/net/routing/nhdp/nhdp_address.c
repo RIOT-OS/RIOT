@@ -115,34 +115,47 @@ void nhdp_free_addr_entry(nhdp_addr_entry_t *addr_entry)
     free(addr_entry);
 }
 
-nhdp_addr_entry_t *nhdp_generate_new_addr_list(nhdp_addr_entry_t *orig_list)
+nhdp_addr_entry_t *nhdp_generate_addr_list_from_tmp(uint8_t tmp_type)
 {
-    nhdp_addr_entry_t *new_list_head, *addr_elt;
+    nhdp_addr_entry_t *new_list_head;
+    nhdp_addr_t *addr_elt;
 
     new_list_head = NULL;
-    LL_FOREACH(orig_list, addr_elt) {
-        nhdp_addr_entry_t *new_entry = (nhdp_addr_entry_t *) malloc(sizeof(nhdp_addr_entry_t));
+    LL_FOREACH(nhdp_addr_db_head, addr_elt) {
+        if (addr_elt->in_tmp_table & tmp_type) {
+            nhdp_addr_entry_t *new_entry = (nhdp_addr_entry_t *) malloc(sizeof(nhdp_addr_entry_t));
 
-        if (!new_entry) {
-            /* Insufficient memory, free all previously allocated memory */
-            nhdp_free_addr_list(new_list_head);
-            return NULL;
+            if (!new_entry) {
+                /* Insufficient memory, free all previously allocated memory */
+                nhdp_free_addr_list(new_list_head);
+                return NULL;
+            }
+
+            new_entry->address = addr_elt;
+            /* Increment usage counter of address in central NHDP address storage */
+            addr_elt->usg_count++;
+            LL_PREPEND(new_list_head, new_entry);
         }
-
-        new_entry->address = addr_elt->address;
-        /* Increment usage counter of address in central NHDP address storage */
-        addr_elt->address->usg_count++;
-        LL_PREPEND(new_list_head, new_entry);
     }
 
     return new_list_head;
 }
 
-void nhdp_reset_addresses_tmp_usg(void)
+void nhdp_reset_addresses_tmp_usg(uint8_t decr_usg)
 {
-    nhdp_addr_t *addr_elt;
+    nhdp_addr_t *addr_elt, *addr_tmp;
 
-    LL_FOREACH(nhdp_addr_db_head, addr_elt) {
-        addr_elt->in_tmp_table = NHDP_ADDR_TMP_NONE;
+    LL_FOREACH_SAFE(nhdp_addr_db_head, addr_elt, addr_tmp) {
+        if (addr_elt->in_tmp_table) {
+            addr_elt->in_tmp_table = NHDP_ADDR_TMP_NONE;
+            if (decr_usg) {
+                nhdp_decrement_addr_usage(addr_elt);
+            }
+        }
     }
+}
+
+nhdp_addr_t *nhdp_get_addr_db_head(void)
+{
+    return nhdp_addr_db_head;
 }

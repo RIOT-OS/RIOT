@@ -213,7 +213,7 @@ static void _nhdp_add_addresses_cb(struct rfc5444_writer *wr)
     lib_fill_wr_addresses(nhdp_wr_curr_if_entry->if_pid, wr);
     iib_fill_wr_addresses(nhdp_wr_curr_if_entry->if_pid, wr);
     nib_fill_wr_addresses(wr);
-    nhdp_reset_addresses_tmp_usg();
+    nhdp_reset_addresses_tmp_usg(0);
 }
 
 /**
