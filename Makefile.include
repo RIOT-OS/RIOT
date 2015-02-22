@@ -212,24 +212,48 @@ distclean:
 	-@rm -rf $(BINDIRBASE)
 
 flash: all
+	$(AD)command -v $(FLASHER) >/dev/null 2>&1 || \
+		{ $(COLOR_ECHO) \
+		'${COLOR_RED} Flash program $(FLASHER) not found. Aborting.${COLOR_RESET}'; \
+		exit 1; }
 	$(FLASHER) $(FFLAGS)
 
 term: $(filter flash, $(MAKECMDGOALS))
+	$(AD)command -v $(TERMPROG) >/dev/null 2>&1 || \
+		{ $(COLOR_ECHO) \
+		'${COLOR_RED} Terminal program $(TERMPROG) not found. Aborting.${COLOR_RESET}'; \
+		exit 1; }
 	$(TERMPROG) $(TERMFLAGS)
 
 doc:
 	make -BC $(RIOTBASE) doc
 
 debug:
+	$(AD)command -v $(DEBUGGER) >/dev/null 2>&1 || \
+		{ $(COLOR_ECHO) \
+		'${COLOR_RED} Debug program $(DEBUGGER) not found. Aborting.${COLOR_RESET}'; \
+		exit 1; }
 	$(DEBUGGER) $(DEBUGGER_FLAGS)
 
 debug-server:
+	$(AD)command -v $(DEBUGSERVER) >/dev/null 2>&1 || \
+		{ $(COLOR_ECHO) \
+		'${COLOR_RED} Debug server program $(DEBUGSERVER) not found. Aborting.${COLOR_RESET}'; \
+		exit 1; }
 	$(DEBUGSERVER) $(DEBUGSERVER_FLAGS)
 
 reset:
+	$(AD)command -v $(RESET) >/dev/null 2>&1 || \
+		{ $(COLOR_ECHO) \
+		'${COLOR_RED} Reset program $(RESET) not found. Aborting.${COLOR_RESET}'; \
+		exit 1; }
 	$(RESET) $(RESET_FLAGS)
 
 objdump:
+	$(AD)command -v $(PREFIX)objdump >/dev/null 2>&1 || \
+		{ $(COLOR_ECHO) \
+		'${COLOR_RED} Objdump program $(PREFIX)objdump not found. Aborting.${COLOR_RESET}'; \
+		exit 1; }
 	$(PREFIX)objdump -S -D -h $(ELFFILE) | less
 
 # Extra make goals for testing and comparing changes.
