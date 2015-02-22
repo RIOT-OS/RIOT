@@ -1,1 +1,2 @@
 FEATURES_PROVIDED += transceiver periph_gpio periph_spi cpp periph_timer periph_uart periph_i2c cpp periph_rtc periph_cpuid
+FEATURES_MCU_GROUP = cortex_m0

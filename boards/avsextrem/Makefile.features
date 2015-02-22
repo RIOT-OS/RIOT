@@ -1,1 +1,2 @@
 FEATURES_PROVIDED += transceiver periph_rtc
+FEATURES_MCU_GROUP = arm7
