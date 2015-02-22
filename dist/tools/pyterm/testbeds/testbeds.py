@@ -19,7 +19,7 @@
 # 02110-1301 USA
 
 
-import os, re, datetime
+import sys, os, re, datetime
 from subprocess import call, Popen, PIPE
 
 
@@ -139,6 +139,9 @@ class DesVirtTestbed(Testbed):
         self.pyterm = pyterm
         self.logFilePath = logFilePath
         self.namePortList = []
+	if not os.path.isdir(self.desvirtPath):
+		print("desvirt not found! Try running 'make' in RIOT/pkg/desvirt")
+		sys.exit(-1)
         
     def findPorts(self):        
         return self.namePortList
