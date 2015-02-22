@@ -91,6 +91,10 @@ ifeq (,$(UNZIP_HERE))
   endif
 endif
 
+ifneq (0,$(shell test -d $(RIOTBOARD)/$(BOARD); echo $$?))
+    $(error The specified board $(BOARD) does not exist.)
+endif
+
 # mandatory includes!
 include $(RIOTBASE)/Makefile.modules
 include $(RIOTBOARD)/$(BOARD)/Makefile.include
