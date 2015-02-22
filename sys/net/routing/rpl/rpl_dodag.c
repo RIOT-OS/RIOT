@@ -35,7 +35,8 @@ static rpl_instance_t instances[RPL_MAX_INSTANCES];
 static rpl_dodag_t dodags[RPL_MAX_DODAGS];
 static rpl_parent_t parents[RPL_MAX_PARENTS];
 
-void rpl_trickle_send_dio(void *args) {
+void rpl_trickle_send_dio(void *args)
+{
     (void) args;
     ipv6_addr_t mcast;
 
@@ -383,8 +384,8 @@ void rpl_join_dodag(rpl_dodag_t *dodag, ipv6_addr_t *parent, uint16_t parent_ran
     DEBUG("\tmy_preferred_parent lifetime\t%04X\n", my_dodag->my_preferred_parent->lifetime);
 
     trickle_start(rpl_process_pid, &my_dodag->trickle, RPL_MSG_TYPE_TRICKLE_INTERVAL,
-            RPL_MSG_TYPE_TRICKLE_CALLBACK, (1 << my_dodag->dio_min), my_dodag->dio_interval_doubling,
-            my_dodag->dio_redundancy);
+                  RPL_MSG_TYPE_TRICKLE_CALLBACK, (1 << my_dodag->dio_min), my_dodag->dio_interval_doubling,
+                  my_dodag->dio_redundancy);
     rpl_delay_dao(my_dodag);
 }
 

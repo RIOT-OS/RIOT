@@ -9,19 +9,15 @@ MODE :=
 
 ifeq (RPL_MOP_NO_DOWNWARD_ROUTES, $(RPL_MOP))
 	MODE := 0x00
-	DIRS += rpl_storing
 endif
 ifeq (RPL_MOP_NON_STORING_MODE, $(RPL_MOP))
 	MODE := 0x01
-	DIRS += rpl_nonstoring
 endif
 ifeq (RPL_MOP_STORING_MODE_NO_MC, $(RPL_MOP))
 	MODE := 0x02
-	DIRS += rpl_storing
 endif
 ifeq (RPL_MOP_STORING_MODE_MC, $(RPL_MOP))
 	MODE := 0x03
-	DIRS += rpl_storing
 endif
 
 # If a valid RPL_MOP was provided, use it for RPL
@@ -30,7 +26,6 @@ ifneq (,$(MODE))
 else
 	# If no (valid) RPL_MOP has been provided, use the following parameters
 	CFLAGS += -DRPL_DEFAULT_MOP=0x02
-	DIRS += rpl_storing
 endif
 
 # Set the maximum number of routing entries to 128 if no number is provided

@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2013, 2014  INRIA.
+ * Copyright (C) 2013 - 2014  INRIA.
+ * Copyright (C) 2015 Cenk Gündoğan <cnkgndgn@gmail.com>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -19,6 +20,7 @@
  *
  * @author      Eric Engel <eric.engel@fu-berlin.de>
  * @author      Fabian Brandt <fabianbr@zedat.fu-berlin.de>
+ * @author      Cenk Gündoğan <cnkgndgn@gmail.com>
  */
 
 #ifndef __RPL_H
@@ -45,16 +47,29 @@ extern "C" {
 /* global variables */
 extern kernel_pid_t rpl_process_pid;
 extern uint8_t rpl_max_routing_entries;
+extern ipv6_addr_t my_address;
 extern msg_t rpl_msg_queue[RPL_PKT_RECV_BUF_SIZE];
 extern char rpl_process_buf[RPL_PROCESS_STACKSIZE];
 extern uint8_t rpl_buffer[BUFFER_SIZE - LL_HDR_LEN];
 
 /**
+ * @brief Sends a RPL message to a given destination
+ *
+ * This function sends any RPL related messages to a given destination.
+ *
+ * @param[in] destination           IPv6-address of the destination of the message.
+ * @param[in] payload               Payload of the message.
+ * @param[in] p_len                 Length of the message
+ * @param[in] next_header           Index to next header in message.
+ *
+ */
+void rpl_send(ipv6_addr_t *destination, uint8_t *payload, uint16_t p_len, uint8_t next_header);
+
+/**
  * @brief Initialization of RPL.
  *
  * This function initializes all basic RPL resources such as
- * corresponding objective functions and sixlowpan (including own address). Calls
- * initialization for mode as specified by PL_DEFAULT_MOP in rpl_structs.h.
+ * corresponding objective functions and sixlowpan (including own address).
  *
  * @param[in] if_id             ID of the interface, which correspond to the network under RPL-control
  *
@@ -68,8 +83,6 @@ uint8_t rpl_init(int if_id);
  * @brief Initialization of RPL-root.
  *
  * This function initializes all RPL resources to act as a root node.
- * Because the root has different features in different modes, the core
- * initialization just calls the root-initialization of the chosen mode
  *
  */
 void rpl_init_root(void);
@@ -77,9 +90,7 @@ void rpl_init_root(void);
 /**
  * @brief Sends a DIO-message to a given destination
  *
- * This function sends a DIO message to a given destination. Because nodes can act
- * differently in different modes, this function calls the DIO
- * sending function of the chosen mode.
+ * This function sends a DIO message to a given destination.
  *
  * @param[in] destination       IPv6-address of the destination of the DIO. Should be a direct neighbor.
  *
@@ -89,9 +100,7 @@ void rpl_send_DIO(ipv6_addr_t *destination);
 /**
  * @brief Sends a DAO-message to a given destination
  *
- * This function sends a DAO message to a given destination. Because nodes can act
- * differently in different modes, this function calls the DAO
- * sending function of the chosen mode.
+ * This function sends a DAO message to a given destination.
  *
  * @param[in] destination       IPv6-address of the destination of the DAO. Should be the preferred parent.
  * @param[in] lifetime          Lifetime of the node. Reflect the estimated time of presence in the network.
@@ -104,32 +113,29 @@ void rpl_send_DAO(ipv6_addr_t *destination, uint8_t lifetime, bool default_lifet
 /**
  * @brief Sends a DIS-message to a given destination
  *
- * This function sends a DIS message to a given destination or multicast-address. Because nodes can act
- * differently in different modes, this function calls the DIS
- * sending function of the chosen mode.
+ * This function sends a DIS message to a given destination or multicast-address.
  *
  * @param[in] destination       IPv6-address of the destination of the DIS. Should be a direct neighbor or multicast-address.
  *
  */
 void rpl_send_DIS(ipv6_addr_t *destination);
 
+#if RPL_DEFAULT_MOP != RPL_MOP_NON_STORING_MODE
 /**
  * @brief Sends a DAO acknowledgment-message to a given destination
  *
- * This function sends a DAO_ACK message to a given destination. Because nodes can act
- * differently in different modes, this function calls the DAO_ACK
- * sending function of the chosen mode.
+ * This function sends a DAO_ACK message to a given destination.
  *
  * @param[in] destination       IPv6-address of the destination of the DAO_ACK. Should be a direct neighbor.
  *
  */
 void rpl_send_DAO_ACK(ipv6_addr_t *destination);
+#endif
 
 /**
  * @brief Receives a DIO message
  *
- * This function handles receiving a DIO message. Because nodes can act differently in different modes,
- * this function just calls the receiving function of the chosen mode.
+ * This function handles receiving a DIO message.
  *
  */
 void rpl_recv_DIO(void);
@@ -137,8 +143,7 @@ void rpl_recv_DIO(void);
 /**
  * @brief Receives a DAO message
  *
- * This function handles receiving a DAO message. Because nodes can act differently in different modes,
- * this function just calls the receiving function of the chosen mode.
+ * This function handles receiving a DAO message.
  *
  */
 void rpl_recv_DAO(void);
@@ -146,8 +151,7 @@ void rpl_recv_DAO(void);
 /**
  * @brief Receives a DIS message
  *
- * This function handles receiving a DIS message. Because nodes can act differently in different modes,
- * this function just calls the receiving function of the chosen mode.
+ * This function handles receiving a DIS message.
  *
  */
 void rpl_recv_DIS(void);
@@ -155,8 +159,7 @@ void rpl_recv_DIS(void);
 /**
  * @brief Receives a DAO acknowledgment message
  *
- * This function handles receiving a DAO_ACK message. Because nodes can act differently in different modes,
- * this function just calls the receiving function of the chosen mode.
+ * This function handles receiving a DAO_ACK message.
  *
  */
 void rpl_recv_DAO_ACK(void);
@@ -166,6 +169,7 @@ void rpl_recv_DAO_ACK(void);
  *
  * This function initializes all RPL resources especially for root purposes.
  * corresponding objective functions and sixlowpan (including own address).
+ *
  * @param arg ignored
  * @returns nothing
  */
