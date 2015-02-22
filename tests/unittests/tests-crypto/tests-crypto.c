@@ -10,5 +10,13 @@
 
 void tests_crypto(void)
 {
+    TESTS_RUN(tests_crypto_dragon_tests());
+    TESTS_RUN(tests_crypto_hc128_tests());
+    TESTS_RUN(tests_crypto_hc256_tests());
+    TESTS_RUN(tests_crypto_lexv2_tests());
+    TESTS_RUN(tests_crypto_nlsv2_tests());
+    TESTS_RUN(tests_crypto_rabbit_tests());
+    TESTS_RUN(tests_crypto_salsa20_tests());
     TESTS_RUN(tests_crypto_sha256_tests());
+    TESTS_RUN(tests_crypto_sosemanuk_tests());
 }
