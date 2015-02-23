@@ -18,7 +18,6 @@
  * @}
  */
 
-#include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <errno.h>
@@ -32,6 +31,7 @@
 #include "thread.h"
 #include "hwtimer.h"
 #include "irq.h"
+#include "log.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -82,19 +82,19 @@ static char idle_stack[KERNEL_CONF_STACKSIZE_IDLE];
 void kernel_init(void)
 {
     (void) disableIRQ();
-    printf("kernel_init(): This is RIOT! (Version: %s)\n", RIOT_VERSION);
+    log_info("kernel_init(): This is RIOT! (Version: %s)\n", RIOT_VERSION);
 
     hwtimer_init();
 
     if (thread_create(idle_stack, sizeof(idle_stack), PRIORITY_IDLE, CREATE_WOUT_YIELD | CREATE_STACKTEST, idle_thread, NULL, idle_name) < 0) {
-        printf("kernel_init(): error creating idle task.\n");
+        log_error("kernel_init(): error creating idle task.\n");
     }
 
     if (thread_create(main_stack, sizeof(main_stack), PRIORITY_MAIN, CREATE_WOUT_YIELD | CREATE_STACKTEST, main_trampoline, NULL, main_name) < 0) {
-        printf("kernel_init(): error creating main task.\n");
+        log_error("kernel_init(): error creating main task.\n");
     }
 
-    printf("kernel_init(): jumping into first task...\n");
+    log_info("kernel_init(): jumping into first task...\n");
 
     cpu_switch_context_exit();
 }

@@ -17,6 +17,7 @@
  */
 
 #include "lifo.h"
+#include "log.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -42,7 +43,7 @@ void lifo_insert(int *array, int i)
 
 #if DEVELHELP
     if ((array[index] != -1) && (array[0] != -1)) {
-        printf("lifo_insert: overwriting array[%i] == %i with %i\n\n\n\t\tThe lifo is broken now.\n\n\n", index, array[index], array[0]);
+        log_error("lifo_insert: overwriting array[%i] == %i with %i\n\n\n\t\tThe lifo is broken now.\n\n\n", index, array[index], array[0]);
     }
 #endif
 
