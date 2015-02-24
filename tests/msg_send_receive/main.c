@@ -20,6 +20,7 @@
  */
 
 #include <stdio.h>
+#include <string.h>
 
 #include "cpu-conf.h"
 #include "thread.h"
@@ -40,29 +41,30 @@ static void *thread1(void *args)
 {
     (void)args;
 
-    msg_t msg_req, msg_resp;
-    int counter = 0, success = 1;
+    msg_t msg_req = {0}, msg_resp = {0};
+    int counter = 0;
 
     msg_resp.content.ptr = NULL;
     msg_req.content.ptr = (void *) &counter;
 
     for (int i = 0; i < TEST_EXECUTION_NUM; i++) {
+        msg_t msg_req_pristine;
+        memcpy(&msg_req_pristine, &msg_req, sizeof(msg_t));
+
         msg_send_receive(&msg_req, &msg_resp, thread2_pid);
 
-        if ((NULL == msg_resp.content.ptr) ||
-            (&counter != ((int *) msg_req.content.ptr)) ||
-            (counter != (*(int *) msg_resp.content.ptr)) ||
-            (counter != (*(int *) msg_req.content.ptr))) {
-            success = 0;
+        if (memcmp(&msg_req_pristine, &msg_req, sizeof(msg_req)) != 0) {
+            puts("FAIL #1: msg_req was corrupted");
             break;
         }
-    }
-
-    if (success) {
-        puts("Test successful.");
-    }
-    else {
-        puts("Test failed.");
+        else if (counter != *(int *) msg_resp.content.ptr) {
+            puts("FAIL #1: counter != *(int *) msg_resp.content.ptr");
+            break;
+        }
+        else if (counter != *(int *) msg_req.content.ptr) {
+            puts("FAIL #1: counter != *(int *) msg_req.content.ptr");
+            break;
+        }
     }
 
     return NULL;
@@ -72,7 +74,7 @@ static void *thread2(void *args)
 {
     (void)args;
 
-    msg_t msg_req, msg_resp;
+    msg_t msg_req = {0}, msg_resp = {0};
     int counter = 0;
 
     msg_resp.content.ptr = (void *) &counter;
@@ -85,7 +87,20 @@ static void *thread2(void *args)
         printf("Incremented counters to %d and %d\n",
                *(int *) msg_req.content.ptr, *(int *) msg_resp.content.ptr);
 
+        msg_t msg_req_pristine, msg_resp_pristine;
+        memcpy(&msg_req_pristine, &msg_req, sizeof(msg_t));
+        memcpy(&msg_resp_pristine, &msg_resp, sizeof(msg_t));
+
         msg_reply(&msg_req, &msg_resp);
+
+        if (memcmp(&msg_req_pristine, &msg_req, sizeof(msg_t)) != 0) {
+            puts("FAIL #2: msg_req was corrupted");
+            break;
+        }
+        else if (memcmp(&msg_resp_pristine, &msg_resp, sizeof(msg_t)) != 0) {
+            puts("FAIL #2: msg_resp was corrupted");
+            break;
+        }
     }
 
     return NULL;

@@ -77,7 +77,7 @@ typedef struct msg {
  *            (it is not waiting or it's message queue is full)
  * @return -1, on error (invalid PID)
  */
-int msg_send(msg_t *m, kernel_pid_t target_pid);
+int msg_send(const msg_t *m, kernel_pid_t target_pid);
 
 
 /**
@@ -96,7 +96,7 @@ int msg_send(msg_t *m, kernel_pid_t target_pid);
  * @return 0, if receiver is not waiting or has a full message queue
  * @return -1, on error (invalid PID)
  */
-int msg_try_send(msg_t *m, kernel_pid_t target_pid);
+int msg_try_send(const msg_t *m, kernel_pid_t target_pid);
 
 
 /**
@@ -112,7 +112,7 @@ int msg_try_send(msg_t *m, kernel_pid_t target_pid);
  * @return 1 if sending was successful
  * @return 0 if the thread's message queue is full (or inexistent)
  */
-int msg_send_to_self(msg_t *m);
+int msg_send_to_self(const msg_t *m);
 
 /**
  * Value of msg_t::sender_pid if the sender was an interrupt service routine.
@@ -137,7 +137,7 @@ int msg_send_to_self(msg_t *m);
  * @return 0, if receiver is not waiting and ``block == 0``
  * @return -1, on error (invalid PID)
  */
-int msg_send_int(msg_t *m, kernel_pid_t target_pid);
+int msg_send_int(const msg_t *m, kernel_pid_t target_pid);
 
 /**
  * @brief Test if the message was sent inside an ISR.
@@ -192,7 +192,7 @@ int msg_try_receive(msg_t *m);
  *
  * @return  1, if successful.
  */
-int msg_send_receive(msg_t *m, msg_t *reply, kernel_pid_t target_pid);
+int msg_send_receive(const msg_t *m, msg_t *reply, kernel_pid_t target_pid);
 
 /**
  * @brief Replies to a message.
@@ -200,13 +200,12 @@ int msg_send_receive(msg_t *m, msg_t *reply, kernel_pid_t target_pid);
  * Sender must have sent the message with msg_send_receive().
  *
  * @param[in] m         message to reply to, must not be NULL.
- * @param[out] reply    message that target will get as reply, must not be
- *                      NULL.
+ * @param[in] reply     message that target will get as reply, must not be NULL.
  *
  * @return 1, if successful
  * @return 0, on error
  */
-int msg_reply(msg_t *m, msg_t *reply);
+int msg_reply(const msg_t *m, const msg_t *reply);
 
 /**
  * @brief Initialize the current thread's message queue.
