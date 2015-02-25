@@ -28,7 +28,8 @@
 #include "periph/timer.h"
 #include "periph_conf.h"
 
-#define USEC_PER_SEC             1000000 /**< Conversion factor between seconds and microseconds */
+#define TIMER_A_IRQ_MASK 0x000000ff
+#define TIMER_B_IRQ_MASK 0x0000ff00
 
 typedef struct {
     void (*cb)(int);
@@ -77,6 +78,14 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
             return -1;
     }
 
+    /*
+     * In 32-bit mode, the prescaler is not usable,
+     * so the only frequency available is 16 MHz.
+     */
+    if (ticks_per_us != 16) {
+        return -1;
+    }
+
     gptimer_num = ((uintptr_t)gptimer - (uintptr_t)GPTIMER0) / 0x1000;
 
     /* Save the callback function: */
@@ -88,12 +97,10 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
     /* Disable this timer before configuring it: */
     gptimer->cc2538_gptimer_ctl.CTL = 0;
 
-    gptimer->CFG  = GPTMCFG_16_BIT_TIMER;
+    gptimer->CFG  = GPTMCFG_32_BIT_TIMER;
     gptimer->cc2538_gptimer_tamr.TAMR = GPTIMER_PERIODIC_MODE;
     gptimer->cc2538_gptimer_tamr.TAMRbits.TACDIR = 1; /**< Count up */
-
-    /* Set the prescale register for the desired frequency: */
-    gptimer->TAPR = RCOSC16M_FREQ / (ticks_per_us * USEC_PER_SEC) - 1;
+    gptimer->cc2538_gptimer_tamr.TAMRbits.TAMIE  = 1; /**< Enable the Timer A Match Interrupt */
 
     /* Enable interrupts for given timer: */
     timer_irq_enable(dev);
@@ -141,18 +148,9 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
     }
 
     /* set timeout value */
-    switch (channel) {
-        case 0:
-            gptimer->TAILR = value;
-            break;
-
-        case 1:
-            gptimer->TBILR = value;
-            break;
-
-        default:
-            return -1;
-    }
+    gptimer->ICR           = TIMER_A_IRQ_MASK; /**< Clear any pending interrupt status */
+    gptimer->TAMATCHR      = value;
+    gptimer->IMRbits.TAMIM = 1;                /**< Enable the Timer A Match Interrupt */
 
     return 1;
 }
@@ -189,18 +187,7 @@ int timer_clear(tim_t dev, int channel)
             return -1;
     }
 
-    switch (channel) {
-        case 0:
-            gptimer->cc2538_gptimer_ctl.CTLbits.TAEN = 0;
-            break;
-
-        case 1:
-            gptimer->cc2538_gptimer_ctl.CTLbits.TBEN = 0;
-            break;
-
-        default:
-            return -1;
-    }
+    gptimer->IMR = 0;
 
     return 1;
 }
@@ -214,19 +201,19 @@ unsigned int timer_read(tim_t dev)
     switch (dev) {
 #if TIMER_0_EN
         case TIMER_0:
-            return TIMER_0_DEV->TAR;
+            return TIMER_0_DEV->TAV;
 #endif
 #if TIMER_1_EN
         case TIMER_1:
-            return TIMER_1_DEV->TAR;
+            return TIMER_1_DEV->TAV;
 #endif
 #if TIMER_2_EN
         case TIMER_2:
-            return TIMER_2_DEV->TAR;
+            return TIMER_2_DEV->TAV;
 #endif
 #if TIMER_3_EN
         case TIMER_3:
-            return TIMER_3_DEV->TAR;
+            return TIMER_3_DEV->TAV;
 #endif
 
         case TIMER_UNDEFINED:
@@ -244,25 +231,21 @@ void timer_stop(tim_t dev)
 #if TIMER_0_EN
         case TIMER_0:
             TIMER_0_DEV->cc2538_gptimer_ctl.CTLbits.TAEN = 0;
-            TIMER_0_DEV->cc2538_gptimer_ctl.CTLbits.TBEN = 0;
             break;
 #endif
 #if TIMER_1_EN
         case TIMER_1:
             TIMER_1_DEV->cc2538_gptimer_ctl.CTLbits.TAEN = 0;
-            TIMER_1_DEV->cc2538_gptimer_ctl.CTLbits.TBEN = 0;
             break;
 #endif
 #if TIMER_2_EN
         case TIMER_2:
             TIMER_2_DEV->cc2538_gptimer_ctl.CTLbits.TAEN = 0;
-            TIMER_2_DEV->cc2538_gptimer_ctl.CTLbits.TBEN = 0;
             break;
 #endif
 #if TIMER_3_EN
         case TIMER_3:
             TIMER_3_DEV->cc2538_gptimer_ctl.CTLbits.TAEN = 0;
-            TIMER_3_DEV->cc2538_gptimer_ctl.CTLbits.TBEN = 0;
             break;
 #endif
 
@@ -277,25 +260,21 @@ void timer_start(tim_t dev)
 #if TIMER_0_EN
         case TIMER_0:
             TIMER_0_DEV->cc2538_gptimer_ctl.CTLbits.TAEN = 1;
-            TIMER_0_DEV->cc2538_gptimer_ctl.CTLbits.TBEN = 1;
             break;
 #endif
 #if TIMER_1_EN
         case TIMER_1:
             TIMER_1_DEV->cc2538_gptimer_ctl.CTLbits.TAEN = 1;
-            TIMER_1_DEV->cc2538_gptimer_ctl.CTLbits.TBEN = 1;
             break;
 #endif
 #if TIMER_2_EN
         case TIMER_2:
             TIMER_2_DEV->cc2538_gptimer_ctl.CTLbits.TAEN = 1;
-            TIMER_2_DEV->cc2538_gptimer_ctl.CTLbits.TBEN = 1;
             break;
 #endif
 #if TIMER_3_EN
         case TIMER_3:
             TIMER_3_DEV->cc2538_gptimer_ctl.CTLbits.TAEN = 1;
-            TIMER_3_DEV->cc2538_gptimer_ctl.CTLbits.TBEN = 1;
             break;
 #endif
 
@@ -383,6 +362,7 @@ void timer_irq_disable(tim_t dev)
 #if TIMER_0_EN
 void TIMER_0_ISR_1(void)
 {
+    TIMER_0_DEV->ICR = TIMER_A_IRQ_MASK;
     if (config[0].cb != NULL) config[0].cb(0);
 
     if (sched_context_switch_request) {
@@ -393,6 +373,7 @@ void TIMER_0_ISR_1(void)
 
 void TIMER_0_ISR_2(void)
 {
+    TIMER_0_DEV->ICR = TIMER_B_IRQ_MASK;
     if (config[0].cb != NULL) config[0].cb(1);
 
     if (sched_context_switch_request) {
@@ -405,6 +386,7 @@ void TIMER_0_ISR_2(void)
 #if TIMER_1_EN
 void TIMER_1_ISR_1(void)
 {
+    TIMER_1_DEV->ICR = TIMER_A_IRQ_MASK;
     if (config[1].cb != NULL) config[1].cb(0);
 
     if (sched_context_switch_request) {
@@ -415,6 +397,7 @@ void TIMER_1_ISR_1(void)
 
 void TIMER_1_ISR_2(void)
 {
+    TIMER_1_DEV->ICR = TIMER_B_IRQ_MASK;
     if (config[1].cb != NULL) config[1].cb(1);
 
     if (sched_context_switch_request) {
@@ -427,6 +410,7 @@ void TIMER_1_ISR_2(void)
 #if TIMER_2_EN
 void TIMER_2_ISR_1(void)
 {
+    TIMER_2_DEV->ICR = TIMER_A_IRQ_MASK;
     if (config[2].cb != NULL) config[2].cb(0);
 
     if (sched_context_switch_request) {
@@ -437,6 +421,7 @@ void TIMER_2_ISR_1(void)
 
 void TIMER_2_ISR_2(void)
 {
+    TIMER_2_DEV->ICR = TIMER_B_IRQ_MASK;
     if (config[2].cb != NULL) config[2].cb(1);
 
     if (sched_context_switch_request) {
@@ -449,6 +434,7 @@ void TIMER_2_ISR_2(void)
 #if TIMER_3_EN
 void TIMER_3_ISR_1(void)
 {
+    TIMER_3_DEV->ICR = TIMER_A_IRQ_MASK;
     if (config[3].cb != NULL) config[3].cb(0);
 
     if (sched_context_switch_request) {
@@ -459,6 +445,7 @@ void TIMER_3_ISR_1(void)
 
 void TIMER_3_ISR_2(void)
 {
+    TIMER_3_DEV->ICR = TIMER_B_IRQ_MASK;
     if (config[3].cb != NULL) config[3].cb(1);
 
     if (sched_context_switch_request) {
