@@ -40,7 +40,7 @@ void rpl_trickle_send_dio(void *args)
     (void) args;
     ipv6_addr_t mcast;
 
-    ipv6_addr_set_all_nodes_addr(&mcast);
+    ipv6_addr_set_all_rpl_nodes_addr(&mcast);
     rpl_send_DIO(&mcast);
 }
 
