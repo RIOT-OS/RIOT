@@ -90,3 +90,6 @@ ifneq (,$(filter embunit,$(USEMODULE)))
         CFLAGS += -DOUTPUT=OUTPUT_COMPILER
     endif
 endif
+ifneq (,$(filter log_%,$(USEMODULE)))
+    include $(RIOTBASE)/sys/log/Makefile.include
+endif

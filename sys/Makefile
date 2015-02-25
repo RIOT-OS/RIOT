@@ -143,6 +143,9 @@ endif
 ifneq (,$(filter hwtimer_compat,$(USEMODULE)))
     DIRS += compat/hwtimer
 endif
+ifneq (,$(filter log_%,$(USEMODULE)))
+    DIRS += log
+endif
 
 DIRS += $(dir $(wildcard $(addsuffix /Makefile, ${USEMODULE})))
 
