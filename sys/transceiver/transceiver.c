@@ -582,7 +582,7 @@ void receive_cc2420_packet(ieee802154_packet_t *trans_p)
     dINT();
     cc2420_packet_t *p = &cc2420_rx_buffer[rx_buffer_pos];
     trans_p->length = p->length;
-    memcpy(&trans_p->frame, &p->frame, p->length);
+    memcpy(&trans_p->frame, &p->frame, sizeof(trans_p->frame));
     trans_p->rssi = p->rssi;
     trans_p->crc = p->crc;
     trans_p->lqi = p->lqi;
@@ -678,7 +678,7 @@ void receive_at86rf231_packet(ieee802154_packet_t *trans_p)
     trans_p->rssi = p->rssi;
     trans_p->crc = p->crc;
     trans_p->lqi = p->lqi;
-    memcpy(&trans_p->frame, &p->frame, p->length);
+    memcpy(&trans_p->frame, &p->frame, sizeof(trans_p->frame));
     memcpy(&data_buffer[transceiver_buffer_pos * AT86RF231_MAX_DATA_LENGTH], p->frame.payload,
            p->frame.payload_len);
     trans_p->frame.payload = (uint8_t *) & (data_buffer[transceiver_buffer_pos * AT86RF231_MAX_DATA_LENGTH]);
