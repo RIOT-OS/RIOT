@@ -1268,6 +1268,7 @@ void lowpan_iphc_decoding(uint8_t *data, uint8_t length, net_if_eui64_t *s_addr,
     /* Generate IPv6 address from stateless information, if SAC=1 we will use
      * this stateless information as a starting point for the stateful
      * information. */
+    /* RFC 6282 describes each of the following address compression methods */
     switch (((lowpan_iphc[1] & SIXLOWPAN_IPHC2_SAM) >> 4) & 0x03) {
         case (0x01): {
             /* 64-bits */
@@ -1281,7 +1282,10 @@ void lowpan_iphc_decoding(uint8_t *data, uint8_t length, net_if_eui64_t *s_addr,
         case (0x02): {
             /* 16-bits */
             memcpy(&(ipv6_buf->srcaddr.uint8[0]), &ll_prefix[0], 2);
-            memset(&(ipv6_buf->srcaddr.uint8[2]), 0, 12);
+            ipv6_buf->srcaddr.uint16[1] = HTONS(0x0000u);
+            ipv6_buf->srcaddr.uint32[1] = HTONL(0x00000000u);
+            ipv6_buf->srcaddr.uint32[2] = HTONL(0x000000ffu);
+            ipv6_buf->srcaddr.uint16[6] = HTONS(0xfe00u);
             memcpy(&(ipv6_buf->srcaddr.uint8[14]), &ipv6_hdr_fields[hdr_pos], 2);
             hdr_pos += 2;
             break;
@@ -1415,7 +1419,10 @@ void lowpan_iphc_decoding(uint8_t *data, uint8_t length, net_if_eui64_t *s_addr,
             case (0x02): {
                 /* 16-bits */
                 memcpy(&(ipv6_buf->destaddr.uint8[0]), &ll_prefix[0], 2);
-                memset(&(ipv6_buf->destaddr.uint8[2]), 0, 12);
+                ipv6_buf->destaddr.uint16[1] = HTONS(0x0000u);
+                ipv6_buf->destaddr.uint32[1] = HTONL(0x00000000u);
+                ipv6_buf->destaddr.uint32[2] = HTONL(0x000000ffu);
+                ipv6_buf->destaddr.uint16[6] = HTONS(0xfe00u);
                 memcpy(&(ipv6_buf->destaddr.uint8[14]), &ipv6_hdr_fields[hdr_pos], 2);
                 hdr_pos += 2;
                 break;
