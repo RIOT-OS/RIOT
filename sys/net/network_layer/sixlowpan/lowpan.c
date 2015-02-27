@@ -1011,12 +1011,11 @@ uint8_t lowpan_iphc_encoding(int if_id, const uint8_t *dest, int dest_len,
                  * and possibly the link-layer addresses.*/
                 lowpan_iphc[1] |= 0x30;
             }
-            else if ((ipv6_buf->srcaddr.uint16[4] == 0) &&
-                     (ipv6_buf->srcaddr.uint16[5] == 0) &&
-                     (ipv6_buf->srcaddr.uint16[6] == 0) &&
-                     ((ipv6_buf->srcaddr.uint8[14]) & 0x80) == 0) {
-                /* 49-bit of interface identifier are 0, so we can compress
-                 * source address-iid to 16-bit */
+            else if ((ipv6_buf->srcaddr.uint32[2] == HTONL(0x000000ffu)) &&
+                     (ipv6_buf->srcaddr.uint16[6] == HTONL(0xfe00u))) {
+                /* The 48 leading bits of the interface identifier are
+                 * 0000:00FF:FE00, so we can compress the source address-iid to
+                 * 16-bit */
                 memcpy(&ipv6_hdr_fields[hdr_pos], &ipv6_buf->srcaddr.uint16[7], 2);
                 hdr_pos += 2;
                 /* 16 bits. The address is derived using context information
