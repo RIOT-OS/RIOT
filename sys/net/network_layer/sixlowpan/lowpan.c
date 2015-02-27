@@ -1106,25 +1106,24 @@ uint8_t lowpan_iphc_encoding(int if_id, const uint8_t *dest, int dest_len,
                  * and possibly the link-layer addresses.*/
                 lowpan_iphc[1] |= 0x03;
             }
-            else if (dest_len == 2 &&
-                     ipv6_buf->destaddr.uint32[2] == HTONL(0x000000ff) &&
-                     ipv6_buf->destaddr.uint16[6] == HTONS(0xfe00) &&
-                     ipv6_buf->destaddr.uint16[7] == *((uint16_t *) dest)) {
-                /* 0 bits. The address is derived using context information
-                 * and possibly the link-layer addresses.*/
-                lowpan_iphc[1] |= 0x03;
-            }
-            else if ((ipv6_buf->destaddr.uint16[4] == 0) &&
-                     (ipv6_buf->destaddr.uint16[5] == 0) &&
-                     (ipv6_buf->destaddr.uint16[6] == 0) &&
-                     ((ipv6_buf->destaddr.uint8[14]) & 0x80) == 0) {
-                /* 49-bit of interface identifier are 0, so we can compress
-                 * source address-iid to 16-bit */
-                memcpy(&ipv6_hdr_fields[hdr_pos], &ipv6_buf->destaddr.uint16[7], 2);
-                hdr_pos += 2;
-                /* 16 bits. The address is derived using context information
-                 * and the 16 bits carried inline. */
-                lowpan_iphc[1] |= 0x02;
+            else if (ipv6_buf->destaddr.uint32[2] == HTONL(0x000000ff) &&
+                     ipv6_buf->destaddr.uint16[6] == HTONS(0xfe00)) {
+                if (dest_len == 2 &&
+                    ipv6_buf->destaddr.uint16[7] == *((uint16_t *) dest)) {
+                    /* 0 bits. The address is derived using context information
+                     * and possibly the link-layer addresses.*/
+                    lowpan_iphc[1] |= 0x03;
+                }
+                else {
+                    /* The 48 leading bits of the interface identifier are
+                     * 0000:00FF:FE00, so we can compress the source address-iid to
+                     * 16-bit */
+                    memcpy(&ipv6_hdr_fields[hdr_pos], &ipv6_buf->destaddr.uint16[7], 2);
+                    hdr_pos += 2;
+                    /* 16 bits. The address is derived using context information
+                     * and the 16 bits carried inline. */
+                    lowpan_iphc[1] |= 0x02;
+                }
             }
             else {
                 memcpy(&ipv6_hdr_fields[hdr_pos], &(ipv6_buf->destaddr.uint16[4]), 8);
@@ -1135,6 +1134,7 @@ uint8_t lowpan_iphc_encoding(int if_id, const uint8_t *dest, int dest_len,
             }
         }
         else {
+            /* Full 128 bit address */
             memcpy(&ipv6_hdr_fields[hdr_pos], &(ipv6_buf->destaddr.uint8[0]), 16);
             hdr_pos += 16;
         }
