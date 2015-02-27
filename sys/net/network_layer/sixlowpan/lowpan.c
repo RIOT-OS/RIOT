@@ -1042,48 +1042,46 @@ uint8_t lowpan_iphc_encoding(int if_id, const uint8_t *dest, int dest_len,
         /* 1: Destination address is a multicast address. */
         lowpan_iphc[1] |= SIXLOWPAN_IPHC2_M;
 
-        /* just another cool if condition */
-        if ((ipv6_buf->destaddr.uint8[1] == 2) &&
-            (ipv6_buf->destaddr.uint16[1] == 0) &&
-            (ipv6_buf->destaddr.uint16[2] == 0) &&
-            (ipv6_buf->destaddr.uint16[3] == 0) &&
-            (ipv6_buf->destaddr.uint16[4] == 0) &&
-            (ipv6_buf->destaddr.uint16[5] == 0) &&
-            (ipv6_buf->destaddr.uint16[6] == 0) &&
-            (ipv6_buf->destaddr.uint8[14] == 0)) {
-            /* 11: 8 bits. The address takes the form FF02::00XX. */
-            lowpan_iphc[1] |= 0x03;
-            ipv6_hdr_fields[hdr_pos] = ipv6_buf->destaddr.uint8[15];
-            hdr_pos++;
-        }
-        else if ((ipv6_buf->destaddr.uint16[1] == 0) &&
-                 (ipv6_buf->destaddr.uint16[2] == 0) &&
-                 (ipv6_buf->destaddr.uint16[3] == 0) &&
-                 (ipv6_buf->destaddr.uint16[4] == 0) &&
-                 (ipv6_buf->destaddr.uint16[5] == 0) &&
-                 (ipv6_buf->destaddr.uint8[12] == 0)) {
-            /* 10: 32 bits. The address takes the form FFXX::00XX:XXXX. */
-            lowpan_iphc[1] |= 0x02;
-            /* copy second and last 3 byte */
-            ipv6_hdr_fields[hdr_pos] = ipv6_buf->destaddr.uint8[1];
-            hdr_pos++;
-            memcpy(&ipv6_hdr_fields[hdr_pos], &ipv6_buf->destaddr.uint8[13], 3);
-            hdr_pos += 3;
-        }
-        else if ((ipv6_buf->destaddr.uint16[1] == 0) &&
-                 (ipv6_buf->destaddr.uint16[2] == 0) &&
-                 (ipv6_buf->destaddr.uint16[3] == 0) &&
-                 (ipv6_buf->destaddr.uint16[4] == 0) &&
-                 (ipv6_buf->destaddr.uint8[10] == 0)) {
-            /* 01: 48 bits.  The address takes the form FFXX::00XX:XXXX:XXXX */
-            lowpan_iphc[1] |= 0x01;
-            /* copy second and last 5 byte */
-            ipv6_hdr_fields[hdr_pos] = ipv6_buf->destaddr.uint8[1];
-            hdr_pos++;
-            memcpy(&ipv6_hdr_fields[hdr_pos], &ipv6_buf->destaddr.uint8[11], 5);
-            hdr_pos += 5;
+        /* Check if we can compress any part of the address */
+        if ((ipv6_buf->destaddr.uint8[0] == 0xff) &&
+            (ipv6_buf->destaddr.uint16[1] == HTONS(0x0000u)) &&
+            (ipv6_buf->destaddr.uint32[1] == HTONL(0x00000000u)) &&
+            (ipv6_buf->destaddr.uint16[4] == HTONS(0x0000u)) &&
+            (ipv6_buf->destaddr.uint8[10] == 0x00)) {
+            /* If we got here then the address is on the form:
+             * FFXX:0000:0000:0000:0000:00XX:XXXX:XXXX
+             * which means that it can be compressed. */
+            if ((ipv6_buf->destaddr.uint8[1] == 0x02) &&
+                (ipv6_buf->destaddr.uint16[5] == HTONS(0x0000u)) &&
+                (ipv6_buf->destaddr.uint16[6] == HTONS(0x0000u)) &&
+                (ipv6_buf->destaddr.uint8[14] == 0x00)) {
+                /* 11: 8 bits. The address takes the form FF02::00XX. */
+                lowpan_iphc[1] |= 0x03;
+                ipv6_hdr_fields[hdr_pos] = ipv6_buf->destaddr.uint8[15];
+                hdr_pos++;
+            }
+            else if ((ipv6_buf->destaddr.uint16[5] == HTONS(0x0000u)) &&
+                     (ipv6_buf->destaddr.uint8[12] == 0x00)) {
+                /* 10: 32 bits. The address takes the form FFXX::00XX:XXXX. */
+                lowpan_iphc[1] |= 0x02;
+                /* copy second and last 3 bytes */
+                ipv6_hdr_fields[hdr_pos] = ipv6_buf->destaddr.uint8[1];
+                hdr_pos++;
+                memcpy(&ipv6_hdr_fields[hdr_pos], &ipv6_buf->destaddr.uint8[13], 3);
+                hdr_pos += 3;
+            }
+            else {
+                /* 01: 48 bits.  The address takes the form FFXX::00XX:XXXX:XXXX */
+                lowpan_iphc[1] |= 0x01;
+                /* copy second and last 5 byte */
+                ipv6_hdr_fields[hdr_pos] = ipv6_buf->destaddr.uint8[1];
+                hdr_pos++;
+                memcpy(&ipv6_hdr_fields[hdr_pos], &ipv6_buf->destaddr.uint8[11], 5);
+                hdr_pos += 5;
+            }
         }
         else {
+            /* Full 128 bit address */
             memcpy(&ipv6_hdr_fields[hdr_pos], &ipv6_buf->destaddr.uint8[0], 16);
             hdr_pos += 16;
         }
