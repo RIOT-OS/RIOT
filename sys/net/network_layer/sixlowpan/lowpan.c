@@ -874,7 +874,7 @@ void lowpan_read(uint8_t *data, uint8_t length, net_if_eui64_t *s_addr,
 
 }
 
-/* draft-ietf-6lowpan-hc-13#section-3.1 */
+/* RFC6282 https://tools.ietf.org/html/rfc6282#section-3.1 */
 uint8_t lowpan_iphc_encoding(int if_id, const uint8_t *dest, int dest_len,
                              ipv6_hdr_t *ipv6_buf_extra, uint8_t *ptr)
 {
