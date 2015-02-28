@@ -16,21 +16,21 @@ then
         make -s -C ./examples/default info-concurrency
         git rebase riot/master || git rebase --abort
 
-        ./dist/tools/whitespacecheck/check.sh master || exit
+        ./dist/tools/whitespacecheck/check.sh master
 
-        ./dist/tools/licenses/check.sh master --diff-filter=MR --error-exitcode=0 || exit
-        ./dist/tools/licenses/check.sh master --diff-filter=AC || exit
+        ./dist/tools/licenses/check.sh master --diff-filter=MR --error-exitcode=0
+        ./dist/tools/licenses/check.sh master --diff-filter=AC
 
-        ./dist/tools/doccheck/check.sh master || exit
+        ./dist/tools/doccheck/check.sh master
 
-        ./dist/tools/externc/check.sh master || exit
+        ./dist/tools/externc/check.sh master
 
         # TODO:
         #   Remove all but `master` parameters to cppcheck (and remove second
         #   invocation) once all warnings of cppcheck have been taken care of
         #   in master.
-        ./dist/tools/cppcheck/check.sh master --diff-filter=MR --error-exitcode=0 || exit
-        ./dist/tools/cppcheck/check.sh master --diff-filter=AC || exit
+        ./dist/tools/cppcheck/check.sh master --diff-filter=MR --error-exitcode=0
+        ./dist/tools/cppcheck/check.sh master --diff-filter=AC
         ./dist/tools/pr_check/pr_check.sh riot/master
         exit 0
     fi
