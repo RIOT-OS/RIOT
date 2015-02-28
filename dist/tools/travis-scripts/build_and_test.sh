@@ -9,30 +9,57 @@
 
 set -e
 
+set_result() {
+    NEW_RESULT=$1
+    LAST_RESULT=$2
+
+    if [ $LAST_RESULT -ne 0 ] && [ $NEW_RESULT -eq 0 ]
+    then
+        NEW_RESULT=$LAST_RESULT
+    fi
+
+    echo $NEW_RESULT
+}
+
 if [[ $BUILDTEST_MCU_GROUP ]]
 then
     if [ "$BUILDTEST_MCU_GROUP" == "static-tests" ]
     then
+        RESULT=0
+
         make -s -C ./examples/default info-concurrency
         git rebase riot/master || git rebase --abort
+        RESULT=$(set_result $? $RESULT)
 
         ./dist/tools/whitespacecheck/check.sh master
+        RESULT=$(set_result $? $RESULT)
 
         ./dist/tools/licenses/check.sh master --diff-filter=MR --error-exitcode=0
+        RESULT=$(set_result $? $RESULT)
+
         ./dist/tools/licenses/check.sh master --diff-filter=AC
+        RESULT=$(set_result $? $RESULT)
 
         ./dist/tools/doccheck/check.sh master
+        RESULT=$(set_result $? $RESULT)
 
         ./dist/tools/externc/check.sh master
+        RESULT=$(set_result $? $RESULT)
 
         # TODO:
         #   Remove all but `master` parameters to cppcheck (and remove second
         #   invocation) once all warnings of cppcheck have been taken care of
         #   in master.
         ./dist/tools/cppcheck/check.sh master --diff-filter=MR --error-exitcode=0
+        RESULT=$(set_result $? $RESULT)
+
         ./dist/tools/cppcheck/check.sh master --diff-filter=AC
+        RESULT=$(set_result $? $RESULT)
+
         ./dist/tools/pr_check/pr_check.sh riot/master
-        exit 0
+        RESULT=$(set_result $? $RESULT)
+
+        exit $RESULT
     fi
     if [ "$BUILDTEST_MCU_GROUP" == "x86" ]
     then
