@@ -298,6 +298,25 @@ static inline void ipv6_addr_set_all_nodes_addr(ipv6_addr_t *ipv6_addr)
 }
 
 /**
+ * @brief   Set *ipv6_addr* to the all-RPL-nodes multicast address
+ *          (ff02::1a).
+ *
+ * @see <a href="http://tools.ietf.org/html/rfc6550#section-6">
+ *          RFC 6550
+ *      </a>
+ *
+ * @param[out] ipv6_addr    Is set to the all-RPL-nodes multicast
+ *                          address.
+ */
+static inline void ipv6_addr_set_all_rpl_nodes_addr(ipv6_addr_t *ipv6_addr)
+{
+    ipv6_addr->uint32[0] = HTONL(0xff020000);
+    ipv6_addr->uint32[1] = 0;
+    ipv6_addr->uint32[2] = 0;
+    ipv6_addr->uint32[3] = HTONL(0x1a);
+}
+
+/**
  * @brief   Set *ipv6_addr_out* to the solicited-node multicast address
  *          computed from *ipv6_addr_in*.
  *
