@@ -124,7 +124,7 @@ int ipv6_send_packet(ipv6_hdr_t *packet, ipv6_addr_t *next_hop)
                                            nce->lladdr_len, (uint8_t *) packet, length) < 0) {
                 /* XXX: this is wrong, but until ND does work correctly,
                  *      this is the only way (aka the old way)*/
-                uint16_t raddr = dest->uint16[7];
+                uint16_t raddr = 0xffff; /* Broadcast message */
                 sixlowpan_lowpan_sendto(0, &raddr, 2, (uint8_t *) packet,
                                         length);
                 /* return -1; */
