@@ -67,7 +67,7 @@ void clist_print(clist_node_t *clist)
     }
 
     do {
-        log.info("list entry: %p: prev=%p next=%p\n", clist, clist->prev, clist->next);
+        log_info("list entry: %p: prev=%p next=%p\n", clist, clist->prev, clist->next);
         clist = clist->next;
 
         if (clist == start) {
