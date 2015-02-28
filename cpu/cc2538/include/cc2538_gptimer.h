@@ -116,7 +116,24 @@ typedef struct {
 
     cc2538_reg_t SYNC;                      /**< GPTIMER Synchronize */
     cc2538_reg_t RESERVED2;                 /**< Reserved word */
+
+    union {
     cc2538_reg_t IMR;                       /**< GPTIMER Interrupt Mask */
+        struct {
+            cc2538_reg_t TATOIM    :  1;    /**< GPTM Timer A time-out interrupt mask */
+            cc2538_reg_t CAMIM     :  1;    /**< GPTM Timer A capture match interrupt mask */
+            cc2538_reg_t CAEIM     :  1;    /**< GPTM Timer A capture event interrupt mask */
+            cc2538_reg_t RESERVED1 :  1;    /**< Reserved bits */
+            cc2538_reg_t TAMIM     :  1;    /**< GPTM Timer A match interrupt mask */
+            cc2538_reg_t RESERVED2 :  3;    /**< Reserved bits */
+            cc2538_reg_t TBTOIM    :  1;    /**< GPTM Timer B time-out interrupt mask */
+            cc2538_reg_t CBMIM     :  1;    /**< GPTM Timer B capture match interrupt mask */
+            cc2538_reg_t CBEIM     :  1;    /**< GPTM Timer B capture event interrupt mask */
+            cc2538_reg_t TBMIM     :  1;    /**< GPTM Timer B match interrupt mask */
+            cc2538_reg_t RESERVED3 : 20;    /**< Reserved bits */
+        } IMRbits;
+    };
+
     cc2538_reg_t RIS;                       /**< GPTIMER Raw Interrupt Status */
     cc2538_reg_t MIS;                       /**< GPTIMER Masked Interrupt Status */
     cc2538_reg_t ICR;                       /**< GPTIMER Interrupt Clear */
