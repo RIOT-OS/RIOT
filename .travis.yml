@@ -13,6 +13,7 @@ env:
     - NPROC_MAX=8 BUILDTEST_MCU_GROUP=cortex_m3_2
     - NPROC_MAX=8 BUILDTEST_MCU_GROUP=cortex_m4
 
+
 matrix:
   allow_failures:
     - env: NPROC_MAX=8 BUILDTEST_MCU_GROUP=static-tests
