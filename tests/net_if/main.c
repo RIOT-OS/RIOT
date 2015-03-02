@@ -341,24 +341,24 @@ int test_net_if_get_set_pan_id(int iface)
 {
     uint16_t pan_id = 0xabcd;
 
-    if (net_if_get_pan_id(iface + 1) >= 0) {
+    if (net_if_get_pan_id(iface + 1) > 0) {
         printf("FAILED: net_if_get_pan_id(%d) not failed\n", iface);
         return 0;
     }
 
-    if (net_if_set_pan_id(iface, pan_id) < 0) {
+    if (net_if_set_pan_id(iface, pan_id) == 0) {
         printf("FAILED: net_if_set_pan_id(%d, 0x%04x) failed\n", iface, pan_id);
         return 0;
     }
 
 #if MODULE_AT86RF231 || MODULE_CC2420 || MODULE_MC1322X
-    int32_t res = net_if_get_pan_id(iface);
+    uint16_t res = net_if_get_pan_id(iface);
     if (res < 0) {
         printf("FAILED: net_if_get_pan_id(%d) failed\n", iface);
         return 0;
     }
 
-    pan_id = (uint16_t) res;
+    pan_id = res;
 #else
     pan_id = 0;
 #endif

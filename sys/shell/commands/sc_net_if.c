@@ -540,7 +540,7 @@ void _net_if_ifconfig_list(int if_id)
     transceiver_type_t transceivers;
     uint16_t hw_address;
     int32_t channel;
-    int32_t pan_id;
+    uint16_t pan_id;
     net_if_eui64_t eui64;
     char eui64_str[24];
     net_if_addr_t *addr_ptr = NULL;
@@ -566,11 +566,11 @@ void _net_if_ifconfig_list(int if_id)
         printf(" Channel: %d", (uint16_t) channel);
     }
 
-    if (pan_id < 0) {
+    if (pan_id == 0) {
         printf(" PAN ID: not set");
     }
     else {
-        printf(" PAN ID: 0x%04x", (uint16_t)pan_id);
+        printf(" PAN ID: 0x%04x", pan_id);
     }
 
     printf("\n");
