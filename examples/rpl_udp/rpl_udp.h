@@ -9,6 +9,8 @@
 #ifndef RPL_UDP_H
 #define RPL_UDP_H
 
+#include <stdio.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -100,6 +102,7 @@ extern radio_address_t id;
 
 /** @brief Char array for IP address printing */
 extern char addr_str[IPV6_MAX_ADDR_STR_LEN];
+extern int32_t pan_id;
 
 #ifdef __cplusplus
 }

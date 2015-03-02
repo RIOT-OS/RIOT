@@ -195,24 +195,6 @@ typedef struct __attribute__((packed)) {
 int sixlowpan_lowpan_init_interface(int if_id);
 
 /**
- * @brief   Checks if an EUI-64 was set from a short address. If so
- *          it returns this address, else 0
- *
- * @param[in] iid   An EUI-64.
- *
- * @return  The short address on success, 0 on failure.
- */
-static inline uint16_t sixlowpan_lowpan_eui64_to_short_addr(const net_if_eui64_t *iid)
-{
-    if (iid->uint32[0] == HTONL(0x000000ff) &&
-        iid->uint16[2] == HTONS(0xfe00)) {
-        return NTOHS(iid->uint16[3]);
-    }
-
-    return 0;
-}
-
-/**
  * @brief   Initializes all addresses and prefixes on an interface needed
  *          for 6LoWPAN. Calling this function together with
  *          sixlowpan_lowpan_init_interface() is not necessary.
