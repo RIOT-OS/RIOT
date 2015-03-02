@@ -1428,7 +1428,7 @@ void lowpan_iphc_decoding(uint8_t *data, uint8_t length, net_if_eui64_t *s_addr,
                 /* 0-bits */
                 memcpy(&(ipv6_buf->destaddr.uint8[0]), &ll_prefix[0], 2);
                 memset(&(ipv6_buf->destaddr.uint8[2]), 0, 6);
-                memcpy(&(ipv6_buf->destaddr.uint8[8]), &s_addr->uint8[0], 8);
+                memcpy(&(ipv6_buf->destaddr.uint8[8]), &d_addr->uint8[0], 8);
                 /* Invert Universal/local bit as specified in
                  * RFC4291, section 2.5.1 "Interface Identifiers" */
                 ipv6_buf->destaddr.uint8[8] ^= 0x02;
