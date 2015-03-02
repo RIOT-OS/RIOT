@@ -433,20 +433,7 @@ int net_if_get_eui64(net_if_eui64_t *eui64, int if_id, int force_generation)
          * the local/universal bit to 1. */
         eui64->uint32[0] = HTONL(0x020000ff);
         eui64->uint16[2] = HTONS(0xfe00);
-
-        if (sizeof(hwaddr) == 2) {
-            eui64->uint16[3] = HTONS(hwaddr);
-        }
-        else if (sizeof(hwaddr) == 1) {
-            eui64->uint8[6] = 0;
-            eui64->uint8[7] = (uint8_t)hwaddr;
-        }
-        else {
-            DEBUG("Error on EUI-64 generation: do not know what to do with "
-                  "hardware address of length %d\n", sizeof(hwaddr));
-            return 0;
-        }
-
+        eui64->uint16[3] = HTONS(hwaddr);
     }
 
     return 1;
