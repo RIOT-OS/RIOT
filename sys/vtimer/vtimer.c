@@ -120,7 +120,8 @@ static int update_shortterm(void)
     uint32_t next = hwtimer_next_absolute;
 
     /* current short term time */
-    uint32_t now = HWTIMER_TICKS_TO_US(hwtimer_now());
+    uint32_t now_ticks = hwtimer_now();
+    uint32_t now = HWTIMER_TICKS_TO_US(now_ticks);
 
     /* make sure the longterm_tick_timer does not get truncated */
     if (node_get_timer(shortterm_priority_queue_root.first)->action != vtimer_callback_tick) {
@@ -134,8 +135,9 @@ static int update_shortterm(void)
         next = now +  HWTIMER_TICKS_TO_US(VTIMER_BACKOFF);
     }
 
-    DEBUG("update_shortterm: Set hwtimer to %" PRIu32 " (now=%lu)\n", next, HWTIMER_TICKS_TO_US(hwtimer_now()));
-    hwtimer_id = hwtimer_set_absolute(HWTIMER_TICKS(next), vtimer_callback, NULL);
+    DEBUG("update_shortterm: Set hwtimer to %" PRIu32 " (now=%lu)\n", next, now);
+    uint32_t next_ticks = now_ticks + HWTIMER_TICKS(next - now);
+    hwtimer_id = hwtimer_set_absolute(next_ticks, vtimer_callback, NULL);
 
     return 0;
 }
@@ -286,7 +288,7 @@ static int vtimer_set(vtimer_t *timer)
 
 void vtimer_now(timex_t *out)
 {
-    uint32_t us = HWTIMER_TICKS_TO_US(hwtimer_now() - longterm_tick_start);
+    uint32_t us = HWTIMER_TICKS_TO_US(hwtimer_now()) - longterm_tick_start;
     uint32_t us_per_s = 1000ul * 1000ul;
 
     out->seconds = seconds + us / us_per_s;
