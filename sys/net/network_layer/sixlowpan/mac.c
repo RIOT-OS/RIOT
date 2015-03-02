@@ -188,16 +188,16 @@ void set_ieee802154_fcf_values(ieee802154_frame_t *frame, uint8_t dest_mode,
 void set_ieee802154_frame_values(int if_id, uint16_t dest_pan,
                                  ieee802154_frame_t *frame)
 {
-    int32_t pan_id = net_if_get_pan_id(if_id);
+    uint16_t pan_id = net_if_get_pan_id(if_id);
     // TODO: addresse aus ip paket auslesen und in frame einfuegen
 
-    if (pan_id < 0) {
+    if (pan_id == 0) {
         frame->dest_pan_id = NTOLES(dest_pan);
         frame->src_pan_id = HTOLES(DEFAULT_IEEE_802154_PAN_ID);
     }
     else {
         frame->dest_pan_id = NTOLES(dest_pan);
-        frame->src_pan_id = HTOLES((uint16_t)pan_id);
+        frame->src_pan_id = HTOLES(pan_id);
     }
 
     frame->seq_nr = macdsn;

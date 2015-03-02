@@ -138,8 +138,8 @@ static radio_address_t set_address(transceiver_type_t t, void *address);
 static transceiver_eui64_t get_long_addr(transceiver_type_t t);
 static transceiver_eui64_t set_long_addr(transceiver_type_t t,
         void *address);
-static int32_t get_pan(transceiver_type_t t);
-static int32_t set_pan(transceiver_type_t t, void *pan);
+static uint16_t get_pan(transceiver_type_t t);
+static uint16_t set_pan(transceiver_type_t t, void *pan);
 
 static void set_monitor(transceiver_type_t t, void *mode);
 static void powerdown(transceiver_type_t t);
@@ -353,12 +353,12 @@ static void *run(void *arg)
                 break;
 
             case GET_PAN:
-                *((int32_t *) cmd->data) = get_pan(cmd->transceivers);
+                *((uint16_t *) cmd->data) = get_pan(cmd->transceivers);
                 msg_reply(&m, &m);
                 break;
 
             case SET_PAN:
-                *((int32_t *) cmd->data) = set_pan(cmd->transceivers, cmd->data);
+                *((uint16_t *) cmd->data) = set_pan(cmd->transceivers, cmd->data);
                 msg_reply(&m, &m);
                 break;
 
@@ -919,9 +919,9 @@ static int32_t get_channel(transceiver_type_t t)
  * @param t         The transceiver device
  * @param pan       The PAN to be set
  *
- * @return The PAN AFTER calling the set command, -1 on error
+ * @return The PAN AFTER calling the set command, 0 on error
  */
-static int32_t set_pan(transceiver_type_t t, void *pan)
+static uint16_t set_pan(transceiver_type_t t, void *pan)
 {
     uint16_t c = *((uint16_t *) pan);
 
@@ -950,7 +950,7 @@ static int32_t set_pan(transceiver_type_t t, void *pan)
         default:
             /* get rid of compiler warning about unused variable */
             (void) c;
-            return -1;
+            return 0;
     }
 }
 
@@ -959,9 +959,9 @@ static int32_t set_pan(transceiver_type_t t, void *pan)
  *
  * @param t     The transceiver device
  *
- * @return The current pan of the transceiver, -1 on error
+ * @return The current pan of the transceiver, 0 on error
  */
-static int32_t get_pan(transceiver_type_t t)
+static uint16_t get_pan(transceiver_type_t t)
 {
     switch (t) {
 #ifdef MODULE_CC2420
@@ -986,7 +986,7 @@ static int32_t get_pan(transceiver_type_t t)
 #endif
 
         default:
-            return -1;
+            return 0;
     }
 }
 /*------------------------------------------------------------------------------------*/

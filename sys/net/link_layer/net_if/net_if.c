@@ -516,30 +516,24 @@ int32_t net_if_set_channel(int if_id, uint16_t channel)
     return channel;
 }
 
-int32_t net_if_get_pan_id(int if_id)
+uint16_t net_if_get_pan_id(int if_id)
 {
-    int32_t pan_id;
+    uint16_t pan_id;
 
     if (if_id < 0 || if_id >= NET_IF_MAX || !interfaces[if_id].initialized) {
         DEBUG("Get PAN ID: No interface initialized with ID %d.\n", if_id);
-        return -1;
+        return 0;
     }
 
     net_if_transceiver_get_set_handler(if_id, GET_PAN, &pan_id);
-    if (pan_id < 0) {
-        return 0;
-    }
-    else {
-        return pan_id;
-    }
-
+    return pan_id;
 }
 
-int32_t net_if_set_pan_id(int if_id, uint16_t pan_id)
+uint16_t net_if_set_pan_id(int if_id, uint16_t pan_id)
 {
     if (if_id < 0 || if_id >= NET_IF_MAX || !interfaces[if_id].initialized) {
         DEBUG("Set PAN ID: No interface initialized with ID %d.\n", if_id);
-        return -1;
+        return 0;
     }
 
     net_if_transceiver_get_set_handler(if_id, SET_PAN, &pan_id);

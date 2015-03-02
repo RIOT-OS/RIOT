@@ -484,9 +484,9 @@ int32_t net_if_set_channel(int if_id, uint16_t channel);
  *
  * @param[in]  if_id    The interface's ID
  *
- * @return  The transceiver's PAN ID on success, -1 on failure
+ * @return  The transceiver's PAN ID on success, 0 on failure
  */
-int32_t net_if_get_pan_id(int if_id);
+uint16_t net_if_get_pan_id(int if_id);
 
 /**
  * Sets the PAN ID of the transceiver associated with the given interface.
@@ -497,9 +497,9 @@ int32_t net_if_get_pan_id(int if_id);
  * @param[in]  if_id    The interface's ID
  * @param[in]  pan_id   The new frequency channel
  *
- * @return  the PAN ID on success, -1 on failure.
+ * @return  the PAN ID on success, 0 on failure.
  */
-int32_t net_if_set_pan_id(int if_id, uint16_t pan_id);
+uint16_t net_if_set_pan_id(int if_id, uint16_t pan_id);
 
 #ifdef __cplusplus
 }
