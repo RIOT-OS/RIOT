@@ -27,7 +27,6 @@ then
     then
         RESULT=0
 
-        make -s -C ./examples/default info-concurrency
         git rebase riot/master || git rebase --abort
         RESULT=$(set_result $? $RESULT)
 
