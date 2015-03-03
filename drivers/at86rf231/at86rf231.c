@@ -15,6 +15,7 @@
  *
  * @author      Alaeddine Weslati <alaeddine.weslati@inria.fr>
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
+ * @author      Kévin Roussel <Kevin.Roussel@inria.fr>
  *
  * @}
  */
@@ -725,8 +726,25 @@ int at86rf231_set_state(netdev_t *dev, netdev_state_t state)
 int at86rf231_channel_is_clear(netdev_t *dev)
 {
     (void)dev;
-    /* channel is checked by hardware automatically before transmission */
-    return 1;
+
+    /* Ask for a CCA measure */
+    uint8_t reg = at86rf231_reg_read(AT86RF231_REG__PHY_CC_CCA);
+    reg &= AT86RF231_PHY_CC_CCA_MASK__CCA_REQUEST;
+    at86rf231_reg_write(AT86RF231_REG__PHY_CC_CCA, reg);
+
+    /* wait for CCA measurement to be finished */
+    uint8_t status;
+    do {
+        int max_wait = _MAX_RETRIES;
+        if (!--max_wait) {
+            DEBUG("at86rf231 : ERROR : could not measure CCA\n");
+            break;
+        }
+        status = at86rf231_reg_read(AT86RF231_REG__TRX_STATUS);
+    } while (!(status & AT86RF231_TRX_STATUS_MASK__CCA_DONE));
+
+    /* return CCA status */
+    return (status & AT86RF231_TRX_STATUS_MASK__CCA_STATUS);
 }
 
 void at86rf231_event(netdev_t *dev, uint32_t event_type)
