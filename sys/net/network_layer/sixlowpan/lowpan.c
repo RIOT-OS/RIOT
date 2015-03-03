@@ -895,9 +895,9 @@ uint8_t lowpan_iphc_encoding(int if_id, const uint8_t *dest, int dest_len,
         if (!net_if_get_eui64(&own_iid, if_id, 0)) {
             return 1;
         }
-
-        own_iid.uint8[0] ^= 0x02;
     }
+
+    own_iid.uint8[0] ^= 0x02;
 
     ipv6_buf = ipv6_buf_extra;
 

@@ -54,7 +54,9 @@ static uint8_t macdsn;
 static inline void mac_frame_short_to_eui64(net_if_eui64_t *eui64,
                                             uint8_t *frame_short)
 {
-    eui64->uint32[0] = HTONL(0x000000ff);
+    /* Since this is a short address, which is never globally unique, we set
+     * the local/universal bit to 1. */
+    eui64->uint32[0] = HTONL(0x020000ff);
     eui64->uint16[2] = HTONS(0xfe00);
     eui64->uint8[6] = frame_short[1];
     eui64->uint8[7] = frame_short[0];
