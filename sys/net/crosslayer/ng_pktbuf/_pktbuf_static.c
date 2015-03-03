@@ -19,6 +19,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "net/ng_pktbuf.h"
 #include "_pktbuf_internal.h"
