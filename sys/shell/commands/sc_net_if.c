@@ -1,6 +1,4 @@
 /*
- * Shell commands for network interfaces
- *
  * Copyright (C) 2013 Martine Lenders <mlenders@inf.fu-berlin.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
@@ -9,11 +7,14 @@
  */
 
 /**
- * @ingroup shell_commands
+ * @ingroup     sys_shell_commands
  * @{
- * @file    sc_net_if.c
- * @brief   provides shell commands to configure network interfaces
- * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
+ *
+ * @file
+ * @brief       Provides shell commands to configure network interfaces
+ *
+ * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
+ *
  * @}
  */
 

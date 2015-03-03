@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup shell_commands
+ * @ingroup     sys_shell_commands
  * @{
  *
  * @file

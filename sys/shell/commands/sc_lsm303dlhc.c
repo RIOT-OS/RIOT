@@ -7,11 +7,11 @@
  */
 
 /**
- * @ingroup shell_commands
+ * @ingroup     sys_shell_commands
  * @{
  *
  * @file
- * @brief       provides shell commands to poll lsm303dlhc sensor
+ * @brief       Provides shell commands to poll lsm303dlhc sensor
  *
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  *

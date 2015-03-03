@@ -8,13 +8,15 @@
  */
 
 /**
- * @ingroup shell_commands
+ * @ingroup     sys_shell_commands
  * @{
+ *
  * @file
- * @brief   Shell command implementation for the peripheral RTC interface
+ * @brief       Shell command implementation for the peripheral RTC interface
  *
  * @author  Oliver Hahm <oliver.hahm@inria.fr>
- * @author  Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ * @author  Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>#
+ *
  * @}
  */
 
