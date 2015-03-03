@@ -1,0 +1,7 @@
+apart from all the RIoT-related stuff, you need to supply headers (and iomux-init-code) for the SDK this i.MX6-port is based on
+You can do this by either:
+-copying the files from the riotboard
+-generating your own with the iomux-tool from freescale
+-implementing all necessary functions/macros yourself
+
+in board/riotboard/tools is a tool for pulling the generated sources into the riotboard-structure but you can put them whereever you want. Just make sure the headers are on the include-path and the sources are compiled.

@@ -1,0 +1,20 @@
+files come from this git-repo:
+[remote "origin"]
+        url = git://github.com/embest-tech/u-boot-imx.git
+        fetch = +refs/heads/*:refs/remotes/origin/*
+[branch "embest_imx_3.0.35_4.0.0"]
+        remote = origin
+        merge = refs/heads/embest_imx_3.0.35_4.0.0
+
+
+£ ~/git/u-boot-imx/include/u-boot/u-boot.lds.h
+
+£ ~/git/u-boot-imx/board/freescale/mx6solo_RIoTboard/u-boot.lds
+with these lines removed:
+"
+ __u_boot_cmd_start = .;
+  .u_boot_cmd : { *(.u_boot_cmd) }
+  __u_boot_cmd_end = .;
+"
+
+

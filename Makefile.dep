@@ -2,6 +2,40 @@ ifneq (,$(filter libcoap,$(USEPKG)))
 	USEMODULE += pnet
 endif
 
+
+ifneq (,$(filter riotboard,$(BOARD)))
+	ifeq (,$(filter riotboard_basesdk,$(USEMODULE)))
+	USEMODULE += riotboard_basesdk
+	endif
+endif
+
+ifneq (,$(filter imx6,$(CPU)))
+	ifeq (,$(filter libsdk-drivers-uart,$(USEMODULE)))
+		USEMODULE += libsdk-drivers-uart
+	endif
+	ifeq (,$(filter libsdk-drivers-gpio,$(USEMODULE)))
+		USEMODULE += libsdk-drivers-gpio
+	endif
+	ifeq (,$(filter libsdk-drivers-timer,$(USEMODULE)))
+		USEMODULE += libsdk-drivers-timer
+	endif
+	ifeq (,$(filter libsdk-core,$(USEMODULE)))
+		USEMODULE += libsdk-core
+	endif
+	ifeq (,$(filter cpu,$(USEMODULE)))
+		USEMODULE += cpu
+	endif
+	ifeq (,$(filter imx6-periph,$(USEMODULE)))
+		USEMODULE += imx6-periph
+	endif
+	ifeq (,$(filter libsdk-common,$(USEMODULE)))
+		USEMODULE += libsdk-common
+	endif
+	ifeq (,$(filter libsdk-utility,$(USEMODULE)))
+		USEMODULE += libsdk-utility
+	endif
+endif
+
 ifneq (,$(filter pnet,$(USEMODULE)))
 	USEMODULE += posix
 	USEMODULE += socket_base

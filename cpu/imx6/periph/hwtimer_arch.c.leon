@@ -1,0 +1,177 @@
+/*
+ * Copyright (C) 2014 Freie Universität Berlin
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
+ */
+
+/**
+ * @ingroup     cpu_sam3x8e
+ * @{
+ *
+ * @file        hwtimer_arch.c
+ * @brief       Implementation of the kernels hwtimer interface
+ *
+ * The hardware timer implementation uses the Cortex build-in system timer as back-end.
+ *
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ *
+ * @}
+ */
+
+#include "hwtimer_arch.h"
+#include "sdk.h"
+
+#include "hwtimer_cpu.h"
+#include "hardware_modules.h"
+
+void (*timeout_handler)(int);
+void irq_handler1(void) {
+	timeout_handler(1);
+#ifdef USEHIGHRESTIMER
+  epit_counter_disable(1);
+#else
+#endif
+}
+void irq_handler2(void) {
+	timeout_handler(2);
+#ifdef USEHIGHRESTIMER
+  epit_counter_disable(2);
+#else
+#endif
+}
+
+#ifdef USEHIGHRESTIMER
+/*	Use the Enhanced-Precision-Interruptable-Timer-subsystem.
+		They apparently dont burn too many cycles.
+		There are two, but one can be used for the sys_time.
+*/
+
+void hwtimer_arch_init(void (*handler)(int), uint32_t fcpu)
+{
+	timeout_handler = handler;
+	epit_init(g_hw_timer_port,
+		/*	CLKSRC_OFF,
+				CLKSRC_IPG_CLK,
+        CLKSRC_PER_CLK,
+				CLKSRC_CKIL.
+				00 Clock is off
+				01 Peripheral clock
+				10 High-frequency reference clock
+				11 Low-frequency reference clock */
+		HWTIMER_CLKSRC, 
+		/*	12-bit prescale (0..4096) */
+		HWTIMER_PRESCALE,
+		/*	FREE_RUNNING or SET_AND_FORGET.
+				0 When the counter reaches zero it rolls over to 0xFFFF_FFFF (free-running mode)
+				1 When the counter reaches zero it reloads from the modulus register (set-and-forget mode) */
+		SET_AND_FORGET,
+		/*	32-bit modulus register, as mention above */,
+		1000,
+		/*	Can be one of those or both (or):
+				WAIT_MODE_EN - enabled in wait-mode
+   			STOP_MODE_EN - enablged in stop-mode */
+		WAIT_MODE_EN | STOP_MODE_EN
+	);
+#ifndef USE_SDK_SYS_TIMER
+	epit_init(g_system_timer_port,
+		HWTIMER_CLKSRC, 
+		HWTIMER_PRESCALE,
+		SET_AND_FORGET,
+		1000,
+		WAIT_MODE_EN | STOP_MODE_EN
+	);
+#endif
+}
+
+void hwtimer_arch_enable_interrupt(void)
+{
+	epit_setup_interrupt(g_hw_timer_port, &irq_handler1, 1);
+#ifndef USE_SDK_SYS_TIMER	
+  epit_setup_interrupt(g_system_timer_port, &irq_handler2, 1);
+#endif
+}
+
+void hwtimer_arch_disable_interrupt(void)
+{
+	epit_setup_interrupt(g_hw_timer_port, &irq_handler1, 0);
+#ifndef USE_SDK_SYS_TIMER 
+  epit_setup_interrupt(g_system_timer_port, &irq_handler2, 0);
+#endif
+}
+
+void hwtimer_arch_set(unsigned long offset, short timer)
+{
+	epit_counter_enable(timer, offset, IRQ_MODE);
+}
+
+void hwtimer_arch_set_absolute(unsigned long value, short timer)
+{
+	epit_set_compare_event(timer, offset);
+}
+
+void hwtimer_arch_unset(short timer)
+{
+	epit_set_compare_event(timer, 0);
+	epit_counter_disable(timer);
+}
+
+unsigned long hwtimer_arch_now(void)
+{
+	// TODO right now, when no timer operation is pending; the timer is disabled.
+	// Problem? Find Out!
+	return epit_get_counter_value(g_hw_timer_port);
+}
+#else
+/* Use the General-Purpose-Timer-interface */
+
+void hwtimer_arch_init(void (*handler)(int), uint32_t fcpu)
+{
+	gpt_init(HWTIMER_CLKSRC, HWTIMER_PRESCALE, RESTART_MODE, WAIT_MODE_EN | STOP_MODE_EN);
+	timeout_handler = handler;
+}
+
+void hwtimer_arch_enable_interrupt(void)
+{
+	gpt_setup_interrupt(&irq_handler1, 1);
+}
+
+void hwtimer_arch_disable_interrupt(void)
+{
+	gpt_setup_interrupt(&irq_handler1, 0);
+}
+
+void hwtimer_arch_set(unsigned long offset, short timer)
+{
+	epit_set_compare_event(g_hw_timer_port, offset);
+}
+
+void hwtimer_arch_set_absolute(unsigned long value, short timer)
+{
+    /* DEPRECATED?! - will not be implemented */
+}
+
+void hwtimer_arch_unset(short timer)
+{
+	epit_set_compare_event(g_hw_timer_port, 0);
+}
+
+unsigned long hwtimer_arch_now(void)
+{
+	return epit_get_counter_value(g_hw_timer_port);
+}
+
+void irq_handler()
+{
+	// use this to clear the compare-flag:
+	epit_get_compare_event();
+
+	timeout_handler((short)(0));
+	//thread_yield();
+}
+
+void irq_handler3(void) {
+	timeout_handler(3);
+}
+#endif

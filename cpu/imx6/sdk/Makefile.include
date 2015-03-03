@@ -1,0 +1,1 @@
+export UNDEF += $(BINDIR)$(MODULE).a
