@@ -42,7 +42,7 @@ Its features comprise
 * IPv6
 * TCP and UDP
 * 6LoWPAN
-* RPL
+* AODVv2, NHDP, RPL
 
 ## GETTING STARTED
 * You want to start the RIOT? Just follow our [Getting started documentation](https://github.com/RIOT-OS/RIOT/wiki/Introduction)
