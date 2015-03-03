@@ -68,6 +68,10 @@
 #include "tcp.h"
 #endif
 
+#ifdef MODULE_NG_TCP
+#include "net/ng_tcp.h"
+#endif
+
 #ifdef MODULE_NOMAC
 #include "nomac.h"
 #endif
@@ -304,6 +308,10 @@ void auto_init(void)
 #ifdef MODULE_TCP
     DEBUG("Auto init transport layer module: [tcp].\n");
     tcp_init_transport_layer();
+#endif
+#ifdef MODULE_NG_TCP
+    DEBUG("Auto init transport layer module: [ng_tcp].\n");
+    ng_tcp_init();
 #endif
 #ifdef MODULE_NG_PKTDUMP
     DEBUG("Auto init ng_pktdump module.\n");

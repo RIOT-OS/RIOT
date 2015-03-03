@@ -128,6 +128,9 @@ endif
 ifneq (,$(filter ng_sixlowpan_ctx,$(USEMODULE)))
     DIRS += net/network_layer/ng_sixlowpan/ctx
 endif
+ifneq (,$(filter ng_tcp,$(USEMODULE)))
+    DIRS += net/transport_layer/ng_tcp
+endif
 ifneq (,$(filter ng_sixlowpan_frag,$(USEMODULE)))
     DIRS += net/network_layer/ng_sixlowpan/frag
 endif
