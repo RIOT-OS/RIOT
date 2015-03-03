@@ -6,12 +6,14 @@
 # as it depends on certain environment variables. An OpenOCD
 # configuration file must be present in a the boards dist folder.
 #
+# Any extra command line arguments after the command name are passed on the
+# openocd command line after the configuration file name but before any other
+# initialization commands.
+#
 # Global environment variables used:
 # OPENOCD:             OpenOCD command name, default: "openocd"
 # OPENOCD_CONFIG:      OpenOCD configuration file name,
 #                      default: "${RIOTBOARD}/${BOARD}/dist/openocd.cfg"
-# OPENOCD_EXTRA_INIT:  extra parameters to pass on the OpenOCD command line
-#                      before any initialization commands, default: (empty)
 #
 # The script supports the following actions:
 #
@@ -117,7 +119,7 @@ do_flash() {
     test_hexfile
     # flash device
     ${OPENOCD} -f "${OPENOCD_CONFIG}" \
-            ${OPENOCD_EXTRA_INIT} \
+            "$@" \
             -c "tcl_port 0" \
             -c "telnet_port 0" \
             -c "gdb_port 0" \
@@ -135,7 +137,7 @@ do_debug() {
     test_tui
     # start OpenOCD as GDB server
     ${OPENOCD} -f "${OPENOCD_CONFIG}" \
-            ${OPENOCD_EXTRA_INIT} \
+            "$@" \
             -c "tcl_port ${TCL_PORT}" \
             -c "telnet_port ${TELNET_PORT}" \
             -c "gdb_port ${GDB_PORT}" \
@@ -156,7 +158,7 @@ do_debugserver() {
     test_ports
     # start OpenOCD as GDB server
     ${OPENOCD} -f "${OPENOCD_CONFIG}" \
-            ${OPENOCD_EXTRA_INIT} \
+            "$@" \
             -c "tcl_port ${TCL_PORT}" \
             -c "telnet_port ${TELNET_PORT}" \
             -c "gdb_port ${GDB_PORT}" \
@@ -169,7 +171,7 @@ do_reset() {
     test_config
     # start OpenOCD and invoke board reset
     ${OPENOCD} -f "${OPENOCD_CONFIG}" \
-            ${OPENOCD_EXTRA_INIT} \
+            "$@" \
             -c "tcl_port 0" \
             -c "telnet_port 0" \
             -c "gdb_port 0" \
@@ -181,24 +183,27 @@ do_reset() {
 #
 # parameter dispatching
 #
-case "$1" in
+ACTION="$1"
+shift # pop $1 from $@
+
+case "${ACTION}" in
   flash)
     echo "### Flashing Target ###"
-    do_flash
+    do_flash "$@"
     ;;
   debug)
     echo "### Starting Debugging ###"
-    do_debug
+    do_debug "$@"
     ;;
   debug-server)
     echo "### Starting GDB Server ###"
-    do_debugserver
+    do_debugserver "$@"
     ;;
   reset)
     echo "### Resetting Target ###"
-    do_reset
+    do_reset "$@"
     ;;
   *)
-    echo "Usage: $0 {flash|debug|debug-server|reset}"
+    echo "Usage: $0 {flash|debug|debug-server|reset} [extra OpenOCD initialization arguments]"
     ;;
 esac
