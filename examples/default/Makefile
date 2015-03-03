@@ -61,8 +61,8 @@ ifneq (,$(filter iot-lab_M3,$(BOARD)))
 	USEMODULE += lsm303dlhc
 endif
 ifneq (,$(filter fox,$(BOARD)))
-        USEMODULE += lps331ap
-        USEMODULE += l3g4200d
+	USEMODULE += lps331ap
+	USEMODULE += l3g4200d
 	USEMODULE += lsm303dlhc
 endif
 
