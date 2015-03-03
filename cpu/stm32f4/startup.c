@@ -41,6 +41,11 @@ extern void kernel_init(void);
 extern void __libc_init_array(void);
 
 /**
+ * Required by g++ cross compiler
+ */
+void *__dso_handle;
+
+/**
  * @brief This function is the entry point after a system reset
  *
  * After a system reset, the following steps are necessary and carried out:
