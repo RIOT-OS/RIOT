@@ -165,7 +165,7 @@ void isr_dma(void)           __attribute__ ((weak, alias("dummy_handler")));
 void isr_dmaerr(void)        __attribute__ ((weak, alias("dummy_handler")));
 
 /* interrupt vector table */
-__attribute__ ((section(".vectors")))
+__attribute__ ((section(".vectors"), aligned(CC2538_VTOR_ALIGN)))
 const void *interrupt_vector[] = {
     /* Stack pointer */
     (void*) (&_estack),             /* pointer to the top of the empty stack */
