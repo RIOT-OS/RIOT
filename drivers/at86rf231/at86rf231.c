@@ -47,6 +47,9 @@ static uint8_t  radio_channel;
 static uint16_t radio_address;
 static uint64_t radio_address_long;
 
+static volatile unsigned long sfd_count;
+
+
 netdev_802154_raw_packet_cb_t at86rf231_raw_packet_cb;
 netdev_rcv_data_cb_t at86rf231_data_packet_cb;
 
@@ -163,16 +166,10 @@ void at86rf231_switch_to_rx(void)
         }
     } while (at86rf231_current_mode() != AT86RF231_TRX_STATUS__PLL_ON);
 
-#ifndef MODULE_OPENWSN
-    /* Reset IRQ to TRX END only */
-    at86rf231_reg_write(AT86RF231_REG__IRQ_MASK,
-                        AT86RF231_IRQ_STATUS_MASK__TRX_END);
-#else
     /* OpenWSN also needs RX_START IRQ */
     at86rf231_reg_write(AT86RF231_REG__IRQ_MASK,
                         (AT86RF231_IRQ_STATUS_MASK__RX_START
                        | AT86RF231_IRQ_STATUS_MASK__TRX_END));
-#endif
 
 
     /* Read IRQ to clear it */
@@ -216,7 +213,13 @@ void at86rf231_rx_irq(void)
         at86rf231_rx_handler();
     }
 }
+
+void at86rf233_sfd_irq(void)
+{
+    sfd_count++;
+}
 #endif
+
 
 int at86rf231_add_raw_recv_callback(netdev_t *dev,
                                     netdev_802154_raw_packet_cb_t recv_cb)
@@ -426,6 +429,57 @@ int at86rf231_get_monitor(void)
             & AT86RF231_XAH_CTRL_1__AACK_PROM_MODE);
 }
 
+static uint8_t DBM_TO_TX_POW[] =
+    {0xF, 0xE, 0xE, 0xE, 0xE, 0xE, 0xD, 0xD, 0xD, 0xD, 0xC,
+     0xC, 0xB, 0xB, 0xA, 0x9, 0x8, 0x7, 0x6, 0x5, 0x3, 0x0};
+int at86rf231_set_tx_power(int dbm)
+{
+    if (dbm < AT86RF231_TX_POWER_MIN) {
+        dbm = AT86RF231_TX_POWER_MIN;
+    }
+    if (dbm < AT86RF231_TX_POWER_MAX) {
+        dbm = AT86RF231_TX_POWER_MAX;
+    }
+    uint8_t pow = DBM_TO_TX_POW[dbm - AT86RF231_TX_POWER_MIN];
+    at86rf231_reg_write(AT86RF231_REG__PHY_TX_PWR,
+                        pow & AT86RF231_PHY_TX_PWR_MASK__TX_PWR);
+    return pow;
+}
+
+static const int TX_POW_TO_DBM[] =
+    {4, 3, 3, 3, 2, 2, 1, 0, -1, -2, -3, -4, -6, -8, -12, -17};
+int at86rf231_get_tx_power(void)
+{
+    uint8_t pow = at86rf231_reg_read(AT86RF231_REG__PHY_TX_PWR)
+                & AT86RF231_PHY_TX_PWR_MASK__TX_PWR;
+    return TX_POW_TO_DBM[pow];
+}
+
+static void at86rf231_reset_sfd_count(void)
+{
+    sfd_count = 0;
+}
+
+static unsigned long at86rf231_get_sfd_count(void)
+{
+    return sfd_count;
+}
+
+static void at86rf231_set_cca_threshold(int pow)
+{
+    uint8_t val = (pow - AT86RF231_RSSI_BASE_VAL) >> 1;
+    at86rf231_reg_write(AT86RF231_REG__CCA_THRES,
+                        val & AT86RF231_CCA_THRES_MASK__CCA_ED_THRES);
+}
+
+static int at86rf231_get_cca_threshold(void)
+{
+    uint8_t val = at86rf231_reg_read(AT86RF231_REG__CCA_THRES)
+                & AT86RF231_CCA_THRES_MASK__CCA_ED_THRES;
+    return AT86RF231_RSSI_BASE_VAL + 2 * val;
+}
+
+
 void at86rf231_gpio_spi_interrupts_init(void)
 {
     /* SPI init */
@@ -507,77 +561,114 @@ int at86rf231_get_option(netdev_t *dev, netdev_opt_t opt, void *value,
     }
 
     switch (opt) {
-        case NETDEV_OPT_CHANNEL:
-            if (*value_len < sizeof(unsigned int)) {
-                return -EOVERFLOW;
-            }
-            if (*value_len > sizeof(unsigned int)) {
-                *value_len = sizeof(unsigned int);
-            }
-            *((unsigned int *)value) = at86rf231_get_channel();
-            break;
+    case NETDEV_OPT_CHANNEL:
+        if (*value_len < sizeof(unsigned int)) {
+            return -EOVERFLOW;
+        }
+        if (*value_len > sizeof(unsigned int)) {
+            *value_len = sizeof(unsigned int);
+        }
+        *((unsigned int *)value) = at86rf231_get_channel();
+        break;
 
-        case NETDEV_OPT_ADDRESS:
-            if (*value_len < sizeof(uint16_t)) {
-                return -EOVERFLOW;
-            }
-            if (*value_len > sizeof(uint16_t)) {
-                *value_len = sizeof(uint16_t);
-            }
-            *((uint16_t *)value) = at86rf231_get_address();
-            break;
+    case NETDEV_OPT_ADDRESS:
+        if (*value_len < sizeof(uint16_t)) {
+            return -EOVERFLOW;
+        }
+        if (*value_len > sizeof(uint16_t)) {
+            *value_len = sizeof(uint16_t);
+        }
+        *((uint16_t *)value) = at86rf231_get_address();
+        break;
 
-        case NETDEV_OPT_NID:
-            if (*value_len < sizeof(uint16_t)) {
-                return -EOVERFLOW;
-            }
-            if (*value_len > sizeof(uint16_t)) {
-                *value_len = sizeof(uint16_t);
-            }
-            *((uint16_t *)value) = at86rf231_get_pan();
-            break;
+    case NETDEV_OPT_NID:
+        if (*value_len < sizeof(uint16_t)) {
+            return -EOVERFLOW;
+        }
+        if (*value_len > sizeof(uint16_t)) {
+            *value_len = sizeof(uint16_t);
+        }
+        *((uint16_t *)value) = at86rf231_get_pan();
+        break;
 
-        case NETDEV_OPT_ADDRESS_LONG:
-            if (*value_len < sizeof(uint64_t)) {
-                return -EOVERFLOW;
-            }
-            if (*value_len > sizeof(uint64_t)) {
-                *value_len = sizeof(uint64_t);
-            }
-            *((uint64_t *)value) = at86rf231_get_address_long();
-            break;
+    case NETDEV_OPT_ADDRESS_LONG:
+        if (*value_len < sizeof(uint64_t)) {
+            return -EOVERFLOW;
+        }
+        if (*value_len > sizeof(uint64_t)) {
+            *value_len = sizeof(uint64_t);
+        }
+        *((uint64_t *)value) = at86rf231_get_address_long();
+        break;
 
-        case NETDEV_OPT_MAX_PACKET_SIZE:
-            if (*value_len == 0) {
-                return -EOVERFLOW;
-            }
-            if (*value_len > sizeof(uint8_t)) {
-                *value_len = sizeof(uint8_t);
-            }
-            *((uint8_t *)value) = AT86RF231_MAX_PKT_LENGTH;
-            break;
+    case NETDEV_OPT_MAX_PACKET_SIZE:
+        if (*value_len == 0) {
+            return -EOVERFLOW;
+        }
+        if (*value_len > sizeof(uint8_t)) {
+            *value_len = sizeof(uint8_t);
+        }
+        *((uint8_t *)value) = AT86RF231_MAX_PKT_LENGTH;
+        break;
 
-        case NETDEV_OPT_PROTO:
-            if (*value_len < sizeof(netdev_proto_t)) {
-                return -EOVERFLOW;
-            }
-            if (*value_len > sizeof(netdev_proto_t)) {
-                *value_len = sizeof(netdev_proto_t);
-            }
-            *((netdev_type_t *)value) = NETDEV_PROTO_802154;
-            break;
+    case NETDEV_OPT_PROTO:
+        if (*value_len < sizeof(netdev_proto_t)) {
+            return -EOVERFLOW;
+        }
+        if (*value_len > sizeof(netdev_proto_t)) {
+            *value_len = sizeof(netdev_proto_t);
+        }
+        *((netdev_type_t *)value) = NETDEV_PROTO_802154;
+        break;
 
-        case NETDEV_OPT_SRC_LEN:
-            if (*value_len < sizeof(size_t)) {
-                return -EOVERFLOW;
-            }
-            if (*value_len > sizeof(size_t)) {
-                *value_len = sizeof(size_t);
-            }
-            *((size_t *)value) = _default_src_addr_len;
+    case NETDEV_OPT_SRC_LEN:
+        if (*value_len < sizeof(size_t)) {
+            return -EOVERFLOW;
+        }
+        if (*value_len > sizeof(size_t)) {
+            *value_len = sizeof(size_t);
+        }
+        *((size_t *)value) = _default_src_addr_len;
 
-        default:
-            return -ENOTSUP;
+    case NETDEV_OPT_TX_POWER:
+        if (*value_len < sizeof(int)) {
+            return -EOVERFLOW;
+        }
+        if (*value_len > sizeof(int)) {
+            *value_len = sizeof(int);
+        }
+        *((int *)value) = at86rf231_get_tx_power();
+
+    case NETDEV_OPT_CAN_MONITOR:
+        if (*value_len == 0) {
+            return -EOVERFLOW;
+        }
+        if (*value_len > sizeof(uint8_t)) {
+            *value_len = sizeof(uint8_t);
+        }
+        *((uint8_t *)value) = 1;   /* true : AT86RF23x can go promiscuous */
+        break;
+
+    case NETDEV_OPT_CCA_THRESHOLD:
+        if (*value_len < sizeof(int)) {
+            return -EOVERFLOW;
+        }
+        if (*value_len > sizeof(int)) {
+            *value_len = sizeof(int);
+        }
+        *((int *)value) = at86rf231_get_cca_threshold();
+
+    case NETDEV_OPT_SFD_COUNT:
+        if (*value_len < sizeof(unsigned long)) {
+            return -EOVERFLOW;
+        }
+        if (*value_len > sizeof(unsigned long)) {
+            *value_len = sizeof(unsigned long);
+        }
+        *((int *)value) = at86rf231_get_sfd_count();
+
+    default:
+        return -ENOTSUP;
     }
 
     return 0;
@@ -664,64 +755,84 @@ int at86rf231_set_option(netdev_t *dev, netdev_opt_t opt, void *value,
     }
 
     switch (opt) {
-        case NETDEV_OPT_CHANNEL:
-            if ((res = _type_pun_up_unsigned(set_value, sizeof(unsigned int),
-                                             value, value_len)) == 0) {
-                unsigned int *v = (unsigned int *)set_value;
-                if (*v > 26) {
-                    return -EINVAL;
-                }
-                at86rf231_set_channel(*v);
+    case NETDEV_OPT_CHANNEL:
+        if ((res = _type_pun_up_unsigned(set_value, sizeof(unsigned int),
+                                         value, value_len)) == 0) {
+            unsigned int *v = (unsigned int *)set_value;
+            if (*v > 26) {
+                return -EINVAL;
             }
-            break;
+            at86rf231_set_channel(*v);
+        }
+        break;
 
-        case NETDEV_OPT_ADDRESS:
-            if ((res = _type_pun_up_unsigned(set_value, sizeof(uint16_t),
-                                             value, value_len)) == 0) {
-                uint16_t *v = (uint16_t *)set_value;
-                if (*v == 0xffff) {
-                    /* Do not allow setting to broadcast */
-                    return -EINVAL;
-                }
-                at86rf231_set_address(*v);
+    case NETDEV_OPT_ADDRESS:
+        if ((res = _type_pun_up_unsigned(set_value, sizeof(uint16_t),
+                                         value, value_len)) == 0) {
+            uint16_t *v = (uint16_t *)set_value;
+            if (*v == 0xffff) {
+                /* Do not allow setting to broadcast */
+                return -EINVAL;
             }
-            break;
+            at86rf231_set_address(*v);
+        }
+        break;
 
-        case NETDEV_OPT_NID:
-            if ((res = _type_pun_up_unsigned(set_value, sizeof(uint16_t),
-                                             value, value_len)) == 0) {
-                uint16_t *v = (uint16_t *)set_value;
-                if (*v == 0xffff) {
-                    /* Do not allow setting to broadcast */
-                    return -EINVAL;
-                }
-                at86rf231_set_pan(*v);
+    case NETDEV_OPT_NID:
+        if ((res = _type_pun_up_unsigned(set_value, sizeof(uint16_t),
+                                         value, value_len)) == 0) {
+            uint16_t *v = (uint16_t *)set_value;
+            if (*v == 0xffff) {
+                /* Do not allow setting to broadcast */
+                return -EINVAL;
             }
-            break;
+            at86rf231_set_pan(*v);
+        }
+        break;
 
-        case NETDEV_OPT_ADDRESS_LONG:
-            if ((res = _type_pun_up_unsigned(set_value, sizeof(uint64_t),
-                                             value, value_len)) == 0) {
-                uint64_t *v = (uint64_t *)set_value;
-                /* TODO: error checking? */
-                at86rf231_set_address_long(*v);
+    case NETDEV_OPT_ADDRESS_LONG:
+        if ((res = _type_pun_up_unsigned(set_value, sizeof(uint64_t),
+                                         value, value_len)) == 0) {
+            uint64_t *v = (uint64_t *)set_value;
+            /* TODO: error checking? */
+            at86rf231_set_address_long(*v);
+        }
+        break;
+
+    case NETDEV_OPT_SRC_LEN:
+        if ((res = _type_pun_up_unsigned(set_value, sizeof(size_t),
+                                         value, value_len)) == 0) {
+            size_t *v = (size_t *)set_value;
+            if (*v != 2 && *v != 8) {
+                return -EINVAL;
             }
-            break;
+            _default_src_addr_len = *v;
+        }
+        break;
 
-        case NETDEV_OPT_SRC_LEN:
-            if ((res = _type_pun_up_unsigned(set_value, sizeof(size_t),
-                                             value, value_len)) == 0) {
-                size_t *v = (size_t *)set_value;
+    case NETDEV_OPT_TX_POWER:
+        if ((res = _type_pun_up_unsigned(set_value, sizeof(int),
+                                         value, value_len)) == 0) {
+            int *v = (int *)set_value;
+            at86rf231_set_tx_power(*v);
+        }
+        break;
 
-                if (*v != 2 && *v != 8) {
-                    return -EINVAL;
-                }
-                _default_src_addr_len = *v;
-            }
-            break;
+    case NETDEV_OPT_CCA_THRESHOLD:
+        if ((res = _type_pun_up_unsigned(set_value, sizeof(int),
+                                         value, value_len)) == 0) {
+            int *v = (int *)set_value;
+            at86rf231_set_cca_threshold(*v);
+        }
+        break;
 
-        default:
-            return -ENOTSUP;
+    case NETDEV_OPT_SFD_COUNT:
+        /* we don't care the given value... */
+        at86rf231_reset_sfd_count();
+        break;
+
+    default:
+        return -ENOTSUP;
     }
 
     return res;
@@ -737,15 +848,18 @@ int at86rf231_get_state(netdev_t *dev, netdev_state_t *state)
 
     if (!at86rf231_is_on()) {
         *state = NETDEV_STATE_POWER_OFF;
+        return 0;
     }
     else if (at86rf231_get_monitor()) {
         *state = NETDEV_STATE_PROMISCUOUS_MODE;
+        return 0;
     }
     else {
         *state = NETDEV_STATE_RX_MODE;
+        return 0;
     }
 
-    return 0;
+    return -ENOTSUP;
 }
 
 int at86rf231_set_state(netdev_t *dev, netdev_state_t state)
@@ -761,20 +875,30 @@ int at86rf231_set_state(netdev_t *dev, netdev_state_t state)
     }
 
     switch (state) {
-        case NETDEV_STATE_POWER_OFF:
+    case NETDEV_STATE_POWER_OFF:
+        if (at86rf231_is_on()) {
             at86rf231_off();
-            break;
+        }
+        break;
 
-        case NETDEV_STATE_RX_MODE:
-            at86rf231_switch_to_rx();
-            break;
+    case NETDEV_STATE_RX_MODE:
+        if (!at86rf231_is_on()) {
+            at86rf231_on();
+        }
+        at86rf231_set_monitor(0);
+        at86rf231_switch_to_rx();
+        break;
 
-        case NETDEV_STATE_PROMISCUOUS_MODE:
-            at86rf231_set_monitor(1);
-            break;
+    case NETDEV_STATE_PROMISCUOUS_MODE:
+        if (!at86rf231_is_on()) {
+            at86rf231_on();
+        }
+        at86rf231_set_monitor(1);
+        at86rf231_switch_to_rx();
+        break;
 
-        default:
-            return -ENOTSUP;
+    default:
+        return -ENOTSUP;
     }
 
     return 0;

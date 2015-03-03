@@ -23,6 +23,13 @@
 extern "C" {
 #endif
 
+
+#define AT86RF231_RSSI_BASE_VAL -94
+
+#define AT86RF231_TX_POWER_MIN  -17
+#define AT86RF231_TX_POWER_MAX  4
+
+
 #define AT86RF231_RX_BUF_SIZE   3
 
 enum at86rf231_access {
@@ -218,6 +225,10 @@ enum at86rf231_phy_rssi {
     AT86RF231_PHY_RSSI_MASK__RX_CRC_VALID = 0x80,
     AT86RF231_PHY_RSSI_MASK__RND_VALUE = 0x60,
     AT86RF231_PHY_RSSI_MASK__RSSI = 0x1F,
+};
+
+enum at86rf231_cca_thres {
+    AT86RF231_CCA_THRES_MASK__CCA_ED_THRES = 0x0F,
 };
 
 enum at86rf231_xosc_ctrl {
