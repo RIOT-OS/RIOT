@@ -429,7 +429,9 @@ int net_if_get_eui64(net_if_eui64_t *eui64, int if_id, int force_generation)
         }
 
         /* RFC 6282 Section 3.2.2 / RFC 2464 Section 4 */
-        eui64->uint32[0] = HTONL(0x000000ff);
+        /* Since this is a short address, which is never globally unique, we set
+         * the local/universal bit to 1. */
+        eui64->uint32[0] = HTONL(0x020000ff);
         eui64->uint16[2] = HTONS(0xfe00);
 
         if (sizeof(hwaddr) == 2) {
