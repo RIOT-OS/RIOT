@@ -1,4 +1,5 @@
 PSEUDOMODULES += defaulttransceiver
 PSEUDOMODULES += transport_layer
+PSEUDOMODULES += ng_ipv6_router
 PSEUDOMODULES += pktqueue
 PSEUDOMODULES += ng_netbase
