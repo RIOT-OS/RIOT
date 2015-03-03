@@ -37,17 +37,6 @@ msg_t udp_msg_queue[UDP_PKT_RECV_BUF_SIZE];
 
 char udp_stack_buffer[UDP_STACK_SIZE];
 
-uint16_t udp_csum(ipv6_hdr_t *ipv6_header, udp_hdr_t *udp_header)
-{
-    uint16_t sum;
-    uint16_t len = NTOHS(udp_header->length);
-
-    sum = len + IPPROTO_UDP;
-    sum = net_help_csum(sum, (uint8_t *)&ipv6_header->srcaddr, 2 * sizeof(ipv6_addr_t));
-    sum = net_help_csum(sum, (uint8_t *)udp_header, len);
-    return (sum == 0) ? 0xffff : HTONS(sum);
-}
-
 socket_internal_t *get_udp_socket(udp_hdr_t *udp_header)
 {
     uint8_t i = 1;
