@@ -51,6 +51,7 @@ extern ipv6_addr_t my_address;
 extern msg_t rpl_msg_queue[RPL_PKT_RECV_BUF_SIZE];
 extern char rpl_process_buf[RPL_PROCESS_STACKSIZE];
 extern uint8_t rpl_buffer[BUFFER_SIZE - LL_HDR_LEN];
+extern uint8_t rpl_if_id;
 
 /**
  * @brief Sends a RPL message to a given destination
@@ -84,8 +85,10 @@ uint8_t rpl_init(int if_id);
  *
  * This function initializes all RPL resources to act as a root node.
  *
+ * @param[in] rpl_opts          RPL root node configurations
+ *
  */
-void rpl_init_root(void);
+void rpl_init_root(rpl_options_t *rpl_opts);
 
 /**
  * @brief Sends a DIO-message to a given destination
