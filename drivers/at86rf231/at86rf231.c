@@ -26,6 +26,7 @@
 #include "periph/gpio.h"
 #include "periph/spi.h"
 #include "kernel_types.h"
+#include "crash.h"
 #include "transceiver.h"
 #include "hwtimer.h"
 #include "config.h"
@@ -71,8 +72,6 @@ int at86rf231_initialize(netdev_t *dev)
 
     at86rf231_reset();
 
-    at86rf231_on();
-
     /* TODO :
      * and configure security, power
      */
@@ -104,41 +103,17 @@ int at86rf231_initialize(netdev_t *dev)
 
 int at86rf231_on(void)
 {
-    /* Send a FORCE TRX OFF command */
-    at86rf231_reg_write(AT86RF231_REG__TRX_STATE,
-                        AT86RF231_TRX_STATE__FORCE_TRX_OFF);
+    /* negate SLP_TR line */
+    gpio_clear(AT86RF231_SLEEP);
 
     /* busy wait for TRX_OFF state */
     do {
         int delay = _MAX_RETRIES;
         if (!--delay) {
-            DEBUG("at86rf231 : ERROR : could not enter TRX_OFF mode\n");
+            DEBUG("at86rf231 : ERROR : could not wake up transceiver!\n");
             return 0;
         }
     } while (at86rf231_current_mode() != AT86RF231_TRX_STATUS__TRX_OFF);
-
-    at86rf231_reg_write(AT86RF231_REG__TRX_STATE,
-                        AT86RF231_TRX_STATE__RX_ON);
-
-    /* change into basic reception mode to initialise CSMA seed by RNG */
-    do {
-        int delay = _MAX_RETRIES;
-        if (!--delay) {
-            DEBUG("at86rf231 : ERROR : could not enter RX_ON mode\n");
-            return 0;
-        }
-    } while (at86rf231_current_mode() != AT86RF231_TRX_STATUS__RX_ON);
-
-    /* read RNG values into CSMA_SEED_0 */
-    for (int i=0; i<7; i+=2) {
-        uint8_t tmp = at86rf231_reg_read(AT86RF231_REG__PHY_CC_CCA);
-        tmp = ((tmp&0x60)>>5);
-        at86rf231_reg_write(AT86RF231_REG__CSMA_SEED_0, tmp << i);
-    }
-    /* read CSMA_SEED_1 and write back with RNG value */
-    uint8_t tmp = at86rf231_reg_read(AT86RF231_REG__CSMA_SEED_1);
-    tmp |= ((at86rf231_reg_read(AT86RF231_REG__PHY_CC_CCA) & 0x60) >> 5);
-    at86rf231_reg_write(AT86RF231_REG__CSMA_SEED_1, tmp);
 
     /* change into reception mode */
     at86rf231_switch_to_rx();
@@ -148,12 +123,28 @@ int at86rf231_on(void)
 
 void at86rf231_off(void)
 {
-    /* TODO */
+    /* Send a FORCE TRX OFF command */
+    at86rf231_reg_write(AT86RF231_REG__TRX_STATE,
+                        AT86RF231_TRX_STATE__FORCE_TRX_OFF);
+
+    /* busy wait for TRX_OFF state */
+    do {
+        int delay = _MAX_RETRIES;
+        if (!--delay) {
+            DEBUG("at86rf231 : ERROR : could not enter TRX_OFF mode\n");
+            return;
+        }
+    } while (at86rf231_current_mode() != AT86RF231_TRX_STATUS__TRX_OFF);
+
+    /* assert SLP_TR line */
+    gpio_set(AT86RF231_SLEEP);
 }
 
 int at86rf231_is_on(void)
 {
-    return ((at86rf231_get_status() & 0x1f) != 0);
+    uint8_t mode = at86rf231_current_mode();
+    return (mode != AT86RF231_TRX_STATUS__P_ON)
+        && (mode != AT86RF231_TRX_STATUS__SLEEP);
 }
 
 void at86rf231_switch_to_rx(void)
@@ -465,6 +456,45 @@ void at86rf231_reset(void)
     uint8_t volatile delay = 50; /* volatile to ensure it isn't optimized away */
     while (--delay);
     gpio_set(AT86RF231_RESET);
+
+    /* Send a FORCE TRX OFF command */
+    at86rf231_reg_write(AT86RF231_REG__TRX_STATE,
+                        AT86RF231_TRX_STATE__FORCE_TRX_OFF);
+
+    /* busy wait for TRX_OFF state */
+    do {
+        int delay = _MAX_RETRIES;
+        if (!--delay) {
+            core_panic(0x0231,
+                       "at86rf231 : ERROR : could not enter TRX_OFF mode\n");
+        }
+    } while (at86rf231_current_mode() != AT86RF231_TRX_STATUS__TRX_OFF);
+
+    at86rf231_reg_write(AT86RF231_REG__TRX_STATE,
+                        AT86RF231_TRX_STATE__RX_ON);
+
+    /* change into basic reception mode to initialise CSMA seed by RNG */
+    do {
+        int delay = _MAX_RETRIES;
+        if (!--delay) {
+            core_panic(0x0231,
+                       "at86rf231 : ERROR : could not enter RX_ON mode\n");
+        }
+    } while (at86rf231_current_mode() != AT86RF231_TRX_STATUS__RX_ON);
+
+    /* read RNG values into CSMA_SEED_0 */
+    for (int i=0; i<7; i+=2) {
+        uint8_t tmp = at86rf231_reg_read(AT86RF231_REG__PHY_CC_CCA);
+        tmp = ((tmp&0x60)>>5);
+        at86rf231_reg_write(AT86RF231_REG__CSMA_SEED_0, tmp << i);
+    }
+    /* read CSMA_SEED_1 and write back with RNG value */
+    uint8_t tmp = at86rf231_reg_read(AT86RF231_REG__CSMA_SEED_1);
+    tmp |= ((at86rf231_reg_read(AT86RF231_REG__PHY_CC_CCA) & 0x60) >> 5);
+    at86rf231_reg_write(AT86RF231_REG__CSMA_SEED_1, tmp);
+
+    /* change into reception mode */
+    at86rf231_switch_to_rx();
 }
 
 int at86rf231_get_option(netdev_t *dev, netdev_opt_t opt, void *value,
