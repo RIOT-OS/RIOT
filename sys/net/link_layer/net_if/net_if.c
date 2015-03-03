@@ -423,28 +423,21 @@ int net_if_get_eui64(net_if_eui64_t *eui64, int if_id, int force_generation)
 
     if (eui64->uint64 == 0 || force_generation) {
         uint16_t hwaddr = net_if_get_hardware_address(if_id);
+        int32_t pan_id = net_if_get_pan_id(if_id);
 
         if (hwaddr == 0) {
             return 0;
         }
 
-        /* RFC 6282 Section 3.2.2 / RFC 2464 Section 4 */
-        eui64->uint32[0] = HTONL(0x000000ff);
-        eui64->uint16[2] = HTONS(0xfe00);
-
-        if (sizeof(hwaddr) == 2) {
-            eui64->uint16[3] = HTONS(hwaddr);
-        }
-        else if (sizeof(hwaddr) == 1) {
-            eui64->uint8[6] = 0;
-            eui64->uint8[7] = (uint8_t)hwaddr;
-        }
-        else {
-            DEBUG("Error on EUI-64 generation: do not know what to do with "
-                  "hardware address of length %d\n", sizeof(hwaddr));
+        if(pan_id < 0) {
             return 0;
         }
 
+        /* RFC 6282 Section 3.2.2 / RFC 2464 Section 4 */
+        eui64->uint16[0] = HTONS((uint16_t)pan_id) & ~(1 << 1);
+        eui64->uint16[1] = HTONS(0x00ff);
+        eui64->uint16[2] = HTONS(0xfe00);
+        eui64->uint16[3] = HTONS(hwaddr);
     }
 
     return 1;

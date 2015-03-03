@@ -41,6 +41,7 @@
 
 static char monitor_stack_buffer[MONITOR_STACK_SIZE];
 radio_address_t id;
+int32_t pan_id = -1;
 
 static uint8_t is_root = 0;
 
@@ -96,6 +97,17 @@ void rpl_udp_init(int argc, char **argv)
 
         printf("Channel set to %" PRIi32 "\n", chan);
 
+        tcmd.transceivers = TRANSCEIVER;
+        tcmd.data = &pan_id;
+        m.type = GET_PAN;
+        m.content.ptr = (void *) &tcmd;
+
+        msg_send_receive(&m, &m, transceiver_pid);
+        if ( pan_id < 0 ) {
+            puts("ERROR: pan id NOT set! Aborting initialization.");
+            return;
+        }
+
         if (command != 'h') {
             DEBUGF("Initializing RPL for interface 0\n");
             uint8_t state = rpl_init(0);
@@ -141,7 +153,7 @@ void rpl_udp_init(int argc, char **argv)
     /* add global address */
     ipv6_addr_t tmp;
     /* initialize prefix */
-    ipv6_addr_init(&tmp, 0xabcd, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, id);
+    ipv6_addr_init(&tmp, (uint16_t) pan_id, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, id);
     /* set host suffix */
     ipv6_addr_set_by_eui64(&tmp, 0, &tmp);
     ipv6_net_if_add_addr(0, &tmp, NDP_ADDR_STATE_PREFERRED, 0, 0, 0);
