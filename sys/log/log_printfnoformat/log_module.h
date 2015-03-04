@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 
-static void _log(unsigned level, const char *format, ...) {
+static inline void _log(unsigned level, const char *format, ...) {
     (void)level;
     puts(format);
 }
