@@ -27,9 +27,10 @@ extern "C" {
  * @name Hardware timer configuration
  * @{
  */
-#define HWTIMER_MAXTIMERS   4               /**< the CPU implementation supports 4 HW timers */
-#define HWTIMER_SPEED       1000000         /**< the HW timer runs with 1MHz */
-#define HWTIMER_MAXTICKS    (0xFFFFFFFF)    /**< 32-bit timer */
+#define HWTIMER_MAXTIMERS       (4U)            /**< the CPU implementation supports 4 HW timers */
+#define HWTIMER_SPEED           (1000000U)      /**< the HW timer runs with 1MHz */
+#define HWTIMER_MAXTICKS        (0xFFFFFFFF)    /**< 32-bit timer */
+#define HWTIMER_SPIN_BARRIER    (11U)           /**< set cpu specific spin barrier */
 /** @} */
 
 #ifdef __cplusplus
