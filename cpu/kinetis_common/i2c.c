@@ -78,16 +78,46 @@ int i2c_init_master(i2c_t dev, i2c_speed_t speed)
     PORT_Type *i2c_port;
     int pin_scl = 0;
     int pin_sda = 0;
+    uint32_t baudrate_flags = 0;
 
-    /* TODO: read speed configuration */
+    /** @todo Kinetis I2C: Add automatic baud rate flags selection function */
+    /*
+     * See the Chapter "I2C divider and hold values":
+     *     Kinetis K60 Reference Manual, section 51.4.1.10, Table 51-41.
+     *     Kinetis MKW2x  Reference Manual, section 52.4.1.10, Table 52-41.
+     *
+     * baud rate = I2C_module_clock / (mul × ICR)
+     */
     switch (speed) {
+        case I2C_SPEED_LOW:
+            baudrate_flags |= I2C_F_MULT(KINETIS_I2C_F_MULT_LOW) |
+                I2C_F_ICR(KINETIS_I2C_F_ICR_LOW);
+            break;
+
         case I2C_SPEED_NORMAL:
+            baudrate_flags |= I2C_F_MULT(KINETIS_I2C_F_MULT_NORMAL) |
+                I2C_F_ICR(KINETIS_I2C_F_ICR_NORMAL);
             break;
 
         case I2C_SPEED_FAST:
+            baudrate_flags |= I2C_F_MULT(KINETIS_I2C_F_MULT_FAST) |
+                I2C_F_ICR(KINETIS_I2C_F_ICR_FAST);
+            break;
+
+        case I2C_SPEED_FAST_PLUS:
+            baudrate_flags |= I2C_F_MULT(KINETIS_I2C_F_MULT_FAST_PLUS) |
+                I2C_F_ICR(KINETIS_I2C_F_ICR_FAST_PLUS);
             break;
 
         default:
+            /*
+             * High speed mode is not supported on Kinetis devices,
+             * see: https://community.freescale.com/thread/316371
+             *
+             * Hardware allows setting the baud rate high enough but the
+             * capacitance of the bus and lacking a proper high speed mode SCL
+             * driver will make the signals go out of spec.
+             */
             return -2;
     }
 
@@ -113,17 +143,7 @@ int i2c_init_master(i2c_t dev, i2c_speed_t speed)
     i2c_port->PCR[pin_scl] = I2C_0_PORT_CFG;
     i2c_port->PCR[pin_sda] = I2C_0_PORT_CFG;
 
-    /*
-     * TODO: Add baud rate selection function
-     * See the Chapter "I2C divider and hold values":
-     *     Kinetis K60 Reference Manual, section 51.4.1.10, Table 51-41.
-     *     Kinetis MKW2x  Reference Manual, section 52.4.1.10, Table 52-41.
-     *
-     * baud rate = I2C_module_clock / (mul × ICR)
-     *
-     * The assignment below will set baud rate to I2C_module_clock / (240 x 2).
-     */
-    i2c->F = I2C_F_MULT(1) | I2C_F_ICR(0x1f);
+    i2c->F = baudrate_flags;
 
     /* enable i2c-module and interrupt */
     i2c->C1 = I2C_C1_IICEN_MASK | I2C_C1_IICIE_MASK | I2C_C1_TXAK_MASK;
