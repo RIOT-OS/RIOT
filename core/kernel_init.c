@@ -82,19 +82,19 @@ static char idle_stack[KERNEL_CONF_STACKSIZE_IDLE];
 void kernel_init(void)
 {
     (void) disableIRQ();
-    log_info("kernel_init(): This is RIOT! (Version: %s)\n", RIOT_VERSION);
+    log(LOG_INFO, "kernel_init(): This is RIOT! (Version: %s)\n", RIOT_VERSION);
 
     hwtimer_init();
 
     if (thread_create(idle_stack, sizeof(idle_stack), PRIORITY_IDLE, CREATE_WOUT_YIELD | CREATE_STACKTEST, idle_thread, NULL, idle_name) < 0) {
-        log_error("kernel_init(): error creating idle task.\n");
+        log(LOG_ERROR, "kernel_init(): error creating idle task.\n");
     }
 
     if (thread_create(main_stack, sizeof(main_stack), PRIORITY_MAIN, CREATE_WOUT_YIELD | CREATE_STACKTEST, main_trampoline, NULL, main_name) < 0) {
-        log_error("kernel_init(): error creating main task.\n");
+        log(LOG_ERROR, "kernel_init(): error creating main task.\n");
     }
 
-    log_info("kernel_init(): jumping into first task...\n");
+    log(LOG_INFO, "kernel_init(): jumping into first task...\n");
 
     cpu_switch_context_exit();
 }

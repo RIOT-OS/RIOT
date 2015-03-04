@@ -44,23 +44,15 @@ enum {
  * @{
  */
 
-#define LOG(level, ...) if (level <= LOG_LEVEL) _log(level, __VA_ARGS__)
+#define log(level, ...) if (level <= LOG_LEVEL) _log(level, __VA_ARGS__)
 
 /** @} */
 
 #ifdef HAVE_LOG_MODULE
 #include "log_module.h"
 #else
-
 #include <stdio.h>
-
 #define _log(level, ...) printf(__VA_ARGS__)
-
-#define log_error(...) LOG(LOG_ERROR, __VA_ARGS__)
-#define log_warning(...) LOG(LOG_WARNING, __VA_ARGS__)
-#define log_info(...) LOG(LOG_INFO, __VA_ARGS__)
-#define log_debug(...) LOG(LOG_DEBUG, __VA_ARGS__)
-
 #endif
 
 #ifdef __cplusplus
