@@ -24,6 +24,7 @@
 #ifndef NG_NETIF_H_
 #define NG_NETIF_H_
 
+#include <stdlib.h>
 #include "kernel_types.h"
 
 #ifdef __cplusplus
