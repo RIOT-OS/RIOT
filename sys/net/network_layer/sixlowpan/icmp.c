@@ -1232,7 +1232,7 @@ void icmpv6_send_neighbor_adv(ipv6_addr_t *src, ipv6_addr_t *dst, ipv6_addr_t *t
             packet_length += OPT_STLLAO_MAX_LEN;
         }
         else {
-            icmpv6_ndp_set_sllao(opt_stllao_buf, if_id, NDP_OPT_SLLAO_TYPE, 1);
+            icmpv6_ndp_set_sllao(opt_stllao_buf, if_id, NDP_OPT_TLLAO_TYPE, 1);
             icmpv6_opt_hdr_len += OPT_STLLAO_MIN_LEN;
             packet_length += OPT_STLLAO_MIN_LEN;
         }
