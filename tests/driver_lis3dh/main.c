@@ -59,7 +59,7 @@
 #define SCALE       LIS3DH_SCALE_4G
 #define ODR         LIS3DH_ODR_100Hz
 #define SLEEP       (100 * 1000U)
-#define SPI_CONF    (SPI_)
+#define SPI_CONF    (SPI_CONF_SECOND_FALLING)
 
 int main(void)
 {
@@ -69,7 +69,7 @@ int main(void)
 
     puts("LIS3DH accelerometer driver test application\n");
     printf("Initializing SPI_%i... ", TEST_LIS3DH_SPI);
-    if (spi_init_master(TEST_LIS3DH_SPI, SPI_CONF_SECOND_FALLING, SPI_SPEED_10MHZ) == 0) {
+    if (spi_init_master(TEST_LIS3DH_SPI, SPI_CONF, SPI_SPEED_10MHZ) == 0) {
         puts("[OK]");
     }
     else {
