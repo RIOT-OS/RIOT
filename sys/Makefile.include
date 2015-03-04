@@ -83,3 +83,8 @@ ifneq (,$(filter embunit,$(USEMODULE)))
         CFLAGS += -DOUTPUT=OUTPUT_COMPILER
     endif
 endif
+
+ifneq (,$(filter log_printfnoformat,$(USEMODULE)))
+    USEMODULE_INCLUDES += $(RIOTBASE)/sys/log/log_printfnoformat
+    CFLAGS += -DHAVE_LOG_MODULE
+endif
