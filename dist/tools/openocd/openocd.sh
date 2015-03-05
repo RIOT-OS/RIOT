@@ -127,7 +127,9 @@ do_flash() {
             -c "targets" \
             -c "reset halt" \
             -c "program ${HEXFILE} verify" \
-            -c "reset run"
+            -c "reset run" \
+            -c "shutdown"
+    echo "Done flashing"
 }
 
 do_debug() {
