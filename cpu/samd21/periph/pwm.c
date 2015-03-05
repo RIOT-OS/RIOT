@@ -111,10 +111,8 @@ int pwm_init(pwm_t dev, pwm_mode_t mode, unsigned int frequency, unsigned int re
     /* 8MHz  source divided by presc */
     pwm_dev->CTRLA.bit.PRESCALER = presc;
 
-    /* the timer/counter is counting up */
-    pwm_dev->CTRLBCLR.reg |= TCC_CTRLBSET_DIR;
     /* reload or reset the counter on next generic clock */
-    pwm_dev->CTRLBCLR.reg |= TCC_CTRLBSET_ONESHOT;
+    pwm_dev->CTRLBCLR.bit.ONESHOT = 1;
     while (pwm_dev->SYNCBUSY.bit.CTRLB);
 
     /* select the waveform generation operation */
@@ -128,13 +126,20 @@ int pwm_init(pwm_t dev, pwm_mode_t mode, unsigned int frequency, unsigned int re
     /* set PWM mode */
     switch (mode) {
         case PWM_LEFT:
+            /* the timer/counter is counting up */
+            pwm_dev->CTRLBCLR.bit.DIR = 1;
+            while (pwm_dev->SYNCBUSY.bit.CTRLB);
             break;
         case PWM_RIGHT:
+            /* the timer/counter is counting down */
+            pwm_dev->CTRLBSET.bit.DIR = 1;
+            while (pwm_dev->SYNCBUSY.bit.CTRLB);
             break;
         case PWM_CENTER:
-            break;
-        //default:
-        //    return -1;
+            /* the center mode is not supported */
+            return -1;
+        default:
+            return -1;
     }
 
     pwm_start(dev);
