@@ -200,11 +200,10 @@ int msg_send_receive(msg_t *m, msg_t *reply, kernel_pid_t target_pid);
  * Sender must have sent the message with msg_send_receive().
  *
  * @param[in] m         message to reply to, must not be NULL.
- * @param[out] reply    message that target will get as reply, must not be
- *                      NULL.
+ * @param[out] reply    message that target will get as reply, must not be NULL.
  *
  * @return 1, if successful
- * @return 0, on error
+ * @return -1, on error
  */
 int msg_reply(msg_t *m, msg_t *reply);
 
