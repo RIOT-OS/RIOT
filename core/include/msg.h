@@ -219,7 +219,7 @@ int msg_reply(msg_t *m, msg_t *reply);
  * @return 1, if successful
  * @return -1, on error
  */
-int msg_reply_int(msg_t *m, msg_t *reply)
+int msg_reply_int(msg_t *m, msg_t *reply);
 
 /**
  * @brief Initialize the current thread's message queue.
