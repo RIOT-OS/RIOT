@@ -38,7 +38,13 @@ extern "C" {
 /**
  * @brief   Length of an IPv6 address in bit.
  */
-#define NG_IPV6_ADDR_BIT_LEN    (128)
+#define NG_IPV6_ADDR_BIT_LEN        (128)
+
+/**
+ * @brief   Maximum length of an IPv6 address as string.
+ */
+#define NG_IPV6_ADDR_MAX_STR_LEN    (sizeof("ffff:ffff:ffff:ffff:" \
+                                            "ffff:ffff:ffff:ffff"))
 
 /**
  * @brief Data type to represent an IPv6 address.
@@ -496,6 +502,23 @@ static inline void ng_ipv6_addr_set_solicited_nodes(ng_ipv6_addr_t *out,
     out->u16[7] = in->u16[7];
 }
 
+/**
+ * @brief   Converts an IPv6 address to its string representation
+ *
+ * @see <a href="https://tools.ietf.org/html/rfc5952">
+ *          RFC 5952
+ *      </a>
+ *
+ * @param[out] result       The resulting string representation
+ * @param[in] addr          An IPv6 address
+ * @param[in] result_len    Length of @p result_len
+ *
+ * @return  @p result, on success
+ * @return  NULL, if @p result_len was smaller than needed
+ * @return  NULL, if @p result or @p addr was NULL
+ */
+char *ng_ipv6_addr_to_str(char *result, const ng_ipv6_addr_t *addr,
+                          uint8_t result_len);
 
 #ifdef __cplusplus
 }
