@@ -520,6 +520,23 @@ static inline void ng_ipv6_addr_set_solicited_nodes(ng_ipv6_addr_t *out,
 char *ng_ipv6_addr_to_str(char *result, const ng_ipv6_addr_t *addr,
                           uint8_t result_len);
 
+/**
+ * @brief   Converts an IPv6 address string representation to a byte-represented
+ *          IPv6 address
+ *
+ * @see <a href="https://tools.ietf.org/html/rfc5952">
+ *          RFC 5952
+ *      </a>
+ *
+ * @param[in] result    The resulting byte representation
+ * @param[in] addr      An IPv6 address string representation
+ *
+ * @return  @p result, on success
+ * @return  NULL, if @p addr was malformed
+ * @return  NULL, if @p result or @p addr was NULL
+ */
+ng_ipv6_addr_t *ng_ipv6_addr_from_str(ng_ipv6_addr_t *result, const char *addr);
+
 #ifdef __cplusplus
 }
 #endif
