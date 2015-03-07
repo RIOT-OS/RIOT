@@ -35,6 +35,9 @@
 #   elif (OUTPUT==OUTPUT_COMPILER)
 #       include "embUnit/CompilerOutputter.h"
 #       define OUTPUTTER   (CompilerOutputter_outputter())
+#   elif (OUTPUT==OUTPUT_COLORTEXT)
+#       include "embUnit/ColorTextOutputter.h"
+#       define OUTPUTTER   (ColorTextOutputter_outputter())
 #   endif
 
 #   include "embUnit/TextUIRunner.h"
