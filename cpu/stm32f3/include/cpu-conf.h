@@ -54,6 +54,11 @@
 #endif
 /** @} */
 
+/**
+ * @brief Length for reading CPU_ID
+ */
+#define CPUID_ID_LEN                    (12)
+
 #ifdef __cplusplus
 extern "C" {
 #endif
