@@ -24,6 +24,7 @@
 
 #include "kernel_types.h"
 #include "net/ng_nettype.h"
+#include "net/ng_pkt.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -125,6 +126,25 @@ int ng_netreg_num(ng_nettype_t type, uint32_t demux_ctx);
  * @return  NULL if no entry new entry can be found.
  */
 ng_netreg_entry_t *ng_netreg_getnext(ng_netreg_entry_t *entry);
+
+/**
+ * @brief   Builds a header for sending and adds it to the packet buffer.
+ *
+ * @param[in] type      Type of the header.
+ * @param[in] payload   Payload for the packet.
+ * @param[in] src       Source address for the header. Can be NULL if not
+ *                      known or required.
+ * @param[in] src_len   Length of @p src. Can be 0 if not known or required.
+ * @param[in] dst       Destination address for the header. Can be NULL if not
+ *                      known or required.
+ * @param[in] dst_len   Length of @p dst. Can be 0 if not known or required.
+ *
+ * @return  The header for the protocol on success.
+ * @return  NULL on error.
+ */
+ng_pktsnip_t *ng_netreg_hdr_build(ng_nettype_t type, ng_pktsnip_t *payload,
+                                  uint8_t *src, uint8_t src_len,
+                                  uint8_t *dst, uint8_t dst_len);
 
 #ifdef __cplusplus
 }
