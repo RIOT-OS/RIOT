@@ -19,6 +19,7 @@
 #include "utlist.h"
 #include "net/ng_netreg.h"
 #include "net/ng_nettype.h"
+#include "net/ng_pkt.h"
 #include "net/ng_ipv6.h"
 
 #define _INVALID_TYPE(type) (((type) < NG_NETTYPE_UNDEF) || ((type) >= NG_NETTYPE_NUMOF))
@@ -100,6 +101,33 @@ ng_netreg_entry_t *ng_netreg_getnext(ng_netreg_entry_t *entry)
     LL_SEARCH_SCALAR(entry->next, entry, demux_ctx, demux_ctx);
 
     return entry;
+}
+
+int ng_netreg_calc_csum(ng_pktsnip_t *hdr, ng_pktsnip_t *pseudo_hdr)
+{
+    if (pseudo_hdr == NULL) {
+        /* XXX: Might be allowed for future checksums.
+         *      If this is the case: move this to the branches were it
+         *      is needed. */
+        return -EINVAL;
+    }
+
+    switch (hdr->type) {
+#ifdef MODULE_NG_ICMPV6
+        case NG_NETTYPE_ICMPV6:
+            return ng_icmpv6_calc_csum(hdr, pseudo_hdr);
+#endif
+#ifdef MODULE_NG_TCP
+        case NG_NETTYPE_TCP:
+            return ng_tcp_calc_csum(hdr, pseudo_hdr);
+#endif
+#ifdef MODULE_NG_UDP
+        case NG_NETTYPE_UDP:
+            return ng_udp_calc_csum(hdr, pseudo_hdr);
+#endif
+        default:
+            return -ENOENT;
+    }
 }
 
 ng_pktsnip_t *ng_netreg_hdr_build(ng_nettype_t type, ng_pktsnip_t *payload,
