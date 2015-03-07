@@ -30,6 +30,8 @@ Other output formats using [*embUnit*](http://embunit.sourceforge.net/)'s ``text
 * Compiler: ``OUTPUT="COMPILER"``
 * Text: ``OUTPUT="TEXT"``
 * XML: ``OUTPUT="XML"``
+* Color: ``OUTPUT="COLOR"`` (like default, but with red/green output)
+* Colored-Text: ``OUTPUT="COLORTEXT"`` (like ``TEXT``, but with red/green output)
 
 #### Compile example
 ```bash
