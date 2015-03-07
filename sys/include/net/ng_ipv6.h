@@ -33,6 +33,7 @@
 #include "thread.h"
 
 #include "net/ng_ipv6/addr.h"
+#include "net/ng_ipv6/ext.h"
 #include "net/ng_ipv6/hdr.h"
 #include "net/ng_ipv6/nc.h"
 #include "net/ng_ipv6/netif.h"

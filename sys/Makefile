@@ -74,6 +74,9 @@ endif
 ifneq (,$(filter ng_ipv6_addr,$(USEMODULE)))
     DIRS += net/network_layer/ng_ipv6/addr
 endif
+ifneq (,$(filter ng_ipv6_ext,$(USEMODULE)))
+    DIRS += net/network_layer/ng_ipv6/ext
+endif
 ifneq (,$(filter ng_ipv6_hdr,$(USEMODULE)))
     DIRS += net/network_layer/ng_ipv6/hdr
 endif

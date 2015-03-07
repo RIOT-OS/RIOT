@@ -112,6 +112,18 @@ ifneq (,$(filter ng_ipv6_hdr,$(USEMODULE)))
   USEMODULE += ng_pktbuf
 endif
 
+ifneq (,$(filter ng_rpl_srh,$(USEMODULE)))
+  USEMODULE += ng_ipv6_ext_rh
+endif
+
+ifneq (,$(filter ng_ipv6_ext_rh,$(USEMODULE)))
+  USEMODULE += ng_ipv6_ext
+endif
+
+ifneq (,$(filter ng_ipv6_ext,$(USEMODULE)))
+  USEMODULE += ng_ipv6
+endif
+
 ifneq (,$(filter ng_ipv6_router,$(USEMODULE)))
   USEMODULE += ng_ipv6
 endif
