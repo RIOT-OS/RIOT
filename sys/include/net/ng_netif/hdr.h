@@ -15,6 +15,7 @@
  * @brief       Generic network interface header
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 
 #ifndef NETIF_HDR_H_
@@ -24,6 +25,8 @@
 #include <stdint.h>
 
 #include "kernel.h"
+#include "net/ng_pkt.h"
+#include "net/ng_pktbuf.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -132,6 +135,44 @@ static inline void ng_netif_hdr_set_dst_addr(ng_netif_hdr_t *hdr, uint8_t *addr,
     }
 
     memcpy(((uint8_t *)(hdr + 1)) + hdr->src_l2addr_len, addr, addr_len);
+}
+
+/**
+ * @brief   Builds a generic network interface header for sending and
+ *          adds it to the packet buffer.
+ *
+ * @param[in] src       Source address for the header. Can be NULL if not
+ *                      known or required.
+ * @param[in] src_len   Length of @p src. Can be 0 if not known or required.
+ * @param[in] dst       Destination address for the header. Can be NULL if not
+ *                      known or required.
+ * @param[in] dst_len   Length of @p dst. Can be 0 if not known or required.
+ *
+ * @return  The generic network layer header on success.
+ * @return  NULL on error.
+ */
+static inline ng_pktsnip_t *ng_netif_hdr_build(uint8_t *src, uint8_t src_len,
+                                               uint8_t *dst, uint8_t dst_len)
+{
+    ng_pktsnip_t *pkt = ng_pktbuf_add(NULL, NULL,
+                                      sizeof(ng_netif_hdr_t) + src_len + dst_len,
+                                      NG_NETTYPE_NETIF);
+
+    if (pkt == NULL) {
+        return NULL;
+    }
+
+    ng_netif_hdr_init(pkt->data, src_len, dst_len);
+
+    if (src != NULL && src_len > 0) {
+        ng_netif_hdr_set_src_addr(pkt->data, src, src_len);
+    }
+
+    if (dst != NULL && dst_len > 0) {
+        ng_netif_hdr_set_dst_addr(pkt->data, dst, dst_len);
+    }
+
+    return pkt;
 }
 
 #ifdef __cplusplus
