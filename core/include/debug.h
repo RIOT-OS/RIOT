@@ -26,8 +26,15 @@
 #include "sched.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
+
+/**
+ * @def ENABLE_DEBUG
+ * @brief   This macro can be defined as 0 or other on a file-based level.
+ *          If ENABLE_DEBUG is 0 @ref DEBUG() and @ref DEBUGF() will generate
+ *          no output if not they will generate output.
+ */
 
 /**
  * @name Print debug information if the calling thread stack is large enough

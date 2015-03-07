@@ -1990,7 +1990,10 @@ PREDEFINED             = __attribute__(x)= \
                          RTT_NUMOF \
                          GPIO_NUMOF \
                          SPI_NUMOF \
-                         UART_NUMOF
+                         UART_NUMOF \
+                         DEVELHELP \
+                         ENABLE_DEBUG \
+                         TEST_SUITES
 
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this
