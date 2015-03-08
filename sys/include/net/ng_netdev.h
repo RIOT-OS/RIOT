@@ -145,11 +145,11 @@ typedef struct {
 
     /**
      * @brief   This function is called by a MAC layer when a message of type
-     *          NETDEV_MSG_EVENT_TYPE was received
+     *          @ref NG_NETDEV_MSG_TYPE_EVENT was received
      *
      * @param[in] dev           network device descriptor
-     * @param[in] event_type    event type, given by @ref msg_t::value in the
-     *                          received message
+     * @param[in] event_type    event type, given by msg_t::content::value
+     *                          in the received message
      */
     void (*isr_event)(ng_netdev_t *dev, uint16_t event_type);
 } ng_netdev_driver_t;
