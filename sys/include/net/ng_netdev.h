@@ -151,7 +151,7 @@ typedef struct {
      * @param[in] event_type    event type, given by msg_t::content::value
      *                          in the received message
      */
-    void (*isr_event)(ng_netdev_t *dev, uint16_t event_type);
+    void (*isr_event)(ng_netdev_t *dev, uint32_t event_type);
 } ng_netdev_driver_t;
 
 /**
