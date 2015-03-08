@@ -35,6 +35,7 @@
 
 #include "board_internal.h"
 #include "native_internal.h"
+#include "ng_tapnet.h"
 #include "tap.h"
 
 int _native_null_in_pipe[2];
@@ -252,7 +253,7 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
     int replay = 0;
 #endif
 
-#ifdef MODULE_NATIVENET
+#if defined(MODULE_NATIVENET) || defined(MODULE_NG_TAPNET)
     if (
             (argc < 2)
             || (
@@ -366,6 +367,20 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
     native_interrupt_init();
 #ifdef MODULE_NATIVENET
     tap_init(argv[1]);
+#endif
+#ifdef MODULE_NG_TAPNET
+# ifdef MODULE_NATIVENET
+#  error  "Modules nativenet and ng_tapnet are mutually exclusive."
+# endif
+
+    do {    /* Don't wanna have this int forever reserved ;-) */
+        int res;
+
+        if ((res = ng_tapnet_init(&ng_tapnet, argv[1], strlen(argv[1]))) < 0) {
+            errno = -res;
+            err(EXIT_FAILURE, "initialization ng_tapnet");
+        }
+    } while (0);
 #endif
 
     board_init();

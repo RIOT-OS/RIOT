@@ -57,6 +57,10 @@ ifneq (,$(filter ng_ipv6_netif,$(USEMODULE)))
   USEMODULE += ng_netif
 endif
 
+ifneq (,$(filter ng_tapnet,$(USEMODULE)))
+  USEMODULE += ng_pktbuf
+endif
+
 ifneq (,$(filter ng_netbase,$(USEMODULE)))
   USEMODULE += ng_netapi
   USEMODULE += ng_netreg
