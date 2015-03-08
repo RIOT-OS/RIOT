@@ -54,6 +54,11 @@
 /** @} */
 
 /**
+ * @brief Length for reading CPU_ID
+ */
+#define CPUID_ID_LEN                    (12)
+
+/**
  * @name CC110X buffer size definitions for the stm32f4
  * @{
  */
