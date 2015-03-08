@@ -50,8 +50,8 @@ typedef struct __attribute__((packed)) {
  * @param[in] src_l2addr_len    link layer source address length
  * @param[in] dst_l2addr_len    link layer destination address length
  */
-inline void ng_netif_hdr_init(ng_netif_hdr_t *hdr, uint8_t src_l2addr_len,
-                          uint8_t dst_l2addr_len)
+static inline void ng_netif_hdr_init(ng_netif_hdr_t *hdr, uint8_t src_l2addr_len,
+                                     uint8_t dst_l2addr_len)
 {
     hdr->src_l2addr_len = src_l2addr_len;
     hdr->dst_l2addr_len = dst_l2addr_len;
@@ -68,7 +68,7 @@ inline void ng_netif_hdr_init(ng_netif_hdr_t *hdr, uint8_t src_l2addr_len,
  * @return                  the size of the given header, including link layer
  *                          addresses
  */
-inline size_t ng_netif_hdr_sizeof(ng_netif_hdr_t *hdr)
+static inline size_t ng_netif_hdr_sizeof(ng_netif_hdr_t *hdr)
 {
     return sizeof(ng_netif_hdr_t) + hdr->src_l2addr_len + hdr->dst_l2addr_len;
 }
@@ -81,7 +81,7 @@ inline size_t ng_netif_hdr_sizeof(ng_netif_hdr_t *hdr)
  * @return                  pointer to source address on success
  * @return                  NULL on error
  */
-inline uint8_t *ng_netif_hdr_get_src_addr(ng_netif_hdr_t *hdr)
+static inline uint8_t *ng_netif_hdr_get_src_addr(ng_netif_hdr_t *hdr)
 {
     return ((uint8_t *)hdr) + sizeof(ng_netif_hdr_t);
 }
@@ -93,12 +93,13 @@ inline uint8_t *ng_netif_hdr_get_src_addr(ng_netif_hdr_t *hdr)
  * @param[in] addr          new source address
  * @param[in] addr_len      *addr* length
  */
-inline void ng_netif_hdr_set_src_addr(ng_netif_hdr_t *hdr, uint8_t *addr,
-                                  uint8_t addr_len)
+static inline void ng_netif_hdr_set_src_addr(ng_netif_hdr_t *hdr, uint8_t *addr,
+        uint8_t addr_len)
 {
     if (addr_len != hdr->src_l2addr_len) {
         return;
     }
+
     memcpy(((uint8_t *)hdr) + sizeof(ng_netif_hdr_t), addr, addr_len);
 }
 
@@ -111,7 +112,7 @@ inline void ng_netif_hdr_set_src_addr(ng_netif_hdr_t *hdr, uint8_t *addr,
  * @return                  pointer to destination address on success
  * @return                  NULL on error
  */
-inline uint8_t *ng_netif_hdr_get_dst_addr(ng_netif_hdr_t *hdr)
+static inline uint8_t *ng_netif_hdr_get_dst_addr(ng_netif_hdr_t *hdr)
 {
     return ((uint8_t *)hdr) + sizeof(ng_netif_hdr_t) + hdr->src_l2addr_len;
 }
@@ -123,12 +124,13 @@ inline uint8_t *ng_netif_hdr_get_dst_addr(ng_netif_hdr_t *hdr)
  * @param[in] addr          new destination address
  * @param[in] addr_len      *addr* length
  */
-inline void ng_netif_hdr_set_dst_addr(ng_netif_hdr_t *hdr, uint8_t *addr,
-                                  uint8_t addr_len)
+static inline void ng_netif_hdr_set_dst_addr(ng_netif_hdr_t *hdr, uint8_t *addr,
+        uint8_t addr_len)
 {
     if (addr_len != hdr->dst_l2addr_len) {
         return;
     }
+
     memcpy(((uint8_t *)hdr) + sizeof(ng_netif_hdr_t) + hdr->dst_l2addr_len,
            addr, addr_len);
 }
