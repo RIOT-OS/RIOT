@@ -507,24 +507,31 @@ int at86rf231_get_tx_power(void)
     return TX_POW_TO_DBM[pow];
 }
 
-static void at86rf231_reset_sfd_count(void)
+void at86rf231_reset_sfd_count(void)
 {
     sfd_count = 0;
 }
 
-static unsigned long at86rf231_get_sfd_count(void)
+unsigned long at86rf231_get_sfd_count(void)
 {
     return sfd_count;
 }
 
-static void at86rf231_set_cca_threshold(int pow)
+int at86rf231_set_cca_threshold(int pow)
 {
+    if (pow < -91) {
+        pow = -91;
+    }
+    if (pow > -61) {
+        pow = -61;
+    }
     uint8_t val = (pow - AT86RF231_RSSI_BASE_VAL) >> 1;
     at86rf231_reg_write(AT86RF231_REG__CCA_THRES,
                         val & AT86RF231_CCA_THRES_MASK__CCA_ED_THRES);
+    return pow;
 }
 
-static int at86rf231_get_cca_threshold(void)
+int at86rf231_get_cca_threshold(void)
 {
     uint8_t val = at86rf231_reg_read(AT86RF231_REG__CCA_THRES)
                 & AT86RF231_CCA_THRES_MASK__CCA_ED_THRES;

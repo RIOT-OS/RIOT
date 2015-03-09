@@ -24,12 +24,6 @@ extern "C" {
 #endif
 
 
-#define AT86RF231_RSSI_BASE_VAL -94
-
-#define AT86RF231_TX_POWER_MIN  -17
-#define AT86RF231_TX_POWER_MAX  4
-
-
 #define AT86RF231_RX_BUF_SIZE   3
 
 enum at86rf231_access {
