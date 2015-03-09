@@ -83,7 +83,7 @@ static inline size_t ng_netif_hdr_sizeof(ng_netif_hdr_t *hdr)
  */
 static inline uint8_t *ng_netif_hdr_get_src_addr(ng_netif_hdr_t *hdr)
 {
-    return ((uint8_t *)hdr) + sizeof(ng_netif_hdr_t);
+    return ((uint8_t *)(hdr + 1));
 }
 
 /**
@@ -100,7 +100,7 @@ static inline void ng_netif_hdr_set_src_addr(ng_netif_hdr_t *hdr, uint8_t *addr,
         return;
     }
 
-    memcpy(((uint8_t *)hdr) + sizeof(ng_netif_hdr_t), addr, addr_len);
+    memcpy(((uint8_t *)(hdr + 1)), addr, addr_len);
 }
 
 
@@ -114,7 +114,7 @@ static inline void ng_netif_hdr_set_src_addr(ng_netif_hdr_t *hdr, uint8_t *addr,
  */
 static inline uint8_t *ng_netif_hdr_get_dst_addr(ng_netif_hdr_t *hdr)
 {
-    return ((uint8_t *)hdr) + sizeof(ng_netif_hdr_t) + hdr->src_l2addr_len;
+    return (((uint8_t *)(hdr + 1)) + hdr->src_l2addr_len);
 }
 
 /**
@@ -131,8 +131,7 @@ static inline void ng_netif_hdr_set_dst_addr(ng_netif_hdr_t *hdr, uint8_t *addr,
         return;
     }
 
-    memcpy(((uint8_t *)hdr) + sizeof(ng_netif_hdr_t) + hdr->dst_l2addr_len,
-           addr, addr_len);
+    memcpy(((uint8_t *)(hdr + 1)) + hdr->src_l2addr_len, addr, addr_len);
 }
 
 #ifdef __cplusplus
