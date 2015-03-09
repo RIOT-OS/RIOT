@@ -6,7 +6,8 @@
  * directory for more details.
  */
 
-/**
+/*
+ * @defgroup etx_beaconing
  * @ingroup     rpl
  * @{
  * @file        etx_beaconing.h
@@ -44,8 +45,8 @@ extern "C" {
 #define MS  (1000)
 
 /*
- * ETX_INTERVAL
- *
+ * @{
+ * @name ETX Interval parameters
  * Given in ms, the default is 1 second.
  * Should be divisible through 2 (For ETX_DEF_JIT_CORRECT)
  * and 5 (For ETX_MAX_JITTER) unless those values are adjusted too.
@@ -61,6 +62,7 @@ extern "C" {
 #define ETX_DEF_JIT_CORRECT (ETX_MAX_JITTER / 2)    /**< Default Jitter correction value (normally ETX_MAX_JITTER / 2) */
 #define ETX_CLOCK_ADJUST    (52500)                 /**< Adjustment for clockthread computations to stay close/near ETX_INTERVAL */
 
+/** @} */
 /*
  * The ETX beaconing packet consists of:
  *
