@@ -98,10 +98,10 @@ static void rtc_irq_handler(uint8_t irq_num)
     (void) irq_num; /* == PIC_NUM_RTC */
 
     uint8_t c = x86_cmos_read(RTC_REG_C);
-    DEBUG("RTC: c = 0x%02x, IRQ=%u, A=%u, P=%u, U=%u\n", c, c & RTC_REG_C_IRQ ? 1 : 0,
-                                                            c & RTC_REG_C_IRQ_ALARM ? 1 : 0,
-                                                            c & RTC_REG_C_IRQ_PERIODIC ? 1 : 0,
-                                                            c & RTC_REG_C_IRQ_UPDATE ? 1 : 0);
+    DEBUG("RTC: c = 0x%02x, IRQ=%u, A=%u, P=%u, U=%u\n", c, (c & RTC_REG_C_IRQ) ? 1 : 0,
+                                                            (c & RTC_REG_C_IRQ_ALARM) ? 1 : 0,
+                                                            (c & RTC_REG_C_IRQ_PERIODIC) ? 1 : 0,
+                                                            (c & RTC_REG_C_IRQ_UPDATE) ? 1 : 0);
     if (!(c & RTC_REG_C_IRQ)) {
         return;
     }
