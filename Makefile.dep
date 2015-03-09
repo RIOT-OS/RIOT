@@ -58,8 +58,13 @@ ifneq (,$(filter ng_icmpv6_echo,$(USEMODULE)))
   USEMODULE += ng_netbase
 endif
 
+ifneq (,$(filter ng_ndp,$(USEMODULE)))
+  USEMODULE += ng_icmpv6
+  USEMODULE += random
+endif
+
 ifneq (,$(filter ng_icmpv6,$(USEMODULE)))
-  USEMODULE += ng_ipv6
+    USEMODULE += ng_ipv6
 endif
 
 ifneq (,$(filter ng_ipv6_hdr,$(USEMODULE)))
@@ -78,6 +83,7 @@ ifneq (,$(filter ng_ipv6,$(USEMODULE)))
   USEMODULE += ng_ipv6_hdr
   USEMODULE += ng_ipv6_nc
   USEMODULE += ng_ipv6_netif
+  USEMODULE += ng_ndp
   USEMODULE += ng_netbase
 endif
 

@@ -24,6 +24,7 @@
 #include "net/ng_netbase.h"
 #include "net/ng_protnum.h"
 #include "net/ng_ipv6/hdr.h"
+#include "net/ng_ndp.h"
 #include "od.h"
 #include "utlist.h"
 
@@ -75,16 +76,14 @@ void ng_icmpv6_demux(kernel_pid_t iface, ng_pktsnip_t *pkt)
             break;
 #endif
 
-#ifdef MODULE_NG_NDP
         case NG_ICMPV6_RTR_SOL:
         case NG_ICMPV6_RTR_ADV:
         case NG_ICMPV6_NBR_SOL:
         case NG_ICMPV6_NBR_ADV:
         case NG_ICMPV6_REDIRECT:
             DEBUG("icmpv6: neighbor discovery message received\n");
-            /* TODO */
+            ng_ndp_demux(iface, pkt, ipv6->data, hdr, icmpv6->size);
             break;
-#endif
 
 #ifdef MODULE_NG_RPL
         case NG_ICMPV6_RPL_CTRL:
