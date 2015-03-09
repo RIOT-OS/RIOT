@@ -21,9 +21,11 @@
 #include "utlist.h"
 
 #define _INVALID_TYPE(type) (((type) <= NG_NETTYPE_UNDEF) || ((type) >= NG_NETTYPE_NUMOF))
+#define _NETREG_SIZE  (NG_NETTYPE_NUMOF - 1) /* leave out NG_NETTYPE_UNDEF */
 
+#if _NETREG_SIZE > 0
 /* The registry as lookup table by ng_nettype_t */
-static ng_netreg_entry_t *netreg[NG_NETTYPE_NUMOF - 1]; /* leave out NG_NETTYPE_UNDEF */
+static ng_netreg_entry_t *netreg[_NETREG_SIZE];
 
 void ng_netreg_init(void)
 {
@@ -100,5 +102,45 @@ ng_netreg_entry_t *ng_netreg_getnext(ng_netreg_entry_t *entry)
 
     return entry;
 }
+#else
+void ng_netreg_init(void)
+{
+    return;
+}
+
+int ng_netreg_register(ng_nettype_t type, ng_netreg_entry_t *entry)
+{
+    (void)type;
+    (void)entry;
+    return -EINVAL;
+}
+
+void ng_netreg_unregister(ng_nettype_t type, ng_netreg_entry_t *entry)
+{
+    (void)type;
+    (void)entry;
+    return;
+}
+
+ng_netreg_entry_t *ng_netreg_lookup(ng_nettype_t type, uint32_t demux_ctx)
+{
+    (void)type;
+    (void)demux_ctx;
+    return NULL;
+}
+
+int ng_netreg_num(ng_nettype_t type, uint32_t demux_ctx)
+{
+    (void)type;
+    (void)demux_ctx;
+    return 0;
+}
+
+ng_netreg_entry_t *ng_netreg_getnext(ng_netreg_entry_t *entry)
+{
+    (void)entry;
+    return NULL;
+}
+#endif
 
 /** @} */
