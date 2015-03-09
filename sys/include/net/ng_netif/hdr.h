@@ -7,8 +7,8 @@
  */
 
 /**
- * @defgroup    net_netif_hdr Generic network interface header
- * @ingroup     net_netif
+ * @defgroup    net_ng_netif_hdr Generic network interface header
+ * @ingroup     net_ng_netif
  * @{
  *
  * @file
