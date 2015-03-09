@@ -18,6 +18,8 @@
  * @author      unknown, propably Kaspar Schleiser <kaspar@schleiser.de>
  */
 
+#include <stdint.h>
+
 #ifndef __CIB_H
 #define __CIB_H
 
