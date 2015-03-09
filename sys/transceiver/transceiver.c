@@ -1279,6 +1279,7 @@ static unsigned long get_sfd_count(transceiver_type_t t)
         case TRANSCEIVER_AT86RF231:
             return at86rf231_get_sfd_count();
 #endif
+
         default:
             return 0;
     }
@@ -1294,6 +1295,7 @@ static void reset_sfd_count(transceiver_type_t t)
             at86rf231_reset_sfd_count();
             break;
 #endif
+
         default:
             break;
     }
