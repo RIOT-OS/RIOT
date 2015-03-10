@@ -10,7 +10,7 @@
  * @ingroup     sys_crypto
  * @{
  *
- * @file        lexv2.c
+ * @file
  * @brief       Implementation of the LEXv2 stream cipher
  *
  * @author      Jan Wagner <mail@jwagner.eu>
