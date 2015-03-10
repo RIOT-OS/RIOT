@@ -28,7 +28,8 @@ extern "C" {
 #endif
 
 /**
- * @brief The macro definitions
+ * @name Bit arithmetic macros
+ * @{
  */
 #define U8V(v) ((uint8_t)(v) & 0xFF)
 #define U32TO32_LITTLE(v) (v)
@@ -51,6 +52,7 @@ extern "C" {
 (ct)[2] = (uint8_t)((st) >>  8); \
 (ct)[3] = (uint8_t)(st);	 \
  }
+/** @} */
 
 /* Valid values are 10/12/14 for key sizes 128/192/256 */
 #define ROUNDS 10
