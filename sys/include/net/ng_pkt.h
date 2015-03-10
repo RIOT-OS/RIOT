@@ -45,35 +45,57 @@ extern "C" {
  *              +---------------------------+                      +------+
  *              | size = 14                 | data +-------------->|      |
  *              | type = NETTYPE_ETHERNET   |------+               +------+
+ *              +---------------------------+                      .      .
+ *                    | next                                       .      .
+ *                    v                                            +------+
  *              +---------------------------+         +----------->|      |
- *                    | next                          |            |      |
- *                    v                               |            |      |
- *              +---------------------------+         |            +------+
- *              | size = 40                 | data    |  +-------->|      |
- *              | type = NETTYPE_IPV6       |---------+  |         +------+
- *              +---------------------------+            |  +----->|      |
- *                    | next                             |  |      +------+
- *                    v                                  |  |  +-->|      |
- *              +---------------------------+            |  |  |   |      |
- *              | size = 8                  | data       |  |  |   .      .
- *              | type = NETTYPE_UDP        |------------+  |  |   .      .
- *              +---------------------------+               |  |
- *                    | next                                |  |
- *                    v                                     |  |
- *              +---------------------------+               |  |
- *              | size = 5                  | data          |  |
- *              | type = NETTYPE_COAP       |---------------+  |
- *              +---------------------------+                  |
- *                    | next                                   |
- *                    v                                        |
- *              +---------------------------+                  |
- *              | size = 54                 | data             |
- *              | type = NETTYPE_UNKNOWN    |------------------+
- *              +---------------------------+
+ *              | size = 40                 | data    |            |      |
+ *              | type = NETTYPE_IPV6       |---------+            +------+
+ *              +---------------------------+                      .      .
+ *                    | next                                       .      .
+ *                    v                                            +------+
+ *              +---------------------------+            +-------->|      |
+ *              | size = 8                  | data       |         +------+
+ *              | type = NETTYPE_UDP        |------------+         .      .
+ *              +---------------------------+                      .      .
+ *                    | next                                       +------+
+ *                    v                                     +----->|      |
+ *              +---------------------------+               |      |      |
+ *              | size = 59                 | data          |      .      .
+ *              | type = NETTYPE_UNDEF      |---------------+      .      .
+ *              +---------------------------+                      .      .
  *
+ * To keep data duplication as low as possible the order of the snips
+ * in a packet will be reversed depending on if you send the packet or if
+ * you received it. For sending the order is from (in the network stack) lowest
+ * protocol snip to the highest, for receiving the order is from highest
+ * snip to the lowest. This way, if a layer needs to duplicate the packet
+ * a tree is created rather than a duplication of the whole package.
  *
- * @note    This type implements its own list implementation because of the way
- *          it is stored in the packet buffer.
+ * A very extreme example for this (we only expect one or two duplications at
+ * maximum per package) can be seen here:
+ *
+ *      Sending                          Receiving
+ *      =======                          =========
+ *
+ *      * Payload                        * L2 header
+ *      ^                                ^
+ *      |                                |
+ *      |\                               |\
+ *      | * L4 header 1                  | * L2.5 header 1
+ *      | * L3 header 1                  | * L3 header 1
+ *      | * netif header 1               | * L4 header 1
+ *      * L4 header 2                    | * Payload 1
+ *      ^                                * L3 header 2
+ *      |                                ^
+ *      |\                               |
+ *      | * L3 header 2                  |\
+ *      | * L2 header 2                  | * L4 header 2
+ *      * L2 header 3                    | * Payload 2
+ *      |\                               * Payload 3
+ *      | * L2 header 3
+ *      * L2 header 4
+ *
  * @note    This type has no initializer on purpose. Please use @ref net_ng_pktbuf
  *          as factory.
  */
