@@ -10,7 +10,7 @@
  * @ingroup     sys_crypto
  * @{
  *
- * @file        rabbit.c
+ * @file
  * @brief       Implementation of the Rabbit stream cipher
  *
  * @author      Jan Wagner <mail@jwagner.eu>
