@@ -108,7 +108,24 @@ void rpl_udp_init(int argc, char **argv)
             }
 
             if (command == 'r') {
-                rpl_init_root();
+                /* add global address */
+                ipv6_addr_t tmp;
+                /* initialize prefix */
+                ipv6_addr_init(&tmp, 0xabcd, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0);
+
+                rpl_options_t rpl_opts = {
+                    .instance_id = 0,
+                    .prefix = tmp,
+                    .prefix_len = 64,
+                    .prefix_flags = RPL_PREFIX_INFO_AUTO_ADDR_CONF, /* autonomous address-configuration */
+                };
+
+                tmp.uint16[7] = HTONS(id);
+                /* set host suffix */
+                ipv6_addr_set_by_eui64(&tmp, 0, &tmp);
+                ipv6_net_if_add_addr(0, &tmp, NDP_ADDR_STATE_PREFERRED, 0, 0, 0);
+
+                rpl_init_root(&rpl_opts);
                 ipv6_iface_set_routing_provider(rpl_get_next_hop);
                 is_root = 1;
             }
@@ -137,14 +154,6 @@ void rpl_udp_init(int argc, char **argv)
         printf("ERROR: Unknown command '%c'\n", command);
         return;
     }
-
-    /* add global address */
-    ipv6_addr_t tmp;
-    /* initialize prefix */
-    ipv6_addr_init(&tmp, 0xabcd, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, id);
-    /* set host suffix */
-    ipv6_addr_set_by_eui64(&tmp, 0, &tmp);
-    ipv6_net_if_add_addr(0, &tmp, NDP_ADDR_STATE_PREFERRED, 0, 0, 0);
 
     if (command != 'h') {
         ipv6_init_as_router();
