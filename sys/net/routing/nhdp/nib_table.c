@@ -54,12 +54,12 @@ nib_entry_t *nib_process_hello(nhdp_addr_entry_t *nb_list, nhdp_addr_entry_t **o
 {
     nib_entry_t *nb_match = NULL;
     timex_t now;
-    uint8_t matches = 0;
 
     mutex_lock(&mtx_nib_access);
 
     if (nb_list) {
         nib_entry_t *nib_elt, *nib_tmp;
+        uint8_t matches = 0;
 
         vtimer_now(&now);
 
@@ -252,10 +252,10 @@ static void clear_nb_addresses(nib_entry_t *nib_entry, nhdp_addr_entry_t *nb_lis
                                nhdp_addr_entry_t **out_list, timex_t *now)
 {
     nhdp_addr_entry_t *elt, *nib_elt, *nib_tmp;
-    uint8_t found;
 
     LL_FOREACH_SAFE(nib_entry->address_list_head, nib_elt, nib_tmp) {
-        found = 0;
+        uint8_t found = 0;
+
         LL_FOREACH(nb_list, elt) {
             /* Check whether address is still present in the new neighbor address list */
             if (nib_elt->address == elt->address) {

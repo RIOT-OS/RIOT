@@ -64,7 +64,6 @@ int lis3dh_init(lis3dh_t *dev, spi_t spi, gpio_t cs_pin, gpio_t int1_pin, gpio_t
 
 int lis3dh_read_xyz(const lis3dh_t *dev, lis3dh_data_t *acc_data)
 {
-    int32_t tmp;
     uint8_t i;
     /* Set READ MULTIPLE mode */
     static const uint8_t addr = (LIS3DH_REG_OUT_X_L | LIS3DH_SPI_READ_MASK | LIS3DH_SPI_MULTI_MASK);
@@ -86,7 +85,7 @@ int lis3dh_read_xyz(const lis3dh_t *dev, lis3dh_data_t *acc_data)
 
     /* Scale to milli-G */
     for (i = 0; i < 3; ++i) {
-        tmp = (int32_t)(((int16_t *)acc_data)[i]);
+        int32_t tmp = (int32_t)(((int16_t *)acc_data)[i]);
         tmp *= dev->scale;
         tmp /= 32768;
         (((int16_t *)acc_data)[i]) = (int16_t)tmp;
