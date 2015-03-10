@@ -10,7 +10,7 @@
  * @ingroup     sys_crypto
  * @{
  *
- * @file        sosemanuk.c
+ * @file
  * @brief       Implementation of the SOSEMANUK stream cipher
  *
  * @author      Jan Wagner <mail@jwagner.eu>
