@@ -28,7 +28,8 @@ extern "C" {
 #endif
 
 /**
- * @brief The macro definitions
+ * @name Bit arithmetic macros
+ * @{
  */
 #define XOR(v,w) ((v) ^ (w))
 #define PLUS(v,w) ((uint32_t)((v) + (w)))
@@ -37,6 +38,7 @@ extern "C" {
 #define ROTL32(v,c) ((uint32_t)((v) << (c)) | ((v) >> (32 - (c))))
 #define U8TO32_LITTLE(p) (((uint32_t*)(p))[0])
 #define U32TO8_LITTLE(p, v) (((uint32_t*)(p))[0] = v)
+/** @} */
 
 /**
  * @brief The Salsa20 state context
