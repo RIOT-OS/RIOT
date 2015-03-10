@@ -10,7 +10,7 @@
  * @ingroup     sys_crypto
  * @{
  *
- * @file        nlsv2.h
+ * @file
  * @brief       Headers for the implementation of the NLSv2 stream cipher
  *
  * @author      Jan Wagner <mail@jwagner.eu>
