@@ -45,6 +45,9 @@ then
         ./dist/tools/externc/check.sh master
         RESULT=$(set_result $? $RESULT)
 
+        ./dist/tools/endingcheck/check.sh riot/master --diff-filter=MA
+        RESULT=$(set_result $? $RESULT)
+
         # TODO:
         #   Remove all but `master` parameters to cppcheck (and remove second
         #   invocation) once all warnings of cppcheck have been taken care of
