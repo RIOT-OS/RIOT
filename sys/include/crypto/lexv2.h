@@ -59,9 +59,9 @@ extern "C" {
  * @brief The LEXv2 state context
  */
 typedef struct {
-    uint32_t subkeys[4 * (ROUNDS + 1)];
-    uint32_t blockstate[4];
-    uint32_t ks[ROUNDS];
+    uint32_t subkeys[4 * (ROUNDS + 1)]; /**< Subkey array */
+    uint32_t blockstate[4]; /**< Blockstate array */
+    uint32_t ks[ROUNDS]; /**< Keystream array */
 } lexv2_ctx;
 
 /**
