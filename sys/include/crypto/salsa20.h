@@ -42,7 +42,7 @@ extern "C" {
  * @brief The Salsa20 state context
  */
 typedef struct {
-    uint32_t input[16]; /* could be compressed */
+    uint32_t input[16]; /**< Input Buffer (could be compressed) */
 } salsa20_ctx;
 
 /**
