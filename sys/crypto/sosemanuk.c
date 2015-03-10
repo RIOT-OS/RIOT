@@ -50,6 +50,7 @@ static void sosemanuk_internal(sosemanuk_ctx *rc, const uint32_t *src, uint32_t 
     uint32_t s09 = rc->s09;
     uint32_t r1 = rc->r1;
     uint32_t r2 = rc->r2;
+    //cppcheck-suppress variableScope unreadVariable
     uint32_t u0, u1, u2, u3, u4;
     uint32_t v0, v1, v2, v3;
 
@@ -97,7 +98,9 @@ static void sosemanuk_internal(sosemanuk_ctx *rc, const uint32_t *src, uint32_t 
 void sosemanuk_keysetup(sosemanuk_ctx *kc, const uint8_t *key, uint32_t keysize, uint32_t ivsize)
 {
     unsigned char wbuf[32];
+    //cppcheck-suppress variableScope unreadVariable
     register uint32_t w0, w1, w2, w3, w4, w5, w6, w7;
+    //cppcheck-suppress variableScope unreadVariable
     int i = 0;
     size_t key_len = keysize / 8;
 
@@ -151,6 +154,7 @@ void sosemanuk_keysetup(sosemanuk_ctx *kc, const uint8_t *key, uint32_t keysize,
 /* SOSEMANUK IV setup */
 void sosemanuk_ivsetup(sosemanuk_ctx *ctx, const uint8_t *iv)
 {
+    //cppcheck-suppress variableScope unreadVariable
     register uint32_t r0, r1, r2, r3, r4;
     unsigned char ivtmp[16];
 
