@@ -39,14 +39,14 @@ extern "C" {
  * @brief The HC-128 state context
  */
 typedef struct {
-    uint32_t T[1024];
-    uint32_t X[16];
-    uint32_t Y[16];
-    uint32_t counter1024;
-    uint32_t key[8];
-    uint32_t iv[8];
-    uint32_t keysize;
-    uint32_t ivsize;
+    uint32_t T[1024]; /**< T array*/
+    uint32_t X[16]; /**< X array */
+    uint32_t Y[16]; /**< Y array */
+    uint32_t counter1024; /**< Counter variable */
+    uint32_t key[8]; /**< Key */
+    uint32_t iv[8]; /**< IV */
+    uint32_t keysize; /**< Key size */
+    uint32_t ivsize; /**< IV size */
 } hc128_ctx;
 
 /* h1 function */
