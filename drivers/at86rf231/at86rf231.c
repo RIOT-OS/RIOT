@@ -982,7 +982,7 @@ int at86rf231_channel_is_clear(netdev_t *dev)
 
     /* Ask for a CCA measure */
     uint8_t reg = at86rf231_reg_read(AT86RF231_REG__PHY_CC_CCA);
-    reg &= AT86RF231_PHY_CC_CCA_MASK__CCA_REQUEST;
+    reg |= AT86RF231_PHY_CC_CCA_MASK__CCA_REQUEST;
     at86rf231_reg_write(AT86RF231_REG__PHY_CC_CCA, reg);
 
     /* wait for CCA measurement to be finished */
