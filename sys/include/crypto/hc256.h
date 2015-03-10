@@ -39,14 +39,14 @@ extern "C" {
  * @brief The HC-256 state context
  */
 typedef struct {
-    uint32_t T[2048];
-    uint32_t X[16];
-    uint32_t Y[16];
-    uint32_t counter2048;
-    uint32_t key[8];
-    uint32_t iv[8];
-    uint32_t keysize;
-    uint32_t ivsize;
+    uint32_t T[2048]; /**< T array */
+    uint32_t X[16]; /**< X array */
+    uint32_t Y[16]; /**< Y array */
+    uint32_t counter2048; /**< Counter variable */
+    uint32_t key[8]; /**< Key */
+    uint32_t iv[8]; /**< IV */
+    uint32_t keysize; /**< Key size */
+    uint32_t ivsize; /**< IV size */
 } hc256_ctx;
 
 /* h1 function */
