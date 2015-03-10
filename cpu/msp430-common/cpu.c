@@ -14,10 +14,6 @@
 #include "sched.h"
 #include "thread.h"
 
-volatile int __inISR = 0;
-
-char __isr_stack[MSP430_ISR_STACK_SIZE];
-
 /*
  * we must prevent the compiler to generate a prologue or an epilogue
  * for thread_yield_higher(), since we rely on the RETI instruction at the end
@@ -95,11 +91,6 @@ char *thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_sta
     }
 
     return (char *) stackptr;
-}
-
-int inISR(void)
-{
-    return __inISR;
 }
 
 /******************************************************************************/
