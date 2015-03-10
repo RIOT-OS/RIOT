@@ -37,6 +37,7 @@
 
 #define VTIMER_THRESHOLD 20UL
 #define VTIMER_BACKOFF 10UL
+#define VTIMER_SLEEP_UNTIL_OVERHEAD (VTIMER_THRESHOLD)
 
 #define SECONDS_PER_TICK (4096U)
 #define MICROSECONDS_PER_TICK (4096UL * 1000000)
@@ -241,17 +242,11 @@ void normalize_to_tick(timex_t *time)
     DEBUG("     Result: %" PRIu32 " %" PRIu32 "\n", time->seconds, time->microseconds);
 }
 
-static int vtimer_set(vtimer_t *timer)
+static int vtimer_set_absolute(vtimer_t *timer)
 {
-    DEBUG("vtimer_set(): New timer. Offset: %" PRIu32 " %" PRIu32 "\n", timer->absolute.seconds, timer->absolute.microseconds);
+    DEBUG("vtimer_set_absolute(): timer->absolute: %" PRIu32 " %" PRIu32 "\n", timer->absolute.seconds, timer->absolute.microseconds);
 
-    timex_t now;
-    vtimer_now(&now);
-    timer->absolute = timex_add(now, timer->absolute);
     normalize_to_tick(&(timer->absolute));
-
-    DEBUG("vtimer_set(): Absolute: %" PRIu32 " %" PRIu32 "\n", timer->absolute.seconds, timer->absolute.microseconds);
-    DEBUG("vtimer_set(): NOW: %" PRIu32 " %" PRIu32 "\n", now.seconds, now.microseconds);
 
     int result = 0;
 
@@ -264,11 +259,11 @@ static int vtimer_set(vtimer_t *timer)
     unsigned state = disableIRQ();
     if (timer->absolute.seconds != seconds) {
         /* we're long-term */
-        DEBUG("vtimer_set(): setting long_term\n");
+        DEBUG("vtimer_set_absolute(): setting long_term\n");
         result = set_longterm(timer);
     }
     else {
-        DEBUG("vtimer_set(): setting short_term\n");
+        DEBUG("vtimer_set_absolute(): setting short_term\n");
 
         if (set_shortterm(timer)) {
             /* delay update of next shortterm timer if we
@@ -282,6 +277,19 @@ static int vtimer_set(vtimer_t *timer)
     restoreIRQ(state);
 
     return result;
+}
+
+static int vtimer_set(vtimer_t *timer)
+{
+    DEBUG("vtimer_set(): New timer. Offset: %" PRIu32 " %" PRIu32 "\n", timer->absolute.seconds, timer->absolute.microseconds);
+
+    timex_t now;
+    vtimer_now(&now);
+    DEBUG("vtimer_set(): NOW: %" PRIu32 " %" PRIu32 "\n", now.seconds, now.microseconds);
+
+    timer->absolute = timex_add(now, timer->absolute);
+
+    return vtimer_set_absolute(timer);
 }
 
 void vtimer_now(timex_t *out)
@@ -351,6 +359,12 @@ int vtimer_usleep(uint32_t usecs)
     return vtimer_sleep(offset);
 }
 
+int vtimer_usleep_until(timex_t *last_wakeup, uint32_t usecs)
+{
+    timex_t offset = timex_set(0, usecs);
+    return vtimer_sleep_until(last_wakeup, offset);
+}
+
 int vtimer_sleep(timex_t time)
 {
     /**
@@ -376,6 +390,39 @@ int vtimer_sleep(timex_t time)
 
     ret = vtimer_set(&t);
     mutex_lock(&mutex);
+    return ret;
+}
+
+int vtimer_sleep_until(timex_t *last_wakeup, timex_t interval) {
+    int ret = 0;
+    vtimer_t t;
+    mutex_t mutex = MUTEX_INIT;
+    timex_t overhead = { 0, VTIMER_SLEEP_UNTIL_OVERHEAD};
+    timex_t now;
+
+    interval = timex_sub(interval, overhead);
+
+    t.action = vtimer_callback_unlock;
+    t.arg = &mutex;
+    t.absolute = timex_add(*last_wakeup, interval);
+
+    /* make sure we're not setting a value in the past */
+    vtimer_now(&now);
+    
+    if (timex_cmp(now, t.absolute) == 1) {
+#ifdef DEVELHELP
+        DEBUG("WARNING: vtimer_sleep_until() called with target time in the past.\n");
+#endif
+        goto out;
+    }
+
+    mutex_lock(&mutex);
+    ret = vtimer_set_absolute(&t);
+    mutex_lock(&mutex);
+
+out:
+    vtimer_now(last_wakeup);
+
     return ret;
 }
 
