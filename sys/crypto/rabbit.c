@@ -173,7 +173,7 @@ void rabbit_process_bytes(rabbit_ctx *ctx, const uint8_t *input, uint8_t *output
         rabbit_next_state(ctx);
 
         /* Encrypt 16 bytes of data */
-        *(uint32_t *)(output + 0) = 
+        *(uint32_t *)(output + 0) =
 	   *(uint32_t *)(input + 0) ^ ctx->x[0] ^ (ctx->x[5] >> 16) ^ (ctx->x[3] << 16);
 
         *(uint32_t *)(output + 4) =
