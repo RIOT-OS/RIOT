@@ -32,13 +32,15 @@ extern "C" {
 #endif
 
 /**
- * @brief The macro definitions
+ * @name Bit arithmetic macros
+ * @{
  */
 #define ROTL32(v, n) ((uint32_t)(((v) << (n)) & 0xFFFFFFFF) | ((v) >> (32 - (n))))
 
 #define G_FUNC(x) \
 ((((((x & 0xFFFF) * (x & 0xFFFF))>>17) + ((x & 0xFFFF)*(x >> 16)))>>15) \
 + (x >> 16)*(x >> 16)) ^ (x * x)
+/** @} */
 
 /**
  * @brief The Rabbit state context
