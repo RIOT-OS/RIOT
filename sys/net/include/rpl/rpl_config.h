@@ -133,7 +133,7 @@ static inline bool RPL_COUNTER_GREATER_THAN(uint8_t A, uint8_t B)
 #define REGULAR_DAO_INTERVAL 300
 #define DAO_SEND_RETRIES 4
 #define DEFAULT_WAIT_FOR_DAO_ACK 15
-#define RPL_DODAG_ID_LEN 16
+#define RPL_DODAG_ID_LEN 128
 
 /* others */
 
