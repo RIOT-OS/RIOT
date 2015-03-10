@@ -52,13 +52,13 @@ extern "C" {
  * @brief The Dragon state context
  */
 typedef struct {
-    uint32_t  nlfsr_word[DRAGON_NLFSR_SIZE];
-    uint64_t  state_counter;
-    uint32_t  nlfsr_offset;
-    uint32_t  init_state[DRAGON_NLFSR_SIZE];
-    uint32_t  key_size;
-    uint8_t   keystream_buffer[DRAGON_BUFFER_BYTES];
-    uint32_t  buffer_index;
+    uint32_t  nlfsr_word[DRAGON_NLFSR_SIZE]; /**< NLFSR word */
+    uint64_t  state_counter; /**< State counter */
+    uint32_t  nlfsr_offset; /**< NLFSR offset */
+    uint32_t  init_state[DRAGON_NLFSR_SIZE]; /**< Inital state */
+    uint32_t  key_size; /**< Key size */
+    uint8_t   keystream_buffer[DRAGON_BUFFER_BYTES]; /**< Keystream buffer */
+    uint32_t  buffer_index; /**< Buffer index */
 } dragon_ctx;
 
 /**
