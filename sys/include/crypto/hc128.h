@@ -51,6 +51,11 @@ typedef struct {
     uint32_t ivsize; /**< IV size */
 } hc128_ctx;
 
+
+/**
+ * @name Algorithm macros
+ * @{
+ */
 /* h1 function */
 #define h1(ctx, x, y) {			\
      uint32_t B0,B2,t0;			\
@@ -117,6 +122,7 @@ typedef struct {
      (ctx->T[(u)]) = ((ctx->T[(u)]) + tem2+(tem0^tem1)) ^ tem3;	\
      (ctx->Y[(a)]) = (ctx->T[(u)]);				\
 }
+/** @} */
 
 /**
  * @brief  HC-128 Key setup
