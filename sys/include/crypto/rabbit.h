@@ -60,8 +60,9 @@ void rabbit_keysetup(rabbit_ctx *ctx, const uint8_t *key);
 /**
  * @brief  Rabbit IV setup
  *
- * @param[in]   ctx     Rabbit context
- * @param[in]   iv      IV to setup the ctx
+ * @param[in]   master_ctx      Rabbit context
+ * @param[in]   ctx             Master Rabbit context
+ * @param[in]   iv              IV to setup the ctx
  */
 void rabbit_ivsetup(const rabbit_ctx *master_ctx, rabbit_ctx *ctx, const uint8_t *iv);
 
