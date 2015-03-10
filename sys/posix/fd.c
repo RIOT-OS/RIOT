@@ -44,7 +44,7 @@ int fd_init(void)
     posix_open(uart0_handler_pid, 0);
     fd_t fd = {
         .__active = 1,
-        .fd = (int)uart0_handler_pid,
+        .fd_internal = (int)uart0_handler_pid,
         .read = (ssize_t ( *)(int, void *, size_t))posix_read,
         .write = (ssize_t ( *)(int, const void *, size_t))posix_write,
         .close = posix_close
@@ -78,7 +78,7 @@ int fd_new(int internal_fd, ssize_t (*internal_read)(int, void *, size_t),
     if (fd >= 0) {
         fd_t *fd_s = fd_get(fd);
         fd_s->__active = 1;
-        fd_s->fd = internal_fd;
+        fd_s->fd_internal = internal_fd;
         fd_s->read = internal_read;
         fd_s->write = internal_write;
         fd_s->close = internal_close;
