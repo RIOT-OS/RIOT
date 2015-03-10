@@ -164,58 +164,58 @@ typedef struct {
 /**
  * @brief  Dragon Key setup
  *
- * @param  ctx[in/out]		Dragon context
- * @param  key[in]		Key to setup the ctx
- * @param  keysize[in]		Size of the key
+ * @param[in]   ctx     Dragon context
+ * @param[in]   key     Key to setup the ctx
+ * @param[in]   keysize Size of the key
  */
 void dragon_keysetup(dragon_ctx *ctx, const uint8_t *key, uint32_t keysize);
 
 /**
  * @brief  Dragon IV setup
  *
- * @param  ctx[in/out]		Dragon context
- * @param  iv[in]		IV to setup the ctx
+ * @param[in]   ctx     Dragon context
+ * @param[in]   iv      IV to setup the ctx
  */
 void dragon_ivsetup(dragon_ctx *ctx, const uint8_t *iv);
 
 /**
  * @brief  Generate "blocks" number of keystream blocks
  *
- * @param  ctx[in/out]          Dragon context
- * @param  keystream[out]       Pre-allocated array containing 8*(blocks)
- *                              bytes of memory
- * @param  length[in]           Number of keystream blocks to produce
+ * @param[in]   ctx         Dragon context
+ * @param[out]  keystream   Pre-allocated array containing 8*(blocks)
+ *                          bytes of memory
+ * @param[in]   length      Number of keystream blocks to produce
  */
 void dragon_keystream_blocks(dragon_ctx *ctx, uint8_t *keystream, uint32_t blocks);
 
 /**
  * @brief  Generate "length" number of keystream bytes
  *
- * @param  ctx[in/out]          Dragon context
- * @param  keystream[out]	Pre-allocated array containing (msglen)
- *                              bytes of memory
- * @param  length[in]		Number of keystream bytes to produce
+ * @param[in]   ctx         Dragon context
+ * @param[out]  keystream   Pre-allocated array containing (msglen)
+ *                          bytes of memory
+ * @param[in]   length      Number of keystream bytes to produce
  */
 void dragon_keystream_bytes(dragon_ctx *ctx, uint8_t *keystream, uint32_t length);
 
 /**
  * @brief  Encrypt or decrypt a "blocks" number of blocks
  *
- * @param  ctx[in/out]		Dragon context
- * @param  input[in]		(Plain/Cipher)text blocks for (en/de)crypting
- * @param  output[out]		Pre-allocated array for (cipher/plain)text blocks
- *                              consisting of 8*(blocks) bytes
- * @param  blocks[in]		Number of blocks to (en/de)crypt
+ * @param[in]   ctx         Dragon context
+ * @param[in]   input       (Plain/Cipher)text blocks for (en/de)crypting
+ * @param[out]  output      Pre-allocated array for (cipher/plain)text blocks
+ *                          consisting of 8*(blocks) bytes
+ * @param[in]   blocks      Number of blocks to (en/de)crypt
  */
 void dragon_process_blocks(dragon_ctx *ctx, const uint8_t *input, uint8_t *output, uint32_t blocks);
 
 /**
  * @brief  Encrypt or decrypt "msglen" number of message bytes
  *
- * @param  ctx[in/out]		Dragon context
- * @param  input[in]		(Plain/Cipher)text for (en/de)crypting
- * @param  output[out]		(Cipher/Plain)text for (en/de)crypting
- * @param  msglen[in]		Number of bytes to (en/de)crypt
+ * @param[in]   ctx         Dragon context
+ * @param[in]   input       (Plain/Cipher)text for (en/de)crypting
+ * @param[out]  output      (Cipher/Plain)text for (en/de)crypting
+ * @param[in]   msglen      Number of bytes to (en/de)crypt
  */
 void dragon_process_bytes(dragon_ctx *ctx, const uint8_t *input, uint8_t *output, uint32_t msglen);
 
