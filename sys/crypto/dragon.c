@@ -10,7 +10,7 @@
  * @ingroup     sys_crypto
  * @{
  *
- * @file        dragon.c
+ * @file
  * @brief       Implementation of the Dragon stream cipher
  *
  * @author      Jan Wagner <mail@jwagner.eu>
