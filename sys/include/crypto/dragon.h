@@ -184,7 +184,7 @@ void dragon_ivsetup(dragon_ctx *ctx, const uint8_t *iv);
  * @param[in]   ctx         Dragon context
  * @param[out]  keystream   Pre-allocated array containing 8*(blocks)
  *                          bytes of memory
- * @param[in]   length      Number of keystream blocks to produce
+ * @param[in]   blocks      Number of keystream blocks to produce
  */
 void dragon_keystream_blocks(dragon_ctx *ctx, uint8_t *keystream, uint32_t blocks);
 
