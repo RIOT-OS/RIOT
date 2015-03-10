@@ -51,6 +51,10 @@ typedef struct {
     uint32_t ivsize; /**< IV size */
 } hc256_ctx;
 
+/**
+ * @name Bit arithmetic macros
+ * @{
+ */
 /* h1 function */
 #define h1(ctx, x, y){				\
      uint32_t B0,B1,B2,B3;			\
@@ -125,6 +129,7 @@ typedef struct {
      (ctx->T[(u)]) += (ctx->Y[(b)])+(tem0^tem1)+(ctx->T[tem2]);	\
      (ctx->Y[(a)]) = (ctx->T[(u)]);				\
 }
+/** @} */
 
 /**
  * @brief  HC-256 Key setup
