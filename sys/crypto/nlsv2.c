@@ -136,7 +136,7 @@ void nlsv2_ivsetup(nlsv2_ctx *ctx, const uint8_t *iv)
         ctx->R[i] = ctx->initR[i];
     }
 
-    /* TWEAK */ 
+    /* TWEAK */
     ctx->konst = INITKONST;
 
     /* Start folding in iv */
