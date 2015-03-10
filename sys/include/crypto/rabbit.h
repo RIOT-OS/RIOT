@@ -52,35 +52,35 @@ typedef struct {
 /**
  * @brief  Rabbit Key setup
  *
- * @param  ctx[in/out]		Rabbit context
- * @param  key[in]              Key to setup the ctx
+ * @param[in]   ctx     Rabbit context
+ * @param[in]   key     Key to setup the ctx
  */
 void rabbit_keysetup(rabbit_ctx *ctx, const uint8_t *key);
 
 /**
  * @brief  Rabbit IV setup
  *
- * @param  ctx[in/out]          Rabbit context
- * @param  iv[in]               IV to setup the ctx
+ * @param[in]   ctx     Rabbit context
+ * @param[in]   iv      IV to setup the ctx
  */
 void rabbit_ivsetup(const rabbit_ctx *master_ctx, rabbit_ctx *ctx, const uint8_t *iv);
 
 /**
  * @brief  Encrypt or decrypt "msglen" number of message bytes
  *
- * @param  ctx[in/out]          Rabbit context
- * @param  input[in]            (Plain/Cipher)text for (en/de)crypting
- * @param  output[out]          (Cipher/Plain)text for (en/de)crypting
- * @param  msglen[in]           Number of bytes to (en/de)crypt
+ * @param[in]   ctx         Rabbit context
+ * @param[in]   input       (Plain/Cipher)text for (en/de)crypting
+ * @param[out]  output      (Cipher/Plain)text for (en/de)crypting
+ * @param[in]   msglen      Number of bytes to (en/de)crypt
  */
 void rabbit_process_bytes(rabbit_ctx *ctx, const uint8_t *input, uint8_t *output, uint32_t msglen);
 
 /**
  * @brief  Generate data with Pseudo-Random Number Generator
  *
- * @param  ctx[in/out]          Rabbit context
- * @param  output[out]          Generated ciphertext
- * @param  msglen[in]           Number of bytes to output
+ * @param[in]   ctx         Rabbit context
+ * @param[out]  output      Generated ciphertext
+ * @param[in]   msglen      Number of bytes to output
  */
 void rabbit_prng(rabbit_ctx *ctx, uint8_t *output, uint32_t msglen);
 
