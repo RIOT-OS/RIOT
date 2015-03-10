@@ -43,24 +43,30 @@ extern "C" {
 #define SWAP32(v) ((ROTL32(v,  8) & 0x00FF00FF) | (ROTL32(v, 24) & 0xFF00FF00))
 #define U32TO32_BIG(v) SWAP32(v)
 #define U8TO32_BIG(p) U32TO32_BIG(((uint32_t*)(p))[0])
+/** @} */
 
-#define DRAGON_NLFSR_SIZE      32 /* size of NLFSR in 32-bit multiples */
-#define DRAGON_KEYSTREAM_SIZE   2 /* size of output in 32-bit multiples */
-#define DRAGON_BUFFER_SIZE      1
-#define DRAGON_BUFFER_BYTES    (DRAGON_BUFFER_SIZE * DRAGON_KEYSTREAM_SIZE * 4)
+/**
+ * @name Algorithm constants 
+ * @{
+ */
+#define DRAGON_NLFSR_SIZE	32 /* size of NLFSR in 32-bit multiples */
+#define DRAGON_KEYSTREAM_SIZE	2 /* size of output in 32-bit multiples */
+#define DRAGON_BUFFER_SIZE	1
+#define DRAGON_BUFFER_BYTES	(DRAGON_BUFFER_SIZE * DRAGON_KEYSTREAM_SIZE * 4)
+#define DRAGON_MIXING_STAGES	16
 /** @} */
 
 /**
  * @brief The Dragon state context
  */
 typedef struct {
-    uint32_t  nlfsr_word[DRAGON_NLFSR_SIZE]; /**< NLFSR word */
-    uint64_t  state_counter; /**< State counter */
-    uint32_t  nlfsr_offset; /**< NLFSR offset */
-    uint32_t  init_state[DRAGON_NLFSR_SIZE]; /**< Inital state */
-    uint32_t  key_size; /**< Key size */
-    uint8_t   keystream_buffer[DRAGON_BUFFER_BYTES]; /**< Keystream buffer */
-    uint32_t  buffer_index; /**< Buffer index */
+    uint32_t  nlfsr_word[DRAGON_NLFSR_SIZE];		/**< NLFSR word */
+    uint64_t  state_counter;				/**< State counter */
+    uint32_t  nlfsr_offset;				/**< NLFSR offset */
+    uint32_t  init_state[DRAGON_NLFSR_SIZE];		/**< Inital state */
+    uint32_t  key_size;					/**< Key size */
+    uint8_t   keystream_buffer[DRAGON_BUFFER_BYTES];	/**< Keystream buffer */
+    uint32_t  buffer_index;				/**< Buffer index */
 } dragon_ctx;
 
 /**
@@ -88,30 +94,28 @@ typedef struct {
  * ADD layer. The s-box layer contains two sublayers, one which uses three G
  * s-boxes, and the other which uses three H s-boxes.
  */
-#define XOR_LAYER(d1, s1, d2, s2, d3, s3)	\
-    d1 ^= s1;					\
-    d2 ^= s2;					\
+#define DRAGON_XOR_LAYER(d1, s1, d2, s2, d3, s3)	\
+    d1 ^= s1;						\
+    d2 ^= s2;						\
     d3 ^= s3;
 
-#define ADD_LAYER(d1, s1, d2, s2, d3, s3)	\
-    d1 += s1;					\
-    d2 += s2;					\
-    d3 += s3;					\
+#define DRAGON_ADD_LAYER(d1, s1, d2, s2, d3, s3)	\
+    d1 += s1;						\
+    d2 += s2;						\
+    d3 += s3;						\
 
-#define SBOX_LAYER(sbox, d1, s1, d2, s2, d3, s3)	\
+#define DRAGON_SBOX_LAYER(sbox, d1, s1, d2, s2, d3, s3)	\
     d1 ^= sbox##1(s1);					\
     d2 ^= sbox##2(s2);					\
     d3 ^= sbox##3(s3);
 
-#define DRAGON_UPDATE(a, b, c, d, e, f)	\
-    XOR_LAYER(b, a, d, c, f, e)		\
-    ADD_LAYER(c, b, e, d, a, f)		\
-    SBOX_LAYER(G, d, a, f, c, b, e)	\
-    SBOX_LAYER(H, a, b, c, d, e, f)	\
-    ADD_LAYER(f, c, b, e, d, a)		\
-    XOR_LAYER(a, f, c, b, e, d)
-
-#define DRAGON_MIXING_STAGES   16
+#define DRAGON_UPDATE(a, b, c, d, e, f)			\
+    DRAGON_XOR_LAYER(b, a, d, c, f, e)			\
+    DRAGON_ADD_LAYER(c, b, e, d, a, f)			\
+    DRAGON_SBOX_LAYER(DRAGON_G, d, a, f, c, b, e)	\
+    DRAGON_SBOX_LAYER(DRAGON_H, a, b, c, d, e, f)	\
+    DRAGON_ADD_LAYER(f, c, b, e, d, a)			\
+    DRAGON_XOR_LAYER(a, f, c, b, e, d)
 
 /**
  * DRAGON_ROUND produces one block of keystream
@@ -130,41 +134,41 @@ typedef struct {
     DRAGON_NLFSR_WORD(ctx, 1) = c;
 
 /* virtual 32x32 s-boxes G and H */
-#define G1(x) 			\
-    sbox2[x & 0xFF] ^		\
-    sbox1[(x >> 8) & 0xFF]  ^	\
-    sbox1[(x >> 16) & 0xFF] ^	\
-    sbox1[(x >> 24) & 0xFF]
+#define DRAGON_G1(x) 			\
+    dragon_sbox2[x & 0xFF] ^		\
+    dragon_sbox1[(x >> 8) & 0xFF]  ^	\
+    dragon_sbox1[(x >> 16) & 0xFF] ^	\
+    dragon_sbox1[(x >> 24) & 0xFF]
 
-#define G2(x)			\
-    sbox1[x & 0xFF] ^		\
-    sbox2[(x >> 8) & 0xFF]  ^	\
-    sbox1[(x >> 16) & 0xFF] ^	\
-    sbox1[(x >> 24) & 0xFF]
+#define DRAGON_G2(x)			\
+    dragon_sbox1[x & 0xFF] ^		\
+    dragon_sbox2[(x >> 8) & 0xFF]  ^	\
+    dragon_sbox1[(x >> 16) & 0xFF] ^	\
+    dragon_sbox1[(x >> 24) & 0xFF]
 
-#define G3(x)			\
-    sbox1[x & 0xFF] ^		\
-    sbox1[(x >> 8) & 0xFF]  ^	\
-    sbox2[(x >> 16) & 0xFF] ^	\
-    sbox1[(x >> 24) & 0xFF]
+#define DRAGON_G3(x)			\
+    dragon_sbox1[x & 0xFF] ^		\
+    dragon_sbox1[(x >> 8) & 0xFF]  ^	\
+    dragon_sbox2[(x >> 16) & 0xFF] ^	\
+    dragon_sbox1[(x >> 24) & 0xFF]
 
-#define H1(x)			\
-    sbox1[x & 0xFF] ^		\
-    sbox2[(x >> 8) & 0xFF]  ^	\
-    sbox2[(x >> 16) & 0xFF] ^	\
-    sbox2[(x >> 24) & 0xFF]
+#define DRAGON_H1(x)			\
+    dragon_sbox1[x & 0xFF] ^		\
+    dragon_sbox2[(x >> 8) & 0xFF]  ^	\
+    dragon_sbox2[(x >> 16) & 0xFF] ^	\
+    dragon_sbox2[(x >> 24) & 0xFF]
 
-#define H2(x)			\
-    sbox2[x & 0xFF] ^		\
-    sbox1[(x >> 8) & 0xFF]  ^	\
-    sbox2[(x >> 16) & 0xFF] ^	\
-    sbox2[(x >> 24) & 0xFF]
+#define DRAGON_H2(x)			\
+    dragon_sbox2[x & 0xFF] ^		\
+    dragon_sbox1[(x >> 8) & 0xFF]  ^	\
+    dragon_sbox2[(x >> 16) & 0xFF] ^	\
+    dragon_sbox2[(x >> 24) & 0xFF]
 
-#define H3(x)			\
-    sbox2[x & 0xFF] ^		\
-    sbox2[(x >> 8) & 0xFF]  ^	\
-    sbox1[(x >> 16) & 0xFF] ^	\
-    sbox2[(x >> 24) & 0xFF]
+#define DRAGON_H3(x)			\
+    dragon_sbox2[x & 0xFF] ^		\
+    dragon_sbox2[(x >> 8) & 0xFF]  ^	\
+    dragon_sbox1[(x >> 16) & 0xFF] ^	\
+    dragon_sbox2[(x >> 24) & 0xFF]
 /** @} */
 
 /**
@@ -228,7 +232,7 @@ void dragon_process_bytes(dragon_ctx *ctx, const uint8_t *input, uint8_t *output
 /**
  * @brief The Dragon sbox definitions
  */
-static const uint32_t sbox1[256] = {
+static const uint32_t dragon_sbox1[256] = {
     0x393BCE6B, 0x232BA00D, 0x84E18ADA, 0x84557BA7,
     0x56828948, 0x166908F3, 0x414A3437, 0x7BB44897,
     0x2315BE89, 0x7A01F224, 0x7056AA5D, 0x121A3917,
@@ -295,7 +299,7 @@ static const uint32_t sbox1[256] = {
     0x8E53A875, 0x965E8183, 0x14D79DAC, 0x0192B555
 };
 
-static const uint32_t sbox2[256] = {
+static const uint32_t dragon_sbox2[256] = {
     0xA94BC384, 0xF7A81CAE, 0xAB84ECD4, 0x00DEF340,
     0x8E2329B8, 0x23AF3A22, 0x23C241FA, 0xAED8729E,
     0x2E59357F, 0xC3ED78AB, 0x687724BB, 0x7663886F,

@@ -41,7 +41,7 @@ static void cycle(nlsv2_ctx *ctx)
 
     /* Nonlinear feedback function */
     t = ROTL(ctx->R[0], 19) + ROTL(ctx->R[15], 9) + ctx->konst;
-    t ^= Sbox[(t >> 24) & 0xFF];
+    t ^= nlsv2_sbox[(t >> 24) & 0xFF];
     t ^= ctx->R[4];
 
     /* Shift register */

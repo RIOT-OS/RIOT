@@ -45,37 +45,44 @@ extern "C" {
 #define U32V(v) ((uint32_t)(v) & 0xFFFFFFFF)
 #define ROTL32(v, n) (U32V((v) << (n)) | ((v) >> (32 - (n))))
 #define U32TO32_LITTLE(v) (v)
-#define U8TO32_LITTLE(p) \
-  (((uint32_t)((p)[0])      ) | \
-   ((uint32_t)((p)[1]) <<  8) | \
-   ((uint32_t)((p)[2]) << 16) | \
+#define U8TO32_LITTLE(p)		\
+  (((uint32_t)((p)[0])      ) |		\
+   ((uint32_t)((p)[1]) <<  8) |		\
+   ((uint32_t)((p)[2]) << 16) |		\
    ((uint32_t)((p)[3]) << 24))
-
-#define XMUX(c, x, y)   (((c) & 0x1) ? ((x) ^ (y)) : (x))
-#define MUL_A(x)    (U32V((x) << 8) ^ mul_a[(x) >> 24])
-#define MUL_G(x)    (((x) >> 8) ^ mul_ia[(x) & 0xFF])
 /** @} */
 
+
+/**
+ * @name Algorithm constants 
+ * @{
+ */
 #define SOSEMANUK_BLOCKLENGTH 80
+
+#define XMUX(c, x, y)	(((c) & 0x1) ? ((x) ^ (y)) : (x))
+#define MUL_A(x)	(U32V((x) << 8) ^ sosemanuk_mul_a[(x) >> 24])
+#define MUL_G(x)	(((x) >> 8) ^ sosemanuk_mul_ia[(x) & 0xFF])
+/** @} */
+
 
 /**
  * @brief The SOSEMANUK state context
  */
 typedef struct {
-    uint32_t sk[100]; /**< Subkey array */
-    uint32_t ivlen; /**< IV size */
-    uint32_t s00; /**< Internal cipher state - s00 */
-    uint32_t s01; /**< Internal cipher state - s01 */
-    uint32_t s02; /**< Internal cipher state - s02 */
-    uint32_t s03; /**< Internal cipher state - s03 */
-    uint32_t s04; /**< Internal cipher state - s04 */
-    uint32_t s05; /**< Internal cipher state - s05 */
-    uint32_t s06; /**< Internal cipher state - s06 */
-    uint32_t s07; /**< Internal cipher state - s07 */
-    uint32_t s08; /**< Internal cipher state - s08 */
-    uint32_t s09; /**< Internal cipher state - s09 */
-    uint32_t r1; /**< Internal cipher state - r1 */
-    uint32_t r2; /**< Internal cipher state - r2 */
+    uint32_t sk[100];	/**< Subkey array */
+    uint32_t ivlen;	/**< IV size */
+    uint32_t s00;	/**< Internal cipher state - s00 */
+    uint32_t s01;	/**< Internal cipher state - s01 */
+    uint32_t s02;	/**< Internal cipher state - s02 */
+    uint32_t s03;	/**< Internal cipher state - s03 */
+    uint32_t s04;	/**< Internal cipher state - s04 */
+    uint32_t s05;	/**< Internal cipher state - s05 */
+    uint32_t s06;	/**< Internal cipher state - s06 */
+    uint32_t s07;	/**< Internal cipher state - s07 */
+    uint32_t s08;	/**< Internal cipher state - s08 */
+    uint32_t s09;	/**< Internal cipher state - s09 */
+    uint32_t r1;	/**< Internal cipher state - r1 */
+    uint32_t r2;	/**< Internal cipher state - r2 */
 } sosemanuk_ctx;
 
 /**
@@ -123,7 +130,7 @@ void sosemanuk_process_blocks(sosemanuk_ctx *ctx, const uint8_t *input, uint8_t 
  * @name Algorithm macros
  * @{
  */
-#define S0(r0, r1, r2, r3, r4)   do {	\
+#define SOSEMANUK_S0(r0, r1, r2, r3, r4)   do {	\
                 r3 ^= r0;  r4  = r1; 	\
                 r1 &= r3;  r4 ^= r2; 	\
                 r1 ^= r0;  r0 |= r3; 	\
@@ -135,7 +142,7 @@ void sosemanuk_process_blocks(sosemanuk_ctx *ctx, const uint8_t *input, uint8_t 
                 r1 ^= r3;  r4 ^= r3;	\
         } while (0)
 
-#define S1(r0, r1, r2, r3, r4)   do {	\
+#define SOSEMANUK_S1(r0, r1, r2, r3, r4)   do {	\
                 r0 = ~r0;  r2 = ~r2;	\
                 r4  = r0;  r0 &= r1;	\
                 r2 ^= r0;  r0 |= r3;	\
@@ -148,7 +155,7 @@ void sosemanuk_process_blocks(sosemanuk_ctx *ctx, const uint8_t *input, uint8_t 
                 r0 ^= r4;		\
         } while (0)
 
-#define S2(r0, r1, r2, r3, r4)   do {	\
+#define SOSEMANUK_S2(r0, r1, r2, r3, r4)   do {	\
                 r4  = r0;  r0 &= r2;	\
                 r0 ^= r3;  r2 ^= r1;	\
                 r2 ^= r0;  r3 |= r4;	\
@@ -159,7 +166,7 @@ void sosemanuk_process_blocks(sosemanuk_ctx *ctx, const uint8_t *input, uint8_t 
                 r1 ^= r4;  r4 = ~r4;	\
         } while (0)
 
-#define S3(r0, r1, r2, r3, r4)   do {	\
+#define SOSEMANUK_S3(r0, r1, r2, r3, r4)   do {	\
                 r4  = r0;  r0 |= r3;	\
                 r3 ^= r1;  r1 &= r4;	\
                 r4 ^= r2;  r2 ^= r3;	\
@@ -172,7 +179,7 @@ void sosemanuk_process_blocks(sosemanuk_ctx *ctx, const uint8_t *input, uint8_t 
                 r1 ^= r0;		\
         } while (0)
 
-#define S4(r0, r1, r2, r3, r4)   do {	\
+#define SOSEMANUK_S4(r0, r1, r2, r3, r4)   do {	\
                 r1 ^= r3;  r3 = ~r3;	\
                 r2 ^= r3;  r3 ^= r0;	\
                 r4  = r1;  r1 &= r3;	\
@@ -185,7 +192,7 @@ void sosemanuk_process_blocks(sosemanuk_ctx *ctx, const uint8_t *input, uint8_t 
                 r0 = ~r0;  r4 ^= r2;	\
         } while (0)
 
-#define S5(r0, r1, r2, r3, r4)   do {	\
+#define SOSEMANUK_S5(r0, r1, r2, r3, r4)   do {	\
                 r0 ^= r1;  r1 ^= r3;	\
                 r3 = ~r3;  r4  = r1;	\
                 r1 &= r0;  r2 ^= r3;	\
@@ -198,7 +205,7 @@ void sosemanuk_process_blocks(sosemanuk_ctx *ctx, const uint8_t *input, uint8_t 
                 r2 ^= r4;		\
         } while (0)
 
-#define S6(r0, r1, r2, r3, r4)   do {	\
+#define SOSEMANUK_S6(r0, r1, r2, r3, r4)   do {	\
                 r2 = ~r2;  r4  = r3;	\
                 r3 &= r0;  r0 ^= r4;	\
                 r3 ^= r2;  r2 |= r4;	\
@@ -211,7 +218,7 @@ void sosemanuk_process_blocks(sosemanuk_ctx *ctx, const uint8_t *input, uint8_t 
                 r2 ^= r3;		\
         } while (0)
 
-#define S7(r0, r1, r2, r3, r4)   do {	\
+#define SOSEMANUK_S7(r0, r1, r2, r3, r4)   do {	\
                 r4  = r1;  r1 |= r2;	\
                 r1 ^= r3;  r4 ^= r2;	\
                 r2 ^= r1;  r3 |= r4;	\
@@ -252,33 +259,33 @@ void sosemanuk_process_blocks(sosemanuk_ctx *ctx, const uint8_t *input, uint8_t 
                 kc->sk[i ++] = r ## d3;			\
         } while (0)
 
-#define SKS0    SKS(S0, 4, 5, 6, 7, 1, 4, 2, 0)
-#define SKS1    SKS(S1, 0, 1, 2, 3, 2, 0, 3, 1)
-#define SKS2    SKS(S2, 4, 5, 6, 7, 2, 3, 1, 4)
-#define SKS3    SKS(S3, 0, 1, 2, 3, 1, 2, 3, 4)
-#define SKS4    SKS(S4, 4, 5, 6, 7, 1, 4, 0, 3)
-#define SKS5    SKS(S5, 0, 1, 2, 3, 1, 3, 0, 2)
-#define SKS6    SKS(S6, 4, 5, 6, 7, 0, 1, 4, 2)
-#define SKS7    SKS(S7, 0, 1, 2, 3, 4, 3, 1, 0)
+#define SKS0	SKS(SOSEMANUK_S0, 4, 5, 6, 7, 1, 4, 2, 0)
+#define SKS1	SKS(SOSEMANUK_S1, 0, 1, 2, 3, 2, 0, 3, 1)
+#define SKS2	SKS(SOSEMANUK_S2, 4, 5, 6, 7, 2, 3, 1, 4)
+#define SKS3	SKS(SOSEMANUK_S3, 0, 1, 2, 3, 1, 2, 3, 4)
+#define SKS4	SKS(SOSEMANUK_S4, 4, 5, 6, 7, 1, 4, 0, 3)
+#define SKS5	SKS(SOSEMANUK_S5, 0, 1, 2, 3, 1, 3, 0, 2)
+#define SKS6	SKS(SOSEMANUK_S6, 4, 5, 6, 7, 0, 1, 4, 2)
+#define SKS7	SKS(SOSEMANUK_S7, 0, 1, 2, 3, 4, 3, 1, 0)
 
-#define WUP(wi, wi5, wi3, wi1, cc)   do {				\
+#define SOSEMANUK_WUP(wi, wi5, wi3, wi1, cc)   do {			\
                 uint32_t tt = (wi) ^ (wi5) ^ (wi3)			\
                         ^ (wi1) ^ (0x9E3779B9 ^ (uint32_t)(cc));	\
                 (wi) = ROTL32(tt, 11);					\
         } while (0)
 
-#define WUP0(cc)   do {				\
-                WUP(w0, w3, w5, w7, cc);	\
-                WUP(w1, w4, w6, w0, cc + 1);	\
-                WUP(w2, w5, w7, w1, cc + 2);	\
-                WUP(w3, w6, w0, w2, cc + 3);	\
+#define SOSEMANUK_WUP0(cc)   do {			\
+                SOSEMANUK_WUP(w0, w3, w5, w7, cc);	\
+                SOSEMANUK_WUP(w1, w4, w6, w0, cc + 1);	\
+                SOSEMANUK_WUP(w2, w5, w7, w1, cc + 2);	\
+                SOSEMANUK_WUP(w3, w6, w0, w2, cc + 3);	\
         } while (0)
 
-#define WUP1(cc)   do {				\
-                WUP(w4, w7, w1, w3, cc);	\
-                WUP(w5, w0, w2, w4, cc + 1);	\
-                WUP(w6, w1, w3, w5, cc + 2);	\
-                WUP(w7, w2, w4, w6, cc + 3);	\
+#define SOSEMANUK_WUP1(cc)   do {			\
+                SOSEMANUK_WUP(w4, w7, w1, w3, cc);	\
+                SOSEMANUK_WUP(w5, w0, w2, w4, cc + 1);	\
+                SOSEMANUK_WUP(w6, w1, w3, w5, cc + 2);	\
+                SOSEMANUK_WUP(w7, w2, w4, w6, cc + 3);	\
         } while (0)
 
 #define rc       ctx
@@ -286,7 +293,7 @@ void sosemanuk_process_blocks(sosemanuk_ctx *ctx, const uint8_t *input, uint8_t 
 #define iv_len   (ctx->ivlen)
 
 /* The Serpent key addition step */
-#define KA(zc, x0, x1, x2, x3)  do {		\
+#define SOSEMANUK_KA(zc, x0, x1, x2, x3)  do {	\
                 x0 ^= kc->sk[(zc)];		\
                 x1 ^= kc->sk[(zc) + 1];		\
                 x2 ^= kc->sk[(zc) + 2];		\
@@ -294,50 +301,50 @@ void sosemanuk_process_blocks(sosemanuk_ctx *ctx, const uint8_t *input, uint8_t 
         } while (0)
 
 /* One Serpent round */
-#define FSS(zc, S, i0, i1, i2, i3, i4, o0, o1, o2, o3)  do {	\
-                KA(zc, r ## i0, r ## i1, r ## i2, r ## i3);	\
-                S(r ## i0, r ## i1, r ## i2, r ## i3, r ## i4);	\
-                SERPENT_LT(r ## o0, r ## o1, r ## o2, r ## o3);	\
+#define SOSEMANUK_FSS(zc, S, i0, i1, i2, i3, i4, o0, o1, o2, o3)  do {	\
+                SOSEMANUK_KA(zc, r ## i0, r ## i1, r ## i2, r ## i3);	\
+                S(r ## i0, r ## i1, r ## i2, r ## i3, r ## i4);		\
+                SERPENT_LT(r ## o0, r ## o1, r ## o2, r ## o3);		\
         } while (0)
 
 /* Last Serpent round */
-#define FSF(zc, S, i0, i1, i2, i3, i4, o0, o1, o2, o3)  do {	\
-                KA(zc, r ## i0, r ## i1, r ## i2, r ## i3);	\
-                S(r ## i0, r ## i1, r ## i2, r ## i3, r ## i4);	\
-                SERPENT_LT(r ## o0, r ## o1, r ## o2, r ## o3);	\
-                KA(zc + 4, r ## o0, r ## o1, r ## o2, r ## o3);	\
+#define SOSEMANUK_FSF(zc, S, i0, i1, i2, i3, i4, o0, o1, o2, o3)  do {		\
+                SOSEMANUK_KA(zc, r ## i0, r ## i1, r ## i2, r ## i3);		\
+                S(r ## i0, r ## i1, r ## i2, r ## i3, r ## i4);			\
+                SERPENT_LT(r ## o0, r ## o1, r ## o2, r ## o3);			\
+                SOSEMANUK_KA(zc + 4, r ## o0, r ## o1, r ## o2, r ## o3);	\
         } while (0)
 
-/* FSM() updates the finite state machine */
-#define FSM(x0, x1, x2, x3, x4, x5, x6, x7, x8, x9)   do {	\
-                uint32_t tt, or1;				\
-                tt = XMUX(r1, s ## x1, s ## x8);		\
-                or1 = r1;					\
-                r1 = U32V(r2 + tt);				\
-                tt = U32V(or1 * 0x54655307);			\
-                r2 = ROTL32(tt, 7);				\
+/* SOSEMANUK_FSM() updates the finite state machine */
+#define SOSEMANUK_FSM(x0, x1, x2, x3, x4, x5, x6, x7, x8, x9)   do {	\
+                uint32_t tt, or1;					\
+                tt = XMUX(r1, s ## x1, s ## x8);			\
+                or1 = r1;						\
+                r1 = U32V(r2 + tt);					\
+                tt = U32V(or1 * 0x54655307);				\
+                r2 = ROTL32(tt, 7);					\
         } while (0)
 
-/* LRU updates the shift register */
-#define LRU(x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, dd)   do {		\
-                dd = s ## x0;						\
-                s ## x0 = MUL_A(s ## x0) ^ MUL_G(s ## x3) ^ s ## x9;	\
+/* SOSEMANUK_LRU updates the shift register */
+#define SOSEMANUK_LRU(x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, dd)   do {	\
+                dd = s ## x0;							\
+                s ## x0 = MUL_A(s ## x0) ^ MUL_G(s ## x3) ^ s ## x9;		\
         } while (0)
 
-/* Combination of the new states of the LFSR and the FSM */
-#define CC1(x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, ee)   do {	\
-                ee = U32V(s ## x9 + r1) ^ r2;			\
+/* Combination of the new states of the LFSR and the SOSEMANUK_FSM */
+#define SOSEMANUK_CC1(x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, ee)   do {	\
+                ee = U32V(s ## x9 + r1) ^ r2;					\
         } while (0)
 
-/* STEP computes one internal round */
-#define STEP(x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, dd, ee)   do {	\
-                FSM(x0, x1, x2, x3, x4, x5, x6, x7, x8, x9);		\
-                LRU(x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, dd);	\
-                CC1(x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, ee);	\
+/* SOSEMANUK_STEP computes one internal round */
+#define SOSEMANUK_STEP(x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, dd, ee)   do {	\
+                SOSEMANUK_FSM(x0, x1, x2, x3, x4, x5, x6, x7, x8, x9);		\
+                SOSEMANUK_LRU(x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, dd);	\
+                SOSEMANUK_CC1(x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, ee);	\
         } while (0)
 
 /* Apply one Serpent round (with the provided S-box macro) */
-#define SRD(S, x0, x1, x2, x3, ooff)   do {							\
+#define SOSEMANUK_SRD(S, x0, x1, x2, x3, ooff)   do {						\
                 S(u0, u1, u2, u3, u4);								\
                 dst[(ooff / 4)] = src[(ooff / 4)] ^ U32TO32_LITTLE(u ## x0 ^ v0);		\
                 dst[(ooff / 4) + 1] = src[(ooff / 4) + 1] ^ U32TO32_LITTLE(u ## x1 ^ v1);	\
@@ -347,9 +354,9 @@ void sosemanuk_process_blocks(sosemanuk_ctx *ctx, const uint8_t *input, uint8_t 
 /** @} */
 
 /*
- * @brief Multiplication by alpha: alpha * x = U32V(x << 8) ^ mul_a[x >> 24]
+ * @brief Multiplication by alpha: alpha * x = U32V(x << 8) ^ sosemanuk_mul_a[x >> 24]
  */
-static const uint32_t mul_a[] = {
+static const uint32_t sosemanuk_mul_a[] = {
     0x00000000, 0xE19FCF13, 0x6B973726, 0x8A08F835,
     0xD6876E4C, 0x3718A15F, 0xBD10596A, 0x5C8F9679,
     0x05A7DC98, 0xE438138B, 0x6E30EBBE, 0x8FAF24AD,
@@ -417,9 +424,9 @@ static const uint32_t mul_a[] = {
 };
 
 /*
- * @brief Multiplication by 1/alpha: 1/alpha * x = (x >> 8) ^ mul_ia[x & 0xFF]
+ * @brief Multiplication by 1/alpha: 1/alpha * x = (x >> 8) ^ sosemanuk_mul_ia[x & 0xFF]
  */
-static const uint32_t mul_ia[] = {
+static const uint32_t sosemanuk_mul_ia[] = {
     0x00000000, 0x180F40CD, 0x301E8033, 0x2811C0FE,
     0x603CA966, 0x7833E9AB, 0x50222955, 0x482D6998,
     0xC078FBCC, 0xD877BB01, 0xF0667BFF, 0xE8693B32,

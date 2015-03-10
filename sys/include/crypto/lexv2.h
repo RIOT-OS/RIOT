@@ -34,36 +34,40 @@ extern "C" {
 #define U8V(v) ((uint8_t)(v) & 0xFF)
 #define U32TO32_LITTLE(v) (v)
 
-#define U8TO32_LITTLE(p) \
+#define U8TO32_LITTLE(p)	\
   (((uint32_t)((p)[0])      ) | \
    ((uint32_t)((p)[1]) <<  8) | \
    ((uint32_t)((p)[2]) << 16) | \
    ((uint32_t)((p)[3]) << 24))
 
-#define GETU32(pt) \
-(((uint32_t)(pt)[0] << 24) ^ \
- ((uint32_t)(pt)[1] << 16) ^ \
- ((uint32_t)(pt)[2] <<  8) ^ \
+#define GETU32(pt)		\
+(((uint32_t)(pt)[0] << 24) ^	\
+ ((uint32_t)(pt)[1] << 16) ^	\
+ ((uint32_t)(pt)[2] <<  8) ^	\
  ((uint32_t)(pt)[3]))
 
-#define PUTU32(ct, st) { \
-(ct)[0] = (uint8_t)((st) >> 24); \
-(ct)[1] = (uint8_t)((st) >> 16); \
-(ct)[2] = (uint8_t)((st) >>  8); \
-(ct)[3] = (uint8_t)(st);	 \
+#define PUTU32(ct, st) {		\
+(ct)[0] = (uint8_t)((st) >> 24);	\
+(ct)[1] = (uint8_t)((st) >> 16);	\
+(ct)[2] = (uint8_t)((st) >>  8);	\
+(ct)[3] = (uint8_t)(st);		\
  }
 /** @} */
 
-/* Valid values are 10/12/14 for key sizes 128/192/256 */
-#define ROUNDS 10
+/**
+ * @name Algorithm constants 
+ * @{
+ */
+#define ROUNDS	10 /* Valid values are 10/12/14 for key sizes 128/192/256 */
+/** @} */
 
 /**
  * @brief The LEXv2 state context
  */
 typedef struct {
-    uint32_t subkeys[4 * (ROUNDS + 1)]; /**< Subkey array */
-    uint32_t blockstate[4]; /**< Blockstate array */
-    uint32_t ks[ROUNDS]; /**< Keystream array */
+    uint32_t subkeys[4 * (ROUNDS + 1)];		/**< Subkey array */
+    uint32_t blockstate[4];			/**< Blockstate array */
+    uint32_t ks[ROUNDS];			/**< Keystream array */
 } lexv2_ctx;
 
 /**
@@ -107,7 +111,7 @@ void lexv2_process_bytes(lexv2_ctx *ctx, const uint8_t *input, uint8_t *output, 
 /**
  * @brief The LEXv2 sbox definitions
  */
-static const uint32_t Te0[256] = {
+static const uint32_t lexv2_te0[256] = {
     0xc66363a5, 0xf87c7c84, 0xee777799, 0xf67b7b8d,
     0xfff2f20d, 0xd66b6bbd, 0xde6f6fb1, 0x91c5c554,
     0x60303050, 0x02010103, 0xce6767a9, 0x562b2b7d,
@@ -174,7 +178,7 @@ static const uint32_t Te0[256] = {
     0x7bb0b0cb, 0xa85454fc, 0x6dbbbbd6, 0x2c16163a,
 };
 
-static const uint32_t Te1[256] = {
+static const uint32_t lexv2_te1[256] = {
     0xa5c66363, 0x84f87c7c, 0x99ee7777, 0x8df67b7b,
     0x0dfff2f2, 0xbdd66b6b, 0xb1de6f6f, 0x5491c5c5,
     0x50603030, 0x03020101, 0xa9ce6767, 0x7d562b2b,
@@ -241,7 +245,7 @@ static const uint32_t Te1[256] = {
     0xcb7bb0b0, 0xfca85454, 0xd66dbbbb, 0x3a2c1616,
 };
 
-static const uint32_t Te2[256] = {
+static const uint32_t lexv2_te2[256] = {
     0x63a5c663, 0x7c84f87c, 0x7799ee77, 0x7b8df67b,
     0xf20dfff2, 0x6bbdd66b, 0x6fb1de6f, 0xc55491c5,
     0x30506030, 0x01030201, 0x67a9ce67, 0x2b7d562b,
@@ -308,7 +312,7 @@ static const uint32_t Te2[256] = {
     0xb0cb7bb0, 0x54fca854, 0xbbd66dbb, 0x163a2c16,
 };
 
-static const uint32_t Te3[256] = {
+static const uint32_t lexv2_te3[256] = {
     0x6363a5c6, 0x7c7c84f8, 0x777799ee, 0x7b7b8df6,
     0xf2f20dff, 0x6b6bbdd6, 0x6f6fb1de, 0xc5c55491,
     0x30305060, 0x01010302, 0x6767a9ce, 0x2b2b7d56,
@@ -375,7 +379,7 @@ static const uint32_t Te3[256] = {
     0xb0b0cb7b, 0x5454fca8, 0xbbbbd66d, 0x16163a2c,
 };
 
-static const uint32_t Te4[256] = {
+static const uint32_t lexv2_te4[256] = {
     0x63636363, 0x7c7c7c7c, 0x77777777, 0x7b7b7b7b,
     0xf2f2f2f2, 0x6b6b6b6b, 0x6f6f6f6f, 0xc5c5c5c5,
     0x30303030, 0x01010101, 0x67676767, 0x2b2b2b2b,
@@ -442,11 +446,11 @@ static const uint32_t Te4[256] = {
     0xb0b0b0b0, 0x54545454, 0xbbbbbbbb, 0x16161616,
 };
 
-static const uint32_t rcon[] = {
+static const uint32_t lexv2_rcon[] = {
     0x01000000, 0x02000000, 0x04000000, 0x08000000,
     0x10000000, 0x20000000, 0x40000000, 0x80000000,
     0x1B000000, 0x36000000,
-    /* for 128-bit blocks, Rijndael never uses more than 10 rcon values */
+    /* for 128-bit blocks, Rijndael never uses more than 10 lexv2_rcon values */
 };
 
 #ifdef __cplusplus

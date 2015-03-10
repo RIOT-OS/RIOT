@@ -39,11 +39,11 @@ static int rijndael_key_setup(uint32_t *rk, const uint8_t *cipher_key, int keybi
         for (;;) {
             temp  = rk[3];
             rk[4] = rk[0] ^
-                    (Te4[(temp >> 16) & 0xff] & 0xff000000) ^
-                    (Te4[(temp >>  8) & 0xff] & 0x00ff0000) ^
-                    (Te4[(temp) & 0xff] & 0x0000ff00) ^
-                    (Te4[(temp >> 24)       ] & 0x000000ff) ^
-                    rcon[i];
+                    (lexv2_te4[(temp >> 16) & 0xff] & 0xff000000) ^
+                    (lexv2_te4[(temp >>  8) & 0xff] & 0x00ff0000) ^
+                    (lexv2_te4[(temp) & 0xff] & 0x0000ff00) ^
+                    (lexv2_te4[(temp >> 24)       ] & 0x000000ff) ^
+                    lexv2_rcon[i];
             rk[5] = rk[1] ^ rk[4];
             rk[6] = rk[2] ^ rk[5];
             rk[7] = rk[3] ^ rk[6];
@@ -63,11 +63,11 @@ static int rijndael_key_setup(uint32_t *rk, const uint8_t *cipher_key, int keybi
         for (;;) {
             temp = rk[ 5];
             rk[ 6] = rk[ 0] ^
-                     (Te4[(temp >> 16) & 0xff] & 0xff000000) ^
-                     (Te4[(temp >>  8) & 0xff] & 0x00ff0000) ^
-                     (Te4[(temp) & 0xff] & 0x0000ff00) ^
-                     (Te4[(temp >> 24)       ] & 0x000000ff) ^
-                     rcon[i];
+                     (lexv2_te4[(temp >> 16) & 0xff] & 0xff000000) ^
+                     (lexv2_te4[(temp >>  8) & 0xff] & 0x00ff0000) ^
+                     (lexv2_te4[(temp) & 0xff] & 0x0000ff00) ^
+                     (lexv2_te4[(temp >> 24)       ] & 0x000000ff) ^
+                     lexv2_rcon[i];
             rk[ 7] = rk[ 1] ^ rk[ 6];
             rk[ 8] = rk[ 2] ^ rk[ 7];
             rk[ 9] = rk[ 3] ^ rk[ 8];
@@ -89,11 +89,11 @@ static int rijndael_key_setup(uint32_t *rk, const uint8_t *cipher_key, int keybi
         for (;;) {
             temp = rk[ 7];
             rk[ 8] = rk[ 0] ^
-                     (Te4[(temp >> 16) & 0xff] & 0xff000000) ^
-                     (Te4[(temp >>  8) & 0xff] & 0x00ff0000) ^
-                     (Te4[(temp) & 0xff] & 0x0000ff00) ^
-                     (Te4[(temp >> 24)       ] & 0x000000ff) ^
-                     rcon[i];
+                     (lexv2_te4[(temp >> 16) & 0xff] & 0xff000000) ^
+                     (lexv2_te4[(temp >>  8) & 0xff] & 0x00ff0000) ^
+                     (lexv2_te4[(temp) & 0xff] & 0x0000ff00) ^
+                     (lexv2_te4[(temp >> 24)       ] & 0x000000ff) ^
+                     lexv2_rcon[i];
             rk[ 9] = rk[ 1] ^ rk[ 8];
             rk[10] = rk[ 2] ^ rk[ 9];
             rk[11] = rk[ 3] ^ rk[10];
@@ -104,10 +104,10 @@ static int rijndael_key_setup(uint32_t *rk, const uint8_t *cipher_key, int keybi
 
             temp = rk[11];
             rk[12] = rk[ 4] ^
-                     (Te4[(temp >> 24)       ] & 0xff000000) ^
-                     (Te4[(temp >> 16) & 0xff] & 0x00ff0000) ^
-                     (Te4[(temp >>  8) & 0xff] & 0x0000ff00) ^
-                     (Te4[(temp) & 0xff] & 0x000000ff);
+                     (lexv2_te4[(temp >> 24)       ] & 0xff000000) ^
+                     (lexv2_te4[(temp >> 16) & 0xff] & 0x00ff0000) ^
+                     (lexv2_te4[(temp >>  8) & 0xff] & 0x0000ff00) ^
+                     (lexv2_te4[(temp) & 0xff] & 0x000000ff);
             rk[13] = rk[ 5] ^ rk[12];
             rk[14] = rk[ 6] ^ rk[13];
             rk[15] = rk[ 7] ^ rk[14];
@@ -134,74 +134,126 @@ static void LEX_ivsetup(lexv2_ctx *ctx, int nr, const uint32_t *pt, uint32_t *ct
     s3 = pt[3] ^ rk[3];
 
     /* Round 1: */
-    t0 = Te0[s0 >> 24] ^ Te1[(s1 >> 16) & 0xff] ^ Te2[(s2 >>  8) & 0xff] ^ Te3[s3 & 0xff] ^ rk[ 4];
-    t1 = Te0[s1 >> 24] ^ Te1[(s2 >> 16) & 0xff] ^ Te2[(s3 >>  8) & 0xff] ^ Te3[s0 & 0xff] ^ rk[ 5];
-    t2 = Te0[s2 >> 24] ^ Te1[(s3 >> 16) & 0xff] ^ Te2[(s0 >>  8) & 0xff] ^ Te3[s1 & 0xff] ^ rk[ 6];
-    t3 = Te0[s3 >> 24] ^ Te1[(s0 >> 16) & 0xff] ^ Te2[(s1 >>  8) & 0xff] ^ Te3[s2 & 0xff] ^ rk[ 7];
+    t0 = lexv2_te0[s0 >> 24] ^ lexv2_te1[(s1 >> 16) & 0xff] ^ lexv2_te2[(s2 >>  8) & 0xff] ^
+         lexv2_te3[s3 & 0xff] ^ rk[ 4];
+    t1 = lexv2_te0[s1 >> 24] ^ lexv2_te1[(s2 >> 16) & 0xff] ^ lexv2_te2[(s3 >>  8) & 0xff] ^
+         lexv2_te3[s0 & 0xff] ^ rk[ 5];
+    t2 = lexv2_te0[s2 >> 24] ^ lexv2_te1[(s3 >> 16) & 0xff] ^ lexv2_te2[(s0 >>  8) & 0xff] ^
+         lexv2_te3[s1 & 0xff] ^ rk[ 6];
+    t3 = lexv2_te0[s3 >> 24] ^ lexv2_te1[(s0 >> 16) & 0xff] ^ lexv2_te2[(s1 >>  8) & 0xff] ^
+         lexv2_te3[s2 & 0xff] ^ rk[ 7];
     /* Round 2: */
-    s0 = Te0[t0 >> 24] ^ Te1[(t1 >> 16) & 0xff] ^ Te2[(t2 >>  8) & 0xff] ^ Te3[t3 & 0xff] ^ rk[ 8];
-    s1 = Te0[t1 >> 24] ^ Te1[(t2 >> 16) & 0xff] ^ Te2[(t3 >>  8) & 0xff] ^ Te3[t0 & 0xff] ^ rk[ 9];
-    s2 = Te0[t2 >> 24] ^ Te1[(t3 >> 16) & 0xff] ^ Te2[(t0 >>  8) & 0xff] ^ Te3[t1 & 0xff] ^ rk[10];
-    s3 = Te0[t3 >> 24] ^ Te1[(t0 >> 16) & 0xff] ^ Te2[(t1 >>  8) & 0xff] ^ Te3[t2 & 0xff] ^ rk[11];
+    s0 = lexv2_te0[t0 >> 24] ^ lexv2_te1[(t1 >> 16) & 0xff] ^ lexv2_te2[(t2 >>  8) & 0xff] ^
+         lexv2_te3[t3 & 0xff] ^ rk[ 8];
+    s1 = lexv2_te0[t1 >> 24] ^ lexv2_te1[(t2 >> 16) & 0xff] ^ lexv2_te2[(t3 >>  8) & 0xff] ^
+         lexv2_te3[t0 & 0xff] ^ rk[ 9];
+    s2 = lexv2_te0[t2 >> 24] ^ lexv2_te1[(t3 >> 16) & 0xff] ^ lexv2_te2[(t0 >>  8) & 0xff] ^
+         lexv2_te3[t1 & 0xff] ^ rk[10];
+    s3 = lexv2_te0[t3 >> 24] ^ lexv2_te1[(t0 >> 16) & 0xff] ^ lexv2_te2[(t1 >>  8) & 0xff] ^
+         lexv2_te3[t2 & 0xff] ^ rk[11];
     /* Round 3: */
-    t0 = Te0[s0 >> 24] ^ Te1[(s1 >> 16) & 0xff] ^ Te2[(s2 >>  8) & 0xff] ^ Te3[s3 & 0xff] ^ rk[12];
-    t1 = Te0[s1 >> 24] ^ Te1[(s2 >> 16) & 0xff] ^ Te2[(s3 >>  8) & 0xff] ^ Te3[s0 & 0xff] ^ rk[13];
-    t2 = Te0[s2 >> 24] ^ Te1[(s3 >> 16) & 0xff] ^ Te2[(s0 >>  8) & 0xff] ^ Te3[s1 & 0xff] ^ rk[14];
-    t3 = Te0[s3 >> 24] ^ Te1[(s0 >> 16) & 0xff] ^ Te2[(s1 >>  8) & 0xff] ^ Te3[s2 & 0xff] ^ rk[15];
+    t0 = lexv2_te0[s0 >> 24] ^ lexv2_te1[(s1 >> 16) & 0xff] ^ lexv2_te2[(s2 >>  8) & 0xff] ^
+         lexv2_te3[s3 & 0xff] ^ rk[12];
+    t1 = lexv2_te0[s1 >> 24] ^ lexv2_te1[(s2 >> 16) & 0xff] ^ lexv2_te2[(s3 >>  8) & 0xff] ^
+         lexv2_te3[s0 & 0xff] ^ rk[13];
+    t2 = lexv2_te0[s2 >> 24] ^ lexv2_te1[(s3 >> 16) & 0xff] ^ lexv2_te2[(s0 >>  8) & 0xff] ^
+         lexv2_te3[s1 & 0xff] ^ rk[14];
+    t3 = lexv2_te0[s3 >> 24] ^ lexv2_te1[(s0 >> 16) & 0xff] ^ lexv2_te2[(s1 >>  8) & 0xff] ^
+         lexv2_te3[s2 & 0xff] ^ rk[15];
     /* Round 4: */
-    s0 = Te0[t0 >> 24] ^ Te1[(t1 >> 16) & 0xff] ^ Te2[(t2 >>  8) & 0xff] ^ Te3[t3 & 0xff] ^ rk[16];
-    s1 = Te0[t1 >> 24] ^ Te1[(t2 >> 16) & 0xff] ^ Te2[(t3 >>  8) & 0xff] ^ Te3[t0 & 0xff] ^ rk[17];
-    s2 = Te0[t2 >> 24] ^ Te1[(t3 >> 16) & 0xff] ^ Te2[(t0 >>  8) & 0xff] ^ Te3[t1 & 0xff] ^ rk[18];
-    s3 = Te0[t3 >> 24] ^ Te1[(t0 >> 16) & 0xff] ^ Te2[(t1 >>  8) & 0xff] ^ Te3[t2 & 0xff] ^ rk[19];
+    s0 = lexv2_te0[t0 >> 24] ^ lexv2_te1[(t1 >> 16) & 0xff] ^ lexv2_te2[(t2 >>  8) & 0xff] ^
+         lexv2_te3[t3 & 0xff] ^ rk[16];
+    s1 = lexv2_te0[t1 >> 24] ^ lexv2_te1[(t2 >> 16) & 0xff] ^ lexv2_te2[(t3 >>  8) & 0xff] ^
+         lexv2_te3[t0 & 0xff] ^ rk[17];
+    s2 = lexv2_te0[t2 >> 24] ^ lexv2_te1[(t3 >> 16) & 0xff] ^ lexv2_te2[(t0 >>  8) & 0xff] ^
+         lexv2_te3[t1 & 0xff] ^ rk[18];
+    s3 = lexv2_te0[t3 >> 24] ^ lexv2_te1[(t0 >> 16) & 0xff] ^ lexv2_te2[(t1 >>  8) & 0xff] ^
+         lexv2_te3[t2 & 0xff] ^ rk[19];
     /* Round 5: */
-    t0 = Te0[s0 >> 24] ^ Te1[(s1 >> 16) & 0xff] ^ Te2[(s2 >>  8) & 0xff] ^ Te3[s3 & 0xff] ^ rk[20];
-    t1 = Te0[s1 >> 24] ^ Te1[(s2 >> 16) & 0xff] ^ Te2[(s3 >>  8) & 0xff] ^ Te3[s0 & 0xff] ^ rk[21];
-    t2 = Te0[s2 >> 24] ^ Te1[(s3 >> 16) & 0xff] ^ Te2[(s0 >>  8) & 0xff] ^ Te3[s1 & 0xff] ^ rk[22];
-    t3 = Te0[s3 >> 24] ^ Te1[(s0 >> 16) & 0xff] ^ Te2[(s1 >>  8) & 0xff] ^ Te3[s2 & 0xff] ^ rk[23];
+    t0 = lexv2_te0[s0 >> 24] ^ lexv2_te1[(s1 >> 16) & 0xff] ^ lexv2_te2[(s2 >>  8) & 0xff] ^
+         lexv2_te3[s3 & 0xff] ^ rk[20];
+    t1 = lexv2_te0[s1 >> 24] ^ lexv2_te1[(s2 >> 16) & 0xff] ^ lexv2_te2[(s3 >>  8) & 0xff] ^
+         lexv2_te3[s0 & 0xff] ^ rk[21];
+    t2 = lexv2_te0[s2 >> 24] ^ lexv2_te1[(s3 >> 16) & 0xff] ^ lexv2_te2[(s0 >>  8) & 0xff] ^
+         lexv2_te3[s1 & 0xff] ^ rk[22];
+    t3 = lexv2_te0[s3 >> 24] ^ lexv2_te1[(s0 >> 16) & 0xff] ^ lexv2_te2[(s1 >>  8) & 0xff] ^
+         lexv2_te3[s2 & 0xff] ^ rk[23];
     /* Round 6: */
-    s0 = Te0[t0 >> 24] ^ Te1[(t1 >> 16) & 0xff] ^ Te2[(t2 >>  8) & 0xff] ^ Te3[t3 & 0xff] ^ rk[24];
-    s1 = Te0[t1 >> 24] ^ Te1[(t2 >> 16) & 0xff] ^ Te2[(t3 >>  8) & 0xff] ^ Te3[t0 & 0xff] ^ rk[25];
-    s2 = Te0[t2 >> 24] ^ Te1[(t3 >> 16) & 0xff] ^ Te2[(t0 >>  8) & 0xff] ^ Te3[t1 & 0xff] ^ rk[26];
-    s3 = Te0[t3 >> 24] ^ Te1[(t0 >> 16) & 0xff] ^ Te2[(t1 >>  8) & 0xff] ^ Te3[t2 & 0xff] ^ rk[27];
+    s0 = lexv2_te0[t0 >> 24] ^ lexv2_te1[(t1 >> 16) & 0xff] ^ lexv2_te2[(t2 >>  8) & 0xff] ^
+         lexv2_te3[t3 & 0xff] ^ rk[24];
+    s1 = lexv2_te0[t1 >> 24] ^ lexv2_te1[(t2 >> 16) & 0xff] ^ lexv2_te2[(t3 >>  8) & 0xff] ^
+         lexv2_te3[t0 & 0xff] ^ rk[25];
+    s2 = lexv2_te0[t2 >> 24] ^ lexv2_te1[(t3 >> 16) & 0xff] ^ lexv2_te2[(t0 >>  8) & 0xff] ^
+         lexv2_te3[t1 & 0xff] ^ rk[26];
+    s3 = lexv2_te0[t3 >> 24] ^ lexv2_te1[(t0 >> 16) & 0xff] ^ lexv2_te2[(t1 >>  8) & 0xff] ^
+         lexv2_te3[t2 & 0xff] ^ rk[27];
     /* Round 7: */
-    t0 = Te0[s0 >> 24] ^ Te1[(s1 >> 16) & 0xff] ^ Te2[(s2 >>  8) & 0xff] ^ Te3[s3 & 0xff] ^ rk[28];
-    t1 = Te0[s1 >> 24] ^ Te1[(s2 >> 16) & 0xff] ^ Te2[(s3 >>  8) & 0xff] ^ Te3[s0 & 0xff] ^ rk[29];
-    t2 = Te0[s2 >> 24] ^ Te1[(s3 >> 16) & 0xff] ^ Te2[(s0 >>  8) & 0xff] ^ Te3[s1 & 0xff] ^ rk[30];
-    t3 = Te0[s3 >> 24] ^ Te1[(s0 >> 16) & 0xff] ^ Te2[(s1 >>  8) & 0xff] ^ Te3[s2 & 0xff] ^ rk[31];
+    t0 = lexv2_te0[s0 >> 24] ^ lexv2_te1[(s1 >> 16) & 0xff] ^ lexv2_te2[(s2 >>  8) & 0xff] ^
+         lexv2_te3[s3 & 0xff] ^ rk[28];
+    t1 = lexv2_te0[s1 >> 24] ^ lexv2_te1[(s2 >> 16) & 0xff] ^ lexv2_te2[(s3 >>  8) & 0xff] ^
+         lexv2_te3[s0 & 0xff] ^ rk[29];
+    t2 = lexv2_te0[s2 >> 24] ^ lexv2_te1[(s3 >> 16) & 0xff] ^ lexv2_te2[(s0 >>  8) & 0xff] ^
+         lexv2_te3[s1 & 0xff] ^ rk[30];
+    t3 = lexv2_te0[s3 >> 24] ^ lexv2_te1[(s0 >> 16) & 0xff] ^ lexv2_te2[(s1 >>  8) & 0xff] ^
+         lexv2_te3[s2 & 0xff] ^ rk[31];
     /* Round 8: */
-    s0 = Te0[t0 >> 24] ^ Te1[(t1 >> 16) & 0xff] ^ Te2[(t2 >>  8) & 0xff] ^ Te3[t3 & 0xff] ^ rk[32];
-    s1 = Te0[t1 >> 24] ^ Te1[(t2 >> 16) & 0xff] ^ Te2[(t3 >>  8) & 0xff] ^ Te3[t0 & 0xff] ^ rk[33];
-    s2 = Te0[t2 >> 24] ^ Te1[(t3 >> 16) & 0xff] ^ Te2[(t0 >>  8) & 0xff] ^ Te3[t1 & 0xff] ^ rk[34];
-    s3 = Te0[t3 >> 24] ^ Te1[(t0 >> 16) & 0xff] ^ Te2[(t1 >>  8) & 0xff] ^ Te3[t2 & 0xff] ^ rk[35];
+    s0 = lexv2_te0[t0 >> 24] ^ lexv2_te1[(t1 >> 16) & 0xff] ^ lexv2_te2[(t2 >>  8) & 0xff] ^
+         lexv2_te3[t3 & 0xff] ^ rk[32];
+    s1 = lexv2_te0[t1 >> 24] ^ lexv2_te1[(t2 >> 16) & 0xff] ^ lexv2_te2[(t3 >>  8) & 0xff] ^
+         lexv2_te3[t0 & 0xff] ^ rk[33];
+    s2 = lexv2_te0[t2 >> 24] ^ lexv2_te1[(t3 >> 16) & 0xff] ^ lexv2_te2[(t0 >>  8) & 0xff] ^
+         lexv2_te3[t1 & 0xff] ^ rk[34];
+    s3 = lexv2_te0[t3 >> 24] ^ lexv2_te1[(t0 >> 16) & 0xff] ^ lexv2_te2[(t1 >>  8) & 0xff] ^
+         lexv2_te3[t2 & 0xff] ^ rk[35];
     /* Round 9: */
-    t0 = Te0[s0 >> 24] ^ Te1[(s1 >> 16) & 0xff] ^ Te2[(s2 >>  8) & 0xff] ^ Te3[s3 & 0xff] ^ rk[36];
-    t1 = Te0[s1 >> 24] ^ Te1[(s2 >> 16) & 0xff] ^ Te2[(s3 >>  8) & 0xff] ^ Te3[s0 & 0xff] ^ rk[37];
-    t2 = Te0[s2 >> 24] ^ Te1[(s3 >> 16) & 0xff] ^ Te2[(s0 >>  8) & 0xff] ^ Te3[s1 & 0xff] ^ rk[38];
-    t3 = Te0[s3 >> 24] ^ Te1[(s0 >> 16) & 0xff] ^ Te2[(s1 >>  8) & 0xff] ^ Te3[s2 & 0xff] ^ rk[39];
+    t0 = lexv2_te0[s0 >> 24] ^ lexv2_te1[(s1 >> 16) & 0xff] ^ lexv2_te2[(s2 >>  8) & 0xff] ^
+         lexv2_te3[s3 & 0xff] ^ rk[36];
+    t1 = lexv2_te0[s1 >> 24] ^ lexv2_te1[(s2 >> 16) & 0xff] ^ lexv2_te2[(s3 >>  8) & 0xff] ^
+         lexv2_te3[s0 & 0xff] ^ rk[37];
+    t2 = lexv2_te0[s2 >> 24] ^ lexv2_te1[(s3 >> 16) & 0xff] ^ lexv2_te2[(s0 >>  8) & 0xff] ^
+         lexv2_te3[s1 & 0xff] ^ rk[38];
+    t3 = lexv2_te0[s3 >> 24] ^ lexv2_te1[(s0 >> 16) & 0xff] ^ lexv2_te2[(s1 >>  8) & 0xff] ^
+         lexv2_te3[s2 & 0xff] ^ rk[39];
 
     if (nr > 10) {
         /* Round 10: */
-        s0 = Te0[t0 >> 24] ^ Te1[(t1 >> 16) & 0xff] ^ Te2[(t2 >>  8) & 0xff] ^ Te3[t3 & 0xff] ^ rk[40];
-        s1 = Te0[t1 >> 24] ^ Te1[(t2 >> 16) & 0xff] ^ Te2[(t3 >>  8) & 0xff] ^ Te3[t0 & 0xff] ^ rk[41];
-        s2 = Te0[t2 >> 24] ^ Te1[(t3 >> 16) & 0xff] ^ Te2[(t0 >>  8) & 0xff] ^ Te3[t1 & 0xff] ^ rk[42];
-        s3 = Te0[t3 >> 24] ^ Te1[(t0 >> 16) & 0xff] ^ Te2[(t1 >>  8) & 0xff] ^ Te3[t2 & 0xff] ^ rk[43];
+        s0 = lexv2_te0[t0 >> 24] ^ lexv2_te1[(t1 >> 16) & 0xff] ^ lexv2_te2[(t2 >>  8) & 0xff] ^
+             lexv2_te3[t3 & 0xff] ^ rk[40];
+        s1 = lexv2_te0[t1 >> 24] ^ lexv2_te1[(t2 >> 16) & 0xff] ^ lexv2_te2[(t3 >>  8) & 0xff] ^
+             lexv2_te3[t0 & 0xff] ^ rk[41];
+        s2 = lexv2_te0[t2 >> 24] ^ lexv2_te1[(t3 >> 16) & 0xff] ^ lexv2_te2[(t0 >>  8) & 0xff] ^
+             lexv2_te3[t1 & 0xff] ^ rk[42];
+        s3 = lexv2_te0[t3 >> 24] ^ lexv2_te1[(t0 >> 16) & 0xff] ^ lexv2_te2[(t1 >>  8) & 0xff] ^
+             lexv2_te3[t2 & 0xff] ^ rk[43];
         /* Round 11: */
-        t0 = Te0[s0 >> 24] ^ Te1[(s1 >> 16) & 0xff] ^ Te2[(s2 >>  8) & 0xff] ^ Te3[s3 & 0xff] ^ rk[44];
-        t1 = Te0[s1 >> 24] ^ Te1[(s2 >> 16) & 0xff] ^ Te2[(s3 >>  8) & 0xff] ^ Te3[s0 & 0xff] ^ rk[45];
-        t2 = Te0[s2 >> 24] ^ Te1[(s3 >> 16) & 0xff] ^ Te2[(s0 >>  8) & 0xff] ^ Te3[s1 & 0xff] ^ rk[46];
-        t3 = Te0[s3 >> 24] ^ Te1[(s0 >> 16) & 0xff] ^ Te2[(s1 >>  8) & 0xff] ^ Te3[s2 & 0xff] ^ rk[47];
+        t0 = lexv2_te0[s0 >> 24] ^ lexv2_te1[(s1 >> 16) & 0xff] ^ lexv2_te2[(s2 >>  8) & 0xff] ^
+             lexv2_te3[s3 & 0xff] ^ rk[44];
+        t1 = lexv2_te0[s1 >> 24] ^ lexv2_te1[(s2 >> 16) & 0xff] ^ lexv2_te2[(s3 >>  8) & 0xff] ^
+             lexv2_te3[s0 & 0xff] ^ rk[45];
+        t2 = lexv2_te0[s2 >> 24] ^ lexv2_te1[(s3 >> 16) & 0xff] ^ lexv2_te2[(s0 >>  8) & 0xff] ^
+             lexv2_te3[s1 & 0xff] ^ rk[46];
+        t3 = lexv2_te0[s3 >> 24] ^ lexv2_te1[(s0 >> 16) & 0xff] ^ lexv2_te2[(s1 >>  8) & 0xff] ^
+             lexv2_te3[s2 & 0xff] ^ rk[47];
 
         if (nr > 12) {
             /* Round 12: */
-            s0 = Te0[t0 >> 24] ^ Te1[(t1 >> 16) & 0xff] ^ Te2[(t2 >>  8) & 0xff] ^ Te3[t3 & 0xff] ^ rk[48];
-            s1 = Te0[t1 >> 24] ^ Te1[(t2 >> 16) & 0xff] ^ Te2[(t3 >>  8) & 0xff] ^ Te3[t0 & 0xff] ^ rk[49];
-            s2 = Te0[t2 >> 24] ^ Te1[(t3 >> 16) & 0xff] ^ Te2[(t0 >>  8) & 0xff] ^ Te3[t1 & 0xff] ^ rk[50];
-            s3 = Te0[t3 >> 24] ^ Te1[(t0 >> 16) & 0xff] ^ Te2[(t1 >>  8) & 0xff] ^ Te3[t2 & 0xff] ^ rk[51];
+            s0 = lexv2_te0[t0 >> 24] ^ lexv2_te1[(t1 >> 16) & 0xff] ^ lexv2_te2[(t2 >>  8) & 0xff] ^
+                 lexv2_te3[t3 & 0xff] ^ rk[48];
+            s1 = lexv2_te0[t1 >> 24] ^ lexv2_te1[(t2 >> 16) & 0xff] ^ lexv2_te2[(t3 >>  8) & 0xff] ^
+                 lexv2_te3[t0 & 0xff] ^ rk[49];
+            s2 = lexv2_te0[t2 >> 24] ^ lexv2_te1[(t3 >> 16) & 0xff] ^ lexv2_te2[(t0 >>  8) & 0xff] ^
+                 lexv2_te3[t1 & 0xff] ^ rk[50];
+            s3 = lexv2_te0[t3 >> 24] ^ lexv2_te1[(t0 >> 16) & 0xff] ^ lexv2_te2[(t1 >>  8) & 0xff] ^
+                 lexv2_te3[t2 & 0xff] ^ rk[51];
             /* Round 13: */
-            t0 = Te0[s0 >> 24] ^ Te1[(s1 >> 16) & 0xff] ^ Te2[(s2 >>  8) & 0xff] ^ Te3[s3 & 0xff] ^ rk[52];
-            t1 = Te0[s1 >> 24] ^ Te1[(s2 >> 16) & 0xff] ^ Te2[(s3 >>  8) & 0xff] ^ Te3[s0 & 0xff] ^ rk[53];
-            t2 = Te0[s2 >> 24] ^ Te1[(s3 >> 16) & 0xff] ^ Te2[(s0 >>  8) & 0xff] ^ Te3[s1 & 0xff] ^ rk[54];
-            t3 = Te0[s3 >> 24] ^ Te1[(s0 >> 16) & 0xff] ^ Te2[(s1 >>  8) & 0xff] ^ Te3[s2 & 0xff] ^ rk[55];
+            t0 = lexv2_te0[s0 >> 24] ^ lexv2_te1[(s1 >> 16) & 0xff] ^ lexv2_te2[(s2 >>  8) & 0xff] ^
+                 lexv2_te3[s3 & 0xff] ^ rk[52];
+            t1 = lexv2_te0[s1 >> 24] ^ lexv2_te1[(s2 >> 16) & 0xff] ^ lexv2_te2[(s3 >>  8) & 0xff] ^
+                 lexv2_te3[s0 & 0xff] ^ rk[53];
+            t2 = lexv2_te0[s2 >> 24] ^ lexv2_te1[(s3 >> 16) & 0xff] ^ lexv2_te2[(s0 >>  8) & 0xff] ^
+                 lexv2_te3[s1 & 0xff] ^ rk[54];
+            t3 = lexv2_te0[s3 >> 24] ^ lexv2_te1[(s0 >> 16) & 0xff] ^ lexv2_te2[(s1 >>  8) & 0xff] ^
+                 lexv2_te3[s2 & 0xff] ^ rk[55];
         }
     }
 
@@ -209,28 +261,28 @@ static void LEX_ivsetup(lexv2_ctx *ctx, int nr, const uint32_t *pt, uint32_t *ct
 
     /* Apply last Round and map cipher state to byte array block */
     ct[0] =
-        (Te4[(t0 >> 24)       ] & 0xff000000) ^
-        (Te4[(t1 >> 16) & 0xff] & 0x00ff0000) ^
-        (Te4[(t2 >>  8) & 0xff] & 0x0000ff00) ^
-        (Te4[(t3) & 0xff] & 0x000000ff) ^
+        (lexv2_te4[(t0 >> 24)       ] & 0xff000000) ^
+        (lexv2_te4[(t1 >> 16) & 0xff] & 0x00ff0000) ^
+        (lexv2_te4[(t2 >>  8) & 0xff] & 0x0000ff00) ^
+        (lexv2_te4[(t3) & 0xff] & 0x000000ff) ^
         rk[0];
     ct[1] =
-        (Te4[(t1 >> 24)       ] & 0xff000000) ^
-        (Te4[(t2 >> 16) & 0xff] & 0x00ff0000) ^
-        (Te4[(t3 >>  8) & 0xff] & 0x0000ff00) ^
-        (Te4[(t0) & 0xff] & 0x000000ff) ^
+        (lexv2_te4[(t1 >> 24)       ] & 0xff000000) ^
+        (lexv2_te4[(t2 >> 16) & 0xff] & 0x00ff0000) ^
+        (lexv2_te4[(t3 >>  8) & 0xff] & 0x0000ff00) ^
+        (lexv2_te4[(t0) & 0xff] & 0x000000ff) ^
         rk[1];
     ct[2] =
-        (Te4[(t2 >> 24)       ] & 0xff000000) ^
-        (Te4[(t3 >> 16) & 0xff] & 0x00ff0000) ^
-        (Te4[(t0 >>  8) & 0xff] & 0x0000ff00) ^
-        (Te4[(t1) & 0xff] & 0x000000ff) ^
+        (lexv2_te4[(t2 >> 24)       ] & 0xff000000) ^
+        (lexv2_te4[(t3 >> 16) & 0xff] & 0x00ff0000) ^
+        (lexv2_te4[(t0 >>  8) & 0xff] & 0x0000ff00) ^
+        (lexv2_te4[(t1) & 0xff] & 0x000000ff) ^
         rk[2];
     ct[3] =
-        (Te4[(t3 >> 24)       ] & 0xff000000) ^
-        (Te4[(t0 >> 16) & 0xff] & 0x00ff0000) ^
-        (Te4[(t1 >>  8) & 0xff] & 0x0000ff00) ^
-        (Te4[(t2) & 0xff] & 0x000000ff) ^
+        (lexv2_te4[(t3 >> 24)       ] & 0xff000000) ^
+        (lexv2_te4[(t0 >> 16) & 0xff] & 0x00ff0000) ^
+        (lexv2_te4[(t1 >>  8) & 0xff] & 0x0000ff00) ^
+        (lexv2_te4[(t2) & 0xff] & 0x000000ff) ^
         rk[3];
 }
 
@@ -249,86 +301,138 @@ static void rijndael_encrypt(lexv2_ctx *ctx, int nr, const uint32_t *pt, uint32_
     s3 = pt[3]; /* ^ rk[3]; */
 
     /* Round 1: */
-    t0 = Te0[s0 >> 24] ^ Te1[(s1 >> 16) & 0xff] ^ Te2[(s2 >>  8) & 0xff] ^ Te3[s3 & 0xff] ^ rk[ 4];
-    t1 = Te0[s1 >> 24] ^ Te1[(s2 >> 16) & 0xff] ^ Te2[(s3 >>  8) & 0xff] ^ Te3[s0 & 0xff] ^ rk[ 5];
-    t2 = Te0[s2 >> 24] ^ Te1[(s3 >> 16) & 0xff] ^ Te2[(s0 >>  8) & 0xff] ^ Te3[s1 & 0xff] ^ rk[ 6];
-    t3 = Te0[s3 >> 24] ^ Te1[(s0 >> 16) & 0xff] ^ Te2[(s1 >>  8) & 0xff] ^ Te3[s2 & 0xff] ^ rk[ 7];
+    t0 = lexv2_te0[s0 >> 24] ^ lexv2_te1[(s1 >> 16) & 0xff] ^ lexv2_te2[(s2 >>  8) & 0xff] ^
+         lexv2_te3[s3 & 0xff] ^ rk[ 4];
+    t1 = lexv2_te0[s1 >> 24] ^ lexv2_te1[(s2 >> 16) & 0xff] ^ lexv2_te2[(s3 >>  8) & 0xff] ^
+         lexv2_te3[s0 & 0xff] ^ rk[ 5];
+    t2 = lexv2_te0[s2 >> 24] ^ lexv2_te1[(s3 >> 16) & 0xff] ^ lexv2_te2[(s0 >>  8) & 0xff] ^
+         lexv2_te3[s1 & 0xff] ^ rk[ 6];
+    t3 = lexv2_te0[s3 >> 24] ^ lexv2_te1[(s0 >> 16) & 0xff] ^ lexv2_te2[(s1 >>  8) & 0xff] ^
+         lexv2_te3[s2 & 0xff] ^ rk[ 7];
     ctx->ks[0] = (t0 & 0xFF00FF00) ^ ((t2 & 0xFF00FF00) >> 8); /* Leak for odd Rounds */
     /* Round 2: */
-    s0 = Te0[t0 >> 24] ^ Te1[(t1 >> 16) & 0xff] ^ Te2[(t2 >>  8) & 0xff] ^ Te3[t3 & 0xff] ^ rk[ 8];
-    s1 = Te0[t1 >> 24] ^ Te1[(t2 >> 16) & 0xff] ^ Te2[(t3 >>  8) & 0xff] ^ Te3[t0 & 0xff] ^ rk[ 9];
-    s2 = Te0[t2 >> 24] ^ Te1[(t3 >> 16) & 0xff] ^ Te2[(t0 >>  8) & 0xff] ^ Te3[t1 & 0xff] ^ rk[10];
-    s3 = Te0[t3 >> 24] ^ Te1[(t0 >> 16) & 0xff] ^ Te2[(t1 >>  8) & 0xff] ^ Te3[t2 & 0xff] ^ rk[11];
+    s0 = lexv2_te0[t0 >> 24] ^ lexv2_te1[(t1 >> 16) & 0xff] ^ lexv2_te2[(t2 >>  8) & 0xff] ^
+         lexv2_te3[t3 & 0xff] ^ rk[ 8];
+    s1 = lexv2_te0[t1 >> 24] ^ lexv2_te1[(t2 >> 16) & 0xff] ^ lexv2_te2[(t3 >>  8) & 0xff] ^
+         lexv2_te3[t0 & 0xff] ^ rk[ 9];
+    s2 = lexv2_te0[t2 >> 24] ^ lexv2_te1[(t3 >> 16) & 0xff] ^ lexv2_te2[(t0 >>  8) & 0xff] ^
+         lexv2_te3[t1 & 0xff] ^ rk[10];
+    s3 = lexv2_te0[t3 >> 24] ^ lexv2_te1[(t0 >> 16) & 0xff] ^ lexv2_te2[(t1 >>  8) & 0xff] ^
+         lexv2_te3[t2 & 0xff] ^ rk[11];
     ctx->ks[1] = ((s0 & 0xFF00FF) << 8) ^ (s2 & 0xFF00FF);  /* Leak for even Rounds */
     /* Round 3: */
-    t0 = Te0[s0 >> 24] ^ Te1[(s1 >> 16) & 0xff] ^ Te2[(s2 >>  8) & 0xff] ^ Te3[s3 & 0xff] ^ rk[12];
-    t1 = Te0[s1 >> 24] ^ Te1[(s2 >> 16) & 0xff] ^ Te2[(s3 >>  8) & 0xff] ^ Te3[s0 & 0xff] ^ rk[13];
-    t2 = Te0[s2 >> 24] ^ Te1[(s3 >> 16) & 0xff] ^ Te2[(s0 >>  8) & 0xff] ^ Te3[s1 & 0xff] ^ rk[14];
-    t3 = Te0[s3 >> 24] ^ Te1[(s0 >> 16) & 0xff] ^ Te2[(s1 >>  8) & 0xff] ^ Te3[s2 & 0xff] ^ rk[15];
+    t0 = lexv2_te0[s0 >> 24] ^ lexv2_te1[(s1 >> 16) & 0xff] ^ lexv2_te2[(s2 >>  8) & 0xff] ^
+         lexv2_te3[s3 & 0xff] ^ rk[12];
+    t1 = lexv2_te0[s1 >> 24] ^ lexv2_te1[(s2 >> 16) & 0xff] ^ lexv2_te2[(s3 >>  8) & 0xff] ^
+         lexv2_te3[s0 & 0xff] ^ rk[13];
+    t2 = lexv2_te0[s2 >> 24] ^ lexv2_te1[(s3 >> 16) & 0xff] ^ lexv2_te2[(s0 >>  8) & 0xff] ^
+         lexv2_te3[s1 & 0xff] ^ rk[14];
+    t3 = lexv2_te0[s3 >> 24] ^ lexv2_te1[(s0 >> 16) & 0xff] ^ lexv2_te2[(s1 >>  8) & 0xff] ^
+         lexv2_te3[s2 & 0xff] ^ rk[15];
     ctx->ks[2] = (t0 & 0xFF00FF00) ^ ((t2 & 0xFF00FF00) >> 8); /* Leak for odd Rounds */
     /* Round 4: */
-    s0 = Te0[t0 >> 24] ^ Te1[(t1 >> 16) & 0xff] ^ Te2[(t2 >>  8) & 0xff] ^ Te3[t3 & 0xff] ^ rk[16];
-    s1 = Te0[t1 >> 24] ^ Te1[(t2 >> 16) & 0xff] ^ Te2[(t3 >>  8) & 0xff] ^ Te3[t0 & 0xff] ^ rk[17];
-    s2 = Te0[t2 >> 24] ^ Te1[(t3 >> 16) & 0xff] ^ Te2[(t0 >>  8) & 0xff] ^ Te3[t1 & 0xff] ^ rk[18];
-    s3 = Te0[t3 >> 24] ^ Te1[(t0 >> 16) & 0xff] ^ Te2[(t1 >>  8) & 0xff] ^ Te3[t2 & 0xff] ^ rk[19];
+    s0 = lexv2_te0[t0 >> 24] ^ lexv2_te1[(t1 >> 16) & 0xff] ^ lexv2_te2[(t2 >>  8) & 0xff] ^
+         lexv2_te3[t3 & 0xff] ^ rk[16];
+    s1 = lexv2_te0[t1 >> 24] ^ lexv2_te1[(t2 >> 16) & 0xff] ^ lexv2_te2[(t3 >>  8) & 0xff] ^
+         lexv2_te3[t0 & 0xff] ^ rk[17];
+    s2 = lexv2_te0[t2 >> 24] ^ lexv2_te1[(t3 >> 16) & 0xff] ^ lexv2_te2[(t0 >>  8) & 0xff] ^
+         lexv2_te3[t1 & 0xff] ^ rk[18];
+    s3 = lexv2_te0[t3 >> 24] ^ lexv2_te1[(t0 >> 16) & 0xff] ^ lexv2_te2[(t1 >>  8) & 0xff] ^
+         lexv2_te3[t2 & 0xff] ^ rk[19];
     ctx->ks[3] = ((s0 & 0xFF00FF) << 8) ^ (s2 & 0xFF00FF);  /* Leak for even Rounds */
     /* Round 5: */
-    t0 = Te0[s0 >> 24] ^ Te1[(s1 >> 16) & 0xff] ^ Te2[(s2 >>  8) & 0xff] ^ Te3[s3 & 0xff] ^ rk[20];
-    t1 = Te0[s1 >> 24] ^ Te1[(s2 >> 16) & 0xff] ^ Te2[(s3 >>  8) & 0xff] ^ Te3[s0 & 0xff] ^ rk[21];
-    t2 = Te0[s2 >> 24] ^ Te1[(s3 >> 16) & 0xff] ^ Te2[(s0 >>  8) & 0xff] ^ Te3[s1 & 0xff] ^ rk[22];
-    t3 = Te0[s3 >> 24] ^ Te1[(s0 >> 16) & 0xff] ^ Te2[(s1 >>  8) & 0xff] ^ Te3[s2 & 0xff] ^ rk[23];
+    t0 = lexv2_te0[s0 >> 24] ^ lexv2_te1[(s1 >> 16) & 0xff] ^ lexv2_te2[(s2 >>  8) & 0xff] ^
+         lexv2_te3[s3 & 0xff] ^ rk[20];
+    t1 = lexv2_te0[s1 >> 24] ^ lexv2_te1[(s2 >> 16) & 0xff] ^ lexv2_te2[(s3 >>  8) & 0xff] ^
+         lexv2_te3[s0 & 0xff] ^ rk[21];
+    t2 = lexv2_te0[s2 >> 24] ^ lexv2_te1[(s3 >> 16) & 0xff] ^ lexv2_te2[(s0 >>  8) & 0xff] ^
+         lexv2_te3[s1 & 0xff] ^ rk[22];
+    t3 = lexv2_te0[s3 >> 24] ^ lexv2_te1[(s0 >> 16) & 0xff] ^ lexv2_te2[(s1 >>  8) & 0xff] ^
+         lexv2_te3[s2 & 0xff] ^ rk[23];
     ctx->ks[4] = (t0 & 0xFF00FF00) ^ ((t2 & 0xFF00FF00) >> 8); /* Leak for odd Rounds */
     /* Round 6: */
-    s0 = Te0[t0 >> 24] ^ Te1[(t1 >> 16) & 0xff] ^ Te2[(t2 >>  8) & 0xff] ^ Te3[t3 & 0xff] ^ rk[24];
-    s1 = Te0[t1 >> 24] ^ Te1[(t2 >> 16) & 0xff] ^ Te2[(t3 >>  8) & 0xff] ^ Te3[t0 & 0xff] ^ rk[25];
-    s2 = Te0[t2 >> 24] ^ Te1[(t3 >> 16) & 0xff] ^ Te2[(t0 >>  8) & 0xff] ^ Te3[t1 & 0xff] ^ rk[26];
-    s3 = Te0[t3 >> 24] ^ Te1[(t0 >> 16) & 0xff] ^ Te2[(t1 >>  8) & 0xff] ^ Te3[t2 & 0xff] ^ rk[27];
+    s0 = lexv2_te0[t0 >> 24] ^ lexv2_te1[(t1 >> 16) & 0xff] ^ lexv2_te2[(t2 >>  8) & 0xff] ^
+         lexv2_te3[t3 & 0xff] ^ rk[24];
+    s1 = lexv2_te0[t1 >> 24] ^ lexv2_te1[(t2 >> 16) & 0xff] ^ lexv2_te2[(t3 >>  8) & 0xff] ^
+         lexv2_te3[t0 & 0xff] ^ rk[25];
+    s2 = lexv2_te0[t2 >> 24] ^ lexv2_te1[(t3 >> 16) & 0xff] ^ lexv2_te2[(t0 >>  8) & 0xff] ^
+         lexv2_te3[t1 & 0xff] ^ rk[26];
+    s3 = lexv2_te0[t3 >> 24] ^ lexv2_te1[(t0 >> 16) & 0xff] ^ lexv2_te2[(t1 >>  8) & 0xff] ^
+         lexv2_te3[t2 & 0xff] ^ rk[27];
     ctx->ks[5] = ((s0 & 0xFF00FF) << 8) ^ (s2 & 0xFF00FF);  /* Leak for even Rounds */
     /* Round 7: */
-    t0 = Te0[s0 >> 24] ^ Te1[(s1 >> 16) & 0xff] ^ Te2[(s2 >>  8) & 0xff] ^ Te3[s3 & 0xff] ^ rk[28];
-    t1 = Te0[s1 >> 24] ^ Te1[(s2 >> 16) & 0xff] ^ Te2[(s3 >>  8) & 0xff] ^ Te3[s0 & 0xff] ^ rk[29];
-    t2 = Te0[s2 >> 24] ^ Te1[(s3 >> 16) & 0xff] ^ Te2[(s0 >>  8) & 0xff] ^ Te3[s1 & 0xff] ^ rk[30];
-    t3 = Te0[s3 >> 24] ^ Te1[(s0 >> 16) & 0xff] ^ Te2[(s1 >>  8) & 0xff] ^ Te3[s2 & 0xff] ^ rk[31];
+    t0 = lexv2_te0[s0 >> 24] ^ lexv2_te1[(s1 >> 16) & 0xff] ^ lexv2_te2[(s2 >>  8) & 0xff] ^
+         lexv2_te3[s3 & 0xff] ^ rk[28];
+    t1 = lexv2_te0[s1 >> 24] ^ lexv2_te1[(s2 >> 16) & 0xff] ^ lexv2_te2[(s3 >>  8) & 0xff] ^
+         lexv2_te3[s0 & 0xff] ^ rk[29];
+    t2 = lexv2_te0[s2 >> 24] ^ lexv2_te1[(s3 >> 16) & 0xff] ^ lexv2_te2[(s0 >>  8) & 0xff] ^
+         lexv2_te3[s1 & 0xff] ^ rk[30];
+    t3 = lexv2_te0[s3 >> 24] ^ lexv2_te1[(s0 >> 16) & 0xff] ^ lexv2_te2[(s1 >>  8) & 0xff] ^
+         lexv2_te3[s2 & 0xff] ^ rk[31];
     ctx->ks[6] = (t0 & 0xFF00FF00) ^ ((t2 & 0xFF00FF00) >> 8); /* Leak for odd Rounds */
     /* Round 8: */
-    s0 = Te0[t0 >> 24] ^ Te1[(t1 >> 16) & 0xff] ^ Te2[(t2 >>  8) & 0xff] ^ Te3[t3 & 0xff] ^ rk[32];
-    s1 = Te0[t1 >> 24] ^ Te1[(t2 >> 16) & 0xff] ^ Te2[(t3 >>  8) & 0xff] ^ Te3[t0 & 0xff] ^ rk[33];
-    s2 = Te0[t2 >> 24] ^ Te1[(t3 >> 16) & 0xff] ^ Te2[(t0 >>  8) & 0xff] ^ Te3[t1 & 0xff] ^ rk[34];
-    s3 = Te0[t3 >> 24] ^ Te1[(t0 >> 16) & 0xff] ^ Te2[(t1 >>  8) & 0xff] ^ Te3[t2 & 0xff] ^ rk[35];
+    s0 = lexv2_te0[t0 >> 24] ^ lexv2_te1[(t1 >> 16) & 0xff] ^ lexv2_te2[(t2 >>  8) & 0xff] ^
+         lexv2_te3[t3 & 0xff] ^ rk[32];
+    s1 = lexv2_te0[t1 >> 24] ^ lexv2_te1[(t2 >> 16) & 0xff] ^ lexv2_te2[(t3 >>  8) & 0xff] ^
+         lexv2_te3[t0 & 0xff] ^ rk[33];
+    s2 = lexv2_te0[t2 >> 24] ^ lexv2_te1[(t3 >> 16) & 0xff] ^ lexv2_te2[(t0 >>  8) & 0xff] ^
+         lexv2_te3[t1 & 0xff] ^ rk[34];
+    s3 = lexv2_te0[t3 >> 24] ^ lexv2_te1[(t0 >> 16) & 0xff] ^ lexv2_te2[(t1 >>  8) & 0xff] ^
+         lexv2_te3[t2 & 0xff] ^ rk[35];
     ctx->ks[7] = ((s0 & 0xFF00FF) << 8) ^ (s2 & 0xFF00FF);  /* Leak for even Rounds */
     /* Round 9: */
-    t0 = Te0[s0 >> 24] ^ Te1[(s1 >> 16) & 0xff] ^ Te2[(s2 >>  8) & 0xff] ^ Te3[s3 & 0xff] ^ rk[36];
-    t1 = Te0[s1 >> 24] ^ Te1[(s2 >> 16) & 0xff] ^ Te2[(s3 >>  8) & 0xff] ^ Te3[s0 & 0xff] ^ rk[37];
-    t2 = Te0[s2 >> 24] ^ Te1[(s3 >> 16) & 0xff] ^ Te2[(s0 >>  8) & 0xff] ^ Te3[s1 & 0xff] ^ rk[38];
-    t3 = Te0[s3 >> 24] ^ Te1[(s0 >> 16) & 0xff] ^ Te2[(s1 >>  8) & 0xff] ^ Te3[s2 & 0xff] ^ rk[39];
+    t0 = lexv2_te0[s0 >> 24] ^ lexv2_te1[(s1 >> 16) & 0xff] ^ lexv2_te2[(s2 >>  8) & 0xff] ^
+         lexv2_te3[s3 & 0xff] ^ rk[36];
+    t1 = lexv2_te0[s1 >> 24] ^ lexv2_te1[(s2 >> 16) & 0xff] ^ lexv2_te2[(s3 >>  8) & 0xff] ^
+         lexv2_te3[s0 & 0xff] ^ rk[37];
+    t2 = lexv2_te0[s2 >> 24] ^ lexv2_te1[(s3 >> 16) & 0xff] ^ lexv2_te2[(s0 >>  8) & 0xff] ^
+         lexv2_te3[s1 & 0xff] ^ rk[38];
+    t3 = lexv2_te0[s3 >> 24] ^ lexv2_te1[(s0 >> 16) & 0xff] ^ lexv2_te2[(s1 >>  8) & 0xff] ^
+         lexv2_te3[s2 & 0xff] ^ rk[39];
     ctx->ks[8] = (t0 & 0xFF00FF00) ^ ((t2 & 0xFF00FF00) >> 8); /* Leak for odd Rounds */
 
     if (nr > 10) {
         /* Round 10: */
-        s0 = Te0[t0 >> 24] ^ Te1[(t1 >> 16) & 0xff] ^ Te2[(t2 >>  8) & 0xff] ^ Te3[t3 & 0xff] ^ rk[40];
-        s1 = Te0[t1 >> 24] ^ Te1[(t2 >> 16) & 0xff] ^ Te2[(t3 >>  8) & 0xff] ^ Te3[t0 & 0xff] ^ rk[41];
-        s2 = Te0[t2 >> 24] ^ Te1[(t3 >> 16) & 0xff] ^ Te2[(t0 >>  8) & 0xff] ^ Te3[t1 & 0xff] ^ rk[42];
-        s3 = Te0[t3 >> 24] ^ Te1[(t0 >> 16) & 0xff] ^ Te2[(t1 >>  8) & 0xff] ^ Te3[t2 & 0xff] ^ rk[43];
+        s0 = lexv2_te0[t0 >> 24] ^ lexv2_te1[(t1 >> 16) & 0xff] ^ lexv2_te2[(t2 >>  8) & 0xff] ^
+             lexv2_te3[t3 & 0xff] ^ rk[40];
+        s1 = lexv2_te0[t1 >> 24] ^ lexv2_te1[(t2 >> 16) & 0xff] ^ lexv2_te2[(t3 >>  8) & 0xff] ^
+             lexv2_te3[t0 & 0xff] ^ rk[41];
+        s2 = lexv2_te0[t2 >> 24] ^ lexv2_te1[(t3 >> 16) & 0xff] ^ lexv2_te2[(t0 >>  8) & 0xff] ^
+             lexv2_te3[t1 & 0xff] ^ rk[42];
+        s3 = lexv2_te0[t3 >> 24] ^ lexv2_te1[(t0 >> 16) & 0xff] ^ lexv2_te2[(t1 >>  8) & 0xff] ^
+             lexv2_te3[t2 & 0xff] ^ rk[43];
         ctx->ks[9] = ((s0 & 0xFF00FF) << 8) ^ (s2 & 0xFF00FF);  /* Leak for even Rounds */
         /* Round 11: */
-        t0 = Te0[s0 >> 24] ^ Te1[(s1 >> 16) & 0xff] ^ Te2[(s2 >>  8) & 0xff] ^ Te3[s3 & 0xff] ^ rk[44];
-        t1 = Te0[s1 >> 24] ^ Te1[(s2 >> 16) & 0xff] ^ Te2[(s3 >>  8) & 0xff] ^ Te3[s0 & 0xff] ^ rk[45];
-        t2 = Te0[s2 >> 24] ^ Te1[(s3 >> 16) & 0xff] ^ Te2[(s0 >>  8) & 0xff] ^ Te3[s1 & 0xff] ^ rk[46];
-        t3 = Te0[s3 >> 24] ^ Te1[(s0 >> 16) & 0xff] ^ Te2[(s1 >>  8) & 0xff] ^ Te3[s2 & 0xff] ^ rk[47];
+        t0 = lexv2_te0[s0 >> 24] ^ lexv2_te1[(s1 >> 16) & 0xff] ^ lexv2_te2[(s2 >>  8) & 0xff] ^
+             lexv2_te3[s3 & 0xff] ^ rk[44];
+        t1 = lexv2_te0[s1 >> 24] ^ lexv2_te1[(s2 >> 16) & 0xff] ^ lexv2_te2[(s3 >>  8) & 0xff] ^
+             lexv2_te3[s0 & 0xff] ^ rk[45];
+        t2 = lexv2_te0[s2 >> 24] ^ lexv2_te1[(s3 >> 16) & 0xff] ^ lexv2_te2[(s0 >>  8) & 0xff] ^
+             lexv2_te3[s1 & 0xff] ^ rk[46];
+        t3 = lexv2_te0[s3 >> 24] ^ lexv2_te1[(s0 >> 16) & 0xff] ^ lexv2_te2[(s1 >>  8) & 0xff] ^
+             lexv2_te3[s2 & 0xff] ^ rk[47];
         ctx->ks[10] = (t0 & 0xFF00FF00) ^ ((t2 & 0xFF00FF00) >> 8); /* Leak for odd Rounds */
 
         if (nr > 12) {
             /* Round 12: */
-            s0 = Te0[t0 >> 24] ^ Te1[(t1 >> 16) & 0xff] ^ Te2[(t2 >>  8) & 0xff] ^ Te3[t3 & 0xff] ^ rk[48];
-            s1 = Te0[t1 >> 24] ^ Te1[(t2 >> 16) & 0xff] ^ Te2[(t3 >>  8) & 0xff] ^ Te3[t0 & 0xff] ^ rk[49];
-            s2 = Te0[t2 >> 24] ^ Te1[(t3 >> 16) & 0xff] ^ Te2[(t0 >>  8) & 0xff] ^ Te3[t1 & 0xff] ^ rk[50];
-            s3 = Te0[t3 >> 24] ^ Te1[(t0 >> 16) & 0xff] ^ Te2[(t1 >>  8) & 0xff] ^ Te3[t2 & 0xff] ^ rk[51];
+            s0 = lexv2_te0[t0 >> 24] ^ lexv2_te1[(t1 >> 16) & 0xff] ^ lexv2_te2[(t2 >>  8) & 0xff] ^
+                 lexv2_te3[t3 & 0xff] ^ rk[48];
+            s1 = lexv2_te0[t1 >> 24] ^ lexv2_te1[(t2 >> 16) & 0xff] ^ lexv2_te2[(t3 >>  8) & 0xff] ^
+                 lexv2_te3[t0 & 0xff] ^ rk[49];
+            s2 = lexv2_te0[t2 >> 24] ^ lexv2_te1[(t3 >> 16) & 0xff] ^ lexv2_te2[(t0 >>  8) & 0xff] ^
+                 lexv2_te3[t1 & 0xff] ^ rk[50];
+            s3 = lexv2_te0[t3 >> 24] ^ lexv2_te1[(t0 >> 16) & 0xff] ^ lexv2_te2[(t1 >>  8) & 0xff] ^
+                 lexv2_te3[t2 & 0xff] ^ rk[51];
             ctx->ks[11] = ((s0 & 0xFF00FF) << 8) ^ (s2 & 0xFF00FF);  /* Leak for even Rounds */
             /* Round 13: */
-            t0 = Te0[s0 >> 24] ^ Te1[(s1 >> 16) & 0xff] ^ Te2[(s2 >>  8) & 0xff] ^ Te3[s3 & 0xff] ^ rk[52];
-            t1 = Te0[s1 >> 24] ^ Te1[(s2 >> 16) & 0xff] ^ Te2[(s3 >>  8) & 0xff] ^ Te3[s0 & 0xff] ^ rk[53];
-            t2 = Te0[s2 >> 24] ^ Te1[(s3 >> 16) & 0xff] ^ Te2[(s0 >>  8) & 0xff] ^ Te3[s1 & 0xff] ^ rk[54];
-            t3 = Te0[s3 >> 24] ^ Te1[(s0 >> 16) & 0xff] ^ Te2[(s1 >>  8) & 0xff] ^ Te3[s2 & 0xff] ^ rk[55];
+            t0 = lexv2_te0[s0 >> 24] ^ lexv2_te1[(s1 >> 16) & 0xff] ^ lexv2_te2[(s2 >>  8) & 0xff] ^
+                 lexv2_te3[s3 & 0xff] ^ rk[52];
+            t1 = lexv2_te0[s1 >> 24] ^ lexv2_te1[(s2 >> 16) & 0xff] ^ lexv2_te2[(s3 >>  8) & 0xff] ^
+                 lexv2_te3[s0 & 0xff] ^ rk[53];
+            t2 = lexv2_te0[s2 >> 24] ^ lexv2_te1[(s3 >> 16) & 0xff] ^ lexv2_te2[(s0 >>  8) & 0xff] ^
+                 lexv2_te3[s1 & 0xff] ^ rk[54];
+            t3 = lexv2_te0[s3 >> 24] ^ lexv2_te1[(s0 >> 16) & 0xff] ^ lexv2_te2[(s1 >>  8) & 0xff] ^
+                 lexv2_te3[s2 & 0xff] ^ rk[55];
             ctx->ks[12] = (t0 & 0xFF00FF00) ^ ((t2 & 0xFF00FF00) >> 8); /* Leak for odd Rounds */
         }
     }
@@ -336,10 +440,14 @@ static void rijndael_encrypt(lexv2_ctx *ctx, int nr, const uint32_t *pt, uint32_
     rk += nr << 2;
 
     /* Apply last Round * * map cipher state to byte array block */
-    ct[0] = Te0[t0 >> 24] ^ Te1[(t1 >> 16) & 0xff] ^ Te2[(t2 >>  8) & 0xff] ^ Te3[t3 & 0xff] ^ rk[0];
-    ct[1] = Te0[t1 >> 24] ^ Te1[(t2 >> 16) & 0xff] ^ Te2[(t3 >>  8) & 0xff] ^ Te3[t0 & 0xff] ^ rk[1];
-    ct[2] = Te0[t2 >> 24] ^ Te1[(t3 >> 16) & 0xff] ^ Te2[(t0 >>  8) & 0xff] ^ Te3[t1 & 0xff] ^ rk[2];
-    ct[3] = Te0[t3 >> 24] ^ Te1[(t0 >> 16) & 0xff] ^ Te2[(t1 >>  8) & 0xff] ^ Te3[t2 & 0xff] ^ rk[3];
+    ct[0] = lexv2_te0[t0 >> 24] ^ lexv2_te1[(t1 >> 16) & 0xff] ^ lexv2_te2[(t2 >>  8) & 0xff] ^
+            lexv2_te3[t3 & 0xff] ^ rk[0];
+    ct[1] = lexv2_te0[t1 >> 24] ^ lexv2_te1[(t2 >> 16) & 0xff] ^ lexv2_te2[(t3 >>  8) & 0xff] ^
+            lexv2_te3[t0 & 0xff] ^ rk[1];
+    ct[2] = lexv2_te0[t2 >> 24] ^ lexv2_te1[(t3 >> 16) & 0xff] ^ lexv2_te2[(t0 >>  8) & 0xff] ^
+            lexv2_te3[t1 & 0xff] ^ rk[2];
+    ct[3] = lexv2_te0[t3 >> 24] ^ lexv2_te1[(t0 >> 16) & 0xff] ^ lexv2_te2[(t1 >>  8) & 0xff] ^
+            lexv2_te3[t2 & 0xff] ^ rk[3];
     ctx->ks[nr - 1] = ((ct[0] & 0xFF00FF) << 8) ^ (ct[2] & 0xFF00FF); /* Leak for even Rounds */
 
 }
@@ -377,7 +485,7 @@ void lexv2_process_blocks(lexv2_ctx *ctx, const uint8_t *input, uint8_t *output,
             *(uint32_t *)(output + 4 * j) = *(uint32_t *)(input + 4 * j) ^ U32TO32_LITTLE(ctx->ks[j]);
         }
 
-	/* Move pointers to get ready for the next block */
+        /* Move pointers to get ready for the next block */
         input  += 4 * ROUNDS;
         output += 4 * ROUNDS;
     }

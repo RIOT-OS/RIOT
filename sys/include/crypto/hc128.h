@@ -41,23 +41,22 @@ extern "C" {
  * @brief The HC-128 state context
  */
 typedef struct {
-    uint32_t T[1024]; /**< T array*/
-    uint32_t X[16]; /**< X array */
-    uint32_t Y[16]; /**< Y array */
-    uint32_t counter1024; /**< Counter variable */
-    uint32_t key[8]; /**< Key */
-    uint32_t iv[8]; /**< IV */
-    uint32_t keysize; /**< Key size */
-    uint32_t ivsize; /**< IV size */
+    uint32_t T[1024];		/**< T array*/
+    uint32_t X[16];		/**< X array */
+    uint32_t Y[16];		/**< Y array */
+    uint32_t counter1024;	/**< Counter variable */
+    uint32_t key[8];		/**< Key */
+    uint32_t iv[8];		/**< IV */
+    uint32_t keysize;		/**< Key size */
+    uint32_t ivsize;		/**< IV size */
 } hc128_ctx;
-
 
 /**
  * @name Algorithm macros
  * @{
  */
-/* h1 function */
-#define h1(ctx, x, y) {			\
+/* HC-128 H1 function */
+#define HC128_H1(ctx, x, y) {		\
      uint32_t B0,B2,t0;			\
      B0 = (uint8_t) (x);		\
      t0 = (ctx->T[512+B0]);		\
@@ -65,8 +64,8 @@ typedef struct {
      y = t0 + (ctx->T[512+256+B2]);	\
 }
 
-/* h2 function */
-#define h2(ctx, x, y) {			\
+/* HC-128 H2 function */
+#define HC128_H2(ctx, x, y) {		\
      uint32_t B0,B2,t0;			\
      B0 = (uint8_t) (x);		\
      t0 = (ctx->T[B0]);			\
@@ -74,10 +73,10 @@ typedef struct {
      y = t0 + (ctx->T[256+B2]);		\
 }
 
-/* one step of HC-128, update P and generate 32 bits keystream */
-#define step_P(ctx,u,v,a,b,c,d,n){		\
+/* One step of HC-128, update P and generate 32 bits keystream */
+#define HC128_STEP_P(ctx,u,v,a,b,c,d,n){	\
      uint32_t tem0,tem1,tem2,tem3;		\
-     h1((ctx),(ctx->X[(d)]),tem3);		\
+     HC128_H1((ctx),(ctx->X[(d)]),tem3);	\
      tem0 = ROTR32((ctx->T[(v)]),23);		\
      tem1 = ROTR32((ctx->X[(c)]),10);		\
      tem2 = ROTR32((ctx->X[(b)]),8);		\
@@ -86,10 +85,10 @@ typedef struct {
      (n) = tem3 ^ (ctx->T[(u)]);		\
 }
 
-/* one step of HC-128, update Q and generate 32 bits keystream */
-#define step_Q(ctx,u,v,a,b,c,d,n){		\
+/* One step of HC-128, update Q and generate 32 bits keystream */
+#define HC128_STEP_Q(ctx,u,v,a,b,c,d,n){	\
      uint32_t tem0,tem1,tem2,tem3;		\
-     h2((ctx),(ctx->Y[(d)]),tem3);		\
+     HC128_H2((ctx),(ctx->Y[(d)]),tem3);	\
      tem0 = ROTR32((ctx->T[(v)]),(32-23));	\
      tem1 = ROTR32((ctx->Y[(c)]),(32-10));	\
      tem2 = ROTR32((ctx->Y[(b)]),(32-8));	\
@@ -98,27 +97,27 @@ typedef struct {
      (n) = tem3 ^ (ctx->T[(u)]);		\
 }
 
-#define f1(x)  (ROTR32((x),7) ^ ROTR32((x),18) ^ ((x) >> 3))
-#define f2(x)  (ROTR32((x),17) ^ ROTR32((x),19) ^ ((x) >> 10))
+#define HC128_F1(x)  (ROTR32((x),7) ^ ROTR32((x),18) ^ ((x) >> 3))
+#define HC128_F2(x)  (ROTR32((x),17) ^ ROTR32((x),19) ^ ((x) >> 10))
 
-/* update table P */
-#define update_P(ctx,u,v,a,b,c,d){				\
+/* Update HC-128 table P */
+#define HC128_UPDATE_P(ctx,u,v,a,b,c,d){			\
      uint32_t tem0,tem1,tem2,tem3;				\
      tem0 = ROTR32((ctx->T[(v)]),23);				\
      tem1 = ROTR32((ctx->X[(c)]),10);				\
      tem2 = ROTR32((ctx->X[(b)]),8);				\
-     h1((ctx),(ctx->X[(d)]),tem3);				\
+     HC128_H1((ctx),(ctx->X[(d)]),tem3);			\
      (ctx->T[(u)]) = ((ctx->T[(u)]) + tem2+(tem0^tem1)) ^ tem3; \
      (ctx->X[(a)]) = (ctx->T[(u)]);				\
 }
 
-/* update table Q */
-#define update_Q(ctx,u,v,a,b,c,d){				\
+/* Update HC-128 table Q */
+#define HC128_UPDATE_Q(ctx,u,v,a,b,c,d){			\
      uint32_t tem0,tem1,tem2,tem3;				\
      tem0 = ROTR32((ctx->T[(v)]),(32-23));			\
      tem1 = ROTR32((ctx->Y[(c)]),(32-10));			\
      tem2 = ROTR32((ctx->Y[(b)]),(32-8));			\
-     h2((ctx),(ctx->Y[(d)]),tem3);				\
+     HC128_H2((ctx),(ctx->Y[(d)]),tem3);			\
      (ctx->T[(u)]) = ((ctx->T[(u)]) + tem2+(tem0^tem1)) ^ tem3;	\
      (ctx->Y[(a)]) = (ctx->T[(u)]);				\
 }

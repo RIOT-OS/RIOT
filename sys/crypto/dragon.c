@@ -38,41 +38,41 @@ void dragon_keysetup(dragon_ctx *ctx, const uint8_t *key, uint32_t keysize)
     ctx->key_size = keysize;
 
     if (keysize == 128) {
-        ctx->nlfsr_word[0 + 0]  = ctx->nlfsr_word[12 + 0] = ctx->nlfsr_word[20 + 0]
-         = U8TO32_BIG( key + 0 * 4);
-        ctx->nlfsr_word[0 + 1]  = ctx->nlfsr_word[12 + 1] = ctx->nlfsr_word[20 + 1]
-         = U8TO32_BIG( key + 1 * 4);
-        ctx->nlfsr_word[0 + 2]  = ctx->nlfsr_word[12 + 2] = ctx->nlfsr_word[20 + 2]
-         = U8TO32_BIG( key + 2 * 4);
-        ctx->nlfsr_word[0 + 3]  = ctx->nlfsr_word[12 + 3] = ctx->nlfsr_word[20 + 3]
-         = U8TO32_BIG( key + 3 * 4);
+        ctx->nlfsr_word[0 + 0] = ctx->nlfsr_word[12 + 0] = ctx->nlfsr_word[20 + 0]
+                                  = U8TO32_BIG(key + 0 * 4);
+        ctx->nlfsr_word[0 + 1] = ctx->nlfsr_word[12 + 1] = ctx->nlfsr_word[20 + 1]
+                                  = U8TO32_BIG(key + 1 * 4);
+        ctx->nlfsr_word[0 + 2] = ctx->nlfsr_word[12 + 2] = ctx->nlfsr_word[20 + 2]
+                                  = U8TO32_BIG(key + 2 * 4);
+        ctx->nlfsr_word[0 + 3] = ctx->nlfsr_word[12 + 3] = ctx->nlfsr_word[20 + 3]
+                                  = U8TO32_BIG(key + 3 * 4);
 
         ctx->nlfsr_word[4 + 0] = ctx->nlfsr_word[16 + 0] = ctx->nlfsr_word[28 + 0]
-         = U8TO32_BIG( key + 8 + 0 * 4);
+                                 = U8TO32_BIG(key + 8 + 0 * 4);
         ctx->nlfsr_word[6 + 0] = ctx->nlfsr_word[18 + 0] = ctx->nlfsr_word[30 + 0]
-         = U8TO32_BIG( key + 0 * 4);
+                                 = U8TO32_BIG(key + 0 * 4);
         ctx->nlfsr_word[4 + 1] = ctx->nlfsr_word[16 + 1] = ctx->nlfsr_word[28 + 1]
-         = U8TO32_BIG( key + 8 + 1 * 4);
+                                 = U8TO32_BIG(key + 8 + 1 * 4);
         ctx->nlfsr_word[6 + 1] = ctx->nlfsr_word[18 + 1] = ctx->nlfsr_word[30 + 1]
-         = U8TO32_BIG( key + 1 * 4);
+                                 = U8TO32_BIG(key + 1 * 4);
     }
     else {
-        ctx->nlfsr_word[0 + 0]  = ctx->nlfsr_word[8 + 0] = ctx->nlfsr_word[16 + 0]
-         = U8TO32_BIG( key + 0 * 4);
-        ctx->nlfsr_word[0 + 1]  = ctx->nlfsr_word[8 + 1] = ctx->nlfsr_word[16 + 1]
-          = U8TO32_BIG( key + 1 * 4);
-        ctx->nlfsr_word[0 + 2]  = ctx->nlfsr_word[8 + 2] = ctx->nlfsr_word[16 + 2]
-         = U8TO32_BIG( key + 2 * 4);
-        ctx->nlfsr_word[0 + 3]  = ctx->nlfsr_word[8 + 3] = ctx->nlfsr_word[16 + 3]
-         = U8TO32_BIG( key + 3 * 4);
-        ctx->nlfsr_word[0 + 4]  = ctx->nlfsr_word[8 + 4] = ctx->nlfsr_word[16 + 4]
-         = U8TO32_BIG( key + 4 * 4);
-        ctx->nlfsr_word[0 + 5]  = ctx->nlfsr_word[8 + 5] = ctx->nlfsr_word[16 + 5]
-         = U8TO32_BIG( key + 5 * 4);
-        ctx->nlfsr_word[0 + 6]  = ctx->nlfsr_word[8 + 6] = ctx->nlfsr_word[16 + 6]
-         = U8TO32_BIG( key + 6 * 4);
-        ctx->nlfsr_word[0 + 7]  = ctx->nlfsr_word[8 + 7] = ctx->nlfsr_word[16 + 7]
-         = U8TO32_BIG( key + 7 * 4);
+        ctx->nlfsr_word[0 + 0] = ctx->nlfsr_word[8 + 0] = ctx->nlfsr_word[16 + 0]
+                                  = U8TO32_BIG(key + 0 * 4);
+        ctx->nlfsr_word[0 + 1] = ctx->nlfsr_word[8 + 1] = ctx->nlfsr_word[16 + 1]
+                                  = U8TO32_BIG(key + 1 * 4);
+        ctx->nlfsr_word[0 + 2] = ctx->nlfsr_word[8 + 2] = ctx->nlfsr_word[16 + 2]
+                                  = U8TO32_BIG(key + 2 * 4);
+        ctx->nlfsr_word[0 + 3] = ctx->nlfsr_word[8 + 3] = ctx->nlfsr_word[16 + 3]
+                                  = U8TO32_BIG(key + 3 * 4);
+        ctx->nlfsr_word[0 + 4] = ctx->nlfsr_word[8 + 4] = ctx->nlfsr_word[16 + 4]
+                                  = U8TO32_BIG(key + 4 * 4);
+        ctx->nlfsr_word[0 + 5] = ctx->nlfsr_word[8 + 5] = ctx->nlfsr_word[16 + 5]
+                                  = U8TO32_BIG(key + 5 * 4);
+        ctx->nlfsr_word[0 + 6] = ctx->nlfsr_word[8 + 6] = ctx->nlfsr_word[16 + 6]
+                                  = U8TO32_BIG(key + 6 * 4);
+        ctx->nlfsr_word[0 + 7] = ctx->nlfsr_word[8 + 7] = ctx->nlfsr_word[16 + 7]
+                                  = U8TO32_BIG(key + 7 * 4);
     }
 
     /* Preserve the state for the key-IV-IV */

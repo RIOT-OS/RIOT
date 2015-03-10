@@ -41,22 +41,22 @@ extern "C" {
  * @brief The HC-256 state context
  */
 typedef struct {
-    uint32_t T[2048]; /**< T array */
-    uint32_t X[16]; /**< X array */
-    uint32_t Y[16]; /**< Y array */
-    uint32_t counter2048; /**< Counter variable */
-    uint32_t key[8]; /**< Key */
-    uint32_t iv[8]; /**< IV */
-    uint32_t keysize; /**< Key size */
-    uint32_t ivsize; /**< IV size */
+    uint32_t T[2048];		/**< T array */
+    uint32_t X[16];		/**< X array */
+    uint32_t Y[16];		/**< Y array */
+    uint32_t counter2048;	/**< Counter variable */
+    uint32_t key[8];		/**< Key */
+    uint32_t iv[8];		/**< IV */
+    uint32_t keysize;		/**< Key size */
+    uint32_t ivsize;		/**< IV size */
 } hc256_ctx;
 
 /**
- * @name Bit arithmetic macros
+ * @name Algorithm macros
  * @{
  */
-/* h1 function */
-#define h1(ctx, x, y){				\
+/* HC-256 H1 function */
+#define HC256_H1(ctx, x, y){			\
      uint32_t B0,B1,B2,B3;			\
      uint32_t t0,t1,t2;				\
      B0 = (uint8_t) (x);			\
@@ -69,8 +69,8 @@ typedef struct {
      (y) =  t2 + ((ctx)->T[1024 + 768 + B3]);	\
 }
 
-/* h2 function */
-#define h2(ctx, x, y){			\
+/* HC-256 H2 function */
+#define HC256_H2(ctx, x, y){		\
      uint32_t B0,B1,B2,B3;		\
      uint32_t t0,t1,t2;			\
      B0 = (uint8_t) (x);		\
@@ -83,35 +83,35 @@ typedef struct {
      (y) =  t2 + ((ctx)->T[768 + B3]);	\
 }
 
-/* one step of HC-256, update P and generate 32 bits keystream */
-#define step_P(ctx,u,v,a,b,c,d,m){					\
+/* One step of HC-256, update P and generate 32 bits keystream */
+#define HC256_STEP_P(ctx,u,v,a,b,c,d,m){				\
      uint32_t tem0,tem1,tem2,tem3;					\
      tem0 = ROTR32((ctx->T[(v)]),23);					\
      tem1 = ROTR32((ctx->X[(c)]),10);					\
      tem2 = ((ctx->T[(v)]) ^ (ctx->X[(c)])) & 0x3ff;			\
      (ctx->T[(u)]) += (ctx->X[(b)])+(tem0^tem1)+(ctx->T[1024+tem2]);	\
      (ctx->X[(a)]) = (ctx->T[(u)]);					\
-     h1((ctx),(ctx->X[(d)]),tem3);					\
+     HC256_H1((ctx),(ctx->X[(d)]),tem3);				\
      (m) = tem3 ^ (ctx->T[(u)]);					\
 }
 
-/* one step of HC-256, update Q and generate 32 bits keystream */
-#define step_Q(ctx,u,v,a,b,c,d,m){				\
-     uint32_t tem0,tem1,tem2,tem3;				\
-     tem0 = ROTR32((ctx->T[(v)]),23);				\
-     tem1 = ROTR32((ctx->Y[(c)]),10);				\
-     tem2 = ((ctx->T[(v)]) ^ (ctx->Y[(c)])) & 0x3ff;		\
-     (ctx->T[(u)]) += (ctx->Y[(b)])+(tem0^tem1)+(ctx->T[tem2]);	\
-     (ctx->Y[(a)]) = (ctx->T[(u)]);				\
-     h2((ctx),(ctx->Y[(d)]),tem3);				\
-     (m) = tem3 ^ (ctx->T[(u)]);				\
+/* One step of HC-256, update Q and generate 32 bits keystream */
+#define HC256_STEP_Q(ctx,u,v,a,b,c,d,m){				\
+     uint32_t tem0,tem1,tem2,tem3;					\
+     tem0 = ROTR32((ctx->T[(v)]),23);					\
+     tem1 = ROTR32((ctx->Y[(c)]),10);					\
+     tem2 = ((ctx->T[(v)]) ^ (ctx->Y[(c)])) & 0x3ff;			\
+     (ctx->T[(u)]) += (ctx->Y[(b)])+(tem0^tem1)+(ctx->T[tem2]);		\
+     (ctx->Y[(a)]) = (ctx->T[(u)]);					\
+     HC256_H2((ctx),(ctx->Y[(d)]),tem3);				\
+     (m) = tem3 ^ (ctx->T[(u)]);					\
 }
 
-#define f1(x)  (ROTR32((x),7) ^ ROTR32((x),18) ^ ((x) >> 3))
-#define f2(x)  (ROTR32((x),17) ^ ROTR32((x),19) ^ ((x) >> 10))
+#define HC256_F1(x)  (ROTR32((x),7) ^ ROTR32((x),18) ^ ((x) >> 3))
+#define HC256_F2(x)  (ROTR32((x),17) ^ ROTR32((x),19) ^ ((x) >> 10))
 
-/* update table P */
-#define update_P(ctx,u,v,a,b,c){					\
+/* Update HC-256 table P */
+#define HC256_UPDATE_P(ctx,u,v,a,b,c){					\
      uint32_t tem0,tem1,tem2;						\
      tem0 = ROTR32((ctx->T[(v)]),23);					\
      tem1 = ROTR32((ctx->X[(c)]),10);					\
@@ -120,8 +120,8 @@ typedef struct {
      (ctx->X[(a)]) = (ctx->T[(u)]);					\
 }
 
-/* update table Q */
-#define update_Q(ctx,u,v,a,b,c){				\
+/* Update HC-256 table Q */
+#define HC256_UPDATE_Q(ctx,u,v,a,b,c){				\
      uint32_t tem0,tem1,tem2;					\
      tem0 = ROTR32((ctx->T[(v)]),23);				\
      tem1 = ROTR32((ctx->Y[(c)]),10);				\

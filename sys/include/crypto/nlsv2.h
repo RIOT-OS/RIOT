@@ -48,53 +48,40 @@ extern "C" {
 #define ROTL(v, n) (U32V((v) << (n)) | ((v) >> (32 - (n))))
 #define U8TO32_LITTLE(p) (((uint32_t*)(p))[0])
 #define U32TO8_LITTLE(p, v) (((uint32_t*)(p))[0] = v)
-#define Byte(x,i) ((uint8_t)(((x) >> (8*(i))) & 0xFF))
+#define BYTE(x,i) ((uint8_t)(((x) >> (8*(i))) & 0xFF))
 
-#define BYTE2WORD(b) ( \
-        (((uint32_t)(b)[3] & 0xFF)<<24) | \
-        (((uint32_t)(b)[2] & 0xFF)<<16) | \
-        (((uint32_t)(b)[1] & 0xFF)<<8) | \
-        (((uint32_t)(b)[0] & 0xFF)) \
+#define BYTE2WORD(b) (				\
+        (((uint32_t)(b)[3] & 0xFF)<<24) |	\
+        (((uint32_t)(b)[2] & 0xFF)<<16) |	\
+        (((uint32_t)(b)[1] & 0xFF)<<8) |	\
+        (((uint32_t)(b)[0] & 0xFF))		\
 )
 
-#define WORD2BYTE(w, b) { \
-        (b)[3] = Byte(w,3); \
-        (b)[2] = Byte(w,2); \
-        (b)[1] = Byte(w,1); \
-        (b)[0] = Byte(w,0); \
+#define WORD2BYTE(w, b) {	\
+        (b)[3] = BYTE(w,3);	\
+        (b)[2] = BYTE(w,2);	\
+        (b)[1] = BYTE(w,1);	\
+        (b)[0] = BYTE(w,0);	\
 }
 
-#define XORWORD(w, b) { \
-        (b)[3] ^= Byte(w,3); \
-        (b)[2] ^= Byte(w,2); \
-        (b)[1] ^= Byte(w,1); \
-        (b)[0] ^= Byte(w,0); \
+#define XORWORD(w, b) {		\
+        (b)[3] ^= BYTE(w,3);	\
+        (b)[2] ^= BYTE(w,2);	\
+        (b)[1] ^= BYTE(w,1);	\
+        (b)[0] ^= BYTE(w,0);	\
 }
-
-#define A c->M[0]
-#define B c->M[1]
-#define C c->M[2]
-#define D c->M[3]
-#define E c->M[4]
-#define F c->M[5]
-#define G c->M[6]
-#define H c->M[7]
-#define SIGMA0(x) (ROTR((x), 2) ^ ROTR((x), 13) ^ ROTR((x), 22))
-#define SIGMA1(x) (ROTR((x), 6) ^ ROTR((x), 11) ^ ROTR((x), 25))
-#define CHOOSE(x,y,z) (((x) & (y)) ^ ((~(x)) & (z)))
-#define MAJORITY(x,y,z) (((x) & (y)) ^ ((x) & (z)) ^ ((y) & (z)))
 /** @} */
 
 /**
  * @brief The NLSv2 state context
  */
 typedef struct {
-    uint32_t        R[N]; /**< Storage for the shift register */
-    uint32_t        initR[N]; /**< Saved register contents */
-    uint32_t        konst; /**< Key dependent constant */
-    uint32_t        sbuf; /**< Encryption buffer */
-    uint32_t        ivsize; /**< IV size */
-    int             nbuf; /**< Number of stream bits buffered */
+    uint32_t        R[N];	/**< Storage for the shift register */
+    uint32_t        initR[N];	/**< Saved register contents */
+    uint32_t        konst;	/**< Key dependent constant */
+    uint32_t        sbuf;	/**< Encryption buffer */
+    uint32_t        ivsize;	/**< IV size */
+    int             nbuf;	/**< Number of stream bits buffered */
 } nlsv2_ctx;
 
 /**
@@ -128,7 +115,7 @@ void nlsv2_process_bytes(nlsv2_ctx *ctx, const uint8_t *input, uint8_t *output, 
 /**
  * @brief The NLSv2 sbox definitions
  */
-static const uint32_t Sbox[256] = {
+static const uint32_t nlsv2_sbox[256] = {
     0xa3aa1887, 0xd65e435c, 0x0b65c042, 0x800e6ef4,
     0xfc57ee20, 0x4d84fed3, 0xf066c502, 0xf354e8ae,
     0xbb2ee9d9, 0x281f38d4, 0x1f829b5d, 0x735cdf3c,

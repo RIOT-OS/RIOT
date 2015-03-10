@@ -54,31 +54,31 @@ static void sosemanuk_internal(sosemanuk_ctx *rc, const uint32_t *src, uint32_t 
     uint32_t u0, u1, u2, u3, u4;
     uint32_t v0, v1, v2, v3;
 
-    STEP(00, 01, 02, 03, 04, 05, 06, 07, 08, 09, v0, u0);
-    STEP(01, 02, 03, 04, 05, 06, 07, 08, 09, 00, v1, u1);
-    STEP(02, 03, 04, 05, 06, 07, 08, 09, 00, 01, v2, u2);
-    STEP(03, 04, 05, 06, 07, 08, 09, 00, 01, 02, v3, u3);
-    SRD(S2, 2, 3, 1, 4, 0);
-    STEP(04, 05, 06, 07, 08, 09, 00, 01, 02, 03, v0, u0);
-    STEP(05, 06, 07, 08, 09, 00, 01, 02, 03, 04, v1, u1);
-    STEP(06, 07, 08, 09, 00, 01, 02, 03, 04, 05, v2, u2);
-    STEP(07, 08, 09, 00, 01, 02, 03, 04, 05, 06, v3, u3);
-    SRD(S2, 2, 3, 1, 4, 16);
-    STEP(08, 09, 00, 01, 02, 03, 04, 05, 06, 07, v0, u0);
-    STEP(09, 00, 01, 02, 03, 04, 05, 06, 07, 08, v1, u1);
-    STEP(00, 01, 02, 03, 04, 05, 06, 07, 08, 09, v2, u2);
-    STEP(01, 02, 03, 04, 05, 06, 07, 08, 09, 00, v3, u3);
-    SRD(S2, 2, 3, 1, 4, 32);
-    STEP(02, 03, 04, 05, 06, 07, 08, 09, 00, 01, v0, u0);
-    STEP(03, 04, 05, 06, 07, 08, 09, 00, 01, 02, v1, u1);
-    STEP(04, 05, 06, 07, 08, 09, 00, 01, 02, 03, v2, u2);
-    STEP(05, 06, 07, 08, 09, 00, 01, 02, 03, 04, v3, u3);
-    SRD(S2, 2, 3, 1, 4, 48);
-    STEP(06, 07, 08, 09, 00, 01, 02, 03, 04, 05, v0, u0);
-    STEP(07, 08, 09, 00, 01, 02, 03, 04, 05, 06, v1, u1);
-    STEP(08, 09, 00, 01, 02, 03, 04, 05, 06, 07, v2, u2);
-    STEP(09, 00, 01, 02, 03, 04, 05, 06, 07, 08, v3, u3);
-    SRD(S2, 2, 3, 1, 4, 64);
+    SOSEMANUK_STEP(00, 01, 02, 03, 04, 05, 06, 07, 08, 09, v0, u0);
+    SOSEMANUK_STEP(01, 02, 03, 04, 05, 06, 07, 08, 09, 00, v1, u1);
+    SOSEMANUK_STEP(02, 03, 04, 05, 06, 07, 08, 09, 00, 01, v2, u2);
+    SOSEMANUK_STEP(03, 04, 05, 06, 07, 08, 09, 00, 01, 02, v3, u3);
+    SOSEMANUK_SRD(SOSEMANUK_S2, 2, 3, 1, 4, 0);
+    SOSEMANUK_STEP(04, 05, 06, 07, 08, 09, 00, 01, 02, 03, v0, u0);
+    SOSEMANUK_STEP(05, 06, 07, 08, 09, 00, 01, 02, 03, 04, v1, u1);
+    SOSEMANUK_STEP(06, 07, 08, 09, 00, 01, 02, 03, 04, 05, v2, u2);
+    SOSEMANUK_STEP(07, 08, 09, 00, 01, 02, 03, 04, 05, 06, v3, u3);
+    SOSEMANUK_SRD(SOSEMANUK_S2, 2, 3, 1, 4, 16);
+    SOSEMANUK_STEP(08, 09, 00, 01, 02, 03, 04, 05, 06, 07, v0, u0);
+    SOSEMANUK_STEP(09, 00, 01, 02, 03, 04, 05, 06, 07, 08, v1, u1);
+    SOSEMANUK_STEP(00, 01, 02, 03, 04, 05, 06, 07, 08, 09, v2, u2);
+    SOSEMANUK_STEP(01, 02, 03, 04, 05, 06, 07, 08, 09, 00, v3, u3);
+    SOSEMANUK_SRD(SOSEMANUK_S2, 2, 3, 1, 4, 32);
+    SOSEMANUK_STEP(02, 03, 04, 05, 06, 07, 08, 09, 00, 01, v0, u0);
+    SOSEMANUK_STEP(03, 04, 05, 06, 07, 08, 09, 00, 01, 02, v1, u1);
+    SOSEMANUK_STEP(04, 05, 06, 07, 08, 09, 00, 01, 02, 03, v2, u2);
+    SOSEMANUK_STEP(05, 06, 07, 08, 09, 00, 01, 02, 03, 04, v3, u3);
+    SOSEMANUK_SRD(SOSEMANUK_S2, 2, 3, 1, 4, 48);
+    SOSEMANUK_STEP(06, 07, 08, 09, 00, 01, 02, 03, 04, 05, v0, u0);
+    SOSEMANUK_STEP(07, 08, 09, 00, 01, 02, 03, 04, 05, 06, v1, u1);
+    SOSEMANUK_STEP(08, 09, 00, 01, 02, 03, 04, 05, 06, 07, v2, u2);
+    SOSEMANUK_STEP(09, 00, 01, 02, 03, 04, 05, 06, 07, 08, v3, u3);
+    SOSEMANUK_SRD(SOSEMANUK_S2, 2, 3, 1, 4, 64);
 
     rc->s00 = s00;
     rc->s01 = s01;
@@ -124,31 +124,56 @@ void sosemanuk_keysetup(sosemanuk_ctx *kc, const uint8_t *key, uint32_t keysize,
     w6 = U8TO32_LITTLE(wbuf + 24);
     w7 = U8TO32_LITTLE(wbuf + 28);
 
-    WUP0(0); SKS3;
-    WUP1(4); SKS2;
-    WUP0(8); SKS1;
-    WUP1(12); SKS0;
-    WUP0(16); SKS7;
-    WUP1(20); SKS6;
-    WUP0(24); SKS5;
-    WUP1(28); SKS4;
-    WUP0(32); SKS3;
-    WUP1(36); SKS2;
-    WUP0(40); SKS1;
-    WUP1(44); SKS0;
-    WUP0(48); SKS7;
-    WUP1(52); SKS6;
-    WUP0(56); SKS5;
-    WUP1(60); SKS4;
-    WUP0(64); SKS3;
-    WUP1(68); SKS2;
-    WUP0(72); SKS1;
-    WUP1(76); SKS0;
-    WUP0(80); SKS7;
-    WUP1(84); SKS6;
-    WUP0(88); SKS5;
-    WUP1(92); SKS4;
-    WUP0(96); SKS3;
+    SOSEMANUK_WUP0(0);
+    SKS3;
+    SOSEMANUK_WUP1(4);
+    SKS2;
+    SOSEMANUK_WUP0(8);
+    SKS1;
+    SOSEMANUK_WUP1(12);
+    SKS0;
+    SOSEMANUK_WUP0(16);
+    SKS7;
+    SOSEMANUK_WUP1(20);
+    SKS6;
+    SOSEMANUK_WUP0(24);
+    SKS5;
+    SOSEMANUK_WUP1(28);
+    SKS4;
+    SOSEMANUK_WUP0(32);
+    SKS3;
+    SOSEMANUK_WUP1(36);
+    SKS2;
+    SOSEMANUK_WUP0(40);
+    SKS1;
+    SOSEMANUK_WUP1(44);
+    SKS0;
+    SOSEMANUK_WUP0(48);
+    SKS7;
+    SOSEMANUK_WUP1(52);
+    SKS6;
+    SOSEMANUK_WUP0(56);
+    SKS5;
+    SOSEMANUK_WUP1(60);
+    SKS4;
+    SOSEMANUK_WUP0(64);
+    SKS3;
+    SOSEMANUK_WUP1(68);
+    SKS2;
+    SOSEMANUK_WUP0(72);
+    SKS1;
+    SOSEMANUK_WUP1(76);
+    SKS0;
+    SOSEMANUK_WUP0(80);
+    SKS7;
+    SOSEMANUK_WUP1(84);
+    SKS6;
+    SOSEMANUK_WUP0(88);
+    SKS5;
+    SOSEMANUK_WUP1(92);
+    SKS4;
+    SOSEMANUK_WUP0(96);
+    SKS3;
 }
 
 /* SOSEMANUK IV setup */
@@ -161,11 +186,11 @@ void sosemanuk_ivsetup(sosemanuk_ctx *ctx, const uint8_t *iv)
     if (iv_len >= sizeof ivtmp) {
         memcpy(ivtmp, iv, sizeof ivtmp);
     }
-    else
-    {
+    else {
         if (iv_len > 0) {
             memcpy(ivtmp, iv, iv_len);
         }
+
         memset(ivtmp + iv_len, 0, (sizeof ivtmp) - iv_len);
     }
 
@@ -176,40 +201,40 @@ void sosemanuk_ivsetup(sosemanuk_ctx *ctx, const uint8_t *iv)
     r3 = U8TO32_LITTLE(ivtmp + 12);
 
     /* Encrypt IV with Serpent24. Some values are extracted */
-    FSS(0, S0, 0, 1, 2, 3, 4, 1, 4, 2, 0);
-    FSS(4, S1, 1, 4, 2, 0, 3, 2, 1, 0, 4);
-    FSS(8, S2, 2, 1, 0, 4, 3, 0, 4, 1, 3);
-    FSS(12, S3, 0, 4, 1, 3, 2, 4, 1, 3, 2);
-    FSS(16, S4, 4, 1, 3, 2, 0, 1, 0, 4, 2);
-    FSS(20, S5, 1, 0, 4, 2, 3, 0, 2, 1, 4);
-    FSS(24, S6, 0, 2, 1, 4, 3, 0, 2, 3, 1);
-    FSS(28, S7, 0, 2, 3, 1, 4, 4, 1, 2, 0);
-    FSS(32, S0, 4, 1, 2, 0, 3, 1, 3, 2, 4);
-    FSS(36, S1, 1, 3, 2, 4, 0, 2, 1, 4, 3);
-    FSS(40, S2, 2, 1, 4, 3, 0, 4, 3, 1, 0);
-    FSS(44, S3, 4, 3, 1, 0, 2, 3, 1, 0, 2);
+    SOSEMANUK_FSS(0, SOSEMANUK_S0, 0, 1, 2, 3, 4, 1, 4, 2, 0);
+    SOSEMANUK_FSS(4, SOSEMANUK_S1, 1, 4, 2, 0, 3, 2, 1, 0, 4);
+    SOSEMANUK_FSS(8, SOSEMANUK_S2, 2, 1, 0, 4, 3, 0, 4, 1, 3);
+    SOSEMANUK_FSS(12, SOSEMANUK_S3, 0, 4, 1, 3, 2, 4, 1, 3, 2);
+    SOSEMANUK_FSS(16, SOSEMANUK_S4, 4, 1, 3, 2, 0, 1, 0, 4, 2);
+    SOSEMANUK_FSS(20, SOSEMANUK_S5, 1, 0, 4, 2, 3, 0, 2, 1, 4);
+    SOSEMANUK_FSS(24, SOSEMANUK_S6, 0, 2, 1, 4, 3, 0, 2, 3, 1);
+    SOSEMANUK_FSS(28, SOSEMANUK_S7, 0, 2, 3, 1, 4, 4, 1, 2, 0);
+    SOSEMANUK_FSS(32, SOSEMANUK_S0, 4, 1, 2, 0, 3, 1, 3, 2, 4);
+    SOSEMANUK_FSS(36, SOSEMANUK_S1, 1, 3, 2, 4, 0, 2, 1, 4, 3);
+    SOSEMANUK_FSS(40, SOSEMANUK_S2, 2, 1, 4, 3, 0, 4, 3, 1, 0);
+    SOSEMANUK_FSS(44, SOSEMANUK_S3, 4, 3, 1, 0, 2, 3, 1, 0, 2);
     rc->s09 = r3;
     rc->s08 = r1;
     rc->s07 = r0;
     rc->s06 = r2;
 
-    FSS(48, S4, 3, 1, 0, 2, 4, 1, 4, 3, 2);
-    FSS(52, S5, 1, 4, 3, 2, 0, 4, 2, 1, 3);
-    FSS(56, S6, 4, 2, 1, 3, 0, 4, 2, 0, 1);
-    FSS(60, S7, 4, 2, 0, 1, 3, 3, 1, 2, 4);
-    FSS(64, S0, 3, 1, 2, 4, 0, 1, 0, 2, 3);
-    FSS(68, S1, 1, 0, 2, 3, 4, 2, 1, 3, 0);
+    SOSEMANUK_FSS(48, SOSEMANUK_S4, 3, 1, 0, 2, 4, 1, 4, 3, 2);
+    SOSEMANUK_FSS(52, SOSEMANUK_S5, 1, 4, 3, 2, 0, 4, 2, 1, 3);
+    SOSEMANUK_FSS(56, SOSEMANUK_S6, 4, 2, 1, 3, 0, 4, 2, 0, 1);
+    SOSEMANUK_FSS(60, SOSEMANUK_S7, 4, 2, 0, 1, 3, 3, 1, 2, 4);
+    SOSEMANUK_FSS(64, SOSEMANUK_S0, 3, 1, 2, 4, 0, 1, 0, 2, 3);
+    SOSEMANUK_FSS(68, SOSEMANUK_S1, 1, 0, 2, 3, 4, 2, 1, 3, 0);
     rc->r1  = r2;
     rc->s04 = r1;
     rc->r2  = r3;
     rc->s05 = r0;
 
-    FSS(72, S2, 2, 1, 3, 0, 4, 3, 0, 1, 4);
-    FSS(76, S3, 3, 0, 1, 4, 2, 0, 1, 4, 2);
-    FSS(80, S4, 0, 1, 4, 2, 3, 1, 3, 0, 2);
-    FSS(84, S5, 1, 3, 0, 2, 4, 3, 2, 1, 0);
-    FSS(88, S6, 3, 2, 1, 0, 4, 3, 2, 4, 1);
-    FSF(92, S7, 3, 2, 4, 1, 0, 0, 1, 2, 3);
+    SOSEMANUK_FSS(72, SOSEMANUK_S2, 2, 1, 3, 0, 4, 3, 0, 1, 4);
+    SOSEMANUK_FSS(76, SOSEMANUK_S3, 3, 0, 1, 4, 2, 0, 1, 4, 2);
+    SOSEMANUK_FSS(80, SOSEMANUK_S4, 0, 1, 4, 2, 3, 1, 3, 0, 2);
+    SOSEMANUK_FSS(84, SOSEMANUK_S5, 1, 3, 0, 2, 4, 3, 2, 1, 0);
+    SOSEMANUK_FSS(88, SOSEMANUK_S6, 3, 2, 1, 0, 4, 3, 2, 4, 1);
+    SOSEMANUK_FSF(92, SOSEMANUK_S7, 3, 2, 4, 1, 0, 0, 1, 2, 3);
     rc->s03 = r0;
     rc->s02 = r1;
     rc->s01 = r2;

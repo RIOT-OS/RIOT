@@ -31,41 +31,41 @@ static void generate_keystream(hc256_ctx *ctx, uint32_t *keystream)
 
     if (ctx->counter2048 < 1024) {
         ctx->counter2048 = (ctx->counter2048 + 16) & 0x7ff;
-        step_P(ctx, cc + 0, cc + 1, 0, 6, 13, 4, keystream[0]);
-        step_P(ctx, cc + 1, cc + 2, 1, 7, 14, 5, keystream[1]);
-        step_P(ctx, cc + 2, cc + 3, 2, 8, 15, 6, keystream[2]);
-        step_P(ctx, cc + 3, cc + 4, 3, 9, 0, 7, keystream[3]);
-        step_P(ctx, cc + 4, cc + 5, 4, 10, 1, 8, keystream[4]);
-        step_P(ctx, cc + 5, cc + 6, 5, 11, 2, 9, keystream[5]);
-        step_P(ctx, cc + 6, cc + 7, 6, 12, 3, 10, keystream[6]);
-        step_P(ctx, cc + 7, cc + 8, 7, 13, 4, 11, keystream[7]);
-        step_P(ctx, cc + 8, cc + 9, 8, 14, 5, 12, keystream[8]);
-        step_P(ctx, cc + 9, cc + 10, 9, 15, 6, 13, keystream[9]);
-        step_P(ctx, cc + 10, cc + 11, 10, 0, 7, 14, keystream[10]);
-        step_P(ctx, cc + 11, cc + 12, 11, 1, 8, 15, keystream[11]);
-        step_P(ctx, cc + 12, cc + 13, 12, 2, 9, 0, keystream[12]);
-        step_P(ctx, cc + 13, cc + 14, 13, 3, 10, 1, keystream[13]);
-        step_P(ctx, cc + 14, cc + 15, 14, 4, 11, 2, keystream[14]);
-        step_P(ctx, cc + 15, dd + 0, 15, 5, 12, 3, keystream[15]);
+        HC256_STEP_P(ctx, cc + 0, cc + 1, 0, 6, 13, 4, keystream[0]);
+        HC256_STEP_P(ctx, cc + 1, cc + 2, 1, 7, 14, 5, keystream[1]);
+        HC256_STEP_P(ctx, cc + 2, cc + 3, 2, 8, 15, 6, keystream[2]);
+        HC256_STEP_P(ctx, cc + 3, cc + 4, 3, 9, 0, 7, keystream[3]);
+        HC256_STEP_P(ctx, cc + 4, cc + 5, 4, 10, 1, 8, keystream[4]);
+        HC256_STEP_P(ctx, cc + 5, cc + 6, 5, 11, 2, 9, keystream[5]);
+        HC256_STEP_P(ctx, cc + 6, cc + 7, 6, 12, 3, 10, keystream[6]);
+        HC256_STEP_P(ctx, cc + 7, cc + 8, 7, 13, 4, 11, keystream[7]);
+        HC256_STEP_P(ctx, cc + 8, cc + 9, 8, 14, 5, 12, keystream[8]);
+        HC256_STEP_P(ctx, cc + 9, cc + 10, 9, 15, 6, 13, keystream[9]);
+        HC256_STEP_P(ctx, cc + 10, cc + 11, 10, 0, 7, 14, keystream[10]);
+        HC256_STEP_P(ctx, cc + 11, cc + 12, 11, 1, 8, 15, keystream[11]);
+        HC256_STEP_P(ctx, cc + 12, cc + 13, 12, 2, 9, 0, keystream[12]);
+        HC256_STEP_P(ctx, cc + 13, cc + 14, 13, 3, 10, 1, keystream[13]);
+        HC256_STEP_P(ctx, cc + 14, cc + 15, 14, 4, 11, 2, keystream[14]);
+        HC256_STEP_P(ctx, cc + 15, dd + 0, 15, 5, 12, 3, keystream[15]);
     }
     else {
         ctx->counter2048 = (ctx->counter2048 + 16) & 0x7ff;
-        step_Q(ctx, 1024 + cc + 0, 1024 + cc + 1, 0, 6, 13, 4, keystream[0]);
-        step_Q(ctx, 1024 + cc + 1, 1024 + cc + 2, 1, 7, 14, 5, keystream[1]);
-        step_Q(ctx, 1024 + cc + 2, 1024 + cc + 3, 2, 8, 15, 6, keystream[2]);
-        step_Q(ctx, 1024 + cc + 3, 1024 + cc + 4, 3, 9, 0, 7, keystream[3]);
-        step_Q(ctx, 1024 + cc + 4, 1024 + cc + 5, 4, 10, 1, 8, keystream[4]);
-        step_Q(ctx, 1024 + cc + 5, 1024 + cc + 6, 5, 11, 2, 9, keystream[5]);
-        step_Q(ctx, 1024 + cc + 6, 1024 + cc + 7, 6, 12, 3, 10, keystream[6]);
-        step_Q(ctx, 1024 + cc + 7, 1024 + cc + 8, 7, 13, 4, 11, keystream[7]);
-        step_Q(ctx, 1024 + cc + 8, 1024 + cc + 9, 8, 14, 5, 12, keystream[8]);
-        step_Q(ctx, 1024 + cc + 9, 1024 + cc + 10, 9, 15, 6, 13, keystream[9]);
-        step_Q(ctx, 1024 + cc + 10, 1024 + cc + 11, 10, 0, 7, 14, keystream[10]);
-        step_Q(ctx, 1024 + cc + 11, 1024 + cc + 12, 11, 1, 8, 15, keystream[11]);
-        step_Q(ctx, 1024 + cc + 12, 1024 + cc + 13, 12, 2, 9, 0, keystream[12]);
-        step_Q(ctx, 1024 + cc + 13, 1024 + cc + 14, 13, 3, 10, 1, keystream[13]);
-        step_Q(ctx, 1024 + cc + 14, 1024 + cc + 15, 14, 4, 11, 2, keystream[14]);
-        step_Q(ctx, 1024 + cc + 15, 1024 + dd + 0, 15, 5, 12, 3, keystream[15]);
+        HC256_STEP_Q(ctx, 1024 + cc + 0, 1024 + cc + 1, 0, 6, 13, 4, keystream[0]);
+        HC256_STEP_Q(ctx, 1024 + cc + 1, 1024 + cc + 2, 1, 7, 14, 5, keystream[1]);
+        HC256_STEP_Q(ctx, 1024 + cc + 2, 1024 + cc + 3, 2, 8, 15, 6, keystream[2]);
+        HC256_STEP_Q(ctx, 1024 + cc + 3, 1024 + cc + 4, 3, 9, 0, 7, keystream[3]);
+        HC256_STEP_Q(ctx, 1024 + cc + 4, 1024 + cc + 5, 4, 10, 1, 8, keystream[4]);
+        HC256_STEP_Q(ctx, 1024 + cc + 5, 1024 + cc + 6, 5, 11, 2, 9, keystream[5]);
+        HC256_STEP_Q(ctx, 1024 + cc + 6, 1024 + cc + 7, 6, 12, 3, 10, keystream[6]);
+        HC256_STEP_Q(ctx, 1024 + cc + 7, 1024 + cc + 8, 7, 13, 4, 11, keystream[7]);
+        HC256_STEP_Q(ctx, 1024 + cc + 8, 1024 + cc + 9, 8, 14, 5, 12, keystream[8]);
+        HC256_STEP_Q(ctx, 1024 + cc + 9, 1024 + cc + 10, 9, 15, 6, 13, keystream[9]);
+        HC256_STEP_Q(ctx, 1024 + cc + 10, 1024 + cc + 11, 10, 0, 7, 14, keystream[10]);
+        HC256_STEP_Q(ctx, 1024 + cc + 11, 1024 + cc + 12, 11, 1, 8, 15, keystream[11]);
+        HC256_STEP_Q(ctx, 1024 + cc + 12, 1024 + cc + 13, 12, 2, 9, 0, keystream[12]);
+        HC256_STEP_Q(ctx, 1024 + cc + 13, 1024 + cc + 14, 13, 3, 10, 1, keystream[13]);
+        HC256_STEP_Q(ctx, 1024 + cc + 14, 1024 + cc + 15, 14, 4, 11, 2, keystream[14]);
+        HC256_STEP_Q(ctx, 1024 + cc + 15, 1024 + dd + 0, 15, 5, 12, 3, keystream[15]);
     }
 }
 
@@ -77,41 +77,41 @@ static void setup_update(hc256_ctx *ctx)
 
     if (ctx->counter2048 < 1024) {
         ctx->counter2048 = (ctx->counter2048 + 16) & 0x7ff;
-        update_P(ctx, cc + 0, cc + 1, 0, 6, 13);
-        update_P(ctx, cc + 1, cc + 2, 1, 7, 14);
-        update_P(ctx, cc + 2, cc + 3, 2, 8, 15);
-        update_P(ctx, cc + 3, cc + 4, 3, 9, 0);
-        update_P(ctx, cc + 4, cc + 5, 4, 10, 1);
-        update_P(ctx, cc + 5, cc + 6, 5, 11, 2);
-        update_P(ctx, cc + 6, cc + 7, 6, 12, 3);
-        update_P(ctx, cc + 7, cc + 8, 7, 13, 4);
-        update_P(ctx, cc + 8, cc + 9, 8, 14, 5);
-        update_P(ctx, cc + 9, cc + 10, 9, 15, 6);
-        update_P(ctx, cc + 10, cc + 11, 10, 0, 7);
-        update_P(ctx, cc + 11, cc + 12, 11, 1, 8);
-        update_P(ctx, cc + 12, cc + 13, 12, 2, 9);
-        update_P(ctx, cc + 13, cc + 14, 13, 3, 10);
-        update_P(ctx, cc + 14, cc + 15, 14, 4, 11);
-        update_P(ctx, cc + 15, dd + 0, 15, 5, 12);
+        HC256_UPDATE_P(ctx, cc + 0, cc + 1, 0, 6, 13);
+        HC256_UPDATE_P(ctx, cc + 1, cc + 2, 1, 7, 14);
+        HC256_UPDATE_P(ctx, cc + 2, cc + 3, 2, 8, 15);
+        HC256_UPDATE_P(ctx, cc + 3, cc + 4, 3, 9, 0);
+        HC256_UPDATE_P(ctx, cc + 4, cc + 5, 4, 10, 1);
+        HC256_UPDATE_P(ctx, cc + 5, cc + 6, 5, 11, 2);
+        HC256_UPDATE_P(ctx, cc + 6, cc + 7, 6, 12, 3);
+        HC256_UPDATE_P(ctx, cc + 7, cc + 8, 7, 13, 4);
+        HC256_UPDATE_P(ctx, cc + 8, cc + 9, 8, 14, 5);
+        HC256_UPDATE_P(ctx, cc + 9, cc + 10, 9, 15, 6);
+        HC256_UPDATE_P(ctx, cc + 10, cc + 11, 10, 0, 7);
+        HC256_UPDATE_P(ctx, cc + 11, cc + 12, 11, 1, 8);
+        HC256_UPDATE_P(ctx, cc + 12, cc + 13, 12, 2, 9);
+        HC256_UPDATE_P(ctx, cc + 13, cc + 14, 13, 3, 10);
+        HC256_UPDATE_P(ctx, cc + 14, cc + 15, 14, 4, 11);
+        HC256_UPDATE_P(ctx, cc + 15, dd + 0, 15, 5, 12);
     }
     else {
         ctx->counter2048 = (ctx->counter2048 + 16) & 0x7ff;
-        update_Q(ctx, 1024 + cc + 0, 1024 + cc + 1, 0, 6, 13);
-        update_Q(ctx, 1024 + cc + 1, 1024 + cc + 2, 1, 7, 14);
-        update_Q(ctx, 1024 + cc + 2, 1024 + cc + 3, 2, 8, 15);
-        update_Q(ctx, 1024 + cc + 3, 1024 + cc + 4, 3, 9, 0);
-        update_Q(ctx, 1024 + cc + 4, 1024 + cc + 5, 4, 10, 1);
-        update_Q(ctx, 1024 + cc + 5, 1024 + cc + 6, 5, 11, 2);
-        update_Q(ctx, 1024 + cc + 6, 1024 + cc + 7, 6, 12, 3);
-        update_Q(ctx, 1024 + cc + 7, 1024 + cc + 8, 7, 13, 4);
-        update_Q(ctx, 1024 + cc + 8, 1024 + cc + 9, 8, 14, 5);
-        update_Q(ctx, 1024 + cc + 9, 1024 + cc + 10, 9, 15, 6);
-        update_Q(ctx, 1024 + cc + 10, 1024 + cc + 11, 10, 0, 7);
-        update_Q(ctx, 1024 + cc + 11, 1024 + cc + 12, 11, 1, 8);
-        update_Q(ctx, 1024 + cc + 12, 1024 + cc + 13, 12, 2, 9);
-        update_Q(ctx, 1024 + cc + 13, 1024 + cc + 14, 13, 3, 10);
-        update_Q(ctx, 1024 + cc + 14, 1024 + cc + 15, 14, 4, 11);
-        update_Q(ctx, 1024 + cc + 15, 1024 + dd + 0, 15, 5, 12);
+        HC256_UPDATE_Q(ctx, 1024 + cc + 0, 1024 + cc + 1, 0, 6, 13);
+        HC256_UPDATE_Q(ctx, 1024 + cc + 1, 1024 + cc + 2, 1, 7, 14);
+        HC256_UPDATE_Q(ctx, 1024 + cc + 2, 1024 + cc + 3, 2, 8, 15);
+        HC256_UPDATE_Q(ctx, 1024 + cc + 3, 1024 + cc + 4, 3, 9, 0);
+        HC256_UPDATE_Q(ctx, 1024 + cc + 4, 1024 + cc + 5, 4, 10, 1);
+        HC256_UPDATE_Q(ctx, 1024 + cc + 5, 1024 + cc + 6, 5, 11, 2);
+        HC256_UPDATE_Q(ctx, 1024 + cc + 6, 1024 + cc + 7, 6, 12, 3);
+        HC256_UPDATE_Q(ctx, 1024 + cc + 7, 1024 + cc + 8, 7, 13, 4);
+        HC256_UPDATE_Q(ctx, 1024 + cc + 8, 1024 + cc + 9, 8, 14, 5);
+        HC256_UPDATE_Q(ctx, 1024 + cc + 9, 1024 + cc + 10, 9, 15, 6);
+        HC256_UPDATE_Q(ctx, 1024 + cc + 10, 1024 + cc + 11, 10, 0, 7);
+        HC256_UPDATE_Q(ctx, 1024 + cc + 11, 1024 + cc + 12, 11, 1, 8);
+        HC256_UPDATE_Q(ctx, 1024 + cc + 12, 1024 + cc + 13, 12, 2, 9);
+        HC256_UPDATE_Q(ctx, 1024 + cc + 13, 1024 + cc + 14, 13, 3, 10);
+        HC256_UPDATE_Q(ctx, 1024 + cc + 14, 1024 + cc + 15, 14, 4, 11);
+        HC256_UPDATE_Q(ctx, 1024 + cc + 15, 1024 + dd + 0, 15, 5, 12);
     }
 }
 
@@ -157,7 +157,7 @@ void hc256_ivsetup(hc256_ctx *ctx, const uint8_t *iv)
     }
 
     for (i = 16; i < 528; i++) {
-        ctx->T[i] = f2(ctx->T[i - 2]) + ctx->T[i - 7] + f1(ctx->T[i - 15]) + ctx->T[i - 16] + i;
+        ctx->T[i] = HC256_F2(ctx->T[i - 2]) + ctx->T[i - 7] + HC256_F1(ctx->T[i - 15]) + ctx->T[i - 16] + i;
     }
 
     for (i = 0; i < 16;  i++) {
@@ -165,7 +165,7 @@ void hc256_ivsetup(hc256_ctx *ctx, const uint8_t *iv)
     }
 
     for (i = 16; i < 2048; i++) {
-        ctx->T[i] = f2(ctx->T[i - 2]) + ctx->T[i - 7] + f1(ctx->T[i - 15]) + ctx->T[i - 16] + 512 + i;
+        ctx->T[i] = HC256_F2(ctx->T[i - 2]) + ctx->T[i - 7] + HC256_F1(ctx->T[i - 15]) + ctx->T[i - 16] + 512 + i;
     }
 
     /* Initialize counter2048, X and Y */
