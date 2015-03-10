@@ -120,7 +120,8 @@ void sosemanuk_process_blocks(sosemanuk_ctx *ctx, const uint8_t *input, uint8_t 
                               uint32_t blocks);
 
 /**
- * @brief The SOSEMANUK sbox and macro definitions
+ * @name Algorithm macros
+ * @{
  */
 #define S0(r0, r1, r2, r3, r4)   do {	\
                 r3 ^= r0;  r4  = r1; 	\
@@ -343,6 +344,7 @@ void sosemanuk_process_blocks(sosemanuk_ctx *ctx, const uint8_t *input, uint8_t 
                 dst[(ooff / 4) + 2] = src[(ooff / 4) + 2] ^ U32TO32_LITTLE(u ## x2 ^ v2);	\
                 dst[(ooff / 4) + 3] = src[(ooff / 4) + 3] ^ U32TO32_LITTLE(u ## x3 ^ v3);	\
         } while (0)
+/** @} */
 
 /*
  * @brief Multiplication by alpha: alpha * x = U32V(x << 8) ^ mul_a[x >> 24]
