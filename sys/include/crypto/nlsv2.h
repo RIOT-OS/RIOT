@@ -31,13 +31,19 @@ extern "C" {
 #endif
 
 /**
- * @brief The macro definitions
+ * @name Algorithm constants
+ * @{
  */
 #define N 17			/* number of iterations */
 #define INITKONST 0x6996c53a	/* value of KONST to use during key loading */
 #define KEYP 15         	/* where to insert key words */
 #define FOLDP 4         	/* where to insert extra non-linear feedback */
+/** @} */
 
+/**
+ * @name Bit arithmetic macros
+ * @{
+ */
 #define U32V(v) ((uint32_t)(v) & 0xFFFFFFFF)
 #define ROTL(v, n) (U32V((v) << (n)) | ((v) >> (32 - (n))))
 #define U8TO32_LITTLE(p) (((uint32_t*)(p))[0])
@@ -77,6 +83,7 @@ extern "C" {
 #define SIGMA1(x) (ROTR((x), 6) ^ ROTR((x), 11) ^ ROTR((x), 25))
 #define CHOOSE(x,y,z) (((x) & (y)) ^ ((~(x)) & (z)))
 #define MAJORITY(x,y,z) (((x) & (y)) ^ ((x) & (z)) ^ ((y) & (z)))
+/** @} */
 
 /**
  * @brief The NLSv2 state context
