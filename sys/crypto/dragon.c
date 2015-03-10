@@ -38,7 +38,7 @@ void dragon_keysetup(dragon_ctx *ctx, const uint8_t *key, uint32_t keysize)
     ctx->key_size = keysize;
 
     if (keysize == 128) {
-        ctx->nlfsr_word[0 + 0]  = ctx->nlfsr_word[12 + 0] = ctx->nlfsr_word[20 + 0] 
+        ctx->nlfsr_word[0 + 0]  = ctx->nlfsr_word[12 + 0] = ctx->nlfsr_word[20 + 0]
          = U8TO32_BIG( key + 0 * 4);
         ctx->nlfsr_word[0 + 1]  = ctx->nlfsr_word[12 + 1] = ctx->nlfsr_word[20 + 1]
          = U8TO32_BIG( key + 1 * 4);
