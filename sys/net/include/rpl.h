@@ -73,12 +73,13 @@ void rpl_send(ipv6_addr_t *destination, uint8_t *payload, uint16_t p_len, uint8_
  * corresponding objective functions and sixlowpan (including own address).
  *
  * @param[in] if_id             ID of the interface, which correspond to the network under RPL-control
+ * @param[in] address           Global IPv6 address to use
  *
  * @return 1 if initialization was successful
  * @return 0 if initialization was not successful
  *
  */
-uint8_t rpl_init(int if_id);
+uint8_t rpl_init(int if_id, ipv6_addr_t *address);
 
 /**
  * @brief Initialization of RPL-root.
