@@ -67,38 +67,38 @@ typedef struct {
 /**
  * @brief  LEXv2 Key setup
  *
- * @param  ctx[in/out]          LEXv2 context
- * @param  key[in]              Key to setup the ctx
- * @param  keysize[in]          Size of the key
+ * @param[in]   ctx       LEXv2 context
+ * @param[in]   key       Key to setup the ctx
+ * @param[in]   keysize   Size of the key
  */
 void lexv2_keysetup(lexv2_ctx *ctx, const uint8_t *key, uint32_t keysize);
 
 /**
  * @brief  LEXv2 IV setup
  *
- * @param  ctx[in/out]          LEVv2 context
- * @param  iv[in]               IV to setup the ctx
+ * @param[in]   ctx       LEVv2 context
+ * @param[in]   iv        IV to setup the ctx
  */
 void lexv2_ivsetup(lexv2_ctx *ctx, const uint8_t *iv);
 
 /**
  * @brief  Encrypt or decrypt a "blocks" number of blocks
  *
- * @param  ctx[in/out]          LEXv2 context
- * @param  input[in]            (Plain/Cipher)text blocks for (en/de)crypting
- * @param  output[out]          Pre-allocated array for (cipher/plain)text blocks
- *                              consisting of 8*(blocks) bytes
- * @param  blocks[in]           Number of blocks to (en/de)crypt
+ * @param[in]   ctx       LEXv2 context
+ * @param[in]   input     (Plain/Cipher)text blocks for (en/de)crypting
+ * @param[out]  output    Pre-allocated array for (cipher/plain)text blocks
+ *                        consisting of 8*(blocks) bytes
+ * @param[in]   blocks    Number of blocks to (en/de)crypt
  */
 void lexv2_process_blocks(lexv2_ctx *ctx, const uint8_t *input, uint8_t *output, uint32_t blocks);
 
 /**
  * @brief  Encrypt or decrypt "msglen" number of message bytes
  *
- * @param  ctx[in/out]          LEXv2 context
- * @param  input[in]            (Plain/Cipher)text for (en/de)crypting
- * @param  output[out]          (Cipher/Plain)text for (en/de)crypting
- * @param  msglen[in]           Number of bytes to (en/de)crypt
+ * @param[in]   ctx       LEXv2 context
+ * @param[in]   input     (Plain/Cipher)text for (en/de)crypting
+ * @param[out]  output    (Cipher/Plain)text for (en/de)crypting
+ * @param[in]   msglen    Number of bytes to (en/de)crypt
  */
 void lexv2_process_bytes(lexv2_ctx *ctx, const uint8_t *input, uint8_t *output, uint32_t msglen);
 
