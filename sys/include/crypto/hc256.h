@@ -10,7 +10,7 @@
  * @ingroup     sys_crypto
  * @{
  *
- * @file        hc256.h
+ * @file
  * @brief       Headers for the implementation of the HC-256 stream cipher
  *
  * @author      Jan Wagner <mail@jwagner.eu>
