@@ -44,9 +44,9 @@ extern "C" {
  * @brief The Rabbit state context
  */
 typedef struct {
-    uint32_t x[8];
-    uint32_t c[8];
-    uint32_t carry;
+    uint32_t x[8]; /**< X array */
+    uint32_t c[8]; /**< C array */
+    uint32_t carry; /**< Carry variable */
 } rabbit_ctx;
 
 /**
