@@ -64,6 +64,10 @@ typedef struct {
 } dragon_ctx;
 
 /**
+ * @name Algorithm macros
+ * @{
+ */
+/**
  * The DRAGON_OFFSET macro calculates the position of the
  * ith_element within the circular buffer that represents the
  * NLFSR.
@@ -161,7 +165,7 @@ typedef struct {
     sbox2[(x >> 8) & 0xFF]  ^	\
     sbox1[(x >> 16) & 0xFF] ^	\
     sbox2[(x >> 24) & 0xFF]
-
+/** @} */
 
 /**
  * @brief  Dragon Key setup
