@@ -10,7 +10,7 @@
  * @ingroup     sys_crypto
  * @{
  *
- * @file        hc128.h
+ * @file
  * @brief       Headers for the implementation of the HC-128 stream cipher
  *
  * @author      Jan Wagner <mail@jwagner.eu>
