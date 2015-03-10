@@ -70,28 +70,28 @@ typedef struct {
 /**
  * @brief  SOSEMANUK Key setup
  *
- * @param  ctx[in/out]          SOSEMANUK context
- * @param  key[in]              Key to setup the ctx
- * @param  keysize[in]          Size of the key
- * @param  ivsize[in]           Size of the IV
+ * @param[in]   ctx       SOSEMANUK context
+ * @param[in]   key       Key to setup the ctx
+ * @param[in]   keysize   Size of the key
+ * @param[in]   ivsize    Size of the IV
  */
 void sosemanuk_keysetup(sosemanuk_ctx *ctx, const uint8_t *key, uint32_t keysize, uint32_t ivsize);
 
 /**
  * @brief  SOSEMANUK IV setup
  *
- * @param  ctx[in/out]          SOSEMANUK context
- * @param  iv[in]               IV to setup the ctx
+ * @param[in]   ctx     SOSEMANUK context
+ * @param[in]   iv      IV to setup the ctx
  */
 void sosemanuk_ivsetup(sosemanuk_ctx *ctx, const uint8_t *iv);
 
 /**
  * @brief  Encrypt or decrypt "msglen" number of message bytes
  *
- * @param  ctx[in/out]          SOSEMANUK context
- * @param  input[in]            (Plain/Cipher)text for (en/de)crypting
- * @param  output[out]          (Cipher/Plain)text for (en/de)crypting
- * @param  msglen[in]           Number of bytes to (en/de)crypt
+ * @param[in]   ctx       SOSEMANUK context
+ * @param[in]   input     (Plain/Cipher)text for (en/de)crypting
+ * @param[out]  output    (Cipher/Plain)text for (en/de)crypting
+ * @param[in]   msglen    Number of bytes to (en/de)crypt
  */
 void sosemanuk_process_bytes(sosemanuk_ctx *ctx, const uint8_t *input, uint8_t *output,
                              uint32_t msglen);
@@ -99,11 +99,11 @@ void sosemanuk_process_bytes(sosemanuk_ctx *ctx, const uint8_t *input, uint8_t *
 /**
  * @brief  Encrypt or decrypt a "blocks" number of blocks
  *
- * @param  ctx[in/out]          SOSEMANUK context
- * @param  input[in]            (Plain/Cipher)text blocks for (en/de)crypting
- * @param  output[out]          Pre-allocated array for (cipher/plain)text blocks
- *                              consisting of 8*(blocks) bytes
- * @param  blocks[in]           Number of blocks to (en/de)crypt
+ * @param[in]   ctx       SOSEMANUK context
+ * @param[in]   input     (Plain/Cipher)text blocks for (en/de)crypting
+ * @param[out]  output    Pre-allocated array for (cipher/plain)text blocks
+ *                        consisting of 8*(blocks) bytes
+ * @param[in]  blocks     Number of blocks to (en/de)crypt
  */
 void sosemanuk_process_blocks(sosemanuk_ctx *ctx, const uint8_t *input, uint8_t *output,
                               uint32_t blocks);
