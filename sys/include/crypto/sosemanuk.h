@@ -61,10 +61,20 @@ extern "C" {
  * @brief The SOSEMANUK state context
  */
 typedef struct {
-    uint32_t sk[100];
-    uint32_t ivlen;
-    uint32_t s00, s01, s02, s03, s04, s05, s06, s07, s08, s09;
-    uint32_t r1, r2;
+    uint32_t sk[100]; /**< Subkey array */
+    uint32_t ivlen; /**< IV size */
+    uint32_t s00; /**< Internal cipher state - s00 */
+    uint32_t s01; /**< Internal cipher state - s01 */
+    uint32_t s02; /**< Internal cipher state - s02 */
+    uint32_t s03; /**< Internal cipher state - s03 */
+    uint32_t s04; /**< Internal cipher state - s04 */
+    uint32_t s05; /**< Internal cipher state - s05 */
+    uint32_t s06; /**< Internal cipher state - s06 */
+    uint32_t s07; /**< Internal cipher state - s07 */
+    uint32_t s08; /**< Internal cipher state - s08 */
+    uint32_t s09; /**< Internal cipher state - s09 */
+    uint32_t r1; /**< Internal cipher state - r1 */
+    uint32_t r2; /**< Internal cipher state - r2 */
 } sosemanuk_ctx;
 
 /**
