@@ -82,12 +82,12 @@ extern "C" {
  * @brief The NLSv2 state context
  */
 typedef struct {
-    uint32_t        R[N];           /* Working storage for the shift register */
-    uint32_t        initR[N];       /* saved register contents */
-    uint32_t        konst;          /* key dependent constant */
-    uint32_t        sbuf;           /* partial word encryption buffer */
-    uint32_t        ivsize;         /* size of iv */
-    int             nbuf;           /* number of part-word stream bits buffered */
+    uint32_t        R[N]; /**< Storage for the shift register */
+    uint32_t        initR[N]; /**< Saved register contents */
+    uint32_t        konst; /**< Key dependent constant */
+    uint32_t        sbuf; /**< Encryption buffer */
+    uint32_t        ivsize; /**< IV size */
+    int             nbuf; /**< Number of stream bits buffered */
 } nlsv2_ctx;
 
 /**
