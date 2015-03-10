@@ -35,7 +35,8 @@ extern "C" {
 #endif
 
 /**
- * @brief The macro definitions
+ * @name Bit arithmetic macros
+ * @{
  */
 #define U32V(v) ((uint32_t)(v) & 0xFFFFFFFF)
 #define ROTL32(v, n) (U32V((v) << (n)) | ((v) >> (32 - (n))))
@@ -47,6 +48,7 @@ extern "C" {
 #define DRAGON_KEYSTREAM_SIZE   2 /* size of output in 32-bit multiples */
 #define DRAGON_BUFFER_SIZE      1
 #define DRAGON_BUFFER_BYTES    (DRAGON_BUFFER_SIZE * DRAGON_KEYSTREAM_SIZE * 4)
+/** @} */
 
 /**
  * @brief The Dragon state context
