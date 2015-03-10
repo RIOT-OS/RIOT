@@ -10,7 +10,7 @@
  * @ingroup     sys_crypto
  * @{
  *
- * @file        salsa20.h
+ * @file
  * @brief       Headers for the implementation of the Salsa20 stream cipher
  *
  * @author      Jan Wagner <mail@jwagner.eu>
