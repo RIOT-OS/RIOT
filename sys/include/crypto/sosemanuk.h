@@ -39,9 +39,9 @@ extern "C" {
 #endif
 
 /**
- * @brief The macro definitions
+ * @name Bit arithmetic macros
+ * @{
  */
-
 #define U32V(v) ((uint32_t)(v) & 0xFFFFFFFF)
 #define ROTL32(v, n) (U32V((v) << (n)) | ((v) >> (32 - (n))))
 #define U32TO32_LITTLE(v) (v)
@@ -54,6 +54,7 @@ extern "C" {
 #define XMUX(c, x, y)   (((c) & 0x1) ? ((x) ^ (y)) : (x))
 #define MUL_A(x)    (U32V((x) << 8) ^ mul_a[(x) >> 24])
 #define MUL_G(x)    (((x) >> 8) ^ mul_ia[(x) & 0xFF])
+/** @} */
 
 #define SOSEMANUK_BLOCKLENGTH 80
 
