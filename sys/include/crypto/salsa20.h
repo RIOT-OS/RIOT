@@ -48,27 +48,27 @@ typedef struct {
 /**
  * @brief  Salsa20 Key setup
  *
- * @param  ctx[in/out]          Salsa20 context
- * @param  key[in]              Key to setup the ctx
- * @param  keysize[in]          Size of the key in bits
+ * @param[in]   ctx         Salsa20 context
+ * @param[in]   key         Key to setup the ctx
+ * @param[in]   keysize     Size of the key in bits
  */
 void salsa20_keysetup(salsa20_ctx *ctx, const uint8_t *key, uint32_t keysize);
 
 /**
  * @brief  Salsa20 IV setup
  *
- * @param  ctx[in/out]          Salsa20 context
- * @param  iv[in]               IV to setup the ctx
+ * @param[in]   ctx         Salsa20 context
+ * @param[in]   iv          IV to setup the ctx
  */
 void salsa20_ivsetup(salsa20_ctx *ctx, const uint8_t *iv);
 
 /**
  * @brief  Encrypt or decrypt "msglen" number of message bytes
  *
- * @param  ctx[in/out]          Salsa20 context
- * @param  input[in]            (Plain/Cipher)text for (en/de)crypting
- * @param  output[out]          (Cipher/Plain)text for (en/de)crypting
- * @param  msglen[in]           Number of bytes to (en/de)crypt
+ * @param[in]   ctx         Salsa20 context
+ * @param[in]   input       (Plain/Cipher)text for (en/de)crypting
+ * @param[out]  output      (Cipher/Plain)text for (en/de)crypting
+ * @param[in]   msglen      Number of bytes to (en/de)crypt
  */
 void salsa20_process_bytes(salsa20_ctx *ctx, const uint8_t *input, uint8_t *output,
                            uint32_t msglen);
