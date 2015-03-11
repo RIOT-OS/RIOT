@@ -122,16 +122,18 @@ void cc110x_rx_handler(void *args)
 static uint8_t receive_packet_variable(uint8_t *rxBuffer, radio_packet_length_t length)
 {
     uint8_t status[2];
-    uint8_t packetLength = 0;
-    uint8_t crc_ok = 0;
 
     /* Any bytes available in RX FIFO? */
     if ((cc110x_read_status(CC1100_RXBYTES) & BYTES_IN_RXFIFO)) {
+        uint8_t packetLength = 0;
+
         /* Read length byte (first byte in RX FIFO) */
         packetLength = cc110x_read_reg(CC1100_RXFIFO);
 
         /* Read data from RX FIFO and store in rxBuffer */
         if (packetLength <= length) {
+	     uint8_t crc_ok = 0;
+
             /* Put length byte at first position in RX Buffer */
             rxBuffer[0] = packetLength;
 
