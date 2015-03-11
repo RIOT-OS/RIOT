@@ -27,12 +27,12 @@ int close(int fildes)
         return -1;
     }
 
-    if (fd_obj->close(fd_obj->fd) < 0) {
+    if (fd_obj->close(fd_obj->internal_fd) < 0) {
         errno = EIO;    // EINTR may not occur since RIOT has no signals yet.
         return -1;
     }
 
-    fd_destroy(fd_obj->fd);
+    fd_destroy(fd_obj->internal_fd);
 
     return 0;
 }

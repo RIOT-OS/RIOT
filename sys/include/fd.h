@@ -34,13 +34,13 @@ extern "C" {
  */
 typedef struct {
     /** private status of this fd_t */
-    int __active;
+    int internal_active;
 
-    /** the internal filedescriptor */
-    int fd;
+    /** Stores the RIOT internal value for the file descriptor (not POSIX). */
+    int internal_fd;
 
     /**
-     * Read *n* into *buf* from *fd*.  Return the
+     * Read *n* bytes into *buf* from *fd*.  Return the
      * number read, -1 for errors or 0 for EOF.
      */
     ssize_t (*read)(int fd, void *buf, size_t n);
