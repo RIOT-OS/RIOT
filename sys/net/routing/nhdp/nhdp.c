@@ -170,6 +170,8 @@ int nhdp_register_if(kernel_pid_t if_pid, uint8_t *addr, size_t addr_size, uint8
     if_entry->validity_time.microseconds = MS_IN_USEC * val_time_ms;
     timex_normalize(&if_entry->hello_interval);
     timex_normalize(&if_entry->validity_time);
+    /* Reset sequence number */
+    if_entry->seq_no = 0;
 
     /* Everything went well */
     nhdp_decrement_addr_usage(nhdp_addr);

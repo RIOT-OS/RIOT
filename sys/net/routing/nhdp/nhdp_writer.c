@@ -46,6 +46,8 @@ static void _nhdp_add_hello_msg_header_cb(struct rfc5444_writer *wr,
         struct rfc5444_writer_message *msg);
 static void _nhdp_add_message_tlvs_cb(struct rfc5444_writer *wr);
 static void _nhdp_add_addresses_cb(struct rfc5444_writer *wr);
+static void _nhdp_add_packet_header_cb(struct rfc5444_writer *writer,
+                                       struct rfc5444_writer_target *rfc5444_target);
 static void netaddr_from_nhdp_address(struct netaddr *target, nhdp_addr_t *n_addr);
 
 /* Array containing the known Address TLVs */
@@ -108,6 +110,8 @@ void nhdp_writer_register_if(struct rfc5444_writer_target *new_if)
 {
     mutex_lock(&mtx_packet_write);
 
+    /* Add packet header callback to writer target of the interface */
+    new_if->addPacketHeader = _nhdp_add_packet_header_cb;
     /* Register target interface in writer */
     rfc5444_writer_register_target(&nhdp_writer, new_if);
 
@@ -210,6 +214,17 @@ static void _nhdp_add_addresses_cb(struct rfc5444_writer *wr)
     iib_fill_wr_addresses(nhdp_wr_curr_if_entry->if_pid, wr);
     nib_fill_wr_addresses(wr);
     nhdp_reset_addresses_tmp_usg();
+}
+
+/**
+ * Add packet header with sequence number to current packet
+ * Called by oonf_api during packet creation
+ */
+static void _nhdp_add_packet_header_cb(struct rfc5444_writer *writer,
+                                       struct rfc5444_writer_target *rfc5444_target)
+{
+    rfc5444_writer_set_pkt_header(writer, rfc5444_target, true);
+    rfc5444_writer_set_pkt_seqno(writer, rfc5444_target, ++nhdp_wr_curr_if_entry->seq_no);
 }
 
 /**
