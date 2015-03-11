@@ -45,7 +45,9 @@ typedef enum {
     NETCONF_OPT_ADDR_LEN,           /**< get the default address length a
                                      *   network device expects as uint16_t in
                                      *   host byte order */
-
+    NETCONF_OPT_SRC_LEN,            /**< get/set the address length to choose
+                                     *   for the network device's source address
+                                     *   as uint16_t in host byte order */
     /**
      * @brief    get/set the network ID as uint16_t in host byte order
      *
