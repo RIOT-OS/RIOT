@@ -115,6 +115,26 @@ extern "C" {
 /** @} */
 
 /**
+ * @name DAC configuration
+ * @{
+ */
+#define DAC_NUMOF          (1U)
+#define DAC_0_EN           1
+#define DAC_MAX_CHANNELS   2
+
+/* DAC 0 configuration */
+#define DAC_0_DEV            DAC
+#define DAC_0_CHANNELS       2
+#define DAC_0_CLKEN()        (RCC->APB1ENR |=  (RCC_APB1ENR_DACEN))
+#define DAC_0_CLKDIS()       (RCC->APB1ENR &= ~(RCC_APB1ENR_DACEN))
+#define DAC_0_PORT           GPIOA
+#define DAC_0_PORT_CLKEN()   (RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN)
+/* DAC 0 channel config */
+#define DAC_0_CH0_PIN        4
+#define DAC_0_CH1_PIN        5
+/** @} */
+
+/**
  * @name Random Number Generator configuration
  * @{
  */
