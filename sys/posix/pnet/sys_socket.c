@@ -45,7 +45,7 @@ int socket(int domain, int type, int protocol)
 
 #define sock_func_wrapper(func, sockfd, ...) \
     ((fd_get(sockfd)) ? \
-        func(fd_get(sockfd)->fd, __VA_ARGS__) : \
+        func(fd_get(sockfd)->fd_internal, __VA_ARGS__) : \
         (errno = EBADF, -1))
 
 int accept(int socket, struct sockaddr *restrict address,
