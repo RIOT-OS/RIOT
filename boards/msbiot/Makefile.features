@@ -1,4 +1,4 @@
 FEATURES_PROVIDED += cpp
-FEATURES_PROVIDED += periph_uart periph_gpio periph_spi periph_i2c periph_pwm
+FEATURES_PROVIDED += periph_uart periph_gpio periph_spi periph_i2c periph_pwm periph_random
 FEATURES_PROVIDED += transceiver
 FEATURES_MCU_GROUP = cortex_m4
