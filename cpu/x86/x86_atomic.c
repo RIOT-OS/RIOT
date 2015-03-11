@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014  René Kijewski  <rene.kijewski@fu-berlin.de>
+ * Copyright (C) 2014-2015  René Kijewski  <rene.kijewski@fu-berlin.de>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -28,10 +28,22 @@
  * @}
  */
 
+#include <stdint.h>
 #include "atomic.h"
 
 unsigned int atomic_set_return(unsigned int *val, unsigned int set)
 {
     asm volatile ("lock xchg %0, %1" : "+m"(*val), "+r"(set));
     return set;
+}
+
+int atomic_cas(atomic_int_t *dest, int known_value, int new_value)
+{
+    uint8_t successful;
+    asm volatile ("lock cmpxchgl %2, %0\n"
+                  "seteb %1"
+                  : "+m"(ATOMIC_VALUE(*dest)), "=g"(successful)
+                  : "r"(new_value), "a"(known_value)
+                  : "flags");
+    return successful;
 }

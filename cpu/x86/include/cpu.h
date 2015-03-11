@@ -26,8 +26,8 @@
  * @author  René Kijewski <rene.kijewski@fu-berlin.de>
  */
 
-#ifndef CPU__X86__CPU__H__
-#define CPU__X86__CPU__H__
+#ifndef CPU_X86_CPU_H_
+#define CPU_X86_CPU_H_
 
 #include "attributes.h"
 #include "irq.h"
@@ -46,7 +46,8 @@ extern "C" {
 /**
  * @brief x86 has architecture specific atomic operations in x86_atomic.c.
  */
-#define ARCH_HAS_ATOMIC_INT 1
+#define ARCH_HAS_ATOMIC_SET_RETURN 1
+#define ARCH_HAS_ATOMIC_COMPARE_AND_SWAP 1
 
 static inline void __attribute__((always_inline)) dINT(void)
 {
