@@ -158,7 +158,7 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
     port->PCR[tx_pin] = PORT_PCR_MUX(af);
 
     /* disable transmitter and receiver */
-    dev->C2 &= ~(1 << UART_C2_TE_SHIFT | 1 << UART_C2_RE_SHIFT);
+    dev->C2 &= ~(UART_C2_TE_MASK | UART_C2_RE_MASK);
     /* set defaults, 8-bit mode, no parity */
     dev->C1 = 0;
 
@@ -170,8 +170,31 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
     dev->BDL = (uint8_t)UART_BDL_SBR(ubd);
     kinetis_set_brfa(dev, baudrate, clk);
 
+#if KINETIS_UART_ADVANCED
+    /* Enable FIFO buffers */
+    dev->PFIFO |= UART_PFIFO_RXFE_MASK | UART_PFIFO_TXFE_MASK;
+    /* Set level to trigger TDRE flag whenever there is space in the TXFIFO */
+    /* FIFO size is 2^(PFIFO_TXFIFOSIZE + 1) (4, 8, 16 ...) for values != 0.
+     * TXFIFOSIZE == 0 means size = 1 (i.e. only one byte, no hardware FIFO) */
+    if ((dev->PFIFO & UART_PFIFO_TXFIFOSIZE_MASK) != 0) {
+        uint8_t txfifo_size =
+            (2 << ((dev->PFIFO & UART_PFIFO_TXFIFOSIZE_MASK) >>
+                    UART_PFIFO_TXFIFOSIZE_SHIFT));
+        dev->TWFIFO = UART_TWFIFO_TXWATER(txfifo_size - 1);
+    }
+    else {
+        /* Missing hardware support */
+        dev->TWFIFO = 0;
+    }
+    /* Trigger RX interrupt when there is 1 byte or more in the RXFIFO */
+    dev->RWFIFO = 1;
+    /* Clear all hardware buffers now, this must be done whenever the FIFO
+     * enable flags are modified. */
+    dev->CFIFO = UART_CFIFO_RXFLUSH_MASK | UART_CFIFO_TXFLUSH_MASK;
+#endif
+
     /* enable transmitter and receiver */
-    dev->C2 |= (1 << UART_C2_TE_SHIFT | 1 << UART_C2_RE_SHIFT);
+    dev->C2 |= UART_C2_TE_MASK | UART_C2_RE_MASK;
     return 0;
 }
 

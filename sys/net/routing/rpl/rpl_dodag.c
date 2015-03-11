@@ -358,6 +358,11 @@ void rpl_join_dodag(rpl_dodag_t *dodag, ipv6_addr_t *parent, uint16_t parent_ran
     my_dodag->lifetime_unit = dodag->lifetime_unit;
     my_dodag->version = dodag->version;
     my_dodag->grounded = dodag->grounded;
+    my_dodag->prefix_length = dodag->prefix_length;
+    my_dodag->prefix = dodag->prefix;
+    my_dodag->prefix_valid_lifetime = dodag->prefix_valid_lifetime;
+    my_dodag->prefix_preferred_lifetime = dodag->prefix_preferred_lifetime;
+    my_dodag->prefix_flags = dodag->prefix_flags;
     my_dodag->joined = 1;
 
     preferred_parent = rpl_new_parent(my_dodag, parent, parent_rank);

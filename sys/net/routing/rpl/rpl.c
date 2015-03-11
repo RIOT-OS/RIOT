@@ -49,6 +49,7 @@ char rpl_process_buf[RPL_PROCESS_STACKSIZE];
 uint8_t rpl_buffer[BUFFER_SIZE - LL_HDR_LEN];
 static timex_t rt_time;
 static vtimer_t rt_timer;
+uint8_t rpl_if_id;
 
 static void _dao_handle_send(rpl_dodag_t *dodag);
 static void _rpl_update_routing_table(void);
@@ -74,6 +75,7 @@ static ipv6_hdr_t *ipv6_buf;
 
 uint8_t rpl_init(int if_id)
 {
+    rpl_if_id = if_id;
     rpl_instances_init();
 
     /* initialize routing table */
