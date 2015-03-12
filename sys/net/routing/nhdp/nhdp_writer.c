@@ -123,8 +123,8 @@ void nhdp_writer_send_hello(nhdp_if_entry_t *if_entry)
 
     /* Create HELLO message and send it using the given interface */
     rfc5444_writer_create_message(&nhdp_writer, RFC5444_MSGTYPE_HELLO,
-                                  rfc5444_writer_singletarget_selector, if_entry->wr_target);
-    rfc5444_writer_flush(&nhdp_writer, if_entry->wr_target, false);
+                                  rfc5444_writer_singletarget_selector, &if_entry->wr_target);
+    rfc5444_writer_flush(&nhdp_writer, &if_entry->wr_target, false);
 
     mutex_unlock(&mtx_packet_write);
 }
