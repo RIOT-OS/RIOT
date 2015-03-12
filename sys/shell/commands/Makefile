@@ -61,6 +61,9 @@ endif
 ifneq (,$(filter fib,$(USEMODULE)))
 	SRC += sc_fib.c
 endif
+ifneq (,$(filter ng_ipv6_nc,$(USEMODULE)))
+    SRC += sc_ipv6_nc.c
+endif
 
 # TODO
 # Conditional building not possible at the moment due to
