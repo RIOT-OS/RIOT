@@ -42,7 +42,9 @@ extern "C" {
 #define CC1100_RADIO_MODE CC1100_MODE_WOR
 
 #define RPL_PKT_RECV_BUF_SIZE 16
+#ifndef RPL_PROCESS_STACKSIZE
 #define RPL_PROCESS_STACKSIZE KERNEL_CONF_STACKSIZE_MAIN
+#endif
 
 /* global variables */
 extern kernel_pid_t rpl_process_pid;
