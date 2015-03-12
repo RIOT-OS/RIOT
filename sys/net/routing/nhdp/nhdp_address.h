@@ -32,6 +32,7 @@ typedef struct nhdp_addr_t {
     uint8_t addr_type;                  /**< AF type for the address */
     uint8_t usg_count;                  /**< Usage count in information bases */
     uint8_t in_tmp_table;               /**< Signals usage in a writers temp table */
+    uint16_t tmp_metric_val;            /**< Encoded metric value used during HELLO processing */
     struct nhdp_addr_t *next;           /**< Pointer to next address (used in central storage) */
 } nhdp_addr_t;
 

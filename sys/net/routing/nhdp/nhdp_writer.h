@@ -65,9 +65,12 @@ void nhdp_writer_send_hello(nhdp_if_entry_t *if_entry);
  * @param[in] addr          Pointer to a NHDP address to add to the HELLO message
  * @param[in] type          TLV type for the address
  * @param[in] value         TLV value for the address
+ * @param[in] metric_in     Encoded incoming link metric value
+ * @param[in] metric_out    Encoded outgoing link metric value
  */
 void nhdp_writer_add_addr(struct rfc5444_writer *wr, nhdp_addr_t *addr,
-                          enum rfc5444_addrtlv_iana type, uint8_t value);
+                          enum rfc5444_addrtlv_iana type, uint8_t value,
+                          uint16_t metric_in, uint16_t metric_out);
 
 #ifdef __cplusplus
 }

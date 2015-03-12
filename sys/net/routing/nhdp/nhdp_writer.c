@@ -55,6 +55,7 @@ static struct rfc5444_writer_tlvtype _nhdp_addrtlvs[] = {
     [RFC5444_ADDRTLV_LOCAL_IF] = { .type = RFC5444_ADDRTLV_LOCAL_IF },
     [RFC5444_ADDRTLV_LINK_STATUS] = { .type = RFC5444_ADDRTLV_LINK_STATUS },
     [RFC5444_ADDRTLV_OTHER_NEIGHB] = { .type = RFC5444_ADDRTLV_OTHER_NEIGHB },
+    [RFC5444_ADDRTLV_LINK_METRIC] = { .type = RFC5444_ADDRTLV_LINK_METRIC, .exttype = NHDP_METRIC }
 };
 
 /* Writer content provider for HELLO messages */
@@ -134,7 +135,8 @@ void nhdp_writer_send_hello(nhdp_if_entry_t *if_entry)
 }
 
 void nhdp_writer_add_addr(struct rfc5444_writer *wr, nhdp_addr_t *addr,
-                          enum rfc5444_addrtlv_iana type, uint8_t value)
+                          enum rfc5444_addrtlv_iana type, uint8_t value,
+                          uint16_t metric_in, uint16_t metric_out)
 {
     struct rfc5444_writer_address *wr_addr;
     struct netaddr n_addr;
@@ -164,6 +166,25 @@ void nhdp_writer_add_addr(struct rfc5444_writer *wr, nhdp_addr_t *addr,
 
     rfc5444_writer_add_addrtlv(wr, wr_addr, &_nhdp_addrtlvs[type],
                                &value, sizeof(uint8_t), false);
+
+    /* Add LINK_METRIC TLV if necessary */
+    if ((NHDP_METRIC == NHDP_LMT_DAT) && (metric_in != NHDP_METRIC_UNKNOWN)) {
+        switch(type) {
+            case RFC5444_ADDRTLV_LINK_STATUS:
+                metric_in |= NHDP_KD_LM_INC;
+                metric_in |= (metric_in == metric_out) ? NHDP_KD_LM_OUT : 0x00;
+                break;
+            case RFC5444_ADDRTLV_OTHER_NEIGHB:
+                metric_in |= NHDP_KD_NM_INC;
+                metric_in |= (metric_in == metric_out) ? NHDP_KD_NM_OUT : 0x00;
+                break;
+            default:
+                /* Other types are not used and therefore no address tlv is added */
+                return;
+        }
+        rfc5444_writer_add_addrtlv(wr, wr_addr, &_nhdp_addrtlvs[RFC5444_ADDRTLV_LINK_METRIC],
+                                   &metric_in, sizeof(metric_in), true);
+    }
 }
 
 

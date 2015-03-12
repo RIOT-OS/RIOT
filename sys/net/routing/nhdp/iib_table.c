@@ -24,11 +24,13 @@
 #include "utlist.h"
 #include "kernel_types.h"
 
+#include "rfc5444/rfc5444.h"
 #include "rfc5444/rfc5444_iana.h"
 #include "rfc5444/rfc5444_writer.h"
 
 #include "iib_table.h"
 #include "nhdp_address.h"
+#include "nhdp_metric.h"
 #include "nhdp_writer.h"
 
 #define ENABLE_DEBUG (0)
@@ -37,6 +39,10 @@
 /* Internal variables */
 static mutex_t mtx_iib_access = MUTEX_INIT;
 static iib_base_entry_t *iib_base_entry_head = NULL;
+
+#if (NHDP_METRIC == NHDP_LMT_DAT)
+static const double const_dat = (((double)DAT_CONSTANT) / DAT_MAXIMUM_LOSS);
+#endif
 
 /* Internal function prototypes */
 static void rem_link_set_entry(iib_base_entry_t *base_entry, iib_link_set_entry_t *ls_entry);
@@ -64,6 +70,11 @@ static void rem_not_heard_nb_tuple(iib_link_set_entry_t *ls_entry, timex_t *now)
 static inline timex_t get_max_timex(timex_t time_one, timex_t time_two);
 static iib_link_tuple_status_t get_tuple_status(iib_link_set_entry_t *ls_entry, timex_t *now);
 
+#if (NHDP_METRIC == NHDP_LMT_DAT)
+static void queue_rem(uint8_t *queue);
+static uint16_t queue_sum(uint8_t *queue);
+static void dat_metric_refresh(void);
+#endif
 
 /*---------------------------------------------------------------------------*
  *                       Interface Information Base API                      *
@@ -86,10 +97,12 @@ int iib_register_if(kernel_pid_t pid)
     return 0;
 }
 
-int iib_process_hello(kernel_pid_t if_pid, nib_entry_t *nb_elt,
-                      uint64_t validity_time, uint8_t is_sym_nb, uint8_t is_lost)
+iib_link_set_entry_t *iib_process_hello(kernel_pid_t if_pid, nib_entry_t *nb_elt,
+                                        uint64_t validity_time, uint8_t is_sym_nb,
+                                        uint8_t is_lost)
 {
     iib_base_entry_t *base_elt;
+    iib_link_set_entry_t *ls_entry = NULL;
     timex_t now;
 
     mutex_lock(&mtx_iib_access);
@@ -108,8 +121,7 @@ int iib_process_hello(kernel_pid_t if_pid, nib_entry_t *nb_elt,
         vtimer_now(&now);
 
         /* Create a new link tuple for the neighbor that originated the hello */
-        iib_link_set_entry_t *ls_entry = update_link_set(base_elt, nb_elt, &now,
-                                                         validity_time, is_sym_nb, is_lost);
+        ls_entry = update_link_set(base_elt, nb_elt, &now, validity_time, is_sym_nb, is_lost);
 
         /* Create new two hop tuples for signaled symmetric neighbors */
         if (ls_entry) {
@@ -119,7 +131,7 @@ int iib_process_hello(kernel_pid_t if_pid, nib_entry_t *nb_elt,
 
     mutex_unlock(&mtx_iib_access);
 
-    return 0;
+    return ls_entry;
 }
 
 void iib_fill_wr_addresses(kernel_pid_t if_pid, struct rfc5444_writer *wr)
@@ -149,14 +161,18 @@ void iib_fill_wr_addresses(kernel_pid_t if_pid, struct rfc5444_writer *wr)
                                 case IIB_LT_STATUS_SYM:
                                     nhdp_writer_add_addr(wr, addr_elt->address,
                                                          RFC5444_ADDRTLV_LINK_STATUS,
-                                                         RFC5444_LINKSTATUS_SYMMETRIC);
+                                                         RFC5444_LINKSTATUS_SYMMETRIC,
+                                                         rfc5444_metric_encode(ls_elt->metric_in),
+                                                         rfc5444_metric_encode(ls_elt->metric_out));
                                     addr_elt->address->in_tmp_table = NHDP_ADDR_TMP_SYM;
                                     break;
 
                                 case IIB_LT_STATUS_HEARD:
                                     nhdp_writer_add_addr(wr, addr_elt->address,
                                                          RFC5444_ADDRTLV_LINK_STATUS,
-                                                         RFC5444_LINKSTATUS_HEARD);
+                                                         RFC5444_LINKSTATUS_HEARD,
+                                                         rfc5444_metric_encode(ls_elt->metric_in),
+                                                         rfc5444_metric_encode(ls_elt->metric_out));
                                     addr_elt->address->in_tmp_table = NHDP_ADDR_TMP_ANY;
                                     break;
 
@@ -166,7 +182,9 @@ void iib_fill_wr_addresses(kernel_pid_t if_pid, struct rfc5444_writer *wr)
                                 case IIB_LT_STATUS_LOST:
                                     nhdp_writer_add_addr(wr, addr_elt->address,
                                                          RFC5444_ADDRTLV_LINK_STATUS,
-                                                         RFC5444_LINKSTATUS_LOST);
+                                                         RFC5444_LINKSTATUS_LOST,
+                                                         rfc5444_metric_encode(ls_elt->metric_in),
+                                                         rfc5444_metric_encode(ls_elt->metric_out));
                                     addr_elt->address->in_tmp_table = NHDP_ADDR_TMP_ANY;
                                     break;
 
@@ -214,6 +232,120 @@ void iib_propagate_nb_entry_change(nib_entry_t *old_entry, nib_entry_t *new_entr
             }
         }
     }
+}
+
+void iib_process_metric_msg(iib_link_set_entry_t *ls_entry, uint64_t int_time)
+{
+#if (NHDP_METRIC == NHDP_LMT_HOP_COUNT)
+    /* Hop metric value for an existing direct link is always 1 */
+    (void)int_time;
+    ls_entry->metric_in = 1;
+    ls_entry->metric_out = 1;
+    if (ls_entry->nb_elt) {
+        ls_entry->nb_elt->metric_in = 1;
+        ls_entry->nb_elt->metric_out = 1;
+    }
+#elif (NHDP_METRIC == NHDP_LMT_DAT)
+    /* Process required DAT metric steps */
+    ls_entry->hello_interval = rfc5444_timetlv_encode(int_time);
+    if (ls_entry->last_seq_no == 0) {
+        timex_t now, i_time;
+        vtimer_now(&now);
+        i_time = timex_from_uint64(int_time * MS_IN_USEC * DAT_HELLO_TIMEOUT_FACTOR);
+        ls_entry->dat_received[0]++;
+        ls_entry->dat_total[0]++;
+        ls_entry->dat_time = timex_add(now, i_time);
+    }
+#else
+    /* NHDP_METRIC is not set properly */
+    (void)ls_entry;
+    (void)int_time;
+    DEBUGF("[WARNING] Unknown NHDP_METRIC setting\n");
+#endif
+}
+
+void iib_process_metric_pckt(iib_link_set_entry_t *ls_entry, uint32_t metric_out, uint16_t seq_no)
+{
+#if (NHDP_METRIC == NHDP_LMT_HOP_COUNT)
+    /* Nothing to do here */
+    (void)ls_entry;
+    (void)metric_out;
+    (void)seq_no;
+#elif (NHDP_METRIC == NHDP_LMT_DAT)
+    /* Metric packet processing */
+    if (ls_entry->last_seq_no == 0) {
+        ls_entry->dat_received[0] = 1;
+        ls_entry->dat_total[0] = 1;
+    }
+    /* Don't add values to the queue for duplicate packets */
+    else if (seq_no != ls_entry->last_seq_no) {
+        uint16_t seq_diff;
+        if (seq_no < ls_entry->last_seq_no) {
+            seq_diff = (uint16_t) ((((uint32_t) seq_no) + 0xFFFF) - ls_entry->last_seq_no);
+        }
+        else {
+            seq_diff = seq_no - ls_entry->last_seq_no;
+        }
+        ls_entry->dat_total[0] += (seq_diff > NHDP_SEQNO_RESTART_DETECT) ? 1 : seq_diff;
+        ls_entry->dat_received[0]++;
+    }
+
+    ls_entry->last_seq_no = seq_no;
+    ls_entry->lost_hellos = 0;
+
+    if (ls_entry->hello_interval != 0) {
+        timex_t now, i_time;
+        vtimer_now(&now);
+        i_time = timex_from_uint64(rfc5444_timetlv_decode(ls_entry->hello_interval)
+                * MS_IN_USEC * DAT_HELLO_TIMEOUT_FACTOR);
+        ls_entry->dat_time = timex_add(now, i_time);
+    }
+
+    /* Refresh metric value for link tuple and corresponding neighbor tuple */
+    if (ls_entry->nb_elt) {
+        if ((metric_out <= ls_entry->nb_elt->metric_out) ||
+                (ls_entry->nb_elt->metric_out == NHDP_METRIC_UNKNOWN)) {
+            /* Better value, use it also for your neighbor */
+            ls_entry->nb_elt->metric_out = metric_out;
+        }
+        else if (ls_entry->metric_out == ls_entry->nb_elt->metric_out){
+            /* The corresponding neighbor tuples metric needs to be updated */
+            iib_base_entry_t *base_elt;
+            iib_link_set_entry_t *ls_elt;
+            ls_entry->nb_elt->metric_out = metric_out;
+            LL_FOREACH(iib_base_entry_head, base_elt) {
+                LL_FOREACH(base_elt->link_set_head, ls_elt) {
+                    if ((ls_elt->nb_elt == ls_entry->nb_elt) && (ls_elt != ls_entry)) {
+                        if (ls_elt->metric_out < ls_entry->nb_elt->metric_out) {
+                            /* Smaller DAT value is better */
+                            ls_entry->nb_elt->metric_out = ls_elt->metric_out;
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    ls_entry->metric_out = metric_out;
+#else
+    /* NHDP_METRIC is not set properly */
+    (void)ls_entry;
+    (void)metric_out;
+    (void)seq_no;
+    DEBUGF("[WARNING] Unknown NHDP_METRIC setting\n");
+#endif
+}
+
+void iib_process_metric_refresh(void)
+{
+#if (NHDP_METRIC == NHDP_LMT_HOP_COUNT)
+    /* Nothing to do here */
+#elif (NHDP_METRIC == NHDP_LMT_DAT)
+    dat_metric_refresh();
+#else
+    /* NHDP_METRIC is not set properly */
+    DEBUGF("[WARNING] Unknown NHDP_METRIC setting\n");
+#endif
 }
 
 
@@ -427,7 +559,6 @@ static iib_link_set_entry_t *add_default_link_set_entry(iib_base_entry_t *base_e
                                                         uint64_t val_time)
 {
     iib_link_set_entry_t *new_entry;
-    timex_t v_time = timex_from_uint64(val_time * MS_IN_USEC);
 
     new_entry = (iib_link_set_entry_t *) malloc(sizeof(iib_link_set_entry_t));
 
@@ -437,15 +568,7 @@ static iib_link_set_entry_t *add_default_link_set_entry(iib_base_entry_t *base_e
     }
 
     new_entry->address_list_head = NULL;
-    new_entry->heard_time.microseconds = 0;
-    new_entry->heard_time.seconds = 0;
-    new_entry->sym_time.microseconds = 0;
-    new_entry->sym_time.seconds = 0;
-    new_entry->pending = NHDP_INITIAL_PENDING;
-    new_entry->lost = 0;
-    new_entry->exp_time = timex_add(*now, v_time);
-    new_entry->last_status = IIB_LT_STATUS_UNKNOWN;
-    new_entry->nb_elt = NULL;
+    reset_link_set_entry(new_entry, now, val_time);
     LL_PREPEND(base_entry->link_set_head, new_entry);
 
     return new_entry;
@@ -468,6 +591,18 @@ static void reset_link_set_entry(iib_link_set_entry_t *ls_entry, timex_t *now, u
     ls_entry->exp_time = timex_add(*now, v_time);
     ls_entry->nb_elt = NULL;
     ls_entry->last_status = IIB_LT_STATUS_UNKNOWN;
+    ls_entry->metric_in = NHDP_METRIC_UNKNOWN;
+    ls_entry->metric_out = NHDP_METRIC_UNKNOWN;
+#if (NHDP_METRIC == NHDP_LMT_DAT)
+    memset(ls_entry->dat_received, 0, NHDP_Q_MEM_LENGTH);
+    memset(ls_entry->dat_total, 0, NHDP_Q_MEM_LENGTH);
+    ls_entry->dat_time.microseconds = 0;
+    ls_entry->dat_time.seconds = 0;
+    ls_entry->hello_interval = 0;
+    ls_entry->lost_hellos = 0;
+    ls_entry->rx_bitrate = 100000;
+    ls_entry->last_seq_no = 0;
+#endif
 }
 
 /**
@@ -554,6 +689,15 @@ static int add_two_hop_entry(iib_base_entry_t *base_entry, iib_link_set_entry_t 
     new_entry->th_nb_addr = th_addr;
     new_entry->ls_elt = ls_entry;
     new_entry->exp_time = timex_add(*now, v_time);
+    if (th_addr->tmp_metric_val != NHDP_METRIC_UNKNOWN) {
+        new_entry->metric_in = rfc5444_metric_decode(th_addr->tmp_metric_val);
+        new_entry->metric_out = rfc5444_metric_decode(th_addr->tmp_metric_val);
+    }
+    else {
+        new_entry->metric_in = NHDP_METRIC_UNKNOWN;
+        new_entry->metric_out = NHDP_METRIC_UNKNOWN;
+    }
+
     LL_PREPEND(base_entry->two_hop_set_head, new_entry);
 
     return 0;
@@ -665,3 +809,111 @@ static inline timex_t get_max_timex(timex_t time_one, timex_t time_two)
 
     return time_two;
 }
+
+#if (NHDP_METRIC == NHDP_LMT_DAT)
+/**
+ * Sum all elements in the queue
+ */
+static uint16_t queue_sum(uint8_t *queue)
+{
+    uint16_t sum = 0;
+
+    for (int i = 0; i < NHDP_Q_MEM_LENGTH; i++) {
+        sum += queue[i];
+    }
+
+    return sum;
+}
+
+/**
+ * Remove the oldest element in the queue
+ */
+static void queue_rem(uint8_t *queue)
+{
+    uint8_t temp;
+    uint8_t prev_value = queue[0];
+
+    /* Clear spot for a new element */
+    queue[0] = 0;
+
+    /* Shift elements */
+    for (int i = 1; i < NHDP_Q_MEM_LENGTH; i++) {
+        temp = queue[i];
+        queue[i] = prev_value;
+        prev_value = temp;
+    }
+}
+
+/**
+ * Update DAT metric values for all Link Tuples
+ */
+static void dat_metric_refresh(void)
+{
+    iib_base_entry_t *base_elt;
+    iib_link_set_entry_t *ls_elt;
+    uint32_t metric_temp;
+    double sum_total, sum_rcvd, loss;
+
+    LL_FOREACH(iib_base_entry_head, base_elt) {
+        LL_FOREACH(base_elt->link_set_head, ls_elt) {
+            sum_rcvd = queue_sum(ls_elt->dat_received);
+            sum_total = queue_sum(ls_elt->dat_total);
+            metric_temp = ls_elt->metric_in;
+
+            if ((ls_elt->hello_interval != 0) && (ls_elt->lost_hellos > 0)) {
+                /* Compute lost time proportion */
+                loss = (((double)ls_elt->hello_interval) * ((double)ls_elt->lost_hellos))
+                        / DAT_MEMORY_LENGTH;
+                if (loss >= 1.0) {
+                    sum_rcvd = 0.0;
+                }
+                else {
+                    sum_rcvd *= (1.0 - loss);
+                }
+            }
+
+            if (sum_rcvd < 1.0) {
+                ls_elt->metric_in = NHDP_METRIC_MAXIMUM;
+            }
+            else {
+                loss = sum_total / sum_rcvd;
+                if (loss > DAT_MAXIMUM_LOSS) {
+                    loss = DAT_MAXIMUM_LOSS;
+                }
+                ls_elt->metric_in = (const_dat * loss) / (ls_elt->rx_bitrate / DAT_MINIMUM_BITRATE);
+                if (ls_elt->metric_in > NHDP_METRIC_MAXIMUM) {
+                    ls_elt->metric_in = NHDP_METRIC_MAXIMUM;
+                }
+            }
+
+            if (ls_elt->nb_elt) {
+                if (ls_elt->metric_in <= ls_elt->nb_elt->metric_in ||
+                        (ls_elt->nb_elt->metric_in == NHDP_METRIC_UNKNOWN)) {
+                    /* Better value, use it also for your neighbor */
+                    ls_elt->nb_elt->metric_in = ls_elt->metric_in;
+                }
+                else if (metric_temp == ls_elt->nb_elt->metric_in){
+                    /* The corresponding neighbor tuples metric needs to be updated */
+                    iib_base_entry_t *base_entry;
+                    iib_link_set_entry_t *ls_entry;
+                    ls_elt->nb_elt->metric_in = ls_elt->metric_in;
+                    LL_FOREACH(iib_base_entry_head, base_entry) {
+                        LL_FOREACH(base_entry->link_set_head, ls_entry) {
+                            if ((ls_elt->nb_elt == ls_entry->nb_elt) && (ls_elt != ls_entry)) {
+                                if (ls_entry->metric_in < ls_elt->nb_elt->metric_in) {
+                                    /* Smaller DAT value is better */
+                                    ls_elt->nb_elt->metric_in = ls_entry->metric_in;
+                                }
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            queue_rem(ls_elt->dat_received);
+            queue_rem(ls_elt->dat_total);
+        }
+    }
+}
+#endif

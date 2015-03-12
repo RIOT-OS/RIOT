@@ -122,7 +122,9 @@ void nib_fill_wr_addresses(struct rfc5444_writer *wr)
                 /* Check whether address is not already included with link status symmetric */
                 if (!NHDP_ADDR_TMP_IN_SYM(addr_elt->address)) {
                     nhdp_writer_add_addr(wr, addr_elt->address, RFC5444_ADDRTLV_OTHER_NEIGHB,
-                                         RFC5444_OTHERNEIGHB_SYMMETRIC);
+                                         RFC5444_OTHERNEIGHB_SYMMETRIC,
+                                         rfc5444_metric_encode(nib_elt->metric_in),
+                                         rfc5444_metric_encode(nib_elt->metric_out));
                     addr_elt->address->in_tmp_table = NHDP_ADDR_TMP_SYM;
                 }
             }
@@ -140,7 +142,8 @@ void nib_fill_wr_addresses(struct rfc5444_writer *wr)
             if (!NHDP_ADDR_TMP_IN_ANY(lost_elt->address)) {
                 /* Address is not present in one of the lists, add it */
                 nhdp_writer_add_addr(wr, lost_elt->address, RFC5444_ADDRTLV_OTHER_NEIGHB,
-                                     RFC5444_OTHERNEIGHB_LOST);
+                                     RFC5444_OTHERNEIGHB_LOST, NHDP_METRIC_UNKNOWN,
+                                     NHDP_METRIC_UNKNOWN);
             }
         }
     }
@@ -215,6 +218,8 @@ static nib_entry_t *add_nib_entry_for_nb_addr_list(void)
     }
 
     new_elem->symmetric = 0;
+    new_elem->metric_in = NHDP_METRIC_UNKNOWN;
+    new_elem->metric_out = NHDP_METRIC_UNKNOWN;
     LL_PREPEND(nib_entry_head, new_elem);
 
     return new_elem;
