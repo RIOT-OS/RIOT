@@ -68,6 +68,9 @@
  *  - CREATE_STACKTEST      write markers into the thread's stack to measure the stack's memory
  *                          usage (for debugging and profiling purposes)
  *
+ * @note Currently we support creating threads from within an ISR, however it is considered
+ *       to be a bad programming practice and we strongly discourage it.
+ *
  * @param[out] stack    start address of the preallocated stack memory
  * @param[in] stacksize the size of the thread's stack in bytes
  * @param[in] priority  priority of the new thread, lower mean higher priority
