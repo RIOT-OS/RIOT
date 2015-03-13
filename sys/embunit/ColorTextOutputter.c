@@ -35,6 +35,7 @@
 #include <stdio.h>
 #include "ColorTextOutputter.h"
 #include "ColorOutputter.h"
+#include "ColorTextColors.h"
 
 static void ColorTextOutputter_printHeader(OutputterRef self)
 {

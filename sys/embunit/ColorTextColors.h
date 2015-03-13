@@ -30,23 +30,36 @@
  * use or other dealings in this Software without prior written
  * authorization of the copyright holder.
  *
- * $Id: ColorOutputter.h,v 1.2 2003/09/06 13:28:27 arms22 Exp $
+ * $Id: ColorTextOutputter.h,v 1.2 2003/09/06 13:28:27 arms22 Exp $
  */
-#ifndef __COLOROUTPUTTER_H__
-#define __COLOROUTPUTTER_H__
-
-#include "Outputter.h"
+#ifndef __COLORTEXTCOLORS_H__
+#define __COLORTEXTCOLORS_H__
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-OutputterRef ColorOutputter_outputter(void);
-
-void ColorOutputter_printStatistics(OutputterRef self, TestResultRef result);
+/*
+ * Some terminal color definitions:
+ * C<color>:    text color
+ * CDEFAULT:    default text color
+ * BG<color>:   background color
+ * BGDEFAULT:   default background color
+ * S<style>:    text style
+ * SDEFAULT:    default text style
+ */
+#define CRED        "\033[31m"
+#define CGREEN      "\033[32m"
+#define CDEFAULT    "\033[39m"
+#define BGRED       "\033[41m"
+#define BGGREEN     "\033[42m"
+#define BGDEFAULT   "\033[49m"
+#define SBOLD       "\033[1m"
+#define SDEFAULT    "\033[21m"
+#define LINEFILL    "\033[K"
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif/*__COLOROUTPUTTER_H__*/
+#endif/*__COLORTEXTCOLORS_H__*/
