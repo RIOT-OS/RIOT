@@ -56,13 +56,13 @@ static void ColorTextOutputter_printEndTest(OutputterRef self,TestRef test)
 static void ColorTextOutputter_printSuccessful(OutputterRef self,TestRef test,int runCount)
 {
     (void)self;
-    printf("\033[32m%d) OK %s\033[0m\n", runCount, Test_name(test));
+    printf(CGREEN "%d) OK %s" CDEFAULT "\n", runCount, Test_name(test));
 }
 
 static void ColorTextOutputter_printFailure(OutputterRef self,TestRef test,char *msg,int line,char *file,int runCount)
 {
     (void)self;
-    printf("\033[31m%d) NG %s\033[0m (%s %d) %s\n", runCount, Test_name(test), file, line, msg);
+    printf(CRED "%d) NG %s" CDEFAULT " (%s:%d) %s\n", runCount, Test_name(test), file, line, msg);
 }
 
 void ColorTextOutputter_printStatistics(OutputterRef self,TestResultRef result)

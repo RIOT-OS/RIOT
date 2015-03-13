@@ -57,30 +57,28 @@ static void ColorOutputter_printSuccessful(OutputterRef self, TestRef test, int 
     (void) self;
     (void) test;
     (void) runCount;
+    printf(CGREEN "." CDEFAULT);
 }
 
 static void ColorOutputter_printFailure(OutputterRef self, TestRef test, char *msg, int line,
         char *file, int runCount)
 {
     (void) self;
-    (void) test;
-    (void) msg;
-    (void) line;
-    (void) file;
     (void) runCount;
+    printf("\n" CRED "FAILED %s (%s:%d) %s" CDEFAULT "\n", Test_name(test), file, line, msg);
 }
 
 void ColorOutputter_printStatistics(OutputterRef self, TestResultRef result)
 {
     (void) self;
     if (result->failureCount) {
-        printf("\n\033[41;1mFAILED\033[21m (%d of %d failed)", result->failureCount,
+        printf("\n" BGRED SBOLD "FAILED" SDEFAULT " (%d of %d failed)", result->failureCount,
                 result->runCount);
     }
     else {
-        printf("\n\033[42;1mOK\033[21m (%d tests)", result->runCount);
+        printf("\n" BGGREEN SBOLD "OK" SDEFAULT " (%d tests)", result->runCount);
     }
-    printf("\033[K\033[0m\n");
+    printf(LINEFILL BGDEFAULT "\n");
 }
 
 static const OutputterImplement ColorOutputterImplement = {
