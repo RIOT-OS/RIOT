@@ -40,7 +40,7 @@ extern "C" {
  */
 #define TIMER_NUMOF         (1U)
 #define TIMER_0_EN          1
-#define TIMER_1_EN          0
+#define TIMER_IRQ_PRIO      1
 
 /* Timer 0 configuration */
 #define TIMER_0_DEV         TIM2
@@ -50,17 +50,6 @@ extern "C" {
 #define TIMER_0_CLKEN()     (RCC->APB1ENR |= RCC_APB1ENR_TIM2EN)
 #define TIMER_0_ISR         isr_tim2
 #define TIMER_0_IRQ_CHAN    TIM2_IRQn
-#define TIMER_0_IRQ_PRIO    1
-
-/* Timer 1 configuration */
-#define TIMER_1_DEV         TIMx                                                        /* TODO */
-#define TIMER_1_CHANNELS
-#define TIMER_1_PRESCALER   (47U)
-#define TIMER_1_MAX_VALUE   (0xffff)
-#define TIMER_1_CLKEN()
-#define TIMER_1_ISR
-#define TIMER_1_IRQCHAN
-#define TIMER_1_IRQ_PRIO
 /** @} */
 
 /**
