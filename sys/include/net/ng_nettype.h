@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    net_ng_nettype  Protocol type definitions.
+ * @defgroup    net_ng_nettype  Protocol type
  * @ingroup     net
  * @brief       Protocol type definitions to be used with the @ref net_ng_netapi,
  *              the @ref net_ng_netdev, the @ref net_ng_netreg, and
