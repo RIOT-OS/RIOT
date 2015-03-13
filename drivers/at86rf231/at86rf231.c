@@ -31,7 +31,7 @@
 #include "hwtimer.h"
 #include "config.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG (1)
 #include "debug.h"
 
 #ifndef AT86RF231_SPI_SPEED
@@ -48,6 +48,8 @@ static uint16_t radio_address;
 static uint64_t radio_address_long;
 
 static volatile unsigned long sfd_count;
+
+static volatile bool at86rf231_active;
 
 
 netdev_802154_raw_packet_cb_t at86rf231_raw_packet_cb;
@@ -94,12 +96,12 @@ int at86rf231_initialize(netdev_t *dev)
     radio_address_long = 0x00000000000000FF
                        & (uint64_t)at86rf231_reg_read(AT86RF231_REG__IEEE_ADDR_0);
     radio_address_long |= ((uint64_t)at86rf231_reg_read(AT86RF231_REG__IEEE_ADDR_1)) << 8;
-    radio_address_long |= ((uint64_t)at86rf231_reg_read(AT86RF231_REG__IEEE_ADDR_1)) << 16;
-    radio_address_long |= ((uint64_t)at86rf231_reg_read(AT86RF231_REG__IEEE_ADDR_1)) << 24;
-    radio_address_long |= ((uint64_t)at86rf231_reg_read(AT86RF231_REG__IEEE_ADDR_1)) << 32;
-    radio_address_long |= ((uint64_t)at86rf231_reg_read(AT86RF231_REG__IEEE_ADDR_1)) << 40;
-    radio_address_long |= ((uint64_t)at86rf231_reg_read(AT86RF231_REG__IEEE_ADDR_1)) << 48;
-    radio_address_long |= ((uint64_t)at86rf231_reg_read(AT86RF231_REG__IEEE_ADDR_1)) << 56;
+    radio_address_long |= ((uint64_t)at86rf231_reg_read(AT86RF231_REG__IEEE_ADDR_2)) << 16;
+    radio_address_long |= ((uint64_t)at86rf231_reg_read(AT86RF231_REG__IEEE_ADDR_3)) << 24;
+    radio_address_long |= ((uint64_t)at86rf231_reg_read(AT86RF231_REG__IEEE_ADDR_4)) << 32;
+    radio_address_long |= ((uint64_t)at86rf231_reg_read(AT86RF231_REG__IEEE_ADDR_5)) << 40;
+    radio_address_long |= ((uint64_t)at86rf231_reg_read(AT86RF231_REG__IEEE_ADDR_6)) << 48;
+    radio_address_long |= ((uint64_t)at86rf231_reg_read(AT86RF231_REG__IEEE_ADDR_7)) << 56;
 
     return 0;
 }
@@ -118,6 +120,8 @@ int at86rf231_on(void)
             return 0;
         }
     } while (at86rf231_current_mode() != AT86RF231_TRX_STATUS__TRX_OFF);
+
+    at86rf231_active = true;
 
     /* change into reception mode */
     at86rf231_switch_to_rx();
@@ -146,14 +150,13 @@ void at86rf231_off(void)
     /* assert SLP_TR line */
     gpio_set(AT86RF231_SLEEP);
 
+    at86rf231_active = false;
     DEBUG("AT86RF231 transceiver goes off.\n");
 }
 
 int at86rf231_is_on(void)
 {
-    uint8_t mode = at86rf231_current_mode();
-    return (mode != AT86RF231_TRX_STATUS__P_ON)
-        && (mode != AT86RF231_TRX_STATUS__SLEEP);
+    return at86rf231_active;
 }
 
 void at86rf231_switch_to_rx(void)
@@ -194,13 +197,11 @@ void at86rf231_switch_to_rx(void)
 }
 
 #ifndef MODULE_OPENWSN
-void at86rf231_rxoverflow_irq(void)
+void at86rf231_fberror_irq(void)
 {
-    /* When frame buffer corruption occurs, reset the transceiver */
-    puts("at86rf231: frame buffer corruption detected!");
-    puts("Resetting radio transceiver...");
-    at86rf231_reset();
-    puts("at86rf231: reset done.");
+    /* When frame buffer corruption occurs, halt/reset the system */
+    core_panic(0x0231,
+               "at86rf231: frame buffer corruption detected!");
 }
 
 void at86rf233_sfd_irq(void)
@@ -213,33 +214,33 @@ void at86rf231_irq(void)
     /* Check the kind of the received interrupt(s) */
     uint8_t irqStat = at86rf231_reg_read(AT86RF231_REG__IRQ_STATUS);
 #if ENABLE_DEBUG
-    puts("at86rf231 IRQ!");
-    puts("Pending:");
+    DEBUG("at86rf231 IRQ!\n");
+    DEBUG("Pending:\n");
     if (irqStat & AT86RF231_IRQ_STATUS_MASK__BAT_LOW) {
-        puts("-> BAT_LOW");
+        DEBUG("-> BAT_LOW\n");
     }
     if (irqStat & AT86RF231_IRQ_STATUS_MASK__TRX_UR) {
-        puts("-> TRX_UR");
+        DEBUG("-> TRX_UR\n");
     }
     if (irqStat & AT86RF231_IRQ_STATUS_MASK__AMI) {
-        puts("-> AMI");
+        DEBUG("-> AMI\n");
     }
     if (irqStat & AT86RF231_IRQ_STATUS_MASK__CCA_ED_DONE) {
-        puts("-> CCA_ED_DONE");
+        DEBUG("-> CCA_ED_DONE\n");
     }
     if (irqStat & AT86RF231_IRQ_STATUS_MASK__TRX_END) {
-        puts("-> TRX_END");
+        DEBUG("-> TRX_END\n");
     }
     if (irqStat & AT86RF231_IRQ_STATUS_MASK__RX_START) {
-        puts("-> RX_START");
+        DEBUG("-> RX_START\n");
     }
     if (irqStat & AT86RF231_IRQ_STATUS_MASK__PLL_UNLOCK) {
-        puts("-> PLL_UNLOCK");
+        DEBUG("-> PLL_UNLOCK\n");
     }
     if (irqStat & AT86RF231_IRQ_STATUS_MASK__PLL_LOCK) {
-        puts("-> PLL_LOCK");
+        DEBUG("-> PLL_LOCK\n");
     }
-    puts(" ");
+    DEBUG("\n");
 #endif
 
     /* Handle SFD recognitions */
@@ -263,7 +264,7 @@ void at86rf231_irq(void)
 
     /* Handle Frame Buffer access violations */
     if (irqStat & AT86RF231_IRQ_STATUS_MASK__TRX_UR) {
-        at86rf231_rxoverflow_irq();
+        at86rf231_fberror_irq();
     }
 
     /* other interrupts don't interest us (and shouldn't be enabled */
@@ -282,7 +283,6 @@ int at86rf231_add_raw_recv_callback(netdev_t *dev,
     }
 
     return -ENOBUFS;
-
 }
 
 int at86rf231_rem_raw_recv_callback(netdev_t *dev,
@@ -460,6 +460,24 @@ unsigned int at86rf231_get_channel(void)
     return radio_channel;
 }
 
+void at86rf231_update_config_values(void)
+{
+    radio_address =  at86rf231_reg_read(AT86RF231_REG__SHORT_ADDR_0)
+                  | (at86rf231_reg_read(AT86RF231_REG__SHORT_ADDR_1) << 8);
+    radio_address_long =  at86rf231_reg_read(AT86RF231_REG__IEEE_ADDR_0)
+            | ((uint64_t) at86rf231_reg_read(AT86RF231_REG__IEEE_ADDR_1) << 8)
+            | ((uint64_t) at86rf231_reg_read(AT86RF231_REG__IEEE_ADDR_2) << 16)
+            | ((uint64_t) at86rf231_reg_read(AT86RF231_REG__IEEE_ADDR_3) << 24)
+            | ((uint64_t) at86rf231_reg_read(AT86RF231_REG__IEEE_ADDR_4) << 32)
+            | ((uint64_t) at86rf231_reg_read(AT86RF231_REG__IEEE_ADDR_5) << 40)
+            | ((uint64_t) at86rf231_reg_read(AT86RF231_REG__IEEE_ADDR_6) << 48)
+            | ((uint64_t) at86rf231_reg_read(AT86RF231_REG__IEEE_ADDR_7) << 56);
+    radio_pan =  at86rf231_reg_read(AT86RF231_REG__PAN_ID_0)
+              | (at86rf231_reg_read(AT86RF231_REG__PAN_ID_1) << 8);
+    radio_channel = at86rf231_reg_read(AT86RF231_REG__PHY_CC_CCA)
+                  & AT86RF231_PHY_CC_CCA_MASK__CHANNEL;
+}
+
 void at86rf231_set_monitor(int mode)
 {
     /* read register */
@@ -594,6 +612,8 @@ void at86rf231_reset(void)
                        "at86rf231 : ERROR : could not enter TRX_OFF mode\n");
         }
     } while (at86rf231_current_mode() != AT86RF231_TRX_STATUS__TRX_OFF);
+
+    at86rf231_active = true;
 
     at86rf231_reg_write(AT86RF231_REG__TRX_STATE,
                         AT86RF231_TRX_STATE__RX_ON);
