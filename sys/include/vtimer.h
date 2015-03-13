@@ -100,8 +100,17 @@ int vtimer_usleep(uint32_t us);
 int vtimer_sleep(timex_t time);
 
 /**
- * @brief   set a vtimer with msg event handler of type @ref MSG_TIMER
- * @param[in]   t           pointer to preinitialised vtimer_t
+ * @brief   Initialize a vtimer to send a message after a specified interval.
+ *
+ * Initialize a vtimer to send a message after a specified interval.
+ * The sent message will be constructed from the process id, the type and the
+ * pointer. The message will be sent from interrupt context.
+ * The message construction and sending is equivalent to:
+ * @code
+ *       msg_t msg = { .type = type, .content = { .value = (unsigned int) ptr } };
+ *       msg_send_int(&msg, pid);
+ * @endcode
+ * @param[in]   t           pointer to an uninitialised vtimer_t structure
  * @param[in]   interval    vtimer timex_t interval
  * @param[in]   pid         process id
  * @param[in]   type        value for the msg_t type
@@ -111,8 +120,8 @@ int vtimer_sleep(timex_t time);
 int vtimer_set_msg(vtimer_t *t, timex_t interval, kernel_pid_t pid, uint16_t type, void *ptr);
 
 /**
- * @brief   set a vtimer with wakeup event
- * @param[in]   t           pointer to preinitialised vtimer_t
+ * @brief   Initialize a vtimer to perform a 'thread_wakeup(pid)' after a specified interval.
+ * @param[in]   t           pointer to an uninitialised vtimer_t structure
  * @param[in]   interval    the interval after which the timer shall fire
  * @param[in]   pid         process id
  * @return      0 on success, < 0 on error
