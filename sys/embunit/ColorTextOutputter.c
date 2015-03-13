@@ -34,6 +34,7 @@
  */
 #include <stdio.h>
 #include "ColorTextOutputter.h"
+#include "ColorOutputter.h"
 
 static void ColorTextOutputter_printHeader(OutputterRef self)
 {
@@ -64,14 +65,9 @@ static void ColorTextOutputter_printFailure(OutputterRef self,TestRef test,char 
     printf("\033[31m%d) NG %s\033[0m (%s %d) %s\n", runCount, Test_name(test), file, line, msg);
 }
 
-static void ColorTextOutputter_printStatistics(OutputterRef self,TestResultRef result)
+void ColorTextOutputter_printStatistics(OutputterRef self,TestResultRef result)
 {
-    (void)self;
-    if (result->failureCount) {
-        printf("\n\033[31;1mFAILED\033[21m (%d of %d failed)\033[0m\n",result->failureCount,result->runCount);
-    } else {
-        printf("\n\033[32;1mOK\033[21m (%d tests)\033[0m\n",result->runCount);
-    }
+    ColorOutputter_printStatistics(self, result);
 }
 
 static const OutputterImplement ColorTextOutputterImplement = {
