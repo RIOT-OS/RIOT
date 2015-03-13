@@ -111,7 +111,7 @@ void *radio(void *arg)
             puts("Transceiver buffer full");
         }
         else {
-            puts("Unknown packet received");
+            puts("Unknown message received");
         }
     }
 }
