@@ -110,6 +110,7 @@ static void *_nomac_thread(void *args)
                 opt = (ng_netapi_opt_t *)msg.content.ptr;
                 /* set option for device driver */
                 res = dev->driver->set(dev, opt->opt, opt->data, opt->data_len);
+                DEBUG("nomac: response of netdev->set: %i\n", res);
                 /* send reply to calling thread */
                 reply.type = NG_NETAPI_MSG_TYPE_ACK;
                 reply.content.value = (uint32_t)res;
@@ -122,8 +123,8 @@ static void *_nomac_thread(void *args)
                 /* read incoming options */
                 opt = (ng_netapi_opt_t *)msg.content.ptr;
                 /* get option from device driver */
-                res = dev->driver->get(dev, opt->opt, opt->data,
-                                       (size_t*)(&(opt->data_len)));
+                res = dev->driver->get(dev, opt->opt, opt->data, opt->data_len);
+                DEBUG("nomac: response of netdev->get: %i\n", res);
                 /* send reply to calling thread */
                 reply.type = NG_NETAPI_MSG_TYPE_ACK;
                 reply.content.value = (uint32_t)res;
