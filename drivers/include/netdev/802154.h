@@ -102,6 +102,9 @@ typedef enum {
         has been received as response */
     NETDEV_802154_TX_STATUS_NOACK,
 
+    /** Transmission aborted because transceiver is off! */
+    NETDEV_802154_TX_STATUS_DEV_IS_OFF,
+
     /** Transmission failed because of an unexpected (fatal?) error */
     NETDEV_802154_TX_STATUS_ERROR,
 

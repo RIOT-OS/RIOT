@@ -237,6 +237,13 @@ uint16_t at86rf231_set_pan(uint16_t pan);
 uint16_t at86rf231_get_pan(void);
 
 /**
+ * @brief Updates the transceiver configuration values 
+ *        (PAN ID, addresses, radio channel) by actually
+ *        reading them from transceiver's registers.
+ */
+void at86rf231_update_config_values(void);
+
+/**
  * @brief Sets the output (TX) power of the at86rf231.
  *
  * @param[in] pow The desired TX (output) power in dBm,
@@ -395,13 +402,13 @@ void at86rf231_rx_handler(void);
  * @return @ref netdev_802154_tx_status_t
  */
 netdev_802154_tx_status_t at86rf231_load_tx_buf(netdev_t *dev,
-                                             netdev_802154_pkt_kind_t kind,
-                                             netdev_802154_node_addr_t *dest,
-                                             int use_long_addr,
-                                             int wants_ack,
-                                             netdev_hlist_t *upper_layer_hdrs,
-                                             void *buf,
-                                             unsigned int len);
+                                                netdev_802154_pkt_kind_t kind,
+                                                netdev_802154_node_addr_t *dest,
+                                                int use_long_addr,
+                                                int wants_ack,
+                                                netdev_hlist_t *upper_layer_hdrs,
+                                                void *buf,
+                                                unsigned int len);
 
 /**
  * @brief Transmit the data loaded into the at86rf231 TX buffer.
