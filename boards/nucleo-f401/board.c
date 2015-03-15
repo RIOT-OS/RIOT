@@ -32,39 +32,29 @@ void board_init(void)
 }
 
 /**
- * @brief Initialize the boards on-board LEDs (LD3 and LD4)
+ * @brief Initialize the boards on-board LEDs (LD2)
  *
  * The LED initialization is hard-coded in this function. As the LEDs are soldered
  * onto the board they are fixed to their CPU pins.
  *
  * The LEDs are connected to the following pins:
- * - LD3: PD13
- * - LD4: PD12
- * - LD5: PD14
- * - LD6: PD15
+ * - LD2: PA5
  */
 static void leds_init(void)
 {
     /* enable clock for port GPIOD */
     RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
 
+    /* configure pins as general outputs */
     LED_PORT->MODER &= ~(uint32_t)(0xC00);
     LED_PORT->MODER |= (uint32_t)(0x400);
-    LED_PORT->OSPEEDR |= (uint32_t)(0xC00);
-    LED_PORT->OTYPER &= ~(uint32_t)(0x20);
-    LED_PORT->PUPDR &= ~(uint32_t)(0xC00);
-    LED_PORT->BSRRH = 0x20;
-
-    /* configure pins as general outputs */
-    //LED_PORT->MODER &= ~(0xff000000);
-    //LED_PORT->MODER |= 0x55000000;
     /* set output speed high-speed */
-    //LED_PORT->OSPEEDR |= 0xff000000;
+    LED_PORT->OSPEEDR |= (uint32_t)(0xC00);
     /* set output type to push-pull */
-    //LED_PORT->OTYPER &= ~(0xf000);
+    LED_PORT->OTYPER &= ~(uint32_t)(0x20);
     /* disable pull resistors */
-    //LED_PORT->PUPDR &= ~(0xff000000);
+    LED_PORT->PUPDR &= ~(uint32_t)(0xC00);
 
-    /* turn all LEDs off */
-    //LED_PORT->BSRRH = 0xf000;
+    /* turn LED off */
+    LED_PORT->BSRRH = 0x20;
 }
