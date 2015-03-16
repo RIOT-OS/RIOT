@@ -116,10 +116,10 @@ rpl_dodag_t *rpl_new_dodag(rpl_instance_t *inst, ipv6_addr_t *dodagid)
 
 }
 
-rpl_dodag_t *rpl_get_dodag(ipv6_addr_t *id)
+rpl_dodag_t *rpl_get_joined_dodag(uint8_t instanceid)
 {
     for (int i = 0; i < RPL_MAX_DODAGS; i++) {
-        if (rpl_dodags[i].used && (rpl_equal_id(&rpl_dodags[i].dodag_id, id))) {
+        if (rpl_dodags[i].joined && rpl_dodags[i].instance->id == instanceid) {
             return &rpl_dodags[i];
         }
     }

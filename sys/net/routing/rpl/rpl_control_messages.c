@@ -666,7 +666,7 @@ void rpl_recv_DIO(void)
     }
 
     /* handle packet content... */
-    rpl_dodag_t *my_dodag = rpl_get_my_dodag();
+    rpl_dodag_t *my_dodag = rpl_get_joined_dodag(dio_inst->id);
 
     if (my_dodag == NULL) {
         if (!has_dodag_conf_opt) {
@@ -769,13 +769,6 @@ void rpl_recv_DIO(void)
 
 void rpl_recv_DAO(void)
 {
-    rpl_dodag_t *my_dodag = rpl_get_my_dodag();
-
-    if (my_dodag == NULL) {
-        DEBUG("[Error] got DAO although not a DODAG\n");
-        return;
-    }
-
 #if RPL_DEFAULT_MOP == RPL_MOP_NON_STORING_MODE
 
     if (!i_am_root) {
@@ -788,6 +781,13 @@ void rpl_recv_DAO(void)
     rpl_dao_buf = get_rpl_dao_buf();
     DEBUG("instance %04X ", rpl_dao_buf->rpl_instanceid);
     DEBUG("sequence %04X\n", rpl_dao_buf->dao_sequence);
+
+    rpl_dodag_t *my_dodag = rpl_get_joined_dodag(rpl_dao_buf->rpl_instanceid);
+
+    if (my_dodag == NULL) {
+        DEBUG("[Error] got DAO although not a DODAG\n");
+        return;
+    }
 
     int len = DAO_BASE_LEN;
     uint8_t increment_seq = 0;
@@ -941,13 +941,13 @@ void rpl_recv_DIS(void)
 
 void rpl_recv_DAO_ACK(void)
 {
-    rpl_dodag_t *my_dodag = rpl_get_my_dodag();
+    rpl_dao_ack_buf = get_rpl_dao_ack_buf();
+
+    rpl_dodag_t *my_dodag = rpl_get_joined_dodag(rpl_dao_ack_buf->rpl_instanceid);
 
     if (my_dodag == NULL) {
         return;
     }
-
-    rpl_dao_ack_buf = get_rpl_dao_ack_buf();
 
     if (rpl_dao_ack_buf->rpl_instanceid != my_dodag->instance->id) {
         return;
