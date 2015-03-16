@@ -276,25 +276,22 @@ void *rpl_process(void *arg)
 
 void _rpl_update_routing_table(void)
 {
-    rpl_dodag_t *my_dodag = rpl_get_my_dodag();
-    rpl_routing_entry_t *rt;
+    rpl_dodag_t *my_dodag, *end;
+    rpl_routing_entry_t *rt = rpl_get_routing_table();
 
-    if (my_dodag != NULL) {
-        rt = rpl_get_routing_table();
-
-        for (uint8_t i = 0; i < rpl_max_routing_entries; i++) {
-            if (rt[i].used) {
-                if (rt[i].lifetime <= 1) {
-                    memset(&rt[i], 0, sizeof(rt[i]));
-                }
-                else {
-                    rt[i].lifetime = rt[i].lifetime - RPL_LIFETIME_STEP;
-                }
+    for (unsigned int i = 0; i < rpl_max_routing_entries; i++) {
+        if (rt[i].used) {
+            if (rt[i].lifetime <= 1) {
+                memset(&rt[i], 0, sizeof(rt[i]));
+            }
+            else {
+                rt[i].lifetime = rt[i].lifetime - RPL_LIFETIME_STEP;
             }
         }
+    }
 
-        /* Parent is NULL for root too */
-        if (my_dodag->my_preferred_parent != NULL) {
+    for (my_dodag = rpl_dodags, end = my_dodag + RPL_MAX_DODAGS; my_dodag < end; my_dodag++) {
+        if ((my_dodag->used) && (my_dodag->my_preferred_parent != NULL)) {
             if (my_dodag->my_preferred_parent->lifetime <= 1) {
                 DEBUGF("parent lifetime timeout\n");
                 rpl_parent_update(my_dodag, NULL);
