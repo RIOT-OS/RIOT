@@ -106,7 +106,6 @@ int vtimer_sleep(timex_t time);
  * @param[in]   pid         process id
  * @param[in]   type        value for the msg_t type
  * @param[in]   ptr         message value
- * @return      0 on success, < 0 on error
  */
 void vtimer_set_msg(vtimer_t *t, timex_t interval, kernel_pid_t pid, uint16_t type, void *ptr);
 
