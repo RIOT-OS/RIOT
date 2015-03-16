@@ -108,7 +108,7 @@ int vtimer_sleep(timex_t time);
  * @param[in]   ptr         message value
  * @return      0 on success, < 0 on error
  */
-int vtimer_set_msg(vtimer_t *t, timex_t interval, kernel_pid_t pid, uint16_t type, void *ptr);
+void vtimer_set_msg(vtimer_t *t, timex_t interval, kernel_pid_t pid, uint16_t type, void *ptr);
 
 /**
  * @brief   set a vtimer with wakeup event

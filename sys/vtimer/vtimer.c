@@ -392,7 +392,7 @@ int vtimer_remove(vtimer_t *t)
     return 0;
 }
 
-int vtimer_set_msg(vtimer_t *t, timex_t interval, kernel_pid_t pid, uint16_t type, void *ptr)
+ vtimer_set_msg(vtimer_t *t, timex_t interval, kernel_pid_t pid, uint16_t type, void *ptr)
 {
     t->action = vtimer_callback_msg;
     t->type = type;
@@ -400,7 +400,6 @@ int vtimer_set_msg(vtimer_t *t, timex_t interval, kernel_pid_t pid, uint16_t typ
     t->absolute = interval;
     t->pid = pid;
     vtimer_set(t);
-    return 0;
 }
 
 int vtimer_msg_receive_timeout(msg_t *m, timex_t timeout) {
