@@ -257,7 +257,7 @@ uint8_t rpl_is_root(void)
     return i_am_root;
 }
 
-void rpl_send_DIO(ipv6_addr_t *destination)
+void rpl_send_DIO(rpl_dodag_t *mydodag, ipv6_addr_t *destination)
 {
 #if ENABLE_DEBUG
 
@@ -266,10 +266,7 @@ void rpl_send_DIO(ipv6_addr_t *destination)
     }
 
 #endif
-    rpl_dodag_t *mydodag;
     icmp_send_buf = get_rpl_send_icmpv6_buf(ipv6_ext_hdr_len);
-
-    mydodag = rpl_get_my_dodag();
 
     if (mydodag == NULL) {
         DEBUGF("Error - trying to send DIO without being part of a dodag.\n");
@@ -936,7 +933,7 @@ void rpl_recv_DIS(void)
         }
     }
 
-    rpl_send_DIO(&ipv6_buf->srcaddr);
+    rpl_send_DIO(my_dodag, &ipv6_buf->srcaddr);
 
 }
 

@@ -37,11 +37,10 @@ static rpl_parent_t parents[RPL_MAX_PARENTS];
 
 void rpl_trickle_send_dio(void *args)
 {
-    (void) args;
     ipv6_addr_t mcast;
 
     ipv6_addr_set_all_rpl_nodes_addr(&mcast);
-    rpl_send_DIO(&mcast);
+    rpl_send_DIO((rpl_dodag_t *) args, &mcast);
 }
 
 void rpl_instances_init(void)
@@ -110,6 +109,7 @@ rpl_dodag_t *rpl_new_dodag(uint8_t instanceid, ipv6_addr_t *dodagid)
             dodag->ack_received = true;
             dodag->dao_counter = 0;
             dodag->trickle.callback.func = &rpl_trickle_send_dio;
+            dodag->trickle.callback.args = dodag;
             memcpy(&dodag->dodag_id, dodagid, sizeof(*dodagid));
             return dodag;
         }
