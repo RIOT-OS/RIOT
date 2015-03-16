@@ -330,7 +330,7 @@ void rpl_send_DIO(ipv6_addr_t *destination)
     rpl_send(destination, (uint8_t *)icmp_send_buf, plen, IPV6_PROTO_NUM_ICMPV6);
 }
 
-void rpl_send_DAO(ipv6_addr_t *destination, uint8_t lifetime, bool default_lifetime,
+void rpl_send_DAO(rpl_dodag_t *my_dodag, ipv6_addr_t *destination, uint8_t lifetime, bool default_lifetime,
                   uint8_t start_index)
 {
 #if RPL_DEFAULT_MOP == RPL_MOP_NON_STORING_MODE
@@ -349,9 +349,7 @@ void rpl_send_DAO(ipv6_addr_t *destination, uint8_t lifetime, bool default_lifet
         return;
     }
 
-    rpl_dodag_t *my_dodag;
-
-    if ((my_dodag = rpl_get_my_dodag()) == NULL) {
+    if (my_dodag == NULL) {
         DEBUGF("send_DAO: I have no my_dodag\n");
         return;
     }
@@ -451,7 +449,7 @@ void rpl_send_DAO(ipv6_addr_t *destination, uint8_t lifetime, bool default_lifet
 #if RPL_DEFAULT_MOP != RPL_MOP_NON_STORING_MODE
 
     if (continue_index > 1) {
-        rpl_send_DAO(destination, lifetime, default_lifetime, continue_index);
+        rpl_send_DAO(my_dodag, destination, lifetime, default_lifetime, continue_index);
     }
 
 #endif
@@ -479,7 +477,7 @@ void rpl_send_DIS(ipv6_addr_t *destination)
 }
 
 #if RPL_DEFAULT_MOP != RPL_MOP_NON_STORING_MODE
-void rpl_send_DAO_ACK(ipv6_addr_t *destination)
+void rpl_send_DAO_ACK(rpl_dodag_t *my_dodag, ipv6_addr_t *destination)
 {
 #if ENABLE_DEBUG
 
@@ -489,9 +487,6 @@ void rpl_send_DAO_ACK(ipv6_addr_t *destination)
     }
 
 #endif
-
-    rpl_dodag_t *my_dodag;
-    my_dodag = rpl_get_my_dodag();
 
     if (my_dodag == NULL) {
         return;
@@ -864,7 +859,7 @@ void rpl_recv_DAO(void)
     }
 
 #if RPL_DEFAULT_MOP != RPL_MOP_NON_STORING_MODE
-    rpl_send_DAO_ACK(&ipv6_buf->srcaddr);
+    rpl_send_DAO_ACK(my_dodag, &ipv6_buf->srcaddr);
 #endif
 
     if (increment_seq) {

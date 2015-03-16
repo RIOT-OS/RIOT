@@ -344,7 +344,7 @@ void _dao_handle_send(rpl_dodag_t *dodag)
 {
     if ((dodag->ack_received == false) && (dodag->dao_counter < DAO_SEND_RETRIES)) {
         dodag->dao_counter++;
-        rpl_send_DAO(NULL, 0, true, 0);
+        rpl_send_DAO(dodag, NULL, 0, true, 0);
         dodag->dao_time = timex_set(DEFAULT_WAIT_FOR_DAO_ACK, 0);
         vtimer_remove(&dodag->dao_timer);
         vtimer_set_msg(&dodag->dao_timer, dodag->dao_time,
