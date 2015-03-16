@@ -152,7 +152,7 @@ static void test_ng_netif_get__full(void)
         TEST_ASSERT_EQUAL_INT(0, ng_netif_add(TEST_UINT8 + i));
     }
 
-    ng_netif_get(&size);
+    TEST_ASSERT_NOT_NULL(ng_netif_get(&size));
     TEST_ASSERT_EQUAL_INT(NG_NETIF_NUMOF, size);
 }
 
