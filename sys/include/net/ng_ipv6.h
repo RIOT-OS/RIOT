@@ -49,7 +49,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   Default name for the IPv6 thread
+ * @brief   Default priority for the IPv6 thread
  */
 #ifndef NG_IPV6_PRIO
 #define NG_IPV6_PRIO            (PRIORITY_MAIN - 3)
