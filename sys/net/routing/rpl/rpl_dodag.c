@@ -87,11 +87,8 @@ rpl_instance_t *rpl_get_my_instance(void)
     return NULL;
 }
 
-rpl_dodag_t *rpl_new_dodag(uint8_t instanceid, ipv6_addr_t *dodagid)
+rpl_dodag_t *rpl_new_dodag(rpl_instance_t *inst, ipv6_addr_t *dodagid)
 {
-    rpl_instance_t *inst;
-    inst = rpl_get_instance(instanceid);
-
     if (inst == NULL) {
         DEBUGF("Error - No instance found for id %d. This should not happen\n",
                instanceid);
@@ -338,7 +335,7 @@ void rpl_join_dodag(rpl_dodag_t *dodag, ipv6_addr_t *parent, uint16_t parent_ran
 {
     rpl_dodag_t *my_dodag;
     rpl_parent_t *preferred_parent;
-    my_dodag = rpl_new_dodag(dodag->instance->id, &dodag->dodag_id);
+    my_dodag = rpl_new_dodag(dodag->instance, &dodag->dodag_id);
 
     if (my_dodag == NULL) {
         return;
