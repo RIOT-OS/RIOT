@@ -669,6 +669,21 @@ void rpl_recv_DIO(void)
     /* handle packet content... */
     rpl_dodag_t *my_dodag = rpl_get_my_dodag();
 
+    if (my_dodag != NULL && my_dodag->node_status != ROOT_NODE
+            && memcmp(&my_dodag->dodag_id, &dio_dodag.dodag_id, sizeof(ipv6_addr_t))) {
+        /* create a temporary parent and assign it to the incoming DIO's dodag */
+        rpl_parent_t tmp_parent = { .rank = byteorder_ntohs(rpl_dio_buf->rank), .dodag = &dio_dodag };
+        dio_dodag.my_preferred_parent = &tmp_parent;
+
+        /* calculate the incoming DIO's dodag rank and check wheter my rank would be better in the new dodag */
+        dio_dodag.my_rank = dio_dodag.of->calc_rank(&tmp_parent, tmp_parent.rank);
+        if (my_dodag != my_dodag->of->which_dodag(my_dodag, &dio_dodag)) {
+            /* my rank would be better in the incoming DIO's dodag. leave old dodag */
+            rpl_leave_dodag(my_dodag);
+            my_dodag = NULL;
+        }
+    }
+
     if (my_dodag == NULL) {
         if (!has_dodag_conf_opt) {
             DEBUGF("send DIS\n");
