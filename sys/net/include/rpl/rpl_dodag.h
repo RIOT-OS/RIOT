@@ -43,7 +43,7 @@ bool rpl_equal_id(ipv6_addr_t *id1, ipv6_addr_t *id2);
 ipv6_addr_t *rpl_get_my_preferred_parent(void);
 void rpl_delete_parent(rpl_parent_t *parent);
 void rpl_delete_worst_parent(void);
-void rpl_delete_all_parents(void);
+void rpl_delete_all_parents(rpl_dodag_t *dodag);
 rpl_parent_t *rpl_find_preferred_parent(rpl_dodag_t *dodag);
 void rpl_parent_update(rpl_dodag_t *dodag, rpl_parent_t *parent);
 void rpl_global_repair(rpl_dodag_t *dodag, ipv6_addr_t *p_addr, uint16_t rank);
