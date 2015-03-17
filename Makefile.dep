@@ -52,9 +52,10 @@ ifneq (,$(filter ng_ipv6_nc,$(USEMODULE)))
   USEMODULE += ng_ipv6_addr
 endif
 
-ifneq (,$(filter ng_netif,$(USEMODULE)))
+ifneq (,$(filter ng_netbase,$(USEMODULE)))
   USEMODULE += ng_netapi
   USEMODULE += ng_netreg
+  USEMODULE += ng_netif
   USEMODULE += ng_pktbuf
 endif
 
