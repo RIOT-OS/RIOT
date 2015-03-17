@@ -26,6 +26,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#include "kernel.h"
 #include "net/ng_pkt.h"
 #include "net/ng_netconf.h"
 
