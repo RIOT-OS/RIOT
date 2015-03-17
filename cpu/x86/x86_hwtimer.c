@@ -39,7 +39,6 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#define ENABLE_DEBUG    (0)
 #include "debug.h"
 
 #define US_PER_SECOND (1000l * 1000l)

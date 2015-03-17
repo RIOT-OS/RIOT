@@ -23,7 +23,6 @@
 #include "periph/i2c.h"
 #include "hwtimer.h"
 
-#define ENABLE_DEBUG        (0)
 #include "debug.h"
 
 #define REG_RESET           (0x00)

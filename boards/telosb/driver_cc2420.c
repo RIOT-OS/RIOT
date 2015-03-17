@@ -20,7 +20,6 @@
 #include "cc2420_arch.h"
 #include "cc2420_spi.h"
 
-#define ENABLE_DEBUG    (0)
 #include "debug.h"
 
 #define CC2420_RESETn_PIN   0x40

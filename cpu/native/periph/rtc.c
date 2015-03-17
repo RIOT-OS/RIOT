@@ -29,7 +29,6 @@
 
 #include "native_internal.h"
 
-#define ENABLE_DEBUG (0)
 #include "debug.h"
 
 static int _native_rtc_initialized = 0;

@@ -26,7 +26,6 @@
 
 #include "periph/random.h"
 
-#define ENABLE_DEBUG (0)
 #include "debug.h"
 
 static int powered = 0;

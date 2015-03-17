@@ -21,7 +21,6 @@
 #include <stdio.h>
 #include <inttypes.h>
 
-#define ENABLE_DEBUG (0)
 #include "debug.h"
 
 #include "timex.h"

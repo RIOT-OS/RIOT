@@ -6,6 +6,9 @@ unexport DIRS
 DIRS := $(sort $(abspath ${DIRS}))
 
 MODULE ?= $(shell basename $(CURDIR))
+ifeq (,$(filter -DENABLE_DEBUG=%, $(CFLAGS)))
+    CFLAGS += -DENABLE_DEBUG=$(if $(filter $(MODULE),$(DEBUG_MODULES)),1,0)
+endif
 
 .PHONY: all ${DIRS:%=ALL--%} ${DIRS:%=CLEAN--%}
 

@@ -18,7 +18,6 @@
 #include "net/ng_ipv6/addr.h"
 #include "net/ng_ipv6/nc.h"
 
-#define ENABLE_DEBUG    (0)
 #include "debug.h"
 
 #if ENABLE_DEBUG

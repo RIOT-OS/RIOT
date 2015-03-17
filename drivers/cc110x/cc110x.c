@@ -27,7 +27,6 @@
 #include "cpu.h"
 #include "netdev/base.h"
 
-#define ENABLE_DEBUG    (0)
 #include "debug.h"
 
 /* Internal function prototypes */

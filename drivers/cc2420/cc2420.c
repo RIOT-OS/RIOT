@@ -16,7 +16,6 @@
 #include "hwtimer.h"
 #include "transceiver.h"
 
-#define ENABLE_DEBUG    (0)
 #include "debug.h"
 
 

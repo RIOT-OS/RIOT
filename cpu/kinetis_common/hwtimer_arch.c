@@ -24,7 +24,6 @@
 #include "cpu-conf.h"
 #include "thread.h"
 
-#define ENABLE_DEBUG (0)
 #include "debug.h"
 
 #define LPTMR_MAXTICKS            (0x0000FFFF)

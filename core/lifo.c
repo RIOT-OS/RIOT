@@ -18,7 +18,6 @@
 
 #include "lifo.h"
 
-#define ENABLE_DEBUG (0)
 #include "debug.h"
 
 int lifo_empty(int *array)

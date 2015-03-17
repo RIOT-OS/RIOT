@@ -26,7 +26,6 @@
 #include "etx_beaconing.h"
 #include "rpl/rpl_config.h"
 
-#define ENABLE_DEBUG (0)
 #include "debug.h"
 
 static rpl_of_t *objective_functions[NUMBER_IMPLEMENTED_OFS];

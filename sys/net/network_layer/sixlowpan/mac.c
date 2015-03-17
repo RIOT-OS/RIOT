@@ -36,7 +36,6 @@
 #include "ieee802154_frame.h"
 #include "net_help.h"
 
-#define ENABLE_DEBUG    (0)
 #include "debug.h"
 
 #define RADIO_STACK_SIZE            (KERNEL_CONF_STACKSIZE_MAIN)

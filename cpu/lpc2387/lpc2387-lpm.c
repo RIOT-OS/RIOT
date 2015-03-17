@@ -36,7 +36,6 @@ static enum lpm_mode lpm;
 extern void init_clks1(void);
 extern void init_clks2(void);
 
-#define ENABLE_DEBUG (0)
 #include "debug.h"
 
 void lpm_init(void)

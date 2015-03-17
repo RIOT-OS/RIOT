@@ -24,7 +24,6 @@
 
 #include "etx_beaconing.h"
 
-#define ENABLE_DEBUG    (0)
 #include "debug.h"
 
 // Function Prototypes

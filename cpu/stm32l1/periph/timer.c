@@ -27,7 +27,6 @@
 
 #include "thread.h"
 
-#define ENABLE_DEBUG (0)
 #include "debug.h"
 
 /* guard file in case no TIMER device is defined */

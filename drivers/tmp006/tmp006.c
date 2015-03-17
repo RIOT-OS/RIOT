@@ -26,7 +26,6 @@
 #include "periph/i2c.h"
 #include "tmp006.h"
 
-#define ENABLE_DEBUG    (0)
 #include "debug.h"
 
 #define TMP006_V_OBJECT            0x00 /**< Sensor Voltage Register */

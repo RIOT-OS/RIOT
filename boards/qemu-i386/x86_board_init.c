@@ -22,7 +22,6 @@
 #include "x86_ports.h"
 #include "x86_reboot.h"
 
-#define ENABLE_DEBUG (0)
 #include "debug.h"
 
 static bool qemu_shutdown(void)

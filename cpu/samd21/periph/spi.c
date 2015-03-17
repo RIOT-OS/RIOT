@@ -27,7 +27,6 @@
 #include "periph/spi.h"
 #include "periph_conf.h"
 #include "board.h"
-#define ENABLE_DEBUG (0)
 #include "debug.h"
 #if SPI_0_EN  || SPI_1_EN
 

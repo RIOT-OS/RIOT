@@ -24,7 +24,6 @@
 #include "net/ng_nomac.h"
 #include "net/ng_netbase.h"
 
-#define ENABLE_DEBUG    (0)
 #include "debug.h"
 
 /**

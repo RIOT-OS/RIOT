@@ -25,7 +25,6 @@
 #include "posix_io.h"
 
 /* increase stack size in uart0 when setting this to 1 */
-#define ENABLE_DEBUG    (0)
 #include "debug.h"
 
 static int min(int a, int b)

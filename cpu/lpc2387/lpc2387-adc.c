@@ -22,7 +22,6 @@
 #include "lpc23xx.h"
 #include "lpc2387-adc.h"
 
-#define ENABLE_DEBUG    (0)
 #include "debug.h"
 #if ENABLE_DEBUG
 #include "hwtimer.h"

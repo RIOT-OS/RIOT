@@ -18,7 +18,6 @@
 
 #include "ieee802154_frame.h"
 
-#define ENABLE_DEBUG    (0)
 #include "debug.h"
 
 #define IEEE_802154_FCS_POLY    (0x8408)  /* x^16 + x^12 + x^5 + 1 for LSB first */
