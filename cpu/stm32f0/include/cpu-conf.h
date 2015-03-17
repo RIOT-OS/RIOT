@@ -24,6 +24,9 @@
 #ifdef CPU_MODEL_STM32F051R8
 #include "stm32f051x8.h"
 #endif
+#ifdef CPU_MODEL_STM32F091RC
+#include "stm32f091xc.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
