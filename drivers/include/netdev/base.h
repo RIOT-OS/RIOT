@@ -110,7 +110,7 @@ typedef enum {
     NETDEV_OPT_ADDRESS_LONG,        /**< Longer hardware address for the device
                                          (e.g. EUI-64) for the device as
                                          unsigned value in host byte order */
-    NETDEV_OPT_TX_POWER,            /**< The output of the device in dB as
+    NETDEV_OPT_TX_POWER,            /**< The output of the device in dBm as
                                          signed value in host byte order */
     NETDEV_OPT_MAX_PACKET_SIZE,     /**< Maximum packet size the device supports
                                          unsigned value in host byte order */
@@ -118,6 +118,17 @@ typedef enum {
                                          set to as value of `size_t`. (e.g.
                                          either PAN-centric 16-bit address or
                                          EUI-64 in IEEE 802.15.4) */
+    NETDEV_OPT_CAN_MONITOR,         /**< Indicate whether the transceiver
+                                         can go into "monitor" (a.k.a
+                                         "promiscuous") mode */
+    NETDEV_OPT_CCA_THRESHOLD,       /**< The threshold value in dBm for
+                                         determining if channel if available
+                                         or not */
+    NETDEV_OPT_SFD_COUNT,           /**< The number of SFD (i.e.: packets
+                                         beginnings) counted by transceiver
+                                         since last SFD-counter reset;
+                                         setting this option resets the
+                                         SFD-counter (value actually ignored) */
 
     /**
      * @brief   Last value for @ref netdev_opt_t defined here

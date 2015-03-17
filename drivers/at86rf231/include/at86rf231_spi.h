@@ -36,6 +36,9 @@ void at86rf231_write_fifo(const uint8_t *data, radio_packet_length_t length);
 
 uint8_t at86rf231_get_status(void);
 
+#define at86rf231_current_mode()  \
+        (at86rf231_get_status() & AT86RF231_TRX_STATUS_MASK__TRX_STATUS)
+
 #ifdef __cplusplus
 }
 #endif

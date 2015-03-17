@@ -32,6 +32,7 @@
 at86rf231_packet_t at86rf231_rx_buffer[AT86RF231_RX_BUF_SIZE];
 static uint8_t buffer[AT86RF231_RX_BUF_SIZE][AT86RF231_MAX_PKT_LENGTH];
 volatile uint8_t rx_buffer_next;
+
 extern netdev_802154_raw_packet_cb_t at86rf231_raw_packet_cb;
 
 void at86rf231_rx_handler(void)

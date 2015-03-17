@@ -165,14 +165,17 @@ typedef struct {
      *
      * @details The options are constrained as follows:
      *
-     *         *opt*                       | type        | *value_len*
-     *         --------------------------- | ----------- | -----------
-     *         NETDEV_OPT_CHANNEL          | uint8_t     | >= 1
-     *         NETDEV_OPT_ADDRESS          | uint16_t    | >= 2
-     *         NETDEV_OPT_NID              | uint16_t    | >= 2
-     *         NETDEV_OPT_ADDRESS_LONG     | uint64_t    | >= 8
-     *         NETDEV_OPT_TX_POWER         | int         | >= 4
-     *         NETDEV_OPT_MAX_PACKET_SIZE  | uint8_t     | >= 1
+     *         *opt*                       | type           | *value_len*
+     *         --------------------------- | -------------- | -----------
+     *         NETDEV_OPT_CHANNEL          | uint8_t        | >= 1
+     *         NETDEV_OPT_ADDRESS          | uint16_t       | >= 2
+     *         NETDEV_OPT_NID              | uint16_t       | >= 2
+     *         NETDEV_OPT_ADDRESS_LONG     | uint64_t       | >= 8
+     *         NETDEV_OPT_TX_POWER         | int            | >= 2
+     *         NETDEV_OPT_CCA_THRESHOLD    | int            | >= 2
+     *         NETDEV_OPT_SFD_COUNT        | unsigned long  | >= 4
+     *         NETDEV_OPT_MAX_PACKET_SIZE  | uint8_t        | >= 1
+     *         NETDEV_OPT_CAN_MONITOR      | uint8_t (bool) | >= 1
      */
     int (*get_option)(netdev_t *dev, netdev_opt_t opt, void *value,
                       size_t *value_len);
@@ -188,9 +191,11 @@ typedef struct {
      *         NETDEV_OPT_ADDRESS          | uint16_t    | >= 2        |
      *         NETDEV_OPT_NID              | uint16_t    | >= 2        |
      *         NETDEV_OPT_ADDRESS_LONG     | uint64_t    | >= 8        |
-     *         NETDEV_OPT_TX_POWER         | int         | >= 4        |
+     *         NETDEV_OPT_TX_POWER         | int         | >= 2        |
+     *         NETDEV_OPT_CCA_THRESHOLD    | int         | >= 2
      *
-     *         NETDEV_OPT_MAX_PACKET_SIZE can not be set.
+     *         NETDEV_OPT_SFD_COUNT can only be reset (not set to a given value).
+     *         NETDEV_OPT_MAX_PACKET_SIZE and NETDEV_OPT_CAN_MONITOR can't be set.
      */
     int (*set_option)(netdev_t *dev, netdev_opt_t opt, void *value,
                       size_t value_len);

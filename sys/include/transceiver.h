@@ -199,34 +199,37 @@ enum transceiver_msg_type_t {
     RCV_PKT_AT86RF231,     /**< packet was received by AT86RF231 transceiver */
 
     /* Message types for transceiver <-> upper layer communication */
-    PKT_PENDING,    /**< packet pending in transceiver buffer */
-    SND_PKT,        /**< request for sending a packet */
-    SND_ACK,        /**< request for sending an acknowledgement */
-    SWITCH_RX,      /**< switch transceiver to RX sate */
-    POWERDOWN,      /**< power down transceiver */
-    GET_CHANNEL,    /**< Get current channel */
-    SET_CHANNEL,    /**< Set a new channel */
-    GET_ADDRESS,    /**< Get the radio address */
-    SET_ADDRESS,    /**< Set the radio address */
-    GET_LONG_ADDR,  /**< Get the long radio address, if existing */
-    SET_LONG_ADDR,  /**< Set the long radio address, if supported by hardware */
-    SET_MONITOR,    /**< Set transceiver to monitor mode (disable address
-                         checking) */
-    GET_PAN,        /**< Get current pan */
-    SET_PAN,        /**< Set a new pan */
+    PKT_PENDING,       /**< packet pending in transceiver buffer */
+    SND_PKT,           /**< request for sending a packet */
+    SND_ACK,           /**< request for sending an acknowledgement */
+    SWITCH_RX,         /**< switch transceiver to RX sate */
+    POWERDOWN,         /**< power down transceiver */
+    GET_CHANNEL,       /**< Get current channel */
+    SET_CHANNEL,       /**< Set a new channel */
+    GET_ADDRESS,       /**< Get the radio address */
+    SET_ADDRESS,       /**< Set the radio address */
+    GET_LONG_ADDR,     /**< Get the long radio address, if existing */
+    SET_LONG_ADDR,     /**< Set the long radio address, if supported
+                            by hardware */
+    SET_MONITOR,       /**< Set transceiver to monitor mode (disable address
+                            checking) */
+    GET_PAN,           /**< Get current pan */
+    SET_PAN,           /**< Set a new pan */
+    GET_SFD_COUNT,     /**< Get the number of counted SFDs */
+    RESET_SFD_COUNT,   /**< Reset the number of counted SFDs */
 
     /* debug message types */
-    DBG_IGN,        /**< add a physical address to the ignore list */
+    DBG_IGN,           /**< add a physical address to the ignore list */
 
     /* Error messages */
-    ENOBUFFER,      /**< No buffer left */
+    ENOBUFFER,         /**< No buffer left */
 
     /* reserve message types for higher layer notifications */
-    UPPER_LAYER_1,  /**< reserved */
-    UPPER_LAYER_2,  /**< reserved */
-    UPPER_LAYER_3,  /**< reserved */
-    UPPER_LAYER_4,  /**< reserved */
-    UPPER_LAYER_5,  /**< reserved */
+    UPPER_LAYER_1,     /**< reserved */
+    UPPER_LAYER_2,     /**< reserved */
+    UPPER_LAYER_3,     /**< reserved */
+    UPPER_LAYER_4,     /**< reserved */
+    UPPER_LAYER_5,     /**< reserved */
 };
 
 /**

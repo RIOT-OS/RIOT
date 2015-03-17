@@ -145,6 +145,9 @@ static void set_monitor(transceiver_type_t t, void *mode);
 static void powerdown(transceiver_type_t t);
 static void switch_to_rx(transceiver_type_t t);
 
+static unsigned long get_sfd_count(transceiver_type_t t);
+static void reset_sfd_count(transceiver_type_t t);
+
 #ifdef DBG_IGNORE
 static int16_t ignore_add(transceiver_type_t transceiver, void *address);
 
@@ -360,6 +363,15 @@ static void *run(void *arg)
             case SET_PAN:
                 *((int32_t *) cmd->data) = set_pan(cmd->transceivers, cmd->data);
                 msg_reply(&m, &m);
+                break;
+
+            case GET_SFD_COUNT:
+                *((unsigned long *) cmd->data) = get_sfd_count(cmd->transceivers);
+                msg_reply(&m, &m);
+                break;
+
+            case RESET_SFD_COUNT:
+                reset_sfd_count(cmd->transceivers);
                 break;
 
 #ifdef DBG_IGNORE
@@ -1250,6 +1262,7 @@ static void switch_to_rx(transceiver_type_t t)
 
         case TRANSCEIVER_AT86RF231:
             at86rf231_switch_to_rx();
+            break;
 #endif
 
         default:
@@ -1257,6 +1270,38 @@ static void switch_to_rx(transceiver_type_t t)
     }
 }
 
+/*------------------------------------------------------------------------------------*/
+static unsigned long get_sfd_count(transceiver_type_t t)
+{
+    switch (t) {
+#ifdef MODULE_AT86RF231
+
+        case TRANSCEIVER_AT86RF231:
+            return at86rf231_get_sfd_count();
+#endif
+
+        default:
+            return 0;
+    }
+}
+
+/*------------------------------------------------------------------------------------*/
+static void reset_sfd_count(transceiver_type_t t)
+{
+    switch (t) {
+#ifdef MODULE_AT86RF231
+
+        case TRANSCEIVER_AT86RF231:
+            at86rf231_reset_sfd_count();
+            break;
+#endif
+
+        default:
+            break;
+    }
+}
+
+/*------------------------------------------------------------------------------------*/
 #ifdef DBG_IGNORE
 static int16_t ignore_add(transceiver_type_t transceiver, void *address)
 {

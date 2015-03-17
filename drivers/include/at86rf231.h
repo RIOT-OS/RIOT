@@ -17,6 +17,7 @@
  *
  * @author      Alaeddine Weslati <alaeddine.weslati@inria.fr>
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
+ * @author      Kévin Roussel <Kevin.Roussel@inria.fr>
  */
 
 #ifndef AT86RF231_H_
@@ -57,6 +58,21 @@ extern "C" {
  * @brief Broadcast address
  */
 #define AT86RF231_BROADCAST_ADDRESS (0xFFFF)
+
+/**
+ * @brief at86rf231's minimum RSSI detection level in dBm
+ */
+#define AT86RF231_RSSI_BASE_VAL -94
+
+/**
+ * @brief at86rf231's minimum TX power in dBm
+ */
+#define AT86RF231_TX_POWER_MIN  -17
+
+/**
+ * @brief at86rf231's maximum TX power in dBm
+ */
+#define AT86RF231_TX_POWER_MAX  4
 
 /**
  * @brief at86rf231's lowest supported channel
@@ -221,10 +237,17 @@ uint16_t at86rf231_set_pan(uint16_t pan);
 uint16_t at86rf231_get_pan(void);
 
 /**
+ * @brief Updates the transceiver configuration values 
+ *        (PAN ID, addresses, radio channel) by actually
+ *        reading them from transceiver's registers.
+ */
+void at86rf231_update_config_values(void);
+
+/**
  * @brief Sets the output (TX) power of the at86rf231.
  *
  * @param[in] pow The desired TX (output) power in dBm,
- *                 valid values are -25 to 0; other values
+ *                 valid values are -17 to 4; other values
  *                 will be "saturated" into this range.
  *
  * @return The set TX (output) power after calling.
@@ -237,6 +260,38 @@ int at86rf231_set_tx_power(int pow);
  * @return The current TX (output) power.
  */
 int at86rf231_get_tx_power(void);
+
+/**
+ * @brief Resets the counter of detected SFDs.
+ */
+void at86rf231_reset_sfd_count(void);
+
+/**
+ * @brief Returns the number of SFDs detected by the at86rf231.
+ *
+ * @return The current SFD count.
+ */
+unsigned long at86rf231_get_sfd_count(void);
+
+/**
+ * @brief Sets the threshold value for CCA detection.
+ *
+ * @param[in] pow The desired threshold value (in dBm)
+ *                 for determining if radio channel is
+ *                 busy or not. Valid values are -91 to
+ *                 -61; other values will be "saturated"
+ *                 into this range.
+ *
+ * @return The set threshold value after calling.
+ */
+int at86rf231_set_cca_threshold(int pow);
+
+/**
+ * @brief Returns the threshold value for CCA detection.
+ *
+ * @return The current threshold value.
+ */
+int at86rf231_get_cca_threshold(void);
 
 /**
  * @brief Checks if the radio medium is available/clear to send
@@ -347,13 +402,13 @@ void at86rf231_rx_handler(void);
  * @return @ref netdev_802154_tx_status_t
  */
 netdev_802154_tx_status_t at86rf231_load_tx_buf(netdev_t *dev,
-                                             netdev_802154_pkt_kind_t kind,
-                                             netdev_802154_node_addr_t *dest,
-                                             int use_long_addr,
-                                             int wants_ack,
-                                             netdev_hlist_t *upper_layer_hdrs,
-                                             void *buf,
-                                             unsigned int len);
+                                                netdev_802154_pkt_kind_t kind,
+                                                netdev_802154_node_addr_t *dest,
+                                                int use_long_addr,
+                                                int wants_ack,
+                                                netdev_hlist_t *upper_layer_hdrs,
+                                                void *buf,
+                                                unsigned int len);
 
 /**
  * @brief Transmit the data loaded into the at86rf231 TX buffer.

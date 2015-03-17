@@ -15,6 +15,7 @@
  *
  * @author      Alaeddine Weslati <alaeddine.weslati@inria.fr>
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
+ * @author      Kévin Roussel <Kevin.Roussel@inria.fr>
  *
  * @}
  */
@@ -25,11 +26,12 @@
 #include "periph/gpio.h"
 #include "periph/spi.h"
 #include "kernel_types.h"
+#include "crash.h"
 #include "transceiver.h"
 #include "hwtimer.h"
 #include "config.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG (1)
 #include "debug.h"
 
 #ifndef AT86RF231_SPI_SPEED
@@ -44,6 +46,11 @@ static uint16_t radio_pan;
 static uint8_t  radio_channel;
 static uint16_t radio_address;
 static uint64_t radio_address_long;
+
+static volatile unsigned long sfd_count;
+
+static volatile bool at86rf231_active;
+
 
 netdev_802154_raw_packet_cb_t at86rf231_raw_packet_cb;
 netdev_rcv_data_cb_t at86rf231_data_packet_cb;
@@ -70,8 +77,6 @@ int at86rf231_initialize(netdev_t *dev)
 
     at86rf231_reset();
 
-    at86rf231_on();
-
     /* TODO :
      * and configure security, power
      */
@@ -81,73 +86,77 @@ int at86rf231_initialize(netdev_t *dev)
     at86rf231_set_pan(0x0001);
 #endif
 
-    radio_channel = at86rf231_reg_read(AT86RF231_REG__PHY_CC_CCA) & AT86RF231_PHY_CC_CCA_MASK__CHANNEL;
+    radio_channel = at86rf231_reg_read(AT86RF231_REG__PHY_CC_CCA)
+                                       & AT86RF231_PHY_CC_CCA_MASK__CHANNEL;
 
-    radio_address = 0x00FF & (uint16_t)at86rf231_reg_read(AT86RF231_REG__SHORT_ADDR_0);
+    radio_address = 0x00FF
+                  & (uint16_t)at86rf231_reg_read(AT86RF231_REG__SHORT_ADDR_0);
     radio_address |= at86rf231_reg_read(AT86RF231_REG__SHORT_ADDR_1) << 8;
 
-    radio_address_long = 0x00000000000000FF & (uint64_t)at86rf231_reg_read(AT86RF231_REG__IEEE_ADDR_0);
+    radio_address_long = 0x00000000000000FF
+                       & (uint64_t)at86rf231_reg_read(AT86RF231_REG__IEEE_ADDR_0);
     radio_address_long |= ((uint64_t)at86rf231_reg_read(AT86RF231_REG__IEEE_ADDR_1)) << 8;
-    radio_address_long |= ((uint64_t)at86rf231_reg_read(AT86RF231_REG__IEEE_ADDR_1)) << 16;
-    radio_address_long |= ((uint64_t)at86rf231_reg_read(AT86RF231_REG__IEEE_ADDR_1)) << 24;
-    radio_address_long |= ((uint64_t)at86rf231_reg_read(AT86RF231_REG__IEEE_ADDR_1)) << 32;
-    radio_address_long |= ((uint64_t)at86rf231_reg_read(AT86RF231_REG__IEEE_ADDR_1)) << 40;
-    radio_address_long |= ((uint64_t)at86rf231_reg_read(AT86RF231_REG__IEEE_ADDR_1)) << 48;
-    radio_address_long |= ((uint64_t)at86rf231_reg_read(AT86RF231_REG__IEEE_ADDR_1)) << 56;
+    radio_address_long |= ((uint64_t)at86rf231_reg_read(AT86RF231_REG__IEEE_ADDR_2)) << 16;
+    radio_address_long |= ((uint64_t)at86rf231_reg_read(AT86RF231_REG__IEEE_ADDR_3)) << 24;
+    radio_address_long |= ((uint64_t)at86rf231_reg_read(AT86RF231_REG__IEEE_ADDR_4)) << 32;
+    radio_address_long |= ((uint64_t)at86rf231_reg_read(AT86RF231_REG__IEEE_ADDR_5)) << 40;
+    radio_address_long |= ((uint64_t)at86rf231_reg_read(AT86RF231_REG__IEEE_ADDR_6)) << 48;
+    radio_address_long |= ((uint64_t)at86rf231_reg_read(AT86RF231_REG__IEEE_ADDR_7)) << 56;
 
     return 0;
 }
 
 int at86rf231_on(void)
 {
-    /* Send a FORCE TRX OFF command */
-    at86rf231_reg_write(AT86RF231_REG__TRX_STATE, AT86RF231_TRX_STATE__FORCE_TRX_OFF);
+    /* negate SLP_TR line */
+    gpio_clear(AT86RF231_SLEEP);
 
     /* busy wait for TRX_OFF state */
     do {
         int delay = _MAX_RETRIES;
         if (!--delay) {
-            DEBUG("at86rf231 : ERROR : could not enter TRX_OFF mode\n");
+            core_panic(0x0231,
+                       "at86rf231 : ERROR : could not wake up transceiver!\n");
             return 0;
         }
-    } while (at86rf231_get_status() != AT86RF231_TRX_STATUS__TRX_OFF);
+    } while (at86rf231_current_mode() != AT86RF231_TRX_STATUS__TRX_OFF);
 
-    at86rf231_reg_write(AT86RF231_REG__TRX_STATE, AT86RF231_TRX_STATE__RX_ON);
-
-    /* change into basic reception mode to initialise CSMA seed by RNG */
-    do {
-        int delay = _MAX_RETRIES;
-        if (!--delay) {
-            DEBUG("at86rf231 : ERROR : could not enter RX_ON mode\n");
-            return 0;
-        }
-    } while (at86rf231_get_status() != AT86RF231_TRX_STATUS__RX_ON);
-
-    /* read RNG values into CSMA_SEED_0 */
-    for (int i=0; i<7; i+=2) {
-        uint8_t tmp = at86rf231_reg_read(AT86RF231_REG__PHY_CC_CCA);
-        tmp = ((tmp&0x60)>>5);
-        at86rf231_reg_write(AT86RF231_REG__CSMA_SEED_0, tmp << i);
-    }
-    /* read CSMA_SEED_1 and write back with RNG value */
-    uint8_t tmp = at86rf231_reg_read(AT86RF231_REG__CSMA_SEED_1);
-    tmp |= ((at86rf231_reg_read(AT86RF231_REG__PHY_CC_CCA)&0x60)>>5);
-    at86rf231_reg_write(AT86RF231_REG__CSMA_SEED_1, tmp);
+    at86rf231_active = true;
 
     /* change into reception mode */
     at86rf231_switch_to_rx();
+
+    DEBUG("AT86RF231 transceiver is up and running.\n");
 
     return 1;
 }
 
 void at86rf231_off(void)
 {
-    /* TODO */
+    /* Send a FORCE TRX OFF command */
+    at86rf231_reg_write(AT86RF231_REG__TRX_STATE,
+                        AT86RF231_TRX_STATE__FORCE_TRX_OFF);
+
+    /* busy wait for TRX_OFF state */
+    do {
+        int delay = _MAX_RETRIES;
+        if (!--delay) {
+            core_panic(0x0231,
+                       "at86rf231 : ERROR : could not enter TRX_OFF mode\n");
+            return;
+        }
+    } while (at86rf231_current_mode() != AT86RF231_TRX_STATUS__TRX_OFF);
+
+    /* assert SLP_TR line */
+    gpio_set(AT86RF231_SLEEP);
+
+    at86rf231_active = false;
+    DEBUG("AT86RF231 transceiver goes off.\n");
 }
 
 int at86rf231_is_on(void)
 {
-    return ((at86rf231_get_status() & 0x1f) != 0);
+    return at86rf231_active;
 }
 
 void at86rf231_switch_to_rx(void)
@@ -155,66 +164,113 @@ void at86rf231_switch_to_rx(void)
     gpio_irq_disable(AT86RF231_INT);
 
     /* now change to PLL_ON state for extended operating mode */
-    at86rf231_reg_write(AT86RF231_REG__TRX_STATE, AT86RF231_TRX_STATE__PLL_ON);
+    at86rf231_reg_write(AT86RF231_REG__TRX_STATE,
+                        AT86RF231_TRX_STATE__PLL_ON);
 
     do {
         int max_wait = _MAX_RETRIES;
         if (!--max_wait) {
-            DEBUG("at86rf231 : ERROR : could not enter PLL_ON mode\n");
+            core_panic(0x0231,
+                       "at86rf231 : ERROR : could not enter PLL_ON mode\n");
             break;
         }
-    } while (at86rf231_get_status() != AT86RF231_TRX_STATUS__PLL_ON);
+    } while (at86rf231_current_mode() != AT86RF231_TRX_STATUS__PLL_ON);
 
-#ifndef MODULE_OPENWSN
-    /* Reset IRQ to TRX END only */
-    at86rf231_reg_write(AT86RF231_REG__IRQ_MASK, AT86RF231_IRQ_STATUS_MASK__TRX_END);
-#else
-    /* OpenWSN also needs RX_START IRQ */
-    at86rf231_reg_write(AT86RF231_REG__IRQ_MASK, ( AT86RF231_IRQ_STATUS_MASK__RX_START | AT86RF231_IRQ_STATUS_MASK__TRX_END));
-#endif
-
-
-    /* Read IRQ to clear it */
+    /* Read IRQ status register to clear it */
     at86rf231_reg_read(AT86RF231_REG__IRQ_STATUS);
 
     /* Enable IRQ interrupt */
     gpio_irq_enable(AT86RF231_INT);
 
     /* Enter RX_AACK_ON state */
-    at86rf231_reg_write(AT86RF231_REG__TRX_STATE, AT86RF231_TRX_STATE__RX_AACK_ON);
+    at86rf231_reg_write(AT86RF231_REG__TRX_STATE,
+                        AT86RF231_TRX_STATE__RX_AACK_ON);
 
     do {
         int max_wait = _MAX_RETRIES;
         if (!--max_wait) {
-            DEBUG("at86rf231 : ERROR : could not enter RX_AACK_ON mode\n");
+            core_panic(0x0231,
+                       "at86rf231 : ERROR : could not enter RX_AACK_ON mode\n");
             break;
         }
-    } while (at86rf231_get_status() != AT86RF231_TRX_STATUS__RX_AACK_ON);
-}
-
-void at86rf231_rxoverflow_irq(void)
-{
-    /* TODO */
+    } while (at86rf231_current_mode() != AT86RF231_TRX_STATUS__RX_AACK_ON);
 }
 
 #ifndef MODULE_OPENWSN
-void at86rf231_rx_irq(void)
+void at86rf231_fberror_irq(void)
 {
-    /* check if we are in sending state */
-    if (driver_state == AT_DRIVER_STATE_SENDING) {
-        /* Read IRQ to clear it */
-        at86rf231_reg_read(AT86RF231_REG__IRQ_STATUS);
-        /* tx done, listen again */
-        at86rf231_switch_to_rx();
-        /* clear internal state */
-        driver_state = AT_DRIVER_STATE_DEFAULT;
-    }
-    else {
-        /* handle receive */
-        at86rf231_rx_handler();
-    }
+    /* When frame buffer corruption occurs, halt/reset the system */
+    core_panic(0x0231,
+               "at86rf231: frame buffer corruption detected!");
 }
+
+void at86rf233_sfd_irq(void)
+{
+    sfd_count++;
+}
+
+void at86rf231_irq(void)
+{
+    /* Check the kind of the received interrupt(s) */
+    uint8_t irqStat = at86rf231_reg_read(AT86RF231_REG__IRQ_STATUS);
+#if ENABLE_DEBUG
+    DEBUG("at86rf231 IRQ!\n");
+    DEBUG("Pending:\n");
+    if (irqStat & AT86RF231_IRQ_STATUS_MASK__BAT_LOW) {
+        DEBUG("-> BAT_LOW\n");
+    }
+    if (irqStat & AT86RF231_IRQ_STATUS_MASK__TRX_UR) {
+        DEBUG("-> TRX_UR\n");
+    }
+    if (irqStat & AT86RF231_IRQ_STATUS_MASK__AMI) {
+        DEBUG("-> AMI\n");
+    }
+    if (irqStat & AT86RF231_IRQ_STATUS_MASK__CCA_ED_DONE) {
+        DEBUG("-> CCA_ED_DONE\n");
+    }
+    if (irqStat & AT86RF231_IRQ_STATUS_MASK__TRX_END) {
+        DEBUG("-> TRX_END\n");
+    }
+    if (irqStat & AT86RF231_IRQ_STATUS_MASK__RX_START) {
+        DEBUG("-> RX_START\n");
+    }
+    if (irqStat & AT86RF231_IRQ_STATUS_MASK__PLL_UNLOCK) {
+        DEBUG("-> PLL_UNLOCK\n");
+    }
+    if (irqStat & AT86RF231_IRQ_STATUS_MASK__PLL_LOCK) {
+        DEBUG("-> PLL_LOCK\n");
+    }
+    DEBUG("\n");
 #endif
+
+    /* Handle SFD recognitions */
+    if (irqStat & AT86RF231_IRQ_STATUS_MASK__RX_START) {
+        at86rf233_sfd_irq();
+    }
+
+    /* Handle completed transmissions */
+    if (irqStat & AT86RF231_IRQ_STATUS_MASK__TRX_END) {
+        /* check if we are in sending state */
+        if (driver_state == AT_DRIVER_STATE_SENDING) {
+            /* TX done, listen again */
+            at86rf231_switch_to_rx();
+            /* clear internal state */
+            driver_state = AT_DRIVER_STATE_DEFAULT;
+        } else {
+            /* process received frame */
+            at86rf231_rx_handler();
+        }
+    }
+
+    /* Handle Frame Buffer access violations */
+    if (irqStat & AT86RF231_IRQ_STATUS_MASK__TRX_UR) {
+        at86rf231_fberror_irq();
+    }
+
+    /* other interrupts don't interest us (and shouldn't be enabled */
+}
+#endif /* MODULE_OPENWSN */
+
 
 int at86rf231_add_raw_recv_callback(netdev_t *dev,
                                     netdev_802154_raw_packet_cb_t recv_cb)
@@ -227,7 +283,6 @@ int at86rf231_add_raw_recv_callback(netdev_t *dev,
     }
 
     return -ENOBUFS;
-
 }
 
 int at86rf231_rem_raw_recv_callback(netdev_t *dev,
@@ -265,23 +320,26 @@ radio_address_t at86rf231_set_address(radio_address_t address)
 {
     radio_address = address;
 
-    uint8_t old_state = at86rf231_get_status() & AT86RF231_TRX_STATUS_MASK__TRX_STATUS;
+    uint8_t old_state = at86rf231_current_mode();
 
     /* Go to state PLL_ON */
-    at86rf231_reg_write(AT86RF231_REG__TRX_STATE, AT86RF231_TRX_STATE__PLL_ON);
+    at86rf231_reg_write(AT86RF231_REG__TRX_STATE,
+                        AT86RF231_TRX_STATE__PLL_ON);
 
     /* wait until it is on PLL_ON state */
     do {
         int max_wait = _MAX_RETRIES;
         if (!--max_wait) {
-            DEBUG("at86rf231 : ERROR : could not enter PLL_ON mode\n");
+            core_panic(0x0231,
+                       "at86rf231 : ERROR : could not enter PLL_ON mode\n");
             break;
         }
-    } while ((at86rf231_get_status() & AT86RF231_TRX_STATUS_MASK__TRX_STATUS)
-             != AT86RF231_TRX_STATUS__PLL_ON);
+    } while (at86rf231_current_mode() != AT86RF231_TRX_STATUS__PLL_ON);
 
-    at86rf231_reg_write(AT86RF231_REG__SHORT_ADDR_0, (uint8_t)(0x00FF & radio_address));
-    at86rf231_reg_write(AT86RF231_REG__SHORT_ADDR_1, (uint8_t)(radio_address >> 8));
+    at86rf231_reg_write(AT86RF231_REG__SHORT_ADDR_0,
+                        (uint8_t)(0x00FF & radio_address));
+    at86rf231_reg_write(AT86RF231_REG__SHORT_ADDR_1,
+                        (uint8_t)(radio_address >> 8));
 
     /* Go to state old state */
     at86rf231_reg_write(AT86RF231_REG__TRX_STATE, old_state);
@@ -290,11 +348,11 @@ radio_address_t at86rf231_set_address(radio_address_t address)
     do {
         int max_wait = _MAX_RETRIES;
         if (!--max_wait) {
-            DEBUG("at86rf231 : ERROR : could not enter old state %x\n", old_state);
+            core_panic(0x0231,
+                       "at86rf231 : ERROR : could not revert old state\n");
             break;
         }
-    } while ((at86rf231_get_status() & AT86RF231_TRX_STATUS_MASK__TRX_STATUS)
-             != old_state);
+    } while (at86rf231_current_mode() != old_state);
 
     return radio_address;
 }
@@ -308,42 +366,52 @@ uint64_t at86rf231_set_address_long(uint64_t address)
 {
     radio_address_long = address;
 
-    uint8_t old_state = at86rf231_get_status() & AT86RF231_TRX_STATUS_MASK__TRX_STATUS;
+    uint8_t old_state = at86rf231_current_mode();
 
     /* Go to state PLL_ON */
-    at86rf231_reg_write(AT86RF231_REG__TRX_STATE, AT86RF231_TRX_STATE__PLL_ON);
+    at86rf231_reg_write(AT86RF231_REG__TRX_STATE,
+                        AT86RF231_TRX_STATE__PLL_ON);
 
     /* wait until it is on PLL_ON state */
     do {
         int max_wait = _MAX_RETRIES;
         if (!--max_wait) {
-            DEBUG("at86rf231 : ERROR : could not enter PLL_ON mode\n");
+            core_panic(0x0231,
+                       "at86rf231 : ERROR : could not enter PLL_ON mode\n");
             break;
         }
-    } while ((at86rf231_get_status() & AT86RF231_TRX_STATUS_MASK__TRX_STATUS)
-             != AT86RF231_TRX_STATUS__PLL_ON);
+    } while (at86rf231_current_mode() != AT86RF231_TRX_STATUS__PLL_ON);
 
-    at86rf231_reg_write(AT86RF231_REG__IEEE_ADDR_0, (uint8_t)(0x00000000000000FF & radio_address_long));
-    at86rf231_reg_write(AT86RF231_REG__IEEE_ADDR_1, (uint8_t)(0x000000000000FF00 & radio_address_long >> 8));
-    at86rf231_reg_write(AT86RF231_REG__IEEE_ADDR_2, (uint8_t)(0x0000000000FF0000 & radio_address_long >> 16));
-    at86rf231_reg_write(AT86RF231_REG__IEEE_ADDR_3, (uint8_t)(0x00000000FF000000 & radio_address_long >> 24));
-    at86rf231_reg_write(AT86RF231_REG__IEEE_ADDR_4, (uint8_t)(0x000000FF00000000 & radio_address_long >> 32));
-    at86rf231_reg_write(AT86RF231_REG__IEEE_ADDR_5, (uint8_t)(0x0000FF0000000000 & radio_address_long >> 40));
-    at86rf231_reg_write(AT86RF231_REG__IEEE_ADDR_6, (uint8_t)(0x00FF000000000000 & radio_address_long >> 48));
-    at86rf231_reg_write(AT86RF231_REG__IEEE_ADDR_7, (uint8_t)(radio_address_long >> 56));
+    at86rf231_reg_write(AT86RF231_REG__IEEE_ADDR_0,
+                        (uint8_t)(0x00000000000000FF & radio_address_long));
+    at86rf231_reg_write(AT86RF231_REG__IEEE_ADDR_1,
+                        (uint8_t)(0x000000000000FF00 & radio_address_long >> 8));
+    at86rf231_reg_write(AT86RF231_REG__IEEE_ADDR_2,
+                        (uint8_t)(0x0000000000FF0000 & radio_address_long >> 16));
+    at86rf231_reg_write(AT86RF231_REG__IEEE_ADDR_3,
+                        (uint8_t)(0x00000000FF000000 & radio_address_long >> 24));
+    at86rf231_reg_write(AT86RF231_REG__IEEE_ADDR_4,
+                        (uint8_t)(0x000000FF00000000 & radio_address_long >> 32));
+    at86rf231_reg_write(AT86RF231_REG__IEEE_ADDR_5,
+                        (uint8_t)(0x0000FF0000000000 & radio_address_long >> 40));
+    at86rf231_reg_write(AT86RF231_REG__IEEE_ADDR_6,
+                        (uint8_t)(0x00FF000000000000 & radio_address_long >> 48));
+    at86rf231_reg_write(AT86RF231_REG__IEEE_ADDR_7,
+                        (uint8_t)(0xFF00000000000000 & radio_address_long >> 56));
 
     /* Go to state old state */
-    at86rf231_reg_write(AT86RF231_REG__TRX_STATE, old_state);
+    at86rf231_reg_write(AT86RF231_REG__TRX_STATE,
+                        old_state);
 
     /* wait until it is on old state */
     do {
         int max_wait = _MAX_RETRIES;
         if (!--max_wait) {
-            DEBUG("at86rf231 : ERROR : could not enter old state %x\n", old_state);
+            core_panic(0x0231,
+                       "at86rf231 : ERROR : could not revert old state\n");
             break;
         }
-    } while ((at86rf231_get_status() & AT86RF231_TRX_STATUS_MASK__TRX_STATUS)
-             != old_state);
+    } while (at86rf231_current_mode() != old_state);
 
     return radio_address_long;
 }
@@ -357,8 +425,10 @@ uint16_t at86rf231_set_pan(uint16_t pan)
 {
     radio_pan = pan;
 
-    at86rf231_reg_write(AT86RF231_REG__PAN_ID_0, (uint8_t)(0x00FF & radio_pan));
-    at86rf231_reg_write(AT86RF231_REG__PAN_ID_1, (uint8_t)(radio_pan >> 8));
+    at86rf231_reg_write(AT86RF231_REG__PAN_ID_0,
+                        (uint8_t)(0x00FF & radio_pan));
+    at86rf231_reg_write(AT86RF231_REG__PAN_ID_1,
+                        (uint8_t)(radio_pan >> 8));
 
     return radio_pan;
 }
@@ -372,15 +442,15 @@ int at86rf231_set_channel(unsigned int channel)
 {
     radio_channel = channel;
 
-    if (channel < AT86RF231_MIN_CHANNEL ||
-        channel > AT86RF231_MAX_CHANNEL) {
+    if (channel < AT86RF231_MIN_CHANNEL || channel > AT86RF231_MAX_CHANNEL) {
 #if DEVELHELP
         puts("[at86rf231] channel out of range!");
 #endif
         return -1;
     }
 
-    at86rf231_reg_write(AT86RF231_REG__PHY_CC_CCA, (radio_channel & AT86RF231_PHY_CC_CCA_MASK__CHANNEL));
+    at86rf231_reg_write(AT86RF231_REG__PHY_CC_CCA,
+                        (radio_channel & AT86RF231_PHY_CC_CCA_MASK__CHANNEL));
 
     return radio_channel;
 }
@@ -390,23 +460,102 @@ unsigned int at86rf231_get_channel(void)
     return radio_channel;
 }
 
+void at86rf231_update_config_values(void)
+{
+    radio_address =  at86rf231_reg_read(AT86RF231_REG__SHORT_ADDR_0)
+                  | (at86rf231_reg_read(AT86RF231_REG__SHORT_ADDR_1) << 8);
+    radio_address_long =  at86rf231_reg_read(AT86RF231_REG__IEEE_ADDR_0)
+            | ((uint64_t) at86rf231_reg_read(AT86RF231_REG__IEEE_ADDR_1) << 8)
+            | ((uint64_t) at86rf231_reg_read(AT86RF231_REG__IEEE_ADDR_2) << 16)
+            | ((uint64_t) at86rf231_reg_read(AT86RF231_REG__IEEE_ADDR_3) << 24)
+            | ((uint64_t) at86rf231_reg_read(AT86RF231_REG__IEEE_ADDR_4) << 32)
+            | ((uint64_t) at86rf231_reg_read(AT86RF231_REG__IEEE_ADDR_5) << 40)
+            | ((uint64_t) at86rf231_reg_read(AT86RF231_REG__IEEE_ADDR_6) << 48)
+            | ((uint64_t) at86rf231_reg_read(AT86RF231_REG__IEEE_ADDR_7) << 56);
+    radio_pan =  at86rf231_reg_read(AT86RF231_REG__PAN_ID_0)
+              | (at86rf231_reg_read(AT86RF231_REG__PAN_ID_1) << 8);
+    radio_channel = at86rf231_reg_read(AT86RF231_REG__PHY_CC_CCA)
+                  & AT86RF231_PHY_CC_CCA_MASK__CHANNEL;
+}
+
 void at86rf231_set_monitor(int mode)
 {
     /* read register */
     uint8_t tmp = at86rf231_reg_read(AT86RF231_REG__XAH_CTRL_1);
     /* set promicuous mode depending on *mode* */
     if (mode) {
-        at86rf231_reg_write(AT86RF231_REG__XAH_CTRL_1, (tmp|AT86RF231_XAH_CTRL_1__AACK_PROM_MODE));
+        at86rf231_reg_write(AT86RF231_REG__XAH_CTRL_1,
+                            (tmp | AT86RF231_XAH_CTRL_1__AACK_PROM_MODE));
     }
     else {
-        at86rf231_reg_write(AT86RF231_REG__XAH_CTRL_1, (tmp&(~AT86RF231_XAH_CTRL_1__AACK_PROM_MODE)));
+        at86rf231_reg_write(AT86RF231_REG__XAH_CTRL_1,
+                            (tmp & (~AT86RF231_XAH_CTRL_1__AACK_PROM_MODE)));
     }
 }
 
 int at86rf231_get_monitor(void)
 {
-    return (at86rf231_reg_read(AT86RF231_REG__XAH_CTRL_1) & AT86RF231_XAH_CTRL_1__AACK_PROM_MODE);
+    return (at86rf231_reg_read(AT86RF231_REG__XAH_CTRL_1)
+            & AT86RF231_XAH_CTRL_1__AACK_PROM_MODE);
 }
+
+static uint8_t DBM_TO_TX_POW[] =
+    {0xF, 0xE, 0xE, 0xE, 0xE, 0xE, 0xD, 0xD, 0xD, 0xD, 0xC,
+     0xC, 0xB, 0xB, 0xA, 0x9, 0x8, 0x7, 0x6, 0x5, 0x3, 0x0};
+int at86rf231_set_tx_power(int dbm)
+{
+    if (dbm < AT86RF231_TX_POWER_MIN) {
+        dbm = AT86RF231_TX_POWER_MIN;
+    }
+    if (dbm < AT86RF231_TX_POWER_MAX) {
+        dbm = AT86RF231_TX_POWER_MAX;
+    }
+    uint8_t pow = DBM_TO_TX_POW[dbm - AT86RF231_TX_POWER_MIN];
+    at86rf231_reg_write(AT86RF231_REG__PHY_TX_PWR,
+                        pow & AT86RF231_PHY_TX_PWR_MASK__TX_PWR);
+    return pow;
+}
+
+static const int TX_POW_TO_DBM[] =
+    {4, 3, 3, 3, 2, 2, 1, 0, -1, -2, -3, -4, -6, -8, -12, -17};
+int at86rf231_get_tx_power(void)
+{
+    uint8_t pow = at86rf231_reg_read(AT86RF231_REG__PHY_TX_PWR)
+                & AT86RF231_PHY_TX_PWR_MASK__TX_PWR;
+    return TX_POW_TO_DBM[pow];
+}
+
+void at86rf231_reset_sfd_count(void)
+{
+    sfd_count = 0;
+}
+
+unsigned long at86rf231_get_sfd_count(void)
+{
+    return sfd_count;
+}
+
+int at86rf231_set_cca_threshold(int pow)
+{
+    if (pow < -91) {
+        pow = -91;
+    }
+    if (pow > -61) {
+        pow = -61;
+    }
+    uint8_t val = (pow - AT86RF231_RSSI_BASE_VAL) >> 1;
+    at86rf231_reg_write(AT86RF231_REG__CCA_THRES,
+                        val & AT86RF231_CCA_THRES_MASK__CCA_ED_THRES);
+    return pow;
+}
+
+int at86rf231_get_cca_threshold(void)
+{
+    uint8_t val = at86rf231_reg_read(AT86RF231_REG__CCA_THRES)
+                & AT86RF231_CCA_THRES_MASK__CCA_ED_THRES;
+    return AT86RF231_RSSI_BASE_VAL + 2 * val;
+}
+
 
 void at86rf231_gpio_spi_interrupts_init(void)
 {
@@ -415,7 +564,8 @@ void at86rf231_gpio_spi_interrupts_init(void)
     spi_init_master(AT86RF231_SPI, SPI_CONF_FIRST_RISING, SPI_SPEED);
     spi_release(AT86RF231_SPI);
     /* IRQ0 */
-    gpio_init_int(AT86RF231_INT, GPIO_NOPULL, GPIO_RISING, (gpio_cb_t)at86rf231_rx_irq, NULL);
+    gpio_init_int(AT86RF231_INT, GPIO_NOPULL, GPIO_RISING,
+                  (gpio_cb_t)at86rf231_irq, NULL);
     /* CS */
     gpio_init_out(AT86RF231_CS, GPIO_NOPULL);
     /* SLEEP */
@@ -433,10 +583,64 @@ void at86rf231_reset(void)
     gpio_set(AT86RF231_CS);
     gpio_clear(AT86RF231_SLEEP);
 
+    /* disable transceiver-related interrupts */
+    gpio_irq_disable(AT86RF231_INT);
+
     /* additional waiting to comply to min rst pulse width */
     uint8_t volatile delay = 50; /* volatile to ensure it isn't optimized away */
     while (--delay);
     gpio_set(AT86RF231_RESET);
+
+    /* interrupts configuration: we want to know about SFDs, TRX ends,
+       and frame buffer errors */
+    at86rf231_reg_write(AT86RF231_REG__IRQ_MASK,
+                        (AT86RF231_IRQ_STATUS_MASK__RX_START
+                       | AT86RF231_IRQ_STATUS_MASK__TRX_END
+                       | AT86RF231_IRQ_STATUS_MASK__TRX_UR));
+    /* Read IRQ status register to clear it */
+    at86rf231_reg_read(AT86RF231_REG__IRQ_STATUS);
+
+    /* Send a FORCE TRX OFF command */
+    at86rf231_reg_write(AT86RF231_REG__TRX_STATE,
+                        AT86RF231_TRX_STATE__FORCE_TRX_OFF);
+
+    /* busy wait for TRX_OFF state */
+    do {
+        int delay = _MAX_RETRIES;
+        if (!--delay) {
+            core_panic(0x0231,
+                       "at86rf231 : ERROR : could not enter TRX_OFF mode\n");
+        }
+    } while (at86rf231_current_mode() != AT86RF231_TRX_STATUS__TRX_OFF);
+
+    at86rf231_active = true;
+
+    at86rf231_reg_write(AT86RF231_REG__TRX_STATE,
+                        AT86RF231_TRX_STATE__RX_ON);
+
+    /* change into basic reception mode to initialise CSMA seed by RNG */
+    do {
+        int delay = _MAX_RETRIES;
+        if (!--delay) {
+            core_panic(0x0231,
+                       "at86rf231 : ERROR : could not enter RX_ON mode\n");
+        }
+    } while (at86rf231_current_mode() != AT86RF231_TRX_STATUS__RX_ON);
+
+    /* read RNG values into CSMA_SEED_0 */
+    for (int i=0; i<7; i+=2) {
+        uint8_t tmp = at86rf231_reg_read(AT86RF231_REG__PHY_CC_CCA);
+        tmp = ((tmp & 0x60) >> 5);
+        at86rf231_reg_write(AT86RF231_REG__CSMA_SEED_0, tmp << i);
+    }
+    /* read CSMA_SEED_1 and write back with RNG value */
+    uint8_t tmp = at86rf231_reg_read(AT86RF231_REG__CSMA_SEED_1);
+    tmp |= ((at86rf231_reg_read(AT86RF231_REG__PHY_CC_CCA) & 0x60) >> 5);
+    at86rf231_reg_write(AT86RF231_REG__CSMA_SEED_1, tmp);
+    DEBUG("AT86RF231 transceiver is up and running.\n");
+
+    /* change into reception mode */
+    at86rf231_switch_to_rx();
 }
 
 int at86rf231_get_option(netdev_t *dev, netdev_opt_t opt, void *value,
@@ -449,77 +653,114 @@ int at86rf231_get_option(netdev_t *dev, netdev_opt_t opt, void *value,
     }
 
     switch (opt) {
-        case NETDEV_OPT_CHANNEL:
-            if (*value_len < sizeof(unsigned int)) {
-                return -EOVERFLOW;
-            }
-            if (*value_len > sizeof(unsigned int)) {
-                *value_len = sizeof(unsigned int);
-            }
-            *((unsigned int *)value) = at86rf231_get_channel();
-            break;
+    case NETDEV_OPT_CHANNEL:
+        if (*value_len < sizeof(unsigned int)) {
+            return -EOVERFLOW;
+        }
+        if (*value_len > sizeof(unsigned int)) {
+            *value_len = sizeof(unsigned int);
+        }
+        *((unsigned int *)value) = at86rf231_get_channel();
+        break;
 
-        case NETDEV_OPT_ADDRESS:
-            if (*value_len < sizeof(uint16_t)) {
-                return -EOVERFLOW;
-            }
-            if (*value_len > sizeof(uint16_t)) {
-                *value_len = sizeof(uint16_t);
-            }
-            *((uint16_t *)value) = at86rf231_get_address();
-            break;
+    case NETDEV_OPT_ADDRESS:
+        if (*value_len < sizeof(uint16_t)) {
+            return -EOVERFLOW;
+        }
+        if (*value_len > sizeof(uint16_t)) {
+            *value_len = sizeof(uint16_t);
+        }
+        *((uint16_t *)value) = at86rf231_get_address();
+        break;
 
-        case NETDEV_OPT_NID:
-            if (*value_len < sizeof(uint16_t)) {
-                return -EOVERFLOW;
-            }
-            if (*value_len > sizeof(uint16_t)) {
-                *value_len = sizeof(uint16_t);
-            }
-            *((uint16_t *)value) = at86rf231_get_pan();
-            break;
+    case NETDEV_OPT_NID:
+        if (*value_len < sizeof(uint16_t)) {
+            return -EOVERFLOW;
+        }
+        if (*value_len > sizeof(uint16_t)) {
+            *value_len = sizeof(uint16_t);
+        }
+        *((uint16_t *)value) = at86rf231_get_pan();
+        break;
 
-        case NETDEV_OPT_ADDRESS_LONG:
-            if (*value_len < sizeof(uint64_t)) {
-                return -EOVERFLOW;
-            }
-            if (*value_len > sizeof(uint64_t)) {
-                *value_len = sizeof(uint64_t);
-            }
-            *((uint64_t *)value) = at86rf231_get_address_long();
-            break;
+    case NETDEV_OPT_ADDRESS_LONG:
+        if (*value_len < sizeof(uint64_t)) {
+            return -EOVERFLOW;
+        }
+        if (*value_len > sizeof(uint64_t)) {
+            *value_len = sizeof(uint64_t);
+        }
+        *((uint64_t *)value) = at86rf231_get_address_long();
+        break;
 
-        case NETDEV_OPT_MAX_PACKET_SIZE:
-            if (*value_len == 0) {
-                return -EOVERFLOW;
-            }
-            if (*value_len > sizeof(uint8_t)) {
-                *value_len = sizeof(uint8_t);
-            }
-            *((uint8_t *)value) = AT86RF231_MAX_PKT_LENGTH;
-            break;
+    case NETDEV_OPT_MAX_PACKET_SIZE:
+        if (*value_len == 0) {
+            return -EOVERFLOW;
+        }
+        if (*value_len > sizeof(uint8_t)) {
+            *value_len = sizeof(uint8_t);
+        }
+        *((uint8_t *)value) = AT86RF231_MAX_PKT_LENGTH;
+        break;
 
-        case NETDEV_OPT_PROTO:
-            if (*value_len < sizeof(netdev_proto_t)) {
-                return -EOVERFLOW;
-            }
-            if (*value_len > sizeof(netdev_proto_t)) {
-                *value_len = sizeof(netdev_proto_t);
-            }
-            *((netdev_type_t *)value) = NETDEV_PROTO_802154;
-            break;
+    case NETDEV_OPT_PROTO:
+        if (*value_len < sizeof(netdev_proto_t)) {
+            return -EOVERFLOW;
+        }
+        if (*value_len > sizeof(netdev_proto_t)) {
+            *value_len = sizeof(netdev_proto_t);
+        }
+        *((netdev_type_t *)value) = NETDEV_PROTO_802154;
+        break;
 
-        case NETDEV_OPT_SRC_LEN:
-            if (*value_len < sizeof(size_t)) {
-                return -EOVERFLOW;
-            }
-            if (*value_len > sizeof(size_t)) {
-                *value_len = sizeof(size_t);
-            }
-            *((size_t *)value) = _default_src_addr_len;
+    case NETDEV_OPT_SRC_LEN:
+        if (*value_len < sizeof(size_t)) {
+            return -EOVERFLOW;
+        }
+        if (*value_len > sizeof(size_t)) {
+            *value_len = sizeof(size_t);
+        }
+        *((size_t *)value) = _default_src_addr_len;
 
-        default:
-            return -ENOTSUP;
+    case NETDEV_OPT_TX_POWER:
+        if (*value_len < sizeof(int)) {
+            return -EOVERFLOW;
+        }
+        if (*value_len > sizeof(int)) {
+            *value_len = sizeof(int);
+        }
+        *((int *)value) = at86rf231_get_tx_power();
+
+    case NETDEV_OPT_CAN_MONITOR:
+        if (*value_len == 0) {
+            return -EOVERFLOW;
+        }
+        if (*value_len > sizeof(uint8_t)) {
+            *value_len = sizeof(uint8_t);
+        }
+        *((uint8_t *)value) = 1;   /* true : AT86RF23x can go promiscuous */
+        break;
+
+    case NETDEV_OPT_CCA_THRESHOLD:
+        if (*value_len < sizeof(int)) {
+            return -EOVERFLOW;
+        }
+        if (*value_len > sizeof(int)) {
+            *value_len = sizeof(int);
+        }
+        *((int *)value) = at86rf231_get_cca_threshold();
+
+    case NETDEV_OPT_SFD_COUNT:
+        if (*value_len < sizeof(unsigned long)) {
+            return -EOVERFLOW;
+        }
+        if (*value_len > sizeof(unsigned long)) {
+            *value_len = sizeof(unsigned long);
+        }
+        *((int *)value) = at86rf231_get_sfd_count();
+
+    default:
+        return -ENOTSUP;
     }
 
     return 0;
@@ -606,64 +847,84 @@ int at86rf231_set_option(netdev_t *dev, netdev_opt_t opt, void *value,
     }
 
     switch (opt) {
-        case NETDEV_OPT_CHANNEL:
-            if ((res = _type_pun_up_unsigned(set_value, sizeof(unsigned int),
-                                             value, value_len)) == 0) {
-                unsigned int *v = (unsigned int *)set_value;
-                if (*v > 26) {
-                    return -EINVAL;
-                }
-                at86rf231_set_channel(*v);
+    case NETDEV_OPT_CHANNEL:
+        if ((res = _type_pun_up_unsigned(set_value, sizeof(unsigned int),
+                                         value, value_len)) == 0) {
+            unsigned int *v = (unsigned int *)set_value;
+            if (*v > 26) {
+                return -EINVAL;
             }
-            break;
+            at86rf231_set_channel(*v);
+        }
+        break;
 
-        case NETDEV_OPT_ADDRESS:
-            if ((res = _type_pun_up_unsigned(set_value, sizeof(uint16_t),
-                                             value, value_len)) == 0) {
-                uint16_t *v = (uint16_t *)set_value;
-                if (*v == 0xffff) {
-                    /* Do not allow setting to broadcast */
-                    return -EINVAL;
-                }
-                at86rf231_set_address(*v);
+    case NETDEV_OPT_ADDRESS:
+        if ((res = _type_pun_up_unsigned(set_value, sizeof(uint16_t),
+                                         value, value_len)) == 0) {
+            uint16_t *v = (uint16_t *)set_value;
+            if (*v == 0xffff) {
+                /* Do not allow setting to broadcast */
+                return -EINVAL;
             }
-            break;
+            at86rf231_set_address(*v);
+        }
+        break;
 
-        case NETDEV_OPT_NID:
-            if ((res = _type_pun_up_unsigned(set_value, sizeof(uint16_t),
-                                             value, value_len)) == 0) {
-                uint16_t *v = (uint16_t *)set_value;
-                if (*v == 0xffff) {
-                    /* Do not allow setting to broadcast */
-                    return -EINVAL;
-                }
-                at86rf231_set_pan(*v);
+    case NETDEV_OPT_NID:
+        if ((res = _type_pun_up_unsigned(set_value, sizeof(uint16_t),
+                                         value, value_len)) == 0) {
+            uint16_t *v = (uint16_t *)set_value;
+            if (*v == 0xffff) {
+                /* Do not allow setting to broadcast */
+                return -EINVAL;
             }
-            break;
+            at86rf231_set_pan(*v);
+        }
+        break;
 
-        case NETDEV_OPT_ADDRESS_LONG:
-            if ((res = _type_pun_up_unsigned(set_value, sizeof(uint64_t),
-                                             value, value_len)) == 0) {
-                uint64_t *v = (uint64_t *)set_value;
-                /* TODO: error checking? */
-                at86rf231_set_address_long(*v);
+    case NETDEV_OPT_ADDRESS_LONG:
+        if ((res = _type_pun_up_unsigned(set_value, sizeof(uint64_t),
+                                         value, value_len)) == 0) {
+            uint64_t *v = (uint64_t *)set_value;
+            /* TODO: error checking? */
+            at86rf231_set_address_long(*v);
+        }
+        break;
+
+    case NETDEV_OPT_SRC_LEN:
+        if ((res = _type_pun_up_unsigned(set_value, sizeof(size_t),
+                                         value, value_len)) == 0) {
+            size_t *v = (size_t *)set_value;
+            if (*v != 2 && *v != 8) {
+                return -EINVAL;
             }
-            break;
+            _default_src_addr_len = *v;
+        }
+        break;
 
-        case NETDEV_OPT_SRC_LEN:
-            if ((res = _type_pun_up_unsigned(set_value, sizeof(size_t),
-                                             value, value_len)) == 0) {
-                size_t *v = (size_t *)set_value;
+    case NETDEV_OPT_TX_POWER:
+        if ((res = _type_pun_up_unsigned(set_value, sizeof(int),
+                                         value, value_len)) == 0) {
+            int *v = (int *)set_value;
+            at86rf231_set_tx_power(*v);
+        }
+        break;
 
-                if (*v != 2 && *v != 8) {
-                    return -EINVAL;
-                }
-                _default_src_addr_len = *v;
-            }
-            break;
+    case NETDEV_OPT_CCA_THRESHOLD:
+        if ((res = _type_pun_up_unsigned(set_value, sizeof(int),
+                                         value, value_len)) == 0) {
+            int *v = (int *)set_value;
+            at86rf231_set_cca_threshold(*v);
+        }
+        break;
 
-        default:
-            return -ENOTSUP;
+    case NETDEV_OPT_SFD_COUNT:
+        /* we don't care the given value... */
+        at86rf231_reset_sfd_count();
+        break;
+
+    default:
+        return -ENOTSUP;
     }
 
     return res;
@@ -679,15 +940,18 @@ int at86rf231_get_state(netdev_t *dev, netdev_state_t *state)
 
     if (!at86rf231_is_on()) {
         *state = NETDEV_STATE_POWER_OFF;
+        return 0;
     }
     else if (at86rf231_get_monitor()) {
         *state = NETDEV_STATE_PROMISCUOUS_MODE;
+        return 0;
     }
     else {
         *state = NETDEV_STATE_RX_MODE;
+        return 0;
     }
 
-    return 0;
+    return -ENOTSUP;
 }
 
 int at86rf231_set_state(netdev_t *dev, netdev_state_t state)
@@ -703,20 +967,30 @@ int at86rf231_set_state(netdev_t *dev, netdev_state_t state)
     }
 
     switch (state) {
-        case NETDEV_STATE_POWER_OFF:
+    case NETDEV_STATE_POWER_OFF:
+        if (at86rf231_is_on()) {
             at86rf231_off();
-            break;
+        }
+        break;
 
-        case NETDEV_STATE_RX_MODE:
-            at86rf231_switch_to_rx();
-            break;
+    case NETDEV_STATE_RX_MODE:
+        if (!at86rf231_is_on()) {
+            at86rf231_on();
+        }
+        at86rf231_set_monitor(0);
+        at86rf231_switch_to_rx();
+        break;
 
-        case NETDEV_STATE_PROMISCUOUS_MODE:
-            at86rf231_set_monitor(1);
-            break;
+    case NETDEV_STATE_PROMISCUOUS_MODE:
+        if (!at86rf231_is_on()) {
+            at86rf231_on();
+        }
+        at86rf231_set_monitor(1);
+        at86rf231_switch_to_rx();
+        break;
 
-        default:
-            return -ENOTSUP;
+    default:
+        return -ENOTSUP;
     }
 
     return 0;
@@ -725,8 +999,26 @@ int at86rf231_set_state(netdev_t *dev, netdev_state_t state)
 int at86rf231_channel_is_clear(netdev_t *dev)
 {
     (void)dev;
-    /* channel is checked by hardware automatically before transmission */
-    return 1;
+
+    /* Ask for a CCA measure */
+    uint8_t reg = at86rf231_reg_read(AT86RF231_REG__PHY_CC_CCA);
+    reg |= AT86RF231_PHY_CC_CCA_MASK__CCA_REQUEST;
+    at86rf231_reg_write(AT86RF231_REG__PHY_CC_CCA, reg);
+
+    /* wait for CCA measurement to be finished */
+    uint8_t status;
+    do {
+        int max_wait = _MAX_RETRIES;
+        if (!--max_wait) {
+            core_panic(0x0231,
+                       "at86rf231 : ERROR : could not measure CCA\n");
+            break;
+        }
+        status = at86rf231_reg_read(AT86RF231_REG__TRX_STATUS);
+    } while (!(status & AT86RF231_TRX_STATUS_MASK__CCA_DONE));
+
+    /* return CCA status */
+    return (status & AT86RF231_TRX_STATUS_MASK__CCA_STATUS);
 }
 
 void at86rf231_event(netdev_t *dev, uint32_t event_type)
@@ -753,4 +1045,8 @@ const netdev_802154_driver_t at86rf231_driver = {
     .channel_is_clear = at86rf231_channel_is_clear,
 };
 
-netdev_t at86rf231_netdev = { NETDEV_TYPE_802154, (netdev_driver_t *) &at86rf231_driver, NULL };
+netdev_t at86rf231_netdev = {
+    NETDEV_TYPE_802154,
+    (netdev_driver_t *) &at86rf231_driver,
+    NULL
+};

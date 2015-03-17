@@ -10,11 +10,12 @@
  * @ingroup     sys_shell_commands
  * @{
  *
- * @file
+ * @file        sc_transceiver.c
  * @brief       Provides shell commands to configure the transceiver
  *
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  * @author      Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ * @author      Kévin Roussel <Kevin.Roussel@inria.fr>
  *
  * @}
  */
@@ -338,6 +339,32 @@ void _transceiver_get_set_pan_handler(int argc, char **argv)
     }
     else {
         printf("[transceiver] Got pan: %" PRIi32 "\n", p);
+    }
+}
+
+void _transceiver_sfd_count_handler(int argc, char **argv)
+{
+    if (transceiver_pid == KERNEL_PID_UNDEF) {
+        puts("Transceiver not initialized");
+        return;
+    }
+
+    unsigned long cnt = ~0;
+
+    transceiver_command_t tcmd;
+    tcmd.transceivers = _TC_TYPE;
+    tcmd.data = &cnt;
+
+    msg_t mesg;
+    mesg.content.ptr = (char*) &tcmd;
+    if (argc > 1) {
+        puts("[transceiver] Resetting SFD counter (argument ignored)");
+        mesg.type = RESET_SFD_COUNT;
+        msg_send(&mesg, transceiver_pid);
+    } else {
+        mesg.type = GET_SFD_COUNT;
+        msg_send_receive(&mesg, &mesg, transceiver_pid);
+        printf("[transceiver] Current SFD count == %lu\n", cnt);
     }
 }
 

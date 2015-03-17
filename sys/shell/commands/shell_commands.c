@@ -92,6 +92,9 @@ extern void _x86_lspci(int argc, char **argv);
 #define _TC_LONG_ADDR
 #define _TC_PAN
 #endif
+#if (defined(MODULE_AT86RF231))
+#define _TC_SFDCNT
+#endif
 #else /* WITHOUT MODULE_TRANSCEIVER */
 #ifdef MODULE_CC110X_LEGACY_CSMA
 extern void _cc110x_get_set_address_handler(int argc, char **argv);
@@ -117,6 +120,9 @@ extern void _transceiver_monitor_handler(int argc, char **argv);
 #endif
 #ifdef _TC_PAN
 extern void _transceiver_get_set_pan_handler(int argc, char **argv);
+#endif
+#ifdef _TC_SFDCNT
+extern void _transceiver_sfd_count_handler(int argc, char **argv);
 #endif
 #ifdef _TC_IGN
 extern void _transceiver_set_ignore_handler(int argc, char **argv);
@@ -214,6 +220,9 @@ const shell_command_t _shell_command_list[] = {
 #endif
 #ifdef _TC_MON
     {"monitor", "Enables or disables address checking for the transceiver", _transceiver_monitor_handler},
+#endif
+#ifdef _TC_SFDCNT
+    {"sfdcnt", "Gets or resets (argument ignored) SFD counter", _transceiver_sfd_count_handler},
 #endif
 #ifdef _TC_IGN
     {"ign", "Ignore the address at the transceiver", _transceiver_set_ignore_handler},
