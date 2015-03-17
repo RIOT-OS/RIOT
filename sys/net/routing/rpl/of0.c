@@ -75,10 +75,16 @@ uint16_t calc_rank(rpl_parent_t *parent, uint16_t base_rank)
     return base_rank + add;
 }
 
-/* We simply return the Parent with lower rank */
+/* We simply return the parent with lower rank.
+ * If their ranks are equal, p1 is returned.
+ *
+ * If a new parent is compared to a current preferred parent,
+ * it is reasonable to pass the current preferred parent
+ * as p1 and the new parent as p2.
+ */
 rpl_parent_t *which_parent(rpl_parent_t *p1, rpl_parent_t *p2)
 {
-    if (p1->rank < p2->rank) {
+    if (p1->rank <= p2->rank) {
         return p1;
     }
 
@@ -88,6 +94,9 @@ rpl_parent_t *which_parent(rpl_parent_t *p1, rpl_parent_t *p2)
 /* Not used yet, as the implementation only makes use of one dodag for now. */
 rpl_dodag_t *which_dodag(rpl_dodag_t *d1, rpl_dodag_t *d2)
 {
-    (void) d2;
-    return d1;
+    if (d1->my_rank <= d2->my_rank) {
+        return d1;
+    }
+
+    return d2;
 }
