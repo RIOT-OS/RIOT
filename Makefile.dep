@@ -73,6 +73,14 @@ ifneq (,$(filter xbee,$(USEMODULE)))
   USEMODULE += ng_ieee802154
 endif
 
+ifneq (,$(filter ng_zep,$(USEMODULE)))
+  USEMODULE += hashes
+  USEMODULE += ng_ieee802154
+  USEMODULE += ng_udp
+  USEMODULE += random
+  USEMODULE += vtimer
+endif
+
 ifneq (,$(filter ng_ieee802154,$(USEMODULE)))
   ifneq (,$(filter ng_ipv6, $(USEMODULE)))
     USEMODULE += ng_sixlowpan
