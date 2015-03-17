@@ -23,11 +23,10 @@
 
 #include "clist.h"
 #include "mutex.h"
+#include "utlist.h"
+#include "net/ng_pktbuf.h"
 #include "net/ng_nettype.h"
 #include "net/ng_pkt.h"
-#include "utlist.h"
-
-#include "net/ng_pktbuf.h"
 
 #include "_pktbuf_internal.h"
 

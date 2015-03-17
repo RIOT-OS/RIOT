@@ -16,9 +16,9 @@
 #include <string.h>
 
 #include "clist.h"
+#include "utlist.h"
 #include "net/ng_netreg.h"
 #include "net/ng_nettype.h"
-#include "utlist.h"
 
 #define _INVALID_TYPE(type) (((type) <= NG_NETTYPE_UNDEF) || ((type) >= NG_NETTYPE_NUMOF))
 
