@@ -56,11 +56,7 @@ ifneq (,$(filter lsm303dlhc,$(USEMODULE)))
 	SRC += sc_lsm303dlhc.c
 endif
 ifneq (,$(filter ng_netif,$(USEMODULE)))
-	ifneq (,$(filter ng_netapi,$(USEMODULE)))
-		ifneq (,$(filter ng_pktbuf,$(USEMODULE)))
-			SRC += sc_netif.c
-		endif
-	endif
+    SRC += sc_netif.c
 endif
 
 # TODO
