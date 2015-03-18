@@ -1,4 +1,5 @@
 FEATURES_PROVIDED += periph_cpuid
+FEATURES_PROVIDED += periph_gpio
 FEATURES_PROVIDED += periph_spi
 FEATURES_PROVIDED += periph_uart
 FEATURES_PROVIDED += cpp
