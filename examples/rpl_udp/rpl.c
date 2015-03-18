@@ -96,42 +96,46 @@ void rpl_udp_init(int argc, char **argv)
 
         printf("Channel set to %" PRIi32 "\n", chan);
 
+        /* global address */
+        ipv6_addr_t global_addr, global_prefix;
+        ipv6_addr_init(&global_prefix, 0xabcd, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0);
+        ipv6_addr_set_by_eui64(&global_addr, 0, &global_prefix);
+
         if (command != 'h') {
             DEBUGF("Initializing RPL for interface 0\n");
-            uint8_t state = rpl_init(0);
+
+            uint8_t state;
+            if (command == 'n') {
+                /*
+                 * no global address specified, we'll use auto address config
+                 * initiated by the root node
+                 */
+                state = rpl_init(0, NULL);
+            }
+            else if (command == 'r') {
+                rpl_options_t rpl_opts = {
+                    .instance_id = 0,
+                    .prefix = global_prefix,
+                    .prefix_len = 64,
+                    .prefix_flags = RPL_PREFIX_INFO_AUTO_ADDR_CONF,
+                    /* autonomous address-configuration */
+                };
+
+                /* use specific global address */
+                state = rpl_init(0, &global_addr);
+                rpl_init_root(&rpl_opts);
+                is_root = 1;
+            }
 
             if (state != SIXLOWERROR_SUCCESS) {
-                printf("Error initializing RPL\n");
+                puts("Error initializing RPL");
             }
             else {
                 puts("6LoWPAN and RPL initialized.");
             }
 
-            if (command == 'r') {
-                /* add global address */
-                ipv6_addr_t tmp;
-                /* initialize prefix */
-                ipv6_addr_init(&tmp, 0xabcd, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0);
+            ipv6_iface_set_routing_provider(rpl_get_next_hop);
 
-                rpl_options_t rpl_opts = {
-                    .instance_id = 0,
-                    .prefix = tmp,
-                    .prefix_len = 64,
-                    .prefix_flags = RPL_PREFIX_INFO_AUTO_ADDR_CONF, /* autonomous address-configuration */
-                };
-
-                tmp.uint16[7] = HTONS(id);
-                /* set host suffix */
-                ipv6_addr_set_by_eui64(&tmp, 0, &tmp);
-                ipv6_net_if_add_addr(0, &tmp, NDP_ADDR_STATE_PREFERRED, 0, 0, 0);
-
-                rpl_init_root(&rpl_opts);
-                ipv6_iface_set_routing_provider(rpl_get_next_hop);
-                is_root = 1;
-            }
-            else {
-                ipv6_iface_set_routing_provider(rpl_get_next_hop);
-            }
         }
         else {
             puts("6LoWPAN initialized.");

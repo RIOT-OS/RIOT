@@ -73,7 +73,7 @@ ipv6_addr_t my_address;
 /* IPv6 message buffer */
 static ipv6_hdr_t *ipv6_buf;
 
-uint8_t rpl_init(int if_id)
+uint8_t rpl_init(int if_id, ipv6_addr_t *address)
 {
     rpl_if_id = if_id;
     rpl_instances_init();
@@ -89,11 +89,12 @@ uint8_t rpl_init(int if_id)
                                     rpl_process, NULL, "rpl_process");
 
     sixlowpan_lowpan_init_interface(if_id);
-    /* need link local prefix to query _our_ corresponding address  */
-    ipv6_addr_t ll_address;
-    ipv6_addr_set_link_local_prefix(&ll_address);
-    ipv6_net_if_get_best_src_addr(&my_address, &ll_address);
     ipv6_register_rpl_handler(rpl_process_pid);
+
+    if (address) {
+        my_address = *address;
+        ipv6_net_if_add_addr(if_id, &my_address, NDP_ADDR_STATE_PREFERRED, 0, 0, 0);
+    }
 
     /* add all-RPL-nodes address */
     ipv6_addr_t all_rpl_nodes;
