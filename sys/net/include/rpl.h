@@ -92,14 +92,15 @@ uint8_t rpl_init(int if_id, ipv6_addr_t *address);
 void rpl_init_root(rpl_options_t *rpl_opts);
 
 /**
- * @brief Sends a DIO-message to a given destination
+ * @brief Sends a DIO-message to a given destination in a given dodag
  *
- * This function sends a DIO message to a given destination.
+ * This function sends a DIO message to a given destination in a given dodag.
  *
+ * @param[in] dodag             Dodag of the DIO-message.
  * @param[in] destination       IPv6-address of the destination of the DIO. Should be a direct neighbor.
  *
  */
-void rpl_send_DIO(ipv6_addr_t *destination);
+void rpl_send_DIO(rpl_dodag_t *dodag, ipv6_addr_t *destination);
 
 /**
  * @brief Sends a DAO-message to a given destination
