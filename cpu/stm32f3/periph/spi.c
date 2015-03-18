@@ -134,7 +134,9 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
     spi_conf_pins(dev);
 
     /**************** SPI-Init *****************/
+#ifdef CPU_MODEL_STM32F303VC
     spi[dev]->I2SCFGR &= ~(SPI_I2SCFGR_I2SMOD);/* Activate the SPI mode (Reset I2SMOD bit in I2SCFGR register) */
+#endif
     spi[dev]->CR1 = 0;
     spi[dev]->CR2 = 0;
     /* the NSS (chip select) is managed purely by software */
@@ -194,7 +196,9 @@ int spi_init_slave(spi_t dev, spi_conf_t conf, char(*cb)(char data))
     spi_conf_pins(dev);
 
     /***************** SPI-Init *****************/
+#ifdef CPU_MODEL_STM32F303VC
     spi[dev]->I2SCFGR &= ~(SPI_I2SCFGR_I2SMOD);
+#endif
     spi[dev]->CR1 = 0;
     spi[dev]->CR2 = 0;
     /* enable RXNEIE flag to enable rx buffer not empty interrupt */
