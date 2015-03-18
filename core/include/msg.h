@@ -187,7 +187,7 @@ int msg_try_receive(msg_t *m);
  * @param[in] m             Pointer to preallocated ``msg_t`` structure with
  *                          the message to send, must not be NULL.
  * @param[out] reply        Pointer to preallocated msg. Reply will be written
- *                          here, must not be NULL.
+ *                          here, must not be NULL. Can be identical to @p m.
  * @param[in] target_pid    The PID of the target process
  *
  * @return  1, if successful.
