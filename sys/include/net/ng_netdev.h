@@ -82,6 +82,8 @@ typedef struct {
      * @return              number of bytes that were actually send out
      * @return              -ENODEV if @p dev is invalid
      * @return              -ENOMSG if pkt is invalid
+     * @return              -EOVERFLOW if the payload size of @p pkt exceeds the
+     *                      payload size that can be handled by the device
      */
     int (*send_data)(ng_netdev_t *dev, ng_pktsnip_t *pkt);
 
