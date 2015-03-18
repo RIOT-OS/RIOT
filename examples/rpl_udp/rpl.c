@@ -104,7 +104,7 @@ void rpl_udp_init(int argc, char **argv)
         if (command != 'h') {
             DEBUGF("Initializing RPL for interface 0\n");
 
-            uint8_t state;
+            uint8_t state = SIXLOWERROR_VALUE;
             if (command == 'n') {
                 /*
                  * no global address specified, we'll use auto address config
