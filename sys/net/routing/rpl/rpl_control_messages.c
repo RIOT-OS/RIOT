@@ -208,7 +208,7 @@ void rpl_init_root(rpl_options_t *rpl_opts)
 
     inst->joined = 1;
 
-    dodag = rpl_new_dodag(inst->id, &my_address);
+    dodag = rpl_new_dodag(inst, &my_address);
 
     if (dodag != NULL) {
         dodag->of = (struct rpl_of_t *) rpl_get_of_for_ocp(RPL_DEFAULT_OCP);
