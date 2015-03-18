@@ -11,6 +11,12 @@
  * @defgroup    sys_chardevthread Chardev Thread
  * @ingroup     sys
  * @brief       Chardev thread
+ * @{
+ *
+ * @file
+ * @brief       Handles I/O from a char devices
+ *
+ * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
 #ifndef __CHARDEV_THREAD_H
@@ -30,3 +36,4 @@ void *chardev_thread_entry(void *rb_);
 #endif
 
 #endif /* __CHARDEV_THREAD_H */
+/** @} */
