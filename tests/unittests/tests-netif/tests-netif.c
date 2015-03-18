@@ -118,6 +118,32 @@ static void test_ng_netif_get__empty(void)
     TEST_ASSERT_EQUAL_INT(0, size);
 }
 
+/* takes one out of the middle of the netif list and checks if all interfaces
+ * are gotten regardless */
+static void test_ng_netif_get__success_3_minus_one(void)
+{
+    size_t size = TEST_UINT8;
+    kernel_pid_t *ifs;
+    int count = 0;
+
+    for (int i = 0; i < 3; i++) {
+        TEST_ASSERT_EQUAL_INT(0, ng_netif_add(TEST_UINT8 + i));
+    }
+
+    ng_netif_remove(TEST_UINT8 + 1);
+
+    ifs = ng_netif_get(&size);
+    TEST_ASSERT_EQUAL_INT(2, size);
+
+    for (size_t i = 0; i < size; i++) {
+        if ((ifs[i] == TEST_UINT8) || ifs[i] == (TEST_UINT8 + 2)) {
+            count++;
+        }
+    }
+
+    TEST_ASSERT_EQUAL_INT(size, count);
+}
+
 static void test_ng_netif_get__full(void)
 {
     size_t size = TEST_UINT8;
@@ -126,7 +152,7 @@ static void test_ng_netif_get__full(void)
         TEST_ASSERT_EQUAL_INT(0, ng_netif_add(TEST_UINT8 + i));
     }
 
-    ng_netif_get(&size);
+    TEST_ASSERT_NOT_NULL(ng_netif_get(&size));
     TEST_ASSERT_EQUAL_INT(NG_NETIF_NUMOF, size);
 }
 
@@ -141,6 +167,7 @@ Test *tests_netif_tests(void)
         new_TestFixture(test_ng_netif_remove__not_an_if),
         new_TestFixture(test_ng_netif_remove__success),
         new_TestFixture(test_ng_netif_get__empty),
+        new_TestFixture(test_ng_netif_get__success_3_minus_one),
         new_TestFixture(test_ng_netif_get__full),
     };
 

@@ -92,6 +92,56 @@ extern "C" {
 /** @} */
 
 /**
+ * @name ADC configuration
+ * @{
+ */
+#define ADC_NUMOF           (1U)
+#define ADC_0_EN            1
+#define ADC_MAX_CHANNELS    2
+
+/* ADC 0 configuration */
+#define ADC_0_DEV           ADC1
+#define ADC_0_CHANNELS      2
+#define ADC_0_CLKEN()       (RCC->APB2ENR |= RCC_APB2ENR_ADC1EN)
+#define ADC_0_CLKDIS()      (RCC->APB2ENR &= ~(RCC_APB2ENR_ADC1EN))
+#define ADC_0_PORT          GPIOB
+#define ADC_0_PORT_CLKEN()  (RCC->AHB1ENR |= RCC_AHB1ENR_GPIOBEN)
+/* ADC 0 channel 0 pin config */
+#define ADC_0_CH0           8
+#define ADC_0_CH0_PIN       0
+/* ADC 0 channel 1 pin config */
+#define ADC_0_CH1           9
+#define ADC_0_CH1_PIN       1
+/** @} */
+
+/**
+ * @name DAC configuration
+ * @{
+ */
+#define DAC_NUMOF          (1U)
+#define DAC_0_EN           1
+#define DAC_MAX_CHANNELS   2
+
+/* DAC 0 configuration */
+#define DAC_0_DEV            DAC
+#define DAC_0_CHANNELS       2
+#define DAC_0_CLKEN()        (RCC->APB1ENR |=  (RCC_APB1ENR_DACEN))
+#define DAC_0_CLKDIS()       (RCC->APB1ENR &= ~(RCC_APB1ENR_DACEN))
+#define DAC_0_PORT           GPIOA
+#define DAC_0_PORT_CLKEN()   (RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN)
+/* DAC 0 channel config */
+#define DAC_0_CH0_PIN        4
+#define DAC_0_CH1_PIN        5
+/** @} */
+
+/**
+ * @name Random Number Generator configuration
+ * @{
+ */
+#define RANDOM_NUMOF        (1U)
+/** @} */
+
+/**
  * @name UART configuration
  * @{
  */

@@ -48,6 +48,16 @@ ifneq (,$(filter sixlowpan,$(USEMODULE)))
 	USEMODULE += vtimer
 endif
 
+ifneq (,$(filter ng_ipv6_nc,$(USEMODULE)))
+    USEMODULE += ng_ipv6_addr
+endif
+
+ifneq (,$(filter ng_netif,$(USEMODULE)))
+    USEMODULE += ng_netapi
+    USEMODULE += ng_netreg
+    USEMODULE += ng_pktbuf
+endif
+
 ifneq (,$(filter aodvv2,$(USEMODULE)))
         USEMODULE += vtimer
         USEMODULE += sixlowpan

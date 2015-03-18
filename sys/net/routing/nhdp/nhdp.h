@@ -92,8 +92,8 @@ typedef struct nhdp_if_entry_t {
     vtimer_t if_timer;                          /**< Vtimer used for the periodic signaling */
     timex_t hello_interval;                     /**< Interval time for periodic HELLOs */
     timex_t validity_time;                      /**< Validity time for propagated information */
-    struct rfc5444_writer_target *wr_target;    /**< Interface specific writer target */
-    struct nhdp_if_entry_t *next;               /**< Pointer to next list entry */
+    uint16_t seq_no;                            /**< Sequence number of last send RFC5444 packet */
+    struct rfc5444_writer_target wr_target;     /**< Interface specific writer target */
 } nhdp_if_entry_t;
 
 /**

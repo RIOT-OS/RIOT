@@ -65,6 +65,9 @@ endif
 ifneq (,$(filter ng_ipv6_addr,$(USEMODULE)))
     DIRS += net/network_layer/ng_ipv6/addr
 endif
+ifneq (,$(filter ng_ipv6_nc,$(USEMODULE)))
+    DIRS += net/network_layer/ng_ipv6/nc
+endif
 ifneq (,$(filter ng_netapi,$(USEMODULE)))
     DIRS += net/crosslayer/ng_netapi
 endif
@@ -73,6 +76,9 @@ ifneq (,$(filter ng_netif,$(USEMODULE)))
 endif
 ifneq (,$(filter ng_netreg,$(USEMODULE)))
     DIRS += net/crosslayer/ng_netreg
+endif
+ifneq (,$(filter ng_nomac,$(USEMODULE)))
+    DIRS += net/link_layer/ng_nomac
 endif
 ifneq (,$(filter ng_pktbuf,$(USEMODULE)))
     DIRS += net/crosslayer/ng_pktbuf
@@ -85,6 +91,9 @@ ifneq (,$(filter trickle,$(USEMODULE)))
 endif
 ifneq (,$(filter nhdp,$(USEMODULE)))
     DIRS += net/routing/nhdp
+endif
+ifneq (,$(filter ng_nomac,$(USEMODULE)))
+    DIRS += net/link_layer/ng_nomac
 endif
 
 DIRS += $(dir $(wildcard $(addsuffix /Makefile, ${USEMODULE})))

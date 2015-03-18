@@ -216,9 +216,11 @@ ifneq (, $(filter info-boards-supported info-boards-features-missing info-build,
   define board_missing_features
     FEATURES_PROVIDED := $(FEATURES_PROVIDED_BAK)
     -include $${RIOTBOARD}/${1}/Makefile.features
-    ifneq ($(BUILDTEST_MCU_GROUP), $$(FEATURES_MCU_GROUP))
-      BOARDS_FEATURES_MISSING += "${1} $${BUILDTEST_MCU_GROUP}"
-      BOARDS_WITH_MISSING_FEATURES += ${1}
+    ifdef BUILDTEST_MCU_GROUP
+       ifneq ($(BUILDTEST_MCU_GROUP), $$(FEATURES_MCU_GROUP))
+          BOARDS_FEATURES_MISSING += "${1} $${BUILDTEST_MCU_GROUP}"
+          BOARDS_WITH_MISSING_FEATURES += ${1}
+       endif
     endif
 
     FEATURES_MISSING := $$(filter-out $$(FEATURES_PROVIDED), $$(FEATURES_REQUIRED))

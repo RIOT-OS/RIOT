@@ -60,7 +60,7 @@ typedef struct msg {
 
 
 /**
- * @brief Send a message. (blocking)
+ * @brief Send a message (blocking).
  *
  * This function sends a message to another thread. The ``msg_t`` structure has
  * to be allocated (e.g. on the stack) before calling the function and can be
@@ -81,7 +81,7 @@ int msg_send(msg_t *m, kernel_pid_t target_pid);
 
 
 /**
- * @brief Send a message. (non-blocking)
+ * @brief Send a message (non-blocking).
  *
  * This function sends a message to another thread. The ``msg_t`` structure has
  * to be allocated (e.g. on the stack) before calling the function and can be

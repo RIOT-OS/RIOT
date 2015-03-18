@@ -91,12 +91,12 @@ int ng_netapi_send(kernel_pid_t pid, ng_pktsnip_t *pkt);
  * @param[in] opt       option to get
  * @param[in] context   (optional) context to the given option
  * @param[in] data      pointer to buffer for reading the option's value
- * @param[in] data_len  size of the given buffer
+ * @param[in] max_len   maximum number of bytes that fit into @p data
  *
  * @return              value returned by the @ref NG_NETAPI_MSG_TYPE_ACK message
  */
 int ng_netapi_get(kernel_pid_t pid, ng_netconf_opt_t opt, uint16_t context,
-                  void *data, size_t data_len);
+                  void *data, size_t max_len);
 
 /**
  * @brief   Shortcut function for sending @ref NG_NETAPI_MSG_TYPE_SET messages and

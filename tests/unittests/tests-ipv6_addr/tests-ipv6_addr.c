@@ -623,6 +623,205 @@ static void test_ipv6_addr_set_solicited_nodes(void)
     TEST_ASSERT_EQUAL_INT(0xff0d0e0f, byteorder_ntohl(a.u32[3]));
 }
 
+static void test_ipv6_addr_to_str__string_too_short(void)
+{
+    ng_ipv6_addr_t a = { {
+            0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
+            0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
+        }
+    };
+    char result[1];
+
+    TEST_ASSERT_NULL(ng_ipv6_addr_to_str(result, &a, sizeof(result)));
+}
+
+static void test_ipv6_addr_to_str__addr_NULL(void)
+{
+    char result[NG_IPV6_ADDR_MAX_STR_LEN];
+
+    TEST_ASSERT_NULL(ng_ipv6_addr_to_str(result, NULL, sizeof(result)));
+}
+
+static void test_ipv6_addr_to_str__result_NULL(void)
+{
+    ng_ipv6_addr_t a;
+
+    TEST_ASSERT_NULL(ng_ipv6_addr_to_str(NULL, &a, NG_IPV6_ADDR_MAX_STR_LEN));
+}
+
+static void test_ipv6_addr_to_str__success(void)
+{
+    ng_ipv6_addr_t a = { {
+            0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
+            0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
+        }
+    };
+    char result[NG_IPV6_ADDR_MAX_STR_LEN];
+
+    TEST_ASSERT_EQUAL_STRING("1:203:405:607:809:a0b:c0d:e0f",
+                             ng_ipv6_addr_to_str(result, &a, sizeof(result)));
+}
+
+static void test_ipv6_addr_to_str__success2(void)
+{
+    ng_ipv6_addr_t a = { {
+            0xfe, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0xf8, 0xf9, 0xfa, 0xfb, 0xfc, 0xfd, 0xfe, 0xff
+        }
+    };
+    char result[NG_IPV6_ADDR_MAX_STR_LEN];
+
+    TEST_ASSERT_EQUAL_STRING("fe80::f8f9:fafb:fcfd:feff",
+                             ng_ipv6_addr_to_str(result, &a, sizeof(result)));
+}
+
+static void test_ipv6_addr_to_str__success3(void)
+{
+    ng_ipv6_addr_t a = NG_IPV6_ADDR_UNSPECIFIED;
+    char result[sizeof("::")];
+
+    TEST_ASSERT_EQUAL_STRING("::", ng_ipv6_addr_to_str(result, &a, sizeof(result)));
+}
+
+static void test_ipv6_addr_to_str__success4(void)
+{
+    ng_ipv6_addr_t a = NG_IPV6_ADDR_LOOPBACK;
+    char result[sizeof("::1")];
+
+    TEST_ASSERT_EQUAL_STRING("::1", ng_ipv6_addr_to_str(result, &a, sizeof(result)));
+}
+
+static void test_ipv6_addr_to_str__success5(void)
+{
+    ng_ipv6_addr_t a = { {
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0xff, 0xff, 192, 168, 0, 1
+        }
+    };
+    char result[NG_IPV6_ADDR_MAX_STR_LEN];
+
+    TEST_ASSERT_EQUAL_STRING("::ffff:192.168.0.1",
+                             ng_ipv6_addr_to_str(result, &a, sizeof(result)));
+}
+
+static void test_ipv6_addr_from_str__one_colon_start(void)
+{
+    ng_ipv6_addr_t result;
+
+    TEST_ASSERT_NULL(ng_ipv6_addr_from_str(&result, ":ff::1"));
+}
+
+static void test_ipv6_addr_from_str__three_colons(void)
+{
+    ng_ipv6_addr_t result;
+
+    TEST_ASSERT_NULL(ng_ipv6_addr_from_str(&result, "ff02:::1"));
+}
+
+static void test_ipv6_addr_from_str__string_too_long(void)
+{
+    ng_ipv6_addr_t result;
+
+    TEST_ASSERT_NULL(ng_ipv6_addr_from_str(&result, "ffff:ffff:ffff:ffff:"
+                                           "ffff:ffff:ffff:ffff:ffff"));
+}
+
+static void test_ipv6_addr_from_str__illegal_chars(void)
+{
+    ng_ipv6_addr_t result;
+
+    TEST_ASSERT_NULL(ng_ipv6_addr_from_str(&result, ":-)"));
+}
+
+static void test_ipv6_addr_from_str__illegal_encapsulated_ipv4(void)
+{
+    ng_ipv6_addr_t result;
+
+    TEST_ASSERT_NULL(ng_ipv6_addr_from_str(&result, "192.168.0.1"));
+}
+
+static void test_ipv6_addr_from_str__addr_NULL(void)
+{
+    ng_ipv6_addr_t result;
+
+    TEST_ASSERT_NULL(ng_ipv6_addr_from_str(&result, NULL));
+}
+
+static void test_ipv6_addr_from_str__result_NULL(void)
+{
+    TEST_ASSERT_NULL(ng_ipv6_addr_from_str(NULL, "::"));
+}
+
+static void test_ipv6_addr_from_str__success(void)
+{
+    ng_ipv6_addr_t a = { {
+            0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
+            0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
+        }
+    };
+    ng_ipv6_addr_t result;
+
+    TEST_ASSERT_NOT_NULL(ng_ipv6_addr_from_str(&result, "1:203:405:607:809:a0b:c0d:e0f"));
+    TEST_ASSERT(ng_ipv6_addr_equal(&a, &result));
+}
+
+static void test_ipv6_addr_from_str__success2(void)
+{
+    ng_ipv6_addr_t a = { {
+            0xfe, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0xf8, 0xf9, 0xfa, 0xfb, 0xfc, 0xfd, 0xfe, 0xff
+        }
+    };
+    ng_ipv6_addr_t result;
+
+    TEST_ASSERT_NOT_NULL(ng_ipv6_addr_from_str(&result, "fe80::f8f9:fafb:fcfd:feff"));
+    TEST_ASSERT(ng_ipv6_addr_equal(&a, &result));
+}
+
+static void test_ipv6_addr_from_str__success3(void)
+{
+    ng_ipv6_addr_t a = { {
+            0xfe, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0xf8, 0xf9, 0xfa, 0xfb, 0xfc, 0xfd, 0xfe, 0xff
+        }
+    };
+    ng_ipv6_addr_t result;
+
+    TEST_ASSERT_NOT_NULL(ng_ipv6_addr_from_str(&result, "FE80::F8F9:FAFB:FCFD:FEFF"));
+    TEST_ASSERT(ng_ipv6_addr_equal(&a, &result));
+}
+
+static void test_ipv6_addr_from_str__success4(void)
+{
+    ng_ipv6_addr_t a = NG_IPV6_ADDR_UNSPECIFIED;
+    ng_ipv6_addr_t result;
+
+    TEST_ASSERT_NOT_NULL(ng_ipv6_addr_from_str(&result, "::"));
+    TEST_ASSERT(ng_ipv6_addr_equal(&a, &result));
+}
+
+static void test_ipv6_addr_from_str__success5(void)
+{
+    ng_ipv6_addr_t a = NG_IPV6_ADDR_LOOPBACK;
+    ng_ipv6_addr_t result;
+
+    TEST_ASSERT_NOT_NULL(ng_ipv6_addr_from_str(&result, "::1"));
+    TEST_ASSERT(ng_ipv6_addr_equal(&a, &result));
+}
+
+static void test_ipv6_addr_from_str__success6(void)
+{
+    ng_ipv6_addr_t a = { {
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0xff, 0xff, 192, 168, 0, 1
+        }
+    };
+    ng_ipv6_addr_t result;
+
+    TEST_ASSERT_NOT_NULL(ng_ipv6_addr_from_str(&result, "::ffff:192.168.0.1"));
+    TEST_ASSERT(ng_ipv6_addr_equal(&a, &result));
+}
+
 Test *tests_ipv6_addr_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -673,6 +872,27 @@ Test *tests_ipv6_addr_tests(void)
         new_TestFixture(test_ipv6_addr_set_all_routers_multicast_site_local),
         new_TestFixture(test_ipv6_addr_set_all_routers_multicast_unusual),
         new_TestFixture(test_ipv6_addr_set_solicited_nodes),
+        new_TestFixture(test_ipv6_addr_to_str__string_too_short),
+        new_TestFixture(test_ipv6_addr_to_str__addr_NULL),
+        new_TestFixture(test_ipv6_addr_to_str__result_NULL),
+        new_TestFixture(test_ipv6_addr_to_str__success),
+        new_TestFixture(test_ipv6_addr_to_str__success2),
+        new_TestFixture(test_ipv6_addr_to_str__success3),
+        new_TestFixture(test_ipv6_addr_to_str__success4),
+        new_TestFixture(test_ipv6_addr_to_str__success5),
+        new_TestFixture(test_ipv6_addr_from_str__one_colon_start),
+        new_TestFixture(test_ipv6_addr_from_str__three_colons),
+        new_TestFixture(test_ipv6_addr_from_str__string_too_long),
+        new_TestFixture(test_ipv6_addr_from_str__illegal_chars),
+        new_TestFixture(test_ipv6_addr_from_str__illegal_encapsulated_ipv4),
+        new_TestFixture(test_ipv6_addr_from_str__addr_NULL),
+        new_TestFixture(test_ipv6_addr_from_str__result_NULL),
+        new_TestFixture(test_ipv6_addr_from_str__success),
+        new_TestFixture(test_ipv6_addr_from_str__success2),
+        new_TestFixture(test_ipv6_addr_from_str__success3),
+        new_TestFixture(test_ipv6_addr_from_str__success4),
+        new_TestFixture(test_ipv6_addr_from_str__success5),
+        new_TestFixture(test_ipv6_addr_from_str__success6),
     };
 
     EMB_UNIT_TESTCALLER(ipv6_addr_tests, NULL, NULL, fixtures);

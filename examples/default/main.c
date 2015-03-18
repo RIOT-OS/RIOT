@@ -49,7 +49,7 @@
 
 #define SND_BUFFER_SIZE     (100)
 #define RCV_BUFFER_SIZE     (64)
-#define RADIO_STACK_SIZE    (KERNEL_CONF_STACKSIZE_DEFAULT)
+#define RADIO_STACK_SIZE    (KERNEL_CONF_STACKSIZE_MAIN)
 
 #ifdef MODULE_TRANSCEIVER
 
@@ -111,7 +111,7 @@ void *radio(void *arg)
             puts("Transceiver buffer full");
         }
         else {
-            puts("Unknown packet received");
+            puts("Unknown message received");
         }
     }
 }

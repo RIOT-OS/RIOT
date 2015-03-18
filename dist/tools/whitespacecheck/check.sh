@@ -27,7 +27,7 @@ if [ -z "${BRANCH}" ]; then
     BRANCH=$(git rev-list HEAD | tail -n 1)
 fi
 
-git diff --check $(git merge-base ${BRANCH} HEAD) > /dev/null
+git diff --check $(git merge-base ${BRANCH} HEAD)
 if [ $? -gt 0 ]
 then
     echo "ERROR: This change introduces new whitespace errors"

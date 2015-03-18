@@ -20,6 +20,7 @@
 
 #include "msg.h"
 #include "netapi.h"
+#include "net/ng_netif.h"
 #include "thread.h"
 #include "utlist.h"
 #include "mutex.h"
@@ -41,7 +42,7 @@ char nhdp_rcv_stack[NHDP_STACK_SIZE];
 static kernel_pid_t nhdp_pid = KERNEL_PID_UNDEF;
 static kernel_pid_t nhdp_rcv_pid = KERNEL_PID_UNDEF;
 static kernel_pid_t helper_pid = KERNEL_PID_UNDEF;
-static nhdp_if_entry_t *nhdp_if_entry_head = NULL;
+static nhdp_if_entry_t nhdp_if_table[NG_NETIF_NUMOF];
 static mutex_t send_rcv_mutex = MUTEX_INIT;
 static sockaddr6_t sa_bcast;
 static int sock_rcv;
@@ -62,6 +63,12 @@ void nhdp_init(void)
     if (nhdp_pid != KERNEL_PID_UNDEF) {
         /* do not initialize twice */
         return;
+    }
+
+    /* Prepare interface table */
+    for (int i = 0; i < NG_NETIF_NUMOF; i++) {
+        nhdp_if_table[i].if_pid = KERNEL_PID_UNDEF;
+        memset(&nhdp_if_table[i].wr_target, 0, sizeof(struct rfc5444_writer_target));
     }
 
     /* Initialize reader and writer */
@@ -98,7 +105,7 @@ int nhdp_register_if_default(kernel_pid_t if_pid, uint8_t *addr, size_t addr_siz
 int nhdp_register_if(kernel_pid_t if_pid, uint8_t *addr, size_t addr_size, uint8_t addr_type,
                      uint16_t max_pl_size, uint16_t hello_int_ms, uint16_t val_time_ms)
 {
-    nhdp_if_entry_t *if_entry;
+    nhdp_if_entry_t *if_entry = NULL;
     nhdp_addr_t *nhdp_addr;
     msg_t signal_msg;
 
@@ -106,45 +113,51 @@ int nhdp_register_if(kernel_pid_t if_pid, uint8_t *addr, size_t addr_size, uint8
         return -2;
     }
 
-    if_entry = (nhdp_if_entry_t *) malloc(sizeof(nhdp_if_entry_t));
-
-    if (!if_entry) {
-        /* Insufficient memory */
-        return -1;
+    for (int i = 0; i < NG_NETIF_NUMOF; i++) {
+        if (nhdp_if_table[i].if_pid == KERNEL_PID_UNDEF) {
+            if_entry = &nhdp_if_table[i];
+            break;
+        }
     }
 
-    /* Create an interface writer targer for the nhdp_writer */
-    if_entry->wr_target = (struct rfc5444_writer_target *)
-                          calloc(1, sizeof(struct rfc5444_writer_target));
-
-    if (!if_entry->wr_target) {
-        /* Insufficient memory */
-        free(if_entry);
-        return -1;
+    if (!if_entry) {
+        /* Maximum number of registerable interfaces reached */
+        return -2;
     }
 
     uint16_t payload_size = max_pl_size > NHDP_MAX_RFC5444_PACKET_SZ
                             ? NHDP_MAX_RFC5444_PACKET_SZ : max_pl_size;
-    if_entry->wr_target->packet_buffer = (uint8_t *) calloc(payload_size, sizeof(uint8_t));
+    if_entry->wr_target.packet_buffer = (uint8_t *) calloc(payload_size, sizeof(uint8_t));
 
-    if (!if_entry->wr_target->packet_buffer) {
+    if (!if_entry->wr_target.packet_buffer) {
         /* Insufficient memory */
-        free(if_entry->wr_target);
-        free(if_entry);
         return -1;
     }
 
-    if_entry->wr_target->packet_size = payload_size;
-    if_entry->wr_target->sendPacket = write_packet;
+    if_entry->wr_target.packet_size = payload_size;
+    if_entry->wr_target.sendPacket = write_packet;
 
     /* Get NHDP address entry for the given address */
     nhdp_addr = nhdp_addr_db_get_address(addr, addr_size, addr_type);
 
     if (!nhdp_addr) {
         /* Insufficient memory */
-        free(if_entry->wr_target->packet_buffer);
-        free(if_entry->wr_target);
-        free(if_entry);
+        free(if_entry->wr_target.packet_buffer);
+        return -1;
+    }
+
+    /* Add the interface to the LIB */
+    if (lib_add_if_addr(if_pid, nhdp_addr) != 0) {
+        free(if_entry->wr_target.packet_buffer);
+        nhdp_decrement_addr_usage(nhdp_addr);
+        return -1;
+    }
+
+    /* Create new IIB for the interface */
+    if (iib_register_if(if_pid) != 0) {
+        /* TODO: Cleanup lib entry */
+        free(if_entry->wr_target.packet_buffer);
+        nhdp_decrement_addr_usage(nhdp_addr);
         return -1;
     }
 
@@ -157,30 +170,12 @@ int nhdp_register_if(kernel_pid_t if_pid, uint8_t *addr, size_t addr_size, uint8
     if_entry->validity_time.microseconds = MS_IN_USEC * val_time_ms;
     timex_normalize(&if_entry->hello_interval);
     timex_normalize(&if_entry->validity_time);
-
-    /* Add the interface to the LIB */
-    if (lib_add_if_addr(if_entry->if_pid, nhdp_addr) != 0) {
-        free(if_entry->wr_target->packet_buffer);
-        free(if_entry->wr_target);
-        free(if_entry);
-        nhdp_decrement_addr_usage(nhdp_addr);
-        return -1;
-    }
-
-    /* Create new IIB for the interface */
-    if (iib_register_if(if_pid) != 0) {
-        /* TODO: Cleanup lib entry */
-        free(if_entry->wr_target->packet_buffer);
-        free(if_entry->wr_target);
-        free(if_entry);
-        nhdp_decrement_addr_usage(nhdp_addr);
-        return -1;
-    }
+    /* Reset sequence number */
+    if_entry->seq_no = 0;
 
     /* Everything went well */
     nhdp_decrement_addr_usage(nhdp_addr);
-    nhdp_writer_register_if(if_entry->wr_target);
-    LL_PREPEND(nhdp_if_entry_head, if_entry);
+    nhdp_writer_register_if(&if_entry->wr_target);
     helper_pid = if_pid;
 
     /* Start the receiving thread */

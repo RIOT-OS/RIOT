@@ -14,8 +14,10 @@
  * @brief       Shell commands for interacting with network devices
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -25,94 +27,301 @@
 #include "net/ng_netif.h"
 #include "net/ng_netapi.h"
 #include "net/ng_netconf.h"
+#include "net/ng_pkt.h"
 #include "net/ng_pktbuf.h"
 #include "net/ng_netif/hdr.h"
 
 /**
  * @brief   The maximal expected link layer address length in byte
  */
-#define MAX_ADDR_LEN            (16U)
-
+#define MAX_ADDR_LEN            (8U)
 
 /* utility functions */
-uint8_t _parse_addr(char *str, uint8_t *addr)
+static bool _is_number(char *str)
+{
+    for (; *str; str++) {
+        if (*str < '0' || *str > '9') {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+static bool _is_iface(kernel_pid_t dev)
+{
+    size_t numof;
+    kernel_pid_t *ifs = ng_netif_get(&numof);
+
+    for (size_t i = 0; i < numof; i++) {
+        if (ifs[i] == dev) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+static void _set_usage(char *cmd_name)
+{
+    printf("usage: %s <if_id> set <key> <value>\n", cmd_name);
+    puts("      Sets an hardware specific specific value\n"
+         "      <key> may be one of the following\n"
+         "       * \"addr\" - sets (short) address\n"
+         "       * \"addr_long\" - sets long address\n"
+         "       * \"addr_short\" - alias for \"addr\"\n"
+         "       * \"channel\" - sets the frequency channel\n"
+         "       * \"chan\" - alias for \"channel\""
+         "       * \"nid\" - sets the network identifier (or the PAN ID)\n"
+         "       * \"pan\" - alias for \"nid\"\n"
+         "       * \"pan_id\" - alias for \"nid\"\n"
+         "       * \"src_len\" - sets the source address length in byte\n");
+}
+
+static size_t _parse_hwaddr(char *str, uint8_t *addr)
 {
     char *tok = strtok(str, ":");
-    uint8_t res = 0;
+    size_t res = 0;
 
     while (tok != NULL) {
         if (res >= MAX_ADDR_LEN) {
             return 0;
         }
-        uint16_t tmp = (uint16_t)strtol(tok, NULL, 16);
+
+        unsigned int tmp = strtoul(tok, NULL, 16);
+
         if (tmp <= 0xff) {
             addr[res++] = (uint8_t)tmp;
         }
         else {
             return 0;
         }
+
         tok = strtok(NULL, ":");
     }
+
     return res;
 }
 
-void _print_addr(uint8_t *addr, uint8_t addr_len)
+static void _print_hwaddr(uint8_t *addr, uint8_t addr_len)
 {
     for (uint8_t i = 0; i < addr_len; i++) {
         printf("%02x", addr[i]);
+
         if (i != (addr_len - 1)) {
             printf(":");
         }
     }
 }
 
-/* shell commands */
-void _netif_list(int argc, char **argv)
+static void _print_netconf(ng_netconf_opt_t opt)
 {
-    (void)argc;
-    (void)argv;
-    kernel_pid_t *ifs;
-    size_t numof;
+    switch (opt) {
+        case NETCONF_OPT_ADDRESS:
+            printf("(short) address");
+            break;
 
-    /* read available interfaces */
-    ifs = ng_netif_get(&numof);
+        case NETCONF_OPT_ADDRESS_LONG:
+            printf("long address");
+            break;
 
-    /* print information about each interface */
-    for (size_t i = 0; i < numof; i++) {
-        /* TODO: print more information about the devices */
-        printf("%3i - \n", ifs[i]);
+        case NETCONF_OPT_SRC_LEN:
+            printf("source address length");
+            break;
+
+        case NETCONF_OPT_CHANNEL:
+            printf("channel");
+            break;
+
+        case NETCONF_OPT_NID:
+            printf("network identifier");
+            break;
+
+        default:
+            /* we don't serve these options here */
+            break;
     }
 }
 
+void _netif_list(kernel_pid_t dev)
+{
+    uint8_t hwaddr[MAX_ADDR_LEN];
+    uint16_t u16;
+    int res;
+
+    printf("Iface %2d  ", dev);
+
+    res = ng_netapi_get(dev, NETCONF_OPT_ADDRESS, 0, hwaddr, sizeof(hwaddr));
+
+    if (res >= 0) {
+        printf(" HWaddr: ");
+        _print_hwaddr(hwaddr, (uint8_t)res);
+        printf(" ");
+    }
+
+    res = ng_netapi_get(dev, NETCONF_OPT_CHANNEL, 0, &u16, sizeof(u16));
+
+    if (res >= 0) {
+        printf(" Channel: %" PRIu16 " ", u16);
+    }
+
+    res = ng_netapi_get(dev, NETCONF_OPT_NID, 0, &u16, sizeof(u16));
+
+    if (res >= 0) {
+        printf(" NID: %" PRIx16 " ", u16);
+    }
+
+    printf("\n            ");
+
+    res = ng_netapi_get(dev, NETCONF_OPT_ADDRESS_LONG, 0, hwaddr, sizeof(hwaddr));
+
+    if (res >= 0) {
+        printf("Long HWaddr: ");
+        _print_hwaddr(hwaddr, (uint8_t)res);
+        printf("\n            ");
+    }
+
+    res = ng_netapi_get(dev, NETCONF_OPT_SRC_LEN, 0, &u16, sizeof(u16));
+
+    if (res >= 0) {
+        printf("Source address length: %" PRIx16 "\n            ", u16);
+    }
+
+    /* TODO: list IPv6 info */
+
+    puts("");
+}
+
+static void _netif_set_u16(kernel_pid_t dev, ng_netconf_opt_t opt,
+                           char *u16_str)
+{
+    unsigned int res;
+    bool hex = false;
+
+    if (_is_number(u16_str)) {
+        if ((res = strtoul(u16_str, NULL, 10)) == ULONG_MAX) {
+            puts("error: unable to parse value.\n"
+                 "Must be a 16-bit unsigned integer (dec or hex)\n");
+            return;
+        }
+    }
+    else {
+        if ((res = strtoul(u16_str, NULL, 16)) == ULONG_MAX) {
+            puts("error: unable to parse value.\n"
+                 "Must be a 16-bit unsigned integer (dec or hex)\n");
+            return;
+        }
+
+        hex = true;
+    }
+
+    if (res > 0xffff) {
+        puts("error: unable to parse value.\n"
+             "Must be a 16-bit unsigned integer (dec or hex)\n");
+        return;
+    }
+
+    if (ng_netapi_set(dev, opt, 0, (uint16_t *)&res, sizeof(uint16_t)) < 0) {
+        printf("error: unable to set ");
+        _print_netconf(opt);
+        puts("");
+    }
+
+    printf("success: set ");
+    _print_netconf(opt);
+    printf(" on interface %" PRIkernel_pid " to ", dev);
+
+    if (hex) {
+        printf("0x%04x\n", res);
+    }
+    else {
+        printf("%u\n", res);
+    }
+}
+
+static void _netif_set_addr(kernel_pid_t dev, ng_netconf_opt_t opt,
+                            char *addr_str)
+{
+    uint8_t addr[MAX_ADDR_LEN];
+    size_t addr_len = _parse_hwaddr(addr_str, addr);
+
+    if (addr_len == 0) {
+        puts("error: unable to parse address.\n"
+             "Must be of format [0-9a-fA-F]{2}(:[0-9a-fA-F]{2})*\n"
+             "(hex pairs delimited by colons)");
+    }
+
+    if (ng_netapi_set(dev, opt, 0, addr, addr_len) < 0) {
+        printf("error: unable to set ");
+        _print_netconf(opt);
+        puts("");
+    }
+
+    printf("success: set ");
+    _print_netconf(opt);
+    printf(" on interface %" PRIkernel_pid " to ", dev);
+    _print_hwaddr(addr, addr_len);
+    puts("");
+}
+
+static void _netif_set(char *cmd_name, kernel_pid_t dev, char *key, char *value)
+{
+    if ((strcmp("addr", key) == 0) || (strcmp("addr_short", key) == 0)) {
+        _netif_set_addr(dev, NETCONF_OPT_ADDRESS, value);
+    }
+    else if (strcmp("addr_long", key) == 0) {
+        _netif_set_addr(dev, NETCONF_OPT_ADDRESS_LONG, value);
+    }
+    else if ((strcmp("channel", key) == 0) || (strcmp("chan", key) == 0)) {
+        _netif_set_u16(dev, NETCONF_OPT_CHANNEL, value);
+    }
+    else if ((strcmp("nid", key) == 0) || (strcmp("pan", key) == 0) ||
+             (strcmp("pan_id", key) == 0)) {
+        _netif_set_u16(dev, NETCONF_OPT_NID, value);
+    }
+    else if (strcmp("src_len", key) == 0) {
+        _netif_set_u16(dev, NETCONF_OPT_SRC_LEN, value);
+    }
+    else {
+        _set_usage(cmd_name);
+    }
+}
+
+/* shell commands */
 void _netif_send(int argc, char **argv)
 {
     kernel_pid_t dev;
     uint8_t addr[MAX_ADDR_LEN];
-    uint8_t addr_len;
+    size_t addr_len;
     ng_pktsnip_t *pkt;
     ng_netif_hdr_t *nethdr;
 
 
     if (argc < 4) {
-        printf("usage: %s IF ADDR DATA\n", argv[0]);
+        printf("usage: %s <if> <addr> <data>\n", argv[0]);
         return;
     }
+
     /* parse interface */
     dev = (kernel_pid_t)atoi(argv[1]);
-    if (thread_get(dev) == NULL) {
+
+    if (!_is_iface(dev)) {
         puts("error: invalid interface given");
         return;
     }
+
     /* parse address */
-    addr_len = _parse_addr(argv[2], addr);
+    addr_len = _parse_hwaddr(argv[2], addr);
+
     if (addr_len == 0) {
         puts("error: invalid address given");
         return;
     }
+
     /* put packet together */
     pkt = ng_pktbuf_add(NULL, argv[3], strlen(argv[3]), NG_NETTYPE_UNDEF);
     pkt = ng_pktbuf_add(pkt, NULL, sizeof(ng_netif_hdr_t) + addr_len,
-                     NG_NETTYPE_UNDEF);
+                        NG_NETTYPE_UNDEF);
     nethdr = (ng_netif_hdr_t *)pkt->data;
     ng_netif_hdr_init(nethdr, 0, addr_len);
     ng_netif_hdr_set_dst_addr(nethdr, addr, addr_len);
@@ -120,132 +329,41 @@ void _netif_send(int argc, char **argv)
     ng_netapi_send(dev, pkt);
 }
 
-void _netif_addr(int argc, char **argv)
+void _netif_config(int argc, char **argv)
 {
-    kernel_pid_t dev;
-    uint8_t addr[MAX_ADDR_LEN];
-    size_t addr_len;
-    int res;
-
     if (argc < 2) {
-        printf("usage: %s IF [ADDR]\n", argv[0]);
-        return;
-    }
-    /* parse interface */
-    dev = (kernel_pid_t)atoi(argv[1]);
-    if (thread_get(dev) == NULL) {
-        puts("error: invalid interface given");
-        return;
-    }
-    /* if address was given, parse and set it */
-    if (argc >= 3) {
-        addr_len = _parse_addr(argv[2], addr);
-        if (addr_len == 0) {
-            puts("error: unable to parse address");
+        size_t numof;
+        kernel_pid_t *ifs = ng_netif_get(&numof);
+
+        for (size_t i = 0; i < numof; i++) {
+            _netif_list(ifs[i]);
+            return;
         }
-        else {
-            res = ng_netapi_set(dev, NETCONF_OPT_ADDRESS, 0,
-                                     addr, addr_len);
-            if (res > 0) {
-                printf("success: address of interface %i set to ", dev);
-                _print_addr(addr, addr_len);
-                puts("");
+    }
+    else if (_is_number(argv[1])) {
+        kernel_pid_t dev = (kernel_pid_t)atoi(argv[1]);
+
+        if (_is_iface(dev)) {
+            if (argc < 3) {
+                _netif_list(dev);
+                return;
             }
-            else {
-                puts("error: could not set address\n");
+            else if (strcmp(argv[2], "set") == 0) {
+                if (argc < 5) {
+                    _set_usage(argv[0]);
+                    return;
+                }
+
+                _netif_set(argv[0], dev, argv[3], argv[4]);
+                return;
             }
-        }
-    }
-    /* otherwise read it */
-    else {
-        res = ng_netapi_get(dev, NETCONF_OPT_ADDRESS, 0, addr, MAX_ADDR_LEN);
-        if (res > 0) {
-            addr_len = (size_t)res;
-            printf("address of interface %i is ", dev);
-            _print_addr(addr, addr_len);
-            puts("");
-        }
-        else {
-            puts("error: unable to read address");
-        }
-    }
-}
 
-void _netif_chan(int argc, char **argv)
-{
-    kernel_pid_t dev;
-    uint16_t chan;
-    int res;
-
-    if (argc < 2) {
-        printf("usage: %s IF [CHAN]\n", argv[0]);
-        return;
-    }
-    /* parse interface */
-    dev = (kernel_pid_t)atoi(argv[1]);
-    if (thread_get(dev) == NULL) {
-        puts("error: invalid interface given");
-        return;
-    }
-    /* if channel was given, parse and set it */
-    if (argc >= 3) {
-        chan = (uint16_t)atoi(argv[2]);
-        res = ng_netapi_set(dev, NETCONF_OPT_CHANNEL, 0, &chan, 2);
-        if (res > 0) {
-            printf("success: channel of interface %i set to %u\n", dev, chan);
+            /* TODO implement add for IP addresses */
         }
         else {
-            puts("error: could not set channel\n");
-        }
-    }
-    /* otherwise read it */
-    else {
-        res = ng_netapi_get(dev, NETCONF_OPT_CHANNEL, 0, &chan, 2);
-        if (res > 0) {
-            printf("channel of interface %i is %u\n", dev, chan);
-        }
-        else {
-            puts("error: unable to read channel");
-        }
-    }
-}
-
-void _netif_pan(int argc, char **argv)
-{
-    kernel_pid_t dev;
-    uint16_t pan;
-    int res;
-
-    if (argc < 2) {
-        printf("usage: %s IF [CHAN]\n", argv[0]);
-        return;
-    }
-    /* parse interface */
-    dev = (kernel_pid_t)atoi(argv[1]);
-    if (thread_get(dev) == NULL) {
-        puts("error: invalid interface given");
-        return;
-    }
-    /* if PAN was given, parse and set it */
-    if (argc >= 3) {
-        pan = (uint16_t)atoi(argv[2]);
-        res = ng_netapi_set(dev, NETCONF_OPT_NID, 0, &pan, 2);
-        if (res > 0) {
-            printf("success: PAN of interface %i set to %u\n", dev, pan);
-        }
-        else {
-            puts("error: could not set PAN\n");
-        }
-    }
-    /* otherwise read it */
-    else {
-        res = ng_netapi_get(dev, NETCONF_OPT_NID, 0, &pan, 2);
-        if (res > 0) {
-            printf("PAN of interface %i is %u\n", dev, pan);
-        }
-        else {
-            puts("error: unable to read PAN");
+            puts("error: invalid interface given");
         }
     }
 
+    printf("usage: %s [<if_id> set <key> <value>]]\n", argv[0]);
 }

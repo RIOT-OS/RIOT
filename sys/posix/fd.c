@@ -43,8 +43,13 @@ int fd_init(void)
 #ifdef MODULE_UART0
     posix_open(uart0_handler_pid, 0);
     fd_t fd = {
+<<<<<<< HEAD
         .__active = 1,
-        .fd_internal = (int)uart0_handler_pid,
+        .fd = (int)uart0_handler_pid,
+=======
+        .internal_active = 1,
+        .internal_fd = (int)uart0_handler_pid,
+>>>>>>> upstream/master
         .read = (ssize_t ( *)(int, void *, size_t))posix_read,
         .write = (ssize_t ( *)(int, const void *, size_t))posix_write,
         .close = posix_close
@@ -61,7 +66,7 @@ static int fd_get_next_free(void)
     for (int i = 0; i < FD_MAX; i++) {
         fd_t *cur = &fd_table[i];
 
-        if (!cur->__active) {
+        if (!cur->internal_active) {
             return i;
         }
     }
@@ -77,8 +82,13 @@ int fd_new(int internal_fd, ssize_t (*internal_read)(int, void *, size_t),
 
     if (fd >= 0) {
         fd_t *fd_s = fd_get(fd);
+<<<<<<< HEAD
         fd_s->__active = 1;
-        fd_s->fd_internal = internal_fd;
+        fd_s->fd = internal_fd;
+=======
+        fd_s->internal_active = 1;
+        fd_s->internal_fd = internal_fd;
+>>>>>>> upstream/master
         fd_s->read = internal_read;
         fd_s->write = internal_write;
         fd_s->close = internal_close;

@@ -150,12 +150,13 @@ extern void _mersenne_init(int argc, char **argv);
 extern void _mersenne_get(int argc, char **argv);
 #endif
 
-#if defined(MODULE_NG_NETIF) && defined(MODULE_NG_NETAPI) && defined(MODULE_NG_PKTBUF)
-void _netif_list(int argc, char **argv);
-void _netif_send(int argc, char **argv);
-void _netif_addr(int argc, char **argv);
-void _netif_chan(int argc, char **argv);
-void _netif_pan(int argc, char **argv);
+#ifdef MODULE_NG_NETIF
+#ifndef MODULE_NET_IF
+extern void _netif_config(int argc, char **argv);
+#endif
+#ifndef MODULE_TRANSCEIVER
+extern void _netif_send(int argc, char **argv);
+#endif
 #endif
 
 const shell_command_t _shell_command_list[] = {
@@ -251,12 +252,17 @@ const shell_command_t _shell_command_list[] = {
 #ifdef CPU_X86
     {"lspci", "Lists PCI devices", _x86_lspci},
 #endif
-#if defined(MODULE_NG_NETIF) && defined(MODULE_NG_NETAPI) && defined(MODULE_NG_PKTBUF)
-    {"netif_list", "list network devices", _netif_list },
-    {"netif_send", "send raw data", _netif_send },
-    {"netif_addr", "get/set link layer address", _netif_addr },
-    {"netif_chan", "get/set channel (for radio devices)", _netif_chan },
-    {"netif_pan", "get/set PAN (for some radios)", _netif_pan },
+#ifdef MODULE_NG_NETIF
+#ifndef MODULE_NET_IF
+    {
+        "ifconfig",
+        "Configures a network interface\n\nusage: %s [<if_id> set <key> <value>]]",
+        _netif_config
+    },
+#endif
+#ifndef MODULE_TRANSCEIVER
+    {"txtsnd", "send raw data", _netif_send },
+#endif
 #endif
     {NULL, NULL, NULL}
 };

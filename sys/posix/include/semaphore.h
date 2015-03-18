@@ -46,7 +46,7 @@ int sem_init(sem_t *sem, int pshared, unsigned int value);
  */
 int sem_destroy(sem_t *sem);
 
-/*
+/**
  * @brief Open a named semaphore NAME with open flags OFLAG.
  *
  * @brief WARNING: named semaphore are currently not supported
