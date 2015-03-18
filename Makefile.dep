@@ -1,3 +1,7 @@
+ifneq (,$(filter log_printfnoformat,$(USEMODULE)))
+	DISABLE_MODULE += log_printf
+endif
+
 ifneq (,$(filter libcoap,$(USEPKG)))
 	USEMODULE += pnet
 endif
