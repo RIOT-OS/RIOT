@@ -105,15 +105,16 @@ void rpl_send_DIO(rpl_dodag_t *dodag, ipv6_addr_t *destination);
 /**
  * @brief Sends a DAO-message to a given destination
  *
- * This function sends a DAO message to a given destination.
+ * This function sends a DAO message to a given destination in a given dodag.
  *
+ * @param[in] dodag             Dodag of the DAO-message.
  * @param[in] destination       IPv6-address of the destination of the DAO. Should be the preferred parent.
  * @param[in] lifetime          Lifetime of the node. Reflect the estimated time of presence in the network.
  * @param[in] default_lifetime  If true, param lifetime is ignored and lifetime is dodag default-lifetime
  * @param[in] start_index       Describes whether a DAO must be split because of too many routing entries.
  *
  */
-void rpl_send_DAO(ipv6_addr_t *destination, uint8_t lifetime, bool default_lifetime, uint8_t start_index);
+void rpl_send_DAO(rpl_dodag_t *dodag, ipv6_addr_t *destination, uint8_t lifetime, bool default_lifetime, uint8_t start_index);
 
 /**
  * @brief Sends a DIS-message to a given destination
@@ -129,12 +130,13 @@ void rpl_send_DIS(ipv6_addr_t *destination);
 /**
  * @brief Sends a DAO acknowledgment-message to a given destination
  *
- * This function sends a DAO_ACK message to a given destination.
+ * This function sends a DAO_ACK message to a given destination in a given dodag.
  *
+ * @param[in] dodag             Dodag of the DAO_ACK message.
  * @param[in] destination       IPv6-address of the destination of the DAO_ACK. Should be a direct neighbor.
  *
  */
-void rpl_send_DAO_ACK(ipv6_addr_t *destination);
+void rpl_send_DAO_ACK(rpl_dodag_t *dodag, ipv6_addr_t *destination);
 #endif
 
 /**
