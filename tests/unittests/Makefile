@@ -1,8 +1,9 @@
 APPLICATION = unittests
 include ../Makefile.tests_common
 
-BOARD_INSUFFICIENT_RAM := chronos msb-430 msb-430h redbee-econotag stm32f0discovery \
-                          telosb wsn430-v1_3b wsn430-v1_4 z1 nucleo-f334
+BOARD_INSUFFICIENT_RAM := chronos msb-430 msb-430h redbee-econotag spark-core \
+                          stm32f0discovery telosb wsn430-v1_3b wsn430-v1_4 z1 \
+                          nucleo-f334
 
 USEMODULE += embunit
 
