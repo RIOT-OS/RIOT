@@ -292,8 +292,8 @@ static int init_base(uart_t uart, uint32_t baudrate)
     u->cc2538_uart_im.IMbits.FEIM = 1; /**< UART framing error interrupt mask */
 
     /* Set FIFO interrupt levels: */
-    u->cc2538_uart_ifls.IFLSbits.RXIFLSEL = FIFO_LEVEL_1_8TH;
-    u->cc2538_uart_ifls.IFLSbits.TXIFLSEL = FIFO_LEVEL_4_8TH;
+    u->cc2538_uart_ifls.IFLSbits.RXIFLSEL = FIFO_LEVEL_4_8TH; /**< MCU default */
+    u->cc2538_uart_ifls.IFLSbits.TXIFLSEL = FIFO_LEVEL_4_8TH; /**< MCU default */
 
     u->cc2538_uart_ctl.CTLbits.RXE = 1;
     u->cc2538_uart_ctl.CTLbits.TXE = 1;
