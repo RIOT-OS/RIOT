@@ -18,12 +18,16 @@
 #include "kernel_types.h"
 #include "net/ng_netif.h"
 
-static ng_netif_handler_t if_handler[] = {
-#ifdef MODULE_NG_IPV6
-    { ipv6_if_add, ipv6_if_remove },
+#ifdef MODULE_NG_IPV6_NETIF
+#include "net/ng_ipv6/netif.h"
 #endif
-    /* #ifdef MODULE_NG_IPV4
-     *  { ipv4_if_add, ipv4_if_remove },
+
+static ng_netif_handler_t if_handler[] = {
+#ifdef MODULE_NG_IPV6_NETIF
+    { ng_ipv6_netif_add, ng_ipv6_netif_remove },
+#endif
+    /* #ifdef MODULE_NG_IPV4_NETIF
+     *  { ipv4_netif_add, ipv4_netif_remove },
      * #endif ... you get the idea
      */
     { NULL, NULL }
