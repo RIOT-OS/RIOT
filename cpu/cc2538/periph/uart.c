@@ -111,11 +111,9 @@ void UART_0_ISR(void)
 {
     uint_fast16_t mis;
 
-    /* Store the current MIS and clear all flags early, except the RTM flag.
-     * This will clear itself when we read out the entire FIFO contents */
+    /* Latch the Masked Interrupt Status and clear any active flags */
     mis = UART_0_DEV->cc2538_uart_mis.MIS;
-
-    UART_0_DEV->ICR = 0x0000FFBF;
+    UART_0_DEV->ICR = mis;
 
     while (UART_0_DEV->cc2538_uart_fr.FRbits.RXFE == 0) {
         uart_config[0].rx_cb(uart_config[0].arg, UART_0_DEV->DR);
@@ -137,11 +135,9 @@ void UART_1_ISR(void)
 {
     uint_fast16_t mis;
 
-    /* Store the current MIS and clear all flags early, except the RTM flag.
-     * This will clear itself when we read out the entire FIFO contents */
-    mis = UART_1_DEV->MIS;
-
-    UART_1_DEV->ICR = 0x0000FFBF;
+    /* Latch the Masked Interrupt Status and clear any active flags */
+    mis = UART_1_DEV->cc2538_uart_mis.MIS;
+    UART_1_DEV->ICR = mis;
 
     while (UART_1_DEV->FRbits.RXFE == 0) {
         uart_config[1].rx_cb(uart_config[1].arg, UART_1_DEV->DR);
