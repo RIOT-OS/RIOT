@@ -25,7 +25,7 @@
 extern "C" {
 #endif
 
-/** 
+/**
  * @brief [option|length|ipaddr|packetcount] with up to 15 ipaddr|packetcount pairs
  *        | option | length | ipaddr  | packetcount |
  *        | ----:  | :----: | :----:  | :----:      |
@@ -34,7 +34,7 @@ extern "C" {
 #define ETX_BUF_SIZE   (32)
 #define ETX_RCV_QUEUE_SIZE     (128)
 
-/**  
+/**
  * @brief defining the number of neighbours
  */
 #if ENABLE_DEBUG
@@ -51,9 +51,9 @@ extern "C" {
 /**
  * @{
  * @name ETX Interval parameters
- * 
+ *
  * @brief Defines the ETX_INTERVAL Given in ms, the default is 1 second
- * 
+ *
  * Should be divisible through 2 (For ETX_DEF_JIT_CORRECT)
  * and 5 (For ETX_MAX_JITTER) unless those values are adjusted too.
  */
@@ -88,7 +88,7 @@ extern "C" {
 /** @} */
 /**
  * @brief contents of ETX beaconing packet
- * 
+ *
  * The ETX beaconing packet consists of:
  *
  *      0                   1                   2
@@ -120,7 +120,7 @@ extern "C" {
 } etx_probe_t;
 /**
  * @brief etx neighbour data structure
- */ 
+ */
 typedef struct etx_neighbor_t {
     /**The address of this node
      */
