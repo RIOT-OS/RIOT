@@ -188,13 +188,16 @@ rpl_parent_t *rpl_new_parent(rpl_dodag_t *dodag, ipv6_addr_t *address, uint16_t 
     return rpl_new_parent(dodag, address, rank);
 }
 
-rpl_parent_t *rpl_find_parent(ipv6_addr_t *address)
+rpl_parent_t *rpl_find_parent(rpl_dodag_t *dodag, ipv6_addr_t *address)
 {
     rpl_parent_t *parent;
     rpl_parent_t *end;
 
     for (parent = &parents[0], end = parents + RPL_MAX_PARENTS; parent < end; parent++) {
-        if ((parent->used) && (rpl_equal_id(address, &parent->addr))) {
+        if ((parent->used) && (rpl_equal_id(address, &parent->addr)
+                    && (parent->dodag->instance->id == dodag->instance->id)
+                    && (!memcmp(&parent->dodag->dodag_id,
+                        &dodag->dodag_id, sizeof(ipv6_addr_t))))) {
             return parent;
         }
     }
