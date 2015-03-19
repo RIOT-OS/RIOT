@@ -119,6 +119,10 @@ void auto_init_net_if(void)
 #ifdef MODULE_NATIVENET
     transceivers |= TRANSCEIVER_NATIVE;
 #endif
+#ifdef MODULE_AT86RF212B
+    transceivers |= TRANSCEIVER_AT86RF212B;
+#endif
+    
     net_if_init();
 
     if (transceivers != 0) {

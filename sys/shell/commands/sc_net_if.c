@@ -433,6 +433,9 @@ void _net_if_ifconfig_create(char *transceivers_str)
         else if (strcasecmp(transceiver_str, "native") == 0) {
             transceivers |= TRANSCEIVER_NATIVE;
         }
+        else if (strcasecmp(transceiver_str, "at86rf212b") == 0) {
+            transceivers |= TRANSCEIVER_AT86RF212B;
+        }
         else {
             create_usage();
             return;
@@ -616,6 +619,10 @@ void _net_if_ifconfig_list(int if_id)
 
     if (transceivers & TRANSCEIVER_NATIVE) {
         puts("             * native");
+    }
+    
+    if (transceivers & TRANSCEIVER_AT86RF212B) {
+        puts("             * at86rf212b");
     }
 
     while (net_if_iter_addresses(if_id, &addr_ptr)) {

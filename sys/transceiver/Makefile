@@ -10,4 +10,8 @@ ifneq (,$(filter mc1322x,$(USEMODULE)))
 	INCLUDES += -I$(RIOTBASE)/sys/net/include
 endif
 
+ifneq (,$(filter at86rf212b,$(USEMODULE)))
+        INCLUDES += -I$(RIOTBASE)/sys/net/include
+endif
+
 include $(RIOTBASE)/Makefile.base

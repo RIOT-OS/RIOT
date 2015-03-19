@@ -69,6 +69,13 @@
 #include "ieee802154_frame.h"
 #define TEXT_SIZE           MACA_MAX_PAYLOAD_SIZE
 #define _TC_TYPE            TRANSCEIVER_MC1322X
+
+#elif defined( MODULE_AT86RF212B )
+#include "at86rf212b.h"
+#include "ieee802154_frame.h"
+#define TEXT_SIZE           AT86RF212B_MAX_DATA_LENGTH
+#define _TC_TYPE            TRANSCEIVER_AT86RF212B
+
 #endif
 
 /* checked for type safety */
@@ -231,7 +238,7 @@ void _transceiver_send_handler(int argc, char **argv)
         return;
     }
 
-#if MODULE_AT86RF231 || MODULE_CC2420 || MODULE_MC1322X
+#if MODULE_AT86RF231 || MODULE_CC2420 || MODULE_MC1322X || MODULE_AT86RF212B
     ieee802154_packet_t p;
     uint16_t short_addr;
 #else
@@ -246,7 +253,7 @@ void _transceiver_send_handler(int argc, char **argv)
     memset(text_msg, 0, TEXT_SIZE);
     strcpy(text_msg, argv[2]);
 
-#if MODULE_AT86RF231 || MODULE_CC2420 || MODULE_MC1322X
+#if MODULE_AT86RF231 || MODULE_CC2420 || MODULE_MC1322X || MODULE_AT86RF212B
     memset(&p, 0, sizeof(ieee802154_packet_t));
     p.frame.payload = (uint8_t*) text_msg;
     p.frame.payload_len = strlen(text_msg) + 1;
@@ -272,7 +279,7 @@ void _transceiver_send_handler(int argc, char **argv)
     mesg.type = SND_PKT;
     mesg.content.ptr = (char *) &tcmd;
 
-#if MODULE_AT86RF231 || MODULE_CC2420 || MODULE_MC1322X
+#if MODULE_AT86RF231 || MODULE_CC2420 || MODULE_MC1322X || MODULE_AT86RF212B
     printf("[transceiver] Sending packet of length %" PRIu16 " to %" PRIu16 ": %s\n", p.frame.payload_len, p.frame.dest_addr[1], (char*) p.frame.payload);
 #else
     printf("[transceiver] Sending packet of length %" PRIu16 " to %" PRIu16 ": %s\n", p.length, p.dst, (char*) p.data);
