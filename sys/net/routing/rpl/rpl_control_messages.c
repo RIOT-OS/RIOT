@@ -707,7 +707,8 @@ void rpl_recv_DIO(void)
             }
             else {
                 DEBUGF("my dodag has no preferred_parent yet - seems to be odd since I have a parent.\n");
-                rpl_global_repair(&dio_dodag, &ipv6_buf->srcaddr, byteorder_ntohs(rpl_dio_buf->rank));
+                my_dodag->version = dio_dodag.version;
+                rpl_global_repair(my_dodag, &ipv6_buf->srcaddr, byteorder_ntohs(rpl_dio_buf->rank));
             }
 
             return;
@@ -753,7 +754,7 @@ void rpl_recv_DIO(void)
 
     /* update parent rank */
     parent->rank = byteorder_ntohs(rpl_dio_buf->rank);
-    rpl_parent_update(parent);
+    rpl_parent_update(my_dodag, parent);
 
     if (my_dodag->my_preferred_parent == NULL) {
         DEBUGF("My dodag has no preferred_parent yet - seems to be odd since I have a parent...\n");

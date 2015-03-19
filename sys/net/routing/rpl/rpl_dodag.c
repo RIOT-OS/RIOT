@@ -248,10 +248,9 @@ void rpl_delete_all_parents(void)
     }
 }
 
-rpl_parent_t *rpl_find_preferred_parent(void)
+rpl_parent_t *rpl_find_preferred_parent(rpl_dodag_t *my_dodag)
 {
     rpl_parent_t *best = NULL;
-    rpl_dodag_t *my_dodag = rpl_get_my_dodag();
 
     if (my_dodag == NULL) {
         DEBUG("Not part of a dodag\n");
@@ -259,7 +258,10 @@ rpl_parent_t *rpl_find_preferred_parent(void)
     }
 
     for (uint8_t i = 0; i < RPL_MAX_PARENTS; i++) {
-        if (parents[i].used) {
+        if (parents[i].used
+                && (parents[i].dodag->instance->id == my_dodag->instance->id)
+                && (!memcmp(&parents[i].dodag->dodag_id,
+                    &my_dodag->dodag_id, sizeof(ipv6_addr_t)))) {
             if ((parents[i].rank == INFINITE_RANK) || (parents[i].lifetime <= 1)) {
                 DEBUG("Infinite rank, bad parent\n");
                 continue;
@@ -300,9 +302,8 @@ rpl_parent_t *rpl_find_preferred_parent(void)
     return best;
 }
 
-void rpl_parent_update(rpl_parent_t *parent)
+void rpl_parent_update(rpl_dodag_t *my_dodag, rpl_parent_t *parent)
 {
-    rpl_dodag_t *my_dodag = rpl_get_my_dodag();
     uint16_t old_rank;
 
     if (my_dodag == NULL) {
@@ -317,8 +318,8 @@ void rpl_parent_update(rpl_parent_t *parent)
         parent->lifetime = my_dodag->default_lifetime * my_dodag->lifetime_unit;
     }
 
-    if (rpl_find_preferred_parent() == NULL) {
-        rpl_local_repair();
+    if (rpl_find_preferred_parent(my_dodag) == NULL) {
+        rpl_local_repair(my_dodag);
     }
 
     if (rpl_calc_rank(old_rank, my_dodag->minhoprankincrease) !=
@@ -391,10 +392,9 @@ void rpl_join_dodag(rpl_dodag_t *dodag, ipv6_addr_t *parent, uint16_t parent_ran
     rpl_delay_dao(my_dodag);
 }
 
-void rpl_global_repair(rpl_dodag_t *dodag, ipv6_addr_t *p_addr, uint16_t rank)
+void rpl_global_repair(rpl_dodag_t *my_dodag, ipv6_addr_t *p_addr, uint16_t rank)
 {
     DEBUGF("[INFO] Global repair started\n");
-    rpl_dodag_t *my_dodag = rpl_get_my_dodag();
 
     if (my_dodag == NULL) {
         DEBUGF("[Error] - no global repair possible, if not part of a DODAG\n");
@@ -402,7 +402,6 @@ void rpl_global_repair(rpl_dodag_t *dodag, ipv6_addr_t *p_addr, uint16_t rank)
     }
 
     rpl_delete_all_parents();
-    my_dodag->version = dodag->version;
     my_dodag->dtsn++;
     my_dodag->my_preferred_parent = rpl_new_parent(my_dodag, p_addr, rank);
 
@@ -423,10 +422,9 @@ void rpl_global_repair(rpl_dodag_t *dodag, ipv6_addr_t *p_addr, uint16_t rank)
            my_dodag->my_rank);
 }
 
-void rpl_local_repair(void)
+void rpl_local_repair(rpl_dodag_t *my_dodag)
 {
     DEBUGF("[INFO] Local Repair started\n");
-    rpl_dodag_t *my_dodag = rpl_get_my_dodag();
 
     if (my_dodag == NULL) {
         DEBUGF("[Error] - no local repair possible, if not part of a DODAG\n");
