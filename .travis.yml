@@ -35,6 +35,7 @@ install:
     - git remote add riot https://github.com/RIOT-OS/RIOT.git
     - git fetch riot master
     - git log -1 --pretty=format:%H riot/master
+    - echo "$PATH"
     - ln -s /usr/bin/ccache /usr/local/bin/gcc
     - ln -s /usr/bin/ccache /usr/local/bin/g++
     - ln -s /usr/bin/ccache /usr/local/bin/cc
