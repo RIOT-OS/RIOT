@@ -87,10 +87,6 @@ void *timer_thread(void *arg)
             printf("WARNING: timer difference %" PRId64 "us exceeds MAXDIFF(%d)!\n", diff, MAXDIFF);
         }
 
-        if (vtimer_set_msg(&tmsg->timer, tmsg->interval, thread_getpid(), MSG_TIMER, tmsg) != 0) {
-            puts("something went wrong setting a timer");
-        }
-
         if (tmsg->count >= MAXCOUNT) {
             printf("Maximum count reached. (%d) Exiting.\n", MAXCOUNT);
             break;
