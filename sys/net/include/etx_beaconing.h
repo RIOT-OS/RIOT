@@ -38,10 +38,10 @@ extern "C" {
  * @brief defining the number of neighbours
  */
 #if ENABLE_DEBUG
- /**Stacksizes are huge in debug mode, so memory is rare so we fix it at 15
+ /**Defines the maximum number of neighbours in debug mode, we fix it at 15
   */
 #define ETX_MAX_CANDIDATE_NEIGHBORS (15)
-/**Default 40, should be enough to get all messages for neighbors
+/**Defines the maximum number of neighbours in normal mode default is 40
  */
 #else
 #define ETX_MAX_CANDIDATE_NEIGHBORS (40)
@@ -51,45 +51,38 @@ extern "C" {
 /**
  * @{
  * @name ETX Interval parameters
- * Given in ms, the default is 1 second
+ * 
+ * @brief Defines the ETX_INTERVAL Given in ms, the default is 1 second
+ * 
  * Should be divisible through 2 (For ETX_DEF_JIT_CORRECT)
  * and 5 (For ETX_MAX_JITTER) unless those values are adjusted too.
  */
 #define ETX_INTERVAL        (1000)
-/** 
- *10 is the default value
+/** @brief Defines the ETX_WINDOW , 10 is the default value
  */
 #define ETX_WINDOW          (10)
- /**
-  *Sent only 15 candidates in a beaconing packet
+ /** @brief Defines the best candidates to send the beaconing packet
   */
 #define ETX_BEST_CANDIDATES (15)
-/**
- *1 Byte for Addr, 1 Byte for packets rec
+/** @brief Defines the Tuple size , 1 Byte for Addr, 1 Byte for packets rec
  */
 #define ETX_TUPLE_SIZE      (2)
-/**
- *Offset in a tuple of (addr,pkt_rec), will always be the last byte
+/** @brief Defines the Offset in a tuple of (addr,pkt_rec)
  */
 #define ETX_PKT_REC_OFFSET  (ETX_TUPLE_SIZE - 1)
-/**
- *The last byte for an ipv6 address
+/**@brief Defines the last byte for an ipv6 address
  */
 #define ETX_IPV6_LAST_BYTE  (15)
-/**
- *The default value is 20% of ETX_INTERVAL
+/** @brief Defines the maximum jitter , default value is 20% of ETX_INTERVAL
  */
 #define ETX_MAX_JITTER      (ETX_INTERVAL / 5)
- /**
-  *The modulo value for jitter computation
-  */
+/** @brief Defines the modulo value for jitter computation
+ */
 #define ETX_JITTER_MOD      (ETX_MAX_JITTER + 1)
-/**
- *Default Jitter correction value (normally ETX_MAX_JITTER / 2)
+/** @brief Defines the Default Jitter correction value (normally ETX_MAX_JITTER / 2)
  */
 #define ETX_DEF_JIT_CORRECT (ETX_MAX_JITTER / 2)
-/**
- *Adjustment for clockthread computations to stay close/near ETX_INTERVAL
+/** @brief Defines the Adjustment for clockthread computations to stay close/near ETX_INTERVAL
  */
 #define ETX_CLOCK_ADJUST    (52500)
 /** @} */
@@ -129,28 +122,22 @@ extern "C" {
  * @brief etx neighbour data structure
  */ 
 typedef struct etx_neighbor_t {
-    /**
-     *The address of this node
+    /**The address of this node
      */
     ipv6_addr_t addr;
-    /**
-     *The indicator for receiving a packet from this candidate this round
+    /**The indicator for receiving a packet from this candidate this round
      */
     uint8_t     tx_cur_round;
-    /**
-     *The packets this node has transmitted TO ME
+    /**The packets this node has transmitted TO ME
      */
     uint8_t     packets_tx[ETX_WINDOW];
-    /**
-     *The packets this node has received FROM ME
+    /**The packets this node has received FROM ME
      */
     uint8_t     packets_rx;
-    /**
-     *The currently calculated ETX-value
+    /**The currently calculated ETX-value
      */
     double      cur_etx;
-     /**
-      *The indicator if this node is active or not
+     /**The indicator if this node is active or not
       */
     uint8_t     used;
 } etx_neighbor_t;
