@@ -355,7 +355,7 @@ int set_baud(const char *baud_name)
         return -3;
     }
 
-#ifdef __APPLE__
+#ifdef APPLE__
     cfsetspeed(&port_setting, baud);
     port_setting.c_iflag = IGNBRK | IGNPAR;
     port_setting.c_cflag =  CS8 | CREAD | HUPCL | CLOCAL;

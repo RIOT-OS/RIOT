@@ -18,8 +18,8 @@
  * @author      unknwon
  */
 
-#ifndef _CHRONOS_BOARD_H
-#define _CHRONOS_BOARD_H
+#ifndef CHRONOS_BOARD_H
+#define CHRONOS_BOARD_H
 
 #include <stdint.h>
 
@@ -28,8 +28,8 @@ extern "C" {
 #endif
 
 // for correct inclusion of <msp430.h>
-#ifndef __CC430F6137__
-#define __CC430F6137__
+#ifndef CC430F6137__
+#define CC430F6137__
 #endif
 
 #define MSP430_INITIAL_CPU_SPEED    7372800uL
@@ -44,5 +44,5 @@ typedef uint8_t radio_packet_length_t;
 }
 #endif
 
-#endif /* _CHRONOS_BOARD_H */
+#endif /* CHRONOS_BOARD_H */
 /** @} */

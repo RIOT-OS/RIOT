@@ -18,16 +18,16 @@
  * @author      Freie Universität Berlin, Computer Systems & Telematics, FeuerWhere project
  */
 
-#ifndef _MSB_BOARD_H
-#define _MSB_BOARD_H
+#ifndef MSB_BOARD_H
+#define MSB_BOARD_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 // for correct inclusion of <msp430.h>
-#ifndef __MSP430F1612__
-#define __MSP430F1612__
+#ifndef MSP430F1612__
+#define MSP430F1612__
 #endif
 
 //MSB430 core
@@ -57,4 +57,4 @@ extern "C" {
 typedef uint8_t radio_packet_length_t;
 
 /** @} */
-#endif // _MSB_BOARD_H
+#endif // MSB_BOARD_H
