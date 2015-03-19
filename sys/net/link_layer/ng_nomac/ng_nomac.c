@@ -22,13 +22,7 @@
 #include "msg.h"
 #include "thread.h"
 #include "net/ng_nomac.h"
-#include "net/ng_netreg.h"
-#include "net/ng_pkt.h"
-#include "net/ng_nettype.h"
-#include "net/ng_netdev.h"
-#include "net/ng_netapi.h"
-#include "net/ng_netif.h"
-#include "net/ng_pktbuf.h"
+#include "net/ng_netbase.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
