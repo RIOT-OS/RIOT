@@ -1,6 +1,8 @@
 language: c
 
-cache: apt
+cache:
+    - apt
+    - ccache
 
 env:
     - NPROC_MAX=8 BUILDTEST_MCU_GROUP=static-tests
@@ -33,6 +35,19 @@ install:
     - git remote add riot https://github.com/RIOT-OS/RIOT.git
     - git fetch riot master
     - git log -1 --pretty=format:%H riot/master
+    - ln -s /usr/bin/ccache /usr/local/bin/gcc
+    - ln -s /usr/bin/ccache /usr/local/bin/g++
+    - ln -s /usr/bin/ccache /usr/local/bin/cc
+    - ln -s /usr/bin/ccache /usr/local/bin/c++
+    - ln -s /usr/bin/ccache /usr/local/bin/arm-none-eabi-gcc
+    - ln -s /usr/bin/ccache /usr/local/bin/arm-none-eabi-g++
+    - ln -s /usr/bin/ccache /usr/local/bin/arm-none-eabi-c++
+    - ln -s /usr/bin/ccache /usr/local/bin/avr-gcc
+    - ln -s /usr/bin/ccache /usr/local/bin/avr-g++
+    - ln -s /usr/bin/ccache /usr/local/bin/avr-c++
+    - ln -s /usr/bin/ccache /usr/local/bin/msp430-gcc
+    - ln -s /usr/bin/ccache /usr/local/bin/msp430-g++
+    - ln -s /usr/bin/ccache /usr/local/bin/msp430-c++
 
 script:
     - ./dist/tools/travis-scripts/build_and_test.sh
