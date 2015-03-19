@@ -1,5 +1,5 @@
 /*******************************************************************************
-* File Name: TIMER0_CONTROL.c  
+* File Name: TIMER0_CONTROL.c
 * Version 1.70
 *
 * Description:
@@ -9,8 +9,8 @@
 *
 ********************************************************************************
 * Copyright 2008-2012, Cypress Semiconductor Corporation.  All rights reserved.
-* You may use this file only in accordance with the license, terms, conditions, 
-* disclaimers, and limitations in the end user license agreement accompanying 
+* You may use this file only in accordance with the license, terms, conditions,
+* disclaimers, and limitations in the end user license agreement accompanying
 * the software package with which this file was provided.
 *******************************************************************************/
 
@@ -32,7 +32,7 @@
 *  None.
 *
 *******************************************************************************/
-void TIMER0_CONTROL_Write(uint8 control) 
+void TIMER0_CONTROL_Write(uint8 control)
 {
     TIMER0_CONTROL_Control = control;
 }
@@ -52,7 +52,7 @@ void TIMER0_CONTROL_Write(uint8 control)
 *  Returns the current value in the Control Register.
 *
 *******************************************************************************/
-uint8 TIMER0_CONTROL_Read(void) 
+uint8 TIMER0_CONTROL_Read(void)
 {
     return TIMER0_CONTROL_Control;
 }

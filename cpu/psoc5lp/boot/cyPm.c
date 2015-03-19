@@ -77,7 +77,7 @@ static void CyPmHviLviRestore(void) ;
 *  All peripheral clocks are going to be off after this API method call.
 *
 *******************************************************************************/
-void CyPmSaveClocks(void) 
+void CyPmSaveClocks(void)
 {
     /* Digital and analog clocks - save enable state and disable them all */
     cyPmClockBackup.enClkA = CY_PM_ACT_CFG1_REG & CY_PM_ACT_EN_CLK_A_MASK;
@@ -279,7 +279,7 @@ void CyPmSaveClocks(void)
 *  None
 *
 *******************************************************************************/
-void CyPmRestoreClocks(void) 
+void CyPmRestoreClocks(void)
 {
     cystatus status = CYRET_TIMEOUT;
     uint16 i;
@@ -633,7 +633,7 @@ void CyPmRestoreClocks(void)
 *  will be left started.
 *
 *******************************************************************************/
-void CyPmAltAct(uint16 wakeupTime, uint16 wakeupSource) 
+void CyPmAltAct(uint16 wakeupTime, uint16 wakeupSource)
 {
     #if(CY_PSOC5)
 
@@ -837,7 +837,7 @@ void CyPmAltAct(uint16 wakeupTime, uint16 wakeupSource)
 *  Refer to the device errata for more information.
 *
 *******************************************************************************/
-void CyPmSleep(uint8 wakeupTime, uint16 wakeupSource) 
+void CyPmSleep(uint8 wakeupTime, uint16 wakeupSource)
 {
     uint8 interruptState;
 
@@ -1110,7 +1110,7 @@ void CyPmSleep(uint8 wakeupTime, uint16 wakeupSource)
 *  delay is measured using the rising edges of the 1 kHz ILO.
 *
 *******************************************************************************/
-void CyPmHibernate(void) 
+void CyPmHibernate(void)
 {
     uint8 interruptState;
 
@@ -1238,7 +1238,7 @@ void CyPmHibernate(void)
 *  Status.  Same bits values as the mask parameter.
 *
 *******************************************************************************/
-uint8 CyPmReadStatus(uint8 mask) 
+uint8 CyPmReadStatus(uint8 mask)
 {
     static uint8 interruptStatus;
     uint8 interruptState;
@@ -1282,7 +1282,7 @@ uint8 CyPmReadStatus(uint8 mask)
 *  No
 *
 *******************************************************************************/
-static void CyPmHibSaveSet(void) 
+static void CyPmHibSaveSet(void)
 {
     /* I2C backup reg must be off when the sleep regulator is unavailable */
     if(0u != (CY_PM_PWRSYS_CR1_REG & CY_PM_PWRSYS_CR1_I2CREG_BACKUP))
@@ -1372,7 +1372,7 @@ static void CyPmHibSaveSet(void)
 *  None
 *
 *******************************************************************************/
-static void CyPmHibRestore(void) 
+static void CyPmHibRestore(void)
 {
     /* Restore LVI/HVI configuration */
     CyPmHviLviRestore();
@@ -1433,7 +1433,7 @@ static void CyPmHibRestore(void)
 *  Enables ILO 1 KHz clock and leaves it enabled.
 *
 *******************************************************************************/
-void CyPmCtwSetInterval(uint8 ctwInterval) 
+void CyPmCtwSetInterval(uint8 ctwInterval)
 {
     /* Disable CTW interrupt enable */
     CY_PM_TW_CFG2_REG &= ((uint8)(~CY_PM_CTW_IE));
@@ -1485,7 +1485,7 @@ void CyPmCtwSetInterval(uint8 ctwInterval)
 *  None
 *
 *******************************************************************************/
-void CyPmOppsSet(void) 
+void CyPmOppsSet(void)
 {
     /* Enable 32kHz XTAL if needed */
     if(0u == (CY_PM_SLOWCLK_X32_CR_REG & CY_PM_X32_CR_X32EN))
@@ -1522,7 +1522,7 @@ void CyPmOppsSet(void)
 *  Enables the ILO 100 KHz clock and leaves it enabled.
 *
 *******************************************************************************/
-void CyPmFtwSetInterval(uint8 ftwInterval) 
+void CyPmFtwSetInterval(uint8 ftwInterval)
 {
     /* Disable FTW interrupt enable */
     CY_PM_TW_CFG2_REG &= ((uint8)(~CY_PM_FTW_IE));
@@ -1579,7 +1579,7 @@ void CyPmFtwSetInterval(uint8 ftwInterval)
 *  No
 *
 *******************************************************************************/
-static void CyPmHibSlpSaveSet(void) 
+static void CyPmHibSlpSaveSet(void)
 {
     /* Save SC/CT routing registers */
     cyPmBackup.scctData[0u]   = CY_GET_REG8(CYREG_SC0_SW0 );
@@ -1710,7 +1710,7 @@ static void CyPmHibSlpSaveSet(void)
 *  None
 *
 *******************************************************************************/
-static void CyPmHibSlpRestore(void) 
+static void CyPmHibSlpRestore(void)
 {
     /* Restore SC/CT routing registers */
     CY_SET_REG8(CYREG_SC0_SW0 , cyPmBackup.scctData[0u] );
@@ -1787,7 +1787,7 @@ static void CyPmHibSlpRestore(void)
 *  No
 *
 *******************************************************************************/
-static void CyPmHviLviSaveDisable(void) 
+static void CyPmHviLviSaveDisable(void)
 {
     if(0u != (CY_VD_LVI_HVI_CONTROL_REG & CY_VD_LVID_EN))
     {
@@ -1850,7 +1850,7 @@ static void CyPmHviLviSaveDisable(void)
 *  No
 *
 *******************************************************************************/
-static void CyPmHviLviRestore(void) 
+static void CyPmHviLviRestore(void)
 {
     /* Restore LVI/HVI configuration */
     if(CY_PM_ENABLED == cyPmBackup.lvidEn)

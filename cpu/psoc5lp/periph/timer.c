@@ -66,41 +66,41 @@ static timer_conf_t config[TIMER_NUMOF];
  */
 CY_ISR(TIMER0_IRQHandler)
 {
-    /* 
-     * Read Status register in order to clear the sticky Terminal Count (TC) bit 
-	 * in the status register. Note that the function is not called, but rather 
+    /*
+     * Read Status register in order to clear the sticky Terminal Count (TC) bit
+	 * in the status register. Note that the function is not called, but rather
 	 * the status is read directly.
 	 */
     TIMER0_STATUS;
-    
+
     /* Warn client about timeout */
     config[TIMER_0].cb(0);
-    
+
     if (sched_context_switch_request) {
         thread_yield();
     }
-    
+
     /* Disable interrupt */
     TIMER0_IRQn_Disable();
 }
 
 /**************************** PUBLIC FUNCTIONS *******************************/
 int timer_init(tim_t dev, unsigned int us_per_tick, void (*callback)(int))
-{    
+{
     if (dev == TIMER_0) {
-        
+
         /* save callback */
         config[TIMER_0].cb = callback;
-        
+
         /* Set divider value for Timer Timing */
         CLK_TIMER_SetDividerValue(TIMER_CLK_DIVIDER_VALUE(us_per_tick));
-        
+
         /* Register Handler function for Timer Interrupt */
         TIMER0_IRQn_StartEx(TIMER0_IRQHandler);
-        
+
         /* Disable Timer Interrupt as initial */
         TIMER0_IRQn_Disable();
-        
+
         /* Start Timer */
         TIMER0_Start();
 
@@ -125,10 +125,10 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
     (void)channel;
 
     if (dev == TIMER_0) {
-        
-        TIMER0_WriteCompare(value);        
+
+        TIMER0_WriteCompare(value);
         TIMER0_IRQn_Enable();
-        
+
         return 1;
     }
     return -1;
@@ -138,10 +138,10 @@ int timer_clear(tim_t dev, int channel)
 {
     /* To suppress unused variable warning */
     (void)channel;
-        
+
     if (dev == TIMER_0) {
         TIMER0_Stop();
-        
+
         return 1;
     }
     return -1;

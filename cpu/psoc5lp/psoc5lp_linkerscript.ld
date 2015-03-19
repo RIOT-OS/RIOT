@@ -28,7 +28,7 @@ MEMORY
 }
 
 
-CY_APPL_ORIGIN      = 0; 
+CY_APPL_ORIGIN      = 0;
 CY_FLASH_ROW_SIZE   = 256;
 CY_ECC_ROW_SIZE     = 32;
 CY_EE_IN_BTLDR      = 0x0;
@@ -72,7 +72,7 @@ SECTIONS
   ee_offset     = (CY_APPL_LOADABLE && !CY_EE_IN_BTLDR) ? ((CY_EE_SIZE / CY_APPL_MAX) * (CY_APPL_NUM - 1)) : 0;
   ee_size       = (CY_APPL_LOADABLE && !CY_EE_IN_BTLDR) ? (CY_EE_SIZE / CY_APPL_MAX) : CY_EE_SIZE;
   PROVIDE(CY_ECC_OFFSET = ecc_offset);
-  
+
   .text appl_start :
   {
     CREATE_OBJECT_SYMBOLS
@@ -93,12 +93,12 @@ SECTIONS
 	/* Place DMA initialization before text to ensure it gets placed in first 64K of flash */
     *(.dma_init)
     ASSERT(appl_start + . <= 0x10000 || !0, "DMA Init must be within the first 64k of flash");
-		
+
     *(.text .text.* .gnu.linkonce.t.*)
     *(.plt)
     *(.gnu.warning)
     *(.glue_7t) *(.glue_7) *(.vfp11_veneer)
-	
+
     KEEP(*(.bootloader)) /* necessary for bootloader's, but doesn't impact non-bootloaders */
 
     *(.ARM.extab* .gnu.linkonce.armextab.*)
@@ -206,12 +206,12 @@ SECTIONS
   } >ram AT>rom
   PROVIDE(end = .);
   PROVIDE(__bss_end__ = .);
-  
+
   __cy_region_init_ram = LOADADDR (.data);
   __cy_region_init_size_ram = _edata - ADDR (.data);
   __cy_region_zero_size_ram = _end - _edata;
-  
-  /* The .stack and .heap sections don't contain any symbols. 
+
+  /* The .stack and .heap sections don't contain any symbols.
    * They are only used for linker to calculate RAM utilization.
    */
   .heap (NOLOAD) :
@@ -226,7 +226,7 @@ SECTIONS
     __cy_stack_limit = .;
     . += 0x0800;
   } >ram
-  
+
   /* Check if data + heap + stack exceeds RAM limit */
   ASSERT(__cy_stack_limit >= __cy_heap_limit, "region RAM overflowed with stack")
 
@@ -240,22 +240,22 @@ SECTIONS
     KEEP(*(.cyloadablemeta))
   } >rom
 
-  .cyconfigecc (0x80000000 + ecc_offset) : 
+  .cyconfigecc (0x80000000 + ecc_offset) :
   {
     KEEP(*(.cyconfigecc))
-  } :NONE 
+  } :NONE
 
-  .cycustnvl      0x90000000 : { KEEP(*(.cycustnvl)) } :NONE 
-  .cywolatch      0x90100000 : { KEEP(*(.cywolatch)) } :NONE 
+  .cycustnvl      0x90000000 : { KEEP(*(.cycustnvl)) } :NONE
+  .cywolatch      0x90100000 : { KEEP(*(.cywolatch)) } :NONE
 
-  .cyeeprom (0x90200000 + ee_offset) : 
+  .cyeeprom (0x90200000 + ee_offset) :
   {
     KEEP(*(.cyeeprom))
     ASSERT(. <= (0x90200000 + ee_offset + ee_size), ".cyeeprom data will not fit in EEPROM");
-  } :NONE 
+  } :NONE
 
-  .cyflashprotect 0x90400000 : { KEEP(*(.cyflashprotect)) } :NONE 
-  .cymeta         0x90500000 : { KEEP(*(.cymeta)) } :NONE 
+  .cyflashprotect 0x90400000 : { KEEP(*(.cyflashprotect)) } :NONE
+  .cymeta         0x90500000 : { KEEP(*(.cymeta)) } :NONE
 
   .stab 0 (NOLOAD) : { *(.stab) }
   .stabstr 0 (NOLOAD) : { *(.stabstr) }

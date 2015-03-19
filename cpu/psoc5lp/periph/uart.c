@@ -68,7 +68,7 @@ CY_ISR(UART0_TX_IRQHandler)
             UART0_TX_IRQn_Disable();
         }
     }
-    
+
     if (sched_context_switch_request) {
         thread_yield();
     }
@@ -95,12 +95,12 @@ CY_ISR(UART0_RX_IRQHandler)
 /**************************** PUBLIC FUNCTIONS *******************************/
 
 int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, uart_tx_cb_t tx_cb, void *arg)
-{    
+{
     int res = uart_init_blocking(uart, baudrate);
     if (res < 0) {
         return res;
     }
- 
+
     /* save callbacks */
     config[uart].rx_cb = rx_cb;
     config[uart].tx_cb = tx_cb;
@@ -109,27 +109,27 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, uart_tx_cb_t t
     switch (uart) {
 
         case UART_0:
-        
+
             /* configure and enable global device interrupts */
             if (tx_cb != NULL)
             {
                 /* Enable TX Interrupt */
                 /* TODO : DEFECT. System is halting when TX Interrupt is enabled.
-                 * TX Interrupt works fine individually(tested in main.c) but in 
+                 * TX Interrupt works fine individually(tested in main.c) but in
                  * this module, this problem should be fixed.
-                 * RIOT not using TX Interrupt so Fix is postponed to next 
+                 * RIOT not using TX Interrupt so Fix is postponed to next
                  * revisions.
                  */
                 UART0_TX_IRQn_StartEx(UART0_TX_IRQHandler);
             }
-            
-            
+
+
             if (rx_cb != NULL)
             {
                 /* Enable RX Interrupt */
                 UART0_RX_IRQn_StartEx(UART0_RX_IRQHandler);
             }
-           
+
             UART0_Start();
             break;
         default:
@@ -182,8 +182,8 @@ int uart_read_blocking(uart_t uart, char *data)
         case UART_0:
             /* Wait until a byte received */
             while (!(UART0_RXSTATUS_REG & UART0_RX_STS_FIFO_NOTEMPTY));
-            
-            *data = UART0_ReadRxData();            
+
+            *data = UART0_ReadRxData();
             break;
         default:
             return -1;

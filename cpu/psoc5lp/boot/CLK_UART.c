@@ -9,8 +9,8 @@
 *
 ********************************************************************************
 * Copyright 2008-2012, Cypress Semiconductor Corporation.  All rights reserved.
-* You may use this file only in accordance with the license, terms, conditions, 
-* disclaimers, and limitations in the end user license agreement accompanying 
+* You may use this file only in accordance with the license, terms, conditions,
+* disclaimers, and limitations in the end user license agreement accompanying
 * the software package with which this file was provided.
 *******************************************************************************/
 
@@ -42,7 +42,7 @@
 *  None
 *
 *******************************************************************************/
-void CLK_UART_Start(void) 
+void CLK_UART_Start(void)
 {
     /* Set the bit to enable the clock. */
     CLK_UART_CLKEN |= CLK_UART_CLKEN_MASK;
@@ -68,7 +68,7 @@ void CLK_UART_Start(void)
 *  None
 *
 *******************************************************************************/
-void CLK_UART_Stop(void) 
+void CLK_UART_Stop(void)
 {
     /* Clear the bit to disable the clock. */
     CLK_UART_CLKEN &= (uint8)(~CLK_UART_CLKEN_MASK);
@@ -97,7 +97,7 @@ void CLK_UART_Stop(void)
 *  None
 *
 *******************************************************************************/
-void CLK_UART_StopBlock(void) 
+void CLK_UART_StopBlock(void)
 {
     if ((CLK_UART_CLKEN & CLK_UART_CLKEN_MASK) != 0u)
     {
@@ -154,7 +154,7 @@ void CLK_UART_StopBlock(void)
 *  None
 *
 *******************************************************************************/
-void CLK_UART_StandbyPower(uint8 state) 
+void CLK_UART_StandbyPower(uint8 state)
 {
     if(state == 0u)
     {
@@ -191,7 +191,7 @@ void CLK_UART_StandbyPower(uint8 state)
 *
 *******************************************************************************/
 void CLK_UART_SetDividerRegister(uint16 clkDivider, uint8 restart)
-                                
+
 {
     uint8 enabled;
 
@@ -223,7 +223,7 @@ void CLK_UART_SetDividerRegister(uint16 clkDivider, uint8 restart)
         }
         else
         {
-			
+
             if (enabled != 0u)
             {
                 CLK_DIST_LD = 0x00u;
@@ -294,7 +294,7 @@ void CLK_UART_SetDividerRegister(uint16 clkDivider, uint8 restart)
 *  divide by 2, the return value will be 1.
 *
 *******************************************************************************/
-uint16 CLK_UART_GetDividerRegister(void) 
+uint16 CLK_UART_GetDividerRegister(void)
 {
     return CY_GET_REG16(CLK_UART_DIV_PTR);
 }
@@ -329,7 +329,7 @@ uint16 CLK_UART_GetDividerRegister(void)
 *  None
 *
 *******************************************************************************/
-void CLK_UART_SetModeRegister(uint8 modeBitMask) 
+void CLK_UART_SetModeRegister(uint8 modeBitMask)
 {
     CLK_UART_MOD_SRC |= modeBitMask & (uint8)CLK_UART_MODE_MASK;
 }
@@ -364,7 +364,7 @@ void CLK_UART_SetModeRegister(uint8 modeBitMask)
 *  None
 *
 *******************************************************************************/
-void CLK_UART_ClearModeRegister(uint8 modeBitMask) 
+void CLK_UART_ClearModeRegister(uint8 modeBitMask)
 {
     CLK_UART_MOD_SRC &= (uint8)(~modeBitMask) | (uint8)(~(uint8)(CLK_UART_MODE_MASK));
 }
@@ -385,7 +385,7 @@ void CLK_UART_ClearModeRegister(uint8 modeBitMask)
 *  ClearModeRegister descriptions for details about the mode bits.
 *
 *******************************************************************************/
-uint8 CLK_UART_GetModeRegister(void) 
+uint8 CLK_UART_GetModeRegister(void)
 {
     return CLK_UART_MOD_SRC & (uint8)(CLK_UART_MODE_MASK);
 }
@@ -416,12 +416,12 @@ uint8 CLK_UART_GetModeRegister(void)
 *  None
 *
 *******************************************************************************/
-void CLK_UART_SetSourceRegister(uint8 clkSource) 
+void CLK_UART_SetSourceRegister(uint8 clkSource)
 {
     uint16 currDiv = CLK_UART_GetDividerRegister();
     uint8 oldSrc = CLK_UART_GetSourceRegister();
 
-    if (((oldSrc != ((uint8)CYCLK_SRC_SEL_CLK_SYNC_D)) && 
+    if (((oldSrc != ((uint8)CYCLK_SRC_SEL_CLK_SYNC_D)) &&
         (clkSource == ((uint8)CYCLK_SRC_SEL_CLK_SYNC_D))) && (currDiv == 0u))
     {
         /* Switching to Master and divider is 1, set SSS, which will output master, */
@@ -430,7 +430,7 @@ void CLK_UART_SetSourceRegister(uint8 clkSource)
         CLK_UART_MOD_SRC =
             (CLK_UART_MOD_SRC & (uint8)(~CLK_UART_SRC_SEL_MSK)) | clkSource;
     }
-    else if (((oldSrc == ((uint8)CYCLK_SRC_SEL_CLK_SYNC_D)) && 
+    else if (((oldSrc == ((uint8)CYCLK_SRC_SEL_CLK_SYNC_D)) &&
             (clkSource != ((uint8)CYCLK_SRC_SEL_CLK_SYNC_D))) && (currDiv == 0u))
     {
         /* Switching from Master to not and divider is 1, set source, so we don't   */
@@ -461,7 +461,7 @@ void CLK_UART_SetSourceRegister(uint8 clkSource)
 *  The input source of the clock. See SetSourceRegister for details.
 *
 *******************************************************************************/
-uint8 CLK_UART_GetSourceRegister(void) 
+uint8 CLK_UART_GetSourceRegister(void)
 {
     return CLK_UART_MOD_SRC & CLK_UART_SRC_SEL_MSK;
 }
@@ -482,14 +482,14 @@ uint8 CLK_UART_GetSourceRegister(void)
 * Parameters:
 *  clkPhase: Amount to delay the phase of the clock, in 1.0ns increments.
 *   clkPhase must be from 1 to 11 inclusive. Other values, including 0,
-*   disable the clock. clkPhase = 1 produces a 0ns delay and clkPhase = 11 
+*   disable the clock. clkPhase = 1 produces a 0ns delay and clkPhase = 11
 *   produces a 10ns delay.
 *
 * Returns:
 *  None
 *
 *******************************************************************************/
-void CLK_UART_SetPhaseRegister(uint8 clkPhase) 
+void CLK_UART_SetPhaseRegister(uint8 clkPhase)
 {
     CLK_UART_PHASE = clkPhase & CLK_UART_PHASE_MASK;
 }
@@ -510,7 +510,7 @@ void CLK_UART_SetPhaseRegister(uint8 clkPhase)
 *  Phase of the analog clock. See SetPhaseRegister for details.
 *
 *******************************************************************************/
-uint8 CLK_UART_GetPhaseRegister(void) 
+uint8 CLK_UART_GetPhaseRegister(void)
 {
     return CLK_UART_PHASE & CLK_UART_PHASE_MASK;
 }

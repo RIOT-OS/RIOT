@@ -93,9 +93,9 @@ void CharacterLCD_Wakeup(void) ;
     void CharacterLCD_PrintInt8(uint8 value) ;
     void CharacterLCD_PrintInt16(uint16 value) ;
     void CharacterLCD_PrintInt32(uint32 value) ;
-    void CharacterLCD_PrintNumber(uint16 value) ; 
+    void CharacterLCD_PrintNumber(uint16 value) ;
     void CharacterLCD_PrintU32Number(uint32 value) ;
-    
+
 #endif /* CharacterLCD_CONVERSION_ROUTINES == 1u */
 
 /* Clear Macro */
@@ -205,10 +205,10 @@ extern uint8 const CYCODE CharacterLCD_customFonts[64u];
     #define CharacterLCD_PORT_DR_PTR           ( (reg32 *) CharacterLCD_LCDPort__DR)
     #define CharacterLCD_PORT_PS_REG           (*(reg32 *) CharacterLCD_LCDPort__PS)  /* Pin State Register */
     #define CharacterLCD_PORT_PS_PTR           ( (reg32 *) CharacterLCD_LCDPort__PS)
-    
+
     #define CharacterLCD_PORT_PC_REG           (*(reg32 *) CharacterLCD_LCDPort__PC)
     #define CharacterLCD_PORT_PC_PTR           (*(reg32 *) CharacterLCD_LCDPort__PC)
-    
+
 #else
 
     #define CharacterLCD_PORT_DR_REG           (*(reg8 *) CharacterLCD_LCDPort__DR)  /* Data Output Register */
@@ -297,12 +297,12 @@ extern uint8 const CYCODE CharacterLCD_customFonts[64u];
 *       Obsolete function names
 ***************************************/
 #if(CharacterLCD_CONVERSION_ROUTINES == 1u)
-    /* This function names are obsolete and will be removed in future 
+    /* This function names are obsolete and will be removed in future
     * revisions of the component.
     */
-    #define CharacterLCD_PrintDecUint16(x)   CharacterLCD_PrintNumber(x)  
+    #define CharacterLCD_PrintDecUint16(x)   CharacterLCD_PrintNumber(x)
     #define CharacterLCD_PrintHexUint8(x)    CharacterLCD_PrintInt8(x)
-    #define CharacterLCD_PrintHexUint16(x)   CharacterLCD_PrintInt16(x)        
+    #define CharacterLCD_PrintHexUint16(x)   CharacterLCD_PrintInt16(x)
 
 #endif /* CharacterLCD_CONVERSION_ROUTINES == 1u */
 

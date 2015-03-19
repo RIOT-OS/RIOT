@@ -70,7 +70,7 @@ uint8 UART0_initVar = 0u;
 *  No.
 *
 *******************************************************************************/
-void UART0_Start(void) 
+void UART0_Start(void)
 {
     /* If not Initialized then initialize all required hardware and software */
     if(UART0_initVar == 0u)
@@ -98,7 +98,7 @@ void UART0_Start(void)
 *  None.
 *
 *******************************************************************************/
-void UART0_Init(void) 
+void UART0_Init(void)
 {
     #if(UART0_RX_ENABLED || UART0_HD_ENABLED)
 
@@ -171,7 +171,7 @@ void UART0_Init(void)
 *  UART0_rxAddressDetected - set to initial state (0).
 *
 *******************************************************************************/
-void UART0_Enable(void) 
+void UART0_Enable(void)
 {
     uint8 enableInterrupts;
     enableInterrupts = CyEnterCriticalSection();
@@ -224,7 +224,7 @@ void UART0_Enable(void)
 *  None.
 *
 *******************************************************************************/
-void UART0_Stop(void) 
+void UART0_Stop(void)
 {
     uint8 enableInterrupts;
     enableInterrupts = CyEnterCriticalSection();
@@ -278,7 +278,7 @@ void UART0_Stop(void)
 *  Current state of the control register.
 *
 *******************************************************************************/
-uint8 UART0_ReadControlRegister(void) 
+uint8 UART0_ReadControlRegister(void)
 {
     #if( UART0_CONTROL_REG_REMOVED )
         return(0u);
@@ -302,7 +302,7 @@ uint8 UART0_ReadControlRegister(void)
 *  None.
 *
 *******************************************************************************/
-void  UART0_WriteControlRegister(uint8 control) 
+void  UART0_WriteControlRegister(uint8 control)
 {
     #if( UART0_CONTROL_REG_REMOVED )
         if(control != 0u) { }      /* release compiler warning */
@@ -333,7 +333,7 @@ void  UART0_WriteControlRegister(uint8 control)
         *  Enable the interrupt output -or- the interrupt component itself
         *
         *******************************************************************************/
-        void UART0_EnableRxInt(void) 
+        void UART0_EnableRxInt(void)
         {
             CyIntEnable(UART0_RX_VECT_NUM);
         }
@@ -356,7 +356,7 @@ void  UART0_WriteControlRegister(uint8 control)
         *  Disable the interrupt output -or- the interrupt component itself
         *
         *******************************************************************************/
-        void UART0_DisableRxInt(void) 
+        void UART0_DisableRxInt(void)
         {
             CyIntDisable(UART0_RX_VECT_NUM);
         }
@@ -382,7 +382,7 @@ void  UART0_WriteControlRegister(uint8 control)
     *  Enables the output of specific status bits to the interrupt controller
     *
     *******************************************************************************/
-    void UART0_SetRxInterruptMode(uint8 intSrc) 
+    void UART0_SetRxInterruptMode(uint8 intSrc)
     {
         UART0_RXSTATUS_MASK_REG  = intSrc;
     }
@@ -415,7 +415,7 @@ void  UART0_WriteControlRegister(uint8 control)
     *  No.
     *
     *******************************************************************************/
-    uint8 UART0_ReadRxData(void) 
+    uint8 UART0_ReadRxData(void)
     {
         uint8 rxData;
 
@@ -506,7 +506,7 @@ void  UART0_WriteControlRegister(uint8 control)
     *   bits.
     *
     *******************************************************************************/
-    uint8 UART0_ReadRxStatus(void) 
+    uint8 UART0_ReadRxStatus(void)
     {
         uint8 status;
 
@@ -553,7 +553,7 @@ void  UART0_WriteControlRegister(uint8 control)
     *  No.
     *
     *******************************************************************************/
-    uint8 UART0_GetChar(void) 
+    uint8 UART0_GetChar(void)
     {
         uint8 rxData = 0u;
         uint8 rxStatus;
@@ -655,7 +655,7 @@ void  UART0_WriteControlRegister(uint8 control)
     *  No.
     *
     *******************************************************************************/
-    uint16 UART0_GetByte(void) 
+    uint16 UART0_GetByte(void)
     {
         return ( ((uint16)UART0_ReadRxStatus() << 8u) | UART0_ReadRxData() );
     }
@@ -689,7 +689,7 @@ void  UART0_WriteControlRegister(uint8 control)
     *
     *******************************************************************************/
     uint8 UART0_GetRxBufferSize(void)
-                                                            
+
     {
         uint8 size;
 
@@ -768,7 +768,7 @@ void  UART0_WriteControlRegister(uint8 control)
     * Side Effects:
     *  Any received data not read from the RAM or FIFO buffer will be lost.
     *******************************************************************************/
-    void UART0_ClearRxBuffer(void) 
+    void UART0_ClearRxBuffer(void)
     {
         uint8 enableInterrupts;
 
@@ -830,7 +830,7 @@ void  UART0_WriteControlRegister(uint8 control)
     *
     *******************************************************************************/
     void UART0_SetRxAddressMode(uint8 addressMode)
-                                                        
+
     {
         #if(UART0_RXHW_ADDRESS_ENABLED)
             #if(UART0_CONTROL_REG_REMOVED)
@@ -866,7 +866,7 @@ void  UART0_WriteControlRegister(uint8 control)
     *  None.
     *
     *******************************************************************************/
-    void UART0_SetRxAddress1(uint8 address) 
+    void UART0_SetRxAddress1(uint8 address)
 
     {
         UART0_RXADDRESS1_REG = address;
@@ -887,7 +887,7 @@ void  UART0_WriteControlRegister(uint8 control)
     *  None.
     *
     *******************************************************************************/
-    void UART0_SetRxAddress2(uint8 address) 
+    void UART0_SetRxAddress2(uint8 address)
     {
         UART0_RXADDRESS2_REG = address;
     }
@@ -916,7 +916,7 @@ void  UART0_WriteControlRegister(uint8 control)
         *  Enable the interrupt output -or- the interrupt component itself
         *
         *******************************************************************************/
-        void UART0_EnableTxInt(void) 
+        void UART0_EnableTxInt(void)
         {
             CyIntEnable(UART0_TX_VECT_NUM);
         }
@@ -939,7 +939,7 @@ void  UART0_WriteControlRegister(uint8 control)
         *  Disable the interrupt output -or- the interrupt component itself
         *
         *******************************************************************************/
-        void UART0_DisableTxInt(void) 
+        void UART0_DisableTxInt(void)
         {
             CyIntDisable(UART0_TX_VECT_NUM);
         }
@@ -965,7 +965,7 @@ void  UART0_WriteControlRegister(uint8 control)
     *  Enables the output of specific status bits to the interrupt controller
     *
     *******************************************************************************/
-    void UART0_SetTxInterruptMode(uint8 intSrc) 
+    void UART0_SetTxInterruptMode(uint8 intSrc)
     {
         UART0_TXSTATUS_MASK_REG = intSrc;
     }
@@ -999,7 +999,7 @@ void  UART0_WriteControlRegister(uint8 control)
     *  No.
     *
     *******************************************************************************/
-    void UART0_WriteTxData(uint8 txDataByte) 
+    void UART0_WriteTxData(uint8 txDataByte)
     {
         /* If not Initialized then skip this function*/
         if(UART0_initVar != 0u)
@@ -1067,7 +1067,7 @@ void  UART0_WriteControlRegister(uint8 control)
     *  accordingly.
     *
     *******************************************************************************/
-    uint8 UART0_ReadTxStatus(void) 
+    uint8 UART0_ReadTxStatus(void)
     {
         return(UART0_TXSTATUS_REG);
     }
@@ -1103,7 +1103,7 @@ void  UART0_WriteControlRegister(uint8 control)
     *  Allows the user to transmit any byte of data in a single transfer
     *
     *******************************************************************************/
-    void UART0_PutChar(uint8 txDataByte) 
+    void UART0_PutChar(uint8 txDataByte)
     {
             #if(UART0_TXBUFFERSIZE > UART0_FIFO_LENGTH)
                 /* The temporary output pointer is used since it takes two instructions
@@ -1195,7 +1195,7 @@ void  UART0_WriteControlRegister(uint8 control)
     *  transmit buffer.
     *
     *******************************************************************************/
-    void UART0_PutString(const char8 string[]) 
+    void UART0_PutString(const char8 string[])
     {
         uint16 buf_index = 0u;
         /* If not Initialized then skip this function*/
@@ -1234,7 +1234,7 @@ void  UART0_WriteControlRegister(uint8 control)
     *
     *******************************************************************************/
     void UART0_PutArray(const uint8 string[], uint8 byteCount)
-                                                                    
+
     {
         uint8 buf_index = 0u;
         /* If not Initialized then skip this function*/
@@ -1270,7 +1270,7 @@ void  UART0_WriteControlRegister(uint8 control)
     *  No.
     *
     *******************************************************************************/
-    void UART0_PutCRLF(uint8 txDataByte) 
+    void UART0_PutCRLF(uint8 txDataByte)
     {
         /* If not Initialized then skip this function*/
         if(UART0_initVar != 0u)
@@ -1308,7 +1308,7 @@ void  UART0_WriteControlRegister(uint8 control)
     *
     *******************************************************************************/
     uint8 UART0_GetTxBufferSize(void)
-                                                            
+
     {
         uint8 size;
 
@@ -1393,7 +1393,7 @@ void  UART0_WriteControlRegister(uint8 control)
     *  Any received data not read from the RAM buffer will be lost when overwritten.
     *
     *******************************************************************************/
-    void UART0_ClearTxBuffer(void) 
+    void UART0_ClearTxBuffer(void)
     {
         uint8 enableInterrupts;
 
@@ -1482,7 +1482,7 @@ void  UART0_WriteControlRegister(uint8 control)
     *   Uses static variable to keep registers configuration.
     *
     *******************************************************************************/
-    void UART0_SendBreak(uint8 retMode) 
+    void UART0_SendBreak(uint8 retMode)
     {
 
         /* If not Initialized then skip this function*/
@@ -1603,7 +1603,7 @@ void  UART0_WriteControlRegister(uint8 control)
     *  None.
     *
     *******************************************************************************/
-    void UART0_SetTxAddressMode(uint8 addressMode) 
+    void UART0_SetTxAddressMode(uint8 addressMode)
     {
         /* Mark/Space sending enable*/
         if(addressMode != 0u)
@@ -1650,7 +1650,7 @@ void  UART0_WriteControlRegister(uint8 control)
     *  Disable RX interrupt mask, when software buffer has been used.
     *
     *******************************************************************************/
-    void UART0_LoadTxConfig(void) 
+    void UART0_LoadTxConfig(void)
     {
         #if((UART0_RX_INTERRUPT_ENABLED) && (UART0_RXBUFFERSIZE > UART0_FIFO_LENGTH))
             /* Disable RX interrupts before set TX configuration */
@@ -1690,7 +1690,7 @@ void  UART0_WriteControlRegister(uint8 control)
     *  has been used.
     *
     *******************************************************************************/
-    void UART0_LoadRxConfig(void) 
+    void UART0_LoadRxConfig(void)
     {
         UART0_WriteControlRegister(UART0_ReadControlRegister() &
                                                 (uint8)~UART0_CTRL_HD_SEND);

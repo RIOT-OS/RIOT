@@ -1,5 +1,5 @@
 /*******************************************************************************
-* File Name: LED4.h  
+* File Name: LED4.h
 * Version 2.10
 *
 * Description:
@@ -9,8 +9,8 @@
 *
 ********************************************************************************
 * Copyright 2008-2014, Cypress Semiconductor Corporation.  All rights reserved.
-* You may use this file only in accordance with the license, terms, conditions, 
-* disclaimers, and limitations in the end user license agreement accompanying 
+* You may use this file only in accordance with the license, terms, conditions,
+* disclaimers, and limitations in the end user license agreement accompanying
 * the software package with which this file was provided.
 *******************************************************************************/
 
@@ -34,8 +34,8 @@
 
 
 /***************************************
-*        Function Prototypes             
-***************************************/    
+*        Function Prototypes
+***************************************/
 
 void    LED4_Write(uint8 value) ;
 void    LED4_SetDriveMode(uint8 mode) ;
@@ -45,7 +45,7 @@ uint8   LED4_ClearInterrupt(void) ;
 
 
 /***************************************
-*           API Constants        
+*           API Constants
 ***************************************/
 
 /* Drive Modes */
@@ -65,7 +65,7 @@ uint8   LED4_ClearInterrupt(void) ;
 
 
 /***************************************
-*             Registers        
+*             Registers
 ***************************************/
 
 /* Main Port Registers */
@@ -74,23 +74,23 @@ uint8   LED4_ClearInterrupt(void) ;
 /* Data Register */
 #define LED4_DR                     (* (reg8 *) LED4__DR)
 /* Port Number */
-#define LED4_PRT_NUM                (* (reg8 *) LED4__PRT) 
-/* Connect to Analog Globals */                                                  
-#define LED4_AG                     (* (reg8 *) LED4__AG)                       
+#define LED4_PRT_NUM                (* (reg8 *) LED4__PRT)
+/* Connect to Analog Globals */
+#define LED4_AG                     (* (reg8 *) LED4__AG)
 /* Analog MUX bux enable */
-#define LED4_AMUX                   (* (reg8 *) LED4__AMUX) 
-/* Bidirectional Enable */                                                        
+#define LED4_AMUX                   (* (reg8 *) LED4__AMUX)
+/* Bidirectional Enable */
 #define LED4_BIE                    (* (reg8 *) LED4__BIE)
 /* Bit-mask for Aliased Register Access */
 #define LED4_BIT_MASK               (* (reg8 *) LED4__BIT_MASK)
 /* Bypass Enable */
 #define LED4_BYP                    (* (reg8 *) LED4__BYP)
-/* Port wide control signals */                                                   
+/* Port wide control signals */
 #define LED4_CTL                    (* (reg8 *) LED4__CTL)
 /* Drive Modes */
-#define LED4_DM0                    (* (reg8 *) LED4__DM0) 
+#define LED4_DM0                    (* (reg8 *) LED4__DM0)
 #define LED4_DM1                    (* (reg8 *) LED4__DM1)
-#define LED4_DM2                    (* (reg8 *) LED4__DM2) 
+#define LED4_DM2                    (* (reg8 *) LED4__DM2)
 /* Input Buffer Disable Override */
 #define LED4_INP_DIS                (* (reg8 *) LED4__INP_DIS)
 /* LCD Common or Segment Drive */
@@ -102,17 +102,17 @@ uint8   LED4_ClearInterrupt(void) ;
 
 /* DSI Port Registers */
 /* Global DSI Select Register */
-#define LED4_PRTDSI__CAPS_SEL       (* (reg8 *) LED4__PRTDSI__CAPS_SEL) 
+#define LED4_PRTDSI__CAPS_SEL       (* (reg8 *) LED4__PRTDSI__CAPS_SEL)
 /* Double Sync Enable */
-#define LED4_PRTDSI__DBL_SYNC_IN    (* (reg8 *) LED4__PRTDSI__DBL_SYNC_IN) 
+#define LED4_PRTDSI__DBL_SYNC_IN    (* (reg8 *) LED4__PRTDSI__DBL_SYNC_IN)
 /* Output Enable Select Drive Strength */
-#define LED4_PRTDSI__OE_SEL0        (* (reg8 *) LED4__PRTDSI__OE_SEL0) 
-#define LED4_PRTDSI__OE_SEL1        (* (reg8 *) LED4__PRTDSI__OE_SEL1) 
+#define LED4_PRTDSI__OE_SEL0        (* (reg8 *) LED4__PRTDSI__OE_SEL0)
+#define LED4_PRTDSI__OE_SEL1        (* (reg8 *) LED4__PRTDSI__OE_SEL1)
 /* Port Pin Output Select Registers */
-#define LED4_PRTDSI__OUT_SEL0       (* (reg8 *) LED4__PRTDSI__OUT_SEL0) 
-#define LED4_PRTDSI__OUT_SEL1       (* (reg8 *) LED4__PRTDSI__OUT_SEL1) 
+#define LED4_PRTDSI__OUT_SEL0       (* (reg8 *) LED4__PRTDSI__OUT_SEL0)
+#define LED4_PRTDSI__OUT_SEL1       (* (reg8 *) LED4__PRTDSI__OUT_SEL1)
 /* Sync Output Enable Registers */
-#define LED4_PRTDSI__SYNC_OUT       (* (reg8 *) LED4__PRTDSI__SYNC_OUT) 
+#define LED4_PRTDSI__SYNC_OUT       (* (reg8 *) LED4__PRTDSI__SYNC_OUT)
 
 
 #if defined(LED4__INTSTAT)  /* Interrupt Registers */

@@ -1,5 +1,5 @@
 /*******************************************************************************
-* File Name: TIMER0_CONTROL.h  
+* File Name: TIMER0_CONTROL.h
 * Version 1.70
 *
 * Description:
@@ -9,8 +9,8 @@
 *
 ********************************************************************************
 * Copyright 2008-2012, Cypress Semiconductor Corporation.  All rights reserved.
-* You may use this file only in accordance with the license, terms, conditions, 
-* disclaimers, and limitations in the end user license agreement accompanying 
+* You may use this file only in accordance with the license, terms, conditions,
+* disclaimers, and limitations in the end user license agreement accompanying
 * the software package with which this file was provided.
 *******************************************************************************/
 
@@ -21,7 +21,7 @@
 
 
 /***************************************
-*         Function Prototypes 
+*         Function Prototypes
 ***************************************/
 
 void    TIMER0_CONTROL_Write(uint8 control) ;
@@ -29,7 +29,7 @@ uint8   TIMER0_CONTROL_Read(void) ;
 
 
 /***************************************
-*            Registers        
+*            Registers
 ***************************************/
 
 /* Control Register */

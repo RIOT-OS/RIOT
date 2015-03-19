@@ -1,5 +1,5 @@
 /*******************************************************************************
-* File Name: UART0_RX_IRQn.c  
+* File Name: UART0_RX_IRQn.c
 * Version 1.70
 *
 *  Description:
@@ -10,8 +10,8 @@
 *
 ********************************************************************************
 * Copyright 2008-2012, Cypress Semiconductor Corporation.  All rights reserved.
-* You may use this file only in accordance with the license, terms, conditions, 
-* disclaimers, and limitations in the end user license agreement accompanying 
+* You may use this file only in accordance with the license, terms, conditions,
+* disclaimers, and limitations in the end user license agreement accompanying
 * the software package with which this file was provided.
 *******************************************************************************/
 
@@ -23,7 +23,7 @@
 #if !defined(UART0_RX_IRQn__REMOVED) /* Check for removal by optimization */
 
 /*******************************************************************************
-*  Place your includes, defines and code here 
+*  Place your includes, defines and code here
 ********************************************************************************/
 /* `#START UART0_RX_IRQn_intc` */
 
@@ -47,7 +47,7 @@ CY_ISR_PROTO(IntDefaultHandler);
 * Summary:
 *  Set up the interrupt and enable it.
 *
-* Parameters:  
+* Parameters:
 *   None
 *
 * Return:
@@ -77,7 +77,7 @@ void UART0_RX_IRQn_Start(void)
 * Summary:
 *  Set up the interrupt and enable it.
 *
-* Parameters:  
+* Parameters:
 *   address: Address of the ISR to set in the interrupt vector table.
 *
 * Return:
@@ -107,7 +107,7 @@ void UART0_RX_IRQn_StartEx(cyisraddress address)
 * Summary:
 *   Disables and removes the interrupt.
 *
-* Parameters:  
+* Parameters:
 *
 * Return:
 *   None
@@ -133,7 +133,7 @@ void UART0_RX_IRQn_Stop(void)
 *   Add custom code between the coments to keep the next version of this file
 *   from over writting your code.
 *
-* Parameters:  
+* Parameters:
 *
 * Return:
 *   None
@@ -154,7 +154,7 @@ CY_ISR(UART0_RX_IRQn_Interrupt)
 *
 * Summary:
 *   Change the ISR vector for the Interrupt. Note calling UART0_RX_IRQn_Start
-*   will override any effect this method would have had. To set the vector 
+*   will override any effect this method would have had. To set the vector
 *   before the component has been started use UART0_RX_IRQn_StartEx instead.
 *
 * Parameters:
@@ -204,9 +204,9 @@ cyisraddress UART0_RX_IRQn_GetVector(void)
 *
 * Summary:
 *   Sets the Priority of the Interrupt. Note calling UART0_RX_IRQn_Start
-*   or UART0_RX_IRQn_StartEx will override any effect this method 
-*   would have had. This method should only be called after 
-*   UART0_RX_IRQn_Start or UART0_RX_IRQn_StartEx has been called. To set 
+*   or UART0_RX_IRQn_StartEx will override any effect this method
+*   would have had. This method should only be called after
+*   UART0_RX_IRQn_Start or UART0_RX_IRQn_StartEx has been called. To set
 *   the initial priority for the component use the cydwr file in the tool.
 *
 * Parameters:

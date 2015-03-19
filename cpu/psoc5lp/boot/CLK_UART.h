@@ -9,8 +9,8 @@
 *
 ********************************************************************************
 * Copyright 2008-2012, Cypress Semiconductor Corporation.  All rights reserved.
-* You may use this file only in accordance with the license, terms, conditions, 
-* disclaimers, and limitations in the end user license agreement accompanying 
+* You may use this file only in accordance with the license, terms, conditions,
+* disclaimers, and limitations in the end user license agreement accompanying
 * the software package with which this file was provided.
 *******************************************************************************/
 
@@ -44,7 +44,7 @@ void CLK_UART_StopBlock(void) ;
 #endif /* (CY_PSOC3 || CY_PSOC5LP) */
 
 void CLK_UART_StandbyPower(uint8 state) ;
-void CLK_UART_SetDividerRegister(uint16 clkDivider, uint8 restart) 
+void CLK_UART_SetDividerRegister(uint16 clkDivider, uint8 restart)
                                 ;
 uint16 CLK_UART_GetDividerRegister(void) ;
 void CLK_UART_SetModeRegister(uint8 modeBitMask) ;

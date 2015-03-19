@@ -1,5 +1,5 @@
 /*******************************************************************************
-* File Name: TIMER0.h  
+* File Name: TIMER0.h
 * Version 2.40
 *
 *  Description:
@@ -11,11 +11,11 @@
 *
 ********************************************************************************
 * Copyright 2008-2012, Cypress Semiconductor Corporation.  All rights reserved.
-* You may use this file only in accordance with the license, terms, conditions, 
-* disclaimers, and limitations in the end user license agreement accompanying 
+* You may use this file only in accordance with the license, terms, conditions,
+* disclaimers, and limitations in the end user license agreement accompanying
 * the software package with which this file was provided.
 ********************************************************************************/
-    
+
 #if !defined(CY_COUNTER_TIMER0_H)
 #define CY_COUNTER_TIMER0_H
 
@@ -33,7 +33,7 @@ extern uint8 TIMER0_initVar;
 
 
 /**************************************
-*           Parameter Defaults        
+*           Parameter Defaults
 **************************************/
 
 #define TIMER0_Resolution            32u
@@ -55,12 +55,12 @@ extern uint8 TIMER0_initVar;
  *************************************************************************/
 typedef struct
 {
-    uint8 CounterEnableState; 
+    uint8 CounterEnableState;
     uint32 CounterUdb;         /* Current Counter Value */
 
     #if (CY_UDB_V0)
         uint32 CounterPeriod;  /* Counter Period Value */
-        uint32 CompareValue;   /* Counter Compare Value */           
+        uint32 CompareValue;   /* Counter Compare Value */
         uint8 InterruptMaskValue;                   /* Counter Interrupt Mask Value */
     #endif /* (CY_UDB_V0) */
 
@@ -86,7 +86,7 @@ uint8   TIMER0_ReadStatusRegister(void) ;
 #endif /* (!TIMER0_ControlRegRemoved) */
 #if (!(TIMER0_UsingFixedFunction && (CY_PSOC5A)))
     void    TIMER0_WriteCounter(uint32 counter) \
-            ; 
+            ;
 #endif /* (!(TIMER0_UsingFixedFunction && (CY_PSOC5A))) */
 uint32  TIMER0_ReadCounter(void) ;
 uint32  TIMER0_ReadCapture(void) ;
@@ -169,7 +169,7 @@ void TIMER0_Wakeup(void)        ;
 
 #if( 0 != TIMER0_CAPTURE_MODE_CONF)
     #define TIMER0_DEFAULT_CAPTURE_MODE    ((uint8)((uint8)0u << TIMER0_CTRL_CAPMODE0_SHIFT))
-#else    
+#else
     #define TIMER0_DEFAULT_CAPTURE_MODE    (0u )
 #endif /* ( 0 != TIMER0_CAPTURE_MODE_CONF) */
 
@@ -193,9 +193,9 @@ void TIMER0_Wakeup(void)        ;
     #define TIMER0_RT1                 (*(reg8 *) TIMER0_CounterHW__RT1)
     #define TIMER0_RT1_PTR             ( (reg8 *) TIMER0_CounterHW__RT1)
 #else
-    
+
     #if (TIMER0_Resolution <= 8u) /* 8-bit Counter */
-    
+
         #define TIMER0_STATICCOUNT_LSB     (*(reg8 *) \
             TIMER0_CounterUDB_sC32_counterdp_u0__F0_REG )
         #define TIMER0_STATICCOUNT_LSB_PTR ( (reg8 *) \
@@ -209,12 +209,12 @@ void TIMER0_Wakeup(void)        ;
         #define TIMER0_COMPARE_LSB_PTR     ( (reg8 *) \
             TIMER0_CounterUDB_sC32_counterdp_u0__D1_REG )
         #define TIMER0_COUNTER_LSB         (*(reg8 *) \
-            TIMER0_CounterUDB_sC32_counterdp_u0__A0_REG )  
+            TIMER0_CounterUDB_sC32_counterdp_u0__A0_REG )
         #define TIMER0_COUNTER_LSB_PTR     ( (reg8 *)\
             TIMER0_CounterUDB_sC32_counterdp_u0__A0_REG )
-    
+
     #elif(TIMER0_Resolution <= 16u) /* 16-bit Counter */
-        #if(CY_PSOC3) /* 8-bit address space */ 
+        #if(CY_PSOC3) /* 8-bit address space */
             #define TIMER0_STATICCOUNT_LSB     (*(reg16 *) \
                 TIMER0_CounterUDB_sC32_counterdp_u0__F0_REG )
             #define TIMER0_STATICCOUNT_LSB_PTR ( (reg16 *) \
@@ -228,7 +228,7 @@ void TIMER0_Wakeup(void)        ;
             #define TIMER0_COMPARE_LSB_PTR     ( (reg16 *) \
                 TIMER0_CounterUDB_sC32_counterdp_u0__D1_REG )
             #define TIMER0_COUNTER_LSB         (*(reg16 *) \
-                TIMER0_CounterUDB_sC32_counterdp_u0__A0_REG )  
+                TIMER0_CounterUDB_sC32_counterdp_u0__A0_REG )
             #define TIMER0_COUNTER_LSB_PTR     ( (reg16 *)\
                 TIMER0_CounterUDB_sC32_counterdp_u0__A0_REG )
         #else /* 16-bit address space */
@@ -245,12 +245,12 @@ void TIMER0_Wakeup(void)        ;
             #define TIMER0_COMPARE_LSB_PTR     ( (reg16 *) \
                 TIMER0_CounterUDB_sC32_counterdp_u0__16BIT_D1_REG )
             #define TIMER0_COUNTER_LSB         (*(reg16 *) \
-                TIMER0_CounterUDB_sC32_counterdp_u0__16BIT_A0_REG )  
+                TIMER0_CounterUDB_sC32_counterdp_u0__16BIT_A0_REG )
             #define TIMER0_COUNTER_LSB_PTR     ( (reg16 *)\
                 TIMER0_CounterUDB_sC32_counterdp_u0__16BIT_A0_REG )
-        #endif /* CY_PSOC3 */   
+        #endif /* CY_PSOC3 */
     #elif(TIMER0_Resolution <= 24u) /* 24-bit Counter */
-        
+
         #define TIMER0_STATICCOUNT_LSB     (*(reg32 *) \
             TIMER0_CounterUDB_sC32_counterdp_u0__F0_REG )
         #define TIMER0_STATICCOUNT_LSB_PTR ( (reg32 *) \
@@ -264,10 +264,10 @@ void TIMER0_Wakeup(void)        ;
         #define TIMER0_COMPARE_LSB_PTR     ( (reg32 *) \
             TIMER0_CounterUDB_sC32_counterdp_u0__D1_REG )
         #define TIMER0_COUNTER_LSB         (*(reg32 *) \
-            TIMER0_CounterUDB_sC32_counterdp_u0__A0_REG )  
+            TIMER0_CounterUDB_sC32_counterdp_u0__A0_REG )
         #define TIMER0_COUNTER_LSB_PTR     ( (reg32 *)\
             TIMER0_CounterUDB_sC32_counterdp_u0__A0_REG )
-    
+
     #else /* 32-bit Counter */
         #if(CY_PSOC3 || CY_PSOC5) /* 8-bit address space */
             #define TIMER0_STATICCOUNT_LSB     (*(reg32 *) \
@@ -283,7 +283,7 @@ void TIMER0_Wakeup(void)        ;
             #define TIMER0_COMPARE_LSB_PTR     ( (reg32 *) \
                 TIMER0_CounterUDB_sC32_counterdp_u0__D1_REG )
             #define TIMER0_COUNTER_LSB         (*(reg32 *) \
-                TIMER0_CounterUDB_sC32_counterdp_u0__A0_REG )  
+                TIMER0_CounterUDB_sC32_counterdp_u0__A0_REG )
             #define TIMER0_COUNTER_LSB_PTR     ( (reg32 *)\
                 TIMER0_CounterUDB_sC32_counterdp_u0__A0_REG )
         #else /* 32-bit address space */
@@ -300,35 +300,35 @@ void TIMER0_Wakeup(void)        ;
             #define TIMER0_COMPARE_LSB_PTR     ( (reg32 *) \
                 TIMER0_CounterUDB_sC32_counterdp_u0__32BIT_D1_REG )
             #define TIMER0_COUNTER_LSB         (*(reg32 *) \
-                TIMER0_CounterUDB_sC32_counterdp_u0__32BIT_A0_REG )  
+                TIMER0_CounterUDB_sC32_counterdp_u0__32BIT_A0_REG )
             #define TIMER0_COUNTER_LSB_PTR     ( (reg32 *)\
                 TIMER0_CounterUDB_sC32_counterdp_u0__32BIT_A0_REG )
-        #endif /* CY_PSOC3 || CY_PSOC5 */   
+        #endif /* CY_PSOC3 || CY_PSOC5 */
     #endif
 
 	#define TIMER0_COUNTER_LSB_PTR_8BIT     ( (reg8 *)\
                 TIMER0_CounterUDB_sC32_counterdp_u0__A0_REG )
-				
+
     #define TIMER0_AUX_CONTROLDP0 \
         (*(reg8 *) TIMER0_CounterUDB_sC32_counterdp_u0__DP_AUX_CTL_REG)
-    
+
     #define TIMER0_AUX_CONTROLDP0_PTR \
         ( (reg8 *) TIMER0_CounterUDB_sC32_counterdp_u0__DP_AUX_CTL_REG)
-    
+
     #if (TIMER0_Resolution == 16 || TIMER0_Resolution == 24 || TIMER0_Resolution == 32)
        #define TIMER0_AUX_CONTROLDP1 \
            (*(reg8 *) TIMER0_CounterUDB_sC32_counterdp_u1__DP_AUX_CTL_REG)
        #define TIMER0_AUX_CONTROLDP1_PTR \
            ( (reg8 *) TIMER0_CounterUDB_sC32_counterdp_u1__DP_AUX_CTL_REG)
     #endif /* (TIMER0_Resolution == 16 || TIMER0_Resolution == 24 || TIMER0_Resolution == 32) */
-    
+
     #if (TIMER0_Resolution == 24 || TIMER0_Resolution == 32)
        #define TIMER0_AUX_CONTROLDP2 \
            (*(reg8 *) TIMER0_CounterUDB_sC32_counterdp_u2__DP_AUX_CTL_REG)
        #define TIMER0_AUX_CONTROLDP2_PTR \
            ( (reg8 *) TIMER0_CounterUDB_sC32_counterdp_u2__DP_AUX_CTL_REG)
     #endif /* (TIMER0_Resolution == 24 || TIMER0_Resolution == 32) */
-    
+
     #if (TIMER0_Resolution == 32)
        #define TIMER0_AUX_CONTROLDP3 \
            (*(reg8 *) TIMER0_CounterUDB_sC32_counterdp_u3__DP_AUX_CTL_REG)
@@ -355,7 +355,7 @@ void TIMER0_Wakeup(void)        ;
     #define TIMER0_GLOBAL_ENABLE_PTR       ( (reg8 *) TIMER0_CounterHW__PM_ACT_CFG)
     #define TIMER0_GLOBAL_STBY_ENABLE      (*(reg8 *) TIMER0_CounterHW__PM_STBY_CFG)
     #define TIMER0_GLOBAL_STBY_ENABLE_PTR  ( (reg8 *) TIMER0_CounterHW__PM_STBY_CFG)
-    
+
 
     /********************************
     *    Constants
@@ -363,44 +363,44 @@ void TIMER0_Wakeup(void)        ;
 
     /* Fixed Function Block Chosen */
     #define TIMER0_BLOCK_EN_MASK          TIMER0_CounterHW__PM_ACT_MSK
-    #define TIMER0_BLOCK_STBY_EN_MASK     TIMER0_CounterHW__PM_STBY_MSK 
-    
-    /* Control Register Bit Locations */    
+    #define TIMER0_BLOCK_STBY_EN_MASK     TIMER0_CounterHW__PM_STBY_MSK
+
+    /* Control Register Bit Locations */
     /* As defined in Register Map, part of TMRX_CFG0 register */
     #define TIMER0_CTRL_ENABLE_SHIFT      0x00u
     #define TIMER0_ONESHOT_SHIFT          0x02u
     /* Control Register Bit Masks */
-    #define TIMER0_CTRL_ENABLE            ((uint8)((uint8)0x01u << TIMER0_CTRL_ENABLE_SHIFT))         
+    #define TIMER0_CTRL_ENABLE            ((uint8)((uint8)0x01u << TIMER0_CTRL_ENABLE_SHIFT))
     #define TIMER0_ONESHOT                ((uint8)((uint8)0x01u << TIMER0_ONESHOT_SHIFT))
 
     /* Control2 Register Bit Masks */
     /* Set the mask for run mode */
     #if (CY_PSOC5A)
         /* Use CFG1 Mode bits to set run mode */
-        #define TIMER0_CTRL_MODE_SHIFT        0x01u    
+        #define TIMER0_CTRL_MODE_SHIFT        0x01u
         #define TIMER0_CTRL_MODE_MASK         ((uint8)((uint8)0x07u << TIMER0_CTRL_MODE_SHIFT))
     #endif /* (CY_PSOC5A) */
     #if (CY_PSOC3 || CY_PSOC5LP)
         /* Use CFG2 Mode bits to set run mode */
-        #define TIMER0_CTRL_MODE_SHIFT        0x00u    
+        #define TIMER0_CTRL_MODE_SHIFT        0x00u
         #define TIMER0_CTRL_MODE_MASK         ((uint8)((uint8)0x03u << TIMER0_CTRL_MODE_SHIFT))
     #endif /* (CY_PSOC3 || CY_PSOC5LP) */
     /* Set the mask for interrupt (raw/status register) */
     #define TIMER0_CTRL2_IRQ_SEL_SHIFT     0x00u
-    #define TIMER0_CTRL2_IRQ_SEL          ((uint8)((uint8)0x01u << TIMER0_CTRL2_IRQ_SEL_SHIFT))     
-    
+    #define TIMER0_CTRL2_IRQ_SEL          ((uint8)((uint8)0x01u << TIMER0_CTRL2_IRQ_SEL_SHIFT))
+
     /* Status Register Bit Locations */
-    #define TIMER0_STATUS_ZERO_SHIFT      0x07u  /* As defined in Register Map, part of TMRX_SR0 register */ 
+    #define TIMER0_STATUS_ZERO_SHIFT      0x07u  /* As defined in Register Map, part of TMRX_SR0 register */
 
     /* Status Register Interrupt Enable Bit Locations */
     #define TIMER0_STATUS_ZERO_INT_EN_MASK_SHIFT      (TIMER0_STATUS_ZERO_SHIFT - 0x04u)
 
-    /* Status Register Bit Masks */                           
+    /* Status Register Bit Masks */
     #define TIMER0_STATUS_ZERO            ((uint8)((uint8)0x01u << TIMER0_STATUS_ZERO_SHIFT))
 
     /* Status Register Interrupt Bit Masks*/
     #define TIMER0_STATUS_ZERO_INT_EN_MASK       ((uint8)((uint8)TIMER0_STATUS_ZERO >> 0x04u))
-    
+
     /*RT1 Synch Constants: Applicable for PSoC3 and PSoC5LP */
     #define TIMER0_RT1_SHIFT            0x04u
     #define TIMER0_RT1_MASK             ((uint8)((uint8)0x03u << TIMER0_RT1_SHIFT))  /* Sync TC and CMP bit masks */
@@ -408,7 +408,7 @@ void TIMER0_Wakeup(void)        ;
     #define TIMER0_SYNCDSI_SHIFT        0x00u
     #define TIMER0_SYNCDSI_MASK         ((uint8)((uint8)0x0Fu << TIMER0_SYNCDSI_SHIFT)) /* Sync all DSI inputs */
     #define TIMER0_SYNCDSI_EN           ((uint8)((uint8)0x0Fu << TIMER0_SYNCDSI_SHIFT)) /* Sync all DSI inputs */
-    
+
 #else /* !TIMER0_UsingFixedFunction */
     #define TIMER0_STATUS               (* (reg8 *) TIMER0_CounterUDB_sSTSReg_rstSts_stsreg__STATUS_REG )
     #define TIMER0_STATUS_PTR           (  (reg8 *) TIMER0_CounterUDB_sSTSReg_rstSts_stsreg__STATUS_REG )
@@ -428,10 +428,10 @@ void TIMER0_Wakeup(void)        ;
     #define TIMER0_CTRL_RESET_SHIFT       0x06u       /* As defined by Verilog Implementation */
     #define TIMER0_CTRL_ENABLE_SHIFT      0x07u       /* As defined by Verilog Implementation */
     /* Control Register Bit Masks */
-    #define TIMER0_CTRL_CMPMODE_MASK      0x07u 
-    #define TIMER0_CTRL_CAPMODE_MASK      0x03u  
-    #define TIMER0_CTRL_RESET             ((uint8)((uint8)0x01u << TIMER0_CTRL_RESET_SHIFT))  
-    #define TIMER0_CTRL_ENABLE            ((uint8)((uint8)0x01u << TIMER0_CTRL_ENABLE_SHIFT)) 
+    #define TIMER0_CTRL_CMPMODE_MASK      0x07u
+    #define TIMER0_CTRL_CAPMODE_MASK      0x03u
+    #define TIMER0_CTRL_RESET             ((uint8)((uint8)0x01u << TIMER0_CTRL_RESET_SHIFT))
+    #define TIMER0_CTRL_ENABLE            ((uint8)((uint8)0x01u << TIMER0_CTRL_ENABLE_SHIFT))
 
     /* Status Register Bit Locations */
     #define TIMER0_STATUS_CMP_SHIFT       0x00u       /* As defined by Verilog Implementation */
@@ -442,41 +442,41 @@ void TIMER0_Wakeup(void)        ;
     #define TIMER0_STATUS_FIFOFULL_SHIFT  0x05u       /* As defined by Verilog Implementation */
     #define TIMER0_STATUS_FIFONEMP_SHIFT  0x06u       /* As defined by Verilog Implementation */
     /* Status Register Interrupt Enable Bit Locations - UDB Status Interrupt Mask match Status Bit Locations*/
-    #define TIMER0_STATUS_CMP_INT_EN_MASK_SHIFT       TIMER0_STATUS_CMP_SHIFT       
-    #define TIMER0_STATUS_ZERO_INT_EN_MASK_SHIFT      TIMER0_STATUS_ZERO_SHIFT      
-    #define TIMER0_STATUS_OVERFLOW_INT_EN_MASK_SHIFT  TIMER0_STATUS_OVERFLOW_SHIFT  
-    #define TIMER0_STATUS_UNDERFLOW_INT_EN_MASK_SHIFT TIMER0_STATUS_UNDERFLOW_SHIFT 
-    #define TIMER0_STATUS_CAPTURE_INT_EN_MASK_SHIFT   TIMER0_STATUS_CAPTURE_SHIFT   
-    #define TIMER0_STATUS_FIFOFULL_INT_EN_MASK_SHIFT  TIMER0_STATUS_FIFOFULL_SHIFT  
-    #define TIMER0_STATUS_FIFONEMP_INT_EN_MASK_SHIFT  TIMER0_STATUS_FIFONEMP_SHIFT  
-    /* Status Register Bit Masks */                
-    #define TIMER0_STATUS_CMP             ((uint8)((uint8)0x01u << TIMER0_STATUS_CMP_SHIFT))  
-    #define TIMER0_STATUS_ZERO            ((uint8)((uint8)0x01u << TIMER0_STATUS_ZERO_SHIFT)) 
-    #define TIMER0_STATUS_OVERFLOW        ((uint8)((uint8)0x01u << TIMER0_STATUS_OVERFLOW_SHIFT)) 
-    #define TIMER0_STATUS_UNDERFLOW       ((uint8)((uint8)0x01u << TIMER0_STATUS_UNDERFLOW_SHIFT)) 
-    #define TIMER0_STATUS_CAPTURE         ((uint8)((uint8)0x01u << TIMER0_STATUS_CAPTURE_SHIFT)) 
+    #define TIMER0_STATUS_CMP_INT_EN_MASK_SHIFT       TIMER0_STATUS_CMP_SHIFT
+    #define TIMER0_STATUS_ZERO_INT_EN_MASK_SHIFT      TIMER0_STATUS_ZERO_SHIFT
+    #define TIMER0_STATUS_OVERFLOW_INT_EN_MASK_SHIFT  TIMER0_STATUS_OVERFLOW_SHIFT
+    #define TIMER0_STATUS_UNDERFLOW_INT_EN_MASK_SHIFT TIMER0_STATUS_UNDERFLOW_SHIFT
+    #define TIMER0_STATUS_CAPTURE_INT_EN_MASK_SHIFT   TIMER0_STATUS_CAPTURE_SHIFT
+    #define TIMER0_STATUS_FIFOFULL_INT_EN_MASK_SHIFT  TIMER0_STATUS_FIFOFULL_SHIFT
+    #define TIMER0_STATUS_FIFONEMP_INT_EN_MASK_SHIFT  TIMER0_STATUS_FIFONEMP_SHIFT
+    /* Status Register Bit Masks */
+    #define TIMER0_STATUS_CMP             ((uint8)((uint8)0x01u << TIMER0_STATUS_CMP_SHIFT))
+    #define TIMER0_STATUS_ZERO            ((uint8)((uint8)0x01u << TIMER0_STATUS_ZERO_SHIFT))
+    #define TIMER0_STATUS_OVERFLOW        ((uint8)((uint8)0x01u << TIMER0_STATUS_OVERFLOW_SHIFT))
+    #define TIMER0_STATUS_UNDERFLOW       ((uint8)((uint8)0x01u << TIMER0_STATUS_UNDERFLOW_SHIFT))
+    #define TIMER0_STATUS_CAPTURE         ((uint8)((uint8)0x01u << TIMER0_STATUS_CAPTURE_SHIFT))
     #define TIMER0_STATUS_FIFOFULL        ((uint8)((uint8)0x01u << TIMER0_STATUS_FIFOFULL_SHIFT))
     #define TIMER0_STATUS_FIFONEMP        ((uint8)((uint8)0x01u << TIMER0_STATUS_FIFONEMP_SHIFT))
     /* Status Register Interrupt Bit Masks  - UDB Status Interrupt Mask match Status Bit Locations */
-    #define TIMER0_STATUS_CMP_INT_EN_MASK            TIMER0_STATUS_CMP                    
-    #define TIMER0_STATUS_ZERO_INT_EN_MASK           TIMER0_STATUS_ZERO            
-    #define TIMER0_STATUS_OVERFLOW_INT_EN_MASK       TIMER0_STATUS_OVERFLOW        
-    #define TIMER0_STATUS_UNDERFLOW_INT_EN_MASK      TIMER0_STATUS_UNDERFLOW       
-    #define TIMER0_STATUS_CAPTURE_INT_EN_MASK        TIMER0_STATUS_CAPTURE         
-    #define TIMER0_STATUS_FIFOFULL_INT_EN_MASK       TIMER0_STATUS_FIFOFULL        
-    #define TIMER0_STATUS_FIFONEMP_INT_EN_MASK       TIMER0_STATUS_FIFONEMP         
-    
+    #define TIMER0_STATUS_CMP_INT_EN_MASK            TIMER0_STATUS_CMP
+    #define TIMER0_STATUS_ZERO_INT_EN_MASK           TIMER0_STATUS_ZERO
+    #define TIMER0_STATUS_OVERFLOW_INT_EN_MASK       TIMER0_STATUS_OVERFLOW
+    #define TIMER0_STATUS_UNDERFLOW_INT_EN_MASK      TIMER0_STATUS_UNDERFLOW
+    #define TIMER0_STATUS_CAPTURE_INT_EN_MASK        TIMER0_STATUS_CAPTURE
+    #define TIMER0_STATUS_FIFOFULL_INT_EN_MASK       TIMER0_STATUS_FIFOFULL
+    #define TIMER0_STATUS_FIFONEMP_INT_EN_MASK       TIMER0_STATUS_FIFONEMP
+
 
     /* StatusI Interrupt Enable bit Location in the Auxilliary Control Register */
     #define TIMER0_STATUS_ACTL_INT_EN     0x10u /* As defined for the ACTL Register */
-    
+
     /* Datapath Auxillary Control Register definitions */
     #define TIMER0_AUX_CTRL_FIFO0_CLR         0x01u   /* As defined by Register map */
     #define TIMER0_AUX_CTRL_FIFO1_CLR         0x02u   /* As defined by Register map */
     #define TIMER0_AUX_CTRL_FIFO0_LVL         0x04u   /* As defined by Register map */
     #define TIMER0_AUX_CTRL_FIFO1_LVL         0x08u   /* As defined by Register map */
     #define TIMER0_STATUS_ACTL_INT_EN_MASK    0x10u   /* As defined for the ACTL Register */
-    
+
 #endif /* TIMER0_UsingFixedFunction */
 
 #endif  /* CY_COUNTER_TIMER0_H */

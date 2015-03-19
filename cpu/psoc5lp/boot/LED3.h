@@ -1,5 +1,5 @@
 /*******************************************************************************
-* File Name: LED3.h  
+* File Name: LED3.h
 * Version 2.10
 *
 * Description:
@@ -9,8 +9,8 @@
 *
 ********************************************************************************
 * Copyright 2008-2014, Cypress Semiconductor Corporation.  All rights reserved.
-* You may use this file only in accordance with the license, terms, conditions, 
-* disclaimers, and limitations in the end user license agreement accompanying 
+* You may use this file only in accordance with the license, terms, conditions,
+* disclaimers, and limitations in the end user license agreement accompanying
 * the software package with which this file was provided.
 *******************************************************************************/
 
@@ -34,8 +34,8 @@
 
 
 /***************************************
-*        Function Prototypes             
-***************************************/    
+*        Function Prototypes
+***************************************/
 
 void    LED3_Write(uint8 value) ;
 void    LED3_SetDriveMode(uint8 mode) ;
@@ -45,7 +45,7 @@ uint8   LED3_ClearInterrupt(void) ;
 
 
 /***************************************
-*           API Constants        
+*           API Constants
 ***************************************/
 
 /* Drive Modes */
@@ -65,7 +65,7 @@ uint8   LED3_ClearInterrupt(void) ;
 
 
 /***************************************
-*             Registers        
+*             Registers
 ***************************************/
 
 /* Main Port Registers */
@@ -74,23 +74,23 @@ uint8   LED3_ClearInterrupt(void) ;
 /* Data Register */
 #define LED3_DR                     (* (reg8 *) LED3__DR)
 /* Port Number */
-#define LED3_PRT_NUM                (* (reg8 *) LED3__PRT) 
-/* Connect to Analog Globals */                                                  
-#define LED3_AG                     (* (reg8 *) LED3__AG)                       
+#define LED3_PRT_NUM                (* (reg8 *) LED3__PRT)
+/* Connect to Analog Globals */
+#define LED3_AG                     (* (reg8 *) LED3__AG)
 /* Analog MUX bux enable */
-#define LED3_AMUX                   (* (reg8 *) LED3__AMUX) 
-/* Bidirectional Enable */                                                        
+#define LED3_AMUX                   (* (reg8 *) LED3__AMUX)
+/* Bidirectional Enable */
 #define LED3_BIE                    (* (reg8 *) LED3__BIE)
 /* Bit-mask for Aliased Register Access */
 #define LED3_BIT_MASK               (* (reg8 *) LED3__BIT_MASK)
 /* Bypass Enable */
 #define LED3_BYP                    (* (reg8 *) LED3__BYP)
-/* Port wide control signals */                                                   
+/* Port wide control signals */
 #define LED3_CTL                    (* (reg8 *) LED3__CTL)
 /* Drive Modes */
-#define LED3_DM0                    (* (reg8 *) LED3__DM0) 
+#define LED3_DM0                    (* (reg8 *) LED3__DM0)
 #define LED3_DM1                    (* (reg8 *) LED3__DM1)
-#define LED3_DM2                    (* (reg8 *) LED3__DM2) 
+#define LED3_DM2                    (* (reg8 *) LED3__DM2)
 /* Input Buffer Disable Override */
 #define LED3_INP_DIS                (* (reg8 *) LED3__INP_DIS)
 /* LCD Common or Segment Drive */
@@ -102,17 +102,17 @@ uint8   LED3_ClearInterrupt(void) ;
 
 /* DSI Port Registers */
 /* Global DSI Select Register */
-#define LED3_PRTDSI__CAPS_SEL       (* (reg8 *) LED3__PRTDSI__CAPS_SEL) 
+#define LED3_PRTDSI__CAPS_SEL       (* (reg8 *) LED3__PRTDSI__CAPS_SEL)
 /* Double Sync Enable */
-#define LED3_PRTDSI__DBL_SYNC_IN    (* (reg8 *) LED3__PRTDSI__DBL_SYNC_IN) 
+#define LED3_PRTDSI__DBL_SYNC_IN    (* (reg8 *) LED3__PRTDSI__DBL_SYNC_IN)
 /* Output Enable Select Drive Strength */
-#define LED3_PRTDSI__OE_SEL0        (* (reg8 *) LED3__PRTDSI__OE_SEL0) 
-#define LED3_PRTDSI__OE_SEL1        (* (reg8 *) LED3__PRTDSI__OE_SEL1) 
+#define LED3_PRTDSI__OE_SEL0        (* (reg8 *) LED3__PRTDSI__OE_SEL0)
+#define LED3_PRTDSI__OE_SEL1        (* (reg8 *) LED3__PRTDSI__OE_SEL1)
 /* Port Pin Output Select Registers */
-#define LED3_PRTDSI__OUT_SEL0       (* (reg8 *) LED3__PRTDSI__OUT_SEL0) 
-#define LED3_PRTDSI__OUT_SEL1       (* (reg8 *) LED3__PRTDSI__OUT_SEL1) 
+#define LED3_PRTDSI__OUT_SEL0       (* (reg8 *) LED3__PRTDSI__OUT_SEL0)
+#define LED3_PRTDSI__OUT_SEL1       (* (reg8 *) LED3__PRTDSI__OUT_SEL1)
 /* Sync Output Enable Registers */
-#define LED3_PRTDSI__SYNC_OUT       (* (reg8 *) LED3__PRTDSI__SYNC_OUT) 
+#define LED3_PRTDSI__SYNC_OUT       (* (reg8 *) LED3__PRTDSI__SYNC_OUT)
 
 
 #if defined(LED3__INTSTAT)  /* Interrupt Registers */

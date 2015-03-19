@@ -75,7 +75,7 @@ uint8 SpcLockState = CY_SPC_UNLOCKED;
 *  None
 *
 *******************************************************************************/
-void CySpcStart(void) 
+void CySpcStart(void)
 {
     /* Save current global interrupt enable and disable it */
     uint8 interruptState = CyEnterCriticalSection();
@@ -101,7 +101,7 @@ void CySpcStart(void)
 *  None
 *
 *******************************************************************************/
-void CySpcStop(void) 
+void CySpcStop(void)
 {
     /* Save current global interrupt enable and disable it */
     uint8 interruptState = CyEnterCriticalSection();
@@ -132,7 +132,7 @@ void CySpcStop(void)
 *   The number of bytes read from the SPC.
 *
 *******************************************************************************/
-uint8 CySpcReadData(uint8 buffer[], uint8 size) 
+uint8 CySpcReadData(uint8 buffer[], uint8 size)
 {
     uint8 i;
 

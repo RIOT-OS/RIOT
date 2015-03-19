@@ -38,16 +38,16 @@ void isr_systick(void)        __attribute__ ((weak, alias("dummy_handler")));
  */
 void cpu_init(void)
 {
-    /* 
-     * IMP: Following Cortex-M Specific interrupts are being managed by RIOT but 
+    /*
+     * IMP: Following Cortex-M Specific interrupts are being managed by RIOT but
      * PSoC Creator sets interrupt vectors with a dummy handlers internally and
-     * provides APIs to associate interupts and handler methods. 
+     * provides APIs to associate interupts and handler methods.
      */
     CyIntSetSysVector(CY_INT_SVCALL_IRQN, isr_svc);
     CyIntSetSysVector(CY_INT_PEND_SV_IRQN, isr_pendsv);
     CyIntSetSysVector(CY_INT_SYSTICK_IRQN, isr_systick);
-    
-    
+
+
     /* set pendSV interrupt to lowest possible priority */
     NVIC_SetPriority(PendSV_IRQn, 0xff);
 }

@@ -92,7 +92,7 @@ static void CyBusClk_Internal_SetDivider(uint16 divider);
 *  Register is only done using the CyPmReadStatus() function.
 *
 *******************************************************************************/
-cystatus CyPLL_OUT_Start(uint8 wait) 
+cystatus CyPLL_OUT_Start(uint8 wait)
 {
     cystatus status = CYRET_SUCCESS;
 
@@ -156,7 +156,7 @@ cystatus CyPLL_OUT_Start(uint8 wait)
 *  None
 *
 *******************************************************************************/
-void CyPLL_OUT_Stop(void) 
+void CyPLL_OUT_Stop(void)
 {
     CY_CLK_PLL_CFG0_REG &= ((uint8)(~CY_CLK_PLL_ENABLE));
 }
@@ -194,7 +194,7 @@ void CyPLL_OUT_Stop(void)
 *  See CyFlash_SetWaitCycles() description for more information.
 *
 *******************************************************************************/
-void CyPLL_OUT_SetPQ(uint8 pDiv, uint8 qDiv, uint8 current) 
+void CyPLL_OUT_SetPQ(uint8 pDiv, uint8 qDiv, uint8 current)
 {
     /* Halt CPU in debug mode if PLL is enabled */
     CYASSERT(0u == (CY_CLK_PLL_CFG0_REG & CY_CLK_PLL_ENABLE));
@@ -249,7 +249,7 @@ void CyPLL_OUT_SetPQ(uint8 pDiv, uint8 qDiv, uint8 current)
 *  See CyFlash_SetWaitCycles() description for more information.
 *
 *******************************************************************************/
-void CyPLL_OUT_SetSource(uint8 source) 
+void CyPLL_OUT_SetSource(uint8 source)
 {
     /* Halt CPU in debug mode if PLL is enabled */
     CYASSERT(0u == (CY_CLK_PLL_CFG0_REG & CY_CLK_PLL_ENABLE));
@@ -299,7 +299,7 @@ void CyPLL_OUT_SetSource(uint8 source)
 *  Register is only done using the CyPmReadStatus() function.
 *
 *******************************************************************************/
-void CyIMO_Start(uint8 wait) 
+void CyIMO_Start(uint8 wait)
 {
     uint8 pmFtwCfg2Reg;
     uint8 pmFtwCfg0Reg;
@@ -348,7 +348,7 @@ void CyIMO_Start(uint8 wait)
 *  None
 *
 *******************************************************************************/
-void CyIMO_Stop(void) 
+void CyIMO_Stop(void)
 {
     CY_LIB_PM_ACT_CFG0_REG  &= ((uint8) (~CY_LIB_PM_ACT_CFG0_IMO_EN));
     CY_LIB_PM_STBY_CFG0_REG &= ((uint8) (~CY_LIB_PM_STBY_CFG0_IMO_EN));
@@ -369,7 +369,7 @@ void CyIMO_Stop(void)
 *   uint8: one if the USB is enabled, 0 if not enabled.
 *
 *******************************************************************************/
-static uint8 CyUSB_PowerOnCheck(void)  
+static uint8 CyUSB_PowerOnCheck(void)
 {
     uint8 poweredOn = 0u;
 
@@ -400,7 +400,7 @@ static uint8 CyUSB_PowerOnCheck(void)
 *  None
 *
 *******************************************************************************/
-static void CyIMO_SetTrimValue(uint8 freq) 
+static void CyIMO_SetTrimValue(uint8 freq)
 {
     uint8 usbPowerOn = CyUSB_PowerOnCheck();
 
@@ -495,7 +495,7 @@ static void CyIMO_SetTrimValue(uint8 freq)
 *  selecting the USB setting.
 *
 *******************************************************************************/
-void CyIMO_SetFreq(uint8 freq) 
+void CyIMO_SetFreq(uint8 freq)
 {
     uint8 currentFreq;
     uint8 nextFreq;
@@ -650,7 +650,7 @@ void CyIMO_SetFreq(uint8 freq)
 *  See CyFlash_SetWaitCycles() description for more information.
 *
 *******************************************************************************/
-void CyIMO_SetSource(uint8 source) 
+void CyIMO_SetSource(uint8 source)
 {
     switch(source)
     {
@@ -691,7 +691,7 @@ void CyIMO_SetSource(uint8 source)
 *  None
 *
 *******************************************************************************/
-void CyIMO_EnableDoubler(void) 
+void CyIMO_EnableDoubler(void)
 {
     /* Set FASTCLK_IMO_CR_PTR regigster's 4th bit */
     CY_LIB_FASTCLK_IMO_CR_REG |= CY_LIB_FASTCLK_IMO_DOUBLER;
@@ -712,7 +712,7 @@ void CyIMO_EnableDoubler(void)
 *  None
 *
 *******************************************************************************/
-void CyIMO_DisableDoubler(void) 
+void CyIMO_DisableDoubler(void)
 {
     CY_LIB_FASTCLK_IMO_CR_REG &= ((uint8)(~CY_LIB_FASTCLK_IMO_DOUBLER));
 }
@@ -747,7 +747,7 @@ void CyIMO_DisableDoubler(void)
 *  See CyFlash_SetWaitCycles() description for more information.
 *
 *******************************************************************************/
-void CyMasterClk_SetSource(uint8 source) 
+void CyMasterClk_SetSource(uint8 source)
 {
     CY_LIB_CLKDIST_MSTR1_REG = (CY_LIB_CLKDIST_MSTR1_REG & MASTER_CLK_SRC_CLEAR) |
                                 (source & ((uint8)(~MASTER_CLK_SRC_CLEAR)));
@@ -782,7 +782,7 @@ void CyMasterClk_SetSource(uint8 source)
 *  than the final/expected div-by-1 period.
 *
 *******************************************************************************/
-void CyMasterClk_SetDivider(uint8 divider) 
+void CyMasterClk_SetDivider(uint8 divider)
 {
     CY_LIB_CLKDIST_MSTR0_REG = divider;
 }
@@ -851,7 +851,7 @@ static void CyBusClk_Internal_SetDivider(uint16 divider)
 *  See CyFlash_SetWaitCycles() description for more information.
 *
 *******************************************************************************/
-void CyBusClk_SetDivider(uint16 divider) 
+void CyBusClk_SetDivider(uint16 divider)
 {
     uint8  masterClkDiv;
     uint16 busClkDiv;
@@ -924,7 +924,7 @@ void CyBusClk_SetDivider(uint16 divider)
     *  See CyFlash_SetWaitCycles() description for more information.
     *
     *******************************************************************************/
-    void CyCpuClk_SetDivider(uint8 divider) 
+    void CyCpuClk_SetDivider(uint8 divider)
     {
             CY_LIB_CLKDIST_MSTR1_REG = (CY_LIB_CLKDIST_MSTR1_REG & CY_LIB_CLKDIST_MSTR1_DIV_MASK) |
                                 ((uint8)(divider << CY_LIB_CLKDIST_DIV_POSITION));
@@ -951,7 +951,7 @@ void CyBusClk_SetDivider(uint16 divider)
 *  None
 *
 *******************************************************************************/
-void CyUsbClk_SetSource(uint8 source) 
+void CyUsbClk_SetSource(uint8 source)
 {
     CY_LIB_CLKDIST_UCFG_REG = (CY_LIB_CLKDIST_UCFG_REG & ((uint8)(~CY_LIB_CLKDIST_UCFG_SRC_SEL_MASK))) |
                         (CY_LIB_CLKDIST_UCFG_SRC_SEL_MASK & source);
@@ -976,7 +976,7 @@ void CyUsbClk_SetSource(uint8 source)
 *  None
 *
 *******************************************************************************/
-void CyILO_Start1K(void) 
+void CyILO_Start1K(void)
 {
     /* Set bit 1 of ILO RS */
     CY_LIB_SLOWCLK_ILO_CR0_REG |= CY_LIB_SLOWCLK_ILO_CR0_EN_1KHZ;
@@ -1004,7 +1004,7 @@ void CyILO_Start1K(void)
 *  PSoC5: Stopping the ILO 1 kHz could break the active WDT functionality.
 *
 *******************************************************************************/
-void CyILO_Stop1K(void) 
+void CyILO_Stop1K(void)
 {
     /* Clear bit 1 of ILO RS */
     CY_LIB_SLOWCLK_ILO_CR0_REG &= ((uint8)(~CY_LIB_SLOWCLK_ILO_CR0_EN_1KHZ));
@@ -1025,7 +1025,7 @@ void CyILO_Stop1K(void)
 *  None
 *
 *******************************************************************************/
-void CyILO_Start100K(void) 
+void CyILO_Start100K(void)
 {
     CY_LIB_SLOWCLK_ILO_CR0_REG |= CY_LIB_SLOWCLK_ILO_CR0_EN_100KHZ;
 }
@@ -1045,7 +1045,7 @@ void CyILO_Start100K(void)
 *  None
 *
 *******************************************************************************/
-void CyILO_Stop100K(void) 
+void CyILO_Stop100K(void)
 {
     CY_LIB_SLOWCLK_ILO_CR0_REG &= ((uint8)(~CY_LIB_SLOWCLK_ILO_CR0_EN_100KHZ));
 }
@@ -1068,7 +1068,7 @@ void CyILO_Stop100K(void)
 *  None
 *
 *******************************************************************************/
-void CyILO_Enable33K(void) 
+void CyILO_Enable33K(void)
 {
     /* Set bit 5 of ILO RS */
     CY_LIB_SLOWCLK_ILO_CR0_REG |= CY_LIB_SLOWCLK_ILO_CR0_EN_33KHZ;
@@ -1092,7 +1092,7 @@ void CyILO_Enable33K(void)
 *  None
 *
 *******************************************************************************/
-void CyILO_Disable33K(void) 
+void CyILO_Disable33K(void)
 {
     CY_LIB_SLOWCLK_ILO_CR0_REG &= ((uint8)(~CY_LIB_SLOWCLK_ILO_CR0_EN_33KHZ));
 }
@@ -1116,7 +1116,7 @@ void CyILO_Disable33K(void)
 *  None
 *
 *******************************************************************************/
-void CyILO_SetSource(uint8 source) 
+void CyILO_SetSource(uint8 source)
 {
     CY_LIB_CLKDIST_CR_REG = (CY_LIB_CLKDIST_CR_REG & CY_ILO_SOURCE_BITS_CLEAR) |
                     (((uint8) (source << 2u)) & ((uint8)(~CY_ILO_SOURCE_BITS_CLEAR)));
@@ -1140,7 +1140,7 @@ void CyILO_SetSource(uint8 source)
 *   Prevous power mode state.
 *
 *******************************************************************************/
-uint8 CyILO_SetPowerMode(uint8 mode) 
+uint8 CyILO_SetPowerMode(uint8 mode)
 {
     uint8 state;
 
@@ -1176,7 +1176,7 @@ uint8 CyILO_SetPowerMode(uint8 mode)
 *  None
 *
 *******************************************************************************/
-void CyXTAL_32KHZ_Start(void) 
+void CyXTAL_32KHZ_Start(void)
 {
     volatile uint16 i;
 
@@ -1220,7 +1220,7 @@ void CyXTAL_32KHZ_Start(void)
 *  None
 *
 *******************************************************************************/
-void CyXTAL_32KHZ_Stop(void) 
+void CyXTAL_32KHZ_Stop(void)
 {
     CY_CLK_XTAL32_TST_REG  = CY_CLK_XTAL32_TST_DEFAULT;
     CY_CLK_XTAL32_TR_REG   = CY_CLK_XTAL32_TR_POWERDOWN;
@@ -1251,7 +1251,7 @@ void CyXTAL_32KHZ_Stop(void)
 *                                       0: Not stable
 *
 *******************************************************************************/
-uint8 CyXTAL_32KHZ_ReadStatus(void) 
+uint8 CyXTAL_32KHZ_ReadStatus(void)
 {
     return(CY_CLK_XTAL32_CR_REG & CY_XTAL32K_ANA_STAT);
 }
@@ -1275,7 +1275,7 @@ uint8 CyXTAL_32KHZ_ReadStatus(void)
 *  Previous power mode.
 *
 *******************************************************************************/
-uint8 CyXTAL_32KHZ_SetPowerMode(uint8 mode) 
+uint8 CyXTAL_32KHZ_SetPowerMode(uint8 mode)
 {
     uint8 state = (0u != (CY_CLK_XTAL32_CR_REG & CY_CLK_XTAL32_CR_LPM)) ? 1u : 0u;
 
@@ -1341,7 +1341,7 @@ uint8 CyXTAL_32KHZ_SetPowerMode(uint8 mode)
 *  CyPmReadStatus() function.
 *
 *******************************************************************************/
-cystatus CyXTAL_Start(uint8 wait) 
+cystatus CyXTAL_Start(uint8 wait)
 {
     cystatus status = CYRET_SUCCESS;
     volatile uint8  timeout = wait;
@@ -1421,7 +1421,7 @@ cystatus CyXTAL_Start(uint8 wait)
 *  None
 *
 *******************************************************************************/
-void CyXTAL_Stop(void) 
+void CyXTAL_Stop(void)
 {
     /* Disable oscillator. */
     FASTCLK_XMHZ_CSR &= ((uint8)(~XMHZ_CONTROL_ENABLE));
@@ -1443,7 +1443,7 @@ void CyXTAL_Stop(void)
 *  None
 *
 *******************************************************************************/
-void CyXTAL_EnableErrStatus(void) 
+void CyXTAL_EnableErrStatus(void)
 {
     /* If oscillator has insufficient amplitude, XERR bit will be high. */
     CY_CLK_XMHZ_CSR_REG &= ((uint8)(~CY_CLK_XMHZ_CSR_XFB));
@@ -1465,7 +1465,7 @@ void CyXTAL_EnableErrStatus(void)
 *  None
 *
 *******************************************************************************/
-void CyXTAL_DisableErrStatus(void) 
+void CyXTAL_DisableErrStatus(void)
 {
     /* If oscillator has insufficient amplitude, XERR bit will be high. */
     CY_CLK_XMHZ_CSR_REG |= CY_CLK_XMHZ_CSR_XFB;
@@ -1489,7 +1489,7 @@ void CyXTAL_DisableErrStatus(void)
 *    1: Error
 *
 *******************************************************************************/
-uint8 CyXTAL_ReadStatus(void) 
+uint8 CyXTAL_ReadStatus(void)
 {
     /***************************************************************************
     * High output indicates an oscillator failure. Only use this after a start-up
@@ -1516,7 +1516,7 @@ uint8 CyXTAL_ReadStatus(void)
 *  None
 *
 *******************************************************************************/
-void CyXTAL_EnableFaultRecovery(void) 
+void CyXTAL_EnableFaultRecovery(void)
 {
     CY_CLK_XMHZ_CSR_REG |= CY_CLK_XMHZ_CSR_XPROT;
 }
@@ -1538,7 +1538,7 @@ void CyXTAL_EnableFaultRecovery(void)
 *  None
 *
 *******************************************************************************/
-void CyXTAL_DisableFaultRecovery(void) 
+void CyXTAL_DisableFaultRecovery(void)
 {
     CY_CLK_XMHZ_CSR_REG &= ((uint8)(~CY_CLK_XMHZ_CSR_XPROT));
 }
@@ -1564,7 +1564,7 @@ void CyXTAL_DisableFaultRecovery(void)
 *  None
 *
 *******************************************************************************/
-void CyXTAL_SetStartup(uint8 setting) 
+void CyXTAL_SetStartup(uint8 setting)
 {
     CY_CLK_XMHZ_CFG0_REG = (CY_CLK_XMHZ_CFG0_REG & ((uint8)(~CY_CLK_XMHZ_CFG0_XCFG_MASK))) |
                            (setting & CY_CLK_XMHZ_CFG0_XCFG_MASK);
@@ -1588,7 +1588,7 @@ void CyXTAL_SetStartup(uint8 setting)
 *  None
 *
 *******************************************************************************/
-void CyXTAL_SetFbVoltage(uint8 setting) 
+void CyXTAL_SetFbVoltage(uint8 setting)
 {
     CY_CLK_XMHZ_CFG1_REG = ((CY_CLK_XMHZ_CFG1_REG & ((uint8)(~CY_CLK_XMHZ_CFG1_VREF_FB_MASK))) |
                             (setting & CY_CLK_XMHZ_CFG1_VREF_FB_MASK));
@@ -1611,7 +1611,7 @@ void CyXTAL_SetFbVoltage(uint8 setting)
 *  None
 *
 *******************************************************************************/
-void CyXTAL_SetWdVoltage(uint8 setting) 
+void CyXTAL_SetWdVoltage(uint8 setting)
 {
     CY_CLK_XMHZ_CFG1_REG = ((CY_CLK_XMHZ_CFG1_REG & ((uint8)(~CY_CLK_XMHZ_CFG1_VREF_WD_MASK))) |
                             (((uint8)(setting << 4u)) & CY_CLK_XMHZ_CFG1_VREF_WD_MASK));
@@ -1663,7 +1663,7 @@ void CyHalt(uint8 reason) CYREENTRANT
 *  None
 *
 *******************************************************************************/
-void CySoftwareReset(void) 
+void CySoftwareReset(void)
 {
     CY_LIB_RESET_CR2_REG |= CY_LIB_RESET_CR2_RESET;
 }
@@ -1823,7 +1823,7 @@ void CyDelayFreq(uint32 freq) CYREENTRANT
 *  ILO 1 kHz could break the active WDT functionality.
 *
 *******************************************************************************/
-void CyWdtStart(uint8 ticks, uint8 lpMode) 
+void CyWdtStart(uint8 ticks, uint8 lpMode)
 {
     /* Set WDT interval */
     CY_WDT_CFG_REG = (CY_WDT_CFG_REG & ((uint8)(~CY_WDT_CFG_INTERVAL_MASK))) | (ticks & CY_WDT_CFG_INTERVAL_MASK);
@@ -1855,7 +1855,7 @@ void CyWdtStart(uint8 ticks, uint8 lpMode)
 *  None
 *
 *******************************************************************************/
-void CyWdtClear(void) 
+void CyWdtClear(void)
 {
     CY_WDT_CR_REG = CY_WDT_CR_FEED;
 }
@@ -1883,7 +1883,7 @@ void CyWdtClear(void)
 *  None
 *
 *******************************************************************************/
-void CyVdLvDigitEnable(uint8 reset, uint8 threshold) 
+void CyVdLvDigitEnable(uint8 reset, uint8 threshold)
 {
     *CY_INT_CLEAR_PTR = 0x01u;
 
@@ -1933,7 +1933,7 @@ void CyVdLvDigitEnable(uint8 reset, uint8 threshold)
 *  None
 *
 *******************************************************************************/
-void CyVdLvAnalogEnable(uint8 reset, uint8 threshold) 
+void CyVdLvAnalogEnable(uint8 reset, uint8 threshold)
 {
     *CY_INT_CLEAR_PTR = 0x01u;
 
@@ -1976,7 +1976,7 @@ void CyVdLvAnalogEnable(uint8 reset, uint8 threshold)
 *  None
 *
 *******************************************************************************/
-void CyVdLvDigitDisable(void) 
+void CyVdLvDigitDisable(void)
 {
     CY_VD_LVI_HVI_CONTROL_REG &= ((uint8)(~CY_VD_LVID_EN));
 
@@ -2004,7 +2004,7 @@ void CyVdLvDigitDisable(void)
 *  None
 *
 *******************************************************************************/
-void CyVdLvAnalogDisable(void) 
+void CyVdLvAnalogDisable(void)
 {
     CY_VD_LVI_HVI_CONTROL_REG &= ((uint8)(~CY_VD_LVIA_EN));
 
@@ -2032,7 +2032,7 @@ void CyVdLvAnalogDisable(void)
 *  None
 *
 *******************************************************************************/
-void CyVdHvAnalogEnable(void) 
+void CyVdHvAnalogEnable(void)
 {
     *CY_INT_CLEAR_PTR = 0x01u;
 
@@ -2065,7 +2065,7 @@ void CyVdHvAnalogEnable(void)
 *  None
 *
 *******************************************************************************/
-void CyVdHvAnalogDisable(void) 
+void CyVdHvAnalogDisable(void)
 {
     CY_VD_LVI_HVI_CONTROL_REG &= ((uint8)(~CY_VD_HVIA_EN));
 }
@@ -2091,7 +2091,7 @@ void CyVdHvAnalogDisable(void)
 *  Status.  Same enumerated bit values as used for the mask parameter.
 *
 *******************************************************************************/
-uint8 CyVdStickyStatus(uint8 mask) 
+uint8 CyVdStickyStatus(uint8 mask)
 {
     uint8 status;
 
@@ -2120,7 +2120,7 @@ uint8 CyVdStickyStatus(uint8 mask)
 *   CY_VD_HVIA            Persistent status of analog HVI.
 *
 *******************************************************************************/
-uint8 CyVdRealTimeStatus(void) 
+uint8 CyVdRealTimeStatus(void)
 {
     uint8 interruptState;
     uint8 vdFlagsState;
@@ -2147,7 +2147,7 @@ uint8 CyVdRealTimeStatus(void)
 *  32 bit mask of previously enabled interrupts.
 *
 *******************************************************************************/
-uint32 CyDisableInts(void) 
+uint32 CyDisableInts(void)
 {
     uint32 intState;
     uint8 interruptState;
@@ -2199,7 +2199,7 @@ uint32 CyDisableInts(void)
 *  None
 *
 *******************************************************************************/
-void CyEnableInts(uint32 mask) 
+void CyEnableInts(uint32 mask)
 {
 
     uint8 interruptState;
@@ -2505,7 +2505,7 @@ void CyEnableInts(uint32 mask)
     *  Previous interrupt vector value.
     *
     *******************************************************************************/
-    cyisraddress CyIntSetVector(uint8 number, cyisraddress address) 
+    cyisraddress CyIntSetVector(uint8 number, cyisraddress address)
     {
         cyisraddress oldIsr;
 
@@ -2536,7 +2536,7 @@ void CyEnableInts(uint32 mask)
     *  Address of the ISR in the interrupt vector table.
     *
     *******************************************************************************/
-    cyisraddress CyIntGetVector(uint8 number) 
+    cyisraddress CyIntGetVector(uint8 number)
     {
         CYASSERT(number <= CY_INT_NUMBER_MAX);
 
@@ -2560,7 +2560,7 @@ void CyEnableInts(uint32 mask)
     *  None
     *
     *******************************************************************************/
-    void CyIntSetPriority(uint8 number, uint8 priority) 
+    void CyIntSetPriority(uint8 number, uint8 priority)
     {
         CYASSERT(priority <= CY_INT_PRIORITY_MAX);
 
@@ -2585,7 +2585,7 @@ void CyEnableInts(uint32 mask)
     *  Priority of the interrupt. 0 - 7, 0 being the highest.
     *
     *******************************************************************************/
-    uint8 CyIntGetPriority(uint8 number) 
+    uint8 CyIntGetPriority(uint8 number)
     {
         uint8 priority;
 
@@ -2611,7 +2611,7 @@ void CyEnableInts(uint32 mask)
     *   Enable status: 1 if enabled, 0 if disabled
     *
     *******************************************************************************/
-    uint8 CyIntGetState(uint8 number) 
+    uint8 CyIntGetState(uint8 number)
     {
         reg8 * stateReg;
 
@@ -2659,7 +2659,7 @@ void CyEnableInts(uint32 mask)
     *   None
     *
     *******************************************************************************/
-    void CySetScPumps(uint8 enable) 
+    void CySetScPumps(uint8 enable)
     {
         if(1u == enable)
         {

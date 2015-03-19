@@ -55,7 +55,7 @@ static cystatus CyFlashGetSpcAlgorithm(void);
 *  None
 *
 *******************************************************************************/
-void CyFlash_Start(void) 
+void CyFlash_Start(void)
 {
     uint8 interruptState;
 
@@ -120,7 +120,7 @@ void CyFlash_Start(void)
 *  only take effect when the CPU is later disabled.
 *
 *******************************************************************************/
-void CyFlash_Stop(void) 
+void CyFlash_Stop(void)
 {
     uint8 interruptState;
 
@@ -152,7 +152,7 @@ void CyFlash_Stop(void)
 *   CYRET_UNKNOWN - if there was an SPC error
 *
 *******************************************************************************/
-static cystatus CySetTempInt(void) 
+static cystatus CySetTempInt(void)
 {
     cystatus status;
 
@@ -212,7 +212,7 @@ static cystatus CySetTempInt(void)
 *   CYRET_UNKNOWN - if there was an SPC error
 *
 *******************************************************************************/
-static cystatus CyFlashGetSpcAlgorithm(void) 
+static cystatus CyFlashGetSpcAlgorithm(void)
 {
     cystatus status;
 
@@ -270,7 +270,7 @@ static cystatus CyFlashGetSpcAlgorithm(void)
 *   the magnitude.
 *
 *******************************************************************************/
-cystatus CySetTemp(void) 
+cystatus CySetTemp(void)
 {
     cystatus status = CyFlashGetSpcAlgorithm();
 
@@ -303,7 +303,7 @@ cystatus CySetTemp(void)
 *   CYRET_BAD_PARAM if the buffer is NULL
 *
 *******************************************************************************/
-cystatus CySetFlashEEBuffer(uint8 * buffer) 
+cystatus CySetFlashEEBuffer(uint8 * buffer)
 {
     cystatus status = CYRET_SUCCESS;
 
@@ -363,7 +363,7 @@ cystatus CySetFlashEEBuffer(uint8 * buffer)
 *   CYRET_UNKNOWN if there was an SPC error.
 *
 *******************************************************************************/
-cystatus CyWriteRowData(uint8 arrayId, uint16 rowAddress, const uint8 * rowData) 
+cystatus CyWriteRowData(uint8 arrayId, uint16 rowAddress, const uint8 * rowData)
 {
     uint16 rowSize;
     cystatus status;
@@ -407,7 +407,7 @@ cystatus CyWriteRowData(uint8 arrayId, uint16 rowAddress, const uint8 * rowData)
     *
     *******************************************************************************/
     cystatus CyWriteRowConfig(uint8 arrayId, uint16 rowAddress, const uint8 * rowECC)\
-    
+
     {
         cystatus status;
 
@@ -441,7 +441,7 @@ cystatus CyWriteRowData(uint8 arrayId, uint16 rowAddress, const uint8 * rowData)
 *
 *******************************************************************************/
 cystatus CyWriteRowFull(uint8 arrayId, uint16 rowNumber, const uint8* rowData, uint16 rowSize) \
-        
+
 {
     cystatus status = CYRET_SUCCESS;
 
@@ -568,7 +568,7 @@ cystatus CyWriteRowFull(uint8 arrayId, uint16 rowNumber, const uint8* rowData, u
 *  None
 *
 *******************************************************************************/
-void CyFlash_SetWaitCycles(uint8 freq) 
+void CyFlash_SetWaitCycles(uint8 freq)
 {
     uint8 interruptState;
 
@@ -633,7 +633,7 @@ void CyFlash_SetWaitCycles(uint8 freq)
 *  None
 *
 *******************************************************************************/
-void CyEEPROM_Start(void) 
+void CyEEPROM_Start(void)
 {
     uint8 interruptState;
 
@@ -691,7 +691,7 @@ void CyEEPROM_Start(void)
 *  None
 *
 *******************************************************************************/
-void CyEEPROM_Stop (void) 
+void CyEEPROM_Stop (void)
 {
     uint8 interruptState;
 
@@ -718,7 +718,7 @@ void CyEEPROM_Stop (void)
 *  None
 *
 *******************************************************************************/
-void CyEEPROM_ReadReserve(void) 
+void CyEEPROM_ReadReserve(void)
 {
     /* Make request for PHUB to have access */
     CY_FLASH_EE_SCR_REG |= CY_FLASH_EE_SCR_AHB_EE_REQ;
@@ -744,7 +744,7 @@ void CyEEPROM_ReadReserve(void)
 *  None
 *
 *******************************************************************************/
-void CyEEPROM_ReadRelease(void) 
+void CyEEPROM_ReadRelease(void)
 {
     CY_FLASH_EE_SCR_REG &= (uint8)(~CY_FLASH_EE_SCR_AHB_EE_REQ);
 }

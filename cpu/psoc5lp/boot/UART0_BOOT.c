@@ -38,7 +38,7 @@
 *  This component automatically enables global interrupt.
 *
 *******************************************************************************/
-void UART0_CyBtldrCommStart(void) CYSMALL 
+void UART0_CyBtldrCommStart(void) CYSMALL
 {
     /* Start UART component and clear the Tx,Rx buffers */
     UART0_Start();
@@ -61,7 +61,7 @@ void UART0_CyBtldrCommStart(void) CYSMALL
 *  None
 *
 *******************************************************************************/
-void UART0_CyBtldrCommStop(void) CYSMALL 
+void UART0_CyBtldrCommStop(void) CYSMALL
 {
     /* Stop UART component */
     UART0_Stop();
@@ -82,7 +82,7 @@ void UART0_CyBtldrCommStop(void) CYSMALL
 *  None
 *
 *******************************************************************************/
-void UART0_CyBtldrCommReset(void) CYSMALL 
+void UART0_CyBtldrCommReset(void) CYSMALL
 {
     /* Clear RX and TX buffers */
     UART0_ClearRxBuffer();
@@ -114,7 +114,7 @@ void UART0_CyBtldrCommReset(void) CYSMALL
 *
 *******************************************************************************/
 cystatus UART0_CyBtldrCommWrite(const uint8 pData[], uint16 size, uint16 * count, uint8 timeOut) CYSMALL
-         
+
 {
     uint16 buf_index = 0u;
 
@@ -166,7 +166,7 @@ cystatus UART0_CyBtldrCommWrite(const uint8 pData[], uint16 size, uint16 * count
 *  calculating this value, if you are using any USB-UART bridges.
 *******************************************************************************/
 cystatus UART0_CyBtldrCommRead(uint8 pData[], uint16 size, uint16 * count, uint8 timeOut) CYSMALL
-         
+
 {
     uint16 iCntr;
     uint16 dataIndexCntr;

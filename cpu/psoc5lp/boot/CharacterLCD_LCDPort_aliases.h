@@ -1,5 +1,5 @@
 /*******************************************************************************
-* File Name: CharacterLCD_LCDPort.h  
+* File Name: CharacterLCD_LCDPort.h
 * Version 2.10
 *
 * Description:
@@ -9,8 +9,8 @@
 *
 ********************************************************************************
 * Copyright 2008-2014, Cypress Semiconductor Corporation.  All rights reserved.
-* You may use this file only in accordance with the license, terms, conditions, 
-* disclaimers, and limitations in the end user license agreement accompanying 
+* You may use this file only in accordance with the license, terms, conditions,
+* disclaimers, and limitations in the end user license agreement accompanying
 * the software package with which this file was provided.
 *******************************************************************************/
 
@@ -23,7 +23,7 @@
 
 
 /***************************************
-*              Constants        
+*              Constants
 ***************************************/
 #define CharacterLCD_LCDPort_0		(CharacterLCD_LCDPort__0__PC)
 #define CharacterLCD_LCDPort_1		(CharacterLCD_LCDPort__1__PC)
