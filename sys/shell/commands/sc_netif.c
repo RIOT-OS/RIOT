@@ -168,7 +168,7 @@ void _netif_list(kernel_pid_t dev)
     res = ng_netapi_get(dev, NETCONF_OPT_NID, 0, &u16, sizeof(u16));
 
     if (res >= 0) {
-        printf(" NID: %" PRIx16 " ", u16);
+        printf(" NID: 0x%" PRIx16 " ", u16);
     }
 
     printf("\n            ");
@@ -184,7 +184,7 @@ void _netif_list(kernel_pid_t dev)
     res = ng_netapi_get(dev, NETCONF_OPT_SRC_LEN, 0, &u16, sizeof(u16));
 
     if (res >= 0) {
-        printf("Source address length: %" PRIx16 "\n            ", u16);
+        printf("Source address length: %" PRIu16 "\n            ", u16);
     }
 
     /* TODO: list IPv6 info */
