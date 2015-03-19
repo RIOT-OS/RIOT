@@ -26,6 +26,7 @@
 #include "net/ng_netreg.h"
 #include "net/ng_nettype.h"
 #include "net/ng_netif.h"
+#include "net/ng_netif/hdr.h"
 #include "net/ng_pktbuf.h"
 #include "net/ng_pkt.h"
 
