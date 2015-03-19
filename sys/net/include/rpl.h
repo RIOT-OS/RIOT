@@ -52,6 +52,7 @@ extern msg_t rpl_msg_queue[RPL_PKT_RECV_BUF_SIZE];
 extern char rpl_process_buf[RPL_PROCESS_STACKSIZE];
 extern uint8_t rpl_buffer[BUFFER_SIZE - LL_HDR_LEN];
 extern uint8_t rpl_if_id;
+extern rpl_dodag_t rpl_dodags[RPL_MAX_DODAGS];
 
 /**
  * @brief Sends a RPL message to a given destination

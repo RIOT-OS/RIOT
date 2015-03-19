@@ -32,7 +32,7 @@ char addr_str[IPV6_MAX_ADDR_STR_LEN];
 #include "debug.h"
 
 static rpl_instance_t instances[RPL_MAX_INSTANCES];
-static rpl_dodag_t dodags[RPL_MAX_DODAGS];
+rpl_dodag_t rpl_dodags[RPL_MAX_DODAGS];
 static rpl_parent_t parents[RPL_MAX_PARENTS];
 
 void rpl_trickle_send_dio(void *args)
@@ -97,7 +97,7 @@ rpl_dodag_t *rpl_new_dodag(rpl_instance_t *inst, ipv6_addr_t *dodagid)
     rpl_dodag_t *dodag;
     rpl_dodag_t *end;
 
-    for (dodag = &dodags[0], end = dodag + RPL_MAX_DODAGS; dodag < end; dodag++) {
+    for (dodag = &rpl_dodags[0], end = dodag + RPL_MAX_DODAGS; dodag < end; dodag++) {
         if (dodag->used == 0) {
             memset(dodag, 0, sizeof(*dodag));
             dodag->instance = inst;
@@ -119,8 +119,8 @@ rpl_dodag_t *rpl_new_dodag(rpl_instance_t *inst, ipv6_addr_t *dodagid)
 rpl_dodag_t *rpl_get_dodag(ipv6_addr_t *id)
 {
     for (int i = 0; i < RPL_MAX_DODAGS; i++) {
-        if (dodags[i].used && (rpl_equal_id(&dodags[i].dodag_id, id))) {
-            return &dodags[i];
+        if (rpl_dodags[i].used && (rpl_equal_id(&rpl_dodags[i].dodag_id, id))) {
+            return &rpl_dodags[i];
         }
     }
 
@@ -129,8 +129,8 @@ rpl_dodag_t *rpl_get_dodag(ipv6_addr_t *id)
 rpl_dodag_t *rpl_get_my_dodag(void)
 {
     for (int i = 0; i < RPL_MAX_DODAGS; i++) {
-        if (dodags[i].joined) {
-            return &dodags[i];
+        if (rpl_dodags[i].joined) {
+            return &rpl_dodags[i];
         }
     }
 
