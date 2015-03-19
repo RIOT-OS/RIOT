@@ -101,6 +101,11 @@ ifneq (,$(filter at86rf231,$(USEMODULE)))
 	USEMODULE += ieee802154
 endif
 
+ifneq (,$(filter at86rf212b,$(USEMODULE)))
+        USEMODULE += netdev_802154
+        USEMODULE += ieee802154
+endif
+
 ifneq (,$(filter l2_ping,$(USEMODULE)))
 	USEMODULE += vtimer
 endif
