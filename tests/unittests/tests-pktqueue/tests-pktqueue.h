@@ -15,8 +15,8 @@
  *
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef __TESTS_PKTQUEUE_H_
-#define __TESTS_PKTQUEUE_H_
+#ifndef TESTS_PKTQUEUE_H_
+#define TESTS_PKTQUEUE_H_
 
 #include "embUnit.h"
 
@@ -33,5 +33,5 @@ void tests_pktqueue(void);
 }
 #endif
 
-#endif /* __TESTS_PKTQUEUE_H_ */
+#endif /* TESTS_PKTQUEUE_H_ */
 /** @} */

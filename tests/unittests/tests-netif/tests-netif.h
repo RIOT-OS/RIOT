@@ -15,8 +15,8 @@
  *
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef __TESTS_PKTBUF_H_
-#define __TESTS_PKTBUF_H_
+#ifndef TESTS_PKTBUF_H_
+#define TESTS_PKTBUF_H_
 
 #include "embUnit.h"
 
@@ -33,5 +33,5 @@ void tests_netif(void);
 }
 #endif
 
-#endif /* __TESTS_PKTBUF_H_ */
+#endif /* TESTS_PKTBUF_H_ */
 /** @} */
