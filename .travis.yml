@@ -1,6 +1,9 @@
 language: c
 
-cache: apt
+cache:
+    - apt
+    - directories:
+        - pkg
 
 env:
     - NPROC_MAX=8 BUILDTEST_MCU_GROUP=static-tests
