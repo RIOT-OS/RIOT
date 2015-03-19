@@ -216,8 +216,6 @@ void at86rf212b_rx_irq(void)
 	if(at86rf212b_reg_read(AT86RF212B_REG__IRQ_STATUS) & AT86RF212B_IRQ_STATUS_MASK__TRX_END)
 	{
 		/* check if we are in sending state */
-LED_TOGGLE;
-for(int i=0;i<50000;i++);
 		if (driver_state == AT_DRIVER_STATE_SENDING) {
 			/* Read IRQ to clear it */
 			at86rf212b_reg_read(AT86RF212B_REG__IRQ_STATUS);
