@@ -299,7 +299,7 @@ void _rpl_update_routing_table(void)
         if (my_dodag->my_preferred_parent != NULL) {
             if (my_dodag->my_preferred_parent->lifetime <= 1) {
                 DEBUGF("parent lifetime timeout\n");
-                rpl_parent_update(NULL);
+                rpl_parent_update(my_dodag, NULL);
             }
             else {
                 my_dodag->my_preferred_parent->lifetime =
