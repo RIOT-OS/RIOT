@@ -16,6 +16,7 @@
 
 #include "netdev_dummy.h"
 
+#include "unittests-constants.h"
 #include "tests-netdev_dummy.h"
 
 static netdev_t *dev = &(unittest_netdev_dummy_devs[0]);

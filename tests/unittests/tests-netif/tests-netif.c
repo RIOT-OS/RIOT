@@ -19,6 +19,7 @@
 #include "kernel_types.h"
 #include "net/ng_netif.h"
 
+#include "unittests-constants.h"
 #include "tests-netif.h"
 
 static void set_up(void)

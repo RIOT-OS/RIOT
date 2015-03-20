@@ -19,6 +19,7 @@
 #include "net/ng_ipv6/addr.h"
 #include "net/ng_ipv6/nc.h"
 
+#include "unittests-constants.h"
 #include "tests-ipv6_nc.h"
 
 /* default interface for testing */

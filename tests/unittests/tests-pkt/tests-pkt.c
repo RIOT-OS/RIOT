@@ -18,6 +18,7 @@
 #include "net/ng_pkt.h"
 #include "net/ng_nettype.h"
 
+#include "unittests-constants.h"
 #include "tests-pkt.h"
 
 #define _INIT_ELEM(len, data, next) \
