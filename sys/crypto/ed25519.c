@@ -45,7 +45,7 @@ const struct ed25519_pt ed25519_base = {
     .z = {1, 0}
 };
 
-/* Projective coordinates - neutrral */
+/* Projective coordinates - neutral */
 const struct ed25519_pt ed25519_neutral = {
     .x = {0},
     .y = {1, 0},
