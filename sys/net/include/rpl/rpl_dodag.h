@@ -33,7 +33,7 @@ rpl_instance_t *rpl_new_instance(uint8_t instanceid);
 rpl_instance_t *rpl_get_instance(uint8_t instanceid);
 rpl_instance_t *rpl_get_my_instance(void);
 rpl_dodag_t *rpl_new_dodag(rpl_instance_t *inst, ipv6_addr_t *id);
-rpl_dodag_t *rpl_get_dodag(ipv6_addr_t *id);
+rpl_dodag_t *rpl_get_joined_dodag(uint8_t instanceid);
 rpl_dodag_t *rpl_get_my_dodag(void);
 void rpl_join_dodag(rpl_dodag_t *dodag, ipv6_addr_t *parent, uint16_t parent_rank);
 void rpl_del_dodag(rpl_dodag_t *dodag);
