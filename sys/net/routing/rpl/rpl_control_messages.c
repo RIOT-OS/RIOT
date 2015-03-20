@@ -736,7 +736,7 @@ void rpl_recv_DIO(void)
     /*********************  Parent Handling *********************/
 
     rpl_parent_t *parent;
-    parent = rpl_find_parent(&ipv6_buf->srcaddr);
+    parent = rpl_find_parent(my_dodag, &ipv6_buf->srcaddr);
 
     if (parent == NULL) {
         /* add new parent candidate */
