@@ -148,6 +148,8 @@ void _netif_list(kernel_pid_t dev)
     uint8_t hwaddr[MAX_ADDR_LEN];
     uint16_t u16;
     int res;
+    memset(hwaddr,0,MAX_ADDR_LEN);
+    u16 = 0;
 
     printf("Iface %2d  ", dev);
 
@@ -168,7 +170,7 @@ void _netif_list(kernel_pid_t dev)
     res = ng_netapi_get(dev, NETCONF_OPT_NID, 0, &u16, sizeof(u16));
 
     if (res >= 0) {
-        printf(" NID: %" PRIx16 " ", u16);
+        printf(" NID: x%" PRIx16 " ", u16);
     }
 
     printf("\n            ");

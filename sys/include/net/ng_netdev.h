@@ -30,6 +30,8 @@
 #include "net/ng_pkt.h"
 #include "net/ng_netconf.h"
 
+#include "kernel_types.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
