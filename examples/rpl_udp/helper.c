@@ -39,7 +39,7 @@ extern uint8_t ipv6_ext_hdr_len;
 
 static msg_t msg_q[RCV_BUFFER_SIZE];
 
-void rpl_udp_set_id(int argc, char **argv)
+int rpl_udp_set_id(int argc, char **argv)
 {
     if (argc != 2) {
         printf("Usage: %s address\n", argv[0]);
@@ -49,12 +49,14 @@ void rpl_udp_set_id(int argc, char **argv)
         printf("\taddress must be an 16 bit integer\n");
 #endif
         printf("\n\t(Current address is %u)\n", id);
-        return;
+        return 1;
     }
 
     id = atoi(argv[1]);
 
     printf("Set node ID to %u\n", id);
+
+    return 0;
 }
 
 void *rpl_udp_monitor(void *arg)
@@ -123,18 +125,18 @@ void *rpl_udp_monitor(void *arg)
 
 static transceiver_command_t tcmd;
 
-void rpl_udp_ignore(int argc, char **argv)
+int rpl_udp_ignore(int argc, char **argv)
 {
     uint16_t a;
 
     if (argc < 2) {
         printf("Usage: %s <addr>\n", argv[0]);
-        return;
+        return 1;
     }
 
     if (transceiver_pid == KERNEL_PID_UNDEF) {
         puts("Transceiver not runnning.");
-        return;
+        return 1;
     }
 
     /* cppcheck: a is actually read via tcmd.data */
@@ -151,4 +153,6 @@ void rpl_udp_ignore(int argc, char **argv)
     printf("sending to transceiver (%" PRIkernel_pid "): %u\n", transceiver_pid,
            (*(uint8_t *)tcmd.data));
     msg_send(&mesg, transceiver_pid);
+
+    return 0;
 }

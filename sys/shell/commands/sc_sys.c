@@ -20,10 +20,12 @@
 
 #include "kernel.h"
 
-void _reboot_handler(int argc, char **argv)
+int _reboot_handler(int argc, char **argv)
 {
     (void) argc;
     (void) argv;
 
     (void) reboot(RB_AUTOBOOT);
+
+    return 0;
 }

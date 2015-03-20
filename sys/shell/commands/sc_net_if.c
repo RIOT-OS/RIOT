@@ -40,19 +40,19 @@ static uint8_t addrs[ADDR_REGISTERED_MAX][ADDRS_LEN_MAX];
 #include "ipv6.h"
 #endif
 
-void _net_if_ifconfig_add(int if_id, int argc, char **argv);
-void _net_if_ifconfig_add_ipv6(int if_id, int argc, char **argv);
-void _net_if_ifconfig_set(int if_id, char *key, char *value);
-void _net_if_ifconfig_set_srcaddrmode(int if_id, char *mode);
-void _net_if_ifconfig_set_eui64(int if_id, char *addr);
-void _net_if_ifconfig_set_hwaddr(int if_id, char *addr);
-void _net_if_ifconfig_set_pan_id(int if_id, char *pan_id);
-void _net_if_ifconfig_set_channel(int if_id, char *channel);
-void _net_if_ifconfig_create(char *transceivers_str);
+int _net_if_ifconfig_add(int if_id, int argc, char **argv);
+int _net_if_ifconfig_add_ipv6(int if_id, int argc, char **argv);
+int _net_if_ifconfig_set(int if_id, char *key, char *value);
+int _net_if_ifconfig_set_srcaddrmode(int if_id, char *mode);
+int _net_if_ifconfig_set_eui64(int if_id, char *addr);
+int _net_if_ifconfig_set_hwaddr(int if_id, char *addr);
+int _net_if_ifconfig_set_pan_id(int if_id, char *pan_id);
+int _net_if_ifconfig_set_channel(int if_id, char *channel);
+int _net_if_ifconfig_create(char *transceivers_str);
 int _net_if_ifconfig_ipv6_addr_convert(net_if_addr_t *addr, void *addr_data,
                                        char *type, char *addr_data_str,
                                        char *addr_data_len);
-void _net_if_ifconfig_list(int if_id);
+int _net_if_ifconfig_list(int if_id);
 
 int is_number(char *str)
 {
@@ -142,7 +142,7 @@ void create_usage(void)
         );
 }
 
-void _net_if_ifconfig(int argc, char **argv)
+int _net_if_ifconfig(int argc, char **argv)
 {
     if (argc < 2) {
         int if_id = -1;
@@ -151,173 +151,173 @@ void _net_if_ifconfig(int argc, char **argv)
             _net_if_ifconfig_list(if_id);
         }
 
-        return;
+        return 0;
     }
     else if (strcmp(argv[1], "create") == 0) {
-        _net_if_ifconfig_create(argv[2]);
-        return;
+        return _net_if_ifconfig_create(argv[2]);
     }
     else if (is_number(argv[1])) {
         int if_id = atoi(argv[1]);
 
         if (argc < 3) {
-            _net_if_ifconfig_list(if_id);
-            return;
+            return _net_if_ifconfig_list(if_id);
         }
         else if (strcmp(argv[2], "add") == 0) {
             if (argc < 5) {
                 add_usage();
-                return;
+                return 1;
             }
 
-            _net_if_ifconfig_add(if_id, argc, argv);
-            return;
+            return _net_if_ifconfig_add(if_id, argc, argv);
         }
         else if (strcmp(argv[2], "set") == 0) {
             if (argc < 5) {
                 set_usage();
-                return;
+                return 1;
             }
 
-            _net_if_ifconfig_set(if_id, argv[3], argv[4]);
-            return;
+            return _net_if_ifconfig_set(if_id, argv[3], argv[4]);
         }
     }
 
     create_usage();
     printf("or:    ifconfig [<if_id> [add <protocol> <addr>|set <key> <value>]]\n");
+
+    return 1;
 }
 
-void _net_if_ifconfig_set_srcaddrmode(int if_id, char *mode)
+int _net_if_ifconfig_set_srcaddrmode(int if_id, char *mode)
 {
     if (mode == NULL) {
         set_usage();
-        return;
+        return 1;
     }
     else if (strcmp(mode, "short") == 0) {
-        net_if_set_src_address_mode(if_id, NET_IF_TRANS_ADDR_M_SHORT);
+        return !net_if_set_src_address_mode(if_id, NET_IF_TRANS_ADDR_M_SHORT);
     }
     else if (strcmp(mode, "long") == 0) {
-        net_if_set_src_address_mode(if_id, NET_IF_TRANS_ADDR_M_LONG);
+        return !net_if_set_src_address_mode(if_id, NET_IF_TRANS_ADDR_M_LONG);
     }
     else {
         set_usage();
-        return;
+        return 1;
     }
 }
 
-void _net_if_ifconfig_set_eui64(int if_id, char *eui64_str)
+int _net_if_ifconfig_set_eui64(int if_id, char *eui64_str)
 {
     net_if_eui64_t eui64;
 
     if (eui64_str == NULL) {
         set_usage();
-        return;
+        return 1;
     }
 
     net_if_hex_to_eui64(&eui64, eui64_str);
     net_if_set_eui64(if_id, &eui64);
+
+    return 0;
 }
 
-void _net_if_ifconfig_set_hwaddr(int if_id, char *addr_str)
+int _net_if_ifconfig_set_hwaddr(int if_id, char *addr_str)
 {
     int addr;
 
     if (addr_str == NULL) {
         set_usage();
-        return;
+        return 1;
     }
 
     if (is_number(addr_str)) {
         if ((addr = atoi(addr_str)) > 0xffff) {
             set_usage();
-            return;
+            return 1;
         }
     }
     else {
         if ((addr = strtoul(addr_str, NULL, 16)) > 0xffff) {
             set_usage();
-            return;
+            return 1;
         }
     }
 
-    net_if_set_hardware_address(if_id, (uint16_t)addr);
+    return net_if_set_hardware_address(if_id, (uint16_t)addr) == 0;
 }
 
-void _net_if_ifconfig_set_pan_id(int if_id, char *pan_str)
+int _net_if_ifconfig_set_pan_id(int if_id, char *pan_str)
 {
     int pan_id;
 
     if (pan_str == NULL) {
         set_usage();
-        return;
+        return 1;
     }
 
     if (is_number(pan_str)) {
         if ((pan_id = atoi(pan_str)) > 0xffff) {
             set_usage();
-            return;
+            return 1;
         }
     }
     else {
         if ((pan_id = strtoul(pan_str, NULL, 16)) > 0xffff) {
             set_usage();
-            return;
+            return 1;
         }
     }
 
-    net_if_set_pan_id(if_id, (uint16_t) pan_id);
+    return net_if_set_pan_id(if_id, (uint16_t) pan_id) == -1;
 }
 
-void _net_if_ifconfig_set_channel(int if_id, char *chan_str)
+int _net_if_ifconfig_set_channel(int if_id, char *chan_str)
 {
     int channel;
 
     if (chan_str == NULL) {
         set_usage();
-        return;
+        return 1;
     }
 
     if (is_number(chan_str)) {
         if ((channel = atoi(chan_str)) > 0xffff) {
             set_usage();
-            return;
+            return 1;
         }
     }
     else {
         if ((channel = strtoul(chan_str, NULL, 16)) > 0xffff) {
             set_usage();
-            return;
+            return 1;
         }
     }
 
-    net_if_set_channel(if_id, (uint16_t) channel);
+    return net_if_set_channel(if_id, (uint16_t) channel) == -1;
 }
 
-void _net_if_ifconfig_set(int if_id, char *key, char *value)
+int _net_if_ifconfig_set(int if_id, char *key, char *value)
 {
     if (strcmp(key, "sam") == 0 || strcmp(key, "srcaddrmode") == 0) {
-        _net_if_ifconfig_set_srcaddrmode(if_id, value);
+        return _net_if_ifconfig_set_srcaddrmode(if_id, value);
     }
     else if (strcmp(key, "eui64") == 0) {
-        _net_if_ifconfig_set_eui64(if_id, value);
+        return _net_if_ifconfig_set_eui64(if_id, value);
     }
     else if (strcmp(key, "hwaddr") == 0) {
-        _net_if_ifconfig_set_hwaddr(if_id, value);
+        return _net_if_ifconfig_set_hwaddr(if_id, value);
     }
     else if (strcmp(key, "pan") == 0 || strcmp(key, "pan_id") == 0) {
-        _net_if_ifconfig_set_pan_id(if_id, value);
+        return _net_if_ifconfig_set_pan_id(if_id, value);
     }
     else if (strcmp(key, "chan") == 0 || strcmp(key, "channel") == 0) {
-        _net_if_ifconfig_set_channel(if_id, value);
+        return _net_if_ifconfig_set_channel(if_id, value);
     }
     else {
         set_usage();
-        return;
+        return 1;
     }
 }
 
-void _net_if_ifconfig_add_ipv6(int if_id, int argc, char **argv)
+int _net_if_ifconfig_add_ipv6(int if_id, int argc, char **argv)
 {
     char *type;
     char *addr_str;
@@ -332,7 +332,7 @@ void _net_if_ifconfig_add_ipv6(int if_id, int argc, char **argv)
         }
         else {
             add_usage();
-            return;
+            return 1;
         }
     }
     else {
@@ -353,7 +353,7 @@ void _net_if_ifconfig_add_ipv6(int if_id, int argc, char **argv)
     if (!_net_if_ifconfig_ipv6_addr_convert(&addr, addr_data, type,
                                             addr_data_str, addr_data_len)) {
         add_usage();
-        return;
+        return 1;
     }
 
 #ifdef MODULE_SIXLOWPAN
@@ -364,7 +364,7 @@ void _net_if_ifconfig_add_ipv6(int if_id, int argc, char **argv)
                                 NDP_OPT_PI_PLIFETIME_INFINITE, 1,
                                 ICMPV6_NDP_OPT_PI_FLAG_AUTONOM) != SIXLOWERROR_SUCCESS) {
             add_usage();
-            return;
+            return 1;
         }
     }
     else if (addr.addr_protocol & NET_IF_L3P_IPV6_ADDR) {
@@ -377,36 +377,39 @@ void _net_if_ifconfig_add_ipv6(int if_id, int argc, char **argv)
         if (!ipv6_net_if_add_addr(if_id, &ipv6_addr, NDP_ADDR_STATE_PREFERRED,
                                   0, 0, is_anycast)) {
             add_usage();
-            return;
+            return 1;
         }
     }
     else {
         add_usage();
-        return;
+        return 1;
     }
 
 #else
 
     if (net_if_add_address(if_id, &addr) < 0) {
         add_usage();
-        return;
+        return 1;
     }
 
     addr_registered++;
 #endif
+
+    return 0;
 }
 
-void _net_if_ifconfig_add(int if_id, int argc, char **argv)
+int _net_if_ifconfig_add(int if_id, int argc, char **argv)
 {
     if (strcmp(argv[3], "ipv6") == 0) {
-        _net_if_ifconfig_add_ipv6(if_id, argc, argv);
+        return _net_if_ifconfig_add_ipv6(if_id, argc, argv);
     }
     else {
         add_usage();
+        return 1;
     }
 }
 
-void _net_if_ifconfig_create(char *transceivers_str)
+int _net_if_ifconfig_create(char *transceivers_str)
 {
     char *transceiver_str;
     transceiver_type_t transceivers = TRANSCEIVER_NONE;
@@ -435,7 +438,7 @@ void _net_if_ifconfig_create(char *transceivers_str)
         }
         else {
             create_usage();
-            return;
+            return 1;
         }
 
         transceiver_str = strtok(NULL, ",");
@@ -443,16 +446,18 @@ void _net_if_ifconfig_create(char *transceivers_str)
 
     if (!transceivers) {
         create_usage();
-        return;
+        return 1;
     }
 
     iface = net_if_init_interface(NET_IF_L3P_RAW, transceivers);
 
     if (iface < 0) {
         puts("Maximum number of allowed interfaces reached.\n");
+        return 1;
     }
     else {
         printf("Initialized interface %d\n", iface);
+        return 0;
     }
 }
 
@@ -535,7 +540,7 @@ int _net_if_ifconfig_ipv6_addr_convert(net_if_addr_t *addr, void *addr_data,
     return 1;
 }
 
-void _net_if_ifconfig_list(int if_id)
+int _net_if_ifconfig_list(int if_id)
 {
     net_if_t *iface = net_if_get_interface(if_id);
     transceiver_type_t transceivers;
@@ -547,7 +552,7 @@ void _net_if_ifconfig_list(int if_id)
     net_if_addr_t *addr_ptr = NULL;
 
     if (!iface) {
-        return;
+        return 1;
     }
 
     transceivers = iface->transceivers;
@@ -666,4 +671,6 @@ void _net_if_ifconfig_list(int if_id)
     }
 
     puts("");
+
+    return 0;
 }

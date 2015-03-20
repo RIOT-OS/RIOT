@@ -55,9 +55,9 @@
 
 static int shell_read(void);
 static void shell_write(int);
-static void cmd_send(int argc, char **argv);
-static void cmd_print_regs(int argc, char **argv);
-static void cmd_its(int argc, char **argv);
+static int cmd_send(int argc, char **argv);
+static int cmd_print_regs(int argc, char **argv);
+static int cmd_its(int argc, char **argv);
 
 
 void printbin(unsigned byte);
@@ -182,7 +182,7 @@ void *nrf24l01p_rx_handler(void *arg)
 /**
  * @init transceiver
  */
-void cmd_its(int argc, char **argv)
+int cmd_its(int argc, char **argv)
 {
     (void) argc;
     (void) argv;
@@ -206,16 +206,16 @@ void cmd_its(int argc, char **argv)
     /* setup device as receiver */
     if (nrf24l01p_set_rxmode(&nrf24l01p_0) < 0) {
         puts("Error in nrf24l01p_set_rxmode");
-        return;
+        return 1;
     }
-    /* get and print all registers */
-    cmd_print_regs(0, 0);
+
+    return cmd_print_regs(0, 0);
 }
 
 /**
  * @set TX mode
  */
-void cmd_send(int argc, char **argv)
+int cmd_send(int argc, char **argv)
 {
     (void) argc;
     (void) argv;
@@ -259,14 +259,16 @@ void cmd_send(int argc, char **argv)
     /* setup device as receiver */
     if (nrf24l01p_set_rxmode(&nrf24l01p_0) < 0) {
         puts("Error in nrf24l01p_set_rxmode");
-        return;
+        return 1;
     }
+
+    return 0;
 }
 
 /**
  * @print registers
  */
-void cmd_print_regs(int argc, char **argv)
+int cmd_print_regs(int argc, char **argv)
 {
     (void) argc;
     (void) argv;
@@ -321,6 +323,8 @@ void cmd_print_regs(int argc, char **argv)
 
     puts("REG_FEATURE: ");
     print_register(REG_FEATURE, 1);
+
+    return 0;
 }
 
 

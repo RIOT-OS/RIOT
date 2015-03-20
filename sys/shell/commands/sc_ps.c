@@ -20,10 +20,12 @@
 
 #include "ps.h"
 
-void _ps_handler(int argc, char **argv)
+int _ps_handler(int argc, char **argv)
 {
     (void) argc;
     (void) argv;
 
     thread_print_all();
+
+    return 0;
 }

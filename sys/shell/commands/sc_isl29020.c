@@ -30,7 +30,7 @@
 
 static isl29020_t isl29020_dev;
 
-void _get_isl29020_init_handler(int argc, char **argv)
+int _get_isl29020_init_handler(int argc, char **argv)
 {
     (void)argc;
     (void)argv;
@@ -41,13 +41,15 @@ void _get_isl29020_init_handler(int argc, char **argv)
 
     if (res) {
         puts("Error initializing ISL29020 sensor.");
+        return 1;
     }
     else {
         puts("Initialized ISL29020 sensor with default values");
+        return 0;
     }
 }
 
-void _get_isl29020_read_handler(int argc, char **argv)
+int _get_isl29020_read_handler(int argc, char **argv)
 {
     (void)argc;
     (void)argv;
@@ -56,16 +58,17 @@ void _get_isl29020_read_handler(int argc, char **argv)
 
     if (!isl29020_dev.address) {
         puts("Error: please call `isl29020_init` first!");
-        return;
+        return 1;
     }
 
     val = isl29020_read(&isl29020_dev);
     if (val < 0) {
         puts("Error reading brightness value from ISL29020.");
-        return;
+        return 1;
     }
     else {
         printf("ISL29020: brightness %i LUX\n", val);
+        return 0;
     }
 }
 

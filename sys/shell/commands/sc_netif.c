@@ -323,7 +323,7 @@ static void _netif_set(char *cmd_name, kernel_pid_t dev, char *key, char *value)
 }
 
 /* shell commands */
-void _netif_send(int argc, char **argv)
+int _netif_send(int argc, char **argv)
 {
     kernel_pid_t dev;
     uint8_t addr[MAX_ADDR_LEN];
@@ -334,7 +334,7 @@ void _netif_send(int argc, char **argv)
 
     if (argc < 4) {
         printf("usage: %s <if> <addr> <data>\n", argv[0]);
-        return;
+        return 1;
     }
 
     /* parse interface */
@@ -342,7 +342,7 @@ void _netif_send(int argc, char **argv)
 
     if (!_is_iface(dev)) {
         puts("error: invalid interface given");
-        return;
+        return 1;
     }
 
     /* parse address */
@@ -350,7 +350,7 @@ void _netif_send(int argc, char **argv)
 
     if (addr_len == 0) {
         puts("error: invalid address given");
-        return;
+        return 1;
     }
 
     /* put packet together */
@@ -362,9 +362,11 @@ void _netif_send(int argc, char **argv)
     ng_netif_hdr_set_dst_addr(nethdr, addr, addr_len);
     /* and send it */
     ng_netapi_send(dev, pkt);
+
+    return 0;
 }
 
-void _netif_config(int argc, char **argv)
+int _netif_config(int argc, char **argv)
 {
     if (argc < 2) {
         size_t numof;
@@ -372,7 +374,7 @@ void _netif_config(int argc, char **argv)
 
         for (size_t i = 0; i < numof; i++) {
             _netif_list(ifs[i]);
-            return;
+            return 0;
         }
     }
     else if (_is_number(argv[1])) {
@@ -381,16 +383,16 @@ void _netif_config(int argc, char **argv)
         if (_is_iface(dev)) {
             if (argc < 3) {
                 _netif_list(dev);
-                return;
+                return 0;
             }
             else if (strcmp(argv[2], "set") == 0) {
                 if (argc < 5) {
                     _set_usage(argv[0]);
-                    return;
+                    return 0;
                 }
 
                 _netif_set(argv[0], dev, argv[3], argv[4]);
-                return;
+                return 0;
             }
 
             /* TODO implement add for IP addresses */
@@ -401,4 +403,5 @@ void _netif_config(int argc, char **argv)
     }
 
     printf("usage: %s [<if_id> set <key> <value>]]\n", argv[0]);
+    return 1;
 }
