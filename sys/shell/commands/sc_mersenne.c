@@ -26,7 +26,7 @@
 #include "hwtimer.h"
 #include "random.h"
 
-void _mersenne_init(int argc, char **argv)
+int _mersenne_init(int argc, char **argv)
 {
     int initval;
 
@@ -40,12 +40,16 @@ void _mersenne_init(int argc, char **argv)
     }
 
     genrand_init(initval);
+
+    return 0;
 }
 
-void _mersenne_get(int argc, char **argv)
+int _mersenne_get(int argc, char **argv)
 {
     (void) argc;
     (void) argv;
 
     printf("%" PRIu32 "\n", genrand_uint32());
+
+    return 0;
 }

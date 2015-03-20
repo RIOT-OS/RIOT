@@ -27,7 +27,7 @@
 #include "timex.h"
 #include "vtimer.h"
 
-void _l2_ping_req_handler(int argc, char **argv)
+int _l2_ping_req_handler(int argc, char **argv)
 {
     size_t payload_strlen;
     uint16_t count = 5;
@@ -35,11 +35,11 @@ void _l2_ping_req_handler(int argc, char **argv)
 
     if (transceiver_pid == KERNEL_PID_UNDEF) {
         puts("Transceiver not initialized");
-        return;
+        return 1;
     }
     if (argc < 2) {
         printf("Usage:\t%s <ADDR> [COUNT] [MSG]\n", argv[0]);
-        return;
+        return 1;
     }
 
     char l2_payload[L2_PING_PAYLOAD_SIZE];
@@ -82,9 +82,11 @@ void _l2_ping_req_handler(int argc, char **argv)
             l2_ping_stats.min_rtt.seconds, l2_ping_stats.min_rtt.microseconds,
             l2_ping_stats.avg_rtt.seconds, l2_ping_stats.avg_rtt.microseconds,
             l2_ping_stats.max_rtt.seconds, l2_ping_stats.max_rtt.microseconds);
+
+    return 0;
 }
 
-void _l2_ping_probe_handler(int argc, char **argv)
+int _l2_ping_probe_handler(int argc, char **argv)
 {
     size_t payload_strlen;
     uint16_t count = 5;
@@ -92,11 +94,11 @@ void _l2_ping_probe_handler(int argc, char **argv)
 
     if (transceiver_pid == KERNEL_PID_UNDEF) {
         puts("Transceiver not initialized");
-        return;
+        return 1;
     }
     if (argc < 2) {
         printf("Usage:\t%s <ADDR> [COUNT] [MSG]\n", argv[0]);
-        return;
+        return 1;
     }
 
     char l2_payload[L2_PING_PAYLOAD_SIZE];
@@ -128,9 +130,11 @@ void _l2_ping_probe_handler(int argc, char **argv)
     printf("  --- ping statistics for host %" PRIu16 " ---\n", l2_ping_stats.dst);
     printf("  %" PRIu16 " packets transmitted in %" PRIu32 ".%06" PRIu32 "s\n", l2_ping_stats.ping_count,
             period.seconds, period.microseconds);
+
+    return 0;
 }
 
-void _l2_ping_get_probe_handler(int argc, char **argv)
+int _l2_ping_get_probe_handler(int argc, char **argv)
 {
     (void) argc;
     (void) argv;
@@ -144,4 +148,6 @@ void _l2_ping_get_probe_handler(int argc, char **argv)
     for (uint16_t i = 0; i < count; i++) {
         printf("...received %" PRIu16 " probes from node %" PRIu16 ".\n", stats[i].count, stats[i].src);
     }
+
+    return 0;
 }

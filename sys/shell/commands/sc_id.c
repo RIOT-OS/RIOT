@@ -23,7 +23,7 @@
 #include <stdlib.h>
 #include "config.h"
 
-void _id_handler(int argc, char **argv)
+int _id_handler(int argc, char **argv)
 {
     if (argc < 2) {
         printf("Current id: %u\n", sysconfig.id);
@@ -35,6 +35,9 @@ void _id_handler(int argc, char **argv)
 
         if (!config_save()) {
             puts("ERROR setting new id");
+            return 1;
         }
     }
+
+    return 0;
 }

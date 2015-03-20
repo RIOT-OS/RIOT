@@ -29,11 +29,12 @@
 
 #include "periph/rtc.h"
 
-void _alarm_handler(void *arg)
+int _alarm_handler(void *arg)
 {
     (void) arg;
 
     puts("The alarm rang");
+    return 0;
 }
 
 static int dow(int year, int month, int day)
@@ -74,59 +75,70 @@ static int _parse_time(char **argv, struct tm *time)
     return 0;
 }
 
-static void _print_time(struct tm *time)
+static int _print_time(struct tm *time)
 {
     printf("%04i-%02i-%02i %02i:%02i:%02i\n",
             time->tm_year + 1900, time->tm_mon + 1, time->tm_mday,
             time->tm_hour, time->tm_min, time->tm_sec
           );
+    return 0;
 }
 
-static void _rtc_getalarm(void)
+static int _rtc_getalarm(void)
 {
     struct tm t;
     if (rtc_get_alarm(&t) == 0) {
         _print_time(&t);
+        return 0;
     }
     else {
         puts("rtc: error getting alarm");
+	return 1;
     }
 }
 
-static void _rtc_setalarm(char **argv)
+static int _rtc_setalarm(char **argv)
 {
     struct tm now;
 
     if (_parse_time(argv, &now) == 0) {
         if (rtc_set_alarm(&now, _alarm_handler, NULL) == -1) {
             puts("rtc: error setting alarm");
+	    return 1;
         }
+	return 0;
     }
+    return 1;
 }
 
-static void _rtc_gettime(void)
+static int _rtc_gettime(void)
 {
     struct tm t;
     if (rtc_get_time(&t) == 0) {
         _print_time(&t);
+        return 0;
     }
     else {
         puts("rtc: error getting time");
+        return 1;
     }
 }
 
-static void _rtc_settime(char **argv)
+static int _rtc_settime(char **argv)
 {
     struct tm now;
 
     if (_parse_time(argv, &now) == 0) {
         if (rtc_set_time(&now) == -1) {
             puts("rtc: error setting time");
+	    return 1;
         }
+	return 0;
     }
+    return 1;
 }
 
-static void _rtc_usage(void)
+static int _rtc_usage(void)
 {
     puts("usage: rtc <command> [arguments]");
     puts("commands:");
@@ -138,12 +150,14 @@ static void _rtc_usage(void)
     puts("\tsetalarm YYYY-MM-DD HH:MM:SS\n\t\t\tset an alarm for the specified time");
     puts("\tgettime\t\tprint the current time");
     puts("\tsettime YYYY-MM-DD HH:MM:SS\n\t\t\tset the current time");
+    return 0;
 }
 
-void _rtc_handler(int argc, char **argv)
+int _rtc_handler(int argc, char **argv)
 {
     if (argc < 2) {
         _rtc_usage();
+	return 1;
     }
     else if (strncmp(argv[1], "init", 4) == 0) {
         rtc_init();
@@ -171,19 +185,22 @@ void _rtc_handler(int argc, char **argv)
     }
     else {
         printf("unknown command: %s\n", argv[1]);
+	return 1;
     }
+    return 0;
 }
 
 #else
 
 #include <stdio.h>
 
-void _rtc_handler(int argc, char **argv)
+int _rtc_handler(int argc, char **argv)
 {
     (void) argc;
     (void) argv;
 
     puts("not implemented");
+    return 1;
 }
 
 #endif /* FEATURE_RTC */

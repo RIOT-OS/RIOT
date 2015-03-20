@@ -28,7 +28,7 @@
 
 extern float sht11_temperature_offset;
 
-void _get_humidity_handler(int argc, char **argv)
+int _get_humidity_handler(int argc, char **argv)
 {
     (void) argc;
     (void) argv;
@@ -39,14 +39,18 @@ void _get_humidity_handler(int argc, char **argv)
 
     if (!success) {
         printf("Error reading SHT11\n");
+
+        return 1;
     }
     else {
         printf("Relative humidity: %5.2f%% / Temperature compensated humidity; %5.2f%%\n",
                (double) sht11_val.relhum, (double) sht11_val.relhum_temp);
+
+        return 0;
     }
 }
 
-void _get_temperature_handler(int argc, char **argv)
+int _get_temperature_handler(int argc, char **argv)
 {
     (void) argc;
     (void) argv;
@@ -57,13 +61,17 @@ void _get_temperature_handler(int argc, char **argv)
 
     if (!success) {
         printf("Error reading SHT11\n");
+
+        return 1;
     }
     else {
         printf("Temperature: %-6.2f°C\n", (double) sht11_val.temperature);
+
+        return 0;
     }
 }
 
-void _get_weather_handler(int argc, char **argv)
+int _get_weather_handler(int argc, char **argv)
 {
     (void) argc;
     (void) argv;
@@ -74,22 +82,30 @@ void _get_weather_handler(int argc, char **argv)
 
     if (!success) {
         printf("Error reading SHT11\n");
+
+        return 1;
     }
     else {
         printf("Relative humidity: %5.2f%% / Temperature compensated humidity; %5.2f%% ",
                (double) sht11_val.relhum, (double) sht11_val.relhum_temp);
         printf("Temperature: %-6.2f°C\n", (double) sht11_val.temperature);
+
+        return 0;
     }
 }
 
-void _set_offset_handler(int argc, char **argv)
+int _set_offset_handler(int argc, char **argv)
 {
     if (argc != 2) {
         printf("Usage: %s <OFFSET>\n", argv[0]);
+
+        return 1;
     }
     else {
         sht11_temperature_offset = atoi(argv[1]);
         printf("Temperature offset set to %f\n", (double) sht11_temperature_offset);
+
+        return 0;
     }
 }
 
