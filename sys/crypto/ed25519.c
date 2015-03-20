@@ -12,7 +12,7 @@
  * @{
  *
  * @file
- * @brief       Implementation the Edwards-curve equivalent of Curve25519
+ * @brief       Implementation of the Edwards-curve equivalent of Curve25519
  *
  * @author      Jan Wagner <mail@jwagner.eu>
  * @author      Daniel Beer <dlbeer@gmail.com>
@@ -45,7 +45,7 @@ const struct ed25519_pt ed25519_base = {
     .z = {1, 0}
 };
 
-/* Projective coordinates - neurtral */
+/* Projective coordinates - neutrral */
 const struct ed25519_pt ed25519_neutral = {
     .x = {0},
     .y = {1, 0},

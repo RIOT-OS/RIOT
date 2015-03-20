@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2015 Jan Wagner <mail@jwagner.eu>
+ * Copyright (C) 2014 Daniel Beer <dlbeer@gmail.com>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -13,8 +14,8 @@
  * @file
  * @brief       Headers for the implementation of the SHA-512 hash function 
  *
- * @author      Jan Wagner <mail@jwagner.eu>
- * @author      Daniel Beer <dlbeer@gmail.com> 
+ * @author	Jan Wagner <mail@jwagner.eu>
+ * @author	Daniel Beer <dlbeer@gmail.com> 
  * @author	NSA
  *
  */
@@ -44,7 +45,6 @@ typedef struct {
 #define SHA512_BLOCK_SIZE	128
 #define SHA512_HASH_SIZE	64
 /** @} */
-
 
 /**
  * @brief  SHA-512 Key setup

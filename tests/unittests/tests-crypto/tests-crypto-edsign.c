@@ -77,7 +77,6 @@ static void test_crypto_edsign_sign(void)
     TEST_ASSERT(test_sign(TV4_SECRET, TV4_PUBLIC, TV4_MLEN, TV4_MESSAGE, TV4_SIGNATURE));
 }
 
-
 Test *tests_crypto_edsign_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {

@@ -25,7 +25,7 @@
 #include <stdint.h>
 
 /**
- * @brief  Convert an Edwards Y to a Montgomery X
+ * @brief  Convert a Edwards Y to a Montgomery X
  *
  * @param[out]  montgomery_x	Montgomery X coordinate output
  * @param[in]   edwards_y	Edwards Y coordinate input
@@ -33,7 +33,7 @@
 void morph25519_e2m(uint8_t *montgomery_x, const uint8_t *edwards_y);
 
 /**
- * @brief  Convert a Montgomery X and a parity bit to an Edwards X/Y
+ * @brief  Convert a Montgomery X and a parity bit to a Edwards X/Y
  *
  * @param[out]   ex		Edwards X coordinate output
  * @param[out]   ey		Edwards Y coordinate output

@@ -14,8 +14,8 @@
  * @file
  * @brief       Implementation of the SHA512 hash function
  *
- * @author      Jan Wagner <mail@jwagner.eu>
- * @author      Daniel Beer <dlbeer@gmail.com>
+ * @author	Jan Wagner <mail@jwagner.eu>
+ * @author	Daniel Beer <dlbeer@gmail.com>
  * @author	NSA
  *
  */

@@ -23,7 +23,7 @@
 #include "crypto/morph25519.h"
 #include "crypto/f25519.h"
 
-/* Convert an Edwards Y to a Montgomery X (Edwards X is not used) */
+/* Convert a Edwards Y to a Montgomery X (Edwards X is not used) */
 void morph25519_e2m(uint8_t *montgomery, const uint8_t *y)
 {
     uint8_t yplus[F25519_SIZE];
@@ -36,7 +36,7 @@ void morph25519_e2m(uint8_t *montgomery, const uint8_t *y)
     f25519_normalize(montgomery);
 }
 
-/* Convert a Montgomery X to an Edwards Y */
+/* Convert a Montgomery X to a Edwards Y */
 static void mx2ey(uint8_t *ey, const uint8_t *mx)
 {
     uint8_t n[F25519_SIZE];
@@ -91,7 +91,7 @@ static uint8_t ey2ex(uint8_t *x, const uint8_t *y, int parity)
     return f25519_eq(a, c);
 }
 
-/* Convert a Montgomery X and a parity bit to an Edwards X/Y */
+/* Convert a Montgomery X and a parity bit to a Edwards X/Y */
 uint8_t morph25519_m2e(uint8_t *ex, uint8_t *ey, const uint8_t *mx, int parity)
 {
     uint8_t ok;

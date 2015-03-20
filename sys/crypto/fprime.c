@@ -35,7 +35,7 @@ static void raw_add(uint8_t *x, const uint8_t *p)
     }
 }
 
-/* Substract two field points */
+/* Subtract two field points */
 static void raw_try_sub(uint8_t *x, const uint8_t *p)
 {
     uint8_t minusp[FPRIME_SIZE];
@@ -180,7 +180,7 @@ void fprime_add(uint8_t *r, const uint8_t *a, const uint8_t *modulus)
     raw_try_sub(r, modulus);
 }
 
-/* Substract one value to another. The two pointers must be distinct. */
+/* Subtract one value to another. The two pointers must be distinct. */
 void fprime_sub(uint8_t *r, const uint8_t *a, const uint8_t *modulus)
 {
     raw_add(r, modulus);

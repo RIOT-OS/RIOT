@@ -15,6 +15,7 @@
  * @brief       Test vectors for the Ed25519 signature system
  *
  * @author      Jan Wagner <mail@jwagner.eu>
+ * @author      Daniel Beer <dlbeer@gmail.com>
  *
  */
 
