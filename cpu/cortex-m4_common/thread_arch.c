@@ -142,12 +142,16 @@ void thread_arch_stack_print(void)
 __attribute__((naked)) void NORETURN thread_arch_start_threading(void)
 {
     /* enable IRQs to make sure the SVC interrupt is reachable */
-    enableIRQ();
+    __ASM volatile ("bl irq_arch_enable\n");
 
     /* trigger the SVC interrupt which will get and execute the next thread */
-    asm("svc    0x01");
+    __ASM volatile ("svc #1\n");
 
-    UNREACHABLE();
+    /* This line is unreachable, infinite loop */
+    __ASM volatile (
+        "unreachable%=:\n"
+        "b unreachable%=\n"
+        :::);
 }
 
 void thread_arch_yield(void)
@@ -156,50 +160,54 @@ void thread_arch_yield(void)
     SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
 }
 
-__attribute__((always_inline)) static __INLINE void context_save(void)
-{
-    /* {r0-r3,r12,LR,PC,xPSR} are saved automatically on exception entry */
-
-    /* save unsaved registers */
-    asm("mrs    r0, psp"            );      /* get stack pointer from user mode */
-    asm("stmdb  r0!,{r4-r11}"       );      /* save regs */
-    asm("stmdb  r0!,{lr}"           );      /* exception return value */
-/*  asm("vstmdb sp!, {s16-s31}"     ); */   /* TODO save FPU registers if needed */
-    asm("ldr    r1, =sched_active_thread" );      /* load address of current tcb */
-    asm("ldr    r1, [r1]"           );      /* dereference pdc */
-    asm("str    r0, [r1]"           );      /* write r0 to pdc->sp means current threads stack pointer */
-}
-
-__attribute__((always_inline)) static __INLINE void context_restore(void)
-{
-    asm("ldr    r0, =sched_active_thread" );      /* load address of current TCB */
-    asm("ldr    r0, [r0]"           );      /* dereference TCB */
-    asm("ldr    r1, [r0]"           );      /* load tcb->sp to register 1 */
-    asm("ldmia  r1!, {r0}"          );      /* restore exception return value from stack */
-/*  asm("pop    {s16-s31}"          ); */   /* TODO load FPU register if needed depends on r0 exret */
-    asm("ldmia  r1!, {r4-r11}"      );      /* restore other registers */
-    asm("msr    psp, r1"            );      /* restore PSP register (user mode SP)*/
-    asm("bx     r0"                 );      /* load exception return value to PC causes end of exception*/
-
-    /* {r0-r3,r12,LR,PC,xPSR} are restored automatically on exception return */
-}
-
 /**
  * @brief The svc is used for running the scheduler and scheduling a new task during start-up or
  *        after a thread has exited
  */
-__attribute__((naked)) void isr_svc(void)
-{
-    sched_run();
-    context_restore();
-}
+void isr_svc(void);
 
 /**
- * @brief All task switching activity is carried out int the pendSV interrupt
+ * @brief All task switching activity is carried out in the PendSV interrupt
  */
-__attribute__((naked)) void isr_pendsv(void)
+void isr_pendsv(void);
+
+__attribute__((naked)) void arch_context_switch(void)
 {
-    context_save();
-    sched_run();
-    context_restore();
+    /* {r0-r3,r12,LR,PC,xPSR} are saved automatically on exception entry */
+    __ASM volatile (
+    /* PendSV handler entry point */
+    ".global isr_pendsv               \n"
+    ".thumb_func                      \n"
+    "isr_pendsv:                      \n"
+    /* Save the context */
+    /* save unsaved registers */
+    ".thumb_func                      \n"
+    "context_save:"
+    "mrs    r0, psp                   \n" /* get stack pointer from user mode */
+    "stmdb  r0!,{r4-r11}              \n" /* save regs */
+    "stmdb  r0!,{lr}                  \n" /* exception return value */
+/*  "vstmdb sp!, {s16-s31}            \n" */ /* TODO save FPU registers if needed */
+    "ldr    r1, =sched_active_thread  \n" /* load address of current tcb */
+    "ldr    r1, [r1]                  \n" /* dereference pdc */
+    "str    r0, [r1]                  \n" /* write r0 to pdc->sp means current threads stack pointer */
+    /* SVC handler entry point */
+    /* PendSV will continue from above and through this part as well */
+    ".global isr_svc                  \n"
+    ".thumb_func                      \n"
+    "isr_svc:                         \n"
+    /* perform scheduling */
+    "bl     sched_run                 \n"
+    /* Restore context and return from exception */
+    ".thumb_func                      \n"
+    "context_restore:                 \n"
+    "ldr    r0, =sched_active_thread  \n" /* load address of current TCB */
+    "ldr    r0, [r0]                  \n" /* dereference TCB */
+    "ldr    r1, [r0]                  \n" /* load tcb->sp to register 1 */
+    "ldmia  r1!, {r0}                 \n" /* restore exception return value from stack */
+/*  "pop    {s16-s31}                 \n" */ /* TODO load FPU register if needed depends on r0 exret */
+    "ldmia  r1!, {r4-r11}             \n" /* restore other registers */
+    "msr    psp, r1                   \n" /* restore PSP register (user mode SP)*/
+    "bx     r0                        \n" /* load exception return value to PC causes end of exception*/
+    /* {r0-r3,r12,LR,PC,xPSR} are restored automatically on exception return */
+    );
 }
