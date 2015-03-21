@@ -190,6 +190,7 @@ int spi_init_slave(spi_t dev, spi_conf_t conf, char (*cb)(char))
     /* TODO */
     return 0;
 }
+
 void spi_transmission_begin(spi_t dev, char reset_val)
 {
     /* TODO*/
@@ -324,4 +325,5 @@ void spi_poweroff(spi_t dev)
 #endif
     }
 }
+
 #endif /* SPI_0_EN || SPI_1_EN */

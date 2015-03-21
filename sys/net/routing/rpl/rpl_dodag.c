@@ -64,6 +64,7 @@ rpl_instance_t *rpl_new_instance(uint8_t instanceid)
 
     return NULL;
 }
+
 rpl_instance_t *rpl_get_instance(uint8_t instanceid)
 {
     for (int i = 0; i < RPL_MAX_INSTANCES; i++) {
@@ -126,6 +127,7 @@ rpl_dodag_t *rpl_get_joined_dodag(uint8_t instanceid)
 
     return NULL;
 }
+
 rpl_dodag_t *rpl_get_my_dodag(void)
 {
     for (int i = 0; i < RPL_MAX_DODAGS; i++) {
@@ -136,6 +138,7 @@ rpl_dodag_t *rpl_get_my_dodag(void)
 
     return NULL;
 }
+
 void rpl_del_dodag(rpl_dodag_t *dodag)
 {
     rpl_leave_dodag(dodag);
