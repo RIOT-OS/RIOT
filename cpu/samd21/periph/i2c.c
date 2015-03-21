@@ -485,6 +485,7 @@ static inline void _read(SercomI2cm *dev, char *data, int length)
     /* Send NACK before STOP */
     dev->CTRLB.reg |= SERCOM_I2CM_CTRLB_ACKACT;
 }
+
 static inline void _stop(SercomI2cm *dev)
 {
     /* Wait for hardware module to sync */

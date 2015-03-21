@@ -45,6 +45,7 @@ void _get_humidity_handler(int argc, char **argv)
                (double) sht11_val.relhum, (double) sht11_val.relhum_temp);
     }
 }
+
 void _get_temperature_handler(int argc, char **argv)
 {
     (void) argc;
@@ -61,6 +62,7 @@ void _get_temperature_handler(int argc, char **argv)
         printf("Temperature: %-6.2f°C\n", (double) sht11_val.temperature);
     }
 }
+
 void _get_weather_handler(int argc, char **argv)
 {
     (void) argc;
