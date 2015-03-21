@@ -30,6 +30,34 @@ extern "C" {
 void tests_crypto(void);
 
 /**
+ * @brief   Generates tests for crypto/blake2b.h
+ *
+ * @return  embUnit tests if successful, NULL if not.
+ */
+Test *tests_crypto_blake2b_tests(void);
+
+/**
+ * @brief   Generates tests for crypto/blake2s.h
+ *
+ * @return  embUnit tests if successful, NULL if not.
+ */
+Test *tests_crypto_blake2s_tests(void);
+
+/**
+ * @brief   Generates tests for crypto/groestl256.h
+ *
+ * @return  embUnit tests if successful, NULL if not.
+ */
+Test *tests_crypto_groestl256_tests(void);
+
+/**
+ * @brief   Generates tests for crypto/groestl512.h
+ *
+ * @return  embUnit tests if successful, NULL if not.
+ */
+Test *tests_crypto_groestl512_tests(void);
+
+/**
  * @brief   Generates tests for crypto/sha256.h
  *
  * @return  embUnit tests if successful, NULL if not.

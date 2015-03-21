@@ -10,5 +10,9 @@
 
 void tests_crypto(void)
 {
+    TESTS_RUN(tests_crypto_blake2b_tests());
+    TESTS_RUN(tests_crypto_blake2s_tests());
+    TESTS_RUN(tests_crypto_groestl256_tests());
+    TESTS_RUN(tests_crypto_groestl512_tests());
     TESTS_RUN(tests_crypto_sha256_tests());
 }
