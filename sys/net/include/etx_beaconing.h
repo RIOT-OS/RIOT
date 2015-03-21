@@ -38,10 +38,10 @@ extern "C" {
  */
 #if ENABLE_DEBUG
  /* Defines the maximum number of neighbours in debug mode, we fix it at 15 */
-#define ETX_MAX_CANDIDATE_NEIGHBORS (15) 
+#define ETX_MAX_CANDIDATE_NEIGHBORS (15)
 #else
 /* Defines the maximum number of neighbours in normal mode default is 40 */
-#define ETX_MAX_CANDIDATE_NEIGHBORS (40) 
+#define ETX_MAX_CANDIDATE_NEIGHBORS (40)
 #endif
 #define MS  (1000)
 
@@ -49,7 +49,6 @@ extern "C" {
  * @{
  * @name ETX Interval parameters
  */
- 
 /** @brief Defines the ETX_INTERVAL Given in ms, the default is 1 second
  *
  * Should be divisible through 2 (For ETX_DEF_JIT_CORRECT)
