@@ -15,8 +15,8 @@
  *
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef __TESTS_NOMAC_H_
-#define __TESTS_NOMAC_H_
+#ifndef TESTS_NOMAC_H_
+#define TESTS_NOMAC_H_
 
 #include "embUnit.h"
 
@@ -33,5 +33,5 @@ void tests_nomac(void);
 }
 #endif
 
-#endif /* __TESTS_NETDEV_DUMMY_H_ */
+#endif /* TESTS_NETDEV_DUMMY_H_ */
 /** @} */
