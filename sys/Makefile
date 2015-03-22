@@ -119,6 +119,9 @@ endif
 ifneq (,$(filter ng_sixlowpan_netif,$(USEMODULE)))
     DIRS += net/network_layer/ng_sixlowpan/netif
 endif
+ifneq (,$(filter ng_slip,$(USEMODULE)))
+    DIRS += net/link_layer/ng_slip
+endif
 ifneq (,$(filter netapi,$(USEMODULE)))
     DIRS += net/crosslayer/netapi
 endif

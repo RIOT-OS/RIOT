@@ -82,6 +82,10 @@ ifneq (,$(filter cpp11-compat,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/sys/cpp11-compat/include
 endif
 
+ifneq (,$(filter ng_slip,$(USEMODULE)))
+    FEATURES_REQUIRED += periph_uart
+endif
+
 ifneq (,$(filter embunit,$(USEMODULE)))
     ifeq ($(OUTPUT),XML)
         CFLAGS += -DOUTPUT=OUTPUT_XML
