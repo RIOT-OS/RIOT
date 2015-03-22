@@ -15,8 +15,8 @@
  *
  * @author      Philipp Rosenkranz <philipp.rosenkranz@fu-berlin.de>
  */
-#ifndef __TESTS_BLOOM_H_
-#define __TESTS_BLOOM_H_
+#ifndef TESTS_BLOOM_H_
+#define TESTS_BLOOM_H_
 
 #include "embUnit.h"
 
@@ -40,5 +40,5 @@ Test *tests_bloom_tests(void);
 }
 #endif
 
-#endif /* __TESTS_BLOOM_H_ */
+#endif /* TESTS_BLOOM_H_ */
 /** @} */
