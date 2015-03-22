@@ -33,7 +33,7 @@ extern "C" {
 typedef struct {
     uint16_t read_count;    /**< number of (successful) read accesses */
     uint16_t write_count;   /**< number of (successful) write accesses */
-    uint16_t mask;          /**< Size of buffer -1, i.e. mask of the bits */
+    int16_t mask;          /**< Size of buffer -1, i.e. mask of the bits */
 } cib_t;
 
 /**
@@ -46,7 +46,7 @@ typedef struct {
  *
  * @param[out] cib      Buffer to initialize.
  *                      Must not be NULL.
- * @param[in]  size     Size of the buffer, must not exceed 65,534.
+ * @param[in]  size     Size of the buffer, must not exceed 32,767
  */
 static inline void cib_init(cib_t *__restrict cib, uint16_t size)
 {
