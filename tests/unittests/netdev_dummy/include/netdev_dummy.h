@@ -17,8 +17,8 @@
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 
-#ifndef __UNITTESTS_NETDEV_DUMMY_H_
-#define __UNITTESTS_NETDEV_DUMMY_H_
+#ifndef UNITTESTS_NETDEV_DUMMY_H_
+#define UNITTESTS_NETDEV_DUMMY_H_
 
 #include <stdlib.h>
 
@@ -153,7 +153,7 @@ void unittest_netdev_dummy_init(void);
 }
 #endif
 
-#endif /* __UNITTESTS_NETDEV_DUMMY_H_ */
+#endif /* UNITTESTS_NETDEV_DUMMY_H_ */
 
 /**
  * @}
