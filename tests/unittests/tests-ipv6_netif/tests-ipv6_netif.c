@@ -21,6 +21,7 @@
 #include "net/ng_netif.h"
 #include "net/ng_ipv6/netif.h"
 
+#include "unittests-constants.h"
 #include "tests-ipv6_netif.h"
 
 /* default interface for testing */

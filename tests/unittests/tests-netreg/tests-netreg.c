@@ -18,6 +18,7 @@
 #include "net/ng_netreg.h"
 #include "net/ng_nettype.h"
 
+#include "unittests-constants.h"
 #include "tests-netreg.h"
 
 static void set_up(void)

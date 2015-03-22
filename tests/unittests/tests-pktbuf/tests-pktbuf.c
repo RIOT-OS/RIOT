@@ -20,6 +20,7 @@
 #include "net/ng_pkt.h"
 #include "net/ng_pktbuf.h"
 
+#include "unittests-constants.h"
 #include "tests-pktbuf.h"
 
 typedef struct __attribute__((packed)) {
