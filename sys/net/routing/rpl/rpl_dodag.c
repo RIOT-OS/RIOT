@@ -90,8 +90,7 @@ rpl_instance_t *rpl_get_my_instance(void)
 rpl_dodag_t *rpl_new_dodag(rpl_instance_t *inst, ipv6_addr_t *dodagid)
 {
     if (inst == NULL) {
-        DEBUGF("Error - No instance found for id %p. This should not happen\n",
-               inst);
+        DEBUGF("Error - No instance specified\n");
         return NULL;
     }
 
