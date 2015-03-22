@@ -433,6 +433,7 @@ void rpl_local_repair(void)
 {
     DEBUGF("[INFO] Local Repair started\n");
     rpl_dodag_t *my_dodag = rpl_get_my_dodag();
+    ipv6_addr_t all_rpl_nodes;
 
     if (my_dodag == NULL) {
         DEBUGF("[Error] - no local repair possible, if not part of a DODAG\n");
@@ -444,6 +445,8 @@ void rpl_local_repair(void)
     rpl_delete_all_parents();
     trickle_reset_timer(&my_dodag->trickle);
 
+    ipv6_addr_set_all_rpl_nodes_addr(&all_rpl_nodes);
+    rpl_send_DIS(&all_rpl_nodes);
 }
 
 ipv6_addr_t *rpl_get_my_preferred_parent(void)
