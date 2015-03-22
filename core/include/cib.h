@@ -18,8 +18,6 @@
  * @author      unknown, propably Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-#include <stdint.h>
-
 #ifndef __CIB_H
 #define __CIB_H
 
@@ -31,9 +29,9 @@ extern "C" {
  * @brief circular integer buffer structure
  */
 typedef struct {
-    uint16_t read_count;    /**< number of (successful) read accesses */
-    uint16_t write_count;   /**< number of (successful) write accesses */
-    int16_t mask;          /**< Size of buffer -1, i.e. mask of the bits */
+    unsigned int read_count;    /**< number of (successful) read accesses */
+    unsigned int write_count;   /**< number of (successful) write accesses */
+    unsigned int mask;          /**< Size of buffer -1, i.e. mask of the bits */
 } cib_t;
 
 /**
@@ -46,9 +44,9 @@ typedef struct {
  *
  * @param[out] cib      Buffer to initialize.
  *                      Must not be NULL.
- * @param[in]  size     Size of the buffer, must not exceed 32,767
+ * @param[in]  size     Size of the buffer, must not exceed MAXINT/2.
  */
-static inline void cib_init(cib_t *__restrict cib, uint16_t size)
+static inline void cib_init(cib_t *__restrict cib, unsigned int size)
 {
     cib_t c = CIB_INIT(size);
     *cib = c;
@@ -61,7 +59,7 @@ static inline void cib_init(cib_t *__restrict cib, uint16_t size)
  *                      Must not be NULL.
  * @return How often cib_get() can be called before the CIB is empty.
  */
-static inline uint16_t cib_avail(cib_t *__restrict cib)
+static inline unsigned int cib_avail(cib_t *__restrict cib)
 {
     return cib->write_count - cib->read_count;
 }
@@ -75,7 +73,7 @@ static inline uint16_t cib_avail(cib_t *__restrict cib)
  */
 static inline int cib_get(cib_t *__restrict cib)
 {
-    uint16_t avail = cib_avail(cib);
+    unsigned int avail = cib_avail(cib);
 
     if (avail > 0) {
         return (int) (cib->read_count++ & cib->mask);
@@ -93,7 +91,7 @@ static inline int cib_get(cib_t *__restrict cib)
  */
 static inline int cib_put(cib_t *__restrict cib)
 {
-    uint16_t avail = cib_avail(cib);
+    unsigned int avail = cib_avail(cib);
 
     /* We use a signed compare, because the mask is -1u for an empty CIB. */
     if ((int) avail <= (int) cib->mask) {
