@@ -27,6 +27,32 @@
 
 #include "crypto/blake2s.h"
 
+/* Algorithm macro G */
+#define G(r,i,a,b,c,d) \
+  do { \
+    a = a + b + m[blake2s_sigma[r][2*i+0]]; \
+    d = rotr32(d ^ a, 16); \
+    c = c + d; \
+    b = rotr32(b ^ c, 12); \
+    a = a + b + m[blake2s_sigma[r][2*i+1]]; \
+    d = rotr32(d ^ a, 8); \
+    c = c + d; \
+    b = rotr32(b ^ c, 7); \
+  } while (0)
+
+/* Algorithm macro ROUND */
+#define BLAKE2S_ROUND(r)  \
+  do { \
+    G(r,0,v[ 0],v[ 4],v[ 8],v[12]); \
+    G(r,1,v[ 1],v[ 5],v[ 9],v[13]); \
+    G(r,2,v[ 2],v[ 6],v[10],v[14]); \
+    G(r,3,v[ 3],v[ 7],v[11],v[15]); \
+    G(r,4,v[ 0],v[ 5],v[10],v[15]); \
+    G(r,5,v[ 1],v[ 6],v[11],v[12]); \
+    G(r,6,v[ 2],v[ 7],v[ 8],v[13]); \
+    G(r,7,v[ 3],v[ 4],v[ 9],v[14]); \
+  } while (0)
+
 /* BLAKE2s IVs */
 static const uint32_t blake2s_IV[8] = {
     0x6A09E667UL, 0xBB67AE85UL, 0x3C6EF372UL, 0xA54FF53AUL,
