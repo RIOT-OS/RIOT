@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2014 Hamburg University of Applied Sciences
  * Copyright (C) 2014 Freie Universität Berlin
+ * Copyright (C) 2015 Kaspar Schleiser <kaspar@schleiser.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -18,6 +19,7 @@
  * @author      Fabian Nack <nack@inf.fu-berlin.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Joakim Gebart <joakim.gebart@eistec.se>
+ * @author      Kaspar Schleiser <kaspar@schleiser.de>
  *
  * @}
  */
