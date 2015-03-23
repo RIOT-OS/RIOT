@@ -36,14 +36,11 @@ typedef struct {
     /** private status of this fd_t */
     int internal_active;
 
-<<<<<<< HEAD
     /** the RIOT internal filedescriptor while is differentiated here */
     /** from the POSIX filedescriptor in order to avoid confusion */
-    int fd;
-=======
+    in
     /** Stores the RIOT internal value for the file descriptor (not POSIX). */
     int internal_fd;
->>>>>>> upstream/master
 
     /**
      * Read *n* bytes into *buf* from *fd*.  Return the

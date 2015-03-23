@@ -43,13 +43,10 @@ int fd_init(void)
 #ifdef MODULE_UART0
     posix_open(uart0_handler_pid, 0);
     fd_t fd = {
-<<<<<<< HEAD
         .__active = 1,
-        .fd = (int)uart0_handler_pid,
-=======
+        .fd_internal = (int)uart0_handler_pid,
         .internal_active = 1,
         .internal_fd = (int)uart0_handler_pid,
->>>>>>> upstream/master
         .read = (ssize_t ( *)(int, void *, size_t))posix_read,
         .write = (ssize_t ( *)(int, const void *, size_t))posix_write,
         .close = posix_close
