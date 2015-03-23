@@ -1,2 +1,3 @@
-FEATURES_PROVIDED += transceiver config
+FEATURES_PROVIDED += transceiver
+FEATURES_PROVIDED += config
 FEATURES_MCU_GROUP = msp430

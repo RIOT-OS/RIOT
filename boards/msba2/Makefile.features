@@ -1,2 +1,6 @@
-FEATURES_PROVIDED += transceiver periph_pwm periph_rtc cpp config
+FEATURES_PROVIDED += transceiver
+FEATURES_PROVIDED += periph_pwm
+FEATURES_PROVIDED += periph_rtc
+FEATURES_PROVIDED += cpp
+FEATURES_PROVIDED += config
 FEATURES_MCU_GROUP = arm7
