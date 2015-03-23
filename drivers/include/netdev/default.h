@@ -17,8 +17,8 @@
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 
-#ifndef __NETDEV_DEFAULT_H_
-#define __NETDEV_DEFAULT_H_
+#ifndef NETDEV_DEFAULT_H_
+#define NETDEV_DEFAULT_H_
 
 #include "netdev/base.h"
 
@@ -59,5 +59,5 @@ extern "C" {
 }
 #endif
 
-#endif /* __NETDEV_DEFAULT_H_ */
+#endif /* NETDEV_DEFAULT_H_ */
 /** @} */

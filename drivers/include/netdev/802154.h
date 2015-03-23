@@ -17,8 +17,8 @@
  *
  */
 
-#ifndef __NETDEV_802154_H_
-#define __NETDEV_802154_H_
+#ifndef NETDEV_802154_H_
+#define NETDEV_802154_H_
 
 #include <stdint.h>
 
@@ -422,7 +422,7 @@ netdev_802154_tx_status_t netdev_802154_send(netdev_t *dev,
 }
 #endif
 
-#endif /* __NETDEV_802154_H_ */
+#endif /* NETDEV_802154_H_ */
 
 /**
  * @}

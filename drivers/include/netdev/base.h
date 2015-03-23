@@ -16,8 +16,8 @@
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 
-#ifndef __NETDEV_BASE_H_
-#define __NETDEV_BASE_H_
+#ifndef NETDEV_BASE_H_
+#define NETDEV_BASE_H_
 
 #include <errno.h>
 #include <stdint.h>
@@ -402,7 +402,7 @@ static inline void netdev_hlist_remove(netdev_hlist_t **list,
 }
 #endif
 
-#endif /* __NETDEV_BASE_H_ */
+#endif /* NETDEV_BASE_H_ */
 /**
  * @}
  */
