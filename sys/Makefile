@@ -98,6 +98,9 @@ endif
 ifneq (,$(filter ng_nomac,$(USEMODULE)))
     DIRS += net/link_layer/ng_nomac
 endif
+ifneq (,$(filter ng_pktdump,$(USEMODULE)))
+    DIRS += net/crosslayer/ng_pktdump
+endif
 
 DIRS += $(dir $(wildcard $(addsuffix /Makefile, ${USEMODULE})))
 
