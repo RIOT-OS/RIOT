@@ -8,12 +8,7 @@ It should also works with other boards wired with this device.
 Usage
 =====
 
-Build, flash and start the application:
-```
-export BOARD=udoo
-make clean all
-make flash
-```
+Just add in your modules path.
 
 RIOT specific
 =============

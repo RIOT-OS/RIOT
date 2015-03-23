@@ -35,15 +35,15 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <../../cpu/sam3x8e/include/hwtimer_cpu.h>
-#include <../../drivers/include/periph/gpio.h>
-#include <../../drivers/include/periph/spi.h>
-#include <../../drivers/include/periph/gpio.h>
-#include <../../cpu/sam3x8e/include/pio/pio_sam3x8e.h>
-#include <../../cpu/sam3x8e/include/sam3x8e.h>
-#include <../../cpu/sam3x8e/include/component/component_pio.h>
-#include <../../boards/udoo/include/board.h>
-#include <../../boards/udoo/include/periph_conf.h>
+#include <hwtimer_cpu.h>
+#include <gpio.h>
+#include <spi.h>
+#include <gpio.h>
+#include <pio_sam3x8e.h>
+#include <sam3x8e.h>
+#include <component_pio.h>
+#include <board.h>
+#include <periph_conf.h>
 
 /* Uncomment these lines to enable debug output for PN532, MIFARE or P2P */
 #define PN532DEBUG
