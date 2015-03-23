@@ -11,6 +11,10 @@
  * @defgroup    sys_random Random
  * @ingroup     sys
  * @brief       Random number generator
+ * @{
+ *
+ * @file
+ * @brief       Mersenne Twister - a very fast random number generator
  */
 
 #ifndef RANDOM_H
@@ -85,3 +89,4 @@ double genrand_res53(void);
 #endif
 
 #endif /* RANDOM_H */
+/** @} */

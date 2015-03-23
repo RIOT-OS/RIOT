@@ -52,6 +52,7 @@ extern msg_t rpl_msg_queue[RPL_PKT_RECV_BUF_SIZE];
 extern char rpl_process_buf[RPL_PROCESS_STACKSIZE];
 extern uint8_t rpl_buffer[BUFFER_SIZE - LL_HDR_LEN];
 extern uint8_t rpl_if_id;
+extern rpl_dodag_t rpl_dodags[RPL_MAX_DODAGS];
 
 /**
  * @brief Sends a RPL message to a given destination
@@ -73,12 +74,13 @@ void rpl_send(ipv6_addr_t *destination, uint8_t *payload, uint16_t p_len, uint8_
  * corresponding objective functions and sixlowpan (including own address).
  *
  * @param[in] if_id             ID of the interface, which correspond to the network under RPL-control
+ * @param[in] address           Global IPv6 address to use
  *
  * @return 1 if initialization was successful
  * @return 0 if initialization was not successful
  *
  */
-uint8_t rpl_init(int if_id);
+uint8_t rpl_init(int if_id, ipv6_addr_t *address);
 
 /**
  * @brief Initialization of RPL-root.
@@ -91,27 +93,29 @@ uint8_t rpl_init(int if_id);
 void rpl_init_root(rpl_options_t *rpl_opts);
 
 /**
- * @brief Sends a DIO-message to a given destination
+ * @brief Sends a DIO-message to a given destination in a given dodag
  *
- * This function sends a DIO message to a given destination.
+ * This function sends a DIO message to a given destination in a given dodag.
  *
+ * @param[in] dodag             Dodag of the DIO-message.
  * @param[in] destination       IPv6-address of the destination of the DIO. Should be a direct neighbor.
  *
  */
-void rpl_send_DIO(ipv6_addr_t *destination);
+void rpl_send_DIO(rpl_dodag_t *dodag, ipv6_addr_t *destination);
 
 /**
  * @brief Sends a DAO-message to a given destination
  *
- * This function sends a DAO message to a given destination.
+ * This function sends a DAO message to a given destination in a given dodag.
  *
+ * @param[in] dodag             Dodag of the DAO-message.
  * @param[in] destination       IPv6-address of the destination of the DAO. Should be the preferred parent.
  * @param[in] lifetime          Lifetime of the node. Reflect the estimated time of presence in the network.
  * @param[in] default_lifetime  If true, param lifetime is ignored and lifetime is dodag default-lifetime
  * @param[in] start_index       Describes whether a DAO must be split because of too many routing entries.
  *
  */
-void rpl_send_DAO(ipv6_addr_t *destination, uint8_t lifetime, bool default_lifetime, uint8_t start_index);
+void rpl_send_DAO(rpl_dodag_t *dodag, ipv6_addr_t *destination, uint8_t lifetime, bool default_lifetime, uint8_t start_index);
 
 /**
  * @brief Sends a DIS-message to a given destination
@@ -127,12 +131,13 @@ void rpl_send_DIS(ipv6_addr_t *destination);
 /**
  * @brief Sends a DAO acknowledgment-message to a given destination
  *
- * This function sends a DAO_ACK message to a given destination.
+ * This function sends a DAO_ACK message to a given destination in a given dodag.
  *
+ * @param[in] dodag             Dodag of the DAO_ACK message.
  * @param[in] destination       IPv6-address of the destination of the DAO_ACK. Should be a direct neighbor.
  *
  */
-void rpl_send_DAO_ACK(ipv6_addr_t *destination);
+void rpl_send_DAO_ACK(rpl_dodag_t *dodag, ipv6_addr_t *destination);
 #endif
 
 /**

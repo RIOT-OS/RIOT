@@ -313,7 +313,7 @@ void vtimer_get_localtime(struct tm *localt)
     // TODO: fill the other fields
 }
 
-int vtimer_init(void)
+void vtimer_init(void)
 {
     DEBUG("vtimer_init().\n");
     unsigned state = disableIRQ();
@@ -333,7 +333,6 @@ int vtimer_init(void)
     update_shortterm();
 
     restoreIRQ(state);
-    return 0;
 }
 
 int vtimer_set_wakeup(vtimer_t *t, timex_t interval, kernel_pid_t pid)
@@ -379,7 +378,7 @@ int vtimer_sleep(timex_t time)
     return ret;
 }
 
-int vtimer_remove(vtimer_t *t)
+void vtimer_remove(vtimer_t *t)
 {
     unsigned irq_state = disableIRQ();
 
@@ -389,10 +388,13 @@ int vtimer_remove(vtimer_t *t)
 
     restoreIRQ(irq_state);
 
-    return 0;
 }
 
+<<<<<<< HEAD
  vtimer_set_msg(vtimer_t *t, timex_t interval, kernel_pid_t pid, uint16_t type, void *ptr)
+=======
+void vtimer_set_msg(vtimer_t *t, timex_t interval, kernel_pid_t pid, uint16_t type, void *ptr)
+>>>>>>> upstream/master
 {
     t->action = vtimer_callback_msg;
     t->type = type;

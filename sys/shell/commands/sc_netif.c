@@ -168,7 +168,7 @@ void _netif_list(kernel_pid_t dev)
     res = ng_netapi_get(dev, NETCONF_OPT_NID, 0, &u16, sizeof(u16));
 
     if (res >= 0) {
-        printf(" NID: %" PRIx16 " ", u16);
+        printf(" NID: 0x%" PRIx16 " ", u16);
     }
 
     printf("\n            ");
@@ -184,7 +184,7 @@ void _netif_list(kernel_pid_t dev)
     res = ng_netapi_get(dev, NETCONF_OPT_SRC_LEN, 0, &u16, sizeof(u16));
 
     if (res >= 0) {
-        printf("Source address length: %" PRIx16 "\n            ", u16);
+        printf("Source address length: %" PRIu16 "\n            ", u16);
     }
 
     /* TODO: list IPv6 info */
@@ -225,6 +225,7 @@ static void _netif_set_u16(kernel_pid_t dev, ng_netconf_opt_t opt,
         printf("error: unable to set ");
         _print_netconf(opt);
         puts("");
+        return;
     }
 
     printf("success: set ");
@@ -249,12 +250,14 @@ static void _netif_set_addr(kernel_pid_t dev, ng_netconf_opt_t opt,
         puts("error: unable to parse address.\n"
              "Must be of format [0-9a-fA-F]{2}(:[0-9a-fA-F]{2})*\n"
              "(hex pairs delimited by colons)");
+        return;
     }
 
     if (ng_netapi_set(dev, opt, 0, addr, addr_len) < 0) {
         printf("error: unable to set ");
         _print_netconf(opt);
         puts("");
+        return;
     }
 
     printf("success: set ");

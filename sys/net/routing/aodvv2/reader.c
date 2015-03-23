@@ -411,6 +411,7 @@ static enum rfc5444_result _cb_rrep_blocktlv_messagetlvs_okay(struct rfc5444_rea
 static enum rfc5444_result _cb_rrep_blocktlv_addresstlvs_okay(struct rfc5444_reader_tlvblock_context *cont)
 {
 #if ENABLE_DEBUG
+    /* cppcheck-suppress unusedVariable as nbuf is needed by VDEBUG. */
     struct netaddr_str nbuf;
 #endif
     struct rfc5444_reader_tlvblock_entry *tlv;
@@ -609,6 +610,7 @@ static enum rfc5444_result _cb_rerr_blocktlv_messagetlvs_okay(struct rfc5444_rea
 static enum rfc5444_result _cb_rerr_blocktlv_addresstlvs_okay(struct rfc5444_reader_tlvblock_context *cont)
 {
 #if ENABLE_DEBUG
+    /* cppcheck-suppress unusedVariable as nbuf is needed by VDEBUG. */
     struct netaddr_str nbuf;
 #endif
     struct aodvv2_routing_entry_t *unreachable_entry;

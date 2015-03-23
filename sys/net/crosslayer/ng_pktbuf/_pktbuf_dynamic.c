@@ -76,7 +76,7 @@ void *_pktbuf_internal_alloc(size_t size)
 void *_pktbuf_internal_realloc(void *ptr, size_t size)
 {
     _chunk_list_t *node = NULL;
-    void *new = NULL;
+    void *new_value = NULL;
     _chunk_table_t *entry;
 
     if (size == 0) {
@@ -87,13 +87,13 @@ void *_pktbuf_internal_realloc(void *ptr, size_t size)
 
     /* entry can't be NULL since prelimanary _pktbuf_internal_contains() check ensures that */
     if ((ptr == entry->range_start) && (entry->chunks == NULL)) {
-        new = realloc(entry->range_start, size);
+        new_value = realloc(entry->range_start, size);
 
-        if (new == NULL) {
+        if (new_value == NULL) {
             return NULL;
         }
 
-        entry->range_start = new;
+        entry->range_start = new_value;
         entry->range_len = size;
     }
     else {
@@ -103,25 +103,25 @@ void *_pktbuf_internal_realloc(void *ptr, size_t size)
             range_len -= (node->ptr - entry->range_start);
         }
 
-        new = malloc(size);
+        new_value = malloc(size);
 
-        if (new == NULL) {
+        if (new_value == NULL) {
             return NULL;
         }
 
-        entry = _create_table_entry(new, size);
+        entry = _create_table_entry(new_value, size);
 
         if (entry == NULL) {
-            free(new);
+            free(new_value);
 
             return NULL;
         }
 
-        memcpy(new, ptr, (size < range_len) ? size : range_len);
+        memcpy(new_value, ptr, (size < range_len) ? size : range_len);
         _pktbuf_internal_free(ptr);
     }
 
-    return new;
+    return new_value;
     /* cppcheck-suppress memleak entry will be freed eventually in _pktbuf_internal_free().
      * Checked with valgrind. */
 }

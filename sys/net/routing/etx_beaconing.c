@@ -111,6 +111,7 @@ static etx_probe_t *etx_get_send_buf(void)
 {
     return ((etx_probe_t *) &(etx_send_buf[0]));
 }
+
 static etx_probe_t *etx_get_rec_buf(void)
 {
     return ((etx_probe_t *) &(etx_rec_buf[0]));

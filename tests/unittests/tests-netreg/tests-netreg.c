@@ -18,18 +18,12 @@
 #include "net/ng_netreg.h"
 #include "net/ng_nettype.h"
 
+#include "unittests-constants.h"
 #include "tests-netreg.h"
 
 static void set_up(void)
 {
     ng_netreg_init();
-}
-
-static void test_netreg_register__inval_undef(void)
-{
-    ng_netreg_entry_t entry = { NULL, TEST_UINT16, TEST_UINT8 };
-
-    TEST_ASSERT_EQUAL_INT(-EINVAL, ng_netreg_register(NG_NETTYPE_UNDEF, &entry));
 }
 
 static void test_netreg_register__inval_numof(void)
@@ -159,7 +153,6 @@ void test_netreg_getnext__2_entries(void)
 Test *tests_netreg_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
-        new_TestFixture(test_netreg_register__inval_undef),
         new_TestFixture(test_netreg_register__inval_numof),
         new_TestFixture(test_netreg_register__success),
         new_TestFixture(test_netreg_unregister__success),

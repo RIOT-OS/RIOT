@@ -68,31 +68,3 @@ int lifo_get(int *array)
     DEBUG("lifo_get: returning %i\n", head);
     return head;
 }
-
-
-#ifdef WITH_MAIN
-#include <stdio.h>
-int main()
-{
-    int array[5];
-
-    lifo_init(array, 4);
-
-    lifo_insert(array, 2);
-    lifo_insert(array, 1);
-    lifo_insert(array, 3);
-    lifo_insert(array, 0);
-    lifo_insert(array, 3);
-    printf("get: %i\n", lifo_get(array));
-    printf("get: %i\n", lifo_get(array));
-    printf("get: %i\n", lifo_get(array));
-    printf("get: %i\n", lifo_get(array));
-    printf("get: %i\n", lifo_get(array));
-    printf("get: %i\n", lifo_get(array));
-    printf("get: %i\n", lifo_get(array));
-    printf("get: %i\n", lifo_get(array));
-    printf("get: %i\n", lifo_get(array));
-
-    return 0;
-}
-#endif

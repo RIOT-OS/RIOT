@@ -32,16 +32,15 @@ char addr_str[IPV6_MAX_ADDR_STR_LEN];
 #include "debug.h"
 
 static rpl_instance_t instances[RPL_MAX_INSTANCES];
-static rpl_dodag_t dodags[RPL_MAX_DODAGS];
+rpl_dodag_t rpl_dodags[RPL_MAX_DODAGS];
 static rpl_parent_t parents[RPL_MAX_PARENTS];
 
 void rpl_trickle_send_dio(void *args)
 {
-    (void) args;
     ipv6_addr_t mcast;
 
     ipv6_addr_set_all_rpl_nodes_addr(&mcast);
-    rpl_send_DIO(&mcast);
+    rpl_send_DIO((rpl_dodag_t *) args, &mcast);
 }
 
 void rpl_instances_init(void)
@@ -65,6 +64,7 @@ rpl_instance_t *rpl_new_instance(uint8_t instanceid)
 
     return NULL;
 }
+
 rpl_instance_t *rpl_get_instance(uint8_t instanceid)
 {
     for (int i = 0; i < RPL_MAX_INSTANCES; i++) {
@@ -87,21 +87,18 @@ rpl_instance_t *rpl_get_my_instance(void)
     return NULL;
 }
 
-rpl_dodag_t *rpl_new_dodag(uint8_t instanceid, ipv6_addr_t *dodagid)
+rpl_dodag_t *rpl_new_dodag(rpl_instance_t *inst, ipv6_addr_t *dodagid)
 {
-    rpl_instance_t *inst;
-    inst = rpl_get_instance(instanceid);
-
     if (inst == NULL) {
-        DEBUGF("Error - No instance found for id %d. This should not happen\n",
-               instanceid);
+        DEBUGF("Error - No instance found for id %p. This should not happen\n",
+               inst);
         return NULL;
     }
 
     rpl_dodag_t *dodag;
     rpl_dodag_t *end;
 
-    for (dodag = &dodags[0], end = dodag + RPL_MAX_DODAGS; dodag < end; dodag++) {
+    for (dodag = &rpl_dodags[0], end = dodag + RPL_MAX_DODAGS; dodag < end; dodag++) {
         if (dodag->used == 0) {
             memset(dodag, 0, sizeof(*dodag));
             dodag->instance = inst;
@@ -110,6 +107,7 @@ rpl_dodag_t *rpl_new_dodag(uint8_t instanceid, ipv6_addr_t *dodagid)
             dodag->ack_received = true;
             dodag->dao_counter = 0;
             dodag->trickle.callback.func = &rpl_trickle_send_dio;
+            dodag->trickle.callback.args = dodag;
             memcpy(&dodag->dodag_id, dodagid, sizeof(*dodagid));
             return dodag;
         }
@@ -119,26 +117,28 @@ rpl_dodag_t *rpl_new_dodag(uint8_t instanceid, ipv6_addr_t *dodagid)
 
 }
 
-rpl_dodag_t *rpl_get_dodag(ipv6_addr_t *id)
+rpl_dodag_t *rpl_get_joined_dodag(uint8_t instanceid)
 {
     for (int i = 0; i < RPL_MAX_DODAGS; i++) {
-        if (dodags[i].used && (rpl_equal_id(&dodags[i].dodag_id, id))) {
-            return &dodags[i];
+        if (rpl_dodags[i].joined && rpl_dodags[i].instance->id == instanceid) {
+            return &rpl_dodags[i];
         }
     }
 
     return NULL;
 }
+
 rpl_dodag_t *rpl_get_my_dodag(void)
 {
     for (int i = 0; i < RPL_MAX_DODAGS; i++) {
-        if (dodags[i].joined) {
-            return &dodags[i];
+        if (rpl_dodags[i].joined) {
+            return &rpl_dodags[i];
         }
     }
 
     return NULL;
 }
+
 void rpl_del_dodag(rpl_dodag_t *dodag)
 {
     rpl_leave_dodag(dodag);
@@ -191,13 +191,16 @@ rpl_parent_t *rpl_new_parent(rpl_dodag_t *dodag, ipv6_addr_t *address, uint16_t 
     return rpl_new_parent(dodag, address, rank);
 }
 
-rpl_parent_t *rpl_find_parent(ipv6_addr_t *address)
+rpl_parent_t *rpl_find_parent(rpl_dodag_t *dodag, ipv6_addr_t *address)
 {
     rpl_parent_t *parent;
     rpl_parent_t *end;
 
     for (parent = &parents[0], end = parents + RPL_MAX_PARENTS; parent < end; parent++) {
-        if ((parent->used) && (rpl_equal_id(address, &parent->addr))) {
+        if ((parent->used) && (rpl_equal_id(address, &parent->addr)
+                    && (parent->dodag->instance->id == dodag->instance->id)
+                    && (!memcmp(&parent->dodag->dodag_id,
+                        &dodag->dodag_id, sizeof(ipv6_addr_t))))) {
             return parent;
         }
     }
@@ -288,7 +291,7 @@ rpl_parent_t *rpl_find_preferred_parent(void)
     if (!rpl_equal_id(&my_dodag->my_preferred_parent->addr, &best->addr)) {
         if (my_dodag->mop != RPL_MOP_NO_DOWNWARD_ROUTES) {
             /* send DAO with ZERO_LIFETIME to old parent */
-            rpl_send_DAO(&my_dodag->my_preferred_parent->addr, 0, false, 0);
+            rpl_send_DAO(my_dodag, &my_dodag->my_preferred_parent->addr, 0, false, 0);
         }
 
         my_dodag->my_preferred_parent = best;
@@ -338,7 +341,7 @@ void rpl_join_dodag(rpl_dodag_t *dodag, ipv6_addr_t *parent, uint16_t parent_ran
 {
     rpl_dodag_t *my_dodag;
     rpl_parent_t *preferred_parent;
-    my_dodag = rpl_new_dodag(dodag->instance->id, &dodag->dodag_id);
+    my_dodag = rpl_new_dodag(dodag->instance, &dodag->dodag_id);
 
     if (my_dodag == NULL) {
         return;

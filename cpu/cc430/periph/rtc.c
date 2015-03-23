@@ -41,6 +41,7 @@ void rtc_poweron(void)
     /* Set RTC operational */
     RTCCTL1 &= ~RTCHOLD_H;
 }
+
 void rtc_poweroff(void)
 {
     /* Stop RTC */

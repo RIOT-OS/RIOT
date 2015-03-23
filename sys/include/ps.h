@@ -11,6 +11,12 @@
  * @defgroup    sys_ps PS
  * @ingroup     sys
  * @brief       Show list with all threads
+ * @{
+ *
+ * @file
+ * @brief       List information about all active threads
+ *
+ * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
 #ifndef __PS_H
@@ -28,3 +34,4 @@ void _ps_handler(int argc, char **argv);
 #endif
 
 #endif /* __PS_H */
+/** @} */
