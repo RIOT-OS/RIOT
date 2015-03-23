@@ -16,8 +16,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef __L3G4200D_REGS_H
-#define __L3G4200D_REGS_H
+#ifndef L3G4200D_REGS_H
+#define L3G4200D_REGS_H
 
 
 #ifdef __cplusplus
@@ -90,5 +90,5 @@
 }
 #endif
 
-#endif /* __L3G4200D_REGS_H */
+#endif /* L3G4200D_REGS_H */
 /** @} */
