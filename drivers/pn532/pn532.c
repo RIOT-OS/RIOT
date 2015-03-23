@@ -36,12 +36,11 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <hwtimer_cpu.h>
-#include <gpio.h>
-#include <spi.h>
-#include <gpio.h>
-#include <pio_sam3x8e.h>
+#include <periph/gpio.h>
+#include <periph/spi.h>
+#include <pio/pio_sam3x8e.h>
 #include <sam3x8e.h>
-#include <component_pio.h>
+#include <component/component_pio.h>
 #include <board.h>
 #include <periph_conf.h>
 
