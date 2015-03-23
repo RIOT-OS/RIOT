@@ -95,7 +95,7 @@ static void test_pktbuf_add__pkt_NULL__data_NOT_NULL__size_0(void)
     TEST_ASSERT_NOT_NULL((pkt = ng_pktbuf_add(NULL, TEST_STRING8, 0, NG_NETTYPE_UNDEF)));
 
     TEST_ASSERT_NULL(pkt->next);
-    TEST_ASSERT_NULL(pkt->data);
+    TEST_ASSERT_NOT_NULL(pkt->data);
     TEST_ASSERT_EQUAL_INT(0, pkt->size);
     TEST_ASSERT_EQUAL_INT(NG_NETTYPE_UNDEF, pkt->type);
 
@@ -112,7 +112,7 @@ static void test_pktbuf_add__pkt_NOT_NULL__data_NOT_NULL__size_0(void)
     TEST_ASSERT_NOT_NULL((pkt = ng_pktbuf_add(next, TEST_STRING8, 0, NG_NETTYPE_UNDEF)));
 
     TEST_ASSERT(pkt->next == next);
-    TEST_ASSERT_NULL(pkt->data);
+    TEST_ASSERT_NOT_NULL(pkt->data);
     TEST_ASSERT_EQUAL_INT(0, pkt->size);
     TEST_ASSERT_EQUAL_INT(NG_NETTYPE_UNDEF, pkt->type);
 
