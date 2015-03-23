@@ -17,8 +17,8 @@
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  */
 
-#ifndef __CC110X_REG_H
-#define __CC110X_REG_H
+#ifndef CC110X_REG_H
+#define CC110X_REG_H
 
 #include <stdint.h>
 
@@ -97,4 +97,4 @@ uint8_t cc110x_strobe(uint8_t c);
 #endif
 
 /** @} */
-#endif /* __CC110X_REG_H */
+#endif /* CC110X_REG_H */
