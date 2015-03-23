@@ -18,8 +18,8 @@
  *
  */
 
-#ifndef __MAG3110_REG_H__
-#define __MAG3110_REG_H__
+#ifndef MAG3110_REG_H
+#define MAG3110_REG_H
 
 #ifdef __cplusplus
 extern "C"
