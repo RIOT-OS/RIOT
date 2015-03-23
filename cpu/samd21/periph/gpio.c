@@ -938,10 +938,87 @@ void gpio_clear(gpio_t dev)
 
 void gpio_toggle(gpio_t dev)
 {
-    if (gpio_read(dev)) {
-        gpio_clear(dev);
-    } else {
-        gpio_set(dev);
+    switch (dev) {
+#if GPIO_0_EN
+        case GPIO_0:
+            (&GPIO_0_DEV)->OUTTGL.reg = 1 << GPIO_0_PIN;
+            break;
+#endif
+#if GPIO_1_EN
+        case GPIO_1:
+            (&GPIO_1_DEV)->OUTTGL.reg = 1 << GPIO_1_PIN;
+            break;
+#endif
+#if GPIO_2_EN
+        case GPIO_2:
+            (&GPIO_2_DEV)->OUTTGL.reg = 1 << GPIO_2_PIN;
+            break;
+#endif
+#if GPIO_3_EN
+        case GPIO_3:
+            (&GPIO_3_DEV)->OUTTGL.reg = 1 << GPIO_3_PIN;
+            break;
+#endif
+#if GPIO_4_EN
+        case GPIO_4:
+            (&GPIO_4_DEV)->OUTTGL.reg = 1 << GPIO_4_PIN;
+            break;
+#endif
+#if GPIO_5_EN
+        case GPIO_5:
+            (&GPIO_5_DEV)->OUTTGL.reg = 1 << GPIO_5_PIN;
+            break;
+#endif
+#if GPIO_6_EN
+        case GPIO_6:
+            (&GPIO_6_DEV)->OUTTGL.reg = 1 << GPIO_6_PIN;
+            break;
+#endif
+#if GPIO_7_EN
+        case GPIO_7:
+            (&GPIO_7_DEV)->OUTTGL.reg = 1 << GPIO_7_PIN;
+            break;
+#endif
+#if GPIO_8_EN
+        case GPIO_8:
+            (&GPIO_8_DEV)->OUTTGL.reg = 1 << GPIO_8_PIN;
+            break;
+#endif
+#if GPIO_9_EN
+        case GPIO_9:
+            (&GPIO_9_DEV)->OUTTGL.reg = 1 << GPIO_9_PIN;
+            break;
+#endif
+#if GPIO_10_EN
+        case GPIO_10:
+            (&GPIO_10_DEV)->OUTTGL.reg = 1 << GPIO_10_PIN;
+            break;
+#endif
+#if GPIO_11_EN
+        case GPIO_11:
+            (&GPIO_11_DEV)->OUTTGL.reg = 1 << GPIO_11_PIN;
+            break;
+#endif
+#if GPIO_12_EN
+        case GPIO_12:
+            (&GPIO_12_DEV)->OUTTGL.reg = 1 << GPIO_12_PIN;
+            break;
+#endif
+#if GPIO_13_EN
+        case GPIO_13:
+            (&GPIO_13_DEV)->OUTTGL.reg = 1 << GPIO_13_PIN;
+            break;
+#endif
+#if GPIO_14_EN
+        case GPIO_14:
+            (&GPIO_14_DEV)->OUTTGL.reg = 1 << GPIO_14_PIN;
+            break;
+#endif
+#if GPIO_15_EN
+        case GPIO_15:
+            (&GPIO_15_DEV)->OUTTGL.reg = 1 << GPIO_15_PIN;
+            break;
+#endif
     }
 }
 
