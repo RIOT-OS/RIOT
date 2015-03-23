@@ -334,7 +334,6 @@ int spi_transfer_byte(spi_t dev, char out, char *in)
 
 int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length)
 {
-
     int i, trans_ret, trans_bytes = 0;
     char in_temp;
 
