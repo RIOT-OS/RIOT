@@ -144,8 +144,12 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
     spi[dev]->CR1 |= (speed_divider << 3);  /* Define serial clock baud rate. 001 leads to f_PCLK/4 */
     spi[dev]->CR1 |= (SPI_CR1_MSTR);  /* 1: master configuration */
     spi[dev]->CR1 |= (conf);
+
+    spi[dev]->CR2 |= SPI_CR2_FRXTH; /* set FIFO reception threshold to 8bit (default: 16bit) */
+
     /* enable SPI */
     spi[dev]->CR1 |= (SPI_CR1_SPE);
+
     return 0;
 }
 
@@ -303,20 +307,26 @@ int spi_release(spi_t dev)
 
 int spi_transfer_byte(spi_t dev, char out, char *in)
 {
-    if (dev >= SPI_NUMOF) {
-        return -1;
-    }
+    char tmp;
 
-    while (!(spi[dev]->SR & SPI_SR_TXE));
-    spi[dev]->DR = out;
+    /* recast to uint_8 to force 8bit access */
+    volatile uint8_t *DR = (volatile uint8_t*) &spi[dev]->DR;
 
-    while (!(spi[dev]->SR & SPI_SR_RXNE));
+    /* wait for an eventually previous byte to be readily transferred */
+    while(!(spi[dev]->SR & SPI_SR_TXE));
 
-    if (in != NULL) {
-        *in = spi[dev]->DR;
-    }
-    else {
-        spi[dev]->DR;
+    /* put next byte into the output register */
+    *DR = out;
+
+    /* wait until the current byte was successfully transferred */
+    while(!(spi[dev]->SR & SPI_SR_RXNE) );
+
+    /* read response byte to reset flags */
+    tmp = *DR;
+
+    /* 'return' response byte if wished for */
+    if (in) {
+        *in = tmp;
     }
 
     return 1;
