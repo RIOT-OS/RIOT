@@ -16,8 +16,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef __LPS331AP_INTERNAL_H
-#define __LPS331AP_INTERNAL_H
+#ifndef LPS331AP_INTERNAL_H
+#define LPS331AP_INTERNAL_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -66,5 +66,5 @@ extern "C" {
 }
 #endif
 
-#endif /* __LPS331AP_INTERNAL_H */
+#endif /* LPS331AP_INTERNAL_H */
 /** @} */
