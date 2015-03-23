@@ -22,8 +22,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef __SPI_H
-#define __SPI_H
+#ifndef SPI_H
+#define SPI_H
 
 #include "periph_conf.h"
 
@@ -252,5 +252,5 @@ void spi_poweroff(spi_t dev);
 }
 #endif
 
-#endif /* __SPI_H */
+#endif /* SPI_H */
 /** @} */

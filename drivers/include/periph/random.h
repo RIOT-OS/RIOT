@@ -26,8 +26,8 @@
  * @author      Christian Mehlis <mehlis@inf.fu-berlin.de>
  */
 
-#ifndef __RANDOM_H
-#define __RANDOM_H
+#ifndef RANDOM_H
+#define RANDOM_H
 
 #include "periph_conf.h"
 
@@ -77,5 +77,5 @@ void random_poweroff(void);
 }
 #endif
 
-#endif /* __RANDOM_H */
+#endif /* RANDOM_H */
 /** @} */

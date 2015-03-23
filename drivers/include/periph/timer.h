@@ -18,8 +18,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef __TIMER_H
-#define __TIMER_H
+#ifndef TIMER_H
+#define TIMER_H
 
 #include "periph_conf.h"
 
@@ -151,5 +151,5 @@ void timer_reset(tim_t dev);
 }
 #endif
 
-#endif /* __TIMER_H */
+#endif /* TIMER_H */
 /** @} */

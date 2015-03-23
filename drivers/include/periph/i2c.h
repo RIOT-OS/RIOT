@@ -49,8 +49,8 @@
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  */
 
-#ifndef __I2C_H
-#define __I2C_H
+#ifndef I2C_H
+#define I2C_H
 
 #include <stdint.h>
 
@@ -267,5 +267,5 @@ void i2c_poweroff(i2c_t dev);
 }
 #endif
 
-#endif /* __I2C_H */
+#endif /* I2C_H */
 /** @} */

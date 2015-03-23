@@ -18,8 +18,8 @@
  * @author      Simon Brummer <simon.brummer@haw-hamburg.de>
  */
 
-#ifndef __DAC_H
-#define __DAC_H
+#ifndef DAC_H
+#define DAC_H
 
 #include <stdint.h>
 #include "periph_conf.h"
@@ -148,5 +148,5 @@ uint16_t dac_mapf(dac_t dev, float value, float min, float max);
 #ifdef __cplusplus
 }
 #endif
-#endif /* __DAC_H */
+#endif /* DAC_H */
 /** @} */
