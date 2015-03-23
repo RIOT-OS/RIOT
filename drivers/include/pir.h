@@ -18,8 +18,8 @@
  * @author      Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
  */
 
-#ifndef __PIR_H
-#define __PIR_H
+#ifndef PIR_H
+#define PIR_H
 
 #include "kernel_types.h"
 #include "periph/gpio.h"
@@ -92,5 +92,5 @@ int pir_register_thread(pir_t *dev);
 }
 #endif
 
-#endif /* __PIR_H */
+#endif /* PIR_H */
 /** @} */
