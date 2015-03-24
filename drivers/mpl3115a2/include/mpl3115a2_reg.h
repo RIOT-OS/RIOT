@@ -18,8 +18,8 @@
  *
  */
 
-#ifndef __MPL3115A2_REG_H__
-#define __MPL3115A2_REG_H__
+#ifndef MPL3115A2_REG_H
+#define MPL3115A2_REG_H
 
 #ifdef __cplusplus
 extern "C"

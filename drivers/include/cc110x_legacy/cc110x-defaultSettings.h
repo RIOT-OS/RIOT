@@ -6,8 +6,8 @@
  * directory for more details.
  */
 
-#ifndef __CC1100_DEFAULTSETTINGS_H
-#define __CC1100_DEFAULTSETTINGS_H
+#ifndef CC1100_DEFAULTSETTINGS_H
+#define CC1100_DEFAULTSETTINGS_H
 
 /**
  * @ingroup     drivers_cc110x_legacy
@@ -87,4 +87,4 @@ extern "C" {
 #endif
 
 /** @} */
-#endif /* __CC110X_DEFAULTSETTINGS_H */
+#endif /* CC110X_DEFAULTSETTINGS_H */

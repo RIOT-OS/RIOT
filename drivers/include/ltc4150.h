@@ -6,8 +6,8 @@
  * directory for more details.
  */
 
-#ifndef __LTC4150_H
-#define __LTC4150_H
+#ifndef LTC4150_H
+#define LTC4150_H
 
 #include "ltc4150_arch.h"
 
@@ -30,4 +30,4 @@ long ltc4150_get_intcount(void);
 }
 #endif
 
-#endif /* __LTC4150_H */
+#endif /* LTC4150_H */

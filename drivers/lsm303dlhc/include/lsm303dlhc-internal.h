@@ -17,8 +17,8 @@
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  */
 
-#ifndef __LSM303DLHC_INTERNAL_H
-#define __LSM303DLHC_INTERNAL_H
+#ifndef LSM303DLHC_INTERNAL_H
+#define LSM303DLHC_INTERNAL_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -174,5 +174,5 @@ extern "C" {
 }
 #endif
 
-#endif /* __LSM303DLHC_INTERNAL_H */
+#endif /* LSM303DLHC_INTERNAL_H */
 /** @} */

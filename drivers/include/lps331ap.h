@@ -20,8 +20,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef __LPS331AP_H
-#define __LPS331AP_H
+#ifndef LPS331AP_H
+#define LPS331AP_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -108,5 +108,5 @@ int lps331ap_disable(lps331ap_t *dev);
 }
 #endif
 
-#endif /* __LPS331AP_H */
+#endif /* LPS331AP_H */
 /** @} */

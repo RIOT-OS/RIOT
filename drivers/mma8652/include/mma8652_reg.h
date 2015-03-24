@@ -18,8 +18,8 @@
  *
  */
 
-#ifndef __MMA8652_REG_H__
-#define __MMA8652_REG_H__
+#ifndef MMA8652_REG_H
+#define MMA8652_REG_H
 
 #ifdef __cplusplus
 extern "C"

@@ -18,8 +18,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef __PWM_H
-#define __PWM_H
+#ifndef PWM_H
+#define PWM_H
 
 #include "periph_conf.h"
 
@@ -137,5 +137,5 @@ void pwm_poweroff(pwm_t dev);
 }
 #endif
 
-#endif /* __PWM_H */
+#endif /* PWM_H */
 /** @} */

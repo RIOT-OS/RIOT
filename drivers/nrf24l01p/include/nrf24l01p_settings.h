@@ -19,8 +19,8 @@
  * @}
  */
 
-#ifndef __NRF24L01P_SETTINGS_H
-#define __NRF24L01P_SETTINGS_H
+#ifndef NRF24L01P_SETTINGS_H
+#define NRF24L01P_SETTINGS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -127,4 +127,4 @@ extern "C" {
 }
 #endif
 
-#endif /* __NRF24L01P_SETTINGS_H */
+#endif /* NRF24L01P_SETTINGS_H */

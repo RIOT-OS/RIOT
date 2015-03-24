@@ -119,4 +119,4 @@ typedef struct cc110x_statistic {
 #endif
 
 /** @} */
-#endif /* __CC110X_CONFIG_H */
+#endif /* CC110X_CONFIG_H */
