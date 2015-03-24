@@ -100,8 +100,6 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, uart_tx_cb_t t
 #if UART_0_EN
 
         case UART_0:
-            NVIC_SetPriority(UART_0_IRQ_CHAN, UART_IRQ_PRIO);
-            NVIC_EnableIRQ(UART_0_IRQ_CHAN);
             UART_0_DEV->C2 |= (1 << UART_C2_RIE_SHIFT);
             /* Enable receiver edge detect interrupt */
             UART_0_DEV->BDH |= UART_BDH_RXEDGIE_MASK;
@@ -110,8 +108,6 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, uart_tx_cb_t t
 #if UART_1_EN
 
         case UART_1:
-            NVIC_SetPriority(UART_1_IRQ_CHAN, UART_IRQ_PRIO);
-            NVIC_EnableIRQ(UART_1_IRQ_CHAN);
             UART_1_DEV->C2 |= (1 << UART_C2_RIE_SHIFT);
             /* Enable receiver edge detect interrupt */
             UART_1_DEV->BDH |= UART_BDH_RXEDGIE_MASK;
@@ -155,6 +151,10 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
             af = UART_0_AF;
             UART_0_PORT_CLKEN();
             UART_0_CLKEN();
+            /* Enable IRQs in the NVIC because we are using TX IRQs for blocking
+             * transfers as well */
+            NVIC_SetPriority(UART_0_IRQ_CHAN, UART_IRQ_PRIO);
+            NVIC_EnableIRQ(UART_0_IRQ_CHAN);
             break;
 #endif
 #if UART_1_EN
@@ -168,6 +168,10 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
             af = UART_1_AF;
             UART_1_PORT_CLKEN();
             UART_1_CLKEN();
+            /* Enable IRQs in the NVIC because we are using TX IRQs for blocking
+             * transfers as well */
+            NVIC_SetPriority(UART_1_IRQ_CHAN, UART_IRQ_PRIO);
+            NVIC_EnableIRQ(UART_1_IRQ_CHAN);
             break;
 #endif
 
