@@ -54,14 +54,24 @@ static inline int _get_set(kernel_pid_t pid, uint16_t type,
     return (int)ack.content.value;
 }
 
-int ng_netapi_send(kernel_pid_t pid, ng_pktsnip_t *pkt)
+static inline int _snd_rcv(kernel_pid_t pid, uint16_t type, ng_pktsnip_t *pkt)
 {
     msg_t msg;
     /* set the outgoing message's fields */
-    msg.type = NG_NETAPI_MSG_TYPE_SND;
+    msg.type = type;
     msg.content.ptr = (void *)pkt;
-    /* send data using netapi */
+    /* send message */
     return msg_send(&msg, pid);
+}
+
+int ng_netapi_send(kernel_pid_t pid, ng_pktsnip_t *pkt)
+{
+    return _snd_rcv(pid, NG_NETAPI_MSG_TYPE_SND, pkt);
+}
+
+int ng_netapi_receive(kernel_pid_t pid, ng_pktsnip_t *pkt)
+{
+    return _snd_rcv(pid, NG_NETAPI_MSG_TYPE_RCV, pkt);
 }
 
 int ng_netapi_get(kernel_pid_t pid, ng_netconf_opt_t opt, uint16_t context,
