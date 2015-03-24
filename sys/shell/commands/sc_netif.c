@@ -76,7 +76,8 @@ static void _set_usage(char *cmd_name)
          "       * \"pan\" - alias for \"nid\"\n"
          "       * \"pan_id\" - alias for \"nid\"\n"
          "       * \"power\" - TX power in dBm\n"
-         "       * \"src_len\" - sets the source address length in byte\n");
+         "       * \"src_len\" - sets the source address length in byte\n"
+         "       * \"state\" - set the device state\n");
 }
 
 static size_t _parse_hwaddr(char *str, uint8_t *addr)
@@ -148,12 +149,40 @@ static void _print_netconf(ng_netconf_opt_t opt)
     }
 }
 
+static void _print_netconf_state(ng_netconf_state_t state)
+{
+    switch (state) {
+        case NETCONF_STATE_OFF:
+            printf("OFF");
+            break;
+        case NETCONF_STATE_SLEEP:
+            printf("SLEEP");
+            break;
+        case NETCONF_STATE_IDLE:
+            printf("IDLE");
+            break;
+        case NETCONF_STATE_RX:
+            printf("RX");
+            break;
+        case NETCONF_STATE_TX:
+            printf("TX");
+            break;
+        case NETCONF_STATE_RESET:
+            printf("RESET");
+            break;
+        default:
+            /* nothing to do then */
+            break;
+    }
+}
+
 void _netif_list(kernel_pid_t dev)
 {
     uint8_t hwaddr[MAX_ADDR_LEN];
     uint16_t u16;
     int16_t i16;
     int res;
+    ng_netconf_state_t state;
 
     printf("Iface %2d  ", dev);
 
@@ -181,6 +210,13 @@ void _netif_list(kernel_pid_t dev)
 
     if (res >= 0) {
         printf(" TX-Power: %" PRIi16 "dBm ", i16);
+    }
+
+    res = ng_netapi_get(dev, NETCONF_OPT_STATE, 0, &state, sizeof(state));
+
+    if (res >= 0) {
+        printf(" State: ");
+        _print_netconf_state(state);
     }
 
     printf("\n            ");
@@ -296,6 +332,40 @@ static void _netif_set_addr(kernel_pid_t dev, ng_netconf_opt_t opt,
     puts("");
 }
 
+static void _netif_set_state(kernel_pid_t dev, char *state_str)
+{
+    ng_netconf_state_t state;
+    if ((strcmp("off", state_str) == 0) || (strcmp("OFF", state_str) == 0)) {
+        state = NETCONF_STATE_OFF;
+    }
+    else if ((strcmp("sleep", state_str) == 0) ||
+             (strcmp("SLEEP", state_str) == 0)) {
+        state = NETCONF_STATE_SLEEP;
+    }
+    else if ((strcmp("idle", state_str) == 0) ||
+             (strcmp("IDLE", state_str) == 0)) {
+        state = NETCONF_STATE_IDLE;
+    }
+    else if ((strcmp("reset", state_str) == 0) ||
+             (strcmp("RESET", state_str) == 0)) {
+        state = NETCONF_STATE_RESET;
+    }
+    else {
+        puts("usage: ifconfig <if_id> set state [off|sleep|idle|reset]");
+        return;
+    }
+    if (ng_netapi_set(dev, NETCONF_OPT_STATE, 0,
+                      &state, sizeof(ng_netconf_state_t)) < 0) {
+        printf("error: unable to set state to ");
+        _print_netconf_state(state);
+        puts("");
+        return;
+    }
+    printf("success: set state of interface %" PRIkernel_pid " to ", dev);
+    _print_netconf_state(state);
+    puts("");
+}
+
 static void _netif_set(char *cmd_name, kernel_pid_t dev, char *key, char *value)
 {
     if ((strcmp("addr", key) == 0) || (strcmp("addr_short", key) == 0)) {
@@ -316,6 +386,9 @@ static void _netif_set(char *cmd_name, kernel_pid_t dev, char *key, char *value)
     }
     else if (strcmp("src_len", key) == 0) {
         _netif_set_u16(dev, NETCONF_OPT_SRC_LEN, value);
+    }
+    else if (strcmp("state", key) == 0) {
+        _netif_set_state(dev, value);
     }
     else {
         _set_usage(cmd_name);
