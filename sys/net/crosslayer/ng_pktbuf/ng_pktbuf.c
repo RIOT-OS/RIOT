@@ -66,18 +66,34 @@ int ng_pktbuf_realloc_data(ng_pktsnip_t *pkt, size_t size)
     return 0;
 }
 
-ng_pktsnip_t *ng_pktbuf_add(ng_pktsnip_t *next, void *data, size_t size,
+ng_pktsnip_t *ng_pktbuf_add(ng_pktsnip_t *pkt, void *data, size_t size,
                             ng_nettype_t type)
 {
-    ng_pktsnip_t *snip;
+    ng_pktsnip_t *new_pktsnip;
 
     mutex_lock(&_pktbuf_mutex);
 
-    snip = _pktbuf_add_unsafe(next, data, size, type);
+    new_pktsnip = _pktbuf_add_unsafe(pkt, data, size, type);
 
     mutex_unlock(&_pktbuf_mutex);
 
-    return snip;
+    return new_pktsnip;
+}
+
+void ng_pktbuf_hold(ng_pktsnip_t *pkt, unsigned int num)
+{
+    if ((pkt == NULL) || (num == 0)) {
+        return;
+    }
+
+    mutex_lock(&_pktbuf_mutex);
+
+    while (pkt != NULL) {
+        pkt->users += num;
+        pkt = pkt->next;
+    }
+
+    mutex_unlock(&_pktbuf_mutex);
 }
 
 void ng_pktbuf_release(ng_pktsnip_t *pkt)
@@ -86,16 +102,27 @@ void ng_pktbuf_release(ng_pktsnip_t *pkt)
         return;
     }
 
-    atomic_set_return(&(pkt->users), pkt->users - 1);
+    mutex_lock(&_pktbuf_mutex);
 
-    if (pkt->users == 0 && _pktbuf_internal_contains(pkt->data)) {
-        mutex_lock(&_pktbuf_mutex);
+    while (pkt != NULL) {
+        if (pkt->users > 0) {   /* Don't accidentally overshoot */
+            pkt->users--;
+        }
 
-        _pktbuf_internal_free(pkt->data);
-        _pktbuf_internal_free(pkt);
+        if (pkt->users == 0) {
+            if (_pktbuf_internal_contains(pkt->data)) {
+                _pktbuf_internal_free(pkt->data);
+            }
 
-        mutex_unlock(&_pktbuf_mutex);
+            if (_pktbuf_internal_contains(pkt)) {
+                _pktbuf_internal_free(pkt);
+            }
+        }
+
+        pkt = pkt->next;
     }
+
+    mutex_unlock(&_pktbuf_mutex);
 }
 
 ng_pktsnip_t *ng_pktbuf_start_write(ng_pktsnip_t *pkt)
@@ -146,60 +173,70 @@ static ng_pktsnip_t *_pktbuf_alloc(size_t size)
     return pkt;
 }
 
-static ng_pktsnip_t *_pktbuf_add_unsafe(ng_pktsnip_t *next, void *data,
+static ng_pktsnip_t *_pktbuf_add_unsafe(ng_pktsnip_t *pkt, void *data,
                                         size_t size, ng_nettype_t type)
 {
-    ng_pktsnip_t *snip;
+    ng_pktsnip_t *new_pktsnip;
 
-    if (size == 0) {
-        data = 0;
-    }
+    new_pktsnip = (ng_pktsnip_t *)_pktbuf_internal_alloc(sizeof(ng_pktsnip_t));
 
-    snip = (ng_pktsnip_t *)_pktbuf_internal_alloc(sizeof(ng_pktsnip_t));
-
-    if (snip == NULL) {
+    if (new_pktsnip == NULL) {
         return NULL;
     }
 
-    if (next == NULL || next->data != data) {
-        if (size != 0) {
-            snip->data = _pktbuf_internal_alloc(size);
+    if (pkt == NULL || pkt->data != data) {
+        if ((size != 0) && (!_pktbuf_internal_contains(data))) {
+            new_pktsnip->data = _pktbuf_internal_alloc(size);
 
-            if (snip->data == NULL) {
-                _pktbuf_internal_free(snip);
+            if (new_pktsnip->data == NULL) {
+                _pktbuf_internal_free(new_pktsnip);
 
                 return NULL;
             }
 
             if (data != NULL) {
-                memcpy(snip->data, data, size);
+                memcpy(new_pktsnip->data, data, size);
             }
         }
         else {
-            snip->data = data;
+            if (_pktbuf_internal_contains(data)) {
+                if (!_pktbuf_internal_add_pkt(new_pktsnip->data)) {
+                    _pktbuf_internal_free(new_pktsnip);
+
+                    return NULL;
+                }
+            }
+
+            new_pktsnip->data = data;
         }
+
+        new_pktsnip->next = NULL;
+        LL_PREPEND(pkt, new_pktsnip);
     }
     else {
-        snip->data = data;
+        if (size > pkt->size) {
+            return NULL;
+        }
 
-        next->size -= size;
-        next->data = (void *)(((uint8_t *)next->data) + size);
+        new_pktsnip->next = pkt->next;
+        new_pktsnip->data = data;
 
-        if (!_pktbuf_internal_add_pkt(next->data)) {
-            _pktbuf_internal_free(snip);
+        pkt->next = new_pktsnip;
+        pkt->size -= size;
+        pkt->data = (void *)(((uint8_t *)pkt->data) + size);
+
+        if (!_pktbuf_internal_add_pkt(pkt->data)) {
+            _pktbuf_internal_free(new_pktsnip);
 
             return NULL;
         }
     }
 
-    snip->next = NULL;
-    snip->size = size;
-    snip->type = type;
-    snip->users = 1;
+    new_pktsnip->size = size;
+    new_pktsnip->type = type;
+    new_pktsnip->users = 1;
 
-    LL_PREPEND(next, snip);
-
-    return snip;
+    return new_pktsnip;
 }
 
 static ng_pktsnip_t *_pktbuf_duplicate(const ng_pktsnip_t *pkt)
@@ -216,12 +253,12 @@ static ng_pktsnip_t *_pktbuf_duplicate(const ng_pktsnip_t *pkt)
     res->type = pkt->type;
 
     while (pkt->next) {
-        ng_pktsnip_t *header = NULL;
+        ng_pktsnip_t *hdr = NULL;
 
         pkt = pkt->next;
-        header = _pktbuf_add_unsafe(res, pkt->data, pkt->size, pkt->type);
+        hdr = _pktbuf_add_unsafe(res, pkt->data, pkt->size, pkt->type);
 
-        if (header == NULL) {
+        if (hdr == NULL) {
             do {
                 ng_pktsnip_t *next = res->next;
 

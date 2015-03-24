@@ -56,38 +56,61 @@ extern "C" {
 #endif  /* NG_PKTBUF_SIZE */
 
 /**
- * @brief   Prepends a new ng_pktsnip_t to a packet.
+ * @brief   Adds a new ng_pktsnip_t and its packet to the packet buffer.
  *
- * @details It is ill-advised to add a ng_pktsnip_t simply by using
+ * @details This function is very powerful and reflects the unique characterics
+ *          of ng_pktsnip_t of being reversed for either the sending or
+ *          receiving context. Because of this the assumtion of the transmission
+ *          direction, the state of the packet buffer and the values for the
+ *          members of the resulting ng_pktsnip_t can be very different after
+ *          execution of this function depending on what parameters you use:
  *
- *     next = ng_pktsnip_add(NULL, NULL, size1, NG_NETTYPE_UNDEF);
- *     pkt = ng_pktsnip_add(NULL, NULL, size2, NG_NETTYPE_UNDEF);
+ * * for most cases the result will be pretty straight forward and the
+ *   packet is either assumed to be in sending direction or for creation
+ *   (@p pkt == NULL) there will be made no assumtions about direction at all.
+ * * if @p pkt != NULL, @p data = `pkt->data`, @p size < `pkt->size` receiving
+ *   direction is assumed and the following values will be set:
+ *   * ng_pktsnip_t::next of result = `pkt->next`
+ *   * ng_pktsnip_t::data of result = @p data
+ *   * ng_pktsnip_t::size of result = @p size
+ *   * ng_pktsnip_t::next of @p pkt = result
+ *   * ng_pktsnip_t::data of @p pkt = @p data + @p size
+ *   * ng_pktsnip_t::size of @p pkt = old size value - @p size
+ * * graphically this can be represented as follows:
  *
- *     pkt->next = next;
- *     next->data = next->data + size2;
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * Before                                    After
+ * ======                                    =====
+ *                                                       (next)
+ *  pkt->data                                 result->data <== pkt->data
+ *  v                                         v                v
+ * +--------------------------------+        +----------------+---------------+
+ * +--------------------------------+        +----------------+---------------+
+ *  \__________pkt->size___________/          \_result->size_/ \__pkt->size__/
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
- * Since @p data can be in the range of the data allocated on
- * ng_pktsnip_t::data of @p next, it would be impossible to free
- * ng_pktsnip_t::data of @p next, after @p next was released and the
- * generated ng_pktsnip_t not or vice versa. This function ensures that this
- * can't happen.
+ * @note    **Do not** change the ng_pktsnip_t::data and ng_pktsnip_t::size
+ *          of a ng_pktsnip_t created by this function externally, except if
+ *          they both are null or data is not from inside the packet buffer.
+ *          This will most likely create memory leaks.
  *
- * @param[in] next  The packet you want to add the ng_pktsnip_t to. If
- *                  ng_pktsnip_t::data field of @p next is equal to data it will
- *                  be set to `next->data + size`. If @p next is NULL the
- *                  ng_pktsnip_t::next field of the result will be also set to
- *                  NULL.
- * @param[in] data  Data of the new ng_pktsnip_t. If @p data is NULL no data
- *                  will be inserted into the result.
- * @param[in] size  Length of @p data. If @p size is 0, it will be assumed,
- *                  that @p data is NULL and no data will be inserted into the
- *                  result
- * @param[in] type  Protocol type of the ng_pktsnip_t.
+ * @param[in,out] pkt   The packet you want to add a ng_pktsnip_t to. Leave
+ *                      NULL if you want to create a new packet. Members may
+ *                      change values; see above.
+ * @param[in] data      Data of the new ng_pktsnip_t. If @p data is NULL no data
+ *                      will be inserted into the result. @p data that is already
+ *                      in the packet buffer (e.g. a payload of an already
+ *                      allocated packet) will not be duplicated.
+ * @param[in] size      Length of @p data. If @p size is 0 no data will be inserted
+ *                      into the the packet buffer and ng_pktsnip_t::data will be
+ *                      set to @p data.
+ * @param[in] type      Protocol type of the ng_pktsnip_t.
  *
  * @return  Pointer to the packet part that represents the new ng_pktsnip_t.
  * @return  NULL, if no space is left in the packet buffer.
+ * @return  NULL, if @p pkt != NULL, @data = `pkt->data`, and @size > `pkt->data`.
  */
-ng_pktsnip_t *ng_pktbuf_add(ng_pktsnip_t *next, void *data, size_t size,
+ng_pktsnip_t *ng_pktbuf_add(ng_pktsnip_t *pkt, void *data, size_t size,
                             ng_nettype_t type);
 
 /**
@@ -101,8 +124,8 @@ ng_pktsnip_t *ng_pktbuf_add(ng_pktsnip_t *next, void *data, size_t size,
  *          not be moved. Otherwise, it will be moved. If no space is available
  *          nothing happens.
  *
- * @param[in] pkt           A packet part.
- * @param[in] size          The size for @p pkt.
+ * @param[in] pkt   A packet part.
+ * @param[in] size  The size for @p pkt.
  *
  * @return  0, on success
  * @return  EINVAL, if precondition is not met
@@ -117,12 +140,7 @@ int ng_pktbuf_realloc_data(ng_pktsnip_t *pkt, size_t size);
  * @param[in] pkt   A packet.
  * @param[in] num   Number you want to increment ng_pktsnip_t::users of @p pkt by.
  */
-static inline void ng_pktbuf_hold(ng_pktsnip_t *pkt, unsigned int num)
-{
-    if (pkt != NULL) {
-        atomic_set_return(&(pkt->users), pkt->users + num);
-    }
-}
+void ng_pktbuf_hold(ng_pktsnip_t *pkt, unsigned int num);
 
 /**
  * @brief   Decreases ng_pktsnip_t::users of @p pkt atomically and removes it if it
