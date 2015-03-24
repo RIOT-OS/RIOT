@@ -324,7 +324,7 @@ void _netif_send(int argc, char **argv)
     /* put packet together */
     pkt = ng_pktbuf_add(NULL, argv[3], strlen(argv[3]), NG_NETTYPE_UNDEF);
     pkt = ng_pktbuf_add(pkt, NULL, sizeof(ng_netif_hdr_t) + addr_len,
-                        NG_NETTYPE_UNDEF);
+                        NG_NETTYPE_NETIF);
     nethdr = (ng_netif_hdr_t *)pkt->data;
     ng_netif_hdr_init(nethdr, 0, addr_len);
     ng_netif_hdr_set_dst_addr(nethdr, addr, addr_len);
