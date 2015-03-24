@@ -157,6 +157,65 @@ static void test_ng_netif_get__full(void)
     TEST_ASSERT_EQUAL_INT(NG_NETIF_NUMOF, size);
 }
 
+static void test_ng_netif_addr_to_str__out_too_short(void)
+{
+    uint8_t addr[] = {0x05, 0xcd};
+    char out[2];
+
+    TEST_ASSERT_NULL(ng_netif_addr_to_str(out, sizeof(out), addr, sizeof(addr)));
+}
+
+static void test_ng_netif_addr_to_str__success(void)
+{
+    uint8_t addr[] = {0x05, 0xcd};
+    char out[3 * sizeof(addr)];
+
+    TEST_ASSERT_EQUAL_STRING("05:cd", ng_netif_addr_to_str(out, sizeof(out),
+                             addr, sizeof(addr)));
+}
+
+static void test_ng_netif_addr_from_str__out_too_short(void)
+{
+    char str[] = "05:cd";
+    uint8_t out[1];
+
+    TEST_ASSERT_EQUAL_INT(0, ng_netif_addr_from_str(out, sizeof(out), str));
+}
+
+static void test_ng_netif_addr_from_str__ill_formated1(void)
+{
+    char str[] = "576:cd";
+    uint8_t out[sizeof(str)];
+
+    TEST_ASSERT_EQUAL_INT(0, ng_netif_addr_from_str(out, sizeof(out), str));
+}
+
+static void test_ng_netif_addr_from_str__ill_formated2(void)
+{
+    char str[] = TEST_STRING8;
+    uint8_t out[sizeof(str)];
+
+    TEST_ASSERT_EQUAL_INT(0, ng_netif_addr_from_str(out, sizeof(out), str));
+}
+
+static void test_ng_netif_addr_from_str__ill_formated3(void)
+{
+    char str[] = "05-cd";
+    uint8_t out[sizeof(str)];
+
+    TEST_ASSERT_EQUAL_INT(0, ng_netif_addr_from_str(out, sizeof(out), str));
+}
+
+static void test_ng_netif_addr_from_str__success(void)
+{
+    char str[] = "05:cd";
+    uint8_t out[2];
+
+    TEST_ASSERT_EQUAL_INT(2, ng_netif_addr_from_str(out, sizeof(out), str));
+    TEST_ASSERT_EQUAL_INT(0x05, out[0]);
+    TEST_ASSERT_EQUAL_INT(0xcd, out[1]);
+}
+
 Test *tests_netif_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -170,6 +229,13 @@ Test *tests_netif_tests(void)
         new_TestFixture(test_ng_netif_get__empty),
         new_TestFixture(test_ng_netif_get__success_3_minus_one),
         new_TestFixture(test_ng_netif_get__full),
+        new_TestFixture(test_ng_netif_addr_to_str__out_too_short),
+        new_TestFixture(test_ng_netif_addr_to_str__success),
+        new_TestFixture(test_ng_netif_addr_from_str__out_too_short),
+        new_TestFixture(test_ng_netif_addr_from_str__ill_formated1),
+        new_TestFixture(test_ng_netif_addr_from_str__ill_formated2),
+        new_TestFixture(test_ng_netif_addr_from_str__ill_formated3),
+        new_TestFixture(test_ng_netif_addr_from_str__success),
     };
 
     EMB_UNIT_TESTCALLER(netif_tests, set_up, NULL, fixtures);
