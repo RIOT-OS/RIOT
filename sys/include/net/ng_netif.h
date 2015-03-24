@@ -90,6 +90,44 @@ void ng_netif_remove(kernel_pid_t pid);
  */
 kernel_pid_t *ng_netif_get(size_t *size);
 
+/**
+ * @brief   Converts a hardware address to a human readable string.
+ *
+ * @details The format will be like `xx:xx:xx:xx` where `xx` are the bytes
+ *          of @p addr in hexadecimal representation.
+ *
+ * @pre @p out_len >= 3 * @p addr_len
+ *
+ * @param[out] out      A string to store the output in.
+ * @param[out] out_len  Length of @p out. Must be at least
+ *                      3 * @p addr_len long.
+ * @param[in] addr      A hardware address.
+ * @param[in] addr_len  Length of @p addr.
+ *
+ * @return  Copy of @p out on success.
+ * @return  NULL, if @p out_len < 3 * @p addr_len.
+ */
+char *ng_netif_addr_to_str(char *out, size_t out_len, uint8_t *addr,
+                           size_t addr_len);
+
+/**
+ * @brief   Parses a string of colon-separated hexadecimals to a hardware
+ *          address.
+ *
+ * @details The input format must be like `xx:xx:xx:xx` where `xx` will be the
+ *          bytes of @p addr in hexadecimal representation.
+ *          Changes @p str for simple parsing purposes. Make a copy if you
+ *          need it later.
+ *
+ * @param[out] out      The resulting hardware address.
+ * @param[out] out_len  Length of @p out.
+ * @param[in] str       A string of colon-separated hexadecimals.
+ *
+ * @return  Actual length of @p out on success.
+ * @return  0, on failure.
+ */
+size_t ng_netif_addr_from_str(uint8_t *out, size_t out_len, char *str);
+
 #ifdef __cplusplus
 }
 #endif
