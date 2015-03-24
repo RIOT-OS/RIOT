@@ -15,8 +15,8 @@
  *
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef __TESTS_NETREG_H_
-#define __TESTS_NETREG_H_
+#ifndef TESTS_NETREG_H_
+#define TESTS_NETREG_H_
 
 #include "embUnit.h"
 
@@ -33,5 +33,5 @@ void tests_ipv6_nc(void);
 }
 #endif
 
-#endif /* __TESTS_NETREG_H_ */
+#endif /* TESTS_NETREG_H_ */
 /** @} */
