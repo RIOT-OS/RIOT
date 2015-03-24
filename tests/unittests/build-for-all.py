@@ -29,17 +29,25 @@ from concurrent.futures import ThreadPoolExecutor
 _null = open(devnull, 'wb', 0)
 
 
-def build(test, board):
+def build(test_board):
+    test, board = test_board
+
     start = time()
 
-    make_process = Popen(['make', 'BOARD=' + board, test, '-j2'],
+    make_process = Popen(['make', 'BOARD=' + board, 'clean', test, '-j2'],
                          stdin=_null, stdout=_null, stderr=PIPE)
     make_out, make_err = make_process.communicate()
     retcode = make_process.poll()
 
     duration = time() - start
     make_err = make_err.decode('UTF-8').rstrip()
-    return board, retcode, make_err, duration
+    return test, board, retcode, make_err, duration
+
+
+def info_boards_supported(test):
+    boards = check_output(['make', 'info-boards-supported', 'UNIT_TESTS=' + test],
+                          stdin=_null, stderr=_null).decode('UTF-8').split()
+    return [(test, board) for board in boards]
 
 
 def build_for_all(colored=False, map=map):
@@ -52,23 +60,26 @@ def build_for_all(colored=False, map=map):
     else:
         BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE, RESET = [''] * 9
 
-    for test in sorted(basename(dirname(d)) for d in iglob(join('tests-*', 'Makefile'))):
-        boards = check_output(['make', 'info-boards-supported', 'UNIT_TESTS=' + test],
-                              stdin=_null, stderr=_null).decode('UTF-8').split()
-        for board, retcode, make_err, duration in map(lambda board: build(test, board), boards):
-            print('Built {neutral}{test}{reset} '
-                  'for {neutral}{board}{reset} .. '
-                  '{color}{outcome}{reset} in '
-                  '{duration:.3f}s'.format(neutral=MAGENTA,
-                                           test=test[6:],
-                                           board=board,
-                                           reset=RESET,
-                                           color=GREEN if retcode == 0 else RED,
-                                           outcome='success' if retcode == 0 else 'fail',
-                                           duration=duration))
-            if retcode:
-                errored.append((board, test))
-                print(make_err, file=stderr)
+    tests = sorted(basename(dirname(d)) for d in iglob(join('tests-*', 'Makefile')))
+    tests_boards = [test_board
+                    for tests_boards in map(info_boards_supported, tests)
+                    for test_board in tests_boards]
+    print('Will compile {count} unittests.'.format(count=len(tests_boards)))
+
+    for test, board, retcode, make_err, duration in map(build, tests_boards):
+        print('Built {neutral}{test}{reset} '
+              'for {neutral}{board}{reset} .. '
+              '{color}{outcome}{reset} in '
+              '{duration:.3f}s'.format(neutral=MAGENTA,
+                                       test=test[6:],
+                                       board=board,
+                                       reset=RESET,
+                                       color=GREEN if retcode == 0 else RED,
+                                       outcome='success' if retcode == 0 else 'fail',
+                                       duration=duration))
+        if retcode:
+            errored.append((board, test))
+            print(make_err, file=stderr)
 
     if errored:
         print('{}Errored: {}{}'.format(RED, RESET, ', '.join('{} on {}'.format(test[6:], board)
