@@ -2780,7 +2780,7 @@ void CyEnableInts(uint32 mask)
             CySysTickCallbacks[i] = (void *) 0;
         }
 
-    	(void) CyIntSetSysVector(CY_INT_SYSTICK_IRQN, &CySysTickServiceCallbacks);
+        (void) CyIntSetSysVector(CY_INT_SYSTICK_IRQN, &CySysTickServiceCallbacks);
         CySysTickSetClockSource(CY_SYS_SYST_CSR_CLK_SRC_SYSCLK);
         CySysTickSetReload(cydelay_freq_hz/1000u);
         CySysTickClear();

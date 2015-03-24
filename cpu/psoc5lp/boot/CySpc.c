@@ -733,4 +733,3 @@ cystatus CySpcGetAlgorithm(void)
 }
 
 /* [] END OF FILE */
-
