@@ -101,14 +101,14 @@ const ng_netdev_driver_t ng_tapnet_driver = {
 
 static inline bool _has_src(ng_pktsnip_t *pkt)
 {
-    return ((pkt->size > sizeof(ng_netif_hdr_t)) &&
+    return ((pkt->type == NG_NETTYPE_NETIF) &&
             ((ng_netif_hdr_t *)pkt->data)->src_l2addr_len == NG_ETHERNET_ADDR_LEN);
 }
 
 static inline bool _for_ethernet(ng_pktsnip_t *pkt)
 {
-    return (((pkt->size > (sizeof(ng_netif_hdr_t)) &&
-              (((ng_netif_hdr_t *)pkt->data)->dst_l2addr_len == NG_ETHERNET_ADDR_LEN))) ||
+    return (((pkt->type == NG_NETTYPE_NETIF) &&
+             (((ng_netif_hdr_t *)pkt->data)->dst_l2addr_len == NG_ETHERNET_ADDR_LEN)) ||
             _has_src(pkt));
 }
 
@@ -591,7 +591,7 @@ static void _rx_event(ng_tapnet_t *dev)
         }
 
         netif_hdr = ng_pktbuf_add(NULL, NULL, sizeof(ng_netif_hdr_t) + (2 * NG_ETHERNET_ADDR_LEN),
-                                  NG_NETTYPE_UNDEF);
+                                  NG_NETTYPE_NETIF);
 
         if (netif_hdr == NULL) {
             DEBUG("ng_tapnet: no space left in packet buffer\n");
