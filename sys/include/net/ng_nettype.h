@@ -37,6 +37,11 @@ extern "C" {
  * @note    Expand at will.
  */
 typedef enum {
+    /**
+     * @brief   Protocol is as defined in @ref ng_netif_hdr_t. Not usable with
+     *          @ref net_ng_netreg
+     */
+    NG_NETTYPE_NETIF = -1,
     NG_NETTYPE_UNDEF = 0,       /**< Protocol is undefined */
 
 #ifdef MODULE_NG_SIXLOWPAN
