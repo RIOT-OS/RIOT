@@ -18,6 +18,8 @@
  * @author      unknown, propably Kaspar Schleiser <kaspar@schleiser.de>
  */
 
+#include <stdint.h>
+
 #ifndef __CIB_H
 #define __CIB_H
 
@@ -29,9 +31,9 @@ extern "C" {
  * @brief circular integer buffer structure
  */
 typedef struct {
-    unsigned int read_count;    /**< number of (successful) read accesses */
-    unsigned int write_count;   /**< number of (successful) write accesses */
-    unsigned int mask;          /**< Size of buffer -1, i.e. mask of the bits */
+    uint16_t read_count;    /**< number of (successful) read accesses */
+    uint16_t write_count;   /**< number of (successful) write accesses */
+    uint16_t mask;          /**< Size of buffer -1, i.e. mask of the bits */
 } cib_t;
 
 /**
@@ -44,9 +46,9 @@ typedef struct {
  *
  * @param[out] cib      Buffer to initialize.
  *                      Must not be NULL.
- * @param[in]  size     Size of the buffer, must not exceed MAXINT/2.
+ * @param[in]  size     Size of the buffer, must not exceed 32,768
  */
-static inline void cib_init(cib_t *__restrict cib, unsigned int size)
+static inline void cib_init(cib_t *__restrict cib, uint16_t size)
 {
     cib_t c = CIB_INIT(size);
     *cib = c;
@@ -59,7 +61,7 @@ static inline void cib_init(cib_t *__restrict cib, unsigned int size)
  *                      Must not be NULL.
  * @return How often cib_get() can be called before the CIB is empty.
  */
-static inline unsigned int cib_avail(cib_t *__restrict cib)
+static inline uint16_t cib_avail(cib_t *__restrict cib)
 {
     return cib->write_count - cib->read_count;
 }
@@ -71,12 +73,12 @@ static inline unsigned int cib_avail(cib_t *__restrict cib)
  *                      Must not be NULL.
  * @return index of next item, -1 if the buffer is empty
  */
-static inline int cib_get(cib_t *__restrict cib)
+static inline int16_t cib_get(cib_t *__restrict cib)
 {
-    unsigned int avail = cib_avail(cib);
+    uint16_t avail = cib_avail(cib);
 
     if (avail > 0) {
-        return (int) (cib->read_count++ & cib->mask);
+        return (int16_t) (cib->read_count++ & cib->mask);
     }
 
     return -1;
@@ -89,13 +91,13 @@ static inline int cib_get(cib_t *__restrict cib)
  *                      Must not be NULL.
  * @return index of item to put to, -1 if the buffer is full
  */
-static inline int cib_put(cib_t *__restrict cib)
+static inline int16_t cib_put(cib_t *__restrict cib)
 {
-    unsigned int avail = cib_avail(cib);
+    uint16_t avail = cib_avail(cib);
 
     /* We use a signed compare, because the mask is -1u for an empty CIB. */
-    if ((int) avail <= (int) cib->mask) {
-        return (int) (cib->write_count++ & cib->mask);
+    if ((int16_t) avail <= (int16_t) cib->mask) {
+        return (int16_t) (cib->write_count++ & cib->mask);
     }
 
     return -1;
