@@ -71,6 +71,7 @@ endif
 
 ifneq (,$(filter ng_pktdump,$(USEMODULE)))
   USEMODULE += ng_pktbuf
+  USEMODULE += od
 endif
 
 ifneq (,$(filter aodvv2,$(USEMODULE)))
