@@ -35,8 +35,6 @@ void random_init(void)
 
 int random_read(char *buf, unsigned int num)
 {
-    /* cppcheck-suppress variableScope */
-    uint32_t tmp;
     int count = 0;
 
     /* self-seeding */
@@ -48,7 +46,7 @@ int random_read(char *buf, unsigned int num)
         /* wait for random data to be ready to read */
         while (!(KINETIS_RNGA->SR & RNG_SR_OREG_LVL_MASK));
 
-        tmp = KINETIS_RNGA->OR;
+        uint32_t tmp = KINETIS_RNGA->OR;
 
         /* copy data into result vector */
         for (int i = 0; i < 4 && count < num; i++) {
