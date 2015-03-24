@@ -24,6 +24,8 @@
 
 #include <inttypes.h>
 
+#include "byteorder.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -36,7 +38,7 @@ extern "C" {
 typedef struct __attribute__((packed)) {
     uint8_t dst[NG_ETHERNET_ADDR_LEN];  /**< destination address */
     uint8_t src[NG_ETHERNET_ADDR_LEN];  /**< source address */
-    uint16_t type;                      /**< ether type (see @ref net_ng_ethertype) */
+    network_uint16_t type;              /**< ether type (see @ref net_ng_ethertype) */
 } ng_ethernet_hdr_t;
 
 #ifdef __cplusplus
