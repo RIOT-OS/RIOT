@@ -75,6 +75,7 @@ static void _set_usage(char *cmd_name)
          "       * \"nid\" - sets the network identifier (or the PAN ID)\n"
          "       * \"pan\" - alias for \"nid\"\n"
          "       * \"pan_id\" - alias for \"nid\"\n"
+         "       * \"power\" - TX power in dBm\n"
          "       * \"src_len\" - sets the source address length in byte\n");
 }
 
@@ -137,6 +138,10 @@ static void _print_netconf(ng_netconf_opt_t opt)
             printf("network identifier");
             break;
 
+        case NETCONF_OPT_TX_POWER:
+            printf("TX power [in dBm]");
+            break;
+
         default:
             /* we don't serve these options here */
             break;
@@ -147,6 +152,7 @@ void _netif_list(kernel_pid_t dev)
 {
     uint8_t hwaddr[MAX_ADDR_LEN];
     uint16_t u16;
+    int16_t i16;
     int res;
 
     printf("Iface %2d  ", dev);
@@ -169,6 +175,12 @@ void _netif_list(kernel_pid_t dev)
 
     if (res >= 0) {
         printf(" NID: 0x%" PRIx16 " ", u16);
+    }
+
+    res = ng_netapi_get(dev, NETCONF_OPT_TX_POWER, 0, &i16, sizeof(i16));
+
+    if (res >= 0) {
+        printf(" TX-Power: %" PRIi16 "dBm ", i16);
     }
 
     printf("\n            ");
@@ -240,6 +252,23 @@ static void _netif_set_u16(kernel_pid_t dev, ng_netconf_opt_t opt,
     }
 }
 
+static void _netif_set_i16(kernel_pid_t dev, ng_netconf_opt_t opt,
+                           char *i16_str)
+{
+    int16_t val = (int16_t)atoi(i16_str);
+
+    if (ng_netapi_set(dev, opt, 0, (int16_t *)&val, sizeof(int16_t)) < 0) {
+        printf("error: unable to set ");
+        _print_netconf(opt);
+        puts("");
+        return;
+    }
+
+    printf("success: set ");
+    _print_netconf(opt);
+    printf(" on interface %" PRIkernel_pid " to %i\n", dev, val);
+}
+
 static void _netif_set_addr(kernel_pid_t dev, ng_netconf_opt_t opt,
                             char *addr_str)
 {
@@ -281,6 +310,9 @@ static void _netif_set(char *cmd_name, kernel_pid_t dev, char *key, char *value)
     else if ((strcmp("nid", key) == 0) || (strcmp("pan", key) == 0) ||
              (strcmp("pan_id", key) == 0)) {
         _netif_set_u16(dev, NETCONF_OPT_NID, value);
+    }
+    else if (strcmp("power", key) == 0) {
+        _netif_set_i16(dev, NETCONF_OPT_TX_POWER, value);
     }
     else if (strcmp("src_len", key) == 0) {
         _netif_set_u16(dev, NETCONF_OPT_SRC_LEN, value);
