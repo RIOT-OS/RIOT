@@ -35,37 +35,37 @@ index 50dae92..071431e 100644
 +++ b/include/relic_test.h
 @@ -74,7 +74,7 @@
  #define TEST_ASSERT(C, LABEL)												\
- 	if (!(C)) {																\
- 		test_fail();														\
+	if (!(C)) {																\
+		test_fail();														\
 -		util_print("(at ");													\
-+		util_print("(at ", NULL);													\
- 		util_print(__FILE__);												\
- 		util_print(":%d)\n", __LINE__);										\
- 		ERROR(LABEL);														\
++		util_print("(at ", NULL);											\
+		util_print(__FILE__);												\
+		util_print(":%d)\n", __LINE__);										\
+		ERROR(LABEL);														\
 diff --git a/src/bn/relic_bn_util.c b/src/bn/relic_bn_util.c
 index cad06c4..aef9f9d 100644
 --- a/src/bn/relic_bn_util.c
 +++ b/src/bn/relic_bn_util.c
 @@ -203,10 +203,10 @@ void bn_print(const bn_t a) {
- 	int i;
+	int i;
  
- 	if (a->sign == BN_NEG) {
+	if (a->sign == BN_NEG) {
 -		util_print("-");
 +		util_print("-", NULL);
- 	}
- 	if (a->used == 0) {
+	}
+	if (a->used == 0) {
 -		util_print("0\n");
 +		util_print("0\n", NULL);
- 	} else {
+	} else {
  #if WORD == 64
- 		util_print_dig(a->dp[a->used - 1], 0);
+		util_print_dig(a->dp[a->used - 1], 0);
 @@ -219,7 +219,7 @@ void bn_print(const bn_t a) {
- 			util_print_dig(a->dp[i], 1);
- 		}
+			util_print_dig(a->dp[i], 1);
+		}
  #endif
 -		util_print("\n");
 +		util_print("\n", NULL);
- 	}
+	}
  }
  
 diff --git a/src/dv/relic_dv_util.c b/src/dv/relic_dv_util.c
@@ -73,39 +73,39 @@ index f3b5eff..469c3c3 100644
 --- a/src/dv/relic_dv_util.c
 +++ b/src/dv/relic_dv_util.c
 @@ -46,7 +46,7 @@ void dv_print(dig_t *a, int digits) {
- 	for (i = digits - 1; i >= 0; i--) {
- 		util_print_dig(a[i], 1);
- 	}
+	for (i = digits - 1; i >= 0; i--) {
+		util_print_dig(a[i], 1);
+	}
 -	util_print("\n");
 +	util_print("\n", NULL);
  
- 	return;
+	return;
  }
 diff --git a/src/ed/relic_ed_util.c b/src/ed/relic_ed_util.c
 index 36533d4..feb7247 100644
 --- a/src/ed/relic_ed_util.c
 +++ b/src/ed/relic_ed_util.c
 @@ -347,7 +347,7 @@ int ed_is_valid(const ed_t p) {
- 			}
+			}
  #endif
- 			// if (r == 0) {
+			// if (r == 0) {
 -			// 	util_printf("\n\n(X, Y, T, Z) = \n");
 +			// 	util_printf("\n\n(X, Y, T, Z) = \n", NULL);
- 			// 	ed_print(p);
- 			// }
- 		} CATCH_ANY {
+			// 	ed_print(p);
+			// }
+		} CATCH_ANY {
 diff --git a/src/fb/relic_fb_util.c b/src/fb/relic_fb_util.c
 index 0370af4..5cc622f 100644
 --- a/src/fb/relic_fb_util.c
 +++ b/src/fb/relic_fb_util.c
 @@ -166,10 +166,10 @@ void fb_print(const fb_t a) {
- 	(void)a;
- 	for (i = FB_DIGS - 1; i > 0; i--) {
- 		util_print_dig(a[i], 1);
+	(void)a;
+	for (i = FB_DIGS - 1; i > 0; i--) {
+		util_print_dig(a[i], 1);
 -		util_print(" ");
 +		util_print(" ", NULL);
- 	}
- 	util_print_dig(a[0], 1);
+	}
+	util_print_dig(a[0], 1);
 -	util_print("\n");
 +	util_print("\n", NULL);
  }
@@ -118,43 +118,43 @@ index b6f1278..273b572 100644
 @@ -737,7 +737,7 @@ int fp_param_set_any_tower() {
  
  void fp_param_print(void) {
- 	util_banner("Prime modulus:", 0);
+	util_banner("Prime modulus:", 0);
 -	util_print("   ");
 +	util_print("   ", NULL);
  #if ALLOC == AUTO
- 	fp_print(fp_prime_get());
+	fp_print(fp_prime_get());
  #else
 diff --git a/src/fp/relic_fp_util.c b/src/fp/relic_fp_util.c
 index d32c253..5ece340 100644
 --- a/src/fp/relic_fp_util.c
 +++ b/src/fp/relic_fp_util.c
 @@ -147,10 +147,10 @@ void fp_print(const fp_t a) {
- 			} else {
- 				util_print_dig(t->dp[i], 1);
- 			}
+			} else {
+				util_print_dig(t->dp[i], 1);
+			}
 -			util_print(" ");
 +			util_print(" ", NULL);
- 		}
- 		util_print_dig(t->dp[0], 1);
+		}
+		util_print_dig(t->dp[0], 1);
 -		util_print("\n");
 +		util_print("\n", NULL);
  
- 	} CATCH_ANY {
- 		THROW(ERR_CAUGHT);
+	} CATCH_ANY {
+		THROW(ERR_CAUGHT);
 diff --git a/src/relic_bench.c b/src/relic_bench.c
 index 7b56cc5..0f2f65f 100644
 --- a/src/relic_bench.c
 +++ b/src/relic_bench.c
 @@ -190,9 +190,9 @@ void bench_print() {
- 	util_print("%lld nanosec", ctx->total);
+	util_print("%lld nanosec", ctx->total);
  #endif
- 	if (ctx->total < 0) {
+	if (ctx->total < 0) {
 -		util_print(" (overflow or bad overhead estimation)\n");
 +		util_print(" (overflow or bad overhead estimation)\n", NULL);
- 	} else {
+	} else {
 -		util_print("\n");
 +		util_print("\n", NULL);
- 	}
+	}
  }
  
 diff --git a/src/relic_conf.c b/src/relic_conf.c
@@ -200,11 +200,11 @@ index a1370c1..0baee89 100644
  #if BENCH > 1
 -	util_print("** Benchmarking options:\n");
 +	util_print("** Benchmarking options:\n", NULL);
- 	util_print("   Number of times: %d\n", BENCH * BENCH);
+	util_print("   Number of times: %d\n", BENCH * BENCH);
  #ifdef OVERH
 -	util_print("   Estimated overhead: ");
 +	util_print("   Estimated overhead: ", NULL);
- 	bench_overhead();
+	bench_overhead();
  #endif
 -	util_print("\n");
 +	util_print("\n", NULL);
@@ -213,7 +213,7 @@ index a1370c1..0baee89 100644
  #ifdef WITH_BN
 -	util_print("** Multiple precision module options:\n");
 +	util_print("** Multiple precision module options:\n", NULL);
- 	util_print("   Precision: %d bits, %d words\n", BN_BITS, BN_DIGS);
+	util_print("   Precision: %d bits, %d words\n", BN_BITS, BN_DIGS);
 -	util_print("   Arithmetic method: " BN_METHD "\n\n");
 +	util_print("   Arithmetic method: " BN_METHD "\n\n", NULL);
  #endif
@@ -221,7 +221,7 @@ index a1370c1..0baee89 100644
  #ifdef WITH_FP
 -	util_print("** Prime field module options:\n");
 +	util_print("** Prime field module options:\n", NULL);
- 	util_print("   Prime size: %d bits, %d words\n", FP_BITS, FP_DIGS);
+	util_print("   Prime size: %d bits, %d words\n", FP_BITS, FP_DIGS);
 -	util_print("   Arithmetic method: " FP_METHD "\n\n");
 +	util_print("   Arithmetic method: " FP_METHD "\n\n", NULL);
  #endif
@@ -250,7 +250,7 @@ index a1370c1..0baee89 100644
  #ifdef WITH_FB
 -	util_print("** Binary field module options:\n");
 +	util_print("** Binary field module options:\n", NULL);
- 	util_print("   Polynomial size: %d bits, %d words\n", FB_BITS, FB_DIGS);
+	util_print("   Polynomial size: %d bits, %d words\n", FB_BITS, FB_DIGS);
 -	util_print("   Arithmetic method: " FB_METHD "\n\n");
 +	util_print("   Arithmetic method: " FB_METHD "\n\n", NULL);
  #endif
@@ -284,10 +284,10 @@ index 3539fdc..2535dae 100644
 @@ -69,19 +69,19 @@
  void test_fail(void) {
  #ifdef COLOR
- 	util_print("[%c[%d;%dm", CMD_SET, CMD_ATTR, FAIL_COLOR);
+	util_print("[%c[%d;%dm", CMD_SET, CMD_ATTR, FAIL_COLOR);
 -	util_print("FAIL");
 +	util_print("FAIL", NULL);
- 	util_print("%c[%dm]\n", CMD_SET, CMD_RESET);
+	util_print("%c[%dm]\n", CMD_SET, CMD_RESET);
  #else
 -	util_print("[FAIL]\n");
 +	util_print("[FAIL]\n", NULL);
@@ -296,10 +296,10 @@ index 3539fdc..2535dae 100644
  
  void test_pass(void) {
  #ifdef COLOR
- 	util_print("[%c[%d;%dm", CMD_SET, CMD_ATTR, PASS_COLOR);
+	util_print("[%c[%d;%dm", CMD_SET, CMD_ATTR, PASS_COLOR);
 -	util_print("PASS");
 +	util_print("PASS", NULL);
- 	util_print("%c[%dm]\n", CMD_SET, CMD_RESET);
+	util_print("%c[%dm]\n", CMD_SET, CMD_RESET);
  #else
 -	util_print("[PASS]\n");
 +	util_print("[PASS]\n", NULL);
@@ -310,1025 +310,1025 @@ index e424cc4..dbfebdf 100644
 --- a/test/test_bn.c
 +++ b/test/test_bn.c
 @@ -52,7 +52,7 @@ static int memory(void) {
- 	CATCH(e) {
- 		switch (e) {
- 			case ERR_NO_MEMORY:
+	CATCH(e) {
+		switch (e) {
+			case ERR_NO_MEMORY:
 -				util_print("FATAL ERROR!\n");
 +				util_print("FATAL ERROR!\n", NULL);
- 				ERROR(end);
- 				break;
- 		}
+				ERROR(end);
+				break;
+		}
 diff --git a/test/test_dv.c b/test/test_dv.c
 index 01ca147..09e9588 100644
 --- a/test/test_dv.c
 +++ b/test/test_dv.c
 @@ -77,7 +77,7 @@ static int memory(void) {
- 	} CATCH(e) {
- 		switch (e) {
- 			case ERR_NO_MEMORY:
+	} CATCH(e) {
+		switch (e) {
+			case ERR_NO_MEMORY:
 -				util_print("FATAL ERROR!\n");
 +				util_print("FATAL ERROR!\n", NULL);
- 				ERROR(end);
- 				break;
- 		}
+				ERROR(end);
+				break;
+		}
 diff --git a/test/test_eb.c b/test/test_eb.c
 index bafcf7a..44fbedc 100644
 --- a/test/test_eb.c
 +++ b/test/test_eb.c
 @@ -49,7 +49,7 @@ static int memory(void) {
- 	} CATCH(e) {
- 		switch (e) {
- 			case ERR_NO_MEMORY:
+	} CATCH(e) {
+		switch (e) {
+			case ERR_NO_MEMORY:
 -				util_print("FATAL ERROR!\n");
 +				util_print("FATAL ERROR!\n", NULL);
- 				ERROR(end);
- 				break;
- 		}
+				ERROR(end);
+				break;
+		}
 @@ -667,7 +667,7 @@ static int multiplication(void) {
  
- 	}
- 	CATCH_ANY {
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -823,7 +823,7 @@ static int fixed(void) {
  #endif
- 	}
- 	CATCH_ANY {
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -921,7 +921,7 @@ static int simultaneous(void) {
- 		} TEST_END;
- 	}
- 	CATCH_ANY {
+		} TEST_END;
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 diff --git a/test/test_ec.c b/test/test_ec.c
 index 71f05b1..44e03b8 100644
 --- a/test/test_ec.c
 +++ b/test/test_ec.c
 @@ -49,7 +49,7 @@ static int memory(void) {
- 	} CATCH(e) {
- 		switch (e) {
- 			case ERR_NO_MEMORY:
+	} CATCH(e) {
+		switch (e) {
+			case ERR_NO_MEMORY:
 -				util_print("FATAL ERROR!\n");
 +				util_print("FATAL ERROR!\n", NULL);
- 				ERROR(end);
- 				break;
- 		}
+				ERROR(end);
+				break;
+		}
 @@ -150,7 +150,7 @@ int util(void) {
- 		TEST_END;
- 	}
- 	CATCH_ANY {
+		TEST_END;
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -354,7 +354,7 @@ static int multiplication(void) {
- 		} TEST_END;
- 	}
- 	CATCH_ANY {
+		} TEST_END;
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -408,7 +408,7 @@ static int fixed(void) {
- 		}
- 	}
- 	CATCH_ANY {
+		}
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -467,7 +467,7 @@ static int simultaneous(void) {
- 		} TEST_END;
- 	}
- 	CATCH_ANY {
+		} TEST_END;
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 diff --git a/test/test_ed.c b/test/test_ed.c
 index 2563fb3..5c64f02 100644
 --- a/test/test_ed.c
 +++ b/test/test_ed.c
 @@ -49,7 +49,7 @@ static int memory(void) {
- 	} CATCH(e) {
- 		switch (e) {
- 			case ERR_NO_MEMORY:
+	} CATCH(e) {
+		switch (e) {
+			case ERR_NO_MEMORY:
 -				util_print("FATAL ERROR!\n");
 +				util_print("FATAL ERROR!\n", NULL);
- 				ERROR(end);
- 				break;
- 		}
+				ERROR(end);
+				break;
+		}
 @@ -236,7 +236,7 @@ int util(void) {
- 		TEST_END;
- 	}
- 	CATCH_ANY {
+		TEST_END;
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -363,7 +363,7 @@ static int multiplication(void) {
- 		TEST_END;
- 	}
- 	CATCH_ANY {
+		TEST_END;
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 diff --git a/test/test_ep.c b/test/test_ep.c
 index 86f6053..0a6f88e 100644
 --- a/test/test_ep.c
 +++ b/test/test_ep.c
 @@ -49,7 +49,7 @@ static int memory(void) {
- 	} CATCH(e) {
- 		switch (e) {
- 			case ERR_NO_MEMORY:
+	} CATCH(e) {
+		switch (e) {
+			case ERR_NO_MEMORY:
 -				util_print("FATAL ERROR!\n");
 +				util_print("FATAL ERROR!\n", NULL);
- 				ERROR(end);
- 				break;
- 		}
+				ERROR(end);
+				break;
+		}
 @@ -142,7 +142,7 @@ int util(void) {
- 		TEST_END;
- 	}
- 	CATCH_ANY {
+		TEST_END;
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -548,7 +548,7 @@ static int multiplication(void) {
- 		TEST_END;
- 	}
- 	CATCH_ANY {
+		TEST_END;
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -704,7 +704,7 @@ static int fixed(void) {
  #endif
- 	}
- 	CATCH_ANY {
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -803,7 +803,7 @@ static int simultaneous(void) {
- 		} TEST_END;
- 	}
- 	CATCH_ANY {
+		} TEST_END;
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 diff --git a/test/test_epx.c b/test/test_epx.c
 index ae11955..6a57ad3 100644
 --- a/test/test_epx.c
 +++ b/test/test_epx.c
 @@ -50,7 +50,7 @@ static int memory(void) {
- 	} CATCH(e) {
- 		switch (e) {
- 			case ERR_NO_MEMORY:
+	} CATCH(e) {
+		switch (e) {
+			case ERR_NO_MEMORY:
 -				util_print("FATAL ERROR!\n");
 +				util_print("FATAL ERROR!\n", NULL);
- 				ERROR(end);
- 				break;
- 		}
+				ERROR(end);
+				break;
+		}
 @@ -155,7 +155,7 @@ int util(void) {
- 		TEST_END;		
- 	}
- 	CATCH_ANY {
+		TEST_END;		
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -524,7 +524,7 @@ static int multiplication(void) {
- 		TEST_END;
- 	}
- 	CATCH_ANY {
+		TEST_END;
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -680,7 +680,7 @@ static int fixed(void) {
  #endif
- 	}
- 	CATCH_ANY {
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -779,7 +779,7 @@ static int simultaneous(void) {
- 		} TEST_END;
- 	}
- 	CATCH_ANY {
+		} TEST_END;
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -850,7 +850,7 @@ static int hashing(void) {
- 		TEST_END;
- 	}
- 	CATCH_ANY {
+		TEST_END;
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -903,7 +903,7 @@ static int frobenius(void) {
- 		} TEST_END;
- 	}
- 	CATCH_ANY {
+		} TEST_END;
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 diff --git a/test/test_fb.c b/test/test_fb.c
 index d419636..e482c4e 100644
 --- a/test/test_fb.c
 +++ b/test/test_fb.c
 @@ -50,7 +50,7 @@ static int memory(void) {
- 	} CATCH(e) {
- 		switch (e) {
- 			case ERR_NO_MEMORY:
+	} CATCH(e) {
+		switch (e) {
+			case ERR_NO_MEMORY:
 -				util_print("FATAL ERROR!\n");
 +				util_print("FATAL ERROR!\n", NULL);
- 				ERROR(end);
- 				break;
- 		}
+				ERROR(end);
+				break;
+		}
 @@ -338,7 +338,7 @@ static int subtraction(void) {
- 		} TEST_END;
- 	}
- 	CATCH_ANY {
+		} TEST_END;
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 diff --git a/test/test_fbx.c b/test/test_fbx.c
 index 59a92c3..e5fbba7 100644
 --- a/test/test_fbx.c
 +++ b/test/test_fbx.c
 @@ -49,7 +49,7 @@ static int memory2(void) {
- 	} CATCH(e) {
- 		switch (e) {
- 			case ERR_NO_MEMORY:
+	} CATCH(e) {
+		switch (e) {
+			case ERR_NO_MEMORY:
 -				util_print("FATAL ERROR!\n");
 +				util_print("FATAL ERROR!\n", NULL);
- 				ERROR(end);
- 				break;
- 		}
+				ERROR(end);
+				break;
+		}
 @@ -192,7 +192,7 @@ static int addition2(void) {
- 		} TEST_END;
- 	}
- 	CATCH_ANY {
+		} TEST_END;
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -246,7 +246,7 @@ static int subtraction2(void) {
- 		TEST_END;
- 	}
- 	CATCH_ANY {
+		TEST_END;
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -324,7 +324,7 @@ static int multiplication2(void) {
- 		} TEST_END;
- 	}
- 	CATCH_ANY {
+		} TEST_END;
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -359,7 +359,7 @@ static int squaring2(void) {
- 		} TEST_END;
- 	}
- 	CATCH_ANY {
+		} TEST_END;
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -428,7 +428,7 @@ static int inversion2(void) {
- 		} TEST_END;
- 	}
- 	CATCH_ANY {
+		} TEST_END;
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -454,7 +454,7 @@ static int memory4(void) {
- 	} CATCH(e) {
- 		switch (e) {
- 			case ERR_NO_MEMORY:
+	} CATCH(e) {
+		switch (e) {
+			case ERR_NO_MEMORY:
 -				util_print("FATAL ERROR!\n");
 +				util_print("FATAL ERROR!\n", NULL);
- 				ERROR(end);
- 				break;
- 		}
+				ERROR(end);
+				break;
+		}
 @@ -597,7 +597,7 @@ static int addition4(void) {
- 		} TEST_END;
- 	}
- 	CATCH_ANY {
+		} TEST_END;
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -651,7 +651,7 @@ static int subtraction4(void) {
- 		TEST_END;
- 	}
- 	CATCH_ANY {
+		TEST_END;
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -773,7 +773,7 @@ static int multiplication4(void) {
- 		} TEST_END;
- 	}
- 	CATCH_ANY {
+		} TEST_END;
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -807,7 +807,7 @@ static int squaring4(void) {
- 		} TEST_END;
- 	}
- 	CATCH_ANY {
+		} TEST_END;
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -839,7 +839,7 @@ static int inversion4(void) {
- 		} TEST_END;
- 	}
- 	CATCH_ANY {
+		} TEST_END;
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -875,7 +875,7 @@ static int exponentiation4(void) {
- 		} TEST_END;
- 	}
- 	CATCH_ANY {
+		} TEST_END;
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 diff --git a/test/test_fp.c b/test/test_fp.c
 index 4fc13b7..71ba83a 100644
 --- a/test/test_fp.c
 +++ b/test/test_fp.c
 @@ -50,7 +50,7 @@ static int memory(void) {
- 	} CATCH(e) {
- 		switch (e) {
- 			case ERR_NO_MEMORY:
+	} CATCH(e) {
+		switch (e) {
+			case ERR_NO_MEMORY:
 -				util_print("FATAL ERROR!\n");
 +				util_print("FATAL ERROR!\n", NULL);
- 				ERROR(end);
- 				break;
- 		}
+				ERROR(end);
+				break;
+		}
 @@ -644,7 +644,7 @@ static int doubling_halving(void) {
  #endif
- 	}
- 	CATCH_ANY {
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 diff --git a/test/test_fpx.c b/test/test_fpx.c
 index 7fcbc05..ba83d1f 100644
 --- a/test/test_fpx.c
 +++ b/test/test_fpx.c
 @@ -50,7 +50,7 @@ static int memory2(void) {
- 	} CATCH(e) {
- 		switch (e) {
- 			case ERR_NO_MEMORY:
+	} CATCH(e) {
+		switch (e) {
+			case ERR_NO_MEMORY:
 -				util_print("FATAL ERROR!\n");
 +				util_print("FATAL ERROR!\n", NULL);
- 				ERROR(end);
- 				break;
- 		}
+				ERROR(end);
+				break;
+		}
 @@ -246,7 +246,7 @@ static int addition2(void) {
  #endif
- 	}
- 	CATCH_ANY {
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -320,7 +320,7 @@ static int subtraction2(void) {
  #endif
- 	}
- 	CATCH_ANY {
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -371,7 +371,7 @@ static int doubling2(void) {
  #endif
- 	}
- 	CATCH_ANY {
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -525,7 +525,7 @@ static int multiplication2(void) {
  #endif
- 	}
- 	CATCH_ANY {
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -579,7 +579,7 @@ static int squaring2(void) {
  #endif
- 	}
- 	CATCH_ANY {
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -631,7 +631,7 @@ static int inversion2(void) {
- 		} TEST_END;
- 	}
- 	CATCH_ANY {
+		} TEST_END;
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -687,7 +687,7 @@ static int exponentiation2(void) {
          } TEST_END;
- 	}
- 	CATCH_ANY {
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -725,7 +725,7 @@ static int compression2(void) {
- 		} TEST_END;
- 	}
- 	CATCH_ANY {
+		} TEST_END;
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -762,7 +762,7 @@ static int square_root2(void) {
- 		} TEST_END;
- 	}
- 	CATCH_ANY {
+		} TEST_END;
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -788,7 +788,7 @@ static int memory3(void) {
- 	} CATCH(e) {
- 		switch (e) {
- 			case ERR_NO_MEMORY:
+	} CATCH(e) {
+		switch (e) {
+			case ERR_NO_MEMORY:
 -				util_print("FATAL ERROR!\n");
 +				util_print("FATAL ERROR!\n", NULL);
- 				ERROR(end);
- 				break;
- 		}
+				ERROR(end);
+				break;
+		}
 @@ -977,7 +977,7 @@ static int addition3(void) {
  #endif
- 	}
- 	CATCH_ANY {
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -1051,7 +1051,7 @@ static int subtraction3(void) {
  #endif
- 	}
- 	CATCH_ANY {
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -1102,7 +1102,7 @@ static int doubling3(void) {
  #endif
- 	}
- 	CATCH_ANY {
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -1253,7 +1253,7 @@ static int multiplication3(void) {
- 		TEST_END;
- 	}
- 	CATCH_ANY {
+		TEST_END;
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -1307,7 +1307,7 @@ static int squaring3(void) {
  #endif
- 	}
- 	CATCH_ANY {
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -1357,7 +1357,7 @@ static int inversion3(void) {
- 		} TEST_END;
- 	}
- 	CATCH_ANY {
+		} TEST_END;
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -1413,7 +1413,7 @@ static int exponentiation3(void) {
- 		} TEST_END;
- 	}
- 	CATCH_ANY {
+		} TEST_END;
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -1449,7 +1449,7 @@ static int square_root3(void) {
- 		} TEST_END;
- 	}
- 	CATCH_ANY {
+		} TEST_END;
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -1475,7 +1475,7 @@ static int memory6(void) {
- 	} CATCH(e) {
- 		switch (e) {
- 			case ERR_NO_MEMORY:
+	} CATCH(e) {
+		switch (e) {
+			case ERR_NO_MEMORY:
 -				util_print("FATAL ERROR!\n");
 +				util_print("FATAL ERROR!\n", NULL);
- 				ERROR(end);
- 				break;
- 		}
+				ERROR(end);
+				break;
+		}
 @@ -1644,7 +1644,7 @@ static int addition6(void) {
- 		} TEST_END;
- 	}
- 	CATCH_ANY {
+		} TEST_END;
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -1698,7 +1698,7 @@ static int subtraction6(void) {
- 		TEST_END;
- 	}
- 	CATCH_ANY {
+		TEST_END;
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -1731,7 +1731,7 @@ static int doubling6(void) {
- 		} TEST_END;
- 	}
- 	CATCH_ANY {
+		} TEST_END;
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -1835,7 +1835,7 @@ static int multiplication6(void) {
  #endif
- 	}
- 	CATCH_ANY {
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -1888,7 +1888,7 @@ static int squaring6(void) {
  #endif
- 	}
- 	CATCH_ANY {
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -1922,7 +1922,7 @@ static int inversion6(void) {
- 		} TEST_END;
- 	}
- 	CATCH_ANY {
+		} TEST_END;
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -1967,7 +1967,7 @@ static int exponentiation6(void) {
- 		} TEST_END;
- 	}
- 	CATCH_ANY {
+		} TEST_END;
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -1994,7 +1994,7 @@ static int memory12(void) {
- 	} CATCH(e) {
- 		switch (e) {
- 			case ERR_NO_MEMORY:
+	} CATCH(e) {
+		switch (e) {
+			case ERR_NO_MEMORY:
 -				util_print("FATAL ERROR!\n");
 +				util_print("FATAL ERROR!\n", NULL);
- 				ERROR(end);
- 				break;
- 		}
+				ERROR(end);
+				break;
+		}
 @@ -2169,7 +2169,7 @@ static int addition12(void) {
- 		} TEST_END;
- 	}
- 	CATCH_ANY {
+		} TEST_END;
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -2223,7 +2223,7 @@ static int subtraction12(void) {
- 		TEST_END;
- 	}
- 	CATCH_ANY {
+		TEST_END;
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -2359,7 +2359,7 @@ static int multiplication12(void) {
- 		} TEST_END;
+		} TEST_END;
  #endif
- 	} CATCH_ANY {
+	} CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -2412,7 +2412,7 @@ static int squaring12(void) {
  #endif
- 	}
- 	CATCH_ANY {
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -2564,7 +2564,7 @@ static int cyclotomic12(void) {
- 		} TEST_END;
- 	}
- 	CATCH_ANY {
+		} TEST_END;
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -2611,7 +2611,7 @@ static int inversion12(void) {
- 		} TEST_END;
- 	}
- 	CATCH_ANY {
+		} TEST_END;
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -2665,7 +2665,7 @@ static int exponentiation12(void) {
- 		} TEST_END;
- 	}
- 	CATCH_ANY {
+		} TEST_END;
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -2703,7 +2703,7 @@ static int compression12(void) {
- 		} TEST_END;
- 	}
- 	CATCH_ANY {
+		} TEST_END;
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -2729,7 +2729,7 @@ static int memory18(void) {
- 	} CATCH(e) {
- 		switch (e) {
- 			case ERR_NO_MEMORY:
+	} CATCH(e) {
+		switch (e) {
+			case ERR_NO_MEMORY:
 -				util_print("FATAL ERROR!\n");
 +				util_print("FATAL ERROR!\n", NULL);
- 				ERROR(end);
- 				break;
- 		}
+				ERROR(end);
+				break;
+		}
 @@ -2883,7 +2883,7 @@ static int addition18(void) {
- 		} TEST_END;
- 	}
- 	CATCH_ANY {
+		} TEST_END;
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -2932,7 +2932,7 @@ static int subtraction18(void) {
- 		TEST_END;
- 	}
- 	CATCH_ANY {
+		TEST_END;
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -3020,7 +3020,7 @@ static int multiplication18(void) {
- 		} TEST_END;
+		} TEST_END;
  #endif
- 	} CATCH_ANY {
+	} CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -3073,7 +3073,7 @@ static int squaring18(void) {
  #endif
- 	}
- 	CATCH_ANY {
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -3178,7 +3178,7 @@ static int cyclotomic18(void) {
- 		} TEST_END;
- 	}
- 	CATCH_ANY {
+		} TEST_END;
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -3225,7 +3225,7 @@ static int inversion18(void) {
- 		} TEST_END;
- 	}
- 	CATCH_ANY {
+		} TEST_END;
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -3300,7 +3300,7 @@ static int exponentiation18(void) {
- 		} TEST_END;
- 	}
- 	CATCH_ANY {
+		} TEST_END;
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 diff --git a/test/test_pc.c b/test/test_pc.c
 index 041d1b2..bcab7f7 100755
 --- a/test/test_pc.c
 +++ b/test/test_pc.c
 @@ -49,7 +49,7 @@ static int memory1(void) {
- 	} CATCH(e) {
- 		switch (e) {
- 			case ERR_NO_MEMORY:
+	} CATCH(e) {
+		switch (e) {
+			case ERR_NO_MEMORY:
 -				util_print("FATAL ERROR!\n");
 +				util_print("FATAL ERROR!\n", NULL);
- 				ERROR(end);
- 				break;
- 		}
+				ERROR(end);
+				break;
+		}
 @@ -143,7 +143,7 @@ int util1(void) {
- 		TEST_END;		
- 	}
- 	CATCH_ANY {
+		TEST_END;		
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -353,7 +353,7 @@ static int multiplication1(void) {
- 		} TEST_END;
- 	}
- 	CATCH_ANY {
+		} TEST_END;
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -408,7 +408,7 @@ static int fixed1(void) {
- 		}
- 	}
- 	CATCH_ANY {
+		}
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -467,7 +467,7 @@ static int simultaneous1(void) {
- 		} TEST_END;
- 	}
- 	CATCH_ANY {
+		} TEST_END;
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -531,7 +531,7 @@ static int memory2(void) {
- 	} CATCH(e) {
- 		switch (e) {
- 			case ERR_NO_MEMORY:
+	} CATCH(e) {
+		switch (e) {
+			case ERR_NO_MEMORY:
 -				util_print("FATAL ERROR!\n");
 +				util_print("FATAL ERROR!\n", NULL);
- 				ERROR(end);
- 				break;
- 		}
+				ERROR(end);
+				break;
+		}
 @@ -625,7 +625,7 @@ int util2(void) {
- 		TEST_END;		
- 	}
- 	CATCH_ANY {
+		TEST_END;		
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -835,7 +835,7 @@ static int multiplication2(void) {
- 		} TEST_END;
- 	}
- 	CATCH_ANY {
+		} TEST_END;
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -890,7 +890,7 @@ static int fixed2(void) {
- 		}
- 	}
- 	CATCH_ANY {
+		}
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -949,7 +949,7 @@ static int simultaneous2(void) {
- 		} TEST_END;
- 	}
- 	CATCH_ANY {
+		} TEST_END;
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -1013,7 +1013,7 @@ static int memory(void) {
- 	} CATCH(e) {
- 		switch (e) {
- 			case ERR_NO_MEMORY:
+	} CATCH(e) {
+		switch (e) {
+			case ERR_NO_MEMORY:
 -				util_print("FATAL ERROR!\n");
 +				util_print("FATAL ERROR!\n", NULL);
- 				ERROR(end);
- 				break;
- 		}
+				ERROR(end);
+				break;
+		}
 @@ -1083,7 +1083,7 @@ int util(void) {
- 		TEST_END;
- 	}
- 	CATCH_ANY {
+		TEST_END;
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -1202,7 +1202,7 @@ static int inversion(void) {
- 		} TEST_END;
- 	}
- 	CATCH_ANY {
+		} TEST_END;
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -1243,7 +1243,7 @@ int exponentiation(void) {
- 		TEST_END;
- 	}
- 	CATCH_ANY {
+		TEST_END;
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -1308,7 +1308,7 @@ static int pairing(void) {
- 		} TEST_END;
- 	}
- 	CATCH_ANY {
+		} TEST_END;
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 diff --git a/test/test_pp.c b/test/test_pp.c
 index eea9995..205898c 100644
 --- a/test/test_pp.c
 +++ b/test/test_pp.c
 @@ -135,7 +135,7 @@ static int addition2(void) {
  #endif /* EP_ADD = PROJC */
- 	}
- 	CATCH_ANY {
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -246,7 +246,7 @@ static int doubling2(void) {
  #endif /* EP_ADD = PROJC */
- 	}
- 	CATCH_ANY {
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -355,7 +355,7 @@ static int pairing2(void) {
  #endif
- 	}
- 	CATCH_ANY {
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -471,7 +471,7 @@ static int addition12(void) {
  #endif /* EP_ADD = PROJC */
- 	}
- 	CATCH_ANY {
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -597,7 +597,7 @@ static int doubling12(void) {
  #endif /* EP_ADD = PROJC */
- 	}
- 	CATCH_ANY {
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 @@ -754,7 +754,7 @@ static int pairing12(void) {
  #endif
- 	}
- 	CATCH_ANY {
+	}
+	CATCH_ANY {
 -		util_print("FATAL ERROR!\n");
 +		util_print("FATAL ERROR!\n", NULL);
- 		ERROR(end);
- 	}
- 	code = STS_OK;
+		ERROR(end);
+	}
+	code = STS_OK;
 -- 
 2.3.0
 
