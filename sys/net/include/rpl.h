@@ -234,15 +234,6 @@ void rpl_del_routing_entry(ipv6_addr_t *addr);
 rpl_routing_entry_t *rpl_find_routing_entry(ipv6_addr_t *addr);
 
 /**
- * @brief Clears routing table.
- *
- * @deprecated This function is obsolete and will be removed shortly. This will be replaced with a
- * common routing information base.
- *
- * */
-void rpl_clear_routing_table(void);
-
-/**
  * @brief Returns routing table
  *
  * @deprecated This function is obsolete and will be removed shortly. This will be replaced with a

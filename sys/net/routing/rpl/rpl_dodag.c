@@ -43,11 +43,6 @@ void rpl_trickle_send_dio(void *args)
     rpl_send_DIO((rpl_dodag_t *) args, &mcast);
 }
 
-void rpl_instances_init(void)
-{
-    memset(instances, 0, sizeof(rpl_instance_t) * RPL_MAX_INSTANCES);
-}
-
 rpl_instance_t *rpl_new_instance(uint8_t instanceid)
 {
     rpl_instance_t *inst;
