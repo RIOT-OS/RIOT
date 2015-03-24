@@ -72,14 +72,15 @@ void _dump(ng_pktsnip_t *pkt)
 {
     int snips = 0;
     int size = 0;
+    ng_pktsnip_t *snip = pkt;
 
-    while (pkt != NULL) {
-        printf("~~ SNIP %2i - size: %3i byte, type: ", snips, pkt->size);
-        _dump_type(pkt->type);
+    while (snip != NULL) {
+        printf("~~ SNIP %2i - size: %3i byte, type: ", snips, snip->size);
+        _dump_type(snip->type);
         puts("");
         ++snips;
-        size += pkt->size;
-        pkt = pkt->next;
+        size += snip->size;
+        snip = snip->next;
     }
     printf("~~ PKT    - %2i snips, total size: %3i byte\n", snips, size);
     ng_pktbuf_release(pkt);
