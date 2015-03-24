@@ -76,12 +76,10 @@ static ipv6_hdr_t *ipv6_buf;
 uint8_t rpl_init(int if_id, ipv6_addr_t *address)
 {
     rpl_if_id = if_id;
-    rpl_instances_init();
 
     /* initialize routing table */
 #if RPL_MAX_ROUTING_ENTRIES != 0
     rpl_max_routing_entries = RPL_MAX_ROUTING_ENTRIES;
-    rpl_clear_routing_table();
 #endif
 
     rpl_process_pid = thread_create(rpl_process_buf, RPL_PROCESS_STACKSIZE,
@@ -447,16 +445,6 @@ rpl_routing_entry_t *rpl_find_routing_entry(ipv6_addr_t *addr)
     }
 
     return NULL;
-}
-#endif
-
-#if RPL_MAX_ROUTING_ENTRIES != 0
-void rpl_clear_routing_table(void)
-{
-
-    for (uint8_t i = 0; i < rpl_max_routing_entries; i++) {
-        memset(&rpl_routing_table[i], 0, sizeof(rpl_routing_table[i]));
-    }
 }
 #endif
 
