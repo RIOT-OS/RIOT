@@ -2,6 +2,6 @@
  - reset handler(cpu) is calling board_init(board) and board_init also calling cpu_init() : Is it a circular dependency
  - Why cpu object uses defines from board (e.g periph_conf.h)
  - shall I add a cpu and board group for doxygen (e.g ingroup cpu_lpc1768)
- - TODO : LPM (Low power mode) is not implemented. 
- 
+ - TODO : LPM (Low power mode) is not implemented.
+
  Implement syscall.c for uart outputs.

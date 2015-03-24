@@ -1,2 +1,2 @@
-'doc' items not included. 
-Documentation can be done by RIOT build environment. 
+'doc' items not included.
+Documentation can be done by RIOT build environment.
