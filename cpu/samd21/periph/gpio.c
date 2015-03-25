@@ -148,6 +148,21 @@ int gpio_init_out(gpio_t dev, gpio_pp_t pushpull)
     }
 
     /* configure as output */
+    if (pin < 16) {
+        port->WRCONFIG.reg = PORT_WRCONFIG_WRPINCFG \
+                        | PORT_WRCONFIG_WRPMUX \
+                        | PORT_WRCONFIG_PMUX(0x0) \
+                        | PORT_WRCONFIG_DRVSTR \
+                        | (1 << pin);
+    }
+    else {
+        port->WRCONFIG.reg = PORT_WRCONFIG_HWSEL \
+                        | PORT_WRCONFIG_WRPINCFG \
+                        | PORT_WRCONFIG_WRPMUX \
+                        | PORT_WRCONFIG_PMUX(0x0) \
+                        | PORT_WRCONFIG_DRVSTR \
+                        | ((1 << pin) >> 16);
+    }
     port->DIRSET.reg = 1 << pin;
 
     /* configure the pin's pull resistor state */
