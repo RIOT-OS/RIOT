@@ -783,7 +783,7 @@ void isr_exti1(void)
     }
 }
 
-void isr_exti2(void)
+void isr_exti2_tsc(void)
 {
     if (EXTI->PR & EXTI_PR_PR2) {
         EXTI->PR |= EXTI_PR_PR2;        /* clear status bit by writing a 1 to it */
