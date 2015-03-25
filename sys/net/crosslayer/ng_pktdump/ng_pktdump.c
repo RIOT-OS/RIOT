@@ -22,8 +22,19 @@
 
 #include "thread.h"
 #include "msg.h"
+#include "kernel.h"
 #include "net/ng_pktdump.h"
 #include "net/ng_netbase.h"
+
+/**
+ * @brief   PID of the pktdump thread
+ */
+static kernel_pid_t _pid = KERNEL_PID_UNDEF;
+
+/**
+ * @brief   Stack for the pktdump thread
+ */
+static char _stack[NG_PKTDUMP_STACKSIZE];
 
 void _dump_type(ng_nettype_t type)
 {
@@ -117,8 +128,16 @@ void *_eventloop(void *arg)
     return NULL;
 }
 
-kernel_pid_t ng_pktdump_init(char *stack, int stacksize,
-                             char priority, char *name)
+kernel_pid_t ng_pktdump_getpid(void)
 {
-    return thread_create(stack, stacksize, priority, 0, _eventloop, NULL, name);
+    return _pid;
+}
+
+kernel_pid_t ng_pktdump_init(void)
+{
+    if (_pid == KERNEL_PID_UNDEF) {
+        _pid = thread_create(_stack, sizeof(_stack), NG_PKTDUMP_PRIO,
+                             0, _eventloop, NULL, "pktdump");
+    }
+    return _pid;
 }
