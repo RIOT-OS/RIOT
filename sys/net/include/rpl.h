@@ -8,7 +8,11 @@
  */
 
 /**
+ * @defgroup    rpl RPL Header
+ * @brief       Provides core functionality for RPL 
+ * 
  * @ingroup     rpl
+ *
  * @{
  *
  * @file        rpl.h
