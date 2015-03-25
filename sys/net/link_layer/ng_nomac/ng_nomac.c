@@ -49,6 +49,7 @@ static void _event_cb(ng_netdev_event_t event, void *data)
         if (sendto == NULL) {
             DEBUG("nomac: unable to forward packet of type %i\n", pkt->type);
             ng_pktbuf_release(pkt);
+            return;
         }
         /* send the packet to everyone interested in it's type */
         ng_pktbuf_hold(pkt, ng_netreg_num(pkt->type, NG_NETREG_DEMUX_CTX_ALL) - 1);
