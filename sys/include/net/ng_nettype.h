@@ -145,7 +145,7 @@ static inline ng_nettype_t ng_nettype_from_protnum(uint8_t num)
     switch (num) {
 #ifdef MODULE_NG_ICMPV6
         case NG_PROTNUM_ICMPV6:
-            return NG_NETTYPE_IPCMPV6;
+            return NG_NETTYPE_ICMPV6;
 #endif
 #ifdef MODULE_NG_IPV6
         case NG_PROTNUM_IPV6:
@@ -180,7 +180,7 @@ static inline uint8_t ng_nettype_to_protnum(ng_nettype_t type)
     switch (type) {
 #ifdef MODULE_NG_ICMPV6
         case NG_NETTYPE_ICMPV6:
-            return NG_PROTNUM_IPCMPV6;
+            return NG_PROTNUM_ICMPV6;
 #endif
 #ifdef MODULE_NG_IPV6
         case NG_NETTYPE_IPV6:
