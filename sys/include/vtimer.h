@@ -106,10 +106,10 @@ int vtimer_sleep(timex_t time);
  * The sent message will be constructed from the process id, the type and the
  * pointer. The message will be sent from interrupt context.
  * The message construction and sending is equivalent to:
- * @code
- *       msg_t msg = { .type = type, .content = { .value = (unsigned int) ptr } };
- *       msg_send_int(&msg, pid);
- * @endcode
+ * ~~~~~~~ {.c}
+ * msg_t msg = { .type = type, .content = { .value = (unsigned int) ptr } };
+ * msg_send_int(&msg, pid);
+ * ~~~~~~~
  * @param[in]   t           pointer to an uninitialised vtimer_t structure
  * @param[in]   interval    vtimer timex_t interval
  * @param[in]   pid         process id
