@@ -29,6 +29,13 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Message queue size for the pktdump thread
+ */
+#ifndef NG_PKTDUMP_MSG_QUEUE_SIZE
+#define NG_PKTDUMP_MSG_QUEUE_SIZE       (8U)
+#endif
+
+/**
  * @brief   Start the packet dump thread and listening for incoming packets
  *
  * @param[in] stack         stack for the packet dump thread

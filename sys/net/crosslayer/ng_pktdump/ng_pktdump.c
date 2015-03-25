@@ -90,6 +90,10 @@ void *_eventloop(void *arg)
 {
     (void)arg;
     msg_t msg;
+    msg_t msg_queue[NG_PKTDUMP_MSG_QUEUE_SIZE];
+
+    /* setup the message queue */
+    msg_init_queue(msg_queue, NG_PKTDUMP_MSG_QUEUE_SIZE);
 
     while (1) {
         msg_receive(&msg);
