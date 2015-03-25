@@ -16,6 +16,7 @@
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  * @author      Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
  * @author      Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
  * @}
  */
@@ -167,6 +168,10 @@ extern int _fib_route_handler(int argc, char **argv);
 extern int _ipv6_nc_manage(int argc, char **argv);
 #endif
 
+#ifdef MODULE_NG_UDP
+extern void _udp(int argc, char **argv);
+#endif
+
 const shell_command_t _shell_command_list[] = {
     {"reboot", "Reboot the node", _reboot_handler},
 #ifdef MODULE_CONFIG
@@ -273,6 +278,9 @@ const shell_command_t _shell_command_list[] = {
 #endif
 #ifdef MODULE_NG_IPV6_NC
     {"ncache", "manage neighbor cache by hand", _ipv6_nc_manage },
+#endif
+#ifdef MODULE_NG_UDP
+    {"udp", "send data over UDP and listen on UDP ports", _udp},
 #endif
     {NULL, NULL, NULL}
 };
