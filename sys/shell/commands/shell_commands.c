@@ -254,11 +254,7 @@ const shell_command_t _shell_command_list[] = {
 #endif
 #ifdef MODULE_NG_NETIF
 #ifndef MODULE_NET_IF
-    {
-        "ifconfig",
-        "Configures a network interface\n\nusage: %s [<if_id> set <key> <value>]]",
-        _netif_config
-    },
+    {"ifconfig", "Configure network interfaces", _netif_config},
 #endif
 #ifndef MODULE_TRANSCEIVER
     {"txtsnd", "send raw data", _netif_send },
