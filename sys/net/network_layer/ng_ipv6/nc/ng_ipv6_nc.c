@@ -136,6 +136,50 @@ ng_ipv6_nc_t *ng_ipv6_nc_get(kernel_pid_t iface, const ng_ipv6_addr_t *ipv6_addr
     return NULL;
 }
 
+ng_ipv6_nc_t *ng_ipv6_nc_get_next(ng_ipv6_nc_t *prev)
+{
+    if (prev == NULL) {
+        prev = ncache;
+    }
+    else {
+        prev++;     /* get next entry */
+    }
+
+    while (prev - ncache < NG_IPV6_NC_SIZE) {   /* while not reached end */
+        if (!ng_ipv6_addr_is_unspecified(&(prev->ipv6_addr))) {
+            return prev;
+        }
+
+        prev++;
+    }
+
+    return NULL;
+}
+
+static inline bool _is_reachable(ng_ipv6_nc_t *entry)
+{
+    switch ((entry->flags & NG_IPV6_NC_STATE_MASK) >> NG_IPV6_NC_STATE_POS) {
+        case NG_IPV6_NC_STATE_UNREACHABLE:
+        case NG_IPV6_NC_STATE_INCOMPLETE:
+            return false;
+        default:
+            return true;
+    }
+}
+
+ng_ipv6_nc_t *ng_ipv6_nc_get_next_router(ng_ipv6_nc_t *prev)
+{
+    ng_ipv6_nc_t *router;
+
+    NG_IPV6_NC_ITER_FROM(prev, router) {
+        if (_is_reachable(router) && (router->flags & NG_IPV6_NC_IS_ROUTER)) {
+            return router;
+        }
+    }
+
+    return NULL;
+}
+
 ng_ipv6_nc_t *ng_ipv6_nc_get_reachable(kernel_pid_t iface,
                                        const ng_ipv6_addr_t *ipv6_addr)
 {
@@ -148,17 +192,11 @@ ng_ipv6_nc_t *ng_ipv6_nc_get_reachable(kernel_pid_t iface,
         return NULL;
     }
 
-    switch ((entry->flags & NG_IPV6_NC_STATE_MASK) >> NG_IPV6_NC_STATE_POS) {
-        case NG_IPV6_NC_STATE_UNREACHABLE:
-        case NG_IPV6_NC_STATE_INCOMPLETE:
-            DEBUG("ipv6_nc: Entry %s is unreachable (flags = 0x%02x)\n",
-                  ng_ipv6_addr_to_str(addr_str, ipv6_addr, sizeof(addr_str)),
-                  entry->flags);
-            return NULL;
-
-        default:
-            return entry;
+    if (_is_reachable(entry)) {
+        return entry;
     }
+
+    return NULL;
 }
 
 ng_ipv6_nc_t *ng_ipv6_nc_still_reachable(const ng_ipv6_addr_t *ipv6_addr)
