@@ -104,8 +104,8 @@ int at86rf231_on(void)
     at86rf231_reg_write(AT86RF231_REG__TRX_STATE, AT86RF231_TRX_STATE__FORCE_TRX_OFF);
 
     /* busy wait for TRX_OFF state */
+    int delay = _MAX_RETRIES;
     do {
-        int delay = _MAX_RETRIES;
         if (!--delay) {
             DEBUG("at86rf231 : ERROR : could not enter TRX_OFF mode\n");
             return 0;
@@ -115,8 +115,8 @@ int at86rf231_on(void)
     at86rf231_reg_write(AT86RF231_REG__TRX_STATE, AT86RF231_TRX_STATE__RX_ON);
 
     /* change into basic reception mode to initialise CSMA seed by RNG */
+    delay = _MAX_RETRIES;
     do {
-        int delay = _MAX_RETRIES;
         if (!--delay) {
             DEBUG("at86rf231 : ERROR : could not enter RX_ON mode\n");
             return 0;
