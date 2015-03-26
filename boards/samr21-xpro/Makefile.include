@@ -33,6 +33,9 @@ export LINKFLAGS += -T$(LINKERSCRIPT)
 export OFLAGS = -O ihex
 export TERMFLAGS += -p "$(PORT)"
 export FFLAGS = flash
+ifneq (,$(SERIAL))
+export FFLAGS += "-c cmsis_dap_serial $(SERIAL)"
+endif
 export DEBUGGER_FLAGS = debug
 export DEBUGSERVER_FLAGS = debug-server
 export RESET_FLAGS = reset
