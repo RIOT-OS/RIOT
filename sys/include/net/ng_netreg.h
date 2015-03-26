@@ -126,6 +126,20 @@ int ng_netreg_num(ng_nettype_t type, uint32_t demux_ctx);
  */
 ng_netreg_entry_t *ng_netreg_getnext(ng_netreg_entry_t *entry);
 
+/**
+ * @brief   Iterator for all network registry entries matching @p type and
+ *          @p demux
+ *
+ * @param[out] entry    The next registry entry
+ * @param[in] type      Type of the protocol.
+ * @param[in] demux_ctx The demultiplexing context for the registered thread.
+ *                      See ng_netreg_entry_t::demux_ctx.
+ */
+#define NG_NETREG_FOREACH(entry, type, demux_ctx) \
+    for (entry = ng_netreg_lookup(type, demux_ctx); \
+         entry != NULL; \
+         entry = ng_netreg_getnext(entry))
+
 #ifdef __cplusplus
 }
 #endif

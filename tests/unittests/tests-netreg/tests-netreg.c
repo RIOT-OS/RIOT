@@ -150,6 +150,33 @@ void test_netreg_getnext__2_entries(void)
     TEST_ASSERT_NOT_NULL(ng_netreg_getnext(entry));
 }
 
+void test_netreg_foreach__empty(void)
+{
+    ng_netreg_entry_t *entry = NULL;
+    int count = 0;
+
+    NG_NETREG_FOREACH(entry, NG_NETTYPE_TEST, TEST_UINT16) {
+        TEST_ASSERT_NOT_NULL(entry);
+        count++;
+    }
+
+    TEST_ASSERT_EQUAL_INT(0, count);
+}
+
+void test_netreg_foreach__2_entries(void)
+{
+    ng_netreg_entry_t *entry = NULL;
+    int count = 0;
+
+    test_netreg_num__2_entries();
+    NG_NETREG_FOREACH(entry, NG_NETTYPE_TEST, TEST_UINT16) {
+        TEST_ASSERT_NOT_NULL(entry);
+        count++;
+    }
+
+    TEST_ASSERT_EQUAL_INT(2, count);
+}
+
 Test *tests_netreg_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -166,6 +193,8 @@ Test *tests_netreg_tests(void)
         new_TestFixture(test_netreg_num__2_entries),
         new_TestFixture(test_netreg_getnext__NULL),
         new_TestFixture(test_netreg_getnext__2_entries),
+        new_TestFixture(test_netreg_foreach__empty),
+        new_TestFixture(test_netreg_foreach__2_entries),
     };
 
     EMB_UNIT_TESTCALLER(netreg_tests, set_up, NULL, fixtures);
