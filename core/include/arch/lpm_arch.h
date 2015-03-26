@@ -19,8 +19,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef __LPM_ARCH_H
-#define __LPM_ARCH_H
+#ifndef LPM_ARCH_H
+#define LPM_ARCH_H
 
 #ifdef __cplusplus
  extern "C" {
@@ -96,5 +96,5 @@ void lpm_arch_end_awake(void);
 }
 #endif
 
-#endif /* __LPM_ARCH_H */
+#endif /* LPM_ARCH_H */
 /** @} */
