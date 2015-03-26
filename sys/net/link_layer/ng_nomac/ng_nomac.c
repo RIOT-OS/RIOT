@@ -40,22 +40,20 @@ static void _event_cb(ng_netdev_event_t event, void *data)
     if (event == NETDEV_EVENT_RX_COMPLETE) {
         ng_pktsnip_t *pkt;
         ng_netreg_entry_t *sendto;
+        int sendto_num = ng_netreg_num(pkt->type, NG_NETREG_DEMUX_CTX_ALL);
 
         /* get pointer to the received packet */
         pkt = (ng_pktsnip_t *)data;
-        /* find out, who to send the packet to */
-        sendto = ng_netreg_lookup(pkt->type, NG_NETREG_DEMUX_CTX_ALL);
         /* throw away packet if no one is interested */
-        if (sendto == NULL) {
+        if (sendto_num == 0) {
             DEBUG("nomac: unable to forward packet of type %i\n", pkt->type);
             ng_pktbuf_release(pkt);
         }
         /* send the packet to everyone interested in it's type */
-        ng_pktbuf_hold(pkt, ng_netreg_num(pkt->type, NG_NETREG_DEMUX_CTX_ALL) - 1);
-        while (sendto != NULL) {
+        ng_pktbuf_hold(pkt, sendto_num - 1);
+        NG_NETREG_FOREACH(sendto, pkt->type, NG_NETREG_DEMUX_CTX_ALL) {
             DEBUG("nomac: sending pkt %p to PID %u\n", pkt, sendto->pid);
             ng_netapi_receive(sendto->pid, pkt);
-            sendto = ng_netreg_getnext(sendto);
         }
     }
 }
