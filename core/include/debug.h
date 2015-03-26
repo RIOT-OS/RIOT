@@ -19,8 +19,8 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-#ifndef __DEBUG_H
-#define __DEBUG_H
+#ifndef DEBUG_H
+#define DEBUG_H
 
 #include <stdio.h>
 #include "sched.h"
@@ -112,5 +112,5 @@ extern "C" {
 }
 #endif
 
-#endif /* __DEBUG_H */
+#endif /* DEBUG_H */
 /** @} */

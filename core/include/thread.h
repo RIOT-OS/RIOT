@@ -19,8 +19,8 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-#ifndef __THREAD_H
-#define __THREAD_H
+#ifndef THREAD_H
+#define THREAD_H
 
 #include "kernel.h"
 #include "tcb.h"
@@ -192,4 +192,4 @@ uintptr_t thread_measure_stack_free(char *stack);
 #endif
 
 /** @} */
-#endif /* __THREAD_H */
+#endif /* THREAD_H */

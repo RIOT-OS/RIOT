@@ -29,8 +29,8 @@
  * @author      Kévin Roussel <Kevin.Roussel@inria.fr>
  */
 
-#ifndef __MSG_H_
-#define __MSG_H_
+#ifndef MSG_H_
+#define MSG_H_
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -238,5 +238,5 @@ int msg_init_queue(msg_t *array, int num);
 }
 #endif
 
-#endif /* __MSG_H_ */
+#endif /* MSG_H_ */
 /** @} */
