@@ -145,7 +145,7 @@ ng_ipv6_nc_t *ng_ipv6_nc_get_next(ng_ipv6_nc_t *prev)
         prev++;     /* get next entry */
     }
 
-    while (prev - ncache < NG_IPV6_NC_SIZE) {   /* while not reached end */
+    while (prev < (ncache + NG_IPV6_NC_SIZE)) { /* while not reached end */
         if (!ng_ipv6_addr_is_unspecified(&(prev->ipv6_addr))) {
             return prev;
         }
