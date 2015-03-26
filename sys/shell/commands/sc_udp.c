@@ -22,6 +22,7 @@
 #include "net/ng_netbase.h"
 #include "net/ng_udp.h"
 #include "net/ng_ipv6.h"
+#include "net/ng_ipv6/addr.h"
 
 #ifdef MODULE_NG_PKTDUMP
 static ng_netreg_entry_t _server = {NULL,
@@ -42,7 +43,7 @@ void _send(char *addr, char *port, char *data)
      * For the future: we should read the type of address from the addr string,
      * so figure out if IPv4 or IPv6 and build the header accordingly...
      * So only IPv6 support for now */
-    if (_parse_addr(&ip_addr, addr) < 0) {
+    if (ng_ipv6_addr_from_str(&ip_addr, addr) == NULL) {
         puts("Error: unable to parse destination address");
         return;
     }
