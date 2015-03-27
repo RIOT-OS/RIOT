@@ -154,6 +154,9 @@ static void test_ipv6_netif_add_addr__ENOMEM(void)
     ng_ipv6_addr_t addr = DEFAULT_TEST_IPV6_ADDR;
     int res = 0, i;
 
+    /* make link local to avoid automatic link local adding */
+    ng_ipv6_addr_set_link_local_prefix(&addr);
+
     test_ipv6_netif_add__success(); /* adds DEFAULT_TEST_NETIF as interface */
 
     for (i = 0; res != -ENOMEM; i++, addr.u8[15]++) {
@@ -272,6 +275,11 @@ static void test_ipv6_netif_find_addr__success(void)
 
     TEST_ASSERT_NOT_NULL((out = ng_ipv6_netif_find_addr(DEFAULT_TEST_NETIF, &addr)));
     TEST_ASSERT(out != &addr);
+    TEST_ASSERT_EQUAL_INT(true, ng_ipv6_addr_equal(out, &addr));
+
+    /* also test for link local address */
+    ng_ipv6_addr_set_link_local_prefix(&addr);
+    TEST_ASSERT_NOT_NULL((out = ng_ipv6_netif_find_addr(DEFAULT_TEST_NETIF, &addr)));
     TEST_ASSERT_EQUAL_INT(true, ng_ipv6_addr_equal(out, &addr));
 }
 
