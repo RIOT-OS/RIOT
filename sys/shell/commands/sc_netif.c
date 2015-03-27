@@ -296,10 +296,10 @@ int _netif_send(int argc, char **argv)
     size_t addr_len;
     ng_pktsnip_t *pkt;
     ng_netif_hdr_t *nethdr;
-
+    uint8_t flags = 0x00;
 
     if (argc < 4) {
-        printf("usage: %s <if> <addr> <data>\n", argv[0]);
+        printf("usage: %s <if> [<addr>|bcast] <data>\n", argv[0]);
         return 1;
     }
 
@@ -315,8 +315,13 @@ int _netif_send(int argc, char **argv)
     addr_len = ng_netif_addr_from_str(addr, sizeof(addr), argv[2]);
 
     if (addr_len == 0) {
-        puts("error: invalid address given");
-        return 1;
+        if (strcmp(argv[2], "bcast") == 0) {
+            flags |= NG_NETIF_HDR_FLAGS_BROADCAST;
+        }
+        else {
+            puts("error: invalid address given");
+            return 1;
+        }
     }
 
     /* put packet together */
@@ -326,6 +331,7 @@ int _netif_send(int argc, char **argv)
     nethdr = (ng_netif_hdr_t *)pkt->data;
     ng_netif_hdr_init(nethdr, 0, addr_len);
     ng_netif_hdr_set_dst_addr(nethdr, addr, addr_len);
+    nethdr->flags = flags;
     /* and send it */
     ng_netapi_send(dev, pkt);
 
