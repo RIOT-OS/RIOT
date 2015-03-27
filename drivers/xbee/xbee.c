@@ -486,6 +486,12 @@ int xbee_init(xbee_t *dev, uart_t uart, uint32_t baudrate,
     return 0;
 }
 
+static inline bool _is_broadcast(ng_netif_hdr_t *hdr) {
+    /* IEEE 802.15.4 does not support multicast so we need to check both flags */
+    return (bool)(hdr->flags & (NG_NETIF_HDR_FLAGS_BROADCAST |
+                                NG_NETIF_HDR_FLAGS_MULTICAST));
+}
+
 int _send(ng_netdev_t *netdev, ng_pktsnip_t *pkt)
 {
     xbee_t *dev = (xbee_t *)netdev;
@@ -510,9 +516,10 @@ int _send(ng_netdev_t *netdev, ng_pktsnip_t *pkt)
         ng_pktbuf_release(pkt);
         return -EOVERFLOW;
     }
-    /* get netif header check address length */
+    /* get netif header check address length and flags */
     hdr = (ng_netif_hdr_t *)pkt->data;
-    if (!(hdr->dst_l2addr_len == 2 || hdr->dst_l2addr_len == 8)) {
+    if (!((hdr->dst_l2addr_len == 2) || (hdr->dst_l2addr_len == 8) ||
+          _is_broadcast(hdr))) {
         ng_pktbuf_release(pkt);
         return -ENOMSG;
     }
@@ -523,6 +530,13 @@ int _send(ng_netdev_t *netdev, ng_pktsnip_t *pkt)
     dev->tx_buf[0] = API_START_DELIMITER;
     dev->tx_buf[4] = 0;         /* set to zero to disable response frame */
     /* set size, API id and address field depending on dst address length  */
+    if (_is_broadcast(hdr)) {
+        dev->tx_buf[1] = (uint8_t)((size + 5) >> 8);
+        dev->tx_buf[2] = (uint8_t)(size + 5);
+        dev->tx_buf[3] = API_ID_TX_SHORT_ADDR;
+        dev->tx_buf[4] = 0xff;
+        dev->tx_buf[5] = 0xff;
+    }
     if (hdr->dst_l2addr_len == 2) {
         dev->tx_buf[1] = (uint8_t)((size + 5) >> 8);
         dev->tx_buf[2] = (uint8_t)(size + 5);
