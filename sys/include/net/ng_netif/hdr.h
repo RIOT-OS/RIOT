@@ -33,6 +33,37 @@ extern "C" {
 #endif
 
 /**
+ * @{
+ * @name    Flags for the ng_netif_hdr_t
+ */
+/**
+ * @brief   Send packet broadcast.
+ *
+ * @details Packets with this flag set must be send broadcast.
+ *          ng_netif_hdr_t::dst_l2addr_len and any appended destination
+ *          address must be ignored.
+ *          If the link layer does not support broadcast the packet must be
+ *          dropped silently.
+ */
+#define NG_NETIF_HDR_FLAGS_BROADCAST    (0x80)
+
+/**
+ * @brief   Send packet multicast.
+ *
+ * @details Packets with this flag set must be send multicast.
+ *          ng_netif_hdr_t::dst_l2addr_len and any appended destination
+ *          address must be ignored.
+ *          The context for the multicast address must be derived from the
+ *          network layer destination address.
+ *          If the link layer does not support multicast it should interpret
+ *          this flag the same way it does @ref NG_NETIF_HDR_FLAGS_BROADCAST.
+ */
+#define NG_NETIF_HDR_FLAGS_MULTICAST    (0x40)
+/**
+ * @}
+ */
+
+/**
  * @brief   Generic network interface header
  *
  * The link layer addresses included in this header are put in memory directly
@@ -42,6 +73,7 @@ typedef struct __attribute__((packed)) {
     uint8_t src_l2addr_len;     /**< length of l2 source address in byte */
     uint8_t dst_l2addr_len;     /**< length of l2 destination address in byte */
     kernel_pid_t if_pid;        /**< PID of network interface */
+    uint8_t flags;              /**< flags as defined above */
     uint8_t rssi;               /**< rssi of received packet (optional) */
     uint8_t lqi;                /**< lqi of received packet (optional) */
 } ng_netif_hdr_t;
@@ -61,6 +93,7 @@ static inline void ng_netif_hdr_init(ng_netif_hdr_t *hdr, uint8_t src_l2addr_len
     hdr->if_pid = KERNEL_PID_UNDEF;
     hdr->rssi = 0;
     hdr->lqi = 0;
+    hdr->flags = 0;
 }
 
 /**
