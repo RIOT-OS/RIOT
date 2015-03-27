@@ -162,6 +162,7 @@ static inline bool _is_reachable(ng_ipv6_nc_t *entry)
         case NG_IPV6_NC_STATE_UNREACHABLE:
         case NG_IPV6_NC_STATE_INCOMPLETE:
             return false;
+
         default:
             return true;
     }
@@ -169,9 +170,8 @@ static inline bool _is_reachable(ng_ipv6_nc_t *entry)
 
 ng_ipv6_nc_t *ng_ipv6_nc_get_next_router(ng_ipv6_nc_t *prev)
 {
-    ng_ipv6_nc_t *router;
-
-    NG_IPV6_NC_ITER_FROM(prev, router) {
+    for (ng_ipv6_nc_t *router = ng_ipv6_nc_get_next(prev); router != NULL;
+         router = ng_ipv6_nc_get_next(router)) {
         if (_is_reachable(router) && (router->flags & NG_IPV6_NC_IS_ROUTER)) {
             return router;
         }

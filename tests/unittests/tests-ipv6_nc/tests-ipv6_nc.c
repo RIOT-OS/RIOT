@@ -264,127 +264,6 @@ static void test_ipv6_nc_get_next__holey(void)
     TEST_ASSERT_NULL(ng_ipv6_nc_get_next(entry));
 }
 
-static void test_ipv6_nc_iter_from__empty(void)
-{
-    int count = 0;
-    ng_ipv6_nc_t *entry = NULL;
-
-    NG_IPV6_NC_ITER_FROM(NULL, entry) {
-        count++;
-    }
-
-    TEST_ASSERT_EQUAL_INT(0, count);
-}
-
-static void test_ipv6_nc_iter_from__1_entry(void)
-{
-    int count = 0;
-    ng_ipv6_nc_t *entry = NULL;
-
-    test_ipv6_nc_add__success(); /* adds DEFAULT_TEST_IPV6_ADDR to DEFAULT_TEST_NETIF */
-    NG_IPV6_NC_ITER_FROM(NULL, entry) {
-        TEST_ASSERT_NOT_NULL(entry);
-        count++;
-    }
-
-    TEST_ASSERT_EQUAL_INT(1, count);
-}
-
-static void test_ipv6_nc_iter_from__2_entries(void)
-{
-    int count = 0;
-    ng_ipv6_nc_t *entry1 = NULL, *entry2 = NULL;
-
-    /* adds DEFAULT_TEST_IPV6_ADDR and OTHER_TEST_IPV6_ADDR to DEFAULT_TEST_NETIF */
-    test_ipv6_nc_get_next__2_entries();
-
-    TEST_ASSERT_NOT_NULL((entry1 = ng_ipv6_nc_get_next(NULL)));
-
-    NG_IPV6_NC_ITER_FROM(entry1, entry2) {
-        TEST_ASSERT_NOT_NULL(entry2);
-        TEST_ASSERT(entry1 == ng_ipv6_nc_get_next(NULL));
-        count++;
-    }
-
-    TEST_ASSERT_EQUAL_INT(1, count);
-}
-
-static void test_ipv6_nc_iter_from__holey(void)
-{
-    int count = 0;
-    ng_ipv6_nc_t *entry = NULL;
-
-    /* adds DEFAULT_TEST_IPV6_ADDR and THIRD_TEST_IPV6_ADDR to DEFAULT_TEST_NETIF,
-     * but leaves a "hole" where OTHER_TEST_IPV6_ADDR was previously */
-    test_ipv6_nc_get_next__holey();
-
-    NG_IPV6_NC_ITER_FROM(NULL, entry) {
-        TEST_ASSERT_NOT_NULL(entry);
-        count++;
-    }
-
-    TEST_ASSERT_EQUAL_INT(2, count);
-}
-
-static void test_ipv6_nc_iter__empty(void)
-{
-    int count = 0;
-    ng_ipv6_nc_t *entry = NULL;
-
-    NG_IPV6_NC_ITER(entry) {
-        count++;
-    }
-
-    TEST_ASSERT_EQUAL_INT(0, count);
-}
-
-static void test_ipv6_nc_iter__1_entry(void)
-{
-    int count = 0;
-    ng_ipv6_nc_t *entry = NULL;
-
-    test_ipv6_nc_add__success(); /* adds DEFAULT_TEST_IPV6_ADDR to DEFAULT_TEST_NETIF */
-    NG_IPV6_NC_ITER(entry) {
-        TEST_ASSERT_NOT_NULL(entry);
-        count++;
-    }
-
-    TEST_ASSERT_EQUAL_INT(1, count);
-}
-
-static void test_ipv6_nc_iter__2_entries(void)
-{
-    int count = 0;
-    ng_ipv6_nc_t *entry = NULL;
-
-    /* adds DEFAULT_TEST_IPV6_ADDR and OTHER_TEST_IPV6_ADDR to DEFAULT_TEST_NETIF */
-    test_ipv6_nc_get_next__2_entries();
-
-    NG_IPV6_NC_ITER(entry) {
-        TEST_ASSERT_NOT_NULL(entry);
-        count++;
-    }
-
-    TEST_ASSERT_EQUAL_INT(2, count);
-}
-
-static void test_ipv6_nc_iter__holey(void)
-{
-    int count = 0;
-    ng_ipv6_nc_t *entry = NULL;
-
-    /* adds DEFAULT_TEST_IPV6_ADDR and THIRD_TEST_IPV6_ADDR to DEFAULT_TEST_NETIF,
-     * but leaves a "hole" where OTHER_TEST_IPV6_ADDR was previously */
-    test_ipv6_nc_get_next__holey();
-
-    NG_IPV6_NC_ITER(entry) {
-        TEST_ASSERT_NOT_NULL(entry);
-        count++;
-    }
-
-    TEST_ASSERT_EQUAL_INT(2, count);
-}
-
 static void test_ipv6_nc_get_next_router__empty(void)
 {
     TEST_ASSERT_NULL(ng_ipv6_nc_get_next_router(NULL));
@@ -418,66 +297,6 @@ static void test_ipv6_nc_get_next_router__second_entry(void)
     TEST_ASSERT_NOT_NULL((entry1 = ng_ipv6_nc_get_next_router(NULL)));
     TEST_ASSERT(entry2 == entry1);
     TEST_ASSERT_NULL(ng_ipv6_nc_get_next_router(entry1));
-}
-
-static void test_ipv6_nc_iter_router_from__empty(void)
-{
-    int count = 0;
-    ng_ipv6_nc_t *entry = NULL;
-
-    NG_IPV6_NC_ITER_ROUTERS_FROM(NULL, entry) {
-        count++;
-    }
-
-    TEST_ASSERT_EQUAL_INT(0, count);
-}
-
-static void test_ipv6_nc_iter_router_from__filled(void)
-{
-    int count = 0;
-    ng_ipv6_nc_t *entry1 = NULL, *entry2 = NULL;
-
-    /* adds DEFAULT_TEST_IPV6_ADDR and OTHER_TEST_IPV6_ADDR to DEFAULT_TEST_NETIF
-     * and marks OTHER_TEST_IPV6_ADDR as reachable router */
-    test_ipv6_nc_get_next_router__second_entry();
-    TEST_ASSERT_NOT_NULL((entry1 = ng_ipv6_nc_get_next(NULL)));
-
-    NG_IPV6_NC_ITER_ROUTERS_FROM(entry1, entry2) {
-        TEST_ASSERT_NOT_NULL(entry2);
-        TEST_ASSERT(entry1 == ng_ipv6_nc_get_next(NULL));
-        count++;
-    }
-
-    TEST_ASSERT_EQUAL_INT(1, count);
-}
-
-static void test_ipv6_nc_iter_router__empty(void)
-{
-    int count = 0;
-    ng_ipv6_nc_t *entry = NULL;
-
-    NG_IPV6_NC_ITER_ROUTERS(entry) {
-        count++;
-    }
-
-    TEST_ASSERT_EQUAL_INT(0, count);
-}
-
-static void test_ipv6_nc_iter_router__filled(void)
-{
-    int count = 0;
-    ng_ipv6_nc_t *entry = NULL;
-
-    /* adds DEFAULT_TEST_IPV6_ADDR and OTHER_TEST_IPV6_ADDR to DEFAULT_TEST_NETIF
-     * and marks OTHER_TEST_IPV6_ADDR as reachable router */
-    test_ipv6_nc_get_next_router__second_entry();
-
-    NG_IPV6_NC_ITER_ROUTERS(entry) {
-        TEST_ASSERT_NOT_NULL(entry);
-        count++;
-    }
-
-    TEST_ASSERT_EQUAL_INT(1, count);
 }
 
 static void test_ipv6_nc_get_reachable__incomplete_if_local(void)
@@ -595,21 +414,9 @@ Test *tests_ipv6_nc_tests(void)
         new_TestFixture(test_ipv6_nc_get_next__1_entry),
         new_TestFixture(test_ipv6_nc_get_next__2_entries),
         new_TestFixture(test_ipv6_nc_get_next__holey),
-        new_TestFixture(test_ipv6_nc_iter_from__empty),
-        new_TestFixture(test_ipv6_nc_iter_from__1_entry),
-        new_TestFixture(test_ipv6_nc_iter_from__2_entries),
-        new_TestFixture(test_ipv6_nc_iter_from__holey),
-        new_TestFixture(test_ipv6_nc_iter__empty),
-        new_TestFixture(test_ipv6_nc_iter__1_entry),
-        new_TestFixture(test_ipv6_nc_iter__2_entries),
-        new_TestFixture(test_ipv6_nc_iter__holey),
         new_TestFixture(test_ipv6_nc_get_next_router__empty),
         new_TestFixture(test_ipv6_nc_get_next_router__first_entry),
         new_TestFixture(test_ipv6_nc_get_next_router__second_entry),
-        new_TestFixture(test_ipv6_nc_iter_router_from__empty),
-        new_TestFixture(test_ipv6_nc_iter_router_from__filled),
-        new_TestFixture(test_ipv6_nc_iter_router__empty),
-        new_TestFixture(test_ipv6_nc_iter_router__filled),
         new_TestFixture(test_ipv6_nc_get_reachable__incomplete_if_local),
         new_TestFixture(test_ipv6_nc_get_reachable__incomplete_if_global),
         new_TestFixture(test_ipv6_nc_get_reachable__reachable_if_local),
