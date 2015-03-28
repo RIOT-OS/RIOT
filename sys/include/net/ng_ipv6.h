@@ -23,6 +23,7 @@
 #define NG_IPV6_H_
 
 #include "net/ng_ipv6/addr.h"
+#include "net/ng_ipv6/hdr.h"
 #include "net/ng_ipv6/netif.h"
 
 #ifdef __cplusplus
