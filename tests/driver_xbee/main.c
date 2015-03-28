@@ -56,11 +56,6 @@ static xbee_t dev;
 static char nomac_stack[KERNEL_CONF_STACKSIZE_DEFAULT];
 
 /**
- * @brief   Stack for the pktdump thread
- */
-static char dump_stack[KERNEL_CONF_STACKSIZE_MAIN];
-
-/**
  * @brief   Read chars from STDIO
  */
 int shell_read(void)
@@ -93,8 +88,7 @@ int main(void)
     ng_netif_init();
 
     /* initialize and register pktdump */
-    dump.pid = ng_pktdump_init(dump_stack, sizeof(dump_stack), PRIORITY_MAIN - 2,
-                           "dump");
+    dump.pid = ng_pktdump_getpid();
     if (dump.pid <= KERNEL_PID_UNDEF) {
         puts("Error starting pktdump thread");
         return -1;
