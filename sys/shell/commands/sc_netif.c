@@ -145,7 +145,7 @@ static void _print_netconf_state(ng_netconf_state_t state)
     }
 }
 
-void _netif_list(kernel_pid_t dev)
+static void _netif_list(kernel_pid_t dev)
 {
     uint8_t hwaddr[MAX_ADDR_LEN];
     uint16_t u16;
@@ -192,7 +192,7 @@ void _netif_list(kernel_pid_t dev)
         _print_netconf_state(state);
     }
 
-    printf("\n            ");
+    printf("\n           ");
 
     res = ng_netapi_get(dev, NETCONF_OPT_ADDRESS_LONG, 0, hwaddr, sizeof(hwaddr));
 
@@ -201,7 +201,7 @@ void _netif_list(kernel_pid_t dev)
         printf("Long HWaddr: ");
         printf("%s", ng_netif_addr_to_str(hwaddr_str, sizeof(hwaddr_str),
                                           hwaddr, res));
-        printf("\n            ");
+        printf("\n           ");
     }
 
     res = ng_netapi_get(dev, NETCONF_OPT_PROMISCUOUSMODE, 0, &enable, sizeof(enable));
@@ -240,8 +240,8 @@ void _netif_list(kernel_pid_t dev)
     puts("");
 }
 
-static void _netif_set_u16(kernel_pid_t dev, ng_netconf_opt_t opt,
-                           char *u16_str)
+static int _netif_set_u16(kernel_pid_t dev, ng_netconf_opt_t opt,
+                          char *u16_str)
 {
     unsigned int res;
     bool hex = false;
@@ -250,14 +250,14 @@ static void _netif_set_u16(kernel_pid_t dev, ng_netconf_opt_t opt,
         if ((res = strtoul(u16_str, NULL, 10)) == ULONG_MAX) {
             puts("error: unable to parse value.\n"
                  "Must be a 16-bit unsigned integer (dec or hex)\n");
-            return;
+            return 1;
         }
     }
     else {
         if ((res = strtoul(u16_str, NULL, 16)) == ULONG_MAX) {
             puts("error: unable to parse value.\n"
                  "Must be a 16-bit unsigned integer (dec or hex)\n");
-            return;
+            return 1;
         }
 
         hex = true;
@@ -266,14 +266,14 @@ static void _netif_set_u16(kernel_pid_t dev, ng_netconf_opt_t opt,
     if (res > 0xffff) {
         puts("error: unable to parse value.\n"
              "Must be a 16-bit unsigned integer (dec or hex)\n");
-        return;
+        return 1;
     }
 
     if (ng_netapi_set(dev, opt, 0, (uint16_t *)&res, sizeof(uint16_t)) < 0) {
         printf("error: unable to set ");
         _print_netconf(opt);
         puts("");
-        return;
+        return 1;
     }
 
     printf("success: set ");
@@ -286,10 +286,12 @@ static void _netif_set_u16(kernel_pid_t dev, ng_netconf_opt_t opt,
     else {
         printf("%u\n", res);
     }
+
+    return 0;
 }
 
-static void _netif_set_i16(kernel_pid_t dev, ng_netconf_opt_t opt,
-                           char *i16_str)
+static int _netif_set_i16(kernel_pid_t dev, ng_netconf_opt_t opt,
+                          char *i16_str)
 {
     int16_t val = (int16_t)atoi(i16_str);
 
@@ -297,25 +299,29 @@ static void _netif_set_i16(kernel_pid_t dev, ng_netconf_opt_t opt,
         printf("error: unable to set ");
         _print_netconf(opt);
         puts("");
-        return;
+        return 1;
     }
 
     printf("success: set ");
     _print_netconf(opt);
     printf(" on interface %" PRIkernel_pid " to %i\n", dev, val);
+
+    return 0;
 }
 
-static void _netif_set_flag(kernel_pid_t dev, ng_netconf_opt_t opt,
-                            ng_netconf_enable_t set)
+static int _netif_set_flag(kernel_pid_t dev, ng_netconf_opt_t opt,
+                           ng_netconf_enable_t set)
 {
     if (ng_netapi_set(dev, opt, 0, &set, sizeof(ng_netconf_enable_t)) < 0) {
         puts("error: unable to set option");
+        return 1;
     }
     printf("success: %sset option\n", (set) ? "" : "un");
+    return 0;
 }
 
-static void _netif_set_addr(kernel_pid_t dev, ng_netconf_opt_t opt,
-                            char *addr_str)
+static int _netif_set_addr(kernel_pid_t dev, ng_netconf_opt_t opt,
+                           char *addr_str)
 {
     uint8_t addr[MAX_ADDR_LEN];
     size_t addr_len = ng_netif_addr_from_str(addr, sizeof(addr), addr_str);
@@ -324,22 +330,24 @@ static void _netif_set_addr(kernel_pid_t dev, ng_netconf_opt_t opt,
         puts("error: unable to parse address.\n"
              "Must be of format [0-9a-fA-F]{2}(:[0-9a-fA-F]{2})*\n"
              "(hex pairs delimited by colons)");
-        return;
+        return 1;
     }
 
     if (ng_netapi_set(dev, opt, 0, addr, addr_len) < 0) {
         printf("error: unable to set ");
         _print_netconf(opt);
         puts("");
-        return;
+        return 1;
     }
 
     printf("success: set ");
     _print_netconf(opt);
     printf(" on interface %" PRIkernel_pid " to %s\n", dev, addr_str);
+
+    return 0;
 }
 
-static void _netif_set_state(kernel_pid_t dev, char *state_str)
+static int _netif_set_state(kernel_pid_t dev, char *state_str)
 {
     ng_netconf_state_t state;
     if ((strcmp("off", state_str) == 0) || (strcmp("OFF", state_str) == 0)) {
@@ -359,47 +367,49 @@ static void _netif_set_state(kernel_pid_t dev, char *state_str)
     }
     else {
         puts("usage: ifconfig <if_id> set state [off|sleep|idle|reset]");
-        return;
+        return 1;
     }
     if (ng_netapi_set(dev, NETCONF_OPT_STATE, 0,
                       &state, sizeof(ng_netconf_state_t)) < 0) {
         printf("error: unable to set state to ");
         _print_netconf_state(state);
         puts("");
-        return;
+        return 1;
     }
     printf("success: set state of interface %" PRIkernel_pid " to ", dev);
     _print_netconf_state(state);
     puts("");
+
+    return 0;
 }
 
-static void _netif_set(char *cmd_name, kernel_pid_t dev, char *key, char *value)
+static int _netif_set(char *cmd_name, kernel_pid_t dev, char *key, char *value)
 {
     if ((strcmp("addr", key) == 0) || (strcmp("addr_short", key) == 0)) {
-        _netif_set_addr(dev, NETCONF_OPT_ADDRESS, value);
+        return _netif_set_addr(dev, NETCONF_OPT_ADDRESS, value);
     }
     else if (strcmp("addr_long", key) == 0) {
-        _netif_set_addr(dev, NETCONF_OPT_ADDRESS_LONG, value);
+        return _netif_set_addr(dev, NETCONF_OPT_ADDRESS_LONG, value);
     }
     else if ((strcmp("channel", key) == 0) || (strcmp("chan", key) == 0)) {
-        _netif_set_u16(dev, NETCONF_OPT_CHANNEL, value);
+        return _netif_set_u16(dev, NETCONF_OPT_CHANNEL, value);
     }
     else if ((strcmp("nid", key) == 0) || (strcmp("pan", key) == 0) ||
              (strcmp("pan_id", key) == 0)) {
-        _netif_set_u16(dev, NETCONF_OPT_NID, value);
+        return _netif_set_u16(dev, NETCONF_OPT_NID, value);
     }
     else if (strcmp("power", key) == 0) {
-        _netif_set_i16(dev, NETCONF_OPT_TX_POWER, value);
+        return _netif_set_i16(dev, NETCONF_OPT_TX_POWER, value);
     }
     else if (strcmp("src_len", key) == 0) {
-        _netif_set_u16(dev, NETCONF_OPT_SRC_LEN, value);
+        return _netif_set_u16(dev, NETCONF_OPT_SRC_LEN, value);
     }
     else if (strcmp("state", key) == 0) {
-        _netif_set_state(dev, value);
+        return _netif_set_state(dev, value);
     }
-    else {
-        _set_usage(cmd_name);
-    }
+
+    _set_usage(cmd_name);
+    return 1;
 }
 
 static int _netif_flag(char *cmd, kernel_pid_t dev, char *flag)
@@ -412,20 +422,17 @@ static int _netif_flag(char *cmd, kernel_pid_t dev, char *flag)
     }
 
     if (strcmp(flag, "promisc") == 0) {
-        _netif_set_flag(dev, NETCONF_OPT_PROMISCUOUSMODE, set);
+        return _netif_set_flag(dev, NETCONF_OPT_PROMISCUOUSMODE, set);
     }
     else if (strcmp(flag, "preload") == 0) {
-        _netif_set_flag(dev, NETCONF_OPT_PRELOADING, set);
+        return _netif_set_flag(dev, NETCONF_OPT_PRELOADING, set);
     }
     else if (strcmp(flag, "autoack") == 0) {
-        _netif_set_flag(dev, NETCONF_OPT_AUTOACK, set);
-    }
-    else {
-        _flag_usage(cmd);
-        return 1;
+        return _netif_set_flag(dev, NETCONF_OPT_AUTOACK, set);
     }
 
-    return 0;
+    _flag_usage(cmd);
+    return 1;
 }
 
 /* shell commands */
@@ -486,8 +493,9 @@ int _netif_config(int argc, char **argv)
 
         for (size_t i = 0; i < numof; i++) {
             _netif_list(ifs[i]);
-            return 0;
         }
+
+        return 0;
     }
     else if (_is_number(argv[1])) {
         kernel_pid_t dev = (kernel_pid_t)atoi(argv[1]);
@@ -500,11 +508,10 @@ int _netif_config(int argc, char **argv)
             else if (strcmp(argv[2], "set") == 0) {
                 if (argc < 5) {
                     _set_usage(argv[0]);
-                    return 0;
+                    return 1;
                 }
 
-                _netif_set(argv[0], dev, argv[3], argv[4]);
-                return 0;
+                return _netif_set(argv[0], dev, argv[3], argv[4]);
             }
 
             /* TODO implement add for IP addresses */
@@ -515,6 +522,7 @@ int _netif_config(int argc, char **argv)
         }
         else {
             puts("error: invalid interface given");
+            return 1;
         }
     }
 
