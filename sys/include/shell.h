@@ -41,8 +41,11 @@ extern "C" {
  *                  This functionality can be used by getopt() or a similar function.
  * @param[in]       argc   Number of arguments supplied to the function invocation.
  * @param[in]       argv   The supplied argument list.
+ *
+ * @return 0 on success
+ * @return Anything else on failure
  */
-typedef void (*shell_command_handler_t)(int argc, char **argv);
+typedef int (*shell_command_handler_t)(int argc, char **argv);
 
 /**
  * @brief           A single command in the list of the supported commands.

@@ -60,14 +60,14 @@ unsigned char big_buf[3 * 1024];
 char small_buf[PAYLOAD_SIZE];
 
 #if RIOT_CCN_APPSERVER
-static void riot_ccn_appserver(int argc, char **argv)
+static int riot_ccn_appserver(int argc, char **argv)
 {
     (void) argc; /* the function takes no arguments */
     (void) argv;
 
     if (_appserver_pid != KERNEL_PID_UNDEF) {
         /* already running */
-        return;
+        return 1;
     }
 
     _appserver_pid = thread_create(
@@ -75,10 +75,12 @@ static void riot_ccn_appserver(int argc, char **argv)
             PRIORITY_MAIN - 1, CREATE_STACKTEST,
             ccnl_riot_appserver_start, (void *) &_relay_pid, "appserver");
     DEBUG("ccn-lite appserver on thread_id %" PRIkernel_pid "...\n", _appserver_pid);
+
+    return 0;
 }
 #endif
 
-static void riot_ccn_express_interest(int argc, char **argv)
+static int riot_ccn_express_interest(int argc, char **argv)
 {
     if (argc < 2) {
         strncpy(small_buf, DEFAULT_INTEREST, sizeof(small_buf));
@@ -93,7 +95,7 @@ static void riot_ccn_express_interest(int argc, char **argv)
 
     if (content_len == 0) {
         puts("riot_get returned 0 bytes...aborting!");
-        return;
+        return 1;
     }
 
     puts("####################################################");
@@ -101,13 +103,15 @@ static void riot_ccn_express_interest(int argc, char **argv)
     printf("data='%s'\n", big_buf);
     puts("####################################################");
     puts("done");
+
+    return 0;
 }
 
-static void riot_ccn_register_prefix(int argc, char **argv)
+static int riot_ccn_register_prefix(int argc, char **argv)
 {
     if (argc < 4) {
         puts("enter: prefix </path/to/abc> <type> <faceid>");
-        return;
+        return 1;
     }
 
     strncpy(small_buf, argv[1], 100);
@@ -121,18 +125,20 @@ static void riot_ccn_register_prefix(int argc, char **argv)
     DEBUG("shell received: '%s'\n", big_buf);
     DEBUG("received %d bytes.\n", content_len);
     puts("done");
+
+    return 0;
 }
 
-static void riot_ccn_relay_config(int argc, char **argv)
+static int riot_ccn_relay_config(int argc, char **argv)
 {
     if (_relay_pid == KERNEL_PID_UNDEF) {
         puts("ccnl stack not running");
-        return;
+        return 1;
     }
 
     if (argc < 2) {
         printf("%s: <max_cache_entries>\n", argv[0]);
-        return;
+        return 1;
     }
 
     msg_t m;
@@ -170,12 +176,12 @@ static void riot_ccn_transceiver_start(kernel_pid_t _relay_pid)
     }
 }
 
-static void riot_ccn_relay_start(void)
+static int riot_ccn_relay_start(void)
 {
     if (_relay_pid != KERNEL_PID_UNDEF) {
         DEBUG("ccn-lite relay on thread_id %d...please stop it first!\n", _relay_pid);
         /* already running */
-        return;
+        return 1;
     }
 
     _relay_pid = thread_create(
@@ -185,9 +191,11 @@ static void riot_ccn_relay_start(void)
     DEBUG("ccn-lite relay on thread_id %" PRIkernel_pid "...\n", _relay_pid);
 
     riot_ccn_transceiver_start(_relay_pid);
+
+    return 0;
 }
 
-static void riot_ccn_relay_stop(int argc, char **argv)
+static int riot_ccn_relay_stop(int argc, char **argv)
 {
     (void) argc; /* the function takes no arguments */
     (void) argv;
@@ -199,10 +207,12 @@ static void riot_ccn_relay_stop(int argc, char **argv)
 
     /* mark relay as not running */
     _relay_pid = 0;
+
+    return 0;
 }
 
 #if RIOT_CCN_TESTS
-static void riot_ccn_pit_test(int argc, char **argv)
+static int riot_ccn_pit_test(int argc, char **argv)
 {
     (void) argc; /* the function takes no arguments */
     (void) argv;
@@ -249,9 +259,11 @@ static void riot_ccn_pit_test(int argc, char **argv)
     }
 
     printf("done: tried to send %d interests\n", segment);
+
+    return 0;
 }
 
-static void riot_ccn_fib_test(int argc, char **argv)
+static int riot_ccn_fib_test(int argc, char **argv)
 {
     (void) argc; /* the function takes no arguments */
     (void) argv;
@@ -278,10 +290,12 @@ static void riot_ccn_fib_test(int argc, char **argv)
 
     DEBUG("%d: '%s'\n", i, big_buf);
     printf("done: %d\n", i - 1);
+
+	return 0;
 }
 #endif
 
-static void riot_ccn_populate(int argc, char **argv)
+static int riot_ccn_populate(int argc, char **argv)
 {
     (void) argc; /* the function takes no arguments */
     (void) argv;
@@ -290,9 +304,11 @@ static void riot_ccn_populate(int argc, char **argv)
     m.content.value = 0;
     m.type = CCNL_RIOT_POPULATE;
     msg_send(&m, _relay_pid);
+
+    return 0;
 }
 
-static void riot_ccn_stat(int argc, char **argv)
+static int riot_ccn_stat(int argc, char **argv)
 {
     (void) argc; /* the function takes no arguments */
     (void) argv;
@@ -301,6 +317,8 @@ static void riot_ccn_stat(int argc, char **argv)
     m.content.value = 0;
     m.type = CCNL_RIOT_PRINT_STAT;
     msg_send(&m, _relay_pid);
+
+    return 0;
 }
 
 static const shell_command_t sc[] = {

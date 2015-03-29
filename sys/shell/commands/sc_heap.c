@@ -20,10 +20,12 @@
 
 extern void heap_stats(void);
 
-void _heap_handler(int argc, char **argv)
+int _heap_handler(int argc, char **argv)
 {
     (void) argc;
     (void) argv;
 
     heap_stats();
+
+    return 0;
 }

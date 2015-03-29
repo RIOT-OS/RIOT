@@ -25,7 +25,7 @@
 
 static char addr_str[IPV6_MAX_ADDR_STR_LEN];
 
-void _rpl_route_handler(int argc, char **argv)
+int _rpl_route_handler(int argc, char **argv)
 {
     (void) argc;
     (void) argv;
@@ -57,4 +57,6 @@ void _rpl_route_handler(int argc, char **argv)
         puts("No routing table available");
     }
     puts("$");
+
+    return 0;
 }
