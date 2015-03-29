@@ -48,6 +48,18 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Default hop limit
+ *
+ * @see <a href="https://tools.ietf.org/html/rfc4861#section-6.3.2">
+ *          RFC 4861, section 6.3.2
+ *      </a>
+ * @see <a href="http://www.iana.org/assignments/ip-parameters/ip-parameters.xhtml#ip-parameters-2">
+ *          IANA, IP TIME TO LIVE PARAMETER
+ *      </a>
+ */
+#define NG_IPV6_NETIF_DEFAULT_HL    (64)
+
+/**
  * @{
  * @name Flags for a registered IPv6 address.
  * @brief   Needed primarily to identify addresses as either anycast or unicast.
@@ -80,6 +92,7 @@ typedef struct {
     mutex_t mutex;          /**< mutex for the interface */
     kernel_pid_t pid;       /**< PID of the interface */
     uint16_t mtu;           /**< Maximum Transmission Unit (MTU) of the interface */
+    uint8_t cur_hl;         /**< current hop limit for the interface */
 } ng_ipv6_netif_t;
 
 /**
