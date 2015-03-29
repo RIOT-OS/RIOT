@@ -20,7 +20,6 @@
 
 #include "kernel_types.h"
 #include "mutex.h"
-#include "net/ng_ipv6.h"
 #include "net/ng_ipv6/addr.h"
 #include "net/ng_netif.h"
 
@@ -100,7 +99,7 @@ void ng_ipv6_netif_add(kernel_pid_t pid)
             DEBUG("Add IPv6 interface %" PRIkernel_pid " (i = %d)\n", pid, i);
             ipv6_ifs[i].pid = pid;
             DEBUG(" * pid = %" PRIkernel_pid "  ", ipv6_ifs[i].pid);
-            ipv6_ifs[i].mtu = NG_IPV6_DEFAULT_MTU;
+            ipv6_ifs[i].mtu = NG_IPV6_NETIF_DEFAULT_MTU;
             DEBUG("mtu = %d  ", ipv6_ifs[i].mtu);
             ipv6_ifs[i].cur_hl = NG_IPV6_NETIF_DEFAULT_HL;
             DEBUG("cur_hl = %d  ", ipv6_ifs[i].cur_hl);

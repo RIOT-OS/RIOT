@@ -48,6 +48,15 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Default MTU
+ *
+ * @see <a href="https://tools.ietf.org/html/rfc2460#section-5">
+ *          RFC 2460, section 5
+ *      </a>
+ */
+#define NG_IPV6_NETIF_DEFAULT_MTU   (1280)
+
+/**
  * @brief   Default hop limit
  *
  * @see <a href="https://tools.ietf.org/html/rfc4861#section-6.3.2">
