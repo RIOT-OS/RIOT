@@ -98,24 +98,16 @@ const ng_netdev_driver_t ng_tapnet_driver = {
 };
 
 /* internal function definitions */
-
-static inline bool _has_src(ng_pktsnip_t *pkt)
-{
-    return ((pkt->type == NG_NETTYPE_NETIF) &&
-            ((ng_netif_hdr_t *)pkt->data)->src_l2addr_len == NG_ETHERNET_ADDR_LEN);
-}
-
-static inline bool _for_ethernet(ng_pktsnip_t *pkt)
-{
-    return (((pkt->type == NG_NETTYPE_NETIF) &&
-             (((ng_netif_hdr_t *)pkt->data)->dst_l2addr_len == NG_ETHERNET_ADDR_LEN)) ||
-            _has_src(pkt));
-}
-
-static inline bool _addr_broadcast(uint8_t *addr)
+static inline bool _is_addr_broadcast(uint8_t *addr)
 {
     return ((addr[0] == 0xff) && (addr[1] == 0xff) && (addr[2] == 0xff) &&
             (addr[3] == 0xff) && (addr[4] == 0xff) && (addr[5] == 0xff));
+}
+
+static inline bool _is_addr_multicast(uint8_t *addr)
+{
+    /* source: http://ieee802.org/secmail/pdfocSP2xXA6d.pdf */
+    return (addr[0] & 0x01);
 }
 
 /* build Ethernet packet from pkt */
@@ -488,6 +480,30 @@ static void _sigio_child(ng_tapnet_t *dev)
 }
 #endif
 
+static inline void _addr_set_broadcast(uint8_t *dst)
+{
+    memset(dst, 0xff, NG_ETHERNET_ADDR_LEN);
+}
+
+#define _IPV6_DST_OFFSET    (36)    /* sizeof(ipv6_hdr_t) - 4  */
+
+static inline void _addr_set_multicast(uint8_t *dst, ng_pktsnip_t *payload)
+{
+    switch (payload->type) {
+#ifdef MODULE_NG_IPV6
+        case NG_NETTYPE_IPV6:
+            dst[0] = 0x33;
+            dst[1] = 0x33;
+            memcpy(dst + 2, ((uint8_t *)payload->data) + _IPV6_DST_OFFSET, 4);
+            /* TODO change to proper types when ng_ipv6_hdr_t got merged */
+            break;
+#endif
+       default:
+            _addr_set_broadcast(dst);
+            break;
+    }
+}
+
 static int _marshall_ethernet(ng_tapnet_t *dev, uint8_t *buffer, ng_pktsnip_t *pkt)
 {
     int data_len = 0;
@@ -502,8 +518,8 @@ static int _marshall_ethernet(ng_tapnet_t *dev, uint8_t *buffer, ng_pktsnip_t *p
 
     payload = pkt->next;
 
-    if (!_for_ethernet(pkt)) {
-        DEBUG("ng_tapnet: First header was not generic netif header for Ethernet\n");
+    if (pkt->type != NG_NETTYPE_NETIF) {
+        DEBUG("ng_tapnet: First header was not generic netif header\n");
         return -EBADMSG;
     }
 
@@ -512,7 +528,7 @@ static int _marshall_ethernet(ng_tapnet_t *dev, uint8_t *buffer, ng_pktsnip_t *p
     netif_hdr = pkt->data;
 
     /* set ethernet header */
-    if (_has_src(pkt)) {
+    if (netif_hdr->src_l2addr_len == NG_ETHERNET_ADDR_LEN) {
         memcpy(hdr->dst, ng_netif_hdr_get_src_addr(netif_hdr),
                netif_hdr->src_l2addr_len);
     }
@@ -520,8 +536,20 @@ static int _marshall_ethernet(ng_tapnet_t *dev, uint8_t *buffer, ng_pktsnip_t *p
         memcpy(hdr->src, dev->addr, NG_ETHERNET_ADDR_LEN);
     }
 
-    memcpy(hdr->dst, ng_netif_hdr_get_dst_addr(netif_hdr),
-           netif_hdr->dst_l2addr_len);
+    if (netif_hdr->flags & NG_NETIF_HDR_FLAGS_BROADCAST) {
+        _addr_set_broadcast(hdr->dst);
+    }
+    else if (netif_hdr->flags & NG_NETIF_HDR_FLAGS_MULTICAST) {
+        _addr_set_multicast(hdr->dst, payload);
+    }
+    else if (netif_hdr->dst_l2addr_len == NG_ETHERNET_ADDR_LEN) {
+        memcpy(hdr->dst, ng_netif_hdr_get_dst_addr(netif_hdr),
+               NG_ETHERNET_ADDR_LEN);
+    } else {
+        DEBUG("ng_tapnet: destination address had unexpected format\n");
+        return -EBADMSG;
+    }
+
     DEBUG("ng_tapnet: send to %02x:%02x:%02x:%02x:%02x:%02x\n",
           hdr->dst[0], hdr->dst[1], hdr->dst[2],
           hdr->dst[3], hdr->dst[4], hdr->dst[5]);
@@ -580,9 +608,9 @@ static void _rx_event(ng_tapnet_t *dev)
         ng_nettype_t receive_type = NG_NETTYPE_UNDEF;
         size_t data_len = (nread - sizeof(ng_ethernet_hdr_t));
 
-        if (!(dev->promiscous) && (memcmp(hdr->dst, dev->addr, NG_ETHERNET_ADDR_LEN) != 0) &&
-            (!_addr_broadcast(hdr->dst))) {
-            /* TODO: check multicast */
+        if (!(dev->promiscous) && !_is_addr_multicast(hdr->dst) &&
+            !_is_addr_broadcast(hdr->dst) &&
+            (memcmp(hdr->dst, dev->addr, NG_ETHERNET_ADDR_LEN) != 0)) {
             DEBUG("ng_tapnet: received for %02x:%02x:%02x:%02x:%02x:%02x\n"
                   "That's not me => Dropped\n",
                   hdr->dst[0], hdr->dst[1], hdr->dst[2],
@@ -590,7 +618,10 @@ static void _rx_event(ng_tapnet_t *dev)
             return;
         }
 
-        netif_hdr = ng_pktbuf_add(NULL, NULL, sizeof(ng_netif_hdr_t) + (2 * NG_ETHERNET_ADDR_LEN),
+        /* TODO: implement multicast groups? */
+
+        netif_hdr = ng_pktbuf_add(NULL, NULL,
+                                  sizeof(ng_netif_hdr_t) + (2 * NG_ETHERNET_ADDR_LEN),
                                   NG_NETTYPE_NETIF);
 
         if (netif_hdr == NULL) {
