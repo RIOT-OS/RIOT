@@ -29,7 +29,7 @@
 
 #include "periph/rtc.h"
 
-int _alarm_handler(void *arg)
+static void _alarm_handler(void *arg)
 {
     (void) arg;
 
