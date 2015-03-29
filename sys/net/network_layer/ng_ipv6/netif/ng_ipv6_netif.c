@@ -54,12 +54,12 @@ static int _add_addr_to_entry(ng_ipv6_netif_t *entry, const ng_ipv6_addr_t *addr
                     entry->addrs[i].prefix_len = NG_IPV6_ADDR_BIT_LEN;
                 }
 
-                entry->addrs[i].flags = NG_IPV6_NETIF_FLAGS_NON_UNICAST;
+                entry->addrs[i].flags = NG_IPV6_NETIF_ADDR_FLAGS_NON_UNICAST;
             }
             else {
                 entry->addrs[i].prefix_len = prefix_len;
 
-                entry->addrs[i].flags = NG_IPV6_NETIF_FLAGS_UNICAST;
+                entry->addrs[i].flags = NG_IPV6_NETIF_ADDR_FLAGS_UNICAST;
             }
 
             return 0;

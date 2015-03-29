@@ -77,8 +77,8 @@ extern "C" {
  *          RFC 4291, section 2.6
  *      </a>
  */
-#define NG_IPV6_NETIF_FLAGS_UNICAST     (0x00)  /**< unicast address */
-#define NG_IPV6_NETIF_FLAGS_NON_UNICAST (0x01)  /**< non-unicast address */
+#define NG_IPV6_NETIF_ADDR_FLAGS_UNICAST        (0x00)  /**< unicast address */
+#define NG_IPV6_NETIF_ADDR_FLAGS_NON_UNICAST    (0x01)  /**< non-unicast address */
 /**
  * @}
  */
@@ -267,7 +267,7 @@ ng_ipv6_addr_t *ng_ipv6_netif_find_best_src_addr(kernel_pid_t pid, const ng_ipv6
 static inline bool ng_ipv6_netif_addr_is_non_unicast(const ng_ipv6_addr_t *addr)
 {
     return (bool)(container_of(addr, ng_ipv6_netif_addr_t, addr)->flags &
-                  NG_IPV6_NETIF_FLAGS_NON_UNICAST);
+                  NG_IPV6_NETIF_ADDR_FLAGS_NON_UNICAST);
 
 }
 
