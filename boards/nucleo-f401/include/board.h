@@ -64,6 +64,10 @@ extern "C" {
 #define LD1_TOGGLE          (LED_PORT->ODR ^= LD1_PIN)
 
 /* for compatability to other boards */
+#define LED_RED_ON
+#define LED_RED_OFF
+#define LED_RED_TOGGLE
+
 #define LED_GREEN_ON        LD1_ON
 #define LED_GREEN_OFF       LD1_OFF
 #define LED_GREEN_TOGGLE    LD1_TOGGLE
