@@ -68,6 +68,7 @@ extern "C" {
 typedef struct {
     ng_ipv6_addr_t addr;    /**< The address data */
     uint8_t flags;          /**< flags */
+    uint8_t prefix_len;     /**< length of the prefix of the address */
 } ng_ipv6_netif_addr_t;
 
 /**
@@ -117,24 +118,27 @@ ng_ipv6_netif_t *ng_ipv6_netif_get(kernel_pid_t pid);
 /**
  * @brief   Adds an address to an interface.
  *
- * @param[in] pid       The PID to the interface.
- * @param[in] addr      An address you want to add to the interface.
- * @param[in] anycast   If @p addr should be an anycast address, @p anycast
- *                      must be true. Otherwise set it false.
- *                      If @p addr is a multicast address, @p anycast will be
- *                      ignored.
+ * @param[in] pid           The PID to the interface.
+ * @param[in] addr          An address you want to add to the interface.
+ * @param[in] prefix_len    Length of the prefix of the address.
+ *                          Must be between 1 and 128.
+ * @param[in] anycast       If @p addr should be an anycast address, @p anycast
+ *                          must be true. Otherwise set it false.
+ *                          If @p addr is a multicast address, @p anycast will be
+ *                          ignored.
  *
  * @see <a href="https://tools.ietf.org/html/rfc4291#section-2.6">
  *          RFC 4291, section 2.6
  *      </a>
  *
  * @return  0, on success.
- * @return  -EINVAL, if @p addr is NULL or unspecified address.
+ * @return  -EINVAL, if @p addr is NULL or unspecified address or if
+ *          @p prefix length was < 1 or > 128.
  * @return  -ENOENT, if @p pid is no interface.
  * @return  -ENOMEM, if there is no space left to store @p addr.
  */
 int ng_ipv6_netif_add_addr(kernel_pid_t pid, const ng_ipv6_addr_t *addr,
-                           bool anycast);
+                           uint8_t prefix_len, bool anycast);
 
 /**
  * @brief   Remove an address from the interface.
