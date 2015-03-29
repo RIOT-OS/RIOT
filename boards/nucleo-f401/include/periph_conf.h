@@ -53,13 +53,13 @@ extern "C" {
 #define TIMER_IRQ_PRIO      1
 
 /* Timer 0 configuration */
-#define TIMER_0_DEV         TIM2
-#define TIMER_0_CHANNELS    4
-#define TIMER_0_PRESCALER   (42U)
+#define TIMER_0_DEV         TIM9
+#define TIMER_0_CHANNELS    2
+#define TIMER_0_PRESCALER   (84U)
 #define TIMER_0_MAX_VALUE   (0xffffffff)
-#define TIMER_0_CLKEN()     (RCC->APB1ENR |= RCC_APB1ENR_TIM2EN)
-#define TIMER_0_ISR         isr_tim2
-#define TIMER_0_IRQ_CHAN    TIM2_IRQn
+#define TIMER_0_CLKEN()     (RCC->APB2ENR |= RCC_APB2ENR_TIM9EN)
+#define TIMER_0_ISR         isr_tim1_brk_tim9
+#define TIMER_0_IRQ_CHAN    TIM1_BRK_TIM9_IRQn
 
 /* Timer 1 configuration */
 #define TIMER_1_DEV         TIM5
@@ -75,7 +75,7 @@ extern "C" {
  * @name UART configuration
  * @{
  */
-#define UART_NUMOF          (2U)
+#define UART_NUMOF          (3U)
 #define UART_0_EN           1
 #define UART_1_EN           1
 #define UART_IRQ_PRIO       1
@@ -108,6 +108,20 @@ extern "C" {
 #define UART_1_TX_PIN       9
 #define UART_1_RX_PIN       10
 #define UART_1_AF           7
+
+/* UART 2 device configuration */
+#define UART_2_DEV          USART6
+#define UART_2_CLKEN()      (RCC->APB2ENR |= RCC_APB2ENR_USART6EN)
+#define UART_2_CLKDIS()     (RCC->APB2ENR &= ~(RCC_APB2ENR_USART6EN))
+#define UART_2_CLK          (42000000)          /* UART clock runs with 42MHz (F_CPU / 4) */
+#define UART_2_IRQ_CHAN     USART6_IRQn
+#define UART_2_ISR          isr_usart6
+/* UART 1 pin configuration */
+#define UART_2_PORT_CLKEN() (RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN)
+#define UART_2_PORT         GPIOA
+#define UART_2_TX_PIN       11
+#define UART_2_RX_PIN       12
+#define UART_2_AF           8
 /** @} */
 
 /**
@@ -149,34 +163,43 @@ extern "C" {
 #define PWM_MAX_CHANNELS    4
 
 /* PWM 0 device configuration */
-#define PWM_0_DEV           TIM1
-#define PWM_0_CHANNELS      4
-#define PWM_0_CLK           (168000000U)
-#define PWM_0_CLKEN()       (RCC->APB2ENR |= RCC_APB2ENR_TIM1EN)
-#define PWM_0_CLKDIS()      (RCC->APB2ENR &= ~RCC_APB2ENR_TIM1EN)
+#define PWM_0_DEV           TIM4
+#define PWM_0_CHANNELS      1
+#define PWM_0_CLK           (42000000U)
+#define PWM_0_CLKEN()       (RCC->APB1ENR |= RCC_APB1ENR_TIM4EN)
+#define PWM_0_CLKDIS()      (RCC->APB1ENR &= ~RCC_APB1ENR_TIM4EN)
 /* PWM 0 pin configuration */
-#define PWM_0_PORT          GPIOE
-#define PWM_0_PORT_CLKEN()  (RCC->AHB1ENR |= RCC_AHB1ENR_GPIOEEN)
-#define PWM_0_PIN_CH0       9
-#define PWM_0_PIN_CH1       11
-#define PWM_0_PIN_CH2       13
-#define PWM_0_PIN_CH3       14
-#define PWM_0_PIN_AF        1
+#define PWM_0_PORT          GPIOB
+#define PWM_0_PORT_CLKEN()  (RCC->AHB1ENR |= RCC_AHB1ENR_GPIOBEN)
+#define PWM_0_PIN_CH0       6
+#define PWM_0_PIN_AF        2
 
 /* PWM 1 device configuration */
 #define PWM_1_DEV           TIM3
-#define PWM_1_CHANNELS      3
-#define PWM_1_CLK           (84000000U)
-#define PWM_1_CLKEN()       (RCC->APB1ENR |= RCC_APB1ENR_TIM3EN)
-#define PWM_1_CLKDIS()      (RCC->APB1ENR &= ~RCC_APB1ENR_TIM3EN)
+#define PWM_1_CHANNELS      2
+#define PWM_1_CLK           (42000000U)
+#define PWM_1_CLKEN()       (RCC->APB1ENR |= RCC_APB1ENR_TIM4EN)
+#define PWM_1_CLKDIS()      (RCC->APB1ENR &= ~RCC_APB1ENR_TIM4EN)
 /* PWM 1 pin configuration */
 #define PWM_1_PORT          GPIOB
 #define PWM_1_PORT_CLKEN()  (RCC->AHB1ENR |= RCC_AHB1ENR_GPIOBEN)
-#define PWM_1_PIN_CH0       4
+#define PWM_1_PIN_CH0       5
 #define PWM_1_PIN_CH1       5
-#define PWM_1_PIN_CH2       0
-#define PWM_1_PIN_CH3       1
 #define PWM_1_PIN_AF        2
+
+/* PWM 2 device configuration */
+#define PWM_2_DEV           TIM2
+#define PWM_2_CHANNELS      3
+#define PWM_2_CLK           (84000000U)
+#define PWM_2_CLKEN()       (RCC->APB1ENR |= RCC_APB1ENR_TIM2EN)
+#define PWM_2_CLKDIS()      (RCC->APB1ENR &= ~RCC_APB1ENR_TIM2EN)
+/* PWM 2 pin configuration */
+#define PWM_2_PORT          GPIOB
+#define PWM_2_PORT_CLKEN()  (RCC->AHB1ENR |= RCC_AHB1ENR_GPIOBEN)
+#define PWM_2_PIN_CH0       10
+#define PWM_2_PIN_CH1       10
+#define PWM_2_PIN_CH2       10
+#define PWM_2_PIN_AF        1
 /** @} */
 
 /**
@@ -311,111 +334,51 @@ extern "C" {
  * @name GPIO configuration
  * @{
  */
-#define GPIO_NUMOF          12
+#define GPIO_NUMOF          3
 #define GPIO_0_EN           1
 #define GPIO_1_EN           1
 #define GPIO_2_EN           1
-#define GPIO_3_EN           1
-#define GPIO_4_EN           1
-#define GPIO_5_EN           1
-#define GPIO_6_EN           1
-#define GPIO_7_EN           1
-#define GPIO_8_EN           1
-#define GPIO_9_EN           1
-#define GPIO_10_EN          1
-#define GPIO_11_EN          1
 #define GPIO_IRQ_PRIO       1
 
 /* IRQ config */
-#define GPIO_IRQ_0          GPIO_0 /* alternatively GPIO_1 could be used here */
-#define GPIO_IRQ_1          GPIO_2
-#define GPIO_IRQ_2          GPIO_3
-#define GPIO_IRQ_3          GPIO_4
-#define GPIO_IRQ_4          GPIO_5
-#define GPIO_IRQ_5          GPIO_6
-#define GPIO_IRQ_6          GPIO_7
-#define GPIO_IRQ_7          GPIO_8
-#define GPIO_IRQ_8          GPIO_9
-#define GPIO_IRQ_9          GPIO_10
-#define GPIO_IRQ_10         GPIO_11
+#define GPIO_IRQ_0          -1/* not configured */
+#define GPIO_IRQ_1          -1/* not configured */
+#define GPIO_IRQ_2          -1/* not configured */
+#define GPIO_IRQ_3          -1/* not configured */
+#define GPIO_IRQ_4          -1/* not configured */
+#define GPIO_IRQ_5          -1/* not configured */
+#define GPIO_IRQ_6          -1/* not configured */
+#define GPIO_IRQ_7          -1/* not configured */
+#define GPIO_IRQ_8          -1/* not configured */
+#define GPIO_IRQ_9          -1/* not configured */
+#define GPIO_IRQ_10         -1/* not configured */
 #define GPIO_IRQ_11         -1/* not configured */
 #define GPIO_IRQ_12         -1/* not configured */
-#define GPIO_IRQ_13         -1/* not configured */
+#define GPIO_IRQ_13         GPIO_0
 #define GPIO_IRQ_14         -1/* not configured */
 #define GPIO_IRQ_15         -1/* not configured */
 
 /* GPIO channel 0 config */
-#define GPIO_0_PORT         GPIOA                   /* Used for user button 1 */
-#define GPIO_0_PIN          0
-#define GPIO_0_CLK          0                       /* 0: PORT A, 1: B ... */
-#define GPIO_0_EXTI_CFG()   (SYSCFG->EXTICR[0] |= SYSCFG_EXTICR1_EXTI0_PA)
-#define GPIO_0_IRQ          EXTI0_IRQn
+#define GPIO_0_PORT         GPIOC                   /* Used for user button 1 */
+#define GPIO_0_PIN          13
+#define GPIO_0_CLK          2                       /* 0: PORT A, 1: B ... */
+#define GPIO_0_EXTI_CFG()   (SYSCFG->EXTICR[3] |= SYSCFG_EXTICR4_EXTI13_PC)
+#define GPIO_0_IRQ          EXTI15_10_IRQn
+
 /* GPIO channel 1 config */
-#define GPIO_1_PORT         GPIOE                   /* LIS302DL INT1 */
-#define GPIO_1_PIN          0
-#define GPIO_1_CLK          4
-#define GPIO_1_EXTI_CFG()   (SYSCFG->EXTICR[0] |= SYSCFG_EXTICR1_EXTI0_PE)
-#define GPIO_1_IRQ          EXTI0_IRQn
+#define GPIO_1_PORT         GPIOC                   /* Used for user button 1 */
+#define GPIO_1_PIN          2
+#define GPIO_1_CLK          2                       /* 0: PORT A, 1: B ... */
+#define GPIO_1_EXTI_CFG()   (SYSCFG->EXTICR[0] |= SYSCFG_EXTICR1_EXTI2_PC)
+#define GPIO_1_IRQ          EXTI2_IRQn
+
 /* GPIO channel 2 config */
-#define GPIO_2_PORT         GPIOE                   /* LIS302DL INT2 */
-#define GPIO_2_PIN          1
-#define GPIO_2_CLK          4
-#define GPIO_2_EXTI_CFG()   (SYSCFG->EXTICR[0] |= SYSCFG_EXTICR1_EXTI1_PE)
-#define GPIO_2_IRQ          EXTI1_IRQn
-/* GPIO channel 3 config */
-#define GPIO_3_PORT         GPIOE
-#define GPIO_3_PIN          2
-#define GPIO_3_CLK          4
-#define GPIO_3_EXTI_CFG()   (SYSCFG->EXTICR[0] |= SYSCFG_EXTICR1_EXTI2_PE)
-#define GPIO_3_IRQ          EXTI2_IRQn
-/* GPIO channel 4 config */
-#define GPIO_4_PORT         GPIOE                   /* LIS302DL CS */
-#define GPIO_4_PIN          3
-#define GPIO_4_CLK          4
-#define GPIO_4_EXTI_CFG()   (SYSCFG->EXTICR[0] |= SYSCFG_EXTICR1_EXTI3_PE)
-#define GPIO_4_IRQ          EXTI3_IRQn
-/* GPIO channel 5 config */
-#define GPIO_5_PORT         GPIOD                   /* CS43L22 RESET */
-#define GPIO_5_PIN          4
-#define GPIO_5_CLK          3
-#define GPIO_5_EXTI_CFG()   (SYSCFG->EXTICR[1] |= SYSCFG_EXTICR2_EXTI4_PD)
-#define GPIO_5_IRQ          EXTI4_IRQn
-/* GPIO channel 6 config */
-#define GPIO_6_PORT         GPIOD                   /* LD8 */
-#define GPIO_6_PIN          5
-#define GPIO_6_CLK          3
-#define GPIO_6_EXTI_CFG()   (SYSCFG->EXTICR[1] |= SYSCFG_EXTICR2_EXTI5_PD)
-#define GPIO_6_IRQ          EXTI9_5_IRQn
-/* GPIO channel 7 config */
-#define GPIO_7_PORT         GPIOD
-#define GPIO_7_PIN          6
-#define GPIO_7_CLK          3
-#define GPIO_7_EXTI_CFG()   (SYSCFG->EXTICR[1] |= SYSCFG_EXTICR2_EXTI6_PD)
-#define GPIO_7_IRQ          EXTI9_5_IRQn
-/* GPIO channel 8 config */
-#define GPIO_8_PORT         GPIOD
-#define GPIO_8_PIN          7
-#define GPIO_8_CLK          3
-#define GPIO_8_EXTI_CFG()   (SYSCFG->EXTICR[1] |= SYSCFG_EXTICR2_EXTI7_PD)
-#define GPIO_8_IRQ          EXTI9_5_IRQn
-/* GPIO channel 9 config */
-#define GPIO_9_PORT         GPIOA
-#define GPIO_9_PIN          8
-#define GPIO_9_CLK          0
-#define GPIO_9_EXTI_CFG()   (SYSCFG->EXTICR[2] |= SYSCFG_EXTICR3_EXTI8_PA)
-#define GPIO_9_IRQ          EXTI9_5_IRQn
-/* GPIO channel 10 config */
-#define GPIO_10_PORT        GPIOA                   /* LD7 */
-#define GPIO_10_PIN         9
-#define GPIO_10_CLK         0
-#define GPIO_10_EXTI_CFG()  (SYSCFG->EXTICR[2] |= SYSCFG_EXTICR3_EXTI9_PA)
-#define GPIO_10_IRQ         EXTI9_5_IRQn
-/* GPIO channel 11 config */
-#define GPIO_11_PORT        GPIOD
-#define GPIO_11_PIN         10
-#define GPIO_11_CLK         3
-#define GPIO_11_EXTI_CFG()  (SYSCFG->EXTICR[2] |= SYSCFG_EXTICR3_EXTI10_PD)
-#define GPIO_11_IRQ         EXTI15_10_IRQn
+#define GPIO_2_PORT         GPIOC                   /* Used for user button 1 */
+#define GPIO_2_PIN          3
+#define GPIO_2_CLK          2                       /* 0: PORT A, 1: B ... */
+#define GPIO_2_EXTI_CFG()   (SYSCFG->EXTICR[0] |= SYSCFG_EXTICR1_EXTI3_PC)
+#define GPIO_2_IRQ          EXTI3_IRQn
+
 /** @} */
 
 #ifdef __cplusplus

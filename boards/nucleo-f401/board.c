@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     boards_stm32f3discovery
+ * @ingroup     boards_nucleo-f401
  * @{
  *
  * @file
