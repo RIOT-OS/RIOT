@@ -152,6 +152,10 @@ ng_pktsnip_t *ng_netreg_hdr_build(ng_nettype_t type, ng_pktsnip_t *payload,
 #endif
 
         default:
+            (void)src;
+            (void)src_len;
+            (void)dst;
+            (void)dst_len;
             return NULL;
     }
 }
