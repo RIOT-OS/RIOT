@@ -19,6 +19,7 @@
 #include "utlist.h"
 #include "net/ng_netreg.h"
 #include "net/ng_nettype.h"
+#include "net/ng_ipv6.h"
 
 #define _INVALID_TYPE(type) (((type) < NG_NETTYPE_UNDEF) || ((type) >= NG_NETTYPE_NUMOF))
 
@@ -99,6 +100,32 @@ ng_netreg_entry_t *ng_netreg_getnext(ng_netreg_entry_t *entry)
     LL_SEARCH_SCALAR(entry->next, entry, demux_ctx, demux_ctx);
 
     return entry;
+}
+
+ng_pktsnip_t *ng_netreg_hdr_build(ng_nettype_t type, ng_pktsnip_t *payload,
+                                  uint8_t *src, uint8_t src_len,
+                                  uint8_t *dst, uint8_t dst_len)
+{
+    switch (type) {
+#ifdef MODULE_NG_IPV6
+
+        case NG_NETTYPE_IPV6:
+            return ng_ipv6_hdr_build(payload, src, src_len, dst, dst_len);
+#endif
+#ifdef MODULE_NG_TCP
+
+        case NG_NETTYPE_TCP:
+            return ng_tcp_hdr_build(payload, src, src_len, dst, dst_len);
+#endif
+#ifdef MODULE_NG_UDP
+
+        case NG_NETTYPE_UDP:
+            return ng_udp_hdr_build(payload, src, src_len, dst, dst_len);
+#endif
+
+        default:
+            return NULL;
+    }
 }
 
 /** @} */
