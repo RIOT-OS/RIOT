@@ -520,3 +520,6 @@ uint8_t pn532_mifareclassic_write_ndef_uri (uint8_t sectorNumber, uint8_t uriIde
  *	@returns	1 on success, 0 on error
  */
 uint8_t pn532_mifareultralight_read_page (uint8_t page, uint8_t *buffer);
+
+#endif /* PN532_H_ */
+/** @} */
