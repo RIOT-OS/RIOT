@@ -102,17 +102,21 @@ int udp_send(int argc, char **argv)
     ipv6_addr_t ipaddr;
     int bytes_sent;
     int address;
-    char text[5];
 
     if (argc != 3) {
         printf("usage: send <addr> <text>\n");
         return 1;
     }
 
-    address = atoi(argv[1]);
+    /* max payload size = MTU - MAC - AES - IPV6_HDR_LEN - UDP_HDR_LEN
+     *              33  = 127 - 25 - 21 - 40 - 8
+     */
+    if (strlen(argv[2]) > 32) {
+        puts("<text> is too large to be sent (max. 33 characters).");
+        return 1;
+    }
 
-    strncpy(text, argv[2], sizeof(text));
-    text[sizeof(text) - 1] = 0;
+    address = atoi(argv[1]);
 
     sock = socket_base_socket(PF_INET6, SOCK_DGRAM, IPPROTO_UDP);
 
@@ -134,8 +138,8 @@ int udp_send(int argc, char **argv)
     memcpy(&sa.sin6_addr, &ipaddr, 16);
     sa.sin6_port = HTONS(SERVER_PORT);
 
-    bytes_sent = socket_base_sendto(sock, (char *)text,
-                                       strlen(text) + 1, 0, &sa,
+    bytes_sent = socket_base_sendto(sock, argv[2],
+                                       strlen(argv[2]), 0, &sa,
                                        sizeof(sa));
 
     if (bytes_sent < 0) {
