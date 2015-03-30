@@ -19,8 +19,8 @@
  * @author      Kévin Roussel <Kevin.Roussel@inria.fr>
  */
 
-#ifndef __CRASH_H
-#define __CRASH_H
+#ifndef CRASH_H
+#define CRASH_H
 
 #include "kernel.h"
 
@@ -54,5 +54,5 @@ NORETURN void core_panic(int crash_code, const char *message);
 }
 #endif
 
-#endif /* __CRASH_H */
+#endif /* CRASH_H */
 /** @} */

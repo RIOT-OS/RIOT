@@ -16,8 +16,8 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-#ifndef __QUEUE_H
-#define __QUEUE_H
+#ifndef QUEUE_H
+#define QUEUE_H
 
 #include <stddef.h>
 #include <stdint.h>
@@ -119,4 +119,4 @@ void priority_queue_print_node(priority_queue_t *root);
 #endif
 
 /** @} */
-#endif /* __QUEUE_H */
+#endif /* QUEUE_H */

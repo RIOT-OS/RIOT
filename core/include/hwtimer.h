@@ -30,8 +30,8 @@
  * @author      Michael Baar
  */
 
-#ifndef __HWTIMER_H
-#define __HWTIMER_H
+#ifndef HWTIMER_H
+#define HWTIMER_H
 
 #include <stdint.h>
 #include "hwtimer_cpu.h"
@@ -193,4 +193,4 @@ void hwtimer_spin(unsigned long ticks);
 #endif
 
 /** @} */
-#endif /* __HWTIMER_H */
+#endif /* HWTIMER_H */

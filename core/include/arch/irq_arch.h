@@ -22,8 +22,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef __IRQ_ARCH_H
-#define __IRQ_ARCH_H
+#ifndef IRQ_ARCH_H
+#define IRQ_ARCH_H
 
 #ifdef __cplusplus
  extern "C" {
@@ -77,5 +77,5 @@ int irq_arch_in(void);
 }
 #endif
 
-#endif /* __IRQ_ARCH_H */
+#endif /* IRQ_ARCH_H */
 /** @} */
