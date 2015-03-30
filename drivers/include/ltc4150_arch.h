@@ -6,8 +6,8 @@
  * directory for more details.
  */
 
-#ifndef __LTC4150_ARCH_H
-#define __LTC4150_ARCH_H
+#ifndef LTC4150_ARCH_H
+#define LTC4150_ARCH_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -50,4 +50,4 @@ void ltc4150_interrupt(void);
 #endif
 
 /** * @} */
-#endif /* __LTC4150_ARCH_H */
+#endif /* LTC4150_ARCH_H */
