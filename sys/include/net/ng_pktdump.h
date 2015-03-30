@@ -29,18 +29,41 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Message queue size for the pktdump thread
+ */
+#ifndef NG_PKTDUMP_MSG_QUEUE_SIZE
+#define NG_PKTDUMP_MSG_QUEUE_SIZE       (8U)
+#endif
+
+/**
+ * @brief   Priority of the pktdump thread
+ */
+#ifndef NG_PKTDUMP_PRIO
+#define NG_PKTDUMP_PRIO                 (PRIORITY_MIN - 1)
+#endif
+
+/**
+ * @brief   Stack size used for the pktdump thread
+ */
+#ifndef NG_PKTDUMP_STACKSIZE
+#define NG_PKTDUMP_STACKSIZE            (KERNEL_CONF_STACKSIZE_MAIN)
+#endif
+
+/**
+ * @brief   Get the PID of the pktdump thread
+ *
+ * @return  PID of the pktdump thread
+ * @return  @ref KERNEL_PID_UNDEF if not initialized
+ */
+kernel_pid_t ng_pktdump_getpid(void);
+
+/**
  * @brief   Start the packet dump thread and listening for incoming packets
  *
- * @param[in] stack         stack for the packet dump thread
- * @param[in] stacksize     size of @p stack
- * @param[in] priority      priority of the packet dump thread
- * @param[in] name          name for the packet dump thread
- *
- * @return                  PID of newly created task on success
- * @return                  negative value on error
+ * @return  PID of the pktdump thread
+ * @return  negative value on error
  */
-kernel_pid_t ng_pktdump_init(char *stack, int stacksize,
-                             char priority, char *name);
+kernel_pid_t ng_pktdump_init(void);
 
 #ifdef __cplusplus
 }
