@@ -16,8 +16,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef __ISL29020_INTERNAL_H
-#define __ISL29020_INTERNAL_H
+#ifndef ISL29020_INTERNAL_H
+#define ISL29020_INTERNAL_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -69,5 +69,5 @@ extern "C" {
 }
 #endif
 
-#endif /* __ISL29020_INTERNAL_H */
+#endif /* ISL29020_INTERNAL_H */
 /** @} */
