@@ -291,7 +291,7 @@ static int riot_ccn_fib_test(int argc, char **argv)
     DEBUG("%d: '%s'\n", i, big_buf);
     printf("done: %d\n", i - 1);
 
-	return 0;
+    return 0;
 }
 #endif
 
