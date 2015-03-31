@@ -147,6 +147,7 @@ extern ucontext_t *_native_cur_ctx, *_native_isr_ctx;
 
 extern const char *_progname;
 extern char **_native_argv;
+extern char **_native_envp;
 extern pid_t _native_pid;
 extern pid_t _native_id;
 extern unsigned _native_rng_seed;

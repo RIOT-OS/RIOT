@@ -1,0 +1,47 @@
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+NCURSES
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	$ sudo apt-get install libncurses5 libncurses5-dbg libncurses5-dev
+	$ sudo ln -s /lib/i386-linux-gnu/libncurses.so.5.9 /lib/i386-linux-gnu/libncurses.so
+	$ sudo ln -s /lib/i386-linux-gnu/libtinfo.so.5.9 /lib/i386-linux-gnu/libtinfo.so
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+SOCAT
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	$ sudo apt-get install socat
+
+	$ socat -d -d PTY,echo=0 PTY,echo=0 
+	Explanation:
+		-d -d provides information of the created tty's
+		This gives two /dev/pts/<port1> and /dev/pts/<port2> numbers, which can be
+		connected
+
+Now a process can be started and pipe stdin and stdout to one of them:
+	$ ./bin/<myprogram> < /dev/pts/<port1> > /dev/pts/<port1>
+
+And MINICOM can be used to connect to the other:
+	$ minicom -p /dev/pts/<port2>
+
+------------------------------------------------------------------------------------------
+A more direct way is to start the process directly in socat and specify a symbolic link
+to the PTS:
+	$ mkdir -p $HOME/dev/pts/
+	$ socat PTY,link=$HOME/dev/pts/1,echo=0 EXEC:./bin/<myprogram>,PTY,echo=0
+
+This will create the symbolic link "$HOME/dev/pts/1" to the /dev/pts/<port1>, which we
+aren't interested in to really know. This link will be deleted when the socat is finished.
+
+We can connect to this with minicom with:
+	$ cd $HOME/dev
+	$ minicom -p pts/1
+
+The sender can also directly send to the virtual pty with ymodem:
+	$ sb <filename> < $HOME/dev/pts/1 > $HOME/dev/pts/1
+
+CAREFUL:
+	The name of the symbolic link must conform to what minicom expects. This is also
+	why we have to enter the directory directly, in which the symbolic link resides, in
+	order to make minicom happy. Carefully read the "-p" option in the minicom manpage!
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

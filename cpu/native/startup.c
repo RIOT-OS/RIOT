@@ -41,6 +41,7 @@ int _native_null_in_pipe[2];
 int _native_null_out_file;
 const char *_progname;
 char **_native_argv;
+char **_native_envp;
 pid_t _native_pid;
 pid_t _native_id;
 unsigned _native_rng_seed = 0;
@@ -232,11 +233,12 @@ The order of command line arguments matters.\n");
 
 }
 
-__attribute__((constructor)) static void startup(int argc, char **argv)
+__attribute__((constructor)) static void startup(int argc, char **argv, char **envp)
 {
     _native_init_syscalls();
 
     _native_argv = argv;
+    _native_envp = envp;
     _progname = argv[0];
     _native_pid = real_getpid();
 

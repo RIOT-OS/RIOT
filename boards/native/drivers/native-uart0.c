@@ -32,6 +32,11 @@
 
 #include <sys/select.h>
 
+#ifdef MODULE_READLINE
+#include <ncurses.h>
+#include <termios.h>
+#endif
+
 #include "cpu.h"
 #include "board_uart0.h"
 #include "thread.h"
@@ -263,6 +268,32 @@ void handle_uart_sock(void)
     _native_uart_conn = s;
 }
 
+
+#ifdef MODULE_READLINE
+static struct termios config, old_config;
+
+static void ncurses_exit_handler(void)
+{
+    // Reset attributes (TCSANOW: change immediately)
+    tcsetattr(0, TCSANOW, &old_config);
+    endwin();
+}
+
+static void ncurses_init(void)
+{
+    initscr(); /* Start curses mode     */
+
+    /* Change the output behaviour of the terminal. */
+    tcgetattr(0, &config);
+    old_config = config;
+    config.c_oflag |= ONLCR;    // (XSI) Map NL to CR-NL on output.
+    // Change attributes (TCSANOW: change immediately)
+    tcsetattr(0, TCSANOW, &config);
+    // Register exit handler, to reset the terminal on program exit.
+    atexit(ncurses_exit_handler);
+}
+#endif
+
 #ifdef MODULE_UART0
 void _native_handle_uart0_input(void)
 {
@@ -289,10 +320,22 @@ int _native_set_uart_fds(void)
         return ((STDIN_FILENO > _native_uart_sock) ? STDIN_FILENO : _native_uart_sock);
     }
 }
+
+void _native_exit_uart0(void)
+{
+    puts("RIOT native uart0 exit.");
+#ifdef MODULE_READLINE
+    ncurses_exit_handler();
+#endif // MODULE_READLINE
+}
 #endif
 
 void _native_init_uart0(char *stdiotype, char *ioparam, int replay)
 {
+#ifdef MODULE_READLINE
+	ncurses_init();
+#endif
+
     _native_replay_enabled = replay;
 
     if (_native_replay_enabled) {
