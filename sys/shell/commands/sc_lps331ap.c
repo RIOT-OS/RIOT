@@ -39,11 +39,11 @@ int _get_lps331ap_init_handler(int argc, char **argv)
 
     if (res) {
         puts("Error initializing LPS331AP sensor.");
-	return 1;
+        return 1;
     }
     else {
         puts("Initialized LPS331AP sensor with default values");
-	return 0;
+        return 0;
     }
 }
 
