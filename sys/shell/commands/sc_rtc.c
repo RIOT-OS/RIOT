@@ -34,7 +34,6 @@ static void _alarm_handler(void *arg)
     (void) arg;
 
     puts("The alarm rang");
-    return 0;
 }
 
 static int dow(int year, int month, int day)
