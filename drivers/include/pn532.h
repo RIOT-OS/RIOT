@@ -34,6 +34,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 #define PN532_PREAMBLE                      (0x00)
 #define PN532_STARTCODE1                    (0x00)
 #define PN532_STARTCODE2                    (0xFF)
@@ -520,6 +524,10 @@ uint8_t pn532_mifareclassic_write_ndef_uri (uint8_t sectorNumber, uint8_t uriIde
  *	@returns	1 on success, 0 on error
  */
 uint8_t pn532_mifareultralight_read_page (uint8_t page, uint8_t *buffer);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* PN532_H_ */
 /** @} */
