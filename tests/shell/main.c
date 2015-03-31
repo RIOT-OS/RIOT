@@ -26,6 +26,10 @@
 #include "shell.h"
 #include "board_uart0.h"
 
+#ifdef MODULE_READLINE
+#include "readline.h"
+#endif
+
 #define SHELL_BUFSIZE   (UART0_BUFSIZE)
 
 static int print_teststart(int argc, char **argv)
@@ -102,7 +106,6 @@ static const shell_command_t shell_commands[] = {
 
 int main(void)
 {
-
     printf("test_shell.\n");
 
     board_uart0_init();
