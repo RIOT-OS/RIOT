@@ -27,8 +27,16 @@ if [ -z "${BRANCH}" ]; then
     BRANCH=$(git rev-list HEAD | tail -n 1)
 fi
 
-git diff --check $(git merge-base ${BRANCH} HEAD)
-if [ $? -gt 0 ]
+git -c core.whitespace="tab-in-indent,tabwidth=4" \
+    diff --check $(git merge-base ${BRANCH} HEAD) -- *.[ch]
+
+RESULT=$?
+
+# Git regards any trailing white space except `\n` as an error so `\r` is
+# checked here, too
+git -c core.whitespace="trailing-space" \
+    diff --check $(git merge-base ${BRANCH} HEAD)
+if [ $? -ne 0 ] || [ $RESULT -ne 0 ]
 then
     echo "ERROR: This change introduces new whitespace errors"
     exit 1
