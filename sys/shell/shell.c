@@ -32,6 +32,10 @@
 #include "shell_commands.h"
 #include "shell_print.h"
 
+#ifdef MODULE_READLINE
+#include "readline.h"
+#endif
+
 static shell_command_handler_t find_handler(const shell_command_t *command_list, char *command)
 {
     const shell_command_t *command_lists[] = {
@@ -214,75 +218,80 @@ static void handle_input_line(shell_t *shell, char *line)
     }
 }
 
+#ifndef MODULE_READLINE
+
+/*
+ * Return negative if no input is read.
+ * Else return the number of characters read.
+ */
 static int readline(shell_t *shell, char *buf, size_t size)
 {
-    char *line_buf_ptr = buf;
+    int cursor = 0;
+    *buf = '\0';
 
     while (1) {
-        if ((line_buf_ptr - buf) >= ((int) size) - 1) {
+        if (cursor >= ((int) size) - 1) {
             return -1;
         }
 
         int c = shell->readchar();
         if (c < 0) {
-            return 1;
+            return -1;
         }
 
         /* We allow Unix linebreaks (\n), DOS linebreaks (\r\n), and Mac linebreaks (\r). */
         /* QEMU transmits only a single '\r' == 13 on hitting enter ("-serial stdio"). */
         /* DOS newlines are handled like hitting enter twice, but empty lines are ignored. */
         if (c == '\r' || c == '\n') {
-            if (line_buf_ptr == buf) {
-                /* The line is empty. */
-                continue;
-            }
-
-            *line_buf_ptr = '\0';
-            shell->put_char('\r');
-            shell->put_char('\n');
-            return 0;
+            return cursor;
         }
         /* QEMU uses 0x7f (DEL) as backspace, while 0x08 (BS) is for most terminals */
         else if (c == 0x08 || c == 0x7f) {
-            if (line_buf_ptr == buf) {
+            if (cursor == 0) {
                 /* The line is empty. */
                 continue;
             }
-
-            *--line_buf_ptr = '\0';
+            buf[--cursor] = '\0';
             /* white-tape the character */
             shell->put_char('\b');
             shell->put_char(' ');
             shell->put_char('\b');
         }
+        else if (c == '\t') {
+            /* Tabulator */
+            for (int i = 0; i < SHELL_TAB_SIZE; i++) {
+                shell_echo_char(shell, ' ');
+                buf[cursor++] = ' ';
+            }
+            continue;
+        }
         else {
-            *line_buf_ptr++ = c;
-            shell->put_char(c);
+            // Any other character
+            shell_echo_char(shell, c);
+            buf[cursor++] = c;
+            buf[cursor] = '\0';
         }
     }
 }
-
-static inline void print_prompt(shell_t *shell)
-{
-    shell->put_char('>');
-    shell->put_char(' ');
-    return;
-}
+#endif // MODULE_READLINE
 
 void shell_run(shell_t *shell)
 {
     char line_buf[shell->shell_buffer_size];
 
-    print_prompt(shell);
+    shell_prompt(shell);
 
     while (1) {
         int res = readline(shell, line_buf, sizeof(line_buf));
 
-        if (!res) {
+        shell_putchar(shell, '\n');
+        if (res > 0) {
+            /* n characters were read. */
             handle_input_line(shell, line_buf);
+            /* empty the line buffer */
+            *line_buf = '\0';
         }
-
-        print_prompt(shell);
+        shell_prompt(shell);
     }
 }
 
