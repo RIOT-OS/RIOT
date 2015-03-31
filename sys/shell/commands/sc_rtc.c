@@ -92,7 +92,7 @@ static int _rtc_getalarm(void)
     }
     else {
         puts("rtc: error getting alarm");
-	return 1;
+        return 1;
     }
 }
 
@@ -103,9 +103,9 @@ static int _rtc_setalarm(char **argv)
     if (_parse_time(argv, &now) == 0) {
         if (rtc_set_alarm(&now, _alarm_handler, NULL) == -1) {
             puts("rtc: error setting alarm");
-	    return 1;
+            return 1;
         }
-	return 0;
+        return 0;
     }
     return 1;
 }
@@ -130,9 +130,9 @@ static int _rtc_settime(char **argv)
     if (_parse_time(argv, &now) == 0) {
         if (rtc_set_time(&now) == -1) {
             puts("rtc: error setting time");
-	    return 1;
+            return 1;
         }
-	return 0;
+        return 0;
     }
     return 1;
 }
@@ -156,7 +156,7 @@ int _rtc_handler(int argc, char **argv)
 {
     if (argc < 2) {
         _rtc_usage();
-	return 1;
+        return 1;
     }
     else if (strncmp(argv[1], "init", 4) == 0) {
         rtc_init();
@@ -184,7 +184,7 @@ int _rtc_handler(int argc, char **argv)
     }
     else {
         printf("unknown command: %s\n", argv[1]);
-	return 1;
+        return 1;
     }
     return 0;
 }
