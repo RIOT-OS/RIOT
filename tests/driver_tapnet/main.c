@@ -40,11 +40,6 @@
 static char nomac_stack[KERNEL_CONF_STACKSIZE_DEFAULT];
 
 /**
- * @brief   Stack for the pktdump thread
- */
-static char dump_stack[KERNEL_CONF_STACKSIZE_MAIN];
-
-/**
  * @brief   Read chars from STDIO
  */
 int shell_read(void)
@@ -76,8 +71,7 @@ int main(void)
     ng_netif_init();
 
     /* initialize and register pktdump */
-    dump.pid = ng_pktdump_init(dump_stack, sizeof(dump_stack), PRIORITY_MAIN - 2,
-                               "dump");
+    dump.pid = ng_pktdump_init();
     dump.demux_ctx = NG_NETREG_DEMUX_CTX_ALL;
 
     if (dump.pid <= KERNEL_PID_UNDEF) {
@@ -96,6 +90,7 @@ int main(void)
         puts("Error starting nomac thread");
         return -1;
     }
+
     /* start the shell */
     shell_init(&shell, NULL, SHELL_BUFSIZE, shell_read, shell_put);
     shell_run(&shell);
