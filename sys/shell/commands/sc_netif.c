@@ -79,42 +79,6 @@ static void _set_usage(char *cmd_name)
          "       * \"src_len\" - sets the source address length in byte\n");
 }
 
-static size_t _parse_hwaddr(char *str, uint8_t *addr)
-{
-    char *tok = strtok(str, ":");
-    size_t res = 0;
-
-    while (tok != NULL) {
-        if (res >= MAX_ADDR_LEN) {
-            return 0;
-        }
-
-        unsigned int tmp = strtoul(tok, NULL, 16);
-
-        if (tmp <= 0xff) {
-            addr[res++] = (uint8_t)tmp;
-        }
-        else {
-            return 0;
-        }
-
-        tok = strtok(NULL, ":");
-    }
-
-    return res;
-}
-
-static void _print_hwaddr(uint8_t *addr, uint8_t addr_len)
-{
-    for (uint8_t i = 0; i < addr_len; i++) {
-        printf("%02x", addr[i]);
-
-        if (i != (addr_len - 1)) {
-            printf(":");
-        }
-    }
-}
-
 static void _print_netconf(ng_netconf_opt_t opt)
 {
     switch (opt) {
@@ -160,8 +124,10 @@ void _netif_list(kernel_pid_t dev)
     res = ng_netapi_get(dev, NETCONF_OPT_ADDRESS, 0, hwaddr, sizeof(hwaddr));
 
     if (res >= 0) {
+        char hwaddr_str[res * 3];
         printf(" HWaddr: ");
-        _print_hwaddr(hwaddr, (uint8_t)res);
+        printf("%s", ng_netif_addr_to_str(hwaddr_str, sizeof(hwaddr_str),
+                                          hwaddr, res));
         printf(" ");
     }
 
@@ -188,8 +154,10 @@ void _netif_list(kernel_pid_t dev)
     res = ng_netapi_get(dev, NETCONF_OPT_ADDRESS_LONG, 0, hwaddr, sizeof(hwaddr));
 
     if (res >= 0) {
+        char hwaddr_str[res * 3];
         printf("Long HWaddr: ");
-        _print_hwaddr(hwaddr, (uint8_t)res);
+        printf("%s", ng_netif_addr_to_str(hwaddr_str, sizeof(hwaddr_str),
+                                          hwaddr, res));
         printf("\n            ");
     }
 
@@ -273,7 +241,7 @@ static void _netif_set_addr(kernel_pid_t dev, ng_netconf_opt_t opt,
                             char *addr_str)
 {
     uint8_t addr[MAX_ADDR_LEN];
-    size_t addr_len = _parse_hwaddr(addr_str, addr);
+    size_t addr_len = ng_netif_addr_from_str(addr, sizeof(addr), addr_str);
 
     if (addr_len == 0) {
         puts("error: unable to parse address.\n"
@@ -291,9 +259,7 @@ static void _netif_set_addr(kernel_pid_t dev, ng_netconf_opt_t opt,
 
     printf("success: set ");
     _print_netconf(opt);
-    printf(" on interface %" PRIkernel_pid " to ", dev);
-    _print_hwaddr(addr, addr_len);
-    puts("");
+    printf(" on interface %" PRIkernel_pid " to %s\n", dev, addr_str);
 }
 
 static void _netif_set(char *cmd_name, kernel_pid_t dev, char *key, char *value)
@@ -346,7 +312,7 @@ int _netif_send(int argc, char **argv)
     }
 
     /* parse address */
-    addr_len = _parse_hwaddr(argv[2], addr);
+    addr_len = ng_netif_addr_from_str(addr, sizeof(addr), argv[2]);
 
     if (addr_len == 0) {
         puts("error: invalid address given");
