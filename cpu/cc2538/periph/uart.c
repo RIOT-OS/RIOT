@@ -303,6 +303,7 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
     /* Set the divisor for the baud rate generator */
     divisor = sys_clock_freq();
     divisor <<= UART_CTL_HSE_VALUE + 2;
+    divisor += baudrate / 2; /**< Avoid a rounding error */
     divisor /= baudrate;
     u->IBRD = divisor >> DIVFRAC_NUM_BITS;
     u->FBRD = divisor & DIVFRAC_MASK;
