@@ -69,6 +69,10 @@ extern int _get_current_handler(int argc, char **argv);
 extern int _reset_current_handler(int argc, char **argv);
 #endif
 
+#ifdef MODULE_READLINE
+extern void readline_print_keyboard(int argc, char **argv);
+#endif
+
 #if FEATURE_PERIPH_RTC
 extern int _rtc_handler(int argc, char **argv);
 #endif
@@ -174,6 +178,9 @@ const shell_command_t _shell_command_list[] = {
 #endif
 #ifdef MODULE_LPC_COMMON
     {"heap", "Shows the heap state for the LPC2387 on the command shell.", _heap_handler},
+#endif
+#ifdef MODULE_READLINE
+    { "keys", "Display shell keyboard controls.", readline_print_keyboard },
 #endif
 #ifdef MODULE_PS
     {"ps", "Prints information about running threads.", _ps_handler},
