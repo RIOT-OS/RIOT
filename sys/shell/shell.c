@@ -30,6 +30,7 @@
 #include <stdlib.h>
 #include "shell.h"
 #include "shell_commands.h"
+#include "shell_print.h"
 
 static shell_command_handler_t find_handler(const shell_command_t *command_list, char *command)
 {
@@ -88,6 +89,7 @@ static void print_help(const shell_command_t *command_list)
 
 static void handle_input_line(shell_t *shell, char *line)
 {
+    static const char *COMMAND_NOT_FOUND = "shell: command not found:";
     static const char *INCORRECT_QUOTING = "shell: incorrect quoting";
 
     /* first we need to calculate the number of arguments */
@@ -103,7 +105,8 @@ static void handle_input_line(shell_t *shell, char *line)
                 do {
                     ++pos;
                     if (!*pos) {
-                        puts(INCORRECT_QUOTING);
+                        shell_print_error(shell, INCORRECT_QUOTING);
+                        shell_putchar(shell, '\n');
                         return;
                     }
                     else if (*pos == '\\') {
@@ -111,14 +114,16 @@ static void handle_input_line(shell_t *shell, char *line)
                         ++contains_esc_seq;
                         ++pos;
                         if (!*pos) {
-                            puts(INCORRECT_QUOTING);
+                            shell_print_error(shell, INCORRECT_QUOTING);
+                            shell_putchar(shell, '\n');
                             return;
                         }
                         continue;
                     }
                 } while (*pos != quote_char);
                 if ((unsigned char) pos[1] > ' ') {
-                    puts(INCORRECT_QUOTING);
+                    shell_print_error(shell, INCORRECT_QUOTING);
+                    shell_putchar(shell, '\n');
                     return;
                 }
             }
@@ -130,13 +135,15 @@ static void handle_input_line(shell_t *shell, char *line)
                         ++contains_esc_seq;
                         ++pos;
                         if (!*pos) {
-                            puts(INCORRECT_QUOTING);
+                            shell_print_error(shell, INCORRECT_QUOTING);
+                            shell_putchar(shell, '\n');
                             return;
                         }
                     }
                     ++pos;
                     if (*pos == '"') {
-                        puts(INCORRECT_QUOTING);
+                        shell_print_error(shell, INCORRECT_QUOTING);
+                        shell_putchar(shell, '\n');
                         return;
                     }
                 } while ((unsigned char) *pos > ' ');
@@ -199,8 +206,10 @@ static void handle_input_line(shell_t *shell, char *line)
             print_help(shell->command_list);
         }
         else {
-            puts("shell: command not found:");
-            puts(argv[0]);
+            shell_print_error(shell, COMMAND_NOT_FOUND);
+            shell_putchar(shell, '\n');
+            shell_print(shell, argv[0]);
+            shell_putchar(shell, '\n');
         }
     }
 }

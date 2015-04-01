@@ -56,6 +56,25 @@ static int print_echo(int argc, char **argv)
     return 0;
 }
 
+#ifdef USE_SHELL_COLORS
+unsigned int FGBG[] = { 38, 48 };
+static void print_colors(int argc, char **argv)
+{
+    (void) argc; (void) argv;
+    int color, fgbg;
+    for (fgbg = 0; fgbg < 2; fgbg++) {
+        for (color = 0; color <= 256; color++) {
+            printf("\033[%i;5;%im %i\t\033[0m", FGBG[fgbg], color, color);
+            if (((color + 1) % 10) == 0) {
+                putchar('\n');
+            }
+        }
+        putchar('\n');
+    }
+    puts("\033[94m[Source: http://misc.flogisoft.com/bash/tip_colors_and_formatting]\033[0m");
+}
+#endif // USE_SHELL_COLORS
+
 static int shell_readc(void)
 {
     char c;
@@ -75,6 +94,9 @@ static const shell_command_t shell_commands[] = {
     { "start_test", "starts a test", print_teststart },
     { "end_test", "ends a test", print_testend },
     { "echo", "prints the input command", print_echo },
+#ifdef USE_SHELL_COLORS
+    { "colors", "Show fancy \033[31mC\033[32mo\033[34ml\033[34mo\033[35mr\033[36ms\033[37m!\033[0m", print_colors },
+#endif
     { NULL, NULL, NULL }
 };
 

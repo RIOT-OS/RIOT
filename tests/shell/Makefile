@@ -1,6 +1,7 @@
 APPLICATION = shell
 include ../Makefile.tests_common
 
+CFLAGS += -DUSE_SHELL_COLORS
 USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += ps
