@@ -66,7 +66,7 @@ static void _fib_usage(int info)
     };
 }
 
-void _fib_route_handler(int argc, char **argv)
+int _fib_route_handler(int argc, char **argv)
 {
     /* e.g. fibroute right now dont care about the adress/protocol family */
     if (argc == 1) {
@@ -86,12 +86,12 @@ void _fib_route_handler(int argc, char **argv)
             puts("\nunrecognized parameter1.\nPlease enter fibroute [add|del] for more information.");
         }
 
-        return;
+        return 1;
     }
 
     if (argc > 2 && !((strcmp("add", argv[1]) == 0) || (strcmp("del", argv[1]) == 0))) {
         puts("\nunrecognized parameter2.\nPlease enter fibroute [add|del] for more information.");
-        return;
+        return 1;
     }
 
     /* e.g. fibroute del <destination> */
@@ -106,7 +106,7 @@ void _fib_route_handler(int argc, char **argv)
             fib_remove_entry((uint8_t *)argv[2], (strlen(argv[2])));
         }
 
-        return;
+        return 0;
     }
 
     /* e.g. fibroute add <destination> via <next hop> dev <device> */
@@ -152,9 +152,10 @@ void _fib_route_handler(int argc, char **argv)
         }
         else {
             _fib_usage(1);
+            return 1;
         }
 
-        return;
+        return 0;
     }
 
     /* e.g. fibroute add <destination> via <next hop> dev <device> lifetime <lifetime> */
@@ -201,9 +202,10 @@ void _fib_route_handler(int argc, char **argv)
         }
         else {
             _fib_usage(2);
+            return 1;
         }
 
-        return;
+        return 0;
     }
 
     puts("\nunrecognized parameters.\nPlease enter fibroute [add|del] for more information.");

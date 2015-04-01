@@ -160,7 +160,7 @@ extern int _netif_send(int argc, char **argv);
 #endif
 
 #ifdef MODULE_FIB
-extern void _fib_route_handler( int argc, char **argv );
+extern int _fib_route_handler(int argc, char **argv);
 #endif
 
 const shell_command_t _shell_command_list[] = {
@@ -265,11 +265,7 @@ const shell_command_t _shell_command_list[] = {
 #endif
 #endif
 #ifdef MODULE_FIB
-    {
-        "fibroute",
-        "Manipulate the FIB (info: 'fibroute [add|del]')",
-        _fib_route_handler
-    },
+    {"fibroute", "Manipulate the FIB (info: 'fibroute [add|del]')", _fib_route_handler},
 #endif
     {NULL, NULL, NULL}
 };
