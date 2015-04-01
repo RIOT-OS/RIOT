@@ -34,6 +34,7 @@
 #include "net/ng_nettype.h"
 #include "net/ng_pkt.h"
 
+#include "net/ng_icmpv6/echo.h"
 #include "net/ng_icmpv6/error.h"
 
 #ifdef __cplusplus

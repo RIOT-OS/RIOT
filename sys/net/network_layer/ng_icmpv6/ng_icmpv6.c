@@ -28,6 +28,7 @@
 #include "utlist.h"
 
 #include "net/ng_icmpv6.h"
+#include "net/ng_icmpv6/echo.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
@@ -69,7 +70,8 @@ void ng_icmpv6_demux(kernel_pid_t iface, ng_pktsnip_t *pkt)
 #ifdef MODULE_NG_ICMPV6_ECHO
         case NG_ICMPV6_ECHO_REQ:
             DEBUG("icmpv6: handle echo request.\n");
-            /* TODO */
+            ng_icmpv6_echo_req_handle(iface, (ng_ipv6_hdr_t *)ipv6->data,
+                                      (ng_icmpv6_echo_t *)hdr, icmpv6->size);
             break;
 #endif
 
