@@ -163,6 +163,10 @@ extern int _netif_send(int argc, char **argv);
 extern int _fib_route_handler(int argc, char **argv);
 #endif
 
+#ifdef MODULE_NG_IPV6_NC
+extern int _ipv6_nc_manage(int argc, char **argv);
+#endif
+
 const shell_command_t _shell_command_list[] = {
     {"reboot", "Reboot the node", _reboot_handler},
 #ifdef MODULE_CONFIG
@@ -266,6 +270,9 @@ const shell_command_t _shell_command_list[] = {
 #endif
 #ifdef MODULE_FIB
     {"fibroute", "Manipulate the FIB (info: 'fibroute [add|del]')", _fib_route_handler},
+#endif
+#ifdef MODULE_NG_IPV6_NC
+    {"ncache", "manage neighbor cache by hand", _ipv6_nc_manage },
 #endif
     {NULL, NULL, NULL}
 };
