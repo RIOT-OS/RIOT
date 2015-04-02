@@ -172,7 +172,7 @@ ng_ipv6_nc_t *ng_ipv6_nc_get_next_router(ng_ipv6_nc_t *prev)
 {
     for (ng_ipv6_nc_t *router = ng_ipv6_nc_get_next(prev); router != NULL;
          router = ng_ipv6_nc_get_next(router)) {
-        if (_is_reachable(router) && (router->flags & NG_IPV6_NC_IS_ROUTER)) {
+        if (router->flags & NG_IPV6_NC_IS_ROUTER) {
             return router;
         }
     }
