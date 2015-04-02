@@ -519,6 +519,13 @@ void rpl_recv_DIO(void)
     rpl_dio_buf = get_rpl_dio_buf();
     DEBUGF("instance %04X ", rpl_dio_buf->rpl_instanceid);
     DEBUGF("rank %04X\n", byteorder_ntohs(rpl_dio_buf->rank));
+
+    /* do not process incoming DIOs containing my address as DODAGID */
+    if (ipv6_addr_is_equal(&my_address, &rpl_dio_buf->dodagid)) {
+        DEBUGF("Ignoring DIO with my address as DODAGID\n");
+        return;
+    }
+
     int len = DIO_BASE_LEN;
 
     rpl_instance_t *dio_inst = rpl_get_instance(rpl_dio_buf->rpl_instanceid);
