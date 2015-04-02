@@ -32,17 +32,17 @@
 
 
 //prototype
-static int twofish_set_key(twofish_context_t *ctx, uint8_t *key, uint8_t keylen);
+static int twofish_setup_key(twofish_context_t *ctx, const uint8_t *key, uint8_t keylen);
 
 // twofish interface
-block_cipher_interface_t twofish_interface = {
-    "TWOFISH",
+static const cipher_interface_t twofish_interface = {
+    TWOFISH_BLOCK_SIZE,
+    TWOFISH_KEY_SIZE,
     twofish_init,
     twofish_encrypt,
-    twofish_decrypt,
-    twofish_setup_key,
-    twofish_get_preferred_block_size
+    twofish_decrypt
 };
+const cipher_id_t CIPHER_TWOFISH = &twofish_interface;
 
 /* These two tables are the q0 and q1 permutations, exactly as described in
  * the Twofish paper. */
@@ -473,38 +473,31 @@ static uint8_t calc_sb_tbl[512] = {
 
 
 
-int twofish_init(cipher_context_t *context, uint8_t blockSize, uint8_t keySize,
-                 uint8_t *key)
+int twofish_init(cipher_context_t *context, const uint8_t *key,
+                 uint8_t keySize)
 {
-    //printf("%-40s: Entry\r\n", __FUNCTION__);
-    // 16 byte blocks only
-    if (blockSize != TWOFISH_BLOCK_SIZE) {
-        printf("%-40s: blockSize != TWOFISH_BLOCK_SIZE...\r\n", __FUNCTION__);
+    uint8_t i;
+
+    // Make sure that context is large enough. If this is not the case,
+    // you should build with -DTWOFISH.
+    if(CIPHER_MAX_CONTEXT_SIZE < TWOFISH_CONTEXT_SIZE) {
         return 0;
     }
 
-    uint8_t i;
-
-    //key must be at least CIPHERS_KEYSIZE Bytes long
-    if (keySize < CIPHERS_KEYSIZE) {
+    //key must be at least CIPHERS_MAX_KEY_SIZE Bytes long
+    if (keySize < CIPHERS_MAX_KEY_SIZE) {
         //fill up by concatenating key to as long as needed
-        for (i = 0; i < CIPHERS_KEYSIZE; i++) {
+        for (i = 0; i < CIPHERS_MAX_KEY_SIZE; i++) {
             context->context[i] = key[(i % keySize)];
         }
     }
     else {
-        for (i = 0; i < CIPHERS_KEYSIZE; i++) {
+        for (i = 0; i < CIPHERS_MAX_KEY_SIZE; i++) {
             context->context[i] = key[i];
         }
     }
 
     return 1;
-}
-
-int twofish_setup_key(cipher_context_t *context, uint8_t *key, uint8_t keysize)
-{
-    return twofish_init(context, twofish_get_preferred_block_size(),
-                        keysize, key);
 }
 
 /**
@@ -518,7 +511,7 @@ int twofish_setup_key(cipher_context_t *context, uint8_t *key, uint8_t keysize)
  *
  * @return  -1 if invalid key-length, 0 otherwise
  */
-static int twofish_set_key(twofish_context_t *ctx, uint8_t *key, uint8_t keylen)
+static int twofish_setup_key(twofish_context_t *ctx, const uint8_t *key, uint8_t keylen)
 {
     int i, j, k;
 
@@ -658,7 +651,7 @@ static int twofish_set_key(twofish_context_t *ctx, uint8_t *key, uint8_t keylen)
 
 
 /* Encrypt one block.  in and out may be the same. */
-int twofish_encrypt(cipher_context_t *context, uint8_t *in, uint8_t *out)
+int twofish_encrypt(const cipher_context_t *context, const uint8_t *in, uint8_t *out)
 {
     int res;
     //setup the twofish-specific context
@@ -670,7 +663,7 @@ int twofish_encrypt(cipher_context_t *context, uint8_t *in, uint8_t *out)
         return -1;
     }
 
-    res = twofish_set_key(ctx, context->context, TWOFISH_KEY_SIZE);
+    res = twofish_setup_key(ctx, context->context, TWOFISH_KEY_SIZE);
 
     if (res < 0) {
         printf("%-40s: [ERROR] twofish_setKey failed with Code %i\r\n",
@@ -716,7 +709,7 @@ int twofish_encrypt(cipher_context_t *context, uint8_t *in, uint8_t *out)
 }
 
 /* Decrypt one block.  in and out may be the same. */
-int twofish_decrypt(cipher_context_t *context, uint8_t *in, uint8_t *out)
+int twofish_decrypt(const cipher_context_t *context, const uint8_t *in, uint8_t *out)
 {
     int res;
     twofish_context_t *ctx = malloc(sizeof(twofish_context_t));
@@ -727,7 +720,7 @@ int twofish_decrypt(cipher_context_t *context, uint8_t *in, uint8_t *out)
         return -1;
     }
 
-    res = twofish_set_key(ctx, context->context, TWOFISH_KEY_SIZE);
+    res = twofish_setup_key(ctx, context->context, TWOFISH_KEY_SIZE);
 
     if (res < 0) {
         printf("%-40s: [ERROR] twofish_setKey failed with Code %i\r\n",
@@ -770,9 +763,4 @@ int twofish_decrypt(cipher_context_t *context, uint8_t *in, uint8_t *out)
 
     free(ctx);
     return 1;
-}
-
-uint8_t twofish_get_preferred_block_size(void)
-{
-    return TWOFISH_BLOCK_SIZE;
 }

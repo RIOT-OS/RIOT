@@ -87,13 +87,8 @@ extern "C" {
     counter--;                               \
     skey -= 4; }
 
-/**
- * @brief The cipher_context_t adapted for SkipJack
- */
-typedef struct {
-    /** 2 times keysize. makes unrolling keystream easier / efficient */
-    uint8_t skey [ 20 ];
-} skipjack_context_t;
+/** 2 times keysize. makes unrolling keystream easier / efficient */
+#define SKIPJACK_CONTEXT_SIZE 20
 
 /**
  * @brief   Initialize the SkipJack-BlockCipher context.
@@ -102,15 +97,13 @@ typedef struct {
  *                      initialization call. It should be passed to future
  *                      invocations of this module which use this particular
  *                      key.
- * @param   blockSize   size of the block in bytes.
  * @param   keySize     key size in bytes
  * @param   key         pointer to the key
  *
  * @return  Whether initialization was successful. The command may be
- *          unsuccessful if the key size or blockSize are not valid.
+ *          unsuccessful if the key size is not valid.
  */
-int skipjack_init(cipher_context_t *context, uint8_t blockSize, uint8_t keySize,
-                  uint8_t *key);
+int skipjack_init(cipher_context_t *context, const uint8_t *key, uint8_t keySize);
 
 /**
  * @brief   Encrypts a single block (of blockSize) using the passed context.
@@ -123,7 +116,7 @@ int skipjack_init(cipher_context_t *context, uint8_t blockSize, uint8_t keySize,
  * @return  Whether the encryption was successful. Possible failure reasons
  *          include not calling init().
  */
-int skipjack_encrypt(cipher_context_t *context, uint8_t *plainBlock,
+int skipjack_encrypt(const cipher_context_t *context, const uint8_t *plainBlock,
                      uint8_t *cipherBlock);
 
 /**
@@ -137,38 +130,8 @@ int skipjack_encrypt(cipher_context_t *context, uint8_t *plainBlock,
  * @return  Whether the decryption was successful. Possible failure reasons
  *         include not calling init()
  */
-int skipjack_decrypt(cipher_context_t *context, uint8_t *cipherBlock,
+int skipjack_decrypt(const cipher_context_t *context, const uint8_t *cipherBlock,
                      uint8_t *plainBlock);
-
-/**
- * @brief   Sets up the context to use the passed key for usage with SkipJack
- *          Performs the key expansion on the real secret.
- *
- * @param   context       the cipher_context_t-struct to save the updated key in
- * @param   key           a pointer to the secret key
- * @param   keysize       the length of the secret key
- *
- * @return SUCCESS
- */
-int skipjack_setup_key(cipher_context_t *context, uint8_t *key, uint8_t keysize);
-
-/**
- * @brief   Returns the preferred block size that this cipher operates with.
- *          It is always safe to call this function before the init() call has
- *          been made.
- *
- * @return  the preferred block size for this cipher. In the case where the
- *          cipher operates with multiple block sizes, this will pick one
- *          particular size (deterministically).
- */
-uint8_t skipjack_get_preferred_block_size(void);
-
-
-/**
- * Interface to access the functions
- *
- */
-extern block_cipher_interface_t skipjack_interface;
 
 #ifdef __cplusplus
 }

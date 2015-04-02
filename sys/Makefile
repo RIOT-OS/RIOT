@@ -110,6 +110,9 @@ endif
 ifneq (,$(filter ng_nomac,$(USEMODULE)))
     DIRS += net/link_layer/ng_nomac
 endif
+ifneq (,$(filter cipher_modes,$(USEMODULE)))
+    DIRS += crypto/modes
+endif
 ifneq (,$(filter ng_pktbuf,$(USEMODULE)))
     DIRS += net/crosslayer/ng_pktbuf
 endif
