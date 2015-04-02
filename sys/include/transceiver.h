@@ -87,6 +87,13 @@
 #endif
 #endif
 
+#ifdef MODULE_KW2XRF
+#include "kw2xrf.h"
+#ifndef TRANSCEIVER_DEFAULT
+#define TRANSCEIVER_DEFAULT TRANSCEIVER_KW2XRF
+#endif
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -141,6 +148,12 @@ extern "C" {
 #define PAYLOAD_SIZE (NATIVE_MAX_DATA_LENGTH)
 #endif
 #endif
+#ifdef MODULE_KW2XRF
+#if (MKW2XDRF_MAX_DATA_LENGTH > PAYLOAD_SIZE)
+#undef PAYLOAD_SIZE
+#define PAYLOAD_SIZE (MKW2XDRF_MAX_DATA_LENGTH)
+#endif
+#endif
 /**
  * @}
  */
@@ -172,6 +185,7 @@ extern "C" {
 #define TRANSCEIVER_MC1322X     (0x08)      /**< MC1322X transceivers */
 #define TRANSCEIVER_NATIVE      (0x10)      /**< NATIVE transceivers */
 #define TRANSCEIVER_AT86RF231   (0x20)      /**< AT86RF231 transceivers */
+#define TRANSCEIVER_KW2XRF      (0x40)      /**< KW2XRF transceivers */
 /**
  * @}
  */
@@ -197,6 +211,7 @@ enum transceiver_msg_type_t {
     RCV_PKT_MC1322X,       /**< packet was received by mc1322x transceiver */
     RCV_PKT_NATIVE,        /**< packet was received by native transceiver */
     RCV_PKT_AT86RF231,     /**< packet was received by AT86RF231 transceiver */
+    RCV_PKT_KW2XRF,        /**< packet was received by KW2XRF transceiver */
 
     /* Message types for transceiver <-> upper layer communication */
     PKT_PENDING,    /**< packet pending in transceiver buffer */

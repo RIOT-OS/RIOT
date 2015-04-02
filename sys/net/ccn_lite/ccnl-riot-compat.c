@@ -31,7 +31,7 @@
 #include "ccnl-pdu.h"
 #include "ccnl-riot-compat.h"
 
-#if defined (MODULE_AT86RF231) || defined(MODULE_CC2420) || defined(MODULE_MC1322X)
+#if defined (MODULE_AT86RF231) || defined(MODULE_CC2420) || defined(MODULE_MC1322X) || defined(MODULE_KW2XRF)
 ieee802154_packet_t p;
 #else
 radio_packet_t p;
@@ -52,7 +52,7 @@ int riot_send_transceiver(uint8_t *buf, uint16_t size, uint16_t to)
         return 0;
     }
 
-#if MODULE_AT86RF231 || MODULE_CC2420 || MODULE_MC1322X
+#if MODULE_AT86RF231 || MODULE_CC2420 || MODULE_MC1322X || MODULE_KW2XRF
     memset(&p, 0, sizeof(ieee802154_packet_t));
     p.frame.payload_len = size;
     p.frame.fcf.frame_type = IEEE_802154_DATA_FRAME;
