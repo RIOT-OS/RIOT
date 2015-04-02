@@ -338,7 +338,7 @@ ipv6_addr_t *aodv_get_next_hop(ipv6_addr_t *dest)
         /* Case 2: Broken Link (detected by lower layer) */
         int link_broken = (ndp_nc_entry->state == NDP_NCE_STATUS_INCOMPLETE ||
                            ndp_nc_entry->state == NDP_NCE_STATUS_PROBE) &&
-                          (rt_entry != NULL && rt_entry->state != ROUTE_STATE_BROKEN);
+                          (rt_entry != NULL && rt_entry->state != ROUTE_STATE_INVALID);
 
         if (link_broken) {
             DEBUG("\tNeighbor Cache entry found, but invalid (state: %i). Sending RERR.\n",
@@ -360,8 +360,7 @@ ipv6_addr_t *aodv_get_next_hop(ipv6_addr_t *dest)
           ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, dest));
     if (rt_entry) {
         /* Case 1: Undeliverable Packet */
-        int packet_indeliverable = rt_entry->state == ROUTE_STATE_BROKEN ||
-                                   rt_entry->state == ROUTE_STATE_EXPIRED;
+        int packet_indeliverable = rt_entry->state == ROUTE_STATE_INVALID;
         if (packet_indeliverable) {
             DEBUG("\tRouting table entry found, but invalid (state %i). Sending RERR.\n",
                   rt_entry->state);
