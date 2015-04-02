@@ -44,6 +44,55 @@ static bool _is_iface(kernel_pid_t iface)
 #endif
 }
 
+static int _ipv6_nc_list(void)
+{
+    char ipv6_str[NG_IPV6_ADDR_MAX_STR_LEN];
+    char l2addr_str[3 * MAX_L2_ADDR_LEN];
+
+    puts("IPv6 address                    if  L2 address                state");
+    puts("-------------------------------------------------------------------------");
+
+    for (ng_ipv6_nc_t *entry = ng_ipv6_nc_get_next(NULL);
+         entry != NULL;
+         entry = ng_ipv6_nc_get_next(entry)) {
+        printf("%-30s  %2" PRIkernel_pid "  %-24s  ",
+               ng_ipv6_addr_to_str(ipv6_str, &entry->ipv6_addr, sizeof(ipv6_str)),
+               entry->iface,
+               ng_netif_addr_to_str(l2addr_str, sizeof(l2addr_str),
+                                    entry->l2_addr, entry->l2_addr_len));
+
+        switch (entry->flags & NG_IPV6_NC_STATE_MASK) {
+            case NG_IPV6_NC_STATE_UNMANAGED:
+                puts("UNMANAGED");
+                break;
+
+            case NG_IPV6_NC_STATE_UNREACHABLE:
+                puts("UNREACHABLE");
+                break;
+
+            case NG_IPV6_NC_STATE_INCOMPLETE:
+                puts("INCOMPLETE");
+                break;
+
+            case NG_IPV6_NC_STATE_STALE:
+                puts("STALE");
+                break;
+
+            case NG_IPV6_NC_STATE_DELAY:
+                puts("DELAY");
+                break;
+
+            case NG_IPV6_NC_STATE_PROBE:
+                puts("PROBE");
+
+            case NG_IPV6_NC_STATE_REACHABLE:
+                puts("REACHABLE");
+        }
+    }
+
+    return 0;
+}
+
 static int _ipv6_nc_add(kernel_pid_t iface, char *ipv6_addr_str,
                         char *l2_addr_str)
 {
@@ -88,6 +137,10 @@ static int _ipv6_nc_del(char *ipv6_addr_str)
 
 int _ipv6_nc_manage(int argc, char **argv)
 {
+    if ((argc == 1) || (strcmp("list", argv[1]) == 0)) {
+        return _ipv6_nc_list();
+    }
+
     if (argc > 2) {
         if ((argc > 4) && (strcmp("add", argv[1]) == 0)) {
             kernel_pid_t iface = (kernel_pid_t)atoi(argv[2]);
@@ -105,9 +158,69 @@ int _ipv6_nc_manage(int argc, char **argv)
         }
     }
 
-    printf("usage: %s add <iface pid> <ipv6_addr> <l2_addr>\n"
-           "   or: %s del <ipv6_addr>\n", argv[0], argv[0]);
+    printf("usage: %s [list]\n"
+           "   or: %s add <iface pid> <ipv6_addr> <l2_addr>\n"
+           "   or: %s del <ipv6_addr>\n", argv[0], argv[0], argv[0]);
     return 1;
+}
+
+int _ipv6_nc_routers(int argc, char **argv)
+{
+    kernel_pid_t iface = KERNEL_PID_UNDEF;
+    char ipv6_str[NG_IPV6_ADDR_MAX_STR_LEN];
+
+    if (argc > 1) {
+        iface = atoi(argv[1]);
+
+        if (!_is_iface(iface)) {
+            printf("usage: %s [<iface pid>]\n", argv[0]);
+            return 1;
+        }
+    }
+
+    puts("if  Router                          state");
+    puts("-----------------------------------------------");
+
+    for (ng_ipv6_nc_t *entry = ng_ipv6_nc_get_next_router(NULL);
+         entry != NULL;
+         entry = ng_ipv6_nc_get_next_router(entry)) {
+        if ((iface != KERNEL_PID_UNDEF) && (iface != entry->iface)) {
+            continue;
+        }
+
+        printf("%2" PRIkernel_pid "  %-30s  ", entry->iface,
+               ng_ipv6_addr_to_str(ipv6_str, &entry->ipv6_addr, sizeof(ipv6_str)));
+
+        switch (entry->flags & NG_IPV6_NC_STATE_MASK) {
+            case NG_IPV6_NC_STATE_UNMANAGED:
+                puts("UNMANAGED");
+                break;
+
+            case NG_IPV6_NC_STATE_UNREACHABLE:
+                puts("UNREACHABLE");
+                break;
+
+            case NG_IPV6_NC_STATE_INCOMPLETE:
+                puts("INCOMPLETE");
+                break;
+
+            case NG_IPV6_NC_STATE_STALE:
+                puts("STALE");
+                break;
+
+            case NG_IPV6_NC_STATE_DELAY:
+                puts("DELAY");
+                break;
+
+            case NG_IPV6_NC_STATE_PROBE:
+                puts("PROBE");
+
+            case NG_IPV6_NC_STATE_REACHABLE:
+                puts("REACHABLE");
+        }
+    }
+
+    return 0;
 }
 
 /**
