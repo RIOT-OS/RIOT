@@ -120,7 +120,7 @@ void routingtable_break_and_get_all_hopping_over(struct netaddr *hop,
                 (*len)++;
                 DEBUG("\t[routing] unreachable node found: %s\n", netaddr_to_string(&nbuf, &routing_table[i].nextHopAddr));
             }
-            routing_table[i].state = ROUTE_STATE_BROKEN;
+            routing_table[i].state = ROUTE_STATE_INVALID;
             DEBUG("\t[routing] number of unreachable nodes: %i\n", *len);
         }
     }
@@ -159,30 +159,33 @@ static void _reset_entry_if_stale(uint8_t i)
         routing_table[i].lastUsed = now; /* mark the time entry was set to Idle */
     }
 
-    /* After an idle route remains Idle for MAX_IDLETIME, it becomes an Expired route.
-       A route MUST be considered Expired if Current_Time >= Route.ExpirationTime
-    */
+    /* After an Idle route remains Idle for MAX_IDLETIME, it becomes an Invalid route. */
 
     /* if the node is younger than the expiration time, don't bother */
     if (timex_cmp(now, expirationTime) < 0) {
         return;
     }
 
+    /* If Current_Time > Route.ExpirationTime, set Route.State := Invalid. */
     if ((state == ROUTE_STATE_IDLE) &&
-        (timex_cmp(expirationTime, now) < 1)) {
-        DEBUG("\t[routing] route towards %s Expired\n",
+        (timex_cmp(now, expirationTime) > 0)) {
+        DEBUG("\t[routing] route towards %s became Invalid\n",
               netaddr_to_string(&nbuf, &routing_table[i].addr));
-        DEBUG("\t expirationTime: %"PRIu32":%"PRIu32" , now: %"PRIu32":%"PRIu32"\n",
-              expirationTime.seconds, expirationTime.microseconds,
-              now.seconds, now.microseconds);
-        routing_table[i].state = ROUTE_STATE_EXPIRED;
-        routing_table[i].lastUsed = now; /* mark the time entry was set to Expired */
+        routing_table[i].state = ROUTE_STATE_INVALID;
+        routing_table[i].lastUsed = now; /* mark the time entry was set to Invalid */
+    }
+
+    /* If (Current_Time - Route.LastUsed) > (ACTIVE_INTERVAL + MAX_IDLETIME),
+     * and if (Route.Timed == FALSE), set Route.State := Invalid. */
+    if ((timex_cmp(timex_sub(now, lastUsed), timex_add(active_interval, max_idletime)) > 0) &&
+        (state != ROUTE_STATE_TIMED)) {
+        routing_table[i].state = ROUTE_STATE_INVALID;
     }
 
     /* After that time, old sequence number information is considered no longer
-     * valuable and the Expired route MUST BE expunged */
+     * valid and the Invalid route MUST BE expunged */
     if (timex_cmp(timex_sub(now, lastUsed), max_seqnum_lifetime) >= 0) {
-        DEBUG("\t[routing] reset routing table entry for %s at %i\n",
+        DEBUG("\t[routing] Expunged routing table entry for %s at %i\n",
               netaddr_to_string(&nbuf, &routing_table[i].addr), i);
         memset(&routing_table[i], 0, sizeof(routing_table[i]));
     }
@@ -197,11 +200,11 @@ bool routingtable_offers_improvement(struct aodvv2_routing_entry_t *rt_entry,
     }
     /* Check if new info is more costly */
     if ((node_data->metric >= rt_entry->metric)
-        && !(rt_entry->state != ROUTE_STATE_BROKEN)) {
+        && !(rt_entry->state != ROUTE_STATE_INVALID)) {
         return false;
     }
-    /* Check if new info repairs a broken route */
-    if (!(rt_entry->state != ROUTE_STATE_BROKEN)) {
+    /* Check if new info repairs an invalid route */
+    if (!(rt_entry->state != ROUTE_STATE_INVALID)) {
         return false;
     }
     return true;
