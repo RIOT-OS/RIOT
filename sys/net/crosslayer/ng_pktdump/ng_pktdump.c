@@ -137,7 +137,7 @@ kernel_pid_t ng_pktdump_init(void)
 {
     if (_pid == KERNEL_PID_UNDEF) {
         _pid = thread_create(_stack, sizeof(_stack), NG_PKTDUMP_PRIO,
-                             0, _eventloop, NULL, "pktdump");
+                             CREATE_STACKTEST, _eventloop, NULL, "pktdump");
     }
     return _pid;
 }
