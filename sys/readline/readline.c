@@ -25,8 +25,8 @@
 
 static char cut_buffer[SHELL_BUFFER_SIZE];
 
-// TODO: Introduce definition PROMT_LENGTH (instead of "2")
-#define PROMT_LENGTH 2
+// TODO: Introduce definition PROMPT_LENGTH (instead of "2")
+#define PROMPT_LENGTH 2
 
 /*
  * Create a terminal command to set the cursor to the specified position, plus the size of
@@ -36,7 +36,7 @@ void set_screen_cursor(shell_t *shell, int cursor)
 {
     char buf[4];
     shell_print(shell, "\r\x1b[");
-    snprintf(buf, 4, "%d", cursor + PROMT_LENGTH);
+    snprintf(buf, 4, "%d", cursor + PROMPT_LENGTH);
     shell_print(shell, buf);
     shell_putchar(shell, 'C');
 }
