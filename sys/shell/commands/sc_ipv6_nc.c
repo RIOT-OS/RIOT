@@ -26,6 +26,64 @@
 /* maximum length of L2 address */
 #define MAX_L2_ADDR_LEN (8U)
 
+static char *_print_nc_state(ng_ipv6_nc_t *entry)
+{
+    switch (entry->flags & NG_IPV6_NC_STATE_MASK) {
+        case NG_IPV6_NC_STATE_UNMANAGED:
+            printf("UNMANAGED");
+            break;
+
+        case NG_IPV6_NC_STATE_UNREACHABLE:
+            printf("UNREACHABLE");
+            break;
+
+        case NG_IPV6_NC_STATE_INCOMPLETE:
+            printf("INCOMPLETE");
+            break;
+
+        case NG_IPV6_NC_STATE_STALE:
+            printf("STALE");
+            break;
+
+        case NG_IPV6_NC_STATE_DELAY:
+            printf("DELAY");
+            break;
+
+        case NG_IPV6_NC_STATE_PROBE:
+            printf("PROBE");
+            break;
+
+        case NG_IPV6_NC_STATE_REACHABLE:
+            printf("REACHABLE");
+            break;
+
+        default:
+            printf("UNKNOWN");
+            break;
+    }
+}
+
+static char *_print_nc_type(ng_ipv6_nc_t *entry)
+{
+    switch (entry->flags & NG_IPV6_NC_TYPE_MASK) {
+        case NG_IPV6_NC_TYPE_GC:
+            printf("GC");
+            break;
+
+        case NG_IPV6_NC_TYPE_TENTATIVE:
+            printf("T");
+            break;
+
+        case NG_IPV6_NC_TYPE_REGISTERED:
+            printf("R");
+            break;
+
+        default:
+            printf("-");
+            break;
+    }
+}
+
 static bool _is_iface(kernel_pid_t iface)
 {
 #ifdef MODULE_NG_NETIF
@@ -49,8 +107,8 @@ static int _ipv6_nc_list(void)
     char ipv6_str[NG_IPV6_ADDR_MAX_STR_LEN];
     char l2addr_str[3 * MAX_L2_ADDR_LEN];
 
-    puts("IPv6 address                    if  L2 address                state");
-    puts("-------------------------------------------------------------------------");
+    puts("IPv6 address                    if  L2 address                state      type");
+    puts("-----------------------------------------------------------------------------");
 
     for (ng_ipv6_nc_t *entry = ng_ipv6_nc_get_next(NULL);
          entry != NULL;
@@ -60,34 +118,9 @@ static int _ipv6_nc_list(void)
                entry->iface,
                ng_netif_addr_to_str(l2addr_str, sizeof(l2addr_str),
                                     entry->l2_addr, entry->l2_addr_len));
-
-        switch (entry->flags & NG_IPV6_NC_STATE_MASK) {
-            case NG_IPV6_NC_STATE_UNMANAGED:
-                puts("UNMANAGED");
-                break;
-
-            case NG_IPV6_NC_STATE_UNREACHABLE:
-                puts("UNREACHABLE");
-                break;
-
-            case NG_IPV6_NC_STATE_INCOMPLETE:
-                puts("INCOMPLETE");
-                break;
-
-            case NG_IPV6_NC_STATE_STALE:
-                puts("STALE");
-                break;
-
-            case NG_IPV6_NC_STATE_DELAY:
-                puts("DELAY");
-                break;
-
-            case NG_IPV6_NC_STATE_PROBE:
-                puts("PROBE");
-
-            case NG_IPV6_NC_STATE_REACHABLE:
-                puts("REACHABLE");
-        }
+        _print_nc_state(entry);
+        _print_nc_type(entry);
+        puts("");
     }
 
     return 0;
@@ -178,8 +211,8 @@ int _ipv6_nc_routers(int argc, char **argv)
         }
     }
 
-    puts("if  Router                          state");
-    puts("-----------------------------------------------");
+    puts("if  Router                          state      type");
+    puts("---------------------------------------------------");
 
     for (ng_ipv6_nc_t *entry = ng_ipv6_nc_get_next_router(NULL);
          entry != NULL;
@@ -190,34 +223,9 @@ int _ipv6_nc_routers(int argc, char **argv)
 
         printf("%2" PRIkernel_pid "  %-30s  ", entry->iface,
                ng_ipv6_addr_to_str(ipv6_str, &entry->ipv6_addr, sizeof(ipv6_str)));
-
-        switch (entry->flags & NG_IPV6_NC_STATE_MASK) {
-            case NG_IPV6_NC_STATE_UNMANAGED:
-                puts("UNMANAGED");
-                break;
-
-            case NG_IPV6_NC_STATE_UNREACHABLE:
-                puts("UNREACHABLE");
-                break;
-
-            case NG_IPV6_NC_STATE_INCOMPLETE:
-                puts("INCOMPLETE");
-                break;
-
-            case NG_IPV6_NC_STATE_STALE:
-                puts("STALE");
-                break;
-
-            case NG_IPV6_NC_STATE_DELAY:
-                puts("DELAY");
-                break;
-
-            case NG_IPV6_NC_STATE_PROBE:
-                puts("PROBE");
-
-            case NG_IPV6_NC_STATE_REACHABLE:
-                puts("REACHABLE");
-        }
+        _print_nc_state(entry);
+        _print_nc_type(entry);
+        puts("");
     }
 
     return 0;
