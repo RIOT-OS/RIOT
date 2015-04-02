@@ -29,11 +29,15 @@ extern "C" {
 
 /**
  * @brief SPI interface initialization
+ * @param[in] spi           SPI bus the device is connected to
+ * @param[in] spi_speed     SPI speed to use
+ * @param[in] cs_pin        GPIO pin connected to chip select
  *
  * @return 0 on success
  * @return -1 on error
  */
-int kw2xrf_spi_init(void);
+int kw2xrf_spi_init(spi_t spi, spi_speed_t spi_speed,
+                    gpio_t cs_pin);
 
 /**
  * @brief Writes a byte to the kw2xrf register.
@@ -94,7 +98,7 @@ void kw2xrf_read_iregs(uint8_t addr, uint8_t *buf, uint8_t length);
  *
  * @return number of bytes written.
  */
-void kw2xrf_write_fifo(uint8_t *data, radio_packet_length_t data_length);
+void kw2xrf_write_fifo(uint8_t *data, uint8_t data_length);
 
 /**
  * @brief Reads multiple bytes from the kw2xrf fifo.
@@ -104,7 +108,7 @@ void kw2xrf_write_fifo(uint8_t *data, radio_packet_length_t data_length);
  *
  * @return number of bytes read.
  */
-void kw2xrf_read_fifo(uint8_t *data, radio_packet_length_t data_length);
+void kw2xrf_read_fifo(uint8_t *data, uint8_t data_length);
 
 #ifdef __cplusplus
 }

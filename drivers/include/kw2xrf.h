@@ -22,6 +22,11 @@
 #ifndef MKW2XDRF_H_
 #define MKW2XDRF_H_
 
+#include <stdint.h>
+
+#include "board.h"
+#include "periph/spi.h"
+#include "periph/gpio.h"
 #include "net/ng_netdev.h"
 
 #ifdef __cplusplus
@@ -29,7 +34,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   Maximum packet length, including XBee API frame overhead
+ * @brief   Maximum packet length
  */
 #define KW2XRF_MAX_PKT_LENGTH         (127U)
 
@@ -48,57 +53,89 @@ extern "C" {
 #define KW2XRF_DEFAULT_SHORT_ADDR     (0x0002)
 
 /**
+ * @brief   Default short address used after initialization
+ */
+#define KW2XRF_DEFAULT_ADDR_LONG  (0x0000000000000000)
+
+/**
  * @brief   Default PAN ID used after initialization
  */
-#define KW2XRF_DEFAULT_PANID          (0x0001)
+#define KW2XRF_DEFAULT_PANID          (0x0023)
 
 /**
  * @brief   Default channel used after initialization
  */
-#define KW2XRF_DEFAULT_CHANNEL        (13U)
+#define KW2XRF_DEFAULT_CHANNEL        (17U)
+
+/**
+ * @brief   Default TX_POWER in dbm used after initialization
+ */
+#define KW2XRF_DEFAULT_TX_POWER       (0)
 
 /**
  * @brief   Maximum output power of the kw2x device in dBm
  */
-#define MKW2XDRF_OUTPUT_POWER_MAX  8
+#define MKW2XDRF_OUTPUT_POWER_MAX      (8)
 
 /**
  * @brief   Minimum output power of the kw2x device in dBm
  */
-#define MKW2XDRF_OUTPUT_POWER_MIN  (-35)
+#define MKW2XDRF_OUTPUT_POWER_MIN      (-35)
+
+/**
+ * @brief   Internal device option flags
+ * @{
+ */
+#define KW2XRF_OPT_AUTOACK       (0x0001)  /**< auto ACKs active */
+#define KW2XRF_OPT_CSMA          (0x0002)  /**< CSMA active */
+#define KW2XRF_OPT_PROMISCUOUS   (0x0004)  /**< promiscuous mode active */
+#define KW2XRF_OPT_PRELOADING    (0x0008)  /**< preloading enabled */
+#define KW2XRF_OPT_TELL_TX_START (0x0010)  /**< notify MAC layer on TX start */
+#define KW2XRF_OPT_TELL_TX_END   (0x0020)  /**< notify MAC layer on TX finished */
+#define KW2XRF_OPT_TELL_RX_START (0x0040)  /**< notify MAC layer on RX start */
+#define KW2XRF_OPT_TELL_RX_END   (0x0080)  /**< notify MAC layer on RX finished */
+#define KW2XRF_OPT_RAWDUMP       (0x0100)  /**< pass RAW frame data to upper layer */
+#define KW2XRF_OPT_SRC_ADDR_LONG (0x0200)  /**< send data using long source address */
+#define KW2XRF_OPT_USE_SRC_PAN   (0x0400)  /**< do not compress source PAN ID */
+/** @} */
 
 /**
  * @brief   kw2xrf device descriptor
  */
 typedef struct {
     /* netdev fields */
-    ng_netdev_driver_t const *driver;     /**< pointer to the devices interface */
-    ng_netdev_event_cb_t event_cb;        /**< netdev event callback */
-    kernel_pid_t mac_pid;                 /**< the driver's thread's PID */
-    /* Devide driver specific fields */
-    uint8_t buf[KW2XRF_MAX_PKT_LENGTH];   /**> Buffer for the kw2x radio device */
+    ng_netdev_driver_t const *driver;     /**< Pointer to the devices interface */
+    ng_netdev_event_cb_t event_cb;        /**< Netdev event callback */
+    kernel_pid_t mac_pid;                 /**< The driver's thread's PID */
+    /* driver specific fields */
+    uint8_t buf[KW2XRF_MAX_PKT_LENGTH];   /**< Buffer for incoming or outgoing packets */
     ng_netconf_state_t state;             /**< Variable to keep radio driver's state */
     uint8_t seq_nr;                       /**< Next packets sequence number */
     uint16_t radio_pan;                   /**< The PAN the radio device is using */
     uint8_t radio_channel;                /**< The channel the radio device is using */
     uint8_t addr_short[2];                /**< The short address the radio device is using */
     uint8_t addr_long[8];                 /**< The long address the radio device is using */
-    uint8_t options;                      /**< Bit field to save enable/disable options */
+    uint16_t option;                      /**< Bit field to save enable/disable options */
+    int8_t tx_power;                      /**< The current tx-power setting of the device */
     ng_nettype_t proto;                   /**< Protocol the interface speaks */
 } kw2xrf_t;
 
 /**
  * @brief   Initialize the given KW2XRF device
- *
- * @param[out] dev          KW2XRF device to initialize
+ * @param[out] dev          device descriptor
+ * @param[in] spi           SPI bus the device is connected to
+ * @param[in] spi_speed     SPI speed to use
+ * @param[in] cs_pin        GPIO pin connected to chip select
+ * @param[in] int_pin       GPIO pin connected to the interrupt pin
  *
  * @return                  0 on success
- * @return                  -ENODEV on invalid device descriptor
+ * @return                  <0 on error
  */
-int kw2xrf_init(kw2xrf_t *dev);
+int kw2xrf_init(kw2xrf_t *dev, spi_t spi, spi_speed_t spi_speed,
+                    gpio_t cs_pin, gpio_t int_pin);
 
 /**
- * Reference to the KW2XRF driver interface.
+ * @brief Reference to the KW2XRF driver interface
  */
 extern const ng_netdev_driver_t kw2xrf_driver;
 

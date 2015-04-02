@@ -31,42 +31,46 @@
 
 static uint8_t ibuf[KW2XRF_IBUF_LENGTH];
 
-#ifndef KW2XRF_SPI_SPEED
-#define KW2XRF_SPI_SPEED      SPI_SPEED_5MHZ
-#endif
+/** Set up in kw2xrf_spi_init during initialization */
+static gpio_t kw2xrf_cs_pin;
+static spi_t kw2xrf_spi;
 
-inline void kw2xrf_spi_transfer_head(void)
+void kw2xrf_spi_transfer_head(void)
 {
 #if KW2XRF_SHARED_SPI
-    spi_acquire(KW2XRF_SPI);
-    gpio_clear(KW2XRF_CS_GPIO);
+    spi_acquire(kw2xrf_spi);
+    gpio_clear(kw2xrf_cs_pin);
 #endif
 }
 
-inline void kw2xrf_spi_transfer_tail(void)
+void kw2xrf_spi_transfer_tail(void)
 {
 #if KW2XRF_SHARED_SPI
-    gpio_set(KW2XRF_CS_GPIO);
-    spi_release(KW2XRF_SPI);
+    gpio_set(kw2xrf_cs_pin);
+    spi_release(kw2xrf_spi);
 #endif
 }
 
-int kw2xrf_spi_init(void)
+int kw2xrf_spi_init(spi_t spi, spi_speed_t spi_speed,
+                    gpio_t cs_pin)
 {
     int res;
+    kw2xrf_cs_pin = cs_pin;     /**< for later reference */
+    kw2xrf_spi = spi;
 
 #if KW2XRF_SHARED_SPI
-    spi_acquire(KW2XRF_SPI);
+    spi_acquire(kw2xrf_spi);
 #endif
-    res = spi_init_master(KW2XRF_SPI, SPI_CONF_FIRST_RISING, KW2XRF_SPI_SPEED);
+    res = spi_init_master(kw2xrf_spi, SPI_CONF_FIRST_RISING, spi_speed);
 #if KW2XRF_SHARED_SPI
-    spi_release(KW2XRF_SPI);
-    gpio_init_out(KW2XRF_CS_GPIO, GPIO_NOPULL);
-    gpio_set(KW2XRF_CS_GPIO);
+    spi_release(kw2xrf_spi);
+    gpio_init_out(kw2xrf_cs_pin, GPIO_NOPULL);
+    gpio_set(kw2xrf_cs_pin);
 #endif
+
     if (res < 0) {
         DEBUG("kw2xrf_spi_init: error initializing SPI_%i device (code %i)\n",
-              spi_dev, res);
+              kw2xrf_spi, res);
         return -1;
     }
 
@@ -76,7 +80,7 @@ int kw2xrf_spi_init(void)
 void kw2xrf_write_dreg(uint8_t addr, uint8_t value)
 {
     kw2xrf_spi_transfer_head();
-    spi_transfer_reg(KW2XRF_SPI, addr, value, NULL);
+    spi_transfer_reg(kw2xrf_spi, addr, value, NULL);
     kw2xrf_spi_transfer_tail();
     return;
 }
@@ -85,8 +89,8 @@ uint8_t kw2xrf_read_dreg(uint8_t addr)
 {
     uint8_t value;
     kw2xrf_spi_transfer_head();
-    spi_transfer_reg(KW2XRF_SPI, (addr | MKW2XDRF_REG_READ),
-                                  0x0, (char *)&value);
+    spi_transfer_reg(kw2xrf_spi, (addr | MKW2XDRF_REG_READ),
+                     0x0, (char *)&value);
     kw2xrf_spi_transfer_tail();
     return value;
 }
@@ -96,6 +100,7 @@ void kw2xrf_write_iregs(uint8_t addr, uint8_t *buf, uint8_t length)
     if (length > (KW2XRF_IBUF_LENGTH - 1)) {
         length = KW2XRF_IBUF_LENGTH - 1;
     }
+
     ibuf[0] = addr;
 
     for (uint8_t i = 0; i < length; i++) {
@@ -103,7 +108,7 @@ void kw2xrf_write_iregs(uint8_t addr, uint8_t *buf, uint8_t length)
     }
 
     kw2xrf_spi_transfer_head();
-    spi_transfer_regs(KW2XRF_SPI, MKW2XDM_IAR_INDEX,
+    spi_transfer_regs(kw2xrf_spi, MKW2XDM_IAR_INDEX,
                       (char *)ibuf, NULL, length + 1);
     kw2xrf_spi_transfer_tail();
 
@@ -115,10 +120,11 @@ void kw2xrf_read_iregs(uint8_t addr, uint8_t *buf, uint8_t length)
     if (length > (KW2XRF_IBUF_LENGTH - 1)) {
         length = KW2XRF_IBUF_LENGTH - 1;
     }
+
     ibuf[0] = addr;
 
     kw2xrf_spi_transfer_head();
-    spi_transfer_regs(KW2XRF_SPI, MKW2XDM_IAR_INDEX | MKW2XDRF_REG_READ,
+    spi_transfer_regs(kw2xrf_spi, MKW2XDM_IAR_INDEX | MKW2XDRF_REG_READ,
                       (char *)ibuf, (char *)ibuf, length + 1);
     kw2xrf_spi_transfer_tail();
 
@@ -129,19 +135,19 @@ void kw2xrf_read_iregs(uint8_t addr, uint8_t *buf, uint8_t length)
     return;
 }
 
-void kw2xrf_write_fifo(uint8_t *data, radio_packet_length_t length)
+void kw2xrf_write_fifo(uint8_t *data, uint8_t length)
 {
     kw2xrf_spi_transfer_head();
-    spi_transfer_regs(KW2XRF_SPI, MKW2XDRF_BUF_WRITE,
-                             (char *)data, NULL, length);
+    spi_transfer_regs(kw2xrf_spi, MKW2XDRF_BUF_WRITE,
+                      (char *)data, NULL, length);
     kw2xrf_spi_transfer_tail();
 }
 
-void kw2xrf_read_fifo(uint8_t *data, radio_packet_length_t length)
+void kw2xrf_read_fifo(uint8_t *data, uint8_t length)
 {
     kw2xrf_spi_transfer_head();
-    spi_transfer_regs(KW2XRF_SPI, MKW2XDRF_BUF_READ, NULL,
-                             (char *)data, length);
+    spi_transfer_regs(kw2xrf_spi, MKW2XDRF_BUF_READ, NULL,
+                      (char *)data, length);
     kw2xrf_spi_transfer_tail();
 }
 /** @} */
