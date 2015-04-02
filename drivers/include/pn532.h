@@ -14,7 +14,7 @@
 /**
  * @ingroup     drivers_pn532
  * @{
- * @file        pn532.c
+ * @file        
  * @brief       C Library for the PN532 written for Riot OS.
  * 				SPI Driver for NXP's PN532 NFC/13.56MHz RFID Transceiver
  * 				This is a library to connect a PN532 chip on a Sam3x CPU.

@@ -24,7 +24,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
-#include "../../drivers/pn532/pn532.h"
+#include "pn532.h"
 
 int main(void){
 	sleep(10);

@@ -1,9 +1,6 @@
 # name of your application
-APPLICATION = authentication_mifare
+APPLICATION = driver_pn532
 
-#BOARD_BLACKLIST := chronos mbed_lpc1768 msb-430 msb-430h native qemu-i386 redbee-econotag telosb \
-                   wsn430-v1_3b wsn430-v1_4 z1
-# If no BOARD is found in the environment, use this default:
 BOARD ?= udoo
 
 # This has to be the absolute path to the RIOT base directory:
@@ -24,14 +21,14 @@ RIOTBASE ?= $(CURDIR)/../..
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the
 # development process:
-CFLAGS += -DDEVELHELP
+#CFLAGS += -DDEVELHELP
 
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 0
 
 # Modules to include:
-#FEATURES_REQUIRED = periph_spi
-FEATURES_PROVIDED += periph_uart periph_gpio periph_spi periph_random cpp
+FEATURES_REQUIRED = periph_spi periph_gpio
+#FEATURES_PROVIDED += periph_uart periph_gpio periph_spi periph_random cpp
 
 USEMODULE += uart0
 #USEMODULE += shell
