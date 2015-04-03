@@ -43,7 +43,7 @@ typedef struct {
     ng_netdev_driver_t *driver;         /**< pointer to the devices interface */
     ng_netdev_event_cb_t event_cb;      /**< netdev event callback */
     kernel_pid_t mac_pid;               /**< the driver's thread's PID */
-    int tap_fd;                         /**< file descriptor for the TAP */
+    int tap_fd;                         /**< host file descriptor for the TAP */
     uint8_t addr[NG_ETHERNET_ADDR_LEN]; /**< The MAC address of the TAP */
     uint8_t promiscous;                 /**< Flag for promiscous mode */
 } ng_tapnet_t;
