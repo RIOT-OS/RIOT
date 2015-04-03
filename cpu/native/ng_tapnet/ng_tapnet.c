@@ -499,7 +499,7 @@ static inline void _addr_set_multicast(uint8_t *dst, ng_pktsnip_t *payload)
             /* TODO change to proper types when ng_ipv6_hdr_t got merged */
             break;
 #endif
-       default:
+        default:
             _addr_set_broadcast(dst);
             break;
     }
@@ -546,7 +546,8 @@ static int _marshall_ethernet(ng_tapnet_t *dev, uint8_t *buffer, ng_pktsnip_t *p
     else if (netif_hdr->dst_l2addr_len == NG_ETHERNET_ADDR_LEN) {
         memcpy(hdr->dst, ng_netif_hdr_get_dst_addr(netif_hdr),
                NG_ETHERNET_ADDR_LEN);
-    } else {
+    }
+    else {
         DEBUG("ng_tapnet: destination address had unexpected format\n");
         return -EBADMSG;
     }
