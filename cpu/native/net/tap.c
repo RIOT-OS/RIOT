@@ -149,6 +149,9 @@ void _native_handle_tap_input(void)
             err(EXIT_FAILURE, "_native_handle_tap_input: read");
         }
     }
+    else if (nread == 0) {
+        DEBUG("_native_handle_tap_input: ignoring null-event\n");
+    }
     else {
         errx(EXIT_FAILURE, "internal error _native_handle_tap_input");
     }
