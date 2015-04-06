@@ -26,7 +26,7 @@
 /* maximum length of L2 address */
 #define MAX_L2_ADDR_LEN (8U)
 
-static char *_print_nc_state(ng_ipv6_nc_t *entry)
+static void _print_nc_state(ng_ipv6_nc_t *entry)
 {
     switch (entry->flags & NG_IPV6_NC_STATE_MASK) {
         case NG_IPV6_NC_STATE_UNMANAGED:
@@ -63,7 +63,7 @@ static char *_print_nc_state(ng_ipv6_nc_t *entry)
     }
 }
 
-static char *_print_nc_type(ng_ipv6_nc_t *entry)
+static void _print_nc_type(ng_ipv6_nc_t *entry)
 {
     switch (entry->flags & NG_IPV6_NC_TYPE_MASK) {
         case NG_IPV6_NC_TYPE_GC:
