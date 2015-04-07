@@ -20,7 +20,6 @@
 #include <string.h>
 #include <errno.h>
 #include "thread.h"
-#include "mutex.h"
 #include "msg.h"
 
 #define ENABLE_DEBUG (0)
@@ -56,42 +55,19 @@ static kernel_pid_t notify_rp[FIB_MAX_REGISTERED_RP];
 static universal_address_container_t* prefix_rp[FIB_MAX_REGISTERED_RP];
 
 /**
- * @brief maximum number of FIB tables entries handled
- */
-#define FIB_MAX_FIB_TABLE_ENTRIES (20)
-
-/**
  * @brief array of the FIB tables
  */
 static fib_entry_t fib_table[FIB_MAX_FIB_TABLE_ENTRIES];
 
-/**
- * @brief convert given ms to a point in time from now on in the future
- * @param[in]  ms     the milliseconds to be converted
- * @param[out] timex  the converted point in time
- */
-static void fib_ms_to_timex(uint32_t ms, timex_t *timex)
+void fib_ms_to_timex(uint32_t ms, timex_t *timex)
 {
     vtimer_now(timex);
     timex->seconds += ms / 1000;
     timex->microseconds += (ms - timex->seconds * 1000) * 1000;
 }
 
-/**
- * @brief returns pointer to the entry for the given destination address
- *
- * @param[in] dst                  the destination address
- * @param[in] dst_size             the destination address size
- * @param[out] entry_arr           the array to scribe the found match
- * @param[in, out] entry_arr_size  the number of entries provided by entry_arr (should be always 1)
- *                                 this value is overwritten with the actual found number
- *
- * @return 0 if we found a next-hop prefix
- *         1 if we found the exact address next-hop
- *         -EHOSTUNREACH if no fitting next-hop is available
- */
-static int fib_find_entry(uint8_t *dst, size_t dst_size,
-                          fib_entry_t **entry_arr, size_t *entry_arr_size)
+int fib_find_entry(uint8_t *dst, size_t dst_size,
+                   fib_entry_t **entry_arr, size_t *entry_arr_size)
 {
     timex_t now;
     vtimer_now(&now);
@@ -158,21 +134,9 @@ static int fib_find_entry(uint8_t *dst, size_t dst_size,
     return ret;
 }
 
-/**
- * @brief updates the next hop the lifetime and the interface id for a given entry
- *
- * @param[in] entry          the entry to be updated
- * @param[in] next_hop       the next hop address to be updated
- * @param[in] next_hop_size  the next hop address size
- * @param[in] next_hop_flags the next-hop address flags
- * @param[in] lifetime       the lifetime in ms
- *
- * @return 0 if the entry has been updated
- *         -ENOMEM if the entry cannot be updated due to insufficient RAM
- */
-static int fib_upd_entry(fib_entry_t *entry,
-                         uint8_t *next_hop, size_t next_hop_size, uint32_t next_hop_flags,
-                         uint32_t lifetime)
+int fib_upd_entry(fib_entry_t *entry,
+                  uint8_t *next_hop, size_t next_hop_size, uint32_t next_hop_flags,
+                  uint32_t lifetime)
 {
     universal_address_container_t *container = universal_address_add(next_hop, next_hop_size);
 
@@ -195,25 +159,10 @@ static int fib_upd_entry(fib_entry_t *entry,
     return 0;
 }
 
-/**
- * @brief creates a new FIB entry with the provided parameters
- *
- * @param[in] iface_id       the interface ID
- * @param[in] dst            the destination address
- * @param[in] dst_size       the destination address size
- * @param[in] dst_flags      the destination address flags
- * @param[in] next_hop       the next hop address
- * @param[in] next_hop_size  the next hop address size
- * @param[in] next_hop_flags the next-hop address flags
- * @param[in] lifetime       the lifetime in ms
- *
- * @return 0 on success
- *         -ENOMEM if no new entry can be created
- */
-static int fib_create_entry(kernel_pid_t iface_id,
-                            uint8_t *dst, size_t dst_size, uint32_t dst_flags,
-                            uint8_t *next_hop, size_t next_hop_size, uint32_t next_hop_flags,
-                            uint32_t lifetime)
+int fib_create_entry(kernel_pid_t iface_id,
+                     uint8_t *dst, size_t dst_size, uint32_t dst_flags,
+                     uint8_t *next_hop, size_t next_hop_size, uint32_t next_hop_flags,
+                     uint32_t lifetime)
 {
     for (size_t i = 0; i < FIB_MAX_FIB_TABLE_ENTRIES; ++i) {
         if (fib_table[i].lifetime.seconds == 0 && fib_table[i].lifetime.microseconds == 0) {
@@ -246,14 +195,7 @@ static int fib_create_entry(kernel_pid_t iface_id,
     return -ENOMEM;
 }
 
-/**
- * @brief removes the given entry
- *
- * @param[in] entry the entry to be removed
- *
- * @return 0 on success
- */
-static int fib_remove(fib_entry_t *entry)
+int fib_remove(fib_entry_t *entry)
 {
     if (entry->global != NULL) {
         universal_address_rem(entry->global);
@@ -275,20 +217,7 @@ static int fib_remove(fib_entry_t *entry)
     return 0;
 }
 
-/**
- * @brief signals (sends a message to) all registered routing protocols
- *        registered with a matching prefix (usually this should be only one).
- *        The message informs the recipient that no next-hop is available for the
- *        requested destination address.
- *        The receiver MUST copy the content, i.e. the address before reply.
- *
- * @param[in] dst       the destination address
- * @param[in] dst_size  the destination address size
- *
- * @return 0 on a new available entry,
- *         -ENOENT if no suiting entry is provided.
- */
-static int fib_signal_rp(uint8_t *dst, size_t dst_size, uint32_t dst_flags)
+int fib_signal_rp(uint8_t *dst, size_t dst_size, uint32_t dst_flags)
 {
     msg_t msg, reply;
     rp_address_msg_t content;
@@ -318,120 +247,6 @@ static int fib_signal_rp(uint8_t *dst, size_t dst_size, uint32_t dst_flags)
     }
 
     return ret;
-}
-
-int fib_add_entry(kernel_pid_t iface_id, uint8_t *dst, size_t dst_size, uint32_t dst_flags,
-                  uint8_t *next_hop, size_t next_hop_size, uint32_t next_hop_flags,
-                  uint32_t lifetime)
-{
-    mutex_lock(&mtx_access);
-    DEBUG("[fib_add_entry]");
-    size_t count = 1;
-    fib_entry_t *entry[count];
-
-    int ret = fib_find_entry(dst, dst_size, &(entry[0]), &count);
-
-    if (ret == 1) {
-        /* we must take the according entry and update the values */
-        ret = fib_upd_entry(entry[0], next_hop, next_hop_size, next_hop_flags, lifetime);
-    }
-    else {
-        ret = fib_create_entry(iface_id, dst, dst_size, dst_flags,
-                               next_hop, next_hop_size, next_hop_flags, lifetime);
-    }
-
-    mutex_unlock(&mtx_access);
-    return ret;
-}
-
-int fib_update_entry(uint8_t *dst, size_t dst_size,
-                     uint8_t *next_hop, size_t next_hop_size, uint32_t next_hop_flags,
-                     uint32_t lifetime)
-{
-    mutex_lock(&mtx_access);
-    DEBUG("[fib_update_entry]");
-    size_t count = 1;
-    fib_entry_t *entry[count];
-    int ret = -ENOMEM;
-
-    if (fib_find_entry(dst, dst_size, &(entry[0]), &count) == 1) {
-        DEBUG("[fib_update_entry] found entry: %p\n", (void *)(entry[0]));
-        /* we must take the according entry and update the values */
-        ret = fib_upd_entry(entry[0], next_hop, next_hop_size, next_hop_flags, lifetime);
-    }
-    else {
-        /* we have ambiguous entries, i.e. count > 1
-         * this should never happen
-         */
-        DEBUG("[fib_update_entry] ambigious entries detected!!!");
-    }
-
-    mutex_unlock(&mtx_access);
-    return ret;
-}
-
-void fib_remove_entry(uint8_t *dst, size_t dst_size)
-{
-    mutex_lock(&mtx_access);
-    DEBUG("[fib_remove_entry]");
-    size_t count = 1;
-    fib_entry_t *entry[count];
-
-    int ret = fib_find_entry(dst, dst_size, &(entry[0]), &count);
-
-    if (ret == 1) {
-        /* we must take the according entry and update the values */
-        fib_remove(entry[0]);
-    }
-    else {
-        /* we have ambiguous entries, i.e. count > 1
-         * this should never happen
-         */
-        DEBUG("[fib_update_entry] ambigious entries detected!!!");
-    }
-
-    mutex_unlock(&mtx_access);
-}
-
-int fib_get_next_hop(kernel_pid_t *iface_id,
-                     uint8_t *next_hop, size_t *next_hop_size, uint32_t *next_hop_flags,
-                     uint8_t *dst, size_t dst_size, uint32_t dst_flags)
-{
-    mutex_lock(&mtx_access);
-    DEBUG("[fib_get_next_hop]");
-    size_t count = 1;
-    fib_entry_t *entry[count];
-
-    int ret = fib_find_entry(dst, dst_size, &(entry[0]), &count);
-
-    if (!(ret == 0 || ret == 1)) {
-        /* notify all responsible RPs for unknown  next-hop for the destination address */
-        if (fib_signal_rp(dst, dst_size, dst_flags) == 0) {
-            count = 1;
-            /* now lets see if the RRPs have found a valid next-hop */
-            ret = fib_find_entry(dst, dst_size, &(entry[0]), &count);
-        }
-    }
-
-    if (ret == 0 || ret == 1) {
-
-        uint8_t *address_ret = universal_address_get_address(entry[0]->next_hop,
-                               next_hop, next_hop_size);
-
-        if (address_ret == NULL) {
-            mutex_unlock(&mtx_access);
-            return -ENOBUFS;
-        }
-    }
-    else {
-        mutex_unlock(&mtx_access);
-        return -EHOSTUNREACH;
-    }
-
-    *iface_id = entry[0]->iface_id;
-    *next_hop_flags = entry[0]->next_hop_flags;
-    mutex_unlock(&mtx_access);
-    return 0;
 }
 
 void fib_init(void)
@@ -522,6 +337,11 @@ int fib_get_num_used_entries(void)
     return used_entries;
 }
 
+mutex_t *fib_get_mutex(void)
+{
+    return &mtx_access;
+}
+
 /* print functions */
 
 void fib_print_notify_rp(void)
@@ -573,7 +393,7 @@ static void fib_print_adress(universal_address_container_t *entry)
 void fib_print_routes(void)
 {
     mutex_lock(&mtx_access);
-    printf("%-32s %-6s %-32s %-6s %-16s Interface\n"
+    printf("%-32s %-6s %-32s %-6s %-16sInterface\n"
            , "Destination", "Flags", "Next Hop", "Flags", "Expires");
 
     timex_t now;
@@ -597,7 +417,7 @@ void fib_print_routes(void)
                     printf("%-16s ", "EXPIRED");
                 }
                 else {
-                    printf("%"PRIu32".%05"PRIu32, tm.seconds, tm.microseconds);
+                    printf("%"PRIu32".%05"PRIu32"\t", tm.seconds, tm.microseconds);
                 }
             }
             else {

@@ -26,11 +26,6 @@
 #include "ng_fib/ng_universal_address.h"
 
 /**
- * @brief Maximum number of entries handled
- */
-#define UNIVERSAL_ADDRESS_MAX_ENTRIES (40)
-
-/**
  * @brief counter indicating the number of entries allocated
  */
 static size_t universal_address_table_filled = 0;
@@ -150,8 +145,8 @@ void universal_address_rem(universal_address_container_t *entry)
     mutex_unlock(&mtx_access);
 }
 
-uint8_t* universal_address_get_address(universal_address_container_t *entry,
-                                  uint8_t *addr, size_t *addr_size)
+uint8_t *universal_address_get_address(universal_address_container_t *entry,
+                                       uint8_t *addr, size_t *addr_size)
 {
     mutex_lock(&mtx_access);
 
@@ -182,15 +177,16 @@ int universal_address_compare(universal_address_container_t *entry,
 
     /* Get the index of the first trailing `0` (indicates a network prefix) */
     int i = 0;
-    for( i = entry->address_size-1; i >= 0; --i) {
-        if( entry->address[i] != 0 ) {
+
+    for (i = entry->address_size - 1; i >= 0; --i) {
+        if (entry->address[i] != 0) {
             break;
         }
     }
 
-    if( memcmp(entry->address, addr, i+1) == 0 ) {
+    if (memcmp(entry->address, addr, i + 1) == 0) {
         ret = 0;
-        *addr_size = i+1;
+        *addr_size = i + 1;
     }
 
     mutex_unlock(&mtx_access);

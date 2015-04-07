@@ -15,8 +15,15 @@
 #include "tests-fib.h"
 
 #include "thread.h"
+#include "ng_ipv6.h"
 #include "ng_fib.h"
 #include "ng_fib/ng_universal_address.h"
+
+#ifdef FIB_ADDON_GENERIC_H_
+/*
+* @note test the generic address function prototypes
+* iff its header (ng_fib/ng_fib_addon_generic.h) has been included in ng_fib.h.
+*/
 
 /*
 * @brief helper to fill FIB with unique entries
@@ -528,25 +535,79 @@ static void test_fib_14_exact_and_prefix_match(void)
 #endif
     fib_deinit();
 }
+#endif /* FIB_ADDON_GENERIC_H_ */
+
+
+#ifdef FIB_ADDON_IPV6_H_
+/*
+* @note test the ipv6 address function prototypes
+* iff its header (ng_fib/ng_fib_addon_ipv6.h) has been included in ng_fib.h.
+*/
+
+/*
+* @brief testing the ipv6 addon for the fib
+* (only iff its header has been included in ng_fib.h)
+*/
+static void test_fib_15_ipv6_addon(void)
+{
+    ng_ipv6_addr_t dst;
+    dst.u64[0] = byteorder_htonll(0xabcd000000000000);
+    dst.u64[1] = byteorder_htonll(0x1234);
+
+    ng_ipv6_addr_t next_hop;
+    next_hop.u64[0] = byteorder_htonll(0x4567);
+    next_hop.u64[1] = byteorder_htonll(0xef00);
+
+    kernel_pid_t iface_id = KERNEL_PID_UNDEF;
+
+    fib_add_entry_ipv6(43, &dst, &next_hop, 10000);
+    fib_update_entry_ipv6(&dst, &next_hop, 20000);
+
+    ng_ipv6_addr_t next_hop_new;
+    int ret = fib_get_next_hop_ipv6(&iface_id, &next_hop_new, &dst);
+    TEST_ASSERT_EQUAL_INT(0, ret);
+
+    TEST_ASSERT(ng_ipv6_addr_equal(&next_hop, &next_hop_new));
+
+    fib_remove_entry_ipv6(&dst);
+
+    ret = fib_get_next_hop_ipv6(&iface_id, &next_hop_new, &dst);
+    TEST_ASSERT_EQUAL_INT(-EHOSTUNREACH, ret);
+
+#if (TEST_FIB_SHOW_OUTPUT == 1)
+    fib_print_fib_table();
+    puts("");
+    universal_address_print_table();
+    puts("");
+#endif
+    fib_deinit();
+}
+#endif /* FIB_ADDON_IPV6_H_ */
 
 Test *tests_fib_tests(void)
 {
     fib_init();
     EMB_UNIT_TESTFIXTURES(fixtures) {
+        #ifdef FIB_ADDON_GENERIC_H_
         new_TestFixture(test_fib_01_fill_unique_entries),
-                        new_TestFixture(test_fib_02_fill_multiple_entries),
-                        new_TestFixture(test_fib_03_removing_all_entries),
-                        new_TestFixture(test_fib_04_remove_lower_half),
-                        new_TestFixture(test_fib_05_remove_upper_half),
-                        new_TestFixture(test_fib_06_remove_one_entry),
-                        new_TestFixture(test_fib_07_remove_one_entry_multiple_times),
-                        new_TestFixture(test_fib_08_remove_unknown),
-                        new_TestFixture(test_fib_09_update_entry),
-                        new_TestFixture(test_fib_10_add_exceed),
-                        new_TestFixture(test_fib_11_get_next_hop_success),
-                        new_TestFixture(test_fib_12_get_next_hop_fail),
-                        new_TestFixture(test_fib_13_get_next_hop_fail_on_buffer_size),
-                        new_TestFixture(test_fib_14_exact_and_prefix_match),
+        new_TestFixture(test_fib_02_fill_multiple_entries),
+        new_TestFixture(test_fib_03_removing_all_entries),
+        new_TestFixture(test_fib_04_remove_lower_half),
+        new_TestFixture(test_fib_05_remove_upper_half),
+        new_TestFixture(test_fib_06_remove_one_entry),
+        new_TestFixture(test_fib_07_remove_one_entry_multiple_times),
+        new_TestFixture(test_fib_08_remove_unknown),
+        new_TestFixture(test_fib_09_update_entry),
+        new_TestFixture(test_fib_10_add_exceed),
+        new_TestFixture(test_fib_11_get_next_hop_success),
+        new_TestFixture(test_fib_12_get_next_hop_fail),
+        new_TestFixture(test_fib_13_get_next_hop_fail_on_buffer_size),
+        new_TestFixture(test_fib_14_exact_and_prefix_match),
+        #endif /* FIB_ADDON_GENERIC_H_ */
+
+        #ifdef FIB_ADDON_IPV6_H_
+        new_TestFixture(test_fib_15_ipv6_addon),
+        #endif /* FIB_ADDON_IPV6_H_ */
     };
 
     EMB_UNIT_TESTCALLER(fib_tests, NULL, NULL, fixtures);

@@ -25,7 +25,16 @@
 extern "C" {
 #endif
 
-#define UNIVERSAL_ADDRESS_SIZE (16)         /**< size of the used addresses in bytes        */
+/**
+ * @brief Maximum number of entries handled
+ *        This should be 2*FIB_MAX_FIB_TABLE_ENTRIES for the worst case
+ */
+#define UNIVERSAL_ADDRESS_MAX_ENTRIES (40)
+
+/**
+* @brief size of the provided bytes for one address
+*/
+#define UNIVERSAL_ADDRESS_SIZE (16)
 
 /**
  * @brief The container descriptor used to identify a universal address entry
@@ -77,7 +86,7 @@ void universal_address_rem(universal_address_container_t *entry);
  * @return addr if the address is copied to the addr destination
  *         NULL if the size is unsufficient for copy
  */
-uint8_t* universal_address_get_address(universal_address_container_t *entry,
+uint8_t *universal_address_get_address(universal_address_container_t *entry,
                                        uint8_t *addr, size_t *addr_size);
 
 /**
