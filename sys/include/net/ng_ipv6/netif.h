@@ -102,6 +102,7 @@ typedef struct {
     kernel_pid_t pid;       /**< PID of the interface */
     uint16_t mtu;           /**< Maximum Transmission Unit (MTU) of the interface */
     uint8_t cur_hl;         /**< current hop limit for the interface */
+    uint8_t flags;          /**< flags for 6LoWPAN and Neighbor Discovery */
 } ng_ipv6_netif_t;
 
 /**
