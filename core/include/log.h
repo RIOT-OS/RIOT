@@ -69,8 +69,8 @@
  * @author      Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
  */
 
-#ifndef __LOG_H_
-#define __LOG_H_
+#ifndef LOG_H_
+#define LOG_H_
 
 #include <stdio.h>
 
@@ -170,5 +170,5 @@ void log_error(const char *format, ...);
 }
 #endif
 
-#endif /* __LOG_H_ */
+#endif /* LOG_H_ */
 /** @} */
