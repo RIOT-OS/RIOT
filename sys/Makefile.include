@@ -78,6 +78,10 @@ ifneq (,$(filter fib,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/sys/include/net
 endif
 
+ifneq (,$(filter ng_socket,$(USEMODULE)))
+    USEMODULE_INCLUDES += $(RIOTBASE)/sys/include/net
+endif
+
 ifneq (,$(filter embunit,$(USEMODULE)))
     ifeq ($(OUTPUT),XML)
         CFLAGS += -DOUTPUT=OUTPUT_XML
