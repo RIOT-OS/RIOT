@@ -646,7 +646,7 @@ static enum rfc5444_result _cb_rerr_blocktlv_addresstlvs_okay(struct rfc5444_rea
         /* check if route to unreachable node has to be marked as broken and RERR has to be forwarded */
         if (netaddr_cmp(&unreachable_entry->nextHopAddr, &packet_data.sender) == 0
                 && (!tlv || seqnum_cmp(unreachable_entry->seqnum, packet_data.origNode.seqnum) == 0)) {
-            unreachable_entry->state = ROUTE_STATE_BROKEN;
+            unreachable_entry->state = ROUTE_STATE_INVALID;
             unreachable_nodes[num_unreachable_nodes].addr = packet_data.origNode.addr;
             unreachable_nodes[num_unreachable_nodes].seqnum = packet_data.origNode.seqnum;
             num_unreachable_nodes++;
