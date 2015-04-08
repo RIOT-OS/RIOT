@@ -1,3 +1,4 @@
+FEATURES_PROVIDED += ethernet
 FEATURES_PROVIDED += transceiver
 FEATURES_PROVIDED += periph_cpuid
 FEATURES_PROVIDED += config
