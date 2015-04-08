@@ -48,6 +48,27 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Default MTU
+ *
+ * @see <a href="https://tools.ietf.org/html/rfc2460#section-5">
+ *          RFC 2460, section 5
+ *      </a>
+ */
+#define NG_IPV6_NETIF_DEFAULT_MTU   (1280)
+
+/**
+ * @brief   Default hop limit
+ *
+ * @see <a href="https://tools.ietf.org/html/rfc4861#section-6.3.2">
+ *          RFC 4861, section 6.3.2
+ *      </a>
+ * @see <a href="http://www.iana.org/assignments/ip-parameters/ip-parameters.xhtml#ip-parameters-2">
+ *          IANA, IP TIME TO LIVE PARAMETER
+ *      </a>
+ */
+#define NG_IPV6_NETIF_DEFAULT_HL    (64)
+
+/**
  * @{
  * @name Flags for a registered IPv6 address.
  * @brief   Needed primarily to identify addresses as either anycast or unicast.
@@ -56,8 +77,8 @@ extern "C" {
  *          RFC 4291, section 2.6
  *      </a>
  */
-#define NG_IPV6_NETIF_FLAGS_UNICAST     (0x00)  /**< unicast address */
-#define NG_IPV6_NETIF_FLAGS_NON_UNICAST (0x01)  /**< non-unicast address */
+#define NG_IPV6_NETIF_ADDR_FLAGS_UNICAST        (0x00)  /**< unicast address */
+#define NG_IPV6_NETIF_ADDR_FLAGS_NON_UNICAST    (0x01)  /**< non-unicast address */
 /**
  * @}
  */
@@ -80,6 +101,8 @@ typedef struct {
     mutex_t mutex;          /**< mutex for the interface */
     kernel_pid_t pid;       /**< PID of the interface */
     uint16_t mtu;           /**< Maximum Transmission Unit (MTU) of the interface */
+    uint8_t cur_hl;         /**< current hop limit for the interface */
+    uint8_t flags;          /**< flags for 6LoWPAN and Neighbor Discovery */
 } ng_ipv6_netif_t;
 
 /**
@@ -244,7 +267,7 @@ ng_ipv6_addr_t *ng_ipv6_netif_find_best_src_addr(kernel_pid_t pid, const ng_ipv6
 static inline bool ng_ipv6_netif_addr_is_non_unicast(const ng_ipv6_addr_t *addr)
 {
     return (bool)(container_of(addr, ng_ipv6_netif_addr_t, addr)->flags &
-                  NG_IPV6_NETIF_FLAGS_NON_UNICAST);
+                  NG_IPV6_NETIF_ADDR_FLAGS_NON_UNICAST);
 
 }
 

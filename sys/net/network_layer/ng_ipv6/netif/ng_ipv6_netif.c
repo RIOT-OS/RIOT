@@ -20,7 +20,6 @@
 
 #include "kernel_types.h"
 #include "mutex.h"
-#include "net/ng_ipv6.h"
 #include "net/ng_ipv6/addr.h"
 #include "net/ng_netif.h"
 
@@ -55,12 +54,12 @@ static int _add_addr_to_entry(ng_ipv6_netif_t *entry, const ng_ipv6_addr_t *addr
                     entry->addrs[i].prefix_len = NG_IPV6_ADDR_BIT_LEN;
                 }
 
-                entry->addrs[i].flags = NG_IPV6_NETIF_FLAGS_NON_UNICAST;
+                entry->addrs[i].flags = NG_IPV6_NETIF_ADDR_FLAGS_NON_UNICAST;
             }
             else {
                 entry->addrs[i].prefix_len = prefix_len;
 
-                entry->addrs[i].flags = NG_IPV6_NETIF_FLAGS_UNICAST;
+                entry->addrs[i].flags = NG_IPV6_NETIF_ADDR_FLAGS_UNICAST;
             }
 
             return 0;
@@ -99,9 +98,11 @@ void ng_ipv6_netif_add(kernel_pid_t pid)
 
             DEBUG("Add IPv6 interface %" PRIkernel_pid " (i = %d)\n", pid, i);
             ipv6_ifs[i].pid = pid;
-            DEBUG(" * pid = %" PRIkernel_pid "\n", ipv6_ifs[i].pid);
-            ipv6_ifs[i].mtu = NG_IPV6_DEFAULT_MTU;
-            DEBUG(" * mtu = %d\n", ipv6_ifs[i].mtu);
+            DEBUG(" * pid = %" PRIkernel_pid "  ", ipv6_ifs[i].pid);
+            ipv6_ifs[i].mtu = NG_IPV6_NETIF_DEFAULT_MTU;
+            DEBUG("mtu = %d  ", ipv6_ifs[i].mtu);
+            ipv6_ifs[i].cur_hl = NG_IPV6_NETIF_DEFAULT_HL;
+            DEBUG("cur_hl = %d  ", ipv6_ifs[i].cur_hl);
 
             _add_addr_to_entry(&ipv6_ifs[i], &addr, NG_IPV6_ADDR_BIT_LEN, 0);
 
