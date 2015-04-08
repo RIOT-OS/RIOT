@@ -24,6 +24,8 @@
 
 #include "kernel_types.h"
 
+#include "net/ng_sixlowpan/frag.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
