@@ -31,6 +31,7 @@
 #include <vtimer.h>
 #include <transceiver.h>
 #include "ipv6.h"
+#include "ng_fib.h"
 #include "rpl/rpl_dodag.h"
 #include "rpl/rpl_of_manager.h"
 
@@ -46,12 +47,11 @@ extern "C" {
 
 /* global variables */
 extern kernel_pid_t rpl_process_pid;
-extern uint8_t rpl_max_routing_entries;
 extern ipv6_addr_t my_address;
 extern msg_t rpl_msg_queue[RPL_PKT_RECV_BUF_SIZE];
 extern char rpl_process_buf[RPL_PROCESS_STACKSIZE];
 extern uint8_t rpl_buffer[BUFFER_SIZE - LL_HDR_LEN];
-extern uint8_t rpl_if_id;
+extern kernel_pid_t rpl_if_id;
 extern rpl_dodag_t rpl_dodags[RPL_MAX_DODAGS];
 
 /**
@@ -80,7 +80,7 @@ void rpl_send(ipv6_addr_t *destination, uint8_t *payload, uint16_t p_len, uint8_
  * @return 0 if initialization was not successful
  *
  */
-uint8_t rpl_init(int if_id, ipv6_addr_t *address);
+uint8_t rpl_init(kernel_pid_t if_id, ipv6_addr_t *address);
 
 /**
  * @brief Initialization of RPL-root.
@@ -197,60 +197,19 @@ void *rpl_process(void *arg);
 ipv6_addr_t *rpl_get_next_hop(ipv6_addr_t *addr);
 
 /**
- * @brief Adds routing entry to routing table
- *
- * @deprecated This function is obsolete and will be removed shortly. This will be replaced with a
- * common routing information base.
- *
- * @param[in] addr                  Destination address
- * @param[in] next_hop              Next hop address
- * @param[in] lifetime              Lifetime of the entry
- *
- * */
-void rpl_add_routing_entry(ipv6_addr_t *addr, ipv6_addr_t *next_hop, uint16_t lifetime);
-
-/**
- * @brief Deletes routing entry to routing table
- *
- * @deprecated This function is obsolete and will be removed shortly. This will be replaced with a
- * common routing information base.
- *
- * @param[in] addr                  Destination address
- *
- * */
-void rpl_del_routing_entry(ipv6_addr_t *addr);
-
-/**
- * @brief Finds routing entry for a given destination.
- *
- * @deprecated This function is obsolete and will be removed shortly. This will be replaced with a
- * common routing information base.
- *
- * @param[in] addr                  Destination address
- *
- * @return Routing entry address
- *
- * */
-rpl_routing_entry_t *rpl_find_routing_entry(ipv6_addr_t *addr);
-
-/**
- * @brief Returns routing table
- *
- * @deprecated This function is obsolete and will be removed shortly. This will be replaced with a
- * common routing information base.
- *
- * @return Routing table
- *
- * */
-rpl_routing_entry_t *rpl_get_routing_table(void);
-
-/**
  * @brief Returns the network status of the actual node
  *
  * @return 1 if root, 0 otherwise
  *
  * */
 uint8_t rpl_is_root(void);
+
+/**
+ * @brief receive the set inteface id
+ *
+ * @return the set interface id of KERNEL_PID_UNDEF if no interface has been set
+ */
+kernel_pid_t rpl_get_if(void);
 
 #if RPL_DEFAULT_MOP == RPL_MOP_NON_STORING_MODE
 

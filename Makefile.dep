@@ -37,6 +37,7 @@ ifneq (,$(filter rpl,$(USEMODULE)))
 endif
 
 ifneq (,$(filter routing,$(USEMODULE)))
+  USEMODULE += fib
   USEMODULE += sixlowpan
 endif
 

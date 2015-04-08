@@ -21,6 +21,7 @@
 #include <string.h>
 #include <stdio.h>
 
+#include "vtimer.h"
 #include "rpl/rpl_dodag.h"
 #include "trickle.h"
 #include "rpl.h"
@@ -159,13 +160,20 @@ bool rpl_equal_id(ipv6_addr_t *id1, ipv6_addr_t *id2)
     }
 
     return true;
+}
 
+rpl_parent_t *rpl_get_parents(void)
+{
+    return &parents[0];
 }
 
 rpl_parent_t *rpl_new_parent(rpl_dodag_t *dodag, ipv6_addr_t *address, uint16_t rank)
 {
     rpl_parent_t *parent;
     rpl_parent_t *end;
+
+    timex_t now;
+    vtimer_now(&now);
 
     for (parent = &parents[0], end = parents + RPL_MAX_PARENTS; parent < end; parent++) {
         if (parent->used == 0) {
@@ -174,7 +182,11 @@ rpl_parent_t *rpl_new_parent(rpl_dodag_t *dodag, ipv6_addr_t *address, uint16_t 
             parent->addr = *address;
             parent->rank = rank;
             parent->dodag = dodag;
-            parent->lifetime = dodag->default_lifetime * dodag->lifetime_unit;
+            parent->lifetime.seconds = now.seconds + (dodag->default_lifetime * dodag->lifetime_unit);
+
+            fib_add_entry(rpl_get_if(), &address->uint8[0], sizeof(ipv6_addr_t), AF_INET6,
+                          &address->uint8[0], sizeof(ipv6_addr_t), AF_INET6,
+                          (dodag->default_lifetime * dodag->lifetime_unit)*1000);
             /* dtsn is set at the end of recv_dio function */
             parent->dtsn = 0;
             return parent;
@@ -207,6 +219,8 @@ void rpl_delete_parent(rpl_parent_t *parent)
     if (parent == parent->dodag->my_preferred_parent) {
         parent->dodag->my_preferred_parent = NULL;
     }
+
+    fib_remove_entry(&parent->addr.uint8[0], sizeof(ipv6_addr_t));
     memset(parent, 0, sizeof(*parent));
 }
 
@@ -247,6 +261,9 @@ rpl_parent_t *rpl_find_preferred_parent(rpl_dodag_t *my_dodag)
 {
     rpl_parent_t *best = NULL;
 
+    timex_t now;
+    vtimer_now(&now);
+
     if (my_dodag == NULL) {
         DEBUG("Not part of a dodag\n");
         return NULL;
@@ -257,7 +274,7 @@ rpl_parent_t *rpl_find_preferred_parent(rpl_dodag_t *my_dodag)
                 && (parents[i].dodag->instance->id == my_dodag->instance->id)
                 && (!memcmp(&parents[i].dodag->dodag_id,
                     &my_dodag->dodag_id, sizeof(ipv6_addr_t)))) {
-            if ((parents[i].rank == INFINITE_RANK) || (parents[i].lifetime <= 1)) {
+            if ((parents[i].rank == INFINITE_RANK) || ((parents[i].lifetime.seconds-now.seconds) <= 1)) {
                 DEBUG("Infinite rank, bad parent\n");
                 continue;
             }
@@ -275,8 +292,13 @@ rpl_parent_t *rpl_find_preferred_parent(rpl_dodag_t *my_dodag)
         return NULL;
     }
 
+    ipv6_addr_t def = {.uint32 = {0x0,0x0, 0x0, 0x0} };
     if (my_dodag->my_preferred_parent == NULL) {
         my_dodag->my_preferred_parent = best;
+        /* this will be our default gateway */
+        fib_add_entry(rpl_get_if(), &def.uint8[0], sizeof(ipv6_addr_t), AF_INET6,
+                      &best->addr.uint8[0], sizeof(ipv6_addr_t),
+                      AF_INET6, (best->lifetime.seconds - now.seconds)*1000 );
     }
 
     if (!rpl_equal_id(&my_dodag->my_preferred_parent->addr, &best->addr)) {
@@ -284,8 +306,17 @@ rpl_parent_t *rpl_find_preferred_parent(rpl_dodag_t *my_dodag)
             /* send DAO with ZERO_LIFETIME to old parent */
             rpl_send_DAO(my_dodag, &my_dodag->my_preferred_parent->addr, 0, false, 0);
         }
-
+        /* we already have a default gateway so we will replace it
+         * but first we move the current prefered parent to a usual next-hop
+         */
+        fib_add_entry(rpl_get_if(), &my_dodag->my_preferred_parent->addr.uint8[0], sizeof(ipv6_addr_t), AF_INET6,
+                      &my_dodag->my_preferred_parent->addr.uint8[0], sizeof(ipv6_addr_t), AF_INET6,
+                      (best->lifetime.seconds-now.seconds)*1000 );
         my_dodag->my_preferred_parent = best;
+        fib_remove_entry(&def.uint8[0], sizeof(ipv6_addr_t));
+        fib_add_entry(rpl_get_if(), &def.uint8[0], sizeof(ipv6_addr_t), AF_INET6,
+                         &best->addr.uint8[0], sizeof(ipv6_addr_t),
+                         AF_INET6, (best->lifetime.seconds - now.seconds)*1000 );
 
         if (my_dodag->mop != RPL_MOP_NO_DOWNWARD_ROUTES) {
             rpl_delay_dao(my_dodag);
@@ -300,6 +331,8 @@ rpl_parent_t *rpl_find_preferred_parent(rpl_dodag_t *my_dodag)
 void rpl_parent_update(rpl_dodag_t *my_dodag, rpl_parent_t *parent)
 {
     uint16_t old_rank;
+    timex_t now;
+    vtimer_now(&now);
 
     if (my_dodag == NULL) {
         DEBUG("Not part of a dodag - this should not happen");
@@ -310,7 +343,10 @@ void rpl_parent_update(rpl_dodag_t *my_dodag, rpl_parent_t *parent)
 
     /* update Parent lifetime */
     if (parent != NULL) {
-        parent->lifetime = my_dodag->default_lifetime * my_dodag->lifetime_unit;
+        parent->lifetime.seconds = (now.seconds + my_dodag->default_lifetime * my_dodag->lifetime_unit);
+        fib_update_entry(&parent->addr.uint8[0], sizeof(ipv6_addr_t),
+                         &parent->addr.uint8[0], sizeof(ipv6_addr_t), AF_INET6,
+                         (my_dodag->default_lifetime * my_dodag->lifetime_unit * 1000));
     }
 
     if (rpl_find_preferred_parent(my_dodag) == NULL) {
@@ -331,6 +367,9 @@ void rpl_join_dodag(rpl_dodag_t *dodag, ipv6_addr_t *parent, uint16_t parent_ran
 {
     rpl_dodag_t *my_dodag;
     rpl_parent_t *preferred_parent;
+    timex_t now;
+    vtimer_now(&now);
+
     my_dodag = rpl_new_dodag(dodag->instance, &dodag->dodag_id);
 
     if (my_dodag == NULL) {
@@ -364,8 +403,15 @@ void rpl_join_dodag(rpl_dodag_t *dodag, ipv6_addr_t *parent, uint16_t parent_ran
         rpl_del_dodag(my_dodag);
         return;
     }
+    /* Use the parent as new default gateway */
+    ipv6_addr_t def = {.uint32 = {0x0, 0x0, 0x0, 0x0} };
+    fib_remove_entry(&def.uint8[0], sizeof(ipv6_addr_t));
 
-    my_dodag->my_preferred_parent = preferred_parent;
+    fib_add_entry(rpl_get_if(), &def.uint8[0], sizeof(ipv6_addr_t), AF_INET6,
+                  &preferred_parent->addr.uint8[0], sizeof(ipv6_addr_t), AF_INET6,
+                  (preferred_parent->lifetime.seconds - now.seconds)*1000);
+
+
     my_dodag->node_status = (uint8_t) NORMAL_NODE;
     my_dodag->my_rank = dodag->of->calc_rank(preferred_parent, dodag->my_rank);
     my_dodag->dao_seq = RPL_COUNTER_INIT;
@@ -379,7 +425,7 @@ void rpl_join_dodag(rpl_dodag_t *dodag, ipv6_addr_t *parent, uint16_t parent_ran
           ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
                            &my_dodag->my_preferred_parent->addr));
     DEBUG("\tmy_preferred_parent rank\t%02X\n", my_dodag->my_preferred_parent->rank);
-    DEBUG("\tmy_preferred_parent lifetime\t%04X\n", my_dodag->my_preferred_parent->lifetime);
+    DEBUG("\tmy_preferred_parent lifetime\t%04X\n", my_dodag->my_preferred_parent->lifetime.seconds - now.seconds);
 
     trickle_start(rpl_process_pid, &my_dodag->trickle, RPL_MSG_TYPE_TRICKLE_INTERVAL,
                   RPL_MSG_TYPE_TRICKLE_CALLBACK, (1 << my_dodag->dio_min), my_dodag->dio_interval_doubling,

@@ -146,7 +146,7 @@ typedef struct {
     uint16_t            rank;
     uint8_t             dtsn;
     struct rpl_dodag_t *dodag;
-    uint16_t            lifetime;
+    timex_t             lifetime;
     double              link_metric;
     uint8_t             link_metric_type;
     uint8_t             used;
@@ -206,13 +206,6 @@ typedef struct rpl_of_t {
     void (*init)(void);  //OF specific init function
     void (*process_dio)(void);  //DIO processing callback (acc. to OF0 spec, chpt 5)
 } rpl_of_t;
-
-typedef struct {
-    ipv6_addr_t address;
-    ipv6_addr_t next_hop;
-    uint16_t lifetime;
-    uint8_t used;
-} rpl_routing_entry_t;
 
 /* Parameters passed to RPL on initialization */
 typedef struct {

@@ -135,9 +135,6 @@ int rpl_udp_init(int argc, char **argv)
             else {
                 puts("6LoWPAN and RPL initialized.");
             }
-
-            ipv6_iface_set_routing_provider(rpl_get_next_hop);
-
         }
         else {
             puts("6LoWPAN initialized.");
