@@ -1,0 +1,37 @@
+# this CPU implementation is using the explicit core/CPU interface
+export CFLAGS += -DCOREIF_NG=1
+
+# export the peripheral drivers to be linked into the final binary
+export USEMODULE += periph
+
+# tell the build system that the CPU depends on the Cortex-M common files
+export USEMODULE += cortex-m0_common
+
+# tell the build system that the CPU depends on the Kinetis common files
+export USEMODULE += kinetis_common
+
+# define path to cortex-m common module, which is needed for this CPU
+export CORTEX_M0_COMMON = $(RIOTCPU)/cortex-m0_common/
+
+# define path to kinetis module, which is needed for this CPU
+export KINETIS_COMMON = $(RIOTCPU)/kinetis_common/
+
+# CPU depends on the cortex-m common module, so include it
+include $(CORTEX_M0_COMMON)Makefile.include
+
+# CPU depends on the kinetis module, so include it
+include $(KINETIS_COMMON)Makefile.include
+
+# define the linker script to use for this CPU
+export LINKERSCRIPT = $(RIOTCPU)/$(CPU)/$(CPU_MODEL)_linkerscript.ld
+
+#export the CPU model
+MODEL = $(shell echo $(CPU_MODEL)|tr 'a-z' 'A-Z')
+export CFLAGS += -DCPU_MODEL_$(MODEL)
+
+# include CPU specific includes
+export INCLUDES += -I$(RIOTCPU)/$(CPU)/include
+
+# add the CPU specific system calls implementations for the linker
+export UNDEF += $(BINDIR)cpu/interrupt-vector.o
+export UNDEF += $(BINDIR)cpu/syscalls.o
