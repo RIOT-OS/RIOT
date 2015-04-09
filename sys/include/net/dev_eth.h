@@ -24,10 +24,17 @@
 #include <stdint.h>
 #include "ng_ethernet/hdr.h"
 
+/**
+ * @brief Structure to hold driver state
+ * Supposed to be extended by driver implementations.
+ */
 typedef struct dev_eth {
     struct eth_driver *driver;
 } dev_eth_t;
 
+/**
+ * @brief Structure to hold driver interface -> function mapping
+ */
 typedef struct eth_driver {
     int (*send)(dev_eth_t *dev, char* buf, int len);
     int (*recv)(dev_eth_t *dev, char* buf, int len);
