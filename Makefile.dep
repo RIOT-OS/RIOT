@@ -158,5 +158,6 @@ ifneq (,$(filter fib,$(USEMODULE)))
 endif
 
 ifneq (,$(filter oonf_common,$(USEMODULE)))
+  USEPKG += oonf_api
   USEMODULE += socket_base
 endif
