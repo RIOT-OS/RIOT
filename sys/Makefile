@@ -98,6 +98,9 @@ endif
 ifneq (,$(filter ng_sixlowpan_ctx,$(USEMODULE)))
     DIRS += net/network_layer/ng_sixlowpan/ctx
 endif
+ifneq (,$(filter ng_sixlowpan_netif,$(USEMODULE)))
+    DIRS += net/network_layer/ng_sixlowpan/netif
+endif
 ifneq (,$(filter netapi,$(USEMODULE)))
     DIRS += net/crosslayer/netapi
 endif
