@@ -225,6 +225,15 @@ static void _netif_list(kernel_pid_t dev)
         linebreak = true;
     }
 
+#ifdef MODULE_NG_IPV6_NETIF
+    ng_ipv6_netif_t *entry = ng_ipv6_netif_get(dev);
+
+    if ((entry != NULL) && (entry->flags & NG_IPV6_NETIF_FLAGS_SIXLOWPAN)) {
+        printf("6LO ");
+        linebreak = true;
+    }
+#endif
+
     if (linebreak) {
         printf("\n           ");
     }
@@ -429,6 +438,37 @@ static int _netif_flag(char *cmd, kernel_pid_t dev, char *flag)
     }
     else if (strcmp(flag, "autoack") == 0) {
         return _netif_set_flag(dev, NETCONF_OPT_AUTOACK, set);
+    }
+    else if (strcmp(flag, "6lo") == 0) {
+#ifdef MODULE_NG_IPV6_NETIF
+        ng_ipv6_netif_t *entry = ng_ipv6_netif_get(dev);
+
+        if (entry == NULL) {
+            puts("error: unable to (un)set 6LoWPAN support");
+            return 1;
+        }
+
+        mutex_lock(&entry->mutex);
+
+        if (set) {
+            entry->flags |= NG_IPV6_NETIF_FLAGS_SIXLOWPAN;
+            printf("success: set 6LoWPAN support on interface %" PRIkernel_pid
+                   "\n", dev);
+        }
+        else {
+            entry->flags &= ~NG_IPV6_NETIF_FLAGS_SIXLOWPAN;
+            printf("success: unset 6LoWPAN support on interface %" PRIkernel_pid
+                   "\n", dev);
+        }
+
+        mutex_unlock(&entry->mutex);
+
+        return 0;
+#else
+        puts("error: unable to (un)set 6LoWPAN support");
+
+        return 1;
+#endif
     }
 
     _flag_usage(cmd);
