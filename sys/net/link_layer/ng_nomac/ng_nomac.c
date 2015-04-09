@@ -54,7 +54,7 @@ static void _event_cb(ng_netdev_event_t event, void *data)
         /* send the packet to everyone interested in it's type */
         ng_pktbuf_hold(pkt, ng_netreg_num(pkt->type, NG_NETREG_DEMUX_CTX_ALL) - 1);
         while (sendto != NULL) {
-            DEBUG("nomac: sending pkt %p to PID %u\n", pkt, sendto->pid);
+            DEBUG("nomac: sending pkt %p to PID %u\n", (void*)pkt, sendto->pid);
             ng_netapi_receive(sendto->pid, pkt);
             sendto = ng_netreg_getnext(sendto);
         }
