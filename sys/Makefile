@@ -161,6 +161,9 @@ endif
 ifneq (,$(filter cpp11-compat,$(USEMODULE)))
     DIRS += cpp11-compat
 endif
+ifneq (,$(filter ng_netdev_eth,$(USEMODULE)))
+    DIRS += net/link_layer/ng_netdev_eth
+endif
 
 DIRS += $(dir $(wildcard $(addsuffix /Makefile, ${USEMODULE})))
 
