@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2014 Hamburg University of Applied Sciences
  * Copyright (C) 2014 Freie Universität Berlin
+ * Copyright (C) 2015 Kaspar Schleiser <kaspar@schleiser.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -18,6 +19,7 @@
  * @author      Fabian Nack <nack@inf.fu-berlin.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Joakim Gebart <joakim.gebart@eistec.se>
+ * @author      Kaspar Schleiser <kaspar@schleiser.de>
  *
  * @}
  */
@@ -134,7 +136,9 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
     spi_conf_pins(dev);
 
     /**************** SPI-Init *****************/
+#ifdef CPU_MODEL_STM32F303VC
     spi[dev]->I2SCFGR &= ~(SPI_I2SCFGR_I2SMOD);/* Activate the SPI mode (Reset I2SMOD bit in I2SCFGR register) */
+#endif
     spi[dev]->CR1 = 0;
     spi[dev]->CR2 = 0;
     /* the NSS (chip select) is managed purely by software */
@@ -142,8 +146,12 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
     spi[dev]->CR1 |= (speed_divider << 3);  /* Define serial clock baud rate. 001 leads to f_PCLK/4 */
     spi[dev]->CR1 |= (SPI_CR1_MSTR);  /* 1: master configuration */
     spi[dev]->CR1 |= (conf);
+
+    spi[dev]->CR2 |= SPI_CR2_FRXTH; /* set FIFO reception threshold to 8bit (default: 16bit) */
+
     /* enable SPI */
     spi[dev]->CR1 |= (SPI_CR1_SPE);
+
     return 0;
 }
 
@@ -194,7 +202,9 @@ int spi_init_slave(spi_t dev, spi_conf_t conf, char(*cb)(char data))
     spi_conf_pins(dev);
 
     /***************** SPI-Init *****************/
+#ifdef CPU_MODEL_STM32F303VC
     spi[dev]->I2SCFGR &= ~(SPI_I2SCFGR_I2SMOD);
+#endif
     spi[dev]->CR1 = 0;
     spi[dev]->CR2 = 0;
     /* enable RXNEIE flag to enable rx buffer not empty interrupt */
@@ -299,20 +309,26 @@ int spi_release(spi_t dev)
 
 int spi_transfer_byte(spi_t dev, char out, char *in)
 {
-    if (dev >= SPI_NUMOF) {
-        return -1;
-    }
+    char tmp;
 
-    while (!(spi[dev]->SR & SPI_SR_TXE));
-    spi[dev]->DR = out;
+    /* recast to uint_8 to force 8bit access */
+    volatile uint8_t *DR = (volatile uint8_t*) &spi[dev]->DR;
 
-    while (!(spi[dev]->SR & SPI_SR_RXNE));
+    /* wait for an eventually previous byte to be readily transferred */
+    while(!(spi[dev]->SR & SPI_SR_TXE));
 
-    if (in != NULL) {
-        *in = spi[dev]->DR;
-    }
-    else {
-        spi[dev]->DR;
+    /* put next byte into the output register */
+    *DR = out;
+
+    /* wait until the current byte was successfully transferred */
+    while(!(spi[dev]->SR & SPI_SR_RXNE) );
+
+    /* read response byte to reset flags */
+    tmp = *DR;
+
+    /* 'return' response byte if wished for */
+    if (in) {
+        *in = tmp;
     }
 
     return 1;
@@ -320,7 +336,6 @@ int spi_transfer_byte(spi_t dev, char out, char *in)
 
 int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length)
 {
-
     int i, trans_ret, trans_bytes = 0;
     char in_temp;
 
