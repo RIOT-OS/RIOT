@@ -2,7 +2,7 @@
  * Copyright (C) 2015 Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>,
  *                    Martine Lenders <mlenders@inf.fu-berlin.de>
  *                    Kaspar Schleiser <kaspar@schleiser.de>
- *
+ *                    Ell-i open source co-operative
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for
