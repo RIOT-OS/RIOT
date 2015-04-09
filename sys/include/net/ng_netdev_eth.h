@@ -39,7 +39,7 @@ extern "C" {
 #endif
 
 /**
- * @brief Definition of the dev_eth device
+ * @brief Definition of the netdev_eth device
  * @extends ng_netdev_t
  * @internal
  */
@@ -51,26 +51,22 @@ typedef struct {
 } ng_netdev_eth_t;
 
 /**
- * @brief Reference to the dev_eth driver interface
+ * @brief Reference to the netdev_eth driver interface
  */
 extern const ng_netdev_driver_t ng_netdev_eth_driver;
 
 /**
- * @brief Reference to the dev_eth device
+ * @brief Reference to the netdev_eth device
  */
 extern ng_netdev_eth_t ng_netdev_eth; /* XXX: this is only here since I do not know how
                                * to get the device in the interrupt handler */
 /**
- * @brief Initialize a given dev_eth device
+ * @brief Initialize a given netdev_eth device
  *
- * @param[out] dev dev_eth device to initialize
- * @param[in] name Name of the dev_eth interface.
+ * @param[out] netdev netdev_eth device to initialize
+ * @param[in] ethdev handle dev_eth interface to be used
  *
- * If @p name is an empty string, the kernel chooses a name.
- * If @p name is an existing device, that device is used.
- * Otherwise a device named "name" is created
- *
- * @param[in] name_len Length of @p name.
+ * Will initialize ethdev.
  *
  * @return 0 on success
  * @return -ENODEV on invalid device descriptor
