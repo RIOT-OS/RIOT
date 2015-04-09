@@ -46,4 +46,5 @@ extern void dev_eth_isr(dev_eth_t *dev);
 extern void dev_eth_rx_handler(dev_eth_t *dev);
 extern void dev_eth_linkstate_handler(dev_eth_t *dev, int newstate);
 
+/** @} */
 #endif /* DEV_ETH_H */
