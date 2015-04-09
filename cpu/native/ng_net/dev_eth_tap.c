@@ -113,7 +113,7 @@ static int _recv(dev_eth_t *dev_eth, char *buf, int len) {
     if (nread > 0) {
         ng_ethernet_hdr_t *hdr = (ng_ethernet_hdr_t *)buf;
         if (!(dev->promiscous) && !_is_addr_multicast(hdr->dst) &&
-            !_is_addr_broadcast(hdr->dst) && 
+            !_is_addr_broadcast(hdr->dst) &&
             (memcmp(hdr->dst, dev->addr, NG_ETHERNET_ADDR_LEN) != 0)) {
             DEBUG("ng_eth_dev: received for %02x:%02x:%02x:%02x:%02x:%02x\n"
                   "That's not me => Dropped\n",
@@ -181,7 +181,7 @@ static void _tap_isr(void) {
 static int _init(dev_eth_t *ethdev)
 {
     dev_eth_tap_t *dev = (dev_eth_tap_t*)ethdev;
-    
+
     char *name = dev->tap_name;
 #ifdef __MACH__ /* OSX */
     char clonedev[255] = "/dev/"; /* XXX bad size */
