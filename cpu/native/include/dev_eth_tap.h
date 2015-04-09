@@ -7,8 +7,8 @@
  */
 
 /**
- * @defgroup    net_dev_eth Ethernet
- * @ingroup     net
+ * @defgroup    net_dev_eth_impl Low-level Ethernet driver implementations
+ * @ingroup     net_dev_eth_ll
  * @brief       Low-level ethernet driver for native tap interfaces
  * @{
  *
@@ -25,19 +25,30 @@
 
 #include "net/if.h"
 
+/**
+ * @brief tap interface state
+ */
 typedef struct dev_eth_tap {
-    dev_eth_t ethdev;
+    dev_eth_t ethdev;                   /**< dev_eth internal member */
     char tap_name[IFNAMSIZ];            /**< host dev file name */
     int tap_fd;                         /**< host file descriptor for the TAP */
     uint8_t addr[NG_ETHERNET_ADDR_LEN]; /**< The MAC address of the TAP */
     uint8_t promiscous;                 /**< Flag for promiscous mode */
 } dev_eth_tap_t;
 
+/**
+ * @brief global device struct. driver only supports one tap device as of now.
+ */
 extern dev_eth_tap_t dev_eth_tap;
 
+/**
+ * @brief Setup dev_eth_tap_t structure.
+ *
+ * @param dev  the preallocated dev_eth_tap device handle to setup
+ * @param name Name of the host system's tap inteface to bind to.
+ */
 void dev_eth_tap_setup(dev_eth_tap_t *dev, const char *name);
 
-extern void dev_eth_tap_isr(void);
 /**
  * @}
  */
