@@ -1,7 +1,7 @@
 APPLICATION = dev_eth
 include ../Makefile.tests_common
 
-BOARD_WHITELIST = native 
+BOARD_WHITELIST = native
 FEATURES_REQUIRED += ethernet
 
 ifneq (,$(filter native,$(BOARD)))

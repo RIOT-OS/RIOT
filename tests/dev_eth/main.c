@@ -73,7 +73,7 @@ void dev_eth_rx_handler(dev_eth_t *dev) {
     if (n>0) {
         turn_packet(_rxbuf);
         dev->driver->send(dev, _rxbuf, n);
-    } 
+    }
 }
 
 int main(void)
