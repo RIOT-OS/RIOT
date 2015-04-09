@@ -14,6 +14,7 @@
  */
 
 #include <stdio.h>
+#include <errno.h>
 #include "msg.h"
 #include "thread.h"
 #include "sched.h"
@@ -37,7 +38,7 @@ static char payload[MAX_PAYLOAD_SIZE];
 unsigned sixlowapp_waiting_for_pong;
 kernel_pid_t sixlowapp_waiter_pid;
 
-void sixlowapp_send_ping(int argc, char **argv)
+int sixlowapp_send_ping(int argc, char **argv)
 {
     ipv6_addr_t dest;
     const char *icmp_data = ICMP_DATA;
@@ -45,12 +46,12 @@ void sixlowapp_send_ping(int argc, char **argv)
     if (argc != 2) {
         puts("! Invalid number of parameters");
         printf("  usage: %s destination\n", argv[0]);
-        return;
+        return EINVAL;
     }
 
     if (!inet_pton(AF_INET6, argv[1], &dest)) {
         printf("! %s is not a valid IPv6 address\n", argv[1]);
-        return;
+        return EFAULT;
     }
 
     sixlowapp_ndp_workaround(&dest);
@@ -77,23 +78,25 @@ void sixlowapp_send_ping(int argc, char **argv)
                                                               addr_str,
                                                               IPV6_MAX_ADDR_STR_LEN));
     }
+
+    return 0;
 }
 
-void sixlowapp_netcat(int argc, char **argv)
+int sixlowapp_netcat(int argc, char **argv)
 {
     ipv6_addr_t dest;
     
     if (argc < 3) {
         puts("! Not enough parameters");
         puts("  usage: nc [-l] [destination] [port] [text]");
-        return;
+        return EINVAL;
     }
 
     if (strlen(argv[1]) == 2) {
         if (strncmp(argv[1], "-l", 2)) {
             puts("! Invalid parameter");
             puts("  usage: nc [-l] [destination] [port] [text]");
-            return;
+                return EINVAL;
         }
         else {
             sixlowapp_netcat_listen_port = atoi(argv[2]);
@@ -118,6 +121,8 @@ void sixlowapp_netcat(int argc, char **argv)
         }
         sixlowapp_udp_send(&dest, atoi(argv[2]), payload, plen);
     }
+
+    return 0;
 }
 
 

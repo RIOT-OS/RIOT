@@ -50,16 +50,19 @@ extern char addr_str[IPV6_MAX_ADDR_STR_LEN];
  * @param[in] argc   Number of arguments supplied to the function invocation.
  * @param[in] argv   The supplied argument list.
  *
+ * @returns 0 on success, error code on invalide parameters
  */
-void sixlowapp_send_ping(int argc, char **argv);
+int sixlowapp_send_ping(int argc, char **argv);
 
 /**
  * @brief   Shell command for netcat
  *
  * @param[in] argc   Number of arguments supplied to the function invocation.
  * @param[in] argv   The supplied argument list.
+ *
+ * @returns 0 on success, error code on invalide parameters
  */
-void sixlowapp_netcat(int argc, char **argv);
+int sixlowapp_netcat(int argc, char **argv);
 
 /**
  * @brief  Wrapper function for sending data of UDP
