@@ -96,20 +96,14 @@ int iib_register_if(kernel_pid_t pid);
  *
  * @param[in] if_pid        PID of the interface the message was received on
  * @param[in] nb_elt        Pointer to the Neighbor Tuple for the message originator
- * @param[in] send_list     Pointer to the Sending Address List from the received HELLO
- * @param[in] th_sym_list   Pointer to the Addr List of the originator's symmetric 2-Hop neighbors
- * @param[in] th_rem_list   Pointer to the Addr List of the originator's lost 2-Hop neighbors
- * @param[in] rem_list      Pointer to the Removed Address List
  * @param[in] validity_time Validity time in milliseconds for the originator's information
  * @param[in] is_sym_nb     Flag whether the link to the originator is symmetric
  * @param[in] is_lost       Flag whether the originator marked this link as lost
  *
  * @return                  0 on success
  */
-int iib_process_hello(kernel_pid_t if_pid, nib_entry_t *nb_elt, nhdp_addr_entry_t *send_list,
-                      nhdp_addr_entry_t *th_sym_list, nhdp_addr_entry_t *th_rem_list,
-                      nhdp_addr_entry_t *rem_list, uint64_t validity_time, uint8_t is_sym_nb,
-                      uint8_t is_lost);
+int iib_process_hello(kernel_pid_t if_pid, nib_entry_t *nb_elt,
+                      uint64_t validity_time, uint8_t is_sym_nb, uint8_t is_lost);
 
 /**
  * @brief                   Add addresses to the currently constructed HELLO message

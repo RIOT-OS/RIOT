@@ -51,9 +51,19 @@ typedef struct nhdp_addr_entry_t {
 #define NHDP_ADDR_TMP_NONE          (0x00)
 #define NHDP_ADDR_TMP_ANY           (0x01)
 #define NHDP_ADDR_TMP_SYM           (0x03)
+#define NHDP_ADDR_TMP_REM_LIST      (0x04)
+#define NHDP_ADDR_TMP_TH_REM_LIST   (0x08)
+#define NHDP_ADDR_TMP_TH_SYM_LIST   (0x10)
+#define NHDP_ADDR_TMP_NB_LIST       (0x20)
+#define NHDP_ADDR_TMP_SEND_LIST     (0x60)
 
-#define NHDP_ADDR_TMP_IN_SYM(addr)  ((addr->in_tmp_table & 0x02) >> 1)
-#define NHDP_ADDR_TMP_IN_ANY(addr)  ((addr->in_tmp_table & 0x01))
+#define NHDP_ADDR_TMP_IN_ANY(addr)          ((addr->in_tmp_table & 0x01))
+#define NHDP_ADDR_TMP_IN_SYM(addr)          ((addr->in_tmp_table & 0x02) >> 1)
+#define NHDP_ADDR_TMP_IN_REM_LIST(addr)     ((addr->in_tmp_table & 0x04) >> 2)
+#define NHDP_ADDR_TMP_IN_TH_REM_LIST(addr)  ((addr->in_tmp_table & 0x08) >> 3)
+#define NHDP_ADDR_TMP_IN_TH_SYM_LIST(addr)  ((addr->in_tmp_table & 0x10) >> 4)
+#define NHDP_ADDR_TMP_IN_NB_LIST(addr)      ((addr->in_tmp_table & 0x20) >> 5)
+#define NHDP_ADDR_TMP_IN_SEND_LIST(addr)    ((addr->in_tmp_table & 0x40) >> 6)
 /** @} */
 
 /**
@@ -97,22 +107,31 @@ void nhdp_free_addr_list(nhdp_addr_entry_t *list_head);
 void nhdp_free_addr_entry(nhdp_addr_entry_t *addr_entry);
 
 /**
- * @brief                   Construct an address list containing the addresses of the given list
- *
- * @param[in] orig_list     Pointer to the head of the address list to 'clone'
+ * @brief                   Construct an addr list containing all addresses with
+ *                          the given tmp_type
  *
  * @return                  Pointer to the head of the newly created address list
  * @return                  NULL on error
  */
-nhdp_addr_entry_t *nhdp_generate_new_addr_list(nhdp_addr_entry_t *orig_list);
+nhdp_addr_entry_t *nhdp_generate_addr_list_from_tmp(uint8_t tmp_type);
 
 /**
  * @brief                   Reset in_tmp_table flag of all NHDP addresses
  *
  * @note
- * Must not be called from outside the NHDP writer's message creation process.
+ * Must not be called from outside the NHDP writer's or reader's message creation process.
+ *
+ * @param[in] decr_usg      Flag whether the usage counter of a resetted addr has to be decremented
  */
-void nhdp_reset_addresses_tmp_usg(void);
+void nhdp_reset_addresses_tmp_usg(uint8_t decr_usg);
+
+/**
+ * @brief                   Get a pointer to the head of the address storage list
+ *
+ * @return                  Pointer to the head of the central storage address list
+ * @return                  NULL if no addresses are registered
+ */
+nhdp_addr_t *nhdp_get_addr_db_head(void);
 
 #ifdef __cplusplus
 }
