@@ -39,7 +39,7 @@ extern "C" {
  * @brief   Priority of the pktdump thread
  */
 #ifndef NG_PKTDUMP_PRIO
-#define NG_PKTDUMP_PRIO                 (PRIORITY_MIN - 1)
+#define NG_PKTDUMP_PRIO                 (PRIORITY_MAIN - 1)
 #endif
 
 /**
