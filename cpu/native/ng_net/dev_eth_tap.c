@@ -157,6 +157,9 @@ static int _recv(dev_eth_t *dev_eth, char *buf, int len) {
             err(EXIT_FAILURE, "dev_eth_tap: read");
         }
     }
+    else if (nread == 0) {
+        DEBUG("_native_handle_tap_input: ignoring null-event");
+    }
     else {
         errx(EXIT_FAILURE, "internal error _rx_event");
     }
