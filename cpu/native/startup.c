@@ -35,6 +35,7 @@
 
 #include "board_internal.h"
 #include "native_internal.h"
+#include "ng_tapnet.h"
 #include "tap.h"
 
 int _native_null_in_pipe[2];
