@@ -104,6 +104,9 @@ endif
 ifneq (,$(filter fib,$(USEMODULE)))
     DIRS += net/network_layer/fib
 endif
+ifneq (,$(filter ng_netdev_eth,$(USEMODULE)))
+    DIRS += net/link_layer/ng_netdev_eth
+endif
 
 DIRS += $(dir $(wildcard $(addsuffix /Makefile, ${USEMODULE})))
 
