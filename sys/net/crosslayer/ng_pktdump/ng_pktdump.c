@@ -36,7 +36,7 @@ static kernel_pid_t _pid = KERNEL_PID_UNDEF;
  */
 static char _stack[NG_PKTDUMP_STACKSIZE];
 
-void _dump_type(ng_nettype_t type)
+static void _dump_type(ng_nettype_t type)
 {
     switch (type) {
         case NG_NETTYPE_UNDEF:
@@ -79,7 +79,7 @@ void _dump_type(ng_nettype_t type)
     }
 }
 
-void _dump(ng_pktsnip_t *pkt)
+static void _dump(ng_pktsnip_t *pkt)
 {
     int snips = 0;
     int size = 0;
@@ -97,7 +97,7 @@ void _dump(ng_pktsnip_t *pkt)
     ng_pktbuf_release(pkt);
 }
 
-void *_eventloop(void *arg)
+static void *_eventloop(void *arg)
 {
     (void)arg;
     msg_t msg;
