@@ -77,7 +77,7 @@ static universal_address_container_t *universal_address_get_next_unused_entry(vo
 {
     if (universal_address_table_filled < UNIVERSAL_ADDRESS_MAX_ENTRIES) {
         for (size_t i = 0; i < UNIVERSAL_ADDRESS_MAX_ENTRIES; ++i) {
-            if ((universal_address_table[i].use_count == 0)) {
+            if (universal_address_table[i].use_count == 0) {
                 return &(universal_address_table[i]);
             }
         }
@@ -256,6 +256,6 @@ void universal_address_print_table(void)
            (int)universal_address_table_filled);
 
     for (size_t i = 0; i < UNIVERSAL_ADDRESS_MAX_ENTRIES; ++i) {
-        universal_address_print_entry((&universal_address_table[i]));
+        universal_address_print_entry(&universal_address_table[i]);
     }
 }
