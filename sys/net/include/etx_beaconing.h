@@ -126,12 +126,17 @@ typedef struct etx_neighbor_t {
 
 /**
  * @brief initializes the module
+ * In this function we pass the address of our node as the parameter
  * @param[in] address a ipv6_addr_t pointer
  */
 void etx_init_beaconing(ipv6_addr_t *address);
 
 /**
  * @brief calculates the ETX-value
+ * we need to keep track of the ETX values of other nodes without
+ * needing them to be in our parent array, so we have another array in
+ * which we put all necessary info for up to ETX_MAX_CANDIDATE_NEIHGBORS
+ * candidates.Here we pass the address of the neighbour node .
  * @param[in] address a ipv6_addr_t pointer
  * @return the calculated ETX-value
  */
