@@ -109,11 +109,6 @@ uint8_t rpl_init(kernel_pid_t if_id, ipv6_addr_t *address)
     return SIXLOWERROR_SUCCESS;
 }
 
-kernel_pid_t rpl_get_if(void)
-{
-    return rpl_if_id;
-}
-
 #if (RPL_DEFAULT_MOP == RPL_MOP_NON_STORING_MODE)
 void internal_srh_process(ipv6_srh_t *srh_header)
 {

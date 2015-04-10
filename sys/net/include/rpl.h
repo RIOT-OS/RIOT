@@ -204,13 +204,6 @@ ipv6_addr_t *rpl_get_next_hop(ipv6_addr_t *addr);
  * */
 uint8_t rpl_is_root(void);
 
-/**
- * @brief receive the set inteface id
- *
- * @return the set interface id of KERNEL_PID_UNDEF if no interface has been set
- */
-kernel_pid_t rpl_get_if(void);
-
 #if RPL_DEFAULT_MOP == RPL_MOP_NON_STORING_MODE
 
 /**

@@ -831,7 +831,7 @@ void rpl_recv_DAO(void)
                  * This is a bit hack-ish, but sufficient for now
                 */
                 if ( my_address.uint32[3] != rpl_opt_target_buf->target.uint32[3] ) {
-                      fib_add_entry(rpl_get_if(),
+                      fib_add_entry(rpl_if_id,
                          &rpl_opt_target_buf->target.uint8[0], sizeof(ipv6_addr_t), AF_INET6,
                          &ipv6_buf->srcaddr.uint8[0], sizeof(ipv6_addr_t), AF_INET6,
                          (rpl_opt_transit_buf->path_lifetime * my_dodag->lifetime_unit * 1000));

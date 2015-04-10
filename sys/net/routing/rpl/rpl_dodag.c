@@ -184,7 +184,7 @@ rpl_parent_t *rpl_new_parent(rpl_dodag_t *dodag, ipv6_addr_t *address, uint16_t 
             parent->dodag = dodag;
             parent->lifetime.seconds = now.seconds + (dodag->default_lifetime * dodag->lifetime_unit);
 
-            fib_add_entry(rpl_get_if(), &address->uint8[0], sizeof(ipv6_addr_t), AF_INET6,
+            fib_add_entry(rpl_if_id, &address->uint8[0], sizeof(ipv6_addr_t), AF_INET6,
                           &address->uint8[0], sizeof(ipv6_addr_t), AF_INET6,
                           (dodag->default_lifetime * dodag->lifetime_unit)*1000);
             /* dtsn is set at the end of recv_dio function */
@@ -296,7 +296,7 @@ rpl_parent_t *rpl_find_preferred_parent(rpl_dodag_t *my_dodag)
     if (my_dodag->my_preferred_parent == NULL) {
         my_dodag->my_preferred_parent = best;
         /* this will be our default gateway */
-        fib_add_entry(rpl_get_if(), &def.uint8[0], sizeof(ipv6_addr_t), AF_INET6,
+        fib_add_entry(rpl_if_id, &def.uint8[0], sizeof(ipv6_addr_t), AF_INET6,
                       &best->addr.uint8[0], sizeof(ipv6_addr_t),
                       AF_INET6, (best->lifetime.seconds - now.seconds)*1000 );
     }
@@ -309,12 +309,12 @@ rpl_parent_t *rpl_find_preferred_parent(rpl_dodag_t *my_dodag)
         /* we already have a default gateway so we will replace it
          * but first we move the current prefered parent to a usual next-hop
          */
-        fib_add_entry(rpl_get_if(), &my_dodag->my_preferred_parent->addr.uint8[0], sizeof(ipv6_addr_t), AF_INET6,
+        fib_add_entry(rpl_if_id, &my_dodag->my_preferred_parent->addr.uint8[0], sizeof(ipv6_addr_t), AF_INET6,
                       &my_dodag->my_preferred_parent->addr.uint8[0], sizeof(ipv6_addr_t), AF_INET6,
                       (best->lifetime.seconds-now.seconds)*1000 );
         my_dodag->my_preferred_parent = best;
         fib_remove_entry(&def.uint8[0], sizeof(ipv6_addr_t));
-        fib_add_entry(rpl_get_if(), &def.uint8[0], sizeof(ipv6_addr_t), AF_INET6,
+        fib_add_entry(rpl_if_id, &def.uint8[0], sizeof(ipv6_addr_t), AF_INET6,
                          &best->addr.uint8[0], sizeof(ipv6_addr_t),
                          AF_INET6, (best->lifetime.seconds - now.seconds)*1000 );
 
@@ -407,7 +407,7 @@ void rpl_join_dodag(rpl_dodag_t *dodag, ipv6_addr_t *parent, uint16_t parent_ran
     ipv6_addr_t def = {.uint32 = {0x0, 0x0, 0x0, 0x0} };
     fib_remove_entry(&def.uint8[0], sizeof(ipv6_addr_t));
 
-    fib_add_entry(rpl_get_if(), &def.uint8[0], sizeof(ipv6_addr_t), AF_INET6,
+    fib_add_entry(rpl_if_id, &def.uint8[0], sizeof(ipv6_addr_t), AF_INET6,
                   &preferred_parent->addr.uint8[0], sizeof(ipv6_addr_t), AF_INET6,
                   (preferred_parent->lifetime.seconds - now.seconds)*1000);
 
