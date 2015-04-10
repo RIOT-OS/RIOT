@@ -128,6 +128,22 @@ int ng_netreg_num(ng_nettype_t type, uint32_t demux_ctx);
 ng_netreg_entry_t *ng_netreg_getnext(ng_netreg_entry_t *entry);
 
 /**
+ * @brief   Calculates the checksum for a header.
+ *
+ * @param[in] hdr           The header the checksum should be calculated
+ *                          for.
+ * @param[in] pseudo_hdr    The header the pseudo header shall be generated
+ *                          from. NULL if none is needed.
+ *
+ * @return  0, on success.
+ * @return  -EINVAL, if @p pseudo_hdr is NULL but a pseudo header was required.
+ * @return  -ENOENT, if @ref net_netreg does not know how to calculate checksum
+ *          for ng_pktsnip_t::type of @p hdr.
+ */
+
+int ng_netreg_calc_csum(ng_pktsnip_t *hdr, ng_pktsnip_t *pseudo_hdr);
+
+/**
  * @brief   Builds a header for sending and adds it to the packet buffer.
  *
  * @param[in] type      Type of the header.
