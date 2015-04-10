@@ -397,12 +397,12 @@ void rpl_send_DAO(rpl_dodag_t *my_dodag, ipv6_addr_t *destination, uint8_t lifet
     uint8_t continue_index = 0;
 
     for (uint8_t i = start_index; i < RPL_MAX_PARENTS; i++) {
-        if(rpl_get_parents()[i].used) {
+        if(rpl_parents[i].used) {
             rpl_send_opt_target_buf->type = RPL_OPT_TARGET;
             rpl_send_opt_target_buf->length = RPL_OPT_TARGET_LEN;
             rpl_send_opt_target_buf->flags = 0x00;
             rpl_send_opt_target_buf->prefix_length = RPL_DODAG_ID_LEN;
-            memcpy(&rpl_send_opt_target_buf->target, &rpl_get_parents()[i].addr,
+            memcpy(&rpl_send_opt_target_buf->target, &rpl_parents[i].addr,
                    sizeof(ipv6_addr_t));
             opt_len += RPL_OPT_TARGET_LEN_WITH_OPT_LEN;
             rpl_send_opt_transit_buf = get_rpl_send_opt_transit_buf(DAO_BASE_LEN + opt_len);

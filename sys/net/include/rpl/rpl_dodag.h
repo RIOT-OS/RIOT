@@ -36,7 +36,6 @@ rpl_dodag_t *rpl_get_joined_dodag(uint8_t instanceid);
 rpl_dodag_t *rpl_get_my_dodag(void);
 void rpl_join_dodag(rpl_dodag_t *dodag, ipv6_addr_t *parent, uint16_t parent_rank);
 void rpl_del_dodag(rpl_dodag_t *dodag);
-rpl_parent_t *rpl_get_parents(void);
 rpl_parent_t *rpl_new_parent(rpl_dodag_t *dodag, ipv6_addr_t *address, uint16_t rank);
 rpl_parent_t *rpl_find_parent(rpl_dodag_t *dodag, ipv6_addr_t *address);
 void rpl_leave_dodag(rpl_dodag_t *dodag);

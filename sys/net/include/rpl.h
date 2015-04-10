@@ -53,6 +53,7 @@ extern char rpl_process_buf[RPL_PROCESS_STACKSIZE];
 extern uint8_t rpl_buffer[BUFFER_SIZE - LL_HDR_LEN];
 extern kernel_pid_t rpl_if_id;
 extern rpl_dodag_t rpl_dodags[RPL_MAX_DODAGS];
+extern rpl_parent_t rpl_parents[RPL_MAX_PARENTS];
 
 /**
  * @brief Sends a RPL message to a given destination

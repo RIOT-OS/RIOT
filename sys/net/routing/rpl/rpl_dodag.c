@@ -34,7 +34,7 @@ char addr_str[IPV6_MAX_ADDR_STR_LEN];
 
 static rpl_instance_t instances[RPL_MAX_INSTANCES];
 rpl_dodag_t rpl_dodags[RPL_MAX_DODAGS];
-static rpl_parent_t parents[RPL_MAX_PARENTS];
+rpl_parent_t rpl_parents[RPL_MAX_PARENTS];
 
 void rpl_trickle_send_dio(void *args)
 {
@@ -162,11 +162,6 @@ bool rpl_equal_id(ipv6_addr_t *id1, ipv6_addr_t *id2)
     return true;
 }
 
-rpl_parent_t *rpl_get_parents(void)
-{
-    return &parents[0];
-}
-
 rpl_parent_t *rpl_new_parent(rpl_dodag_t *dodag, ipv6_addr_t *address, uint16_t rank)
 {
     rpl_parent_t *parent;
@@ -175,7 +170,7 @@ rpl_parent_t *rpl_new_parent(rpl_dodag_t *dodag, ipv6_addr_t *address, uint16_t 
     timex_t now;
     vtimer_now(&now);
 
-    for (parent = &parents[0], end = parents + RPL_MAX_PARENTS; parent < end; parent++) {
+    for (parent = &rpl_parents[0], end = rpl_parents + RPL_MAX_PARENTS; parent < end; parent++) {
         if (parent->used == 0) {
             memset(parent, 0, sizeof(*parent));
             parent->used = 1;
@@ -202,7 +197,7 @@ rpl_parent_t *rpl_find_parent(rpl_dodag_t *dodag, ipv6_addr_t *address)
     rpl_parent_t *parent;
     rpl_parent_t *end;
 
-    for (parent = &parents[0], end = parents + RPL_MAX_PARENTS; parent < end; parent++) {
+    for (parent = &rpl_parents[0], end = rpl_parents + RPL_MAX_PARENTS; parent < end; parent++) {
         if ((parent->used) && (rpl_equal_id(address, &parent->addr)
                     && (parent->dodag->instance->id == dodag->instance->id)
                     && (!memcmp(&parent->dodag->dodag_id,
@@ -230,9 +225,9 @@ void rpl_delete_worst_parent(void)
     uint16_t max_rank = 0x0000;
 
     for (int i = 0; i < RPL_MAX_PARENTS; i++) {
-        if (parents[i].rank > max_rank) {
+        if (rpl_parents[i].rank > max_rank) {
             worst = i;
-            max_rank = parents[i].rank;
+            max_rank = rpl_parents[i].rank;
         }
     }
 
@@ -241,7 +236,7 @@ void rpl_delete_worst_parent(void)
         return;
     }
 
-    rpl_delete_parent(&parents[worst]);
+    rpl_delete_parent(&rpl_parents[worst]);
 
 }
 
@@ -250,9 +245,9 @@ void rpl_delete_all_parents(rpl_dodag_t *dodag)
 
     dodag->my_preferred_parent = NULL;
     for (int i = 0; i < RPL_MAX_PARENTS; i++) {
-        if (parents[i].dodag && (dodag->instance->id == parents[i].dodag->instance->id) &&
-                (!memcmp(&dodag->dodag_id, &parents[i].dodag->dodag_id, sizeof(ipv6_addr_t)))) {
-             memset(&parents[i], 0, sizeof(parents[i]));
+        if (rpl_parents[i].dodag && (dodag->instance->id == rpl_parents[i].dodag->instance->id) &&
+                (!memcmp(&dodag->dodag_id, &rpl_parents[i].dodag->dodag_id, sizeof(ipv6_addr_t)))) {
+             memset(&rpl_parents[i], 0, sizeof(rpl_parents[i]));
         }
     }
 }
@@ -270,20 +265,21 @@ rpl_parent_t *rpl_find_preferred_parent(rpl_dodag_t *my_dodag)
     }
 
     for (uint8_t i = 0; i < RPL_MAX_PARENTS; i++) {
-        if (parents[i].used
-                && (parents[i].dodag->instance->id == my_dodag->instance->id)
-                && (!memcmp(&parents[i].dodag->dodag_id,
+        if (rpl_parents[i].used
+                && (rpl_parents[i].dodag->instance->id == my_dodag->instance->id)
+                && (!memcmp(&rpl_parents[i].dodag->dodag_id,
                     &my_dodag->dodag_id, sizeof(ipv6_addr_t)))) {
-            if ((parents[i].rank == INFINITE_RANK) || ((parents[i].lifetime.seconds-now.seconds) <= 1)) {
+            if ((rpl_parents[i].rank == INFINITE_RANK)
+                 || ((rpl_parents[i].lifetime.seconds-now.seconds) <= 1)) {
                 DEBUG("Infinite rank, bad parent\n");
                 continue;
             }
             else if (best == NULL) {
                 DEBUG("possible parent\n");
-                best = &parents[i];
+                best = &rpl_parents[i];
             }
             else {
-                best = my_dodag->of->which_parent(best, &parents[i]);
+                best = my_dodag->of->which_parent(best, &rpl_parents[i]);
             }
         }
     }
