@@ -35,13 +35,13 @@
 static mutex_t mtx_access = MUTEX_INIT;
 
 /**
- * @brief maximum number of handled reactice routing protocols (RRP)
+ * @brief maximum number of handled reactive routing protocols (RRP)
  *        used to notify the saved kernel_pid_t
  */
 #define FIB_MAX_RRP (5)
 
 /**
- * @brief registered RRPs for notification un unreachable destinations
+ * @brief registered RRPs for notifications about unreachable destinations
  */
 static size_t notify_rrp_pos = 0;
 
@@ -61,9 +61,9 @@ static kernel_pid_t notify_rrp[FIB_MAX_RRP];
 static fib_entry_t fib_table[FIB_MAX_FIB_TABLE_ENTRIES];
 
 /**
- * @brief convert given ms to a timepoint from now on in the future
- * @param[in] ms the miliseconds to be converted
- * @param[out] timex the converted timepoint
+ * @brief convert given ms to a point in time from now on in the future
+ * @param[in]  ms     the milliseconds to be converted
+ * @param[out] timex  the converted point in time
  */
 static void fib_ms_to_timex(uint32_t ms, timex_t *timex)
 {
@@ -160,7 +160,7 @@ static int fib_find_entry(uint8_t *dst, size_t dst_size,
  * @param[in] lifetime       the lifetime in ms
  *
  * @return 0 if the entry has been updated
- *         -ENOMEM if the entry cannot be updated due to unsufficient RAM
+ *         -ENOMEM if the entry cannot be updated due to insufficient RAM
  */
 static int fib_upd_entry(fib_entry_t *entry,
                          uint8_t *next_hop, size_t next_hop_size, uint32_t next_hop_flags,
@@ -268,7 +268,7 @@ static int fib_remove(fib_entry_t *entry)
 }
 
 /**
- * @brief signalls (sends a message to) all registered RRPs
+ * @brief signals (sends a message to) all registered RRPs
  *        to start a route discovery for the provided destination.
  *        The receiver MUST copy the content, i.e. the address before reply.
  *
@@ -347,7 +347,7 @@ int fib_update_entry(uint8_t *dst, size_t dst_size,
         ret = fib_upd_entry(entry[0], next_hop, next_hop_size, next_hop_flags, lifetime);
     }
     else {
-        /* we have ambigious entries, i.e. count > 1
+        /* we have ambiguous entries, i.e. count > 1
          * this should never happen
          */
         DEBUG("[fib_update_entry] ambigious entries detected!!!");
@@ -371,7 +371,7 @@ void fib_remove_entry(uint8_t *dst, size_t dst_size)
         fib_remove(entry[0]);
     }
     else {
-        /* we have ambigious entries, i.e. count > 1
+        /* we have ambiguous entries, i.e. count > 1
          * this should never happen
          */
         DEBUG("[fib_update_entry] ambigious entries detected!!!");
