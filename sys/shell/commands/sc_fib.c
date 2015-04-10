@@ -71,7 +71,7 @@ int _fib_route_handler(int argc, char **argv)
     /* e.g. fibroute right now dont care about the adress/protocol family */
     if (argc == 1) {
         fib_print_routes();
-        return;
+        return 1;
     }
 
     /* e.g. firoute [add|del] */
@@ -209,4 +209,5 @@ int _fib_route_handler(int argc, char **argv)
     }
 
     puts("\nunrecognized parameters.\nPlease enter fibroute [add|del] for more information.");
+    return 1;
 }
