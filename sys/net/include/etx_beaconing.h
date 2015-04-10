@@ -37,7 +37,7 @@ extern "C" {
  * @brief defining the number of neighbours
  */
 #if ENABLE_DEBUG
- /* Defines the maximum number of neighbours in debug mode, we fix it at 15 */
+/* Defines the maximum number of neighbours in debug mode, we fix it at 15 */
 #define ETX_MAX_CANDIDATE_NEIGHBORS (15)
 #else
 /* Defines the maximum number of neighbours in normal mode default is 40 */
@@ -57,7 +57,7 @@ extern "C" {
 #define ETX_INTERVAL        (1000)
 /** @brief Defines the ETX_WINDOW , 10 is the default value */
 #define ETX_WINDOW          (10)
- /** @brief Defines the best candidates to send the beaconing packet */
+/** @brief Defines the best candidates to send the beaconing packet */
 #define ETX_BEST_CANDIDATES (15)
 /** @brief Defines the Tuple size , 1 Byte for Addr, 1 Byte for packets rec */
 #define ETX_TUPLE_SIZE      (2)
@@ -101,7 +101,7 @@ extern "C" {
  * information
  * The information processed shall not exceed the value set in Option Length
  */
- typedef struct __attribute__((packed)) etx_probe_t {
+typedef struct __attribute__((packed)) etx_probe_t {
     uint8_t code;                       /**< Option type */
     uint8_t length;                     /**< Option Length*/
     uint8_t data[30];                   /**< Option Data */
@@ -120,27 +120,27 @@ typedef struct etx_neighbor_t {
     uint8_t     packets_rx;
     /** The currently calculated ETX-value */
     double      cur_etx;
-     /** The indicator if this node is active or not */
+    /** The indicator if this node is active or not */
     uint8_t     used;
 } etx_neighbor_t;
 
- /**
-  * @brief initializes the module
-  * @param[in] address a ipv6_addr_t pointer
-  */
+/**
+ * @brief initializes the module
+ * @param[in] address a ipv6_addr_t pointer
+ */
 void etx_init_beaconing(ipv6_addr_t *address);
 
- /**
-  * @brief calculates the ETX-value
-  * @param[in] address a ipv6_addr_t pointer
-  * @return the calculated ETX-value
-  */
+/**
+ * @brief calculates the ETX-value
+ * @param[in] address a ipv6_addr_t pointer
+ * @return the calculated ETX-value
+ */
 double etx_get_metric(ipv6_addr_t *address);
 
- /**
-  * @brief Updates the current ETX value of a candidate
-  * @param[in] neighbour an etx_neighbour_t pointer
-  */
+/**
+ * @brief Updates the current ETX value of a candidate
+ * @param[inout] neighbour an etx_neighbour_t pointer
+ */
 void etx_update(etx_neighbor_t *neighbor);
 
 #define ETX_PKT_OPT         (0)     /**< Position of Option-Type-Byte */
