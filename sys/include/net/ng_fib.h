@@ -69,7 +69,7 @@ void fib_register_rrp(void);
  * @param[in] lifetime       the lifetime in ms to be updates
  *
  * @return 0 on success
- *         -ENOMEM if the entry cannot be created due to unsufficient RAM
+ *         -ENOMEM if the entry cannot be created due to insufficient RAM
  */
 int fib_add_entry(kernel_pid_t iface_id, uint8_t *dst, size_t dst_size, uint32_t dst_flags,
                   uint8_t *next_hop, size_t next_hop_size, uint32_t next_hop_flags,
@@ -86,7 +86,7 @@ int fib_add_entry(kernel_pid_t iface_id, uint8_t *dst, size_t dst_size, uint32_t
  * @param[in] lifetime       the lifetime in ms to be updates
  *
  * @return 0 on success
- *         -ENOMEM if the entry cannot be updated due to unsufficient RAM
+ *         -ENOMEM if the entry cannot be updated due to insufficient RAM
  */
 int fib_update_entry(uint8_t *dst, size_t dst_size,
                      uint8_t *next_hop, size_t next_hop_size, uint32_t next_hop_flags,
