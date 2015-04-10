@@ -133,10 +133,6 @@ extern int _l2_ping_get_probe_handler(int argc, char **argv);
 extern int _net_if_ifconfig(int argc, char **argv);
 #endif
 
-#ifdef MODULE_RPL
-extern int _rpl_route_handler(int argc, char **argv);
-#endif
-
 #ifdef MODULE_MCI
 extern int _get_sectorsize(int argc, char **argv);
 extern int _get_blocksize(int argc, char **argv);
@@ -246,9 +242,6 @@ const shell_command_t _shell_command_list[] = {
 #endif
 #ifdef MODULE_NET_IF
     {"ifconfig", "Configures a network interface", _net_if_ifconfig},
-#endif
-#ifdef MODULE_RPL
-    {"route", "Shows the routing table", _rpl_route_handler},
 #endif
 #ifdef MODULE_MCI
     {DISK_READ_SECTOR_CMD, "Reads the specified sector of inserted memory card", _read_sector},

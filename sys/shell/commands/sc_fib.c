@@ -154,8 +154,6 @@ int _fib_route_handler(int argc, char **argv)
             _fib_usage(1);
             return 1;
         }
-
-        return 0;
     }
 
     /* e.g. fibroute add <destination> via <next hop> dev <device> lifetime <lifetime> */
