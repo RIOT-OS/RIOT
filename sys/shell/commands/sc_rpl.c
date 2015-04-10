@@ -29,7 +29,9 @@ int _rpl_route_handler(int argc, char **argv)
 {
     (void) argc;
     (void) argv;
-
+    (void) addr_str;
+    puts("DEPRECATED please use fibroute");
+/*
     rpl_routing_entry_t *rtable;
     rtable = rpl_get_routing_table();
     if (rtable) {
@@ -57,6 +59,6 @@ int _rpl_route_handler(int argc, char **argv)
         puts("No routing table available");
     }
     puts("$");
-
+*/
     return 0;
 }
