@@ -1,0 +1,104 @@
+/*
+ * Copyright (C) 2015 Janos Kutscherauer (noshky@gmail.com)
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
+                +===================+===================+===================++==============================++
+ TERMINAL CODES |   ZSH             |   MINICOM-VT102   |   MINICOM-ANSI    ||  ACTION                      ||
+++==============+-------------------+-------------------+-------------------++------------------------------+|
+||  NL          |   CR              |   CR              |   CR              ||  <enter>                     ||
+||  ESC         |   ESC             |   ESC             |   ESC             ||  <no action>                 ||
+||  BS          |   DEL             |   DEL             |   BS              ||  Delete 1 before             ||
+||  DEL         |   ESC [ 3 ~       |   ESC [ 3 ~       |   ESC DEL         ||  Delete 1 behind             ||
+||  INS         |   ESC [ 2 ~       |   ESC [ 2 ~       |   ESC [ @         ||  not implemented             ||
+||  HOME        |   ESC O H         |   ESC [ 1 ~       |   ESC [ H         ||  Cursor HOME                 ||
+||  END         |   ESC O F         |   ESC O F         |   ESC O F         ||  Cursor END                  ||
+||  PGUP        |   ESC [ 5 ~       |   ESC [ 5 ~       |   ESC [ V         ||  History up                  ||
+||  PGDWN       |   ESC [ 6 ~       |   ESC [ 6 ~       |   ESC [ U         ||  History down                ||
+||  UP          |   ESC [ A         |   ESC [ A         |   ESC [ A         ||  History up                  ||
+||  DOWN        |   ESC [ B         |   ESC [ B         |   ESC [ B         ||  History down                ||
+||  RIGHT       |   ESC [ C         |   ESC [ C         |   ESC [ C         ||  Cursor right                ||
+||  LEFT        |   ESC [ D         |   ESC [ D         |   ESC [ D         ||  Cursor left                 ||
+|+--------------+-------------------+-------------------+-------------------++------------------------------+|
+||  CTRL+UP     |   ESC [ 1 ; 5 A   |                   |                   ||  History up                  ||
+||  CTRL+DOWN   |   ESC [ 1 ; 5 B   |                   |                   ||  History down                ||
+||  CTRL+RIGHT  |   ESC [ 1 ; 5 C   |                   |                   ||  Cursor skip word right      ||
+||  CTRL+LEFT   |   ESC [ 1 ; 5 D   |                   |                   ||  Cursor skip word left       ||
+||  CTRL+A      |   0x01            |                   |                   ||  Cursor HOME                 ||
+||  CTRL+E      |   0x05            |                   |                   ||  Cursor END                  ||
+|+--------------+-------------------+-------------------+-------------------++------------------------------+|
+||  CTRL+DEL    |   ESC [ 3 ; 5 ~   |                   |                   ||  DELETE word behind cursor   ||
+||  CTRL+U      |   0x15            |                   |                   ||  CUT all                     ||
+||  CTRL+K      |   0x0B            |                   |                   ||  CUT all behind cursor       ||
+||  CTRL+W      |   0x17            |                   |                   ||  CUT word before cursor      ||
+||  ESC+BS      |   ESC BS          |                   |                   ||  CUT word before cursor      ||
+||  ALT+D       |   ESC d           |                   |                   ||  CUT word behind cursor      ||
+||  CTRL+Y      |   0x19            |                   |                   ||  PASTE                       ||
+|+--------------+-------------------+-------------------+-------------------++------------------------------+|
+||  ä           |   Ã 0xA4          |                   |                   ||  <not implemented>           ||
+||  Ä           |   Ã 0x84          |                   |                   ||  <not implemented>           ||
+||  ö           |   Ã 0xB6          |                   |                   ||  <not implemented>           ||
+||  Ö           |   Ã 0x96          |                   |                   ||  <not implemented>           ||
+||  ü           |   Ã 0xBC          |                   |                   ||  <not implemented>           ||
+||  Ü           |   Ã 0x9C          |                   |                   ||  <not implemented>           ||
+||  ß           |   Ã 0x9F          |                   |                   ||  <not implemented>           ||
+++==============+===================+===================+===================++==============================++
+
+
+    +-------+-----------+
+    |   LF  |   0x0A    |
+    |   CR  |   0x0D    |
+    |   ESC |   0x1B    |
+    |   BS  |   0x08    |
+    |   DEL |   0x7F    |
+    |   [   |   0x5B    |
+    |   ~   |   0x7E    |
+    |   ;   |   0x3B    |
+    |   O   |   0x4F    |
+    |   1   |   0x31    |
+    |   3   |   0x33    |
+    |   5   |   0x35    |
+    |   Ã   |   0xC3    |
+    +-------+-----------+
+
+
+
+
++-----------+  DEL,BS                                                           +----------------+
+|   START   +------------------------------------------------------------------->     DONE       |
++-----------+                                                         ctrl:=BS  +----------------+
+|           |  CR,LF                                                            |                |
+|           +------------------------------------------------------------------->                |
+|           |                                                         ctrl:=NL  |                |
+|           |  ESC    +----+  DEL                                               |                |
+|           +--------->    +---------------------------------------------------->                |
+|           |         |    |                                         ctrl:=DEL  |                |
++-----------+         |    |  ESC                                               |                |
+                      |    +---------------------------------------------------->                |
+                      |    |                                         ctrl:=ESC  |                |
+                      |    |                                                    |                |
+                      |    |  '['      +----+  [12356]  +---------------+  '~'  |                |
+                      |    +----------->    +-----------> ctrl:=        +------->                |
+                      |    |           |    |           | $C=='1':HOME  |       |                |
+                      |    |           |    |           |     '2':INS   |       |                |
+                      |    |           |    |           |     '3':DEL   |       | ctrl:=         |
+                      |    |           |    |           |     '5':PGUP  |       | $C=='A':UP     |
++-------------+       |    |           |    |           |     '6':PGDWN |       |     'B':DOWN   |
+| LF     0x0A |       |    |           |    |           +---------------+       |     'C':RIGHT  |
+| CR     0x0D |       |    |           |    |                                   |     'D':LEFT   |
+| ESC    0x1B |       |    |           |    |  [ABCDHUV@]                       |     'H':HOME   |
+| BS     0x08 |       |    |           |    +----------------------------------->     'U':PGDWN  |
+| DEL    0x7F |       |    |           +----+                                   |     'V':PGUP   |
+| [      0x5B |       |    |                                                    |     '@':INS    |
+| ~      0x7E |       |    |  'O'      +----+  [FH]                             |     'F':END    |
+| O      0x4F |       |    +---------> |    +----------------------------------->     'H':HOME   |
++-------------+       +----+           +----+                                   +----------------+
+                                                                                                  
+                                                                                                  
+                                                                                                  
+                                                                 (drawn with http://asciiflow.com)
+
+

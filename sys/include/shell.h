@@ -24,6 +24,10 @@
 
 #include "attributes.h"
 
+#ifndef SHELL_TAB_SIZE
+#define SHELL_TAB_SIZE 4
+#endif // SHELL_TAB_SIZE
+
 #ifdef __cplusplus
 extern "C" {
 #endif

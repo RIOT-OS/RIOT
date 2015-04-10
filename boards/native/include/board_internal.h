@@ -24,6 +24,7 @@ void _native_handle_uart0_input(void);
  */
 void _native_init_uart0(char *stdiotype, char *ioparam, int replay);
 int _native_set_uart_fds(void);
+void _native_exit_uart0(void);
 #endif /* MODULE_UART0 */
 
 extern int _native_null_out_file;

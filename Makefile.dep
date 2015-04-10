@@ -161,3 +161,7 @@ ifneq (,$(filter fib,$(USEMODULE)))
   USEMODULE += vtimer
   USEMODULE += net_help
 endif
+
+ifneq (,$(filter readline,$(USEMODULE)))
+	USEMODULE += shell
+endif

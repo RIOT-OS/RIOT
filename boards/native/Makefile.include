@@ -67,6 +67,8 @@ else
 export LINKFLAGS += -ldl
 endif
 
+LINKFLAGS += -lncurses -ltinfo
+
 # set the tap interface for term/valgrind
 ifneq (,$(filter nativenet,$(USEMODULE)))
 	export PORT ?= tap0

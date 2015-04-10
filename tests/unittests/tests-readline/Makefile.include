@@ -1,0 +1,4 @@
+USEMODULE += readline
+
+CFLAGS += -DSHELL_HISTORY_SIZE=10
+INCLUDES += -I$(RIOTBASE)/sys/readline/include
