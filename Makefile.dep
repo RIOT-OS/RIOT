@@ -161,3 +161,8 @@ ifneq (,$(filter fib,$(USEMODULE)))
   USEMODULE += vtimer
   USEMODULE += net_help
 endif
+
+ifneq (,$(filter oonf_common,$(USEMODULE)))
+  USEPKG += oonf_api
+  USEMODULE += socket_base
+endif
