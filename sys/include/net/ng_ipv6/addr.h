@@ -44,7 +44,7 @@ extern "C" {
  * @brief   Maximum length of an IPv6 address as string.
  */
 #define NG_IPV6_ADDR_MAX_STR_LEN    (sizeof("ffff:ffff:ffff:ffff:" \
-                                            "ffff:ffff:ffff:ffff"))
+                                            "ffff:ffff:255.255.255.255"))
 
 /**
  * @brief Data type to represent an IPv6 address.
