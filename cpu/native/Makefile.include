@@ -6,3 +6,4 @@ ifeq ($(BUILDOSXNATIVE),1)
 endif
 
 export USEMODULE += periph
+export USEMODULE += vtimer
