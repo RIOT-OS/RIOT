@@ -52,7 +52,7 @@ ng_sixlowpan_ctx_t *ng_sixlowpan_ctx_lookup_addr(const ng_ipv6_addr_t *addr)
 
             if ((_ctxs[id].prefix_len <= match) && (match > best)) {
                 best = match;
-                res = _ctxs + id;
+                res = &(_ctxs[id]);
             }
         }
     }
@@ -84,7 +84,7 @@ ng_sixlowpan_ctx_t *ng_sixlowpan_ctx_lookup_id(uint8_t id)
               ng_ipv6_addr_to_str(ipv6str, &_ctxs[id].prefix, sizeof(ipv6str)),
               _ctxs[id].prefix_len);
         mutex_unlock(&_ctx_mutex);
-        return _ctxs + id;
+        return &(_ctxs[id]);
     }
 
     mutex_unlock(&_ctx_mutex);
@@ -140,7 +140,7 @@ ng_sixlowpan_ctx_t *ng_sixlowpan_ctx_update(uint8_t id, const ng_ipv6_addr_t *pr
 
     mutex_unlock(&_ctx_mutex);
 
-    return _ctxs + id;
+    return &(_ctxs[id]);
 }
 
 static uint32_t _current_minute(void)
@@ -168,5 +168,14 @@ static void _update_lifetime(unsigned int id)
         _ctxs[id].ltime = (uint16_t)(_ctx_inval_times[id] - now);
     }
 }
+
+#ifdef TEST_SUITES
+#include <string.h>
+
+void ng_sixlowpan_ctx_reset(void)
+{
+    memset(_ctxs, 0, sizeof(_ctxs));
+}
+#endif
 
 /** @} */

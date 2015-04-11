@@ -37,6 +37,9 @@ extern "C" {
 #define NG_SIXLOWPAN_CTX_SIZE   (16)    /**< maximum number of entries in
                                          *   context buffer */
 
+/**
+ * @brief   Entry in the 6LoWPAN context buffer.
+ */
 typedef struct {
     ng_ipv6_addr_t prefix;  /**< The prefix associated to this context. */
     uint8_t prefix_len;     /**< Length of ng_sixlowpan_ctx_t::prefix in bit. */
@@ -94,6 +97,13 @@ ng_sixlowpan_ctx_t *ng_sixlowpan_ctx_lookup_id(uint8_t id);
 ng_sixlowpan_ctx_t *ng_sixlowpan_ctx_update(uint8_t id, const ng_ipv6_addr_t *prefix,
                                             uint8_t prefix_len, uint16_t ltime);
 
+
+#ifdef TEST_SUITES
+/**
+ * @brief   Resets the whole context buffer.
+ */
+void ng_sixlowpan_ctx_reset(void);
+#endif
 
 #ifdef __cplusplus
 }
