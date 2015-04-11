@@ -57,7 +57,7 @@ static mutex_t rreq_mutex;
 static mutex_t rrep_mutex;
 static mutex_t rerr_mutex;
 
-struct netaddr na_mcast = (struct netaddr){};
+struct netaddr na_mcast;
 
 void aodv_init(void)
 {
