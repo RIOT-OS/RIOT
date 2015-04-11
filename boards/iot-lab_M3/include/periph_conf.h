@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     board_iot-lab_M3
+ * @ingroup     boards_iot-lab_M3
  * @{
  *
  * @file

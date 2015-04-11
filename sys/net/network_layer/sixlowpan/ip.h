@@ -9,10 +9,10 @@
  *
  * @ingroup sixlowpan
  * @{
- * @file    sixlowip.h
+ * @file
  * @brief   6lowpan IP layer header
  * @author  Stephan Zeisberg <zeisberg@mi.fu-berlin.de>
- * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
+ * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  * @author  Eric Engel <eric.engel@fu-berlin.de>
  * @author  Oliver Gesch <oliver.gesch@googlemail.com>
  * @}
@@ -63,7 +63,7 @@ extern int srh_handler_pid;
 #define IPV6_NET_IF_ADDR_LIST_LEN   (10)    // maybe to much
 
 /* buffer */
-extern uint8_t buffer[BUFFER_SIZE];
+extern uint8_t sixlowpan_buffer[BUFFER_SIZE];
 extern char ip_process_buf[IP_PROCESS_STACKSIZE];
 extern kernel_pid_t sixlowip_reg[SIXLOWIP_MAX_REGISTERED];
 

@@ -29,8 +29,8 @@
  * @author      Kévin Roussel <Kevin.Roussel@inria.fr>
  */
 
-#ifndef __MSG_H_
-#define __MSG_H_
+#ifndef MSG_H_
+#define MSG_H_
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -60,7 +60,7 @@ typedef struct msg {
 
 
 /**
- * @brief Send a message. (blocking)
+ * @brief Send a message (blocking).
  *
  * This function sends a message to another thread. The ``msg_t`` structure has
  * to be allocated (e.g. on the stack) before calling the function and can be
@@ -81,7 +81,7 @@ int msg_send(msg_t *m, kernel_pid_t target_pid);
 
 
 /**
- * @brief Send a message. (non-blocking)
+ * @brief Send a message (non-blocking).
  *
  * This function sends a message to another thread. The ``msg_t`` structure has
  * to be allocated (e.g. on the stack) before calling the function and can be
@@ -187,7 +187,7 @@ int msg_try_receive(msg_t *m);
  * @param[in] m             Pointer to preallocated ``msg_t`` structure with
  *                          the message to send, must not be NULL.
  * @param[out] reply        Pointer to preallocated msg. Reply will be written
- *                          here, must not be NULL.
+ *                          here, must not be NULL. Can be identical to @p m.
  * @param[in] target_pid    The PID of the target process
  *
  * @return  1, if successful.
@@ -200,13 +200,26 @@ int msg_send_receive(msg_t *m, msg_t *reply, kernel_pid_t target_pid);
  * Sender must have sent the message with msg_send_receive().
  *
  * @param[in] m         message to reply to, must not be NULL.
- * @param[out] reply    message that target will get as reply, must not be
- *                      NULL.
+ * @param[out] reply    message that target will get as reply, must not be NULL.
  *
  * @return 1, if successful
- * @return 0, on error
+ * @return -1, on error
  */
 int msg_reply(msg_t *m, msg_t *reply);
+
+/**
+ * @brief Replies to a message from interrupt.
+ *
+ * An ISR can obviously not receive messages, however a thread might delegate
+ * replying to a message to an ISR.
+ *
+ * @param[in] m         message to reply to, must not be NULL.
+ * @param[out] reply    message that target will get as reply, must not be NULL.
+ *
+ * @return 1, if successful
+ * @return -1, on error
+ */
+int msg_reply_int(msg_t *m, msg_t *reply);
 
 /**
  * @brief Initialize the current thread's message queue.
@@ -225,5 +238,5 @@ int msg_init_queue(msg_t *array, int num);
 }
 #endif
 
-#endif /* __MSG_H_ */
+#endif /* MSG_H_ */
 /** @} */

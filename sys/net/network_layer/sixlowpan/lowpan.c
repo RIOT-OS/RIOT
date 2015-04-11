@@ -12,7 +12,7 @@
  * @file    sixlowpan.c
  * @brief   6lowpan functions
  * @author  Stephan Zeisberg <zeisberg@mi.fu-berlin.de>
- * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
+ * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  * @author  Oliver Gesch <oliver.gesch@googlemail.com>
  * @author  Eric Engel <eric.engel@fu-berlin.de>
  * @}
@@ -49,7 +49,7 @@
 
 #define ENABLE_DEBUG    (0)
 #if ENABLE_DEBUG
-char addr_str[IPV6_MAX_ADDR_STR_LEN];
+static char addr_str[IPV6_MAX_ADDR_STR_LEN];
 #endif
 #include "debug.h"
 
@@ -874,7 +874,7 @@ void lowpan_read(uint8_t *data, uint8_t length, net_if_eui64_t *s_addr,
 
 }
 
-/* draft-ietf-6lowpan-hc-13#section-3.1 */
+/* RFC6282 https://tools.ietf.org/html/rfc6282#section-3.1 */
 uint8_t lowpan_iphc_encoding(int if_id, const uint8_t *dest, int dest_len,
                              ipv6_hdr_t *ipv6_buf_extra, uint8_t *ptr)
 {
@@ -895,9 +895,9 @@ uint8_t lowpan_iphc_encoding(int if_id, const uint8_t *dest, int dest_len,
         if (!net_if_get_eui64(&own_iid, if_id, 0)) {
             return 1;
         }
-
-        own_iid.uint8[0] ^= 0x02;
     }
+
+    own_iid.uint8[0] ^= 0x02;
 
     ipv6_buf = ipv6_buf_extra;
 
@@ -1011,12 +1011,11 @@ uint8_t lowpan_iphc_encoding(int if_id, const uint8_t *dest, int dest_len,
                  * and possibly the link-layer addresses.*/
                 lowpan_iphc[1] |= 0x30;
             }
-            else if ((ipv6_buf->srcaddr.uint16[4] == 0) &&
-                     (ipv6_buf->srcaddr.uint16[5] == 0) &&
-                     (ipv6_buf->srcaddr.uint16[6] == 0) &&
-                     ((ipv6_buf->srcaddr.uint8[14]) & 0x80) == 0) {
-                /* 49-bit of interface identifier are 0, so we can compress
-                 * source address-iid to 16-bit */
+            else if ((ipv6_buf->srcaddr.uint32[2] == HTONL(0x000000ffu)) &&
+                     (ipv6_buf->srcaddr.uint16[6] == HTONL(0xfe00u))) {
+                /* The 48 leading bits of the interface identifier are
+                 * 0000:00FF:FE00, so we can compress the source address-iid to
+                 * 16-bit */
                 memcpy(&ipv6_hdr_fields[hdr_pos], &ipv6_buf->srcaddr.uint16[7], 2);
                 hdr_pos += 2;
                 /* 16 bits. The address is derived using context information
@@ -1043,48 +1042,46 @@ uint8_t lowpan_iphc_encoding(int if_id, const uint8_t *dest, int dest_len,
         /* 1: Destination address is a multicast address. */
         lowpan_iphc[1] |= SIXLOWPAN_IPHC2_M;
 
-        /* just another cool if condition */
-        if ((ipv6_buf->destaddr.uint8[1] == 2) &&
-            (ipv6_buf->destaddr.uint16[1] == 0) &&
-            (ipv6_buf->destaddr.uint16[2] == 0) &&
-            (ipv6_buf->destaddr.uint16[3] == 0) &&
-            (ipv6_buf->destaddr.uint16[4] == 0) &&
-            (ipv6_buf->destaddr.uint16[5] == 0) &&
-            (ipv6_buf->destaddr.uint16[6] == 0) &&
-            (ipv6_buf->destaddr.uint8[14] == 0)) {
-            /* 11: 8 bits. The address takes the form FF02::00XX. */
-            lowpan_iphc[1] |= 0x03;
-            ipv6_hdr_fields[hdr_pos] = ipv6_buf->destaddr.uint8[15];
-            hdr_pos++;
-        }
-        else if ((ipv6_buf->destaddr.uint16[1] == 0) &&
-                 (ipv6_buf->destaddr.uint16[2] == 0) &&
-                 (ipv6_buf->destaddr.uint16[3] == 0) &&
-                 (ipv6_buf->destaddr.uint16[4] == 0) &&
-                 (ipv6_buf->destaddr.uint16[5] == 0) &&
-                 (ipv6_buf->destaddr.uint8[12] == 0)) {
-            /* 10: 32 bits. The address takes the form FFXX::00XX:XXXX. */
-            lowpan_iphc[1] |= 0x02;
-            /* copy second and last 3 byte */
-            ipv6_hdr_fields[hdr_pos] = ipv6_buf->destaddr.uint8[1];
-            hdr_pos++;
-            memcpy(&ipv6_hdr_fields[hdr_pos], &ipv6_buf->destaddr.uint8[13], 3);
-            hdr_pos += 3;
-        }
-        else if ((ipv6_buf->destaddr.uint16[1] == 0) &&
-                 (ipv6_buf->destaddr.uint16[2] == 0) &&
-                 (ipv6_buf->destaddr.uint16[3] == 0) &&
-                 (ipv6_buf->destaddr.uint16[4] == 0) &&
-                 (ipv6_buf->destaddr.uint8[10] == 0)) {
-            /* 01: 48 bits.  The address takes the form FFXX::00XX:XXXX:XXXX */
-            lowpan_iphc[1] |= 0x01;
-            /* copy second and last 5 byte */
-            ipv6_hdr_fields[hdr_pos] = ipv6_buf->destaddr.uint8[1];
-            hdr_pos++;
-            memcpy(&ipv6_hdr_fields[hdr_pos], &ipv6_buf->destaddr.uint8[11], 5);
-            hdr_pos += 5;
+        /* Check if we can compress any part of the address */
+        if ((ipv6_buf->destaddr.uint8[0] == 0xff) &&
+            (ipv6_buf->destaddr.uint16[1] == HTONS(0x0000u)) &&
+            (ipv6_buf->destaddr.uint32[1] == HTONL(0x00000000u)) &&
+            (ipv6_buf->destaddr.uint16[4] == HTONS(0x0000u)) &&
+            (ipv6_buf->destaddr.uint8[10] == 0x00)) {
+            /* If we got here then the address is on the form:
+             * FFXX:0000:0000:0000:0000:00XX:XXXX:XXXX
+             * which means that it can be compressed. */
+            if ((ipv6_buf->destaddr.uint8[1] == 0x02) &&
+                (ipv6_buf->destaddr.uint16[5] == HTONS(0x0000u)) &&
+                (ipv6_buf->destaddr.uint16[6] == HTONS(0x0000u)) &&
+                (ipv6_buf->destaddr.uint8[14] == 0x00)) {
+                /* 11: 8 bits. The address takes the form FF02::00XX. */
+                lowpan_iphc[1] |= 0x03;
+                ipv6_hdr_fields[hdr_pos] = ipv6_buf->destaddr.uint8[15];
+                hdr_pos++;
+            }
+            else if ((ipv6_buf->destaddr.uint16[5] == HTONS(0x0000u)) &&
+                     (ipv6_buf->destaddr.uint8[12] == 0x00)) {
+                /* 10: 32 bits. The address takes the form FFXX::00XX:XXXX. */
+                lowpan_iphc[1] |= 0x02;
+                /* copy second and last 3 bytes */
+                ipv6_hdr_fields[hdr_pos] = ipv6_buf->destaddr.uint8[1];
+                hdr_pos++;
+                memcpy(&ipv6_hdr_fields[hdr_pos], &ipv6_buf->destaddr.uint8[13], 3);
+                hdr_pos += 3;
+            }
+            else {
+                /* 01: 48 bits.  The address takes the form FFXX::00XX:XXXX:XXXX */
+                lowpan_iphc[1] |= 0x01;
+                /* copy second and last 5 byte */
+                ipv6_hdr_fields[hdr_pos] = ipv6_buf->destaddr.uint8[1];
+                hdr_pos++;
+                memcpy(&ipv6_hdr_fields[hdr_pos], &ipv6_buf->destaddr.uint8[11], 5);
+                hdr_pos += 5;
+            }
         }
         else {
+            /* Full 128 bit address */
             memcpy(&ipv6_hdr_fields[hdr_pos], &ipv6_buf->destaddr.uint8[0], 16);
             hdr_pos += 16;
         }
@@ -1108,25 +1105,24 @@ uint8_t lowpan_iphc_encoding(int if_id, const uint8_t *dest, int dest_len,
                  * and possibly the link-layer addresses.*/
                 lowpan_iphc[1] |= 0x03;
             }
-            else if (dest_len == 2 &&
-                     ipv6_buf->destaddr.uint32[2] == HTONL(0x000000ff) &&
-                     ipv6_buf->destaddr.uint16[6] == HTONS(0xfe00) &&
-                     ipv6_buf->destaddr.uint16[7] == HTONS(destination)) {
-                /* 0 bits. The address is derived using context information
-                 * and possibly the link-layer addresses.*/
-                lowpan_iphc[1] |= 0x03;
-            }
-            else if ((ipv6_buf->destaddr.uint16[4] == 0) &&
-                     (ipv6_buf->destaddr.uint16[5] == 0) &&
-                     (ipv6_buf->destaddr.uint16[6] == 0) &&
-                     ((ipv6_buf->destaddr.uint8[14]) & 0x80) == 0) {
-                /* 49-bit of interface identifier are 0, so we can compress
-                 * source address-iid to 16-bit */
-                memcpy(&ipv6_hdr_fields[hdr_pos], &ipv6_buf->destaddr.uint16[7], 2);
-                hdr_pos += 2;
-                /* 16 bits. The address is derived using context information
-                 * and the 16 bits carried inline. */
-                lowpan_iphc[1] |= 0x02;
+            else if (ipv6_buf->destaddr.uint32[2] == HTONL(0x000000ff) &&
+                     ipv6_buf->destaddr.uint16[6] == HTONS(0xfe00)) {
+                if (dest_len == 2 &&
+                    ipv6_buf->destaddr.uint16[7] == *((uint16_t *) dest)) {
+                    /* 0 bits. The address is derived using context information
+                     * and possibly the link-layer addresses.*/
+                    lowpan_iphc[1] |= 0x03;
+                }
+                else {
+                    /* The 48 leading bits of the interface identifier are
+                     * 0000:00FF:FE00, so we can compress the source address-iid to
+                     * 16-bit */
+                    memcpy(&ipv6_hdr_fields[hdr_pos], &ipv6_buf->destaddr.uint16[7], 2);
+                    hdr_pos += 2;
+                    /* 16 bits. The address is derived using context information
+                     * and the 16 bits carried inline. */
+                    lowpan_iphc[1] |= 0x02;
+                }
             }
             else {
                 memcpy(&ipv6_hdr_fields[hdr_pos], &(ipv6_buf->destaddr.uint16[4]), 8);
@@ -1137,6 +1133,7 @@ uint8_t lowpan_iphc_encoding(int if_id, const uint8_t *dest, int dest_len,
             }
         }
         else {
+            /* Full 128 bit address */
             memcpy(&ipv6_hdr_fields[hdr_pos], &(ipv6_buf->destaddr.uint8[0]), 16);
             hdr_pos += 16;
         }
@@ -1234,10 +1231,7 @@ void lowpan_iphc_decoding(uint8_t *data, uint8_t length, net_if_eui64_t *s_addr,
     }
 
     /* NH: Next Header: */
-    if (lowpan_iphc[0] & SIXLOWPAN_IPHC1_NH) {
-        // TODO: next header decompression
-    }
-    else {
+    if (!(lowpan_iphc[0] & SIXLOWPAN_IPHC1_NH)) {
         ipv6_buf->nextheader = ipv6_hdr_fields[hdr_pos];
         hdr_pos++;
     }
@@ -1269,6 +1263,52 @@ void lowpan_iphc_decoding(uint8_t *data, uint8_t length, net_if_eui64_t *s_addr,
         hdr_pos++;
     }
 
+    /* Generate IPv6 address from stateless information, if SAC=1 we will use
+     * this stateless information as a starting point for the stateful
+     * information. */
+    /* RFC 6282 describes each of the following address compression methods */
+    switch (((lowpan_iphc[1] & SIXLOWPAN_IPHC2_SAM) >> 4) & 0x03) {
+        case (0x01): {
+            /* 64-bits */
+            memcpy(&(ipv6_buf->srcaddr.uint8[0]), &ll_prefix[0], 2);
+            memset(&(ipv6_buf->srcaddr.uint8[2]), 0, 6);
+            memcpy(&(ipv6_buf->srcaddr.uint8[8]), &ipv6_hdr_fields[hdr_pos], 8);
+            hdr_pos += 8;
+            break;
+        }
+
+        case (0x02): {
+            /* 16-bits */
+            memcpy(&(ipv6_buf->srcaddr.uint8[0]), &ll_prefix[0], 2);
+            ipv6_buf->srcaddr.uint16[1] = HTONS(0x0000u);
+            ipv6_buf->srcaddr.uint32[1] = HTONL(0x00000000u);
+            ipv6_buf->srcaddr.uint32[2] = HTONL(0x000000ffu);
+            ipv6_buf->srcaddr.uint16[6] = HTONS(0xfe00u);
+            memcpy(&(ipv6_buf->srcaddr.uint8[14]), &ipv6_hdr_fields[hdr_pos], 2);
+            hdr_pos += 2;
+            break;
+        }
+
+        case (0x03): {
+            /* 0-bits */
+            memcpy(&(ipv6_buf->srcaddr.uint8[0]), &ll_prefix[0], 2);
+            memset(&(ipv6_buf->srcaddr.uint8[2]), 0, 6);
+            memcpy(&(ipv6_buf->srcaddr.uint8[8]), &s_addr->uint8[0], 8);
+            /* Invert Universal/local bit as specified in
+             * RFC4291, section 2.5.1 "Interface Identifiers" */
+            ipv6_buf->srcaddr.uint8[8] ^= 0x02;
+            break;
+        }
+
+        default: {
+            /* full address carried inline */
+            memcpy(&(ipv6_buf->srcaddr.uint8[0]),
+                   &ipv6_hdr_fields[hdr_pos], 16);
+            hdr_pos += 16;
+            break;
+        }
+    }
+
     /* CID: Context Identifier Extension: + SAC: Source Address Compression */
     if (lowpan_iphc[1] & SIXLOWPAN_IPHC2_SAC) {
         /* 1: Source address compression uses stateful, context-based
@@ -1287,85 +1327,14 @@ void lowpan_iphc_decoding(uint8_t *data, uint8_t length, net_if_eui64_t *s_addr,
 
         if (con == NULL) {
             printf("ERROR: context not found\n");
+            mutex_unlock(&lowpan_context_mutex);
             return;
         }
-
-        switch (((lowpan_iphc[1] & SIXLOWPAN_IPHC2_SAM) >> 4) & 0x03) {
-            case (0x01): {
-                /* 64-bits */
-                memcpy(&(ipv6_buf->srcaddr.uint8[8]), &ipv6_hdr_fields[hdr_pos], 8);
-                /* By RFC 6282 3.1.1. Bits covered by context
-                 * information are always used. */
-                memcpy(&(ipv6_buf->srcaddr.uint8[0]), &con->prefix, con->length);
-                hdr_pos += 8;
-                break;
-            }
-
-            case (0x02): {
-                /* 16-bits */
-                memset(&(ipv6_buf->srcaddr.uint8[8]), 0, 6);
-                memcpy(&(ipv6_buf->srcaddr.uint8[14]), &ipv6_hdr_fields[hdr_pos], 2);
-                /* By RFC 6282 3.1.1. Bits covered by context
-                 * information are always used. */
-                memcpy(&(ipv6_buf->srcaddr.uint8[0]), &con->prefix, con->length);
-                hdr_pos += 2;
-                break;
-            }
-
-            case (0x03): {
-                /* 0-bits */
-                memcpy(&(ipv6_buf->srcaddr.uint8[8]), &s_addr->uint8[0], 8);
-                /* By RFC 6282 3.1.1. Bits covered by context
-                 * information are always used. */
-                memcpy(&(ipv6_buf->srcaddr.uint8[0]), &con->prefix, con->length);
-                break;
-            }
-
-            default: {
-                /* unspecified address */
-                memset(&(ipv6_buf->srcaddr.uint8[0]), 0, 16);
-                break;
-            }
-        }
+        /* By RFC 6282 3.1.1. Bits covered by context
+         * information are always used. */
+        memcpy(&(ipv6_buf->srcaddr.uint8[0]), &con->prefix, con->length);
 
         mutex_unlock(&lowpan_context_mutex);
-    }
-    else {
-        switch (((lowpan_iphc[1] & SIXLOWPAN_IPHC2_SAM) >> 4) & 0x03) {
-            case (0x01): {
-                /* 64-bits */
-                memcpy(&(ipv6_buf->srcaddr.uint8[0]), &ll_prefix[0], 2);
-                memset(&(ipv6_buf->srcaddr.uint8[2]), 0, 6);
-                memcpy(&(ipv6_buf->srcaddr.uint8[8]), &ipv6_hdr_fields[hdr_pos], 8);
-                hdr_pos += 8;
-                break;
-            }
-
-            case (0x02): {
-                /* 16-bits */
-                memcpy(&(ipv6_buf->srcaddr.uint8[0]), &ll_prefix[0], 2);
-                memset(&(ipv6_buf->srcaddr.uint8[2]), 0, 12);
-                memcpy(&(ipv6_buf->srcaddr.uint8[14]), &ipv6_hdr_fields[hdr_pos], 2);
-                hdr_pos += 2;
-                break;
-            }
-
-            case (0x03): {
-                /* 0-bits */
-                memcpy(&(ipv6_buf->srcaddr.uint8[0]), &ll_prefix[0], 2);
-                memset(&(ipv6_buf->srcaddr.uint8[2]), 0, 6);
-                memcpy(&(ipv6_buf->srcaddr.uint8[8]), &s_addr->uint8[0], 8);
-                break;
-            }
-
-            default: {
-                /* full address carried inline */
-                memcpy(&(ipv6_buf->srcaddr.uint8[0]),
-                       &ipv6_hdr_fields[hdr_pos], 16);
-                hdr_pos += 16;
-                break;
-            }
-        }
     }
 
     /* M: Multicast Compression + DAC: Destination Address Compression */
@@ -1387,6 +1356,7 @@ void lowpan_iphc_decoding(uint8_t *data, uint8_t length, net_if_eui64_t *s_addr,
 
             if (con == NULL) {
                 printf("ERROR: context not found\n");
+                mutex_unlock(&lowpan_context_mutex);
                 return;
             }
 
@@ -1396,25 +1366,10 @@ void lowpan_iphc_decoding(uint8_t *data, uint8_t length, net_if_eui64_t *s_addr,
         else {
             uint8_t m_prefix[2] = {0xff, 0x02};
             /* If M=1 and DAC=0: */
-            switch (lowpan_iphc[1] & 0x03) {
+            switch (lowpan_iphc[1] & SIXLOWPAN_IPHC2_DAM) {
                 case (0x01): {
                     m_prefix[1] = ipv6_hdr_fields[hdr_pos];
                     hdr_pos++;
-                    break;
-                }
-
-                case (0x02): {
-                    m_prefix[1] = ipv6_hdr_fields[hdr_pos];
-                    hdr_pos++;
-                    break;
-                }
-
-                default:
-                    break;
-            }
-
-            switch (lowpan_iphc[1] & 0x03) {
-                case (0x01): {
                     memcpy(&(ipv6_buf->destaddr.uint8[0]), &m_prefix[0], 2);
                     memset(&(ipv6_buf->destaddr.uint8[2]), 0, 9);
                     memcpy(&(ipv6_buf->destaddr.uint8[11]), &ipv6_hdr_fields[hdr_pos], 5);
@@ -1423,6 +1378,8 @@ void lowpan_iphc_decoding(uint8_t *data, uint8_t length, net_if_eui64_t *s_addr,
                 }
 
                 case (0x02): {
+                    m_prefix[1] = ipv6_hdr_fields[hdr_pos];
+                    hdr_pos++;
                     memcpy(&(ipv6_buf->destaddr.uint8[0]), &m_prefix[0], 2);
                     memset(&(ipv6_buf->destaddr.uint8[2]), 0, 11);
                     memcpy(&(ipv6_buf->destaddr.uint8[13]), &ipv6_hdr_fields[hdr_pos], 3);
@@ -1447,10 +1404,52 @@ void lowpan_iphc_decoding(uint8_t *data, uint8_t length, net_if_eui64_t *s_addr,
         }
     }
     else {
+        switch ((lowpan_iphc[1] & SIXLOWPAN_IPHC2_DAM) & 0x03) {
+            case (0x01): {
+                /* 64-bits */
+                memcpy(&(ipv6_buf->destaddr.uint8[0]), &ll_prefix[0], 2);
+                memset(&(ipv6_buf->destaddr.uint8[2]), 0, 6);
+                memcpy(&(ipv6_buf->destaddr.uint8[8]), &ipv6_hdr_fields[hdr_pos], 8);
+                hdr_pos += 8;
+                break;
+            }
+
+            case (0x02): {
+                /* 16-bits */
+                memcpy(&(ipv6_buf->destaddr.uint8[0]), &ll_prefix[0], 2);
+                ipv6_buf->destaddr.uint16[1] = HTONS(0x0000u);
+                ipv6_buf->destaddr.uint32[1] = HTONL(0x00000000u);
+                ipv6_buf->destaddr.uint32[2] = HTONL(0x000000ffu);
+                ipv6_buf->destaddr.uint16[6] = HTONS(0xfe00u);
+                memcpy(&(ipv6_buf->destaddr.uint8[14]), &ipv6_hdr_fields[hdr_pos], 2);
+                hdr_pos += 2;
+                break;
+            }
+
+            case (0x03): {
+                /* 0-bits */
+                memcpy(&(ipv6_buf->destaddr.uint8[0]), &ll_prefix[0], 2);
+                memset(&(ipv6_buf->destaddr.uint8[2]), 0, 6);
+                memcpy(&(ipv6_buf->destaddr.uint8[8]), &d_addr->uint8[0], 8);
+                /* Invert Universal/local bit as specified in
+                 * RFC4291, section 2.5.1 "Interface Identifiers" */
+                ipv6_buf->destaddr.uint8[8] ^= 0x02;
+                break;
+            }
+
+            default: {
+                /* full address carried inline */
+                memcpy(&(ipv6_buf->destaddr.uint8[0]),
+                       &ipv6_hdr_fields[hdr_pos], 16);
+                hdr_pos += 16;
+                break;
+            }
+        }
+
         if (lowpan_iphc[1] & SIXLOWPAN_IPHC2_DAC) {
             /* 1: Destination address compression uses stateful, context-based
              * compression.
-             * If M=1 and DAC=1: */
+             * If M=0 and DAC=1: */
             if (cid) {
                 dci = ipv6_hdr_fields[3] & 0x0f;
             }
@@ -1463,85 +1462,44 @@ void lowpan_iphc_decoding(uint8_t *data, uint8_t length, net_if_eui64_t *s_addr,
 
             if (con == NULL) {
                 printf("ERROR: context not found\n");
+                mutex_unlock(&lowpan_context_mutex);
                 return;
             }
 
-            switch ((lowpan_iphc[1] & SIXLOWPAN_IPHC2_DAM) & 0x03) {
-                case (0x01): {
-                    memcpy(&(ipv6_buf->destaddr.uint8[8]), &ipv6_hdr_fields[hdr_pos], 8);
-                    /* By draft-ietf-6lowpan-hc-15 3.1.1. Bits covered by context information are always used. */
-                    memcpy(&(ipv6_buf->srcaddr.uint8[0]), &con->prefix, con->length);
-                    hdr_pos += 8;
-                    break;
-                }
-
-                case (0x02): {
-                    memset(&(ipv6_buf->destaddr.uint8[8]), 0, 6);
-                    memcpy(&(ipv6_buf->destaddr.uint8[14]), &ipv6_hdr_fields[hdr_pos], 2);
-                    /* By draft-ietf-6lowpan-hc-15 3.1.1. Bits covered by context information are always used. */
-                    memcpy(&(ipv6_buf->srcaddr.uint8[0]), &con->prefix, con->length);
-                    hdr_pos += 2;
-                    break;
-                }
-
-                case (0x03): {
-                    memset(&(ipv6_buf->destaddr.uint8[0]), 0, 8);
-                    memcpy(&(ipv6_buf->destaddr.uint8[8]), &d_addr->uint8[0], 8);
-                    /* By draft-ietf-6lowpan-hc-15 3.1.1. Bits covered by context information are always used. */
-                    memcpy(&(ipv6_buf->srcaddr.uint8[0]), &con->prefix, con->length);
-                    break;
-                }
-
-                default:
-                    break;
-            }
+            /* By RFC 6282 3.1.1. Bits covered by context
+             * information are always used. */
+            memcpy(&(ipv6_buf->destaddr.uint8[0]), &con->prefix, con->length);
 
             mutex_unlock(&lowpan_context_mutex);
-        }
-        else {
-            switch ((lowpan_iphc[1] & SIXLOWPAN_IPHC2_DAM) & 0x03) {
-                case (0x01): {
-                    memcpy(&(ipv6_buf->destaddr.uint8[0]), &ll_prefix[0], 2);
-                    memset(&(ipv6_buf->destaddr.uint8[2]), 0, 6);
-                    memcpy(&(ipv6_buf->destaddr.uint8[8]),
-                           &ipv6_hdr_fields[hdr_pos], 8);
-                    hdr_pos += 8;
-                    break;
-                }
-
-                case (0x02): {
-                    memcpy(&(ipv6_buf->destaddr.uint8[0]), &ll_prefix[0], 2);
-                    memset(&(ipv6_buf->destaddr.uint8[2]), 0, 12);
-                    memcpy(&(ipv6_buf->destaddr.uint8[14]),
-                           &ipv6_hdr_fields[hdr_pos], 2);
-                    hdr_pos += 2;
-                    break;
-                }
-
-                case (0x03): {
-                    memcpy(&(ipv6_buf->destaddr.uint8[0]), &ll_prefix, 2);
-                    memset(&(ipv6_buf->destaddr.uint8[2]), 0, 14);
-                    memcpy(&(ipv6_buf->destaddr.uint8[8]), &d_addr->uint8[0], 8);
-                    break;
-                }
-
-                default: {
-                    memcpy(&(ipv6_buf->destaddr.uint8[0]),
-                           &ipv6_hdr_fields[hdr_pos], 16);
-                    hdr_pos += 16;
-                    break;
-                }
-            }
         }
     }
 
     uint8_t *ptr = get_payload_buf(ipv6_ext_hdr_len);
 
-    memcpy(ptr, &ipv6_hdr_fields[hdr_pos], length - hdr_pos);
+    if (lowpan_iphc[0] & SIXLOWPAN_IPHC1_NH) {
+        if ((ipv6_hdr_fields[hdr_pos] & SIXLOWPAN_NHC_UDP_MASK) == SIXLOWPAN_NHC_UDP_ID) {
+            ipv6_buf->nextheader = IPV6_PROTO_NUM_UDP;
+            /* ipv6 length */
+            ipv6_buf->length = HTONS(length - hdr_pos + 1);
+            packet_length = IPV6_HDR_LEN + ipv6_buf->length;
 
-    /* ipv6 length */
-    ipv6_buf->length = HTONS(length - hdr_pos);
-    packet_length = IPV6_HDR_LEN + ipv6_buf->length;
+            hdr_pos ++;
+            /* copy inline src_port and dst_port */
+            memcpy(ptr, &ipv6_hdr_fields[hdr_pos], 4);
+            hdr_pos += 4;
+            ptr += 4;
+            /* insert length value */
+            *((uint16_t*)ptr) = ipv6_buf->length;
+            ptr += 2;
+        }
+    }
+    else {
+        /* ipv6 length */
+        ipv6_buf->length = HTONS(length - hdr_pos);
+        packet_length = IPV6_HDR_LEN + ipv6_buf->length;
+    }
+
+    memcpy(ptr, &ipv6_hdr_fields[hdr_pos], length - hdr_pos);
 }
 
 uint8_t lowpan_context_len(void)

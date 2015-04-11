@@ -18,8 +18,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef __MQ3_H
-#define __MQ3_H
+#ifndef MQ3_H
+#define MQ3_H
 
 #include "periph/adc.h"
 
@@ -76,5 +76,5 @@ int mq3_read(mq3_t *dev);
 }
 #endif
 
-#endif /* __MQ3_H */
+#endif /* MQ3_H */
 /** @} */

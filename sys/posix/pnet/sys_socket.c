@@ -10,7 +10,7 @@
  * @{
  * @file    sys_socket.c
  * @brief   Providing implementation for POSIX socket wrapper.
- * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
+ * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 #include <errno.h>
 
@@ -45,7 +45,7 @@ int socket(int domain, int type, int protocol)
 
 #define sock_func_wrapper(func, sockfd, ...) \
     ((fd_get(sockfd)) ? \
-        func(fd_get(sockfd)->fd, __VA_ARGS__) : \
+        func(fd_get(sockfd)->internal_fd, __VA_ARGS__) : \
         (errno = EBADF, -1))
 
 int accept(int socket, struct sockaddr *restrict address,

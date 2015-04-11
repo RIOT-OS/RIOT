@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    board_atsamr21-xpro Atmel SAM R21 Xplained Pro
+ * @defgroup    boards_samr21-xpro Atmel SAM R21 Xplained Pro
  * @ingroup     boards
  * @brief       Support for the Atmel SAM R21 Xplained Pro board.
  * @{
@@ -39,7 +39,7 @@ extern "C" {
 
 /**
 * @name AT86RF231 config
-* @{ 
+* @{
 */
 #define AT86RF231_SPI      SPI_0
 #define AT86RF231_CS       GPIO_4
@@ -70,9 +70,9 @@ extern "C" {
  * @name Macros for controlling the on-board LEDs.
  * @{
  */
-#define LED_ON              (LED_PORT.OUTCLR.reg = LED_PIN)//ON = LOW
-#define LED_OFF             (LED_PORT.OUTSET.reg = LED_PIN)
-#define LED_TOGGLE          (LED_PORT.OUTTGL.reg = LED_PIN)
+#define LED_ON              (LED_PORT.OUTCLR.reg = 1<<LED_PIN)
+#define LED_OFF             (LED_PORT.OUTSET.reg = 1<<LED_PIN)
+#define LED_TOGGLE          (LED_PORT.OUTTGL.reg = 1<<LED_PIN)
 
 /* for compatability to other boards */
 #define LED_GREEN_ON        /* not available */

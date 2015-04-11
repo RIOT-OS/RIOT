@@ -34,6 +34,7 @@
 #include <sys/time.h>
 #endif
 #include <ifaddrs.h>
+#include <sys/stat.h>
 
 #include "kernel.h"
 #include "cpu.h"
@@ -66,6 +67,7 @@ int (*real_printf)(const char *format, ...);
 int (*real_getaddrinfo)(const char *node, ...);
 int (*real_getifaddrs)(struct ifaddrs **ifap);
 int (*real_getpid)(void);
+int (*real_chdir)(const char *path);
 int (*real_close)(int);
 int (*real_creat)(const char *path, ...);
 int (*real_dup2)(int, int);
@@ -81,12 +83,14 @@ int (*real_pipe)(int[2]);
 int (*real_select)(int nfds, ...);
 int (*real_setitimer)(int which, const struct itimerval
         *restrict value, struct itimerval *restrict ovalue);
+int (*real_setsid)(void);
 int (*real_setsockopt)(int socket, ...);
 int (*real_socket)(int domain, int type, int protocol);
 int (*real_unlink)(const char *);
 long int (*real_random)(void);
 const char* (*real_gai_strerror)(int errcode);
 FILE* (*real_fopen)(const char *path, const char *mode);
+mode_t (*real_umask)(mode_t cmask);
 
 #ifdef __MACH__
 #else
@@ -393,12 +397,14 @@ void _native_init_syscalls(void)
     *(void **)(&real_getifaddrs) = dlsym(RTLD_NEXT, "getifaddrs");
     *(void **)(&real_getpid) = dlsym(RTLD_NEXT, "getpid");
     *(void **)(&real_pipe) = dlsym(RTLD_NEXT, "pipe");
+    *(void **)(&real_chdir) = dlsym(RTLD_NEXT, "chdir");
     *(void **)(&real_close) = dlsym(RTLD_NEXT, "close");
     *(void **)(&real_creat) = dlsym(RTLD_NEXT, "creat");
     *(void **)(&real_fork) = dlsym(RTLD_NEXT, "fork");
     *(void **)(&real_dup2) = dlsym(RTLD_NEXT, "dup2");
     *(void **)(&real_select) = dlsym(RTLD_NEXT, "select");
     *(void **)(&real_setitimer) = dlsym(RTLD_NEXT, "setitimer");
+    *(void **)(&real_setsid) = dlsym(RTLD_NEXT, "setsid");
     *(void **)(&real_setsockopt) = dlsym(RTLD_NEXT, "setsockopt");
     *(void **)(&real_socket) = dlsym(RTLD_NEXT, "socket");
     *(void **)(&real_unlink) = dlsym(RTLD_NEXT, "unlink");
@@ -413,6 +419,7 @@ void _native_init_syscalls(void)
     *(void **)(&real_feof) = dlsym(RTLD_NEXT, "feof");
     *(void **)(&real_ferror) = dlsym(RTLD_NEXT, "ferror");
     *(void **)(&real_clearerr) = dlsym(RTLD_NEXT, "clearerr");
+    *(void **)(&real_umask) = dlsym(RTLD_NEXT, "umask");
 #ifdef __MACH__
 #else
     *(void **)(&real_clock_gettime) = dlsym(RTLD_NEXT, "clock_gettime");

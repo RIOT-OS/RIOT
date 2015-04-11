@@ -16,7 +16,7 @@
  * @brief       6LoWPAN LoWPAN layer header
  *
  * @author      Stephan Zeisberg <zeisberg@mi.fu-berlin.de>
- * @author      Martin Lenders <mlenders@inf.fu-berlin.de>
+ * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  * @author      Eric Engel <eric.engel@fu-berlin.de>
  * @author      Oliver Gesch <oliver.gesch@googlemail.com>
  */
@@ -78,6 +78,8 @@ extern "C" {
  *      </a>
  */
 #define SIXLOWPAN_IPHC1_NH          (0x04)
+#define SIXLOWPAN_NHC_UDP_MASK      (0xF8)
+#define SIXLOWPAN_NHC_UDP_ID        (0xF0)
 
 /**
  * @brief   Flag for Context Identifier Extention (part of second byte

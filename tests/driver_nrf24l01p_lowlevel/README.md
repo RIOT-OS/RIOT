@@ -1,7 +1,7 @@
 # Test for nrf24l01p lowlevel functions 
 
 ## About
-This is a small test application to see how the lowlevel-driver functions of the proprietary nrf24l01p-transceiver work. These functions consist of general SPI and GPIO commands, which abstract the driver-functions from the used board. In order to build this application, you need to add the board to the Makefile's `WHITELIST` first and define a pin mapping.
+This is a small test application to see how the lowlevel-driver functions of the proprietary nrf24l01p-transceiver work. These functions consist of general SPI and GPIO commands, which abstract the driver-functions from the used board.
 
 ## Predefined pin mapping
 Please compare the `tests/driver_nrf24l01p_lowlevel/Makefile` for predefined pin-mappings on different boards. (In addition, you also need to connect to 3V and GND)

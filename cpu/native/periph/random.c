@@ -30,6 +30,7 @@
 #include "debug.h"
 
 static int powered = 0;
+static int initialized = 0;
 static int dev_random = -1;
 
 /**********************************************************************
@@ -63,12 +64,20 @@ void random_init(void)
                    _native_rng_mode);
             break;
     }
+
+    initialized = 1;
+
     DEBUG("random_init: powering on\n");
     random_poweron();
 }
 
 int random_read(char *buf, unsigned int num)
 {
+    if (!initialized) {
+        warnx("random_read: random device not initialized, failing\n");
+        return 0;
+    }
+
     if (!powered) {
         warnx("random_read: random device not powered, failing\n");
         return 0;
@@ -94,12 +103,22 @@ int random_read(char *buf, unsigned int num)
 void random_poweron(void)
 {
     DEBUG("random_poweron: power on\n");
+
+    if (!initialized) {
+        warnx("random_poweron: not initialized.");
+    }
+
     powered = 1;
 }
 
 void random_poweroff(void)
 {
     DEBUG("random_poweroff: power off\n");
+
+    if (!initialized) {
+        warnx("random_poweroff: not initialized.");
+    }
+
     powered = 0;
 }
 

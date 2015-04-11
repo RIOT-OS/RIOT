@@ -54,49 +54,63 @@ bool proper_atoi(const char *a, int *i)
 }
 
 
-static void cmd_days_in(int argc, char **argv)
+static int cmd_days_in(int argc, char **argv)
 {
     int mon;
     if ((argc != 2) || (proper_atoi(argv[1], &mon) != 1) || (mon < 1) || (mon > 12)) {
         printf("Usage: %s <Month[1..12]>\n", argv[0]);
+
+        return 1;
     }
     else {
         printf("There are %d days in %.3s in common years.\n",
                TM_MON_DAYS[mon - 1], MON_NAMES[mon - 1]);
+
+        return 0;
     }
 }
 
-static void cmd_leap_year(int argc, char **argv)
+static int cmd_leap_year(int argc, char **argv)
 {
     int year;
     if ((argc != 2) || (proper_atoi(argv[1], &year) != 1)) {
         printf("Usage: %s <Year>\n", argv[0]);
+
+        return 1;
     }
     else {
         printf("Was %d a leap year? %.3s.\n",
                year, BOOL_NAMES[tm_is_leap_year(year)]);
+
+        return 0;
     }
 }
 
-static void cmd_doomsday(int argc, char **argv)
+static int cmd_doomsday(int argc, char **argv)
 {
     int year;
     if ((argc != 2) || (proper_atoi(argv[1], &year) != 1)) {
         printf("Usage: %s <Year>\n", argv[0]);
+
+        return 1;
     }
     else {
         printf("What weekday was MAR 0 of %d? %.3s.\n",
                year, DAY_NAMES[tm_doomsday(year) % 7]);
+
+        return 0;
     }
 }
 
-static void cmd_day(int argc, char **argv)
+static int cmd_day(int argc, char **argv)
 {
     int year, mon, day;
     if ((argc != 4) || (proper_atoi(argv[1], &year) != 1)
                     || (proper_atoi(argv[2], &mon) != 1)
                     || (proper_atoi(argv[3], &day) != 1)) {
         printf("Usage: %s <Year> <Month[1..12]> <Day[1..31]>\n", argv[0]);
+
+        return 1;
     }
     else {
         if (!tm_is_valid_date(year, mon - 1, day)) {
@@ -107,6 +121,8 @@ static void cmd_day(int argc, char **argv)
         tm_get_wyday(year, mon - 1, day, &wday, &yday);
         printf("What weekday was %04d-%02d-%02d? The %d(th) day of the year was a %.3s.\n",
                year, mon, day, yday + 1, DAY_NAMES[wday]);
+
+        return 0;
     }
 }
 

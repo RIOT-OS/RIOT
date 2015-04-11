@@ -11,7 +11,7 @@
  * @{
  * @file    serialnumber.c
  * @brief   serial number arithmetics (corresponding RFC1982) for version field in ABRO
- * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
+ * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  * @author  Oliver Hahm <oliver.hahm@inria.fr>
  * @}
  */

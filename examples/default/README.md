@@ -50,7 +50,6 @@ Running the `help` command on an msba2:
 2014-05-06 13:14:38,522 - INFO # id                   Gets or sets the node's id.
 2014-05-06 13:14:38,529 - INFO # heap                 Shows the heap state for the LPC2387 on the command shell.
 2014-05-06 13:14:38,535 - INFO # ps                   Prints information about running threads.
-2014-05-06 13:14:38,540 - INFO # date                 Gets or sets current date and time.
 2014-05-06 13:14:38,544 - INFO # temp                 Prints measured temperature.
 2014-05-06 13:14:38,548 - INFO # hum                  Prints measured humidity.
 2014-05-06 13:14:38,553 - INFO # weather              Prints measured humidity and temperature.
@@ -68,6 +67,7 @@ Running the `help` command on an msba2:
 2014-05-06 13:14:38,622 - INFO # dget_bsize           Get the block size of inserted memory card
 2014-05-06 13:14:38,625 - INFO # mersenne_init        initializes the PRNG
 2014-05-06 13:14:38,630 - INFO # mersenne_get         returns 32 bit of pseudo randomness
+2015-03-09 21:09:52,124 - INFO # rtc                  control RTC peripheral interface.
 ```
 
 Running the `ps` command on an msba2:

@@ -14,6 +14,7 @@
  * @brief       Low-level PWM driver implementation
  *
  * @author      Hauke Petersen <mail@haukepetersen.de>
+ * @author      Fabian Nack <nack@inf.fu-berlin.de>
  *
  * @}
  */
@@ -34,8 +35,8 @@ int pwm_init(pwm_t dev, pwm_mode_t mode, unsigned int frequency, unsigned int re
     GPIO_TypeDef *port = NULL;
     uint32_t pins[PWM_MAX_CHANNELS];
     uint32_t af = 0;
-    int channels = 0;
     uint32_t pwm_clk = 0;
+    int channels = 0;
 
     pwm_poweron(dev);
 
@@ -45,9 +46,15 @@ int pwm_init(pwm_t dev, pwm_mode_t mode, unsigned int frequency, unsigned int re
             tim = PWM_0_DEV;
             port = PWM_0_PORT;
             pins[0] = PWM_0_PIN_CH0;
+#if (PWM_0_CHANNELS > 1)
             pins[1] = PWM_0_PIN_CH1;
+#endif
+#if (PWM_0_CHANNELS > 2)
             pins[2] = PWM_0_PIN_CH2;
+#endif
+#if (PWM_0_CHANNELS > 3)
             pins[3] = PWM_0_PIN_CH3;
+#endif
             af = PWM_0_PIN_AF;
             channels = PWM_0_CHANNELS;
             pwm_clk = PWM_0_CLK;
@@ -59,9 +66,15 @@ int pwm_init(pwm_t dev, pwm_mode_t mode, unsigned int frequency, unsigned int re
             tim = PWM_1_DEV;
             port = PWM_1_PORT;
             pins[0] = PWM_1_PIN_CH0;
+#if (PWM_1_CHANNELS > 1)
             pins[1] = PWM_1_PIN_CH1;
+#endif
+#if (PWM_1_CHANNELS > 2)
             pins[2] = PWM_1_PIN_CH2;
+#endif
+#if (PWM_1_CHANNELS > 3)
             pins[3] = PWM_1_PIN_CH3;
+#endif
             af = PWM_1_PIN_AF;
             channels = PWM_1_CHANNELS;
             pwm_clk = PWM_1_CLK;
@@ -83,17 +96,23 @@ int pwm_init(pwm_t dev, pwm_mode_t mode, unsigned int frequency, unsigned int re
         }
     }
 
-    /* reset timer configuration registers */
-    tim->CR1 = 0;
-    tim->CR2 = 0;
-    tim->CCMR1 = 0;
-    tim->CCMR2 = 0;
-
-    /* set c/c register to initial 0 */
-    tim->CCR1 = 0;
-    tim->CCR2 = 0;
-    tim->CCR3 = 0;
-    tim->CCR4 = 0;
+    /* Reset C/C and timer configuration register */
+    switch (channels) {
+        case 4:
+            tim->CCR4 = 0;
+            /* Fall through */
+        case 3:
+            tim->CCR3 = 0;
+            tim->CR2 = 0;
+            /* Fall through */
+        case 2:
+            tim->CCR2 = 0;
+            /* Fall through */
+        case 1:
+            tim->CCR1 = 0;
+            tim->CR1 = 0;
+            break;
+    }
 
     /* set prescale and auto-reload registers to matching values for resolution and frequency */
     if (resolution > 0xffff || (resolution * frequency) > pwm_clk) {
@@ -105,18 +124,26 @@ int pwm_init(pwm_t dev, pwm_mode_t mode, unsigned int frequency, unsigned int re
     /* set PWM mode */
     switch (mode) {
         case PWM_LEFT:
-            tim->CCMR1 |= (TIM_CCMR1_OC1M_1 | TIM_CCMR1_OC1M_2 |
+            tim->CCMR1 = (TIM_CCMR1_OC1M_1 | TIM_CCMR1_OC1M_2 |
                            TIM_CCMR1_OC2M_1 | TIM_CCMR1_OC2M_2);
-            tim->CCMR2 |= (TIM_CCMR2_OC3M_1 | TIM_CCMR2_OC3M_2 |
-                           TIM_CCMR2_OC4M_1 | TIM_CCMR2_OC4M_2);
+            if (channels > 2) {
+                tim->CCMR2 = (TIM_CCMR2_OC3M_1 | TIM_CCMR2_OC3M_2 |
+                        TIM_CCMR2_OC4M_1 | TIM_CCMR2_OC4M_2);
+            }
             break;
         case PWM_RIGHT:
-            tim->CCMR1 |= (TIM_CCMR1_OC1M_0 | TIM_CCMR1_OC1M_1 | TIM_CCMR1_OC1M_2 |
+            tim->CCMR1 = (TIM_CCMR1_OC1M_0 | TIM_CCMR1_OC1M_1 | TIM_CCMR1_OC1M_2 |
                            TIM_CCMR1_OC2M_0 | TIM_CCMR1_OC2M_1 | TIM_CCMR1_OC2M_2);
-            tim->CCMR2 |= (TIM_CCMR2_OC3M_0 | TIM_CCMR2_OC3M_1 | TIM_CCMR2_OC3M_2 |
-                           TIM_CCMR2_OC4M_0 | TIM_CCMR2_OC4M_1 | TIM_CCMR2_OC4M_2);
+            if (channels > 2) {
+                tim->CCMR2 = (TIM_CCMR2_OC3M_0 | TIM_CCMR2_OC3M_1 | TIM_CCMR2_OC3M_2 |
+                               TIM_CCMR2_OC4M_0 | TIM_CCMR2_OC4M_1 | TIM_CCMR2_OC4M_2);
+            }
             break;
         case PWM_CENTER:
+            tim->CCMR1 = 0;
+            if (channels > 2) {
+                tim->CCMR2 = 0;
+            }
             tim->CR1 |= (TIM_CR1_CMS_0 | TIM_CR1_CMS_1);
             break;
     }
@@ -141,18 +168,24 @@ int pwm_set(pwm_t dev, int channel, unsigned int value)
 #if PWM_0_EN
         case PWM_0:
             tim = PWM_0_DEV;
+            if (channel >= PWM_0_CHANNELS) {
+                return -1;
+            }
             break;
 #endif
 #if PWM_1_EN
         case PWM_1:
             tim = PWM_1_DEV;
+            if (channel >= PWM_1_CHANNELS) {
+                return -1;
+            }
             break;
 #endif
     }
 
     /* norm value to maximum possible value */
-    if (value > 0xffff) {
-        value = 0xffff;
+    if (value > tim->ARR) {
+        value = (unsigned int) tim->ARR;
     }
 
     switch (channel) {

@@ -18,10 +18,9 @@
  * @}
  */
 
-#include <stdio.h>
 #include <stdint.h>
 
-#include "board.h"
+#include "crash.h"
 
 /**
  * memory markers as defined in the linker script
@@ -81,7 +80,7 @@ void reset_handler(void)
  */
 void dummy_handler(void)
 {
-    while (1) {asm ("nop");}
+    core_panic(DUMMY_HANDLER, "DUMMY HANDLER");
 }
 
 void isr_nmi(void)
@@ -101,23 +100,17 @@ void isr_debug_mon(void)
 
 void isr_hard_fault(void)
 {
-    puts("\n### HARD FAULT ###\n");
-    while (1) {
-        LED_RED_TOGGLE;
-        for (int i = 0; i < 2000000; i++) {
-            asm ("nop");
-        }
-    }
+    core_panic(HARD_FAULT, "HARD FAULT");
 }
 
 void isr_bus_fault(void)
 {
-    while (1) {asm ("nop");}
+    core_panic(BUS_FAULT, "BUS FAULT");
 }
 
 void isr_usage_fault(void)
 {
-    while (1) {asm ("nop");}
+    core_panic(USAGE_FAULT, "USAGE FAULT");
 }
 
 /* Cortex-M specific interrupt vectors */

@@ -16,6 +16,9 @@
  * @author      René Kijewski
  */
 
+#ifndef KENREL_MACROS_H
+#define KENREL_MACROS_H
+
 #include <stddef.h>
 
 #ifdef __cplusplus
@@ -58,6 +61,7 @@ extern "C" {
 }
 #endif
 
+#endif /* KENREL_MACROS_H */
 /**
  * @}
  */

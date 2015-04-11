@@ -19,8 +19,8 @@
  * @}
  */
 
-#ifndef __NRF24L01P_SETTINGS_H
-#define __NRF24L01P_SETTINGS_H
+#ifndef NRF24L01P_SETTINGS_H
+#define NRF24L01P_SETTINGS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -29,6 +29,7 @@ extern "C" {
 #define INITIAL_ADDRESS_WIDTH       5
 #define NRF24L01P_MAX_DATA_LENGTH   32
 #define INITIAL_RF_CHANNEL          5
+#define INITIAL_RX_POWER_0dB        0
 
 #define DELAY_CS_TOGGLE_TICKS               2
 #define DELAY_AFTER_FUNC_TICKS              2
@@ -36,9 +37,9 @@ extern "C" {
 #define DELAY_CHANGE_PWR_MODE_US            HWTIMER_TICKS(1500)
 #define DELAY_CHANGE_TXRX_US                HWTIMER_TICKS(130)
 #define DELAY_CE_START_US                   HWTIMER_TICKS(5)
-/* 
+/*
  * This is the time which is needed to physically transmit the data.
- * Compare nrf24l01+ pruduct specification p.42. It is computed just 
+ * Compare nrf24l01+ pruduct specification p.42. It is computed just
  * for this setup
  */
 #define DELAY_DATA_ON_AIR                   HWTIMER_TICKS(1300)
@@ -126,4 +127,4 @@ extern "C" {
 }
 #endif
 
-#endif /* __NRF24L01P_SETTINGS_H */
+#endif /* NRF24L01P_SETTINGS_H */

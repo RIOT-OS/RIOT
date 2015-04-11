@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     board_msbiot
+ * @ingroup     boards_msbiot
  * @{
  *
  * @file
@@ -70,6 +70,76 @@ extern "C" {
 #define TIMER_1_IRQ_CHAN    TIM5_IRQn
 /** @} */
 
+/**
+ * @name PWM configuration
+ * @{
+ */
+#define PWM_NUMOF           (1U)
+#define PWM_0_EN            1
+#define PWM_MAX_CHANNELS    1                   /* Increase if Timer with more channels is used */
+
+/* PWM 0 device configuration */
+#define PWM_0_DEV           TIM11
+#define PWM_0_CHANNELS      1
+#define PWM_0_CLK           (168000000U)
+#define PWM_0_CLKEN()       (RCC->APB2ENR |= RCC_APB2ENR_TIM11EN)
+#define PWM_0_CLKDIS()      (RCC->APB2ENR &= ~RCC_APB2ENR_TIM11EN)
+/* PWM 0 pin configuration */
+#define PWM_0_PORT          GPIOB
+#define PWM_0_PORT_CLKEN()  (RCC->AHB1ENR |= RCC_AHB1ENR_GPIOBEN)
+#define PWM_0_PIN_CH0       9
+#define PWM_0_PIN_AF        3
+/** @} */
+
+/**
+ * @name ADC configuration
+ * @{
+ */
+#define ADC_NUMOF           (1U)
+#define ADC_0_EN            1
+#define ADC_MAX_CHANNELS    2
+
+/* ADC 0 configuration */
+#define ADC_0_DEV           ADC1
+#define ADC_0_CHANNELS      2
+#define ADC_0_CLKEN()       (RCC->APB2ENR |= RCC_APB2ENR_ADC1EN)
+#define ADC_0_CLKDIS()      (RCC->APB2ENR &= ~(RCC_APB2ENR_ADC1EN))
+#define ADC_0_PORT          GPIOB
+#define ADC_0_PORT_CLKEN()  (RCC->AHB1ENR |= RCC_AHB1ENR_GPIOBEN)
+/* ADC 0 channel 0 pin config */
+#define ADC_0_CH0           8
+#define ADC_0_CH0_PIN       0
+/* ADC 0 channel 1 pin config */
+#define ADC_0_CH1           9
+#define ADC_0_CH1_PIN       1
+/** @} */
+
+/**
+ * @name DAC configuration
+ * @{
+ */
+#define DAC_NUMOF          (1U)
+#define DAC_0_EN           1
+#define DAC_MAX_CHANNELS   2
+
+/* DAC 0 configuration */
+#define DAC_0_DEV            DAC
+#define DAC_0_CHANNELS       2
+#define DAC_0_CLKEN()        (RCC->APB1ENR |=  (RCC_APB1ENR_DACEN))
+#define DAC_0_CLKDIS()       (RCC->APB1ENR &= ~(RCC_APB1ENR_DACEN))
+#define DAC_0_PORT           GPIOA
+#define DAC_0_PORT_CLKEN()   (RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN)
+/* DAC 0 channel config */
+#define DAC_0_CH0_PIN        4
+#define DAC_0_CH1_PIN        5
+/** @} */
+
+/**
+ * @name Random Number Generator configuration
+ * @{
+ */
+#define RANDOM_NUMOF        (1U)
+/** @} */
 
 /**
  * @name UART configuration
@@ -154,6 +224,33 @@ extern "C" {
 #define SPI_0_MISO_PORT_CLKEN()     (RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN)
 #define SPI_0_MOSI_PORT_CLKEN()     (RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN)
 /** @} */
+
+/**
+ * @name I2C configuration
+ * @{
+ */
+#define I2C_NUMOF           (1U)
+#define I2C_0_EN            1
+#define I2C_IRQ_PRIO        1
+#define I2C_APBCLK          (42000000U)
+
+/* I2C 0 device configuration */
+#define I2C_0_DEV           I2C1
+#define I2C_0_CLKEN()       (RCC->APB1ENR |= RCC_APB1ENR_I2C1EN)
+#define I2C_0_CLKDIS()      (RCC->APB1ENR &= ~(RCC_APB1ENR_I2C1EN))
+#define I2C_0_EVT_IRQ       I2C1_EV_IRQn
+#define I2C_0_EVT_ISR       isr_i2c1_ev
+#define I2C_0_ERR_IRQ       I2C1_ER_IRQn
+#define I2C_0_ERR_ISR       isr_i2c1_er
+/* I2C 0 pin configuration */
+#define I2C_0_SCL_PORT      GPIOB
+#define I2C_0_SCL_PIN       6
+#define I2C_0_SCL_AF        4
+#define I2C_0_SCL_CLKEN()   (RCC->AHB1ENR |= RCC_AHB1ENR_GPIOBEN)
+#define I2C_0_SDA_PORT      GPIOB
+#define I2C_0_SDA_PIN       7
+#define I2C_0_SDA_AF        4
+#define I2C_0_SDA_CLKEN()   (RCC->AHB1ENR |= RCC_AHB1ENR_GPIOBEN)
 
 /**
  * @name GPIO configuration

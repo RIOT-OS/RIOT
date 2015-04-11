@@ -1,17 +1,20 @@
-/**
- * Shell commands for accessing storage
- *
+/*
  * Copyright (C) 2013  INRIA.
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
- *
- * @ingroup shell_commands
+ */
+
+/**
+ * @ingroup     sys_shell_commands
  * @{
- * @file    sc_disk.c
- * @brief   provides shell commands to access storage (like mmc)
- * @author  Oliver Hahm <oliver.hahm@inria.fr>
+ *
+ * @file
+ * @brief       Provides shell commands to access storage (like MMC)
+ *
+ * @author      Oliver Hahm <oliver.hahm@inria.fr>
+ *
  * @}
  */
 
@@ -42,7 +45,7 @@ static inline uint8_t sector_read(unsigned char *read_buf, unsigned long sector,
     return 0;
 }
 
-void _get_sectorsize(int argc, char **argv)
+int _get_sectorsize(int argc, char **argv)
 {
     (void) argc;
     (void) argv;
@@ -50,13 +53,17 @@ void _get_sectorsize(int argc, char **argv)
     unsigned short ssize;
     if (MCI_ioctl(GET_SECTOR_SIZE, &ssize) == RES_OK) {
         printf("[disk] sector size is %u\n", ssize);
+
+        return 0;
     }
     else {
         puts("[disk] Failed to fetch sector size. Card inserted?");
+
+        return 1;
     }
 }
 
-void _get_blocksize(int argc, char **argv)
+int _get_blocksize(int argc, char **argv)
 {
     (void) argc;
     (void) argv;
@@ -64,13 +71,17 @@ void _get_blocksize(int argc, char **argv)
     unsigned long bsize;
     if (MCI_ioctl(GET_BLOCK_SIZE, &bsize) == RES_OK) {
         printf("[disk] block size is %lu\n", bsize);
+
+        return 0;
     }
     else {
         puts("[disk] Failed to fetch block size. Card inserted?");
+
+        return 1;
     }
 }
 
-void _get_sectorcount(int argc, char **argv)
+int _get_sectorcount(int argc, char **argv)
 {
     (void) argc;
     (void) argv;
@@ -78,13 +89,17 @@ void _get_sectorcount(int argc, char **argv)
     unsigned long scount;
     if (MCI_ioctl(GET_SECTOR_COUNT, &scount) == RES_OK) {
         printf("[disk] sector count is %lu\n", scount);
+
+        return 0;
     }
     else {
         puts("[disk] Failed to fetch sector count. Card inserted?");
+
+        return 1;
     }
 }
 
-void _read_sector(int argc, char **argv)
+int _read_sector(int argc, char **argv)
 {
     if (argc == 2) {
         unsigned long scount;
@@ -96,26 +111,27 @@ void _read_sector(int argc, char **argv)
             unsigned char read_buf[ssize];
 
             if (sector_read(read_buf, sectornr, ssize, 0)) {
-                return;
+                return 0;
             }
         }
 
         printf("[disk] Error while reading sector %lu\n", sectornr);
+        return 1;
     }
     else {
         printf("[disk] Usage:\n%s <SECTOR>\n", argv[0]);
-        return;
+        return 1;
     }
 }
 
-void _read_bytes(int argc, char **argv)
+int _read_bytes(int argc, char **argv)
 {
     unsigned long sector = 1, scount, offset;
     unsigned short ssize, length;
 
     if (argc != 3) {
         printf("[disk] Usage:\n%s <OFFSET> <LENGTH>\n", argv[0]);
-        return;
+        return 1;
     }
 
     offset = atol(argv[1]);
@@ -143,17 +159,17 @@ void _read_bytes(int argc, char **argv)
                 tmp = (length >= ssize) ? ssize : length;
             }
 
-            return;
+            return 0;
         } /* length > (ssize - offset) */
         /* read only one sector */
         else {
             if (sector_read(read_buf, sector, length, offset)) {
-                return;
+                return 0;
             }
         } /* length < (ssize - offset) */
     } /* ioctl */
 
     printf("[disk] Error while reading sector %lu\n", sector);
-    return;
+    return 1;
 
 }

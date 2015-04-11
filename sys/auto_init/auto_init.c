@@ -86,6 +86,10 @@
 #include "l2_ping.h"
 #endif
 
+#ifdef MODULE_NG_PKTDUMP
+#include "net/ng_pktdump.h"
+#endif
+
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
@@ -143,6 +147,8 @@ void auto_init_net_if(void)
 
         memcpy(&(eui64.uint32[0]), &hash_h, sizeof(uint32_t));
         memcpy(&(eui64.uint32[1]), &hash_l, sizeof(uint32_t));
+        /* Set Local/Universal bit to Local since this EUI64 is made up. */
+        eui64.uint8[0] |= 0x02;
         net_if_set_eui64(iface, &eui64);
 
 #if ENABLE_DEBUG
@@ -267,5 +273,9 @@ void auto_init(void)
 #ifdef MODULE_TCP
     DEBUG("Auto init transport layer module: [tcp].\n");
     tcp_init_transport_layer();
+#endif
+#ifdef MODULE_NG_PKTDUMP
+    DEBUG("Auto init ng_pktdump module.\n");
+    ng_pktdump_init();
 #endif
 }

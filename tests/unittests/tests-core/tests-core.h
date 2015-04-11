@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Martin Lenders
+ * Copyright (C) 2014 Martine Lenders <mlenders@inf.fu-berlin.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -15,8 +15,8 @@
  *
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef __TESTS_CORE_H_
-#define __TESTS_CORE_H_
+#ifndef TESTS_CORE_H_
+#define TESTS_CORE_H_
 
 #include "embUnit.h"
 
@@ -89,5 +89,5 @@ Test *tests_core_ringbuffer_tests(void);
 }
 #endif
 
-#endif /* __TESTS_CORE_H_ */
+#endif /* TESTS_CORE_H_ */
 /** @} */

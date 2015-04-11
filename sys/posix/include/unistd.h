@@ -18,7 +18,7 @@
  *              The Open Group Base Specifications Issue 7, <unistd.h>
  *          </a>
  *
- * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
+ * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 #ifndef _UNISTD_H
 #define _UNISTD_H

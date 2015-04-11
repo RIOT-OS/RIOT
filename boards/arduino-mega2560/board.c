@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     board_arduino-mega2560
+ * @ingroup     boards_arduino-mega2560
  * @{
  *
  * @file        board.c

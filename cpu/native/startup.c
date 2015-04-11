@@ -149,6 +149,19 @@ void daemonize(void)
     }
     else {
         _native_pid = real_getpid();
+
+        /* detach from current working directory */
+        if (real_chdir("/") == -1) {
+            err(EXIT_FAILURE, "daemonize: chdir");
+        }
+
+        /* detach from process group */
+        if (real_setsid() == -1) {
+            err(EXIT_FAILURE, "daemonize: setsid");
+        }
+
+        /* set umask */
+        real_umask(0);
     }
 }
 

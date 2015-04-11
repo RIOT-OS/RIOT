@@ -16,7 +16,7 @@
 
 #include "tests-bloom-sets.h"
 
-#define TESTS_BLOOM_BYTES (128)
+#define TESTS_BLOOM_BITS (128)
 #define TESTS_BLOOM_HASHF (6)
 #define TESTS_BLOOM_PROB_IN_FILTER (4)
 #define TESTS_BLOOM_NOT_IN_FILTER (996)
@@ -35,7 +35,7 @@ static void load_dictionary_fixture(void)
 
 static void set_up_bloom(void)
 {
-    bloom = bloom_new(TESTS_BLOOM_BYTES, TESTS_BLOOM_HASHF, fnv_hash, sax_hash,
+    bloom = bloom_new(TESTS_BLOOM_BITS, TESTS_BLOOM_HASHF, fnv_hash, sax_hash,
             sdbm_hash, djb2_hash, kr_hash, dek_hash, rotating_hash,
             one_at_a_time_hash);
 }
@@ -47,7 +47,7 @@ static void tear_down_bloom(void)
 
 static void test_bloom_parameters_bytes_hashf(void)
 {
-    TEST_ASSERT_EQUAL_INT(TESTS_BLOOM_BYTES, bloom->m);
+    TEST_ASSERT_EQUAL_INT(TESTS_BLOOM_BITS, bloom->m);
     TEST_ASSERT_EQUAL_INT(TESTS_BLOOM_HASHF, bloom->k);
 }
 

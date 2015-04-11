@@ -188,7 +188,7 @@ void isr_dma2_ch4_5(void)     __attribute__ ((weak, alias("dummy_handler")));
 
 
 /* interrupt vector table */
-__attribute__ ((section(".vectors")))
+__attribute__ ((section(".vectors"))) __attribute__((used))
 const void *interrupt_vector[] = {
     /* Stack pointer */
     (void*) (&_estack),             /* pointer to the top of the empty stack */

@@ -46,10 +46,11 @@
                 7-bit addressing mode.
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  */
 
-#ifndef __I2C_H
-#define __I2C_H
+#ifndef I2C_H
+#define I2C_H
 
 #include <stdint.h>
 
@@ -118,6 +119,28 @@ int i2c_init_master(i2c_t dev, i2c_speed_t speed);
  * @return                  -1 on undefined device given
  */
 int i2c_init_slave(i2c_t dev, uint8_t address);
+
+/**
+ * @brief Get mutually exclusive access to the given I2C bus
+ *
+ * In case the I2C device is busy, this function will block until the bus is free again.
+ *
+ * @param[in] dev       I2C device to access
+ *
+ * @return              0 on success
+ * @return              -1 on error
+ */
+int i2c_acquire(i2c_t dev);
+
+/**
+ * @brief Release the given I2C device to be used by others
+ *
+ * @param[in] dev       I2C device to release
+ *
+ * @return              0 on success
+ * @return              -1 on error
+ */
+int i2c_release(i2c_t dev);
 
 /**
  * @brief Read one byte from an I2C device with the given address
@@ -244,5 +267,5 @@ void i2c_poweroff(i2c_t dev);
 }
 #endif
 
-#endif /* __I2C_H */
+#endif /* I2C_H */
 /** @} */

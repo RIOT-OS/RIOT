@@ -7,10 +7,10 @@
  */
 
 /**
- * @ingroup     board_nucleo-l1
+ * @ingroup     boards_nucleo-l1
  * @{
  *
- * @file        periph_conf.h
+ * @file
  * @brief       Peripheral MCU configuration for the nucleo-l1 board
  *
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>

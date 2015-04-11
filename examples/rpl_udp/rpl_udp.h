@@ -31,7 +31,7 @@ extern "C" {
  * @param[in] argc  Argument count
  * @param[in] argv  Arguments
  */
-void rpl_udp_init(int argc, char **argv);
+int rpl_udp_init(int argc, char **argv);
 
 /**
  * @brief   Shell command to set node's ID
@@ -42,7 +42,7 @@ void rpl_udp_init(int argc, char **argv);
  * @param[in] argc  Argument count
  * @param[in] argv  Arguments
  */
-void rpl_udp_set_id(int argc, char **argv);
+int rpl_udp_set_id(int argc, char **argv);
 
 /**
  * @brief   Shows the dodag
@@ -52,7 +52,7 @@ void rpl_udp_set_id(int argc, char **argv);
  * @param[in] argc  Argument count
  * @param[in] argv  Arguments
  */
-void rpl_udp_dodag(int argc, char **argv);
+int rpl_udp_dodag(int argc, char **argv);
 
 /**
  * @brief Command handler to start a UDP server
@@ -62,7 +62,7 @@ void rpl_udp_dodag(int argc, char **argv);
  * @param[in] argc  Argument count
  * @param[in] argv  Arguments
  */
-void udp_server(int argc, char **argv);
+int udp_server(int argc, char **argv);
 
 /**
  * @brief Sends a UDP datagram
@@ -74,7 +74,7 @@ void udp_server(int argc, char **argv);
  * @param[in] argc  Argument count
  * @param[in] argv  Arguments
  */
-void udp_send(int argc, char **argv);
+int udp_send(int argc, char **argv);
 
 /**
  * @brief Ignore a certain node
@@ -86,7 +86,7 @@ void udp_send(int argc, char **argv);
  * @param[in] argc  Argument count
  * @param[in] argv  Arguments
  */
-void rpl_udp_ignore(int argc, char **argv);
+int rpl_udp_ignore(int argc, char **argv);
 
 /**
  * @brief monitoring thread start function

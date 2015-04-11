@@ -16,6 +16,9 @@
  * @author      Kévin Roussel <Kevin.Roussel@inria.fr>
  */
 
+#ifndef CC2420_ARCH_H
+#define CC2420_ARCH_H
+
 #include <stdint.h>
 
 #ifdef __cplusplus
@@ -125,3 +128,5 @@ void cc2420_after_send(void);
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* CC2420_ARCH_H */

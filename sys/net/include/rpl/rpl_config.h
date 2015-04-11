@@ -27,10 +27,10 @@ extern "C" {
 #endif
 
 /*  Default values */
-#define RPL_NO_DOWNWARD_ROUTES  0x00
-#define RPL_NON_STORING_MODE    0x01
-#define RPL_STORING_MODE_NO_MC  0x02
-#define RPL_STORING_MODE_MC     0x03
+#define RPL_MOP_NO_DOWNWARD_ROUTES  0x00
+#define RPL_MOP_NON_STORING_MODE    0x01
+#define RPL_MOP_STORING_MODE_NO_MC  0x02
+#define RPL_MOP_STORING_MODE_MC     0x03
 
 #define RPL_SEQUENCE_WINDOW         16
 /* RPL Message type */
@@ -48,18 +48,22 @@ enum RPL_MSG_CODE {
 };
 
 /* packet base lengths */
-#define DIO_BASE_LEN                24
-#define DIS_BASE_LEN                2
-#define DAO_BASE_LEN                4
-#define DAO_D_LEN                   24
-#define DAO_ACK_LEN                 4
-#define DAO_ACK_D_LEN               24
-#define RPL_OPT_LEN                 2
-#define RPL_OPT_DODAG_CONF_LEN      16
-#define RPL_OPT_PREFIX_INFO_LEN     32
-#define RPL_OPT_SOLICITED_INFO_LEN  21
-#define RPL_OPT_TARGET_LEN          20
-#define RPL_OPT_TRANSIT_LEN         22
+#define DIO_BASE_LEN                            24
+#define DIS_BASE_LEN                            2
+#define DAO_BASE_LEN                            4
+#define DAO_D_LEN                               24
+#define DAO_ACK_LEN                             4
+#define DAO_ACK_D_LEN                           24
+#define RPL_OPT_LEN                             2
+#define RPL_OPT_DODAG_CONF_LEN                  14
+#define RPL_OPT_DODAG_CONF_LEN_WITH_OPT_LEN     (RPL_OPT_DODAG_CONF_LEN + RPL_OPT_LEN)
+#define RPL_OPT_PREFIX_INFO_LEN                 30
+#define RPL_OPT_PREFIX_INFO_LEN_WITH_OPT_LEN    (RPL_OPT_PREFIX_INFO_LEN + RPL_OPT_LEN)
+#define RPL_OPT_SOLICITED_INFO_LEN              21
+#define RPL_OPT_TARGET_LEN                      18
+#define RPL_OPT_TARGET_LEN_WITH_OPT_LEN         (RPL_OPT_TARGET_LEN + RPL_OPT_LEN)
+#define RPL_OPT_TRANSIT_LEN                     20
+#define RPL_OPT_TRANSIT_LEN_WITH_OPT_LEN        (RPL_OPT_TRANSIT_LEN + RPL_OPT_LEN)
 
 /* message options */
 #define RPL_OPT_PAD1                 0
@@ -108,8 +112,9 @@ static inline bool RPL_COUNTER_GREATER_THAN(uint8_t A, uint8_t B)
 #define METRIC_ETX 1
 
 /*  RPL Constants and Variables */
-
-#define RPL_DEFAULT_MOP RPL_STORING_MODE_NO_MC
+#ifndef RPL_DEFAULT_MOP
+#   define RPL_DEFAULT_MOP RPL_MOP_STORING_MODE_NO_MC
+#endif
 #define BASE_RANK 0
 #define INFINITE_RANK 0xFFFF
 #define RPL_DEFAULT_INSTANCE 0
@@ -128,7 +133,7 @@ static inline bool RPL_COUNTER_GREATER_THAN(uint8_t A, uint8_t B)
 #define REGULAR_DAO_INTERVAL 300
 #define DAO_SEND_RETRIES 4
 #define DEFAULT_WAIT_FOR_DAO_ACK 15
-#define RPL_DODAG_ID_LEN 16
+#define RPL_DODAG_ID_LEN 128
 
 /* others */
 
@@ -137,17 +142,17 @@ static inline bool RPL_COUNTER_GREATER_THAN(uint8_t A, uint8_t B)
 #define RPL_MAX_INSTANCES 1
 #define RPL_MAX_PARENTS 5
 #ifndef RPL_MAX_ROUTING_ENTRIES
-    #if (RPL_DEFAULT_MOP == RPL_NO_DOWNWARD_ROUTES)
+    #if (RPL_DEFAULT_MOP == RPL_MOP_NO_DOWNWARD_ROUTES)
     #    define RPL_MAX_ROUTING_ENTRIES (128)
-    #elif (RPL_DEFAULT_MOP == RPL_NON_STORING_MODE)
+    #elif (RPL_DEFAULT_MOP == RPL_MOP_NON_STORING_MODE)
         #ifdef RPL_NODE_IS_ROOT
         #    define RPL_MAX_ROUTING_ENTRIES (128)
         #else
         #    define RPL_MAX_ROUTING_ENTRIES (0)
         #endif
-    #elif (RPL_DEFAULT_MOP == RPL_STORING_MODE_NO_MC)
+    #elif (RPL_DEFAULT_MOP == RPL_MOP_STORING_MODE_NO_MC)
     #    define RPL_MAX_ROUTING_ENTRIES (128)
-    #else // RPL_DEFAULT_MOP == RPL_STORING_MODE_MC
+    #else // RPL_DEFAULT_MOP == RPL_MOP_STORING_MODE_MC
     #    define RPL_MAX_ROUTING_ENTRIES (128)
     #endif
 #endif

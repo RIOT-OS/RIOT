@@ -1,2 +1,3 @@
 FEATURES_PROVIDED += cpp
 FEATURES_PROVIDED += periph_uart
+FEATURES_MCU_GROUP = cortex_m3_1

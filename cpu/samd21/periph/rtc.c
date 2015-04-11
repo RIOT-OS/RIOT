@@ -44,17 +44,17 @@ void rtc_init(void)
     /* Turn on power manager for RTC */
     PM->APBAMASK.reg |= PM_APBAMASK_RTC;
 
-    SYSCTRL->OSC32K.bit.ENABLE = 0;
-    SYSCTRL->OSC32K.bit.ONDEMAND = 1;
-    SYSCTRL->OSC32K.bit.RUNSTDBY = 0;
-    SYSCTRL->OSC32K.bit.EN1K = 1;
-    SYSCTRL->OSC32K.bit.EN32K = 1;
-    SYSCTRL->OSC32K.bit.ENABLE = 1;
+    /* RTC uses External 32,768KHz Oscillator (OSC32K isn't accurate enough p1075/1138)*/
+    SYSCTRL->XOSC32K.reg =  SYSCTRL_XOSC32K_ONDEMAND |
+                            SYSCTRL_XOSC32K_EN32K |
+                            SYSCTRL_XOSC32K_XTALEN |
+                            SYSCTRL_XOSC32K_STARTUP(6) |
+                            SYSCTRL_XOSC32K_ENABLE;
 
     /* Setup clock GCLK2 with OSC32K divided by 32 */
     GCLK->GENDIV.reg = GCLK_GENDIV_ID(2)|GCLK_GENDIV_DIV(4);
     while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY);
-    GCLK->GENCTRL.reg = (GCLK_GENCTRL_GENEN | GCLK_GENCTRL_SRC_OSC32K | GCLK_GENCTRL_ID(2) | GCLK_GENCTRL_DIVSEL );
+    GCLK->GENCTRL.reg = (GCLK_GENCTRL_GENEN | GCLK_GENCTRL_SRC_XOSC32K | GCLK_GENCTRL_ID(2) | GCLK_GENCTRL_DIVSEL );
     while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY);
     GCLK->CLKCTRL.reg = (uint32_t)((GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN_GCLK2 | (RTC_GCLK_ID << GCLK_CLKCTRL_ID_Pos)));
     while (GCLK->STATUS.bit.SYNCBUSY);

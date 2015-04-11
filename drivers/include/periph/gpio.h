@@ -18,8 +18,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef __GPIO_H
-#define __GPIO_H
+#ifndef GPIO_H
+#define GPIO_H
 
 #include "periph_conf.h"
 
@@ -259,5 +259,5 @@ void gpio_write(gpio_t dev, int value);
 }
 #endif
 
-#endif /* __GPIO_H */
+#endif /* GPIO_H */
 /** @} */

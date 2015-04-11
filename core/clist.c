@@ -59,7 +59,6 @@ void clist_remove(clist_node_t **list, clist_node_t *node)
 }
 
 #if ENABLE_DEBUG
-
 void clist_print(clist_node_t *clist)
 {
     clist_node_t *start = clist, *node = start;
@@ -76,51 +75,4 @@ void clist_print(clist_node_t *clist)
         }
     } while (node != start);
 }
-
 #endif
-
-/*
-int main (int argc, char* argv[]) {
-    clist_node_t a;
-    clist_node_t b;
-    clist_node_t c;
-
-    clist_node_t* clist = NULL;
-
-    a.data = 0;
-    a.next = NULL;
-    a.prev = NULL;
-
-    b.data = 1;
-    b.next = NULL;
-    b.prev = NULL;
-
-    c.data = 2;
-    c.next = NULL;
-    c.prev = NULL;
-
-    printf("adding a,b,c\n");
-    clist_add(&clist,&a);
-    clist_add(&clist,&b);
-    clist_add(&clist,&c);
-
-    clist_print(clist);
-    printf("\n");
-
-    printf("removing b...\n");
-    clist_remove(&clist, &b);
-
-    clist_print(clist);
-    printf("\n");
-
-    printf("removing a...\n");
-
-    clist_remove(&clist, &a);
-    clist_print(clist);
-
-    printf("removing c...\n");
-
-    clist_remove(&clist, &c);
-    clist_print(clist);
-}
-*/

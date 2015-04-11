@@ -14,7 +14,7 @@
  * @file
  * @brief   6lowpan neighbor discovery constants, data structs, and prototypes
  * @author  Stephan Zeisberg <zeisberg@mi.fu-berlin.de>
- * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
+ * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  * @author  Oliver Gesch <oliver.gesch@googlemail.com>
  * @}
  */

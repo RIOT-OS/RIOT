@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     board_cc2538dk
+ * @ingroup     boards_cc2538dk
  * @{
  *
  * @file

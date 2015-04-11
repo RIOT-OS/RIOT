@@ -208,7 +208,7 @@ typedef struct ubjson_cookie ubjson_cookie_t;
  * @return        @arg `< 0` on error. UBJSON_PREMATURELY_ENDED will be return by ubjson_read().
  *                @arg `> 0` the amount of read data, which must not exceed max_len.
  */
-typedef ssize_t (*ubjson_read_t)(ubjson_cookie_t *restrict cookie, void *buf, size_t max_len);
+typedef ssize_t (*ubjson_read_t)(ubjson_cookie_t *__restrict cookie, void *buf, size_t max_len);
 
 /**
  * @brief         Method called by ubjson_read() to denote the next element in the structure.
@@ -224,7 +224,7 @@ typedef ssize_t (*ubjson_read_t)(ubjson_cookie_t *restrict cookie, void *buf, si
  * @param[in]     content2   The sub-type of the value that belongs to the next key/index.
  * @returns       Either UBJSON_OKAY or UBJSON_ABORTED.
  */
-typedef ubjson_read_callback_result_t (*ubjson_read_callback_t)(ubjson_cookie_t *restrict cookie,
+typedef ubjson_read_callback_result_t (*ubjson_read_callback_t)(ubjson_cookie_t *__restrict cookie,
                                                                 ubjson_type_t type1, ssize_t content1,
                                                                 ubjson_type_t type2, ssize_t content2);
 
@@ -240,7 +240,7 @@ typedef ubjson_read_callback_result_t (*ubjson_read_callback_t)(ubjson_cookie_t 
  * @returns       @arg `< 0` to indicate an error.
  *                @arg `> 0` to indicate success.
  */
-typedef ssize_t (*ubjson_write_t)(ubjson_cookie_t *restrict cookie, const void *buf, size_t len);
+typedef ssize_t (*ubjson_write_t)(ubjson_cookie_t *__restrict cookie, const void *buf, size_t len);
 
 /**
  * @brief        See @ref ubjson_cookie_t.
@@ -279,7 +279,7 @@ struct ubjson_cookie {
  * @param[in]     cookie     The cookie that is passed to the callback function.
  * @returns       The same as ubjson_read().
  */
-ubjson_read_callback_result_t ubjson_read_next(ubjson_cookie_t *restrict cookie);
+ubjson_read_callback_result_t ubjson_read_next(ubjson_cookie_t *__restrict cookie);
 
 /**
  * @brief         The entry function to read UBJSON serialized data.
@@ -297,7 +297,7 @@ ubjson_read_callback_result_t ubjson_read_next(ubjson_cookie_t *restrict cookie)
  * @param[in]     callback   The callback function.
  * @returns       See \ref ubjson_read_callback_result_t
  */
-static inline ubjson_read_callback_result_t ubjson_read(ubjson_cookie_t *restrict cookie,
+static inline ubjson_read_callback_result_t ubjson_read(ubjson_cookie_t *__restrict cookie,
                                                         ubjson_read_t read,
                                                         ubjson_read_callback_t callback)
 {
@@ -315,7 +315,7 @@ static inline ubjson_read_callback_result_t ubjson_read(ubjson_cookie_t *restric
  * @param[in,out] content    Pointer to a variable that was initialized with the value of content2, returns the new content1.
  * @returns       The same as ubjson_read().
  */
-ubjson_read_callback_result_t ubjson_peek_value(ubjson_cookie_t *restrict cookie,
+ubjson_read_callback_result_t ubjson_peek_value(ubjson_cookie_t *__restrict cookie,
                                                 ubjson_type_t *type, ssize_t *content);
 
 /**
@@ -326,7 +326,7 @@ ubjson_read_callback_result_t ubjson_peek_value(ubjson_cookie_t *restrict cookie
  * @param[out]    dest       The read datum.
  * @returns       The result of the read callback, probably the amount of read bytes.
  */
-ssize_t ubjson_get_i32(ubjson_cookie_t *restrict cookie, ssize_t content, int32_t *dest);
+ssize_t ubjson_get_i32(ubjson_cookie_t *__restrict cookie, ssize_t content, int32_t *dest);
 
 /**
  * @brief         Call if type1 of the callback was UBJSON_TYPE_INT64.
@@ -335,7 +335,7 @@ ssize_t ubjson_get_i32(ubjson_cookie_t *restrict cookie, ssize_t content, int32_
  * @param[out]    dest       The read datum.
  * @returns       The result of the read callback, probably the amount of read bytes.
  */
-ssize_t ubjson_get_i64(ubjson_cookie_t *restrict cookie, ssize_t content, int64_t *dest);
+ssize_t ubjson_get_i64(ubjson_cookie_t *__restrict cookie, ssize_t content, int64_t *dest);
 
 /**
  * @brief         Call if type1 of the callback was UBJSON_TYPE_STRING.
@@ -346,7 +346,7 @@ ssize_t ubjson_get_i64(ubjson_cookie_t *restrict cookie, ssize_t content, int64_
  * @param[out]    dest       Buffer to read the string into.
  * @returns       The result of the read callback, probably the amount of read bytes.
  */
-ssize_t ubjson_get_string(ubjson_cookie_t *restrict cookie, ssize_t content, void *dest);
+ssize_t ubjson_get_string(ubjson_cookie_t *__restrict cookie, ssize_t content, void *dest);
 
 /**
  * @brief         Call if type1 of the callback was UBJSON_TYPE_BOOL.
@@ -356,7 +356,7 @@ ssize_t ubjson_get_string(ubjson_cookie_t *restrict cookie, ssize_t content, voi
  * @param[out]    dest       The read datum.
  * @returns       `1`, the invocation cannot fail.
  */
-static inline ssize_t ubjson_get_bool(ubjson_cookie_t *restrict cookie, ssize_t content, bool *dest)
+static inline ssize_t ubjson_get_bool(ubjson_cookie_t *__restrict cookie, ssize_t content, bool *dest)
 {
     (void) cookie;
     *dest = content;
@@ -370,7 +370,7 @@ static inline ssize_t ubjson_get_bool(ubjson_cookie_t *restrict cookie, ssize_t 
  * @param[out]    dest       The read datum.
  * @returns       The result of the read callback, probably the amount of read bytes.
  */
-static inline ssize_t ubjson_get_float(ubjson_cookie_t *restrict cookie, ssize_t content, float *dest)
+static inline ssize_t ubjson_get_float(ubjson_cookie_t *__restrict cookie, ssize_t content, float *dest)
 {
     (void) content;
     union {
@@ -389,7 +389,7 @@ static inline ssize_t ubjson_get_float(ubjson_cookie_t *restrict cookie, ssize_t
  * @param[out]    dest       The read datum.
  * @returns       The result of the read callback, probably the amount of read bytes.
  */
-static inline ssize_t ubjson_get_double(ubjson_cookie_t *restrict cookie, ssize_t content, double *dest)
+static inline ssize_t ubjson_get_double(ubjson_cookie_t *__restrict cookie, ssize_t content, double *dest)
 {
     (void) content;
     union {
@@ -411,7 +411,7 @@ static inline ssize_t ubjson_get_double(ubjson_cookie_t *restrict cookie, ssize_
  * @param[in]     cookie     The cookie that was passed to the callback function.
  * @returns       The same as ubjson_read().
  */
-ubjson_read_callback_result_t ubjson_read_array(ubjson_cookie_t *restrict cookie);
+ubjson_read_callback_result_t ubjson_read_array(ubjson_cookie_t *__restrict cookie);
 
 
 /**
@@ -425,7 +425,7 @@ ubjson_read_callback_result_t ubjson_read_array(ubjson_cookie_t *restrict cookie
  * @param[in]     cookie     The cookie that was passed to the callback function.
  * @returns       The same as ubjson_read().
  */
-ubjson_read_callback_result_t ubjson_read_object(ubjson_cookie_t *restrict cookie);
+ubjson_read_callback_result_t ubjson_read_object(ubjson_cookie_t *__restrict cookie);
 
 /* ***************************************************************************
  * WRITE FUNCTIONS / DEFINITIONS
@@ -440,7 +440,7 @@ ubjson_read_callback_result_t ubjson_read_object(ubjson_cookie_t *restrict cooki
  * @param[out]    cookie     The cookie that will be passed to ubjson_write_null() and friends.
  * @param[in]     write_fun  The function that will be called to write data.
  */
-static inline void ubjson_write_init(ubjson_cookie_t *restrict cookie, ubjson_write_t write_fun)
+static inline void ubjson_write_init(ubjson_cookie_t *__restrict cookie, ubjson_write_t write_fun)
 {
     cookie->rw.write = write_fun;
 }
@@ -449,14 +449,14 @@ static inline void ubjson_write_init(ubjson_cookie_t *restrict cookie, ubjson_wr
  * @brief         Write a null value.
  * @param[in]     cookie     The cookie that was initialized with ubjson_write_init().
  */
-ssize_t ubjson_write_null(ubjson_cookie_t *restrict cookie);
+ssize_t ubjson_write_null(ubjson_cookie_t *__restrict cookie);
 
 /**
  * @brief         Write a no-operation value.
  * @param[in]     cookie     The cookie that was initialized with ubjson_write_init().
  * @returns       The result of the supplied @ref ubjson_write_t function.
  */
-ssize_t ubjson_write_noop(ubjson_cookie_t *restrict cookie);
+ssize_t ubjson_write_noop(ubjson_cookie_t *__restrict cookie);
 
 /**
  * @brief         Write a boolean value.
@@ -464,7 +464,7 @@ ssize_t ubjson_write_noop(ubjson_cookie_t *restrict cookie);
  * @param[in]     value      The boolean value to write.
  * @returns       The result of the supplied @ref ubjson_write_t function.
  */
-ssize_t ubjson_write_bool(ubjson_cookie_t *restrict cookie, bool value);
+ssize_t ubjson_write_bool(ubjson_cookie_t *__restrict cookie, bool value);
 
 /**
  * @brief         Write an integer value.
@@ -472,7 +472,7 @@ ssize_t ubjson_write_bool(ubjson_cookie_t *restrict cookie, bool value);
  * @param[in]     cookie     The cookie that was initialized with ubjson_write_init().
  * @param[in]     value      The integer value to write.
  */
-ssize_t ubjson_write_i32(ubjson_cookie_t *restrict cookie, int32_t value);
+ssize_t ubjson_write_i32(ubjson_cookie_t *__restrict cookie, int32_t value);
 
 /**
  * @brief         Write an integer value.
@@ -481,7 +481,7 @@ ssize_t ubjson_write_i32(ubjson_cookie_t *restrict cookie, int32_t value);
  * @param[in]     value      The integer value to write.
  * @returns       The result of the supplied @ref ubjson_write_t function.
  */
-ssize_t ubjson_write_i64(ubjson_cookie_t *restrict cookie, int64_t value);
+ssize_t ubjson_write_i64(ubjson_cookie_t *__restrict cookie, int64_t value);
 
 /**
  * @brief         Write a floating point value.
@@ -489,7 +489,7 @@ ssize_t ubjson_write_i64(ubjson_cookie_t *restrict cookie, int64_t value);
  * @param[in]     value      The integer value to write.
  * @returns       The result of the supplied @ref ubjson_write_t function.
  */
-ssize_t ubjson_write_float(ubjson_cookie_t *restrict cookie, float value);
+ssize_t ubjson_write_float(ubjson_cookie_t *__restrict cookie, float value);
 
 /**
  * @brief         Write a floating point value.
@@ -497,7 +497,7 @@ ssize_t ubjson_write_float(ubjson_cookie_t *restrict cookie, float value);
  * @param[in]     value      The integer value to write.
  * @returns       The result of the supplied @ref ubjson_write_t function.
  */
-ssize_t ubjson_write_double(ubjson_cookie_t *restrict cookie, double value);
+ssize_t ubjson_write_double(ubjson_cookie_t *__restrict cookie, double value);
 
 /**
  * @brief         Write a string or blob.
@@ -506,7 +506,7 @@ ssize_t ubjson_write_double(ubjson_cookie_t *restrict cookie, double value);
  * @param[in]     len        The length of the string or blob.
  * @returns       The result of the supplied @ref ubjson_write_t function.
  */
-ssize_t ubjson_write_string(ubjson_cookie_t *restrict cookie, const void *value, size_t len);
+ssize_t ubjson_write_string(ubjson_cookie_t *__restrict cookie, const void *value, size_t len);
 
 /**
  * @brief         Open an array.
@@ -515,7 +515,7 @@ ssize_t ubjson_write_string(ubjson_cookie_t *restrict cookie, const void *value,
  * @param[in]     cookie     The cookie that was initialized with ubjson_write_init().
  * @returns       The result of the supplied @ref ubjson_write_t function.
  */
-ssize_t ubjson_open_array(ubjson_cookie_t *restrict cookie);
+ssize_t ubjson_open_array(ubjson_cookie_t *__restrict cookie);
 
 /**
  * @brief         Open an array with a known length.
@@ -524,14 +524,14 @@ ssize_t ubjson_open_array(ubjson_cookie_t *restrict cookie);
  * @param[in]     len        Length of the array.
  * @returns       The result of the supplied @ref ubjson_write_t function.
  */
-ssize_t ubjson_open_array_len(ubjson_cookie_t *restrict cookie, size_t len);
+ssize_t ubjson_open_array_len(ubjson_cookie_t *__restrict cookie, size_t len);
 
 /**
  * @brief         Close an array that was opened with ubjson_open_array().
  * @param[in]     cookie     The cookie that was initialized with ubjson_write_init().
  * @returns       The result of the supplied @ref ubjson_write_t function.
  */
-ssize_t ubjson_close_array(ubjson_cookie_t *restrict cookie);
+ssize_t ubjson_close_array(ubjson_cookie_t *__restrict cookie);
 
 /**
  * @brief         Open an object.
@@ -543,7 +543,7 @@ ssize_t ubjson_close_array(ubjson_cookie_t *restrict cookie);
  * @param[in]     cookie     The cookie that was initialized with ubjson_write_init().
  * @returns       The result of the supplied @ref ubjson_write_t function.
  */
-ssize_t ubjson_open_object(ubjson_cookie_t *restrict cookie);
+ssize_t ubjson_open_object(ubjson_cookie_t *__restrict cookie);
 
 /**
  * @brief         Open an object with a known length.
@@ -555,7 +555,7 @@ ssize_t ubjson_open_object(ubjson_cookie_t *restrict cookie);
  * @param[in]     len        Number of keys inside the object.
  * @returns       The result of the supplied @ref ubjson_write_t function.
  */
-ssize_t ubjson_open_object_len(ubjson_cookie_t *restrict cookie, size_t len);
+ssize_t ubjson_open_object_len(ubjson_cookie_t *__restrict cookie, size_t len);
 
 /**
  * @brief         Write a key inside an object.
@@ -568,14 +568,14 @@ ssize_t ubjson_open_object_len(ubjson_cookie_t *restrict cookie, size_t len);
  * @param[in]     len        The length of the key.
  * @returns       The result of the supplied @ref ubjson_write_t function.
  */
-ssize_t ubjson_write_key(ubjson_cookie_t *restrict cookie, const void *value, size_t len);
+ssize_t ubjson_write_key(ubjson_cookie_t *__restrict cookie, const void *value, size_t len);
 
 /**
  * @brief         Close an array that was opened with ubjson_open_object().
  * @param[in]     cookie     The cookie that was initialized with ubjson_write_init().
  * @returns       The result of the supplied @ref ubjson_write_t function.
  */
-ssize_t ubjson_close_object(ubjson_cookie_t *restrict cookie);
+ssize_t ubjson_close_object(ubjson_cookie_t *__restrict cookie);
 
 #ifdef __cplusplus
 }

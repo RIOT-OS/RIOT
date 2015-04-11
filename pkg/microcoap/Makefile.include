@@ -1,0 +1,1 @@
+INCLUDES += -I$(RIOTBASE)/pkg/microcoap/microcoap

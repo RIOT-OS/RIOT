@@ -1,7 +1,7 @@
-s/if(/if (/
-s/switch(/switch (/
-s/case(/case (/
-s/while(/while (/
-s/for(/for (/
-s/do(/do (/
+s/\bif(/if (/
+s/\bswitch(/switch (/
+s/\bcase(/case (/
+s/\bwhile(/while (/
+s/\bfor(/for (/
+s/\bdo(/do (/
 s/! /!/

@@ -140,7 +140,7 @@ typedef uint32_t (*hashfp_t)(const uint8_t *, int len);
  * @brief bloom_t bloom filter object
  */
 typedef struct {
-    /** number of bytes in the bloom array */
+    /** number of bits in the bloom array */
     size_t m;
     /** number of hash functions */
     size_t k;
@@ -155,7 +155,7 @@ typedef struct {
  *
  * For best results, make 'size' a power of 2.
  *
- * @param size        size of the bit array in the filter
+ * @param size        size of the bit array of the filter in bits
  * @param num_hashes  the number of hash functions
  * @param ...         varg function pointers, use hashfp_t
  *

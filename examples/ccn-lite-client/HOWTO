@@ -4,7 +4,7 @@ simple appserver (all in one shell)
 0. create tap devices: *./cpu/native/tapsetup.sh create 3*
 1. build ccn-lite-client: *make -B clean all-valgrind*
 2. start: *./bin/native/ccn-lite-client.elf tap0* (valgrind support included)
-3. optinonal: *config 20* [enter] (this sets the content store size)
+3. optional: *config 20* [enter] (this sets the content store size)
 4. start appserver thread: *appserver* [enter] (this starts the userland appserver, which registers for "/riot/appserver/"
 5. request content: *interest /riot/appserver/test* [enter] (ask the relay for this "file", userland code splits this up in
 chunks and requests them from the relay. In the relay the name "/riot/appserver" is registered to the RIOT MSG face with

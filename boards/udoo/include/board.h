@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    board_udoo UDOO
+ * @defgroup    boards_udoo UDOO
  * @ingroup     boards
  * @brief       Support for the UDOO board.
  * @{

@@ -42,7 +42,7 @@ Its features comprise
 * IPv6
 * TCP and UDP
 * 6LoWPAN
-* RPL
+* AODVv2, NHDP, RPL
 
 ## GETTING STARTED
 * You want to start the RIOT? Just follow our [Getting started documentation](https://github.com/RIOT-OS/RIOT/wiki/Introduction)
@@ -79,7 +79,7 @@ To contribute something to RIOT, please refer to the [development procedures](ht
 
 ## LICENSE
 * All sources and binaries that have been developed at Freie Universität Berlin are
-  licensed under the GNU Lesser General Public License version 2 as published by the
+  licensed under the GNU Lesser General Public License version 2.1 as published by the
   Free Software Foundation.
 * Some external sources, especially files developed by SICS are published under
   a separate license.

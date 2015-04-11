@@ -20,8 +20,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef __L3G4200D_H
-#define __L3G4200D_H
+#ifndef L3G4200D_H
+#define L3G4200D_H
 
 #include <stdint.h>
 
@@ -139,5 +139,5 @@ int l3g4200d_disable(l3g4200d_t *dev);
 }
 #endif
 
-#endif /* __L3G4200D_H */
+#endif /* L3G4200D_H */
 /** @} */

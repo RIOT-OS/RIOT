@@ -6,6 +6,17 @@
  * directory for more details.
  */
 
+/**
+ * @ingroup     sys_shell_commands
+ *
+ * @{
+ *
+ * @file
+ * @brief       Shell command definitions
+ *
+ * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ */
+
 #ifndef __SHELL_COMMANDS_H
 #define __SHELL_COMMANDS_H
 
@@ -28,3 +39,4 @@ extern const shell_command_t _shell_command_list[];
 #endif
 
 #endif /* __SHELL_COMMANDS_H */
+/** @} */

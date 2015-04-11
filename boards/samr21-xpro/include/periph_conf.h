@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     board_atsamr21-xpro
+ * @ingroup     boards_samr21-xpro
  * @{
  *
  * @file

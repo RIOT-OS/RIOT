@@ -9,10 +9,10 @@
  *
  * @ingroup sixlowpan
  * @{
- * @file    sixlowip.c
+ * @file
  * @brief   6lowpan IP layer functions
  * @author  Stephan Zeisberg <zeisberg@mi.fu-berlin.de>
- * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
+ * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  * @author  Eric Engel <eric.engel@fu-berlin.de>
  * @author  Oliver Gesch <oliver.gesch@googlemail.com>
  * @}
@@ -36,7 +36,7 @@
 
 #define ENABLE_DEBUG    (0)
 #if ENABLE_DEBUG
-char addr_str[IPV6_MAX_ADDR_STR_LEN];
+static char addr_str[IPV6_MAX_ADDR_STR_LEN];
 #endif
 #include "debug.h"
 
@@ -44,12 +44,12 @@ char addr_str[IPV6_MAX_ADDR_STR_LEN];
 #define LLHDR_IPV6HDR_LEN           (LL_HDR_LEN + IPV6_HDR_LEN)
 #define IPV6_NET_IF_ADDR_BUFFER_LEN (NET_IF_MAX * IPV6_NET_IF_ADDR_LIST_LEN)
 
-uint8_t ip_send_buffer[BUFFER_SIZE];
-uint8_t buffer[BUFFER_SIZE];
-msg_t ip_msg_queue[IP_PKT_RECV_BUF_SIZE];
-ipv6_hdr_t *ipv6_buf;
-icmpv6_hdr_t *icmp_buf;
-uint8_t *nextheader;
+static uint8_t ip_send_buffer[BUFFER_SIZE];
+uint8_t sixlowpan_buffer[BUFFER_SIZE];
+static msg_t ip_msg_queue[IP_PKT_RECV_BUF_SIZE];
+static ipv6_hdr_t *ipv6_buf;
+static icmpv6_hdr_t *icmp_buf;
+static uint8_t *nextheader;
 
 kernel_pid_t udp_packet_handler_pid = KERNEL_PID_UNDEF;
 kernel_pid_t tcp_packet_handler_pid = KERNEL_PID_UNDEF;
@@ -127,7 +127,7 @@ int ipv6_send_packet(ipv6_hdr_t *packet, ipv6_addr_t *next_hop)
                                            nce->lladdr_len, (uint8_t *) packet, length) < 0) {
                 /* XXX: this is wrong, but until ND does work correctly,
                  *      this is the only way (aka the old way)*/
-                uint16_t raddr = dest->uint16[7];
+                uint16_t raddr = 0xffff; /* Broadcast message */
                 sixlowpan_lowpan_sendto(0, &raddr, 2, (uint8_t *) packet,
                                         length);
                 /* return -1; */
@@ -164,17 +164,17 @@ uint8_t *get_payload_buf_send(uint8_t ext_len)
 
 ipv6_hdr_t *ipv6_get_buf(void)
 {
-    return ((ipv6_hdr_t *) &buffer[LL_HDR_LEN]);
+    return ((ipv6_hdr_t *) &sixlowpan_buffer[LL_HDR_LEN]);
 }
 
 icmpv6_hdr_t *get_icmpv6_buf(uint8_t ext_len)
 {
-    return ((icmpv6_hdr_t *) &buffer[LLHDR_IPV6HDR_LEN + ext_len]);
+    return ((icmpv6_hdr_t *) &sixlowpan_buffer[LLHDR_IPV6HDR_LEN + ext_len]);
 }
 
 uint8_t *get_payload_buf(uint8_t ext_len)
 {
-    return &(buffer[LLHDR_IPV6HDR_LEN + ext_len]);
+    return &(sixlowpan_buffer[LLHDR_IPV6HDR_LEN + ext_len]);
 }
 
 int ipv6_sendto(const ipv6_addr_t *dest, uint8_t next_header,
@@ -693,15 +693,7 @@ ipv6_addr_t *ipv6_addr_set_by_eui64(ipv6_addr_t *out, int if_id,
 
     if (net_if_get_eui64((net_if_eui64_t *) &out->uint8[8], if_id,
                          force_generation)) {
-#ifdef MODULE_SIXLOWPAN
-
-        if (!sixlowpan_lowpan_eui64_to_short_addr((net_if_eui64_t *)&out->uint8[8])) {
-            out->uint8[8] ^= 0x02;
-        }
-
-#else
         out->uint8[8] ^= 0x02;
-#endif        
         return out;
     }
     else {
@@ -894,9 +886,10 @@ uint16_t ipv6_csum(ipv6_hdr_t *ipv6_header, uint8_t *buf, uint16_t len,
                    uint8_t proto)
 {
     uint16_t sum = 0;
-    DEBUG("Calculate checksum over src: %s, dst: %s, len: %04X, buf: %p, proto: %u\n",
+    DEBUG("Calculate checksum over src: %s, ",
           ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
-                           &ipv6_header->srcaddr),
+                           &ipv6_header->srcaddr));
+    DEBUG("dst: %s, len: %04X, buf: %p, proto: %u\n",
           ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
                            &ipv6_header->destaddr),
           len, buf, proto);

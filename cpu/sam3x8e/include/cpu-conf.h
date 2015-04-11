@@ -51,6 +51,16 @@ extern "C" {
 #endif
 /** @} */
 
+/**
+ * @brief Definition of different panic modes
+ */
+typedef enum {
+    HARD_FAULT,
+    BUS_FAULT,
+    USAGE_FAULT,
+    DUMMY_HANDLER
+} panic_t;
+
 #ifdef __cplusplus
 }
 #endif

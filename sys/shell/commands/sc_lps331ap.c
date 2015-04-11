@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup shell_commands
+ * @ingroup     sys_shell_commands
  * @{
  *
  * @file
@@ -29,7 +29,7 @@
 
 static lps331ap_t lps331ap_dev;
 
-void _get_lps331ap_init_handler(int argc, char **argv)
+int _get_lps331ap_init_handler(int argc, char **argv)
 {
     (void)argc;
     (void)argv;
@@ -39,13 +39,15 @@ void _get_lps331ap_init_handler(int argc, char **argv)
 
     if (res) {
         puts("Error initializing LPS331AP sensor.");
+        return 1;
     }
     else {
         puts("Initialized LPS331AP sensor with default values");
+        return 0;
     }
 }
 
-void _get_lps331ap_read_handler(int argc, char **argv)
+int _get_lps331ap_read_handler(int argc, char **argv)
 {
     (void)argc;
     (void)argv;
@@ -54,7 +56,7 @@ void _get_lps331ap_read_handler(int argc, char **argv)
 
     if (!lps331ap_dev.address) {
         puts("Error: please call `lps331ap_init` first!");
-        return;
+        return 1;
     }
 
     temp = lps331ap_read_temp(&lps331ap_dev);
@@ -62,7 +64,7 @@ void _get_lps331ap_read_handler(int argc, char **argv)
 
     if (temp < 0) {
         puts("Error reading temperature value from LPS331AP.");
-        return;
+        return 1;
     }
     else {
         int temp_abs = temp / 1000;
@@ -72,11 +74,13 @@ void _get_lps331ap_read_handler(int argc, char **argv)
 
     if (pres < 0) {
         puts("Error reading pressure value from LPS331AP.");
-        return;
+        return 1;
     }
     else {
         printf("LPS331AP: pressure: %i mBar\n", pres);
     }
+
+    return 0;
 }
 
 #endif /* MODULE_LPS331AP */

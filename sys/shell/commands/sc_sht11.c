@@ -1,17 +1,20 @@
-/**
- * Shell commands for temperature and humidity sensor
- *
+/*
  * Copyright (C) 2013  INRIA.
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
- *
- * @ingroup shell_commands
+ */
+
+/**
+ * @ingroup     sys_shell_commands
  * @{
- * @file    sc_sht11.c
- * @brief   provides shell commands to poll sht11 sensor
- * @author  Oliver Hahm <oliver.hahm@inria.fr>
+ *
+ * @file
+ * @brief       Provides shell commands to poll sht11 sensor
+ *
+ * @author      Oliver Hahm <oliver.hahm@inria.fr>
+ *
  * @}
  */
 
@@ -25,7 +28,7 @@
 
 extern float sht11_temperature_offset;
 
-void _get_humidity_handler(int argc, char **argv)
+int _get_humidity_handler(int argc, char **argv)
 {
     (void) argc;
     (void) argv;
@@ -36,13 +39,18 @@ void _get_humidity_handler(int argc, char **argv)
 
     if (!success) {
         printf("Error reading SHT11\n");
+
+        return 1;
     }
     else {
         printf("Relative humidity: %5.2f%% / Temperature compensated humidity; %5.2f%%\n",
                (double) sht11_val.relhum, (double) sht11_val.relhum_temp);
+
+        return 0;
     }
 }
-void _get_temperature_handler(int argc, char **argv)
+
+int _get_temperature_handler(int argc, char **argv)
 {
     (void) argc;
     (void) argv;
@@ -53,12 +61,17 @@ void _get_temperature_handler(int argc, char **argv)
 
     if (!success) {
         printf("Error reading SHT11\n");
+
+        return 1;
     }
     else {
         printf("Temperature: %-6.2f°C\n", (double) sht11_val.temperature);
+
+        return 0;
     }
 }
-void _get_weather_handler(int argc, char **argv)
+
+int _get_weather_handler(int argc, char **argv)
 {
     (void) argc;
     (void) argv;
@@ -69,22 +82,30 @@ void _get_weather_handler(int argc, char **argv)
 
     if (!success) {
         printf("Error reading SHT11\n");
+
+        return 1;
     }
     else {
         printf("Relative humidity: %5.2f%% / Temperature compensated humidity; %5.2f%% ",
                (double) sht11_val.relhum, (double) sht11_val.relhum_temp);
         printf("Temperature: %-6.2f°C\n", (double) sht11_val.temperature);
+
+        return 0;
     }
 }
 
-void _set_offset_handler(int argc, char **argv)
+int _set_offset_handler(int argc, char **argv)
 {
     if (argc != 2) {
         printf("Usage: %s <OFFSET>\n", argv[0]);
+
+        return 1;
     }
     else {
         sht11_temperature_offset = atoi(argv[1]);
         printf("Temperature offset set to %f\n", (double) sht11_temperature_offset);
+
+        return 0;
     }
 }
 

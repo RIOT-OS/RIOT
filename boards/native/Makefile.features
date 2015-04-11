@@ -1,3 +1,7 @@
-FEATURES_PROVIDED += transceiver periph_cpuid config cpp
+FEATURES_PROVIDED += transceiver
+FEATURES_PROVIDED += periph_cpuid
+FEATURES_PROVIDED += config
+FEATURES_PROVIDED += cpp
 FEATURES_PROVIDED += periph_random
 FEATURES_PROVIDED += periph_rtc
+FEATURES_MCU_GROUP = x86

@@ -16,8 +16,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef __ATOMIC_ARCH_H
-#define __ATOMIC_ARCH_H
+#ifndef ATOMIC_ARCH_H
+#define ATOMIC_ARCH_H
 
 #ifdef __cplusplus
  extern "C" {
@@ -49,5 +49,5 @@ unsigned int atomic_arch_set_return(unsigned int *to_set, unsigned int value);
 }
 #endif
 
-#endif /* __ATOMIC_ARCH_H */
+#endif /* ATOMIC_ARCH_H */
 /** @} */

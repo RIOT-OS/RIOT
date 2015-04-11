@@ -17,8 +17,8 @@
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  */
 
-#ifndef __REBOOT_ARCH_H
-#define __REBOOT_ARCH_H
+#ifndef REBOOT_ARCH_H
+#define REBOOT_ARCH_H
 
 #ifdef __cplusplus
  extern "C" {
@@ -38,5 +38,5 @@ int reboot_arch(int mode);
 }
 #endif
 
-#endif /* __REBOOT_ARCH_H */
+#endif /* REBOOT_ARCH_H */
 /** @} */

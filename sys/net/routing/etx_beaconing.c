@@ -56,7 +56,7 @@ static void *etx_beacon(void *);
 static void *etx_clock(void *);
 static void *etx_radio(void *);
 
-//Buffer
+/* Buffer */
 static char etx_beacon_buf[ETX_BEACON_STACKSIZE];
 static char etx_radio_buf[ETX_RADIO_STACKSIZE];
 static char etx_clock_buf[ETX_CLOCK_STACKSIZE];
@@ -64,12 +64,12 @@ static char etx_clock_buf[ETX_CLOCK_STACKSIZE];
 static uint8_t etx_send_buf[ETX_BUF_SIZE];
 static uint8_t etx_rec_buf[ETX_BUF_SIZE];
 
-//PIDs
-kernel_pid_t etx_beacon_pid = KERNEL_PID_UNDEF;
-kernel_pid_t etx_radio_pid = KERNEL_PID_UNDEF;
-kernel_pid_t etx_clock_pid = KERNEL_PID_UNDEF;
+/* PIDs */
+static kernel_pid_t etx_beacon_pid = KERNEL_PID_UNDEF;
+static kernel_pid_t etx_radio_pid = KERNEL_PID_UNDEF;
+static kernel_pid_t etx_clock_pid = KERNEL_PID_UNDEF;
 
-//Message queue for radio
+/* Message queue for radio */
 static msg_t msg_que[ETX_RCV_QUEUE_SIZE];
 
 /*
@@ -93,7 +93,7 @@ static char reached_window;
  * which we put all necessary info for up to ETX_MAX_CANDIDATE_NEIHGBORS
  * candidates.
  */
-//Candidate array
+/* Candidate array */
 static etx_neighbor_t candidates[ETX_MAX_CANDIDATE_NEIGHBORS];
 
 /*
@@ -103,12 +103,7 @@ static etx_neighbor_t candidates[ETX_MAX_CANDIDATE_NEIGHBORS];
  * In this time, no packet may be handled, otherwise it could assume values
  * from the last round to count for this round.
  */
-mutex_t etx_mutex = MUTEX_INIT;
-//Transceiver command for sending ETX probes
-transceiver_command_t tcmd;
-
-//Message to send probes with
-msg_t mesg;
+static mutex_t etx_mutex = MUTEX_INIT;
 
 static ipv6_addr_t *own_address;
 
@@ -116,6 +111,7 @@ static etx_probe_t *etx_get_send_buf(void)
 {
     return ((etx_probe_t *) &(etx_send_buf[0]));
 }
+
 static etx_probe_t *etx_get_rec_buf(void)
 {
     return ((etx_probe_t *) &(etx_rec_buf[0]));

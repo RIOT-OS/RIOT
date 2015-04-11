@@ -29,7 +29,7 @@
 timex_t timex_add(const timex_t a, const timex_t b)
 {
 #if ENABLE_DEBUG
-    if (!timex_isnormalized(a) || !timex_isnormalized(b)) {
+    if (!timex_isnormalized(&a) || !timex_isnormalized(&b)) {
         puts("timex_add on denormalized value");
     }
 #endif
@@ -53,7 +53,7 @@ timex_t timex_set(uint32_t seconds, uint32_t microseconds)
     result.microseconds = microseconds;
 
 #if ENABLE_DEBUG
-    if (!timex_isnormalized(result)) {
+    if (!timex_isnormalized(&result)) {
         puts("timex_set on denormalized value");
     }
 #endif
@@ -64,7 +64,7 @@ timex_t timex_set(uint32_t seconds, uint32_t microseconds)
 timex_t timex_sub(const timex_t a, const timex_t b)
 {
 #if ENABLE_DEBUG
-    if (!timex_isnormalized(a) || !timex_isnormalized(b)) {
+    if (!timex_isnormalized(&a) || !timex_isnormalized(&b)) {
         puts("timex_sub on denormalized value");
     }
 #endif
@@ -86,7 +86,7 @@ timex_t timex_sub(const timex_t a, const timex_t b)
 int timex_cmp(const timex_t a, const timex_t b)
 {
 #if ENABLE_DEBUG
-    if (!timex_isnormalized(a) || !timex_isnormalized(b)) {
+    if (!timex_isnormalized(&a) || !timex_isnormalized(&b)) {
         puts("timex_cmp on denormalized value");
     }
 #endif

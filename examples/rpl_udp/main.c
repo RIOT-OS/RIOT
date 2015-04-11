@@ -29,7 +29,7 @@
 
 #include "rpl_udp.h"
 
-const shell_command_t shell_commands[] = {
+static const shell_command_t shell_commands[] = {
     {"init", "Initialize network", rpl_udp_init},
     {"set", "Set ID", rpl_udp_set_id},
     {"dodag", "Shows the dodag", rpl_udp_dodag},

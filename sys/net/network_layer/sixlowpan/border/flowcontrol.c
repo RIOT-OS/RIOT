@@ -11,7 +11,7 @@
  * @{
  * @file    flowcontrol.c
  * @brief   flowcontrol for constraint node border router implementation
- * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
+ * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  * @author  Oliver Hahm <oliver.hahm@inria.fr>
  * @}
  */

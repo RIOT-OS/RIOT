@@ -7,11 +7,11 @@
  */
 
 /**
- * @ingroup shell_commands
+ * @ingroup     sys_shell_commands
  * @{
  *
  * @file
- * @brief       provides shell commands to poll lsm303dlhc sensor
+ * @brief       Provides shell commands to poll lsm303dlhc sensor
  *
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  *
@@ -31,7 +31,7 @@
 
 static lsm303dlhc_t lsm303_dev;
 
-void _get_lsm303dlhc_init_handler(int argc, char **argv)
+int _get_lsm303dlhc_init_handler(int argc, char **argv)
 {
     (void)argc;
     (void)argv;
@@ -45,13 +45,15 @@ void _get_lsm303dlhc_init_handler(int argc, char **argv)
 
     if (error) {
         puts("Error initializing lsm303dlhc sensor.");
+        return 1;
     }
     else {
         puts("Initialized lsm303dlhc sensor with default values");
+        return 0;
     }
 }
 
-void _get_lsm303dlhc_read_handler(int argc, char **argv)
+int _get_lsm303dlhc_read_handler(int argc, char **argv)
 {
     (void)argc;
     (void)argv;
@@ -61,13 +63,13 @@ void _get_lsm303dlhc_read_handler(int argc, char **argv)
 
     if (!lsm303_dev.acc_address || !lsm303_dev.mag_address) {
         puts("Error: please call `lsm303dlhc_init` first!");
-        return;
+        return 1;
     }
 
     error = lsm303dlhc_read_acc(&lsm303_dev, &data);
     if (error) {
         puts("Error reading accelerometer data from lsm303dlhc.");
-        return;
+        return 1;
     }
     else {
         printf("lsm303dlhc: Accelerometer {%i, %i, %i} mg\n", data.x_axis, data.y_axis, data.z_axis);
@@ -76,7 +78,7 @@ void _get_lsm303dlhc_read_handler(int argc, char **argv)
     error = lsm303dlhc_read_mag(&lsm303_dev, &data);
     if (error) {
         puts("Error reading magnetometer data from lsm303dlhc.");
-        return;
+        return 1;
     }
     else {
         printf("lsm303dlhc: Magnetometer {%i, %i, %i}/1100 gauss\n", data.x_axis, data.y_axis, data.z_axis);
@@ -85,10 +87,11 @@ void _get_lsm303dlhc_read_handler(int argc, char **argv)
     error = lsm303dlhc_read_temp(&lsm303_dev, &(data.x_axis));
     if (error) {
         puts("Error reading temperature data from lsm303dlhc.");
-        return;
+        return 1;
     }
     else {
         printf("lsm303dlhc: Temperature %i\n", data.x_axis);
+        return 0;
     }
 }
 

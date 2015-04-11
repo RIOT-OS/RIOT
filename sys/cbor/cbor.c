@@ -157,7 +157,7 @@ double decode_float_half(unsigned char *halfp)
         val = mant == 0 ? INFINITY : NAN;
     }
 
-    return half & 0x8000 ? -val : val;
+    return (half & 0x8000) ? -val : val;
 }
 
 /**

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#ifndef ATMEGA_TIME_H
+#define ATMEGA_TIME_H
 
 #include <sys/types.h>
 
@@ -21,3 +23,5 @@ struct timeval {
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* ATMEGA_TIME_H */

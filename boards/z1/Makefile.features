@@ -1,1 +1,2 @@
 FEATURES_PROVIDED += transceiver
+FEATURES_MCU_GROUP = msp430

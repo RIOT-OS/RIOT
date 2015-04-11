@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Martin Lenders
+ * Copyright (C) 2014 Martine Lenders <mlenders@inf.fu-berlin.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -15,8 +15,8 @@
  *
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef __TESTS_NETDEV_DUMMY_H_
-#define __TESTS_NETDEV_DUMMY_H_
+#ifndef TESTS_NETDEV_DUMMY_H_
+#define TESTS_NETDEV_DUMMY_H_
 
 #include "embUnit.h"
 
@@ -33,5 +33,5 @@ void tests_netdev_dummy(void);
 }
 #endif
 
-#endif /* __TESTS_NETDEV_DUMMY_H_ */
+#endif /* TESTS_NETDEV_DUMMY_H_ */
 /** @} */

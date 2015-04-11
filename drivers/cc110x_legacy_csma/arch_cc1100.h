@@ -17,6 +17,9 @@
  * @note        $Id: arch_cc1100.h 1775 2010-01-26 09:37:03Z hillebra $
  */
 
+#ifndef ARCH_CC1100_H
+#define ARCH_CC1100_H
+
 #include <stdint.h>
 
 #ifdef __cplusplus
@@ -37,3 +40,5 @@ void cc110x_after_send(void);
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* ARCH_CC1100_H */

@@ -548,6 +548,7 @@ inline int __set_timer(tim_t dev, int channel, unsigned int timeout, unsigned in
 
     return 1;
 }
+
 #if TIMER_0_EN
 ISR(TIMER0_COMPA_ISR, ISR_BLOCK)
 {
@@ -559,6 +560,7 @@ ISR(TIMER0_COMPA_ISR, ISR_BLOCK)
         TIMER0_COMP_A = TIMER0_COMP_A + config[TIMER_0].timeout_a * config[TIMER_0].limit;
     }
 }
+
 ISR(TIMER0_COMPB_ISR, ISR_BLOCK)
 {
     config[TIMER_0].ctr_b++;
@@ -569,6 +571,7 @@ ISR(TIMER0_COMPB_ISR, ISR_BLOCK)
         TIMER0_COMP_B = TIMER0_COMP_B + config[TIMER_0].timeout_b * config[TIMER_0].limit;
     }
 }
+
 ISR(TIMER0_COMPC_ISR, ISR_BLOCK)
 {
     config[TIMER_0].ctr_c++;
@@ -596,6 +599,7 @@ ISR(TIMER1_COMPA_ISR, ISR_BLOCK)
         thread_yield();
     }
 }
+
 ISR(TIMER1_COMPB_ISR, ISR_BLOCK)
 {
     config[TIMER_1].ctr_b++;
@@ -610,6 +614,7 @@ ISR(TIMER1_COMPB_ISR, ISR_BLOCK)
         thread_yield();
     }
 }
+
 ISR(TIMER1_COMPC_ISR, ISR_BLOCK)
 {
     config[TIMER_1].ctr_c++;
@@ -641,6 +646,7 @@ ISR(TIMER2_COMPA_ISR, ISR_BLOCK)
         thread_yield();
     }
 }
+
 ISR(TIMER2_COMPB_ISR, ISR_BLOCK)
 {
     config[TIMER_2].ctr_b++;
@@ -655,6 +661,7 @@ ISR(TIMER2_COMPB_ISR, ISR_BLOCK)
         thread_yield();
     }
 }
+
 ISR(TIMER2_COMPC_ISR, ISR_BLOCK)
 {
     config[TIMER_2].ctr_c++;

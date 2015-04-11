@@ -1,5 +1,3 @@
-MODULE = tests-cbor
-
 CFLAGS += -DCBOR_NO_PRINT
 
 ifeq (,$(filter native,$(BOARD)))

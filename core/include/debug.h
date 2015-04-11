@@ -13,21 +13,28 @@
  * @file        debug.h
  * @brief       Debug-header
  *
- * @details     If ENABLE_DEBUG is set, before this header is included, 
+ * @details     If ENABLE_DEBUG is set, before this header is included,
  *              ::DEBUG will print out to stdout, otherwise do nothing
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-#ifndef __DEBUG_H
-#define __DEBUG_H
+#ifndef DEBUG_H
+#define DEBUG_H
 
 #include <stdio.h>
 #include "sched.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
+
+/**
+ * @def ENABLE_DEBUG
+ * @brief   This macro can be defined as 0 or other on a file-based level.
+ *          If ENABLE_DEBUG is 0 @ref DEBUG() and @ref DEBUGF() will generate
+ *          no output if not they will generate output.
+ */
 
 /**
  * @name Print debug information if the calling thread stack is large enough
@@ -70,12 +77,29 @@
  */
 #if ENABLE_DEBUG
 #include "tcb.h"
+
+/**
+ * @def DEBUG_FUNC
+ *
+ * @brief   Contains the function name if given compiler supports it.
+ *          Otherwise it is an empty string.
+ */
+# if defined(__cplusplus) && defined(__GNUC__)
+#  define DEBUG_FUNC __PRETTY_FUNCTION__
+# elif __STDC_VERSION__ >= 199901L
+#  define DEBUG_FUNC __func__
+# elif __GNUC__ >= 2
+#  define DEBUG_FUNC __FUNCTION__
+# else
+#  define DEBUG_FUNC ""
+# endif
+
 #define DEBUG(...) DEBUG_PRINT(__VA_ARGS__)
 #define DEBUGF(...) \
     do { \
         DEBUG_PRINT("DEBUG(%s): %s:%d in %s: ", \
                 sched_active_thread ? sched_active_thread->name : "NO THREAD", \
-                __FILE__, __LINE__, __func__); \
+                __FILE__, __LINE__, DEBUG_FUNC); \
         DEBUG_PRINT(__VA_ARGS__); \
     } while (0)
 #else
@@ -88,5 +112,5 @@
 }
 #endif
 
-#endif /* __DEBUG_H */
+#endif /* DEBUG_H */
 /** @} */

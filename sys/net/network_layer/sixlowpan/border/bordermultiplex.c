@@ -11,7 +11,7 @@
  * @{
  * @file    bordermultiplex.c
  * @brief   multiplexiing border router information
- * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
+ * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  * @author  Oliver Hahm <oliver.hahm@inria.fr>
  * @}
  */

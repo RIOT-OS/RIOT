@@ -3,7 +3,15 @@ language: c
 cache: apt
 
 env:
-    - NPROC_MAX=8
+    - NPROC_MAX=8 BUILDTEST_MCU_GROUP=static-tests
+    - NPROC_MAX=8 BUILDTEST_MCU_GROUP=avr8
+    - NPROC_MAX=8 BUILDTEST_MCU_GROUP=msp430
+    - NPROC_MAX=8 BUILDTEST_MCU_GROUP=x86
+    - NPROC_MAX=8 BUILDTEST_MCU_GROUP=arm7
+    - NPROC_MAX=8 BUILDTEST_MCU_GROUP=cortex_m0
+    - NPROC_MAX=8 BUILDTEST_MCU_GROUP=cortex_m3_1
+    - NPROC_MAX=8 BUILDTEST_MCU_GROUP=cortex_m3_2
+    - NPROC_MAX=8 BUILDTEST_MCU_GROUP=cortex_m4
 
 before_install:
     - sudo apt-get install emdebian-archive-keyring
@@ -18,21 +26,7 @@ before_install:
 
 install:
     - >
-        sudo apt-get install \
-            build-essential \
-            gcc-multilib \
-            gcc-arm-none-eabi \
-            gcc-msp430 \
-            pcregrep \
-            libpcre3 \
-            qemu-system-x86 \
-            python3 \
-            g++-multilib \
-            gcc-avr \
-            binutils-avr \
-            avr-libc \
-            cppcheck \
-            doxygen
+        sudo apt-get install $(./dist/tools/travis-scripts/get-pkg-list.py)
     - git config --global user.email "travis@example.com"
     - git config --global user.name "Travis CI"
 
@@ -41,31 +35,7 @@ install:
     - git log -1 --pretty=format:%H riot/master
 
 script:
-    - make -s -C ./examples/default info-concurrency
-    - git rebase riot/master || git rebase --abort
-
-    - ./dist/tools/licenses/check.sh master --diff-filter=MR --error-exitcode=0 || exit
-    - ./dist/tools/licenses/check.sh master --diff-filter=AC || exit
-
-    - ./dist/tools/doccheck/check.sh master || exit
-
-    - ./dist/tools/externc/check.sh master || exit
-
-# TODO:
-#   Remove all but `master` parameters to cppcheck (and remove second
-#   invocation) once all warnings of cppcheck have been taken care of
-#   in master.
-    - ./dist/tools/cppcheck/check.sh master --diff-filter=MR --error-exitcode=0 || exit
-    - ./dist/tools/cppcheck/check.sh master --diff-filter=AC || exit
-
-    - make -C ./tests/unittests all test BOARD=native || exit
-# TODO:
-#   Reenable once https://github.com/RIOT-OS/RIOT/issues/2300 is
-#   resolved:
-#   - make -C ./tests/unittests all test BOARD=qemu-i386 || exit
-
-    - ./dist/tools/compile_test/compile_test.py
-    - ./dist/tools/pr_check/pr_check.sh riot/master
+    - ./dist/tools/travis-scripts/build_and_test.sh
 
 notifications:
     email: false

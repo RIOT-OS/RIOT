@@ -1,9 +1,3 @@
-ifneq (,$(filter pkt,$(USEMODULE)))
-    DIRS += net/crosslayer/pkt
-endif
-ifneq (,$(filter pktbuf,$(USEMODULE)))
-    DIRS += net/crosslayer/pktbuf
-endif
 ifneq (,$(filter pnet,$(USEMODULE)))
     DIRS += posix/pnet
 endif
@@ -68,11 +62,53 @@ endif
 ifneq (,$(filter oneway_malloc,$(USEMODULE)))
     DIRS += oneway-malloc
 endif
+ifneq (,$(filter ng_ipv6_addr,$(USEMODULE)))
+    DIRS += net/network_layer/ng_ipv6/addr
+endif
+ifneq (,$(filter ng_ipv6_hdr,$(USEMODULE)))
+    DIRS += net/network_layer/ng_ipv6/hdr
+endif
+ifneq (,$(filter ng_ipv6_nc,$(USEMODULE)))
+    DIRS += net/network_layer/ng_ipv6/nc
+endif
+ifneq (,$(filter ng_ipv6_netif,$(USEMODULE)))
+    DIRS += net/network_layer/ng_ipv6/netif
+endif
+ifneq (,$(filter ng_inet_csum,$(USEMODULE)))
+    DIRS += net/crosslayer/ng_inet_csum
+endif
+ifneq (,$(filter ng_netapi,$(USEMODULE)))
+    DIRS += net/crosslayer/ng_netapi
+endif
+ifneq (,$(filter ng_netif,$(USEMODULE)))
+    DIRS += net/crosslayer/ng_netif
+endif
+ifneq (,$(filter ng_netreg,$(USEMODULE)))
+    DIRS += net/crosslayer/ng_netreg
+endif
+ifneq (,$(filter ng_nomac,$(USEMODULE)))
+    DIRS += net/link_layer/ng_nomac
+endif
+ifneq (,$(filter ng_pktbuf,$(USEMODULE)))
+    DIRS += net/crosslayer/ng_pktbuf
+endif
 ifneq (,$(filter netapi,$(USEMODULE)))
     DIRS += net/crosslayer/netapi
 endif
 ifneq (,$(filter trickle,$(USEMODULE)))
     DIRS += trickle
+endif
+ifneq (,$(filter nhdp,$(USEMODULE)))
+    DIRS += net/routing/nhdp
+endif
+ifneq (,$(filter ng_nomac,$(USEMODULE)))
+    DIRS += net/link_layer/ng_nomac
+endif
+ifneq (,$(filter ng_pktdump,$(USEMODULE)))
+    DIRS += net/crosslayer/ng_pktdump
+endif
+ifneq (,$(filter fib,$(USEMODULE)))
+    DIRS += net/network_layer/fib
 endif
 
 DIRS += $(dir $(wildcard $(addsuffix /Makefile, ${USEMODULE})))

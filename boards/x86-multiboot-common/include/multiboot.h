@@ -1,4 +1,3 @@
-/* multiboot.h - the header for Multiboot */
 /* Copyright (C) 1999, 2001  Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
@@ -16,12 +15,18 @@
    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.  */
 
 /**
- * Architecture specific definitions for multiboot enabled kernels.
+ * @defgroup    boards_x86-multiboot i586 multiboot common
+ * @ingroup     boards
+ * @brief       Common files for multiboot enabled kernels
  *
  * @ingroup x86-multiboot
  * @{
  * @file
+ * @brief       Architecture specific definitions for multiboot enabled kernels
  */
+
+#ifndef MULTIBOOT_H
+#define MULTIBOOT_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -129,4 +134,5 @@ enum multiboot_info_flags {
 }
 #endif
 
+#endif /* MULTIBOOT_H */
 /** @} */

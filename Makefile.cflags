@@ -41,3 +41,18 @@ endif
 
 # Unwanted flags for c++
 CXXUWFLAGS += -std=%
+
+ifeq ($(LTO),yes)
+  LTOFLAGS = -flto -ffat-lto-objects
+  CFLAGS += ${LTOFLAGS}
+  LINKFLAGS += ${LTOFLAGS}
+endif
+
+# Forbid common symbols to prevent accidental aliasing.
+CFLAGS += -fno-common
+
+# Default ARFLAGS for platforms which do not specify it.
+# Note: make by default provides ARFLAGS=rv which we want to override
+ifeq ($(origin ARFLAGS),default)
+  ARFLAGS = rcs
+endif
