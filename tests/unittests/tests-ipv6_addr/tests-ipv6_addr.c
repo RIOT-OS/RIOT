@@ -812,13 +812,13 @@ static void test_ipv6_addr_from_str__success5(void)
 static void test_ipv6_addr_from_str__success6(void)
 {
     ng_ipv6_addr_t a = { {
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-            0x00, 0x00, 0xff, 0xff, 192, 168, 0, 1
+            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+            0xff, 0xff, 0xff, 0xff, 255, 255, 255, 255
         }
     };
     ng_ipv6_addr_t result;
 
-    TEST_ASSERT_NOT_NULL(ng_ipv6_addr_from_str(&result, "::ffff:192.168.0.1"));
+    TEST_ASSERT_NOT_NULL(ng_ipv6_addr_from_str(&result, "ffff:ffff:ffff:ffff:ffff:ffff:255.255.255.255"));
     TEST_ASSERT(ng_ipv6_addr_equal(&a, &result));
 }
 
