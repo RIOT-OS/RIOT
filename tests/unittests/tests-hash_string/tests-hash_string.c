@@ -6,14 +6,13 @@
  * directory for more details.
  */
 
-#include <limits.h>
 #include "tests-hash_string.h"
 #include "hash_string.h"
 
 static void test_hash_value(void)
 {
     TEST_ASSERT_EQUAL_INT(177621, hash_string("0");
-    TEST_ASSERT_EQUAL_INT(ULLONG_MAX, hash_string("0123456789abcde-0123456789abcde-0123456789abcde-0123456789abcde-"));
+    TEST_ASSERT_EQUAL_INT(6555485335635392041, hash_string("0123456789abcde-0123456789abcde-0123456789abcde-0123456789abcde-"));
     TEST_ASSERT_EQUAL_INT(210674770391, hash_string("Frank jagt im komplett verwahrlosten Taxi quer durch Bayern"));
     TEST_ASSERT_EQUAL_INT(249811328611268156, hash_string("12A5B6cd_"));
     TEST_ASSERT_EQUAL_INT(5381, hash_string(""));
