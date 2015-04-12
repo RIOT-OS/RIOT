@@ -5,16 +5,15 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  */
-
 /**
+ * @defgroup etx_beaconing
  * @ingroup     rpl
  * @{
- * @file        etx_beaconing.h
+ * @file
  *
  * Header-file, which includes all constants and functions used for ETX-based beaconing.
  *
  * @author  Stephan Arndt <arndtste@zedat.fu-berlin.de>
- * @}
  */
 
 #ifndef ETX_BEACONING_H_
@@ -26,43 +25,58 @@
 extern "C" {
 #endif
 
-//[option|length|ipaddr.|packetcount] with up to 15 ipaddr|packetcount pairs
-// 1 Byte 1 Byte  1 Byte  1 Byte
+/**
+ * @brief [option|length|ipaddr|packetcount] with up to 15 ipaddr|packetcount pairs
+ *        | option | length | ipaddr  | packetcount |
+ *        | ----:  | :----: | :----:  | :----:      |
+ *        | 1 Byte | 1 Byte | 1 Byte  | 1 Byte      |
+ */
 #define ETX_BUF_SIZE   (32)
-
 #define ETX_RCV_QUEUE_SIZE     (128)
-
-/*
- * Default 40, should be enough to get all messages for neighbors.
- * In my tests, the maximum count of neighbors was around 30-something
+/**
+ * @brief defining the number of neighbours
  */
 #if ENABLE_DEBUG
-#define ETX_MAX_CANDIDATE_NEIGHBORS (15) //Stacksizes are huge in debug mode, so memory is rare
+/* Defines the maximum number of neighbours in debug mode, we fix it at 15 */
+#define ETX_MAX_CANDIDATE_NEIGHBORS (15)
 #else
+/* Defines the maximum number of neighbours in normal mode default is 40 */
 #define ETX_MAX_CANDIDATE_NEIGHBORS (40)
 #endif
-//ETX Interval parameters
 #define MS  (1000)
 
-/*
- * ETX_INTERVAL
+/**
+ * @{
+ * @name ETX Interval parameters
+ */
+/** @brief Defines the ETX_INTERVAL Given in ms, the default is 1 second
  *
- * Given in ms, the default is 1 second.
  * Should be divisible through 2 (For ETX_DEF_JIT_CORRECT)
  * and 5 (For ETX_MAX_JITTER) unless those values are adjusted too.
  */
 #define ETX_INTERVAL        (1000)
-#define ETX_WINDOW          (10)                    //10 is the default value
-#define ETX_BEST_CANDIDATES (15)                    //Sent only 15 candidates in a beaconing packet
-#define ETX_TUPLE_SIZE      (2)                     //1 Byte for Addr, 1 Byte for packets rec.
-#define ETX_PKT_REC_OFFSET  (ETX_TUPLE_SIZE - 1)    //Offset in a tuple of (addr,pkt_rec), will always be the last byte
-#define ETX_IPV6_LAST_BYTE  (15)                    //The last byte for an ipv6 address
-#define ETX_MAX_JITTER      (ETX_INTERVAL / 5)      //The default value is 20% of ETX_INTERVAL
-#define ETX_JITTER_MOD      (ETX_MAX_JITTER + 1)    //The modulo value for jitter computation
-#define ETX_DEF_JIT_CORRECT (ETX_MAX_JITTER / 2)    //Default Jitter correction value (normally ETX_MAX_JITTER / 2)
-#define ETX_CLOCK_ADJUST    (52500)                 //Adjustment for clockthread computations to stay close/near ETX_INTERVAL
-
-/*
+/** @brief Defines the ETX_WINDOW , 10 is the default value */
+#define ETX_WINDOW          (10)
+/** @brief Defines the best candidates to send the beaconing packet */
+#define ETX_BEST_CANDIDATES (15)
+/** @brief Defines the Tuple size , 1 Byte for Addr, 1 Byte for packets rec */
+#define ETX_TUPLE_SIZE      (2)
+/** @brief Defines the Offset in a tuple of (addr,pkt_rec) */
+#define ETX_PKT_REC_OFFSET  (ETX_TUPLE_SIZE - 1)
+/**@brief Defines the last byte for an ipv6 address */
+#define ETX_IPV6_LAST_BYTE  (15)
+/** @brief Defines the maximum jitter , default value is 20% of ETX_INTERVAL */
+#define ETX_MAX_JITTER      (ETX_INTERVAL / 5)
+/** @brief Defines the modulo value for jitter computation */
+#define ETX_JITTER_MOD      (ETX_MAX_JITTER + 1)
+/** @brief Defines the Default Jitter correction value (normally ETX_MAX_JITTER / 2) */
+#define ETX_DEF_JIT_CORRECT (ETX_MAX_JITTER / 2)
+/** @brief Defines the Adjustment for clockthread computations to stay close/near ETX_INTERVAL */
+#define ETX_CLOCK_ADJUST    (52500)
+/** @} */
+/**
+ * @brief contents of ETX beaconing packet
+ *
  * The ETX beaconing packet consists of:
  *
  *      0                   1                   2
@@ -78,41 +92,71 @@ extern "C" {
  *                  denoting the amount of packets received from that IP address
  *
  * We only need 1 octet for the ip address since RPL for now only allows for
- * 255 different addresses.
+ * 255 different addresses
  *
  * If the length of this packet says 0, it has received no other beaconing
- * packets itself so far.
+ * packets itself so far
  *
  * The packet is always 32bytes long, but may contain varying amounts of
- * information.
- * The information processed shall not exceed the value set in Option Length.
+ * information
+ * The information processed shall not exceed the value set in Option Length
  */
 typedef struct __attribute__((packed)) etx_probe_t {
-    uint8_t code;
-    uint8_t length;
-    uint8_t data[30];
+    uint8_t code;                       /**< Option type */
+    uint8_t length;                     /**< Option Length*/
+    uint8_t data[30];                   /**< Option Data */
 } etx_probe_t;
-
+/**
+ * @brief etx neighbour data structure
+ */
 typedef struct etx_neighbor_t {
-    ipv6_addr_t addr;           //The address of this node
-    uint8_t     tx_cur_round;   //The indicator for receiving a packet from this candidate this round
-    uint8_t     packets_tx[ETX_WINDOW]; //The packets this node has transmitted TO ME
-    uint8_t     packets_rx;     //The packets this node has received FROM ME
-    double      cur_etx;        //The currently calculated ETX-value
-    uint8_t     used;           //The indicator if this node is active or not
+    /** The address of this node */
+    ipv6_addr_t addr;
+    /** The indicator for receiving a packet from this candidate this round */
+    uint8_t     tx_cur_round;
+    /** The packets this node has transmitted TO ME */
+    uint8_t     packets_tx[ETX_WINDOW];
+    /** The packets this node has received FROM ME */
+    uint8_t     packets_rx;
+    /** The currently calculated ETX-value */
+    double      cur_etx;
+    /** The indicator if this node is active or not */
+    uint8_t     used;
 } etx_neighbor_t;
 
-//prototypes
+/**
+ * @brief initializes the module
+ * In this function we pass the address of our node as the parameter
+ * @param[in] address a ipv6_addr_t pointer
+ */
 void etx_init_beaconing(ipv6_addr_t *address);
+
+/**
+ * @brief calculates the ETX-value
+ * we need to keep track of the ETX values of other nodes without
+ * needing them to be in our parent array, so we have another array in
+ * which we put all necessary info for up to ETX_MAX_CANDIDATE_NEIHGBORS
+ * candidates.Here we pass the address of the neighbour node .
+ * @param[in] address a ipv6_addr_t pointer
+ * @return the calculated ETX-value
+ */
 double etx_get_metric(ipv6_addr_t *address);
+
+/**
+ * @brief Updates the current ETX value of a candidate
+ * @param[inout] neighbour an etx_neighbour_t pointer
+ */
 void etx_update(etx_neighbor_t *neighbor);
 
-#define ETX_PKT_OPT         (0)     //Position of Option-Type-Byte
-#define ETX_PKT_OPTVAL      (0x20)  //Non-standard way of saying this is an ETX-Packet.
-#define ETX_PKT_LEN         (1)     //Position of Length-Byte
-#define ETX_DATA_MAXLEN     (30)    //max length of the data
-#define ETX_PKT_HDR_LEN     (2)     //Option type + Length (1 Byte each)
-#define ETX_PKT_DATA        (2)     //Begin of Data Bytes
+#define ETX_PKT_OPT         (0)     /**< Position of Option-Type-Byte */
+#define ETX_PKT_OPTVAL      (0x20)  /**< Non-standard way of saying this is an ETX-Packet. */
+#define ETX_PKT_LEN         (1)     /**< Position of Length-Byte */
+#define ETX_DATA_MAXLEN     (30)    /**< max length of the data */
+#define ETX_PKT_HDR_LEN     (2)     /**< Option type + Length (1 Byte each) */
+#define ETX_PKT_DATA        (2)     /**< Begin of Data Bytes */
+
+
+/** @} */
 
 #ifdef __cplusplus
 }
