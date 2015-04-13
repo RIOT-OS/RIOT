@@ -1,6 +1,12 @@
 FEATURES_PROVIDED += cpp
+<<<<<<< HEAD
+FEATURES_PROVIDED += periph_uart 
+FEATURES_PROVIDED += periph_gpio 
+FEATURES_PROVIDED += periph_spi 
+=======
 FEATURES_PROVIDED += periph_uart
 FEATURES_PROVIDED += periph_gpio
 FEATURES_PROVIDED += periph_spi
+>>>>>>> upstream/master
 FEATURES_PROVIDED += periph_random
 FEATURES_MCU_GROUP = cortex_m3_1

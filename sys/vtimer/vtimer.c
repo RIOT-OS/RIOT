@@ -390,7 +390,11 @@ void vtimer_remove(vtimer_t *t)
 
 }
 
+<<<<<<< HEAD
+ vtimer_set_msg(vtimer_t *t, timex_t interval, kernel_pid_t pid, uint16_t type, void *ptr)
+=======
 void vtimer_set_msg(vtimer_t *t, timex_t interval, kernel_pid_t pid, uint16_t type, void *ptr)
+>>>>>>> upstream/master
 {
     t->action = vtimer_callback_msg;
     t->type = type;
