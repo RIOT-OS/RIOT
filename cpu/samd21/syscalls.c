@@ -149,21 +149,21 @@ pid_t _getpid(void)
     return (pid_t) sched_active_pid;
 }
 
-/**
- * @brief Send a signal to a given thread
- *
- * @param r     TODO
- * @param pid   TODO
- * @param sig   TODO
- *
- * @return      TODO
- */
-__attribute__ ((weak))
-int _kill_r(struct _reent *r, pid_t pid, int sig)
-{
-    r->_errno = ESRCH;                      /* not implemented yet */
-    return -1;
-}
+// /**
+//  * @brief Send a signal to a given thread
+//  *
+//  * @param r     TODO
+//  * @param pid   TODO
+//  * @param sig   TODO
+//  *
+//  * @return      TODO
+//  */
+// __attribute__ ((weak))
+// int _kill(struct _reent *r, pid_t pid, int sig)
+// {
+//     r->_errno = ESRCH;                      /* not implemented yet */
+//     return -1;
+// }
 
 /**
  * @brief Open a file
@@ -229,7 +229,7 @@ int _write_r(struct _reent *r, int fd, const void *data, unsigned int count)
 {
     char *c = (char*)data;
     for (int i = 0; i < count; i++) {
-        uart_write_blocking(UART_0, c[i]);
+        uart_write_blocking(STDIO, c[i]);
     }
     return count;
 }

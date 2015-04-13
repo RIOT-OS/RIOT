@@ -45,7 +45,7 @@ extern "C" {
 #define MULTIHOP_HOPLIMIT           (64)
 
 #define SIXLOWIP_MAX_REGISTERED     (4)
-#define IP_PROCESS_STACKSIZE        (KERNEL_CONF_STACKSIZE_MAIN)
+#define IP_PROCESS_STACKSIZE        (1024)
 
 /* extern variables */
 extern uint8_t ipv6_ext_hdr_len;
@@ -65,7 +65,6 @@ extern int srh_handler_pid;
 /* buffer */
 extern uint8_t sixlowpan_buffer[BUFFER_SIZE];
 extern char ip_process_buf[IP_PROCESS_STACKSIZE];
-
 extern kernel_pid_t sixlowip_reg[SIXLOWIP_MAX_REGISTERED];
 
 typedef struct __attribute__((packed))

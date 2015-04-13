@@ -11,7 +11,7 @@ export CC = $(PREFIX)gcc
 export CXX = $(PREFIX)g++
 export AR = $(PREFIX)ar
 export AS = $(PREFIX)as
-export LINK = $(PREFIX)gcc
+export LINK = $(PREFIX)g++
 export SIZE = $(PREFIX)size
 export OBJCOPY = $(PREFIX)objcopy
 export DBG = $(PREFIX)gdb
@@ -25,8 +25,10 @@ export RESET = $(RIOTBASE)/dist/tools/openocd/openocd.sh
 export CPU_USAGE = -mcpu=cortex-m0plus
 FPU_USAGE =
 export CFLAGS += -ggdb -g3 -std=gnu99 -O0 -Wall -Wstrict-prototypes $(CPU_USAGE) $(FPU_USAGE) -mlittle-endian -mthumb -mno-thumb-interwork -nostartfiles
+#remember to change to little endian
+export CFLAGS += -std=gnu99 -O0 -Wall -Wstrict-prototypes $(CPU_USAGE) $(FPU_USAGE) -mlittle-endian -mthumb -mthumb-interwork -nostartfiles -mtune=cortex-m0plus
 export CFLAGS += -ffunction-sections -fdata-sections -fno-builtin
-export ASFLAGS += -ggdb -g3 $(CPU_USAGE) $(FPU_USAGE) -mlittle-endian
+export ASFLAGS += $(CPU_USAGE) $(FPU_USAGE) -mlittle-endian
 export LINKFLAGS += -g3 -ggdb -std=gnu99 $(CPU_USAGE) $(FPU_USAGE) -mlittle-endian -static -lgcc -mthumb -mno-thumb-interwork -nostartfiles
 # linkerscript specified in cpu/Makefile.include
 export LINKFLAGS += -T$(LINKERSCRIPT)

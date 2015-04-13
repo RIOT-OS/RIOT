@@ -32,9 +32,9 @@
 #include "bordermultiplex.h"
 #include "flowcontrol.h"
 #include "border.h"
-#include "ip.h"
-#include "icmp.h"
-#include "serialnumber.h"
+#include "../ip.h"
+#include "../icmp.h"
+#include "../serialnumber.h"
 
 #include "net_help.h"
 
@@ -69,12 +69,12 @@ uint8_t *get_serial_in_buffer(int offset)
     return &(serial_in_buf[offset]);
 }
 
-kernel_pid_t border_get_serial_reader()
+kernel_pid_t border_get_serial_reader(void)
 {
     return serial_reader_pid;
 }
 
-void serial_reader_f(void)
+void *serial_reader_f(void *arg)
 {
     kernel_pid_t main_pid;
     msg_t m;
@@ -129,13 +129,22 @@ int sixlowpan_lowpan_border_init(int if_id)
     uint8_t abr_addr_initialized = 0;
 
     serial_reader_pid = thread_create(
-                            serial_reader_stack, READER_STACK_SIZE,
-                            PRIORITY_MAIN - 1, CREATE_STACKTEST,
-                            serial_reader_f, "serial_reader");
-    ip_process_pid = thread_create(ip_process_buf, IP_PROCESS_STACKSIZE,
-                                   PRIORITY_MAIN - 1, CREATE_STACKTEST,
-                                   border_process_lowpan,
-                                   "border_process_lowpan");
+                            serial_reader_stack, 
+                            READER_STACK_SIZE,
+                            serial_reader_f, NULL,"serial_reader");
+                            CREATE_STACKTEST,
+                            serial_reader_f, 
+                                   border_process_lowpan, NULL,
+                            "serial_reader"
+                            );
+    ip_process_pid = thread_create(
+                            ip_process_buf, 
+                            IP_PROCESS_STACKSIZE,
+                            PRIORITY_MAIN - 1,
+                            CREATE_STACKTEST,
+                            NULL,
+                            "border_process_lowpan"
+                            );
 
     if (ip_process_pid != KERNEL_PID_UNDEF) {
         return 0;
@@ -167,7 +176,7 @@ int sixlowpan_lowpan_border_init(int if_id)
     return 1;
 }
 
-void border_process_lowpan(void)
+void *border_process_lowpan(void *arg)
 {
     msg_t m;
 

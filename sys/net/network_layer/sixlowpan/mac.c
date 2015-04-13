@@ -39,7 +39,7 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-#define RADIO_STACK_SIZE            (KERNEL_CONF_STACKSIZE_MAIN)
+#define RADIO_STACK_SIZE            (512+128)
 #define RADIO_RCV_BUF_SIZE          (64)
 #define RADIO_SENDING_DELAY         (1000)
 
@@ -118,10 +118,19 @@ static void *recv_ieee802154_frame(void *arg)
 
             DEBUG("\n");
 
-            DEBUG("Payload:\n");
+            DEBUG("Payload in hex:\n");
 
             for (uint8_t i = 0; i < frame.payload_len; i++) {
                 printf("%02x ", frame.payload[i]);
+
+                if (!((i + 1) % 16) || i == frame.payload_len - 1) {
+                    printf("\n");
+                }
+            }
+            DEBUG("Payload filtered in ascii:\n");
+
+            for (uint8_t i = 35; i < frame.payload_len; i++) {
+                printf("%c", (char)frame.payload[i]);
 
                 if (!((i + 1) % 16) || i == frame.payload_len - 1) {
                     printf("\n");
@@ -274,6 +283,7 @@ int sixlowpan_mac_send_data(int if_id,
                             const void *payload,
                             uint8_t payload_len, uint8_t mcast)
 {
+
     if (mcast) {
         return net_if_send_packet_broadcast(IEEE_802154_SHORT_ADDR_M,
                                             payload,
@@ -285,11 +295,11 @@ int sixlowpan_mac_send_data(int if_id,
                                            payload, (size_t)payload_len);
         }
         else if (dest_len == 2) {
-            return net_if_send_packet(if_id, NTOHS((*((net_if_eui64_t*)dest)).uint16[0]),
+            uint16_t destination = ((net_if_eui64_t*)dest)->uint16[0];
+            return net_if_send_packet(if_id, (destination),
                                       payload, (size_t)payload_len);
         }
-    }
-
+    }    
     return -1;
 }
 
@@ -300,6 +310,7 @@ int sixlowpan_mac_send_ieee802154_frame(int if_id,
 {
     if (net_if_get_interface(if_id) &&
         net_if_get_interface(if_id)->transceivers & IEEE802154_TRANSCEIVER) {
+        
         return sixlowpan_mac_send_data(if_id, dest, dest_len, payload,
                                        payload_len, mcast);
     }

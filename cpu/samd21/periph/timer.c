@@ -161,7 +161,12 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
     case TIMER_UNDEFINED:
     default:
         return -1;
-    }
+}
+
+
+
+
+
 
     return 1;
 }
@@ -207,6 +212,9 @@ int timer_clear(tim_t dev, int channel)
         return -1;
     }
 
+    /* disable the channels interrupt */
+
+
     return 1;
 }
 
@@ -220,6 +228,7 @@ unsigned int timer_read(tim_t dev)
         while (TIMER_0_DEV.STATUS.bit.SYNCBUSY);
         return TIMER_0_DEV.COUNT.reg;
         break;
+        break;
 #endif
 #if TIMER_1_EN
     case TIMER_1:
@@ -227,6 +236,7 @@ unsigned int timer_read(tim_t dev)
         TIMER_1_DEV.READREQ.reg = TC_READREQ_RREQ | TC_READREQ_ADDR(0x10);
         while (TIMER_1_DEV.STATUS.bit.SYNCBUSY);
         return TIMER_1_DEV.COUNT.reg;
+        break;
         break;
 #endif
     default:
@@ -336,6 +346,7 @@ void TIMER_0_ISR(void)
             config[TIMER_0].cb(0);
         }
     }
+
     else if (TIMER_0_DEV.INTFLAG.bit.MC1 && TIMER_0_DEV.INTENSET.bit.MC1) {
         if(config[TIMER_0].cb) {
             TIMER_0_DEV.INTFLAG.bit.MC1 = 1;
@@ -367,7 +378,6 @@ void TIMER_1_ISR(void)
             TIMER_1_DEV.INTENCLR.reg = TC_INTENCLR_MC1;
             config[TIMER_1].cb(1);
         }
-
     }
 
     if (sched_context_switch_request) {

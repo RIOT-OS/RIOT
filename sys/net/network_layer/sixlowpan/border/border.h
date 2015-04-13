@@ -26,7 +26,7 @@
 #include "mutex.h"
 #include "transceiver.h"
 
-#include "ip.h"
+#include "sixlowpan/ip.h"
 #include "semaphore.h"
 
 #ifdef __cplusplus

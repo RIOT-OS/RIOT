@@ -35,7 +35,6 @@
 
 #include "sixlowpan.h"
 #include "net_help.h"
-
 #define ENABLE_DEBUG (0)
 #if ENABLE_DEBUG
 static char addr_str[IPV6_MAX_ADDR_STR_LEN];
@@ -82,11 +81,15 @@ uint8_t rpl_init(int if_id, ipv6_addr_t *address)
     rpl_max_routing_entries = RPL_MAX_ROUTING_ENTRIES;
 #endif
 
+    //thread_print_all();
+
     rpl_process_pid = thread_create(rpl_process_buf, RPL_PROCESS_STACKSIZE,
                                     PRIORITY_MAIN - 1, CREATE_STACKTEST,
                                     rpl_process, NULL, "rpl_process");
 
     sixlowpan_lowpan_init_interface(if_id);
+    DEBUG("sixlowpan_lowpan_init_interface \n");
+    
     ipv6_register_rpl_handler(rpl_process_pid);
 
     if (address) {

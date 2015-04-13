@@ -82,17 +82,20 @@ int ipv6_send_packet(ipv6_hdr_t *packet, ipv6_addr_t *next_hop)
         && ndp_addr_is_on_link(&packet->destaddr)) {
         /* not multicast, on-link */
         nce = ndp_get_ll_address(&packet->destaddr);
-
+        DEBUG("ipv6 send packet: after get ll adr\n");
         if (nce == NULL
             || sixlowpan_lowpan_sendto(nce->if_id, &nce->lladdr,
                                        nce->lladdr_len, (uint8_t *) packet, length) < 0) {
+            DEBUG("ipv6 send packet: before lowpan_sendto\n");
             /* XXX: this is wrong, but until ND does work correctly,
              *      this is the only way (aka the old way)*/
+
             uint16_t raddr = NTOHS(packet->destaddr.uint16[7]);
             sixlowpan_lowpan_sendto(0, &raddr, 2, (uint8_t *) packet, length);
+
             /* return -1; */
         }
-
+        DEBUG("ipv6 send packet: before return length\n");
         return length;
     }
     else {
@@ -145,7 +148,6 @@ int ipv6_send_packet(ipv6_hdr_t *packet, ipv6_addr_t *next_hop)
                 /* return -1; */
             }
         }
-
         return length;
     }
 }
@@ -195,9 +197,10 @@ int ipv6_sendto(const ipv6_addr_t *dest, uint8_t next_header,
     ipv6_buf->nextheader = next_header;
     ipv6_buf->hoplimit = MULTIHOP_HOPLIMIT;
     ipv6_buf->length = HTONS(payload_length);
-
+    //printf("IPV6_sendto payload length: %u\n", payload_length);
     memcpy(&(ipv6_buf->destaddr), dest, 16);
     memcpy(p_ptr, payload, payload_length);
+    //printf("IPV6_sendto  before");
     return ipv6_send_packet(ipv6_buf, next_hop);
 }
 
@@ -800,6 +803,7 @@ void set_remaining_time(timex_t *t, uint32_t time)
 }
 
 int ipv6_init_as_router(void)
+
 {
     ipv6_addr_t addr;
     int if_id = -1;

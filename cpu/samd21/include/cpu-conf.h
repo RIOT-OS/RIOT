@@ -24,19 +24,24 @@
 extern "C" {
 #endif
 
+
 /**
  * @name Kernel configuration
  *
  * TODO: measure and adjust for the cortex-m0
  * @{
  */
-#define KERNEL_CONF_STACKSIZE_PRINTF    (512)
+#define KERNEL_CONF_STACKSIZE_PRINTF    (256/2)
 
 #ifndef KERNEL_CONF_STACKSIZE_DEFAULT
-#define KERNEL_CONF_STACKSIZE_DEFAULT   (1024)
+#define KERNEL_CONF_STACKSIZE_DEFAULT   (1024+512) //1024
 #endif
 
 #define KERNEL_CONF_STACKSIZE_IDLE      (256)
+
+//#define RT_STACKSIZE     (512)
+
+
 /** @} */
 
 /**
@@ -46,15 +51,35 @@ extern "C" {
  * @{
  */
 #ifndef UART0_BUFSIZE
-#define UART0_BUFSIZE                   (128)
+#define UART0_BUFSIZE                   (256)//(256)
 #endif
 /** @} */
 
 #define TRANSCEIVER_BUFFER_SIZE (3)
-#ifdef __cplusplus
-}
-#endif
 
+
+/**
+ * @name CPUID_ID_LEN length of cpuid in bytes
+ * @{
+ */
+#define CPUID_ID_LEN (16) /* 128 bits long, 16 bytes long */
+/** @} */
+
+/*
+ * @name Definition of different panic modes
+ */
+typedef enum {
+    HARD_FAULT,
+    WATCHDOG,
+    BUS_FAULT,
+    USAGE_FAULT,
+    DUMMY_HANDLER
+} panic_t;
+
+
+#ifdef __cplusplus
+} /* end extern "C" */
+#endif
 /**
  * @brief CPUID_ID_LEN length of cpuid in bytes
  */

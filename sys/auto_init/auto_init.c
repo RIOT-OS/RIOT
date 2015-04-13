@@ -134,7 +134,6 @@ void auto_init_net_if(void)
         transceiver_init(transceivers);
         transceiver_start();
         int iface = net_if_init_interface(0, transceivers);
-
 #if CPUID_ID_LEN && defined(MODULE_HASHES)
         net_if_eui64_t eui64;
         uint32_t hash_h = djb2_hash(cpuid, CPUID_ID_LEN / 2);
@@ -191,7 +190,6 @@ void auto_init_net_if(void)
             DEBUG("Auto init source address mode to long on interface %d\n",
                   iface);
         }
-
 
         if (net_if_get_pan_id(iface) <= 0) {
             DEBUG("Auto init PAN ID on interface %d to 0x%04x\n", iface, CONF_PAN_ID);

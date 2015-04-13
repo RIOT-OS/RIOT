@@ -39,7 +39,7 @@ extern "C" {
 #if ENABLE_DEBUG
 #define ETX_MAX_CANDIDATE_NEIGHBORS (15) //Stacksizes are huge in debug mode, so memory is rare
 #else
-#define ETX_MAX_CANDIDATE_NEIGHBORS (40)
+#define ETX_MAX_CANDIDATE_NEIGHBORS (5)
 #endif
 //ETX Interval parameters
 #define MS  (1000)

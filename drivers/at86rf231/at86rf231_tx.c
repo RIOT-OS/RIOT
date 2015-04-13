@@ -180,8 +180,9 @@ netdev_802154_tx_status_t at86rf231_transmit_tx_buf(netdev_t *dev)
 
     uint8_t trac_status;
     do {
+        printf("%s\n", "at86rf231_transmit_tx_buf while hangs here!");
         trac_status = at86rf231_reg_read(AT86RF231_REG__TRX_STATE);
-        trac_status &= AT86RF231_TRX_STATE_MASK__TRAC;
+        trac_status &= AT86RF231_TRX_STATE_MASK__TRAC;        
     }
     while (trac_status == AT86RF231_TRX_STATE__TRAC_INVALID);
 
@@ -270,7 +271,6 @@ int16_t at86rf231_load(at86rf231_packet_t *packet)
     /* load packet into fifo */
     at86rf231_write_fifo(pkt, packet->length);
     DEBUG("at86rf231: Wrote to FIFO\n");
-
     return packet->length;
 }
 

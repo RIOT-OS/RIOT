@@ -46,8 +46,7 @@
  * @def     HWTIMER_SPEED
  */
 #ifndef HWTIMER_SPEED
-#warning "HWTIMER_SPEED undefined. Set HWTIMER_SPEED to the number of ticks \
-per second for the current architecture."
+#warning "HWTIMER_SPEED undefined. Set HWTIMER_SPEED to the number of ticks per second for the current architecture."
 #endif
 
 /**
@@ -108,8 +107,7 @@ per second for the current architecture."
  * @def     HWTIMER_MAXTICKS
  */
 #ifndef HWTIMER_MAXTICKS
-#warning "HWTIMER_MAXTICKS undefined. Set HWTIMER_MAXTICKS to the maximum \
-number of ticks countable on the current architecture."
+#warning "HWTIMER_MAXTICKS undefined. Set HWTIMER_MAXTICKS to the maximum number of ticks countable on the current architecture."
 #endif
 
 /**

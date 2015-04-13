@@ -29,6 +29,8 @@
 #include "posix_io.h"
 #include "irq.h"
 
+#define ENABLE_DEBUG (0)
+#include "debug.h" 
 #include "board_uart0.h"
 
 #ifndef UART0_BUFSIZE
@@ -36,7 +38,7 @@
 #endif
 
 /* increase when ENABLE_DEBUG in chardev_thread is set to 1! */
-#define UART0_STACKSIZE     (KERNEL_CONF_STACKSIZE_DEFAULT)
+#define UART0_STACKSIZE     (KERNEL_CONF_STACKSIZE_DEFAULT - 1024)
 
 ringbuffer_t uart0_ringbuffer;
 kernel_pid_t uart0_handler_pid = KERNEL_PID_UNDEF;

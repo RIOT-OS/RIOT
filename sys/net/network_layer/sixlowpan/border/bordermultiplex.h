@@ -22,7 +22,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "ip.h"
+#include "../ip.h"
 
 #ifdef __cplusplus
 extern "C" {

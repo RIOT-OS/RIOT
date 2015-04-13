@@ -49,7 +49,7 @@
 
 #define SND_BUFFER_SIZE     (100)
 #define RCV_BUFFER_SIZE     (64)
-#define RADIO_STACK_SIZE    (KERNEL_CONF_STACKSIZE_MAIN)
+#define RADIO_STACK_SIZE    (1024)
 
 #ifdef MODULE_TRANSCEIVER
 
@@ -65,7 +65,6 @@ void *radio(void *arg)
 #if MODULE_AT86RF231 || MODULE_CC2420 || MODULE_MC1322X
     ieee802154_packet_t *p;
 #else
-    radio_packet_t *p;
     radio_packet_length_t i;
 #endif
 
@@ -89,17 +88,17 @@ void *radio(void *arg)
 
             p->processing--;
 #else
-            p = (radio_packet_t *) m.content.ptr;
 
             printf("Got radio packet:\n");
             printf("\tLength:\t%u\n", p->length);
-            printf("\tSrc:\t%u\n", p->src);
-            printf("\tDst:\t%u\n", p->dst);
+            printf("\tSrc:\t%u\n", p->frame.src_pan_id);
+            printf("\tDst:\t%u\n", p->frame.dest_pan_id);
             printf("\tLQI:\t%u\n", p->lqi);
             printf("\tRSSI:\t%u\n", p->rssi);
+            printf("\tPLEN:\t%u\n", p->frame.payload_len);
 
-            for (i = 0; i < p->length; i++) {
-                printf("%02X ", p->data[i]);
+            for (i = 0; i < p->frame.payload_len; i++) {
+                printf("%c", p->frame.payload[i]);
             }
 
             p->processing--;

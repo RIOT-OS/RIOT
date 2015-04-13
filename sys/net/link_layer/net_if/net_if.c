@@ -263,7 +263,6 @@ uint32_t net_if_transceiver_get_set_handler(int if_id, uint16_t op_type,
     msg.content.ptr = (char *)&tcmd;
     msg.type = op_type;
     msg_send_receive(&msg, &msg, transceiver_pid);
-
     return msg.content.value;
 }
 
@@ -344,15 +343,13 @@ int net_if_send_packet(int if_id, uint16_t target, const void *payload,
         p.dst = target;
         response = net_if_transceiver_get_set_handler(if_id, SND_PKT, (void *)&p);
     }
-
-
     return (response > payload_len) ? (int)payload_len : (int)response;
 }
 
 int net_if_send_packet_long(int if_id, net_if_eui64_t *target,
                             const void *payload, size_t payload_len)
 {
-    DEBUG("net_if_send_packet: if_id = %d, target = %016" PRIx64 ", "
+    DEBUG("net_if_send_packet_long: if_id = %d, target = %016" PRIx64 ", "
           "payload = %p, payload_len = %d\n", if_id, NTOHLL(target->uint64), payload,
           payload_len);
     uint32_t response;
@@ -406,7 +403,6 @@ int net_if_register(int if_id, kernel_pid_t pid)
 int net_if_get_eui64(net_if_eui64_t *eui64, int if_id, int force_generation)
 {
     uint64_t tmp;
-
     if (if_id < 0 || if_id >= NET_IF_MAX || !interfaces[if_id].initialized) {
         DEBUG("Get EUI-64: No interface initialized with ID %d.\n", if_id);
         return 0;

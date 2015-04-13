@@ -39,6 +39,7 @@
 #ifdef MODULE_SIXLOWBORDER
 #include "border/border.h"
 #endif
+ 
 #include "ip.h"
 #include "icmp.h"
 
@@ -52,8 +53,8 @@ static char addr_str[IPV6_MAX_ADDR_STR_LEN];
 #endif
 #include "debug.h"
 
-#define CON_STACKSIZE                   (KERNEL_CONF_STACKSIZE_DEFAULT)
-#define LOWPAN_TRANSFER_BUF_STACKSIZE   (KERNEL_CONF_STACKSIZE_DEFAULT)
+#define CON_STACKSIZE                   (512+16)
+#define LOWPAN_TRANSFER_BUF_STACKSIZE   (512+16)
 
 #define SIXLOWPAN_MAX_REGISTERED        (4)
 
@@ -178,8 +179,9 @@ int sixlowpan_lowpan_sendto(int if_id, const void *dest, int dest_len,
         print_long_local_addr((net_if_eui64_t *)dest);
     }
     else {
-        printf("0x%04"PRIx16"\n", NTOHS(*((uint16_t *)dest)));
-    }
+        uint16_t destination;
+        memcpy(&destination, dest, 2); // i really do not know if this is correct
+        printf("0x%04"PRIx16"\n", destination);//NTOHS(*((uint16_t *)dest)));
 
     DEBUG("data: \n");
 
@@ -193,12 +195,10 @@ int sixlowpan_lowpan_sendto(int if_id, const void *dest, int dest_len,
 
 #endif
 
-
     if (iphc_status == LOWPAN_IPHC_ENABLE) {
         if (!lowpan_iphc_encoding(if_id, dest, dest_len, ipv6_buf, data)) {
             return -1;
         }
-
         data = &comp_buf[0];
         send_packet_length = comp_len;
     }
@@ -298,7 +298,7 @@ void sixlowpan_lowpan_set_iphc_status(
     iphc_status = status;
 }
 
-#if ENABLE_DEBUG
+
 void print_long_local_addr(net_if_eui64_t *saddr)
 {
     printf("%02x%02x:%02x%02x:%02x%02x:%02x%02x\n",
@@ -306,7 +306,7 @@ void print_long_local_addr(net_if_eui64_t *saddr)
            ((uint8_t *)saddr)[3], ((uint8_t *)saddr)[4], ((uint8_t *)saddr)[5],
            ((uint8_t *)saddr)[6], ((uint8_t *)saddr)[7]);
 }
-
+#if ENABLE_DEBUG
 void sixlowpan_lowpan_print_reassembly_buffers(void)
 {
     lowpan_reas_buf_t *temp_buffer;
@@ -1095,7 +1095,8 @@ uint8_t lowpan_iphc_encoding(int if_id, const uint8_t *dest, int dest_len,
             ipv6_hdr_fields[0] = con->num;
 
         }
-
+        uint16_t destination;
+        memcpy(&destination, dest, 2);
         if (con || ipv6_addr_is_link_local(&ipv6_buf->destaddr)) {
             if (dest_len == 8 &&
                 ipv6_buf->destaddr.uint8[8] == (dest[0] ^ 0x02) &&
@@ -1637,6 +1638,7 @@ void init_reas_bufs(lowpan_reas_buf_t *buf)
 
 int sixlowpan_lowpan_init_adhoc_interface(int if_id, const ipv6_addr_t *prefix)
 {
+    DEBUG("sixlowpan_lowpan_init_adhoc_interface \n");
     ipv6_addr_t tmp;
 
     /* if prefix is set */
@@ -1677,7 +1679,6 @@ int sixlowpan_lowpan_init_interface(int if_id)
 
     /* init link-local prefix */
     ipv6_addr_set_link_local_prefix(&tmp);
-
     if (!ipv6_addr_set_by_eui64(&tmp, if_id, &tmp)) {
         DEBUG("Can not set link-local by EUI-64 on interface %d\n", if_id);
         return 0;
@@ -1696,6 +1697,7 @@ int sixlowpan_lowpan_init_interface(int if_id)
 
     /* add solicited nodes multicast address of link local address */
     ipv6_addr_set_solicited_node_addr(&tmp, &tmp);
+    
     DEBUG("%s, %d: sixlowpan_lowpan_init(): add solicited nodes multicast address "
           "to of link layer address interface %d: %s\n", __FILE__, __LINE__,
           if_id, ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, &tmp));

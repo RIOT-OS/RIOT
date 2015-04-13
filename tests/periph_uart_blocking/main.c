@@ -52,11 +52,10 @@ int main(void)
     int p, i;
     char tmp;
 
-    puts("Test UART driver in blocking mode\n");
     puts("Setting up remaining UART devices:");
-    for (int i = UART_0; i < UART_NUMOF; i++) {
+    for (int i = UART_0; i < UART_NUMOF; ++i) {
         if (i != STDIO) {
-            printf("Setting up UART_%i @ %i", i, baudrates[i]);
+            printf("Setting up UART_%u @ %u", i, baudrates[i]);
             if (uart_init_blocking(i, baudrates[i]) >= 0) {
                 puts("   ...ok");
             }

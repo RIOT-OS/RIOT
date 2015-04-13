@@ -29,7 +29,8 @@
 
 #include <stdint.h>
 #include <math.h>
-#include "i2c.h"
+#include "periph/i2c.h"
+#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -39,7 +40,6 @@ extern "C" {
  * @name LM75A register addresses
  * @{
  */
-#define LM75A_ADDR                      0x48
 #define LM75A_TEMPERATURE_REG           0x0
 #define LM75A_CONFIG_REG                0x1
 #define LM75A_THYST_REG                 0x2
@@ -49,8 +49,6 @@ extern "C" {
 /**
  * @brief Define the used I2C Interface
  */
-//#define LM75A_I2C_INTERFACE I2C0                // P0.27 SDA0, P0.28 SCL0
-#define LM75A_I2C_INTERFACE             I2C1_0    // P0.0  SDA1, P0.1  SCL1
 //#define LM75A_I2C_INTERFACE I2C1_1              // P0.19 SDA1, P0.20 SCL1
 //#define LM75A_I2C_INTERFACE I2C2                // P0.10 SDA2, P0.11 SCL2
 

@@ -95,7 +95,7 @@ extern "C" {
  * @brief Stack size for transceiver thread
  */
 #ifndef TRANSCEIVER_STACK_SIZE
-#define TRANSCEIVER_STACK_SIZE      (KERNEL_CONF_STACKSIZE_DEFAULT)
+#define TRANSCEIVER_STACK_SIZE      (1024)
 #endif
 
 /**

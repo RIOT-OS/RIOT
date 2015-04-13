@@ -53,9 +53,9 @@ extern "C" {
  * @name Define UART device and baudrate for stdio
  * @{
  */
-#define STDIO               UART_0
-#define STDIO_BAUDRATE      (115200U)
-#define STDIO_BUFSIZE       (64U)
+#define STDIO               UART_1//UART_0
+#define STDIO_BAUDRATE      (115200U)//(9600U)//(115200U)
+#define STDIO_BUFSIZE		(64U)
 /** @} */
 
 /**
@@ -78,9 +78,9 @@ extern "C" {
 #define LED_GREEN_ON        /* not available */
 #define LED_GREEN_OFF       /* not available */
 #define LED_GREEN_TOGGLE    /* not available */
-#define LED_ORANGE_ON       /* not available */
-#define LED_ORANGE_OFF      /* not available */
-#define LED_ORANGE_TOGGLE   /* not available */
+#define LED_ORANGE_ON        /* not available */
+#define LED_ORANGE_OFF       /* not available */
+#define LED_ORANGE_TOGGLE    /* not available */
 #define LED_RED_ON          LED_ON
 #define LED_RED_OFF         LED_OFF
 #define LED_RED_TOGGLE      LED_TOGGLE

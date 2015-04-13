@@ -36,6 +36,19 @@ FEATURES_REQUIRED += cpp
 
 # If you want to add some extra flags when compile c++ files, add these flags
 # to CXXEXFLAGS variable
-CXXEXFLAGS +=
+CXXEXFLAGS += -std=gnu++11
+
+
+# Modules
+#USEMODULE += posix
+#USEMODULE += transceiver
+USEMODULE += defaulttransceiver
+USEMODULE += auto_init
+USEMODULE += sixlowpan
+USEMODULE += shell
+USEMODULE += shell_commands
+USEMODULE += uart0
+USEMODULE += ps
+USEMODULE += hashes
 
 include $(RIOTBASE)/Makefile.include

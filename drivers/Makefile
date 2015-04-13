@@ -1,3 +1,6 @@
+ifneq (,$(filter sht2x,$(USEMODULE)))
+    DIRS += sht2x
+endif
 ifneq (,$(filter netdev_base,$(USEMODULE)))
     DIRS += netdev/base
 endif

@@ -164,7 +164,6 @@ uint8_t ieee802154_frame_read(uint8_t *buf, ieee802154_frame_t *frame,
 {
     uint8_t index = 0;
     uint8_t hdrlen;
-
     frame->fcf.frame_type = (buf[index]) & 0x07;
     frame->fcf.sec_enb = (buf[index] >> 3) & 0x01;
     frame->fcf.frame_pend = (buf[index] >> 4) & 0x01;
@@ -183,11 +182,12 @@ uint8_t ieee802154_frame_read(uint8_t *buf, ieee802154_frame_t *frame,
 
     index++;
 
-    if(frame->fcf.dest_addr_m != 0)
+    if (frame->fcf.dest_addr_m != 0)
     {
         frame->dest_pan_id = (((uint16_t)buf[index]) << 8) | buf[index + 1];
         index += 2;
     }
+
 
     switch (frame->fcf.dest_addr_m) {
         case (0): {
@@ -258,7 +258,6 @@ uint8_t ieee802154_frame_read(uint8_t *buf, ieee802154_frame_t *frame,
     frame->payload = (buf + index);
     hdrlen = index;
     frame->payload_len = (len - hdrlen - IEEE_802154_FCS_LEN);
-
     return hdrlen;
 }
 

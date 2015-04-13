@@ -24,6 +24,7 @@
 extern "C" {
 #endif
 
+
 /**
  * @name Kernel configuration
  *

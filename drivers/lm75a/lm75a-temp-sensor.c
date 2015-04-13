@@ -33,9 +33,9 @@
 #include "thread.h"
 #include "vtimer.h"
 #include "timex.h"
-#include "lpc2387.h"
-#include "gpioint.h"
-#include "i2c.h"
+//#include "lpc2387.h"
+//#include "gpioint.h"
+#include "periph/i2c.h"
 #include "lm75a-temp-sensor.h"
 #include "hwtimer.h"
 #include "board.h"
@@ -102,12 +102,12 @@ static void set_register(uint8_t i2c_interface, uint8_t reg_addr, float_t value)
         case LM75A_OVER_TEMP_REG:
         case LM75A_THYST_REG:
             to_bytes(value, tx_buff);
-            status = i2c_write(i2c_interface, LM75A_ADDR, reg_addr, tx_buff, 2);
+            status = i2c_write_regs(i2c_interface, LM75A_ADDR, reg_addr, tx_buff, 2);
             break;
 
         case LM75A_CONFIG_REG:
             tx_buff[0] = (uint8_t) value;
-            status = i2c_write(i2c_interface, LM75A_ADDR, reg_addr, tx_buff, 1);
+            status = i2c_write_regs(i2c_interface, LM75A_ADDR, reg_addr, tx_buff, 1);
     }
 
     if (!status) {
@@ -132,9 +132,9 @@ static uint16_t lm75A_get_register_value(uint8_t i2c_interface,
 {
     uint8_t rx_buff[reg_size];
 
-    i2c_clear_buffer(rx_buff, sizeof(rx_buff));
+    //i2c_clear_buffer(rx_buff, sizeof(rx_buff)); TODO:
     if ((reg_size > 0) && (reg_size < 3)) {
-        bool status = i2c_read(i2c_interface, LM75A_ADDR, reg_addr, rx_buff, sizeof(rx_buff));
+        bool status = i2c_read_regs(i2c_interface, LM75A_ADDR, reg_addr, rx_buff, sizeof(rx_buff));
         if (!status) { //Slave is not ready
             puts(
                 "[lm75a_tempSensorI2C/lm75A_getConfigReg]: Slave is not\
@@ -233,31 +233,31 @@ void lm75A_set_operation_mode(uint8_t op_mode)
 bool lm75A_ext_irq_handler_register(int32_t port, uint32_t pin_bit_mask,
                                     int32_t flags, void *handler)
 {
-    return gpioint_set(port, pin_bit_mask, flags, handler);
+    return 0;//gpioint_set(port, pin_bit_mask, flags, handler);
 }
 
 bool lm75A_init(uint8_t i2c_interface, uint32_t baud_rate,
                 void *external_interr_handler)
 {
-    if (i2c_initialize(i2c_interface, (uint32_t) I2CMASTER, 0, baud_rate, NULL)
-        == false) { /* initialize I2C */
+    if (i2c_init_master(i2c_interface, I2C_SPEED_NORMAL)/*(i2c_interface, (uint32_t) I2CMASTER, 0, baud_rate, NULL)*/ != 0) 
+    { /* initialize I2C */
         puts("fatal error happened in i2c_initialize()\n");
         return false;
     }
     //i2c_enable_pull_up_resistor(i2c_interface);
-    i2c_disable_pull_up_resistor(i2c_interface);
+    //i2c_disable_pull_up_resistor(i2c_interface);
 
-    if ((external_interr_handler != NULL)
-        && lm75A_ext_irq_handler_register(2, BIT3, GPIOINT_FALLING_EDGE,
-                                          external_interr_handler)) {
-        printf("# %-70s%10s\n", "External interrupt handler registration",
-               "...[OK]");
-    }
-    else {
-        printf("# %-70s%10s\n", "External interrupt handler registration",
-               "...[FAILED]");
-        return false;
-    }
+    // if ((external_interr_handler != NULL)
+    //     && lm75A_ext_irq_handler_register(2, BIT3, GPIOINT_FALLING_EDGE,
+    //                                       external_interr_handler)) {
+    //     printf("# %-70s%10s\n", "External interrupt handler registration",
+    //            "...[OK]");
+    // }
+    // else {
+    //     printf("# %-70s%10s\n", "External interrupt handler registration",
+    //            "...[FAILED]");
+    //     return false;
+    // }
 
     puts("################## Before reset ##################");
     printf("configReg = %u\n", lm75A_get_config_reg());
