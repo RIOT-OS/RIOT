@@ -20,6 +20,8 @@
 #ifndef NG_SIXLOWPAN_NETIF_H_
 #define NG_SIXLOWPAN_NETIF_H_
 
+#include <stdbool.h>
+
 #include "kernel_types.h"
 
 #ifdef __cplusplus
@@ -32,6 +34,9 @@ extern "C" {
 typedef struct {
     kernel_pid_t pid;       /**< PID of the interface */
     uint16_t max_frag_size; /**< Maximum fragment size for this interface */
+#ifdef MODULE_NG_SIXLOWPAN_IPHC
+    bool iphc_enabled;      /**< enable or disable IPHC */
+#endif
 } ng_sixlowpan_netif_t;
 
 /**

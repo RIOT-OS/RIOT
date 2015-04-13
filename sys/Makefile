@@ -116,6 +116,9 @@ endif
 ifneq (,$(filter ng_sixlowpan_frag,$(USEMODULE)))
     DIRS += net/network_layer/ng_sixlowpan/frag
 endif
+ifneq (,$(filter ng_sixlowpan_iphc,$(USEMODULE)))
+    DIRS += net/network_layer/ng_sixlowpan/iphc
+endif
 ifneq (,$(filter ng_sixlowpan_netif,$(USEMODULE)))
     DIRS += net/network_layer/ng_sixlowpan/netif
 endif
