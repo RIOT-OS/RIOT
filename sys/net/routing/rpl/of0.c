@@ -75,12 +75,12 @@ uint16_t calc_rank(rpl_parent_t *parent, uint16_t base_rank)
     return base_rank + add;
 }
 
-/* We simply return the parent with lower rank.
- * If their ranks are equal, p1 is returned.
+/**
+ * @brief Return the parent with lower rank.
  *
- * If a new parent is compared to a current preferred parent,
- * it is reasonable to pass the current preferred parent
- * as p1 and the new parent as p2.
+ * @param[in] p1 parent used as left element in the relation
+ * @param[in] p2 parent used as right element in the relation
+ * @returns the parent with the lower rank or p1 if the rank of p1 and p2 are equal
  */
 rpl_parent_t *which_parent(rpl_parent_t *p1, rpl_parent_t *p2)
 {
@@ -91,7 +91,14 @@ rpl_parent_t *which_parent(rpl_parent_t *p1, rpl_parent_t *p2)
     return p2;
 }
 
-/* Not used yet, as the implementation only makes use of one dodag for now. */
+/**
+ * @brief Return the DODAG with a better rank for this node.
+ *
+ * @param[in] d1 DODAG used as left element in the relation
+ * @param[in] d2 DODAG used as right element in the relation
+ * @returns the DODAG with the lower rank for this node or d1
+ *          if this node rank in d1 and d2 are equal
+ */
 rpl_dodag_t *which_dodag(rpl_dodag_t *d1, rpl_dodag_t *d2)
 {
     if (d1->my_rank <= d2->my_rank) {
