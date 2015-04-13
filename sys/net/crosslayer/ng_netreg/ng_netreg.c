@@ -21,6 +21,10 @@
 #include "net/ng_nettype.h"
 #include "net/ng_pkt.h"
 #include "net/ng_ipv6.h"
+/* #include "net/ng_icmpv6.h"   <- TODO: comment in once ICMPV6 gets merged */
+/* #include "net/ng_udp.h"      <- TODO: comment in once UDP gets merged */
+/* #include "net/ng_tcp.h"      <- TODO: comment in once TCP gets merged */
+
 
 #define _INVALID_TYPE(type) (((type) < NG_NETTYPE_UNDEF) || ((type) >= NG_NETTYPE_NUMOF))
 
@@ -136,17 +140,14 @@ ng_pktsnip_t *ng_netreg_hdr_build(ng_nettype_t type, ng_pktsnip_t *payload,
 {
     switch (type) {
 #ifdef MODULE_NG_IPV6
-
         case NG_NETTYPE_IPV6:
             return ng_ipv6_hdr_build(payload, src, src_len, dst, dst_len);
 #endif
 #ifdef MODULE_NG_TCP
-
         case NG_NETTYPE_TCP:
             return ng_tcp_hdr_build(payload, src, src_len, dst, dst_len);
 #endif
 #ifdef MODULE_NG_UDP
-
         case NG_NETTYPE_UDP:
             return ng_udp_hdr_build(payload, src, src_len, dst, dst_len);
 #endif
