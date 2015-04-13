@@ -142,7 +142,7 @@ static void _api_at_cmd(xbee_t *dev, uint8_t *cmd, uint8_t size, resp_t *resp)
 /*
  * Interrupt callbacks
  */
-int _tx_cb(void *arg)
+static int _tx_cb(void *arg)
 {
     xbee_t *dev = (xbee_t *)arg;
     if (dev->tx_count < dev->tx_limit) {
@@ -156,7 +156,7 @@ int _tx_cb(void *arg)
     return 0;
 }
 
-void _rx_cb(void *arg, char c)
+static void _rx_cb(void *arg, char c)
 {
     xbee_t *dev = (xbee_t *)arg;
     msg_t msg;
@@ -223,7 +223,7 @@ void _rx_cb(void *arg, char c)
  * Getter and setter functions
  */
 
-int _get_addr_short(xbee_t *dev, uint8_t *val, size_t len)
+static int _get_addr_short(xbee_t *dev, uint8_t *val, size_t len)
 {
     uint8_t cmd[2];
     resp_t resp;
@@ -242,7 +242,7 @@ int _get_addr_short(xbee_t *dev, uint8_t *val, size_t len)
     return -ECANCELED;
 }
 
-int _get_addr_long(xbee_t *dev, uint8_t *val, size_t len)
+static int _get_addr_long(xbee_t *dev, uint8_t *val, size_t len)
 {
     uint8_t cmd[2];
     resp_t resp;
@@ -271,7 +271,7 @@ int _get_addr_long(xbee_t *dev, uint8_t *val, size_t len)
     return -ECANCELED;
 }
 
-int _set_addr(xbee_t *dev, uint8_t *val, size_t len)
+static int _set_addr(xbee_t *dev, uint8_t *val, size_t len)
 {
     uint8_t cmd[4];
     resp_t resp;
@@ -292,7 +292,7 @@ int _set_addr(xbee_t *dev, uint8_t *val, size_t len)
     return -ECANCELED;
 }
 
-int _get_channel(xbee_t *dev, uint8_t *val, size_t max)
+static int _get_channel(xbee_t *dev, uint8_t *val, size_t max)
 {
     uint8_t cmd[2];
     resp_t resp;
@@ -311,7 +311,7 @@ int _get_channel(xbee_t *dev, uint8_t *val, size_t max)
     return -ECANCELED;
 }
 
-int _set_channel(xbee_t *dev, uint8_t *val, size_t len)
+static int _set_channel(xbee_t *dev, uint8_t *val, size_t len)
 {
     uint8_t cmd[3];
     resp_t resp;
@@ -329,7 +329,7 @@ int _set_channel(xbee_t *dev, uint8_t *val, size_t len)
     return -EINVAL;
 }
 
-int _get_panid(xbee_t *dev, uint8_t *val, size_t max)
+static int _get_panid(xbee_t *dev, uint8_t *val, size_t max)
 {
     uint8_t cmd[2];
     resp_t resp;
@@ -348,7 +348,7 @@ int _get_panid(xbee_t *dev, uint8_t *val, size_t max)
     return -ECANCELED;
 }
 
-int _set_panid(xbee_t *dev, uint8_t *val, size_t len)
+static int _set_panid(xbee_t *dev, uint8_t *val, size_t len)
 {
     uint8_t cmd[4];
     resp_t resp;
@@ -367,7 +367,7 @@ int _set_panid(xbee_t *dev, uint8_t *val, size_t len)
     return -EINVAL;
 }
 
-int _get_proto(xbee_t *dev, uint8_t *val, size_t max)
+static int _get_proto(xbee_t *dev, uint8_t *val, size_t max)
 {
     if (max < sizeof(ng_nettype_t)) {
         return -EOVERFLOW;
@@ -376,7 +376,7 @@ int _get_proto(xbee_t *dev, uint8_t *val, size_t max)
     return sizeof(ng_nettype_t);
 }
 
-int _set_proto(xbee_t *dev, uint8_t *val, size_t len)
+static int _set_proto(xbee_t *dev, uint8_t *val, size_t len)
 {
     if (len != sizeof(ng_nettype_t)) {
         return -EINVAL;
@@ -492,7 +492,7 @@ static inline bool _is_broadcast(ng_netif_hdr_t *hdr) {
                                 NG_NETIF_HDR_FLAGS_MULTICAST));
 }
 
-int _send(ng_netdev_t *netdev, ng_pktsnip_t *pkt)
+static int _send(ng_netdev_t *netdev, ng_pktsnip_t *pkt)
 {
     xbee_t *dev = (xbee_t *)netdev;
     size_t size;
@@ -572,7 +572,7 @@ int _send(ng_netdev_t *netdev, ng_pktsnip_t *pkt)
     return (int)size;
 }
 
-int _add_cb(ng_netdev_t *dev, ng_netdev_event_cb_t cb)
+static int _add_cb(ng_netdev_t *dev, ng_netdev_event_cb_t cb)
 {
     if (dev == NULL) {
         return -ENODEV;
@@ -584,7 +584,7 @@ int _add_cb(ng_netdev_t *dev, ng_netdev_event_cb_t cb)
     return 0;
 }
 
-int _rem_cb(ng_netdev_t *dev, ng_netdev_event_cb_t cb)
+static int _rem_cb(ng_netdev_t *dev, ng_netdev_event_cb_t cb)
 {
     if (dev == NULL) {
         return -ENODEV;
@@ -596,7 +596,8 @@ int _rem_cb(ng_netdev_t *dev, ng_netdev_event_cb_t cb)
     return 0;
 }
 
-int _get(ng_netdev_t *netdev, ng_netconf_opt_t opt, void *value, size_t max_len)
+static int _get(ng_netdev_t *netdev, ng_netconf_opt_t opt,
+                void *value, size_t max_len)
 {
     xbee_t *dev = (xbee_t *)netdev;
     if (dev == NULL) {
@@ -619,7 +620,8 @@ int _get(ng_netdev_t *netdev, ng_netconf_opt_t opt, void *value, size_t max_len)
     }
 }
 
-int _set(ng_netdev_t *netdev, ng_netconf_opt_t opt, void *value, size_t value_len)
+static int _set(ng_netdev_t *netdev, ng_netconf_opt_t opt,
+                void *value, size_t value_len)
 {
     xbee_t *dev = (xbee_t *)netdev;
     if (dev == NULL) {
@@ -640,7 +642,7 @@ int _set(ng_netdev_t *netdev, ng_netconf_opt_t opt, void *value, size_t value_le
     }
 }
 
-void _isr_event(ng_netdev_t *netdev, uint32_t event_type)
+static void _isr_event(ng_netdev_t *netdev, uint32_t event_type)
 {
     xbee_t *dev = (xbee_t *)netdev;
     ng_pktsnip_t *pkt_head;
