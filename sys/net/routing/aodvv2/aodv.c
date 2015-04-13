@@ -53,6 +53,10 @@ static ipv6_addr_t _v6_addr_local, _v6_addr_mcast, _v6_addr_loopback;
 static struct netaddr na_local; /* the same as _v6_addr_local, but to save us
                                  * constant calls to ipv6_addr_t_to_netaddr()... */
 static struct writer_target *wt;
+static mutex_t rreq_mutex;
+static mutex_t rrep_mutex;
+static mutex_t rerr_mutex;
+
 struct netaddr na_mcast = (struct netaddr){};
 
 void aodv_init(void)
@@ -62,6 +66,10 @@ void aodv_init(void)
     /* TODO: set if_id properly */
     int if_id = 0;
     net_if_set_src_address_mode(if_id, NET_IF_TRANS_ADDR_M_SHORT);
+
+    mutex_init(&rreq_mutex);
+    mutex_init(&rrep_mutex);
+    mutex_init(&rerr_mutex);
 
     aodv_set_metric_type(AODVV2_DEFAULT_METRIC_TYPE);
     _init_addresses();
@@ -103,6 +111,9 @@ void aodv_set_metric_type(aodvv2_metric_t metric_type)
 
 void aodv_send_rreq(struct aodvv2_packet_data *packet_data)
 {
+    /* Make sure only one thread is dispatching a RREQ at a time */
+    mutex_lock(&rreq_mutex);
+
     AODV_DEBUG("%s()\n", __func__);
 
     struct aodvv2_packet_data *pd = malloc(sizeof(struct aodvv2_packet_data));
@@ -124,10 +135,14 @@ void aodv_send_rreq(struct aodvv2_packet_data *packet_data)
     msg.content.ptr = (char *) mc;
 
     msg_try_send(&msg, sender_thread);
+    mutex_unlock(&rreq_mutex);
 }
 
 void aodv_send_rrep(struct aodvv2_packet_data *packet_data, struct netaddr *next_hop)
 {
+    /* Make sure only one thread is dispatching a RREP at a time */
+    mutex_lock(&rrep_mutex);
+
     AODV_DEBUG("%s()\n", __func__);
 
     struct aodvv2_packet_data *pd = malloc(sizeof(struct aodvv2_packet_data));
@@ -152,10 +167,14 @@ void aodv_send_rrep(struct aodvv2_packet_data *packet_data, struct netaddr *next
     msg.content.ptr = (char *) mc;
 
     msg_try_send(&msg, sender_thread);
+    mutex_unlock(&rrep_mutex);
 }
 
 void aodv_send_rerr(struct unreachable_node unreachable_nodes[], size_t len, struct netaddr *next_hop)
 {
+    /* Make sure only one thread is dispatching a RERR at a time */
+    mutex_lock(&rerr_mutex);
+
     AODV_DEBUG("%s()\n", __func__);
 
     struct rerr_data *rerrd = malloc(sizeof(struct rerr_data));
@@ -176,6 +195,7 @@ void aodv_send_rerr(struct unreachable_node unreachable_nodes[], size_t len, str
     msg2.content.ptr = (char *) mc2;
 
     msg_try_send(&msg2, sender_thread);
+    mutex_unlock(&rerr_mutex);
 }
 
 /*
