@@ -227,12 +227,6 @@ extern "C" {
 #define UART3_RECEIVED_DATA (UART3_CTRL_STAT_A & (1 << UART3_RX_COMPLETE))
 #define UART3_DTREG_EMPTY   (UART3_CTRL_STAT_A & (1 << UART3_DATA_EMPTY))
 
-
-
-/* TODO: add defines for device agnostic implementation */
-/** @} */
-
-
 /**
  * @brief ADC configuration
  */
@@ -260,26 +254,6 @@ extern "C" {
 #define I2C_NUMOF           (0U)                                                    /* TODO */
 #define I2C_0_EN            0
 #define I2C_0_EN            0
-
-/**
- * @brief GPIO configuration
- */
-#define GPIO_0_EN           0
-#define GPIO_1_EN           0
-#define GPIO_2_EN           0
-#define GPIO_3_EN           0
-#define GPIO_4_EN           0
-#define GPIO_5_EN           0
-#define GPIO_6_EN           0
-#define GPIO_7_EN           0
-#define GPIO_8_EN           0
-#define GPIO_9_EN           0
-#define GPIO_10_EN          0
-#define GPIO_11_EN          0
-#define GPIO_12_EN          0
-#define GPIO_13_EN          0
-#define GPIO_14_EN          0
-#define GPIO_15_EN          0
 
 #ifdef __cplusplus
 }
