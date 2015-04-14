@@ -126,6 +126,102 @@ void g15_cb(void *arg){
 }
 #endif
 
+#if GPIO_16_EN
+void g16_cb(void *arg){
+    puts("GPIO_16 triggered");
+}
+#endif
+
+#if GPIO_17_EN
+void g17_cb(void *arg){
+    puts("GPIO_17 triggered");
+}
+#endif
+
+#if GPIO_18_EN
+void g18_cb(void *arg){
+    puts("GPIO_18 triggered");
+}
+#endif
+
+#if GPIO_19_EN
+void g19_cb(void *arg){
+    puts("GPIO_19 triggered");
+}
+#endif
+
+#if GPIO_20_EN
+void g20_cb(void *arg){
+    puts("GPIO_20 triggered");
+}
+#endif
+
+#if GPIO_21_EN
+void g21_cb(void *arg){
+    puts("GPIO_21 triggered");
+}
+#endif
+
+#if GPIO_22_EN
+void g22_cb(void *arg){
+    puts("GPIO_22 triggered");
+}
+#endif
+
+#if GPIO_23_EN
+void g23_cb(void *arg){
+    puts("GPIO_23 triggered");
+}
+#endif
+
+#if GPIO_24_EN
+void g24_cb(void *arg){
+    puts("GPIO_24 triggered");
+}
+#endif
+
+#if GPIO_25_EN
+void g25_cb(void *arg){
+    puts("GPIO_25 triggered");
+}
+#endif
+
+#if GPIO_26_EN
+void g26_cb(void *arg){
+    puts("GPIO_26 triggered");
+}
+#endif
+
+#if GPIO_27_EN
+void g27_cb(void *arg){
+    puts("GPIO_27 triggered");
+}
+#endif
+
+#if GPIO_28_EN
+void g28_cb(void *arg){
+    puts("GPIO_28 triggered");
+}
+#endif
+
+#if GPIO_29_EN
+void g29_cb(void *arg){
+    puts("GPIO_29 triggered");
+}
+#endif
+
+#if GPIO_30_EN
+void g30_cb(void *arg){
+    puts("GPIO_30 triggered");
+}
+#endif
+
+#if GPIO_31_EN
+void g31_cb(void *arg){
+    puts("GPIO_31 triggered");
+}
+#endif
+
 int main(void)
 {
     puts("GPIO driver test - external interrupts");
@@ -178,6 +274,54 @@ int main(void)
 #endif
 #if GPIO_15_EN
     gpio_init_int(GPIO_15, PULL, ACTIVE_FLANK, g15_cb, 0);
+#endif
+#if GPIO_16_EN
+    gpio_init_int(GPIO_16, PULL, ACTIVE_FLANK, g16_cb, 0);
+#endif
+#if GPIO_17_EN
+    gpio_init_int(GPIO_17, PULL, ACTIVE_FLANK, g17_cb, 0);
+#endif
+#if GPIO_18_EN
+    gpio_init_int(GPIO_18, PULL, ACTIVE_FLANK, g18_cb, 0);
+#endif
+#if GPIO_19_EN
+    gpio_init_int(GPIO_19, PULL, ACTIVE_FLANK, g19_cb, 0);
+#endif
+#if GPIO_20_EN
+    gpio_init_int(GPIO_20, PULL, ACTIVE_FLANK, g20_cb, 0);
+#endif
+#if GPIO_21_EN
+    gpio_init_int(GPIO_21, PULL, ACTIVE_FLANK, g21_cb, 0);
+#endif
+#if GPIO_22_EN
+    gpio_init_int(GPIO_22, PULL, ACTIVE_FLANK, g22_cb, 0);
+#endif
+#if GPIO_23_EN
+    gpio_init_int(GPIO_23, PULL, ACTIVE_FLANK, g23_cb, 0);
+#endif
+#if GPIO_24_EN
+    gpio_init_int(GPIO_24, PULL, ACTIVE_FLANK, g24_cb, 0);
+#endif
+#if GPIO_25_EN
+    gpio_init_int(GPIO_25, PULL, ACTIVE_FLANK, g25_cb, 0);
+#endif
+#if GPIO_26_EN
+    gpio_init_int(GPIO_26, PULL, ACTIVE_FLANK, g26_cb, 0);
+#endif
+#if GPIO_27_EN
+    gpio_init_int(GPIO_27, PULL, ACTIVE_FLANK, g27_cb, 0);
+#endif
+#if GPIO_28_EN
+    gpio_init_int(GPIO_28, PULL, ACTIVE_FLANK, g28_cb, 0);
+#endif
+#if GPIO_29_EN
+    gpio_init_int(GPIO_29, PULL, ACTIVE_FLANK, g29_cb, 0);
+#endif
+#if GPIO_30_EN
+    gpio_init_int(GPIO_30, PULL, ACTIVE_FLANK, g30_cb, 0);
+#endif
+#if GPIO_31_EN
+    gpio_init_int(GPIO_31, PULL, ACTIVE_FLANK, g31_cb, 0);
 #endif
 
     puts("Initialization done, going to sleep now");
