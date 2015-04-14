@@ -294,6 +294,7 @@ static void *_aodv_receiver_thread(void *arg)
     if (-1 == socket_base_bind(sock_rcv, &sa_rcv, sizeof(sa_rcv))) {
         DEBUG("Error: bind to receive socket failed!\n");
         socket_base_close(sock_rcv);
+        return NULL;
     }
 
     AODV_DEBUG("ready to receive data\n");
