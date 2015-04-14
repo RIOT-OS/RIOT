@@ -48,7 +48,7 @@ index 0000000..c286ad3
 +# this has to be the absolute path of the RIOT-base dir
 +export RIOTBASE =$(CURDIR)/../../../../../..
 +
-+export CFLAGS = -DRIOT -DOONF_LOG_INFO -DOONF_LOG_DEBUG_INFO
++export CFLAGS = -DOONF_LOG_INFO -DOONF_LOG_DEBUG_INFO
 +
 +## Modules to include.
 +
@@ -152,7 +152,7 @@ index 0000000..8a0452d
 +# this has to be the absolute path of the RIOT-base dir
 +export RIOTBASE =$(CURDIR)/../../../../../..
 +
-+export CFLAGS = -DRIOT -DOONF_LOG_INFO -DOONF_LOG_DEBUG_INFO
++export CFLAGS = -DOONF_LOG_INFO -DOONF_LOG_DEBUG_INFO
 +
 +## Modules to include.
 +

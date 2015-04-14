@@ -35,7 +35,7 @@ index 0000000..42f9a55
 +# this has to be the absolute path of the RIOT-base dir
 +export RIOTBASE =$(CURDIR)/../../../../..
 +
-+export CFLAGS = -DRIOT -DOONF_LOG_INFO -DOONF_LOG_DEBUG_INFO
++export CFLAGS = -DOONF_LOG_INFO -DOONF_LOG_DEBUG_INFO
 +
 +## Modules to include.
 +
@@ -61,7 +61,7 @@ index 9cca869..c786d19 100644
  #include <string.h>
  #include <stdio.h>
 
-+#ifdef RIOT
++#ifdef RIOT_VERSION
 +#include "net_help.h"
 +#define ntohl(val)	NTOHL(val)
 +#endif
@@ -77,7 +77,7 @@ index 59bb741..d05c48c 100644
  #include <string.h>
  #include <stdio.h>
 
-+#ifdef RIOT
++#ifdef RIOT_VERSION
 +#include "net_help.h"
 +#define htonl(val)	HTONL(val)
 +#endif
