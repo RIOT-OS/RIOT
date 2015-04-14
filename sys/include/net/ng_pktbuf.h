@@ -36,6 +36,7 @@
 #include "cpu-conf.h"
 #include "net/ng_pkt.h"
 #include "net/ng_nettype.h"
+#include "utlist.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -165,6 +166,19 @@ void ng_pktbuf_release(ng_pktsnip_t *pkt);
  *          space in the packet buffer.
  */
 ng_pktsnip_t *ng_pktbuf_start_write(ng_pktsnip_t *pkt);
+
+/**
+ * @brief   Deletes a snip from a packet and the packet buffer.
+ *
+ * @param[in] pkt   A packet.
+ * @param[in] snip  A snip in the packet.
+ */
+static inline void ng_pktbuf_remove_snip(ng_pktsnip_t *pkt, ng_pktsnip_t *snip)
+{
+    LL_DELETE(pkt, snip);
+    snip->next = NULL;
+    ng_pktbuf_release(snip);
+}
 
 #ifdef DEVELHELP
 /**
