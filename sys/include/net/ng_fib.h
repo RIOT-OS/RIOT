@@ -39,6 +39,20 @@ typedef struct rp_address_msg_t {
 #define FIB_MSG_RP_SIGNAL (0x99)     /**< message type for RP notifications */
 
 /**
+ * @brief the size in bytes of a full address
+ * TODO: replace with UNIVERSAL_ADDRESS_SIZE (#3022)
+*/
+#define FIB_DESTINATION_SIZE_SUBSTITUTE (16)
+
+/**
+ * @brief entry used to collect available destinations
+ */
+typedef struct fib_destination_set_entry_t {
+    uint8_t dest[FIB_DESTINATION_SIZE_SUBSTITUTE]; /**< The destination address */
+    size_t dest_size;    /**< The destination address size */
+} fib_destination_set_entry_t;
+
+/**
  * @brief indicator of a lifetime that does not expire (2^32 - 1)
  */
 #define FIB_LIFETIME_NO_EXPIRE (0xFFFFFFFF)
@@ -129,6 +143,27 @@ void fib_remove_entry(uint8_t *dst, size_t dst_size);
 int fib_get_next_hop(kernel_pid_t *iface_id,
                      uint8_t *next_hop, size_t *next_hop_size, uint32_t* next_hop_flags,
                      uint8_t *dst, size_t dst_size, uint32_t dst_flags);
+
+/**
+* @brief provides a set of destination addresses matching the given prefix
+* If the out buffer is insufficient low or passed as NULL,
+* the function will continue to count the number of matching entries
+* and provide the number to the caller.
+*
+* @param[in] prefix           the destination address
+* @param[in] prefix_size      the destination address size
+* @param[out] dst_set         the destination addresses matching the prefix
+* @param[in, out] dst_size    the number of entries available on in and used on out
+*
+* @return 0 on success
+*         -EHOSTUNREACH if no entry matches the type in the FIB
+*         -ENOBUFS if the size for the found entries is insufficient low
+*                  The actual needed size is stored then in dst_set_size,
+*                  however the required size may change in between calls.
+*/
+int fib_get_destination_set(uint8_t *prefix, size_t prefix_size,
+                            fib_destination_set_entry_t *dst_set, size_t* dst_set_size);
+
 
 /**
  * @brief returns the actual number of used FIB entries

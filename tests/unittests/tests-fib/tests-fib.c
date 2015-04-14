@@ -488,6 +488,7 @@ static void test_fib_14_exact_and_prefix_match(void)
     fib_add_entry(42, (uint8_t *)addr_dst, add_buf_size - 1, 0x1234,
                   (uint8_t *)addr_nxt, add_buf_size - 1, 0x34, 100000);
 
+    memset(addr_lookup, 0, add_buf_size);
     /* exact match */
     snprintf(addr_lookup, add_buf_size, "Test addr123");
     int ret = fib_get_next_hop(&iface_id,
@@ -495,6 +496,7 @@ static void test_fib_14_exact_and_prefix_match(void)
                                (uint8_t *)addr_lookup, add_buf_size - 1, 0x123);
 
     TEST_ASSERT_EQUAL_INT(0, ret);
+    add_buf_size = 16;
 
     char addr_expect_01[] = "Test address 23";
     ret = strncmp(addr_expect_01, addr_nxt, add_buf_size - 1);
@@ -553,6 +555,148 @@ static void test_fib_15_get_lifetime(void)
     TEST_ASSERT_EQUAL_INT(1, timex_cmp(lifetime, cmp_lifetime));
     /* make sure lifetime hasn't grown magically either */
     TEST_ASSERT_EQUAL_INT(-1, timex_cmp(lifetime, cmp_max_lifetime));
+
+    fib_deinit();
+}
+
+/*
+* @brief testing prefix with bits
+*/
+static void test_fib_16_prefix_match(void)
+{
+    size_t add_buf_size = 16;
+    char addr_dst[add_buf_size];
+    char addr_nxt[add_buf_size];
+    char addr_lookup[add_buf_size];
+    kernel_pid_t iface_id = KERNEL_PID_UNDEF;
+    uint32_t next_hop_flags = 0;
+
+    memset(addr_dst, 0, add_buf_size);
+    memset(addr_nxt, 0, add_buf_size);
+    memset(addr_lookup, 0, add_buf_size);
+
+    snprintf(addr_dst, add_buf_size, "Test address 1X");
+    snprintf(addr_nxt, add_buf_size, "Test address 99");
+    snprintf(addr_lookup, add_buf_size, "Test address 1X");
+
+    /* now we change the last byte of addr_dst to have defined trailing 0 bits */
+    /* test success */
+    addr_dst[14] = (char)0x80;    /* 1000 0000 */
+    addr_lookup[14] = (char)0x87; /* 1000 0111 */
+
+    fib_add_entry(42, (uint8_t *)addr_dst, add_buf_size - 1, 0x123,
+                  (uint8_t *)addr_nxt, add_buf_size - 1, 0x23, 100000);
+
+    addr_dst[14] = (char)0x3c;    /* 0011 1100 */
+    fib_add_entry(42, (uint8_t *)addr_dst, add_buf_size - 1, 0x123,
+                  (uint8_t *)addr_nxt, add_buf_size - 1, 0x23, 100000);
+
+    memset(addr_nxt, 0, add_buf_size);
+
+    int ret = fib_get_next_hop(&iface_id,
+                             (uint8_t *)addr_nxt, &add_buf_size, &next_hop_flags,
+                             (uint8_t *)addr_lookup, add_buf_size - 1, 0x123);
+
+    TEST_ASSERT_EQUAL_INT(0, ret);
+
+    /* test fail */
+    addr_dst[14] = (char)0x3c;    /* 0011 1100 */
+    addr_lookup[14] = (char)0x34; /* 0011 0100 */
+    add_buf_size = 16;
+
+    fib_add_entry(42, (uint8_t *)addr_dst, add_buf_size - 1, 0x123,
+                (uint8_t *)addr_nxt, add_buf_size - 1, 0x23, 100000);
+
+    memset(addr_nxt, 0, add_buf_size);
+
+    ret = fib_get_next_hop(&iface_id,
+                             (uint8_t *)addr_nxt, &add_buf_size, &next_hop_flags,
+                             (uint8_t *)addr_lookup, add_buf_size - 1, 0x123);
+
+    TEST_ASSERT_EQUAL_INT(-EHOSTUNREACH, ret);
+
+    /* test success (again) by adjusting the lsb */
+    addr_lookup[14] = (char)0x3e; /* 0011 1110 */
+    add_buf_size = 16;
+
+    memset(addr_nxt, 0, add_buf_size);
+
+    ret = fib_get_next_hop(&iface_id,
+                             (uint8_t *)addr_nxt, &add_buf_size, &next_hop_flags,
+                             (uint8_t *)addr_lookup, add_buf_size - 1, 0x123);
+
+    TEST_ASSERT_EQUAL_INT(0, ret);
+
+#if (TEST_FIB_SHOW_OUTPUT == 1)
+    fib_print_fib_table();
+    puts("");
+    universal_address_print_table();
+    puts("");
+#endif
+    fib_deinit();
+}
+
+
+/*
+* @brief testing receiving an destination address set matching a specific prefix
+*/
+static void test_fib_17_get_entry_set(void)
+{
+    size_t addr_buf_size = 16;
+    char addr_dst[addr_buf_size];
+    char addr_nxt[addr_buf_size];
+
+    /* fill 20 addresses */
+    for (size_t i = 0; i < 20; ++i) {
+        /* construct "addresses" for the FIB */
+        snprintf(addr_dst, addr_buf_size, "Test address %02d", (int)i);
+        snprintf(addr_nxt, addr_buf_size, "Test address %02d", i % 11);
+        fib_add_entry(42, (uint8_t *)addr_dst, addr_buf_size - 1, 0x0,
+                      (uint8_t *)addr_nxt, addr_buf_size - 1, 0x0, 100000);
+    }
+
+    size_t arr_size = 20;
+    fib_destination_set_entry_t arr_dst[arr_size];
+    char prefix[addr_buf_size];
+    memset(prefix,0, addr_buf_size);
+    snprintf(prefix, addr_buf_size, "Test address 1");
+
+    int ret = fib_get_destination_set((uint8_t *)prefix, addr_buf_size-1, &arr_dst[0], &arr_size);
+    TEST_ASSERT_EQUAL_INT(0, ret);
+
+    /* we should receive 10 entries 10 to 19 */
+    TEST_ASSERT_EQUAL_INT(10, arr_size);
+    arr_size = 20;
+
+    memset(prefix,0, addr_buf_size);
+    snprintf(prefix, addr_buf_size, "Test address 0");
+
+    ret = fib_get_destination_set((uint8_t *)prefix, addr_buf_size-1, &arr_dst[0], &arr_size);
+    TEST_ASSERT_EQUAL_INT(0, ret);
+
+    /* we should receive 20 entries 0-19 */
+    TEST_ASSERT_EQUAL_INT(20, arr_size);
+    arr_size = 20;
+
+    memset(prefix,0, addr_buf_size);
+    snprintf(prefix, addr_buf_size, "Test address");
+
+    ret = fib_get_destination_set((uint8_t *)prefix, addr_buf_size-1, &arr_dst[0], &arr_size);
+    TEST_ASSERT_EQUAL_INT(0, ret);
+
+    /* we should receive 20 entries 0-19 */
+    TEST_ASSERT_EQUAL_INT(20, arr_size);
+
+#if (TEST_FIB_SHOW_OUTPUT == 1)
+    puts("");
+    for(size_t i = 0; i < arr_size; ++i) {
+        for( size_t j = 0; j < arr_dst[i].dest_size; ++j) {
+            printf("%c", (char)arr_dst[i].dest[j]);
+        }
+        puts("");
+    }
+#endif
+
     fib_deinit();
 }
 
@@ -575,6 +719,8 @@ Test *tests_fib_tests(void)
                         new_TestFixture(test_fib_13_get_next_hop_fail_on_buffer_size),
                         new_TestFixture(test_fib_14_exact_and_prefix_match),
                         new_TestFixture(test_fib_15_get_lifetime),
+                        new_TestFixture(test_fib_16_prefix_match),
+                        new_TestFixture(test_fib_17_get_entry_set),
     };
 
     EMB_UNIT_TESTCALLER(fib_tests, NULL, NULL, fixtures);

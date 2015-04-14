@@ -98,7 +98,7 @@ static int fib_find_entry(uint8_t *dst, size_t dst_size,
 
     size_t count = 0;
     size_t prefix_size = 0;
-    size_t match_size = dst_size;
+    size_t match_size = dst_size<<3;
     int ret = -EHOSTUNREACH;
     bool is_all_zeros_addr = true;
 
@@ -136,13 +136,11 @@ static int fib_find_entry(uint8_t *dst, size_t dst_size,
             }
         }
 
-        if ((prefix_size < dst_size) &&
-            (fib_table[i].global != NULL) &&
-            (universal_address_compare(fib_table[i].global, dst, &match_size) == 0)) {
+        if ((prefix_size < (dst_size<<3)) && (fib_table[i].global != NULL)) {
 
+            int ret_comp = universal_address_compare(fib_table[i].global, dst, &match_size);
             /* If we found an exact match */
-            if (match_size == dst_size
-                || (is_all_zeros_addr && match_size == 0)) {
+            if (ret_comp == 0 || (is_all_zeros_addr && match_size == 0)) {
                 entry_arr[0] = &(fib_table[i]);
                 *entry_arr_size = 1;
                 /* we will not find a better one so we return */
@@ -150,16 +148,16 @@ static int fib_find_entry(uint8_t *dst, size_t dst_size,
             }
             else {
                 /* we try to find the most fitting prefix */
-                if (match_size > prefix_size) {
+                if (ret_comp == 1) {
                     entry_arr[0] = &(fib_table[i]);
                     /* we could find a better one so we move on */
                     ret = 0;
+
+                    prefix_size = match_size;
+                    match_size = dst_size<<3;
+                    count = 1;
                 }
             }
-
-            prefix_size = match_size;
-            match_size = dst_size;
-            count = 1;
         }
     }
 
@@ -412,7 +410,6 @@ int fib_get_next_hop(kernel_pid_t *iface_id,
     fib_entry_t *entry[count];
 
     int ret = fib_find_entry(dst, dst_size, &(entry[0]), &count);
-
     if (!(ret == 0 || ret == 1)) {
         /* notify all responsible RPs for unknown  next-hop for the destination address */
         if (fib_signal_rp(dst, dst_size, dst_flags) == 0) {
@@ -441,6 +438,40 @@ int fib_get_next_hop(kernel_pid_t *iface_id,
     *next_hop_flags = entry[0]->next_hop_flags;
     mutex_unlock(&mtx_access);
     return 0;
+}
+
+int fib_get_destination_set(uint8_t *prefix, size_t prefix_size,
+                            fib_destination_set_entry_t *dst_set, size_t* dst_set_size)
+{
+    mutex_lock(&mtx_access);
+    int ret = -EHOSTUNREACH;
+    size_t found_entries = 0;
+
+    for (size_t i = 0; i < FIB_MAX_FIB_TABLE_ENTRIES; ++i) {
+        if ((fib_table[i].global != NULL) &&
+            (universal_address_compare_prefix(fib_table[i].global, prefix, prefix_size<<3) >= 0)) {
+            if( (dst_set != NULL) && (found_entries < *dst_set_size) ) {
+            /* set the size to full byte usage */
+            dst_set[found_entries].dest_size = sizeof(dst_set[found_entries].dest);
+            universal_address_get_address(fib_table[i].global,
+                                          dst_set[found_entries].dest,
+                                          &dst_set[found_entries].dest_size);
+            }
+            found_entries++;
+        }
+    }
+
+    if( found_entries > *dst_set_size ) {
+        ret = -ENOBUFS;
+    } else if( found_entries > 0 ) {
+        ret = 0;
+    }
+
+    *dst_set_size = found_entries;
+
+    mutex_unlock(&mtx_access);
+
+    return ret;
 }
 
 void fib_init(void)
