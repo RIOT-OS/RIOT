@@ -16,9 +16,13 @@
  */
 
 #include <errno.h>
-#include "socket_base/socket.h" /**< needed for IN6ADDRSZ and AF_INET6 */
+#include "ng_nettype.h"
 #include "ng_fib/ng_fib_table.h"
 #include "ng_fib/ng_fib_addon_ipv6.h"
+
+#ifndef MODULE_NG_IPV6
+#define NG_NETTYPE_IPV6 (28) /**< is AF_INET6 */
+#endif
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -33,15 +37,15 @@ int fib_add_entry_ipv6(kernel_pid_t iface_id, ng_ipv6_addr_t *dst,
     size_t count = 1;
     fib_entry_t *entry[count];
 
-    int ret = fib_find_entry((uint8_t *)dst, IN6ADDRSZ, &(entry[0]), &count);
+    int ret = fib_find_entry((uint8_t *)dst, sizeof(ng_ipv6_addr_t), &(entry[0]), &count);
 
     if (ret == 1) {
         /* we must take the according entry and update the values */
-        ret = fib_upd_entry(entry[0], (uint8_t *)next_hop, IN6ADDRSZ, AF_INET6, lifetime);
+        ret = fib_upd_entry(entry[0], (uint8_t *)next_hop, sizeof(ng_ipv6_addr_t), NG_NETTYPE_IPV6, lifetime);
     }
     else {
-        ret = fib_create_entry(iface_id, (uint8_t *)dst, IN6ADDRSZ, AF_INET6,
-                               (uint8_t *)next_hop, IN6ADDRSZ, AF_INET6, lifetime);
+        ret = fib_create_entry(iface_id, (uint8_t *)dst, sizeof(ng_ipv6_addr_t), NG_NETTYPE_IPV6,
+                               (uint8_t *)next_hop, sizeof(ng_ipv6_addr_t), NG_NETTYPE_IPV6, lifetime);
     }
 
     mutex_unlock(mtx_access);
@@ -59,10 +63,10 @@ int fib_update_entry_ipv6(ng_ipv6_addr_t *dst,
     fib_entry_t *entry[count];
     int ret = -ENOMEM;
 
-    if (fib_find_entry((uint8_t *)dst, IN6ADDRSZ, &(entry[0]), &count) == 1) {
+    if (fib_find_entry((uint8_t *)dst, sizeof(ng_ipv6_addr_t), &(entry[0]), &count) == 1) {
         DEBUG("[fib_update_entry_ipv6] found entry: %p\n", (void *)(entry[0]));
         /* we must take the according entry and update the values */
-        ret = fib_upd_entry(entry[0], (uint8_t *)next_hop, IN6ADDRSZ, AF_INET6, lifetime);
+        ret = fib_upd_entry(entry[0], (uint8_t *)next_hop, sizeof(ng_ipv6_addr_t), NG_NETTYPE_IPV6, lifetime);
     }
     else {
         /* we have ambigious entries, i.e. count > 1
@@ -83,7 +87,7 @@ void fib_remove_entry_ipv6(ng_ipv6_addr_t *dst)
     size_t count = 1;
     fib_entry_t *entry[count];
 
-    int ret = fib_find_entry((uint8_t *)dst, IN6ADDRSZ, &(entry[0]), &count);
+    int ret = fib_find_entry((uint8_t *)dst, sizeof(ng_ipv6_addr_t), &(entry[0]), &count);
 
     if (ret == 1) {
         /* we must take the according entry and update the values */
@@ -109,19 +113,19 @@ int fib_get_next_hop_ipv6(kernel_pid_t *iface_id,
     size_t count = 1;
     fib_entry_t *entry[count];
 
-    int ret = fib_find_entry((uint8_t *)dst, IN6ADDRSZ, &(entry[0]), &count);
+    int ret = fib_find_entry((uint8_t *)dst, sizeof(ng_ipv6_addr_t), &(entry[0]), &count);
 
     if (!(ret == 0 || ret == 1)) {
         /* notify all RRPs for route discovery if available */
-        if (fib_signal_rp((uint8_t *)dst, IN6ADDRSZ, AF_INET6) == 0) {
+        if (fib_signal_rp((uint8_t *)dst, sizeof(ng_ipv6_addr_t), NG_NETTYPE_IPV6) == 0) {
             count = 1;
             /* now lets see if the RRPs have found a valid next-hop */
-            ret = fib_find_entry((uint8_t *)dst, IN6ADDRSZ, &(entry[0]), &count);
+            ret = fib_find_entry((uint8_t *)dst, sizeof(ng_ipv6_addr_t), &(entry[0]), &count);
         }
     }
 
     if (ret == 0 || ret == 1) {
-        size_t next_hop_size = IN6ADDRSZ;
+        size_t next_hop_size = sizeof(ng_ipv6_addr_t);
         uint8_t *address_ret = universal_address_get_address(entry[0]->next_hop,
                                (uint8_t *)next_hop, &next_hop_size);
 
