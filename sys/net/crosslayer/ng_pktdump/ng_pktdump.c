@@ -130,11 +130,14 @@ static void _dump(ng_pktsnip_t *pkt)
 static void *_eventloop(void *arg)
 {
     (void)arg;
-    msg_t msg;
+    msg_t msg, reply;
     msg_t msg_queue[NG_PKTDUMP_MSG_QUEUE_SIZE];
 
     /* setup the message queue */
     msg_init_queue(msg_queue, NG_PKTDUMP_MSG_QUEUE_SIZE);
+
+    reply.content.value = (uint32_t)(-ENOTSUP);
+    reply.type = NG_NETAPI_MSG_TYPE_ACK;
 
     while (1) {
         msg_receive(&msg);
@@ -147,6 +150,10 @@ static void *_eventloop(void *arg)
             case NG_NETAPI_MSG_TYPE_SND:
                 puts("PKTDUMP: data to send:");
                 _dump((ng_pktsnip_t *)msg.content.ptr);
+                break;
+            case NG_NETAPI_MSG_TYPE_GET:
+            case NG_NETAPI_MSG_TYPE_SET:
+                msg_reply(&msg, &reply);
                 break;
             default:
                 puts("PKTDUMP: received something unexpected");
