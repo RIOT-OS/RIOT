@@ -25,6 +25,8 @@
 #ifndef SPI_H
 #define SPI_H
 
+#include <stdint.h>
+
 #include "periph_conf.h"
 
 #ifdef __cplusplus
