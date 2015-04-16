@@ -815,6 +815,7 @@ EXCLUDE_PATTERNS       = */board/*/tools/* \
                          */cpu/*/include/component/* \
                          */cpu/*/include/instance/* \
                          */cpu/*/include/pio/* \
+                         */cpu/*/include/atmel/* \
                          */cpu/lpc*/include/core_cm*.h \
                          */cpu/cortex-*_common/include/core_cm*.h \
                          */cpu/cortex-*_common/include/core_cmInstr.h \
