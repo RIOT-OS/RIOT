@@ -117,7 +117,7 @@ bool rreqtable_is_redundant(struct aodvv2_packet_data *packet_data)
 {
     struct aodvv2_rreq_entry *comparable_rreq;
     timex_t now;
-    bool result;
+    bool result = false;
 
     mutex_lock(&rreqt_mutex);
     comparable_rreq = _get_comparable_rreq(packet_data);
@@ -125,7 +125,6 @@ bool rreqtable_is_redundant(struct aodvv2_packet_data *packet_data)
     /* if there is no comparable rreq stored, add one and return false */
     if (comparable_rreq == NULL) {
         _add_rreq(packet_data);
-        result = false;
     }
     else {
         int seqnum_comparison = seqnum_cmp(packet_data->origNode.seqnum, comparable_rreq->seqnum);
@@ -140,8 +139,9 @@ bool rreqtable_is_redundant(struct aodvv2_packet_data *packet_data)
         }
 
         if (seqnum_comparison == 1) {
-            /* Update RREQ table entry with new seqnum value */
+            /* Update RREQ table entry with new seqnum and metric value */
             comparable_rreq->seqnum = packet_data->origNode.seqnum;
+            comparable_rreq->metric = packet_data->origNode.metric;
         }
 
         /*
@@ -159,7 +159,6 @@ bool rreqtable_is_redundant(struct aodvv2_packet_data *packet_data)
         /* Since we've changed RREQ info, update the timestamp */
         vtimer_now(&now);
         comparable_rreq->timestamp = now;
-        result = true;
     }
 
     mutex_unlock(&rreqt_mutex);
