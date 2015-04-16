@@ -194,20 +194,19 @@ static void _reset_entry_if_stale(uint8_t i)
 bool routingtable_offers_improvement(struct aodvv2_routing_entry_t *rt_entry,
                                      struct node_data *node_data)
 {
-    /* Check if new info is stale */
-    if (seqnum_cmp(node_data->seqnum, rt_entry->seqnum) == -1) {
-        return false;
+    /* (TODO only guaranteed for AODVV2_DEFAULT_METRIC_TYPE!)*/
+    bool is_loop_free = node_data->metric <= rt_entry->metric;
+    int stale = seqnum_cmp(node_data->seqnum, rt_entry->seqnum);
+
+    if ((stale == 1)                                                 /* New info is more recent and MUST be used */
+        || ((stale == 0) && (node_data->metric < rt_entry->metric))  /* New info offers a better route and SHOULD be used */
+        || ((stale == 0) && (node_data->metric >= rt_entry->metric)  /* Route is not an improvement, */
+                         && (rt_entry->state == ROUTE_STATE_INVALID) /* but repairs an invalid route */
+                         && is_loop_free)                             /* and contains no loops */
+        ) {
+        return true;
     }
-    /* Check if new info is more costly */
-    if ((node_data->metric >= rt_entry->metric)
-        && !(rt_entry->state != ROUTE_STATE_INVALID)) {
-        return false;
-    }
-    /* Check if new info repairs an invalid route */
-    if (!(rt_entry->state != ROUTE_STATE_INVALID)) {
-        return false;
-    }
-    return true;
+    return false;
 }
 
 void routingtable_fill_routing_entry_t_rreq(struct aodvv2_packet_data *packet_data,
