@@ -172,12 +172,17 @@ ng_pktsnip_t *ng_pktbuf_start_write(ng_pktsnip_t *pkt);
  *
  * @param[in] pkt   A packet.
  * @param[in] snip  A snip in the packet.
+ *
+ * @return  The new reference to @p pkt.
  */
-static inline void ng_pktbuf_remove_snip(ng_pktsnip_t *pkt, ng_pktsnip_t *snip)
+static inline ng_pktsnip_t *ng_pktbuf_remove_snip(ng_pktsnip_t *pkt,
+                                                  ng_pktsnip_t *snip)
 {
     LL_DELETE(pkt, snip);
     snip->next = NULL;
     ng_pktbuf_release(snip);
+
+    return pkt;
 }
 
 #ifdef DEVELHELP
