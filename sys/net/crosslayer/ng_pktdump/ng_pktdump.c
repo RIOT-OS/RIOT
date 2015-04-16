@@ -25,6 +25,7 @@
 #include "kernel.h"
 #include "net/ng_pktdump.h"
 #include "net/ng_netbase.h"
+#include "od.h"
 
 /**
  * @brief   PID of the pktdump thread
@@ -36,45 +37,74 @@ static kernel_pid_t _pid = KERNEL_PID_UNDEF;
  */
 static char _stack[NG_PKTDUMP_STACKSIZE];
 
-static void _dump_type(ng_nettype_t type)
-{
-    switch (type) {
-        case NG_NETTYPE_UNDEF:
-            printf("NETTYPE_UNDEF (%i)", type);
-            break;
+#define ADDR_STR_MAX    (24)
 
+#ifdef MODULE_NG_NETIF
+static void _dump_netif_hdr(ng_netif_hdr_t *hdr)
+{
+    char addr_str[ADDR_STR_MAX];
+
+    printf("if_pid: %" PRIkernel_pid "  ", hdr->if_pid);
+    printf("rssi: %" PRIu8 "  ", hdr->rssi);
+    printf("lqi: %" PRIu8 "\n", hdr->lqi);
+    printf("src_l2addr: %s\n",
+           ng_netif_addr_to_str(addr_str, sizeof(addr_str),
+                                ng_netif_hdr_get_src_addr(hdr),
+                                (size_t)hdr->src_l2addr_len));
+    printf("dst_l2addr: %s\n",
+           ng_netif_addr_to_str(addr_str, sizeof(addr_str),
+                                ng_netif_hdr_get_dst_addr(hdr),
+                                (size_t)hdr->dst_l2addr_len));
+}
+#endif
+
+static void _dump_snip(ng_pktsnip_t *pkt)
+{
+    switch (pkt->type) {
+        case NG_NETTYPE_UNDEF:
+            printf("NETTYPE_UNDEF (%i)\n", pkt->type);
+            od_hex_dump(pkt->data, pkt->size, OD_WIDTH_DEFAULT);
+            break;
+#ifdef MODULE_NG_NETIF
+        case NG_NETTYPE_NETIF:
+            printf("NETTYPE_NETIF (%i)\n", pkt->type);
+            _dump_netif_hdr(pkt->data);
+            break;
+#endif
 #ifdef MODULE_NG_SIXLOWPAN
         case NG_NETTYPE_SIXLOWPAN:
-            printf("NETTYPE_SIXLOPAN (%i)", type);
+            printf("NETTYPE_SIXLOWPAN (%i)", pkt->type);
             break;
 #endif
 #ifdef MODULE_NG_IPV6
         case NG_NETTYPE_IPV6:
-            printf("NETTYPE_IPV6 (%i)", type);
+            printf("NETTYPE_IPV6 (%i)", pkt->type);
             break;
 #endif
 #ifdef MODULE_NG_ICMPV6
         case NG_NETTYPE_ICMPV6:
-            printf("NETTYPE_ICMPV6 (%i)", type);
+            printf("NETTYPE_ICMPV6 (%i)", pkt->type);
             break;
 #endif
 #ifdef MODULE_NG_TCP
         case NG_NETTYPE_TCP:
-            printf("NETTYPE_TCP (%i)", type);
+            printf("NETTYPE_TCP (%i)", pkt->type);
             break;
 #endif
 #ifdef MODULE_NG_UDP
         case NG_NETTYPE_UDP:
-            printf("NETTYPE_UDP (%i)", type);
+            printf("NETTYPE_UDP (%i)", pkt->type);
             break;
 #endif
 #ifdef TEST_SUITES
         case NG_NETTYPE_TEST:
-            printf("NETTYPE_TEST (%i)", type);
+            printf("NETTYPE_TEST (%i)", pkt->type);
+            od_hex_dump(pkt->data, pkt->size, OD_WIDTH_DEFAULT);
             break;
 #endif
         default:
-            printf("NETTYPE_UNKNOWN (%i)", type);
+            printf("NETTYPE_UNKNOWN (%i)", pkt->type);
+            od_hex_dump(pkt->data, pkt->size, OD_WIDTH_DEFAULT);
             break;
     }
 }
@@ -87,12 +117,12 @@ static void _dump(ng_pktsnip_t *pkt)
 
     while (snip != NULL) {
         printf("~~ SNIP %2i - size: %3i byte, type: ", snips, snip->size);
-        _dump_type(snip->type);
-        puts("");
+        _dump_snip(snip);
         ++snips;
         size += snip->size;
         snip = snip->next;
     }
+
     printf("~~ PKT    - %2i snips, total size: %3i byte\n", snips, size);
     ng_pktbuf_release(pkt);
 }
