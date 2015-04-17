@@ -38,7 +38,7 @@ const char *state_names[] = {
 /**
  * @brief Prints a list of running threads including stack usage to stdout.
  */
-void thread_print_all(void)
+void ps(void)
 {
     const char queued_name[] = {'_', 'Q'};
 #ifdef DEVELHELP

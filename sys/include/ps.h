@@ -26,7 +26,7 @@
 extern "C" {
 #endif
 
-void thread_print_all(void);
+void ps(void);
 int _ps_handler(int argc, char **argv);
 
 #ifdef __cplusplus
