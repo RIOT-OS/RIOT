@@ -264,6 +264,10 @@
  *                  #define SPI_0_SIN_PIN           7
  *
  *                  #define SPI_0_PCS0_ACTIVE_LOW   1
+ *
+ *              It is possible to use the hardware CS, currently only for the PCS0:
+ *
+ *                  #define KINETIS_SPI_USE_HW_CS   1
  */
 
 /**
