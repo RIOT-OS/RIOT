@@ -139,6 +139,102 @@ int gpio_init_out(gpio_t dev, gpio_pp_t pushpull)
             pin = GPIO_15_PIN;
             break;
 #endif
+#if GPIO_16_EN
+        case GPIO_16:
+            port = GPIO_16_DEV;
+            pin = GPIO_16_PIN;
+            break;
+#endif
+#if GPIO_17_EN
+        case GPIO_17:
+            port = GPIO_17_DEV;
+            pin = GPIO_17_PIN;
+            break;
+#endif
+#if GPIO_18_EN
+        case GPIO_18:
+            port = GPIO_18_DEV;
+            pin = GPIO_18_PIN;
+            break;
+#endif
+#if GPIO_19_EN
+        case GPIO_19:
+            port = GPIO_19_DEV;
+            pin = GPIO_19_PIN;
+            break;
+#endif
+#if GPIO_20_EN
+        case GPIO_20:
+            port = GPIO_20_DEV;
+            pin = GPIO_20_PIN;
+            break;
+#endif
+#if GPIO_21_EN
+        case GPIO_21:
+            port = GPIO_21_DEV;
+            pin = GPIO_21_PIN;
+            break;
+#endif
+#if GPIO_22_EN
+        case GPIO_22:
+            port = GPIO_22_DEV;
+            pin = GPIO_22_PIN;
+            break;
+#endif
+#if GPIO_23_EN
+        case GPIO_23:
+            port = GPIO_23_DEV;
+            pin = GPIO_23_PIN;
+            break;
+#endif
+#if GPIO_24_EN
+        case GPIO_24:
+            port = GPIO_24_DEV;
+            pin = GPIO_24_PIN;
+            break;
+#endif
+#if GPIO_25_EN
+        case GPIO_25:
+            port = GPIO_25_DEV;
+            pin = GPIO_25_PIN;
+            break;
+#endif
+#if GPIO_26_EN
+        case GPIO_26:
+            port = GPIO_26_DEV;
+            pin = GPIO_26_PIN;
+            break;
+#endif
+#if GPIO_27_EN
+        case GPIO_27:
+            port = GPIO_27_DEV;
+            pin = GPIO_27_PIN;
+            break;
+#endif
+#if GPIO_28_EN
+        case GPIO_28:
+            port = GPIO_28_DEV;
+            pin = GPIO_28_PIN;
+            break;
+#endif
+#if GPIO_29_EN
+        case GPIO_29:
+            port = GPIO_29_DEV;
+            pin = GPIO_29_PIN;
+            break;
+#endif
+#if GPIO_30_EN
+        case GPIO_30:
+            port = GPIO_30_DEV;
+            pin = GPIO_30_PIN;
+            break;
+#endif
+#if GPIO_31_EN
+        case GPIO_31:
+            port = GPIO_31_DEV;
+            pin = GPIO_31_PIN;
+            break;
+#endif
     }
 
     /* configure pin as output */
@@ -277,6 +373,118 @@ int gpio_init_in(gpio_t dev, gpio_pp_t pushpull)
             port = GPIO_15_DEV;
             pin = GPIO_15_PIN;
             PMC->PMC_PCER0 = (1 << GPIO_15_IRQ);
+            break;
+#endif
+#if GPIO_16_EN
+        case GPIO_16:
+            port = GPIO_16_DEV;
+            pin = GPIO_16_PIN;
+            PMC->PMC_PCER0 = (1 << GPIO_16_IRQ);
+            break;
+#endif
+#if GPIO_17_EN
+        case GPIO_17:
+            port = GPIO_17_DEV;
+            pin = GPIO_17_PIN;
+            PMC->PMC_PCER0 = (1 << GPIO_17_IRQ);
+            break;
+#endif
+#if GPIO_18_EN
+        case GPIO_18:
+            port = GPIO_18_DEV;
+            pin = GPIO_18_PIN;
+            PMC->PMC_PCER0 = (1 << GPIO_18_IRQ);
+            break;
+#endif
+#if GPIO_19_EN
+        case GPIO_19:
+            port = GPIO_19_DEV;
+            pin = GPIO_19_PIN;
+            PMC->PMC_PCER0 = (1 << GPIO_19_IRQ);
+            break;
+#endif
+#if GPIO_20_EN
+        case GPIO_20:
+            port = GPIO_20_DEV;
+            pin = GPIO_20_PIN;
+            PMC->PMC_PCER0 = (1 << GPIO_20_IRQ);
+            break;
+#endif
+#if GPIO_21_EN
+        case GPIO_21:
+            port = GPIO_21_DEV;
+            pin = GPIO_21_PIN;
+            PMC->PMC_PCER0 = (1 << GPIO_21_IRQ);
+            break;
+#endif
+#if GPIO_22_EN
+        case GPIO_22:
+            port = GPIO_22_DEV;
+            pin = GPIO_22_PIN;
+            PMC->PMC_PCER0 = (1 << GPIO_22_IRQ);
+            break;
+#endif
+#if GPIO_23_EN
+        case GPIO_23:
+            port = GPIO_23_DEV;
+            pin = GPIO_23_PIN;
+            PMC->PMC_PCER0 = (1 << GPIO_23_IRQ);
+            break;
+#endif
+#if GPIO_24_EN
+        case GPIO_24:
+            port = GPIO_24_DEV;
+            pin = GPIO_24_PIN;
+            PMC->PMC_PCER0 = (1 << GPIO_24_IRQ);
+            break;
+#endif
+#if GPIO_25_EN
+        case GPIO_25:
+            port = GPIO_25_DEV;
+            pin = GPIO_25_PIN;
+            PMC->PMC_PCER0 = (1 << GPIO_25_IRQ);
+            break;
+#endif
+#if GPIO_26_EN
+        case GPIO_26:
+            port = GPIO_26_DEV;
+            pin = GPIO_26_PIN;
+            PMC->PMC_PCER0 = (1 << GPIO_26_IRQ);
+            break;
+#endif
+#if GPIO_27_EN
+        case GPIO_27:
+            port = GPIO_27_DEV;
+            pin = GPIO_27_PIN;
+            PMC->PMC_PCER0 = (1 << GPIO_27_IRQ);
+            break;
+#endif
+#if GPIO_28_EN
+        case GPIO_28:
+            port = GPIO_28_DEV;
+            pin = GPIO_28_PIN;
+            PMC->PMC_PCER0 = (1 << GPIO_28_IRQ);
+            break;
+#endif
+#if GPIO_29_EN
+        case GPIO_29:
+            port = GPIO_29_DEV;
+            pin = GPIO_29_PIN;
+            PMC->PMC_PCER0 = (1 << GPIO_29_IRQ);
+            break;
+#endif
+#if GPIO_30_EN
+        case GPIO_30:
+            port = GPIO_30_DEV;
+            pin = GPIO_30_PIN;
+            PMC->PMC_PCER0 = (1 << GPIO_30_IRQ);
+            break;
+#endif
+#if GPIO_31_EN
+        case GPIO_31:
+            port = GPIO_31_DEV;
+            pin = GPIO_31_PIN;
+            PMC->PMC_PCER0 = (1 << GPIO_31_IRQ);
             break;
 #endif
     }
@@ -443,6 +651,134 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb
             NVIC_EnableIRQ(GPIO_15_IRQ);
             break;
 #endif
+#if GPIO_16_EN
+        case GPIO_16:
+            port = GPIO_16_DEV;
+            pin = GPIO_16_PIN;
+            NVIC_SetPriority(GPIO_16_IRQ, GPIO_IRQ_PRIO);
+            NVIC_EnableIRQ(GPIO_16_IRQ);
+            break;
+#endif
+#if GPIO_17_EN
+        case GPIO_17:
+            port = GPIO_17_DEV;
+            pin = GPIO_17_PIN;
+            NVIC_SetPriority(GPIO_17_IRQ, GPIO_IRQ_PRIO);
+            NVIC_EnableIRQ(GPIO_17_IRQ);
+            break;
+#endif
+#if GPIO_18_EN
+        case GPIO_18:
+            port = GPIO_18_DEV;
+            pin = GPIO_18_PIN;
+            NVIC_SetPriority(GPIO_18_IRQ, GPIO_IRQ_PRIO);
+            NVIC_EnableIRQ(GPIO_18_IRQ);
+            break;
+#endif
+#if GPIO_19_EN
+        case GPIO_19:
+            port = GPIO_19_DEV;
+            pin = GPIO_19_PIN;
+            NVIC_SetPriority(GPIO_19_IRQ, GPIO_IRQ_PRIO);
+            NVIC_EnableIRQ(GPIO_19_IRQ);
+            break;
+#endif
+#if GPIO_20_EN
+        case GPIO_20:
+            port = GPIO_20_DEV;
+            pin = GPIO_20_PIN;
+            NVIC_SetPriority(GPIO_20_IRQ, GPIO_IRQ_PRIO);
+            NVIC_EnableIRQ(GPIO_20_IRQ);
+            break;
+#endif
+#if GPIO_21_EN
+        case GPIO_21:
+            port = GPIO_21_DEV;
+            pin = GPIO_21_PIN;
+            NVIC_SetPriority(GPIO_21_IRQ, GPIO_IRQ_PRIO);
+            NVIC_EnableIRQ(GPIO_21_IRQ);
+            break;
+#endif
+#if GPIO_22_EN
+        case GPIO_22:
+            port = GPIO_22_DEV;
+            pin = GPIO_22_PIN;
+            NVIC_SetPriority(GPIO_22_IRQ, GPIO_IRQ_PRIO);
+            NVIC_EnableIRQ(GPIO_22_IRQ);
+            break;
+#endif
+#if GPIO_23_EN
+        case GPIO_23:
+            port = GPIO_23_DEV;
+            pin = GPIO_23_PIN;
+            NVIC_SetPriority(GPIO_23_IRQ, GPIO_IRQ_PRIO);
+            NVIC_EnableIRQ(GPIO_23_IRQ);
+            break;
+#endif
+#if GPIO_24_EN
+        case GPIO_24:
+            port = GPIO_24_DEV;
+            pin = GPIO_24_PIN;
+            NVIC_SetPriority(GPIO_24_IRQ, GPIO_IRQ_PRIO);
+            NVIC_EnableIRQ(GPIO_24_IRQ);
+            break;
+#endif
+#if GPIO_25_EN
+        case GPIO_25:
+            port = GPIO_25_DEV;
+            pin = GPIO_25_PIN;
+            NVIC_SetPriority(GPIO_25_IRQ, GPIO_IRQ_PRIO);
+            NVIC_EnableIRQ(GPIO_25_IRQ);
+            break;
+#endif
+#if GPIO_26_EN
+        case GPIO_26:
+            port = GPIO_26_DEV;
+            pin = GPIO_26_PIN;
+            NVIC_SetPriority(GPIO_26_IRQ, GPIO_IRQ_PRIO);
+            NVIC_EnableIRQ(GPIO_26_IRQ);
+            break;
+#endif
+#if GPIO_27_EN
+        case GPIO_27:
+            port = GPIO_27_DEV;
+            pin = GPIO_27_PIN;
+            NVIC_SetPriority(GPIO_27_IRQ, GPIO_IRQ_PRIO);
+            NVIC_EnableIRQ(GPIO_27_IRQ);
+            break;
+#endif
+#if GPIO_28_EN
+        case GPIO_28:
+            port = GPIO_28_DEV;
+            pin = GPIO_28_PIN;
+            NVIC_SetPriority(GPIO_28_IRQ, GPIO_IRQ_PRIO);
+            NVIC_EnableIRQ(GPIO_28_IRQ);
+            break;
+#endif
+#if GPIO_29_EN
+        case GPIO_29:
+            port = GPIO_29_DEV;
+            pin = GPIO_29_PIN;
+            NVIC_SetPriority(GPIO_29_IRQ, GPIO_IRQ_PRIO);
+            NVIC_EnableIRQ(GPIO_29_IRQ);
+            break;
+#endif
+#if GPIO_30_EN
+        case GPIO_30:
+            port = GPIO_30_DEV;
+            pin = GPIO_30_PIN;
+            NVIC_SetPriority(GPIO_30_IRQ, GPIO_IRQ_PRIO);
+            NVIC_EnableIRQ(GPIO_30_IRQ);
+            break;
+#endif
+#if GPIO_31_EN
+        case GPIO_31:
+            port = GPIO_31_DEV;
+            pin = GPIO_31_PIN;
+            NVIC_SetPriority(GPIO_31_IRQ, GPIO_IRQ_PRIO);
+            NVIC_EnableIRQ(GPIO_31_IRQ);
+            break;
+#endif
     }
 
     /* set callback function and parameter */
@@ -578,6 +914,102 @@ int gpio_read(gpio_t dev)
             pin = GPIO_15_PIN;
             break;
 #endif
+#if GPIO_16_EN
+        case GPIO_16:
+            port = GPIO_16_DEV;
+            pin = GPIO_16_PIN;
+            break;
+#endif
+#if GPIO_17_EN
+        case GPIO_17:
+            port = GPIO_17_DEV;
+            pin = GPIO_17_PIN;
+            break;
+#endif
+#if GPIO_18_EN
+        case GPIO_18:
+            port = GPIO_18_DEV;
+            pin = GPIO_18_PIN;
+            break;
+#endif
+#if GPIO_19_EN
+        case GPIO_19:
+            port = GPIO_19_DEV;
+            pin = GPIO_19_PIN;
+            break;
+#endif
+#if GPIO_20_EN
+        case GPIO_20:
+            port = GPIO_20_DEV;
+            pin = GPIO_20_PIN;
+            break;
+#endif
+#if GPIO_21_EN
+        case GPIO_21:
+            port = GPIO_21_DEV;
+            pin = GPIO_21_PIN;
+            break;
+#endif
+#if GPIO_22_EN
+        case GPIO_22:
+            port = GPIO_22_DEV;
+            pin = GPIO_22_PIN;
+            break;
+#endif
+#if GPIO_23_EN
+        case GPIO_23:
+            port = GPIO_23_DEV;
+            pin = GPIO_23_PIN;
+            break;
+#endif
+#if GPIO_24_EN
+        case GPIO_24:
+            port = GPIO_24_DEV;
+            pin = GPIO_24_PIN;
+            break;
+#endif
+#if GPIO_25_EN
+        case GPIO_25:
+            port = GPIO_25_DEV;
+            pin = GPIO_25_PIN;
+            break;
+#endif
+#if GPIO_26_EN
+        case GPIO_26:
+            port = GPIO_26_DEV;
+            pin = GPIO_26_PIN;
+            break;
+#endif
+#if GPIO_27_EN
+        case GPIO_27:
+            port = GPIO_27_DEV;
+            pin = GPIO_27_PIN;
+            break;
+#endif
+#if GPIO_28_EN
+        case GPIO_28:
+            port = GPIO_28_DEV;
+            pin = GPIO_28_PIN;
+            break;
+#endif
+#if GPIO_29_EN
+        case GPIO_29:
+            port = GPIO_29_DEV;
+            pin = GPIO_29_PIN;
+            break;
+#endif
+#if GPIO_30_EN
+        case GPIO_30:
+            port = GPIO_30_DEV;
+            pin = GPIO_30_PIN;
+            break;
+#endif
+#if GPIO_31_EN
+        case GPIO_31:
+            port = GPIO_31_DEV;
+            pin = GPIO_31_PIN;
+            break;
+#endif
     }
 
     if (port->PIO_OSR & pin) {
@@ -678,6 +1110,86 @@ void gpio_set(gpio_t dev)
             GPIO_15_DEV->PIO_SODR = GPIO_15_PIN;
             break;
 #endif
+#if GPIO_16_EN
+        case GPIO_16:
+            GPIO_16_DEV->PIO_SODR = GPIO_16_PIN;
+            break;
+#endif
+#if GPIO_17_EN
+        case GPIO_17:
+            GPIO_17_DEV->PIO_SODR = GPIO_17_PIN;
+            break;
+#endif
+#if GPIO_18_EN
+        case GPIO_18:
+            GPIO_18_DEV->PIO_SODR = GPIO_18_PIN;
+            break;
+#endif
+#if GPIO_19_EN
+        case GPIO_19:
+            GPIO_19_DEV->PIO_SODR = GPIO_19_PIN;
+            break;
+#endif
+#if GPIO_20_EN
+        case GPIO_20:
+            GPIO_20_DEV->PIO_SODR = GPIO_20_PIN;
+            break;
+#endif
+#if GPIO_21_EN
+        case GPIO_21:
+            GPIO_21_DEV->PIO_SODR = GPIO_21_PIN;
+            break;
+#endif
+#if GPIO_22_EN
+        case GPIO_22:
+            GPIO_22_DEV->PIO_SODR = GPIO_22_PIN;
+            break;
+#endif
+#if GPIO_23_EN
+        case GPIO_23:
+            GPIO_23_DEV->PIO_SODR = GPIO_23_PIN;
+            break;
+#endif
+#if GPIO_24_EN
+        case GPIO_24:
+            GPIO_24_DEV->PIO_SODR = GPIO_24_PIN;
+            break;
+#endif
+#if GPIO_25_EN
+        case GPIO_25:
+            GPIO_25_DEV->PIO_SODR = GPIO_25_PIN;
+            break;
+#endif
+#if GPIO_26_EN
+        case GPIO_26:
+            GPIO_26_DEV->PIO_SODR = GPIO_26_PIN;
+            break;
+#endif
+#if GPIO_27_EN
+        case GPIO_27:
+            GPIO_27_DEV->PIO_SODR = GPIO_27_PIN;
+            break;
+#endif
+#if GPIO_28_EN
+        case GPIO_28:
+            GPIO_28_DEV->PIO_SODR = GPIO_28_PIN;
+            break;
+#endif
+#if GPIO_29_EN
+        case GPIO_29:
+            GPIO_29_DEV->PIO_SODR = GPIO_29_PIN;
+            break;
+#endif
+#if GPIO_30_EN
+        case GPIO_30:
+            GPIO_30_DEV->PIO_SODR = GPIO_30_PIN;
+            break;
+#endif
+#if GPIO_31_EN
+        case GPIO_31:
+            GPIO_31_DEV->PIO_SODR = GPIO_31_PIN;
+            break;
+#endif
     }
 }
 
@@ -764,6 +1276,86 @@ void gpio_clear(gpio_t dev)
             GPIO_15_DEV->PIO_CODR = GPIO_15_PIN;
             break;
 #endif
+#if GPIO_16_EN
+        case GPIO_16:
+            GPIO_16_DEV->PIO_CODR = GPIO_16_PIN;
+            break;
+#endif
+#if GPIO_17_EN
+        case GPIO_17:
+            GPIO_17_DEV->PIO_CODR = GPIO_17_PIN;
+            break;
+#endif
+#if GPIO_18_EN
+        case GPIO_18:
+            GPIO_18_DEV->PIO_CODR = GPIO_18_PIN;
+            break;
+#endif
+#if GPIO_19_EN
+        case GPIO_19:
+            GPIO_19_DEV->PIO_CODR = GPIO_19_PIN;
+            break;
+#endif
+#if GPIO_20_EN
+        case GPIO_20:
+            GPIO_20_DEV->PIO_CODR = GPIO_20_PIN;
+            break;
+#endif
+#if GPIO_21_EN
+        case GPIO_21:
+            GPIO_21_DEV->PIO_CODR = GPIO_21_PIN;
+            break;
+#endif
+#if GPIO_22_EN
+        case GPIO_22:
+            GPIO_22_DEV->PIO_CODR = GPIO_22_PIN;
+            break;
+#endif
+#if GPIO_23_EN
+        case GPIO_23:
+            GPIO_23_DEV->PIO_CODR = GPIO_23_PIN;
+            break;
+#endif
+#if GPIO_24_EN
+        case GPIO_24:
+            GPIO_24_DEV->PIO_CODR = GPIO_24_PIN;
+            break;
+#endif
+#if GPIO_25_EN
+        case GPIO_25:
+            GPIO_25_DEV->PIO_CODR = GPIO_25_PIN;
+            break;
+#endif
+#if GPIO_26_EN
+        case GPIO_26:
+            GPIO_26_DEV->PIO_CODR = GPIO_26_PIN;
+            break;
+#endif
+#if GPIO_27_EN
+        case GPIO_27:
+            GPIO_27_DEV->PIO_CODR = GPIO_27_PIN;
+            break;
+#endif
+#if GPIO_28_EN
+        case GPIO_28:
+            GPIO_28_DEV->PIO_CODR = GPIO_28_PIN;
+            break;
+#endif
+#if GPIO_29_EN
+        case GPIO_29:
+            GPIO_29_DEV->PIO_CODR = GPIO_29_PIN;
+            break;
+#endif
+#if GPIO_30_EN
+        case GPIO_30:
+            GPIO_30_DEV->PIO_CODR = GPIO_30_PIN;
+            break;
+#endif
+#if GPIO_31_EN
+        case GPIO_31:
+            GPIO_31_DEV->PIO_CODR = GPIO_31_PIN;
+            break;
+#endif
     }
 }
 
@@ -782,6 +1374,338 @@ void gpio_write(gpio_t dev, int value)
         gpio_set(dev);
     } else {
         gpio_clear(dev);
+    }
+}
+
+
+void gpio_irq_disable(gpio_t dev)
+{
+    switch (dev) {
+#if GPIO_0_EN
+        case GPIO_0:
+            NVIC_DisableIRQ(GPIO_0_IRQ);
+            break;
+#endif
+#if GPIO_1_EN
+        case GPIO_1:
+            NVIC_DisableIRQ(GPIO_1_IRQ);
+            break;
+#endif
+#if GPIO_2_EN
+        case GPIO_2:
+            NVIC_DisableIRQ(GPIO_2_IRQ);
+            break;
+#endif
+#if GPIO_3_EN
+        case GPIO_3:
+            NVIC_DisableIRQ(GPIO_3_IRQ);
+            break;
+#endif
+#if GPIO_4_EN
+        case GPIO_4:
+            NVIC_DisableIRQ(GPIO_4_IRQ);
+            break;
+#endif
+#if GPIO_5_EN
+        case GPIO_5:
+            NVIC_DisableIRQ(GPIO_5_IRQ);
+            break;
+#endif
+#if GPIO_6_EN
+        case GPIO_6:
+            NVIC_DisableIRQ(GPIO_6_IRQ);
+            break;
+#endif
+#if GPIO_7_EN
+        case GPIO_7:
+            NVIC_DisableIRQ(GPIO_7_IRQ);
+            break;
+#endif
+#if GPIO_8_EN
+        case GPIO_8:
+            NVIC_DisableIRQ(GPIO_8_IRQ);
+            break;
+#endif
+#if GPIO_9_EN
+        case GPIO_9:
+            NVIC_DisableIRQ(GPIO_9_IRQ);
+            break;
+#endif
+#if GPIO_10_EN
+        case GPIO_10:
+            NVIC_DisableIRQ(GPIO_10_IRQ);
+            break;
+#endif
+#if GPIO_11_EN
+        case GPIO_11:
+            NVIC_DisableIRQ(GPIO_11_IRQ);
+            break;
+#endif
+#if GPIO_12_EN
+        case GPIO_12:
+            NVIC_DisableIRQ(GPIO_12_IRQ);
+            break;
+#endif
+#if GPIO_13_EN
+        case GPIO_13:
+            NVIC_DisableIRQ(GPIO_13_IRQ);
+            break;
+#endif
+#if GPIO_14_EN
+        case GPIO_14:
+            NVIC_DisableIRQ(GPIO_14_IRQ);
+            break;
+#endif
+#if GPIO_15_EN
+        case GPIO_15:
+            NVIC_DisableIRQ(GPIO_15_IRQ);
+            break;
+#endif
+#if GPIO_16_EN
+        case GPIO_16:
+            NVIC_DisableIRQ(GPIO_16_IRQ);
+            break;
+#endif
+#if GPIO_17_EN
+        case GPIO_17:
+            NVIC_DisableIRQ(GPIO_17_IRQ);
+            break;
+#endif
+#if GPIO_18_EN
+        case GPIO_18:
+            NVIC_DisableIRQ(GPIO_18_IRQ);
+            break;
+#endif
+#if GPIO_19_EN
+        case GPIO_19:
+            NVIC_DisableIRQ(GPIO_19_IRQ);
+            break;
+#endif
+#if GPIO_20_EN
+        case GPIO_20:
+            NVIC_DisableIRQ(GPIO_20_IRQ);
+            break;
+#endif
+#if GPIO_21_EN
+        case GPIO_21:
+            NVIC_DisableIRQ(GPIO_21_IRQ);
+            break;
+#endif
+#if GPIO_22_EN
+        case GPIO_22:
+            NVIC_DisableIRQ(GPIO_22_IRQ);
+            break;
+#endif
+#if GPIO_23_EN
+        case GPIO_23:
+            NVIC_DisableIRQ(GPIO_23_IRQ);
+            break;
+#endif
+#if GPIO_24_EN
+        case GPIO_24:
+            NVIC_DisableIRQ(GPIO_24_IRQ);
+            break;
+#endif
+#if GPIO_25_EN
+        case GPIO_25:
+            NVIC_DisableIRQ(GPIO_25_IRQ);
+            break;
+#endif
+#if GPIO_26_EN
+        case GPIO_26:
+            NVIC_DisableIRQ(GPIO_26_IRQ);
+            break;
+#endif
+#if GPIO_27_EN
+        case GPIO_27:
+            NVIC_DisableIRQ(GPIO_27_IRQ);
+            break;
+#endif
+#if GPIO_28_EN
+        case GPIO_28:
+            NVIC_DisableIRQ(GPIO_28_IRQ);
+            break;
+#endif
+#if GPIO_29_EN
+        case GPIO_29:
+            NVIC_DisableIRQ(GPIO_29_IRQ);
+            break;
+#endif
+#if GPIO_30_EN
+        case GPIO_30:
+            NVIC_DisableIRQ(GPIO_30_IRQ);
+            break;
+#endif
+#if GPIO_31_EN
+        case GPIO_31:
+            NVIC_DisableIRQ(GPIO_31_IRQ);
+            break;
+#endif
+    }
+}
+void gpio_irq_enable(gpio_t dev)
+{
+    switch (dev) {
+#if GPIO_0_EN
+        case GPIO_0:
+            NVIC_EnableIRQ(GPIO_0_IRQ);
+            break;
+#endif
+#if GPIO_1_EN
+        case GPIO_1:
+            NVIC_EnableIRQ(GPIO_1_IRQ);
+            break;
+#endif
+#if GPIO_2_EN
+        case GPIO_2:
+            NVIC_EnableIRQ(GPIO_2_IRQ);
+            break;
+#endif
+#if GPIO_3_EN
+        case GPIO_3:
+            NVIC_EnableIRQ(GPIO_3_IRQ);
+            break;
+#endif
+#if GPIO_4_EN
+        case GPIO_4:
+            NVIC_EnableIRQ(GPIO_4_IRQ);
+            break;
+#endif
+#if GPIO_5_EN
+        case GPIO_5:
+            NVIC_EnableIRQ(GPIO_5_IRQ);
+            break;
+#endif
+#if GPIO_6_EN
+        case GPIO_6:
+            NVIC_EnableIRQ(GPIO_6_IRQ);
+            break;
+#endif
+#if GPIO_7_EN
+        case GPIO_7:
+            NVIC_EnableIRQ(GPIO_7_IRQ);
+            break;
+#endif
+#if GPIO_8_EN
+        case GPIO_8:
+            NVIC_EnableIRQ(GPIO_8_IRQ);
+            break;
+#endif
+#if GPIO_9_EN
+        case GPIO_9:
+            NVIC_EnableIRQ(GPIO_9_IRQ);
+            break;
+#endif
+#if GPIO_10_EN
+        case GPIO_10:
+            NVIC_EnableIRQ(GPIO_10_IRQ);
+            break;
+#endif
+#if GPIO_11_EN
+        case GPIO_11:
+            NVIC_EnableIRQ(GPIO_11_IRQ);
+            break;
+#endif
+#if GPIO_12_EN
+        case GPIO_12:
+            NVIC_EnableIRQ(GPIO_12_IRQ);
+            break;
+#endif
+#if GPIO_13_EN
+        case GPIO_13:
+            NVIC_EnableIRQ(GPIO_13_IRQ);
+            break;
+#endif
+#if GPIO_14_EN
+        case GPIO_14:
+            NVIC_EnableIRQ(GPIO_14_IRQ);
+            break;
+#endif
+#if GPIO_15_EN
+        case GPIO_15:
+            NVIC_EnableIRQ(GPIO_15_IRQ);
+            break;
+#endif
+#if GPIO_16_EN
+        case GPIO_16:
+            NVIC_EnableIRQ(GPIO_16_IRQ);
+            break;
+#endif
+#if GPIO_17_EN
+        case GPIO_17:
+            NVIC_EnableIRQ(GPIO_17_IRQ);
+            break;
+#endif
+#if GPIO_18_EN
+        case GPIO_18:
+            NVIC_EnableIRQ(GPIO_18_IRQ);
+            break;
+#endif
+#if GPIO_19_EN
+        case GPIO_19:
+            NVIC_EnableIRQ(GPIO_19_IRQ);
+            break;
+#endif
+#if GPIO_20_EN
+        case GPIO_20:
+            NVIC_EnableIRQ(GPIO_20_IRQ);
+            break;
+#endif
+#if GPIO_21_EN
+        case GPIO_21:
+            NVIC_EnableIRQ(GPIO_21_IRQ);
+            break;
+#endif
+#if GPIO_22_EN
+        case GPIO_22:
+            NVIC_EnableIRQ(GPIO_22_IRQ);
+            break;
+#endif
+#if GPIO_23_EN
+        case GPIO_23:
+            NVIC_EnableIRQ(GPIO_23_IRQ);
+            break;
+#endif
+#if GPIO_24_EN
+        case GPIO_24:
+            NVIC_EnableIRQ(GPIO_24_IRQ);
+            break;
+#endif
+#if GPIO_25_EN
+        case GPIO_25:
+            NVIC_EnableIRQ(GPIO_25_IRQ);
+            break;
+#endif
+#if GPIO_26_EN
+        case GPIO_26:
+            NVIC_EnableIRQ(GPIO_26_IRQ);
+            break;
+#endif
+#if GPIO_27_EN
+        case GPIO_27:
+            NVIC_EnableIRQ(GPIO_27_IRQ);
+            break;
+#endif
+#if GPIO_28_EN
+        case GPIO_28:
+            NVIC_EnableIRQ(GPIO_28_IRQ);
+            break;
+#endif
+#if GPIO_29_EN
+        case GPIO_29:
+            NVIC_EnableIRQ(GPIO_29_IRQ);
+            break;
+#endif
+#if GPIO_30_EN
+        case GPIO_30:
+            NVIC_EnableIRQ(GPIO_30_IRQ);
+            break;
+#endif
+#if GPIO_31_EN
+        case GPIO_31:
+            NVIC_EnableIRQ(GPIO_31_IRQ);
+            break;
+#endif
     }
 }
 
