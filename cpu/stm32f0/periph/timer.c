@@ -52,7 +52,7 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
             /* enable timer peripheral clock */
             TIMER_0_CLKEN();
             /* set timer's IRQ priority */
-            NVIC_SetPriority(TIMER_0_IRQ_CHAN, TIMER_0_IRQ_PRIO);
+            NVIC_SetPriority(TIMER_0_IRQ_CHAN, TIMER_IRQ_PRIO);
             /* select timer */
             timer = TIMER_0_DEV;
             break;
@@ -62,7 +62,7 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
             /* enable timer peripheral clock */
             TIMER_1_CLKEN();
             /* set timer's IRQ priority */
-            NVIC_SetPriority(TIMER_1_IRQ_CHAN, TIMER_1_IRQ_PRIO);
+            NVIC_SetPriority(TIMER_1_IRQ_CHAN, TIMER_IRQ_PRIO);
             /* select timer */
             timer = TIMER_1_DEV;
             break;

@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    board_arduino-mega2560 Arduino Mega 2560
+ * @defgroup    boards_arduino-mega2560 Arduino Mega 2560
  * @ingroup     boards
  * @brief       Board specific files for the Arduino Mega 2560 board.
  * @{

@@ -9,10 +9,13 @@
 /**
  * @defgroup    sys_transceiver Transceiver
  * @ingroup     sys
+ *
+ * @brief       The transceiver module implements a generic link abstraction to
+ *              any radio interface.
+ *
  * @{
  *
- * @file        transceiver.h
- * @brief       Transceiver library
+ * @file
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  */
 
@@ -143,7 +146,7 @@ extern "C" {
  */
 
 /**
- * @brief The maximum of threads to register 
+ * @brief The maximum of threads to register
  */
 #define TRANSCEIVER_MAX_REGISTERED  (4)
 
@@ -207,7 +210,7 @@ enum transceiver_msg_type_t {
     SET_ADDRESS,    /**< Set the radio address */
     GET_LONG_ADDR,  /**< Get the long radio address, if existing */
     SET_LONG_ADDR,  /**< Set the long radio address, if supported by hardware */
-    SET_MONITOR,    /**< Set transceiver to monitor mode (disable address 
+    SET_MONITOR,    /**< Set transceiver to monitor mode (disable address
                          checking) */
     GET_PAN,        /**< Get current pan */
     SET_PAN,        /**< Set a new pan */
@@ -230,7 +233,7 @@ enum transceiver_msg_type_t {
  * @brief Manage registered threads per transceiver
  */
 typedef struct {
-    transceiver_type_t transceivers;   /**< the tranceivers the thread is 
+    transceiver_type_t transceivers;   /**< the tranceivers the thread is
                                             registered for */
     kernel_pid_t pid;                  /**< the thread's pid */
 } registered_t;
@@ -249,7 +252,7 @@ typedef struct {
 extern volatile kernel_pid_t transceiver_pid;
 
 /**
- * @brief An array of ignored link layer addresses 
+ * @brief An array of ignored link layer addresses
  */
 extern radio_address_t transceiver_ignored_addr[TRANSCEIVER_MAX_IGNORED_ADDR];
 

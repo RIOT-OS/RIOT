@@ -22,11 +22,11 @@
 #endif
 
 #include "writer.h"
-#include "debug.h"
 
 #include "aodv_debug.h"
 
 #define ENABLE_DEBUG (0)
+#include "debug.h"
 
 static void _cb_addMessageHeader(struct rfc5444_writer *wr,
                                  struct rfc5444_writer_message *message);
@@ -34,8 +34,6 @@ static void _cb_addMessageHeader(struct rfc5444_writer *wr,
 static void _cb_rreq_addAddresses(struct rfc5444_writer *wr);
 static void _cb_rrep_addAddresses(struct rfc5444_writer *wr);
 static void _cb_rerr_addAddresses(struct rfc5444_writer *wr);
-
-static mutex_t writer_mutex;
 
 struct rfc5444_writer writer;
 static struct writer_target _target;
@@ -220,8 +218,6 @@ void aodv_packet_writer_init(write_packet_func_ptr ptr)
 {
     AODV_DEBUG("%s()\n", __func__);
 
-    mutex_init(&writer_mutex);
-
     /* define interface for generating rfc5444 packets */
     _target.interface.packet_buffer = _packet_buffer;
     _target.interface.packet_size = sizeof(_packet_buffer);
@@ -278,7 +274,6 @@ void aodv_packet_writer_send_rreq(struct aodvv2_packet_data *packet_data, struct
     }
 
     /* Make sure no other thread is using the writer right now */
-    mutex_lock(&writer_mutex);
     memcpy(&_target.packet_data, packet_data, sizeof(struct aodvv2_packet_data));
     _target.type = RFC5444_MSGTYPE_RREQ;
     _target.packet_data.hoplimit = packet_data->hoplimit;
@@ -288,7 +283,6 @@ void aodv_packet_writer_send_rreq(struct aodvv2_packet_data *packet_data, struct
 
     rfc5444_writer_create_message_alltarget(&writer, RFC5444_MSGTYPE_RREQ);
     rfc5444_writer_flush(&writer, &_target.interface, false);
-    mutex_unlock(&writer_mutex);
 }
 
 
@@ -306,8 +300,6 @@ void aodv_packet_writer_send_rrep(struct aodvv2_packet_data *packet_data, struct
         return;
     }
 
-    /* Make sure no other thread is using the writer right now */
-    mutex_lock(&writer_mutex);
     memcpy(&_target.packet_data, packet_data, sizeof(struct aodvv2_packet_data));
     _target.type = RFC5444_MSGTYPE_RREP;
     _target.packet_data.hoplimit = AODVV2_MAX_HOPCOUNT;
@@ -317,7 +309,6 @@ void aodv_packet_writer_send_rrep(struct aodvv2_packet_data *packet_data, struct
 
     rfc5444_writer_create_message_alltarget(&writer, RFC5444_MSGTYPE_RREP);
     rfc5444_writer_flush(&writer, &_target.interface, false);
-    mutex_unlock(&writer_mutex);
 }
 
 /**
@@ -338,7 +329,6 @@ void aodv_packet_writer_send_rerr(struct unreachable_node unreachable_nodes[], s
         return;
     }
 
-    mutex_lock(&writer_mutex);
     _target.packet_data.hoplimit = hoplimit;
     _target.type = RFC5444_MSGTYPE_RERR;
     _unreachable_nodes = unreachable_nodes;
@@ -349,7 +339,6 @@ void aodv_packet_writer_send_rerr(struct unreachable_node unreachable_nodes[], s
 
     rfc5444_writer_create_message_alltarget(&writer, RFC5444_MSGTYPE_RERR);
     rfc5444_writer_flush(&writer, &_target.interface, false);
-    mutex_unlock(&writer_mutex);
 }
 
 void aodv_packet_writer_cleanup(void)

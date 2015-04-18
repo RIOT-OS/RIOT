@@ -1,0 +1,345 @@
+/**
+ * @defgroup    cpu_kinetis_common Freescale Kinetis MCU
+ * @ingroup     cpu
+ * @brief       Common Drivers for Freescale Kinetis MCUs
+ */
+
+/**
+ * @defgroup    cpu_kinetis_common_adc Kinetis ADC
+ * @ingroup     cpu_kinetis_common
+ * @brief       ADC driver.
+ *
+ *              ### ADC Configuration Example (for periph_conf.h) ###
+ *
+ *                  #define ADC_NUMOF           (1U)
+ *                  #define ADC_0_EN            1
+ *                  #define ADC_MAX_CHANNELS    1
+ *
+ *                  // ADC 0 configuration
+ *                  #define ADC_0_DEV           ADC0
+ *                  #define ADC_0_MODULE_CLOCK  CLOCK_CORECLOCK
+ *                  #define ADC_0_CHANNELS      1
+ *                  #define ADC_0_CLKEN()       (SIM->SCGC6 |= (SIM_SCGC6_ADC0_MASK))
+ *                  #define ADC_0_CLKDIS()      (SIM->SCGC6 &= ~(SIM_SCGC6_ADC0_MASK))
+ *                  #define ADC_0_PORT_CLKEN()  (SIM->SCGC5 |= (SIM_SCGC5_PORTE_MASK))
+ *
+ *                  #define ADC_0_CH5           11
+ *                  #define ADC_0_CH5_PIN       1
+ *                  #define ADC_0_CH5_PIN_AF    0
+ *                  #define ADC_0_CH5_PORT      PORTE
+ */
+
+/**
+ * @defgroup    cpu_kinetis_common_cpuid Kinetis CPUID
+ * @ingroup     cpu_kinetis_common
+ * @brief       CPUID driver.
+ */
+
+/**
+ * @defgroup    cpu_kinetis_common_gpio Kinetis GPIO
+ * @ingroup     cpu_kinetis_common
+ * @brief       GPIO driver.
+ *
+ *              ### GPIO Configuration Example (for periph_conf.h) ###
+ *
+ *                  #define GPIO_NUMOF          1
+ *                  #define GPIO_0_EN           0
+ *                  #define GPIO_IRQ_PRIO       1
+ *                  #define ISR_PORT_D          isr_portd
+ *
+ *                  #define GPIO_22_DEV         GPIOD
+ *                  #define GPIO_22_PORT        PORTD
+ *                  #define GPIO_22_PIN         1
+ *                  #define GPIO_22_CLKEN()     (SIM->SCGC5 |= (SIM_SCGC5_PORTD_MASK))
+ *                  #define GPIO_22_IRQ         PORTD_IRQn
+ */
+
+/**
+ * @defgroup    cpu_kinetis_common_i2c Kinetis I2C
+ * @ingroup     cpu_kinetis_common
+ * @brief       I2C driver.
+ *
+ *              ### I2C Configuration Example (for periph_conf.h) ###
+ *
+ *                  #define I2C_NUMOF               (1U)
+ *                  #define I2C_CLK                 (48e6)
+ *                  #define I2C_0_EN                1
+ *                  #define I2C_IRQ_PRIO            1
+ *
+ *                  / * Low (10 kHz): MUL = 4, SCL divider = 2560, total: 10240 * /
+ *                  #define KINETIS_I2C_F_ICR_LOW        (0x3D)
+ *                  #define KINETIS_I2C_F_MULT_LOW       (2)
+ *                  / * Normal (100 kHz): MUL = 2, SCL divider = 240, total: 480 * /
+ *                  #define KINETIS_I2C_F_ICR_NORMAL     (0x1F)
+ *                  #define KINETIS_I2C_F_MULT_NORMAL    (1)
+ *                  / * Fast (400 kHz): MUL = 1, SCL divider = 128, total: 128 * /
+ *                  #define KINETIS_I2C_F_ICR_FAST       (0x17)
+ *                  #define KINETIS_I2C_F_MULT_FAST      (0)
+ *                  / * Fast plus (1000 kHz): MUL = 1, SCL divider = 48, total: 48 * /
+ *                  #define KINETIS_I2C_F_ICR_FAST_PLUS  (0x10)
+ *                  #define KINETIS_I2C_F_MULT_FAST_PLUS (0)
+ *
+ *                  // I2C 0 device configuration
+ *                  #define I2C_0_DEV               I2C1
+ *                  #define I2C_0_CLKEN()           (SIM->SCGC4 |= (SIM_SCGC4_I2C1_MASK))
+ *                  #define I2C_0_CLKDIS()          (SIM->SCGC4 &= ~(SIM_SCGC4_I2C1_MASK))
+ *                  #define I2C_0_IRQ               I2C1_IRQn
+ *                  #define I2C_0_IRQ_HANDLER       isr_i2c1
+ *                  // I2C 0 pin configuration
+ *                  #define I2C_0_PORT              PORTE
+ *                  #define I2C_0_PORT_CLKEN()      (SIM->SCGC5 |= (SIM_SCGC5_PORTE_MASK))
+ *                  #define I2C_0_PIN_AF            6
+ *                  #define I2C_0_SDA_PIN           0
+ *                  #define I2C_0_SCL_PIN           1
+ *                  #define I2C_0_PORT_CFG          (PORT_PCR_MUX(I2C_0_PIN_AF) | PORT_PCR_ODE_MASK)
+ */
+
+/**
+ * @defgroup    cpu_kinetis_common_pwm Kinetis PWM
+ * @ingroup     cpu_kinetis_common
+ * @brief       PWM driver.
+ *
+ *              ### PWM Configuration Example (for periph_conf.h) ###
+ *
+ *                  #define PWM_NUMOF           (1U)
+ *                  #define PWM_0_EN            1
+ *                  #define PWM_MAX_CHANNELS    2
+ *
+ *                  // PWM 0 device configuration
+ *                  #define PWM_0_DEV           FTM0
+ *                  #define PWM_0_CHANNELS      2
+ *                  #define PWM_0_CLK           (48e6)
+ *                  #define PWM_0_CLKEN()       (SIM->SCGC6 |= (SIM_SCGC6_FTM0_MASK))
+ *                  #define PWM_0_CLKDIS()      (SIM->SCGC6 &= ~(SIM_SCGC6_FTM0_MASK))
+ *                  // PWM 0 pin configuration
+ *                  #define PWM_0_PORT_CLKEN()  (SIM->SCGC5 |= (SIM_SCGC5_PORTD_MASK | SIM_SCGC5_PORTA_MASK))
+ *
+ *                  #define PWM_0_PIN_CH0       4
+ *                  #define PWM_0_FTMCHAN_CH0   1
+ *                  #define PWM_0_PORT_CH0      PORTA
+ *                  #define PWM_0_PIN_AF_CH0    3
+ *
+ *                  #define PWM_0_PIN_CH1       4
+ *                  #define PWM_0_FTMCHAN_CH1   4
+ *                  #define PWM_0_PORT_CH1      PORTD
+ *                  #define PWM_0_PIN_AF_CH1    4
+ */
+
+/**
+ * @defgroup    cpu_kinetis_common_rnga Kinetis RNGA
+ * @ingroup     cpu_kinetis_common
+ * @brief       Driver for Freescale's RNGA module. RNGA generates data that
+ *              looks random. Reference Manual recommends to use the RNGA as entropy
+ *              source.
+ *
+ *              ### RNGA Configuration Example (for periph_conf.h) ###
+ *
+ *                  #define RANDOM_NUMOF         (1U)
+ *                  #define KINETIS_RNGA         RNG
+ *                  #define RANDOM_CLKEN()       (SIM->SCGC6 |= (1 << 9))
+ *                  #define RANDOM_CLKDIS()      (SIM->SCGC6 &= ~(1 << 9))
+ */
+
+/**
+ * @defgroup    cpu_kinetis_common_rngb Kinetis RNGB
+ * @ingroup     cpu_kinetis_common
+ * @brief       Low-level random number generator driver implementation.
+ *              Driver for Freescale's RNGB module. RNGB generates data that
+ *              looks random. Reference Manual recommends to use the RNGB as entropy
+ *              source.
+ *
+ *              ### RNGB Configuration Example (for periph_conf.h) ###
+ *
+ *                  #define RANDOM_NUMOF         (1U)
+ *                  #define KINETIS_RNGB         RNG
+ *                  #define RANDOM_CLKEN()       (SIM->SCGC6 |= (1 << 9))
+ *                  #define RANDOM_CLKDIS()      (SIM->SCGC6 &= ~(1 << 9))
+ */
+
+/**
+ * @defgroup    cpu_kinetis_common_rtc Kinetis RTC
+ * @ingroup     cpu_kinetis_common
+ * @brief       RTC is clocked by a 32.768 kHz clock.
+ *              Please note the manual of your MCU or SiP for the
+ *              clock setting for the RTC module. After initilization
+ *              Time Seconds Register (TSR) increments once a second.
+ *              The TSR (also TAR) value will be converted to the stuct tm
+ *              and back with the help of stdlib functions that are
+ *              defined in time.h.
+ *              The driver supports alarm, it is stored in the
+ *              Time Alarm Registers (TAR) and the unit is seconds.
+ *
+ *              ### RTC Configuration Example (for periph_conf.h) ###
+ *
+ *                  #define RTC_NUMOF           (1U)
+ *                  #define RTC_DEV             RTC
+ *                  #define RTC_UNLOCK()        (SIM->SCGC6 |= (SIM_SCGC6_RTC_MASK))
+ *
+ *              Optional settings:
+ *
+ *                  #define RTC_LOAD_CAP_BITS   0
+ */
+
+/**
+ * @defgroup    cpu_kinetis_common_spi Kinetis SPI
+ * @ingroup     cpu_kinetis_common
+ * @brief       Kinetis SPI driver for MCUs with Cortex-M4 core.
+ *
+ *              If necessary, it is possible to define two RIOT SPI buses for
+ *              each Kinetis hardware SPI module by specifying different CTAS
+ *              (timing register number) for the two buses. It is then possible to
+ *              initialize the two RIOT SPI buses with different baud rates or
+ *              polarity settings.
+ *
+ *              SPI_x_INDEX should be set to the index on the hardware module
+ *              used (SPI0 => 0, SPI1 => 1 etc). spi_acquire and spi_release will
+ *              share the same lock for all SPI buses defined with the same
+ *              SPI_x_INDEX.
+ *
+ *              Finer tuning of timings than the RIOT SPI API is capable of is
+ *              supported by setting macros SPI_0_TCSC_FREQ, SPI_0_TASC_FREQ,
+ *              SPI_0_TDT_FREQ. These macros define the desired maximum frequency
+ *              of the t<SUB>CSC</SUB>, t<SUB>ASC</SUB>, and t<SUB>DT</SUB> SPI
+ *              timings (i.e. reciprocal of time). See the reference manual for
+ *              your Kinetis CPU (Chapter: "SPI module, Functional description,
+ *              Module baud rate and clock delay generation") for a description of
+ *              each delay. Set to 0 or leave unset to default to using the same
+ *              delay timing as the baudrate.
+ *
+ *              ### SPI Configuration Example (for periph_conf.h): ###
+ *
+ *                  // SPI 0 device config
+ *                  #define SPI_0_DEV               SPI0
+ *                  #define SPI_0_INDEX             0
+ *                  #define SPI_0_CTAS              0
+ *                  #define SPI_0_CLKEN()           (SIM->SCGC6 |= (SIM_SCGC6_SPI0_MASK))
+ *                  #define SPI_0_CLKDIS()          (SIM->SCGC6 &= ~(SIM_SCGC6_SPI0_MASK))
+ *                  #define SPI_0_IRQ               SPI0_IRQn
+ *                  #define SPI_0_IRQ_HANDLER       isr_spi0
+ *                  #define SPI_0_FREQ              (48e6)
+ *
+ *                  // SPI 0 pin configuration
+ *                  #define SPI_0_SCK_PORT          PORTC
+ *                  #define SPI_0_SOUT_PORT         PORTC
+ *                  #define SPI_0_SIN_PORT          PORTC
+ *                  #define SPI_0_PCS0_PORT         PORTC
+ *
+ *                  #define SPI_0_SCK_PORT_CLKEN()  (SIM->SCGC5 |= (SIM_SCGC5_PORTC_MASK))
+ *                  #define SPI_0_SOUT_PORT_CLKEN() (SIM->SCGC5 |= (SIM_SCGC5_PORTC_MASK))
+ *                  #define SPI_0_SIN_PORT_CLKEN()  (SIM->SCGC5 |= (SIM_SCGC5_PORTC_MASK))
+ *                  #define SPI_0_PCS0_PORT_CLKEN() (SIM->SCGC5 |= (SIM_SCGC5_PORTC_MASK))
+ *
+ *                  #define SPI_0_SCK_AF            2
+ *                  #define SPI_0_SOUT_AF           2
+ *                  #define SPI_0_SIN_AF            2
+ *                  #define SPI_0_PCS0_AF           2
+ *
+ *                  #define SPI_0_PCS0_PIN          4
+ *                  #define SPI_0_SCK_PIN           5
+ *                  #define SPI_0_SOUT_PIN          6
+ *                  #define SPI_0_SIN_PIN           7
+ *
+ *                  #define SPI_0_PCS0_ACTIVE_LOW   1
+ *
+ *              Alternative Configuration Example:
+ *
+ *                  // SPI 0 device config
+ *                  #define SPI_0_DEV               SPI0
+ *                  #define SPI_0_INDEX             0
+ *                  #define SPI_0_CTAS              0
+ *                  #define SPI_0_CLKEN()           (SIM->SCGC6 |= (SIM_SCGC6_SPI0_MASK))
+ *                  #define SPI_0_CLKDIS()          (SIM->SCGC6 &= ~(SIM_SCGC6_SPI0_MASK))
+ *                  #define SPI_0_IRQ               SPI0_IRQn
+ *                  #define SPI_0_IRQ_HANDLER       isr_spi0
+ *                  #define SPI_0_FREQ              (48e6)
+ *
+ *                  // SPI 0 pin configuration
+ *                  #define SPI_0_PORT              PORTC
+ *                  #define SPI_0_PORT_CLKEN()      (SIM->SCGC5 |= (SIM_SCGC5_PORTC_MASK))
+ *                  #define SPI_0_AF                2
+ *
+ *                  #define SPI_0_PCS0_PIN          4
+ *                  #define SPI_0_SCK_PIN           5
+ *                  #define SPI_0_SOUT_PIN          6
+ *                  #define SPI_0_SIN_PIN           7
+ *
+ *                  #define SPI_0_PCS0_ACTIVE_LOW   1
+ *
+ *              It is possible to use the hardware CS, currently only for the PCS0:
+ *
+ *                  #define KINETIS_SPI_USE_HW_CS   1
+ */
+
+/**
+ * @defgroup    cpu_kinetis_common_timer Kinetis Timer
+ * @ingroup     cpu_kinetis_common
+ * @brief       Periodic Interrupt Timer (PIT) driver.
+ *              Implementation of riot-os low level timer interface
+ *              for the Kinetis Periodic Interrupt Timer.
+ *              The PIT is a count down timer, in order to use it with riot-os
+ *              a count up timer will be simulated. The PIT has four channels,
+ *              each two channels are cascaded. The n-1 channel is a prescaler
+ *              and the n channel a down counter. In standard configuration
+ *              with four channels, two simulated count up timer are possible.
+ *
+ *              ### Timer configuration Example (for periph_conf.h) ###
+ *
+ *                  #define TIMER_NUMOF             (1U)
+ *                  #define TIMER_0_EN              1
+ *                  #define TIMER_1_EN              0
+ *                  #define TIMER_IRQ_PRIO          1
+ *                  #define TIMER_DEV               PIT
+ *                  #define TIMER_MAX_VALUE         (0xffffffff)
+ *                  #define TIMER_CLOCK             CLOCK_CORECLOCK
+ *                  #define TIMER_CLKEN()           (SIM->SCGC6 |= (SIM_SCGC6_PIT_MASK))
+ *
+ *                  // Timer 0 configuration
+ *                  #define TIMER_0_PRESCALER_CH    0
+ *                  #define TIMER_0_COUNTER_CH      1
+ *                  #define TIMER_0_ISR             isr_pit1
+ *                  #define TIMER_0_IRQ_CHAN        PIT1_IRQn
+ *
+ *                  // Timer 1 configuration
+ *                  #define TIMER_1_PRESCALER_CH    2
+ *                  #define TIMER_1_COUNTER_CH      3
+ *                  #define TIMER_1_ISR             isr_pit3
+ *                  #define TIMER_1_IRQ_CHAN        PIT3_IRQn
+ *
+ */
+
+/**
+ * @defgroup    cpu_kinetis_common_uart Kinetis UART
+ * @ingroup     cpu_kinetis_common
+ * @brief       Kinetis UART driver.
+ *              There are different implementations of the UART interface.
+ *              The treatment of interrupts is also slightly different.
+ *              The register UARTx_BDH to UARTx_C4 look almost the same.
+ *              We distinguish the type of the UART
+ *              using the BRFA field in the UART C4 register.
+ *              Currently, only the base functionality is available.
+ *
+ *              ### UART configuration Example (for periph_conf.h) ###
+ *
+ *                  #define UART_NUMOF          (1U)
+ *                  #define UART_0_EN           1
+ *                  #define UART_IRQ_PRIO       1
+ *                  #define UART_CLK            (48e6)
+ *
+ *                  // UART 0 device configuration
+ *                  #define KINETIS_UART        UART0_Type
+ *                  #define UART_0_DEV          UART0
+ *                  #define UART_0_CLKEN()      (SIM->SCGC4 |= (SIM_SCGC4_UART0_MASK))
+ *                  #define UART_0_CLK          UART_CLK
+ *                  #define UART_0_IRQ_CHAN     UART0_IRQn
+ *                  #define UART_0_ISR          isr_uart0
+ *                  // UART 0 pin configuration
+ *                  #define UART_0_PORT_CLKEN() (SIM->SCGC5 |= (SIM_SCGC5_PORTA_MASK))
+ *                  #define UART_0_PORT         PORTA
+ *                  #define UART_0_RX_PIN       1
+ *                  #define UART_0_TX_PIN       2
+ *                  #define UART_0_AF           2
+ *
+ *              Optional settings:
+ *
+ *                  #define KINETIS_UART_ADVANCED    1
+ */

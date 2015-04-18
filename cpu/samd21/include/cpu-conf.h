@@ -33,7 +33,7 @@ extern "C" {
 #define KERNEL_CONF_STACKSIZE_PRINTF    (512)
 
 #ifndef KERNEL_CONF_STACKSIZE_DEFAULT
-#define KERNEL_CONF_STACKSIZE_DEFAULT   (512)
+#define KERNEL_CONF_STACKSIZE_DEFAULT   (1024)
 #endif
 
 #define KERNEL_CONF_STACKSIZE_IDLE      (256)
@@ -50,9 +50,14 @@ extern "C" {
 #endif
 /** @} */
 
+#define TRANSCEIVER_BUFFER_SIZE (3)
 #ifdef __cplusplus
 }
 #endif
 
+/**
+ * @brief CPUID_ID_LEN length of cpuid in bytes
+ */
+#define CPUID_ID_LEN (16) /* 128 bits long, 16 bytes long */
 #endif /* __CPU_CONF_H */
 /** @} */

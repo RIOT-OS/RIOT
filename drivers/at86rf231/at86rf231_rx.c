@@ -30,7 +30,7 @@
 #include "debug.h"
 
 at86rf231_packet_t at86rf231_rx_buffer[AT86RF231_RX_BUF_SIZE];
-uint8_t buffer[AT86RF231_RX_BUF_SIZE][AT86RF231_MAX_PKT_LENGTH];
+static uint8_t buffer[AT86RF231_RX_BUF_SIZE][AT86RF231_MAX_PKT_LENGTH];
 volatile uint8_t rx_buffer_next;
 extern netdev_802154_raw_packet_cb_t at86rf231_raw_packet_cb;
 
@@ -53,7 +53,7 @@ void at86rf231_rx_handler(void)
     /* build package */
     at86rf231_rx_buffer[rx_buffer_next].lqi = lqi;
     /* RSSI has no meaning here, it should be read during packet reception. */
-    at86rf231_rx_buffer[rx_buffer_next].rssi = fcs_rssi & 0x0F;  // bit[4:0]
+    at86rf231_rx_buffer[rx_buffer_next].rssi = fcs_rssi & 0x1F;  /* bit[4:0] */
     /* bit7, boolean, 1 FCS valid, 0 FCS not valid */
     at86rf231_rx_buffer[rx_buffer_next].crc = (fcs_rssi >> 7) & 0x01;
 

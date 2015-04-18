@@ -1,18 +1,21 @@
-/**
- * Shell commands for transceiver module
- *
+/*
  * Copyright (C) 2013 Ludwig Ortmann.
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
- *
- * @ingroup shell_commands
+ */
+
+/**
+ * @ingroup     sys_shell_commands
  * @{
- * @file    sc_transceiver.c
- * @brief   provides shell commands to configure the transceiver
- * @author  Oliver Hahm <oliver.hahm@inria.fr>
- * @author  Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ *
+ * @file
+ * @brief       Provides shell commands to configure the transceiver
+ *
+ * @author      Oliver Hahm <oliver.hahm@inria.fr>
+ * @author      Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ *
  * @}
  */
 
@@ -69,7 +72,7 @@
 #endif
 
 /* checked for type safety */
-void _transceiver_get_set_address_handler(int argc, char **argv)
+int _transceiver_get_set_address_handler(int argc, char **argv)
 {
     msg_t mesg;
     transceiver_command_t tcmd;
@@ -77,7 +80,7 @@ void _transceiver_get_set_address_handler(int argc, char **argv)
 
     if (transceiver_pid == KERNEL_PID_UNDEF) {
         puts("Transceiver not initialized");
-        return;
+        return 1;
     }
 
     tcmd.transceivers = _TC_TYPE;
@@ -95,6 +98,8 @@ void _transceiver_get_set_address_handler(int argc, char **argv)
 
     msg_send_receive(&mesg, &mesg, transceiver_pid);
     printf("[transceiver] got address: %" PRIu16 "\n", a);
+
+    return 0;
 }
 
 #ifndef MODULE_NET_IF
@@ -148,7 +153,7 @@ uint64_t _str_to_eui64(const char *eui64_str)
 #endif
 
 /* checked for type safety */
-void _transceiver_get_set_long_addr_handler(int argc, char **argv)
+int _transceiver_get_set_long_addr_handler(int argc, char **argv)
 {
     msg_t mesg;
     transceiver_command_t tcmd;
@@ -156,7 +161,7 @@ void _transceiver_get_set_long_addr_handler(int argc, char **argv)
 
     if (transceiver_pid == KERNEL_PID_UNDEF) {
         puts("Transceiver not initialized");
-        return;
+        return 1;
     }
 
     tcmd.transceivers = _TC_TYPE;
@@ -180,11 +185,13 @@ void _transceiver_get_set_long_addr_handler(int argc, char **argv)
 
     msg_send_receive(&mesg, &mesg, transceiver_pid);
     printf("[transceiver] got EUI-64: %016"PRIx64"\n", a);
+
+    return 0;
 }
 
 
 /* checked for type safety */
-void _transceiver_get_set_channel_handler(int argc, char **argv)
+int _transceiver_get_set_channel_handler(int argc, char **argv)
 {
     msg_t mesg;
     transceiver_command_t tcmd;
@@ -192,7 +199,7 @@ void _transceiver_get_set_channel_handler(int argc, char **argv)
 
     if (transceiver_pid == KERNEL_PID_UNDEF) {
         puts("Transceiver not initialized");
-        return;
+        return 1;
     }
 
     tcmd.transceivers = _TC_TYPE;
@@ -215,17 +222,19 @@ void _transceiver_get_set_channel_handler(int argc, char **argv)
     else {
         printf("[transceiver] Got channel: %" PRIi32 "\n", c);
     }
+
+    return 0;
 }
 
-void _transceiver_send_handler(int argc, char **argv)
+int _transceiver_send_handler(int argc, char **argv)
 {
     if (transceiver_pid == KERNEL_PID_UNDEF) {
         puts("Transceiver not initialized");
-        return;
+        return 1;
     }
     if (argc < 3) {
         printf("Usage:\t%s <ADDR> <MSG> [PAN]\n", argv[0]);
-        return;
+        return 1;
     }
 
 #if MODULE_AT86RF231 || MODULE_CC2420 || MODULE_MC1322X
@@ -257,7 +266,7 @@ void _transceiver_send_handler(int argc, char **argv)
         p.frame.dest_pan_id = atoi(argv[3]);
     }
     else {
-        p.frame.dest_pan_id = 1;
+        p.frame.dest_pan_id = IEEE_802154_DEFAULT_PAN_ID;
     }
 #else
     p.data = (uint8_t *) text_msg;
@@ -277,18 +286,20 @@ void _transceiver_send_handler(int argc, char **argv)
     msg_send_receive(&mesg, &mesg, transceiver_pid);
     int8_t response = mesg.content.value;
     printf("[transceiver] Packet sent: %" PRIi8 "\n", response);
+
+    return 0;
 }
 
 /* checked for type safety */
-void _transceiver_monitor_handler(int argc, char **argv)
+int _transceiver_monitor_handler(int argc, char **argv)
 {
     if (transceiver_pid == KERNEL_PID_UNDEF) {
         puts("Transceiver not initialized");
-        return;
+        return 1;
     }
     else if (argc != 2) {
         printf("Usage:\n%s <MODE>\n", argv[0]);
-        return;
+        return 1;
     }
 
     uint8_t m = atoi(argv[1]);
@@ -303,14 +314,16 @@ void _transceiver_monitor_handler(int argc, char **argv)
     mesg.type = SET_MONITOR;
 
     msg_send(&mesg, transceiver_pid);
+
+    return 0;
 }
 
 /* checked for type safety */
-void _transceiver_get_set_pan_handler(int argc, char **argv)
+int _transceiver_get_set_pan_handler(int argc, char **argv)
 {
     if (transceiver_pid == KERNEL_PID_UNDEF) {
         puts("Transceiver not initialized");
-        return;
+        return 1;
     }
 
     int32_t p;
@@ -336,16 +349,18 @@ void _transceiver_get_set_pan_handler(int argc, char **argv)
     else {
         printf("[transceiver] Got pan: %" PRIi32 "\n", p);
     }
+
+    return 0;
 }
 
 /* checked for type safety */
 #ifdef DBG_IGNORE
-void _transceiver_set_ignore_handler(int argc, char **argv)
+int _transceiver_set_ignore_handler(int argc, char **argv)
 {
 
     if (transceiver_pid == KERNEL_PID_UNDEF) {
         puts("Transceiver not initialized");
-        return;
+        return 1;
     }
     else if (argc < 2) {
         printf("[transceiver] Ignored link layer addresses: ");
@@ -359,7 +374,7 @@ void _transceiver_set_ignore_handler(int argc, char **argv)
     }
     else if (argc > 2) {
         printf("Usage:\n%s <address>\n", argv[0]);
-        return;
+        return 1;
     }
 
     radio_address_t a;
@@ -383,5 +398,7 @@ void _transceiver_set_ignore_handler(int argc, char **argv)
     else {
         printf("Success (added at index %" PRIi16 ").\n", response);
     }
+
+    return 0;
 }
 #endif

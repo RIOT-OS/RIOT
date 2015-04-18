@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Martin Lenders <mlenders@inf.fu-berlin.de>
+ * Copyright (C) 2014 Martine Lenders <mlenders@inf.fu-berlin.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -17,8 +17,8 @@
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 
-#ifndef __UNITTESTS_NETDEV_DUMMY_H_
-#define __UNITTESTS_NETDEV_DUMMY_H_
+#ifndef UNITTESTS_NETDEV_DUMMY_H_
+#define UNITTESTS_NETDEV_DUMMY_H_
 
 #include <stdlib.h>
 
@@ -153,7 +153,7 @@ void unittest_netdev_dummy_init(void);
 }
 #endif
 
-#endif /* __UNITTESTS_NETDEV_DUMMY_H_ */
+#endif /* UNITTESTS_NETDEV_DUMMY_H_ */
 
 /**
  * @}

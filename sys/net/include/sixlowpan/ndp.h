@@ -16,7 +16,7 @@
  * @brief       6LoWPAN constants, data structs, and prototypes related to NDP
  *
  * @author      Stephan Zeisberg <zeisberg@mi.fu-berlin.de>
- * @author      Martin Lenders <mlenders@inf.fu-berlin.de>
+ * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  * @author      Eric Engel <eric.engel@fu-berlin.de>
  * @author      Oliver Gesch <oliver.gesch@googlemail.com>
  */
@@ -78,11 +78,11 @@ typedef enum __attribute__((packed)) {
  */
 typedef struct __attribute__((packed)) ndp_prefix_info_t {
     /**
-     * @brief The next on the interface. Intialise with NULL
+     * @brief The next on the interface. Initialize with NULL
      */
     struct ndp_prefix_info_t *addr_next;
     /**
-     * @brief The prev address on the interface. Initialise with NULL
+     * @brief The prev address on the interface. Initialize with NULL
      */
     struct ndp_prefix_info_t *addr_prev;
     /**

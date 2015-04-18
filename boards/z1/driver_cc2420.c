@@ -11,7 +11,7 @@
  */
 
 /**
- * @ingroup     board_z1
+ * @ingroup     boards_z1
  * @{
  *
  * @file        driver_cc2420.c

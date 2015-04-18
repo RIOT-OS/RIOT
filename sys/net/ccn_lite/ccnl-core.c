@@ -50,12 +50,14 @@ void free_2ptr_list(void *a, void *b)
     ccnl_free(a);
     ccnl_free(b);
 }
+
 void free_3ptr_list(void *a, void *b, void *c)
 {
     ccnl_free(a);
     ccnl_free(b);
     ccnl_free(c);
 }
+
 void free_4ptr_list(void *a, void *b, void *c, void *d)
 {
     ccnl_free(a);

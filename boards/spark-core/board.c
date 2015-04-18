@@ -7,10 +7,10 @@
  */
 
 /**
- * @ingroup     board_spark-core
+ * @ingroup     boards_spark-core
  * @{
  *
- * @file        board.c
+ * @file
  * @brief       Board specific implementations for the spark-core board
  *
  * @author      Christian Mehlis <mehlis@inf.fu-berlin.de>

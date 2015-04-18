@@ -150,21 +150,26 @@ void sched_set_status(tcb_t *process, unsigned int status)
 
 void sched_switch(uint16_t other_prio)
 {
-    int in_isr = inISR();
     tcb_t *active_thread = (tcb_t *) sched_active_thread;
     uint16_t current_prio = active_thread->priority;
+    int on_runqueue = (active_thread->status >= STATUS_ON_RUNQUEUE);
 
-    DEBUG("sched_switch: active pid=%" PRIkernel_pid" prio=%" PRIu16
-          ", other_prio=%" PRIu16 " in_isr=%i\n",
-          active_thread->pid, current_prio, other_prio, in_isr);
+    DEBUG("sched_switch: active pid=%" PRIkernel_pid" prio=%" PRIu16 " on_runqueue=%i "
+          ", other_prio=%" PRIu16 "\n",
+          active_thread->pid, current_prio, on_runqueue, other_prio);
 
-    if (current_prio > other_prio) {
-        if (in_isr) {
+    if (!on_runqueue || (current_prio > other_prio)) {
+        if (inISR()) {
+            DEBUG("sched_switch: setting sched_context_switch_request.\n");
             sched_context_switch_request = 1;
         }
         else {
+            DEBUG("sched_switch: yielding immediately.\n");
             thread_yield_higher();
         }
+    }
+    else {
+        DEBUG("sched_switch: continuing without yield.\n");
     }
 }
 

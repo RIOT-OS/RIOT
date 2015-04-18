@@ -9,10 +9,10 @@
  *
  * @ingroup sixlowpan
  * @{
- * @file    sixlownd.c
+ * @file
  * @brief   6lowpan neighbor discovery functions
  * @author  Stephan Zeisberg <zeisberg@mi.fu-berlin.de>
- * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
+ * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  * @author  Oliver Gesch <oliver.gesch@googlemail.com>
  * @author  Oliver Hahm <oliver.hahm@inria.fr>
  * @}
@@ -167,72 +167,72 @@ int min(int a, int b)
 
 static icmpv6_parameter_prob_hdr_t *get_para_prob_buf(uint8_t ext_len)
 {
-    return ((icmpv6_parameter_prob_hdr_t *) &buffer[LLHDR_ICMPV6HDR_LEN + ext_len]);
+    return ((icmpv6_parameter_prob_hdr_t *) &sixlowpan_buffer[LLHDR_ICMPV6HDR_LEN + ext_len]);
 }
 
 static icmpv6_echo_request_hdr_t *get_echo_req_buf(uint8_t ext_len)
 {
-    return ((icmpv6_echo_request_hdr_t *) &buffer[LLHDR_ICMPV6HDR_LEN + ext_len]);
+    return ((icmpv6_echo_request_hdr_t *) &sixlowpan_buffer[LLHDR_ICMPV6HDR_LEN + ext_len]);
 }
 
 static icmpv6_echo_reply_hdr_t *get_echo_repl_buf(uint8_t ext_len)
 {
-    return ((icmpv6_echo_reply_hdr_t *) &buffer[LLHDR_ICMPV6HDR_LEN + ext_len]);
+    return ((icmpv6_echo_reply_hdr_t *) &sixlowpan_buffer[LLHDR_ICMPV6HDR_LEN + ext_len]);
 }
 
 static icmpv6_router_adv_hdr_t *get_rtr_adv_buf(uint8_t ext_len)
 {
-    return ((icmpv6_router_adv_hdr_t *) &buffer[LLHDR_ICMPV6HDR_LEN + ext_len]);
+    return ((icmpv6_router_adv_hdr_t *) &sixlowpan_buffer[LLHDR_ICMPV6HDR_LEN + ext_len]);
 }
 
 static icmpv6_neighbor_sol_hdr_t *get_nbr_sol_buf(uint8_t ext_len)
 {
-    return ((icmpv6_neighbor_sol_hdr_t *) &buffer[LLHDR_ICMPV6HDR_LEN + ext_len]);
+    return ((icmpv6_neighbor_sol_hdr_t *) &sixlowpan_buffer[LLHDR_ICMPV6HDR_LEN + ext_len]);
 }
 
 static icmpv6_neighbor_adv_hdr_t *get_nbr_adv_buf(uint8_t ext_len)
 {
-    return ((icmpv6_neighbor_adv_hdr_t *) &buffer[LLHDR_ICMPV6HDR_LEN + ext_len]);
+    return ((icmpv6_neighbor_adv_hdr_t *) &sixlowpan_buffer[LLHDR_ICMPV6HDR_LEN + ext_len]);
 }
 
 static icmpv6_ndp_opt_hdr_t *get_opt_buf(uint8_t ext_len, uint8_t opt_len)
 {
-    return ((icmpv6_ndp_opt_hdr_t *) &buffer[LLHDR_ICMPV6HDR_LEN + ext_len + opt_len]);
+    return ((icmpv6_ndp_opt_hdr_t *) &sixlowpan_buffer[LLHDR_ICMPV6HDR_LEN + ext_len + opt_len]);
 }
 
 static icmpv6_ndp_opt_stllao_t *get_opt_stllao_buf(uint8_t ext_len, uint8_t opt_len)
 {
-    return ((icmpv6_ndp_opt_stllao_t *) &buffer[LLHDR_ICMPV6HDR_LEN + ext_len + opt_len]);
+    return ((icmpv6_ndp_opt_stllao_t *) &sixlowpan_buffer[LLHDR_ICMPV6HDR_LEN + ext_len + opt_len]);
 }
 
 static icmpv6_ndp_opt_mtu_t *get_opt_mtu_buf(uint8_t ext_len, uint8_t opt_len)
 {
-    return ((icmpv6_ndp_opt_mtu_t *) &buffer[LLHDR_ICMPV6HDR_LEN + ext_len + opt_len]);
+    return ((icmpv6_ndp_opt_mtu_t *) &sixlowpan_buffer[LLHDR_ICMPV6HDR_LEN + ext_len + opt_len]);
 }
 
 static icmpv6_ndp_opt_abro_t *get_opt_abro_buf(uint8_t ext_len, uint8_t opt_len)
 {
-    return ((icmpv6_ndp_opt_abro_t *) &buffer[LLHDR_ICMPV6HDR_LEN + ext_len + opt_len]);
+    return ((icmpv6_ndp_opt_abro_t *) &sixlowpan_buffer[LLHDR_ICMPV6HDR_LEN + ext_len + opt_len]);
 }
 
 static icmpv6_ndp_opt_6co_hdr_t *get_opt_6co_hdr_buf(uint8_t ext_len, uint8_t opt_len)
 {
-    return ((icmpv6_ndp_opt_6co_hdr_t *) &buffer[LLHDR_ICMPV6HDR_LEN + ext_len + opt_len]);
+    return ((icmpv6_ndp_opt_6co_hdr_t *) &sixlowpan_buffer[LLHDR_ICMPV6HDR_LEN + ext_len + opt_len]);
 }
 
 static uint8_t *get_opt_6co_prefix_buf(uint8_t ext_len, uint8_t opt_len)
 {
-    return ((uint8_t *) &buffer[LLHDR_ICMPV6HDR_LEN + ext_len + opt_len]);
+    return ((uint8_t *) &sixlowpan_buffer[LLHDR_ICMPV6HDR_LEN + ext_len + opt_len]);
 }
 
 static icmpv6_ndp_opt_pi_t *get_opt_pi_buf(uint8_t ext_len, uint8_t opt_len)
 {
-    return ((icmpv6_ndp_opt_pi_t *) &buffer[LLHDR_ICMPV6HDR_LEN + ext_len + opt_len]);
+    return ((icmpv6_ndp_opt_pi_t *) &sixlowpan_buffer[LLHDR_ICMPV6HDR_LEN + ext_len + opt_len]);
 }
 
 static icmpv6_ndp_opt_aro_t *get_opt_aro_buf(uint8_t ext_len, uint8_t opt_len)
 {
-    return ((icmpv6_ndp_opt_aro_t *) &buffer[LLHDR_ICMPV6HDR_LEN + ext_len + opt_len]);
+    return ((icmpv6_ndp_opt_aro_t *) &sixlowpan_buffer[LLHDR_ICMPV6HDR_LEN + ext_len + opt_len]);
 }
 
 void icmpv6_send_echo_request(ipv6_addr_t *destaddr, uint16_t id, uint16_t seq, uint8_t *data, size_t data_len)
@@ -605,8 +605,6 @@ void icmpv6_send_router_adv(ipv6_addr_t *addr, uint8_t sllao, uint8_t mtu, uint8
         else {
             lowpan_context_t c_tmp[NDP_6LOWPAN_CONTEXT_MAX];
 
-            contexts_len = 0;
-
             for (int i = 0; i < NDP_6LOWPAN_CONTEXT_MAX; i++) {
                 lowpan_context_t *ctx = abr_get_context(msg_abr, i);
 
@@ -615,8 +613,17 @@ void icmpv6_send_router_adv(ipv6_addr_t *addr, uint8_t sllao, uint8_t mtu, uint8
                 }
             }
 
-            contexts = (lowpan_context_t *)malloc(contexts_len * sizeof(lowpan_context_t));
-            memcpy(contexts, c_tmp, contexts_len);
+            if (contexts_len > 0) {
+                contexts = (lowpan_context_t *)malloc(contexts_len * sizeof(lowpan_context_t));
+
+                if (contexts == NULL) {
+                    DEBUG("icmpv6_send_router_adv: no memory left");
+                    contexts_len = 0; /* HACK to skip over for loop below */
+                }
+                else {
+                    memcpy(contexts, c_tmp, contexts_len);
+                }
+            }
         }
 
         for (int i = 0; i < contexts_len; i++) {

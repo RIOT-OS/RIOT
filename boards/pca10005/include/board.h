@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    board_pca10005 PCA10005 (nRF51822 Development Kit)
+ * @defgroup    boards_pca10005 PCA10005 (nRF51822 Development Kit)
  * @ingroup     boards
  * @brief       Board specific files for the nRF51822 board pca10005
  * @{

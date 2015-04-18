@@ -1,3 +1,232 @@
+RIOT-2014.12 - Release Notes
+============================
+RIOT is a real-time multi-threading operating system that supports a range of
+devices that are typically found in the Internet of Things: from 8-bit
+microcontrollers to light-weight 32-bit processors.
+
+RIOT is based on the following design principles: energy-efficiency, real-time
+capabilities, small memory footprint, modularity, and uniform API access,
+independent of the underlying hardware (this API offers partial POSIX
+compliance).
+
+New features
+============
+Core
+----
++ introduced new thread_yield() and renamed the old implementation to thread_yield_higher()
+
+Supported platforms
+-------------------
+Additional support for the following boards:
++ Arduino Mega 2560 (first-time support of an 8-bit platform)
++ HikoB Fox
++ Atmel samr21-Xplained Pro
++ OpenMote
++ cc2538 Developer Kit
++ Spark-Core
++ f4vi1
++ Airfy-Beacon
++ STMF0Discovery Board
++ STMF3Discovery Board
++ STMF4Discovery Board
++ nrf51822 Development Kit
++ yunjia-nrf51822
++ MSB-IoT
++ native on ARM platforms
+
+Drivers
+-------
++ various peripheral drivers (ADC, UART, timer, SPI, I²C, RTC, RTT, DAC, PWM...)
++ MQ-3 alcohol sensor
++ ISL29020 light sensor
++ LPS331AP pressure sensor
++ LSM303DLHC accelerometer
++ L3G4200D gyroscope
++ servo motor
++ TI HDC 1000 low power humidity and temperature digital sensor
++ SRF02/SRF08 ultrasonic range sensors
++ PIR motion sensor
++ RGB LED
+
+Network Stack
+---------------
++ AODVv2
++ RPL non-storing mode
++ OF manager for RPL
++ Source Routing Header support
++ introduced netapi
++ introduced netdev, a general interface for network device drivers
++ introduced global packet buffer
+
+System libraries
+----------------
++ CBOR
++ UBJSON
++ color module for PWM
+
+Packages
+--------
++ libfixmath
+
+Other
+-----
++ C++ support for most platforms
++ PCAP based wireless sniffer
+
+Changes
+=======
+Core
+----
+* PIDs begin with 1
+* mamximum 16 priority levels for every platform
+* fixed sched_switch()
+* simplified mutex signatures
+* minimized size of TCB
+* allow hwtimer to run with more than 1MHz
+* imported ringbuffer from sys
+
+Supported platforms
+-------------------
+* improved iot-lab_M3 support
+* major improvements on the mbed LPC1768
+* improved at86rf231 radio driver
+* fixed hwtimer for MSP430
+* added support for timer B for MSP430
+* fixed thread_yield() for MSP430
+* several fixes for the cc2420
+* improved interrupt handling on ARM
+* adjusted stack sizes for Cortex platforms
+
+Network Stack
+---------------
+* refactored CCN-lite
+* refactored RPL
+* renamed destiny to transport_layer and socket_base
+* several fixes for TCP
+* split UDP and TCP
+
+System libraries
+----------------
+- removed hashtable implementation
+
+Packages
+--------
+* updated and simplified OpenWSN
+
+Other
+-----
+* Improved and cleaned up build system
+* various new helper targets (like debug, distclean, reset, objdump...)
+* use newlib's nano specs if available
+* various new features and added Python 3 compatibility for pyterm
+* major reduction of warnings in doxygen and improved html layout
+
+Fixed Issues from the last release
+==================================
+#426: Interrupt handling on MSP430 is buggy
+    Several fixes by @rousselk
+#1798: core: first thread on runqueue is scheduled twice
+    Was fixed along with the thread_yield() refactoring
+#1127: Random build fails on OSX
+    native is building stable also on OSX now
+
+Known Issues
+============
+network related issues
+----------------------
+#21: Deal with stdin in bordermultiplex.c
+    Not all supported platforms provide a stdin in the current release.
+    However, the implementation of the 6LoWPAN border router won't work
+    without stdin.
+#861: neighbor discovery for 6LoWPAN not working
+    Duplicate address detection according to RFC 6775 is also missing.
+#1577: ccn-lite: populate does not work with disabled cache
+    If cache is set to zero, the chunks cannot be loaded and therefore also not get populated.
+#1870: IPv6 neighbor advertisements are malformed
+    According to Wireshark, ICMPv6 neighbor advertisements are malformed (wrong
+    checksum or other reasons).
+
+native related issues
+---------------------
+#495: native not float safe
+    When the FPU is used when an asynchronous context switch occurs, either the
+    stack gets corrupted or a floating point exception occurs.
+#499: native is segfaulting on heavy network usage
+    Sending more than 100 packets per second causes a SEGFAULT in RIOT native.
+#534: native debugging on osx fails
+    Using valgrind or gdb with a nativenet target in OSX leads to "the network"
+    being stuck (gdb) or the whole process being stuck (valgrind).
+#715: test_hwtimer_wait fails on native
+    The problem appears to be lost signals and depends on the CPU speed.
+#787: reboot not working with open file descriptors on native
+    If for example a tap device is in use, the reboot command fails.
+#862: sometimes the tap bridge does not work in native
+    Sometimes (rather suddenly) packages are not received by a TAP and won't be
+    received even if I reconfigure the bridge.
+
+
+other platform related issues
+-----------------------------
+#1232: x86 doesn't build on OS X with clang
+    Current version of the x86 port doesn't build for OS X with clang.
+#1442: setting channel is not persistent cc2420
+    After changing the channel via a shell command, the channel reverts back to an arbitrary
+    value. However, this might be only a shell problem.
+#1753: vtimer_msg test crashes after ~49'20"
+    dependent on the platform, vtimer stops working after some time.
+#1891: printf formatting does not work properly on some Cortex platforms for 64 bit numbers
+    This problem happens mostly for the Newlib nano, which does not support 64 bit integer
+    printing, but sometimes happens also with other toolchains.
+#1964 and #1955: eventual problems with IoT-LAB M3 nodes in the testbed
+    The shell is sometimes not properly working after a reboot and the PDR is sometimes
+    worse than expected.
+#2143: tests.core doesn't compile for all platforms
+    For some missing GCC compiler builtins, the unittests do not compile for MSP430
+    platforms.
+#2228: samd21 stack sizes are too small
+    The application examples/default for example will crash when issuing the txtsnd command
+
+other issues:
+--------------
+#1449: a removed vtimer might still get called back by hwtimer
+    The timer callback might still fire even after vtimer_remove() was called.
+#2175: valgrind registeres "Invalid write of size 4" in unittests for ubjson
+     According to valgrind the stack gets corrupted in UBJSON.
+
+For all issues and open pull requests please check the RIOT issue tracker:
+https://github.com/RIOT-OS/RIOT/issues
+
+Special Thanks
+--------------------
+We like to give our special thanks to all the companies that provided us with their hardware for porting and testing, namely the people from (in alphabetical order): airfy, Atmel, ELL-i, Intel, IoT-Lab, mbed, Phytec, and Udoo
+
+
+More information
+================
+http://www.riot-os.org
+
+Mailing lists
+-------------
+* RIOT OS kernel developers list
+ * devel@riot-os.org (http://lists.riot-os.org/mailman/listinfo/devel)
+* RIOT OS users list
+ * users@riot-os.org (http://lists.riot-os.org/mailman/listinfo/users)
+* RIOT commits
+ * commits@riot-os.org (http://lists.riot-os.org/mailman/listinfo/commits)
+* Github notifications
+ * notifications@riot-os.org  (http://lists.riot-os.org/mailman/listinfo/notifications)
+
+License
+=======
+* All sources and binaries that have been developed at Freie Universität Berlin
+  and most of the other code are licensed under the GNU Lesser General Public
+  License version 2 as published by the Free Software Foundation.
+* Some external sources, especially files developed by SICS are published under
+  a separate license.
+
+All code files contain licensing information.
+
+
 RIOT-2014.05 - Release Notes
 ============================
 RIOT is a real-time multi-threading operating system that supports a range of

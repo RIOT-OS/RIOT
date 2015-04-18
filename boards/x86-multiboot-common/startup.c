@@ -17,9 +17,7 @@
  */
 
 /**
- * @ingroup     x86
- * @ingroup     boards
- * @defgroup    x86-multiboot   i586 multiboot common
+ * @ingroup     boards_x86-multiboot
  * @{
  *
  * @file

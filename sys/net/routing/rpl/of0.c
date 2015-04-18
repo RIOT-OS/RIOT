@@ -27,7 +27,7 @@ static rpl_parent_t *which_parent(rpl_parent_t *, rpl_parent_t *);
 static rpl_dodag_t *which_dodag(rpl_dodag_t *, rpl_dodag_t *);
 static void reset(rpl_dodag_t *);
 
-rpl_of_t rpl_of0 = {
+static rpl_of_t rpl_of0 = {
     0x0,
     calc_rank,
     which_parent,

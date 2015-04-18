@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Martin Lenders
+ * Copyright (C) 2014 Martine Lenders <mlenders@inf.fu-berlin.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -12,10 +12,11 @@
 
 #include "clist.h"
 
-#include "embUnit/embUnit.h"
+#include "embUnit.h"
 
 #include "netdev_dummy.h"
 
+#include "unittests-constants.h"
 #include "tests-netdev_dummy.h"
 
 static netdev_t *dev = &(unittest_netdev_dummy_devs[0]);

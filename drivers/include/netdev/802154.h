@@ -7,18 +7,18 @@
  */
 
 /**
- * @defgroup    netdev_802154  IEEE 802.15.4 interface
  * @addtogroup  netdev
+ *
  * @{
- * @file  netdev/802154.h
+ * @file
  * @brief API definitions for 802.15.4 radio transceivers' drivers
  * @author Kévin Roussel <Kevin.Roussel@inria.fr>
  * @author Martine Lenders <mlenders@inf.fu-berlin.de>
  *
  */
 
-#ifndef __NETDEV_802154_H_
-#define __NETDEV_802154_H_
+#ifndef NETDEV_802154_H_
+#define NETDEV_802154_H_
 
 #include <stdint.h>
 
@@ -422,7 +422,7 @@ netdev_802154_tx_status_t netdev_802154_send(netdev_t *dev,
 }
 #endif
 
-#endif /* __NETDEV_802154_H_ */
+#endif /* NETDEV_802154_H_ */
 
 /**
  * @}

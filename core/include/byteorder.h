@@ -275,6 +275,12 @@ static inline uint64_t NTOHLL(uint64_t v);
 
 /* **************************** IMPLEMENTATION ***************************** */
 
+#ifdef HAVE_NO_BUILTIN_BSWAP16
+static inline unsigned short __builtin_bswap16(unsigned short a)
+{
+    return (a<<8)|(a>>8);
+}
+#endif
 
 static inline uint16_t byteorder_swaps(uint16_t v)
 {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Martin Lenders
+ * Copyright (C) 2014 Martine Lenders <mlenders@inf.fu-berlin.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -15,10 +15,10 @@
  *
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef __TESTS_PKTBUF_H_
-#define __TESTS_PKTBUF_H_
+#ifndef TESTS_PKTBUF_H_
+#define TESTS_PKTBUF_H_
 
-#include "../unittests.h"
+#include "embUnit.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -33,5 +33,5 @@ void tests_pktbuf(void);
 }
 #endif
 
-#endif /* __TESTS_PKTBUF_H_ */
+#endif /* TESTS_PKTBUF_H_ */
 /** @} */

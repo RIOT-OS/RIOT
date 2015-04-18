@@ -15,13 +15,42 @@
  * @file
  * @brief       Low-level I2C peripheral driver interface definition
  *
- * @note The current version of this interface only supports the 7-bit addressing mode.
+ *              The I2C signal lines SDA/SCL need external pull-up resistors which connect
+ *              the lines to the positive voltage supply Vcc. The I2C driver implementation
+ *              should enable the pin's internal pull-up resistors. There are however some
+ *              use cases for which the internal pull resistors are not strong enough and the
+ *              I2C bus will show faulty behavior. This can for example happen when connecting
+ *              a logic analyzer which will raise the capacitance of the bus. In this case you
+ *              should make sure you connect external pull-up resistors to both I2C bus lines.
+ *
+ *              The minimum and maximum resistances are computed by:
+ *              \f{eqnarray*}{
+ *              R_{min} &=& \frac{V_{DD} - V_{OL(max)}} {I_{OL}}\\
+ *              R_{max} &=& \frac{t_r} {(0.8473 \cdot C_b)}
+ *              \f}<br>
+ *              where:<br>
+ *              \f$ V_{DD} =\f$ Supply voltage,
+ *              \f$ V_{OL(max)} =\f$ Low level voltage,
+ *              \f$ I_{OL} =\f$ Low level output current,
+ *              \f$ t_r =\f$ Signal rise time,
+ *              \f$ C_b =\f$ Bus capacitance <br>
+ *              <br>The pull-up resistors depend on the bus speed. Some typical values are:<br>
+ *              Normal mode:       10k&Omega;<br>
+ *              Fast mode:          2k&Omega;<br>
+ *              Fast plus mode:     2k&Omega;
+ *
+ *              For more details refer to section 7.1 in:<br>
+ *              http://www.nxp.com/documents/user_manual/UM10204.pdf
+ *
+ * @note        The current version of this interface only supports the
+                7-bit addressing mode.
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  */
 
-#ifndef __I2C_H
-#define __I2C_H
+#ifndef I2C_H
+#define I2C_H
 
 #include <stdint.h>
 
@@ -90,6 +119,28 @@ int i2c_init_master(i2c_t dev, i2c_speed_t speed);
  * @return                  -1 on undefined device given
  */
 int i2c_init_slave(i2c_t dev, uint8_t address);
+
+/**
+ * @brief Get mutually exclusive access to the given I2C bus
+ *
+ * In case the I2C device is busy, this function will block until the bus is free again.
+ *
+ * @param[in] dev       I2C device to access
+ *
+ * @return              0 on success
+ * @return              -1 on error
+ */
+int i2c_acquire(i2c_t dev);
+
+/**
+ * @brief Release the given I2C device to be used by others
+ *
+ * @param[in] dev       I2C device to release
+ *
+ * @return              0 on success
+ * @return              -1 on error
+ */
+int i2c_release(i2c_t dev);
 
 /**
  * @brief Read one byte from an I2C device with the given address
@@ -216,5 +267,5 @@ void i2c_poweroff(i2c_t dev);
 }
 #endif
 
-#endif /* __I2C_H */
+#endif /* I2C_H */
 /** @} */

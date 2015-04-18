@@ -56,6 +56,7 @@ int main(void)
             return -1;
         }
         vtimer_usleep(HDC1000_CONVERSION_TIME);
+
         hdc1000_read(&dev, &rawtemp, &rawhum);
         printf("Raw data T: %5i   RH: %5i\n", rawtemp, rawhum);
 
@@ -63,6 +64,7 @@ int main(void)
         printf("Data T: %d   RH: %d\n", temp, hum);
 
         vtimer_usleep(SLEEP);
+
     }
 
     return 0;

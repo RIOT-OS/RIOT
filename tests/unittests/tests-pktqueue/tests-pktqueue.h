@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Martin Lenders
+ * Copyright (C) 2014 Martine Lenders <mlenders@inf.fu-berlin.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -15,10 +15,10 @@
  *
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef __TESTS_PKTQUEUE_H_
-#define __TESTS_PKTQUEUE_H_
+#ifndef TESTS_PKTQUEUE_H_
+#define TESTS_PKTQUEUE_H_
 
-#include "../unittests.h"
+#include "embUnit.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -29,10 +29,9 @@ extern "C" {
  */
 void tests_pktqueue(void);
 
-
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __TESTS_PKTQUEUE_H_ */
+#endif /* TESTS_PKTQUEUE_H_ */
 /** @} */

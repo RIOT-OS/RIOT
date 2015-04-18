@@ -18,8 +18,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef __ISL29020_H
-#define __ISL29020_H
+#ifndef ISL29020_H
+#define ISL29020_H
 
 #include <stdint.h>
 #include "periph/i2c.h"
@@ -109,5 +109,5 @@ int isl29020_disable(isl29020_t *dev);
 }
 #endif
 
-#endif /* __ISL29020_H */
+#endif /* ISL29020_H */
 /** @} */

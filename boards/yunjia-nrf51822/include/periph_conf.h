@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     board_yunjia-nrf51822
+ * @ingroup     boards_yunjia-nrf51822
  * @{
  *
  * @file
@@ -105,6 +105,29 @@ extern "C" {
  */
 #define RANDOM_NUMOF        (1U)
 /** @} */
+
+/**
+ * @name SPI configuration
+ * @{
+ */
+#define SPI_NUMOF           (2U)
+#define SPI_0_EN            1
+#define SPI_1_EN            1
+#define SPI_IRQ_PRIO        1
+
+/* SPI_0 device configuration */
+#define SPI_0_DEV           NRF_SPI0
+#define SPI_0_PIN_MOSI      17
+#define SPI_0_PIN_MISO      18
+#define SPI_0_PIN_SCK       19
+
+/* SPI_1 device configuration */
+#define SPI_1_DEV           NRF_SPI1
+#define SPI_1_PIN_MOSI      20
+#define SPI_1_PIN_MISO      21
+#define SPI_1_PIN_SCK       22
+/** @} */
+
 
 /**
  * @name GPIO configuration

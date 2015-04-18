@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup shell_commands
+ * @ingroup     sys_shell_commands
  * @{
  *
  * @file
@@ -30,7 +30,7 @@
 
 static l3g4200d_t l3g4200d_dev;
 
-void _get_l3g4200d_init_handler(int argc, char **argv)
+int _get_l3g4200d_init_handler(int argc, char **argv)
 {
     (void)argc;
     (void)argv;
@@ -42,13 +42,15 @@ void _get_l3g4200d_init_handler(int argc, char **argv)
 
     if (res) {
         puts("Error initializing L3G4200D sensor.");
+        return 1;
     }
     else {
         puts("Initialized L3G4200D sensor with default values");
+        return 0;
     }
 }
 
-void _get_l3g4200d_read_handler(int argc, char **argv)
+int _get_l3g4200d_read_handler(int argc, char **argv)
 {
     (void)argc;
     (void)argv;
@@ -57,17 +59,18 @@ void _get_l3g4200d_read_handler(int argc, char **argv)
 
     if (!l3g4200d_dev.addr) {
         puts("Error: please call `l3g4200d_init` first!");
-        return;
+        return 1;
     }
 
     res = l3g4200d_read(&l3g4200d_dev, &data);
     if (res < 0) {
         puts("Error reading gyro values from L3G4200D.");
-        return;
+        return 1;
     }
     else {
         printf("L3G4200D: gyro values: roll(x): %6i   pitch(y): %6i   yaw(z): %6i\n",
                data.acc_x, data.acc_y, data.acc_z);
+        return 0;
     }
 }
 

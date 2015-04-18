@@ -1,0 +1,220 @@
+From 60ac2261d89d1a483bef4676c1e9b16fec8830d1 Mon Sep 17 00:00:00 2001
+From: Frank Holtz <frank-riot2015@holtznet.de>
+Date: Sat, 17 Jan 2015 18:41:14 +0100
+Subject: [PATCH 2/2] Include RIOT Hardware RNG interface
+
+---
+ uECC.c | 99 +++++++++++-------------------------------------------------------
+ uECC.h | 28 +------------------
+ 2 files changed, 17 insertions(+), 110 deletions(-)
+
+diff --git a/uECC.c b/uECC.c
+index aded242..5fe3389 100644
+--- a/uECC.c
++++ b/uECC.c
+@@ -322,85 +322,6 @@ static void vli_square(uECC_word_t *p_result, uECC_word_t *p_left);
+ static void vli_modSquare_fast(uECC_word_t *p_result, uECC_word_t *p_left);
+ #endif
+ 
+-#if (defined(_WIN32) || defined(_WIN64))
+-/* Windows */
+-
+-#define WIN32_LEAN_AND_MEAN
+-#include <windows.h>
+-#include <wincrypt.h>
+-
+-static int default_RNG(uint8_t *p_dest, unsigned p_size)
+-{
+-    HCRYPTPROV l_prov;
+-    if(!CryptAcquireContext(&l_prov, NULL, NULL, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT))
+-    {
+-        return 0;
+-    }
+-
+-    CryptGenRandom(l_prov, p_size, (BYTE *)p_dest);
+-    CryptReleaseContext(l_prov, 0);
+-    
+-    return 1;
+-}
+-
+-#elif defined(unix) || defined(__linux__) || defined(__unix__) || defined(__unix) || \
+-    (defined(__APPLE__) && defined(__MACH__)) || defined(uECC_POSIX)
+-
+-/* Some POSIX-like system with /dev/urandom or /dev/random. */
+-#include <sys/types.h>
+-#include <fcntl.h>
+-#include <unistd.h>
+-
+-#ifndef O_CLOEXEC
+-    #define O_CLOEXEC 0
+-#endif
+-
+-static int default_RNG(uint8_t *p_dest, unsigned p_size)
+-{
+-    int l_fd = open("/dev/urandom", O_RDONLY | O_CLOEXEC);
+-    if(l_fd == -1)
+-    {
+-        l_fd = open("/dev/random", O_RDONLY | O_CLOEXEC);
+-        if(l_fd == -1)
+-        {
+-            return 0;
+-        }
+-    }
+-    
+-    char *l_ptr = (char *)p_dest;
+-    size_t l_left = p_size;
+-    while(l_left > 0)
+-    {
+-        int l_read = read(l_fd, l_ptr, l_left);
+-        if(l_read <= 0)
+-        { // read failed
+-            close(l_fd);
+-            return 0;
+-        }
+-        l_left -= l_read;
+-        l_ptr += l_read;
+-    }
+-    
+-    close(l_fd);
+-    return 1;
+-}
+-
+-#else /* Some other platform */
+-
+-static int default_RNG(uint8_t *p_dest, unsigned p_size)
+-{
+-    return 0;
+-}
+-
+-#endif
+-
+-static uECC_RNG_Function g_rng = &default_RNG;
+-
+-void uECC_set_rng(uECC_RNG_Function p_rng)
+-{
+-    g_rng = p_rng;
+-}
+-
+ #ifdef __GNUC__ /* Only support GCC inline asm for now */
+     #if (uECC_ASM && (uECC_PLATFORM == uECC_avr))
+         #include "asm_avr.inc"
+@@ -1779,11 +1700,15 @@ int uECC_make_key(uint8_t p_publicKey[uECC_BYTES*2], uint8_t p_privateKey[uECC_B
+     uECC_word_t l_private[uECC_WORDS];
+     uECC_word_t l_tries = 0;
+     
++    /* power on rng */
++    random_poweron();
++    
+     do
+     {
+     repeat:
+-        if(!g_rng((uint8_t *)l_private, sizeof(l_private)) || (l_tries++ >= MAX_TRIES))
++        if(random_read((char *)l_private, sizeof(l_private))!=sizeof(l_private) || (l_tries++ >= MAX_TRIES))
+         {
++           random_poweroff();
+             return 0;
+         }
+         if(vli_isZero(l_private))
+@@ -1805,6 +1730,7 @@ int uECC_make_key(uint8_t p_publicKey[uECC_BYTES*2], uint8_t p_privateKey[uECC_B
+     vli_nativeToBytes(p_privateKey, l_private);
+     vli_nativeToBytes(p_publicKey, l_public.x);
+     vli_nativeToBytes(p_publicKey + uECC_BYTES, l_public.y);
++    random_poweroff();
+     return 1;
+ }
+ 
+@@ -1814,7 +1740,9 @@ int uECC_shared_secret(const uint8_t p_publicKey[uECC_BYTES*2], const uint8_t p_
+     uECC_word_t l_private[uECC_WORDS];
+     uECC_word_t l_random[uECC_WORDS];
+     
+-    g_rng((uint8_t *)l_random, sizeof(l_random));
++    random_poweron();
++    random_read((char *)l_random, sizeof(l_random));
++    random_poweroff();
+     
+     vli_bytesToNative(l_private, p_privateKey);
+     vli_bytesToNative(l_public.x, p_publicKey);
+@@ -2152,11 +2080,14 @@ int uECC_sign(const uint8_t p_privateKey[uECC_BYTES], const uint8_t p_hash[uECC_
+     EccPoint p;
+     uECC_word_t l_tries = 0;
+     
++    random_poweron();
++    
+     do
+     {
+     repeat:
+-        if(!g_rng((uint8_t *)k, sizeof(k)) || (l_tries++ >= MAX_TRIES))
++        if(random_read((char *)k, sizeof(k))!=sizeof(k) || (l_tries++ >= MAX_TRIES))
+         {
++            random_poweroff();
+             return 0;
+         }
+         
+@@ -2203,8 +2134,9 @@ int uECC_sign(const uint8_t p_privateKey[uECC_BYTES], const uint8_t p_hash[uECC_
+     l_tries = 0;
+     do
+     {
+-        if(!g_rng((uint8_t *)l_tmp, sizeof(l_tmp)) || (l_tries++ >= MAX_TRIES))
++        if(random_read((char *)l_tmp, sizeof(l_tmp))!=sizeof(l_tmp) || (l_tries++ >= MAX_TRIES))
+         {
++            random_poweroff();
+             return 0;
+         }
+     } while(vli_isZero(l_tmp));
+@@ -2234,6 +2166,7 @@ int uECC_sign(const uint8_t p_privateKey[uECC_BYTES], const uint8_t p_hash[uECC_
+ #endif
+     vli_nativeToBytes(p_signature + uECC_BYTES, s);
+     
++    random_poweroff();
+     return 1;
+ }
+ 
+diff --git a/uECC.h b/uECC.h
+index 2c9927b..27a2e47 100644
+--- a/uECC.h
++++ b/uECC.h
+@@ -4,6 +4,7 @@
+ #define _MICRO_ECC_H_
+ 
+ #include <stdint.h>
++#include "periph/random.h"
+ 
+ /* Platform selection options.
+ If uECC_PLATFORM is not defined, the code will try to guess it based on compiler macros.
+@@ -57,33 +58,6 @@ extern "C"
+ {
+ #endif
+ 
+-/* uECC_RNG_Function type
+-The RNG function should fill p_size random bytes into p_dest. It should return 1 if
+-p_dest was filled with random data, or 0 if the random data could not be generated.
+-The filled-in values should be either truly random, or from a cryptographically-secure PRNG.
+-
+-A correctly functioning RNG function must be set (using uECC_set_rng()) before calling
+-uECC_make_key() or uECC_sign().
+-
+-A correct RNG function is set by default when building for Windows, Linux, or OS X.
+-If you are building on another POSIX-compliant system that supports /dev/random or /dev/urandom,
+-you can define uECC_POSIX to use the predefined RNG. For embedded platforms there is no predefined
+-RNG function; you must provide your own.
+-*/
+-typedef int (*uECC_RNG_Function)(uint8_t *p_dest, unsigned p_size);
+-
+-/* uECC_set_rng() function.
+-Set the function that will be used to generate random bytes. The RNG function should
+-return 1 if the random data was generated, or 0 if the random data could not be generated.
+-
+-On platforms where there is no predefined RNG function (eg embedded platforms), this must
+-be called before uECC_make_key() or uECC_sign() are used.
+-    
+-Inputs:
+-    p_rng  - The function that will be used to generate random bytes.
+-*/
+-void uECC_set_rng(uECC_RNG_Function p_rng);
+-
+ /* uECC_make_key() function.
+ Create a public/private key pair.
+     
+-- 
+1.8.3.1
+

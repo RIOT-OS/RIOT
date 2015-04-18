@@ -15,7 +15,7 @@
  *          Wraps all API types, constants and functions of
  *          6LoWPAN in layer 3.
  *
- * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
+ * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 #ifndef IPV6_H
 #define IPV6_H

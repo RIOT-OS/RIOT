@@ -1,7 +1,7 @@
 /**
  * virtual timer
  *
- * Copyright (C) 2013, 2014 Freie Universität Berlin
+ * Copyright (C) 2013 - 2015 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -40,6 +40,15 @@
 
 #define SECONDS_PER_TICK (4096U)
 #define MICROSECONDS_PER_TICK (4096UL * 1000000)
+
+/*
+ * This is a workaround for missing support in clang on OSX,
+ * the alias is not needed in native.
+ * Compare https://github.com/RIOT-OS/RIOT/issues/2336
+ */
+#ifndef BOARD_NATIVE
+void _gettimeofday(void)           __attribute__ ((weak, alias("vtimer_gettimeofday")));
+#endif
 
 static void vtimer_callback(void *ptr);
 static void vtimer_callback_tick(vtimer_t *timer);
@@ -304,7 +313,7 @@ void vtimer_get_localtime(struct tm *localt)
     // TODO: fill the other fields
 }
 
-int vtimer_init(void)
+void vtimer_init(void)
 {
     DEBUG("vtimer_init().\n");
     unsigned state = disableIRQ();
@@ -324,7 +333,6 @@ int vtimer_init(void)
     update_shortterm();
 
     restoreIRQ(state);
-    return 0;
 }
 
 int vtimer_set_wakeup(vtimer_t *t, timex_t interval, kernel_pid_t pid)
@@ -370,7 +378,7 @@ int vtimer_sleep(timex_t time)
     return ret;
 }
 
-int vtimer_remove(vtimer_t *t)
+void vtimer_remove(vtimer_t *t)
 {
     unsigned irq_state = disableIRQ();
 
@@ -380,10 +388,9 @@ int vtimer_remove(vtimer_t *t)
 
     restoreIRQ(irq_state);
 
-    return 0;
 }
 
-int vtimer_set_msg(vtimer_t *t, timex_t interval, kernel_pid_t pid, uint16_t type, void *ptr)
+void vtimer_set_msg(vtimer_t *t, timex_t interval, kernel_pid_t pid, uint16_t type, void *ptr)
 {
     t->action = vtimer_callback_msg;
     t->type = type;
@@ -391,7 +398,6 @@ int vtimer_set_msg(vtimer_t *t, timex_t interval, kernel_pid_t pid, uint16_t typ
     t->absolute = interval;
     t->pid = pid;
     vtimer_set(t);
-    return 0;
 }
 
 int vtimer_msg_receive_timeout(msg_t *m, timex_t timeout) {
@@ -414,11 +420,11 @@ int vtimer_msg_receive_timeout(msg_t *m, timex_t timeout) {
 
 #if ENABLE_DEBUG
 
-void vtimer_print_short_queue(){
+void vtimer_print_short_queue(void){
     priority_queue_print(&shortterm_priority_queue_root);
 }
 
-void vtimer_print_long_queue(){
+void vtimer_print_long_queue(void){
     priority_queue_print(&longterm_priority_queue_root);
 }
 

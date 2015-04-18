@@ -12,7 +12,7 @@
  * @file    sixlowmac.c
  * @brief   6lowpan link layer functions
  * @author  Stephan Zeisberg <zeisberg@mi.fu-berlin.de>
- * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
+ * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  * @author  Eric Engel <eric.engel@fu-berlin.de>
  * @author  Oliver Gesch <oliver.gesch@googlemail.com>
  * @author  Oliver Hahm <oliver.hahm@inria.fr>
@@ -45,16 +45,18 @@
 
 #define DEFAULT_IEEE_802154_PAN_ID  (0x1234)
 
-char radio_stack_buffer[RADIO_STACK_SIZE];
-msg_t msg_q[RADIO_RCV_BUF_SIZE];
+static char radio_stack_buffer[RADIO_STACK_SIZE];
+static msg_t msg_q[RADIO_RCV_BUF_SIZE];
 
-uint8_t lowpan_mac_buf[PAYLOAD_SIZE];
+static uint8_t lowpan_mac_buf[PAYLOAD_SIZE];
 static uint8_t macdsn;
 
 static inline void mac_frame_short_to_eui64(net_if_eui64_t *eui64,
                                             uint8_t *frame_short)
 {
-    eui64->uint32[0] = HTONL(0x000000ff);
+    /* Since this is a short address, which is never globally unique, we set
+     * the local/universal bit to 1. */
+    eui64->uint32[0] = HTONL(0x020000ff);
     eui64->uint16[2] = HTONS(0xfe00);
     eui64->uint8[6] = frame_short[1];
     eui64->uint8[7] = frame_short[0];
@@ -136,6 +138,7 @@ static void *recv_ieee802154_frame(void *arg)
             }
             else {
                 DEBUG("Unknown IEEE 802.15.4 source address mode.\n");
+                p->processing--;
                 continue;
             }
 

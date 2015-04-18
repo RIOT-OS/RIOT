@@ -17,13 +17,12 @@
  * @author      Lotte Steenbrink <lotte.steenbrink@fu-berlin.de>
  */
 
-#include "debug.h"
-
 #include "aodv.h"
 #include "aodvv2/aodvv2.h"
 #include "aodv_debug.h"
 
 #define ENABLE_DEBUG (0)
+#include "debug.h"
 
 #define UDP_BUFFER_SIZE     (128) /** with respect to IEEE 802.15.4's MTU */
 #define RCV_MSG_Q_SIZE      (32)  /* TODO: check if smaller values work, too */
@@ -54,7 +53,11 @@ static ipv6_addr_t _v6_addr_local, _v6_addr_mcast, _v6_addr_loopback;
 static struct netaddr na_local; /* the same as _v6_addr_local, but to save us
                                  * constant calls to ipv6_addr_t_to_netaddr()... */
 static struct writer_target *wt;
-struct netaddr na_mcast = (struct netaddr){};
+static mutex_t rreq_mutex;
+static mutex_t rrep_mutex;
+static mutex_t rerr_mutex;
+
+struct netaddr na_mcast;
 
 void aodv_init(void)
 {
@@ -63,6 +66,10 @@ void aodv_init(void)
     /* TODO: set if_id properly */
     int if_id = 0;
     net_if_set_src_address_mode(if_id, NET_IF_TRANS_ADDR_M_SHORT);
+
+    mutex_init(&rreq_mutex);
+    mutex_init(&rrep_mutex);
+    mutex_init(&rerr_mutex);
 
     aodv_set_metric_type(AODVV2_DEFAULT_METRIC_TYPE);
     _init_addresses();
@@ -104,6 +111,9 @@ void aodv_set_metric_type(aodvv2_metric_t metric_type)
 
 void aodv_send_rreq(struct aodvv2_packet_data *packet_data)
 {
+    /* Make sure only one thread is dispatching a RREQ at a time */
+    mutex_lock(&rreq_mutex);
+
     AODV_DEBUG("%s()\n", __func__);
 
     struct aodvv2_packet_data *pd = malloc(sizeof(struct aodvv2_packet_data));
@@ -125,10 +135,14 @@ void aodv_send_rreq(struct aodvv2_packet_data *packet_data)
     msg.content.ptr = (char *) mc;
 
     msg_try_send(&msg, sender_thread);
+    mutex_unlock(&rreq_mutex);
 }
 
 void aodv_send_rrep(struct aodvv2_packet_data *packet_data, struct netaddr *next_hop)
 {
+    /* Make sure only one thread is dispatching a RREP at a time */
+    mutex_lock(&rrep_mutex);
+
     AODV_DEBUG("%s()\n", __func__);
 
     struct aodvv2_packet_data *pd = malloc(sizeof(struct aodvv2_packet_data));
@@ -153,10 +167,14 @@ void aodv_send_rrep(struct aodvv2_packet_data *packet_data, struct netaddr *next
     msg.content.ptr = (char *) mc;
 
     msg_try_send(&msg, sender_thread);
+    mutex_unlock(&rrep_mutex);
 }
 
 void aodv_send_rerr(struct unreachable_node unreachable_nodes[], size_t len, struct netaddr *next_hop)
 {
+    /* Make sure only one thread is dispatching a RERR at a time */
+    mutex_lock(&rerr_mutex);
+
     AODV_DEBUG("%s()\n", __func__);
 
     struct rerr_data *rerrd = malloc(sizeof(struct rerr_data));
@@ -177,6 +195,7 @@ void aodv_send_rerr(struct unreachable_node unreachable_nodes[], size_t len, str
     msg2.content.ptr = (char *) mc2;
 
     msg_try_send(&msg2, sender_thread);
+    mutex_unlock(&rerr_mutex);
 }
 
 /*
@@ -275,6 +294,7 @@ static void *_aodv_receiver_thread(void *arg)
     if (-1 == socket_base_bind(sock_rcv, &sa_rcv, sizeof(sa_rcv))) {
         DEBUG("Error: bind to receive socket failed!\n");
         socket_base_close(sock_rcv);
+        return NULL;
     }
 
     AODV_DEBUG("ready to receive data\n");
@@ -294,9 +314,11 @@ static void *_aodv_receiver_thread(void *arg)
         struct netaddr _sender;
         ipv6_addr_t_to_netaddr(&sa_rcv.sin6_addr, &_sender);
 
-        /* For some reason we sometimes get passed our own packets. drop them. */
+        /* We sometimes get passed our own packets. Drop them. */
         if (netaddr_cmp(&_sender, &na_local) == 0) {
             AODV_DEBUG("received our own packet, dropping it.\n");
+        }
+        else {
             aodv_packet_reader_handle_packet((void *) buf_rcv, rcv_size, &_sender);
         }
     }
@@ -337,7 +359,7 @@ ipv6_addr_t *aodv_get_next_hop(ipv6_addr_t *dest)
         /* Case 2: Broken Link (detected by lower layer) */
         int link_broken = (ndp_nc_entry->state == NDP_NCE_STATUS_INCOMPLETE ||
                            ndp_nc_entry->state == NDP_NCE_STATUS_PROBE) &&
-                          (rt_entry != NULL && rt_entry->state != ROUTE_STATE_BROKEN);
+                          (rt_entry != NULL && rt_entry->state != ROUTE_STATE_INVALID);
 
         if (link_broken) {
             DEBUG("\tNeighbor Cache entry found, but invalid (state: %i). Sending RERR.\n",
@@ -354,13 +376,12 @@ ipv6_addr_t *aodv_get_next_hop(ipv6_addr_t *dest)
         DEBUG("[aodvv2][ndp] found NC entry. Returning dest addr.\n");
         return dest;
     }
+
     DEBUG("\t[ndp] no entry for addr %s found\n",
           ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, dest));
-
     if (rt_entry) {
         /* Case 1: Undeliverable Packet */
-        int packet_indeliverable = rt_entry->state == ROUTE_STATE_BROKEN ||
-                                   rt_entry->state == ROUTE_STATE_EXPIRED;
+        int packet_indeliverable = rt_entry->state == ROUTE_STATE_INVALID;
         if (packet_indeliverable) {
             DEBUG("\tRouting table entry found, but invalid (state %i). Sending RERR.\n",
                   rt_entry->state);

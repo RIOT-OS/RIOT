@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    board_arduino-due Arduino Due
+ * @defgroup    boards_arduino-due Arduino Due
  * @ingroup     boards
  * @brief       Support for the Arduino Due board.
  * @{

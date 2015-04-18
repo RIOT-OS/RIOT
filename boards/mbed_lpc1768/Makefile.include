@@ -4,7 +4,7 @@ export CPU = lpc1768
 #define the default port depending on the host OS
 OS := $(shell uname)
 ifeq ($(OS),Linux)
-  PORT ?= /dev/ttyUSB0
+  PORT ?= /dev/ttyACM0
 else ifeq ($(OS),Darwin)
   PORT ?= $(shell ls -1 /dev/tty.SLAB_USBtoUART* | head -n 1)
 else
@@ -30,10 +30,10 @@ export DEBUGSERVER =
 # define build specific options
 CPU_USAGE = -mcpu=cortex-m3
 FPU_USAGE =
-export CFLAGS += -ggdb -g3 -std=gnu99 -Os -Wall -Wstrict-prototypes $(CPU_USAGE) $(FPU_USAGE) -mlittle-endian -mthumb -mthumb-interwork -nostartfiles
+export CFLAGS += -ggdb -g3 -std=gnu99 -Os -Wall -Wstrict-prototypes $(CPU_USAGE) $(FPU_USAGE) -mlittle-endian -mthumb -mno-thumb-interwork -nostartfiles
 export CFLAGS += -ffunction-sections -fdata-sections -fno-builtin
 export ASFLAGS += -ggdb -g3 $(CPU_USAGE) $(FPU_USAGE) -mlittle-endian
-export LINKFLAGS += -g3 -ggdb -std=gnu99 $(CPU_USAGE) $(FPU_USAGE) -mlittle-endian -static -lgcc -mthumb -mthumb-interwork -nostartfiles
+export LINKFLAGS += -g3 -ggdb -std=gnu99 $(CPU_USAGE) $(FPU_USAGE) -mlittle-endian -static -lgcc -mthumb -mno-thumb-interwork -nostartfiles
 export LINKFLAGS += -T$(LINKERSCRIPT)
 export OFLAGS = -O binary
 export HEXFILE = $(ELFFILE:.elf=.bin)

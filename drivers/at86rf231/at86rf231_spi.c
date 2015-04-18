@@ -15,6 +15,7 @@
  *
  * @author      Alaeddine Weslati <alaeddine.weslati@inria.fr>
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
+ * @author      Joakim Gebart <joakim.gebart@eistec.se>
  *
  * @}
  */
@@ -27,29 +28,39 @@
 
 void at86rf231_reg_write(uint8_t addr, uint8_t value)
 {
+    /* Acquire exclusive access to the bus. */
+    spi_acquire(AT86RF231_SPI);
     /* Start the SPI transfer */
     gpio_clear(AT86RF231_CS);
     /* write to register */
     spi_transfer_reg(AT86RF231_SPI, AT86RF231_ACCESS_REG | AT86RF231_ACCESS_WRITE | addr, value, 0);
     /* End the SPI transfer */
     gpio_set(AT86RF231_CS);
+    /* Release the bus for other threads. */
+    spi_release(AT86RF231_SPI);
 }
 
 uint8_t at86rf231_reg_read(uint8_t addr)
 {
     char value;
 
+    /* Acquire exclusive access to the bus. */
+    spi_acquire(AT86RF231_SPI);
     /* Start the SPI transfer */
     gpio_clear(AT86RF231_CS);
     /* read from register */
     spi_transfer_reg(AT86RF231_SPI, AT86RF231_ACCESS_REG | AT86RF231_ACCESS_READ | addr, 0, &value);
     /* End the SPI transfer */
     gpio_set(AT86RF231_CS);
+    /* Release the bus for other threads. */
+    spi_release(AT86RF231_SPI);
     return (uint8_t)value;
 }
 
 void at86rf231_read_fifo(uint8_t *data, radio_packet_length_t length)
 {
+    /* Acquire exclusive access to the bus. */
+    spi_acquire(AT86RF231_SPI);
     /* Start the SPI transfer */
     gpio_clear(AT86RF231_CS);
     /* Read a number of bytes from the devices frame buffer */
@@ -57,10 +68,14 @@ void at86rf231_read_fifo(uint8_t *data, radio_packet_length_t length)
                       0, (char*)data, length);
     /* End the SPI transfer */
     gpio_set(AT86RF231_CS);
+    /* Release the bus for other threads. */
+    spi_release(AT86RF231_SPI);
 }
 
 void at86rf231_write_fifo(const uint8_t *data, radio_packet_length_t length)
 {
+    /* Acquire exclusive access to the bus. */
+    spi_acquire(AT86RF231_SPI);
     /* Start the SPI transfer */
     gpio_clear(AT86RF231_CS);
     /* Send Frame Buffer Write access */
@@ -68,6 +83,8 @@ void at86rf231_write_fifo(const uint8_t *data, radio_packet_length_t length)
                       (char*)data, 0, length);
     /* End the SPI transfer */
     gpio_set(AT86RF231_CS);
+    /* Release the bus for other threads. */
+    spi_release(AT86RF231_SPI);
 }
 
 uint8_t at86rf231_get_status(void)

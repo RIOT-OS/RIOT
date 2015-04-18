@@ -55,6 +55,8 @@ static kernel_pid_t fpu_owner = KERNEL_PID_UNDEF;
 
 //static ucontext_t *cur_ctx, *isr_ctx;
 
+static struct x86_fxsave initial_fpu_state;
+
 int inISR(void)
 {
     return x86_in_isr;
@@ -169,6 +171,7 @@ char *thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_sta
     p->uc_stack.ss_size = stacksize;
     p->uc_link = &end_context;
     p->uc_context.flags |= X86_IF;
+    p->__fxsave = initial_fpu_state;
     makecontext(p, (makecontext_fun_t) task_func, 1, arg);
 
     return (char *) p;
@@ -218,6 +221,7 @@ void x86_init_threading(void)
     makecontext(&end_context, x86_thread_exit, 0);
 
     x86_interrupt_handler_set(X86_INT_NM, fpu_used_interrupt);
+    asm volatile ("fxsave (%0)" :: "r"(&initial_fpu_state));
 
     DEBUG("Threading initialized\n");
 }

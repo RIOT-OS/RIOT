@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup pttu
+ * @ingroup boards_pttu
  * @{
  */
 

@@ -18,8 +18,8 @@
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  */
 
-#ifndef __LSM303DLHC_H
-#define __LSM303DLHC_H
+#ifndef LSM303DLHC_H
+#define LSM303DLHC_H
 
 #include <stdint.h>
 #include "periph/i2c.h"
@@ -213,5 +213,5 @@ int lsm303dlhc_disable(lsm303dlhc_t *dev);
 }
 #endif
 
-#endif /* __LSM303DLHC_H */
+#endif /* LSM303DLHC_H */
  /** @} */

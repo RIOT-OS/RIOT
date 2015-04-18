@@ -14,6 +14,7 @@
  * @brief       Test application for the SRF02 ultrasonic range sensor
  *
  * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
+ * @author      Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
  *
  * @}
  */

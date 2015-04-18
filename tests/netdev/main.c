@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Martin Lenders <mlenders@inf.fu-berlin.de>
+ * Copyright (C) 2014 Martine Lenders <mlenders@inf.fu-berlin.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -36,6 +36,61 @@
 
 static size_t dev_address_len = 0;
 static netdev_t *dev = NULL;
+
+/***********************************
+ * helper functions                *
+ ***********************************/
+static inline int _got_uint8_value(char *param_name, uint8_t *value_ptr, size_t value_len,
+                                   uint8_t check_value, uint8_t value_exp)
+{
+    printf("Got %s of value %" PRIu8 " of length %zu\n", param_name, *value_ptr, value_len);
+
+    if (check_value) {
+        return (*value_ptr == value_exp) ? 1 : 0;
+    }
+    else {
+        return 1;
+    }
+}
+
+static inline int _got_uint16_value(char *param_name, uint16_t *value_ptr, size_t value_len,
+                                    uint8_t check_value, uint16_t value_exp)
+{
+    printf("Got %s of value %" PRIu16 " of length %zu\n", param_name, *value_ptr, value_len);
+
+    if (check_value) {
+        return (*value_ptr == value_exp) ? 1 : 0;
+    }
+    else {
+        return 1;
+    }
+}
+
+static inline int _got_uint32_value(char *param_name, uint32_t *value_ptr, size_t value_len,
+                                    uint8_t check_value, uint32_t value_exp)
+{
+    printf("Got %s of value %" PRIu32 " of length %zu\n", param_name, *value_ptr, value_len);
+
+    if (check_value) {
+        return (*value_ptr == value_exp) ? 1 : 0;
+    }
+    else {
+        return 1;
+    }
+}
+
+static inline int _got_uint64_value(char *param_name, uint64_t *value_ptr, size_t value_len,
+                                    uint8_t check_value, uint64_t value_exp)
+{
+    printf("Got %s of value %" PRIu64 " of length %zu\n", param_name, *value_ptr, value_len);
+
+    if (check_value) {
+        return (*value_ptr == value_exp) ? 1 : 0;
+    }
+    else {
+        return 1;
+    }
+}
 
 /***********************************
  * test channel                    *
@@ -86,39 +141,16 @@ static int check_channel(void)
         case 0:
             switch (channel_len) {
                 case 1:
-                    printf("Got channel of value %" PRIu8 " of length %u\n",
-                           channel[0], channel_len);
-                    return (channel[0] == NETDEV_TEST_CHANNEL) ? 1 : 0;
+                    return _got_uint8_value("channel", (uint8_t *)channel, channel_len, 1, NETDEV_TEST_CHANNEL);
 
                 case 2:
-                    do {
-                        uint16_t *c = (uint16_t *)channel;
-                        printf("Got channel of value %" PRIu16 " of length %u\n",
-                               *c, channel_len);
-                        return (*c == NETDEV_TEST_CHANNEL) ? 1 : 0;
-                    } while (0);
-
-                    break;
+                    return _got_uint16_value("channel", (uint16_t *)channel, channel_len, 1, NETDEV_TEST_CHANNEL);
 
                 case 4:
-                    do {
-                        uint32_t *c = (uint32_t *)channel;
-                        printf("Got channel of value %" PRIu32 " of length %u\n",
-                               *c, channel_len);
-                        return (*c == NETDEV_TEST_CHANNEL) ? 1 : 0;
-                    } while (0);
-
-                    break;
+                    return _got_uint32_value("channel", (uint32_t *)channel, channel_len, 1, NETDEV_TEST_CHANNEL);
 
                 case 8:
-                    do {
-                        uint64_t *c = (uint64_t *)channel;
-                        printf("Got channel of value %" PRIu64 " of length %u\n",
-                               *c, channel_len);
-                        return (*c == NETDEV_TEST_CHANNEL) ? 1 : 0;
-                    } while (0);
-
-                    break;
+                    return _got_uint64_value("channel", (uint64_t *)channel, channel_len, 1, NETDEV_TEST_CHANNEL);
 
                 default:
                     printf("Unexpected channel type of length %u:", channel_len);
@@ -202,29 +234,13 @@ static int check_address(void)
 
             switch (address_len) {
                 case 1:
-                    printf("Got address of value %" PRIu8 " of length %u\n",
-                           address[0], address_len);
-                    return (address[0] == NETDEV_TEST_ADDRESS) ? 1 : 0;
+                    return _got_uint8_value("address", (uint8_t *)address, address_len, 1, NETDEV_TEST_ADDRESS);
 
                 case 2:
-                    do {
-                        uint16_t *a = (uint16_t *)address;
-                        printf("Got address of value %" PRIu16 " of length %u\n",
-                               *a, address_len);
-                        return (*a == NETDEV_TEST_ADDRESS) ? 1 : 0;
-                    } while (0);
-
-                    break;
+                    return _got_uint16_value("address", (uint16_t *)address, address_len, 1, NETDEV_TEST_ADDRESS);
 
                 case 4:
-                    do {
-                        uint32_t *a = (uint32_t *)address;
-                        printf("Got address of value %" PRIu32 " of length %u\n",
-                               *a, address_len);
-                        return (*a == NETDEV_TEST_ADDRESS) ? 1 : 0;
-                    } while (0);
-
-                    break;
+                    return _got_uint32_value("address", (uint32_t *)address, address_len, 1, NETDEV_TEST_ADDRESS);
 
                 case 6:
                     printf("Got address of length %u of value: ", address_len);
@@ -237,14 +253,7 @@ static int check_address(void)
                     return 1;
 
                 case 8:
-                    do {
-                        uint64_t *a = (uint64_t *)address;
-                        printf("Got address of value %" PRIu64 " of length %u\n",
-                               *a, address_len);
-                        return (*a == NETDEV_TEST_ADDRESS) ? 1 : 0;
-                    } while (0);
-
-                    break;
+                    return _got_uint64_value("address", (uint64_t *)address, address_len, 1, NETDEV_TEST_ADDRESS);
 
                 default:
                     printf("Unexpected address type of length %u:", address_len);
@@ -326,29 +335,13 @@ static int check_long_address(void)
         case 0:
             switch (address_len) {
                 case 1:
-                    printf("Got long address of value %" PRIu8 " of length %u\n",
-                           address[0], address_len);
-                    return (address[0] == NETDEV_TEST_ADDRESS) ? 1 : 0;
+                    return _got_uint8_value("long address", (uint8_t *)address, address_len, 1, NETDEV_TEST_ADDRESS);
 
                 case 2:
-                    do {
-                        uint16_t *a = (uint16_t *)address;
-                        printf("Got long address of value %" PRIu16 " of length %u\n",
-                               *a, address_len);
-                        return (*a == NETDEV_TEST_ADDRESS) ? 1 : 0;
-                    } while (0);
-
-                    break;
+                    return _got_uint16_value("long address", (uint16_t *)address, address_len, 1, NETDEV_TEST_ADDRESS);
 
                 case 4:
-                    do {
-                        uint32_t *a = (uint32_t *)address;
-                        printf("Got long address of value %" PRIu32 " of length %u\n",
-                               *a, address_len);
-                        return (*a == NETDEV_TEST_ADDRESS) ? 1 : 0;
-                    } while (0);
-
-                    break;
+                    return _got_uint32_value("long address", (uint32_t *)address, address_len, 1, NETDEV_TEST_ADDRESS);
 
                 case 6:
                     printf("Got long address of length %u of value: ", address_len);
@@ -361,12 +354,7 @@ static int check_long_address(void)
                     return 1;
 
                 case 8:
-                    do {
-                        uint64_t *a = (uint64_t *)address;
-                        printf("Got long address of value 0x%" PRIx64 " of length %u\n",
-                               *a, address_len);
-                        return (*a == NETDEV_TEST_ADDRESS) ? 1 : 0;
-                    } while (0);
+                    return _got_uint64_value("long address", (uint64_t *)address, address_len, 1, NETDEV_TEST_ADDRESS);
 
                 default:
                     printf("Unexpected long address type of length %u:", address_len);
@@ -448,41 +436,16 @@ static int check_nid(void)
         case 0:
             switch (nid_len) {
                 case 1:
-                    printf("Got network ID of value %" PRIu8 " of length %u\n",
-                           nid[0], nid_len);
-                    return (nid[0] == NETDEV_TEST_NID) ? 1 : 0;
-
-                    break;
+                    return _got_uint8_value("network ID", (uint8_t *)nid, nid_len, 1, NETDEV_TEST_NID);
 
                 case 2:
-                    do {
-                        uint16_t *n = (uint16_t *)nid;
-                        printf("Got network ID of value %" PRIu16 " of length %u\n",
-                               *n, nid_len);
-                        return (*n == NETDEV_TEST_NID) ? 1 : 0;
-                    } while (0);
-
-                    break;
+                    return _got_uint16_value("network ID", (uint16_t *)nid, nid_len, 1, NETDEV_TEST_NID);
 
                 case 4:
-                    do {
-                        uint32_t *n = (uint32_t *)nid;
-                        printf("Got network ID of value %" PRIu32 " of length %u\n",
-                               *n, nid_len);
-                        return (*n == NETDEV_TEST_NID) ? 1 : 0;
-                    } while (0);
-
-                    break;
+                    return _got_uint32_value("network ID", (uint32_t *)nid, nid_len, 1, NETDEV_TEST_NID);
 
                 case 8:
-                    do {
-                        uint64_t *n = (uint64_t *)nid;
-                        printf("Got network ID of value %" PRIu64 " of length %u\n",
-                               *n, nid_len);
-                        return (*n == NETDEV_TEST_NID) ? 1 : 0;
-                    } while (0);
-
-                    break;
+                    return _got_uint64_value("network ID", (uint64_t *)nid, nid_len, 1, NETDEV_TEST_NID);
 
                 default:
                     printf("Unexpected network ID type of length %u:", nid_len);
@@ -529,39 +492,16 @@ static int check_max_packet_size(void)
         case 0:
             switch (mps_len) {
                 case 1:
-                    printf("Got maximum packet size of value %" PRIu8 " of length %u\n",
-                           mps[0], mps_len);
-                    return 1;
+                    return _got_uint8_value("maximum packet size", (uint8_t *)mps, mps_len, 0, 0);
 
                 case 2:
-                    do {
-                        uint16_t *size = (uint16_t *)mps;
-                        printf("Got maximum packet size of value %" PRIu16 " of length %u\n",
-                               *size, mps_len);
-                        return 1;
-                    } while (0);
-
-                    break;
+                    return _got_uint16_value("maximum packet size", (uint16_t *)mps, mps_len, 0, 0);
 
                 case 4:
-                    do {
-                        uint32_t *size = (uint32_t *)mps;
-                        printf("Got maximum packet size of value %" PRIu32 " of length %u\n",
-                               *size, mps_len);
-                        return 1;
-                    } while (0);
-
-                    break;
+                    return _got_uint32_value("maximum packet size", (uint32_t *)mps, mps_len, 0, 0);
 
                 case 8:
-                    do {
-                        uint64_t *size = (uint64_t *)mps;
-                        printf("Got maximum packet size of value %" PRIu64 " of length %u\n",
-                               *size, mps_len);
-                        return 1;
-                    } while (0);
-
-                    break;
+                    return _got_uint64_value("maximum packet size", (uint64_t *)mps, mps_len, 0, 0);
 
                 default:
                     printf("Unexpected maximum packet size type of length %u:", mps_len);
@@ -772,31 +712,29 @@ static int send_packet(void)
 
     switch (dev_address_len) {
         case 1:
-            do {
+            do {    /* open block to reduce scope of variable */
                 uint8_t dest = NETDEV_TEST_RECEIVER;
 
                 printf(" %" PRIu8 "\n", dest);
                 dev->driver->send_data(dev, &dest, dev_address_len,
                                        hlist, payload, strlen(payload));
-            }
-            while (0);
+            } while (0);
 
             break;
 
         case 2:
-            do {
+            do {    /* open block to reduce scope of variable */
                 uint16_t dest = NETDEV_TEST_RECEIVER;
 
                 printf(" %" PRIu16 "\n", dest);
                 dev->driver->send_data(dev, &dest, dev_address_len,
                                        hlist, payload, strlen(payload));
-            }
-            while (0);
+            } while (0);
 
             break;
 
         case 3:
-            do {
+            do {    /* open block to reduce scope of variable */
                 uint16_t dest_int = HTONS(NETDEV_TEST_RECEIVER);
                 uint8_t dest[dev_address_len];
 
@@ -812,35 +750,32 @@ static int send_packet(void)
 
                 dev->driver->send_data(dev, &dest, dev_address_len,
                                        hlist, payload, strlen(payload));
-            }
-            while (0);
+            } while (0);
 
         case 4:
-            do {
+            do {    /* open block to reduce scope of variable */
                 uint32_t dest = NETDEV_TEST_RECEIVER;
 
                 printf(" %" PRIu32 "\n", dest);
                 dev->driver->send_data(dev, &dest, dev_address_len, hlist,
                                        payload, strlen(payload));
-            }
-            while (0);
+            } while (0);
 
             break;
 
         case 8:
-            do {
+            do {    /* open block to reduce scope of variable */
                 uint64_t dest = NETDEV_TEST_RECEIVER;
 
                 printf(" %" PRIu64 "\n", dest);
                 dev->driver->send_data(dev, &dest, dev_address_len,
                                        hlist, payload, strlen(payload));
-            }
-            while (0);
+            } while (0);
 
             break;
 
         default:
-            do {
+            do {    /* open block to reduce scope of variable */
                 uint32_t dest_int = HTONL(NETDEV_TEST_RECEIVER);
                 uint8_t dest[dev_address_len];
 
@@ -856,8 +791,7 @@ static int send_packet(void)
 
                 dev->driver->send_data(dev, &dest, dev_address_len,
                                        hlist, payload, strlen(payload));
-            }
-            while (0);
+            } while (0);
 
             break;
     }
@@ -887,7 +821,7 @@ static int test_callback(netdev_t *rcv_dev, void *src, size_t src_len,
             break;
 
         case 2:
-            do {
+            do {    /* open block to reduce scope of variable */
                 uint16_t *exp_src_ptr = (uint16_t *)exp_src;
                 uint16_t *exp_dest_ptr = (uint16_t *)exp_dest;
                 *exp_src_ptr = NETDEV_TEST_SENDER;
@@ -897,7 +831,7 @@ static int test_callback(netdev_t *rcv_dev, void *src, size_t src_len,
             break;
 
         case 3:
-            do {
+            do {    /* open block to reduce scope of variable */
                 uint16_t exp_src_int = HTONS(NETDEV_TEST_SENDER);
                 uint16_t exp_dest_int = HTONS(NETDEV_TEST_RECEIVER);
                 memset(exp_dest, 0, dev_address_len - sizeof(uint16_t));
@@ -906,13 +840,12 @@ static int test_callback(netdev_t *rcv_dev, void *src, size_t src_len,
                        &exp_dest_int, sizeof(uint16_t));
                 memcpy(&(exp_src[dev_address_len - sizeof(uint16_t)]),
                        &exp_src_int, sizeof(uint16_t));
-            }
-            while (0);
+            } while (0);
 
             break;
 
         case 4:
-            do {
+            do {    /* open block to reduce scope of variable */
                 uint32_t *exp_src_ptr = (uint32_t *)exp_src;
                 uint32_t *exp_dest_ptr = (uint32_t *)exp_dest;
                 *exp_src_ptr = NETDEV_TEST_SENDER;
@@ -922,7 +855,7 @@ static int test_callback(netdev_t *rcv_dev, void *src, size_t src_len,
             break;
 
         case 8:
-            do {
+            do {    /* open block to reduce scope of variable */
                 uint64_t *exp_src_ptr = (uint64_t *)exp_src;
                 uint64_t *exp_dest_ptr = (uint64_t *)exp_dest;
                 *exp_src_ptr = NETDEV_TEST_SENDER;
@@ -932,7 +865,7 @@ static int test_callback(netdev_t *rcv_dev, void *src, size_t src_len,
             break;
 
         default:
-            do {
+            do {    /* open block to reduce scope of variable */
                 uint32_t exp_src_int = HTONL(NETDEV_TEST_SENDER);
                 uint32_t exp_dest_int = HTONL(NETDEV_TEST_RECEIVER);
                 memset(exp_dest, 0, dev_address_len - sizeof(uint32_t));
@@ -941,8 +874,7 @@ static int test_callback(netdev_t *rcv_dev, void *src, size_t src_len,
                        &exp_dest_int, sizeof(uint32_t));
                 memcpy(&(exp_src[dev_address_len - sizeof(uint32_t)]),
                        &exp_src_int, sizeof(uint32_t));
-            }
-            while (0);
+            } while (0);
 
             break;
     }

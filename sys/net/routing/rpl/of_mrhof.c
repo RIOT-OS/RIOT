@@ -34,10 +34,10 @@ static rpl_dodag_t *which_dodag(rpl_dodag_t *, rpl_dodag_t *);
 static void reset(rpl_dodag_t *);
 static uint16_t calc_path_cost(rpl_parent_t *parent);
 
-uint16_t cur_min_path_cost = MAX_PATH_COST;
-rpl_parent_t *cur_preferred_parent = NULL;
+static uint16_t cur_min_path_cost = MAX_PATH_COST;
+static rpl_parent_t *cur_preferred_parent = NULL;
 
-rpl_of_t rpl_of_mrhof = {
+static rpl_of_t rpl_of_mrhof = {
     0x1,
     calc_rank,
     which_parent,

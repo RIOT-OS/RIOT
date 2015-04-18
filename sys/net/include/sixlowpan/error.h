@@ -13,7 +13,7 @@
  * @file        sixlowpan/error.h
  * @brief       6LoWPAN error codes
  *
- * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
+ * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 
 #ifndef SIXLOWPAN_ERROR_H

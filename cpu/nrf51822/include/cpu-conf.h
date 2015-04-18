@@ -33,7 +33,7 @@ extern "C" {
 #define KERNEL_CONF_STACKSIZE_PRINTF    (512)
 
 #ifndef KERNEL_CONF_STACKSIZE_DEFAULT
-#define KERNEL_CONF_STACKSIZE_DEFAULT   (512)
+#define KERNEL_CONF_STACKSIZE_DEFAULT   (1024)
 #endif
 
 #define KERNEL_CONF_STACKSIZE_IDLE      (256)
@@ -54,6 +54,15 @@ extern "C" {
  * @name Length in bytes for reading CPU_ID
  */
 #define CPUID_ID_LEN                    (8)
+
+/**
+ * @brief Definition of different panic modes
+ */
+typedef enum {
+    HARD_FAULT,             /**< hard fault */
+    NMI_HANDLER,            /**< non maskable interrupt */
+    DUMMY_HANDLER           /**< dummy interrupt handler */
+} panic_t;
 
 #ifdef __cplusplus
 }

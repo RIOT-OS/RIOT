@@ -16,10 +16,10 @@
  * @author      Philipp Rosenkranz <philipp.rosenkranz@fu-berlin.de>
  * @author      Daniel Jentsch <d.jentsch@fu-berlin.de>
  */
-#ifndef __TESTS_TIMEX_H_
-#define __TESTS_TIMEX_H_
+#ifndef TESTS_TIMEX_H_
+#define TESTS_TIMEX_H_
 
-#include "../unittests.h"
+#include "embUnit.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -41,5 +41,5 @@ Test *tests_timex_tests(void);
 }
 #endif
 
-#endif /* __TESTS_TIMEX_H_ */
+#endif /* TESTS_TIMEX_H_ */
 /** @} */

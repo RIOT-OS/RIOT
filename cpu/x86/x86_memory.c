@@ -371,13 +371,13 @@ static void pagefault_handler(uint8_t intr_num, struct x86_pushad *orig_ctx, uns
     }
 #endif
     else if (error_code & PF_EC_P) {
-        printf("Page fault: access violation while %s present page.\n", error_code & PF_EC_W ? "writing to" : "reading from");
+        printf("Page fault: access violation while %s present page.\n", (error_code & PF_EC_W) ? "writing to" : "reading from");
         x86_print_registers(orig_ctx, error_code);
         puts("Halting.");
         x86_hlt();
     }
     else {
-        printf("Page fault: access violation while %s non-present page.\n", error_code & PF_EC_W ? "writing to" : "reading from");
+        printf("Page fault: access violation while %s non-present page.\n", (error_code & PF_EC_W) ? "writing to" : "reading from");
         x86_print_registers(orig_ctx, error_code);
         puts("Halting.");
         x86_hlt();

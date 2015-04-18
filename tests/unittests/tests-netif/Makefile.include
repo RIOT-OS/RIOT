@@ -1,0 +1,3 @@
+USEMODULE += ng_netif
+
+CFLAGS += -DNG_NETIF_NUMOF=3

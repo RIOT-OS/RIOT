@@ -31,6 +31,10 @@
 #include "shell_commands.h"
 #include "board_uart0.h"
 
+#if FEATURE_PERIPH_RTC
+#include "periph/rtc.h"
+#endif
+
 #ifdef MODULE_LTC4150
 #include "ltc4150.h"
 #endif
@@ -45,12 +49,12 @@
 
 #define SND_BUFFER_SIZE     (100)
 #define RCV_BUFFER_SIZE     (64)
-#define RADIO_STACK_SIZE    (KERNEL_CONF_STACKSIZE_DEFAULT)
+#define RADIO_STACK_SIZE    (KERNEL_CONF_STACKSIZE_MAIN)
 
 #ifdef MODULE_TRANSCEIVER
 
-char radio_stack_buffer[RADIO_STACK_SIZE];
-msg_t msg_q[RCV_BUFFER_SIZE];
+static char radio_stack_buffer[RADIO_STACK_SIZE];
+static msg_t msg_q[RCV_BUFFER_SIZE];
 
 void *radio(void *arg)
 {
@@ -107,7 +111,7 @@ void *radio(void *arg)
             puts("Transceiver buffer full");
         }
         else {
-            puts("Unknown packet received");
+            puts("Unknown message received");
         }
     }
 }
@@ -154,6 +158,10 @@ int main(void)
 
 #ifdef MODULE_TRANSCEIVER
     init_transceiver();
+#endif
+
+#ifdef FEATURE_PERIPH_RTC
+    rtc_init();
 #endif
 
     (void) puts("Welcome to RIOT!");

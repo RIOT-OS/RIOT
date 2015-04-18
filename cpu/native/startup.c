@@ -43,6 +43,8 @@ const char *_progname;
 char **_native_argv;
 pid_t _native_pid;
 pid_t _native_id;
+unsigned _native_rng_seed = 0;
+int _native_rng_mode = 0;
 const char *_native_unix_socket_path = NULL;
 
 /**
@@ -147,6 +149,19 @@ void daemonize(void)
     }
     else {
         _native_pid = real_getpid();
+
+        /* detach from current working directory */
+        if (real_chdir("/") == -1) {
+            err(EXIT_FAILURE, "daemonize: chdir");
+        }
+
+        /* detach from process group */
+        if (real_setsid() == -1) {
+            err(EXIT_FAILURE, "daemonize: setsid");
+        }
+
+        /* set umask */
+        real_umask(0);
     }
 }
 
@@ -202,6 +217,8 @@ void usage_exit(void)
 #endif
     real_printf("\
 -i <id>     specify instance id (set by config module)\n\
+-s <seed>   specify srandom(3) seed (/dev/random is used instead of\n\
+            random(3) if the option is omitted)\n\
 -d          daemonize\n\
 -e          redirect stderr to file\n\
 -E          do not redirect stderr (i.e. leave sterr unchanged despite\n\
@@ -261,6 +278,16 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
                 usage_exit();
             }
             _native_id = atol(argv[argp]);
+        }
+        else if (strcmp("-s", arg) == 0) {
+            if (argp + 1 < argc) {
+                argp++;
+            }
+            else {
+                usage_exit();
+            }
+            _native_rng_seed = atol(argv[argp]);
+            _native_rng_mode = 1;
         }
         else if (strcmp("-d", arg) == 0) {
             if (strcmp(stdiotype, "stdio") == 0) {

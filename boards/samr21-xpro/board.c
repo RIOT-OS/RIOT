@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     board_samr21-xpro
+ * @ingroup     boards_samr21-xpro
  * @{
  *
  * @file        board.c
@@ -48,6 +48,7 @@ void board_init(void)
  */
 void led_init(void)
 {
-    LED_PORT.DIRSET.reg = LED_PIN;
+    LED_PORT.DIRSET.reg = 1 << LED_PIN;
     LED_PORT.OUTSET.reg = LED_PIN;
+    LED_PORT.PINCFG[LED_PIN].bit.PULLEN = false;
 }

@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    board_openmote OpenMote
+ * @defgroup    boards_openmote OpenMote
  * @ingroup     boards
  * @brief       Support for the OpenMote board
  * @{

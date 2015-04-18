@@ -295,6 +295,7 @@ uint32_t compare(uint32_t tmp_adr_dst, uint32_t tmp_adr_src, uint32_t tmp_size)
 {
     return iap(COMPARE, tmp_adr_dst, tmp_adr_src, tmp_size, 0);
 }
+
 uint8_t iap_get_sector(uint32_t addr)
 {
     if (addr <= 0x00000FFF) {

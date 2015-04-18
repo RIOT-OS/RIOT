@@ -19,7 +19,8 @@
  */
 
 #include <stdint.h>
-#include "board.h"
+
+#include "crash.h"
 
 /**
  * memory markers as defined in the linker script
@@ -79,42 +80,17 @@ void reset_handler(void)
  */
 void dummy_handler(void)
 {
-    while (1) {asm ("nop");}
+    core_panic(DUMMY_HANDLER, "DUMMY HANDLER");
 }
 
 void isr_nmi(void)
 {
-    while (1) {asm ("nop");}
-}
-
-void isr_mem_manage(void)
-{
-    while (1) {asm ("nop");}
-}
-
-void isr_debug_mon(void)
-{
-    while (1) {asm ("nop");}
+    core_panic(NMI_HANDLER, "NMI HANDLER");
 }
 
 void isr_hard_fault(void)
 {
-    while (1) {
-        for (int i = 0; i < 250000; i++) {
-            asm ("nop");
-        }
-        LED_RED_TOGGLE;
-    }
-}
-
-void isr_bus_fault(void)
-{
-    while (1) {asm ("nop");}
-}
-
-void isr_usage_fault(void)
-{
-    while (1) {asm ("nop");}
+    core_panic(HARD_FAULT, "HARD FAULT");
 }
 
 /* Cortex-M specific interrupt vectors */
@@ -141,6 +117,7 @@ void isr_tim1_cc(void)              __attribute__ ((weak, alias("dummy_handler")
 void isr_tim2(void)                 __attribute__ ((weak, alias("dummy_handler")));
 void isr_tim3(void)                 __attribute__ ((weak, alias("dummy_handler")));
 void isr_tim6_dac(void)             __attribute__ ((weak, alias("dummy_handler")));
+void isr_tim7(void)                 __attribute__ ((weak, alias("dummy_handler")));
 void isr_tim14(void)                __attribute__ ((weak, alias("dummy_handler")));
 void isr_tim15(void)                __attribute__ ((weak, alias("dummy_handler")));
 void isr_tim16(void)                __attribute__ ((weak, alias("dummy_handler")));
@@ -151,6 +128,7 @@ void isr_spi1(void)                 __attribute__ ((weak, alias("dummy_handler")
 void isr_spi2(void)                 __attribute__ ((weak, alias("dummy_handler")));
 void isr_usart1(void)               __attribute__ ((weak, alias("dummy_handler")));
 void isr_usart2(void)               __attribute__ ((weak, alias("dummy_handler")));
+void isr_usart3_8(void)             __attribute__ ((weak, alias("dummy_handler")));
 void isr_cec(void)                  __attribute__ ((weak, alias("dummy_handler")));
 
 /* interrupt vector table */
@@ -193,7 +171,7 @@ const void *interrupt_vector[] = {
     (void*) isr_tim2,               /* timer 2 */
     (void*) isr_tim3,               /* timer 3 */
     (void*) isr_tim6_dac,           /* timer 6 and digital to analog converter */
-    (void*) (0UL),                  /* reserved */
+    (void*) isr_tim7,               /* timer 7 */
     (void*) isr_tim14,              /* timer 14 */
     (void*) isr_tim15,              /* timer 15 */
     (void*) isr_tim16,              /* timer 16 */
@@ -204,7 +182,7 @@ const void *interrupt_vector[] = {
     (void*) isr_spi2,               /* SPI 2 */
     (void*) isr_usart1,             /* USART 1 */
     (void*) isr_usart2,             /* USART 2 */
-    (void*) (0UL),                  /* reserved */
+    (void*) isr_usart3_8,           /* USART 3 to 8 */
     (void*) isr_cec,                /* consumer electronics control */
     (void*) (0UL)                   /* reserved */
 };

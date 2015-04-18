@@ -11,7 +11,7 @@
  * @ingroup     drivers_cc110x
  * @{
  *
- * @file        cc110x-config.h
+ * @file
  * @brief       Configuration parameters for the cc110x radio chip
  *
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
@@ -31,45 +31,45 @@ extern "C" {
  * @brief   CC110x register configuration
  */
 typedef struct {
-    uint8_t _IOCFG2;
-    uint8_t _IOCFG1;
-    uint8_t _IOCFG0;
-    uint8_t _FIFOTHR;
-    uint8_t _SYNC1;
-    uint8_t _SYNC0;
-    uint8_t _PKTLEN;
-    uint8_t _PKTCTRL1;
-    uint8_t _PKTCTRL0;
-    uint8_t _ADDR;
-    uint8_t _CHANNR;
-    uint8_t _FSCTRL1;
-    uint8_t _FSCTRL0;
-    uint8_t _FREQ2;
-    uint8_t _FREQ1;
-    uint8_t _FREQ0;
-    uint8_t _MDMCFG4;
-    uint8_t _MDMCFG3;
-    uint8_t _MDMCFG2;
-    uint8_t _MDMCFG1;
-    uint8_t _MDMCFG0;
-    uint8_t _DEVIATN;
-    uint8_t _MCSM2;
-    uint8_t _MCSM1;
-    uint8_t _MCSM0;
-    uint8_t _FOCCFG;
-    uint8_t _BSCFG;
-    uint8_t _AGCCTRL2;
-    uint8_t _AGCCTRL1;
-    uint8_t _AGCCTRL0;
-    uint8_t _WOREVT1;
-    uint8_t _WOREVT0;
-    uint8_t _WORCTRL;
-    uint8_t _FREND1;
-    uint8_t _FREND0;
-    uint8_t _FSCAL3;
-    uint8_t _FSCAL2;
-    uint8_t _FSCAL1;
-    uint8_t _FSCAL0;
+    uint8_t _IOCFG2;      /**< GDO2 output pin configuration */
+    uint8_t _IOCFG1;      /**< GDO1 output pin configuration */
+    uint8_t _IOCFG0;      /**< GDO0 output pin configuration */
+    uint8_t _FIFOTHR;     /**< RX FIFO and TX FIFO thresholds */
+    uint8_t _SYNC1;       /**< Sync word, high byte */
+    uint8_t _SYNC0;       /**< Sync word, low byte */
+    uint8_t _PKTLEN;      /**< Packet length */
+    uint8_t _PKTCTRL1;    /**< Packet automation control */
+    uint8_t _PKTCTRL0;    /**< Packet automation control */
+    uint8_t _ADDR;        /**< Device address */
+    uint8_t _CHANNR;      /**< Channel number */
+    uint8_t _FSCTRL1;     /**< Frequency synthesizer control */
+    uint8_t _FSCTRL0;     /**< Frequency synthesizer control */
+    uint8_t _FREQ2;       /**< Frequency control word, high byte */
+    uint8_t _FREQ1;       /**< Frequency control word, middle byte */
+    uint8_t _FREQ0;       /**< Frequency control word, low byte */
+    uint8_t _MDMCFG4;     /**< Modem configuration */
+    uint8_t _MDMCFG3;     /**< Modem configuration */
+    uint8_t _MDMCFG2;     /**< Modem configuration */
+    uint8_t _MDMCFG1;     /**< Modem configuration */
+    uint8_t _MDMCFG0;     /**< Modem configuration */
+    uint8_t _DEVIATN;     /**< Modem deviation setting */
+    uint8_t _MCSM2;       /**< Main Radio Control State Machine configuration */
+    uint8_t _MCSM1;       /**< Main Radio Control State Machine configuration */
+    uint8_t _MCSM0;       /**< Main Radio Control State Machine configuration */
+    uint8_t _FOCCFG;      /**< Frequency Offset Compensation configuration */
+    uint8_t _BSCFG;       /**< Bit Synchronization configuration */
+    uint8_t _AGCCTRL2;    /**< AGC control */
+    uint8_t _AGCCTRL1;    /**< AGC control */
+    uint8_t _AGCCTRL0;    /**< AGC control */
+    uint8_t _WOREVT1;     /**< High byte Event 0 timeout */
+    uint8_t _WOREVT0;     /**< Low byte Event 0 timeout */
+    uint8_t _WORCTRL;     /**< Wake On Radio control */
+    uint8_t _FREND1;      /**< Front end RX configuration */
+    uint8_t _FREND0;      /**< Front end TX configuration */
+    uint8_t _FSCAL3;      /**< Frequency synthesizer calibration */
+    uint8_t _FSCAL2;      /**< Frequency synthesizer calibration */
+    uint8_t _FSCAL1;      /**< Frequency synthesizer calibration */
+    uint8_t _FSCAL0;      /**< Frequency synthesizer calibration */
 } cc110x_reg_t;
 
 /**

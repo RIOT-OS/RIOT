@@ -18,11 +18,11 @@
  */
 
 #include "utils.h"
-#include "debug.h"
 
 #include "aodv_debug.h"
 
 #define ENABLE_DEBUG (0)
+#include "debug.h"
 
 /* Some aodvv2 utilities (mostly tables) */
 static mutex_t clientt_mutex;

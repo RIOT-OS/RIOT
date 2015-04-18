@@ -48,74 +48,74 @@ extern "C" {
 
 /** @} */
 
-/** CC1100 register configuration */
+/** @brief CC1100 register configuration */
 typedef struct cc1100_reg {
-    uint8_t IOCFG2;
-    uint8_t IOCFG1;
-    uint8_t IOCFG0;
-    uint8_t FIFOTHR;
-    uint8_t SYNC1;
-    uint8_t SYNC0;
-    uint8_t PKTLEN;
-    uint8_t PKTCTRL1;
-    uint8_t PKTCTRL0;
-    uint8_t ADDR;
-    uint8_t CHANNR;
-    uint8_t FSCTRL1;
-    uint8_t FSCTRL0;
-    uint8_t FREQ2;
-    uint8_t FREQ1;
-    uint8_t FREQ0;
-    uint8_t MDMCFG4;
-    uint8_t MDMCFG3;
-    uint8_t MDMCFG2;
-    uint8_t MDMCFG1;
-    uint8_t MDMCFG0;
-    uint8_t DEVIATN;
-    uint8_t MCSM2;
-    uint8_t MCSM1;
-    uint8_t MCSM0;
-    uint8_t FOCCFG;
-    uint8_t BSCFG;
-    uint8_t AGCCTRL2;
-    uint8_t AGCCTRL1;
-    uint8_t AGCCTRL0;
-    uint8_t WOREVT1;
-    uint8_t WOREVT0;
-    uint8_t WORCTRL;
-    uint8_t FREND1;
-    uint8_t FREND0;
-    uint8_t FSCAL3;
-    uint8_t FSCAL2;
-    uint8_t FSCAL1;
-    uint8_t FSCAL0;
+    uint8_t IOCFG2;      /**< GDO2 output pin configuration */
+    uint8_t IOCFG1;      /**< GDO1 output pin configuration */
+    uint8_t IOCFG0;      /**< GDO0 output pin configuration */
+    uint8_t FIFOTHR;     /**< RX FIFO and TX FIFO thresholds */
+    uint8_t SYNC1;       /**< Sync word, high byte */
+    uint8_t SYNC0;       /**< Sync word, low byte */
+    uint8_t PKTLEN;      /**< Packet length */
+    uint8_t PKTCTRL1;    /**< Packet automation control */
+    uint8_t PKTCTRL0;    /**< Packet automation control */
+    uint8_t ADDR;        /**< Device address */
+    uint8_t CHANNR;      /**< Channel number */
+    uint8_t FSCTRL1;     /**< Frequency synthesizer control */
+    uint8_t FSCTRL0;     /**< Frequency synthesizer control */
+    uint8_t FREQ2;       /**< Frequency control word, high byte */
+    uint8_t FREQ1;       /**< Frequency control word, middle byte */
+    uint8_t FREQ0;       /**< Frequency control word, low byte */
+    uint8_t MDMCFG4;     /**< Modem configuration */
+    uint8_t MDMCFG3;     /**< Modem configuration */
+    uint8_t MDMCFG2;     /**< Modem configuration */
+    uint8_t MDMCFG1;     /**< Modem configuration */
+    uint8_t MDMCFG0;     /**< Modem configuration */
+    uint8_t DEVIATN;     /**< Modem deviation setting */
+    uint8_t MCSM2;       /**< Main Radio Control State Machine configuration */
+    uint8_t MCSM1;       /**< Main Radio Control State Machine configuration */
+    uint8_t MCSM0;       /**< Main Radio Control State Machine configuration */
+    uint8_t FOCCFG;      /**< Frequency Offset Compensation configuration */
+    uint8_t BSCFG;       /**< Bit Synchronization configuration */
+    uint8_t AGCCTRL2;    /**< AGC control */
+    uint8_t AGCCTRL1;    /**< AGC control */
+    uint8_t AGCCTRL0;    /**< AGC control */
+    uint8_t WOREVT1;     /**< High byte Event 0 timeout */
+    uint8_t WOREVT0;     /**< Low byte Event 0 timeout */
+    uint8_t WORCTRL;     /**< Wake On Radio control */
+    uint8_t FREND1;      /**< Front end RX configuration */
+    uint8_t FREND0;      /**< Front end TX configuration */
+    uint8_t FSCAL3;      /**< Frequency synthesizer calibration */
+    uint8_t FSCAL2;      /**< Frequency synthesizer calibration */
+    uint8_t FSCAL1;      /**< Frequency synthesizer calibration */
+    uint8_t FSCAL0;      /**< Frequency synthesizer calibration */
 } cc1100_reg_t;
 
 /** CC1100 radio configuration */
 typedef struct cc1100_cfg_t {
-    cc1100_reg_t reg_cfg;       ///< CC1100 register configuration
-    uint8_t pa_power;           ///< Output power setting
+    cc1100_reg_t reg_cfg;       /**< CC1100 register configuration */
+    uint8_t pa_power;           /**< Output power setting */
 } cc1100_cfg_t;
 
 /**
  * @brief   Radio Control Flags
  */
 typedef struct cc1100_flags {
-    uint32_t TOF;               ///< Time of flight of the last packet and last ACK
-    uint32_t TCP;               ///< Time to compute packet
-    unsigned RPS        : 16;   ///< Raw packets sent to transmit last packet
-    unsigned RETC       : 8;    ///< Retransmission count of last send packet
-    unsigned RSSI       : 8;    ///< The RSSI value of last received packet
-    unsigned RSSI_SEND  : 8;    ///< The RSSI value of the last send unicast packet of this node
-    unsigned LQI        : 8;    ///< The LQI value of the last received packet
-    unsigned LL_ACK     : 1;    ///< Is set if Link-Level ACK is received, otherwise 0 (reset on new burst)
-    unsigned CAA        : 1;    ///< The status of the air (1 = air free, 0 = air not free)
-    unsigned CRC_STATE  : 1;    ///< The CRC status of last received packet (1 = OK, 0 = not OK)
-    unsigned SEQ        : 1;    ///< Sequence number (toggles between 0 and 1)
-    unsigned MAN_WOR    : 1;    ///< Manual WOR set (for randomized WOR times => no synch)
-    unsigned KT_RES_ERR : 1;    ///< A hwtimer resource error has occurred (no free timers available)
-    unsigned TX         : 1;    ///< State machine TX lock, only ACKs will be received
-    unsigned WOR_RST    : 1;    ///< Reset CC1100 real time clock (WOR) on next WOR strobe
+    uint32_t TOF;               /**< Time of flight of the last packet and last ACK */
+    uint32_t TCP;               /**< Time to compute packet */
+    unsigned RPS        : 16;   /**< Raw packets sent to transmit last packet */
+    unsigned RETC       : 8;    /**< Retransmission count of last send packet */
+    unsigned RSSI       : 8;    /**< The RSSI value of last received packet */
+    unsigned RSSI_SEND  : 8;    /**< The RSSI value of the last send unicast packet of this node */
+    unsigned LQI        : 8;    /**< The LQI value of the last received packet */
+    unsigned LL_ACK     : 1;    /**< Is set if Link-Level ACK is received, otherwise 0 (reset on new burst) */
+    unsigned CAA        : 1;    /**< The status of the air (1 = air free, 0 = air not free) */
+    unsigned CRC_STATE  : 1;    /**< The CRC status of last received packet (1 = OK, 0 = not OK) */
+    unsigned SEQ        : 1;    /**< Sequence number (toggles between 0 and 1) */
+    unsigned MAN_WOR    : 1;    /**< Manual WOR set (for randomized WOR times => no synch) */
+    unsigned KT_RES_ERR : 1;    /**< A hwtimer resource error has occurred (no free timers available) */
+    unsigned TX         : 1;    /**< State machine TX lock, only ACKs will be received */
+    unsigned WOR_RST    : 1;    /**< Reset CC1100 real time clock (WOR) on next WOR strobe */
 } cc1100_flags;
 
 /**
@@ -138,18 +138,18 @@ typedef struct cc1100_statistic {
 } cc1100_statistic_t;
 
 enum radio_mode {
-    RADIO_MODE_GET  = -1,       ///< leave mode unchanged
-    RADIO_MODE_OFF  = 0,        ///< turn radio off
-    RADIO_MODE_ON   = 1         ///< turn radio on
+    RADIO_MODE_GET  = -1,       /**< leave mode unchanged */
+    RADIO_MODE_OFF  = 0,        /**< turn radio off */
+    RADIO_MODE_ON   = 1         /**< turn radio on */
 };
 
 enum radio_result {
-    RADIO_PAYLOAD_TOO_LONG      = -1,   ///< payload too long
-    RADIO_WRONG_MODE            = -2,   ///< operation not supported in current mode
-    RADIO_ADDR_OUT_OF_RANGE     = -3,   ///< address out of range
-    RADIO_OP_FAILED             = -4,   ///< operation failed
-    RADIO_CS_TIMEOUT            = -5,   ///< Carrier Sense timeout: air was never free
-    RADIO_INVALID_PARAM         = -6    ///< Invalid parameters passed to radio
+    RADIO_PAYLOAD_TOO_LONG      = -1,   /**< payload too long */
+    RADIO_WRONG_MODE            = -2,   /**< operation not supported in current mode */
+    RADIO_ADDR_OUT_OF_RANGE     = -3,   /**< address out of range */
+    RADIO_OP_FAILED             = -4,   /**< operation failed */
+    RADIO_CS_TIMEOUT            = -5,   /**< Carrier Sense timeout: air was never free */
+    RADIO_INVALID_PARAM         = -6    /**< Invalid parameters passed to radio */
 };
 
 /* ------------------------------------------------------------------------- */

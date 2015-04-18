@@ -22,8 +22,10 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef __SPI_H
-#define __SPI_H
+#ifndef SPI_H
+#define SPI_H
+
+#include <stdint.h>
 
 #include "periph_conf.h"
 
@@ -57,10 +59,30 @@ typedef enum {
  *        clock phase.
  */
 typedef enum {
-    SPI_CONF_FIRST_RISING = 0,  /**< first data bit is transacted on the first rising SCK edge */
-    SPI_CONF_SECOND_RISING,     /**< first data bit is transacted on the second rising SCK edge */
-    SPI_CONF_FIRST_FALLING,     /**< first data bit is transacted on the first falling SCK edge */
-    SPI_CONF_SECOND_FALLING     /**< first data bit is transacted on the second falling SCK edge */
+    /**
+     * The first data bit is sampled by the receiver on the first SCK edge. The
+     * first edge of SCK is rising. This is sometimes also referred to as SPI
+     * mode 0, or (CPOL=0, CPHA=0).
+     */
+    SPI_CONF_FIRST_RISING = 0,
+    /**
+     * The first data bit is sampled by the receiver on the second SCK edge. The
+     * first edge of SCK is rising, i.e. the sampling edge is falling. This is
+     * sometimes also referred to as SPI mode 1, or (CPOL=0, CPHA=1).
+     */
+    SPI_CONF_SECOND_RISING = 1,
+    /**
+     * The first data bit is sampled by the receiver on the first SCK edge. The
+     * first edge of SCK is falling. This is sometimes also referred to as SPI
+     * mode 2, or (CPOL=1, CPHA=0).
+     */
+    SPI_CONF_FIRST_FALLING = 2,
+    /**
+     * The first data bit is sampled by the receiver on the second SCK edge. The
+     * first edge of SCK is falling, i.e. the sampling edge is rising. This is
+     * sometimes also referred to as SPI mode 3, or (CPOL=1, CPHA=1).
+     */
+    SPI_CONF_SECOND_FALLING = 3
 } spi_conf_t;
 
 /**
@@ -121,6 +143,28 @@ int spi_init_slave(spi_t dev, spi_conf_t conf, char (*cb)(char data));
  * @return              -1 on error
  */
 int spi_conf_pins(spi_t dev);
+
+/**
+ * @brief Get mutually exclusive access to the given SPI bus
+ *
+ * In case the SPI device is busy, this function will block until the bus is free again.
+ *
+ * @param[in] dev       SPI device to access
+ *
+ * @return              0 on success
+ * @return              -1 on error
+ */
+int spi_acquire(spi_t dev);
+
+/**
+ * @brief Release the given SPI device to be used by others
+ *
+ * @param[in] dev       SPI device to release
+ *
+ * @return              0 on success
+ * @return              -1 on error
+ */
+int spi_release(spi_t dev);
 
 /**
  * @brief Transfer one byte on the given SPI bus
@@ -210,5 +254,5 @@ void spi_poweroff(spi_t dev);
 }
 #endif
 
-#endif /* __SPI_H */
+#endif /* SPI_H */
 /** @} */

@@ -1,0 +1,9 @@
+ifneq (,$(filter defaulttransceiver,$(USEMODULE)))
+    USEMODULE += at86rf231
+    ifeq (,$(filter netdev_base,$(USEMODULE)))
+        USEMODULE += transceiver
+    endif
+endif
+# The Mulle uses NVRAM to store persistent variables, such as boot count.
+#~ USEMODULE += nvram_spi
+# Uncomment above when #2353 is merged.

@@ -14,7 +14,7 @@
  * @brief       6LoWPAN data structs, and prototypes for MAC layer
  *
  * @author      Stephan Zeisberg <zeisberg@mi.fu-berlin.de>
- * @author      Martin Lenders <mlenders@inf.fu-berlin.de>
+ * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  * @author      Eric Engel <eric.engel@fu-berlin.de>
  * @author      Oliver Gesch <oliver.gesch@googlemail.com>
  */
@@ -44,7 +44,7 @@ extern "C" {
  *                          *mcast* is 1).
  * @param[in]   dest        The destination address of the frame (will be
  *                          ignored if *mcast* is 1).
- * @param[in]   dest_len    The lengts of the destination address in byte.
+ * @param[in]   dest_len    The lengths of the destination address in byte.
  * @param[in]   payload     The payload of the frame.
  * @param[in]   length      The length of the payload.
  * @param[in]   mcast       send frame as multicast frame (*addr* and *if_id*

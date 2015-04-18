@@ -57,7 +57,7 @@ int parse_spi_dev(int argc, char **argv)
     spi_mode = SPI_CONF_FIRST_RISING;
     spi_speed = SPI_SPEED_1MHZ;
 
-    if (argc < 3 || argc > 4) {
+    if (argc < 3 || argc > 5) {
         printf("usage: %s DEV CS [MODE [SPEED]]\n", argv[0]);
         puts("        DEV is the SPI device to use:");
         for (int i = 0; i < SPI_NUMOF; i++) {
@@ -91,14 +91,14 @@ int parse_spi_dev(int argc, char **argv)
         return -1;
     }
     if (argc >= 4) {
-        spi_mode = argv[2][0] - '0';
+        spi_mode = argv[3][0] - '0';
         if (spi_mode < 0 || spi_mode > 3) {
             puts("error: invalid MODE value given");
             return -2;
         }
     }
     if (argc >= 5) {
-        spi_speed = argv[3][0] - '0';
+        spi_speed = argv[4][0] - '0';
         if (spi_speed < 0 || spi_speed > 4) {
             puts("error: invalid SPEED value given");
             return -3;
@@ -171,57 +171,65 @@ char slave_on_data(char data)
     return 'e';
 }
 
-void cmd_init_master(int argc, char **argv)
+int cmd_init_master(int argc, char **argv)
 {
     int res;
     spi_master = -1;
     if (parse_spi_dev(argc, argv) < 0) {
-        return;
+        return 1;
     }
+    spi_acquire(spi_dev);
     res = spi_init_master(spi_dev, spi_mode, spi_speed);
+    spi_release(spi_dev);
     if (res < 0) {
         printf("spi_init_master: error initializing SPI_%i device (code %i)\n", spi_dev, res);
+        return 1;
     }
     res = gpio_init_out(spi_cs, GPIO_PULLUP);
     if (res < 0){
         printf("gpio_init_out: error initializing GPIO_%i as CS line (code %i)\n", spi_cs, res);
+        return 1;
     }
     gpio_set(spi_cs);
     spi_master = 1;
     printf("SPI_%i successfully initialized as master, cs: GPIO_%i, mode: %i, speed: %i\n",
             spi_dev, spi_cs, spi_mode, spi_speed);
-    return;
+    return 0;
 }
 
-void cmd_init_slave(int argc, char **argv)
+int cmd_init_slave(int argc, char **argv)
 {
     int res;
     spi_master = -1;
     if (parse_spi_dev(argc, argv) < 0) {
-        return;
+        return 1;
     }
+    spi_acquire(spi_dev);
     res = spi_init_slave(spi_dev, spi_mode, slave_on_data);
+    spi_release(spi_dev);
     if (res < 0) {
         printf("spi_init_slave: error initializing SPI_%i device (code: %i)\n", spi_dev, res);
+        return 1;
     }
     res = gpio_init_int(spi_cs, GPIO_NOPULL, GPIO_FALLING, slave_on_cs, 0);
     if (res < 0){
         printf("gpio_init_int: error initializing GPIO_%i as CS line (code %i)\n", spi_cs, res);
+        return 1;
     }
     spi_master = 0;
     printf("SPI_%i successfully initialized as slave, cs: GPIO_%i, mode: %i\n",
             spi_dev, spi_cs, spi_mode);
-    return;
+    return 0;
 }
 
-void cmd_transfer(int argc, char **argv)
+int cmd_transfer(int argc, char **argv)
 {
     int res;
     char *hello = "Hello";
 
     if (spi_master != 1) {
         puts("error: node is not initialized as master, please do so first");
-        return;
+        return 1;
     }
 
     if (argc < 2) {
@@ -232,25 +240,30 @@ void cmd_transfer(int argc, char **argv)
     }
 
     /* do the actual data transfer */
+    spi_acquire(spi_dev);
     gpio_clear(spi_cs);
     res = spi_transfer_bytes(spi_dev, hello, buffer, strlen(hello));
     gpio_set(spi_cs);
+    spi_release(spi_dev);
 
     /* look at the results */
     if (res < 0) {
         printf("error: unable to transfer data to slave (code: %i)\n", res);
+        return 1;
     }
     else {
         printf("Transfered %i bytes:\n", res);
         print_bytes("MOSI", hello, res);
         print_bytes("MISO", buffer, res);
+        return 0;
     }
 }
 
-void cmd_print(int argc, char **argv)
+int cmd_print(int argc, char **argv)
 {
     if (spi_master != 0) {
         puts("error: node is not initialized as slave");
+        return 1;
     }
     else {
         printf("Received %i bytes:\n", rx_counter);
@@ -258,6 +271,7 @@ void cmd_print(int argc, char **argv)
     }
     rx_counter = 0;
     memset(&rx_buffer, 0, 256);
+    return 0;
 }
 
 int shell_getchar(void)

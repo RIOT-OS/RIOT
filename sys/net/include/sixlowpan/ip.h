@@ -16,7 +16,7 @@
  * @brief       6LoWPAN constants, data structs, and prototypes for network layer
  *
  * @author      Stephan Zeisberg <zeisberg@mi.fu-berlin.de>
- * @author      Martin Lenders <mlenders@inf.fu-berlin.de>
+ * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  * @author      Eric Engel <eric.engel@fu-berlin.de>
  * @author      Oliver Gesch <oliver.gesch@googlemail.com>
  */
@@ -298,6 +298,25 @@ static inline void ipv6_addr_set_all_nodes_addr(ipv6_addr_t *ipv6_addr)
 }
 
 /**
+ * @brief   Set *ipv6_addr* to the all-RPL-nodes multicast address
+ *          (ff02::1a).
+ *
+ * @see <a href="http://tools.ietf.org/html/rfc6550#section-6">
+ *          RFC 6550
+ *      </a>
+ *
+ * @param[out] ipv6_addr    Is set to the all-RPL-nodes multicast
+ *                          address.
+ */
+static inline void ipv6_addr_set_all_rpl_nodes_addr(ipv6_addr_t *ipv6_addr)
+{
+    ipv6_addr->uint32[0] = HTONL(0xff020000);
+    ipv6_addr->uint32[1] = 0;
+    ipv6_addr->uint32[2] = 0;
+    ipv6_addr->uint32[3] = HTONL(0x1a);
+}
+
+/**
  * @brief   Set *ipv6_addr_out* to the solicited-node multicast address
  *          computed from *ipv6_addr_in*.
  *
@@ -313,7 +332,7 @@ static inline void ipv6_addr_set_all_nodes_addr(ipv6_addr_t *ipv6_addr)
 static inline void ipv6_addr_set_solicited_node_addr(ipv6_addr_t *ipv6_addr_out,
         const ipv6_addr_t *ipv6_addr_in)
 {
-    /* copy only the last 24-bit of the ip-address that is beeing resolved */
+    /* copy only the last 24-bit of the ip-address that is being resolved */
     ipv6_addr_out->uint32[0] = HTONL(0xff020000);
     ipv6_addr_out->uint32[1] = 0;
     ipv6_addr_out->uint32[2] = HTONL(1);
@@ -520,18 +539,18 @@ int ipv6_net_if_add_addr(int if_id, const ipv6_addr_t *addr,
  *          is no suitable address attached to the interface.
  *
  * @param[out]  src     The best source address for this node (may be
- *                      all zero if ther is none).
+ *                      all zero if there is none).
  * @param[in]   dest    The destination address for a packet we search
  *                      the source address for.
  */
 void ipv6_net_if_get_best_src_addr(ipv6_addr_t *src, const ipv6_addr_t *dest);
 
 /**
- * @brief   Registers a function that decides how to route incomming
+ * @brief   Registers a function that decides how to route incoming
  *          IP packets with a destination that is not this interface.
- *          The default behaviour is to try forwarding such packets to
+ *          The default behavior is to try forwarding such packets to
  *          the neighborhood.
- *          Register a function to change the default behaviour.
+ *          Register a function to change the default behavior.
  *          Such function shall return the next hop to reach the destination
  *          of the IP packet, or NULL if no such next hop is known.
  *          In this case, the packet will be discarded.

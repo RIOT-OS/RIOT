@@ -30,7 +30,7 @@
  *
  * Given threads with priorities A=6, B=1, and C=3, B has the highest
  * priority.
- * 
+ *
  * A higher priority means that the scheduler will run this thread
  * whenever it becomes runnable instead of a thread with a lower
  * priority.
@@ -114,11 +114,16 @@ int sched_run(void);
 void sched_set_status(tcb_t *process, unsigned int status);
 
 /**
- * @brief   Compare thread priorities and yield() (or set
- *          @ref sched_context_switch_request if inISR()) when @p other_prio is
- *          higher (has a lower value) than the current thread's priority
+ * @brief       Yield if approriate.
  *
- * @param[in]   other_prio      The priority of the target thread
+ * @details     Either yield if other_prio is higher than the current priority,
+ *              or if the current thread is not on the runqueue.
+ *
+ *              Depending on whether the current execution is in an ISR (inISR()),
+ *              thread_yield_higher() is called or @ref sched_context_switch_request is set,
+ *              respectively.
+ *
+ * @param[in]   other_prio      The priority of the target thread.
  */
 void sched_switch(uint16_t other_prio);
 

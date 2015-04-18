@@ -16,12 +16,14 @@
  * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
  * @author      Hauke Petersen <mail@haukepetersen.de>
  * @author      Fabian Nack <nack@inf.fu-berlin.de>
+ * @author      Joakim Gebart <joakim.gebart@eistec.se>
  *
  * @}
  */
 
 #include "cpu.h"
 #include "board.h"
+#include "mutex.h"
 #include "periph/spi.h"
 #include "periph_conf.h"
 #include "thread.h"
@@ -29,6 +31,21 @@
 
 /* guard file in case no SPI device is defined */
 #if SPI_NUMOF
+
+/**
+ * @brief Array holding one pre-initialized mutex for each SPI device
+ */
+static mutex_t locks[] =  {
+#if SPI_0_EN
+    [SPI_0] = MUTEX_INIT,
+#endif
+#if SPI_1_EN
+    [SPI_1] = MUTEX_INIT,
+#endif
+#if SPI_2_EN
+    [SPI_2] = MUTEX_INIT
+#endif
+};
 
 int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
 {
@@ -139,6 +156,24 @@ int spi_conf_pins(spi_t dev)
         port->AFR[hl] |= (af << ((pin[i] - (hl * 8)) * 4));
     }
 
+    return 0;
+}
+
+int spi_acquire(spi_t dev)
+{
+    if (dev >= SPI_NUMOF) {
+        return -1;
+    }
+    mutex_lock(&locks[dev]);
+    return 0;
+}
+
+int spi_release(spi_t dev)
+{
+    if (dev >= SPI_NUMOF) {
+        return -1;
+    }
+    mutex_unlock(&locks[dev]);
     return 0;
 }
 

@@ -123,7 +123,7 @@ void SysTick_Handler(void);      /**< SysTick handler */
 
 typedef volatile uint32_t cc2538_reg_t; /**< Least-significant 32 bits of the IEEE address */
 
-/** @addtogroup Peripheral_memory_map
+/** @addtogroup cpu_specific_Peripheral_memory_map
   * @{
   */
 
@@ -808,6 +808,8 @@ typedef volatile uint32_t cc2538_reg_t; /**< Least-significant 32 bits of the IE
 
 #define XOSC32M_FREQ                32000000 /**< 32 MHz external oscillator/clock frequency */
 #define RCOSC16M_FREQ               16000000 /**< 16 MHz internal RC oscillator frequency */
+
+#define CC2538_VTOR_ALIGN                512 /**< CC2538 Vector Table alignment */
 
 #ifdef __cplusplus
 }

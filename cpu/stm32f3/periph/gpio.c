@@ -126,6 +126,8 @@ int gpio_init_out(gpio_t dev, gpio_pp_t pushpull)
             pin = GPIO_11_PIN;
             break;
 #endif
+        default:
+            return -1;
     }
 
     port->MODER &= ~(2 << (2 * pin));           /* set pin to output mode */
@@ -229,6 +231,8 @@ int gpio_init_in(gpio_t dev, gpio_pp_t pushpull)
             pin = GPIO_11_PIN;
             break;
 #endif
+        default:
+            return -1;
     }
 
     port->MODER &= ~(3 << (2 * pin));           /* configure pin as input */
@@ -597,6 +601,8 @@ int gpio_read(gpio_t dev)
             pin = GPIO_11_PIN;
             break;
 #endif
+        default:
+            return -1;
     }
 
     if (port->MODER & (3 << (pin * 2))) {       /* if configured as output */
@@ -783,7 +789,7 @@ void isr_exti1(void)
     }
 }
 
-void isr_exti2(void)
+void isr_exti2_tsc(void)
 {
     if (EXTI->PR & EXTI_PR_PR2) {
         EXTI->PR |= EXTI_PR_PR2;        /* clear status bit by writing a 1 to it */

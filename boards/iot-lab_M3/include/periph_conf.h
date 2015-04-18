@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     board_iot-lab_M3
+ * @ingroup     boards_iot-lab_M3
  * @{
  *
  * @file
@@ -68,7 +68,7 @@ extern "C" {
 #define TIMER_1_DEV_0       TIM4
 #define TIMER_1_DEV_1       TIM5
 #define TIMER_1_CHANNELS    4
-#define TIMER_1_PRESCALER   (36000U)
+#define TIMER_1_PRESCALER   (72U)
 #define TIMER_1_MAX_VALUE   (0xffff)
 #define TIMER_1_CLKEN()     (RCC->APB1ENR |= (RCC_APB1ENR_TIM4EN | RCC_APB1ENR_TIM5EN))
 #define TIMER_1_ISR_0       isr_tim4

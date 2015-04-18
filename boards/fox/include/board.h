@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    board_fox fox
+ * @defgroup    boards_fox fox
  * @ingroup     boards
  * @brief       Board specific files for the fox board.
  * @{
@@ -114,6 +114,10 @@ extern "C" {
 #define LED_GREEN_ON        (LED_GREEN_PORT->ODR &= ~(1<<LED_GREEN_PIN))
 #define LED_GREEN_OFF       (LED_GREEN_PORT->ODR |= (1<<LED_GREEN_PIN))
 #define LED_GREEN_TOGGLE    (LED_GREEN_PORT->ODR ^= (1<<LED_GREEN_PIN))
+
+#define LED_ORANGE_ON
+#define LED_ORANGE_OFF
+#define LED_ORANGE_TOGGLE
 /** @} */
 
 /**

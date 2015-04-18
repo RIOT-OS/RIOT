@@ -18,8 +18,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef __PERIPH_UART_H
-#define __PERIPH_UART_H
+#ifndef PERIPH_UART_H
+#define PERIPH_UART_H
 
 #include <stdint.h>
 
@@ -179,5 +179,5 @@ void uart_poweroff(uart_t uart);
 }
 #endif
 
-#endif /* __PERIPH_UART_H */
+#endif /* PERIPH_UART_H */
 /** @} */

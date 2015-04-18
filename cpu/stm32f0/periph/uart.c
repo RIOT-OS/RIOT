@@ -18,8 +18,6 @@
  * @}
  */
 
-#include <math.h>
-
 #include "cpu.h"
 #include "board.h"
 #include "sched.h"
@@ -51,6 +49,15 @@ static inline void irq_handler(uart_t uartnum, USART_TypeDef *uart);
  * @brief Allocate memory to store the callback functions.
  */
 static uart_conf_t uart_config[UART_NUMOF];
+
+static USART_TypeDef *const uart_port[UART_NUMOF] = {
+#if UART_0_EN
+    [UART_0] = UART_0_DEV,
+#endif
+#if UART_1_EN
+    [UART_1] = UART_1_DEV,
+#endif
+};
 
 
 int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, uart_tx_cb_t tx_cb, void *arg)
@@ -151,10 +158,9 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
 
     /* configure UART to mode 8N1 with given baudrate */
     divider = ((float)F_CPU) / (16 * baudrate);
-    mantissa = (uint16_t)floorf(divider);
-    fraction = (uint8_t)floorf((divider - mantissa) * 16);
-    dev->BRR = 0;
-    dev->BRR |= ((mantissa & 0x0fff) << 4) | (0x0f & fraction);
+    mantissa = (uint16_t)divider;
+    fraction = (uint8_t)((divider - mantissa) * 16);
+    dev->BRR = ((mantissa & 0x0fff) << 4) | (0x0f & fraction);
 
     /* enable receive and transmit mode */
     dev->CR1 |= USART_CR1_UE | USART_CR1_TE | USART_CR1_RE;
@@ -162,88 +168,38 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
     return 0;
 }
 
-void uart_tx_begin(uart_t uart)
+void uart_tx_begin(uart_t dev)
 {
-    switch (uart) {
-#if UART_0_EN
-        case UART_0:
-            UART_0_DEV->CR1 |= USART_CR1_TXEIE;
-            break;
-#endif
-#if UART_1_EN
-        case UART_1:
-            UART_1_DEV->CR1 |= USART_CR1_TXEIE;
-            break;
-#endif
-    }
+    USART_TypeDef *uart = uart_port[dev];
+    uart->CR1 |= USART_CR1_TXEIE;
 }
 
-int uart_write(uart_t uart, char data)
+int uart_write(uart_t dev, char data)
 {
-    USART_TypeDef *dev = 0;
+    USART_TypeDef *uart = uart_port[dev];
 
-    switch (uart) {
-#if UART_0_EN
-        case UART_0:
-            dev = UART_0_DEV;
-            break;
-#endif
-#if UART_1_EN
-        case UART_1:
-            dev = UART_1_DEV;
-            break;
-#endif
+    if (uart->ISR & USART_ISR_TXE) {
+        uart->TDR = (uint8_t)data;
     }
-
-    if (dev->ISR & USART_ISR_TXE) {
-        dev->TDR = (uint8_t)data;
-    }
-
     return 0;
 }
 
-int uart_read_blocking(uart_t uart, char *data)
+int uart_read_blocking(uart_t dev, char *data)
 {
-    USART_TypeDef *dev = 0;
+    USART_TypeDef *uart = uart_port[dev];
 
-    switch (uart) {
-#if UART_0_EN
-        case UART_0:
-            dev = UART_0_DEV;
-            break;
-#endif
-#if UART_1_EN
-        case UART_1:
-            dev = UART_1_DEV;
-            break;
-#endif
-    }
-
-    while (!(dev->ISR & USART_ISR_RXNE));
-    *data = (char)dev->RDR;
+    while (!(uart->ISR & USART_ISR_RXNE));
+    *data = (char)uart->RDR;
 
     return 1;
 }
 
-int uart_write_blocking(uart_t uart, char data)
+int uart_write_blocking(uart_t dev, char data)
 {
-    USART_TypeDef *dev = 0;
+    USART_TypeDef *uart = uart_port[dev];
 
-    switch (uart) {
-#if UART_0_EN
-        case UART_0:
-            dev = UART_0_DEV;
-            break;
-#endif
-#if UART_1_EN
-        case UART_1:
-            dev = UART_1_DEV;
-            break;
-#endif
-    }
-
-    while (!(dev->ISR & USART_ISR_TXE));
-    dev->TDR = (uint8_t)data;
+    while (!(uart->ISR & USART_ISR_TXE));
+    uart->TDR = (uint8_t)data;
 
     return 1;
 }

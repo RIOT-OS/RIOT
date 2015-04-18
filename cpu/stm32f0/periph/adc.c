@@ -165,37 +165,11 @@ void adc_poweroff(adc_t dev)
     }
 }
 
-/**
- * @brief Helper function to map a converted value to the given integer range.
- *
- * This function is useful for converting sampled ADC values into their physical representation.
- *
- * The min value is asserted to be smaller than the max value.
- *
- * @param[in] dev           the ADC device to read the precision value from (as input interval)
- * @param[in] value         the value to map
- * @param[in] min           the lower bound of the target interval
- * @param[in] max           the upper bound of the target interval
- *
- * @return                  the mapped value
- */
 int adc_map(adc_t dev, int value, int min, int max)
 {
     return 0;
 }
 
-/**
- * @brief Helper function to map a converted value to the given float range
- *
- * @see adc_map
- *
- * @param[in] dev           the ADC device to read the precision value from (as input interval)
- * @param[in] value         the value to map
- * @param[in] min           the lower bound of the target interval
- * @param[in] max           the upper bound of the target interval
- *
- * @return                  the mapped value
- */
 float adc_mapf(adc_t dev, int value, float min, float max)
 {
     return 0.0;

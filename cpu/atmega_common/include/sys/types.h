@@ -6,11 +6,11 @@
  * directory for more details.
  */
 
+ #ifndef AVR_TYPES_H
+ #define AVR_TYPES_H
+
 #include <inttypes.h>
 #include <stddef.h>
-
-#ifndef AVR_TYPES_H
-#define AVR_TYPES_H
 
 #ifdef __cplusplus
 extern "C" {

@@ -15,11 +15,14 @@
  *
  * @author      Maxime Blanloeil <maxime.blanloeil@phelma.grenoble-inp.fr>
  * @author      Peter Kietzmann  <peter.kietzmann@haw-hamburg.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Joakim Gebart <joakim.gebart@eistec.se>
  *
  * @}
  */
 
 #include "cpu.h"
+#include "mutex.h"
 #include "sched.h"
 #include "thread.h"
 #include "periph/gpio.h"
@@ -29,6 +32,21 @@
 
 /* guard this file in case no SPI device is defined */
 #if SPI_NUMOF
+
+/**
+ * @brief Array holding one pre-initialized mutex for each SPI device
+ */
+static mutex_t locks[] =  {
+#if SPI_0_EN
+    [SPI_0] = MUTEX_INIT,
+#endif
+#if SPI_1_EN
+    [SPI_1] = MUTEX_INIT,
+#endif
+#if SPI_2_EN
+    [SPI_2] = MUTEX_INIT
+#endif
+};
 
 typedef struct {
     char(*cb)(char data);
@@ -271,6 +289,24 @@ int spi_conf_pins(spi_t dev)
             return -1;
     }
 
+    return 0;
+}
+
+int spi_acquire(spi_t dev)
+{
+    if (dev >= SPI_NUMOF) {
+        return -1;
+    }
+    mutex_lock(&locks[dev]);
+    return 0;
+}
+
+int spi_release(spi_t dev)
+{
+    if (dev >= SPI_NUMOF) {
+        return -1;
+    }
+    mutex_unlock(&locks[dev]);
     return 0;
 }
 

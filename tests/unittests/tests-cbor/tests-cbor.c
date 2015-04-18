@@ -13,7 +13,7 @@
  * @author      Jana Cavojska <jana.cavojska9@gmail.com>
  */
 
-#include "../unittests.h"
+#include "embUnit.h"
 
 #include "bitarithm.h"
 #include "cbor.h"

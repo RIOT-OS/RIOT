@@ -1,0 +1,28 @@
+From a9ac5cc1f075b8d42cff1dc4b8f4967c755e2303 Mon Sep 17 00:00:00 2001
+From: Lotte Steenbrink <lotte.steenbrink@fu-berlin.de>
+Date: Tue, 31 Mar 2015 05:54:31 +0200
+Subject: [PATCH] Increment MAX_SEGMENTS
+
+---
+ coap.h | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/coap.h b/coap.h
+index 9090285..7bea5f1 100644
+--- a/coap.h
++++ b/coap.h
+@@ -131,7 +131,12 @@ typedef enum
+ ///////////////////////
+
+ typedef int (*coap_endpoint_func)(coap_rw_buffer_t *scratch, const coap_packet_t *inpkt, coap_packet_t *outpkt, uint8_t id_hi, uint8_t id_lo);
++/* To increase COAP_MAX_SEGMENTS, set CFLAGS to -DCOAP_MAX_SEGMENTS=<your value>. */
++#ifndef COAP_MAX_SEGMENTS
+ #define MAX_SEGMENTS 2  // 2 = /foo/bar, 3 = /foo/bar/baz
++#else
++#define MAX_SEGMENTS (COAP_MAX_SEGMENTS)
++#endif
+ typedef struct
+ {
+     int count;
+--
+2.1.0

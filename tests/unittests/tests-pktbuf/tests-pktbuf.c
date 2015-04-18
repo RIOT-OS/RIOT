@@ -14,10 +14,13 @@
 #include <errno.h>
 #include <stdint.h>
 
-#include "embUnit/embUnit.h"
+#include "embUnit.h"
 
-#include "pktbuf.h"
+#include "net/ng_nettype.h"
+#include "net/ng_pkt.h"
+#include "net/ng_pktbuf.h"
 
+#include "unittests-constants.h"
 #include "tests-pktbuf.h"
 
 typedef struct __attribute__((packed)) {
@@ -33,421 +36,232 @@ typedef struct __attribute__((packed)) {
 
 static void tear_down(void)
 {
-    pktbuf_reset();
+    ng_pktbuf_reset();
 }
 
-static void test_pktbuf_alloc_0(void)
+static void test_pktbuf_reset(void)
 {
-    TEST_ASSERT_NULL(pktbuf_alloc(0));
+    TEST_ASSERT(ng_pktbuf_is_empty());
+    TEST_ASSERT_NOT_NULL(ng_pktbuf_add(NULL, TEST_STRING4, sizeof(TEST_STRING4),
+                                       NG_NETTYPE_UNDEF));
+    TEST_ASSERT_NOT_NULL(ng_pktbuf_add(NULL, TEST_STRING8, sizeof(TEST_STRING8),
+                                       NG_NETTYPE_UNDEF));
+    TEST_ASSERT_NOT_NULL(ng_pktbuf_add(NULL, TEST_STRING16, sizeof(TEST_STRING16),
+                                       NG_NETTYPE_UNDEF));
+    TEST_ASSERT(!ng_pktbuf_is_empty());
+    ng_pktbuf_reset();
+    TEST_ASSERT(ng_pktbuf_is_empty());
 }
 
-static void test_pktbuf_alloc_memfull(void)
+static void test_pktbuf_add__pkt_NULL__data_NULL__size_0(void)
+{
+    ng_pktsnip_t *pkt;
+
+    TEST_ASSERT_NOT_NULL((pkt = ng_pktbuf_add(NULL, NULL, 0, NG_NETTYPE_UNDEF)));
+
+    TEST_ASSERT_NULL(pkt->next);
+    TEST_ASSERT_NULL(pkt->data);
+    TEST_ASSERT_EQUAL_INT(0, pkt->size);
+    TEST_ASSERT_EQUAL_INT(NG_NETTYPE_UNDEF, pkt->type);
+
+    TEST_ASSERT(!ng_pktbuf_is_empty());
+}
+
+static void test_pktbuf_add__pkt_NOT_NULL__data_NULL__size_0(void)
+{
+    ng_pktsnip_t *pkt, *next = ng_pktbuf_add(NULL, TEST_STRING4, sizeof(TEST_STRING4),
+                               NG_NETTYPE_UNDEF);
+
+    TEST_ASSERT_NOT_NULL(next);
+
+    TEST_ASSERT_NOT_NULL((pkt = ng_pktbuf_add(next, NULL, 0, NG_NETTYPE_UNDEF)));
+
+    TEST_ASSERT(pkt->next == next);
+    TEST_ASSERT_NULL(pkt->data);
+    TEST_ASSERT_EQUAL_INT(0, pkt->size);
+    TEST_ASSERT_EQUAL_INT(NG_NETTYPE_UNDEF, pkt->type);
+
+    TEST_ASSERT_NULL(next->next);
+    TEST_ASSERT_EQUAL_STRING(TEST_STRING4, next->data);
+    TEST_ASSERT_EQUAL_INT(sizeof(TEST_STRING4), next->size);
+    TEST_ASSERT_EQUAL_INT(NG_NETTYPE_UNDEF, pkt->type);
+
+    TEST_ASSERT(!ng_pktbuf_is_empty());
+}
+
+static void test_pktbuf_add__pkt_NULL__data_NOT_NULL__size_0(void)
+{
+    ng_pktsnip_t *pkt;
+
+    TEST_ASSERT_NOT_NULL((pkt = ng_pktbuf_add(NULL, TEST_STRING8, 0, NG_NETTYPE_UNDEF)));
+
+    TEST_ASSERT_NULL(pkt->next);
+    TEST_ASSERT_NOT_NULL(pkt->data);
+    TEST_ASSERT_EQUAL_INT(0, pkt->size);
+    TEST_ASSERT_EQUAL_INT(NG_NETTYPE_UNDEF, pkt->type);
+
+    TEST_ASSERT(!ng_pktbuf_is_empty());
+}
+
+static void test_pktbuf_add__pkt_NOT_NULL__data_NOT_NULL__size_0(void)
+{
+    ng_pktsnip_t *pkt, *next = ng_pktbuf_add(NULL, TEST_STRING4, sizeof(TEST_STRING4),
+                               NG_NETTYPE_UNDEF);
+
+    TEST_ASSERT_NOT_NULL(next);
+
+    TEST_ASSERT_NOT_NULL((pkt = ng_pktbuf_add(next, TEST_STRING8, 0, NG_NETTYPE_UNDEF)));
+
+    TEST_ASSERT(pkt->next == next);
+    TEST_ASSERT_NOT_NULL(pkt->data);
+    TEST_ASSERT_EQUAL_INT(0, pkt->size);
+    TEST_ASSERT_EQUAL_INT(NG_NETTYPE_UNDEF, pkt->type);
+
+    TEST_ASSERT_NULL(next->next);
+    TEST_ASSERT_EQUAL_STRING(TEST_STRING4, next->data);
+    TEST_ASSERT_EQUAL_INT(sizeof(TEST_STRING4), next->size);
+    TEST_ASSERT_EQUAL_INT(NG_NETTYPE_UNDEF, pkt->type);
+
+    TEST_ASSERT(!ng_pktbuf_is_empty());
+}
+
+static void test_pktbuf_add__pkt_NULL__data_NULL__size_not_0(void)
+{
+    ng_pktsnip_t *pkt;
+
+    TEST_ASSERT_NOT_NULL((pkt = ng_pktbuf_add(NULL, NULL, sizeof(TEST_STRING8),
+                                NG_NETTYPE_UNDEF)));
+    TEST_ASSERT_NULL(pkt->next);
+    TEST_ASSERT_NOT_NULL(pkt->data);
+    TEST_ASSERT_EQUAL_INT(sizeof(TEST_STRING8), pkt->size);
+    TEST_ASSERT_EQUAL_INT(NG_NETTYPE_UNDEF, pkt->type);
+    TEST_ASSERT_EQUAL_INT(1, pkt->users);
+
+    TEST_ASSERT(!ng_pktbuf_is_empty());
+}
+
+static void test_pktbuf_add__pkt_NOT_NULL__data_NULL__size_not_0(void)
+{
+    ng_pktsnip_t *pkt, *next = ng_pktbuf_add(NULL, TEST_STRING4, sizeof(TEST_STRING4),
+                               NG_NETTYPE_UNDEF);
+
+    TEST_ASSERT_NOT_NULL(next);
+
+    TEST_ASSERT_NOT_NULL((pkt = ng_pktbuf_add(next, NULL, sizeof(TEST_STRING8), NG_NETTYPE_UNDEF)));
+
+    TEST_ASSERT(pkt->next == next);
+    TEST_ASSERT_NOT_NULL(pkt->data);
+    TEST_ASSERT_EQUAL_INT(sizeof(TEST_STRING8), pkt->size);
+    TEST_ASSERT_EQUAL_INT(NG_NETTYPE_UNDEF, pkt->type);
+
+    TEST_ASSERT_NULL(next->next);
+    TEST_ASSERT_EQUAL_STRING(TEST_STRING4, next->data);
+    TEST_ASSERT_EQUAL_INT(sizeof(TEST_STRING4), next->size);
+    TEST_ASSERT_EQUAL_INT(NG_NETTYPE_UNDEF, pkt->type);
+
+    TEST_ASSERT(!ng_pktbuf_is_empty());
+}
+
+static void test_pktbuf_add__pkt_NOT_NULL__data_NOT_NULL__size_not_0(void)
+{
+    ng_pktsnip_t *pkt, *next = ng_pktbuf_add(NULL, TEST_STRING4, sizeof(TEST_STRING4),
+                               NG_NETTYPE_UNDEF);
+
+    TEST_ASSERT_NOT_NULL(next);
+
+    TEST_ASSERT_NOT_NULL((pkt = ng_pktbuf_add(next, TEST_STRING8, sizeof(TEST_STRING8),
+                                NG_NETTYPE_UNDEF)));
+
+    TEST_ASSERT(pkt->next == next);
+    TEST_ASSERT_EQUAL_STRING(TEST_STRING8, pkt->data);
+    TEST_ASSERT_EQUAL_INT(sizeof(TEST_STRING8), pkt->size);
+    TEST_ASSERT_EQUAL_INT(NG_NETTYPE_UNDEF, pkt->type);
+
+    TEST_ASSERT_NULL(next->next);
+    TEST_ASSERT_EQUAL_STRING(TEST_STRING4, next->data);
+    TEST_ASSERT_EQUAL_INT(sizeof(TEST_STRING4), next->size);
+    TEST_ASSERT_EQUAL_INT(NG_NETTYPE_UNDEF, pkt->type);
+
+    TEST_ASSERT(!ng_pktbuf_is_empty());
+}
+
+static void test_pktbuf_add__in_place(void)
+{
+    ng_pktsnip_t *pkt = ng_pktbuf_add(NULL, TEST_STRING16, sizeof(TEST_STRING16),
+                                      NG_NETTYPE_UNDEF);
+    ng_pktsnip_t *header;
+
+    TEST_ASSERT_NOT_NULL((header = ng_pktbuf_add(pkt, pkt->data, 4, NG_NETTYPE_UNDEF)));
+    TEST_ASSERT(header == pkt->next);
+    TEST_ASSERT_EQUAL_STRING(TEST_STRING16, header->data); /* there is no 0 byte */
+    TEST_ASSERT_EQUAL_INT(4, header->size);
+    TEST_ASSERT_EQUAL_INT(NG_NETTYPE_UNDEF, header->type);
+    TEST_ASSERT_EQUAL_INT(1, header->users);
+    TEST_ASSERT_EQUAL_STRING(TEST_STRING16 + 4, pkt->data);
+    TEST_ASSERT_EQUAL_INT(sizeof(TEST_STRING16) - 4, pkt->size);
+    TEST_ASSERT_EQUAL_INT(NG_NETTYPE_UNDEF, pkt->type);
+    TEST_ASSERT_EQUAL_INT(1, pkt->users);
+    ng_pktbuf_release(header);
+    ng_pktbuf_release(pkt);
+    TEST_ASSERT(ng_pktbuf_is_empty());
+}
+
+#if NG_PKTBUF_SIZE > 0
+static void test_pktbuf_add__memfull(void)
+{
+    TEST_ASSERT_NULL(ng_pktbuf_add(NULL, NULL, NG_PKTBUF_SIZE + 1, NG_NETTYPE_UNDEF));
+    TEST_ASSERT(ng_pktbuf_is_empty());
+}
+
+static void test_pktbuf_add__memfull2(void)
+{
+    TEST_ASSERT_NULL(ng_pktbuf_add(NULL, NULL, NG_PKTBUF_SIZE - sizeof(ng_pktsnip_t),
+                                   NG_NETTYPE_UNDEF));
+    TEST_ASSERT(ng_pktbuf_is_empty());
+}
+
+static void test_pktbuf_add__memfull3(void)
 {
     for (int i = 0; i < 9; i++) {
-        TEST_ASSERT_NOT_NULL(pktbuf_alloc((PKTBUF_SIZE / 10) + 4));
+        TEST_ASSERT_NOT_NULL(ng_pktbuf_add(NULL, NULL, (NG_PKTBUF_SIZE / 10) + 4, NG_NETTYPE_UNDEF));
         /* Why 4? Because: http://xkcd.com/221/, thats why ;-) */
     }
 
-    TEST_ASSERT_NULL(pktbuf_alloc((PKTBUF_SIZE / 10) + 4));
-}
-
-static void test_pktbuf_alloc_success(void)
-{
-    void *data, *data_prev = NULL;
-
-    for (int i = 0; i < 9; i++) {
-        data = pktbuf_alloc((PKTBUF_SIZE / 10) + 4);
-
-        TEST_ASSERT(data_prev < data);
-
-        data_prev = data;
-    }
-}
-
-static void test_pktbuf_realloc_0(void)
-{
-    void *data = pktbuf_alloc(512);
-
-    TEST_ASSERT_NULL(pktbuf_realloc(data, 0));
-}
-
-static void test_pktbuf_realloc_memfull(void)
-{
-    void *data = pktbuf_alloc(512);
-
-    TEST_ASSERT_NULL(pktbuf_realloc(data, PKTBUF_SIZE + 1));
-}
-
-static void test_pktbuf_realloc_memfull2(void)
-{
-    void *data = pktbuf_alloc(512);
-
-    TEST_ASSERT_NOT_NULL(data);
-    TEST_ASSERT_NOT_NULL(pktbuf_alloc(512));
-    TEST_ASSERT_NULL(pktbuf_realloc(data, PKTBUF_SIZE - 512));
-}
-
-static void test_pktbuf_realloc_memfull3(void)
-{
-    void *data;
-
-    TEST_ASSERT_NOT_NULL(pktbuf_alloc(25));
-
-    data = pktbuf_alloc(512);
-
-    TEST_ASSERT_NOT_NULL(data);
-    TEST_ASSERT_NOT_NULL(pktbuf_alloc(73));
-
-    TEST_ASSERT_NULL(pktbuf_realloc(data, PKTBUF_SIZE - 512));
-}
-
-static void test_pktbuf_realloc_smaller(void)
-{
-    void *data;
-
-    data = pktbuf_alloc(512);
-
-    TEST_ASSERT_NOT_NULL(data);
-    TEST_ASSERT_NOT_NULL(pktbuf_alloc(25));
-
-    TEST_ASSERT(data == pktbuf_realloc(data, 128));
-}
-
-static void test_pktbuf_realloc_memenough(void)
-{
-    void *data;
-
-    data = pktbuf_alloc(128);
-
-    TEST_ASSERT_NOT_NULL(data);
-
-    TEST_ASSERT(data == pktbuf_realloc(data, 200));
-}
-
-static void test_pktbuf_realloc_memenough2(void)
-{
-    void *data, *data2;
-
-    data = pktbuf_alloc(128);
-
-    TEST_ASSERT_NOT_NULL(data);
-
-    data2 = pktbuf_alloc(128);
-
-    TEST_ASSERT_NOT_NULL(data);
-    TEST_ASSERT_NOT_NULL(pktbuf_alloc(25));
-
-    pktbuf_release(data2);
-
-    TEST_ASSERT(data == pktbuf_realloc(data, 200));
-}
-
-static void test_pktbuf_realloc_nomemenough(void)
-{
-    void *data, *data2;
-
-    data = pktbuf_alloc(128);
-
-    TEST_ASSERT_NOT_NULL(data);
-
-    data2 = pktbuf_alloc(128);
-
-    TEST_ASSERT_NOT_NULL(data);
-    TEST_ASSERT_NOT_NULL(pktbuf_alloc(25));
-
-    pktbuf_release(data2);
-
-    TEST_ASSERT(data != pktbuf_realloc(data, 512));
-}
-
-static void test_pktbuf_realloc_unknown_ptr(void)
-{
-    char *data = "abcd", *new_data = pktbuf_realloc(data, 5);
-
-    TEST_ASSERT_NOT_NULL(new_data);
-    TEST_ASSERT(data != new_data);
-    TEST_ASSERT_EQUAL_STRING(data, new_data);
-}
-
-static void test_pktbuf_insert_size_0(void)
-{
-    TEST_ASSERT_NULL(pktbuf_insert("", 0));
-}
-
-static void test_pktbuf_insert_data_NULL(void)
-{
-    TEST_ASSERT_NULL(pktbuf_insert(NULL, 4));
-}
-
-static void test_pktbuf_insert_memfull(void)
-{
-    while (pktbuf_insert("abc", 4));
-
-    TEST_ASSERT_NULL(pktbuf_insert("abc", 4));
-}
-
-static void test_pktbuf_insert_success(void)
-{
-    char *data, *data_prev = NULL;
-
-    for (int i = 0; i < 10; i++) {
-        data = (char *)pktbuf_insert("abc", 4);
-
-        TEST_ASSERT(data_prev < data);
-        TEST_ASSERT_EQUAL_STRING("abc", data);
-
-        data_prev = data;
-    }
-}
-
-#ifdef DEVELHELP
-static void test_pktbuf_copy_efault(void)
-{
-    char *data = (char *)pktbuf_insert("abcd", 5);
-
-    TEST_ASSERT_NOT_NULL(data);
-    TEST_ASSERT_EQUAL_INT(-EFAULT, pktbuf_copy(data, NULL, 3));
-    TEST_ASSERT_EQUAL_STRING("abcd", data);
+    TEST_ASSERT_NULL(ng_pktbuf_add(NULL, NULL, (NG_PKTBUF_SIZE / 10) + 4, NG_NETTYPE_UNDEF));
 }
 #endif
 
-static void test_pktbuf_copy_data_len_too_long(void)
+static void test_pktbuf_add__success(void)
 {
-    char *data = (char *)pktbuf_insert("ab", 3);
+    ng_pktsnip_t *pkt, *pkt_prev = NULL;
 
-    TEST_ASSERT_NOT_NULL(data);
-    TEST_ASSERT_EQUAL_INT(-ENOMEM, pktbuf_copy(data, "cdef", 5));
-    TEST_ASSERT_EQUAL_STRING("ab", data);
+    for (int i = 0; i < 9; i++) {
+        pkt = ng_pktbuf_add(NULL, NULL, (NG_PKTBUF_SIZE / 10) + 4, NG_NETTYPE_UNDEF);
+
+        TEST_ASSERT_NOT_NULL(pkt);
+        TEST_ASSERT_NULL(pkt->next);
+        TEST_ASSERT_NOT_NULL(pkt->data);
+        TEST_ASSERT_EQUAL_INT((NG_PKTBUF_SIZE / 10) + 4, pkt->size);
+        TEST_ASSERT_EQUAL_INT(NG_NETTYPE_UNDEF, pkt->type);
+        TEST_ASSERT_EQUAL_INT(1, pkt->users);
+
+        if (pkt_prev != NULL) {
+            TEST_ASSERT(pkt_prev < pkt);
+            TEST_ASSERT(pkt_prev->data < pkt->data);
+        }
+
+        pkt_prev = pkt;
+    }
 }
 
-static void test_pktbuf_copy_data_len_too_long2(void)
-{
-    char *data = (char *)pktbuf_insert("abcd", 5);
-
-    TEST_ASSERT_NOT_NULL(data);
-    TEST_ASSERT_EQUAL_INT(-ENOMEM, pktbuf_copy(data + 2, "efgh", 5));
-    TEST_ASSERT_EQUAL_STRING("abcd", data);
-}
-
-static void test_pktbuf_copy_data_len_0(void)
-{
-    char *data = (char *)pktbuf_insert("abcd", 5);
-
-    TEST_ASSERT_NOT_NULL(data);
-    TEST_ASSERT_EQUAL_INT(0, pktbuf_copy(data, "ef", 0));
-    TEST_ASSERT_EQUAL_STRING("abcd", data);
-}
-
-static void test_pktbuf_copy_success(void)
-{
-    char *data = (char *)pktbuf_insert("abcd", 5);
-
-    TEST_ASSERT_NOT_NULL(data);
-    TEST_ASSERT_EQUAL_INT(3, pktbuf_copy(data, "ef", 3));
-    TEST_ASSERT_EQUAL_STRING("ef", data);
-}
-
-static void test_pktbuf_copy_success2(void)
-{
-    char *data = (char *)pktbuf_insert("abcdef", 7);
-
-    TEST_ASSERT_NOT_NULL(data);
-    TEST_ASSERT_EQUAL_INT(2, pktbuf_copy(data + 3, "gh", 2));
-    TEST_ASSERT_EQUAL_STRING("abcghf", data);
-}
-
-static void test_pktbuf_hold_ptr_null(void)
-{
-    char *data;
-
-    TEST_ASSERT_NOT_NULL(pktbuf_alloc(25));
-    data = (char *)pktbuf_insert("abcd", 5);
-    TEST_ASSERT_NOT_NULL(data);
-    TEST_ASSERT_NOT_NULL(pktbuf_alloc(16));
-
-    TEST_ASSERT_EQUAL_INT(3, pktbuf_packets_allocated());
-
-    pktbuf_hold(NULL);
-    pktbuf_release(data);
-
-    TEST_ASSERT_EQUAL_INT(2, pktbuf_packets_allocated());
-    TEST_ASSERT_EQUAL_STRING("abcd", data);
-}
-
-static void test_pktbuf_hold_wrong_ptr(void)
-{
-    char *data, wrong;
-
-    TEST_ASSERT_NOT_NULL(pktbuf_alloc(25));
-    data = (char *)pktbuf_insert("abcd", 5);
-    TEST_ASSERT_NOT_NULL(data);
-    TEST_ASSERT_NOT_NULL(pktbuf_alloc(16));
-
-    TEST_ASSERT_EQUAL_INT(3, pktbuf_packets_allocated());
-
-    pktbuf_hold(&wrong);
-    pktbuf_release(data);
-
-    TEST_ASSERT_EQUAL_INT(2, pktbuf_packets_allocated());
-    TEST_ASSERT_EQUAL_STRING("abcd", data);
-}
-
-static void test_pktbuf_hold_success(void)
-{
-    char *data;
-
-    TEST_ASSERT_NOT_NULL(pktbuf_alloc(25));
-    data = (char *)pktbuf_insert("abcd", 5);
-    TEST_ASSERT_NOT_NULL(data);
-    TEST_ASSERT_NOT_NULL(pktbuf_alloc(16));
-
-    pktbuf_hold(data);
-    pktbuf_release(data);
-
-    TEST_ASSERT_EQUAL_INT(3, pktbuf_copy(data, "ef", 3));
-    TEST_ASSERT_EQUAL_STRING("ef", data);
-}
-
-static void test_pktbuf_hold_success2(void)
-{
-    char *data;
-
-    TEST_ASSERT_NOT_NULL(pktbuf_alloc(25));
-    data = (char *)pktbuf_insert("abcd", 5);
-    TEST_ASSERT_NOT_NULL(data);
-    TEST_ASSERT_NOT_NULL(pktbuf_alloc(16));
-
-    pktbuf_hold(data + 4);
-    pktbuf_release(data + 4);
-
-    TEST_ASSERT_EQUAL_INT(3, pktbuf_copy(data, "ef", 3));
-    TEST_ASSERT_EQUAL_STRING("ef", data);
-}
-
-static void test_pktbuf_release_ptr_null(void)
-{
-    char *data;
-
-    TEST_ASSERT_NOT_NULL(pktbuf_alloc(25));
-    data = (char *)pktbuf_insert("abcd", 5);
-    TEST_ASSERT_NOT_NULL(data);
-    TEST_ASSERT_NOT_NULL(pktbuf_alloc(16));
-
-    pktbuf_release(NULL);
-
-    TEST_ASSERT_EQUAL_INT(3, pktbuf_copy(data, "ef", 3));
-    TEST_ASSERT_EQUAL_STRING("ef", data);
-}
-
-static void test_pktbuf_release_wrong_ptr(void)
-{
-    char *data, wrong;
-
-    TEST_ASSERT_NOT_NULL(pktbuf_alloc(25));
-    data = (char *)pktbuf_insert("abcd", 5);
-    TEST_ASSERT_NOT_NULL(data);
-    TEST_ASSERT_NOT_NULL(pktbuf_alloc(16));
-
-    pktbuf_release(&wrong);
-
-    TEST_ASSERT_EQUAL_INT(3, pktbuf_copy(data, "ef", 3));
-    TEST_ASSERT_EQUAL_STRING("ef", data);
-}
-
-static void test_pktbuf_release_success(void)
-{
-    char *data;
-
-    TEST_ASSERT_NOT_NULL(pktbuf_alloc(25));
-    data = (char *)pktbuf_insert("abcd", 5);
-    TEST_ASSERT_NOT_NULL(data);
-    TEST_ASSERT_NOT_NULL(pktbuf_alloc(16));
-
-    TEST_ASSERT_EQUAL_INT(3, pktbuf_packets_allocated());
-
-    pktbuf_hold(data);
-    pktbuf_hold(data);
-    pktbuf_release(data + 3);
-    pktbuf_release(data + 4);
-    pktbuf_release(data + 2);
-
-    TEST_ASSERT_EQUAL_INT(2, pktbuf_packets_allocated());
-}
-
-static void test_pktbuf_release_success2(void)
-{
-    char *data1, *data2, *data3;
-
-    data1 = (char *)pktbuf_insert("abcd", 5);
-    TEST_ASSERT_NOT_NULL(data1);
-    data2 = (char *)pktbuf_insert("ef", 3);
-    TEST_ASSERT_NOT_NULL(data2);
-    data3 = (char *)pktbuf_insert("ghijkl", 7);
-    TEST_ASSERT_NOT_NULL(data3);
-
-    TEST_ASSERT_EQUAL_INT(3, pktbuf_packets_allocated());
-
-    pktbuf_release(data2);
-
-    TEST_ASSERT_EQUAL_INT(2, pktbuf_packets_allocated());
-    TEST_ASSERT_EQUAL_INT(2, pktbuf_copy(data1, "m", 2));
-    TEST_ASSERT_EQUAL_STRING("m", data1);
-    TEST_ASSERT_EQUAL_INT(4, pktbuf_copy(data3, "nop", 4));
-    TEST_ASSERT_EQUAL_STRING("nop", data3);
-}
-
-static void test_pktbuf_release_success3(void)
-{
-    char *data1, *data2, *data3;
-
-    data1 = (char *)pktbuf_insert("abcd", 5);
-    TEST_ASSERT_NOT_NULL(data1);
-    data2 = (char *)pktbuf_insert("ef", 3);
-    TEST_ASSERT_NOT_NULL(data2);
-    data3 = (char *)pktbuf_insert("ghijkl", 7);
-    TEST_ASSERT_NOT_NULL(data3);
-
-    TEST_ASSERT_EQUAL_INT(3, pktbuf_packets_allocated());
-
-    pktbuf_release(data1);
-
-    TEST_ASSERT_EQUAL_INT(2, pktbuf_packets_allocated());
-    TEST_ASSERT_EQUAL_INT(2, pktbuf_copy(data2, "m", 2));
-    TEST_ASSERT_EQUAL_STRING("m", data2);
-    TEST_ASSERT_EQUAL_INT(4, pktbuf_copy(data3, "nop", 4));
-    TEST_ASSERT_EQUAL_STRING("nop", data3);
-}
-
-static void test_pktbuf_release_success4(void)
-{
-    char *data1, *data2, *data3;
-
-    data1 = (char *)pktbuf_insert("abcd", 5);
-    TEST_ASSERT_NOT_NULL(data1);
-    data2 = (char *)pktbuf_insert("ef", 3);
-    TEST_ASSERT_NOT_NULL(data2);
-    data3 = (char *)pktbuf_insert("ghijkl", 7);
-    TEST_ASSERT_NOT_NULL(data3);
-
-    TEST_ASSERT_EQUAL_INT(3, pktbuf_packets_allocated());
-
-    pktbuf_release(data3);
-
-    TEST_ASSERT_EQUAL_INT(2, pktbuf_packets_allocated());
-    TEST_ASSERT_EQUAL_INT(2, pktbuf_copy(data1, "m", 2));
-    TEST_ASSERT_EQUAL_STRING("m", data1);
-    TEST_ASSERT_EQUAL_INT(1, pktbuf_copy(data2, "", 1));
-    TEST_ASSERT_EQUAL_STRING("", data2);
-}
-
-static void test_pktbuf_insert_packed_struct(void)
+static void test_pktbuf_add__packed_struct(void)
 {
     test_pktbuf_struct_t data = { 0x4d, 0xef43, 0xacdef574, 0x43644305695afde5,
                                   34, -4469, 149699748, -46590430597
                                 };
     test_pktbuf_struct_t *data_cpy;
-
-    data_cpy = (test_pktbuf_struct_t *)pktbuf_insert(&data, sizeof(test_pktbuf_struct_t));
+    ng_pktsnip_t *pkt = ng_pktbuf_add(NULL, &data, sizeof(test_pktbuf_struct_t), NG_NETTYPE_UNDEF);
+    data_cpy = (test_pktbuf_struct_t *)pkt->data;
 
     TEST_ASSERT_EQUAL_INT(data.u8, data_cpy->u8);
     TEST_ASSERT_EQUAL_INT(data.u16, data_cpy->u16);
@@ -459,76 +273,380 @@ static void test_pktbuf_insert_packed_struct(void)
     TEST_ASSERT_EQUAL_INT(data.s64, data_cpy->s64);
 }
 
-static void test_pktbuf_alloc_off_by_one1(void)
+static void test_pktbuf_realloc_data__pkt_NULL(void)
 {
-    char *data1, *data2, *data3, *data4;
+    TEST_ASSERT_EQUAL_INT(ENOENT, ng_pktbuf_realloc_data(NULL, 0));
+    TEST_ASSERT(ng_pktbuf_is_empty());
+}
 
-    data1 = (char *)pktbuf_insert("1234567890a", 12);
-    TEST_ASSERT_NOT_NULL(data1);
-    data2 = (char *)pktbuf_alloc(44);
-    TEST_ASSERT_NOT_NULL(data2);
-    data4 = (char *)pktbuf_alloc(4);
-    TEST_ASSERT_NOT_NULL(data4);
-    TEST_ASSERT_EQUAL_INT(3, pktbuf_packets_allocated());
-    TEST_ASSERT_EQUAL_INT(12 + 44 + 4, pktbuf_bytes_allocated());
+static void test_pktbuf_realloc_data__pkt_wrong(void)
+{
+    ng_pktsnip_t pkt = { 1, NULL, TEST_STRING8, sizeof(TEST_STRING8), NG_NETTYPE_UNDEF };
 
-    pktbuf_release(data1);
+    TEST_ASSERT_EQUAL_INT(ENOENT, ng_pktbuf_realloc_data(&pkt, 0));
+    TEST_ASSERT(ng_pktbuf_is_empty());
+}
 
-    TEST_ASSERT_EQUAL_INT(2, pktbuf_packets_allocated());
-    TEST_ASSERT_EQUAL_INT(44 + 4, pktbuf_bytes_allocated());
+static void test_pktbuf_realloc_data__pkt_data_wrong(void)
+{
+    ng_pktsnip_t *pkt = ng_pktbuf_add(NULL, NULL, sizeof(TEST_STRING8), NG_NETTYPE_UNDEF);
+    void *orig_data = pkt->data;
+    pkt->data = TEST_STRING8;
 
-    data3 = (char *)pktbuf_insert("bcdefghijklm", 13);
-    TEST_ASSERT_NOT_NULL(data3);
-    TEST_ASSERT(data1 != data3);
+    TEST_ASSERT_EQUAL_INT(ENOENT, ng_pktbuf_realloc_data(pkt, 0));
+    pkt->data = orig_data;
+    ng_pktbuf_release(pkt);
+    TEST_ASSERT(ng_pktbuf_is_empty());
+}
 
-    TEST_ASSERT_EQUAL_INT(3, pktbuf_packets_allocated());
-    TEST_ASSERT_EQUAL_INT(44 + 4 + 13, pktbuf_bytes_allocated());
+static void test_pktbuf_realloc_data__pkt_users_gt_1(void)
+{
+    ng_pktsnip_t *pkt = ng_pktbuf_add(NULL, NULL, sizeof(TEST_STRING8), NG_NETTYPE_UNDEF);
+    ng_pktbuf_hold(pkt, 1);
+
+    TEST_ASSERT_EQUAL_INT(EINVAL, ng_pktbuf_realloc_data(pkt, sizeof(TEST_STRING8) - 1));
+    ng_pktbuf_release(pkt);
+    ng_pktbuf_release(pkt);
+    TEST_ASSERT(ng_pktbuf_is_empty());
+}
+
+static void test_pktbuf_realloc_data__pkt_next_neq_NULL(void)
+{
+    ng_pktsnip_t *pkt = ng_pktbuf_add(NULL, NULL, sizeof(TEST_STRING8), NG_NETTYPE_UNDEF);
+
+    TEST_ASSERT_NOT_NULL(ng_pktbuf_add(pkt, pkt->data, sizeof(TEST_STRING4), NG_NETTYPE_UNDEF));
+    TEST_ASSERT_EQUAL_INT(EINVAL, ng_pktbuf_realloc_data(pkt, sizeof(TEST_STRING8) - 1));
+    ng_pktbuf_release(pkt);
+    TEST_ASSERT(ng_pktbuf_is_empty());
+}
+
+static void test_pktbuf_realloc_data__size_0(void)
+{
+    ng_pktsnip_t *pkt = ng_pktbuf_add(NULL, NULL, sizeof(TEST_STRING8), NG_NETTYPE_UNDEF);
+
+    TEST_ASSERT_EQUAL_INT(ENOMEM, ng_pktbuf_realloc_data(pkt, 0));
+    ng_pktbuf_release(pkt);
+    TEST_ASSERT(ng_pktbuf_is_empty());
+}
+
+#if NG_PKTBUF_SIZE > 0
+static void test_pktbuf_realloc_data__memfull(void)
+{
+    ng_pktsnip_t *pkt = ng_pktbuf_add(NULL, NULL, sizeof(TEST_STRING8), NG_NETTYPE_UNDEF);
+
+    TEST_ASSERT_EQUAL_INT(ENOMEM, ng_pktbuf_realloc_data(pkt, NG_PKTBUF_SIZE + 1));
+    ng_pktbuf_release(pkt);
+    TEST_ASSERT(ng_pktbuf_is_empty());
+}
+
+static void test_pktbuf_realloc_data__memfull2(void)
+{
+    ng_pktsnip_t *pkt = ng_pktbuf_add(NULL, NULL, sizeof(TEST_STRING8), NG_NETTYPE_UNDEF);
+
+    TEST_ASSERT_NOT_NULL(pkt);
+    TEST_ASSERT_NOT_NULL(ng_pktbuf_add(NULL, NULL, sizeof(TEST_STRING16), NG_NETTYPE_UNDEF));
+    TEST_ASSERT_EQUAL_INT(ENOMEM, ng_pktbuf_realloc_data(pkt, NG_PKTBUF_SIZE - sizeof(TEST_STRING8)));
+}
+
+static void test_pktbuf_realloc_data__memfull3(void)
+{
+    ng_pktsnip_t *pkt;
+
+    TEST_ASSERT_NOT_NULL(ng_pktbuf_add(NULL, NULL, sizeof(TEST_STRING16), NG_NETTYPE_UNDEF));
+
+    pkt = ng_pktbuf_add(NULL, NULL, TEST_UINT8, NG_NETTYPE_UNDEF);
+
+    TEST_ASSERT_NOT_NULL(pkt);
+    TEST_ASSERT_NOT_NULL(ng_pktbuf_add(NULL, NULL, sizeof(TEST_STRING8), NG_NETTYPE_UNDEF));
+    TEST_ASSERT_EQUAL_INT(ENOMEM, ng_pktbuf_realloc_data(pkt, NG_PKTBUF_SIZE - TEST_UINT8));
+}
+
+/* dynamic malloc is a little more unpredictable ;-) */
+static void test_pktbuf_realloc_data__shrink(void)
+{
+    ng_pktsnip_t *pkt;
+    void *exp_data;
+
+    pkt = ng_pktbuf_add(NULL, NULL, sizeof(TEST_STRING16), NG_NETTYPE_UNDEF);
+    exp_data = pkt->data;
+
+    TEST_ASSERT_NOT_NULL(pkt);
+    TEST_ASSERT_NOT_NULL(ng_pktbuf_add(NULL, NULL, 4, NG_NETTYPE_UNDEF));
+
+    TEST_ASSERT_EQUAL_INT(0, ng_pktbuf_realloc_data(pkt, sizeof(TEST_STRING8)));
+    TEST_ASSERT(exp_data == pkt->data);
+    TEST_ASSERT_NULL(pkt->next);
+    TEST_ASSERT_EQUAL_INT(sizeof(TEST_STRING8), pkt->size);
+    TEST_ASSERT_EQUAL_INT(NG_NETTYPE_UNDEF, pkt->type);
+    TEST_ASSERT_EQUAL_INT(1, pkt->users);
+}
+
+static void test_pktbuf_realloc_data__memenough(void)
+{
+    ng_pktsnip_t *pkt;
+    void *exp_data;
+
+    pkt = ng_pktbuf_add(NULL, NULL, sizeof(TEST_STRING16), NG_NETTYPE_UNDEF);
+    exp_data = pkt->data;
+
+    TEST_ASSERT_NOT_NULL(pkt);
+    TEST_ASSERT_EQUAL_INT(0, ng_pktbuf_realloc_data(pkt, sizeof(TEST_STRING8)));
+    TEST_ASSERT(exp_data == pkt->data);
+    TEST_ASSERT_NULL(pkt->next);
+    TEST_ASSERT_EQUAL_INT(sizeof(TEST_STRING8), pkt->size);
+    TEST_ASSERT_EQUAL_INT(NG_NETTYPE_UNDEF, pkt->type);
+    TEST_ASSERT_EQUAL_INT(1, pkt->users);
+}
+
+static void test_pktbuf_realloc_data__nomemenough(void)
+{
+    ng_pktsnip_t *pkt1, *pkt2;
+    void *exp_data;
+
+    pkt1 = ng_pktbuf_add(NULL, TEST_STRING8, sizeof(TEST_STRING8), NG_NETTYPE_UNDEF);
+    exp_data = pkt1->data;
+
+    TEST_ASSERT_NOT_NULL(pkt1);
+
+    pkt2 = ng_pktbuf_add(NULL, NULL, 1, NG_NETTYPE_UNDEF);
+
+    TEST_ASSERT_NOT_NULL(pkt2);
+    TEST_ASSERT_NOT_NULL(ng_pktbuf_add(NULL, NULL, 4, NG_NETTYPE_UNDEF));
+
+    ng_pktbuf_release(pkt2);
+
+    TEST_ASSERT_EQUAL_INT(0, ng_pktbuf_realloc_data(pkt1, 200));
+    TEST_ASSERT(exp_data != pkt1->data);
+    TEST_ASSERT_NULL(pkt1->next);
+    TEST_ASSERT_EQUAL_INT(200, pkt1->size);
+    TEST_ASSERT_EQUAL_STRING(TEST_STRING8, pkt1->data);
+    TEST_ASSERT_EQUAL_INT(NG_NETTYPE_UNDEF, pkt1->type);
+    TEST_ASSERT_EQUAL_INT(1, pkt1->users);
+}
+#endif
+
+static void test_pktbuf_realloc_data__success(void)
+{
+    ng_pktsnip_t *pkt;
+
+    pkt = ng_pktbuf_add(NULL, TEST_STRING8, sizeof(TEST_STRING16), NG_NETTYPE_UNDEF);
+
+    TEST_ASSERT_NOT_NULL(pkt);
+
+    TEST_ASSERT_EQUAL_INT(0, ng_pktbuf_realloc_data(pkt, sizeof(TEST_STRING8)));
+    TEST_ASSERT_NULL(pkt->next);
+    TEST_ASSERT_EQUAL_STRING(TEST_STRING8, pkt->data);
+    TEST_ASSERT_EQUAL_INT(sizeof(TEST_STRING8), pkt->size);
+    TEST_ASSERT_EQUAL_INT(NG_NETTYPE_UNDEF, pkt->type);
+    TEST_ASSERT_EQUAL_INT(1, pkt->users);
+}
+
+static void test_pktbuf_realloc_data__success2(void)
+{
+    ng_pktsnip_t *pkt;
+
+    pkt = ng_pktbuf_add(NULL, TEST_STRING8, sizeof(TEST_STRING8), NG_NETTYPE_UNDEF);
+
+    TEST_ASSERT_NOT_NULL(pkt);
+
+    TEST_ASSERT_EQUAL_INT(0, ng_pktbuf_realloc_data(pkt, sizeof(TEST_STRING16)));
+    TEST_ASSERT_NULL(pkt->next);
+    TEST_ASSERT_EQUAL_STRING(TEST_STRING8, pkt->data);
+    TEST_ASSERT_EQUAL_INT(sizeof(TEST_STRING16), pkt->size);
+    TEST_ASSERT_EQUAL_INT(NG_NETTYPE_UNDEF, pkt->type);
+    TEST_ASSERT_EQUAL_INT(1, pkt->users);
+}
+
+static void test_pktbuf_realloc_data__further_down_the_line(void)
+{
+    ng_pktsnip_t *pkt1, *pkt2, *header;
+    void *exp_data;
+
+    pkt1 = ng_pktbuf_add(NULL, TEST_STRING16, sizeof(TEST_STRING16), NG_NETTYPE_UNDEF);
+    exp_data = pkt1->data;
+
+    TEST_ASSERT_NOT_NULL(pkt1);
+
+    header = ng_pktbuf_add(pkt1, pkt1->data, 4, NG_NETTYPE_UNDEF);
+    pkt2 = ng_pktbuf_add(NULL, TEST_STRING16, sizeof(TEST_STRING16), NG_NETTYPE_UNDEF);
+
+    TEST_ASSERT_NOT_NULL(header);
+    TEST_ASSERT(header == pkt1->next);
+    TEST_ASSERT_EQUAL_INT(4, header->size);
+    TEST_ASSERT(((uint8_t *)pkt1->data) == (((uint8_t *)header->data) + 4));
+    TEST_ASSERT_EQUAL_INT(sizeof(TEST_STRING16) - 4, pkt1->size);
+
+    TEST_ASSERT_EQUAL_INT(0, ng_pktbuf_realloc_data(header, 40));
+    TEST_ASSERT(exp_data != header->data);
+    TEST_ASSERT_NULL(header->next);
+    TEST_ASSERT_EQUAL_STRING(TEST_STRING16, header->data);
+    TEST_ASSERT_EQUAL_INT(40, header->size);
+    TEST_ASSERT_EQUAL_INT(NG_NETTYPE_UNDEF, header->type);
+    TEST_ASSERT_EQUAL_INT(1, header->users);
+    ng_pktbuf_release(pkt1);
+    ng_pktbuf_release(pkt2);
+    TEST_ASSERT(ng_pktbuf_is_empty());
+}
+
+static void test_pktbuf_hold__pkt_null(void)
+{
+    ng_pktbuf_hold(NULL, 1);
+    TEST_ASSERT(ng_pktbuf_is_empty());
+}
+
+static void test_pktbuf_hold__pkt_external(void)
+{
+    ng_pktsnip_t pkt = { 1, NULL, TEST_STRING8, sizeof(TEST_STRING8), NG_NETTYPE_UNDEF };
+
+    ng_pktbuf_hold(&pkt, 1);
+    TEST_ASSERT(ng_pktbuf_is_empty());
+}
+
+static void test_pktbuf_hold__success(void)
+{
+    ng_pktsnip_t *pkt = ng_pktbuf_add(NULL, TEST_STRING16, sizeof(TEST_STRING16), NG_NETTYPE_UNDEF);
+
+    for (uint8_t i = 0; i < TEST_UINT8; i++) {
+        uint8_t prev_users = pkt->users;
+        ng_pktbuf_hold(pkt, 1);
+        TEST_ASSERT_EQUAL_INT(prev_users + 1, pkt->users);
+    }
+}
+
+static void test_pktbuf_hold__success2(void)
+{
+    ng_pktsnip_t *pkt = ng_pktbuf_add(NULL, TEST_STRING16, sizeof(TEST_STRING16), NG_NETTYPE_UNDEF);
+
+    ng_pktbuf_hold(pkt, TEST_UINT8);
+
+    TEST_ASSERT_EQUAL_INT(TEST_UINT8 + 1, pkt->users);
+}
+
+static void test_pktbuf_release__pkt_null(void)
+{
+    ng_pktbuf_release(NULL);
+    TEST_ASSERT(ng_pktbuf_is_empty());
+}
+
+static void test_pktbuf_release__pkt_external(void)
+{
+    ng_pktsnip_t pkt = { 1, NULL, TEST_STRING8, sizeof(TEST_STRING8), NG_NETTYPE_UNDEF };
+
+    ng_pktbuf_release(&pkt);
+    TEST_ASSERT(ng_pktbuf_is_empty());
+}
+
+static void test_pktbuf_release__success(void)
+{
+    ng_pktsnip_t *pkt = ng_pktbuf_add(NULL, TEST_STRING16, sizeof(TEST_STRING16), NG_NETTYPE_UNDEF);
+
+    for (uint8_t i = 0; i < TEST_UINT8; i++) {
+        uint8_t prev_users = pkt->users;
+        ng_pktbuf_hold(pkt, 1);
+        TEST_ASSERT_EQUAL_INT(prev_users + 1, pkt->users);
+    }
+
+    TEST_ASSERT(!ng_pktbuf_is_empty());
+
+    for (uint8_t i = 0; i < TEST_UINT8; i++) {
+        uint8_t prev_users = pkt->users;
+        ng_pktbuf_release(pkt);
+        TEST_ASSERT_EQUAL_INT(prev_users - 1, pkt->users);
+    }
+
+    TEST_ASSERT(!ng_pktbuf_is_empty());
+    ng_pktbuf_release(pkt);
+    TEST_ASSERT(ng_pktbuf_is_empty());
+}
+
+static void test_pktbuf_start_write__NULL(void)
+{
+    ng_pktbuf_start_write(NULL);
+    TEST_ASSERT(ng_pktbuf_is_empty());
+}
+
+static void test_pktbuf_start_write__pkt_users_1(void)
+{
+    ng_pktsnip_t *pkt_copy, *pkt = ng_pktbuf_add(NULL, TEST_STRING16, sizeof(TEST_STRING16),
+                                   NG_NETTYPE_UNDEF);
+
+    TEST_ASSERT_NOT_NULL((pkt_copy = ng_pktbuf_start_write(pkt)));
+    TEST_ASSERT(pkt == pkt_copy);
+    ng_pktbuf_release(pkt);
+    TEST_ASSERT(ng_pktbuf_is_empty());
+}
+
+static void test_pktbuf_start_write__pkt_users_2(void)
+{
+    ng_pktsnip_t *pkt_copy, *pkt = ng_pktbuf_add(NULL, TEST_STRING16, sizeof(TEST_STRING16),
+                                   NG_NETTYPE_UNDEF);
+
+    ng_pktbuf_hold(pkt, 1);
+    TEST_ASSERT_NOT_NULL((pkt_copy = ng_pktbuf_start_write(pkt)));
+    TEST_ASSERT(pkt != pkt_copy);
+    TEST_ASSERT(pkt->next == pkt_copy->next);
+    TEST_ASSERT_EQUAL_STRING(pkt->data, pkt_copy->data);
+    TEST_ASSERT_EQUAL_INT(pkt->size, pkt_copy->size);
+    TEST_ASSERT_EQUAL_INT(pkt->type, pkt_copy->type);
+    TEST_ASSERT_EQUAL_INT(pkt->users, pkt_copy->users);
+    TEST_ASSERT_EQUAL_INT(1, pkt->users);
+
+    ng_pktbuf_release(pkt_copy);
+    ng_pktbuf_release(pkt);
+    TEST_ASSERT(ng_pktbuf_is_empty());
 }
 
 Test *tests_pktbuf_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
-        new_TestFixture(test_pktbuf_alloc_0),
-        new_TestFixture(test_pktbuf_alloc_memfull),
-        new_TestFixture(test_pktbuf_alloc_success),
-        new_TestFixture(test_pktbuf_realloc_0),
-        new_TestFixture(test_pktbuf_realloc_memfull),
-        new_TestFixture(test_pktbuf_realloc_memfull2),
-        new_TestFixture(test_pktbuf_realloc_memfull3),
-        new_TestFixture(test_pktbuf_realloc_smaller),
-        new_TestFixture(test_pktbuf_realloc_memenough),
-        new_TestFixture(test_pktbuf_realloc_memenough2),
-        new_TestFixture(test_pktbuf_realloc_nomemenough),
-        new_TestFixture(test_pktbuf_realloc_unknown_ptr),
-        new_TestFixture(test_pktbuf_insert_size_0),
-        new_TestFixture(test_pktbuf_insert_data_NULL),
-        new_TestFixture(test_pktbuf_insert_memfull),
-        new_TestFixture(test_pktbuf_insert_success),
-#ifdef DEVELHELP
-        new_TestFixture(test_pktbuf_copy_efault),
+        new_TestFixture(test_pktbuf_reset),
+        new_TestFixture(test_pktbuf_add__pkt_NULL__data_NULL__size_0),
+        new_TestFixture(test_pktbuf_add__pkt_NOT_NULL__data_NULL__size_0),
+        new_TestFixture(test_pktbuf_add__pkt_NULL__data_NOT_NULL__size_0),
+        new_TestFixture(test_pktbuf_add__pkt_NOT_NULL__data_NOT_NULL__size_0),
+        new_TestFixture(test_pktbuf_add__pkt_NULL__data_NULL__size_not_0),
+        new_TestFixture(test_pktbuf_add__pkt_NOT_NULL__data_NULL__size_not_0),
+        new_TestFixture(test_pktbuf_add__pkt_NOT_NULL__data_NOT_NULL__size_not_0),
+        new_TestFixture(test_pktbuf_add__in_place),
+#if NG_PKTBUF_SIZE > 0
+        new_TestFixture(test_pktbuf_add__memfull),
+        new_TestFixture(test_pktbuf_add__memfull2),
+        new_TestFixture(test_pktbuf_add__memfull3),
 #endif
-        new_TestFixture(test_pktbuf_copy_data_len_too_long),
-        new_TestFixture(test_pktbuf_copy_data_len_too_long2),
-        new_TestFixture(test_pktbuf_copy_data_len_0),
-        new_TestFixture(test_pktbuf_copy_success),
-        new_TestFixture(test_pktbuf_copy_success2),
-        new_TestFixture(test_pktbuf_hold_ptr_null),
-        new_TestFixture(test_pktbuf_hold_wrong_ptr),
-        new_TestFixture(test_pktbuf_hold_success),
-        new_TestFixture(test_pktbuf_hold_success2),
-        new_TestFixture(test_pktbuf_release_ptr_null),
-        new_TestFixture(test_pktbuf_release_wrong_ptr),
-        new_TestFixture(test_pktbuf_release_success),
-        new_TestFixture(test_pktbuf_release_success2),
-        new_TestFixture(test_pktbuf_release_success3),
-        new_TestFixture(test_pktbuf_release_success4),
-        new_TestFixture(test_pktbuf_insert_packed_struct),
-        new_TestFixture(test_pktbuf_alloc_off_by_one1),
+        new_TestFixture(test_pktbuf_add__success),
+        new_TestFixture(test_pktbuf_add__packed_struct),
+        new_TestFixture(test_pktbuf_realloc_data__pkt_NULL),
+        new_TestFixture(test_pktbuf_realloc_data__pkt_wrong),
+        new_TestFixture(test_pktbuf_realloc_data__pkt_data_wrong),
+        new_TestFixture(test_pktbuf_realloc_data__pkt_users_gt_1),
+        new_TestFixture(test_pktbuf_realloc_data__pkt_next_neq_NULL),
+        new_TestFixture(test_pktbuf_realloc_data__size_0),
+#if NG_PKTBUF_SIZE > 0
+        new_TestFixture(test_pktbuf_realloc_data__memfull),
+        new_TestFixture(test_pktbuf_realloc_data__memfull2),
+        new_TestFixture(test_pktbuf_realloc_data__memfull3),
+        new_TestFixture(test_pktbuf_realloc_data__nomemenough),
+        new_TestFixture(test_pktbuf_realloc_data__shrink),
+        new_TestFixture(test_pktbuf_realloc_data__memenough),
+#endif
+        new_TestFixture(test_pktbuf_realloc_data__success),
+        new_TestFixture(test_pktbuf_realloc_data__success2),
+        new_TestFixture(test_pktbuf_realloc_data__further_down_the_line),
+        new_TestFixture(test_pktbuf_hold__pkt_null),
+        new_TestFixture(test_pktbuf_hold__pkt_external),
+        new_TestFixture(test_pktbuf_hold__success),
+        new_TestFixture(test_pktbuf_hold__success2),
+        new_TestFixture(test_pktbuf_release__pkt_null),
+        new_TestFixture(test_pktbuf_release__pkt_external),
+        new_TestFixture(test_pktbuf_release__success),
+        new_TestFixture(test_pktbuf_start_write__NULL),
+        new_TestFixture(test_pktbuf_start_write__pkt_users_1),
+        new_TestFixture(test_pktbuf_start_write__pkt_users_2),
     };
 
-    EMB_UNIT_TESTCALLER(pktbuf_tests, NULL, tear_down, fixtures);
+    EMB_UNIT_TESTCALLER(ng_pktbuf_tests, NULL, tear_down, fixtures);
 
-    return (Test *)&pktbuf_tests;
+    return (Test *)&ng_pktbuf_tests;
 }
 
 void tests_pktbuf(void)

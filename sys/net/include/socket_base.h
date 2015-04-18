@@ -1,7 +1,4 @@
-/**
- * socket_base.h - Wraps all API types, constants and functions of the transport
- *             layer implementation.
- *
+/*
  * Copyright (C) 2013  INRIA.
  *
  * This file is subject to the terms and conditions of the GNU Lesser
@@ -11,10 +8,15 @@
 
 /**
  * @defgroup socket_base    Transport layer implementation
+ * 
  * @ingroup net
- * @brief   This module implements the transport layer. This includes
- *          6LoWPAN UDP header compression and (experimental) 6LoWPAN TCP header
- *          compression.
+ * @brief   This module implements basic transport layer socket functionality.
+ *          This includes 6LoWPAN UDP header compression and (experimental)
+ *          6LoWPAN TCP header compression.
+ *
+ *          It wraps all API types, constants and functions of the transport layer
+ *          implementation.
+ *
  * @see     <a href="http://tools.ietf.org/html/rfc6282#section-4.3">
  *              RFC 6282 - Compression Format for IPv6 Datagrams over
  *                  IEEE 802.15.4-Based Networks - UDP Header Compression
@@ -27,7 +29,7 @@
  * @file
  * @brief   transport_layer functions
  * @author  Oliver Gesch <oliver.gesch@googlemail.com>
- * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
+ * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 
 #ifndef SOCKET_BASE_H

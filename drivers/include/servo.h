@@ -18,8 +18,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef __SERVO_H
-#define __SERVO_H
+#ifndef SERVO_H
+#define SERVO_H
 
 #include "periph/pwm.h"
 
@@ -89,5 +89,5 @@ int servo_set(servo_t *dev, unsigned int pos);
 }
 #endif
 
-#endif /* __SERVO_H */
+#endif /* SERVO_H */
 /** @} */

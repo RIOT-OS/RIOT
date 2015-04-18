@@ -16,8 +16,8 @@
  * @author      Heiko Will <hwill@inf.fu-berlin.de>
  */
 
-#ifndef __CC1100_ARCH_H
-#define __CC1100_ARCH_H
+#ifndef CC1100_ARCH_H
+#define CC1100_ARCH_H
 
 #include <stdint.h>
 
@@ -41,4 +41,4 @@ void cc110x_after_send(void);
 #endif
 
 /** @} */
-#endif /* __CC1100_ARCH_H */
+#endif /* CC1100_ARCH_H */

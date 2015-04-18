@@ -149,7 +149,7 @@ static void pci_setup_ios(struct x86_known_pci_device *dev)
         io->bar_num = bar_num;
         ++dev->io_count;
 
-        unsigned addr_offs = tmp_bar & PCI_BAR_IO_SPACE ? PCI_BAR_ADDR_OFFS_IO : PCI_BAR_ADDR_OFFS_MEM;
+        unsigned addr_offs = (tmp_bar & PCI_BAR_IO_SPACE) ? PCI_BAR_ADDR_OFFS_IO : PCI_BAR_ADDR_OFFS_MEM;
         uint32_t length_tmp = tmp_bar >> addr_offs;
         uint32_t length = 1 << addr_offs;
         while ((length_tmp & 1) == 0) {

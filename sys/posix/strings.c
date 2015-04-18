@@ -10,7 +10,7 @@
  * @{
  * @file    strings.c
  * @brief   Providing implementation for prototypes defined in strings.h.
- * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
+ * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 #include <strings.h>
 #include <ctype.h>
@@ -18,7 +18,7 @@
 int strncasecmp(const char *s1, const char *s2, size_t n)
 {
     while (n-- && tolower((unsigned char) *s1) == tolower((unsigned char) *s2)) {
-        if (!n && !*s1) {
+        if (!n || !*s1) {
             break;
         }
 

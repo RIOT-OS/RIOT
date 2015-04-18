@@ -21,6 +21,9 @@ COLOR_RED    :=
 COLOR_PURPLE :=
 COLOR_RESET  :=
 COLOR_ECHO   := /bin/echo
+
+OS := $(shell uname)
+
 ifeq (, ${JENKINS_URL})
   ifeq (0,  $(shell tput colors 2>&1 > /dev/null; echo $$?))
     COLOR_GREEN  := \033[1;32m
@@ -88,11 +91,17 @@ ifeq (,$(UNZIP_HERE))
   endif
 endif
 
+ifneq (0,$(shell test -d $(RIOTBOARD)/$(BOARD); echo $$?))
+    $(error The specified board $(BOARD) does not exist.)
+endif
+
 # mandatory includes!
 include $(RIOTBASE)/Makefile.modules
 include $(RIOTBOARD)/$(BOARD)/Makefile.include
 include $(RIOTCPU)/$(CPU)/Makefile.include
 include $(RIOTBASE)/Makefile.dep
+
+USEMODULE += $(filter-out $(DISABLE_MODULE), $(DEFAULT_MODULE))
 
 ifeq ($(strip $(MCU)),)
 	MCU = $(CPU)
@@ -102,12 +111,12 @@ endif
 BOARDDEF := $(shell echo $(BOARD) | tr 'a-z' 'A-Z' | tr '-' '_')
 CPUDEF := $(shell echo $(CPU) | tr 'a-z' 'A-Z' | tr '-' '_')
 MCUDEF := $(shell echo $(MCU) | tr 'a-z' 'A-Z' | tr '-' '_')
-CFLAGS += -DBOARD_$(BOARDDEF)='"$(BOARD)"' -DRIOT_BOARD=BOARD_$(BOARDDEF)
-CFLAGS += -DCPU_$(CPUDEF)='"$(CPU)"' -DRIOT_CPU=CPU_$(CPUDEF)
-CFLAGS += -DMCU_$(MCUDEF)='"$(MCU)"' -DRIOT_MCU=MCU_$(MCUDEF)
+CFLAGS += -DBOARD_$(BOARDDEF)=\"$(BOARD)\" -DRIOT_BOARD=BOARD_$(BOARDDEF)
+CFLAGS += -DCPU_$(CPUDEF)=\"$(CPU)\" -DRIOT_CPU=CPU_$(CPUDEF)
+CFLAGS += -DMCU_$(MCUDEF)=\"$(MCU)\" -DRIOT_MCU=MCU_$(MCUDEF)
 
 # OSX fails to create empty archives. Provide a wrapper to catch that error.
-ifneq (0, $(shell mkdir -p $(BINDIR); $(AR) -rc $(BINDIR)empty-archive.a 2> /dev/null; echo $$?))
+ifneq (0, $(shell mkdir -p $(BINDIR); $(AR) rc $(BINDIR)empty-archive.a 2> /dev/null; echo $$?))
 	AR := $(RIOTBASE)/dist/ar-wrapper $(AR)
 endif
 
@@ -125,17 +134,17 @@ ifeq ($(origin RIOT_VERSION), undefined)
       RIOT_VERSION := $(GIT_STRING)-$(GIT_BRANCH)
     endif
   else
-    RIOT_VERSION := UNKNOWN (builddir: $(RIOTBASE))
+    RIOT_VERSION := "UNKNOWN (builddir: $(RIOTBASE))"
   endif
 endif
-export CFLAGS += -DRIOT_VERSION='"$(RIOT_VERSION)"'
+export CFLAGS += -DRIOT_VERSION=\"$(RIOT_VERSION)\"
 
 # the binaries to link
 BASELIBS += $(BINDIR)$(BOARD)_base.a
 BASELIBS += $(BINDIR)${APPLICATION}.a
 BASELIBS += $(USEPKG:%=${BINDIR}%.a)
 
-.PHONY: all clean flash term doc debug debug-server reset objdump
+.PHONY: all clean flash term doc debug debug-server reset objdump help
 
 ELFFILE ?= $(BINDIR)$(APPLICATION).elf
 HEXFILE ?= $(ELFFILE:.elf=.hex)
@@ -149,7 +158,7 @@ LINKFLAGPREFIX ?= -Wl,
 DIRS += $(EXTERNAL_MODULE_DIRS)
 
 ## make script for your application. Build RIOT-base here!
-all: ..build-message $(USEPKG:%=${BINDIR}%.a) $(APPDEPS)
+all: ..compiler-check ..build-message $(USEPKG:%=${BINDIR}%.a) $(APPDEPS)
 	$(AD)DIRS="$(DIRS)" "$(MAKE)" -C $(CURDIR) -f $(RIOTBASE)/Makefile.application
 ifeq (,$(RIOTNOLINK))
 ifeq ($(BUILDOSXNATIVE),1)
@@ -160,6 +169,12 @@ endif
 	$(AD)$(SIZE) $(ELFFILE)
 	$(AD)$(OBJCOPY) $(OFLAGS) $(ELFFILE) $(HEXFILE)
 endif
+
+..compiler-check:
+	$(AD)command -v $(CC) >/dev/null 2>&1 || \
+		{ $(COLOR_ECHO) \
+		'${COLOR_RED} Compiler $(CC) is required but not found in PATH.  Aborting.${COLOR_RESET}'; \
+		exit 1; }
 
 ..build-message:
 	@$(COLOR_ECHO) '${COLOR_GREEN}Building application "$(APPLICATION)" for "$(BOARD)" with MCU "$(MCU)".${COLOR_RESET}'
@@ -201,24 +216,48 @@ distclean:
 	-@rm -rf $(BINDIRBASE)
 
 flash: all
+	$(AD)command -v $(FLASHER) >/dev/null 2>&1 || \
+		{ $(COLOR_ECHO) \
+		'${COLOR_RED} Flash program $(FLASHER) not found. Aborting.${COLOR_RESET}'; \
+		exit 1; }
 	$(FLASHER) $(FFLAGS)
 
 term: $(filter flash, $(MAKECMDGOALS))
+	$(AD)command -v $(TERMPROG) >/dev/null 2>&1 || \
+		{ $(COLOR_ECHO) \
+		'${COLOR_RED} Terminal program $(TERMPROG) not found. Aborting.${COLOR_RESET}'; \
+		exit 1; }
 	$(TERMPROG) $(TERMFLAGS)
 
 doc:
 	make -BC $(RIOTBASE) doc
 
 debug:
+	$(AD)command -v $(DEBUGGER) >/dev/null 2>&1 || \
+		{ $(COLOR_ECHO) \
+		'${COLOR_RED} Debug program $(DEBUGGER) not found. Aborting.${COLOR_RESET}'; \
+		exit 1; }
 	$(DEBUGGER) $(DEBUGGER_FLAGS)
 
 debug-server:
+	$(AD)command -v $(DEBUGSERVER) >/dev/null 2>&1 || \
+		{ $(COLOR_ECHO) \
+		'${COLOR_RED} Debug server program $(DEBUGSERVER) not found. Aborting.${COLOR_RESET}'; \
+		exit 1; }
 	$(DEBUGSERVER) $(DEBUGSERVER_FLAGS)
 
 reset:
+	$(AD)command -v $(RESET) >/dev/null 2>&1 || \
+		{ $(COLOR_ECHO) \
+		'${COLOR_RED} Reset program $(RESET) not found. Aborting.${COLOR_RESET}'; \
+		exit 1; }
 	$(RESET) $(RESET_FLAGS)
 
 objdump:
+	$(AD)command -v $(PREFIX)objdump >/dev/null 2>&1 || \
+		{ $(COLOR_ECHO) \
+		'${COLOR_RED} Objdump program $(PREFIX)objdump not found. Aborting.${COLOR_RESET}'; \
+		exit 1; }
 	$(PREFIX)objdump -S -D -h $(ELFFILE) | less
 
 # Extra make goals for testing and comparing changes.
@@ -297,3 +336,6 @@ else # RIOT_VERSION
 	$(MAKE) RIOTBASE=$(<D) $(filter-out clean, ${MAKECMDGOALS})
 
 endif
+
+help:
+	@$(MAKE) -qp | sed -ne 's/\(^[a-z][a-z_-]*\):.*/\1/p' | sort | uniq

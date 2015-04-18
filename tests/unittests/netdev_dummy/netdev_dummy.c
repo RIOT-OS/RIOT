@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Martin Lenders <mlenders@inf.fu-berlin.de>
+ * Copyright (C) 2014 Martine Lenders <mlenders@inf.fu-berlin.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for
@@ -481,8 +481,7 @@ static int _set_option(netdev_t *dev, netdev_opt_t opt, void *value,
             if (value_len > UNITTESTS_NETDEV_DUMMY_MAX_ADDR_LEN) {
                 return -EOVERFLOW;
             }
-
-            do {
+            else {
                 int start = UNITTESTS_NETDEV_DUMMY_MAX_ADDR_LEN - value_len;
 
                 if (value_len == 0) {
@@ -495,7 +494,7 @@ static int _set_option(netdev_t *dev, netdev_opt_t opt, void *value,
 
                 memcpy(&(_NETDEV_MORE(dev)->short_address[start]), value,
                        value_len);
-            } while (0);
+            }
 
             break;
 
@@ -511,8 +510,7 @@ static int _set_option(netdev_t *dev, netdev_opt_t opt, void *value,
             if (value_len > UNITTESTS_NETDEV_DUMMY_MAX_LONG_ADDR_LEN) {
                 return -EOVERFLOW;
             }
-
-            do {
+            else {
                 int start = UNITTESTS_NETDEV_DUMMY_MAX_LONG_ADDR_LEN - value_len;
 
                 if (value_len == 0) {
@@ -525,7 +523,7 @@ static int _set_option(netdev_t *dev, netdev_opt_t opt, void *value,
 
                 memcpy(&(_NETDEV_MORE(dev)->long_address[start]), value,
                        value_len);
-            } while (0);
+            }
 
             break;
 

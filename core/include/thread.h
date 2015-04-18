@@ -19,8 +19,8 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-#ifndef __THREAD_H
-#define __THREAD_H
+#ifndef THREAD_H
+#define THREAD_H
 
 #include "kernel.h"
 #include "tcb.h"
@@ -68,6 +68,9 @@
  *  - CREATE_STACKTEST      write markers into the thread's stack to measure the stack's memory
  *                          usage (for debugging and profiling purposes)
  *
+ * @note Currently we support creating threads from within an ISR, however it is considered
+ *       to be a bad programming practice and we strongly discourage it.
+ *
  * @param[out] stack    start address of the preallocated stack memory
  * @param[in] stacksize the size of the thread's stack in bytes
  * @param[in] priority  priority of the new thread, lower mean higher priority
@@ -76,8 +79,10 @@
  * @param[in] arg       the argument to the function
  * @param[in] name      a human readable descriptor for the thread
  *
- * @return              value ``<0`` on error
- * @return              pid of newly created task, otherwise
+ * @return              PID of newly created task on success
+ * @return              -EINVAL, if @p priority is greater than or equal to
+ *                      @ref SCHED_PRIO_LEVELS
+ * @return              -EOVERFLOW, if there are too many threads running already
 */
 kernel_pid_t thread_create(char *stack,
                   int stacksize,
@@ -187,4 +192,4 @@ uintptr_t thread_measure_stack_free(char *stack);
 #endif
 
 /** @} */
-#endif /* __THREAD_H */
+#endif /* THREAD_H */

@@ -17,12 +17,11 @@
  * @author      Lotte Steenbrink <lotte.steenbrink@fu-berlin.de>
  */
 
-#include "debug.h"
-
 #include "routingtable.h"
 #include "aodv_debug.h"
 
 #define ENABLE_DEBUG (0)
+#include "debug.h"
 
 /* helper functions */
 static void _reset_entry_if_stale(uint8_t i);
@@ -121,7 +120,7 @@ void routingtable_break_and_get_all_hopping_over(struct netaddr *hop,
                 (*len)++;
                 DEBUG("\t[routing] unreachable node found: %s\n", netaddr_to_string(&nbuf, &routing_table[i].nextHopAddr));
             }
-            routing_table[i].state = ROUTE_STATE_BROKEN;
+            routing_table[i].state = ROUTE_STATE_INVALID;
             DEBUG("\t[routing] number of unreachable nodes: %i\n", *len);
         }
     }
@@ -160,30 +159,33 @@ static void _reset_entry_if_stale(uint8_t i)
         routing_table[i].lastUsed = now; /* mark the time entry was set to Idle */
     }
 
-    /* After an idle route remains Idle for MAX_IDLETIME, it becomes an Expired route.
-       A route MUST be considered Expired if Current_Time >= Route.ExpirationTime
-    */
+    /* After an Idle route remains Idle for MAX_IDLETIME, it becomes an Invalid route. */
 
     /* if the node is younger than the expiration time, don't bother */
     if (timex_cmp(now, expirationTime) < 0) {
         return;
     }
 
+    /* If Current_Time > Route.ExpirationTime, set Route.State := Invalid. */
     if ((state == ROUTE_STATE_IDLE) &&
-        (timex_cmp(expirationTime, now) < 1)) {
-        DEBUG("\t[routing] route towards %s Expired\n",
+        (timex_cmp(now, expirationTime) > 0)) {
+        DEBUG("\t[routing] route towards %s became Invalid\n",
               netaddr_to_string(&nbuf, &routing_table[i].addr));
-        DEBUG("\t expirationTime: %"PRIu32":%"PRIu32" , now: %"PRIu32":%"PRIu32"\n",
-              expirationTime.seconds, expirationTime.microseconds,
-              now.seconds, now.microseconds);
-        routing_table[i].state = ROUTE_STATE_EXPIRED;
-        routing_table[i].lastUsed = now; /* mark the time entry was set to Expired */
+        routing_table[i].state = ROUTE_STATE_INVALID;
+        routing_table[i].lastUsed = now; /* mark the time entry was set to Invalid */
+    }
+
+    /* If (Current_Time - Route.LastUsed) > (ACTIVE_INTERVAL + MAX_IDLETIME),
+     * and if (Route.Timed == FALSE), set Route.State := Invalid. */
+    if ((timex_cmp(timex_sub(now, lastUsed), timex_add(active_interval, max_idletime)) > 0) &&
+        (state != ROUTE_STATE_TIMED)) {
+        routing_table[i].state = ROUTE_STATE_INVALID;
     }
 
     /* After that time, old sequence number information is considered no longer
-     * valuable and the Expired route MUST BE expunged */
+     * valid and the Invalid route MUST BE expunged */
     if (timex_cmp(timex_sub(now, lastUsed), max_seqnum_lifetime) >= 0) {
-        DEBUG("\t[routing] reset routing table entry for %s at %i\n",
+        DEBUG("\t[routing] Expunged routing table entry for %s at %i\n",
               netaddr_to_string(&nbuf, &routing_table[i].addr), i);
         memset(&routing_table[i], 0, sizeof(routing_table[i]));
     }
@@ -192,20 +194,19 @@ static void _reset_entry_if_stale(uint8_t i)
 bool routingtable_offers_improvement(struct aodvv2_routing_entry_t *rt_entry,
                                      struct node_data *node_data)
 {
-    /* Check if new info is stale */
-    if (seqnum_cmp(node_data->seqnum, rt_entry->seqnum) == -1) {
-        return false;
+    /* (TODO only guaranteed for AODVV2_DEFAULT_METRIC_TYPE!)*/
+    bool is_loop_free = node_data->metric <= rt_entry->metric;
+    int stale = seqnum_cmp(node_data->seqnum, rt_entry->seqnum);
+
+    if ((stale == 1)                                                 /* New info is more recent and MUST be used */
+        || ((stale == 0) && (node_data->metric < rt_entry->metric))  /* New info offers a better route and SHOULD be used */
+        || ((stale == 0) && (node_data->metric >= rt_entry->metric)  /* Route is not an improvement, */
+                         && (rt_entry->state == ROUTE_STATE_INVALID) /* but repairs an invalid route */
+                         && is_loop_free)                             /* and contains no loops */
+        ) {
+        return true;
     }
-    /* Check if new info is more costly */
-    if ((node_data->metric >= rt_entry->metric)
-        && !(rt_entry->state != ROUTE_STATE_BROKEN)) {
-        return false;
-    }
-    /* Check if new info repairs a broken route */
-    if (!(rt_entry->state != ROUTE_STATE_BROKEN)) {
-        return false;
-    }
-    return true;
+    return false;
 }
 
 void routingtable_fill_routing_entry_t_rreq(struct aodvv2_packet_data *packet_data,

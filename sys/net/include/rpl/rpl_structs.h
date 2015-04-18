@@ -18,9 +18,6 @@
  * @}
  */
 
-#include <string.h>
-#include "ipv6.h"
-
 #ifndef RPL_STRUCTS_H_INCLUDED
 #define RPL_STRUCTS_H_INCLUDED
 
@@ -28,46 +25,50 @@
 extern "C" {
 #endif
 
+#include <string.h>
+#include "ipv6.h"
+#include "trickle.h"
+
 /* Modes of Operation */
 
 /* DIO Base Object (RFC 6550 Fig. 14) */
-struct __attribute__((packed)) rpl_dio_t {
+typedef struct __attribute__((packed)) {
     uint8_t rpl_instanceid;
     uint8_t version_number;
-    uint16_t rank;
+    network_uint16_t rank;
     uint8_t g_mop_prf;
     uint8_t dtsn;
     uint8_t flags;
     uint8_t reserved;
     ipv6_addr_t dodagid;
-};
+} rpl_dio_t;
 
-struct __attribute__((packed)) rpl_dis_t {
+typedef struct __attribute__((packed)) {
     uint8_t flags;
     uint8_t reserved;
-};
+} rpl_dis_t;
 
 /* DAO Base Object (RFC 6550 Fig. 16) */
-struct __attribute__((packed)) rpl_dao_t {
+typedef struct __attribute__((packed)) {
     uint8_t rpl_instanceid;
     uint8_t k_d_flags;
     uint8_t reserved;
     uint8_t dao_sequence;
-};
+} rpl_dao_t;
 
 /* DAO ACK Base Object (RFC 6550 Fig. 17.) */
-struct __attribute__((packed)) rpl_dao_ack_t {
+typedef struct __attribute__((packed)) {
     uint8_t rpl_instanceid;
     uint8_t d_reserved;
     uint8_t dao_sequence;
     uint8_t status;
-};
+} rpl_dao_ack_t;
 
 /* DODAG ID Struct */
 /* may be present in dao or dao_ack packets */
-struct __attribute__((packed)) dodag_id_t {
+typedef struct __attribute__((packed)) {
     ipv6_addr_t dodagid;
-};
+} dodag_id_t;
 
 /* RPL-Option Generic Format (RFC 6550 Fig. 19) */
 typedef struct __attribute__((packed)) {
@@ -83,12 +84,12 @@ typedef struct __attribute__((packed)) {
     uint8_t DIOIntDoubl;
     uint8_t DIOIntMin;
     uint8_t DIORedun;
-    uint16_t MaxRankIncrease;
-    uint16_t MinHopRankIncrease;
-    uint16_t ocp;
+    network_uint16_t MaxRankIncrease;
+    network_uint16_t MinHopRankIncrease;
+    network_uint16_t ocp;
     uint8_t reserved;
     uint8_t default_lifetime;
-    uint16_t lifetime_unit;
+    network_uint16_t lifetime_unit;
 } rpl_opt_dodag_conf_t;
 
 /* RPL Solicited Information Option (RFC 6550 Fig. 28) */
@@ -121,6 +122,22 @@ typedef struct __attribute__((packed)) {
     uint8_t path_lifetime;
     ipv6_addr_t parent;
 } rpl_opt_transit_t;
+
+/* RPL Prefix Information Option (RFC 6550 Fig. 29) */
+typedef struct __attribute__((packed)) {
+    uint8_t type;
+    uint8_t length;
+    uint8_t prefix_length;
+/* RFC 6550 https://tools.ietf.org/html/rfc6550#page-61 */
+#define RPL_PREFIX_INFO_ROUTER_ADDRESS      (1 << 5)
+#define RPL_PREFIX_INFO_AUTO_ADDR_CONF      (1 << 6)
+#define RPL_PREFIX_INFO_ON_LINK             (1 << 7)
+    uint8_t flags;
+    network_uint32_t valid_lifetime;
+    network_uint32_t preferred_lifetime;
+    network_uint32_t reserved2;
+    ipv6_addr_t prefix;
+} rpl_opt_prefix_information_t;
 
 struct rpl_dodag_t;
 
@@ -167,6 +184,16 @@ typedef struct rpl_dodag_t {
     uint8_t joined;
     rpl_parent_t *my_preferred_parent;
     struct rpl_of_t *of;
+    trickle_t trickle;
+    bool ack_received;
+    uint8_t dao_counter;
+    ipv6_addr_t prefix;
+    uint8_t prefix_length;
+    uint32_t prefix_valid_lifetime;
+    uint32_t prefix_preferred_lifetime;
+    uint8_t prefix_flags;
+    timex_t dao_time;
+    vtimer_t dao_timer;
 } rpl_dodag_t;
 
 typedef struct rpl_of_t {
@@ -186,6 +213,16 @@ typedef struct {
     uint16_t lifetime;
     uint8_t used;
 } rpl_routing_entry_t;
+
+/* Parameters passed to RPL on initialization */
+typedef struct {
+    uint8_t instance_id;
+    ipv6_addr_t prefix;
+    uint8_t prefix_len;
+    uint8_t prefix_flags;
+    uint32_t prefix_valid_lifetime;
+    uint32_t prefix_preferred_lifetime;
+} rpl_options_t;
 
 #ifdef __cplusplus
 }

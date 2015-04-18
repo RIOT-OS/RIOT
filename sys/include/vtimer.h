@@ -80,10 +80,8 @@ void vtimer_get_localtime(struct tm *localt);
 
 /**
  * @brief   Initializes the vtimer subsystem. To be called once at system initialization. Will be initialized by auto_init.
- *
- * @return  always 0
  */
-int vtimer_init(void);
+void vtimer_init(void);
 
 /**
  * @brief   will cause the calling thread to be suspended from excecution until the number of microseconds has elapsed
@@ -100,15 +98,14 @@ int vtimer_usleep(uint32_t us);
 int vtimer_sleep(timex_t time);
 
 /**
- * @brief   set a vtimer with msg event handler of type @ref MSG_TIMER
+ * @brief   set a vtimer with msg event handler of the specified type
  * @param[in]   t           pointer to preinitialised vtimer_t
  * @param[in]   interval    vtimer timex_t interval
  * @param[in]   pid         process id
  * @param[in]   type        value for the msg_t type
  * @param[in]   ptr         message value
- * @return      0 on success, < 0 on error
  */
-int vtimer_set_msg(vtimer_t *t, timex_t interval, kernel_pid_t pid, uint16_t type, void *ptr);
+void vtimer_set_msg(vtimer_t *t, timex_t interval, kernel_pid_t pid, uint16_t type, void *ptr);
 
 /**
  * @brief   set a vtimer with wakeup event
@@ -122,9 +119,8 @@ int vtimer_set_wakeup(vtimer_t *t, timex_t interval, kernel_pid_t pid);
 /**
  * @brief   remove a vtimer
  * @param[in]   t           pointer to preinitialised vtimer_t
- * @return      0 on success, < 0 on error
  */
-int vtimer_remove(vtimer_t *t);
+void vtimer_remove(vtimer_t *t);
 
 
 /**

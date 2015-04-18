@@ -1,0 +1,11 @@
+# include module specific includes
+export INCLUDES += -I$(RIOTCPU)/kinetis_common/include
+
+# Add search path for linker scripts
+export LINKFLAGS += -L$(RIOTCPU)/kinetis_common/ldscripts
+
+# add the CPU specific startup code for the linker
+export UNDEF += $(BINDIR)kinetis_common/startup.o
+
+# add the CPU specific fault handlers for the linker
+export UNDEF += $(BINDIR)kinetis_common/fault_handlers.o

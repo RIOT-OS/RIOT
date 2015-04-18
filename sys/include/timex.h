@@ -44,6 +44,16 @@ extern "C" {
 #define SEC_IN_USEC 1000000
 
 /**
+ * @brief The number of milliseconds per second
+ */
+#define SEC_IN_MS   (1000)
+
+/**
+ * @brief The number of microseconds per millisecond
+ */
+#define MS_IN_USEC  (1000)
+
+/**
  * @brief The maximum length of the string representation of a timex timestamp
  */
 #define TIMEX_MAX_STR_LEN   (18)
@@ -67,6 +77,7 @@ typedef struct {
  *
  * @return The sum of the two timestamps
  */
+/* cppcheck-suppress passedByValue */
 timex_t timex_add(const timex_t a, const timex_t b);
 
 /**
@@ -77,6 +88,7 @@ timex_t timex_add(const timex_t a, const timex_t b);
  *
  * @return The difference a - b
  */
+/* cppcheck-suppress passedByValue */
 timex_t timex_sub(const timex_t a, const timex_t b);
 
 /**
@@ -99,6 +111,7 @@ timex_t timex_set(uint32_t seconds, uint32_t microseconds);
  * @return 0 if equal
  * @return 1 if a is bigger
  */
+/* cppcheck-suppress passedByValue */
 int timex_cmp(const timex_t a, const timex_t b);
 
 /**
@@ -120,7 +133,7 @@ static inline void timex_normalize(timex_t *time)
  * @return true for a normalized timex_t
  * @return false otherwise
  */
-static inline int timex_isnormalized(timex_t *time)
+static inline int timex_isnormalized(const timex_t *time)
 {
     return (time->microseconds < SEC_IN_USEC);
 }
@@ -132,6 +145,7 @@ static inline int timex_isnormalized(timex_t *time)
  *
  * @return timex representation as uint64_t
  */
+/* cppcheck-suppress passedByValue */
 static inline uint64_t timex_uint64(const timex_t a)
 {
     return (uint64_t) a.seconds * SEC_IN_USEC + a.microseconds;

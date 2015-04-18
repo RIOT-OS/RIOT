@@ -15,10 +15,10 @@
  *
  * @author      Philipp Rosenkranz <philipp.rosenkranz@fu-berlin.de>
  */
-#ifndef __TESTS_CRYPTO_H_
-#define __TESTS_CRYPTO_H_
+#ifndef TESTS_CRYPTO_H_
+#define TESTS_CRYPTO_H_
 
-#include "../unittests.h"
+#include "embUnit.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -40,5 +40,5 @@ Test *tests_crypto_sha256_tests(void);
 }
 #endif
 
-#endif /* __TESTS_CRYPTO_H_ */
+#endif /* TESTS_CRYPTO_H_ */
 /** @} */

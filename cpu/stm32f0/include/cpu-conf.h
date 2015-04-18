@@ -24,6 +24,9 @@
 #ifdef CPU_MODEL_STM32F051R8
 #include "stm32f051x8.h"
 #endif
+#ifdef CPU_MODEL_STM32F091RC
+#include "stm32f091xc.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -57,6 +60,20 @@ extern "C" {
 #define UART0_BUFSIZE                   (128)
 #endif
 /** @} */
+
+/**
+ * @brief Length for reading CPU_ID
+ */
+#define CPUID_ID_LEN                    (12)
+
+/**
+ * @brief Definition of different panic modes
+ */
+typedef enum {
+    HARD_FAULT,             /**< hard fault */
+    NMI_HANDLER,            /**< non maskable interrupt */
+    DUMMY_HANDLER           /**< dummy interrupt handler */
+} panic_t;
 
 #ifdef __cplusplus
 }

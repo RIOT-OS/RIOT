@@ -15,6 +15,7 @@
  *
  * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
  * @author      Fabian Nack <nack@inf.fu-berlin.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
  * @}
  */
@@ -22,6 +23,7 @@
 
 #include "board.h"
 #include "cpu.h"
+#include "mutex.h"
 #include "periph/spi.h"
 #include "periph_conf.h"
 #include "thread.h"
@@ -34,13 +36,47 @@
 /* guard this file in case no SPI device is defined */
 #if SPI_NUMOF
 
+/**
+ * @brief Data-structure holding the state for a SPI device
+ */
 typedef struct {
     char(*cb)(char data);
 } spi_state_t;
 
 static inline void irq_handler_transfer(SPI_TypeDef *spi, spi_t dev);
 
+/**
+ * @brief Reserve memory for saving the SPI device's state
+ */
 static spi_state_t spi_config[SPI_NUMOF];
+
+/* static bus div mapping */
+static const uint8_t spi_bus_div_map[SPI_NUMOF] = {
+#if SPI_0_EN
+    [SPI_0] = SPI_0_BUS_DIV,
+#endif
+#if SPI_1_EN
+    [SPI_1] = SPI_1_BUS_DIV,
+#endif
+#if SPI_2_EN
+    [SPI_2] = SPI_2_BUS_DIV,
+#endif
+};
+
+/**
+ * @brief Array holding one pre-initialized mutex for each SPI device
+ */
+static mutex_t locks[] =  {
+#if SPI_0_EN
+    [SPI_0] = MUTEX_INIT,
+#endif
+#if SPI_1_EN
+    [SPI_1] = MUTEX_INIT,
+#endif
+#if SPI_2_EN
+    [SPI_2] = MUTEX_INIT
+#endif
+};
 
 int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
 {
@@ -49,19 +85,19 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
 
     switch (speed) {
         case SPI_SPEED_100KHZ:
-            return -2;          /* not possible for stm32f4 */
+            return -2;          /* not possible for stm32f4, APB2 minimum is 328 kHz */
             break;
         case SPI_SPEED_400KHZ:
-            speed_devider = 7;  /* makes 656 kHz */
+            speed_devider = 0x05 + spi_bus_div_map[dev];  /* makes 656 kHz */
             break;
         case SPI_SPEED_1MHZ:
-            speed_devider = 6;  /* makes 1.3 MHz */
+            speed_devider = 0x04 + spi_bus_div_map[dev];  /* makes 1.3 MHz */
             break;
         case SPI_SPEED_5MHZ:
-            speed_devider = 4;  /* makes 5.3 MHz */
+            speed_devider = 0x02 + spi_bus_div_map[dev];  /* makes 5.3 MHz */
             break;
         case SPI_SPEED_10MHZ:
-            speed_devider = 3;  /* makes 10.5 MHz */
+            speed_devider = 0x01 + spi_bus_div_map[dev];  /* makes 10.5 MHz */
             break;
         default:
             return -1;
@@ -254,6 +290,24 @@ int spi_conf_pins(spi_t dev)
         port[i]->AFR[hl] |= (af[i] << ((pin[i] - (hl * 8)) * 4));
     }
 
+    return 0;
+}
+
+int spi_acquire(spi_t dev)
+{
+    if (dev >= SPI_NUMOF) {
+        return -1;
+    }
+    mutex_lock(&locks[dev]);
+    return 0;
+}
+
+int spi_release(spi_t dev)
+{
+    if (dev >= SPI_NUMOF) {
+        return -1;
+    }
+    mutex_unlock(&locks[dev]);
     return 0;
 }
 

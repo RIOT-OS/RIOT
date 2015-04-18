@@ -10,7 +10,7 @@
 #define BOARD_CONF_H
 
 /**
- * @ingroup     board_z1
+ * @ingroup     boards_z1
  *
  * @{
  */

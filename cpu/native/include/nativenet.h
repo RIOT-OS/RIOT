@@ -8,7 +8,7 @@
  * The effect of calls like nativenet_set_channel depend on the
  * network layer.
  *
- * Copyright (C) 2013 Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ * Copyright (C) 2013, 2014 Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -31,8 +31,12 @@
 #include "kernel_types.h"
 #include "netdev/base.h"
 
+#ifndef RX_BUF_SIZE
 #define RX_BUF_SIZE (10)
-#define TRANSCEIVER_BUFFER_SIZE (3)
+#endif
+#ifndef TRANSCEIVER_BUFFER_SIZE
+#define TRANSCEIVER_BUFFER_SIZE (10)
+#endif
 
 /**
  * @brief   Number of registrable netdev_rcv_data_cb_t callbacks per nativenet
