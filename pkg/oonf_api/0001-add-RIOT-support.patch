@@ -84,7 +84,7 @@ index 77c519b..e09c0c9 100644
  #include <winsock2.h>
  #endif
 
-+#ifdef RIOT
++#ifdef RIOT_VERSION
 +int getpagesize(void) {
 +	return 512;
 +}
@@ -101,7 +101,7 @@ index c90cf46..54ce281 100644
    #define PRINTF_SIZE_T_HEX_SPECIFIER "Ix"
    #define PRINTF_SSIZE_T_SPECIFIER    "Id"
    #define PRINTF_PTRDIFF_T_SPECIFIER  "Id"
-+#elif defined(RIOT)
++#elif defined(RIOT_VERSION)
 +  #define PRINTF_SIZE_T_SPECIFIER      "d"
 +  #define PRINTF_SIZE_T_HEX_SPECIFIER  "x"
 +  #define PRINTF_SSIZE_T_SPECIFIER     "d"
@@ -118,7 +118,7 @@ index 103c88f..6ea603d 100644
  #include "common/daemonize.h"
 
 -#ifndef WIN32
-+#if (!defined(_WIN32)) && (!defined(RIOT))
++#if (!defined(_WIN32)) && (!defined(RIOT_VERSION))
  /**
   * Prepare the start of a daemon. Fork into background,
   * but keep stdin/out/err open and a pipe connected to
@@ -130,7 +130,7 @@ index dedab2c..fdc3e82 100644
  #include <stdio.h>
  #include <stdlib.h>
  #include <string.h>
-+#ifndef RIOT
++#ifndef RIOT_VERSION
  #include <net/if.h>
 +#else
 +#include "net_help.h"
@@ -343,7 +343,7 @@ index 78fd5b4..cfba7a9 100644
 
 
 -#ifndef _WIN32
-+#if (!defined(_WIN32)) && (!defined(RIOT))
++#if (!defined(_WIN32)) && (!defined(RIOT_VERSION))
  #include <arpa/inet.h>
  #include <netinet/if_ether.h>
  #include <netinet/ip.h>
@@ -358,7 +358,7 @@ index 78fd5b4..cfba7a9 100644
  #define IF_NAMESIZE 16
  #endif
 
-+#ifdef RIOT
++#ifdef RIOT_VERSION
 +#include "socket_base/socket.h"
 +#define INET_ADDRSTRLEN		(16)
 +#define INET6_ADDRSTRLEN	(48)
@@ -465,7 +465,7 @@ index 4b3e04d..6b52f72 100644
  #include <assert.h>
  #include <stdio.h>
  #include <stdlib.h>
-+#ifdef RIOT
++#ifdef RIOT_VERSION
 +#include "socket_base/socket.h"
 +#include "inet_ntop.h"
 +#else
