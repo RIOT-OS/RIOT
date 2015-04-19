@@ -100,7 +100,7 @@ static void _dump_snip(ng_pktsnip_t *pkt)
 #endif
 #ifdef MODULE_NG_SIXLOWPAN
         case NG_NETTYPE_SIXLOWPAN:
-            printf("NETTYPE_SIXLOWPAN (%i)", pkt->type);
+            printf("NETTYPE_SIXLOWPAN (%i)\n", pkt->type);
             break;
 #endif
 #ifdef MODULE_NG_IPV6
@@ -111,27 +111,27 @@ static void _dump_snip(ng_pktsnip_t *pkt)
 #endif
 #ifdef MODULE_NG_ICMPV6
         case NG_NETTYPE_ICMPV6:
-            printf("NETTYPE_ICMPV6 (%i)", pkt->type);
+            printf("NETTYPE_ICMPV6 (%i)\n", pkt->type);
             break;
 #endif
 #ifdef MODULE_NG_TCP
         case NG_NETTYPE_TCP:
-            printf("NETTYPE_TCP (%i)", pkt->type);
+            printf("NETTYPE_TCP (%i)\n", pkt->type);
             break;
 #endif
 #ifdef MODULE_NG_UDP
         case NG_NETTYPE_UDP:
-            printf("NETTYPE_UDP (%i)", pkt->type);
+            printf("NETTYPE_UDP (%i)\n", pkt->type);
             break;
 #endif
 #ifdef TEST_SUITES
         case NG_NETTYPE_TEST:
-            printf("NETTYPE_TEST (%i)", pkt->type);
+            printf("NETTYPE_TEST (%i)\n", pkt->type);
             od_hex_dump(pkt->data, pkt->size, OD_WIDTH_DEFAULT);
             break;
 #endif
         default:
-            printf("NETTYPE_UNKNOWN (%i)", pkt->type);
+            printf("NETTYPE_UNKNOWN (%i)\n", pkt->type);
             od_hex_dump(pkt->data, pkt->size, OD_WIDTH_DEFAULT);
             break;
     }
