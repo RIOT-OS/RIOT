@@ -26,6 +26,9 @@
 extern "C" {
 #endif
 
+/**
+ * @brief Print information to all active threads to stdout.
+ */
 void ps(void);
 int _ps_handler(int argc, char **argv);
 
