@@ -19,6 +19,11 @@
 extern "C" {
 #endif
 
+/**
+ * @brief Broadcast address
+ */
+#define MC1322X_BROADCAST_ADDRESS (0xFFFF)
+
 /*********************************************************/
 /* function definitions                                  */
 /*********************************************************/

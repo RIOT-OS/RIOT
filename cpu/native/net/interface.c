@@ -201,7 +201,7 @@ void _nativenet_handle_packet(radio_packet_t *packet)
         if (dst_addr == _nativenet_default_dev_more._radio_addr) {
             DEBUG("_nativenet_handle_packet: accept packet, addressed to us\n");
         }
-        else if (dst_addr == 0) {
+        else if (dst_addr == NATIVE_BROADCAST_ADDRESS) {
             DEBUG("_nativenet_handle_packet: accept packet, broadcast\n");
         }
         else {

@@ -44,6 +44,11 @@
  */
 #define NATIVENET_DEV_CB_MAX  (128)
 
+/**
+ * @brief Broadcast address
+ */
+#define NATIVE_BROADCAST_ADDRESS (0)
+
 #ifndef NATIVE_MAX_DATA_LENGTH
 #include "tap.h"
 
