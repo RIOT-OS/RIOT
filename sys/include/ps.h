@@ -17,6 +17,7 @@
  * @brief       List information about all active threads
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      Oliver Hahm <oliver.hahm@inria.fr>
  */
 
 #ifndef __PS_H
