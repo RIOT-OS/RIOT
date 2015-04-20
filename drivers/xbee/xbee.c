@@ -558,7 +558,7 @@ static int _send(ng_netdev_t *netdev, ng_pktsnip_t *pkt)
         dev->tx_buf[1] = (uint8_t)((size + 11) >> 8);
         dev->tx_buf[2] = (uint8_t)(size + 11);
         dev->tx_buf[3] = API_ID_TX_LONG_ADDR;
-        memcpy(dev->tx_buf + 11, ng_netif_hdr_get_dst_addr(hdr), 8);
+        memcpy(dev->tx_buf + 5, ng_netif_hdr_get_dst_addr(hdr), 8);
         pos = 13;
     }
     /* set options */
@@ -696,7 +696,7 @@ static void _isr_event(ng_netdev_t *netdev, uint32_t event_type)
     /* allocate and fill interface header */
     pkt_head = ng_pktbuf_add(NULL, NULL,
                              sizeof(ng_netif_hdr_t) + (2 * addr_len),
-                             NG_NETTYPE_UNDEF);
+                             NG_NETTYPE_NETIF);
     if (pkt_head == NULL) {
         DEBUG("xbee: Error allocating netif header in packet buffer on RX\n");
         dev->rx_count = 0;
