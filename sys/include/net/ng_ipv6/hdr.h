@@ -316,6 +316,13 @@ ng_pktsnip_t *ng_ipv6_hdr_build(ng_pktsnip_t *payload,
                                 uint8_t *src, uint8_t src_len,
                                 uint8_t *dst, uint8_t dst_len);
 
+/**
+ * @brief   Outputs an IPv6 header to stdout.
+ *
+ * @param[in] hdr   An IPv6 header.
+ */
+void ng_ipv6_hdr_print(ng_ipv6_hdr_t *hdr);
+
 #ifdef __cplusplus
 }
 #endif

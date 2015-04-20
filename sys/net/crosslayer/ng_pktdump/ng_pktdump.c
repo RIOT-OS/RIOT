@@ -62,29 +62,6 @@ static void _dump_netif_hdr(ng_netif_hdr_t *hdr)
 }
 #endif
 
-#ifdef MODULE_NG_IPV6
-static void _dump_ipv6_hdr(ng_ipv6_hdr_t *hdr)
-{
-    char addr_str[NG_IPV6_ADDR_MAX_STR_LEN];
-
-    if (!ng_ipv6_hdr_is(hdr)) {
-        printf("illegal version field: %" PRIu8 "\n", ng_ipv6_hdr_get_version(hdr));
-    }
-
-    printf("traffic class: 0x%02" PRIx8 " (ECN: 0x%" PRIx8 ", DSCP: 0x%02" PRIx8 ")\n",
-           ng_ipv6_hdr_get_tc(hdr), ng_ipv6_hdr_get_tc_ecn(hdr),
-           ng_ipv6_hdr_get_tc_dscp(hdr));
-    printf("flow label: 0x%05" PRIx32 "\n", ng_ipv6_hdr_get_fl(hdr));
-    printf("length: %" PRIu16 "  next header: %" PRIu8 "  hop limit: %" PRIu8 "\n",
-           byteorder_ntohs(hdr->len), hdr->nh, hdr->hl);
-    printf("source address: %s\n", ng_ipv6_addr_to_str(addr_str, &hdr->src,
-            sizeof(addr_str)));
-    printf("destination address: %s\n", ng_ipv6_addr_to_str(addr_str, &hdr->dst,
-            sizeof(addr_str)));
-
-}
-#endif
-
 static void _dump_snip(ng_pktsnip_t *pkt)
 {
     switch (pkt->type) {
@@ -106,7 +83,7 @@ static void _dump_snip(ng_pktsnip_t *pkt)
 #ifdef MODULE_NG_IPV6
         case NG_NETTYPE_IPV6:
             printf("NETTYPE_IPV6 (%i)\n", pkt->type);
-            _dump_ipv6_hdr(pkt->data);
+            ng_ipv6_hdr_print(pkt->data);
             break;
 #endif
 #ifdef MODULE_NG_ICMPV6
