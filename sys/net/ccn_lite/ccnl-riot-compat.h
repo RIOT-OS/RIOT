@@ -24,7 +24,7 @@ extern "C" {
 
 #define RIOT_CCN_EVENT_NUMBER_OFFSET (1 << 8)
 
-#define RIOT_BROADCAST (UINT16_MAX)
+#define RIOT_BROADCAST TRANSCEIVER_BROADCAST
 
 typedef struct riot_ccnl_msg {
     void *payload;

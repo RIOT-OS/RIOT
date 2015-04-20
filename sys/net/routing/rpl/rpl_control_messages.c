@@ -339,6 +339,9 @@ void rpl_send_DAO(rpl_dodag_t *my_dodag, ipv6_addr_t *destination, uint8_t lifet
     if (destination) {
         DEBUGF("Send DAO to %s\n", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, destination));
     }
+    else {
+        DEBUGF("Send DAO to default destination\n");
+    }
 
 #endif
 
