@@ -11,16 +11,15 @@
 
 static void test_hash_value(void)
 {
-    TEST_ASSERT_EQUAL_INT(177621, hash_string("0"));
-    TEST_ASSERT_EQUAL_INT(6555485335635392041, hash_string("0123456789abcde-"
-                                                           "0123456789abcde-0123"
-                                                           "456789abcde-01234567"
-                                                           "89abcde-"));
-    TEST_ASSERT_EQUAL_INT(210674770391, hash_string("Frank jagt im komplett"
-                                                    " verwahrlosten Taxi q"
-                                                    "uer durch Bayern"));
-    TEST_ASSERT_EQUAL_INT(249811328611268156, hash_string("12A5B6cd_"));
-    TEST_ASSERT_EQUAL_INT(5381, hash_string(""));
+    TEST_ASSERT_EQUAL_INT(177621, hash_string((unsigned char *)"0"));
+    TEST_ASSERT_EQUAL_INT(685012521, hash_string((unsigned char *)"0123456789ab"
+                                                "cde-0123456789abcde-0123456789"
+                                                "abcde-0123456789abcde-"));
+    TEST_ASSERT_EQUAL_INT(900068641, hash_string((unsigned char *)"Frank jagt "
+                                                "im komplett verwahrlosten Taxi"
+                                                " quer durch Bayern"));
+    TEST_ASSERT_EQUAL_INT(1857959484, hash_string((unsigned char *)"12A5B6cd_"));
+    TEST_ASSERT_EQUAL_INT(5381, hash_string((unsigned char *)""));
 }
 
 Test *tests_hash_string_tests(void)
