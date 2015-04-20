@@ -41,27 +41,6 @@ static kernel_pid_t _pid = KERNEL_PID_UNDEF;
  */
 static char _stack[NG_PKTDUMP_STACKSIZE];
 
-#define ADDR_STR_MAX    (24)
-
-#ifdef MODULE_NG_NETIF
-static void _dump_netif_hdr(ng_netif_hdr_t *hdr)
-{
-    char addr_str[ADDR_STR_MAX];
-
-    printf("if_pid: %" PRIkernel_pid "  ", hdr->if_pid);
-    printf("rssi: %" PRIu8 "  ", hdr->rssi);
-    printf("lqi: %" PRIu8 "\n", hdr->lqi);
-    printf("src_l2addr: %s\n",
-           ng_netif_addr_to_str(addr_str, sizeof(addr_str),
-                                ng_netif_hdr_get_src_addr(hdr),
-                                (size_t)hdr->src_l2addr_len));
-    printf("dst_l2addr: %s\n",
-           ng_netif_addr_to_str(addr_str, sizeof(addr_str),
-                                ng_netif_hdr_get_dst_addr(hdr),
-                                (size_t)hdr->dst_l2addr_len));
-}
-#endif
-
 static void _dump_snip(ng_pktsnip_t *pkt)
 {
     switch (pkt->type) {
@@ -72,7 +51,7 @@ static void _dump_snip(ng_pktsnip_t *pkt)
 #ifdef MODULE_NG_NETIF
         case NG_NETTYPE_NETIF:
             printf("NETTYPE_NETIF (%i)\n", pkt->type);
-            _dump_netif_hdr(pkt->data);
+            ng_netif_hdr_print(pkt->data);
             break;
 #endif
 #ifdef MODULE_NG_SIXLOWPAN

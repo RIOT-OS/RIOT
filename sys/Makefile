@@ -86,6 +86,9 @@ endif
 ifneq (,$(filter ng_netif,$(USEMODULE)))
     DIRS += net/crosslayer/ng_netif
 endif
+ifneq (,$(filter ng_netif_hdr,$(USEMODULE)))
+    DIRS += net/crosslayer/ng_netif/hdr
+endif
 ifneq (,$(filter ng_netreg,$(USEMODULE)))
     DIRS += net/crosslayer/ng_netreg
 endif
