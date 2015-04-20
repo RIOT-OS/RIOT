@@ -100,7 +100,8 @@ static void _dump(ng_pktsnip_t *pkt)
     ng_pktsnip_t *snip = pkt;
 
     while (snip != NULL) {
-        printf("~~ SNIP %2i - size: %3i byte, type: ", snips, snip->size);
+        printf("~~ SNIP %2i - size: %3u byte, type: ", snips,
+               (unsigned int)snip->size);
         _dump_snip(snip);
         ++snips;
         size += snip->size;
