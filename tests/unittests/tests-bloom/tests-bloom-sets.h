@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef TESTS_BLOOM_SETS_H_
+#define TESTS_BLOOM_SETS_H_
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -1030,3 +1033,4 @@ const char* const B[10] = {"interbedded"
 }
 #endif
 
+#endif /* TESTS_BLOOM_SETS_H_ */

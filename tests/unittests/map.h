@@ -26,8 +26,8 @@
  * prior written authorization from the authors.
  */
 
-#ifndef MAP_H_INCLUDED
-#define MAP_H_INCLUDED
+#ifndef UNITTESTS_MAP_H_
+#define UNITTESTS_MAP_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -56,4 +56,4 @@ extern "C" {
 }
 #endif
 
-#endif
+#endif /* UNITTESTS_MAP_H_ */
