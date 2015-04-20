@@ -74,7 +74,7 @@ void ng_ipv6_addr_init_prefix(ng_ipv6_addr_t *out, const ng_ipv6_addr_t *prefix,
         uint8_t mask = 0xff << (8 - (bits - (bytes * 8)));
 
         out->u8[bytes] &= ~mask;
-        out->u8[bytes] |= prefix->u8[bytes];
+        out->u8[bytes] |= (prefix->u8[bytes] & mask);
     }
 }
 
