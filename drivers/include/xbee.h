@@ -67,12 +67,12 @@
 /**
  * @brief   Default PAN ID used after initialization
  */
-#define XBEE_DEFAULT_PANID          (0x0001)
+#define XBEE_DEFAULT_PANID          (0x0023)
 
 /**
  * @brief   Default channel used after initialization
  */
-#define XBEE_DEFAULT_CHANNEL        (11U)
+#define XBEE_DEFAULT_CHANNEL        (17U)
 
 /**
  * @brief   States of the internal FSM for handling incoming UART frames
