@@ -753,7 +753,8 @@ WARN_LOGFILE           =
 # spaces.
 # Note: If this tag is empty the current directory is searched.
 
-INPUT                  = ../../core \
+INPUT                  = ../../doc.txt \
+                         ../../core \
                          ../../cpu \
                          ../../boards \
                          ../../drivers \
