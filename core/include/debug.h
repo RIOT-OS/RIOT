@@ -13,9 +13,16 @@
  * @file        debug.h
  * @brief       Debug-header
  *
- * @details     If ENABLE_DEBUG is set, before this header is included,
- *              ::DEBUG will print out to stdout, otherwise do nothing
+ * @details     If *ENABLE_DEBUG* is defined inside an implementation file, all
+ *              calls to ::DEBUG and ::DEBUGF* will work the same as *printf*
+ *              and output the given information to stdout. If *ENABLE_DEBUG*
+ *              is not defined, all calls to ::DEBUG and ::DEBUGF will be
+ *              ignored.
  *
+ *              In addition to just printing the given information ::DEBUGF
+ *              will further print extended debug information about the current
+ *              thread and function.
+     *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
@@ -37,14 +44,14 @@ extern "C" {
  */
 
 /**
- * @name Print debug information if the calling thread stack is large enough
+ * @def DEBUG_PRINT
+ *
+ * @brief Print debug information if the calling thread stack is large enough
  *
  * Use this macro the same as `printf`. When `DEVELHELP` is defined inside an
- * implementation file, all usages of `DEBUG_PRINT` will print the given
- * information to std-out after verifying the stack is big enough. If `DEVELHELP`
+ * implementation file, all usages of ::DEBUG_PRINT will print the given
+ * information to stdout after verifying the stack is big enough. If `DEVELHELP`
  * is not set, this check is not performed. (CPU exception may occur)
- *
- * @{
  */
 #if DEVELHELP
 #include "cpu-conf.h"
@@ -60,18 +67,8 @@ extern "C" {
 #else
 #define DEBUG_PRINT(...) printf(__VA_ARGS__)
 #endif
-/** @} */
 
 /**
- * @brief Print debug information to std-out
- *
- * If *ENABLE_DEBUG* is defined inside an implementation file, all calls to
- * *DEBUG* and *DEBUGF* will work the same as *printf* and output the given
- * information to stdout. If *ENABLE_DEBUG* is not defined, all calls to
- * *DEBUG* and *DEBUGF* will be ignored.
- *
- * In addition to just printing the given information *DEBUGF* will further
- * print extended debug information about the current thread and function.
  *
  * @{
  */
@@ -94,7 +91,20 @@ extern "C" {
 #  define DEBUG_FUNC ""
 # endif
 
+/**
+ * @def DEBUG
+ *
+ * @brief Print debug information to stdout
+ *
+ * @note Another name for ::DEBUG_PRINT
+ */
 #define DEBUG(...) DEBUG_PRINT(__VA_ARGS__)
+/**
+ * @def DEBUGF
+ *
+ * @brief Print extended debug information about the current thread and
+ *        function to stdout
+ */
 #define DEBUGF(...) \
     do { \
         DEBUG_PRINT("DEBUG(%s): %s:%d in %s: ", \

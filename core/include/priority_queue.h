@@ -110,7 +110,18 @@ void priority_queue_add(priority_queue_t *root, priority_queue_node_t *new_obj);
 void priority_queue_remove(priority_queue_t *root, priority_queue_node_t *node);
 
 #if ENABLE_DEBUG
+/**
+ * @brief print the data and priority of every node in the given priority queue
+ *
+ * @note requires ::ENABLE_DEBUG to be set to 1 for this file
+ */
 void priority_queue_print(priority_queue_t *root);
+
+/**
+ * @brief print the data, priority, and successor of a given node
+ *
+ * @note requires ::ENABLE_DEBUG to be set to 1 for this file
+ */
 void priority_queue_print_node(priority_queue_t *root);
 #endif
 
