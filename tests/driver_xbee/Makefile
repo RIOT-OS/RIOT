@@ -20,6 +20,7 @@ USEMODULE += xbee
 USEMODULE += ng_netbase
 USEMODULE += ng_nomac
 USEMODULE += ng_pktdump
+USEMODULE += uart0
 USEMODULE += shell
 USEMODULE += shell_commands
 

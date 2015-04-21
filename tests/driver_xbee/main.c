@@ -22,6 +22,8 @@
 
 #include "board.h"
 #include "kernel.h"
+#include "posix_io.h"
+#include "board_uart0.h"
 #include "shell.h"
 #include "shell_commands.h"
 #include "xbee.h"
@@ -60,7 +62,9 @@ static char nomac_stack[KERNEL_CONF_STACKSIZE_DEFAULT];
  */
 int shell_read(void)
 {
-    return (int)getchar();
+    char c = 0;
+    posix_read(uart0_handler_pid, &c, 1);
+    return c;
 }
 
 /**
@@ -111,6 +115,7 @@ int main(void)
     }
 
     /* start the shell */
+    posix_open(uart0_handler_pid, 0);
     shell_init(&shell, NULL, SHELL_BUFSIZE, shell_read, shell_put);
     shell_run(&shell);
 
