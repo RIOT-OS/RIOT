@@ -75,6 +75,9 @@ typedef enum {
                                      *   as type ng_nettype_t. */
     NETCONF_OPT_STATE,              /**< get/set the state of network devices as
                                      *   type ng_netconf_state_t */
+    NETCONF_OPT_RAWMODE,            /**< en/disable the pre-processing of data
+                                         in a network device driver as type
+                                         ng_nettype_t */
     /* add more options if needed */
 } ng_netconf_opt_t;
 
