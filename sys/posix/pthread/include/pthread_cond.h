@@ -24,6 +24,10 @@
 #   include "msp430_types.h"
 #endif
 
+#if defined(__MACH__)
+typedef int clockid_t;
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
