@@ -525,34 +525,14 @@ void rpl_recv_DIO(void)
     int len = DIO_BASE_LEN;
 
     rpl_instance_t *dio_inst = rpl_get_instance(rpl_dio_buf->rpl_instanceid);
-    rpl_instance_t *my_inst = rpl_get_my_instance();
 
     if (dio_inst == NULL) {
-        if (my_inst != NULL) {
-            /* already part of a DODAG -> impossible to join other instance */
-            DEBUGF("Not joining another DODAG!\n");
-            return;
-        }
-
         dio_inst = rpl_new_instance(rpl_dio_buf->rpl_instanceid);
 
         if (dio_inst == NULL) {
             DEBUGF("Failed to create a new RPL instance!\n");
             return;
         }
-    }
-    else if (my_inst == NULL) {
-        DEBUGF("Not joined an instance yet\n");
-    }
-    else if (my_inst->id != dio_inst->id) {
-        /* TODO: Add support support for several instances.  */
-
-        /* At the moment, nodes can only join one instance, this is
-        * the instance they join first.
-        * Instances cannot be switched later on.  */
-
-        DEBUGF("Ignoring instance - we are %d and got %d\n", my_inst->id, dio_inst->id);
-        return;
     }
 
     rpl_dodag_t dio_dodag;
