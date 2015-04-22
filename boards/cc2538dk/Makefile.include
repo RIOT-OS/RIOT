@@ -1,21 +1,12 @@
 # Define the cpu used by the CC2538DK board:
 export CPU        = cc2538
-
 export CPU_MODEL ?= cc2538nf53
 
-# Define tools used for building the project:
-export PREFIX ?= arm-none-eabi-
+# setup serial terminal
+export PORT      ?= /dev/ttyUSB1
+include $(RIOTBOARD)/Makefile.include.serial
 
-export CC      = $(PREFIX)gcc
-export CXX     = $(PREFIX)g++
-export AR      = $(PREFIX)ar
-export AS      = $(PREFIX)as
-export LINK    = $(PREFIX)gcc
-export SIZE    = $(PREFIX)size
-export OBJCOPY = $(PREFIX)objcopy
-export OBJDUMP = $(PREFIX)objdump
-
-export TERMPROG  ?= $(RIOTBASE)/dist/tools/pyterm/pyterm
+# debugger config
 export DEBUGGER = $(RIOTBOARD)/$(BOARD)/dist/debug.sh
 export DEBUGSERVER = JLinkGDBServer -device CC2538SF53
 export RESET = $(RIOTBOARD)/$(BOARD)/dist/reset.sh
@@ -31,30 +22,13 @@ else ifeq ($(PROGRAMMER),jlink)
   export FFLAGS  = $(BINDIR) $(HEXFILE)
 endif
 
-export PORT      ?= /dev/ttyUSB1
-
-# Define build specific options:
-export CPU_USAGE  = -mcpu=cortex-m3
-
-export ASFLAGS   += -ggdb -g3 $(CPU_USAGE) $(FPU_USAGE) -mlittle-endian
-export CFLAGS    += $(ASFLAGS) -std=gnu99 -mthumb -mno-thumb-interwork -nostartfiles -Os -Wall -Wstrict-prototypes -ffunction-sections -fdata-sections -fno-builtin
-export LINKFLAGS += $(CFLAGS) -static -lgcc -T$(LINKERSCRIPT) -L$(RIOTCPU)/$(CPU)
-export OFLAGS    += -O binary --gap-fill 0xff
+export LINKFLAGS += -L$(RIOTCPU)/$(CPU)
+export OFLAGS    = -O binary --gap-fill 0xff
 export HEXFILE = $(ELFFILE:.elf=.bin)
-export TERMFLAGS += -p "$(PORT)"
 export DEBUGGER_FLAGS = $(BINDIR) $(ELFFILE)
 export RESET_FLAGS = $(BINDIR)
 
 export OBJDUMPFLAGS += --disassemble --source --disassembler-options=force-thumb
 
-# unwanted (CXXUWFLAGS) and extra (CXXEXFLAGS) flags for c++
-export CXXUWFLAGS +=
-export CXXEXFLAGS +=
-
-# Use the nano-specs of the NewLib when available:
-ifeq ($(shell $(LINK) -specs=nano.specs -E - 2>/dev/null >/dev/null </dev/null ; echo $$?),0)
-    export LINKFLAGS += -specs=nano.specs -lc -lnosys
-endif
-
-# Export board specific includes to the global includes-listing:
-export INCLUDES  += -I$(RIOTBOARD)/$(BOARD)/include
+# include cortex defaults
+include $(RIOTBOARD)/Makefile.include.cortex_common
