@@ -1,5 +1,4 @@
-# this CPU implementation is using the new core/CPU interface
-export CFLAGS += -DCOREIF_NG=1
+export CORTEX = cortex-m0
 
 # this CPU implementation doesn't use CMSIS initialisation
 export CFLAGS += -DDONT_USE_CMSIS_INIT
