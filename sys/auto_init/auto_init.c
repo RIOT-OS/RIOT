@@ -82,6 +82,10 @@
 #include "periph/cpuid.h"
 #endif
 
+#ifdef MODULE_NG_IPV6
+#include "net/ng_ipv6.h"
+#endif
+
 #ifdef MODULE_L2_PING
 #include "l2_ping.h"
 #endif
@@ -279,5 +283,9 @@ void auto_init(void)
 #ifdef MODULE_NG_PKTDUMP
     DEBUG("Auto init ng_pktdump module.\n");
     ng_pktdump_init();
+#endif
+#ifdef MODULE_NG_IPV6
+    DEBUG("Auto init ng_ipv6 module.\n");
+    ng_ipv6_init();
 #endif
 }

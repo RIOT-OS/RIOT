@@ -58,6 +58,19 @@ ifneq (,$(filter ng_ipv6_hdr,$(USEMODULE)))
   USEMODULE += ng_pktbuf
 endif
 
+ifneq (,$(filter ng_ipv6_router,$(USEMODULE)))
+  USEMODULE += ng_ipv6
+endif
+
+ifneq (,$(filter ng_ipv6,$(USEMODULE)))
+  USEMODULE += ng_inet_csum
+  USEMODULE += ng_ipv6_addr
+  USEMODULE += ng_ipv6_hdr
+  USEMODULE += ng_ipv6_nc
+  USEMODULE += ng_ipv6_netif
+  USEMODULE += ng_netbase
+endif
+
 ifneq (,$(filter ng_ipv6_nc,$(USEMODULE)))
   USEMODULE += ng_ipv6_addr
 endif
