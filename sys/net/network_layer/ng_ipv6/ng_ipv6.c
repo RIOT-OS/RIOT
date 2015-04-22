@@ -250,6 +250,8 @@ static void _send_multicast(kernel_pid_t iface, ng_pktsnip_t *pkt,
                             ng_pktsnip_t *ipv6, ng_pktsnip_t *payload,
                             bool prep_hdr)
 {
+    ng_pktsnip_t *netif;
+
     /* netif header not present: send over all interfaces */
     if (iface == KERNEL_PID_UNDEF) {
         size_t ifnum;
@@ -267,8 +269,6 @@ static void _send_multicast(kernel_pid_t iface, ng_pktsnip_t *pkt,
         ng_pktbuf_hold(pkt, ifnum - 1);
 
         for (size_t i = 0; i < ifnum; i++) {
-            ng_pktsnip_t *netif;
-
             if (prep_hdr) {
                 /* need to get second write access (duplication) to fill IPv6
                  * header interface-local */
@@ -312,6 +312,8 @@ static void _send_multicast(kernel_pid_t iface, ng_pktsnip_t *pkt,
                 return;
             }
         }
+
+        netif = pkt;
 
         _send_multicast_over_iface(iface, pkt, netif);
     }
