@@ -66,20 +66,25 @@ extern "C" {
  *          members of the resulting ng_pktsnip_t can be very different after
  *          execution of this function depending on what parameters you use:
  *
- * * for most cases the result will be pretty straight forward and the
- *   packet is either assumed to be in sending direction or for creation
- *   (@p pkt == NULL) there will be made no assumtions about direction at all.
+ * * The return value of this function is a @ref ng_pktsnip_t struct referred
+ *   to as `result`
+ * * for most cases the build-up of `result` will be pretty straight forward: Its
+ *   members will be exactly as the given parameters (ng_pktsnip_t::next of
+ *   result will be set to @p pkt). If @p pkt is not NULL it and in turn `result`
+ *   are assumed to be in sending direction. For packet creation (@p pkt == NULL)
+ *   no assumtions about direction of `result` will be made (since its
+ *   ng_pktsnip::next will be set to NULL).
  * * if @p pkt != NULL, @p data = `pkt->data`, @p size < `pkt->size` receiving
  *   direction is assumed and the following values will be set:
- *   * ng_pktsnip_t::next of result = `pkt->next`
- *   * ng_pktsnip_t::data of result = @p data
- *   * ng_pktsnip_t::size of result = @p size
- *   * ng_pktsnip_t::next of @p pkt = result
+ *   * ng_pktsnip_t::next of `result` = `pkt->next`
+ *   * ng_pktsnip_t::data of `result` = @p data
+ *   * ng_pktsnip_t::size of `result` = @p size
+ *   * ng_pktsnip_t::next of @p pkt = `result`
  *   * ng_pktsnip_t::data of @p pkt = @p data + @p size
  *   * ng_pktsnip_t::size of @p pkt = old size value - @p size
- * * graphically this can be represented as follows:
  *
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *  graphically this can be represented as follows:
+ *  @code
  * Before                                    After
  * ======                                    =====
  *                                                       (next)
@@ -88,7 +93,7 @@ extern "C" {
  * +--------------------------------+        +----------------+---------------+
  * +--------------------------------+        +----------------+---------------+
  *  \__________pkt->size___________/          \_result->size_/ \__pkt->size__/
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *  @endcode
  *
  * @note    **Do not** change the ng_pktsnip_t::data and ng_pktsnip_t::size
  *          of a ng_pktsnip_t created by this function externally, except if
@@ -99,9 +104,9 @@ extern "C" {
  *                      NULL if you want to create a new packet. Members may
  *                      change values; see above.
  * @param[in] data      Data of the new ng_pktsnip_t. If @p data is NULL no data
- *                      will be inserted into the result. @p data that is already
+ *                      will be inserted into `result`. If @p data is already
  *                      in the packet buffer (e.g. a payload of an already
- *                      allocated packet) will not be duplicated.
+ *                      allocated packet) it will not be duplicated.
  * @param[in] size      Length of @p data. If @p size is 0 no data will be inserted
  *                      into the the packet buffer and ng_pktsnip_t::data will be
  *                      set to @p data.
