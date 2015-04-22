@@ -225,6 +225,13 @@ static void _netif_list(kernel_pid_t dev)
         linebreak = true;
     }
 
+    res = ng_netapi_get(dev, NETCONF_OPT_RAWMODE, 0, &enable, sizeof(enable));
+
+    if ((res >= 0) && (enable == NETCONF_ENABLE)) {
+        printf("RAWMODE  ");
+        linebreak = true;
+    }
+
 #ifdef MODULE_NG_IPV6_NETIF
     ng_ipv6_netif_t *entry = ng_ipv6_netif_get(dev);
 
@@ -438,6 +445,9 @@ static int _netif_flag(char *cmd, kernel_pid_t dev, char *flag)
     }
     else if (strcmp(flag, "autoack") == 0) {
         return _netif_set_flag(dev, NETCONF_OPT_AUTOACK, set);
+    }
+    else if (strcmp(flag, "raw") == 0) {
+        return _netif_set_flag(dev, NETCONF_OPT_RAWMODE, set);
     }
     else if (strcmp(flag, "6lo") == 0) {
 #ifdef MODULE_NG_IPV6_NETIF
