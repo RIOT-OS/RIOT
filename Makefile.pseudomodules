@@ -2,3 +2,4 @@ PSEUDOMODULES += defaulttransceiver
 PSEUDOMODULES += transport_layer
 PSEUDOMODULES += pktqueue
 PSEUDOMODULES += ng_netbase
+PSEUDOMODULES += newlib

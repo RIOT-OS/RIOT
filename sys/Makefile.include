@@ -87,3 +87,8 @@ ifneq (,$(filter embunit,$(USEMODULE)))
         CFLAGS += -DOUTPUT=OUTPUT_COMPILER
     endif
 endif
+
+ifneq (,$(filter newlib,$(USEMODULE)))
+    include $(RIOTBASE)/sys/newlib/Makefile.include
+endif
+
