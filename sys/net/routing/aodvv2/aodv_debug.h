@@ -7,10 +7,9 @@
  */
 
 /**
- * @addtogroup  core_util
+ * @ingroup     aodvv2
  * @{
  *
- * @ingroup     aodvv2
  * @brief       Debug-header for aodvv2 debug messages
  *
  *

@@ -7,6 +7,9 @@
  */
 
 /**
+ * @defgroup    net_ng_sixlowpan    6LoWPAN
+ * @ingroup     net
+ *
  * @defgroup    net_ng_sixlowpan_ctx    Contexts for 6LoWPAN address compression
  * @ingroup     net_ng_sixlowpan
  * @brief       Context buffer for stateful 6LoWPAN address compression
