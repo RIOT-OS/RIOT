@@ -171,6 +171,7 @@ extern int _fib_route_handler(int argc, char **argv);
 
 #ifdef MODULE_NG_IPV6_NC
 extern int _ipv6_nc_manage(int argc, char **argv);
+extern int _ipv6_nc_routers(int argc, char **argv);
 #endif
 
 const shell_command_t _shell_command_list[] = {
@@ -284,6 +285,7 @@ const shell_command_t _shell_command_list[] = {
 #endif
 #ifdef MODULE_NG_IPV6_NC
     {"ncache", "manage neighbor cache by hand", _ipv6_nc_manage },
+    {"routers", "IPv6 default router list", _ipv6_nc_routers },
 #endif
     {NULL, NULL, NULL}
 };
