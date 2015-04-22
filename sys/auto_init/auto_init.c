@@ -90,6 +90,10 @@
 #include "net/ng_pktdump.h"
 #endif
 
+#ifdef MODULE_NG_SOCKET
+#include "net/ng_socket.h"
+#endif
+
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
@@ -279,5 +283,9 @@ void auto_init(void)
 #ifdef MODULE_NG_PKTDUMP
     DEBUG("Auto init ng_pktdump module.\n");
     ng_pktdump_init();
+#endif
+#ifdef MODULE_NG_SOCKET
+    DEBUG("Auto init ng_socket module\n");
+    ng_socket_init();
 #endif
 }

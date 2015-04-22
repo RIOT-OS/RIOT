@@ -29,6 +29,9 @@ endif
 ifneq (,$(filter tcp,$(USEMODULE)))
     DIRS += net/transport_layer/tcp
 endif
+ifneq (,$(filter ng_socket,$(USEMODULE)))
+    DIRS += net/transport_layer/ng_socket
+endif
 ifneq (,$(filter net_help,$(USEMODULE)))
     DIRS += net/crosslayer/net_help
 endif
