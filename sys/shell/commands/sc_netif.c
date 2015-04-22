@@ -80,6 +80,11 @@ static void _set_usage(char *cmd_name)
          "       * \"state\" - set the device state\n");
 }
 
+static void _flag_usage(char *cmd_name)
+{
+    printf("usage: %s <if_id> [-]{promisc|autoack|preload}", cmd_name);
+}
+
 static void _print_netconf(ng_netconf_opt_t opt)
 {
     switch (opt) {
@@ -147,6 +152,8 @@ void _netif_list(kernel_pid_t dev)
     int16_t i16;
     int res;
     ng_netconf_state_t state;
+    ng_netconf_enable_t enable;
+    bool linebreak = false;
 
     printf("Iface %2d  ", dev);
 
@@ -195,6 +202,31 @@ void _netif_list(kernel_pid_t dev)
         printf("%s", ng_netif_addr_to_str(hwaddr_str, sizeof(hwaddr_str),
                                           hwaddr, res));
         printf("\n            ");
+    }
+
+    res = ng_netapi_get(dev, NETCONF_OPT_PROMISCUOUSMODE, 0, &enable, sizeof(enable));
+
+    if ((res >= 0) && (enable == NETCONF_ENABLE)) {
+        printf("PROMISC  ");
+        linebreak = true;
+    }
+
+    res = ng_netapi_get(dev, NETCONF_OPT_AUTOACK, 0, &enable, sizeof(enable));
+
+    if ((res >= 0) && (enable == NETCONF_ENABLE)) {
+        printf("AUTOACK  ");
+        linebreak = true;
+    }
+
+    res = ng_netapi_get(dev, NETCONF_OPT_PRELOADING, 0, &enable, sizeof(enable));
+
+    if ((res >= 0) && (enable == NETCONF_ENABLE)) {
+        printf("PRELOAD  ");
+        linebreak = true;
+    }
+
+    if (linebreak) {
+        printf("\n           ");
     }
 
     res = ng_netapi_get(dev, NETCONF_OPT_SRC_LEN, 0, &u16, sizeof(u16));
@@ -271,6 +303,15 @@ static void _netif_set_i16(kernel_pid_t dev, ng_netconf_opt_t opt,
     printf("success: set ");
     _print_netconf(opt);
     printf(" on interface %" PRIkernel_pid " to %i\n", dev, val);
+}
+
+static void _netif_set_flag(kernel_pid_t dev, ng_netconf_opt_t opt,
+                            ng_netconf_enable_t set)
+{
+    if (ng_netapi_set(dev, opt, 0, &set, sizeof(ng_netconf_enable_t)) < 0) {
+        puts("error: unable to set option");
+    }
+    printf("success: %sset option\n", (set) ? "" : "un");
 }
 
 static void _netif_set_addr(kernel_pid_t dev, ng_netconf_opt_t opt,
@@ -361,6 +402,32 @@ static void _netif_set(char *cmd_name, kernel_pid_t dev, char *key, char *value)
     }
 }
 
+static int _netif_flag(char *cmd, kernel_pid_t dev, char *flag)
+{
+    ng_netconf_enable_t set = NETCONF_ENABLE;
+
+    if (flag[0] == '-') {
+        set = NETCONF_DISABLE;
+        flag++;
+    }
+
+    if (strcmp(flag, "promisc") == 0) {
+        _netif_set_flag(dev, NETCONF_OPT_PROMISCUOUSMODE, set);
+    }
+    else if (strcmp(flag, "preload") == 0) {
+        _netif_set_flag(dev, NETCONF_OPT_PRELOADING, set);
+    }
+    else if (strcmp(flag, "autoack") == 0) {
+        _netif_set_flag(dev, NETCONF_OPT_AUTOACK, set);
+    }
+    else {
+        _flag_usage(cmd);
+        return 1;
+    }
+
+    return 0;
+}
+
 /* shell commands */
 int _netif_send(int argc, char **argv)
 {
@@ -441,12 +508,18 @@ int _netif_config(int argc, char **argv)
             }
 
             /* TODO implement add for IP addresses */
+
+            else {
+                return _netif_flag(argv[0], dev, argv[2]);
+            }
         }
         else {
             puts("error: invalid interface given");
         }
     }
 
-    printf("usage: %s [<if_id> set <key> <value>]]\n", argv[0]);
+    printf("usage: %s <if_id>\n", argv[0]);
+    _set_usage(argv[0]);
+    _flag_usage(argv[0]);
     return 1;
 }
