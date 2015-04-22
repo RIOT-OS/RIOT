@@ -1,0 +1,41 @@
+# This CPU implementation is using the new core/CPU interface:
+export CFLAGS += -DCOREIF_NG=1
+
+# Tell the build system that the CPU depends on the Cortex-M common files:
+export USEMODULE += $(CORTEX)_common
+
+# all cortex MCU's use newlib as libc
+export USEMODULE += newlib
+
+# some CPU's don't define a model
+export CPU_MODEL ?= $(CPU)
+
+# Define the linker script to use for this CPU:
+export LINKERSCRIPT ?= $(RIOTCPU)/$(CPU)/$(CPU_MODEL)_linkerscript.ld
+
+# Export the CPU model:
+MODEL = $(shell echo $(CPU_MODEL) | tr 'a-z' 'A-Z')
+export CFLAGS += -DCPU_MODEL_$(MODEL)
+
+# Include CPU specific includes:
+export INCLUDES += -I$(RIOTCPU)/$(CPU)/include
+
+# Explicitly tell the linker to link the startup code.
+#   Without this the interrupt vectors will not be linked correctly!
+export UNDEF += $(BINDIR)cpu/startup.o
+
+# Export the peripheral drivers to be linked into the final binary:
+export USEMODULE += periph
+
+# cortex common directory
+export CORTEX_COMMON := $(RIOTCPU)/$(CORTEX)_common
+
+# CPU depends on the cortex-m common module, so include it:
+include $(CORTEX_COMMON)/Makefile.include
+
+# Avoid overriding the default rule:
+all:
+
+# Rule to generate assembly listings from ELF files:
+%.lst: %.elf
+	$(OBJDUMP) $(OBJDUMPFLAGS) $< > $@
