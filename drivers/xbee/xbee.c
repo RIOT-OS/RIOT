@@ -329,17 +329,6 @@ static int _set_channel(xbee_t *dev, uint8_t *val, size_t len)
     return -EINVAL;
 }
 
-static int _get_max_packet_size(xbee_t *dev, uint16_t *val, size_t max)
-{
-    if (max < 2) {
-        return -EOVERFLOW;
-    }
-
-    *val = XBEE_MAX_PAYLOAD_LENGTH;
-
-    return 2;
-}
-
 static int _get_panid(xbee_t *dev, uint8_t *val, size_t max)
 {
     uint8_t cmd[2];
@@ -616,10 +605,21 @@ static int _get(ng_netdev_t *netdev, ng_netconf_opt_t opt,
             return _get_addr_short(dev, (uint8_t *)value, max_len);
         case NETCONF_OPT_ADDRESS_LONG:
             return _get_addr_long(dev, (uint8_t *)value, max_len);
+        case NETCONF_OPT_ADDR_LEN:
+        case NETCONF_OPT_SRC_LEN:
+            if (max_len < sizeof(uint16_t)) {
+                return -EOVERFLOW;
+            }
+            *((uint16_t *)value) = 2;
+            return sizeof(uint16_t);
         case NETCONF_OPT_CHANNEL:
             return _get_channel(dev, (uint8_t *)value, max_len);
         case NETCONF_OPT_MAX_PACKET_SIZE:
-            return _get_max_packet_size(dev, (uint16_t *)value, max_len);
+            if (max_len < sizeof(uint16_t)) {
+                return -EOVERFLOW;
+            }
+            *((uint16_t *)value) = XBEE_MAX_PAYLOAD_LENGTH;
+            return sizeof(uint16_t);
         case NETCONF_OPT_NID:
             return _get_panid(dev, (uint8_t *)value, max_len);
         case NETCONF_OPT_PROTO:
