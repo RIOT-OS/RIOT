@@ -201,3 +201,7 @@ ifneq (,$(filter oonf_common,$(USEMODULE)))
   USEPKG += oonf_api
   USEMODULE += socket_base
 endif
+
+ifneq (,$(filter ng_at86rf2%,$(USEMODULE)))
+  USEMODULE += ng_at86rf2xx
+endif

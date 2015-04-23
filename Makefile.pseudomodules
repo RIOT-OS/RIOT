@@ -3,3 +3,7 @@ PSEUDOMODULES += transport_layer
 PSEUDOMODULES += ng_ipv6_router
 PSEUDOMODULES += pktqueue
 PSEUDOMODULES += ng_netbase
+
+# include variants of the AT86RF2xx drivers as pseudo modules
+PSEUDOMODULES += ng_at86rf23%
+PSEUDOMODULES += ng_at86rf21%
