@@ -246,3 +246,21 @@ endif
 
 info-concurrency:
 	@echo "$(NPROC)"
+
+info-files: QUITE := 0
+info-files:
+	@( \
+		echo "$(abspath $(shell echo "$(MAKEFILE_LIST)"))" | tr ' ' '\n'; \
+		CSRC="$$($(MAKE) USEPKG="" -Bn | grep -o -e "[^ ]\+\.[csS]$$" -e "[^ ]\+\.[csS][ \']")"; \
+		echo "$$CSRC"; \
+		echo "$(RIOTBASE)/Makefile.base"; \
+		echo "$$CSRC" | xargs dirname | sort | uniq | xargs -I{} find {} -name "Makefile*"; \
+		echo "$$CSRC" | xargs $(CC) $(CFLAGS) $(INCLUDES) -MM 2> /dev/null | grep -o "[^ ]\+\.h"; \
+		if [ -n "$$SRCXX" ]; then \
+			CPPSRC="$$($(MAKE) -Bn USEPKG="" | grep -o -e "[^ ]\+\.cpp")"; \
+			echo "$$CPPSRC"; \
+			echo "$$CPPSRC" | xargs dirname | sort | uniq | xargs -I{} find {} -name "Makefile*"; \
+			echo "$$CPPSRC" | xargs $(CXX) $(CXXFLAGS) $(INCLUDES) -MM 2> /dev/null | grep -o "[^ ]\+\.h"; \
+		fi; \
+		$(foreach pkg,$(USEPKG),find $(RIOTBASE)/pkg/$(pkg) -type f;) \
+	) | sort | uniq | sed 's#$(RIOTBASE)/##'
