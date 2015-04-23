@@ -382,27 +382,27 @@
 
 
 /* F_cco0 = (2 * M * F_in) / N  */
-#define __M               (((PLL0CFG_Val      ) & 0x7FFF) + 1)
-#define __N               (((PLL0CFG_Val >> 16) & 0x00FF) + 1)
-#define __FCCO(__F_IN)    ((2ULL * __M * __F_IN) / __N)
-#define __CCLK_DIV        (((CCLKCFG_Val      ) & 0x00FF) + 1)
+#define M               (((PLL0CFG_Val      ) & 0x7FFF) + 1)
+#define N               (((PLL0CFG_Val >> 16) & 0x00FF) + 1)
+#define FCCO(__F_IN)    ((2ULL * __M * __F_IN) / __N)
+#define CCLK_DIV        (((CCLKCFG_Val      ) & 0x00FF) + 1)
 
 /* Determine core clock frequency according to settings */
 #if (PLL0_SETUP)
 #if   ((CLKSRCSEL_Val & 0x03) == 1)
-#define __CORE_CLK (__FCCO(OSC_CLK) / __CCLK_DIV)
+#define CORE_CLK (__FCCO(OSC_CLK) / __CCLK_DIV)
 #elif ((CLKSRCSEL_Val & 0x03) == 2)
-#define __CORE_CLK (__FCCO(RTC_CLK) / __CCLK_DIV)
+#define CORE_CLK (__FCCO(RTC_CLK) / __CCLK_DIV)
 #else
-#define __CORE_CLK (__FCCO(IRC_OSC) / __CCLK_DIV)
+#define CORE_CLK (__FCCO(IRC_OSC) / __CCLK_DIV)
 #endif
 #else
 #if   ((CLKSRCSEL_Val & 0x03) == 1)
-#define __CORE_CLK (OSC_CLK         / __CCLK_DIV)
+#define CORE_CLK (OSC_CLK         / __CCLK_DIV)
 #elif ((CLKSRCSEL_Val & 0x03) == 2)
-#define __CORE_CLK (RTC_CLK         / __CCLK_DIV)
+#define CORE_CLK (RTC_CLK         / __CCLK_DIV)
 #else
-#define __CORE_CLK (IRC_OSC         / __CCLK_DIV)
+#define CORE_CLK (IRC_OSC         / __CCLK_DIV)
 #endif
 #endif
 

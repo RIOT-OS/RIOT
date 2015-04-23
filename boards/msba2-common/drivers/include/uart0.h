@@ -6,8 +6,8 @@
  * directory for more details.
  */
 
-#ifndef __UART0_H
-#define __UART0_H
+#ifndef UART0_H
+#define UART0_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -19,4 +19,4 @@ extern kernel_pid_t uart0_handler_pid;
 }
 #endif
 
-#endif /* __UART0_H */
+#endif /* UART0_H */
