@@ -78,7 +78,7 @@ typedef struct __attribute__((packed)) {
      * fields accordingly:
      * * ng_ipv6_hdr_set_version()
      * * ng_ipv6_hdr_get_version()
-     * * ng_ipv6_hdr_is_ipv6_hdr()
+     * * ng_ipv6_hdr_is()
      * * ng_ipv6_hdr_set_tc()
      * * ng_ipv6_hdr_set_tc_ecn()
      * * ng_ipv6_hdr_set_tc_dscp()
@@ -127,7 +127,7 @@ static inline uint8_t ng_ipv6_hdr_get_version(const ng_ipv6_hdr_t *hdr)
  * @return  true, if version field is 6
  * @return  false, otherwise
  */
-static inline bool ng_ipv6_hdr_is_ipv6_hdr(const ng_ipv6_hdr_t *hdr)
+static inline bool ng_ipv6_hdr_is(const ng_ipv6_hdr_t *hdr)
 {
     return (((hdr->v_tc_fl.u8[0]) & 0xf0) == 0x60);
 }

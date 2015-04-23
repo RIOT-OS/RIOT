@@ -432,14 +432,14 @@ static void _receive(ng_pktsnip_t *pkt)
         /* IP header was already marked. Take it. */
         ipv6 = pkt->next;
 
-        if (!ng_ipv6_hdr_is_ipv6_hdr(ipv6->data)) {
+        if (!ng_ipv6_hdr_is(ipv6->data)) {
             DEBUG("ipv6: Received packet was not IPv6, dropping packet\n");
             ng_pktbuf_release(pkt);
             return;
         }
     }
     else {
-        if (!ng_ipv6_hdr_is_ipv6_hdr(pkt->data)) {
+        if (!ng_ipv6_hdr_is(pkt->data)) {
             DEBUG("ipv6: Received packet was not IPv6, dropping packet\n");
             ng_pktbuf_release(pkt);
             return;
