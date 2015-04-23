@@ -27,7 +27,7 @@
 #include "posix_io.h"
 #include "board_uart0.h"
 
-#include "ieee802154_frame.h"
+#include "ieee802154.h"
 #include "sixlowpan/error.h"
 #include "bordermultiplex.h"
 #include "flowcontrol.h"

@@ -28,7 +28,7 @@
 #include "kernel_types.h"
 #include "board.h"
 #include "radio/types.h"
-#include "ieee802154_frame.h"
+#include "ieee802154.h"
 #include "at86rf231/at86rf231_settings.h"
 #include "periph/gpio.h"
 #include "netdev/802154.h"

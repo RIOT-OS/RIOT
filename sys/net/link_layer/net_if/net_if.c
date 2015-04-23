@@ -15,7 +15,7 @@
 #include <string.h>
 
 #include "clist.h"
-#include "ieee802154_frame.h"
+#include "ieee802154.h"
 #include "msg.h"
 #include "mutex.h"
 #include "transceiver.h"
@@ -324,13 +324,10 @@ int net_if_send_packet(int if_id, uint16_t target, const void *payload,
 
         p.frame.payload = (uint8_t *)payload;
         p.frame.payload_len = (uint8_t)payload_len;
-        p.frame.fcf.src_addr_m = (uint8_t)interfaces[if_id].trans_src_addr_m;
-        p.frame.fcf.dest_addr_m = IEEE_802154_SHORT_ADDR_M;
-        p.frame.fcf.ack_req = 0;
-        p.frame.fcf.sec_enb = 0;
-        p.frame.fcf.frame_type = IEEE_802154_DATA_FRAME;
-        p.frame.fcf.frame_pend = 0;
-
+        p.frame.fcf = (IEEE_802154_FCF_TYPE_DATA |
+                       IEEE_802154_FCF_DST_ADDR_SHORT |
+                       ((uint8_t)interfaces[if_id].trans_src_addr_m
+                        << IEEE_802154_FCF_SRC_ADDR_POS));
         p.frame.dest_pan_id = net_if_get_pan_id(if_id);
         uint16_t target_h = NTOHS(target);
         memcpy(p.frame.dest_addr, &target_h, 2);
@@ -369,12 +366,10 @@ int net_if_send_packet_long(int if_id, net_if_eui64_t *target,
         memset(&p, 0, sizeof(ieee802154_packet_t));
         p.frame.payload = (uint8_t *)payload;
         p.frame.payload_len = (uint8_t)payload_len;
-        p.frame.fcf.src_addr_m = (uint8_t)interfaces[if_id].trans_src_addr_m;
-        p.frame.fcf.dest_addr_m = IEEE_802154_LONG_ADDR_M;
-        p.frame.fcf.ack_req = 0;
-        p.frame.fcf.sec_enb = 0;
-        p.frame.fcf.frame_type = IEEE_802154_DATA_FRAME;
-        p.frame.fcf.frame_pend = 0;
+        p.frame.fcf = (IEEE_802154_FCF_DST_ADDR_LONG |
+                       IEEE_802154_FCF_TYPE_DATA |
+                       ((uint8_t)interfaces[if_id].trans_src_addr_m
+                        << IEEE_802154_FCF_SRC_ADDR_POS));
         p.frame.dest_pan_id = net_if_get_pan_id(if_id);
         uint64_t target_h = NTOHLL(target->uint64);
         memcpy(p.frame.dest_addr, &target_h, 8);

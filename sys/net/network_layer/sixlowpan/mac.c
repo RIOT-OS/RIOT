@@ -33,7 +33,7 @@
 #include "ip.h"
 #include "icmp.h"
 #include "lowpan.h"
-#include "ieee802154_frame.h"
+#include "ieee802154.h"
 #include "net_help.h"
 
 #define ENABLE_DEBUG    (0)
@@ -130,10 +130,10 @@ static void *recv_ieee802154_frame(void *arg)
 
 #endif
 
-            if (frame.fcf.src_addr_m == IEEE_802154_SHORT_ADDR_M) {
+            if ((frame.fcf & IEEE_802154_FCF_SRC_ADDR_MASK) == IEEE_802154_FCF_SRC_ADDR_SHORT) {
                 mac_frame_short_to_eui64(&src, frame.src_addr);
             }
-            else if (frame.fcf.src_addr_m == IEEE_802154_LONG_ADDR_M) {
+            else if ((frame.fcf & IEEE_802154_FCF_SRC_ADDR_MASK) == IEEE_802154_FCF_SRC_ADDR_LONG) {
                 memcpy(&src, frame.src_addr, 8);
             }
             else {
@@ -142,10 +142,10 @@ static void *recv_ieee802154_frame(void *arg)
                 continue;
             }
 
-            if (frame.fcf.dest_addr_m == IEEE_802154_SHORT_ADDR_M) {
+            if ((frame.fcf & IEEE_802154_FCF_DST_ADDR_MASK) == IEEE_802154_FCF_DST_ADDR_SHORT) {
                 mac_frame_short_to_eui64(&dst, frame.dest_addr);
             }
-            else if (frame.fcf.dest_addr_m == IEEE_802154_LONG_ADDR_M) {
+            else if ((frame.fcf & IEEE_802154_FCF_DST_ADDR_MASK) == IEEE_802154_FCF_DST_ADDR_LONG) {
                 memcpy(&dst, frame.dest_addr, 8);
             }
             else {
@@ -171,17 +171,13 @@ static void *recv_ieee802154_frame(void *arg)
     return NULL;
 }
 
-void set_ieee802154_fcf_values(ieee802154_frame_t *frame, uint8_t dest_mode,
-                               uint8_t src_mode)
+void set_ieee802154_fcf_values(ieee802154_frame_t *frame, uint16_t dest_mode,
+                               uint16_t src_mode)
 {
-    frame->fcf.frame_type = IEEE_802154_DATA_FRAME;
-    frame->fcf.sec_enb = 0;
-    frame->fcf.frame_pend = 0;
-    frame->fcf.ack_req = 0;
-    frame->fcf.panid_comp = (frame->dest_pan_id == frame->src_pan_id);
-    frame->fcf.frame_ver = 0;
-    frame->fcf.src_addr_m = src_mode;
-    frame->fcf.dest_addr_m = dest_mode;
+    frame->fcf = (IEEE_802154_FCF_TYPE_DATA |
+                  ((frame->dest_pan_id == frame->src_pan_id) << IEEE_802154_FCF_PANID_COMP_POS) |
+                  dest_mode |
+                  src_mode);
 #if ENABLE_DEBUG
     ieee802154_frame_print_fcf_frame(frame);
 #endif
@@ -210,16 +206,16 @@ int sixlowpan_mac_prepare_ieee802144_frame(
     ieee802154_frame_t *frame, int if_id, uint16_t dest_pan, const void *dest,
     uint8_t dest_len, const void *payload, uint8_t length, uint8_t mcast)
 {
-    uint8_t src_mode = net_if_get_src_address_mode(if_id);
-    uint8_t dest_mode;
+    uint16_t src_mode = (net_if_get_src_address_mode(if_id) << IEEE_802154_FCF_SRC_ADDR_POS);
+    uint16_t dest_mode;
     uint16_t *fcs;
     set_ieee802154_frame_values(if_id, dest_pan, frame);
 
     if (dest_len == 8) {
-        dest_mode = IEEE_802154_LONG_ADDR_M;
+        dest_mode = IEEE_802154_FCF_DST_ADDR_LONG;
     }
     else if (dest_len == 2) {
-        dest_mode = IEEE_802154_SHORT_ADDR_M;
+        dest_mode = IEEE_802154_FCF_DST_ADDR_SHORT;
     }
     else {
         DEBUG("Illegal IEEE 802.15.4 address for address length %d\n", dest_len);
@@ -229,15 +225,16 @@ int sixlowpan_mac_prepare_ieee802144_frame(
     set_ieee802154_fcf_values(frame, dest_mode, src_mode);
 
 
-    if (src_mode == IEEE_802154_LONG_ADDR_M) {
+    if (src_mode == IEEE_802154_FCF_SRC_ADDR_LONG) {
         net_if_get_eui64((net_if_eui64_t *)&frame->src_addr[0], if_id, 0);
     }
-    else if (src_mode == IEEE_802154_SHORT_ADDR_M) {
+    else if (src_mode == IEEE_802154_FCF_SRC_ADDR_SHORT) {
         uint16_t src = HTONS(net_if_get_hardware_address(if_id));
         memcpy(&frame->src_addr[0], &src, 2);
     }
     else {
-        DEBUG("Illegal IEEE 802.15.4 address mode: %d\n", src_mode);
+        DEBUG("Illegal IEEE 802.15.4 address mode: %d\n",
+              (src_mode >> IEEE_802154_FCF_SRC_ADDR_POS));
         return -1;
     }
 
@@ -275,7 +272,8 @@ int sixlowpan_mac_send_data(int if_id,
                             uint8_t payload_len, uint8_t mcast)
 {
     if (mcast) {
-        return net_if_send_packet_broadcast(IEEE_802154_SHORT_ADDR_M,
+        return net_if_send_packet_broadcast(IEEE_802154_FCF_SRC_ADDR_SHORT
+                                            >> IEEE_802154_FCF_SRC_ADDR_POS,
                                             payload,
                                             payload_len);
     }

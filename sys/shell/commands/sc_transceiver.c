@@ -47,13 +47,13 @@
 
 #elif defined( MODULE_CC2420 )
 #include "cc2420.h"
-#include "ieee802154_frame.h"
+#include "ieee802154.h"
 #define TEXT_SIZE           CC2420_MAX_DATA_LENGTH
 #define _TC_TYPE            TRANSCEIVER_CC2420
 
 #elif defined( MODULE_AT86RF231 )
 #include "at86rf231.h"
-#include "ieee802154_frame.h"
+#include "ieee802154.h"
 #define TEXT_SIZE           AT86RF231_MAX_DATA_LENGTH
 #define _TC_TYPE            TRANSCEIVER_AT86RF231
 
@@ -66,7 +66,7 @@
 #include "mc1322x.h"
 #include "maca.h"
 #include "maca_packet.h"
-#include "ieee802154_frame.h"
+#include "ieee802154.h"
 #define TEXT_SIZE           MACA_MAX_PAYLOAD_SIZE
 #define _TC_TYPE            TRANSCEIVER_MC1322X
 #endif
@@ -256,9 +256,9 @@ int _transceiver_send_handler(int argc, char **argv)
     memset(&p, 0, sizeof(ieee802154_packet_t));
     p.frame.payload = (uint8_t*) text_msg;
     p.frame.payload_len = strlen(text_msg) + 1;
-    p.frame.fcf.frame_type = IEEE_802154_DATA_FRAME;
-    p.frame.fcf.dest_addr_m = IEEE_802154_SHORT_ADDR_M;
-    p.frame.fcf.src_addr_m = IEEE_802154_SHORT_ADDR_M;
+    p.frame.fcf = (IEEE_802154_FCF_TYPE_DATA |
+                   IEEE_802154_FCF_DST_ADDR_SHORT |
+                   IEEE_802154_FCF_SRC_ADDR_SHORT);
     short_addr = atoi(argv[1]);
     p.frame.dest_addr[1] = (short_addr&0xff);
     p.frame.dest_addr[0] = (short_addr>>8);

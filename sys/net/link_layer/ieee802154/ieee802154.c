@@ -1,69 +1,55 @@
 /**
- * implementation for the IEEE 802.15.4 frame format
- *
  * Copyright (C) 2013  INRIA.
+ * Copyright (C) 2015  Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
- *
- * @ingroup sixlowpan
+ */
+
+/**
+ * @ingroup     net_ieee802154
  * @{
- * @file    ieee802154_frame.c
- * @brief   IEEE 802.14.4 framing operations
- * @author  Stephan Zeisberg <zeisberg@mi.fu-berlin.de>
- * @author  Oliver Hahm <oliver.hahm@inria.fr>
+ *
+ * @file
+ * @brief       IEEE 802.14.4 framing operations
+ *
+ * @author      Stephan Zeisberg <zeisberg@mi.fu-berlin.de>
+ * @author      Oliver Hahm <oliver.hahm@inria.fr>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @}
  */
 
-#include "ieee802154_frame.h"
+#include <string.h>
+
+#include "ieee802154.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
 #define IEEE_802154_FCS_POLY    (0x8408)  /* x^16 + x^12 + x^5 + 1 for LSB first */
 
-uint8_t ieee802154_hdr_ptr;
-uint8_t ieee802154_payload_ptr;
-uint16_t ieee802154_payload_len;
-
 uint8_t ieee802154_frame_init(ieee802154_frame_t *frame, uint8_t *buf)
 {
     /* Frame Control Field - 802.15.4 - 2006 - 7.2.1.1  */
-    uint8_t index = 0;
+    uint8_t index = 3;
 
-    buf[index] = (((frame->fcf.frame_type)      & 0x07) |
-                  ((frame->fcf.sec_enb    << 3) & 0x08) |
-                  ((frame->fcf.frame_pend << 4) & 0x10) |
-                  ((frame->fcf.ack_req    << 5) & 0x20) |
-                  ((frame->fcf.panid_comp << 6) & 0x40));
-    index++;
-
-    buf[index] = (((frame->fcf.dest_addr_m << 2) & 0x0c) |
-                  ((frame->fcf.frame_ver   << 4) & 0x30) |
-                  ((frame->fcf.src_addr_m  << 6) & 0xc0));
-
-    index++;
-
-    /* Sequence Number - 802.15.4 - 2006 - 7.2.1.2 */
-    buf[index] = frame->seq_nr;
-    index++;
+    /* copy FCF and sequence number */
+    memcpy(buf, frame, 3);
 
     /* Destination PAN Identifier - 802.15.4 - 2006 - 7.2.1.3 */
-    if (frame->fcf.dest_addr_m == 0x02 || frame->fcf.dest_addr_m == 0x03) {
-        buf[index + 1] = ((frame->dest_pan_id >> 8) & 0xff);
-        buf[index] = (frame->dest_pan_id & 0xff);
+    if (frame->fcf & IEEE_802154_FCF_DST_ADDR_MASK) {
+        memcpy(buf + index, &frame->dest_pan_id, 2);
+        index += 2;
     }
 
-    index += 2;
-
     /* Destination Address - 802.15.4 - 2006 - 7.2.1.4 */
-    if (frame->fcf.dest_addr_m == 0x02) {
+    if ((frame->fcf & IEEE_802154_FCF_DST_ADDR_MASK) == IEEE_802154_FCF_DST_ADDR_SHORT) {
         buf[index]     = frame->dest_addr[1];
         buf[index + 1] = frame->dest_addr[0];
         index += 2;
     }
-    else if (frame->fcf.dest_addr_m == 0x03) {
+    else if ((frame->fcf & IEEE_802154_FCF_DST_ADDR_MASK) == IEEE_802154_FCF_DST_ADDR_LONG) {
         buf[index]     = frame->dest_addr[7];
         buf[index + 1] = frame->dest_addr[6];
         buf[index + 2] = frame->dest_addr[5];
@@ -76,8 +62,8 @@ uint8_t ieee802154_frame_init(ieee802154_frame_t *frame, uint8_t *buf)
     }
 
     /* Source PAN Identifier - 802.15.4 - 2006 - 7.2.1.5 */
-    if (!(frame->fcf.panid_comp & 0x01)) {
-        if (frame->fcf.src_addr_m == 0x02 || frame->fcf.src_addr_m == 0x03) {
+    if (!(frame->fcf & IEEE_802154_FCF_PANID_COMP)) {
+        if (frame->fcf & IEEE_802154_FCF_SRC_ADDR_MASK) {
             buf[index + 1]  = ((frame->src_pan_id >> 8) & 0xff);
             buf[index]      = (frame->src_pan_id & 0xff);
             index += 2;
@@ -85,12 +71,12 @@ uint8_t ieee802154_frame_init(ieee802154_frame_t *frame, uint8_t *buf)
     }
 
     /* Source Address field - 802.15.4 - 2006 - 7.2.1.6 */
-    if (frame->fcf.src_addr_m == 0x02) {
+    if ((frame->fcf & IEEE_802154_FCF_SRC_ADDR_MASK) == IEEE_802154_FCF_SRC_ADDR_SHORT) {
         buf[index]     = frame->src_addr[1];
         buf[index + 1] = frame->src_addr[0];
         index += 2;
     }
-    else if (frame->fcf.src_addr_m == 0x03) {
+    else if ((frame->fcf & IEEE_802154_FCF_SRC_ADDR_MASK) == IEEE_802154_FCF_SRC_ADDR_LONG) {
         buf[index]     = frame->src_addr[7];
         buf[index + 1] = frame->src_addr[6];
         buf[index + 2] = frame->src_addr[5];
@@ -125,85 +111,59 @@ uint8_t ieee802154_frame_init(ieee802154_frame_t *frame, uint8_t *buf)
   */
 uint8_t ieee802154_frame_get_hdr_len(ieee802154_frame_t *frame)
 {
-    uint8_t len = 0;
+    uint8_t len = 3;    /* FCF and DSN have fixed length of 3 byte */
 
-    if (frame->fcf.dest_addr_m == 0x02) {
-        len += 2;
+    if ((frame->fcf & IEEE_802154_FCF_DST_ADDR_MASK) == IEEE_802154_FCF_DST_ADDR_SHORT) {
+        len += 4;       /* 2 byte short address + 2 byte destination PAN id */
     }
-    else if (frame->fcf.dest_addr_m == 0x03) {
-        len += 8;
-    }
-
-    if (frame->fcf.src_addr_m == 0x02) {
-        len += 2;
-    }
-    else if (frame->fcf.src_addr_m == 0x03) {
-        len += 8;
+    else if ((frame->fcf & IEEE_802154_FCF_DST_ADDR_MASK) == IEEE_802154_FCF_DST_ADDR_SHORT) {
+        len += 10;      /* 8 byte long address + 2 byte destination PAN id */
     }
 
-    if ((frame->fcf.dest_addr_m == 0x02) || (frame->fcf.dest_addr_m == 0x03)) {
-        len += 2;
+    if ((frame->fcf & IEEE_802154_FCF_SRC_ADDR_MASK) == IEEE_802154_FCF_SRC_ADDR_SHORT) {
+        len += 4;       /* 2 byte short address + 2 byte source PAN id */
+    }
+    else if ((frame->fcf & IEEE_802154_FCF_SRC_ADDR_MASK) == IEEE_802154_FCF_SRC_ADDR_LONG) {
+        len += 10;      /* 8 byte long address + 2 byte source PAN id */
     }
 
-    if ((frame->fcf.src_addr_m == 0x02) || (frame->fcf.src_addr_m == 0x03)) {
-        len += 2;
-    }
-
-    /* if src pan id == dest pan id set compression bit */
-    if (frame->src_pan_id == frame->dest_pan_id) {
-        frame->fcf.panid_comp = 1;
+    /* see if PAN id is compressed (src_pan_id := dst_pan_id) */
+    if (frame->fcf & IEEE_802154_FCF_PANID_COMP) {
         len -= 2;
     }
 
-    /* (DPID + DAD + SPID + SAD) + (FCF + DSN) */
-    return (len + 3);
+    return len;
 }
 
 uint8_t ieee802154_frame_read(uint8_t *buf, ieee802154_frame_t *frame,
                               uint8_t len)
 {
-    uint8_t index = 0;
-    uint8_t hdrlen;
+    uint8_t index = 3;
 
-    frame->fcf.frame_type = (buf[index]) & 0x07;
-    frame->fcf.sec_enb = (buf[index] >> 3) & 0x01;
-    frame->fcf.frame_pend = (buf[index] >> 4) & 0x01;
-    frame->fcf.ack_req = (buf[index] >> 5) & 0x01;
-    frame->fcf.panid_comp = (buf[index] >> 6) & 0x01;
+    /* read frame configuration bits */
+    frame->fcf = (((uint16_t)buf[0]) << 8 ) | buf[1];
+    /* read sequence number */
+    frame->seq_nr = buf[2];
 
-    index++;
-
-    frame->fcf.dest_addr_m = (buf[index] >> 2) & 0x03;
-    frame->fcf.frame_ver = (buf[index] >> 4) & 0x03;
-    frame->fcf.src_addr_m = (buf[index] >> 6) & 0x03;
-
-    index++;
-
-    frame->seq_nr = buf[index];
-
-    index++;
-
-    if(frame->fcf.dest_addr_m != 0)
+    /* if destination address is short or long, set destination PAN id */
+    if (frame->fcf & IEEE_802154_FCF_DST_ADDR_MASK)
     {
         frame->dest_pan_id = (((uint16_t)buf[index]) << 8) | buf[index + 1];
         index += 2;
     }
 
-    switch (frame->fcf.dest_addr_m) {
-        case (0): {
-            DEBUG("fcf.dest_addr_m: pan identifier/address fields empty\n");
+    /* read the destination address */
+    switch (frame->fcf & IEEE_802154_FCF_DST_ADDR_MASK) {
+        case IEEE_802154_FCF_DST_ADDR_EMPTY:
+            DEBUG("dst_addr_m: pan identifier/address fields empty\n");
             break;
-        }
-
-        case (2): {
+        case IEEE_802154_FCF_DST_ADDR_SHORT:
             /* read address in little-endian order */
             frame->dest_addr[0] = buf[index];
             frame->dest_addr[1] = buf[index + 1];
             index += 2;
             break;
-        }
-
-        case (3): {
+        case IEEE_802154_FCF_DST_ADDR_LONG:
             /* read address in network order */
             frame->dest_addr[7] = buf[index];
             frame->dest_addr[6] = buf[index + 1];
@@ -215,32 +175,28 @@ uint8_t ieee802154_frame_read(uint8_t *buf, ieee802154_frame_t *frame,
             frame->dest_addr[0] = buf[index + 7];
             index += 8;
             break;
-        }
     }
 
-    if (!(frame->fcf.panid_comp == 1)) {
-        if(frame->fcf.src_addr_m != 0)
-        {
+    /* set source PAN id, if it was send */
+    if (!(frame->fcf & IEEE_802154_FCF_PANID_COMP)) {
+        if (frame->fcf & IEEE_802154_FCF_SRC_ADDR_MASK) {
             frame->src_pan_id = (((uint16_t)buf[index]) << 8) | buf[index + 1];
             index += 2;
         }
     }
 
-    switch (frame->fcf.src_addr_m) {
-        case (0): {
-            DEBUG("fcf.src_addr_m: pan identifier/address fields empty\n");
+    /* parse source address */
+    switch (frame->fcf & IEEE_802154_FCF_SRC_ADDR_MASK) {
+        case IEEE_802154_FCF_SRC_ADDR_EMPTY:
+            DEBUG("src_addr_m: pan identifier/address fields empty\n");
             break;
-        }
-
-        case (2): {
+        case IEEE_802154_FCF_SRC_ADDR_SHORT:
             /* read address in little-endian order */
             frame->src_addr[0] = buf[index];
             frame->src_addr[1] = buf[index + 1];
             index += 2;
             break;
-        }
-
-        case (3): {
+        case IEEE_802154_FCF_SRC_ADDR_LONG:
             /* read address in network order */
             frame->src_addr[7] = buf[index];
             frame->src_addr[6] = buf[index + 1];
@@ -252,14 +208,14 @@ uint8_t ieee802154_frame_read(uint8_t *buf, ieee802154_frame_t *frame,
             frame->src_addr[0] = buf[index + 7];
             index += 8;
             break;
-        }
     }
 
+    /* set payload pointers */
     frame->payload = (buf + index);
-    hdrlen = index;
-    frame->payload_len = (len - hdrlen - IEEE_802154_FCS_LEN);
+    frame->payload_len = (len - index - IEEE_802154_FCS_LEN);
 
-    return hdrlen;
+    /* return actual header length */
+    return index;
 }
 
 /* crc with lsb first */
@@ -293,12 +249,12 @@ void ieee802154_frame_print_fcf_frame(ieee802154_frame_t *frame)
            "destination address mode: %02x\n"
            "frame version: %02x\n"
            "source address mode: %02x\n",
-           frame->fcf.frame_type,
-           frame->fcf.sec_enb,
-           frame->fcf.frame_pend,
-           frame->fcf.ack_req,
-           frame->fcf.panid_comp,
-           frame->fcf.dest_addr_m,
-           frame->fcf.frame_ver,
-           frame->fcf.src_addr_m);
+           (frame->fcf & IEEE_802154_FCF_TYPE_MASK) >> IEEE_802154_FCF_TYPE_POS,
+           (frame->fcf & IEEE_802154_FCF_SEC_EN) >> IEEE_802154_FCF_SEC_EN_POS,
+           (frame->fcf & IEEE_802154_FCF_FRAME_PEND) >> IEEE_802154_FCF_FRAME_PEND_POS,
+           (frame->fcf & IEEE_802154_FCF_ACK_REQ) >> IEEE_802154_FCF_ACK_REQ_POS,
+           (frame->fcf & IEEE_802154_FCF_PANID_COMP) >> IEEE_802154_FCF_PANID_COMP_POS,
+           (frame->fcf & IEEE_802154_FCF_DST_ADDR_MASK) >> IEEE_802154_FCF_DST_ADDR_POS,
+           (frame->fcf & IEEE_802154_FCF_FRAME_VER_MASK) >> IEEE_802154_FCF_FRAME_VER_POS,
+           (frame->fcf & IEEE_802154_FCF_SRC_ADDR_MASK) >> IEEE_802154_FCF_SRC_ADDR_POS);
 }

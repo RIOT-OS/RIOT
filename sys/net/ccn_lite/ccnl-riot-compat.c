@@ -24,7 +24,7 @@
 #include "msg.h"
 #include "thread.h"
 
-#include "ieee802154_frame.h"
+#include "ieee802154.h"
 
 #include "ccnl.h"
 #include "ccnl-core.h"

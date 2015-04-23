@@ -44,14 +44,14 @@
 
 #ifdef MODULE_CC2420
 #include "cc2420.h"
-#include "ieee802154_frame.h"
+#include "ieee802154.h"
 #endif
 
 #ifdef MODULE_MC1322X
 #include "mc1322x.h"
 #include "maca.h"
 #include "maca_packet.h"
-#include "ieee802154_frame.h"
+#include "ieee802154.h"
 #endif
 
 #ifdef MODULE_NATIVENET
@@ -61,7 +61,7 @@
 
 #ifdef MODULE_AT86RF231
 #include "at86rf231.h"
-#include "ieee802154_frame.h"
+#include "ieee802154.h"
 #endif
 
 #define ENABLE_DEBUG (0)
