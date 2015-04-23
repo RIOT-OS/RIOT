@@ -468,14 +468,10 @@ int xbee_init(xbee_t *dev, uart_t uart, uint32_t baudrate,
     /* get CPU ID */
     uint8_t id[CPUID_ID_LEN];
     cpuid_get(id);
-    /* compress to 2 byte */
+    /* set address */
     memset(dev->addr_short, 0, 2);
-    int i;
-    for (i = 0; i < (CPUID_ID_LEN / 2); i++) {
-        dev->addr_short[0] ^= id[i];
-    }
-    for (; i < CPUID_ID_LEN; i++) {
-        dev->addr_short[1] ^= id[i];
+    for (int i = 0; i < CPUID_ID_LEN; i++) {
+        dev->addr_short[i & 0x01] ^= id[i];
     }
 #else
     dev->addr_short[0] = (uint8_t)(XBEE_DEFAULT_SHORT_ADDR >> 8);
