@@ -23,8 +23,8 @@
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  */
 
-#ifndef _TELOSB_BOARD_H
-#define _TELOSB_BOARD_H
+#ifndef TELOSB_BOARD_H_
+#define TELOSB_BOARD_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -70,4 +70,4 @@ extern "C" {
 typedef uint8_t radio_packet_length_t;
 
 /** @} */
-#endif // _TELOSB_BOARD_H
+#endif // TELOSB_BOARD_H_

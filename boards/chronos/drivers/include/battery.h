@@ -6,8 +6,8 @@
  * directory for more details.
  */
 
-#ifndef BATTERY_H
-#define BATTERY_H
+#ifndef BATTERY_H_
+#define BATTERY_H_
 
 #ifdef __cplusplus
 extern "C" {

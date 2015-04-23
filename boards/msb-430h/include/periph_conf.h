@@ -16,9 +16,10 @@
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  */
 
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
+#ifndef PERIPH_CONF_H_
+#define PERIPH_CONF_H_
 
 /* make Travis happy: #ifdef __cplusplus extern "C" { #endif */
 
+#endif /* PERIPH_CONF_H_ */
 #endif /* PERIPH_CONF_H */

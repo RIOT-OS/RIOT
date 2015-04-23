@@ -18,8 +18,8 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-#ifndef __BOARD_H
-#define __BOARD_H
+#ifndef BOARD_H_
+#define BOARD_H_
 
 #include <stdint.h>
 
@@ -59,5 +59,5 @@ typedef uint8_t radio_packet_length_t;
 }
 #endif
 
-#endif /* __BOARD_H */
 /** @} */
+#endif /* BOARD_H_ */

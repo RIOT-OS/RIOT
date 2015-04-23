@@ -21,8 +21,8 @@
  * @author      Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
  */
 
-#ifndef BOARD_H
-#define BOARD_H
+#ifndef BOARD_H_
+#define BOARD_H_
 
 #include <stdint.h>
 
@@ -52,4 +52,4 @@ typedef uint16_t radio_packet_length_t;
 #endif
 
 /** @} */
-#endif /* BOARD_H */
+#endif /* BOARD_H_ */

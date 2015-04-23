@@ -18,8 +18,8 @@
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  */
 
-#ifndef REDBEE_ECONOTAG_BOARD_H
-#define REDBEE_ECONOTAG_BOARD_H
+#ifndef REDBEE_ECONOTAG_BOARD_H_
+#define REDBEE_ECONOTAG_BOARD_H_
 
 #include <stdint.h>
 

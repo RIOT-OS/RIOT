@@ -6,8 +6,8 @@
  * directory for more details.
  */
 
-#ifndef BUZZER_H
-#define BUZZER_H
+#ifndef BUZZER_H_
+#define BUZZER_H_
 
 #ifdef __cplusplus
 extern "C" {

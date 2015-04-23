@@ -16,8 +16,8 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#ifndef SERIAL_H
-#define SERIAL_H
+#ifndef SERIAL_H_
+#define SERIAL_H_
 
 extern char *baud_rate;
 
@@ -34,4 +34,4 @@ void set_rts(int val);
 void set_dtr(int val);
 void change_baud(const char *baud_name);
 
-#endif // SERIAL_H
+#endif // SERIAL_H_

@@ -7,8 +7,8 @@
  * directory for more details.
  */
 
-#ifndef NVM_H
-#define NVM_H
+#ifndef NVM_H_
+#define NVM_H_
 
 #include <stdint.h>
 
@@ -62,4 +62,4 @@ extern void(*nvm_setsvar)(uint32_t zero_for_awesome);
 }
 #endif
 
-#endif //NVM_H
+#endif //NVM_H_

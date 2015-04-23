@@ -7,8 +7,8 @@
  * directory for more details.
  */
 
-#ifndef _Z1_BOARD_H
-#define _Z1_BOARD_H
+#ifndef Z1_BOARD_H_
+#define Z1_BOARD_H_
 
 /**
  * @defgroup    boards_z1 Zolertia Z1
@@ -83,4 +83,4 @@ typedef uint8_t radio_packet_length_t;
 #endif
 
 /** @} */
-#endif // _Z1_BOARD_H
+#endif // Z1_BOARD_H_
