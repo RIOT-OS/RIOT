@@ -135,6 +135,43 @@ static void *_event_loop(void *args)
     return NULL;
 }
 
+#ifdef MODULE_NG_SIXLOWPAN
+static void _send_to_iface(kernel_pid_t iface, ng_pktsnip_t *pkt)
+{
+    ng_ipv6_netif_t *if_entry = ng_ipv6_netif_get(iface);
+
+    ((ng_netif_hdr_t *)pkt->data)->if_pid = iface;
+
+    if ((if_entry != NULL) && (if_entry->flags & NG_IPV6_NETIF_FLAGS_SIXLOWPAN)) {
+        DEBUG("ipv6: send to 6LoWPAN instead\n");
+        ng_netreg_entry_t *reg = ng_netreg_lookup(NG_NETTYPE_SIXLOWPAN,
+                                                  NG_NETREG_DEMUX_CTX_ALL);
+
+        if (reg != NULL) {
+            ng_pktbuf_hold(pkt, ng_netreg_num(NG_NETTYPE_SIXLOWPAN,
+                                              NG_NETREG_DEMUX_CTX_ALL) - 1);
+        }
+        else {
+            DEBUG("ipv6: no 6LoWPAN thread found");
+        }
+
+        while (reg) {
+            ng_netapi_send(reg->pid, pkt);
+            reg = ng_netreg_getnext(reg);
+        }
+    }
+    else {
+        ng_netapi_send(iface, pkt);
+    }
+}
+#else
+static inline void _send_to_iface(kernel_pid_t iface, ng_pktsnip_t *pkt)
+{
+    ((ng_netif_hdr_t *)pkt->data)->if_pid = iface;
+    ng_netapi_send(iface, pkt);
+}
+#endif
+
 /* functions for sending */
 static void _send_unicast(kernel_pid_t iface, uint8_t *dst_l2addr,
                           uint16_t dst_l2addr_len, ng_pktsnip_t *pkt)
@@ -165,7 +202,7 @@ static void _send_unicast(kernel_pid_t iface, uint8_t *dst_l2addr,
 
     DEBUG("ipv6: send unicast over interface %" PRIkernel_pid "\n", iface);
     /* and send to interface */
-    ng_netapi_send(iface, pkt);
+    _send_to_iface(iface, pkt);
 }
 
 static int _fill_ipv6_hdr(kernel_pid_t iface, ng_pktsnip_t *ipv6,
@@ -243,7 +280,7 @@ static inline void _send_multicast_over_iface(kernel_pid_t iface, ng_pktsnip_t *
     /* mark as multicast */
     ((ng_netif_hdr_t *)netif->data)->flags |= NG_NETIF_HDR_FLAGS_MULTICAST;
     /* and send to interface */
-    ng_netapi_send(iface, pkt);
+    _send_to_iface(iface, pkt);
 }
 
 static void _send_multicast(kernel_pid_t iface, ng_pktsnip_t *pkt,

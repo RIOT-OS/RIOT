@@ -84,6 +84,15 @@ extern "C" {
  */
 
 /**
+ * @{
+ * @name Flags for the interfaces
+ */
+#define NG_IPV6_NETIF_FLAGS_SIXLOWPAN   (0x01)  /**< interface is 6LoWPAN interface */
+/**
+ * @}
+ */
+
+/**
  * @brief   Type to represent an IPv6 address registered to an interface.
  */
 typedef struct {
