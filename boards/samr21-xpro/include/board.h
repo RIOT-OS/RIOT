@@ -18,8 +18,8 @@
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  */
 
-#ifndef __BOARD_H
-#define __BOARD_H
+#ifndef BOARD_H
+#define BOARD_H
 
 #include "cpu.h"
 
@@ -100,5 +100,5 @@ void board_init(void);
 }
 #endif
 
-#endif /** __BOARD_H */
+#endif /** BOARD_H */
 /** @} */

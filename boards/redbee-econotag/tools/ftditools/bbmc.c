@@ -353,7 +353,7 @@ int main(int argc, char **argv)
         }
 
         if (ret)
-#endif // __APPLE__
+#endif // APPLE__
         {
             fprintf(stderr, "couldn't open dev_index %d, err %d (%s)\n", dev_index, ret, ftdi_get_error_string(&ftdic));
             return EXIT_FAILURE;
