@@ -36,7 +36,8 @@ typedef struct {
     void *arg;          /**< argument passed to the callback */
 } gpio_state_t;
 
-static gpio_state_t gpio_config[GPIO_NUMOF];
+#define EXTI_NUMOF 16
+static gpio_state_t gpio_config[EXTI_NUMOF];
 
 int gpio_init_out(gpio_t dev, gpio_pp_t pushpull)
 {
@@ -1034,72 +1035,13 @@ void gpio_write(gpio_t dev, int value)
 void isr_eic(void)
 {
     uint16_t status = EIC->INTFLAG.reg;
-    switch (status) {
-        case EIC_INTFLAG_EXTINT0:
-            gpio_config[0].cb(gpio_config[0].arg);
-            EIC->INTFLAG.reg = EIC_INTFLAG_EXTINT0;
-            break;
-        case EIC_INTFLAG_EXTINT1:
-            gpio_config[1].cb(gpio_config[1].arg);
-            EIC->INTFLAG.reg = EIC_INTFLAG_EXTINT1;
-            break;
-        case EIC_INTFLAG_EXTINT2:
-            gpio_config[2].cb(gpio_config[2].arg);
-            EIC->INTFLAG.reg = EIC_INTFLAG_EXTINT2;
-            break;
-        case EIC_INTFLAG_EXTINT3:
-            gpio_config[3].cb(gpio_config[3].arg);
-            EIC->INTFLAG.reg = EIC_INTFLAG_EXTINT3;
-            break;
-        case EIC_INTFLAG_EXTINT4:
-            gpio_config[4].cb(gpio_config[4].arg);
-            EIC->INTFLAG.reg = EIC_INTFLAG_EXTINT4;
-            break;
-        case EIC_INTFLAG_EXTINT5:
-            gpio_config[5].cb(gpio_config[5].arg);
-            EIC->INTFLAG.reg = EIC_INTFLAG_EXTINT5;
-            break;
-        case EIC_INTFLAG_EXTINT6:
-            gpio_config[6].cb(gpio_config[6].arg);
-            EIC->INTFLAG.reg = EIC_INTFLAG_EXTINT6;
-            break;
-        case EIC_INTFLAG_EXTINT7:
-            gpio_config[7].cb(gpio_config[7].arg);
-            EIC->INTFLAG.reg = EIC_INTFLAG_EXTINT7;
-            break;
-        case EIC_INTFLAG_EXTINT8:
-            gpio_config[8].cb(gpio_config[8].arg);
-            EIC->INTFLAG.reg = EIC_INTFLAG_EXTINT8;
-            break;
-        case EIC_INTFLAG_EXTINT9:
-            gpio_config[9].cb(gpio_config[9].arg);
-            EIC->INTFLAG.reg = EIC_INTFLAG_EXTINT9;
-            break;
-        case EIC_INTFLAG_EXTINT10:
-            gpio_config[10].cb(gpio_config[10].arg);
-            EIC->INTFLAG.reg = EIC_INTFLAG_EXTINT10;
-            break;
-        case EIC_INTFLAG_EXTINT11:
-            gpio_config[11].cb(gpio_config[11].arg);
-            EIC->INTFLAG.reg = EIC_INTFLAG_EXTINT11;
-            break;
-        case EIC_INTFLAG_EXTINT12:
-            gpio_config[12].cb(gpio_config[12].arg);
-            EIC->INTFLAG.reg = EIC_INTFLAG_EXTINT12;
-            break;
-        case EIC_INTFLAG_EXTINT13:
-            gpio_config[13].cb(gpio_config[13].arg);
-            EIC->INTFLAG.reg = EIC_INTFLAG_EXTINT13;
-            break;
-        case EIC_INTFLAG_EXTINT14:
-            gpio_config[14].cb(gpio_config[14].arg);
-            EIC->INTFLAG.reg = EIC_INTFLAG_EXTINT14;
-            break;
-        case EIC_INTFLAG_EXTINT15:
-            gpio_config[15].cb(gpio_config[15].arg);
-            EIC->INTFLAG.reg = EIC_INTFLAG_EXTINT15;
-            break;
+    for (int i = 0; i < 16; i++) {
+        if (status & (0x1<<i)) {
+            gpio_config[i].cb(gpio_config[i].arg);
+            EIC->INTFLAG.reg = 0x1 << i;
+        }
     }
+
     if (sched_context_switch_request) {
         thread_yield();
     }
