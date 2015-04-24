@@ -98,6 +98,10 @@
 #include "net/ng_pktdump.h"
 #endif
 
+#ifdef MODULE_NG_UDP
+#include "net/ng_udp.h"
+#endif
+
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
@@ -295,5 +299,9 @@ void auto_init(void)
 #ifdef MODULE_NG_IPV6
     DEBUG("Auto init ng_ipv6 module.\n");
     ng_ipv6_init();
+#endif
+#ifdef MODULE_NG_UDP
+    DEBUG("Auto init UDP module.\n");
+    ng_udp_init();
 #endif
 }
