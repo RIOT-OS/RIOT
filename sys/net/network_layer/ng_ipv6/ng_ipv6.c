@@ -245,6 +245,7 @@ static int _fill_ipv6_hdr(kernel_pid_t iface, ng_pktsnip_t *ipv6,
 
     DEBUG("ipv6: calculate checksum for upper header.\n");
 
+#if NG_NETIF_NUMOF > 1
     if (payload->users > 1) {
         ng_pktsnip_t *ptr = ipv6;
 
@@ -262,6 +263,7 @@ static int _fill_ipv6_hdr(kernel_pid_t iface, ng_pktsnip_t *ipv6,
             ptr = ptr->next;
         }
     }
+#endif /* NG_NETIF_NUMOF */
 
     if ((res = ng_netreg_calc_csum(payload, ipv6)) < 0) {
         if (res != -ENOENT) {   /* if there is no checksum we are okay */
@@ -289,6 +291,7 @@ static void _send_multicast(kernel_pid_t iface, ng_pktsnip_t *pkt,
 {
     ng_pktsnip_t *netif;
 
+#if NG_NETIF_NUMOF > 1
     /* netif header not present: send over all interfaces */
     if (iface == KERNEL_PID_UNDEF) {
         size_t ifnum;
@@ -354,6 +357,34 @@ static void _send_multicast(kernel_pid_t iface, ng_pktsnip_t *pkt,
 
         _send_multicast_over_iface(iface, pkt, netif);
     }
+#else   /* NG_NETIF_NUMOF */
+    if (iface == KERNEL_PID_UNDEF) {
+        /* allocate interface header */
+        netif = ng_netif_hdr_build(NULL, 0, NULL, 0);
+
+        if (netif == NULL) {
+            DEBUG("ipv6: error on interface header allocation, "
+                  "dropping packet\n");
+            ng_pktbuf_release(pkt);
+            return;
+        }
+
+        LL_PREPEND(pkt, netif);
+    }
+    else {
+        netif = pkt;
+    }
+
+    if (prep_hdr) {
+        if (_fill_ipv6_hdr(iface, ipv6, payload) < 0) {
+            /* error on filling up header */
+            ng_pktbuf_release(pkt);
+            return;
+        }
+    }
+
+    _send_multicast_over_iface(iface, pkt, netif);
+#endif  /* NG_NETIF_NUMOF */
 }
 
 static void _send(ng_pktsnip_t *pkt, bool prep_hdr)
