@@ -21,8 +21,6 @@
 #ifndef ATOMIC_H_
 #define ATOMIC_H_
 
-#include "arch/atomic_arch.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -33,18 +31,6 @@ extern "C" {
 typedef struct atomic_int {
     volatile int value;
 } atomic_int_t;
-
-
-
-/**
- * @brief Sets a new and returns the old value of a variable atomically
- *
- * @param[in] val   The variable to be set
- * @param[in] set   The value to be written
- *
- * @return The old value of *val*
- */
-unsigned int atomic_set_return(unsigned int *val, unsigned int set);
 
 /**
  * @brief Initializer for atomic variables
