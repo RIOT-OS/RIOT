@@ -34,6 +34,14 @@
 #define RTC_NUMOF (1)
 /** @} */
 
+/**
+ * @name Timer peripheral configuration
+ * @{
+ */
+#define TIMER_NUMOF        (1U)
+#define TIMER_0_EN         1
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
