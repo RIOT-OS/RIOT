@@ -66,7 +66,7 @@ static void (*int_handler)(int);
  * Source:
  * http://www.gnu.org/software/libc/manual/html_node/Elapsed-Time.html
  */
-int timeval_subtract(struct timeval *result, struct timeval *x, struct timeval *y)
+static int timeval_subtract(struct timeval *result, struct timeval *x, struct timeval *y)
 {
     /* Perform the carry for the later subtraction by updating y. */
     if (x->tv_usec < y->tv_usec) {
@@ -95,7 +95,7 @@ int timeval_subtract(struct timeval *result, struct timeval *x, struct timeval *
 /**
  * sets timeval to given ticks
  */
-void ticks2tv(unsigned long ticks, struct timeval *tp)
+static void ticks2tv(unsigned long ticks, struct timeval *tp)
 {
     tp->tv_sec = ticks / HWTIMER_SPEED;
     tp->tv_usec = (ticks % HWTIMER_SPEED) ;
@@ -104,7 +104,7 @@ void ticks2tv(unsigned long ticks, struct timeval *tp)
 /**
  * returns ticks for give timeval
  */
-unsigned long tv2ticks(struct timeval *tp)
+static unsigned long tv2ticks(struct timeval *tp)
 {
     /* TODO: check for overflow */
     return((tp->tv_sec * HWTIMER_SPEED) + (tp->tv_usec));
@@ -113,7 +113,7 @@ unsigned long tv2ticks(struct timeval *tp)
 /**
  * returns ticks for give timespec
  */
-unsigned long ts2ticks(struct timespec *tp)
+static unsigned long ts2ticks(struct timespec *tp)
 {
     /* TODO: check for overflow */
     return((tp->tv_sec * HWTIMER_SPEED) + (tp->tv_nsec / 1000));
