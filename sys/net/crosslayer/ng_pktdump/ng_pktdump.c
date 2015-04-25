@@ -67,7 +67,7 @@ static void _dump_ipv6_hdr(ng_ipv6_hdr_t *hdr)
 {
     char addr_str[NG_IPV6_ADDR_MAX_STR_LEN];
 
-    if (!ng_ipv6_hdr_is_ipv6_hdr(hdr)) {
+    if (!ng_ipv6_hdr_is(hdr)) {
         printf("illegal version field: %" PRIu8 "\n", ng_ipv6_hdr_get_version(hdr));
     }
 
