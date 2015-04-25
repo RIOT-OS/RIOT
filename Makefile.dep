@@ -49,6 +49,7 @@ ifneq (,$(filter sixlowpan,$(USEMODULE)))
 endif
 
 ifneq (,$(filter ng_sixlowpan,$(USEMODULE)))
+  USEMODULE += ng_ipv6
   USEMODULE += ng_sixlowpan_netif
   USEMODULE += ng_netbase
 endif
