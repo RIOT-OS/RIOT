@@ -49,20 +49,20 @@ class Testbed():
         self.start()
     
     def flashNodes(self):
-        raise NotImplementedError("Inherit from Testbed and implement flashNodes") 
-    
+        raise NotImplementedError("Inherit from Testbed and implement flashNodes")
+
     def cleanLogs(self):
-        raise NotImplementedError("Inherit from Testbed and implement flashNodes") 
-    
+        raise NotImplementedError("Inherit from Testbed and implement cleanLogs")
+
     def archiveLogs(self, experiment = None):
-        raise NotImplementedError("Inherit from Testbed and implement flashNodes") 
-    
+        raise NotImplementedError("Inherit from Testbed and implement archiveLogs")
+
     def start(self):
-        raise NotImplementedError("Inherit from Testbed and implement flashNodes")  
-    
+        raise NotImplementedError("Inherit from Testbed and implement start")
+
     def stop(self):
-        raise NotImplementedError("Inherit from Testbed and implement flashNodes") 
-    
+        raise NotImplementedError("Inherit from Testbed and implement stop")
+
     def defaultArchivePostfix(self, experimentName = None):
         if not experimentName:
             experimentName = "unknown"
