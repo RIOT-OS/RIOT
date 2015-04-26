@@ -125,6 +125,9 @@ endif
 ifneq (,$(filter fib,$(USEMODULE)))
     DIRS += net/network_layer/fib
 endif
+ifneq (,$(filter ng_udp,$(USEMODULE)))
+    DIRS += net/transport_layer/ng_udp
+endif
 
 DIRS += $(dir $(wildcard $(addsuffix /Makefile, ${USEMODULE})))
 

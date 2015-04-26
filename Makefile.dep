@@ -91,6 +91,11 @@ ifneq (,$(filter ng_ipv6_netif,$(USEMODULE)))
   USEMODULE += ng_netif
 endif
 
+ifneq (,$(filter ng_udp,$(USEMODULE)))
+  USEMODULE += ng_netbase
+  USEMODULE += ng_inet_csum
+endif
+
 ifneq (,$(filter ng_netbase,$(USEMODULE)))
   USEMODULE += ng_netapi
   USEMODULE += ng_netreg
