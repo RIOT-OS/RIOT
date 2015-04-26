@@ -31,12 +31,6 @@
 #include <stdint.h>
 #include "atomic.h"
 
-unsigned int atomic_set_return(unsigned int *val, unsigned int set)
-{
-    asm volatile ("lock xchg %0, %1" : "+m"(*val), "+r"(set));
-    return set;
-}
-
 int atomic_cas(atomic_int_t *dest, int known_value, int new_value)
 {
     uint8_t successful;
