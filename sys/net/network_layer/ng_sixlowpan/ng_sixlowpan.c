@@ -18,6 +18,7 @@
 #include "utlist.h"
 
 #include "net/ng_sixlowpan.h"
+#include "net/ng_sixlowpan/frag.h"
 #include "net/ng_sixlowpan/netif.h"
 
 #define ENABLE_DEBUG    (0)
@@ -80,6 +81,12 @@ void _receive(ng_pktsnip_t *pkt)
         LL_DELETE(pkt, sixlowpan);
         ng_pktbuf_release(sixlowpan);
     }
+#ifdef MODULE_NG_SIXLOWPAN_FRAG
+    else if (ng_sixlowpan_frag_is((ng_sixlowpan_frag_t *)dispatch)) {
+        DEBUG("6lo: received 6LoWPAN fragment\n");
+        ng_sixlowpan_frag_handle_pkt(pkt);
+    }
+#endif
     else {
         DEBUG("6lo: dispatch %02x ... is not supported\n",
               dispatch[0]);
@@ -137,8 +144,6 @@ void _send(ng_pktsnip_t *pkt)
      * length is the length of the IPv6 datagram + 6LoWPAN dispatches,
      * while the datagram size is the size of only the IPv6 datagram */
     payload_len = ng_pkt_len(ipv6);
-    /* cppcheck: datagram_size will be read by ng_sixlowpan_frag implementation */
-    /* cppcheck-suppress unreadVariable */
     datagram_size = (uint16_t)payload_len;
 
     /* use sixlowpan packet snip as temporary one */
@@ -197,8 +202,17 @@ void _send(ng_pktsnip_t *pkt)
 
         return;
     }
+#ifdef MODULE_NG_SIXLOWPAN_FRAG
+    else {
+        DEBUG("6lo: Send fragmented (%u > %" PRIu16 ")\n",
+              (unsigned int)payload_len, max_frag_size);
+        ng_sixlowpan_frag_send(hdr->if_pid, pkt, payload_len, datagram_size);
+    }
+#else
+    (void)datagram_size;
     DEBUG("6lo: packet too big (%u> %" PRIu16 ")\n",
           (unsigned int)payload_len, max_frag_size);
+#endif
 }
 
 static void *_event_loop(void *args)
