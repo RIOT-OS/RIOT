@@ -1,0 +1,36 @@
+# Set some path substitution rules to be able to list source code while
+# debugging after the build was run inside a Docker container
+# These are harmless as they only apply to filenames beginning with /data/riotbuild/
+python
+import os
+try:
+    path = os.environ['RIOTBASE']
+except KeyError:
+    # Environment variable wasn't set.
+    pass
+else:
+    gdb.execute('set substitute-path /data/riotbuild/riotbase ' + path)
+try:
+    path = os.environ['RIOTCPU']
+except KeyError:
+    # Environment variable wasn't set.
+    pass
+else:
+    gdb.execute('set substitute-path /data/riotbuild/riotcpu ' + path)
+try:
+    path = os.environ['RIOTBOARD']
+except KeyError:
+    # Environment variable wasn't set.
+    pass
+else:
+    gdb.execute('set substitute-path /data/riotbuild/riotboard ' + path)
+try:
+    path = os.environ['RIOTPROJECT']
+except KeyError:
+    # Environment variable wasn't set.
+    pass
+else:
+    gdb.execute('set substitute-path /data/riotbuild/riotproject ' + path)
+end
+
+show substitute-path
