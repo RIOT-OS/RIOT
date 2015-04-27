@@ -1294,6 +1294,54 @@ void spi_transmission_begin(spi_t dev, char reset_val)
                                | SPI_PUSHR_TXDATA(reset_val);
             break;
 #endif
+#if SPI_2_EN
+
+        case SPI_2:
+            SPI_2_DEV->PUSHR = SPI_PUSHR_CTAS(SPI_2_CTAS)
+                               | SPI_PUSHR_EOQ_MASK
+                               | SPI_PUSHR_TXDATA(reset_val);
+            break;
+#endif
+#if SPI_3_EN
+
+        case SPI_3:
+            SPI_3_DEV->PUSHR = SPI_PUSHR_CTAS(SPI_3_CTAS)
+                               | SPI_PUSHR_EOQ_MASK
+                               | SPI_PUSHR_TXDATA(reset_val);
+            break;
+#endif
+#if SPI_4_EN
+
+        case SPI_4:
+            SPI_4_DEV->PUSHR = SPI_PUSHR_CTAS(SPI_4_CTAS)
+                               | SPI_PUSHR_EOQ_MASK
+                               | SPI_PUSHR_TXDATA(reset_val);
+            break;
+#endif
+#if SPI_5_EN
+
+        case SPI_5:
+            SPI_5_DEV->PUSHR = SPI_PUSHR_CTAS(SPI_5_CTAS)
+                               | SPI_PUSHR_EOQ_MASK
+                               | SPI_PUSHR_TXDATA(reset_val);
+            break;
+#endif
+#if SPI_6_EN
+
+        case SPI_6:
+            SPI_6_DEV->PUSHR = SPI_PUSHR_CTAS(SPI_6_CTAS)
+                               | SPI_PUSHR_EOQ_MASK
+                               | SPI_PUSHR_TXDATA(reset_val);
+            break;
+#endif
+#if SPI_7_EN
+
+        case SPI_7:
+            SPI_7_DEV->PUSHR = SPI_PUSHR_CTAS(SPI_7_CTAS)
+                               | SPI_PUSHR_EOQ_MASK
+                               | SPI_PUSHR_TXDATA(reset_val);
+            break;
+#endif
     }
 }
 
