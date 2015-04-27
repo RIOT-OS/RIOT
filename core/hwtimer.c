@@ -22,14 +22,13 @@
  * @}
  */
 
-#include <stdio.h>
-
 #include "kernel.h"
 #include "thread.h"
 #include "lifo.h"
 #include "mutex.h"
 #include "irq.h"
 #include "board.h"
+#include "log.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -157,7 +156,7 @@ static int _hwtimer_set(unsigned long offset, void (*callback)(void*), void *ptr
     if (n == -1) {
         restoreIRQ(state);
 
-        puts("No hwtimer left.");
+        log_warning("No hwtimer left.");
         return -1;
     }
 

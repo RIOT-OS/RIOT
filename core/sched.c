@@ -29,6 +29,7 @@
 #include "irq.h"
 #include "thread.h"
 #include "irq.h"
+#include "log.h"
 
 #if SCHEDSTATISTICS
 #include "hwtimer.h"
@@ -86,7 +87,7 @@ int sched_run(void)
 
 #ifdef SCHED_TEST_STACK
         if (*((uintptr_t *) active_thread->stack_start) != (uintptr_t) active_thread->stack_start) {
-            printf("scheduler(): stack overflow detected, pid=%" PRIkernel_pid "\n", active_thread->pid);
+            log_error("scheduler(): stack overflow detected, pid=%" PRIkernel_pid "\n", active_thread->pid);
         }
 #endif
 
