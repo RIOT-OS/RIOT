@@ -15,7 +15,7 @@ env:
 
 before_install:
     - sudo apt-get install emdebian-archive-keyring
-    - echo 'deb http://emdebian.bytesatwork.ch/mirror/toolchains/ wheezy main' | sudo tee /etc/apt/sources.list.d/emdebian.list > /dev/null
+    - echo 'deb http://ftp.uk.debian.org/emdebian/toolchains wheezy main' | sudo tee /etc/apt/sources.list.d/emdebian.list > /dev/null
 
     - echo 'deb http://us.archive.ubuntu.com/ubuntu trusty           main restricted universe multiverse' | sudo tee    /etc/apt/sources.list.d/trusty.list > /dev/null
     - echo 'deb http://us.archive.ubuntu.com/ubuntu trusty-backports main restricted universe multiverse' | sudo tee -a /etc/apt/sources.list.d/trusty.list > /dev/null
