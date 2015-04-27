@@ -77,6 +77,7 @@ typedef struct {
     uint8_t src_len;                    /**< length of source address */
     uint8_t dst_len;                    /**< length of destination address */
     uint16_t tag;                       /**< the datagram's tag */
+    uint16_t datagram_size;             /**< the datagram's size (without 6lo dispatches) */
     uint16_t cur_size;                  /**< the datagram's current size */
 } rbuf_t;
 

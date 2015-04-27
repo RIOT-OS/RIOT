@@ -67,6 +67,7 @@ void rbuf_add(ng_netif_hdr_t *netif_hdr, ng_sixlowpan_frag_t *frag,
     rbuf_t *entry;
     rbuf_int_t *ptr;
     uint8_t *data = ((uint8_t *)frag) + sizeof(ng_sixlowpan_frag_t);
+    uint16_t dg_frag_size = frag_size; /* may differ on first fragment */
 
     _rbuf_gc();
     entry = _rbuf_get(ng_netif_hdr_get_src_addr(netif_hdr), netif_hdr->src_l2addr_len,
@@ -81,8 +82,42 @@ void rbuf_add(ng_netif_hdr_t *netif_hdr, ng_sixlowpan_frag_t *frag,
 
     ptr = entry->ints;
 
+    /* dispatches in the first fragment are ignored */
+    if (offset != 0) {
+        switch (((uint8_t *)(entry->pkt->data))[0]) {
+            case NG_SIXLOWPAN_UNCOMPRESSED:
+                offset++;
+
+                break;
+
+            default:
+                break;
+        }
+
+        data++;     /* also don't take offset field */
+    }
+    else {
+        switch (data[0]) {
+            case NG_SIXLOWPAN_UNCOMPRESSED:
+                dg_frag_size--;
+
+                break;
+
+            default:
+                break;
+        }
+
+    }
+
+    if ((offset + frag_size) > entry->pkt->size) {
+        DEBUG("6lo rfrag: fragment too big for resulting datagram, discarding datagram\n");
+        ng_pktbuf_release(entry->pkt);
+        _rbuf_rem(entry);
+        return;
+    }
+
     while (ptr != NULL) {
-        if (_rbuf_int_in(ptr, offset, offset + frag_size - 1)) {
+        if (_rbuf_int_in(ptr, offset, offset + dg_frag_size - 1)) {
             DEBUG("6lo rfrag: overlapping or same intervals, discarding datagram\n");
             ng_pktbuf_release(entry->pkt);
             _rbuf_rem(entry);
@@ -92,48 +127,31 @@ void rbuf_add(ng_netif_hdr_t *netif_hdr, ng_sixlowpan_frag_t *frag,
         ptr = ptr->next;
     }
 
-    if (_rbuf_update_ints(entry, offset, frag_size)) {
-        if (offset == 0) {
+    if (_rbuf_update_ints(entry, offset, dg_frag_size)) {
+        if (dg_frag_size < frag_size) {
             /* some dispatches do not count to datagram size and we need
              * more space because of that */
-            switch (data[0]) {
-                case NG_SIXLOWPAN_UNCOMPRESSED:
-                    if (ng_pktbuf_realloc_data(entry->pkt, entry->pkt->size + 1) < 0) {
-                        DEBUG("6lo rbuf: could not reallocate packet data.\n");
-                        return;
-                    }
-
-                    /* move already inserted fragments 1 to the right */
-                    for (int i = entry->pkt->size - 1; i > 0; i--) {
-                        uint8_t *d = ((uint8_t *)(entry->pkt->data)) + i;
-                        *d = *(d - 1);
-                    }
-
-                default:
-                    break;
+            if (ng_pktbuf_realloc_data(entry->pkt, entry->pkt->size +
+                                       (frag_size - dg_frag_size)) < 0) {
+                DEBUG("6lo rbuf: could not reallocate packet data.\n");
+                return;
             }
-        }
-        else {
-            data += 1;  /* skip offset field in fragmentation header */
-        }
 
-        /* also adapt offset according to stored dispatch */
-        /* above case only applies for first fragment incoming, this for all */
-        switch (*((uint8_t *)entry->pkt->data)) {
-            case NG_SIXLOWPAN_UNCOMPRESSED:
-                offset++;
-                break;
-
-            default:
-                break;
+            /* move already inserted fragments (frag_size - dg_frag_size) to the right */
+            if (entry->cur_size > 0) {
+                for (int i = entry->pkt->size - (frag_size - dg_frag_size); i > 0; i--) {
+                    uint8_t *d = ((uint8_t *)(entry->pkt->data)) + i;
+                    *d = *(d - 1);
+                }
+            }
         }
 
         DEBUG("6lo rbuf: add fragment data\n");
+        entry->cur_size += (uint16_t)dg_frag_size;
         memcpy(((uint8_t *)entry->pkt->data) + offset, data, frag_size);
-        entry->cur_size += (uint16_t)frag_size;
     }
 
-    if (entry->cur_size == entry->pkt->size) {
+    if (entry->cur_size == entry->datagram_size) {
         kernel_pid_t iface = netif_hdr->if_pid;
         ng_pktsnip_t *netif = ng_netif_hdr_build(entry->src, entry->src_len,
                               entry->dst, entry->dst_len);
@@ -146,7 +164,7 @@ void rbuf_add(ng_netif_hdr_t *netif_hdr, ng_sixlowpan_frag_t *frag,
 
         netif_hdr = netif->data;
         netif_hdr->if_pid = iface;
-        entry->pkt->next = netif;
+        LL_APPEND(entry->pkt, netif);
 
         DEBUG("6lo rbuf: datagram complete, send to self\n");
         ng_netapi_receive(thread_getpid(), entry->pkt);
@@ -163,7 +181,7 @@ static inline bool _rbuf_int_in(rbuf_int_t *i, uint16_t start, uint16_t end)
 
 static rbuf_int_t *_rbuf_int_get_free(void)
 {
-    for (int i = 0; i < RBUF_INT_SIZE; i++) {
+    for (unsigned int i = 0; i < RBUF_INT_SIZE; i++) {
         if (rbuf_int[i].end == 0) { /* start must be smaller than end anyways*/
             return rbuf_int + i;
         }
@@ -205,7 +223,7 @@ static bool _rbuf_update_ints(rbuf_t *entry, uint16_t offset, size_t frag_size)
           new->start, new->end, ng_netif_addr_to_str(l2addr_str,
                   sizeof(l2addr_str), entry->src, entry->src_len));
     DEBUG("%s, %zu, %" PRIu16 ")\n", ng_netif_addr_to_str(l2addr_str,
-            sizeof(l2addr_str), entry->dst, entry->dst_len), entry->pkt->size,
+            sizeof(l2addr_str), entry->dst, entry->dst_len), entry->datagram_size,
           entry->tag);
 
     LL_PREPEND(entry->ints, new);
@@ -217,7 +235,7 @@ static void _rbuf_gc(void)
 {
     rbuf_t *oldest = NULL;
     timex_t now;
-    int i;
+    unsigned int i;
 
     vtimer_now(&now);
 
@@ -229,7 +247,7 @@ static void _rbuf_gc(void)
             DEBUG("%s, %zu, %" PRIu16 ") timed out\n",
                   ng_netif_addr_to_str(l2addr_str, sizeof(l2addr_str), rbuf[i].dst,
                                        rbuf[i].dst_len),
-                  rbuf[i].pkt->size, rbuf[i].tag);
+                  rbuf[i].datagram_size, rbuf[i].tag);
 
             ng_pktbuf_release(rbuf[i].pkt);
             _rbuf_rem(&(rbuf[i]));
@@ -239,7 +257,7 @@ static void _rbuf_gc(void)
         }
     }
 
-    if (((i >= RBUF_SIZE) && (oldest != NULL))) {
+    if ((i >= RBUF_SIZE) && (oldest != NULL) && (oldest->pkt != NULL)) {
         DEBUG("6lo rfrag: reassembly buffer full, remove oldest entry");
         ng_pktbuf_release(oldest->pkt);
         _rbuf_rem(oldest);
@@ -255,9 +273,9 @@ static rbuf_t *_rbuf_get(const void *src, size_t src_len,
 
     vtimer_now(&now);
 
-    for (int i = 0; i < RBUF_SIZE; i++) {
+    for (unsigned int i = 0; i < RBUF_SIZE; i++) {
         /* check first if entry already available */
-        if ((rbuf[i].pkt != NULL) && (rbuf[i].pkt->size == size) &&
+        if ((rbuf[i].pkt != NULL) && (rbuf[i].datagram_size == size) &&
             (rbuf[i].tag == tag) && (rbuf[i].src_len == src_len) &&
             (rbuf[i].dst_len == dst_len) &&
             (memcmp(rbuf[i].src, src, src_len) == 0) &&
@@ -267,8 +285,8 @@ static rbuf_t *_rbuf_get(const void *src, size_t src_len,
             DEBUG("%s, %zu, %" PRIu16 ") found\n",
                   ng_netif_addr_to_str(l2addr_str, sizeof(l2addr_str),
                                        rbuf[i].dst, rbuf[i].dst_len),
-                  rbuf[i].pkt->size, rbuf[i].tag);
-            res->arrival = now.seconds;
+                  rbuf[i].datagram_size, rbuf[i].tag);
+            rbuf[i].arrival = now.seconds;
             return &(rbuf[i]);
         }
 
@@ -280,6 +298,8 @@ static rbuf_t *_rbuf_get(const void *src, size_t src_len,
 
     if (res != NULL) { /* entry not in buffer but found empty spot */
         res->pkt = ng_pktbuf_add(NULL, NULL, size, NG_NETTYPE_SIXLOWPAN);
+        *((uint64_t *)res->pkt->data) = 0;  /* clean first few bytes for later
+                                             * look-ups */
 
         if (res->pkt == NULL) {
             DEBUG("6lo rfrag: can not allocate reassembly buffer space.\n");
@@ -292,13 +312,14 @@ static rbuf_t *_rbuf_get(const void *src, size_t src_len,
         res->src_len = src_len;
         res->dst_len = dst_len;
         res->tag = tag;
+        res->datagram_size = size;
         res->cur_size = 0;
 
         DEBUG("6lo rfrag: entry (%s, ", ng_netif_addr_to_str(l2addr_str,
                 sizeof(l2addr_str), res->src, res->src_len));
         DEBUG("%s, %zu, %" PRIu16 ") created\n",
               ng_netif_addr_to_str(l2addr_str, sizeof(l2addr_str), res->dst,
-                                   res->dst_len), res->pkt->size, res->tag);
+                                   res->dst_len), res->datagram_size, res->tag);
     }
 
     return res;
