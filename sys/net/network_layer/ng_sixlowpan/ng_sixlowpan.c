@@ -85,6 +85,7 @@ void _receive(ng_pktsnip_t *pkt)
     else if (ng_sixlowpan_frag_is((ng_sixlowpan_frag_t *)dispatch)) {
         DEBUG("6lo: received 6LoWPAN fragment\n");
         ng_sixlowpan_frag_handle_pkt(pkt);
+        return;
     }
 #endif
     else {
