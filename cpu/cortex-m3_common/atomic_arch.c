@@ -10,23 +10,37 @@
  * @ingroup     cpu_cortexm3_common
  * @{
  *
- * @file        atomic_arch.c
+ * @file
  * @brief       Implementation of the kernels atomic interface
  *
  * @author      Stefan Pfeiffer <stefan.pfeiffer@fu-berlin.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Joakim Gebart <joakim.gebart@eistec.se>
  *
  * @}
  */
 
-#include "arch/atomic_arch.h"
+#include <stdint.h>
+#include "atomic.h"
 #include "irq.h"
+#include "cpu.h"
 
-unsigned int atomic_arch_set_return(unsigned int *to_set, unsigned int value)
+int atomic_cas(atomic_int_t *var, int old, int now)
 {
-    disableIRQ();
-    unsigned int old = *to_set;
-    *to_set = value;
-    enableIRQ();
-    return old;
+    int tmp;
+    int status;
+
+    /* Load exclusive */
+    tmp = __LDREXW((volatile uint32_t *)(&ATOMIC_VALUE(*var)));
+
+    if (tmp != old) {
+        /* Clear memory exclusivity */
+        __CLREX();
+        return 0;
+    }
+
+    /* Try to write the new value */
+    status = __STREXW(now, (volatile uint32_t *)(&ATOMIC_VALUE(*var)));
+
+    return (status == 0);
 }
