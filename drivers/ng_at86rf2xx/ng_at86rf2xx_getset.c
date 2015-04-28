@@ -72,8 +72,7 @@ void ng_at86rf2xx_set_addr_long(ng_at86rf2xx_t *dev, uint64_t addr)
 
 uint8_t ng_at86rf2xx_get_chan(ng_at86rf2xx_t *dev)
 {
-    uint8_t res = ng_at86rf2xx_reg_read(dev, NG_AT86RF2XX_REG__PHY_CC_CCA);
-    return (res & NG_AT86RF2XX_PHY_CC_CCA_MASK__CHANNEL);
+    return dev->chan;
 }
 
 void ng_at86rf2xx_set_chan(ng_at86rf2xx_t *dev, uint8_t channel)
@@ -84,11 +83,47 @@ void ng_at86rf2xx_set_chan(ng_at86rf2xx_t *dev, uint8_t channel)
         || channel > NG_AT86RF2XX_MAX_CHANNEL) {
         return;
     }
+    dev->chan = channel;
     tmp = ng_at86rf2xx_reg_read(dev, NG_AT86RF2XX_REG__PHY_CC_CCA);
     tmp &= ~(NG_AT86RF2XX_PHY_CC_CCA_MASK__CHANNEL);
     tmp |= (channel & NG_AT86RF2XX_PHY_CC_CCA_MASK__CHANNEL);
     ng_at86rf2xx_reg_write(dev, NG_AT86RF2XX_REG__PHY_CC_CCA, tmp);
 }
+
+#ifdef MODULE_NG_AT86RF212B
+ng_at86rf2xx_freq_t ng_at86rf2xx_get_freq(ng_at86rf2xx_t *dev)
+{
+    return dev->freq;
+}
+
+void ng_at86rf2xx_set_freq(ng_at86rf2xx_t *dev, ng_at86rf2xx_freq_t freq)
+{
+    uint8_t tmp;
+    tmp = ng_at86rf2xx_reg_read(dev, NG_AT86RF2XX_REG__TRX_CTRL_2);
+    tmp &= ~(NG_AT86RF2XX_TRX_CTRL_2_MASK__FREQ_MODE);
+
+    if (freq == NG_AT86RF2XX_FREQ_915MHZ) {
+        dev->freq = NG_AT86RF2XX_FREQ_915MHZ;
+        /* settings used by Linux 4.0rc at86rf212b driver  - BPSK-40*/
+        tmp |= NG_AT86RF2XX_TRX_CTRL_2_MASK__SUB_MODE
+              | NG_AT86RF2XX_TRX_CTRL_2_MASK__OQPSK_SCRAM_EN;
+        if (dev->chan == 0) {
+            ng_at86rf2xx_set_chan(dev,NG_AT86RF2XX_DEFAULT_CHANNEL);
+        } else {
+            ng_at86rf2xx_set_chan(dev,dev->chan);
+        }
+    } else if (freq == NG_AT86RF2XX_FREQ_868MHZ) {
+        dev->freq = NG_AT86RF2XX_FREQ_868MHZ;
+        /* OQPSK-SIN-RC-100 IEEE802.15.4 for 868,3MHz */
+        tmp |= NG_AT86RF2XX_TRX_CTRL_2_MASK__BPSK_OQPSK;
+        /* Channel = 0 for 868MHz means 868.3MHz, only one available */
+        ng_at86rf2xx_set_chan(dev,0x00);
+    } else {
+        return;
+    }
+    ng_at86rf2xx_reg_write(dev, NG_AT86RF2XX_REG__TRX_CTRL_2, tmp);
+}
+#endif
 
 uint16_t ng_at86rf2xx_get_pan(ng_at86rf2xx_t *dev)
 {

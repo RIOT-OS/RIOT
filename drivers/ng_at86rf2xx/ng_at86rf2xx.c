@@ -146,12 +146,10 @@ void ng_at86rf2xx_reset(ng_at86rf2xx_t *dev)
 #endif
     /* enable safe mode (protect RX FIFO until reading data starts) */
     tmp = NG_AT86RF2XX_TRX_CTRL_2_MASK__RX_SAFE_MODE;
-#ifdef MODULE_NG_AT86RF212
-    /* settings used by Linux 4.0rc at86rf212b driver */
-    tmp |= (NG_AT86RF2XX_TRX_CTRL_2_MASK__SUB_MODE
-            | NG_AT86RF2XX_TRX_CTRL_2_MASK__OQPSK_SCRAM_EN);
-#endif
     ng_at86rf2xx_reg_write(dev, NG_AT86RF2XX_REG__TRX_CTRL_2, tmp);
+#ifdef MODULE_NG_AT86RF212
+    ng_at86rf2xx_set_freq(NG_AT86RF2XX_FREQ_915MHZ);
+#endif
     /* enable interrupts */
     ng_at86rf2xx_reg_write(dev, NG_AT86RF2XX_REG__IRQ_MASK,
                            NG_AT86RF2XX_IRQ_STATUS_MASK__TRX_END);

@@ -68,6 +68,19 @@ extern "C" {
 /** @} */
 
 /**
+  * @brief   Frequency configuration
+  * @{
+  */
+#ifdef MODULE_NG_AT86RF212B
+typedef enum {
+    NG_AT86RF2XX_FREQ_915MHZ,    /**< frequency 915MHz enabled */
+    NG_AT86RF2XX_FREQ_868MHZ,    /**< frequency 868MHz enabled */
+} ng_at86rf2xx_freq_t;
+#endif
+/** @} */
+
+
+/**
  * @brief   Default PAN ID
  *
  * TODO: Read some global network stack specific configuration value
@@ -137,6 +150,10 @@ typedef struct {
     uint8_t seq_nr;                     /**< sequence number to use next */
     uint8_t frame_len;                  /**< length of the current TX frame */
     uint16_t pan;                       /**< currently used PAN ID */
+    uint8_t chan;                       /**< currently used channel */
+#ifdef MODULE_NG_AT86RF212B
+    ng_at86rf2xx_freq_t freq;           /**< currently used frequency */
+#endif
     uint8_t addr_short[2];              /**< the radio's short address */
     uint8_t addr_long[8];               /**< the radio's long address */
     uint16_t options;                   /**< state of used options */
@@ -229,6 +246,25 @@ uint8_t ng_at86rf2xx_get_chan(ng_at86rf2xx_t *dev);
  * @param[in] chan          channel to set
  */
 void ng_at86rf2xx_set_chan(ng_at86rf2xx_t *dev, uint8_t chan);
+
+#ifdef MODULE_NG_AT86RF212B
+/**
+ * @brief   Get the configured frequency of the given device
+ *
+ * @param[in] dev           device to read from
+ *
+ * @return                  the currently set frequency
+ */
+ng_at86rf2xx_freq_t ng_at86rf2xx_get_freq(ng_at86rf2xx_t *dev);
+
+/**
+ * @brief   Set the frequency of the given device
+ *
+ * @param[in] dev           device to write to
+ * @param[in] chan          frequency to set
+ */
+void ng_at86rf2xx_set_freq(ng_at86rf2xx_t *dev, ng_at86rf2xx_freq_t freq);
+#endif
 
 /**
  * @brief   Get the configured PAN ID of the given device

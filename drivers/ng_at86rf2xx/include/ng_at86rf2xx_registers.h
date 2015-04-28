@@ -152,13 +152,17 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Bitfield definitions for the TXR_CTRL_2 register
+ * @brief   Bitfield definitions for the TRX_CTRL_2 register
  * @{
  */
 #define NG_AT86RF2XX_TRX_CTRL_2_MASK__RX_SAFE_MODE              (0x80)
-#define NG_AT86RF2XX_TRX_CTRL_2_MASK__SUB_MODE                  (0x4)
-#define NG_AT86RF2XX_TRX_CTRL_2_MASK__OQPSK_DATA_RATE           (0x03)
+#define NG_AT86RF2XX_TRX_CTRL_2_MASK__FREQ_MODE                 (0x3F)
+#define NG_AT86RF2XX_TRX_CTRL_2_MASK__TRX_OFF_AVDD_EN           (0x40)
 #define NG_AT86RF2XX_TRX_CTRL_2_MASK__OQPSK_SCRAM_EN            (0x20)
+#define NG_AT86RF2XX_TRX_CTRL_2_MASK__ALT_SPECTRUM              (0x10)
+#define NG_AT86RF2XX_TRX_CTRL_2_MASK__BPSK_OQPSK                (0x08)
+#define NG_AT86RF2XX_TRX_CTRL_2_MASK__SUB_MODE                  (0x04)
+#define NG_AT86RF2XX_TRX_CTRL_2_MASK__OQPSK_DATA_RATE           (0x03)
 /** @} */
 
 /**
