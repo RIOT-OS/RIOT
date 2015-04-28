@@ -140,7 +140,7 @@ class DesVirtTestbed(Testbed):
         self.logFilePath = logFilePath
         self.namePortList = []
 	if not os.path.isdir(self.desvirtPath):
-		print("desvirt not found! Try running 'make' in RIOT/pkg/desvirt")
+		print("desvirt not found! Try running 'make' in RIOT/dist/tools/desvirt")
 		sys.exit(-1)
         
     def findPorts(self):        

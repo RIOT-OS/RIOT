@@ -35,7 +35,8 @@ from testbeds import DesVirtTestbed
 serverHost = "localhost"
 serverPort = 1025
 desvirtPath = os.path.join(os.path.dirname(__file__), os.pardir, os.pardir,
-                           os.pardir, os.pardir, os.pardir, "pkg", "desvirt", "desvirt")
+                           os.pardir, os.pardir, os.pardir, "dist", "tools",
+                           "desvirt", "desvirt")
 topologyName = "example"
 pytermArgs = " -s" + serverHost + " -P " + str(serverPort)
 pyterm = os.path.join(pytermDir, "pyterm") + pytermArgs
@@ -53,8 +54,8 @@ class MyExperiment(Experiment):
         This can easily achieved by using the waitAndCall method.
 
         Keep in mind that starting pyterms and connecting those to the server
-        will take time. This function is executed regardless of how many pyterms
-        are connected to the server.
+        will take time. This function is executed regardless of how many
+        pyterms are connected to the server.
         """
         self.waitAndCall(10, self.setup)  # assign addresses to all nodes
                                           # after 10s
@@ -68,10 +69,11 @@ class MyExperiment(Experiment):
                     connection, "addr " + str(self.hostid[host]))
 
     def sendMessages(self):
-        """ Sends a simple command to all connected pyterm instances which causes
-        all nodes to broadcast a message over their transceiver.
+        """ Sends a simple command to all connected pyterm instances which
+        causes all nodes to broadcast a message over their transceiver.
 
-        Check the log files in your home directory (.pyterm/log) for the result.
+        Check the log files in your home directory (.pyterm/log) for the
+        result.
         """
         self.sendToAll("txtsnd 0 \"hello world\"")
 

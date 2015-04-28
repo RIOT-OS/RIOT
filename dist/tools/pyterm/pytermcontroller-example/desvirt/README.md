@@ -4,7 +4,7 @@ the usage of pytermcontroller.
 
 ## Usage
 1. Make sure desvirt is setup. In order to do so execute ```make``` in
-RIOT/pkg/desvirt. This will also setup a simple network toplogy consisting of
+RIOT/dist/tools/desvirt. This will also setup a simple network toplogy consisting of
 three nodes. Each node will execute RIOT/example/default/bin/native/default.elf.
 
 2. If you haven't already done it compile RIOT/example/default for native:
@@ -20,7 +20,7 @@ to setup the network bridges etc.
 6. You should see an output similar to this:
 ```
 Running preHook
-executing: ./vnet --start --name example in: ./../../../../../pkg/desvirt/desvirt
+executing: ./vnet --start --name example in: ./../../../../../dist/tools/desvirt/desvirt
 vnet           : Lockfile .desvirt/lib/example.lock exists, network is already defined.
 [sudo] password for philipp:
 name: example_a1 port: 4711

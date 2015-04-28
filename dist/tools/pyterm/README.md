@@ -14,6 +14,16 @@ pytermcontroller.
 demonstrates some of the features of pytermcontroller. A look into
 ```pytermcontroller-example/desvirt/exampleDesVirt.py``` is advisable.
 
+# Dependencies
+
+* pyterm: requires a few basic python modules (inlcuding twisted). 
+Check the import statements at the top of the ```pyterm``` file for more 
+details. 
+* pytermcontroller: requires twisted python modules.
+* testbeds: most classes require GNU ```screen``` to be in your ```$PATH``` 
+The DESTestbed class additionally requires the command ```parallel-ssh```
+(see https://code.google.com/p/parallel-ssh/).
+
 # pyterm
 
 ```
@@ -69,10 +79,11 @@ This module contains the following classes:
 It declares multiple functions a testbed should have (e.g. flashing nodes,
 initializing nodes, assignment of transceiver addresses etc.)
 * DESTestbed: An implementation of Testbed for the DES-testbed at Freie
-Universität Berlin. The init function of this class must be supplied with
-a host file which is a newline separated list of mesh-router host names. The
-numerical transceiver addresses for each node corresponds to the line number in
-the host file. The corresponding ExperimentRuner should be executed on "uhu".
+Universität Berlin (http://des-testbed.net). The init function of this class 
+must be supplied with a host file which is a newline separated list of mesh-router 
+host names. The numerical transceiver addresses for each node corresponds to 
+the line number in the host file. The corresponding ExperimentRuner should 
+be executed on on host "uhu.imp.fu-berlin.de", the DES-testbed server. 
 * LocalTestbed: This class automatically finds all locally connected boards and
 treats those boards as a testbed. This is done by searching for ttyUSB\* devices
 in /dev. Transceiver addresses are assigned in the order the devices are found
