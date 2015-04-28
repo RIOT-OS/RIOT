@@ -154,7 +154,7 @@ static void _send(ng_pktsnip_t *pkt)
     }
     hdr = (ng_udp_hdr_t *)udp_snip->data;
     /* fill in size field */
-    hdr->length = byteorder_htons(sizeof(ng_udp_hdr_t) + ng_pkt_len(udp_snip));
+    hdr->length = byteorder_htons(ng_pkt_len(udp_snip));
 
     /* and forward packet to the network layer */
     sendto = ng_netreg_lookup(pkt->type, NG_NETREG_DEMUX_CTX_ALL);
