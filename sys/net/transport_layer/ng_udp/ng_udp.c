@@ -148,7 +148,7 @@ static void _send(ng_pktsnip_t *pkt)
     LL_SEARCH_SCALAR(pkt, udp_snip, type, NG_NETTYPE_UDP);
     udp_snip = ng_pktbuf_start_write(udp_snip);
     if (udp_snip == NULL) {
-        DEBUG("udp: cannot send packet, no UDP header found\n");
+        DEBUG("udp: cannot send packet: unable to allocate packet\n");
         ng_pktbuf_release(pkt);
         return;
     }
@@ -160,7 +160,7 @@ static void _send(ng_pktsnip_t *pkt)
     sendto = ng_netreg_lookup(pkt->type, NG_NETREG_DEMUX_CTX_ALL);
     /* throw away packet if no one is interested */
     if (sendto == NULL) {
-        DEBUG("udp: cannot send packet because network layer not found\n");
+        DEBUG("udp: cannot send packet: network layer not found\n");
         ng_pktbuf_release(pkt);
         return;
     }
