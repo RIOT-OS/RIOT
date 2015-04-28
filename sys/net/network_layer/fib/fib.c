@@ -107,6 +107,9 @@ static int fib_find_entry(uint8_t *dst, size_t dst_size,
                 /* remove this entry if its lifetime expired */
                 fib_table[i].lifetime.seconds = 0;
                 fib_table[i].lifetime.microseconds = 0;
+                fib_table[i].global_flags = 0;
+                fib_table[i].next_hop_flags = 0;
+                fib_table[i].iface_id = KERNEL_PID_UNDEF;
 
                 if (fib_table[i].global != NULL) {
                     universal_address_rem(fib_table[i].global);
