@@ -63,6 +63,8 @@ void *timer_thread(void *arg)
                tmsg->interval.seconds,
                tmsg->interval.microseconds,
                tmsg->msg);
+
+        vtimer_set_msg(&tmsg->timer, tmsg->interval, thread_getpid(), MSG_TIMER, tmsg);
     }
 }
 
