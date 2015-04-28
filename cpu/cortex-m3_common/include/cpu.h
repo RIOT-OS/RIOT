@@ -20,10 +20,16 @@
  *
  * @author      Stefan Pfeiffer <stefan.pfeiffer@fu-berlin.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Joakim Gebart <joakim.gebart@eistec.se>
  */
 
 #ifndef __CORTEXM_COMMON_H
 #define __CORTEXM_COMMON_H
+
+/**
+ * @brief Cortex-M3 has architecture specific atomic operations in atomic_arch.c.
+ */
+#define ARCH_HAS_ATOMIC_INT 1
 
 #include "cpu-conf.h"
 

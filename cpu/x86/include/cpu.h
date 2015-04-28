@@ -43,6 +43,11 @@
 extern "C" {
 #endif
 
+/**
+ * @brief x86 has architecture specific atomic operations in x86_atomic.c.
+ */
+#define ARCH_HAS_ATOMIC_INT 1
+
 static inline void __attribute__((always_inline)) dINT(void)
 {
     asm volatile ("cli");
