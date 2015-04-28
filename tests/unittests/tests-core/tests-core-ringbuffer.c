@@ -28,7 +28,7 @@
 #define ITERATIONS 15
 #define BUF_SIZE 7
 
-static char stack_get[KERNEL_CONF_STACKSIZE_DEFAULT];
+static char stack_get[THREAD_STACKSIZE_DEFAULT];
 
 static char rb_buf[BUF_SIZE];
 static ringbuffer_t rb = RINGBUFFER_INIT(rb_buf);
@@ -110,7 +110,7 @@ static void tests_core_ringbuffer(void)
 {
     pid_add = sched_active_pid;
     pid_get = thread_create(stack_get, sizeof (stack_get),
-                            PRIORITY_MAIN, CREATE_SLEEPING | CREATE_STACKTEST,
+                            THREAD_PRIORITY_MAIN, CREATE_SLEEPING | CREATE_STACKTEST,
                             run_get, NULL, "get");
     run_add();
 }

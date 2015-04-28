@@ -32,7 +32,7 @@ extern "C" {
 /**
  * @brief   Stack size used for the UDP thread
  */
-#define UDP_STACK_SIZE                  KERNEL_CONF_STACKSIZE_MAIN
+#define UDP_STACK_SIZE                  THREAD_STACKSIZE_MAIN
 
 /**
  * @brief   Size of the UDP receive buffer

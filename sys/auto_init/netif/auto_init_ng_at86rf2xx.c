@@ -33,8 +33,8 @@
  * @brief   Define stack parameters for the MAC layer thread
  * @{
  */
-#define AT86RF2XX_MAC_STACKSIZE     (KERNEL_CONF_STACKSIZE_DEFAULT)
-#define AT86RF2XX_MAC_PRIO          (PRIORITY_MAIN - 3)
+#define AT86RF2XX_MAC_STACKSIZE     (THREAD_STACKSIZE_DEFAULT)
+#define AT86RF2XX_MAC_PRIO          (THREAD_PRIORITY_MAIN - 3)
 
 #define AT86RF2XX_NUM (sizeof(at86rf2xx_params)/sizeof(at86rf2xx_params[0]))
 

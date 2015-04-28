@@ -88,7 +88,7 @@ kernel_pid_t nhdp_start(void)
         sock_rcv = socket_base_socket(PF_INET6, SOCK_DGRAM, IPPROTO_UDP);
 
         /* Start the NHDP thread */
-        nhdp_pid = thread_create(nhdp_stack, sizeof(nhdp_stack), PRIORITY_MAIN - 1,
+        nhdp_pid = thread_create(nhdp_stack, sizeof(nhdp_stack), THREAD_PRIORITY_MAIN - 1,
                                  CREATE_STACKTEST, _nhdp_runner, NULL, "NHDP");
     }
 
@@ -179,7 +179,7 @@ int nhdp_register_if(kernel_pid_t if_pid, uint8_t *addr, size_t addr_size, uint8
     helper_pid = if_pid;
 
     /* Start the receiving thread */
-    nhdp_rcv_pid = thread_create(nhdp_rcv_stack, sizeof(nhdp_rcv_stack), PRIORITY_MAIN - 1,
+    nhdp_rcv_pid = thread_create(nhdp_rcv_stack, sizeof(nhdp_rcv_stack), THREAD_PRIORITY_MAIN - 1,
                                  CREATE_STACKTEST, _nhdp_receiver, NULL, "nhdp_rcv_thread");
 
     /* Start sending periodic HELLO */

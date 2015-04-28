@@ -41,7 +41,7 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-#define READER_STACK_SIZE   (KERNEL_CONF_STACKSIZE_DEFAULT)
+#define READER_STACK_SIZE   (THREAD_STACKSIZE_DEFAULT)
 
 char serial_reader_stack[READER_STACK_SIZE];
 kernel_pid_t serial_reader_pid = KERNEL_PID_UNDEF;
@@ -130,10 +130,10 @@ int sixlowpan_lowpan_border_init(int if_id)
 
     serial_reader_pid = thread_create(
                             serial_reader_stack, READER_STACK_SIZE,
-                            PRIORITY_MAIN - 1, CREATE_STACKTEST,
+                            THREAD_PRIORITY_MAIN - 1, CREATE_STACKTEST,
                             serial_reader_f, "serial_reader");
     ip_process_pid = thread_create(ip_process_buf, IP_PROCESS_STACKSIZE,
-                                   PRIORITY_MAIN - 1, CREATE_STACKTEST,
+                                   THREAD_PRIORITY_MAIN - 1, CREATE_STACKTEST,
                                    border_process_lowpan,
                                    "border_process_lowpan");
 

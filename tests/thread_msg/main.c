@@ -24,9 +24,9 @@
 #include "thread.h"
 #include "msg.h"
 
-char t1_stack[KERNEL_CONF_STACKSIZE_MAIN];
-char t2_stack[KERNEL_CONF_STACKSIZE_MAIN];
-char t3_stack[KERNEL_CONF_STACKSIZE_MAIN];
+char t1_stack[THREAD_STACKSIZE_MAIN];
+char t2_stack[THREAD_STACKSIZE_MAIN];
+char t3_stack[THREAD_STACKSIZE_MAIN];
 
 kernel_pid_t p1, p2, p3;
 
@@ -83,13 +83,13 @@ void *thread3(void *arg)
 
 int main(void)
 {
-    p1 = thread_create(t1_stack, sizeof(t1_stack), PRIORITY_MAIN - 1,
+    p1 = thread_create(t1_stack, sizeof(t1_stack), THREAD_PRIORITY_MAIN - 1,
                        CREATE_WOUT_YIELD | CREATE_STACKTEST,
                        thread1, NULL, "nr1");
-    p2 = thread_create(t2_stack, sizeof(t2_stack), PRIORITY_MAIN - 1,
+    p2 = thread_create(t2_stack, sizeof(t2_stack), THREAD_PRIORITY_MAIN - 1,
                        CREATE_WOUT_YIELD | CREATE_STACKTEST,
                        thread2, NULL, "nr2");
-    p3 = thread_create(t3_stack, sizeof(t3_stack), PRIORITY_MAIN - 1,
+    p3 = thread_create(t3_stack, sizeof(t3_stack), THREAD_PRIORITY_MAIN - 1,
                        CREATE_WOUT_YIELD | CREATE_STACKTEST,
                        thread3, NULL, "nr3");
     puts("THREADS CREATED\n");

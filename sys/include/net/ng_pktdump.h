@@ -39,14 +39,14 @@ extern "C" {
  * @brief   Priority of the pktdump thread
  */
 #ifndef NG_PKTDUMP_PRIO
-#define NG_PKTDUMP_PRIO                 (PRIORITY_MAIN - 1)
+#define NG_PKTDUMP_PRIO                 (THREAD_PRIORITY_MAIN - 1)
 #endif
 
 /**
  * @brief   Stack size used for the pktdump thread
  */
 #ifndef NG_PKTDUMP_STACKSIZE
-#define NG_PKTDUMP_STACKSIZE            (KERNEL_CONF_STACKSIZE_MAIN)
+#define NG_PKTDUMP_STACKSIZE            (THREAD_STACKSIZE_MAIN)
 #endif
 
 /**

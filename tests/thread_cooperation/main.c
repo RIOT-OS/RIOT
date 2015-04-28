@@ -31,7 +31,7 @@ mutex_t mtx = MUTEX_INIT;
 volatile int storage = 1;
 kernel_pid_t main_id = KERNEL_PID_UNDEF;
 kernel_pid_t ths[PROBLEM];
-char stacks[PROBLEM][KERNEL_CONF_STACKSIZE_MAIN];
+char stacks[PROBLEM][THREAD_STACKSIZE_MAIN];
 
 void *run(void *arg)
 {
@@ -70,7 +70,7 @@ int main(void)
     for (int i = 0; i < PROBLEM; ++i) {
         printf("Creating thread with arg %d\n", (i + 1));
         ths[i] = thread_create(stacks[i], sizeof(stacks[i]),
-                               PRIORITY_MAIN - 1, CREATE_WOUT_YIELD | CREATE_STACKTEST,
+                               THREAD_PRIORITY_MAIN - 1, CREATE_WOUT_YIELD | CREATE_STACKTEST,
                                run, NULL, "thread");
 
         if (ths[i] < 0)  {

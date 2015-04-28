@@ -38,11 +38,11 @@
 #define ENABLE_DEBUG (0)
 
 #if ENABLE_DEBUG
-#   define PTHREAD_REAPER_STACKSIZE KERNEL_CONF_STACKSIZE_MAIN
-#   define PTHREAD_STACKSIZE KERNEL_CONF_STACKSIZE_MAIN
+#   define PTHREAD_REAPER_STACKSIZE THREAD_STACKSIZE_MAIN
+#   define PTHREAD_STACKSIZE THREAD_STACKSIZE_MAIN
 #else
-#   define PTHREAD_REAPER_STACKSIZE KERNEL_CONF_STACKSIZE_DEFAULT
-#   define PTHREAD_STACKSIZE KERNEL_CONF_STACKSIZE_DEFAULT
+#   define PTHREAD_REAPER_STACKSIZE THREAD_STACKSIZE_DEFAULT
+#   define PTHREAD_STACKSIZE THREAD_STACKSIZE_DEFAULT
 #endif
 
 #include "debug.h"
@@ -154,7 +154,7 @@ int pthread_create(pthread_t *newthread, const pthread_attr_t *attr, void *(*sta
 
     pt->thread_pid = thread_create(stack,
                                    stack_size,
-                                   PRIORITY_MAIN,
+                                   THREAD_PRIORITY_MAIN,
                                    CREATE_WOUT_YIELD | CREATE_STACKTEST,
                                    pthread_start_routine,
                                    pt,
@@ -166,7 +166,7 @@ int pthread_create(pthread_t *newthread, const pthread_attr_t *attr, void *(*sta
         return -1;
     }
 
-    sched_switch(PRIORITY_MAIN);
+    sched_switch(THREAD_PRIORITY_MAIN);
 
     return 0;
 }

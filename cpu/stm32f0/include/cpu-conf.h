@@ -41,13 +41,13 @@ extern "C" {
  * TODO: measure and adjust for the Cortex-M0
  * @{
  */
-#define KERNEL_CONF_STACKSIZE_PRINTF    (512)
+#define THREAD_EXTRA_STACKSIZE_PRINTF    (512)
 
-#ifndef KERNEL_CONF_STACKSIZE_DEFAULT
-#define KERNEL_CONF_STACKSIZE_DEFAULT   (512)
+#ifndef THREAD_STACKSIZE_DEFAULT
+#define THREAD_STACKSIZE_DEFAULT   (512)
 #endif
 
-#define KERNEL_CONF_STACKSIZE_IDLE      (192)
+#define THREAD_STACKSIZE_IDLE      (192)
 /** @} */
 
 /**

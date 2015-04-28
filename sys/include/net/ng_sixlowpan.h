@@ -34,14 +34,14 @@ extern "C" {
  * @brief   Default stack size to use for the 6LoWPAN thread
  */
 #ifndef NG_SIXLOWPAN_STACK_SIZE
-#define NG_SIXLOWPAN_STACK_SIZE  (KERNEL_CONF_STACKSIZE_DEFAULT)
+#define NG_SIXLOWPAN_STACK_SIZE  (THREAD_STACKSIZE_DEFAULT)
 #endif
 
 /**
  * @brief   Default priority for the 6LoWPAN thread
  */
 #ifndef NG_SIXLOWPAN_PRIO
-#define NG_SIXLOWPAN_PRIO   (PRIORITY_MAIN - 4)
+#define NG_SIXLOWPAN_PRIO   (THREAD_PRIORITY_MAIN - 4)
 #endif
 
 /**

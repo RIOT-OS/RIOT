@@ -25,12 +25,11 @@ extern "C" {
 
 /* FIXME: This file is just a filler. The numbers are entirely random ... */
 
-#define KERNEL_CONF_STACKSIZE_DEFAULT      (8192)
-#define KERNEL_CONF_STACKSIZE_IDLE         (8192)
-#define KERNEL_CONF_STACKSIZE_PRINTF       (8192)
-#define KERNEL_CONF_STACKSIZE_PRINTF_FLOAT (8192)
-
-#define MINIMUM_STACK_SIZE                 (8192)
+#define THREAD_STACKSIZE_DEFAULT                 (8192)
+#define THREAD_STACKSIZE_IDLE                    (8192)
+#define THREAD_EXTRA_STACKSIZE_PRINTF            (8192)
+#define THREAD_EXTRA_STACKSIZE_PRINTF_FLOAT      (8192)
+#define THREAD_STACKSIZE_MINIMUM                 (8192)
 
 #define UART0_BUFSIZE                      (16)
 

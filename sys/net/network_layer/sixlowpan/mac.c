@@ -39,7 +39,7 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-#define RADIO_STACK_SIZE            (KERNEL_CONF_STACKSIZE_MAIN)
+#define RADIO_STACK_SIZE            (THREAD_STACKSIZE_MAIN)
 #define RADIO_RCV_BUF_SIZE          (64)
 #define RADIO_SENDING_DELAY         (1000)
 
@@ -326,7 +326,7 @@ int sixlowpan_mac_send_ieee802154_frame(int if_id,
 kernel_pid_t sixlowpan_mac_init(void)
 {
     kernel_pid_t recv_pid = thread_create(radio_stack_buffer, RADIO_STACK_SIZE,
-                                          PRIORITY_MAIN - 2, CREATE_STACKTEST,
+                                          THREAD_PRIORITY_MAIN - 2, CREATE_STACKTEST,
                                           recv_ieee802154_frame, NULL, "radio");
     int if_id = -1;
 

@@ -27,7 +27,7 @@ static struct pthread_cond_t cv;
 static volatile int is_finished;
 static volatile long count;
 static volatile long expected_value;
-static char stack[KERNEL_CONF_STACKSIZE_MAIN];
+static char stack[THREAD_STACKSIZE_MAIN];
 
 /**
  * @brief   This thread tries to lock the mutex to enter the critical section.
@@ -57,7 +57,7 @@ int main(void)
     expected_value = 1000*1000;
     pthread_cond_init(&cv, NULL);
 
-    kernel_pid_t pid = thread_create(stack,sizeof(stack), PRIORITY_MAIN - 1,
+    kernel_pid_t pid = thread_create(stack,sizeof(stack), THREAD_PRIORITY_MAIN - 1,
                                      CREATE_WOUT_YIELD | CREATE_STACKTEST,
                                      second_thread, NULL, "second_thread");
 

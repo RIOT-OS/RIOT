@@ -29,7 +29,7 @@ static pipe_t communication_pipe;
 static ringbuffer_t pipe_rb;
 static char pipe_buffer[16];
 
-static char receiver_stack[KERNEL_CONF_STACKSIZE_DEFAULT];
+static char receiver_stack[THREAD_STACKSIZE_DEFAULT];
 
 typedef struct {
     void (*run)(void);
@@ -87,7 +87,7 @@ void test_ubjson_test(void (*sender_fun)(void), void (*receiver_fun)(void))
         },
     };
     kernel_pid_t receiver_pid = thread_create(receiver_stack, sizeof(receiver_stack),
-                                              PRIORITY_MAIN, CREATE_WOUT_YIELD,
+                                              THREAD_PRIORITY_MAIN, CREATE_WOUT_YIELD,
                                               test_ubjson_receiver_trampoline, &data, "receiver");
     TEST_ASSERT(pid_is_valid(receiver_pid));
 

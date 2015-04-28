@@ -47,7 +47,7 @@
 
 static volatile int main_pid;
 
-static char uart_stack[KERNEL_CONF_STACKSIZE_MAIN];
+static char uart_stack[THREAD_STACKSIZE_MAIN];
 
 static char rx_mem[128];
 static char tx_mem[128];
@@ -111,7 +111,7 @@ int main(void)
     }
 
     puts("Starting timer thread that triggers UART output...");
-    thread_create(uart_stack, KERNEL_CONF_STACKSIZE_MAIN, PRIORITY_MAIN - 1,
+    thread_create(uart_stack, THREAD_STACKSIZE_MAIN, THREAD_PRIORITY_MAIN - 1,
                   0, uart_thread, 0, "uart");
 
     while (1) {

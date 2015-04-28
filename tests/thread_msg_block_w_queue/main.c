@@ -25,7 +25,7 @@
 #include "thread.h"
 #include "msg.h"
 
-char t1_stack[KERNEL_CONF_STACKSIZE_MAIN];
+char t1_stack[THREAD_STACKSIZE_MAIN];
 
 kernel_pid_t p1 = KERNEL_PID_UNDEF, p_main = KERNEL_PID_UNDEF;
 
@@ -59,7 +59,7 @@ int main(void)
     msg_t msg_q[1];
     msg_init_queue(msg_q, 1);
 
-    p1 = thread_create(t1_stack, sizeof(t1_stack), PRIORITY_MAIN - 1,
+    p1 = thread_create(t1_stack, sizeof(t1_stack), THREAD_PRIORITY_MAIN - 1,
                        CREATE_WOUT_YIELD | CREATE_STACKTEST,
                        thread1, NULL, "nr1");
 

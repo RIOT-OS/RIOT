@@ -85,7 +85,7 @@ enum tcp_codes {
 #define SET_TCP_FIN(a)          (a) = TCP_FIN
 #define SET_TCP_FIN_ACK(a)      (a) = TCP_FIN_ACK
 
-#define TCP_STACK_SIZE          (KERNEL_CONF_STACKSIZE_MAIN)
+#define TCP_STACK_SIZE          (THREAD_STACKSIZE_MAIN)
 
 typedef struct __attribute__((packed)) tcp_mms_o_t {
     uint8_t     kind;

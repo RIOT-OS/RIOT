@@ -41,7 +41,7 @@ void *second_thread(void *arg)
     return NULL;
 }
 
-char second_thread_stack[KERNEL_CONF_STACKSIZE_MAIN];
+char second_thread_stack[THREAD_STACKSIZE_MAIN];
 
 int main(void)
 {
@@ -51,7 +51,7 @@ int main(void)
     msg_t m;
 
     kernel_pid_t pid = thread_create(second_thread_stack, sizeof(second_thread_stack),
-                            PRIORITY_MAIN - 1, CREATE_STACKTEST,
+                            THREAD_PRIORITY_MAIN - 1, CREATE_STACKTEST,
                             second_thread, NULL, "pong");
 
     m.content.value = 1;

@@ -42,7 +42,7 @@
 #include "msg.h"
 #include "debug.h"
 
-#define PRIORITY_CC1100         PRIORITY_MAIN-1
+#define PRIORITY_CC1100         THREAD_PRIORITY_MAIN-1
 
 #define MSG_POLL 12346
 
@@ -83,7 +83,7 @@ static timex_t cc1100_watch_dog_period;
 static kernel_pid_t cc1100_event_handler_pid;
 static void *cc1100_event_handler_function(void *);
 
-static char event_handler_stack[KERNEL_CONF_STACKSIZE_MAIN];
+static char event_handler_stack[THREAD_STACKSIZE_MAIN];
 
 /*---------------------------------------------------------------------------*/
 /*              Sequence number buffer management data structures */
