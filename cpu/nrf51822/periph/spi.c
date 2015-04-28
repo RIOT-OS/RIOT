@@ -185,16 +185,20 @@ int spi_release(spi_t dev)
 
 int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length)
 {
+    char tmp;
+
     if (dev >= SPI_NUMOF) {
         return -1;
     }
 
     for (int i = 0; i < length; i++) {
+        tmp = (out) ? out[i] : 0;
         spi[dev]->EVENTS_READY = 0;
-        spi[dev]->TXD = (uint8_t)out[i];
+        spi[dev]->TXD = (uint8_t)tmp;
         while (spi[dev]->EVENTS_READY != 1);
+        tmp = (char)spi[dev]->RXD;
         if (in) {
-            in[i] = (char)spi[dev]->RXD;
+            in[i] = tmp;
         }
     }
 
