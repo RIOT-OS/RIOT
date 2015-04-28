@@ -143,7 +143,7 @@ void rpl_leave_dodag(rpl_dodag_t *dodag)
 {
     dodag->joined = 0;
     dodag->my_preferred_parent = NULL;
-    rpl_delete_all_parents();
+    rpl_delete_all_parents(dodag);
     trickle_stop(&dodag->trickle);
     vtimer_remove(&dodag->dao_timer);
 }
@@ -204,13 +204,9 @@ rpl_parent_t *rpl_find_parent(rpl_dodag_t *dodag, ipv6_addr_t *address)
 
 void rpl_delete_parent(rpl_parent_t *parent)
 {
-    rpl_dodag_t *my_dodag = rpl_get_my_dodag();
-
-    if ((my_dodag != NULL) && rpl_equal_id(&my_dodag->my_preferred_parent->addr,
-                                           &parent->addr)) {
-        my_dodag->my_preferred_parent = NULL;
+    if (parent == parent->dodag->my_preferred_parent) {
+        parent->dodag->my_preferred_parent = NULL;
     }
-
     memset(parent, 0, sizeof(*parent));
 }
 
@@ -235,16 +231,15 @@ void rpl_delete_worst_parent(void)
 
 }
 
-void rpl_delete_all_parents(void)
+void rpl_delete_all_parents(rpl_dodag_t *dodag)
 {
-    rpl_dodag_t *my_dodag = rpl_get_my_dodag();
 
-    if (my_dodag != NULL) {
-        my_dodag->my_preferred_parent = NULL;
-    }
-
+    dodag->my_preferred_parent = NULL;
     for (int i = 0; i < RPL_MAX_PARENTS; i++) {
-        memset(&parents[i], 0, sizeof(parents[i]));
+        if (parents[i].dodag && (dodag->instance->id == parents[i].dodag->instance->id) &&
+                (!memcmp(&dodag->dodag_id, &parents[i].dodag->dodag_id, sizeof(ipv6_addr_t)))) {
+             memset(&parents[i], 0, sizeof(parents[i]));
+        }
     }
 }
 
@@ -401,7 +396,8 @@ void rpl_global_repair(rpl_dodag_t *my_dodag, ipv6_addr_t *p_addr, uint16_t rank
         return;
     }
 
-    rpl_delete_all_parents();
+    rpl_delete_all_parents(my_dodag);
+    my_dodag->version = my_dodag->version;
     my_dodag->dtsn++;
     my_dodag->my_preferred_parent = rpl_new_parent(my_dodag, p_addr, rank);
 
@@ -433,7 +429,7 @@ void rpl_local_repair(rpl_dodag_t *my_dodag)
 
     my_dodag->my_rank = INFINITE_RANK;
     my_dodag->dtsn++;
-    rpl_delete_all_parents();
+    rpl_delete_all_parents(my_dodag);
     trickle_reset_timer(&my_dodag->trickle);
 
 }
