@@ -78,8 +78,14 @@ void _receive(ng_pktsnip_t *pkt)
         /* packet is uncompressed: just mark and remove the dispatch */
         sixlowpan = ng_pktbuf_add(payload, payload->data, sizeof(uint8_t),
                                   NG_NETTYPE_SIXLOWPAN);
-        LL_DELETE(pkt, sixlowpan);
-        ng_pktbuf_release(sixlowpan);
+
+        if (sixlowpan == NULL) {
+            DEBUG("6lo: can not mark 6LoWPAN dispatch\n");
+            ng_pktbuf_release(pkt);
+            return;
+        }
+
+        pkt = ng_pktbuf_remove_snip(pkt, sixlowpan);
     }
 #ifdef MODULE_NG_SIXLOWPAN_FRAG
     else if (ng_sixlowpan_frag_is((ng_sixlowpan_frag_t *)dispatch)) {
