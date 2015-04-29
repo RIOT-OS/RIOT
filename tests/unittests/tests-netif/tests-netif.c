@@ -208,6 +208,30 @@ static void test_ng_netif_addr_from_str__ill_formated3(void)
     TEST_ASSERT_EQUAL_INT(0, ng_netif_addr_from_str(out, sizeof(out), str));
 }
 
+static void test_ng_netif_addr_from_str__ill_formated4(void)
+{
+    char str[] = "05:c";
+    uint8_t out[sizeof(str)];
+
+    TEST_ASSERT_EQUAL_INT(0, ng_netif_addr_from_str(out, sizeof(out), str));
+}
+
+static void test_ng_netif_addr_from_str__ill_formated5(void)
+{
+    char str[] = "5:cd";
+    uint8_t out[sizeof(str)];
+
+    TEST_ASSERT_EQUAL_INT(0, ng_netif_addr_from_str(out, sizeof(out), str));
+}
+
+static void test_ng_netif_addr_from_str__ill_formated6(void)
+{
+    char str[] = "05:cd:";
+    uint8_t out[sizeof(str)];
+
+    TEST_ASSERT_EQUAL_INT(0, ng_netif_addr_from_str(out, sizeof(out), str));
+}
+
 static void test_ng_netif_addr_from_str__success(void)
 {
     char str[] = "05:cd";
@@ -237,6 +261,9 @@ Test *tests_netif_tests(void)
         new_TestFixture(test_ng_netif_addr_from_str__ill_formated1),
         new_TestFixture(test_ng_netif_addr_from_str__ill_formated2),
         new_TestFixture(test_ng_netif_addr_from_str__ill_formated3),
+        new_TestFixture(test_ng_netif_addr_from_str__ill_formated4),
+        new_TestFixture(test_ng_netif_addr_from_str__ill_formated5),
+        new_TestFixture(test_ng_netif_addr_from_str__ill_formated6),
         new_TestFixture(test_ng_netif_addr_from_str__success),
     };
 
