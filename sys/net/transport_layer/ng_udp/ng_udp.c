@@ -93,7 +93,6 @@ static void _receive(ng_pktsnip_t *pkt)
 {
     ng_pktsnip_t *udp, *ipv6;
     ng_udp_hdr_t *hdr;
-    uint16_t csum;
     uint32_t port;
     ng_netreg_entry_t *sendto;
 
