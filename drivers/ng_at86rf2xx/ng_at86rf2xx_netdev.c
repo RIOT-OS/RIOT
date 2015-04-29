@@ -293,8 +293,8 @@ static void _receive_data(ng_at86rf2xx_t *dev)
     /* fill missing fields in netif header */
     netif = (ng_netif_hdr_t *)hdr->data;
     netif->if_pid = dev->mac_pid;
-    /* LQI offset: PHR (1 byte) + Payload (pkt_len) + FCS (2 byte) */
-    ng_at86rf2xx_rx_read(dev, &(netif->lqi), 1, pkt_len + 3);
+    /* LQI offset: Payload (pkt_len) + FCS (2 byte) */
+    ng_at86rf2xx_rx_read(dev, &(netif->lqi), 1, pkt_len + 2);
     netif->rssi = ng_at86rf2xx_reg_read(dev, NG_AT86RF2XX_REG__PHY_ED_LEVEL);
 
     /* allocate payload */
