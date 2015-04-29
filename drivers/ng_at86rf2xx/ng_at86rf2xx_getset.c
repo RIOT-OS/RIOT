@@ -24,7 +24,7 @@
 #include "ng_at86rf2xx_registers.h"
 #include "periph/spi.h"
 
-#define ENABLE_DEBUG (1)
+#define ENABLE_DEBUG (0)
 #include "debug.h"
 
 
