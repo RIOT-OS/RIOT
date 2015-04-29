@@ -236,12 +236,8 @@ size_t ng_at86rf2xx_rx_len(ng_at86rf2xx_t *dev)
     uint8_t phr;
     ng_at86rf2xx_fb_read(dev, &phr, 1);
 
-    /* Mask MSB for 802.15.4 compliance, see
-     * section 37.1.1.2 of SAM R21 datahseet
-     */
-    phr &= ~(1 << 7);
-
-    return (size_t)(phr - 2);    /* subtract length of FCS field (checksum) */
+    /* ignore MSB (see datasheets section 8.1.1.2) and substract length of FCS field */
+    return (size_t)((phr - 2) & 0x7f);
 }
 
 void ng_at86rf2xx_rx_read(ng_at86rf2xx_t *dev, uint8_t *data, size_t len,
