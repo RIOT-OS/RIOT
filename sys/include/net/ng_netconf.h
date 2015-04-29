@@ -34,10 +34,10 @@ typedef enum {
     NETCONF_OPT_CHANNEL,            /**< get/set channel as uint16_t in host
                                      *   byte order */
     NETCONF_OPT_IS_CHANNEL_CLR,     /**< check if channel is clear */
-    NETCONF_OPT_ADDRESS,            /**< get/set address in host byte order */
+    NETCONF_OPT_ADDRESS,            /**< get/set address in network byte order */
 
     /**
-     * @brief    get/set long address in host byte order
+     * @brief    get/set long address in network byte order
      *
      * Examples for this include the EUI-64 in IEEE 802.15.4
      */
@@ -49,7 +49,7 @@ typedef enum {
                                      *   for the network device's source address
                                      *   as uint16_t in host byte order */
     /**
-     * @brief    get/set the network ID as uint16_t in host byte order
+     * @brief    get/set the network ID as uint16_t in network byte order
      *
      * Examples for this include the PAN ID in IEEE 802.15.4
      */
