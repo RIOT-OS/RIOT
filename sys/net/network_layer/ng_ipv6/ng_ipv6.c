@@ -471,16 +471,12 @@ static inline bool _pkt_not_for_me(kernel_pid_t *iface, ng_ipv6_hdr_t *hdr)
 static void _dispatch_rcv_pkt(ng_nettype_t type, uint32_t demux_ctx,
                               ng_pktsnip_t *pkt)
 {
-    msg_t msg;
     ng_netreg_entry_t *entry = ng_netreg_lookup(type, demux_ctx);
-
-    msg.type = NG_NETAPI_MSG_TYPE_RCV;
-    msg.content.ptr = (char *)pkt;
 
     while (entry) {
         DEBUG("ipv6: Send receive command for %p to %" PRIu16 "\n", (void *)pkt,
               entry->pid);
-        msg_send(&msg, entry->pid);
+        ng_netapi_receive(entry->pid, pkt);
         entry = ng_netreg_getnext(entry);
     }
 }
