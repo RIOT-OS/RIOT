@@ -64,6 +64,20 @@ ifneq (,$(filter ng_sixlowpan_ctx,$(USEMODULE)))
   USEMODULE += vtimer
 endif
 
+ifneq (,$(filter ng_icmpv6_echo,$(USEMODULE)))
+  USEMODULE += ng_icmpv6
+  USEMODULE += ng_netbase
+endif
+
+ifneq (,$(filter ng_ndp,$(USEMODULE)))
+  USEMODULE += ng_icmpv6
+  USEMODULE += random
+endif
+
+ifneq (,$(filter ng_icmpv6,$(USEMODULE)))
+    USEMODULE += ng_ipv6
+endif
+
 ifneq (,$(filter ng_ipv6_hdr,$(USEMODULE)))
   USEMODULE += ng_inet_csum
   USEMODULE += ng_pktbuf
@@ -74,11 +88,13 @@ ifneq (,$(filter ng_ipv6_router,$(USEMODULE)))
 endif
 
 ifneq (,$(filter ng_ipv6,$(USEMODULE)))
+  USEMODULE += ng_icmpv6
   USEMODULE += ng_inet_csum
   USEMODULE += ng_ipv6_addr
   USEMODULE += ng_ipv6_hdr
   USEMODULE += ng_ipv6_nc
   USEMODULE += ng_ipv6_netif
+  USEMODULE += ng_ndp
   USEMODULE += ng_netbase
 endif
 

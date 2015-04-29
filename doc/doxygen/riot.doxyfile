@@ -1996,7 +1996,8 @@ PREDEFINED             = __attribute__(x)= \
                          UART_NUMOF \
                          DEVELHELP \
                          ENABLE_DEBUG \
-                         TEST_SUITES
+                         TEST_SUITES \
+                         MODULE_NG_IPV6_ROUTER
 
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this

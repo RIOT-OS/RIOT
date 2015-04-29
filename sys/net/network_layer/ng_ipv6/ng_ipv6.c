@@ -18,7 +18,9 @@
 #include "byteorder.h"
 #include "cpu-conf.h"
 #include "kernel_types.h"
+#include "net/ng_icmpv6.h"
 #include "net/ng_netbase.h"
+#include "net/ng_ndp.h"
 #include "net/ng_protnum.h"
 #include "thread.h"
 #include "utlist.h"
@@ -68,8 +70,14 @@ void ng_ipv6_demux(kernel_pid_t iface, ng_pktsnip_t *pkt, uint8_t nh)
 
     pkt->type = ng_nettype_from_protnum(nh);
 
-    /* TODO: add ICMPv6 and extension header handling */
-    (void)iface;    /* will be used by that */
+    switch (nh) {
+        case NG_PROTNUM_ICMPV6:
+            ng_icmpv6_demux(iface, pkt);
+            break;
+        /* TODO: add extension header handling */
+        default:
+            break;
+    }
 
     receiver_num = ng_netreg_num(pkt->type, NG_NETREG_DEMUX_CTX_ALL) +
                    ng_netreg_num(NG_NETTYPE_IPV6, nh);
@@ -126,6 +134,19 @@ static void *_event_loop(void *args)
                 reply.content.value = -ENOTSUP;
                 msg_reply(&msg, &reply);
                 break;
+
+            case NG_NDP_MSG_RTR_ADV:
+                DEBUG("ipv6: Router advertisement timer event received\n");
+                ng_ndp_netif_advertise_router((ng_ipv6_netif_t *)msg.content.ptr);
+
+            case NG_NDP_MSG_RTR_TIMEOUT:
+                DEBUG("ipv6: Router timeout received\n");
+                ((ng_ipv6_nc_t *)msg.content.ptr)->flags &= ~NG_IPV6_NC_IS_ROUTER;
+
+            case NG_NDP_MSG_ADDR_TIMEOUT:
+                DEBUG("ipv6: Router advertisement timer event received\n");
+                ng_ipv6_netif_remove_addr(KERNEL_PID_UNDEF,
+                                          (ng_ipv6_addr_t *)msg.content.ptr);
 
             default:
                 break;

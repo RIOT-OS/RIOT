@@ -43,8 +43,8 @@ ng_ipv6_nc_t *_find_free_entry(void)
     return NULL;
 }
 
-int ng_ipv6_nc_add(kernel_pid_t iface, const ng_ipv6_addr_t *ipv6_addr,
-                   const void *l2_addr, size_t l2_addr_len, uint8_t flags)
+ng_ipv6_nc_t *ng_ipv6_nc_add(kernel_pid_t iface, const ng_ipv6_addr_t *ipv6_addr,
+                             const void *l2_addr, size_t l2_addr_len, uint8_t flags)
 {
     if (ipv6_addr == NULL) {
         DEBUG("ipv6_nc: address was NULL\n");
@@ -53,17 +53,18 @@ int ng_ipv6_nc_add(kernel_pid_t iface, const ng_ipv6_addr_t *ipv6_addr,
 
     if ((l2_addr_len > NG_IPV6_NC_L2_ADDR_MAX) || (iface == KERNEL_PID_UNDEF) ||
         ng_ipv6_addr_is_unspecified(ipv6_addr)) {
-        return -EINVAL;
+        DEBUG("ipv6_nc: invalid parameters\n");
+        return NULL;
     }
 
     for (int i = 0; i < NG_IPV6_NC_SIZE; i++) {
         if (ng_ipv6_addr_equal(&(ncache[i].ipv6_addr), ipv6_addr)) {
             DEBUG("ipv6_nc: Address %s already registered\n",
                   ng_ipv6_addr_to_str(addr_str, ipv6_addr, sizeof(addr_str)));
-            return -EADDRINUSE;
+            return ncache + i;
         }
 
-        if (ncache[i].iface == KERNEL_PID_UNDEF) {
+        if (ng_ipv6_addr_is_unspecified(&(ncache[i].ipv6_addr))) {
             ncache[i].iface = iface;
 
             ng_pktqueue_init(&(ncache[i].pkts));
@@ -92,11 +93,13 @@ int ng_ipv6_nc_add(kernel_pid_t iface, const ng_ipv6_addr_t *ipv6_addr,
             ncache[i].flags = flags;
             DEBUG(" with flags = 0x%0x\n", flags);
 
-            return 0;
+            return ncache + i;
         }
     }
 
-    return -ENOMEM;
+    DEBUG("ipv6_nc: neighbor cache full.\n");
+
+    return NULL;
 }
 
 void ng_ipv6_nc_remove(kernel_pid_t iface, const ng_ipv6_addr_t *ipv6_addr)
@@ -136,29 +139,36 @@ ng_ipv6_nc_t *ng_ipv6_nc_get(kernel_pid_t iface, const ng_ipv6_addr_t *ipv6_addr
     return NULL;
 }
 
-ng_ipv6_nc_t *ng_ipv6_nc_get_reachable(kernel_pid_t iface,
-                                       const ng_ipv6_addr_t *ipv6_addr)
+ng_ipv6_nc_t *ng_ipv6_nc_get_next(ng_ipv6_nc_t *prev)
 {
-    ng_ipv6_nc_t *entry = ng_ipv6_nc_get(iface, ipv6_addr);
-
-    if (entry == NULL) {
-        DEBUG("ipv6_nc: No entry found for %s on interface %" PRIkernel_pid "\n",
-              ng_ipv6_addr_to_str(addr_str, ipv6_addr, sizeof(addr_str)),
-              iface);
-        return NULL;
+    if (prev == NULL) {
+        prev = ncache;
+    }
+    else {
+        prev++;     /* get next entry */
     }
 
-    switch ((entry->flags & NG_IPV6_NC_STATE_MASK) >> NG_IPV6_NC_STATE_POS) {
-        case NG_IPV6_NC_STATE_UNREACHABLE:
-        case NG_IPV6_NC_STATE_INCOMPLETE:
-            DEBUG("ipv6_nc: Entry %s is unreachable (flags = 0x%02x)\n",
-                  ng_ipv6_addr_to_str(addr_str, ipv6_addr, sizeof(addr_str)),
-                  entry->flags);
-            return NULL;
+    while (prev < (ncache + NG_IPV6_NC_SIZE)) { /* while not reached end */
+        if (!ng_ipv6_addr_is_unspecified(&(prev->ipv6_addr))) {
+            return prev;
+        }
 
-        default:
-            return entry;
+        prev++;
     }
+
+    return NULL;
+}
+
+ng_ipv6_nc_t *ng_ipv6_nc_get_next_router(ng_ipv6_nc_t *prev)
+{
+    for (ng_ipv6_nc_t *router = ng_ipv6_nc_get_next(prev); router != NULL;
+         router = ng_ipv6_nc_get_next(router)) {
+        if (router->flags & NG_IPV6_NC_IS_ROUTER) {
+            return router;
+        }
+    }
+
+    return NULL;
 }
 
 ng_ipv6_nc_t *ng_ipv6_nc_still_reachable(const ng_ipv6_addr_t *ipv6_addr)

@@ -145,6 +145,12 @@ extern int _read_sector(int argc, char **argv);
 extern int _read_bytes(int argc, char **argv);
 #endif
 
+#ifdef MODULE_NG_ICMPV6_ECHO
+#ifdef MODULE_VTIMER
+extern int _icmpv6_ping(int argc, char **argv);
+#endif
+#endif
+
 #ifdef MODULE_RANDOM
 extern int _mersenne_init(int argc, char **argv);
 extern int _mersenne_get(int argc, char **argv);
@@ -165,6 +171,7 @@ extern int _fib_route_handler(int argc, char **argv);
 
 #ifdef MODULE_NG_IPV6_NC
 extern int _ipv6_nc_manage(int argc, char **argv);
+extern int _ipv6_nc_routers(int argc, char **argv);
 #endif
 
 const shell_command_t _shell_command_list[] = {
@@ -250,6 +257,11 @@ const shell_command_t _shell_command_list[] = {
     {DISK_GET_SECTOR_COUNT, "Get the sector count of inserted memory card", _get_sectorcount},
     {DISK_GET_BLOCK_SIZE, "Get the block size of inserted memory card", _get_blocksize},
 #endif
+#ifdef MODULE_NG_ICMPV6_ECHO
+#ifdef MODULE_VTIMER
+    { "ping6", "Ping via ICMPv6", _icmpv6_ping },
+#endif
+#endif
 #ifdef MODULE_RANDOM
     { "mersenne_init", "initializes the PRNG", _mersenne_init },
     { "mersenne_get", "returns 32 bit of pseudo randomness", _mersenne_get },
@@ -273,6 +285,7 @@ const shell_command_t _shell_command_list[] = {
 #endif
 #ifdef MODULE_NG_IPV6_NC
     {"ncache", "manage neighbor cache by hand", _ipv6_nc_manage },
+    {"routers", "IPv6 default router list", _ipv6_nc_routers },
 #endif
     {NULL, NULL, NULL}
 };
