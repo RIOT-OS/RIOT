@@ -257,6 +257,7 @@ static inline void print_prompt(shell_t *shell)
 {
     shell->put_char('>');
     shell->put_char(' ');
+    fflush(stdout);
     return;
 }
 
