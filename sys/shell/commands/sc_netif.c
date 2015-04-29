@@ -192,10 +192,14 @@ static void _netif_list(kernel_pid_t dev)
         printf(" Channel: %" PRIu16 " ", u16);
     }
 
-    res = ng_netapi_get(dev, NETCONF_OPT_NID, 0, &u16, sizeof(u16));
+    res = ng_netapi_get(dev, NETCONF_OPT_NID, 0, hwaddr, sizeof(hwaddr));
 
     if (res >= 0) {
-        printf(" NID: 0x%" PRIx16 " ", u16);
+        char hwaddr_str[res * 3];
+        printf(" NID: ");
+        printf("%s", ng_netif_addr_to_str(hwaddr_str, sizeof(hwaddr_str),
+                                          hwaddr, res));
+        printf(" ");
     }
 
     res = ng_netapi_get(dev, NETCONF_OPT_TX_POWER, 0, &i16, sizeof(i16));
@@ -462,7 +466,7 @@ static int _netif_set(char *cmd_name, kernel_pid_t dev, char *key, char *value)
     }
     else if ((strcmp("nid", key) == 0) || (strcmp("pan", key) == 0) ||
              (strcmp("pan_id", key) == 0)) {
-        return _netif_set_u16(dev, NETCONF_OPT_NID, value);
+        return _netif_set_addr(dev, NETCONF_OPT_NID, value);
     }
     else if (strcmp("power", key) == 0) {
         return _netif_set_i16(dev, NETCONF_OPT_TX_POWER, value);
