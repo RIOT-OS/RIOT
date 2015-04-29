@@ -16,7 +16,10 @@ RIOTPROJECT := $(abspath $(RIOTPROJECT))
 # Path to the current directory relative to the git root
 BUILDRELPATH ?= $(shell git rev-parse --show-prefix)
 
-BINDIRBASE ?= $(CURDIR)/bin
+APPDIR ?= $(CURDIR)
+APPDIR := $(abspath $(APPDIR))/
+
+BINDIRBASE ?= $(APPDIR)/bin
 BINDIRBASE := $(abspath $(BINDIRBASE))
 
 BINDIR ?= $(BINDIRBASE)/$(BOARD)
