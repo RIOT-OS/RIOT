@@ -223,15 +223,12 @@ static int readline(shell_t *shell, char *buf, size_t size)
         /* QEMU transmits only a single '\r' == 13 on hitting enter ("-serial stdio"). */
         /* DOS newlines are handled like hitting enter twice, but empty lines are ignored. */
         if (c == '\r' || c == '\n') {
-            if (line_buf_ptr == buf) {
-                /* The line is empty. */
-                continue;
-            }
-
             *line_buf_ptr = '\0';
             shell->put_char('\r');
             shell->put_char('\n');
-            return 0;
+
+            /* return 1 if line is empty, 0 otherwise */
+            return line_buf_ptr == buf;
         }
         /* QEMU uses 0x7f (DEL) as backspace, while 0x08 (BS) is for most terminals */
         else if (c == 0x08 || c == 0x7f) {
@@ -257,7 +254,11 @@ static inline void print_prompt(shell_t *shell)
 {
     shell->put_char('>');
     shell->put_char(' ');
+
+#ifdef MODULE_NEWLIB
     fflush(stdout);
+#endif
+
     return;
 }
 
