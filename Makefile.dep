@@ -48,6 +48,14 @@ ifneq (,$(filter sixlowpan,$(USEMODULE)))
   USEMODULE += vtimer
 endif
 
+ifneq (,$(filter ng_netif,$(USEMODULE)))
+  USEMODULE += ng_netbase
+endif
+
+ifneq (,$(filter ng_nomac,$(USEMODULE)))
+  USEMODULE += ng_netbase
+endif
+
 ifneq (,$(filter ng_sixlowpan_frag,$(USEMODULE)))
   USEMODULE += ng_sixlowpan
   USEMODULE += vtimer
