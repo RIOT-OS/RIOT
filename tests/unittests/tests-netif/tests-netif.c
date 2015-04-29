@@ -161,7 +161,7 @@ static void test_ng_netif_get__full(void)
 
 static void test_ng_netif_addr_to_str__out_too_short(void)
 {
-    uint8_t addr[] = {0x05, 0xcd};
+    static const uint8_t addr[] = {0x05, 0xcd};
     char out[2];
 
     TEST_ASSERT_NULL(ng_netif_addr_to_str(out, sizeof(out), addr, sizeof(addr)));
@@ -169,7 +169,7 @@ static void test_ng_netif_addr_to_str__out_too_short(void)
 
 static void test_ng_netif_addr_to_str__success(void)
 {
-    uint8_t addr[] = {0x05, 0xcd};
+    static const uint8_t addr[] = {0x05, 0xcd};
     char out[3 * sizeof(addr)];
 
     TEST_ASSERT_EQUAL_STRING("05:cd", ng_netif_addr_to_str(out, sizeof(out),
@@ -178,7 +178,7 @@ static void test_ng_netif_addr_to_str__success(void)
 
 static void test_ng_netif_addr_from_str__out_too_short(void)
 {
-    char str[] = "05:cd";
+    static const char str[] = "05:cd";
     uint8_t out[1];
 
     TEST_ASSERT_EQUAL_INT(0, ng_netif_addr_from_str(out, sizeof(out), str));
@@ -186,7 +186,7 @@ static void test_ng_netif_addr_from_str__out_too_short(void)
 
 static void test_ng_netif_addr_from_str__ill_formated1(void)
 {
-    char str[] = "576:cd";
+    static const char str[] = "576:cd";
     uint8_t out[sizeof(str)];
 
     TEST_ASSERT_EQUAL_INT(0, ng_netif_addr_from_str(out, sizeof(out), str));
@@ -194,7 +194,7 @@ static void test_ng_netif_addr_from_str__ill_formated1(void)
 
 static void test_ng_netif_addr_from_str__ill_formated2(void)
 {
-    char str[] = TEST_STRING8;
+    static const char str[] = TEST_STRING8;
     uint8_t out[sizeof(str)];
 
     TEST_ASSERT_EQUAL_INT(0, ng_netif_addr_from_str(out, sizeof(out), str));
@@ -202,7 +202,7 @@ static void test_ng_netif_addr_from_str__ill_formated2(void)
 
 static void test_ng_netif_addr_from_str__ill_formated3(void)
 {
-    char str[] = "05-cd";
+    static const char str[] = "05-cd";
     uint8_t out[sizeof(str)];
 
     TEST_ASSERT_EQUAL_INT(0, ng_netif_addr_from_str(out, sizeof(out), str));
@@ -210,7 +210,7 @@ static void test_ng_netif_addr_from_str__ill_formated3(void)
 
 static void test_ng_netif_addr_from_str__ill_formated4(void)
 {
-    char str[] = "05:c";
+    static const char str[] = "05:c";
     uint8_t out[sizeof(str)];
 
     TEST_ASSERT_EQUAL_INT(0, ng_netif_addr_from_str(out, sizeof(out), str));
@@ -218,7 +218,7 @@ static void test_ng_netif_addr_from_str__ill_formated4(void)
 
 static void test_ng_netif_addr_from_str__ill_formated5(void)
 {
-    char str[] = "5:cd";
+    static const char str[] = "5:cd";
     uint8_t out[sizeof(str)];
 
     TEST_ASSERT_EQUAL_INT(0, ng_netif_addr_from_str(out, sizeof(out), str));
@@ -226,7 +226,7 @@ static void test_ng_netif_addr_from_str__ill_formated5(void)
 
 static void test_ng_netif_addr_from_str__ill_formated6(void)
 {
-    char str[] = "05:cd:";
+    static const char str[] = "05:cd:";
     uint8_t out[sizeof(str)];
 
     TEST_ASSERT_EQUAL_INT(0, ng_netif_addr_from_str(out, sizeof(out), str));
@@ -234,7 +234,7 @@ static void test_ng_netif_addr_from_str__ill_formated6(void)
 
 static void test_ng_netif_addr_from_str__success(void)
 {
-    char str[] = "05:cd";
+    static const char str[] = "05:cd";
     uint8_t out[2];
 
     TEST_ASSERT_EQUAL_INT(2, ng_netif_addr_from_str(out, sizeof(out), str));

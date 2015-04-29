@@ -19,7 +19,7 @@ static inline char _half_byte_to_char(uint8_t half_byte)
     return (half_byte < 10) ? ('0' + half_byte) : ('a' + (half_byte - 10));
 }
 
-char *ng_netif_addr_to_str(char *out, size_t out_len, uint8_t *addr,
+char *ng_netif_addr_to_str(char *out, size_t out_len, const uint8_t *addr,
                            size_t addr_len)
 {
     size_t i;
