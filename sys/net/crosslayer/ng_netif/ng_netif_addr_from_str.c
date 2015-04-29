@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2015 Martine Lenders <mlenders@inf.fu-berlin.de>
+ * Copyright (C) 2015 René Kijewski <rene.kijewski@fu-berlin.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,47 +15,47 @@
 
 #include "net/ng_netif.h"
 
-static uint8_t _parse_byte(char *str)
+static int _dehex(char c)
 {
-    uint8_t res = 0;
-
-    for (int i = 0; i < 2; i++) {   /* iterate over half-bytes */
-        if ((str[i] >= '0') && (str[i] <= '9')) {       /* if '0'-'9' */
-            res |= (str[i] - '0') << (4 * (1 - i));     /* set half-byte to 0-9 */
-        }
-        else if ((str[i] >= 'a') && (str[i] <= 'f')) {  /* if 'a'-'f' */
-            res |= (str[i] - 'a' + 10) << (4 * (1 - i));/* set half-byte to 10-15 */
-        }
-
-        /* interpret any other character as 0 */
-    }
-
-    return res;
+    return ('0' <= c && c <= '9') ? c - '0'
+         : ('A' <= c && c <= 'F') ? c - 'A' + 10
+         : ('a' <= c && c <= 'f') ? c - 'a' + 10
+         : -1;
 }
 
-size_t ng_netif_addr_from_str(uint8_t *out, size_t out_len, char *str)
+size_t ng_netif_addr_from_str(uint8_t *out, size_t out_len, const char *str)
 {
-    size_t res = 0;
-    char *byte_str = str;
-    int end = 0;
-
-    while (end == 0) {
-        str++;
-
-        if ((res >= out_len) || ((str - byte_str) > 2)) {
-            /* no space left or byte_str has become > 2 chars */
+    size_t len = 0;
+    while (1) {
+        ++len;
+        if (len > out_len) {
             return 0;
         }
 
-        if ((*str == ':') || (*str == '\0')) {
-            end = (*str == '\0');
-            *str = '\0';
-            out[res++] = _parse_byte(byte_str);
-            byte_str = ++str;
+        int a = _dehex(*str++);
+        if (a < 0) {
+            return 0;
+        }
+
+        int b = _dehex(*str++);
+        if (b < 0) {
+            return 0;
+        }
+
+        *out++ = (a << 4) | b;
+
+        if (*str == ':') {
+            ++str;
+        }
+        else if (*str == '\0') {
+            break;
+        }
+        else {
+            return 0;
         }
     }
 
-    return res;
+    return len;
 }
 
 /** @} */
