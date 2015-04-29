@@ -33,6 +33,12 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Maximum length of the l2 addresses of the generic interface header
+ *          in bytes.
+ */
+#define NG_NETIF_HDR_L2ADDR_MAX_LEN     (8)
+
+/**
  * @{
  * @name    Flags for the ng_netif_hdr_t
  */
@@ -207,6 +213,13 @@ static inline ng_pktsnip_t *ng_netif_hdr_build(uint8_t *src, uint8_t src_len,
 
     return pkt;
 }
+
+/**
+ * @brief   Outputs a generic interface header to stdout.
+ *
+ * @param[in] hdr   A generic interface header.
+ */
+void ng_netif_hdr_print(ng_netif_hdr_t *hdr);
 
 #ifdef __cplusplus
 }

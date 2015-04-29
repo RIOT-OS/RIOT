@@ -100,6 +100,7 @@ ifneq (,$(filter ng_netbase,$(USEMODULE)))
   USEMODULE += ng_netapi
   USEMODULE += ng_netreg
   USEMODULE += ng_netif
+  USEMODULE += ng_netif_hdr
   USEMODULE += ng_pktbuf
 endif
 
