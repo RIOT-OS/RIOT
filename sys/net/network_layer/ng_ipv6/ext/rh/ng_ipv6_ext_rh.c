@@ -46,6 +46,11 @@ ng_ipv6_addr_t *ng_ipv6_ext_rh_next_hop(ng_ipv6_hdr_t *ipv6)
 
     if (ipv6->nh == NG_PROTNUM_IPV6_EXT_RH) {
         switch (ext->type) {
+#ifdef MODULE_NG_RPL_SRH
+            case NG_RPL_SRH_TYPE:
+                return ng_rpl_srh_next_hop((ng_rpl_srh_t *)ext);
+#endif
+
             default:
                 break;
         }
