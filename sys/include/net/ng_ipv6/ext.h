@@ -32,6 +32,8 @@
 #include "kernel_types.h"
 #include "net/ng_pkt.h"
 
+#include "net/ng_ipv6/ext/rh.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -20,6 +20,7 @@
 #include "byteorder.h"
 #include "net/ng_icmpv6.h"
 #include "net/ng_ipv6.h"
+#include "net/ng_ipv6/ext/rh.h"
 #include "net/ng_netbase.h"
 #include "random.h"
 #include "utlist.h"
@@ -337,8 +338,14 @@ kernel_pid_t ng_ndp_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_len,
     ng_ipv6_addr_t *next_hop_ip = NULL, *prefix = NULL;
 #ifdef MODULE_FIB
     size_t next_hop_size;
+#endif
 
-    if ((fib_get_next_hop(&iface, (uint8_t *)next_hop_ip, &next_hop_size,
+#ifdef MODULE_NG_IPV6_EXT_RH
+    next_hop_ip = ng_ipv6_ext_rh_next_hop(hdr);
+#endif
+#ifdef MODULE_FIB
+    if ((next_hop_ip == NULL) &&
+        (fib_get_next_hop(&iface, (uint8_t *)next_hop_ip, &next_hop_size,
                           (uint8_t *)dst, sizeof(ng_ipv6_addr_t),
                           0) < 0) || (next_hop_ip != sizeof(ng_ipv6_addr_t))) {
         next_hop_ip = NULL;
