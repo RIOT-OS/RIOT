@@ -176,6 +176,24 @@ void ng_ipv6_nc_remove(kernel_pid_t iface, const ng_ipv6_addr_t *ipv6_addr);
 ng_ipv6_nc_t *ng_ipv6_nc_get(kernel_pid_t iface, const ng_ipv6_addr_t *ipv6_addr);
 
 /**
+ * @brief   Gets next entry in neighbor cache after @p prev.
+ *
+ * @param[in] prev  Previous entry. NULL to start iteration.
+ *
+ * @return  The next entry in neighbor cache.
+ */
+ng_ipv6_nc_t *ng_ipv6_nc_get_next(ng_ipv6_nc_t *prev);
+
+/**
+ * @brief   Gets next reachable router entry in neighbor cache after @p prev.
+ *
+ * @param[in] prev  Previous router entry. NULL to start iteration.
+ *
+ * @return  The next reachable router entry in neighbor cache.
+ */
+ng_ipv6_nc_t *ng_ipv6_nc_get_next_router(ng_ipv6_nc_t *prev);
+
+/**
  * @brief   Searches for any neighbor cache entry fitting the @p ipv6_addr,
  *          where you currently can send a packet to (do not confuse with
  *          NG_IPV6_NC_STATE_REACHABLE).
