@@ -64,6 +64,9 @@ endif
 ifneq (,$(filter ng_ipv6_nc,$(USEMODULE)))
     SRC += sc_ipv6_nc.c
 endif
+ifneq (,$(filter ng_udp,$(USEMODULE)))
+  SRC += sc_udp.c
+endif
 
 # TODO
 # Conditional building not possible at the moment due to
