@@ -1,0 +1,43 @@
+From 7a98a45da47846f0379cfbd477936f67a2af75b3 Mon Sep 17 00:00:00 2001
+From: Philipp Rosenkranz <philipp.rosenkranz@fu-berlin.de>
+Date: Thu, 2 Oct 2014 17:09:32 +0200
+Subject: [PATCH 1/1] add example topology
+
+---
+ .desvirt/example.xml | 25 +++++++++++++++++++++++++
+ 1 file changed, 25 insertions(+)
+ create mode 100644 .desvirt/example.xml
+
+diff --git a/.desvirt/example.xml b/.desvirt/example.xml
+new file mode 100644
+index 0000000..e8d0244
+--- /dev/null
++++ b/.desvirt/example.xml
+@@ -0,0 +1,25 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<topology version="1">
++    <net description="two client nodes and one probing node" name="example">
++        <nodeTypes>
++            <nodeType name="riot_native">
++                <interfaces>
++                    <interface name="wlan0" type="802.11bg"/>
++                </interfaces>
++            </nodeType>
++        </nodeTypes>
++        <nodes>
++            <node binary="../../../../examples/default/bin/native/default.elf" name="a1" type="riot_native"/>
++            <node binary="../../../../examples/default/bin/native/default.elf" name="a2" type="riot_native"/>
++            <node binary="../../../../examples/default/bin/native/default.elf" name="a3" type="riot_native"/>
++        </nodes>
++        <links>
++            <link broadcast_loss="0.0" from_if="wlan0" from_node="a1" loss="0.0" to_if="wlan0" to_node="a2" uni="false"/>
++            <link broadcast_loss="0.0" from_if="wlan0" from_node="a1" loss="0.0" to_if="wlan0" to_node="a3" uni="false"/>
++            <link broadcast_loss="0.0" from_if="wlan0" from_node="a2" loss="0.0" to_if="wlan0" to_node="a1" uni="false"/>
++            <link broadcast_loss="0.0" from_if="wlan0" from_node="a2" loss="0.0" to_if="wlan0" to_node="a3" uni="false"/>
++            <link broadcast_loss="0.0" from_if="wlan0" from_node="a3" loss="0.0" to_if="wlan0" to_node="a1" uni="false"/>
++            <link broadcast_loss="0.0" from_if="wlan0" from_node="a3" loss="0.0" to_if="wlan0" to_node="a2" uni="false"/>
++        </links>
++    </net>
++</topology>
+--
+1.9.1
