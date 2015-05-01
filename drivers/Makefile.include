@@ -46,3 +46,6 @@ endif
 ifneq (,$(filter ina220,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/drivers/ina220/include
 endif
+ifneq (,$(filter pcd8544,$(USEMODULE)))
+    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/pcd8544/include
+endif
