@@ -18,6 +18,7 @@
 #include "byteorder.h"
 #include "cpu-conf.h"
 #include "kernel_types.h"
+#include "net/ng_icmpv6.h"
 #include "net/ng_netbase.h"
 #include "net/ng_protnum.h"
 #include "thread.h"
@@ -68,8 +69,14 @@ void ng_ipv6_demux(kernel_pid_t iface, ng_pktsnip_t *pkt, uint8_t nh)
 
     pkt->type = ng_nettype_from_protnum(nh);
 
-    /* TODO: add ICMPv6 and extension header handling */
-    (void)iface;    /* will be used by that */
+    switch (nh) {
+        case NG_PROTNUM_ICMPV6:
+            ng_icmpv6_demux(iface, pkt);
+            break;
+        /* TODO: add extension header handling */
+        default:
+            break;
+    }
 
     receiver_num = ng_netreg_num(pkt->type, NG_NETREG_DEMUX_CTX_ALL) +
                    ng_netreg_num(NG_NETTYPE_IPV6, nh);
