@@ -91,6 +91,7 @@ void rreqtable_init(void);
  * Check if a RREQ is redundant, i.e. was received from another node already.
  * Behaves as described in Sections 5.7. and 7.6.
  * @param packet_data  data of the RREQ in question
+ * @return             true if packet_data is redundant, false otherwise.
  */
 bool rreqtable_is_redundant(struct aodvv2_packet_data *packet_data);
 
