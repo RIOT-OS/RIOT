@@ -4,3 +4,8 @@ ifneq (,$(filter defaulttransceiver,$(USEMODULE)))
         USEMODULE += transceiver
     endif
 endif
+
+ifneq (,$(filter ng_netif,$(USEMODULE)))
+  USEMODULE += ng_at86rf233
+  USEMODULE += ng_nomac
+endif

@@ -39,7 +39,7 @@ ifneq (,$(DRIVER))
 else
   USEMODULE += ng_at86rf231         # default to ng_at86rf231
 endif
-USEMODULE += ng_netbase
+USEMODULE += ng_netif
 USEMODULE += ng_nomac
 USEMODULE += ng_pktdump
 USEMODULE += uart0

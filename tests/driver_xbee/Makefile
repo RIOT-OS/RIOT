@@ -17,7 +17,7 @@ ifneq (,$(filter nucleo-f091,$(BOARD)))
 endif
 
 USEMODULE += xbee
-USEMODULE += ng_netbase
+USEMODULE += ng_netif
 USEMODULE += ng_nomac
 USEMODULE += ng_pktdump
 USEMODULE += shell

@@ -12,6 +12,7 @@
  * @file    auto_init_c
  * @brief   initializes any used module that has a trivial init function
  * @author  Oliver Hahm <oliver.hahm@inria.fr>
+ * @author  Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @}
  */
 #include <stdint.h>
@@ -303,5 +304,9 @@ void auto_init(void)
 #ifdef MODULE_NG_UDP
     DEBUG("Auto init UDP module.\n");
     ng_udp_init();
+#endif
+#ifdef MODULE_AUTO_INIT_NG_NETIF
+    DEBUG("Auto init network interfaces.\n");
+    auto_init_ng_netif();
 #endif
 }

@@ -38,6 +38,18 @@ extern "C" {
 #define HW_TIMER            TIMER_1
 
 /**
+* @name NG_AT86RF233 configuration
+* @{
+*/
+#define NG_AT86RF233_SPI        (SPI_0)
+#define NG_AT86RF233_CS         (GPIO_4)
+#define NG_AT86RF233_INT        (GPIO_5)
+#define NG_AT86RF233_RESET      (GPIO_6)
+#define NG_AT86RF233_SLEEP      (GPIO_7)
+#define NG_AT86RF233_SPI_CLK    (SPI_SPEED_1MHZ)
+/** @}*/
+
+/**
 * @name AT86RF231 config
 * @{
 */
@@ -48,7 +60,8 @@ extern "C" {
 #define AT86RF231_SLEEP    GPIO_7
 
 #define AT86RF231_SPI_SPEED SPI_SPEED_1MHZ
-/** @}*/
+/** @} */
+
 /**
  * @name Define UART device and baudrate for stdio
  * @{

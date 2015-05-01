@@ -1,0 +1,13 @@
+# try to find the ng_netif auto init implementation in the application or in
+# the board, respectively. If it is not found, nothing is called.
+ifneq (,$(filter ng_netif,$(USEMODULE)))
+  ifneq (,$(wildcard $(APPDIR)/auto_init_ng_netif/*))
+    export AUTO_INIT_MODULES += $(APPDIR)/auto_init_ng_netif
+    export USEMODULE += auto_init_ng_netif
+  else
+    ifneq (,$(wildcard $(RIOTBOARD)/$(BOARD)/auto_init_ng_netif/*))
+      export AUTO_INIT_MODULES += $(RIOTBOARD)/$(BOARD)/auto_init_ng_netif
+      export USEMODULE += auto_init_ng_netif
+    endif
+  endif
+endif
