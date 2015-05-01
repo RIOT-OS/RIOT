@@ -1,0 +1,26 @@
+.PHONY: iotlab-auth iotlab-exp iotlab-flash iotlab-reset iotlab-term
+
+IOTLAB_NODES    ?= 5
+IOTLAB_DURATION ?= 30
+IOTLAB_SITE     ?= grenoble
+IOTLAB_TYPE     ?= "m3:at86rf231"
+IOTLAB_AUTH     ?= $(HOME)/.iotlabrc
+IOTLAB_USER     ?= $(shell cut -f1 -d: $(IOTLAB_AUTH))
+IOTLAB_EXP_ID   ?= $(shell experiment-cli get -l --state Running | grep '"id"' | sed 's/\ *"id":\ \([0-9]*\),/\1/' | head -n1)
+
+$(IOTLAB_AUTH):
+	auth-cli -u $(IOTLAB_USER)
+
+iotlab-exp: $(IOTLAB_AUTH)
+	experiment-cli submit -d $(IOTLAB_DURATION) -l $(IOTLAB_NODES),archi=$(IOTLAB_TYPE)+site=$(IOTLAB_SITE),$(ELFFILE) -n riot_makefile_experiment
+	experiment-cli wait
+
+iotlab-flash: $(IOTLAB_AUTH) all
+	node-cli --update $(ELFFILE) -i $(IOTLAB_EXP_ID)
+
+iotlab-reset: $(IOTLAB_AUTH)
+	node-cli --reset -i $(IOTLAB_EXP_ID)
+
+iotlab-term:
+	ssh -t $(IOTLAB_USER)@$(IOTLAB_SITE).iot-lab.info "test -f ~/.iotlabrc || auth-cli -u $(IOTLAB_USER)"
+	ssh $(IOTLAB_USER)@$(IOTLAB_SITE).iot-lab.info serial_aggregator
