@@ -57,13 +57,14 @@ int isl29020_read(isl29020_t *dev)
 {
     char low, high;
     uint16_t res;
+    int ret;
 
     i2c_acquire(dev->i2c);
     /* read lighting value */
-    res = i2c_read_reg(dev->i2c, dev->address, ISL29020_REG_LDATA, &low);
-    res += i2c_read_reg(dev->i2c, dev->address, ISL29020_REG_HDATA, &high);
+    ret = i2c_read_reg(dev->i2c, dev->address, ISL29020_REG_LDATA, &low);
+    ret += i2c_read_reg(dev->i2c, dev->address, ISL29020_REG_HDATA, &high);
     i2c_release(dev->i2c);
-    if (res < 2) {
+    if (ret < 2) {
         return -1;
     }
     res = (high << 8) | low;
