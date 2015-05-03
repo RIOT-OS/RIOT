@@ -4264,7 +4264,7 @@ typedef struct
 #define  I2C_CR1_STOPIE                      ((uint32_t)0x00000020)        /*!< STOP detection interrupt enable */
 #define  I2C_CR1_TCIE                        ((uint32_t)0x00000040)        /*!< Transfer complete interrupt enable */
 #define  I2C_CR1_ERRIE                       ((uint32_t)0x00000080)        /*!< Errors interrupt enable */
-#define  I2C_CR1_DFN                         ((uint32_t)0x00000F00)        /*!< Digital noise filter */
+#define  I2C_CR1_DNF                         ((uint32_t)0x00000F00)        /*!< Digital noise filter */
 #define  I2C_CR1_ANFOFF                      ((uint32_t)0x00001000)        /*!< Analog noise filter OFF */
 #define  I2C_CR1_SWRST                       ((uint32_t)0x00002000)        /*!< Software reset */
 #define  I2C_CR1_TXDMAEN                     ((uint32_t)0x00004000)        /*!< DMA transmission requests enable */
