@@ -21,13 +21,14 @@
 #ifndef NG_IPV6_NC_H_
 #define NG_IPV6_NC_H_
 
+#include <stdbool.h>
 #include <stdint.h>
 
 #include "kernel_types.h"
 #include "net/ng_ipv6/addr.h"
 #include "net/ng_netif.h"
 #include "net/ng_pktqueue.h"
-#include "timex.h"
+#include "vtimer.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -123,6 +124,23 @@ typedef struct {
     uint8_t l2_addr_len;                    /**< Length of ng_ipv6_nc_t::l2_addr */
     uint8_t flags;                          /**< Flags as defined above */
     kernel_pid_t iface;                     /**< PID to the interface where the neighbor is */
+    vtimer_t rtr_timeout;                   /**< timeout timer for router flag */
+
+    /**
+     * @brief (Re)Transmission timer for neighbor solicitations of this entry and
+     *        timeout for states.
+     */
+    vtimer_t nbr_sol_timer;
+
+    /**
+     * @brief Delay timer for neighbor advertisements of this entry.
+     */
+    vtimer_t nbr_adv_timer;
+
+    uint8_t unanswered_probes;              /**< number of unanswered probes */
+    /**
+     * @}
+     */
 } ng_ipv6_nc_t;
 
 /**
@@ -141,16 +159,11 @@ void ng_ipv6_nc_init(void);
  *                          to NG_IPV6_L2_ADDR_MAX. 0 if unknown.
  * @param[in] flags         Flags for the entry
  *
- * @return  0 on success
- * @return  -EADDRINUSE, if @p ipv6_addr is already registered to the neighbor
- *          cache.
- * @return  -EFAULT, if @p ipv6_addr was NULL.
- * @return  -EINVAL, if @p l2_addr_len is greater then @ref NG_IPV6_NC_L2_ADDR_MAX,
- *          @p ipv6_addr is unspecified or @p iface is KERNEL_PID_UNDEF.
- * @return  -ENOMEM, if no space is left to store entry.
+ * @return  Pointer to new neighbor cache entry on success
+ * @return  NULL, on failure
  */
-int ng_ipv6_nc_add(kernel_pid_t iface, const ng_ipv6_addr_t *ipv6_addr,
-                   const void *l2_addr, size_t l2_addr_len, uint8_t flags);
+ng_ipv6_nc_t *ng_ipv6_nc_add(kernel_pid_t iface, const ng_ipv6_addr_t *ipv6_addr,
+                             const void *l2_addr, size_t l2_addr_len, uint8_t flags);
 
 /**
  * @brief   Removes a neighbor from the neighbor cache
@@ -194,20 +207,49 @@ ng_ipv6_nc_t *ng_ipv6_nc_get_next(ng_ipv6_nc_t *prev);
 ng_ipv6_nc_t *ng_ipv6_nc_get_next_router(ng_ipv6_nc_t *prev);
 
 /**
- * @brief   Searches for any neighbor cache entry fitting the @p ipv6_addr,
- *          where you currently can send a packet to (do not confuse with
- *          NG_IPV6_NC_STATE_REACHABLE).
+ * @brief   Returns the state of a neigbor cache entry.
  *
- * @param[in] iface         PID to the interface where the neighbor is. If it
- *                          is KERNEL_PID_UNDEF it will be searched on all
- *                          interfaces.
- * @param[in] ipv6_addr     An IPv6 address
+ * @param[in] entry A neighbor cache entry
  *
- * @return  The neighbor cache entry, if one is found.
- * @return  NULL, if none is found.
+ * @return  The state of the neighbor cache entry as defined by its flags.
  */
-ng_ipv6_nc_t *ng_ipv6_nc_get_reachable(kernel_pid_t iface,
-                                       const ng_ipv6_addr_t *ipv6_addr);
+static inline uint8_t ng_ipv6_nc_get_state(const ng_ipv6_nc_t *entry)
+{
+    return (entry->flags & NG_IPV6_NC_STATE_MASK);
+}
+
+/**
+ * @brief   Returns the type of a neigbor cache entry.
+ *
+ * @param[in] entry A neighbor cache entry
+ *
+ * @return  The type of the neighbor cache entry as defined by its flags.
+ */
+static inline uint8_t ng_ipv6_nc_get_type(const ng_ipv6_nc_t *entry)
+{
+    return (entry->flags & NG_IPV6_NC_TYPE_MASK);
+}
+
+/**
+ * @brief   Checks if an entry is reachable (do not confuse with
+ *          @ref NG_IPV6_NC_STATE_REACHABLE).
+ *
+ * @param[in] entry A neighbor cache entry
+ *
+ * @return  true, if you can send packets to @p entry
+ * @return  false, if you can't send packets to @p entry
+ */
+static inline bool ng_ipv6_nc_is_reachable(const ng_ipv6_nc_t *entry)
+{
+    switch (ng_ipv6_nc_get_state(entry)) {
+        case NG_IPV6_NC_STATE_UNREACHABLE:
+        case NG_IPV6_NC_STATE_INCOMPLETE:
+            return false;
+
+        default:
+            return true;
+    }
+}
 
 /**
  * @brief   Marks an entry as still reachable, if one with a fitting @p ipv6_addr
