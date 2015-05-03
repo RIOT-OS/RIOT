@@ -195,6 +195,29 @@ typedef struct {
     uint16_t mtu;           /**< Maximum Transmission Unit (MTU) of the interface */
     uint8_t cur_hl;         /**< current hop limit for the interface */
     uint16_t flags;         /**< flags for 6LoWPAN and Neighbor Discovery */
+    /**
+     * @brief   Base value in microseconds for computing random
+     *          ng_ipv6_netif_t::reach_time.
+     *          The default value is @ref NG_NDP_REACH_TIME.
+     */
+    uint32_t reach_time_base;
+
+    /**
+     * @brief   The time a neighbor is considered reachable after receiving
+     *          a reachability confirmation.
+     *          Should be uniformly distributed between @ref NG_NDP_MIN_RAND
+     *          and NG_NDP_MAX_RAND multiplied with
+     *          ng_ipv6_netif_t::reach_time_base microseconds devided by 10.
+     *          Can't be greater than 1 hour.
+     */
+    timex_t reach_time;
+
+    /**
+     * @brief   Time between retransmissions of neighbor solicitations to a
+     *          neighbor.
+     *          The default value is @ref NG_NDP_RETRANS_TIMER.
+     */
+    timex_t retrans_timer;
 } ng_ipv6_netif_t;
 
 /**

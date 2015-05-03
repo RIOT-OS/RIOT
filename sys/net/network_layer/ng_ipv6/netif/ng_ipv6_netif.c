@@ -21,6 +21,7 @@
 #include "kernel_types.h"
 #include "mutex.h"
 #include "net/ng_ipv6/addr.h"
+#include "net/ng_ndp.h"
 #include "net/ng_netif.h"
 
 #include "net/ng_ipv6/netif.h"
@@ -119,6 +120,10 @@ void ng_ipv6_netif_add(kernel_pid_t pid)
 
             mutex_unlock(&ipv6_ifs[i].mutex);
 
+#ifdef MODULE_NG_NDP
+            ng_ndp_netif_add(&ipv6_ifs[i]);
+#endif
+
             DEBUG(" * pid = %" PRIkernel_pid "  ", ipv6_ifs[i].pid);
             DEBUG("cur_hl = %d  ", ipv6_ifs[i].cur_hl);
             DEBUG("mtu = %d  ", ipv6_ifs[i].mtu);
@@ -137,6 +142,10 @@ void ng_ipv6_netif_remove(kernel_pid_t pid)
     if (entry == NULL) {
         return;
     }
+
+#ifdef MODULE_NG_NDP
+    ng_ndp_netif_remove(entry);
+#endif
 
     mutex_lock(&entry->mutex);
 

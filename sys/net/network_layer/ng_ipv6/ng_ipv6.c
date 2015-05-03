@@ -20,6 +20,7 @@
 #include "kernel_types.h"
 #include "net/ng_icmpv6.h"
 #include "net/ng_netbase.h"
+#include "net/ng_ndp.h"
 #include "net/ng_protnum.h"
 #include "thread.h"
 #include "utlist.h"
@@ -35,11 +36,12 @@
 #define _MAX_L2_ADDR_LEN    (8U)
 
 static char _stack[NG_IPV6_STACK_SIZE];
-static kernel_pid_t _pid = KERNEL_PID_UNDEF;
 
 #if ENABLE_DEBUG
 static char addr_str[NG_IPV6_ADDR_MAX_STR_LEN];
 #endif
+
+kernel_pid_t ng_ipv6_pid = KERNEL_PID_UNDEF;
 
 /* handles NG_NETAPI_MSG_TYPE_RCV commands */
 static void _receive(ng_pktsnip_t *pkt);
@@ -58,12 +60,12 @@ static void _decapsulate(ng_pktsnip_t *pkt);
 
 kernel_pid_t ng_ipv6_init(void)
 {
-    if (_pid == KERNEL_PID_UNDEF) {
-        _pid = thread_create(_stack, sizeof(_stack), NG_IPV6_PRIO,
+    if (ng_ipv6_pid == KERNEL_PID_UNDEF) {
+        ng_ipv6_pid = thread_create(_stack, sizeof(_stack), NG_IPV6_PRIO,
                              CREATE_STACKTEST, _event_loop, NULL, "ipv6");
     }
 
-    return _pid;
+    return ng_ipv6_pid;
 }
 
 void ng_ipv6_demux(kernel_pid_t iface, ng_pktsnip_t *pkt, uint8_t nh)
@@ -138,6 +140,27 @@ static void *_event_loop(void *args)
                 DEBUG("ipv6: reply to unsupported get/set\n");
                 reply.content.value = -ENOTSUP;
                 msg_reply(&msg, &reply);
+                break;
+
+            case NG_NDP_MSG_RTR_TIMEOUT:
+                DEBUG("ipv6: Router timeout received\n");
+                ((ng_ipv6_nc_t *)msg.content.ptr)->flags &= ~NG_IPV6_NC_IS_ROUTER;
+                break;
+
+            case NG_NDP_MSG_ADDR_TIMEOUT:
+                DEBUG("ipv6: Router advertisement timer event received\n");
+                ng_ipv6_netif_remove_addr(KERNEL_PID_UNDEF,
+                                          (ng_ipv6_addr_t *)msg.content.ptr);
+                break;
+
+            case NG_NDP_MSG_NBR_SOL_RETRANS:
+                DEBUG("ipv6: Neigbor solicitation retransmission timer event received\n");
+                ng_ndp_retrans_nbr_sol((ng_ipv6_nc_t *)msg.content.ptr);
+                break;
+
+            case NG_NDP_MSG_NC_STATE_TIMEOUT:
+                DEBUG("ipv6: Neigbor cace state timeout received\n");
+                ng_ndp_state_timeout((ng_ipv6_nc_t *)msg.content.ptr);
                 break;
 
             default:
@@ -411,8 +434,6 @@ static void _send(ng_pktsnip_t *pkt, bool prep_hdr)
     kernel_pid_t iface = KERNEL_PID_UNDEF;
     ng_pktsnip_t *ipv6, *payload;
     ng_ipv6_hdr_t *hdr;
-    ng_ipv6_nc_t *nc_entry;
-
     /* seize payload as temporary variable */
     payload = ng_pktbuf_start_write(pkt);
 
@@ -442,24 +463,14 @@ static void _send(ng_pktsnip_t *pkt, bool prep_hdr)
         _send_multicast(iface, pkt, ipv6, payload, prep_hdr);
     }
     else {
-        ng_ipv6_addr_t *next_hop = NULL;
+        uint8_t l2addr_len = NG_IPV6_NC_L2_ADDR_MAX;
+        uint8_t l2addr[l2addr_len];
 
-        next_hop = &hdr->dst;   /* TODO: next hop determination */
-
-        if (((nc_entry = ng_ipv6_nc_get(iface, next_hop)) == NULL) ||
-            !ng_ipv6_nc_is_reachable(nc_entry)) {
-            DEBUG("ipv6: No link layer address for next_hop %s found.\n",
-                  ng_ipv6_addr_to_str(addr_str, next_hop, sizeof(addr_str)));
-            ng_pktbuf_release(pkt);
-            return;
-        }
-        else {
-            iface = nc_entry->iface;
-        }
+        iface = ng_ndp_next_hop_l2addr(l2addr, &l2addr_len, iface, &hdr->dst,
+                                       pkt);
 
         if (iface == KERNEL_PID_UNDEF) {
-            DEBUG("ipv6: no interface for %s registered, dropping packet\n",
-                  ng_ipv6_addr_to_str(addr_str, next_hop, sizeof(addr_str)));
+            DEBUG("ipv6: error determining next hop's link layer address\n");
             ng_pktbuf_release(pkt);
             return;
         }
@@ -472,7 +483,7 @@ static void _send(ng_pktsnip_t *pkt, bool prep_hdr)
             }
         }
 
-        _send_unicast(iface, nc_entry->l2_addr, nc_entry->l2_addr_len, pkt);
+        _send_unicast(iface, l2addr, l2addr_len, pkt);
     }
 }
 

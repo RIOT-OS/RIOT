@@ -137,7 +137,7 @@ typedef struct {
      */
     vtimer_t nbr_adv_timer;
 
-    uint8_t unanswered_probes;              /**< number of unanswered probes */
+    uint8_t probes_remaining;               /**< remaining number of unanswered probes */
     /**
      * @}
      */

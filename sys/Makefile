@@ -86,6 +86,9 @@ endif
 ifneq (,$(filter ng_inet_csum,$(USEMODULE)))
     DIRS += net/crosslayer/ng_inet_csum
 endif
+ifneq (,$(filter ng_ndp,$(USEMODULE)))
+    DIRS += net/network_layer/ng_ndp
+endif
 ifneq (,$(filter ng_netapi,$(USEMODULE)))
     DIRS += net/crosslayer/ng_netapi
 endif
