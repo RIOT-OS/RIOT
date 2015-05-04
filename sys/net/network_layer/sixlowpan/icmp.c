@@ -832,7 +832,7 @@ void recv_rtr_adv(void)
                     }
                 }
 
-                ndp_add_prefix_info(if_id, &opt_pi_buf->addr, opt_pi_buf->length,
+                ndp_add_prefix_info(if_id, &opt_pi_buf->addr, opt_pi_buf->prefix_length,
                                     opt_pi_buf->val_ltime, opt_pi_buf->pref_ltime,
                                     0, opt_pi_buf->l_a_reserved1);
 
