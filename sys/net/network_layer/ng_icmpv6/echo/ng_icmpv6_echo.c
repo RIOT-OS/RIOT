@@ -67,9 +67,9 @@ void ng_icmpv6_echo_req_handle(kernel_pid_t iface, ng_ipv6_hdr_t *ipv6_hdr,
         return;
     }
 
-    pkt = _echo_build(NG_ICMPV6_ECHO_REP, byteorder_ntohs(echo->id),
-                      byteorder_ntohs(echo->seq), payload,
-                      len - sizeof(ng_icmpv6_echo_t));
+    pkt = ng_icmpv6_echo_build(NG_ICMPV6_ECHO_REP, byteorder_ntohs(echo->id),
+                               byteorder_ntohs(echo->seq), payload,
+                               len - sizeof(ng_icmpv6_echo_t));
 
     if (pkt == NULL) {
         DEBUG("icmpv6_echo: no space left in packet buffer\n");
