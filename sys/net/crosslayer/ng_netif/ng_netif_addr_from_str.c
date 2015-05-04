@@ -15,47 +15,76 @@
 
 #include "net/ng_netif.h"
 
-static int _dehex(char c)
+static inline int _dehex(char c, int default_)
 {
-    return ('0' <= c && c <= '9') ? c - '0'
-         : ('A' <= c && c <= 'F') ? c - 'A' + 10
-         : ('a' <= c && c <= 'f') ? c - 'a' + 10
-         : -1;
+    if ('0' <= c && c <= '9') {
+        return c - '0';
+    }
+    else if ('A' <= c && c <= 'F') {
+        return c - 'A' + 10;
+    }
+    else if ('a' <= c && c <= 'f') {
+        return c - 'a' + 10;
+    }
+    else {
+        return default_;
+    }
 }
 
 size_t ng_netif_addr_from_str(uint8_t *out, size_t out_len, const char *str)
 {
-    size_t len = 0;
-    while (1) {
-        ++len;
-        if (len > out_len) {
-            return 0;
-        }
+    /* Walk over str from the end. */
+    /* Take two chars a time as one hex value (%hhx). */
+    /* Leading zeros can be omitted. */
+    /* Every non-hexadimal character is a delimiter. */
+    /* Leading, tailing and adjacent delimiters are forbidden. */
 
-        int a = _dehex(*str++);
-        if (a < 0) {
-            return 0;
-        }
+    const char *end_str = str;
+    uint8_t *out_end = out;
+    size_t count = 0;
+    int assert_cell = 1;
 
-        int b = _dehex(*str++);
-        if (b < 0) {
-            return 0;
-        }
-
-        *out++ = (a << 4) | b;
-
-        if (*str == ':') {
-            ++str;
-        }
-        else if (*str == '\0') {
-            break;
-        }
-        else {
-            return 0;
-        }
+    if (!str || !*str) {
+        return 0;
+    }
+    while (end_str[1]) {
+        ++end_str;
     }
 
-    return len;
+    while (end_str >= str) {
+        int a = 0, b = _dehex(*end_str--, -1);
+        if (b < 0) {
+            if (assert_cell) {
+                return 0;
+            }
+            else {
+                assert_cell = 1;
+                continue;
+            }
+        }
+        assert_cell = 0;
+
+        if (end_str >= str) {
+            a = _dehex(*end_str--, 0);
+        }
+
+        if (++count > out_len) {
+            return 0;
+        }
+        *out_end++ = (a << 4) | b;
+    }
+    if (assert_cell) {
+        return 0;
+    }
+    /* out is reversed */
+
+    while (out < --out_end) {
+        uint8_t tmp = *out_end;
+        *out_end = *out;
+        *out++ = tmp;
+    }
+
+    return count;
 }
 
 /** @} */
