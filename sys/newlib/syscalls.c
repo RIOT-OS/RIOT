@@ -54,7 +54,7 @@ caddr_t heap_top = (caddr_t)&_sheap + 4;
 /**
  * @brief use mutex for waiting on incoming UART chars
  */
-static mutex_t uart_rx_mutex;
+static mutex_t uart_rx_mutex = MUTEX_INIT;
 static char rx_buf_mem[STDIO_RX_BUFSIZE];
 static ringbuffer_t rx_buf;
 #endif
@@ -65,16 +65,14 @@ static ringbuffer_t rx_buf;
 void rx_cb(void *arg, char data)
 {
     (void)arg;
-
-#ifdef MODULE_UART0
-    if (uart0_handler_pid) {
-        uart0_handle_incoming(data);
-
-        uart0_notify_thread();
-    }
-#else
+#ifndef MODULE_UART0
     ringbuffer_add_one(&rx_buf, data);
     mutex_unlock(&uart_rx_mutex);
+#else
+    if (uart0_handler_pid) {
+        uart0_handle_incoming(data);
+        uart0_notify_thread();
+    }
 #endif
 }
 
@@ -84,7 +82,7 @@ void rx_cb(void *arg, char data)
 void _init(void)
 {
 #ifndef MODULE_UART0
-    mutex_init(&uart_rx_mutex);
+    mutex_lock(&uart_rx_mutex);
     ringbuffer_init(&rx_buf, rx_buf_mem, STDIO_RX_BUFSIZE);
 #endif
     uart_init(STDIO, STDIO_BAUDRATE, rx_cb, 0, 0);
@@ -205,10 +203,11 @@ int _open_r(struct _reent *r, const char *name, int mode)
 int _read_r(struct _reent *r, int fd, void *buffer, unsigned int count)
 {
 #ifndef MODULE_UART0
-    while (rx_buf.avail == 0) {
-        mutex_lock(&uart_rx_mutex);
-    }
-    return ringbuffer_get(&rx_buf, (char*)buffer, rx_buf.avail);
+    mutex_lock(&uart_rx_mutex);
+
+    count = count < rx_buf.avail ? count : rx_buf.avail;
+
+    return ringbuffer_get(&rx_buf, (char*)buffer, count);
 #else
     char *res = (char*)buffer;
     res[0] = (char)uart0_readc();
