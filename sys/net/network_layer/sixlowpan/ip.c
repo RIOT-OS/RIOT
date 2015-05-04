@@ -660,7 +660,7 @@ ipv6_net_if_hit_t *ipv6_net_if_addr_prefix_eq(ipv6_net_if_hit_t *hit,
         while (net_if_iter_addresses(if_id, (net_if_addr_t **) &addr_entry)
                != NULL) {
             if (addr_entry->addr_protocol & NET_IF_L3P_IPV6) {
-                if (memcmp(addr_entry->addr_data, &addr, 8) == 0) {
+                if (memcmp(addr_entry->addr_data, addr, 8) == 0) {
                     hit->if_id = if_id;
                     hit->addr = addr_entry;
                     return hit;
