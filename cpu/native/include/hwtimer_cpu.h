@@ -21,9 +21,10 @@
 extern "C" {
 #endif
 
-#define HWTIMER_MAXTIMERS 4
+#define HWTIMER_MAXTIMERS 1
 #define HWTIMER_SPEED 1000000
 #define HWTIMER_MAXTICKS (0xFFFFFFFF)
+#define HWTIMER_SPIN_BARRIER 20
 
 #ifdef __cplusplus
 }
