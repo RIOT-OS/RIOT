@@ -26,15 +26,15 @@ extern "C" {
 #endif
 
 /**
- * @brief Reactive Routing Protocol (RRP) message content to request/reply route discovery
+ * @brief Routing Protocol (RP) message content to request/reply notification
  */
-typedef struct rrp_address_msg_t {
+typedef struct rp_address_msg_t {
     uint8_t *address;      /**< The pointer to the address */
     uint8_t address_size;  /**< The address size */
     uint32_t address_flags; /**< The flags for the given address */
-} rrp_address_msg_t;
+} rp_address_msg_t;
 
-#define FIB_MSG_RRP_SIGNAL (0x99)     /**< message type for RRP notifications */
+#define FIB_MSG_RP_SIGNAL (0x99)     /**< message type for RP notifications */
 
 /**
  * @brief indicator of a lifetime that does not expire (2^32 - 1)
@@ -52,9 +52,16 @@ void fib_init(void);
 void fib_deinit(void);
 
 /**
- * @brief Registration of reactive routing protocol handler function
+ * @brief Registration of a routing protocol handler function
+ *
+ * @param[in] prefix the prefix handled by the according RP
+ * @param[in] prefix_size the prefix size
+ * @return 0 on success
+ *           -ENOMEM if the entry cannot be registered (mximum registrations reached)
+ *           -EINVAL if the prefix is NULL or the provided size is 0
+ *
  */
-void fib_register_rrp(void);
+int fib_register_rp(uint8_t *prefix, size_t prefix_size);
 
 /**
  * @brief Adds a new entry in the corresponding FIB table for global destination and next hop
