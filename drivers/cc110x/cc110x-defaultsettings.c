@@ -92,11 +92,11 @@ uint8_t pa_table[] = {
 char cc110x_conf[] = {
     0x06, /* IOCFG2 */
     0x2E, /* IOCFG1 */
-    0x0E, /* IOCFG0 */
-    0x0F, /* FIFOTHR */
+    0x00, /* IOCFG0 */
+    0x00, /* FIFOTHR */
     0x9B, /* SYNC1 */
     0xAD, /* SYNC0 */
-    0x3D, /* PKTLEN (maximum value of packet length byte = 61) */
+    0xFF, /* PKTLEN (maximum value of packet length byte = 255) */
     0x06, /* PKTCTRL1 */
     0x45, /* PKTCTRL0 (variable packet length) */
     0xFF, /* ADDR */

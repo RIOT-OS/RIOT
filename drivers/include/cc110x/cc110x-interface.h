@@ -34,23 +34,23 @@
 extern "C" {
 #endif
 
-#define CC1100_MAX_DATA_LENGTH (58)
+#define CC1100_FIFO_SIZE            (64)        /**< Size of the CC110X RX/TX FIFO */
+#define CC1100_MAX_DATA_LENGTH      (252)       /**< Maximum length of pure payload data */
+#define CC1100_HEADER_LENGTH        (3)         ///< Header covers SRC, DST and FLAGS
 
-#define CC1100_HEADER_LENGTH   (3)              ///< Header covers SRC, DST and FLAGS
+#define CC1100_BROADCAST_ADDRESS    (0x00)      ///< CC1100 broadcast address
 
-#define CC1100_BROADCAST_ADDRESS (0x00)         ///< CC1100 broadcast address
-
-#define MAX_UID                  (0xFF)         ///< Maximum UID of a node is 255
-#define MIN_UID                  (0x01)         ///< Minimum UID of a node is 1
+#define MAX_UID                     (0xFF)      ///< Maximum UID of a node is 255
+#define MIN_UID                     (0x01)      ///< Minimum UID of a node is 1
 
 #define MIN_CHANNR                  (0)         ///< Minimum channel number
-#define MAX_CHANNR                 (24)         ///< Maximum channel number
+#define MAX_CHANNR                  (24)        ///< Maximum channel number
 
 #define MIN_OUTPUT_POWER            (0)         ///< Minimum output power value
-#define MAX_OUTPUT_POWER           (11)         ///< Maximum output power value
+#define MAX_OUTPUT_POWER            (11)        ///< Maximum output power value
 
-#define PACKET_LENGTH               (0x3E)      ///< Packet length = 62 Bytes.
-#define CC1100_SYNC_WORD_TX_TIME   (90000)      // loop count (max. timeout ~ 15 ms) to wait for
+#define PACKET_LENGTH               (0xFF)      ///< Packet length = 255 Bytes.
+#define CC1100_SYNC_WORD_TX_TIME    (90000)     // loop count (max. timeout ~ 15 ms) to wait for
                                                 // sync word to be transmitted (GDO2 from low to high)
 /**
  * @name    Defines used as state values for state machine
@@ -64,7 +64,6 @@ extern "C" {
 
 /** @} */
 
-extern volatile cc110x_flags rflags;            ///< Radio flags
 extern char cc110x_conf[];
 
 /**
@@ -125,7 +124,7 @@ void cc110x_init(kernel_pid_t transceiver_pid);
 
 int cc110x_initialize(netdev_t *dev);
 
-int8_t cc110x_send(cc110x_packet_t *pkt);
+int cc110x_send(cc110x_packet_t *pkt);
 
 uint8_t cc110x_get_buffer_pos(void);
 
@@ -146,11 +145,20 @@ void cc110x_set_monitor(uint8_t mode);
 void cc110x_print_config(void);
 
 /**
+ * @brief   GDO0 interrupt handler.
+ *
+ * Triggered if the fill count of the RXFIFO trespasses the configured
+ * threshold in the FIFOTHR register.
+ */
+void cc110x_rxfifo_of_handler(void);
+
+/**
  * @brief   GDO2 interrupt handler.
  *
- * @note    Wakes up MCU on packet reception.
+ * Triggered if a packet was received completely or if a RXFIFO Overflow
+ * occured.
  */
-void cc110x_rx_handler(void *args);
+void cc110x_packet_end_handler(void);
 
 #ifdef __cplusplus
 }

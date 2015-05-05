@@ -35,6 +35,8 @@ static int rd_set_mode(int mode);
 static void reset(void);
 static void power_up_reset(void);
 static void write_register(uint8_t r, uint8_t value);
+static void rx_thr_irq_handler(void *args);
+static void rx_irq_handler(void *args);
 
 /* External variables */
 extern uint8_t pa_table[];                      /* PATABLE with available output powers */
@@ -43,7 +45,6 @@ extern uint8_t pa_table_index;                  /* Current PATABLE Index */
 /* Global variables */
 cc110x_statistic_t cc110x_statistic;            /* Statistic values for debugging */
 
-volatile cc110x_flags rflags;                   /* Radio control flags */
 volatile uint8_t radio_state = RADIO_UNKNOWN;   /* Radio state */
 
 static radio_address_t radio_address;           /* Radio address */
@@ -69,9 +70,10 @@ int cc110x_initialize(netdev_t *dev)
     gpio_init_out(CC110X_CS, GPIO_NOPULL);
     gpio_set(CC110X_CS);
     /* Configure GDO0, GDO1, GDO2 */
-    gpio_init_in(CC110X_GDO0, GPIO_NOPULL);
+    gpio_init_int(CC110X_GDO0, GPIO_PULLDOWN, GPIO_RISING, &rx_thr_irq_handler, 0);
     gpio_init_in(CC110X_GDO1, GPIO_NOPULL);
-    gpio_init_int(CC110X_GDO2, GPIO_NOPULL, GPIO_FALLING, &cc110x_rx_handler, 0);
+    gpio_init_int(CC110X_GDO2, GPIO_NOPULL, GPIO_FALLING, &rx_irq_handler, 0);
+    gpio_irq_disable(CC110X_GDO0);
     gpio_irq_disable(CC110X_GDO2);
 
     /* Configure SPI */
@@ -88,10 +90,6 @@ int cc110x_initialize(netdev_t *dev)
 
     /* Write PATABLE (power settings) */
     cc110x_write_reg(CC1100_PATABLE, pa_table[pa_table_index]);
-
-    /* Initialize Radio Flags */
-    rflags._RSSI    = 0;
-    rflags._LQI     = 0;
 
     /* Set default channel number */
 #ifdef MODULE_CONFIG
@@ -378,6 +376,7 @@ static int rd_set_mode(int mode)
     switch(mode) {
         case RADIO_MODE_ON:
             DEBUG("Enabling rx mode\n");
+            gpio_irq_enable(CC110X_GDO0);
             gpio_irq_enable(CC110X_GDO2);
             cc110x_setup_rx_mode();                 /* Set chip to desired mode */
             break;
@@ -396,4 +395,14 @@ static int rd_set_mode(int mode)
 
     /* Return previous mode */
     return result;
+}
+
+static void rx_thr_irq_handler(void *args)
+{
+    cc110x_rxfifo_of_handler();
+}
+
+static void rx_irq_handler(void *args)
+{
+    cc110x_packet_end_handler();
 }
