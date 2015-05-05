@@ -17,6 +17,7 @@
  * @brief       Definition of global configuration options
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Oliver Hahm <oliver.hahm@inria.fr>
  */
 
 #ifndef NG_NET_CONF_H_
@@ -78,6 +79,45 @@ typedef enum {
     NETCONF_OPT_RAWMODE,            /**< en/disable the pre-processing of data
                                          in a network device driver as type
                                          ng_nettype_t */
+
+    /**
+     * @brief en/disable the interrupt at reception start.
+     *
+     * It is mostly triggered after the preamble is correctly received
+     *
+     * @note not all transceivers may support this interrupt
+     */
+    NETCONF_OPT_RX_START_IRQ,
+
+    /**
+     * @brief en/disable the interrupt after packet reception.
+     *
+     * This interrupt is triggered after a complete packet is received.
+     *
+     * @note in case a transceiver does not support this interrupt, the event
+     *       may be triggered by the driver
+     */
+    NETCONF_OPT_RX_END_IRQ,
+
+    /**
+     * @brief en/disable the interrupt right in the beginning of transmission.
+     *
+     * This interrupt is triggered when the transceiver starts to send out the
+     * packet.
+     *
+     * @note in case a transceiver does not support this interrupt, the event
+     *       may be triggered by the driver
+     */
+    NETCONF_OPT_TX_START_IRQ,
+
+    /**
+     * @brief en/disable the interrupt after packet transmission.
+     *
+     * This interrupt is triggered when the full packet is transmitted.
+     *
+     * @note not all transceivers may support this interrupt
+     */
+    NETCONF_OPT_TX_END_IRQ,
     /* add more options if needed */
 } ng_netconf_opt_t;
 

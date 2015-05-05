@@ -357,6 +357,7 @@ static int _get(ng_netdev_t *device, ng_netconf_opt_t opt,
     ng_at86rf2xx_t *dev = (ng_at86rf2xx_t *) device;
 
     switch (opt) {
+        uint8_t irq_mask;
 
         case NETCONF_OPT_ADDRESS:
             if (max_len < sizeof(uint16_t)) {
@@ -485,6 +486,12 @@ static int _get(ng_netdev_t *device, ng_netconf_opt_t opt,
             else {
                 *((ng_netconf_enable_t *)val) = NETCONF_DISABLE;
             }
+            return sizeof(ng_netconf_enable_t);
+
+        case NETCONT_OPT_SFD_INT:
+            irq_mask = ng_at86rf2xx_reg_read(dev, NG_AT86RF2XX_REG__IRQ_MASK);
+            ng_at86rf2xx_reg_write(dev, NG_AT86RF2XX_REG__IRQ_MASK,
+                    (irq_mask ^ NG_AT86RF2XX_IRQ_STATUS_MASK__RX_START));
             return sizeof(ng_netconf_enable_t);
 
         default:
