@@ -6,8 +6,8 @@
  * directory for more details.
  */
 
-#ifndef _ARM_CPU_H
-#define _ARM_CPU_H
+#ifndef ARM_CPU_H_
+#define ARM_CPU_H_
 
 #include <stdint.h>
 #include "VIC.h"
@@ -16,6 +16,11 @@
 #ifdef __cplusplus
  extern "C" {
 #endif
+
+/**
+ * @brief ARM has architecture specific atomic_set_return in atomic.s
+ */
+#define ARCH_HAS_ATOMIC_SET_RETURN 1
 
 #define NEW_TASK_CPSR 0x1F
 #define WORDSIZE 32
@@ -44,4 +49,4 @@ int uart0_puts(char *astring, int length);
 }
 #endif
 
-#endif // _ARM_CPU_H
+#endif /* ARM_CPU_H_ */
