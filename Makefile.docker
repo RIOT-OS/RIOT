@@ -1,0 +1,76 @@
+export DOCKER_IMAGE ?= riot/riotbuild:latest
+export DOCKER_BUILD_ROOT ?= /data/riotbuild
+export DOCKER_FLAGS ?= --rm
+# List of Docker-enabled make goals
+export DOCKER_MAKECMDGOALS_POSSIBLE = \
+  all \
+  #
+export DOCKER_MAKECMDGOALS = $(filter $(MAKECMDGOALS),$(DOCKER_MAKECMDGOALS_POSSIBLE))
+
+# Default target for building inside a Docker container if nothing was given
+export DOCKER_MAKECMDGOALS ?= all
+# List of all exported environment variables that shall be passed on to the
+# Docker container, they will only be passed if they are set from the
+# environment, not if they are only default Makefile values.
+export DOCKER_ENV_VARS = \
+  BINDIRBASE \
+  BOARD \
+  QUIET \
+  RIOT_VERSION \
+  APPDIR \
+  BINDIR \
+  BUILDRELPATH \
+  ELFFILE \
+  HEXFILE \
+  LINKFLAGPREFIX \
+  CPPMIX \
+  PREFIX \
+  CC \
+  CXX \
+  CFLAGS \
+  CXXUWFLAGS \
+  CXXEXFLAGS \
+  AR \
+  ARFLAGS \
+  AS \
+  ASFLAGS \
+  LINK \
+  LINKFLAGS \
+  OBJCOPY \
+  OFLAGS \
+  SIZE \
+  UNDEF \
+  #
+
+# Find which variables were set using the command line or the environment and
+# pass those to Docker.
+# DOCKER_ENVIRONMENT_CMDLINE must be immediately assigned (:=) or otherwise some
+# of the environment variables will be overwritten by Makefile.include and their
+# origin is changed to "file"
+DOCKER_ENVIRONMENT_CMDLINE := $(foreach varname,$(DOCKER_ENV_VARS), \
+    $(if $(filter environment command,$(origin $(varname))), \
+    -e '$(varname)=$($(varname))', \
+    ))
+DOCKER_ENVIRONMENT_CMDLINE := $(strip $(DOCKER_ENVIRONMENT_CMDLINE))
+
+# This will execute `make $(DOCKER_MAKECMDGOALS)` inside a Docker container.
+# We do not push the regular $(MAKECMDGOALS) to the container's make command in
+# order to only perform building inside the container and defer executing any
+# extra commands such as flashing or debugging until after leaving the
+# container.
+# The `flash`, `term`, `debugserver` etc. targets usually require access to
+# hardware which may not be reachable from inside the container.
+..in-docker-container:
+	@$(COLOR_ECHO) '${COLOR_GREEN}Launching build container using image "$(DOCKER_IMAGE)".${COLOR_RESET}'
+	docker run $(DOCKER_FLAGS) -i -t -u "$$(id -u)" \
+	    -v '$(RIOTBASE):$(DOCKER_BUILD_ROOT)/riotbase' \
+	    -v '$(RIOTCPU):$(DOCKER_BUILD_ROOT)/riotcpu' \
+	    -v '$(RIOTBOARD):$(DOCKER_BUILD_ROOT)/riotboard' \
+	    -v '$(RIOTPROJECT):$(DOCKER_BUILD_ROOT)/riotproject' \
+	    -e 'RIOTBASE=$(DOCKER_BUILD_ROOT)/riotbase' \
+	    -e 'RIOTCPU=$(DOCKER_BUILD_ROOT)/riotcpu' \
+	    -e 'RIOTBOARD=$(DOCKER_BUILD_ROOT)/riotboard' \
+	    -e 'RIOTPROJECT=$(DOCKER_BUILD_ROOT)/riotproject' \
+	    $(DOCKER_ENVIRONMENT_CMDLINE) \
+	    -w '$(DOCKER_BUILD_ROOT)/riotproject/$(BUILDRELPATH)' \
+	    '$(DOCKER_IMAGE)' make $(DOCKER_MAKECMDGOALS)

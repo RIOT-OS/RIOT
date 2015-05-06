@@ -13,6 +13,11 @@ RIOTBOARD := $(abspath $(RIOTBOARD))
 RIOTPROJECT ?= $(shell git rev-parse --show-toplevel 2>/dev/null || pwd)
 RIOTPROJECT := $(abspath $(RIOTPROJECT))
 
+# Include Docker settings near the top because we need to build the environment
+# command line before some of the variable origins are overwritten below when
+# using abspath, strip etc.
+include $(RIOTBASE)/Makefile.docker
+
 # Path to the current directory relative to the git root
 BUILDRELPATH ?= $(shell git rev-parse --show-prefix)
 
@@ -159,7 +164,7 @@ BASELIBS += $(USEPKG:%=${BINDIR}%.a)
 ELFFILE ?= $(BINDIR)$(APPLICATION).elf
 HEXFILE ?= $(ELFFILE:.elf=.hex)
 
-# variables used to complie and link c++
+# variables used to compile and link c++
 CPPMIX ?= $(if $(wildcard *.cpp),1,)
 
 # We assume $(LINK) to be gcc-like. Use `LINKFLAGPREFIX :=` for ld-like linker options.
@@ -273,36 +278,6 @@ objdump:
 		'${COLOR_RED} Objdump program $(PREFIX)objdump not found. Aborting.${COLOR_RESET}'; \
 		exit 1; }
 	$(PREFIX)objdump -S -D -h $(ELFFILE) | less
-
-export DOCKER_IMAGE ?= riot/riotbuild:latest
-export DOCKER_BUILD_ROOT ?= /data/riotbuild
-export DOCKER_FLAGS ?= --rm
-# Default target for building inside a Docker container
-export DOCKER_MAKECMDGOALS ?= all
-# This will execute `make $(DOCKER_MAKECMDGOALS)` inside a Docker container.
-# We do not push the regular $(MAKECMDGOALS) to the container's make command in
-# order to only perform building inside the container and defer executing any
-# extra commands such as flashing or debugging until after leaving the
-# container.
-# The `flash`, `term`, `debugserver` etc. targets usually require access to
-# hardware which may not be reachable from inside the container.
-..in-docker-container:
-	@$(COLOR_ECHO) '${COLOR_GREEN}Launching build container using image "$(DOCKER_IMAGE)".${COLOR_RESET}'
-	docker run $(DOCKER_FLAGS) -i -t -u "$$(id -u)" \
-	    -v '$(RIOTBASE):$(DOCKER_BUILD_ROOT)/riotbase' \
-	    -v '$(RIOTCPU):$(DOCKER_BUILD_ROOT)/riotcpu' \
-	    -v '$(RIOTBOARD):$(DOCKER_BUILD_ROOT)/riotboard' \
-	    -v '$(RIOTPROJECT):$(DOCKER_BUILD_ROOT)/riotproject' \
-	    -e 'RIOTBASE=$(DOCKER_BUILD_ROOT)/riotbase' \
-	    -e 'RIOTCPU=$(DOCKER_BUILD_ROOT)/riotcpu' \
-	    -e 'RIOTBOARD=$(DOCKER_BUILD_ROOT)/riotboard' \
-	    -e 'RIOTPROJECT=$(DOCKER_BUILD_ROOT)/riotproject' \
-	    -e 'BOARD=$(BOARD)' \
-	    -e 'RIOT_VERSION=$(RIOT_VERSION)' \
-	    -e '__RIOTBUILD_FLAG=$(__RIOTBUILD_FLAG)' \
-	    -e 'QUIET=$(QUIET)' \
-	    -w '$(DOCKER_BUILD_ROOT)/riotproject/$(BUILDRELPATH)' \
-	    '$(DOCKER_IMAGE)' make $(DOCKER_MAKECMDGOALS)
 
 # Extra make goals for testing and comparing changes.
 include $(RIOTBASE)/Makefile.buildtests
