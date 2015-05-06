@@ -285,7 +285,7 @@ static int _fill_ipv6_hdr(kernel_pid_t iface, ng_pktsnip_t *ipv6,
 static inline void _send_multicast_over_iface(kernel_pid_t iface, ng_pktsnip_t *pkt,
                                               ng_pktsnip_t *netif)
 {
-    DEBUG("ipv6: send multicast over interface %" PRIkernel_pid "\n", ifs[i]);
+    DEBUG("ipv6: send multicast over interface %" PRIkernel_pid "\n", iface);
     /* mark as multicast */
     ((ng_netif_hdr_t *)netif->data)->flags |= NG_NETIF_HDR_FLAGS_MULTICAST;
     /* and send to interface */
