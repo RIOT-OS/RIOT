@@ -31,6 +31,9 @@ endif
         info-buildsizes-diff info-build info-boards-supported \
         info-features-missing info-boards-features-missing
 
+ifeq ($(BUILD_IN_DOCKER),1)
+buildtest: ..in-docker-container
+else
 buildtest:
 	@ \
 	BUILDTESTOK=true; \
@@ -66,6 +69,7 @@ buildtest:
 		done; \
 	done; \
 	$${BUILDTESTOK}
+endif # BUILD_IN_DOCKER
 
 info-objsize:
 	@case "${SORTROW}" in \
