@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2014 Freie Universität Berlin
+ * Copyright (C) 2015 Kaspar Schleiser <kaspar@schleiser.de>
+ *               2014 Freie Universität Berlin
+ *
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -7,15 +9,16 @@
  */
 
 /**
- * @ingroup     cpu_samd21
+ * @ingroup     sys_compat
  * @{
  *
  * @file        hwtimer_arch.c
- * @brief       Implementation of the kernels hwtimer interface
+ * @brief       Implementation of the kernels hwtimer interface over periph timers
  *
- * The hardware timer implementation uses the Cortex build-in system timer as back-end.
+ * This hwtimer implementation wraps one periph timer
  *
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
+ * @author      Kaspar Schleiser <kaspar@schleiser.de>
  *
  * @}
  */

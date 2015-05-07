@@ -137,6 +137,9 @@ endif
 ifneq (,$(filter ng_udp,$(USEMODULE)))
     DIRS += net/transport_layer/ng_udp
 endif
+ifneq (,$(filter hwtimer_compat,$(USEMODULE)))
+    DIRS += compat/hwtimer
+endif
 
 DIRS += $(dir $(wildcard $(addsuffix /Makefile, ${USEMODULE})))
 

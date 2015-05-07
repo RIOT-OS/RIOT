@@ -22,7 +22,7 @@ export UNDEF += $(BINDIR)cpu/syscalls.o
 export UNDEF += $(BINDIR)cpu/startup.o
 
 # export the peripheral drivers to be linked into the final binary
-export USEMODULE += periph
+export USEMODULE += periph hwtimer_compat
 
 # CPU depends on the cortex-m common module, so include it
 include $(CORTEX_COMMON)Makefile.include
