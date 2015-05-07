@@ -729,6 +729,7 @@ void ipv6_net_if_get_best_src_addr(ipv6_addr_t *src, const ipv6_addr_t *dest)
     int if_id = 0; // TODO: get this somehow
     ipv6_net_if_addr_t *addr = NULL;
     ipv6_net_if_addr_t *tmp_addr = NULL;
+    uint8_t bmatch = 0;
 
     if (!(ipv6_addr_is_link_local(dest)) && !(ipv6_addr_is_multicast(dest))) {
         while ((addr = (ipv6_net_if_addr_t *) net_if_iter_addresses(if_id,
@@ -739,11 +740,15 @@ void ipv6_net_if_get_best_src_addr(ipv6_addr_t *src, const ipv6_addr_t *dest)
                     && !ipv6_addr_is_unique_local_unicast(
                         addr->addr_data)) {
 
-                    uint8_t bmatch = 0;
+                    if (addr->addr_protocol == NET_IF_L3P_IPV6_PREFIX) {
+                        continue;
+                    }
+
                     uint8_t tmp = ipv6_get_addr_match(dest, addr->addr_data);
 
                     if (tmp >= bmatch) {
                         tmp_addr = addr;
+                        bmatch = tmp;
                     }
                 }
             }
