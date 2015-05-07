@@ -154,8 +154,7 @@ void ng_at86rf2xx_reset(ng_at86rf2xx_t *dev)
     ng_at86rf2xx_reg_write(dev, NG_AT86RF2XX_REG__TRX_CTRL_2, tmp);
     /* enable interrupts */
     ng_at86rf2xx_reg_write(dev, NG_AT86RF2XX_REG__IRQ_MASK,
-                           (NG_AT86RF2XX_IRQ_STATUS_MASK__RX_START |
-                            NG_AT86RF2XX_IRQ_STATUS_MASK__TRX_END));
+                           NG_AT86RF2XX_IRQ_STATUS_MASK__TRX_END);
     /* go into RX state */
     ng_at86rf2xx_set_state(dev, NG_AT86RF2XX_STATE_RX_AACK_ON);
 

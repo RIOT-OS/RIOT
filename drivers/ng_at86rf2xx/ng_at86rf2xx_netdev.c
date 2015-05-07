@@ -487,6 +487,26 @@ static int _get(ng_netdev_t *device, ng_netconf_opt_t opt,
             }
             return sizeof(ng_netconf_enable_t);
 
+        case NETCONF_OPT_RX_START_IRQ:
+            *((ng_netconf_enable_t *)val) =
+                !!(dev->options & NG_AT86RF2XX_OPT_TELL_RX_START);
+            return sizeof(ng_netconf_enable_t);
+
+        case NETCONF_OPT_RX_END_IRQ:
+            *((ng_netconf_enable_t *)val) =
+                !!(dev->options & NG_AT86RF2XX_OPT_TELL_RX_END);
+            return sizeof(ng_netconf_enable_t);
+
+        case NETCONF_OPT_TX_START_IRQ:
+            *((ng_netconf_enable_t *)val) =
+                !!(dev->options & NG_AT86RF2XX_OPT_TELL_TX_START);
+            return sizeof(ng_netconf_enable_t);
+
+        case NETCONF_OPT_TX_END_IRQ:
+            *((ng_netconf_enable_t *)val) =
+                !!(dev->options & NG_AT86RF2XX_OPT_TELL_TX_END);
+            return sizeof(ng_netconf_enable_t);
+
         default:
             return -ENOTSUP;
     }
@@ -599,6 +619,26 @@ static int _set(ng_netdev_t *device, ng_netconf_opt_t opt,
                                     ((bool *)val)[0]);
             return sizeof(ng_netconf_enable_t);
 
+        case NETCONF_OPT_RX_START_IRQ:
+            ng_at86rf2xx_set_option(dev, NG_AT86RF2XX_OPT_TELL_RX_START,
+                                    ((bool *)val)[0]);
+            return sizeof(ng_netconf_enable_t);
+
+        case NETCONF_OPT_RX_END_IRQ:
+            ng_at86rf2xx_set_option(dev, NG_AT86RF2XX_OPT_TELL_RX_END,
+                                    ((bool *)val)[0]);
+            return sizeof(ng_netconf_enable_t);
+
+        case NETCONF_OPT_TX_START_IRQ:
+            ng_at86rf2xx_set_option(dev, NG_AT86RF2XX_OPT_TELL_TX_START,
+                                    ((bool *)val)[0]);
+            return sizeof(ng_netconf_enable_t);
+
+        case NETCONF_OPT_TX_END_IRQ:
+            ng_at86rf2xx_set_option(dev, NG_AT86RF2XX_OPT_TELL_TX_END,
+                                    ((bool *)val)[0]);
+            return sizeof(ng_netconf_enable_t);
+
         default:
             return -ENOTSUP;
     }
@@ -643,9 +683,7 @@ static void _isr_event(ng_netdev_t *device, uint32_t event_type)
     state = ng_at86rf2xx_get_state(dev);
 
     if (irq_mask & NG_AT86RF2XX_IRQ_STATUS_MASK__RX_START) {
-        if (dev->event_cb && (dev->options & NG_AT86RF2XX_OPT_TELL_RX_START)) {
-            dev->event_cb(NETDEV_EVENT_RX_STARTED, NULL);
-        }
+        dev->event_cb(NETDEV_EVENT_RX_STARTED, NULL);
         DEBUG("[ng_at86rf2xx] EVT - RX_START\n");
     }
     if (irq_mask & NG_AT86RF2XX_IRQ_STATUS_MASK__TRX_END) {

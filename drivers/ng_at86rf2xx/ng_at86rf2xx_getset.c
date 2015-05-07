@@ -154,6 +154,12 @@ void ng_at86rf2xx_set_option(ng_at86rf2xx_t *dev, uint16_t option, bool state)
                 tmp &= ~(NG_AT86RF2XX_CSMA_SEED_1__AACK_DIS_ACK);
                 ng_at86rf2xx_reg_write(dev, NG_AT86RF2XX_REG__CSMA_SEED_1, tmp);
                 break;
+            case NG_AT86RF2XX_OPT_TELL_RX_START:
+                DEBUG("[ng_at86rf2xx] opt: enabling SFD IRQ\n");
+                tmp = ng_at86rf2xx_reg_read(dev, NG_AT86RF2XX_REG__IRQ_MASK);
+                tmp |= NG_AT86RF2XX_IRQ_STATUS_MASK__RX_START;
+                ng_at86rf2xx_reg_write(dev, NG_AT86RF2XX_REG__IRQ_MASK, tmp);
+                break;
             default:
                 /* do nothing */
                 break;
@@ -184,6 +190,12 @@ void ng_at86rf2xx_set_option(ng_at86rf2xx_t *dev, uint16_t option, bool state)
                 tmp = ng_at86rf2xx_reg_read(dev, NG_AT86RF2XX_REG__CSMA_SEED_1);
                 tmp |= NG_AT86RF2XX_CSMA_SEED_1__AACK_DIS_ACK;
                 ng_at86rf2xx_reg_write(dev, NG_AT86RF2XX_REG__CSMA_SEED_1, tmp);
+                break;
+            case NG_AT86RF2XX_OPT_TELL_RX_START:
+                DEBUG("[ng_at86rf2xx] opt: disabling SFD IRQ\n");
+                tmp = ng_at86rf2xx_reg_read(dev, NG_AT86RF2XX_REG__IRQ_MASK);
+                tmp &= ~NG_AT86RF2XX_IRQ_STATUS_MASK__RX_START;
+                ng_at86rf2xx_reg_write(dev, NG_AT86RF2XX_REG__IRQ_MASK, tmp);
                 break;
             default:
                 /* do nothing */
