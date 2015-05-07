@@ -186,7 +186,7 @@ void isr_rtc(void)
 {
     RtcMode2 *rtcMode2 = &(RTC_DEV);
     uint16_t status = rtcMode2->INTFLAG.reg;
-    if (status & RTC_MODE2_INTFLAG_ALARM0) {
+    if ((status & RTC_MODE2_INTFLAG_ALARM0) && (rtc_callback.cb != NULL)) {
         rtc_callback.cb(rtc_callback.arg);
         rtcMode2->INTFLAG.reg = RTC_MODE2_INTFLAG_ALARM0;
     }
