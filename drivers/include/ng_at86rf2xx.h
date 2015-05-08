@@ -79,7 +79,6 @@ typedef enum {
 #endif
 /** @} */
 
-
 /**
  * @brief   Default PAN ID
  *
