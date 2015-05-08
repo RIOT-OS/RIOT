@@ -240,8 +240,11 @@ static void _rbuf_gc(void)
     vtimer_now(&now);
 
     for (i = 0; i < RBUF_SIZE; i++) {
-        if ((rbuf[i].pkt != NULL) &&
-            ((now.seconds - rbuf[i].arrival) > RBUF_TIMEOUT)) {
+        if (rbuf[i].pkt == NULL) { /* leave GC early if there is still room */
+            return;
+        }
+        else if ((rbuf[i].pkt != NULL) &&
+                 ((now.seconds - rbuf[i].arrival) > RBUF_TIMEOUT)) {
             DEBUG("6lo rfrag: entry (%s, ", ng_netif_addr_to_str(l2addr_str,
                     sizeof(l2addr_str), rbuf[i].src, rbuf[i].src_len));
             DEBUG("%s, %zu, %" PRIu16 ") timed out\n",
