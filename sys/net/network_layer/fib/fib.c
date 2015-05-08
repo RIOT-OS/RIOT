@@ -557,9 +557,9 @@ void fib_print_routes(void)
     for (size_t i = 0; i < FIB_MAX_FIB_TABLE_ENTRIES; ++i) {
         if (fib_table[i].lifetime.seconds != 0 || fib_table[i].lifetime.microseconds != 0) {
             fib_print_adress(fib_table[i].global);
-            printf(" 0x%04x ", fib_table[i].global_flags);
+            printf(" 0x%04"PRIx32" ", fib_table[i].global_flags);
             fib_print_adress(fib_table[i].next_hop);
-            printf(" 0x%04x ", fib_table[i].next_hop_flags);
+            printf(" 0x%04"PRIx32" ", fib_table[i].next_hop_flags);
 
             if ((fib_table[i].lifetime.seconds != FIB_LIFETIME_NO_EXPIRE)
                 || (fib_table[i].lifetime.microseconds != FIB_LIFETIME_NO_EXPIRE)) {
