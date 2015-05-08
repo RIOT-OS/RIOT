@@ -306,4 +306,12 @@ void auto_init(void)
     DEBUG("Auto init UDP module.\n");
     ng_udp_init();
 #endif
+
+
+    /* initialize network devices */
+
+#ifdef MODULE_NG_AT86RF2XX
+    extern void auto_init_ng_at86rf2xx(void);
+    auto_init_ng_at86rf2xx();
+#endif
 }
