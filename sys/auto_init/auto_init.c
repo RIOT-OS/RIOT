@@ -306,8 +306,4 @@ void auto_init(void)
     DEBUG("Auto init UDP module.\n");
     ng_udp_init();
 #endif
-#ifdef MODULE_AUTO_INIT_NG_NETIF
-    DEBUG("Auto init network interfaces.\n");
-    auto_init_ng_netif();
-#endif
 }
