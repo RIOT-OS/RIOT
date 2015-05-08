@@ -9,3 +9,7 @@ FEATURES_PROVIDED += periph_adc
 FEATURES_PROVIDED += periph_dac
 FEATURES_PROVIDED += periph_cpuid
 FEATURES_MCU_GROUP = cortex_m4
+
+FEATURES_CONFLICT += periph_spi:periph_dac
+
+FEATURES_CONFLICT_MSG += "On stm32f4discovery boards there are the same pins for the DAC and/or SPI_0."
