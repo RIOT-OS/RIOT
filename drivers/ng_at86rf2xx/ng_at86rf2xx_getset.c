@@ -134,7 +134,7 @@ void ng_at86rf2xx_set_option(ng_at86rf2xx_t *dev, uint16_t option, bool state)
         /* trigger option specific actions */
         switch (option) {
             case NG_AT86RF2XX_OPT_CSMA:
-                DEBUG("[ng_at86rf2xx] opt: enabling CSMA mode\n");
+                DEBUG("[ng_at86rf2xx] opt: enabling CSMA mode (NOT IMPLEMENTED)\n");
                 /* TODO: en/disable csma */
                 break;
             case NG_AT86RF2XX_OPT_PROMISCUOUS:
@@ -170,9 +170,11 @@ void ng_at86rf2xx_set_option(ng_at86rf2xx_t *dev, uint16_t option, bool state)
         /* trigger option specific actions */
         switch (option) {
             case NG_AT86RF2XX_OPT_CSMA:
+                DEBUG("[ng_at86rf2xx] opt: disabling CSMA mode (NOT IMPLEMENTED)\n");
                 /* TODO: en/disable csma */
                 break;
             case NG_AT86RF2XX_OPT_PROMISCUOUS:
+                DEBUG("[ng_at86rf2xx] opt: disabling PROMISCUOUS mode\n");
                 /* disable promiscuous mode */
                 tmp = ng_at86rf2xx_reg_read(dev, NG_AT86RF2XX_REG__XAH_CTRL_1);
                 tmp &= ~(NG_AT86RF2XX_XAH_CTRL_1__AACK_PROM_MODE);
@@ -187,6 +189,7 @@ void ng_at86rf2xx_set_option(ng_at86rf2xx_t *dev, uint16_t option, bool state)
                 }
                 break;
             case NG_AT86RF2XX_OPT_AUTOACK:
+                DEBUG("[ng_at86rf2xx] opt: disabling auto ACKs\n");
                 tmp = ng_at86rf2xx_reg_read(dev, NG_AT86RF2XX_REG__CSMA_SEED_1);
                 tmp |= NG_AT86RF2XX_CSMA_SEED_1__AACK_DIS_ACK;
                 ng_at86rf2xx_reg_write(dev, NG_AT86RF2XX_REG__CSMA_SEED_1, tmp);

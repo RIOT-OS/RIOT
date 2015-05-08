@@ -77,9 +77,8 @@ typedef enum {
     NETCONF_OPT_STATE,              /**< get/set the state of network devices as
                                      *   type ng_netconf_state_t */
     NETCONF_OPT_RAWMODE,            /**< en/disable the pre-processing of data
-                                         in a network device driver as type
-                                         ng_nettype_t */
-
+                                     *   in a network device driver as type
+                                     *   ng_nettype_t */
     /**
      * @brief en/disable the interrupt at reception start.
      *
