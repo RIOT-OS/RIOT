@@ -155,6 +155,18 @@ extern const ng_netdev_driver_t xbee_driver;
 int xbee_init(xbee_t *dev, uart_t uart, uint32_t baudrate,
               gpio_t sleep_pin, gpio_t status_pin);
 
+/**
+ * @brief   auto_init struct holding Xbee device initalization params
+ */
+typedef struct xbee_params {
+    uart_t uart;            /**< UART interfaced the device is connected to */
+    uint32_t baudrate;      /**< baudrate to use */
+    gpio_t sleep_pin;       /**< GPIO pin that is connected to the SLEEP pin
+                                 set to GPIO_NUMOF if not used */
+    gpio_t status_pin;      /**< GPIO pin that is connected to the STATUS pin
+                                 set to GPIO_NUMOF if not used */
+} xbee_params_t;
+
 #ifdef __cplusplus
 }
 #endif

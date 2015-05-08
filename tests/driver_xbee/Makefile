@@ -18,6 +18,7 @@ endif
 
 USEMODULE += xbee
 USEMODULE += ng_netif
+USEMODULE += auto_init_ng_netif
 USEMODULE += ng_nomac
 USEMODULE += ng_pktdump
 USEMODULE += shell
@@ -29,5 +30,10 @@ else
   # set default
   CFLAGS += -DXBEE_UART=UART_0
 endif
+
+# add current directory to the include path. Putting it in CFLAGS will make
+# it go to the beginning, before the standard includes.
+# That way xbee_params.h get's included and auto configuration can pick it up.
+CFLAGS += -I$(CURDIR)
 
 include $(RIOTBASE)/Makefile.include

@@ -314,4 +314,9 @@ void auto_init(void)
     extern void auto_init_ng_at86rf2xx(void);
     auto_init_ng_at86rf2xx();
 #endif
+
+#ifdef MODULE_XBEE
+    extern void auto_init_xbee(void);
+    auto_init_xbee();
+#endif
 }
