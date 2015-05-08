@@ -7,7 +7,9 @@
  */
 
 /**
- * @addtogroup  cpu_cortex-m3
+ * @defgroup    cpu_cortexm3_common ARM Cortex-M3 common
+ * @ingroup     cpu
+ * @brief       Common implementations and headers for Cortex-M3 family based micro-controllers
  * @{
  *
  * @file
@@ -18,10 +20,16 @@
  *
  * @author      Stefan Pfeiffer <stefan.pfeiffer@fu-berlin.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Joakim Gebart <joakim.gebart@eistec.se>
  */
 
-#ifndef __CORTEXM_COMMON_H
-#define __CORTEXM_COMMON_H
+#ifndef CORTEXM_COMMON_H_
+#define CORTEXM_COMMON_H_
+
+/**
+ * @brief Cortex-M3 has architecture specific atomic operations in atomic_arch.c.
+ */
+#define ARCH_HAS_ATOMIC_COMPARE_AND_SWAP 1
 
 #include "cpu-conf.h"
 
@@ -47,5 +55,5 @@ void cpu_init(void);
 }
 #endif
 
-#endif /* __CORTEXM_COMMON_H */
+#endif /* CORTEXM_COMMON_H_ */
 /** @} */
