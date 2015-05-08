@@ -52,69 +52,75 @@ static void set_up(void)
     ng_ipv6_nc_init();
 }
 
-static void test_ipv6_nc_add__EADDRINUSE(void)
+static void test_ipv6_nc_add__address_registered(void)
+{
+    ng_ipv6_addr_t addr = DEFAULT_TEST_IPV6_ADDR;
+    ng_ipv6_nc_t *entry1, *entry2;
+
+    TEST_ASSERT_NOT_NULL((entry1 = ng_ipv6_nc_add(DEFAULT_TEST_NETIF, &addr,
+                                                  TEST_STRING4, sizeof(TEST_STRING4),
+                                                  0)));
+    TEST_ASSERT_NOT_NULL((entry2 = ng_ipv6_nc_add(DEFAULT_TEST_NETIF, &addr,
+                                                  TEST_STRING4, sizeof(TEST_STRING4),
+                                                  0)));
+    TEST_ASSERT(entry1 == entry2);
+}
+
+static void test_ipv6_nc_add__address_NULL(void)
+{
+    TEST_ASSERT_NULL(ng_ipv6_nc_add(DEFAULT_TEST_NETIF, NULL, TEST_STRING4,
+                                    sizeof(TEST_STRING4), 0));
+}
+
+static void test_ipv6_nc_add__iface_KERNEL_PID_UNDEF(void)
 {
     ng_ipv6_addr_t addr = DEFAULT_TEST_IPV6_ADDR;
 
-    TEST_ASSERT_EQUAL_INT(0, ng_ipv6_nc_add(DEFAULT_TEST_NETIF, &addr,
-                                            TEST_STRING4, sizeof(TEST_STRING4),
-                                            0));
-    TEST_ASSERT_EQUAL_INT(-EADDRINUSE, ng_ipv6_nc_add(DEFAULT_TEST_NETIF, &addr,
-                          TEST_STRING4, sizeof(TEST_STRING4), 0));
+    TEST_ASSERT_NULL(ng_ipv6_nc_add(KERNEL_PID_UNDEF, &addr, TEST_STRING4,
+                                    sizeof(TEST_STRING4), 0));
 }
 
-static void test_ipv6_nc_add__EFAULT(void)
-{
-    TEST_ASSERT_EQUAL_INT(-EFAULT, ng_ipv6_nc_add(DEFAULT_TEST_NETIF, NULL,
-                          TEST_STRING4, sizeof(TEST_STRING4), 0));
-}
-
-static void test_ipv6_nc_add__EINVAL_KERNEL_PID_UNDEF(void)
-{
-    ng_ipv6_addr_t addr = DEFAULT_TEST_IPV6_ADDR;
-
-    TEST_ASSERT_EQUAL_INT(-EINVAL, ng_ipv6_nc_add(KERNEL_PID_UNDEF, &addr,
-                          TEST_STRING4, sizeof(TEST_STRING4), 0));
-}
-
-static void test_ipv6_nc_add__EINVAL_ipv6_addr_unspecified(void)
+static void test_ipv6_nc_add__addr_unspecified(void)
 {
     ng_ipv6_addr_t addr = NG_IPV6_ADDR_UNSPECIFIED;
 
-    TEST_ASSERT_EQUAL_INT(-EINVAL, ng_ipv6_nc_add(DEFAULT_TEST_NETIF, &addr,
-                          TEST_STRING4, sizeof(TEST_STRING4), 0));
+    TEST_ASSERT_NULL(ng_ipv6_nc_add(DEFAULT_TEST_NETIF, &addr, TEST_STRING4,
+                                    sizeof(TEST_STRING4), 0));
 }
 
-static void test_ipv6_nc_add__EINVAL_l2addr_too_long(void)
+static void test_ipv6_nc_add__l2addr_too_long(void)
 {
     ng_ipv6_addr_t addr = DEFAULT_TEST_IPV6_ADDR;
 
-    TEST_ASSERT_EQUAL_INT(-EINVAL, ng_ipv6_nc_add(DEFAULT_TEST_NETIF, &addr,
-                          TEST_STRING4, NG_IPV6_NC_L2_ADDR_MAX + TEST_UINT8, 0));
+    TEST_ASSERT_NULL(ng_ipv6_nc_add(DEFAULT_TEST_NETIF, &addr, TEST_STRING4,
+                                    NG_IPV6_NC_L2_ADDR_MAX + TEST_UINT8, 0));
 }
 
-static void test_ipv6_nc_add__ENOMEM(void)
+static void test_ipv6_nc_add__full(void)
 {
     ng_ipv6_addr_t addr = DEFAULT_TEST_IPV6_ADDR;
 
     for (int i = 0; i < NG_IPV6_NC_SIZE; i++) {
-        TEST_ASSERT_EQUAL_INT(0, ng_ipv6_nc_add(DEFAULT_TEST_NETIF, &addr,
-                                                TEST_STRING4, sizeof(TEST_STRING4), 0));
+        TEST_ASSERT_NOT_NULL(ng_ipv6_nc_add(DEFAULT_TEST_NETIF, &addr, TEST_STRING4,
+                                            sizeof(TEST_STRING4), 0));
         addr.u16[7].u16++;
     }
 
-    TEST_ASSERT_EQUAL_INT(-ENOMEM, ng_ipv6_nc_add(DEFAULT_TEST_NETIF, &addr,
-                          TEST_STRING4, sizeof(TEST_STRING4), 0));
+    TEST_ASSERT_NULL(ng_ipv6_nc_add(DEFAULT_TEST_NETIF, &addr, TEST_STRING4,
+                                    sizeof(TEST_STRING4), 0));
 }
 
 static void test_ipv6_nc_add__success(void)
 {
     ng_ipv6_addr_t addr = DEFAULT_TEST_IPV6_ADDR;
+    ng_ipv6_nc_t *entry1, *entry2;
 
-    TEST_ASSERT_EQUAL_INT(0, ng_ipv6_nc_add(DEFAULT_TEST_NETIF, &addr,
-                                            TEST_STRING4, sizeof(TEST_STRING4), 0));
+    TEST_ASSERT_NOT_NULL((entry1 = ng_ipv6_nc_add(DEFAULT_TEST_NETIF, &addr,
+                                                  TEST_STRING4,
+                                                  sizeof(TEST_STRING4), 0)));
 
-    TEST_ASSERT_NOT_NULL(ng_ipv6_nc_get(DEFAULT_TEST_NETIF, &addr));
+    TEST_ASSERT_NOT_NULL((entry2 = ng_ipv6_nc_get(DEFAULT_TEST_NETIF, &addr)));
+    TEST_ASSERT(entry1 == entry2);
 }
 
 static void test_ipv6_nc_remove__no_entry_pid(void)
@@ -235,8 +241,8 @@ static void test_ipv6_nc_get_next__2_entries(void)
     ng_ipv6_nc_t *entry = NULL;
 
     test_ipv6_nc_add__success(); /* adds DEFAULT_TEST_IPV6_ADDR to DEFAULT_TEST_NETIF */
-    TEST_ASSERT_EQUAL_INT(0, ng_ipv6_nc_add(DEFAULT_TEST_NETIF, &addr,
-                                            TEST_STRING8, sizeof(TEST_STRING8) - 1, 0));
+    TEST_ASSERT_NOT_NULL(ng_ipv6_nc_add(DEFAULT_TEST_NETIF, &addr, TEST_STRING8,
+                                        sizeof(TEST_STRING8) - 1, 0));
 
 
     TEST_ASSERT_NOT_NULL((entry = ng_ipv6_nc_get_next(NULL)));
@@ -252,9 +258,8 @@ static void test_ipv6_nc_get_next__holey(void)
 
     /* adds DEFAULT_TEST_IPV6_ADDR and OTHER_TEST_IPV6_ADDR to DEFAULT_TEST_NETIF */
     test_ipv6_nc_get_next__2_entries();
-    TEST_ASSERT_EQUAL_INT(0, ng_ipv6_nc_add(DEFAULT_TEST_NETIF, &addr2,
-                                            TEST_STRING8,
-                                            sizeof(TEST_STRING8) - 2, 0));
+    TEST_ASSERT_NOT_NULL(ng_ipv6_nc_add(DEFAULT_TEST_NETIF, &addr2, TEST_STRING8,
+                                        sizeof(TEST_STRING8) - 2, 0));
     TEST_ASSERT_NOT_NULL((exp_entry = ng_ipv6_nc_get(DEFAULT_TEST_NETIF, &addr2)));
     ng_ipv6_nc_remove(DEFAULT_TEST_NETIF, &addr1);
 
@@ -299,19 +304,7 @@ static void test_ipv6_nc_get_next_router__second_entry(void)
     TEST_ASSERT_NULL(ng_ipv6_nc_get_next_router(entry1));
 }
 
-static void test_ipv6_nc_get_reachable__incomplete_if_local(void)
-{
-    ng_ipv6_addr_t addr = DEFAULT_TEST_IPV6_ADDR;
-    ng_ipv6_nc_t *entry = NULL;
-
-    test_ipv6_nc_add__success(); /* adds DEFAULT_TEST_IPV6_ADDR to DEFAULT_TEST_NETIF */
-
-    TEST_ASSERT_NOT_NULL((entry = ng_ipv6_nc_get(DEFAULT_TEST_NETIF, &addr)));
-    entry->flags = (NG_IPV6_NC_STATE_INCOMPLETE << NG_IPV6_NC_STATE_POS);
-    TEST_ASSERT_NULL(ng_ipv6_nc_get_reachable(DEFAULT_TEST_NETIF, &addr));
-}
-
-static void test_ipv6_nc_get_reachable__incomplete_if_global(void)
+static void test_ipv6_nc_is_reachable__incomplete(void)
 {
     ng_ipv6_addr_t addr = DEFAULT_TEST_IPV6_ADDR;
     ng_ipv6_nc_t *entry = NULL;
@@ -320,10 +313,10 @@ static void test_ipv6_nc_get_reachable__incomplete_if_global(void)
 
     TEST_ASSERT_NOT_NULL((entry = ng_ipv6_nc_get(KERNEL_PID_UNDEF, &addr)));
     entry->flags = (NG_IPV6_NC_STATE_INCOMPLETE << NG_IPV6_NC_STATE_POS);
-    TEST_ASSERT_NULL(ng_ipv6_nc_get_reachable(KERNEL_PID_UNDEF, &addr));
+    TEST_ASSERT(!ng_ipv6_nc_is_reachable(entry));
 }
 
-static void test_ipv6_nc_get_reachable__reachable_if_local(void)
+static void test_ipv6_nc_is_reachable__reachable(void)
 {
     ng_ipv6_addr_t addr = DEFAULT_TEST_IPV6_ADDR;
     ng_ipv6_nc_t *entry = NULL;
@@ -332,44 +325,22 @@ static void test_ipv6_nc_get_reachable__reachable_if_local(void)
 
     TEST_ASSERT_NOT_NULL((entry = ng_ipv6_nc_get(DEFAULT_TEST_NETIF, &addr)));
     entry->flags = (NG_IPV6_NC_STATE_REACHABLE << NG_IPV6_NC_STATE_POS);
-    TEST_ASSERT_NOT_NULL((entry = ng_ipv6_nc_get_reachable(DEFAULT_TEST_NETIF, &addr)));
-    TEST_ASSERT_EQUAL_INT(DEFAULT_TEST_NETIF, entry->iface);
-    TEST_ASSERT(ng_ipv6_addr_equal(&(entry->ipv6_addr), &addr));
-    TEST_ASSERT_EQUAL_STRING(TEST_STRING4, (char *)entry->l2_addr);
-    TEST_ASSERT_EQUAL_INT(sizeof(TEST_STRING4), entry->l2_addr_len);
-    TEST_ASSERT_EQUAL_INT((NG_IPV6_NC_STATE_REACHABLE << NG_IPV6_NC_STATE_POS),
-                          entry->flags);
-}
-
-static void test_ipv6_nc_get_reachable__reachable_if_global(void)
-{
-    ng_ipv6_addr_t addr = DEFAULT_TEST_IPV6_ADDR;
-    ng_ipv6_nc_t *entry = NULL;
-
-    test_ipv6_nc_add__success(); /* adds DEFAULT_TEST_IPV6_ADDR to DEFAULT_TEST_NETIF */
-
-    TEST_ASSERT_NOT_NULL((entry = ng_ipv6_nc_get(KERNEL_PID_UNDEF, &addr)));
-    entry->flags = (NG_IPV6_NC_STATE_REACHABLE << NG_IPV6_NC_STATE_POS);
-    TEST_ASSERT_NOT_NULL((entry = ng_ipv6_nc_get_reachable(KERNEL_PID_UNDEF, &addr)));
-    TEST_ASSERT_EQUAL_INT(DEFAULT_TEST_NETIF, entry->iface);
-    TEST_ASSERT(ng_ipv6_addr_equal(&(entry->ipv6_addr), &addr));
-    TEST_ASSERT_EQUAL_STRING(TEST_STRING4, (char *)entry->l2_addr);
-    TEST_ASSERT_EQUAL_INT(sizeof(TEST_STRING4), entry->l2_addr_len);
-    TEST_ASSERT_EQUAL_INT((NG_IPV6_NC_STATE_REACHABLE << NG_IPV6_NC_STATE_POS),
-                          entry->flags);
+    TEST_ASSERT(ng_ipv6_nc_is_reachable(entry));
 }
 
 static void test_ipv6_nc_still_reachable__incomplete(void)
 {
     ng_ipv6_addr_t addr = DEFAULT_TEST_IPV6_ADDR;
+    ng_ipv6_nc_t *entry = NULL;
 
     /* adds DEFAULT_TEST_IPV6_ADDR to DEFAULT_TEST_NETIF and sets flags to
      * (NG_IPV6_NC_STATE_INCOMPLETE << NG_IPV6_NC_STATE_POS) */
-    test_ipv6_nc_get_reachable__incomplete_if_global();
+    test_ipv6_nc_is_reachable__incomplete();
 
-    TEST_ASSERT_NULL(ng_ipv6_nc_get_reachable(KERNEL_PID_UNDEF, &addr));
+    TEST_ASSERT_NOT_NULL((entry = ng_ipv6_nc_get(KERNEL_PID_UNDEF, &addr)));
+    TEST_ASSERT(!ng_ipv6_nc_is_reachable(entry));
     TEST_ASSERT_NOT_NULL(ng_ipv6_nc_still_reachable(&addr));
-    TEST_ASSERT_NULL(ng_ipv6_nc_get_reachable(KERNEL_PID_UNDEF, &addr));
+    TEST_ASSERT(!ng_ipv6_nc_is_reachable(entry));
 }
 
 static void test_ipv6_nc_still_reachable__success(void)
@@ -379,27 +350,26 @@ static void test_ipv6_nc_still_reachable__success(void)
 
     /* adds DEFAULT_TEST_IPV6_ADDR to DEFAULT_TEST_NETIF and sets flags to
      * (NG_IPV6_NC_STATE_REACHABLE << NG_IPV6_NC_STATE_POS) */
-    test_ipv6_nc_get_reachable__reachable_if_global();
+    test_ipv6_nc_is_reachable__reachable();
 
-    TEST_ASSERT_NOT_NULL((entry = ng_ipv6_nc_get_reachable(KERNEL_PID_UNDEF, &addr)));
+    TEST_ASSERT_NOT_NULL((entry = ng_ipv6_nc_get(KERNEL_PID_UNDEF, &addr)));
+    TEST_ASSERT(ng_ipv6_nc_is_reachable(entry));
 
     entry->flags = (NG_IPV6_NC_STATE_STALE << NG_IPV6_NC_STATE_POS);
 
     TEST_ASSERT_NOT_NULL(ng_ipv6_nc_still_reachable(&addr));
-    TEST_ASSERT_NOT_NULL((entry = ng_ipv6_nc_get_reachable(KERNEL_PID_UNDEF, &addr)));
-    TEST_ASSERT_EQUAL_INT((NG_IPV6_NC_STATE_REACHABLE << NG_IPV6_NC_STATE_POS),
-                          entry->flags);
+    TEST_ASSERT(ng_ipv6_nc_is_reachable(entry));
 }
 
 Test *tests_ipv6_nc_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
-        new_TestFixture(test_ipv6_nc_add__EADDRINUSE),
-        new_TestFixture(test_ipv6_nc_add__EFAULT),
-        new_TestFixture(test_ipv6_nc_add__EINVAL_KERNEL_PID_UNDEF),
-        new_TestFixture(test_ipv6_nc_add__EINVAL_ipv6_addr_unspecified),
-        new_TestFixture(test_ipv6_nc_add__EINVAL_l2addr_too_long),
-        new_TestFixture(test_ipv6_nc_add__ENOMEM),
+        new_TestFixture(test_ipv6_nc_add__address_registered),
+        new_TestFixture(test_ipv6_nc_add__address_NULL),
+        new_TestFixture(test_ipv6_nc_add__iface_KERNEL_PID_UNDEF),
+        new_TestFixture(test_ipv6_nc_add__addr_unspecified),
+        new_TestFixture(test_ipv6_nc_add__l2addr_too_long),
+        new_TestFixture(test_ipv6_nc_add__full),
         new_TestFixture(test_ipv6_nc_add__success),
         new_TestFixture(test_ipv6_nc_remove__no_entry_pid),
         new_TestFixture(test_ipv6_nc_remove__no_entry_addr1),
@@ -417,10 +387,8 @@ Test *tests_ipv6_nc_tests(void)
         new_TestFixture(test_ipv6_nc_get_next_router__empty),
         new_TestFixture(test_ipv6_nc_get_next_router__first_entry),
         new_TestFixture(test_ipv6_nc_get_next_router__second_entry),
-        new_TestFixture(test_ipv6_nc_get_reachable__incomplete_if_local),
-        new_TestFixture(test_ipv6_nc_get_reachable__incomplete_if_global),
-        new_TestFixture(test_ipv6_nc_get_reachable__reachable_if_local),
-        new_TestFixture(test_ipv6_nc_get_reachable__reachable_if_global),
+        new_TestFixture(test_ipv6_nc_is_reachable__incomplete),
+        new_TestFixture(test_ipv6_nc_is_reachable__reachable),
         new_TestFixture(test_ipv6_nc_still_reachable__incomplete),
         new_TestFixture(test_ipv6_nc_still_reachable__success),
     };
