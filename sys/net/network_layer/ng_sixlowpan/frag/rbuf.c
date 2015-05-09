@@ -222,8 +222,8 @@ static bool _rbuf_update_ints(rbuf_t *entry, uint16_t offset, size_t frag_size)
     DEBUG("6lo rfrag: add interval (%" PRIu16 ", %" PRIu16 ") to entry (%s, ",
           new->start, new->end, ng_netif_addr_to_str(l2addr_str,
                   sizeof(l2addr_str), entry->src, entry->src_len));
-    DEBUG("%s, %zu, %" PRIu16 ")\n", ng_netif_addr_to_str(l2addr_str,
-            sizeof(l2addr_str), entry->dst, entry->dst_len), entry->datagram_size,
+    DEBUG("%s, %u, %" PRIu16 ")\n", ng_netif_addr_to_str(l2addr_str,
+          sizeof(l2addr_str), entry->dst, entry->dst_len), entry->datagram_size,
           entry->tag);
 
     LL_PREPEND(entry->ints, new);
@@ -240,11 +240,14 @@ static void _rbuf_gc(void)
     vtimer_now(&now);
 
     for (i = 0; i < RBUF_SIZE; i++) {
-        if ((rbuf[i].pkt != NULL) &&
-            ((now.seconds - rbuf[i].arrival) > RBUF_TIMEOUT)) {
+        if (rbuf[i].pkt == NULL) { /* leave GC early if there is still room */
+            return;
+        }
+        else if ((rbuf[i].pkt != NULL) &&
+                 ((now.seconds - rbuf[i].arrival) > RBUF_TIMEOUT)) {
             DEBUG("6lo rfrag: entry (%s, ", ng_netif_addr_to_str(l2addr_str,
-                    sizeof(l2addr_str), rbuf[i].src, rbuf[i].src_len));
-            DEBUG("%s, %zu, %" PRIu16 ") timed out\n",
+                  sizeof(l2addr_str), rbuf[i].src, rbuf[i].src_len));
+            DEBUG("%s, %u, %" PRIu16 ") timed out\n",
                   ng_netif_addr_to_str(l2addr_str, sizeof(l2addr_str), rbuf[i].dst,
                                        rbuf[i].dst_len),
                   rbuf[i].datagram_size, rbuf[i].tag);
@@ -258,7 +261,7 @@ static void _rbuf_gc(void)
     }
 
     if ((i >= RBUF_SIZE) && (oldest != NULL) && (oldest->pkt != NULL)) {
-        DEBUG("6lo rfrag: reassembly buffer full, remove oldest entry");
+        DEBUG("6lo rfrag: reassembly buffer full, remove oldest entry\n");
         ng_pktbuf_release(oldest->pkt);
         _rbuf_rem(oldest);
     }
@@ -280,9 +283,10 @@ static rbuf_t *_rbuf_get(const void *src, size_t src_len,
             (rbuf[i].dst_len == dst_len) &&
             (memcmp(rbuf[i].src, src, src_len) == 0) &&
             (memcmp(rbuf[i].dst, dst, dst_len) == 0)) {
-            DEBUG("6lo rfrag: entry (%s, ", ng_netif_addr_to_str(l2addr_str,
-                  sizeof(l2addr_str), rbuf[i].src, rbuf[i].src_len));
-            DEBUG("%s, %zu, %" PRIu16 ") found\n",
+            DEBUG("6lo rfrag: entry %p (%s, ", (void *)(&rbuf[i]),
+                  ng_netif_addr_to_str(l2addr_str, sizeof(l2addr_str),
+                                       rbuf[i].src, rbuf[i].src_len));
+            DEBUG("%s, %u, %" PRIu16 ") found\n",
                   ng_netif_addr_to_str(l2addr_str, sizeof(l2addr_str),
                                        rbuf[i].dst, rbuf[i].dst_len),
                   rbuf[i].datagram_size, rbuf[i].tag);
@@ -315,9 +319,10 @@ static rbuf_t *_rbuf_get(const void *src, size_t src_len,
         res->datagram_size = size;
         res->cur_size = 0;
 
-        DEBUG("6lo rfrag: entry (%s, ", ng_netif_addr_to_str(l2addr_str,
-                sizeof(l2addr_str), res->src, res->src_len));
-        DEBUG("%s, %zu, %" PRIu16 ") created\n",
+        DEBUG("6lo rfrag: entry %p (%s, ", (void *)res,
+              ng_netif_addr_to_str(l2addr_str, sizeof(l2addr_str), res->src,
+                                   res->src_len));
+        DEBUG("%s, %u, %" PRIu16 ") created\n",
               ng_netif_addr_to_str(l2addr_str, sizeof(l2addr_str), res->dst,
                                    res->dst_len), res->datagram_size, res->tag);
     }
