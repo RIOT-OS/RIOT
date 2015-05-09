@@ -120,7 +120,7 @@ typedef struct {
 void ng_ipv6_netif_init(void);
 
 /**
- * @brief   Add interface to IPv6.
+ * @brief   Adds interface to IPv6.
  *
  * @details This function will be called by @ref ng_netif_add().
  *
@@ -129,7 +129,7 @@ void ng_ipv6_netif_init(void);
 void ng_ipv6_netif_add(kernel_pid_t pid);
 
 /**
- * @brief   Remove interface from IPv6.
+ * @brief   Removes interface from IPv6.
  *
  * @details This function will be called by @ref ng_netif_remove().
  *
@@ -138,7 +138,7 @@ void ng_ipv6_netif_add(kernel_pid_t pid);
 void ng_ipv6_netif_remove(kernel_pid_t pid);
 
 /**
- * @brief   Get interface.
+ * @brief   Gets interface.
  *
  * @param[in] pid   The PID to the interface.
  *
@@ -173,7 +173,7 @@ int ng_ipv6_netif_add_addr(kernel_pid_t pid, const ng_ipv6_addr_t *addr,
                            uint8_t prefix_len, bool anycast);
 
 /**
- * @brief   Remove an address from the interface.
+ * @brief   Removes an address from the interface.
  *
  * @param[in] pid       The PID to the interface.
  * @param[in] addr      An address you want to remove from interface.
