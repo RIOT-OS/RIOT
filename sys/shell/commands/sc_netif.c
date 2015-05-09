@@ -265,7 +265,7 @@ static void _netif_list(kernel_pid_t dev)
     res = ng_netapi_get(dev, NETCONF_OPT_SRC_LEN, 0, &u16, sizeof(u16));
 
     if (res >= 0) {
-        printf("Source address length: %" PRIu16 "\n            ", u16);
+        printf("Source address length: %" PRIu16 "\n           ", u16);
     }
 
 #ifdef MODULE_NG_IPV6_NETIF
