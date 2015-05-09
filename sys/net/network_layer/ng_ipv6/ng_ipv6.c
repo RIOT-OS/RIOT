@@ -297,13 +297,12 @@ static void _send_multicast(kernel_pid_t iface, ng_pktsnip_t *pkt,
                             bool prep_hdr)
 {
     ng_pktsnip_t *netif;
+    kernel_pid_t *ifs;
+    size_t ifnum;
 
-#if NG_NETIF_NUMOF > 1
-    /* netif header not present: send over all interfaces */
     if (iface == KERNEL_PID_UNDEF) {
-        size_t ifnum;
         /* get list of interfaces */
-        kernel_pid_t *ifs = ng_netif_get(&ifnum);
+        ifs = ng_netif_get(&ifnum);
 
         /* throw away packet if no one is interested */
         if (ifnum == 0) {
@@ -311,7 +310,12 @@ static void _send_multicast(kernel_pid_t iface, ng_pktsnip_t *pkt,
             ng_pktbuf_release(pkt);
             return;
         }
+    }
 
+
+#if NG_NETIF_NUMOF > 1
+    /* netif header not present: send over all interfaces */
+    if (iface == KERNEL_PID_UNDEF) {
         /* send packet to link layer */
         ng_pktbuf_hold(pkt, ifnum - 1);
 
@@ -366,6 +370,8 @@ static void _send_multicast(kernel_pid_t iface, ng_pktsnip_t *pkt,
     }
 #else   /* NG_NETIF_NUMOF */
     if (iface == KERNEL_PID_UNDEF) {
+        iface = ifs[0];
+
         /* allocate interface header */
         netif = ng_netif_hdr_build(NULL, 0, NULL, 0);
 
