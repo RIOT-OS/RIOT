@@ -55,4 +55,3 @@ For windows you can use the optional third argument to output to a
 .pcap:
 
     $ ./rftestrx2pcap.py /dev/ttyUSB1 26 foo.pcap
-
