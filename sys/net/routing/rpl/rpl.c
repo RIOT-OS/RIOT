@@ -82,7 +82,7 @@ uint8_t rpl_init(int if_id, ipv6_addr_t *address)
     rpl_max_routing_entries = RPL_MAX_ROUTING_ENTRIES;
 #endif
 
-    rpl_process_pid = thread_create(rpl_process_buf, RPL_PROCESS_STACKSIZE,
+    rpl_process_pid = thread_create(rpl_process_buf, sizeof(rpl_process_buf),
                                     PRIORITY_MAIN - 1, CREATE_STACKTEST,
                                     rpl_process, NULL, "rpl_process");
 
