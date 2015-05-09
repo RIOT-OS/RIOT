@@ -324,12 +324,12 @@ static inline bool ng_ipv6_addr_is_solicited_node(const ng_ipv6_addr_t *addr)
  * @param[in] a An IPv6 address.
  * @param[in] b Another IPv6 address.
  *
- * @return  The number of bits @p a and @p b match in there prefix
+ * @return  The number of bits @p a and @p b match in their prefix
  */
 uint8_t ng_ipv6_addr_match_prefix(const ng_ipv6_addr_t *a, const ng_ipv6_addr_t *b);
 
 /**
- * @brief   Sets IPv6 address @p out with the first @p bits bit taken
+ * @brief   Sets IPv6 address @p out with the first @p bits taken
  *          from @p prefix and leaves the remaining bits untouched.
  *
  * @param[out]  out     Prefix to be set.
@@ -422,7 +422,6 @@ static inline void ng_ipv6_addr_set_aiid(ng_ipv6_addr_t *addr, uint8_t *iid)
     addr->u8[14] = iid[6];
     addr->u8[15] = iid[7];
 }
-
 
 /**
  * @brief   Sets the bits for an address required to be a multicast address.
