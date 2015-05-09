@@ -23,4 +23,4 @@ iotlab-reset: $(IOTLAB_AUTH)
 
 iotlab-term:
 	ssh -t $(IOTLAB_USER)@$(IOTLAB_SITE).iot-lab.info "test -f ~/.iotlabrc || auth-cli -u $(IOTLAB_USER)"
-	ssh $(IOTLAB_USER)@$(IOTLAB_SITE).iot-lab.info "serial_aggregator -i $(IOTLAB_EXP_ID)"
+	ssh -t $(IOTLAB_USER)@$(IOTLAB_SITE).iot-lab.info "serial_aggregator -i $(IOTLAB_EXP_ID)"
