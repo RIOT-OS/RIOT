@@ -263,8 +263,8 @@ int ng_udp_init(void)
     /* check if thread is already running */
     if (_pid == KERNEL_PID_UNDEF) {
         /* start UDP thread */
-        _pid = thread_create(_stack, sizeof(_stack), NG_UDP_PRIO, 0,
-                             _event_loop, NULL, "udp");
+        _pid = thread_create(_stack, sizeof(_stack), NG_UDP_PRIO,
+                             CREATE_STACKTEST, _event_loop, NULL, "udp");
     }
     return _pid;
 }
