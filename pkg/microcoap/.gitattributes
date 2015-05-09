@@ -1,0 +1,4 @@
+# Ignore whitespace errors inside these patch files by regarding them as binary.
+0001-Remove-unneeded-.c-files.patch binary
+0002-Add-RIOT-Makefile.patch binary
+0003-change-flag-from-DEBUG-to-MICROCOAP_DEBUG.patch binary

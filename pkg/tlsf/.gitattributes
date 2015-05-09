@@ -1,0 +1,2 @@
+# Ignore whitespace errors inside these patch files by regarding them as binary.
+patch.txt binary

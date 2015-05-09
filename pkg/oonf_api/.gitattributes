@@ -1,0 +1,5 @@
+# Ignore whitespace errors inside these patch files by regarding them as binary.
+0001-add-RIOT-support.patch binary
+0002-port-tests-to-riot.patch binary
+0003-port-example-to-riot.patch binary
+0004-fix-conflicting-types.patch binary

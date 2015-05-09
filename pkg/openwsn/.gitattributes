@@ -1,0 +1,6 @@
+# Ignore whitespace errors inside these patch files by regarding them as binary.
+0001-Add-RIOT-Makefiles.patch binary
+0002-Add-RIOT-adaption.patch binary
+0003-Fix-old-style-definitions.patch binary
+0004-provide-openserial-dummies.patch binary
+0005-fixes-to-RIOT-adaption.patch binary
