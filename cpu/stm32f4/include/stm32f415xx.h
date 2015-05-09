@@ -745,11 +745,11 @@ typedef struct
   __IO uint32_t CSGCM7R;    /*!< CRYP GCM/GMAC context swap register 7,                    Address offset: 0x8C */
 } CRYP_TypeDef;
 
-/** 
+/**
   * @brief HASH
   */
-  
-typedef struct 
+
+typedef struct
 {
   __IO uint32_t CR;               /*!< HASH control register,          Address offset: 0x00        */
   __IO uint32_t DIN;              /*!< HASH data input register,       Address offset: 0x04        */
@@ -761,13 +761,13 @@ typedef struct
   __IO uint32_t CSR[54];          /*!< HASH context swap registers,    Address offset: 0x0F8-0x1CC */
 } HASH_TypeDef;
 
-/** 
+/**
   * @brief HASH_DIGEST
   */
-  
-typedef struct 
+
+typedef struct
 {
-  __IO uint32_t HR[8];     /*!< HASH digest registers,          Address offset: 0x310-0x32C */ 
+  __IO uint32_t HR[8];     /*!< HASH digest registers,          Address offset: 0x310-0x32C */
 } HASH_DIGEST_TypeDef;
 
 /**
@@ -831,11 +831,11 @@ typedef struct
   __IO uint32_t DTHRCTL;      /*!< dev thr                      Address offset : 0x830 */
   __IO uint32_t DIEPEMPMSK;   /*!< dev empty msk                Address offset : 0x834 */
   __IO uint32_t DEACHINT;     /*!< dedicated EP interrupt       Address offset : 0x838 */
-  __IO uint32_t DEACHMSK;     /*!< dedicated EP msk             Address offset : 0x83C */  
+  __IO uint32_t DEACHMSK;     /*!< dedicated EP msk             Address offset : 0x83C */
   uint32_t Reserved40;        /*!< dedicated EP mask            Address offset : 0x840 */
   __IO uint32_t DINEP1MSK;    /*!< dedicated EP mask            Address offset : 0x844 */
   uint32_t  Reserved44[15];   /*!< Reserved                     Address offset : 0x844-0x87C */
-  __IO uint32_t DOUTEP1MSK;   /*!< dedicated EP msk             Address offset : 0x884 */   
+  __IO uint32_t DOUTEP1MSK;   /*!< dedicated EP msk             Address offset : 0x884 */
 }
 USB_OTG_DeviceTypeDef;
 
@@ -1124,7 +1124,7 @@ USB_OTG_HostChannelTypeDef;
 #define DMA2_Stream4        ((DMA_Stream_TypeDef *) DMA2_Stream4_BASE)
 #define DMA2_Stream5        ((DMA_Stream_TypeDef *) DMA2_Stream5_BASE)
 #define DMA2_Stream6        ((DMA_Stream_TypeDef *) DMA2_Stream6_BASE)
-#define DMA2_Stream7        ((DMA_Stream_TypeDef *) DMA2_Stream7_BASE)  
+#define DMA2_Stream7        ((DMA_Stream_TypeDef *) DMA2_Stream7_BASE)
 #define CRYP                ((CRYP_TypeDef *) CRYP_BASE)
 #define HASH                ((HASH_TypeDef *) HASH_BASE)
 #define HASH_DIGEST         ((HASH_DIGEST_TypeDef *) HASH_DIGEST_BASE)
@@ -2830,7 +2830,7 @@ USB_OTG_HostChannelTypeDef;
 #define CRYP_CR_GCM_CCMPH                    ((uint32_t)0x00030000)
 #define CRYP_CR_GCM_CCMPH_0                  ((uint32_t)0x00010000)
 #define CRYP_CR_GCM_CCMPH_1                  ((uint32_t)0x00020000)
-#define CRYP_CR_ALGOMODE_3                   ((uint32_t)0x00080000) 
+#define CRYP_CR_ALGOMODE_3                   ((uint32_t)0x00080000)
 
 /****************** Bits definition for CRYP_SR register  *********************/
 #define CRYP_SR_IFEM                         ((uint32_t)0x00000001)
