@@ -228,7 +228,7 @@ kernel_pid_t ng_ipv6_netif_find_by_prefix(ng_ipv6_addr_t **out,
 
 /**
  * @brief   Searches for the first address matching a prefix best on an
- *          interfaces.
+ *          interface.
  *
  * @param[in] pid       The PID to the interface.
  * @param[in] prefix    The prefix you want to search for.
