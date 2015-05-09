@@ -18,7 +18,7 @@ Finally, in order for the shell to receive input, the `uart0` module
 is used.
 
 
-usage
+Usage
 =====
 
 Build, flash and start the application:
@@ -35,8 +35,8 @@ that is `/dev/ttyUSB0`. If your port is named differently, the
 `PORT=/dev/yourport` variable can be used to override this.
 
 
-Example
-=======
+Example output
+==============
 
 The shell commands come with online help. Call `help` to see which commands
 exist and what they do.
