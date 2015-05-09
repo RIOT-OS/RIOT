@@ -398,6 +398,13 @@ static int _get(ng_netdev_t *device, ng_netconf_opt_t opt,
             *((uint16_t *)val) = dev->pan;
             return sizeof(uint16_t);
 
+        case NETCONF_OPT_PROTO:
+            if (max_len < sizeof(ng_nettype_t)) {
+                return -EOVERFLOW;
+            }
+            *((ng_nettype_t *)val) = dev->proto;
+            return sizeof(ng_nettype_t);
+
         case NETCONF_OPT_CHANNEL:
             if (max_len < sizeof(uint16_t)) {
                 return -EOVERFLOW;
