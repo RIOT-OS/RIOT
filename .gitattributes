@@ -1,1 +1,6 @@
 *.a binary
+# Default conflict marker size is 7 which causes some of the headings in
+# release-notes.txt to trigger git diff --check: 'leftover conflict marker'
+# when the heading is exactly 7 characters long.
+*.md conflict-marker-size=100
+*.txt conflict-marker-size=100
