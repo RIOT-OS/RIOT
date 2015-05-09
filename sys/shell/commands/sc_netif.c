@@ -600,7 +600,10 @@ static int _netif_add(char *cmd_name, kernel_pid_t dev, int argc, char **argv)
         return 1;
     }
 
-    if (ng_ipv6_netif_add_addr(dev, &addr, prefix_len, (type == _ANYCAST)) < 0) {
+    if (ng_ipv6_netif_add_addr(dev, &addr, prefix_len,
+                               (type == _ANYCAST) ?
+                               NG_IPV6_NETIF_ADDR_FLAGS_NON_UNICAST :
+                               NG_IPV6_NETIF_ADDR_FLAGS_UNICAST) == NULL) {
         printf("error: unable to add IPv6 address\n");
         return 1;
     }
