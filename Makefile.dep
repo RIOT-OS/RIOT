@@ -56,6 +56,34 @@ ifneq (,$(filter ng_nomac,$(USEMODULE)))
   USEMODULE += ng_netbase
 endif
 
+ifneq (,$(filter ng_at86rf2%,$(USEMODULE)))
+  USEMODULE += ng_at86rf2xx
+  USEMODULE += ng_ieee802154
+endif
+
+ifneq (,$(filter kw2xrf,$(USEMODULE)))
+  USEMODULE += ng_ieee802154
+endif
+
+ifneq (,$(filter xbee,$(USEMODULE)))
+  USEMODULE += ng_ieee802154
+endif
+
+ifneq (,$(filter ng_ieee802154,$(USEMODULE)))
+  ifneq (,$(filter ng_ipv6, $(USEMODULE)))
+    USEMODULE += ng_sixlowpan
+  endif
+  ifneq (,$(filter ng_ipv6_router, $(USEMODULE)))
+    USEMODULE += ng_sixlowpan   # TODO: replace with ng_sixlowpan_router
+  endif
+  ifneq (,$(filter ng_ipv6_default, $(USEMODULE)))
+    USEMODULE += ng_sixlowpan_default
+  endif
+  ifneq (,$(filter ng_ipv6_router_default, $(USEMODULE)))
+    USEMODULE += ng_sixlowpan_default   # TODO: replace with ng_sixlowpan_router_default
+  endif
+endif
+
 ifneq (,$(filter ng_sixlowpan_default,$(USEMODULE)))
   USEMODULE += ng_ipv6_default
   USEMODULE += ng_sixlowpan
@@ -244,10 +272,6 @@ endif
 ifneq (,$(filter oonf_common,$(USEMODULE)))
   USEPKG += oonf_api
   USEMODULE += socket_base
-endif
-
-ifneq (,$(filter ng_at86rf2%,$(USEMODULE)))
-  USEMODULE += ng_at86rf2xx
 endif
 
 # if any log_* is used, also use LOG pseudomodule
