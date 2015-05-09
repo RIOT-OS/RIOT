@@ -87,6 +87,9 @@ extern "C" {
 #define NG_AT86RF2XX_REG__XOSC_CTRL                             (0x12)
 #define NG_AT86RF2XX_REG__CC_CTRL_1                             (0x14)
 #define NG_AT86RF2XX_REG__RX_SYN                                (0x15)
+#ifdef MODULE_NG_AT86RF212B
+#define NG_AT86RF2XX_REG__RF_CTRL_0                             (0x16)
+#endif
 #define NG_AT86RF2XX_REG__XAH_CTRL_1                            (0x17)
 #define NG_AT86RF2XX_REG__FTN_CTRL                              (0x18)
 #define NG_AT86RF2XX_REG__PLL_CF                                (0x1A)
@@ -152,13 +155,17 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Bitfield definitions for the TXR_CTRL_2 register
+ * @brief   Bitfield definitions for the TRX_CTRL_2 register
  * @{
  */
 #define NG_AT86RF2XX_TRX_CTRL_2_MASK__RX_SAFE_MODE              (0x80)
-#define NG_AT86RF2XX_TRX_CTRL_2_MASK__SUB_MODE                  (0x4)
-#define NG_AT86RF2XX_TRX_CTRL_2_MASK__OQPSK_DATA_RATE           (0x03)
+#define NG_AT86RF2XX_TRX_CTRL_2_MASK__FREQ_MODE                 (0x3F)
+#define NG_AT86RF2XX_TRX_CTRL_2_MASK__TRX_OFF_AVDD_EN           (0x40)
 #define NG_AT86RF2XX_TRX_CTRL_2_MASK__OQPSK_SCRAM_EN            (0x20)
+#define NG_AT86RF2XX_TRX_CTRL_2_MASK__ALT_SPECTRUM              (0x10)
+#define NG_AT86RF2XX_TRX_CTRL_2_MASK__BPSK_OQPSK                (0x08)
+#define NG_AT86RF2XX_TRX_CTRL_2_MASK__SUB_MODE                  (0x04)
+#define NG_AT86RF2XX_TRX_CTRL_2_MASK__OQPSK_DATA_RATE           (0x03)
 /** @} */
 
 /**
@@ -238,9 +245,17 @@ extern "C" {
  * @brief   Bitfield definitions for the PHY_TX_PWR register
  * @{
  */
+#ifdef MODULE_NG_AT86RF212B
+#define NG_AT86RF2XX_PHY_TX_PWR_MASK__PA_BOOST                  (0x80)
+#define NG_AT86RF2XX_PHY_TX_PWR_MASK__GC_PA                     (0x60)
+#define NG_AT86RF2XX_PHY_TX_PWR_MASK__TX_PWR                    (0x1F)
+#elif  MODULE_NG_AT86RF231
 #define NG_AT86RF2XX_PHY_TX_PWR_MASK__PA_BUF_LT                 (0xC0)
 #define NG_AT86RF2XX_PHY_TX_PWR_MASK__PA_LT                     (0x30)
 #define NG_AT86RF2XX_PHY_TX_PWR_MASK__TX_PWR                    (0x0F)
+#else
+#define NG_AT86RF2XX_PHY_TX_PWR_MASK__TX_PWR                    (0x0F)
+#endif
 #define NG_AT86RF2XX_PHY_TX_PWR_DEFAULT__PA_BUF_LT              (0xC0)
 #define NG_AT86RF2XX_PHY_TX_PWR_DEFAULT__PA_LT                  (0x00)
 #define NG_AT86RF2XX_PHY_TX_PWR_DEFAULT__TX_PWR                 (0x00)
@@ -309,6 +324,16 @@ extern "C" {
 #define NG_AT86RF2XX_CSMA_SEED_1__AACK_SET_PD                   (0x20)
 #define NG_AT86RF2XX_CSMA_SEED_1__AACK_DIS_ACK                  (0x10)
 #define NG_AT86RF2XX_CSMA_SEED_1__AACK_I_AM_COORD               (0x08)
+/** @} */
+
+/**
+ * @brief   Bitfield definitions for the RF_CTRL_0 register
+ * @{
+ */
+#ifdef MODULE_NG_AT86RF212B
+#define NG_AT86RF2XX_RF_CTRL_0_MASK__PA_LT                      (0xC0)
+#define NG_AT86RF2XX_RF_CTRL_0_MASK__GC_TX_OFFS                 (0x03)
+#endif
 /** @} */
 
 #ifdef __cplusplus

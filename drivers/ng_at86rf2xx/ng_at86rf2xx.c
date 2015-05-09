@@ -85,7 +85,6 @@ int ng_at86rf2xx_init(ng_at86rf2xx_t *dev, spi_t spi, spi_speed_t spi_speed,
 
 void ng_at86rf2xx_reset(ng_at86rf2xx_t *dev)
 {
-    uint8_t tmp;
 #if CPUID_ID_LEN
     uint8_t cpuid[CPUID_ID_LEN];
     uint16_t addr_short;
@@ -145,16 +144,14 @@ void ng_at86rf2xx_reset(ng_at86rf2xx_t *dev)
     dev->proto = NG_NETTYPE_UNDEF;
 #endif
     /* enable safe mode (protect RX FIFO until reading data starts) */
-    tmp = NG_AT86RF2XX_TRX_CTRL_2_MASK__RX_SAFE_MODE;
+    ng_at86rf2xx_reg_write(dev, NG_AT86RF2XX_REG__TRX_CTRL_2,
+                          NG_AT86RF2XX_TRX_CTRL_2_MASK__RX_SAFE_MODE);
 #ifdef MODULE_NG_AT86RF212
-    /* settings used by Linux 4.0rc at86rf212b driver */
-    tmp |= (NG_AT86RF2XX_TRX_CTRL_2_MASK__SUB_MODE
-            | NG_AT86RF2XX_TRX_CTRL_2_MASK__OQPSK_SCRAM_EN);
+    ng_at86rf2xx_set_freq(NG_AT86RF2XX_FREQ_915MHZ);
 #endif
-    ng_at86rf2xx_reg_write(dev, NG_AT86RF2XX_REG__TRX_CTRL_2, tmp);
     /* enable interrupts */
     ng_at86rf2xx_reg_write(dev, NG_AT86RF2XX_REG__IRQ_MASK,
-                           NG_AT86RF2XX_IRQ_STATUS_MASK__TRX_END);
+                          NG_AT86RF2XX_IRQ_STATUS_MASK__TRX_END);
     /* go into RX state */
     ng_at86rf2xx_set_state(dev, NG_AT86RF2XX_STATE_RX_AACK_ON);
 
