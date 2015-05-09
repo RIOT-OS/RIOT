@@ -94,4 +94,3 @@ static void cpu_clock_init(void)
     while (!SYS_CTRL->CLOCK_STAbits.SYNC_32K);
 #endif
 }
-

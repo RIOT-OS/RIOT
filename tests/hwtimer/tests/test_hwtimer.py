@@ -29,4 +29,3 @@ while hwtimers > 1:
 # term.expect("OK")
 if not term.terminate():
     term.terminate(force=True)
-

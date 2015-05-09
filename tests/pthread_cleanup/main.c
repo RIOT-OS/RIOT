@@ -72,4 +72,3 @@ int main(void) {
     puts("Done.");
     return 0;
 }
-

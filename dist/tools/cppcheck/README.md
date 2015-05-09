@@ -37,4 +37,3 @@ If this happens, you can add an "inline suppression" like this:
 
     /* cppcheck-suppress passedByValue */
     timex_t timex_add(const timex_t a, const timex_t b);
-

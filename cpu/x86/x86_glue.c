@@ -134,4 +134,3 @@ ssize_t write(int fildes, const void *buf, size_t nbyte)
     (void) nbyte;
     return -1;
 }
-
