@@ -22,7 +22,9 @@
 #include "mutex.h"
 #include "net/ng_ipv6/addr.h"
 #include "net/ng_ndp.h"
+#include "net/ng_netapi.h"
 #include "net/ng_netif.h"
+#include "net/ng_netif/hdr.h"
 
 #include "net/ng_ipv6/netif.h"
 
@@ -52,8 +54,8 @@ static ng_ipv6_addr_t *_add_addr_to_entry(ng_ipv6_netif_t *entry, const ng_ipv6_
 
     if (!tmp_addr) {
         DEBUG("ipv6 netif: couldn't add %s/%" PRIu8 " to interface %" PRIkernel_pid "\n: No space left.",
-          ng_ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)),
-          prefix_len, entry->pid);
+              ng_ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)),
+              prefix_len, entry->pid);
         return NULL;
     }
 
@@ -440,6 +442,117 @@ ng_ipv6_addr_t *ng_ipv6_netif_match_prefix(kernel_pid_t pid,
 ng_ipv6_addr_t *ng_ipv6_netif_find_best_src_addr(kernel_pid_t pid, const ng_ipv6_addr_t *dest)
 {
     return _match_prefix(pid, dest, true);
+}
+
+/* TODO: put this somewhere more central and L2 protocol dependent */
+#define IID_LEN (8)
+
+static bool _hwaddr_to_iid(uint8_t *iid, const uint8_t *hwaddr, size_t hwaddr_len)
+{
+    uint8_t i = 0;
+
+    memset(iid, 0, IID_LEN);
+
+    switch (hwaddr_len) {
+        case 8:
+            iid[0] = hwaddr[i++];
+            iid[0] ^= 0x02;
+            iid[1] = hwaddr[i++];
+            iid[2] = hwaddr[i++];
+            iid[3] = hwaddr[i++];
+            iid[4] = hwaddr[i++];
+            iid[5] = hwaddr[i++];
+            iid[6] = hwaddr[i++];
+            iid[7] = hwaddr[i++];
+            break;
+
+        case 6:
+            iid[0] = hwaddr[i++];
+            iid[0] ^= 0x02;
+            iid[1] = hwaddr[i++];
+            iid[2] = hwaddr[i++];
+            iid[3] = 0xff;
+            iid[4] = 0xfe;
+            iid[5] = hwaddr[i++];
+            iid[6] = hwaddr[i++];
+            iid[7] = hwaddr[i++];
+            break;
+
+        case 4:
+            iid[0] = hwaddr[i++];
+            iid[0] ^= 0x02;
+            iid[1] = hwaddr[i++];
+
+        case 2:
+            iid[6] = hwaddr[i++];
+
+        case 1:
+            iid[3] = 0xff;
+            iid[4] = 0xfe;
+            iid[7] = hwaddr[i++];
+            break;
+
+        default:
+            DEBUG("Unknown hardware address length\n");
+            return false;
+    }
+
+    return true;
+}
+
+void ng_ipv6_netif_init_by_dev(void)
+{
+    kernel_pid_t ifs[NG_NETIF_NUMOF];
+    size_t ifnum = ng_netif_get(ifs);
+
+    for (size_t i = 0; i < ifnum; i++) {
+        ng_ipv6_addr_t addr;
+        uint16_t hwaddr_len = 0;
+        uint8_t hwaddr[NG_NETIF_HDR_L2ADDR_MAX_LEN];
+        bool try_long = false;
+        ng_ipv6_netif_t *ipv6_if = ng_ipv6_netif_get(ifs[i]);
+        int res = 0;
+
+        if (ipv6_if == NULL) {
+            continue;
+        }
+
+        mutex_lock(&ipv6_if->mutex);
+
+#ifdef MODULE_NG_SIXLOWPAN
+        ng_nettype_t if_type = NG_NETTYPE_UNDEF;
+
+        if ((ng_netapi_get(ifs[i], NETCONF_OPT_PROTO, 0, &if_type,
+                           sizeof(if_type)) != -ENOTSUP) &&
+            (if_type == NG_NETTYPE_SIXLOWPAN)) {
+            DEBUG("Set 6LoWPAN flag\n");
+            ipv6_ifs->flags |= NG_IPV6_NETIF_FLAGS_SIXLOWPAN;
+        }
+
+#endif
+
+        if ((ng_netapi_get(ifs[i], NETCONF_OPT_SRC_LEN, 0, &hwaddr_len,
+                           sizeof(hwaddr_len)) != -ENOTSUP) &&
+            (hwaddr_len == 8)) {
+            try_long = true;
+        }
+
+        if ((try_long && ((res = ng_netapi_get(ifs[i], NETCONF_OPT_ADDRESS_LONG, 0,
+                                               &hwaddr, sizeof(hwaddr))) > 0)) ||
+            ((res = ng_netapi_get(ifs[i], NETCONF_OPT_ADDRESS, 0, &hwaddr,
+                                  sizeof(hwaddr))) > 0)) {
+            uint8_t iid[IID_LEN];
+            hwaddr_len = (uint16_t)res;
+
+            if (_hwaddr_to_iid(iid, hwaddr, hwaddr_len)) {
+                ng_ipv6_addr_set_aiid(&addr, iid);
+                ng_ipv6_addr_set_link_local_prefix(&addr);
+                _add_addr_to_entry(ipv6_if, &addr, 64, 0);
+            }
+        }
+
+        mutex_unlock(&ipv6_if->mutex);
+    }
 }
 
 /**
