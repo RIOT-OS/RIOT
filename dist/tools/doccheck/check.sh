@@ -42,7 +42,7 @@ WARNINGS=$(comm -1 -2 ${TMP_WARN} ${TMP_DOC})
 ERRORS=$(comm -1 -2 ${TMP_ERR} ${TMP_DOC})
 
 rm ${TMP_ERR} ${TMP_WARN} ${TMP_DOC}
-    
+
 if [ -n "${WARNINGS}" ]
 then
 echo "WARNING: The following modified files generate doxygen warnings:"
