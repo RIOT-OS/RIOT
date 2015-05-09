@@ -28,7 +28,7 @@
 #include "cpu.h"
 #include "irq.h"
 #include "hwtimer.h"
-#include "crash.h"
+#include "panic.h"
 
 #include "cc2420.h"
 #include "cc2420_arch.h"

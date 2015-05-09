@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 INRIA
+ * Copyright (C) 2015 INRIA
  * Copyright (C) 2015 Eistec AB
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
@@ -8,7 +8,7 @@
  */
 
 /**
- * @ingroup     cortex-m3_common
+ * @ingroup     cortex-m0_common
  * @{
  *
  * @file
@@ -24,7 +24,7 @@
 #include "cpu.h"
 #include "irq.h"
 #include "lpm.h"
-#include "crash.h"
+#include "panic.h"
 
 #define PANIC_STR_SIZE 80
 

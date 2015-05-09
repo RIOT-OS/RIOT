@@ -21,7 +21,7 @@
  */
 
 #include <stdint.h>
-#include "crash.h"
+#include "panic.h"
 #include "fault_handlers.h"
 
 void isr_nmi(void)

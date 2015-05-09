@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Freie Universitaet Berlin (FUB) and INRIA
+ * Copyright (C) 2014 INRIA
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -10,36 +10,35 @@
  * @ingroup  core_util
  * @{
  *
- * @file        crash.c
- * @brief       Crash handling functions implementation for 'native' port
+ * @file        panic.c
+ * @brief       Crash handling functions implementation for ARM-based MCUs
  *
- * @author      Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
  * @author      Kévin Roussel <Kevin.Roussel@inria.fr>
  */
 
-#include <unistd.h>
-#include <signal.h>
+#include "cpu.h"
+#include "lpm.h"
+#include "panic.h"
+
 #include <string.h>
 #include <stdio.h>
 
-#include "crash.h"
-#include "native_internal.h"
-
-/* "public" variables holding the crash data (look for them in your debugger) */
+/* "public" variables holding the crash data */
 char panic_str[80];
 int panic_code;
 
 /* flag preventing "recursive crash printing loop" */
 static int crashed = 0;
 
+/* WARNING: this function NEVER returns! */
 NORETURN void core_panic(int crash_code, const char *message)
 {
+    /* copy panic datas to "public" global variables */
+    panic_code = crash_code;
+    strncpy(panic_str, message, 80);
+    /* print panic message to console (if possible) */
     if (crashed == 0) {
         crashed = 1;
-        /* copy the crash data to "long-lived" global variables */
-        panic_code = crash_code;
-        strncpy(panic_str, message, 80);
-        /* try to print panic message to console (if possible) */
         puts("******** SYSTEM FAILURE ********\n");
         puts(message);
 #if DEVELHELP
@@ -49,13 +48,16 @@ NORETURN void core_panic(int crash_code, const char *message)
 #endif
         puts("\n\n");
     }
-
+    /* disable watchdog and all possible sources of interrupts */
+    //TODO
     dINT();
 #if DEVELHELP
-    /* since we're atop an Unix-like platform,
-       just use the (developer-)friendly core-dump feature */
-    kill(_native_pid, SIGTRAP);
+    /* enter infinite loop, into deepest possible sleep mode */
+    while (1) {
+        lpm_set(LPM_OFF);
+    }
 #else
+    /* DEVELHELP not set => reboot system */
     (void) reboot(RB_AUTOBOOT);
 #endif
 

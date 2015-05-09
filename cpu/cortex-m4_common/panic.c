@@ -24,7 +24,7 @@
 #include "cpu.h"
 #include "irq.h"
 #include "lpm.h"
-#include "crash.h"
+#include "panic.h"
 
 #define PANIC_STR_SIZE 80
 

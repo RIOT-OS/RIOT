@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 INRIA
+ * Copyright (C) 2014, 2015 INRIA
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -10,17 +10,17 @@
  * @addtogroup  core_util
  * @{
  *
- * @file        crash.h
+ * @file
  * @brief       Crash handling header
  *
- * Define a core_panic() function that allows to stop/reboot the system
+ * Define a ::core_panic function that allows to stop/reboot the system
  * when an unrecoverable problem has occurred.
  *
  * @author      Kévin Roussel <Kevin.Roussel@inria.fr>
  */
 
-#ifndef CRASH_H
-#define CRASH_H
+#ifndef PANIC_H
+#define PANIC_H
 
 #include "kernel.h"
 
@@ -54,5 +54,5 @@ NORETURN void core_panic(int crash_code, const char *message);
 }
 #endif
 
-#endif /* CRASH_H */
+#endif /* PANIC_H */
 /** @} */
