@@ -295,7 +295,7 @@ static rbuf_t *_rbuf_get(const void *src, size_t src_len,
         }
 
         /* if there is a free spot: remember it */
-        if ((res == NULL) && (rbuf[i].cur_size == 0)) {
+        if ((res == NULL) && (rbuf[i].pkt == NULL)) {
             res = &(rbuf[i]);
         }
     }
