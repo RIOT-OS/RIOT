@@ -8,7 +8,7 @@
 
 /**
  * @defgroup socket_base    Transport layer implementation
- * 
+ *
  * @ingroup net
  * @brief   This module implements basic transport layer socket functionality.
  *          This includes 6LoWPAN UDP header compression and (experimental)

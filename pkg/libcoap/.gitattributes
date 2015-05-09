@@ -1,0 +1,6 @@
+# Ignore whitespace errors inside these patch files by regarding them as binary.
+0001-Add-RIOT-Makefile.patch binary
+0002-Add-config.h.patch binary
+0003-Remove-two-example-programs-in-root.patch binary
+0004-Eliminate-some-compiler-warnings-and-errors.patch binary
+0005-fix-old-style-function-declarations.patch binary

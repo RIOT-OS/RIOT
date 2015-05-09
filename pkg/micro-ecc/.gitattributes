@@ -1,0 +1,3 @@
+# Ignore whitespace errors inside these patch files by regarding them as binary.
+0001-Add-RIOT-Makefile.patch binary
+0002-Include-RIOT-Hardware-RNG-interface.patch binary

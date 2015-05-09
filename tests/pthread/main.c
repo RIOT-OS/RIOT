@@ -56,4 +56,3 @@ int main(void) {
     puts("main: finished");
     return 0;
 }
-

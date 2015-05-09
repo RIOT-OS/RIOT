@@ -170,7 +170,7 @@ extern "C" {
         int tm_isdst;
     };
 
-    
+
     /* We have to provide clock_t / CLOCKS_PER_SEC so that libstdc++-v3 can
        be built.  We define CLOCKS_PER_SEC via a symbol _CLOCKS_PER_SEC_
        so that the user can provide the value on the link line, which should

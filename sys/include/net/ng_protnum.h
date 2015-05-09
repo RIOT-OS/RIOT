@@ -86,7 +86,7 @@ extern "C" {
                                                  *   Extension Header */
 #define NG_PROTNUM_IPV6_EXT_AH          (51)    /**< IPv6 Authentication Extension
                                                  *   Header */
-#define NG_PROTNUM_I_NLSP               (52)    /**< Integrated Net Layer Security 
+#define NG_PROTNUM_I_NLSP               (52)    /**< Integrated Net Layer Security
                                                  *   TUBA */
 #define NG_PROTNUM_SWIPE                (53)    /**< IP with Encryption (deprecated) */
 #define NG_PROTNUM_NARP                 (54)    /**< NBMA Address Resolution Protocol */

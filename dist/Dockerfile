@@ -36,4 +36,3 @@ RUN apt-get -y install subversion curl wget python p7zip unzip
 
 RUN mkdir -p /data/riotbuild
 WORKDIR /data/riotbuild
-

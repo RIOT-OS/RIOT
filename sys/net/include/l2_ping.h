@@ -119,7 +119,7 @@ void l2_ping_init(void);
  * @param[in] interval      the interval between sending ping requests,
  *                          if 0 the default interval (#L2_PING_DEFAULT_INTERVAL)
  * @param[in] payload       optional payload data, may be NULL
- * @param[in] payload_len   the length of the payload data, must be smaller than 
+ * @param[in] payload_len   the length of the payload data, must be smaller than
  *                          #L2_PING_PAYLOAD_SIZE
  * @param[in] probe_only    do not request a pong response
  */
