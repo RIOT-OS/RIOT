@@ -8,7 +8,7 @@
  * directory for more details.
   */
 
-#include "crash.h"
+#include "panic.h"
 #include "cc2420.h"
 #include "cc2420_spi.h"
 #include "cc2420_settings.h"

@@ -20,7 +20,7 @@
  */
 
 #include <stdint.h>
-#include "crash.h"
+#include "panic.h"
 
 
 /**

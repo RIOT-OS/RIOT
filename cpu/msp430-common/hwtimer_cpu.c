@@ -24,7 +24,7 @@
 #include <stdint.h>
 
 #include "cpu.h"
-#include "crash.h"
+#include "panic.h"
 #include "hwtimer.h"
 #include "arch/hwtimer_arch.h"
 

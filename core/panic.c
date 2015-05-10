@@ -8,12 +8,13 @@
  */
 
 /**
- * @ingroup     cortex-m0_common
+ * @ingroup     core_util
  * @{
  *
  * @file
- * @brief       Crash handling functions implementation for ARM Cortex-based MCUs
+ * @brief       Crash handling functions
  *
+ * @author      Kévin Roussel <Kevin.Roussel@inria.fr>
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  * @author      Joakim Gebart <joakim.gebart@eistec.se>
  */
@@ -24,7 +25,8 @@
 #include "cpu.h"
 #include "irq.h"
 #include "lpm.h"
-#include "crash.h"
+#include "panic.h"
+#include "arch/panic_arch.h"
 
 #define PANIC_STR_SIZE 80
 
@@ -57,14 +59,8 @@ NORETURN void core_panic(int crash_code, const char *message)
     }
     /* disable watchdog and all possible sources of interrupts */
     disableIRQ();
-#if DEVELHELP
-    /* The bkpt instruction will signal to the debugger to break here. */
-    __ASM("bkpt #0");
-    /* enter infinite loop, into deepest possible sleep mode */
-    while (1) {
-        lpm_set(LPM_OFF);
-    }
-#else
+    panic_arch();
+#ifndef DEVELHELP
     /* DEVELHELP not set => reboot system */
     (void) reboot(RB_AUTOBOOT);
 #endif

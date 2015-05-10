@@ -22,7 +22,7 @@
 
 #include "board.h"
 #include "cpu.h"
-#include "crash.h"
+#include "panic.h"
 
 /**
  * memory markers as defined in the linker script
