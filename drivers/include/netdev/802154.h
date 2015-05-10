@@ -7,7 +7,9 @@
  */
 
 /**
- * @addtogroup  netdev
+ * @defgroup netdev_802154 Network device interface for IEEE 802.15.4 transceivers
+ * @ingroup  netdev
+ * @brief    Network device driver API for IEEE 802.15.4 radio transceivers
  *
  * @{
  * @file
