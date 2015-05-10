@@ -40,7 +40,7 @@ kernel_pid_t ng_sixlowpan_init(void)
         return _pid;
     }
 
-    _pid = thread_create(_stack, NG_SIXLOWPAN_STACK_SIZE, NG_SIXLOWPAN_PRIO,
+    _pid = thread_create(_stack, sizeof(_stack), NG_SIXLOWPAN_PRIO,
                          CREATE_STACKTEST, _event_loop, NULL, "6lo");
 
     return _pid;

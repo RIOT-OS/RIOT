@@ -56,7 +56,7 @@ static void *_event_loop(void *args);
 kernel_pid_t ng_ipv6_init(void)
 {
     if (_pid == KERNEL_PID_UNDEF) {
-        _pid = thread_create(_stack, NG_IPV6_STACK_SIZE, NG_IPV6_PRIO,
+        _pid = thread_create(_stack, sizeof(_stack), NG_IPV6_PRIO,
                              CREATE_STACKTEST, _event_loop, NULL, "ipv6");
     }
 
