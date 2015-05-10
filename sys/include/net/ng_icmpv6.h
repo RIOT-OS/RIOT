@@ -66,6 +66,7 @@ void ng_icmpv6_demux(kernel_pid_t iface, ng_pktsnip_t *pkt);
 /**
  * @brief   Builds an ICMPv6 message for sending.
  *
+ * @param[in] next  Next packet snip in the new packet.
  * @param[in] type  Type for the ICMPv6 message.
  * @param[in] code  Code for the ICMPv6 message.
  * @param[in] size  Size of the ICMPv6 message (needs do be >
@@ -74,7 +75,7 @@ void ng_icmpv6_demux(kernel_pid_t iface, ng_pktsnip_t *pkt);
  * @return  The ICMPv6 message on success
  * @return  NULL, on failure
  */
-ng_pktsnip_t *ng_icmpv6_build(uint8_t type, uint8_t code, size_t size);
+ng_pktsnip_t *ng_icmpv6_build(ng_pktsnip_t *next, uint8_t type, uint8_t code, size_t size);
 
 /* TODO: build error messages */
 

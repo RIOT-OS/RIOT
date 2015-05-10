@@ -27,7 +27,7 @@ ng_pktsnip_t *ng_icmpv6_echo_build(uint8_t type, uint16_t id, uint16_t seq,
     ng_pktsnip_t *pkt;
     ng_icmpv6_echo_t *echo;
 
-    if ((pkt = ng_icmpv6_build(type, 0, data_len + sizeof(ng_icmpv6_echo_t))) == NULL) {
+    if ((pkt = ng_icmpv6_build(NULL, type, 0, data_len + sizeof(ng_icmpv6_echo_t))) == NULL) {
         return NULL;
     }
 

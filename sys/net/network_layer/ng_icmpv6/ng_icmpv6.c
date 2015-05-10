@@ -126,12 +126,13 @@ void ng_icmpv6_demux(kernel_pid_t iface, ng_pktsnip_t *pkt)
     }
 }
 
-ng_pktsnip_t *ng_icmpv6_build(uint8_t type, uint8_t code, size_t size)
+ng_pktsnip_t *ng_icmpv6_build(ng_pktsnip_t *next, uint8_t type, uint8_t code,
+                              size_t size)
 {
     ng_pktsnip_t *pkt;
     ng_icmpv6_hdr_t *icmpv6;
 
-    pkt = ng_pktbuf_add(NULL, NULL, size, NG_NETTYPE_ICMPV6);
+    pkt = ng_pktbuf_add(next, NULL, size, NG_NETTYPE_ICMPV6);
 
     if (pkt == NULL) {
         DEBUG("icmpv6_echo: no space left in packet buffer\n");
