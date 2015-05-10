@@ -101,7 +101,7 @@ void ng_at86rf2xx_reset(ng_at86rf2xx_t *dev)
     /* set short and long address */
 #if CPUID_ID_LEN
     cpuid_get(cpuid);
-#if CPUID < 8
+#if CPUID_ID_LEN < 8
     /* in case CPUID_ID_LEN < 8, fill missing bytes with zeros */
     for (int i = CPUID_ID_LEN; i < 8; i++) {
         cpuid[i] = 0;
