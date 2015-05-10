@@ -236,7 +236,7 @@ static int _send(ng_netdev_t *netdev, ng_pktsnip_t *pkt)
     len = ng_at86rf2xx_tx_load(dev, mhr, len, 0);
     /* load packet data into FIFO */
     while (snip) {
-        len += ng_at86rf2xx_tx_load(dev, snip->data, snip->size, len);
+        len = ng_at86rf2xx_tx_load(dev, snip->data, snip->size, len);
         snip = snip->next;
     }
     /* send data out directly if pre-loading id disabled */
