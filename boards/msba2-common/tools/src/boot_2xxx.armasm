@@ -1,11 +1,11 @@
-	/* ARM code to run user code */
-	/* This allows us to jump to the user's code in flash.  We have */
-	/* to remap the flash before jumping. */
+    /* ARM code to run user code */
+    /* This allows us to jump to the user's code in flash.  We have */
+    /* to remap the flash before jumping. */
 begin:
-	adr	r0, const
-	ldr	r1, [r0]	/* r1 points to MEMMAP register */
-	mov	r0, #1
-	str	r0, [r1]	/* remap interrupt vectors to flash */
-	mov	pc, #0		/* and then jump to the user's code */
+    adr r0, const
+    ldr r1, [r0]    /* r1 points to MEMMAP register */
+    mov r0, #1
+    str r0, [r1]    /* remap interrupt vectors to flash */
+    mov pc, #0      /* and then jump to the user's code */
 const:
-	.int	0xE01FC040	/* MEMMAP register */
+    .int    0xE01FC040  /* MEMMAP register */
