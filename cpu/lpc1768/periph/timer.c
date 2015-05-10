@@ -77,8 +77,7 @@ int timer_set(tim_t dev, int channel, unsigned int timeout)
 {
     if (dev == TIMER_0) {
         unsigned int now = timer_read(dev);
-        timer_set_absolute(dev, channel, now + timeout);
-        return 1;
+        return timer_set_absolute(dev, channel, now + timeout);
     }
     return -1;
 }
