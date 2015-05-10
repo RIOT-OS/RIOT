@@ -61,7 +61,7 @@ extern "C" {
 /**
  * @brief at86rf231's lowest supported channel
  */
-#define AT86RF231_MIN_CHANNEL       (11)
+#define AT86RF231_MIN_CHANNEL       (0)
 
 /**
  * @brief at86rf231's highest supported channel
