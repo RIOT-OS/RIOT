@@ -30,35 +30,35 @@ static void _print_nc_state(ng_ipv6_nc_t *entry)
 {
     switch (entry->flags & NG_IPV6_NC_STATE_MASK) {
         case NG_IPV6_NC_STATE_UNMANAGED:
-            printf("UNMANAGED");
+            printf("UNMANAGED   ");
             break;
 
         case NG_IPV6_NC_STATE_UNREACHABLE:
-            printf("UNREACHABLE");
+            printf("UNREACHABLE ");
             break;
 
         case NG_IPV6_NC_STATE_INCOMPLETE:
-            printf("INCOMPLETE");
+            printf("INCOMPLETE  ");
             break;
 
         case NG_IPV6_NC_STATE_STALE:
-            printf("STALE");
+            printf("STALE       ");
             break;
 
         case NG_IPV6_NC_STATE_DELAY:
-            printf("DELAY");
+            printf("DELAY       ");
             break;
 
         case NG_IPV6_NC_STATE_PROBE:
-            printf("PROBE");
+            printf("PROBE       ");
             break;
 
         case NG_IPV6_NC_STATE_REACHABLE:
-            printf("REACHABLE");
+            printf("REACHABLE   ");
             break;
 
         default:
-            printf("UNKNOWN");
+            printf("UNKNOWN     ");
             break;
     }
 }
@@ -107,8 +107,8 @@ static int _ipv6_nc_list(void)
     char ipv6_str[NG_IPV6_ADDR_MAX_STR_LEN];
     char l2addr_str[3 * MAX_L2_ADDR_LEN];
 
-    puts("IPv6 address                    if  L2 address                state      type");
-    puts("-----------------------------------------------------------------------------");
+    puts("IPv6 address                    if  L2 address                state       type");
+    puts("------------------------------------------------------------------------------");
 
     for (ng_ipv6_nc_t *entry = ng_ipv6_nc_get_next(NULL);
          entry != NULL;
