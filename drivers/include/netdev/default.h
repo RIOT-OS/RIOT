@@ -22,11 +22,13 @@
 
 #include "netdev/base.h"
 
+#ifdef DOXYGEN
 /**
- * @def     NETDEV_DEFAULT
- *
  * @brief   Default device as a pointer of netdev_t.
  */
+#define NETDEV_DEFAULT
+#endif
+
 #ifdef MODULE_AT86RF231
 #include "at86rf231.h"
 
