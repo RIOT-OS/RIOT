@@ -31,14 +31,14 @@ void random_init(void)
     NRF_RNG->TASKS_START = 1;
 }
 
-int random_read(char *buf, unsigned int num)
+int random_read(unsigned char *buf, unsigned int num)
 {
     unsigned int count = 0;
 
     while (count < num) {
         while (NRF_RNG->EVENTS_VALRDY == 0);
         NRF_RNG->EVENTS_VALRDY = 0;
-        buf[count++] = (char)NRF_RNG->VALUE;
+        buf[count++] = (unsigned char)NRF_RNG->VALUE;
     }
 
     return count;

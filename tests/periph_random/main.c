@@ -28,7 +28,7 @@
 
 int main(void)
 {
-    char buf[LIMIT];
+    unsigned char buf[LIMIT];
 
     puts("\nRandom number generator low-level driver test\n");
     printf("This test will print from 1 to %i random bytes about every second\n\n", LIMIT);
