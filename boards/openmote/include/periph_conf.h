@@ -78,6 +78,15 @@
 #define TIMER_3_ISR_2       isr_timer3_chan1
 /** @} */
 
+
+/**
+ * @name Hardware Timer peripheral configuration
+ * @{
+ */
+#define HWTIMER_IRQ_PRIO    1
+/** @} */
+
+
 /**
  * @name UART configuration
  * @{
