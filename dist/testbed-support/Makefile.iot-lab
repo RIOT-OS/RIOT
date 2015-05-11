@@ -12,15 +12,15 @@ $(IOTLAB_AUTH):
 	auth-cli -u $(IOTLAB_USER)
 
 iotlab-exp: $(IOTLAB_AUTH)
-	experiment-cli submit -d $(IOTLAB_DURATION) -l $(IOTLAB_NODES),archi=$(IOTLAB_TYPE)+site=$(IOTLAB_SITE),$(ELFFILE) -n riot_makefile_experiment
-	experiment-cli wait
+	$(eval NEW_ID := $(shell experiment-cli submit -d $(IOTLAB_DURATION) -l $(IOTLAB_NODES),archi=$(IOTLAB_TYPE)+site=$(IOTLAB_SITE),$(ELFFILE),$(IOTLAB_PROFILE) -n riot_makefile_experiment | grep -Eo '[[:digit:]]+'))
+	$(AD)experiment-cli wait -i $(NEW_ID)
 
 iotlab-flash: $(IOTLAB_AUTH) all
-	node-cli --update $(ELFFILE) -i $(IOTLAB_EXP_ID)
+	$(AD)node-cli --update $(ELFFILE) -i $(IOTLAB_EXP_ID)
 
 iotlab-reset: $(IOTLAB_AUTH)
-	node-cli --reset -i $(IOTLAB_EXP_ID)
+	$(AD)node-cli --reset -i $(IOTLAB_EXP_ID)
 
 iotlab-term:
-	ssh -t $(IOTLAB_USER)@$(IOTLAB_SITE).iot-lab.info "test -f ~/.iotlabrc || auth-cli -u $(IOTLAB_USER)"
-	ssh -t $(IOTLAB_USER)@$(IOTLAB_SITE).iot-lab.info "serial_aggregator -i $(IOTLAB_EXP_ID)"
+	$(AD)ssh -t $(IOTLAB_USER)@$(IOTLAB_SITE).iot-lab.info "test -f ~/.iotlabrc || auth-cli -u $(IOTLAB_USER)"
+	$(AD)ssh -t $(IOTLAB_USER)@$(IOTLAB_SITE).iot-lab.info "serial_aggregator -i $(IOTLAB_EXP_ID)"
