@@ -24,5 +24,10 @@ export UNDEF += $(BINDIR)cpu/startup.o
 # export the peripheral drivers to be linked into the final binary
 export USEMODULE += periph hwtimer_compat
 
+# mark RTC and RTT as mutually exclusive features
+FEATURES_CONFLICT += periph_rtt:periph_rtc
+FEATURES_CONFLICT_MSG += "RTC and RTT use both the same hardware, so they can \
+                          not be used simultaneously"
+
 # CPU depends on the cortex-m common module, so include it
 include $(CORTEX_COMMON)Makefile.include
