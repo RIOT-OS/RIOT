@@ -57,10 +57,16 @@ CXXFLAGS = $(filter-out $(CXXUWFLAGS), $(CFLAGS)) $(CXXEXFLAGS)
 # compile and generate dependency info
 
 $(OBJC): $(BINDIR)$(MODULE)/%.o: %.c
-	$(AD)$(CC) $(CFLAGS) $(INCLUDES) -MD -MP -c -o $@ $(abspath $<)
+	$(AD)$(CC) \
+		-DRIOT_FILE_RELATIVE=\"$(patsubst $(RIOTBASE)/%,%,$(abspath $<))\" \
+		-DRIOT_FILE_NOPATH=\"$(notdir $<)\" \
+		$(CFLAGS) $(INCLUDES) -MD -MP -c -o $@ $(abspath $<)
 
 $(OBJCXX): $(BINDIR)$(MODULE)/%.o: %.cpp
-	$(AD)$(CXX) $(CXXFLAGS) $(INCLUDES) -MD -MP -c -o $@ $(abspath $<)
+	$(AD)$(CXX) \
+		-DRIOT_FILE_RELATIVE=\"$(patsubst $(RIOTBASE)/%,%,$(abspath $<))\" \
+		-DRIOT_FILE_NOPATH=\"$(notdir $<)\" \
+		$(CXXFLAGS) $(INCLUDES) -MD -MP -c -o $@ $(abspath $<)
 
 $(ASMOBJ): $(BINDIR)$(MODULE)/%.o: %.s
 	$(AD)$(AS) $(ASFLAGS) -o $@ $(abspath $<)
