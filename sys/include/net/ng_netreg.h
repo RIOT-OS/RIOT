@@ -70,13 +70,13 @@ void ng_netreg_init(void);
  * @details The semantics are: Thread ng_netreg_entry_t::pid is interested in
  *          packets of protocol @p type with context ng_netreg_entry_t::demux_ctx.
  *
- * @param[in] type      Type of the protocol. Must not be <= NG_NETTYPE_UNDEF or
+ * @param[in] type      Type of the protocol. Must not be < NG_NETTYPE_UNDEF or
  *                      >= NG_NETTYPE_NUMOF.
  * @param[in] entry     An entry you want to add to the registry with
  *                      ng_netreg_entry_t::pid and ng_netreg_entry_t::demux_ctx set.
  *
  * @return  0 on success
- * @return  -EINVAL if @p type was <= NG_NETTYPE_UNDEF or >= NG_NETTYPE_NUMOF
+ * @return  -EINVAL if @p type was < NG_NETTYPE_UNDEF or >= NG_NETTYPE_NUMOF
  */
 int ng_netreg_register(ng_nettype_t type, ng_netreg_entry_t *entry);
 
