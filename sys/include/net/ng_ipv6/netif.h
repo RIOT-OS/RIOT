@@ -264,7 +264,7 @@ ng_ipv6_addr_t *ng_ipv6_netif_find_best_src_addr(kernel_pid_t pid, const ng_ipv6
  * * ng_ipv6_find_addr_local()
  * * ng_ipv6_find_prefix_match()
  * * ng_ipv6_find_prefix_match_local()
- * * ng_ipv6_find_best_src_address
+ * * ng_ipv6_find_best_src_address()
  *
  * The behaviour for other addresses is undefined.
  *

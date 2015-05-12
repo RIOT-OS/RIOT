@@ -20,6 +20,7 @@
 
 #include "kernel_types.h"
 #include "mutex.h"
+#include "net/ng_ipv6.h"
 #include "net/ng_ipv6/addr.h"
 #include "net/ng_netif.h"
 
@@ -55,14 +56,26 @@ static int _add_addr_to_entry(ng_ipv6_netif_t *entry, const ng_ipv6_addr_t *addr
                 }
 
                 entry->addrs[i].flags = NG_IPV6_NETIF_ADDR_FLAGS_NON_UNICAST;
+
+                return 0;
             }
             else {
                 entry->addrs[i].prefix_len = prefix_len;
 
-                entry->addrs[i].flags = NG_IPV6_NETIF_ADDR_FLAGS_UNICAST;
-            }
+                if (!ng_ipv6_addr_is_link_local(addr)) {
+                    /* add also corresponding link-local address */
+                    ng_ipv6_addr_t ll_addr;
 
-            return 0;
+                    ll_addr.u64[1] = addr->u64[1];
+                    ng_ipv6_addr_set_link_local_prefix(&ll_addr);
+
+                    entry->addrs[i].flags = NG_IPV6_NETIF_ADDR_FLAGS_UNICAST;
+
+                    return _add_addr_to_entry(entry, &ll_addr, 64, false);
+                }
+
+                return 0;
+            }
         }
     }
 
