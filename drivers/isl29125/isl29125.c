@@ -34,8 +34,8 @@
  **********************************************************************/
 
 int isl29125_init(isl29125_t *dev, i2c_t i2c, gpio_t gpio,
-        isl29125_mode_t mode, isl29125_range_t range,
-        isl29125_resolution_t resolution)
+                  isl29125_mode_t mode, isl29125_range_t range,
+                  isl29125_resolution_t resolution)
 {
     DEBUG("isl29125_init\n");
 
