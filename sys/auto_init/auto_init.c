@@ -159,8 +159,9 @@ void auto_init_net_if(void)
                                     CPUID_ID_LEN / 2 + 1);
 #endif /* CPUID_ID_LEN % 2 == 0 */
 
-        memcpy(&(eui64.uint32[0]), &hash_h, sizeof(uint32_t));
-        memcpy(&(eui64.uint32[1]), &hash_l, sizeof(uint32_t));
+        eui64.uint32[1] = hash_l;
+        eui64.uint32[0] = hash_h;
+
         /* Set Local/Universal bit to Local since this EUI64 is made up. */
         eui64.uint8[0] |= 0x02;
         net_if_set_eui64(iface, &eui64);
