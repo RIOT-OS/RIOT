@@ -63,6 +63,10 @@ ng_pktsnip_t *ng_ipv6_hdr_build(ng_pktsnip_t *payload,
 #endif
         memcpy(&hdr->src, src, src_len);
     }
+    else {
+        DEBUG("ipv6_hdr: set packet source to ::\n");
+        ng_ipv6_addr_set_unspecified(&hdr->src);
+    }
 
     memset(&hdr->dst + dst_len, 0, sizeof(ng_ipv6_addr_t) - dst_len);
 
@@ -73,6 +77,10 @@ ng_pktsnip_t *ng_ipv6_hdr_build(ng_pktsnip_t *payload,
                                   sizeof(addr_str)));
 #endif
         memcpy(&hdr->dst, dst, dst_len);
+    }
+    else {
+        DEBUG("ipv6_hdr: set packet destination to ::1\n");
+        ng_ipv6_addr_set_loopback(&hdr->dst);
     }
 
     hdr->v_tc_fl = byteorder_htonl(0x60000000); /* set version, tc and fl in one go*/
