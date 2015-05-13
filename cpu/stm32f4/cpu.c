@@ -79,7 +79,7 @@ static void cpu_clock_init(void)
 
     /* disable all clock interrupts */
     RCC->CIR = 0;
-#if CLOCK_USE_HSI
+#if !CLOCK_USE_HSI
     /* enable the HSE clock */
     RCC->CR |= RCC_CR_HSEON;
 
@@ -112,10 +112,11 @@ static void cpu_clock_init(void)
     /* reset PLL config register */
     RCC->PLLCFGR = 0;
 #if CLOCK_USE_HSI
+    /* set HSI as source for the PLL */
+    RCC->PLLCFGR |= RCC_PLLCFGR_PLLSRC_HSI;
+#else
     /* set HSE as source for the PLL */
     RCC->PLLCFGR |= RCC_PLLCFGR_PLLSRC_HSE;
-#else
-    RCC->PLLCFGR |= RCC_PLLCFGR_PLLSRC_HSI;
 #endif
     /* set division factor for main PLL input clock */
     RCC->PLLCFGR |= (CLOCK_PLL_M & 0x3F);
