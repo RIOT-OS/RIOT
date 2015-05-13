@@ -144,7 +144,7 @@ static int _ipv6_nc_add(kernel_pid_t iface, char *ipv6_addr_str,
         return 1;
     }
 
-    if (ng_ipv6_nc_add(iface, &ipv6_addr, l2_addr, l2_addr_len, 0) < 0) {
+    if (ng_ipv6_nc_add(iface, &ipv6_addr, l2_addr, l2_addr_len, 0) == NULL) {
         puts("error: unable to add address to neighbor cache.");
         return 1;
     }
