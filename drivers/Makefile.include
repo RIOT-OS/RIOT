@@ -19,6 +19,9 @@ endif
 ifneq (,$(filter isl29020,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/drivers/isl29020/include
 endif
+ifneq (,$(filter isl29125,$(USEMODULE)))
+    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/isl29125/include
+endif
 ifneq (,$(filter lps331ap,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/drivers/lps331ap/include
 endif
