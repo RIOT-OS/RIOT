@@ -23,13 +23,9 @@
 #include <string.h>
 
 #include "xbee.h"
-#include "mutex.h"
 #include "hwtimer.h"
 #include "msg.h"
-#include "periph/uart.h"
-#include "periph/gpio.h"
 #include "periph/cpuid.h"
-#include "net/ng_netbase.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
