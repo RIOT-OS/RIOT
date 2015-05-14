@@ -139,13 +139,16 @@ void ng_at86rf2xx_set_freq(ng_at86rf2xx_t *dev, ng_at86rf2xx_freq_t freq)
     uint8_t tmp1 = 0, tmp2 = 0;
     tmp1 = ng_at86rf2xx_reg_read(dev, NG_AT86RF2XX_REG__TRX_CTRL_2);
     tmp1 &= ~(NG_AT86RF2XX_TRX_CTRL_2_MASK__FREQ_MODE);
+    tmp2 = ng_at86rf2xx_reg_read(dev, NG_AT86RF2XX_REG__RF_CTRL_0);
+    /* Erase previous conf for GC_TX_OFFS */
+    tmp2 &= ~NG_AT86RF2XX_RF_CTRL_0_MASK__GC_TX_OFFS;
 
     if (freq == NG_AT86RF2XX_FREQ_915MHZ) {
         dev->freq = NG_AT86RF2XX_FREQ_915MHZ;
         /* settings used by Linux 4.0rc at86rf212b driver - BPSK-40*/
         tmp1 |= NG_AT86RF2XX_TRX_CTRL_2_MASK__SUB_MODE
               | NG_AT86RF2XX_TRX_CTRL_2_MASK__OQPSK_SCRAM_EN;
-        tmp2 = 0x03;
+        tmp2 |= NG_AT86RF2XX_RF_CTRL_0_GC_TX_OFFS__2DB;
 
         if (dev->chan == 0) {
             ng_at86rf2xx_set_chan(dev,NG_AT86RF2XX_DEFAULT_CHANNEL);
@@ -156,7 +159,7 @@ void ng_at86rf2xx_set_freq(ng_at86rf2xx_t *dev, ng_at86rf2xx_freq_t freq)
         dev->freq = NG_AT86RF2XX_FREQ_868MHZ;
         /* OQPSK-SIN-RC-100 IEEE802.15.4 for 868,3MHz */
         tmp1 |= NG_AT86RF2XX_TRX_CTRL_2_MASK__BPSK_OQPSK;
-        tmp2 = 0x02;
+        tmp2 |= NG_AT86RF2XX_RF_CTRL_0_GC_TX_OFFS__1DB;
 
         /* Channel = 0 for 868MHz means 868.3MHz, only one available */
         ng_at86rf2xx_set_chan(dev,0x00);
