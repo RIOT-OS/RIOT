@@ -16,6 +16,9 @@ endif
 ifneq (,$(filter ng_at86rf2xx,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/drivers/ng_at86rf2xx/include
 endif
+ifneq (,$(filter kw2xrf,$(USEMODULE)))
+    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/kw2xrf/include
+endif
 ifneq (,$(filter isl29020,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/drivers/isl29020/include
 endif
