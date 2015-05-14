@@ -53,6 +53,9 @@ static void _send(ng_pktsnip_t *pkt, bool prep_hdr);
 /* Main event loop for IPv6 */
 static void *_event_loop(void *args);
 
+/* Handles encapsulated IPv6 packets: http://tools.ietf.org/html/rfc2473 */
+static void _decapsulate(ng_pktsnip_t *pkt);
+
 kernel_pid_t ng_ipv6_init(void)
 {
     if (_pid == KERNEL_PID_UNDEF) {
@@ -74,6 +77,9 @@ void ng_ipv6_demux(kernel_pid_t iface, ng_pktsnip_t *pkt, uint8_t nh)
             ng_icmpv6_demux(iface, pkt);
             break;
         /* TODO: add extension header handling */
+        case NG_PROTNUM_IPV6:
+            _decapsulate(pkt);
+            break;
         default:
             break;
     }
@@ -600,5 +606,21 @@ static void _receive(ng_pktsnip_t *pkt)
     ng_ipv6_demux(iface, pkt, hdr->nh);
 }
 
+static void _decapsulate(ng_pktsnip_t *pkt)
+{
+    ng_pktsnip_t *ptr = pkt;
+
+    pkt->type = NG_NETTYPE_UNDEF;   /* prevent payload (the encapsulated packet)
+                                     * from being removed */
+
+    /* Remove encapsulating IPv6 header */
+    while ((ptr->next != NULL) && (ptr->next->type == NG_NETTYPE_IPV6)) {
+        ng_pktbuf_remove_snip(pkt, pkt->next);
+    }
+
+    pkt->type = NG_NETTYPE_IPV6;
+
+    _receive(pkt);
+}
 
 /** @} */
