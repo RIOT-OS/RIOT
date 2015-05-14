@@ -35,20 +35,25 @@
 static mutex_t mtx_access = MUTEX_INIT;
 
 /**
- * @brief maximum number of handled reactive routing protocols (RRP)
- *        used to notify the saved kernel_pid_t
+ * @brief maximum number of handled routing protocols (RP)
+ *        used to notify the saved kernel_pid_t on ureachable destination
  */
-#define FIB_MAX_RRP (5)
+#define FIB_MAX_REGISTERED_RP (5)
 
 /**
- * @brief registered RRPs for notifications about unreachable destinations
+ * @brief registered RPs for notifications about unreachable destinations
  */
-static size_t notify_rrp_pos = 0;
+static size_t notify_rp_pos = 0;
 
 /**
- * @brief the kernel_pid_t for notifying the RRPs
+ * @brief the kernel_pid_t for notifying the RPs
  */
-static kernel_pid_t notify_rrp[FIB_MAX_RRP];
+static kernel_pid_t notify_rp[FIB_MAX_REGISTERED_RP];
+
+/**
+ * @brief the prefix handled by the RP
+ */
+static universal_address_container_t* prefix_rp[FIB_MAX_REGISTERED_RP];
 
 /**
  * @brief maximum number of FIB tables entries handled
@@ -271,8 +276,10 @@ static int fib_remove(fib_entry_t *entry)
 }
 
 /**
- * @brief signals (sends a message to) all registered RRPs
- *        to start a route discovery for the provided destination.
+ * @brief signals (sends a message to) all registered routing protocols
+ *        registered with a matching prefix (usually this should be only one).
+ *        The message informs the recipient that no next-hop is available for the
+ *        requested destination address.
  *        The receiver MUST copy the content, i.e. the address before reply.
  *
  * @param[in] dst       the destination address
@@ -281,29 +288,32 @@ static int fib_remove(fib_entry_t *entry)
  * @return 0 on a new available entry,
  *         -ENOENT if no suiting entry is provided.
  */
-static int fib_signal_rrp(uint8_t *dst, size_t dst_size, uint32_t dst_flags)
+static int fib_signal_rp(uint8_t *dst, size_t dst_size, uint32_t dst_flags)
 {
     msg_t msg, reply;
-    rrp_address_msg_t content;
+    rp_address_msg_t content;
     content.address = dst;
     content.address_size = dst_size;
     content.address_flags = dst_flags;
     int ret = -ENOENT;
 
-    msg.type = FIB_MSG_RRP_SIGNAL;
+    msg.type = FIB_MSG_RP_SIGNAL;
     msg.content.ptr = (void *)&content;
 
-    for (size_t i = 0; i < FIB_MAX_RRP; ++i) {
-        if (notify_rrp[i] != KERNEL_PID_UNDEF) {
-            DEBUG("[fib_signal_rrp] send msg@: %p to pid[%d]: %d\n", \
-                  msg.content.ptr, (int)i, (int)notify_rrp[i]);
+    for (size_t i = 0; i < FIB_MAX_REGISTERED_RP; ++i) {
+        if (notify_rp[i] != KERNEL_PID_UNDEF) {
+            DEBUG("[fib_signal_rp] send msg@: %p to pid[%d]: %d\n", \
+                  msg.content.ptr, (int)i, (int)notify_rp[i]);
 
-            /* the receiver, i.e. the RRP, MUST copy the content value.
-             * using the provided pointer after replying this message
-             * will lead to errors
-             */
-            msg_send_receive(&msg, &reply, notify_rrp[i]);
-            DEBUG("[fib_signal_rrp] got reply.");
+            /* do only signal a RP if its registered prefix matches */
+            if (universal_address_compare(prefix_rp[i], dst, &dst_size) == 0) {
+                /* the receiver, i.e. the RP, MUST copy the content value.
+                 * using the provided pointer after replying this message
+                 * will lead to errors
+                 */
+                msg_send_receive(&msg, &reply, notify_rp[i]);
+                DEBUG("[fib_signal_rp] got reply.");
+            }
         }
     }
 
@@ -395,8 +405,8 @@ int fib_get_next_hop(kernel_pid_t *iface_id,
     int ret = fib_find_entry(dst, dst_size, &(entry[0]), &count);
 
     if (!(ret == 0 || ret == 1)) {
-        /* notify all RRPs for route discovery if available */
-        if (fib_signal_rrp(dst, dst_size, dst_flags) == 0) {
+        /* notify all responsible RPs for unknown  next-hop for the destination address */
+        if (fib_signal_rp(dst, dst_size, dst_flags) == 0) {
             count = 1;
             /* now lets see if the RRPs have found a valid next-hop */
             ret = fib_find_entry(dst, dst_size, &(entry[0]), &count);
@@ -429,8 +439,9 @@ void fib_init(void)
     DEBUG("[fib_init] hello. Initializing some stuff.");
     mutex_lock(&mtx_access);
 
-    for (size_t i = 0; i < FIB_MAX_RRP; ++i) {
-        notify_rrp[i] = KERNEL_PID_UNDEF;
+    for (size_t i = 0; i < FIB_MAX_REGISTERED_RP; ++i) {
+        notify_rp[i] = KERNEL_PID_UNDEF;
+        prefix_rp[i] = NULL;
     }
 
     for (size_t i = 0; i < FIB_MAX_FIB_TABLE_ENTRIES; ++i) {
@@ -452,11 +463,12 @@ void fib_deinit(void)
     DEBUG("[fib_deinit] hello. De-Initializing stuff.");
     mutex_lock(&mtx_access);
 
-    for (size_t i = 0; i < FIB_MAX_RRP; ++i) {
-        notify_rrp[i] = KERNEL_PID_UNDEF;
+    for (size_t i = 0; i < FIB_MAX_REGISTERED_RP; ++i) {
+        notify_rp[i] = KERNEL_PID_UNDEF;
+        prefix_rp[i] = NULL;
     }
 
-    notify_rrp_pos = 0;
+    notify_rp_pos = 0;
 
     for (size_t i = 0; i < FIB_MAX_FIB_TABLE_ENTRIES; ++i) {
         fib_table[i].iface_id = 0;
@@ -472,16 +484,29 @@ void fib_deinit(void)
     mutex_unlock(&mtx_access);
 }
 
-void fib_register_rrp(void)
+int fib_register_rrp(uint8_t *prefix, size_t prefix_size)
 {
     mutex_lock(&mtx_access);
 
-    if (notify_rrp_pos < FIB_MAX_RRP) {
-        notify_rrp[notify_rrp_pos] = sched_active_pid;
-        notify_rrp_pos++;
+    if (notify_rp_pos >= FIB_MAX_REGISTERED_RP) {
+        mutex_unlock(&mtx_access);
+        return -ENOMEM;
+    }
+
+    if ((prefix == NULL) || (prefix_size == 0)) {
+        mutex_unlock(&mtx_access);
+        return -EINVAL;
+    }
+
+    if (notify_rp_pos < FIB_MAX_REGISTERED_RP) {
+        notify_rp[notify_rp_pos] = sched_active_pid;
+        universal_address_container_t *container = universal_address_add(prefix, prefix_size);
+        prefix_rp[notify_rp_pos] = container;
+        notify_rp_pos++;
     }
 
     mutex_unlock(&mtx_access);
+    return 0;
 }
 
 int fib_get_num_used_entries(void)
@@ -499,12 +524,12 @@ int fib_get_num_used_entries(void)
 
 /* print functions */
 
-void fib_print_notify_rrp(void)
+void fib_print_notify_rp(void)
 {
     mutex_lock(&mtx_access);
 
-    for (size_t i = 0; i < FIB_MAX_RRP; ++i) {
-        printf("[fib_print_notify_rrp] pid[%d]: %d\n", (int)i, (int)notify_rrp[i]);
+    for (size_t i = 0; i < FIB_MAX_REGISTERED_RP; ++i) {
+        printf("[fib_print_notify_rp] pid[%d]: %d\n", (int)i, (int)notify_rp[i]);
     }
 
     mutex_unlock(&mtx_access);
