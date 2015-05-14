@@ -51,8 +51,7 @@ ng_ipv6_nc_t *ng_ipv6_nc_add(kernel_pid_t iface, const ng_ipv6_addr_t *ipv6_addr
         return NULL;
     }
 
-    if ((l2_addr_len > NG_IPV6_NC_L2_ADDR_MAX) || (iface == KERNEL_PID_UNDEF) ||
-        ng_ipv6_addr_is_unspecified(ipv6_addr)) {
+    if ((l2_addr_len > NG_IPV6_NC_L2_ADDR_MAX) || ng_ipv6_addr_is_unspecified(ipv6_addr)) {
         DEBUG("ipv6_nc: invalid parameters\n");
         return NULL;
     }

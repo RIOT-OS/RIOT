@@ -152,7 +152,6 @@ void ng_ipv6_nc_init(void);
  * @brief   Adds a neighbor to the neighbor cache
  *
  * @param[in] iface         PID to the interface where the neighbor is.
- *                          Must not be KERNEL_PID_UNDEF.
  * @param[in] ipv6_addr     IPv6 address of the neighbor. Must not be NULL.
  * @param[in] l2_addr       Link layer address of the neighbor. NULL if unknown.
  * @param[in] l2_addr_len   Length of @p l2_addr, must be lesser than or equal

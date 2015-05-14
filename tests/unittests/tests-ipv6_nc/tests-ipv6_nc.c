@@ -76,8 +76,8 @@ static void test_ipv6_nc_add__iface_KERNEL_PID_UNDEF(void)
 {
     ng_ipv6_addr_t addr = DEFAULT_TEST_IPV6_ADDR;
 
-    TEST_ASSERT_NULL(ng_ipv6_nc_add(KERNEL_PID_UNDEF, &addr, TEST_STRING4,
-                                    sizeof(TEST_STRING4), 0));
+    TEST_ASSERT_NOT_NULL(ng_ipv6_nc_add(KERNEL_PID_UNDEF, &addr, TEST_STRING4,
+                                        sizeof(TEST_STRING4), 0));
 }
 
 static void test_ipv6_nc_add__addr_unspecified(void)
