@@ -454,6 +454,7 @@ extern "C"
 #define GPIO_23_EN          1
 #define GPIO_24_EN          1
 #define GPIO_25_EN          1
+#define GPIO_26_EN          1
 #define GPIO_IRQ_PRIO       1
 
 /* GPIO channel 0 config */
@@ -716,6 +717,15 @@ extern "C"
 #define GPIO_25_IRQ         PORTC_IRQn
 #define GPIO_25_ISR         isr_portc_pin_detect
 
+/* GPIO channel 26 config */
+/* General purpose expansion PTE4 */
+#define GPIO_26_PORT        PORTE
+#define GPIO_26_PORT_BASE   PORTE_BASE
+#define GPIO_26_DEV         PTE
+#define GPIO_26_PIN         4
+#define GPIO_26_CLKEN()     (BITBAND_REG(SIM->SCGC5, SIM_SCGC5_PORTE_SHIFT) = 1)
+#define GPIO_26_IRQ         PORTE_IRQn
+#define GPIO_26_ISR         isr_porte_pin_detect
 /** @} */
 
 
