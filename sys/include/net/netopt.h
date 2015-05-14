@@ -207,6 +207,12 @@ typedef enum {
      */
     NETOPT_STATS,
 
+    /**
+     * @brief en/disable encryption.
+     */
+    NETOPT_ENCRYPTION,        /**< en/disable encryption */
+    NETOPT_ENCRYPTION_KEY,    /**< set encryption key */
+
     /* add more options if needed */
 
     /**

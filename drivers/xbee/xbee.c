@@ -456,6 +456,50 @@ static int _set_proto(xbee_t *dev, uint8_t *val, size_t len)
     return sizeof(gnrc_nettype_t);
 }
 
+#ifdef MODULE_XBEE_ENCRYPTION
+static int _set_encryption(xbee_t *dev, uint8_t *val)
+{
+    uint8_t cmd[3];
+    resp_t resp;
+    /* get the current state of Encryption */
+    cmd[0] = 'E';
+    cmd[1] = 'E';
+    _api_at_cmd(dev, cmd, 2, &resp);
+
+    /* Prevent writing the same value in EE. */
+    if (val[0] != resp.data[0] ){
+        cmd[0] = 'E';
+        cmd[1] = 'E';
+        cmd[2] = val[0];
+        _api_at_cmd(dev, cmd, 3, &resp);
+    }
+    if (resp.status == 0) {
+        return 2;
+    }
+    return -ECANCELED;
+}
+
+static int _set_encryption_key(xbee_t *dev, uint8_t *val, size_t len)
+{
+        uint8_t cmd[18];
+        resp_t resp;
+        if (len != 16) { /* the AES key is 128bit, 16 byte */
+            return  -EINVAL;
+        }
+        cmd[0] = 'K';
+        cmd[1] = 'Y';
+
+       for (int i = 0; i < 16; i++) { /* Append the key to the KY API AT command */
+           cmd[i + 2] = val[i];
+       }
+        _api_at_cmd(dev, cmd, 18, &resp);
+        if (resp.status == 0) {
+            return 2;
+        }
+        return -ECANCELED;
+}
+#endif
+
 /*
  * Driver's "public" functions
  */
@@ -758,6 +802,12 @@ static int _set(gnrc_netdev_t *netdev, netopt_t opt, void *value, size_t value_l
             return _set_panid(dev, (uint8_t *)value, value_len);
         case NETOPT_PROTO:
             return _set_proto(dev, (uint8_t *)value, value_len);
+#ifdef MODULE_XBEE_ENCRYPTION
+        case NETOPT_ENCRYPTION:
+            return _set_encryption(dev, (uint8_t *)value);
+        case NETOPT_ENCRYPTION_KEY:
+            return _set_encryption_key(dev, (uint8_t *)value, value_len);
+#endif
         default:
             return -ENOTSUP;
     }
