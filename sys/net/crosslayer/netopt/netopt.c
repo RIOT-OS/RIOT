@@ -53,6 +53,8 @@ static const char *_netopt_strmap[] = {
     [NETOPT_CHANNEL_PAGE]    = "NETOPT_CHANNEL_PAGE",
     [NETOPT_CCA_THRESHOLD]   = "NETOPT_CCA_THRESHOLD",
     [NETOPT_STATS]           = "NETOPT_STATS",
+    [NETOPT_ENCRYPTION]      = "NETOPT_ENCRYPTION",
+    [NETOPT_ENCRYPTION_KEY]  = "NETOPT_ENCRYPTION_KEY",
     [NETOPT_NUMOF]           = "NETOPT_NUMOF",
 };
 
