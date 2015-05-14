@@ -9,3 +9,10 @@ export UNDEF += $(BINDIR)kinetis_common/startup.o
 
 # add the CPU specific fault handlers for the linker
 export UNDEF += $(BINDIR)kinetis_common/fault_handlers.o
+
+# Define a recipe to build the watchdog disable binary, used when flashing
+$(RIOTCPU)/kinetis_common/dist/wdog-disable.bin: $(RIOTCPU)/kinetis_common/dist/wdog-disable.s
+	$(AD)$(MAKE) -C $(RIOTCPU)/kinetis_common/dist/ $(notdir $@)
+
+# Reset the default goal to not make wdog-disable.bin the default target.
+.DEFAULT_GOAL :=
