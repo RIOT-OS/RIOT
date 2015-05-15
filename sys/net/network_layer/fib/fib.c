@@ -484,7 +484,7 @@ void fib_deinit(void)
     mutex_unlock(&mtx_access);
 }
 
-int fib_register_rrp(uint8_t *prefix, size_t prefix_size)
+int fib_register_rp(uint8_t *prefix, size_t prefix_size)
 {
     mutex_lock(&mtx_access);
 
