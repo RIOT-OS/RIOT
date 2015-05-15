@@ -23,6 +23,7 @@
 #include "byteorder.h"
 #include "net/ng_icmpv6.h"
 #include "net/ng_ipv6/addr.h"
+#include "net/ng_ipv6/nc.h"
 #include "net/ng_ipv6/hdr.h"
 #include "net/ng_netbase.h"
 #include "thread.h"
@@ -83,6 +84,7 @@ int _handle_reply(ng_pktsnip_t *pkt, uint64_t time)
                ng_ipv6_addr_to_str(ipv6_str, &(ipv6_hdr->src), sizeof(ipv6_str)),
                byteorder_ntohs(icmpv6_hdr->id), byteorder_ntohs(icmpv6_hdr->seq),
                ipv6_hdr->hl, time / MS_IN_USEC, time % MS_IN_USEC);
+        ng_ipv6_nc_still_reachable(&ipv6_hdr->src);
     }
     else {
         puts("error: unexpected parameters");
