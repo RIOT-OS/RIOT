@@ -95,6 +95,15 @@ extern "C" {
 /** @} */
 
 /**
+ * @name RTT configuration
+ * @{
+ */
+#define RTT_FREQUENCY       (32768U)
+#define RTT_MAX_VALUE        (0xffffffffU)
+#define RTT_NUMOF           (1)
+/** @} */
+
+/**
  * @name GPIO configuration
  * @{
  */
