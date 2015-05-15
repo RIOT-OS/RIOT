@@ -35,6 +35,7 @@ extern "C" {
 #define NG_ETHERTYPE_IPV4       (0x0800)    /**< Internet protocol version 4 */
 #define NG_ETHERTYPE_ARP        (0x0806)    /**< Address resolution protocol */
 #define NG_ETHERTYPE_IPV6       (0x86dd)    /**< Internet protocol version 6 */
+#define NG_ETHERTYPE_UNKNOWN    (0xffff)    /**< Reserved (no protocol specified) */
 
 #ifdef __cplusplus
 }

@@ -130,7 +130,7 @@ static inline uint16_t ng_nettype_to_ethertype(ng_nettype_t type)
             return NG_ETHERTYPE_IPV6;
 #endif
         default:
-            return NG_ETHERTYPE_RESERVED;
+            return NG_ETHERTYPE_UNKNOWN;
     }
 }
 
