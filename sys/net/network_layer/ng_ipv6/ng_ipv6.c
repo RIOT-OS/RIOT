@@ -446,7 +446,8 @@ static void _send(ng_pktsnip_t *pkt, bool prep_hdr)
 
         next_hop = &hdr->dst;   /* TODO: next hop determination */
 
-        if ((nc_entry = ng_ipv6_nc_get_reachable(iface, next_hop)) == NULL) {
+        if (((nc_entry = ng_ipv6_nc_get(iface, next_hop)) == NULL) ||
+            !ng_ipv6_nc_is_reachable(nc_entry)) {
             DEBUG("ipv6: No link layer address for next_hop %s found.\n",
                   ng_ipv6_addr_to_str(addr_str, next_hop, sizeof(addr_str)));
             ng_pktbuf_release(pkt);
