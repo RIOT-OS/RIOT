@@ -46,6 +46,8 @@ ng_ipv6_nc_t *_find_free_entry(void)
 ng_ipv6_nc_t *ng_ipv6_nc_add(kernel_pid_t iface, const ng_ipv6_addr_t *ipv6_addr,
                              const void *l2_addr, size_t l2_addr_len, uint8_t flags)
 {
+    ng_ipv6_nc_t *free_entry = NULL;
+
     if (ipv6_addr == NULL) {
         DEBUG("ipv6_nc: address was NULL\n");
         return NULL;
@@ -75,34 +77,40 @@ ng_ipv6_nc_t *ng_ipv6_nc_add(kernel_pid_t iface, const ng_ipv6_addr_t *ipv6_addr
             return &ncache[i];
         }
 
-        if (ng_ipv6_addr_is_unspecified(&(ncache[i].ipv6_addr))) {
-            ncache[i].iface = iface;
-
-            ng_pktqueue_init(&(ncache[i].pkts));
-            memcpy(&(ncache[i].ipv6_addr), ipv6_addr, sizeof(ng_ipv6_addr_t));
-            DEBUG("ipv6_nc: Register %s for interface %" PRIkernel_pid,
-                  ng_ipv6_addr_to_str(addr_str, ipv6_addr, sizeof(addr_str)),
-                  iface);
-
-            if ((l2_addr != NULL) && (l2_addr_len > 0)) {
-                DEBUG(" to L2 address %s",
-                      ng_netif_addr_to_str(addr_str, sizeof(addr_str),
-                                           l2_addr, l2_addr_len));
-                memcpy(&(ncache[i].l2_addr), l2_addr, l2_addr_len);
-                ncache[i].l2_addr_len = l2_addr_len;
-            }
-
-            ncache[i].flags = flags;
-
-            DEBUG(" with flags = 0x%0x\n", flags);
-
-            return &ncache[i];
+        if (ng_ipv6_addr_is_unspecified(&(ncache[i].ipv6_addr)) && !free_entry) {
+            /* found the first free entry */
+            free_entry = &ncache[i];
         }
     }
 
-    DEBUG("ipv6_nc: neighbor cache full.\n");
+    if (!free_entry) {
+        /* reached end of NC without finding updateable or free entry */
+        DEBUG("ipv6_nc: neighbor cache full.\n");
+        return NULL;
+    }
 
-    return NULL;
+    /* Otherwise, fill free entry with your fresh information */
+    free_entry->iface = iface;
+
+    ng_pktqueue_init(&(free_entry->pkts));
+    memcpy(&(free_entry->ipv6_addr), ipv6_addr, sizeof(ng_ipv6_addr_t));
+    DEBUG("ipv6_nc: Register %s for interface %" PRIkernel_pid,
+          ng_ipv6_addr_to_str(addr_str, ipv6_addr, sizeof(addr_str)),
+          iface);
+
+    if ((l2_addr != NULL) && (l2_addr_len > 0)) {
+        DEBUG(" to L2 address %s",
+              ng_netif_addr_to_str(addr_str, sizeof(addr_str),
+                                   l2_addr, l2_addr_len));
+        memcpy(&(free_entry->l2_addr), l2_addr, l2_addr_len);
+        free_entry->l2_addr_len = l2_addr_len;
+    }
+
+    free_entry->flags = flags;
+
+    DEBUG(" with flags = 0x%0x\n", flags);
+
+    return free_entry;
 }
 
 void ng_ipv6_nc_remove(kernel_pid_t iface, const ng_ipv6_addr_t *ipv6_addr)

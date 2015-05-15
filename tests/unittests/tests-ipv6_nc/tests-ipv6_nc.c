@@ -123,6 +123,27 @@ static void test_ipv6_nc_add__success(void)
     TEST_ASSERT(entry1 == entry2);
 }
 
+static void test_ipv6_nc_add__address_update_despite_free_entry(void)
+{
+    ng_ipv6_addr_t default_addr = DEFAULT_TEST_IPV6_ADDR;
+    ng_ipv6_addr_t other_addr = OTHER_TEST_IPV6_ADDR;
+    ng_ipv6_nc_t *entry1, *entry2;
+
+    TEST_ASSERT_NOT_NULL(ng_ipv6_nc_add(OTHER_TEST_NETIF, &other_addr,
+                                        TEST_STRING4, sizeof(TEST_STRING4),
+                                        0));
+    TEST_ASSERT_NOT_NULL((entry1 = ng_ipv6_nc_add(DEFAULT_TEST_NETIF, &default_addr,
+                                                  TEST_STRING4, sizeof(TEST_STRING4),
+                                                  0)));
+
+    /* create space by removing first entry and see if duplicate is still detected & updated */
+    ng_ipv6_nc_remove(OTHER_TEST_NETIF, &other_addr);
+    TEST_ASSERT_NOT_NULL((entry2 = ng_ipv6_nc_add(DEFAULT_TEST_NETIF, &default_addr,
+                                                  TEST_STRING4, sizeof(TEST_STRING4),
+                                                  0)));
+    TEST_ASSERT(entry1 == entry2);
+}
+
 static void test_ipv6_nc_remove__no_entry_pid(void)
 {
     ng_ipv6_addr_t addr = DEFAULT_TEST_IPV6_ADDR;
@@ -371,6 +392,7 @@ Test *tests_ipv6_nc_tests(void)
         new_TestFixture(test_ipv6_nc_add__l2addr_too_long),
         new_TestFixture(test_ipv6_nc_add__full),
         new_TestFixture(test_ipv6_nc_add__success),
+        new_TestFixture(test_ipv6_nc_add__address_update_despite_free_entry),
         new_TestFixture(test_ipv6_nc_remove__no_entry_pid),
         new_TestFixture(test_ipv6_nc_remove__no_entry_addr1),
         new_TestFixture(test_ipv6_nc_remove__no_entry_addr2),
