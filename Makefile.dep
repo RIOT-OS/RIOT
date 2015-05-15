@@ -46,6 +46,7 @@ ifneq (,$(filter sixlowpan,$(USEMODULE)))
   USEMODULE += net_if
   USEMODULE += posix
   USEMODULE += vtimer
+  USEMODULE += fib
 endif
 
 ifneq (,$(filter ng_netif,$(USEMODULE)))
