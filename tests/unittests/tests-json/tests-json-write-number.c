@@ -30,18 +30,6 @@ void tests_json_write_zero(void)
     TEST_ASSERT(tests_json_write_cookie_is_end(&c));
 }
 
-void tests_json_write_zero64(void)
-{
-    static const char EXPECTED[] = "0";
-    tests_json_write_cookie_t c;
-    tests_json_setup_write_cookie(&c, EXPECTED, sizeof(EXPECTED) - 1);
-
-    TEST_ASSERT_EQUAL_INT(JSON_OKAY, json_write_int64(&c.cookie, 0));
-    TEST_ASSERT_EQUAL_INT(JSON_OKAY, json_write_finish(&c.cookie));
-
-    TEST_ASSERT(tests_json_write_cookie_is_end(&c));
-}
-
 void tests_json_write_pos_int(void)
 {
     static const char EXPECTED[] = "4711";
@@ -61,6 +49,19 @@ void tests_json_write_neg_int(void)
     tests_json_setup_write_cookie(&c, EXPECTED, sizeof(EXPECTED) - 1);
 
     TEST_ASSERT_EQUAL_INT(JSON_OKAY, json_write_int(&c.cookie, -4711));
+    TEST_ASSERT_EQUAL_INT(JSON_OKAY, json_write_finish(&c.cookie));
+
+    TEST_ASSERT(tests_json_write_cookie_is_end(&c));
+}
+
+#ifndef MODULE_ATMEGA_COMMON
+void tests_json_write_zero64(void)
+{
+    static const char EXPECTED[] = "0";
+    tests_json_write_cookie_t c;
+    tests_json_setup_write_cookie(&c, EXPECTED, sizeof(EXPECTED) - 1);
+
+    TEST_ASSERT_EQUAL_INT(JSON_OKAY, json_write_int64(&c.cookie, 0));
     TEST_ASSERT_EQUAL_INT(JSON_OKAY, json_write_finish(&c.cookie));
 
     TEST_ASSERT(tests_json_write_cookie_is_end(&c));
@@ -89,6 +90,7 @@ void tests_json_write_neg_int64(void)
 
     TEST_ASSERT(tests_json_write_cookie_is_end(&c));
 }
+#endif /*ifndef MODULE_ATMEGA_COMMON*/
 
 void tests_json_write_zero_float(void)
 {

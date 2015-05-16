@@ -116,8 +116,10 @@ static void _test_number_int_(const char *str, size_t len, int64_t expected_valu
     TEST_ASSERT_EQUAL_INT(JSON_OKAY, json_number_type(buffer, len, &num_type));
     TEST_ASSERT_EQUAL_INT(expected_type, num_type);
 
+#ifndef MODULE_ATMEGA_COMMON
     TEST_ASSERT_EQUAL_INT(expected_value, json_number_to_int(str, len));
     TEST_ASSERT_EQUAL_INT(expected_value, json_number_to_int(buffer, 0));
+#endif /*ifndef MODULE_ATMEGA_COMMON*/
 
     *okay = true;
 }
@@ -134,6 +136,7 @@ static inline void _test_number_int(const char *str, size_t len,
     _test_number_int_(str, len, expected_value, okay, JSON_NUMBER_INTEGER);
 }
 
+#ifndef MODULE_ATMEGA_COMMON
 static void _assert_float(float expected, float actual, bool *okay)
 {
     float diff = expected - actual;
@@ -148,6 +151,7 @@ static void _assert_float(float expected, float actual, bool *okay)
         TEST_FAIL(err);
     }
 }
+#endif /*ifndef MODULE_ATMEGA_COMMON*/
 
 static void _test_number_float(const char *str, size_t len, float expected, bool *okay)
 {
@@ -175,12 +179,14 @@ static void _test_number_float(const char *str, size_t len, float expected, bool
     TEST_ASSERT_EQUAL_INT(JSON_OKAY, json_number_type(buffer, len, &num_type));
     TEST_ASSERT_EQUAL_INT(JSON_NUMBER_FLOAT, num_type);
 
+#ifndef MODULE_ATMEGA_COMMON
     _assert_float(expected, json_number_to_float(str, len), okay);
-    if (!okay) {
+    if (!*okay) {
         return;
     }
 
     _assert_float(expected, json_number_to_float(buffer, 0), okay);
+#endif /*ifndef MODULE_ATMEGA_COMMON*/
 }
 
 #define TEST_NUMBER(TYPE, TOKEN)                                              \
