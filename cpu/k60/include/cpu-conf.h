@@ -121,8 +121,8 @@ extern "C"
  * @{
  */
 #define LPTIMER_DEV                      (LPTMR0) /**< LPTIMER hardware module */
-#define LPTIMER_CLKEN()                  (BITBAND_REG(SIM->SCGC5, SIM_SCGC5_LPTIMER_SHIFT) = 1)    /**< Enable LPTMR0 clock gate */
-#define LPTIMER_CLKDIS()                 (BITBAND_REG(SIM->SCGC5, SIM_SCGC5_LPTIMER_SHIFT) = 0)    /**< Disable LPTMR0 clock gate */
+#define LPTIMER_CLKEN()                  (BITBAND_REG32(SIM->SCGC5, SIM_SCGC5_LPTIMER_SHIFT) = 1)    /**< Enable LPTMR0 clock gate */
+#define LPTIMER_CLKDIS()                 (BITBAND_REG32(SIM->SCGC5, SIM_SCGC5_LPTIMER_SHIFT) = 0)    /**< Disable LPTMR0 clock gate */
 #define LPTIMER_CLKSRC_MCGIRCLK          0    /**< internal reference clock (4MHz) */
 #define LPTIMER_CLKSRC_LPO               1    /**< PMC 1kHz output */
 #define LPTIMER_CLKSRC_ERCLK32K          2    /**< RTC clock 32768Hz */
@@ -213,7 +213,7 @@ extern "C"
 /**
  * @brief Enable clock gate on LLWU module.
  */
-#define LLWU_UNLOCK() (BITBAND_REG(SIM->SCGC4, SIM_SCGC4_LLWU_SHIFT) = 1)
+#define LLWU_UNLOCK() (BITBAND_REG32(SIM->SCGC4, SIM_SCGC4_LLWU_SHIFT) = 1)
 
 /**
  * @brief Internal modules whose interrupts are mapped to LLWU wake up sources.
@@ -308,21 +308,6 @@ typedef enum llwu_wakeup_pin {
  * @note var must be declared 'volatile'
  */
 #define BITBAND_VAR8(var, bit) (*((uint8_t volatile*) BITBAND_ADDR(&(var), (bit))))
-
-/**
- * @brief Bitband 32 bit access to peripheral register
- */
-#define BITBAND_PERIPH32(reg, bit) (*((uint32_t volatile*) BITBAND_ADDR(&(reg), (bit))))
-
-/**
- * @brief Bitband 16 bit access to peripheral register
- */
-#define BITBAND_PERIPH16(reg, bit) (*((uint16_t volatile*) BITBAND_ADDR(&(reg), (bit))))
-
-/**
- * @brief Bitband 8 bit access to peripheral register
- */
-#define BITBAND_PERIPH8(reg, bit) (*((uint8_t volatile*) BITBAND_ADDR(&(reg), (bit))))
 
 /** @} */
 #ifdef __cplusplus

@@ -68,14 +68,16 @@
 **         Update of startup files - possibility to override DefaultISR added.
 **     - rev. 1.8 (2014-10-14)
 **         Renamed interrupt vector Watchdog to WDOG_EWM and LPTimer to LPTMR0
+**     - rev. 1.8-jg (2015-05-18)
+**         Removed BITBAND_REG macro.
 **
 ** ###################################################################
 */
 
 /*!
  * @file MK60D10.h
- * @version 1.8
- * @date 2014-10-14
+ * @version 1.8-jg
+ * @date 2015-05-18
  * @brief CMSIS Peripheral Access Layer for MK60D10
  *
  * CMSIS Peripheral Access Layer for MK60D10
@@ -127,7 +129,6 @@ extern "C"
  * @return Value of the targeted bit in the bit band region.
  */
 #define BITBAND_REG32(Reg,Bit) (*((uint32_t volatile*)(BITBAND_REGADDR(Reg,Bit))))
-#define BITBAND_REG(Reg,Bit) (BITBAND_REG32(Reg,Bit))
 /**
  * @brief Macro to access a single bit of a peripheral register (bit band region
  *        0x40000000 to 0x400FFFFF) using the bit-band alias region access. Can

@@ -46,6 +46,7 @@
 **         Gap between end of interrupt vector table and flash configuration field filled by default ISR.
 **     - rev. 1.2-jg (2015-05-18)
 **         Added BITBAND_REG32, BITBAND_REG16, BITBAND_REG8, BITBAND_REGADDR macros from MK60D10.h.
+**         Removed BITBAND_REG macro.
 **
 ** ###################################################################
 */
@@ -88,7 +89,6 @@ extern "C"
  * @return Value of the targeted bit in the bit band region.
  */
 #define BITBAND_REG32(Reg,Bit) (*((uint32_t volatile*)(BITBAND_REGADDR(Reg,Bit))))
-#define BITBAND_REG(Reg,Bit) (BITBAND_REG32(Reg,Bit))
 /**
  * @brief Macro to access a single bit of a peripheral register (bit band region
  *        0x40000000 to 0x400FFFFF) using the bit-band alias region access. Can
