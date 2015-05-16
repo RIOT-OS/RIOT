@@ -44,14 +44,16 @@
 **     - rev. 1.2 (2011-09-08)
 **         Cortex_Core_Configuration extended with additional parameters.
 **         Gap between end of interrupt vector table and flash configuration field filled by default ISR.
+**     - rev. 1.2-jg (2015-05-18)
+**         Added BITBAND_REG32, BITBAND_REG16, BITBAND_REG8, BITBAND_REGADDR macros from MK60D10.h.
 **
 ** ###################################################################
 */
 
 /**
  * @file MK60DZ10.h
- * @version 1.2
- * @date 2011-09-08
+ * @version 1.2-jg
+ * @date 2015-05-18
  * @brief CMSIS Peripheral Access Layer for MK60DZ10
  *
  * CMSIS Peripheral Access Layer for MK60DZ10
@@ -69,13 +71,42 @@ extern "C"
 #define MCU_MEM_MAP_VERSION 0x0102u
 
 /**
+ * @brief Macro to calculate address of an aliased word in the peripheral
+ *        bitband area for a peripheral register and bit (bit band region 0x40000000 to
+ *        0x400FFFFF).
+ * @param Reg Register to access.
+ * @param Bit Bit number to access.
+ * @return  Address of the aliased word in the peripheral bitband area.
+ */
+#define BITBAND_REGADDR(Reg,Bit) (0x42000000u + (32u*((uint32_t)&(Reg) - (uint32_t)0x40000000u)) + (4u*((uint32_t)(Bit))))
+/**
  * @brief Macro to access a single bit of a peripheral register (bit band region
- *        0x40000000 to 0x400FFFFF) using the bit-band alias region access.
+ *        0x40000000 to 0x400FFFFF) using the bit-band alias region access. Can
+ *        be used for peripherals with 32bit access allowed.
  * @param Reg Register to access.
  * @param Bit Bit number to access.
  * @return Value of the targeted bit in the bit band region.
  */
-#define BITBAND_REG(Reg,Bit) (*((uint32_t volatile*)(0x42000000u + (32u*((uint32_t)&(Reg) - (uint32_t)0x40000000u)) + (4u*((uint32_t)(Bit))))))
+#define BITBAND_REG32(Reg,Bit) (*((uint32_t volatile*)(BITBAND_REGADDR(Reg,Bit))))
+#define BITBAND_REG(Reg,Bit) (BITBAND_REG32(Reg,Bit))
+/**
+ * @brief Macro to access a single bit of a peripheral register (bit band region
+ *        0x40000000 to 0x400FFFFF) using the bit-band alias region access. Can
+ *        be used for peripherals with 16bit access allowed.
+ * @param Reg Register to access.
+ * @param Bit Bit number to access.
+ * @return Value of the targeted bit in the bit band region.
+ */
+#define BITBAND_REG16(Reg,Bit) (*((uint16_t volatile*)(BITBAND_REGADDR(Reg,Bit))))
+/**
+ * @brief Macro to access a single bit of a peripheral register (bit band region
+ *        0x40000000 to 0x400FFFFF) using the bit-band alias region access. Can
+ *        be used for peripherals with 8bit access allowed.
+ * @param Reg Register to access.
+ * @param Bit Bit number to access.
+ * @return Value of the targeted bit in the bit band region.
+ */
+#define BITBAND_REG8(Reg,Bit) (*((uint8_t volatile*)(BITBAND_REGADDR(Reg,Bit))))
 
 /* ----------------------------------------------------------------------------
    -- Interrupt vector numbers
