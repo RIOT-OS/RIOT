@@ -159,8 +159,9 @@ static int _msg_send(msg_t *m, kernel_pid_t target_pid, bool block, unsigned sta
         *target_message = *m;
         sched_set_status(target, STATUS_PENDING);
 
+        uint16_t target_prio = target->priority;
         restoreIRQ(state);
-        thread_yield_higher();
+        sched_switch(target_prio);
     }
 
     return 1;
@@ -217,10 +218,17 @@ int msg_send_receive(msg_t *m, msg_t *reply, kernel_pid_t target_pid)
     unsigned state = disableIRQ();
     tcb_t *me = (tcb_t*) sched_threads[sched_active_pid];
     sched_set_status(me, STATUS_REPLY_BLOCKED);
-    me->wait_data = (void*) reply;
+
+    /* _msg_send() corrupts the data pointed to by me->wait_data if the reeciver
+     * is not write blocked, and has no space in the message queue.*/
+    msg_t in_out = *m;
+    me->wait_data = &in_out;
 
     /* msg_send blocks until reply received */
-    return _msg_send(m, target_pid, true, state);
+    int result = _msg_send(&in_out, target_pid, true, state);
+
+    *reply = in_out;
+    return result;
 }
 
 int msg_reply(msg_t *m, msg_t *reply)
