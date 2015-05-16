@@ -29,6 +29,7 @@
 #include "kernel_types.h"
 #include "mutex.h"
 #include "net/ng_ipv6/addr.h"
+#include "vtimer.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -79,6 +80,24 @@ extern "C" {
  */
 #define NG_IPV6_NETIF_ADDR_FLAGS_UNICAST        (0x00)  /**< unicast address */
 #define NG_IPV6_NETIF_ADDR_FLAGS_NON_UNICAST    (0x01)  /**< non-unicast address */
+
+/**
+ * @brief   A prefix information option that propagates the prefix of this
+ *          address should set the autonomous flag.
+ * @see     <a href="https://tools.ietf.org/html/rfc4861#section-6.2.1">
+ *              RFC 4861, section 6.2.1
+ *          </a>
+ */
+#define NG_IPV6_NETIF_ADDR_FLAGS_NDP_AUTO       (0x40)
+
+/**
+ * @brief   A prefix information option that propagates the prefix of this
+ *          address should set the on-link flag.
+ * @see     <a href="https://tools.ietf.org/html/rfc4861#section-6.2.1">
+ *              RFC 4861, section 6.2.1
+ *          </a>
+ */
+#define NG_IPV6_NETIF_ADDR_FLAGS_NDP_ON_LINK    (0x80)
 /**
  * @}
  */
@@ -87,7 +106,45 @@ extern "C" {
  * @{
  * @name Flags for the interfaces
  */
-#define NG_IPV6_NETIF_FLAGS_SIXLOWPAN   (0x01)  /**< interface is 6LoWPAN interface */
+/**
+ * @brief   Interface is 6LoWPAN interface.
+ */
+#define NG_IPV6_NETIF_FLAGS_SIXLOWPAN           (0x0001)
+
+/**
+ * @brief   Flag to indicate that routing is enabled on the interface.
+ */
+#define NG_IPV6_NETIF_FLAGS_ROUTER              (0x0002)
+
+/**
+ * @brief   Flag to indicate that the interface sends periodic router
+ *          advertisements and in response to router solicitations.
+ */
+#define NG_IPV6_NETIF_FLAGS_RTR_ADV             (0x0004)
+
+/**
+ * @brief   Flag to indicate that ng_ipv6_netif_t::mtu shall be propagated
+ *          with the MTU options in router advertisements.
+ */
+#define NG_IPV6_NETIF_FLAGS_ADV_MTU             (0x0008)
+
+/**
+ * @brief   Flag to indicate that ng_ipv6_netif_t::cur_hl shall be propagated
+ *          in router advertisements.
+ */
+#define NG_IPV6_NETIF_FLAGS_ADV_CUR_HL          (0x0010)
+
+/**
+ * @brief   Flag to indicate that the interface has other address
+ *          configuration.
+ */
+#define NG_IPV6_NETIF_FLAGS_OTHER_CONF          (0x4000)
+
+/**
+ * @brief   Flag to indicate that the interface has managed address
+ *          configuration (e.g. via DHCPv6).
+ */
+#define NG_IPV6_NETIF_FLAGS_MANAGED             (0x8000)
 /**
  * @}
  */
@@ -99,6 +156,32 @@ typedef struct {
     ng_ipv6_addr_t addr;    /**< The address data */
     uint8_t flags;          /**< flags */
     uint8_t prefix_len;     /**< length of the prefix of the address */
+    /**
+     * @{
+     * @name    Neigbour discovery variables for prefixes
+     * @see     <a href="https://tools.ietf.org/html/rfc4861#section-6.2.1">
+     *              RFC 4861, section 6.2.1
+     *          </a>
+     */
+    /**
+     * @brief   The time in seconds this address is valid. If it is UINT32_MAX
+     *          the lifetime is infinite.
+     */
+    uint32_t valid;
+
+    /**
+     * @brief   The length of time that this address remains preferred.
+     *          If it is UINT32_MAX the lifetime is infinite.
+     *          It **must** be < ng_ipv6_netif_addr_t::valid.
+     */
+    uint32_t preferred;
+    /**
+     * @brief   Validity timeout timer.
+     */
+    vtimer_t valid_timeout;
+    /**
+     * @}
+     */
 } ng_ipv6_netif_addr_t;
 
 /**
@@ -111,7 +194,7 @@ typedef struct {
     kernel_pid_t pid;       /**< PID of the interface */
     uint16_t mtu;           /**< Maximum Transmission Unit (MTU) of the interface */
     uint8_t cur_hl;         /**< current hop limit for the interface */
-    uint8_t flags;          /**< flags for 6LoWPAN and Neighbor Discovery */
+    uint16_t flags;         /**< flags for 6LoWPAN and Neighbor Discovery */
 } ng_ipv6_netif_t;
 
 /**
@@ -154,28 +237,29 @@ ng_ipv6_netif_t *ng_ipv6_netif_get(kernel_pid_t pid);
  * @param[in] addr          An address you want to add to the interface.
  * @param[in] prefix_len    Length of the prefix of the address.
  *                          Must be between 1 and 128.
- * @param[in] anycast       If @p addr should be an anycast address, @p anycast
- *                          must be true. Otherwise set it false.
- *                          If @p addr is a multicast address, @p anycast will be
- *                          ignored.
+ * @param[in] flags         Flags for the address entry
+ *                          If @p addr should be an anycast address, @p flags
+ *                          must have @ref NG_IPV6_NETIF_ADDR_FLAGS_NON_UNICAST
+ *                          set. Otherwise leave it unset.
+ *                          If @p addr is a multicast address, the status of
+ *                          @ref NG_IPV6_NETIF_ADDR_FLAGS_NON_UNICAST will be
+ *                          ignored and set in either case.
  *
  * @see <a href="https://tools.ietf.org/html/rfc4291#section-2.6">
  *          RFC 4291, section 2.6
  *      </a>
  *
- * @return  0, on success.
- * @return  -EINVAL, if @p addr is NULL or unspecified address or if
- *          @p prefix length was < 1 or > 128.
- * @return  -ENOENT, if @p pid is no interface.
- * @return  -ENOMEM, if there is no space left to store @p addr.
+ * @return  The address on the interface, on success.
+ * @return  NULL, on failure
  */
-int ng_ipv6_netif_add_addr(kernel_pid_t pid, const ng_ipv6_addr_t *addr,
-                           uint8_t prefix_len, bool anycast);
+ng_ipv6_addr_t *ng_ipv6_netif_add_addr(kernel_pid_t pid, const ng_ipv6_addr_t *addr,
+                                       uint8_t prefix_len, uint8_t flags);
 
 /**
  * @brief   Remove an address from the interface.
  *
- * @param[in] pid       The PID to the interface.
+ * @param[in] pid       The PID to the interface. If @p pid is KERNEL_PID_UNDEF
+ *                      it will be removed from all interfaces.
  * @param[in] addr      An address you want to remove from interface.
  */
 void ng_ipv6_netif_remove_addr(kernel_pid_t pid, ng_ipv6_addr_t *addr);
@@ -255,11 +339,36 @@ ng_ipv6_addr_t *ng_ipv6_netif_match_prefix(kernel_pid_t pid,
 ng_ipv6_addr_t *ng_ipv6_netif_find_best_src_addr(kernel_pid_t pid, const ng_ipv6_addr_t *dest);
 
 /**
+ * @brief   Get interface specific meta-information on an address
+ *
+ * @details This only works with addresses you retrieved via the following
+ *          functions:
+ *
+ * * ng_ipv6_netif_add_addr()
+ * * ng_ipv6_find_addr()
+ * * ng_ipv6_find_addr_local()
+ * * ng_ipv6_find_prefix_match()
+ * * ng_ipv6_find_prefix_match_local()
+ * * ng_ipv6_find_best_src_address()
+ *
+ * The behaviour for other addresses is undefined.
+ *
+ * @param[in] addr  The address you want to get the meta-information for.
+ *
+ * @return  Interface specific meta-information on @p addr
+ */
+static inline ng_ipv6_netif_addr_t *ng_ipv6_netif_addr_get(const ng_ipv6_addr_t *addr)
+{
+    return container_of(addr, ng_ipv6_netif_addr_t, addr);
+}
+
+/**
  * @brief   Checks if an address is non-unicast.
  *
  * @details This only works with addresses you retrieved via the following
  *          functions:
  *
+ * * ng_ipv6_netif_add_addr()
  * * ng_ipv6_find_addr()
  * * ng_ipv6_find_addr_local()
  * * ng_ipv6_find_prefix_match()
