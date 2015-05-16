@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    driver_isl29125 ISL29125 light sensor
+ * @defgroup    driver_isl29125 ISL29125 RGB light sensor
  * @ingroup     drivers
  * @brief       Device driver for the ISL29125 RGB light sensor
  *
