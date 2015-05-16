@@ -144,6 +144,7 @@ ng_pktsnip_t *ng_icmpv6_build(ng_pktsnip_t *next, uint8_t type, uint8_t code,
     icmpv6 = (ng_icmpv6_hdr_t *)pkt->data;
     icmpv6->type = type;
     icmpv6->code = code;
+    icmpv6->csum.u16 = 0;
 
     return pkt;
 }
