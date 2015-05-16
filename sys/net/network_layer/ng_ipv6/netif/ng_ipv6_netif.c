@@ -46,8 +46,7 @@ static int _add_addr_to_entry(ng_ipv6_netif_t *entry, const ng_ipv6_addr_t *addr
         if (ng_ipv6_addr_is_unspecified(&(entry->addrs[i].addr))) {
             memcpy(&(entry->addrs[i].addr), addr, sizeof(ng_ipv6_addr_t));
             DEBUG("Added %s/%" PRIu8 " to interface %" PRIkernel_pid "\n",
-                  ng_ipv6_addr_to_str(&(entry->addrs[i].addr), addr,
-                                      sizeof(addr_str)),
+                  ng_ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)),
                   prefix_len, entry->pid);
 
             if (anycast || ng_ipv6_addr_is_multicast(addr)) {
