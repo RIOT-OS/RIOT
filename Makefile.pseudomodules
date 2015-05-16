@@ -1,8 +1,11 @@
 PSEUDOMODULES += defaulttransceiver
 PSEUDOMODULES += transport_layer
+PSEUDOMODULES += ng_ipv6_default
 PSEUDOMODULES += ng_ipv6_router
+PSEUDOMODULES += ng_ipv6_router_default
 PSEUDOMODULES += pktqueue
 PSEUDOMODULES += ng_netbase
+PSEUDOMODULES += ng_sixlowpan_default
 
 # include variants of the AT86RF2xx drivers as pseudo modules
 PSEUDOMODULES += ng_at86rf23%
