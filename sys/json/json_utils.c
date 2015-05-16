@@ -132,6 +132,7 @@ json_result_t json_codepoint_to_utf8(uint32_t codepoint, char *output, size_t *l
     return JSON_OKAY;
 }
 
+#ifndef MODULE_ATMEGA_COMMON
 int64_t json_number_to_int(const char *str, size_t len)
 {
     char s[len + 1];
@@ -153,3 +154,4 @@ float json_number_to_float(const char *str, size_t len)
     }
     return strtof(str, NULL);
 }
+#endif /*ifndef MODULE_ATMEGA_COMMON*/

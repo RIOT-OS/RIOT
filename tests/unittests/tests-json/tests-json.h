@@ -140,13 +140,19 @@ static inline bool tests_json_write_cookie_is_end(const tests_json_write_cookie_
         write_empty_string,                                                   \
         write_empty_string_bits
 
+#ifndef MODULE_ATMEGA_COMMON
+#   define IFNOT_ATMEGA(X) X,
+#else
+#   define IFNOT_ATMEGA(X)
+#endif
+
 #define TESTS_JSON_WRITE_NUMBER                                               \
         write_zero,                                                           \
-        write_zero64,                                                         \
         write_pos_int,                                                        \
         write_neg_int,                                                        \
-        write_pos_int64,                                                      \
-        write_neg_int64,                                                      \
+        IFNOT_ATMEGA(write_zero64)                                            \
+        IFNOT_ATMEGA(write_pos_int64)                                         \
+        IFNOT_ATMEGA(write_neg_int64)                                         \
         write_zero_float,                                                     \
         write_pos_float,                                                      \
         write_neg_float
