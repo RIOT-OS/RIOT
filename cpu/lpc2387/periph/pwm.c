@@ -82,7 +82,7 @@ int pwm_init(pwm_t dev, pwm_mode_t mode, unsigned int frequency, unsigned int re
 #endif
     }
 
-    return 0;
+    return frequency;
 }
 
 int pwm_set(pwm_t dev, int channel, unsigned int value)
