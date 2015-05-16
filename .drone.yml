@@ -1,0 +1,19 @@
+image: riot/riotbuild:latest
+
+env:
+    - NPROC_MAX=8
+
+script:
+    - git config --global user.email "drone@example.com"
+    - git config --global user.name "Drone CI"
+    - git remote add riot https://github.com/RIOT-OS/RIOT.git
+    - git fetch riot master
+    - git log -1 --pretty=format:%H riot/master
+    - git branch -f master riot/master
+    - pwd
+    - set
+    - git status
+    - git branch
+    - git remote -v
+    - git branch -avv
+    - ./dist/tools/drone-scripts/build_and_test.sh riot/master
