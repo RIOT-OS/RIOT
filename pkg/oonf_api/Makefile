@@ -1,5 +1,5 @@
 PKG_NAME=oonf_api
-PKG_URL=git://olsr.org/oonf_api.git
+PKG_URL=git://olsr.org/oonf.git
 PKG_VERSION=v0.3.0
 
 ifneq ($(RIOTBOARD),)
