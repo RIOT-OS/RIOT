@@ -48,16 +48,15 @@ int main(void)
     int step = STEP;
 
     puts("\nRIOT PWM test");
-    puts("Connect an LED or scope to PWM pins to see something\n");
+    puts("Connect an LED or scope to PWM pins to see something");
 
     res = pwm_init(DEV, MODE, FREQU, STEPS);
-    if (res == 0) {
-        puts("PWM successfully initialized.\n");
-    }
-    else {
+    if (res < 0) {
         puts("Errors while initializing PWM");
         return -1;
     }
+    puts("PWM initialized.");
+    printf("requested: %d Hz, got %d Hz\n", FREQU, res);
 
     while (1) {
         for (int i = 0; i < CHANNELS; i++) {
