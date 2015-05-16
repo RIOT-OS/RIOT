@@ -34,7 +34,7 @@ ng_pktsnip_t *ng_icmpv6_echo_build(uint8_t type, uint16_t id, uint16_t seq,
     DEBUG("icmpv6_echo: Building echo message with type=%" PRIu8 "id=%" PRIu16
           ", seq=%" PRIu16, type, id, seq);
     echo = (ng_icmpv6_echo_t *)pkt->data;
-    echo->id = byteorder_htons(id >> 16);
+    echo->id = byteorder_htons(id);
     echo->seq = byteorder_htons(seq);
 
     if (data != NULL) {
