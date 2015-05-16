@@ -1846,7 +1846,7 @@ ndp_prefix_info_t *ndp_prefix_info_search(int if_id, const ipv6_addr_t *addr,
                 }
             }
 
-            if (prefix->prefix_len == 0 && match > best_match) {
+            if ((prefix->prefix_len != 0) && (match > best_match)) {
                 tmp = prefix;
                 best_match = match;
             }
