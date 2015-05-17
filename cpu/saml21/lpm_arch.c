@@ -18,16 +18,58 @@
  * @}
  */
 
+#include <stdio.h>
+
 #include "arch/lpm_arch.h"
+#include "cpu.h"
+#include "kernel.h"
+
+#define ENABLE_DEBUG 0
+#include "debug.h"
 
 void lpm_arch_init(void)
 {
-    // TODO
+    MCLK->APBAMASK.reg |= MCLK_APBAMASK_PM;
+    PM->CTRLA.reg = PM_CTRLA_MASK & (~PM_CTRLA_IORET);
+
+    SUPC->BOD33.bit.ENABLE=0;
+
+    lpm_prevent_sleep = 1;
 }
 
 enum lpm_mode lpm_arch_set(enum lpm_mode target)
 {
-    // TODO
+    uint32_t mode;
+    switch(target) {
+        case LPM_IDLE:
+            DEBUG("lpm_arch_set(): setting IDLE mode.\n");
+            mode = PM_SLEEPCFG_SLEEPMODE_IDLE2;
+            break;
+        case LPM_SLEEP:
+            DEBUG("lpm_arch_set(): setting STANDBY mode.\n");
+            mode = PM_SLEEPCFG_SLEEPMODE_STANDBY;
+            break;
+        case LPM_POWERDOWN:
+            DEBUG("lpm_arch_set(): setting BACKUP mode.\n");
+            mode = PM_SLEEPCFG_SLEEPMODE_BACKUP;
+            break;
+        default:
+            DEBUG("lpm_arch_set(): unhandled low-power mode.\n");
+            return 0;
+    }
+
+    /* write sleep configuration */
+    PM->SLEEPCFG.bit.SLEEPMODE = mode;
+
+    /* make sure value has been set */
+    while (PM->SLEEPCFG.bit.SLEEPMODE != mode);
+
+    /* ensure all memory accesses have completed */
+    __DSB();
+
+    /* go to sleep mode (issue wait-for-interrupt instruction) */
+    __WFI();
+
     return 0;
 }
 

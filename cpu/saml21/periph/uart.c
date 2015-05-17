@@ -123,7 +123,7 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
                                     | SERCOM_USART_CTRLA_RXPO(0x1) \
                                     | SERCOM_USART_CTRLA_SAMPR(0x0) \
                                     | SERCOM_USART_CTRLA_MODE(0x1) \
-                                    | SERCOM_USART_CTRLA_RUNSTDBY;
+                                    | (UART_0_RUNSTDBY ? SERCOM_USART_CTRLA_RUNSTDBY : 0);
 
             /* Set baud rate */
             UART_0_DEV.BAUD.bit.BAUD = baud_calculated;
