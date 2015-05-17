@@ -298,6 +298,7 @@ ifneq (, $(filter all, $(if $(MAKECMDGOALS), $(MAKECMDGOALS), all)))
   ifneq (, $(filter $(DISABLE_MODULE), $(USEMODULE)))
     $(shell $(COLOR_ECHO) "$(COLOR_RED)Required modules were disabled using DISABLE_MODULE:$(COLOR_RESET)"\
                           "$(sort $(filter $(DISABLE_MODULE), $(USEMODULE)))" 1>&2)
+    USEMODULE := $(filter-out $(DISABLE_MODULE), $(USEMODULE))
     EXPECT_ERRORS := 1
   endif
 
