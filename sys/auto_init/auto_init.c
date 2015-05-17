@@ -308,7 +308,8 @@ void auto_init(void)
 #endif
 
 
-    /* initialize network devices */
+/* initialize network devices */
+#ifdef MODULE_AUTO_INIT_NG_NETIF
 
 #ifdef MODULE_NG_AT86RF2XX
     extern void auto_init_ng_at86rf2xx(void);
@@ -319,4 +320,6 @@ void auto_init(void)
     extern void auto_init_xbee(void);
     auto_init_xbee();
 #endif
+
+#endif /* MODULE_AUTO_INIT_NG_NETIF */
 }
