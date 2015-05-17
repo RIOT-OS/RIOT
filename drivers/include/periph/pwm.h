@@ -76,7 +76,7 @@ typedef enum {
  * @param[in] frequency     the PWM frequency in Hz
  * @param[in] resolution    the PWM resolution
  *
- * @return                  0 on success
+ * @return                  Actual PWM frequency on success
  * @return                  -1 on mode not applicable
  * @return                  -2 on frequency and resolution not applicable
  */
