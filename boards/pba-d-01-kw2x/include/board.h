@@ -91,6 +91,17 @@ extern "C"
 typedef uint8_t radio_packet_length_t;
 
 /**
+@name KW2XRF configuration
+@{
+*/
+#define KW2XRF_SPI        (SPI_1)
+#define KW2XRF_CS         (GPIO_24)
+#define KW2XRF_INT        (GPIO_23)
+#define KW2XRF_SPI_SPEED  (SPI_SPEED_10MHZ)
+#define KW2XRF_SHARED_SPI 0
+/** @}*/
+
+/**
  * @brief Initialize board specific hardware, including clock, LEDs and std-IO
  */
 void board_init(void);

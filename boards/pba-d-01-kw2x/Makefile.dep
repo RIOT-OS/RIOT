@@ -1,0 +1,4 @@
+ifneq (,$(filter ng_netif,$(USEMODULE)))
+  USEMODULE += kw2xrf
+  USEMODULE += ng_nomac
+endif

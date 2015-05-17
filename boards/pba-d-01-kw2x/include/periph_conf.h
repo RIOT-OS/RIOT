@@ -539,16 +539,6 @@ extern "C"
 
 /** @} */
 
-/**
- * @name Radio configuration (kw2xrf)
- * @{
- */
-#define KW2XRF_SHARED_SPI       0
-#define KW2XRF_SPI              SPI_1
-#define KW2XRF_SPI_SPEED        SPI_SPEED_10MHZ
-
-/** @} */
-
 #ifdef __cplusplus
 }
 #endif

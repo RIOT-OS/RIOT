@@ -6,23 +6,23 @@ FEATURES_REQUIRED = periph_spi periph_gpio
 BOARD_INSUFFICIENT_RAM := stm32f0discovery
 
 ifneq (,$(filter pba-d-01-kw2x,$(BOARD)))
-  export KWRF_SPI ?= SPI_1
-  export KWRF_CS ?= GPIO_24
-  export KWRF_INT ?= GPIO_23
-  export KWRF_SPI_SPEED ?= SPI_SPEED_10MHZ
-  export KW2XRF_SHARED_SPI ?= 0
+  DRIVER ?= kw2xrf
+  USE_BOARD_PARAMETERS:=true
 endif
 
-USEMODULE += ng_netif
-USEMODULE += ng_nomac
-USEMODULE += ng_pktdump
-USEMODULE += uart0
-USEMODULE += shell
-USEMODULE += shell_commands
-USEMODULE += ps
-USEMODULE += kw2xrf
+ifneq (,$(DRIVER))
+  USEMODULE += $(DRIVER)
+else
+  # default to kw2xrf
+  USEMODULE += kw2xrf
+endif
 
-CFLAGS += -DDEVELHELP
+ifneq (true,$(USE_BOARD_PARAMETERS))
+  # This adds . to include path so generic kw2xrf_params.h gets picked
+  # up.  All boards actually having such a device on board should define
+  # USE_BOARD_PARAMETERS=true above to skip this step, as the board provides
+  # this header.
+  CFLAGS += -I$(CURDIR)
 
 ifneq (,$(KWRF_SHARED_SPI))
   CFLAGS += -DKW2XRF_SHARED_SPI=$(DKW2XRF_SHARED_SPI)
@@ -42,10 +42,23 @@ endif
 ifneq (,$(KWRF_INT))
   CFLAGS += -DKWRF_INT=$(KWRF_INT)
 else
-  CFLAGS += -DKWRF_INT=GPIO_1        # set default
+  CFLAGS += -DKWRF_INT=GPIO_1       # set default
 endif
 ifneq (,$(KWRF_SPI_SPEED))
   CFLAGS += -DKWRF_SPI_SPEED=$(KWRF_SPI_SPEED)
 endif
+
+endif # USE_BOARD_PARAMETERS=false
+
+USEMODULE += auto_init_ng_netif
+USEMODULE += ng_netif
+USEMODULE += ng_nomac
+USEMODULE += ng_pktdump
+USEMODULE += uart0
+USEMODULE += shell
+USEMODULE += shell_commands
+USEMODULE += ps
+
+CFLAGS += -DDEVELHELP
 
 include $(RIOTBASE)/Makefile.include

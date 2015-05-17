@@ -135,6 +135,16 @@ int kw2xrf_init(kw2xrf_t *dev, spi_t spi, spi_speed_t spi_speed,
                     gpio_t cs_pin, gpio_t int_pin);
 
 /**
+ * @brief struct holding all params needed for device initialization
+ */
+typedef struct kw2xrf_params {
+    spi_t spi;              /**< SPI bus the device is connected to */
+    spi_speed_t spi_speed;  /**< SPI speed to use */
+    gpio_t cs_pin;          /**< GPIO pin connected to chip select */
+    gpio_t int_pin;         /**< GPIO pin connected to the interrupt pin */
+} kw2xrf_params_t;
+
+/**
  * @brief Reference to the KW2XRF driver interface
  */
 extern const ng_netdev_driver_t kw2xrf_driver;
