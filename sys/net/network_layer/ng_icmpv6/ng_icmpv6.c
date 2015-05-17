@@ -24,6 +24,7 @@
 #include "net/ng_netbase.h"
 #include "net/ng_protnum.h"
 #include "net/ng_ipv6/hdr.h"
+#include "net/ng_ndp.h"
 #include "od.h"
 #include "utlist.h"
 
@@ -83,16 +84,32 @@ void ng_icmpv6_demux(kernel_pid_t iface, ng_pktsnip_t *pkt)
             break;
 #endif
 
-#ifdef MODULE_NG_NDP
         case NG_ICMPV6_RTR_SOL:
-        case NG_ICMPV6_RTR_ADV:
-        case NG_ICMPV6_NBR_SOL:
-        case NG_ICMPV6_NBR_ADV:
-        case NG_ICMPV6_REDIRECT:
-            DEBUG("icmpv6: neighbor discovery message received\n");
+            DEBUG("icmpv6: router solicitation received\n");
             /* TODO */
             break;
-#endif
+
+        case NG_ICMPV6_RTR_ADV:
+            DEBUG("icmpv6: router advertisement received\n");
+            /* TODO */
+            break;
+
+        case NG_ICMPV6_NBR_SOL:
+            DEBUG("icmpv6: neighbor solicitation received\n");
+            ng_ndp_nbr_sol_handle(iface, pkt, ipv6->data, (ng_ndp_nbr_sol_t *)hdr,
+                                  icmpv6->size);
+            break;
+
+        case NG_ICMPV6_NBR_ADV:
+            DEBUG("icmpv6: neighbor advertisement received\n");
+            ng_ndp_nbr_adv_handle(iface, pkt, ipv6->data, (ng_ndp_nbr_adv_t *)hdr,
+                                  icmpv6->size);
+            break;
+
+        case NG_ICMPV6_REDIRECT:
+            DEBUG("icmpv6: redirect message received\n");
+            /* TODO */
+            break;
 
 #ifdef MODULE_NG_RPL
         case NG_ICMPV6_RPL_CTRL:

@@ -15,8 +15,14 @@
 #include <errno.h>
 #include <string.h>
 
+#include "net/ng_ipv6.h"
 #include "net/ng_ipv6/addr.h"
 #include "net/ng_ipv6/nc.h"
+#include "net/ng_ipv6/netif.h"
+#include "net/ng_ndp.h"
+#include "thread.h"
+#include "timex.h"
+#include "vtimer.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
@@ -110,6 +116,11 @@ ng_ipv6_nc_t *ng_ipv6_nc_add(kernel_pid_t iface, const ng_ipv6_addr_t *ipv6_addr
 
     DEBUG(" with flags = 0x%0x\n", flags);
 
+    if (ng_ipv6_nc_get_state(free_entry) == NG_IPV6_NC_STATE_INCOMPLETE) {
+        DEBUG("ipv6_nc: Set remaining probes to %" PRIu8 "\n");
+        free_entry->probes_remaining = NG_NDP_MAX_MC_NBR_SOL_NUMOF;
+    }
+
     return free_entry;
 }
 
@@ -192,8 +203,16 @@ ng_ipv6_nc_t *ng_ipv6_nc_still_reachable(const ng_ipv6_addr_t *ipv6_addr)
         return NULL;
     }
 
-    if (((entry->flags & NG_IPV6_NC_STATE_MASK) >> NG_IPV6_NC_STATE_POS) !=
-        NG_IPV6_NC_STATE_INCOMPLETE) {
+    if (ng_ipv6_nc_get_state(entry) != NG_IPV6_NC_STATE_INCOMPLETE) {
+#if defined(MODULE_NG_IPV6_NETIF) && defined(MODULE_VTIMER) && defined(MODULE_NG_IPV6)
+        ng_ipv6_netif_t *iface = ng_ipv6_netif_get(entry->iface);
+        timex_t t = iface->reach_time;
+
+        vtimer_remove(&entry->nbr_sol_timer);
+        vtimer_set_msg(&entry->nbr_sol_timer, t, ng_ipv6_pid,
+                       NG_NDP_MSG_NC_STATE_TIMEOUT, entry);
+#endif
+
         DEBUG("ipv6_nc: Marking entry %s as reachable\n",
               ng_ipv6_addr_to_str(addr_str, ipv6_addr, sizeof(addr_str)));
         entry->flags &= ~(NG_IPV6_NC_STATE_MASK >> NG_IPV6_NC_STATE_POS);

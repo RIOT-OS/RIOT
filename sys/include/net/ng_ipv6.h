@@ -63,6 +63,16 @@ extern "C" {
 #endif
 
 /**
+ * @brief   The PID to the IPv6 thread.
+ *
+ * @note    Use @ref ng_ipv6_init() to initialize. **Do not set by hand**.
+ *
+ * @details This variable is preferred for IPv6 internal communication *only*.
+ *          Please use @ref net_ng_netreg for external communication.
+ */
+extern kernel_pid_t ng_ipv6_pid;
+
+/**
  * @brief   Initialization of the IPv6 thread.
  *
  * @return  The PID to the IPv6 thread, on success.
