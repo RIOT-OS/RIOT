@@ -7924,7 +7924,7 @@ typedef struct
   #define ETH_MACFFR_PCF_ForwardAll              ((uint32_t)0x00000080)  /* MAC forwards all control frames to application even if they fail the Address Filter */
   #define ETH_MACFFR_PCF_ForwardPassedAddrFilter ((uint32_t)0x000000C0)  /* MAC forwards control frames that pass the Address Filter. */
 #define ETH_MACFFR_BFD    ((uint32_t)0x00000020)  /* Broadcast frame disable */
-#define ETH_MACFFR_PAM 	  ((uint32_t)0x00000010)  /* Pass all mutlicast */
+#define ETH_MACFFR_PAM    ((uint32_t)0x00000010)  /* Pass all mutlicast */
 #define ETH_MACFFR_DAIF   ((uint32_t)0x00000008)  /* DA Inverse filtering */
 #define ETH_MACFFR_HM     ((uint32_t)0x00000004)  /* Hash multicast */
 #define ETH_MACFFR_HU     ((uint32_t)0x00000002)  /* Hash unicast */
