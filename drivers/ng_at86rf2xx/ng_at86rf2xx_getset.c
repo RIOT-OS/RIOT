@@ -190,7 +190,7 @@ int16_t ng_at86rf2xx_get_txpower(ng_at86rf2xx_t *dev)
 {
 #ifdef MODULE_NG_AT86RF212B
     uint8_t txpower = ng_at86rf2xx_reg_read(dev, NG_AT86RF2XX_REG__PHY_TX_PWR);
-    printf("txpower value: %x\n", txpower);
+    DEBUG("txpower value: %x\n", txpower);
     return tx_pow_to_dbm(dev->freq, txpower);
 #else
     uint8_t txpower = ng_at86rf2xx_reg_read(dev, NG_AT86RF2XX_REG__PHY_TX_PWR)
