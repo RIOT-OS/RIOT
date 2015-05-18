@@ -44,7 +44,7 @@
 /**
  * Cortex-M knows stacks and handles register backups, so use different stack frame layout
  *
- * TODO: How to handle different Cortex-Ms? Code is so far valid for M3 and M4 without FPU
+ * \todo Cortex-M thread_arch_stack_init: How to handle different Cortex-Ms? Code is so far valid for M3 and M4 without FPU
  *
  * Layout with storage of floating point registers (applicable for Cortex-M4):
  * ------------------------------------------------------------------------------------------------------------------------------------
@@ -65,9 +65,22 @@ char *thread_arch_stack_init(thread_task_func_t task_func,
     uint32_t *stk;
     stk = (uint32_t *)((uintptr_t)stack_start + stack_size);
 
-    /* marker */
+    /* adjust to 32 bit boundary by clearing the last two bits in the address */
+    stk = (uint32_t *)(((uint32_t)stk) & ~((uint32_t)0x3));
+
+    /* Stack start marker */
     stk--;
     *stk = STACK_MARKER;
+
+    /* Make sure the stack is double word aligned (8 bytes) */
+    /* This is required in order to conform with Procedure Call Standard for the
+     * ARM® Architecture (AAPCS) */
+    /* http://infocenter.arm.com/help/topic/com.arm.doc.ihi0042e/IHI0042E_aapcs.pdf */
+    if (((uint32_t) stk % 8) != 0) {
+        /* add a single word padding */
+        --stk;
+        *stk = ~((uint32_t)STACK_MARKER);
+    }
 
     /* TODO: fix FPU handling for Cortex-M4 */
     /*
@@ -83,21 +96,33 @@ char *thread_arch_stack_init(thread_task_func_t task_func,
     }
     */
 
-    /* FIXME xPSR */
-    stk--;
-    *stk = (uint32_t) 0x01000200;
+    /* ****************************** */
+    /* Automatically popped registers */
+    /* ****************************** */
 
-    /* program counter */
+    /* The following eight stacked registers are popped by the hardware upon
+     * return from exception. (bx instruction in context_restore) */
+
+    /* xPSR */
     stk--;
+    /* Setting bit 9 (0x200) of xPSR will cause the initial stack pointer for
+     * the process to be aligned on a 32-bit, non-64-bit, boundary. Don't do that. */
+    /* Default xPSR, only the Thumb mode-bit is set */
+    *stk = 0x01000000;
+
+    /* pc */
+    stk--;
+    /* initial program counter */
     *stk = (uint32_t) task_func;
 
-    /* link register, jumped to when thread exits */
+    /* lr */
     stk--;
+    /* link register, return address when a thread exits.  */
     *stk = (uint32_t) sched_task_exit;
 
     /* r12 */
     stk--;
-    *stk = (uint32_t) 0;
+    *stk = 0;
 
     /* r1 - r3 */
     for (int i = 3; i >= 1; i--) {
@@ -105,9 +130,19 @@ char *thread_arch_stack_init(thread_task_func_t task_func,
         *stk = i;
     }
 
-    /* r0 -> thread function parameter */
+    /* r0 */
     stk--;
+    /* thread function parameter */
     *stk = (uint32_t) arg;
+
+    /* 8 hardware-handled registers in total */
+
+    /* ************************* */
+    /* Manually popped registers */
+    /* ************************* */
+
+    /* The following registers are not handled by hardware in return from
+     * exception, but manually by context_restore. */
 
     /* r11 - r4 */
     for (int i = 11; i >= 4; i--) {
@@ -115,9 +150,17 @@ char *thread_arch_stack_init(thread_task_func_t task_func,
         *stk = i;
     }
 
-    /* lr means exception return code  */
+    /* exception return code  */
     stk--;
-    *stk = EXCEPT_RET_TASK_MODE; /* return to task-mode main stack pointer */
+    *stk = EXCEPT_RET_TASK_MODE; /* return to task-mode process stack pointer */
+
+    /* 9 manually handled registers in total. */
+
+    /* The returned stack pointer will be aligned on a 32 bit boundary not on a
+     * 64 bit boundary because of the odd number of registers above (8+9).
+     * This is not a problem since the initial stack pointer upon process entry
+     * _will_ be 64 bit aligned (because of the cleared bit 9 in the stacked
+     * xPSR and aligned stacking of the hardware-handled registers). */
 
     return (char*) stk;
 }
