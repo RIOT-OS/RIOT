@@ -132,7 +132,7 @@ static uint8_t receive_packet_variable(uint8_t *rxBuffer, radio_packet_length_t 
 
         /* Read data from RX FIFO and store in rxBuffer */
         if (packetLength <= length) {
-	     uint8_t crc_ok = 0;
+            uint8_t crc_ok = 0;
 
             /* Put length byte at first position in RX Buffer */
             rxBuffer[0] = packetLength;

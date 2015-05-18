@@ -1,30 +1,30 @@
-	/* ARM code to run user code */
-	/* on the LPC23xx chips, the bootloader defaults to using the RC */
-	/* osciallator and it activates the PLL to create 14.78 MHz, even */
-	/* if there is no crystal.  However, when we use try to jump to */
-	/* the user's code, their startup routine may (incorrectly) assume */
-	/* the PLL is not enabled and crash if it is.  So in addition to */
-	/* remapping the reset vector to flash, we have to shut off the */
-	/* PLL so the user's startup code sees the same conditions as it */
-	/* would following a hard reset */
+    /* ARM code to run user code */
+    /* on the LPC23xx chips, the bootloader defaults to using the RC */
+    /* osciallator and it activates the PLL to create 14.78 MHz, even */
+    /* if there is no crystal.  However, when we use try to jump to */
+    /* the user's code, their startup routine may (incorrectly) assume */
+    /* the PLL is not enabled and crash if it is.  So in addition to */
+    /* remapping the reset vector to flash, we have to shut off the */
+    /* PLL so the user's startup code sees the same conditions as it */
+    /* would following a hard reset */
 begin:
-	adr	r0, const
-	ldr	r1, [r0]	/* r1 points to MEMMAP register */
-	ldr	r2, [r0,#4]	/* r2 points to PLLCON */
-	ldr	r3, [r0,#8]	/* r3 points to PLLFEED */
-	mov	r0, #1
-	str	r0, [r1]	/* remap interrupt vectors to flash */
-	mov	r4, #0xAA
-	mov	r5, #0x55
-	str	r0, [r2]	/* disconnect the PLL, PLLCON = 1 */
-	str	r4, [r3]
-	str	r5, [r3]
-	mov	r0, #0
-	str	r0, [r2]	/* disable the PLL, PLLCON = 0 */
-	str	r4, [r3]
-	str	r5, [r3]
-	mov	pc, #0		/* and then jump to the user's code */
+    adr r0, const
+    ldr r1, [r0]    /* r1 points to MEMMAP register */
+    ldr r2, [r0,#4] /* r2 points to PLLCON */
+    ldr r3, [r0,#8] /* r3 points to PLLFEED */
+    mov r0, #1
+    str r0, [r1]    /* remap interrupt vectors to flash */
+    mov r4, #0xAA
+    mov r5, #0x55
+    str r0, [r2]    /* disconnect the PLL, PLLCON = 1 */
+    str r4, [r3]
+    str r5, [r3]
+    mov r0, #0
+    str r0, [r2]    /* disable the PLL, PLLCON = 0 */
+    str r4, [r3]
+    str r5, [r3]
+    mov pc, #0      /* and then jump to the user's code */
 const:
-	.int	0xE01FC040	/* MEMMAP register */
-	.int	0xE01FC080	/* PLLCON */
-	.int	0xE01FC08C	/* PLLFEED */
+    .int    0xE01FC040  /* MEMMAP register */
+    .int    0xE01FC080  /* PLLCON */
+    .int    0xE01FC08C  /* PLLFEED */

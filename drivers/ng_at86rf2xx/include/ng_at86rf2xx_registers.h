@@ -259,22 +259,6 @@ extern "C" {
 #define NG_AT86RF2XX_PHY_TX_PWR_DEFAULT__PA_BUF_LT              (0xC0)
 #define NG_AT86RF2XX_PHY_TX_PWR_DEFAULT__PA_LT                  (0x00)
 #define NG_AT86RF2XX_PHY_TX_PWR_DEFAULT__TX_PWR                 (0x00)
-#define NG_AT86RF2XX_PHY_TX_PWR_TX_PWR_VALUE__3dBm              (0x00)
-#define NG_AT86RF2XX_PHY_TX_PWR_TX_PWR_VALUE__2_8dBm            (0x01)
-#define NG_AT86RF2XX_PHY_TX_PWR_TX_PWR_VALUE__2_3dBm            (0x02)
-#define NG_AT86RF2XX_PHY_TX_PWR_TX_PWR_VALUE__1_8dBm            (0x03)
-#define NG_AT86RF2XX_PHY_TX_PWR_TX_PWR_VALUE__1_3dBm            (0x04)
-#define NG_AT86RF2XX_PHY_TX_PWR_TX_PWR_VALUE__0_7dBm            (0x05)
-#define NG_AT86RF2XX_PHY_TX_PWR_TX_PWR_VALUE__0dBm              (0x06)
-#define NG_AT86RF2XX_PHY_TX_PWR_TX_PWR_VALUE__m1dBm             (0x07)
-#define NG_AT86RF2XX_PHY_TX_PWR_TX_PWR_VALUE__m2dBm             (0x08)
-#define NG_AT86RF2XX_PHY_TX_PWR_TX_PWR_VALUE__m3dBm             (0x09)
-#define NG_AT86RF2XX_PHY_TX_PWR_TX_PWR_VALUE__m4dBm             (0x0A)
-#define NG_AT86RF2XX_PHY_TX_PWR_TX_PWR_VALUE__m5dBm             (0x0B)
-#define NG_AT86RF2XX_PHY_TX_PWR_TX_PWR_VALUE__m7dBm             (0x0C)
-#define NG_AT86RF2XX_PHY_TX_PWR_TX_PWR_VALUE__m9dBm             (0x0D)
-#define NG_AT86RF2XX_PHY_TX_PWR_TX_PWR_VALUE__m12dBm            (0x0E)
-#define NG_AT86RF2XX_PHY_TX_PWR_TX_PWR_VALUE__m17dBm            (0x0F)
 /** @} */
 
 /**
@@ -333,6 +317,10 @@ extern "C" {
 #ifdef MODULE_NG_AT86RF212B
 #define NG_AT86RF2XX_RF_CTRL_0_MASK__PA_LT                      (0xC0)
 #define NG_AT86RF2XX_RF_CTRL_0_MASK__GC_TX_OFFS                 (0x03)
+
+#define NG_AT86RF2XX_RF_CTRL_0_GC_TX_OFFS__0DB                  (0x01)
+#define NG_AT86RF2XX_RF_CTRL_0_GC_TX_OFFS__1DB                  (0x02)
+#define NG_AT86RF2XX_RF_CTRL_0_GC_TX_OFFS__2DB                  (0x03)
 #endif
 /** @} */
 

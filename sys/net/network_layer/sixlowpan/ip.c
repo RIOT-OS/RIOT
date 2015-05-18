@@ -729,9 +729,9 @@ void ipv6_net_if_get_best_src_addr(ipv6_addr_t *src, const ipv6_addr_t *dest)
     int if_id = 0; // TODO: get this somehow
     ipv6_net_if_addr_t *addr = NULL;
     ipv6_net_if_addr_t *tmp_addr = NULL;
-    uint8_t bmatch = 0;
 
     if (!(ipv6_addr_is_link_local(dest)) && !(ipv6_addr_is_multicast(dest))) {
+        uint8_t bmatch = 0;
         while ((addr = (ipv6_net_if_addr_t *) net_if_iter_addresses(if_id,
                        (net_if_addr_t **) &addr))) {
             if (addr->ndp_state == NDP_ADDR_STATE_PREFERRED) {

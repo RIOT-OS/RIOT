@@ -545,11 +545,11 @@ static void _send_nbr_sol(kernel_pid_t iface, ng_ipv6_addr_t *tgt,
     ng_pktsnip_t *hdr, *pkt = NULL;
     ng_ipv6_addr_t *src = NULL;
     size_t src_len = 0;
-    uint8_t l2src[8];
-    uint16_t l2src_len;
 
     /* check if there is a fitting source address to target */
     if ((src = ng_ipv6_netif_find_best_src_addr(iface, tgt)) != NULL) {
+        uint8_t l2src[8];
+        uint16_t l2src_len;
         src_len = sizeof(ng_ipv6_addr_t);
         l2src_len = _get_l2src(l2src, sizeof(l2src), iface);
 
@@ -605,8 +605,6 @@ static void _send_nbr_adv(kernel_pid_t iface, ng_ipv6_addr_t *tgt,
                           ng_ipv6_addr_t *dst, bool supply_tl2a)
 {
     ng_pktsnip_t *hdr, *pkt = NULL;
-    uint8_t l2src[8];
-    uint16_t l2src_len;
     uint8_t adv_flags = 0;
 
     if (ng_ipv6_netif_get(iface)->flags & NG_IPV6_NETIF_FLAGS_ROUTER) {
@@ -622,6 +620,8 @@ static void _send_nbr_adv(kernel_pid_t iface, ng_ipv6_addr_t *tgt,
     }
 
     if (supply_tl2a) {
+        uint8_t l2src[8];
+        uint16_t l2src_len;
         /* we previously checked if we are the target, so we can take our L2src */
         l2src_len = _get_l2src(l2src, sizeof(l2src), iface);
 

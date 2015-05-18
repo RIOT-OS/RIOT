@@ -88,8 +88,8 @@ This software is only provided semi-static binary and source code form.
 To use the semi-static binary, simply copy it to a location where you
 can run it, and change the permissions if necessary:
 
-	cp lpc2k_pgm /usr/local/bin
-	chmod 755 /usr/local/bin/lpc2k_pgm
+    cp lpc2k_pgm /usr/local/bin
+    chmod 755 /usr/local/bin/lpc2k_pgm
 
 The semi-static binary has all of the GTK and X11 libraries statically
 linked into it, for maximum compatibility with all linux distributions.

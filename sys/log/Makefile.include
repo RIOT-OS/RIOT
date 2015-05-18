@@ -1,0 +1,3 @@
+ifneq (,$(filter log_printfnoformat,$(USEMODULE)))
+    USEMODULE_INCLUDES += $(RIOTBASE)/sys/log/log_printfnoformat
+endif

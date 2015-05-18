@@ -249,3 +249,8 @@ endif
 ifneq (,$(filter ng_at86rf2%,$(USEMODULE)))
   USEMODULE += ng_at86rf2xx
 endif
+
+# if any log_* is used, also use LOG pseudomodule
+ifneq (,$(filter log_%,$(USEMODULE)))
+  USEMODULE += log
+endif

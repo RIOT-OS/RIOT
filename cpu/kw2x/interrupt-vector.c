@@ -127,71 +127,71 @@ const void *interrupt_vector[] = {
     (void *) isr_pendsv,            /* pendSV interrupt, used for task switching in RIOT */
     (void *) isr_systick,           /* SysTick interrupt, not used in RIOT */
     /* MKW22D512 specific peripheral handlers */
-    (void *) isr_dma0,		   /* DMA channel 0 transfer complete */
-    (void *) isr_dma1,		   /* DMA channel 1 transfer complete */
-    (void *) isr_dma2,		   /* DMA channel 2 transfer complete */
-    (void *) isr_dma3,		   /* DMA channel 3 transfer complete */
-    (void *) isr_dma4,		   /* DMA channel 4 transfer complete */
-    (void *) isr_dma5,		   /* DMA channel 5 transfer complete */
-    (void *) isr_dma6,		   /* DMA channel 6 transfer complete */
-    (void *) isr_dma7,		   /* DMA channel 7 transfer complete */
-    (void *) isr_dma8,		   /* DMA channel 8 transfer complete */
-    (void *) isr_dma9,		   /* DMA channel 9 transfer complete */
-    (void *) isr_dma10,		   /* DMA channel 10 transfer complete */
-    (void *) isr_dma11,		   /* DMA channel 11 transfer complete */
-    (void *) isr_dma12,		   /* DMA channel 12 transfer complete */
-    (void *) isr_dma13,		   /* DMA channel 13 transfer complete */
-    (void *) isr_dma14,		   /* DMA channel 14 transfer complete */
-    (void *) isr_dma15,		   /* DMA channel 15 transfer complete */
-    (void *) isr_dma_error,	   /* DMA channel 0 - 15 error */
-    (void *) isr_mcm,		   /* MCM normal interrupt */
-    (void *) isr_ftfl,		   /* FTFL command complete */
-    (void *) isr_ftfl_collision,	   /* FTFL read collision */
-    (void *) isr_pmc,		   /* PMC controller low-voltage detect low-voltage warning */
-    (void *) isr_llwu,		   /* Low leakage wakeup */
-    (void *) isr_wdog_ewm,	   /* Single interrupt vector for  WDOG and EWM */
-    (void *) isr_rng,		   /* Randon number generator */
-    (void *) isr_i2c0,		   /* Inter-integrated circuit 0 */
-    (void *) isr_i2c1,		   /* Inter-integrated circuit 1 */
-    (void *) isr_spi0,		   /* Serial peripheral Interface 0 */
-    (void *) isr_spi1,		   /* Serial peripheral Interface 1 */
-    (void *) isr_i2s0_tx,	   /* Integrated interchip sound 0 transmit interrupt */
-    (void *) isr_i2s0_rx,	   /* Integrated interchip sound 0 receive interrupt */
-    (void *) dummy_handler,	   /* Reserved interrupt */
-    (void *) isr_uart0_rx_tx,	   /* UART0 receive/transmit interrupt */
-    (void *) isr_uart0_err,	   /* UART0 error interrupt */
-    (void *) isr_uart1_rx_tx,	   /* UART1 receive/transmit interrupt */
-    (void *) isr_uart1_err,	   /* UART1 error interrupt */
-    (void *) isr_uart2_rx_tx,	   /* UART2 receive/transmit interrupt */
-    (void *) isr_uart2_err,	   /* UART2 error interrupt */
-    (void *) dummy_handler,	   /* Reserved interrupt */
-    (void *) dummy_handler,	   /* Reserved interrupt */
-    (void *) isr_adc0,		   /* Analog-to-digital converter 0 */
-    (void *) isr_cmp0,		   /* Comparator 0 */
-    (void *) isr_cmp1,		   /* Comparator 1 */
-    (void *) isr_ftm0, 		   /* FlexTimer module 0 fault overflow and channels interrupt */
-    (void *) isr_ftm1, 		   /* FlexTimer module 1 fault overflow and channels interrupt */
-    (void *) isr_ftm2, 		   /* FlexTimer module 2 fault overflow and channels interrupt */
-    (void *) isr_cmt,		   /* Carrier modulator transmitter */
-    (void *) isr_rtc,		   /* Real time clock */
-    (void *) isr_rtc_seconds,	   /* Real time clock seconds */
-    (void *) isr_pit0,		   /* Periodic interrupt timer channel 0 */
-    (void *) isr_pit1,		   /* Periodic interrupt timer channel 1 */
-    (void *) isr_pit2,		   /* Periodic interrupt timer channel 2 */
-    (void *) isr_pit3,		   /* Periodic interrupt timer channel 3 */
-    (void *) isr_pdb0,		   /* Programmable delay block */
-    (void *) isr_usb0,		   /* USB OTG interrupt */
-    (void *) isr_usbdcd,		   /* USB charger detect */
+    (void *) isr_dma0,              /* DMA channel 0 transfer complete */
+    (void *) isr_dma1,              /* DMA channel 1 transfer complete */
+    (void *) isr_dma2,              /* DMA channel 2 transfer complete */
+    (void *) isr_dma3,              /* DMA channel 3 transfer complete */
+    (void *) isr_dma4,              /* DMA channel 4 transfer complete */
+    (void *) isr_dma5,              /* DMA channel 5 transfer complete */
+    (void *) isr_dma6,              /* DMA channel 6 transfer complete */
+    (void *) isr_dma7,              /* DMA channel 7 transfer complete */
+    (void *) isr_dma8,              /* DMA channel 8 transfer complete */
+    (void *) isr_dma9,              /* DMA channel 9 transfer complete */
+    (void *) isr_dma10,             /* DMA channel 10 transfer complete */
+    (void *) isr_dma11,             /* DMA channel 11 transfer complete */
+    (void *) isr_dma12,             /* DMA channel 12 transfer complete */
+    (void *) isr_dma13,             /* DMA channel 13 transfer complete */
+    (void *) isr_dma14,             /* DMA channel 14 transfer complete */
+    (void *) isr_dma15,             /* DMA channel 15 transfer complete */
+    (void *) isr_dma_error,         /* DMA channel 0 - 15 error */
+    (void *) isr_mcm,               /* MCM normal interrupt */
+    (void *) isr_ftfl,              /* FTFL command complete */
+    (void *) isr_ftfl_collision,    /* FTFL read collision */
+    (void *) isr_pmc,               /* PMC controller low-voltage detect low-voltage warning */
+    (void *) isr_llwu,              /* Low leakage wakeup */
+    (void *) isr_wdog_ewm,          /* Single interrupt vector for  WDOG and EWM */
+    (void *) isr_rng,               /* Randon number generator */
+    (void *) isr_i2c0,              /* Inter-integrated circuit 0 */
+    (void *) isr_i2c1,              /* Inter-integrated circuit 1 */
+    (void *) isr_spi0,              /* Serial peripheral Interface 0 */
+    (void *) isr_spi1,              /* Serial peripheral Interface 1 */
+    (void *) isr_i2s0_tx,           /* Integrated interchip sound 0 transmit interrupt */
+    (void *) isr_i2s0_rx,           /* Integrated interchip sound 0 receive interrupt */
     (void *) dummy_handler,         /* Reserved interrupt */
-    (void *) isr_dac0,		   /* Digital-to-analog converter 0 */
-    (void *) isr_mcg,		   /* Multipurpose clock generator */
-    (void *) isr_lptmr0,		   /* Low power timer interrupt */
-    (void *) isr_porta,		   /* Port A pin detect interrupt */
-    (void *) isr_portb,		   /* Port B pin detect interrupt */
-    (void *) isr_portc,		   /* Port C pin detect interrupt */
-    (void *) isr_portd,		   /* Port D pin detect interrupt */
-    (void *) isr_porte,		   /* Port E pin detect interrupt */
-    (void *) isr_swi,		   /* Software interrupt */
+    (void *) isr_uart0_rx_tx,       /* UART0 receive/transmit interrupt */
+    (void *) isr_uart0_err,         /* UART0 error interrupt */
+    (void *) isr_uart1_rx_tx,       /* UART1 receive/transmit interrupt */
+    (void *) isr_uart1_err,         /* UART1 error interrupt */
+    (void *) isr_uart2_rx_tx,       /* UART2 receive/transmit interrupt */
+    (void *) isr_uart2_err,         /* UART2 error interrupt */
+    (void *) dummy_handler,         /* Reserved interrupt */
+    (void *) dummy_handler,         /* Reserved interrupt */
+    (void *) isr_adc0,              /* Analog-to-digital converter 0 */
+    (void *) isr_cmp0,              /* Comparator 0 */
+    (void *) isr_cmp1,              /* Comparator 1 */
+    (void *) isr_ftm0,              /* FlexTimer module 0 fault overflow and channels interrupt */
+    (void *) isr_ftm1,              /* FlexTimer module 1 fault overflow and channels interrupt */
+    (void *) isr_ftm2,              /* FlexTimer module 2 fault overflow and channels interrupt */
+    (void *) isr_cmt,               /* Carrier modulator transmitter */
+    (void *) isr_rtc,               /* Real time clock */
+    (void *) isr_rtc_seconds,       /* Real time clock seconds */
+    (void *) isr_pit0,              /* Periodic interrupt timer channel 0 */
+    (void *) isr_pit1,              /* Periodic interrupt timer channel 1 */
+    (void *) isr_pit2,              /* Periodic interrupt timer channel 2 */
+    (void *) isr_pit3,              /* Periodic interrupt timer channel 3 */
+    (void *) isr_pdb0,              /* Programmable delay block */
+    (void *) isr_usb0,              /* USB OTG interrupt */
+    (void *) isr_usbdcd,            /* USB charger detect */
+    (void *) dummy_handler,         /* Reserved interrupt */
+    (void *) isr_dac0,              /* Digital-to-analog converter 0 */
+    (void *) isr_mcg,               /* Multipurpose clock generator */
+    (void *) isr_lptmr0,            /* Low power timer interrupt */
+    (void *) isr_porta,             /* Port A pin detect interrupt */
+    (void *) isr_portb,             /* Port B pin detect interrupt */
+    (void *) isr_portc,             /* Port C pin detect interrupt */
+    (void *) isr_portd,             /* Port D pin detect interrupt */
+    (void *) isr_porte,             /* Port E pin detect interrupt */
+    (void *) isr_swi,               /* Software interrupt */
     (void *) dummy_handler,         /* reserved 81 */
     (void *) dummy_handler,         /* reserved 82 */
     (void *) dummy_handler,         /* reserved 83 */

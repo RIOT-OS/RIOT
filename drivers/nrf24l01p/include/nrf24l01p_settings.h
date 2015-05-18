@@ -97,12 +97,12 @@ extern "C" {
 #define PRIM_RX      0x01
 
 /* Bits in STATUS register */
-#define RX_DR       	0x40
-#define TX_DS       	0x20
-#define MAX_RT      	0x10
-#define RX_P_NO			0x0e
-#define TX_FULL			0x01
-#define ALL_INT_MASK	0x70
+#define RX_DR           0x40
+#define TX_DS           0x20
+#define MAX_RT          0x10
+#define RX_P_NO         0x0e
+#define TX_FULL         0x01
+#define ALL_INT_MASK    0x70
 
 #define RF_SETUP_CONT_WAVE      (1 << 7)
 #define RF_SETUP_RF_DR_LOW      (1 << 5)

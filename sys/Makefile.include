@@ -1,6 +1,3 @@
-ifneq (,$(filter auto_init,$(USEMODULE)))
-    include $(RIOTBASE)/sys/auto_init/Makefile.include
-endif
 ifneq (,$(filter nomac,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/include
 endif
@@ -89,4 +86,7 @@ ifneq (,$(filter embunit,$(USEMODULE)))
     else ifeq ($(OUTPUT),COMPILER)
         CFLAGS += -DOUTPUT=OUTPUT_COMPILER
     endif
+endif
+ifneq (,$(filter log_%,$(USEMODULE)))
+    include $(RIOTBASE)/sys/log/Makefile.include
 endif
