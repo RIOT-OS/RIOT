@@ -3,8 +3,8 @@
 $h = '[0-9A-Fa-f]';
 $n = 1;
 while (<stdin>) {
-	next unless /^\s*$h+:\s+($h{8})/;
-	$data[$n++] = "0x$1";
+    next unless /^\s*$h+:\s+($h{8})/;
+    $data[$n++] = "0x$1";
 }
 $data[0] = $n;
 #$size = $ARGV[0];

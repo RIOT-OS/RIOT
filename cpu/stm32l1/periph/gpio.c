@@ -554,7 +554,7 @@ void isr_exti9_5(void)
 #if defined(GPIO_IRQ_10) || defined(GPIO_IRQ_11) || defined(GPIO_IRQ_12) || defined(GPIO_IRQ_13) || defined(GPIO_IRQ_14) || defined(GPIO_IRQ_15)
 void isr_exti15_10(void)
 {
-	if (EXTI->PR & EXTI_PR_PR10) {
+    if (EXTI->PR & EXTI_PR_PR10) {
         EXTI->PR |= EXTI_PR_PR10;        /* clear status bit by writing a 1 to it */
         gpio_config[GPIO_IRQ_10].cb(gpio_config[GPIO_IRQ_10].arg);
     }

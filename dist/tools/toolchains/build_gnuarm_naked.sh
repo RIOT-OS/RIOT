@@ -37,24 +37,24 @@ build_binutils() {
         tar -xjf ${FILES}/binutils-${BINUTILS_VER}.tar.bz2
         touch .binutils_extracted
     fi
-	rm -rf binutils-build && mkdir -p binutils-build && cd binutils-build &&
-	../binutils-${BINUTILS_VER}/configure --target=arm-elf --prefix=${PREFIX} --enable-interwork --enable-multilibi --with-float=soft --with-fpu=vfp &&
-	make ${MAKE_THREADS} all CFLAGS=-Wformat=0 &&
-	make install &&
-	cd ${GNUARM_BUILDDIR}
+    rm -rf binutils-build && mkdir -p binutils-build && cd binutils-build &&
+    ../binutils-${BINUTILS_VER}/configure --target=arm-elf --prefix=${PREFIX} --enable-interwork --enable-multilibi --with-float=soft --with-fpu=vfp &&
+    make ${MAKE_THREADS} all CFLAGS=-Wformat=0 &&
+    make install &&
+    cd ${GNUARM_BUILDDIR}
 }
 
 build_gcc() {
     echo "Building gcc..."
     if [ ! -e .gcc_extracted ] ; then
-	    tar -xjf ${FILES}/gcc-core-${GCC_VER}.tar.bz2 &&
+        tar -xjf ${FILES}/gcc-core-${GCC_VER}.tar.bz2 &&
         touch .gcc_extracted
     fi
     rm -rf gcc-build && mkdir -p gcc-build && cd gcc-build &&
-	../gcc-${GCC_VER}/configure --target=arm-elf --prefix=${PREFIX} --enable-interwork --enable-multilib --enable-languages="c" --enable-lto --disable-libssp --disable-hardfloat --with-float=soft --with-fpu=vfp --without-headers &&
+    ../gcc-${GCC_VER}/configure --target=arm-elf --prefix=${PREFIX} --enable-interwork --enable-multilib --enable-languages="c" --enable-lto --disable-libssp --disable-hardfloat --with-float=soft --with-fpu=vfp --without-headers &&
 
     make ${MAKE_THREADS} all &&
-	make install &&
+    make install &&
 
     cd ${GNUARM_BUILDDIR}
 }
@@ -69,20 +69,20 @@ extract_newlib() {
 }
 
 build_newlib() {
-	cd ${GNUARM_BUILDDIR} &&
+    cd ${GNUARM_BUILDDIR} &&
 
     if [ ! -e .newlib_extracted ] ; then
         extract_newlib
     fi
 
     rm -rf newlib-build && mkdir -p newlib-build && cd newlib-build &&
-	../newlib-${NEWLIB_VER}/configure --target=arm-elf --prefix=${PREFIX} --enable-interwork --enable-multilib --disable-newlib-supplied-syscalls --enable-newlib-reent-small --enable-newlib-io-long-long --enable-newlib-io-float --with-float=soft --with-fpu=vfp &&
-	#--enable-newlib-supplied-syscalls &&
-	# options to try: --enable-newlib-reent-small
+    ../newlib-${NEWLIB_VER}/configure --target=arm-elf --prefix=${PREFIX} --enable-interwork --enable-multilib --disable-newlib-supplied-syscalls --enable-newlib-reent-small --enable-newlib-io-long-long --enable-newlib-io-float --with-float=soft --with-fpu=vfp &&
+    #--enable-newlib-supplied-syscalls &&
+    # options to try: --enable-newlib-reent-small
     make ${MAKE_THREADS} TARGET_CFLAGS=-DREENTRANT_SYSCALLS_PROVIDED all &&
     make install &&
 
-	# generate zip-file to provide binary download
+    # generate zip-file to provide binary download
     cd ${PREFIX}/arm-elf &&
 
     #
@@ -97,14 +97,14 @@ build_newlib() {
 build_gdb() {
     echo "Building gdb..."
     if [ ! -e .gdb_extracted ] ; then
-	    tar -xjf ${FILES}/gdb-${GDB_VER}.tar.bz2 &&
+        tar -xjf ${FILES}/gdb-${GDB_VER}.tar.bz2 &&
         touch .gdb_extracted
     fi
-	rm -rf gdb-build && mkdir -p gdb-build && cd gdb-build &&
-	../gdb-${GDB_VER}/configure --target=arm-elf --prefix=${PREFIX} --enable-interwork --enable-multilib &&
+    rm -rf gdb-build && mkdir -p gdb-build && cd gdb-build &&
+    ../gdb-${GDB_VER}/configure --target=arm-elf --prefix=${PREFIX} --enable-interwork --enable-multilib &&
 
     make ${MAKE_THREADS} all CFLAGS=-D_FORTIFY_SOURCE=0 &&
-	make install &&
+    make install &&
 
     cd ${GNUARM_BUILDDIR}
 }
@@ -134,11 +134,11 @@ download_file() {
 build_all() {
     echo "Starting in ${GNUARM_BUILDDIR}. Installing to ${PREFIX}."
     download &&
-	build_binutils &&
-	build_gcc &&
-	build_gdb &&
+    build_binutils &&
+    build_gcc &&
+    build_gdb &&
 
-	echo "Build complete."
+    echo "Build complete."
 }
 
 usage() {

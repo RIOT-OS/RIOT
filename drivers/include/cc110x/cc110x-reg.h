@@ -15,7 +15,7 @@
  * @brief       Access to CC110X registers
  *
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
- * @author		Fabian Nack <nack@inf.fu-berlin.de>
+ * @author      Fabian Nack <nack@inf.fu-berlin.de>
  */
 
 #ifndef CC110X_REG_H

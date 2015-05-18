@@ -3,44 +3,44 @@
 @arg = split(/\s+/, `gtk-config --libs`);
 
 %liblist = (
-	'libgtk.a',	'/usr/lib/libgtk.a',
-	'libgdk.a',	'/usr/lib/libgdk.a',
-	'libgmodule.a',	'/usr/lib/libgmodule.a',
-	'libglib.a',	'/usr/lib/libglib.a',
-	'libXi.a',	'/usr/X11R6/lib/libXi.a',
-	'libXext.a',	'/usr/X11R6/lib/libXext.a',
-	'libX11.a',	'/usr/X11R6/lib/libX11.a'
+    'libgtk.a', '/usr/lib/libgtk.a',
+    'libgdk.a', '/usr/lib/libgdk.a',
+    'libgmodule.a', '/usr/lib/libgmodule.a',
+    'libglib.a',    '/usr/lib/libglib.a',
+    'libXi.a',  '/usr/X11R6/lib/libXi.a',
+    'libXext.a',    '/usr/X11R6/lib/libXext.a',
+    'libX11.a', '/usr/X11R6/lib/libX11.a'
 );
 
 
 for ($i=0; $i<@arg; $i++) {
-	$a = $arg[$i];
-	next if $a eq '-rdynamic';  # always delete -rdynamic
-	if (($a eq '-lm') || ($a eq '-ldl') || ($a =~ /^-L/)) {
-		# a few things we never change
-		print "$a ";
-		next;
-	}
-	if ($a =~ /^-l/) {
-		$lib = $';
-		$lib = 'lib' . $lib . '.a';
-		# first check if it's in the known location
-		if (-f $liblist{$lib}) {
-			print $liblist{$lib}, " ";
-			next;
-		}
-		# resort to trying whereis to find it
-		@source = split(/\s+/, `whereis $lib`);
-		undef($static);
-		for ($j=0; $j<@source; $j++) {
-			$static = $source[$j] if $source[$j] =~ /$lib$/;
-		}
-		# if we found a static lib, use it.
-		if ($static) {
-			print $static, " ";
-		} else {
-			print $a, " ";
-		}
-	}
+    $a = $arg[$i];
+    next if $a eq '-rdynamic';  # always delete -rdynamic
+    if (($a eq '-lm') || ($a eq '-ldl') || ($a =~ /^-L/)) {
+        # a few things we never change
+        print "$a ";
+        next;
+    }
+    if ($a =~ /^-l/) {
+        $lib = $';
+        $lib = 'lib' . $lib . '.a';
+        # first check if it's in the known location
+        if (-f $liblist{$lib}) {
+            print $liblist{$lib}, " ";
+            next;
+        }
+        # resort to trying whereis to find it
+        @source = split(/\s+/, `whereis $lib`);
+        undef($static);
+        for ($j=0; $j<@source; $j++) {
+            $static = $source[$j] if $source[$j] =~ /$lib$/;
+        }
+        # if we found a static lib, use it.
+        if ($static) {
+            print $static, " ";
+        } else {
+            print $a, " ";
+        }
+    }
 }
 print "\n";

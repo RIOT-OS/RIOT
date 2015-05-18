@@ -44,8 +44,8 @@
 /**
  * manage the heap
  */
-extern uintptr_t __heap_start;		/* start of heap memory space */
-extern uintptr_t __heap_max;		/* maximum for end of heap memory space */
+extern uintptr_t __heap_start;      /* start of heap memory space */
+extern uintptr_t __heap_max;        /* maximum for end of heap memory space */
 
 /* current position in heap */
 static caddr_t heap = {(caddr_t) &__heap_start};

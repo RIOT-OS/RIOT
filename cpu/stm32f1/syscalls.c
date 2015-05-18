@@ -176,7 +176,7 @@ int _kill_r(struct _reent *r, int pid, int sig)
 __attribute__ ((weak))
 int _kill(int pid, int sig)
 {
-    errno = ESRCH;		                   /* not implemented yet */
+    errno = ESRCH;                         /* not implemented yet */
     return -1;
 }
 
