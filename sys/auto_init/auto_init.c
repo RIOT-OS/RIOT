@@ -306,8 +306,20 @@ void auto_init(void)
     DEBUG("Auto init UDP module.\n");
     ng_udp_init();
 #endif
+
+
+/* initialize network devices */
 #ifdef MODULE_AUTO_INIT_NG_NETIF
-    DEBUG("Auto init network interfaces.\n");
-    auto_init_ng_netif();
+
+#ifdef MODULE_NG_AT86RF2XX
+    extern void auto_init_ng_at86rf2xx(void);
+    auto_init_ng_at86rf2xx();
 #endif
+
+#ifdef MODULE_XBEE
+    extern void auto_init_xbee(void);
+    auto_init_xbee();
+#endif
+
+#endif /* MODULE_AUTO_INIT_NG_NETIF */
 }

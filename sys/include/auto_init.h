@@ -49,22 +49,6 @@ extern "C" {
  */
 void auto_init(void);
 
-/**
- * @brief Initialize network interfaces and register them with ng_netif
- *
- *        This function must be implemented in the board or in the application,
- *        in a subfolder that must be named auto_init_ng_netif
- *        This function is called under two conditions:
- *          1. the ng_netif module is used (USEMODULE contains ng_netif)
- *          2. the board or the application contains a subfolder called
- *             auto_init_ng_netif
- *        If the board and the application both contain the mentioned subfolder,
- *        the contents from the applications subfolder have a higher priority
- *        and will be compiled and linked, while the board's subfolder is then
- *        ignored.
- */
-void auto_init_ng_netif(void);
-
 #ifdef __cplusplus
 }
 #endif

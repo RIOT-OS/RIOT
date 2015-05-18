@@ -179,6 +179,18 @@ int ng_at86rf2xx_init(ng_at86rf2xx_t *dev, spi_t spi, spi_speed_t spi_speed,
                       gpio_t sleep_pin, gpio_t reset_pin);
 
 /**
+ * @brief struct holding all params needed for device initialization
+ */
+typedef struct at86rf2xx_params {
+    spi_t spi;              /**< SPI bus the device is connected to */
+    spi_speed_t spi_speed;  /**< SPI speed to use */
+    gpio_t cs_pin;          /**< GPIO pin connected to chip select */
+    gpio_t int_pin;         /**< GPIO pin connected to the interrupt pin */
+    gpio_t sleep_pin;       /**< GPIO pin connected to the sleep pin */
+    gpio_t reset_pin;       /**< GPIO pin connected to the reset pin */
+} at86rf2xx_params_t;
+
+/**
  * @brief   Trigger a hardware reset and configure radio with default values
  *
  * @param[in] dev           device to reset
