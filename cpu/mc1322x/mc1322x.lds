@@ -1,7 +1,6 @@
 /* vim: set syntax=rpcgen : */
 /* Script for -z combreloc: combine and sort reloc sections */
-OUTPUT_FORMAT("elf32-littlearm", "elf32-bigarm",
-	      "elf32-littlearm")
+OUTPUT_FORMAT("elf32-littlearm", "elf32-bigarm", "elf32-littlearm")
 OUTPUT_ARCH(arm)
 ENTRY(_startup)
 
@@ -95,15 +94,15 @@ HEAP_SIZE = 4096;
 
 /*  . = ALIGN (CONSTANT (MAXPAGESIZE)) - ((CONSTANT (MAXPAGESIZE) - .) & (CONSTANT (MAXPAGESIZE) - 1)); . = DATA_SEGMENT_ALIGN (CONSTANT (MAXPAGESIZE), CONSTANT (COMMONPAGESIZE)); */
 
-	. = ALIGN(4);
-	. = DATA_SEGMENT_ALIGN(4,4);
+  . = ALIGN(4);
+  . = DATA_SEGMENT_ALIGN(4,4);
 
   /* Exception handling  */
   .eh_frame       : ONLY_IF_RW { KEEP (*(.eh_frame)) }
   .gcc_except_table   : ONLY_IF_RW { *(.gcc_except_table .gcc_except_table.*) }
   /* Thread Local Storage sections  */
-  .tdata	  : { *(.tdata .tdata.* .gnu.linkonce.td.*) }
-  .tbss		  : { *(.tbss .tbss.* .gnu.linkonce.tb.*) *(.tcommon) }
+  .tdata    : { *(.tdata .tdata.* .gnu.linkonce.td.*) }
+  .tbss     : { *(.tbss .tbss.* .gnu.linkonce.tb.*) *(.tcommon) }
   .preinit_array     :
   {
     PROVIDE_HIDDEN (__preinit_array_start = .);
@@ -168,35 +167,35 @@ HEAP_SIZE = 4096;
   .data1          : { *(.data1) }
   _edata = .; PROVIDE (edata = .);
 
-	.stack : {
-		__stack_start__ = . ;
+  .stack : {
+    __stack_start__ = . ;
 
-		. += IRQ_STACK_SIZE;
-		. = ALIGN (4);
-		__irq_stack_top__ = . ;
+    . += IRQ_STACK_SIZE;
+    . = ALIGN (4);
+    __irq_stack_top__ = . ;
 
-		. += FIQ_STACK_SIZE;
-		. = ALIGN (4);
-		__fiq_stack_top__ = . ;
+    . += FIQ_STACK_SIZE;
+    . = ALIGN (4);
+    __fiq_stack_top__ = . ;
 
-		. += SVC_STACK_SIZE;
-		. = ALIGN (4);
-		__svc_stack_top__ = . ;
+    . += SVC_STACK_SIZE;
+    . = ALIGN (4);
+    __svc_stack_top__ = . ;
 
-		. += ABT_STACK_SIZE;
-		. = ALIGN (4);
-		__abt_stack_top__ = . ;
+    . += ABT_STACK_SIZE;
+    . = ALIGN (4);
+    __abt_stack_top__ = . ;
 
-		. += UND_STACK_SIZE;
-		. = ALIGN (4);
-		__und_stack_top__ = . ;
+    . += UND_STACK_SIZE;
+    . = ALIGN (4);
+    __und_stack_top__ = . ;
 
-		. += SYS_STACK_SIZE;
-		. = ALIGN (4);
-		__sys_stack_top__ = . ;
+    . += SYS_STACK_SIZE;
+    . = ALIGN (4);
+    __sys_stack_top__ = . ;
 
-		__stack_end__ = .;
-	}
+    __stack_end__ = .;
+  }
 
 
   __bss_start = .;
