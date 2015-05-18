@@ -50,9 +50,6 @@ extern "C" {
 /* Define default radio mode to constant RX if no application specific setting
  * is available. */
 #ifndef CC1100_RADIO_MODE
-#ifdef MODULE_RPL
-#warning RPL currently works with CC1100_MODE_WOR
-#endif
 #define CC1100_RADIO_MODE CC1100_MODE_CONSTANT_RX
 #endif
 
