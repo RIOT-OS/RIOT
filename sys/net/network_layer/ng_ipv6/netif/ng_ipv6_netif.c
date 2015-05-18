@@ -38,49 +38,58 @@ static char addr_str[NG_IPV6_ADDR_MAX_STR_LEN];
 static ng_ipv6_addr_t *_add_addr_to_entry(ng_ipv6_netif_t *entry, const ng_ipv6_addr_t *addr,
                                           uint8_t prefix_len, uint8_t flags)
 {
+    ng_ipv6_netif_addr_t *tmp_addr = NULL;
+
     for (int i = 0; i < NG_IPV6_NETIF_ADDR_NUMOF; i++) {
         if (ng_ipv6_addr_equal(&(entry->addrs[i].addr), addr)) {
             return &(entry->addrs[i].addr);
         }
 
-        if (ng_ipv6_addr_is_unspecified(&(entry->addrs[i].addr))) {
-            memcpy(&(entry->addrs[i].addr), addr, sizeof(ng_ipv6_addr_t));
-            DEBUG("ipv6 netif: Added %s/%" PRIu8 " to interface %" PRIkernel_pid "\n",
-                  ng_ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)),
-                  prefix_len, entry->pid);
-
-            entry->addrs[i].prefix_len = prefix_len;
-            entry->addrs[i].flags = flags;
-
-            if (ng_ipv6_addr_is_multicast(addr)) {
-                entry->addrs[i].flags |= NG_IPV6_NETIF_ADDR_FLAGS_NON_UNICAST;
-            }
-            else {
-                ng_ipv6_addr_t sol_node;
-
-                if (!ng_ipv6_addr_is_link_local(addr)) {
-                    /* add also corresponding link-local address */
-                    ng_ipv6_addr_t ll_addr;
-
-                    ll_addr.u64[1] = addr->u64[1];
-                    ng_ipv6_addr_set_link_local_prefix(&ll_addr);
-
-                    _add_addr_to_entry(entry, &ll_addr, 64,
-                                       flags | NG_IPV6_NETIF_ADDR_FLAGS_NDP_ON_LINK);
-                }
-                else {
-                    entry->addrs[i].flags |= NG_IPV6_NETIF_ADDR_FLAGS_NDP_ON_LINK;
-                }
-
-                ng_ipv6_addr_set_solicited_nodes(&sol_node, addr);
-                _add_addr_to_entry(entry, &sol_node, NG_IPV6_ADDR_BIT_LEN, 0);
-            }
-
-            return &entry->addrs[i].addr;
+        if (ng_ipv6_addr_is_unspecified(&(entry->addrs[i].addr)) && !tmp_addr) {
+            tmp_addr = &(entry->addrs[i]);
         }
     }
 
-    return NULL;
+    if (!tmp_addr) {
+        DEBUG("ipv6 netif: couldn't add %s/%" PRIu8 " to interface %" PRIkernel_pid "\n: No space left.",
+          ng_ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)),
+          prefix_len, entry->pid);
+        return NULL;
+    }
+
+    memcpy(&(tmp_addr->addr), addr, sizeof(ng_ipv6_addr_t));
+    DEBUG("ipv6 netif: Added %s/%" PRIu8 " to interface %" PRIkernel_pid "\n",
+          ng_ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)),
+          prefix_len, entry->pid);
+
+    tmp_addr->prefix_len = prefix_len;
+    tmp_addr->flags = flags;
+
+    if (ng_ipv6_addr_is_multicast(addr)) {
+        tmp_addr->flags |= NG_IPV6_NETIF_ADDR_FLAGS_NON_UNICAST;
+    }
+    else {
+        ng_ipv6_addr_t sol_node;
+
+        if (!ng_ipv6_addr_is_link_local(addr)) {
+            /* add also corresponding link-local address */
+            ng_ipv6_addr_t ll_addr;
+
+            ll_addr.u64[1] = addr->u64[1];
+            ng_ipv6_addr_set_link_local_prefix(&ll_addr);
+
+            _add_addr_to_entry(entry, &ll_addr, 64,
+                               flags | NG_IPV6_NETIF_ADDR_FLAGS_NDP_ON_LINK);
+        }
+        else {
+            tmp_addr->flags |= NG_IPV6_NETIF_ADDR_FLAGS_NDP_ON_LINK;
+        }
+
+        ng_ipv6_addr_set_solicited_nodes(&sol_node, addr);
+        _add_addr_to_entry(entry, &sol_node, NG_IPV6_ADDR_BIT_LEN, 0);
+    }
+
+    return &(tmp_addr->addr);
 }
 
 static void _reset_addr_from_entry(ng_ipv6_netif_t *entry)
@@ -102,37 +111,48 @@ void ng_ipv6_netif_init(void)
 
 void ng_ipv6_netif_add(kernel_pid_t pid)
 {
+    ng_ipv6_netif_t *free_entry = NULL;
+
     for (int i = 0; i < NG_NETIF_NUMOF; i++) {
         if (ipv6_ifs[i].pid == pid) {
-            return; /* prevent duplicates */
-        }
-        else if (ipv6_ifs[i].pid == KERNEL_PID_UNDEF) {
-            ng_ipv6_addr_t addr = NG_IPV6_ADDR_ALL_NODES_LINK_LOCAL;
-            mutex_lock(&ipv6_ifs[i].mutex);
-
-            DEBUG("ipv6 netif: Add IPv6 interface %" PRIkernel_pid " (i = %d)\n", pid, i);
-            ipv6_ifs[i].pid = pid;
-            ipv6_ifs[i].mtu = NG_IPV6_NETIF_DEFAULT_MTU;
-            ipv6_ifs[i].cur_hl = NG_IPV6_NETIF_DEFAULT_HL;
-            ipv6_ifs[i].flags = 0;
-
-            _add_addr_to_entry(&ipv6_ifs[i], &addr, NG_IPV6_ADDR_BIT_LEN, 0);
-
-            mutex_unlock(&ipv6_ifs[i].mutex);
-
-#ifdef MODULE_NG_NDP
-            ng_ndp_netif_add(&ipv6_ifs[i]);
-#endif
-
-            DEBUG(" * pid = %" PRIkernel_pid "  ", ipv6_ifs[i].pid);
-            DEBUG("cur_hl = %d  ", ipv6_ifs[i].cur_hl);
-            DEBUG("mtu = %d  ", ipv6_ifs[i].mtu);
-            DEBUG("flags = %04" PRIx16 "\n", ipv6_ifs[i].flags);
+            /* pid has already been added */
             return;
+        }
+
+        else if ((ipv6_ifs[i].pid == KERNEL_PID_UNDEF) && !free_entry) {
+            /* found the first free entry */
+            free_entry = &ipv6_ifs[i];
         }
     }
 
-    DEBUG("ipv6 netif: Could not add %" PRIkernel_pid " to IPv6: No space left.\n", pid);
+    if (!free_entry) {
+        DEBUG("ipv6 netif: Could not add %" PRIkernel_pid " to IPv6: No space left.\n", pid);
+        return;
+    }
+
+    /* Otherwise, fill the free entry */
+
+    ng_ipv6_addr_t addr = NG_IPV6_ADDR_ALL_NODES_LINK_LOCAL;
+    mutex_lock(&free_entry->mutex);
+
+    DEBUG("ipv6 netif: Add IPv6 interface %" PRIkernel_pid " (i = %d)\n", pid, i);
+    free_entry->pid = pid;
+    free_entry->mtu = NG_IPV6_NETIF_DEFAULT_MTU;
+    free_entry->cur_hl = NG_IPV6_NETIF_DEFAULT_HL;
+    free_entry->flags = 0;
+
+    _add_addr_to_entry(free_entry, &addr, NG_IPV6_ADDR_BIT_LEN, 0);
+
+    mutex_unlock(&free_entry->mutex);
+
+#ifdef MODULE_NG_NDP
+    ng_ndp_netif_add(free_entry);
+#endif
+
+    DEBUG(" * pid = %" PRIkernel_pid "  ", free_entry->pid);
+    DEBUG("cur_hl = %d  ", free_entry->cur_hl);
+    DEBUG("mtu = %d  ", free_entry->mtu);
+    DEBUG("flags = %04" PRIx16 "\n", free_entry->flags);
 }
 
 void ng_ipv6_netif_remove(kernel_pid_t pid)
