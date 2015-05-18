@@ -22,6 +22,7 @@
 #define FIB_H_
 
 #include "timex.h"
+#include "ng_fib/ng_fib_config.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -36,26 +37,13 @@ typedef struct rp_address_msg_t {
     uint32_t address_flags; /**< The flags for the given address */
 } rp_address_msg_t;
 
-#define FIB_MSG_RP_SIGNAL (0x99)     /**< message type for RP notifications */
-
-/**
- * @brief the size in bytes of a full address
- * TODO: replace with UNIVERSAL_ADDRESS_SIZE (#3022)
-*/
-#define FIB_DESTINATION_SIZE_SUBSTITUTE (16)
-
 /**
  * @brief entry used to collect available destinations
  */
 typedef struct fib_destination_set_entry_t {
-    uint8_t dest[FIB_DESTINATION_SIZE_SUBSTITUTE]; /**< The destination address */
+    uint8_t dest[UNIVERSAL_ADDRESS_SIZE]; /**< The destination address */
     size_t dest_size;    /**< The destination address size */
 } fib_destination_set_entry_t;
-
-/**
- * @brief indicator of a lifetime that does not expire (2^32 - 1)
- */
-#define FIB_LIFETIME_NO_EXPIRE (0xFFFFFFFF)
 
 /**
  * @brief initializes all FIB entries with 0
@@ -138,8 +126,8 @@ void fib_remove_entry(uint8_t *dst, size_t dst_size);
  * @param[in] dst_flags           the destination address flags
  *
  * @return 0 on success
- *         -EHOSTUNREACH if no next hop is available in any FIB table
- *                                           all RRPs are notified before the return
+ *         -EHOSTUNREACH if no next hop is available in the FIB table
+ *                                           all RPs are notified before the return
  *         -ENOBUFS if the size for the next hop address is insufficient low
  *         -EFAULT if dst and/or next_hop is not a valid pointer
  *         -EINVAL if one of the other passed out pointers is NULL
@@ -154,10 +142,10 @@ int fib_get_next_hop(kernel_pid_t *iface_id,
 * the function will continue to count the number of matching entries
 * and provide the number to the caller.
 *
-* @param[in] prefix           the destination address
-* @param[in] prefix_size      the destination address size
-* @param[out] dst_set         the destination addresses matching the prefix
-* @param[in, out] dst_size    the number of entries available on in and used on out
+* @param[in] prefix            the destination address
+* @param[in] prefix_size       the destination address size
+* @param[out] dst_set          the destination addresses matching the prefix
+* @param[in, out] dst_set_size the number of entries available on in and used on out
 *
 * @return 0 on success
 *         -EHOSTUNREACH if no entry matches the type in the FIB

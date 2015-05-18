@@ -36,12 +36,6 @@
 static mutex_t mtx_access = MUTEX_INIT;
 
 /**
- * @brief maximum number of handled routing protocols (RP)
- *        used to notify the saved kernel_pid_t on ureachable destination
- */
-#define FIB_MAX_REGISTERED_RP (5)
-
-/**
  * @brief registered RPs for notifications about unreachable destinations
  */
 static size_t notify_rp_pos = 0;
@@ -55,11 +49,6 @@ static kernel_pid_t notify_rp[FIB_MAX_REGISTERED_RP];
  * @brief the prefix handled by the RP
  */
 static universal_address_container_t* prefix_rp[FIB_MAX_REGISTERED_RP];
-
-/**
- * @brief maximum number of FIB tables entries handled
- */
-#define FIB_MAX_FIB_TABLE_ENTRIES (20)
 
 /**
  * @brief array of the FIB tables
