@@ -1,0 +1,254 @@
+#******************************************************************************
+#
+# Makefile.grlib-cm4f - Rules for building the graphics library.
+#
+# Copyright (c) 2008-2012 Texas Instruments Incorporated.  All rights reserved.
+# Software License Agreement
+# 
+# Texas Instruments (TI) is supplying this software for use solely and
+# exclusively on TI's microcontroller products. The software is owned by
+# TI and/or its suppliers, and is protected under applicable copyright
+# laws. You may not combine this software with "viral" open-source
+# software in order to form a larger program.
+# 
+# THIS SOFTWARE IS PROVIDED "AS IS" AND WITH ALL FAULTS.
+# NO WARRANTIES, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING, BUT
+# NOT LIMITED TO, IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+# A PARTICULAR PURPOSE APPLY TO THIS SOFTWARE. TI SHALL NOT, UNDER ANY
+# CIRCUMSTANCES, BE LIABLE FOR SPECIAL, INCIDENTAL, OR CONSEQUENTIAL
+# DAMAGES, FOR ANY REASON WHATSOEVER.
+# 
+# This is part of revision 9453 of the Stellaris Graphics Library.
+#
+#******************************************************************************
+
+#
+# Defines the directory suffix that this project uses.
+#
+SUFFIX=-cm4f
+
+#
+# Set the processor variant.
+#
+VARIANT=cm4f
+
+#
+# The base directory for StellarisWare.
+#
+ROOT=..
+
+#
+# Include the common make definitions.
+#
+include ${ROOT}/makedefs
+
+#
+# Where to find source files that do not live in this directory.
+#
+VPATH=fonts
+
+#
+# Where to find header files that do not live in the source directory.
+#
+IPATH=..
+
+#
+# The default rule, which causes the graphics library to be built.
+#
+all: ${COMPILER}-cm4f
+all: ${COMPILER}-cm4f/libgr-cm4f.a
+
+#
+# The rule to clean out all the build products.
+#
+clean:
+	@rm -rf ${COMPILER}-cm4f ${wildcard *~}
+
+#
+# The rule to create the target directory.
+#
+${COMPILER}-cm4f:
+	@mkdir -p ${COMPILER}-cm4f
+
+#
+# Rules for building the graphics library.
+#
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/canvas.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/charmap.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/checkbox.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/circle.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/container.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/context.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcm12.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcm12b.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcm12i.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcm14.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcm14b.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcm14i.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcm16.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcm16b.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcm16i.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcm18.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcm18b.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcm18i.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcm20.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcm20b.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcm20i.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcm22.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcm22b.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcm22i.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcm24.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcm24b.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcm24i.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcm26.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcm26b.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcm26i.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcm28.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcm28b.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcm28i.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcm30.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcm30b.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcm30i.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcm32.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcm32b.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcm32i.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcm34.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcm34b.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcm34i.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcm36.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcm36b.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcm36i.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcm38.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcm38b.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcm38i.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcm40.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcm40b.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcm40i.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcm42.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcm42b.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcm42i.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcm44.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcm44b.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcm44i.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcm46.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcm46b.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcm46i.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcm48.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcm48b.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcm48i.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmsc12.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmsc14.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmsc16.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmsc18.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmsc20.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmsc22.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmsc24.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmsc26.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmsc28.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmsc30.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmsc32.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmsc34.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmsc36.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmsc38.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmsc40.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmsc42.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmsc44.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmsc46.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmsc48.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmss12.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmss12b.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmss12i.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmss14.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmss14b.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmss14i.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmss16.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmss16b.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmss16i.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmss18.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmss18b.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmss18i.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmss20.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmss20b.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmss20i.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmss22.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmss22b.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmss22i.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmss24.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmss24b.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmss24i.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmss26.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmss26b.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmss26i.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmss28.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmss28b.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmss28i.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmss30.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmss30b.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmss30i.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmss32.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmss32b.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmss32i.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmss34.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmss34b.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmss34i.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmss36.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmss36b.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmss36i.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmss38.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmss38b.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmss38i.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmss40.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmss40b.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmss40i.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmss42.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmss42b.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmss42i.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmss44.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmss44b.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmss44i.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmss46.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmss46b.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmss46i.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmss48.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmss48b.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmss48i.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmtt12.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmtt14.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmtt16.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmtt18.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmtt20.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmtt22.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmtt24.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmtt26.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmtt28.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmtt30.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmtt32.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmtt34.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmtt36.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmtt38.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmtt40.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmtt42.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmtt44.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmtt46.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontcmtt48.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/fontfixed6x8.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/image.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/imgbutton.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/line.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/listbox.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/offscr1bpp.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/offscr4bpp.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/offscr8bpp.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/pushbutton.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/radiobutton.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/rectangle.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/slider.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/string.o
+${COMPILER}-cm4f/libgr-cm4f.a: ${COMPILER}-cm4f/widget.o
+
+#
+# Include the automatically generated dependency files.
+#
+ifneq (${MAKECMDGOALS},clean)
+-include ${wildcard ${COMPILER}-cm4f/*.d} __dummy__
+endif
