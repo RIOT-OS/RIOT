@@ -34,6 +34,8 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
+#include "log.h"
+
 #include "hwtimer.h"
 #include "hwtimer_cpu.h"
 #include "arch/hwtimer_arch.h"
@@ -157,7 +159,7 @@ static int _hwtimer_set(unsigned long offset, void (*callback)(void*), void *ptr
     if (n == -1) {
         restoreIRQ(state);
 
-        puts("No hwtimer left.");
+        LOG_WARNING("No hwtimer left.");
         return -1;
     }
 
