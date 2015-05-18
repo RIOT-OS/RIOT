@@ -397,7 +397,6 @@ void rpl_global_repair(rpl_dodag_t *my_dodag, ipv6_addr_t *p_addr, uint16_t rank
     }
 
     rpl_delete_all_parents(my_dodag);
-    my_dodag->version = my_dodag->version;
     my_dodag->dtsn++;
     my_dodag->my_preferred_parent = rpl_new_parent(my_dodag, p_addr, rank);
 
