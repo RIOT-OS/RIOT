@@ -22,7 +22,7 @@
 #include <stdint.h>
 #include "cpu-conf.h"
 
-#define FLASH_BASE         	(0x00000000)
+#define FLASH_BASE          (0x00000000)
 
 static void cpu_clock_init(void);
 
