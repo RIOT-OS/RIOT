@@ -317,6 +317,27 @@ int16_t ng_at86rf2xx_get_txpower(ng_at86rf2xx_t *dev);
 void ng_at86rf2xx_set_txpower(ng_at86rf2xx_t *dev, int16_t txpower);
 
 /**
+ * @brief   Get the maximum number of retransmissions
+ *
+ * @param[in] dev           device to read from
+ *
+ * @return                  configured number of retransmissions
+ */
+uint8_t ng_at86rf2xx_get_max_retries(ng_at86rf2xx_t *dev);
+
+/**
+ * @brief   Set the maximum number of retransmissions
+ *
+ * This setting specifies the number of attempts to retransmit a frame, when it
+ * was not acknowledged by the recipient, before the transaction gets cancelled.
+ * The maximum value is 7.
+ *
+ * @param[in] dev           device to write to
+ * @param[in] max           the maximum number of retransmissions
+ */
+void ng_at86rf2xx_set_max_retries(ng_at86rf2xx_t *dev, uint8_t max);
+
+/**
  * @brief   Enable or disable driver specific options
  *
  * @param[in] dev           device to set/clear option flag for

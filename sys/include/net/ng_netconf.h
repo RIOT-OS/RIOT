@@ -72,6 +72,8 @@ typedef enum {
                                      *   the current state */
     NETCONF_OPT_AUTOACK,            /**< en/disable link layer auto ACKs or read
                                      *   the current state */
+    NETCONF_OPT_RETRANS,            /**< get/set the maximum number of
+                                         retransmissions. */
     NETCONF_OPT_PROTO,              /**< get/set the protocol for the layer
                                      *   as type ng_nettype_t. */
     NETCONF_OPT_STATE,              /**< get/set the state of network devices as

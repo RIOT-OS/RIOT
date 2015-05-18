@@ -445,6 +445,13 @@ static int _get(ng_netdev_t *device, ng_netconf_opt_t opt,
             }
             return sizeof(ng_netconf_enable_t);
 
+        case NETCONF_OPT_RETRANS:
+            if (max_len < sizeof(uint8_t)) {
+                return -EOVERFLOW;
+            }
+            *((uint8_t *)val) = ng_at86rf2xx_get_max_retries(dev);
+            return sizeof(uint8_t);
+
         case NETCONF_OPT_PROMISCUOUSMODE:
             if (dev->options & NG_AT86RF2XX_OPT_PROMISCUOUS) {
                 *((ng_netconf_enable_t *)val) = NETCONF_ENABLE;
@@ -576,6 +583,13 @@ static int _set(ng_netdev_t *device, ng_netconf_opt_t opt,
             ng_at86rf2xx_set_option(dev, NG_AT86RF2XX_OPT_AUTOACK,
                                     ((bool *)val)[0]);
             return sizeof(ng_netconf_enable_t);
+
+        case NETCONF_OPT_RETRANS:
+            if (len > sizeof(uint8_t)) {
+                return -EOVERFLOW;
+            }
+            ng_at86rf2xx_set_max_retries(dev, *((uint8_t *)val));
+            return sizeof(uint8_t);
 
         case NETCONF_OPT_PRELOADING:
             ng_at86rf2xx_set_option(dev, NG_AT86RF2XX_OPT_PRELOADING,
