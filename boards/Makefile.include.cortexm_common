@@ -2,9 +2,6 @@
 export PREFIX = arm-none-eabi-
 include $(RIOTBOARD)/Makefile.include.gnu
 
-# use cortex name of CPU folder, but enable board Makefile to override
-export MCPU ?= $(CORTEX)
-
 # define build specific options
 export CFLAGS_CPU   = -mcpu=$(MCPU) -mlittle-endian -mthumb -mno-thumb-interwork $(CFLAGS_FPU)
 export CFLAGS_STYLE = -std=gnu99 -Wall -Wstrict-prototypes
@@ -14,14 +11,8 @@ export CFLAGS_OPT   ?= -Os
 export CFLAGS += $(CFLAGS_CPU) $(CFLAGS_STYLE) $(CFLAGS_LINK) $(CFLAGS_DBG) $(CFLAGS_OPT)
 
 export ASFLAGS += $(CFLAGS_CPU) $(CFLAGS_DEBUG)
-export LINKFLAGS += -L$(RIOTCPU)/$(CPU)
-export LINKFLAGS += $(CFLAGS_DEBUG) $(CFLAGS_CPU) $(CFLAGS_STYLE) -static -lgcc -nostartfiles -T$(LINKERSCRIPT)
-
-export OFLAGS ?= -O ihex
-export FFLAGS ?= flash
-export DEBUGGER_FLAGS ?= debug
-export DEBUGSERVER_FLAGS ?= debug-server
-export RESET_FLAGS ?= reset
+export LINKFLAGS += -L$(RIOTCPU)/$(CPU) -T$(RIOTCPU)/$(CPU)/$(CPU_MODEL)_linkerscript.ld
+export LINKFLAGS += $(CFLAGS_DEBUG) $(CFLAGS_CPU) $(CFLAGS_STYLE) -static -lgcc -nostartfiles
 
 # use the nano-specs of the NewLib when available
 ifeq ($(shell $(LINK) -specs=nano.specs -E - 2>/dev/null >/dev/null </dev/null ; echo $$?),0)

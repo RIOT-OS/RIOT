@@ -1,26 +1,26 @@
 # This CPU implementation is using the new core/CPU interface:
 export CFLAGS += -DCOREIF_NG=1
 
-# CPU model specifics
-ifeq ($(CORTEX),cortex-m4)
-export CFLAGS_FPU += -mfloat-abi=hard -mfpu=fpv4-sp-d16
-endif
-
 # Tell the build system that the CPU depends on the Cortex-M common files:
-export USEMODULE += $(CORTEX)_common
-
+export USEMODULE += cortexm_common
+# Export the peripheral drivers to be linked into the final binary:
+export USEMODULE += periph
 # all cortex MCU's use newlib as libc
 export USEMODULE += newlib
 
-# some CPU's don't define a model
-export CPU_MODEL ?= $(CPU)
-
-# Define the linker script to use for this CPU:
-export LINKERSCRIPT ?= $(RIOTCPU)/$(CPU)/$(CPU_MODEL)_linkerscript.ld
-
-# Export the CPU model:
+# export the CPU model and architecture
 MODEL = $(shell echo $(CPU_MODEL) | tr 'a-z' 'A-Z')
 export CFLAGS += -DCPU_MODEL_$(MODEL)
+ARCH = $(shell echo $(CPU_ARCH) | tr 'a-z-' 'A-Z_')
+export CFLAGS += -DCPU_ARCH_$(ARCH)
+
+# set the compiler specific CPU and FPU options
+ifeq ($(CPU_ARCH),cortex-m4f)
+export CFLAGS_FPU += -mfloat-abi=hard -mfpu=fpv4-sp-d16
+export MCPU := cortex-m4
+else
+export MCPU ?= $(CPU_ARCH)
+endif
 
 # Include CPU specific includes:
 export INCLUDES += -I$(RIOTCPU)/$(CPU)/include
@@ -29,14 +29,8 @@ export INCLUDES += -I$(RIOTCPU)/$(CPU)/include
 #   Without this the interrupt vectors will not be linked correctly!
 export UNDEF += $(BINDIR)cpu/startup.o
 
-# Export the peripheral drivers to be linked into the final binary:
-export USEMODULE += periph
-
-# cortex common directory
-export CORTEX_COMMON := $(RIOTCPU)/$(CORTEX)_common
-
 # CPU depends on the cortex-m common module, so include it:
-include $(CORTEX_COMMON)/Makefile.include
+include $(RIOTCPU)/cortexm_common/Makefile.include
 
 # Avoid overriding the default rule:
 all:
