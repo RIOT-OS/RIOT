@@ -5,7 +5,7 @@ export CPU_MODEL = lm4f120
 #define the default port depending on the host OS
 OS := $(shell uname)
 ifeq ($(OS),Linux)
-  PORT ?= /dev/ttyUSB0
+  PORT ?= /dev/ttyACM0
 else ifeq ($(OS),Darwin)
   PORT ?= $(shell ls -1 /dev/tty.SLAB_USBtoUART* | head -n 1)
 else
@@ -35,7 +35,7 @@ export STELLARISWARE = $(RIOTCPU)/StellarisWare
 PART = LM4F120H5QR
 CPU_USAGE = -mcpu=cortex-m4			#The CPU Variant
 FPU_USAGE = -mfpu=fpv4-sp-d16 -mfloat-abi=softfp		#The type of FPU we are using
-export CFLAGS += -ggdb -g3 -std=gnu99 -Os -Wall -Wstrict-prototypes $(CPU_USAGE) $(FPU_USAGE) -mlittle-endian -mthumb -mno-thumb-interwork -nostartfiles 
+export CFLAGS += -ggdb -g3 -std=c99 -Os -Wall -Wstrict-prototypes $(CPU_USAGE) $(FPU_USAGE) -mlittle-endian -mthumb -mno-thumb-interwork -nostartfiles 
 export CFLAGS += -ffunction-sections -fdata-sections -fno-builtin
 export CFLAGS += -I$(STELLARISWARE) -DPART_$(PART) -c -DTARGET_IS_BLIZZARD_RA1
 export ASFLAGS += -ggdb -g3 $(CPU_USAGE) $(FPU_USAGE) -mlittle-endian
