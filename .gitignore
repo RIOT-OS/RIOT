@@ -1,19 +1,28 @@
+# Object files
 *.o
+# Documentation artifacts
 doc/doxygen/html
 doc/doxygen/latex
 doc/doxygen/man
 doc/doxygen/*.log
 doc/doxygen/*.db
 doc/doxygen/*.tmp
+# Built binaries
 *bin
+# Backup files
 *~
 *.orig
 .*.swp
 cachegrind.out*
+# Eclipse workspace files
 .project
 .cproject
 .settings
 .idea
+# KDevelop4 project files
 .kdev4
 *.kdev4
+# Codelite (among others) project files
+*.project
+
 /toolchain
