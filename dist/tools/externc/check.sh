@@ -28,7 +28,7 @@ else
     FILES="$(git diff --diff-filter=${DIFFFILTER} --name-only ${BRANCH} | grep -E '\.h$')"
 fi
 
-FILES=$(echo "${FILES}" | grep -v -E '^(dist/tools|boards/msba2-common/tools/)')
+FILES=$(echo "${FILES}" | grep -v -E '^(dist/tools|boards/msba2-common/tools/|cpu/saml21/include/atmel/)')
 
 # check files
 for FILE in ${FILES}; do
