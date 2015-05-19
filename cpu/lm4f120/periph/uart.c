@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Freie Universität Berlin
+ * Copyright (C) 2015 Rakendra Thapa <rakendrathapa@gmail.com
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -76,20 +76,20 @@ int uart_init_testing(uart_t uart, uint32_t baudrate)
 {
 	// Enable lazy stacking for interrupt handlers. This allows floating point instructions to be
 	// used within interrupt handers, but at the expense of extra stack usuage.
-	const unsigned long srcClock = SysCtlClockGet();
+	const unsigned long srcClock = ROM_SysCtlClockGet();
 
-	SysCtlPeripheralEnable(SYSCTL_PERIPH_UART0);
-	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
+	ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_UART0);
+	ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
 
-    GPIOPinTypeUART(GPIO_PORTA_BASE, GPIO_PIN_0 | GPIO_PIN_1);
+    ROM_GPIOPinTypeUART(GPIO_PORTA_BASE, GPIO_PIN_0 | GPIO_PIN_1);
 
-	UARTDisable(UART0_BASE);
-	UARTConfigSetExpClk(UART0_BASE,srcClock, baudrate,
+	ROM_UARTDisable(UART0_BASE);
+	ROM_UARTConfigSetExpClk(UART0_BASE,srcClock, baudrate,
 			(UART_CONFIG_PAR_NONE | UART_CONFIG_STOP_ONE |
 			 UART_CONFIG_WLEN_8));
 
 	//Enable the UART interrupt
-	UARTEnable(UART0_BASE);
+	ROM_UARTEnable(UART0_BASE);
 
     // Prompt for text to be entered.
     //
@@ -112,7 +112,7 @@ void UARTSend(const unsigned char *pucBuffer, unsigned long ulCount)
         //
         // Write the next character to the UART.
         //
-        UARTCharPutNonBlocking(UART0_BASE, *pucBuffer++);
+        ROM_UARTCharPutNonBlocking(UART0_BASE, *pucBuffer++);
     }
 }
 
@@ -131,7 +131,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, uart_tx_cb_t t
 	ASSERT(uart == 0);
 
 	// Check to make sure the UART peripheral is present
-	if(!SysCtlPeripheralPresent(SYSCTL_PERIPH_UART0))
+	if(!ROM_SysCtlPeripheralPresent(SYSCTL_PERIPH_UART0))
 	{
 		return -1;
 	}
@@ -141,14 +141,14 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, uart_tx_cb_t t
 
 	// Configure the relevant UART pins for operations as a UART rather than GPIOs.
 #if UART_0_EN
-	SysCtlPeripheralEnable(SYSCTL_PERIPH_UART0);
-	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
+	ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_UART0);
+	ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
 	// Set GPIO A0 and A1 as UART pins
-	GPIOPinConfigure(GPIO_PA0_U0RX);
-	GPIOPinConfigure(GPIO_PA1_U0TX);
-	GPIOPinTypeUART(GPIO_PORTA_BASE, GPIO_PIN_0 | GPIO_PIN_1);
+	ROM_GPIOPinConfigure(GPIO_PA0_U0RX);
+	ROM_GPIOPinConfigure(GPIO_PA1_U0TX);
+	ROM_GPIOPinTypeUART(GPIO_PORTA_BASE, GPIO_PIN_0 | GPIO_PIN_1);
 #endif
-	UARTDisable(UART0_BASE);
+	ROM_UARTDisable(UART0_BASE);
 	// Enable the UART Peripheral for use
 	//	SysCtlPeripheralEnable(g_ulUARTPeriph[uart]);
 	// Configure the UART
@@ -158,17 +158,17 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, uart_tx_cb_t t
     config[uart].tx_cb = tx_cb;
     config[uart].arg = arg;
 
-	UARTConfigSetExpClk(UART0_BASE,SysCtlClockGet(), baudrate,
+	ROM_UARTConfigSetExpClk(UART0_BASE,ROM_SysCtlClockGet(), baudrate,
 			(UART_CONFIG_PAR_NONE | UART_CONFIG_STOP_ONE |
 			 UART_CONFIG_WLEN_8));
 
 
 
 	// Enable the UART interrupt
-	UARTIntEnable(UART0_BASE, UART_INT_RX | UART_INT_RT);
-	IntEnable(INT_UART0);
+	ROM_UARTIntEnable(UART0_BASE, UART_INT_RX | UART_INT_RT);
+	ROM_IntEnable(INT_UART0);
 
-	UARTEnable(UART0_BASE);
+	ROM_UARTEnable(UART0_BASE);
 
 	return 1;
 }
@@ -177,12 +177,12 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, uart_tx_cb_t t
 	
 int uart_init_blocking(uart_t uart, uint32_t baudrate)
 {
-	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
-	GPIOPinConfigure(GPIO_PA0_U0RX);
-	GPIOPinConfigure(GPIO_PA1_U0TX);
-	GPIOPinTypeUART(GPIO_PORTA_BASE, GPIO_PIN_0 | GPIO_PIN_1);
+	ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
+	ROM_GPIOPinConfigure(GPIO_PA0_U0RX);
+	ROM_GPIOPinConfigure(GPIO_PA1_U0TX);
+	ROM_GPIOPinTypeUART(GPIO_PORTA_BASE, GPIO_PIN_0 | GPIO_PIN_1);
 	
-	UARTConfigSetExpClk(UART0_BASE,SysCtlClockGet(), baudrate,
+	ROM_UARTConfigSetExpClk(UART0_BASE,ROM_SysCtlClockGet(), baudrate,
 			(UART_CONFIG_PAR_NONE | UART_CONFIG_STOP_ONE |
 			 UART_CONFIG_WLEN_8));
 
@@ -191,7 +191,7 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
 	//UARTIntEnable(UART0_BASE, UART_INT_RX | UART_INT_RT);
 	//IntEnable(INT_UART0);
 
-	UARTEnable(UART0_BASE);
+	ROM_UARTEnable(UART0_BASE);
 
     return 1;
 }
@@ -199,35 +199,35 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
 void uart_tx_begin(uart_t uart)
 {
 	// enable TX interrupt
-	UARTIntEnable(UART0_BASE, UART_INT_TX);
+	ROM_UARTIntEnable(UART0_BASE, UART_INT_TX);
 }
 
 int uart_write(uart_t uart, char data)
 {
-	UARTCharPutNonBlocking(UART0_BASE, data);
+	ROM_UARTCharPutNonBlocking(UART0_BASE, data);
     return 1;
 }
 
 int uart_read_blocking(uart_t uart, char *data)
 {
-	*data = (char)UARTCharGet(UART0_BASE);
+	*data = (char)ROM_UARTCharGet(UART0_BASE);
 	return 1;
 }
 
 int uart_write_blocking(uart_t uart, char data)
 {
-	UARTCharPut(UART0_BASE, data);
+	ROM_UARTCharPut(UART0_BASE, data);
     return 1;
 }
 
 void uart_poweron(uart_t uart)
 {
-	UARTEnable(UART0_BASE);
+	ROM_UARTEnable(UART0_BASE);
 }
 
 void uart_poweroff(uart_t uart)
 {
-	UARTDisable(UART0_BASE);
+	ROM_UARTDisable(UART0_BASE);
 }
 
 //*****************************************************************************
@@ -243,17 +243,17 @@ void UARTIntHandler(void)
 	long lChar;
 
 	// Get the interrupt status
-	ulStatus = UARTIntStatus(UART0_BASE, true);
+	ulStatus = ROM_UARTIntStatus(UART0_BASE, true);
 
 	// Clear the asserted interrupts
-	UARTIntClear(UART0_BASE, ulStatus);
+	ROM_UARTIntClear(UART0_BASE, ulStatus);
 
 	// Are we interrupted due to TX done
 	if(ulStatus & UART_INT_TX)
 	{
 		// Turn off the Transmit Interrupt
 		if (config[UART_0].tx_cb(config[UART_0].arg) == 0){
-			UARTIntDisable(UART0_BASE, UART_INT_TX);
+			ROM_UARTIntDisable(UART0_BASE, UART_INT_TX);
 		}
 	}
 
@@ -261,10 +261,10 @@ void UARTIntHandler(void)
 	if(ulStatus & (UART_INT_RX | UART_INT_RT))
 	{
 		// Get all the available characters from the UART
-		while(UARTCharsAvail(UART0_BASE))
+		while(ROM_UARTCharsAvail(UART0_BASE))
 		{
 			// Read a character
-			lChar = UARTCharGetNonBlocking(UART0_BASE);
+			lChar = ROM_UARTCharGetNonBlocking(UART0_BASE);
 			cChar = (unsigned char)(lChar & 0xFF);
 			config[UART_0].rx_cb(config[UART_0].arg, cChar);
 		}

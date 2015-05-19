@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Freie Universität Berlin
+ * Copyright (C) 2015 Rakendra Thapa <rakendrathapa@gmail.com
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -7,14 +7,13 @@
  */
 
 /**
- * @ingroup     cpu_cortexm4_common
+ * @ingroup     cpu_lm4f120
  * @{
  *
  * @file
  * @brief       Implementation of the kernel's architecture dependent thread interface
  *
- * @author      Stefan Pfeiffer <stefan.pfeiffer@fu-berlin.de>
- * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Rakendra Thapa <rakendrathapa@gmail.com>
  *
  * @}
  */
@@ -159,7 +158,7 @@ __attribute__((naked)) void NORETURN thread_arch_start_threading(void)
 void thread_arch_yield(void)
 {
     // trigger the PENDSV interrupt to run scheduler and schedule new thread if applicable 
-	IntPendSet(FAULT_PENDSV);
+	ROM_IntPendSet(FAULT_PENDSV);
 }
 
 /**

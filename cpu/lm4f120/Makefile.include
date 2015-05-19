@@ -17,6 +17,3 @@ export UNDEF += $(BINDIR)cpu/startup.o
 
 # export the peripheral drivers to be linked into the final binary
 export USEMODULE += periph
-
-# CPU depends on the cm4f library from stellarisware, so include it
-export LINKFLAGS += -ldriver-cm4f  

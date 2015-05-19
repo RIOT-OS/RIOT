@@ -1,28 +1,22 @@
-//*****************************************************************************
-//
-// startup.c - Startup code for use with GNU tools.
-//
-// Copyright (c) 2012 Texas Instruments Incorporated.  All rights reserved.
-// Software License Agreement
-// 
-// Texas Instruments (TI) is supplying this software for use solely and
-// exclusively on TI's microcontroller products. The software is owned by
-// TI and/or its suppliers, and is protected under applicable copyright
-// laws. You may not combine this software with "viral" open-source
-// software in order to form a larger program.
-// 
-// THIS SOFTWARE IS PROVIDED "AS IS" AND WITH ALL FAULTS.
-// NO WARRANTIES, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING, BUT
-// NOT LIMITED TO, IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-// A PARTICULAR PURPOSE APPLY TO THIS SOFTWARE. TI SHALL NOT, UNDER ANY
-// CIRCUMSTANCES, BE LIABLE FOR SPECIAL, INCIDENTAL, OR CONSEQUENTIAL
-// DAMAGES, FOR ANY REASON WHATSOEVER.
-// 
-// This is part of revision 9453 of the EK-LM4F120XL Firmware Package.
-//
-// Author:		Rakendra Thapa <rakendrathapa@gmail.com>.
-// Description:	LM4F120H5QR startup code.
-//*****************************************************************************
+/*
+ * Copyright (C) 2015 Rakendra Thapa <rakendrathapa@gmail.com
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License v2.1. See the file LICENSE in the top level directory for more
+ * details.
+ */
+
+/**
+ * @ingroup     cpu_lm4f120
+ * @{
+ *
+ * @file		startup.c - Startup code
+ * @brief       LM4F120H5QR startup code.
+ *
+ * @author      Rakendra Thapa <rakendrathapa@gmail.com>
+ *
+ * @}
+ */
 
 #include <stdio.h>
 #include <stdint.h>

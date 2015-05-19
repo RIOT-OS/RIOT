@@ -1,11 +1,22 @@
 /*
-* Copyright (c) 2012, Rakendra Thapa
-* All rights reserved.
-*
-* File:			lm4f120_linkerscript.ld
-* Author:		Rakendra Thapa <rakendrathapa@gmail.com>.
-* Description:	Linker description file for LM4FXXX microcontrollers.
-*/
+ * Copyright (C) 2015 Rakendra Thapa <rakendrathapa@gmail.com
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License v2.1. See the file LICENSE in the top level directory for more
+ * details.
+ */
+
+/**
+ * @ingroup     cpu_lm4f120
+ * @{
+ *
+ * @file		lm4f120_linkerscript.ld
+ * @brief       Linker description file for LM4FXXX microcontrollers.
+ *
+ * @author      Rakendra Thapa <rakendrathapa@gmail.com>
+ *
+ * @}
+ */
 
 OUTPUT_FORMAT("elf32-littlearm", "elf32-littlearm", "elf32-littlearm")
 OUTPUT_ARCH(arm)

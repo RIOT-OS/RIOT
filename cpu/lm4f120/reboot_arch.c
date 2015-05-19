@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Freie Universität Berlin
+ * Copyright (C) 2015 Rakendra Thapa <rakendrathapa@gmail.com
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -28,7 +28,7 @@ int reboot_arch(int mode)
 	// Perform a software reset request.  This
     // will cause the microcontroller to reset; no further
     // code will be executed.
-	SysCtlReset();
+	ROM_SysCtlReset();
 
 	// The microcontroller should have reset, so this should
 	// never be reached.  Just in case, return -1 otherwise.

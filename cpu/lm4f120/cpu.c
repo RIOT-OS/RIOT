@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Freie Universität Berlin
+ * Copyright (C) 2015 Rakendra Thapa <rakendrathapa@gmail.com
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -53,5 +53,5 @@ CPUipsrGet(void)
 void cpu_init(void)
 {
     /* set pendSV interrupt to lowest possible priority */
-	IntPrioritySet(FAULT_PENDSV, 0x80);
+	ROM_IntPrioritySet(FAULT_PENDSV, 0x80);
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Freie Universität Berlin
+ * Copyright (C) 2015 Rakendra Thapa <rakendrathapa@gmail.com
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -27,8 +27,8 @@
  */
 unsigned int irq_arch_disable(void)
 {
-    unsigned long mask = IntPriorityMaskGet();
-    IntMasterDisable();
+    unsigned long mask = ROM_IntPriorityMaskGet();
+    ROM_IntMasterDisable();
     return ((unsigned int)mask);
 }
 
@@ -37,8 +37,8 @@ unsigned int irq_arch_disable(void)
  */
 unsigned int irq_arch_enable(void)
 {
-	IntMasterEnable();
-	unsigned long mask = IntPriorityMaskGet(); 
+	ROM_IntMasterEnable();
+	unsigned long mask = ROM_IntPriorityMaskGet(); 
     return ((unsigned int)mask);
 }
 
@@ -47,7 +47,7 @@ unsigned int irq_arch_enable(void)
  */
 void irq_arch_restore(unsigned int state)
 {
-    IntPriorityMaskSet((unsigned long) state);
+    ROM_IntPriorityMaskSet((unsigned long) state);
 }
 
 /**
