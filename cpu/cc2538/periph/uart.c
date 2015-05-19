@@ -250,14 +250,14 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
             gpio_hardware_control(UART_1_TX_PIN);
             gpio_hardware_control(UART_1_RX_PIN);
 
-#if ( defined(UART_1_RTS_PORT) && defined(UART_1_RTS_PIN) )
+#ifdef UART_1_RTS_PIN
             IOC_PXX_SEL[UART_1_RTS_PIN] = UART1_RTS;
             gpio_hardware_control(UART_1_RTS_PIN);
             IOC_PXX_OVER[UART_1_RTS_PIN] = IOC_OVERRIDE_OE;
             u->CTLbits.RTSEN = 1;
 #endif
 
-#if ( defined(UART_1_CTS_PORT) && defined(UART_1_CTS_PIN) )
+#ifdef UART_1_CTS_PIN
             IOC_UARTCTS_UART1 = UART_1_CTS_PIN;
             gpio_hardware_control(UART_1_CTS_PIN);
             IOC_PXX_OVER[UART_1_CTS_PIN] = IOC_OVERRIDE_DIS;
