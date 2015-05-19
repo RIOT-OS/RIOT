@@ -106,26 +106,26 @@ extern "C" {
  */
 
 /**
- * @brief   Handles received neighbor solicitations
+ * @brief   Handles received neighbor solicitations.
  *
  * @param[in] iface         The receiving interface.
  * @param[in] pkt           The received packet.
  * @param[in] ipv6          The IPv6 header in @p pkt.
  * @param[in] nbr_sol       The neighbor solicitation in @p pkt.
- * @param[in] icmpv6_size   The overall size of the neighbor solicitation
+ * @param[in] icmpv6_size   The overall size of the neighbor solicitation.
  */
 void ng_ndp_nbr_sol_handle(kernel_pid_t iface, ng_pktsnip_t *pkt,
                            ng_ipv6_hdr_t *ipv6, ng_ndp_nbr_sol_t *nbr_sol,
                            size_t icmpv6_size);
 
 /**
- * @brief   Handles received neighbor solicitations
+ * @brief   Handles received neighbor advertisements.
  *
  * @param[in] iface         The receiving interface.
  * @param[in] pkt           The received packet.
  * @param[in] ipv6          The IPv6 header in @p pkt.
  * @param[in] nbr_adv       The neighbor advertisement in @p pkt.
- * @param[in] icmpv6_size   The overall size of the neighbor solicitation
+ * @param[in] icmpv6_size   The overall size of the neighbor advertisement.
  */
 void ng_ndp_nbr_adv_handle(kernel_pid_t iface, ng_pktsnip_t *pkt,
                            ng_ipv6_hdr_t *ipv6, ng_ndp_nbr_adv_t *nbr_adv,
