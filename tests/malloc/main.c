@@ -11,10 +11,10 @@
  * @{
  *
  * @file
- * @brief	Simple malloc/free test
+ * @brief   Simple malloc/free test
  *
  *
- * @author	Benjamin Valentin <benpicco@zedat.fu-berlin.de>
+ * @author  Benjamin Valentin <benpicco@zedat.fu-berlin.de>
  *
  * @}
  */
