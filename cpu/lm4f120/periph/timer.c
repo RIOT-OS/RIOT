@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Freie Universität Berlin
+ * Copyright (C) 2015 Rakendra Thapa <rakendrathapa@gmail.com
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -42,24 +42,24 @@ int timer_init(tim_t dev, unsigned int us_per_tick, void (*callback)(int))
     if (dev == TIMER_0) {
         /* save callback */
         config[TIMER_0].cb = callback;
-		SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER0); //Activate Timer0
+		ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER0); //Activate Timer0
 
 		//Disable TIMER0A during setup
-		TimerDisable(TIMER0_BASE, TIMER_A);
+		ROM_TimerDisable(TIMER0_BASE, TIMER_A);
 		// Configure for 16-bit mode
 		// Configure for Periodic mode
-		TimerConfigure(TIMER0_BASE, 
+		ROM_TimerConfigure(TIMER0_BASE, 
 				TIMER_CFG_SPLIT_PAIR| TIMER_CFG_A_PERIODIC);
-		TimerPrescaleSet(TIMER0_BASE,
+		ROM_TimerPrescaleSet(TIMER0_BASE,
 				TIMER_A, TIMER_0_PRESCALER);
 		// Configure and enable timer interrupt.
-		TimerIntEnable(TIMER0_BASE, TIMER_TIMA_TIMEOUT);	// TimerA timeout interrupt
+		ROM_TimerIntEnable(TIMER0_BASE, TIMER_TIMA_TIMEOUT);	// TimerA timeout interrupt
 		// Set the priority of an interrupt.
-		IntPrioritySet(INT_TIMER0A,TIMER_IRQ_PRIO);
+		ROM_IntPrioritySet(INT_TIMER0A,TIMER_IRQ_PRIO);
 		// Enable interrupt
-		IntEnable(INT_TIMER0A);
+		ROM_IntEnable(INT_TIMER0A);
 		// Enable Timer0A
-		TimerEnable(TIMER0_BASE, TIMER_A);
+		ROM_TimerEnable(TIMER0_BASE, TIMER_A);
 
         return 0;
     }
@@ -79,7 +79,7 @@ int timer_set(tim_t dev, int channel, unsigned int timeout)
 int timer_set_absolute(tim_t dev, int channel, unsigned int value)
 {
     if (dev == TIMER_0) {
-		TimerLoadSet(TIMER0_BASE, TIMER_A, (unsigned long)value);
+		ROM_TimerLoadSet(TIMER0_BASE, TIMER_A, (unsigned long)value);
         return 1;
     }
     return -1;
@@ -88,7 +88,7 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
 int timer_clear(tim_t dev, int channel)
 {
     if (dev == TIMER_0){
-		TimerLoadSet(TIMER0_BASE, TIMER_A, 0);
+		ROM_TimerLoadSet(TIMER0_BASE, TIMER_A, 0);
         return 1;
     }
     return -1;
@@ -97,7 +97,7 @@ int timer_clear(tim_t dev, int channel)
 unsigned int timer_read(tim_t dev)
 {
     if (dev == TIMER_0) {
-		unsigned int currTimer0Val = (unsigned int)TimerValueGet(TIMER0_BASE, TIMER_A);
+		unsigned int currTimer0Val = (unsigned int)ROM_TimerValueGet(TIMER0_BASE, TIMER_A);
         return (currTimer0Val);
     }
     return 0;
@@ -106,28 +106,28 @@ unsigned int timer_read(tim_t dev)
 void timer_start(tim_t dev)
 {
     if (dev == TIMER_0) {
-		TimerEnable(TIMER0_BASE, TIMER_A);
+		ROM_TimerEnable(TIMER0_BASE, TIMER_A);
     }
 }
 
 void timer_stop(tim_t dev)
 {
     if (dev == TIMER_0) {
-		TimerDisable(TIMER0_BASE, TIMER_A);
+		ROM_TimerDisable(TIMER0_BASE, TIMER_A);
     }
 }
 
 void timer_irq_enable(tim_t dev)
 {
     if (dev == TIMER_0) {
-		TimerIntEnable(TIMER0_BASE, TIMER_TIMA_TIMEOUT);
+		ROM_TimerIntEnable(TIMER0_BASE, TIMER_TIMA_TIMEOUT);
     }
 }
 
 void timer_irq_disable(tim_t dev)
 {
     if (dev == TIMER_0) {
-		TimerIntDisable(TIMER0_BASE, TIMER_TIMA_TIMEOUT);
+		ROM_TimerIntDisable(TIMER0_BASE, TIMER_TIMA_TIMEOUT);
     }
 }
 
@@ -135,7 +135,7 @@ void timer_reset(tim_t dev)
 {
     if (dev == TIMER_0) {
 		// Performs a software reset of a peripheral
-		SysCtlPeripheralReset(SYSCTL_PERIPH_TIMER0);
+		ROM_SysCtlPeripheralReset(SYSCTL_PERIPH_TIMER0);
     }
 }
 
@@ -143,7 +143,7 @@ void timer_reset(tim_t dev)
 void TIMER0IntHandler(void)
 {
 	// Clear the timer Interrupt
-	TimerIntClear(TIMER0_BASE, TIMER_TIMA_TIMEOUT);
+	ROM_TimerIntClear(TIMER0_BASE, TIMER_TIMA_TIMEOUT);
 	// Execute the User Task;
     config[TIMER_0].cb(0);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Freie Universität Berlin
+ * Copyright (C) 2015 Rakendra Thapa <rakendrathapa@gmail.com
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -37,31 +37,31 @@ int adc_init(adc_t dev, adc_precision_t precision)
 	// ADC0 is used with AIN0 on port E3.
 	// ADC1 is used with AIN1 on port E2.
 	// GPIO port E needs to be enabled so that these pinds can be used
-	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOE);
+	ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOE);
 
 	// Set the ADC to 125KSPS.
 	// This requires less power and produce longer samping time,
 	// creating accurate conversions
-	SysCtlADCSpeedSet(SYSCTL_ADCSPEED_125KSPS);
+	ROM_SysCtlADCSpeedSet(SYSCTL_ADCSPEED_125KSPS);
 
 	switch (precision) {
         case ADC_RES_6BIT:
         case ADC_RES_8BIT:
         case ADC_RES_10BIT:
 #if ADC_0_EN
-			ADCResolutionSet(ADC0_BASE, ADC_RES_10BIT_S);
+			ROM_ADCResolutionSet(ADC0_BASE, ADC_RES_10BIT_S);
 #endif	
 #if ADC_1_EN
-			ADCResolutionSet(ADC1_BASE, ADC_RES_10BIT_S);
+			ROM_ADCResolutionSet(ADC1_BASE, ADC_RES_10BIT_S);
 #endif	
             adc_config[dev].max_value = 0x3ff;
             break;
         case ADC_RES_12BIT:
 #if ADC_0_EN
-			ADCResolutionSet(ADC0_BASE, ADC_RES_12BIT_S);
+			ROM_ADCResolutionSet(ADC0_BASE, ADC_RES_12BIT_S);
 #endif	
 #if ADC_1_EN
-			ADCResolutionSet(ADC1_BASE, ADC_RES_12BIT_S);
+			ROM_ADCResolutionSet(ADC1_BASE, ADC_RES_12BIT_S);
 #endif	
             adc_config[dev].max_value = 0xfff;
             break;
@@ -73,56 +73,56 @@ int adc_init(adc_t dev, adc_precision_t precision)
 #if ADC_0_EN
         case ADC_0:
 			// Select the Analog ADC Function for these pins.
-            GPIOPinTypeADC(GPIO_PORTE_BASE, GPIO_PIN_3);
+            ROM_GPIOPinTypeADC(GPIO_PORTE_BASE, GPIO_PIN_3);
 			
 			// Before configuring the sequencer, we need to disable ita to prevent errorneous execution
-			ADCSequenceDisable(ADC0_BASE, 3);
+			ROM_ADCSequenceDisable(ADC0_BASE, 3);
 
 			// Enable Sample Sequence 3 with a Software Start (Processor signal trigger).
 			// The software writes an 8 (SS3) to ADC_PSSI_R to initiate a conversion on sequencer 3.
 			// Sequence 3 will do a single sample when the processor sends a signal to start the conversion.
-			ADCSequenceConfigure(ADC0_BASE, 3, ADC_TRIGGER_PROCESSOR, 0);
+			ROM_ADCSequenceConfigure(ADC0_BASE, 3, ADC_TRIGGER_PROCESSOR, 0);
 
 			// Configure step 0 on sequence 3. 
 			// Sample channel 0 (ADC_CTL_CH0) in single-ended mode and configure the interrupt flag.
 			// (ADC_CTL_IE) to be set to enable Interrupt.
-			ADCSequenceStepConfigure(ADC0_BASE, 3, 0, 
+			ROM_ADCSequenceStepConfigure(ADC0_BASE, 3, 0, 
 					ADC_CTL_CH0 | ADC_CTL_IE | ADC_CTL_END);
 
 			// Clear the interrupt status flag. This is done to make sure
 			// the interrupt flag is cleared before we sample.
-			ADCIntClear(ADC0_BASE, 3);
+			ROM_ADCIntClear(ADC0_BASE, 3);
 
 			// Since sample sequence 3 is now configured, it must be enabled.
-			ADCSequenceEnable(ADC0_BASE, 3);
+			ROM_ADCSequenceEnable(ADC0_BASE, 3);
 
             break;
 #endif
 #if ADC_1_EN
         case ADC_1:
 			// Select the Analog ADC Function for these pins.
-            GPIOPinTypeADC(GPIO_PORTE_BASE, GPIO_PIN_2);
+            ROM_GPIOPinTypeADC(GPIO_PORTE_BASE, GPIO_PIN_2);
 			
 			// Before configuring the sequencer, we need to disable ita to prevent errorneous execution
-			ADCSequenceDisable(ADC1_BASE, 3);
+			ROM_ADCSequenceDisable(ADC1_BASE, 3);
 
 			// Enable Sample Sequence 3 with a Software Start (Processor signal trigger).
 			// The software writes an 8 (SS3) to ADC_PSSI_R to initiate a conversion on sequencer 3.
 			// Sequence 3 will do a single sample when the processor sends a signal to start the conversion.
-			ADCSequenceConfigure(ADC1_BASE, 3, ADC_TRIGGER_PROCESSOR, 0);
+			ROM_ADCSequenceConfigure(ADC1_BASE, 3, ADC_TRIGGER_PROCESSOR, 0);
 
 			// Configure step 0 on sequence 3. 
 			// Sample channel 0 (ADC_CTL_CH1) in single-ended mode and configure the interrupt flag.
 			// (ADC_CTL_IE) to be set to enable Interrupt.
-			ADCSequenceStepConfigure(ADC1_BASE, 3, 0, 
+			ROM_ADCSequenceStepConfigure(ADC1_BASE, 3, 0, 
 					ADC_CTL_CH1 | ADC_CTL_IE | ADC_CTL_END);
 
 			// Clear the interrupt status flag. This is done to make sure
 			// the interrupt flag is cleared before we sample.
-			ADCIntClear(ADC1_BASE, 3);
+			ROM_ADCIntClear(ADC1_BASE, 3);
 
 			// Since sample sequence 3 is now configured, it must be enabled.
-			ADCSequenceEnable(ADC1_BASE, 3);
+			ROM_ADCSequenceEnable(ADC1_BASE, 3);
 
             break;
 #endif
@@ -140,31 +140,31 @@ int adc_sample(adc_t dev, int channel)
 #if ADC_0_EN
         case ADC_0:
 			// Trigger the ADC conversion
-			ADCProcessorTrigger(ADC0_BASE, 3);
+			ROM_ADCProcessorTrigger(ADC0_BASE, 3);
 
 			// Wait for conversion to be completed.
-			while(!ADCIntStatus(ADC0_BASE, 3, false));
+			while(!ROM_ADCIntStatus(ADC0_BASE, 3, false));
 
 			// Read ADC value.
-			ADCSequenceDataGet(ADC0_BASE, 3, &ulADC_val);
+			ROM_ADCSequenceDataGet(ADC0_BASE, 3, &ulADC_val);
 
 			// Clear the ADC interrupt flag
-			ADCIntClear(ADC0_BASE, 3);
+			ROM_ADCIntClear(ADC0_BASE, 3);
 			break;
 #endif
 #if ADC_1_EN
         case ADC_1:
 			// Trigger the ADC conversion
-			ADCProcessorTrigger(ADC1_BASE, 3);
+			ROM_ADCProcessorTrigger(ADC1_BASE, 3);
 
 			// Wait for conversion to be completed.
-			while(!ADCIntStatus(ADC1_BASE, 3, false));
+			while(!ROM_ADCIntStatus(ADC1_BASE, 3, false));
 
 			// Read ADC value.
-			ADCSequenceDataGet(ADC1_BASE, 3, &ulADC_val);
+			ROM_ADCSequenceDataGet(ADC1_BASE, 3, &ulADC_val);
 
 			// Clear the ADC interrupt flag
-			ADCIntClear(ADC1_BASE, 3);
+			ROM_ADCIntClear(ADC1_BASE, 3);
 			break;
 #endif
 		default:
@@ -181,12 +181,12 @@ void adc_poweron(adc_t dev)
 #if ADC_0_EN
         case ADC_0:
 			// The ADC0 Peripheral must be enabled for use
-			SysCtlPeripheralEnable(SYSCTL_PERIPH_ADC0);
+			ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_ADC0);
             break;
 #endif
 #if ADC_1_EN
         case ADC_1:
-			SysCtlPeripheralEnable(SYSCTL_PERIPH_ADC1);
+			ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_ADC1);
             break;
 #endif
     }
@@ -197,12 +197,12 @@ void adc_poweroff(adc_t dev)
     switch (dev) {
 #if ADC_0_EN
         case ADC_0:
-			SysCtlPeripheralDisable(SYSCTL_PERIPH_ADC0);
+			ROM_SysCtlPeripheralDisable(SYSCTL_PERIPH_ADC0);
             break;
 #endif
 #if ADC_1_EN
         case ADC_1:
-			SysCtlPeripheralDisable(SYSCTL_PERIPH_ADC0);
+			ROM_SysCtlPeripheralDisable(SYSCTL_PERIPH_ADC0);
             break;
 #endif
     }
