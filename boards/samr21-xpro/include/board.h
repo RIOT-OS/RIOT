@@ -23,6 +23,7 @@
 #define __BOARD_H
 
 #include "cpu.h"
+#include "periph_conf.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -31,7 +32,7 @@ extern "C" {
 /**
  * Define the nominal CPU core clock in this board
  */
-#define F_CPU               (8000000UL)
+#define F_CPU               (CLOCK_CORECLOCK)
 
 /**
  * Assign the hardware timer
