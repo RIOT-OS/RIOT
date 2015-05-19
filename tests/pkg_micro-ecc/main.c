@@ -39,7 +39,7 @@
 #include "uECC.h"
 #include "periph/random.h"
 
-#define TESTROUNDS	16
+#define TESTROUNDS  16
 
 int main(void)
 {
