@@ -82,7 +82,7 @@ int i2c_init_master(i2c_t dev, i2c_speed_t speed)
             pin_scl = I2C_SDA;
             pin_sda = I2C_SCL;
             i2c_pins = I2C_0_PINS;
-            clock_source_speed = I2C_0_REF_F;
+            clock_source_speed = CLOCK_CORECLOCK;
             sercom_core = SERCOM3_GCLK_ID_CORE;
             sercom_gclk_id_slow = SERCOM3_GCLK_ID_SLOW ;
             break;
