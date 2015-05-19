@@ -20,16 +20,16 @@ my $do_exit;
 my $zerolen;
 
 GetOptions ('file=s' => \$filename,
-	    'secondfile=s' => \$second,
-	    'zerolen' => \$zerolen,
-	    'terminal=s' => \$term,
-	    'verbose' => \$verbose,
-	    'u|baud=s' => \$baud,
-	    'rts=s' => \$rts,
-	    'command=s' => \$command,
-	    'a=s' => \$first_delay,
-	    'b=s' => \$second_delay,
-	    'exit' => \$do_exit,
+            'secondfile=s' => \$second,
+            'zerolen' => \$zerolen,
+            'terminal=s' => \$term,
+            'verbose' => \$verbose,
+            'u|baud=s' => \$baud,
+            'rts=s' => \$rts,
+            'command=s' => \$command,
+            'a=s' => \$first_delay,
+            'b=s' => \$second_delay,
+            'exit' => \$do_exit,
     ) or die 'bad options';
 
 $| = 1;
@@ -87,58 +87,58 @@ while(1) {
 
     if(($command ne '') &&
        ($reset eq 0)) {
-	$reset++;
-	system($command);
+        $reset++;
+        system($command);
     }
 
     if($s == 1) {
-	$test = 'ready';
+        $test = 'ready';
     } else {
-	$test = 'CONNECT';
+        $test = 'CONNECT';
     }
 
     until($ret =~ /$test$/) {
-	($count,$c) = $ob->read(1);
-	if ($count == 0) {
-	    print '.';
-	    $ob->write(pack('C','0'));
-	    next;
-	}
-	$ret .= $c;
+        ($count,$c) = $ob->read(1);
+        if ($count == 0) {
+            print '.';
+            $ob->write(pack('C','0'));
+            next;
+        }
+        $ret .= $c;
     }
     print $ret . "\n";
 
     if (-e $filename || (defined($zerolen) && ($s == 1))) {
 
-	if(defined($zerolen) && ($s == 1)) {
-	    $size = 0;
-	} else {
-	    $size = -s $filename;
-	}
+        if(defined($zerolen) && ($s == 1)) {
+            $size = 0;
+        } else {
+            $size = -s $filename;
+        }
 
-	print ("Size: $size bytes\n");
-	$ob->write(pack('V',$size));
+        print ("Size: $size bytes\n");
+        $ob->write(pack('V',$size));
 
-	if(($s == 0) ||
-	   ((!defined($zerolen)) && ($s == 1))) {
-	    open(FILE, $filename) or die($!);
-	    print "Sending $filename\n";
+        if(($s == 0) ||
+           ((!defined($zerolen)) && ($s == 1))) {
+            open(FILE, $filename) or die($!);
+            print "Sending $filename\n";
 
-	    my $i = 1;
-	    while(read(FILE, $c, 1)) {
-		$i++;
+            my $i = 1;
+            while(read(FILE, $c, 1)) {
+                $i++;
                 usleep($first_delay)  if ( $s == 0 ) && ($first_delay != 0);
                 usleep($second_delay) if ( $s == 1 ) && ($second_delay != 0);
-		$ob->write($c);
-	    }
-	}
+                $ob->write($c);
+            }
+        }
     }
 
     last if ($s==1);
     if((-e $second) || defined($zerolen)) {
-	$s=1; $filename = $second;
+        $s=1; $filename = $second;
     } else {
-	last;
+        last;
     }
 
 }
