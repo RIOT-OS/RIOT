@@ -36,6 +36,11 @@ static void _dump_tcb (const ng_tcp_tcb_t *tcb)
     case SYN_RCVD:    printf("| state = SYN_RCVD\n");    break;
     case ESTABLISHED: printf("| state = ESTABLISHED\n"); break;
     case CLOSE_WAIT:  printf("| state = CLOSE_WAIT\n");  break;
+    case LAST_ACK:    printf("| state = LAST_ACK\n");    break;
+    case FIN_WAIT_1:  printf("| state = FIN_WAIT_1\n");  break;
+    case FIN_WAIT_2:  printf("| state = FIN_WAIT_2\n");  break;
+    case CLOSING:     printf("| state = CLOSING\n");     break;
+    case TIME_WAIT:   printf("| state = TIME_WAIT\n");   break;
     }
 #if MODULE_NG_IPV6
     ng_ipv6_addr_to_str(bufAddr, (ng_ipv6_addr_t *)tcb->peer_addr, tcb->peer_addr_len);

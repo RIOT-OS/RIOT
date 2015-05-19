@@ -128,7 +128,7 @@ int8_t ng_tcp_open(ng_tcp_tcb_t *tcb, uint8_t *addr, const size_t addr_len, cons
         tcb->local_port = _get_free_port(tcb->peer_port);
     }
 
-    /* event CALL_OPEN happens */
+    /* Event CALL_OPEN happens */
     res = _fsm(tcb, NULL, CALL_OPEN);
 
     while(res >= 0 && tcb->state != CLOSED && tcb->state != ESTABLISHED){
@@ -159,12 +159,32 @@ int8_t ng_tcp_recv(ng_tcp_tcb_t *tcb){
 }
 
 int8_t ng_tcp_close(ng_tcp_tcb_t *tcb){
+    int8_t res = 0;
+
+    if(tcb->state != ESTABLISHED && tcb->state != CLOSE_WAIT){
+        return -1;
+    }
+
+    /* Initiate sequence */
+    if(tcb->state == ESTABLISHED){
+        res = _fsm(tcb, NULL, CALL_CLOSE);
+    }
+
+    while(res >= 0 && tcb->state != CLOSED){
+
+    }
+
+    return res;
+}
+
+int8_t ng_tcp_abort(ng_tcp_tcb_t *tcb)
+{
     if(tcb->state != ESTABLISHED){
         return -1;
     }
+
     return 0;
 }
-
 
 int ng_tcp_init(void)
 {

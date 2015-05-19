@@ -9,8 +9,6 @@
 /* Events used to control fsm */
 typedef enum {
     CALL_OPEN,
-    CALL_CONNECT,
-    CALL_LISTEN,
     CALL_SEND,
     CALL_RECV,
     CALL_CLOSE,

@@ -96,7 +96,12 @@ typedef enum {CLOSED,
               SYN_SENT,
               SYN_RCVD,
               ESTABLISHED,
-              CLOSE_WAIT
+              CLOSE_WAIT,
+              LAST_ACK,
+              FIN_WAIT_1,
+              FIN_WAIT_2,
+              CLOSING,
+              TIME_WAIT
 } ng_tcp_states_t;
 
 /**
@@ -112,7 +117,7 @@ typedef struct __attribute__((packed)) {
     size_t   peer_addr_len;    /**< Peer Address Len */
     uint16_t peer_port;        /**< Peer Port, peer is listening on */
     uint16_t local_port;       /**< Local Port, this connection is listening on */
-    uint8_t flags;             /**< Flags used to configure this connection */
+    uint8_t  flags;            /**< Flags used to configure this connection */
 
     /* Sliding Window Mechanism Variables*/
     /* Send Pointers */
@@ -203,7 +208,7 @@ int8_t ng_tcp_tcb_init(ng_tcp_tcb_t *tcb);
  * @param[in]     addr_len   size of addr
  * @param[in]     port       portno. to connect to in active mode, portno. to listen on in passive mode
  * @param[in]     flags      configuration flags for this connection, prefix AI is used for them.
- * 
+ *
  * @return         zero on success
  * @return         negative value on error
  * @return         -EFAULT if addr was NULL or addr_len was zero
