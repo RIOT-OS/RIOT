@@ -1,0 +1,57 @@
+# define the cpu used by the stm nucleo f4 board
+export CPU = stm32f4
+export CPU_MODEL = stm32f411xe
+
+#define the default port depending on the host OS
+OS := $(shell uname)
+ifeq ($(OS),Linux)
+  PORT ?= /dev/ttyACM0
+else ifeq ($(OS),Darwin)
+  PORT ?= $(shell ls -1 /dev/tty.SLAB_USBtoUART* | head -n 1)
+else
+  $(info CAUTION: No flash tool for your host system found!)
+  # TODO: add support for windows as host platform
+endif
+export PORT
+
+# define tools used for building the project
+export PREFIX = arm-none-eabi-
+export CC = $(PREFIX)gcc
+export CXX = $(PREFIX)g++
+export AR = $(PREFIX)ar
+export AS = $(PREFIX)as
+export LINK = $(PREFIX)gcc
+export SIZE = $(PREFIX)size
+export OBJCOPY = $(PREFIX)objcopy
+export DBG = $(PREFIX)gdb
+export TERMPROG = $(RIOTBASE)/dist/tools/pyterm/pyterm
+export FLASHER = $(RIOTBASE)/dist/tools/openocd/openocd.sh
+export DEBUGGER = $(RIOTBASE)/dist/tools/openocd/openocd.sh
+export DEBUGSERVER = $(RIOTBASE)/dist/tools/openocd/openocd.sh
+export RESET = $(RIOTBASE)/dist/tools/openocd/openocd.sh
+
+# unwanted (CXXUWFLAGS) and extra (CXXEXFLAGS) flags for c++
+export CXXUWFLAGS +=
+export CXXEXFLAGS +=
+
+# define build specific options
+export CPU_USAGE = -mcpu=cortex-m4
+export FPU_USAGE = -mfloat-abi=hard -mfpu=fpv4-sp-d16
+export CFLAGS += -ggdb -g3 -std=gnu99 -Os -Wall -Wstrict-prototypes $(CPU_USAGE) $(FPU_USAGE) -mlittle-endian -mthumb -mno-thumb-interwork -nostartfiles
+export CFLAGS += -ffunction-sections -fdata-sections -fno-builtin
+export ASFLAGS += -ggdb -g3 $(CPU_USAGE) $(FPU_USAGE) -mlittle-endian
+export LINKFLAGS += -g3 -ggdb -std=gnu99 $(CPU_USAGE) $(FPU_USAGE) -mlittle-endian -static -lgcc -mthumb -mno-thumb-interwork -nostartfiles
+# $(LINKERSCRIPT) is specified in cpu/Makefile.include
+export LINKFLAGS += -T$(LINKERSCRIPT)
+export OFLAGS = -O ihex
+export TERMFLAGS += -p "$(PORT)"
+export FFLAGS = flash
+export DEBUGGER_FLAGS = debug
+
+# use the nano-specs of the NewLib when available
+#ifeq ($(shell $(LINK) -specs=nano.specs -E - 2>/dev/null >/dev/null </dev/null ; echo $$?),0)
+export LINKFLAGS += -specs=nano.specs -lc -lnosys
+#endif
+
+# export board specific includes to the global includes-listing
+export INCLUDES += -I$(RIOTBOARD)/$(BOARD)/include
