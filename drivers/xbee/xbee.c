@@ -23,13 +23,9 @@
 #include <string.h>
 
 #include "xbee.h"
-#include "mutex.h"
 #include "hwtimer.h"
 #include "msg.h"
-#include "periph/uart.h"
-#include "periph/gpio.h"
 #include "periph/cpuid.h"
-#include "net/ng_netbase.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
@@ -452,24 +448,10 @@ int xbee_init(xbee_t *dev, uart_t uart, uint32_t baudrate,
     /* exit command mode */
     _at_cmd(dev, "ATCN\r");
 
-    /* set default short address, use CPU ID if available */
-#if CPUID_ID_LEN
-    /* get CPU ID */
-    uint8_t id[CPUID_ID_LEN];
-    cpuid_get(id);
-    /* set address */
-    memset(dev->addr_short, 0, 2);
-    for (int i = 0; i < CPUID_ID_LEN; i++) {
-        dev->addr_short[i & 0x01] ^= id[i];
-    }
-#else
-    dev->addr_short[0] = (uint8_t)(XBEE_DEFAULT_SHORT_ADDR >> 8);
-    dev->addr_short[1] = (uint8_t)(XBEE_DEFAULT_SHORT_ADDR);
-#endif
-    _set_addr(dev, dev->addr_short, 2);
     /* load long address (we can not set it, its read only for Xbee devices) */
-    _get_addr_long(dev, dev->addr_long, 8);
+    _get_addr_long(dev, dev->addr_long.uint8, 8);
     /* set default channel */
+    _set_addr(dev, &((dev->addr_long).uint8[6]), 2);
     tmp[1] = 0;
     tmp[0] = XBEE_DEFAULT_CHANNEL;
     _set_channel(dev, tmp, 2);
@@ -709,7 +691,7 @@ static void _isr_event(ng_netdev_t *netdev, uint32_t event_type)
         ng_netif_hdr_set_dst_addr(hdr, dev->addr_short, 2);
     }
     else {
-        ng_netif_hdr_set_dst_addr(hdr, dev->addr_long, 8);
+        ng_netif_hdr_set_dst_addr(hdr, dev->addr_long.uint8, 8);
     }
     pos = 3 + addr_len;
     /* allocate and copy payload */

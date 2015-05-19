@@ -18,12 +18,14 @@
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      Oliver Hahm <oliver.hahm@inria.fr>
  *
  * @}
  */
 
 #include "hwtimer.h"
 #include "periph/cpuid.h"
+#include "byteorder.h"
 #include "net/ng_ieee802154.h"
 #include "net/ng_netbase.h"
 #include "ng_at86rf2xx_registers.h"
@@ -87,8 +89,7 @@ void ng_at86rf2xx_reset(ng_at86rf2xx_t *dev)
 {
 #if CPUID_ID_LEN
     uint8_t cpuid[CPUID_ID_LEN];
-    uint16_t addr_short;
-    uint64_t addr_long;
+    eui64_t addr_long;
 #endif
 
     /* trigger hardware reset */
@@ -101,7 +102,8 @@ void ng_at86rf2xx_reset(ng_at86rf2xx_t *dev)
     /* set short and long address */
 #if CPUID_ID_LEN
     cpuid_get(cpuid);
-#if CPUID < 8
+
+#if CPUID_ID_LEN < 8
     /* in case CPUID_ID_LEN < 8, fill missing bytes with zeros */
     for (int i = CPUID_ID_LEN; i < 8; i++) {
         cpuid[i] = 0;
@@ -116,13 +118,8 @@ void ng_at86rf2xx_reset(ng_at86rf2xx_t *dev)
     cpuid[0] |= 0x02;
     /* copy and set long address */
     memcpy(&addr_long, cpuid, 8);
-    ng_at86rf2xx_set_addr_long(dev, addr_long);
-    /* now compress the long addr to form the short address */
-    for (int i = 2; i < 8; i++) {
-        cpuid[i & 0x01] ^= cpuid[i];
-    }
-    memcpy(&addr_short, cpuid, 2);
-    ng_at86rf2xx_set_addr_short(dev, addr_short);
+    ng_at86rf2xx_set_addr_long(dev, NTOHLL(addr_long.uint64.u64));
+    ng_at86rf2xx_set_addr_short(dev, NTOHS(addr_long.uint16[0].u16));
 #else
     ng_at86rf2xx_set_addr_long(dev, NG_AT86RF2XX_DEFAULT_ADDR_LONG);
     ng_at86rf2xx_set_addr_short(dev, NG_AT86RF2XX_DEFAULT_ADDR_SHORT);

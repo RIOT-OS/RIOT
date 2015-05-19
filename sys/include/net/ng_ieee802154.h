@@ -21,6 +21,9 @@
 #ifndef NG_IEEE802154_H_
 #define NG_IEEE802154_H_
 
+#include <stdint.h>
+#include "byteorder.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -57,6 +60,15 @@ extern "C" {
 #define NG_IEEE802154_FCF_SRC_ADDR_SHORT    (0x80)
 #define NG_IEEE802154_FCF_SRC_ADDR_LONG     (0xc0)
 /** @} */
+
+/**
+ * @brief Data type to represent an EUI-64.
+ */
+typedef union {
+    le_uint64_t uint64;     /**< represented as 64 bit value */
+    uint8_t uint8[8];       /**< split into 8 8-bit words. */
+    le_uint16_t uint16[4];  /**< split into 4 16-bit words. */
+} eui64_t ;
 
 #ifdef __cplusplus
 }
