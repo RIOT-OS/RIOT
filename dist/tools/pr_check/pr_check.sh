@@ -54,12 +54,12 @@ fi
 
 if [ -n "$TRAVIS_PULL_REQUEST" ]; then
     if check_gh_label "NEEDS SQUASHING"; then
-        echo -e "${CERROR}Pull request needs squashing according to its labels${CRESET}"
+        echo -e "${CERROR}Pull request needs squashing according to its labels set on GitHub${CRESET}"
         EXIT_CODE=1
     fi
 
     if check_gh_label "Waiting For Other PR"; then
-        echo -e "${CERROR}Pull request is waiting for another pull request according to its labels${CRESET}"
+        echo -e "${CERROR}Pull request is waiting for another pull request according to its labels set on GitHub${CRESET}"
         EXIT_CODE=1
     fi
 fi
