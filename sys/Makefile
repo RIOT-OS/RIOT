@@ -17,8 +17,8 @@ ifneq (,$(filter nomac,$(USEMODULE)))
     DIRS += net/link_layer/nomac
 endif
 ifneq (,$(filter transport_layer,$(USEMODULE)))
-	USEMODULE += udp
-	USEMODULE += tcp
+    USEMODULE += udp
+    USEMODULE += tcp
 endif
 ifneq (,$(filter socket_base,$(USEMODULE)))
     DIRS += net/transport_layer/socket_base
@@ -45,7 +45,7 @@ ifneq (,$(filter rpl,$(USEMODULE)))
     DIRS += net/routing/rpl
 endif
 ifneq (,$(filter routing,$(USEMODULE)))
-	DIRS += net/routing
+    DIRS += net/routing
 endif
 ifneq (,$(filter aodvv2,$(USEMODULE)))
     DIRS += net/routing/aodvv2
@@ -145,6 +145,9 @@ ifneq (,$(filter hwtimer_compat,$(USEMODULE)))
 endif
 ifneq (,$(filter log_%,$(USEMODULE)))
     DIRS += log
+endif
+ifneq (,$(filter cpp11-compat,$(USEMODULE)))
+    DIRS += cpp11-compat
 endif
 
 DIRS += $(dir $(wildcard $(addsuffix /Makefile, ${USEMODULE})))

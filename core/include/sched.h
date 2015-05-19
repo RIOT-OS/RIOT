@@ -85,6 +85,7 @@
 #include "tcb.h"
 #include "attributes.h"
 #include "kernel_types.h"
+#include "native_sched.h"
 
 #ifdef __cplusplus
  extern "C" {
