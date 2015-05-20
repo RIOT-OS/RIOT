@@ -9,14 +9,14 @@ tmp_frac = 0;
 tmp_int = 11;
 
 while (i <= length(F))
-	tmp_frac = (F(i)./32 - tmp_int - 64).*65536;
-	if tmp_frac >= 65536
-		tmp_int++;
-	else
-		PLL_FRAC0 = [PLL_FRAC0 tmp_frac];
-		PLL_INT0 = [PLL_INT0 tmp_int];
-		i++;
-	endif
+    tmp_frac = (F(i)./32 - tmp_int - 64).*65536;
+    if tmp_frac >= 65536
+        tmp_int++;
+    else
+        PLL_FRAC0 = [PLL_FRAC0 tmp_frac];
+        PLL_INT0 = [PLL_INT0 tmp_int];
+        i++;
+    endif
 endwhile
 
 %F
@@ -26,17 +26,17 @@ endwhile
 
 printf("static const uint8_t pll_int_lt[%d] = {\n", length(F));
 for i = 1:4:length(F)
-	printf("    ");
-	printf("%d,", PLL_INT0(i:1:i+3));
-	printf("\n");
+    printf("    ");
+    printf("%d,", PLL_INT0(i:1:i+3));
+    printf("\n");
 endfor
 printf("};\n");
 printf("\n");
 printf("static const uint16_t pll_frac_lt[%d] = {\n", length(F));
 for i = 1:4:length(F)
-	printf("    ");
-	printf("%d,", PLL_FRAC0(i:1:i+3));
-	printf("\n");
+    printf("    ");
+    printf("%d,", PLL_FRAC0(i:1:i+3));
+    printf("\n");
 endfor
 printf("};\n\n");
 
@@ -53,10 +53,10 @@ pow_lt = round(i .* (RANGE_MAX - RANGE_MIN) ./ length(i) + RANGE_MIN);
 printf("static const uint8_t pow_lt[%d] = {", length(pow_lt));
 printf("    ");
 for i = 0:1:length(pow_lt)-1
-	if (rem(i,4) == 0)
-		printf("\n    ");
-	endif
-	printf("%d,", pow_lt(i+1));
+    if (rem(i,4) == 0)
+        printf("\n    ");
+    endif
+    printf("%d,", pow_lt(i+1));
 endfor
 printf("\n};\n\n");
 
@@ -66,9 +66,9 @@ length(level_lt)
 
 printf("static const int level_lt[%d] = {", length(level_lt));
 for i = 0:1:length(level_lt)-1
-	if (rem(i,4) == 0)
-		printf("\n    ");
-	endif
-	printf("%d,", level_lt(i+1));
+    if (rem(i,4) == 0)
+        printf("\n    ");
+    endif
+    printf("%d,", level_lt(i+1));
 endfor
 printf("\n};\n\n");

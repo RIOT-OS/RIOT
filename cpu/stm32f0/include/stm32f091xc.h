@@ -402,7 +402,7 @@ typedef struct
        uint32_t RESERVED;    /*!< Reserved,                                                                  0x04 */
   __IO uint32_t EXTICR[4];   /*!< SYSCFG external interrupt configuration register,     Address offset: 0x14-0x08 */
   __IO uint32_t CFGR2;       /*!< SYSCFG configuration register 2,                           Address offset: 0x18 */
-       uint32_t RESERVED1[25];    /*!< Reserved + COMP,							                                         0x1C */
+       uint32_t RESERVED1[25];    /*!< Reserved + COMP,                                                      0x1C */
   __IO uint32_t IT_LINE_SR[32]; /*!< SYSCFG configuration IT_LINE register,                  Address offset: 0x80 */
 
 }SYSCFG_TypeDef;

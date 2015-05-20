@@ -57,9 +57,9 @@ extern "C"
 #define LED_G_GPIO            GPIOD /**< GPIO-Device for Green LED*/
 #define LED_B_PORT            PORTA /**< PORT for Blue LED*/
 #define LED_B_GPIO            GPIOA /**< GPIO-Device for Blue LED*/
-#define LED_R_PIN             6	    /**< Red LED connected to PINx*/
-#define LED_G_PIN             4	    /**< Green LED connected to PINx*/
-#define LED_B_PIN             4	    /**< Blue LED connected to PINx*/
+#define LED_R_PIN             6     /**< Red LED connected to PINx*/
+#define LED_G_PIN             4     /**< Green LED connected to PINx*/
+#define LED_B_PIN             4     /**< Blue LED connected to PINx*/
 /** @} */
 
 /**
