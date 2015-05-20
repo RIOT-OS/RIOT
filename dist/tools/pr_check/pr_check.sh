@@ -8,19 +8,7 @@
 #
 
 EXIT_CODE=0
-GITHUB_API_HOST="https://api.github.com"
-GITHUB_REPO="RIOT-OS/RIOT"
-
-if which wget &> /dev/null; then
-    GET="wget -O -"
-elif which curl &> /dev/null; then
-    GET="curl"
-else
-    echo "Script needs wget or curl" >&2
-    exit 2
-fi
-
-LABELS_JSON=$(${GET} "${GITHUB_API_HOST}/repos/${GITHUB_REPO}/issues/${TRAVIS_PULL_REQUEST}/labels" 2> /dev/null)
+source ./dist/tools/pr_check/check_labels.sh
 
 if tput colors &> /dev/null && [ $(tput colors) -ge 8 ]; then
     CERROR="\e[1;31m"
@@ -29,13 +17,6 @@ else
     CERROR=
     CRESET=
 fi
-
-check_gh_label() {
-    LABEL="${1}"
-
-    echo "${LABELS_JSON}" | grep -q "${LABEL}"
-    return $?
-}
 
 if [[ ${#} -eq 1 ]]; then
     RIOT_MASTER="${1}"
