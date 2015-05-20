@@ -19,9 +19,9 @@
 
 kernel_pid_t main_pid = KERNEL_PID_UNDEF;
 
-static char _stack_srv[KERNEL_CONF_STACKSIZE_MAIN];
-static char _stack_cli[KERNEL_CONF_STACKSIZE_MAIN];
-static char _stack_fake_ip6[KERNEL_CONF_STACKSIZE_MAIN];
+static char _stack_srv[THREAD_STACKSIZE_MAIN];
+static char _stack_cli[THREAD_STACKSIZE_MAIN];
+static char _stack_fake_ip6[THREAD_STACKSIZE_MAIN];
 
 void *cli(__attribute__((unused))void *arg)
 {
@@ -31,10 +31,13 @@ void *cli(__attribute__((unused))void *arg)
 
     /* Initialize TCB and connect to peer */
     ng_tcp_tcb_init(&tcb);
-    ng_tcp_open(&tcb, (uint8_t *) &peer_addr, sizeof(peer_addr), PORT_SRV, 0);
+    ng_tcp_open(&tcb, 0, (uint8_t *) &peer_addr, sizeof(peer_addr), PORT_SRV, 0);
 
     // Connection should be Established successfully.
     msg_send(&msg, main_pid);
+
+    // Destroy Transmission Control Block
+    ng_tcp_tcb_destroy(&tcb);
     return NULL;
 }
 
@@ -46,10 +49,13 @@ void *srv(__attribute__((unused))void *arg)
 
     /* Initiailze TCB and wait till peer connects */
     ng_tcp_tcb_init(&tcb);
-    ng_tcp_open(&tcb, (uint8_t *) &peer_addr, sizeof(peer_addr), PORT_SRV, AI_PASSIVE);
+    ng_tcp_open(&tcb, PORT_SRV, (uint8_t *) &peer_addr, sizeof(peer_addr), 0, AI_PASSIVE);
 
     // Connection should be Established successfully.
     msg_send(&msg, main_pid);
+
+    // Destroy Transmission Control Block
+    ng_tcp_tcb_destroy(&tcb);
     return NULL;
 }
 
@@ -157,7 +163,7 @@ int main(void)
     // Startup "Fake IP6"-Thread
     thread_create( _stack_fake_ip6
                  , sizeof(_stack_fake_ip6)
-                 , PRIORITY_MAIN -2
+                 , THREAD_PRIORITY_MAIN -2
                  , CREATE_STACKTEST
                  , fake_ip6
                  , NULL
@@ -168,7 +174,7 @@ int main(void)
 
     thread_create( _stack_srv
                  , sizeof(_stack_srv)
-                 , PRIORITY_MAIN -2
+                 , THREAD_PRIORITY_MAIN -2
                  , CREATE_STACKTEST
                  , srv
                  , NULL
@@ -178,7 +184,7 @@ int main(void)
     // Startup "Client"-Thread
     thread_create( _stack_cli
                  , sizeof(_stack_cli)
-                 , PRIORITY_MAIN -2
+                 , THREAD_PRIORITY_MAIN -2
                  , CREATE_STACKTEST
                  , cli
                  , NULL

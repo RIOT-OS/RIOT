@@ -132,33 +132,37 @@ static void _tcp_receive(ng_pktsnip_t *pkt)
     /* If SYN only is set, move it to contexts that wait for a initial communication */
     /* If not, send it to fitting context(src and dst combination) */
     if((ctl & MSK_SYN_ACK) == MSK_SYN){
-        context = _build_context(PORT_UNASSIGNED, byteorder_ntohs(tcp_hdr->dst_port));
+        context = _build_context(PORT_UNSPEC, byteorder_ntohs(tcp_hdr->dst_port));
     } else {
         context = _build_context(byteorder_ntohs(tcp_hdr->src_port), byteorder_ntohs(tcp_hdr->dst_port));
     }
 
+    /* Lookup pids associated with this context */
     sendto = ng_netreg_lookup(NG_NETTYPE_TCP, context);
-    if(sendto == NULL){
-        /* Reply with RST-Packet*/
+    if(sendto){
+        /* Call every affected FSM with RCVD_PKT event.*/
+        while(sendto){
+            /* NOTE: Assumption, one thread holds only one tcb. Might be problematic!*/
+            _fsm(_search_tcb_of_owner(sendto->pid), pkt, RCVD_PKT);
+            sendto = ng_netreg_getnext(sendto);
+        }
+    }else{
+        /* Nobody cares about this context. Reply with RST*/
         DEBUG("tcp: unable to forward packet as no one is interested in it.\n");
         if((ctl & MSK_RST) != MSK_RST){
-            _tcp_send(_tcp_build_reset(pkt));
+            ng_netapi_send(_tcp_pid, _tcp_build_reset(pkt));
         }
-        ng_pktbuf_release(pkt);
+        
     }
-
-    /* Increase users for this pkt. */
-    ng_pktbuf_hold(pkt, ng_netreg_num(NG_NETTYPE_TCP, context)-1);
-    while(sendto){
-        ng_netapi_receive(sendto->pid, pkt);
-        sendto = ng_netreg_getnext(sendto);
-    }
+    /* Release received Paket */
+    ng_pktbuf_release(pkt);
 }
 
 static void* _tcp_event_loop(__attribute__((unused))void *arg)
 {
     msg_t msg;
     msg_t reply;
+    msg_t msg_queue[NG_TCP_MSG_QUEUE_SIZE];
 
     /* setup reply message */
     reply.type = NG_NETAPI_MSG_TYPE_ACK;
@@ -166,6 +170,9 @@ static void* _tcp_event_loop(__attribute__((unused))void *arg)
 
     /* Save own PID */
     _tcp_pid = thread_getpid();
+
+    /* Init message queue*/
+    msg_init_queue(msg_queue, NG_TCP_MSG_QUEUE_SIZE);
 
     /* Register ng_tcp in netreg */
     ng_netreg_entry_t entry;

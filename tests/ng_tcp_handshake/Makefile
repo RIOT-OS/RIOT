@@ -16,6 +16,6 @@ CFLAGS += -DDEVELHELP
 QUIET ?= 1
 
 # Modules to include
-USEMODULE += vtimer random ng_netreg ng_netapi ng_pktbuf ng_inet_csum ng_ipv6 ng_tcp
+USEMODULE += vtimer random ng_netreg ng_netapi ng_pktbuf ng_inet_csum ng_ndp ng_icmpv6 ng_ipv6 ng_tcp
 
 include $(RIOTBASE)/Makefile.include

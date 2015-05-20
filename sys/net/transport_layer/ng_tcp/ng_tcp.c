@@ -46,10 +46,17 @@
 static kernel_pid_t _tcp_pid = KERNEL_PID_UNDEF;
 
 /**
+ * @brief Head of tcb linked list. The eventloop needs 
+ *        to look up the affected tcbs in case of an incomming paket.
+ *        ng_tcp_tcb_init() adds tcb to this list.
+ */
+static ng_tcp_tcb_t* _head_tcb_list = NULL;
+
+/**
  * @brief Allocate memory for the TCP-Thread Stack
  */
 #if ENABLE_DEBUG
-static char _tcp_stack[KERNEL_CONF_STACKSIZE_DEFAULT + KERNEL_CONF_STACKSIZE_PRINTF];
+static char _tcp_stack[THREAD_STACKSIZE_DEFAULT + THREAD_EXTRA_STACKSIZE_PRINTF];
 #else
 static char _tcp_stack[NG_TCP_STACK_SIZE];
 #endif
@@ -72,8 +79,8 @@ int8_t ng_tcp_tcb_init(ng_tcp_tcb_t *tcb)
     tcb->state = CLOSED;               /* CLOSED: State before any connection occurs */
     tcb->peer_addr = NULL;             /* Peer Address Unspecified */
     tcb->peer_addr_len = 0;            /* Peer Address Length is zero */
-    tcb->peer_port = PORT_UNASSIGNED;  /* Port 0: Reserved. Marks Unassigned Port */
-    tcb->local_port = PORT_UNASSIGNED; /* Port 0: Reserved. Marks Unassigned Port */
+    tcb->peer_port = PORT_UNSPEC;  /* Port 0: Reserved. Marks Unassigned Port */
+    tcb->local_port = PORT_UNSPEC; /* Port 0: Reserved. Marks Unassigned Port */
 
     /* Init Send Pointers */
     tcb->snd_una = 0;
@@ -95,14 +102,36 @@ int8_t ng_tcp_tcb_init(ng_tcp_tcb_t *tcb)
     /* Clear Timeout */
     tcb->timeout.seconds = 0;
     tcb->timeout.microseconds = 0;
-    mutex_init(&tcb->mtx);
+
+    tcb->owner = thread_getpid();
+    tcb->next = NULL;
+
+    /* Add this tcb to the tcb list */
+    _add_tcb_to_list(tcb);
     return 0;
 }
 
-int8_t ng_tcp_open(ng_tcp_tcb_t *tcb, uint8_t *addr, const size_t addr_len, const uint16_t port, const uint8_t flags)
+int8_t ng_tcp_tcb_destroy(ng_tcp_tcb_t *tcb)
+{
+    /* Guard: only tcb owner is allowed to use this on supplied tcb call */
+    if(tcb->owner != thread_getpid()){
+        return -EPERM;
+    }
+
+    _rem_tcb_from_list(tcb);
+    return 0;
+}
+
+int8_t ng_tcp_open(ng_tcp_tcb_t *tcb, uint16_t local_port, uint8_t *peer_addr,
+                   size_t peer_addr_len, uint16_t peer_port, uint8_t options)
 {
     msg_t msg;
     int8_t res = 0;
+
+    /* Guard: only tcb owner is allowed to use this call on tcb  */
+    if(tcb->owner != thread_getpid()){
+        return -EPERM;
+    }
 
     /* Guard: tcb must be in state CLOSED */
     if(tcb->state != CLOSED){
@@ -110,80 +139,105 @@ int8_t ng_tcp_open(ng_tcp_tcb_t *tcb, uint8_t *addr, const size_t addr_len, cons
     }
 
     /* Guard: address buffer must be supplied */
-    if(addr == NULL || addr_len == 0){
+    if(peer_addr == NULL || peer_addr_len == 0){
         return -EFAULT;
     }
 
-    /* Setup basic connection information */
-    tcb->peer_addr = addr;
-    tcb->peer_addr_len = addr_len;
-    tcb->flags = flags;
-
-    /* Setup Port information, based on active or passive mode */
-    if(flags & AI_PASSIVE){
-        tcb->peer_port = PORT_UNASSIGNED;
-        tcb->local_port = port;
+    /* Check parameters based on Mode */
+    if((options & AI_PASSIVE)){
+        /* Guard: passive connection, local_port must specified */
+        if(local_port == PORT_UNSPEC){
+            return -1;
+        }
     }else{
-        tcb->peer_port = port;
-        tcb->local_port = _get_free_port(tcb->peer_port);
+        /* Guard: active connection, peer addr/port must be specified */
+        if(peer_port == PORT_UNSPEC){
+            return -EDESTADDRREQ;
+        }
+#ifdef MODULE_NG_IPV6
+        if(ng_ipv6_addr_is_unspecified((ng_ipv6_addr_t*) peer_addr)){
+            return -EDESTADDRREQ;
+        }
+#endif
     }
 
-    /* Event CALL_OPEN happens */
-    res = _fsm(tcb, NULL, CALL_OPEN);
+    /* Assign connection information.*/
+    tcb->local_port = (options & AI_PASSIVE) ? local_port : _get_free_port(peer_port);
+    tcb->peer_port = (options & AI_PASSIVE) ? PORT_UNSPEC : peer_port;
+    tcb->peer_addr = peer_addr;
+    tcb->peer_addr_len = peer_addr_len;
+    tcb->options = options;
 
-    while(res >= 0 && tcb->state != CLOSED && tcb->state != ESTABLISHED){
-         /* Wait for timeout or a received Message */
-        if((res = vtimer_msg_receive_timeout(&msg, tcb->timeout)) >= 0){
-            /* packet received */
-            res = _fsm(tcb, (ng_pktsnip_t *) msg.content.ptr, RCVD_PKT);
-        }else {
-            /* timer expired */
+    /* Event CALL_OPEN happens */
+    _fsm(tcb, NULL, CALL_OPEN);
+
+    /* Wait till connection is established or closed or in close wait*/
+    while(tcb->state != CLOSED && tcb->state != ESTABLISHED && tcb->state != CLOSE_WAIT){
+        /* Wait for notification(state change or timer expired) */
+        res = vtimer_msg_receive_timeout(&msg, tcb->timeout);
+
+        /* Timer expired: Event TIME_TIMEOUT happend */
+        if(res < 0){
             res = _fsm(tcb, NULL, TIME_TIMEOUT);
         }
     }
+
     return res;
 }
 
-int8_t ng_tcp_send(ng_tcp_tcb_t *tcb){
-    if(tcb->state != ESTABLISHED){
-        return -1;
-    }
-    return 0;
-}
+int8_t ng_tcp_send(ng_tcp_tcb_t *tcb, uint8_t *buf, size_t byte_count, bool push, bool urgent)
+{
+    (void) buf;
+    (void) byte_count;
+    (void) push;
+    (void) urgent;
 
-int8_t ng_tcp_recv(ng_tcp_tcb_t *tcb){
-    if(tcb->state != ESTABLISHED){
-        return -1;
+    /* Guard: only tcb owner is allowed to use this call, on tcb */
+    if(tcb->owner != thread_getpid()){
+        return -EPERM;
     }
-    return 0;
-}
-
-int8_t ng_tcp_close(ng_tcp_tcb_t *tcb){
-    int8_t res = 0;
 
     if(tcb->state != ESTABLISHED && tcb->state != CLOSE_WAIT){
         return -1;
     }
-
-    /* Initiate sequence */
-    if(tcb->state == ESTABLISHED){
-        res = _fsm(tcb, NULL, CALL_CLOSE);
-    }
-
-    while(res >= 0 && tcb->state != CLOSED){
-
-    }
-
-    return res;
+    return 0;
 }
 
-int8_t ng_tcp_abort(ng_tcp_tcb_t *tcb)
+int8_t ng_tcp_recv(ng_tcp_tcb_t *tcb)
 {
+    /* Guard: only tcb owner is allowed to use this call, on tcb */
+    if(tcb->owner != thread_getpid()){
+        return -EPERM;
+    }
+
     if(tcb->state != ESTABLISHED){
         return -1;
     }
-
     return 0;
+}
+
+int8_t ng_tcp_close(ng_tcp_tcb_t *tcb)
+{
+    int8_t res = 0;
+
+    /* Guard: only tcb owner is allowed to use this call, on tcb */
+    if(tcb->owner != thread_getpid()){
+        return -EPERM;
+    }
+
+    /* Connection must be established or in close_wait for this call */
+    if(tcb->state != ESTABLISHED && tcb->state != CLOSE_WAIT){
+        return -1;
+    }
+
+    /* Event CALL_CLOSE happens */
+    res = _fsm(tcb, NULL, CALL_CLOSE);
+
+    while(tcb->state != CLOSED){
+        /* Sleep */
+    }
+
+    return res;
 }
 
 int ng_tcp_init(void)

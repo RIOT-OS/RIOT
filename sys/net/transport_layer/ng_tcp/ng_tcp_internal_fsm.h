@@ -12,38 +12,29 @@ static int8_t _fsm_closed(ng_tcp_tcb_t *tcb, ng_pktsnip_t *pkt, ng_tcp_event_t e
     (void) pkt;
 
     if(event == CALL_OPEN){
+        _demux_register(tcb);
         tcb->rcv_wnd = DEFAULT_WINDOW;
 
-        if(tcb->flags & AI_PASSIVE){
-            /* Open was passive, Register on demux context, Translation: CLOSED -> LISTEN */
-            _demux_register(tcb);
-            _setup_timeout(tcb, TIMEOUT_UNSPEC);
+        if(tcb->options & AI_PASSIVE){
+            /* Open was passive, Translation: CLOSED -> LISTEN */
+            _clear_timeout(tcb);
             tcb->state = LISTEN;
         }else{
-            /* Open was active, Check if given address is specified */
-#ifdef MODULE_NG_IPV6
-            if(ng_ipv6_addr_is_unspecified((ng_ipv6_addr_t*) tcb->peer_addr)){
-                return -EDESTADDRREQ;
-            }
-#endif
-            /* Setup initial values, register on demux context, send SYN to peer.*/
+            /* Open was active, Setup initial values, send SYN, Translation: CLOSED -> SYN_SENT */
             tcb->iss = genrand_uint32();
             tcb->snd_una = tcb->iss;
             tcb->snd_nxt = tcb->snd_una+1;
-            _demux_register(tcb);
             _setup_timeout(tcb, TIMEOUT_SYN_SENT);
             ng_netapi_send(_tcp_pid, _build_pkt(tcb, MSK_SYN, tcb->iss, 0, NULL, 0));
-
-            /* Translation : CLOSED -> SYN_SENT */
             tcb->state = SYN_SENT;
         }
     }
-
     return 0;
 }
 
 static uint8_t _fsm_listen(ng_tcp_tcb_t *tcb, ng_pktsnip_t *pkt, ng_tcp_event_t event)
 {
+    msg_t msg;
     uint16_t src_port = 0;
     uint16_t dst_port = 0;
     uint16_t ctl_bits = 0;
@@ -68,7 +59,7 @@ static uint8_t _fsm_listen(ng_tcp_tcb_t *tcb, ng_pktsnip_t *pkt, ng_tcp_event_t 
         memcpy(tcb->peer_addr, &(ip6_hdr->src), tcb->peer_addr_len);
 #endif
 
-        /* ACK Set: Send reset to peer, drop paket and return. */
+        /* ACK Set: Send reset to peer, return. */
         if(ctl_bits & MSK_ACK){
             ng_netapi_send(_tcp_pid, _build_pkt(tcb, MSK_RST, byteorder_ntohl(tcp_hdr->ack_num), 0, NULL, 0));
             return 0;
@@ -79,16 +70,16 @@ static uint8_t _fsm_listen(ng_tcp_tcb_t *tcb, ng_pktsnip_t *pkt, ng_tcp_event_t 
             src_port = byteorder_ntohs(tcp_hdr->src_port);
             dst_port = byteorder_ntohs(tcp_hdr->dst_port);
 
-            /* Check if connection is handled. Drop paket and return */
+            /* Check if connection is already handled. If so return */
             if(ng_netreg_num(NG_NETTYPE_TCP, _build_context(src_port, dst_port)) > 0){
                 DEBUG("tcp: context already handled.\n");
                 return 0;
             }
 
-            /* Move to new demux context */
+            /* Move to new demux context, specified by received paket */
             _demux_change_context(tcb, src_port, dst_port);
 
-            /* Handle this connection. Fill tcb with received information */
+            /* Fill tcb with received information */
             tcb->irs = byteorder_ntohl(tcp_hdr->seq_num);
             tcb->rcv_nxt = tcb->irs + 1;
             tcb->iss = genrand_uint32();
@@ -96,11 +87,14 @@ static uint8_t _fsm_listen(ng_tcp_tcb_t *tcb, ng_pktsnip_t *pkt, ng_tcp_event_t 
             tcb->snd_nxt = tcb->snd_una+1;
             tcb->snd_wnd = byteorder_ntohs(tcp_hdr->window);
 
-            /* Drop paket, send SYN+ACK to peer, translate: LISTEN -> SYN_RCVD. */
+            /* Send SYN+ACK to peer, translate: LISTEN -> SYN_RCVD. */
             ng_netapi_send(_tcp_pid, _build_pkt(tcb, MSK_SYN_ACK, tcb->iss, tcb->rcv_nxt, NULL, 0));
             _setup_timeout(tcb, TIMEOUT_SYN_RCVD);
             tcb->state = SYN_RCVD;
         }
+
+        /* Send Notification */
+        msg_send(&msg, tcb->owner);
     }
     return 0;
 }
@@ -141,9 +135,16 @@ static int8_t _fsm_syn_rcvd(ng_tcp_tcb_t *tcb, ng_pktsnip_t *pkt, ng_tcp_event_t
 
         /* RST Set and valid seq_num: drop paket, transition: SYN_RCVD -> LISTEN, return */
         if(ctl_bits & MSK_RST){
-            _demux_change_context(tcb, PORT_UNASSIGNED, tcb->local_port);
-            _setup_timeout(tcb, TIMEOUT_UNSPEC);
-            tcb->state = LISTEN;
+            if( tcb->options & AI_PASSIVE){
+                /* Connection is marked as passive: SYN_RCVD -> LISTEN */
+                _demux_change_context(tcb, PORT_UNSPEC, tcb->local_port);
+                _clear_timeout(tcb);
+                tcb->state = LISTEN;
+            }else{
+                /* Connection is marked as active: SYN_RCVD -> CLOSED */
+                _demux_remove(tcb);
+                tcb->state = CLOSED;
+            }
             return 0;
         }
 
@@ -177,8 +178,7 @@ static int8_t _fsm_syn_rcvd(ng_tcp_tcb_t *tcb, ng_pktsnip_t *pkt, ng_tcp_event_t
         }
     }
 
-    // TODO: close call
-    return -1;
+    return 0;
 }
 
 static int8_t _fsm_syn_sent(ng_tcp_tcb_t *tcb, ng_pktsnip_t *pkt, ng_tcp_event_t event)
@@ -226,8 +226,8 @@ static int8_t _fsm_syn_sent(ng_tcp_tcb_t *tcb, ng_pktsnip_t *pkt, ng_tcp_event_t
         }
 
         if(ctl_bits & MSK_SYN){
-            /* SYN+ACK: "Normal Mode"  */
             if(ctl_bits & MSK_ACK){
+                /* SYN+ACK: "Normal Mode" */
                 tcb->irs = byteorder_ntohl(tcp_hdr->seq_num);     // Get IRS from received seq_num
                 tcb->rcv_nxt = tcb->irs + 1;                      // Init rcv_nxt
                 tcb->snd_una = byteorder_ntohl(tcp_hdr->ack_num); // Increase snd_una
@@ -238,6 +238,8 @@ static int8_t _fsm_syn_sent(ng_tcp_tcb_t *tcb, ng_pktsnip_t *pkt, ng_tcp_event_t
                     tcb->state = ESTABLISHED;
                     ng_netapi_send(_tcp_pid, _build_pkt(tcb, MSK_ACK, tcb->snd_nxt, tcb->rcv_nxt, NULL, 0));
                 }
+            }else{
+                /* SYN Only: "Simultanious Mode" */
             }
         }
     }
@@ -678,17 +680,12 @@ static int8_t _fsm(ng_tcp_tcb_t *tcb, ng_pktsnip_t *pkt, ng_tcp_event_t event)
     int8_t res = 0;
     ng_pktsnip_t *snp = NULL;
 
-    /* Syncronize Statemaschine */
-    mutex_lock(&(tcb->mtx));
-
     /* If event was a received paket, parse options*/
     if(event == RCVD_PKT){
         /* If Options are faulty, drop pkt, return non critical error */
         LL_SEARCH_SCALAR(pkt, snp, type, NG_NETTYPE_TCP);
         if( _parse_options(tcb, ((ng_tcp_hdr_t *)snp->data)) < 0){
             DEBUG("_fsm(): Received faulty options\n");
-            ng_pktbuf_release(pkt);
-            mutex_unlock(&(tcb->mtx));
             return 0;
         }
     }
@@ -729,11 +726,5 @@ static int8_t _fsm(ng_tcp_tcb_t *tcb, ng_pktsnip_t *pkt, ng_tcp_event_t event)
 
         default:            DEBUG("_fsm(): Non-legal State\n");
     }
-
-    /* If paket was received, drop it */
-    if(event == RCVD_PKT){
-        ng_pktbuf_release(pkt);
-    }
-    mutex_unlock(&(tcb->mtx));
     return res;
 }

@@ -190,6 +190,14 @@ static inline uint32_t _build_context(const uint16_t peer_port, const uint16_t l
     return (peer_port << 16) | local_port;
 }
 
+static inline bool _is_context_unique(const uint16_t peer_port, const uint16_t local_port)
+{
+    if( ng_netreg_num(NG_NETTYPE_TCP, _build_context(peer_port, local_port)) == 0 ){
+        return true;
+    }
+    return false;
+}
+
 /**
  * @brief Registers a thread on in a multiplexing context.
  *
@@ -202,7 +210,7 @@ static inline uint32_t _build_context(const uint16_t peer_port, const uint16_t l
 static int8_t _demux_register(ng_tcp_tcb_t *tcb)
 {
     tcb->netreg_entry.demux_ctx = _build_context(tcb->peer_port, tcb->local_port);
-    tcb->netreg_entry.pid = thread_getpid();
+    tcb->netreg_entry.pid = tcb->owner;
     ng_netreg_register(NG_NETTYPE_TCP, &tcb->netreg_entry);
     return 0;
 }
@@ -219,7 +227,7 @@ static int8_t _demux_register(ng_tcp_tcb_t *tcb)
 static int8_t _demux_remove(ng_tcp_tcb_t *tcb)
 {
     tcb->netreg_entry.demux_ctx = _build_context(tcb->peer_port, tcb->local_port);
-    tcb->netreg_entry.pid = thread_getpid();
+    tcb->netreg_entry.pid = tcb->owner;
     ng_netreg_unregister(NG_NETTYPE_TCP, &tcb->netreg_entry);
     return 0;
 }
@@ -276,6 +284,11 @@ static uint16_t _get_free_port(const uint8_t dst_port)
 static inline void _setup_timeout(ng_tcp_tcb_t *tcb, const uint32_t msec){
     tcb->timeout.microseconds = msec;
     timex_normalize(&tcb->timeout);
+}
+
+static inline void _clear_timeout(ng_tcp_tcb_t *tcb){
+    tcb->timeout.seconds = 0;
+    tcb->timeout.microseconds = 0;
 }
 
 /**
@@ -389,6 +402,7 @@ static int8_t _parse_options(ng_tcp_tcb_t *tcb, ng_tcp_hdr_t *hdr)
     return 0;
 }
 
+/* TODO: Make this overflow-safe */
 static bool _is_seq_num_acceptable(ng_tcp_tcb_t *tcb, uint32_t snum, uint32_t slen)
 {
     uint32_t rn = tcb->rcv_nxt;
@@ -428,9 +442,39 @@ static uint32_t _get_seg_len(ng_pktsnip_t *pkt)
     uint32_t seg_len = 0;
     ng_pktsnip_t *snp = NULL;
     LL_SEARCH_SCALAR(pkt, snp, type, NG_NETTYPE_UNDEF);
-    while(snp != NULL && snp->type == NG_NETTYPE_UNDEF){
+    while(snp && snp->type == NG_NETTYPE_UNDEF){
         seg_len += snp->size;
         snp = snp->next;
     }
     return seg_len;
+}
+
+static void _add_tcb_to_list(ng_tcp_tcb_t *tcb)
+{
+    ng_tcp_tcb_t** ptr = &_head_tcb_list;
+    while(*ptr && *ptr != tcb){
+        ptr = (ng_tcp_tcb_t **) &((*ptr)->next);
+    }
+    *ptr = tcb;
+}
+
+static void _rem_tcb_from_list(ng_tcp_tcb_t *tcb)
+{
+    ng_tcp_tcb_t** ptr = &_head_tcb_list;
+    while(*ptr && *ptr != tcb){
+        ptr = (ng_tcp_tcb_t **) &((*ptr)->next);
+    }
+    if(*ptr != NULL){
+        *ptr = (ng_tcp_tcb_t *) tcb->next;
+        tcb->next = NULL;
+    }
+}
+
+static ng_tcp_tcb_t* _search_tcb_of_owner(kernel_pid_t owner)
+{
+    ng_tcp_tcb_t* ptr = _head_tcb_list;
+    while(ptr && ptr->owner != owner){
+        ptr = (ng_tcp_tcb_t *) ptr->next;
+    }
+    return ptr;
 }

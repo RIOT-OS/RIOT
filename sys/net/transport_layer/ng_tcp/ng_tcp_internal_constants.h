@@ -15,7 +15,7 @@ typedef enum {
     CALL_ABORT,
     RCVD_PKT,
     TIME_TIMEOUT,
-    EVT_UNKNOWN
+    TIME_USERTIMEOUT
 } ng_tcp_event_t;
 
 /* Offset without Options(in 32-Bit words) */
@@ -35,20 +35,16 @@ typedef enum {
 #define MSK_OFFSET   0x000F
 #define MSK_RESERVED 0x03F0
 
-/* Timeout Message constants */
-#define MSG_CONTENT_TIMEOUT ((void *)0xFFFF)
-
 /* TODO: Find real Timeout times */
-#define TIMEOUT_UNSPEC   0
-#define TIMEOUT_SYN_SENT 2000000
-#define TIMEOUT_SYN_RCVD 2000000
+#define TIMEOUT_SYN_SENT   2000000
+#define TIMEOUT_SYN_RCVD   2000000
 
 /* Default Window Size */
 #define DEFAULT_WINDOW 250
 
 /* PORT 0 is reserved, according to rfc 1700(https://www.ietf.org/rfc/rfc1700.txt) */
 /* Here used to indicate, that tcb internal port is currently not assigned */
-#define PORT_UNASSIGNED 0
+#define PORT_UNSPEC 0
 
 /* Range of Port Numbers, that are not controlled by IANA. */
 #define BEG_REG_PORTS 1024

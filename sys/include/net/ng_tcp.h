@@ -25,7 +25,6 @@
 
 #include "byteorder.h"
 #include "timex.h"
-#include "mutex.h"
 #include "net/ng_netapi.h"
 #include "net/ng_netreg.h"
 #include "net/ng_nettype.h"
@@ -42,7 +41,7 @@ extern "C" {
  * @brief    Default stack size for TCP thread
  */
 #ifndef NG_TCP_STACK_SIZE
-#define NG_TCP_STACK_SIZE   KERNEL_CONF_STACKSIZE_DEFAULT
+#define NG_TCP_STACK_SIZE   THREAD_STACKSIZE_DEFAULT
 #endif
 
 /**
@@ -56,7 +55,14 @@ extern "C" {
  * @brief    TODO: Description
  */
 #ifndef NG_TCP_PRIO
-#define NG_TCP_PRIO   (PRIORITY_MAIN - 2)
+#define NG_TCP_PRIO   (THREAD_PRIORITY_MAIN - 2)
+#endif
+
+/**
+ * @brief Size of TCP threads message queue
+ */
+#ifndef NG_TCP_MSG_QUEUE_SIZE
+#define NG_TCP_MSG_QUEUE_SIZE 4
 #endif
 
 /**
@@ -117,7 +123,7 @@ typedef struct __attribute__((packed)) {
     size_t   peer_addr_len;    /**< Peer Address Len */
     uint16_t peer_port;        /**< Peer Port, peer is listening on */
     uint16_t local_port;       /**< Local Port, this connection is listening on */
-    uint8_t  flags;            /**< Flags used to configure this connection */
+    uint8_t  options;          /**< Options used to configure this connection */
 
     /* Sliding Window Mechanism Variables*/
     /* Send Pointers */
@@ -138,9 +144,10 @@ typedef struct __attribute__((packed)) {
     uint16_t mss;              /**< Peer Maximum Window Size */
 
     /* Misc */
+    kernel_pid_t owner;
+    void* next;
     ng_netreg_entry_t netreg_entry;
     timex_t timeout;
-    mutex_t mtx;
 } ng_tcp_tcb_t;
 
 /**
@@ -201,6 +208,11 @@ ng_pktsnip_t *ng_tcp_hdr_build(ng_pktsnip_t *payload, uint8_t *src, size_t src_l
 int8_t ng_tcp_tcb_init(ng_tcp_tcb_t *tcb);
 
 /**
+ * @brief TODO
+ */
+int8_t ng_tcp_tcb_destroy(ng_tcp_tcb_t *tcb);
+
+/**
  * @brief Opens a connection. Block until a connection is established, closed or an critical error occured.
  *
  * @param[in/out] tcb        transmission control block to handle this connection
@@ -216,12 +228,12 @@ int8_t ng_tcp_tcb_init(ng_tcp_tcb_t *tcb);
  * @return         -EDESTADDRREQ if destination is unspecified
  */
 
-int8_t ng_tcp_open(ng_tcp_tcb_t *tcb, uint8_t *addr, const size_t addr_len, const uint16_t port, const uint8_t flags);
+int8_t ng_tcp_open(ng_tcp_tcb_t *tcb, uint16_t local_port, uint8_t *peer_addr, size_t peer_addr_len, uint16_t peer_port, uint8_t options);
 
 /**
  * @brief TODO
  */
-int8_t ng_tcp_send(ng_tcp_tcb_t *tcb);
+int8_t ng_tcp_send(ng_tcp_tcb_t *tcb, uint8_t *buf, size_t byte_count, bool push, bool urgent);
 
 /**
  * @brief TODO
