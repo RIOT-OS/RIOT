@@ -321,5 +321,10 @@ void auto_init(void)
     auto_init_xbee();
 #endif
 
+#ifdef MODULE_KW2XRF
+    extern void auto_init_kw2xrf(void);
+    auto_init_kw2xrf();
+#endif
+
 #endif /* MODULE_AUTO_INIT_NG_NETIF */
 }
