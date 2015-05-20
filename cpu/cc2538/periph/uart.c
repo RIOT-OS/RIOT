@@ -89,7 +89,7 @@ cc2538_uart_t * const UART1 = (cc2538_uart_t *)0x4000d000;
 static void reset(cc2538_uart_t *u)
 {
     /* Make sure the UART is disabled before trying to configure it */
-    u->CTL = 0;
+    u->CTLbits.UARTEN = 0;
 
     u->CTLbits.RXE = 1;
     u->CTLbits.TXE = 1;
