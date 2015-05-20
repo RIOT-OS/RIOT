@@ -31,22 +31,22 @@ RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-key FE324A81C208C89497EF
 RUN apt-get update
 RUN apt-get -y dist-upgrade
 
-RUN apt-get -y install build-essential
-RUN apt-get -y install git
-RUN apt-get -y install gcc-multilib
-RUN apt-get -y install gcc-arm-none-eabi
-RUN apt-get -y install gcc-msp430
-RUN apt-get -y install pcregrep libpcre3
-RUN apt-get -y install qemu-system-x86 python3
-RUN apt-get -y install g++-multilib
-RUN apt-get -y install gcc-avr binutils-avr avr-libc
-RUN apt-get -y install subversion curl wget python p7zip unzip
+RUN apt-get -y install build-essential \
+ git \
+ gcc-multilib \
+ gcc-arm-none-eabi \
+ gcc-msp430 \
+ pcregrep libpcre3 \
+ qemu-system-x86 python3 \
+ g++-multilib \
+ gcc-avr binutils-avr avr-libc \
+ subversion curl wget python p7zip unzip
 
-RUN wget http://launchpadlibrarian.net/206632429/ccache_3.2.2-2_amd64.deb -O /tmp/ccache_3.2.2-2_amd64.deb
-RUN dpkg -i /tmp/ccache_3.2.2-2_amd64.deb
+RUN wget http://launchpadlibrarian.net/206632429/ccache_3.2.2-2_amd64.deb \
+        -O /tmp/ccache_3.2.2-2_amd64.deb \
+        && dpkg -i /tmp/ccache_3.2.2-2_amd64.deb
 
-RUN mkdir -p /data/ccache
-RUN chmod 777 /data/ccache
+RUN mkdir -m 777 -p /data/ccache
 ENV CCACHE_DIR /data/ccache
 
 RUN mkdir -p /data/riotbuild
