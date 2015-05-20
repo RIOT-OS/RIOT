@@ -31,6 +31,10 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
+#if (ENABLE_DEBUG)
+static char addr_str[NG_IPV6_ADDR_MAX_STR_LEN];
+#endif
+
 static ng_pktqueue_node_t _pkt_nodes[NG_IPV6_NC_SIZE * 2];
 static ng_ipv6_nc_t *_last_router = NULL;   /* last router chosen as default
                                              * router. Only used if reachability
@@ -201,7 +205,7 @@ void ng_ndp_retrans_nbr_sol(ng_ipv6_nc_t *nc_entry)
         ng_ipv6_addr_t dst;
 
         DEBUG("ndp: Retransmit neighbor solicitation for %s\n",
-              ng_ipv6_addr_to_str(addr_str, nc_entry->ipv6_addr, sizeof(addr_str)));
+              ng_ipv6_addr_to_str(addr_str, &nc_entry->ipv6_addr, sizeof(addr_str)));
 
         /* retransmit neighbor solicatation */
         if (ng_ipv6_nc_get_state(nc_entry) == NG_IPV6_NC_STATE_INCOMPLETE) {
@@ -247,7 +251,7 @@ void ng_ndp_retrans_nbr_sol(ng_ipv6_nc_t *nc_entry)
          * entry is */
 
         DEBUG("ndp: Remove nc entry %s for interface %" PRIkernel_pid "\n",
-              ng_ipv6_addr_to_str(addr_str, nc_entry->ipv6_addr, sizeof(addr_str)),
+              ng_ipv6_addr_to_str(addr_str, &nc_entry->ipv6_addr, sizeof(addr_str)),
               nc_entry->iface);
 
         while ((queue_node = ng_pktqueue_remove_head(&nc_entry->pkts))) {
