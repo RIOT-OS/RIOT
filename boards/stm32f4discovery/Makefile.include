@@ -32,7 +32,7 @@ export RESET = $(RIOTBASE)/dist/tools/openocd/openocd.sh
 
 # define build specific options
 CPU_USAGE = -mcpu=cortex-m4
-FPU_USAGE = -mfloat-abi=hard -mfpu=fpv4-sp-d16
+FPU_USAGE = -mfpu=fpv4-sp-d16 -mfloat-abi=softfp		#The type of FPU we are using
 export CFLAGS += -ggdb -g3 -std=gnu99 -Os -Wall -Wstrict-prototypes $(CPU_USAGE) $(FPU_USAGE) -mlittle-endian -mthumb -mno-thumb-interwork -nostartfiles
 export CFLAGS += -ffunction-sections -fdata-sections -fno-builtin
 export ASFLAGS += -ggdb -g3 $(CPU_USAGE) $(FPU_USAGE) -mlittle-endian
