@@ -44,6 +44,7 @@ static void _start(I2C_TypeDef *dev, uint8_t address, uint8_t rw_flag);
 static inline void _clear_addr(I2C_TypeDef *dev);
 static inline void _write(I2C_TypeDef *dev, char *data, int length);
 static inline void _stop(I2C_TypeDef *dev);
+static inline void _error(I2C_TypeDef *dev);
 
 /**
  * @brief Array holding one pre-initialized mutex for each I2C device
@@ -529,10 +530,10 @@ void i2c_poweroff(i2c_t dev)
 #endif
 #if I2C_1_EN
         case I2C_1:
-          while (I2C_1_DEV->SR2 & I2C_SR2_BUSY);
+            while (I2C_1_DEV->SR2 & I2C_SR2_BUSY);
 
-          I2C_1_CLKDIS();
-          break;
+            I2C_1_CLKDIS();
+            break;
 #endif
     }
 }
@@ -594,10 +595,8 @@ static inline void _stop(I2C_TypeDef *dev)
     dev->CR1 |= I2C_CR1_STOP;
 }
 
-#if I2C_0_EN
-void I2C_0_ERR_ISR(void)
-{
-    unsigned state = I2C_0_DEV->SR1;
+static inline void _error(I2C_TypeDef *dev){
+    unsigned state = dev->SR1;
     DEBUG("\n\n### I2C ERROR OCCURED ###\n");
     DEBUG("status: %08x\n", state);
     if (state & I2C_SR1_OVR) {
@@ -613,7 +612,7 @@ void I2C_0_ERR_ISR(void)
         DEBUG("BERR\n");
     }
     if (state & I2C_SR1_PECERR) {
-        DEBUG("PECERR\n");
+          DEBUG("PECERR\n");
     }
     if (state & I2C_SR1_TIMEOUT) {
         DEBUG("TIMEOUT\n");
@@ -623,36 +622,18 @@ void I2C_0_ERR_ISR(void)
     }
     while (1);
 }
+
+#if I2C_0_EN
+void I2C_0_ERR_ISR(void)
+{
+    _error(I2C_0_DEV);
+}
 #endif /* I2C_0_EN */
 
 #if I2C_1_EN
 void I2C_1_ERR_ISR(void)
 {
-    unsigned state = I2C_1_DEV->SR1;
-    DEBUG("\n\n### I2C ERROR OCCURED ###\n");
-    DEBUG("status: %08x\n", state);
-    if (state & I2C_SR1_OVR) {
-        DEBUG("OVR\n");
-    }
-    if (state & I2C_SR1_AF) {
-        DEBUG("AF\n");
-    }
-    if (state & I2C_SR1_ARLO) {
-        DEBUG("ARLO\n");
-    }
-    if (state & I2C_SR1_BERR) {
-        DEBUG("BERR\n");
-    }
-    if (state & I2C_SR1_PECERR) {
-        DEBUG("PECERR\n");
-    }
-    if (state & I2C_SR1_TIMEOUT) {
-        DEBUG("TIMEOUT\n");
-    }
-    if (state & I2C_SR1_SMBALERT) {
-        DEBUG("SMBALERT\n");
-    }
-    while (1);
+    _error(I2C_1_DEV);
 }
 #endif /* I2C_1_EN */
 
