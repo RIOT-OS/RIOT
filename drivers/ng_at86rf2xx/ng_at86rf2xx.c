@@ -36,7 +36,7 @@
 #include "debug.h"
 
 
-#define RESET_DELAY             (0U)        /* must be > 625ns */
+#define RESET_DELAY             (1U)        /* must be > 625ns */
 
 
 static void _irq_handler(void *arg)
