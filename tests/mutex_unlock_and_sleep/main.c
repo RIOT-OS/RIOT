@@ -26,7 +26,7 @@ static mutex_t mutex = MUTEX_INIT;
 static volatile int indicator, count;
 static kernel_pid_t main_pid;
 
-static char stack[KERNEL_CONF_STACKSIZE_MAIN];
+static char stack[THREAD_STACKSIZE_MAIN];
 static void *second_thread(void *arg)
 {
     (void) arg;
@@ -48,7 +48,7 @@ int main(void)
 
     kernel_pid_t second_pid = thread_create(stack,
                   sizeof(stack),
-                  PRIORITY_MAIN - 1,
+                  THREAD_PRIORITY_MAIN - 1,
                   CREATE_WOUT_YIELD | CREATE_STACKTEST,
                   second_thread,
                   NULL,

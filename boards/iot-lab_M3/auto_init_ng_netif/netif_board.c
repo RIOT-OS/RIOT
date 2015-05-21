@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     boards_samr21-xpro
+ * @ingroup     boards_iot-lab_M3
  * @{
  *
  * @file
@@ -47,13 +47,14 @@ static ng_at86rf2xx_t radio;
  */
 static char nomac_stack[MAC_STACKSIZE];
 
+
 void auto_init_ng_netif(void)
 {
     /* initialize the radio */
-    DEBUG("Initializing AT86RF233 radio\n");
-    ng_at86rf2xx_init(&radio, NG_AT86RF233_SPI, NG_AT86RF233_SPI_CLK,
-                      NG_AT86RF233_CS, NG_AT86RF233_INT,
-                      NG_AT86RF233_SLEEP, NG_AT86RF233_RESET);
+    DEBUG("Initializing AT86RF231 radio\n");
+    ng_at86rf2xx_init(&radio, AT86RF231_SPI, AT86RF231_SPI_CLK,
+                      AT86RF231_CS, AT86RF231_INT,
+                      AT86RF231_SLEEP, AT86RF231_RESET);
     /* starting NOMAC */
     DEBUG("Starting the MAC layer\n");
     ng_nomac_init(nomac_stack, sizeof(nomac_stack), MAC_PRIO, "at86rf233",

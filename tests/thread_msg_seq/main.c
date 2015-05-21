@@ -25,9 +25,9 @@
 #include "thread.h"
 #include "msg.h"
 
-char t1_stack[KERNEL_CONF_STACKSIZE_MAIN];
-char t2_stack[KERNEL_CONF_STACKSIZE_MAIN];
-char t3_stack[KERNEL_CONF_STACKSIZE_MAIN];
+char t1_stack[THREAD_STACKSIZE_MAIN];
+char t2_stack[THREAD_STACKSIZE_MAIN];
+char t3_stack[THREAD_STACKSIZE_MAIN];
 
 kernel_pid_t p_main = KERNEL_PID_UNDEF, p1 = KERNEL_PID_UNDEF,
              p2 = KERNEL_PID_UNDEF, p3 = KERNEL_PID_UNDEF;
@@ -55,13 +55,13 @@ int main(void)
 
     p_main = sched_active_pid;
 
-    p1 = thread_create(t1_stack, sizeof(t1_stack), PRIORITY_MAIN - 1,
+    p1 = thread_create(t1_stack, sizeof(t1_stack), THREAD_PRIORITY_MAIN - 1,
                        CREATE_WOUT_YIELD | CREATE_STACKTEST,
                        sub_thread, "nr1", "nr1");
-    p2 = thread_create(t2_stack, sizeof(t2_stack), PRIORITY_MAIN - 1,
+    p2 = thread_create(t2_stack, sizeof(t2_stack), THREAD_PRIORITY_MAIN - 1,
                        CREATE_WOUT_YIELD | CREATE_STACKTEST,
                        sub_thread, "nr2", "nr2");
-    p3 = thread_create(t3_stack, sizeof(t3_stack), PRIORITY_MAIN - 1,
+    p3 = thread_create(t3_stack, sizeof(t3_stack), THREAD_PRIORITY_MAIN - 1,
                        CREATE_WOUT_YIELD | CREATE_STACKTEST,
                        sub_thread, "nr3", "nr3");
 

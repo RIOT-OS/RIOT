@@ -166,7 +166,7 @@ void x86_init_hwtimer(void)
 
 static void (*hwtimer_callback)(int timer);
 
-static char hwtimer_stack[KERNEL_CONF_STACKSIZE_DEFAULT];
+static char hwtimer_stack[THREAD_STACKSIZE_DEFAULT];
 static kernel_pid_t hwtimer_pid = KERNEL_PID_UNDEF;
 
 struct alarm_time {

@@ -26,6 +26,7 @@
 #include <stdint.h>
 
 #include "kernel.h"
+#include "thread.h"
 #include "timex.h"
 #include "mutex.h"
 #include "net_if.h"
@@ -45,7 +46,7 @@ extern "C" {
 #define MULTIHOP_HOPLIMIT           (64)
 
 #define SIXLOWIP_MAX_REGISTERED     (4)
-#define IP_PROCESS_STACKSIZE        (KERNEL_CONF_STACKSIZE_MAIN)
+#define IP_PROCESS_STACKSIZE        (THREAD_STACKSIZE_MAIN)
 
 /* extern variables */
 extern uint8_t ipv6_ext_hdr_len;

@@ -47,9 +47,9 @@ extern "C" {
 
 /** @brief Stack size for NHDP thread */
 #if ENABLE_DEBUG
-#define NHDP_STACK_SIZE      (KERNEL_CONF_STACKSIZE_DEFAULT + KERNEL_CONF_STACKSIZE_PRINTF)
+#define NHDP_STACK_SIZE      (THREAD_STACKSIZE_DEFAULT + THREAD_EXTRA_STACKSIZE_PRINTF)
 #else
-#define NHDP_STACK_SIZE      (KERNEL_CONF_STACKSIZE_DEFAULT)
+#define NHDP_STACK_SIZE      (THREAD_STACKSIZE_DEFAULT)
 #endif
 
 /** @brief Buffer size in bytes for NHDP writer's msg buffer */

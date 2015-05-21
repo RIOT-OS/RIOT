@@ -204,7 +204,7 @@ int udp_init_transport_layer(void)
     /* SOCKETS */
     memset(socket_base_sockets, 0, MAX_SOCKETS * sizeof(socket_internal_t));
 
-    int udp_thread_pid = thread_create(udp_stack_buffer, UDP_STACK_SIZE, PRIORITY_MAIN,
+    int udp_thread_pid = thread_create(udp_stack_buffer, UDP_STACK_SIZE, THREAD_PRIORITY_MAIN,
                                         CREATE_STACKTEST, udp_packet_handler, NULL, "udp_packet_handler");
 
     if (udp_thread_pid < 0) {

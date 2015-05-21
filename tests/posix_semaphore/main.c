@@ -26,8 +26,8 @@
 #include "semaphore.h"
 
 #define SEMAPHORE_TEST_THREADS 5
-char test1_thread_stack[KERNEL_CONF_STACKSIZE_MAIN];
-char test2_thread_stack[SEMAPHORE_TEST_THREADS][KERNEL_CONF_STACKSIZE_MAIN];
+char test1_thread_stack[THREAD_STACKSIZE_MAIN];
+char test2_thread_stack[SEMAPHORE_TEST_THREADS][THREAD_STACKSIZE_MAIN];
 
 sem_t s;
 
@@ -65,7 +65,7 @@ static void test1(void)
     puts("first: thread create");
     kernel_pid_t pid = thread_create(test1_thread_stack,
                                      sizeof(test1_thread_stack),
-                                     PRIORITY_MAIN - 1,
+                                     THREAD_PRIORITY_MAIN - 1,
                                      CREATE_STACKTEST | CREATE_WOUT_YIELD,
                                      test1_second_thread,
                                      NULL,
@@ -134,7 +134,7 @@ void test2(void)
     }
 
     for (int i = 0; i < SEMAPHORE_TEST_THREADS; i++) {
-        int priority = PRIORITY_MAIN - (i + 3) % 10 + 1;
+        int priority = THREAD_PRIORITY_MAIN - (i + 3) % 10 + 1;
 
         snprintf(names[i], sizeof(names[i]), "priority %d", priority);
         printf("first: thread create: %d\n", priority);

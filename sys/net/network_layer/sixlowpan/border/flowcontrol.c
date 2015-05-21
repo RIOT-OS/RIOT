@@ -59,7 +59,7 @@ ipv6_addr_t init_threeway_handshake(void)
     synack->type = BORDER_PACKET_CONF_TYPE;
     synack->conftype = BORDER_CONF_SYNACK;
 
-    sending_slot_pid = thread_create(sending_slot_stack, SENDING_SLOT_STACK_SIZE, PRIORITY_MAIN - 1, CREATE_SLEEPING, sending_slot, "sending slot");
+    sending_slot_pid = thread_create(sending_slot_stack, SENDING_SLOT_STACK_SIZE, THREAD_PRIORITY_MAIN - 1, CREATE_SLEEPING, sending_slot, "sending slot");
     flowcontrol_send_over_uart((border_packet_t *)synack, sizeof(border_conf_header_t));
 
     synack_seqnum = synack->seq_num;

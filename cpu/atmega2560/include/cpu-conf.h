@@ -31,13 +31,13 @@ extern "C" {
  * size tested sucessfully even with pretty small stacks.k
  * @{
  */
-#define KERNEL_CONF_STACKSIZE_PRINTF    (128)
+#define THREAD_EXTRA_STACKSIZE_PRINTF    (128)
 
-#ifndef KERNEL_CONF_STACKSIZE_DEFAULT
-#define KERNEL_CONF_STACKSIZE_DEFAULT   (256)
+#ifndef THREAD_STACKSIZE_DEFAULT
+#define THREAD_STACKSIZE_DEFAULT   (256)
 #endif
 
-#define KERNEL_CONF_STACKSIZE_IDLE      (128)
+#define THREAD_STACKSIZE_IDLE      (128)
 /** @} */
 
 /**

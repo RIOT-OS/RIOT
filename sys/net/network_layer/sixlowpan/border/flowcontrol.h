@@ -43,7 +43,7 @@ extern "C" {
 #define BORDER_RWS                (1)
 #define BORDER_SL_TIMEOUT         (500) // microseconds, maybe smaller
 
-#define SENDING_SLOT_STACK_SIZE     (MINIMUM_STACK_SIZE + 256)
+#define SENDING_SLOT_STACK_SIZE     (THREAD_STACKSIZE_MINIMUM + 256)
 
 typedef struct {
     /* Sender state */

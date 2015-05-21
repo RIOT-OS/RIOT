@@ -138,24 +138,24 @@
  * `cpu-conf.` (which should be provided by the implementation for all
  * supported MCUs). The constants for these stack sizes are
  *
- * * `KERNEL_CONF_STACKSIZE_IDLE`
- * * `KERNEL_CONF_STACKSIZE_DEFAULT`
- * * `KERNEL_CONF_STACKSIZE_PRINTF`
- * * `KERNEL_CONF_STACKSIZE_MAIN`
+ * * `THREAD_STACKSIZE_IDLE`
+ * * `THREAD_STACKSIZE_DEFAULT`
+ * * `THREAD_EXTRA_STACKSIZE_PRINTF`
+ * * `THREAD_STACKSIZE_MAIN`
  *
  * and can be used by including `kernel.h`. ARM based platforms additionally
- * define `KERNEL_CONF_STACKSIZE_PRINTF_FLOAT`, because newlibs printf
+ * define `THREAD_EXTRA_STACKSIZE_PRINTF_FLOAT`, because newlibs printf
  * implementation uses more memory for printing floating point numbers.
  *
- * `KERNEL_CONF_STACKSIZE_IDLE` is the stack size for the idle thread and
- * probably the smallest sensible stack size. `KERNEL_CONF_STACKSIZE_DEFAULT`
+ * `THREAD_STACKSIZE_IDLE` is the stack size for the idle thread and
+ * probably the smallest sensible stack size. `THREAD_STACKSIZE_DEFAULT`
  * is a default size for any typical thread, _not_ using printf.
- * `KERNEL_CONF_STACKSIZE_PRINTF` defines additional stack space needed if the
+ * `THREAD_EXTRA_STACKSIZE_PRINTF` defines additional stack space needed if the
  * thread needs to call printf (which requires additional memory when using
- * newlib). `KERNEL_CONF_STACKSIZE_MAIN` is the stack size for the main thread
+ * newlib). `THREAD_STACKSIZE_MAIN` is the stack size for the main thread
  * and probably a good size for your application. (Note, that on most
  * non-newlib dependent platforms this will probably equal
- * `KERNEL_CONF_STACKSIZE_DEFAULT`.
+ * `THREAD_STACKSIZE_DEFAULT`.
  *
  * ####The IPC
  *

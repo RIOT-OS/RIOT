@@ -67,7 +67,7 @@
 #define ENABLE_DEBUG (0)
 #if ENABLE_DEBUG
 #undef TRANSCEIVER_STACK_SIZE
-#define TRANSCEIVER_STACK_SIZE      (KERNEL_CONF_STACKSIZE_MAIN)
+#define TRANSCEIVER_STACK_SIZE      (THREAD_STACKSIZE_MAIN)
 #endif
 #include "debug.h"
 
@@ -186,7 +186,7 @@ void transceiver_init(transceiver_type_t t)
 /* Start the transceiver thread */
 kernel_pid_t transceiver_start(void)
 {
-    transceiver_pid = thread_create(transceiver_stack, TRANSCEIVER_STACK_SIZE, PRIORITY_MAIN - 3, CREATE_STACKTEST, run, NULL, "Transceiver");
+    transceiver_pid = thread_create(transceiver_stack, TRANSCEIVER_STACK_SIZE, THREAD_PRIORITY_MAIN - 3, CREATE_STACKTEST, run, NULL, "Transceiver");
 
     if (transceiver_pid == KERNEL_PID_UNDEF) {
         puts("Error creating transceiver thread");

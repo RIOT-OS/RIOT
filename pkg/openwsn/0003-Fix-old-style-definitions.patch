@@ -1578,7 +1578,7 @@ index 31021d4..3f4b36e 100644
 +#define ENABLE_DEBUG (0)
 +#include "debug.h"
 +
-+static char openwsn_stack[KERNEL_CONF_STACKSIZE_MAIN];
++static char openwsn_stack[THREAD_STACKSIZE_MAIN];
 +int openwsn_pid = -1;
 +
 +void openwsn_init(void);
@@ -1586,7 +1586,7 @@ index 31021d4..3f4b36e 100644
 +
 +void openwsn_start_thread(void) {
 +    DEBUG("%s\n",__PRETTY_FUNCTION__);
-+    openwsn_pid = thread_create(openwsn_stack, KERNEL_CONF_STACKSIZE_MAIN,
++    openwsn_pid = thread_create(openwsn_stack, THREAD_STACKSIZE_MAIN,
 +                                PRIORITY_OPENWSN-2, CREATE_STACKTEST,
 +                                openwsn_start, NULL, "openwsn thread");
 +}
@@ -1618,7 +1618,7 @@ index 138cb12..5a9f1fa 100644
 +
 +//=========================== define ==========================================
 +
-+#define PRIORITY_OPENWSN            PRIORITY_MAIN-1
++#define PRIORITY_OPENWSN            THREAD_PRIORITY_MAIN-1
 +
  #endif
 diff --git a/projects/common/03oos_openwsn/Makefile b/projects/common/03oos_openwsn/Makefile

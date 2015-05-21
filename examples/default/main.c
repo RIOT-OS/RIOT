@@ -49,7 +49,7 @@
 
 #define SND_BUFFER_SIZE     (100)
 #define RCV_BUFFER_SIZE     (64)
-#define RADIO_STACK_SIZE    (KERNEL_CONF_STACKSIZE_MAIN)
+#define RADIO_STACK_SIZE    (THREAD_STACKSIZE_MAIN)
 
 #ifdef MODULE_TRANSCEIVER
 
@@ -121,7 +121,7 @@ void init_transceiver(void)
     kernel_pid_t radio_pid = thread_create(
                         radio_stack_buffer,
                         sizeof(radio_stack_buffer),
-                        PRIORITY_MAIN - 2,
+                        THREAD_PRIORITY_MAIN - 2,
                         CREATE_STACKTEST,
                         radio,
                         NULL,
