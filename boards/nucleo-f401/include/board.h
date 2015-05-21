@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014 Freie Universität Berlin
+ * Copyright (C) 2015 Adam Berlinger
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -7,15 +8,16 @@
  */
 
 /**
- * @defgroup    boards_stm32f4discovery STM32F4Discovery
+ * @defgroup    boards_nucleo-f401 Nucleo-F401RE
  * @ingroup     boards
- * @brief       Board specific files for the STM32F4Discovery board
+ * @brief       Board specific files for the Nucleo F401RE evaluation board
  * @{
  *
  * @file
- * @brief       Board specific definitions for the STM32F4Discovery evaluation board
+ * @brief       Board specific definitions for the Nucleo F401RE evaluation evaluation board
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Adam Berlinger <berlingeradam@gmail.com>
  */
 
 #ifndef __BOARD_H

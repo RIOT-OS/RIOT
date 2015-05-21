@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014 Freie Universität Berlin
+ * Copyright (C) 2015 Adam Berlinger
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -11,9 +12,10 @@
  * @{
  *
  * @file
- * @brief       Board specific implementations for the STM32F4Discovery evaluation board
+ * @brief       Board specific implementations for the Nucleo F401RE evaluation board
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Adam Berlinger <berlingeradam@gmail.com>
  *
  * @}
  */

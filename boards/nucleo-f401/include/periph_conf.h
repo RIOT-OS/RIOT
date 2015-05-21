@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014 Freie Universität Berlin
+ * Copyright (C) 2015 Adam Berlinger
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -7,14 +8,14 @@
  */
 
 /**
- * @ingroup     boards_stm32f3discovery
+ * @ingroup     boards_nucleo-f401
  * @{
  *
  * @file
- * @name       Peripheral MCU configuration for the STM32F4discovery board
- *
+ * @name       Peripheral MCU configuration for the Nucleo F401RE evaluation board
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
+ * @author      Adam Berlinger <berlingeradam@gmail.com>
  */
 
 #ifndef __PERIPH_CONF_H
@@ -28,8 +29,8 @@ extern "C" {
  * @name Clock system configuration
  * @{
  */
-#define CLOCK_USE_HSI       (1)
-#define CLOCK_HSI           (16000000U)        /* internal oscillator */
+#define CLOCK_USE_HSI       (1)                /* use internal oscillator */
+#define CLOCK_HSI           (16000000U)        /* internal oscillator frequency */
 #define CLOCK_CORECLOCK     (84000000U)        /* desired core clock frequency */
 
 /* the actual PLL values are automatically generated */
