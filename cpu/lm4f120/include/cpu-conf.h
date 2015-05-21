@@ -21,22 +21,23 @@
 #ifndef __CPU_CONF_H
 #define __CPU_CONF_H
 
-#include "inc/hw_ints.h"
-#include "inc/hw_memmap.h"
-#include "inc/hw_nvic.h"
-#include "inc/hw_sysctl.h"
-#include "inc/hw_types.h"
-#include "driverlib/cpu.h"
-#include "driverlib/debug.h"
-#include "driverlib/interrupt.h"
-#include "driverlib/sysctl.h"
-#include "driverlib/adc.h"
-#include "driverlib/gpio.h"
-#include "driverlib/timer.h"
-#include "driverlib/pin_map.h"
-#include "driverlib/uart.h"
-#include "driverlib/fpu.h"
-#include "driverlib/rom.h"
+#include "hw_ints.h"
+#include "hw_memmap.h"
+#include "hw_nvic.h"
+#include "hw_sysctl.h"
+#include "hw_types.h"
+#include "lm4f120h5qr.h"
+#include "stellaris_periph/cpu.h"
+#include "stellaris_periph/debug.h"
+#include "stellaris_periph/interrupt.h"
+#include "stellaris_periph/sysctl.h"
+#include "stellaris_periph/adc.h"
+#include "stellaris_periph/gpio.h"
+#include "stellaris_periph/timer.h"
+#include "stellaris_periph/pin_map.h"
+#include "stellaris_periph/uart.h"
+#include "stellaris_periph/fpu.h"
+#include "stellaris_periph/rom.h"
 #include "periph/uart.h"
 #include "stdio.h"
 #include "stdlib.h"
@@ -69,6 +70,7 @@ extern "C" {
 
 #define KERNEL_CONF_STACKSIZE_IDLE      (256)
 /** @} */
+extern unsigned long CPUipsrGet(void);
 extern int uart_init_testing(uart_t uart, uint32_t baudrate);
 extern void UARTSend(const unsigned char *pucBuffer, unsigned long ulCount);
 /**
@@ -81,6 +83,10 @@ extern void UARTSend(const unsigned char *pucBuffer, unsigned long ulCount);
 #define UART0_BUFSIZE                   (128)
 #endif
 /** @} */
+
+/** __FPU_USED indicates whether an FPU is used or not.
+    For this, __FPU_PRESENT has to be checked prior to making use of FPU specific registers and functions.
+*/
 
 #ifdef __cplusplus
 }
