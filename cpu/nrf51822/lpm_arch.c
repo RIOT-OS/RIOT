@@ -14,10 +14,12 @@
  * @brief       Implementation of the kernels power management interface
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Frank Holtz <frank-riot2015@holtznet.de>
  *
  * @}
  */
 
+#include "cpu.h"
 #include "arch/lpm_arch.h"
 
 void lpm_arch_init(void)
@@ -27,8 +29,26 @@ void lpm_arch_init(void)
 
 enum lpm_mode lpm_arch_set(enum lpm_mode target)
 {
-    (void) target;
-    /* TODO: needs to be implemented */
+    switch (target) {
+        /* wait for next interrupt */
+        case LPM_IDLE:
+        case LPM_SLEEP:
+        case LPM_POWERDOWN:
+            __DSB();
+            __WFI();
+            break;
+        case LPM_OFF:
+            /* Switch of RAM and power off */
+            NRF_POWER->RAMON = 0;
+            NRF_POWER->SYSTEMOFF = 1;
+            break;
+
+        /* do nothing here */
+        case LPM_UNKNOWN:
+        case LPM_ON:
+        default:
+            break;
+    }
     return 0;
 }
 
