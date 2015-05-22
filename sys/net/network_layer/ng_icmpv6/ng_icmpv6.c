@@ -114,13 +114,6 @@ void ng_icmpv6_demux(kernel_pid_t iface, ng_pktsnip_t *pkt)
             /* TODO */
             break;
 
-#ifdef MODULE_NG_RPL
-        case NG_ICMPV6_RPL_CTRL:
-            DEBUG("icmpv6: RPL control message received\n");
-            /* TODO */
-            break;
-#endif
-
         default:
             DEBUG("icmpv6: unknown type field %" PRIu8 "\n", hdr->type);
             break;
