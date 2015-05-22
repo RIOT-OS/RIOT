@@ -171,6 +171,7 @@ extern "C"
 #define PWM_NUMOF           (1U)
 #define PWM_0_EN            1
 #define PWM_MAX_CHANNELS    4
+#define PWM_MAX_VALUE       0xffff
 
 /* PWM 0 device configuration */
 #define PWM_0_DEV           FTM0
