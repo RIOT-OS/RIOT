@@ -94,7 +94,7 @@ void _init(void)
 
 void _fini(void)
 {
-    // nothing to do here 
+    // nothing to do here
 }
 
 /**

@@ -50,19 +50,19 @@ int adc_init(adc_t dev, adc_precision_t precision)
         case ADC_RES_10BIT:
 #if ADC_0_EN
 			ROM_ADCResolutionSet(ADC0_BASE, ADC_RES_10BIT_S);
-#endif	
+#endif
 #if ADC_1_EN
 			ROM_ADCResolutionSet(ADC1_BASE, ADC_RES_10BIT_S);
-#endif	
+#endif
             adc_config[dev].max_value = 0x3ff;
             break;
         case ADC_RES_12BIT:
 #if ADC_0_EN
 			ROM_ADCResolutionSet(ADC0_BASE, ADC_RES_12BIT_S);
-#endif	
+#endif
 #if ADC_1_EN
 			ROM_ADCResolutionSet(ADC1_BASE, ADC_RES_12BIT_S);
-#endif	
+#endif
             adc_config[dev].max_value = 0xfff;
             break;
         case ADC_RES_14BIT:
@@ -74,7 +74,7 @@ int adc_init(adc_t dev, adc_precision_t precision)
         case ADC_0:
 			// Select the Analog ADC Function for these pins.
             ROM_GPIOPinTypeADC(GPIO_PORTE_BASE, GPIO_PIN_3);
-			
+
 			// Before configuring the sequencer, we need to disable ita to prevent errorneous execution
 			ROM_ADCSequenceDisable(ADC0_BASE, 3);
 
@@ -83,10 +83,10 @@ int adc_init(adc_t dev, adc_precision_t precision)
 			// Sequence 3 will do a single sample when the processor sends a signal to start the conversion.
 			ROM_ADCSequenceConfigure(ADC0_BASE, 3, ADC_TRIGGER_PROCESSOR, 0);
 
-			// Configure step 0 on sequence 3. 
+			// Configure step 0 on sequence 3.
 			// Sample channel 0 (ADC_CTL_CH0) in single-ended mode and configure the interrupt flag.
 			// (ADC_CTL_IE) to be set to enable Interrupt.
-			ROM_ADCSequenceStepConfigure(ADC0_BASE, 3, 0, 
+			ROM_ADCSequenceStepConfigure(ADC0_BASE, 3, 0,
 					ADC_CTL_CH0 | ADC_CTL_IE | ADC_CTL_END);
 
 			// Clear the interrupt status flag. This is done to make sure
@@ -102,7 +102,7 @@ int adc_init(adc_t dev, adc_precision_t precision)
         case ADC_1:
 			// Select the Analog ADC Function for these pins.
             ROM_GPIOPinTypeADC(GPIO_PORTE_BASE, GPIO_PIN_2);
-			
+
 			// Before configuring the sequencer, we need to disable ita to prevent errorneous execution
 			ROM_ADCSequenceDisable(ADC1_BASE, 3);
 
@@ -111,10 +111,10 @@ int adc_init(adc_t dev, adc_precision_t precision)
 			// Sequence 3 will do a single sample when the processor sends a signal to start the conversion.
 			ROM_ADCSequenceConfigure(ADC1_BASE, 3, ADC_TRIGGER_PROCESSOR, 0);
 
-			// Configure step 0 on sequence 3. 
+			// Configure step 0 on sequence 3.
 			// Sample channel 0 (ADC_CTL_CH1) in single-ended mode and configure the interrupt flag.
 			// (ADC_CTL_IE) to be set to enable Interrupt.
-			ROM_ADCSequenceStepConfigure(ADC1_BASE, 3, 0, 
+			ROM_ADCSequenceStepConfigure(ADC1_BASE, 3, 0,
 					ADC_CTL_CH1 | ADC_CTL_IE | ADC_CTL_END);
 
 			// Clear the interrupt status flag. This is done to make sure

@@ -33,12 +33,12 @@ enum lpm_mode lpm_set(enum lpm_mode target)
 {
 	return(lpm_arch_set(target));
 }
-	
+
 /* Return the current LPM mode of the MSP430 MCU. */
 enum lpm_mode lpm_get(void)
 {
 	return(lpm_arch_get());
-    
+
 }
 
 /* resume the MSP430 MCU */

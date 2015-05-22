@@ -50,12 +50,12 @@ extern void __libc_init_array(void);
 // External declaration for the interrupt handler used by the application
 extern void UARTIntHandler(void);  		// UART 0							21
 extern void UART1IntHandler(void);  		// UART 1							21
-extern void	TIMER0IntHandler(void);		// 16 bit timer 0 A				
-extern void	TIMER1IntHandler(void);		// 16 bit timer 1 A				
+extern void	TIMER0IntHandler(void);		// 16 bit timer 0 A
+extern void	TIMER1IntHandler(void);		// 16 bit timer 1 A
 extern void isr_svc(void);				// SV call
-extern void isr_pendsv(void);     		// PendSV							
-extern void isr_bus_fault(void);    	// Bus Fault						
-extern void isr_usage_fault(void);		// Usage Fault 						
+extern void isr_pendsv(void);     		// PendSV
+extern void isr_bus_fault(void);    	// Bus Fault
+extern void isr_usage_fault(void);		// Usage Fault
 
 //-----------------------------------------------------------------------------
 // 						     Variables declarations
@@ -70,7 +70,7 @@ void (* const myvectors[])(void) = {
 	// This are the fixed priority interrupts and the stack pointer loaded at startup at R13 (SP).
 	//												VECTOR N (Check Datasheet)
 	// here the compiler it's boring.. have to figure that out
-	(void (*)(void))((unsigned long) &_stack_top),	// stack pointer should be 
+	(void (*)(void))((unsigned long) &_stack_top),	// stack pointer should be
 							// placed here at startup.			0
     ResetISR,				// code entry point					1
     NmiSR,					// NMI handler.						2
@@ -239,35 +239,35 @@ extern unsigned long _srelocate;
 extern unsigned long _erelocate;
 extern unsigned long _szero;
 extern unsigned long _ezero;
-/* 
+/*
 * System on reset code. NVIC 1
 * Here I prepare the memory for the c compiler.
 * The stack pointer should be set at the beginning with the NVIC table already.
 * Copy the .data segment from flash into ram.
-* 0 to the .bss segment 
+* 0 to the .bss segment
 */
-	
-void ResetISR(void){	
+
+void ResetISR(void){
 	// Copy the .data section pointers to ram from flash.
 	// Look at LD manual (Optional Section Attributes).
-	
+
 	// source and destination pointers
 	unsigned long *src;
 	unsigned long *dest;
-	
+
 	// Copy the data segment initializer from flash to RAM
 	src = &_end_text;
 	for(dest = &_srelocate; dest < &_erelocate; )
 	{
         *dest++ = *src++;
     }
-	
+
     // now set the .bss segment to 0!
 	for(dest = &_szero; dest < &_ezero; )
 	{
 		*dest++ = 0;
 	}
-	
+
 	//
     // Enable the floating-point unit.  This must be done here to handle the
     // case where main() uses floating-point and the function prologue saves
@@ -311,15 +311,15 @@ void FaultISR(void){
     }
 }
 
-void isr_bus_fault(void){    	// Bus Fault						
-// Bus fault handler code 
+void isr_bus_fault(void){    	// Bus Fault
+// Bus fault handler code
 	// Just loop forever, so if you want to debug the processor it's running.
     while(1){
     }
 }
 
-void isr_usage_fault(void){		// Usage Fault 						
-// Usage fault handler code 
+void isr_usage_fault(void){		// Usage Fault
+// Usage fault handler code
 // Just loop forever, so if you want to debug the processor it's running.
     while(1){
     }
@@ -332,7 +332,7 @@ void empty_def_handler(void){
     }
 }
 
-void	TIMER1IntHandler(void){				
+void	TIMER1IntHandler(void){
 // Just loop forever, so if you want to debug the processor it's running.
     while(1){
     }

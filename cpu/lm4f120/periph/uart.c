@@ -45,17 +45,17 @@ static uart_conf_t config[UART_NUMOF];
 /**
  * The list of UART peripherals.
  */
-static const unsigned long g_ulUARTPeriph[3] = 
+static const unsigned long g_ulUARTPeriph[3] =
 {
-	SYSCTL_PERIPH_UART0, 
-	SYSCTL_PERIPH_UART1, 
+	SYSCTL_PERIPH_UART0,
+	SYSCTL_PERIPH_UART1,
 	SYSCTL_PERIPH_UART2
 };
 
 /**
  * The list of all possible base address of the console UART
  */
-static const unsigned long g_ulUARTBase[3] = 
+static const unsigned long g_ulUARTBase[3] =
 {
 	UART0_BASE,
 	UART1_BASE,
@@ -67,8 +67,8 @@ static const unsigned long g_ulUARTBase[3] =
 //*****************************************************************************
 static const unsigned long g_ulUARTInt[3] =
 {
-    INT_UART0, 
-	INT_UART1, 
+    INT_UART0,
+	INT_UART1,
 	INT_UART2
 };
 
@@ -152,7 +152,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, uart_tx_cb_t t
 	// Enable the UART Peripheral for use
 	//	SysCtlPeripheralEnable(g_ulUARTPeriph[uart]);
 	// Configure the UART
-	
+
 	/* save callbacks */
     config[uart].rx_cb = rx_cb;
     config[uart].tx_cb = tx_cb;
@@ -172,16 +172,16 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, uart_tx_cb_t t
 
 	return 1;
 }
-	
-	
-	
+
+
+
 int uart_init_blocking(uart_t uart, uint32_t baudrate)
 {
 	ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
 	ROM_GPIOPinConfigure(GPIO_PA0_U0RX);
 	ROM_GPIOPinConfigure(GPIO_PA1_U0TX);
 	ROM_GPIOPinTypeUART(GPIO_PORTA_BASE, GPIO_PIN_0 | GPIO_PIN_1);
-	
+
 	ROM_UARTConfigSetExpClk(UART0_BASE,ROM_SysCtlClockGet(), baudrate,
 			(UART_CONFIG_PAR_NONE | UART_CONFIG_STOP_ONE |
 			 UART_CONFIG_WLEN_8));

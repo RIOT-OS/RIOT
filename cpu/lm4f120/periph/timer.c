@@ -29,7 +29,7 @@
 #if TIMER_0_EN
 
 /**
- * @brief Struct holding the configuration data 
+ * @brief Struct holding the configuration data
  */
 typedef struct {
     void (*cb)(int);            /**< timeout callback */
@@ -48,7 +48,7 @@ int timer_init(tim_t dev, unsigned int us_per_tick, void (*callback)(int))
 		ROM_TimerDisable(TIMER0_BASE, TIMER_A);
 		// Configure for 16-bit mode
 		// Configure for Periodic mode
-		ROM_TimerConfigure(TIMER0_BASE, 
+		ROM_TimerConfigure(TIMER0_BASE,
 				TIMER_CFG_SPLIT_PAIR| TIMER_CFG_A_PERIODIC);
 		ROM_TimerPrescaleSet(TIMER0_BASE,
 				TIMER_A, TIMER_0_PRESCALER);

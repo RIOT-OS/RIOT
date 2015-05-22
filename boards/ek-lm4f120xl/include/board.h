@@ -60,12 +60,12 @@ extern "C" {
 #define LED_BLUE_PIN	    0x04
 #define LED_RED_PIN			0x02
 
-#define LED_GREEN_ON        GPIO_PORTF_DATA_R |= LED_GREEN_PIN 
+#define LED_GREEN_ON        GPIO_PORTF_DATA_R |= LED_GREEN_PIN
 #define LED_GREEN_OFF       GPIO_PORTF_DATA_R &= ~(LED_GREEN_PIN)
 #define LED_GREEN_TOGGLE    /* not available */
 
-#define LED_BLUE_ON         GPIO_PORTF_DATA_R |= LED_BLUE_PIN 
-#define LED_BLUE_OFF        GPIO_PORTF_DATA_R &= ~(LED_BLUE_PIN) 
+#define LED_BLUE_ON         GPIO_PORTF_DATA_R |= LED_BLUE_PIN
+#define LED_BLUE_OFF        GPIO_PORTF_DATA_R &= ~(LED_BLUE_PIN)
 #define LED_BLUE_TOGGLE     /* not available */
 
 #define LED_RED_ON          GPIO_PORTF_DATA_R |= LED_RED_PIN

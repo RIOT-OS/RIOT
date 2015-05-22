@@ -4,23 +4,23 @@
 //
 // Copyright (c) 2005-2012 Texas Instruments Incorporated.  All rights reserved.
 // Software License Agreement
-// 
+//
 //   Redistribution and use in source and binary forms, with or without
 //   modification, are permitted provided that the following conditions
 //   are met:
-// 
+//
 //   Redistributions of source code must retain the above copyright
 //   notice, this list of conditions and the following disclaimer.
-// 
+//
 //   Redistributions in binary form must reproduce the above copyright
 //   notice, this list of conditions and the following disclaimer in the
-//   documentation and/or other materials provided with the  
+//   documentation and/or other materials provided with the
 //   distribution.
-// 
+//
 //   Neither the name of Texas Instruments Incorporated nor the names of
 //   its contributors may be used to endorse or promote products derived
 //   from this software without specific prior written permission.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 // "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 // LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -32,7 +32,7 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-// 
+//
 // This is part of revision 9453 of the Stellaris Peripheral Driver Library.
 //
 //*****************************************************************************
@@ -77,7 +77,7 @@ extern "C"
 #define I2C_MASTER_CMD_BURST_SEND_START                                       \
                                 0x00000003
 #define I2C_MASTER_CMD_BURST_SEND_CONT                                        \
-                                0x00000001                                
+                                0x00000001
 #define I2C_MASTER_CMD_BURST_SEND_FINISH                                      \
                                 0x00000005
 #define I2C_MASTER_CMD_BURST_SEND_STOP                                        \
@@ -95,7 +95,7 @@ extern "C"
 #define I2C_MASTER_CMD_QUICK_COMMAND                                          \
                                 0x00000027
 #define I2C_MASTER_CMD_HS_MASTER_CODE_SEND                                    \
-                                0x00000011      
+                                0x00000011
 
 //*****************************************************************************
 //
@@ -120,7 +120,7 @@ extern "C"
 #define I2C_SLAVE_ACT_OWN2SEL   0x00000008  // Master requested secondary slave
 #define I2C_SLAVE_ACT_QCMD      0x00000010  // Master has sent a Quick Command
 #define I2C_SLAVE_ACT_QCMD_DATA 0x00000020  // Master Quick Command value
-                                
+
 //*****************************************************************************
 //
 // Miscellaneous I2C driver definitions.

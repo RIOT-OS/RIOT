@@ -40,15 +40,15 @@ _stack_size = 4K;
 */
 
 SECTIONS
-{	
+{
 	/* This section it's the code, containing the NVIC Vector table that must start at 0x0
-	*   Look at the LM4F120H5QR datasheet for details. 
+	*   Look at the LM4F120H5QR datasheet for details.
 	*/
-    .text : 
+    .text :
     {
 		. = ALIGN(4);
-    	_start_text = .;	
-    	KEEP(*(.isr_vector)) 
+    	_start_text = .;
+    	KEEP(*(.isr_vector))
         *(.text .text.* .gnu.linkonce.t.*)
         *(.glue_7t) *(.glue_7)
         *(.rodata .rodata* .gnu.linkonce.r.*)
@@ -102,12 +102,12 @@ SECTIONS
     PROVIDE_HIDDEN (__exidx_end = .);
 
 	. = ALIGN(4);
-    _end_text = .;	
+    _end_text = .;
 
-    .relocate : AT (_end_text) 
+    .relocate : AT (_end_text)
     {
 		. = ALIGN(4);
-    	_srelocate = .;	
+    	_srelocate = .;
         *(.ramfunc .ramfunc.*);
         *(.data .data.*);
         . = ALIGN(4);
@@ -133,7 +133,7 @@ SECTIONS
     _eheap = ORIGIN(RAM) + LENGTH(RAM) - _stack_size;
 
     . = ALIGN(8);
-	_stack_bottom = _eheap; 
+	_stack_bottom = _eheap;
 	_stack_top = ORIGIN(RAM) + LENGTH(RAM);			/* An index to the end of the stack */
-	
+
 }
