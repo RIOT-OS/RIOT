@@ -24,6 +24,11 @@
 #               options:
 #               HEXFILE: path to the hexfile that is flashed
 #
+# flash-elf:    flash a given elffile to the target.
+#
+#               options:
+#               ELFFILE: path to the elffile that is flashed
+#
 # debug:        starts OpenOCD as GDB server in the background and
 #               connects to the server with the GDB client specified by
 #               the board (DBG environment variable)
@@ -136,6 +141,28 @@ do_flash() {
     echo 'Done flashing'
 }
 
+do_flash_elf() {
+    test_config
+    test_elffile
+    # flash device
+    sh -c "${OPENOCD} -f '${OPENOCD_CONFIG}' \
+            ${OPENOCD_EXTRA_INIT} \
+            -c 'tcl_port 0' \
+            -c 'telnet_port 0' \
+            -c 'gdb_port 0' \
+            -c 'init' \
+            -c 'targets' \
+            -c 'reset halt' \
+            ${OPENOCD_PRE_FLASH_CMDS} \
+            -c 'flash write_image erase \"${ELFFILE}\"' \
+            -c 'reset halt' \
+            ${OPENOCD_PRE_VERIFY_CMDS} \
+            -c 'verify_image \"${ELFFILE}\"' \
+            -c 'reset run' \
+            -c 'shutdown'"
+    echo 'Done flashing'
+}
+
 do_debug() {
     test_config
     test_elffile
@@ -196,6 +223,10 @@ case "${ACTION}" in
   flash)
     echo "### Flashing Target ###"
     do_flash "$@"
+    ;;
+  flash-elf)
+    echo "### Flashing Target ###"
+    do_flash_elf "$@"
     ;;
   debug)
     echo "### Starting Debugging ###"
