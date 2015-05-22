@@ -40,7 +40,7 @@ radio_packet_t p;
 transceiver_command_t tcmd;
 msg_t mesg, rep;
 
-char relay_helper_stack[KERNEL_CONF_STACKSIZE_MAIN];
+char relay_helper_stack[THREAD_STACKSIZE_MAIN];
 
 int riot_send_transceiver(uint8_t *buf, uint16_t size, uint16_t to)
 {
@@ -117,7 +117,7 @@ void *ccnl_riot_relay_helper_start(void *);
 kernel_pid_t riot_start_helper_thread(void)
 {
     return thread_create(relay_helper_stack, sizeof(relay_helper_stack),
-                         PRIORITY_MAIN - 2, CREATE_STACKTEST,
+                         THREAD_PRIORITY_MAIN - 2, CREATE_STACKTEST,
                          ccnl_riot_relay_helper_start, NULL, "relay-helper");
 }
 

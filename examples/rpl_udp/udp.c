@@ -35,7 +35,7 @@
 #define UDP_BUFFER_SIZE     (128)
 #define SERVER_PORT     (0xFF01)
 
-static char udp_server_stack_buffer[KERNEL_CONF_STACKSIZE_MAIN];
+static char udp_server_stack_buffer[THREAD_STACKSIZE_MAIN];
 char addr_str[IPV6_MAX_ADDR_STR_LEN];
 
 static void *init_udp_server(void *);
@@ -48,7 +48,7 @@ int udp_server(int argc, char **argv)
 
     kernel_pid_t udp_server_thread_pid = thread_create(udp_server_stack_buffer,
                                                        sizeof(udp_server_stack_buffer),
-                                                       PRIORITY_MAIN, CREATE_STACKTEST,
+                                                       THREAD_PRIORITY_MAIN, CREATE_STACKTEST,
                                                        init_udp_server,
                                                        NULL,
                                                        "init_udp_server");

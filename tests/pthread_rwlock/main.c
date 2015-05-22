@@ -97,7 +97,7 @@ static void *reader(void *arg)
 
 int main(void)
 {
-    static char stacks[NUM_CHILDREN][KERNEL_CONF_STACKSIZE_MAIN];
+    static char stacks[NUM_CHILDREN][THREAD_STACKSIZE_MAIN];
 
     puts("Main start.");
 
@@ -108,20 +108,20 @@ int main(void)
 
         if (i < NUM_READERS) {
             if (i < NUM_READERS_HIGH) {
-                prio = PRIORITY_MAIN + 1;
+                prio = THREAD_PRIORITY_MAIN + 1;
             }
             else {
-                prio = PRIORITY_MAIN + 2;
+                prio = THREAD_PRIORITY_MAIN + 2;
             }
             fun = reader;
             name = "reader";
         }
         else {
             if (i - NUM_READERS < NUM_WRITERS_HIGH) {
-                prio = PRIORITY_MAIN + 1;
+                prio = THREAD_PRIORITY_MAIN + 1;
             }
             else {
-                prio = PRIORITY_MAIN + 2;
+                prio = THREAD_PRIORITY_MAIN + 2;
             }
             fun = writer;
             name = "writer";

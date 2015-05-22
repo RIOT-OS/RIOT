@@ -42,14 +42,14 @@ extern "C" {
  * @brief   Priority of the pktdump thread
  */
 #ifndef NG_UDP_PRIO
-#define NG_UDP_PRIO             (PRIORITY_MAIN - 2)
+#define NG_UDP_PRIO             (THREAD_PRIORITY_MAIN - 2)
 #endif
 
 /**
  * @brief   Default stack size to use for the UDP thread
  */
 #ifndef NG_UDP_STACK_SIZE
-#define NG_UDP_STACK_SIZE       (KERNEL_CONF_STACKSIZE_DEFAULT)
+#define NG_UDP_STACK_SIZE       (THREAD_STACKSIZE_DEFAULT)
 #endif
 
 /**

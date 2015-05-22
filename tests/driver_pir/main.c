@@ -28,7 +28,7 @@
 #include "vtimer.h"
 #include "pir.h"
 
-char pir_handler_stack[KERNEL_CONF_STACKSIZE_MAIN];
+char pir_handler_stack[THREAD_STACKSIZE_MAIN];
 pir_t dev;
 
 void* pir_handler(void *arg)
@@ -79,7 +79,7 @@ int main(void)
     }
 #else
    thread_create(
-           pir_handler_stack, sizeof(pir_handler_stack), PRIORITY_MAIN - 1,
+           pir_handler_stack, sizeof(pir_handler_stack), THREAD_PRIORITY_MAIN - 1,
            CREATE_WOUT_YIELD | CREATE_STACKTEST,
            pir_handler, NULL, "pir_handler");
 #endif

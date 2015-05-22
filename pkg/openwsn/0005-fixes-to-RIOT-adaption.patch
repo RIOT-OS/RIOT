@@ -2728,9 +2728,9 @@ index 3f4b36e..70f1750 100644
  #define ENABLE_DEBUG (0)
  #include "debug.h"
  
--static char openwsn_stack[KERNEL_CONF_STACKSIZE_MAIN];
+-static char openwsn_stack[THREAD_STACKSIZE_MAIN];
 -int openwsn_pid = -1;
-+static char openwsn_stack[KERNEL_CONF_STACKSIZE_MAIN*2];
++static char openwsn_stack[THREAD_STACKSIZE_MAIN*2];
 +kernel_pid_t openwsn_pid = -1;
 +uint8_t owsn_mop;
  
@@ -2740,7 +2740,7 @@ index 3f4b36e..70f1750 100644
 -void openwsn_start_thread(void) {
 +void openwsn_start_thread(int argc, char **argv) {
      DEBUG("%s\n",__PRETTY_FUNCTION__);
--    openwsn_pid = thread_create(openwsn_stack, KERNEL_CONF_STACKSIZE_MAIN,
+-    openwsn_pid = thread_create(openwsn_stack, THREAD_STACKSIZE_MAIN,
 -                                PRIORITY_OPENWSN-2, CREATE_STACKTEST,
 -                                openwsn_start, NULL, "openwsn thread");
 +    if (argc < 2) {
@@ -2754,14 +2754,14 @@ index 3f4b36e..70f1750 100644
 +    if (command == 'r') {
 +        printf("Starting OpenWSN as root ... ");
 +        owsn_mop = 1;
-+        openwsn_pid = thread_create(openwsn_stack, KERNEL_CONF_STACKSIZE_MAIN,
++        openwsn_pid = thread_create(openwsn_stack, THREAD_STACKSIZE_MAIN,
 +                                    PRIORITY_OPENWSN, CREATE_STACKTEST,
 +                                    openwsn_start, (void*)&owsn_mop, "openwsn thread");
 +    }
 +    else {
 +        printf("Starting OpenWSN as node ... ");
 +        owsn_mop = 0;
-+        openwsn_pid = thread_create(openwsn_stack, KERNEL_CONF_STACKSIZE_MAIN,
++        openwsn_pid = thread_create(openwsn_stack, THREAD_STACKSIZE_MAIN,
 +                                    PRIORITY_OPENWSN, CREATE_STACKTEST,
 +                                    openwsn_start, (void*)&owsn_mop, "openwsn thread");
 +    }

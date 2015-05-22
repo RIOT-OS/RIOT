@@ -52,8 +52,8 @@ static char addr_str[IPV6_MAX_ADDR_STR_LEN];
 #endif
 #include "debug.h"
 
-#define CON_STACKSIZE                   (KERNEL_CONF_STACKSIZE_DEFAULT)
-#define LOWPAN_TRANSFER_BUF_STACKSIZE   (KERNEL_CONF_STACKSIZE_DEFAULT)
+#define CON_STACKSIZE                   (THREAD_STACKSIZE_DEFAULT)
+#define LOWPAN_TRANSFER_BUF_STACKSIZE   (THREAD_STACKSIZE_DEFAULT)
 
 #define SIXLOWPAN_MAX_REGISTERED        (4)
 
@@ -1748,7 +1748,7 @@ int sixlowpan_lowpan_init(void)
 
     if (ip_process_pid == KERNEL_PID_UNDEF) {
         ip_process_pid = thread_create(ip_process_buf, IP_PROCESS_STACKSIZE,
-                                       PRIORITY_MAIN - 1, CREATE_STACKTEST,
+                                       THREAD_PRIORITY_MAIN - 1, CREATE_STACKTEST,
                                        ipv6_process, NULL, "ip_process");
     }
 
@@ -1759,7 +1759,7 @@ int sixlowpan_lowpan_init(void)
     nbr_cache_auto_rem();
 
     contexts_rem_pid = thread_create(con_buf, CON_STACKSIZE,
-                                     PRIORITY_MAIN + 1, CREATE_STACKTEST,
+                                     THREAD_PRIORITY_MAIN + 1, CREATE_STACKTEST,
                                      lowpan_context_auto_remove, NULL, "lowpan_context_rem");
 
     if (contexts_rem_pid == KERNEL_PID_UNDEF) {
@@ -1767,7 +1767,7 @@ int sixlowpan_lowpan_init(void)
     }
 
     transfer_pid = thread_create(lowpan_transfer_buf, LOWPAN_TRANSFER_BUF_STACKSIZE,
-                                 PRIORITY_MAIN - 1, CREATE_STACKTEST,
+                                 THREAD_PRIORITY_MAIN - 1, CREATE_STACKTEST,
                                  lowpan_transfer, NULL, "lowpan_transfer");
 
     if (transfer_pid == KERNEL_PID_UNDEF) {
