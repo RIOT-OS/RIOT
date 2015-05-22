@@ -36,6 +36,9 @@ static inline void wait(void)
      */
     SCB->SCR &= ~SCB_SCR_SLEEPDEEP_Msk;
 
+    /* Data synchronization barrier, wait for any outstanding writes to
+     * complete before entering low power mode. */
+    __DSB();
     /* WFI instruction will start entry into WAIT mode */
     __WFI();
 }
@@ -61,6 +64,9 @@ static inline void stop(uint8_t stopmode)
     dummy = KINETIS_PMCTRL;
     (void)dummy; /* Avoid warnings about set but not used variable [-Wunused-but-set-variable] */
 
+    /* Data synchronization barrier, wait for any outstanding writes to
+     * complete before entering low power mode. */
+    __DSB();
     /* WFI instruction will start entry into STOP mode */
     __WFI();
 }
