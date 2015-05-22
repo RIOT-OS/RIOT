@@ -49,7 +49,9 @@ extern void __libc_init_array(void);
 
 // External declaration for the interrupt handler used by the application
 extern void UARTIntHandler(void);  		// UART 0							21
+extern void UART1IntHandler(void);  		// UART 1							21
 extern void	TIMER0IntHandler(void);		// 16 bit timer 0 A				
+extern void	TIMER1IntHandler(void);		// 16 bit timer 1 A				
 extern void isr_svc(void);				// SV call
 extern void isr_pendsv(void);     		// PendSV							
 extern void isr_bus_fault(void);    	// Bus Fault						
@@ -93,7 +95,7 @@ void (* const myvectors[])(void) = {
 	empty_def_handler,		// GPIO Port D						19
 	empty_def_handler,		// GPIO Port E						20
 	UARTIntHandler,  		// UART 0							21
-	empty_def_handler,		// UART 1							22
+	UART1IntHandler,		// UART 1							22
 	empty_def_handler,		// SSI 0							23
 	empty_def_handler,		// I2C 0							24
 	0,						// Reserved							25
@@ -108,7 +110,7 @@ void (* const myvectors[])(void) = {
 	empty_def_handler,		// WDT 0 and 1						34
 	TIMER0IntHandler,		// 16/32 bit timer 0 A				35
 	empty_def_handler,		// 16/32 bit timer 0 B				36
-	empty_def_handler,		// 16/32 bit timer 1 A				37
+	TIMER1IntHandler,		// 16/32 bit timer 1 A				37
 	empty_def_handler,		// 16/32 bit timer 1 B				38
 	empty_def_handler,		// 16/32 bit timer 2 A				39
 	empty_def_handler,		// 16/32 bit timer 2 B				40
@@ -328,4 +330,15 @@ void empty_def_handler(void){
 	// Just loop forever, so if you want to debug the processor it's running.
     while(1){
     }
+}
+
+void	TIMER1IntHandler(void){				
+// Just loop forever, so if you want to debug the processor it's running.
+    while(1){
+    }
+}
+
+void UART1IntHandler(void){
+    while(1){
+	}
 }

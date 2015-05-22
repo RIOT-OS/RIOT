@@ -281,8 +281,9 @@ typedef enum
 #endif
 
 #include <stdint.h>                      /* standard types definitions                      */
+#include "cpu-conf.h"
 #include <core_cmInstr.h>                /* Core Instruction Access                         */
-#include <core_cmFunc.h>                 /* Core Function Access                            */
+#include <core_lm4f120_Func.h>                 /* Core Function Access                            */
 #include <core_cmSimd.h>                 /* Compiler specific SIMD Intrinsics               */
 
 #ifdef __cplusplus
