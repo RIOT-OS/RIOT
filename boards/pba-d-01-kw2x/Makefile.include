@@ -23,24 +23,46 @@ export AS = $(PREFIX)as
 export LINK = $(PREFIX)gcc
 export SIZE = $(PREFIX)size
 export OBJCOPY = $(PREFIX)objcopy
+export OPENOCD ?= openocd
+export DBG ?= $(PREFIX)gdb
 export TERMPROG = $(RIOTBASE)/dist/tools/pyterm/pyterm
-export FLASHER = $(RIOTBOARD)/$(BOARD)/dist/flash.sh
-export DEBUGGER = $(RIOTBOARD)/$(BOARD)/dist/debug.sh
-export RESET = $(RIOTBOARD)/$(BOARD)/dist/reset.sh
-export DEBUGSERVER = openocd
+export FLASHER = $(RIOTBASE)/dist/tools/openocd/openocd.sh
+export DEBUGGER = $(RIOTBASE)/dist/tools/openocd/openocd.sh
+export DEBUGSERVER = $(RIOTBASE)/dist/tools/openocd/openocd.sh
+export RESET = $(RIOTBASE)/dist/tools/openocd/openocd.sh
+
+.PHONY: flash
+flash: $(RIOTCPU)/kinetis_common/dist/wdog-disable.bin
+
+# Reset the default goal.
+.DEFAULT_GOAL :=
+
 
 # define build specific options
-CPU_USAGE = -mcpu=cortex-m4
-FPU_USAGE =
+export CPU_USAGE = -mcpu=cortex-m4
+export FPU_USAGE =
 export CFLAGS += -ggdb -g3 -std=gnu99 -Os -Wall -Wstrict-prototypes $(CPU_USAGE) $(FPU_USAGE) -mlittle-endian -mthumb -mthumb-interwork -nostartfiles
 export CFLAGS += -ffunction-sections -fdata-sections -fno-builtin
+
 export ASFLAGS += -ggdb -g3 $(CPU_USAGE) $(FPU_USAGE) -mlittle-endian
 export LINKFLAGS += -g3 -ggdb -std=gnu99 $(CPU_USAGE) $(FPU_USAGE) -mlittle-endian -static -lgcc -mthumb -mthumb-interwork -nostartfiles
 export LINKFLAGS += -T$(LINKERSCRIPT)
-export OFLAGS = -O binary
-export FFLAGS = $(HEXFILE)
-export DEBUGGER_FLAGS = $(RIOTBOARD)/$(BOARD)/dist/gdb.conf $(ELFFILE)
+
+export FFLAGS = flash-elf
+export DEBUGGER_FLAGS = debug
+export DEBUGSERVER_FLAGS = debug-server
+export RESET_FLAGS = reset
 export TERMFLAGS = -p $(PORT)
+export TUI = 1
+# We need special handling of the watchdog if we want to speed up the flash
+# verification by using the MCU to compute the image checksum after flashing.
+# wdog-disable.bin is a precompiled binary which will disable the watchdog and
+# return control to the debugger (OpenOCD)
+export OPENOCD_PRE_VERIFY_CMDS += \
+  -c 'load_image $(RIOTCPU)/kinetis_common/dist/wdog-disable.bin 0x20000000 bin' \
+  -c 'resume 0x20000000'
+export OPENOCD_EXTRA_INIT
+export PRE_FLASH_CHECK_SCRIPT = $(RIOTCPU)/kinetis_common/dist/check-fcfield-elf.sh
 
 # use newLib nano-specs if available
 ifeq ($(shell $(LINK) -specs=nano.specs -E - 2>/dev/null >/dev/null </dev/null ; echo $$?),0)
