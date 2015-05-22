@@ -10,7 +10,7 @@
  * @addtogroup  netdev
  * @{
  *
- * @file        802154.c
+ * @file
  * @brief       Provides wrappers of @ref netdev/base.h functions to
  *              netdev/802154.h functions.
  *

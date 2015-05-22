@@ -10,7 +10,7 @@
  * @addtogroup  core_internal
  * @{
  *
- * @file        flags.h
+ * @file
  * @brief       Misc flag definitions
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>

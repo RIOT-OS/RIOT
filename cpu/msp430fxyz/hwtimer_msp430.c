@@ -10,7 +10,7 @@
  * @ingroup     cpu
  * @{
  *
- * @file        hwtimer_msp430_.c
+ * @file
  * @brief       MSP430Fxyz timer functions
  *
  * @author      Oliver Hahm <oliver.hahm@inria.fr>

@@ -10,7 +10,7 @@
  * @ingroup     examples
  * @{
  *
- * @file        c_functions.c
+ * @file
  * @brief       Some functions implementaion in C.
  *
  * @author      DangNhat Pham-Huu <51002279@hcmut.edu.vn>

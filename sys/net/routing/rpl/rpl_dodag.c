@@ -8,7 +8,7 @@
  * @ingroup rpl
  * @{
  *
- * @file        rpl_dodag.c
+ * @file
  * @brief       RPL DODAG
  *
  * Implementation of a DODAG for usage with RPL.

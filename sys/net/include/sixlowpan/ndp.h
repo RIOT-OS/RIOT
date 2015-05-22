@@ -12,7 +12,7 @@
  * @brief       Neighbor discovery protocol for 6LoWPAN and IPv6
  * @{
  *
- * @file        sixlowpan/ndp.h
+ * @file
  * @brief       6LoWPAN constants, data structs, and prototypes related to NDP
  *
  * @author      Stephan Zeisberg <zeisberg@mi.fu-berlin.de>

@@ -10,7 +10,7 @@
  * @ingroup     driver_periph
  * @{
  *
- * @file        timer.c
+ * @file
  * @brief       Low-level timer driver implementation
  *
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>

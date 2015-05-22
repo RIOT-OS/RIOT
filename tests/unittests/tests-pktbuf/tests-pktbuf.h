@@ -10,7 +10,7 @@
  * @addtogroup  unittests
  * @{
  *
- * @file        tests-pktbuf.h
+ * @file
  * @brief       Unittests for the ``pktbuf`` module
  *
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>

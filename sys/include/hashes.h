@@ -12,7 +12,7 @@
  * @brief       Hash function library
  * @{
  *
- * @file        hashes.h
+ * @file
  * @brief       Hash function API
  *
  * @author      Jason Linehan <patientulysses@gmail.com>

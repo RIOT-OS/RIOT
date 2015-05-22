@@ -11,7 +11,7 @@
  * @ingroup     aodvv2
  * @{
  *
- * @file        routing.c
+ * @file
  * @brief       Cobbled-together routing table.
  *
  * @author      Lotte Steenbrink <lotte.steenbrink@fu-berlin.de>

@@ -10,7 +10,7 @@
  * @addtogroup  unittests
  * @{
  *
- * @file        tests-hash_string.h
+ * @file
  * @brief       Unittests for the ``hash_string`` module
  *
  * @author      Kushal Singh <kushal.spiderman.singh@gmail.com>

@@ -10,7 +10,7 @@
  * @ingroup     core_thread
  * @{
  *
- * @file        thread.c
+ * @file
  * @brief       Threading implementation
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>

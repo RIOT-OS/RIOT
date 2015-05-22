@@ -8,7 +8,7 @@
 
 /**
  * @{
- * @file    sys_socket.c
+ * @file
  * @brief   Providing implementation for POSIX socket wrapper.
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */

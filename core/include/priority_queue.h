@@ -10,7 +10,7 @@
  * @addtogroup  core_util
  * @{
  *
- * @file        priority_queue.h
+ * @file
  * @brief       A simple priority queue
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>

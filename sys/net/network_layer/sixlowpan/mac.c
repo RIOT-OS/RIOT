@@ -9,7 +9,7 @@
  *
  * @ingroup sixlowpan
  * @{
- * @file    sixlowmac.c
+ * @file
  * @brief   6lowpan link layer functions
  * @author  Stephan Zeisberg <zeisberg@mi.fu-berlin.de>
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>

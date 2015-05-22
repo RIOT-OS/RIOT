@@ -14,7 +14,7 @@
  * @ingroup     boards_z1
  * @{
  *
- * @file        driver_cc2420.c
+ * @file
  * @brief       Board specific CC2420 driver HAL for the Zolertia Z1
  *
  * @author      Kévin Roussel <Kevin.Roussel@inria.fr>

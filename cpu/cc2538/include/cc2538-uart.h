@@ -10,7 +10,7 @@
  * @addtogroup      cpu_cc2538
  * @{
  *
- * @file            cc2538-uart.h
+ * @file
  * @brief           CC2538 UART interface
  *
  * @author          Ian Martin <ian@locicontrols.com>

@@ -10,7 +10,7 @@
  * @ingroup     boards_arduino-mega2560
  * @{
  *
- * @file        board.c
+ * @file
  * @brief       Board specific implementations for the Arduino Mega 2560 board
  *
  * @author      Hinnerk van Bruinehsen <h.v.bruinehsen@fu-berlin.de>

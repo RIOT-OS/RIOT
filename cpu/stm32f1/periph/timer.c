@@ -10,7 +10,7 @@
  * @ingroup     cpu_stm32f1
  * @{
  *
- * @file        timer.c
+ * @file
  * @brief       Low-level timer driver implementation
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>

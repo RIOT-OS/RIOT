@@ -9,7 +9,7 @@
 /**
  * @ingroup     rpl
  * @{
- * @file        etx_beaconing.h
+ * @file
  *
  * Header-file, which includes all constants and functions used for ETX-based beaconing.
  *

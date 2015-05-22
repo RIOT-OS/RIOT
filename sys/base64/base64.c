@@ -10,7 +10,7 @@
 /**
  * @ingroup base64
  * @{
- * @file    base64.c
+ * @file
  * @brief   Functions to encode and decode base64
  *
  * @author  Martin Landsmann <Martin.Landsmann@HAW-Hamburg.de>

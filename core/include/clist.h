@@ -10,7 +10,7 @@
  * @addtogroup  core_util
  * @{
  *
- * @file        clist.h
+ * @file
  * @brief       Circular linked list
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>

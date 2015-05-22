@@ -13,7 +13,7 @@
  * @brief       UART0 interface abstraction
  * @{
  *
- * @file        board_uart0.h
+ * @file
  * @brief       Interface definitions for the UART0 abstraction
  */
 

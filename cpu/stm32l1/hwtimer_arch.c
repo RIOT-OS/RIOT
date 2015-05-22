@@ -10,7 +10,7 @@
  * @ingroup     cpu_stm32l1
  * @{
  *
- * @file        hwtimer_arch.c
+ * @file
  * @brief       Implementation of the kernels hwtimer interface
  *
  * The hardware timer implementation uses the Cortex build-in system timer as backend.

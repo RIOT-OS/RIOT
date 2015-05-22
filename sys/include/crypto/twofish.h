@@ -10,7 +10,7 @@
  * @ingroup     sys_crypto
  * @{
  *
- * @file        twofish.h
+ * @file
  * @brief       Headers for the implementation of the TwoFish Cipher-Algorithm
  *
  * @author      Freie Universitaet Berlin, Computer Systems & Telematics

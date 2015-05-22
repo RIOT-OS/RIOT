@@ -20,7 +20,7 @@ extern "C" {
  */
 
 /**
- * @file    cc430-rtc.h
+ * @file
  * @brief   CC430 Real Time Clock
  *
  * @author  Freie Universität Berlin, Computer Systems & Telematics, RIOT

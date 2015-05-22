@@ -10,7 +10,7 @@
  * @ingroup     core_arch
  * @{
  *
- * @file        reboot_arch.h
+ * @file
  * @brief       Architecture dependent interface rebooting
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>

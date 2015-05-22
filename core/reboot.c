@@ -10,7 +10,7 @@
  * @ingroup     core_util
  * @{
  *
- * @file        reboot.c
+ * @file
  * @brief       Reboot function
  *
  * @author      Ludwig Ortmann <ludwig.ortmann@fu-berlin.de

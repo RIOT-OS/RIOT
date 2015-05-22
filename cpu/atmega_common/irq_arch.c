@@ -10,7 +10,7 @@
  * @ingroup     cpu_atmega_common
  * @{
  *
- * @file        irq_arch.c
+ * @file
  * @brief       Implementation of the kernels irq interface
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>

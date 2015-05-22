@@ -9,7 +9,7 @@
  *
  * @ingroup sixlowpan
  * @{
- * @file    flowcontrol.c
+ * @file
  * @brief   flowcontrol for constraint node border router implementation
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  * @author  Oliver Hahm <oliver.hahm@inria.fr>

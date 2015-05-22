@@ -10,7 +10,7 @@
  * @ingroup     drivers_cc110x_legacy
  * @{
  *
- * @file        cc110x_spi.c
+ * @file
  * @brief       TI Chipcon CC1100 SPI driver
  *
  * @author      Thomas Hillebrandt <hillebra@inf.fu-berlin.de>

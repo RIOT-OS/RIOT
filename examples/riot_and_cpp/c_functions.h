@@ -10,7 +10,7 @@
  * @ingroup     examples
  * @{
  *
- * @file        c_functions.h
+ * @file
  * @brief       Definitions for some c functions.
  *
  * @author      DangNhat Pham-Huu <51002279@hcmut.edu.vn>

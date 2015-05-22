@@ -8,7 +8,7 @@
 
 /**
  * @{
- * @file    netinet_in.c
+ * @file
  * @brief   Providing values for in6addr_any and in6addr_loopback.
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */

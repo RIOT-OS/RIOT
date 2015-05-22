@@ -8,7 +8,7 @@
 
 /**
  * @{
- * @file    tcp_timer.h
+ * @file
  * @author  Oliver Gesch <oliver.gesch@googlemail.com>
  */
 

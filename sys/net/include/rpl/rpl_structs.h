@@ -9,7 +9,7 @@
 /**
  * @ingroup rpl
  * @{
- * @file    rpl_structs.h
+ * @file
  * @brief   RPL data structs
  *
  * File, which defines all structs used by RPL.

@@ -10,7 +10,7 @@
  * @ingroup     core_util
  * @{
  *
- * @file        bitarithm.c
+ * @file
  * @brief       Bit arithmetic helper functions implementation
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>

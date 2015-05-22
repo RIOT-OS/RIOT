@@ -10,7 +10,7 @@
  * @ingroup     driver_periph
  * @{
  *
- * @file        gpio.c
+ * @file
  * @brief       Low-level GPIO driver implementation
  *
  * @author      Ian Martin <ian@locicontrols.com>

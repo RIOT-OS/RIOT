@@ -71,7 +71,7 @@
 */
 
 /*!
- * @file MKW22D5.h
+ * @file
  * @version 1.7
  * @date 2015-01-21
  * @brief CMSIS Peripheral Access Layer for MKW22D5

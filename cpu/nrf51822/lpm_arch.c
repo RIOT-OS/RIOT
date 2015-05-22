@@ -10,7 +10,7 @@
  * @ingroup     cpu_nrf51822
  * @{
  *
- * @file        lpm_arch.c
+ * @file
  * @brief       Implementation of the kernels power management interface
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>

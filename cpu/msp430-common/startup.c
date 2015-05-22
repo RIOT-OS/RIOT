@@ -10,7 +10,7 @@
  * @ingroup     cpu
  * @{
  *
- * @file        startup.c
+ * @file
  * @brief       Calls startup functions on MSP430-based platforms
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>

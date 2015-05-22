@@ -9,7 +9,7 @@
 /**
  * @{
  *
- * @file    tests-ipv6_netif.c
+ * @file
  */
 #include <errno.h>
 #include <stdint.h>

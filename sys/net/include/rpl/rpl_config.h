@@ -10,7 +10,7 @@
  * @ingroup     rpl
  * @{
  *
- * @file        rpl_config.h
+ * @file
  * @brief       RPL Config
  *
  * Configuration file, which defines all environmental variables for RPL.

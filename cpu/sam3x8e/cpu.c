@@ -10,7 +10,7 @@
  * @ingroup     cpu_sam3x8e
  * @{
  *
- * @file        cpu.c
+ * @file
  * @brief       Implementation of the CPU initialization
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>

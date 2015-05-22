@@ -10,7 +10,7 @@
  * @addtogroup      cpu_cc2538
  * @{
  *
- * @file            cc2538nf11_linkerscript.ld
+ * @file
  * @brief           Linker script for the CC2538NF11 model MCU
  *
  * @author          Ian Martin <ian@locicontrols.com>

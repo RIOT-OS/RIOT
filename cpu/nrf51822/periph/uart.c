@@ -10,7 +10,7 @@
  * @ingroup     cpu_nrf51822
  * @{
  *
- * @file        uart.c
+ * @file
  * @brief       Low-level UART driver implementation
  *
  * @author      Christian Kühling <kuehling@zedat.fu-berlin.de>

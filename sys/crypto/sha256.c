@@ -31,7 +31,7 @@
  * @ingroup     sys_crypto
  * @{
  *
- * @file        sha256.c
+ * @file
  * @brief       SHA256 hash function implementation
  *
  * @author      Colin Percival

@@ -9,7 +9,7 @@
  *
  * @ingroup fib
  * @{
- * @file    fib.c
+ * @file
  * @brief   Functions to manage FIB entries
  * @author  Martin Landsmann <Martin.Landsmann@HAW-Hamburg.de>
  * @}

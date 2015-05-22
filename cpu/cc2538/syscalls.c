@@ -10,7 +10,7 @@
  * @ingroup     cpu_cc2538
  * @{
  *
- * @file        syscalls.c
+ * @file
  * @brief       NewLib system calls implementations for CC2538
  *
  * @author      Michael Baar <michael.baar@fu-berlin.de>

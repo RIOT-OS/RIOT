@@ -9,7 +9,7 @@
 /**
  * @{
  *
- * @file    ng_netreg.c
+ * @file
  */
 
 #include <errno.h>

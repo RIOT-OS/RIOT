@@ -9,7 +9,7 @@
 /**
  * @{
  *
- * @file    tests-pktqueue.c
+ * @file
  */
 #include <string.h>
 

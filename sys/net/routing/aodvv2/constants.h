@@ -11,7 +11,7 @@
  * @ingroup     aodvv2
  * @{
  *
- * @file        constants.h
+ * @file
  * @brief       constants for the aodvv2 routing protocol
  *
  * @author      Lotte Steenbrink <lotte.steenbrink@fu-berlin.de>

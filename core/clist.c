@@ -10,7 +10,7 @@
  * @ingroup     core_util
  * @{
  *
- * @file        clist.c
+ * @file
  * @brief       Circular linked list implementation
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>

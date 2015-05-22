@@ -10,7 +10,7 @@
  * @ingroup     cpu_nrf51822
  * @{
  *
- * @file        gpio.c
+ * @file
  * @brief       Low-level GPIO driver implementation
  *
  * NOTE: this GPIO driver implementation supports due to hardware limitations

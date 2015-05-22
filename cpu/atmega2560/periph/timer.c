@@ -10,7 +10,7 @@
  * @ingroup     driver_periph
  * @{
  *
- * @file        timer.c
+ * @file
  * @brief       Low-level timer driver implementation for the ATmega2560 CPU
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>

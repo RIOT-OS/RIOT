@@ -10,7 +10,7 @@
  * @ingroup     cpu_stm32l1
  * @{
  *
- * @file        lpm_arch.c
+ * @file
  * @brief       Implementation of the kernel's lpm interface
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>

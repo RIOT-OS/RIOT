@@ -10,7 +10,7 @@
  * @ingroup     driver_periph
  * @{
  *
- * @file        uart.c
+ * @file
  * @brief       Low-level UART driver implementation
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>

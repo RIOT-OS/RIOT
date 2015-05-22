@@ -10,7 +10,7 @@
  * @ingroup     cpu
 * @{
  *
- * @file        irq.c
+ * @file
  * @brief       ISR related functions
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>

@@ -13,7 +13,7 @@
  * @ingroup     examples
  * @{
  *
- * @file        cpp_class.hpp
+ * @file
  * @brief       simple c++ object declaration with public and private functions
  *
  * @author      Martin Landsmann <martin.landsmann@haw-hamburg.de>

@@ -12,7 +12,7 @@
  * @brief       Internet Protocol version 6
  * @{
  *
- * @file        include/sixlowpan/ip.h
+ * @file
  * @brief       6LoWPAN constants, data structs, and prototypes for network layer
  *
  * @author      Stephan Zeisberg <zeisberg@mi.fu-berlin.de>

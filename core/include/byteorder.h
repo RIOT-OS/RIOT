@@ -10,7 +10,7 @@
  * @addtogroup     core_util
  * @{
  *
- * @file           byteorder.h
+ * @file
  * @brief          Functions to work with different byte orders.
  *
  * @author         René Kijewski <rene.kijewski@fu-berlin.de>

@@ -10,7 +10,7 @@
  * @addtogroup  core_util
  * @{
  *
- * @file    lifo.h
+ * @file
  * @brief   LIFO buffer API, read long description carefully
  * @author  Heiko Will <hwill@inf.fu-berlin.de>
  *

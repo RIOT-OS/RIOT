@@ -9,7 +9,7 @@
 /**
  * @ingroup     posix
  * @{
- * @file        posix_io.h
+ * @file
  * @brief       POSIX-like IO
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>

@@ -10,7 +10,7 @@
  * @ingroup     core_sync
  * @{
  *
- * @file        mutex.c
+ * @file
  * @brief       Kernel mutex implementation
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>

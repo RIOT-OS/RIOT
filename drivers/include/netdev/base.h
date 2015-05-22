@@ -10,7 +10,7 @@
  * @addtogroup  netdev
  * @{
  *
- * @file        netdev/base.h
+ * @file
  * @brief       Basic network device driver interface definitions.
  *
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>

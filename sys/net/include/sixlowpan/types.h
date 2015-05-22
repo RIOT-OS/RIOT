@@ -12,7 +12,7 @@
  * @brief       Structs, constants, and enums for 6LoWPAN and IPv6 related functions
  * @{
  *
- * @file        sixlowpan/types.h
+ * @file
  * @brief       6LoWPAN data types
  *
  * @author      Stephan Zeisberg <zeisberg@mi.fu-berlin.de>

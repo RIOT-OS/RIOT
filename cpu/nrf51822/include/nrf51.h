@@ -1,6 +1,6 @@
 /****************************************************************************************************/
 /**
- * @file     nRF51.h
+ * @file
  *
  * @brief    CMSIS Cortex-M0 Peripheral Access Layer Header File for
  *           nRF51 from Nordic Semiconductor.

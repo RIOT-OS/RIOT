@@ -13,7 +13,7 @@
  *
  * @{
  *
- * @file        include/sixlowpan/icmp.h
+ * @file
  * @brief       6LoWPAN ICMP related header
  *
  * @author      Stephan Zeisberg <zeisberg@mi.fu-berlin.de>

@@ -10,7 +10,7 @@
  * @ingroup     cpu_stm32l1
  * @{
  *
- * @file        startup.c
+ * @file
  * @brief       Startup code and interrupt vector definition
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>

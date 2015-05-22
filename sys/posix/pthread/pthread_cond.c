@@ -10,7 +10,7 @@
  * @ingroup     sys
  * @{
  *
- * @file        pthread_cond.c
+ * @file
  * @brief       Condition variable implementation
  *
  * @author      Martin Landsmann <martin.landsmann@haw-hamburg.de>

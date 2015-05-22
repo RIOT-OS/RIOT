@@ -11,7 +11,7 @@
  * @ingroup     aodvv2
  * @{
  *
- * @file        reader.c
+ * @file
  * @brief       reading and handling of RFC5444 aodvv2 messages
  *
  * @author      Lotte Steenbrink <lotte.steenbrink@fu-berlin.de>

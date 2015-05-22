@@ -11,7 +11,7 @@
  * @ingroup     sys_crypto
  * @{
  *
- * @file        twofish.c
+ * @file
  * @brief       implementation of the twofish cipher-algorithm
  *
  * @author      Freie Universitaet Berlin, Computer Systems & Telematics

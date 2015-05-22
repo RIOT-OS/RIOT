@@ -11,7 +11,7 @@
 /**
  * @ingroup     rpl
  * @{
- * @file        etx_beaconing.c
+ * @file
  * @brief       ETX-beaconing implementation
  *
  * Implementation for ETX-based beaconing.

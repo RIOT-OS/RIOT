@@ -13,7 +13,7 @@
  * @ingroup     drivers
  * @{
  *
- * @file        cc110x_legacy.h
+ * @file
  * @brief       Data structures and variables for the cc110x driver interface
  *
  * @author      Oliver Hahm <oliver.hahm@inria.fr>

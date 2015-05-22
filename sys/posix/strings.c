@@ -8,7 +8,7 @@
 
 /**
  * @{
- * @file    strings.c
+ * @file
  * @brief   Providing implementation for prototypes defined in strings.h.
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */

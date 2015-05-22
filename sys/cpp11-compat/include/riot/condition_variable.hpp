@@ -10,7 +10,7 @@
  * @ingroup cpp11-compat
  * @{
  *
- * @file   condition_variable.hpp
+ * @file
  * @brief  C++11 condition variable drop in replacement
  * @see    <a href="http://en.cppreference.com/w/cpp/thread/condition_variable">
  *           std::condition_variable

@@ -9,7 +9,7 @@
  *
  * @ingroup sixlowpan
  * @{
- * @file    serialnumber.c
+ * @file
  * @brief   serial number arithmetics (corresponding RFC1982) for version field in ABRO
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  * @author  Oliver Hahm <oliver.hahm@inria.fr>

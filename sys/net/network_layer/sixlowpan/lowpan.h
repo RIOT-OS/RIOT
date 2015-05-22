@@ -7,7 +7,7 @@
  */
 
 /**
- * @file        network_layer/sixlowpan/lowpan.h
+ * @file
  * @brief       6lowpan header
  *
  * @author      Stephan Zeisberg <zeisberg@mi.fu-berlin.de>

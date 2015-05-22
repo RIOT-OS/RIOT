@@ -10,7 +10,7 @@
  * @ingroup     core_arch
  * @{
  *
- * @file        lpm_arch.h
+ * @file
  * @brief       Architecture dependent interface for power mode management
  *
  * This file acts as a wrapper between the kernels power management interface and the architecture

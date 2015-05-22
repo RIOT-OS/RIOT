@@ -8,7 +8,7 @@
 
 /**
  * @{
- * @file    net_help.c
+ * @file
  * @brief   Providing implementation for prototypes defined in net_help.h.
  * @author  Oliver Gesch <oliver.gesch@googlemail.com>
  */

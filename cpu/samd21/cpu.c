@@ -10,7 +10,7 @@
  * @ingroup     cpu_samd21
  * @{
  *
- * @file        cpu.c
+ * @file
  * @brief       Implementation of the CPU initialization
  *
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>

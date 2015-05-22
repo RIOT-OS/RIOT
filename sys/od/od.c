@@ -9,7 +9,7 @@
 /**
  * @{
  *
- * @file    od.c
+ * @file
  */
 #include <stdio.h>
 #include <string.h>

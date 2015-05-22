@@ -10,7 +10,7 @@
  * @ingroup     boards_iot-lab_M3
  * @{
  *
- * @file        board.c
+ * @file
  * @brief       Board specific implementations for the iot-lab_M3 board
  *
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>

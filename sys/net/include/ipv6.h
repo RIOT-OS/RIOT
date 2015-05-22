@@ -9,7 +9,7 @@
 /**
  * @ingroup net_sixlowpan
  * @{
- * @file    ipv6.h
+ * @file
  * @brief   IPv6 and ICMP functions
  *
  *          Wraps all API types, constants and functions of

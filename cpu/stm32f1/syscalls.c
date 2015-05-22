@@ -10,7 +10,7 @@
  * @ingroup     cpu_stm32f1
  * @{
  *
- * @file        syscalls.c
+ * @file
  * @brief       NewLib system calls implementations for stm32f1
  *
  * @author      Michael Baar <michael.baar@fu-berlin.de>

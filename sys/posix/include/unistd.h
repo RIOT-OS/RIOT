@@ -12,7 +12,7 @@
  */
 
 /**
- * @file    unistd.h
+ * @file
  * @brief   standard symbolic constants and types
  * @see     <a href="http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/unistd.h.html">
  *              The Open Group Base Specifications Issue 7, <unistd.h>

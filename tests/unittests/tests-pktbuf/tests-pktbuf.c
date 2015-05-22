@@ -9,7 +9,7 @@
 /**
  * @{
  *
- * @file    tests-pktbuf.c
+ * @file
  */
 #include <errno.h>
 #include <stdint.h>

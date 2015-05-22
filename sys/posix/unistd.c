@@ -8,7 +8,7 @@
 
 /**
  * @{
- * @file    fd.c
+ * @file
  * @brief   Providing implementation for close for fds defined in fd.h.
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  * @author  Christian Mehlis <mehlis@inf.fu-berlin.de>

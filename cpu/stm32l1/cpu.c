@@ -10,7 +10,7 @@
  * @ingroup     cpu_stm32l1
  * @{
  *
- * @file        cpu.c
+ * @file
  * @brief       Implementation of the kernel cpu functions
  *
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>

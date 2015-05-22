@@ -32,7 +32,7 @@
  * @ingroup     sys_crypto
  * @{
  *
- * @file        sha256.h
+ * @file
  * @brief       Header definitions for the SHA256 hash function
  *
  * @author      Colin Percival

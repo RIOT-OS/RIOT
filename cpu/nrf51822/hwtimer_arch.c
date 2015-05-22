@@ -10,7 +10,7 @@
  * @ingroup     cpu_nrf51822
  * @{
  *
- * @file        hwtimer_arch.c
+ * @file
  * @brief       Implementation of the kernels hwtimer interface
  *
  * The hardware timer implementation uses a direct mapping to the low-level UART driver.

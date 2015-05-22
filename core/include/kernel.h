@@ -10,7 +10,7 @@
  * @addtogroup  core_internal
  * @{
  *
- * @file        kernel.h
+ * @file
  * @brief       Kernel compile time configuration
  *
  *              A reboot() function is also provided

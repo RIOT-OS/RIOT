@@ -15,7 +15,7 @@
  *
  * @{
  *
- * @file        diskio.h
+ * @file
  *
  * @author      unknown
  */

@@ -9,7 +9,7 @@
  *
  * @ingroup ps
  * @{
- * @file    ps.c
+ * @file
  * @brief   UNIX like ps command
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
  * @}

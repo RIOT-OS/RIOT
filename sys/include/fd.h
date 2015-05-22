@@ -12,7 +12,7 @@
  */
 
 /**
- * @file    fd.h
+ * @file
  * @brief   Unifies diverse identifiers of RIOT to POSIX like file descriptors.
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>

@@ -12,7 +12,7 @@
  * @brief       The kernels power management interface
  * @{
  *
- * @file        lpm.h
+ * @file
  * @brief       Power management interface
  *
  * This interface needs to be implemented for each platform.

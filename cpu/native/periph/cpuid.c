@@ -10,7 +10,7 @@
  * @addtogroup  driver_periph
  * @{
  *
- * @file        cpuid.c
+ * @file
  * @brief       Implementation
  *
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>

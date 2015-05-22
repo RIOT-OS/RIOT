@@ -10,7 +10,7 @@
 /**
  * @ingroup     drivers_cc110x
  * @{
- * @file        cc110x.c
+ * @file
  * @brief       Basic functionality of cc110x driver
  *
  * @author      Oliver Hahm <oliver.hahm@inria.fr>

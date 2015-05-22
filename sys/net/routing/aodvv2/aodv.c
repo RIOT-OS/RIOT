@@ -11,7 +11,7 @@
  * @ingroup     aodvv2
  * @{
  *
- * @file        aodv.c
+ * @file
  * @brief       aodvv2 routing protocol
  *
  * @author      Lotte Steenbrink <lotte.steenbrink@fu-berlin.de>

@@ -9,7 +9,7 @@
 /**
  * @ingroup     rpl
  * @{
- * @file        of_mrhof.h
+ * @file
  * @brief       Objective Function MRHOF.
  *
  * Header-file, which defines all functions for the implementation of Objective Function MRHOF.

@@ -10,7 +10,7 @@
  * @ingroup     cpu_nrf51822
  * @{
  *
- * @file        syscalls.c
+ * @file
  * @brief       NewLib system calls implementations for nRF51822
  *
  * @author      Michael Baar <michael.baar@fu-berlin.de>

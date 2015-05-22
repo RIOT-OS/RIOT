@@ -9,7 +9,7 @@
  *
  * @ingroup tcp
  * @{
- * @file    tcp.c
+ * @file
  * @brief   TCP implementation
  * @author  Oliver Gesch <oliver.gesch@googlemail.com>
  * @author  Cenk Gündoğan <cnkgndgn@gmail.com>

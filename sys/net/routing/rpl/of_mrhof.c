@@ -9,7 +9,7 @@
 /**
  * @ingroup     rpl
  * @{
- * @file        of_mrhof.c
+ * @file
  * @brief       Objective Function MRHOF.
  *
  * Implementation of Objective Function MRHOF.

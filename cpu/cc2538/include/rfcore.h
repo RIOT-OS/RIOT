@@ -9,7 +9,7 @@
 /**
  * @{
  *
- * @file            rfcore.h
+ * @file
  * @brief           CC2538 RF core interface
  *
  * @author          Ian Martin <ian@locicontrols.com>

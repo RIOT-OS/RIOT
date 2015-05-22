@@ -10,7 +10,7 @@
  * @ingroup     cpu_cc2538
  * @{
  *
- * @file        lpm_arch.c
+ * @file
  * @brief       Implementation of the kernels power management interface
  *
  * @author      Ian Martin <ian@locicontrols.com>

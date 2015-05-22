@@ -9,7 +9,7 @@
 /**
  * @ingroup     drivers_kw2xrf
  * @{
- * @file        kw2xrf_spi.c
+ * @file
  * @brief       Implementation of SPI-functions for the kw2xrf driver
  *
  * @author      Johann Fischer <j.fischer@phytec.de>

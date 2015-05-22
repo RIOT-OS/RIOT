@@ -22,7 +22,7 @@
  *
  * @{
  *
- * @file        msg.h
+ * @file
  * @brief       Messaging API for inter process communication
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>

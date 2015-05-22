@@ -10,7 +10,7 @@
  * @ingroup     net_sixlowpan_lowpan
  * @{
  *
- * @file        sixlowpan/mac.h
+ * @file
  * @brief       6LoWPAN data structs, and prototypes for MAC layer
  *
  * @author      Stephan Zeisberg <zeisberg@mi.fu-berlin.de>

@@ -10,7 +10,7 @@
  * @addtogroup  core_util
  * @{
  *
- * @file        kernel_types.h
+ * @file
  * @brief       Types used by the kernel
  *
  * @author      Oliver Hahm <oliver.hahm@inria.fr>

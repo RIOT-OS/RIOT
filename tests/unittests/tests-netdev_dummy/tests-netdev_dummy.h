@@ -10,7 +10,7 @@
  * @addtogroup  unittests
  * @{
  *
- * @file        tests-netdev_dummy.h
+ * @file
  * @brief       Unittests for the ``netdev_dummy`` module
  *
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>

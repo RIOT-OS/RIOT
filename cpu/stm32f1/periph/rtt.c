@@ -10,7 +10,7 @@
  * @ingroup     cpu_stm32f1
  * @{
  *
- * @file        rtt.c
+ * @file
  * @brief       Low-level RTT driver implementation
  *
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>

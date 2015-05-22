@@ -12,7 +12,7 @@
  *
  * @ingroup rpl
  * @{
- * @file    rpl_of_manager.c
+ * @file
  * @brief   RPL Objective functions manager
  * @author  Fabian Brandt <fabianbr@zedat.fu-berlin.de>
  * @}

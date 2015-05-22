@@ -11,7 +11,7 @@
  * @ingroup     aodvv2
  * @{
  *
- * @file        utils.h
+ * @file
  * @brief       client- and RREQ-table, ipv6 address representation converters
  *
  * @author      Lotte Steenbrink <lotte.steenbrink@fu-berlin.de>

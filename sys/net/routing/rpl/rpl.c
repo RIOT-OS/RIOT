@@ -11,7 +11,7 @@
  * @ingroup     rpl
  * @{
  *
- * @file        rpl.c
+ * @file
  * @brief       Implementation of the RPL-core.
  *
  * Implementation of core RPL-functions. Normally it shouldn't be necessary to

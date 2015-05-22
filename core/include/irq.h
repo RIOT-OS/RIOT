@@ -12,7 +12,7 @@
  * @brief       Provides an API to control interrupt processing
  * @{
  *
- * @file        irq.h
+ * @file
  * @brief       IRQ driver interface
  *
  * @author      Freie Universität Berlin, Computer Systems & Telematics

@@ -10,7 +10,7 @@
  * @ingroup     cpu_sam3x8e
  * @{
  *
- * @file        lpm_arch.c
+ * @file
  * @brief       Implementation of the kernels power management interface
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>

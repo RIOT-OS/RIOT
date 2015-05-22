@@ -10,7 +10,7 @@
  * @addtogroup  core_internal
  * @{
  *
- * @file        attributes.h
+ * @file
  * @brief       Compiler attributes/pragmas configuration
  *
  * @author      René Kijewski <rene.kijewski@fu-berlin.de>

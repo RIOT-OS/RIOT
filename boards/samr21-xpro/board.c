@@ -10,7 +10,7 @@
  * @ingroup     boards_samr21-xpro
  * @{
  *
- * @file        board.c
+ * @file
  * @brief       Board specific implementations for the Atem SAM R21 Xplained Pro board
  *
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>

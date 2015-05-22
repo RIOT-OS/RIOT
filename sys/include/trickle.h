@@ -15,7 +15,7 @@
  */
 
 /**
- * @file    trickle.h
+ * @file
  * @brief   Implementation of a generic Trickle Algorithm (RFC 6206)
  *
  * @author  Eric Engel <eric.engel@fu-berlin.de>

@@ -10,7 +10,7 @@
  * @ingroup     core_hwtimer
  * @{
  *
- * @file        hwtimer.c
+ * @file
  * @brief       Hardware timer abstraction implementation
  *
  * @author      Heiko Will <hwill@inf.fu-berlin.de>

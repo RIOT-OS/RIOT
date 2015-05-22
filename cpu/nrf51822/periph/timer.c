@@ -10,7 +10,7 @@
  * @ingroup     cpu_nrf51822
  * @{
  *
- * @file        timer.c
+ * @file
  * @brief       Low-level timer driver implementation
  *
  * @author      Christian Kühling <kuehling@zedat.fu-berlin.de>

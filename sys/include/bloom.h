@@ -114,7 +114,7 @@
  * @brief       Bloom filter library
  * @{
  *
- * @file        bloom.h
+ * @file
  * @brief       Bloom filter API
  *
  * @author Christian Mehlis <mehlis@inf.fu-berlin.de>

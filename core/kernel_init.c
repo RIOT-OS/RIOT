@@ -10,7 +10,7 @@
  * @ingroup     core_internal
  * @{
  *
- * @file        kernel_init.c
+ * @file
  * @brief       Platform-independent kernel initilization
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>

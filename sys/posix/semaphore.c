@@ -11,7 +11,7 @@
  *
  * @{
  *
- * @file    semaphore.c
+ * @file
  * @brief   Implementation of semaphores with priority queues
  *
  * @author  Christian Mehlis <mehlis@inf.fu-berlin.de>

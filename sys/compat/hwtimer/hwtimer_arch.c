@@ -12,7 +12,7 @@
  * @ingroup     sys_compat
  * @{
  *
- * @file        hwtimer_arch.c
+ * @file
  * @brief       Implementation of the kernels hwtimer interface over periph timers
  *
  * This hwtimer implementation wraps one periph timer
