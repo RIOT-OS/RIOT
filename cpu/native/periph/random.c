@@ -21,7 +21,7 @@
 #include <fcntl.h>
 
 
-#include "cpu-conf.h"
+#include "cpu_conf.h"
 #include "native_internal.h"
 
 #include "periph/random.h"

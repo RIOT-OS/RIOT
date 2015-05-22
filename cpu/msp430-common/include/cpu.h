@@ -29,7 +29,7 @@
 
 #include "sched.h"
 #include "msp430_types.h"
-#include "cpu-conf.h"
+#include "cpu_conf.h"
 
 #ifdef __cplusplus
 extern "C" {

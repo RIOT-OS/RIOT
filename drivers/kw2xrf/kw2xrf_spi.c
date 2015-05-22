@@ -21,7 +21,7 @@
 #include "kw2xrf_spi.h"
 #include "periph/spi.h"
 #include "periph/gpio.h"
-#include "cpu-conf.h"
+#include "cpu_conf.h"
 #include "irq.h"
 
 #define ENABLE_DEBUG    (0)

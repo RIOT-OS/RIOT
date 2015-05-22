@@ -25,7 +25,7 @@
 #ifndef __CPU_H
 #define __CPU_H
 
-#include "cpu-conf.h"
+#include "cpu_conf.h"
 
 
 /**

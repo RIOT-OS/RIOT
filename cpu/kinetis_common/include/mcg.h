@@ -100,7 +100,7 @@
 #ifndef __MCG_CPU_H
 #define __MCG_CPU_H
 
-#include "cpu-conf.h"
+#include "cpu_conf.h"
 #include "periph_conf.h"
 
 #if KINETIS_CPU_USE_MCG

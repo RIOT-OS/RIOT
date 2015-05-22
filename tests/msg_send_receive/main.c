@@ -21,7 +21,7 @@
 
 #include <stdio.h>
 
-#include "cpu-conf.h"
+#include "cpu_conf.h"
 #include "thread.h"
 
 #define THREAD1_STACKSIZE   (THREAD_EXTRA_STACKSIZE_PRINTF)

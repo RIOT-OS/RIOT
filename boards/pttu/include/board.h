@@ -24,7 +24,7 @@
 #include <stdint.h>
 
 #include "lpc2387.h"
-#include "cpu-conf.h"
+#include "cpu_conf.h"
 
 #ifdef __cplusplus
 extern "C" {

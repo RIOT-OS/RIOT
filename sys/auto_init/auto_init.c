@@ -73,7 +73,7 @@
 #endif
 
 #ifdef MODULE_NET_IF
-#include "cpu-conf.h"
+#include "cpu_conf.h"
 #include "cpu.h"
 #include "kernel.h"
 #include "net_if.h"

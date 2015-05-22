@@ -22,7 +22,7 @@
 #ifndef __PERIPH_CONF_H
 #define __PERIPH_CONF_H
 
-#include "cpu-conf.h"
+#include "cpu_conf.h"
 
 #ifdef __cplusplus
 extern "C"

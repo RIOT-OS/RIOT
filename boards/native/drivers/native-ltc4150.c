@@ -25,7 +25,7 @@
 #include "ltc4150_arch.h"
 
 #include "cpu.h"
-#include "cpu-conf.h"
+#include "cpu_conf.h"
 #include "hwtimer.h"
 #include "irq.h"
 

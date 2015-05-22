@@ -25,7 +25,7 @@
 #ifndef __ATMEGA_COMMON_H
 #define __ATMEGA_COMMON_H
 
-#include "cpu-conf.h"
+#include "cpu_conf.h"
 #include <avr/interrupt.h>
 
 /**

@@ -31,7 +31,7 @@
  */
 #define ARCH_HAS_ATOMIC_COMPARE_AND_SWAP 1
 
-#include "cpu-conf.h"
+#include "cpu_conf.h"
 
 /**
  * For downwards compatibility with old RIOT code.

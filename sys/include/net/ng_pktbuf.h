@@ -33,7 +33,7 @@
 #include <string.h>
 
 #include "atomic.h"
-#include "cpu-conf.h"
+#include "cpu_conf.h"
 #include "net/ng_pkt.h"
 #include "net/ng_nettype.h"
 #include "utlist.h"

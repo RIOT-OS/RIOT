@@ -32,7 +32,7 @@
 #include "attributes.h"
 #include "irq.h"
 #include "ucontext.h"
-#include "cpu-conf.h"
+#include "cpu_conf.h"
 
 #include <stdbool.h>
 #include <stdint.h>

@@ -18,7 +18,7 @@
 
 #include <string.h>
 
-#include "cpu-conf.h"
+#include "cpu_conf.h"
 #include "periph/cpuid.h"
 
 #define SAML21_CPUID_WORD0 (*(volatile uint32_t *)0x0080A00C)

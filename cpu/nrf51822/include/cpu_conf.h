@@ -30,13 +30,13 @@ extern "C" {
  * @name Kernel configuration
  * @{
  */
-#define THREAD_EXTRA_STACKSIZE_PRINTF    (512)
+#define THREAD_EXTRA_STACKSIZE_PRINTF   (512)
 
 #ifndef THREAD_STACKSIZE_DEFAULT
-#define THREAD_STACKSIZE_DEFAULT   (1024)
+#define THREAD_STACKSIZE_DEFAULT        (1024)
 #endif
 
-#define THREAD_STACKSIZE_IDLE      (256)
+#define THREAD_STACKSIZE_IDLE           (256)
 /** @} */
 
 /**

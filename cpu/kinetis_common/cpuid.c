@@ -20,7 +20,7 @@
  */
 
 #include <string.h>
-#include "cpu-conf.h"
+#include "cpu_conf.h"
 
 #include "periph/cpuid.h"
 

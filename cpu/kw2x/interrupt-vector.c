@@ -21,7 +21,7 @@
  */
 
 #include <stdint.h>
-#include "cpu-conf.h"
+#include "cpu_conf.h"
 #include "fault_handlers.h"
 
 /**
