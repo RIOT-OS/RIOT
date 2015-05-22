@@ -13,7 +13,7 @@
  * @ingroup     boards_z1
  * @{
  *
- * @file        uart.c
+ * @file
  * @brief       Board specific UART/USB driver HAL for the Zolertia Z1
  *
  * @author      Kévin Roussel <Kevin.Roussel@inria.fr>

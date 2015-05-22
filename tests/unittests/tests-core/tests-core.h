@@ -10,7 +10,7 @@
  * @addtogroup  unittests
  * @{
  *
- * @file        tests-core.h
+ * @file
  * @brief       Unittests for the ``core`` module
  *
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>

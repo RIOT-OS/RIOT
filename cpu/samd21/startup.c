@@ -10,7 +10,7 @@
  * @ingroup     cpu_samd21
  * @{
  *
- * @file        startup.c
+ * @file
  * @brief       Startup code and interrupt vector definition
  *
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>

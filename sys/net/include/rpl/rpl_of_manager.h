@@ -9,7 +9,7 @@
 *
 * @ingroup rpl
 * @{
-* @file    rpl_of_manager.h
+* @file
 * @brief   RPL Objective functions manager header
 * @author  Fabian Brandt <fabianbr@zedat.fu-berlin.de>
 * @}

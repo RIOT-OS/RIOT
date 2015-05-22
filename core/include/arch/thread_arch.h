@@ -10,7 +10,7 @@
  * @ingroup     core_arch
  * @{
  *
- * @file        thread_arch.h
+ * @file
  * @brief       Architecture dependent kernel interface for handling and managing threads
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>

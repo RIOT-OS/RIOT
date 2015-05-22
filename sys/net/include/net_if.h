@@ -14,7 +14,7 @@
  *
  * @{
  *
- * @file        net_if.h
+ * @file
  * @brief       Types and functions for network interfaces
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */

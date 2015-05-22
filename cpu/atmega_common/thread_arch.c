@@ -10,7 +10,7 @@
  * @ingroup     cpu_atmega_common
  * @{
  *
- * @file        thread_arch.c
+ * @file
  * @brief       Implementation of the kernel's architecture dependent thread interface
  *
  * @author      Hinnerk van Bruinehsen <h.v.bruinehsen@fu-berlin.de>

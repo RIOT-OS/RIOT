@@ -10,7 +10,7 @@
  * @ingroup     sys_crypto
  * @{
  *
- * @file        3des.c
+ * @file
  * @brief       implementation of the 3DES cipher-algorithm
  *
  * @author      Freie Universitaet Berlin, Computer Systems & Telematics

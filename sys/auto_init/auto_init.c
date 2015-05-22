@@ -9,7 +9,7 @@
  *
  * @ingroup auto_init
  * @{
- * @file    auto_init_c
+ * @file
  * @brief   initializes any used module that has a trivial init function
  * @author  Oliver Hahm <oliver.hahm@inria.fr>
  * @author  Hauke Petersen <hauke.petersen@fu-berlin.de>

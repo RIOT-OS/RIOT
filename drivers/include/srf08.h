@@ -15,7 +15,7 @@
  *
  * @{
  *
- * @file        srf08.h
+ * @file
  * @brief       Driver definitions for the SRF02 ultrasonic ranger.
  *
  * The connection between the SRF08 and the MCU is based on the i2c interface.

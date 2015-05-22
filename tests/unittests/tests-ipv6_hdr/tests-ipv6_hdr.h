@@ -10,7 +10,7 @@
  * @addtogroup  unittests
  * @{
  *
- * @file        tests-ipv6_hdr.h
+ * @file
  * @brief       Unittests for the ``ipv6_hdr`` module
  *
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>

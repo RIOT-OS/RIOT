@@ -10,7 +10,7 @@
  * @ingroup cpp11-compat
  * @{
  *
- * @file    thread.cpp
+ * @file
  * @brief   C++11 thread drop in replacement
  *
  * @author  Raphael Hiesgen <raphael.hiesgen (at) haw-hamburg.de>

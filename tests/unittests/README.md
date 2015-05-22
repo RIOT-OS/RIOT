@@ -135,7 +135,7 @@ The test header ``tests-<modulename>/tests-<module>.h`` of a module you add to `
  * @addtogroup  unittests
  * @{
  *
- * @file        tests-<module>.h
+ * @file
  * @brief       Unittests for the ``module`` module
  *
  * @author      <author>

@@ -10,7 +10,7 @@
  * @addtogroup  netdev
  * @{
  *
- * @file        base.c
+ * @file
  * @brief       Provides helper functions to the API in @ref netdev/base.h.
  *
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>

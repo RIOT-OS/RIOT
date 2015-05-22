@@ -10,7 +10,7 @@
  * @addtogroup  unittests
  * @{
  *
- * @file        netdev_dummy.h
+ * @file
  * @brief       Provides a virtual device that understands the netdev_base API
  *              for testing.
  *

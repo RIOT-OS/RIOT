@@ -9,7 +9,7 @@
 /**
  * @ingroup net_if
  * @{
- * @file    net_if.c
+ * @file
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 #include <string.h>

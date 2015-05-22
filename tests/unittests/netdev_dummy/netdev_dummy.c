@@ -10,7 +10,7 @@
  * @addtogroup
  * @{
  *
- * @file        netdev_dummy.c
+ * @file
  *
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */

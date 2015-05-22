@@ -10,7 +10,7 @@
  * @addtogroup  core_util
  * @{
  *
- * @file        debug.h
+ * @file
  * @brief       Debug-header
  *
  * @details     If *ENABLE_DEBUG* is defined inside an implementation file, all

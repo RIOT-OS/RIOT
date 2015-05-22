@@ -10,7 +10,7 @@
  * @ingroup     cpu_sam3x8e
  * @{
  *
- * @file        startup.c
+ * @file
  * @brief       Startup code and interrupt vector definition
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>

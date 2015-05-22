@@ -10,7 +10,7 @@
  * @addtogroup  core_internal
  * @{
  *
- * @file        kernel_internal.h
+ * @file
  * @brief       prototypes for kernel internal functions
  *
  * @author      Oliver Hahm <oliver.hahm@inria.fr>

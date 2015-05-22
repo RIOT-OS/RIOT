@@ -10,7 +10,7 @@
  * @addtogroup  core_util
  * @{
  *
- * @file        cib.h
+ * @file
  * @brief       Circular integer buffer interface
  * @details     This structure provides an organizational interface
  *              and combined with an memory array forms a circular buffer.

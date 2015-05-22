@@ -11,7 +11,7 @@
  * @ingroup     examples
  * @{
  *
- * @file        cpp_class.cpp
+ * @file
  * @brief       implementation of declared functions of object cpp_class
  *
  * @author      Martin Landsmann <martin.landsmann@haw-hamburg.de>

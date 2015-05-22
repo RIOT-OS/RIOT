@@ -10,7 +10,7 @@
  * @addtogroup  unittests
  * @{
  *
- * @file        tests-timex.h
+ * @file
  * @brief       Unittests for the ``timex`` module
  *
  * @author      Philipp Rosenkranz <philipp.rosenkranz@fu-berlin.de>

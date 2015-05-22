@@ -12,7 +12,7 @@
  */
 
 /**
- * @file    arpa/inet.h
+ * @file
  * @brief   Definitions for internet operations
  * @see     <a href="http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/arpa_inet.h.html">
  *              The Open Group Base Specifications Issue 7, <arpa/inet.h>

@@ -10,7 +10,7 @@
  * @ingroup     net_sixlowpan_lowpan
  * @{
  *
- * @file        sixlowpan/error.h
+ * @file
  * @brief       6LoWPAN error codes
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>

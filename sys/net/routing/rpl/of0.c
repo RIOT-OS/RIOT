@@ -9,7 +9,7 @@
 /**
  * @ingroup     rpl
  * @{
- * @file        of0.c
+ * @file
  * @brief       Objective Function Zero.
  *
  * Implementation of Objective Function Zero.

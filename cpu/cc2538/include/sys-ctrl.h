@@ -10,7 +10,7 @@
  * @ingroup         cpu_cc2538
  * @{
  *
- * @file            sys-ctrl.h
+ * @file
  * @brief           CC2538 System Control interface
  *
  * @author          Ian Martin <ian@locicontrols.com>

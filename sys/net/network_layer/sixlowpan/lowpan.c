@@ -9,7 +9,7 @@
  *
  * @ingroup sixlowpan
  * @{
- * @file    sixlowpan.c
+ * @file
  * @brief   6lowpan functions
  * @author  Stephan Zeisberg <zeisberg@mi.fu-berlin.de>
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>

@@ -12,7 +12,7 @@
  * @brief       This module implements an example logging module
  * @{
  *
- * @file        log_module.h
+ * @file
  * @brief       log_module header
  *
  * @author      Jason Linehan <patientulysses@gmail.com>

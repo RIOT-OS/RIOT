@@ -9,7 +9,7 @@
  *
  * @ingroup sys_posix
  * @{
- * @file    posix_io.c
+ * @file
  * @brief   Implementation of basic POSIX IO functionality.
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
  * @}

@@ -9,7 +9,7 @@
 /**
  * @ingroup     core_util
  * @{
- * @file        lifo.c
+ * @file
  * @brief       LIFO buffer implementation
  *
  * @author      Heiko Will <hwill@inf.fu-berlin.de>

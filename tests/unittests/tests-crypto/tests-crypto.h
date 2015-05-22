@@ -10,7 +10,7 @@
  * @addtogroup  unittests
  * @{
  *
- * @file        tests-crypto.h
+ * @file
  * @brief       Unittests for the ``crypto`` module
  *
  * @author      Philipp Rosenkranz <philipp.rosenkranz@fu-berlin.de>

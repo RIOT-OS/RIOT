@@ -10,7 +10,7 @@
  * @ingroup     driver_srf02
  * @{
  *
- * @file        srf02.c
+ * @file
  * @brief       Driver for the SRF02 ultrasonic ranger.
  *              The connection between the MCU and the SRF02 is based on the
  *              i2c-interface.

@@ -10,7 +10,7 @@
  * @addtogroup  unittests
  * @{
  *
- * @file        tests-inet_csum.h
+ * @file
  * @brief       Unittests for the ``inet_csum`` module
  *
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>

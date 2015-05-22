@@ -10,7 +10,7 @@
  * @addtogroup      cpu_cc2538
  * @{
  *
- * @file            gptimer.h
+ * @file
  * @brief           CC2538 General Purpose Timer (GPTIMER) driver
  *
  * @author          Ian Martin <ian@locicontrols.com>

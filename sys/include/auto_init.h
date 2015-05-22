@@ -26,7 +26,7 @@
  *
  * @{
  *
- * @file        auto_init.h
+ * @file
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @author      Oliver Hahm <oliver.hahm@inria.fr>

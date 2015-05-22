@@ -10,7 +10,7 @@
  * @ingroup     cpu_sam3x8e
  * @{
  *
- * @file        syscalls.c
+ * @file
  * @brief       NewLib system calls implementations for SAM3X8E
  *
  * @author      Michael Baar <michael.baar@fu-berlin.de>

@@ -10,7 +10,7 @@
  * @ingroup     driver_periph
  * @{
  *
- * @file        random.c
+ * @file
  * @brief       Low-level random number generator driver implementation
  *
  * @author      Ian Martin <ian@locicontrols.com>

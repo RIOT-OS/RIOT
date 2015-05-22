@@ -10,7 +10,7 @@
  * @ingroup     boards_fox
  * @{
  *
- * @file        board.c
+ * @file
  * @brief       Board specific implementations for the fox board
  *
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>

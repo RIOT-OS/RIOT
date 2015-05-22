@@ -19,7 +19,7 @@ extern "C" {
  * @brief       Driver for the Linear Technology LTC4150 Coulomb Counter
  * @{
  *
- * @file        ltc4150_arch.h
+ * @file
  * @brief       LTC4150 Coulomb Counter
  *
  * @author      Heiko Will

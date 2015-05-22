@@ -10,7 +10,7 @@
  * @ingroup cpp11-compat
  * @{
  *
- * @file    condition_variable.cpp
+ * @file
  * @brief   C++11 condition variable drop in replacement
  *
  * @author  Raphael Hiesgen <raphael.hiesgen (at) haw-hamburg.de>

@@ -10,7 +10,7 @@
  * @ingroup     cpu_nrf51822
  * @{
  *
- * @file        gpio.c
+ * @file
  * @brief       Low-level SPI driver implementation
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>

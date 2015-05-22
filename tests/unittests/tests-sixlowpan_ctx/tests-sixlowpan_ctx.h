@@ -10,7 +10,7 @@
  * @addtogroup  unittests
  * @{
  *
- * @file        tests-sixlowpan_ctx.h
+ * @file
  * @brief       Unittests for the ``sixlowpan_ctx`` module
  *
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>

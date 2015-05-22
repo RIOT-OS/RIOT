@@ -10,7 +10,7 @@
  * @ingroup     cpu
  * @{
  *
- * @file        flashrom.c
+ * @file
  * @brief       MSP430Fxyz flashrom functions
  *
  * @author      Oliver Hahm <oliver.hahm@inria.fr>

@@ -11,7 +11,7 @@
  * @ingroup sys
  * @{
  *
- * @file        oneway_malloc.c
+ * @file
  * @brief       Simple malloc wrapper for SBRK
 
  * @author      Kaspar Schleiser <kaspar@schleiser.de>

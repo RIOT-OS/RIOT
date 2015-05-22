@@ -10,7 +10,7 @@
  * @addtogroup  driver_periph
  * @{
  *
- * @file        cpuid.c
+ * @file
  * @brief       Low-level CPUID driver implementation
  *
  * @author      Troels Hoffmeyer <troels.d.hoffmeyer@gmail.com>

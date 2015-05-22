@@ -10,7 +10,7 @@
  * @ingroup     boards_arduino-due
  * @{
  *
- * @file        board.c
+ * @file
  * @brief       Board specific implementations for the Arduino Due board
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>

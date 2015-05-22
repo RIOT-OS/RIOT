@@ -10,7 +10,7 @@
  * @ingroup     core_sched
  * @{
  *
- * @file        sched.c
+ * @file
  * @brief       Scheduler implementation
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>

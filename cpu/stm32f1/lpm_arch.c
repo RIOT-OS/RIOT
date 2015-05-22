@@ -11,7 +11,7 @@
  * @ingroup     cpu_stm32f1
  * @{
  *
- * @file        lpm_arch.c
+ * @file
  * @brief       Implementation of the kernel's lpm interface
  *
  * @author      Alaeddine Weslati <alaeddine.weslati@inria.fr>

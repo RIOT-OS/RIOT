@@ -33,7 +33,7 @@
  * @ingroup     cpu
  * @{
  *
- * @file        msp430-main.c
+ * @file
  * @brief       MSP430 CPU initialization
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>

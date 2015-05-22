@@ -8,7 +8,7 @@
  * @ingroup rpl
  * @{
  *
- * @file        rpl_dodag.h
+ * @file
  * @brief       RPL DODAG header
  *
  * Header file, which defines all public known DODAG-related functions for RPL.

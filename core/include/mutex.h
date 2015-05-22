@@ -12,7 +12,7 @@
  * @ingroup     core
  * @{
  *
- * @file        mutex.h
+ * @file
  * @brief       RIOT synchronization API
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>

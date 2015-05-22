@@ -9,7 +9,7 @@
  *
  * @ingroup sixlowpan
  * @{
- * @file    bordermultiplex.h
+ * @file
  * @brief   data structs for border router multiplexing
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  * @author  Oliver Hahm <oliver.hahm@inria.fr>

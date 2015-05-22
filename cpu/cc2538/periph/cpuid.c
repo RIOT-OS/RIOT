@@ -10,7 +10,7 @@
  * @ingroup     cpu_cc2538
  * @{
  *
- * @file        cpuid.c
+ * @file
  * @brief       CPU-ID driver implementation
  *
  * The CC2538 provides a 64-bit unique identifier, that is unique for each shipped unit.

@@ -10,7 +10,7 @@
  * @ingroup     boards_airfy-beacon
  * @{
  *
- * @file        board.c
+ * @file
  * @brief       Board specific implementations for the Airfy Beacon board
  *
  * @author      Christian Mehlis <mehlis@inf.fu-berlin.de>

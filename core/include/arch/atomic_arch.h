@@ -10,7 +10,7 @@
  * @ingroup     core_arch
  * @{
  *
- * @file        atomic_arch.h
+ * @file
  * @brief       Architecture dependent interface for an atomic set operation
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>

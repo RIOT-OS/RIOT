@@ -9,7 +9,7 @@
 /**
  * @ingroup     kw2xrf
  * @{
- * @file        kw2xrf.c
+ * @file
  * @brief       Basic functionality of kw2xrf driver
  *
  * @author      Johann Fischer <j.fischer@phytec.de>

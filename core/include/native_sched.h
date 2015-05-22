@@ -14,7 +14,7 @@
  *
  * @{
  *
- * @file        native_sched.h
+ * @file
  * @brief       Add definitions required on the native board
  *
  * @author      Raphael Hiesgen <raphael.hiesgen@haw-hamburg.de>

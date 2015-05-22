@@ -7,7 +7,7 @@
  */
 
 /**
- * @file    testing.h
+ * @file
  * @brief   Test suite for the 6LoWPAN Border Router.
  *
  *          The tests are managed in the following way:

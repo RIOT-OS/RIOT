@@ -10,7 +10,7 @@
  * @ingroup     cpu_samd21
  * @{
  *
- * @file        spi.c
+ * @file
  * @brief       Low-level SPI driver implementation
  *
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>

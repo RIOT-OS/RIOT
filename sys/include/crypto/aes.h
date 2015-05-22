@@ -10,7 +10,7 @@
  * @ingroup     sys_crypto
  * @{
  *
- * @file        aes.h
+ * @file
  * @brief       Headers for the implementation of the AES cipher-algorithm
  *
  * @author      Freie Universitaet Berlin, Computer Systems & Telematics

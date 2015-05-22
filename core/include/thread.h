@@ -13,7 +13,7 @@
  *
  * @{
  *
- * @file        thread.h
+ * @file
  * @brief       Threading API
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>

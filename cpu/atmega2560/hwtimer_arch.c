@@ -10,7 +10,7 @@
  * @ingroup     cpu_atmega2560
  * @{
  *
- * @file        hwtimer_arch.c
+ * @file
  * @brief       Implementation of the kernels hwtimer interface
  *
  * The hardware timer implementation uses the ATmega2560 build-in system timer as back-end.

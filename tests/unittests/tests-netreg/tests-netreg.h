@@ -10,7 +10,7 @@
  * @addtogroup  unittests
  * @{
  *
- * @file        tests-netreg.h
+ * @file
  * @brief       Unittests for the ``netreg`` module
  *
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>

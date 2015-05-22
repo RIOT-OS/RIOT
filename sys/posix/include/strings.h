@@ -10,7 +10,7 @@
  * @ingroup     posix
  * @{
  *
- * @file    strings.h
+ * @file
  * @brief   string operations
  *
  * @see     <a href="http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/strings.h.html">

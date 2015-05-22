@@ -10,7 +10,7 @@
  * @ingroup cpp11-compat
  * @{
  *
- * @file    thread_util.hpp
+ * @file
  * @brief   utility functions
  *
  * @author  Dominik Charousset <dominik.charousset (at) haw-hamburg.de>

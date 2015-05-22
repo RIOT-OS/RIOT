@@ -10,7 +10,7 @@
 /**
  * @ingroup     drivers_cc110x
  * @{
- * @file        cc110x-rx.c
+ * @file
  * @brief       Functions for packet reception and transmission on cc110x devices
  *
  * @author      Oliver Hahm <oliver.hahm@inria.fr>

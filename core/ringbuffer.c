@@ -10,7 +10,7 @@
  *
  * @ingroup  core_util
  * @{
- * @file   ringbuffer.c
+ * @file
  * @author Kaspar Schleiser <kaspar@schleiser.de>
  * @author René Kijewski <rene.kijewski@fu-berlin.de>
  * @}

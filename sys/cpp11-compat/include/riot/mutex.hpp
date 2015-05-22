@@ -10,7 +10,7 @@
  * @ingroup cpp11-compat
  * @{
  *
- * @file    mutex.hpp
+ * @file
  * @brief   C++11 mutex drop in replacement
  * @see     <a href="http://en.cppreference.com/w/cpp/thread/mutex">
  *            std::mutex, std::lock_guard and std::unique_lock

@@ -9,7 +9,7 @@
  *
  * @ingroup transport_layer
  * @{
- * @file    tcp_timer.c
+ * @file
  * @brief   TCP timer
  * @author  Oliver Gesch <oliver.gesch@googlemail.com>
  * @}

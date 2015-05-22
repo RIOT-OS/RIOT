@@ -11,7 +11,7 @@
  * @ingroup     aodvv2
  * @{
  *
- * @file        aodvv2/types.h
+ * @file
  * @brief       data types for the aodvv2 routing protocol
  *
  * @author      Lotte Steenbrink <lotte.steenbrink@fu-berlin.de>

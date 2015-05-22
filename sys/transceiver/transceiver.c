@@ -9,7 +9,7 @@
  *
  * @ingroup transceiver
  * @{
- * @file    transceiver.c
+ * @file
  * @brief   Providing a generic interface to the driver implementation for any supported network device.
  * @author  Oliver Hahm <oliver.hahm@inria.fr>
  * @}

@@ -8,7 +8,7 @@
  */
 
 /**
- * @file        main.cpp
+ * @file
  * @brief       Demonstration of mixed c++ and c user application with pure c RIOT
  *              - mixing of c and c++ source to test name mangling
  *              - introducing a namespace to declarative block, avoiding to qualify calls, e.g. std::vector

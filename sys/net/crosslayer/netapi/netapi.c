@@ -8,7 +8,7 @@
 
 /**
  * @{
- * @file    netapi.c
+ * @file
  * @brief   You do not necessarily need this file (leave `netapi` out of
  *          `USEMODULE`, the netapi.h file will still be available for
  *          inclusion). It supplies you however with some helper functions

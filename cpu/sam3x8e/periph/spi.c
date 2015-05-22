@@ -10,7 +10,7 @@
  * @ingroup     cpu_sam3x8e
  * @{
  *
- * @file        spi.c
+ * @file
  * @brief       Low-level SPI driver implementation
  *
  * @author      Maxime Blanloeil <maxime.blanloeil@phelma.grenoble-inp.fr>

@@ -10,7 +10,7 @@
  * @ingroup     core_arch
  * @{
  *
- * @file        hwtimer_arch.h
+ * @file
  * @brief       The kernel's hardware timer abstraction interface
  *
  * @author      Thomas Hillebrandt <hillebra@inf.fu-berlin.de>

@@ -10,7 +10,7 @@
  * @ingroup     cpu_stm32f1
  * @{
  *
- * @file        gpio.c
+ * @file
  * @brief       Low-level GPIO driver implementation
  *
  * @author      Hauke Petersen <mail@haukepetersen.de>

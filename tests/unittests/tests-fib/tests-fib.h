@@ -10,7 +10,7 @@
  * @addtogroup  unittests
  * @{
  *
- * @file        tests-fib.h
+ * @file
  * @brief       Unittests for the ``fib`` module
  *
  * @author      Martin Landsmann <Martin.Landsmann@HAW-Hamburg.de>

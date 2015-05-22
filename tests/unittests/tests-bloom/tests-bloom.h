@@ -10,7 +10,7 @@
  * @addtogroup  unittests
  * @{
  *
- * @file        tests-bloom.h
+ * @file
  * @brief       Unittests for the ``bloom`` module
  *
  * @author      Philipp Rosenkranz <philipp.rosenkranz@fu-berlin.de>

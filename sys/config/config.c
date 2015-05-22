@@ -9,7 +9,7 @@
  *
  * @ingroup config
  * @{
- * @file    config_c
+ * @file
  * @brief   Provides system configuration struct with default values.
  * @author  Oliver Hahm <oliver.hahm@inria.fr>
  * @}

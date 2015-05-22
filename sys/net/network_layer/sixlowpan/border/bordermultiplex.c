@@ -9,7 +9,7 @@
  *
  * @ingroup sixlowpan
  * @{
- * @file    bordermultiplex.c
+ * @file
  * @brief   multiplexiing border router information
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  * @author  Oliver Hahm <oliver.hahm@inria.fr>

@@ -1,5 +1,5 @@
 /**************************************************************************//**
- * @file     LPC17xx.h
+ * @file
  * @brief    CMSIS Cortex-M3 Core Peripheral Access Layer Header File for
  *           NXP LPC17xx Device Series
  * @version: V1.09

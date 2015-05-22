@@ -10,7 +10,7 @@
  * @addtogroup cpu_cc2538
  * @{
  *
- * @file            cc2538-gpio.h
+ * @file
  * @brief           Driver for the cc2538 GPIO controller
  *
  * Header file with register and macro declarations for the cc2538 GPIO module

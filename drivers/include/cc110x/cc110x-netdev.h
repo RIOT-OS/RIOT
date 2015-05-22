@@ -10,7 +10,7 @@
  * @ingroup     drivers_cc110x
  * @{
  *
- * @file        cc110x-netdev.h
+ * @file
  * @brief       Variables for the cc110x netdev base interface
  *
  * @author      Fabian Nack <nack@inf.fu-berlin.de>

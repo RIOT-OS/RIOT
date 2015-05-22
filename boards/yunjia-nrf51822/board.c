@@ -10,7 +10,7 @@
  * @ingroup     boards_yunjia-nrf51822
  * @{
  *
- * @file        board.c
+ * @file
  * @brief       Board specific implementations for the Yunjia NRF51822 board
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>

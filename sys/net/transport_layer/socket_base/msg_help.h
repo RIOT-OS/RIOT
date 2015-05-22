@@ -8,7 +8,7 @@
 
 /**
  * @{
- * @file    msg_help.h
+ * @file
  * @author  Oliver Gesch <oliver.gesch@googlemail.com>
  */
 #ifndef MSG_HELP_H_

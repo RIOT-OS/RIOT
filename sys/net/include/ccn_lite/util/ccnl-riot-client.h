@@ -19,7 +19,7 @@
 /**
  * @ingroup ccnl
  * @{
- * @file    ccnl-riot-client.h
+ * @file
  * @brief   CCN high level client functions
  * @author  Christian Mehlis <mehlis@inf.fu-berlin.de>
  * @}

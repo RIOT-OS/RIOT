@@ -43,7 +43,7 @@
  *
  * @{
  *
- * @file        netapi.h
+ * @file
  * @brief       Basic general interface to communicate with a network layer.
  *
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>

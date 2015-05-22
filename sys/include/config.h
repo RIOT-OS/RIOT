@@ -10,7 +10,7 @@
  * @addtogroup  core_internal
  * @{
  *
- * @file        config.h
+ * @file
  * @brief       Kernel configuration interface
  *
  * @author      unknown

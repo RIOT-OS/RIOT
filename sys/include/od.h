@@ -20,7 +20,7 @@
  *      </a>
  * @{
  *
- * @file    od.h
+ * @file
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */

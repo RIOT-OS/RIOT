@@ -11,7 +11,7 @@
  * @ingroup     aodvv2
  * @{
  *
- * @file        writer.c
+ * @file
  * @brief       writer to create RFC5444 aodvv2 messages
  *
  * @author      Lotte Steenbrink <lotte.steenbrink@fu-berlin.de>

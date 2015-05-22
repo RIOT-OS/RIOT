@@ -9,7 +9,7 @@
 /**
  * @ingroup posix
  * @{
- * @file    fd.c
+ * @file
  * @brief   Providing unifying file descriptor wrapper for POSIX-compliant
  *          operations.
  * @author  Christian Mehlis <mehlis@inf.fu-berlin.de>

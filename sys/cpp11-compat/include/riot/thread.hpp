@@ -10,7 +10,7 @@
  * @ingroup cpp11-compat
  * @{
  *
- * @file    thread.hpp
+ * @file
  * @brief   C++11 thread drop in replacement
  * @see     <a href="http://en.cppreference.com/w/cpp/thread/thread">
  *            std::thread, std::this_thread

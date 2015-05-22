@@ -10,7 +10,7 @@
  * @addtogroup  netdev
  * @{
  *
- * @file        netdev/default.h
+ * @file
  * @brief       Supplies the users with default values for the use of
  *              @ref netdev
  *

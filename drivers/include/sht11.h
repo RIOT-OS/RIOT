@@ -15,7 +15,7 @@
  * @ingroup     drivers
  * @{
  *
- * @file        sht11.h
+ * @file
  * @brief       SHT11 Device Driver
  *
  * @author      Freie Universität Berlin, Computer Systems & Telematics

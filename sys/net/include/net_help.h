@@ -12,7 +12,7 @@
  * @brief       Helper functions for networking as byte order conversions and checksum calculations
  * @{
  *
- * @file        net_help.h
+ * @file
  *
  * @author      Oliver Gesch <oliver.gesch@googlemail.com>
  */

@@ -10,7 +10,7 @@
  * @ingroup     drivers_cc110x_legacy
  * @{
  *
- * @file        cc110x-arch.h
+ * @file
  * @brief       CC1100 architecture dependent functions
  *
  * @author      Heiko Will <hwill@inf.fu-berlin.de>

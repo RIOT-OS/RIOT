@@ -10,7 +10,7 @@
  * @ingroup     sys_crypto
  * @{
  *
- * @file        rc5.c
+ * @file
  * @brief       implementation of the RC5 cipher-algorithm
  *
  * @author      Nicolai Schmittberger <nicolai.schmittberger@fu-berlin.de>

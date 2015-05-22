@@ -7,7 +7,7 @@
  */
 
 /**
- * @file    sixlowdriver.h
+ * @file
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  * @brief   Public declarations for the 6LoWPAN Border Router driver.
  */

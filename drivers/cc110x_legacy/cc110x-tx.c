@@ -10,7 +10,7 @@
 /**
  * @ingroup     drivers_cc110x_legacy
  * @{
- * @file        cc110x-tx.c
+ * @file
  * @brief       Functions for packet transmission on cc110x
  *
  * @author      Oliver Hahm <oliver.hahm@inria.fr>

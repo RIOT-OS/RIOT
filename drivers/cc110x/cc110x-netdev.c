@@ -9,7 +9,7 @@
 /**
  * @ingroup     drivers_cc110x
  * @{
- * @file        cc110x_netdev.c
+ * @file
  * @brief       Functionality for netdev base interface
  *
  * @author      Fabian Nack <nack@inf.fu-berlin.de>

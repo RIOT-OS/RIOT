@@ -10,7 +10,7 @@
  * @ingroup     cpu
  * @{
  *
- * @file        lpm_cpu.c
+ * @file
  * @brief       low-power mode implementation for MSP430 MCUs
  *
  * @author      Kévin Roussel <Kevin.Roussel@inria.fr>

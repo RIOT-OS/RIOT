@@ -12,7 +12,7 @@
  */
 
 /**
- * @file    netinet/in.h
+ * @file
  * @brief   Main socket header
  * @see     <a href="http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/netinet_in.h.html">
  *              The Open Group Base Specifications Issue 7, <netinet/in.h>

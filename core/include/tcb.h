@@ -10,7 +10,7 @@
  * @addtogroup  core_thread
  * @{
  *
- * @file        tcb.h
+ * @file
  * @brief       Thread context block definition
  *
  * @author      Heiko Will

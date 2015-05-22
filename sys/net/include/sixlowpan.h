@@ -34,7 +34,7 @@
  *
  *
  * @{
- * @file        sixlowpan.h
+ * @file
  * @brief       6lowpan link layer and lowpan functions
  *
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>

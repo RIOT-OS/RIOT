@@ -9,7 +9,7 @@
 /**
  * @{
  *
- * @file    tests-ipv6_addr.c
+ * @file
  */
 #include <errno.h>
 #include <stdint.h>

@@ -10,7 +10,7 @@
  * @ingroup     sys_crypto
  * @{
  *
- * @file        rc5.h
+ * @file
  * @brief       Headers for the implementation of the RC5 Cipher-Algorithm
  *
  * @author      Freie Universitaet Berlin, Computer Systems & Telematics

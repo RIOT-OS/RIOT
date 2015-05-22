@@ -10,7 +10,7 @@
  * @addtogroup  unittests
  * @{
  *
- * @file        tests-ipv6_nc.h
+ * @file
  * @brief       Unittests for the ``ipv6_nc`` module
  *
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>

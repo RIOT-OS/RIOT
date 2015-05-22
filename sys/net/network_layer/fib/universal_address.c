@@ -9,7 +9,7 @@
  *
  * @ingroup fib
  * @{
- * @file    universal_address.c
+ * @file
  * @brief   Functions to manage universal address container
  * @author  Martin Landsmann <Martin.Landsmann@HAW-Hamburg.de>
  * @}

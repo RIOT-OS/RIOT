@@ -9,7 +9,7 @@
  *
  * @ingroup chardev
  * @{
- * @file    chardev_thread.c
+ * @file
  * @brief   Runs an infinite loop in a separate thread to handle access to character devices such as uart.
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
  * @}

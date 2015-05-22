@@ -9,7 +9,7 @@
 /**
  * @{
  *
- * @file            ioc.h
+ * @file
  * @brief           CC2538 I/O Control driver
  *
  * @author          Ian Martin <ian@locicontrols.com>

@@ -11,7 +11,7 @@
  * @ingroup     aodvv2
  * @{
  *
- * @file        seqnum.c
+ * @file
  * @brief       aodvv2 sequence number
  *
  * @author      Lotte Steenbrink <lotte.steenbrink@fu-berlin.de>

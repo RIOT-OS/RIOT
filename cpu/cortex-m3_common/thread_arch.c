@@ -10,7 +10,7 @@
  * @ingroup     cpu_cortexm3_common
  * @{
  *
- * @file        thread_arch.c
+ * @file
  * @brief       Implementation of the kernel's architecture dependent thread interface
  *
  * @author      Stefan Pfeiffer <stefan.pfeiffer@fu-berlin.de>

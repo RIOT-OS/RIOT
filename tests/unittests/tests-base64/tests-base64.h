@@ -10,7 +10,7 @@
  * @addtogroup  unittests
  * @{
  *
- * @file        tests-base64.h
+ * @file
  * @brief       Unittests for the ``base64`` module
  *
  * @author      Martin Landsmann <Martin.Landsmann@HAW-Hamburg.de>

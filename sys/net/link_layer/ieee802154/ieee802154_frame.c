@@ -9,7 +9,7 @@
  *
  * @ingroup sixlowpan
  * @{
- * @file    ieee802154_frame.c
+ * @file
  * @brief   IEEE 802.14.4 framing operations
  * @author  Stephan Zeisberg <zeisberg@mi.fu-berlin.de>
  * @author  Oliver Hahm <oliver.hahm@inria.fr>

@@ -13,7 +13,7 @@
  * @ingroup     boards_z1
  * @{
  *
- * @file        board.c
+ * @file
  * @brief       Board specific implementations for the Zolertia Z1
  *
  * @author      Kévin Roussel <Kevin.Roussel@inria.fr>

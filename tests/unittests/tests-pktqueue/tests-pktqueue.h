@@ -10,7 +10,7 @@
  * @addtogroup  unittests
  * @{
  *
- * @file        tests-pktqueue.h
+ * @file
  * @brief       Unittests for the ``pktqueue`` module
  *
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>

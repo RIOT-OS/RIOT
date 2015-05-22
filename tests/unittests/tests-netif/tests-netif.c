@@ -9,7 +9,7 @@
 /**
  * @{
  *
- * @file    tests-netif.c
+ * @file
  */
 #include <errno.h>
 #include <stdint.h>

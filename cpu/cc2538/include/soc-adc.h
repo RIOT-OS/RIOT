@@ -10,7 +10,7 @@
  * @ingroup         cpu_cc2538
  * @{
  *
- * @file            soc-adc.h
+ * @file
  * @brief           CC2538 SOC ADC interface
  *
  * @author          Ian Martin <ian@locicontrols.com>

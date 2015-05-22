@@ -8,7 +8,7 @@
 
 /**
  * @{
- * @file    msg_help.c
+ * @file
  * @brief   Providing implementation for prototypes defined in msg_help.h.
  * @author  Oliver Gesch <oliver.gesch@googlemail.com>
  */

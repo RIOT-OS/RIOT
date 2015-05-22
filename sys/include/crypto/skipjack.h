@@ -10,7 +10,7 @@
  * @ingroup     sys_crypto
  * @{
  *
- * @file        skipjack.h
+ * @file
  * @brief       Headers for the implementation of the SkipJack cipher-algorithm
  *
  * @author      Freie Universitaet Berlin, Computer Systems & Telematics

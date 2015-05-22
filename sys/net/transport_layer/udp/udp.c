@@ -9,7 +9,7 @@
 /**
  * @ingroup udp
  * @{
- * @file    udp.c
+ * @file
  * @brief   UDP implementation
  * @author  Oliver Gesch <oliver.gesch@googlemail.com>
  * @author  Cenk Gündoğan <cnkgndgn@gmail.com>

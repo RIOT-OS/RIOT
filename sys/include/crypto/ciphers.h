@@ -10,7 +10,7 @@
  * @ingroup     sys_crypto
  * @{
  *
- * @file        ciphers.h
+ * @file
  * @brief       Headers for the packet encryption class. They are used to encrypt single packets.
  *
  * @author      Freie Universitaet Berlin, Computer Systems & Telematics

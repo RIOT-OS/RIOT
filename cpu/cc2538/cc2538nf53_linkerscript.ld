@@ -10,7 +10,7 @@
  * @addtogroup      cpu_cc2538
  * @{
  *
- * @file            cc2538nf53_linkerscript.ld
+ * @file
  * @brief           Linker script for the CC2538NF53 and CC2538SF53 model MCUs
  *
  * @author          Ian Martin <ian@locicontrols.com>

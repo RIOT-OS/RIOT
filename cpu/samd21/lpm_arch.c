@@ -10,7 +10,7 @@
  * @ingroup     cpu_samd21
  * @{
  *
- * @file        lpm_arch.c
+ * @file
  * @brief       Implementation of the kernels power management interface
  *
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>

@@ -10,7 +10,7 @@
  * @ingroup     core_arch
  * @{
  *
- * @file        irq_arch.h
+ * @file
  * @brief       Interrupt handling interface for globally en- and disabling interrupts
  *
  * This file acts as a wrapper between the kernels interrupt interface and the architecture

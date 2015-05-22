@@ -10,7 +10,7 @@
  * @addtogroup  core_util
  * @{
  *
- * @file        kernel_macros.h
+ * @file
  * @brief       common macros
  *
  * @author      René Kijewski

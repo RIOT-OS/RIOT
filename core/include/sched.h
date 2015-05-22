@@ -71,7 +71,7 @@
  *
  * @{
  *
- * @file        sched.h
+ * @file
  * @brief       Scheduler API definition
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>

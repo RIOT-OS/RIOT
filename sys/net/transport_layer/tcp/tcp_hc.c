@@ -9,7 +9,7 @@
  *
  * @ingroup transport_layer
  * @{
- * @file    tcp_hc.c
+ * @file
  * @brief   TCP HC
  * @author  Oliver Gesch <oliver.gesch@googlemail.com>
  * @}

@@ -10,7 +10,7 @@
  * @ingroup     cpu_samd21
  * @{
  *
- * @file        syscalls.c
+ * @file
  * @brief       NewLib system calls implementations for samd21
  *
  * @author      Michael Baar <michael.baar@fu-berlin.de>

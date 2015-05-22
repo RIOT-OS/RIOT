@@ -9,7 +9,7 @@
 
 /**
  * @ingroup     cc430
- * @file        cc430-gpioint.c
+ * @file
  * @brief       CC430 GPIO Interrupt Multiplexer implementation
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  */

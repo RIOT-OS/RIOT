@@ -12,7 +12,7 @@
  * @brief       IPv6 over LoW Power wireless Area Networks
  * @{
  *
- * @file        include/sixlowpan/lowpan.h
+ * @file
  * @brief       6LoWPAN LoWPAN layer header
  *
  * @author      Stephan Zeisberg <zeisberg@mi.fu-berlin.de>

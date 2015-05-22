@@ -10,7 +10,7 @@
  * @ingroup     cpu_nrf51822
  * @{
  *
- * @file        rtt.c
+ * @file
  * @brief       Real-time timer driver implementation
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
