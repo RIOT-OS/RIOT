@@ -51,7 +51,7 @@ extern "C" {
  */
 #define CPUID_ID_LEN                    (12)
 
-#define CPUID_ADDR						NVIC_CPUID					
+#define CPUID_ADDR						NVIC_CPUID
 
 /**
  * @name Kernel configuration
@@ -62,13 +62,13 @@ extern "C" {
  * TODO: measure and adjust for the Cortex-M3
  * @{
  */
-#define KERNEL_CONF_STACKSIZE_PRINTF    (1024)
+#define THREAD_EXTRA_STACKSIZE_PRINTF    (1024)
 
-#ifndef KERNEL_CONF_STACKSIZE_DEFAULT
-#define KERNEL_CONF_STACKSIZE_DEFAULT   (1024)
+#ifndef THREAD_STACKSIZE_DEFAULT
+#define THREAD_STACKSIZE_DEFAULT   (1024)
 #endif
 
-#define KERNEL_CONF_STACKSIZE_IDLE      (256)
+#define THREAD_STACKSIZE_IDLE      (256)
 /** @} */
 extern unsigned long CPUipsrGet(void);
 extern int uart_init_testing(uart_t uart, uint32_t baudrate);
