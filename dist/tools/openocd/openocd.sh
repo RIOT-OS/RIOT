@@ -17,17 +17,23 @@
 #
 # The script supports the following actions:
 #
-# flash:        flash a given hexfile to the target.
+# flash:        flash a given hex file to the target.
 #               hexfile is expected in ihex format and is pointed to
 #               by HEXFILE environment variable
 #
 #               options:
-#               HEXFILE: path to the hexfile that is flashed
+#               HEXFILE: path to the hex file that is flashed
+#               PRE_FLASH_CHECK_SCRIPT: a command to run before flashing to
+#               verify the integrity of the image to be flashed. HEXFILE is
+#               passed as an argument to this command.
 #
-# flash-elf:    flash a given elffile to the target.
+# flash-elf:    flash a given ELF file to the target.
 #
 #               options:
-#               ELFFILE: path to the elffile that is flashed
+#               ELFFILE: path to the ELF file that is flashed
+#               PRE_FLASH_CHECK_SCRIPT: a command to run before flashing to
+#               verify the integrity of the image to be flashed. ELFFILE is
+#               passed as an argument to this command.
 #
 # debug:        starts OpenOCD as GDB server in the background and
 #               connects to the server with the GDB client specified by
@@ -38,6 +44,7 @@
 #               TCL_PORT:       port opened for TCL connections
 #               TELNET_PORT:    port opened for telnet connections
 #               TUI:            if TUI!=null, the -tui option will be used
+#               ELFFILE:        path to the ELF file to debug
 #
 # debug-server: starts OpenOCD as GDB server, but does not connect to
 #               to it with any frontend. This might be useful when using
@@ -122,6 +129,14 @@ test_tui() {
 do_flash() {
     test_config
     test_hexfile
+    if [ -n "${PRE_FLASH_CHECK_SCRIPT}" ]; then
+        sh -c "${PRE_FLASH_CHECK_SCRIPT} '${HEXFILE}'"
+        RETVAL=$?
+        if [ $RETVAL -ne 0 ]; then
+            echo "pre-flash checks failed, status=$RETVAL"
+            exit $RETVAL
+        fi
+    fi
     # flash device
     sh -c "${OPENOCD} -f '${OPENOCD_CONFIG}' \
             ${OPENOCD_EXTRA_INIT} \
@@ -144,6 +159,14 @@ do_flash() {
 do_flash_elf() {
     test_config
     test_elffile
+    if [ -n "${PRE_FLASH_CHECK_SCRIPT}" ]; then
+        sh -c "${PRE_FLASH_CHECK_SCRIPT} '${ELFFILE}'"
+        RETVAL=$?
+        if [ $RETVAL -ne 0 ]; then
+            echo "pre-flash checks failed, status=$RETVAL"
+            exit $RETVAL
+        fi
+    fi
     # flash device
     sh -c "${OPENOCD} -f '${OPENOCD_CONFIG}' \
             ${OPENOCD_EXTRA_INIT} \
