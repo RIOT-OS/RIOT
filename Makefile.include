@@ -285,6 +285,16 @@ objdump:
 		exit 1; }
 	$(PREFIX)objdump -S -D -h $(ELFFILE) | less
 
+# Generate an XML file containing all macro definitions and include paths for
+# use in Eclipse CDT
+.PHONY: eclipsesym eclipsesym.xml $(CURDIR)/eclipsesym.xml
+eclipsesym: $(CURDIR)/eclipsesym.xml
+eclipsesym.xml: $(CURDIR)/eclipsesym.xml
+
+$(CURDIR)/eclipsesym.xml:
+	$(AD)printf "%s\n" $(CC) $(CFLAGS) $(INCLUDES) | \
+		$(RIOTBASE)/dist/tools/eclipsesym/cmdline2xml.sh > $@
+
 # Extra make goals for testing and comparing changes.
 include $(RIOTBASE)/Makefile.buildtests
 
