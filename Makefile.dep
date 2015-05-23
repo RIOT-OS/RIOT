@@ -180,6 +180,10 @@ ifneq (,$(filter ng_pktdump,$(USEMODULE)))
   USEMODULE += od
 endif
 
+ifneq (,$(filter ng_slip,$(USEMODULE)))
+  USEMODULE += ng_netbase
+endif
+
 ifneq (,$(filter aodvv2,$(USEMODULE)))
   USEMODULE += vtimer
   USEMODULE += sixlowpan
