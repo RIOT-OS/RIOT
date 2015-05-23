@@ -210,6 +210,12 @@ USEMODULE_INCLUDES_ = $(shell echo $(USEMODULE_INCLUDES) | tr ' ' '\n' | awk '!a
 
 INCLUDES += $(USEMODULE_INCLUDES_:%=-I%)
 
+# import list of provided features
+-include $(RIOTBOARD)/$(BOARD)/Makefile.features
+
+# Export variables used throughout the whole make system:
+include $(RIOTBASE)/Makefile.vars
+
 # The `clean` needs to be serialized before everything else.
 ifneq (, $(filter clean, $(MAKECMDGOALS)))
     all $(BASELIBS) $(USEPKG:%=$(RIOTBASE)/pkg/%/Makefile.include): clean
@@ -282,12 +288,6 @@ objdump:
 
 # Extra make goals for testing and comparing changes.
 include $(RIOTBASE)/Makefile.buildtests
-
-# import list of provided features
--include $(RIOTBOARD)/$(BOARD)/Makefile.features
-
-# Export variables used throughout the whole make system:
-include $(RIOTBASE)/Makefile.vars
 
 # Warn if the selected board and drivers don't provide all needed featues:
 ifneq (, $(filter all, $(if $(MAKECMDGOALS), $(MAKECMDGOALS), all)))
