@@ -68,6 +68,8 @@ defaultrunname  = "default-run"
 # default logging prefix format string
 default_fmt_str = '%(asctime)s - %(levelname)s # %(message)s'
 
+defaultnewline = "NL"
+
 
 class SerCmd(cmd.Cmd):
     """Main class for pyterm based on Python's Cmd class.
@@ -78,7 +80,7 @@ class SerCmd(cmd.Cmd):
 
     def __init__(self, port=None, baudrate=None, toggle=None, tcp_serial=None,
                  confdir=None, conffile=None, host=None, run_name=None,
-                 log_dir_name=None):
+                 log_dir_name=None, newline=None):
         """Constructor.
 
         Args:
@@ -103,6 +105,7 @@ class SerCmd(cmd.Cmd):
         self.host = host
         self.run_name = run_name
         self.log_dir_name = log_dir_name
+        self.newline = newline
 
         if not self.host:
             self.host = defaulthostname
@@ -568,6 +571,8 @@ class SerCmd(cmd.Cmd):
         """Serial or TCP reader.
         """
         output = ""
+        crreceived = False
+        nlreceived = False
         while (1):
             # check if serial port can be accessed.
             try:
@@ -585,13 +590,19 @@ class SerCmd(cmd.Cmd):
                                      % (self.port))
                     self.serial_connect()
                 continue
-            if c == '\n' or c == '\r':
-                self.handle_line(output)
-                output = ""
+            if c == '\r':
+                if (self.newline == "NLCR" and nlreceived) or (self.newline == "CR"):
+                    self.handle_line(output)
+                    output = ""
+            elif c == '\n':
+                if (self.newline == "CRNL" and crreceived) or (self.newline == "NL"):
+                    self.handle_line(output)
+                    output = ""
             else:
                 output += c
-            # sys.stdout.write(c)
-            # sys.stdout.flush()
+
+            crreceived = c == '\r'
+            nlreceived = c == '\n'
 
 
 class PytermProt(Protocol):
@@ -696,11 +707,16 @@ if __name__ == "__main__":
                         help="Log directory name (default is hostname e.g. "
                         "%s/<hostname>)" % defaultdir,
                         default=defaultdir)
+    parser.add_argument("-nl", "--newline",
+                        help="Specify the newline character(s) as a combination "
+                        "of CR and LF. Examples: -nl=LF, -nl=CRLF. "
+                        "(Default is %s)" % defaultnewline,
+                        default=defaultnewline)
     args = parser.parse_args()
 
     myshell = SerCmd(args.port, args.baudrate, args.toggle, args.tcp_serial,
                      args.directory, args.config, args.host, args.run_name,
-                     args.log_dir_name)
+                     args.log_dir_name, args.newline)
     myshell.prompt = ''
 
     if args.server and args.tcp_port:
