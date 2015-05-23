@@ -118,18 +118,22 @@ do_flash() {
     test_config
     test_hexfile
     # flash device
-    ${OPENOCD} -f "${OPENOCD_CONFIG}" \
-            "$@" \
-            -c "tcl_port 0" \
-            -c "telnet_port 0" \
-            -c "gdb_port 0" \
-            -c "init" \
-            -c "targets" \
-            -c "reset halt" \
-            -c "program ${HEXFILE} verify" \
-            -c "reset run" \
-            -c "shutdown"
-    echo "Done flashing"
+    sh -c "${OPENOCD} -f '${OPENOCD_CONFIG}' \
+            ${OPENOCD_EXTRA_INIT} \
+            -c 'tcl_port 0' \
+            -c 'telnet_port 0' \
+            -c 'gdb_port 0' \
+            -c 'init' \
+            -c 'targets' \
+            -c 'reset halt' \
+            ${OPENOCD_PRE_FLASH_CMDS} \
+            -c 'flash write_image erase \"${HEXFILE}\"' \
+            -c 'reset halt' \
+            ${OPENOCD_PRE_VERIFY_CMDS} \
+            -c 'verify_image \"${HEXFILE}\"' \
+            -c 'reset run' \
+            -c 'shutdown'"
+    echo 'Done flashing'
 }
 
 do_debug() {
@@ -138,15 +142,15 @@ do_debug() {
     test_ports
     test_tui
     # start OpenOCD as GDB server
-    ${OPENOCD} -f "${OPENOCD_CONFIG}" \
-            "$@" \
-            -c "tcl_port ${TCL_PORT}" \
-            -c "telnet_port ${TELNET_PORT}" \
-            -c "gdb_port ${GDB_PORT}" \
-            -c "init" \
-            -c "targets" \
-            -c "reset halt" \
-            -l /dev/null &
+    sh -c "${OPENOCD} -f '${OPENOCD_CONFIG}' \
+            ${OPENOCD_EXTRA_INIT} \
+            -c 'tcl_port ${TCL_PORT}' \
+            -c 'telnet_port ${TELNET_PORT}' \
+            -c 'gdb_port ${GDB_PORT}' \
+            -c 'init' \
+            -c 'targets' \
+            -c 'reset halt' \
+            -l /dev/null" &
     # save PID for terminating the server afterwards
     OCD_PID=$?
     # connect to the GDB server
@@ -159,27 +163,27 @@ do_debugserver() {
     test_config
     test_ports
     # start OpenOCD as GDB server
-    ${OPENOCD} -f "${OPENOCD_CONFIG}" \
-            "$@" \
-            -c "tcl_port ${TCL_PORT}" \
-            -c "telnet_port ${TELNET_PORT}" \
-            -c "gdb_port ${GDB_PORT}" \
-            -c "init" \
-            -c "targets" \
-            -c "reset halt"
+    sh -c "${OPENOCD} -f '${OPENOCD_CONFIG}' \
+            ${OPENOCD_EXTRA_INIT} \
+            -c 'tcl_port ${TCL_PORT}' \
+            -c 'telnet_port ${TELNET_PORT}' \
+            -c 'gdb_port ${GDB_PORT}' \
+            -c 'init' \
+            -c 'targets' \
+            -c 'reset halt'"
 }
 
 do_reset() {
     test_config
     # start OpenOCD and invoke board reset
-    ${OPENOCD} -f "${OPENOCD_CONFIG}" \
-            "$@" \
-            -c "tcl_port 0" \
-            -c "telnet_port 0" \
-            -c "gdb_port 0" \
-            -c "init" \
-            -c "reset run" \
-            -c "shutdown"
+    sh -c "${OPENOCD} -f '${OPENOCD_CONFIG}' \
+            ${OPENOCD_EXTRA_INIT} \
+            -c 'tcl_port 0' \
+            -c 'telnet_port 0' \
+            -c 'gdb_port 0' \
+            -c 'init' \
+            -c 'reset run' \
+            -c 'shutdown'"
 }
 
 #
