@@ -16,8 +16,8 @@
  * @author      René Kijewski <rene.kijewski@fu-berlin.de>
  */
 
-#ifndef __RIOT__BOARDS__QEMU_I386__CPU_CONF__H
-#define __RIOT__BOARDS__QEMU_I386__CPU_CONF__H
+#ifndef RIOT__BOARDS__QEMU_I386__CPU_CONF__H
+#define RIOT__BOARDS__QEMU_I386__CPU_CONF__H
 
 #ifdef __cplusplus
 extern "C" {

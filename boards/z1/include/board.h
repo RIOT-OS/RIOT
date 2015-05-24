@@ -7,8 +7,8 @@
  * directory for more details.
  */
 
-#ifndef _Z1_BOARD_H
-#define _Z1_BOARD_H
+#ifndef Z1_BOARD_H
+#define Z1_BOARD_H
 
 /**
  * @defgroup    boards_z1 Zolertia Z1
@@ -36,8 +36,8 @@
 extern "C" {
 #endif
 
-#ifndef __MSP430F2617__
-#define __MSP430F2617__
+#ifndef MSP430F2617__
+#define MSP430F2617__
 #endif
 
 // MSP430 core

@@ -23,8 +23,8 @@
  * @author      Milan Babel <babel@inf.fu-berlin.de>
  */
 
-#ifndef _WSN_BOARD_H
-#define _WSN_BOARD_H
+#ifndef WSN_BOARD_H
+#define WSN_BOARD_H
 
 #include "board-conf.h"
 
@@ -33,8 +33,8 @@ extern "C" {
 #endif
 
 // for correct inclusion of <msp430.h>
-#ifndef __MSP430F1611__
-#define __MSP430F1611__
+#ifndef MSP430F1611__
+#define MSP430F1611__
 #endif
 
 //MSB430 core
