@@ -29,17 +29,27 @@ void ng_sixlowpan_netif_init(void)
 
 void ng_sixlowpan_netif_add(kernel_pid_t pid, uint16_t max_frag_size)
 {
+    ng_sixlowpan_netif_t *free_entry = NULL;
+
     for (int i = 0; i < NG_NETIF_NUMOF; i++) {
         if (sixlow_ifs[i].pid == pid) {
             return;
         }
 
-        if (sixlow_ifs[i].pid == KERNEL_PID_UNDEF) {
-            sixlow_ifs[i].pid = pid;
-            sixlow_ifs[i].max_frag_size = max_frag_size;
-            return;
+        if ((sixlow_ifs[i].pid == KERNEL_PID_UNDEF) && !free_entry) {
+            /* found the first free entry */
+            free_entry = &sixlow_ifs[i];
         }
     }
+
+    if (!free_entry) {
+        DEBUG("ng_sixlowpan_netif_add: couldn't add interface with PID %d: No space left.\n", pid);
+        return;
+    }
+
+    free_entry->pid = pid;
+    free_entry->max_frag_size = max_frag_size;
+    return;
 }
 
 void ng_sixlowpan_netif_remove(kernel_pid_t pid)
