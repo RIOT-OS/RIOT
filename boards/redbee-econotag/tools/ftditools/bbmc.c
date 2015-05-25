@@ -160,7 +160,7 @@ struct layout *find_layout(char *str)
 static uint32_t vendid = 0x0403;
 uint32_t prodid = 0x6010;
 
-#if __APPLE__
+#if APPLE__
 static void restore_ftdi_kext(void)
 {
     system("sudo kextload /System/Library/Extensions/FTDIUSBSerialDriver.kext");
@@ -337,7 +337,7 @@ int main(int argc, char **argv)
                    NULL,
                    NULL,
                    dev_index)) < 0) {
-#if __APPLE__
+#if APPLE__
 
         if ((ret == -5) && (0 == system("sudo kextunload /System/Library/Extensions/FTDIUSBSerialDriver.kext"))) {
             // Try again without the FTDI kext loaded this time
@@ -353,7 +353,7 @@ int main(int argc, char **argv)
         }
 
         if (ret)
-#endif // __APPLE__
+#endif // APPLE__
         {
             fprintf(stderr, "couldn't open dev_index %d, err %d (%s)\n", dev_index, ret, ftdi_get_error_string(&ftdic));
             return EXIT_FAILURE;
