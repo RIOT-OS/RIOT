@@ -326,12 +326,11 @@ static void _send_multicast(kernel_pid_t iface, ng_pktsnip_t *pkt,
                             bool prep_hdr)
 {
     ng_pktsnip_t *netif;
-    kernel_pid_t *ifs;
-    size_t ifnum;
+    kernel_pid_t ifs[NG_NETIF_NUMOF];
 
     if (iface == KERNEL_PID_UNDEF) {
         /* get list of interfaces */
-        ifs = ng_netif_get(&ifnum);
+        size_t ifnum = ng_netif_get(ifs);
 
         /* throw away packet if no one is interested */
         if (ifnum == 0) {

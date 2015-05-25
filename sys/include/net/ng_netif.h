@@ -83,12 +83,12 @@ void ng_netif_remove(kernel_pid_t pid);
 /**
  * @brief   Get all active interfaces.
  *
- * @param[out] size Size of the resulting array.
+ * @param[out] netifs   List of all active interfaces. There is no order ensured.
+ *                      It must at least fit @ref NG_NETIF_NUMOF elements.
  *
- * @return  All active interfaces. If @p size is 0 on return, the return value
- *          is undefined. No order must be ensured.
+ * @return  The number of active interfaces.
  */
-kernel_pid_t *ng_netif_get(size_t *size);
+size_t ng_netif_get(kernel_pid_t *netifs);
 
 /**
  * @brief   Converts a hardware address to a human readable string.
