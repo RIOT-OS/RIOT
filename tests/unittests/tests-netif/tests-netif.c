@@ -29,10 +29,11 @@ static void set_up(void)
 
 static void test_ng_netif_add__KERNEL_PID_UNDEF(void)
 {
-    size_t size = TEST_UINT8;
+    kernel_pid_t ifs[NG_NETIF_NUMOF];
+    size_t size;
 
     TEST_ASSERT_EQUAL_INT(0, ng_netif_add(KERNEL_PID_UNDEF));
-    ng_netif_get(&size);
+    size = ng_netif_get(ifs);
     TEST_ASSERT_EQUAL_INT(0, size);
 }
 
@@ -47,75 +48,75 @@ static void test_ng_netif_add__memfull(void)
 
 static void test_ng_netif_add__success(void)
 {
-    size_t size = TEST_UINT8;
-    kernel_pid_t *res = NULL;
+    kernel_pid_t ifs[NG_NETIF_NUMOF];
+    size_t size;
 
     TEST_ASSERT_EQUAL_INT(0, ng_netif_add(TEST_UINT8));
 
-    res = ng_netif_get(&size);
+    size = ng_netif_get(ifs);
     TEST_ASSERT_EQUAL_INT(1, size);
-    TEST_ASSERT_EQUAL_INT(TEST_UINT8, res[0]);
+    TEST_ASSERT_EQUAL_INT(TEST_UINT8, ifs[0]);
 }
 
 static void test_ng_netif_add__duplicate_entry(void)
 {
-    size_t size = TEST_UINT8;
-    kernel_pid_t *res = NULL;
+    kernel_pid_t ifs[NG_NETIF_NUMOF];
+    size_t size;
 
     for (int i = 0; i < NG_NETIF_NUMOF + 4; i++) {
         TEST_ASSERT_EQUAL_INT(0, ng_netif_add(TEST_UINT8));
     }
 
-    res = ng_netif_get(&size);
+    size = ng_netif_get(ifs);
     TEST_ASSERT_EQUAL_INT(1, size);
-    TEST_ASSERT_EQUAL_INT(TEST_UINT8, res[0]);
+    TEST_ASSERT_EQUAL_INT(TEST_UINT8, ifs[0]);
 }
 
 static void test_ng_netif_remove__KERNEL_PID_UNDEF(void)
 {
-    size_t size = TEST_UINT8;
-    kernel_pid_t *res = NULL;
+    kernel_pid_t ifs[NG_NETIF_NUMOF];
+    size_t size;
 
     test_ng_netif_add__success();
 
     ng_netif_remove(KERNEL_PID_UNDEF);
 
-    res = ng_netif_get(&size);
+    size = ng_netif_get(ifs);
     TEST_ASSERT_EQUAL_INT(1, size);
-    TEST_ASSERT_EQUAL_INT(TEST_UINT8, res[0]);
+    TEST_ASSERT_EQUAL_INT(TEST_UINT8, ifs[0]);
 }
 
 static void test_ng_netif_remove__not_an_if(void)
 {
-    size_t size = TEST_UINT8;
-    kernel_pid_t *res = NULL;
+    kernel_pid_t ifs[NG_NETIF_NUMOF];
+    size_t size;
 
     test_ng_netif_add__success();
 
     ng_netif_remove(TEST_UINT8 + 1);
 
-    res = ng_netif_get(&size);
+    size = ng_netif_get(ifs);
     TEST_ASSERT_EQUAL_INT(1, size);
-    TEST_ASSERT_EQUAL_INT(TEST_UINT8, res[0]);
+    TEST_ASSERT_EQUAL_INT(TEST_UINT8, ifs[0]);
 }
 
 static void test_ng_netif_remove__success(void)
 {
-    size_t size = TEST_UINT8;
+    kernel_pid_t ifs[NG_NETIF_NUMOF];
+    size_t size;
 
     test_ng_netif_add__success();
 
     ng_netif_remove(TEST_UINT8);
 
-    ng_netif_get(&size);
+    size = ng_netif_get(ifs);
     TEST_ASSERT_EQUAL_INT(0, size);
 }
 
 static void test_ng_netif_get__empty(void)
 {
-    size_t size = TEST_UINT8;
-
-    ng_netif_get(&size);
+    kernel_pid_t ifs[NG_NETIF_NUMOF];
+    size_t size = ng_netif_get(ifs);
     TEST_ASSERT_EQUAL_INT(0, size);
 }
 
@@ -123,8 +124,8 @@ static void test_ng_netif_get__empty(void)
  * are gotten regardless */
 static void test_ng_netif_get__success_3_minus_one(void)
 {
-    size_t size = TEST_UINT8;
-    kernel_pid_t *ifs;
+    kernel_pid_t ifs[NG_NETIF_NUMOF];
+    size_t size;
     int count = 0;
 
     for (int i = 0; i < 3; i++) {
@@ -133,7 +134,7 @@ static void test_ng_netif_get__success_3_minus_one(void)
 
     ng_netif_remove(TEST_UINT8 + 1);
 
-    ifs = ng_netif_get(&size);
+    size = ng_netif_get(ifs);
     TEST_ASSERT_EQUAL_INT(2, size);
 
     for (size_t i = 0; i < size; i++) {
@@ -147,13 +148,14 @@ static void test_ng_netif_get__success_3_minus_one(void)
 
 static void test_ng_netif_get__full(void)
 {
-    size_t size = TEST_UINT8;
+    kernel_pid_t ifs[NG_NETIF_NUMOF];
+    size_t size;
 
     for (int i = 0; i < NG_NETIF_NUMOF; i++) {
         TEST_ASSERT_EQUAL_INT(0, ng_netif_add(TEST_UINT8 + i));
     }
 
-    TEST_ASSERT_NOT_NULL(ng_netif_get(&size));
+    size = ng_netif_get(ifs);
     TEST_ASSERT_EQUAL_INT(NG_NETIF_NUMOF, size);
 }
 

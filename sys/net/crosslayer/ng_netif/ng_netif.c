@@ -91,13 +91,17 @@ void ng_netif_remove(kernel_pid_t pid)
     ifs[i] = KERNEL_PID_UNDEF;  /* set in case of i == (NG_NETIF_NUMOF - 1) */
 }
 
-kernel_pid_t *ng_netif_get(size_t *size)
+size_t ng_netif_get(kernel_pid_t *netifs)
 {
-    for (*size = 0;
-         (*size < NG_NETIF_NUMOF) && (ifs[*size] != KERNEL_PID_UNDEF);
-         (*size)++);
+    size_t size = 0;
 
-    return ifs;
+    for (int i = 0; i < NG_NETIF_NUMOF; i++) {
+        if (ifs[i] != KERNEL_PID_UNDEF) {
+            netifs[size++] = ifs[i];
+        }
+    }
+
+    return size;
 }
 
 /** @} */

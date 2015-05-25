@@ -80,14 +80,14 @@ static void test_ipv6_netif_add__success(void)
 
 static void test_netif_add__success_with_ipv6(void)
 {
-    kernel_pid_t *pids;
+    kernel_pid_t pids[NG_NETIF_NUMOF];
     size_t pid_num;
     ng_ipv6_netif_t *entry;
     ng_ipv6_addr_t exp_addr = NG_IPV6_ADDR_ALL_NODES_LINK_LOCAL;
 
     ng_netif_add(DEFAULT_TEST_NETIF);
 
-    TEST_ASSERT_NOT_NULL((pids = ng_netif_get(&pid_num)));
+    TEST_ASSERT_NOT_NULL((pid_num = ng_netif_get(pids)));
     TEST_ASSERT_EQUAL_INT(1, pid_num);
     TEST_ASSERT_EQUAL_INT(DEFAULT_TEST_NETIF, pids[0]);
     TEST_ASSERT_NOT_NULL((entry = ng_ipv6_netif_get(DEFAULT_TEST_NETIF)));

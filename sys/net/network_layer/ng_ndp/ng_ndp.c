@@ -220,10 +220,8 @@ void ng_ndp_retrans_nbr_sol(ng_ipv6_nc_t *nc_entry)
 
         if (nc_entry->iface == KERNEL_PID_UNDEF) {
             timex_t t = { 0, NG_NDP_RETRANS_TIMER };
-            kernel_pid_t *ifs;
-            size_t ifnum;
-
-            ifs = ng_netif_get(&ifnum);
+            kernel_pid_t ifs[NG_NETIF_NUMOF];
+            size_t ifnum = ng_netif_get(ifs);
 
             for (size_t i = 0; i < ifnum; i++) {
                 _send_nbr_sol(ifs[i], &nc_entry->ipv6_addr, &dst);
@@ -413,10 +411,8 @@ kernel_pid_t ng_ndp_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_len,
 
             if (iface == KERNEL_PID_UNDEF) {
                 timex_t t = { 0, NG_NDP_RETRANS_TIMER };
-                kernel_pid_t *ifs;
-                size_t ifnum;
-
-                ifs = ng_netif_get(&ifnum);
+                kernel_pid_t ifs[NG_NETIF_NUMOF];
+                size_t ifnum = ng_netif_get(ifs);
 
                 for (size_t i = 0; i < ifnum; i++) {
                     _send_nbr_sol(ifs[i], next_hop_ip, &dst_sol);

@@ -87,8 +87,8 @@ static void _print_nc_type(ng_ipv6_nc_t *entry)
 static bool _is_iface(kernel_pid_t iface)
 {
 #ifdef MODULE_NG_NETIF
-    size_t numof;
-    kernel_pid_t *ifs = ng_netif_get(&numof);
+    kernel_pid_t ifs[NG_NETIF_NUMOF];
+    size_t numof = ng_netif_get(ifs);
 
     for (size_t i = 0; i < numof; i++) {
         if (ifs[i] == iface) {
