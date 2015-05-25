@@ -7,8 +7,8 @@
  */
 
 /**
- * @defgroup    net_universal_address Universal Address Container
- * @ingroup     net
+ * @defgroup    sys_universal_address Universal Address Container
+ * @ingroup     sys
  * @brief       universal address container
  *
  * @{
@@ -24,6 +24,9 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#include <stdint.h>
+#include <stdlib.h>
 
 #define UNIVERSAL_ADDRESS_SIZE (16)         /**< size of the used addresses in bytes        */
 
