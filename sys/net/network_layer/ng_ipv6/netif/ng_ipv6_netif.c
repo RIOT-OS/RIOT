@@ -333,7 +333,8 @@ static uint8_t _find_by_prefix_unsafe(ng_ipv6_addr_t **res, ng_ipv6_netif_t *ifa
 
         match = ng_ipv6_addr_match_prefix(&(iface->addrs[i].addr), addr);
 
-        if (match < iface->addrs[i].prefix_len) {
+        if (only_unicast && !ng_ipv6_addr_is_multicast(addr) &&
+            (match < iface->addrs[i].prefix_len)) {
             /* match but not of same subnet */
             continue;
         }
