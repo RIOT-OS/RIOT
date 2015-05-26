@@ -13,6 +13,7 @@
 #include <errno.h>
 #include "embUnit.h"
 #include "tests-fib.h"
+#include "vtimer.h"
 
 #include "thread.h"
 #include "ng_fib.h"
@@ -529,6 +530,32 @@ static void test_fib_14_exact_and_prefix_match(void)
     fib_deinit();
 }
 
+static void test_fib_15_get_lifetime(void)
+{
+    timex_t lifetime, now;
+    kernel_pid_t iface_id = 1;
+    char addr_dst[] = "Test address151";
+    char addr_nxt[] = "Test address152";
+    size_t add_buf_size = 16;
+    uint32_t addr_dst_flags = 0x77777777;
+    uint32_t addr_nxt_flags = 0x77777777;
+
+    TEST_ASSERT_EQUAL_INT(0, fib_add_entry(iface_id, (uint8_t *)addr_dst, add_buf_size - 1,
+                          addr_dst_flags, (uint8_t *)addr_nxt, add_buf_size - 1,
+                          addr_nxt_flags, 1000));
+
+    TEST_ASSERT_EQUAL_INT(0, fib_devel_get_lifetime(&lifetime, (uint8_t *)addr_dst, add_buf_size - 1));
+
+    /* assuming some ms passed during these operations... */
+    vtimer_now(&now);
+    timex_t cmp_lifetime = timex_add(now, timex_set(0, 900000));
+    timex_t cmp_max_lifetime = timex_add(now, timex_set(1,1));
+    TEST_ASSERT_EQUAL_INT(1, timex_cmp(lifetime, cmp_lifetime));
+    /* make sure lifetime hasn't grown magically either */
+    TEST_ASSERT_EQUAL_INT(-1, timex_cmp(lifetime, cmp_max_lifetime));
+    fib_deinit();
+}
+
 Test *tests_fib_tests(void)
 {
     fib_init();
@@ -547,6 +574,7 @@ Test *tests_fib_tests(void)
                         new_TestFixture(test_fib_12_get_next_hop_fail),
                         new_TestFixture(test_fib_13_get_next_hop_fail_on_buffer_size),
                         new_TestFixture(test_fib_14_exact_and_prefix_match),
+                        new_TestFixture(test_fib_15_get_lifetime),
     };
 
     EMB_UNIT_TESTCALLER(fib_tests, NULL, NULL, fixtures);
