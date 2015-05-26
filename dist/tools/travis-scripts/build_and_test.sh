@@ -62,21 +62,23 @@ then
         exit $RESULT
     fi
 
-    source ./dist/tools/pr_check/check_labels.sh
-
-    if check_gh_label "Ready for CI build"; then
-        if [ "$BUILDTEST_MCU_GROUP" == "x86" ]
-        then
-            make -C ./tests/unittests all test BOARD=native || exit
-            # TODO:
-            #   Reenable once https://github.com/RIOT-OS/RIOT/issues/2300 is
-            #   resolved:
-            #   - make -C ./tests/unittests all test BOARD=qemu-i386 || exit
-        fi
-        echo -e "\e[0;32mCompile tests will be performed for this pull request\e[0m"
-        ./dist/tools/compile_test/compile_test.py riot/master
-    else
-        echo -e "\e[33;40mCompile tests will be skipped for this pull request\e[0m"
-        exit 1
+    # make travis skip this build if "Ready for CI build" is not set
+    if [ -n "$TRAVIS_PULL_REQUEST" ]; then
+        source ./dist/tools/pr_check/check_labels.sh
+        check_gh_label "Ready for CI build" || {
+            echo -e "\e[33;40mCompile tests will be skipped for this pull request\e[0m"
+            exit 1
+        }
     fi
+
+    if [ "$BUILDTEST_MCU_GROUP" == "x86" ]
+    then
+        make -C ./tests/unittests all test BOARD=native || exit
+        # TODO:
+        #   Reenable once https://github.com/RIOT-OS/RIOT/issues/2300 is
+        #   resolved:
+        #   - make -C ./tests/unittests all test BOARD=qemu-i386 || exit
+    fi
+    echo -e "\e[0;32mCompile tests will be performed for this pull request\e[0m"
+    ./dist/tools/compile_test/compile_test.py riot/master
 fi
