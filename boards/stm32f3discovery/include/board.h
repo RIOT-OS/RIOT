@@ -107,5 +107,5 @@ void board_init(void);
 }
 #endif
 
-#endif /** BOARD_H_ */
+#endif /* BOARD_H_ */
 /** @} */

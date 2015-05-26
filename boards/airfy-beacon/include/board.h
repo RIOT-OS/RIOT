@@ -67,5 +67,5 @@ void board_init(void);
 } /* end extern "C" */
 #endif
 
-#endif /** BOARD_H_ */
+#endif /* BOARD_H_ */
 /** @} */
