@@ -1,0 +1,28 @@
+# this CPU implementation is using the new core/CPU interface
+export CFLAGS += -DCOREIF_NG=1
+
+# export the peripheral drivers to be linked into the final binary
+export USEMODULE += periph
+
+# tell the build system that the CPU depends on the Cortex-M common files
+export USEMODULE += cortex-m4_common
+
+# define path to cortex-m common module, which is needed for this CPU
+export CORTEX_M4_COMMON = $(RIOTCPU)/cortex-m4_common/
+
+# CPU depends on the cortex-m common module, so include it
+include $(CORTEX_M4_COMMON)Makefile.include
+
+# define the linker script to use for this CPU
+export LINKERSCRIPT ?= $(RIOTCPU)/$(CPU)/$(CPU_MODEL)_linkerscript.ld
+
+#export the CPU model
+MODEL = $(shell echo $(CPU_MODEL)|tr 'a-z' 'A-Z')
+export CFLAGS += -DCPU_MODEL_$(MODEL)
+
+# include CPU specific includes
+export INCLUDES += -I$(RIOTCPU)/$(CPU)/include
+
+# add the CPU specific system calls implementations for the linker
+export UNDEF += $(BINDIR)cpu/syscalls.o
+export UNDEF += $(BINDIR)cpu/startup.o
