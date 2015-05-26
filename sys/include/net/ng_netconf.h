@@ -120,6 +120,13 @@ typedef enum {
     NETCONF_OPT_AUTOCCA,            /**< en/disable to check automatically
                                          before sending the channel is clear. */
     /* add more options if needed */
+
+    /**
+     * @brief   maximum number of options defined here
+     *
+     * @note    Interfaces are not meant to respond to that.
+     */
+    NETCONF_OPT_NUMOF,
 } ng_netconf_opt_t;
 
 /**
