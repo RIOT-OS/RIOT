@@ -64,7 +64,7 @@ then
 
     source ./dist/tools/pr_check/check_labels.sh
 
-    if check_gh_label "Ready for CI build"; then
+    if check_gh_label "Ready for CI build" || test "$SKIP_CI_READY_CHECK"="yes"; then
         if [ "$BUILDTEST_MCU_GROUP" == "x86" ]
         then
             make -C ./tests/unittests all test BOARD=native || exit
