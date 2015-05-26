@@ -71,16 +71,16 @@ ng_pktsnip_t *ng_ipv6_ext_build(ng_pktsnip_t *ipv6, ng_pktsnip_t *next,
     ng_pktsnip_t *prev = NULL, *snip;
     ng_ipv6_ext_t *ext;
 
+    if (size < NG_IPV6_EXT_LEN_UNIT) {
+        return NULL;
+    }
+
     if (ipv6 != NULL) {
         LL_SEARCH_SCALAR(ipv6, prev, next, next);
 
         if (prev == NULL) {
             return NULL;
         }
-    }
-
-    if (size < NG_IPV6_EXT_LEN_UNIT) {
-        return NULL;
     }
 
     snip = ng_pktbuf_add(next, NULL, size, NG_NETTYPE_IPV6);
