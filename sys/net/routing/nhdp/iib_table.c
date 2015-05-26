@@ -31,7 +31,6 @@
 #include "nhdp_address.h"
 #include "nhdp_writer.h"
 
-#define ENABLE_DEBUG (0)
 #include "debug.h"
 
 /* Internal variables */

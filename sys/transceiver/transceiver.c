@@ -64,7 +64,6 @@
 #include "ieee802154_frame.h"
 #endif
 
-#define ENABLE_DEBUG (0)
 #if ENABLE_DEBUG
 #undef TRANSCEIVER_STACK_SIZE
 #define TRANSCEIVER_STACK_SIZE      (THREAD_STACKSIZE_MAIN)

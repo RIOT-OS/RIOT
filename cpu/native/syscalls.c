@@ -43,7 +43,6 @@
 
 #include "native_internal.h"
 
-#define ENABLE_DEBUG (0)
 #if ENABLE_DEBUG
 #define LOCAL_DEBUG (1)
 #endif

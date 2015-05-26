@@ -24,7 +24,6 @@
 #include "hwtimer.h"
 #include "arch/hwtimer_arch.h"
 
-#define ENABLE_DEBUG (0)
 #include "debug.h"
 
 extern void (*int_handler)(int);

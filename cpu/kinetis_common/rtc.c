@@ -26,7 +26,6 @@
 #include "periph/rtt.h"
 #include "periph_conf.h"
 
-#define ENABLE_DEBUG (0)
 #include "debug.h"
 
 #if RTC_NUMOF

@@ -8,6 +8,8 @@ BOARD_INSUFFICIENT_RAM := airfy-beacon chronos msb-430 msb-430h pca10000 \
 
 USEMODULE += embunit
 
+export DEBUG_MODULES += cbor ng_ipv6_nc ng_nomac
+
 ifeq (, $(filter tests-%, $(MAKECMDGOALS)))
     UNIT_TESTS := $(foreach d,$(wildcard tests-*/Makefile),$(shell dirname $(d)))
 else

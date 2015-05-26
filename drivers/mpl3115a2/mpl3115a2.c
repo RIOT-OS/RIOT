@@ -26,7 +26,6 @@
 #include "mpl3115a2.h"
 #include "mpl3115a2_reg.h"
 
-#define ENABLE_DEBUG    (0)
 #include "debug.h"
 
 #define I2C_SPEED                  I2C_SPEED_FAST

@@ -23,7 +23,6 @@
 
 #include "malloc.h"
 
-#define ENABLE_DEBUG    (0)
 #include "debug.h"
 
 extern void *sbrk(int incr);

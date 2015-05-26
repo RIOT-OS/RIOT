@@ -29,7 +29,6 @@
 #include "hwtimer.h"
 #include "irq.h"
 
-#define ENABLE_DEBUG (0)
 #include "debug.h"
 
 #define LTC_TIMER_INTERVAL (10 * 1000UL) // 10 ms

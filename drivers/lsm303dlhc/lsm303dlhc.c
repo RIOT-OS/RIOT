@@ -22,7 +22,6 @@
 #include "lsm303dlhc.h"
 #include "lsm303dlhc-internal.h"
 
-#define ENABLE_DEBUG    (0)
 #include "debug.h"
 
 int lsm303dlhc_init(lsm303dlhc_t *dev, i2c_t i2c, gpio_t acc_pin, gpio_t mag_pin,

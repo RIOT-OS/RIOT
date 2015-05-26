@@ -24,7 +24,6 @@
 #include "timex.h"
 #include "vtimer.h"
 
-#define ENABLE_DEBUG    (0)
 #include "debug.h"
 
 #if ENABLE_DEBUG

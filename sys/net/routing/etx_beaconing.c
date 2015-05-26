@@ -34,7 +34,6 @@
 #include "ieee802154_frame.h"
 #include "etx_beaconing.h"
 
-#define ENABLE_DEBUG (0)
 #include "debug.h"
 
 #if ENABLE_DEBUG

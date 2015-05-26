@@ -24,7 +24,6 @@
 #include "reader.h"
 #include "aodv_debug.h"
 
-#define ENABLE_DEBUG (0)
 #include "debug.h"
 
 #define VERBOSE_DEBUG (0)

@@ -137,7 +137,6 @@ extern "C" {
 #define CCNL_DTAG_WFRAG_FLAG_FIRST  0x01
 #define CCNL_DTAG_WFRAG_FLAG_LAST   0x02
 
-#define ENABLE_DEBUG (0)
 #include "debug.h"
 
 // function alias for RIOTs debug infrastructure

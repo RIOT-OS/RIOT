@@ -23,7 +23,6 @@
 #include "at86rf231_spi.h"
 #include "hwtimer.h"
 
-#define ENABLE_DEBUG (0)
 #include "debug.h"
 
 #define _MAX_RETRIES   (100)

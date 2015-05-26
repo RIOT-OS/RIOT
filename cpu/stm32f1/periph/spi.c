@@ -28,7 +28,6 @@
 #include "periph_conf.h"
 #include "board.h"
 
-#define ENABLE_DEBUG (0)
 #include "debug.h"
 
 /* guard file in case no SPI device is defined */

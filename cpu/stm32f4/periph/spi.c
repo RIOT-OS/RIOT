@@ -30,7 +30,6 @@
 #include "sched.h"
 #include "vtimer.h"
 
-#define ENABLE_DEBUG (0)
 #include "debug.h"
 
 /* guard this file in case no SPI device is defined */

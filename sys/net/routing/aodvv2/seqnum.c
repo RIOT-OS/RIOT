@@ -20,7 +20,6 @@
 
 #include "seqnum.h"
 
-#define ENABLE_DEBUG (0)
 #include "debug.h"
 
 static aodvv2_seqnum_t seqnum;

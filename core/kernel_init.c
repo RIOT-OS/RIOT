@@ -33,7 +33,6 @@
 #include "irq.h"
 #include "log.h"
 
-#define ENABLE_DEBUG (0)
 #include "debug.h"
 
 #ifdef MODULE_AUTO_INIT

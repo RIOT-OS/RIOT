@@ -30,7 +30,6 @@
 #include "periph_conf.h"
 #include "periph/timer.h"
 
-#define ENABLE_DEBUG (0)
 #include "debug.h"
 
 #if TIMER_NUMOF

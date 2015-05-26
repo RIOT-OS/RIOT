@@ -20,7 +20,6 @@
 
 #include "pthread.h"
 
-#define ENABLE_DEBUG (0)
 #include "debug.h"
 
 typedef struct __pthread_tls_datum {

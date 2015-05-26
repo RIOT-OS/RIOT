@@ -32,7 +32,6 @@
 #include "serialnumber.h"
 #include "net_help.h"
 
-#define ENABLE_DEBUG    (0)
 #include "debug.h"
 
 #define LLHDR_ICMPV6HDR_LEN             (LL_HDR_LEN + IPV6_HDR_LEN + ICMPV6_HDR_LEN)

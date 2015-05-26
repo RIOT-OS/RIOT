@@ -23,7 +23,6 @@
 #include "isl29020-internal.h"
 #include "periph/i2c.h"
 
-#define ENABLE_DEBUG    (0)
 #include "debug.h"
 
 int isl29020_init(isl29020_t *dev, i2c_t i2c, uint8_t address,

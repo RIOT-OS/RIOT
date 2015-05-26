@@ -21,7 +21,6 @@
 
 #include "priority_queue.h"
 
-#define ENABLE_DEBUG (0)
 #include "debug.h"
 
 void priority_queue_remove(priority_queue_t *root_, priority_queue_node_t *node)

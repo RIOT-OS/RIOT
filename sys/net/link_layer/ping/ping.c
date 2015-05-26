@@ -28,7 +28,6 @@
 #include "timex.h"
 #include "l2_ping.h"
 
-#define ENABLE_DEBUG    (0)
 #include "debug.h"
 
 /*--------------------------------------------------------------------------------------*/

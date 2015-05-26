@@ -18,7 +18,6 @@
 #include "hwtimer.h"
 #include "diskio.h"
 
-#define ENABLE_DEBUG    (0)
 #include "debug.h"
 
 extern unsigned long hwtimer_now(void);

@@ -32,7 +32,6 @@ extern "C" {
 #endif
 
 /** @brief Definition for RIOTs debugging option */
-#define ENABLE_DEBUG (0)
 #include "debug.h"
 
 /**

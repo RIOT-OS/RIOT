@@ -35,7 +35,6 @@
 #include "hwtimer.h"
 #endif
 
-#define ENABLE_DEBUG (0)
 #include "debug.h"
 
 volatile int sched_num_threads = 0;

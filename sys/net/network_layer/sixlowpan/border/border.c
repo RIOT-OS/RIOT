@@ -38,7 +38,6 @@
 
 #include "net_help.h"
 
-#define ENABLE_DEBUG    (0)
 #include "debug.h"
 
 #define READER_STACK_SIZE   (THREAD_STACKSIZE_DEFAULT)

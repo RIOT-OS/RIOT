@@ -27,7 +27,6 @@
 /* guard file in case no RTT device was specified */
 #if RTT_NUMOF
 
-#define ENABLE_DEBUG (0)
 #include "debug.h"
 
 #define RTT_FLAG_RTOFF       ((uint16_t)0x0020)  /**< RTC Operation OFF flag */
