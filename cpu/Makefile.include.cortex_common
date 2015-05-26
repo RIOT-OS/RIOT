@@ -1,6 +1,11 @@
 # This CPU implementation is using the new core/CPU interface:
 export CFLAGS += -DCOREIF_NG=1
 
+# CPU model specifics
+ifeq ($(CORTEX),cortex-m4)
+export CFLAGS_FPU += -mfloat-abi=hard -mfpu=fpv4-sp-d16
+endif
+
 # Tell the build system that the CPU depends on the Cortex-M common files:
 export USEMODULE += $(CORTEX)_common
 
