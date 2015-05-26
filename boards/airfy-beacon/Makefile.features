@@ -1,4 +1,5 @@
 FEATURES_PROVIDED += cpp
+FEATURES_PROVIDED += radio_blemin
 FEATURES_PROVIDED += periph_uart
 FEATURES_PROVIDED += periph_gpio
 FEATURES_PROVIDED += periph_random

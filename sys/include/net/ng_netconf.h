@@ -36,6 +36,8 @@ typedef enum {
                                      *   byte order */
     NETCONF_OPT_IS_CHANNEL_CLR,     /**< check if channel is clear */
     NETCONF_OPT_ADDRESS,            /**< get/set address in host byte order */
+    NETCONF_OPT_ACCESS_ADDRESS,     /**< get/set BLE access address */
+    NETCONF_OPT_ADV_ADDRESS,        /**< get/set BLE advertising address */
 
     /**
      * @brief    get/set long address in host byte order

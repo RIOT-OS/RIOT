@@ -107,6 +107,16 @@ extern "C" {
 /** @} */
 
 /**
+ * @name Radio device configuration
+ *
+ * The radio is not guarded by a NUMOF define, as the radio is selected by its
+ * own module in the build system.
+ * @{
+ */
+#define RADIO_IRQ_PRIO      1
+/** @} */
+
+/**
  * @name SPI configuration
  * @{
  */
