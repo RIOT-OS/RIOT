@@ -18,6 +18,7 @@ fi
 
 BRANCH=${1}
 FILEREGEX='\.([sScHh]|cpp)$'
+EXCLUDE='^(cpu/saml21/include/atmel/)'
 
 # If no branch but an option is given, unset BRANCH.
 # Otherwise, consume this parameter.
@@ -44,6 +45,9 @@ if [ -z "${BRANCH}" ]; then
 else
     FILES="$(git diff ${DIFFFILTER} --name-only ${BRANCH} | grep -E ${FILEREGEX})"
 fi
+
+# filter out negatives
+FILES=$(echo "${FILES}" | grep -v -E ${EXCLUDE})
 
 if [ -z "${FILES}" ]; then
     exit
