@@ -80,15 +80,9 @@ void ng_netif_remove(kernel_pid_t pid)
                 if_handler[j].remove(pid);
             }
 
-            break;
+            return;
         }
     }
-
-    for (; (i < (NG_NETIF_NUMOF - 1)) && (ifs[i + 1] != KERNEL_PID_UNDEF); i++) {
-        ifs[i] = ifs[i + 1];
-    }
-
-    ifs[i] = KERNEL_PID_UNDEF;  /* set in case of i == (NG_NETIF_NUMOF - 1) */
 }
 
 size_t ng_netif_get(kernel_pid_t *netifs)
