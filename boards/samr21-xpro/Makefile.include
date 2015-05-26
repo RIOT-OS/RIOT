@@ -2,9 +2,6 @@
 export CPU = samd21
 export CPU_MODEL = samr21g18a
 
-# TODO: remove once the CPU implementation is stable with -Os
-CFLAGS_OPT = -O0
-
 # set default port depending on operating system
 PORT_LINUX ?= /dev/ttyACM0
 
