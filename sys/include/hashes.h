@@ -19,8 +19,8 @@
  * @author      Christian Mehlis <mehlis@inf.fu-berlin.de>
  */
 
-#ifndef __HASHES_H
-#define __HASHES_H
+#ifndef HASHES_H_
+#define HASHES_H_
 
 #include <stddef.h>
 #include <inttypes.h>
@@ -164,4 +164,4 @@ uint32_t one_at_a_time_hash(const uint8_t *buf, size_t len);
 #endif
 
 /** @} */
-#endif /* __HASHES_H */
+#endif /* HASHES_H_ */
