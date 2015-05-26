@@ -75,7 +75,7 @@ extern "C" {
 #define NG_PROTNUM_IL                   (40)    /**< IL Transport Protocol */
 #define NG_PROTNUM_IPV6                 (41)    /**< IPv6 encapsulation */
 #define NG_PROTNUM_SDRP                 (42)    /**< Source Demand Routing Protocol */
-#define NG_PROTNUM_IPV6_EXT_ROUTE       (43)    /**< Routing Header for IPv6 */
+#define NG_PROTNUM_IPV6_EXT_RH          (43)    /**< Routing Header for IPv6 */
 #define NG_PROTNUM_IPV6_EXT_FRAG        (44)    /**< Fragment Header for IPv6 */
 #define NG_PROTNUM_IDRP                 (45)    /**< Inter-Domain Routing Protocol */
 #define NG_PROTNUM_RSVP                 (46)    /**< Reservation Protocol */
@@ -95,7 +95,7 @@ extern "C" {
 #define NG_PROTNUM_SKIP                 (57)    /**< SKIP */
 #define NG_PROTNUM_ICMPV6               (58)    /**< ICMP for IPv6 */
 #define NG_PROTNUM_IPV6_NONXT           (59)    /**< No Next Header for IPv6 */
-#define NG_PROTNUM_IPV6_EXT_DEST_OPTS   (60)    /**< IPv6 Extension Header:
+#define NG_PROTNUM_IPV6_EXT_DST         (60)    /**< IPv6 Extension Header:
                                                  *   Destination Options */
 #define NG_PROTNUM_CFTP                 (62)    /**< CFTP */
 #define NG_PROTNUM_SAT_EXPAK            (64)    /**< SATNET and Backroom EXPAK */
@@ -168,7 +168,7 @@ extern "C" {
 #define NG_PROTNUM_SCTP                 (132)   /**< Stream Control Transmission Protocol */
 #define NG_PROTNUM_FC                   (133)   /**< Fibre Channel */
 #define NG_PROTNUM_RSVP_E2E_IGNORE      (134)   /**< RSVP-E2E-IGNORE */
-#define NG_PROTNUM_IPV6_EXT_MOB_HDR     (135)   /**< IPv6 Mobility Extension Header */
+#define NG_PROTNUM_IPV6_EXT_MOB         (135)   /**< IPv6 Mobility Extension Header */
 #define NG_PROTNUM_UDPLITE              (136)   /**< UDPLite */
 #define NG_PROTNUM_MPLS_IN_IP           (137)   /**< MPLS-in-IP */
 #define NG_PROTNUM_MANET                (138)   /**< MANET Protocols */

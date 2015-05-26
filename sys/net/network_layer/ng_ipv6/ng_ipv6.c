@@ -78,7 +78,18 @@ void ng_ipv6_demux(kernel_pid_t iface, ng_pktsnip_t *pkt, uint8_t nh)
         case NG_PROTNUM_ICMPV6:
             ng_icmpv6_demux(iface, pkt);
             break;
-        /* TODO: add extension header handling */
+        case NG_PROTNUM_IPV6_EXT_HOPOPT:
+        case NG_PROTNUM_IPV6_EXT_DST:
+        case NG_PROTNUM_IPV6_EXT_RH:
+        case NG_PROTNUM_IPV6_EXT_FRAG:
+        case NG_PROTNUM_IPV6_EXT_AH:
+        case NG_PROTNUM_IPV6_EXT_ESP:
+        case NG_PROTNUM_IPV6_EXT_MOB:
+            if (!ng_ipv6_ext_demux(iface, pkt, nh)) {
+                DEBUG("ipv6: unable to parse extension headers.\n");
+                ng_pktbuf_release(pkt);
+                return;
+            }
         case NG_PROTNUM_IPV6:
             _decapsulate(pkt);
             break;
