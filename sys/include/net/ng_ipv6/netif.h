@@ -412,6 +412,14 @@ static inline bool ng_ipv6_netif_addr_is_non_unicast(const ng_ipv6_addr_t *addr)
 
 }
 
+/**
+ * @brief   Initializes an interface with device-dependent values.
+ *
+ * @note    Must be called after all interfaces were initialized and must not
+ *          be called in an interface's thread (will otherwise hang up).
+ */
+void ng_ipv6_netif_init_by_dev(void);
+
 #ifdef __cplusplus
 }
 #endif
