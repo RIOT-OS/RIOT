@@ -30,7 +30,7 @@
 
 #define SHELL_BUFSIZE       (UART0_BUFSIZE)
 
-static char nomac_stack[KERNEL_CONF_STACKSIZE_DEFAULT];
+static char nomac_stack[THREAD_STACKSIZE_DEFAULT];
 
 int shell_read(void)
 {
