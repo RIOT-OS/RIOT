@@ -114,7 +114,8 @@ extern "C" {
  *
  * @return  Pointer to the packet part that represents the new ng_pktsnip_t.
  * @return  NULL, if no space is left in the packet buffer.
- * @return  NULL, if @p pkt != NULL, @data = `pkt->data`, and @size > `pkt->data`.
+ * @return  NULL, if @p pkt != NULL, @p data = `pkt->data`,
+ *                and @p size > `pkt->data`.
  */
 ng_pktsnip_t *ng_pktbuf_add(ng_pktsnip_t *pkt, void *data, size_t size,
                             ng_nettype_t type);
