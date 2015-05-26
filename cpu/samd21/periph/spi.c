@@ -217,7 +217,7 @@ int spi_release(spi_t dev)
 int spi_transfer_byte(spi_t dev, char out, char *in)
 {
     SercomSpi* spi_dev = 0;
-    int transfered = 0;
+    char tmp;
 
     switch(dev)
     {
@@ -235,18 +235,15 @@ int spi_transfer_byte(spi_t dev, char out, char *in)
 
     while (!spi_dev->INTFLAG.bit.DRE); /* while data register is not empty*/
     spi_dev->DATA.bit.DATA = out;
-    transfered++;
+
+    while (!spi_dev->INTFLAG.bit.RXC); /* while receive is not complete*/
+    tmp = (char)spi_dev->DATA.bit.DATA;
+
     if (in != NULL)
     {
-        while (!spi_dev->INTFLAG.bit.RXC); /* while receive is not complete*/
-        *in = spi_dev->DATA.bit.DATA;
-        transfered++;
+        in[0] = tmp;
     }
-    else
-    {
-        spi_dev->DATA.reg;
-    }
-    return transfered;
+    return 1;
 }
 
 int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length)
