@@ -610,3 +610,19 @@ void fib_print_routes(void)
 
     mutex_unlock(&mtx_access);
 }
+
+#if FIB_DEVEL_HELPER
+int fib_devel_get_lifetime(timex_t *lifetime, uint8_t *dst, size_t dst_size)
+{
+    size_t count = 1;
+    fib_entry_t *entry[count];
+
+    int ret = fib_find_entry(dst, dst_size, &(entry[0]), &count);
+    if (ret == 1 ) {
+        /* only return lifetime of exact matches */
+        *lifetime = entry[0]->lifetime;
+        return 0;
+    }
+    return -EHOSTUNREACH;
+}
+#endif
