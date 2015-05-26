@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2014 Freie Universität Berlin
+ * Copyright (C) 2015 Kaspar Schleiser <kaspar@schleiser.de>
+ *               2014 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -7,25 +8,29 @@
  */
 
 /**
- * @ingroup     cpu_nrf51822
+ * @ingroup     sys_newlib
  * @{
  *
  * @file
- * @brief       NewLib system calls implementations for nRF51822
+ * @brief       Newlib system call implementations
  *
  * @author      Michael Baar <michael.baar@fu-berlin.de>
  * @author      Stefan Pfeiffer <pfeiffer@inf.fu-berlin.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Kaspar Schleiser <kaspar@schleiser.de>
  *
  * @}
  */
 
 #include <errno.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <sys/stat.h>
 #include <sys/unistd.h>
 #include <stdint.h>
 
+#include "cpu.h"
 #include "board.h"
 #include "thread.h"
 #include "kernel.h"
@@ -39,16 +44,16 @@
 #endif
 
 /**
- * manage the heap
+ * @brief manage the heap
  */
 extern char _sheap;                 /* start of the heap */
 extern char _eheap;                 /* end of the heap */
 caddr_t heap_top = (caddr_t)&_sheap + 4;
 
+#ifndef MODULE_UART0
 /**
  * @brief use mutex for waiting on incoming UART chars
  */
-#ifndef MODULE_UART0
 static mutex_t uart_rx_mutex;
 static char rx_buf_mem[STDIO_RX_BUFSIZE];
 static ringbuffer_t rx_buf;
@@ -59,14 +64,15 @@ static ringbuffer_t rx_buf;
  */
 void rx_cb(void *arg, char data)
 {
+#ifndef MODULE_UART0
     (void)arg;
 
-#ifndef MODULE_UART0
     ringbuffer_add_one(&rx_buf, data);
     mutex_unlock(&uart_rx_mutex);
 #else
     if (uart0_handler_pid) {
         uart0_handle_incoming(data);
+
         uart0_notify_thread();
     }
 #endif
@@ -156,26 +162,7 @@ int _getpid(void)
 __attribute__ ((weak))
 int _kill_r(struct _reent *r, int pid, int sig)
 {
-    (void) pid;
-    (void) sig;
     r->_errno = ESRCH;                      /* not implemented yet */
-    return -1;
-}
-
-/**
- * @brief Send a signal to a thread
- *
- * @param[in] pid the pid to send to
- * @param[in] sig the signal to send
- *
- * @return TODO
- */
-__attribute__ ((weak))
-int _kill(int pid, int sig)
-{
-    (void) pid;
-    (void) sig;
-    errno = ESRCH;                         /* not implemented yet */
     return -1;
 }
 
@@ -190,8 +177,6 @@ int _kill(int pid, int sig)
  */
 int _open_r(struct _reent *r, const char *name, int mode)
 {
-    (void) name;
-    (void) mode;
     r->_errno = ENODEV;                     /* not implemented yet */
     return -1;
 }
@@ -215,16 +200,6 @@ int _open_r(struct _reent *r, const char *name, int mode)
  */
 int _read_r(struct _reent *r, int fd, void *buffer, unsigned int count)
 {
-    if (fd != STDIN_FILENO) {
-        r->_errno = EBADF;
-        return -1;
-    }
-
-    r->_errno = 0;
-    if (count == 0) {
-        return 0;
-    }
-
 #ifndef MODULE_UART0
     while (rx_buf.avail == 0) {
         mutex_lock(&uart_rx_mutex);
@@ -254,16 +229,13 @@ int _read_r(struct _reent *r, int fd, void *buffer, unsigned int count)
  */
 int _write_r(struct _reent *r, int fd, const void *data, unsigned int count)
 {
-    if ((fd != STDOUT_FILENO) && (fd != STDERR_FILENO)) {
-        r->_errno = EBADF;
-        return -1;
+    int i = 0;
+
+    while (i < count) {
+        uart_write_blocking(STDIO, ((char*)data)[i++]);
     }
 
-    r->_errno = 0;
-    for (unsigned i = 0; i < count; i++) {
-        uart_write_blocking(STDIO, ((char*)data)[i]);
-    }
-    return count;
+    return i;
 }
 
 /**
@@ -276,7 +248,6 @@ int _write_r(struct _reent *r, int fd, const void *data, unsigned int count)
  */
 int _close_r(struct _reent *r, int fd)
 {
-    (void) fd;
     r->_errno = ENODEV;                     /* not implemented yet */
     return -1;
 }
@@ -293,9 +264,6 @@ int _close_r(struct _reent *r, int fd)
  */
 _off_t _lseek_r(struct _reent *r, int fd, _off_t pos, int dir)
 {
-    (void) fd;
-    (void) pos;
-    (void) dir;
     r->_errno = ENODEV;                     /* not implemented yet */
     return -1;
 }
@@ -311,8 +279,6 @@ _off_t _lseek_r(struct _reent *r, int fd, _off_t pos, int dir)
  */
 int _fstat_r(struct _reent *r, int fd, struct stat * st)
 {
-    (void) fd;
-    (void) st;
     r->_errno = ENODEV;                     /* not implemented yet */
     return -1;
 }
@@ -328,8 +294,6 @@ int _fstat_r(struct _reent *r, int fd, struct stat * st)
  */
 int _stat_r(struct _reent *r, char *name, struct stat *st)
 {
-    (void) name;
-    (void) st;
     r->_errno = ENODEV;                     /* not implemented yet */
     return -1;
 }
@@ -345,12 +309,12 @@ int _stat_r(struct _reent *r, char *name, struct stat *st)
 int _isatty_r(struct _reent *r, int fd)
 {
     r->_errno = 0;
-    if(fd == STDOUT_FILENO || fd == STDERR_FILENO) {
+
+    if(fd == STDIN_FILENO || fd == STDOUT_FILENO || fd == STDERR_FILENO) {
         return 1;
     }
-    else {
-        return 0;
-    }
+
+    return 0;
 }
 
 /**
@@ -363,7 +327,21 @@ int _isatty_r(struct _reent *r, int fd)
  */
 int _unlink_r(struct _reent *r, char* path)
 {
-    (void) path;
     r->_errno = ENODEV;                     /* not implemented yet */
+    return -1;
+}
+
+/**
+ * @brief Send a signal to a thread
+ *
+ * @param[in] pid the pid to send to
+ * @param[in] sig the signal to send
+ *
+ * @return TODO
+ */
+__attribute__ ((weak))
+int _kill(int pid, int sig)
+{
+    errno = ESRCH;                         /* not implemented yet */
     return -1;
 }
