@@ -128,6 +128,15 @@ extern "C" {
 #define SPI_1_PIN_SCK       22
 /** @} */
 
+/**
+ * @name Radio device configuration
+ *
+ * The radio is not guarded by a NUMOF define, as the radio is selected by its
+ * own module in the build system.
+ * @{
+ */
+#define RADIO_IRQ_PRIO      1
+/** @} */
 
 /**
  * @name GPIO configuration
