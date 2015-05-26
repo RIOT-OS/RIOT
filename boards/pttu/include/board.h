@@ -30,17 +30,34 @@
 extern "C" {
 #endif
 
+/**
+ * @brief   VICIntEnClear Alias for compatibility
+ */
 #define VICIntEnClear VICIntEnClr
 
+/**
+ * @brief   Clock initialization part one
+ */
 void init_clks1(void);
+
+/**
+ * @brief   Clock initialization part two
+ */
 void init_clks2(void);
+
+/**
+ * @brief   Jump to clock initialization code
+ */
 void bl_init_clks(void);
 
+/**
+ * @brief   Define the type for the radio packet length for the transceiver
+ */
 typedef uint8_t radio_packet_length_t;
 
 #ifdef __cplusplus
 }
 #endif
 
+#endif /* __BOARD_H */
 /** @} */
-#endif // __BOARD_H
