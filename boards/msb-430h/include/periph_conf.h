@@ -22,4 +22,3 @@
 /* make Travis happy: #ifdef __cplusplus extern "C" { #endif */
 
 #endif /* PERIPH_CONF_H_ */
-#endif /* PERIPH_CONF_H */
