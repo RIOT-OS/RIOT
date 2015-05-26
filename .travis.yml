@@ -14,6 +14,8 @@ env:
     - NPROC_MAX=8 BUILDTEST_MCU_GROUP=cortex_m4
 
 before_install:
+    - source ./dist/tools/pr_check/check_labels.sh
+    - test -z "$TRAVIS_PULL_REQUEST" || test "$BUILDTEST_MCU_GROUP" = "static-tests" || check_gh_label "Ready for CI build" || exit 1
     - sudo apt-get install emdebian-archive-keyring
     - echo 'deb http://ftp.uk.debian.org/emdebian/toolchains wheezy main' | sudo tee /etc/apt/sources.list.d/emdebian.list > /dev/null
 
