@@ -71,9 +71,19 @@ typedef enum {
     DUMMY_HANDLER
 } panic_t;
 
-void cpu_clock_scale(uint32_t source, uint32_t target, uint32_t *prescale);
-
+/**
+ * @brief Buffer size to use by the transceiver
+ */
 #define TRANSCEIVER_BUFFER_SIZE (3)
+
+/**
+ * @brief Configure the CPU's clock system
+ *
+ * @param[in] source    source clock frequency
+ * @param[in] target    target clock frequency
+ * @param[in] prescale  prescaler to use
+ */
+void cpu_clock_scale(uint32_t source, uint32_t target, uint32_t *prescale);
 
 #ifdef __cplusplus
 }

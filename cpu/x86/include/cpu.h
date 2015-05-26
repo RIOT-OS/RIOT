@@ -45,14 +45,22 @@ extern "C" {
 
 /**
  * @brief x86 has architecture specific atomic_cas in x86_atomic.c
+ * @{
  */
 #define ARCH_HAS_ATOMIC_COMPARE_AND_SWAP 1
+/** @} */
 
+/**
+ * @brief Disable interrupts
+ */
 static inline void __attribute__((always_inline)) dINT(void)
 {
     asm volatile ("cli");
 }
 
+/**
+ * @brief Enable interrupts
+ */
 static inline void __attribute__((always_inline)) eINT(void)
 {
     asm volatile ("sti");

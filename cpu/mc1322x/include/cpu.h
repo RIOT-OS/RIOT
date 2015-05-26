@@ -1,5 +1,4 @@
 /*
- * cpu.h - mc1322x specific definitions
  * Copyright (C) 2013 Oliver Hahm <oliver.hahm@inria.fr>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
@@ -25,12 +24,26 @@
 extern "C" {
 #endif
 
-extern uintptr_t __stack_start;     ///< end of user stack memory space
+/**
+ * @brief   End of user stack memory
+ */
+extern uintptr_t __stack_start;
+
+/**
+ * @brief   Install a interrupt service routine
+ *
+ * @param[in] int_number    interrupt source
+ * @param[in] handler_addr  interrupt function
+ * @param[in] priority      interrupt priority
+ *
+ * @return                  true on success
+ * @return                  false on error
+ */
 bool install_irq(int int_number, void *handler_addr, int priority);
 
 #ifdef __cplusplus
 }
 #endif
 
-/** @} */
 #endif /* CPU_H */
+/** @} */

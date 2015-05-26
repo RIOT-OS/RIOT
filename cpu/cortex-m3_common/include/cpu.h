@@ -43,8 +43,13 @@
 extern "C" {
 #endif
 
+/**
+ * @brief   Deprecated interrupt control function for backward compatibility
+ * @{
+ */
 #define eINT            enableIRQ
 #define dINT            disableIRQ
+/** @} */
 
 /**
  * @brief Initialization of the CPU

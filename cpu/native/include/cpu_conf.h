@@ -20,49 +20,65 @@
 extern "C" {
 #endif
 
-/* TODO: tighten stack sizes */
+/**
+ * @brief   CPU specific default stack sizes
+ *
+ * TODO: tighten stack sizes
+ *
+ * @{
+ */
 #ifdef __MACH__ /* OSX */
-#define THREAD_STACKSIZE_DEFAULT       (163840)
-#define THREAD_STACKSIZE_IDLE          (163840)
-#define THREAD_EXTRA_STACKSIZE_PRINTF        (163840)
-#define THREAD_EXTRA_STACKSIZE_PRINTF_FLOAT  (163840)
+#define THREAD_STACKSIZE_DEFAULT            (163840)
+#define THREAD_STACKSIZE_IDLE               (163840)
+#define THREAD_EXTRA_STACKSIZE_PRINTF       (163840)
+#define THREAD_EXTRA_STACKSIZE_PRINTF_FLOAT (163840)
 /* for core/include/thread.h */
-#define THREAD_STACKSIZE_MINIMUM              (163840)
+#define THREAD_STACKSIZE_MINIMUM            (163840)
 /* undefine the TRANSCEIVER_STACK_SIZE (2048 or 512) defined in transceiver.h */
 #ifdef TRANSCEIVER_STACK_SIZE
 #undef TRANSCEIVER_STACK_SIZE
 #endif
-#define TRANSCEIVER_STACK_SIZE          (163840)
+#define TRANSCEIVER_STACK_SIZE              (163840)
 /* native internal */
-#define THREAD_STACKSIZE_MINIMUM              (163840)
-#define NATIVE_ISR_STACKSIZE            (163840)
+#define THREAD_STACKSIZE_MINIMUM            (163840)
+#define NATIVE_ISR_STACKSIZE                (163840)
 
 #else /* Linux etc. */
-#define THREAD_STACKSIZE_DEFAULT       (8192)
-#define THREAD_STACKSIZE_IDLE          (8192)
-#define THREAD_EXTRA_STACKSIZE_PRINTF        (8192)
-#define THREAD_EXTRA_STACKSIZE_PRINTF_FLOAT  (8192)
+#define THREAD_STACKSIZE_DEFAULT            (8192)
+#define THREAD_STACKSIZE_IDLE               (8192)
+#define THREAD_EXTRA_STACKSIZE_PRINTF       (8192)
+#define THREAD_EXTRA_STACKSIZE_PRINTF_FLOAT (8192)
 /* for core/include/thread.h */
-#define THREAD_STACKSIZE_MINIMUM              (8192)
+#define THREAD_STACKSIZE_MINIMUM            (8192)
 /* undefine the TRANSCEIVER_STACK_SIZE (2048 or 512) defined in transceiver.h */
 #ifdef TRANSCEIVER_STACK_SIZE
 #undef TRANSCEIVER_STACK_SIZE
 #endif
-#define TRANSCEIVER_STACK_SIZE          (16384)
+#define TRANSCEIVER_STACK_SIZE              (16384)
 /* native internal */
-#define NATIVE_ISR_STACKSIZE            (8192)
+#define NATIVE_ISR_STACKSIZE                (8192)
 #endif /* OS */
+/** @} */
 
+/**
+ * @brief   UART0 buffer size definition for compatibility reasons
+ *
+ * TODO: remove once the remodeling of the uart0 driver is done
+ * @{
+ */
 #ifdef UART0_BUFSIZE
 #undef UART0_BUFSIZE
 #endif
-#define UART0_BUFSIZE                   (128)
+#define UART0_BUFSIZE                       (128)
+/** @} */
 
-/* for nativenet */
+/**
+ * @brief   Native internal Ethernet protocol number
+ */
 #define NATIVE_ETH_PROTO 0x1234
 
 /**
- * @brief   length of CPU ID for @ref cpu_id_get() in @ref periph/cpuid.h
+ * @brief   Length of CPU ID for @ref cpu_id_get() in @ref periph/cpuid.h
  */
 #ifndef CPUID_ID_LEN
 #define CPUID_ID_LEN                    (4)
