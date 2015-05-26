@@ -47,6 +47,11 @@ unsigned _native_rng_seed = 0;
 int _native_rng_mode = 0;
 const char *_native_unix_socket_path = NULL;
 
+#ifdef MODULE_NG_NATIVENET
+#include "dev_eth_tap.h"
+extern dev_eth_tap_t dev_eth_tap;
+#endif
+
 /**
  * initialize _native_null_in_pipe to allow for reading from stdin
  * @param stdiotype: "stdio" (only initialize pipe) or any string
@@ -192,7 +197,7 @@ void usage_exit(void)
 {
     real_printf("usage: %s", _progname);
 
-#ifdef MODULE_NATIVENET
+#if defined(MODULE_NATIVENET) || defined(MODULE_NG_NATIVENET)
     real_printf(" <tap interface>");
 #endif
 
@@ -252,7 +257,7 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
     int replay = 0;
 #endif
 
-#ifdef MODULE_NATIVENET
+#if defined(MODULE_NATIVENET) || defined(MODULE_NG_NATIVENET)
     if (
             (argc < 2)
             || (
@@ -366,6 +371,12 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
     native_interrupt_init();
 #ifdef MODULE_NATIVENET
     tap_init(argv[1]);
+#endif
+#ifdef MODULE_NG_NATIVENET
+# ifdef MODULE_NATIVENET
+#  error  "Modules nativenet and ng_native are mutually exclusive."
+# endif
+    dev_eth_tap_setup(&dev_eth_tap, argv[1]);
 #endif
 
     board_init();

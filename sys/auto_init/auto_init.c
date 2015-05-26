@@ -103,6 +103,11 @@
 #include "net/ng_udp.h"
 #endif
 
+#ifdef MODULE_DEV_ETH_AUTOINIT
+#include "net/dev_eth.h"
+#include "dev_eth_autoinit.h"
+#endif
+
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
