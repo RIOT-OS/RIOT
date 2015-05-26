@@ -34,7 +34,7 @@
 #include "net/dev_eth.h"
 #include "dev_eth_autoinit.h"
 
-#define ENABLE_DEBUG 1
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 kernel_pid_t handler_pid = KERNEL_PID_UNDEF;
@@ -75,6 +75,7 @@ void dev_eth_rx_handler(dev_eth_t *dev) {
 void dev_eth_linkstate_handler(dev_eth_t *dev, int newstate)
 {
     DEBUG("dev_eth: dev=0x%08x link %s\n", (unsigned)dev, newstate ? "UP" : "DOWN");
+    (void)dev; (void)newstate;
 }
 
 int main(void)

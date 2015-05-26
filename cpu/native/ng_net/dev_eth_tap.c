@@ -118,6 +118,9 @@ static int _recv(dev_eth_t *dev_eth, char *buf, int len) {
                   "That's not me => Dropped\n",
                   hdr->dst[0], hdr->dst[1], hdr->dst[2],
                   hdr->dst[3], hdr->dst[4], hdr->dst[5]);
+#ifdef __MACH__
+            kill(_sigio_child_pid, SIGCONT);
+#endif
             return 0;
         }
         /* work around lost signals */
@@ -139,7 +142,7 @@ static int _recv(dev_eth_t *dev_eth, char *buf, int len) {
         }
         else {
 #ifdef __MACH__
-            kill(_sigio_child_pid, SIGCONT);
+        kill(_sigio_child_pid, SIGCONT);
 #endif
         }
 
