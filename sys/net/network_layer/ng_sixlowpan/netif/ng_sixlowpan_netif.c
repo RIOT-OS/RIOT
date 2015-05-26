@@ -17,6 +17,9 @@
 #include "net/ng_netif.h"
 #include "net/ng_sixlowpan/netif.h"
 
+#define ENABLE_DEBUG    (0)
+#include "debug.h"
+
 static ng_sixlowpan_netif_t sixlow_ifs[NG_NETIF_NUMOF];
 
 void ng_sixlowpan_netif_init(void)
