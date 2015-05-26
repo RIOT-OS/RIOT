@@ -34,4 +34,4 @@ void set_rts(int val);
 void set_dtr(int val);
 void change_baud(const char *baud_name);
 
-#endif // SERIAL_H_
+#endif /*  SERIAL_H_ */

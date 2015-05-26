@@ -27,4 +27,4 @@ void change_baud(const char *baud_name);
 */
 void signal_terminal(void);
 
-#endif // LPC2K_PGM
+#endif /*  LPC2K_PGM */

@@ -56,13 +56,13 @@ extern "C" {
 #define FIFOSIZE        8
 
 /* SSP select pin */
-#define SSP0_SEL        1 << 21 //P1.21 SMB380
+#define SSP0_SEL        1 << 21 /* P1.21 SMB380 */
 
-#define SSP0_SELN       1 << 16 //P0.16 Nanotron
+#define SSP0_SELN       1 << 16 /* P0.16 Nanotron */
 
 /* SSP1 external interrupt Pin (SMB380 specific) */
-#define SMB380_INT1     1 << 1  //P0.1
-#define BMA180_INT1     1 << 8  //P2.8
+#define SMB380_INT1     1 << 1  /* P0.1 */
+#define BMA180_INT1     1 << 8  /* P2.8 */
 
 
 

@@ -34,9 +34,9 @@ extern "C" {
 
 #define MSG_TYPE_SMB380_WAKEUP          814
 
-#define SMB380_X_AXIS               0   //X Axis-Name
-#define SMB380_Y_AXIS               1   //Y Axis-Name
-#define SMB380_Z_AXIS               2   //Z Axis-Name
+#define SMB380_X_AXIS               0   /* X Axis-Name */
+#define SMB380_Y_AXIS               1   /* Y Axis-Name */
+#define SMB380_Z_AXIS               2   /* Z Axis-Name */
 
 #define LPM_PREVENT_SLEEP_ACCSENSOR     BIT2
 
@@ -47,8 +47,8 @@ enum SMB380_MODE {
     SMB380_THRESHOLD,
     SMB380_FALSEALERT
 };
-//volatile enum SMB380_MODE
-volatile enum SMB380_MODE smb380_mode;// = SMB380_POLL;
+/* volatile enum SMB380_MODE */
+volatile enum SMB380_MODE smb380_mode;/*  = SMB380_POLL; */
 
 /* Writeable values to EEPROM: from 0x0A (control1) to 0x1D (offset_T).
    For writing enable ... flag and add eeprom_offset_address.
@@ -58,32 +58,32 @@ volatile enum SMB380_MODE smb380_mode;// = SMB380_POLL;
 */
 
 #define SMB380_EEPROM_OFFSET                0x20
-//Chip-ID Bit0-2, default: 010b
+/* Chip-ID Bit0-2, default: 010b */
 #define SMB380_CHIP_ID                      0x00
-//Chip-ID mask
+/* Chip-ID mask */
 #define SMB380_CHIP_ID_MASK                 0x07
-//ml_version Bit0-3 ; al_version Bit4-7
+/* ml_version Bit0-3 ; al_version Bit4-7 */
 #define SMB380_AL_ML_VERSION                0x01
 #define SMB380_AL_MASK                      0xF0
 #define SMB380_ML_MASK                      0x0F
-//LSB_acc_x Bit6-7; new_data_x Bit0
+/* LSB_acc_x Bit6-7; new_data_x Bit0 */
 #define SMB380_ACC_X_LSB_NEWDATA            0x02
-//MSB_acc_x Bit0-7
+/* MSB_acc_x Bit0-7 */
 #define SMB380_ACC_X_MSB                    0x03
-//LSB_acc_y Bit6-7; new_data_y Bit0
+/* LSB_acc_y Bit6-7; new_data_y Bit0 */
 #define SMB380_ACC_Y_LSB_NEWDATA            0x04
-//MSB_acc_y Bit0-7
+/* MSB_acc_y Bit0-7 */
 #define SMB380_ACC_Y_MSB                    0x05
-//LSB_acc_z Bit6-7; new_data_z Bit0
+/* LSB_acc_z Bit6-7; new_data_z Bit0 */
 #define SMB380_ACC_Z_LSB_NEWDATA            0x06
-//MSB_acc_z Bit0-7
+/* MSB_acc_z Bit0-7 */
 #define SMB380_ACC_Z_MSB                    0x07
 #define SMB380_ACC_LSB_MASK                 0xC0
 #define SMB380_ACC_MSB_MASK                 0xFF
 #define SMB380_ACC_NEWDATA_MASK             0x01
-//Temperature Bit0-7
+/* Temperature Bit0-7 */
 #define SMB380_TEMP                         0x08
-//Status register, contains six flags
+/* Status register, contains six flags */
 #define SMB380_STATUS                       0x09
 #define SMB380_STATUS_ST_RESULT_MASK        0x80
 #define SMB380_STATUS_ALERT_PHASE_MASK      0x10
@@ -91,7 +91,7 @@ volatile enum SMB380_MODE smb380_mode;// = SMB380_POLL;
 #define SMB380_STATUS_HG_LATCHED_MASK       0x04
 #define SMB380_STATUS_STATUS_LG_MASK        0x02
 #define SMB380_STATUS_STATUS_HG_MASK        0x01
-//Control register - contains seven values, default: x000 0000b
+/* Control register - contains seven values, default: x000 0000b */
 #define SMB380_CONTROL1                     0x0A
 #define SMB380_CONTROL1_RESET_INT_MASK      0x40
 #define SMB380_CONTROL1_UPDATE_MASK         0x20
@@ -100,7 +100,7 @@ volatile enum SMB380_MODE smb380_mode;// = SMB380_POLL;
 #define SMB380_CONTROL1_SELF_TEST_0_MASK    0x04
 #define SMB380_CONTROL1_SOFT_RESET_MASK     0x02
 #define SMB380_CONTROL1_SLEEP_MASK          0x01
-//Control register - contains six values, default: x000 0011b
+/* Control register - contains six values, default: x000 0011b */
 #define SMB380_CONTROL2                     0x0B
 #define SMB380_CONTROL2_ALERT_MASK          0x80
 #define SMB380_CONTROL2_ANY_MOTION_MASK     0x40
@@ -108,30 +108,30 @@ volatile enum SMB380_MODE smb380_mode;// = SMB380_POLL;
 #define SMB380_CONTROL2_COUNTER_LG_MASK     0x0C
 #define SMB380_CONTROL2_ENABLE_HG_MASK      0x02
 #define SMB380_CONTROL2_ENABLE_LG_MASK      0x01
-//default: 20
+/* default: 20 */
 #define SMB380_LG_THRES                     0x0C
-//default: 150
+/* default: 150 */
 #define SMB380_LG_DUR                       0x0D
-//default: 160
+/* default: 160 */
 #define SMB380_HG_THRES                     0x0E
-//default: 150
+/* default: 150 */
 #define SMB380_HG_DUR                       0x0F
-//default: 0
+/* default: 0 */
 #define SMB380_ANY_MOTION_THRES             0x10
-//default: 0000 0000b
+/* default: 0000 0000b */
 #define SMB380_ANY_MOTION_DUR_HYST          0x1
 #define SMB380_ANY_MOTION_DUR_MASK          0xC0
 #define SMB380_ANY_MOTION_DUR_HG_HYST_MASK  0x38
 #define SMB380_ANY_MOTION_DUR_LG_HYST_MASK  0x07
-//default: 162
+/* default: 162 */
 #define SMB380_CUST1                        0x12
-//default: 13
+/* default: 13 */
 #define SMB380_CUST2                        0x13
-//default: xxx0 1110b
+/* default: xxx0 1110b */
 #define SMB380_CONTROL3                     0x14
 #define SMB380_CONTROL3_RANGE_MASK          0x18
 #define SMB380_CONTROL3_BANDWITH_MASK       0x07
-//default: 1000 0000b
+/* default: 1000 0000b */
 #define SMB380_CONTROL4                     0x15
 #define SMB380_CONTROL4_SPI4_MASK           0x80
 #define SMB380_CONTROL4_ENABLE_ADV_INT_MASK 0x40
@@ -171,9 +171,9 @@ volatile enum SMB380_MODE smb380_mode;// = SMB380_POLL;
 #define SMB380_BAND_WIDTH_375HZ             0x04
 #define SMB380_BAND_WIDTH_750HZ             0x05
 #define SMB380_BAND_WIDTH_1500HZ            0x06
-//SMB380_RING_BUFF_SIZE * int16_t (2Byte) * 4 (x,y,z,Temp) = 512 Byte (for 64)
+/* SMB380_RING_BUFF_SIZE * int16_t (2Byte) * 4 (x,y,z,Temp) = 512 Byte (for 64) */
 #define SMB380_RING_BUFF_SIZE               256
-//TODO chsnge size to 2048
+/* TODO chsnge size to 2048 */
 #define SMB380_RING_BUFF_MAX_THREADS        10
 #define SMB380_SAMPLE_RATE_MAX              3000
 
@@ -192,15 +192,15 @@ void SMB380_update_image(void);
  * enable write to 0x16 to 0x3D
  **/
 void SMB380_enable_eeprom_default(void);
-//Example Hysterese function
+/* Example Hysterese function */
 uint8_t SMB380_HystereseFunctionSample(int16_t *value);
 
-//Simple api for single-sample, single thread interrupt mode
+/* Simple api for single-sample, single thread interrupt mode */
 uint8_t SMB380_init_simple(uint16_t samplerate, uint8_t bandwidth,
                            uint8_t range);
 
 
-//Enables Interrupts (normally only once called)
+/* Enables Interrupts (normally only once called) */
 uint8_t SMB380_init(uint8_t (*func)(int16_t *));
 void SMB380_setSampleRate(uint16_t rate);
 uint16_t SMB380_getSampleRate(void);
@@ -214,7 +214,7 @@ uint8_t checkRange(int16_t *value);
 void SMB380_enableEEPROM(void);
 void SMB380_disableEEPROM(void);
 
-// getter
+/*  getter */
 float SMB380_getSampleRatio(void);
 void SMB380_getAcceleration(unsigned char axis, int16_t *pAbs, int16_t *pMg);
 int16_t SMB380_getTemperature(void);
@@ -229,7 +229,7 @@ unsigned char SMB380_readOffsetTemp(uint16_t *offset);
 unsigned char SMB380_readGain(uint16_t *gain);
 unsigned char SMB380_readGainTemp(uint16_t *gain);
 
-// setter
+/*  setter */
 void SMB380_setTempOffset(uint16_t offset, uint8_t EEPROM);
 void SMB380_setWakeUpPause(unsigned char duration);
 void SMB380_setBandWidth(unsigned char bandWidth);
@@ -250,7 +250,7 @@ void SMB380_resetInterruptFlags(void);
 void SMB380_writeOffset(uint16_t *offset, uint8_t EEPROM);
 void SMB380_writeOffsetTemp(uint16_t *offset, uint8_t EEPROM);
 
-// stats
+/*  stats */
 void SMB380_ShowMemory(void);
 void SMB380_Selftest_1(void);
 

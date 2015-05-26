@@ -62,4 +62,4 @@ extern void(*nvm_setsvar)(uint32_t zero_for_awesome);
 }
 #endif
 
-#endif //NVM_H_
+#endif /* NVM_H_ */
