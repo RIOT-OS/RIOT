@@ -65,7 +65,7 @@ typedef struct {
 typedef struct xbee_params {
     uart_t uart;            /**< UART interfaced the device is connected to */
     uint32_t baudrate;      /**< baudrate to use */
-} xbee_params_t;
+} ng_slip_params_t;
 
 /**
  * @brief   Initializes a new @ref net_ng_slip control thread for UART device

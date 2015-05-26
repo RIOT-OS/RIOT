@@ -19,11 +19,13 @@
 #ifndef SLIP_PARAMS_H
 #define SLIP_PARAMS_H
 
+#include "net/ng_slip.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-static xbee_params_t xbee_params[] = {
+static ng_slip_params_t xbee_params[] = {
     {
         .uart = SLIP_UART,
         .baudrate = SLIP_BAUDRATE,
