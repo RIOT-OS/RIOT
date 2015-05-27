@@ -24,6 +24,8 @@
 
 #include <stdint.h>
 
+#include "panic.h"
+
 /**
  * memory markers as defined in the linker script
  */
@@ -80,12 +82,12 @@ void reset_handler(void)
 
 void isr_nmi(void)
 {
-    while (1) {asm ("nop");}
+    core_panic(NMI_HANDLER, "NMI HANDLER");
 }
 
 void isr_hard_fault(void)
 {
-    while (1) {asm ("nop");}
+    core_panic(HARD_FAULT, "HARD FAULT");
 }
 
 /**
@@ -93,7 +95,7 @@ void isr_hard_fault(void)
  */
 void dummy_handler(void)
 {
-    while (1) {asm ("nop");}
+    core_panic(DUMMY_HANDLER, "DUMMY HANDLER");
 }
 
 /* Cortex-M specific interrupt vectors */
