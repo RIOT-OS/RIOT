@@ -109,7 +109,8 @@ void lib_fill_wr_addresses(kernel_pid_t if_pid, struct rfc5444_writer *wr)
         if (lib_elt->if_pid == if_pid) {
             LL_FOREACH(lib_elt->if_addr_list_head, add_tmp) {
                 nhdp_writer_add_addr(wr, add_tmp->address,
-                                     RFC5444_ADDRTLV_LOCAL_IF, RFC5444_LOCALIF_THIS_IF);
+                                     RFC5444_ADDRTLV_LOCAL_IF, RFC5444_LOCALIF_THIS_IF,
+                                     NHDP_METRIC_UNKNOWN, NHDP_METRIC_UNKNOWN);
                 add_tmp->address->in_tmp_table = NHDP_ADDR_TMP_ANY;
             }
             break;
@@ -124,7 +125,8 @@ void lib_fill_wr_addresses(kernel_pid_t if_pid, struct rfc5444_writer *wr)
                 if (!NHDP_ADDR_TMP_IN_ANY(add_tmp->address)) {
                     /* Address can be added */
                     nhdp_writer_add_addr(wr, add_tmp->address,
-                                         RFC5444_ADDRTLV_LOCAL_IF, RFC5444_LOCALIF_OTHER_IF);
+                                         RFC5444_ADDRTLV_LOCAL_IF, RFC5444_LOCALIF_OTHER_IF,
+                                         NHDP_METRIC_UNKNOWN, NHDP_METRIC_UNKNOWN);
                     add_tmp->address->in_tmp_table = NHDP_ADDR_TMP_ANY;
                 }
             }

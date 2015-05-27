@@ -36,6 +36,9 @@
 struct rfc5444_reader reader;
 static mutex_t mtx_packet_handler = MUTEX_INIT;
 
+static iib_link_set_entry_t *originator_link_tuple = NULL;
+static uint32_t lt_metric_val = NHDP_METRIC_UNKNOWN;
+
 static kernel_pid_t if_pid;
 static uint64_t val_time;
 static uint64_t int_time;
@@ -43,6 +46,8 @@ static uint8_t sym = 0;
 static uint8_t lost = 0;
 
 /* Internal function prototypes */
+static enum rfc5444_result _nhdp_pkt_end_cb(struct rfc5444_reader_tlvblock_context *context,
+                                            bool dropped);
 static enum rfc5444_result _nhdp_blocktlv_msg_cb(struct rfc5444_reader_tlvblock_context *cont);
 static enum rfc5444_result _nhdp_blocktlv_address_cb(struct rfc5444_reader_tlvblock_context *cont);
 static enum rfc5444_result _nhdp_msg_end_cb(struct rfc5444_reader_tlvblock_context *cont,
@@ -50,6 +55,7 @@ static enum rfc5444_result _nhdp_msg_end_cb(struct rfc5444_reader_tlvblock_conte
 static enum rfc5444_result check_msg_validity(struct rfc5444_reader_tlvblock_context *cont);
 static enum rfc5444_result check_addr_validity(nhdp_addr_t *addr);
 static nhdp_addr_t *get_nhdp_db_addr(uint8_t *addr, uint8_t prefix);
+static void add_temp_metric_value(nhdp_addr_t *address);
 static void process_temp_tables(void);
 
 /* Array containing the processable message TLVs for HELLO messages */
@@ -63,6 +69,14 @@ static struct rfc5444_reader_tlvblock_consumer_entry _nhdp_addr_tlvs[] = {
     [RFC5444_ADDRTLV_LOCAL_IF] = { .type = RFC5444_ADDRTLV_LOCAL_IF },
     [RFC5444_ADDRTLV_LINK_STATUS] = { .type = RFC5444_ADDRTLV_LINK_STATUS },
     [RFC5444_ADDRTLV_OTHER_NEIGHB] = { .type = RFC5444_ADDRTLV_OTHER_NEIGHB },
+    [RFC5444_ADDRTLV_LINK_METRIC] = { .type = RFC5444_ADDRTLV_LINK_METRIC, .type_ext = NHDP_METRIC,
+                                      .match_type_ext = true, .min_length = 0x02,
+                                      .max_length = 0x02, .match_length = true },
+};
+
+/* oonf_api packet consumer used for RFC5444 packet consumption */
+static struct rfc5444_reader_tlvblock_consumer _nhdp_packet_consumer = {
+    .end_callback = _nhdp_pkt_end_cb,
 };
 
 /* oonf_api message consumer used for HELLO message consumption */
@@ -88,6 +102,9 @@ void nhdp_reader_init(void)
 {
     /* Initialize reader */
     rfc5444_reader_init(&reader);
+
+    /* Register packet consumer for sequence number processing */
+    rfc5444_reader_add_packet_consumer(&reader, &_nhdp_packet_consumer, NULL, 0);
 
     /* Register HELLO message consumer */
     rfc5444_reader_add_message_consumer(&reader, &_nhdp_msg_consumer,
@@ -121,6 +138,25 @@ void nhdp_reader_cleanup(void)
 /*------------------------------------------------------------------------------------*/
 /*                                Internal functions                                  */
 /*------------------------------------------------------------------------------------*/
+
+/**
+ * Process metric steps for packet with packet sequence number
+ * Called by oonf_api after the whole packet was processed
+ */
+static enum rfc5444_result _nhdp_pkt_end_cb(struct rfc5444_reader_tlvblock_context *context,
+                                            bool dropped __attribute__((unused)))
+{
+    /* Process metric changes */
+    if ((originator_link_tuple != NULL) && (context->has_pktseqno)) {
+        iib_process_metric_pckt(originator_link_tuple, lt_metric_val, context->pkt_seqno);
+    }
+
+    /* Reset originator temp fields */
+    originator_link_tuple = NULL;
+    lt_metric_val = NHDP_METRIC_UNKNOWN;
+
+    return RFC5444_OKAY;
+}
 
 /**
  * Handle one address and its corresponding TLVs
@@ -186,12 +222,24 @@ _nhdp_blocktlv_address_cb(struct rfc5444_reader_tlvblock_context *cont)
             }
         }
 
+        if (lt_metric_val == NHDP_METRIC_UNKNOWN
+            && _nhdp_addr_tlvs[RFC5444_ADDRTLV_LINK_METRIC].tlv != NULL) {
+            /* Determine our outgoing link metric value to the originator interface */
+            uint16_t metric_enc = *((uint16_t*)_nhdp_addr_tlvs[RFC5444_ADDRTLV_LINK_METRIC]
+                                                      .tlv->single_value);
+            if (metric_enc & NHDP_KD_LM_INC) {
+                /* Incoming metric value at the neighbor if is outgoing value for our if */
+                lt_metric_val = rfc5444_metric_decode(metric_enc);
+            }
+        }
+
         /* Address is one of our own addresses, ignore it */
         nhdp_decrement_addr_usage(current_addr);
     }
     else if (_nhdp_addr_tlvs[RFC5444_ADDRTLV_LINK_STATUS].tlv) {
         switch (*_nhdp_addr_tlvs[RFC5444_ADDRTLV_LINK_STATUS].tlv->single_value) {
             case RFC5444_LINKSTATUS_SYMMETRIC:
+                add_temp_metric_value(current_addr);
                 current_addr->in_tmp_table = NHDP_ADDR_TMP_TH_SYM_LIST;
                 break;
 
@@ -203,6 +251,7 @@ _nhdp_blocktlv_address_cb(struct rfc5444_reader_tlvblock_context *cont)
                     && *_nhdp_addr_tlvs[RFC5444_ADDRTLV_OTHER_NEIGHB].tlv->single_value
                     == RFC5444_OTHERNEIGHB_SYMMETRIC) {
                     /* Symmetric has higher priority */
+                    add_temp_metric_value(current_addr);
                     current_addr->in_tmp_table = NHDP_ADDR_TMP_TH_SYM_LIST;
                 }
                 else {
@@ -220,6 +269,7 @@ _nhdp_blocktlv_address_cb(struct rfc5444_reader_tlvblock_context *cont)
     else if (_nhdp_addr_tlvs[RFC5444_ADDRTLV_OTHER_NEIGHB].tlv) {
         switch (*_nhdp_addr_tlvs[RFC5444_ADDRTLV_OTHER_NEIGHB].tlv->single_value) {
             case RFC5444_OTHERNEIGHB_SYMMETRIC:
+                add_temp_metric_value(current_addr);
                 current_addr->in_tmp_table = NHDP_ADDR_TMP_TH_SYM_LIST;
                 break;
 
@@ -385,6 +435,20 @@ static nhdp_addr_t *get_nhdp_db_addr(uint8_t *addr, uint8_t prefix)
 }
 
 /**
+ * Add a metric value to the address if a corresponding TLV exists in the message
+ */
+static void add_temp_metric_value(nhdp_addr_t *address)
+{
+    if (_nhdp_addr_tlvs[RFC5444_ADDRTLV_LINK_METRIC].tlv) {
+        uint16_t metric_enc = *((uint16_t*)_nhdp_addr_tlvs[RFC5444_ADDRTLV_LINK_METRIC]
+                                                           .tlv->single_value);
+        if (metric_enc & (NHDP_KD_LM_INC | NHDP_KD_NM_INC)) {
+            address->tmp_metric_val = metric_enc;
+        }
+    }
+}
+
+/**
  * Process address lists from the HELLO msg in the information bases
  */
 static void process_temp_tables(void)
@@ -398,6 +462,10 @@ static void process_temp_tables(void)
     nib_elt = nib_process_hello();
 
     if (nib_elt) {
-        iib_process_hello(if_pid, nib_elt, val_time, sym, lost);
+        originator_link_tuple = iib_process_hello(if_pid, nib_elt, val_time, sym, lost);
+
+        if (originator_link_tuple) {
+            iib_process_metric_msg(originator_link_tuple, int_time != 0 ? int_time : val_time);
+        }
     }
 }

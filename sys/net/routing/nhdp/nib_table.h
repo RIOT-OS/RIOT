@@ -35,6 +35,8 @@ extern "C" {
 typedef struct nib_entry_t {
     nhdp_addr_entry_t *address_list_head;   /**< Pointer to this tuple's addresses*/
     uint8_t symmetric;                      /**< Flag whether sym link to this nb exists */
+    uint32_t metric_in;                     /**< Lowest metric value for incoming link */
+    uint32_t metric_out;                    /**< Lowest metric value for outgoing link */
     struct nib_entry_t *next;               /**< Pointer to next list entry */
 } nib_entry_t;
 

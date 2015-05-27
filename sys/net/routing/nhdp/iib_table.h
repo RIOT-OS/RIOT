@@ -24,6 +24,7 @@
 
 #include "nib_table.h"
 #include "nhdp_address.h"
+#include "nhdp_metric.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -52,6 +53,17 @@ typedef struct iib_link_set_entry_t {
     timex_t exp_time;                           /**< Time at which entry expires */
     nib_entry_t *nb_elt;                        /**< Pointer to corresponding nb tuple */
     enum iib_link_tuple_status_t last_status;   /**< Last processed status of link tuple */
+    uint32_t metric_in;                         /**< Metric value for incoming link */
+    uint32_t metric_out;                        /**< Metric value for outgoing link */
+#if (NHDP_METRIC == NHDP_LMT_DAT)
+    uint8_t dat_received[NHDP_Q_MEM_LENGTH];    /**< Queue for containing sums of rcvd packets */
+    uint8_t dat_total[NHDP_Q_MEM_LENGTH];       /**< Queue for containing sums of xpctd packets */
+    timex_t dat_time;                           /**< Time next HELLO is expected */
+    uint8_t hello_interval;                     /**< Encoded HELLO interval value */
+    uint8_t lost_hellos;                        /**< Lost HELLO count after last received HELLO */
+    uint32_t rx_bitrate;                        /**< Incoming Bitrate for this link in Bit/s */
+    uint16_t last_seq_no;                       /**< The last received packet sequence number */
+#endif
     struct iib_link_set_entry_t *next;          /**< Pointer to next list entry */
 } iib_link_set_entry_t;
 
@@ -62,6 +74,8 @@ typedef struct iib_two_hop_set_entry_t {
     struct iib_link_set_entry_t *ls_elt;        /**< Pointer to corresponding link tuple */
     nhdp_addr_t *th_nb_addr;                    /**< Address of symmetric 2-hop neighbor */
     timex_t exp_time;                           /**< Time at which entry expires */
+    uint32_t metric_in;                         /**< Metric value for incoming link */
+    uint32_t metric_out;                        /**< Metric value for outgoing link */
     struct iib_two_hop_set_entry_t *next;       /**< Pointer to next list entry */
 } iib_two_hop_set_entry_t;
 
@@ -100,10 +114,12 @@ int iib_register_if(kernel_pid_t pid);
  * @param[in] is_sym_nb     Flag whether the link to the originator is symmetric
  * @param[in] is_lost       Flag whether the originator marked this link as lost
  *
- * @return                  0 on success
+ * @return                  Pointer to the new or updated Link Tuple
+ * @return                  NULL on error
  */
-int iib_process_hello(kernel_pid_t if_pid, nib_entry_t *nb_elt,
-                      uint64_t validity_time, uint8_t is_sym_nb, uint8_t is_lost);
+iib_link_set_entry_t *iib_process_hello(kernel_pid_t if_pid, nib_entry_t *nb_elt,
+                                        uint64_t validity_time, uint8_t is_sym_nb,
+                                        uint8_t is_lost);
 
 /**
  * @brief                   Add addresses to the currently constructed HELLO message
@@ -136,6 +152,34 @@ void iib_update_lt_status(timex_t *now);
  * @param[in] new_entry     Pointer to the new corresponding Neighbor Tuple
  */
 void iib_propagate_nb_entry_change(nib_entry_t *old_entry, nib_entry_t *new_entry);
+
+/**
+ * @brief                   Process steps for the chosen NHDP metric for a message
+ *
+ * @note
+ * Must not be called from outside the NHDP reader's message processing.
+ *
+ * @param[in] ls_entry      Pointer to the Link Tuple that needs to be updated
+ * @param[in] int_time      Interval time in milliseconds for the originator's HELLO
+ */
+void iib_process_metric_msg(iib_link_set_entry_t *ls_entry, uint64_t int_time);
+
+/**
+ * @brief                   Process steps for the chosen NHDP metric for a packet
+ *
+ * @note
+ * Must not be called from outside the NHDP reader's packet processing.
+ *
+ * @param[in] ls_entry      Pointer to the Link Tuple that needs to be updated
+ * @param[in] metric_out    Metric value for outgoing link direction
+ * @param[in] seq_no        The sequence number from the received packet
+ */
+void iib_process_metric_pckt(iib_link_set_entry_t *ls_entry, uint32_t metric_out, uint16_t seq_no);
+
+/**
+ * @brief                   Update metric values for the chosen NHDP metric for all Link Tuples
+ */
+void iib_process_metric_refresh(void);
 
 #ifdef __cplusplus
 }

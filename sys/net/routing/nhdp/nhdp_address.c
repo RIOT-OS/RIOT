@@ -71,6 +71,7 @@ nhdp_addr_t *nhdp_addr_db_get_address(uint8_t *addr, size_t addr_size, uint8_t a
         addr_elt->addr_type = addr_type;
         addr_elt->usg_count = 0;
         addr_elt->in_tmp_table = NHDP_ADDR_TMP_NONE;
+        addr_elt->tmp_metric_val = NHDP_METRIC_UNKNOWN;
         LL_PREPEND(nhdp_addr_db_head, addr_elt);
     }
 
@@ -146,6 +147,7 @@ void nhdp_reset_addresses_tmp_usg(uint8_t decr_usg)
     nhdp_addr_t *addr_elt, *addr_tmp;
 
     LL_FOREACH_SAFE(nhdp_addr_db_head, addr_elt, addr_tmp) {
+        addr_elt->tmp_metric_val = NHDP_METRIC_UNKNOWN;
         if (addr_elt->in_tmp_table) {
             addr_elt->in_tmp_table = NHDP_ADDR_TMP_NONE;
             if (decr_usg) {
