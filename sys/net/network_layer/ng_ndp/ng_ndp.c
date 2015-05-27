@@ -300,6 +300,7 @@ void ng_ndp_netif_add(ng_ipv6_netif_t *iface)
 void ng_ndp_netif_remove(ng_ipv6_netif_t *iface)
 {
     /* TODO */
+    (void) iface;
 }
 
 static ng_ipv6_addr_t *_default_router(void)
