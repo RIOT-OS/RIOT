@@ -39,11 +39,6 @@
 #define SHELL_BUFSIZE           (64U)
 
 /**
- * @brief   Stack for the nomac thread
- */
-static char nomac_stack[THREAD_STACKSIZE_DEFAULT];
-
-/**
  * @brief   Read chars from STDIO
  */
 int shell_read(void)
@@ -64,14 +59,10 @@ void shell_put(int c)
  */
 int main(void)
 {
-    int res;
     shell_t shell;
     ng_netreg_entry_t dump;
 
     puts("netdev ethernet device driver test");
-
-    /* initialize network module(s) */
-    ng_netif_init();
 
     /* initialize and register pktdump */
     dump.pid = ng_pktdump_init();
@@ -83,18 +74,6 @@ int main(void)
     }
 
     ng_netreg_register(NG_NETTYPE_UNDEF, &dump);
-
-    /* initialize netdev_eth layer */
-    ng_netdev_eth_init(&ng_netdev_eth, (dev_eth_t*)&dev_eth_tap);
-
-    /* start MAC layer */
-    res = ng_nomac_init(nomac_stack, sizeof(nomac_stack), THREAD_PRIORITY_MAIN - 3,
-                        "tapnet_l2", (ng_netdev_t *)&ng_netdev_eth);
-
-    if (res < 0) {
-        printf("Error starting nomac thread. res=%i\n", res);
-        return -1;
-    }
 
     /* start the shell */
     shell_init(&shell, NULL, SHELL_BUFSIZE, shell_read, shell_put);
