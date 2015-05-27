@@ -34,7 +34,7 @@ int random_read(char *buf, unsigned int num)
 {
     /* cppcheck-suppress variableScope */
     uint32_t tmp;
-    int count = 0;
+    unsigned int count = 0;
 
     while (count < num) {
         /* wait for random data to be ready to read */
@@ -48,7 +48,7 @@ int random_read(char *buf, unsigned int num)
         }
     }
 
-    return count;
+    return (int)count;
 }
 
 void random_poweron(void)
