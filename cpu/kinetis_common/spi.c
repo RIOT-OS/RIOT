@@ -352,8 +352,11 @@
 /**
  * @brief Array holding one pre-initialized mutex for each hardware SPI device
  */
-/* TODO: Avoid adding duplicate entries with the same index. GCC warns about it
- * but it works. It does look strange in the preprocessed output, however.
+/* We try to avoid adding duplicate entries with the same index by comparing the
+ * SPI_x_INDEX macros, the #if statements become quite long though.
+ *
+ * If not checking for multiple initializations GCC will warn about it
+ * but the binary still works. It does look strange in the preprocessed output, however.
  *
  * The warning message is:
  * warning: initialized field overwritten [-Woverride-init]
@@ -371,25 +374,34 @@ static mutex_t locks[] =  {
 #if SPI_0_EN
     [SPI_0_INDEX] = MUTEX_INIT,
 #endif
-#if SPI_1_EN
+#if SPI_1_EN && (SPI_1_INDEX != SPI_0_INDEX)
     [SPI_1_INDEX] = MUTEX_INIT,
 #endif
-#if SPI_2_EN
+#if SPI_2_EN && (SPI_2_INDEX != SPI_0_INDEX) && (SPI_2_INDEX != SPI_1_INDEX)
     [SPI_2_INDEX] = MUTEX_INIT,
 #endif
-#if SPI_3_EN
+#if SPI_3_EN && (SPI_3_INDEX != SPI_0_INDEX) && (SPI_3_INDEX != SPI_1_INDEX) \
+    && (SPI_3_INDEX != SPI_2_INDEX)
     [SPI_3_INDEX] = MUTEX_INIT,
 #endif
-#if SPI_4_EN
+#if SPI_4_EN && (SPI_4_INDEX != SPI_0_INDEX) && (SPI_4_INDEX != SPI_1_INDEX) \
+    && (SPI_4_INDEX != SPI_2_INDEX) && (SPI_4_INDEX != SPI_3_INDEX)
     [SPI_4_INDEX] = MUTEX_INIT,
 #endif
-#if SPI_5_EN
+#if SPI_5_EN && (SPI_5_INDEX != SPI_0_INDEX) && (SPI_5_INDEX != SPI_1_INDEX) \
+    && (SPI_5_INDEX != SPI_2_INDEX) && (SPI_5_INDEX != SPI_3_INDEX) \
+    && (SPI_5_INDEX != SPI_4_INDEX)
     [SPI_5_INDEX] = MUTEX_INIT,
 #endif
-#if SPI_6_EN
+#if SPI_6_EN && (SPI_6_INDEX != SPI_0_INDEX) && (SPI_6_INDEX != SPI_1_INDEX) \
+    && (SPI_6_INDEX != SPI_2_INDEX) && (SPI_6_INDEX != SPI_3_INDEX) \
+    && (SPI_6_INDEX != SPI_4_INDEX) && (SPI_6_INDEX != SPI_5_INDEX)
     [SPI_6_INDEX] = MUTEX_INIT,
 #endif
-#if SPI_7_EN
+#if SPI_7_EN && (SPI_7_INDEX != SPI_0_INDEX) && (SPI_7_INDEX != SPI_1_INDEX) \
+    && (SPI_7_INDEX != SPI_2_INDEX) && (SPI_7_INDEX != SPI_3_INDEX) \
+    && (SPI_7_INDEX != SPI_4_INDEX) && (SPI_7_INDEX != SPI_5_INDEX) \
+    && (SPI_7_INDEX != SPI_6_INDEX)
     [SPI_7_INDEX] = MUTEX_INIT,
 #endif
 };
