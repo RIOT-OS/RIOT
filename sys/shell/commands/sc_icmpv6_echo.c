@@ -79,11 +79,12 @@ int _handle_reply(ng_pktsnip_t *pkt, uint64_t time)
 
     if ((byteorder_ntohs(icmpv6_hdr->id) == id) &&
         (byteorder_ntohs(icmpv6_hdr->seq) == seq)) {
-        printf("%zu bytes from %s: id=%" PRIu16 " seq=%" PRIu16 " hop limit=%" PRIu8
-               "time = %" PRIu64 ".%03" PRIu64 " ms\n", icmpv6->size,
+        timex_t rt = timex_from_uint64(time);
+        printf("%u bytes from %s: id=%" PRIu16 " seq=%" PRIu16 " hop limit=%" PRIu8
+               " time = %" PRIu32 ".%03" PRIu32 " ms\n", (unsigned) icmpv6->size,
                ng_ipv6_addr_to_str(ipv6_str, &(ipv6_hdr->src), sizeof(ipv6_str)),
                byteorder_ntohs(icmpv6_hdr->id), byteorder_ntohs(icmpv6_hdr->seq),
-               ipv6_hdr->hl, time / MS_IN_USEC, time % MS_IN_USEC);
+               ipv6_hdr->hl, rt.seconds, rt.microseconds);
         ng_ipv6_nc_still_reachable(&ipv6_hdr->src);
     }
     else {
@@ -214,18 +215,16 @@ int _icmpv6_ping(int argc, char **argv)
 
     if (success > 0) {
         printf("%d packets transmitted, %d received, %d%% packet loss, time %"
-               PRIu64 " ms\n", n, success, (success - n) / n,
-               timex_uint64(sum_rtt) / MS_IN_USEC);
-        uint64_t avg_rtt = timex_uint64(sum_rtt) / n;  /* get average */
+               PRIu32 ".03%" PRIu32 " s\n", n, success, (success - n) / n,
+               sum_rtt.seconds, sum_rtt.microseconds);
+        timex_t avg_rtt = timex_from_uint64(timex_uint64(sum_rtt) / n);  /* get average */
         printf("rtt min/avg/max = "
-               "%" PRIu64 ".%03" PRIu64 "/"
-               "%" PRIu64 ".%03" PRIu64 "/"
-               "%" PRIu64 ".%03" PRIu64 " ms\n",
-               timex_uint64(min_rtt) / MS_IN_USEC,
-               timex_uint64(min_rtt) % MS_IN_USEC,
-               avg_rtt / MS_IN_USEC, avg_rtt % MS_IN_USEC,  /* sum is now avg, see above */
-               timex_uint64(max_rtt) / MS_IN_USEC,
-               timex_uint64(max_rtt) % MS_IN_USEC);
+               "%" PRIu32 ".%03" PRIu32 "/"
+               "%" PRIu32 ".%03" PRIu32 "/"
+               "%" PRIu32 ".%03" PRIu32 " ms\n",
+               min_rtt.seconds, min_rtt.microseconds,
+               avg_rtt.seconds, avg_rtt.microseconds,
+               max_rtt.seconds, max_rtt.microseconds);
     }
     else {
         printf("%d packets transmitted, 0 received, 100%% packet loss\n", n);
