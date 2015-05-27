@@ -21,10 +21,6 @@
 #include "cpu.h"
 #include "periph_conf.h"
 
-/**
- * @name Pattern to write into the Coprocessor Access Control Register to allow full FPU access
- */
-#define FULL_FPU_ACCESS         (0x00f00000)
 
 
 static void cpu_clock_init(void);
@@ -34,17 +30,10 @@ static void cpu_clock_init(void);
  */
 void cpu_init(void)
 {
-    /* give full access to the FPU */
-    SCB->CPACR |= (uint32_t)FULL_FPU_ACCESS;
-
-    /* configure the vector table location to internal flash */
-    SCB->VTOR = FLASH_BASE;
-
+    /* initialize the Cortex-M core */
+    cortexm_init();
     /* initialize the clock system */
     cpu_clock_init();
-
-    /* set pendSV interrupt to lowest possible priority */
-    NVIC_SetPriority(PendSV_IRQn, 0xff);
 }
 
 /**
