@@ -240,7 +240,8 @@ int ng_udp_calc_csum(ng_pktsnip_t *hdr, ng_pktsnip_t *pseudo_hdr)
 
 ng_pktsnip_t *ng_udp_hdr_build(ng_pktsnip_t *payload,
                                uint8_t *src, size_t src_len,
-                               uint8_t *dst, size_t dst_len) {
+                               uint8_t *dst, size_t dst_len)
+{
     ng_pktsnip_t *res;
     ng_udp_hdr_t *hdr;
 
