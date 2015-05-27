@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Freie Universität Berlin
+ * Copyright (C) 2014-2015 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,12 +14,12 @@
  * @brief       Startup code and interrupt vector definition
  *
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
  * @}
  */
 
 #include <stdint.h>
-
 
 /**
  * memory markers as defined in the linker script
@@ -33,7 +33,6 @@ extern uint32_t _szero;
 extern uint32_t _ezero;
 extern uint32_t _sstack;
 extern uint32_t _estack;
-
 
 /**
  * @brief functions for initializing the board, std-lib and kernel
@@ -75,26 +74,7 @@ void reset_handler(void)
     kernel_init();
 }
 
-/**
- * @brief Default handler is called in case no interrupt handler was defined
- */
-void dummy_handler(void)
-{
-    while (1) {asm ("nop");}
-}
-
-
 void isr_nmi(void)
-{
-    while (1) {asm ("nop");}
-}
-
-void isr_mem_manage(void)
-{
-    while (1) {asm ("nop");}
-}
-
-void isr_debug_mon(void)
 {
     while (1) {asm ("nop");}
 }
@@ -104,12 +84,10 @@ void isr_hard_fault(void)
     while (1) {asm ("nop");}
 }
 
-void isr_bus_fault(void)
-{
-    while (1) {asm ("nop");}
-}
-
-void isr_usage_fault(void)
+/**
+ * @brief Default handler is called in case no interrupt handler was defined
+ */
+void dummy_handler(void)
 {
     while (1) {asm ("nop");}
 }
@@ -158,15 +136,15 @@ const void *interrupt_vector[] = {
     (void*) reset_handler,          /* entry point of the program */
     (void*) isr_nmi,                /* non maskable interrupt handler */
     (void*) isr_hard_fault,         /* if you end up here its not good */
-    (void*) isr_mem_manage,         /* memory controller interrupt */
-    (void*) isr_bus_fault,          /* also not good to end up here */
-    (void*) isr_usage_fault,        /* autsch */
+    (void*) (0UL),                  /* Reserved */
+    (void*) (0UL),                  /* Reserved */
+    (void*) (0UL),                  /* Reserved */
     (void*) (0UL),                  /* Reserved */
     (void*) (0UL),                  /* Reserved */
     (void*) (0UL),                  /* Reserved */
     (void*) (0UL),                  /* Reserved */
     (void*) isr_svc,                /* system call interrupt */
-    (void*) isr_debug_mon,          /* debug interrupt */
+    (void*) (0UL),                  /* Reserved */
     (void*) (0UL),                  /* Reserved */
     (void*) isr_pendsv,             /* pendSV interrupt, used for task switching in RIOT */
     (void*) isr_systick,            /* SysTick interrupt, not used in RIOT */
