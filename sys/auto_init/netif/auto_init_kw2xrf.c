@@ -65,6 +65,8 @@ void auto_init_kw2xrf(void)
         }
     }
 }
+#else
+typedef int dont_be_pedantic;
 #endif /* MODULE_NG_KW2XRF */
 
 /** @} */

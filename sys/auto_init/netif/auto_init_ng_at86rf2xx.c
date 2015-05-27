@@ -64,6 +64,8 @@ void auto_init_ng_at86rf2xx(void)
         }
     }
 }
+#else
+typedef int dont_be_pedantic;
 #endif /* MODULE_NG_AT86RF2XX */
 
 /** @} */
