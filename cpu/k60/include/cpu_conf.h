@@ -62,6 +62,15 @@ extern "C"
 #include "MK60-comp.h"
 
 /**
+ * @brief   ARM Cortex-M specific CPU configuration
+ * @{
+ */
+#define CPU_DEFAULT_IRQ_PRIO            (1U)
+#define CPU_IRQ_NUMOF                   (104U)
+#define CPU_FLASH_BASE                  (0x00000000)
+/** @} */
+
+/**
  * @name GPIO pin mux function numbers
  */
 /** @{ */
@@ -76,20 +85,6 @@ extern "C"
 #define PIN_INTERRUPT_FALLING 0b1010
 #define PIN_INTERRUPT_EDGE 0b1011
 /** @} */
-/**
- * @name Kernel stack size configuration
- *
- * TODO: Tune this
- * @{
- */
-#define THREAD_EXTRA_STACKSIZE_PRINTF    (1024)
-
-#ifndef THREAD_STACKSIZE_DEFAULT
-#define THREAD_STACKSIZE_DEFAULT   (1024)
-#endif
-
-#define THREAD_STACKSIZE_IDLE      (256)
-/** @} */
 
 /**
  * @name Length and address for reading CPU_ID (named UID in Freescale documents)
@@ -98,15 +93,6 @@ extern "C"
 #define CPUID_ID_LEN                    (16)
 #define CPUID_ID_PTR                    ((void *)(&(SIM->UIDH)))
 /** @} */
-
-#ifndef UART0_BUFSIZE
-/**
- * @brief UART0 buffer size definition for compatibility reasons
- *
- * TODO: remove once the remodeling of the uart0 driver is done
- */
-#define UART0_BUFSIZE                   (128)
-#endif
 
 /**
  * @name UART driver settings
