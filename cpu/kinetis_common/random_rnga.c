@@ -35,7 +35,7 @@ void random_init(void)
 
 int random_read(char *buf, unsigned int num)
 {
-    int count = 0;
+    unsigned int count = 0;
 
     /* self-seeding */
     while (!(KINETIS_RNGA->SR & RNG_SR_OREG_LVL_MASK));
@@ -55,7 +55,7 @@ int random_read(char *buf, unsigned int num)
         }
     }
 
-    return count;
+    return (int)count;
 }
 
 void random_poweron(void)
