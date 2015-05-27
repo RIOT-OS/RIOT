@@ -79,12 +79,14 @@ static void cpu_clock_init(void)
 
     /* disable all clock interrupts */
     RCC->CIR = 0;
-
+#if !CLOCK_USE_HSI
     /* enable the HSE clock */
     RCC->CR |= RCC_CR_HSEON;
 
     /* wait for HSE to be ready */
     while (!(RCC->CR & RCC_CR_HSERDY));
+
+#endif
 
     /* setup power module */
 
@@ -109,21 +111,27 @@ static void cpu_clock_init(void)
 
     /* reset PLL config register */
     RCC->PLLCFGR = 0;
+#if CLOCK_USE_HSI
+    /* set HSI as source for the PLL */
+    RCC->PLLCFGR |= RCC_PLLCFGR_PLLSRC_HSI;
+#else
     /* set HSE as source for the PLL */
     RCC->PLLCFGR |= RCC_PLLCFGR_PLLSRC_HSE;
+#endif
     /* set division factor for main PLL input clock */
     RCC->PLLCFGR |= (CLOCK_PLL_M & 0x3F);
     /* set main PLL multiplication factor for VCO */
     RCC->PLLCFGR |= (CLOCK_PLL_N & 0x1FF) << 6;
     /* set main PLL division factor for main system clock */
-    RCC->PLLCFGR |= (((CLOCK_PLL_P & 0x03) >> 1) - 1) << 16;
+    RCC->PLLCFGR |= (((CLOCK_PLL_P >> 1) & 0x03)  - 1) << 16;
     /* set main PLL division factor for USB OTG FS, SDIO and RNG clocks */
     RCC->PLLCFGR |= (CLOCK_PLL_Q & 0x0F) << 24;
 
     /* enable PLL again */
     RCC->CR |= RCC_CR_PLLON;
+
     /* wait until PLL is stable */
-    while(!(RCC->CR & RCC_CR_PLLRDY));
+    while (!(RCC->CR & RCC_CR_PLLRDY));
 
     /* configure flash latency */
 

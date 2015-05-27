@@ -44,6 +44,7 @@ static void _start(I2C_TypeDef *dev, uint8_t address, uint8_t rw_flag);
 static inline void _clear_addr(I2C_TypeDef *dev);
 static inline void _write(I2C_TypeDef *dev, char *data, int length);
 static inline void _stop(I2C_TypeDef *dev);
+static inline void _error(I2C_TypeDef *dev);
 
 /**
  * @brief Array holding one pre-initialized mutex for each I2C device
@@ -99,6 +100,20 @@ int i2c_init_master(i2c_t dev, i2c_speed_t speed)
             I2C_0_SDA_CLKEN();
             NVIC_SetPriority(I2C_0_ERR_IRQ, I2C_IRQ_PRIO);
             NVIC_EnableIRQ(I2C_0_ERR_IRQ);
+            break;
+#endif
+#if I2C_1_EN
+        case I2C_1:
+            i2c = I2C_1_DEV;
+            port_scl = I2C_1_SCL_PORT;
+            pin_scl = I2C_1_SCL_PIN;
+            port_sda = I2C_1_SDA_PORT;
+            pin_sda = I2C_1_SDA_PIN;
+            I2C_1_CLKEN();
+            I2C_1_SCL_CLKEN();
+            I2C_1_SDA_CLKEN();
+            NVIC_SetPriority(I2C_1_ERR_IRQ, I2C_IRQ_PRIO);
+            NVIC_EnableIRQ(I2C_1_ERR_IRQ);
             break;
 #endif
 
@@ -256,6 +271,11 @@ int i2c_read_bytes(i2c_t dev, uint8_t address, char *data, int length)
             i2c = I2C_0_DEV;
             break;
 #endif
+#if I2C_1_EN
+        case I2C_1:
+            i2c = I2C_1_DEV;
+            break;
+#endif
 
         default:
             return -1;
@@ -385,6 +405,11 @@ int i2c_read_regs(i2c_t dev, uint8_t address, uint8_t reg, char *data, int lengt
             i2c = I2C_0_DEV;
             break;
 #endif
+#if I2C_1_EN
+        case I2C_1:
+            i2c = I2C_1_DEV;
+            break;
+#endif
 
         default:
             return -1;
@@ -414,6 +439,11 @@ int i2c_write_bytes(i2c_t dev, uint8_t address, char *data, int length)
 #if I2C_0_EN
         case I2C_0:
             i2c = I2C_0_DEV;
+            break;
+#endif
+#if I2C_1_EN
+        case I2C_1:
+            i2c = I2C_1_DEV;
             break;
 #endif
 
@@ -449,6 +479,11 @@ int i2c_write_regs(i2c_t dev, uint8_t address, uint8_t reg, char *data, int leng
             i2c = I2C_0_DEV;
             break;
 #endif
+#if I2C_1_EN
+        case I2C_1:
+            i2c = I2C_1_DEV;
+            break;
+#endif
 
         default:
             return -1;
@@ -475,6 +510,11 @@ void i2c_poweron(i2c_t dev)
             I2C_0_CLKEN();
             break;
 #endif
+#if I2C_1_EN
+        case I2C_1:
+            I2C_1_CLKEN();
+            break;
+#endif
     }
 }
 
@@ -486,6 +526,13 @@ void i2c_poweroff(i2c_t dev)
             while (I2C_0_DEV->SR2 & I2C_SR2_BUSY);
 
             I2C_0_CLKDIS();
+            break;
+#endif
+#if I2C_1_EN
+        case I2C_1:
+            while (I2C_1_DEV->SR2 & I2C_SR2_BUSY);
+
+            I2C_1_CLKDIS();
             break;
 #endif
     }
@@ -548,10 +595,8 @@ static inline void _stop(I2C_TypeDef *dev)
     dev->CR1 |= I2C_CR1_STOP;
 }
 
-#if I2C_0_EN
-void I2C_0_ERR_ISR(void)
-{
-    unsigned state = I2C_0_DEV->SR1;
+static inline void _error(I2C_TypeDef *dev){
+    unsigned state = dev->SR1;
     DEBUG("\n\n### I2C ERROR OCCURED ###\n");
     DEBUG("status: %08x\n", state);
     if (state & I2C_SR1_OVR) {
@@ -567,7 +612,7 @@ void I2C_0_ERR_ISR(void)
         DEBUG("BERR\n");
     }
     if (state & I2C_SR1_PECERR) {
-        DEBUG("PECERR\n");
+          DEBUG("PECERR\n");
     }
     if (state & I2C_SR1_TIMEOUT) {
         DEBUG("TIMEOUT\n");
@@ -577,6 +622,19 @@ void I2C_0_ERR_ISR(void)
     }
     while (1);
 }
+
+#if I2C_0_EN
+void I2C_0_ERR_ISR(void)
+{
+    _error(I2C_0_DEV);
+}
 #endif /* I2C_0_EN */
+
+#if I2C_1_EN
+void I2C_1_ERR_ISR(void)
+{
+    _error(I2C_1_DEV);
+}
+#endif /* I2C_1_EN */
 
 #endif /* I2C_NUMOF */

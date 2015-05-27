@@ -204,6 +204,7 @@ void isr_dcmi(void)                 __attribute__ ((weak, alias("dummy_handler")
 void isr_cryp(void)                 __attribute__ ((weak, alias("dummy_handler")));
 void isr_hash_rng(void)             __attribute__ ((weak, alias("dummy_handler")));
 void isr_fpu(void)                  __attribute__ ((weak, alias("dummy_handler")));
+void isr_spi4(void)                 __attribute__ ((weak, alias("dummy_handler")));
 
 /* interrupt vector table */
 __attribute__ ((section(".vectors")))
@@ -309,4 +310,7 @@ const void *interrupt_vector[] = {
     (void*) isr_cryp,               /* CRYP crypto */
     (void*) isr_hash_rng,           /* Hash and Rng */
     (void*) isr_fpu,                /* FPU */
+#ifdef CPU_MODEL_STM32F401RE
+    (void*) isr_spi4,
+#endif
 };
