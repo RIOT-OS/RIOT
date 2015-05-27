@@ -24,6 +24,10 @@ cachegrind.out*
 *.kdev4
 # Codelite (among others) project files
 *.project
+# ctags index files
+tags
+# GDB initialization scripts
+.gdbinit
 
 # Eclipse symbol file (output from make eclipsesym)
 eclipsesym.xml
