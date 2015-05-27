@@ -13,7 +13,8 @@
  * @{
  *
  * @file
- * @brief       Board specific definitions for the Atmel SAM R21 Xplained Pro board.
+ * @brief       Board specific definitions for the Atmel SAM R21 Xplained Pro
+ *              board
  *
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  */
@@ -83,9 +84,9 @@ extern "C" {
  * @name Macros for controlling the on-board LEDs.
  * @{
  */
-#define LED_ON              (LED_PORT.OUTCLR.reg = 1<<LED_PIN)
-#define LED_OFF             (LED_PORT.OUTSET.reg = 1<<LED_PIN)
-#define LED_TOGGLE          (LED_PORT.OUTTGL.reg = 1<<LED_PIN)
+#define LED_ON              (LED_PORT.OUTCLR.reg = (1 << LED_PIN))
+#define LED_OFF             (LED_PORT.OUTSET.reg = (1 << LED_PIN))
+#define LED_TOGGLE          (LED_PORT.OUTTGL.reg = (1 << LED_PIN))
 
 /* for compatability to other boards */
 #define LED_GREEN_ON        /* not available */
