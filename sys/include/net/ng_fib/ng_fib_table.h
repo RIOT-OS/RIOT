@@ -34,7 +34,7 @@ extern "C" {
 typedef struct fib_entry_t {
     /** interface ID */
     kernel_pid_t iface_id;
-    /** Lifetime of this entry */
+    /** Lifetime of this entry (an absolute time-point is stored by the FIB) */
     timex_t lifetime;
     /** Unique identifier for the type of the global address */
     uint32_t global_flags;
