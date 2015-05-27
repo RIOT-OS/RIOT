@@ -832,6 +832,9 @@ int spi_init_slave(spi_t dev, spi_conf_t conf, char(*cb)(char data))
 
     spi_dev->RSER = (uint32_t)0;
 
+    /* set callback */
+    spi_config[dev].cb = cb;
+
     return 0;
 }
 
