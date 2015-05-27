@@ -205,18 +205,6 @@ SECTIONS
     __end__ = .;
     PROVIDE(end = .);
 
-    . = ALIGN(4);
-    HEAP_SIZE = ORIGIN(sram_u) + LENGTH(sram_u) - STACK_SIZE - .;
-
-    .heap (NOLOAD):
-    {
-        _heap_start = .;
-        PROVIDE(__heap_start = .); /*__heap_start = .; */
-        . = . + HEAP_SIZE;
-        _heap_end = .;
-        PROVIDE(__heap_max = .);
-    } > sram_u
-
     /* stack section */
     .stack (NOLOAD):
     {
@@ -226,6 +214,11 @@ SECTIONS
         . = ALIGN(8);
         _estack = .;
     } > sram_u
+
+    /* heap section */
+    . = ALIGN(8);
+    _sheap = . ;
+    _eheap = ORIGIN(sram_u) + LENGTH(sram_u);
 
     /* Any debugging sections */
     /* Stabs debugging sections.  */
