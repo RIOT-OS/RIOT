@@ -817,9 +817,7 @@ EXCLUDE_PATTERNS       = */board/*/tools/* \
                          */cpu/*/include/pio/* \
                          */cpu/*/include/atmel/* \
                          */cpu/lpc*/include/core_cm*.h \
-                         */cpu/cortex-*_common/include/core_cm*.h \
-                         */cpu/cortex-*_common/include/core_cmInstr.h \
-                         */cpu/cortex-*_common/include/core_cmFunc.h \
+                         */cpu/cortexm_common/include/core_cm*.h \
                          */cpu/stm32f*/include/stm32f* \
                          */drivers/nrf24l01p/include/nrf24l01p_settings.h \
                          */cpu/nrf51822/include/nrf51.h \
