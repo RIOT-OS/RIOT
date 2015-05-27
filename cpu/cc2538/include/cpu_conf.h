@@ -33,25 +33,12 @@ extern "C" {
 #endif
 
 /**
- * @name Kernel configuration
+ * @brief   ARM Cortex-M specific CPU configuration
  * @{
  */
-#define THREAD_EXTRA_STACKSIZE_PRINTF    1024
-
-#ifndef THREAD_STACKSIZE_DEFAULT
-#define THREAD_STACKSIZE_DEFAULT   1024
-#endif
-
-#define THREAD_STACKSIZE_IDLE      512
-/** @} */
-
-/**
- * @name UART0 buffer size definition for compatibility reasons
- * @{
- */
-#ifndef UART0_BUFSIZE
-#define UART0_BUFSIZE                   128
-#endif
+#define CPU_DEFAULT_IRQ_PRIO            (1U)
+#define CPU_IRQ_NUMOF                   PERIPH_COUNT_IRQn
+#define CPU_FLASH_BASE                  FLASH_BASE
 /** @} */
 
 /**

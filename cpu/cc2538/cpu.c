@@ -34,8 +34,6 @@
 
 #define CLOCK_STA_MASK ( OSC32K | OSC )
 
-extern const void *interrupt_vector[];
-
 static void cpu_clock_init(void);
 
 /**
@@ -43,18 +41,12 @@ static void cpu_clock_init(void);
  */
 void cpu_init(void)
 {
-    /* configure the vector table location to internal flash */
-    assert((uintptr_t)&interrupt_vector % CC2538_VTOR_ALIGN == 0);
-    SCB->VTOR = (uintptr_t)&interrupt_vector;
-
+    /* initialize the Cortex-M core */
+    cortexm_init();
     /* Enable the CC2538's more compact alternate interrupt mapping */
     SYS_CTRL->I_MAP = 1;
-
     /* initialize the clock system */
     cpu_clock_init();
-
-    /* set pendSV interrupt to lowest possible priority */
-    NVIC_SetPriority(PendSV_IRQn, 0xff);
 }
 
 /**
