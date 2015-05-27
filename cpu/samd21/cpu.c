@@ -32,10 +32,8 @@ void cpu_init(void)
     PM->APBBMASK.reg |= PM_APBBMASK_PORT;
     /* disable the watchdog timer */
     WDT->CTRL.bit.ENABLE = 0;
-
-    /* set pendSV interrupt to lowest possible priority */
-    NVIC_SetPriority(PendSV_IRQn, 0xff);
-
+    /* initialize the Cortex-M core */
+    cortexm_init();
     /* Initialise clock sources and generic clocks */
     clk_init();
 }

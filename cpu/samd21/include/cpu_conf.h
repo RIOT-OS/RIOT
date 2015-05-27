@@ -25,29 +25,12 @@ extern "C" {
 #endif
 
 /**
- * @name Kernel configuration
- *
- * TODO: measure and adjust for the cortex-m0
+ * @brief   ARM Cortex-M specific CPU configuration
  * @{
  */
-#define THREAD_EXTRA_STACKSIZE_PRINTF   (512)
-
-#ifndef THREAD_STACKSIZE_DEFAULT
-#define THREAD_STACKSIZE_DEFAULT        (1024)
-#endif
-
-#define THREAD_STACKSIZE_IDLE           (256)
-/** @} */
-
-/**
- * @name UART0 buffer size definition for compatibility reasons
- *
- * TODO: remove once the remodeling of the uart0 driver is done
- * @{
- */
-#ifndef UART0_BUFSIZE
-#define UART0_BUFSIZE                   (128)
-#endif
+#define CPU_DEFAULT_IRQ_PRIO            (1U)
+#define CPU_IRQ_NUMOF                   PERIPH_COUNT_IRQn
+#define CPU_FLASH_BASE                  FLASH_ADDR
 /** @} */
 
 /**
