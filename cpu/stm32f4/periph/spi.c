@@ -352,20 +352,23 @@ int spi_transfer_byte(spi_t dev, char out, char *in)
 
 int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length)
 {
+    int trans_bytes = 0;
 
-    int i, trans_ret, trans_bytes = 0;
-    char in_temp;
+    for (unsigned int i = 0; i < length; i++) {
+        char in_temp;
+        int trans_ret;
 
-    for (i = 0; i < length; i++) {
         if (out) {
             trans_ret = spi_transfer_byte(dev, out[i], &in_temp);
         }
         else {
             trans_ret = spi_transfer_byte(dev, 0, &in_temp);
         }
+
         if (trans_ret < 0) {
             return -1;
         }
+
         if (in != NULL) {
             in[i] = in_temp;
         }
