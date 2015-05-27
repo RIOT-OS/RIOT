@@ -21,6 +21,7 @@
  */
 
 #include <stdint.h>
+#include "cpu.h"
 #include "panic.h"
 #include "fault_handlers.h"
 
@@ -56,5 +57,5 @@ void isr_debug_mon(void)
 
 void isr_unhandled(void)
 {
-    core_panic(PANIC_UNHANDLED_ISR, "UNHANDLED ISR");
+    core_panic(PANIC_DUMMY_HANDLER, "UNHANDLED ISR");
 }
