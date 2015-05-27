@@ -31,14 +31,10 @@ static void cpu_clock_init(void);
  */
 void cpu_init(void)
 {
-    /* configure the vector table location to internal flash */
-    SCB->VTOR = FLASH_BASE;
-
+    /* initialize the Cortex-M core */
+    cortexm_init();
     /* initialize the clock system */
     cpu_clock_init();
-
-    /* set pendSV interrupt to lowest possible priority */
-    NVIC_SetPriority(PendSV_IRQn, 0xff);
 }
 
 static inline void modem_clock_init(void)

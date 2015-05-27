@@ -43,17 +43,12 @@ extern "C"
 #endif
 
 /**
- * @name Kernel configuration
- *
+ * @brief   ARM Cortex-M specific CPU configuration
  * @{
  */
-#define THREAD_EXTRA_STACKSIZE_PRINTF     (1024)
-
-#ifndef THREAD_STACKSIZE_DEFAULT
-#define THREAD_STACKSIZE_DEFAULT    (1024)
-#endif
-
-#define THREAD_STACKSIZE_IDLE       (256)
+#define CPU_DEFAULT_IRQ_PRIO            (1U)
+#define CPU_IRQ_NUMOF                   (65U)
+#define CPU_FLASH_BASE                  (0x00000000)
 /** @} */
 
 /**
@@ -65,17 +60,6 @@ extern "C"
  * @brief Pointer to CPU_ID
  */
 #define CPUID_ID_PTR                     ((void *)(&(SIM_UIDH)))
-
-/**
- * @name UART0 buffer size definition for compatibility reasons.
- *
- * TODO: remove once the remodeling of the uart0 driver is done.
- * @{
- */
-#ifndef UART0_BUFSIZE
-#define UART0_BUFSIZE                    (128)
-#endif
-/** @} */
 
 #define TRANSCEIVER_BUFFER_SIZE          (3) /**< Buffer Size for Transceiver Module */
 
