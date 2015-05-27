@@ -26,6 +26,8 @@
 static inline long uart_write_r(uart_t uart_num, struct _reent *r, int fd, const char *ptr,
                                 int len)
 {
+    (void) r;
+    (void) fd;
     int i = 0;
 
     while (i < len) {
@@ -39,6 +41,11 @@ static inline long uart_write_r(uart_t uart_num, struct _reent *r, int fd, const
 static long uart_read_r(uart_t uart_num, struct _reent *r, int fd, char *ptr, int len)
 {
     /* not yet implemented */
+    (void) uart_num;
+    (void) r;
+    (void) fd;
+    (void) ptr;
+    (void) len;
     return 0;
 }
 
