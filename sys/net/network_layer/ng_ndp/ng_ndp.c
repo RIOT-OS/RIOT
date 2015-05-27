@@ -28,6 +28,7 @@
 #include "vtimer.h"
 
 #include "net/ng_ndp.h"
+#include "net/ng_fib.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
@@ -338,18 +339,18 @@ kernel_pid_t ng_ndp_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_len,
                                     ng_pktsnip_t *pkt)
 {
     ng_ipv6_addr_t *next_hop_ip = NULL, *prefix = NULL;
-#ifdef MODULE_FIB
-    size_t next_hop_size;
-#endif
 
 #ifdef MODULE_NG_IPV6_EXT_RH
     next_hop_ip = ng_ipv6_ext_rh_next_hop(hdr);
 #endif
 #ifdef MODULE_FIB
+    size_t next_hop_size;
+    uint32_t next_hop_flags = 0;
     if ((next_hop_ip == NULL) &&
-        (fib_get_next_hop(&iface, (uint8_t *)next_hop_ip, &next_hop_size,
-                          (uint8_t *)dst, sizeof(ng_ipv6_addr_t),
-                          0) < 0) || (next_hop_ip != sizeof(ng_ipv6_addr_t))) {
+        ((fib_get_next_hop(&iface, (uint8_t *)next_hop_ip, &next_hop_size,
+                          &next_hop_flags, (uint8_t *)dst,
+                          sizeof(ng_ipv6_addr_t), 0) < 0) ||
+                          (next_hop_size != sizeof(ng_ipv6_addr_t)))) {
         next_hop_ip = NULL;
     }
 #endif
