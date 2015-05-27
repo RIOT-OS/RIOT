@@ -93,39 +93,38 @@ void dummy_handler(void)
 }
 
 /* Cortex-M specific interrupt vectors */
-void isr_svc(void)                  __attribute__ ((weak, alias("dummy_handler")));
-void isr_pendsv(void)               __attribute__ ((weak, alias("dummy_handler")));
-void isr_systick(void)              __attribute__ ((weak, alias("dummy_handler")));
-
+void isr_svc(void)              __attribute__ ((weak, alias("dummy_handler")));
+void isr_pendsv(void)           __attribute__ ((weak, alias("dummy_handler")));
+void isr_systick(void)          __attribute__ ((weak, alias("dummy_handler")));
 /* SAMR21 specific interrupt vector */
-void isr_pm(void)                   __attribute__ ((weak, alias("dummy_handler")));
-void isr_sysctrl(void)              __attribute__ ((weak, alias("dummy_handler")));
-void isr_wdt(void)                  __attribute__ ((weak, alias("dummy_handler")));
-void isr_rtc(void)                  __attribute__ ((weak, alias("dummy_handler")));
-void isr_eic(void)                  __attribute__ ((weak, alias("dummy_handler")));
-void isr_nvmctrl(void)              __attribute__ ((weak, alias("dummy_handler")));
-void isr_dmac(void)                 __attribute__ ((weak, alias("dummy_handler")));
-void isr_usb(void)                  __attribute__ ((weak, alias("dummy_handler")));
-void isr_evsys(void)                __attribute__ ((weak, alias("dummy_handler")));
-void isr_sercom0(void)              __attribute__ ((weak, alias("dummy_handler")));
-void isr_sercom1(void)              __attribute__ ((weak, alias("dummy_handler")));
-void isr_sercom2(void)              __attribute__ ((weak, alias("dummy_handler")));
-void isr_sercom3(void)              __attribute__ ((weak, alias("dummy_handler")));
-void isr_sercom4(void)              __attribute__ ((weak, alias("dummy_handler")));
-void isr_sercom5(void)              __attribute__ ((weak, alias("dummy_handler")));
-void isr_tcc0(void)                 __attribute__ ((weak, alias("dummy_handler")));
-void isr_tcc1(void)                 __attribute__ ((weak, alias("dummy_handler")));
-void isr_tcc2(void)                 __attribute__ ((weak, alias("dummy_handler")));
-void isr_tc3(void)                  __attribute__ ((weak, alias("dummy_handler")));
-void isr_tc4(void)                  __attribute__ ((weak, alias("dummy_handler")));
-void isr_tc5(void)                  __attribute__ ((weak, alias("dummy_handler")));
-void isr_tc6(void)                  __attribute__ ((weak, alias("dummy_handler")));
-void isr_tc7(void)                  __attribute__ ((weak, alias("dummy_handler")));
-void isr_adc(void)                  __attribute__ ((weak, alias("dummy_handler")));
-void isr_ac(void)                   __attribute__ ((weak, alias("dummy_handler")));
-void isr_dac(void)                  __attribute__ ((weak, alias("dummy_handler")));
-void isr_ptc(void)                  __attribute__ ((weak, alias("dummy_handler")));
-void isr_i2c(void)                  __attribute__ ((weak, alias("dummy_handler")));
+void isr_pm(void)               __attribute__ ((weak, alias("dummy_handler")));
+void isr_sysctrl(void)          __attribute__ ((weak, alias("dummy_handler")));
+void isr_wdt(void)              __attribute__ ((weak, alias("dummy_handler")));
+void isr_rtc(void)              __attribute__ ((weak, alias("dummy_handler")));
+void isr_eic(void)              __attribute__ ((weak, alias("dummy_handler")));
+void isr_nvmctrl(void)          __attribute__ ((weak, alias("dummy_handler")));
+void isr_dmac(void)             __attribute__ ((weak, alias("dummy_handler")));
+void isr_usb(void)              __attribute__ ((weak, alias("dummy_handler")));
+void isr_evsys(void)            __attribute__ ((weak, alias("dummy_handler")));
+void isr_sercom0(void)          __attribute__ ((weak, alias("dummy_handler")));
+void isr_sercom1(void)          __attribute__ ((weak, alias("dummy_handler")));
+void isr_sercom2(void)          __attribute__ ((weak, alias("dummy_handler")));
+void isr_sercom3(void)          __attribute__ ((weak, alias("dummy_handler")));
+void isr_sercom4(void)          __attribute__ ((weak, alias("dummy_handler")));
+void isr_sercom5(void)          __attribute__ ((weak, alias("dummy_handler")));
+void isr_tcc0(void)             __attribute__ ((weak, alias("dummy_handler")));
+void isr_tcc1(void)             __attribute__ ((weak, alias("dummy_handler")));
+void isr_tcc2(void)             __attribute__ ((weak, alias("dummy_handler")));
+void isr_tc3(void)              __attribute__ ((weak, alias("dummy_handler")));
+void isr_tc4(void)              __attribute__ ((weak, alias("dummy_handler")));
+void isr_tc5(void)              __attribute__ ((weak, alias("dummy_handler")));
+void isr_tc6(void)              __attribute__ ((weak, alias("dummy_handler")));
+void isr_tc7(void)              __attribute__ ((weak, alias("dummy_handler")));
+void isr_adc(void)              __attribute__ ((weak, alias("dummy_handler")));
+void isr_ac(void)               __attribute__ ((weak, alias("dummy_handler")));
+void isr_dac(void)              __attribute__ ((weak, alias("dummy_handler")));
+void isr_ptc(void)              __attribute__ ((weak, alias("dummy_handler")));
+void isr_i2c(void)              __attribute__ ((weak, alias("dummy_handler")));
 
 /* interrupt vector table */
 __attribute__ ((section(".vectors")))
