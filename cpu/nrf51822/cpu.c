@@ -25,9 +25,8 @@
  */
 void cpu_init(void)
 {
-    /* set pendSV interrupt to lowest possible priority */
-    NVIC_SetPriority(PendSV_IRQn, 0xff);
-
+    /* initialize the Cortex-M core */
+    cortexm_init();
     /* set the correct clock source for HFCLK */
 #if CLOCK_CRYSTAL == 32
     NRF_CLOCK->XTALFREQ = CLOCK_XTALFREQ_XTALFREQ_32MHz;
