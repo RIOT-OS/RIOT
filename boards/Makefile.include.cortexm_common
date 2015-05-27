@@ -1,5 +1,10 @@
+# Target triple for the build. Use arm-none-eabi if you are unsure.
+export TARGET_TRIPLE ?= arm-none-eabi
+
+# Toolchain prefix, defaults to target triple followed by a dash, you will most likely not need to touch this.
+export PREFIX ?= $(if $(TARGET_TRIPLE),$(TARGET_TRIPLE)-)
+
 # we build all cortex boards with the GNU toolchain
-export PREFIX = arm-none-eabi-
 include $(RIOTBOARD)/Makefile.include.gnu
 
 # define build specific options
