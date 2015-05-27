@@ -52,6 +52,9 @@ void ng_sixlowpan_netif_add(kernel_pid_t pid, uint16_t max_frag_size)
 
     free_entry->pid = pid;
     free_entry->max_frag_size = max_frag_size;
+#ifdef MODULE_NG_SIXLOWPAN_IPHC
+    free_entry->iphc_enabled = true;
+#endif
     return;
 }
 

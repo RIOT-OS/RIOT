@@ -19,6 +19,7 @@
 
 #include "net/ng_sixlowpan.h"
 #include "net/ng_sixlowpan/frag.h"
+#include "net/ng_sixlowpan/iphc.h"
 #include "net/ng_sixlowpan/netif.h"
 
 #define ENABLE_DEBUG    (0)
@@ -101,6 +102,18 @@ void _receive(ng_pktsnip_t *pkt)
         return;
     }
 
+#ifdef MODULE_NG_SIXLOWPAN_IPHC
+    if (ng_sixlowpan_iphc_is(payload->data)) {
+        if (!ng_sixlowpan_iphc_decode(pkt)) {
+            DEBUG("6lo: error on IPHC decoding\n");
+            ng_pktbuf_release(pkt);
+            return;
+        }
+        LL_SEARCH_SCALAR(pkt, payload, type, NG_NETTYPE_IPV6);
+
+    }
+#endif
+
     payload->type = NG_NETTYPE_IPV6;
 
     entry = ng_netreg_lookup(NG_NETTYPE_IPV6, NG_NETREG_DEMUX_CTX_ALL);
@@ -151,6 +164,8 @@ void _send(ng_pktsnip_t *pkt)
      * length is the length of the IPv6 datagram + 6LoWPAN dispatches,
      * while the datagram size is the size of only the IPv6 datagram */
     payload_len = ng_pkt_len(ipv6);
+    /* cppcheck: datagram_size will be read by ng_sixlowpan_frag implementation */
+    /* cppcheck-suppress unreadVariable */
     datagram_size = (uint16_t)payload_len;
 
     /* use sixlowpan packet snip as temporary one */
@@ -163,7 +178,51 @@ void _send(ng_pktsnip_t *pkt)
     }
 
     pkt = sixlowpan;
+    iface = ng_sixlowpan_netif_get(hdr->if_pid);
 
+    if (iface == NULL) {
+        if (ng_netapi_get(hdr->if_pid, NETCONF_OPT_MAX_PACKET_SIZE,
+                          0, &max_frag_size, sizeof(max_frag_size)) < 0) {
+            /* if error we assume it works */
+            DEBUG("6lo: can not get max packet size from interface %"
+                  PRIkernel_pid "\n", hdr->if_pid);
+            max_frag_size = UINT16_MAX;
+        }
+
+        ng_sixlowpan_netif_add(hdr->if_pid, max_frag_size);
+        iface = ng_sixlowpan_netif_get(hdr->if_pid);
+    }
+    else {
+        max_frag_size = iface->max_frag_size;
+    }
+
+#ifdef MODULE_NG_SIXLOWPAN_IPHC
+    if (iface->iphc_enabled) {
+        if (!ng_sixlowpan_iphc_encode(pkt)) {
+            DEBUG("6lo: error on IPHC encoding\n");
+            ng_pktbuf_release(pkt);
+            return;
+        }
+    }
+    else {
+        DEBUG("6lo: Send uncompressed\n");
+
+        sixlowpan = ng_pktbuf_add(NULL, NULL, sizeof(uint8_t),
+                                  NG_NETTYPE_SIXLOWPAN);
+
+        if (sixlowpan == NULL) {
+            DEBUG("6lo: no space left in packet buffer\n");
+            ng_pktbuf_release(pkt);
+            return;
+        }
+
+        sixlowpan->next = ipv6;
+        pkt->next = sixlowpan;
+        disp = sixlowpan->data;
+        disp[0] = NG_SIXLOWPAN_UNCOMPRESSED;
+        payload_len++;
+    }
+#else
     DEBUG("6lo: Send uncompressed\n");
 
     sixlowpan = ng_pktbuf_add(NULL, NULL, sizeof(uint8_t), NG_NETTYPE_SIXLOWPAN);
@@ -179,23 +238,7 @@ void _send(ng_pktsnip_t *pkt)
     disp = sixlowpan->data;
     disp[0] = NG_SIXLOWPAN_UNCOMPRESSED;
     payload_len++;
-
-    iface = ng_sixlowpan_netif_get(hdr->if_pid);
-
-    if (iface == NULL) {
-        if (ng_netapi_get(hdr->if_pid, NETCONF_OPT_MAX_PACKET_SIZE,
-                          0, &max_frag_size, sizeof(max_frag_size)) < 0) {
-            /* if error we assume it works */
-            DEBUG("6lo: can not get max packet size from interface %"
-                  PRIkernel_pid "\n", hdr->if_pid);
-            max_frag_size = UINT16_MAX;
-        }
-
-        ng_sixlowpan_netif_add(hdr->if_pid, max_frag_size);
-    }
-    else {
-        max_frag_size = iface->max_frag_size;
-    }
+#endif
 
     DEBUG("6lo: max_frag_size = %" PRIu16 " for interface %"
           PRIkernel_pid "\n", max_frag_size, hdr->if_pid);
