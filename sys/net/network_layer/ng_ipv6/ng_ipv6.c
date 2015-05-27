@@ -78,6 +78,7 @@ void ng_ipv6_demux(kernel_pid_t iface, ng_pktsnip_t *pkt, uint8_t nh)
         case NG_PROTNUM_ICMPV6:
             ng_icmpv6_demux(iface, pkt);
             break;
+#ifdef MODULE_NG_IPV6_EXT
         case NG_PROTNUM_IPV6_EXT_HOPOPT:
         case NG_PROTNUM_IPV6_EXT_DST:
         case NG_PROTNUM_IPV6_EXT_RH:
@@ -90,6 +91,7 @@ void ng_ipv6_demux(kernel_pid_t iface, ng_pktsnip_t *pkt, uint8_t nh)
                 ng_pktbuf_release(pkt);
                 return;
             }
+#endif
         case NG_PROTNUM_IPV6:
             _decapsulate(pkt);
             break;
