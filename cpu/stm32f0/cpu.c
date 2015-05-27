@@ -28,11 +28,10 @@ static void clock_init(void);
  */
 void cpu_init(void)
 {
+    /* initialize the Cortex-M core */
+    cortexm_init();
     /* initialize the clock system */
     clock_init();
-
-    /* set pendSV interrupt to lowest possible priority */
-    NVIC_SetPriority(PendSV_IRQn, 0xff);
 }
 
 /**
