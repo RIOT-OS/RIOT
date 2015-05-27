@@ -30,6 +30,9 @@
 
 #include "_pktbuf_internal.h"
 
+#define ENABLE_DEBUG (0)
+#include "debug.h"
+
 static mutex_t _pktbuf_mutex = MUTEX_INIT;
 
 /* internal ng_pktbuf functions */
@@ -249,28 +252,12 @@ static ng_pktsnip_t *_pktbuf_duplicate(const ng_pktsnip_t *pkt)
         return NULL;
     }
 
+    DEBUG("pktbuf: copying %u byte from %p to %p\n", (unsigned)pkt->size,
+          pkt->data, res->data);
     memcpy(res->data, pkt->data, pkt->size);
     res->type = pkt->type;
-
-    while (pkt->next) {
-        ng_pktsnip_t *hdr = NULL;
-
-        pkt = pkt->next;
-        hdr = _pktbuf_add_unsafe(res, pkt->data, pkt->size, pkt->type);
-
-        if (hdr == NULL) {
-            do {
-                ng_pktsnip_t *next = res->next;
-
-                _pktbuf_internal_free(res->data);
-                _pktbuf_internal_free(res);
-
-                res = next;
-            } while (res);
-
-            return NULL;
-        }
-    }
+    res->next = pkt->next;
+    DEBUG("pktbuf: set res->next to %p", (void *)pkt->next);
 
     return res;
 }
