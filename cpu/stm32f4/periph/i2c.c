@@ -218,6 +218,8 @@ static void _toggle_pins(GPIO_TypeDef *port_scl, GPIO_TypeDef *port_sda, int pin
 int i2c_init_slave(i2c_t dev, uint8_t address)
 {
     /* TODO: implement slave mode */
+    (void) dev;
+    (void) address;
     return -1;
 }
 
