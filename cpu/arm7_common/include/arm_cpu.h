@@ -17,11 +17,6 @@
  extern "C" {
 #endif
 
-/**
- * @brief ARM has architecture specific atomic_set_return in atomic.s
- */
-#define ARCH_HAS_ATOMIC_SET_RETURN 1
-
 #define NEW_TASK_CPSR 0x1F
 #define WORDSIZE 32
 

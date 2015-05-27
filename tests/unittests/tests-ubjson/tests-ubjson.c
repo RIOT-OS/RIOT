@@ -81,11 +81,11 @@ void test_ubjson_test(void (*sender_fun)(void), void (*receiver_fun)(void))
     test_ubjson_receiver_data_t data = {
         .run = receiver_fun,
         .main_thread = (tcb_t *) sched_active_thread,
-        .mutexes = {
-            { 1, PRIORITY_QUEUE_INIT },
-            { 1, PRIORITY_QUEUE_INIT },
-        },
+        .mutexes = { MUTEX_INIT, MUTEX_INIT },
     };
+    mutex_lock(&data.mutexes[0]);
+    mutex_lock(&data.mutexes[1]);
+
     kernel_pid_t receiver_pid = thread_create(receiver_stack, sizeof(receiver_stack),
                                               THREAD_PRIORITY_MAIN, CREATE_WOUT_YIELD,
                                               test_ubjson_receiver_trampoline, &data, "receiver");

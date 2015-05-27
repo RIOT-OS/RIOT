@@ -134,7 +134,7 @@ ng_pktsnip_t *ng_pktbuf_start_write(ng_pktsnip_t *pkt)
 
         res = _pktbuf_duplicate(pkt);
 
-        atomic_set_return(&pkt->users, pkt->users - 1);
+        atomic_dec(&pkt->users);
 
         mutex_unlock(&_pktbuf_mutex);
 

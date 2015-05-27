@@ -14,6 +14,7 @@
  * @brief       Kernel mutex implementation
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      Joakim Gebart <joakim.gebart@eistec.se>
  *
  * @}
  */
@@ -37,15 +38,15 @@ static void mutex_wait(struct mutex_t *mutex);
 
 int mutex_trylock(struct mutex_t *mutex)
 {
-    DEBUG("%s: trylocking to get mutex. val: %u\n", sched_active_thread->name, mutex->val);
-    return (atomic_set_return(&mutex->val, 1) == 0);
+    DEBUG("%s: trylocking to get mutex. val: %u\n", sched_active_thread->name, ATOMIC_VALUE(mutex->val));
+    return atomic_set_to_one(&mutex->val);
 }
 
 void mutex_lock(struct mutex_t *mutex)
 {
-    DEBUG("%s: trying to get mutex. val: %u\n", sched_active_thread->name, mutex->val);
+    DEBUG("%s: trying to get mutex. val: %u\n", sched_active_thread->name, ATOMIC_VALUE(mutex->val));
 
-    if (atomic_set_return(&mutex->val, 1) != 0) {
+    if (atomic_set_to_one(&mutex->val) == 0) {
         /* mutex was locked. */
         mutex_wait(mutex);
     }
@@ -54,12 +55,11 @@ void mutex_lock(struct mutex_t *mutex)
 static void mutex_wait(struct mutex_t *mutex)
 {
     unsigned irqstate = disableIRQ();
-    DEBUG("%s: Mutex in use. %u\n", sched_active_thread->name, mutex->val);
+    DEBUG("%s: Mutex in use. %u\n", sched_active_thread->name, ATOMIC_VALUE(mutex->val));
 
-    if (mutex->val == 0) {
+    if (atomic_set_to_one(&mutex->val)) {
         /* somebody released the mutex. return. */
-        mutex->val = 1;
-        DEBUG("%s: mutex_wait early out. %u\n", sched_active_thread->name, mutex->val);
+        DEBUG("%s: mutex_wait early out. %u\n", sched_active_thread->name, ATOMIC_VALUE(mutex->val));
         restoreIRQ(irqstate);
         return;
     }
@@ -84,10 +84,10 @@ static void mutex_wait(struct mutex_t *mutex)
 
 void mutex_unlock(struct mutex_t *mutex)
 {
-    DEBUG("%s: unlocking mutex. val: %u pid: %" PRIkernel_pid "\n", sched_active_thread->name, mutex->val, sched_active_pid);
+    DEBUG("%s: unlocking mutex. val: %u pid: %" PRIkernel_pid "\n", sched_active_thread->name, ATOMIC_VALUE(mutex->val), sched_active_pid);
     unsigned irqstate = disableIRQ();
 
-    if (mutex->val != 0) {
+    if (ATOMIC_VALUE(mutex->val) != 0) {
         priority_queue_node_t *next = priority_queue_remove_head(&(mutex->queue));
         if (next) {
             tcb_t *process = (tcb_t *) next->data;
@@ -97,7 +97,7 @@ void mutex_unlock(struct mutex_t *mutex)
             sched_switch(process->priority);
         }
         else {
-            mutex->val = 0;
+            ATOMIC_VALUE(mutex->val) = 0; /* This is safe, interrupts are disabled */
         }
     }
 
@@ -106,10 +106,10 @@ void mutex_unlock(struct mutex_t *mutex)
 
 void mutex_unlock_and_sleep(struct mutex_t *mutex)
 {
-    DEBUG("%s: unlocking mutex. val: %u pid: %" PRIkernel_pid ", and taking a nap\n", sched_active_thread->name, mutex->val, sched_active_pid);
+    DEBUG("%s: unlocking mutex. val: %u pid: %" PRIkernel_pid ", and taking a nap\n", sched_active_thread->name, ATOMIC_VALUE(mutex->val), sched_active_pid);
     unsigned irqstate = disableIRQ();
 
-    if (mutex->val != 0) {
+    if (ATOMIC_VALUE(mutex->val) != 0) {
         priority_queue_node_t *next = priority_queue_remove_head(&(mutex->queue));
         if (next) {
             tcb_t *process = (tcb_t *) next->data;
@@ -117,7 +117,7 @@ void mutex_unlock_and_sleep(struct mutex_t *mutex)
             sched_set_status(process, STATUS_PENDING);
         }
         else {
-            mutex->val = 0;
+            ATOMIC_VALUE(mutex->val) = 0; /* This is safe, interrupts are disabled */
         }
     }
     DEBUG("%s: going to sleep.\n", sched_active_thread->name);

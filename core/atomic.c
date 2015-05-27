@@ -26,19 +26,6 @@
 #include "cpu.h"
 #include "atomic.h"
 
-#if (ARCH_HAS_ATOMIC_SET_RETURN == 0)
-
-unsigned int atomic_set_return(unsigned int *val, unsigned int set)
-{
-    unsigned int mask = disableIRQ();
-    unsigned int old_val = *val;
-    *val = set;
-    restoreIRQ(mask);
-    return old_val;
-}
-
-#endif
-
 /* Set ARCH_HAS_ATOMIC_COMPARE_AND_SWAP within cpu.h to override this function */
 #if (ARCH_HAS_ATOMIC_COMPARE_AND_SWAP == 0)
 

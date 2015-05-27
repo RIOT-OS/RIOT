@@ -44,9 +44,8 @@ extern "C" {
 #endif
 
 /**
- * @brief x86 has architecture specific atomic operations in x86_atomic.c.
+ * @brief x86 has architecture specific atomic_cas in x86_atomic.c
  */
-#define ARCH_HAS_ATOMIC_SET_RETURN 1
 #define ARCH_HAS_ATOMIC_COMPARE_AND_SWAP 1
 
 static inline void __attribute__((always_inline)) dINT(void)
