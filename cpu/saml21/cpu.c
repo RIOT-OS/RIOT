@@ -28,8 +28,8 @@ void cpu_init(void)
     /* disable the watchdog timer */
     WDT->CTRLA.bit.ENABLE = 0;
 
-    /* set pendSV interrupt to lowest possible priority */
-    NVIC_SetPriority(PendSV_IRQn, 0xff);
+    /* initialize the Cortex-M core */
+    cortexm_init();
 
     /* turn on MCLK */
     MCLK->APBAMASK.reg |= MCLK_APBAMASK_GCLK;
