@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2015 Kaspar Schleiser <kaspar@schleiser.de>
  *               2015 FreshTemp, LLC.
- *               2014 Freie Universität Berlin
+ *               2014-2015 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -17,6 +17,7 @@
  *
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
  * @}
  */
@@ -77,26 +78,7 @@ void reset_handler(void)
     kernel_init();
 }
 
-/**
- * @brief Default handler is called in case no interrupt handler was defined
- */
-void dummy_handler(void)
-{
-    while (1) {asm ("nop");}
-}
-
-
 void isr_nmi(void)
-{
-    while (1) {asm ("nop");}
-}
-
-void isr_mem_manage(void)
-{
-    while (1) {asm ("nop");}
-}
-
-void isr_debug_mon(void)
 {
     while (1) {asm ("nop");}
 }
@@ -106,12 +88,10 @@ void isr_hard_fault(void)
     while (1) {asm ("nop");}
 }
 
-void isr_bus_fault(void)
-{
-    while (1) {asm ("nop");}
-}
-
-void isr_usage_fault(void)
+/**
+ * @brief Default handler is called in case no interrupt handler was defined
+ */
+void dummy_handler(void)
 {
     while (1) {asm ("nop");}
 }
@@ -155,23 +135,23 @@ __attribute__ ((section(".vectors")))
 const void *interrupt_vector[] = {
     /* Stack pointer */
     (void*) (&_estack),             /* pointer to the top of the empty stack */
-    /* Cortex-M handlers */
+    /* Cortex-M0+ handlers */
     (void*) reset_handler,          /* entry point of the program */
     (void*) isr_nmi,                /* non maskable interrupt handler */
     (void*) isr_hard_fault,         /* if you end up here its not good */
-    (void*) isr_mem_manage,         /* memory controller interrupt */
-    (void*) isr_bus_fault,          /* also not good to end up here */
-    (void*) isr_usage_fault,        /* autsch */
+    (void*) (0UL),                  /* Reserved */
+    (void*) (0UL),                  /* Reserved */
+    (void*) (0UL),                  /* Reserved */
     (void*) (0UL),                  /* Reserved */
     (void*) (0UL),                  /* Reserved */
     (void*) (0UL),                  /* Reserved */
     (void*) (0UL),                  /* Reserved */
     (void*) isr_svc,                /* system call interrupt */
-    (void*) isr_debug_mon,          /* debug interrupt */
+    (void*) (0UL),                  /* Reserved */
     (void*) (0UL),                  /* Reserved */
     (void*) isr_pendsv,             /* pendSV interrupt, used for task switching in RIOT */
     (void*) isr_systick,            /* SysTick interrupt, not used in RIOT */
-    /* Atmel specific peripheral handlers */
+    /* Atmel SAML21 specific peripheral handlers */
     (void*) isr_pm,                 /*  0 Power Manager */
     (void*) isr_wdt,                /*  1 Watchdog Timer */
     (void*) isr_rtc,                /*  2 Real-Time Counter */
