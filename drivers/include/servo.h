@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014 Freie Universität Berlin
+ * Copyright (C) 2015 Eistec AB
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -16,6 +17,7 @@
  * @brief       High-level driver for easy handling of servo motors
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Joakim Gebart <joakim.gebart@eistec.se>
  */
 
 #ifndef SERVO_H
@@ -31,10 +33,12 @@ extern "C" {
  * @brief Descriptor struct for a servo
  */
 typedef struct {
-    pwm_t device;       /**< the PWM device driving the servo */
-    int channel;        /**< the channel the servo is connected to */
-    unsigned int min;   /**< minimum pulse width, in us */
-    unsigned int max;   /**< maximum pulse width, in us */
+    pwm_t device;           /**< the PWM device driving the servo */
+    int channel;            /**< the channel the servo is connected to */
+    unsigned int min;       /**< minimum pulse width, in us */
+    unsigned int max;       /**< maximum pulse width, in us */
+    unsigned int scale_nom; /**< timing scale factor, to adjust for an inexact PWM frequency, nominator */
+    unsigned int scale_den; /**< timing scale factor, to adjust for an inexact PWM frequency, denominator */
 } servo_t;
 
 /**

@@ -14,4 +14,3 @@ long. The requested frequency is 100 Hz, but due to hardware limitations it
 might not be possible to achieve the selected frequency. The pulse width
 should, however, remain the same, only the frequency of pulses (and hence the
 duty cycle) should differ.
-
