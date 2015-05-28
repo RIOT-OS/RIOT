@@ -44,7 +44,7 @@ check_gh_label() {
     LABEL="${1}"
 
     if [ -z "${LABELS_JSON}" ]; then
-        LABELS_JSON=$(${GET} "${GITHUB_API_HOST}/repos/${GITHUB_REPO}/issues/${CI_PULL_REQUEST}/labels" 2> /dev/null)
+        LABELS_JSON=$(${GET} "${GITHUB_API_HOST}/repos/${GITHUB_REPO}/issues/${CI_PULL_REQUEST}/labels")
         if [ "$?" -ne 0 ]; then
             # Reading labels failed
             return 3
