@@ -21,6 +21,8 @@
 #ifndef FIB_H_
 #define FIB_H_
 
+#include "timex.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -147,6 +149,20 @@ void fib_print_fib_table(void);
  * @brief Prints the FIB content
  */
 void fib_print_routes(void);
+
+#if FIB_DEVEL_HELPER
+/**
+ * @brief get the point in time at which the entry for destination dst expires.
+ *
+ * @param[out] lifetime  pointer where the expiration time is written on success
+ * @param[in]  dst       the destination address
+ * @param[in]  dst_size  the destination address size
+ *
+ * @return 0             on success: entry for dst found and lifetime copied
+ *         -EHOSTUNREACH if no fitting entry is available
+ */
+int fib_devel_get_lifetime(timex_t *lifetime, uint8_t *dst, size_t dst_size);
+#endif
 
 #ifdef __cplusplus
 }
