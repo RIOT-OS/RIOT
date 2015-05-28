@@ -373,7 +373,12 @@ static int _marshall_ethernet(ng_netdev_eth_t *dev, uint8_t *buffer, ng_pktsnip_
         return -EBADMSG;
     }
 
-    hdr->type = byteorder_htons(ng_nettype_to_ethertype(pkt->next->type));
+    if (payload) {
+        hdr->type = byteorder_htons(ng_nettype_to_ethertype(payload->type));
+    }
+    else {
+        hdr->type = byteorder_htons(NG_ETHERTYPE_UNKNOWN);
+    }
 
     netif_hdr = pkt->data;
 
