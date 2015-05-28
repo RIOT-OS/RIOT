@@ -1,5 +1,6 @@
 # define the cpu used by the udoo board
 export CPU = sam3x8e
+export CPU_MODEL = sam3x8e
 
 #define the flash-tool and default port depending on the host operating system
 OS := $(shell uname)
@@ -23,4 +24,4 @@ export FFLAGS = -R -e -w -v -b bin/$(BOARD)/$(APPLICATION).hex
 include $(RIOTBOARD)/Makefile.include.serial
 
 # include cortex defaults
-include $(RIOTBOARD)/Makefile.include.cortex_common
+include $(RIOTBOARD)/Makefile.include.cortexm_common

@@ -1,5 +1,7 @@
 # define the cpu used by the mbed_lpx1768 board
 export CPU = lpc1768
+export CPU_MODEL = lpc1768
+
 
 export FLASHER = $(RIOTBOARD)/$(BOARD)/dist/flash.sh
 export DEBUGGER =
@@ -18,4 +20,4 @@ PORT_DARWIN ?= $(shell ls -1 /dev/tty.SLAB_USBtoUART* | head -n 1)
 include $(RIOTBOARD)/Makefile.include.serial
 
 # include cortex defaults
-include $(RIOTBOARD)/Makefile.include.cortex_common
+include $(RIOTBOARD)/Makefile.include.cortexm_common

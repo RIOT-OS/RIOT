@@ -22,7 +22,6 @@ else ifeq ($(PROGRAMMER),jlink)
   export FFLAGS  = $(BINDIR) $(HEXFILE)
 endif
 
-export LINKFLAGS += -L$(RIOTCPU)/$(CPU)
 export OFLAGS    = -O binary --gap-fill 0xff
 export HEXFILE = $(ELFFILE:.elf=.bin)
 export DEBUGGER_FLAGS = $(BINDIR) $(ELFFILE)
@@ -31,4 +30,4 @@ export RESET_FLAGS = $(BINDIR)
 export OBJDUMPFLAGS += --disassemble --source --disassembler-options=force-thumb
 
 # include cortex defaults
-include $(RIOTBOARD)/Makefile.include.cortex_common
+include $(RIOTBOARD)/Makefile.include.cortexm_common

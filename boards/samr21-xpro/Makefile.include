@@ -2,13 +2,13 @@
 export CPU = samd21
 export CPU_MODEL = samr21g18a
 
-#
+# TODO: remove once the CPU implementation is stable with -Os
 CFLAGS_OPT = -O0
 
 # set default port depending on operating system
 PORT_LINUX ?= /dev/ttyACM0
 
-#
+# setup the boards dependencies
 include $(RIOTBOARD)/$(BOARD)/Makefile.dep
 
 # setup serial terminal
@@ -18,4 +18,4 @@ include $(RIOTBOARD)/Makefile.include.serial
 include $(RIOTBOARD)/Makefile.include.openocd
 
 # include cortex defaults
-include $(RIOTBOARD)/Makefile.include.cortex_common
+include $(RIOTBOARD)/Makefile.include.cortexm_common
