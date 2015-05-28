@@ -14,12 +14,24 @@
  * @{
  *
  * @file
- * @brief       Types and functions for FIB
+ * @brief       Types and functions for the FIB
  * @author      Martin Landsmann
  */
 
 #ifndef FIB_H_
 #define FIB_H_
+
+/**
+* @note: The specific prototype functions to manipulate FIB entries are present in
+* each of the following headers.
+*
+* This separation enables to extend the prototypes for specific address types easily.
+* Additionally it allows to switch only the required function prototypes by
+* only include the required fib_addon_*.h header(s).
+* At least one header MUST be included.
+*/
+#include "ng_fib/ng_fib_addon_generic.h"
+#include "ng_fib/ng_fib_addon_ipv6.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -42,14 +54,9 @@ typedef struct rp_address_msg_t {
 #define FIB_LIFETIME_NO_EXPIRE (0xFFFFFFFF)
 
 /**
- * @brief initializes all FIB entries with 0
+ * @brief maximum number of FIB table entries handled
  */
-void fib_init(void);
-
-/**
- * @brief de-initializes the FIB entries
- */
-void fib_deinit(void);
+#define FIB_MAX_FIB_TABLE_ENTRIES (20)
 
 /**
  * @brief Registration of a routing protocol handler function
@@ -64,69 +71,14 @@ void fib_deinit(void);
 int fib_register_rp(uint8_t *prefix, size_t prefix_size);
 
 /**
- * @brief Adds a new entry in the corresponding FIB table for global destination and next hop
- *
- * @param[in] iface_id       the interface ID
- * @param[in] dst            the destination address
- * @param[in] dst_size       the destination address size
- * @param[in] dst_flags      the destination address flags
- * @param[in] next_hop       the next hop address to be updated
- * @param[in] next_hop_size  the next hop address size
- * @param[in] next_hop_flags the next-hop address flags
- * @param[in] lifetime       the lifetime in ms to be updates
- *
- * @return 0 on success
- *         -ENOMEM if the entry cannot be created due to insufficient RAM
+ * @brief initializes all FIB entries with 0
  */
-int fib_add_entry(kernel_pid_t iface_id, uint8_t *dst, size_t dst_size, uint32_t dst_flags,
-                  uint8_t *next_hop, size_t next_hop_size, uint32_t next_hop_flags,
-                  uint32_t lifetime);
+void fib_init(void);
 
 /**
- * @brief Updates an entry in the FIB table with next hop and lifetime
- *
- * @param[in] dst            the destination address
- * @param[in] dst_size       the destination address size
- * @param[in] next_hop       the next hop address to be updated
- * @param[in] next_hop_size  the next hop address size
- * @param[in] next_hop_flags the next-hop address flags
- * @param[in] lifetime       the lifetime in ms to be updates
- *
- * @return 0 on success
- *         -ENOMEM if the entry cannot be updated due to insufficient RAM
+ * @brief de-initializes the FIB entries
  */
-int fib_update_entry(uint8_t *dst, size_t dst_size,
-                     uint8_t *next_hop, size_t next_hop_size, uint32_t next_hop_flags,
-                     uint32_t lifetime);
-
-/**
- * @brief removes an entry from the corresponding FIB table
- *
- * @param[in] dst       the destination address
- * @param[in] dst_size  the destination address size
- */
-void fib_remove_entry(uint8_t *dst, size_t dst_size);
-
-/**
- * @brief provides a next hop for a given destination
- *
- * @param[in, out] iface_id       pointer to store the interface ID for the next hop
- * @param[out] next_hop           pointer where the next hop address should be stored
- * @param[in, out] next_hop_size  the next hop address size. The value is
- *                                overwritten with the actual next hop size
- * @param[out] next_hop_flags     the next-hop address flags, e.g. compression type
- * @param[in] dst                 the destination address
- * @param[in] dst_size            the destination address size
- * @param[in] dst_flags           the destination address flags
- *
- * @return 0 on success
- *         -EHOSTUNREACH if no next hop is available in any FIB table
- *                                           all RRPs are notified before the return
- *         -ENOBUFS if the size for the next hop address is insufficient low
- */
-int fib_get_next_hop(kernel_pid_t *iface_id,
-                     uint8_t *next_hop, size_t *next_hop_size, uint32_t* next_hop_flags,
-                     uint8_t *dst, size_t dst_size, uint32_t dst_flags);
+void fib_deinit(void);
 
 /**
  * @brief returns the actual number of used FIB entries
