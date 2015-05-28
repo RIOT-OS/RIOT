@@ -22,7 +22,7 @@
 #define __BOARD_H
 
 #include "cpu.h"
-#include "cpu-conf.h"
+#include "cpu_conf.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -48,7 +48,7 @@
 #include "debug.h"
 
 #include "cpu.h"
-#include "cpu-conf.h"
+#include "cpu_conf.h"
 #include "tap.h"
 #include "nativenet.h"
 #include "nativenet_internal.h"

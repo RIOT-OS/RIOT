@@ -30,13 +30,13 @@ extern "C" {
  * TODO: measure and adjust for the cortex-m0
  * @{
  */
-#define THREAD_EXTRA_STACKSIZE_PRINTF    (512)
+#define THREAD_EXTRA_STACKSIZE_PRINTF   (512)
 
 #ifndef THREAD_STACKSIZE_DEFAULT
-#define THREAD_STACKSIZE_DEFAULT   (1024)
+#define THREAD_STACKSIZE_DEFAULT        (1024)
 #endif
 
-#define THREAD_STACKSIZE_IDLE      (256)
+#define THREAD_STACKSIZE_IDLE           (256)
 /** @} */
 
 /**
@@ -50,14 +50,19 @@ extern "C" {
 #endif
 /** @} */
 
-#define TRANSCEIVER_BUFFER_SIZE (3)
-#ifdef __cplusplus
-}
-#endif
+/**
+ * @brief Buffer size to use by the transceiver
+ */
+#define TRANSCEIVER_BUFFER_SIZE         (3)
 
 /**
  * @brief CPUID_ID_LEN length of cpuid in bytes
  */
-#define CPUID_ID_LEN (16) /* 128 bits long, 16 bytes long */
+#define CPUID_ID_LEN                    (16) /* 128 bits long, 16 bytes long */
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif /* __CPU_CONF_H */
 /** @} */

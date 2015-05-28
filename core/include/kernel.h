@@ -31,7 +31,7 @@
 #include "cpu.h"
 #include "flags.h"
 #include "sched.h"
-#include "cpu-conf.h"
+#include "cpu_conf.h"
 
 #ifdef __cplusplus
  extern "C" {

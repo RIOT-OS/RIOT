@@ -39,7 +39,7 @@
 
 #include "hwtimer_cpu.h"
 #include "cpu.h"
-#include "cpu-conf.h"
+#include "cpu_conf.h"
 #include "native_internal.h"
 
 #define ENABLE_DEBUG (0)

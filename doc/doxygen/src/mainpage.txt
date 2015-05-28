@@ -135,7 +135,7 @@
  * will probably crash. The minimum stack size depends also on some RIOT
  * internal structs and is hardware dependent. In order to help developers
  * finding the right stack size, RIOT defines some typical stack sizes in
- * `cpu-conf.` (which should be provided by the implementation for all
+ * `cpu_conf.` (which should be provided by the implementation for all
  * supported MCUs). The constants for these stack sizes are
  *
  * * `THREAD_STACKSIZE_IDLE`

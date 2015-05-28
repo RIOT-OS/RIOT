@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2013 INRIA
  * Copyright (C) 2014 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
@@ -7,20 +8,22 @@
  */
 
 /**
- * @ingroup         cpu_nrf51822
+ * @defgroup        cpu_stm32f1 STM32F1
+ * @ingroup         cpu
+ * @brief           CPU specific implementations for the STM32F1
  * @{
  *
  * @file
  * @brief           Implementation specific CPU configuration options
  *
- * @author          Hauke Petersen <hauke.peterse@fu-berlin.de>
+ * @author          Alaeddine Weslati <alaeddine.weslati@intia.fr>
+ * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
 #ifndef __CPU_CONF_H
 #define __CPU_CONF_H
 
-#include "nrf51.h"
-#include "nrf51_bitfields.h"
+#include "stm32f10x.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -28,9 +31,11 @@ extern "C" {
 
 /**
  * @name Kernel configuration
+ *
+ * TODO: measure and adjust for the cortex-m3
  * @{
  */
-#define THREAD_EXTRA_STACKSIZE_PRINTF    (512)
+#define THREAD_EXTRA_STACKSIZE_PRINTF    (1024)
 
 #ifndef THREAD_STACKSIZE_DEFAULT
 #define THREAD_STACKSIZE_DEFAULT   (1024)
@@ -51,18 +56,34 @@ extern "C" {
 /** @} */
 
 /**
- * @name Length in bytes for reading CPU_ID
+ * @brief Length for reading CPU_ID
  */
-#define CPUID_ID_LEN                    (8)
+#define CPUID_ID_LEN                    (12)
 
 /**
  * @brief Definition of different panic modes
  */
 typedef enum {
-    HARD_FAULT,             /**< hard fault */
-    NMI_HANDLER,            /**< non maskable interrupt */
-    DUMMY_HANDLER           /**< dummy interrupt handler */
+    HARD_FAULT,
+    WATCHDOG,
+    BUS_FAULT,
+    USAGE_FAULT,
+    DUMMY_HANDLER
 } panic_t;
+
+/**
+ * @brief Buffer size to use by the transceiver
+ */
+#define TRANSCEIVER_BUFFER_SIZE (3)
+
+/**
+ * @brief Configure the CPU's clock system
+ *
+ * @param[in] source    source clock frequency
+ * @param[in] target    target clock frequency
+ * @param[in] prescale  prescaler to use
+ */
+void cpu_clock_scale(uint32_t source, uint32_t target, uint32_t *prescale);
 
 #ifdef __cplusplus
 }

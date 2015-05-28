@@ -21,7 +21,7 @@
 
 #include "arch/hwtimer_arch.h"
 #include "hwtimer_cpu.h"
-#include "cpu-conf.h"
+#include "cpu_conf.h"
 #include "thread.h"
 
 #define ENABLE_DEBUG (0)
@@ -30,7 +30,7 @@
 #define LPTMR_MAXTICKS            (0x0000FFFF)
 
 #ifndef LPTIMER_CNR_NEEDS_LATCHING
-#warning LPTIMER_CNR_NEEDS_LATCHING is not defined in cpu-conf.h! Defaulting to 1
+#warning LPTIMER_CNR_NEEDS_LATCHING is not defined in cpu_conf.h! Defaulting to 1
 #define LPTIMER_CNR_NEEDS_LATCHING 1
 #endif
 

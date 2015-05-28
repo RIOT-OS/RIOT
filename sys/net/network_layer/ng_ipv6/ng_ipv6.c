@@ -16,7 +16,7 @@
 #include <stdbool.h>
 
 #include "byteorder.h"
-#include "cpu-conf.h"
+#include "cpu_conf.h"
 #include "kernel_types.h"
 #include "net/ng_icmpv6.h"
 #include "net/ng_netbase.h"

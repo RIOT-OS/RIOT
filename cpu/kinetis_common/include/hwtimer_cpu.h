@@ -25,7 +25,7 @@
  *              Possibly, additional settings in System Integration Module are necessary.
  *              Please consult the Reference Manual of your MCU for proper clock settings.
  *
- *              ### LPTMR Configuration Example (for cpu-conf.h) ###
+ *              ### LPTMR Configuration Example (for cpu_conf.h) ###
  *
  *                  #define LPTIMER_CLKSRC                   LPTIMER_CLKSRC_LPO
  *                  #define LPTIMER_CLKEN()                  (SIM->SCGC5 |= SIM_SCGC5_LPTMR_MASK)
@@ -48,7 +48,7 @@
 #ifndef __HWTIMER_CPU_H
 #define __HWTIMER_CPU_H
 
-#include "cpu-conf.h"
+#include "cpu_conf.h"
 
 #ifdef __cplusplus
 extern "C"

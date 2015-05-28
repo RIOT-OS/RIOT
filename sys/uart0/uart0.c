@@ -21,7 +21,7 @@
 
 #include <stdio.h>
 
-#include "cpu-conf.h"
+#include "cpu_conf.h"
 #include "chardev_thread.h"
 #include "ringbuffer.h"
 #include "thread.h"

@@ -47,7 +47,7 @@
 #include "sched.h"
 
 #include "cpu.h"
-#include "cpu-conf.h"
+#include "cpu_conf.h"
 #ifdef MODULE_NATIVENET
 #include "tap.h"
 #endif

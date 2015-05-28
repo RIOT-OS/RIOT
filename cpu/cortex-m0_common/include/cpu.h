@@ -25,7 +25,7 @@
 #ifndef __CPU_H
 #define __CPU_H
 
-#include "cpu-conf.h"
+#include "cpu_conf.h"
 
 
 /**
@@ -38,8 +38,13 @@
 extern "C" {
 #endif
 
+/**
+ * @brief   Deprecated interrupt control function for backward compatibility
+ * @{
+ */
 #define eINT            enableIRQ
 #define dINT            disableIRQ
+/** @} */
 
 /**
  * @brief Initialization of the CPU

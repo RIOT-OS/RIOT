@@ -24,7 +24,7 @@
 #include <stddef.h>
 #include <string.h>
 
-#include "cpu-conf.h"
+#include "cpu_conf.h"
 #include "irq.h"
 #include "kernel_internal.h"
 #include "msg.h"

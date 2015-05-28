@@ -1,11 +1,11 @@
 /*
- * Copyright (C) 2013, Freie Universitaet Berlin (FUB). All rights reserved.
+ * cpu.h - mc1322x specific definitions
+ * Copyright (C) 2013 Oliver Hahm <oliver.hahm@inria.fr>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  */
-
 
 #ifndef CPUCONF_H_
 #define CPUCONF_H_
@@ -16,19 +16,16 @@ extern "C" {
 
 /**
  * @ingroup     conf
- * @ingroup     lpc2387
+ * @ingroup     mc1322x
  *
  * @{
  */
 
 /**
  * @file
- * @brief       LPC2387 CPUconfiguration
+ * @brief       MC1322X CPUconfiguration
  *
- * @author      baar
- * @version     $Revision$
- *
- * @note        $Id$
+ * @author      Oliver Hahm <oliver.hahm@inria.fr>
  */
 
 /**
@@ -50,7 +47,7 @@ extern "C" {
 #define THREAD_STACKSIZE_DEFAULT   (512)
 #endif
 
-#define THREAD_STACKSIZE_IDLE      (160)
+#define THREAD_STACKSIZE_IDLE  (160)
 /** @} */
 
 /**
@@ -63,12 +60,24 @@ extern "C" {
 #define CC_CONF_WARN_UNUSED_RESULT      __attribute__((warn_unused_result))
 /** @} */
 
+/**
+ * @brief Transceiver configuration
+ * @{
+ */
 #define TRANSCEIVER_BUFFER_SIZE (10)
 #define RX_BUF_SIZE  (10)
+/** @} */
 
+/**
+ * @name UART0 buffer size definition for compatibility reasons
+ *
+ * TODO: remove once the remodeling of the uart0 driver is done
+ * @{
+ */
 #ifndef UART0_BUFSIZE
-#define UART0_BUFSIZE                   (128)
+#define UART0_BUFSIZE                   (64)
 #endif
+/** @} */
 
 #ifdef __cplusplus
 }

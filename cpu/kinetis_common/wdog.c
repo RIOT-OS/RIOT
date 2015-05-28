@@ -23,7 +23,7 @@
 
 #include <stdint.h>
 #include "wdog.h"
-#include "cpu-conf.h"
+#include "cpu_conf.h"
 #include "periph_conf.h"
 
 #ifndef KINETIS_WDOG_ADVANCED

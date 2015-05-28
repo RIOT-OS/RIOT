@@ -54,7 +54,7 @@ extern "C" {
  * is not set, this check is not performed. (CPU exception may occur)
  */
 #if DEVELHELP
-#include "cpu-conf.h"
+#include "cpu_conf.h"
 #define DEBUG_PRINT(...) \
     do { \
         if ((sched_active_thread == NULL) || (sched_active_thread->stack_size > THREAD_EXTRA_STACKSIZE_PRINTF)) { \

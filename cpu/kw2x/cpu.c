@@ -20,7 +20,7 @@
  */
 
 #include <stdint.h>
-#include "cpu-conf.h"
+#include "cpu_conf.h"
 
 #define FLASH_BASE          (0x00000000)
 

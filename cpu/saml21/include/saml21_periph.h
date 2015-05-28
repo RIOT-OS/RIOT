@@ -24,7 +24,7 @@ extern "C" {
 #endif
 
 #include <stdint.h>
-#include "cpu-conf.h"
+#include "cpu_conf.h"
 #include "panic.h"
 
 /**
