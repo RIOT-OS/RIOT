@@ -54,3 +54,7 @@ check_gh_label() {
     printf '%s\n' "${LABELS_JSON}" | grep -q "${LABEL}"
     return $?
 }
+
+# make sure we don't trigger test script failure because of the return status
+# of the environment checks above.
+true
