@@ -23,6 +23,7 @@ before_install:
     - echo 'deb http://us.archive.ubuntu.com/ubuntu trusty-updates   main restricted universe multiverse' | sudo tee -a /etc/apt/sources.list.d/trusty.list > /dev/null
     - sudo add-apt-repository -y ppa:terry.guo/gcc-arm-embedded
     - sudo apt-get update
+    - printenv
 
 install:
     - >
