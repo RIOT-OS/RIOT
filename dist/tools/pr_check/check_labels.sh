@@ -25,15 +25,6 @@ fi
 # initialize label cache variable
 LABELS_JSON=
 
-if [ -z "${CI_PULL_REQUEST}" ]; then
-    # Travis does not set the CI_PULL_REQUEST environment variable
-    # Other PR systems (e.g. Drone, Strider, Codeship) usually set the
-    # variable CI_PULL_REQUEST to the pull request number.
-    if [ -n "${TRAVIS_PULL_REQUEST}" ]; then
-        CI_PULL_REQUEST=${TRAVIS_PULL_REQUEST}
-    fi
-fi
-
 check_gh_label() {
     if [ -z "${CI_PULL_REQUEST}" ]; then
         # No pull request number, this happens if we run the CI on a branch

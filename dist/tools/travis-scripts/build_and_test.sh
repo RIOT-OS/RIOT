@@ -21,6 +21,15 @@ set_result() {
     echo $NEW_RESULT
 }
 
+if [ -z "${CI_PULL_REQUEST}" ]; then
+    # Travis does not set the CI_PULL_REQUEST environment variable
+    # Other PR systems (e.g. Drone, Strider, Codeship) usually set the
+    # variable CI_PULL_REQUEST to the pull request number.
+    if [ -n "${TRAVIS_PULL_REQUEST}" ]; then
+        CI_PULL_REQUEST=${TRAVIS_PULL_REQUEST}
+    fi
+fi
+
 if [[ $BUILDTEST_MCU_GROUP ]]
 then
 
@@ -64,7 +73,7 @@ then
 
     source ./dist/tools/pr_check/check_labels.sh
 
-    if check_gh_label "Ready for CI build"; then
+    if [ -z "$CI_PULL_REQUEST" ] || check_gh_label "Ready for CI build"; then
         if [ "$BUILDTEST_MCU_GROUP" == "x86" ]
         then
             make -C ./tests/unittests all test BOARD=native || exit
