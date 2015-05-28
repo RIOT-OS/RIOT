@@ -28,6 +28,8 @@ char *ng_netif_addr_to_str(char *out, size_t out_len, uint8_t *addr,
         return NULL;
     }
 
+    out[0] = '\0';
+
     for (i = 0; i < addr_len; i++) {
         out[(3 * i)] = _half_byte_to_char(addr[i] >> 4);
         out[(3 * i) + 1] = _half_byte_to_char(addr[i] & 0xf);
