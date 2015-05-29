@@ -54,7 +54,6 @@ int main(void)
 {
     shell_t shell;
     gnrc_netdev_t dev;
-    gnrc_netreg_entry_t netobj;
 
     puts("\nManual test for the minimal NRF51822 BLE radio driver\n");
     puts("Use the 'ifconfig' and 'blesnd' shell commands to verify the driver");
@@ -62,12 +61,6 @@ int main(void)
     /* initialize network device */
     blemin_init(&dev);
     gnrc_nomac_init(nomac_stack, sizeof(nomac_stack), 5, "nomac", &dev);
-
-    /* initialize packet dumper */
-    netobj.demux_ctx = GNRC_NETREG_DEMUX_CTX_ALL;
-    //netobj.pid = gnrc_pktdump_init(dump_stack, sizeof(dump_stack), 6, "dump");
-    netobj.pid = gnrc_pktdump_init();
-    gnrc_netreg_register(GNRC_NETTYPE_UNDEF, &netobj);
 
     /* initialize and run the shell */
     board_uart0_init();

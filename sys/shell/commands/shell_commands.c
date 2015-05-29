@@ -99,6 +99,7 @@ extern int _mersenne_get(int argc, char **argv);
 #ifdef MODULE_GNRC_NETIF
 extern int _netif_config(int argc, char **argv);
 extern int _netif_send(int argc, char **argv);
+#ifdef MODULE_RADIO_BLEMIN
 extern int _netif_send_ble(int argc, char **argv);
 #endif
 
