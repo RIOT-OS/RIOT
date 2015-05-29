@@ -44,7 +44,11 @@ static kernel_pid_t _pid = KERNEL_PID_UNDEF;
 /**
  * @brief   Allocate memory for the UDP thread's stack
  */
+#if ENABLE_DEBUG
+static char _stack[NG_UDP_STACK_SIZE + THREAD_EXTRA_STACKSIZE_PRINTF];
+#else
 static char _stack[NG_UDP_STACK_SIZE];
+#endif
 
 /**
  * @brief   Calculate the UDP checksum dependent on the network protocol
@@ -236,7 +240,8 @@ int ng_udp_calc_csum(ng_pktsnip_t *hdr, ng_pktsnip_t *pseudo_hdr)
 
 ng_pktsnip_t *ng_udp_hdr_build(ng_pktsnip_t *payload,
                                uint8_t *src, size_t src_len,
-                               uint8_t *dst, size_t dst_len) {
+                               uint8_t *dst, size_t dst_len)
+{
     ng_pktsnip_t *res;
     ng_udp_hdr_t *hdr;
 

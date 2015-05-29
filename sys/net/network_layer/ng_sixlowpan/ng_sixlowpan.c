@@ -26,7 +26,13 @@
 #include "debug.h"
 
 static kernel_pid_t _pid = KERNEL_PID_UNDEF;
+
+#if ENABLE_DEBUG
+static char _stack[NG_SIXLOWPAN_STACK_SIZE + THREAD_EXTRA_STACKSIZE_PRINTF];
+#else
 static char _stack[NG_SIXLOWPAN_STACK_SIZE];
+#endif
+
 
 /* handles NG_NETAPI_MSG_TYPE_RCV commands */
 void _receive(ng_pktsnip_t *pkt);
