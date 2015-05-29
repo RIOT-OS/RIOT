@@ -6,7 +6,4 @@ export CFLAGS += -DDONT_USE_CMSIS_INIT
 # use the hwtimer compatibility layer
 USEMODULE += hwtimer_compat
 
-# TODO: remove once the CPU implementation is stable with -Os
-CFLAGS_OPT = -O0
-
 include $(RIOTCPU)/Makefile.include.cortexm_common
