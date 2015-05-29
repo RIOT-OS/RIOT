@@ -60,6 +60,15 @@ extern "C" {
  */
 #define CPUID_ID_LEN                    (16) /* 128 bits long, 16 bytes long */
 
+/**
+ * @brief Definition of different panic modes
+ */
+typedef enum {
+    NMI_HANDLER,
+    HARD_FAULT,
+    DUMMY_HANDLER
+} panic_t;
+
 #ifdef __cplusplus
 }
 #endif
