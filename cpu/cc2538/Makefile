@@ -2,6 +2,6 @@
 MODULE = cpu
 
 # Add a list of subdirectories, that should also be built:
-DIRS = periph $(CORTEX_COMMON)
+DIRS = periph $(RIOTCPU)/cortexm_common
 
 include $(RIOTBASE)/Makefile.base

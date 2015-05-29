@@ -1,9 +1,12 @@
-export CORTEX = cortex-m0
+export CPU_ARCH = cortex-m0plus
 
 # this CPU implementation doesn't use CMSIS initialisation
 export CFLAGS += -DDONT_USE_CMSIS_INIT
 
-#
+# use the hwtimer compatibility layer
 USEMODULE += hwtimer_compat
 
-include $(RIOTCPU)/Makefile.include.cortex_common
+# TODO: remove once the CPU implementation is stable with -Os
+CFLAGS_OPT = -O0
+
+include $(RIOTCPU)/Makefile.include.cortexm_common

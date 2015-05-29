@@ -1,15 +1,17 @@
 # define the cpu used by the arduino due board
 export CPU = sam3x8e
-
-export FLASHER = $(RIOTBOARD)/$(BOARD)/dist/flash.sh
-export OFLAGS = -O binary
+export CPU_MODEL = sam3x8e
 
 # define the default port depending on the host OS
 PORT_LINUX ?= /dev/ttyACM0
 PORT_DARWIN ?= $(shell ls -1 /dev/tty.usbmodem* | head -n 1)
 
+# define board specific flasher options
+export FLASHER = $(RIOTBOARD)/$(BOARD)/dist/flash.sh
+export OFLAGS = -O binary
+
 # setup serial terminal
 include $(RIOTBOARD)/Makefile.include.serial
 
 # include cortex defaults
-include $(RIOTBOARD)/Makefile.include.cortex_common
+include $(RIOTBOARD)/Makefile.include.cortexm_common

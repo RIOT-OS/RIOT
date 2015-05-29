@@ -13,11 +13,8 @@ include $(RIOTBOARD)/Makefile.include.serial
 # this board uses openocd
 include $(RIOTBOARD)/Makefile.include.openocd
 
-# export board specific includes to the global includes-listing
-export INCLUDES += -I$(RIOTBASE)/drivers/at86rf231/include -I$(RIOTBASE)/sys/net/include
-
 # include board dependencies
 include $(RIOTBOARD)/$(BOARD)/Makefile.dep
 
 # include cortex defaults
-include $(RIOTBOARD)/Makefile.include.cortex_common
+include $(RIOTBOARD)/Makefile.include.cortexm_common

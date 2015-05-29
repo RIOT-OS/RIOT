@@ -1,2 +1,0 @@
-# include module specific includes
-export INCLUDES += -I$(RIOTCPU)/cortex-m0_common/include

@@ -14,10 +14,10 @@ export FLASHER = st-flash
 export DEBUGGER = $(RIOTBOARD)/$(BOARD)/dist/debug.sh
 export DEBUGSERVER = st-util
 
-#
+# define st-flash parameters
 export OFLAGS = -O binary
 export FFLAGS = write bin/$(BOARD)/$(APPLICATION).hex 0x8000000
 export DEBUGGER_FLAGS = $(RIOTBOARD)/$(BOARD)/dist/gdb.conf $(BINDIR)/$(APPLICATION).elf
 
 # include cortex defaults
-include $(RIOTBOARD)/Makefile.include.cortex_common
+include $(RIOTBOARD)/Makefile.include.cortexm_common

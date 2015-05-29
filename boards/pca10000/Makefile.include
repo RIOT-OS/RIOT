@@ -22,4 +22,4 @@ export RESET_FLAGS = $(BINDIR)
 include $(RIOTBOARD)/Makefile.include.serial
 
 # include cortex defaults
-include $(RIOTBOARD)/Makefile.include.cortex_common
+include $(RIOTBOARD)/Makefile.include.cortexm_common

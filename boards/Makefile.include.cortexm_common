@@ -1,9 +1,11 @@
-# we build all cortex boards with the GNU toolchain
-export PREFIX = arm-none-eabi-
-include $(RIOTBOARD)/Makefile.include.gnu
+# Target triple for the build. Use arm-none-eabi if you are unsure.
+export TARGET_TRIPLE ?= arm-none-eabi
 
-# use cortex name of CPU folder, but enable board Makefile to override
-export MCPU ?= $(CORTEX)
+# Toolchain prefix, defaults to target triple followed by a dash, you will most likely not need to touch this.
+export PREFIX ?= $(if $(TARGET_TRIPLE),$(TARGET_TRIPLE)-)
+
+# we build all cortex boards with the GNU toolchain
+include $(RIOTBOARD)/Makefile.include.gnu
 
 # define build specific options
 export CFLAGS_CPU   = -mcpu=$(MCPU) -mlittle-endian -mthumb -mno-thumb-interwork $(CFLAGS_FPU)
@@ -14,14 +16,8 @@ export CFLAGS_OPT   ?= -Os
 export CFLAGS += $(CFLAGS_CPU) $(CFLAGS_STYLE) $(CFLAGS_LINK) $(CFLAGS_DBG) $(CFLAGS_OPT)
 
 export ASFLAGS += $(CFLAGS_CPU) $(CFLAGS_DEBUG)
-export LINKFLAGS += -L$(RIOTCPU)/$(CPU)
-export LINKFLAGS += $(CFLAGS_DEBUG) $(CFLAGS_CPU) $(CFLAGS_STYLE) -static -lgcc -nostartfiles -T$(LINKERSCRIPT)
-
-export OFLAGS ?= -O ihex
-export FFLAGS ?= flash
-export DEBUGGER_FLAGS ?= debug
-export DEBUGSERVER_FLAGS ?= debug-server
-export RESET_FLAGS ?= reset
+export LINKFLAGS += -L$(RIOTCPU)/$(CPU) -T$(RIOTCPU)/$(CPU)/$(CPU_MODEL)_linkerscript.ld
+export LINKFLAGS += $(CFLAGS_DEBUG) $(CFLAGS_CPU) $(CFLAGS_STYLE) -static -lgcc -nostartfiles
 
 # use the nano-specs of the NewLib when available
 ifeq ($(shell $(LINK) -specs=nano.specs -E - 2>/dev/null >/dev/null </dev/null ; echo $$?),0)

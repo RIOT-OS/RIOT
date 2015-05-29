@@ -25,4 +25,4 @@ include $(RIOTBOARD)/Makefile.include.serial
 include $(RIOTBOARD)/Makefile.include.openocd
 
 # include cortex defaults
-include $(RIOTBOARD)/Makefile.include.cortex_common
+include $(RIOTBOARD)/Makefile.include.cortexm_common
