@@ -11,9 +11,11 @@
  * @{
  *
  * @file
- * @brief       Board specific implementations for the Atem SAM R21 Xplained Pro board
+ * @brief       Board specific implementations for the Atmel SAM R21 Xplained
+ *              Pro board
  *
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
  * @}
  */
@@ -23,32 +25,12 @@
 #include "board.h"
 #include "cpu.h"
 
-
-void led_init(void);
-
-
 void board_init(void)
 {
     /* initialize the CPU */
     cpu_init();
-
-    /* initialize the boards LEDs */
-    led_init();
-}
-
-
-/**
- * @brief Initialize the boards on-board LED
- *
- * The LED initialization is hard-coded in this function. As the LED is soldered
- * onto the board it is fixed to its CPU pins.
- *
- * The LED is connected to the following pin:
- * - LED: PA19
- */
-void led_init(void)
-{
-    LED_PORT.DIRSET.reg = 1 << LED_PIN;
-    LED_PORT.OUTSET.reg = LED_PIN;
+    /* initialize the boards LED at pin PA19 */
+    LED_PORT.DIRSET.reg = (1 << LED_PIN);
+    LED_PORT.OUTSET.reg = (1 << LED_PIN);
     LED_PORT.PINCFG[LED_PIN].bit.PULLEN = false;
 }
