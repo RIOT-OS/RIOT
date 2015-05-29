@@ -33,7 +33,7 @@ if [ -n "${SQUASH_COMMITS}" ]; then
     EXIT_CODE=1
 fi
 
-if [ -n "$TRAVIS_PULL_REQUEST" ]; then
+if [ -n "${CI_PULL_REQUEST}" ]; then
     if check_gh_label "NEEDS SQUASHING"; then
         echo -e "${CERROR}Pull request needs squashing according to its labels set on GitHub${CRESET}"
         EXIT_CODE=1

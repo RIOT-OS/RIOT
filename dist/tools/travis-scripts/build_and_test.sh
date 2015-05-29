@@ -21,6 +21,15 @@ set_result() {
     echo $NEW_RESULT
 }
 
+if [ -z "${CI_PULL_REQUEST}" ]; then
+    # Travis does not set the CI_PULL_REQUEST environment variable
+    # Other PR systems (e.g. Drone, Strider, Codeship) usually set the
+    # variable CI_PULL_REQUEST to the pull request number.
+    if [ -n "${TRAVIS_PULL_REQUEST}" ]; then
+        CI_PULL_REQUEST=${TRAVIS_PULL_REQUEST}
+    fi
+fi
+
 if [[ $BUILDTEST_MCU_GROUP ]]
 then
 
@@ -64,7 +73,17 @@ then
 
     source ./dist/tools/pr_check/check_labels.sh
 
-    if check_gh_label "Ready for CI build"; then
+    if [ -z "${CI_PULL_REQUEST}" ]; then
+        echo -e "\e[0;32m(Not a pull request) compile tests will be performed for this branch\e[0m"
+        PERFORM_COMPILE_TESTS=1
+    elif check_gh_label "Ready for CI build"; then
+        echo -e "\e[0;32mCompile tests will be performed for this pull request\e[0m"
+        PERFORM_COMPILE_TESTS=1
+    fi
+    if [ -z "${PERFORM_COMPILE_TESTS}" ]; then
+        PERFORM_COMPILE_TESTS=0
+    fi
+    if [ "${PERFORM_COMPILE_TESTS}" -ne 0 ]; then
         if [ "$BUILDTEST_MCU_GROUP" == "x86" ]
         then
             make -C ./tests/unittests all test BOARD=native || exit
@@ -73,7 +92,6 @@ then
             #   resolved:
             #   - make -C ./tests/unittests all test BOARD=qemu-i386 || exit
         fi
-        echo -e "\e[0;32mCompile tests will be performed for this pull request\e[0m"
         ./dist/tools/compile_test/compile_test.py riot/master
     else
         echo -e "\e[33;40mCompile tests will be skipped for this pull request\e[0m"
