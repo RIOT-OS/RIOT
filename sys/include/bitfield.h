@@ -27,6 +27,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <stddef.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -38,7 +39,7 @@ extern "C" {
  * @note    SIZE should be a constant expression. This avoids variable length
  *          arrays.
  */
-#define BITFIELD(NAME, SIZE)  (uint8_t NAME[((SIZE) + 7) / 8])
+#define BITFIELD(NAME, SIZE)  uint8_t NAME[((SIZE) + 7) / 8]
 
 /**
  * @brief   Set the bit to 1
