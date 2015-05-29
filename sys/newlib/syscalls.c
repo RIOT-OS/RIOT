@@ -200,15 +200,21 @@ int _open_r(struct _reent *r, const char *name, int mode)
  */
 int _read_r(struct _reent *r, int fd, void *buffer, unsigned int count)
 {
-#ifndef MODULE_UART0
-    while (rx_buf.avail == 0) {
-        mutex_lock(&uart_rx_mutex);
-    }
-    return ringbuffer_get(&rx_buf, (char*)buffer, rx_buf.avail);
-#else
+    (void) r;
+    (void) fd;
+#ifdef MODULE_UART0
+    (void) count;
     char *res = (char*)buffer;
     res[0] = (char)uart0_readc();
     return 1;
+#else
+    while (rx_buf.avail == 0) {
+        mutex_lock(&uart_rx_mutex);
+    }
+    if (count > rx_buf.avail) {
+        count = rx_buf.avail;
+    }
+    return ringbuffer_get(&rx_buf, (char*)buffer, count);
 #endif
 }
 
