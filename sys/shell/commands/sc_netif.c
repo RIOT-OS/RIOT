@@ -791,7 +791,7 @@ void _netif_send_ble(int argc, char **argv)
     if (pkt_type == CONNECT_REQ_TYPE) {
         puts("error: CONNECT_REQ type is not supported yet");
         return;
-}
+    }
 
     /* put packet together */
     if (argc > 3) {
@@ -825,6 +825,7 @@ void _netif_send_ble(int argc, char **argv)
     /* and send it */
     ng_netapi_send(dev, pkt);
 }
+
 #endif
 
 int _netif_config(int argc, char **argv)

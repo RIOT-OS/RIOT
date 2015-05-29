@@ -55,7 +55,6 @@ int main(void)
 {
     shell_t shell;
     ng_netdev_t dev;
-    ng_netreg_entry_t netobj;
 
     puts("\nManual test for the minimal NRF51822 BLE radio driver\n");
     puts("Use the 'ifconfig' and 'blesnd' shell commands to verify the driver");
@@ -63,12 +62,6 @@ int main(void)
     /* initialize network device */
     blemin_init(&dev);
     ng_nomac_init(nomac_stack, sizeof(nomac_stack), 5, "nomac", &dev);
-
-    /* initialize packet dumper */
-    netobj.demux_ctx = NG_NETREG_DEMUX_CTX_ALL;
-    //netobj.pid = ng_pktdump_init(dump_stack, sizeof(dump_stack), 6, "dump");
-    netobj.pid = ng_pktdump_init();
-    ng_netreg_register(NG_NETTYPE_UNDEF, &netobj);
 
     /* initialize and run the shell */
     board_uart0_init();

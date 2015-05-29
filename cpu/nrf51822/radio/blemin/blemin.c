@@ -72,17 +72,24 @@ typedef enum {
 } state_t;
 
 /**
+ * @brief   Possible BLE link layer states
+ */
+typedef enum {
+    LL_STANDBY,		    /**< link layer is in standby mode */
+    LL_ADVERTISING,         /**< link layer is in advertising mode */
+    LL_CONNECTION,          /**< link layer is in connection mode */
+    LL_INITIATING,          /**< link layer is in initiating mode */
+    LL_SCANNING,            /**< link layer is in scanning mode */
+} ll_state_t;
+
+/**
  * @brief   In-memory structure of a blemin radio packet
  */
 typedef struct __attribute__((packed))
 {
-    uint8_t length;                     /**< packet length */
-    uint8_t src_addr[2];                /**< source address of the packet */
-    uint8_t dst_addr[2];                /**< destination address */
-    uint16_t proto;                     /**< protocol of payload */
+    PDU_header header;                  /**< BLE pdu header */
     uint8_t payload[CONF_PAYLOAD_LEN];  /**< actual payload */
-}
-packet_t;
+} packet_t;
 
 /**
  * @brief   Pointer to the MAC layer event callback
@@ -93,6 +100,11 @@ static ng_netdev_t *_netdev = NULL;
  * @brief   Current state of the device
  */
 static volatile state_t _state = STATE_OFF;
+
+/**
+ * @brief   Current state of the BLE link layer 
+ */
+static volatile ll_state_t _ll_state = LL_STANDBY;
 
 /**
  * @brief   Address of the device
@@ -124,6 +136,7 @@ static volatile int _rx_next = 0;
  */
 static void _switch_to_idle(void)
 {
+    DEBUG("blemin: switch_to_idle\n");
     /* witch to idle state */
     NRF_RADIO->EVENTS_DISABLED = 0;
     NRF_RADIO->TASKS_DISABLE = 1;
@@ -135,6 +148,7 @@ static void _switch_to_idle(void)
 
 static void _switch_to_rx(void)
 {
+    DEBUG("blemin: switch_to_rx\n");
     /* set pointer to receive buffer */
     NRF_RADIO->PACKETPTR = (uint32_t) & (_rx_buf[_rx_next]);
 
@@ -148,6 +162,7 @@ static void _switch_to_rx(void)
  */
 int _get_state(uint8_t *val, size_t max_len)
 {
+    DEBUG("blemin: get_state\n");
     ng_netconf_state_t state;
 
     if (max_len < sizeof(ng_netconf_state_t)) {
@@ -181,6 +196,7 @@ int _get_state(uint8_t *val, size_t max_len)
 
 int _set_state(uint8_t *val, size_t len)
 {
+    DEBUG("blemin: set_state\n");
     ng_netconf_state_t state;
 
     if (len != sizeof(ng_netconf_state_t)) {
@@ -274,7 +290,6 @@ int _get_adv_address(uint8_t *val, size_t max_len)
 
 int _set_adv_address(uint8_t *val, size_t len)
 {
-
     /* check parameters */
     if (len != BLE_ADDR_LEN) {
         return -EINVAL;
@@ -396,6 +411,7 @@ int _set_txpower(uint8_t *val, size_t len)
  */
 void isr_radio(void)
 {
+    DEBUG("blemin: isr_radio\n");
     msg_t msg;
 
     if (NRF_RADIO->EVENTS_END == 1) {
@@ -438,40 +454,44 @@ void isr_radio(void)
  */
 static void _receive_data(void)
 {
+    DEBUG("blemin: receive_data\n");
     packet_t *data;
-    ng_pktsnip_t *pkt_head;
     ng_pktsnip_t *pkt;
-    ng_netif_hdr_t *hdr;
 
     /* only read data if we have somewhere to send it to */
     if (_netdev->event_cb == NULL) {
-        return;
+       DEBUG("blemin: receive_data (return)\n");
+       return;
     }
 
     /* get pointer to RX data buffer */
     data = &(_rx_buf[_rx_next ^ 1]);
 
-    /* allocate and fill netif header */
-    pkt_head = ng_pktbuf_add(NULL, NULL, sizeof(ng_netif_hdr_t) + 4,
-                             NG_NETTYPE_UNDEF);
+#if ENABLE_DEBUG
+    int i;
+    static const char *pdu_type_name[] = {
+        "ADV_IND", "ADV_DIRECT_IND", "ADV_NONCONN_IND", "SCAN_REQ", "SCAN_RSP",
+        "CONNECT_REQ", "ADV_SCAN_IND"
+    };
 
-    if (pkt_head == NULL) {
-        DEBUG("blemin: Error allocating netif header on RX\n");
-        return;
+    printf("Type: %s  Len: %u  Access Address: %08x  %s Address: %02x:%02x:%02x:%02x:%02x:%02x\n",
+           pdu_type_name[data->header.pdu_type], data->header.length, (unsigned int)_access_addr,
+           (data->header.pdu_type == SCAN_REQ_TYPE) ? "Scanning" : "Advertising",
+	   data->payload[5], data->payload[4], data->payload[3], data->payload[2], data->payload[1], data->payload[0]);
+
+    for (i = 0; i < data->header.length; i++) {
+        printf("%02x ", data->payload[i]);
     }
-
-    hdr = (ng_netif_hdr_t *)pkt_head->data;
-    ng_netif_hdr_init(hdr, 2, 2);
-    hdr->if_pid = _netdev->mac_pid;
-    ng_netif_hdr_set_src_addr(hdr, data->src_addr, 2);
-    ng_netif_hdr_set_dst_addr(hdr, data->dst_addr, 2);
+    printf("\n");
+#endif
 
     /* allocate and fill payload */
-    pkt = ng_pktbuf_add(pkt_head, data->payload, data->length - 6, data->proto);
+     pkt = ng_pktbuf_add(NULL, data->payload, data->header.length, NG_NETTYPE_UNDEF);
+     pkt = ng_pktbuf_add(pkt, data, BLE_PDU_HDR_LEN, NG_NETTYPE_UNDEF);
 
     if (pkt == NULL) {
         DEBUG("blemin: Error allocating packet payload on RX\n");
-        ng_pktbuf_release(pkt_head);
+        ng_pktbuf_release(pkt);
         return;
     }
 
@@ -484,6 +504,7 @@ static void _receive_data(void)
  */
 int blemin_init(ng_netdev_t *dev)
 {
+    DEBUG("blemin: init\n");
     /* check given device descriptor */
     if (dev == NULL) {
         return -ENODEV;
@@ -545,6 +566,7 @@ int blemin_init(ng_netdev_t *dev)
 
 int _send(ng_netdev_t *dev, ng_pktsnip_t *pkt)
 {
+    DEBUG("blemin: send\n");
     (void)dev;
     int i;
     size_t size;
@@ -634,6 +656,7 @@ int _send(ng_netdev_t *dev, ng_pktsnip_t *pkt)
 
 int _add_event_cb(ng_netdev_t *dev, ng_netdev_event_cb_t cb)
 {
+    DEBUG("blemin: add_event_cb\n");
     if (dev->event_cb != NULL) {
         return -ENOBUFS;
     }
@@ -644,6 +667,7 @@ int _add_event_cb(ng_netdev_t *dev, ng_netdev_event_cb_t cb)
 
 int _rem_event_cb(ng_netdev_t *dev, ng_netdev_event_cb_t cb)
 {
+    DEBUG("blemin; rem_event_cb\n");
     if (dev->event_cb == cb) {
         dev->event_cb = NULL;
         return 0;
@@ -708,10 +732,12 @@ void _isr_event(ng_netdev_t *dev, uint32_t event_type)
 {
     switch (event_type) {
         case ISR_EVENT_RX_DONE:
+	    DEBUG("blemin; isr_event -> ISR_EVENT_RX_DONE\n");
             _receive_data();
             break;
 
         default:
+	    DEBUG("blemin; isr_event -> return\n");
             /* do nothing */
             return;
     }

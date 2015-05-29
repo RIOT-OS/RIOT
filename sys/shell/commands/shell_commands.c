@@ -162,7 +162,9 @@ extern int _netif_config(int argc, char **argv);
 #endif
 #ifndef MODULE_TRANSCEIVER
 extern int _netif_send(int argc, char **argv);
+#ifdef MODULE_RADIO_BLEMIN
 extern int _netif_send_ble(int argc, char **argv);
+#endif
 #endif
 #endif
 
@@ -279,7 +281,7 @@ const shell_command_t _shell_command_list[] = {
 #endif
 #ifndef MODULE_TRANSCEIVER
 #ifdef MODULE_RADIO_BLEMIN
-    {"blesnd", "send BLE packet", _netif_send_ble },
+    {"blesnd", "send BLE packets", _netif_send_ble },
 #else
     {"txtsnd", "send raw data", _netif_send },
 #endif
