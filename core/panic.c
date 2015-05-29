@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2015 INRIA
  * Copyright (C) 2015 Eistec AB
+ * Copyright (C) 2015 Kaspar Schleiser <kaspar@schleiser.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -17,6 +18,7 @@
  * @author      Kévin Roussel <Kevin.Roussel@inria.fr>
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  * @author      Joakim Gebart <joakim.gebart@eistec.se>
+ * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
 #include <string.h>
@@ -32,27 +34,16 @@
 #include "ps.h"
 #endif
 
-#define PANIC_STR_SIZE 80
-
-/* "public" variables holding the crash data */
-char panic_str[PANIC_STR_SIZE];
-int panic_code;
-
 /* flag preventing "recursive crash printing loop" */
 static int crashed = 0;
 
 /* WARNING: this function NEVER returns! */
 NORETURN void core_panic(int crash_code, const char *message)
 {
-    /* copy panic datas to "public" global variables */
-    panic_code = crash_code;
-    strncpy(panic_str, message, sizeof(panic_str));
-    /* strncpy does not add any null-termination. */
-    panic_str[sizeof(panic_str)-1] = '\0';
-    /* print panic message to console (if possible) */
     if (crashed == 0) {
+        /* print panic message to console (if possible) */
         crashed = 1;
-        puts("******** SYSTEM FAILURE ********\n");
+        puts("*** RIOT kernel panic");
         puts(message);
 #if DEVELHELP
 #ifdef MODULE_PS
@@ -60,11 +51,10 @@ NORETURN void core_panic(int crash_code, const char *message)
         puts("");
 #endif
 
-        puts("******** RIOT HALTS HERE ********\n");
+        puts("*** halted.\n");
 #else
-        puts("******** RIOT WILL REBOOT ********\n");
+        puts("*** rebooting...\n\n");
 #endif
-        puts("\n\n");
     }
     /* disable watchdog and all possible sources of interrupts */
     disableIRQ();
