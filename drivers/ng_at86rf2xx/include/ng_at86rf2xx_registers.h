@@ -292,6 +292,15 @@ extern "C" {
 /** @} */
 
 /**
+ * @brief   Bitfield definitions for the XAH_CTRL_0 register
+ * @{
+ */
+#define NG_AT86RF2XX_XAH_CTRL_0__MAX_FRAME_RETRIES              (0xF0)
+#define NG_AT86RF2XX_XAH_CTRL_0__MAX_CSMA_RETRIES               (0x0E)
+#define NG_AT86RF2XX_XAH_CTRL_0__SLOTTED_OPERATION              (0x01)
+/** @} */
+
+/**
  * @brief   Bitfield definitions for the XAH_CTRL_1 register
  * @{
  */
