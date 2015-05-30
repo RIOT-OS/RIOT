@@ -88,17 +88,17 @@ void reset_handler(void)
  */
 void dummy_handler(void)
 {
-    core_panic(DUMMY_HANDLER, "DUMMY ISR HANDLER");
+    core_panic(PANIC_DUMMY_HANDLER, "DUMMY ISR HANDLER");
 }
 
 void isr_nmi(void)
 {
-    core_panic(NMI_HANDLER, "NMI HANDLER");
+    core_panic(PANIC_NMI_HANDLER, "NMI HANDLER");
 }
 
 void isr_hard_fault(void)
 {
-    core_panic(HARD_FAULT, "HARD FAULT");
+    core_panic(PANIC_HARD_FAULT, "HARD FAULT");
 }
 
 /* Cortex-M specific interrupt vectors */

@@ -20,8 +20,6 @@
  * @author      Joakim Gebart <joakim.gebart@eistec.se>
  */
 
-extern void *_vector_rom[];
-
 /** @brief Current core clock frequency */
 uint32_t SystemCoreClock = DEFAULT_SYSTEM_CLOCK;
 /** @brief Current system clock frequency */
@@ -46,15 +44,10 @@ static void check_running_cpu_revision(void);
  */
 void cpu_init(void)
 {
+    /* initialize the Cortex-M core */
+    cortexm_init();
     /* Check that we are running on the CPU that this code was built for */
     check_running_cpu_revision();
-
-    /* configure the vector table location to internal flash */
-    SCB->VTOR = (uint32_t)_vector_rom;
-
-    /* set pendSV interrupt to lowest possible priority */
-    NVIC_SetPriority(PendSV_IRQn, 0xff);
-
 }
 
 static void check_running_cpu_revision(void)

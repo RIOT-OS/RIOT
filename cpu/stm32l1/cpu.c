@@ -26,14 +26,10 @@ static void clk_init(void);
 
 void cpu_init(void)
 {
-    /* set PendSV priority to the lowest possible priority */
-    NVIC_SetPriority(PendSV_IRQn, 0xff);
-
+    /* initialize the Cortex-M core */
+    cortexm_init();
     /* initialize system clocks */
     clk_init();
-
-    /* configure the vector table location to internal flash */
-    SCB->VTOR = FLASH_BASE;
 }
 
 /**

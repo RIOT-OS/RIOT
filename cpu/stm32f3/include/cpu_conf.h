@@ -28,30 +28,17 @@
 #include "stm32f334x8.h"
 #endif
 
-/**
- * @name Kernel configuration
- *
- * TODO: measure and adjust for the Cortex-M4f
- * @{
- */
-#define THREAD_EXTRA_STACKSIZE_PRINTF    (1024)
-
-#ifndef THREAD_STACKSIZE_DEFAULT
-#define THREAD_STACKSIZE_DEFAULT   (1024)
+#ifdef __cplusplus
+extern "C" {
 #endif
 
-#define THREAD_STACKSIZE_IDLE      (256)
-/** @} */
-
 /**
- * @name UART0 buffer size definition for compatibility reasons
- *
- * TODO: remove once the remodeling of the uart0 driver is done
+ * @brief   ARM Cortex-M specific CPU configuration
  * @{
  */
-#ifndef UART0_BUFSIZE
-#define UART0_BUFSIZE                   (128)
-#endif
+#define CPU_DEFAULT_IRQ_PRIO            (1U)
+#define CPU_IRQ_NUMOF                   (82U)
+#define CPU_FLASH_BASE                  FLASH_BASE
 /** @} */
 
 /**
@@ -59,9 +46,6 @@
  */
 #define CPUID_ID_LEN                    (12)
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #ifdef __cplusplus
 }

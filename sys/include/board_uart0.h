@@ -21,7 +21,8 @@
 #define __BOARD_UART0_H
 
 #include "kernel_types.h"
-#include "cpu_conf.h"   /* To give user access to UART0_BUFSIZE */
+#include "cpu.h"        /* To give user access to UART0_BUFSIZE */
+#include "cpu_conf.h"   /* Some CPUs define this in cpu_conf.h... */
 
 #ifdef __cplusplus
 extern "C" {

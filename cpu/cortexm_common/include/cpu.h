@@ -25,13 +25,12 @@
  * @author      Joakim Gebart <joakim.gebart@eistec.se>
  */
 
-#ifndef CORTEXM_COMMON_H_
-#define CORTEXM_COMMON_H_
-
+#ifndef CPU_H_
+#define CPU_H_
 
 #include "cpu_conf.h"
 
-/**
+/*
  * TODO: remove once core was adjusted
  */
 #include "irq.h"
@@ -41,16 +40,52 @@ extern "C" {
 #endif
 
 /**
- * @brief   Deprecated interrupt control function for backward compatibility
+ * @brief    Configuration of default stack sizes
+ *
+ * As all members of the Cortex-M family behave identical in terms of stack
+ * usage, we define the default stack size values here centrally for all CPU
+ * implementations.
+ *
+ * If needed, you can overwrite these values the the `cpu_conf.h` file of the
+ * specific CPU implementation.
+ *
+ * TODO: Adjust values for Cortex-M4F with FPU?
+ * TODO: Configure second set if no newlib nano.specs are available?
  * @{
  */
-#define eINT            enableIRQ
-#define dINT            disableIRQ
+#ifndef THREAD_EXTRA_STACKSIZE_PRINTF
+#define THREAD_EXTRA_STACKSIZE_PRINTF   (512)
+#endif
+#ifndef THREAD_STACKSIZE_DEFAULT
+#define THREAD_STACKSIZE_DEFAULT        (1024)
+#endif
+#ifndef THREAD_STACKSIZE_IDLE
+#define THREAD_STACKSIZE_IDLE           (256)
+#endif
 /** @} */
 
 /**
- * @brief   Some members of the Cortex-M family have architecture specific atomic
- *          operations in atomic_arch.c
+ * @brief   UART0 buffer size definition for compatibility reasons
+ *
+ * TODO: remove once the remodeling of the uart0 driver is done
+ * @{
+ */
+#ifndef UART0_BUFSIZE
+#define UART0_BUFSIZE                   (128)
+#endif
+/** @} */
+
+/**
+ * @brief   Deprecated interrupt control function for backward compatibility
+ * @{
+ */
+#define eINT                            enableIRQ
+#define dINT                            disableIRQ
+/** @} */
+
+/**
+ * @brief   Some members of the Cortex-M family have architecture specific
+ *          atomic operations in atomic_arch.c
  */
 #if defined(CPU_ARCH_CORTEX_M3) || defined(CPU_ARCH_CORTEX_M4) || \
     defined(CPU_ARCH_CORTEX_M4F)
@@ -58,13 +93,34 @@ extern "C" {
 #endif
 
 /**
+ * @brief Definition of available panic modes
+ */
+typedef enum {
+    PANIC_NMI_HANDLER,       /**< non maskable interrupt */
+    PANIC_HARD_FAULT,        /**< hard fault */
+#if defined(CPU_ARCH_CORTEX_M3) || defined(CPU_ARCH_CORTEX_M4) || \
+    defined(CPU_ARCH_CORTEX_M4F)
+    PANIC_MEM_MANAGE,        /**< memory controller interrupt */
+    PANIC_BUS_FAULT,         /**< bus fault */
+    PANIC_USAGE_FAULT,       /**< undefined instruction or unaligned access */
+    PANIC_DEBUG_MON,         /**< debug interrupt */
+#endif
+    PANIC_DUMMY_HANDLER,     /**< unhandled interrupt */
+} panic_t;
+
+/**
  * @brief   Initialization of the CPU
  */
 void cpu_init(void);
+
+/**
+ * @brief   Initialize Cortex-M specific core parts of the CPU
+ */
+void cortexm_init(void);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* CORTEXM_COMMON_H_ */
+#endif /* CPU_H_ */
 /** @} */

@@ -29,9 +29,11 @@ include $(KINETIS_COMMON)Makefile.include
 export LINKFLAGS += -L$(RIOTCPU)/$(CPU)/ldscripts
 export LINKERSCRIPT = $(CPU_MODEL).ld
 
-#export the CPU model
+#export the CPU model and architecture
 MODEL = $(shell echo $(CPU_MODEL)|tr 'a-z' 'A-Z')
 export CFLAGS += -DCPU_MODEL_$(MODEL)
+ARCH = $(shell echo $(CPU_ARCH) | tr 'a-z-' 'A-Z_')
+export CFLAGS += -DCPU_ARCH_$(ARCH)
 
 # include CPU specific includes
 export INCLUDES += -I$(RIOTCPU)/$(CPU)/include

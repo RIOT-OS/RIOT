@@ -63,20 +63,6 @@ void isr_debug_mon(void);
  */
 void isr_unhandled(void);
 
-/**
- * @brief Definition of different panic modes
- */
-typedef enum {
-    PANIC_NMI_HANDLER,       /**< non maskable interrupt */
-    PANIC_HARD_FAULT,        /**< hard fault */
-    PANIC_MEM_MANAGE,        /**< memory controller interrupt */
-    PANIC_BUS_FAULT,         /**< bus fault */
-    PANIC_USAGE_FAULT,       /**< undefined instruction or unaligned access */
-    PANIC_DEBUG_MON,         /**< debug interrupt */
-    PANIC_UNHANDLED_ISR,     /**< unhandled interrupt */
-} panic_t;
-
-
 #ifdef __cplusplus
 }
 #endif
