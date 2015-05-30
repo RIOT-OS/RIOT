@@ -11,7 +11,7 @@ include $(RIOTBOARD)/Makefile.include.gnu
 export CFLAGS_CPU   = -mcpu=$(MCPU) -mlittle-endian -mthumb -mno-thumb-interwork $(CFLAGS_FPU)
 export CFLAGS_STYLE = -std=gnu99 -Wall -Wstrict-prototypes -Werror=implicit-function-declaration
 export CFLAGS_LINK  = -ffunction-sections -fdata-sections -fno-builtin
-export CFLAGS_DBG   = -ggdb -g3
+export CFLAGS_DBG   ?= -ggdb -g3
 export CFLAGS_OPT   ?= -Os
 export CFLAGS += $(CFLAGS_CPU) $(CFLAGS_STYLE) $(CFLAGS_LINK) $(CFLAGS_DBG) $(CFLAGS_OPT)
 
