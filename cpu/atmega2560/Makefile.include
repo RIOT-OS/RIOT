@@ -9,7 +9,7 @@ export USEMODULE += atmega_common
 export ATMEGA_COMMON = $(RIOTCPU)/atmega_common/
 
 # define the linker script to use for this CPU
-#export LINKERSCRIPT = $(RIOTCPU)/$(CPU)/atmega2560_linkerscript.ld
+#export LINKERSCRIPT = $(RIOTCPU)/$(CPU)/ldscripts/atmega2560.ld
 
 # include CPU specific includes
 export INCLUDES += -I$(RIOTCPU)/$(CPU)/include
