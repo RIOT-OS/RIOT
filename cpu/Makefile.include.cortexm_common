@@ -16,11 +16,13 @@ export CFLAGS += -DCPU_ARCH_$(ARCH)
 
 # set the compiler specific CPU and FPU options
 ifeq ($(CPU_ARCH),cortex-m4f)
-export CFLAGS_FPU += -mfloat-abi=hard -mfpu=fpv4-sp-d16
+# TODO: enable hard floating points for the M4F once the context save/restore
+#       code is adjusted to take care of FPU registers
+#export CFLAGS_FPU += -mfloat-abi=hard -mfpu=fpv4-sp-d16
 export MCPU := cortex-m4
-else
-export MCPU ?= $(CPU_ARCH)
 endif
+CFLAGS_FPU ?= -mfloat-abi=soft
+export MCPU ?= $(CPU_ARCH)
 
 # Include CPU specific includes:
 export INCLUDES += -I$(RIOTCPU)/$(CPU)/include
