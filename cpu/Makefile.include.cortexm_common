@@ -27,6 +27,24 @@ endif
 CFLAGS_FPU ?= -mfloat-abi=soft
 export MCPU ?= $(CPU_ARCH)
 
+# CMSIS DSP needs to know about the CPU core
+ifneq (,$(filter cmsis-dsp,$(USEPKG)))
+# definition needed to use cmsis-dsp headers
+ifeq ($(CPU_ARCH),cortex-m0)
+export CFLAGS += -DARM_MATH_CM0
+else ifeq ($(CPU_ARCH),cortex-m0plus)
+export CFLAGS += -DARM_MATH_CM0PLUS
+else ifeq ($(CPU_ARCH),cortex-m3)
+export CFLAGS += -DARM_MATH_CM3
+else ifeq ($(CPU_ARCH),cortex-m4)
+export CFLAGS += -DARM_MATH_CM4
+else ifeq ($(CPU_ARCH),cortex-m4f)
+export CFLAGS += -DARM_MATH_CM4
+else ifeq ($(CPU_ARCH),cortex-m7)
+export CFLAGS += -DARM_MATH_CM7
+endif
+endif
+
 # Include CPU specific includes:
 export INCLUDES += -I$(RIOTCPU)/$(CPU)/include
 
