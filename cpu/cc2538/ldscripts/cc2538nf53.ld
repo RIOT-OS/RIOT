@@ -26,6 +26,6 @@ MEMORY
     ram   (rwx) : ORIGIN = 0x20000000, LENGTH = 32K
 }
 
-INCLUDE cc2538_linkerscript.ld
+INCLUDE cc2538.ld
 
 /* @} */

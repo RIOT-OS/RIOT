@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief           Linker script for the CC2538NF23 and CC2538SF23 model MCUs
+ * @brief           Linker script for the CC2538NF11 model MCU
  *
  * @author          Ian Martin <ian@locicontrols.com>
  */
@@ -19,13 +19,12 @@
 /* Memory Space Definitions: */
 MEMORY
 {
-    rom   (rx ) : ORIGIN = 0x00200000, LENGTH = 256K - 44
+    rom   (rx ) : ORIGIN = 0x00200000, LENGTH = 128K - 44
     cca   (rx ) : ORIGIN = 0x0027ffd4, LENGTH = 44
-    sram0 (rwx) : ORIGIN = 0x20000000, LENGTH = 16K /* Lost in PM2 and PM3 */
     sram1 (rwx) : ORIGIN = 0x20004000, LENGTH = 16K
-    ram   (rwx) : ORIGIN = 0x20000000, LENGTH = 32K
+    ram   (rwx) : ORIGIN = 0x20004000, LENGTH = 16K
 }
 
-INCLUDE cc2538_linkerscript.ld
+INCLUDE cc2538.ld
 
 /* @} */
