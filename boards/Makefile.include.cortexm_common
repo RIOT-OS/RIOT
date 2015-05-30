@@ -9,7 +9,7 @@ include $(RIOTBOARD)/Makefile.include.gnu
 
 # define build specific options
 export CFLAGS_CPU   = -mcpu=$(MCPU) -mlittle-endian -mthumb -mno-thumb-interwork $(CFLAGS_FPU)
-export CFLAGS_STYLE = -std=gnu99 -Wall -Wstrict-prototypes
+export CFLAGS_STYLE = -std=gnu99 -Wall -Wstrict-prototypes -Werror=implicit-function-declaration
 export CFLAGS_LINK  = -ffunction-sections -fdata-sections -fno-builtin
 export CFLAGS_DBG   = -ggdb -g3
 export CFLAGS_OPT   ?= -Os
