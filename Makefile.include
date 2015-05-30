@@ -152,7 +152,12 @@ ifeq ($(origin RIOT_VERSION), undefined)
     RIOT_VERSION := "UNKNOWN (builddir: $(RIOTBASE))"
   endif
 endif
+
+ifneq (,$(RIOT_VERSION_OVERRIDE))
+export CFLAGS += -DRIOT_VERSION=\"$(RIOT_VERSION_OVERRIDE)\"
+else
 export CFLAGS += -DRIOT_VERSION=\"$(RIOT_VERSION)\"
+endif
 
 # the binaries to link
 BASELIBS += $(BINDIR)$(BOARD)_base.a
