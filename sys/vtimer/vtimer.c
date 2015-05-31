@@ -21,6 +21,9 @@
 #include <string.h>
 #include <inttypes.h>
 
+#define ENABLE_DEBUG    (0)
+#include "debug.h"
+
 #include "irq.h"
 #include "priority_queue.h"
 #include "timex.h"
@@ -32,8 +35,6 @@
 
 #include "vtimer.h"
 
-#define ENABLE_DEBUG    (0)
-#include "debug.h"
 
 #if ENABLE_DEBUG
 
