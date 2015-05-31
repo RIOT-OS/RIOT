@@ -21,6 +21,9 @@
 #include <string.h>
 #include <inttypes.h>
 
+#define ENABLE_DEBUG    (0)
+#include "debug.h"
+
 #include "irq.h"
 #include "priority_queue.h"
 #include "timex.h"
@@ -32,8 +35,14 @@
 
 #include "vtimer.h"
 
-#define ENABLE_DEBUG    (0)
-#include "debug.h"
+
+#if ENABLE_DEBUG
+
+void vtimer_print_short_queue(void);
+void vtimer_print_long_queue(void);
+void vtimer_print(vtimer_t *t);
+
+#endif
 
 #define VTIMER_THRESHOLD 20UL
 #define VTIMER_BACKOFF 10UL
