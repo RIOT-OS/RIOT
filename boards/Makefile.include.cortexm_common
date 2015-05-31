@@ -16,7 +16,8 @@ export CFLAGS_OPT   ?= -Os
 export CFLAGS += $(CFLAGS_CPU) $(CFLAGS_STYLE) $(CFLAGS_LINK) $(CFLAGS_DBG) $(CFLAGS_OPT)
 
 export ASFLAGS += $(CFLAGS_CPU) $(CFLAGS_DEBUG)
-export LINKFLAGS += -L$(RIOTCPU)/$(CPU)/ldscripts -T$(RIOTCPU)/$(CPU)/ldscripts/$(CPU_MODEL).ld -Wl,--fatal-warnings
+export LINKFLAGS += -L$(RIOTCPU)/$(CPU)/ldscripts -L$(RIOTCPU)/cortexm_common/ldscripts
+export LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ldscripts/$(CPU_MODEL).ld -Wl,--fatal-warnings
 export LINKFLAGS += $(CFLAGS_DEBUG) $(CFLAGS_CPU) $(CFLAGS_STYLE) -static -lgcc -nostartfiles
 
 # use the nano-specs of the NewLib when available
