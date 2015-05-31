@@ -104,7 +104,7 @@ typedef uint8_t radio_packet_length_t;
 #endif
 
 /**
- * @name Define the interface to the AT86RF231 radio
+ * @name Define the interface to the AT86RF212B radio
  * @{
  */
 #define AT86RF231_SPI       SPI_0
@@ -113,6 +113,7 @@ typedef uint8_t radio_packet_length_t;
 /** @todo work around missing RESET pin on Mulle v0.6x */
 #define AT86RF231_RESET     GPIO_5
 #define AT86RF231_SLEEP     GPIO_13
+#define AT86RF231_SPI_CLK   SPI_SPEED_5MHZ
 /** @} */
 
 /**
