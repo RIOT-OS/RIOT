@@ -155,6 +155,8 @@ int i2c_init_master(i2c_t dev, i2c_speed_t speed)
 int i2c_init_slave(i2c_t dev, uint8_t address)
 {
     /* TODO: implement slave mode */
+    (void) dev;
+    (void) address;
     return -1;
 }
 

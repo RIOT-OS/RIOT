@@ -598,6 +598,7 @@ __attribute__( ( always_inline ) ) __STATIC_INLINE uint32_t __get_FPSCR(void)
 }
 
 
+#if (__FPU_PRESENT == 1) && (__FPU_USED == 1)
 /** \brief  Set FPSCR
 
     This function assigns the given value to the Floating Point Status/Control register.
@@ -606,13 +607,12 @@ __attribute__( ( always_inline ) ) __STATIC_INLINE uint32_t __get_FPSCR(void)
  */
 __attribute__( ( always_inline ) ) __STATIC_INLINE void __set_FPSCR(uint32_t fpscr)
 {
-#if (__FPU_PRESENT == 1) && (__FPU_USED == 1)
   /* Empty asm statement works as a scheduling barrier */
   __ASM volatile ("");
   __ASM volatile ("VMSR fpscr, %0" : : "r" (fpscr) : "vfpcc");
   __ASM volatile ("");
-#endif
 }
+#endif
 
 #endif /* (__CORTEX_M == 0x04) || (__CORTEX_M == 0x07) */
 

@@ -352,8 +352,11 @@
 /**
  * @brief Array holding one pre-initialized mutex for each hardware SPI device
  */
-/* TODO: Avoid adding duplicate entries with the same index. GCC warns about it
- * but it works. It does look strange in the preprocessed output, however.
+/* We try to avoid adding duplicate entries with the same index by comparing the
+ * SPI_x_INDEX macros, the #if statements become quite long though.
+ *
+ * If not checking for multiple initializations GCC will warn about it
+ * but the binary still works. It does look strange in the preprocessed output, however.
  *
  * The warning message is:
  * warning: initialized field overwritten [-Woverride-init]
@@ -371,25 +374,34 @@ static mutex_t locks[] =  {
 #if SPI_0_EN
     [SPI_0_INDEX] = MUTEX_INIT,
 #endif
-#if SPI_1_EN
+#if SPI_1_EN && (SPI_1_INDEX != SPI_0_INDEX)
     [SPI_1_INDEX] = MUTEX_INIT,
 #endif
-#if SPI_2_EN
+#if SPI_2_EN && (SPI_2_INDEX != SPI_0_INDEX) && (SPI_2_INDEX != SPI_1_INDEX)
     [SPI_2_INDEX] = MUTEX_INIT,
 #endif
-#if SPI_3_EN
+#if SPI_3_EN && (SPI_3_INDEX != SPI_0_INDEX) && (SPI_3_INDEX != SPI_1_INDEX) \
+    && (SPI_3_INDEX != SPI_2_INDEX)
     [SPI_3_INDEX] = MUTEX_INIT,
 #endif
-#if SPI_4_EN
+#if SPI_4_EN && (SPI_4_INDEX != SPI_0_INDEX) && (SPI_4_INDEX != SPI_1_INDEX) \
+    && (SPI_4_INDEX != SPI_2_INDEX) && (SPI_4_INDEX != SPI_3_INDEX)
     [SPI_4_INDEX] = MUTEX_INIT,
 #endif
-#if SPI_5_EN
+#if SPI_5_EN && (SPI_5_INDEX != SPI_0_INDEX) && (SPI_5_INDEX != SPI_1_INDEX) \
+    && (SPI_5_INDEX != SPI_2_INDEX) && (SPI_5_INDEX != SPI_3_INDEX) \
+    && (SPI_5_INDEX != SPI_4_INDEX)
     [SPI_5_INDEX] = MUTEX_INIT,
 #endif
-#if SPI_6_EN
+#if SPI_6_EN && (SPI_6_INDEX != SPI_0_INDEX) && (SPI_6_INDEX != SPI_1_INDEX) \
+    && (SPI_6_INDEX != SPI_2_INDEX) && (SPI_6_INDEX != SPI_3_INDEX) \
+    && (SPI_6_INDEX != SPI_4_INDEX) && (SPI_6_INDEX != SPI_5_INDEX)
     [SPI_6_INDEX] = MUTEX_INIT,
 #endif
-#if SPI_7_EN
+#if SPI_7_EN && (SPI_7_INDEX != SPI_0_INDEX) && (SPI_7_INDEX != SPI_1_INDEX) \
+    && (SPI_7_INDEX != SPI_2_INDEX) && (SPI_7_INDEX != SPI_3_INDEX) \
+    && (SPI_7_INDEX != SPI_4_INDEX) && (SPI_7_INDEX != SPI_5_INDEX) \
+    && (SPI_7_INDEX != SPI_6_INDEX)
     [SPI_7_INDEX] = MUTEX_INIT,
 #endif
 };
@@ -464,12 +476,12 @@ static spi_state_t spi_config[SPI_NUMOF];
  * @return The actual achieved frequency on success
  * @return Less than 0 on error.
  */
-static int find_closest_baudrate_scalers(const uint32_t module_clock, const uint32_t target_clock,
+static long find_closest_baudrate_scalers(const uint32_t module_clock, const long target_clock,
         uint8_t *closest_prescaler, uint8_t *closest_scaler)
 {
     uint8_t i;
     uint8_t k;
-    int freq;
+    long freq;
     static const uint8_t num_scalers = 16;
     static const uint8_t num_prescalers = 4;
     static const int br_scalers[16] = {
@@ -478,7 +490,7 @@ static int find_closest_baudrate_scalers(const uint32_t module_clock, const uint
     };
     static const int br_prescalers[4] = {2, 3, 5, 7};
 
-    int closest_frequency = -1;
+    long closest_frequency = -1;
 
     /* Test all combinations until we arrive close to the target clock */
     for (i = 0; i < num_prescalers; ++i) {
@@ -533,18 +545,18 @@ static int find_closest_baudrate_scalers(const uint32_t module_clock, const uint
  * @return The actual achieved frequency on success
  * @return Less than 0 on error.
  */
-static int find_closest_delay_scalers(const uint32_t module_clock, const uint32_t target_freq,
+static long find_closest_delay_scalers(const uint32_t module_clock, const long target_freq,
                                       uint8_t *closest_prescaler, uint8_t *closest_scaler)
 {
     uint8_t i;
     uint8_t k;
-    int freq;
+    long freq;
     int prescaler;
     int scaler;
     static const uint8_t num_scalers = 16;
     static const uint8_t num_prescalers = 4;
 
-    int closest_frequency = -1;
+    long closest_frequency = -1;
 
     /* Test all combinations until we arrive close to the target clock */
     for (i = 0; i < num_prescalers; ++i) {
@@ -832,6 +844,9 @@ int spi_init_slave(spi_t dev, spi_conf_t conf, char(*cb)(char data))
 
     spi_dev->RSER = (uint32_t)0;
 
+    /* set callback */
+    spi_config[dev].cb = cb;
+
     return 0;
 }
 
@@ -1041,13 +1056,13 @@ int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length)
     /* Default: send idle data */
     byte_out = (uint8_t)SPI_IDLE_DATA;
 
-    for (i = 0; i < length; i++) {
+    for (i = 0; i < (int)length; i++) {
         if (out != NULL) {
             /* Send given out data */
             byte_out = (uint8_t)out[i];
         }
 
-        if (i >= length - 1) {
+        if (i >= (int)length - 1) {
             /* Last byte, set End-of-Queue flag, clear Continue flag. */
             flags &= ~(SPI_PUSHR_CONT_MASK);
             flags |= SPI_PUSHR_EOQ_MASK;
@@ -1248,13 +1263,13 @@ int spi_transfer_regs(spi_t dev, uint8_t reg, char *out, char *in, unsigned int 
     /* Default: send idle data */
     byte_out = (uint8_t)SPI_IDLE_DATA;
 
-    for (i = 0; i < length; i++) {
+    for (i = 0; i < (int)length; i++) {
         if (out != NULL) {
             /* Send given out data */
             byte_out = (uint8_t)out[i];
         }
 
-        if (i >= length - 1) {
+        if (i >= (int)length - 1) {
             /* Last byte, set End-of-Queue flag, clear Continue flag. */
             flags &= ~(SPI_PUSHR_CONT_MASK);
             flags |= SPI_PUSHR_EOQ_MASK;

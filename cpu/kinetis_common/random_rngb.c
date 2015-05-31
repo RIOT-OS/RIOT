@@ -37,7 +37,7 @@ void random_init(void)
 
 int random_read(char *buf, unsigned int num)
 {
-    int count = 0;
+    unsigned int count = 0;
 
     while (count < num) {
         uint32_t tmp;
@@ -54,7 +54,7 @@ int random_read(char *buf, unsigned int num)
         }
     }
 
-    return count;
+    return (int)count;
 }
 
 void random_poweron(void)

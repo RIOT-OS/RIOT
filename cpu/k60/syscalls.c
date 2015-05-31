@@ -67,19 +67,17 @@ static ringbuffer_t rx_buf;
  */
 static void stdio_rx_cb(void *arg, char data)
 {
-#ifndef MODULE_UART0
     (void)arg;
 
-    ringbuffer_add_one(&rx_buf, data);
-    mutex_unlock(&uart_rx_mutex);
-#else
-
+#ifdef MODULE_UART0
     if (uart0_handler_pid) {
         uart0_handle_incoming(data);
 
         uart0_notify_thread();
     }
-
+#else
+    ringbuffer_add_one(&rx_buf, data);
+    mutex_unlock(&uart_rx_mutex);
 #endif
 }
 
@@ -119,6 +117,7 @@ _exit(int code)
     /* See local variable `status` during debugger break. */
     asm volatile ("bkpt #0");
 #else
+    (void) code;
     NVIC_SystemReset();
 #endif
 

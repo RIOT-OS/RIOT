@@ -87,6 +87,7 @@ inline static void hwtimer_stop(void)
 
 void hwtimer_arch_init(void (*handler)(int), uint32_t fcpu)
 {
+    (void) fcpu; /* fcpu does not affect the Low power timer module frequency */
     timeout_handler = handler;
 
     /* unlock LPTIMER_DEV */
@@ -146,7 +147,7 @@ void hwtimer_arch_disable_interrupt(void)
 
 void hwtimer_arch_set(unsigned long offset, short timer)
 {
-    (void)timer;
+    (void)timer; /* we only support one timer */
     stimer.counter32b += lptmr_get_cnr();
     hwtimer_stop();
 
@@ -165,7 +166,7 @@ void hwtimer_arch_set(unsigned long offset, short timer)
 
 void hwtimer_arch_set_absolute(unsigned long value, short timer)
 {
-    (void)timer;
+    (void)timer; /* we only support one timer */
     stimer.counter32b += lptmr_get_cnr();
     hwtimer_stop();
 
@@ -184,6 +185,7 @@ void hwtimer_arch_set_absolute(unsigned long value, short timer)
 
 void hwtimer_arch_unset(short timer)
 {
+    (void)timer; /* we only support one timer */
     stimer.counter32b += lptmr_get_cnr();
     hwtimer_stop();
     stimer.diff = 0;

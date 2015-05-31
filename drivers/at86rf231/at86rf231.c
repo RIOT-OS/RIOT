@@ -66,6 +66,7 @@ void at86rf231_init(kernel_pid_t tpid)
 
 int at86rf231_initialize(netdev_t *dev)
 {
+    (void)dev;
     at86rf231_gpio_spi_interrupts_init();
 
     at86rf231_reset();
@@ -234,6 +235,7 @@ int at86rf231_rem_raw_recv_callback(netdev_t *dev,
                                     netdev_802154_raw_packet_cb_t recv_cb)
 {
     (void)dev;
+    (void)recv_cb;
 
     at86rf231_raw_packet_cb = NULL;
     return 0;
@@ -256,6 +258,7 @@ int at86rf231_rem_data_recv_callback(netdev_t *dev,
                                      netdev_rcv_data_cb_t recv_cb)
 {
     (void)dev;
+    (void)recv_cb;
 
     at86rf231_data_packet_cb = NULL;
     return 0;

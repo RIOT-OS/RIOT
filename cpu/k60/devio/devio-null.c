@@ -25,22 +25,33 @@
 
 int  devnull_open_r(struct _reent *r, const char *path, int flags, int mode)
 {
+    (void) r;
+    (void) path;
+    (void) flags;
+    (void) mode;
     return 0;
 }
 
 int  devnull_close_r(struct _reent *r, int fd)
 {
+    (void) r;
+    (void) fd;
     return 0;
 }
 
 long devnull_write_r(struct _reent *r, int fd, const char *ptr, int len)
 {
+    (void) r;
+    (void) fd;
+    (void) ptr;
     /* Aaand... it's gone!*/
     return len;
 }
 
 long devnull_read_r(struct _reent *r, int fd, char *ptr, int len)
 {
+    (void) r;
+    (void) fd;
     /* Read null bytes */
     memset(ptr, '\0', len);
     return len;
@@ -48,12 +59,20 @@ long devnull_read_r(struct _reent *r, int fd, char *ptr, int len)
 
 long devnull_lseek_r(struct _reent *r, int fd, int ptr, int dir)
 {
+    (void) r;
+    (void) fd;
+    (void) ptr;
+    (void) dir;
     r->_errno = ENOSYS;
     return -1;
 }
 
 long devnull_fstat_r(struct _reent *r, int fd, char *ptr, int len)
 {
+    (void) r;
+    (void) fd;
+    (void) ptr;
+    (void) len;
     r->_errno = ENOSYS;
     return -1;
 }
