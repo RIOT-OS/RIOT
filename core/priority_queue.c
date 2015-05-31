@@ -55,6 +55,13 @@ void priority_queue_add(priority_queue_t *root, priority_queue_node_t *new_obj)
     priority_queue_node_t *node = (priority_queue_node_t *) root;
 
     while (node->next != NULL) {
+        if (node->next == new_obj) {
+            /* Trying to add an item that is already in queue */
+#if DEVELHELP
+            core_panic(123, "priority_queue_add already existing new_obj\n");
+#endif
+            return;
+        }
         if (node->next->priority > new_obj->priority) {
             new_obj->next = node->next;
             node->next = new_obj;
