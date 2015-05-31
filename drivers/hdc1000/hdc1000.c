@@ -148,7 +148,7 @@ int hdc1000_startmeasure(hdc1000_t *dev)
      * to the address 0x00 (HDC1000_TEMPERATURE).
      * Conversion Time is 6.50ms by 14 bit resolution.
      */
-    if (i2c_write_bytes(dev->i2c, dev->addr, HDC1000_TEMPERATURE, 1) != 1) {
+    if (i2c_write_byte(dev->i2c, dev->addr, HDC1000_TEMPERATURE) != 1) {
         i2c_release(dev->i2c);
         return -1;
     }
