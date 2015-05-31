@@ -202,12 +202,40 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
 
 void uart_tx_begin(uart_t uart)
 {
-
+    switch (uart) {
+#if UART_0_EN
+        case UART_0:
+            if (uart_config[uart].tx_cb(uart_config[uart].arg) != 0) {
+                /* TXC flag is also cleared by writing data to DATA register */
+                UART_0_DEV.INTENSET.bit.TXC = 1;
+            }
+            break;
+#endif
+#if UART_1_EN
+    case UART_1:
+            if (uart_config[uart].tx_cb(uart_config[uart].arg) != 0) {
+                /* TXC flag is also cleared by writing data to DATA register */
+                UART_1_DEV.INTENSET.bit.TXC = 1;
+            }
+            break;
+#endif
+    }
 }
 
 void uart_tx_end(uart_t uart)
 {
-
+    switch (uart) {
+#if UART_0_EN
+        case UART_0:
+                UART_0_DEV.INTENCLR.bit.TXC = 1;
+            break;
+#endif
+#if UART_1_EN
+    case UART_1:
+                UART_1_DEV.INTENCLR.bit.TXC = 1;
+            break;
+#endif
+    }
 }
 
 int uart_write(uart_t uart, char data)
