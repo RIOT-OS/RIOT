@@ -1,13 +1,13 @@
 /**************************************************************************//**
  * @file     core_cmFunc.h
  * @brief    CMSIS Cortex-M Core Function Access Header File
- * @version  V4.00
- * @date     28. August 2014
+ * @version  V4.10
+ * @date     18. March 2015
  *
  * @note
  *
  ******************************************************************************/
-/* Copyright (c) 2009 - 2014 ARM LIMITED
+/* Copyright (c) 2009 - 2015 ARM LIMITED
 
    All rights reserved.
    Redistribution and use in source and binary forms, with or without
@@ -38,9 +38,6 @@
 #ifndef __CORE_CMFUNC_H
 #define __CORE_CMFUNC_H
 
-#ifdef __cplusplus
- extern "C" {
-#endif
 
 /* ###########################  Core Function Access  ########################### */
 /** \ingroup  CMSIS_Core_FunctionInterface
@@ -245,6 +242,20 @@ __STATIC_INLINE void __set_BASEPRI(uint32_t basePri)
 }
 
 
+/** \brief  Set Base Priority with condition
+
+    This function assigns the given value to the Base Priority register only if BASEPRI masking is disabled,
+    or the new value increases the BASEPRI priority level.
+
+    \param [in]    basePri  Base Priority value to set
+ */
+__STATIC_INLINE void __set_BASEPRI_MAX(uint32_t basePri)
+{
+  register uint32_t __regBasePriMax      __ASM("basepri_max");
+  __regBasePriMax = (basePri & 0xff);
+}
+
+
 /** \brief  Get Fault Mask
 
     This function returns the current value of the Fault Mask register.
@@ -345,7 +356,6 @@ __attribute__( ( always_inline ) ) __STATIC_INLINE uint32_t __get_CONTROL(void)
   uint32_t result;
 
   __ASM volatile ("MRS %0, control" : "=r" (result) );
-  /* cppcheck-suppress uninitvar */
   return(result);
 }
 
@@ -373,7 +383,6 @@ __attribute__( ( always_inline ) ) __STATIC_INLINE uint32_t __get_IPSR(void)
   uint32_t result;
 
   __ASM volatile ("MRS %0, ipsr" : "=r" (result) );
-  /* cppcheck-suppress uninitvar */
   return(result);
 }
 
@@ -389,7 +398,6 @@ __attribute__( ( always_inline ) ) __STATIC_INLINE uint32_t __get_APSR(void)
   uint32_t result;
 
   __ASM volatile ("MRS %0, apsr" : "=r" (result) );
-  /* cppcheck-suppress uninitvar */
   return(result);
 }
 
@@ -405,7 +413,6 @@ __attribute__( ( always_inline ) ) __STATIC_INLINE uint32_t __get_xPSR(void)
   uint32_t result;
 
   __ASM volatile ("MRS %0, xpsr" : "=r" (result) );
-  /* cppcheck-suppress uninitvar */
   return(result);
 }
 
@@ -421,7 +428,6 @@ __attribute__( ( always_inline ) ) __STATIC_INLINE uint32_t __get_PSP(void)
   register uint32_t result;
 
   __ASM volatile ("MRS %0, psp\n"  : "=r" (result) );
-  /* cppcheck-suppress uninitvar */
   return(result);
 }
 
@@ -449,7 +455,6 @@ __attribute__( ( always_inline ) ) __STATIC_INLINE uint32_t __get_MSP(void)
   register uint32_t result;
 
   __ASM volatile ("MRS %0, msp\n" : "=r" (result) );
-  /* cppcheck-suppress uninitvar */
   return(result);
 }
 
@@ -477,7 +482,6 @@ __attribute__( ( always_inline ) ) __STATIC_INLINE uint32_t __get_PRIMASK(void)
   uint32_t result;
 
   __ASM volatile ("MRS %0, primask" : "=r" (result) );
-  /* cppcheck-suppress uninitvar */
   return(result);
 }
 
@@ -528,7 +532,7 @@ __attribute__( ( always_inline ) ) __STATIC_INLINE uint32_t __get_BASEPRI(void)
 {
   uint32_t result;
 
-  __ASM volatile ("MRS %0, basepri_max" : "=r" (result) );
+  __ASM volatile ("MRS %0, basepri" : "=r" (result) );
   return(result);
 }
 
@@ -542,6 +546,19 @@ __attribute__( ( always_inline ) ) __STATIC_INLINE uint32_t __get_BASEPRI(void)
 __attribute__( ( always_inline ) ) __STATIC_INLINE void __set_BASEPRI(uint32_t value)
 {
   __ASM volatile ("MSR basepri, %0" : : "r" (value) : "memory");
+}
+
+
+/** \brief  Set Base Priority with condition
+
+    This function assigns the given value to the Base Priority register only if BASEPRI masking is disabled,
+	or the new value increases the BASEPRI priority level.
+
+    \param [in]    basePri  Base Priority value to set
+ */
+__attribute__( ( always_inline ) ) __STATIC_INLINE void __set_BASEPRI_MAX(uint32_t value)
+{
+  __ASM volatile ("MSR basepri_max, %0" : : "r" (value) : "memory");
 }
 
 
@@ -643,9 +660,5 @@ __attribute__( ( always_inline ) ) __STATIC_INLINE void __set_FPSCR(uint32_t fps
 #endif
 
 /*@} end of CMSIS_Core_RegAccFunctions */
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* __CORE_CMFUNC_H */
