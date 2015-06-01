@@ -226,6 +226,7 @@ ifneq (,$(filter aodvv2,$(USEMODULE)))
   USEMODULE += sixlowpan
   USEMODULE += oonf_common
   USEMODULE += oonf_rfc5444
+  USEMODULE += fib
 endif
 
 ifneq (,$(filter uart0,$(USEMODULE)))
