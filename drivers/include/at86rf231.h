@@ -429,6 +429,42 @@ netdev_802154_tx_status_t at86rf231_transmit_tx_buf(netdev_t *dev);
  */
 int16_t at86rf231_send(at86rf231_packet_t *packet);
 
+
+/**
+ * @brief Send a packet via the at86rf231 transceiver directly,
+ *        i.e. in an unique step.
+ *
+ * @param[in] kind Kind of packet to transmit.
+ * @param[in] dest Address of the node to which the packet is sent.
+ * @param[in] use_long_addr 1 to use the 64-bit address mode
+ *                          with *dest* param; 0 to use
+ *                          "short" PAN-centric mode.
+ * @param[in] wants_ack 1 to request an acknowledgement
+ *                      from the receiving node for this packet;
+ *                      0 otherwise.
+ * @param[in] upper_layer_hdrs  header data from higher network layers from
+ *                              highest to lowest layer. Must be prepended to
+ *                              the data stream by the network device. May be
+ *                              NULL if there are none.
+ * @param[in] buf Pointer to the buffer containing the payload
+ *                of the 802.15.4 packet to transmit.
+ *                The frame header (i.e.: FCS, sequence number,
+ *                src and dest PAN and addresses) is inserted
+ *                using values in accord with *kind* parameter
+ *                and transceiver configuration.
+ * @param[in] len Length (in bytes) of the outgoing packet payload.
+ *
+ * @return @ref netdev_802154_tx_status_t
+ */
+netdev_802154_tx_status_t at86rf231_send_direct(netdev_802154_pkt_kind_t kind,
+                                                netdev_802154_node_addr_t *dest,
+                                                int use_long_addr,
+                                                int wants_ack,
+                                                netdev_hlist_t *upper_layer_hdrs,
+                                                void *buf,
+                                                unsigned int len);
+
+
 /**
  * RX Packet Buffer, read from the transceiver, filled by the at86rf231_rx_handler.
  */
@@ -443,6 +479,26 @@ uint8_t at86rf231_get_status(void);
  * Get at86rf231's TRAC status byte
  */
 uint8_t at86rf231_get_trac_status(void);
+
+/**
+ * This function handles putting AT86RF23x from one mode (state) to another;
+ * since this is quite a complex process, every transceiver mode change
+ * should be done through this "public" function.
+ *
+ * @param[in] target_mode Mode (state) command to send to transceiver;
+ *                        the available commands are those defined as
+ *                        @c AT86RF231_TRX_STATE__xxx in the
+ *                        @c at86rf231_settings.h file.
+ *
+ * @return
+ *  - @c NETDEV_802154_TX_STATUS_OK if the mode change was successfully done.
+ *  - @c NETDEV_802154_TX_STATUS_INVALID_PARAM if a wrong @c target_mode was
+ *       given as parameter.
+ *  - @c NETDEV_802154_TX_STATUS_ERROR if the transceiver could not reach
+ *       the wanted mode (for an unknown reason).
+ */
+netdev_802154_tx_status_t at86rf231_change_mode(uint8_t target_mode);
+
 
 /**
  * at86rf231 low-level radio driver definition.
