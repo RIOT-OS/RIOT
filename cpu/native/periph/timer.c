@@ -36,7 +36,7 @@
 #include <err.h>
 
 #include "cpu.h"
-#include "cpu-conf.h"
+#include "cpu_conf.h"
 #include "native_internal.h"
 #include "periph/timer.h"
 
