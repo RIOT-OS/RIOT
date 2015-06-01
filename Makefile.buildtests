@@ -261,15 +261,15 @@ info-files: QUITE := 0
 info-files:
 	@( \
 		echo "$(abspath $(shell echo "$(MAKEFILE_LIST)"))" | tr ' ' '\n'; \
-		CSRC="$$($(MAKE) USEPKG="" -Bn | grep -o -e "[^ ]\+\.[csS]$$" -e "[^ ]\+\.[csS][ \']")"; \
+		CSRC="$$($(MAKE) USEPKG="" -Bn | grep -o -e "[^ ]\+\.[csS]$$" -e "[^ ]\+\.[csS][ \']" | grep -v -e "^\s*-D")"; \
 		echo "$$CSRC"; \
 		echo "$(RIOTBASE)/Makefile.base"; \
-		echo "$$CSRC" | xargs dirname | sort | uniq | xargs -I{} find {} -name "Makefile*"; \
+		echo "$$CSRC" | xargs dirname -- | sort | uniq | xargs -I{} find {} -name "Makefile*"; \
 		echo "$$CSRC" | xargs $(CC) $(CFLAGS) $(INCLUDES) -MM 2> /dev/null | grep -o "[^ ]\+\.h"; \
 		if [ -n "$$SRCXX" ]; then \
-			CPPSRC="$$($(MAKE) -Bn USEPKG="" | grep -o -e "[^ ]\+\.cpp")"; \
+			CPPSRC="$$($(MAKE) -Bn USEPKG="" | grep -o -e "[^ ]\+\.cpp" | grep -v -e "^\s*-D")"; \
 			echo "$$CPPSRC"; \
-			echo "$$CPPSRC" | xargs dirname | sort | uniq | xargs -I{} find {} -name "Makefile*"; \
+			echo "$$CPPSRC" | xargs dirname -- | sort | uniq | xargs -I{} find {} -name "Makefile*"; \
 			echo "$$CPPSRC" | xargs $(CXX) $(CXXFLAGS) $(INCLUDES) -MM 2> /dev/null | grep -o "[^ ]\+\.h"; \
 		fi; \
 		$(foreach pkg,$(USEPKG),find $(RIOTBASE)/pkg/$(pkg) -type f;) \
