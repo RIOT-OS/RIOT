@@ -203,11 +203,13 @@ int _open_r(struct _reent *r, const char *name, int mode)
 int _read_r(struct _reent *r, int fd, void *buffer, unsigned int count)
 {
 #ifndef MODULE_UART0
+    int res;
     mutex_lock(&uart_rx_mutex);
-
+    unsigned state = disableIRQ();
     count = count < rx_buf.avail ? count : rx_buf.avail;
-
-    return ringbuffer_get(&rx_buf, (char*)buffer, count);
+    res = ringbuffer_get(&rx_buf, (char*)buffer, count);
+    restoreIRQ(state);
+    return res;
 #else
     char *res = (char*)buffer;
     res[0] = (char)uart0_readc();
