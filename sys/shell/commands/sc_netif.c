@@ -80,7 +80,8 @@ static void _set_usage(char *cmd_name)
          "       * \"addr_long\" - sets long address\n"
          "       * \"addr_short\" - alias for \"addr\"\n"
          "       * \"channel\" - sets the frequency channel\n"
-         "       * \"chan\" - alias for \"channel\""
+         "       * \"chan\" - alias for \"channel\"\n"
+         "       * \"csma_retries\" - set max. number of channel access attempts\n"
          "       * \"nid\" - sets the network identifier (or the PAN ID)\n"
          "       * \"pan\" - alias for \"nid\"\n"
          "       * \"pan_id\" - alias for \"nid\"\n"
@@ -96,7 +97,7 @@ static void _mtu_usage(char *cmd_name)
 
 static void _flag_usage(char *cmd_name)
 {
-    printf("usage: %s <if_id> [-]{promisc|autoack|preload|6lo|iphc}\n", cmd_name);
+    printf("usage: %s <if_id> [-]{promisc|autoack|csma|autocca|preload|6lo|iphc}\n", cmd_name);
 }
 
 static void _add_usage(char *cmd_name)
@@ -138,6 +139,10 @@ static void _print_netopt(netopt_t opt)
             printf("TX power [in dBm]");
             break;
 
+        case NETOPT_CSMA_RETRIES:
+            printf("CSMA retries");
+            break;
+
         default:
             /* we don't serve these options here */
             break;
@@ -176,6 +181,7 @@ static void _netif_list(kernel_pid_t dev)
     uint8_t hwaddr[MAX_ADDR_LEN];
     uint16_t u16;
     int16_t i16;
+    uint8_t u8;
     int res;
     netopt_state_t state;
     netopt_enable_t enable;
@@ -230,10 +236,20 @@ static void _netif_list(kernel_pid_t dev)
     if (res >= 0) {
         char hwaddr_str[res * 3];
         printf("Long HWaddr: ");
-        printf("%s", gnrc_netif_addr_to_str(hwaddr_str, sizeof(hwaddr_str),
+        printf("%s ", gnrc_netif_addr_to_str(hwaddr_str, sizeof(hwaddr_str),
                                             hwaddr, res));
-        printf("\n           ");
     }
+
+    res = gnrc_netapi_get(dev, NETOPT_CSMA_RETRIES, 0, &u8, sizeof(u8));
+
+    if (res >= 0) {
+        res = gnrc_netapi_get(dev, NETOPT_CSMA, 0, &enable, sizeof(enable));
+        if ((res >= 0) && (enable == NETOPT_ENABLE)) {
+            printf(" CSMA Retries: %" PRIu8 " ", *((uint8_t*) &u8));
+        }
+    }
+
+    printf("\n           ");
 
     res = gnrc_netapi_get(dev, NETOPT_PROMISCUOUSMODE, 0, &enable, sizeof(enable));
 
@@ -260,6 +276,20 @@ static void _netif_list(kernel_pid_t dev)
 
     if ((res >= 0) && (enable == NETOPT_ENABLE)) {
         printf("RAWMODE  ");
+        linebreak = true;
+    }
+
+    res = gnrc_netapi_get(dev, NETOPT_CSMA, 0, &enable, sizeof(enable));
+
+    if ((res >= 0) && (enable == NETOPT_ENABLE)) {
+        printf("CSMA  ");
+        linebreak = true;
+    }
+
+    res = gnrc_netapi_get(dev, NETOPT_AUTOCCA, 0, &enable, sizeof(enable));
+
+    if ((res >= 0) && (enable == NETOPT_ENABLE)) {
+        printf("AUTOCCA  ");
         linebreak = true;
     }
 
@@ -401,6 +431,24 @@ static int _netif_set_i16(kernel_pid_t dev, netopt_t opt, char *i16_str)
     return 0;
 }
 
+static int _netif_set_u8(kernel_pid_t dev, netopt_t opt, char *u8_str)
+{
+    uint8_t val = (uint8_t)atoi(u8_str);
+
+    if (gnrc_netapi_set(dev, opt, 0, (uint8_t *)&val, sizeof(uint8_t)) < 0) {
+        printf("error: unable to set ");
+        _print_netopt(opt);
+        puts("");
+        return 1;
+    }
+
+    printf("success: set ");
+    _print_netopt(opt);
+    printf(" on interface %" PRIkernel_pid " to %i\n", dev, val);
+
+    return 0;
+}
+
 static int _netif_set_flag(kernel_pid_t dev, netopt_t opt,
                            netopt_enable_t set)
 {
@@ -498,6 +546,9 @@ static int _netif_set(char *cmd_name, kernel_pid_t dev, char *key, char *value)
     else if (strcmp("state", key) == 0) {
         return _netif_set_state(dev, value);
     }
+    else if (strcmp("csma_retries", key) == 0) {
+        return _netif_set_u8(dev, NETOPT_CSMA_RETRIES, value);
+    }
 
     _set_usage(cmd_name);
     return 1;
@@ -523,6 +574,12 @@ static int _netif_flag(char *cmd, kernel_pid_t dev, char *flag)
     }
     else if (strcmp(flag, "raw") == 0) {
         return _netif_set_flag(dev, NETOPT_RAWMODE, set);
+    }
+    else if (strcmp(flag, "csma") == 0) {
+        return _netif_set_flag(dev, NETOPT_CSMA, set);
+    }
+    else if (strcmp(flag, "autocca") == 0) {
+        return _netif_set_flag(dev, NETOPT_AUTOCCA, set);
     }
     else if (strcmp(flag, "6lo") == 0) {
 #ifdef MODULE_GNRC_IPV6_NETIF
