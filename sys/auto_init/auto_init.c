@@ -167,6 +167,11 @@ void auto_init(void)
     auto_init_at86rf2xx();
 #endif
 
+#ifdef MODULE_NG_SLIP
+    extern void auto_init_slip(void);
+    auto_init_slip();
+#endif
+
 #ifdef MODULE_XBEE
     extern void auto_init_xbee(void);
     auto_init_xbee();

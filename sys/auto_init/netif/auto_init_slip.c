@@ -23,7 +23,7 @@
 #include "net/gnrc/nomac.h"
 #include "net/gnrc.h"
 
-#include "slip.h"
+#include "net/gnrc/slip.h"
 #include "slip_params.h"
 
 #define ENABLE_DEBUG (0)
@@ -37,8 +37,8 @@ static gnrc_slip_dev_t slip_devs[SLIP_NUM];
  * @brief   Define stack parameters for the MAC layer thread
  * @{
  */
-#define SLIP_STACKSIZE          (KERNEL_CONF_STACKSIZE_DEFAULT)
-#define SLIP_PRIO               (PRIORITY_MAIN - 4)
+#define SLIP_STACKSIZE          (THREAD_STACKSIZE_DEFAULT)
+#define SLIP_PRIO               (THREAD_PRIORITY_MAIN - 4)
 
 /**
  * @brief   Stacks for the MAC layer threads
@@ -55,7 +55,7 @@ void auto_init_slip(void)
                                           SLIP_PRIO);
 
         if (res <= KERNEL_PID_UNDEF) {
-            DEBUG("Error initializing XBee radio device!");
+            DEBUG("Error initializing SLIP radio device!\n");
         }
     }
 }
