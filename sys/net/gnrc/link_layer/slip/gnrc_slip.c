@@ -63,20 +63,19 @@ static void _slip_rx_cb(void *arg, char data)
 
         _SLIP_DEV(arg)->in_bytes = 0;
     }
-
-    if (_SLIP_DEV(arg)->in_esc) {
+    else if (_SLIP_DEV(arg)->in_esc) {
         _SLIP_DEV(arg)->in_esc = 0;
 
         switch (data) {
             case (_SLIP_END_ESC):
-                if (ringbuffer_add_one(_SLIP_DEV(arg)->in_buf, _SLIP_END) < 0) {
+                if (ringbuffer_add_one(&_SLIP_DEV(arg)->in_buf, _SLIP_END) < 0) {
                     _SLIP_DEV(arg)->in_bytes++;
                 }
 
                 break;
 
             case (_SLIP_ESC_ESC):
-                if (ringbuffer_add_one(_SLIP_DEV(arg)->in_buf, _SLIP_ESC) < 0) {
+                if (ringbuffer_add_one(&_SLIP_DEV(arg)->in_buf, _SLIP_ESC) < 0) {
                     _SLIP_DEV(arg)->in_bytes++;
                 }
 
@@ -90,7 +89,7 @@ static void _slip_rx_cb(void *arg, char data)
         _SLIP_DEV(arg)->in_esc = 1;
     }
     else {
-        if (ringbuffer_add_one(_SLIP_DEV(arg)->in_buf, data) < 0) {
+        if (ringbuffer_add_one(&_SLIP_DEV(arg)->in_buf, data) < 0) {
             _SLIP_DEV(arg)->in_bytes++;
         }
     }
@@ -98,8 +97,8 @@ static void _slip_rx_cb(void *arg, char data)
 
 int _slip_tx_cb(void *arg)
 {
-    if (_SLIP_DEV(arg)->out_buf->avail > 0) {
-        char c = (char)ringbuffer_get_one(_SLIP_DEV(arg)->out_buf);
+    if (_SLIP_DEV(arg)->out_buf.avail > 0) {
+        char c = (char)ringbuffer_get_one(&_SLIP_DEV(arg)->out_buf);
         uart_write((uart_t)(_SLIP_DEV(arg)->uart), c);
         return 1;
     }
@@ -134,7 +133,7 @@ static void _slip_receive(gnrc_slip_dev_t *dev, size_t bytes)
     gnrc_netif_hdr_init(hdr, 0, 0);
     hdr->if_pid = thread_getpid();
 
-    if (ringbuffer_get(dev->in_buf, pkt->data, bytes) != bytes) {
+    if (ringbuffer_get(&dev->in_buf, pkt->data, bytes) != bytes) {
         DEBUG("slip: could not read %u bytes from ringbuffer\n", (unsigned)bytes);
         gnrc_pktbuf_release(pkt);
         return;
@@ -171,7 +170,7 @@ static void _slip_receive(gnrc_slip_dev_t *dev, size_t bytes)
 
 static inline void _slip_send_char(gnrc_slip_dev_t *dev, char c)
 {
-    ringbuffer_add_one(dev->out_buf, c);
+    ringbuffer_add_one(&dev->out_buf, c);
     uart_tx_begin(dev->uart);
 }
 
@@ -260,17 +259,17 @@ static void *_slip(void *args)
 kernel_pid_t gnrc_slip_init(gnrc_slip_dev_t *dev, uart_t uart, uint32_t baudrate,
                             char *stack, size_t stack_size, char priority)
 {
-    int res;
     kernel_pid_t pid;
 
     /* reset device descriptor fields */
+    dev->uart = uart;
     dev->in_bytes = 0;
     dev->in_esc = 0;
     dev->slip_pid = KERNEL_PID_UNDEF;
 
     /* initialize buffers */
-    ringbuffer_init(dev->in_buf, dev->rx_mem, sizeof(dev->rx_mem));
-    ringbuffer_init(dev->out_buf, dev->tx_mem, sizeof(dev->tx_mem));
+    ringbuffer_init(&dev->in_buf, dev->rx_mem, sizeof(dev->rx_mem));
+    ringbuffer_init(&dev->out_buf, dev->tx_mem, sizeof(dev->tx_mem));
 
     /* initialize UART */
     DEBUG("slip: initialize UART_%d with baudrate %" PRIu32 "\n", uart,
