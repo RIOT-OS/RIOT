@@ -137,7 +137,8 @@ void ng_ipv6_netif_add(kernel_pid_t pid)
     ng_ipv6_addr_t addr = NG_IPV6_ADDR_ALL_NODES_LINK_LOCAL;
     mutex_lock(&free_entry->mutex);
 
-    DEBUG("ipv6 netif: Add IPv6 interface %" PRIkernel_pid " (i = %d)\n", pid, i);
+    DEBUG("ipv6 netif: Add IPv6 interface %" PRIkernel_pid " (i = %d)\n", pid,
+          free_entry - ipv6_ifs);
     free_entry->pid = pid;
     free_entry->mtu = NG_IPV6_NETIF_DEFAULT_MTU;
     free_entry->cur_hl = NG_IPV6_NETIF_DEFAULT_HL;
