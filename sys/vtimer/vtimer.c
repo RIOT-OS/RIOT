@@ -136,8 +136,8 @@ static int update_shortterm(void)
     }
 
     DEBUG("update_shortterm: Set hwtimer to %" PRIu32 " (now=%lu)\n", next, now);
-    uint32_t next_ticks = now_ticks + HWTIMER_TICKS(next - now);
-    hwtimer_id = hwtimer_set_absolute(next_ticks, vtimer_callback, NULL);
+    unsigned long offset_ticks = (unsigned long)HWTIMER_TICKS(next - now);
+    hwtimer_id = hwtimer_set(offset_ticks, vtimer_callback, NULL);
 
     return 0;
 }
