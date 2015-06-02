@@ -4,32 +4,10 @@ export CPU_MODEL = kw21d256
 #export CPU_MODEL = kw21d512
 #export CPU_MODEL = kw22d512
 
-#define the default port depending on the host OS
-OS := $(shell uname)
-ifeq ($(OS),Linux)
-  PORT ?= /dev/ttyACM0
-else ifeq ($(OS),Darwin)
-  PORT ?= $(shell ls -1 /dev/tty.SLAB_USBtoUART* | head -n 1)
-else
-  $(info CAUTION: No flash tool for your host system found!)
-endif
-export PORT
+export MCPU = cortex-m4
 
-# define tools used for building the project
-export PREFIX = arm-none-eabi-
-export CC = $(PREFIX)gcc
-export AR = $(PREFIX)ar
-export AS = $(PREFIX)as
-export LINK = $(PREFIX)gcc
-export SIZE = $(PREFIX)size
-export OBJCOPY = $(PREFIX)objcopy
-export OPENOCD ?= openocd
-export DBG ?= $(PREFIX)gdb
-export TERMPROG = $(RIOTBASE)/dist/tools/pyterm/pyterm
-export FLASHER = $(RIOTBASE)/dist/tools/openocd/openocd.sh
-export DEBUGGER = $(RIOTBASE)/dist/tools/openocd/openocd.sh
-export DEBUGSERVER = $(RIOTBASE)/dist/tools/openocd/openocd.sh
-export RESET = $(RIOTBASE)/dist/tools/openocd/openocd.sh
+# set default port depending on operating system
+PORT_LINUX ?= /dev/ttyACM0
 
 .PHONY: flash
 flash: $(RIOTCPU)/kinetis_common/dist/wdog-disable.bin
@@ -37,23 +15,8 @@ flash: $(RIOTCPU)/kinetis_common/dist/wdog-disable.bin
 # Reset the default goal.
 .DEFAULT_GOAL :=
 
-
-# define build specific options
-export CPU_USAGE = -mcpu=cortex-m4
-export FPU_USAGE =
-export CFLAGS += -ggdb -g3 -std=gnu99 -Os -Wall -Wstrict-prototypes $(CPU_USAGE) $(FPU_USAGE) -mlittle-endian -mthumb -mthumb-interwork -nostartfiles
-export CFLAGS += -ffunction-sections -fdata-sections -fno-builtin
-
-export ASFLAGS += -ggdb -g3 $(CPU_USAGE) $(FPU_USAGE) -mlittle-endian
-export LINKFLAGS += -g3 -ggdb -std=gnu99 $(CPU_USAGE) $(FPU_USAGE) -mlittle-endian -static -lgcc -mthumb -mthumb-interwork -nostartfiles
-export LINKFLAGS += -T$(LINKERSCRIPT)
-
-export FFLAGS = flash-elf
-export DEBUGGER_FLAGS = debug
-export DEBUGSERVER_FLAGS = debug-server
-export RESET_FLAGS = reset
-export TERMFLAGS = -p $(PORT)
 export TUI = 1
+export FFLAGS = flash-elf
 # We need special handling of the watchdog if we want to speed up the flash
 # verification by using the MCU to compute the image checksum after flashing.
 # wdog-disable.bin is a precompiled binary which will disable the watchdog and
@@ -64,11 +27,10 @@ export OPENOCD_PRE_VERIFY_CMDS += \
 export OPENOCD_EXTRA_INIT
 export PRE_FLASH_CHECK_SCRIPT = $(RIOTCPU)/kinetis_common/dist/check-fcfield-elf.sh
 
-# use newLib nano-specs if available
-ifeq ($(shell $(LINK) -specs=nano.specs -E - 2>/dev/null >/dev/null </dev/null ; echo $$?),0)
-export LINKFLAGS += -specs=nano.specs -lc -lnosys
-endif
-
-# export board specific includes to the global includes-listing
-export INCLUDES += -I$(RIOTBOARD)/$(BOARD)/include
 include $(RIOTBOARD)/$(BOARD)/Makefile.dep
+# setup serial terminal
+include $(RIOTBOARD)/Makefile.include.serial
+# this board uses openocd
+include $(RIOTBOARD)/Makefile.include.openocd
+# include cortex defaults
+include $(RIOTBOARD)/Makefile.include.cortexm_common

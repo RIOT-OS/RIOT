@@ -93,8 +93,6 @@ void board_init(void)
 
     LED_YELLOW_ON;
 
-    devicemap_init();
-
     LED_GREEN_ON;
 
     /* Initialize power control pins */
