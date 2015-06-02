@@ -25,4 +25,6 @@ cachegrind.out*
 # Codelite (among others) project files
 *.project
 
+# Eclipse symbol file (output from make eclipsesym)
+eclipsesym.xml
 /toolchain
