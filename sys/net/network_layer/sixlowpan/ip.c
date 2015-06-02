@@ -32,6 +32,10 @@
 #include "icmp.h"
 #include "lowpan.h"
 
+#ifdef FIB_COMPAT
+#include "ng_fib.h"
+#endif
+
 #include "net_help.h"
 
 #define ENABLE_DEBUG    (0)
@@ -55,7 +59,9 @@ kernel_pid_t udp_packet_handler_pid = KERNEL_PID_UNDEF;
 kernel_pid_t tcp_packet_handler_pid = KERNEL_PID_UNDEF;
 
 static volatile kernel_pid_t _rpl_process_pid = KERNEL_PID_UNDEF;
+#ifndef FIB_COMPAT
 ipv6_addr_t *(*ip_get_next_hop)(ipv6_addr_t *);
+#endif
 uint8_t (*ip_srh_indicator)(void);
 
 static ipv6_net_if_ext_t ipv6_net_if_ext[NET_IF_MAX];
@@ -107,6 +113,21 @@ int ipv6_send_packet(ipv6_hdr_t *packet, ipv6_addr_t *next_hop)
         if (next_hop == NULL) {
             DEBUG("Trying to find the next hop for %s\n", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, &packet->destaddr));
 
+#ifdef FIB_COMPAT
+            ipv6_addr_t nxt;
+            ipv6_addr_t *dest;
+            kernel_pid_t iface_id;
+            size_t nxt_size = sizeof(ipv6_addr_t);
+            uint32_t nxt_flags;
+
+            int ret = fib_get_next_hop(&iface_id, &nxt.uint8[0], &nxt_size, &nxt_flags,
+                                       &packet->destaddr.uint8[0], sizeof(ipv6_addr_t), AF_INET6);
+
+            if (ret == -EHOSTUNREACH) {
+               return -1;
+            }
+            dest = &nxt;
+#else
             if (ip_get_next_hop == NULL) {
                 return -1;
             }
@@ -116,7 +137,7 @@ int ipv6_send_packet(ipv6_hdr_t *packet, ipv6_addr_t *next_hop)
             if (dest == NULL) {
                 return -1;
             }
-
+#endif
             nce = ndp_get_ll_address(dest);
 
             if (nce == NULL
@@ -495,14 +516,29 @@ void *ipv6_process(void *arg)
                 ndp_neighbor_cache_t *nce;
 
                 ipv6_addr_t *dest;
+#ifdef FIB_COMPAT
+                ipv6_addr_t nxt;
+                kernel_pid_t iface_id;
+                size_t nxt_size = sizeof(ipv6_addr_t);
+                uint32_t nxt_flags;
 
+                int ret = fib_get_next_hop(&iface_id,
+                                           &nxt.uint8[0], &nxt_size, &nxt_flags,
+                                           &ipv6_buf->destaddr.uint8[0],
+                                           sizeof(ipv6_addr_t), AF_INET6);
+
+                if (ret == -EHOSTUNREACH) {
+                    memcpy(&nxt, &ipv6_buf->destaddr, sizeof(ipv6_addr_t));
+                }
+                dest = &nxt;
+#else
                 if (ip_get_next_hop == NULL) {
                     dest = &ipv6_buf->destaddr;
                 }
                 else {
                     dest = ip_get_next_hop(&ipv6_buf->destaddr);
                 }
-
+#endif
                 if ((dest == NULL) || ((--ipv6_buf->hoplimit) == 0)) {
                     DEBUG("!!! Packet not for me, routing handler is set, but I "
                           " have no idea where to send or the hop limit is exceeded.\n");
@@ -865,7 +901,14 @@ void ipv6_register_next_header_handler(uint8_t next_header, kernel_pid_t pid)
 /* register routing function */
 void ipv6_iface_set_routing_provider(ipv6_addr_t *(*next_hop)(ipv6_addr_t *dest))
 {
+#ifdef FIB_COMPAT
+    (void)next_hop;
+    puts("[WARNING] you are using FIB_COMPAT!\n\
+    \t- The registered get_next_hop() function is NOT USED.\n\
+    \t- In turn the fib_get_next_hop() function will be called!");
+#else
     ip_get_next_hop = next_hop;
+#endif
 }
 
 #ifdef MODULE_RPL
