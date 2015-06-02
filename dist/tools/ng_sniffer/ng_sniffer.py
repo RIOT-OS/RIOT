@@ -39,19 +39,16 @@ if len(sys.argv) < 4:
         sys.stderr.write( "       channel = 11-26\n")
         sys.exit(2)
 
-# change the channel
-
+# open serial port
 try:
-        #serport = serial.Serial(sys.argv[1], baudrate=115200, dsrdtr=0, rtscts=0, timeout=1)
         serport = serial.Serial(sys.argv[1], sys.argv[2], dsrdtr=0, rtscts=0, timeout=1)
-        serport.setDTR(0)
-        serport.setRTS(0)
 except IOError:
         print "error opening port"
         sys.exit(2)
 
 time.sleep(1)
 
+# set channel, raw mode, and promiscuous mode
 sys.stderr.write('ifconfig 4 set chan %s\n' % sys.argv[3])
 sys.stderr.write('ifconfig 4 raw\n')
 sys.stderr.write('ifconfig 4 promisc\n')
