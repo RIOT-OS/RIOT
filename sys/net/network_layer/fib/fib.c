@@ -100,6 +100,14 @@ static int fib_find_entry(uint8_t *dst, size_t dst_size,
     size_t prefix_size = 0;
     size_t match_size = dst_size;
     int ret = -EHOSTUNREACH;
+    bool is_all_zeros_addr = true;
+
+    for(size_t i = 0; i < dst_size; ++i) {
+        if (dst[i] != 0) {
+            is_all_zeros_addr = false;
+            break;
+        }
+    }
 
     for (size_t i = 0; i < FIB_MAX_FIB_TABLE_ENTRIES; ++i) {
 
@@ -133,7 +141,8 @@ static int fib_find_entry(uint8_t *dst, size_t dst_size,
             (universal_address_compare(fib_table[i].global, dst, &match_size) == 0)) {
 
             /* If we found an exact match */
-            if (match_size == dst_size) {
+            if (match_size == dst_size
+                || (is_all_zeros_addr && match_size == 0)) {
                 entry_arr[0] = &(fib_table[i]);
                 *entry_arr_size = 1;
                 /* we will not find a better one so we return */
