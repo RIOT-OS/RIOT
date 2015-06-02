@@ -6,12 +6,15 @@ IOTLAB_SITE     ?= grenoble
 IOTLAB_TYPE     ?= "m3:at86rf231"
 IOTLAB_AUTH     ?= $(HOME)/.iotlabrc
 IOTLAB_USER     ?= $(shell cut -f1 -d: $(IOTLAB_AUTH))
-IOTLAB_EXP_ID   ?= $(shell experiment-cli get -l --state Running | grep '"id"' | sed 's/\ *"id":\ \([0-9]*\),/\1/' | head -n1)
+IOTLAB_EXP_ID   ?= $(shell experiment-cli get -l --state Running | grep -m 1 '"id"' | grep -Eo '[[:digit:]]+')
 
 $(IOTLAB_AUTH):
 	auth-cli -u $(IOTLAB_USER)
 
 iotlab-exp: $(IOTLAB_AUTH)
+    ifeq (,$(AD))
+	    @echo "experiment-cli submit -d $(IOTLAB_DURATION) -l $(IOTLAB_NODES),archi=$(IOTLAB_TYPE)+site=$(IOTLAB_SITE),$(ELFFILE),$(IOTLAB_PROFILE) -n riot_makefile_experiment"
+    endif
 	$(eval NEW_ID := $(shell experiment-cli submit -d $(IOTLAB_DURATION) -l $(IOTLAB_NODES),archi=$(IOTLAB_TYPE)+site=$(IOTLAB_SITE),$(ELFFILE),$(IOTLAB_PROFILE) -n riot_makefile_experiment | grep -Eo '[[:digit:]]+'))
 	$(AD)experiment-cli wait -i $(NEW_ID)
 
