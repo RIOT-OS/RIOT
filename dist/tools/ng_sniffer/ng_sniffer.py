@@ -48,13 +48,31 @@ except IOError:
 
 time.sleep(1)
 
+serport.write('ifconfig\n')
+
+iface = 0
+
+while True:
+    line = serport.readline();
+
+    if line == '':
+        print >> sys.stderr, "Application has no network interface defined"
+        sys.exit(2)
+
+    m = re.search(r'^Iface +(\d+)', line)
+
+    if m != None:
+        iface = int(m.group(1))
+
+        break;
+
 # set channel, raw mode, and promiscuous mode
-sys.stderr.write('ifconfig 4 set chan %s\n' % sys.argv[3])
-sys.stderr.write('ifconfig 4 raw\n')
-sys.stderr.write('ifconfig 4 promisc\n')
-serport.write('ifconfig 4 set chan %s\n' % sys.argv[3])
-serport.write('ifconfig 4 raw\n')
-serport.write('ifconfig 4 promisc\n')
+sys.stderr.write('ifconfig %d set chan %s\n' % (iface, sys.argv[3]))
+sys.stderr.write('ifconfig %d raw\n' % iface)
+sys.stderr.write('ifconfig %d promisc\n' % iface)
+serport.write('ifconfig %d set chan %s\n' % (iface, sys.argv[3]))
+serport.write('ifconfig %d raw\n' % iface)
+serport.write('ifconfig %d promisc\n' % iface)
 
 time.sleep(1)
 
