@@ -12,6 +12,7 @@
  * @file
  */
 #include <inttypes.h>
+#include <stdbool.h>
 #include <stdlib.h>
 
 #include "embUnit.h"
@@ -53,8 +54,19 @@ static void test_sixlowpan_ctx_update__success(void)
 
     TEST_ASSERT_NOT_NULL(ng_sixlowpan_ctx_update(DEFAULT_TEST_ID, &addr,
                                                  DEFAULT_TEST_PREFIX_LEN,
-                                                 TEST_UINT16));
+                                                 TEST_UINT16, true));
     TEST_ASSERT_NOT_NULL(ng_sixlowpan_ctx_lookup_id(DEFAULT_TEST_ID));
+}
+
+static void test_sixlowpan_ctx_update__ltime0(void)
+{
+    ng_ipv6_addr_t addr = DEFAULT_TEST_PREFIX;
+
+    TEST_ASSERT_NOT_NULL(ng_sixlowpan_ctx_update(DEFAULT_TEST_ID, &addr,
+                                                 DEFAULT_TEST_PREFIX_LEN,
+                                                 0, true));
+    TEST_ASSERT_NOT_NULL(ng_sixlowpan_ctx_lookup_id(DEFAULT_TEST_ID));
+    TEST_ASSERT_EQUAL_INT(DEFAULT_TEST_ID, ng_sixlowpan_ctx_lookup_id(DEFAULT_TEST_ID)->flags_id);
 }
 
 static void test_sixlowpan_ctx_update__wrong_id1(void)
@@ -67,12 +79,12 @@ static void test_sixlowpan_ctx_update__wrong_id1(void)
      * should not be possible */
     TEST_ASSERT_NULL(ng_sixlowpan_ctx_update(NG_SIXLOWPAN_CTX_SIZE, &addr,
                                              DEFAULT_TEST_PREFIX_LEN,
-                                             TEST_UINT16));
+                                             TEST_UINT16, true));
     TEST_ASSERT_NULL(ng_sixlowpan_ctx_lookup_id(NG_SIXLOWPAN_CTX_SIZE));
 
     TEST_ASSERT_NOT_NULL(ng_sixlowpan_ctx_update(DEFAULT_TEST_ID, &addr,
                                                  DEFAULT_TEST_PREFIX_LEN,
-                                                 TEST_UINT16));
+                                                 TEST_UINT16, true));
     TEST_ASSERT_NOT_NULL(ng_sixlowpan_ctx_lookup_id(DEFAULT_TEST_ID));
 }
 
@@ -86,12 +98,12 @@ static void test_sixlowpan_ctx_update__wrong_id2(void)
      * be possible */
     TEST_ASSERT_NULL(ng_sixlowpan_ctx_update(UINT8_MAX, &addr,
                                              DEFAULT_TEST_PREFIX_LEN,
-                                             TEST_UINT16));
+                                             TEST_UINT16, true));
     TEST_ASSERT_NULL(ng_sixlowpan_ctx_lookup_id(UINT8_MAX));
 
     TEST_ASSERT_NOT_NULL(ng_sixlowpan_ctx_update(DEFAULT_TEST_ID, &addr,
                                                  DEFAULT_TEST_PREFIX_LEN,
-                                                 TEST_UINT16));
+                                                 TEST_UINT16, true));
     TEST_ASSERT_NOT_NULL(ng_sixlowpan_ctx_lookup_id(DEFAULT_TEST_ID));
 }
 
@@ -100,14 +112,7 @@ static void test_sixlowpan_ctx_update__wrong_prefix_len(void)
     ng_ipv6_addr_t addr = DEFAULT_TEST_PREFIX;
 
     TEST_ASSERT_NULL(ng_sixlowpan_ctx_update(DEFAULT_TEST_ID, &addr,
-                                             0, TEST_UINT16));
-    TEST_ASSERT_NULL(ng_sixlowpan_ctx_lookup_id(DEFAULT_TEST_ID));
-}
-
-static void test_sixlowpan_ctx_update__ltime0(void)
-{
-    test_sixlowpan_ctx_update__success(); /* add context to DEFAULT_TEST_ID */
-    TEST_ASSERT_NULL(ng_sixlowpan_ctx_update(DEFAULT_TEST_ID, NULL, 0, 0));
+                                             0, TEST_UINT16, true));
     TEST_ASSERT_NULL(ng_sixlowpan_ctx_lookup_id(DEFAULT_TEST_ID));
 }
 
@@ -126,7 +131,7 @@ static void test_sixlowpan_ctx_lookup_addr__same_addr(void)
     /* add context DEFAULT_TEST_PREFIX to DEFAULT_TEST_ID */
     test_sixlowpan_ctx_update__success();
     TEST_ASSERT_NOT_NULL((ctx = ng_sixlowpan_ctx_lookup_addr(&addr)));
-    TEST_ASSERT_EQUAL_INT(DEFAULT_TEST_ID, ctx->id);
+    TEST_ASSERT_EQUAL_INT(NG_SIXLOWPAN_CTX_FLAGS_COMP | DEFAULT_TEST_ID, ctx->flags_id);
     TEST_ASSERT_EQUAL_INT(DEFAULT_TEST_PREFIX_LEN, ctx->prefix_len);
     TEST_ASSERT(TEST_UINT16 >= ctx->ltime);
     TEST_ASSERT(DEFAULT_TEST_PREFIX_LEN >= ng_ipv6_addr_match_prefix(&addr, &ctx->prefix));
@@ -141,7 +146,7 @@ static void test_sixlowpan_ctx_lookup_addr__other_addr_same_prefix(void)
     /* add context DEFAULT_TEST_PREFIX to DEFAULT_TEST_ID */
     test_sixlowpan_ctx_update__success();
     TEST_ASSERT_NOT_NULL((ctx = ng_sixlowpan_ctx_lookup_addr(&addr2)));
-    TEST_ASSERT_EQUAL_INT(DEFAULT_TEST_ID, ctx->id);
+    TEST_ASSERT_EQUAL_INT(NG_SIXLOWPAN_CTX_FLAGS_COMP | DEFAULT_TEST_ID, ctx->flags_id);
     TEST_ASSERT_EQUAL_INT(DEFAULT_TEST_PREFIX_LEN, ctx->prefix_len);
     TEST_ASSERT(TEST_UINT16 >= ctx->ltime);
     TEST_ASSERT(DEFAULT_TEST_PREFIX_LEN >= ng_ipv6_addr_match_prefix(&addr1, &ctx->prefix));
@@ -176,10 +181,23 @@ static void test_sixlowpan_ctx_lookup_id__success(void)
     /* add context DEFAULT_TEST_PREFIX to DEFAULT_TEST_ID */
     test_sixlowpan_ctx_update__success();
     TEST_ASSERT_NOT_NULL((ctx = ng_sixlowpan_ctx_lookup_id(DEFAULT_TEST_ID)));
-    TEST_ASSERT_EQUAL_INT(DEFAULT_TEST_ID, ctx->id);
+    TEST_ASSERT_EQUAL_INT(NG_SIXLOWPAN_CTX_FLAGS_COMP | DEFAULT_TEST_ID, ctx->flags_id);
     TEST_ASSERT_EQUAL_INT(DEFAULT_TEST_PREFIX_LEN, ctx->prefix_len);
     TEST_ASSERT(TEST_UINT16 >= ctx->ltime);
     TEST_ASSERT(DEFAULT_TEST_PREFIX_LEN >= ng_ipv6_addr_match_prefix(&addr, &ctx->prefix));
+}
+
+static void test_sixlowpan_ctx_remove(void)
+{
+    ng_ipv6_addr_t addr = DEFAULT_TEST_PREFIX;
+
+    /* add context DEFAULT_TEST_PREFIX to DEFAULT_TEST_ID */
+    test_sixlowpan_ctx_update__success();
+    TEST_ASSERT_NOT_NULL(ng_sixlowpan_ctx_lookup_id(DEFAULT_TEST_ID));
+    TEST_ASSERT_NOT_NULL(ng_sixlowpan_ctx_lookup_addr(&addr));
+    ng_sixlowpan_ctx_remove(DEFAULT_TEST_ID);
+    TEST_ASSERT_NULL(ng_sixlowpan_ctx_lookup_id(DEFAULT_TEST_ID));
+    TEST_ASSERT_NULL(ng_sixlowpan_ctx_lookup_addr(&addr));
 }
 
 Test *tests_sixlowpan_ctx_tests(void)
@@ -197,6 +215,7 @@ Test *tests_sixlowpan_ctx_tests(void)
         new_TestFixture(test_sixlowpan_ctx_lookup_id__empty),
         new_TestFixture(test_sixlowpan_ctx_lookup_id__wrong_id),
         new_TestFixture(test_sixlowpan_ctx_lookup_id__success),
+        new_TestFixture(test_sixlowpan_ctx_remove),
     };
 
     EMB_UNIT_TESTCALLER(sixlowpan_ctx_tests, NULL, tear_down, fixtures);
