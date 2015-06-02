@@ -27,16 +27,16 @@ static uint32_t _ctx_inval_times[NG_SIXLOWPAN_CTX_SIZE];
 static mutex_t _ctx_mutex = MUTEX_INIT;
 
 static uint32_t _current_minute(void);
-static void _update_lifetime(unsigned int id);
+static void _update_lifetime(uint8_t id);
 
 #if ENABLE_DEBUG
 static char ipv6str[NG_IPV6_ADDR_MAX_STR_LEN];
 #endif
 
-static inline bool _still_valid(unsigned int id)
+static inline bool _valid(uint8_t id)
 {
     _update_lifetime(id);
-    return (_ctxs[id].ltime > 0);
+    return (_ctxs[id].prefix_len > 0);
 }
 
 ng_sixlowpan_ctx_t *ng_sixlowpan_ctx_lookup_addr(const ng_ipv6_addr_t *addr)
@@ -47,7 +47,7 @@ ng_sixlowpan_ctx_t *ng_sixlowpan_ctx_lookup_addr(const ng_ipv6_addr_t *addr)
     mutex_lock(&_ctx_mutex);
 
     for (unsigned int id = 0; id < NG_SIXLOWPAN_CTX_SIZE; id++) {
-        if (_still_valid(id)) {
+        if (_valid(id)) {
             uint8_t match = ng_ipv6_addr_match_prefix(&_ctxs[id].prefix, addr);
 
             if ((_ctxs[id].prefix_len <= match) && (match > best)) {
@@ -79,7 +79,7 @@ ng_sixlowpan_ctx_t *ng_sixlowpan_ctx_lookup_id(uint8_t id)
 
     mutex_lock(&_ctx_mutex);
 
-    if (_still_valid((unsigned int)id)) {
+    if (_valid(id)) {
         DEBUG("6lo ctx: found context (%u, %s/%" PRIu8 ")\n", id,
               ng_ipv6_addr_to_str(ipv6str, &_ctxs[id].prefix, sizeof(ipv6str)),
               _ctxs[id].prefix_len);
@@ -93,9 +93,10 @@ ng_sixlowpan_ctx_t *ng_sixlowpan_ctx_lookup_id(uint8_t id)
 }
 
 ng_sixlowpan_ctx_t *ng_sixlowpan_ctx_update(uint8_t id, const ng_ipv6_addr_t *prefix,
-                                            uint8_t prefix_len, uint16_t ltime)
+                                            uint8_t prefix_len, uint16_t ltime,
+                                            bool comp)
 {
-    if ((id >= NG_SIXLOWPAN_CTX_SIZE)) {
+    if ((id >= NG_SIXLOWPAN_CTX_SIZE) || (prefix_len == 0)) {
         return NULL;
     }
 
@@ -104,19 +105,7 @@ ng_sixlowpan_ctx_t *ng_sixlowpan_ctx_update(uint8_t id, const ng_ipv6_addr_t *pr
     _ctxs[id].ltime = ltime;
 
     if (ltime == 0) {
-        mutex_unlock(&_ctx_mutex);
-        DEBUG("6lo ctx: remove context (%u, %s/%" PRIu8 ")\n", id,
-              ng_ipv6_addr_to_str(ipv6str, &_ctxs[id].prefix, sizeof(ipv6str)),
-              _ctxs[id].prefix_len);
-        return NULL;
-    }
-
-    /* test prefix_len now so that invalidation is possible regardless of the
-     * value. */
-    if (prefix_len == 0) {
-        mutex_unlock(&_ctx_mutex);
-        _ctxs[id].ltime = 0;
-        return NULL;
+        comp = false;
     }
 
     if (prefix_len > NG_IPV6_ADDR_BIT_LEN) {
@@ -126,7 +115,7 @@ ng_sixlowpan_ctx_t *ng_sixlowpan_ctx_update(uint8_t id, const ng_ipv6_addr_t *pr
         _ctxs[id].prefix_len = prefix_len;
     }
 
-    _ctxs[id].id = id;
+    _ctxs[id].flags_id = (comp) ? (NG_SIXLOWPAN_CTX_FLAGS_COMP | id) : id;
 
     if (!ng_ipv6_addr_equal(&(_ctxs[id].prefix), prefix)) {
         ng_ipv6_addr_set_unspecified(&(_ctxs[id].prefix));
@@ -150,19 +139,21 @@ static uint32_t _current_minute(void)
     return now.seconds / 60;
 }
 
-static void _update_lifetime(unsigned int id)
+static void _update_lifetime(uint8_t id)
 {
     uint32_t now;
 
     if (_ctxs[id].ltime == 0) {
+        _ctxs[id].flags_id &= ~NG_SIXLOWPAN_CTX_FLAGS_COMP;
         return;
     }
 
     now = _current_minute();
 
     if (now >= _ctx_inval_times[id]) {
-        DEBUG("6lo ctx: context %u was invalidated\n", id);
+        DEBUG("6lo ctx: context %u was invalidated for compression\n", id);
         _ctxs[id].ltime = 0;
+        _ctxs[id].flags_id &= ~NG_SIXLOWPAN_CTX_FLAGS_COMP;
     }
     else {
         _ctxs[id].ltime = (uint16_t)(_ctx_inval_times[id] - now);

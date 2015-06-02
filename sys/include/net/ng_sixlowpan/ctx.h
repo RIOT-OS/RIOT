@@ -30,6 +30,7 @@
 #define NG_SIXLOWPAN_CTX_H_
 
 #include <inttypes.h>
+#include <stdbool.h>
 
 #include "net/ng_ipv6/addr.h"
 
@@ -41,18 +42,31 @@ extern "C" {
                                          *   context buffer */
 
 /**
+ * @{
+ * @name    Context flags.
+ * @brief   Flags to set in ng_sixlowpan_ctx_t::flags_id.
+ */
+#define NG_SIXLOWPAN_CTX_FLAGS_CID_MASK (0x0f)  /**< mask for the Context ID. */
+#define NG_SIXLOWPAN_CTX_FLAGS_COMP     (0x10)  /**< Use context for compression */
+/**
+ * @}
+ */
+
+/**
  * @brief   Entry in the 6LoWPAN context buffer.
  */
 typedef struct {
     ng_ipv6_addr_t prefix;  /**< The prefix associated to this context. */
     uint8_t prefix_len;     /**< Length of ng_sixlowpan_ctx_t::prefix in bit. */
     /**
-     * @brief   4-bit Context ID.
+     * @brief   4-bit flags, 4-bit Context ID.
      *
      * @note    This needs to be here to easily translate prefixes to
      *          ID.
+     *
+     * @details The flags are defined as above.
      */
-    uint8_t id;
+    uint8_t flags_id;
     /**
      * @brief   Lifetime in minutes this context is valid.
      *
@@ -89,17 +103,28 @@ ng_sixlowpan_ctx_t *ng_sixlowpan_ctx_lookup_id(uint8_t id);
  * @param[in] id            The ID for the context.
  *                          Must be < @ref NG_SIXLOWPAN_CTX_SIZE.
  * @param[in] prefix        The prefix for the context.
- * @param[in] prefix_len    Length of @p prefix in bits. Must be > 0, when
- *                          @p ltime > 0.
- * @param[in] ltime         New lifetime of the context. The context will
- *                          be removed if 0.
+ * @param[in] prefix_len    Length of @p prefix in bits. Must be > 0.
+ * @param[in] ltime         New lifetime of the context. @p comp will be
+ *                          implicitly set to `false` if @p ltime == 0.
+ * @param[in] comp          Use for compression if true, do not use for
+ *                          compression, but still for decompression if false.
  *
  * @return  The new context on success.
  * @return  NULL, on error or on removal.
  */
 ng_sixlowpan_ctx_t *ng_sixlowpan_ctx_update(uint8_t id, const ng_ipv6_addr_t *prefix,
-                                            uint8_t prefix_len, uint16_t ltime);
+                                            uint8_t prefix_len, uint16_t ltime,
+                                            bool comp);
 
+/**
+ * @brief   Removes context.
+ *
+ * @param[in] id    A context ID.
+ */
+static inline void ng_sixlowpan_ctx_remove(uint8_t id)
+{
+    ng_sixlowpan_ctx_lookup_id(id)->prefix_len = 0;
+}
 
 #ifdef TEST_SUITES
 /**
