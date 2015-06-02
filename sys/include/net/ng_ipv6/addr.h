@@ -131,6 +131,17 @@ typedef union __attribute__((packed)) {
                                                0, 0, 0, 0, 0, 0, 0, 2 }}
 
 /**
+ * @brief   Static initializer for the all-RPL-nodes multicast IPv6
+ *          address (ff02::1a)
+ *
+ * @see <a href="https://tools.ietf.org/html/rfc6550#section-6">
+ *          RFC 6550, section 6
+ *      </a>
+ */
+#define NG_IPV6_ADDR_ALL_RPL_NODES {{ 0xff, 0x02, 0, 0, 0, 0, 0, 0, \
+                                               0, 0, 0, 0, 0, 0, 0, 0x1a }}
+
+/**
  * @brief   Values for the flag field in multicast addresses.
  *
  * @see <a href="http://tools.ietf.org/html/rfc4291#section-2.7">
