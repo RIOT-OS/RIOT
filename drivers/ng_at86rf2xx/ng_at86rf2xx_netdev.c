@@ -40,7 +40,9 @@ static size_t _make_data_frame_hdr(ng_at86rf2xx_t *dev, uint8_t *buf,
     buf[1] = 0x88;      /* use short src and dst addresses as starting point */
 
     /* if AUTOACK is enabled, then we also expect ACKs for this packet */
-    if (dev->options & NG_AT86RF2XX_OPT_AUTOACK) {
+    if (!(hdr->flags & NG_NETIF_HDR_FLAGS_BROADCAST) &&
+        !(hdr->flags & NG_NETIF_HDR_FLAGS_MULTICAST) &&
+        (dev->options & NG_AT86RF2XX_OPT_AUTOACK)) {
         buf[0] |= NG_IEEE802154_FCF_ACK_REQ;
     }
 
