@@ -202,7 +202,11 @@ unsigned long hwtimer_arch_now(void)
 
 void isr_lptmr0(void)
 {
-    stimer.counter32b += (uint32_t)LPTIMER_DEV->CMR;
+    /* The timer counter is reset to 0 when the compare value is hit, add the
+     * compare value to the 32 bit counter. Add 1 for counting the 0'th tick as
+     * well (TCF asserts when CNR equals CMR and the counter increases) */
+    stimer.counter32b += (uint32_t)LPTIMER_DEV->CMR + 1;
+
     /* clear compare flag (w1c bit) */
     LPTIMER_DEV->CSR |= LPTMR_CSR_TCF_MASK;
 
