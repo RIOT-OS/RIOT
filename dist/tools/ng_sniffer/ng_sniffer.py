@@ -3,6 +3,7 @@
 (C) 2012, Mariano Alvira <mar@devl.org>
 (C) 2014, Oliver Hahm <oliver.hahm@inria.fr>
 (C) 2015, Hauke Petersen <hauke.petersen@fu-berlin.de>
+(C) 2015, Martine Lenders <mlenders@inf.fu-berlin.de>
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -29,59 +30,10 @@ OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 SUCH DAMAGE.
 '''
 
-import sys,os,time
+import sys, re
+from time import sleep, time
 from struct import pack
-import re
-import serial
-
-if len(sys.argv) < 4:
-        sys.stderr.write( "Usage: %s tty baudrate channel [outfile]\n" %(sys.argv[0]))
-        sys.stderr.write( "       channel = 11-26\n")
-        sys.exit(2)
-
-# open serial port
-try:
-        serport = serial.Serial(sys.argv[1], sys.argv[2], dsrdtr=0, rtscts=0, timeout=1)
-except IOError:
-        print "error opening port"
-        sys.exit(2)
-
-time.sleep(1)
-
-serport.write('ifconfig\n')
-
-iface = 0
-
-while True:
-    line = serport.readline();
-
-    if line == '':
-        print >> sys.stderr, "Application has no network interface defined"
-        sys.exit(2)
-
-    m = re.search(r'^Iface +(\d+)', line)
-
-    if m != None:
-        iface = int(m.group(1))
-
-        break;
-
-# set channel, raw mode, and promiscuous mode
-sys.stderr.write('ifconfig %d set chan %s\n' % (iface, sys.argv[3]))
-sys.stderr.write('ifconfig %d raw\n' % iface)
-sys.stderr.write('ifconfig %d promisc\n' % iface)
-serport.write('ifconfig %d set chan %s\n' % (iface, sys.argv[3]))
-serport.write('ifconfig %d raw\n' % iface)
-serport.write('ifconfig %d promisc\n' % iface)
-
-time.sleep(1)
-
-# figure out where to write
-try:
-    sys.stderr.write('trying to open file %s\n' % sys.argv[4])
-    outfile = open(sys.argv[4], 'w+b')
-except IndexError:
-    outfile = sys.stdout
+from serial import Serial
 
 # PCAP setup
 MAGIC = 0xa1b2c3d4
@@ -92,25 +44,46 @@ SIG = 0
 SNAPLEN = 0xffff
 NETWORK = 230 # 802.15.4 no FCS
 
-# output overall PCAP header
-outfile.write(pack('<LHHLLLL', MAGIC, MAJOR, MINOR, ZONE, SIG, SNAPLEN, NETWORK))
+def configure_interface(port, channel):
+    line = ""
+    iface = 0
+    port.write('ifconfig\n')
+    while True:
+        line = port.readline()
+        if line == '':
+            print >> sys.stderr, "Application has no network interface defined"
+            sys.exit(2)
+        match = re.search(r'^Iface +(\d+)', line)
+        if match != None:
+            iface = int(match.group(1))
+            break
 
-# count incoming packets
-count = 0
-sys.stderr.write("RX: %i\r" % count)
+    # set channel, raw mode, and promiscuous mode
+    print >> sys.stderr, 'ifconfig %d set chan %d' % (iface, channel)
+    print >> sys.stderr, 'ifconfig %d raw' % iface
+    print >> sys.stderr, 'ifconfig %d promisc' % iface
+    port.write('ifconfig %d set chan %d\n' % (iface, channel))
+    port.write('ifconfig %d raw\n' % iface)
+    port.write('ifconfig %d promisc\n' % iface)
 
-try:
-    while 1:
-        line = serport.readline().rstrip()
+def generate_pcap(port, out):
+    # count incoming packets
+    count = 0
+    # output overall PCAP header
+    out.write(pack('<LHHLLLL', MAGIC, MAJOR, MINOR, ZONE, SIG, SNAPLEN,
+                   NETWORK))
+    sys.stderr.write("RX: %i\r" % count)
+    while True:
+        line = port.readline().rstrip()
 
         pkt_header = re.match(r">? *rftest-rx --- len 0x(\w\w).*", line)
         if pkt_header:
-            t = time.time()
-            sec = int(t)
-            usec = (t - sec) * 100000
+            now = time()
+            sec = int(now)
+            usec = (now - sec) * 100000
             length = int(pkt_header.group(1), 16)
-            outfile.write(pack('<LLLL', sec, usec, length, length))
-            outfile.flush()
+            out.write(pack('<LLLL', sec, usec, length, length))
+            out.flush()
             count += 1
             sys.stderr.write("RX: %i\r" % count)
             continue
@@ -120,8 +93,39 @@ try:
             for part in line.split(' '):
                 byte = re.match(r"0x(\w\w)", part)
                 if byte:
-                    outfile.write(pack('<B', int(byte.group(1), 16)))
-            outfile.flush()
+                    out.write(pack('<B', int(byte.group(1), 16)))
+            out.flush()
 
-except KeyboardInterrupt:
-    sys.exit(2)
+def main(argv):
+    if len(argv) < 4:
+        print >> sys.stderr, "Usage: %s tty baudrate channel [outfile]" % (argv[0])
+        print >> sys.stderr, "       channel = 11-26"
+        sys.exit(2)
+
+    # open serial port
+    try:
+        serport = Serial(argv[1], argv[2], dsrdtr=0, rtscts=0,
+                         timeout=1)
+    except IOError:
+        print >> sys.stderr, "error opening port"
+        sys.exit(2)
+
+    sleep(1)
+    configure_interface(serport, int(argv[3]))
+    sleep(1)
+
+    # figure out where to write
+    try:
+        sys.stderr.write('trying to open file %s\n' % argv[4])
+        outfile = open(argv[4], 'w+b')
+    except IndexError:
+        outfile = sys.stdout
+
+    try:
+        generate_pcap(serport, outfile)
+    except KeyboardInterrupt:
+        print ""
+        sys.exit(2)
+
+if __name__ == "__main__":
+    main(sys.argv)
