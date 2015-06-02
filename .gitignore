@@ -1,0 +1,23 @@
+# Object files
+*.o
+# Built binaries
+*bin
+# Backup files
+*~
+*.orig
+.*.swp
+cachegrind.out*
+# Eclipse workspace files
+.project
+.cproject
+.settings
+.idea
+# KDevelop4 project files
+.kdev4
+*.kdev4
+# Codelite (among others) project files
+*.project
+
+# Eclipse symbol file (output from make eclipsesym)
+eclipsesym.xml
+/toolchain
