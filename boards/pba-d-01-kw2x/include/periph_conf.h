@@ -303,7 +303,6 @@ extern "C"
  * @name GPIO configuration
  * @{
  */
-#define GPIO_NUMOF          8
 #define GPIO_0_EN           1
 #define GPIO_1_EN           1
 #define GPIO_2_EN           1

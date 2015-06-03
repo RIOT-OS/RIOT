@@ -24,6 +24,7 @@
 
 #include "cpu.h"
 #include "periph_conf.h"
+#include "periph_cpu.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -44,10 +45,10 @@ extern "C" {
 * @{
 */
 #define NG_AT86RF233_SPI        (SPI_0)
-#define NG_AT86RF233_CS         (GPIO_4)
-#define NG_AT86RF233_INT        (GPIO_5)
-#define NG_AT86RF233_RESET      (GPIO_6)
-#define NG_AT86RF233_SLEEP      (GPIO_7)
+#define NG_AT86RF233_CS         GPIO(PORT_B, 31)
+#define NG_AT86RF233_INT        GPIO(PORT_B, 0)
+#define NG_AT86RF233_RESET      GPIO(PORT_B, 15)
+#define NG_AT86RF233_SLEEP      GPIO(PORT_A, 20)
 #define NG_AT86RF233_SPI_CLK    (SPI_SPEED_1MHZ)
 /** @}*/
 
@@ -56,10 +57,10 @@ extern "C" {
 * @{
 */
 #define AT86RF231_SPI      SPI_0
-#define AT86RF231_CS       GPIO_4
-#define AT86RF231_INT      GPIO_5
-#define AT86RF231_RESET    GPIO_6
-#define AT86RF231_SLEEP    GPIO_7
+#define AT86RF231_CS       GPIO(PORT_B, 31)
+#define AT86RF231_INT      GPIO(PORT_B, 0)
+#define AT86RF231_RESET    GPIO(PORT_B, 15)
+#define AT86RF231_SLEEP    GPIO(PORT_A, 20)
 
 #define AT86RF231_SPI_SPEED SPI_SPEED_1MHZ
 /** @} */

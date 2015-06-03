@@ -116,8 +116,6 @@ extern "C" {
  * @name GPIO configuration
  * @{
  */
-#define GPIO_NUMOF          32
-
 #define GPIO_IRQ_PRIO       1
 
 #define GPIO_0_EN           1
