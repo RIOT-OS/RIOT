@@ -40,6 +40,7 @@ static int crashed = 0;
 /* WARNING: this function NEVER returns! */
 NORETURN void core_panic(int crash_code, const char *message)
 {
+    (void)crash_code;
     if (crashed == 0) {
         /* print panic message to console (if possible) */
         crashed = 1;
