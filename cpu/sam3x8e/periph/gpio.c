@@ -27,9 +27,6 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-/* guard file in case no GPIO devices are defined */
-#if GPIO_NUMOF
-
 typedef struct {
     gpio_cb_t cb;       /**< callback called from GPIO interrupt */
     void *arg;          /**< argument passed to the callback */
@@ -37,227 +34,7 @@ typedef struct {
 
 static gpio_state_t gpio_config[GPIO_NUMOF];
 
-int gpio_init_out(gpio_t dev, gpio_pp_t pushpull)
-{
-    Pio *port = 0;
-    uint32_t pin = 0;
-
-    switch (dev) {
-#if GPIO_0_EN
-        case GPIO_0:
-            port = GPIO_0_DEV;
-            pin = GPIO_0_PIN;
-            break;
-#endif
-#if GPIO_1_EN
-        case GPIO_1:
-            port = GPIO_1_DEV;
-            pin = GPIO_1_PIN;
-            break;
-#endif
-#if GPIO_2_EN
-        case GPIO_2:
-            port = GPIO_2_DEV;
-            pin = GPIO_2_PIN;
-            break;
-#endif
-#if GPIO_3_EN
-        case GPIO_3:
-            port = GPIO_3_DEV;
-            pin = GPIO_3_PIN;
-            break;
-#endif
-#if GPIO_4_EN
-        case GPIO_4:
-            port = GPIO_4_DEV;
-            pin = GPIO_4_PIN;
-            break;
-#endif
-#if GPIO_5_EN
-        case GPIO_5:
-            port = GPIO_5_DEV;
-            pin = GPIO_5_PIN;
-            break;
-#endif
-#if GPIO_6_EN
-        case GPIO_6:
-            port = GPIO_6_DEV;
-            pin = GPIO_6_PIN;
-            break;
-#endif
-#if GPIO_7_EN
-        case GPIO_7:
-            port = GPIO_7_DEV;
-            pin = GPIO_7_PIN;
-            break;
-#endif
-#if GPIO_8_EN
-        case GPIO_8:
-            port = GPIO_8_DEV;
-            pin = GPIO_8_PIN;
-            break;
-#endif
-#if GPIO_9_EN
-        case GPIO_9:
-            port = GPIO_9_DEV;
-            pin = GPIO_9_PIN;
-            break;
-#endif
-#if GPIO_10_EN
-        case GPIO_10:
-            port = GPIO_10_DEV;
-            pin = GPIO_10_PIN;
-            break;
-#endif
-#if GPIO_11_EN
-        case GPIO_11:
-            port = GPIO_11_DEV;
-            pin = GPIO_11_PIN;
-            break;
-#endif
-#if GPIO_12_EN
-        case GPIO_12:
-            port = GPIO_12_DEV;
-            pin = GPIO_12_PIN;
-            break;
-#endif
-#if GPIO_13_EN
-        case GPIO_13:
-            port = GPIO_13_DEV;
-            pin = GPIO_13_PIN;
-            break;
-#endif
-#if GPIO_14_EN
-        case GPIO_14:
-            port = GPIO_14_DEV;
-            pin = GPIO_14_PIN;
-            break;
-#endif
-#if GPIO_15_EN
-        case GPIO_15:
-            port = GPIO_15_DEV;
-            pin = GPIO_15_PIN;
-            break;
-#endif
-#if GPIO_16_EN
-        case GPIO_16:
-            port = GPIO_16_DEV;
-            pin = GPIO_16_PIN;
-            break;
-#endif
-#if GPIO_17_EN
-        case GPIO_17:
-            port = GPIO_17_DEV;
-            pin = GPIO_17_PIN;
-            break;
-#endif
-#if GPIO_18_EN
-        case GPIO_18:
-            port = GPIO_18_DEV;
-            pin = GPIO_18_PIN;
-            break;
-#endif
-#if GPIO_19_EN
-        case GPIO_19:
-            port = GPIO_19_DEV;
-            pin = GPIO_19_PIN;
-            break;
-#endif
-#if GPIO_20_EN
-        case GPIO_20:
-            port = GPIO_20_DEV;
-            pin = GPIO_20_PIN;
-            break;
-#endif
-#if GPIO_21_EN
-        case GPIO_21:
-            port = GPIO_21_DEV;
-            pin = GPIO_21_PIN;
-            break;
-#endif
-#if GPIO_22_EN
-        case GPIO_22:
-            port = GPIO_22_DEV;
-            pin = GPIO_22_PIN;
-            break;
-#endif
-#if GPIO_23_EN
-        case GPIO_23:
-            port = GPIO_23_DEV;
-            pin = GPIO_23_PIN;
-            break;
-#endif
-#if GPIO_24_EN
-        case GPIO_24:
-            port = GPIO_24_DEV;
-            pin = GPIO_24_PIN;
-            break;
-#endif
-#if GPIO_25_EN
-        case GPIO_25:
-            port = GPIO_25_DEV;
-            pin = GPIO_25_PIN;
-            break;
-#endif
-#if GPIO_26_EN
-        case GPIO_26:
-            port = GPIO_26_DEV;
-            pin = GPIO_26_PIN;
-            break;
-#endif
-#if GPIO_27_EN
-        case GPIO_27:
-            port = GPIO_27_DEV;
-            pin = GPIO_27_PIN;
-            break;
-#endif
-#if GPIO_28_EN
-        case GPIO_28:
-            port = GPIO_28_DEV;
-            pin = GPIO_28_PIN;
-            break;
-#endif
-#if GPIO_29_EN
-        case GPIO_29:
-            port = GPIO_29_DEV;
-            pin = GPIO_29_PIN;
-            break;
-#endif
-#if GPIO_30_EN
-        case GPIO_30:
-            port = GPIO_30_DEV;
-            pin = GPIO_30_PIN;
-            break;
-#endif
-#if GPIO_31_EN
-        case GPIO_31:
-            port = GPIO_31_DEV;
-            pin = GPIO_31_PIN;
-            break;
-#endif
-    }
-
-    /* configure pin as output */
-    port->PIO_PER = pin;
-    port->PIO_OER = pin;
-    port->PIO_CODR = pin;
-
-    /* configure the pin's pull resistor state */
-    switch (pushpull) {
-        case GPIO_PULLDOWN:
-            return -1;
-        case GPIO_PULLUP:
-            port->PIO_PUER = pin;
-            break;
-        case GPIO_NOPULL:
-            port->PIO_PUDR = pin;
-            break;
-    }
-
-    return 0;
-}
-
-int gpio_init_in(gpio_t dev, gpio_pp_t pushpull)
+int gpio_init(gpio_t dev, gpio_dir_t dir, gpio_pp_t pushpull)
 {
     Pio *port = 0;
     uint32_t pin = 0;
@@ -491,9 +268,6 @@ int gpio_init_in(gpio_t dev, gpio_pp_t pushpull)
 
     /* give the PIO module the power over the corresponding pin */
     port->PIO_PER = pin;
-    /* configure pin as input */
-    port->PIO_ODR = pin;
-
     /* configure the pin's pull resistor state */
     switch (pushpull) {
         case GPIO_PULLDOWN:
@@ -505,18 +279,27 @@ int gpio_init_in(gpio_t dev, gpio_pp_t pushpull)
             port->PIO_PUDR = pin;
             break;
     }
+    if (dir == GPIO_DIR_OUT) {
+        /* configure pin as output */
+        port->PIO_OER = pin;
+        port->PIO_CODR = pin;
+    }
+    else {
+        /* configure pin as input */
+        port->PIO_ODR = pin;
+    }
 
     return 0;
 }
 
-int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb, void *arg)
+int gpio_init_exti(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb, void *arg)
 {
     int res;
     Pio *port = 0;
     uint32_t pin = 0;
 
     /* initialize port as input */
-    res = gpio_init_in(dev, pullup);
+    res = gpio_init(dev, GPIO_DIR_IN, pullup);
     if (res < 0) {
         return res;
     }
@@ -1543,6 +1326,7 @@ void gpio_irq_disable(gpio_t dev)
 #endif
     }
 }
+
 void gpio_irq_enable(gpio_t dev)
 {
     switch (dev) {
@@ -2380,5 +2164,3 @@ void isr_piod(void)
         thread_yield();
     }
 }
-
-#endif /* GPIO_NUMOF */
