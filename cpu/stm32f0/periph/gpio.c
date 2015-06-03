@@ -24,9 +24,6 @@
 #include "periph/gpio.h"
 #include "periph_conf.h"
 
-/* guard file in case no GPIO devices are defined */
-#if GPIO_NUMOF
-
 typedef struct {
     gpio_cb_t cb;
     void *arg;
@@ -194,7 +191,7 @@ static const uint8_t gpio_clock_map[GPIO_NUMOF] = {
 #endif
 };
 
-int gpio_init_out(gpio_t dev, gpio_pp_t pullup)
+int gpio_init(gpio_t dev, gpio_dir_t dir, gpio_pp_t pullup)
 {
     GPIO_TypeDef *port;
     uint8_t pin;
@@ -208,13 +205,20 @@ int gpio_init_out(gpio_t dev, gpio_pp_t pullup)
 
     RCC->AHBENR |= (1 << gpio_clock_map[dev]);
 
-    port->MODER &= ~(2 << (2 * pin));           /* set pin to output mode */
-    port->MODER |= (1 << (2 * pin));
-    port->OTYPER &= ~(1 << pin);                /* set to push-pull configuration */
-    port->OSPEEDR |= (3 << (2 * pin));          /* set to high speed */
     port->PUPDR &= ~(3 << (2 * pin));           /* configure push-pull resistors */
     port->PUPDR |= (pullup << (2 * pin));
-    port->ODR &= ~(1 << pin);                   /* set pin to low signal */
+
+    if (dir == GPIO_DIR_OUT) {
+        port->MODER &= ~(2 << (2 * pin));           /* set pin to output mode */
+        port->MODER |= (1 << (2 * pin));
+        port->OTYPER &= ~(1 << pin);                /* set to push-pull configuration */
+        port->OSPEEDR |= (3 << (2 * pin));          /* set to high speed */
+        port->ODR &= ~(1 << pin);                   /* set pin to low signal */
+    }
+    else {
+        port->MODER &= ~(3 << (2 * pin));           /* configure pin as input */
+
+    }
 
     return 0; /* all OK */
 }
@@ -233,14 +237,10 @@ int gpio_init_in(gpio_t dev, gpio_pp_t pullup)
 
     RCC->AHBENR |= (1 << gpio_clock_map[dev]);
 
-    port->MODER &= ~(3 << (2 * pin));           /* configure pin as input */
-    port->PUPDR &= ~(3 << (2 * pin));           /* configure push-pull resistors */
-    port->PUPDR |= (pullup << (2 * pin));
-
     return 0; /* everything alright here */
 }
 
-int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb, void *arg)
+int gpio_init_exti(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb, void *arg)
 {
     int res;
     uint8_t pin;
@@ -252,7 +252,7 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb
     pin = gpio_pin_map[dev];
 
     /* configure pin as input */
-    res = gpio_init_in(dev, pullup);
+    res = gpio_init(dev, GPIO_DIR_IN, pullup);
     if (res < 0) {
         return res;
     }
@@ -565,5 +565,3 @@ void isr_exti4_15(void)
         thread_yield();
     }
 }
-
-#endif /* GPIO_NUMOF */
