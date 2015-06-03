@@ -15,1036 +15,231 @@
  *
  * @author      Troels Hoffmeyer <troels.d.hoffmeyer@gmail.com>
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
  * @}
  */
 
 #include "cpu.h"
+#include "sched.h"
+#include "thread.h"
 #include "periph/gpio.h"
 #include "periph_conf.h"
 
-#include "sched.h"
-#include "thread.h"
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-/* guard file in case no GPIO devices are defined */
-#if GPIO_NUMOF
+/**
+ * @brief   Number of external interrupt lines
+ */
+#define NUMOF_IRQS                  (16U)
 
+/**
+ * @brief   Mapping of pins to EXTI lines, -1 means not EXTI possible
+ */
+static const int8_t exti_config[2][32] = {
+    {-1,  1, -1, -1,  4,  5,  6,  7, -1,  9, 10, 11, 12, 13, 14, 15,
+     -1,  1,  2,  3, -1, -1,  6,  7, 12, 13, -1, -1, -1, -1, -1, -1},
+    { 0, -1,  2,  3, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+      0,  1, -1, -1, -1, -1,  6,  7, -1, -1, -1, 15,  8, -1, 10, 11},
+};
+
+/**
+ * @brief   Datatype to use for saving the interrupt contexts
+ */
 typedef struct {
-    gpio_cb_t cb;       /**< callback called from GPIO interrupt */
+    gpio_cb_t cb;       /**< callback to call on GPIO interrupt */
     void *arg;          /**< argument passed to the callback */
-} gpio_state_t;
+} gpio_exti_t;
 
-#define EXTI_NUMOF 16
-static gpio_state_t gpio_config[EXTI_NUMOF];
+/**
+ * @brief   Hold one interrupt context per interrupt line
+ */
+static gpio_exti_t gpio_config[NUMOF_IRQS];
 
-int gpio_init_out(gpio_t dev, gpio_pp_t pushpull)
+static inline PortGroup *_port(gpio_t pin)
 {
-    PortGroup* port = NULL;
-    uint32_t pin = 0;
-    switch (dev) {
-#if GPIO_0_EN
-        case GPIO_0:
-            port = &GPIO_0_DEV;
-            pin = GPIO_0_PIN;
-            break;
-#endif
-#if GPIO_1_EN
-        case GPIO_1:
-            port = &GPIO_1_DEV;
-            pin = GPIO_1_PIN;
-            break;
-#endif
-#if GPIO_2_EN
-        case GPIO_2:
-            port = &GPIO_2_DEV;
-            pin = GPIO_2_PIN;
-            break;
-#endif
-#if GPIO_3_EN
-        case GPIO_3:
-            port = &GPIO_3_DEV;
-            pin = GPIO_3_PIN;
-            break;
-#endif
-#if GPIO_4_EN
-        case GPIO_4:
-            port = &GPIO_4_DEV;
-            pin = GPIO_4_PIN;
-            break;
-#endif
-#if GPIO_5_EN
-        case GPIO_5:
-            port = &GPIO_5_DEV;
-            pin = GPIO_5_PIN;
-            break;
-#endif
-#if GPIO_6_EN
-        case GPIO_6:
-            port = &GPIO_6_DEV;
-            pin = GPIO_6_PIN;
-            break;
-#endif
-#if GPIO_7_EN
-        case GPIO_7:
-            port = &GPIO_7_DEV;
-            pin = GPIO_7_PIN;
-            break;
-#endif
-#if GPIO_8_EN
-        case GPIO_8:
-            port = &GPIO_8_DEV;
-            pin = GPIO_8_PIN;
-            break;
-#endif
-#if GPIO_9_EN
-        case GPIO_9:
-            port = &GPIO_9_DEV;
-            pin = GPIO_9_PIN;
-            break;
-#endif
-#if GPIO_10_EN
-        case GPIO_10:
-            port = &GPIO_10_DEV;
-            pin = GPIO_10_PIN;
-            break;
-#endif
-#if GPIO_11_EN
-        case GPIO_11:
-            port = &GPIO_11_DEV;
-            pin = GPIO_11_PIN;
-            break;
-#endif
-#if GPIO_12_EN
-        case GPIO_12:
-            port = &GPIO_12_DEV;
-            pin = GPIO_12_PIN;
-            break;
-#endif
-#if GPIO_13_EN
-        case GPIO_13:
-            port = &GPIO_13_DEV;
-            pin = GPIO_13_PIN;
-            break;
-#endif
-#if GPIO_14_EN
-        case GPIO_14:
-            port = &GPIO_14_DEV;
-            pin = GPIO_14_PIN;
-            break;
-#endif
-#if GPIO_15_EN
-        case GPIO_15:
-            port = &GPIO_15_DEV;
-            pin = GPIO_15_PIN;
-            break;
-#endif
-        default:
-            return -1;
-    }
-
-    if (port == NULL) {
-        return -1;
-    }
-
-    /* configure as output */
-    port->DIRSET.reg = 1 << pin;
-
-    /* configure the pin's pull resistor state */
-    switch (pushpull) {
-        case GPIO_PULLDOWN:
-            return -1;
-        case GPIO_PULLUP:
-            port->PINCFG[pin].bit.PULLEN = true;
-            break;
-        case GPIO_NOPULL:
-            port->PINCFG[pin].bit.PULLEN = false;
-            break;
-    }
-
-    return 0;
+    return (PortGroup *)(pin & ~(0x1f));
 }
 
-int gpio_init_in(gpio_t dev, gpio_pp_t pushpull)
+static inline int _pin_pos(gpio_t pin)
 {
-    PortGroup* port = NULL;
-    uint32_t pin = 0;
-    switch (dev) {
-#if GPIO_0_EN
-        case GPIO_0:
-            port = &GPIO_0_DEV;
-            pin = GPIO_0_PIN;
-            break;
-#endif
-#if GPIO_1_EN
-        case GPIO_1:
-            port = &GPIO_1_DEV;
-            pin = GPIO_1_PIN;
-            break;
-#endif
-#if GPIO_2_EN
-        case GPIO_2:
-            port = &GPIO_2_DEV;
-            pin = GPIO_2_PIN;
-            break;
-#endif
-#if GPIO_3_EN
-        case GPIO_3:
-            port = &GPIO_3_DEV;
-            pin = GPIO_3_PIN;
-            break;
-#endif
-#if GPIO_4_EN
-        case GPIO_4:
-            port = &GPIO_4_DEV;
-            pin = GPIO_4_PIN;
-            break;
-#endif
-#if GPIO_5_EN
-        case GPIO_5:
-            port = &GPIO_5_DEV;
-            pin = GPIO_5_PIN;
-            break;
-#endif
-#if GPIO_6_EN
-        case GPIO_6:
-            port = &GPIO_6_DEV;
-            pin = GPIO_6_PIN;
-            break;
-#endif
-#if GPIO_7_EN
-        case GPIO_7:
-            port = &GPIO_7_DEV;
-            pin = GPIO_7_PIN;
-            break;
-#endif
-#if GPIO_8_EN
-        case GPIO_8:
-            port = &GPIO_8_DEV;
-            pin = GPIO_8_PIN;
-            break;
-#endif
-#if GPIO_9_EN
-        case GPIO_9:
-            port = &GPIO_9_DEV;
-            pin = GPIO_9_PIN;
-            break;
-#endif
-#if GPIO_10_EN
-        case GPIO_10:
-            port = &GPIO_10_DEV;
-            pin = GPIO_10_PIN;
-            break;
-#endif
-#if GPIO_11_EN
-        case GPIO_11:
-            port = &GPIO_11_DEV;
-            pin = GPIO_11_PIN;
-            break;
-#endif
-#if GPIO_12_EN
-        case GPIO_12:
-            port = &GPIO_12_DEV;
-            pin = GPIO_12_PIN;
-            break;
-#endif
-#if GPIO_13_EN
-        case GPIO_13:
-            port = &GPIO_13_DEV;
-            pin = GPIO_13_PIN;
-            break;
-#endif
-#if GPIO_14_EN
-        case GPIO_14:
-            port = &GPIO_14_DEV;
-            pin = GPIO_14_PIN;
-            break;
-#endif
-#if GPIO_15_EN
-        case GPIO_15:
-            port = &GPIO_15_DEV;
-            pin = GPIO_15_PIN;
-            break;
-#endif
-        default:
-            return -1;
-    }
-
-    if (port == NULL) {
-        return -1;
-    }
-
-    /* configure as input */
-    port->DIRCLR.reg = 1 << pin;
-    /* buffer input value */
-    port->PINCFG[pin].bit.INEN = true;
-
-    /* configure the pin's pull resistor state */
-    switch (pushpull) {
-        case GPIO_PULLDOWN:
-            port->OUTCLR.reg = 1 << pin;
-            port->PINCFG[pin].bit.PULLEN = true;
-            break;
-        case GPIO_PULLUP:
-            port->OUTSET.reg = 1 << pin;
-            port->PINCFG[pin].bit.PULLEN = true;
-            break;
-        case GPIO_NOPULL:
-            port->PINCFG[pin].bit.PULLEN = false;
-            break;
-    }
-
-    return 0;
+    return (pin & 0x1f);
 }
 
-int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb, void *arg)
+static inline int _pin_mask(gpio_t pin)
 {
-    PortGroup* port = NULL;
-    uint32_t pin = 0;
-    uint32_t extint = 0;
-    int res = 0;
+    return (1 << _pin_pos(pin));
+}
 
-    switch (dev) {
-#if GPIO_0_EN
-        case GPIO_0:
-            port = &GPIO_0_DEV;
-            pin = GPIO_0_PIN;
-            extint = GPIO_0_EXTINT;
-            break;
-#endif
-#if GPIO_1_EN
-        case GPIO_1:
-            port = &GPIO_1_DEV;
-            pin = GPIO_1_PIN;
-            extint = GPIO_1_EXTINT;
-            break;
-#endif
-#if GPIO_2_EN
-        case GPIO_2:
-            port = &GPIO_2_DEV;
-            pin = GPIO_2_PIN;
-            extint = GPIO_2_EXTINT;
-            break;
-#endif
-#if GPIO_3_EN
-        case GPIO_3:
-            port = &GPIO_3_DEV;
-            pin = GPIO_3_PIN;
-            extint = GPIO_3_EXTINT;
-            break;
-#endif
-#if GPIO_4_EN
-        case GPIO_4:
-            port = &GPIO_4_DEV;
-            pin = GPIO_4_PIN;
-            extint = GPIO_4_EXTINT;
-            break;
-#endif
-#if GPIO_5_EN
-        case GPIO_5:
-            port = &GPIO_5_DEV;
-            pin = GPIO_5_PIN;
-            extint = GPIO_5_EXTINT;
-            break;
-#endif
-#if GPIO_6_EN
-        case GPIO_6:
-            port = &GPIO_6_DEV;
-            pin = GPIO_6_PIN;
-            extint = GPIO_6_EXTINT;
-            break;
-#endif
-#if GPIO_7_EN
-        case GPIO_7:
-            port = &GPIO_7_DEV;
-            pin = GPIO_7_PIN;
-            extint = GPIO_7_EXTINT;
-            break;
-#endif
-#if GPIO_8_EN
-        case GPIO_8:
-            port = &GPIO_8_DEV;
-            pin = GPIO_8_PIN;
-            extint = GPIO_8_EXTINT;
-            break;
-#endif
-#if GPIO_9_EN
-        case GPIO_9:
-            port = &GPIO_9_DEV;
-            pin = GPIO_9_PIN;
-            extint = GPIO_9_EXTINT;
-            break;
-#endif
-#if GPIO_10_EN
-        case GPIO_10:
-            port = &GPIO_10_DEV;
-            pin = GPIO_10_PIN;
-            extint = GPIO_10_EXTINT;
-            break;
-#endif
-#if GPIO_11_EN
-        case GPIO_11:
-            port = &GPIO_11_DEV;
-            pin = GPIO_11_PIN;
-            extint = GPIO_11_EXTINT;
-            break;
-#endif
-#if GPIO_12_EN
-        case GPIO_12:
-            port = &GPIO_12_DEV;
-            pin = GPIO_12_PIN;
-            extint = GPIO_12_EXTINT;
-            break;
-#endif
-#if GPIO_13_EN
-        case GPIO_13:
-            port = &GPIO_13_DEV;
-            pin = GPIO_13_PIN;
-            extint = GPIO_13_EXTINT;
-            break;
-#endif
-#if GPIO_14_EN
-        case GPIO_14:
-            port = &GPIO_14_DEV;
-            pin = GPIO_14_PIN;
-            extint = GPIO_14_EXTINT;
-            break;
-#endif
-#if GPIO_15_EN
-        case GPIO_15:
-            port = &GPIO_15_DEV;
-            pin = GPIO_15_PIN;
-            extint = GPIO_15_EXTINT;
-            break;
-#endif
-        default:
-            return -1;
-    }
+static int _exti(gpio_t pin)
+{
+    int port_num = ((pin >> 7) & 0x03);
 
-    if (port == NULL) {
+    if (port_num > 1) {
         return -1;
     }
+    return exti_config[port_num][_pin_pos(pin)];
+}
 
+int gpio_init(gpio_t pin, gpio_dir_t dir, gpio_pp_t pushpull)
+{
+    PortGroup* port = _port(pin);
+    int pin_pos = _pin_pos(pin);
+    int pin_mask = _pin_mask(pin);
 
-
-    if (pin < 16) {
-        port->WRCONFIG.reg = PORT_WRCONFIG_WRPINCFG \
-                        | PORT_WRCONFIG_WRPMUX \
-                        | PORT_WRCONFIG_PMUX(0x0) \
-                        | PORT_WRCONFIG_PMUXEN \
-                        | (1 << pin);
+    /* configure the pin's pull resistor and reset all other configuration */
+    switch (pushpull) {
+        case GPIO_PULLDOWN:
+            port->OUTCLR.reg = pin_mask;
+            port->PINCFG[pin_pos].reg = PORT_PINCFG_PULLEN;
+            break;
+        case GPIO_PULLUP:
+            port->OUTSET.reg = pin_mask;
+            port->PINCFG[pin_pos].reg = PORT_PINCFG_PULLEN;
+            break;
+        case GPIO_NOPULL:
+            port->PINCFG[pin_pos].reg = 0;
+            break;
+    }
+    /* set pin_pos direction */
+    if (dir == GPIO_DIR_OUT) {
+        if (pushpull == GPIO_PULLDOWN) {
+            return -1;
+        }
+        port->DIRSET.reg = pin_mask;            /* configure as output */
     }
     else {
-        port->WRCONFIG.reg = PORT_WRCONFIG_HWSEL \
-                        | PORT_WRCONFIG_WRPINCFG \
-                        | PORT_WRCONFIG_WRPMUX \
-                        | PORT_WRCONFIG_PMUX(0x0) \
-                        | PORT_WRCONFIG_PMUXEN \
-                        | ((1 << pin) >> 16);
+        port->DIRCLR.reg = pin_mask;            /* configure as input */
+        port->PINCFG[pin_pos].reg |= PORT_PINCFG_INEN;
     }
-
-    /* configure pin as input */
-    res = gpio_init_in(dev, pullup);
-    if (res < 0) {
-        return res;
-    }
-
-    /* Turn on APB clock */
-    PM->APBAMASK.reg |= PM_APBAMASK_EIC;
-
-    GCLK->CLKCTRL = (GCLK_CLKCTRL_Type){
-        .bit.ID = EIC_GCLK_ID,
-        .bit.GEN = 0,
-        .bit.CLKEN = 1,
-        .bit.WRTLOCK = 0
-    };
-
-    /* Setup interrupt */
-    NVIC_SetPriority(EIC_IRQn, 10);
-    NVIC_EnableIRQ(EIC_IRQn);
-
-    /* save callback */
-    gpio_config[extint].cb = cb;
-    gpio_config[extint].arg = arg;
-
-    /*Enable pin interrupt */
-    EIC->INTFLAG.reg |= (1 << extint);
-    EIC->INTENSET.reg = 1 << extint;
-    EIC->WAKEUP.reg |= 1 << extint;
-
-    /*Set config */
-    uint8_t config_pos = (4 * (extint % 8));
-    uint8_t config_reg    = extint / 8;
-    /*Set flank detection */
-    switch (flank) {
-        case GPIO_FALLING:
-            EIC->CONFIG[config_reg].reg
-                        |= (EIC_CONFIG_SENSE0_FALL_Val << config_pos);
-            break;
-        case GPIO_RISING:
-            EIC->CONFIG[config_reg].reg
-                        |= (EIC_CONFIG_SENSE0_RISE_Val << config_pos);
-            break;
-        case GPIO_BOTH:
-            EIC->CONFIG[config_reg].reg
-                        |= (EIC_CONFIG_SENSE0_BOTH_Val << config_pos);
-            break;
-    }
-
-    /*Enable external interrupts*/
-    EIC->CTRL.bit.ENABLE = true;
     return 0;
 }
 
-void gpio_irq_enable(gpio_t dev)
+int gpio_init_exti(gpio_t pin, gpio_pp_t pullup, gpio_flank_t flank,
+                    gpio_cb_t cb, void *arg)
 {
-    switch (dev) {
-#if GPIO_0_EN
-        case GPIO_0:
-            EIC->INTENSET.reg = 1 << GPIO_0_EXTINT;
+    int exti = _exti(pin);
+
+    /* make sure EIC channel is valid */
+    if (exti == -1) {
+        return -1;
+    }
+
+    /* save callback */
+    gpio_config[exti].cb = cb;
+    gpio_config[exti].arg = arg;
+    /* configure ping as input and set MUX to peripheral function A */
+    gpio_init(pin, GPIO_DIR_IN, pullup);
+    gpio_init_mux(pin, GPIO_MUX_A);
+    /* enable clocks for the EIC module */
+    PM->APBAMASK.reg |= PM_APBAMASK_EIC;
+    GCLK->CLKCTRL.reg = (EIC_GCLK_ID | GCLK_CLKCTRL_CLKEN);
+    /* enable the EIC module*/
+    EIC->CTRL.reg = EIC_CTRL_ENABLE;
+    /* configure the active flank */
+    EIC->CONFIG[exti >> 3].reg &= ~(0xf << (exti & 0x7));
+    switch (flank) {
+        case GPIO_FALLING:
+            EIC->CONFIG[exti >> 3].reg |= (EIC_CONFIG_SENSE0_FALL_Val <<
+                                          (exti & 0x7));
             break;
-#endif
-#if GPIO_1_EN
-        case GPIO_1:
-            EIC->INTENSET.reg = 1 << GPIO_1_EXTINT;
+        case GPIO_RISING:
+            EIC->CONFIG[exti >> 3].reg |= (EIC_CONFIG_SENSE1_RISE_Val <<
+                                          (exti & 0x7));
+        case GPIO_BOTH:
+        default:
+            EIC->CONFIG[exti >> 3].reg |= (EIC_CONFIG_SENSE1_BOTH_Val <<
+                                          (exti & 0x7));
             break;
-#endif
-#if GPIO_2_EN
-        case GPIO_2:
-            EIC->INTENSET.reg = 1 << GPIO_2_EXTINT;
-            break;
-#endif
-#if GPIO_3_EN
-        case GPIO_3:
-            EIC->INTENSET.reg = 1 << GPIO_3_EXTINT;
-            break;
-#endif
-#if GPIO_4_EN
-        case GPIO_4:
-            EIC->INTENSET.reg = 1 << GPIO_4_EXTINT;
-            break;
-#endif
-#if GPIO_5_EN
-        case GPIO_5:
-            EIC->INTENSET.reg = 1 << GPIO_5_EXTINT;
-            break;
-#endif
-#if GPIO_6_EN
-        case GPIO_6:
-            EIC->INTENSET.reg = 1 << GPIO_6_EXTINT;
-            break;
-#endif
-#if GPIO_7_EN
-        case GPIO_7:
-            EIC->INTENSET.reg = 1 << GPIO_7_EXTINT;
-            break;
-#endif
-#if GPIO_8_EN
-        case GPIO_8:
-            EIC->INTENSET.reg = 1 << GPIO_8_EXTINT;
-            break;
-#endif
-#if GPIO_9_EN
-        case GPIO_9:
-            EIC->INTENSET.reg = 1 << GPIO_9_EXTINT;
-            break;
-#endif
-#if GPIO_10_EN
-        case GPIO_10:
-            EIC->INTENSET.reg = 1 << GPIO_10_EXTINT;
-            break;
-#endif
-#if GPIO_11_EN
-        case GPIO_11:
-            EIC->INTENSET.reg = 1 << GPIO_11_EXTINT;
-            break;
-#endif
-#if GPIO_12_EN
-        case GPIO_12:
-            EIC->INTENSET.reg = 1 << GPIO_12_EXTINT;
-            break;
-#endif
-#if GPIO_13_EN
-        case GPIO_13:
-            EIC->INTENSET.reg = 1 << GPIO_13_EXTINT;
-            break;
-#endif
-#if GPIO_14_EN
-        case GPIO_14:
-            EIC->INTENSET.reg = 1 << GPIO_14_EXTINT;
-            break;
-#endif
-#if GPIO_15_EN
-        case GPIO_15:
-            EIC->INTENSET.reg = 1 << GPIO_15_EXTINT;
-            break;
-#endif
+    }
+
+    /* enable the global EIC interrupt */
+    NVIC_EnableIRQ(EIC_IRQn);
+    /* clear interrupt flag and enable the interrupt line and line wakeup */
+    EIC->INTFLAG.reg = (1 << exti);
+    EIC->WAKEUP.reg |= (1 << exti);
+    EIC->INTENSET.reg = (1 << exti);
+    return 0;
+}
+
+int gpio_init_mux(gpio_t pin, gpio_mux_t mux)
+{
+    PortGroup* port = _port(pin);
+    int pin_pos = _pin_pos(pin);
+
+    port->PINCFG[pin_pos].reg |= PORT_PINCFG_PMUXEN;
+    port->PMUX[pin_pos >> 1].reg &= ~(0xf << (4 * (pin_pos & 0x1)));
+    port->PMUX[pin_pos >> 1].reg |=  (mux << (4 * (pin_pos & 0x1)));
+
+    return 0;
+}
+
+void gpio_irq_enable(gpio_t pin)
+{
+    int exti = _exti(pin);
+    if (exti == -1) {
+        return;
+    }
+    EIC->INTENSET.reg = (1 << exti);
+}
+
+void gpio_irq_disable(gpio_t pin)
+{
+    int exti = _exti(pin);
+    if (exti == -1) {
+        return;
+    }
+    EIC->INTENCLR.reg = (1 << exti);
+}
+
+int gpio_read(gpio_t pin)
+{
+    PortGroup *port = _port(pin);
+    int mask = _pin_mask(pin);
+
+    if (port->DIR.reg & mask) {
+        return (port->OUT.reg & mask) ? 1 : 0;
+    }
+    else {
+        return (port->IN.reg & mask) ? 1 : 0;
     }
 }
 
-void gpio_irq_disable(gpio_t dev)
+void gpio_set(gpio_t pin)
 {
-    switch (dev) {
-#if GPIO_0_EN
-        case GPIO_0:
-            EIC->INTENCLR.reg = 1 << GPIO_0_EXTINT;
-            break;
-#endif
-#if GPIO_1_EN
-        case GPIO_1:
-            EIC->INTENCLR.reg = 1 << GPIO_1_EXTINT;
-            break;
-#endif
-#if GPIO_2_EN
-        case GPIO_2:
-            EIC->INTENCLR.reg = 1 << GPIO_2_EXTINT;
-            break;
-#endif
-#if GPIO_3_EN
-        case GPIO_3:
-            EIC->INTENCLR.reg = 1 << GPIO_3_EXTINT;
-            break;
-#endif
-#if GPIO_4_EN
-        case GPIO_4:
-            EIC->INTENCLR.reg = 1 << GPIO_4_EXTINT;
-            break;
-#endif
-#if GPIO_5_EN
-        case GPIO_5:
-            EIC->INTENCLR.reg = 1 << GPIO_5_EXTINT;
-            break;
-#endif
-#if GPIO_6_EN
-        case GPIO_6:
-            EIC->INTENCLR.reg = 1 << GPIO_6_EXTINT;
-            break;
-#endif
-#if GPIO_7_EN
-        case GPIO_7:
-            EIC->INTENCLR.reg = 1 << GPIO_7_EXTINT;
-            break;
-#endif
-#if GPIO_8_EN
-        case GPIO_8:
-            EIC->INTENCLR.reg = 1 << GPIO_8_EXTINT;
-            break;
-#endif
-#if GPIO_9_EN
-        case GPIO_9:
-            EIC->INTENCLR.reg = 1 << GPIO_9_EXTINT;
-            break;
-#endif
-#if GPIO_10_EN
-        case GPIO_10:
-            EIC->INTENCLR.reg = 1 << GPIO_10_EXTINT;
-            break;
-#endif
-#if GPIO_11_EN
-        case GPIO_11:
-            EIC->INTENCLR.reg = 1 << GPIO_11_EXTINT;
-            break;
-#endif
-#if GPIO_12_EN
-        case GPIO_12:
-            EIC->INTENCLR.reg = 1 << GPIO_12_EXTINT;
-            break;
-#endif
-#if GPIO_13_EN
-        case GPIO_13:
-            EIC->INTENCLR.reg = 1 << GPIO_13_EXTINT;
-            break;
-#endif
-#if GPIO_14_EN
-        case GPIO_14:
-            EIC->INTENCLR.reg = 1 << GPIO_14_EXTINT;
-            break;
-#endif
-#if GPIO_15_EN
-        case GPIO_15:
-            EIC->INTENCLR.reg = 1 << GPIO_15_EXTINT;
-            break;
-#endif
-    }
+    _port(pin)->OUTSET.reg = _pin_mask(pin);
 }
 
-int gpio_read(gpio_t dev)
+void gpio_clear(gpio_t pin)
 {
-    int res = -1;
-
-    switch (dev) {
-#if GPIO_0_EN
-        case GPIO_0:
-            res = (&GPIO_0_DEV)->IN.reg & (1 << GPIO_0_PIN);
-            break;
-#endif
-#if GPIO_1_EN
-        case GPIO_1:
-            res = (&GPIO_1_DEV)->IN.reg & (1 << GPIO_1_PIN);
-            break;
-#endif
-#if GPIO_2_EN
-        case GPIO_2:
-            res = (&GPIO_2_DEV)->IN.reg & (1 << GPIO_2_PIN);
-            break;
-#endif
-#if GPIO_3_EN
-        case GPIO_3:
-            res = (&GPIO_3_DEV)->IN.reg & (1 << GPIO_3_PIN);
-            break;
-#endif
-#if GPIO_4_EN
-        case GPIO_4:
-            res = (&GPIO_4_DEV)->IN.reg & (1 << GPIO_4_PIN);
-            break;
-#endif
-#if GPIO_5_EN
-        case GPIO_5:
-            res = (&GPIO_5_DEV)->IN.reg & (1 << GPIO_5_PIN);
-            break;
-#endif
-#if GPIO_6_EN
-        case GPIO_6:
-            res = (&GPIO_6_DEV)->IN.reg & (1 << GPIO_6_PIN);
-            break;
-#endif
-#if GPIO_7_EN
-        case GPIO_7:
-            res = (&GPIO_7_DEV)->IN.reg & (1 << GPIO_7_PIN);
-            break;
-#endif
-#if GPIO_8_EN
-        case GPIO_8:
-            res = (&GPIO_8_DEV)->IN.reg & (1 << GPIO_8_PIN);
-            break;
-#endif
-#if GPIO_9_EN
-        case GPIO_9:
-            res = (&GPIO_9_DEV)->IN.reg & (1 << GPIO_9_PIN);
-            break;
-#endif
-#if GPIO_10_EN
-        case GPIO_10:
-            res = (&GPIO_10_DEV)->IN.reg & (1 << GPIO_10_PIN);
-            break;
-#endif
-#if GPIO_11_EN
-        case GPIO_11:
-            res = (&GPIO_11_DEV)->IN.reg & (1 << GPIO_11_PIN);
-            break;
-#endif
-#if GPIO_12_EN
-        case GPIO_12:
-            res = (&GPIO_12_DEV)->IN.reg & (1 << GPIO_12_PIN);
-            break;
-#endif
-#if GPIO_13_EN
-        case GPIO_13:
-            res = (&GPIO_13_DEV)->IN.reg & (1 << GPIO_13_PIN);
-            break;
-#endif
-#if GPIO_14_EN
-        case GPIO_14:
-            res = (&GPIO_14_DEV)->IN.reg & (1 << GPIO_14_PIN);
-            break;
-#endif
-#if GPIO_15_EN
-        case GPIO_15:
-            res = (&GPIO_15_DEV)->IN.reg & (1 << GPIO_15_PIN);
-            break;
-#endif
-    }
-
-    /* make sure we are not returning a negative value if bit 31 is set */
-    if (res < -1) {
-        res = 1;
-    }
-
-    return res;
+    _port(pin)->OUTCLR.reg = _pin_mask(pin);
 }
 
-void gpio_set(gpio_t dev)
+void gpio_toggle(gpio_t pin)
 {
-    switch (dev) {
-#if GPIO_0_EN
-        case GPIO_0:
-            (&GPIO_0_DEV)->OUTSET.reg = 1 << GPIO_0_PIN;
-            break;
-#endif
-#if GPIO_1_EN
-        case GPIO_1:
-            (&GPIO_1_DEV)->OUTSET.reg = 1 << GPIO_1_PIN;
-            break;
-#endif
-#if GPIO_2_EN
-        case GPIO_2:
-            (&GPIO_2_DEV)->OUTSET.reg = 1 << GPIO_2_PIN;
-            break;
-#endif
-#if GPIO_3_EN
-        case GPIO_3:
-            (&GPIO_3_DEV)->OUTSET.reg = 1 << GPIO_3_PIN;
-            break;
-#endif
-#if GPIO_4_EN
-        case GPIO_4:
-            (&GPIO_4_DEV)->OUTSET.reg = 1 << GPIO_4_PIN;
-            break;
-#endif
-#if GPIO_5_EN
-        case GPIO_5:
-            (&GPIO_5_DEV)->OUTSET.reg = 1 << GPIO_5_PIN;
-            break;
-#endif
-#if GPIO_6_EN
-        case GPIO_6:
-            (&GPIO_6_DEV)->OUTSET.reg = 1 << GPIO_6_PIN;
-            break;
-#endif
-#if GPIO_7_EN
-        case GPIO_7:
-            (&GPIO_7_DEV)->OUTSET.reg = 1 << GPIO_7_PIN;
-            break;
-#endif
-#if GPIO_8_EN
-        case GPIO_8:
-            (&GPIO_8_DEV)->OUTSET.reg = 1 << GPIO_8_PIN;
-            break;
-#endif
-#if GPIO_9_EN
-        case GPIO_9:
-            (&GPIO_9_DEV)->OUTSET.reg = 1 << GPIO_9_PIN;
-            break;
-#endif
-#if GPIO_10_EN
-        case GPIO_10:
-            (&GPIO_10_DEV)->OUTSET.reg = 1 << GPIO_10_PIN;
-            break;
-#endif
-#if GPIO_11_EN
-        case GPIO_11:
-            (&GPIO_11_DEV)->OUTSET.reg = 1 << GPIO_11_PIN;
-            break;
-#endif
-#if GPIO_12_EN
-        case GPIO_12:
-            (&GPIO_12_DEV)->OUTSET.reg = 1 << GPIO_12_PIN;
-            break;
-#endif
-#if GPIO_13_EN
-        case GPIO_13:
-            (&GPIO_13_DEV)->OUTSET.reg = 1 << GPIO_13_PIN;
-            break;
-#endif
-#if GPIO_14_EN
-        case GPIO_14:
-            (&GPIO_14_DEV)->OUTSET.reg = 1 << GPIO_14_PIN;
-            break;
-#endif
-#if GPIO_15_EN
-        case GPIO_15:
-            (&GPIO_15_DEV)->OUTSET.reg = 1 << GPIO_15_PIN;
-            break;
-#endif
-    }
+    _port(pin)->OUTTGL.reg = _pin_mask(pin);
 }
 
-void gpio_clear(gpio_t dev)
-{
-    switch (dev) {
-#if GPIO_0_EN
-        case GPIO_0:
-            (&GPIO_0_DEV)->OUTCLR.reg = 1 << GPIO_0_PIN;
-            break;
-#endif
-#if GPIO_1_EN
-        case GPIO_1:
-            (&GPIO_1_DEV)->OUTCLR.reg = 1 << GPIO_1_PIN;
-            break;
-#endif
-#if GPIO_2_EN
-        case GPIO_2:
-            (&GPIO_2_DEV)->OUTCLR.reg = 1 << GPIO_2_PIN;
-            break;
-#endif
-#if GPIO_3_EN
-        case GPIO_3:
-            (&GPIO_3_DEV)->OUTCLR.reg = 1 << GPIO_3_PIN;
-            break;
-#endif
-#if GPIO_4_EN
-        case GPIO_4:
-            (&GPIO_4_DEV)->OUTCLR.reg = 1 << GPIO_4_PIN;
-            break;
-
-#endif
-#if GPIO_5_EN
-        case GPIO_5:
-            (&GPIO_5_DEV)->OUTCLR.reg = 1 << GPIO_5_PIN;
-            break;
-#endif
-#if GPIO_6_EN
-        case GPIO_6:
-            (&GPIO_6_DEV)->OUTCLR.reg = 1 << GPIO_6_PIN;
-            break;
-#endif
-#if GPIO_7_EN
-        case GPIO_7:
-            (&GPIO_7_DEV)->OUTCLR.reg = 1 << GPIO_7_PIN;
-            break;
-#endif
-#if GPIO_8_EN
-        case GPIO_8:
-            (&GPIO_8_DEV)->OUTCLR.reg = 1 << GPIO_8_PIN;
-            break;
-#endif
-#if GPIO_9_EN
-        case GPIO_9:
-            (&GPIO_9_DEV)->OUTCLR.reg = 1 << GPIO_9_PIN;
-            break;
-#endif
-#if GPIO_10_EN
-        case GPIO_10:
-            (&GPIO_10_DEV)->OUTCLR.reg = 1 << GPIO_10_PIN;
-            break;
-#endif
-#if GPIO_11_EN
-        case GPIO_11:
-            (&GPIO_11_DEV)->OUTCLR.reg = 1 << GPIO_11_PIN;
-            break;
-#endif
-#if GPIO_12_EN
-        case GPIO_12:
-            (&GPIO_12_DEV)->OUTCLR.reg = 1 << GPIO_12_PIN;
-            break;
-#endif
-#if GPIO_13_EN
-        case GPIO_13:
-            (&GPIO_13_DEV)->OUTCLR.reg = 1 << GPIO_13_PIN;
-            break;
-#endif
-#if GPIO_14_EN
-        case GPIO_14:
-            (&GPIO_14_DEV)->OUTCLR.reg = 1 << GPIO_14_PIN;
-            break;
-#endif
-#if GPIO_15_EN
-        case GPIO_15:
-            (&GPIO_15_DEV)->OUTCLR.reg = 1 << GPIO_15_PIN;
-            break;
-#endif
-    }
-}
-
-void gpio_toggle(gpio_t dev)
-{
-    switch (dev) {
-#if GPIO_0_EN
-        case GPIO_0:
-            (&GPIO_0_DEV)->OUTTGL.reg = 1 << GPIO_0_PIN;
-            break;
-#endif
-#if GPIO_1_EN
-        case GPIO_1:
-            (&GPIO_1_DEV)->OUTTGL.reg = 1 << GPIO_1_PIN;
-            break;
-#endif
-#if GPIO_2_EN
-        case GPIO_2:
-            (&GPIO_2_DEV)->OUTTGL.reg = 1 << GPIO_2_PIN;
-            break;
-#endif
-#if GPIO_3_EN
-        case GPIO_3:
-            (&GPIO_3_DEV)->OUTTGL.reg = 1 << GPIO_3_PIN;
-            break;
-#endif
-#if GPIO_4_EN
-        case GPIO_4:
-            (&GPIO_4_DEV)->OUTTGL.reg = 1 << GPIO_4_PIN;
-            break;
-#endif
-#if GPIO_5_EN
-        case GPIO_5:
-            (&GPIO_5_DEV)->OUTTGL.reg = 1 << GPIO_5_PIN;
-            break;
-#endif
-#if GPIO_6_EN
-        case GPIO_6:
-            (&GPIO_6_DEV)->OUTTGL.reg = 1 << GPIO_6_PIN;
-            break;
-#endif
-#if GPIO_7_EN
-        case GPIO_7:
-            (&GPIO_7_DEV)->OUTTGL.reg = 1 << GPIO_7_PIN;
-            break;
-#endif
-#if GPIO_8_EN
-        case GPIO_8:
-            (&GPIO_8_DEV)->OUTTGL.reg = 1 << GPIO_8_PIN;
-            break;
-#endif
-#if GPIO_9_EN
-        case GPIO_9:
-            (&GPIO_9_DEV)->OUTTGL.reg = 1 << GPIO_9_PIN;
-            break;
-#endif
-#if GPIO_10_EN
-        case GPIO_10:
-            (&GPIO_10_DEV)->OUTTGL.reg = 1 << GPIO_10_PIN;
-            break;
-#endif
-#if GPIO_11_EN
-        case GPIO_11:
-            (&GPIO_11_DEV)->OUTTGL.reg = 1 << GPIO_11_PIN;
-            break;
-#endif
-#if GPIO_12_EN
-        case GPIO_12:
-            (&GPIO_12_DEV)->OUTTGL.reg = 1 << GPIO_12_PIN;
-            break;
-#endif
-#if GPIO_13_EN
-        case GPIO_13:
-            (&GPIO_13_DEV)->OUTTGL.reg = 1 << GPIO_13_PIN;
-            break;
-#endif
-#if GPIO_14_EN
-        case GPIO_14:
-            (&GPIO_14_DEV)->OUTTGL.reg = 1 << GPIO_14_PIN;
-            break;
-#endif
-#if GPIO_15_EN
-        case GPIO_15:
-            (&GPIO_15_DEV)->OUTTGL.reg = 1 << GPIO_15_PIN;
-            break;
-#endif
-    }
-}
-
-void gpio_write(gpio_t dev, int value)
+void gpio_write(gpio_t pin, int value)
 {
     if (value) {
-        gpio_set(dev);
+        gpio_set(pin);
     } else {
-        gpio_clear(dev);
+        gpio_clear(pin);
     }
 }
 
 void isr_eic(void)
 {
     uint16_t status = EIC->INTFLAG.reg;
-    for (int i = 0; i < 16; i++) {
-        if (status & (0x1<<i)) {
+    for (int i = 0; i < NUMOF_IRQS; i++) {
+        if (status & (1 << i)) {
             gpio_config[i].cb(gpio_config[i].arg);
-            EIC->INTFLAG.reg = 0x1 << i;
+            EIC->INTFLAG.reg = (1 << i);
         }
     }
-
     if (sched_context_switch_request) {
         thread_yield();
     }
 }
-
-#endif /* GPIO_NUMOF */
