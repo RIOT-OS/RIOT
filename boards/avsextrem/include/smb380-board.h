@@ -15,9 +15,6 @@
  *
  * @author  Marco Ziegert <ziegert@inf.fu-berlin.de>
  * @author  Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
- * @version $Revision: 3854 $
- *
- * @note    $Id: msba2acc-smb380.h 3854 2010-01-18 15:27:01 kasmi $
  *
  */
 
@@ -47,8 +44,8 @@ enum SMB380_MODE {
     SMB380_THRESHOLD,
     SMB380_FALSEALERT
 };
-/* volatile enum SMB380_MODE */
-volatile enum SMB380_MODE smb380_mode;/*  = SMB380_POLL; */
+
+volatile enum SMB380_MODE smb380_mode;
 
 /* Writeable values to EEPROM: from 0x0A (control1) to 0x1D (offset_T).
    For writing enable ... flag and add eeprom_offset_address.

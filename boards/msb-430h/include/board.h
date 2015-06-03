@@ -25,7 +25,7 @@
 extern "C" {
 #endif
 
-// for correct inclusion of <msp430.h>
+/* for correct inclusion of <msp430.h> */
 #ifndef __MSP430F1612__
 #define __MSP430F1612__
 #endif
@@ -57,4 +57,4 @@ extern "C" {
 typedef uint8_t radio_packet_length_t;
 
 /** @} */
-#endif // MSB_BOARD_H_
+#endif /* MSB_BOARD_H_ */

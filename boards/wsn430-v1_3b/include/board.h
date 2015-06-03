@@ -72,4 +72,4 @@ extern "C" {
 typedef uint8_t radio_packet_length_t;
 
 /** @} */
-#endif // WSN_BOARD_H_
+#endif /* WSN_BOARD_H_ */

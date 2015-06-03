@@ -134,5 +134,5 @@ enum multiboot_info_flags {
 }
 #endif
 
-#endif /* MULTIBOOT_H */
+#endif /* MULTIBOOT_H_ */
 /** @} */

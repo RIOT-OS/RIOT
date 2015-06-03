@@ -16,10 +16,10 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#ifndef CONTROL_2XXXX_H_
-#define CONTROL_2XXXX_H_
+#ifndef CONTROL_2XXX_H_
+#define CONTROL_2XXX_H_
 
 void hard_reset_to_bootloader(void);
 void hard_reset_to_user_code(void);
 
-#endif /*  ..._H_ */
+#endif /*  CONTROL_2XXX_H_ */

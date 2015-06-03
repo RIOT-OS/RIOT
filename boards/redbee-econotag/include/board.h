@@ -27,7 +27,7 @@
 extern "C" {
 #endif
 
-#define F_CPU   (24000000)              /* /< CPU target speed in Hz */
+#define F_CPU   (24000000)              /**< CPU target speed in Hz */
 
 #define CTUNE       0xb
 #define IBIAS       0x1f

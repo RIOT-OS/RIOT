@@ -18,8 +18,8 @@
  * @author      René Kijewski <rene.kijewski@fu-berlin.de>
  */
 
-#ifndef RIOT__BOARDS__QEMU_I386__BOARD__H_
-#define RIOT__BOARDS__QEMU_I386__BOARD__H_
+#ifndef RIOT_BOARDS_QEMU_I386_BOARD__H_
+#define RIOT_BOARDS_QEMU_I386_BOARD__H_
 
 #ifdef __cplusplus
 extern "C" {
