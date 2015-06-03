@@ -7,11 +7,11 @@
  */
 
 /**
- * @ingroup tests
+ * @ingroup     tests
  * @{
  *
  * @file
- * @brief       Test input and output functionality of low-level GPIO driver
+ * @brief       Manual test application for GPIO peripheral drivers
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
@@ -19,74 +19,237 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 
-#include "cpu.h"
-#include "periph_conf.h"
+#include "shell.h"
+#include "posix_io.h"
+#include "board_uart0.h"
 #include "periph/gpio.h"
 #include "hwtimer.h"
 
-uint32_t state = 0;
-uint32_t old_state = 0;
+#define SHELL_BUFSIZE       (64U)
+
+static void cb(void *arg)
+{
+    printf("INT: external interrupt from pin %i\n", (int)arg);
+}
+
+static int parse_pull(char *val)
+{
+    switch (atoi(val)) {
+        case 0:
+            return GPIO_NOPULL;
+        case 1:
+            return GPIO_PULLUP;
+        case 2:
+            return GPIO_PULLDOWN;
+        default:
+            puts("Error: invalid pull configuration");
+            return -1;
+    }
+}
+
+static int init_out(int argc, char **argv)
+{
+    int port, pin, pull;
+
+    if (argc < 3) {
+        printf("usage: %s <port> <pin> [pull_config]\n", argv[0]);
+        puts("      pull_config: 0: no pull resistor (default)\n"
+             "                   1: pull up\n"
+             "                   2: pull down");
+        return 1;
+    }
+    port = atoi(argv[1]);
+    pin = atoi(argv[2]);
+    if (argc >= 4) {
+        pull = parse_pull(argv[3]);
+        if (pull < 0) {
+            return 1;
+        }
+    }
+    else {
+        pull = GPIO_NOPULL;
+    }
+    if (gpio_init(GPIO(port, pin), GPIO_DIR_OUT, pull) < 0) {
+        printf("Error while initializing  PORT_%i.%i as output\n", port, pin);
+        return 1;
+    }
+    printf("PORT_%i.%i initialized successful as output\n", port, pin);
+
+    return 0;
+}
+
+static int init_in(int argc, char **argv)
+{
+    int port, pin, pull;
+
+    if (argc < 3) {
+        printf("usage: %s <port> <pin> [pull_config]\n", argv[0]);
+        puts("      pull_config: 0: no pull resistor (default)\n"
+             "                   1: pull up\n"
+             "                   2: pull down");
+        return 1;
+    }
+    port = atoi(argv[1]);
+    pin = atoi(argv[2]);
+    if (argc >= 4) {
+        pull = parse_pull(argv[3]);
+        if (pull < 0) {
+            return 1;
+        }
+    }
+    else {
+        pull = GPIO_NOPULL;
+    }
+    if (gpio_init(GPIO(port, pin), GPIO_DIR_IN, pull) < 0) {
+        printf("Error while initializing  PORT_%i.%02i as input\n", port, pin);
+        return 1;
+    }
+    printf("PORT_%i.%02i initialized successful as input\n", port, pin);
+
+    return 0;
+}
+
+static int init_int(int argc, char **argv)
+{
+    int port, pin, flank, pull;
+
+    if (argc < 4) {
+        printf("usage: %s <port> <pin> <flank> [pull_config]\n", argv[0]);
+        puts("      flank:       0: falling\n"
+             "                   1: rising\n"
+             "                   2: both\n"
+             "      pull_config: 0: no pull resistor (default)\n"
+             "                   1: pull up\n"
+             "                   2: pull down");
+        return 1;
+    }
+    port = atoi(argv[1]);
+    pin = atoi(argv[2]);
+    flank = atoi(argv[3]);
+    switch (flank) {
+        case 0:
+            flank = GPIO_FALLING;
+            break;
+        case 1:
+            flank = GPIO_RISING;
+            break;
+        case 2:
+            flank = GPIO_BOTH;
+            break;
+        default:
+            printf("wrong flank setting.\n");
+            return 0;
+    }
+    if (argc >= 5) {
+        pull = parse_pull(argv[4]);
+        if (pull < 0) {
+            return 1;
+        }
+    }
+    else {
+        pull = GPIO_NOPULL;
+    }
+    if (gpio_init_int(GPIO(port, pin), pull, flank, cb, (void *)pin) < 0) {
+        printf("Error while initializing  PORT_%i.%02i as external interrupt\n",
+               port, pin);
+        return 1;
+    }
+    printf("PORT_%i.%02i initialized successful as external interrupt\n",
+           port, pin);
+
+    return 0;
+}
+
+static int read(int argc, char **argv)
+{
+    int port, pin;
+
+    if (argc < 3) {
+        printf("usage: %s <port> <pin>\n", argv[0]);
+        return 1;
+    }
+    port = atoi(argv[1]);
+    pin = atoi(argv[2]);
+    if (gpio_read(GPIO(port, pin))) {
+        printf("PORT_%i.%02i is HIGH\n", port, pin);
+    }
+    else {
+        printf("PORT_%i.%02i is LOW\n", port, pin);
+    }
+    return 0;
+}
+
+static int set(int argc, char **argv)
+{
+    int port, pin;
+
+    if (argc < 3) {
+        printf("usage: %s <port> <pin>\n", argv[0]);
+        return 1;
+    }
+    port = atoi(argv[1]);
+    pin = atoi(argv[2]);
+
+    gpio_set(GPIO(port, pin));
+    return 0;
+}
+
+static int clear(int argc, char **argv)
+{
+    int port, pin;
+
+    if (argc < 3) {
+        printf("usage: %s <port> <pin>\n", argv[0]);
+        return 1;
+    }
+    port = atoi(argv[1]);
+    pin = atoi(argv[2]);
+    gpio_clear(GPIO(port, pin));
+    return 0;
+}
+
+static int toggle(int argc, char **argv)
+{
+    int port, pin;
+
+    if (argc < 3) {
+        printf("usage: %s <port> <pin>\n", argv[0]);
+        return 1;
+    }
+    port = atoi(argv[1]);
+    pin = atoi(argv[2]);
+    gpio_toggle(GPIO(port, pin));
+    return 0;
+}
+
+static const shell_command_t shell_commands[] = {
+    { "init_in", "initialize pin as output", init_in },
+    { "init_out", "initialize pin as input", init_out },
+    { "init_int", "initialize pin as EXTI", init_int },
+    { "read", "read pin status", read },
+    { "set", "set pin to HIGH", set },
+    { "clear", "set pin to LOW", clear },
+    { "toggle", "toggle pin", toggle },
+    { NULL, NULL, NULL }
+};
 
 int main(void)
 {
-    puts("GPIO driver test");
+    shell_t shell;
 
+    puts("GPIO peripheral driver test\n");
+    puts("In this test, pins are specified by integer port and pin numbers.\n"
+         "So if your platform has a pin PA01, it will be port=0 and pin=1,\n"
+         "PC14 would be port=2 and pin=14 etc.\n\n"
+         "NOTE: make sure the values you use exist on your platform! The\n"
+         "      behavior for not existing ports/pins is not defined!");
 
-    puts("Setting GPIOs to output w/o pull resistor");
-    for (int i = 0; i < GPIO_NUMOF; i++) {
-        gpio_init_out(i, GPIO_NOPULL);
-    }
-
-    puts("Turning pins 1s on");
-    for (int i = 0; i < GPIO_NUMOF; i++) {
-        gpio_set(i);
-    }
-    hwtimer_wait(1000000);
-
-
-    puts("Turning pins 1s off");
-    for (int i = 0; i < GPIO_NUMOF; i++) {
-        gpio_clear(i);
-    }
-    hwtimer_wait(1000000);
-
-    puts("Now toggling pins 6 times with 500ms interval");
-    for (int c = 0; c < 6; c++) {
-        for (int i = 0; i < GPIO_NUMOF; i++) {
-            gpio_toggle(i);
-        }
-        hwtimer_wait(500000);
-    }
-
-
-    puts("\n--------------------------------------------\n");
-    puts("Setting GPIOs to input w/o pull resister now");
-    for (int i = 0; i < GPIO_NUMOF; i++) {
-        gpio_init_in(i, GPIO_NOPULL);
-    }
-
-    puts("Will now poll all pins and print status on change");
-
-    while (1) {
-        state = 0;
-        for (int i = 0; i < GPIO_NUMOF; i++) {
-            if (gpio_read(i)) {
-                state |= (1 << i);
-            }
-        }
-        if (state != old_state) {
-            for (int i = 0; i < GPIO_NUMOF; i++) {
-                if (state & (1 << i)) {
-                    printf("GPIO_%i:H  ", i);
-                } else {
-                    printf("GPIO_%i:L  ", i);
-                }
-            }
-            printf("\n");
-            old_state = state;
-        }
-    }
+    /* start the shell */
+    (void) posix_open(uart0_handler_pid, 0);
+    shell_init(&shell, shell_commands, SHELL_BUFSIZE, uart0_readc, uart0_putc);
+    shell_run(&shell);
 
     return 0;
 }
