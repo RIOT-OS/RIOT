@@ -72,7 +72,7 @@ typedef struct spi_saml21 {
 static const spi_saml21_t spi[] = {
 #if SPI_0_EN
     /* SPI device */   /* MCLK flag */        /* GLCK id */         /* SCLK */  /* MISO */  /* MOSI */ /* dipo+dopo */
-    { &(SERCOM0->SPI), MCLK_APBCMASK_SERCOM0, SERCOM0_GCLK_ID_CORE, { PA7, 3 }, { PA4, 3 }, { PA6, 3 }, 0, 1 }
+    { &(SERCOM0->SPI), MCLK_APBCMASK_SERCOM0, SERCOM0_GCLK_ID_CORE, { GPIO(PA,7), 3 }, { GPIO(PA,4), 3 }, { GPIO(PA,6), 3 }, 0, 1 }
 #endif
 };
 
@@ -133,20 +133,18 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
 
     while (!(GCLK->PCHCTRL[spi[dev].gclk_id].reg & GCLK_PCHCTRL_CHEN));
 
+    /* SCLK+MOSI = output */
+    gpio_init(spi[dev].sclk.pin, GPIO_DIR_OUT, GPIO_NOPULL);
+    gpio_init(spi[dev].mosi.pin, GPIO_DIR_OUT, GPIO_NOPULL);
+    /* MISO = input */
+    gpio_init(spi[dev].miso.pin, GPIO_DIR_IN, GPIO_PULLUP);
+
     /*
      * Set alternate funcion (PMUX) for our ports.
-     * This has to be done before gpio_init_[in|out].
      */
     gpio_init_mux(spi[dev].sclk.pin, spi[dev].sclk.pmux);
     gpio_init_mux(spi[dev].miso.pin, spi[dev].miso.pmux);
     gpio_init_mux(spi[dev].mosi.pin, spi[dev].mosi.pmux);
-
-    /* SCLK+MOSI = output */
-    gpio_init_out(spi[dev].sclk.pin, GPIO_NOPULL);
-    gpio_init_out(spi[dev].mosi.pin, GPIO_NOPULL);
-
-    /* MISO = input */
-    gpio_init_in(spi[dev].miso.pin, GPIO_PULLUP);
 
     /* pin pad mapping */
     dipo = spi[dev].dipo;
