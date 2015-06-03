@@ -20,18 +20,15 @@
  */
 
 #include "cpu.h"
-#include "stm32f10x.h"
-#include "periph/gpio.h"
-#include "periph_conf.h"
 #include "board.h"
-
+#include "periph/gpio.h"
+#include "periph_cpu.h"
+#include "periph_conf.h"
 #include "thread.h"
+#include "sched.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
-
-/* guard file in case no GPIO device is defined */
-#if GPIO_NUMOF
 
 typedef struct {
     gpio_cb_t cb;       /**< callback called from GPIO interrupt */
@@ -40,7 +37,7 @@ typedef struct {
 
 static gpio_state_t config[GPIO_NUMOF];
 
-int gpio_init_out(gpio_t dev, gpio_pp_t pullup)
+int gpio_init(gpio_t dev, gpio_dir_t dir, gpio_pp_t pullup)
 {
     GPIO_TypeDef *port;
     uint32_t pin;
@@ -163,162 +160,40 @@ int gpio_init_out(gpio_t dev, gpio_pp_t pullup)
             return -1;
     }
 
-    if (pin < 8) {
-        port->CRL &= ~(0xf << (4 * pin));
-        port->CRL |= (0x3 << (4* pin)); /* Output mode, 50 MHz */
-                                        /* general purpose push-pull set implicitly */
+    if (dir == GPIO_DIR_OUT) {
+        if (pin < 8) {
+            port->CRL &= ~(0xf << (4 * pin));
+            port->CRL |= (0x3 << (4* pin)); /* Output mode, 50 MHz */
+                                            /* general purpose push-pull set implicitly */
+        }
+        else {
+            port->CRH &= ~(0xf << (4 * (pin-8)));
+            port->CRH |= (0x3 << (4* (pin-8))); /* Output mode, 50 MHz */
+                                                /* general purpose push-pull set implicitly */
+        }
     }
     else {
-        port->CRH &= ~(0xf << (4 * (pin-8)));
-        port->CRH |= (0x3 << (4* (pin-8))); /* Output mode, 50 MHz */
-                                            /* general purpose push-pull set implicitly */
+        if (pin < 8) {
+            port->CRL &= ~(0xf << (4 * pin));
+            port->CRL |= (0x4 << (4 * pin));
+        }
+        else {
+            port->CRL &= ~(0xf << (4 * pin));
+            port->CRH |= (0x4 << (4 * (pin-8)));
+        }
     }
 
     return 0; /* all OK */
 }
 
-int gpio_init_in(gpio_t dev, gpio_pp_t pullup)
-{
-    GPIO_TypeDef *port;
-    uint32_t pin;
-
-    switch (dev) {
-#if GPIO_0_EN
-        case GPIO_0:
-            GPIO_0_CLKEN();
-            port = GPIO_0_PORT;
-            pin = GPIO_0_PIN;
-            break;
-#endif
-#if GPIO_1_EN
-        case GPIO_1:
-            GPIO_1_CLKEN();
-            port = GPIO_1_PORT;
-            pin = GPIO_1_PIN;
-            break;
-#endif
-#if GPIO_2_EN
-        case GPIO_2:
-            GPIO_2_CLKEN();
-            port = GPIO_2_PORT;
-            pin = GPIO_2_PIN;
-            break;
-#endif
-#if GPIO_3_EN
-        case GPIO_3:
-            GPIO_3_CLKEN();
-            port = GPIO_3_PORT;
-            pin = GPIO_3_PIN;
-            break;
-#endif
-#if GPIO_4_EN
-        case GPIO_4:
-            GPIO_4_CLKEN();
-            port = GPIO_4_PORT;
-            pin = GPIO_4_PIN;
-            break;
-#endif
-#if GPIO_5_EN
-        case GPIO_5:
-            GPIO_5_CLKEN();
-            port = GPIO_5_PORT;
-            pin = GPIO_5_PIN;
-            break;
-#endif
-#if GPIO_6_EN
-        case GPIO_6:
-            GPIO_6_CLKEN();
-            port = GPIO_6_PORT;
-            pin = GPIO_6_PIN;
-            break;
-#endif
-#if GPIO_7_EN
-        case GPIO_7:
-            GPIO_7_CLKEN();
-            port = GPIO_7_PORT;
-            pin = GPIO_7_PIN;
-            break;
-#endif
-#if GPIO_8_EN
-        case GPIO_8:
-            GPIO_8_CLKEN();
-            port = GPIO_8_PORT;
-            pin = GPIO_8_PIN;
-            break;
-#endif
-#if GPIO_9_EN
-        case GPIO_9:
-            GPIO_9_CLKEN();
-            port = GPIO_9_PORT;
-            pin = GPIO_9_PIN;
-            break;
-#endif
-#if GPIO_10_EN
-        case GPIO_10:
-            GPIO_10_CLKEN();
-            port = GPIO_10_PORT;
-            pin = GPIO_10_PIN;
-            break;
-#endif
-#if GPIO_11_EN
-        case GPIO_11:
-            GPIO_11_CLKEN();
-            port = GPIO_11_PORT;
-            pin = GPIO_11_PIN;
-            break;
-#endif
-#if GPIO_12_EN
-        case GPIO_12:
-            GPIO_12_CLKEN();
-            port = GPIO_12_PORT;
-            pin = GPIO_12_PIN;
-            break;
-#endif
-#if GPIO_13_EN
-        case GPIO_13:
-            GPIO_13_CLKEN();
-            port = GPIO_13_PORT;
-            pin = GPIO_13_PIN;
-            break;
-#endif
-#if GPIO_14_EN
-        case GPIO_14:
-            GPIO_14_CLKEN();
-            port = GPIO_14_PORT;
-            pin = GPIO_14_PIN;
-            break;
-#endif
-#if GPIO_15_EN
-        case GPIO_15:
-            GPIO_15_CLKEN();
-            port = GPIO_15_PORT;
-            pin = GPIO_15_PIN;
-            break;
-#endif
-        default:
-            return -1;
-    }
-
-    if (pin < 8) {
-        port->CRL &= ~(0xf << (4 * pin));
-        port->CRL |= (0x4 << (4 * pin));
-    }
-    else {
-        port->CRL &= ~(0xf << (4 * pin));
-        port->CRH |= (0x4 << (4 * (pin-8)));
-    }
-
-    return 0; /* everything alright here */
-}
-
-int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb, void *arg)
+int gpio_init_exti(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb, void *arg)
 {
     int res;
     uint8_t exti_line;
     uint8_t gpio_irq;
 
     /* configure pin as input */
-    res = gpio_init_in(dev, pullup);
+    res = gpio_init(dev, GPIO_DIR_IN, pullup);
     if (res < 0) {
         return res;
     }
@@ -1166,6 +1041,4 @@ void isr_exti15_10(void)
         thread_yield();
     }
 }
-#endif
-
 #endif
