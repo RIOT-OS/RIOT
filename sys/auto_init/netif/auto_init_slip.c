@@ -60,5 +60,7 @@ void auto_init_slip(void)
     }
 }
 
+#else
+typedef int dont_be_pedantic;
 #endif /* MODULE_NG_SLIP */
 /** @} */

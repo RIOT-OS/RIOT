@@ -335,6 +335,11 @@ void auto_init(void)
     auto_init_kw2xrf();
 #endif
 
+#ifdef MODULE_NG_NETDEV_ETH
+    extern void auto_init_ng_netdev_eth(void);
+    auto_init_ng_netdev_eth();
+#endif
+
 #endif /* MODULE_AUTO_INIT_NG_NETIF */
 
 #ifdef MODULE_NG_IPV6_NETIF
