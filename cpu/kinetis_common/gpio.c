@@ -30,8 +30,6 @@
 #include "periph/gpio.h"
 #include "periph_conf.h"
 
-#if GPIO_NUMOF
-
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
@@ -181,7 +179,7 @@ static inline void irq_handler(gpio_t dev);
  */
 static gpio_state_t config[GPIO_NUMOF];
 
-int gpio_init_out(gpio_t dev, gpio_pp_t pushpull)
+int gpio_init(gpio_t dev, gpio_dir_t dir, gpio_pp_t pushpull)
 {
     switch (dev) {
 #if GPIO_0_EN
@@ -388,231 +386,25 @@ int gpio_init_out(gpio_t dev, gpio_pp_t pushpull)
             break;
     }
 
-    gpio->PDDR |= GPIO_PDDR_PDD(1 << pin);     /* set pin to output mode */
-    gpio->PCOR |= GPIO_PCOR_PTCO(1 << pin);    /* set output to low */
+    if (dir == GPIO_DIR_OUT) {
+        gpio->PDDR |= GPIO_PDDR_PDD(1 << pin);     /* set pin to output mode */
+        gpio->PCOR |= GPIO_PCOR_PTCO(1 << pin);    /* set output to low */
+    }
+    else {
+        gpio->PDDR &= ~(GPIO_PDDR_PDD(1 << pin));     /* set pin to input mode */
+    }
+
     /* Select GPIO function for the pin */
     port->PCR[pin] |= PORT_PCR_MUX(PIN_MUX_FUNCTION_GPIO);
 
     return 0;
 }
 
-int gpio_init_in(gpio_t dev, gpio_pp_t pushpull)
-{
-    switch (dev) {
-#if GPIO_0_EN
-        case GPIO_0:
-            GPIO_0_CLKEN();
-            break;
-#endif
-#if GPIO_1_EN
-        case GPIO_1:
-            GPIO_1_CLKEN();
-            break;
-#endif
-#if GPIO_2_EN
-        case GPIO_2:
-            GPIO_2_CLKEN();
-            break;
-#endif
-#if GPIO_3_EN
-
-        case GPIO_3:
-            GPIO_3_CLKEN();
-            break;
-#endif
-#if GPIO_4_EN
-        case GPIO_4:
-            GPIO_4_CLKEN();
-            break;
-#endif
-#if GPIO_5_EN
-        case GPIO_5:
-            GPIO_5_CLKEN();
-            break;
-#endif
-#if GPIO_6_EN
-        case GPIO_6:
-            GPIO_6_CLKEN();
-            break;
-#endif
-#if GPIO_7_EN
-
-        case GPIO_7:
-            GPIO_7_CLKEN();
-            break;
-#endif
-#if GPIO_8_EN
-
-        case GPIO_8:
-            GPIO_8_CLKEN();
-            break;
-#endif
-#if GPIO_9_EN
-
-        case GPIO_9:
-            GPIO_9_CLKEN();
-            break;
-#endif
-#if GPIO_10_EN
-
-        case GPIO_10:
-            GPIO_10_CLKEN();
-            break;
-#endif
-#if GPIO_11_EN
-
-        case GPIO_11:
-            GPIO_11_CLKEN();
-            break;
-#endif
-#if GPIO_12_EN
-
-        case GPIO_12:
-            GPIO_12_CLKEN();
-            break;
-#endif
-#if GPIO_13_EN
-
-        case GPIO_13:
-            GPIO_13_CLKEN();
-            break;
-#endif
-#if GPIO_14_EN
-
-        case GPIO_14:
-            GPIO_14_CLKEN();
-            break;
-#endif
-#if GPIO_15_EN
-
-        case GPIO_15:
-            GPIO_15_CLKEN();
-            break;
-#endif
-#if GPIO_16_EN
-
-        case GPIO_16:
-            GPIO_16_CLKEN();
-            break;
-#endif
-#if GPIO_17_EN
-
-        case GPIO_17:
-            GPIO_17_CLKEN();
-            break;
-#endif
-#if GPIO_18_EN
-
-        case GPIO_18:
-            GPIO_18_CLKEN();
-            break;
-#endif
-#if GPIO_19_EN
-        case GPIO_19:
-            GPIO_19_CLKEN();
-            break;
-#endif
-#if GPIO_20_EN
-        case GPIO_20:
-            GPIO_20_CLKEN();
-            break;
-#endif
-#if GPIO_21_EN
-        case GPIO_21:
-            GPIO_21_CLKEN();
-            break;
-#endif
-#if GPIO_22_EN
-        case GPIO_22:
-            GPIO_22_CLKEN();
-            break;
-#endif
-#if GPIO_23_EN
-        case GPIO_23:
-            GPIO_23_CLKEN();
-            break;
-#endif
-#if GPIO_24_EN
-        case GPIO_24:
-            GPIO_24_CLKEN();
-            break;
-#endif
-#if GPIO_25_EN
-        case GPIO_25:
-            GPIO_25_CLKEN();
-            break;
-#endif
-#if GPIO_26_EN
-        case GPIO_26:
-            GPIO_26_CLKEN();
-            break;
-#endif
-#if GPIO_27_EN
-        case GPIO_27:
-            GPIO_27_CLKEN();
-            break;
-#endif
-#if GPIO_28_EN
-        case GPIO_28:
-            GPIO_28_CLKEN();
-            break;
-#endif
-#if GPIO_29_EN
-        case GPIO_29:
-            GPIO_29_CLKEN();
-            break;
-#endif
-#if GPIO_30_EN
-        case GPIO_30:
-            GPIO_30_CLKEN();
-            break;
-#endif
-#if GPIO_31_EN
-        case GPIO_31:
-            GPIO_31_CLKEN();
-            break;
-#endif
-        default:
-            return -1;
-    }
-
-    uint8_t pin = kinetis_gpio_lut[dev].pin;
-    PORT_Type *port = kinetis_gpio_lut[dev].port;
-    GPIO_Type *gpio = kinetis_gpio_lut[dev].gpio;
-
-    /* Reset all pin control settings for the pin */
-    /* Switch to analog input function while fiddling with the settings, to be safe. */
-    port->PCR[pin] = PORT_PCR_MUX(PIN_MUX_FUNCTION_ANALOG);
-
-    /* set to push-pull configuration */
-    switch (pushpull) {
-        case GPIO_NOPULL:
-            break;
-
-        case GPIO_PULLUP:
-            port->PCR[pin] |= PORT_PCR_PE_MASK | PORT_PCR_PS_MASK; /* Pull enable, pull up */
-            break;
-
-        case GPIO_PULLDOWN:
-            port->PCR[pin] |= PORT_PCR_PE_MASK; /* Pull enable */
-            break;
-
-        default:
-            break;
-    }
-
-    gpio->PDDR &= ~(GPIO_PDDR_PDD(1 << pin));     /* set pin to input mode */
-    /* Select GPIO function for the pin */
-    port->PCR[pin] |= PORT_PCR_MUX(PIN_MUX_FUNCTION_GPIO);
-
-    return 0;
-}
-
-int gpio_init_int(gpio_t dev, gpio_pp_t pushpull, gpio_flank_t flank, gpio_cb_t cb, void *arg)
+int gpio_init_exti(gpio_t dev, gpio_pp_t pushpull, gpio_flank_t flank, gpio_cb_t cb, void *arg)
 {
     int res;
 
-    res = gpio_init_in(dev, pushpull);
+    res = gpio_init(dev, GPIO_DIR_IN, pushpull);
 
     if (res < 0) {
         return res;
@@ -2084,5 +1876,3 @@ void ISR_PORT_H(void)
 
 }
 #endif /* PORTH_BASE */
-
-#endif /* GPIO_NUMOF */
