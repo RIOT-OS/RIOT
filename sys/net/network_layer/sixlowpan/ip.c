@@ -756,7 +756,7 @@ void ipv6_addr_init_prefix(ipv6_addr_t *out, const ipv6_addr_t *prefix,
         out->uint8[bytes] = prefix->uint8[bytes] & mask;
     }
 
-    memset(&(out[bytes + 1]), 0, 15 - bytes);
+    memset(&(out->uint8[bytes + 1]), 0, 15 - bytes);
 }
 
 void ipv6_net_if_get_best_src_addr(ipv6_addr_t *src, const ipv6_addr_t *dest)
