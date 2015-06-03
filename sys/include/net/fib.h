@@ -83,6 +83,11 @@ typedef struct fib_destination_set_entry_t {
 #define FIB_FLAG_RPL_ROUTE (1UL << 0)
 
 /**
+ * @brief flag to identify if the FIB-Entry is a net prefix (MSB == 1)
+ */
+#define FIB_FLAG_NET_PREFIX (1UL<<31)
+
+/**
  * @brief initializes all FIB entries with 0
  *
  * @param[in] table         the fib instance to initialize

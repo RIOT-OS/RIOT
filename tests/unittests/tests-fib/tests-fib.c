@@ -492,20 +492,24 @@ static void test_fib_14_exact_and_prefix_match(void)
 
     snprintf(addr_dst, add_buf_size, "Test addr12");
     snprintf(addr_nxt, add_buf_size, "Test address %02d", 12);
+
     fib_add_entry(&test_fib_table, 42, (uint8_t *)addr_dst,
-                  add_buf_size - 1, 0x12, (uint8_t *)addr_nxt, add_buf_size - 1,
+                  add_buf_size - 1, (FIB_FLAG_NET_PREFIX | 0x12),
+                  (uint8_t *)addr_nxt, add_buf_size - 1,
                   0x12, 100000);
 
     snprintf(addr_dst, add_buf_size, "Test addr123");
     snprintf(addr_nxt, add_buf_size, "Test address %02d", 23);
     fib_add_entry(&test_fib_table, 42, (uint8_t *)addr_dst,
-                  add_buf_size - 1, 0x123, (uint8_t *)addr_nxt, add_buf_size - 1,
+                  add_buf_size - 1, (FIB_FLAG_NET_PREFIX | 0x123),
+                  (uint8_t *)addr_nxt, add_buf_size - 1,
                   0x23, 100000);
 
     snprintf(addr_dst, add_buf_size, "Test addr1234");
     snprintf(addr_nxt, add_buf_size, "Test address %02d", 34);
     fib_add_entry(&test_fib_table, 42, (uint8_t *)addr_dst,
-                  add_buf_size - 1, 0x1234, (uint8_t *)addr_nxt, add_buf_size - 1,
+                  add_buf_size - 1, (FIB_FLAG_NET_PREFIX | 0x1234),
+                  (uint8_t *)addr_nxt, add_buf_size - 1,
                   0x34, 100000);
 
     memset(addr_lookup, 0, add_buf_size);
@@ -609,12 +613,14 @@ static void test_fib_16_prefix_match(void)
     addr_lookup[14] = (char)0x87; /* 1000 0111 */
 
     fib_add_entry(&test_fib_table, 42, (uint8_t *)addr_dst,
-                  add_buf_size - 1, 0x123, (uint8_t *)addr_nxt, add_buf_size - 1,
+                  add_buf_size - 1, (FIB_FLAG_NET_PREFIX | 0x123),
+                  (uint8_t *)addr_nxt, add_buf_size - 1,
                   0x23, 100000);
 
     addr_dst[14] = (char)0x3c;    /* 0011 1100 */
     fib_add_entry(&test_fib_table, 42, (uint8_t *)addr_dst,
-                  add_buf_size - 1, 0x123, (uint8_t *)addr_nxt, add_buf_size - 1,
+                  add_buf_size - 1, (FIB_FLAG_NET_PREFIX | 0x123),
+                  (uint8_t *)addr_nxt, add_buf_size - 1,
                   0x23, 100000);
 
     memset(addr_nxt, 0, add_buf_size);
@@ -631,7 +637,8 @@ static void test_fib_16_prefix_match(void)
     add_buf_size = 16;
 
     fib_add_entry(&test_fib_table, 42, (uint8_t *)addr_dst,
-                  add_buf_size - 1, 0x123, (uint8_t *)addr_nxt, add_buf_size -
+                  add_buf_size - 1, (FIB_FLAG_NET_PREFIX | 0x123),
+                  (uint8_t *)addr_nxt, add_buf_size -
                   1, 0x23, 100000);
 
     memset(addr_nxt, 0, add_buf_size);
@@ -687,6 +694,9 @@ static void test_fib_17_get_entry_set(void)
     fib_destination_set_entry_t arr_dst[arr_size];
     char prefix[addr_buf_size];
     memset(prefix,0, addr_buf_size);
+    /* cppcheck: prefix is set to all 0 before adding an address
+    */
+    /* cppcheck-suppress redundantCopy */
     snprintf(prefix, addr_buf_size, "Test address 1");
 
     int ret = fib_get_destination_set(&test_fib_table,
@@ -699,6 +709,9 @@ static void test_fib_17_get_entry_set(void)
     arr_size = 20;
 
     memset(prefix,0, addr_buf_size);
+    /* cppcheck: prefix is set to all 0 before adding an address
+    */
+    /* cppcheck-suppress redundantCopy */
     snprintf(prefix, addr_buf_size, "Test address 0");
 
     ret = fib_get_destination_set(&test_fib_table,
@@ -800,7 +813,8 @@ static void test_fib_19_default_gateway(void)
 
     /* add a default gateway entry */
     fib_add_entry(&test_fib_table, 42, (uint8_t *)addr_dst,
-                  add_buf_size, 0x123, (uint8_t *)addr_nxt, add_buf_size, 0x23,
+                  add_buf_size, (FIB_FLAG_NET_PREFIX | 0x123),
+                  (uint8_t *)addr_nxt, add_buf_size, 0x23,
                   100000);
 
     /* check if it matches all */
@@ -876,7 +890,8 @@ static void test_fib_20_replace_prefix(void)
 
     /* add a prefix entry */
     fib_add_entry(&test_fib_table, 42, (uint8_t *)addr_dst,
-                  add_buf_size, 0x123, (uint8_t *)addr_nxt, add_buf_size, 0x23,
+                  add_buf_size, (FIB_FLAG_NET_PREFIX | 0x123),
+                  (uint8_t *)addr_nxt, add_buf_size, 0x23,
                   100000);
 
     /* check if it matches */
@@ -905,7 +920,8 @@ static void test_fib_20_replace_prefix(void)
 
     /* change the prefix entry */
     fib_add_entry(&test_fib_table, 42, (uint8_t *)addr_dst,
-                  add_buf_size, 0x123, (uint8_t *)addr_nxt, add_buf_size, 0x24,
+                  add_buf_size, (FIB_FLAG_NET_PREFIX | 0x123),
+                  (uint8_t *)addr_nxt, add_buf_size, 0x24,
                   100000);
 
     /* and check again if it matches  */

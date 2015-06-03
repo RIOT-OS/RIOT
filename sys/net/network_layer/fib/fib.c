@@ -132,15 +132,18 @@ static int fib_find_entry(fib_table_t *table, uint8_t *dst, size_t dst_size,
             }
             else {
                 /* we try to find the most fitting prefix */
-                if (ret_comp == 1) {
-                    entry_arr[0] = &(table->data.entries[i]);
-                    /* we could find a better one so we move on */
-                    ret = 0;
+                if ((ret_comp == 1)
+                    && (table->data.entries[i].global_flags & FIB_FLAG_NET_PREFIX)) {
+                    if ((prefix_size == 0) || (match_size > prefix_size)) {
+                        entry_arr[0] = &(table->data.entries[i]);
+                        /* we could find a better one so we move on */
+                        ret = 0;
 
-                    prefix_size = match_size;
-                    match_size = dst_size << 3;
-                    count = 1;
+                        prefix_size = match_size;
+                        count = 1;
+                    }
                 }
+                match_size = dst_size<<3;
             }
         }
     }
@@ -1499,6 +1502,7 @@ void fib_print_routes(fib_table_t *table)
 {
     mutex_lock(&(table->mtx_access));
     uint64_t now = xtimer_now64();
+
     if (table->table_type == FIB_TABLE_TYPE_SH) {
         printf("%-" FIB_ADDR_PRINT_LENS "s %-6s %-" FIB_ADDR_PRINT_LENS "s %-6s %-16s Interface\n"
                , "Destination", "Flags", "Next Hop", "Flags", "Expires");
@@ -1507,9 +1511,14 @@ void fib_print_routes(fib_table_t *table)
             if (table->data.entries[i].lifetime != 0) {
                 fib_print_address(table->data.entries[i].global);
                 printf(" 0x%04"PRIx32" ", table->data.entries[i].global_flags);
+                if(table->data.entries[i].global_flags & FIB_FLAG_NET_PREFIX) {
+                    printf("N ");
+                } else {
+                    printf("H ");
+                }
+
                 fib_print_address(table->data.entries[i].next_hop);
                 printf(" 0x%04"PRIx32" ", table->data.entries[i].next_hop_flags);
-
                 if (table->data.entries[i].lifetime != FIB_LIFETIME_NO_EXPIRE) {
 
                     uint64_t tm = table->data.entries[i].lifetime - now;
