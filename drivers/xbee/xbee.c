@@ -288,6 +288,26 @@ static int _set_addr(xbee_t *dev, uint8_t *val, size_t len)
     return -ECANCELED;
 }
 
+static int _set_addr_len(xbee_t *dev, uint16_t *val, size_t len)
+{
+    if (len != sizeof(uint16_t)) {
+        return -EOVERFLOW;
+    }
+
+    switch (*val) {
+        case 8:
+            dev->addr_flags |= XBEE_ADDR_FLAGS_LONG;
+            break;
+        case 2:
+            dev->addr_flags &= ~XBEE_ADDR_FLAGS_LONG;
+            break;
+        default:
+            return -EINVAL;
+    }
+
+    return sizeof(uint16_t);
+}
+
 static int _get_channel(xbee_t *dev, uint8_t *val, size_t max)
 {
     uint8_t cmd[2];
@@ -403,6 +423,7 @@ int xbee_init(xbee_t *dev, uart_t uart, uint32_t baudrate,
     dev->reset_pin = reset_pin;
     dev->sleep_pin = sleep_pin;
     /* set default options */
+    dev->addr_flags = 0;
     dev->proto = XBEE_DEFAULT_PROTOCOL;
     dev->options = 0;
     /* initialize buffers and locks*/
@@ -592,7 +613,12 @@ static int _get(ng_netdev_t *netdev, ng_netconf_opt_t opt,
             if (max_len < sizeof(uint16_t)) {
                 return -EOVERFLOW;
             }
-            *((uint16_t *)value) = 2;
+            if (dev->addr_flags & XBEE_ADDR_FLAGS_LONG) {
+                *((uint16_t *)value) = 8;
+            }
+            else {
+                *((uint16_t *)value) = 2;
+            }
             return sizeof(uint16_t);
         case NETCONF_OPT_CHANNEL:
             return _get_channel(dev, (uint8_t *)value, max_len);
@@ -622,6 +648,9 @@ static int _set(ng_netdev_t *netdev, ng_netconf_opt_t opt,
     switch (opt) {
         case NETCONF_OPT_ADDRESS:
             return _set_addr(dev, (uint8_t *)value, value_len);
+        case NETCONF_OPT_ADDR_LEN:
+        case NETCONF_OPT_SRC_LEN:
+            return _set_addr_len(dev, value, value_len);
         case NETCONF_OPT_CHANNEL:
             return _set_channel(dev, (uint8_t *)value, value_len);
         case NETCONF_OPT_NID:

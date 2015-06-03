@@ -71,6 +71,19 @@
 #define XBEE_DEFAULT_CHANNEL        (17U)
 
 /**
+ * @name    Address flags
+ * @{
+ */
+/**
+ * @brief   Use long addresses if not otherwise defined when set, use short
+ *          addresses when unset.
+ */
+#define XBEE_ADDR_FLAGS_LONG              (0x80)
+/**
+ * @}
+ */
+
+/**
  * @brief   States of the internal FSM for handling incoming UART frames
  *
  * Incoming data frames on the UART interfaces are handled using a finite state
@@ -104,6 +117,7 @@ typedef struct {
     gpio_t sleep_pin;                   /**< GPIO pin connected to SLEEP */
     ng_nettype_t proto;                 /**< protocol the interface speaks */
     uint8_t options;                    /**< options field */
+    uint8_t addr_flags;                 /**< address flags as defined above */
     uint8_t addr_short[2];              /**< onw 802.15.4 short address */
     eui64_t addr_long;                  /**< own 802.15.4 long address */
     /* general variables for the UART RX state machine */
