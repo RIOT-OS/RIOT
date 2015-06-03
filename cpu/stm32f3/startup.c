@@ -123,11 +123,7 @@ void isr_tamp_stamp(void)            __attribute__ ((weak, alias("dummy_handler"
 void isr_rtc_wkup(void)            __attribute__ ((weak, alias("dummy_handler")));
 void isr_flash(void)            __attribute__ ((weak, alias("dummy_handler")));
 void isr_rcc(void)            __attribute__ ((weak, alias("dummy_handler")));
-void isr_exti0(void)            __attribute__ ((weak, alias("dummy_handler")));
-void isr_exti1(void)            __attribute__ ((weak, alias("dummy_handler")));
-void isr_exti2_tsc(void)            __attribute__ ((weak, alias("dummy_handler")));
-void isr_exti3(void)            __attribute__ ((weak, alias("dummy_handler")));
-void isr_exti4(void)            __attribute__ ((weak, alias("dummy_handler")));
+void isr_exti(void)            __attribute__ ((weak, alias("dummy_handler")));
 void isr_dma1_channel1(void)            __attribute__ ((weak, alias("dummy_handler")));
 void isr_dma1_channel2(void)            __attribute__ ((weak, alias("dummy_handler")));
 void isr_dma1_channel3(void)            __attribute__ ((weak, alias("dummy_handler")));
@@ -140,7 +136,6 @@ void isr_usb_hp_can_tx(void)            __attribute__ ((weak, alias("dummy_handl
 void isr_usb_lp_can_rx0(void)            __attribute__ ((weak, alias("dummy_handler")));
 void isr_can_rx1(void)            __attribute__ ((weak, alias("dummy_handler")));
 void isr_can_sce(void)            __attribute__ ((weak, alias("dummy_handler")));
-void isr_exti9_5(void)            __attribute__ ((weak, alias("dummy_handler")));
 void isr_tim1_brk_tim15(void)            __attribute__ ((weak, alias("dummy_handler")));
 void isr_tim1_up_tim16(void)            __attribute__ ((weak, alias("dummy_handler")));
 void isr_tim1_trg_com_tim17(void)            __attribute__ ((weak, alias("dummy_handler")));
@@ -157,7 +152,6 @@ void isr_spi2(void)            __attribute__ ((weak, alias("dummy_handler")));
 void isr_usart1(void)            __attribute__ ((weak, alias("dummy_handler")));
 void isr_usart2(void)            __attribute__ ((weak, alias("dummy_handler")));
 void isr_usart3(void)            __attribute__ ((weak, alias("dummy_handler")));
-void isr_exti15_10(void)            __attribute__ ((weak, alias("dummy_handler")));
 void isr_rtc_alarm(void)            __attribute__ ((weak, alias("dummy_handler")));
 void isr_usbwakeup(void)            __attribute__ ((weak, alias("dummy_handler")));
 void isr_tim8_brk(void)            __attribute__ ((weak, alias("dummy_handler")));
@@ -213,11 +207,11 @@ const void *interrupt_vector[] = {
     (void*) isr_rtc_wkup,           /*  */
     (void*) isr_flash,              /*  */
     (void*) isr_rcc,                /*  */
-    (void*) isr_exti0,              /*  */
-    (void*) isr_exti1,              /*  */
-    (void*) isr_exti2_tsc,          /*  */
-    (void*) isr_exti3,              /*  */
-    (void*) isr_exti4,              /*  */
+    (void*) isr_exti,               /*  */
+    (void*) isr_exti,               /*  */
+    (void*) isr_exti,               /*  */
+    (void*) isr_exti,               /*  */
+    (void*) isr_exti,               /*  */
     (void*) isr_dma1_channel1,      /*  */
     (void*) isr_dma1_channel2,      /*  */
     (void*) isr_dma1_channel3,      /*  */
@@ -230,7 +224,7 @@ const void *interrupt_vector[] = {
     (void*) isr_usb_lp_can_rx0,     /*  */
     (void*) isr_can_rx1,            /*  */
     (void*) isr_can_sce,            /*  */
-    (void*) isr_exti9_5,            /*  */
+    (void*) isr_exti,               /*  */
     (void*) isr_tim1_brk_tim15,     /*  */
     (void*) isr_tim1_up_tim16,      /*  */
     (void*) isr_tim1_trg_com_tim17, /*  */
@@ -247,7 +241,7 @@ const void *interrupt_vector[] = {
     (void*) isr_usart1,             /*  */
     (void*) isr_usart2,             /*  */
     (void*) isr_usart3,             /*  */
-    (void*) isr_exti15_10,          /*  */
+    (void*) isr_exti,               /*  */
     (void*) isr_rtc_alarm,          /*  */
     (void*) isr_usbwakeup,          /*  */
     (void*) isr_tim8_brk,           /*  */
