@@ -128,11 +128,7 @@ void isr_tamp_stamp(void)           __attribute__ ((weak, alias("dummy_handler")
 void isr_rtc_wkup(void)             __attribute__ ((weak, alias("dummy_handler")));
 void isr_flash(void)                __attribute__ ((weak, alias("dummy_handler")));
 void isr_rcc(void)                  __attribute__ ((weak, alias("dummy_handler")));
-void isr_exti0(void)                __attribute__ ((weak, alias("dummy_handler")));
-void isr_exti1(void)                __attribute__ ((weak, alias("dummy_handler")));
-void isr_exti2(void)                __attribute__ ((weak, alias("dummy_handler")));
-void isr_exti3(void)                __attribute__ ((weak, alias("dummy_handler")));
-void isr_exti4(void)                __attribute__ ((weak, alias("dummy_handler")));
+void isr_exti(void)                 __attribute__ ((weak, alias("dummy_handler")));
 void isr_dma1_stream0(void)         __attribute__ ((weak, alias("dummy_handler")));
 void isr_dma1_stream1(void)         __attribute__ ((weak, alias("dummy_handler")));
 void isr_dma1_stream2(void)         __attribute__ ((weak, alias("dummy_handler")));
@@ -145,7 +141,6 @@ void isr_can1_tx(void)              __attribute__ ((weak, alias("dummy_handler")
 void isr_can1_rx0(void)             __attribute__ ((weak, alias("dummy_handler")));
 void isr_can1_rx1(void)             __attribute__ ((weak, alias("dummy_handler")));
 void isr_can1_sce(void)             __attribute__ ((weak, alias("dummy_handler")));
-void isr_exti9_5(void)              __attribute__ ((weak, alias("dummy_handler")));
 void isr_tim1_brk_tim9(void)        __attribute__ ((weak, alias("dummy_handler")));
 void isr_tim1_up_tim10(void)        __attribute__ ((weak, alias("dummy_handler")));
 void isr_tim1_trg_com_tim11(void)   __attribute__ ((weak, alias("dummy_handler")));
@@ -162,7 +157,6 @@ void isr_spi2(void)                 __attribute__ ((weak, alias("dummy_handler")
 void isr_usart1(void)               __attribute__ ((weak, alias("dummy_handler")));
 void isr_usart2(void)               __attribute__ ((weak, alias("dummy_handler")));
 void isr_usart3(void)               __attribute__ ((weak, alias("dummy_handler")));
-void isr_exti15_10(void)            __attribute__ ((weak, alias("dummy_handler")));
 void isr_rtc_alarm(void)            __attribute__ ((weak, alias("dummy_handler")));
 void isr_otg_fs_wkup(void)          __attribute__ ((weak, alias("dummy_handler")));
 void isr_tim8_brk_tim12(void)       __attribute__ ((weak, alias("dummy_handler")));
@@ -233,11 +227,11 @@ const void *interrupt_vector[] = {
     (void*) isr_rtc_wkup,           /* RTC Wakeup through the EXTI line */
     (void*) isr_flash,              /* FLASH */
     (void*) isr_rcc,                /* RCC */
-    (void*) isr_exti0,              /* EXTI Line0 */
-    (void*) isr_exti1,              /* EXTI Line1 */
-    (void*) isr_exti2,              /* EXTI Line2 */
-    (void*) isr_exti3,              /* EXTI Line3 */
-    (void*) isr_exti4,              /* EXTI Line4 */
+    (void*) isr_exti,               /* EXTI Line0 */
+    (void*) isr_exti,               /* EXTI Line1 */
+    (void*) isr_exti,               /* EXTI Line2 */
+    (void*) isr_exti,               /* EXTI Line3 */
+    (void*) isr_exti,               /* EXTI Line4 */
     (void*) isr_dma1_stream0,       /* DMA1 Stream 0 */
     (void*) isr_dma1_stream1,       /* DMA1 Stream 1 */
     (void*) isr_dma1_stream2,       /* DMA1 Stream 2 */
@@ -250,7 +244,7 @@ const void *interrupt_vector[] = {
     (void*) isr_can1_rx0,           /* CAN1 RX0 */
     (void*) isr_can1_rx1,           /* CAN1 RX1 */
     (void*) isr_can1_sce,           /* CAN1 SCE */
-    (void*) isr_exti9_5,            /* External Line[9:5]s */
+    (void*) isr_exti,               /* External Line[9:5]s */
     (void*) isr_tim1_brk_tim9,      /* TIM1 Break and TIM9 */
     (void*) isr_tim1_up_tim10,      /* TIM1 Update and TIM10 */
     (void*) isr_tim1_trg_com_tim11, /* TIM1 Trigger and Commutation and TIM11 */
@@ -267,7 +261,7 @@ const void *interrupt_vector[] = {
     (void*) isr_usart1,             /* USART1 */
     (void*) isr_usart2,             /* USART2 */
     (void*) isr_usart3,             /* USART3 */
-    (void*) isr_exti15_10,          /* External Line[15:10]s */
+    (void*) isr_exti,               /* External Line[15:10]s */
     (void*) isr_rtc_alarm,          /* RTC Alarm (A and B) through EXTI Line */
     (void*) isr_otg_fs_wkup,        /* USB OTG FS Wakeup through EXTI line */
     (void*) isr_tim8_brk_tim12,     /* TIM8 Break and TIM12 */
