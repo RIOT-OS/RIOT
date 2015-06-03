@@ -416,14 +416,14 @@ int xbee_init(xbee_t *dev, uart_t uart, uint32_t baudrate,
         return -ENXIO;
     }
     if (reset_pin < GPIO_NUMOF) {
-        if (gpio_init_out(reset_pin, GPIO_NOPULL) < 0) {
+        if (gpio_init(reset_pin, GPIO_DIR_OUT, GPIO_NOPULL) < 0) {
             DEBUG("xbee: Error initializing RESET pin\n");
             return -ENXIO;
         }
         gpio_set(reset_pin);
     }
     if (sleep_pin < GPIO_NUMOF) {
-        if (gpio_init_out(sleep_pin, GPIO_NOPULL) < 0) {
+        if (gpio_init(sleep_pin, GPIO_DIR_OUT, GPIO_NOPULL) < 0) {
             DEBUG("xbee: Error initializing SLEEP pin\n");
             return -ENXIO;
         }

@@ -80,14 +80,14 @@ int nrf24l01p_init(nrf24l01p_t *dev, spi_t spi, gpio_t ce, gpio_t cs, gpio_t irq
     dev->listener = KERNEL_PID_UNDEF;
 
     /* Init CE pin */
-    gpio_init_out(dev->ce, GPIO_NOPULL);
+    gpio_init(dev->ce, GPIO_DIR_OUT, GPIO_NOPULL);
 
     /* Init CS pin */
-    gpio_init_out(dev->cs, GPIO_NOPULL);
+    gpio_init(dev->cs, GPIO_DIR_OUT, GPIO_NOPULL);
     gpio_set(dev->cs);
 
     /* Init IRQ pin */
-    gpio_init_int(dev->irq, GPIO_PULLUP, GPIO_FALLING, nrf24l01p_rx_cb, dev);
+    gpio_init_exti(dev->irq, GPIO_PULLUP, GPIO_FALLING, nrf24l01p_rx_cb, dev);
 
 
     /* Init SPI */

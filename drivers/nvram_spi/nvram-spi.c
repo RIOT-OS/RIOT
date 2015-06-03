@@ -114,7 +114,7 @@ int nvram_spi_init(nvram_t *dev, nvram_spi_params_t *spi_params, size_t size)
     }
     dev->extra = spi_params;
 
-    gpio_init_out(spi_params->cs, GPIO_NOPULL);
+    gpio_init(spi_params->cs, GPIO_DIR_OUT, GPIO_NOPULL);
     gpio_set(spi_params->cs);
 
     return 0;

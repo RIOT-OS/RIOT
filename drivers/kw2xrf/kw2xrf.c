@@ -298,7 +298,7 @@ void kw2xrf_init_interrupts(kw2xrf_t *dev, gpio_t int_pin)
     kw2xrf_write_dreg(MKW2XDM_PHY_CTRL3, reg);
 
     /* set up GPIO-pin used for IRQ */
-    gpio_init_int(int_pin, GPIO_NOPULL, GPIO_FALLING, &kw2xrf_irq_handler, dev);
+    gpio_init_exti(int_pin, GPIO_NOPULL, GPIO_FALLING, &kw2xrf_irq_handler, dev);
 }
 
 int kw2xrf_set_pan(kw2xrf_t *dev, uint16_t pan)

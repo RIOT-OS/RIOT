@@ -64,7 +64,7 @@ int kw2xrf_spi_init(spi_t spi, spi_speed_t spi_speed,
     res = spi_init_master(kw2xrf_spi, SPI_CONF_FIRST_RISING, spi_speed);
 #if KW2XRF_SHARED_SPI
     spi_release(kw2xrf_spi);
-    gpio_init_out(kw2xrf_cs_pin, GPIO_NOPULL);
+    gpio_init(kw2xrf_cs_pin, GPIO_DIR_OUT, GPIO_NOPULL);
     gpio_set(kw2xrf_cs_pin);
 #endif
 

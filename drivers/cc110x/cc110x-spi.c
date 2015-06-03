@@ -39,7 +39,7 @@ void cc110x_cs(void)
 {
     volatile int retry_count = 0;
     /* Switch MISO/GDO1 to GPIO input mode */
-    gpio_init_in(CC110X_GDO1, GPIO_NOPULL);
+    gpio_init(CC110X_GDO1, GPIO_DIR_IN, GPIO_NOPULL);
     /* CS to low */
     gpio_clear(CC110X_CS);
     /* Wait for SO to go low (voltage regulator

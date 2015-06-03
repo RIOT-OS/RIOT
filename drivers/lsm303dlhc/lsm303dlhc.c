@@ -70,7 +70,7 @@ int lsm303dlhc_init(lsm303dlhc_t *dev, i2c_t i2c, gpio_t acc_pin, gpio_t mag_pin
     res += i2c_write_reg(dev->i2c, dev->acc_address,
                          LSM303DLHC_REG_CTRL3_A, LSM303DLHC_CTRL3_A_I1_NONE);
     /* configure acc data ready pin */
-    gpio_init_in(acc_pin, GPIO_NOPULL);
+    gpio_init(acc_pin, GPIO_DIR_IN, GPIO_NOPULL);
 
     /* configure magnetometer and temperature */
     /* enable temperature output and set sample rate */
@@ -85,7 +85,7 @@ int lsm303dlhc_init(lsm303dlhc_t *dev, i2c_t i2c, gpio_t acc_pin, gpio_t mag_pin
                          LSM303DLHC_REG_MR_M, LSM303DLHC_MAG_MODE_CONTINUOUS);
     i2c_release(dev->i2c);
     /* configure mag data ready pin */
-    gpio_init_in(mag_pin, GPIO_NOPULL);
+    gpio_init(mag_pin, GPIO_DIR_IN, GPIO_NOPULL);
 
     return (res < 7) ? -1 : 0;
 }
@@ -215,7 +215,7 @@ int lsm303dlhc_enable(lsm303dlhc_t *dev)
     tmp = (LSM303DLHC_CTRL4_A_BDU| LSM303DLHC_CTRL4_A_SCALE_2G | LSM303DLHC_CTRL4_A_HR);
     res += i2c_write_reg(dev->i2c, dev->acc_address, LSM303DLHC_REG_CTRL4_A, tmp);
     res += i2c_write_reg(dev->i2c, dev->acc_address, LSM303DLHC_REG_CTRL3_A, LSM303DLHC_CTRL3_A_I1_DRDY1);
-    gpio_init_in(dev->acc_pin, GPIO_NOPULL);
+    gpio_init(dev->acc_pin, GPIO_DIR_IN, GPIO_NOPULL);
 
     tmp = LSM303DLHC_TEMP_EN | LSM303DLHC_TEMP_SAMPLE_75HZ;
     res += i2c_write_reg(dev->i2c, dev->mag_address, LSM303DLHC_REG_CRA_M, tmp);
@@ -227,7 +227,7 @@ int lsm303dlhc_enable(lsm303dlhc_t *dev)
                         LSM303DLHC_REG_MR_M, LSM303DLHC_MAG_MODE_CONTINUOUS);
     i2c_release(dev->i2c);
 
-    gpio_init_in(dev->mag_pin, GPIO_NOPULL);
+    gpio_init(dev->mag_pin, GPIO_DIR_IN, GPIO_NOPULL);
 
     return (res < 6) ? -1 : 0;
 }

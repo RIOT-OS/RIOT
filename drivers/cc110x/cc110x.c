@@ -66,12 +66,12 @@ int cc110x_initialize(netdev_t *dev)
     rx_buffer_next = 0;
 
     /* Configure chip-select */
-    gpio_init_out(CC110X_CS, GPIO_NOPULL);
+    gpio_init(CC110X_CS, GPIO_DIR_OUT, GPIO_NOPULL);
     gpio_set(CC110X_CS);
     /* Configure GDO0, GDO1, GDO2 */
-    gpio_init_in(CC110X_GDO0, GPIO_NOPULL);
-    gpio_init_in(CC110X_GDO1, GPIO_NOPULL);
-    gpio_init_int(CC110X_GDO2, GPIO_NOPULL, GPIO_FALLING, &cc110x_rx_handler, 0);
+    gpio_init(CC110X_GDO0, GPIO_DIR_IN, GPIO_NOPULL);
+    gpio_init(CC110X_GDO1, GPIO_DIR_IN, GPIO_NOPULL);
+    gpio_init_exti(CC110X_GDO2, GPIO_NOPULL, GPIO_FALLING, &cc110x_rx_handler, 0);
     gpio_irq_disable(CC110X_GDO2);
 
     /* Configure SPI */
