@@ -55,6 +55,22 @@ typedef enum {
      * Examples for this include the PAN ID in IEEE 802.15.4
      */
     NETCONF_OPT_NID,
+
+    /**
+     * @brief   get the IPv6 interface identifier of a network interface as
+     *          eui64_t.
+     *
+     * @see <a href="https://tools.ietf.org/html/rfc4291#section-2.5.1">
+     *          RFC 4291, section 2.5.1
+     *      </a>
+     *
+     * The generation of the interface identifier is dependent on the link-layer.
+     * Please refer to the appropriate IPv6 over `<link>` specification for
+     * further implementation details (such as
+     * <a href="https://tools.ietf.org/html/rfc2464">RFC 2464</a> or
+     * <a href="https://tools.ietf.org/html/rfc4944">RFC 4944</a>).
+     */
+    NETCONF_OPT_IPV6_IID,
     NETCONF_OPT_TX_POWER,           /**< get/set the output power for radio
                                      *   devices in dBm as int16_t in host byte
                                      *   order */
