@@ -22,7 +22,10 @@
 #ifndef NG_ETHERNET_H_
 #define NG_ETHERNET_H_
 
+#include <stdint.h>
+
 #include "net/ng_ethernet/hdr.h"
+#include "net/eui64.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -45,6 +48,29 @@ extern "C" {
  */
 #define NG_ETHERNET_MAX_LEN     (NG_ETHERNET_FRAME_LEN + \
                                  NG_ETHERNET_FCS_LEN)
+
+/**
+ * @brief   Generates an IPv6 interface identifier from a 48-bit MAC address.
+ *
+ * @see <a href="https://tools.ietf.org/html/rfc2464#section-4">
+ *          RFC 2464, section 4
+ *      </a>
+ *
+ * @param[out] eui64    The resulting EUI-64.
+ * @param[in] mac       A 48-bit MAC address. Is expected to be at least
+ *                      @ref NG_ETHERNET_ADDR_LEN long.
+ */
+static inline void ng_ethernet_get_iid(eui64_t *eui64, uint8_t *mac)
+{
+    eui64->uint8[0] = mac[0] ^ 0x02;
+    eui64->uint8[1] = mac[1];
+    eui64->uint8[2] = mac[2];
+    eui64->uint8[3] = 0xff;
+    eui64->uint8[4] = 0xfe;
+    eui64->uint8[5] = mac[3];
+    eui64->uint8[6] = mac[4];
+    eui64->uint8[7] = mac[5];
+}
 
 #ifdef __cplusplus
 }
