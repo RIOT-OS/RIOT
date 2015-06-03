@@ -1,9 +1,9 @@
 /*
- * Copyright (C) 2014 Freie Universität Berlin
+ * Copyright (C) 2015 Freie Universität Berlin
  *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**
@@ -29,178 +29,54 @@
 #include "periph/gpio.h"
 #include "periph_conf.h"
 
-/* guard file in case no GPIO device is defined */
-#if GPIO_NUMOF
-
+/**
+ * @brief   Datastructure to hold an interrupt context
+ */
 typedef struct {
-    gpio_t dev;
-    gpio_cb_t cb;
-    void *arg;
-} gpio_state_t;
-
-static gpio_state_t gpio_config;
+    void (*cb)(void *arg);      /**< interrupt callback routine */
+    void *arg;                  /**< optional argument */
+} exti_ctx_t;
 
 /**
- * @brief helper function to get the pin that corresponds to a GPIO device
- *
- * @param[in] dev       the device the returned pin corresponds to
- *
- * @return              the pin number of for the given device
- * @return              -1 if device unknown
+ * @brief   Place to store the interrupt context
  */
-static inline int get_pin(gpio_t dev)
+static exti_ctx_t exti_chan;
+
+int gpio_init(gpio_t pin, gpio_dir_t dir, gpio_pp_t pullup)
 {
-    switch (dev) {
-#if GPIO_0_EN
-        case GPIO_0:
-            return GPIO_0_PIN;
-            break;
-#endif
-#if GPIO_1_EN
-        case GPIO_1:
-            return GPIO_1_PIN;
-            break;
-#endif
-#if GPIO_2_EN
-        case GPIO_2:
-            return GPIO_2_PIN;
-            break;
-#endif
-#if GPIO_3_EN
-        case GPIO_3:
-            return GPIO_3_PIN;
-            break;
-#endif
-#if GPIO_4_EN
-        case GPIO_4:
-            return GPIO_4_PIN;
-            break;
-#endif
-#if GPIO_5_EN
-        case GPIO_5:
-            return GPIO_5_PIN;
-            break;
-#endif
-#if GPIO_6_EN
-        case GPIO_6:
-            return GPIO_6_PIN;
-            break;
-#endif
-#if GPIO_7_EN
-        case GPIO_7:
-            return GPIO_7_PIN;
-            break;
-#endif
-#if GPIO_8_EN
-        case GPIO_8:
-            return GPIO_8_PIN;
-            break;
-#endif
-#if GPIO_9_EN
-        case GPIO_9:
-            return GPIO_9_PIN;
-            break;
-#endif
-#if GPIO_10_EN
-        case GPIO_10:
-            return GPIO_10_PIN;
-            break;
-#endif
-#if GPIO_11_EN
-        case GPIO_11:
-            return GPIO_11_PIN;
-            break;
-#endif
-#if GPIO_12_EN
-        case GPIO_12:
-            return GPIO_12_PIN;
-            break;
-#endif
-#if GPIO_13_EN
-        case GPIO_13:
-            return GPIO_13_PIN;
-            break;
-#endif
-#if GPIO_14_EN
-        case GPIO_14:
-            return GPIO_14_PIN;
-            break;
-#endif
-#if GPIO_15_EN
-        case GPIO_15:
-            return GPIO_15_PIN;
-            break;
-#endif
+    /* configure pin direction */
+    if (dir == GPIO_DIR_OUT) {
+        /* configure pin: output, input buffer disabled */
+        NRF_GPIO->PIN_CNF[pin] = (1 << GPIO_PIN_CNF_DIR_Pos) |
+                                 (1 << GPIO_PIN_CNF_INPUT_Pos);
     }
-
-    return -1;
-}
-
-int gpio_init_out(gpio_t dev, gpio_pp_t pullup)
-{
-    int pin = get_pin(dev);
-    if (pin < 0) {
-        return pin;
+    else {
+        /* configure pin: input, input buffer enabled */
+        NRF_GPIO->PIN_CNF[pin] = 0;
     }
-
-    /* configure pin: output, input buffer disabled */
-    NRF_GPIO->PIN_CNF[pin] = (GPIO_PIN_CNF_DIR_Output << GPIO_PIN_CNF_DIR_Pos) |
-                             (GPIO_PIN_CNF_INPUT_Disconnect << GPIO_PIN_CNF_INPUT_Pos);
     /* configure pull up value, map 0x1 -> 0x2; 0x2 -> 0x1 */
     if (pullup > 0) {
         NRF_GPIO->PIN_CNF[pin] |= ((pullup ^ 0x3) << GPIO_PIN_CNF_PULL_Pos);
     }
-
     return 0;
 }
 
-int gpio_init_in(gpio_t dev, gpio_pp_t pullup)
+int gpio_init_exti(gpio_t pin, gpio_pp_t pullup, gpio_flank_t flank,
+                    gpio_cb_t cb, void *arg)
 {
-    int pin = get_pin(dev);
-    if (pin < 0) {
-        return pin;
-    }
-
-    /* configure pin: output, input buffer disabled */
-    NRF_GPIO->PIN_CNF[pin] = (GPIO_PIN_CNF_DIR_Input << GPIO_PIN_CNF_DIR_Pos) |
-                             (GPIO_PIN_CNF_INPUT_Connect << GPIO_PIN_CNF_INPUT_Pos);
-    /* configure pull up value, map 0x1 -> 0x2; 0x2 -> 0x1 */
-    if (pullup > 0) {
-        NRF_GPIO->PIN_CNF[pin] |= ((pullup ^ 0x3) << GPIO_PIN_CNF_PULL_Pos);
-    }
-
-    return 0;
-}
-
-int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb, void *arg)
-{
-    int res;
-    uint32_t pin;
-
-    /* configure pin as input */
-    res = gpio_init_in(dev, pullup);
-    if (res < 0) {
-        return res;
-    }
-
-    /* get pin */
-    pin = get_pin(dev);         /* no need to check return value, init_in already did */
-
-    /* set interrupt priority and enable global GPIOTE interrupt */
-    NVIC_SetPriority(GPIOTE_IRQn, GPIO_IRQ_PRIO);
-    NVIC_EnableIRQ(GPIOTE_IRQn);
-
+    /* disable external interrupt in case one is active */
+    NRF_GPIOTE->INTENSET &= ~(GPIOTE_INTENSET_IN0_Msk);
     /* save callback */
-    gpio_config.dev = dev;
-    gpio_config.cb = cb;
-    gpio_config.arg = arg;
-
+    exti_chan.cb = cb;
+    exti_chan.arg = arg;
+    /* configure pin as input */
+    gpio_init(pin, GPIO_DIR_IN, pullup);
+    /* set interrupt priority and enable global GPIOTE interrupt */
+    NVIC_EnableIRQ(GPIOTE_IRQn);
     /* reset GPIOTE configuration register to EVENT mode*/
     NRF_GPIOTE->CONFIG[0] = GPIOTE_CONFIG_MODE_Event;
-
     /* select active pin for external interrupt */
     NRF_GPIOTE->CONFIG[0] |= (pin << GPIOTE_CONFIG_PSEL_Pos);
-
     /* set active flank */
     switch (flank) {
         case GPIO_FALLING:
@@ -213,85 +89,60 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb
             NRF_GPIOTE->CONFIG[0] |= (3 << GPIOTE_CONFIG_POLARITY_Pos);
             break;
     }
-
     /* enable external interrupt */
     NRF_GPIOTE->INTENSET |= GPIOTE_INTENSET_IN0_Msk;
-
     return 0;
 }
 
-void gpio_irq_enable(gpio_t dev)
+/*
+ * the gpio_init_mux function is not defined as it is not needed for this CPU
+ */
+
+void gpio_irq_enable(gpio_t pin)
 {
-    if (gpio_config.dev == dev) {
-        NRF_GPIOTE->INTENSET |= GPIOTE_INTENSET_IN0_Msk;
-    }
+    NRF_GPIOTE->INTENSET |= GPIOTE_INTENSET_IN0_Msk;
 }
 
 void gpio_irq_disable(gpio_t dev)
 {
-    if (gpio_config.dev == dev) {
-        NRF_GPIOTE->INTENCLR |= GPIOTE_INTENSET_IN0_Msk;
-    }
+    NRF_GPIOTE->INTENCLR |= GPIOTE_INTENSET_IN0_Msk;
 }
 
-int gpio_read(gpio_t dev)
+int gpio_read(gpio_t pin)
 {
-    /* get pin */
-    int pin = get_pin(dev);
-    if (pin < 0) {
-        return pin;
-    }
-
-    /* read pin value depending if pin is input or output */
-    int res;
     if (NRF_GPIO->DIR & (1 << pin)) {
-        res = (NRF_GPIO->OUT & (1 << pin));
+        return (NRF_GPIO->OUT & (1 << pin)) ? 1 : 0;
     }
     else {
-        res = (NRF_GPIO->IN & (1 << pin));
+        return (NRF_GPIO->IN & (1 << pin)) ? 1 : 0;
     }
-
-    /* fix issue with negative number if pin 31 is set */
-    if (res < -1) {
-        res = 1;
-    }
-
-    return res;
 }
 
-void gpio_set(gpio_t dev)
+void gpio_set(gpio_t pin)
 {
-    int pin = get_pin(dev);
-    if (pin < 0) {
-        return;
-    }
     NRF_GPIO->OUTSET = (1 << pin);
 }
 
-void gpio_clear(gpio_t dev)
+void gpio_clear(gpio_t pin)
 {
-    int pin = get_pin(dev);
-    if (pin < 0) {
-        return;
-    }
     NRF_GPIO->OUTCLR = (1 << pin);
 }
 
-void gpio_toggle(gpio_t dev)
+void gpio_toggle(gpio_t pin)
 {
-    if (gpio_read(dev)) {
-        gpio_clear(dev);
+    if (gpio_read(pin)) {
+        gpio_clear(pin);
     } else {
-        gpio_set(dev);
+        gpio_set(pin);
     }
 }
 
-void gpio_write(gpio_t dev, int value)
+void gpio_write(gpio_t pin, int value)
 {
     if (value) {
-        gpio_set(dev);
+        gpio_set(pin);
     } else {
-        gpio_clear(dev);
+        gpio_clear(pin);
     }
 }
 
@@ -300,11 +151,9 @@ void isr_gpiote(void)
     if (NRF_GPIOTE->EVENTS_IN[0] == 1)
     {
         NRF_GPIOTE->EVENTS_IN[0] = 0;
-        gpio_config.cb(gpio_config.arg);
+        exti_chan.cb(exti_chan.arg);
     }
     if (sched_context_switch_request) {
         thread_yield();
     }
 }
-
-#endif /* GPIO_NUMOF */
