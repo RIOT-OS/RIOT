@@ -25,6 +25,8 @@
 #include "xbee.h"
 #include "hwtimer.h"
 #include "msg.h"
+#include "net/eui64.h"
+#include "net/ng_ieee802154.h"
 #include "periph/cpuid.h"
 
 #define ENABLE_DEBUG    (0)
@@ -620,6 +622,18 @@ static int _get(ng_netdev_t *netdev, ng_netconf_opt_t opt,
                 *((uint16_t *)value) = 2;
             }
             return sizeof(uint16_t);
+        case NETCONF_OPT_IPV6_IID:
+            if (max_len < sizeof(eui64_t)) {
+                return -EOVERFLOW;
+            }
+            if (dev->addr_flags & XBEE_ADDR_FLAGS_LONG) {
+                ng_ieee802154_get_iid(value, (uint8_t *)&dev->addr_long, 8);
+            }
+            else {
+                ng_ieee802154_get_iid(value, (uint8_t *)&dev->addr_short, 2);
+            }
+
+            return sizeof(eui64_t);
         case NETCONF_OPT_CHANNEL:
             return _get_channel(dev, (uint8_t *)value, max_len);
         case NETCONF_OPT_MAX_PACKET_SIZE:
