@@ -14,6 +14,7 @@
  * @brief       Peripheral MCU configuration for the Atmel SAM R21 Xplained Pro board
  *
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
+ * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
  */
 
 #ifndef __PERIPH_CONF_H
@@ -49,9 +50,9 @@ extern "C" {
  * @name UART configuration
  * @{
  */
-#define UART_NUMOF          (1U)
+#define UART_NUMOF          (2U)
 #define UART_0_EN           1
-#define UART_1_EN           0
+#define UART_1_EN           1
 #define UART_2_EN           0
 #define UART_3_EN           0
 #define UART_IRQ_PRIO       1
@@ -69,12 +70,15 @@ extern "C" {
 
 
 /* UART 1 device configuration */
-#define UART_1_DEV
-#define UART_1_IRQ
-#define UART_1_ISR
+#define UART_1_DEV          SERCOM5->USART
+#define UART_1_IRQ          SERCOM5_IRQn
+#define UART_1_ISR          isr_sercom5
 /* UART 1 pin configuration */
-#define UART_1_PORT
-#define UART_1_PINS
+#define UART_1_PORT         (PORT->Group[0])
+#define UART_1_TX_PIN       (22)
+#define UART_1_RX_PIN       (23)
+#define UART_1_PINS         (PORT_PA22 | PORT_PA23)
+#define UART_1_REF_F        (8000000UL)
 /** @} */
 
 
