@@ -26,9 +26,6 @@
 #include "periph/gpio.h"
 #include "periph_conf.h"
 
-/* guard file in case no GPIO devices are defined */
-#if GPIO_NUMOF
-
 /**
  * @brief Generate a bit mask in which only the specified bit is high.
  *
@@ -357,7 +354,7 @@ static const uint32_t ioc_mask_lut[] = {
     [GPIO_PULLDOWN] = IOC_OVERRIDE_PDE,
 };
 
-int gpio_init_out(gpio_t dev, gpio_pp_t pushpull)
+int gpio_init(gpio_t dev, gpio_dir_t dir, gpio_pp_t pushpull)
 {
     int pin;
 
@@ -367,40 +364,29 @@ int gpio_init_out(gpio_t dev, gpio_pp_t pushpull)
 
     pin = pin_lut[dev];
     gpio_software_control(pin);
-    gpio_dir_output(pin);
 
-    /* configure the pin's pull resistor state */
-    IOC_PXX_OVER[pin] = IOC_OVERRIDE_OE | ioc_mask_lut[pushpull];
-
-    return 0;
-}
-
-int gpio_init_in(gpio_t dev, gpio_pp_t pushpull)
-{
-    int pin;
-
-    if (!gpio_enabled(dev)) {
-        return -1;
+    if (dir == GPIO_DIR_OUT) {
+        gpio_dir_output(pin);
+        /* configure the pin's pull resistor state */
+        IOC_PXX_OVER[pin] = IOC_OVERRIDE_OE | ioc_mask_lut[pushpull];
+    }
+    else {
+        gpio_dir_input(pin);
+        /* configure the pin's pull resistor state */
+        IOC_PXX_OVER[pin] = ioc_mask_lut[pushpull];
     }
 
-    pin = pin_lut[dev];
-    gpio_software_control(pin);
-    gpio_dir_input(pin);
-
-    /* configure the pin's pull resistor state */
-    IOC_PXX_OVER[pin] = ioc_mask_lut[pushpull];
-
     return 0;
 }
 
-int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb, void *arg)
+int gpio_init_exti(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb, void *arg)
 {
     int res, pin, irq_num;
     uint32_t mask;
     cc2538_gpio_t* instance;
 
     /* Note: gpio_init_in() also checks if the gpio is enabled. */
-    res = gpio_init_in(dev, pullup);
+    res = gpio_init(dev, GPIO_DIR_IN, pullup);
     if (res < 0) {
         return res;
     }
@@ -623,5 +609,3 @@ void isr_gpiod(void)
         thread_yield();
     }
 }
-
-#endif /* GPIO_NUMOF */
