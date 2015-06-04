@@ -28,8 +28,8 @@
 kernel_pid_t sixlowapp_udp_server_pid = KERNEL_PID_UNDEF;
 
 char addr_str[IPV6_MAX_ADDR_STR_LEN];
-char monitor_stack_buffer[KERNEL_CONF_STACKSIZE_MAIN];
-char udp_server_stack_buffer[KERNEL_CONF_STACKSIZE_MAIN];
+char monitor_stack_buffer[THREAD_STACKSIZE_MAIN];
+char udp_server_stack_buffer[THREAD_STACKSIZE_MAIN];
 
 const shell_command_t shell_commands[] = {
     {"ping", "Send an ICMPv6 echo request to another node", sixlowapp_send_ping},
@@ -46,7 +46,7 @@ int main(void)
     /* start thread for monitor mode */
     kernel_pid_t monitor_pid = thread_create(monitor_stack_buffer,
                                              sizeof(monitor_stack_buffer),
-                                             PRIORITY_MAIN - 2,
+                                             THREAD_PRIORITY_MAIN - 2,
                                              CREATE_STACKTEST,
                                              sixlowapp_monitor, NULL,
                                              "monitor");
@@ -56,7 +56,7 @@ int main(void)
     /* Start the UDP server thread */
     sixlowapp_udp_server_pid = thread_create(udp_server_stack_buffer,
                                              sizeof(udp_server_stack_buffer),
-                                             PRIORITY_MAIN, CREATE_STACKTEST,
+                                             THREAD_PRIORITY_MAIN, CREATE_STACKTEST,
                                              sixlowapp_udp_server_loop, NULL,
                                              "UDP receiver");
 
