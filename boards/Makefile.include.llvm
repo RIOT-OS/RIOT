@@ -1,0 +1,23 @@
+export GDBPREFIX  ?= $(PREFIX)
+export LLVMPREFIX ?= llvm-
+export CC          = clang
+export CXX         = clang++
+export LINK        = $(CC)
+export AS          = $(LLVMPREFIX)as
+export AR          = $(LLVMPREFIX)ar
+export NM          = $(LLVMPREFIX)nm
+# There is no LLVM linker yet, use GNU binutils.
+#export LINKER      = $(LLVMPREFIX)ld
+# objcopy does not have a clear substitute in LLVM, use GNU binutils
+#export OBJCOPY     = $(LLVMPREFIX)objcopy
+export OBJCOPY     = $(PREFIX)objcopy
+export OBJDUMP     = $(LLVMPREFIX)objdump
+export SIZE        = $(LLVMPREFIX)size
+export DBG         = $(GDBPREFIX)gdb
+# LLVM lacks a binutils strip tool as well...
+#export STRIP      = $(LLVMPREFIX)strip
+
+# Tell clang to cross compile
+export CFLAGS     += -target $(TARGET_TRIPLE)
+export CXXFLAGS   += -target $(TARGET_TRIPLE)
+export LINKFLAGS  += -target $(TARGET_TRIPLE)
