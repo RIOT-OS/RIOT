@@ -3,6 +3,6 @@ INCLUDES += -I$(RIOTCPU)/$(CPU)/maca/include
 
 include $(RIOTCPU)/arm7_common/Makefile.include
 
-export UNDEF += $(BINDIR)cpu/mc1322x_syscalls.o
+export UNDEF += $(BINDIR)cpu/mc1322x_syscalls.o $(BINDIR)cpu/syscalls.o
 
 export USEMODULE += arm7_common

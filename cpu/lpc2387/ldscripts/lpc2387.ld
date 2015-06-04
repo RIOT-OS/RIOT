@@ -237,9 +237,9 @@ SECTIONS
     __heap1_size = ORIGIN(ram) + LENGTH(ram) - . - __stack_size;
     .heap1 (NOLOAD) :
     {
-        PROVIDE(__heap1_start = .);
+        PROVIDE(_sheap = .);
         . = . + __heap1_size;
-        PROVIDE(__heap1_max = .);
+        PROVIDE(_eheap = .);
     } > ram
 
     /*
