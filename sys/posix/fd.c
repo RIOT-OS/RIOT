@@ -21,9 +21,6 @@
 #include <string.h>
 
 #include "posix_io.h"
-#ifdef MODULE_UART0
-#include "board_uart0.h"
-#endif
 #include "unistd.h"
 
 #include "fd.h"
@@ -40,19 +37,6 @@ int fd_init(void)
 {
     memset(fd_table, 0, sizeof(fd_t) * FD_MAX);
 
-#ifdef MODULE_UART0
-    posix_open(uart0_handler_pid, 0);
-    fd_t fd = {
-        .internal_active = 1,
-        .internal_fd = (int)uart0_handler_pid,
-        .read = (ssize_t ( *)(int, void *, size_t))posix_read,
-        .write = (ssize_t ( *)(int, const void *, size_t))posix_write,
-        .close = posix_close
-    };
-    memcpy(&fd_table[STDIN_FILENO], &fd, sizeof(fd_t));
-    memcpy(&fd_table[STDOUT_FILENO], &fd, sizeof(fd_t));
-    memcpy(&fd_table[STDERR_FILENO], &fd, sizeof(fd_t));
-#endif
     return FD_MAX;
 }
 

@@ -205,10 +205,6 @@ ifneq (,$(filter newlib,$(USEMODULE)))
   USEMODULE += uart_stdio
 endif
 
-ifneq (,$(filter uart0,$(USEMODULE)))
-  USEMODULE += posix
-endif
-
 ifneq (,$(filter posix,$(USEMODULE)))
   USEMODULE += timex
   USEMODULE += vtimer
