@@ -30,7 +30,8 @@ OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 SUCH DAMAGE.
 '''
 
-import sys, re
+import sys
+import re
 from time import sleep, time
 from struct import pack
 from serial import Serial
@@ -42,7 +43,8 @@ MINOR = 4
 ZONE = 0
 SIG = 0
 SNAPLEN = 0xffff
-NETWORK = 230 # 802.15.4 no FCS
+NETWORK = 230       # 802.15.4 no FCS
+
 
 def configure_interface(port, channel):
     line = ""
@@ -54,7 +56,7 @@ def configure_interface(port, channel):
             print >> sys.stderr, "Application has no network interface defined"
             sys.exit(2)
         match = re.search(r'^Iface +(\d+)', line)
-        if match != None:
+        if match is not None:
             iface = int(match.group(1))
             break
 
@@ -65,6 +67,7 @@ def configure_interface(port, channel):
     port.write('ifconfig %d set chan %d\n' % (iface, channel))
     port.write('ifconfig %d raw\n' % iface)
     port.write('ifconfig %d promisc\n' % iface)
+
 
 def generate_pcap(port, out):
     # count incoming packets
@@ -96,9 +99,11 @@ def generate_pcap(port, out):
                     out.write(pack('<B', int(byte.group(1), 16)))
             out.flush()
 
+
 def main(argv):
     if len(argv) < 4:
-        print >> sys.stderr, "Usage: %s tty baudrate channel [outfile]" % (argv[0])
+        print >> sys.stderr, "Usage: %s tty baudrate channel [outfile]" % \
+            (argv[0])
         print >> sys.stderr, "       channel = 11-26"
         sys.exit(2)
 
@@ -126,6 +131,7 @@ def main(argv):
     except KeyboardInterrupt:
         print ""
         sys.exit(2)
+
 
 if __name__ == "__main__":
     main(sys.argv)
