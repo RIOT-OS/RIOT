@@ -385,7 +385,7 @@ int gpio_init_exti(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t c
     uint32_t mask;
     cc2538_gpio_t* instance;
 
-    /* Note: gpio_init_in() also checks if the gpio is enabled. */
+    /* Note: gpio_init() also checks if the gpio is enabled. */
     res = gpio_init(dev, GPIO_DIR_IN, pullup);
     if (res < 0) {
         return res;
