@@ -119,7 +119,7 @@ static int _send_data(ng_netdev_t *netdev, ng_pktsnip_t *pkt)
     }
 
     DEBUG("ng_netdev_eth: send %d bytes\n", to_send);
-#if MODULE_OD && defined(ENABLE_DEBUG)
+#if defined(MODULE_OD) && ENABLE_DEBUG
     od_hex_dump(send_buffer, to_send, OD_WIDTH_DEFAULT);
 #endif
 
