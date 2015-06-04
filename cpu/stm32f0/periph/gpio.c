@@ -223,23 +223,6 @@ int gpio_init(gpio_t dev, gpio_dir_t dir, gpio_pp_t pullup)
     return 0; /* all OK */
 }
 
-int gpio_init_in(gpio_t dev, gpio_pp_t pullup)
-{
-    GPIO_TypeDef *port;
-    uint8_t pin;
-
-    if (dev >= GPIO_NUMOF) {
-        return -1;
-    }
-
-    port = gpio_port_map[dev];
-    pin = gpio_pin_map[dev];
-
-    RCC->AHBENR |= (1 << gpio_clock_map[dev]);
-
-    return 0; /* everything alright here */
-}
-
 int gpio_init_exti(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb, void *arg)
 {
     int res;
