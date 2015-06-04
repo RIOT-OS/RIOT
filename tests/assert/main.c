@@ -25,7 +25,7 @@ int main(void)
 {
     printf("assert test app\n");
 
-    int i = 1;
+    volatile int i = 1;
 
     printf("testing positive assertion: (shouldn't print anything)\n");
 
