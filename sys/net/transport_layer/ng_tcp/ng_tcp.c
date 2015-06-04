@@ -76,9 +76,9 @@ extern "C" {
 int8_t ng_tcp_tcb_init(ng_tcp_tcb_t *tcb)
 {
     /* Clear Transmision Control Block */
-    tcb->state = CLOSED;               /* CLOSED: State before any connection occurs */
-    tcb->peer_addr = NULL;             /* Peer Address Unspecified */
-    tcb->peer_addr_len = 0;            /* Peer Address Length is zero */
+    tcb->state = CLOSED;           /* CLOSED: State before any connection occurs */
+    tcb->peer_addr = NULL;         /* Peer Address Unspecified */
+    tcb->peer_addr_len = 0;        /* Peer Address Length is zero */
     tcb->peer_port = PORT_UNSPEC;  /* Port 0: Reserved. Marks Unassigned Port */
     tcb->local_port = PORT_UNSPEC; /* Port 0: Reserved. Marks Unassigned Port */
 
@@ -99,10 +99,27 @@ int8_t ng_tcp_tcb_init(ng_tcp_tcb_t *tcb)
     /* Maximum Window Sizes */
     tcb->mss = 0;
 
+    /* Clear Buffers */
+    tcb->snd_buf = NULL;
+    tcb->snd_buf_size = 0;
+    tcb->rcv_buf = NULL;
+    tcb->rcv_buf_size = 0;
+
+    /* Clear Retransmission Queue and Timer */
+    for(uint8_t i=0; i < NG_TCP_RETRANSMIT_QUEUE_SIZE; i++){
+        tcb->ret_queue[i].no_of_retries = 0;
+        tcb->ret_queue[i].pkt = NULL;
+    }
+    tcb->ret_head = 0;
+    tcb->ret_size = NG_TCP_RETRANSMIT_QUEUE_SIZE;
+    tcb->ret_tout.seconds = 0;
+    tcb->ret_tout.microseconds = 0;
+
     /* Clear Timeout */
     tcb->timeout.seconds = 0;
     tcb->timeout.microseconds = 0;
 
+    /* Clear TCB List variables*/
     tcb->owner = thread_getpid();
     tcb->next = NULL;
 
@@ -118,6 +135,16 @@ int8_t ng_tcp_tcb_destroy(ng_tcp_tcb_t *tcb)
         return -EPERM;
     }
 
+    /* Release possibly existing retransmission queue entries */
+    for(uint8_t i=0; i < NG_TCP_RETRANSMIT_QUEUE_SIZE; i++){
+        if(tcb->ret_queue[i].pkt != NULL){
+            ng_pktbuf_release(ret_queue[i].pkt);
+            ret_queue[i].pkt = NULL;
+            ret_queue[i].no_of_retries = 0;
+        }
+    }
+
+    /* Remove this tcb from linked tcb list */
     _rem_tcb_from_list(tcb);
     return 0;
 }
@@ -174,11 +201,11 @@ int8_t ng_tcp_open(ng_tcp_tcb_t *tcb, uint16_t local_port, uint8_t *peer_addr,
     /* Wait till connection is established or closed or in close wait*/
     while(tcb->state != CLOSED && tcb->state != ESTABLISHED && tcb->state != CLOSE_WAIT){
         /* Wait for notification(state change or timer expired) */
-        res = vtimer_msg_receive_timeout(&msg, tcb->timeout);
+        res = vtimer_msg_receive_timeout(&msg, tcb->tout);
 
-        /* Timer expired: Event TIME_TIMEOUT happend */
+        /* Timer expired: Possibly packet loss -> retransmit */
         if(res < 0){
-            res = _fsm(tcb, NULL, TIME_TIMEOUT);
+            res = _fsm(tcb, NULL, TIME_RETRANSMIT);
         }
     }
 

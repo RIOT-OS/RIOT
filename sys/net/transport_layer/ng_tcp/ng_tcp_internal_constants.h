@@ -15,6 +15,7 @@ typedef enum {
     CALL_ABORT,
     RCVD_PKT,
     TIME_TIMEOUT,
+    TIME_RETRANSMIT,
     TIME_USERTIMEOUT
 } ng_tcp_event_t;
 

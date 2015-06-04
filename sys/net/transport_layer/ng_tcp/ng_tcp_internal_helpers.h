@@ -428,15 +428,6 @@ static bool _is_seq_num_acceptable(ng_tcp_tcb_t *tcb, uint32_t snum, uint32_t sl
     return false;
 }
 
-static bool _is_ack_num_acceptable(ng_tcp_tcb_t *tcb, uint32_t anum)
-{
-    // TODO: Overflow checking
-    if(tcb->snd_una < anum && anum <= tcb->snd_nxt){
-        return true;
-    }
-    return false;
-}
-
 static uint32_t _get_seg_len(ng_pktsnip_t *pkt)
 {
     uint32_t seg_len = 0;
@@ -477,4 +468,47 @@ static ng_tcp_tcb_t* _search_tcb_of_owner(kernel_pid_t owner)
         ptr = (ng_tcp_tcb_t *) ptr->next;
     }
     return ptr;
+}
+
+static void _send_pkt(ng_tcp_tcb_t* tcb, ng_pktsnip_t* pkt)
+{
+    ng_tcp_queue_entry_t* entry = NULL;
+
+    /* Check if Paket is already in the transmission queue */
+    for(int i=0; i<NG_TCP_RETRANSMIT_QUEUE_SIZE; i++){
+        if(tcb->ret_queue[i].pkt == pkt){
+            entry = &(ret_queue[i]);
+            entry->no_of_retries += 1;
+            break;
+        }
+    }
+
+    /* If not, try to add it */
+    if(entry == NULL){
+        /* If the queue is full: release pkt */
+        if(tcb->size == 0){
+            ng_pktbuf_release(pkt);
+            DEBUG("_send_pkt: Retransmit Queue is full, release pkt");
+            return;
+        }
+
+        /* Add it to queue. Increase users to make it persistent */
+
+    }
+
+    /* Calculate new timer */
+
+    /* signal user, not in case of a retransmit */
+
+    /* Send pkt */
+    ng_netapi_send(_tcp_pid, pkt);
+}
+
+static void _ack_pkt(uint32_t ack)
+{
+    /* Remove pakets from retransmission queue */
+
+    /* Setup Retransmission Timer */
+
+    /* Signal User */
 }
