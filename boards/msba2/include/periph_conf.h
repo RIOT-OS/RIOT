@@ -51,6 +51,12 @@ extern "C" {
  */
 #define RTC_NUMOF           (1)
 
+/**
+ * @brief uart configuration
+ */
+#define UART_NUMOF          (1)
+#define UART_0_EN           (1)
+
 #ifdef __cplusplus
 }
 #endif

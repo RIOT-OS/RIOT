@@ -49,6 +49,15 @@ extern "C" {
 #define SYSLOG_CONF_NUM_INTERFACES        1
 #endif
 
+/**
+ * @name Define UART device and baudrate for stdio
+ * @{
+ */
+#define STDIO               UART_0
+#define STDIO_BAUDRATE      (115200U)
+#define STDIO_RX_BUFSIZE    (64U)
+/** @} */
+
 void init_clks1(void);
 
 #ifdef __cplusplus
