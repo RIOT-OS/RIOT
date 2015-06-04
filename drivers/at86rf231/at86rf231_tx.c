@@ -15,6 +15,7 @@
  *
  * @author      Alaeddine Weslati <alaeddine.weslati@inria.fr>
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
+ * @author      Kévin Roussel <Kevin.Roussel@inria.fr>
  *
  * @}
  */
@@ -27,7 +28,9 @@
 #define ENABLE_DEBUG (1)
 #include "debug.h"
 
-#define _MAX_RETRIES   (100)
+#define _MAX_RETRIES            (100)
+#define TX_END_TEST_INTERVAL_uS (200)
+
 
 static int16_t at86rf231_load(at86rf231_packet_t *packet);
 static void at86rf231_gen_pkt(uint8_t *buf, at86rf231_packet_t *packet);
@@ -36,6 +39,10 @@ static uint8_t sequence_nr;
 static uint8_t wait_for_ack;
 
 static uint8_t txpkt[AT86RF231_MAX_PKT_LENGTH + 1];
+
+
+/* IRQ handler, forcibly called to handle any pending interrupt */
+extern void at86rf231_irq(void);
 
 
 //******
@@ -178,15 +185,17 @@ netdev_802154_tx_status_t at86rf231_send_direct(
     netdev_802154_tx_status_t res =
            at86rf231_change_mode(AT86RF231_TRX_STATE__FORCE_TRX_OFF);
     if (res != NETDEV_802154_TX_STATUS_OK) {
-        core_panic(0x0231,
-                   "at86rf231 (TX) : ERROR : could not force TRX_OFF mode");
+        printf("at86rf231 (TX) : ERROR : could not force TRX_OFF mode.\n");
+        at86rf231_print_status();
+        return NETDEV_802154_TX_STATUS_ERROR;
     }
 
     /* ...then go into TX_ARET_ON state if ACKnowledgement is needed */
     res = at86rf231_change_mode(AT86RF231_TRX_STATE__TX_ARET_ON);
     if (res != NETDEV_802154_TX_STATUS_OK) {
-        core_panic(0x0231,
-                   "at86rf231 (TX) : ERROR : could not enter TX_ARET_ON mode");
+        printf("at86rf231 (TX) : ERROR : could not enter TX_ARET_ON mode.\n");
+        at86rf231_print_status();
+        return NETDEV_802154_TX_STATUS_ERROR;
     }
 
 #if ENABLE_DEBUG
@@ -202,8 +211,9 @@ netdev_802154_tx_status_t at86rf231_send_direct(
     DEBUG("at86rf231: Starting TX...\n");
     res = at86rf231_change_mode(AT86RF231_TRX_STATE__TX_START);
     if (res != NETDEV_802154_TX_STATUS_OK) {
-        core_panic(0x0231,
-                   "at86rf231 (TX) : ERROR : could not start TX");
+        printf("at86rf231 (TX) : ERROR : could not start TX.\n");
+        at86rf231_print_status();
+        return NETDEV_802154_TX_STATUS_ERROR;
     }
 //    gpio_set(AT86RF231_SLEEP);
     /* wait for TX to actually begin */
@@ -221,10 +231,23 @@ netdev_802154_tx_status_t at86rf231_send_direct(
         return NETDEV_802154_TX_STATUS_OK;
     }
 
+    /* wait for TX to finish */
+    int countdown = _MAX_RETRIES;
+    do {
+        hwtimer_wait(HWTIMER_TICKS(TX_END_TEST_INTERVAL_uS) + 1);
+        at86rf231_irq();
+        if (!--countdown) {
+            printf("at86rf231 (TX) : ERROR : could not exit from TX mode!\n");
+            at86rf231_print_status();
+            return NETDEV_802154_TX_STATUS_ERROR;
+        }
+    } while (driver_state == AT_DRIVER_STATE_SENDING);
+
+    /* get TX outcome */
     uint8_t trac_status;
     do {
         trac_status = at86rf231_reg_read(AT86RF231_REG__TRX_STATE);
-        trac_status &= AT86RF231_TRX_STATE_MASK__TRAC;
+        trac_status &= AT86RF231_TRX_STATE_MASK__TRAC_STATUS;
     }
     while (trac_status == AT86RF231_TRX_STATE__TRAC_INVALID);
 
@@ -238,7 +261,6 @@ netdev_802154_tx_status_t at86rf231_send_direct(
         default:
             return NETDEV_802154_TX_STATUS_OK;
     }
-
 }
 
 //******
@@ -447,7 +469,7 @@ netdev_802154_tx_status_t at86rf231_transmit_tx_buf(netdev_t *dev)
     uint8_t trac_status;
     do {
         trac_status = at86rf231_reg_read(AT86RF231_REG__TRX_STATE);
-        trac_status &= AT86RF231_TRX_STATE_MASK__TRAC;
+        trac_status &= AT86RF231_TRX_STATE_MASK__TRAC_STATUS;
     }
     while (trac_status == AT86RF231_TRX_STATE__TRAC_INVALID);
 

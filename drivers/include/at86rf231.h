@@ -104,8 +104,10 @@ extern netdev_t at86rf231_netdev;   /**< netdev representation of this driver */
  * @brief States to be assigned to `driver_state`
  * @{
  */
-#define AT_DRIVER_STATE_DEFAULT     (0)
-#define AT_DRIVER_STATE_SENDING     (1)
+typedef enum {
+    AT_DRIVER_STATE_DEFAULT = 0,
+    AT_DRIVER_STATE_SENDING
+} driver_state_t;
 /** @} */
 
 /**
@@ -114,7 +116,7 @@ extern netdev_t at86rf231_netdev;   /**< netdev representation of this driver */
  *          the radio transceiver has to be interpreted as end of
  *          sending or reception.
  */
-extern uint8_t driver_state;
+extern volatile driver_state_t driver_state;
 
 /**
  * @brief Initialize the at86rf231 transceiver
@@ -498,6 +500,12 @@ uint8_t at86rf231_get_trac_status(void);
  *       the wanted mode (for an unknown reason).
  */
 netdev_802154_tx_status_t at86rf231_change_mode(uint8_t target_mode);
+
+/**
+ * This function prints the complete current status of the radio transceiver
+ * (it is useful mainly for debugging the radio driver).
+ */
+void at86rf231_print_status(void);
 
 
 /**
