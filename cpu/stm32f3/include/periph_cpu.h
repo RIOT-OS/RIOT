@@ -27,7 +27,7 @@ extern "C" {
  * @brief   Overwrite the default gpio_t type definition
  * @{
  */
-#define OVRD_GPIO_T
+#define HAVE_GPIO_T
 typedef uint32_t gpio_t;
 /** @} */
 
