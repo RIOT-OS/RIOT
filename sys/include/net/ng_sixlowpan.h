@@ -78,6 +78,14 @@ static inline bool ng_sixlowpan_nalp(uint8_t disp)
  */
 kernel_pid_t ng_sixlowpan_init(void);
 
+/**
+ * @brief   Prints 6LoWPAN dispatch to stdout.
+ *
+ * @param[in] data  A 6LoWPAN frame.
+ * @param[in] size  Size of @p data.
+ */
+void ng_sixlowpan_print(uint8_t *data, size_t size);
+
 #ifdef __cplusplus
 }
 #endif
