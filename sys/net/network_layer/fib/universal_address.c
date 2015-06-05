@@ -168,19 +168,19 @@ uint8_t* universal_address_get_address(universal_address_container_t *entry,
 }
 
 int universal_address_compare(universal_address_container_t *entry,
-                              uint8_t *addr, size_t *addr_size)
+                              uint8_t *addr, size_t *addr_size_in_bits)
 {
     mutex_lock(&mtx_access);
 
     int ret = -ENOENT;
 
     /* If we have distinct sizes, the addresses are probably not comperable */
-    if (entry->address_size != *addr_size) {
+    if ((size_t)(entry->address_size<<3) != *addr_size_in_bits) {
         mutex_unlock(&mtx_access);
         return ret;
     }
 
-    /* Get the index of the first trailing `0` (indicates a network prefix) */
+    /* Get the index of the first trailing `0` (indicates a prefix) */
     int i = 0;
     for( i = entry->address_size-1; i >= 0; --i) {
         if( entry->address[i] != 0 ) {
@@ -188,9 +188,80 @@ int universal_address_compare(universal_address_container_t *entry,
         }
     }
 
-    if( memcmp(entry->address, addr, i+1) == 0 ) {
-        ret = 0;
-        *addr_size = i+1;
+    if( memcmp(entry->address, addr, i) == 0 ) {
+        /* if the bytes-1 equals we check the bits of the lowest byte */
+        uint8_t bitmask = 0x00;
+        uint8_t j = 0;
+        /* get a bitmask for the trailing 0b */
+        for( ; j < 8; ++j ) {
+            if ( (entry->address[i] >> j) & 0x01 ) {
+                bitmask = 0xff << j;
+                break;
+            }
+        }
+        if( (entry->address[i] & bitmask) == (addr[i] & bitmask) ) {
+            ret = entry->address[i] != addr[i];
+            *addr_size_in_bits = (i<<3) + j;
+            if( ret == 0 ) {
+                /* check if the remaining bits from addr are significant */
+                i++;
+                for(; i < entry->address_size; ++i) {
+                    if( addr[i] != 0 ) {
+                        ret = 1;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    mutex_unlock(&mtx_access);
+    return ret;
+}
+
+int universal_address_compare_prefix(universal_address_container_t *entry,
+                              uint8_t *prefix, size_t prefix_size_in_bits)
+{
+    mutex_lock(&mtx_access);
+    int ret = -ENOENT;
+    /* If we have distinct sizes, the prefix is not comperable */
+    if ((size_t)(entry->address_size<<3) != prefix_size_in_bits) {
+        mutex_unlock(&mtx_access);
+        return ret;
+    }
+
+    /* Get the index of the first trailing `0` */
+    int i = 0;
+    for( i = entry->address_size-1; i >= 0; --i) {
+        if( prefix[i] != 0 ) {
+            break;
+        }
+    }
+
+    if( memcmp(entry->address, prefix, i) == 0 ) {
+        /* if the bytes-1 equals we check the bits of the lowest byte */
+        uint8_t bitmask = 0x00;
+        /* get a bitmask for the trailing 0b */
+        for( uint8_t j = 0; j < 8; ++j ) {
+            if ( (prefix[i] >> j) & 0x01 ) {
+                bitmask = 0xff << j;
+                break;
+            }
+        }
+
+        if( (entry->address[i] & bitmask) == (prefix[i] & bitmask) ) {
+            ret = entry->address[i] != prefix[i];
+            if( ret == 0 ) {
+                /* check if the remaining bits from entry are significant */
+                i++;
+                for(; i < entry->address_size; ++i) {
+                    if( entry->address[i] != 0 ) {
+                        ret = 1;
+                        break;
+                    }
+                }
+            }
+        }
     }
 
     mutex_unlock(&mtx_access);

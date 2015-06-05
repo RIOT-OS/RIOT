@@ -82,19 +82,43 @@ uint8_t* universal_address_get_address(universal_address_container_t *entry,
 
 /**
  * @brief determines if the entry equals the provided address
+ *        This function requires to be provided with the full size of the used
+ *        address type behind *addr to be compareable with the address stored in *entry.
  *
  * @param[in] entry       pointer to the universal_address_container_t for compare
  * @param[in] addr        pointer to the address for compare
- * @param[in, out] addr_size   the number of bytes used for the address entry
- *                             on sucessfull return this value is overwritten
- *                             with the number of matching bytes till the
- *                             first of trailing `0`s indicating a prefix
+ * @param[in, out] addr_size_in_bits  the number of bits  used for the address entry
+ *                                    on sucessfull return this value is overwritten
+ *                                    with the number of matching bits till the
+ *                                    first of trailing `0`s
  *
- * @return 0 if the entries are equal or comperable
+ * @return 0 if the entries are equal
+ *         1 if the entry match to a certain prefix (trailing '0's in *entry)
  *         -ENOENT if the given adresses do not match
  */
 int universal_address_compare(universal_address_container_t *entry,
-                              uint8_t *addr, size_t *addr_size);
+                              uint8_t *addr, size_t *addr_size_in_bits);
+
+
+/**
+* @brief determines if the entry equals the provided prefix
+*        This function requires to be provided with the full size of the used
+*        address type behind *prefix to be compareable with the address stored in *entry.
+*
+*
+* @param[in] entry       pointer to the universal_address_container_t for compare
+* @param[in] prefix      pointer to the address for compare
+* @param[in] prefix_size_in_bits the number of bits used for the prefix entry.
+*                                This size MUST be the full address size including trailing '0's,
+*                                e.g. for an ng_ipv6_addr_t it would be sizeof(ng_ipv6_addr_t)
+*                                regardless if the stored prefix is < ::/128
+*
+* @return 0 if the entries are equal
+*         1 if the entry match to a certain prefix (trailing '0's in *prefix)
+*         -ENOENT if the given adresses do not match
+*/
+int universal_address_compare_prefix(universal_address_container_t *entry,
+                            uint8_t *prefix, size_t prefix_size_in_bits);
 
 /**
  * @brief Prints the content of the given entry
