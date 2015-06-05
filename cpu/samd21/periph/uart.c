@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Freie Universität Berlin
+ * Copyright (C) 2015 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -15,6 +15,7 @@
  *
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  * @author      Troels Hoffmeyer <troels.d.hoffmeyer@gmail.com>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
  * @}
  */
@@ -53,8 +54,6 @@ static inline void irq_handler(uart_t uartnum, SercomUsart *uart);
  */
 static uart_conf_t uart_config[UART_NUMOF];
 
-static uint64_t _long_division(uint64_t n, uint64_t d);
-
 int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, uart_tx_cb_t tx_cb, void *arg)
 {
     /* initialize basic functionality */
@@ -81,11 +80,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, uart_tx_cb_t t
 
 int uart_init_blocking(uart_t uart, uint32_t baudrate)
 {
-    /* Calculate the BAUD value */
-    uint64_t temp1 = ((16 * ((uint64_t)baudrate)) << 32);
-    uint64_t ratio = _long_division(temp1 , UART_0_REF_F);
-    uint64_t scale = ((uint64_t)1 << 32) - ratio;
-    uint64_t baud_calculated = (65536 * scale) >> 32;
+    uint32_t baud =  ((((uint32_t)CLOCK_CORECLOCK * 10) / baudrate) / 16);
 
     switch (uart) {
 #if UART_0_EN
@@ -95,9 +90,6 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
 
             /* configure GCLK0 to feed sercom0 */;
             GCLK->CLKCTRL.reg = (uint16_t)((GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN_GCLK0 | (SERCOM0_GCLK_ID_CORE << GCLK_CLKCTRL_ID_Pos)));
-            while (GCLK->STATUS.bit.SYNCBUSY);
-
-            GCLK->CLKCTRL.reg = (uint16_t)((GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN_GCLK0 | (SERCOM0_GCLK_ID_SLOW << GCLK_CLKCTRL_ID_Pos)));
             while (GCLK->STATUS.bit.SYNCBUSY);
 
             /* configure PINS to input/output*/
@@ -117,20 +109,17 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
             /* set to LSB, asynchronous mode without parity, PAD0 Tx, PAD1 Rx,
              * 16x over-sampling, internal clk */
             UART_0_DEV.CTRLA.reg = SERCOM_USART_CTRLA_DORD \
-                                    | SERCOM_USART_CTRLA_FORM(0x0) \
-                                    | SERCOM_USART_CTRLA_SAMPA(0x0) \
-                                    | SERCOM_USART_CTRLA_TXPO(0x0) \
                                     | SERCOM_USART_CTRLA_RXPO(0x1) \
-                                    | SERCOM_USART_CTRLA_SAMPR(0x0) \
+                                    | SERCOM_USART_CTRLA_SAMPR(0x1) \
                                     | SERCOM_USART_CTRLA_MODE_USART_INT_CLK;
 
-            /* Set baud rate */
-            UART_0_DEV.BAUD.bit.BAUD = baud_calculated;
+
+            UART_0_DEV.BAUD.FRAC.FP = (baud % 10);
+            UART_0_DEV.BAUD.FRAC.BAUD = (baud / 10);
 
             /* enable receiver and transmitter, one stop bit*/
             UART_0_DEV.CTRLB.reg = (SERCOM_USART_CTRLB_RXEN | SERCOM_USART_CTRLB_TXEN);
             while(UART_0_DEV.SYNCBUSY.bit.CTRLB);
-
             break;
 #endif
     }
@@ -224,31 +213,6 @@ static inline void irq_handler(uint8_t uartnum, SercomUsart *dev)
     if (sched_context_switch_request) {
         thread_yield();
     }
-}
-
-
-
-
-static uint64_t _long_division(uint64_t n, uint64_t d)
-{
-    int32_t i;
-    uint64_t q = 0, r = 0, bit_shift;
-    for (i = 63; i >= 0; i--) {
-        bit_shift = (uint64_t)1 << i;
-
-        r = r << 1;
-
-        if (n & bit_shift) {
-            r |= 0x01;
-        }
-
-        if (r >= d) {
-            r = r - d;
-            q |= bit_shift;
-        }
-    }
-
-    return q;
 }
 
 #endif /* UART_NUMOF */
