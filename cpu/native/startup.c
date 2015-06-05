@@ -374,7 +374,7 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
 #endif
 #ifdef MODULE_NG_NATIVENET
 # ifdef MODULE_NATIVENET
-#  error  "Modules nativenet and ng_native are mutually exclusive."
+#  error  "Modules nativenet and ng_nativenet are mutually exclusive."
 # endif
     dev_eth_tap_setup(&dev_eth_tap, argv[1]);
 #endif
