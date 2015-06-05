@@ -29,6 +29,7 @@
 #include "net/ng_netbase.h"
 #include "net/ng_ipv6/addr.h"
 #include "net/ng_ipv6/hdr.h"
+#include "net/ng_udp.h"
 #include "od.h"
 
 /**
@@ -78,6 +79,7 @@ static void _dump_snip(ng_pktsnip_t *pkt)
 #ifdef MODULE_NG_UDP
         case NG_NETTYPE_UDP:
             printf("NETTYPE_UDP (%i)\n", pkt->type);
+            ng_udp_hdr_print(pkt->data);
             break;
 #endif
 #ifdef TEST_SUITES

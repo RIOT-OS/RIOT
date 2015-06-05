@@ -93,6 +93,13 @@ ng_pktsnip_t *ng_udp_hdr_build(ng_pktsnip_t *payload,
                                uint8_t *dst, size_t dst_len);
 
 /**
+ * @brief   Print the given UDP header to STDOUT
+ *
+ * @param[in] hdr           UDP header to print
+ */
+void ng_udp_hdr_print(ng_udp_hdr_t *hdr);
+
+/**
  * @brief   Initialize and start UDP
  *
  * @return  PID of the UDP thread
