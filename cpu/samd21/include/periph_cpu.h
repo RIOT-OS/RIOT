@@ -27,7 +27,7 @@ extern "C" {
  * @brief   Define mandatory GPIO types for NRF51822 CPUs
  * @{
  */
-#define OVRD_GPIO_T
+#define HAVE_GPIO_T
 typedef uint32_t gpio_t;
 /** @} */
 
