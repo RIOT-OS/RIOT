@@ -37,14 +37,14 @@ extern "C" {
 /**
  * @brief   Define the default GPIO type identifier
  */
-#ifndef OVRD_GPIO_T
+#ifndef HAVE_GPIO_T
 typedef int gpio_t;
 #endif
 
 /**
  * @brief   Definition of available pin directions
  */
-#ifndef OVRD_GPIO_DIR_T
+#ifndef HAVE_GPIO_DIR_T
 typedef enum {
     GPIO_DIR_IN = 0,        /**< configure pin as input */
     GPIO_DIR_OUT = 1,       /**< configure pin as output */
@@ -54,7 +54,7 @@ typedef enum {
 /**
  * @brief   Definition of pull-up/pull-down modes
  */
-#ifndef OVRD_GPIO_PP_T
+#ifndef HAVE_GPIO_PP_T
 typedef enum {
     GPIO_NOPULL = 0,        /**< do not use internal pull resistors */
     GPIO_PULLUP = 1,        /**< enable internal pull-up resistor */
@@ -65,7 +65,7 @@ typedef enum {
 /**
  * @brief   Definition of possible active flanks for external interrupt mode
  */
-#ifndef OVRD_GPIO_FLANK_T
+#ifndef HAVE_GPIO_FLANK_T
 typedef enum {
     GPIO_FALLING = 0,       /**< emit interrupt on falling flank */
     GPIO_RISING = 1,        /**< emit interrupt on rising flank */
