@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 '''
 (C) 2012, Mariano Alvira <mar@devl.org>
 (C) 2014, Oliver Hahm <oliver.hahm@inria.fr>
@@ -30,6 +30,7 @@ OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 SUCH DAMAGE.
 '''
 
+from __future__ import print_function
 import sys
 import re
 from time import sleep, time
@@ -49,24 +50,25 @@ NETWORK = 230       # 802.15.4 no FCS
 def configure_interface(port, channel):
     line = ""
     iface = 0
-    port.write('ifconfig\n')
+    port.write(b'ifconfig\n')
     while True:
         line = port.readline()
         if line == '':
-            print >> sys.stderr, "Application has no network interface defined"
+            print("Application has no network interface defined",
+                  file=sys.stderr)
             sys.exit(2)
-        match = re.search(r'^Iface +(\d+)', line)
+        match = re.search(r'^Iface +(\d+)', line.decode())
         if match is not None:
             iface = int(match.group(1))
             break
 
     # set channel, raw mode, and promiscuous mode
-    print >> sys.stderr, 'ifconfig %d set chan %d' % (iface, channel)
-    print >> sys.stderr, 'ifconfig %d raw' % iface
-    print >> sys.stderr, 'ifconfig %d promisc' % iface
-    port.write('ifconfig %d set chan %d\n' % (iface, channel))
-    port.write('ifconfig %d raw\n' % iface)
-    port.write('ifconfig %d promisc\n' % iface)
+    print('ifconfig %d set chan %d' % (iface, channel), file=sys.stderr)
+    print('ifconfig %d raw' % iface, file=sys.stderr)
+    print('ifconfig %d promisc' % iface, file=sys.stderr)
+    port.write(('ifconfig %d set chan %d\n' % (iface, channel)).encode())
+    port.write(('ifconfig %d raw\n' % iface).encode())
+    port.write(('ifconfig %d promisc\n' % iface).encode())
 
 
 def generate_pcap(port, out):
@@ -79,11 +81,12 @@ def generate_pcap(port, out):
     while True:
         line = port.readline().rstrip()
 
-        pkt_header = re.match(r">? *rftest-rx --- len 0x(\w\w).*", line)
+        pkt_header = re.match(r">? *rftest-rx --- len 0x(\w\w).*",
+                              line.decode())
         if pkt_header:
             now = time()
             sec = int(now)
-            usec = (now - sec) * 100000
+            usec = (int(now) - sec) * 100000
             length = int(pkt_header.group(1), 16)
             out.write(pack('<LLLL', sec, usec, length, length))
             out.flush()
@@ -91,9 +94,9 @@ def generate_pcap(port, out):
             sys.stderr.write("RX: %i\r" % count)
             continue
 
-        pkt_data = re.match(r"(0x\w\w )+", line)
+        pkt_data = re.match(r"(0x\w\w )+", line.decode())
         if pkt_data:
-            for part in line.split(' '):
+            for part in line.decode().split(' '):
                 byte = re.match(r"0x(\w\w)", part)
                 if byte:
                     out.write(pack('<B', int(byte.group(1), 16)))
@@ -102,9 +105,9 @@ def generate_pcap(port, out):
 
 def main(argv):
     if len(argv) < 4:
-        print >> sys.stderr, "Usage: %s tty baudrate channel [outfile]" % \
-            (argv[0])
-        print >> sys.stderr, "       channel = 11-26"
+        print("Usage: %s tty baudrate channel [outfile]" % (argv[0]),
+              file=sys.stderr)
+        print("       channel = 11-26", file=sys.stderr)
         sys.exit(2)
 
     # open serial port
@@ -112,7 +115,7 @@ def main(argv):
         serport = Serial(argv[1], argv[2], dsrdtr=0, rtscts=0,
                          timeout=1)
     except IOError:
-        print >> sys.stderr, "error opening port"
+        print("error opening port", file=sys.stderr)
         sys.exit(2)
 
     sleep(1)
@@ -124,12 +127,15 @@ def main(argv):
         sys.stderr.write('trying to open file %s\n' % argv[4])
         outfile = open(argv[4], 'w+b')
     except IndexError:
-        outfile = sys.stdout
+        if sys.version > (3,):
+            outfile = sys.stdout.buffer
+        else:
+            outfile = sys.stdout
 
     try:
         generate_pcap(serport, outfile)
     except KeyboardInterrupt:
-        print ""
+        print()
         sys.exit(2)
 
 
