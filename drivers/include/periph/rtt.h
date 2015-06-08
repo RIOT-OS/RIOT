@@ -32,6 +32,39 @@ extern "C" {
 /* guard file in case no RTT device was specified */
 #if RTT_NUMOF
 
+#ifndef RTT_FREQUENCY
+#warning "RTT_FREQUENCY undefined. Set RTT_FREQUENCY to the number of ticks" \
+         "per second for the current architecture."
+#endif
+
+/**
+ * @brief       Convert microseconds to rtt ticks
+ * @param[in]   us number of microseconds
+ * @return      rtt ticks
+ */
+#define RTT_US_TO_TICKS(us)     ((uint32_t)((uint64_t)(us) * RTT_FREQUENCY / 1000000UL))
+
+/**
+ * @brief       Convert milliseconds to rtt ticks
+ * @param[in]   ms number of milliseconds
+ * @return      rtt ticks
+ */
+#define RTT_MS_TO_TICKS(ms)     ( RTT_US_TO_TICKS((ms) * 1000) )
+
+/**
+ * @brief       Convert seconds to rtt ticks
+ * @param[in]   sec number of seconds
+ * @return      rtt ticks
+ */
+#define RTT_SEC_TO_TICKS(sec)   ( RTT_MS_TO_TICKS((sec) * 1000) )
+
+/**
+ * @brief       Convert minutes to rtt ticks
+ * @param[in]   min number of minutes
+ * @return      rtt ticks
+ */
+#define RTT_MIN_TO_TICKS(min)   ( RTT_SEC_TO_TICKS((min) * 60) )
+
 /**
  * @brief Signature for the alarm callback
  *
