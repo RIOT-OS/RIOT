@@ -46,7 +46,8 @@ typedef struct {
  */
 typedef enum {
     DHT11,                  /**< DHT11 device identifier */
-    DHT22                   /**< DHT22 device identifier */
+    DHT22,                  /**< DHT22 device identifier */
+    DHT21 = DHT22           /**< DHT21 device identifier */
 } dht_type_t;
 
 /**
