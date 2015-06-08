@@ -116,8 +116,8 @@ void rtt_set_overflow_cb(rtt_cb_t cb, void *arg)
 
     /* Enable Overflow Interrupt and clear flag */
     RtcMode0 *rtcMode0 = &(RTT_DEV);
-    rtcMode0->INTENSET.bit.OVF = 1;
     rtcMode0->INTFLAG.bit.OVF = 1;
+    rtcMode0->INTENSET.bit.OVF = 1;
 }
 
 void rtt_clear_overflow_cb(void)
@@ -154,8 +154,8 @@ void rtt_set_alarm(uint32_t alarm, rtt_cb_t cb, void *arg)
     while (rtcMode0->STATUS.bit.SYNCBUSY);
 
     /* Enable Compare Interrupt and clear flag */
-    rtcMode0->INTENSET.bit.CMP0 = 1;
     rtcMode0->INTFLAG.bit.CMP0 = 1;
+    rtcMode0->INTENSET.bit.CMP0 = 1;
 }
 
 void rtt_clear_alarm(void)
