@@ -85,6 +85,19 @@ static inline bool bf_isset(uint8_t field[], size_t idx)
     return (field[idx / 8] & (1u << (idx % 8)));
 }
 
+/**
+ * @brief  Atomically get the number of an unset bit and set it
+ *
+ * This function can be used to record e.g., empty entries in an array.
+ *
+ * @param[in,out] field The bitfield
+ * @param[in]     size  The size of the bitfield
+ *
+ * @return      number of bit that was set
+ * @return      -1 if no bit was unset
+ */
+int bf_get_unset(uint8_t field[], int size);
+
 #ifdef __cplusplus
 }
 #endif
