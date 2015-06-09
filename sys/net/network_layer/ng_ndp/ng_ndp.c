@@ -15,6 +15,7 @@
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 
+#include <errno.h>
 #include <string.h>
 
 #include "byteorder.h"
@@ -52,10 +53,9 @@ static inline uint32_t _rand(uint32_t min, uint32_t max)
 static bool _handle_sl2a_opt(kernel_pid_t iface, ng_pktsnip_t *pkt,
                              ng_ipv6_hdr_t *ipv6, uint8_t icmpv6_type,
                              ng_ndp_opt_t *sl2a_opt);
-static bool _handle_tl2a_opt(kernel_pid_t iface, ng_pktsnip_t *pkt,
-                             ng_ipv6_hdr_t *ipv6, uint8_t icmpv6_type,
-                             ng_ndp_opt_t *tl2a_opt, ng_ipv6_addr_t *tgt,
-                             uint8_t adv_flags);
+static int _handle_tl2a_opt(ng_pktsnip_t *pkt, ng_ipv6_hdr_t *ipv6,
+                            uint8_t icmpv6_type, ng_ndp_opt_t *tl2a_opt,
+                            uint8_t *l2addr);
 
 /* send address resolution messages */
 static void _send_nbr_sol(kernel_pid_t iface, ng_ipv6_addr_t *tgt,
@@ -130,14 +130,24 @@ void ng_ndp_nbr_sol_handle(kernel_pid_t iface, ng_pktsnip_t *pkt,
     return;
 }
 
+static inline bool _pkt_has_l2addr(ng_netif_hdr_t *netif_hdr)
+{
+    return (netif_hdr != NULL) && (netif_hdr->src_l2addr_len != 0) &&
+           (netif_hdr->dst_l2addr_len != 0);
+}
+
 void ng_ndp_nbr_adv_handle(kernel_pid_t iface, ng_pktsnip_t *pkt,
                            ng_ipv6_hdr_t *ipv6, ng_ndp_nbr_adv_t *nbr_adv,
                            size_t icmpv6_size)
 {
     uint16_t opt_offset = 0;
     uint8_t *buf = ((uint8_t *)nbr_adv) + sizeof(ng_ndp_nbr_adv_t);
-    bool tl2a_supplied = false;
+    int l2tgt_len = 0;
+    uint8_t l2tgt[NG_IPV6_NC_L2_ADDR_MAX];
     int sicmpv6_size = (int)icmpv6_size;
+    ng_ipv6_nc_t *nc_entry = ng_ipv6_nc_get(iface, &nbr_adv->tgt);
+    ng_pktsnip_t *netif;
+    ng_netif_hdr_t *netif_hdr = NULL;
 
     /* check validity */
     if ((ipv6->hl != 255) || (nbr_adv->code != 0) ||
@@ -148,12 +158,12 @@ void ng_ndp_nbr_adv_handle(kernel_pid_t iface, ng_pktsnip_t *pkt,
         return;
     }
 
-    if (ng_ipv6_nc_get(iface, &nbr_adv->tgt) == NULL) {
+    if (nc_entry == NULL) {
+        /* see https://tools.ietf.org/html/rfc4861#section-7.2.5 */
         DEBUG("ndp: no neighbor cache entry found for advertisement's target\n");
         /* ipv6 releases */
         return;
     }
-
 
     sicmpv6_size -= sizeof(ng_ndp_nbr_adv_t);
 
@@ -162,13 +172,11 @@ void ng_ndp_nbr_adv_handle(kernel_pid_t iface, ng_pktsnip_t *pkt,
 
         switch (opt->type) {
             case NG_NDP_OPT_TL2A:
-                if (!_handle_tl2a_opt(iface, pkt, ipv6, nbr_adv->type, opt,
-                                      &nbr_adv->tgt, nbr_adv->flags)) {
+                if ((l2tgt_len = _handle_tl2a_opt(pkt, ipv6, nbr_adv->type, opt,
+                                                  l2tgt)) < 0) {
                     /* invalid target link-layer address option */
                     return;
                 }
-
-                tl2a_supplied = true;
 
                 break;
 
@@ -181,17 +189,87 @@ void ng_ndp_nbr_adv_handle(kernel_pid_t iface, ng_pktsnip_t *pkt,
         sicmpv6_size -= (opt->len * 8);
     }
 
-    if (!tl2a_supplied) {
-        if (nbr_adv->flags & NG_NDP_NBR_ADV_FLAGS_O) {
-            ng_ipv6_nc_t *nc_entry = ng_ipv6_nc_get(iface, &nbr_adv->tgt);
+    LL_SEARCH_SCALAR(pkt, netif, type, NG_NETTYPE_NETIF);
 
-            if (nc_entry != NULL) {
-                if (nbr_adv->flags & NG_NDP_NBR_ADV_FLAGS_S) {
-                    _set_state(nc_entry, NG_IPV6_NC_STATE_REACHABLE);
-                }
-                else {
-                    _set_state(nc_entry, NG_IPV6_NC_STATE_STALE);
-                }
+    if (netif != NULL) {
+        netif_hdr = netif->data;
+    }
+
+    if (ng_ipv6_nc_get_state(nc_entry) == NG_IPV6_NC_STATE_INCOMPLETE) {
+        ng_pktqueue_node_t *queued_pkt;
+
+        if (_pkt_has_l2addr(netif_hdr) && (l2tgt_len == 0)) {
+            /* link-layer has addresses, but no TLLAO supplied: discard silently
+             * (see https://tools.ietf.org/html/rfc4861#section-7.2.5) */
+            return;
+        }
+
+        nc_entry->iface = iface;
+        nc_entry->l2_addr_len = l2tgt_len;
+        memcpy(nc_entry->l2_addr, l2tgt, l2tgt_len);
+
+        if (nbr_adv->flags & NG_NDP_NBR_ADV_FLAGS_S) {
+            _set_state(nc_entry, NG_IPV6_NC_STATE_REACHABLE);
+        }
+        else {
+            _set_state(nc_entry, NG_IPV6_NC_STATE_STALE);
+        }
+
+        if (nbr_adv->flags & NG_NDP_NBR_ADV_FLAGS_R) {
+            nc_entry->flags |= NG_IPV6_NC_IS_ROUTER;
+        }
+        else {
+            nc_entry->flags &= ~NG_IPV6_NC_IS_ROUTER;
+            /* TODO: update FIB */
+        }
+
+        while ((queued_pkt = ng_pktqueue_remove_head(&nc_entry->pkts)) != NULL) {
+            ng_netapi_send(ng_ipv6_pid, queued_pkt->data);
+            queued_pkt->data = NULL;
+        }
+    }
+    else {
+        /* first or-term: no link-layer, but nc_entry has l2addr,
+         * second or-term: different l2addr cached */
+        bool l2tgt_changed = false;
+
+        if ((!_pkt_has_l2addr(netif_hdr)) && (l2tgt_len == 0)) {
+            /* there was previously a L2 address registered */
+            l2tgt_changed = (nc_entry->l2_addr_len != 0);
+        }
+        /* link-layer has addresses and TLLAO with different address */
+        else if (_pkt_has_l2addr(netif_hdr) && (l2tgt_len != 0)) {
+            l2tgt_changed = (!(l2tgt_len == nc_entry->l2_addr_len)) &&
+                            (memcmp(nc_entry->l2_addr, l2tgt, l2tgt_len) == 0);
+        }
+
+        if ((nbr_adv->flags & NG_NDP_NBR_ADV_FLAGS_O) || !l2tgt_changed ||
+            (l2tgt_len == 0)) {
+            if (l2tgt_len != 0) {
+                nc_entry->iface = iface;
+                nc_entry->l2_addr_len = l2tgt_len;
+                memcpy(nc_entry->l2_addr, l2tgt, l2tgt_len);
+            }
+
+            if (nbr_adv->flags & NG_NDP_NBR_ADV_FLAGS_S) {
+                _set_state(nc_entry, NG_IPV6_NC_STATE_REACHABLE);
+            }
+            else if (l2tgt_changed && (l2tgt_len != 0)) {
+                _set_state(nc_entry, NG_IPV6_NC_STATE_STALE);
+            }
+
+            if (nbr_adv->flags & NG_NDP_NBR_ADV_FLAGS_R) {
+                nc_entry->flags |= NG_IPV6_NC_IS_ROUTER;
+            }
+            else {
+                nc_entry->flags &= ~NG_IPV6_NC_IS_ROUTER;
+                /* TODO: update FIB */
+            }
+        }
+        else if (l2tgt_changed) {
+            if (ng_ipv6_nc_get_state(nc_entry) == NG_IPV6_NC_STATE_REACHABLE) {
+                _set_state(nc_entry, NG_IPV6_NC_STATE_STALE);
+
             }
         }
     }
@@ -803,104 +881,44 @@ static bool _handle_sl2a_opt(kernel_pid_t iface, ng_pktsnip_t *pkt,
     }
 }
 
-static bool _handle_tl2a_opt(kernel_pid_t iface, ng_pktsnip_t *pkt,
-                             ng_ipv6_hdr_t *ipv6, uint8_t icmpv6_type,
-                             ng_ndp_opt_t *tl2a_opt, ng_ipv6_addr_t *tgt,
-                             uint8_t adv_flags)
+static int _handle_tl2a_opt(ng_pktsnip_t *pkt, ng_ipv6_hdr_t *ipv6,
+                            uint8_t icmpv6_type, ng_ndp_opt_t *tl2a_opt,
+                            uint8_t *l2addr)
 {
-    ng_ipv6_nc_t *nc_entry = NULL;
     uint8_t tl2a_len = 0;
     uint8_t *tl2a = (uint8_t *)(tl2a_opt + 1);
 
     if ((tl2a_opt->len == 0) || ng_ipv6_addr_is_unspecified(&ipv6->src)) {
         DEBUG("ndp: invalid target link-layer address option received\n");
-        return false;
-    }
-
-    while (pkt) {
-        if (pkt->type == NG_NETTYPE_NETIF) {
-            ng_netif_hdr_t *hdr = pkt->data;
-            tl2a_len = hdr->src_l2addr_len;
-            break;
-        }
-        pkt = pkt->next;
-    }
-
-    if (tl2a_len == 0) {  /* in case there was no source address in l2 */
-        tl2a_len = (tl2a_opt->len / 8) - sizeof(ng_ndp_opt_t);
-
-        /* ignore all zeroes at the end for length */
-        for (; tl2a[tl2a_len - 1] == 0x00; tl2a_len--);
+        return -EINVAL;
     }
 
     switch (icmpv6_type) {
         case NG_ICMPV6_NBR_ADV:
-            nc_entry = ng_ipv6_nc_get(iface, tgt);
-
-            /* no need to create an entry in the negative case (see RFC 4861) */
-            if (nc_entry != NULL) {
-                nc_entry->l2_addr_len = tl2a_len;
-
-                if (tl2a_len > 0) {
-                    memcpy(nc_entry->l2_addr, tl2a, tl2a_len);
+            while (pkt) {
+                if (pkt->type == NG_NETTYPE_NETIF) {
+                    ng_netif_hdr_t *hdr = pkt->data;
+                    tl2a_len = hdr->src_l2addr_len;
+                    break;
                 }
-
-                if (ng_ipv6_nc_get_state(nc_entry) == NG_IPV6_NC_STATE_INCOMPLETE) {
-                    ng_pktqueue_node_t *queued_pkt;
-
-                    if (adv_flags & NG_NDP_NBR_ADV_FLAGS_S) {
-                        _set_state(nc_entry, NG_IPV6_NC_STATE_REACHABLE);
-                    }
-                    else {
-                        _set_state(nc_entry, NG_IPV6_NC_STATE_STALE);
-                    }
-
-                    if (adv_flags & NG_NDP_NBR_ADV_FLAGS_R) {
-                        nc_entry->flags |= NG_IPV6_NC_IS_ROUTER;
-                    }
-                    else {
-                        nc_entry->flags &= ~NG_IPV6_NC_IS_ROUTER;
-                    }
-
-                    while ((queued_pkt = ng_pktqueue_remove_head(&nc_entry->pkts)) != NULL) {
-                        ng_netapi_send(ng_ipv6_pid, queued_pkt->data);
-                        queued_pkt->data = NULL;
-                    }
-                }
-                else {
-                    if (memcmp(tl2a, nc_entry->l2_addr, tl2a_len) != 0) {
-                        if ((adv_flags & NG_NDP_NBR_ADV_FLAGS_O)) {
-                            memcpy(nc_entry->l2_addr, tl2a, tl2a_len);
-                        }
-                        else if (ng_ipv6_nc_get_state(nc_entry) == NG_IPV6_NC_STATE_REACHABLE) {
-                            _set_state(nc_entry, NG_IPV6_NC_STATE_STALE);
-                        }
-                    }
-
-                    if ((adv_flags & NG_NDP_NBR_ADV_FLAGS_O)) {
-                        if (adv_flags & NG_NDP_NBR_ADV_FLAGS_S) {
-                            _set_state(nc_entry, NG_IPV6_NC_STATE_REACHABLE);
-                        }
-                        else {
-                            _set_state(nc_entry, NG_IPV6_NC_STATE_STALE);
-                        }
-
-                        if (adv_flags & NG_NDP_NBR_ADV_FLAGS_R) {
-                            nc_entry->flags |= NG_IPV6_NC_IS_ROUTER;
-                        }
-                        else {
-                            nc_entry->flags &= ~NG_IPV6_NC_IS_ROUTER;
-                        }
-                    }
-                }
+                pkt = pkt->next;
             }
 
-            return true;
+            if (tl2a_len == 0) {  /* in case there was no source address in l2 */
+                tl2a_len = (tl2a_opt->len / 8) - sizeof(ng_ndp_opt_t);
+
+                /* ignore all zeroes at the end for length */
+                for (; tl2a[tl2a_len - 1] == 0x00; tl2a_len--);
+            }
+
+            memcpy(l2addr, tl2a, tl2a_len);
+
+            return (int)tl2a_len;
 
         default:    /* wrong encapsulating message: silently discard */
             DEBUG("ndp: silently discard tl2a_opt for ICMPv6 message type %"
                   PRIu8 "\n", icmpv6_type);
-            return true;
+            return 0;
     }
 }
 
