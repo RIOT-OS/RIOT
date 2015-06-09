@@ -1,2 +1,3 @@
+FEATURES_PROVIDED += periph_gpio
 FEATURES_PROVIDED += periph_rtc
 FEATURES_MCU_GROUP = arm7
