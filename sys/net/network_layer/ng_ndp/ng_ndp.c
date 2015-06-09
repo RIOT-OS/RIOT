@@ -686,7 +686,8 @@ static void _send_nbr_adv(kernel_pid_t iface, ng_ipv6_addr_t *tgt,
     ((ng_netif_hdr_t *)hdr->data)->if_pid = iface;
 
     if (ng_ipv6_netif_addr_is_non_unicast(tgt)) {
-        /* avoid collision for anycast addresses */
+        /* avoid collision for anycast addresses
+         * (see https://tools.ietf.org/html/rfc4861#section-7.2.7) */
         timex_t delay = { _rand(0, NG_NDP_MAX_AC_TGT_DELAY), 0 };
         ng_ipv6_nc_t *nc_entry = ng_ipv6_nc_get(iface, tgt);
 
