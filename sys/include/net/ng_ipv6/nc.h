@@ -134,6 +134,12 @@ typedef struct {
 
     /**
      * @brief Delay timer for neighbor advertisements of this entry.
+     *
+     * @note Only needed for delayed anycast neighbor advertisements
+     *
+     * @see <a href="https://tools.ietf.org/html/rfc4861#section-7.2.7">
+     *          RFC 4861, section 7.2.7
+     *      </a>
      */
     vtimer_t nbr_adv_timer;
 
