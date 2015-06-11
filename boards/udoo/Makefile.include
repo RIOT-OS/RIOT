@@ -1,6 +1,5 @@
 # define the cpu used by the udoo board
 export CPU = sam3x8e
-export CPU_MODEL = sam3x8e
 
 #define the flash-tool and default port depending on the host operating system
 OS := $(shell uname)
