@@ -149,7 +149,7 @@ static int init_int(int argc, char **argv)
     else {
         pull = GPIO_NOPULL;
     }
-    if (gpio_init_exti(GPIO(port, pin), pull, flank, cb, (void *)pin) < 0) {
+    if (gpio_init_int(GPIO(port, pin), pull, flank, cb, (void *)pin) < 0) {
         printf("Error while initializing  PORT_%i.%02i as external interrupt\n",
                port, pin);
     }

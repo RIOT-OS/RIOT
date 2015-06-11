@@ -211,9 +211,9 @@ int cmd_init_slave(int argc, char **argv)
         printf("spi_init_slave: error initializing SPI_%i device (code: %i)\n", spi_dev, res);
         return 1;
     }
-    res = gpio_init_exti(spi_cs, GPIO_NOPULL, GPIO_FALLING, slave_on_cs, 0);
+    res = gpio_init_int(spi_cs, GPIO_NOPULL, GPIO_FALLING, slave_on_cs, 0);
     if (res < 0){
-        printf("gpio_init_exti: error initializing GPIO_%i as CS line (code %i)\n", spi_cs, res);
+        printf("gpio_init_int: error initializing GPIO_%i as CS line (code %i)\n", spi_cs, res);
         return 1;
     }
     spi_master = 0;
