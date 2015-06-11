@@ -24,6 +24,9 @@
 #include "periph/gpio.h"
 #include "periph_conf.h"
 
+#define ENABLE_DEBUG    (1)
+#include "debug.h"
+
 /**
  * @brief   The STM32F3 has 16 EXTI channels
  */
@@ -74,14 +77,16 @@ int gpio_init(gpio_t pin, gpio_dir_t dir, gpio_pp_t pushpull)
     GPIO_TypeDef *port = _port(pin);
     int pin_num = _pin_num(pin);
 
+    DEBUG("Init %i: port %i, pin %i\n", dir, pin_num, _port_num(pin));
+
     /* enable clock */
-    RCC->AHBENR |= (1 << (RCC_AHBENR_GPIOAEN + _port_num(pin)));
+    RCC->AHBENR |= (RCC_AHBENR_GPIOAEN << _port_num(pin));
     /* configure pull register */
     port->PUPDR &= ~(3 << (2 * pin_num));
     port->PUPDR |= (pushpull << (2 * pin_num));
     /* set direction */
     if (dir == GPIO_DIR_OUT) {
-        port->MODER &= ~(2 << (2 * pin_num));   /* set pin to output mode */
+        port->MODER &= ~(3 << (2 * pin_num));   /* set pin to output mode */
         port->MODER |= (1 << (2 * pin_num));
         port->OTYPER &= ~(1 << pin_num);        /* set to push-pull */
         port->OSPEEDR |= (3 << (2 * pin_num));  /* set to high speed */
@@ -132,8 +137,8 @@ int gpio_init_exti(gpio_t pin, gpio_pp_t pullup, gpio_flank_t flank,
             break;
     }
     /* enable specific pin as exti sources */
-    SYSCFG->EXTICR[pin_num >> 2] &= ~(0xf << (pin_num & 0x03));
-    SYSCFG->EXTICR[pin_num >> 2] |= (port_num << (pin_num & 0x03));
+    SYSCFG->EXTICR[pin_num >> 2] &= ~(0xf << ((pin_num & 0x03) * 4));
+    SYSCFG->EXTICR[pin_num >> 2] |= (port_num << ((pin_num & 0x03) * 4));
     /* clear any pending requests */
     EXTI->PR = (1 << pin_num);
     /* enable interrupt for EXTI line */
@@ -206,7 +211,7 @@ void gpio_write(gpio_t pin, int value)
 
 void isr_exti(void)
 {
-    for (int i = 0; i << EXTI_NUMOF; i++) {
+    for (int i = 0; i < EXTI_NUMOF; i++) {
         if (EXTI->PR & (1 << i)) {
             EXTI->PR |= (1 << i);               /* clear by writing a 1 */
             exti_chan[i].cb(exti_chan[i].arg);
