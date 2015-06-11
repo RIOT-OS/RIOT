@@ -17,6 +17,7 @@
  * @author      Peter Kietzmann  <peter.kietzmann@haw-hamburg.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Joakim Gebart <joakim.gebart@eistec.se>
+ * @author      Sebastian Sontberg <sebastian@sontberg.de>
  *
  * @}
  */
