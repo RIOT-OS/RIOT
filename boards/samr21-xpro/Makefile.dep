@@ -5,7 +5,7 @@ ifneq (,$(filter defaulttransceiver,$(USEMODULE)))
     endif
 endif
 
-ifneq (,$(filter ng_netif,$(USEMODULE)))
+ifneq (,$(filter ng_netif_default,$(USEMODULE)))
   USEMODULE += ng_at86rf233
   USEMODULE += ng_nomac
 endif
