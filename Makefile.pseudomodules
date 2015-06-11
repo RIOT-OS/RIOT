@@ -1,5 +1,6 @@
 PSEUDOMODULES += defaulttransceiver
 PSEUDOMODULES += transport_layer
+PSEUDOMODULES += ng_netif_default
 PSEUDOMODULES += ng_ieee802154
 PSEUDOMODULES += ng_ipv6_default
 PSEUDOMODULES += ng_ipv6_router
