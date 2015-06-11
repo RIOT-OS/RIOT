@@ -159,7 +159,7 @@ static int _hwtimer_set(unsigned long offset, void (*callback)(void*), void *ptr
     if (n == -1) {
         restoreIRQ(state);
 
-        LOG_WARNING("No hwtimer left.");
+        LOG_WARNING("No hwtimer left.\n");
         return -1;
     }
 
