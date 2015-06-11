@@ -80,6 +80,7 @@ void ng_ipv6_demux(kernel_pid_t iface, ng_pktsnip_t *pkt, uint8_t nh)
 
     switch (nh) {
         case NG_PROTNUM_ICMPV6:
+            DEBUG("ipv6: handle ICMPv6 packet (nh = %" PRIu8 ")\n", nh);
             ng_icmpv6_demux(iface, pkt);
             break;
 #ifdef MODULE_NG_IPV6_EXT
@@ -90,6 +91,7 @@ void ng_ipv6_demux(kernel_pid_t iface, ng_pktsnip_t *pkt, uint8_t nh)
         case NG_PROTNUM_IPV6_EXT_AH:
         case NG_PROTNUM_IPV6_EXT_ESP:
         case NG_PROTNUM_IPV6_EXT_MOB:
+            DEBUG("ipv6: handle extension header (nh = %" PRIu8 ")\n", nh);
             if (!ng_ipv6_ext_demux(iface, pkt, nh)) {
                 DEBUG("ipv6: unable to parse extension headers.\n");
                 ng_pktbuf_release(pkt);
@@ -97,12 +99,14 @@ void ng_ipv6_demux(kernel_pid_t iface, ng_pktsnip_t *pkt, uint8_t nh)
             }
 #endif
         case NG_PROTNUM_IPV6:
+            DEBUG("ipv6: handle encapsulated IPv6 packet (nh = %" PRIu8 ")\n", nh);
             _decapsulate(pkt);
             break;
         default:
             break;
     }
 
+    DEBUG("ipv6: forward nh = %" PRIu8 " to other threads\n", nh);
     receiver_num = ng_netreg_num(pkt->type, NG_NETREG_DEMUX_CTX_ALL) +
                    ng_netreg_num(NG_NETTYPE_IPV6, nh);
 
