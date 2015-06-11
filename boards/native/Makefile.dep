@@ -6,7 +6,6 @@ ifneq (,$(filter defaulttransceiver,$(USEMODULE)))
 endif
 
 ifneq (,$(filter ng_netif_default,$(USEMODULE)))
-    USEMODULE += ng_netif
     USEMODULE += ng_nativenet
     USEMODULE += ng_netdev_eth
     USEMODULE += ng_nomac
