@@ -105,6 +105,18 @@ static int init_exti(int argc, char **argv)
     port = atoi(argv[1]);
     pin = atoi(argv[2]);
     flank = atoi(argv[3]);
+    switch (flank) {
+        case 0:
+            flank = GPIO_FALLING;
+            break;
+        case 1:
+            flank = GPIO_RISING;
+            break;
+        case 2:
+            flank = GPIO_BOTH;
+            break;
+    }
+
     if (argc >= 5) {
         pull = atoi(argv[3]);
     }
