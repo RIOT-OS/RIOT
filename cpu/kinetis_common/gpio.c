@@ -400,7 +400,7 @@ int gpio_init(gpio_t dev, gpio_dir_t dir, gpio_pp_t pushpull)
     return 0;
 }
 
-int gpio_init_exti(gpio_t dev, gpio_pp_t pushpull, gpio_flank_t flank, gpio_cb_t cb, void *arg)
+int gpio_init_int(gpio_t dev, gpio_pp_t pushpull, gpio_flank_t flank, gpio_cb_t cb, void *arg)
 {
     int res;
 
