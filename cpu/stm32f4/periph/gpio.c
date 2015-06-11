@@ -76,13 +76,13 @@ int gpio_init(gpio_t pin, gpio_dir_t dir, gpio_pp_t pullup)
     int pin_num = _pin_num(pin);
 
     /* enable clock */
-    RCC->AHB1ENR |= (1 << _port_num(pin));
+    RCC->AHB1ENR |= (RCC_AHB1ENR_GPIOAEN << _port_num(pin));
     /* configure pull register */
     port->PUPDR &= ~(3 << (2 * pin_num));
     port->PUPDR |= (pullup << (2 * pin_num));
     /* set direction */
     if (dir == GPIO_DIR_OUT) {
-        port->MODER &= ~(2 << (2 * pin_num));   /* set pin to output mode */
+        port->MODER &= ~(3 << (2 * pin_num));   /* set pin to output mode */
         port->MODER |= (1 << (2 * pin_num));
         port->OTYPER &= ~(1 << pin_num);        /* set to push-pull */
         port->OSPEEDR |= (3 << (2 * pin_num));  /* set to high speed */
@@ -134,8 +134,8 @@ int gpio_init_exti(gpio_t pin,
             break;
     }
     /* enable specific pin as exti sources */
-    SYSCFG->EXTICR[pin_num >> 2] &= ~(0xf << (pin_num & 0x03));
-    SYSCFG->EXTICR[pin_num >> 2] |= (port_num << (pin_num & 0x03));
+    SYSCFG->EXTICR[pin_num >> 2] &= ~(0xf << ((pin_num & 0x03) * 4));
+    SYSCFG->EXTICR[pin_num >> 2] |= (port_num << ((pin_num & 0x03) * 4));
     /* clear any pending requests */
     EXTI->PR = (1 << pin_num);
     /* enable interrupt for EXTI line */
@@ -208,7 +208,7 @@ void gpio_write(gpio_t pin, int value)
 
 void isr_exti(void)
 {
-    for (int i = 0; i << GPIO_ISR_CHAN_NUMOF; i++) {
+    for (int i = 0; i < GPIO_ISR_CHAN_NUMOF; i++) {
         if (EXTI->PR & (1 << i)) {
             EXTI->PR |= (1 << i);               /* clear by writing a 1 */
             exti_chan[i].cb(exti_chan[i].arg);
