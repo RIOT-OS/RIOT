@@ -14,6 +14,7 @@
 
 #include "net/ng_netbase.h"
 
+#include "od.h"
 #include "net/ng_icmpv6.h"
 #include "net/ng_icmpv6/echo.h"
 #include "utlist.h"
