@@ -98,7 +98,7 @@ int gpio_init(gpio_t pin, gpio_dir_t dir, gpio_pp_t pushpull)
     return 0;
 }
 
-int gpio_init_exti(gpio_t pin, gpio_pp_t pullup, gpio_flank_t flank,
+int gpio_init_int(gpio_t pin, gpio_pp_t pullup, gpio_flank_t flank,
                    gpio_cb_t cb, void *arg)
 {
     int pin_num = _pin_num(pin);
