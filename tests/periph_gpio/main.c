@@ -115,6 +115,9 @@ static int init_exti(int argc, char **argv)
         case 2:
             flank = GPIO_BOTH;
             break;
+        default:
+            printf("wrong flank setting.\n");
+            return 0;
     }
 
     if (argc >= 5) {
@@ -123,7 +126,7 @@ static int init_exti(int argc, char **argv)
     else {
         pull = 0;
     }
-    if (gpio_init_exti(GPIO(port, pin), flank, pull, cb, (void *)pin) < 0) {
+    if (gpio_init_exti(GPIO(port, pin), pull, flank, cb, (void *)pin) < 0) {
         printf("Error while initializing  PORT_%i.%02i as output\n", port, pin);
     }
     printf("PORT_%i.%02i initialized successful as output\n", port, pin);
