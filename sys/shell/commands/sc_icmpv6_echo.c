@@ -178,8 +178,10 @@ int _icmpv6_ping(int argc, char **argv)
                 case NG_NETAPI_MSG_TYPE_RCV:
                     vtimer_now(&stop);
                     stop = timex_sub(stop, start);
-                    success += _handle_reply((ng_pktsnip_t *)msg.content.ptr,
-                                             timex_uint64(stop));
+
+                    ng_pktsnip_t *pkt = (ng_pktsnip_t *)msg.content.ptr;
+                    success += _handle_reply(pkt, timex_uint64(stop));
+                    ng_pktbuf_release(pkt);
 
                     if (timex_cmp(stop, max_rtt) > 0) {
                         max_rtt = stop;

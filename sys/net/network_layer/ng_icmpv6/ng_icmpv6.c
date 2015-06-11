@@ -135,7 +135,7 @@ void ng_icmpv6_demux(kernel_pid_t iface, ng_pktsnip_t *pkt)
     }
 
     /* ICMPv6 is not interested anymore so `- 1` */
-    ng_pktbuf_hold(pkt, ng_netreg_num(NG_NETTYPE_ICMPV6, hdr->type) - 1);
+    ng_pktbuf_hold(pkt, ng_netreg_num(NG_NETTYPE_ICMPV6, hdr->type));
 
     while (sendto != NULL) {
         ng_netapi_receive(sendto->pid, pkt);
