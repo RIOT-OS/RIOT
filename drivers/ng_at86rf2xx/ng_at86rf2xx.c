@@ -71,7 +71,7 @@ int ng_at86rf2xx_init(ng_at86rf2xx_t *dev, spi_t spi, spi_speed_t spi_speed,
     gpio_clear(dev->sleep_pin);
     gpio_init(dev->reset_pin, GPIO_DIR_OUT, GPIO_NOPULL);
     gpio_set(dev->reset_pin);
-    gpio_init_exti(dev->int_pin, GPIO_NOPULL, GPIO_RISING, _irq_handler, dev);
+    gpio_init_int(dev->int_pin, GPIO_NOPULL, GPIO_RISING, _irq_handler, dev);
 
     /* test if the SPI is set up correctly and the device is responding */
     if (ng_at86rf2xx_reg_read(dev, NG_AT86RF2XX_REG__PART_NUM) !=

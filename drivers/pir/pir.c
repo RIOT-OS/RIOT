@@ -106,5 +106,5 @@ static void pir_callback(void *arg)
 
 static int pir_activate_int(pir_t *dev)
 {
-    return gpio_init_exti(dev->gpio_dev, GPIO_NOPULL, GPIO_BOTH, pir_callback, dev);
+    return gpio_init_int(dev->gpio_dev, GPIO_NOPULL, GPIO_BOTH, pir_callback, dev);
 }

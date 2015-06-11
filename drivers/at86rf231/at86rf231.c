@@ -418,7 +418,7 @@ void at86rf231_gpio_spi_interrupts_init(void)
     spi_init_master(AT86RF231_SPI, SPI_CONF_FIRST_RISING, SPI_SPEED);
     spi_release(AT86RF231_SPI);
     /* IRQ0 */
-    gpio_init_exti(AT86RF231_INT, GPIO_NOPULL, GPIO_RISING, (gpio_cb_t)at86rf231_rx_irq, NULL);
+    gpio_init_int(AT86RF231_INT, GPIO_NOPULL, GPIO_RISING, (gpio_cb_t)at86rf231_rx_irq, NULL);
     /* CS */
     gpio_init(AT86RF231_CS, GPIO_DIR_OUT, GPIO_NOPULL);
     /* SLEEP */
