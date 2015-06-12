@@ -185,9 +185,9 @@ int cmd_init_master(int argc, char **argv)
         printf("spi_init_master: error initializing SPI_%i device (code %i)\n", spi_dev, res);
         return 1;
     }
-    res = gpio_init_out(spi_cs, GPIO_PULLUP);
+    res = gpio_init(spi_cs, GPIO_DIR_OUT, GPIO_PULLUP);
     if (res < 0){
-        printf("gpio_init_out: error initializing GPIO_%i as CS line (code %i)\n", spi_cs, res);
+        printf("gpio_init: error initializing GPIO_%i as CS line (code %i)\n", spi_cs, res);
         return 1;
     }
     gpio_set(spi_cs);
