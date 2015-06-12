@@ -1,4 +1,4 @@
-ifneq (,$(filter ng_netif,$(USEMODULE)))
+ifneq (,$(filter ng_netif_default,$(USEMODULE)))
   USEMODULE += kw2xrf
   USEMODULE += ng_nomac
 endif
