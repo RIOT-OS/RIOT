@@ -18,50 +18,35 @@
 
 #include "tests-json.h"
 
+#include <string.h>
+
+static void test_json_read_literal(const char *str,
+                                   json_result_t (*fun)(json_read_cookie_t *),
+                                   json_type_t expected_type)
+{
+    tests_json_read_cookie_t c;
+    tests_json_setup_cookie(&c, str, strlen(str));
+
+    json_type_t actual_type;
+    TEST_ASSERT_EQUAL_INT(JSON_OKAY, json_read_peek(&c.cookie, &actual_type));
+    TEST_ASSERT_EQUAL_INT(expected_type, actual_type);
+
+    TEST_ASSERT_EQUAL_INT(JSON_OKAY, fun(&c.cookie));
+
+    TEST_ASSERT_EQUAL_INT(JSON_PREMATURELY_ENDED, json_read_peek(&c.cookie, &actual_type));
+}
+
 void tests_json_read_true(void)
 {
-    static const char DATA[] = "true";
-
-    tests_json_read_cookie_t c;
-    tests_json_setup_cookie(&c, DATA, sizeof(DATA) - 1);
-
-    json_type_t type;
-    TEST_ASSERT_EQUAL_INT(JSON_OKAY, json_read_peek(&c.cookie, &type));
-    TEST_ASSERT_EQUAL_INT(JSON_TRUE, type);
-
-    TEST_ASSERT_EQUAL_INT(JSON_OKAY, json_read_true(&c.cookie));
-
-    TEST_ASSERT_EQUAL_INT(JSON_PREMATURELY_ENDED, json_read_peek(&c.cookie, &type));
+    test_json_read_literal("true", json_read_true, JSON_TRUE);
 }
 
 void tests_json_read_false(void)
 {
-    static const char DATA[] = "false";
-
-    tests_json_read_cookie_t c;
-    tests_json_setup_cookie(&c, DATA, sizeof(DATA) - 1);
-
-    json_type_t type;
-    TEST_ASSERT_EQUAL_INT(JSON_OKAY, json_read_peek(&c.cookie, &type));
-    TEST_ASSERT_EQUAL_INT(JSON_FALSE, type);
-
-    TEST_ASSERT_EQUAL_INT(JSON_OKAY, json_read_false(&c.cookie));
-
-    TEST_ASSERT_EQUAL_INT(JSON_PREMATURELY_ENDED, json_read_peek(&c.cookie, &type));
+    test_json_read_literal("false", json_read_false, JSON_FALSE);
 }
 
 void tests_json_read_null(void)
 {
-    static const char DATA[] = "null";
-
-    tests_json_read_cookie_t c;
-    tests_json_setup_cookie(&c, DATA, sizeof(DATA) - 1);
-
-    json_type_t type;
-    TEST_ASSERT_EQUAL_INT(JSON_OKAY, json_read_peek(&c.cookie, &type));
-    TEST_ASSERT_EQUAL_INT(JSON_NULL, type);
-
-    TEST_ASSERT_EQUAL_INT(JSON_OKAY, json_read_null(&c.cookie));
-
-    TEST_ASSERT_EQUAL_INT(JSON_PREMATURELY_ENDED, json_read_peek(&c.cookie, &type));
+    test_json_read_literal("null", json_read_null, JSON_NULL);
 }

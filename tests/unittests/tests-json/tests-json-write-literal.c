@@ -18,38 +18,31 @@
 
 #include "tests-json.h"
 
-void tests_json_write_true(void)
-{
-    static const char EXPECTED[] = "true";
-    tests_json_write_cookie_t c;
-    tests_json_setup_write_cookie(&c, EXPECTED, sizeof(EXPECTED) - 1);
+#include <string.h>
 
-    TEST_ASSERT_EQUAL_INT(JSON_OKAY, json_write_true(&c.cookie));
+static void tests_json_write_literal(const char *expected,
+                                     json_result_t (*fun)(json_write_cookie_t *))
+{
+    tests_json_write_cookie_t c;
+    tests_json_setup_write_cookie(&c, expected, strlen(expected));
+
+    TEST_ASSERT_EQUAL_INT(JSON_OKAY, fun(&c.cookie));
     TEST_ASSERT_EQUAL_INT(JSON_OKAY, json_write_finish(&c.cookie));
 
     TEST_ASSERT(tests_json_write_cookie_is_end(&c));
+}
+
+void tests_json_write_true(void)
+{
+    tests_json_write_literal("true", json_write_true);
 }
 
 void tests_json_write_false(void)
 {
-    static const char EXPECTED[] = "false";
-    tests_json_write_cookie_t c;
-    tests_json_setup_write_cookie(&c, EXPECTED, sizeof(EXPECTED) - 1);
-
-    TEST_ASSERT_EQUAL_INT(JSON_OKAY, json_write_false(&c.cookie));
-    TEST_ASSERT_EQUAL_INT(JSON_OKAY, json_write_finish(&c.cookie));
-
-    TEST_ASSERT(tests_json_write_cookie_is_end(&c));
+    tests_json_write_literal("false", json_write_false);
 }
 
 void tests_json_write_null(void)
 {
-    static const char EXPECTED[] = "null";
-    tests_json_write_cookie_t c;
-    tests_json_setup_write_cookie(&c, EXPECTED, sizeof(EXPECTED) - 1);
-
-    TEST_ASSERT_EQUAL_INT(JSON_OKAY, json_write_null(&c.cookie));
-    TEST_ASSERT_EQUAL_INT(JSON_OKAY, json_write_finish(&c.cookie));
-
-    TEST_ASSERT(tests_json_write_cookie_is_end(&c));
+    tests_json_write_literal("null", json_write_null);
 }
