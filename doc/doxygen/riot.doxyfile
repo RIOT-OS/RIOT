@@ -816,6 +816,8 @@ EXCLUDE_PATTERNS       = */board/*/tools/* \
                          */cpu/*/include/instance/* \
                          */cpu/*/include/pio/* \
                          */cpu/*/include/atmel/* \
+                         */cpu/sam3/include/sam3*.h \
+                         */cpu/sam3/include/system_sam*.h \
                          */cpu/lpc*/include/core_cm*.h \
                          */cpu/cortexm_common/include/core_cm*.h \
                          */cpu/stm32f*/include/stm32f* \
@@ -824,7 +826,6 @@ EXCLUDE_PATTERNS       = */board/*/tools/* \
                          */cpu/lpc1768/include/LPC17xx.h \
                          */boards/*/include/periph_conf.h \
                          */cpu/x86/include/x86_pci.h \
-                         */cpu/sam3x8e/include/sam3x8e.h \
                          */cpu/stm32l1/include/stm32l1xx.h \
                          */cpu/k60/include/MK60D10.h \
                          */cpu/k60/include/MK60DZ10.h \
