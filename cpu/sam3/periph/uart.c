@@ -95,8 +95,6 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, uart_tx_cb_t t
 
 int uart_init_blocking(uart_t uart, uint32_t baudrate)
 {
-    uint16_t clock_divider = F_CPU / (16 * baudrate);
-
     switch (uart) {
 #if UART_0_EN
         case UART_0:
@@ -108,7 +106,7 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
             UART_0_PORT->PIO_ABSR &= ~UART_0_PINS;      /* periph function A */
 
             /* set clock divider */
-            UART_0_DEV->UART_BRGR = clock_divider;
+            UART_0_DEV->UART_BRGR = (F_CPU / (16 * baudrate));
             /* set to normal mode without parity */
             UART_0_DEV->UART_MR = UART_MR_PAR_NO | UART_MR_CHMODE_NORMAL;
             /* enable receiver and transmitter and reset status bits */
@@ -125,7 +123,7 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
             UART_1_PORT->PIO_ABSR &= ~UART_1_PINS;      /* periph function A */
 
             /* set clock divider */
-            UART_1_DEV->US_BRGR = clock_divider;
+            UART_1_DEV->US_BRGR = (F_CPU / (16 * baudrate));
             /* set to normal mode without parity */
             UART_1_DEV->US_MR = US_MR_CHRL_8_BIT | US_MR_PAR_NO;
             /* enable receiver and transmitter and reset status bits */
@@ -142,7 +140,7 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
             UART_2_PORT->PIO_ABSR &= ~UART_2_PINS;      /* periph function A */
 
             /* set clock divider */
-            UART_2_DEV->US_BRGR = clock_divider;
+            UART_2_DEV->US_BRGR = (F_CPU / (16 * baudrate));
             /* set to normal mode without parity */
             UART_2_DEV->US_MR = US_MR_CHRL_8_BIT | US_MR_PAR_NO;
             /* enable receiver and transmitter and reset status bits */
@@ -159,7 +157,7 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
             UART_3_PORT->PIO_ABSR |= UART_3_PINS;       /* periph function B */
 
             /* set clock divider */
-            UART_3_DEV->US_BRGR = clock_divider;
+            UART_3_DEV->US_BRGR = (F_CPU / (16 * baudrate));
             /* set to normal mode without parity */
             UART_3_DEV->US_MR = US_MR_CHRL_8_BIT | US_MR_PAR_NO;
             /* enable receiver and transmitter and reset status bits */
