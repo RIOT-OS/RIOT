@@ -1,5 +1,6 @@
 # define the cpu used by the arduino due board
-export CPU = sam3x8e
+export CPU = sam3
+export CPU_MODEL = sam3x8e
 
 # define the default port depending on the host OS
 PORT_LINUX ?= /dev/ttyACM0
