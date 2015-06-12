@@ -10,9 +10,9 @@ USEMODULE += nrf24l01p
 FEATURES_REQUIRED = periph_spi
 
 SPI_PORT ?= SPI_0
-CE_PIN   ?= GPIO_0
-CS_PIN   ?= GPIO_1
-IRQ_PIN  ?= GPIO_2
+CE_PIN   ?= GPIO\(0,0\)
+CS_PIN   ?= GPIO\(0,1\)
+IRQ_PIN  ?= GPIO\(0,2\)
 
 include $(RIOTBASE)/Makefile.include
 
