@@ -8,6 +8,9 @@ export USEMODULE += periph
 # all cortex MCU's use newlib as libc
 export USEMODULE += newlib
 
+# set default for CPU_MODEL
+export CPU_MODEL ?= $(CPU)
+
 # export the CPU model and architecture
 MODEL = $(shell echo $(CPU_MODEL) | tr 'a-z' 'A-Z')
 export CFLAGS += -DCPU_MODEL_$(MODEL)

@@ -1,7 +1,5 @@
 # define the cpu used by the mbed_lpx1768 board
 export CPU = lpc1768
-export CPU_MODEL = lpc1768
-
 
 export FLASHER = $(RIOTBOARD)/$(BOARD)/dist/flash.sh
 export DEBUGGER =
