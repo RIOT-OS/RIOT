@@ -75,6 +75,13 @@ static json_result_t _json_read_consume(json_read_cookie_t *cookie, char c)
     return _json_read_consume_filled(cookie, c);
 }
 
+static json_result_t _json_read_consume_next(json_read_cookie_t *cookie, char c)
+{
+    json_result_t result;
+    _DO_OR_FAIL(fill_pushback, cookie);
+    return _json_read_consume_filled(cookie, c);
+}
+
 json_result_t json_read_peek(json_read_cookie_t *cookie, json_type_t *type)
 {
     json_result_t result;
@@ -136,11 +143,8 @@ json_result_t json_read_array(json_read_cookie_t *cookie)
 
 json_result_t json_read_array_next(json_read_cookie_t *cookie, bool *array_closed)
 {
-    json_result_t result;
-    _DO_OR_FAIL(advance_to_data, cookie);
-
     if (cookie->state == JSON_READ_STATE_IN_ARRAY) {
-        if (_json_read_consume_filled(cookie, ']') == JSON_OKAY) {
+        if (_json_read_consume(cookie, ']') == JSON_OKAY) {
             *array_closed = true;
         }
         else {
@@ -149,10 +153,10 @@ json_result_t json_read_array_next(json_read_cookie_t *cookie, bool *array_close
         cookie->state = JSON_READ_STATE_SOMEWHERE;
     }
     else {
-        if (_json_read_consume_filled(cookie, ',') == JSON_OKAY) {
+        if (_json_read_consume(cookie, ',') == JSON_OKAY) {
             *array_closed = false;
         }
-        else if (_json_read_consume_filled(cookie, ']') == JSON_OKAY) {
+        else if (_json_read_consume(cookie, ']') == JSON_OKAY) {
             *array_closed = true;
         }
         else {
@@ -203,8 +207,8 @@ static json_result_t _json_read_in_unicode(json_read_cookie_t *cookie)
         return JSON_OKAY;
     }
 
-    _DO_OR_FAIL(consume, cookie, '\\');
-    _DO_OR_FAIL(consume, cookie, 'u');
+    _DO_OR_FAIL(consume_next, cookie, '\\');
+    _DO_OR_FAIL(consume_next, cookie, 'u');
 
     uint16_t value2;
     _DO_OR_FAIL(in_unicode_ucs2, cookie, &value2);
@@ -222,17 +226,16 @@ static json_result_t _json_read_in_string(json_read_cookie_t *cookie,
 {
     *done = false;
 
-    json_result_t result;
     while (len > 0) {
-        _DO_OR_FAIL(fill_pushback, cookie);
-
-        if (_json_read_consume_filled(cookie, '"') == JSON_OKAY) {
+        if (_json_read_consume_next(cookie, '"') == JSON_OKAY) {
             *done = true;
             return JSON_OKAY;
         }
 
         char c;
-        if (_json_read_consume_filled(cookie, '\\') == JSON_OKAY) {
+        if (_json_read_consume_next(cookie, '\\') == JSON_OKAY) {
+            json_result_t result;
+
             _DO_OR_FAIL(fill_pushback, cookie);
             switch (cookie->pushback) {
                 case '"':
@@ -348,9 +351,8 @@ json_result_t json_read_number(json_read_cookie_t *cookie,
                                char *buffer, size_t len_in,
                                size_t *len_out, bool *done)
 {
-    json_result_t result;
-
     if (cookie->state != JSON_READ_STATE_IN_SEQUENCE) {
+        json_result_t result;
         _DO_OR_FAIL(advance_to_data, cookie);
         char c = cookie->pushback;
         if ((c == '-') || (('0' <= c) && (c <= '9'))) {
@@ -361,62 +363,53 @@ json_result_t json_read_number(json_read_cookie_t *cookie,
         }
     }
 
-    *done = false;
-    while (len_in > 0) {
+    while (1) {
+        json_result_t result = _json_read_fill_pushback(cookie);
         char c = cookie->pushback;
-        if ((('0' <= c) && (c <= '9')) || ((c == '-') || (c == '+') || (c == '.') ||
-                                           (c == 'E') || (c == 'e'))) {
-            *buffer = c;
-            ++buffer;
-            --len_in;
-            ++*len_out;
 
+        if (result != JSON_OKAY) {
+            break;
+        }
+        else if (len_in-- == 0) {
+            *done = false;
+            return JSON_OKAY;
+        }
+        else if (('0' <= c && c <= '9') ||
+                 (c == '-') || (c == '+') || (c == '.') || ((c | 0x20) == 'e')) {
+            *buffer++ = cookie->pushback;
             cookie->pushback = -1;
-            result = _json_read_fill_pushback(cookie);
-            if (result == JSON_PREMATURELY_ENDED) {
-                cookie->state = JSON_READ_STATE_SOMEWHERE;
-                *done = true;
-                break;
-            }
+            ++*len_out;
         }
         else {
-            cookie->state = JSON_READ_STATE_SOMEWHERE;
-            *done = true;
             break;
         }
     }
 
+    cookie->state = JSON_READ_STATE_SOMEWHERE;
+    *done = true;
     return JSON_OKAY;
 }
 
-static json_result_t _json_read_token(json_read_cookie_t *cookie,
-                                      const char *str, size_t len)
+static json_result_t _json_read_token(json_read_cookie_t *cookie, const char *str)
 {
-    json_result_t result;
-    _DO_OR_FAIL(advance_to_data, cookie);
-
-    while (1) {
-        _DO_OR_FAIL(consume_filled, cookie, *str);
-        if (--len == 0) {
-            return JSON_OKAY;
-        }
-
-        ++str;
-        _DO_OR_FAIL(fill_pushback, cookie);
+    for (; *str; ++str) {
+        json_result_t result;
+        _DO_OR_FAIL(consume_next, cookie, *str);
     }
+    return JSON_OKAY;
 }
 
 json_result_t json_read_true(json_read_cookie_t *cookie)
 {
-    return _json_read_token(cookie, "true", sizeof("true") - 1);
+    return _json_read_token(cookie, "true");
 }
 
 json_result_t json_read_false(json_read_cookie_t *cookie)
 {
-    return _json_read_token(cookie, "false", sizeof("false") - 1);
+    return _json_read_token(cookie, "false");
 }
 
 json_result_t json_read_null(json_read_cookie_t *cookie)
 {
-    return _json_read_token(cookie, "null", sizeof("null") - 1);
+    return _json_read_token(cookie, "null");
 }
