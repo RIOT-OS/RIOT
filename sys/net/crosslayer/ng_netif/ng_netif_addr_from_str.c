@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2015 Martine Lenders <mlenders@inf.fu-berlin.de>
+ * Copyright (C) 2015 René Kijewski <rene.kijewski@fu-berlin.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,47 +15,76 @@
 
 #include "net/ng_netif.h"
 
-static uint8_t _parse_byte(char *str)
+static inline int _dehex(char c, int default_)
 {
-    uint8_t res = 0;
-
-    for (int i = 0; i < 2; i++) {   /* iterate over half-bytes */
-        if ((str[i] >= '0') && (str[i] <= '9')) {       /* if '0'-'9' */
-            res |= (str[i] - '0') << (4 * (1 - i));     /* set half-byte to 0-9 */
-        }
-        else if ((str[i] >= 'a') && (str[i] <= 'f')) {  /* if 'a'-'f' */
-            res |= (str[i] - 'a' + 10) << (4 * (1 - i));/* set half-byte to 10-15 */
-        }
-
-        /* interpret any other character as 0 */
+    if ('0' <= c && c <= '9') {
+        return c - '0';
     }
-
-    return res;
+    else if ('A' <= c && c <= 'F') {
+        return c - 'A' + 10;
+    }
+    else if ('a' <= c && c <= 'f') {
+        return c - 'a' + 10;
+    }
+    else {
+        return default_;
+    }
 }
 
-size_t ng_netif_addr_from_str(uint8_t *out, size_t out_len, char *str)
+size_t ng_netif_addr_from_str(uint8_t *out, size_t out_len, const char *str)
 {
-    size_t res = 0;
-    char *byte_str = str;
-    int end = 0;
+    /* Walk over str from the end. */
+    /* Take two chars a time as one hex value (%hhx). */
+    /* Leading zeros can be omitted. */
+    /* Every non-hexadimal character is a delimiter. */
+    /* Leading, tailing and adjacent delimiters are forbidden. */
 
-    while (end == 0) {
-        str++;
+    const char *end_str = str;
+    uint8_t *out_end = out;
+    size_t count = 0;
+    int assert_cell = 1;
 
-        if ((res >= out_len) || ((str - byte_str) > 2)) {
-            /* no space left or byte_str has become > 2 chars */
-            return 0;
-        }
-
-        if ((*str == ':') || (*str == '\0')) {
-            end = (*str == '\0');
-            *str = '\0';
-            out[res++] = _parse_byte(byte_str);
-            byte_str = ++str;
-        }
+    if (!str || !*str) {
+        return 0;
+    }
+    while (end_str[1]) {
+        ++end_str;
     }
 
-    return res;
+    while (end_str >= str) {
+        int a = 0, b = _dehex(*end_str--, -1);
+        if (b < 0) {
+            if (assert_cell) {
+                return 0;
+            }
+            else {
+                assert_cell = 1;
+                continue;
+            }
+        }
+        assert_cell = 0;
+
+        if (end_str >= str) {
+            a = _dehex(*end_str--, 0);
+        }
+
+        if (++count > out_len) {
+            return 0;
+        }
+        *out_end++ = (a << 4) | b;
+    }
+    if (assert_cell) {
+        return 0;
+    }
+    /* out is reversed */
+
+    while (out < --out_end) {
+        uint8_t tmp = *out_end;
+        *out_end = *out;
+        *out++ = tmp;
+    }
+
+    return count;
 }
 
 /** @} */
