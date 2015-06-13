@@ -161,7 +161,7 @@ kernel_pid_t thread_create(char *stack, int stacksize, char priority, int flags,
     }
     else {
         /* create stack guard */
-        *stack = (uintptr_t) stack;
+        *(uintptr_t *) stack = (uintptr_t) stack;
     }
 #endif
 
