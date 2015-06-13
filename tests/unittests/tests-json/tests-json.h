@@ -127,7 +127,8 @@ static inline bool tests_json_write_cookie_is_end(const tests_json_write_cookie_
 #define TESTS_JSON_READ_LITERAL                                               \
         read_true,                                                            \
         read_false,                                                           \
-        read_null
+        read_null,                                                            \
+        read_illegal_literal
 
 #define TESTS_JSON_READ_ALL                                                   \
         TESTS_JSON_READ_NUMBER,                                               \

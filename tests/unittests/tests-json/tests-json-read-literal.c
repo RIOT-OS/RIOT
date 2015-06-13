@@ -20,7 +20,7 @@
 
 #include <string.h>
 
-static void test_json_read_literal(const char *str,
+static void _test_json_read_literal(const char *str,
                                    json_result_t (*fun)(json_read_cookie_t *),
                                    json_type_t expected_type)
 {
@@ -36,17 +36,38 @@ static void test_json_read_literal(const char *str,
     TEST_ASSERT_EQUAL_INT(JSON_PREMATURELY_ENDED, json_read_peek(&c.cookie, &actual_type));
 }
 
+static void _test_json_read_illegal_literal(const char *str,
+                                            json_result_t (*fun)(json_read_cookie_t *),
+                                            json_type_t expected_type)
+{
+    tests_json_read_cookie_t c;
+    tests_json_setup_cookie(&c, str, strlen(str));
+
+    json_type_t actual_type;
+    TEST_ASSERT_EQUAL_INT(JSON_OKAY, json_read_peek(&c.cookie, &actual_type));
+    TEST_ASSERT_EQUAL_INT(expected_type, actual_type);
+
+    TEST_ASSERT_EQUAL_INT(JSON_INVALID_DATA, fun(&c.cookie));
+}
+
 void tests_json_read_true(void)
 {
-    test_json_read_literal("true", json_read_true, JSON_TRUE);
+    _test_json_read_literal("true", json_read_true, JSON_TRUE);
 }
 
 void tests_json_read_false(void)
 {
-    test_json_read_literal("false", json_read_false, JSON_FALSE);
+    _test_json_read_literal("false", json_read_false, JSON_FALSE);
 }
 
 void tests_json_read_null(void)
 {
-    test_json_read_literal("null", json_read_null, JSON_NULL);
+    _test_json_read_literal("null", json_read_null, JSON_NULL);
+}
+
+void tests_json_read_illegal_literal(void)
+{
+    _test_json_read_illegal_literal("tRUE",  json_read_true, JSON_TRUE);
+    _test_json_read_illegal_literal("fals",  json_read_null, JSON_FALSE);
+    _test_json_read_illegal_literal("nu ll", json_read_null, JSON_NULL);
 }
