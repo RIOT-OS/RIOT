@@ -327,23 +327,6 @@ int cmd_print_regs(int argc, char **argv)
     return 0;
 }
 
-
-/**
- * @brief proxy for reading a char from std-in and passing it to the shell
- */
-int shell_read(void)
-{
-    return (int) getchar();
-}
-
-/**
- * @brief proxy for taking a character from the shell and writing it to std-out
- */
-void shell_write(int c)
-{
-    putchar((char)c);
-}
-
 int main(void)
 {
     shell_t shell;
@@ -351,8 +334,7 @@ int main(void)
     puts("Welcome to RIOT!");
 
     puts("Initializing shell...");
-    shell_init(&shell, shell_commands, SHELL_BUFFER_SIZE, shell_read,
-               shell_write);
+    shell_init(&shell, shell_commands, SHELL_BUFFER_SIZE, getchar, putchar);
 
     puts("Starting shell...");
     shell_run(&shell);
