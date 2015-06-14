@@ -34,6 +34,11 @@ typedef uint32_t gpio_t;
 /** @} */
 
 /**
+ * @brief   Definition of a fitting UNDEF value
+ */
+#define GPIO_UNDEF          (0xffffffff)
+
+/**
  * @brief   Mandatory function for defining a GPIO pins
  * @{
  */
