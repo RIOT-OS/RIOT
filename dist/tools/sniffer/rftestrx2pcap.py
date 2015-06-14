@@ -49,15 +49,15 @@ except IOError:
 
 time.sleep(1)
 chanstr = ''
-sys.stderr.write('chan %s\n' % sys.argv[2])
-serport.write('chan %s\n' % sys.argv[2])
+sys.stderr.write('ifconfig 4 set channel %s\n' % sys.argv[2])
+serport.write('ifconfig 4 set channel %s\n' % sys.argv[2])
 while 1:
         c = serport.read(1)
         if (c == '\n'):
             chanstr = ''
             continue
         chanstr += c 
-        m = re.match(".*channel: (\w+)", chanstr)
+        m = re.match(".*success: set channel on interface 4 to (\w+)", chanstr)
         if m:
                 chan = int(m.group(1))
                 sys.stderr.write(chanstr + '\n')
@@ -78,7 +78,7 @@ MINOR = 4
 ZONE = 0
 SIG = 0
 SNAPLEN = 0xffff
-NETWORK = 230 # 802.15.4 no FCS
+NETWORK = 251 # DLT_BLUETOOTH_LE_LL
 
 # output overall PCAP header
 outfile.write(pack('<LHHLLLL', MAGIC, MAJOR, MINOR, ZONE, SIG, SNAPLEN, NETWORK))
@@ -98,7 +98,7 @@ try:
                         t = time.time()
                         sec = int(t)
                         usec = (t - sec) * 100000
-                        length = int(m_rftestline.group(1), 16)
+                        length = int(m_rftestline.group(1), 16) + 4
                         continue
                         
                 # if this is a new packet, add a packet header
@@ -115,6 +115,9 @@ try:
                                 fileempty = 0
                 if fileempty == 0 :
                         # write payload
+			if len(line) > 1:
+				line = '0xd6 0xbe 0x89 0x8e ' + line
+
                         for d in line.split(' '):
                                 # do a match because their might be a \r floating around
                                 m = re.match('.*(\w\w).*', d)
