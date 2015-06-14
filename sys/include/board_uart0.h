@@ -64,7 +64,7 @@ int uart0_readc(void);
  *
  * @param[in] c The character to put on the UART.
  */
-void uart0_putc(int c);
+int uart0_putc(int c);
 
 #ifdef __cplusplus
 }

@@ -81,7 +81,7 @@ int uart0_readc(void)
     return c;
 }
 
-void uart0_putc(int c)
+int uart0_putc(int c)
 {
-    putchar(c);
+    return putchar(c);
 }
