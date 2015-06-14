@@ -16,8 +16,8 @@
  * @author          Hauke Petersen <hauke.peterse@fu-berlin.de>
  */
 
-#ifndef PERIPH_CPU_H_
-#define PERIPH_CPU_H_
+#ifndef PERIPH_CPU_H
+#define PERIPH_CPU_H
 
 #include "periph/dev_enums.h"
 
@@ -31,5 +31,5 @@ extern "C" {
 }
 #endif
 
-#endif /* PERIPH_CPU_H_ */
+#endif /* PERIPH_CPU_H */
 /** @} */

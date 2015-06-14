@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2014 Freie Universität Berlin, Hinnerk van Bruinehsen
+ * Copyright (C) 2014 Hinnerk van Bruinehsen
+ *               2014-205 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -27,8 +28,6 @@
 #include "periph/uart.h"
 #include "periph_conf.h"
 
-#if UART_0_EN || UART_1_EN || UART2_EN || UART_3_EN
-
 /**
  * @brief Each UART device has to store two callbacks.
  */
@@ -43,13 +42,14 @@ typedef struct {
  */
 static uart_conf_t config[UART_NUMOF];
 
-int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, uart_tx_cb_t tx_cb, void *arg)
+int uart_init(uart_t uart, uint32_t baudrate,
+              uart_rx_cb_t rx_cb, uart_tx_cb_t tx_cb, void *arg)
 {
-    /* initialize basic functionality */
-    int res = uart_init_blocking(uart, baudrate);
+    uint16_t clock_divider = F_CPU / (16 * baudrate);
 
-    if (res != 0) {
-        return res;
+    /* check UART device */
+    if (uart < 0 || uart >= UART_NUMOF) {
+        return -1;
     }
 
     /* register callbacks */
@@ -60,93 +60,60 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, uart_tx_cb_t t
     /* configure interrupts and enable RX interrupt */
     switch (uart) {
 #if UART_0_EN
-
-        case UART_0:
-            UART0_RX_IRQ_EN;
-            break;
-#endif /* UART_0_EN */
-#if UART_1_EN
-
-        case UART_1:
-            UART1_RX_IRQ_EN;
-            break;
-#endif /* UART_1_EN */
-#if UART_2_EN
-
-        case UART_2:
-            UART2_RX_IRQ_EN;
-            break;
-#endif /* UART_2_EN */
-#if UART_3_EN
-
-        case UART_3:
-            UART3_RX_IRQ_EN;
-            break;
-#endif /* UART_3_EN */
-    }
-
-    return 0;
-}
-
-int uart_init_blocking(uart_t uart, uint32_t baudrate)
-{
-    uint16_t clock_divider = F_CPU / (16 * baudrate);
-
-    switch (uart) {
-#if UART_0_EN
-
         case UART_0:
             /* enable RX and TX */
             UART0_RX_TX_EN;
             /* use 8 Bit characters */
             UART0_SET_8BIT_SIZE;
-
             /* set clock divider */
             UART0_BAUD_RATE_L = clock_divider;
             UART0_BAUD_RATE_H = (clock_divider >> 8);
+            /* enable RX interrupt */
+            UART0_RX_IRQ_EN;
             break;
-#endif /* UART_0 */
+#endif /* UART_0_EN */
 #if UART_1_EN
-
         case UART_1:
             /* enable RX and TX */
             UART1_RX_TX_EN;
             /* use 8 Bit characters */
             UART1_SET_8BIT_SIZE;
-
             /* set clock divider */
             UART1_BAUD_RATE_L = clock_divider;
             UART1_BAUD_RATE_H = (clock_divider >> 8);
+            /* enable RX interrupt */
+            UART1_RX_IRQ_EN;
             break;
-#endif /* UART_1 */
+#endif /* UART_1_EN */
 #if UART_2_EN
-
         case UART_2:
             /* enable RX and TX */
             UART2_RX_TX_EN;
             /* use 8 Bit characters */
             UART2_SET_8BIT_SIZE;
-
             /* set clock divider */
             UART2_BAUD_RATE_L = clock_divider;
             UART2_BAUD_RATE_H = (clock_divider >> 8);
+            /* enable RX interrupt */
+            UART2_RX_IRQ_EN;
             break;
-#endif /* UART_2 */
+#endif /* UART_2_EN */
 #if UART_3_EN
-
         case UART_3:
             /* enable RX and TX */
             UART3_RX_TX_EN;
             /* use 8 Bit characters */
             UART3_SET_8BIT_SIZE;
-
             /* set clock divider */
             UART3_BAUD_RATE_L = clock_divider;
             UART3_BAUD_RATE_H = (clock_divider >> 8);
+            /* enable RX interrupt */
+            UART3_RX_IRQ_EN;
             break;
-#endif /* UART_3 */
+#endif /* UART_3_EN */
+        default:
+            return -1;
     }
-
     return 0;
 }
 
@@ -155,123 +122,61 @@ void uart_tx_begin(uart_t uart)
 
 }
 
-void uart_tx_end(uart_t uart)
-{
-
-}
-
-int uart_write(uart_t uart, char data)
+void uart_write(uart_t uart, char data)
 {
     switch (uart) {
 #if UART_0_EN
-
         case UART_0:
             UART0_DATA_REGISTER = data;
             break;
 #endif /* UART_0_EN */
 #if UART_1_EN
-
         case UART_1:
             UART1_DATA_REGISTER = data;
             break;
 #endif /* UART_1_EN */
 #if UART_2_EN
-
         case UART_2:
             UART2_DATA_REGISTER = data;
             break;
 #endif /* UART_2_EN */
 #if UART_3_EN
-
         case UART_3:
             UART3_DATA_REGISTER = data;
             break;
 #endif /* UART_3_EN */
     }
-
-    return 1;
 }
 
-int uart_read_blocking(uart_t uart, char *data)
+void uart_write_blocking(uart_t uart, char data)
 {
     switch (uart) {
 #if UART_0_EN
-
-        case UART_0:
-            while (!UART0_RECEIVED_DATA);
-
-            *data = (char) UART0_DATA_REGISTER;
-            break;
-#endif /* UART_0_EN */
-#if UART_1_EN
-
-        case UART_1:
-            while (!UART1_RECEIVED_DATA);
-
-            *data = (char) UART1_DATA_REGISTER;
-            break;
-#endif /* UART_1_EN */
-#if UART_2_EN
-
-        case UART_2:
-            while (!UART2_RECEIVED_DATA);
-
-            *data = (char) UART2_DATA_REGISTER;
-            break;
-#endif /* UART_2_EN */
-#if UART_3_EN
-
-        case UART_3:
-            while (!UART3_RECEIVED_DATA);
-
-            *data = (char) UART3_DATA_REGISTER;
-            break;
-#endif /* UART_3_EN */
-    }
-
-    return 1;
-}
-
-int uart_write_blocking(uart_t uart, char data)
-{
-    switch (uart) {
-#if UART_0_EN
-
         case UART_0:
             while (!UART0_DTREG_EMPTY);
-
             UART0_DATA_REGISTER = data;
             break;
 #endif /* UART_0_EN */
 #if UART_1_EN
-
         case UART_1:
             while (!UART1_DTREG_EMPTY);
-
             UART1_DATA_REGISTER = data;
             break;
 #endif /* UART_1_EN */
 #if UART_2_EN
-
         case UART_2:
             while (!UART2_DTREG_EMPTY);
-
             UART2_DATA_REGISTER = data;
             break;
 #endif /* UART_2_EN */
 #if UART_3_EN
-
         case UART_3:
             while (!UART3_DTREG_EMPTY);
-
             UART3_DATA_REGISTER = data;
             break;
 #endif /* UART_3_EN */
     }
-
-    return 1;
 }
-
 
 #if UART_0_EN
 ISR(USART0_RX_vect, ISR_BLOCK)
@@ -324,4 +229,3 @@ ISR(USART2_RX_vect, ISR_BLOCK)
     __exit_isr();
 }
 #endif /* UART_3_EN */
-#endif /* UART_0_EN || UART_1_EN |UART_2_EN| UART3 */

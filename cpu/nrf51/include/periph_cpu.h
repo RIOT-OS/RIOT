@@ -16,10 +16,8 @@
  * @author          Hauke Petersen <hauke.peterse@fu-berlin.de>
  */
 
-#ifndef CPU_PERIPH_H_
-#define CPU_PERIPH_H_
-
-#include "periph/dev_enums.h"
+#ifndef PERIPH_CPU_H
+#define PERIPH_CPU_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -60,5 +58,5 @@ typedef enum {
 }
 #endif
 
-#endif /* CPU_PERIPH_H_ */
+#endif /* PERIPH_CPU_H */
 /** @} */

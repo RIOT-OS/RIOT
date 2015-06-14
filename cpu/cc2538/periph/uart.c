@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014 Loci Controls Inc.
+ *               2015 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,6 +15,7 @@
  * @brief       Low-level UART driver implementation
  *
  * @author      Ian Martin <ian@locicontrols.com>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
  * @}
  */
@@ -26,9 +28,6 @@
 #include "thread.h"
 #include "periph/uart.h"
 #include "periph_conf.h"
-
-/* guard file in case no UART device was specified */
-#if UART_NUMOF
 
 #undef BIT
 #define BIT(n) ( 1 << (n) )
@@ -109,92 +108,8 @@ static void reset(cc2538_uart_t *u)
 }
 /*---------------------------------------------------------------------------*/
 
-#if UART_0_EN
-void UART_0_ISR(void)
-{
-    uint_fast16_t mis;
-
-    /* Store the current MIS and clear all flags early, except the RTM flag.
-     * This will clear itself when we read out the entire FIFO contents */
-    mis = UART_0_DEV->MIS;
-
-    UART_0_DEV->ICR = 0x0000FFBF;
-
-    while (UART_0_DEV->FRbits.RXFE == 0) {
-        uart_config[0].rx_cb(uart_config[0].arg, UART_0_DEV->DR);
-    }
-
-    if (mis & (OEMIS | BEMIS | FEMIS)) {
-        /* ISR triggered due to some error condition */
-        reset(UART_0_DEV);
-    }
-
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
-}
-#endif /* UART_0_EN */
-
-#if UART_1_EN
-void UART_1_ISR(void)
-{
-    uint_fast16_t mis;
-
-    /* Store the current MIS and clear all flags early, except the RTM flag.
-     * This will clear itself when we read out the entire FIFO contents */
-    mis = UART_1_DEV->MIS;
-
-    UART_1_DEV->ICR = 0x0000FFBF;
-
-    while (UART_1_DEV->FRbits.RXFE == 0) {
-        uart_config[1].rx_cb(uart_config[1].arg, UART_1_DEV->DR);
-    }
-
-    if (mis & (OEMIS | BEMIS | FEMIS)) {
-        /* ISR triggered due to some error condition */
-        reset(UART_1_DEV);
-    }
-
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
-}
-#endif /* UART_1_EN */
-
-int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, uart_tx_cb_t tx_cb, void *arg)
-{
-    /* initialize basic functionality */
-    int res = uart_init_blocking(uart, baudrate);
-
-    if (res != 0) {
-        return res;
-    }
-
-    /* register callbacks */
-    uart_config[uart].rx_cb = rx_cb;
-    uart_config[uart].tx_cb = tx_cb;
-    uart_config[uart].arg = arg;
-
-    /* configure interrupts and enable RX interrupt */
-    switch (uart) {
-#if UART_0_EN
-        case UART_0:
-            NVIC_SetPriority(UART0_IRQn, UART_IRQ_PRIO);
-            NVIC_EnableIRQ(UART0_IRQn);
-            break;
-#endif
-#if UART_1_EN
-        case UART_1:
-            NVIC_SetPriority(UART1_IRQn, UART_IRQ_PRIO);
-            NVIC_EnableIRQ(UART1_IRQn);
-            break;
-#endif
-    }
-
-    return 0;
-}
-
-int uart_init_blocking(uart_t uart, uint32_t baudrate)
+int uart_init(uart_t uart, uint32_t baudrate,
+              uart_rx_cb_t rx_cb, uart_tx_cb_t tx_cb, void *arg)
 {
     cc2538_uart_t *u;
     unsigned int uart_num;
@@ -316,20 +231,36 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
     /* UART Enable */
     u->CTLbits.UARTEN = 1;
 
+    /* register callbacks */
+    uart_config[uart].rx_cb = rx_cb;
+    uart_config[uart].tx_cb = tx_cb;
+    uart_config[uart].arg = arg;
+
+    /* configure interrupts and enable RX interrupt */
+    switch (uart) {
+#if UART_0_EN
+        case UART_0:
+            NVIC_SetPriority(UART0_IRQn, UART_IRQ_PRIO);
+            NVIC_EnableIRQ(UART0_IRQn);
+            break;
+#endif
+#if UART_1_EN
+        case UART_1:
+            NVIC_SetPriority(UART1_IRQn, UART_IRQ_PRIO);
+            NVIC_EnableIRQ(UART1_IRQn);
+            break;
+#endif
+    }
+
     return 0;
 }
 
 void uart_tx_begin(uart_t uart)
 {
-
+    /* TODO: implement interrupt based TX */
 }
 
-void uart_tx_end(uart_t uart)
-{
-
-}
-
-int uart_write(uart_t uart, char data)
+void uart_write(uart_t uart, char data)
 {
     cc2538_uart_t *u;
 
@@ -346,19 +277,17 @@ int uart_write(uart_t uart, char data)
 #endif
 
         default:
-            return -1;
+            return;
     }
 
     if (u->FRbits.TXFF) {
-        return 0;
+        return;
     }
 
     u->DR = data;
-
-    return 1;
 }
 
-int uart_read_blocking(uart_t uart, char *data)
+void uart_write_blocking(uart_t uart, char data)
 {
     cc2538_uart_t *u;
 
@@ -373,54 +302,74 @@ int uart_read_blocking(uart_t uart, char *data)
             u = UART_1_DEV;
             break;
 #endif
-
         default:
-            return -1;
-    }
-
-    while (u->FRbits.RXFE);
-
-    *data = u->DR;
-
-    return 1;
-}
-
-int uart_write_blocking(uart_t uart, char data)
-{
-    cc2538_uart_t *u;
-
-    switch (uart) {
-#if UART_0_EN
-        case UART_0:
-            u = UART_0_DEV;
-            break;
-#endif
-#if UART_1_EN
-        case UART_1:
-            u = UART_1_DEV;
-            break;
-#endif
-
-        default:
-            return -1;
+            return;
     }
 
     /* Block if the TX FIFO is full */
     while (u->FRbits.TXFF);
 
     u->DR = data;
-
-    return 1;
 }
 
 void uart_poweron(uart_t uart)
 {
-
+    /* TODO: implement */
 }
 
 void uart_poweroff(uart_t uart)
 {
-
+    /* TODO: implement */
 }
 
-#endif /* UART_NUMOF */
+#if UART_0_EN
+void UART_0_ISR(void)
+{
+    uint_fast16_t mis;
+
+    /* Store the current MIS and clear all flags early, except the RTM flag.
+     * This will clear itself when we read out the entire FIFO contents */
+    mis = UART_0_DEV->MIS;
+
+    UART_0_DEV->ICR = 0x0000FFBF;
+
+    while (UART_0_DEV->FRbits.RXFE == 0) {
+        uart_config[0].rx_cb(uart_config[0].arg, UART_0_DEV->DR);
+    }
+
+    if (mis & (OEMIS | BEMIS | FEMIS)) {
+        /* ISR triggered due to some error condition */
+        reset(UART_0_DEV);
+    }
+
+    if (sched_context_switch_request) {
+        thread_yield();
+    }
+}
+#endif /* UART_0_EN */
+
+#if UART_1_EN
+void UART_1_ISR(void)
+{
+    uint_fast16_t mis;
+
+    /* Store the current MIS and clear all flags early, except the RTM flag.
+     * This will clear itself when we read out the entire FIFO contents */
+    mis = UART_1_DEV->MIS;
+
+    UART_1_DEV->ICR = 0x0000FFBF;
+
+    while (UART_1_DEV->FRbits.RXFE == 0) {
+        uart_config[1].rx_cb(uart_config[1].arg, UART_1_DEV->DR);
+    }
+
+    if (mis & (OEMIS | BEMIS | FEMIS)) {
+        /* ISR triggered due to some error condition */
+        reset(UART_1_DEV);
+    }
+
+    if (sched_context_switch_request) {
+        thread_yield();
+    }
+}
+#endif /* UART_1_EN */

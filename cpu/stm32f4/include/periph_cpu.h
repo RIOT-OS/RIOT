@@ -16,11 +16,10 @@
  * @author          Hauke Petersen <hauke.peterse@fu-berlin.de>
  */
 
-#ifndef CPU_PERIPH_H_
-#define CPU_PERIPH_H_
+#ifndef PERIPH_CPU_H
+#define PERIPH_CPU_H
 
 #include "cpu.h"
-#include "periph/dev_enums.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -81,6 +80,20 @@ typedef enum {
 } gpio_af_t;
 
 /**
+ * @brief   Structure for UART configuration data
+ * @{
+ */
+typedef struct {
+    USART_TypeDef *dev;     /**< UART device base register address */
+    uint32_t rcc_mask;      /**< bit in clock enable register */
+    gpio_t rx_pin;          /**< RX pin */
+    gpio_t tx_pin;          /**< TX pin */
+    gpio_af_t af;           /**< alternate pin function to use */
+    uint8_t irqn;           /**< IRQ channel */
+} uart_conf_t;
+/** @} */
+
+/**
  * @brief   Configure the alternate function for the given pin
  *
  * @note    This is meant for internal use in STM32F4 peripheral drivers only
@@ -103,5 +116,5 @@ void gpio_init_af(gpio_t pin, gpio_af_t af);
 }
 #endif
 
-#endif /* CPU_PERIPH_H_ */
+#endif /* PERIPH_CPU_H */
 /** @} */

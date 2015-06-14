@@ -16,11 +16,10 @@
  * @author          Hauke Petersen <hauke.peterse@fu-berlin.de>
  */
 
-#ifndef PERIPH_CPU_H_
-#define PERIPH_CPU_H_
+#ifndef PERIPH_CPU_H
+#define PERIPH_CPU_H
 
 #include "cpu.h"
-#include "periph/dev_enums.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -80,6 +79,27 @@ typedef enum {
 } gpio_mux_t;
 
 /**
+ * @brief   UART device configuration
+ */
+typedef struct {
+    SercomUsart *dev;       /**< pointer to the used UART device */
+    gpio_t rx_pin;          /**< pin used for RX */
+    gpio_t tx_pin;          /**< pin used for TX */
+} uart_conf_t;
+
+/**
+ * @brief   Return the numeric id of a SERCOM device derived from its address
+ *
+ * @param[in] sercom    SERCOM device
+ *
+ * @return              numeric id of the given SERCOM device
+ */
+static inline int _sercom_id(SercomUsart *sercom)
+{
+    return ((((uint32_t)sercom) >> 10) & 0x7) - 2;
+}
+
+/**
  * @brief   Set up alternate function (PMUX setting) for a PORT pin
  *
  * @param[in] dev   Pin to set the multiplexing for
@@ -100,5 +120,5 @@ void gpio_init_mux(gpio_t dev, gpio_mux_t mux);
 }
 #endif
 
-#endif /* PERIPH_CPU_H_ */
+#endif /* PERIPH_CPU_H */
 /** @} */

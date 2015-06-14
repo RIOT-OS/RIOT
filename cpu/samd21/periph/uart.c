@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Freie Universität Berlin
+ * Copyright (C) 2014-2015 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -28,18 +28,9 @@
 #include "periph/gpio.h"
 
 /**
- * @brief   Each UART device has to store two callbacks
- */
-typedef struct {
-    uart_rx_cb_t rx_cb;
-    uart_tx_cb_t tx_cb;
-    void *arg;
-} uart_isr_ctx_t;
-
-/**
  * @brief   Allocate memory to store the callback functions
  */
-static uart_isr_ctx_t uart_ctx[UART_NUMOF];
+static uart_isr_ctx_t isr_ctx[UART_NUMOF];
 
 /**
  * @brief   Get the pointer to the base register of the given UART device
@@ -53,107 +44,84 @@ static inline SercomUsart *_uart(uart_t dev)
     return uart_config[dev].dev;
 }
 
-int uart_init(uart_t uart, uint32_t baudrate,
+int uart_init(uart_t dev, uint32_t baudrate,
               uart_rx_cb_t rx_cb, uart_tx_cb_t tx_cb, void *arg)
 {
-    /* initialize basic functionality */
-    int res = uart_init_blocking(uart, baudrate);
-    if (res != 0) {
-        return res;
-    }
-
-    /* register callbacks */
-    uart_ctx[uart].rx_cb = rx_cb;
-    uart_ctx[uart].tx_cb = tx_cb;
-    uart_ctx[uart].arg = arg;
-    /* configure interrupts and enable RX interrupt */
-    _uart(uart)->INTENSET.reg = SERCOM_USART_INTENSET_RXC;
-    NVIC_EnableIRQ(SERCOM0_IRQn + _sercom_id(_uart(uart)));
-    return 0;
-}
-
-int uart_init_blocking(uart_t uart, uint32_t baudrate)
-{
     uint32_t baud;
-    SercomUsart *dev;
+    SercomUsart *uart;
 
-    if (uart < 0 || uart >= UART_NUMOF) {
+    /* check if device is valid */
+    if (dev < 0 || dev >= UART_NUMOF) {
         return -1;
     }
 
-    /* get the devices base register */
-    dev = _uart(uart);
+    /* get the device's base register */
+    uart = _uart(dev);
     /* calculate baudrate */
     baud =  ((((uint32_t)CLOCK_CORECLOCK * 10) / baudrate) / 16);
+    /* register callbacks */
+    isr_ctx[dev].rx_cb = rx_cb;
+    isr_ctx[dev].tx_cb = tx_cb;
+    isr_ctx[dev].arg = arg;
     /* enable sync and async clocks */
-    uart_poweron(uart);
+    uart_poweron(dev);
     /* configure pins */
-    gpio_init(uart_config[uart].rx_pin, GPIO_DIR_IN, GPIO_NOPULL);
-    gpio_init_mux(uart_config[uart].rx_pin, uart_config[uart].mux);
-    gpio_init(uart_config[uart].tx_pin, GPIO_DIR_OUT, GPIO_NOPULL);
-    gpio_init_mux(uart_config[uart].tx_pin, uart_config[uart].mux);
+    gpio_init(uart_config[dev].rx_pin, GPIO_DIR_IN, GPIO_NOPULL);
+    gpio_init_mux(uart_config[dev].rx_pin, GPIO_MUX_D);
+    gpio_init(uart_config[dev].tx_pin, GPIO_DIR_OUT, GPIO_NOPULL);
+    gpio_init_mux(uart_config[dev].tx_pin, GPIO_MUX_D);
     /* reset the UART device */
-    dev->CTRLA.reg = SERCOM_USART_CTRLA_SWRST;
-    while (dev->SYNCBUSY.reg & SERCOM_USART_SYNCBUSY_SWRST);
+    uart->CTRLA.reg = SERCOM_USART_CTRLA_SWRST;
+    while (uart->SYNCBUSY.reg & SERCOM_USART_SYNCBUSY_SWRST);
     /* set asynchronous mode w/o parity, LSB first, PAD0 to TX, PAD1 to RX and
      * use internal clock */
-    dev->CTRLA.reg = (SERCOM_USART_CTRLA_DORD |
-                      SERCOM_USART_CTRLA_RXPO(0x1) |
-                      SERCOM_USART_CTRLA_SAMPR(0x1) |
-                      SERCOM_USART_CTRLA_MODE_USART_INT_CLK);
+    uart->CTRLA.reg = (SERCOM_USART_CTRLA_DORD |
+                       SERCOM_USART_CTRLA_RXPO(0x1) |
+                       SERCOM_USART_CTRLA_SAMPR(0x1) |
+                       SERCOM_USART_CTRLA_MODE_USART_INT_CLK);
     /* set baudrate */
-    dev->BAUD.FRAC.FP = (baud % 10);
-    dev->BAUD.FRAC.BAUD = (baud / 10);
+    uart->BAUD.FRAC.FP = (baud % 10);
+    uart->BAUD.FRAC.BAUD = (baud / 10);
     /* enable receiver and transmitter, use 1 stop bit */
-    dev->CTRLB.reg = (SERCOM_USART_CTRLB_RXEN | SERCOM_USART_CTRLB_TXEN);
-    while (dev->SYNCBUSY.reg & SERCOM_USART_SYNCBUSY_CTRLB);
+    uart->CTRLB.reg = (SERCOM_USART_CTRLB_RXEN | SERCOM_USART_CTRLB_TXEN);
+    while (uart->SYNCBUSY.reg & SERCOM_USART_SYNCBUSY_CTRLB);
     /* finally, enable the device */
-    dev->CTRLA.reg |= SERCOM_USART_CTRLA_ENABLE;
+    uart->CTRLA.reg |= SERCOM_USART_CTRLA_ENABLE;
+    /* configure interrupts and enable RX interrupt */
+    NVIC_EnableIRQ(SERCOM0_IRQn + _sercom_id(_uart(dev)));
+    uart->INTENSET.reg = SERCOM_USART_INTENSET_RXC;
     return 0;
 }
 
-void uart_tx_begin(uart_t uart)
+void uart_write(uart_t dev, char data)
 {
-    _uart(uart)->INTENSET.reg = SERCOM_USART_INTENSET_TXC;
+    _uart(dev)->DATA.reg = (uint8_t)data;
 }
 
-int uart_read_blocking(uart_t uart, char *data)
+void uart_write_blocking(uart_t dev, char data)
 {
-    while(!(_uart(uart)->INTFLAG.reg & SERCOM_USART_INTFLAG_RXC));
-    *data = (char)_uart(uart)->DATA.reg;
-    return 1;
+    while (!(_uart(dev)->INTFLAG.reg & SERCOM_USART_INTFLAG_DRE));
+    _uart(dev)->DATA.reg = (uint8_t)data;
 }
 
-int uart_write(uart_t uart, char data)
+void uart_poweron(uart_t dev)
 {
-    _uart(uart)->DATA.reg = (uint8_t)data;
-    return 1;
-}
-
-int uart_write_blocking(uart_t uart, char data)
-{
-    while (!(_uart(uart)->INTFLAG.reg & SERCOM_USART_INTFLAG_DRE));
-    _uart(uart)->DATA.reg = (uint8_t)data;
-    return 1;
-}
-
-void uart_poweron(uart_t uart)
-{
-    PM->APBCMASK.reg |= (PM_APBCMASK_SERCOM0 << _sercom_id(_uart(uart)));
+    PM->APBCMASK.reg |= (PM_APBCMASK_SERCOM0 << _sercom_id(_uart(dev)));
     GCLK->CLKCTRL.reg = (GCLK_CLKCTRL_CLKEN |
                          GCLK_CLKCTRL_GEN_GCLK0 |
-                         (SERCOM0_GCLK_ID_CORE + _sercom_id(_uart(uart))) <<
+                         (SERCOM0_GCLK_ID_CORE + _sercom_id(_uart(dev))) <<
                           GCLK_CLKCTRL_ID_Pos);
     while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY);
 }
 
-void uart_poweroff(uart_t uart)
+void uart_poweroff(uart_t dev)
 {
-    PM->APBCMASK.reg &= ~(PM_APBCMASK_SERCOM0 << _sercom_id(_uart(uart)));
-    GCLK->CLKCTRL.reg = ((SERCOM0_GCLK_ID_CORE + _sercom_id(_uart(uart))) <<
+    PM->APBCMASK.reg &= ~(PM_APBCMASK_SERCOM0 << _sercom_id(_uart(dev)));
+    GCLK->CLKCTRL.reg = ((SERCOM0_GCLK_ID_CORE + _sercom_id(_uart(dev))) <<
                           GCLK_CLKCTRL_ID_Pos);
     while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY);
 }
+
 
 static inline void irq_handler(int dev)
 {

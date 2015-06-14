@@ -16,8 +16,8 @@
  * @author          Hauke Petersen <hauke.peterse@fu-berlin.de>
  */
 
-#ifndef PERIPH_CPU_H_
-#define PERIPH_CPU_H_
+#ifndef PERIPH_CPU_H
+#define PERIPH_CPU_H
 
 #include "cpu.h"
 #include "periph/dev_enums.h"
@@ -93,6 +93,15 @@ typedef enum {
 } gpio_af_out_t;
 
 /**
+ * @brief declare needed generic SPI functions
+ * @{
+ */
+#define PERIPH_SPI_NEEDS_TRANSFER_BYTES
+#define PERIPH_SPI_NEEDS_TRANSFER_REG
+#define PERIPH_SPI_NEEDS_TRANSFER_REGS
+/** @} */
+
+/**
  * @brief   Configure the alternate function for the given pin
  *
  * @note    This is meant for internal use in STM32F1 peripheral drivers only
@@ -102,18 +111,9 @@ typedef enum {
  */
 void gpio_init_af(gpio_t pin, gpio_af_out_t af);
 
-/**
- * @brief declare needed generic SPI functions
- * @{
- */
-#define PERIPH_SPI_NEEDS_TRANSFER_BYTES
-#define PERIPH_SPI_NEEDS_TRANSFER_REG
-#define PERIPH_SPI_NEEDS_TRANSFER_REGS
-/** @} */
-
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* PERIPH_CPU_H_ */
+#endif /* PERIPH_CPU_H */
 /** @} */
