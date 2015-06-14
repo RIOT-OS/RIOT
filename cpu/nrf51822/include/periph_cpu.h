@@ -24,14 +24,6 @@ extern "C" {
 #endif
 
 /**
- * @brief   Define mandatory GPIO types for NRF51822 CPUs
- * @{
- */
-typedef int gpio_t;
-typedef int gpio_mux_t;
-/** @} */
-
-/**
  * @brief   Override GPIO pull register select values
  * @{
  */
