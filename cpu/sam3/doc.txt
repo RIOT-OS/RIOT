@@ -1,5 +1,5 @@
 /**
- * @defgroup        cpu_sam3x8e Atmel SAM3X8E
+ * @defgroup        cpu_sam3 Atmel SAM3X8E
  * @ingroup         cpu
  * @brief           Atmel SAM3X8E Cortex-M3 MCU specific code
  */
