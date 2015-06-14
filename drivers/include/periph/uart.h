@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Freie Universität Berlin
+ * Copyright (C) 2014-2015 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -13,7 +13,7 @@
  * @{
  *
  * @file
- * @brief       Low-level UART peripheral driver interface definitions
+ * @brief       Low-level UART peripheral driver interface definition
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
@@ -23,48 +23,63 @@
 
 #include <stdint.h>
 
+#include "periph_cpu.h"
 #include "periph_conf.h"
+/* TODO: remove once all platforms are ported to this interface */
+#include "periph/dev_enums.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/* guard file in case no UART device was specified */
-#if UART_NUMOF
-
 /**
- * @brief Definition of available UART devices
- *
- * To this point a maximum of 4 UART devices would be available,
- * this should be enough for most applications?!
+ * @brief   Make sure the number of available UART devices is defined
+ * @{
  */
-typedef enum {
-#if UART_0_EN
-    UART_0 = 0,             /**< UART channel 0 */
+#ifndef UART_NUMOF
+#error "UART_NUMOF undefined for the target platform"
 #endif
-#if UART_1_EN
-    UART_1,                 /**< UART channel 1 */
-#endif
-#if UART_2_EN
-    UART_2,                 /**< UART channel 2 */
-#endif
-#if UART_3_EN
-    UART_3,                 /**< UART channel 3 */
-#endif
-} uart_t;
+/** @} */
 
 /**
- * @brief Signature for receive interrupt callback
+ * @brief   Define default UART type identifier
+ * @{
+ */
+#ifndef HAVE_UART_T
+typedef int uart_t;
+#endif
+/** @} */
+
+/**
+ * @brief   Default UART undefined value
+ * @{
+ */
+#ifndef UART_UNDEF
+#define UART_UNDEF      (-1)
+#endif
+/** @} */
+
+/**
+ * @brief   Default UART device access macro
+ * @{
+ */
+#ifndef UART_DEV
+#define UART_DEV(x)     (x)
+#endif
+/** @} */
+
+/**
+ * @brief   Signature for receive interrupt callback
  *
- * @param[in] arg           optional argument to put the callback in the right context
+ * @param[in] arg           context to the callback (optional)
  * @param[in] data          the byte that was received
  */
 typedef void(*uart_rx_cb_t)(void *arg, char data);
 
 /**
- * @brief Signature for the transmit complete interrupt callback
+ * @brief   Signature for the transmit complete interrupt callback
  *
- * @param[in] arg           optional argument to put the callback in the right context
+ * @param[in] arg           context to the callback (optional)
  *
  * @return                  1 if more data is to be send
  * @return                  0 if no more data is to be send
@@ -72,95 +87,83 @@ typedef void(*uart_rx_cb_t)(void *arg, char data);
 typedef int(*uart_tx_cb_t)(void *arg);
 
 /**
- * @brief Initialize a given UART device
+ * @brief   Interrupt context for a UART device
+ * @{
+ */
+#ifndef HAVE_UART_ISR_CTX_T
+typedef struct {
+    uart_rx_cb_t rx_cb;     /**< data received interrupt callback */
+    uart_tx_cb_t tx_cb;     /**< data transmission done interrupt callback */
+    void *arg;              /**< argument to both callback routines */
+} uart_isr_ctx_t;
+#endif
+/** @} */
+
+/**
+ * @brief   Initialize a given UART device
  *
  * The UART device will be initialized with the following configuration:
  * - 8 data bits
  * - no parity
  * - 1 stop bit
- * - baud-rate as given
+ * - baudrate as given
  *
- * @param[in] uart          the UART device to initialize
- * @param[in] baudrate      the desired baud-rate in baud/s
- * @param[in] rx_cb         receive callback is called for every byte the is receive
- *                          in interrupt context
- * @param[in] tx_cb         transmit callback is called when done with sending a byte
- *                          (TX buffer gets empty)
- * @param[in] arg           optional argument passed to the callback functions
+ * @param[in] uart          UART device to initialize
+ * @param[in] baudrate      desired baudrate in baud/s
+ * @param[in] rx_cb         receive callback, executed in interrupt context once
+ *                          for every byte that is received (RX buffer filled)
+ * @param[in] tx_cb         transmit callback, executed in interrupt context
+ *                          for each finished byte transfer (TX buffer empty)
+ * @param[in] arg           optional context passed to the callback functions
  *
  * @return                  0 on success
- * @return                  -1 for invalid baud-rate
- * @return                  -2 for all other errors
+ * @return                  -1 on invalid UART device
+ * @return                  -2 on inapplicable baudrate
+ * @return                  -3 on other errors
  */
-int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, uart_tx_cb_t tx_cb, void *arg);
+int uart_init(uart_t uart, uint32_t baudrate,
+              uart_rx_cb_t rx_cb, uart_tx_cb_t tx_cb, void *arg);
 
 /**
- * @brief Initialize an UART device for (conventional) blocking usage
+ * @brief   Begin a new transmission
  *
- * This function initializes the an UART device for usage without interrupts.
- * When initializing with this function, the corresponding read_blocking and
- * write_blocking functions must be used.
- *
- * The blocking mode should only be used for debugging and testing.
- *
- * Same as uart_init(), the UART device is configured with in 8N1 mode with the given baud-rate.
- *
- * @param[in] uart          the UART device to initialize
- * @param[in] baudrate      the desired baud-rate in baud/s
- *
-* @return                   0 on success, -1 for invalid baud-rate, -2 for all other errors
- */
-int uart_init_blocking(uart_t uart, uint32_t baudrate);
-
-/**
- * @brief Begin a new transmission, on most platforms this function will enable the TX interrupt
+ * When sending buffered data, we need to tell the UART device, whenever there
+ * is new data waiting to be transferred. In that case, this function should be
+ * called. On most platforms this function will simply enable the TX interrupt
+ * leading to a call of the TX callback function.
  *
  * @param[in] uart          UART device that will start a transmission
  */
 void uart_tx_begin(uart_t uart);
 
 /**
- * @brief Write a byte into the UART's send register
+ * @brief   Write a byte into the UART's send register
  *
- * Writing a byte into while another byte is still waiting to be transferred will override
- * the old byte. This method should be used in the transmit callback routine as in this it
- * is made sure that no old byte is waiting to be transferred.
+ * Calling this function while another byte is still waiting to be transferred,
+ * this call will overwrite the waiting byte. This method should be used in the
+ * TX callback routine, as here it is made sure that no old byte is waiting to
+ * be transferred.
  *
- * @param[in] uart          the UART device to use for transmission
- * @param[in] data          the byte to write
- *
- * @return                  1 on success, -1 on error
+ * @param[in] uart          UART device to use for transmission
+ * @param[in] data          data byte to send
  */
-int uart_write(uart_t uart, char data);
+void uart_write(uart_t uart, char data);
 
 /**
- * @brief Read a single character from the given UART device in blocking manner.
+ * @brief   Write a single byte to the given UART device (blocking)
  *
- * This function will actively wait until a byte is available in the UART receive
- * register. Consider using the interrupt driven UART mode instead!
+ * In contrast *uart_write*, this function will block (active waiting) until the
+ * UART device is ready to send the new byte.
  *
- * @param[in] uart          the UART device to read from
- * @param[in] data          the byte to write
+ * @note Use for testing purposes only!
  *
- * @return                  1 on success, -1 on error
+ * @param[in] uart          UART device to write to
+ * @param[in] data          data byte to send
  */
-int uart_read_blocking(uart_t uart, char *data);
+void uart_write_blocking(uart_t uart, char data);
 
 /**
- * @brief Write a single byte to the given UART device in blocking manner.
- *
- * Note: in contrast uart_write, this function will actively wait (block) until the UART
- * device is ready to send a new byte. Consider using the interrupt driven UART mode instead.
- *
- * @param[in] uart          the UART device to write to
- * @param[in] data          the byte to send
- *
- * @return                  1 on success, -1 on error
- */
-int uart_write_blocking(uart_t uart, char data);
-
-/**
- * @brief Power on the given UART device
+ * @brief   Power on the given UART device
  *
  * @param[in] uart          the UART device to power on
  */
@@ -172,8 +175,6 @@ void uart_poweron(uart_t uart);
  * @param[in] uart          the UART device to power off
  */
 void uart_poweroff(uart_t uart);
-
-#endif /* UART_NUMOF */
 
 #ifdef __cplusplus
 }
