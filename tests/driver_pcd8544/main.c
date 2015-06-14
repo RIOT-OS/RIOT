@@ -156,18 +156,6 @@ static const shell_command_t shell_commands[] = {
     { NULL, NULL, NULL }
 };
 
-static int _getchar(void)
-{
-    char c = 0;
-    (void) posix_read(uart0_handler_pid, &c, 1);
-    return c;
-}
-
-static void _putchar(int c)
-{
-    putchar(c);
-}
-
 int main(void)
 {
     shell_t shell;
@@ -183,7 +171,7 @@ int main(void)
     /* run shell */
     puts("All OK, running shell now");
     (void) posix_open(uart0_handler_pid, 0);
-    shell_init(&shell, shell_commands, SHELL_BUFSIZE, _getchar, _putchar);
+    shell_init(&shell, shell_commands, SHELL_BUFSIZE, uart0_readc, uart0_putc);
     shell_run(&shell);
 
     return 0;

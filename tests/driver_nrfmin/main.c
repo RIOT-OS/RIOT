@@ -32,21 +32,6 @@
 
 static char nomac_stack[THREAD_STACKSIZE_DEFAULT];
 
-int shell_read(void)
-{
-    char c;
-    int result = posix_read(uart0_handler_pid, &c, 1);
-    if (result != 1) {
-        return -1;
-    }
-    return (unsigned char) c;
-}
-
-void shell_put(int c)
-{
-    putchar(c);
-}
-
 int main(void)
 {
     shell_t shell;
@@ -68,7 +53,7 @@ int main(void)
     /* initialize and run the shell */
     board_uart0_init();
     posix_open(uart0_handler_pid, 0);
-    shell_init(&shell, NULL, SHELL_BUFSIZE, shell_read, shell_put);
+    shell_init(&shell, NULL, SHELL_BUFSIZE, uart0_readc, uart0_putc);
     shell_run(&shell);
 
     return 0;
