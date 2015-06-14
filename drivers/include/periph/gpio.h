@@ -28,10 +28,17 @@ extern "C" {
 #endif
 
 /**
- * @brief   Defined the
+ * @brief   Default GPIO macro maps port-pin tuples to the pin value
  */
 #ifndef GPIO
 #define GPIO(x,y)       ((x & 0) | y)
+#endif
+
+/**
+ * @brief   Define global value for GPIO not defined
+ */
+#ifndef GPIO_UNDEF
+#define GPIO_UNDEF      (-1)
 #endif
 
 /**
