@@ -74,16 +74,13 @@
 
 /**
  * @name UART configuration
+ *
+ * @note The NRF51822 only has one UART, so we keep it simple
  * @{
  */
 #define UART_NUMOF          (1U)
-#define UART_0_EN           1
-#define UART_IRQ_PRIO       1
-
-/* UART 0 device configuration */
-#define UART_DEV            NRF_UART0
-#define UART_PIN_RX         17
-#define UART_PIN_TX         18
+#define UART_PIN_RX         (17U)
+#define UART_PIN_TX         (18U)
 /** @} */
 
 /**

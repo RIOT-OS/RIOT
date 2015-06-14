@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2015 Kaspar Schleiser <kaspar@schleiser.de>
  *               2015 FreshTemp, LLC.
- *               2014 Freie Universität Berlin
+ *               2014-2015 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -13,14 +13,17 @@
  * @{
  *
  * @file
- * @brief       Peripheral MCU configuration for the Atmel SAM L21 Xplained Pro board
+ * @brief       Peripheral MCU configuration for the Atmel SAM L21 Xplained Pro
  *
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
- * @autor       Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
 #ifndef __PERIPH_CONF_H
 #define __PERIPH_CONF_H
+
+#include "periph_cpu.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -49,22 +52,12 @@ extern "C" {
  * @name UART configuration
  * @{
  */
-#define UART_NUMOF          (1U)
-#define UART_0_EN           1
-#define UART_IRQ_PRIO       1
+static const uart_conf_t uart_config[] = {
+    {&SERCOM3->USART, GPIO(PA,23), GPIO(PA,22)},    /* device, RX pin, TX pin */
+};
 
-/* UART 0 device configuration */
-#define UART_0_DEV          SERCOM3->USART
-#define UART_0_IRQ          SERCOM3_IRQn
 #define UART_0_ISR          isr_sercom3
-#define UART_0_REF_F        (16000000UL)
-#define UART_0_RUNSTDBY     1
-
-/* UART 0 pin configuration */
-#define UART_0_PORT         (PORT->Group[0])
-#define UART_0_TX_PIN       (22)
-#define UART_0_RX_PIN       (23)
-#define UART_0_PINS         (((PORT_PA22 | PORT_PA23) >> 16) | PORT_WRCONFIG_HWSEL)
+#define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_conf_t))
 /** @} */
 
 /**
