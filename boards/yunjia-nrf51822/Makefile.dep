@@ -1,0 +1,4 @@
+ifneq (,$(filter ng_netif,$(USEMODULE)))
+  USEMODULE += radio_blemin
+  USEMODULE += ng_nomac
+endif
