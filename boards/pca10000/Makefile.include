@@ -1,11 +1,12 @@
-# define the cpu used by the nRF51822 board pca10000
-export CPU = nrf51822
-export CPU_MODEL = nrf51822qfaa
+# define the used CPU
+export CPU = nrf51
+export CPU_MODEL = nrf51x22xxaa
 
 # define the default port depending on the host OS
 PORT_LINUX ?= /dev/ttyACM0
 PORT_DARWIN ?= $(shell ls -1 /dev/tty.SLAB_USBtoUART* | head -n 1)
 
+# define flash and debugging environment
 export FLASHER = $(RIOTBOARD)/$(BOARD)/dist/flash.sh
 export DEBUGGER = $(RIOTBOARD)/$(BOARD)/dist/debug.sh
 export DEBUGSERVER = JLinkGDBServer -device nrf51822 -if SWD

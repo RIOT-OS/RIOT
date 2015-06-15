@@ -1,6 +1,6 @@
-# define the cpu used by the yunjia-nrf51822 board
-export CPU = nrf51822
-export CPU_MODEL = nrf51822qfaa
+# define the used CPU
+export CPU = nrf51
+export CPU_MODEL = nrf51x22xxaa
 
 # define the default port depending on the host OS
 PORT_LINUX ?= /dev/ttyUSB0
