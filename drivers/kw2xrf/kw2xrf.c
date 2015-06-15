@@ -27,7 +27,7 @@
 #include "net/ng_netbase.h"
 #include "net/ng_ieee802154.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG    (1)
 #include "debug.h"
 
 /**
@@ -216,14 +216,15 @@ void kw2xrf_set_sequence(kw2xrf_t *dev, kw2xrf_physeq_t seq)
     /* TODO: This should only used in combination with
      *       an CSMA-MAC layer. Currently not working
      */
-    /*if((seq == XCVSEQ_TRANSMIT) || (seq == XCVSEQ_TX_RX)) {
-        if((dev->option) & KW2XRF_OPT_AUTOACK) {
+    if((seq == XCVSEQ_TRANSMIT) || (seq == XCVSEQ_TX_RX)) {
+        if (((dev->option) & KW2XRF_OPT_AUTOACK)
+        && !((dev->option) & KW2XRF_OPT_CURR_PKT_BCAST)) {
             seq = XCVSEQ_TX_RX;
         }
         else {
             seq = XCVSEQ_TRANSMIT;
         }
-    }*/
+    }
 
     DEBUG("kw2xrf: Set sequence to %i\n", seq);
     reg = kw2xrf_read_dreg(MKW2XDM_PHY_CTRL1);
@@ -649,6 +650,7 @@ void kw2xrf_set_option(kw2xrf_t *dev, uint16_t option, bool state)
                 DEBUG("[kw2xrf] opt: enabling auto ACKs\n");
                 reg = kw2xrf_read_dreg(MKW2XDM_PHY_CTRL1);
                 reg |= MKW2XDM_PHY_CTRL1_AUTOACK;
+                reg |= MKW2XDM_PHY_CTRL1_RXACKRQD;
                 kw2xrf_write_dreg(MKW2XDM_PHY_CTRL1, reg);
                 break;
 
@@ -686,6 +688,7 @@ void kw2xrf_set_option(kw2xrf_t *dev, uint16_t option, bool state)
             case KW2XRF_OPT_AUTOACK:
                 reg = kw2xrf_read_dreg(MKW2XDM_PHY_CTRL1);
                 reg &= ~(MKW2XDM_PHY_CTRL1_AUTOACK);
+                reg &= ~(MKW2XDM_PHY_CTRL1_RXACKRQD);
                 kw2xrf_write_dreg(MKW2XDM_PHY_CTRL1, reg);
                 break;
 
@@ -782,6 +785,16 @@ int kw2xrf_set(ng_netdev_t *netdev, ng_netconf_opt_t opt, void *value, size_t va
 
         case NETCONF_OPT_AUTOCCA:
             kw2xrf_set_option(dev, KW2XRF_OPT_CSMA,
+                              ((bool *)value)[0]);
+            return sizeof(ng_netconf_enable_t);
+
+        case NETCONF_OPT_RX_END_IRQ:
+            kw2xrf_set_option(dev, KW2XRF_OPT_TELL_RX_END,
+                              ((bool *)value)[0]);
+            return sizeof(ng_netconf_enable_t);
+
+        case NETCONF_OPT_TX_END_IRQ:
+            kw2xrf_set_option(dev, KW2XRF_OPT_TELL_TX_END,
                               ((bool *)value)[0]);
             return sizeof(ng_netconf_enable_t);
 
@@ -954,7 +967,7 @@ void _receive_data(kw2xrf_t *dev)
         }
 
         payload->data = dev->buf;
-        dev->event_cb(NETDEV_EVENT_RX_COMPLETE, payload);
+        dev->event_cb((ng_netdev_t*)dev, NETDEV_EVENT_RX_COMPLETE, payload);
         return;
     }
 
@@ -993,7 +1006,7 @@ void _receive_data(kw2xrf_t *dev)
         return;
     }
 
-    dev->event_cb(NETDEV_EVENT_RX_COMPLETE, payload);
+    dev->event_cb((ng_netdev_t*)dev, NETDEV_EVENT_RX_COMPLETE, payload);
 }
 
 void kw2xrf_isr_event(ng_netdev_t *netdev, uint32_t event_type)
@@ -1005,13 +1018,18 @@ void kw2xrf_isr_event(ng_netdev_t *netdev, uint32_t event_type)
     if ((irqst1 & MKW2XDM_IRQSTS1_RXIRQ) && (irqst1 & MKW2XDM_IRQSTS1_SEQIRQ)) {
         /* RX */
         DEBUG("kw2xrf: RX Int\n");
-        _receive_data(dev);
+        if (dev->option & KW2XRF_OPT_TELL_RX_END) {
+            _receive_data(dev);
+        }
         kw2xrf_set_sequence(dev, XCVSEQ_RECEIVE);
         kw2xrf_write_dreg(MKW2XDM_IRQSTS1, MKW2XDM_IRQSTS1_RXIRQ | MKW2XDM_IRQSTS1_SEQIRQ);
     }
     else if ((irqst1 & MKW2XDM_IRQSTS1_TXIRQ) && (irqst1 & MKW2XDM_IRQSTS1_SEQIRQ)) {
         /* TX_Complete */
-        /* Device is automatically in Radio-idle state when TX is done */
+        DEBUG("kw2xrf: TX Complete\n");
+        if (dev->event_cb && (dev->option & KW2XRF_OPT_TELL_TX_END)) {
+            dev->event_cb(netdev, NETDEV_EVENT_TX_COMPLETE, NULL);
+        }
         kw2xrf_set_sequence(dev, XCVSEQ_RECEIVE);
         DEBUG("kw2xrf: TX Complete\n");
         kw2xrf_write_dreg(MKW2XDM_IRQSTS1, MKW2XDM_IRQSTS1_TXIRQ | MKW2XDM_IRQSTS1_SEQIRQ);
@@ -1020,9 +1038,15 @@ void kw2xrf_isr_event(ng_netdev_t *netdev, uint32_t event_type)
         /* TX_Started (CCA_done) */
         if (irqst2 & MKW2XDM_IRQSTS2_CCA) {
             DEBUG("kw2xrf: CCA done -> Channel busy\n");
+            if (dev->event_cb && (dev->option & KW2XRF_OPT_TELL_TX_END)) {
+                dev->event_cb(netdev, NETDEV_EVENT_CCA_CHANNEL_BUSY, NULL);
+            }
         }
         else {
             DEBUG("kw2xrf: CCA done -> Channel idle\n");
+            if (dev->event_cb && (dev->option & KW2XRF_OPT_TELL_TX_END)) {
+                dev->event_cb(netdev, NETDEV_EVENT_CCA_CHANNEL_IDLE, NULL);
+            }
         }
 
         kw2xrf_write_dreg(MKW2XDM_IRQSTS1, MKW2XDM_IRQSTS1_CCAIRQ | MKW2XDM_IRQSTS1_SEQIRQ);
@@ -1056,17 +1080,12 @@ int _assemble_tx_buf(kw2xrf_t *dev, ng_pktsnip_t *pkt)
     hdr = (ng_netif_hdr_t *)pkt->data;
 
     /* FCF, set up data frame, request for ack, panid_compression */
-    /* TODO: Currently we don´t request for Ack in this device.
-     * since this is a soft_mac device this has to be
-     * handled in a upcoming CSMA-MAC layer.
-     */
-    /*if(dev->option & KW2XRF_OPT_AUTOACK) {
+    if(dev->option & KW2XRF_OPT_AUTOACK) {
         dev->buf[1] = 0x61;
     }
     else {
         dev->buf[1] = 0x51;
-    }*/
-    dev->buf[1] = 0x51;
+    }
 
     /* set sequence number */
     dev->buf[3] = dev->seq_nr++;
@@ -1080,6 +1099,7 @@ int _assemble_tx_buf(kw2xrf_t *dev, ng_pktsnip_t *pkt)
     /* fill in destination address */
     if (hdr->flags &
         (NG_NETIF_HDR_FLAGS_BROADCAST | NG_NETIF_HDR_FLAGS_MULTICAST)) {
+        dev->option |= KW2XRF_OPT_CURR_PKT_BCAST;
         dev->buf[2] = 0x88;
         dev->buf[index++] = 0xff;
         dev->buf[index++] = 0xff;
@@ -1088,6 +1108,7 @@ int _assemble_tx_buf(kw2xrf_t *dev, ng_pktsnip_t *pkt)
         dev->buf[index++] = (uint8_t)(dev->addr_short[1]);
     }
     else if (hdr->dst_l2addr_len == 2) {
+        dev->option &= ~(KW2XRF_OPT_CURR_PKT_BCAST);
         /* set to short addressing mode */
         dev->buf[2] = 0x88;
         /* set destination address, byte order is inverted */
@@ -1101,6 +1122,7 @@ int _assemble_tx_buf(kw2xrf_t *dev, ng_pktsnip_t *pkt)
         dev->buf[index++] = (uint8_t)(dev->addr_short[1]);
     }
     else if (hdr->dst_l2addr_len == 8) {
+        dev->option &= ~(KW2XRF_OPT_CURR_PKT_BCAST);
         /* default to use long address mode for src and dst */
         dev->buf[2] |= 0xcc;
         /* set destination address located directly after ng_ifhrd_t in memory */

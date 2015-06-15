@@ -130,7 +130,7 @@ enum mkw2xdrf_dregister {
 #define MKW2XDM_PHY_CTRL1_CCABFRTX                  (1 << 5)
 #define MKW2XDM_PHY_CTRL1_RXACKRQD                  (1 << 4)
 #define MKW2XDM_PHY_CTRL1_AUTOACK                   (1 << 3)
-#define MKW2XDM_PHY_CTRL1_XCVSEQ_MASK               0x03u
+#define MKW2XDM_PHY_CTRL1_XCVSEQ_MASK               0x07u
 #define MKW2XDM_PHY_CTRL1_XCVSEQ(x)                 (((uint8_t)(((uint8_t)(x))<<0))&MKW2XDM_PHY_CTRL1_XCVSEQ_MASK)
 
 #define MKW2XDM_PHY_CTRL2_CRC_MSK                   (1 << 7)
