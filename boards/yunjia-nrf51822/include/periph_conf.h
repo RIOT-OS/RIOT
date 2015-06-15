@@ -138,32 +138,6 @@ extern "C" {
 #define RADIO_IRQ_PRIO      1
 /** @} */
 
-/**
- * @name GPIO configuration
- * @{
- */
-#define GPIO_NUMOF          (8U)
-#define GPIO_0_EN           1
-#define GPIO_1_EN           1
-#define GPIO_2_EN           1
-#define GPIO_3_EN           1
-#define GPIO_4_EN           1
-#define GPIO_5_EN           1
-#define GPIO_6_EN           1
-#define GPIO_7_EN           1
-#define GPIO_IRQ_PRIO       1
-
-/* GPIO pin configuration */
-#define GPIO_0_PIN          7
-#define GPIO_1_PIN          8
-#define GPIO_2_PIN          9
-#define GPIO_3_PIN          10
-#define GPIO_4_PIN          11
-#define GPIO_5_PIN          12
-#define GPIO_6_PIN          13
-#define GPIO_7_PIN          14
-/** @} */
-
 #ifdef __cplusplus
 }
 #endif

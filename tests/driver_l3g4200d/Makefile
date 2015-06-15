@@ -22,13 +22,13 @@ ifneq (,$(TEST_L3G4200D_INT))
   CFLAGS += -DTEST_L3G4200D_INT=$(TEST_L3G4200D_INT)
 else
   # set random default
-  CFLAGS += -DTEST_L3G4200D_INT=GPIO_0
+  CFLAGS += -DTEST_L3G4200D_INT=GPIO\(0,0\)
 endif
 ifneq (,$(TEST_L3G4200D_DRDY))
   CFLAGS += -DTEST_L3G4200D_DRDY=$(TEST_L3G4200D_DRDY)
 else
   # set random default
-  CFLAGS += -DTEST_L3G4200D_DRDY=GPIO_1
+  CFLAGS += -DTEST_L3G4200D_DRDY=GPIO\(0,1\)
 endif
 
 include $(RIOTBASE)/Makefile.include

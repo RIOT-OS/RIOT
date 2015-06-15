@@ -38,7 +38,7 @@ enum {
 } rw;
 
 static int spi_dev = -1;
-static int spi_cs = -1;
+static gpio_t spi_cs = -1;
 static int spi_mode = -1;
 static int spi_speed = -1;
 static int spi_master = -1;     /* 0 for slave, 1 for master, -1 for not initialized */
@@ -48,31 +48,33 @@ static char rx_buffer[256];    /* global receive buffer */
 static int rx_counter = 0;
 
 static volatile int state;
-static char* mem = "Hello Master! abcdefghijklmnopqrstuvwxyz 0123456789 ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+static char* mem = "Hello Master! abcdefghijklmnopqrstuvwxyz 0123456789 "
+                   "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 int parse_spi_dev(int argc, char **argv)
 {
     /* reset default values */
+    int port, pin;
     spi_dev = SPI_0;
     spi_mode = SPI_CONF_FIRST_RISING;
     spi_speed = SPI_SPEED_1MHZ;
 
-    if (argc < 3 || argc > 5) {
-        printf("usage: %s DEV CS [MODE [SPEED]]\n", argv[0]);
+    if (argc < 4) {
+        printf("usage: %s <dev> <cs port> <cs pin> [mode [speed]]\n", argv[0]);
         puts("        DEV is the SPI device to use:");
         for (int i = 0; i < SPI_NUMOF; i++) {
             printf("             %i - SPI_%i\n", i, i);
         }
-        puts("        CS is the GPIO used for the chip-select signal:");
-        for (int i = 0; i < GPIO_NUMOF; i++) {
-            printf("             %i - GPIO_%i\n", i, i);
-        }
-        puts("        MODE must be one of the following options (* marks default value):");
+        puts("        cs port:  port to use as the chip select line");
+        puts("        cs pin:   pin to use on th given port as cs line");
+        puts("        mode: must be one of the following options (* marks "
+                      "default value):");
         puts("            *0 - POL:0, PHASE:0 - ON FIRST RISING EDGE");
         puts("             1 - POL:0, PHASE:1 - ON SECOND RISING EDGE");
         puts("             2 - POL:1, PHASE:0 - ON FIRST FALLING EDGE");
         puts("             3 - POL:1, PHASE:1 - on second falling edge");
-        puts("        SPEED must be one of the following options (only used in master mode):");
+        puts("        speed: must be one of the following options (only used "
+                      "in master mode):");
         puts("             0 - 100 KHz");
         puts("             1 - 400 KHz");
         puts("            *2 - 1 MHz");
@@ -85,20 +87,18 @@ int parse_spi_dev(int argc, char **argv)
         puts("error: invalid DEV value given");
         return -1;
     }
-    spi_cs = atoi(argv[2]);
-    if (spi_dev < 0 || spi_dev >= GPIO_NUMOF) {
-        puts("error: invalid CS value given");
-        return -1;
-    }
-    if (argc >= 4) {
-        spi_mode = argv[3][0] - '0';
+    port = atoi(argv[2]);
+    pin = atoi(argv[3]);
+    spi_cs = GPIO(port,pin);
+    if (argc >= 5) {
+        spi_mode = argv[4][0] - '0';
         if (spi_mode < 0 || spi_mode > 3) {
             puts("error: invalid MODE value given");
             return -2;
         }
     }
-    if (argc >= 5) {
-        spi_speed = argv[4][0] - '0';
+    if (argc >= 6) {
+        spi_speed = argv[5][0] - '0';
         if (spi_speed < 0 || spi_speed > 4) {
             puts("error: invalid SPEED value given");
             return -3;
@@ -185,9 +185,9 @@ int cmd_init_master(int argc, char **argv)
         printf("spi_init_master: error initializing SPI_%i device (code %i)\n", spi_dev, res);
         return 1;
     }
-    res = gpio_init_out(spi_cs, GPIO_PULLUP);
+    res = gpio_init(spi_cs, GPIO_DIR_OUT, GPIO_PULLUP);
     if (res < 0){
-        printf("gpio_init_out: error initializing GPIO_%i as CS line (code %i)\n", spi_cs, res);
+        printf("gpio_init: error initializing GPIO_%i as CS line (code %i)\n", spi_cs, res);
         return 1;
     }
     gpio_set(spi_cs);

@@ -154,9 +154,9 @@ extern const ng_netdev_driver_t xbee_driver;
  * @param[in]  uart         UART interfaced the device is connected to
  * @param[in]  baudrate     baudrate to use
  * @param[in]  sleep_pin    GPIO pin that is connected to the SLEEP pin, set to
- *                          GPIO_NUMOF if not used
+ *                          GPIO_UNDEF if not used
  * @param[in]  status_pin   GPIO pin that is connected to the STATUS pin, set to
- *                          GPIO_NUMOF if not used
+ *                          GPIO_UNDEF if not used
  *
  * @return                  0 on success
  * @return                  -ENODEV on invalid device descriptor
@@ -172,9 +172,9 @@ typedef struct xbee_params {
     uart_t uart;            /**< UART interfaced the device is connected to */
     uint32_t baudrate;      /**< baudrate to use */
     gpio_t sleep_pin;       /**< GPIO pin that is connected to the SLEEP pin
-                                 set to GPIO_NUMOF if not used */
+                                 set to GPIO_UNDEF if not used */
     gpio_t status_pin;      /**< GPIO pin that is connected to the STATUS pin
-                                 set to GPIO_NUMOF if not used */
+                                 set to GPIO_UNDEF if not used */
 } xbee_params_t;
 
 #ifdef __cplusplus

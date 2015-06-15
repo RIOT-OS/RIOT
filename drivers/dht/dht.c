@@ -84,7 +84,7 @@ static void dht_read_data(gpio_t dev, uint32_t *data, uint8_t *checksum)
     hwtimer_wait(HWTIMER_TICKS(40));
 
     /* sync on device */
-    gpio_init_in(dev, GPIO_PULLUP);
+    gpio_init(dev, GPIO_DIR_IN, GPIO_PULLUP);
     while (!gpio_read(dev)) ;
     while (gpio_read(dev)) ;
 
@@ -123,7 +123,7 @@ static void dht_read_data(gpio_t dev, uint32_t *data, uint8_t *checksum)
     *checksum = les_bits & 0x00000000000000FF;
     *data = (les_bits >> 8) & 0x00000000FFFFFFFF;
 
-    gpio_init_out(dev, GPIO_PULLUP);
+    gpio_init(dev, GPIO_DIR_OUT, GPIO_PULLUP);
     gpio_set(dev);
 }
 
@@ -138,7 +138,7 @@ int dht_init(dht_t *dev, dht_type_t type, gpio_t gpio)
     dev->gpio = gpio;
     dev->type = type;
 
-    if (gpio_init_out(gpio, GPIO_PULLUP) == -1) {
+    if (gpio_init(gpio, GPIO_DIR_OUT, GPIO_PULLUP) == -1) {
         return -1;
     }
     gpio_set(gpio);
