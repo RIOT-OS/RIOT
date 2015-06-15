@@ -31,7 +31,7 @@
 #include "mutex.h"
 #include "vtimer.h"
 
-#define ENABLE_DEBUG        (1)
+#define ENABLE_DEBUG        (0)
 
 /* Enables integrated testing functions, such as LED-toggling
  * on state-change and idle-wait functions to test arbitration
@@ -71,6 +71,13 @@ static void _event_cb(ng_netdev_t *dev, ng_netdev_event_t event, void *data)
 
     case NETDEV_EVENT_RX_COMPLETE:
         {
+            /* There is no data, but inform statemachine of occured event */
+            if(data == NULL) {
+                _mac_send_statemachine(dev, NETDEV_EVENT_RX_COMPLETE);
+                DEBUG("csma_mac: empty packet received, statemachine informed about RX-event\n");
+                break;
+            }
+            
             ng_pktsnip_t *pkt;
             ng_netreg_entry_t *sendto;
 
@@ -233,14 +240,22 @@ static int _mac_send_statemachine(ng_netdev_t *dev, ng_netdev_event_t event)
             break;
 
         case CSMA_TX:
-            DEBUG("csma_mac-state: CSMA_TX\n");
+            DEBUG("csma_mac-state: CSMA_TX, event: %d\n", event);
             if (event == NETDEV_EVENT_TX_COMPLETE) {
-                csma_mac_state = CSMA_IDLE; 
-                csma_mac_txbuf_pos--;
-                _csma_mac_reset();
+                csma_mac_state = CSMA_WAIT_FOR_ACK; 
             }
             else if (event == NETDEV_EVENT_CCA_CHANNEL_BUSY) {
                  csma_mac_state = CSMA_WAIT;
+            }
+            else if (event == NETDEV_EVENT_CCA_CHANNEL_IDLE) {
+                csma_mac_state = CSMA_WAIT_FOR_ACK; 
+            }
+            /* May occure if TX-events can not be processed fast enough;
+             * if so, ACK was already received -> clean up and go to IDLE */
+            else if (event == NETDEV_EVENT_RX_COMPLETE) {
+                csma_mac_state = CSMA_IDLE;
+                csma_mac_txbuf_pos--;
+                _csma_mac_reset();
             }
             break;
 
@@ -262,8 +277,26 @@ static int _mac_send_statemachine(ng_netdev_t *dev, ng_netdev_event_t event)
 
         case CSMA_WAIT_FOR_ACK:
             DEBUG("csma_mac-state: CSMA_WAIT_FOR_ACK.\n");
-            /* TODO: Packet was sent, abort at this point for testing */
+            
+            /* TODO: Introduce ack timeout */
             csma_mac_state = CSMA_WAIT_FOR_ACK;
+            
+            if (event == NETDEV_EVENT_RX_COMPLETE) {
+                csma_mac_state = CSMA_WAIT_FOR_ACK; 
+                DEBUG("csma_mac-info: ACK-received; packet sucessful transmitted\n"); 
+            }
+            else {
+                csma_mac_state = CSMA_IDLE;
+                DEBUG("csma_mac-error: ACK-expected; %d received\n", event); 
+            }
+            
+            /* We are finished with that packet, clean up */
+            csma_mac_txbuf_pos--;
+            _csma_mac_reset();
+            break; 
+            
+            
+            
             return 0;
             /* TODO: Set RX state but only react on ACK, maybe introduce a new state */
             opt->opt = NETCONF_OPT_STATE;
