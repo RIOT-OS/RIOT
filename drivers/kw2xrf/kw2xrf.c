@@ -23,6 +23,7 @@
 #include "mutex.h"
 #include "msg.h"
 #include "periph/gpio.h"
+#include "periph/cpuid.h"
 #include "net/ng_netbase.h"
 #include "net/ng_ieee802154.h"
 
@@ -383,6 +384,10 @@ int kw2xrf_init(kw2xrf_t *dev, spi_t spi, spi_speed_t spi_speed,
     uint8_t reg = 0;
     uint8_t tmp[2];
     kw2xrf_gpio_int = int_pin;
+#if CPUID_ID_LEN
+    uint8_t cpuid[CPUID_ID_LEN];
+    eui64_t addr_long;
+#endif
 
     /* check device parameters */
     if (dev == NULL) {
@@ -406,13 +411,34 @@ int kw2xrf_init(kw2xrf_t *dev, spi_t spi, spi_speed_t spi_speed,
     dev->proto = KW2XRF_DEFAULT_PROTOCOL;
     dev->option = 0;
 
-    /* set default short address */
-    uint16_t addr_conv = KW2XRF_DEFAULT_SHORT_ADDR >> 8;
-    addr_conv |= (KW2XRF_DEFAULT_SHORT_ADDR << 8) & 0xff00;
-    kw2xrf_set_addr(dev, addr_conv);
+#if CPUID_ID_LEN
+    cpuid_get(cpuid);
 
-    /* set default long address */
-    kw2xrf_set_addr_long(dev, KW2XRF_DEFAULT_ADDR_LONG);
+#if CPUID_ID_LEN < 8
+
+    /* in case CPUID_ID_LEN < 8, fill missing bytes with zeros */
+    for (int i = CPUID_ID_LEN; i < 8; i++) {
+        cpuid[i] = 0;
+    }
+
+#else
+
+    for (int i = 8; i < CPUID_ID_LEN; i++) {
+        cpuid[i & 0x07] ^= cpuid[i];
+    }
+
+#endif
+    /* make sure we mark the address as non-multicast and not globally unique */
+    cpuid[0] &= ~(0x01);
+    cpuid[0] |= 0x02;
+    /* copy and set long address */
+    memcpy(&addr_long, cpuid, 8);
+    kw2xrf_set_addr_long(dev, NTOHLL(addr_long.uint64.u64));
+    kw2xrf_set_addr(dev, NTOHS(addr_long.uint16[3].u16));
+#else
+    kw2xrf_set_addr_long(dev, KW2XRF_DEFAULT_SHORT_ADDR);
+    kw2xrf_set_addr(dev, KW2XRF_DEFAULT_ADDR_LONG);
+#endif
 
     /* set default TX-Power */
     dev->tx_power = KW2XRF_DEFAULT_TX_POWER;
@@ -995,8 +1021,10 @@ void kw2xrf_isr_event(ng_netdev_t *netdev, uint32_t event_type)
         if (irqst2 & MKW2XDM_IRQSTS2_CCA) {
             DEBUG("kw2xrf: CCA done -> Channel busy\n");
         }
+        else {
+            DEBUG("kw2xrf: CCA done -> Channel idle\n");
+        }
 
-        DEBUG("kw2xrf: CCA done -> Channel idle\n");
         kw2xrf_write_dreg(MKW2XDM_IRQSTS1, MKW2XDM_IRQSTS1_CCAIRQ | MKW2XDM_IRQSTS1_SEQIRQ);
         kw2xrf_set_sequence(dev, XCVSEQ_RECEIVE);
     }
@@ -1013,7 +1041,7 @@ void kw2xrf_isr_event(ng_netdev_t *netdev, uint32_t event_type)
 }
 
 /* TODO: Move to ng_ieee802.15.4 as soon as ready */
-uint8_t _assemble_tx_buf(kw2xrf_t *dev, ng_pktsnip_t *pkt)
+int _assemble_tx_buf(kw2xrf_t *dev, ng_pktsnip_t *pkt)
 {
     ng_netif_hdr_t *hdr;
     hdr = (ng_netif_hdr_t *)pkt->data;
@@ -1026,11 +1054,6 @@ uint8_t _assemble_tx_buf(kw2xrf_t *dev, ng_pktsnip_t *pkt)
 
     /* get netif header check address length */
     hdr = (ng_netif_hdr_t *)pkt->data;
-
-    if (!(hdr->dst_l2addr_len == 2 || hdr->dst_l2addr_len == 8)) {
-        ng_pktbuf_release(pkt);
-        return -ENOMSG;
-    }
 
     /* FCF, set up data frame, request for ack, panid_compression */
     /* TODO: Currently we don´t request for Ack in this device.
@@ -1050,12 +1073,23 @@ uint8_t _assemble_tx_buf(kw2xrf_t *dev, ng_pktsnip_t *pkt)
 
     index = 4;
 
-    if (hdr->dst_l2addr_len == 2) {
+    /* set destination pan_id */
+    dev->buf[index++] = (uint8_t)((dev->radio_pan) & 0xff);
+    dev->buf[index++] = (uint8_t)((dev->radio_pan) >> 8);
+
+    /* fill in destination address */
+    if (hdr->flags &
+        (NG_NETIF_HDR_FLAGS_BROADCAST | NG_NETIF_HDR_FLAGS_MULTICAST)) {
+        dev->buf[2] = 0x88;
+        dev->buf[index++] = 0xff;
+        dev->buf[index++] = 0xff;
+        /* set source address */
+        dev->buf[index++] = (uint8_t)(dev->addr_short[0]);
+        dev->buf[index++] = (uint8_t)(dev->addr_short[1]);
+    }
+    else if (hdr->dst_l2addr_len == 2) {
         /* set to short addressing mode */
         dev->buf[2] = 0x88;
-        /* set destination pan_id */
-        dev->buf[index++] = (uint8_t)((dev->radio_pan) & 0xff);
-        dev->buf[index++] = (uint8_t)((dev->radio_pan) >> 8);
         /* set destination address, byte order is inverted */
         dev->buf[index++] = (ng_netif_hdr_get_dst_addr(hdr))[1];
         dev->buf[index++] = (ng_netif_hdr_get_dst_addr(hdr))[0];
@@ -1066,11 +1100,7 @@ uint8_t _assemble_tx_buf(kw2xrf_t *dev, ng_pktsnip_t *pkt)
         dev->buf[index++] = (uint8_t)(dev->addr_short[0]);
         dev->buf[index++] = (uint8_t)(dev->addr_short[1]);
     }
-
-    if (hdr->dst_l2addr_len == 8) {
-        /* set destination pan_id, wireshark expects it there */
-        dev->buf[index++] = (uint8_t)((dev->radio_pan) & 0xff);
-        dev->buf[index++] = (uint8_t)((dev->radio_pan) >> 8);
+    else if (hdr->dst_l2addr_len == 8) {
         /* default to use long address mode for src and dst */
         dev->buf[2] |= 0xcc;
         /* set destination address located directly after ng_ifhrd_t in memory */
@@ -1084,13 +1114,17 @@ uint8_t _assemble_tx_buf(kw2xrf_t *dev, ng_pktsnip_t *pkt)
         memcpy(&(dev->buf[index]), dev->addr_long, 8);
         index += 8;
     }
+    else {
+        ng_pktbuf_release(pkt);
+        return -ENOMSG;
+    }
 
     return index;
 }
 
 int kw2xrf_send(ng_netdev_t *netdev, ng_pktsnip_t *pkt)
 {
-    uint8_t index = 0;
+    int index = 0;
     kw2xrf_t *dev = (kw2xrf_t *) netdev;
 
     if (pkt == NULL) {
