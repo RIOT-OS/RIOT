@@ -278,7 +278,7 @@ void shell_run(shell_t *shell)
 }
 
 void shell_init(shell_t *shell, const shell_command_t *shell_commands,
-                uint16_t shell_buffer_size, int(*readchar)(void), void(*put_char)(int))
+                uint16_t shell_buffer_size, int(*readchar)(void), int(*put_char)(int))
 {
     shell->command_list = shell_commands;
     shell->shell_buffer_size = shell_buffer_size;

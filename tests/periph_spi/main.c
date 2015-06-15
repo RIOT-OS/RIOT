@@ -274,16 +274,6 @@ int cmd_print(int argc, char **argv)
     return 0;
 }
 
-int shell_getchar(void)
-{
-    return (int)getchar();
-}
-
-void shell_putchar(int c)
-{
-    putchar((char)c);
-}
-
 static const shell_command_t shell_commands[] = {
     { "init_master", "Initialize node as SPI master", cmd_init_master },
     { "init_slave", "Initialize node as SPI slave", cmd_init_slave },
@@ -301,7 +291,7 @@ int main(void)
     puts("Enter 'help' to get started\n");
 
     /* run the shell */
-    shell_init(&shell, shell_commands, SHELL_BUFSIZE, shell_getchar, shell_putchar);
+    shell_init(&shell, shell_commands, SHELL_BUFSIZE, getchar, putchar);
     shell_run(&shell);
 
     return 0;

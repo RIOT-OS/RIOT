@@ -67,7 +67,7 @@ typedef struct shell_t {
     const shell_command_t *command_list; /**< The commandlist supplied to shell_init(). */
     uint16_t shell_buffer_size;          /**< The maximum line length supplied to shell_init(). */
     int (*readchar)(void);               /**< The read function supplied to shell_init(). */
-    void (*put_char)(int);               /**< The write function supplied to shell_init(). */
+    int (*put_char)(int);                /**< The write function supplied to shell_init(). */
 } shell_t;
 
 /**
@@ -87,7 +87,7 @@ void shell_init(shell_t *shell,
                 const shell_command_t *shell_commands,
                 uint16_t shell_buffer_size,
                 int (*read_char)(void),
-                void (*put_char)(int));
+                int (*put_char)(int));
 
 /**
  * @brief           Start the shell session.
