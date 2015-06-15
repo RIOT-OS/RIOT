@@ -1,0 +1,26 @@
+# define the used CPU
+export CPU = nrf51
+export CPU_MODEL = nrf51x22xxab
+
+# define the default port depending on the host OS
+PORT_LINUX ?= /dev/ttyACM0
+PORT_DARWIN ?= $(shell ls -1 /dev/tty.SLAB_USBtoUART* | head -n 1)
+
+# define flash and debugging environment
+export FLASHER = $(RIOTBOARD)/$(BOARD)/dist/flash.sh
+export DEBUGGER = $(RIOTBOARD)/$(BOARD)/dist/debug.sh
+export DEBUGSERVER = JLinkGDBServer -device nrf51822 -if SWD
+export RESET = $(RIOTBOARD)/$(BOARD)/dist/reset.sh
+
+export OFLAGS = -O binary
+export HEXFILE = $(ELFFILE:.elf=.bin)
+export TERMFLAGS += -p "$(PORT)"
+export FFLAGS = $(BINDIR) $(HEXFILE)
+export DEBUGGER_FLAGS = $(BINDIR) $(ELFFILE)
+export RESET_FLAGS = $(BINDIR)
+
+# setup serial terminal
+include $(RIOTBOARD)/Makefile.include.serial
+
+# include cortex defaults
+include $(RIOTBOARD)/Makefile.include.cortexm_common
