@@ -103,6 +103,11 @@
 #include "net/ng_udp.h"
 #endif
 
+#ifdef MODULE_DEV_BLE_AUTOINIT
+#include "net/dev_ble.h"
+#include "dev_ble_autoinit.h"
+#endif
+
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 

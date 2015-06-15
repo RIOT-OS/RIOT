@@ -33,7 +33,7 @@
 #include "hwtimer.h"
 #include "irq.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG (1)
 #include "debug.h"
 
 #ifdef MODULE_AUTO_INIT

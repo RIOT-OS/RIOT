@@ -1,0 +1,3 @@
+ifneq (,$(filter ng_ble,$(USEMODULE)))
+  USEMODULE += ng_ble
+endif

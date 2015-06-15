@@ -8,4 +8,8 @@ endif
 
 DIRS += $(AUTO_INIT_MODULES)
 
+ifneq (,$(filter dev_ble_autoinit,$(USEMODULE)))
+DIRS += $(RIOTBASE)/sys/auto_init/dev_ble
+endif
+
 include $(RIOTBASE)/Makefile.base
