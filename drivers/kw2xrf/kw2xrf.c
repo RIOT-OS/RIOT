@@ -27,7 +27,7 @@
 #include "net/ng_netbase.h"
 #include "net/ng_ieee802154.h"
 
-#define ENABLE_DEBUG    (1)
+#define ENABLE_DEBUG    (0)
 #include "debug.h"
 
 /**
@@ -172,7 +172,6 @@ void kw2xrf_set_sequence(kw2xrf_t *dev, kw2xrf_physeq_t seq)
             DEBUG("kw2xrf_error: device does not finish sequence\n");
             core_panic(-EBUSY, "kw2xrf_error: device does not finish sequence");
         }
-
 #endif
     }
 
@@ -180,6 +179,12 @@ void kw2xrf_set_sequence(kw2xrf_t *dev, kw2xrf_physeq_t seq)
     reg = kw2xrf_read_dreg(MKW2XDM_PHY_CTRL2);
     reg &= ~(MKW2XDM_PHY_CTRL2_SEQMSK);
     kw2xrf_write_dreg(MKW2XDM_PHY_CTRL2, reg);
+
+    /* TODO: For testing: activate TX-IRQ */
+    reg = kw2xrf_read_dreg(MKW2XDM_PHY_CTRL2);
+    reg &= ~(MKW2XDM_PHY_CTRL2_TXMSK);
+    kw2xrf_write_dreg(MKW2XDM_PHY_CTRL2, reg);
+
 
     /* Progrmm new sequence */
     switch (seq) {
@@ -976,6 +981,8 @@ void _receive_data(kw2xrf_t *dev)
 
     if (hdr_len == 0) {
         DEBUG("kw2xrf error: unable parse incoming frame header\n");
+        /* But inform MAC layer about occured RX-event */
+        dev->event_cb((ng_netdev_t*)dev, NETDEV_EVENT_RX_COMPLETE, NULL);
         return;
     }
 
@@ -984,6 +991,8 @@ void _receive_data(kw2xrf_t *dev)
 
     if (hdr == NULL) {
         DEBUG("kw2xrf error: unable to allocate netif header\n");
+        /* But inform MAC layer about occured RX-event */
+        dev->event_cb((ng_netdev_t*)dev, NETDEV_EVENT_RX_COMPLETE, NULL);
         return;
     }
 
@@ -1017,7 +1026,7 @@ void kw2xrf_isr_event(ng_netdev_t *netdev, uint32_t event_type)
 
     if ((irqst1 & MKW2XDM_IRQSTS1_RXIRQ) && (irqst1 & MKW2XDM_IRQSTS1_SEQIRQ)) {
         /* RX */
-        DEBUG("kw2xrf: RX Int\n");
+        DEBUG("kw2xrf: RX Complete\n");
         if (dev->option & KW2XRF_OPT_TELL_RX_END) {
             _receive_data(dev);
         }
@@ -1031,8 +1040,16 @@ void kw2xrf_isr_event(ng_netdev_t *netdev, uint32_t event_type)
             dev->event_cb(netdev, NETDEV_EVENT_TX_COMPLETE, NULL);
         }
         kw2xrf_set_sequence(dev, XCVSEQ_RECEIVE);
-        DEBUG("kw2xrf: TX Complete\n");
         kw2xrf_write_dreg(MKW2XDM_IRQSTS1, MKW2XDM_IRQSTS1_TXIRQ | MKW2XDM_IRQSTS1_SEQIRQ);
+    }
+    else if ((irqst1 & MKW2XDM_IRQSTS1_TXIRQ) && !(irqst1 & MKW2XDM_IRQSTS1_SEQIRQ)) {
+        /* TX_Complete, but sequence not ready, waiting for ACK*/
+        DEBUG("kw2xrf: TX of TX-RX Complete\n");
+        if (dev->event_cb && (dev->option & KW2XRF_OPT_TELL_TX_END)) {
+            dev->event_cb(netdev, NETDEV_EVENT_TX_COMPLETE, NULL);
+        }
+        /* Set no sequence, sequence is still in progress */
+        kw2xrf_write_dreg(MKW2XDM_IRQSTS1, MKW2XDM_IRQSTS1_TXIRQ);
     }
     else if ((irqst1 & MKW2XDM_IRQSTS1_CCAIRQ) && (irqst1 & MKW2XDM_IRQSTS1_SEQIRQ)) {
         /* TX_Started (CCA_done) */
