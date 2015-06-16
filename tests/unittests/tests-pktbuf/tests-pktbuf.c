@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014 Martine Lenders <mail@martine-lenders.eu>
+ *               2015 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -13,6 +14,7 @@
  */
 #include <errno.h>
 #include <stdint.h>
+#include <sys/uio.h>
 
 #include "embUnit.h"
 
@@ -644,6 +646,59 @@ static void test_pktbuf_start_write__pkt_users_2(void)
     TEST_ASSERT(ng_pktbuf_is_empty());
 }
 
+static void test_pktbuf_get_iovec__1_elem(void)
+{
+    struct iovec *vec;
+    size_t len;
+    ng_pktsnip_t *snip = ng_pktbuf_add(NULL, TEST_STRING16, sizeof(TEST_STRING16),
+                                       NG_NETTYPE_UNDEF);
+    snip = ng_pktbuf_get_iovec(snip, &len);
+    vec = (struct iovec *)snip->data;
+
+    TEST_ASSERT_EQUAL_INT(sizeof(struct iovec), snip->size);
+    TEST_ASSERT_EQUAL_INT(1, len);
+    TEST_ASSERT(snip->next->data == vec[0].iov_base);
+    TEST_ASSERT_EQUAL_INT(snip->next->size, vec[0].iov_len);
+
+    ng_pktbuf_release(snip);
+    TEST_ASSERT(ng_pktbuf_is_empty());
+}
+
+static void test_pktbuf_get_iovec__3_elem(void)
+{
+    struct iovec *vec;
+    size_t len;
+    ng_pktsnip_t *snip = ng_pktbuf_add(NULL, TEST_STRING16, sizeof(TEST_STRING16),
+                                       NG_NETTYPE_UNDEF);
+    snip = ng_pktbuf_add(snip, TEST_STRING8, sizeof(TEST_STRING8), NG_NETTYPE_UNDEF);
+    snip = ng_pktbuf_add(snip, TEST_STRING4, sizeof(TEST_STRING4), NG_NETTYPE_UNDEF);
+    snip = ng_pktbuf_get_iovec(snip, &len);
+    vec = (struct iovec *)snip->data;
+
+    TEST_ASSERT_EQUAL_INT((sizeof(struct iovec) * 3), snip->size);
+    TEST_ASSERT_EQUAL_INT(3, len);
+    TEST_ASSERT(snip->next->data == vec[0].iov_base);
+    TEST_ASSERT(snip->next->next->data == vec[1].iov_base);
+    TEST_ASSERT(snip->next->next->next->data == vec[2].iov_base);
+    TEST_ASSERT_EQUAL_INT(sizeof(TEST_STRING4), vec[0].iov_len);
+    TEST_ASSERT_EQUAL_INT(sizeof(TEST_STRING8), vec[1].iov_len);
+    TEST_ASSERT_EQUAL_INT(sizeof(TEST_STRING16), vec[2].iov_len);
+
+    ng_pktbuf_release(snip);
+    TEST_ASSERT(ng_pktbuf_is_empty());
+}
+
+static void test_pktbuf_get_iovec__null(void)
+{
+    ng_pktsnip_t *res;
+    size_t len;
+
+    res = ng_pktbuf_get_iovec(NULL, &len);
+
+    TEST_ASSERT(res == NULL);
+    TEST_ASSERT_EQUAL_INT(0, len);
+}
+
 Test *tests_pktbuf_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -684,6 +739,9 @@ Test *tests_pktbuf_tests(void)
         new_TestFixture(test_pktbuf_start_write__NULL),
         new_TestFixture(test_pktbuf_start_write__pkt_users_1),
         new_TestFixture(test_pktbuf_start_write__pkt_users_2),
+        new_TestFixture(test_pktbuf_get_iovec__1_elem),
+        new_TestFixture(test_pktbuf_get_iovec__3_elem),
+        new_TestFixture(test_pktbuf_get_iovec__null),
     };
 
     EMB_UNIT_TESTCALLER(ng_pktbuf_tests, set_up, NULL, fixtures);
