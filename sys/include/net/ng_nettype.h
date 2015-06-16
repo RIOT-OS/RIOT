@@ -38,6 +38,11 @@ extern "C" {
  */
 typedef enum {
     /**
+     * @brief   Not so much protocol but data type that is passed to network
+     *          devices using the netdev interface
+     */
+    NG_NETTYPE_IOVEC = -2,
+    /**
      * @brief   Protocol is as defined in @ref ng_netif_hdr_t. Not usable with
      *          @ref net_ng_netreg
      */
