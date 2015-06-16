@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2014 Freie Universität Berlin
- * Copyright (C) 2014 PHYTEC Messtechnik GmbH
+ * Copyright (C) 2015 PHYTEC Messtechnik GmbH
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -21,89 +21,91 @@
  */
 
 #include <stdint.h>
-#include "cpu_conf.h"
-#include "fault_handlers.h"
+#include "vectors_cortexm.h"
+#include "wdog.h"
 
 /**
  * memory markers as defined in the linker script
  */
 extern uint32_t _estack;
 
-extern void reset_handler(void);
+void pre_startup (void)
+{
+    /* disable the WDOG */
+    wdog_disable();
+}
 
 void dummy_handler(void)
 {
-    isr_unhandled();
+    dummy_handler_default();
 }
 
 /* Cortex-M specific interrupt vectors */
-void isr_svc(void)                  __attribute__((weak, alias("dummy_handler")));
-void isr_pendsv(void)               __attribute__((weak, alias("dummy_handler")));
-void isr_systick(void)              __attribute__((weak, alias("dummy_handler")));
-
+WEAK_DEFAULT void isr_svc(void);
+WEAK_DEFAULT void isr_pendsv(void);
+WEAK_DEFAULT void isr_systick(void);
 /* MKW22D512 specific interrupt vector */
-void isr_dma0(void)                 __attribute__((weak, alias("dummy_handler")));
-void isr_dma1(void)                 __attribute__((weak, alias("dummy_handler")));
-void isr_dma2(void)                 __attribute__((weak, alias("dummy_handler")));
-void isr_dma3(void)                 __attribute__((weak, alias("dummy_handler")));
-void isr_dma4(void)                 __attribute__((weak, alias("dummy_handler")));
-void isr_dma5(void)                 __attribute__((weak, alias("dummy_handler")));
-void isr_dma6(void)                 __attribute__((weak, alias("dummy_handler")));
-void isr_dma7(void)                 __attribute__((weak, alias("dummy_handler")));
-void isr_dma8(void)                 __attribute__((weak, alias("dummy_handler")));
-void isr_dma9(void)                 __attribute__((weak, alias("dummy_handler")));
-void isr_dma10(void)                __attribute__((weak, alias("dummy_handler")));
-void isr_dma11(void)                __attribute__((weak, alias("dummy_handler")));
-void isr_dma12(void)                __attribute__((weak, alias("dummy_handler")));
-void isr_dma13(void)                __attribute__((weak, alias("dummy_handler")));
-void isr_dma14(void)                __attribute__((weak, alias("dummy_handler")));
-void isr_dma15(void)                __attribute__((weak, alias("dummy_handler")));
-void isr_dma_error(void)            __attribute__((weak, alias("dummy_handler")));
-void isr_mcm(void)                  __attribute__((weak, alias("dummy_handler")));
-void isr_ftfl(void)                 __attribute__((weak, alias("dummy_handler")));
-void isr_ftfl_collision(void)       __attribute__((weak, alias("dummy_handler")));
-void isr_pmc(void)                  __attribute__((weak, alias("dummy_handler")));
-void isr_llwu(void)                 __attribute__((weak, alias("dummy_handler")));
-void isr_wdog_ewm(void)             __attribute__((weak, alias("dummy_handler")));
-void isr_rng(void)                  __attribute__((weak, alias("dummy_handler")));
-void isr_i2c0(void)                 __attribute__((weak, alias("dummy_handler")));
-void isr_i2c1(void)                 __attribute__((weak, alias("dummy_handler")));
-void isr_spi0(void)                 __attribute__((weak, alias("dummy_handler")));
-void isr_spi1(void)                 __attribute__((weak, alias("dummy_handler")));
-void isr_i2s0_tx(void)              __attribute__((weak, alias("dummy_handler")));
-void isr_i2s0_rx(void)              __attribute__((weak, alias("dummy_handler")));
-void isr_uart0_rx_tx(void)          __attribute__((weak, alias("dummy_handler")));
-void isr_uart0_err(void)            __attribute__((weak, alias("dummy_handler")));
-void isr_uart1_rx_tx(void)          __attribute__((weak, alias("dummy_handler")));
-void isr_uart1_err(void)            __attribute__((weak, alias("dummy_handler")));
-void isr_uart2_rx_tx(void)          __attribute__((weak, alias("dummy_handler")));
-void isr_uart2_err(void)            __attribute__((weak, alias("dummy_handler")));
-void isr_adc0(void)                 __attribute__((weak, alias("dummy_handler")));
-void isr_cmp0(void)                 __attribute__((weak, alias("dummy_handler")));
-void isr_cmp1(void)                 __attribute__((weak, alias("dummy_handler")));
-void isr_ftm0(void)                 __attribute__((weak, alias("dummy_handler")));
-void isr_ftm1(void)                 __attribute__((weak, alias("dummy_handler")));
-void isr_ftm2(void)                 __attribute__((weak, alias("dummy_handler")));
-void isr_cmt(void)                  __attribute__((weak, alias("dummy_handler")));
-void isr_rtc(void)                  __attribute__((weak, alias("dummy_handler")));
-void isr_rtc_seconds(void)          __attribute__((weak, alias("dummy_handler")));
-void isr_pit0(void)                 __attribute__((weak, alias("dummy_handler")));
-void isr_pit1(void)                 __attribute__((weak, alias("dummy_handler")));
-void isr_pit2(void)                 __attribute__((weak, alias("dummy_handler")));
-void isr_pit3(void)                 __attribute__((weak, alias("dummy_handler")));
-void isr_pdb0(void)                 __attribute__((weak, alias("dummy_handler")));
-void isr_usb0(void)                 __attribute__((weak, alias("dummy_handler")));
-void isr_usbdcd(void)               __attribute__((weak, alias("dummy_handler")));
-void isr_dac0(void)                 __attribute__((weak, alias("dummy_handler")));
-void isr_mcg(void)                  __attribute__((weak, alias("dummy_handler")));
-void isr_lptmr0(void)               __attribute__((weak, alias("dummy_handler")));
-void isr_porta(void)                __attribute__((weak, alias("dummy_handler")));
-void isr_portb(void)                __attribute__((weak, alias("dummy_handler")));
-void isr_portc(void)                __attribute__((weak, alias("dummy_handler")));
-void isr_portd(void)                __attribute__((weak, alias("dummy_handler")));
-void isr_porte(void)                __attribute__((weak, alias("dummy_handler")));
-void isr_swi(void)                  __attribute__((weak, alias("dummy_handler")));
-
+WEAK_DEFAULT void isr_dma0(void);
+WEAK_DEFAULT void isr_dma1(void);
+WEAK_DEFAULT void isr_dma2(void);
+WEAK_DEFAULT void isr_dma3(void);
+WEAK_DEFAULT void isr_dma4(void);
+WEAK_DEFAULT void isr_dma5(void);
+WEAK_DEFAULT void isr_dma6(void);
+WEAK_DEFAULT void isr_dma7(void);
+WEAK_DEFAULT void isr_dma8(void);
+WEAK_DEFAULT void isr_dma9(void);
+WEAK_DEFAULT void isr_dma10(void);
+WEAK_DEFAULT void isr_dma11(void);
+WEAK_DEFAULT void isr_dma12(void);
+WEAK_DEFAULT void isr_dma13(void);
+WEAK_DEFAULT void isr_dma14(void);
+WEAK_DEFAULT void isr_dma15(void);
+WEAK_DEFAULT void isr_dma_error(void);
+WEAK_DEFAULT void isr_mcm(void);
+WEAK_DEFAULT void isr_ftfl(void);
+WEAK_DEFAULT void isr_ftfl_collision(void);
+WEAK_DEFAULT void isr_pmc(void);
+WEAK_DEFAULT void isr_llwu(void);
+WEAK_DEFAULT void isr_wdog_ewm(void);
+WEAK_DEFAULT void isr_rng(void);
+WEAK_DEFAULT void isr_i2c0(void);
+WEAK_DEFAULT void isr_i2c1(void);
+WEAK_DEFAULT void isr_spi0(void);
+WEAK_DEFAULT void isr_spi1(void);
+WEAK_DEFAULT void isr_i2s0_tx(void);
+WEAK_DEFAULT void isr_i2s0_rx(void);
+WEAK_DEFAULT void isr_uart0_rx_tx(void);
+WEAK_DEFAULT void isr_uart0_err(void);
+WEAK_DEFAULT void isr_uart1_rx_tx(void);
+WEAK_DEFAULT void isr_uart1_err(void);
+WEAK_DEFAULT void isr_uart2_rx_tx(void);
+WEAK_DEFAULT void isr_uart2_err(void);
+WEAK_DEFAULT void isr_adc0(void);
+WEAK_DEFAULT void isr_cmp0(void);
+WEAK_DEFAULT void isr_cmp1(void);
+WEAK_DEFAULT void isr_ftm0(void);
+WEAK_DEFAULT void isr_ftm1(void);
+WEAK_DEFAULT void isr_ftm2(void);
+WEAK_DEFAULT void isr_cmt(void);
+WEAK_DEFAULT void isr_rtc(void);
+WEAK_DEFAULT void isr_rtc_seconds(void);
+WEAK_DEFAULT void isr_pit0(void);
+WEAK_DEFAULT void isr_pit1(void);
+WEAK_DEFAULT void isr_pit2(void);
+WEAK_DEFAULT void isr_pit3(void);
+WEAK_DEFAULT void isr_pdb0(void);
+WEAK_DEFAULT void isr_usb0(void);
+WEAK_DEFAULT void isr_usbdcd(void);
+WEAK_DEFAULT void isr_dac0(void);
+WEAK_DEFAULT void isr_mcg(void);
+WEAK_DEFAULT void isr_lptmr0(void);
+WEAK_DEFAULT void isr_porta(void);
+WEAK_DEFAULT void isr_portb(void);
+WEAK_DEFAULT void isr_portc(void);
+WEAK_DEFAULT void isr_portd(void);
+WEAK_DEFAULT void isr_porte(void);
+WEAK_DEFAULT void isr_swi(void);
 
 /* interrupt vector table */
 __attribute__((section(".vector_table")))
@@ -111,21 +113,23 @@ const void *interrupt_vector[] = {
     /* Stack pointer */
     (void *)(&_estack),             /* pointer to the top of the empty stack */
     /* Cortex-M4 handlers */
-    (void *) reset_handler,         /* entry point of the program */
-    (void *) isr_nmi,               /* non maskable interrupt handler */
-    (void *) isr_hard_fault,        /* if you end up here its not good */
-    (void *) isr_mem_manage,        /* memory controller interrupt */
-    (void *) isr_bus_fault,         /* also not good to end up here */
-    (void *) isr_usage_fault,       /* autsch */
-    (void *)(0UL),                  /* Reserved */
-    (void *)(0UL),                  /* Reserved */
-    (void *)(0UL),                  /* Reserved */
-    (void *)(0UL),                  /* Reserved */
-    (void *) isr_svc,               /* system call interrupt */
-    (void *) isr_debug_mon,         /* debug interrupt */
-    (void *)(0UL),                  /* Reserved */
-    (void *) isr_pendsv,            /* pendSV interrupt, used for task switching in RIOT */
-    (void *) isr_systick,           /* SysTick interrupt, not used in RIOT */
+    (void*) reset_handler_default,  /* entry point of the program */
+    (void*) nmi_default,            /* non maskable interrupt handler */
+    (void*) hard_fault_default,     /* hard fault exception */
+    (void*) mem_manage_default,     /* memory manage exception */
+    (void*) bus_fault_default,      /* bus fault exception */
+    (void*) usage_fault_default,    /* usage fault exception */
+    (void*) (0UL),                  /* Reserved */
+    (void*) (0UL),                  /* Reserved */
+    (void*) (0UL),                  /* Reserved */
+    (void*) (0UL),                  /* Reserved */
+    (void*) isr_svc,                /* system call interrupt, in RIOT used for
+                                     * switching into thread context on boot */
+    (void*) debug_mon_default,      /* debug monitor exception */
+    (void*) (0UL),                  /* Reserved */
+    (void*) isr_pendsv,             /* pendSV interrupt, in RIOT the actual
+                                     * context switching is happening here */
+    (void*) isr_systick,            /* SysTick interrupt, not used in RIOT */
     /* MKW22D512 specific peripheral handlers */
     (void *) isr_dma0,              /* DMA channel 0 transfer complete */
     (void *) isr_dma1,              /* DMA channel 1 transfer complete */
