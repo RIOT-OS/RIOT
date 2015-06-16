@@ -27,9 +27,9 @@
 #include "periph/spi.h"
 #include "periph_conf.h"
 #include "board.h"
+
 #define ENABLE_DEBUG (0)
 #include "debug.h"
-#if SPI_0_EN  || SPI_1_EN
 
 /**
  * @brief Array holding one pre-initialized mutex for each SPI device
@@ -203,30 +203,17 @@ int spi_init_slave(spi_t dev, spi_conf_t conf, char (*cb)(char))
     return 0;
 }
 
-void spi_transmission_begin(spi_t dev, char reset_val)
+void spi_acquire(spi_t dev)
 {
-    /* TODO*/
-}
-
-int spi_acquire(spi_t dev)
-{
-    if (dev >= SPI_NUMOF) {
-        return -1;
-    }
     mutex_lock(&locks[dev]);
-    return 0;
 }
 
-int spi_release(spi_t dev)
+void spi_release(spi_t dev)
 {
-    if (dev >= SPI_NUMOF) {
-        return -1;
-    }
     mutex_unlock(&locks[dev]);
-    return 0;
 }
 
-int spi_transfer_byte(spi_t dev, char out, char *in)
+void spi_transfer_byte(spi_t dev, char out, char *in)
 {
     SercomSpi* spi_dev = 0;
     char tmp;
@@ -248,14 +235,16 @@ int spi_transfer_byte(spi_t dev, char out, char *in)
     while (!spi_dev->INTFLAG.bit.DRE); /* while data register is not empty*/
     spi_dev->DATA.bit.DATA = out;
 
-    while (!spi_dev->INTFLAG.bit.RXC); /* while receive is not complete*/
-    tmp = (char)spi_dev->DATA.bit.DATA;
-
-    if (in != NULL)
+    if (in)
     {
-        in[0] = tmp;
+        while (!spi_dev->INTFLAG.bit.RXC); /* while receive is not complete*/
+        *in = spi_dev->DATA.bit.DATA;
     }
-    return 1;
+    else
+    {
+        /* clear input byte even if we're not interested */
+        spi_dev->DATA.bit.DATA;
+    }
 }
 
 void spi_poweron(spi_t dev)
@@ -293,5 +282,3 @@ void spi_poweroff(spi_t dev)
 #endif
     }
 }
-
-#endif /* SPI_0_EN || SPI_1_EN */

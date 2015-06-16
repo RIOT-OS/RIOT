@@ -31,9 +31,6 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-/* guard file in case no SPI device is defined */
-#if SPI_0_EN
-
 /**
  * @brief Array holding one pre-initialized mutex for each SPI device
  */
@@ -107,7 +104,7 @@ int spi_init_slave(spi_t dev, spi_conf_t conf, char (*cb)(char))
     return -1;
 }
 
-int spi_conf_pins(spi_t dev)
+void spi_conf_pins(spi_t dev)
 {
     gpio_t mosi, miso, clk;
 
@@ -120,7 +117,7 @@ int spi_conf_pins(spi_t dev)
             break;
 #endif
         default:
-            return -1;
+            return;
     }
 
     /* configure pins for alternate function input (MISO) or output (MOSI, CLK) */
@@ -130,28 +127,20 @@ int spi_conf_pins(spi_t dev)
     return 0;
 }
 
-int spi_acquire(spi_t dev)
+void spi_acquire(spi_t dev)
 {
-    if (dev >= SPI_NUMOF) {
-        return -1;
-    }
     mutex_lock(&locks[dev]);
-    return 0;
 }
 
-int spi_release(spi_t dev)
+void spi_release(spi_t dev)
 {
-    if (dev >= SPI_NUMOF) {
-        return -1;
-    }
     mutex_unlock(&locks[dev]);
-    return 0;
 }
 
-int spi_transfer_byte(spi_t dev, char out, char *in)
+void spi_transfer_byte(spi_t dev, char out, char *in)
 {
     SPI_TypeDef *spi;
-    int transferred = 0;
+    char tmp;
 
     switch(dev) {
 #ifdef SPI_0_EN
@@ -160,34 +149,16 @@ int spi_transfer_byte(spi_t dev, char out, char *in)
             break;
 #endif
         default:
-            return -1;
+            return;
     }
 
     while ((spi->SR & SPI_SR_TXE) == RESET);
     spi->DR = out;
-    transferred++;
-
     while ((spi->SR & SPI_SR_RXNE) == RESET);
-    if (in != NULL) {
-        *in = spi->DR;
-        transferred++;
+    tmp = spi->DR;
+    if (in) {
+        *in = tmp;
     }
-    else {
-        spi->DR;
-    }
-
-    /* SPI busy */
-    while ((spi->SR & 0x80));
-#if ENABLE_DEBUG
-    if (in != NULL) {
-        DEBUG("\nout: %x in: %x transferred: %x\n", out, *in, transferred);
-    }
-    else {
-        DEBUG("\nout: %x in: was nullPointer transferred: %x\n", out, transferred);
-    }
-#endif /*ENABLE_DEBUG */
-
-    return transferred;
 }
 
 void spi_transmission_begin(spi_t dev, char reset_val)
@@ -218,5 +189,3 @@ void spi_poweroff(spi_t dev)
 #endif
     }
 }
-
-#endif /* SPI_0_EN */

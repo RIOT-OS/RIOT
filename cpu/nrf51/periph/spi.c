@@ -24,9 +24,6 @@
 #include "periph/spi.h"
 #include "periph_conf.h"
 
-/* guard this file in case no SPI device is defined */
-#if SPI_NUMOF
-
 /* static port mapping */
 static NRF_SPI_Type *const spi[] = {
 #if SPI_0_EN
@@ -127,12 +124,8 @@ int spi_init_slave(spi_t dev, spi_conf_t conf, char (*cb)(char data))
     return -1;
 }
 
-int spi_conf_pins(spi_t dev)
+void spi_conf_pins(spi_t dev)
 {
-    if (dev >= SPI_NUMOF) {
-        return -1;
-    }
-
     switch (dev) {
 #if SPI_0_EN
         case SPI_0:
@@ -157,28 +150,24 @@ int spi_conf_pins(spi_t dev)
             break;
 #endif
     }
-    return 0;
 }
 
-int spi_acquire(spi_t dev)
+void spi_acquire(spi_t dev)
 {
-    if (dev >= SPI_NUMOF) {
-        return -1;
-    }
     mutex_lock(&locks[dev]);
-    return 0;
 }
 
-int spi_release(spi_t dev)
+void spi_release(spi_t dev)
 {
-    if (dev >= SPI_NUMOF) {
-        return -1;
-    }
     mutex_unlock(&locks[dev]);
-    return 0;
 }
 
-int spi_transfer_byte(spi_t dev, char out, char *in)
+void spi_transfer_byte(spi_t dev, char out, char *in)
+{
+    spi_transfer_bytes(dev, &out, in, 1);
+}
+
+void spi_transfer_bytes(spi_t dev, char *out, char *in, size_t len)
 {
     return spi_transfer_bytes(dev, &out, in, 1);
 }
@@ -199,20 +188,18 @@ int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length)
             in[i] = tmp;
         }
     }
-
-    return length;
 }
 
-int spi_transfer_reg(spi_t dev, uint8_t reg, char out, char *in)
+void spi_transfer_reg(spi_t dev, uint8_t reg, char out, char *in)
 {
     spi_transfer_byte(dev, reg, 0);
-    return spi_transfer_byte(dev, out, in);
+    spi_transfer_byte(dev, out, in);
 }
 
-int spi_transfer_regs(spi_t dev, uint8_t reg, char *out, char *in, unsigned int length)
+void spi_transfer_regs(spi_t dev, uint8_t reg, char *out, char *in, size_t len)
 {
     spi_transfer_byte(dev, reg, 0);
-    return spi_transfer_bytes(dev, out, in, length);
+    spi_transfer_bytes(dev, out, in, len);
 }
 
 void spi_transmission_begin(spi_t dev, char reset_val)
@@ -222,16 +209,10 @@ void spi_transmission_begin(spi_t dev, char reset_val)
 
 void spi_poweron(spi_t dev)
 {
-    if (dev < SPI_NUMOF) {
-        spi[dev]->POWER = 1;
-    }
+    spi[dev]->POWER = 1;
 }
 
 void spi_poweroff(spi_t dev)
 {
-    if (dev < SPI_NUMOF) {
-        spi[dev]->POWER = 0;
-    }
+    spi[dev]->POWER = 0;
 }
-
-#endif /* SPI_NUMOF */
