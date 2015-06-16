@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014 Martine Lenders <mlenders@inf.fu-berlin.de>
+ *               2015 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -24,6 +25,7 @@
  *          and layers can allocate space for packets here.
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
+ * @author  Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 #ifndef NG_PKTBUF_H_
 #define NG_PKTBUF_H_
@@ -156,10 +158,25 @@ void ng_pktbuf_release(ng_pktsnip_t *pkt);
  * @param[in] pkt   The packet you want to write into.
  *
  * @return  The (new) pointer to the pkt.
- * @return  NULL, if ng_pktsnip_t::users of @p pkt > 1 and if there is not enough
- *          space in the packet buffer.
+ * @return  NULL, if ng_pktsnip_t::users of @p pkt > 1 and if there is not
+ *          enough space in the packet buffer.
  */
 ng_pktsnip_t *ng_pktbuf_start_write(ng_pktsnip_t *pkt);
+
+/**
+ * @brief   Create a IOVEC representation of the packet pointed to by *pkt*
+ *
+ * @details This function will create a new packet snip in the packet buffer,
+ *          which points to the given *pkt* and contains a IOVEC representation
+ *          of the referenced packet in its data section.
+ *
+ * @param[in]  pkt  Packet to export as IOVEC
+ * @param[out] len  Number of elements in the IOVEC
+ *
+ * @return  Pointer to the 'IOVEC packet snip'
+ * @return  NULL, if packet is empty of the packet buffer is full
+ */
+ng_pktsnip_t *ng_pktbuf_get_iovec(ng_pktsnip_t *pkt, size_t *len);
 
 /**
  * @brief   Deletes a snip from a packet and the packet buffer.
