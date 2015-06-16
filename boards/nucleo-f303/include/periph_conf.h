@@ -230,58 +230,6 @@ extern "C" {
 #define I2C_1_SDA_CLKEN()   (RCC->AHBENR |= RCC_AHBENR_GPIOBEN)
 /** @} */
 
-/**
- * @brief GPIO configuration
- * @{
- */
-#define GPIO_0_EN           1
-#define GPIO_1_EN           1
-#define GPIO_2_EN           1
-#define GPIO_IRQ_PRIO       1
-
-/* IRQ config */
-#define GPIO_IRQ_0          GPIO_1
-#define GPIO_IRQ_1          (-1)    /* not configured */
-#define GPIO_IRQ_2          GPIO_2
-#define GPIO_IRQ_3          (-1)    /* not configured */
-#define GPIO_IRQ_4          (-1)    /* not configured */
-#define GPIO_IRQ_5          (-1)    /* not configured */
-#define GPIO_IRQ_6          (-1)    /* not configured */
-#define GPIO_IRQ_7          (-1)    /* not configured */
-#define GPIO_IRQ_8          (-1)    /* not configured */
-#define GPIO_IRQ_9          (-1)    /* not configured */
-#define GPIO_IRQ_10         (-1)    /* not configured */
-#define GPIO_IRQ_11         (-1)    /* not configured */
-#define GPIO_IRQ_12         (-1)    /* not configured */
-#define GPIO_IRQ_13         GPIO_0
-#define GPIO_IRQ_14         (-1)    /* not configured */
-#define GPIO_IRQ_15         (-1)    /* not configured */
-
-/* GPIO channel 0 config */
-#define GPIO_0_PORT         GPIOC                   /* Used for user button 1 */
-#define GPIO_0_PIN          13
-#define GPIO_0_CLKEN()      (RCC->AHBENR |= RCC_AHBENR_GPIOCEN)
-#define GPIO_0_EXTI_CFG1()  (SYSCFG->EXTICR[3] &= ~(SYSCFG_EXTICR4_EXTI13))
-#define GPIO_0_EXTI_CFG2()  (SYSCFG->EXTICR[3] |= SYSCFG_EXTICR4_EXTI13_PC)
-#define GPIO_0_IRQ          EXTI15_10_IRQn
-
-/* GPIO channel 1 config */
-#define GPIO_1_PORT         GPIOA
-#define GPIO_1_PIN          0
-#define GPIO_1_CLKEN()      (RCC->AHBENR |= RCC_AHBENR_GPIOAEN)
-#define GPIO_1_EXTI_CFG1()  (SYSCFG->EXTICR[0] &= ~(SYSCFG_EXTICR1_EXTI0))
-#define GPIO_1_EXTI_CFG2()  (SYSCFG->EXTICR[0] |= SYSCFG_EXTICR1_EXTI0_PA)
-#define GPIO_1_IRQ          EXTI0_IRQn
-
-/* GPIO channel 2 config */
-#define GPIO_2_PORT         GPIOD
-#define GPIO_2_PIN          2
-#define GPIO_2_CLKEN()      (RCC->AHBENR |= RCC_AHBENR_GPIODEN)
-#define GPIO_2_EXTI_CFG1()  (SYSCFG->EXTICR[0] &= ~(SYSCFG_EXTICR1_EXTI2))
-#define GPIO_2_EXTI_CFG2()  (SYSCFG->EXTICR[0] |= SYSCFG_EXTICR1_EXTI2_PD)
-#define GPIO_2_IRQ          EXTI2_TSC_IRQn
-/** @} */
-
 #ifdef __cplusplus
 }
 #endif
