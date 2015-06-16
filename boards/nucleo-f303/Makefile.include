@@ -1,0 +1,16 @@
+## the cpu to build for
+export CPU = stm32f3
+export CPU_MODEL = stm32f303re
+
+#define the default port depending on the host OS
+PORT_LINUX ?= /dev/ttyUSB0
+PORT_DARWIN ?= $(shell ls -1 /dev/tty.usbmodem* | head -n 1)
+
+# setup serial terminal
+include $(RIOTBOARD)/Makefile.include.serial
+
+# this board uses openocd
+include $(RIOTBOARD)/Makefile.include.openocd
+
+# include cortex defaults
+include $(RIOTBOARD)/Makefile.include.cortexm_common
