@@ -152,8 +152,8 @@ void gpio_init_af(gpio_t pin, gpio_af_t af)
     port->MODER &= ~(3 << (2 * pin_num));
     port->MODER |= (2 << (2 * pin_num));
     /* set selected function */
-    port->AFR[pin_num & 0x10] &= ~(0xf << ((pin_num & 0x0f) * 4));
-    port->AFR[pin_num & 0x10] |= (af << ((pin_num & 0x0f) * 4));
+    port->AFR[(pin_num > 7) ? 1 : 0] &= ~(0xf << ((pin_num & 0x07) * 4));
+    port->AFR[(pin_num > 7) ? 1 : 0] |= (af << ((pin_num & 0x07) * 4));
 }
 
 void gpio_irq_enable(gpio_t pin)
