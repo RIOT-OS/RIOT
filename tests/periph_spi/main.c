@@ -228,7 +228,6 @@ int cmd_init_slave(int argc, char **argv)
 
 int cmd_transfer(int argc, char **argv)
 {
-    int res;
     char *hello = "Hello";
 
     if (spi_master != 1) {
@@ -246,21 +245,14 @@ int cmd_transfer(int argc, char **argv)
     /* do the actual data transfer */
     spi_acquire(spi_dev);
     gpio_clear(spi_cs);
-    res = spi_transfer_bytes(spi_dev, hello, buffer, strlen(hello));
+    spi_transfer_bytes(spi_dev, hello, buffer, strlen(hello));
     gpio_set(spi_cs);
     spi_release(spi_dev);
 
-    /* look at the results */
-    if (res < 0) {
-        printf("error: unable to transfer data to slave (code: %i)\n", res);
-        return 1;
-    }
-    else {
-        printf("Transfered %i bytes:\n", res);
-        print_bytes("MOSI", hello, res);
-        print_bytes("MISO", buffer, res);
-        return 0;
-    }
+    printf("Transfered %i bytes:\n", strlen(hello));
+    print_bytes("MOSI", hello, strlen(hello));
+    print_bytes("MISO", buffer, strlen(hello));
+    return 0;
 }
 
 int cmd_print(int argc, char **argv)
