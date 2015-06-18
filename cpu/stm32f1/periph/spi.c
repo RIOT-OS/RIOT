@@ -137,7 +137,7 @@ void spi_release(spi_t dev)
     mutex_unlock(&locks[dev]);
 }
 
-void spi_transfer_byte(spi_t dev, char out, char *in)
+char spi_transfer_byte(spi_t dev, char out)
 {
     SPI_TypeDef *spi;
     char tmp;
@@ -149,16 +149,14 @@ void spi_transfer_byte(spi_t dev, char out, char *in)
             break;
 #endif
         default:
-            return;
+            return 0;
     }
 
     while ((spi->SR & SPI_SR_TXE) == RESET);
     spi->DR = out;
     while ((spi->SR & SPI_SR_RXNE) == RESET);
     tmp = spi->DR;
-    if (in) {
-        *in = tmp;
-    }
+    return tmp;
 }
 
 void spi_transmission_begin(spi_t dev, char reset_val)

@@ -162,9 +162,11 @@ void spi_release(spi_t dev)
     mutex_unlock(&locks[dev]);
 }
 
-void spi_transfer_byte(spi_t dev, char out, char *in)
+char spi_transfer_byte(spi_t dev, char out)
 {
-    spi_transfer_bytes(dev, &out, in, 1);
+    char tmp;
+    spi_transfer_bytes(dev, &out, &tmp, 1);
+    return tmp;
 }
 
 void spi_transfer_bytes(spi_t dev, char *out, char *in, size_t len)
@@ -190,15 +192,15 @@ int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length)
     }
 }
 
-void spi_transfer_reg(spi_t dev, uint8_t reg, char out, char *in)
+char spi_transfer_reg(spi_t dev, uint8_t reg, char out)
 {
-    spi_transfer_byte(dev, reg, 0);
-    spi_transfer_byte(dev, out, in);
+    spi_transfer_byte(dev, reg);
+    return spi_transfer_byte(dev, out);
 }
 
 void spi_transfer_regs(spi_t dev, uint8_t reg, char *out, char *in, size_t len)
 {
-    spi_transfer_byte(dev, reg, 0);
+    spi_transfer_byte(dev, reg);
     spi_transfer_bytes(dev, out, in, len);
 }
 

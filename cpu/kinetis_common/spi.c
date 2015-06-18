@@ -874,7 +874,7 @@ static inline uint8_t spi_transfer_internal(SPI_Type *spi_dev, uint32_t flags, u
     return (uint8_t)spi_dev->POPR;
 }
 
-void spi_transfer_byte(spi_t dev, char out, char *in)
+char spi_transfer_byte(spi_t dev, char out)
 {
     SPI_Type *spi_dev;
     uint8_t byte_in;
@@ -948,17 +948,14 @@ void spi_transfer_byte(spi_t dev, char out, char *in)
 #endif
 
         default:
-            return;
+            return 0;
     }
 
     byte_in = spi_transfer_internal(spi_dev, flags, out);
 
     /* Clear End-of-Queue status flag */
     spi_dev->SR = SPI_SR_EOQF_MASK;
-
-    if (in != NULL) {
-        *in = (char)byte_in;
-    }
+    return (char)byte_in;
 }
 
 void spi_transfer_bytes(spi_t dev, char *out, char *in, size_t len)
@@ -1065,7 +1062,7 @@ void spi_transfer_bytes(spi_t dev, char *out, char *in, size_t len)
     spi_dev->SR = SPI_SR_EOQF_MASK;
 }
 
-void spi_transfer_reg(spi_t dev, uint8_t reg, char out, char *in)
+char spi_transfer_reg(spi_t dev, uint8_t reg, char out)
 {
     SPI_Type *spi_dev;
     uint8_t byte_in;
@@ -1137,7 +1134,7 @@ void spi_transfer_reg(spi_t dev, uint8_t reg, char out, char *in)
 #endif
 
         default:
-            return;
+            return 0;
     }
 
     /* Transfer the register address first. */
@@ -1150,13 +1147,9 @@ void spi_transfer_reg(spi_t dev, uint8_t reg, char out, char *in)
     /* Transfer the value. */
     byte_in = spi_transfer_internal(spi_dev, flags, out);
 
-    if (in != NULL) {
-        /* Save input byte to buffer */
-        *in = (char)byte_in;
-    }
-
     /* Clear End-of-Queue status flag */
     spi_dev->SR = SPI_SR_EOQF_MASK;
+    return byte_in;
 }
 
 void spi_transfer_regs(spi_t dev, uint8_t reg, char *out, char *in, size_t len)

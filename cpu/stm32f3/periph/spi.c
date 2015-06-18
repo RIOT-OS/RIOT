@@ -294,7 +294,7 @@ void spi_release(spi_t dev)
     mutex_unlock(&locks[dev]);
 }
 
-void spi_transfer_byte(spi_t dev, char out, char *in)
+char spi_transfer_byte(spi_t dev, char out)
 {
     char tmp;
 
@@ -308,10 +308,7 @@ void spi_transfer_byte(spi_t dev, char out, char *in)
     while(!(spi[dev]->SR & SPI_SR_RXNE) );
     /* read response byte to reset flags */
     tmp = *DR;
-    /* 'return' response byte if wished for */
-    if (in) {
-        *in = tmp;
-    }
+    return tmp;
 }
 
 void spi_transmission_begin(spi_t dev, char reset_val)

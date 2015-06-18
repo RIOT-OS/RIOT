@@ -186,23 +186,16 @@ void spi_release(spi_t dev)
     mutex_unlock(&locks[dev]);
 }
 
-void spi_transfer_byte(spi_t dev, char out, char *in)
+char spi_transfer_byte(spi_t dev, char out)
 {
     SercomSpi* spi_dev = spi[dev].dev;
+    char tmp;
 
-    while (!spi_dev->INTFLAG.bit.DRE); /* while data register is not empty*/
+    while (!spi_dev->INTFLAG.bit.DRE);  /* while data register is not empty*/
     spi_dev->DATA.bit.DATA = out;
-
-    if (in)
-    {
-        while (!spi_dev->INTFLAG.bit.RXC); /* while receive is not complete*/
-        *in = spi_dev->DATA.bit.DATA;
-    }
-    else
-    {
-        /* clear input byte even if we're not interested */
-        spi_dev->DATA.bit.DATA;
-    }
+    while (!spi_dev->INTFLAG.bit.RXC);  /* while receive is not complete*/
+    tmp = spi_dev->DATA.bit.DATA;
+    return tmp;
 }
 
 void spi_poweron(spi_t dev)

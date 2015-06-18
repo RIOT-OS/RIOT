@@ -300,9 +300,10 @@ void spi_release(spi_t dev)
     mutex_unlock(&locks[dev]);
 }
 
-void spi_transfer_byte(spi_t dev, char out, char *in)
+char spi_transfer_byte(spi_t dev, char out)
 {
     SPI_TypeDef *spi_port;
+    char tmp;
 
     switch (dev) {
 #if SPI_0_EN
@@ -321,18 +322,14 @@ void spi_transfer_byte(spi_t dev, char out, char *in)
             break;
 #endif
         default:
-            return;
+            return 0;
     }
 
     while (!(spi_port->SR & SPI_SR_TXE));
     spi_port->DR = out;
     while (!(spi_port->SR & SPI_SR_RXNE));
-    if (in != NULL) {
-        *in = spi_port->DR;
-    }
-    else {
-        spi_port->DR;
-    }
+    tmp = (char)spi_port->DR;
+    return tmp;
 }
 
 void spi_transmission_begin(spi_t dev, char reset_val)
