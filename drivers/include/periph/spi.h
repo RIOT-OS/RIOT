@@ -32,13 +32,6 @@ extern "C" {
 #endif
 
 /**
- * @brief   Make sure the number of available SPI devices is defined
- */
-#ifndef SPI_NUMOF
-#error "SPI_NUMOF undefined for the target platform"
-#endif
-
-/**
  * @brief   Default SPI device access macro
  */
 #ifndef SPI_DEV

@@ -80,7 +80,7 @@ int kw2xrf_spi_init(spi_t spi, spi_speed_t spi_speed,
 void kw2xrf_write_dreg(uint8_t addr, uint8_t value)
 {
     kw2xrf_spi_transfer_head();
-    spi_transfer_reg(kw2xrf_spi, addr, value, NULL);
+    spi_transfer_reg(kw2xrf_spi, addr, value);
     kw2xrf_spi_transfer_tail();
     return;
 }
@@ -89,8 +89,7 @@ uint8_t kw2xrf_read_dreg(uint8_t addr)
 {
     uint8_t value;
     kw2xrf_spi_transfer_head();
-    spi_transfer_reg(kw2xrf_spi, (addr | MKW2XDRF_REG_READ),
-                     0x0, (char *)&value);
+    value = spi_transfer_reg(kw2xrf_spi, (addr | MKW2XDRF_REG_READ), 0x0);
     kw2xrf_spi_transfer_tail();
     return value;
 }

@@ -29,13 +29,11 @@
 
 int nrf24l01p_read_reg(nrf24l01p_t *dev, char reg, char *answer)
 {
-    int status;
-
     /* Acquire exclusive access to the bus. */
     spi_acquire(dev->spi);
     gpio_clear(dev->cs);
     hwtimer_spin(DELAY_CS_TOGGLE_TICKS);
-    status = spi_transfer_reg(dev->spi, (CMD_R_REGISTER | (REGISTER_MASK & reg)), CMD_NOP, answer);
+    *answer = spi_transfer_reg(dev->spi, (CMD_R_REGISTER | (REGISTER_MASK & reg)), CMD_NOP);
     hwtimer_spin(DELAY_CS_TOGGLE_TICKS);
     gpio_set(dev->cs);
     /* Release the bus for other threads. */
@@ -43,19 +41,16 @@ int nrf24l01p_read_reg(nrf24l01p_t *dev, char reg, char *answer)
 
     hwtimer_spin(DELAY_AFTER_FUNC_TICKS);
 
-    return status;
+    return 1;
 }
 
 int nrf24l01p_write_reg(nrf24l01p_t *dev, char reg, char write)
 {
-    int status;
-    char reg_content;
-
     /* Acquire exclusive access to the bus. */
     spi_acquire(dev->spi);
     gpio_clear(dev->cs);
     hwtimer_spin(DELAY_CS_TOGGLE_TICKS);
-    status = spi_transfer_reg(dev->spi, (CMD_W_REGISTER | (REGISTER_MASK & reg)), write, &reg_content);
+    spi_transfer_reg(dev->spi, (CMD_W_REGISTER | (REGISTER_MASK & reg)), write);
     hwtimer_spin(DELAY_CS_TOGGLE_TICKS);
     gpio_set(dev->cs);
     /* Release the bus for other threads. */
@@ -63,7 +58,7 @@ int nrf24l01p_write_reg(nrf24l01p_t *dev, char reg, char write)
 
     hwtimer_spin(DELAY_AFTER_FUNC_TICKS);
 
-    return status;
+    return 1;
 }
 
 
@@ -631,12 +626,11 @@ int nrf24l01p_set_datarate(nrf24l01p_t *dev, nrf24l01p_dr_t dr)
 
 int nrf24l01p_get_status(nrf24l01p_t *dev)
 {
-    char status;
     /* Acquire exclusive access to the bus. */
     spi_acquire(dev->spi);
     gpio_clear(dev->cs);
     hwtimer_spin(DELAY_CS_TOGGLE_TICKS);
-    spi_transfer_byte(dev->spi, CMD_NOP, &status);
+    spi_transfer_byte(dev->spi, CMD_NOP);
     hwtimer_spin(DELAY_CS_TOGGLE_TICKS);
     gpio_set(dev->cs);
     /* Release the bus for other threads. */
@@ -644,7 +638,7 @@ int nrf24l01p_get_status(nrf24l01p_t *dev)
 
     hwtimer_spin(DELAY_AFTER_FUNC_TICKS);
 
-    return (int)status;
+    return 1;
 }
 
 int nrf24l01p_set_power(nrf24l01p_t *dev, int pwr)
@@ -868,34 +862,27 @@ int nrf24l01p_disable_all_auto_ack(nrf24l01p_t *dev)
 
 int nrf24l01p_flush_tx_fifo(nrf24l01p_t *dev)
 {
-    int status;
-    char reg_content;
-
     /* Acquire exclusive access to the bus. */
     spi_acquire(dev->spi);
     gpio_clear(dev->cs);
     hwtimer_spin(DELAY_CS_TOGGLE_TICKS);
-    status = spi_transfer_byte(dev->spi, CMD_FLUSH_TX, &reg_content);
+    spi_transfer_byte(dev->spi, CMD_FLUSH_TX);
     hwtimer_spin(DELAY_CS_TOGGLE_TICKS);
     gpio_set(dev->cs);
     /* Release the bus for other threads. */
     spi_release(dev->spi);
 
     hwtimer_spin(DELAY_AFTER_FUNC_TICKS);
-
-    return status;
+    return 1;
 }
 
 int nrf24l01p_flush_rx_fifo(nrf24l01p_t *dev)
 {
-    int status;
-    char reg_content;
-
     /* Acquire exclusive access to the bus. */
     spi_acquire(dev->spi);
     gpio_clear(dev->cs);
     hwtimer_spin(DELAY_CS_TOGGLE_TICKS);
-    status = spi_transfer_byte(dev->spi, CMD_FLUSH_RX, &reg_content);
+    spi_transfer_byte(dev->spi, CMD_FLUSH_RX);
     hwtimer_spin(DELAY_CS_TOGGLE_TICKS);
     gpio_set(dev->cs);
     /* Release the bus for other threads. */
@@ -903,7 +890,7 @@ int nrf24l01p_flush_rx_fifo(nrf24l01p_t *dev)
 
     hwtimer_spin(DELAY_AFTER_FUNC_TICKS);
 
-    return status;
+    return 1;
 }
 
 void nrf24l01p_rx_cb(void *arg)

@@ -154,6 +154,7 @@ enum {
 /**
  * @brief   Legacy definitions of available SPI devices
  */
+#ifdef SPI_NUMOF
 enum {
 #if SPI_0_EN
     SPI_0 = 0,          /**< SPI device 0 */
@@ -168,6 +169,7 @@ enum {
     SPI_3,              /**< SPI device 3 */
 #endif
 };
+#endif
 
 #ifdef __cplusplus
 }
