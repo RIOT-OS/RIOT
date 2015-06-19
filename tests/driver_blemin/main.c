@@ -60,7 +60,9 @@ int main(void)
     puts("Use the 'ifconfig' and 'blesnd' shell commands to verify the driver");
 
     /* initialize network device */
-    blemin_init(&dev);
+    /* interface should have already been initialized by auto-init module */
+    /* blemin_init(&dev); */
+
     ng_nomac_init(nomac_stack, sizeof(nomac_stack), 5, "nomac", &dev);
 
     /* initialize and run the shell */
