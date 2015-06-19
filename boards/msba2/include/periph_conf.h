@@ -53,9 +53,19 @@ extern "C" {
 
 /**
  * @brief uart configuration
+ * @{
  */
 #define UART_NUMOF          (1)
 #define UART_0_EN           (1)
+/** @} */
+
+/**
+ * @brief SPI configuration
+ * @{
+ */
+#define SPI_NUMOF           (1)
+#define SPI_0_EN            (1)
+/** @} */
 
 #ifdef __cplusplus
 }
