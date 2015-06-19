@@ -79,6 +79,7 @@ void _receive(ng_pktsnip_t *pkt)
     if ((payload == NULL) || (payload->size < 1)) {
         DEBUG("6lo: Received packet has no 6LoWPAN payload\n");
         ng_pktbuf_release(pkt);
+        return;
     }
 
     dispatch = payload->data;
