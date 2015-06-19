@@ -165,6 +165,8 @@ void _send(ng_pktsnip_t *pkt)
     /* cppcheck-suppress unreadVariable */
     size_t payload_len, datagram_size;
     uint16_t max_frag_size;
+    /* cppcheck: disp is needed in other build paths on this level already */
+    /* cppcheck-suppress variableScope */
     uint8_t *disp;
 
     if ((pkt == NULL) || (pkt->size < sizeof(ng_netif_hdr_t))) {
