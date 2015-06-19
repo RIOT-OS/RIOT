@@ -59,11 +59,27 @@ void _receive(ng_pktsnip_t *pkt)
     uint8_t *dispatch;
     ng_netreg_entry_t *entry;
 
+    /* seize payload as a temporary variable */
+    payload = ng_pktbuf_start_write(pkt);   /* need to duplicate since pkt->next
+                                             * might get replaced */
+
+    if (payload == NULL) {
+        DEBUG("6lo: can not get write access on received packet\n");
+#if defined(DEVELHELP) && defined(ENABLE_DEBUG)
+        ng_pktbuf_stats();
+#endif
+        ng_pktbuf_release(pkt);
+        return;
+    }
+
+    pkt = payload;  /* reset pkt from temporary variable */
+
     LL_SEARCH_SCALAR(pkt, payload, type, NG_NETTYPE_SIXLOWPAN);
 
     if ((payload == NULL) || (payload->size < 1)) {
         DEBUG("6lo: Received packet has no 6LoWPAN payload\n");
         ng_pktbuf_release(pkt);
+        return;
     }
 
     dispatch = payload->data;
@@ -149,6 +165,8 @@ void _send(ng_pktsnip_t *pkt)
     /* cppcheck-suppress unreadVariable */
     size_t payload_len, datagram_size;
     uint16_t max_frag_size;
+    /* cppcheck: disp is needed in other build paths on this level already */
+    /* cppcheck-suppress variableScope */
     uint8_t *disp;
 
     if ((pkt == NULL) || (pkt->size < sizeof(ng_netif_hdr_t))) {
