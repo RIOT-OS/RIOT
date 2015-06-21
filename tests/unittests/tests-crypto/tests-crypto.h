@@ -36,6 +36,13 @@ void tests_crypto(void);
  */
 Test *tests_crypto_sha256_tests(void);
 
+/**
+ * @brief   Generates tests for crypto/chacha.h
+ *
+ * @return  embUnit tests if successful, NULL if not.
+ */
+Test *tests_crypto_chacha_tests(void);
+
 #ifdef __cplusplus
 }
 #endif
