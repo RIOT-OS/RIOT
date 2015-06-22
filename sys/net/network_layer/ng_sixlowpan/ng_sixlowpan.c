@@ -35,9 +35,9 @@ static char _stack[NG_SIXLOWPAN_STACK_SIZE];
 
 
 /* handles NG_NETAPI_MSG_TYPE_RCV commands */
-void _receive(ng_pktsnip_t *pkt);
+static void _receive(ng_pktsnip_t *pkt);
 /* handles NG_NETAPI_MSG_TYPE_SND commands */
-void _send(ng_pktsnip_t *pkt);
+static void _send(ng_pktsnip_t *pkt);
 /* Main event loop for 6LoWPAN */
 static void *_event_loop(void *args);
 
@@ -53,7 +53,7 @@ kernel_pid_t ng_sixlowpan_init(void)
     return _pid;
 }
 
-void _receive(ng_pktsnip_t *pkt)
+static void _receive(ng_pktsnip_t *pkt)
 {
     ng_pktsnip_t *payload;
     uint8_t *dispatch;
@@ -156,7 +156,7 @@ void _receive(ng_pktsnip_t *pkt)
     }
 }
 
-void _send(ng_pktsnip_t *pkt)
+static void _send(ng_pktsnip_t *pkt)
 {
     ng_netif_hdr_t *hdr;
     ng_pktsnip_t *ipv6, *sixlowpan;
