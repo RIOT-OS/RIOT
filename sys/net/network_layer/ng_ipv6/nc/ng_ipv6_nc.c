@@ -20,6 +20,7 @@
 #include "net/ng_ipv6/nc.h"
 #include "net/ng_ipv6/netif.h"
 #include "net/ng_ndp.h"
+#include "net/ng_pktbuf.h"
 #include "thread.h"
 #include "timex.h"
 #include "vtimer.h"
@@ -98,7 +99,7 @@ ng_ipv6_nc_t *ng_ipv6_nc_add(kernel_pid_t iface, const ng_ipv6_addr_t *ipv6_addr
     /* Otherwise, fill free entry with your fresh information */
     free_entry->iface = iface;
 
-    ng_pktqueue_init(&(free_entry->pkts));
+    free_entry->pkts = NULL;
     memcpy(&(free_entry->ipv6_addr), ipv6_addr, sizeof(ng_ipv6_addr_t));
     DEBUG("ipv6_nc: Register %s for interface %" PRIkernel_pid,
           ng_ipv6_addr_to_str(addr_str, ipv6_addr, sizeof(addr_str)),
@@ -132,6 +133,14 @@ void ng_ipv6_nc_remove(kernel_pid_t iface, const ng_ipv6_addr_t *ipv6_addr)
         DEBUG("ipv6_nc: Remove %s for interface %" PRIkernel_pid "\n",
               ng_ipv6_addr_to_str(addr_str, ipv6_addr, sizeof(addr_str)),
               iface);
+
+        while (entry->pkts != NULL) {
+#ifdef MODULE_NG_PKTBUF
+            ng_pktbuf_release(entry->pkts->pkt);
+#endif
+            entry->pkts->pkt = NULL;
+            ng_pktqueue_remove_head(&entry->pkts);
+        }
 
         ng_ipv6_addr_set_unspecified(&(entry->ipv6_addr));
         entry->iface = KERNEL_PID_UNDEF;
