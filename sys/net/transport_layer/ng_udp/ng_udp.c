@@ -114,6 +114,9 @@ static void _receive(ng_pktsnip_t *pkt)
         ng_pktbuf_release(pkt);
         return;
     }
+    /* mark payload as Type: UNDEF */
+    pkt->type = NG_NETTYPE_UNDEF;
+    /* get explicit pointer to UDP header */
     hdr = (ng_udp_hdr_t *)udp->data;
 
     LL_SEARCH_SCALAR(pkt, ipv6, type, NG_NETTYPE_IPV6);
