@@ -68,6 +68,7 @@ static void _set_state(ng_ipv6_nc_t *nc_entry, uint8_t state);
 /* special netapi helper */
 static inline void _send_delayed(vtimer_t *t, timex_t interval, ng_pktsnip_t *pkt)
 {
+    vtimer_remove(t);
     vtimer_set_msg(t, interval, ng_ipv6_pid, NG_NETAPI_MSG_TYPE_SND, pkt);
 }
 
@@ -307,6 +308,7 @@ void ng_ndp_retrans_nbr_sol(ng_ipv6_nc_t *nc_entry)
                 _send_nbr_sol(ifs[i], &nc_entry->ipv6_addr, &dst);
             }
 
+            vtimer_remove(&nc_entry->nbr_sol_timer);
             vtimer_set_msg(&nc_entry->nbr_sol_timer, t, ng_ipv6_pid,
                            NG_NDP_MSG_NBR_SOL_RETRANS, nc_entry);
         }
@@ -316,6 +318,7 @@ void ng_ndp_retrans_nbr_sol(ng_ipv6_nc_t *nc_entry)
             _send_nbr_sol(nc_entry->iface, &nc_entry->ipv6_addr, &dst);
 
             mutex_lock(&ipv6_iface->mutex);
+            vtimer_remove(&nc_entry->nbr_sol_timer);
             vtimer_set_msg(&nc_entry->nbr_sol_timer,
                            ipv6_iface->retrans_timer, ng_ipv6_pid,
                            NG_NDP_MSG_NBR_SOL_RETRANS, nc_entry);
@@ -505,6 +508,7 @@ kernel_pid_t ng_ndp_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_len,
                     _send_nbr_sol(ifs[i], next_hop_ip, &dst_sol);
                 }
 
+                vtimer_remove(&nc_entry->nbr_sol_timer);
                 vtimer_set_msg(&nc_entry->nbr_sol_timer, t, ng_ipv6_pid,
                                NG_NDP_MSG_NBR_SOL_RETRANS, nc_entry);
             }
@@ -514,6 +518,7 @@ kernel_pid_t ng_ndp_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_len,
                 _send_nbr_sol(iface, next_hop_ip, &dst_sol);
 
                 mutex_lock(&ipv6_iface->mutex);
+                vtimer_remove(&nc_entry->nbr_sol_timer);
                 vtimer_set_msg(&nc_entry->nbr_sol_timer,
                                ipv6_iface->retrans_timer, ng_ipv6_pid,
                                NG_NDP_MSG_NBR_SOL_RETRANS, nc_entry);
@@ -938,6 +943,7 @@ static void _set_state(ng_ipv6_nc_t *nc_entry, uint8_t state)
             vtimer_remove(&nc_entry->nbr_sol_timer);
 
         case NG_IPV6_NC_STATE_DELAY:
+            vtimer_remove(&nc_entry->nbr_sol_timer);
             vtimer_set_msg(&nc_entry->nbr_sol_timer, t, ng_ipv6_pid,
                            NG_NDP_MSG_NC_STATE_TIMEOUT, nc_entry);
             break;
@@ -950,6 +956,7 @@ static void _set_state(ng_ipv6_nc_t *nc_entry, uint8_t state)
                           &nc_entry->ipv6_addr);
 
             mutex_lock(&ipv6_iface->mutex);
+            vtimer_remove(&nc_entry->nbr_sol_timer);
             vtimer_set_msg(&nc_entry->nbr_sol_timer,
                            ipv6_iface->retrans_timer, ng_ipv6_pid,
                            NG_NDP_MSG_NBR_SOL_RETRANS, nc_entry);
