@@ -25,7 +25,7 @@
 #include <stdlib.h>
 
 #include "net/ng_pkt.h"
-#include "priority_queue.h"
+#include "utlist.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -36,78 +36,10 @@ extern "C" {
  *
  * @extends priority_queue_node_t
  */
-typedef struct ng_pktqueue_node {
-    struct ng_pktqueue_node *next;  /**< next node in queue */
-    uint32_t priority;              /**< priority of the node */
-    ng_pktsnip_t *data;             /**< pointer to the data */
-} ng_pktqueue_node_t;
-
-/**
- * @brief   data type for packet queues
- *
- * @extends priority_queue_t
- */
-typedef struct {
-    ng_pktqueue_node_t *first;  /**< first node in the queue */
+typedef struct ng_pktqueue {
+    struct ng_pktqueue *next;   /**< next node in queue */
+    ng_pktsnip_t *pkt;          /**< pointer to the packet */
 } ng_pktqueue_t;
-
-/**
- * @brief   Static initializer for ng_pktqueue_node_t
- */
-#define NG_PKTQUEUE_NODE_INIT { NULL, NULL, 0 }
-
-/**
- * @brief   Initializes a packet queue node.
- * @details For initialization of variables use NG_PKTQUEUE_NODE_INIT instead.
- *          Only use this function for dynamically allocated packet queue nodes.
- *
- * @param[out] node pre-allocated ng_pktqueue_node_t object. must not be NULL.
- */
-static inline void ng_pktqueue_node_init(ng_pktqueue_node_t *node)
-{
-    priority_queue_node_init((priority_queue_node_t *)node);
-}
-
-/**
- * @brief Static initializer for ng_pktqueue_t.
- */
-#define NG_PKTQUEUE_INIT PRIORITY_QUEUE_INIT
-
-/**
- * @brief   Initialize a packet queue object.
- * @details For initialization of variables use NG_PKTQUEUE_INIT
- *          instead. Only use this function for dynamically allocated
- *          packet queues.
- * @param[out] queue    pre-allocated ng_pktqueue_t object, must not be NULL.
- */
-static inline void ng_pktqueue_init(ng_pktqueue_t *queue)
-{
-    priority_queue_init((priority_queue_t *)queue);
-}
-
-/**
- * @brief get the packet queue's head without removing it
- *
- * @param[out] queue    the queue
- *
- * @return              the head
- */
-static inline ng_pktqueue_node_t *ng_pktqueue_get_head(ng_pktqueue_t *queue)
-{
-    return queue->first;
-}
-
-/**
- * @brief remove the packet queue's head
- *
- * @param[in]  queue    the queue
- *
- * @return              the old head
- */
-static inline ng_pktqueue_node_t *ng_pktqueue_remove_head(ng_pktqueue_t *queue)
-{
-    return (ng_pktqueue_node_t *)priority_queue_remove_head((priority_queue_t *)queue);
-}
 
 /**
  * @brief       add @p node into @p queue based on its priority
@@ -115,23 +47,42 @@ static inline ng_pktqueue_node_t *ng_pktqueue_remove_head(ng_pktqueue_t *queue)
  * @details     The new node will be appended after objects with the same
  *              priority.
  *
- * @param[in]   queue   the queue
- * @param[in]   node    the node to add
+ * @param[in,out]   queue   the queue, may not be NULL
+ * @param[in]       node    the node to add.
  */
-static inline void ng_pktqueue_add(ng_pktqueue_t *queue, ng_pktqueue_node_t *node)
+static inline void ng_pktqueue_add(ng_pktqueue_t **queue, ng_pktqueue_t *node)
 {
-    priority_queue_add((priority_queue_t *)queue, (priority_queue_node_t *) node);
+    LL_APPEND(*queue, node);
 }
 
 /**
  * @brief       remove @p node from @p queue
  *
- * @param[in]   queue   the queue
+ * @param[in]   queue   the queue, may not be NULL
  * @param[in]   node    the node to remove
+ *
+ * @return  @p node.
  */
-static inline void ng_pktqueue_remove(ng_pktqueue_t *queue, ng_pktqueue_node_t *node)
+static inline ng_pktqueue_t *ng_pktqueue_remove(ng_pktqueue_t **queue, ng_pktqueue_t *node)
 {
-    priority_queue_remove((priority_queue_t *)queue, (priority_queue_node_t *) node);
+    if (node) {
+        LL_DELETE(*queue, node);
+        node->next = NULL;
+    }
+
+    return node;
+}
+
+/**
+ * @brief remove the packet queue's head
+ *
+ * @param[in]  queue    the queue, may not be NULL
+ *
+ * @return              the old head
+ */
+static inline ng_pktqueue_t *ng_pktqueue_remove_head(ng_pktqueue_t **queue)
+{
+    return ng_pktqueue_remove(queue, *queue);
 }
 
 #ifdef __cplusplus
