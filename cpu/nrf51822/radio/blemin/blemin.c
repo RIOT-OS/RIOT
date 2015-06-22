@@ -91,8 +91,17 @@ typedef struct __attribute__((packed))
 {
     PDU_header header;                  /**< BLE pdu header */
     uint8_t payload[CONF_PAYLOAD_LEN];  /**< actual payload */
-}
-ble_pkt_t;
+} ble_pkt_t;
+
+/**
+ * @brief   In-memory structure of a cached blemin radio packet
+ */
+typedef struct __attribute__((packed))
+{
+    PDU_header header;			/**< BLE pdu header */
+    uint8_t addr[BLE_ADDR_LEN];		/**< actual address */
+    uint8_t count;
+} ble_pkt_cache_t;
 
 /**
  * @brief   Pointer to the MAC layer event callback
@@ -107,7 +116,7 @@ static volatile state_t _state = STATE_OFF;
 /**
  * @brief   Current state of the BLE Link Layer
  */
-static volatile ll_state_t _ll_state = LL_ADVERTISING;
+static volatile ll_state_t _ll_state = LL_SCANNING;
 
 /**
  * @brief   BLE Address of the device
@@ -135,9 +144,34 @@ static uint8_t _advertising_delay = 10;
 static ble_pkt_t _advertising_pkt;
 
 /**
+ * @brief   BLE Scan Request packet buffer
+ */
+static ble_pkt_t _scan_request_pkt;
+
+/**
  * @brief   BLE Scan Response packet buffer
  */
-static ble_pkt_t _scanresponse_pkt;
+static ble_pkt_t _scan_response_pkt;
+
+/**
+ * @brief   BLE Scan Request packet cache
+ */
+static ble_pkt_cache_t _scan_request_cache[BLE_SCAN_REQ_CACHE_SIZE];
+
+/**
+ * @brief   BLE Scan Response packet cache
+ */
+static ble_pkt_cache_t _adv_ind_cache[BLE_ADV_IND_CACHE_SIZE];
+
+/**
+ * @brief   BLE Scan Request packet cache position
+ */
+static uint8_t _scan_request_cache_pos = 0;
+
+/**
+ * @brief   BLE Scan Response packet cache position
+ */
+static uint8_t _adv_ind_cache_pos = 0;
 
 /**
  * @brief   Hold the state before sending to return to it afterwards
@@ -153,6 +187,60 @@ static ble_pkt_t _rx_buf[2];
  * @brief   Pointer to the free receive buffer
  */
 static volatile int _rx_next = 0;
+
+void _print_debug_cache(void) {
+    int i;
+    for (i = 0; i < 3; i++) {
+	printf("%02d:\t%02x:%02x:%02x:%02x:%02x:%02x %u\n", i, _scan_request_cache[i].addr[0], _scan_request_cache[i].addr[1], _scan_request_cache[i].addr[2], _scan_request_cache[i].addr[3], _scan_request_cache[i].addr[4], _scan_request_cache[i].addr[5], _scan_request_cache[i].count);
+    }
+}
+/* Clear packet cache (each cache should be cleared on BLE link state change) */
+void _clear_pkt_cache(ble_pkt_cache_t *ble_pkt_cache)
+{
+    bzero(&ble_pkt_cache, sizeof(ble_pkt_cache));
+}
+
+/* Add BLE packet to cache */
+void _add_pkt_to_cache(ble_pkt_cache_t *ble_pkt_cache, ble_pkt_t *ble_pkt, uint8_t cache_pos, uint8_t cache_size)
+{
+    int i;
+
+    for (i = 0; i < cache_size; i++) {
+	if (memcmp(ble_pkt_cache[i].addr, ble_pkt->payload, BLE_ADDR_LEN) == 0) {
+	    ble_pkt_cache[i].count++;
+	    return;
+	}
+    }
+
+    ble_pkt_cache_t pkt_entry;
+    pkt_entry.count = 1;
+    pkt_entry.header = ble_pkt->header;
+    memcpy(pkt_entry.addr, ble_pkt->payload, BLE_ADDR_LEN);
+    ble_pkt_cache[cache_pos] = pkt_entry;
+    cache_pos++;
+
+    if (cache_pos >= cache_size) {
+	cache_pos = 0;
+    }
+
+}
+
+/* Check cache for the BLE packet and increment the counter if found */
+int _check_pkt_cache(ble_pkt_cache_t *ble_pkt_cache, ble_pkt_t *ble_pkt, uint8_t cache_size)
+{
+    int i;
+    for (i = 0; i < cache_size; i++) {
+	if (memcmp(ble_pkt_cache[i].addr, ble_pkt->payload, BLE_ADDR_LEN) == 0) {
+	    if (ble_pkt_cache[i].count < BLE_MAX_CACHE_COUNT) {
+		return 0;
+	    }
+	    return -1;
+	}
+    }
+
+    return 0;
+}
+
 
 /* Switch the BLE radio state to idle */
 static void _switch_to_idle(void)
@@ -500,7 +588,7 @@ void _prepare_advertising_pkt(void)
 /* Send BLE Advertising packet from corresponding packet buffer */
 void _send_advertising_pkt(void *channel)
 {
-    DEBUG("blemin: _send_advertising_pkt (channel: %u)\n", (unsigned int)channel);
+    // DEBUG("blemin: _send_advertising_pkt (channel: %u)\n", (unsigned int)channel);
 
     if (_ll_state == LL_ADVERTISING) {
         _tx_prestate = _state;
@@ -531,25 +619,65 @@ void _call_advertising_event(void *ptr)
     }
 }
 
-/* Prepare buffer for BLE Scan Response packets */
-void _prepare_scanresponse_pkt(void)
+/* Prepare buffer for BLE Scan Request packets */
+void _prepare_scan_request_pkt(void)
 {
-    DEBUG("blemin: _prepare_scanresponse_pkt\n");
+    DEBUG("blemin: _prepare_scan_request_pkt\n");
 
-    _scanresponse_pkt.header.pdu_type = SCAN_RSP_TYPE;
-    _scanresponse_pkt.header.tx_add = BLE_DEFAULT_SCAN_RSP_TXADD;
-    _scanresponse_pkt.header.rx_add = BLE_DEFAULT_SCAN_RSP_RXADD;
-    _scanresponse_pkt.header.length = BLE_ADDR_LEN;
-    _scanresponse_pkt.header.RFU1 = BLE_DEFAULT_RFU;
-    _scanresponse_pkt.header.RFU2 = BLE_DEFAULT_RFU;
+    _scan_request_pkt.header.pdu_type = SCAN_REQ_TYPE;
+    _scan_request_pkt.header.tx_add = BLE_DEFAULT_SCAN_REQ_TXADD;
+    _scan_request_pkt.header.rx_add = BLE_DEFAULT_SCAN_REQ_RXADD;
+    _scan_request_pkt.header.length = BLE_ADDR_LEN + BLE_ADDR_LEN;
+    _scan_request_pkt.header.RFU1 = BLE_DEFAULT_RFU;
+    _scan_request_pkt.header.RFU2 = BLE_DEFAULT_RFU;
 
-    memcpy(_scanresponse_pkt.payload, BLE_DEFAULT_ADV_ADDRESS, BLE_ADDR_LEN);
+    memcpy(_scan_request_pkt.payload, BLE_EMPTY_ADDRESS, BLE_ADDR_LEN);
+    memcpy((_scan_request_pkt.payload + BLE_ADDR_LEN), BLE_DEFAULT_ADV_ADDRESS, BLE_ADDR_LEN);
+}
+
+/* Send BLE Scan Request packet from corresponding packet buffer */
+void _send_scan_request_pkt(uint8_t *adv_addr)
+{
+    DEBUG("blemin: _send_scan_request_pkt\n");
+
+    if (_ll_state == LL_SCANNING) {
+        _tx_prestate = _state;
+
+        if (_tx_prestate == STATE_RX) {
+            _switch_to_idle();
+        }
+
+        /* set the target advertiser address to scan */
+	memcpy((_scan_request_pkt.payload), adv_addr, BLE_ADDR_LEN);
+
+        /* set packet pointer to TX buffer and write destination address */
+        NRF_RADIO->PACKETPTR = (uint32_t)(&_scan_request_pkt);
+
+        /* start transmission */
+        _state = STATE_TX;
+        NRF_RADIO->TASKS_TXEN = 1;
+    }
+}
+
+/* Prepare buffer for BLE Scan Response packets */
+void _prepare_scan_response_pkt(void)
+{
+    DEBUG("blemin: _prepare_scan_response_pkt\n");
+
+    _scan_response_pkt.header.pdu_type = SCAN_RSP_TYPE;
+    _scan_response_pkt.header.tx_add = BLE_DEFAULT_SCAN_RSP_TXADD;
+    _scan_response_pkt.header.rx_add = BLE_DEFAULT_SCAN_RSP_RXADD;
+    _scan_response_pkt.header.length = BLE_ADDR_LEN;
+    _scan_response_pkt.header.RFU1 = BLE_DEFAULT_RFU;
+    _scan_response_pkt.header.RFU2 = BLE_DEFAULT_RFU;
+
+    memcpy(_scan_response_pkt.payload, BLE_DEFAULT_ADV_ADDRESS, BLE_ADDR_LEN);
 }
 
 /* Send BLE Scan Response packet from corresponding packet buffer */
-void _send_scanresponse_pkt(void)
+void _send_scan_response_pkt(void)
 {
-    DEBUG("blemin: _send_scanresponse_pkt\n");
+    DEBUG("blemin: _send_scan_response_pkt\n");
 
     if (_ll_state == LL_ADVERTISING) {
         _tx_prestate = _state;
@@ -559,7 +687,7 @@ void _send_scanresponse_pkt(void)
         }
 
         /* set packet pointer to TX buffer and write destination address */
-        NRF_RADIO->PACKETPTR = (uint32_t)(&_scanresponse_pkt);
+        NRF_RADIO->PACKETPTR = (uint32_t)(&_scan_response_pkt);
 
         /* start transmission */
         _state = STATE_TX;
@@ -624,12 +752,22 @@ int blemin_init(ng_netdev_t *dev)
     NRF_RADIO->EVENTS_END = 0;
     NRF_RADIO->INTENSET = (1 << RADIO_INTENSET_END_Pos);
 
-    /* if BLE Link State is ADVERTISING prepare and start sending packets */
+    /* Prepare BLE advertising and scan response */
     if (_ll_state == LL_ADVERTISING) {
         _prepare_advertising_pkt();
-        _prepare_scanresponse_pkt();
+        _prepare_scan_response_pkt();
         _call_advertising_event(NULL);
     }
+    /* Prepare BLE scan request */
+    else if (_ll_state == LL_SCANNING) {
+	_prepare_scan_request_pkt();
+    }
+
+    /* clear cache of BLE scan requests */
+    _clear_pkt_cache(_scan_request_cache);
+
+    /* clear cache of BLE scan requests */
+    _clear_pkt_cache(_adv_ind_cache);
 
     /* put device in receive mode */
     _switch_to_rx();
@@ -654,17 +792,71 @@ static void _receive_data(void)
     /* get pointer to RX data buffer */
     data = &(_rx_buf[_rx_next ^ 1]);
 
-    if (_ll_state == LL_ADVERTISING) {
-        /* Send respone to received BLE SCAN_REQ packet */
-        if (data->header.pdu_type == SCAN_REQ_TYPE) {
-            DEBUG("blemin: receive_data -> SCAN_REQ received\n");
-            _send_scanresponse_pkt();
-        }
+    switch (_ll_state) {
+	case LL_ADVERTISING:
+	    /* Send response to received BLE SCAN_REQ packet */
+	    if (data->header.pdu_type == SCAN_REQ_TYPE) {
+		DEBUG("blemin: receive_data -> SCAN_REQ received\n");
 
-        /* Send respone to received BLE CONNECT_REQ packet */
-        else if (data->header.pdu_type == CONNECT_REQ_TYPE) {
-            DEBUG("blemin: receive_data -> CONNECT_REQ received\n");
-        }
+		/* Check if the received SCAN_REQ was already cached */
+		if (_check_pkt_cache(_scan_request_cache, data, BLE_SCAN_REQ_CACHE_SIZE) == 0) {
+		    /* Add received SCAN_REQ to packet cache */
+		    _add_pkt_to_cache(_scan_request_cache, data, _scan_request_cache_pos, BLE_SCAN_REQ_CACHE_SIZE);
+                    /* Send SCAN_RESP packet */
+		    _send_scan_response_pkt();
+		} else {
+		    DEBUG("blemin: receive_data -> SCAN_REQ found in cache!\n");
+		    /* SCAN_REQ is ignored beacause it was already replied to it (with SCAN_RESP) */
+		}
+	    }
+
+	    /* Send response to received BLE CONNECT_REQ packet */
+	    else if (data->header.pdu_type == CONNECT_REQ_TYPE) {
+		DEBUG("blemin: receive_data -> CONNECT_REQ received\n");
+		/* todo: handle BLE connect request */
+	    }
+            break;
+
+	case LL_SCANNING:
+	    /* Send BLE SCAN_REQ packet on receiving a ADV_IND or ADV_SCAN_IND packet */
+	    if (data->header.pdu_type == ADV_IND_TYPE || data->header.pdu_type == ADV_SCAN_IND_TYPE) {
+		DEBUG("blemin: receive_data -> ADV_IND/ADV_SCAN_IND_TYPE received\n");
+
+		/* Check if the received ADV_IND or ADV_SCAN_IND was already cached */
+		if (_check_pkt_cache(_adv_ind_cache, data, BLE_ADV_IND_CACHE_SIZE) == 0) {
+		    /* Add received ADV_IND or ADV_SCAN_IND to packet cache */
+		    _add_pkt_to_cache(_adv_ind_cache, data, _adv_ind_cache_pos, BLE_ADV_IND_CACHE_SIZE);
+                    /* Send SCAN_REQ packet to ADV_IND or ADV_SCAN_IND addr */
+		    _send_scan_request_pkt(data->payload);
+		} else {
+		    DEBUG("blemin: receive_data -> ADV_IND/ADV_SCAN_IND found in cache!\n");
+		    /*  ADV_IND/ADV_SCAN_IND is ignored beacause it has already been queried (with SCAN_REQ) */
+		}
+	    }
+
+	    else if (data->header.pdu_type == SCAN_RSP_TYPE) {
+		DEBUG("blemin: receive_data -> SCAN_RSP_TYPE received\n");
+                /* todo: handle BLE scan response */
+	    }
+	    break;
+
+	case LL_INITIATING:
+	    /* Send BLE CONNECT_REQ_TYPE packet on receiving a ADV_IND packet */
+	    if (data->header.pdu_type == ADV_IND_TYPE) {
+		DEBUG("blemin: receive_data -> ADV_IND received\n");
+                /* todo: send CONNECT_REQ */
+	    }
+
+	    /* Send BLE CONNECT_REQ_TYPE packet on receiving a ADV_SCAN_IND packet */
+	    else if (data->header.pdu_type == ADV_DIRECT_IND_TYPE) {
+		DEBUG("blemin: receive_data -> ADV_DIRECT_IND received\n");
+                /* todo: send CONNECT_REQ */
+	    }
+            break;
+
+	default:
+	    break;
+
     }
 
 #if ENABLE_BLE_PKT_DEBUG

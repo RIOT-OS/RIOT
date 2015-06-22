@@ -66,6 +66,7 @@ enum pdu_types {
 #define BLE_PAYLOAD_LEN_MIN     	(BLE_ADDR_LEN)
 #define BLE_PAYLOAD_LEN_MAX     	37
 #define BLE_MAX_DATA_LEN		(BLE_PAYLOAD_LEN_MAX - BLE_ADDR_LEN)
+#define BLE_EMPTY_ADDRESS		"\x00\x00\x00\x00\x00\x00"
 
 #define BLE_DEFAULT_ACCESS_ADDR		0x8E89BED6
 
@@ -80,8 +81,14 @@ enum pdu_types {
                                         "\x03\x20\x22\x07\xff\x00\x00\x64" \
                                         "\x61\x74\x61"
 
+#define BLE_DEFAULT_SCAN_REQ_TXADD	1
+#define BLE_DEFAULT_SCAN_REQ_RXADD	1
 #define BLE_DEFAULT_SCAN_RSP_TXADD	1
 #define BLE_DEFAULT_SCAN_RSP_RXADD	0
+
+#define BLE_MAX_CACHE_COUNT		32
+#define BLE_SCAN_REQ_CACHE_SIZE		8
+#define BLE_ADV_IND_CACHE_SIZE		8
 
 /** @} */
 
