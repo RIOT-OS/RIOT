@@ -302,14 +302,13 @@ static rbuf_t *_rbuf_get(const void *src, size_t src_len,
 
     if (res != NULL) { /* entry not in buffer but found empty spot */
         res->pkt = ng_pktbuf_add(NULL, NULL, size, NG_NETTYPE_SIXLOWPAN);
-        *((uint64_t *)res->pkt->data) = 0;  /* clean first few bytes for later
-                                             * look-ups */
-
         if (res->pkt == NULL) {
             DEBUG("6lo rfrag: can not allocate reassembly buffer space.\n");
             return NULL;
         }
 
+        *((uint64_t *)res->pkt->data) = 0;  /* clean first few bytes for later
+                                             * look-ups */
         res->arrival = now.seconds;
         memcpy(res->src, src, src_len);
         memcpy(res->dst, dst, dst_len);
