@@ -71,25 +71,6 @@ extern volatile int lpm_prevent_sleep;
  */
 extern config_t sysconfig;
 
-/* ------------------------------------------------------------------------- */
-
-/**
- * @brief Immediately reboots the system.
- *
- * This function is used by core_panic() when the DEVELHELP macro is not defined.
- *
- * @param mode  The reboot mode (unused for now)
- *
- * @return This call never returns when successful. -1 is returned otherwise.
- */
-int reboot(int mode);
-
-/**
- * @def RB_AUTOBOOT
- * @brief Reboot the system in the usual fashion
- */
-#define RB_AUTOBOOT 0
-
 #ifdef __cplusplus
 }
 #endif
