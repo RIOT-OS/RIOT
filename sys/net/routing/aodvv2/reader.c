@@ -58,7 +58,7 @@ static enum rfc5444_result _cb_rerr_end_callback(
 /* helper functions */
 static uint8_t _get_link_cost(aodvv2_metric_t metricType);
 static uint8_t _get_max_metric(aodvv2_metric_t metricType);
-static void _update_metric(aodvv2_metric_t metricType, uint8_t *metric);
+static uint8_t _get_route_cost(aodvv2_metric_t metricType, uint8_t metric);
 
 /* This is where we store data gathered from packets */
 static struct aodvv2_packet_data packet_data;
@@ -264,7 +264,6 @@ static enum rfc5444_result _cb_rreq_end_callback(
 
     struct aodvv2_routing_entry_t *rt_entry;
     timex_t now;
-    uint8_t link_cost = _get_link_cost(packet_data.metricType);
 
     /* Check if packet contains the required information */
     if (dropped) {
@@ -283,7 +282,7 @@ static enum rfc5444_result _cb_rreq_end_callback(
         DEBUG("\tERROR: Hoplimit is 0. Dropping packet.\n");
         return RFC5444_DROP_PACKET;
     }
-    if ((_get_max_metric(packet_data.metricType) - link_cost)
+    if ((_get_max_metric(packet_data.metricType) - _get_link_cost(packet_data.metricType))
         <= packet_data.origNode.metric) {
         DEBUG("\tMetric Limit reached. Dropping packet.\n");
         return RFC5444_DROP_PACKET;
@@ -300,7 +299,10 @@ static enum rfc5444_result _cb_rreq_end_callback(
         return RFC5444_DROP_PACKET;
     }
 
-    _update_metric(packet_data.metricType, &packet_data.origNode.metric);
+    /* Update the cost of the route, since the packet has successfully traversed
+     * one more hop. */
+    packet_data.origNode.metric = _get_route_cost(packet_data.metricType,
+                                                  packet_data.origNode.metric);
     vtimer_now(&now);
     packet_data.timestamp = now;
 
@@ -341,7 +343,7 @@ static enum rfc5444_result _cb_rreq_end_callback(
                                                        malloc(sizeof(struct aodvv2_routing_entry_t));
         memset(tmp_rt_entry, 0, sizeof(*tmp_rt_entry));
 
-        routingtable_fill_routing_entry_t_rreq(&packet_data, tmp_rt_entry, link_cost);
+        routingtable_fill_routing_entry_t_rreq(&packet_data, tmp_rt_entry);
         routingtable_add_entry(tmp_rt_entry);
 
         free(tmp_rt_entry);
@@ -354,7 +356,7 @@ static enum rfc5444_result _cb_rreq_end_callback(
         /* The incoming routing information is better than existing routing
          * table information and SHOULD be used to improve the route table. */
         VDEBUG("\tUpdating Routing Table entry...\n");
-        routingtable_fill_routing_entry_t_rreq(&packet_data, rt_entry, link_cost);
+        routingtable_fill_routing_entry_t_rreq(&packet_data, rt_entry);
     }
 
     /*
@@ -483,7 +485,6 @@ static enum rfc5444_result _cb_rrep_end_callback(
     struct netaddr_str nbuf;
 #endif
     timex_t now;
-    uint8_t link_cost = _get_link_cost(packet_data.metricType);
 
     /* Check if packet contains the required information */
     if (dropped) {
@@ -500,13 +501,16 @@ static enum rfc5444_result _cb_rrep_end_callback(
         DEBUG("\tERROR: missing TargNode Address or SeqNum. Dropping packet.\n");
         return RFC5444_DROP_PACKET;
     }
-    if ((_get_max_metric(packet_data.metricType) - link_cost)
+    if ((_get_max_metric(packet_data.metricType) - _get_link_cost(packet_data.metricType))
         <= packet_data.targNode.metric) {
         DEBUG("\tMetric Limit reached. Dropping packet.\n");
         return RFC5444_DROP_PACKET;
     }
 
-    _update_metric(packet_data.metricType, &packet_data.targNode.metric);
+    /* Update the cost of the route, since the packet has successfully traversed
+     * one more hop. */
+    packet_data.targNode.metric = _get_route_cost(packet_data.metricType,
+                                                  packet_data.origNode.metric);
     vtimer_now(&now);
     packet_data.timestamp = now;
 
@@ -543,7 +547,7 @@ static enum rfc5444_result _cb_rrep_end_callback(
                                                        malloc(sizeof(struct aodvv2_routing_entry_t));
         memset(tmp_rt_entry, 0, sizeof(*tmp_rt_entry));
 
-        routingtable_fill_routing_entry_t_rrep(&packet_data, tmp_rt_entry, link_cost);
+        routingtable_fill_routing_entry_t_rrep(&packet_data, tmp_rt_entry);
         routingtable_add_entry(tmp_rt_entry);
 
         free(tmp_rt_entry);
@@ -556,7 +560,7 @@ static enum rfc5444_result _cb_rrep_end_callback(
         /* The incoming routing information is better than existing routing
          * table information and SHOULD be used to improve the route table. */
         VDEBUG("\tUpdating Routing Table entry...\n");
-        routingtable_fill_routing_entry_t_rrep(&packet_data, rt_entry, link_cost);
+        routingtable_fill_routing_entry_t_rrep(&packet_data, rt_entry);
     }
 
     /* If HandlingRtr is RREQ_Gen then the RREP satisfies RREQ_Gen's
@@ -720,7 +724,7 @@ int aodv_packet_reader_handle_packet(void *buffer, size_t length, struct netaddr
 
 /*
  * Cost(L): Get Cost of a Link regarding the specified metric.
- * (currently only AODVV2_DEFAULT_METRIC_TYPE (HopCt) implemented)
+ * (currently only AODVV2_DEFAULT_METRIC_TYPE (HopCount) implemented)
  * returns cost if metric is known, NULL otherwise
  */
 static uint8_t _get_link_cost(aodvv2_metric_t metricType)
@@ -744,12 +748,14 @@ static uint8_t _get_max_metric(aodvv2_metric_t metricType)
 }
 
 /*
- * Calculate a metric's new value according to the specified MetricType
- * (currently only implemented for AODVV2_DEFAULT_METRIC_TYPE (HopCt))
+ * Cost(R): Get Cost of a Route regarding the specified metric, based on the
+ * earlier metric value of the Route.
+ * (currently only AODVV2_DEFAULT_METRIC_TYPE (HopCount) implemented)
+ * returns cost if metric is known, NULL otherwise
  */
-static void _update_metric(aodvv2_metric_t metricType, uint8_t *metric)
+static uint8_t _get_route_cost(aodvv2_metric_t metricType, uint8_t metric)
 {
     if (metricType == AODVV2_DEFAULT_METRIC_TYPE){
-        *metric = *metric + 1;
+        return metric + _get_link_cost(AODVV2_DEFAULT_METRIC_TYPE);
     }
 }
