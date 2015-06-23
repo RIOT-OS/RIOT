@@ -805,7 +805,7 @@ ng_pktsnip_t *ng_ndp_opt_tl2a_build(const uint8_t *l2addr, uint8_t l2addr_len,
 /* packet queue node allocation */
 static ng_pktqueue_t *_alloc_pkt_node(ng_pktsnip_t *pkt)
 {
-    for (size_t i = 0; i < sizeof(_pkt_nodes); i++) {
+    for (size_t i = 0; i < sizeof(_pkt_nodes) / sizeof(ng_pktqueue_t); i++) {
         if ((_pkt_nodes[i].pkt == NULL) && (_pkt_nodes[i].next == NULL)) {
             _pkt_nodes[i].pkt = pkt;
 
