@@ -205,6 +205,8 @@ void ng_sixlowpan_frag_send(kernel_pid_t pid, ng_pktsnip_t *pkt,
 #if defined(DEVELHELP) && defined(ENABLE_DEBUG)
     if (iface == NULL) {
         DEBUG("6lo frag: iface == NULL, expect segmentation fault.\n");
+        ng_pktbuf_release(pkt);
+        return;
     }
 #endif
 
