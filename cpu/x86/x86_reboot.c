@@ -86,20 +86,14 @@ static bool reboot_twice;
 
 int reboot_arch(int mode)
 {
-    switch (mode) {
-        case RB_AUTOBOOT:
-            asm volatile ("cli");
-            if (!reboot_twice) {
-                reboot_twice = true;
-                if (reboot_fun) {
-                    reboot_fun();
-                }
-            }
-            x86_kbc_reboot();
-
-        default:
-            return -1;
+    asm volatile ("cli");
+    if (!reboot_twice) {
+        reboot_twice = true;
+        if (reboot_fun) {
+            reboot_fun();
+        }
     }
+    x86_kbc_reboot();
 }
 
 void x86_set_reboot_fun(x86_reboot_t fun)

@@ -18,17 +18,11 @@
  * @}
  */
 
-#include <stdio.h>
-
-#include "arch/reboot_arch.h"
 #include "cpu.h"
-#include "hwtimer.h"
 
-int reboot_arch(int mode)
+void reboot_arch(void)
 {
-    printf("Going into reboot, mode %i\n", mode);
-    /* wait 1 ms to make sure the printf is finished */
-    hwtimer_wait(HWTIMER_TICKS(1000));
+    /* we use the default CMSIS call to reboot the system */
     NVIC_SystemReset();
-    return -1;
+    while (1);
 }
