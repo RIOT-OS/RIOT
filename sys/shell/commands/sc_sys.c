@@ -18,13 +18,13 @@
  * @}
  */
 
-#include "arch/reboot_arch.h"
+#include "reboot.h"
 
 int _reboot_handler(int argc, char **argv)
 {
     (void) argc;
     (void) argv;
 
-    reboot_arch();
+    reboot();
     return 0;
 }
