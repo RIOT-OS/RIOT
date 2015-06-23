@@ -38,7 +38,7 @@
 static char addr_str[NG_IPV6_ADDR_MAX_STR_LEN];
 #endif
 
-static ng_pktqueue_node_t _pkt_nodes[NG_IPV6_NC_SIZE * 2];
+static ng_pktqueue_t _pkt_nodes[NG_IPV6_NC_SIZE * 2];
 static ng_ipv6_nc_t *_last_router = NULL;   /* last router chosen as default
                                              * router. Only used if reachability
                                              * is suspect (i. e. incomplete or
@@ -73,7 +73,7 @@ static inline void _send_delayed(vtimer_t *t, timex_t interval, ng_pktsnip_t *pk
 }
 
 /* packet queue node allocation */
-static ng_pktqueue_node_t *_alloc_pkt_node(ng_pktsnip_t *pkt);
+static ng_pktqueue_t *_alloc_pkt_node(ng_pktsnip_t *pkt);
 
 void ng_ndp_nbr_sol_handle(kernel_pid_t iface, ng_pktsnip_t *pkt,
                            ng_ipv6_hdr_t *ipv6, ng_ndp_nbr_sol_t *nbr_sol,
@@ -197,7 +197,7 @@ void ng_ndp_nbr_adv_handle(kernel_pid_t iface, ng_pktsnip_t *pkt,
     }
 
     if (ng_ipv6_nc_get_state(nc_entry) == NG_IPV6_NC_STATE_INCOMPLETE) {
-        ng_pktqueue_node_t *queued_pkt;
+        ng_pktqueue_t *queued_pkt;
 
         if (_pkt_has_l2addr(netif_hdr) && (l2tgt_len == 0)) {
             /* link-layer has addresses, but no TLLAO supplied: discard silently
@@ -225,8 +225,8 @@ void ng_ndp_nbr_adv_handle(kernel_pid_t iface, ng_pktsnip_t *pkt,
         }
 
         while ((queued_pkt = ng_pktqueue_remove_head(&nc_entry->pkts)) != NULL) {
-            ng_netapi_send(ng_ipv6_pid, queued_pkt->data);
-            queued_pkt->data = NULL;
+            ng_netapi_send(ng_ipv6_pid, queued_pkt->pkt);
+            queued_pkt->pkt = NULL;
         }
     }
     else {
@@ -326,24 +326,11 @@ void ng_ndp_retrans_nbr_sol(ng_ipv6_nc_t *nc_entry)
         }
     }
     else if (nc_entry->probes_remaining <= 1) {
-        ng_pktqueue_node_t *queue_node;
-
-        /* No need to call ng_ipv6_nc_remove() we know already were the
-         * entry is */
-
         DEBUG("ndp: Remove nc entry %s for interface %" PRIkernel_pid "\n",
               ng_ipv6_addr_to_str(addr_str, &nc_entry->ipv6_addr, sizeof(addr_str)),
               nc_entry->iface);
 
-        while ((queue_node = ng_pktqueue_remove_head(&nc_entry->pkts))) {
-            ng_pktbuf_release(queue_node->data);
-            queue_node->data = NULL;
-        }
-
-        ng_ipv6_addr_set_unspecified(&(nc_entry->ipv6_addr));
-        nc_entry->iface = KERNEL_PID_UNDEF;
-        nc_entry->flags = 0;
-        nc_entry->probes_remaining = 0;
+        ng_ipv6_nc_remove(nc_entry->iface, &nc_entry->ipv6_addr);
     }
 }
 
@@ -474,7 +461,7 @@ kernel_pid_t ng_ndp_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_len,
             return nc_entry->iface;
         }
         else if (nc_entry == NULL) {
-            ng_pktqueue_node_t *pkt_node;
+            ng_pktqueue_t *pkt_node;
             ng_ipv6_addr_t dst_sol;
 
             nc_entry = ng_ipv6_nc_add(iface, next_hop_ip, NULL, 0,
@@ -492,7 +479,7 @@ kernel_pid_t ng_ndp_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_len,
             }
             else {
                 /* prevent packet from being released by IPv6 */
-                ng_pktbuf_hold(pkt_node->data, 1);
+                ng_pktbuf_hold(pkt_node->pkt, 1);
                 ng_pktqueue_add(&nc_entry->pkts, pkt_node);
             }
 
@@ -816,12 +803,11 @@ ng_pktsnip_t *ng_ndp_opt_tl2a_build(const uint8_t *l2addr, uint8_t l2addr_len,
 
 /* internal functions */
 /* packet queue node allocation */
-static ng_pktqueue_node_t *_alloc_pkt_node(ng_pktsnip_t *pkt)
+static ng_pktqueue_t *_alloc_pkt_node(ng_pktsnip_t *pkt)
 {
-    for (size_t i = 0; i < sizeof(_pkt_nodes); i++) {
-        if (_pkt_nodes[i].data == NULL) {
-            ng_pktqueue_node_init(_pkt_nodes + i);
-            _pkt_nodes[i].data = pkt;
+    for (size_t i = 0; i < sizeof(_pkt_nodes) / sizeof(ng_pktqueue_t); i++) {
+        if ((_pkt_nodes[i].pkt == NULL) && (_pkt_nodes[i].next == NULL)) {
+            _pkt_nodes[i].pkt = pkt;
 
             return &(_pkt_nodes[i]);
         }

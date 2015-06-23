@@ -118,7 +118,7 @@ extern "C" {
  *          </a>.
  */
 typedef struct {
-    ng_pktqueue_t pkts;                     /**< Packets waiting for address resolution */
+    ng_pktqueue_t *pkts;                    /**< Packets waiting for address resolution */
     ng_ipv6_addr_t ipv6_addr;               /**< IPv6 address of the neighbor */
     uint8_t l2_addr[NG_IPV6_NC_L2_ADDR_MAX];/**< Link layer address of the neighbor */
     uint8_t l2_addr_len;                    /**< Length of ng_ipv6_nc_t::l2_addr */
