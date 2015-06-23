@@ -940,8 +940,7 @@ static void _set_state(ng_ipv6_nc_t *nc_entry, uint8_t state)
         case NG_IPV6_NC_STATE_REACHABLE:
             ipv6_iface = ng_ipv6_netif_get(nc_entry->iface);
             t = ipv6_iface->reach_time;
-            vtimer_remove(&nc_entry->nbr_sol_timer);
-
+            /* we intentionally fall through here to set the desired timeout t */
         case NG_IPV6_NC_STATE_DELAY:
             vtimer_remove(&nc_entry->nbr_sol_timer);
             vtimer_set_msg(&nc_entry->nbr_sol_timer, t, ng_ipv6_pid,
