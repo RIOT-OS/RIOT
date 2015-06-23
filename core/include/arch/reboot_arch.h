@@ -25,6 +25,11 @@
 #endif
 
 /**
+ * @brief   Map the kernels reboot interface to the platform specific call
+ */
+#define reboot          reboot_arch
+
+/**
  * @brief   Reboot the system, must never return
  */
 void reboot_arch(void);
