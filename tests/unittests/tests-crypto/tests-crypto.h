@@ -30,11 +30,67 @@ extern "C" {
 void tests_crypto(void);
 
 /**
+ * @brief   Generates tests for crypto/dragon.h
+ *
+ * @return  embUnit tests if successful, NULL if not.
+ */
+Test *tests_crypto_dragon_tests(void);
+
+/**
+ * @brief   Generates tests for crypto/hc128.h
+ *
+ * @return  embUnit tests if successful, NULL if not.
+ */
+Test *tests_crypto_hc128_tests(void);
+
+/**
+ * @brief   Generates tests for crypto/hc256.h
+ *
+ * @return  embUnit tests if successful, NULL if not.
+ */
+Test *tests_crypto_hc256_tests(void);
+
+/**
+ * @brief   Generates tests for crypto/lexv2.h
+ *
+ * @return  embUnit tests if successful, NULL if not.
+ */
+Test *tests_crypto_lexv2_tests(void);
+
+/**
+ * @brief   Generates tests for crypto/nlsv2.h
+ *
+ * @return  embUnit tests if successful, NULL if not.
+ */
+Test *tests_crypto_nlsv2_tests(void);
+
+/**
+ * @brief   Generates tests for crypto/rabbit.h
+ *
+ * @return  embUnit tests if successful, NULL if not.
+ */
+Test *tests_crypto_rabbit_tests(void);
+
+/**
+ * @brief   Generates tests for crypto/salsa20.h
+ *
+ * @return  embUnit tests if successful, NULL if not.
+ */
+Test *tests_crypto_salsa20_tests(void);
+
+/**
  * @brief   Generates tests for crypto/sha256.h
  *
  * @return  embUnit tests if successful, NULL if not.
  */
 Test *tests_crypto_sha256_tests(void);
+
+/**
+ * @brief   Generates tests for crypto/sosemanuk.h
+ *
+ * @return  embUnit tests if successful, NULL if not.
+ */
+Test *tests_crypto_sosemanuk_tests(void);
 
 #ifdef __cplusplus
 }
