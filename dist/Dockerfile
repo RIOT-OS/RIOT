@@ -40,7 +40,7 @@ RUN apt-get -y install build-essential \
  qemu-system-x86 python3 \
  g++-multilib \
  gcc-avr binutils-avr avr-libc \
- subversion curl wget python p7zip unzip
+ subversion curl wget python p7zip unzip parallel
 
 RUN wget http://launchpadlibrarian.net/206632429/ccache_3.2.2-2_amd64.deb \
         -O /tmp/ccache_3.2.2-2_amd64.deb \
