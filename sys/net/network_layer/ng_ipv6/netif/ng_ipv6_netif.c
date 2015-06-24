@@ -483,9 +483,11 @@ static bool _hwaddr_to_iid(uint8_t *iid, const uint8_t *hwaddr, size_t hwaddr_le
             iid[0] = hwaddr[i++];
             iid[0] ^= 0x02;
             iid[1] = hwaddr[i++];
+            break;
 
         case 2:
             iid[6] = hwaddr[i++];
+            break;
 
         case 1:
             iid[3] = 0xff;
