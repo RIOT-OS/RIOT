@@ -19,6 +19,7 @@
  * @}
  */
 
+#include "byteorder.h"
 #include "net/ng_ieee802154.h"
 #include "net/ng_netbase.h"
 #include "ng_at86rf2xx.h"
@@ -361,18 +362,34 @@ static int _get(ng_netdev_t *device, ng_netconf_opt_t opt,
     switch (opt) {
 
         case NETCONF_OPT_ADDRESS:
-            if (max_len < sizeof(uint16_t)) {
+            if (max_len < sizeof(be_uint16_t)) {
                 return -EOVERFLOW;
             }
-            *((uint16_t *)val) = ng_at86rf2xx_get_addr_short(dev);
-            return sizeof(uint16_t);
+            else {
+                be_uint16_t *v = val;
+                le_uint16_t addr;
+
+                addr.u16 = ng_at86rf2xx_get_addr_short(dev);
+
+                *v = byteorder_ltobs(addr);
+
+                return sizeof(be_uint16_t);
+            }
 
         case NETCONF_OPT_ADDRESS_LONG:
-            if (max_len < sizeof(uint64_t)) {
+            if (max_len < sizeof(be_uint64_t)) {
                 return -EOVERFLOW;
             }
-            *((uint64_t *)val) = ng_at86rf2xx_get_addr_long(dev);
-            return sizeof(uint64_t);
+            else {
+                be_uint64_t *v = val;
+                le_uint64_t addr;
+
+                addr.u64 = ng_at86rf2xx_get_addr_long(dev);
+
+                *v = byteorder_ltobll(addr);
+
+                return sizeof(be_uint64_t);
+            }
 
         case NETCONF_OPT_ADDR_LEN:
             if (max_len < sizeof(uint16_t)) {
@@ -394,11 +411,19 @@ static int _get(ng_netdev_t *device, ng_netconf_opt_t opt,
             return sizeof(uint16_t);
 
         case NETCONF_OPT_NID:
-            if (max_len < sizeof(uint16_t)) {
+            if (max_len < sizeof(be_uint16_t)) {
                 return -EOVERFLOW;
             }
-            *((uint16_t *)val) = dev->pan;
-            return sizeof(uint16_t);
+            else {
+                be_uint16_t *v = val;
+                le_uint16_t nid;
+
+                nid.u16 = dev->pan;
+
+                *v = byteorder_ltobs(nid);
+
+                return sizeof(be_uint16_t);
+            }
 
         case NETCONF_OPT_PROTO:
             if (max_len < sizeof(ng_nettype_t)) {
@@ -526,18 +551,29 @@ static int _set(ng_netdev_t *device, ng_netconf_opt_t opt,
 
     switch (opt) {
         case NETCONF_OPT_ADDRESS:
-            if (len > sizeof(uint16_t)) {
+            if (len > sizeof(be_uint16_t)) {
                 return -EOVERFLOW;
             }
-            ng_at86rf2xx_set_addr_short(dev, *((uint16_t*)val));
-            return sizeof(uint16_t);
+            else {
+                be_uint16_t *v = val;
+
+                ng_at86rf2xx_set_addr_short(dev, byteorder_btols(v).u16);
+
+                return sizeof(be_uint16_t);
+            }
 
         case NETCONF_OPT_ADDRESS_LONG:
             if (len > sizeof(uint64_t)) {
                 return -EOVERFLOW;
             }
-            ng_at86rf2xx_set_addr_long(dev, *((uint64_t*)val));
-            return sizeof(uint64_t);
+            else {
+                be_uint64_t *v = val;
+
+                ng_at86rf2xx_set_addr_long(dev, byteorder_btolll(v).u64);
+
+                return sizeof(be_uint64_t);
+            }
+
 
         case NETCONF_OPT_SRC_LEN:
             if (len > sizeof(uint16_t)) {
@@ -557,11 +593,17 @@ static int _set(ng_netdev_t *device, ng_netconf_opt_t opt,
             return sizeof(uint16_t);
 
         case NETCONF_OPT_NID:
-            if (len > sizeof(uint16_t)) {
+            if (len > sizeof(be_uint16_t)) {
                 return -EOVERFLOW;
             }
-            ng_at86rf2xx_set_pan(dev, *((uint16_t *)val));
-            return sizeof(uint16_t);
+            else {
+                be_uint16_t *v = val;
+
+                ng_at86rf2xx_set_pan(dev, byteorder_btols(v).u16);
+
+                return sizeof(be_uint16_t);
+            }
+
 
         case NETCONF_OPT_CHANNEL:
             if (len != sizeof(uint16_t)) {
