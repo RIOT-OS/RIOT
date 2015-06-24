@@ -7,6 +7,7 @@ PSEUDOMODULES += ng_ipv6_router
 PSEUDOMODULES += ng_ipv6_router_default
 PSEUDOMODULES += pktqueue
 PSEUDOMODULES += ng_netbase
+PSEUDOMODULES += ng_pktbuf
 PSEUDOMODULES += newlib
 PSEUDOMODULES += ng_sixlowpan_default
 PSEUDOMODULES += log

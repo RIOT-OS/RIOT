@@ -110,9 +110,6 @@ endif
 ifneq (,$(filter ng_nomac,$(USEMODULE)))
     DIRS += net/link_layer/ng_nomac
 endif
-ifneq (,$(filter ng_pktbuf,$(USEMODULE)))
-    DIRS += net/crosslayer/ng_pktbuf
-endif
 ifneq (,$(filter ng_rpl_srh,$(USEMODULE)))
     DIRS += net/routing/ng_rpl/srh
 endif
@@ -163,6 +160,12 @@ ifneq (,$(filter cpp11-compat,$(USEMODULE)))
 endif
 ifneq (,$(filter ng_netdev_eth,$(USEMODULE)))
     DIRS += net/link_layer/ng_netdev_eth
+endif
+ifneq (,$(filter ng_pktbuf_default,$(USEMODULE)))
+    DIRS += net/crosslayer/ng_pktbuf_default
+endif
+ifneq (,$(filter ng_pktbuf_dynamic,$(USEMODULE)))
+    DIRS += net/crosslayer/ng_pktbuf_dynamic
 endif
 
 DIRS += $(dir $(wildcard $(addsuffix /Makefile, ${USEMODULE})))
