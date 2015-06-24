@@ -112,6 +112,10 @@
 #include "dev_eth_autoinit.h"
 #endif
 
+#ifdef MODULE_FIB
+#include "net/ng_fib.h"
+#endif
+
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
@@ -314,6 +318,10 @@ void auto_init(void)
 #ifdef MODULE_NG_UDP
     DEBUG("Auto init UDP module.\n");
     ng_udp_init();
+#endif
+#ifdef MODULE_FIB
+    DEBUG("Auto init FIB module.\n");
+    fib_init();
 #endif
 
 
