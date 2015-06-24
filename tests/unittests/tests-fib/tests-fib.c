@@ -700,6 +700,45 @@ static void test_fib_17_get_entry_set(void)
     fib_deinit();
 }
 
+/*
+* @brief call get next hop with invalid parameters
+* It is expected to receive -EINVAL on calling get_next_hop()
+*/
+static void test_fib_18_get_next_hop_invalid_parameters(void)
+{
+    size_t add_buf_size = 16; /* includes space for terminating \0 */
+    char addr_dst[] = "Test address 13";
+    char addr_expect[] = "Test address 02";
+    kernel_pid_t iface_id = KERNEL_PID_UNDEF;
+    uint32_t next_hop_flags = 0;
+    char addr_nxt[add_buf_size];
+
+    size_t entries = 20;
+    _fill_FIB_multiple(entries, 11);
+
+    int ret = fib_get_next_hop(NULL, NULL, NULL, NULL,NULL,
+                               add_buf_size - 1, 0x13);
+
+    TEST_ASSERT_EQUAL_INT(-EINVAL, ret);
+
+    ret = fib_get_next_hop(&iface_id,
+                           (uint8_t *)addr_nxt, &add_buf_size, &next_hop_flags,
+                           (uint8_t *)addr_dst, add_buf_size - 1, 0x13);
+
+    TEST_ASSERT_EQUAL_INT(0, ret);
+
+    ret = strncmp(addr_expect, addr_nxt, add_buf_size);
+    TEST_ASSERT_EQUAL_INT(0, ret);
+
+#if (TEST_FIB_SHOW_OUTPUT == 1)
+    fib_print_fib_table();
+    puts("");
+    universal_address_print_table();
+    puts("");
+#endif
+    fib_deinit();
+}
+
 Test *tests_fib_tests(void)
 {
     fib_init();
@@ -721,6 +760,7 @@ Test *tests_fib_tests(void)
                         new_TestFixture(test_fib_15_get_lifetime),
                         new_TestFixture(test_fib_16_prefix_match),
                         new_TestFixture(test_fib_17_get_entry_set),
+                        new_TestFixture(test_fib_18_get_next_hop_invalid_parameters),
     };
 
     EMB_UNIT_TESTCALLER(fib_tests, NULL, NULL, fixtures);
