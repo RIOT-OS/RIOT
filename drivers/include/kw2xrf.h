@@ -86,17 +86,18 @@ extern "C" {
  * @brief   Internal device option flags
  * @{
  */
-#define KW2XRF_OPT_AUTOACK       (0x0001)  /**< auto ACKs active */
-#define KW2XRF_OPT_CSMA          (0x0002)  /**< CSMA active */
-#define KW2XRF_OPT_PROMISCUOUS   (0x0004)  /**< promiscuous mode active */
-#define KW2XRF_OPT_PRELOADING    (0x0008)  /**< preloading enabled */
-#define KW2XRF_OPT_TELL_TX_START (0x0010)  /**< notify MAC layer on TX start */
-#define KW2XRF_OPT_TELL_TX_END   (0x0020)  /**< notify MAC layer on TX finished */
-#define KW2XRF_OPT_TELL_RX_START (0x0040)  /**< notify MAC layer on RX start */
-#define KW2XRF_OPT_TELL_RX_END   (0x0080)  /**< notify MAC layer on RX finished */
-#define KW2XRF_OPT_RAWDUMP       (0x0100)  /**< pass RAW frame data to upper layer */
-#define KW2XRF_OPT_SRC_ADDR_LONG (0x0200)  /**< send data using long source address */
-#define KW2XRF_OPT_USE_SRC_PAN   (0x0400)  /**< do not compress source PAN ID */
+#define KW2XRF_OPT_AUTOACK        (0x0001)  /**< auto ACKs active */
+#define KW2XRF_OPT_CSMA           (0x0002)  /**< CSMA active */
+#define KW2XRF_OPT_PROMISCUOUS    (0x0004)  /**< promiscuous mode active */
+#define KW2XRF_OPT_PRELOADING     (0x0008)  /**< preloading enabled */
+#define KW2XRF_OPT_TELL_TX_START  (0x0010)  /**< notify MAC layer on TX start */
+#define KW2XRF_OPT_TELL_TX_END    (0x0020)  /**< notify MAC layer on TX finished */
+#define KW2XRF_OPT_TELL_RX_START  (0x0040)  /**< notify MAC layer on RX start */
+#define KW2XRF_OPT_TELL_RX_END    (0x0080)  /**< notify MAC layer on RX finished */
+#define KW2XRF_OPT_RAWDUMP        (0x0100)  /**< pass RAW frame data to upper layer */
+#define KW2XRF_OPT_SRC_ADDR_LONG  (0x0200)  /**< send data using long source address */
+#define KW2XRF_OPT_USE_SRC_PAN    (0x0400)  /**< do not compress source PAN ID */
+#define KW2XRF_OPT_CURR_PKT_BCAST (0x0800)  /**< current pkt is a bcast paket */
 /** @} */
 
 /**

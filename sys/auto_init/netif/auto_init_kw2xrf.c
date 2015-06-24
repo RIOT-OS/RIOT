@@ -22,9 +22,16 @@
 #ifdef MODULE_KW2XRF
 
 #include "board.h"
-#include "net/ng_nomac.h"
-#include "net/ng_netbase.h"
 
+#ifdef MODULE_NG_NOMAC
+#include "net/ng_nomac.h"
+#endif /* MODULE_NG_NOMAC */
+
+#ifdef MODULE_NG_CSMA_MAC
+#include "net/ng_csma_mac.h"
+#endif /* MODULE_NG_CSMA_MAC */
+
+#include "net/ng_netbase.h"
 #include "kw2xrf.h"
 #include "kw2xrf_params.h"
 
@@ -41,7 +48,7 @@
 #define KW2XRF_NUM (sizeof(kw2xrf_params)/sizeof(kw2xrf_params[0]))
 
 static kw2xrf_t kw2xrf_devs[KW2XRF_NUM];
-static char _nomac_stacks[KW2XRF_MAC_STACKSIZE][KW2XRF_NUM];
+static char _mac_stacks[KW2XRF_MAC_STACKSIZE][KW2XRF_NUM];
 
 void auto_init_kw2xrf(void)
 {
@@ -59,14 +66,21 @@ void auto_init_kw2xrf(void)
             DEBUG("Error initializing KW2xrf radio device!");
         }
         else {
-            ng_nomac_init(_nomac_stacks[i],
+#ifdef MODULE_NG_NOMAC
+            ng_nomac_init(_mac_stacks[i],
                     KW2XRF_MAC_STACKSIZE, KW2XRF_MAC_PRIO,
                     "kw2xrf", (ng_netdev_t *)&kw2xrf_devs[i]);
+#endif /* MODULE_NG_NOMAC */
+#ifdef MODULE_NG_CSMA_MAC
+            csma_mac_init(_mac_stacks[i],
+                    KW2XRF_MAC_STACKSIZE, KW2XRF_MAC_PRIO,
+                    "kw2xrf", (ng_netdev_t *)&kw2xrf_devs[i]);
+#endif /* MODULE_NG_CSMA_MAC */
         }
     }
 }
 #else
 typedef int dont_be_pedantic;
-#endif /* MODULE_NG_KW2XRF */
+#endif /* MODULE_KW2XRF */
 
 /** @} */

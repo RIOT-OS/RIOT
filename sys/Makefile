@@ -16,6 +16,9 @@ endif
 ifneq (,$(filter nomac,$(USEMODULE)))
     DIRS += net/link_layer/nomac
 endif
+ifneq (,$(filter ng_csma_mac,$(USEMODULE)))
+    DIRS += net/link_layer/ng_csma_mac
+endif
 ifneq (,$(filter transport_layer,$(USEMODULE)))
     USEMODULE += udp
     USEMODULE += tcp
