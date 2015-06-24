@@ -125,6 +125,8 @@ void ng_nettest_register_set(ng_netconf_opt_t opt, ng_nettest_opt_cb_t cb);
  * If no message was received after @ref NG_NETTEST_TIMEOUT microseconds, while
  * there are still packets expected, the function will return NG_NETTEST_TIMED_OUT.
  *
+ * In case of success it releases all packets send by the tested module.
+ *
  * @param[in] pid           The thread you want to test the
  *                          @ref NG_NETAPI_MSG_TYPE_SND command for.
  * @param[in] in            The packet you want to send through @p pid.
@@ -153,6 +155,8 @@ ng_nettest_res_t ng_nettest_send(kernel_pid_t pid, ng_pktsnip_t *in,
  * @p exp_pkts of @p exp_out were received from @p exp_senders. If no message
  * was received after @ref NG_NETTEST_TIMEOUT microseconds, while there are
  * still packets expected, the function will return NG_NETTEST_TIMED_OUT.
+ *
+ * In case of success it releases all packets received from the tested module.
  *
  * @param[in] pid           The thread you want to test the
  *                          @ref NG_NETAPI_MSG_TYPE_SND command for.

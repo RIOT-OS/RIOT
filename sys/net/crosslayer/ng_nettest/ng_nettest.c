@@ -61,38 +61,39 @@ static ng_nettest_res_t _pkt_test(uint16_t cmd_type, kernel_pid_t pid, ng_pktsni
     msg.content.ptr = (char *)in;
 
     msg_send(&msg, pid);
+    timex_normalize(&t);
 
     for (unsigned int i = 0; i < exp_pkts; i++) {
-        ng_pktsnip_t *out;
+        ng_pktsnip_t *out, *exp = exp_out[i];
 
-        if ((vtimer_msg_receive_timeout(&msg, t) < 0) && res == NG_NETTEST_SUCCESS) {
-            res = NG_NETTEST_TIMED_OUT;
+        if (vtimer_msg_receive_timeout(&msg, t) < 0) {
+            return NG_NETTEST_TIMED_OUT;
         }
 
-        if (msg.type != NG_NETAPI_MSG_TYPE_SND && (res == NG_NETTEST_SUCCESS)) {
-            res = NG_NETTEST_WRONG_MSG;
+        if (msg.type != cmd_type) {
+            return NG_NETTEST_WRONG_MSG;
         }
 
-        if (msg.sender_pid != exp_senders[i] && (res == NG_NETTEST_SUCCESS)) {
-            res = NG_NETTEST_WRONG_SENDER;
+        if (msg.sender_pid != exp_senders[i]) {
+            return NG_NETTEST_WRONG_SENDER;
         }
 
         out = (ng_pktsnip_t *)msg.content.ptr;
 
-        if ((out == NULL) && (res == NG_NETTEST_SUCCESS)) {
-            res = NG_NETTEST_FAIL;
+        if (out == NULL) {
+            return NG_NETTEST_FAIL;
         }
 
-        while (out) {
-            if ((res == NG_NETTEST_SUCCESS) &&
-                ((out->users != exp_out[i]->users) ||
-                 (out->size != exp_out[i]->size) ||
-                 (out->type != exp_out[i]->type) ||
-                 (memcmp(out->data, exp_out[i]->data, out->size) != 0))) {
-                res = NG_NETTEST_FAIL;
+        while (out && exp) {
+            if ((out->users != exp->users) ||
+                (out->size != exp->size) ||
+                (out->type != exp->type) ||
+                (memcmp(out->data, exp->data, out->size) != 0)) {
+                return NG_NETTEST_FAIL;
             }
 
             out = out->next;
+            exp = exp->next;
         }
 
         ng_pktbuf_release((ng_pktsnip_t *)msg.content.ptr);
