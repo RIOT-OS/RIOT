@@ -11,6 +11,13 @@ include $(RIOTBOARD)/$(BOARD)/Makefile.dep
 # setup serial terminal
 include $(RIOTBOARD)/Makefile.include.serial
 
+# Add board selector (USB serial) to OpenOCD options if specified.
+# Use /dist/tools/usb-serial/list-ttys.sh to find out serial number.
+#   Usage: SERIAL="ATML..." BOARD="samr21-xpro" make flash
+ifneq (,$(SERIAL))
+export OPENOCD_EXTRA_INIT += "-c cmsis_dap_serial $(SERIAL)"
+endif
+
 # this board uses openocd
 include $(RIOTBOARD)/Makefile.include.openocd
 
