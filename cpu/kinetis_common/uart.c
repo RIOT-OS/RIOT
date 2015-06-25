@@ -360,14 +360,22 @@ int uart_write_blocking(uart_t uart, char data)
 
     /* Avoid sign extension when converting from char, regardless of char signedness */
     qval = (unsigned char)data;
+    /* Check if interrupts are enabled */
+    uint8_t mask = __get_PRIMASK();
 
-    /* Try to write to the TX buffer until we succeed */
-    while (!atomic_cas(&uart_next_tx_char[uart], -1, qval)) {
-        /* TODO: sleep for a bit */
+    if (mask == 0) {
+        /* Try to write to the TX buffer until we succeed */
+        while (!atomic_cas(&uart_next_tx_char[uart], -1, qval)) {
+            /* TODO: sleep for a bit */
+        }
+        /* Enable TX interrupt, the ISR will push data to the transfer register. */
+        dev->C2 |= UART_C2_TIE_MASK;
+    } else {
+        /* Interrupts are disabled, do a busy wait */
+        while ((dev->S1 & UART_S1_TDRE_MASK) == 0) {
+        }
+        dev->D = data;
     }
-
-    /* Enable TX interrupt, the ISR will push data to the transfer register. */
-    dev->C2 |= UART_C2_TIE_MASK;
 
     return 1;
 }
