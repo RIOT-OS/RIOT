@@ -114,11 +114,11 @@ void* operator new[](std::size_t size) {
     return std::malloc(size);
 }
 
-void operator delete(void* ptr) {
+void operator delete(void* ptr) noexcept {
     std::free(ptr);
 }
 
-void operator delete[](void* ptr) {
+void operator delete[](void* ptr) noexcept {
     std::free(ptr);
 }
 
@@ -128,20 +128,24 @@ void operator delete[](void* ptr) {
    rather than just eliminate exceptions.
  */
 
-void* operator new(std::size_t size, const std::nothrow_t&) {
+void* operator new(std::size_t size, const std::nothrow_t&) noexcept {
     return std::malloc(size);
 }
 
-void* operator new[](std::size_t size, const std::nothrow_t&) {
+void* operator new[](std::size_t size, const std::nothrow_t&) noexcept {
     return std::malloc(size);
 }
 
-void operator delete(void* ptr, const std::nothrow_t&) {
+void operator delete(void* ptr, const std::nothrow_t&) noexcept {
     std::free(ptr);
 }
 
-void operator delete[](void* ptr, const std::nothrow_t&) {
+void operator delete[](void* ptr, const std::nothrow_t&) noexcept {
     std::free(ptr);
 }
+
+/*
+ * Additionally there is placement new and delete, which we have not overridden yet.
+ */
 
 /** @} */
