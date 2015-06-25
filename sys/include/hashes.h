@@ -17,10 +17,11 @@
  *
  * @author      Jason Linehan <patientulysses@gmail.com>
  * @author      Christian Mehlis <mehlis@inf.fu-berlin.de>
+ * @author      Joakim Gebart <joakim.gebart@eistec.se>
  */
 
-#ifndef __HASHES_H
-#define __HASHES_H
+#ifndef HASHES_H_
+#define HASHES_H_
 
 #include <stddef.h>
 #include <inttypes.h>
@@ -159,9 +160,39 @@ uint32_t rotating_hash(const uint8_t *buf, size_t len);
  */
 uint32_t one_at_a_time_hash(const uint8_t *buf, size_t len);
 
+/**
+ * @brief Fletcher's 16 bit checksum
+ *
+ * found on
+ * http://en.wikipedia.org/w/index.php?title=Fletcher%27s_checksum&oldid=661273016#Optimizations
+ *
+ * @note the returned sum is never 0
+ *
+ * @param buf input buffer to hash
+ * @param bytes length of buffer, in bytes
+ * @return 16 bit sized hash in the interval [1..65535]
+ */
+uint16_t fletcher16(const uint8_t *buf, size_t bytes);
+
+/**
+ * @brief Fletcher's 32 bit checksum
+ *
+ * found on
+ * http://en.wikipedia.org/w/index.php?title=Fletcher%27s_checksum&oldid=661273016#Optimizations
+ *
+ * @note the returned sum is never 0
+ * @note pay attention to alignment issues since this operates on an input
+ *       buffer containing 16 bit words, not bytes.
+ *
+ * @param buf input buffer to hash
+ * @param words length of buffer, in 16 bit words
+ * @return 32 bit sized hash in the interval [1..2^32]
+ */
+uint32_t fletcher32(const uint16_t *buf, size_t words);
+
 #ifdef __cplusplus
 }
 #endif
 
 /** @} */
-#endif /* __HASHES_H */
+#endif /* HASHES_H_ */
