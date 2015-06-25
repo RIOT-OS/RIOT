@@ -49,11 +49,6 @@ extern uint32_t _estack;
 #define STACK_CANARY_WORD 0xE7FEE7FEu
 
 /**
- * @brief   Required by g++ cross compiler
- */
-void *__dso_handle;
-
-/**
  * @brief   Pre-start routine for CPU-specific settings
  */
 __attribute__((weak)) void pre_startup (void)
