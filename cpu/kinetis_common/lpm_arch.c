@@ -151,10 +151,10 @@ void lpm_arch_end_awake(void)
 
 void kinetis_lpm_enable_wakeup_module(const uint8_t module) {
     /* Use bit-banding for thread-safety instead of disabling interrupts */
-    BITBAND_REG(LLWU->ME, module) = 1;
+    BITBAND_REG32(LLWU->ME, module) = 1;
 }
 
 void kinetis_lpm_disable_wakeup_module(const uint8_t module) {
     /* Use bit-banding for thread-safety instead of disabling interrupts */
-    BITBAND_REG(LLWU->ME, module) = 0;
+    BITBAND_REG32(LLWU->ME, module) = 0;
 }
