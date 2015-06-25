@@ -97,6 +97,12 @@ static inline vtimer_t *node_get_timer(priority_queue_node_t *node)
 static int set_longterm(vtimer_t *timer)
 {
     timer->priority_queue_entry.priority = timer->absolute.seconds;
+    /* *** UGLY FIX BEGINS *** */
+    /* Workaround for a bug in a so far undiscovered location which causes the
+     * vtimer to add the same timer twice, locking the system in an infinite
+     * loop inside priority_queue_add. */
+    priority_queue_remove(&longterm_priority_queue_root, timer_get_node(timer));
+    /* *** UGLY FIX ENDS *** */
     priority_queue_add(&longterm_priority_queue_root, timer_get_node(timer));
     return 0;
 }
@@ -189,6 +195,12 @@ static int set_shortterm(vtimer_t *timer)
 {
     DEBUG("set_shortterm(): Absolute: %" PRIu32 " %" PRIu32 "\n", timer->absolute.seconds, timer->absolute.microseconds);
     timer->priority_queue_entry.priority = timer->absolute.microseconds;
+    /* *** UGLY FIX BEGINS *** */
+    /* Workaround for a bug in a so far undiscovered location which causes the
+     * vtimer to add the same timer twice, locking the system in an infinite
+     * loop inside priority_queue_add. */
+    priority_queue_remove(&shortterm_priority_queue_root, timer_get_node(timer));
+    /* *** UGLY FIX ENDS *** */
     priority_queue_add(&shortterm_priority_queue_root, timer_get_node(timer));
     return 1;
 }
