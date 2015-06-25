@@ -49,9 +49,10 @@ void ng_nettest_register_set(ng_netconf_opt_t opt, ng_nettest_opt_cb_t cb)
     mutex_unlock(&_mutex);
 }
 
-static ng_nettest_res_t _pkt_test(uint16_t cmd_type, kernel_pid_t pid, ng_pktsnip_t *in,
-                                  unsigned int exp_pkts, kernel_pid_t exp_senders[],
-                                  ng_pktsnip_t *exp_out[])
+static ng_nettest_res_t _pkt_test(uint16_t cmd_type, kernel_pid_t pid,
+                                  ng_pktsnip_t *in, unsigned int exp_pkts,
+                                  const kernel_pid_t *exp_senders,
+                                  const ng_pktsnip_t **exp_out)
 {
     msg_t msg;
     timex_t t = { 0, NG_NETTEST_TIMEOUT };
@@ -63,8 +64,13 @@ static ng_nettest_res_t _pkt_test(uint16_t cmd_type, kernel_pid_t pid, ng_pktsni
     msg_send(&msg, pid);
     timex_normalize(&t);
 
+    if (exp_pkts == 0) {
+        thread_yield();
+    }
+
     for (unsigned int i = 0; i < exp_pkts; i++) {
-        ng_pktsnip_t *out, *exp = exp_out[i];
+        ng_pktsnip_t *out;
+        const ng_pktsnip_t *exp = exp_out[i];
 
         if (vtimer_msg_receive_timeout(&msg, t) < 0) {
             return NG_NETTEST_TIMED_OUT;
@@ -103,9 +109,10 @@ static ng_nettest_res_t _pkt_test(uint16_t cmd_type, kernel_pid_t pid, ng_pktsni
 }
 
 ng_nettest_res_t ng_nettest_send(kernel_pid_t pid, ng_pktsnip_t *in,
-                                 unsigned int exp_pkts, kernel_pid_t exp_senders[],
-                                 ng_pktsnip_t *exp_out[], ng_nettype_t exp_type,
-                                 uint32_t exp_demux_ctx)
+                                 unsigned int exp_pkts,
+                                 const kernel_pid_t *exp_senders,
+                                 const ng_pktsnip_t **exp_out,
+                                 ng_nettype_t exp_type, uint32_t exp_demux_ctx)
 {
     ng_netreg_entry_t reg_entry = { NULL, exp_demux_ctx, thread_getpid() };
     ng_nettest_res_t res;
@@ -122,8 +129,8 @@ ng_nettest_res_t ng_nettest_send(kernel_pid_t pid, ng_pktsnip_t *in,
 
 ng_nettest_res_t ng_nettest_send_iface(kernel_pid_t pid, ng_pktsnip_t *in,
                                        unsigned int exp_pkts,
-                                       kernel_pid_t exp_senders[],
-                                       ng_pktsnip_t *exp_out[])
+                                       const kernel_pid_t *exp_senders,
+                                       const ng_pktsnip_t **exp_out)
 {
     ng_nettest_res_t res;
 
@@ -138,9 +145,10 @@ ng_nettest_res_t ng_nettest_send_iface(kernel_pid_t pid, ng_pktsnip_t *in,
 }
 
 ng_nettest_res_t ng_nettest_receive(kernel_pid_t pid, ng_pktsnip_t *in,
-                                    unsigned int exp_pkts, kernel_pid_t exp_senders[],
-                                    ng_pktsnip_t *exp_out[], ng_nettype_t exp_type,
-                                    uint32_t exp_demux_ctx)
+                                    unsigned int exp_pkts,
+                                    const kernel_pid_t *exp_senders,
+                                    const ng_pktsnip_t **exp_out,
+                                    ng_nettype_t exp_type, uint32_t exp_demux_ctx)
 {
     ng_netreg_entry_t reg_entry = { NULL, exp_demux_ctx, thread_getpid() };
     ng_nettest_res_t res;
