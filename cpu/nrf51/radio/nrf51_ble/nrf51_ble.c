@@ -27,7 +27,7 @@
 #include "periph_conf.h"
 #include "periph/cpuid.h"
 #include "net/ng_ble.h"
-#include "net/ng_netbase.h"
+#include "net/gnrc.h"
 #include "hwtimer.h"
 
 #define ENABLE_DEBUG		(1)
@@ -97,7 +97,7 @@ ble_pkt_t;
 /**
  * @brief   Pointer to the MAC layer event callback
  */
-static ng_netdev_t *_netdev = NULL;
+static gnrc_netdev_t *_netdev = NULL;
 
 /**
  * @brief   Current state of the device
@@ -184,45 +184,45 @@ static void _switch_to_rx(void)
 /* Get the BLE radio state */
 int _get_state(uint8_t *val, size_t max_len)
 {
-    ng_netconf_state_t state;
+    netopt_state_t state;
 
     /* check parameters */
-    if (max_len < sizeof(ng_netconf_state_t)) {
+    if (max_len < sizeof(netopt_state_t)) {
         return -EOVERFLOW;
     }
 
     switch (_state) {
         case STATE_OFF:
-            state = NETCONF_STATE_OFF;
+            state = NETOPT_STATE_OFF;
             break;
 
         case STATE_IDLE:
-            state = NETCONF_STATE_SLEEP;
+            state = NETOPT_STATE_SLEEP;
             break;
 
         case STATE_RX:
-            state = NETCONF_STATE_IDLE;
+            state = NETOPT_STATE_IDLE;
             break;
 
         case STATE_TX:
-            state = NETCONF_STATE_TX;
+            state = NETOPT_STATE_TX;
             break;
 
         default:
             return -ECANCELED;
     }
 
-    memcpy(val, &state, sizeof(ng_netconf_state_t));
-    return sizeof(ng_netconf_state_t);
+    memcpy(val, &state, sizeof(netopt_state_t));
+    return sizeof(netopt_state_t);
 }
 
 /* Set the BLE radio state */
 int _set_state(uint8_t *val, size_t len)
 {
-    ng_netconf_state_t state;
+    netopt_state_t state;
 
     /* check parameters */
-    if (len != sizeof(ng_netconf_state_t)) {
+    if (len != sizeof(netopt_state_t)) {
         return -EINVAL;
     }
 
@@ -231,11 +231,11 @@ int _set_state(uint8_t *val, size_t len)
 
     /* switch to target state */
     switch (state) {
-        case NETCONF_STATE_SLEEP:
+        case NETOPT_STATE_SLEEP:
             _switch_to_idle();
             break;
 
-        case NETCONF_STATE_IDLE:
+        case NETOPT_STATE_IDLE:
             _switch_to_rx();
             break;
 
@@ -243,7 +243,7 @@ int _set_state(uint8_t *val, size_t len)
             return -ENOTSUP;
     }
 
-    return sizeof(ng_netconf_state_t);
+    return sizeof(netopt_state_t);
 }
 
 /* Get the BLE Access Address of the interface */
@@ -454,7 +454,7 @@ void isr_radio(void)
                 return;
             }
 
-            msg.type = NG_NETDEV_MSG_TYPE_EVENT;
+            msg.type = GNRC_NETDEV_MSG_TYPE_EVENT;
             msg.content.value = ISR_EVENT_RX_DONE;
             msg_send_int(&msg, _netdev->mac_pid);
             /* switch buffer */
@@ -568,7 +568,7 @@ void _send_scanresponse_pkt(void)
 }
 
 /* Initialize BLE interface */
-int blemin_init(ng_netdev_t *dev)
+int blemin_init(gnrc_netdev_t *dev)
 {
     /* check given device descriptor */
     if (dev == NULL) {
@@ -643,7 +643,7 @@ static void _receive_data(void)
     // DEBUG("blemin: receive_data\n");
 
     ble_pkt_t *data;
-    ng_pktsnip_t *pkt;
+    gnrc_pktsnip_t *pkt;
 
     /* only read data if we have somewhere to send it to */
     if (_netdev->event_cb == NULL) {
@@ -688,12 +688,12 @@ static void _receive_data(void)
 #endif
 
     /* allocate and fill payload */
-    pkt = ng_pktbuf_add(NULL, data->payload, data->header.length, NG_NETTYPE_UNDEF);
-    pkt = ng_pktbuf_add(pkt, data, BLE_PDU_HDR_LEN, NG_NETTYPE_UNDEF);
+    pkt = gnrc_pktbuf_add(NULL, data->payload, data->header.length, GNRC_NETTYPE_UNDEF);
+    pkt = gnrc_pktbuf_add(pkt, data, BLE_PDU_HDR_LEN, GNRC_NETTYPE_UNDEF);
 
     if (pkt == NULL) {
         DEBUG("blemin: Error allocating packet payload on RX\n");
-        ng_pktbuf_release(pkt);
+        gnrc_pktbuf_release(pkt);
         return;
     }
 
@@ -702,13 +702,13 @@ static void _receive_data(void)
 }
 
 /* BLE interface low-level send function */
-int _send(ng_netdev_t *dev, ng_pktsnip_t *pkt)
+int _send(gnrc_netdev_t *dev, gnrc_pktsnip_t *pkt)
 {
     // DEBUG("blemin: send\n");
 
     (void)dev;
     size_t size;
-    ng_pktsnip_t *pkt_payload;
+    gnrc_pktsnip_t *pkt_payload;
 
     uint8_t payload[CONF_PAYLOAD_LEN];  /**< actual payload */
 
@@ -719,10 +719,10 @@ int _send(ng_netdev_t *dev, ng_pktsnip_t *pkt)
     }
 
     /* check if payload is withing length bounds */
-    size = ng_pkt_len(pkt);
+    size = gnrc_pkt_len(pkt);
 
     if (size > CONF_PAYLOAD_LEN) {
-        ng_pktbuf_release(pkt);
+        gnrc_pktbuf_release(pkt);
         DEBUG("blemin: Error sending packet: invalid BLE pdu header length\n");
         return -EOVERFLOW;
     }
@@ -740,10 +740,10 @@ int _send(ng_netdev_t *dev, ng_pktsnip_t *pkt)
 
     /* write optional payload data into TX buffer */
     if (pkt->next != NULL) {
-        size = ng_pkt_len(pkt->next);
+        size = gnrc_pkt_len(pkt->next);
 
         if (size > CONF_PAYLOAD_LEN) {
-            ng_pktbuf_release(pkt);
+            gnrc_pktbuf_release(pkt);
             DEBUG("blemin: Error sending packet: payload to large\n");
             return -EOVERFLOW;
         }
@@ -789,12 +789,12 @@ int _send(ng_netdev_t *dev, ng_pktsnip_t *pkt)
     NRF_RADIO->TASKS_TXEN = 1;
 
     /* release packet */
-    ng_pktbuf_release(pkt);
+    gnrc_pktbuf_release(pkt);
     return (int)size;
 }
 
-/* Add ng_netdev_event callback function to ng_netdev */
-int _add_event_cb(ng_netdev_t *dev, ng_netdev_event_cb_t cb)
+/* Add gnrc_netdev_event callback function to gnrc_netdev */
+int _add_event_cb(gnrc_netdev_t *dev, gnrc_netdev_event_cb_t cb)
 {
     if (dev->event_cb != NULL) {
         return -ENOBUFS;
@@ -804,8 +804,8 @@ int _add_event_cb(ng_netdev_t *dev, ng_netdev_event_cb_t cb)
     return 0;
 }
 
-/* Remove ng_netdev_event callback function from ng_netdev */
-int _rem_event_cb(ng_netdev_t *dev, ng_netdev_event_cb_t cb)
+/* Remove gnrc_netdev_event callback function from gnrc_netdev */
+int _rem_event_cb(gnrc_netdev_t *dev, gnrc_netdev_event_cb_t cb)
 {
     if (dev->event_cb == cb) {
         dev->event_cb = NULL;
@@ -815,26 +815,26 @@ int _rem_event_cb(ng_netdev_t *dev, ng_netdev_event_cb_t cb)
     return -ENOENT;
 }
 
-/* Get ng_netconf parameter value from current BLE interface configuration */
-int _get(ng_netdev_t *dev, ng_netconf_opt_t opt,
+/* Get netopt parameter value from current BLE interface configuration */
+int _get(gnrc_netdev_t *dev, netopt_t opt,
          void *value, size_t max_len)
 {
     (void)dev;
 
     switch (opt) {
-        case NETCONF_OPT_ACCESS_ADDRESS:
+        case NETOPT_BLE_ACCESS_ADDRESS:
             return _get_access_address(value, max_len);
 
-        case NETCONF_OPT_ADV_ADDRESS:
+        case NETOPT_BLE_ADV_ADDRESS:
             return _get_adv_address(value, max_len);
 
-        case NETCONF_OPT_CHANNEL:
+        case NETOPT_CHANNEL:
             return _get_channel(value, max_len);
 
-        case NETCONF_OPT_TX_POWER:
+        case NETOPT_TX_POWER:
             return _get_txpower(value, max_len);
 
-        case NETCONF_OPT_STATE:
+        case NETOPT_STATE:
             return _get_state(value, max_len);
 
         default:
@@ -842,26 +842,26 @@ int _get(ng_netdev_t *dev, ng_netconf_opt_t opt,
     }
 }
 
-/* Set ng_netconf parameter value in current BLE interface configuration */
-int _set(ng_netdev_t *dev, ng_netconf_opt_t opt,
+/* Set netopt parameter value in current BLE interface configuration */
+int _set(gnrc_netdev_t *dev, netopt_t opt,
          void *value, size_t value_len)
 {
     (void)dev;
 
     switch (opt) {
-        case NETCONF_OPT_ACCESS_ADDRESS:
+        case NETOPT_BLE_ACCESS_ADDRESS:
             return _set_access_address(value, value_len);
 
-        case NETCONF_OPT_ADV_ADDRESS:
+        case NETOPT_BLE_ADV_ADDRESS:
             return _set_adv_address(value, value_len);
 
-        case NETCONF_OPT_CHANNEL:
+        case NETOPT_CHANNEL:
             return _set_channel(value, value_len);
 
-        case NETCONF_OPT_TX_POWER:
+        case NETOPT_TX_POWER:
             return _set_txpower(value, value_len);
 
-        case NETCONF_OPT_STATE:
+        case NETOPT_STATE:
             return _set_state(value, value_len);
 
         default:
@@ -870,7 +870,7 @@ int _set(ng_netdev_t *dev, ng_netconf_opt_t opt,
 }
 
 /* Event handler */
-void _isr_event(ng_netdev_t *dev, uint32_t event_type)
+void _isr_event(gnrc_netdev_t *dev, uint32_t event_type)
 {
     switch (event_type) {
         case ISR_EVENT_RX_DONE:
@@ -885,7 +885,7 @@ void _isr_event(ng_netdev_t *dev, uint32_t event_type)
 }
 
 /* Mapping of netdev interface */
-const ng_netdev_driver_t blemin_driver = {
+const gnrc_netdev_driver_t blemin_driver = {
     .send_data = _send,
     .add_event_callback = _add_event_cb,
     .rem_event_callback = _rem_event_cb,

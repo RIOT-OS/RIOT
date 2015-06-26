@@ -1,3 +1,3 @@
-MODULE = radio_blemin
+MODULE = nrf51_ble
 
 include $(RIOTBASE)/Makefile.base

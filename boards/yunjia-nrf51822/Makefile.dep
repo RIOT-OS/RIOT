@@ -1,4 +1,4 @@
 ifneq (,$(filter ng_netif,$(USEMODULE)))
-  USEMODULE += radio_blemin
+  USEMODULE += nrf51_ble
   USEMODULE += ng_nomac
 endif

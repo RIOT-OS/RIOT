@@ -10,8 +10,8 @@ ifneq (,$(filter radio_nrfmin,$(USEMODULE)))
 endif
 
 # build one of the radio drivers, if enabled
-ifneq (,$(filter radio_blemin,$(USEMODULE)))
-    DIRS += radio/blemin
+ifneq (,$(filter nrf51_ble,$(USEMODULE)))
+    DIRS += radio/nrf51_ble
 endif
 
 include $(RIOTBASE)/Makefile.base

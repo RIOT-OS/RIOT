@@ -25,7 +25,7 @@
 #ifndef BLEMIN_H_
 #define BLEMIN_H_
 
-#include "net/ng_netdev.h"
+#include "net/gnrc/netdev.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -137,7 +137,7 @@ LL_data;
 /**
  * @brief   Reference to the netdev driver interface
  */
-extern const ng_netdev_driver_t blemin_driver;
+extern const gnrc_netdev_driver_t blemin_driver;
 
 /**
  * @brief   Initialize the NRF51822 radio
@@ -149,7 +149,7 @@ extern const ng_netdev_driver_t blemin_driver;
  * @return              0 on success
  * @return              -ENODEV if @p dev is invalid
  */
-int blemin_init(ng_netdev_t *dev);
+int blemin_init(gnrc_netdev_t *dev);
 
 #ifdef __cplusplus
 }

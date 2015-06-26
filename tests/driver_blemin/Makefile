@@ -1,15 +1,15 @@
 APPLICATION = driver_blemin
 include ../Makefile.tests_common
 
-FEATURES_REQUIRED = radio_blemin
+BOARD = yunjia-nrf51822
 
 USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += ps
 USEMODULE += uart0
-USEMODULE += radio_blemin
-USEMODULE += ng_netbase
-USEMODULE += ng_nomac
-USEMODULE += ng_pktdump
+USEMODULE += nrf51_ble
+USEMODULE += gnrc
+USEMODULE += gnrc_nomac
+USEMODULE += gnrc_pktdump
 
 include $(RIOTBASE)/Makefile.include
