@@ -70,6 +70,20 @@ buildtest:
 			fi; \
 			break; \
 		done; \
+		env -i \
+			HOME=$${HOME} \
+			PATH=$${PATH} \
+			BOARD=$${BOARD} \
+			CCACHE=$${CCACHE} \
+			CCACHE_DIR=$${CCACHE_DIR} \
+			CCACHE_BASEDIR=$${CCACHE_BASEDIR} \
+			RIOTBASE=$${RIOTBASE} \
+			RIOTBOARD=$${RIOTBOARD} \
+			RIOTCPU=$${RIOTCPU} \
+			BINDIRBASE=$${BINDIRBASE} \
+			RIOTNOLINK=$${RIOTNOLINK} \
+			RIOT_VERSION=$${RIOT_VERSION} \
+			$(MAKE) clean 2>&1 >/dev/null || true; \
 	done; \
 	$${BUILDTESTOK}
 endif # BUILD_IN_DOCKER
