@@ -11,4 +11,5 @@
 void tests_crypto(void)
 {
     TESTS_RUN(tests_crypto_sha256_tests());
+    TESTS_RUN(tests_crypto_chacha_tests());
 }
