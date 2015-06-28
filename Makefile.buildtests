@@ -27,6 +27,10 @@ ifneq (, $(filter buildtest info-concurrency, $(MAKECMDGOALS)))
   endif
 endif
 
+ifeq (, $(strip $(MAKE_MAXLOAD)))
+    MAKE_MAXLOAD := 30
+endif
+
 .PHONY: buildtest info-objsize info-buildsize info-buildsizes \
         info-buildsizes-diff info-build info-boards-supported \
         info-features-missing info-boards-features-missing
@@ -57,7 +61,7 @@ buildtest:
 					BINDIRBASE=$${BINDIRBASE} \
 					RIOTNOLINK=$${RIOTNOLINK} \
 					RIOT_VERSION=$${RIOT_VERSION} \
-					$(MAKE) -j$(NPROC) 2>&1 >/dev/null) ; \
+					$(MAKE) -l$(MAKE_MAXLOAD) -j$(NPROC) 2>&1 >/dev/null) ; \
 			if [ "$${?}" = "0" ]; then \
 				${COLOR_ECHO} "${COLOR_GREEN}success${COLOR_RESET}"; \
 			elif [ -n "$${RIOT_DO_RETRY}" ] && $${BUILDTESTOK} && [ $${NTH_TRY} = 1 ]; then \
