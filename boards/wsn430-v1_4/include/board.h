@@ -23,8 +23,8 @@
  * @author      Milan Babel <babel@inf.fu-berlin.de>
  */
 
-#ifndef _WSN_BOARD_H
-#define _WSN_BOARD_H
+#ifndef WSN_BOARD_H_
+#define WSN_BOARD_H_
 
 #include "board-conf.h"
 
@@ -32,12 +32,12 @@
 extern "C" {
 #endif
 
-// for correct inclusion of <msp430.h>
+/*  for correct inclusion of <msp430.h> */
 #ifndef __MSP430F1611__
 #define __MSP430F1611__
 #endif
 
-//MSB430 core
+/* MSB430 core */
 #define MSP430_INITIAL_CPU_SPEED    800000uL
 #define F_CPU                       MSP430_INITIAL_CPU_SPEED
 #define F_RC_OSCILLATOR             32768
@@ -72,4 +72,4 @@ extern "C" {
 typedef uint8_t radio_packet_length_t;
 
 /** @} */
-#endif // _WSN_BOARD_H
+#endif /*  WSN_BOARD_H_ */

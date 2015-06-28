@@ -25,8 +25,8 @@
  * @brief       Architecture specific definitions for multiboot enabled kernels
  */
 
-#ifndef MULTIBOOT_H
-#define MULTIBOOT_H
+#ifndef MULTIBOOT_H_
+#define MULTIBOOT_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -134,5 +134,5 @@ enum multiboot_info_flags {
 }
 #endif
 
-#endif /* MULTIBOOT_H */
+#endif /* MULTIBOOT_H_ */
 /** @} */

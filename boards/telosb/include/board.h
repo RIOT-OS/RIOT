@@ -23,19 +23,19 @@
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  */
 
-#ifndef _TELOSB_BOARD_H
-#define _TELOSB_BOARD_H
+#ifndef TELOSB_BOARD_H_
+#define TELOSB_BOARD_H_
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-// for correct inclusion of <msp430.h>
+/*  for correct inclusion of <msp430.h> */
 #ifndef __MSP430F1611__
 #define __MSP430F1611__
 #endif
 
-//TelosB core
+/* TelosB core */
 #define MSP430_INITIAL_CPU_SPEED    2457600uL
 #define F_CPU                       MSP430_INITIAL_CPU_SPEED
 #define F_RC_OSCILLATOR             32768
@@ -70,4 +70,4 @@ extern "C" {
 typedef uint8_t radio_packet_length_t;
 
 /** @} */
-#endif // _TELOSB_BOARD_H
+#endif /*  TELOSB_BOARD_H_ */

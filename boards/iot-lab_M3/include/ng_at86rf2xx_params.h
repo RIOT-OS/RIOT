@@ -16,8 +16,8 @@
  * @author    Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-#ifndef NG_AT86RF2XX_PARAMS_H
-#define NG_AT86RF2XX_PARAMS_H
+#ifndef NG_AT86RF2XX_PARAMS_H_
+#define NG_AT86RF2XX_PARAMS_H_
 
 #ifdef __cplusplus
 extern "C" {

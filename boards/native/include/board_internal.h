@@ -6,8 +6,8 @@
  * directory for more details.
  */
 
-#ifndef BOARD_INTERNAL_H
-#define BOARD_INTERNAL_H
+#ifndef BOARD_INTERNAL_H_
+#define BOARD_INTERNAL_H_
 
 #ifdef __cplusplus
 extern "C" {

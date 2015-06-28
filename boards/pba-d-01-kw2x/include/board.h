@@ -19,8 +19,8 @@
  * @author      Johann Fischer <j.fischer@phytec.de>
  */
 
-#ifndef __BOARD_H
-#define __BOARD_H
+#ifndef BOARD_H_
+#define BOARD_H_
 
 #include "cpu.h"
 #include "periph_conf.h"
@@ -110,5 +110,5 @@ void board_init(void);
 }
 #endif
 
-#endif /** __BOARD_H */
+#endif /* __BOARD_H */
 /** @} */

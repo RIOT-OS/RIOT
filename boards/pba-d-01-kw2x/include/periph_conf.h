@@ -19,8 +19,8 @@
  * @author      Jonas Remmert <j.remmert@phytec.de>
  */
 
-#ifndef __PERIPH_CONF_H
-#define __PERIPH_CONF_H
+#ifndef PERIPH_CONF_H_
+#define PERIPH_CONF_H_
 
 #include "cpu_conf.h"
 
