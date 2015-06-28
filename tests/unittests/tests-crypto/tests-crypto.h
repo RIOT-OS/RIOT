@@ -30,11 +30,46 @@ extern "C" {
 void tests_crypto(void);
 
 /**
+ * @brief   Generates tests for crypto/c25519.h
+ *
+ * @return  embUnit tests if successful, NULL if not.
+ */
+Test *tests_crypto_c25519_tests(void);
+
+/**
+ * @brief   Generates tests for crypto/ed25519.h
+ *
+ * @return  embUnit tests if successful, NULL if not.
+ */
+Test *tests_crypto_ed25519_tests(void);
+
+/**
+ * @brief   Generates tests for crypto/edsign.h
+ *
+ * @return  embUnit tests if successful, NULL if not.
+ */
+Test *tests_crypto_edsign_tests(void);
+
+/**
+ * @brief   Generates tests for crypto/morph25519.h
+ *
+ * @return  embUnit tests if successful, NULL if not.
+ */
+Test *tests_crypto_morph25519_tests(void);
+
+/**
  * @brief   Generates tests for crypto/sha256.h
  *
  * @return  embUnit tests if successful, NULL if not.
  */
 Test *tests_crypto_sha256_tests(void);
+
+/**
+ * @brief   Generates tests for crypto/sha512.h
+ *
+ * @return  embUnit tests if successful, NULL if not.
+ */
+Test *tests_crypto_sha512_tests(void);
 
 #ifdef __cplusplus
 }
