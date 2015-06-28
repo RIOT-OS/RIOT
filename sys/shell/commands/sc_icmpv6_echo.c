@@ -84,7 +84,9 @@ int _handle_reply(ng_pktsnip_t *pkt, uint64_t time)
                " time = %" PRIu32 ".%03" PRIu32 " ms\n", (unsigned) icmpv6->size,
                ng_ipv6_addr_to_str(ipv6_str, &(ipv6_hdr->src), sizeof(ipv6_str)),
                byteorder_ntohs(icmpv6_hdr->id), byteorder_ntohs(icmpv6_hdr->seq),
-               ipv6_hdr->hl, rt.seconds, rt.microseconds);
+               ipv6_hdr->hl,
+               (rt.seconds * SEC_IN_MS) + (rt.microseconds / MS_IN_USEC),
+               rt.microseconds % MS_IN_USEC);
         ng_ipv6_nc_still_reachable(&ipv6_hdr->src);
     }
     else {
@@ -216,17 +218,21 @@ int _icmpv6_ping(int argc, char **argv)
     printf("--- %s ping statistics ---\n", addr_str);
 
     if (success > 0) {
+        timex_normalize(&sum_rtt);
         printf("%d packets transmitted, %d received, %d%% packet loss, time %"
-               PRIu32 ".03%" PRIu32 " s\n", n, success, (success - n) / n,
+               PRIu32 ".06%" PRIu32 " s\n", n, success, (success - n) / n,
                sum_rtt.seconds, sum_rtt.microseconds);
         timex_t avg_rtt = timex_from_uint64(timex_uint64(sum_rtt) / n);  /* get average */
         printf("rtt min/avg/max = "
                "%" PRIu32 ".%03" PRIu32 "/"
                "%" PRIu32 ".%03" PRIu32 "/"
                "%" PRIu32 ".%03" PRIu32 " ms\n",
-               min_rtt.seconds, min_rtt.microseconds,
-               avg_rtt.seconds, avg_rtt.microseconds,
-               max_rtt.seconds, max_rtt.microseconds);
+               (min_rtt.seconds * SEC_IN_MS) + (min_rtt.seconds / MS_IN_USEC),
+               min_rtt.microseconds % MS_IN_USEC,
+               (avg_rtt.seconds * SEC_IN_MS) + (avg_rtt.seconds / MS_IN_USEC),
+               avg_rtt.microseconds % MS_IN_USEC,
+               (max_rtt.seconds * SEC_IN_MS) + (max_rtt.seconds / MS_IN_USEC),
+               max_rtt.microseconds % MS_IN_USEC);
     }
     else {
         printf("%d packets transmitted, 0 received, 100%% packet loss\n", n);
