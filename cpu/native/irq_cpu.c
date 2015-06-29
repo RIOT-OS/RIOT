@@ -325,6 +325,7 @@ void native_isr_entry(int sig, siginfo_t *info, void *context)
     _native_cur_ctx = (ucontext_t *)sched_active_thread->sp;
 
     DEBUG("\n\n\t\tnative_isr_entry: return to _native_sig_leave_tramp\n\n");
+    dINT();
     /* disable interrupts in context */
     isr_set_sigmask((ucontext_t *)context);
     _native_in_isr = 1;
