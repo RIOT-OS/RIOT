@@ -42,6 +42,8 @@
 
 #include "native_internal.h"
 
+#include "hwtimer_cpu.h"
+
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
@@ -183,6 +185,11 @@ unsigned enableIRQ(void)
     if (sigprocmask(SIG_SETMASK, &_native_sig_set, NULL) == -1) {
         err(EXIT_FAILURE, "enableIRQ: sigprocmask");
     }
+
+    /* Arm the timer to be scheduled now that signals are enabled again. No
+     * periodic timers are used so we are safe.
+     */
+    hwtimer_arm();
 
     prev_state = native_interrupts_enabled;
     native_interrupts_enabled = 1;

@@ -25,6 +25,8 @@ extern "C" {
 #define HWTIMER_SPEED 1000000
 #define HWTIMER_MAXTICKS (0xFFFFFFFF)
 
+void hwtimer_arm(void);
+
 #ifdef __cplusplus
 }
 #endif
