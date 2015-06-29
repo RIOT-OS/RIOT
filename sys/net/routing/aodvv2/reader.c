@@ -461,7 +461,7 @@ static enum rfc5444_result _cb_rrep_blocktlv_addresstlvs_okay(struct rfc5444_rea
         VDEBUG("\ttlv RFC5444_MSGTLV_METRIC val: %d, exttype: %d\n",
                *tlv->single_value, tlv->type_ext);
         packet_data.metricType = tlv->type_ext;
-        packet_data.origNode.metric = *tlv->single_value;
+        packet_data.targNode.metric = *tlv->single_value;
     }
     return RFC5444_OKAY;
 }
@@ -510,7 +510,7 @@ static enum rfc5444_result _cb_rrep_end_callback(
     /* Update the cost of the route, since the packet has successfully traversed
      * one more hop. */
     packet_data.targNode.metric = _get_route_cost(packet_data.metricType,
-                                                  packet_data.origNode.metric);
+                                                  packet_data.targNode.metric);
     vtimer_now(&now);
     packet_data.timestamp = now;
 
