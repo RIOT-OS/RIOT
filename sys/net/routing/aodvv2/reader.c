@@ -725,7 +725,7 @@ int aodv_packet_reader_handle_packet(void *buffer, size_t length, struct netaddr
 /*
  * Cost(L): Get Cost of a Link regarding the specified metric.
  * (currently only AODVV2_DEFAULT_METRIC_TYPE (HopCount) implemented)
- * returns cost if metric is known, NULL otherwise
+ * returns cost if metric is known, 0 otherwise
  */
 static uint8_t _get_link_cost(aodvv2_metric_t metricType)
 {
@@ -737,7 +737,7 @@ static uint8_t _get_link_cost(aodvv2_metric_t metricType)
 
 /*
  * MAX_METRIC[MetricType]:
- * returns maximum value of the given metric if metric is known, NULL otherwise.
+ * returns maximum value of the given metric if metric is known, 0 otherwise.
  */
 static uint8_t _get_max_metric(aodvv2_metric_t metricType)
 {
@@ -751,11 +751,12 @@ static uint8_t _get_max_metric(aodvv2_metric_t metricType)
  * Cost(R): Get Cost of a Route regarding the specified metric, based on the
  * earlier metric value of the Route.
  * (currently only AODVV2_DEFAULT_METRIC_TYPE (HopCount) implemented)
- * returns cost if metric is known, NULL otherwise
+ * returns cost if metric is known, 0 otherwise
  */
 static uint8_t _get_route_cost(aodvv2_metric_t metricType, uint8_t metric)
 {
     if (metricType == AODVV2_DEFAULT_METRIC_TYPE){
         return metric + _get_link_cost(AODVV2_DEFAULT_METRIC_TYPE);
     }
+    return 0;
 }
