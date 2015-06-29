@@ -26,6 +26,8 @@
 #include "thread.h"
 #include "msg.h"
 
+#define MSG_QUEUE_SIZE 1
+
 char timer_stack[THREAD_STACKSIZE_MAIN];
 char timer_stack_local[THREAD_STACKSIZE_MAIN];
 
@@ -49,8 +51,8 @@ void *timer_thread(void *arg)
     /* we need a queue if the second message arrives while the first is still processed */
     /* without a queue, the message would get lost */
     /* because of the way this timer works, there can be max 1 queued message */
-    msg_t msgq[1];
-    msg_init_queue(msgq, sizeof(msgq));
+    msg_t msgq[MSG_QUEUE_SIZE];
+    msg_init_queue(msgq, MSG_QUEUE_SIZE);
 
     while (1) {
         msg_t m;

@@ -242,7 +242,7 @@ static void *_aodv_sender_thread(void *arg)
     (void) arg;
 
     msg_t msgq[RCV_MSG_Q_SIZE];
-    msg_init_queue(msgq, sizeof msgq);
+    msg_init_queue(msgq, RCV_MSG_Q_SIZE);
     AODV_DEBUG("_aodv_sender_thread initialized.\n");
 
     while (true) {
