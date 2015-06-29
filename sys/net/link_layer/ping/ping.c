@@ -140,7 +140,7 @@ static void *l2_pkt_handler(void *unused)
     radio_packet_t *p;
     l2_ping_payload_t *pp;
 
-    msg_init_queue(msg_q, sizeof(msg_q));
+    msg_init_queue(msg_q, RCV_BUFFER_SIZE);
 
     while (1) {
         msg_receive(&m);
