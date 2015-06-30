@@ -42,6 +42,8 @@
 
 #include "native_internal.h"
 
+#include "hwtimer_cpu.h"
+
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
@@ -184,6 +186,11 @@ unsigned enableIRQ(void)
         err(EXIT_FAILURE, "enableIRQ: sigprocmask");
     }
 
+    /* Arm the timer to be scheduled now that signals are enabled again. No
+     * periodic timers are used so we are safe.
+     */
+    hwtimer_arm();
+
     prev_state = native_interrupts_enabled;
     native_interrupts_enabled = 1;
     _native_syscall_leave();
@@ -302,10 +309,13 @@ void native_isr_entry(int sig, siginfo_t *info, void *context)
         return;
     }
 
-    /* XXX: Workaround safety check - whenever this happens it really
-     * indicates a bug in disableIRQ */
+    /* As we arm timers before interrupt are enabled again and after signals
+     * are enabled again the handler may be called when interrupt are still
+     * disabled.
+     * Just guard the signal handler against it: the signal will be queued for
+     * later consumptioni (_sig_pipefd).
+     */
     if (native_interrupts_enabled == 0) {
-        //printf("interrupts are off, but I caught a signal.\n");
         return;
     }
     if (_native_in_isr != 0) {
@@ -325,6 +335,7 @@ void native_isr_entry(int sig, siginfo_t *info, void *context)
     _native_cur_ctx = (ucontext_t *)sched_active_thread->sp;
 
     DEBUG("\n\n\t\tnative_isr_entry: return to _native_sig_leave_tramp\n\n");
+    dINT();
     /* disable interrupts in context */
     isr_set_sigmask((ucontext_t *)context);
     _native_in_isr = 1;

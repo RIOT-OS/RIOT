@@ -46,8 +46,6 @@
 
 #include "debug.h"
 
-#define HWTIMERMINOFFSET (1000UL) // 1ms
-
 static unsigned long native_hwtimer_now;
 static unsigned long time_null;
 
@@ -57,6 +55,8 @@ static int native_hwtimer_isset[HWTIMER_MAXTIMERS];
 static int next_timer = -1;
 static void (*int_handler)(int);
 
+struct itimerval to_arm_timer;
+volatile int must_arm;
 
 /**
  * Subtract the `struct timeval' values x and y, storing the result in
@@ -120,9 +120,9 @@ unsigned long ts2ticks(struct timespec *tp)
 }
 
 /**
- * set next_timer to the next lowest enabled timer index
+ * Prepare the next_timer to be the next timer to arm
  */
-void schedule_timer(void)
+void prepare_timer(void)
 {
     /* try to find *an active* timer */
     next_timer = -1;
@@ -132,16 +132,13 @@ void schedule_timer(void)
             break;
         }
     }
+
+    /* clear the timer to schedule */
+    memset(&to_arm_timer, 0, sizeof(to_arm_timer));
     if (next_timer == -1) {
-        DEBUG("schedule_timer(): no valid timer found - nothing to schedule\n");
-        struct itimerval null_timer;
-        null_timer.it_interval.tv_sec = 0;
-        null_timer.it_interval.tv_usec = 0;
-        null_timer.it_value.tv_sec = 0;
-        null_timer.it_value.tv_usec = 0;
-        if (real_setitimer(ITIMER_REAL, &null_timer, NULL) == -1) {
-            err(EXIT_FAILURE, "schedule_timer: setitimer");
-        }
+        DEBUG("prepare_timer(): no valid timer found - nothing to schedule\n");
+        /* arm zeroed timer to cancel if needed */
+        must_arm = 1;
         return;
     }
 
@@ -161,22 +158,47 @@ void schedule_timer(void)
     hwtimer_arch_now(); // update timer
     ticks2tv(native_hwtimer_now, &now);
 
-    struct itimerval result;
-    memset(&result, 0, sizeof(result));
+    /* compute in how much time the timer must be fired */
+    bool negative = timeval_subtract(&to_arm_timer.it_value,
+                                     &native_hwtimer[next_timer].it_value,
+                                     &now);
 
-    int retval = timeval_subtract(&result.it_value, &native_hwtimer[next_timer].it_value, &now);
-    if (retval || (tv2ticks(&result.it_value) < HWTIMERMINOFFSET)) {
-        DEBUG("\033[31mschedule_timer(): timer is already due (%i), mitigating.\033[0m\n", next_timer);
-        result.it_value.tv_sec = 0;
-        result.it_value.tv_usec = 1;
+    /* if the timer is already expired -> prepare the shortest timer */
+    if (negative) {
+        to_arm_timer.it_value.tv_sec = 0;
+        to_arm_timer.it_value.tv_usec = 1;
     }
 
+    /*
+     * This function always run with signals disabled: we cannot arm the timer
+     * here because it will be ignored if it fire before signals are enabled
+     * again.
+     * The timer will be armed at the end of enableIRQ() by hwtimer_arm() when
+     * signals will be enabled again. (bottom-half)
+     */
+
+     /* remember that we must arm the timer */
+     must_arm = 1;
+}
+
+/**
+ * Arm the timer prepared in prepare_timer()
+ */
+void hwtimer_arm(void)
+{
+    /* no double arming */
+    if (must_arm == 0) {
+        return;
+    }
+    must_arm = 0;
+
+    /* arm timer */
     _native_syscall_enter();
-    if (real_setitimer(ITIMER_REAL, &result, NULL) == -1) {
-        err(EXIT_FAILURE, "schedule_timer: setitimer");
+    if (real_setitimer(ITIMER_REAL, &to_arm_timer, NULL) == -1) {
+        err(EXIT_FAILURE, "hwtimer_arm: setitimer");
     }
     else {
-        DEBUG("schedule_timer(): set next timer (%i).\n", next_timer);
+        DEBUG("hwtimer_arm(): set next timer (%i).\n", next_timer);
     }
     _native_syscall_leave();
 }
@@ -204,7 +226,7 @@ void hwtimer_isr_timer(void)
         DEBUG("hwtimer_isr_timer(): this should not have happened\n");
     }
 
-    schedule_timer();
+    prepare_timer();
 }
 
 void hwtimer_arch_enable_interrupt(void)
@@ -234,7 +256,7 @@ void hwtimer_arch_unset(short timer)
     DEBUG("hwtimer_arch_unset(\033[31m%i\033[0m)\n", timer);
 
     native_hwtimer_isset[timer] = 0;
-    schedule_timer();
+    prepare_timer();
 
     return;
 }
@@ -261,7 +283,7 @@ void hwtimer_arch_set_absolute(unsigned long value, short timer)
           (unsigned long)native_hwtimer[timer].it_value.tv_usec);
 
     native_hwtimer_isset[timer] = 1;
-    schedule_timer();
+    prepare_timer();
 
     return;
 }
@@ -321,6 +343,8 @@ void hwtimer_arch_init(void (*handler)(int), uint32_t fcpu)
     (void) fcpu;
     hwtimer_arch_disable_interrupt();
     int_handler = handler;
+
+    memset(&to_arm_timer, 0, sizeof(to_arm_timer));
 
     for (int i = 0; i < HWTIMER_MAXTIMERS; i++) {
         native_hwtimer_isset[i] = 0;
