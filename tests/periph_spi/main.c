@@ -37,8 +37,8 @@ enum {
     INIT
 } rw;
 
-static int spi_dev = -1;
-static gpio_t spi_cs = -1;
+static int spi_dev = SPI_UNDEF;
+static spi_cs_t spi_cs = SPI_CS_UNDEF;
 static int spi_mode = -1;
 static int spi_speed = -1;
 static int spi_master = -1;     /* 0 for slave, 1 for master, -1 for not initialized */
@@ -244,9 +244,7 @@ int cmd_transfer(int argc, char **argv)
 
     /* do the actual data transfer */
     spi_acquire(spi_dev);
-    gpio_clear(spi_cs);
-    spi_transfer_bytes(spi_dev, hello, buffer, strlen(hello));
-    gpio_set(spi_cs);
+    spi_transfer_bytes(spi_dev, spi_cs, false, hello, buffer, strlen(hello));
     spi_release(spi_dev);
 
     printf("Transfered %i bytes:\n", strlen(hello));
