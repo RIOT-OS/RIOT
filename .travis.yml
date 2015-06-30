@@ -16,19 +16,18 @@ env:
 before_install:
     - source ./dist/tools/pr_check/check_labels.sh
     - test -z "$TRAVIS_PULL_REQUEST" || test "$BUILDTEST_MCU_GROUP" = "static-tests" || check_gh_label "Ready for CI build" || exit 1
-    - sudo apt-get install emdebian-archive-keyring
-    - echo 'deb http://ftp.uk.debian.org/emdebian/toolchains wheezy main' | sudo tee /etc/apt/sources.list.d/emdebian.list > /dev/null
-
-    - echo 'deb http://us.archive.ubuntu.com/ubuntu trusty           main restricted universe multiverse' | sudo tee    /etc/apt/sources.list.d/trusty.list > /dev/null
-    - echo 'deb http://us.archive.ubuntu.com/ubuntu trusty-backports main restricted universe multiverse' | sudo tee -a /etc/apt/sources.list.d/trusty.list > /dev/null
-    - echo 'deb http://us.archive.ubuntu.com/ubuntu trusty-security  main restricted universe multiverse' | sudo tee -a /etc/apt/sources.list.d/trusty.list > /dev/null
-    - echo 'deb http://us.archive.ubuntu.com/ubuntu trusty-updates   main restricted universe multiverse' | sudo tee -a /etc/apt/sources.list.d/trusty.list > /dev/null
-    - sudo add-apt-repository -y ppa:terry.guo/gcc-arm-embedded
+    - echo 'deb mirror://mirrors.ubuntu.com/mirrors.txt vivid           main restricted universe multiverse' | sudo tee    /etc/apt/sources.list.d/vivid.list > /dev/null
+    - echo 'deb mirror://mirrors.ubuntu.com/mirrors.txt vivid-updates   main restricted universe multiverse' | sudo tee -a /etc/apt/sources.list.d/vivid.list > /dev/null
+    - echo 'deb mirror://mirrors.ubuntu.com/mirrors.txt vivid-backports main restricted universe multiverse' | sudo tee -a /etc/apt/sources.list.d/vivid.list > /dev/null
+    - echo 'deb mirror://mirrors.ubuntu.com/mirrors.txt vivid-security  main restricted universe multiverse' | sudo tee -a /etc/apt/sources.list.d/vivid.list > /dev/null
     - sudo apt-get update
 
 install:
-    - >
-        sudo apt-get install $(./dist/tools/travis-scripts/get-pkg-list.py)
+    - sudo rm /etc/dpkg/dpkg.cfg.d/multiarch
+    - sudo apt-get install dpkg
+    - sudo dpkg --configure -a
+    - sudo dpkg --add-architecture i386
+    - sudo apt-get install $(./dist/tools/travis-scripts/get-pkg-list.py)
     - git config --global user.email "travis@example.com"
     - git config --global user.name "Travis CI"
 
