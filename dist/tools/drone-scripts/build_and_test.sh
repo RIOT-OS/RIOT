@@ -37,12 +37,34 @@ export -f exec_build_func
 MYTMPDIR=$(mktemp -d)
 trap 'rm -rf "$MYTMPDIR"' EXIT
 
-# Execute all groups in parallel (-k ensures correct ordering of the
-# output)
-parallel -k exec_build_func {} "$@"  ::: static-tests avr8 msp430 x86 arm7 \
-                                         cortex_m0 cortex_m3_1 cortex_m3_2 \
-                                         cortex_m4 \
-|& tee -a "$MYTMPDIR/output.log"
+# Check for PRs and labels
+FULL_CHECK=true
+if [ -z "$FORCE_FULL_CHECK" ]; then
+    if [ $CI_PULL_REQUEST != false ] && ! [ -z "$CI_PULL_REQUEST" ]; then
+        # Pull request
+        # Check for labels
+        . ./dist/tools/pr_check/check_labels.sh
+        check_gh_label "Ready for CI build"
+        if [ $? -ne 0 ]; then
+            # CI test label not set -> run only static tests
+            FULL_CHECK=false
+        fi
+    fi
+fi
+
+if $FULL_CHECK; then
+    echo "Executing all tests"
+    echo "NOTE: output is refreshed only when a test group finishes! Be patient!"
+    # Execute all groups in parallel (-k ensures correct ordering of the
+    # output)
+    parallel -k exec_build_func {} "$@"  ::: static-tests avr8 msp430 x86 arm7 \
+                                             cortex_m0 cortex_m3_1 cortex_m3_2 \
+                                             cortex_m4 \
+    |& tee -a "$MYTMPDIR/output.log"
+else
+    echo "PR not ready for CI build. Only static-tests will be executed!"
+    exec_build_func static-tests "$@" |& tee -a "$MYTMPDIR/output.log"
+fi
 
 # Check the log for failures
 RESULTS=$(cat "$MYTMPDIR/output.log" | grep "Result.*:" | cut -d ":" -f2 \
