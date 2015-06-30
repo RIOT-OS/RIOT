@@ -308,11 +308,10 @@ void vtimer_get_localtime(struct tm *localt)
     timex_t now;
     vtimer_now(&now);
 
+    memset(localt, 0, sizeof(struct tm));
     localt->tm_sec = now.seconds % 60;
     localt->tm_min = (now.seconds / 60) % 60;
     localt->tm_hour = (now.seconds / 60 / 60) % 24;
-
-    // TODO: fill the other fields
 }
 
 void vtimer_init(void)
