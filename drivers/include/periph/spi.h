@@ -9,7 +9,7 @@
 /**
  * @defgroup    driver_periph_spi SPI
  * @ingroup     driver_periph
- * @brief       Low-level SPI peripheral driver
+ * @brief       Low-level SPI peripheral driver interface
  *
  * @{
  * @file
@@ -23,9 +23,11 @@
 
 #include <stdint.h>
 #include <string.h>
+#include <stdbool.h>
 
 #include "periph_cpu.h"
 #include "periph_conf.h"
+#include "periph/gpio.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -46,10 +48,24 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Define value for unused CS line
+ */
+#ifndef SPI_CS_UNDEF
+#define SPI_CS_UNDEF    (GPIO_UNDEF)
+#endif
+
+/**
  * @brief   Define default SPI device identifier type
  */
 #ifndef HAVE_SPI_T
 typedef int spi_t;
+#endif
+
+/**
+ * @brief   Default CS pin definition
+ */
+#ifndef HAVE_SPI_CS_T
+typedef gpio_t spi_cs_t;
 #endif
 
 /**
@@ -169,21 +185,26 @@ void spi_release(spi_t dev);
  * @brief   Transfer one byte on the given SPI bus
  *
  * @param[in] dev       SPI device to use
+ * @param[in] cs        Chip select line to use
+ * @param[in] cont      Set true for leaving CS active after transfer
  * @param[in] out       Byte to send out, set NULL if only receiving
  *
  * @return              Byte that was read from the slave
  */
-char spi_transfer_byte(spi_t dev, char out);
+char spi_transfer_byte(spi_t dev, spi_cs_t cs, bool cont, char out);
 
 /**
  * @brief   Transfer a number bytes on the given SPI bus
  *
  * @param[in] dev       SPI device to use
+ * @param[in] cs        Chip select line to use
+ * @param[in] cont      Set true for leaving CS active after transfer
  * @param[in] out       Array of bytes to send, set NULL if only receiving
  * @param[out] in       Buffer to receive bytes to, set NULL if only sending
  * @param[in] len       Number of bytes to transfer
  */
-void spi_transfer_bytes(spi_t dev, char *out, char *in, size_t len);
+void spi_transfer_bytes(spi_t dev, spi_cs_t cs, bool cont,
+                        char *out, char *in, size_t len);
 
 /**
  * @brief   Transfer one byte to/from a given register address
@@ -193,13 +214,15 @@ void spi_transfer_bytes(spi_t dev, char *out, char *in, size_t len);
  * function is a convenient shortcut for interfacing with such devices.
  *
  * @param[in] dev       SPI device to use
+ * @param[in] cs        Chip select line to use
+ * @param[in] cont      Set true for leaving CS active after transfer
  * @param[in] reg       Register address to transfer data to/from
  * @param[in] out       Byte to send, set NULL if only receiving data
  * @param[out] in       Byte to read, set NULL if only sending
  *
  * @return              Value that was read from the slave's register
  */
-char spi_transfer_reg(spi_t dev, uint8_t reg, char out);
+char spi_transfer_reg(spi_t dev, spi_cs_t cs, bool cont, uint8_t reg, char out);
 
 /**
  * @brief   Transfer a number of bytes from/to a given register address
@@ -209,12 +232,15 @@ char spi_transfer_reg(spi_t dev, uint8_t reg, char out);
  * function is a convenient shortcut for interfacing with such devices.
  *
  * @param[in] dev       SPI device to use
+ * @param[in] cs        Chip select line to use
+ * @param[in] cont      Set true for leaving CS active after transfer
  * @param[in] reg       Register address to transfer data to/from
  * @param[in] out       Byte array to send data from, set NULL if only receiving
  * @param[out] in       Byte buffer to read into, set NULL if only sending
  * @param[in] len       Number of bytes to transfer
  */
-void spi_transfer_regs(spi_t dev, uint8_t reg, char *out, char *in, size_t len);
+void spi_transfer_regs(spi_t dev, spi_cs_t cs, bool cont,
+                       uint8_t reg, char *out, char *in, size_t len);
 
 /**
  * @brief   Tell the SPI driver that a new transaction was started
