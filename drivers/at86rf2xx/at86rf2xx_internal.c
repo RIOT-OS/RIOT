@@ -32,11 +32,9 @@ void at86rf2xx_reg_write(const at86rf2xx_t *dev,
                          const uint8_t value)
 {
     spi_acquire(dev->spi);
-    gpio_clear(dev->cs_pin);
-    spi_transfer_reg(dev->spi,
+    spi_transfer_reg(dev->spi, dev->cs, false,
                      AT86RF2XX_ACCESS_REG | AT86RF2XX_ACCESS_WRITE | addr,
                      value);
-    gpio_set(dev->cs_pin);
     spi_release(dev->spi);
 }
 
@@ -45,11 +43,9 @@ uint8_t at86rf2xx_reg_read(const at86rf2xx_t *dev, const uint8_t addr)
     char value;
 
     spi_acquire(dev->spi);
-    gpio_clear(dev->cs_pin);
-    value = spi_transfer_reg(dev->spi,
-                     AT86RF2XX_ACCESS_REG | AT86RF2XX_ACCESS_READ | addr,
-                     0);
-    gpio_set(dev->cs_pin);
+    value = spi_transfer_reg(dev->spi, dev->cs, false,
+                             AT86RF2XX_ACCESS_REG | AT86RF2XX_ACCESS_READ | addr,
+                             0);
     spi_release(dev->spi);
 
     return (uint8_t)value;
@@ -61,11 +57,10 @@ void at86rf2xx_sram_read(const at86rf2xx_t *dev,
                          const size_t len)
 {
     spi_acquire(dev->spi);
-    gpio_clear(dev->cs_pin);
-    spi_transfer_reg(dev->spi, AT86RF2XX_ACCESS_SRAM | AT86RF2XX_ACCESS_READ,
+    spi_transfer_reg(dev->spi, dev->cs, true,
+                     AT86RF2XX_ACCESS_SRAM | AT86RF2XX_ACCESS_READ,
                      (char)offset);
-    spi_transfer_bytes(dev->spi, NULL, (char*)data, len);
-    gpio_set(dev->cs_pin);
+    spi_transfer_bytes(dev->spi, dev->cs, false, NULL, (char*)data, len);
     spi_release(dev->spi);
 }
 
@@ -75,12 +70,10 @@ void at86rf2xx_sram_write(const at86rf2xx_t *dev,
                           const size_t len)
 {
     spi_acquire(dev->spi);
-    gpio_clear(dev->cs_pin);
-    spi_transfer_reg(dev->spi,
+    spi_transfer_reg(dev->spi, dev->cs, true,
                      AT86RF2XX_ACCESS_SRAM | AT86RF2XX_ACCESS_WRITE,
                      (char)offset);
-    spi_transfer_bytes(dev->spi, (char*)data, NULL, len);
-    gpio_set(dev->cs_pin);
+    spi_transfer_bytes(dev->spi, dev->cs, false, (char*)data, NULL, len);
     spi_release(dev->spi);
 }
 
@@ -89,10 +82,9 @@ void at86rf2xx_fb_read(const at86rf2xx_t *dev,
                        const size_t len)
 {
     spi_acquire(dev->spi);
-    gpio_clear(dev->cs_pin);
-    spi_transfer_byte(dev->spi, AT86RF2XX_ACCESS_FB | AT86RF2XX_ACCESS_READ);
-    spi_transfer_bytes(dev->spi, NULL, (char *)data, len);
-    gpio_set(dev->cs_pin);
+    spi_transfer_byte(dev->spi, dev->cs, true,
+                      AT86RF2XX_ACCESS_FB | AT86RF2XX_ACCESS_READ);
+    spi_transfer_bytes(dev->spi, dev->cs, false, NULL, (char *)data, len);
     spi_release(dev->spi);
 }
 
