@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Freie Universität Berlin
+ * Copyright (C) 2014-2015 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -21,7 +21,7 @@
  * @}
  */
 
-#include "stm32f10x.h"
+#include "cpu.h"
 #include "mutex.h"
 #include "periph/gpio.h"
 #include "periph/spi.h"
@@ -137,7 +137,15 @@ void spi_release(spi_t dev)
     mutex_unlock(&locks[dev]);
 }
 
-char spi_transfer_byte(spi_t dev, char out)
+char spi_transfer_byte(spi_t dev, spi_cs_t cs, bool cont, char out)
+{
+    char tmp = 0;
+    spi_transfer_bytes(dev, cs, cont, &out, &tmp, 1);
+    return tmp;
+}
+
+void spi_transfer_bytes(spi_t dev, spi_cs_t cs, bool cont,
+                        char *out, char *in, size_t len)
 {
     SPI_TypeDef *spi;
     char tmp;
@@ -149,14 +157,24 @@ char spi_transfer_byte(spi_t dev, char out)
             break;
 #endif
         default:
-            return 0;
+            return;
     }
 
-    while ((spi->SR & SPI_SR_TXE) == RESET);
-    spi->DR = out;
-    while ((spi->SR & SPI_SR_RXNE) == RESET);
-    tmp = spi->DR;
-    return tmp;
+    if (cs != SPI_CS_UNDEF) {
+        gpio_clear((gpio_t)cs);
+    }
+    for (int i = 0; i < len; i++) {
+        while((spi->SR & SPI_SR_TXE) == RESET);
+        spi->DR = (out) ? out[i] : 0;
+        while ((spi->SR & SPI_SR_RXNE) == RESET);
+        tmp = spi->DR;
+        if (in) {
+            in[i] = tmp;
+        }
+    }
+    if (!cont && (cs != SPI_CS_UNDEF)) {
+        gpio_set((gpio_t)cs);
+    }
 }
 
 void spi_transmission_begin(spi_t dev, char reset_val)
