@@ -220,7 +220,8 @@ int _icmpv6_ping(int argc, char **argv)
     if (success > 0) {
         timex_normalize(&sum_rtt);
         printf("%d packets transmitted, %d received, %d%% packet loss, time %"
-               PRIu32 ".06%" PRIu32 " s\n", n, success, (success - n) / n,
+               PRIu32 ".06%" PRIu32 " s\n", n, success,
+               (100 - ((success * 100) / n)),
                sum_rtt.seconds, sum_rtt.microseconds);
         timex_t avg_rtt = timex_from_uint64(timex_uint64(sum_rtt) / n);  /* get average */
         printf("rtt min/avg/max = "
