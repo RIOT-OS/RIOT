@@ -520,7 +520,6 @@ kernel_pid_t ng_ndp_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_len,
 ng_pktsnip_t *ng_ndp_nbr_sol_build(ng_ipv6_addr_t *tgt, ng_pktsnip_t *options)
 {
     ng_pktsnip_t *pkt;
-    ng_ndp_nbr_sol_t *nbr_sol;
 
     DEBUG("ndp: building neighbor solicitation message\n");
 
@@ -532,9 +531,10 @@ ng_pktsnip_t *ng_ndp_nbr_sol_build(ng_ipv6_addr_t *tgt, ng_pktsnip_t *options)
     pkt = ng_icmpv6_build(options, NG_ICMPV6_NBR_SOL, 0, sizeof(ng_ndp_nbr_sol_t));
 
     if (pkt != NULL) {
-        nbr_sol = pkt->data;
+        ng_ndp_nbr_sol_t *nbr_sol = pkt->data;
         nbr_sol->resv.u32 = 0;
-        memcpy(&nbr_sol->tgt, tgt, sizeof(ng_ipv6_addr_t));
+        nbr_sol->tgt.u64[0].u64 = tgt->u64[0].u64;
+        nbr_sol->tgt.u64[1].u64 = tgt->u64[1].u64;
     }
 
     return pkt;
@@ -544,7 +544,6 @@ ng_pktsnip_t *ng_ndp_nbr_adv_build(uint8_t flags, ng_ipv6_addr_t *tgt,
                                    ng_pktsnip_t *options)
 {
     ng_pktsnip_t *pkt;
-    ng_ndp_nbr_adv_t *nbr_adv;
 
     DEBUG("ndp: building neighbor advertisement message\n");
 
@@ -555,14 +554,13 @@ ng_pktsnip_t *ng_ndp_nbr_adv_build(uint8_t flags, ng_ipv6_addr_t *tgt,
 
     pkt = ng_icmpv6_build(options, NG_ICMPV6_NBR_ADV, 0, sizeof(ng_ndp_nbr_adv_t));
 
-    if (pkt == NULL) {
-        return NULL;
+    if (pkt != NULL) {
+        ng_ndp_nbr_adv_t *nbr_adv = pkt->data;
+        nbr_adv->flags = (flags & NG_NDP_NBR_ADV_FLAGS_MASK);
+        nbr_adv->resv[0] = nbr_adv->resv[1] = nbr_adv->resv[2] = 0;
+        nbr_adv->tgt.u64[0].u64 = tgt->u64[0].u64;
+        nbr_adv->tgt.u64[1].u64 = tgt->u64[1].u64;
     }
-
-    nbr_adv = pkt->data;
-    nbr_adv->flags = (flags & NG_NDP_NBR_ADV_FLAGS_MASK);
-    nbr_adv->resv[0] = nbr_adv->resv[1] = nbr_adv->resv[2] = 0;
-    memcpy(&nbr_adv->tgt, tgt, sizeof(ng_ipv6_addr_t));
 
     return pkt;
 }
@@ -673,9 +671,9 @@ static void _send_nbr_sol(kernel_pid_t iface, ng_ipv6_addr_t *tgt,
         return;
     }
 
-    LL_PREPEND(pkt, hdr);
-
     ((ng_netif_hdr_t *)hdr->data)->if_pid = iface;
+
+    LL_PREPEND(pkt, hdr);
 
     ng_netapi_send(ng_ipv6_pid, pkt);
 }
@@ -751,9 +749,9 @@ static void _send_nbr_adv(kernel_pid_t iface, ng_ipv6_addr_t *tgt,
         return;
     }
 
-    LL_PREPEND(pkt, hdr);
-
     ((ng_netif_hdr_t *)hdr->data)->if_pid = iface;
+
+    LL_PREPEND(pkt, hdr);
 
     if (ng_ipv6_netif_addr_is_non_unicast(tgt)) {
         /* avoid collision for anycast addresses
