@@ -309,10 +309,13 @@ void native_isr_entry(int sig, siginfo_t *info, void *context)
         return;
     }
 
-    /* XXX: Workaround safety check - whenever this happens it really
-     * indicates a bug in disableIRQ */
+    /* As we arm timers before interrupt are enabled again and after signals
+     * are enabled again the handler may be called when interrupt are still
+     * disabled.
+     * Just guard the signal handler against it: the signal will be queued for
+     * later consumptioni (_sig_pipefd).
+     */
     if (native_interrupts_enabled == 0) {
-        //printf("interrupts are off, but I caught a signal.\n");
         return;
     }
     if (_native_in_isr != 0) {
