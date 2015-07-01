@@ -248,7 +248,27 @@ static void test_ipv6_hdr_get_fl(void)
                           ng_ipv6_hdr_get_fl((ng_ipv6_hdr_t *)val));
 }
 
-static void test_ipv6_hdr_inet_csum(void)
+static void test_ipv6_hdr_inet_csum__initial_sum_overflows(void)
+{
+    uint16_t sum = 0xffff;
+    uint16_t res = 0, payload_len = 0;
+    uint8_t val[] = {
+        0x60, 0x00, 0x00, 0x00, 0x00, 0x0c, 0x3a, 0x40, /* IPv6 header */
+        0xfe, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0xc8, 0x86, 0xcd, 0xff, 0xfe, 0x0f, 0xce, 0x49,
+        0xfe, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x18, 0xaa, 0x2d, 0xff, 0xfe, 0x44, 0x43, 0xac
+    };
+
+    /* calculate checksum of pseudo header */
+    res = ng_ipv6_hdr_inet_csum(sum, (ng_ipv6_hdr_t *)&val, NG_PROTNUM_ICMPV6,
+                                payload_len);
+    res = ~res;     /* take 1's-complement for correct checksum */
+
+    TEST_ASSERT_EQUAL_INT(0x1749, res);
+}
+
+static void test_ipv6_hdr_inet_csum__initial_sum_0(void)
 {
     /* source: https://www.cloudshark.org/captures/ea72fbab241b (No. 56) */
     uint16_t res = 0, payload_len;
@@ -386,7 +406,8 @@ Test *tests_ipv6_hdr_tests(void)
         new_TestFixture(test_ipv6_hdr_get_tc_dscp),
         new_TestFixture(test_ipv6_hdr_set_fl),
         new_TestFixture(test_ipv6_hdr_get_fl),
-        new_TestFixture(test_ipv6_hdr_inet_csum),
+        new_TestFixture(test_ipv6_hdr_inet_csum__initial_sum_overflows),
+        new_TestFixture(test_ipv6_hdr_inet_csum__initial_sum_0),
         new_TestFixture(test_ipv6_hdr_build__wrong_src_len),
         new_TestFixture(test_ipv6_hdr_build__wrong_dst_len),
         new_TestFixture(test_ipv6_hdr_build__src_NULL),
