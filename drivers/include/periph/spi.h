@@ -119,6 +119,41 @@ typedef enum {
 #endif
 
 /**
+ * @brief   Configuration options for the chip select polarity
+ */
+#ifndef HAVE_SPI_CS_POL_T
+typedef enum {
+    SPI_CS_POL_LOW_ACTIVE,      /**< device is active when CS is set low */
+    SPI_CS_POL_HIGH_ACTIVE,     /**< device is active when CS is set high */
+} spi_cs_pol_t;
+#endif
+
+/**
+ * @brief   Prototype for callback that is called on ship select events in slave
+ *          mode
+ *
+ * @param[in] start     True if CS was just activated, false if it was
+ *                      deactivated
+ *
+ * @return              Character that is send to the master on the first
+ *                      transfer period. If @p start is false, the return value
+ *                      should be ignored
+ */
+typedef char(spi_cs_cb_t)(bool start);
+
+/**
+ * @brief   Prototype for callback that is called after every transfered byte
+ *          in slave mode
+ *
+ * @param[in] data      Byte that was received on the last transfer period
+ * @param[in] fresh     Flag set true if CS was just activated, false on
+ *
+ * @return              The character that is send to the master on the next
+ *                      transfer period
+ */
+typedef char(spi_data_cb_t)(char data);
+
+/**
  * @brief   Initialize the given SPI device to work in master mode
  *
  * In master mode the SPI device is configured to control the SPI bus. This
@@ -155,14 +190,21 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed);
  * @return              -1 on undefined device given
  * @return              -2 on other errors
  */
-int spi_init_slave(spi_t dev, spi_conf_t conf, char (*cb)(char data));
+int spi_init_slave(spi_t dev, spi_cs_t cs, spi_cs_pol_t pol, spi_conf_t conf,
+                   spi_cs_cb_t cs_cb, spi_data_cb_t data_cb);
 
 /**
- * @brief   Configure SCK, MISO and MOSI pins for the given SPI device
+ * @brief   Initialize the given chip select pin
  *
- * @param[in] dev       SPI device to configure pins for
+ * @param[in] dev       SPI device to use with the CS pin
+ * @param[in] cs        Chip select pin to initialize
+ * @param[in] pol       Polarity to use
+ *
+ * @return              0 on success
+ * @return              -1 on undefined device given
+ * @return              -2 on other errors
  */
-void spi_conf_pins(spi_t dev);
+int spi_init_cs(spi_t dev, spi_cs_t cs, spi_cs_pol_t pol);
 
 /**
  * @brief   Get mutually exclusive access to the given SPI bus
@@ -241,16 +283,6 @@ char spi_transfer_reg(spi_t dev, spi_cs_t cs, bool cont, uint8_t reg, char out);
  */
 void spi_transfer_regs(spi_t dev, spi_cs_t cs, bool cont,
                        uint8_t reg, char *out, char *in, size_t len);
-
-/**
- * @brief   Tell the SPI driver that a new transaction was started
- *
- * @note    This function is to be used in slave mode only!
- *
- * @param[in] dev       SPI device that is active
- * @param[in] reset_val The byte that is send to the master as first byte
- */
-void spi_transmission_begin(spi_t dev, char reset_val);
 
 /**
  * @brief Power on the given SPI device
