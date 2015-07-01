@@ -11,6 +11,7 @@
  * @ingroup     net
  * @brief       Transports IEEE 802.15.4 frames over UDP (can be parsed by
  *              Wireshark)
+ * @note        Stability uncertain
  * @see         <a href="https://www.wireshark.org/docs/dfref/z/zep.html">
  *                  ZigBee Encapsulation Protocol in the Wireshark docs
  *              </a>
