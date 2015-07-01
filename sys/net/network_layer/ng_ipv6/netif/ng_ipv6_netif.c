@@ -527,7 +527,7 @@ void ng_ipv6_netif_init_by_dev(void)
                            sizeof(if_type)) != -ENOTSUP) &&
             (if_type == NG_NETTYPE_SIXLOWPAN)) {
             DEBUG("Set 6LoWPAN flag\n");
-            ipv6_ifs->flags |= NG_IPV6_NETIF_FLAGS_SIXLOWPAN;
+            ipv6_ifs[i].flags |= NG_IPV6_NETIF_FLAGS_SIXLOWPAN;
         }
 
 #endif
