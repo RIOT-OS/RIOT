@@ -31,6 +31,7 @@
 #include "kernel.h"
 #include "thread.h"
 #include "net/ng_netconf.h"
+#include "net/ng_nettype.h"
 #include "net/ng_pkt.h"
 
 #ifdef __cplusplus
@@ -84,6 +85,19 @@ typedef struct {
 int ng_netapi_send(kernel_pid_t pid, ng_pktsnip_t *pkt);
 
 /**
+ * @brief   Sends a @ref NG_NETAPI_MSG_TYPE_SND command to all subscribers to
+ *          (@p type, @p demux_ctx).
+ *
+ * @param[in] type      type of the targeted network module.
+ * @param[in] demux_ctx demultiplexing context for @p type.
+ * @param[in] pkt       pointer into the packet buffer holding the data to send
+ *
+ * @return Number of subscribers to (@p type, @p demux_ctx).
+ */
+int ng_netapi_dispatch_send(ng_nettype_t type, uint32_t demux_ctx,
+                            ng_pktsnip_t *pkt);
+
+/**
  * @brief   Shortcut function for sending @ref NG_NETAPI_MSG_TYPE_RCV messages
  *
  * @param[in] pid       PID of the targeted network module
@@ -93,6 +107,19 @@ int ng_netapi_send(kernel_pid_t pid, ng_pktsnip_t *pkt);
  * @return              -1 on error (invalid PID or no space in queue)
  */
 int ng_netapi_receive(kernel_pid_t pid, ng_pktsnip_t *pkt);
+
+/**
+ * @brief   Sends a @ref NG_NETAPI_MSG_TYPE_RCV command to all subscribers to
+ *          (@p type, @p demux_ctx).
+ *
+ * @param[in] type      type of the targeted network module.
+ * @param[in] demux_ctx demultiplexing context for @p type.
+ * @param[in] pkt       pointer into the packet buffer holding the data to send
+ *
+ * @return Number of subscribers to (@p type, @p demux_ctx).
+ */
+int ng_netapi_dispatch_receive(ng_nettype_t type, uint32_t demux_ctx,
+                               ng_pktsnip_t *pkt);
 
 /**
  * @brief   Shortcut function for sending @ref NG_NETAPI_MSG_TYPE_GET messages and

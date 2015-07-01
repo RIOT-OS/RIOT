@@ -20,6 +20,8 @@
 
 #include "kernel.h"
 #include "msg.h"
+#include "net/ng_netreg.h"
+#include "net/ng_pktbuf.h"
 #include "net/ng_netapi.h"
 
 /**
@@ -64,14 +66,45 @@ static inline int _snd_rcv(kernel_pid_t pid, uint16_t type, ng_pktsnip_t *pkt)
     return msg_send(&msg, pid);
 }
 
+static inline int _snd_rcv_dispatch(ng_nettype_t type, uint32_t demux_ctx,
+                                    uint16_t cmd, ng_pktsnip_t *pkt)
+{
+    int numof = ng_netreg_num(type, demux_ctx);
+    ng_netreg_entry_t *sendto;
+
+    if (numof != 0) {
+        sendto = ng_netreg_lookup(type, demux_ctx);
+
+        ng_pktbuf_hold(pkt, numof - 1);
+
+        while (sendto) {
+            _snd_rcv(sendto->pid, cmd, pkt);
+            sendto = ng_netreg_getnext(sendto);
+        }
+    }
+
+    return numof;
+}
 int ng_netapi_send(kernel_pid_t pid, ng_pktsnip_t *pkt)
 {
     return _snd_rcv(pid, NG_NETAPI_MSG_TYPE_SND, pkt);
 }
 
+int ng_netapi_dispatch_send(ng_nettype_t type, uint32_t demux_ctx,
+                            ng_pktsnip_t *pkt)
+{
+    return _snd_rcv_dispatch(type, demux_ctx, NG_NETAPI_MSG_TYPE_SND, pkt);
+}
+
 int ng_netapi_receive(kernel_pid_t pid, ng_pktsnip_t *pkt)
 {
     return _snd_rcv(pid, NG_NETAPI_MSG_TYPE_RCV, pkt);
+}
+
+int ng_netapi_dispatch_receive(ng_nettype_t type, uint32_t demux_ctx,
+                               ng_pktsnip_t *pkt)
+{
+    return _snd_rcv_dispatch(type, demux_ctx, NG_NETAPI_MSG_TYPE_RCV, pkt);
 }
 
 int ng_netapi_get(kernel_pid_t pid, ng_netconf_opt_t opt, uint16_t context,

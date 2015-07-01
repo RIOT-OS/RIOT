@@ -57,7 +57,6 @@ static void _receive(ng_pktsnip_t *pkt)
 {
     ng_pktsnip_t *payload;
     uint8_t *dispatch;
-    ng_netreg_entry_t *entry;
 
     /* seize payload as a temporary variable */
     payload = ng_pktbuf_start_write(pkt);   /* need to duplicate since pkt->next
@@ -138,21 +137,9 @@ static void _receive(ng_pktsnip_t *pkt)
 
     payload->type = NG_NETTYPE_IPV6;
 
-    entry = ng_netreg_lookup(NG_NETTYPE_IPV6, NG_NETREG_DEMUX_CTX_ALL);
-
-    if (entry == NULL) {
+    if (!ng_netapi_dispatch_receive(NG_NETTYPE_IPV6, NG_NETREG_DEMUX_CTX_ALL, pkt)) {
         DEBUG("ipv6: No receivers for this packet found\n");
         ng_pktbuf_release(pkt);
-        return;
-    }
-
-    ng_pktbuf_hold(pkt, ng_netreg_num(NG_NETTYPE_IPV6, NG_NETREG_DEMUX_CTX_ALL) - 1);
-
-    while (entry) {
-        DEBUG("6lo: Send receive command for %p to %" PRIu16 "\n",
-              (void *)pkt, entry->pid);
-        ng_netapi_receive(entry->pid, pkt);
-        entry = ng_netreg_getnext(entry);
     }
 }
 
