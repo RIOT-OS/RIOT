@@ -353,7 +353,7 @@ static void _send_multicast(kernel_pid_t iface, ng_pktsnip_t *pkt,
 
     if (iface == KERNEL_PID_UNDEF) {
         /* get list of interfaces */
-        size_t ifnum = ng_netif_get(ifs);
+        ifnum = ng_netif_get(ifs);
 
         /* throw away packet if no one is interested */
         if (ifnum == 0) {
