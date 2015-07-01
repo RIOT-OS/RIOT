@@ -75,6 +75,21 @@ static void test_inet_csum__set_initial_sum(void)
     TEST_ASSERT_EQUAL_INT(0xffff, ng_inet_csum(0x38 + 0x3a, data, sizeof(data)));
 }
 
+static void test_inet_csum__wraps_more_than_once(void)
+{
+    /* catches the corner-case that the internal wrap-around does not suffice
+     * to be done once */
+    uint8_t data[] = {
+        0xfe, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0xc8, 0x86, 0xcd, 0xff, 0xfe, 0x0f, 0xce, 0x49,
+        0xfe, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x18, 0xaa, 0x2d, 0xff, 0xfe, 0x44, 0x43, 0xac
+    };
+
+    /* values were taken from a case I encountered in the wild */
+    TEST_ASSERT_EQUAL_INT(0x0002, ng_inet_csum(0x1785, data, sizeof(data)));
+}
+
 static void test_inet_csum__calculate_csum(void)
 {
     /* source: http://en.wikipedia.org/w/index.php?title=IPv4_header_checksum&oldid=645516564
@@ -112,6 +127,7 @@ Test *tests_inet_csum_tests(void)
         new_TestFixture(test_inet_csum__rfc_example),
         new_TestFixture(test_inet_csum__ipv6_pseudo_hdr),
         new_TestFixture(test_inet_csum__set_initial_sum),
+        new_TestFixture(test_inet_csum__wraps_more_than_once),
         new_TestFixture(test_inet_csum__calculate_csum),
         new_TestFixture(test_inet_csum__odd_len),
     };
