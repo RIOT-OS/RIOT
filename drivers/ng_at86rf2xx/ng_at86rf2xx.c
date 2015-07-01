@@ -133,6 +133,7 @@ void ng_at86rf2xx_reset(ng_at86rf2xx_t *dev)
     /* set default options */
     ng_at86rf2xx_set_option(dev, NG_AT86RF2XX_OPT_AUTOACK, true);
     ng_at86rf2xx_set_option(dev, NG_AT86RF2XX_OPT_CSMA, true);
+    ng_at86rf2xx_set_option(dev, NG_AT86RF2XX_OPT_TELL_RX_START, false);
     ng_at86rf2xx_set_option(dev, NG_AT86RF2XX_OPT_TELL_RX_END, true);
     /* set default protocol */
 #ifdef MODULE_NG_SIXLOWPAN
@@ -146,9 +147,18 @@ void ng_at86rf2xx_reset(ng_at86rf2xx_t *dev)
 #ifdef MODULE_NG_AT86RF212B
     ng_at86rf2xx_set_freq(dev,NG_AT86RF2XX_FREQ_915MHZ);
 #endif
+
+    /* don't populate masked interrupt flags to IRQ_STATUS register */
+    uint8_t tmp = ng_at86rf2xx_reg_read(dev, NG_AT86RF2XX_REG__TRX_CTRL_1);
+    tmp &= ~(NG_AT86RF2XX_TRX_CTRL_1_MASK__IRQ_MASK_MODE);
+    ng_at86rf2xx_reg_write(dev, NG_AT86RF2XX_REG__TRX_CTRL_1, tmp);
+
     /* enable interrupts */
     ng_at86rf2xx_reg_write(dev, NG_AT86RF2XX_REG__IRQ_MASK,
                           NG_AT86RF2XX_IRQ_STATUS_MASK__TRX_END);
+    /* clear interrupt flags */
+    ng_at86rf2xx_reg_read(dev, NG_AT86RF2XX_REG__IRQ_STATUS);
+
     /* go into RX state */
     ng_at86rf2xx_set_state(dev, NG_AT86RF2XX_STATE_RX_AACK_ON);
 
