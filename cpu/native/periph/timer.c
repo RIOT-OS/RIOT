@@ -26,6 +26,7 @@
 #include <mach/clock.h>
 #include <mach/mach_init.h>
 #include <mach/mach_port.h>
+#include <mach/mach_host.h>
 #endif
 
 #include <time.h>
