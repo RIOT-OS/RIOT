@@ -24,6 +24,7 @@
 #include "embUnit.h"
 #include "msg.h"
 
+#include "udp-func-tests.h"
 #include "udp-netapi-tests.h"
 
 #define MAIN_MSG_QUEUE_SIZE (1) /* UDP does not fragment so this should suffice */
@@ -44,6 +45,7 @@ int main(void)
     msg_init_queue(msg_queue, MAIN_MSG_QUEUE_SIZE);
 
     TESTS_START();
+    TESTS_RUN(udp_func_tests());
     TESTS_RUN(udp_netapi_tests());
     TESTS_END();
 
