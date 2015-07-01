@@ -30,14 +30,11 @@ extern "C" {
 #endif
 
 /**
- * @brief   Type to represent snips (or parts,
- *          snip == (packet header || packet payload)) of a network packet
+ * @brief   Type to represent parts (either headers or payload) of a packet,
+ *          called snips.
  * @details The idea behind the packet snips is that they either can represent
  *          protocol-specific headers or payload. A packet can be comprised of
- *          @f$ n @f$ pktsnip_t elements, where the first element represents the
- *          header of the lowest available network layer and the @f$ (n - 1) @f$-st
- *          element represents the payload of the highest available layer.
- *          Use @ref sys_ut to operate on this.
+ *          multiple pktsnip_t elements.
  *
  *          Example:
  *
