@@ -36,10 +36,16 @@
  */
 extern uint32_t _estack;
 
-void pre_startup (void)
+void pre_startup(void)
 {
     /* disable the WDOG */
     wdog_disable();
+
+    /*
+     * Workaround for hardware errata e4218: "SIM/FLEXBUS: SIM_SCGC7[FLEXBUS]
+     * bit should be cleared when the FlexBus is not being used."
+     */
+    BITBAND_REG32(SIM->SCGC7, SIM_SCGC7_FLEXBUS_SHIFT) = 0;
 }
 
 void dummy_handler(void)
