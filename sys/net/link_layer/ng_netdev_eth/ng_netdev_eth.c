@@ -29,6 +29,7 @@
 #include <string.h>
 
 #include "byteorder.h"
+#include "net/eui64.h"
 #include "net/ng_ethernet.h"
 #include "net/ng_ethertype.h"
 #include "net/ng_netdev.h"
@@ -198,6 +199,21 @@ static inline int _get_addr_len(uint16_t *value, size_t max_len)
     return sizeof(uint16_t);
 }
 
+static inline int _get_iid(ng_netdev_eth_t *netdev, eui64_t *value, size_t max_len)
+{
+    if (max_len < sizeof(eui64_t)) {
+        /* value buffer not big enough */
+        return -EOVERFLOW;
+    }
+
+    dev_eth_t *dev = netdev->ethdev;
+    uint8_t addr[NG_ETHERNET_ADDR_LEN];
+    dev->driver->get_mac_addr(dev, addr);
+    ng_ethernet_get_iid(value, addr);
+
+    return sizeof(eui64_t);
+}
+
 static inline int _get_max_pkt_sz(uint16_t *value, size_t max_len)
 {
     if (max_len != sizeof(uint16_t)) {
@@ -243,6 +259,10 @@ static int _get(ng_netdev_t *dev, ng_netconf_opt_t opt, void *value,
         case NETCONF_OPT_ADDR_LEN:
             DEBUG("address length\n");
             return _get_addr_len(value, max_len);
+
+        case NETCONF_OPT_IPV6_IID:
+            DEBUG("IPv6 IID\n");
+            return _get_iid((ng_netdev_eth_t *)dev, value, max_len);
 
         case NETCONF_OPT_MAX_PACKET_SIZE:
             DEBUG("maximum packet size\n");

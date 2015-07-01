@@ -21,8 +21,9 @@
 #ifndef NG_IEEE802154_H_
 #define NG_IEEE802154_H_
 
-#include <stdint.h>
-#include "byteorder.h"
+#include <stdlib.h>
+
+#include "net/eui64.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -62,13 +63,62 @@ extern "C" {
 /** @} */
 
 /**
- * @brief Data type to represent an EUI-64.
+ * @brief   Generates an IPv6 interface identifier from an IEEE 802.15.4 address.
+ *
+ * @see <a href="https://tools.ietf.org/html/rfc4944#section-6">
+ *          RFC 4944, section 6
+ *      </a>
+ * @see <a href="https://tools.ietf.org/html/rfc6282#section-3.2.2">
+ *          RFC 6282, section 3.2.2
+ *      </a>
+ *
+ * @param[out] eui64    The resulting EUI-64.
+ * @param[in] addr      An IEEE 802.15.4 address.
+ * @param[in] addr_len  The length of @p addr. Must be 2 (short address),
+ *                      4 (PAN ID + short address), or 8 (long address).
+ *
+ * @return Copy of @p eui64 on success.
+ * @return NULL, if @p addr_len was of illegal length.
  */
-typedef union {
-    le_uint64_t uint64;     /**< represented as 64 bit value */
-    uint8_t uint8[8];       /**< split into 8 8-bit words. */
-    le_uint16_t uint16[4];  /**< split into 4 16-bit words. */
-} eui64_t ;
+static inline eui64_t *ng_ieee802154_get_iid(eui64_t *eui64, uint8_t *addr,
+                                             size_t addr_len)
+{
+    int i = 0;
+
+    eui64->uint8[0] = eui64->uint8[1] = 0;
+
+    switch (addr_len) {
+        case 8:
+            eui64->uint8[0] = addr[i++] ^ 0x02;
+            eui64->uint8[1] = addr[i++];
+            eui64->uint8[2] = addr[i++];
+            eui64->uint8[3] = addr[i++];
+            eui64->uint8[4] = addr[i++];
+            eui64->uint8[5] = addr[i++];
+            eui64->uint8[6] = addr[i++];
+            eui64->uint8[7] = addr[i++];
+            break;
+
+        case 4:
+            eui64->uint8[0] = addr[i++] ^ 0x02;
+            eui64->uint8[1] = addr[i++];
+
+        case 2:
+            eui64->uint8[2] = 0;
+            eui64->uint8[3] = 0xff;
+            eui64->uint8[4] = 0xfe;
+            eui64->uint8[5] = 0;
+            eui64->uint8[6] = addr[i++];
+            eui64->uint8[7] = addr[i++];
+            break;
+
+        default:
+            return NULL;
+    }
+
+    return eui64;
+}
+
 
 #ifdef __cplusplus
 }
