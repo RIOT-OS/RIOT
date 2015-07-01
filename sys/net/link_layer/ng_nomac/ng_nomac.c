@@ -124,7 +124,7 @@ static void *_nomac_thread(void *args)
 }
 
 kernel_pid_t ng_nomac_init(char *stack, int stacksize, char priority,
-                        const char *name, ng_netdev_t *dev)
+                           const char *name, ng_netdev_t *dev)
 {
     kernel_pid_t res;
 
@@ -134,7 +134,7 @@ kernel_pid_t ng_nomac_init(char *stack, int stacksize, char priority,
     }
     /* create new NOMAC thread */
     res = thread_create(stack, stacksize, priority, CREATE_STACKTEST,
-                         _nomac_thread, (void *)dev, name);
+                        _nomac_thread, (void *)dev, name);
     if (res <= 0) {
         return -EINVAL;
     }
