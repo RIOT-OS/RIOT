@@ -43,11 +43,14 @@ uint16_t ng_inet_csum(uint16_t sum, const uint8_t *buf, uint16_t len)
         csum += (*buf << 8);            /* add last byte as top half of 16-byte word */
     }
 
-    csum += csum >> 16;
+    while (csum >> 16) {
+        uint16_t carry = csum >> 16;
+        csum = (csum & 0xffff) + carry;
+    }
 
-    DEBUG("inet_sum: new sum = 0x%04" PRIx32 "\n", csum & 0xffff);
+    DEBUG("inet_sum: new sum = 0x%04" PRIx32 "\n", csum);
 
-    return (csum & 0xffff);
+    return csum;
 }
 
 /** @} */
