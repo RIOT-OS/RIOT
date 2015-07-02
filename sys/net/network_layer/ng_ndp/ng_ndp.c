@@ -330,6 +330,9 @@ void ng_ndp_retrans_nbr_sol(ng_ipv6_nc_t *nc_entry)
               ng_ipv6_addr_to_str(addr_str, &nc_entry->ipv6_addr, sizeof(addr_str)),
               nc_entry->iface);
 
+#ifdef MODULE_FIB
+        fib_remove_entry((uint8_t *)&(nc_entry->ipv6_addr), sizeof(ng_ipv6_addr_t));
+#endif
         ng_ipv6_nc_remove(nc_entry->iface, &nc_entry->ipv6_addr);
     }
 }
@@ -441,11 +444,25 @@ kernel_pid_t ng_ndp_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_len,
             (ng_ipv6_netif_addr_get(prefix)->flags &
              NG_IPV6_NETIF_ADDR_FLAGS_NDP_ON_LINK)) {
             next_hop_ip = dst;
+#ifdef MODULE_FIB
+            /* We don't care if FIB is full, this is just for efficiency
+             * for later sends */
+            fib_add_entry(iface, (uint8_t *)dst, sizeof(ng_ipv6_addr_t), 0,
+                          (uint8_t *)next_hop_ip, sizeof(ng_ipv6_addr_t), 0,
+                          FIB_LIFETIME_NO_EXPIRE);
+#endif
         }
     }
 
     if (next_hop_ip == NULL) {
         next_hop_ip = _default_router();
+#ifdef MODULE_FIB
+        /* We don't care if FIB is full, this is just for efficiency for later
+         * sends */
+        fib_add_entry(iface, (uint8_t *)dst, sizeof(ng_ipv6_addr_t), 0,
+                      (uint8_t *)next_hop_ip, sizeof(ng_ipv6_addr_t), 0,
+                      FIB_LIFETIME_NO_EXPIRE);
+#endif
     }
 
     if (next_hop_ip != NULL) {
