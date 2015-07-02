@@ -208,7 +208,7 @@ int ng_udp_calc_csum(ng_pktsnip_t *hdr, ng_pktsnip_t *pseudo_hdr)
 {
     uint16_t csum;
 
-    if (hdr == NULL || hdr->next == NULL) {
+    if ((hdr == NULL) || (pseudo_hdr == NULL)) {
         return -EFAULT;
     }
     if (hdr->type != NG_NETTYPE_UDP) {
