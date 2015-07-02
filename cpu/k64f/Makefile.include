@@ -1,0 +1,26 @@
+# define the CPU architecture for the k64f
+export CPU_ARCH = cortex-m4
+
+# tell the build system that the CPU depends on the Kinetis common files
+export USEMODULE += kinetis_common
+
+# define path to kinetis module, which is needed for this CPU
+export KINETIS_COMMON = $(RIOTCPU)/kinetis_common/
+# CPU depends on the kinetis module, so include it
+include $(KINETIS_COMMON)Makefile.include
+
+export LINKFLAGS += -L$(RIOTCPU)/kinetis_common/ldscripts
+
+#export the CPU model
+MODEL = $(shell echo $(CPU_MODEL)|tr 'a-z' 'A-Z')
+export CFLAGS += -DCPU_MODEL_$(MODEL)
+ARCH = $(shell echo $(CPU_ARCH) | tr 'a-z-' 'A-Z_')
+export CFLAGS += -DCPU_ARCH_$(ARCH)
+
+# this CPU implementation is using kinetis common startup
+export COMMON_STARTUP = $(KINETIS_COMMON)
+
+# add the CPU specific system calls implementations for the linker
+export UNDEF += $(BINDIR)cpu/vectors.o
+
+include $(RIOTCPU)/Makefile.include.cortexm_common

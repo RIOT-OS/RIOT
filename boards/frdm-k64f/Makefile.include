@@ -1,0 +1,32 @@
+# define the cpu used by the FRDM-K64F board
+export CPU = k64f
+export CPU_MODEL = mk64fn1m0vll12
+
+# set default port depending on operating system
+PORT_LINUX ?= /dev/ttyACM0
+
+.PHONY: flash
+flash: $(RIOTCPU)/kinetis_common/dist/wdog-disable.bin
+
+# Reset the default goal.
+.DEFAULT_GOAL :=
+
+export FFLAGS = flash-elf
+export TUI = 1
+# We need special handling of the watchdog if we want to speed up the flash
+# verification by using the MCU to compute the image checksum after flashing.
+# wdog-disable.bin is a precompiled binary which will disable the watchdog and
+# return control to the debugger (OpenOCD)
+export OPENOCD_PRE_VERIFY_CMDS += \
+  -c 'load_image $(RIOTCPU)/kinetis_common/dist/wdog-disable.bin 0x20000000 bin' \
+  -c 'resume 0x20000000'
+export OPENOCD_EXTRA_INIT
+export PRE_FLASH_CHECK_SCRIPT = $(RIOTCPU)/kinetis_common/dist/check-fcfield-elf.sh
+
+include $(RIOTBOARD)/$(BOARD)/Makefile.dep
+# setup serial terminal
+include $(RIOTBOARD)/Makefile.include.serial
+# this board uses openocd
+include $(RIOTBOARD)/Makefile.include.openocd
+# include cortex defaults
+include $(RIOTBOARD)/Makefile.include.cortexm_common
