@@ -39,6 +39,7 @@ export GPROF ?= gprof
 
 # basic cflags:
 export CFLAGS += -Wall -Wextra -pedantic
+export CFLAGS += -ffunction-sections -fdata-sections
 ifeq ($(shell uname -m),x86_64)
 export CFLAGS += -m32
 endif
