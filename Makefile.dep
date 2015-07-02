@@ -316,3 +316,9 @@ ifneq (,$(filter cpp11-compat,$(USEMODULE)))
   USEMODULE += timex
   FEATURES_REQUIRED += cpp
 endif
+
+ifneq (,$(filter ng_pktbuf, $(USEMODULE)))
+  ifeq (,$(filter ng_pktbuf_dynamic, $(USEMODULE)))
+    USEMODULE += ng_pktbuf_default
+  endif
+endif
