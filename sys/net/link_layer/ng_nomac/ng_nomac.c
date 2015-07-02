@@ -39,24 +39,13 @@ static void _event_cb(ng_netdev_event_t event, void *data)
     /* NOMAC only understands the RX_COMPLETE event... */
     if (event == NETDEV_EVENT_RX_COMPLETE) {
         ng_pktsnip_t *pkt;
-        ng_netreg_entry_t *sendto;
 
         /* get pointer to the received packet */
         pkt = (ng_pktsnip_t *)data;
-        /* find out, who to send the packet to */
-        sendto = ng_netreg_lookup(pkt->type, NG_NETREG_DEMUX_CTX_ALL);
-        /* throw away packet if no one is interested */
-        if (sendto == NULL) {
+        /* send the packet to everyone interested in it's type */
+        if (!ng_netapi_dispatch_receive(pkt->type, NG_NETREG_DEMUX_CTX_ALL, pkt)) {
             DEBUG("nomac: unable to forward packet of type %i\n", pkt->type);
             ng_pktbuf_release(pkt);
-            return;
-        }
-        /* send the packet to everyone interested in it's type */
-        ng_pktbuf_hold(pkt, ng_netreg_num(pkt->type, NG_NETREG_DEMUX_CTX_ALL) - 1);
-        while (sendto != NULL) {
-            DEBUG("nomac: sending pkt %p to PID %u\n", (void*)pkt, sendto->pid);
-            ng_netapi_receive(sendto->pid, pkt);
-            sendto = ng_netreg_getnext(sendto);
         }
     }
 }
@@ -135,7 +124,7 @@ static void *_nomac_thread(void *args)
 }
 
 kernel_pid_t ng_nomac_init(char *stack, int stacksize, char priority,
-                        const char *name, ng_netdev_t *dev)
+                           const char *name, ng_netdev_t *dev)
 {
     kernel_pid_t res;
 
@@ -145,7 +134,7 @@ kernel_pid_t ng_nomac_init(char *stack, int stacksize, char priority,
     }
     /* create new NOMAC thread */
     res = thread_create(stack, stacksize, priority, CREATE_STACKTEST,
-                         _nomac_thread, (void *)dev, name);
+                        _nomac_thread, (void *)dev, name);
     if (res <= 0) {
         return -EINVAL;
     }
