@@ -289,6 +289,11 @@ static inline uint32_t ng_ipv6_hdr_get_fl(const ng_ipv6_hdr_t *hdr)
 static inline uint16_t ng_ipv6_hdr_inet_csum(uint16_t sum, ng_ipv6_hdr_t *hdr,
                                              uint8_t prot_num, uint16_t len)
 {
+    if ((sum + len + prot_num) > 0xffff) {
+        /* increment by one for overflow to keep it as 1's complement sum */
+        sum++;
+    }
+
     return ng_inet_csum(sum + len + prot_num, hdr->src.u8,
                         (2 * sizeof(ng_ipv6_addr_t)));
 }
