@@ -32,14 +32,14 @@ extern "C" {
 #endif
 
 /**
- * @brief   Default stack size to use for the 6LoWPAN thread
+ * @brief   Default stack size to use for the 6LoWPAN thread.
  */
 #ifndef NG_SIXLOWPAN_STACK_SIZE
 #define NG_SIXLOWPAN_STACK_SIZE  (THREAD_STACKSIZE_DEFAULT)
 #endif
 
 /**
- * @brief   Default priority for the 6LoWPAN thread
+ * @brief   Default priority for the 6LoWPAN thread.
  */
 #ifndef NG_SIXLOWPAN_PRIO
 #define NG_SIXLOWPAN_PRIO   (THREAD_PRIORITY_MAIN - 4)
@@ -58,7 +58,7 @@ extern "C" {
 #define NG_SIXLOWPAN_UNCOMPRESSED   (0x41)
 
 /**
- * @brief   Checks if dispatch indicats that fram is not a 6LoWPAN (NALP) frame.
+ * @brief   Checks if dispatch indicates that frame is not a 6LoWPAN (NALP) frame.
  *
  * @param[in] disp  The first byte of a frame.
  *

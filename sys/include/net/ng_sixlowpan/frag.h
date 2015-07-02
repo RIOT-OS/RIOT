@@ -44,8 +44,12 @@ extern "C" {
 /**
  * @brief   General and 1st 6LoWPAN fragmentation header
  *
- * @see <a href="https://tools.ietf.org/html/rfc4944#section-5.1">
- *          RFC 4944, section 5.1
+ * @note    The general 6LoWPAN fragmentation header refers to the first 4
+ *          bytes of a \c FRAG0 or \c FRAGN fragmentation header, which are
+ *          identical.
+ *
+ * @see <a href="https://tools.ietf.org/html/rfc4944#section-5.3">
+ *          RFC 4944, section 5.3
  *      </a>
  */
 typedef struct __attribute__((packed)) {
