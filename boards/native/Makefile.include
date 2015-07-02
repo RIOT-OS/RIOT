@@ -47,7 +47,7 @@ export CFLAGS += -fstack-protector-all
 endif
 ifeq ($(shell uname -s),FreeBSD)
 ifeq ($(shell uname -m),amd64)
-export CFLAGS += -DCOMPAT_32BIT -L/usr/lib32 -B/usr/lib32
+export CFLAGS += -m32 -DCOMPAT_32BIT -B/usr/lib32
 endif
 endif
 
@@ -60,7 +60,7 @@ export LINKFLAGS += -m32
 endif
 ifeq ($(shell uname -s),FreeBSD)
 ifeq ($(shell uname -m),amd64)
-export LINKFLAGS += -DCOMPAT_32BIT -L/usr/lib32 -B/usr/lib32
+export LINKFLAGS += -m32 -DCOMPAT_32BIT -L/usr/lib32 -B/usr/lib32
 endif
 export LINKFLAGS += -L $(BINDIR)
 else
