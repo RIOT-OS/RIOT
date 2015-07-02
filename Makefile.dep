@@ -330,3 +330,7 @@ endif
 ifneq (,$(filter newlib,$(USEMODULE)))
   USEMODULE += uart_stdio
 endif
+
+ifneq (,$(filter hih6130,$(USEMODULE)))
+  USEMODULE += vtimer
+endif
