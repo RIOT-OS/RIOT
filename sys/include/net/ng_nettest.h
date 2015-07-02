@@ -125,6 +125,8 @@ void ng_nettest_register_set(ng_netconf_opt_t opt, ng_nettest_opt_cb_t cb);
  * If no message was received after @ref NG_NETTEST_TIMEOUT microseconds, while
  * there are still packets expected, the function will return NG_NETTEST_TIMED_OUT.
  *
+ * In case of success it releases all packets send by the tested module.
+ *
  * @param[in] pid           The thread you want to test the
  *                          @ref NG_NETAPI_MSG_TYPE_SND command for.
  * @param[in] in            The packet you want to send through @p pid.
@@ -141,9 +143,10 @@ void ng_nettest_register_set(ng_netconf_opt_t opt, ng_nettest_opt_cb_t cb);
  * @return  @see ng_nettest_res_t
  */
 ng_nettest_res_t ng_nettest_send(kernel_pid_t pid, ng_pktsnip_t *in,
-                                 unsigned int exp_pkts, kernel_pid_t exp_senders[],
-                                 ng_pktsnip_t *exp_out[], ng_nettype_t exp_type,
-                                 uint32_t exp_demux_ctx);
+                                 unsigned int exp_pkts,
+                                 const kernel_pid_t *exp_senders,
+                                 const ng_pktsnip_t **exp_out,
+                                 ng_nettype_t exp_type, uint32_t exp_demux_ctx);
 
 /**
  * @brief   Test @ref NG_NETAPI_MSG_TYPE_SND command to @p pid with the receiving
@@ -154,21 +157,25 @@ ng_nettest_res_t ng_nettest_send(kernel_pid_t pid, ng_pktsnip_t *in,
  * was received after @ref NG_NETTEST_TIMEOUT microseconds, while there are
  * still packets expected, the function will return NG_NETTEST_TIMED_OUT.
  *
+ * In case of success it releases all packets received from the tested module.
+ *
  * @param[in] pid           The thread you want to test the
  *                          @ref NG_NETAPI_MSG_TYPE_SND command for.
  * @param[in] in            The packet you want to send through @p pid.
  * @param[in] exp_pkts      The number of packets expected to be received.
  * @param[in] exp_senders   The PID the resulting packet should be coming from.
- *                          Must be of dimension @p exp_pkts.
+ *                          Must be of dimension @p exp_pkts. May be NULL if
+ *                          @p exp_pkts == 0.
  * @param[in] exp_out       The expected packet from @p exp_sender.
- *                          Must be of dimension @p exp_pkts.
+ *                          Must be of dimension @p exp_pkts. May be NULL if
+ *                          @p exp_pkts == 0.
  *
  * @return  @see ng_nettest_res_t
  */
 ng_nettest_res_t ng_nettest_send_iface(kernel_pid_t pid, ng_pktsnip_t *in,
                                        unsigned int exp_pkts,
-                                       kernel_pid_t exp_senders[],
-                                       ng_pktsnip_t *exp_out[]);
+                                       const kernel_pid_t *exp_senders,
+                                       const ng_pktsnip_t **exp_out);
 
 /**
  * @brief   Test @ref NG_NETAPI_MSG_TYPE_RCV command to @p pid.
@@ -194,9 +201,10 @@ ng_nettest_res_t ng_nettest_send_iface(kernel_pid_t pid, ng_pktsnip_t *in,
  * @return  @see ng_nettest_res_t
  */
 ng_nettest_res_t ng_nettest_receive(kernel_pid_t pid, ng_pktsnip_t *in,
-                                    unsigned int exp_pkts, kernel_pid_t exp_senders[],
-                                    ng_pktsnip_t *exp_out[], ng_nettype_t exp_type,
-                                    uint32_t exp_demux_ctx);
+                                    unsigned int exp_pkts,
+                                    const kernel_pid_t *exp_senders,
+                                    const ng_pktsnip_t **exp_out,
+                                    ng_nettype_t exp_type, uint32_t exp_demux_ctx);
 
 /**
  * @brief   Test @ref NG_NETAPI_MSG_TYPE_GET command to @p pid.
