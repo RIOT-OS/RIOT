@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2014 Freie Universität Berlin
  * Copyright (C) 2014 PHYTEC Messtechnik GmbH
+ * Copyright (C) 2015 Eistec AB
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -18,6 +19,7 @@
  * @brief       Low-level I2C driver implementation
  *
  * @author      Johann Fischer <j.fischer@phytec.de>
+ * @author      Joakim Gebart <joakim.gebart@eistec.se>
  *
  * @}
  */
@@ -173,12 +175,36 @@ static inline int _i2c_start(I2C_Type *dev, uint8_t address, uint8_t rw_flag)
     dev->D = address << 1 | (rw_flag & 1);
 
     /* wait for bus-busy to be set */
-    while (!(dev->S & I2C_S_BUSY_MASK));
+    while (!(dev->S & I2C_S_BUSY_MASK)) {
+        if (dev->S & I2C_S_ARBL_MASK) {
+            /* Bus master arbitration lost */
+            /*
+             * Arbitration is lost in the following circumstances:
+             * 1. SDA is sampled as low when the master drives high during an
+             *    address or data transmit cycle.
+             * 2. SDA is sampled as low when the master drives high during the
+             *    acknowledge bit of a data receive cycle.
+             * 3. A START cycle is attempted when the bus is busy.
+             * 4. A repeated START cycle is requested in slave mode.
+             * 5. A STOP condition is detected when the master did not request
+             *    it.
+             */
+            /* Clear ARBL flag */
+            dev->S = I2C_S_ARBL_MASK;
+            return -1;
+        }
+    }
 
     /* wait for address transfer to complete */
     while (!(dev->S & I2C_S_IICIF_MASK));
 
     dev->S = I2C_S_IICIF_MASK;
+
+    if ((dev->S & I2C_S_ARBL_MASK) != 0) {
+        /* Bus master arbitration lost */
+        dev->S = I2C_S_ARBL_MASK;
+        return -1;
+    }
 
     /* check for receive acknowledge */
     if (dev->S & I2C_S_RXAK_MASK) {
@@ -198,6 +224,12 @@ static inline int _i2c_restart(I2C_Type *dev, uint8_t address, uint8_t rw_flag)
     while (!(dev->S & I2C_S_IICIF_MASK));
 
     dev->S = I2C_S_IICIF_MASK;
+
+    if ((dev->S & I2C_S_ARBL_MASK) != 0) {
+        /* Bus master arbitration lost */
+        dev->S = I2C_S_ARBL_MASK;
+        return -1;
+    }
 
     /* check for receive acknowledge */
     if (dev->S & I2C_S_RXAK_MASK) {
@@ -226,6 +258,12 @@ static inline int _i2c_receive(I2C_Type *dev, uint8_t *data, int length)
         while (!(dev->S & I2C_S_IICIF_MASK));
 
         dev->S = I2C_S_IICIF_MASK;
+
+        if ((dev->S & I2C_S_ARBL_MASK) != 0) {
+            /* Bus master arbitration lost */
+            dev->S = I2C_S_ARBL_MASK;
+            return -1;
+        }
 
         length--;
 
