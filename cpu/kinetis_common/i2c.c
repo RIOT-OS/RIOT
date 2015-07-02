@@ -215,11 +215,11 @@ static inline int _i2c_receive(I2C_Type *dev, uint8_t *data, int length)
     dev->C1 = I2C_C1_IICEN_MASK | I2C_C1_MST_MASK;
 
     if (length == 1) {
-        /* no ack signal */
+        /* Send NACK after receiving the next byte */
         dev->C1 |= I2C_C1_TXAK_MASK;
     }
 
-    /* dummy read */
+    /* Initiate master receive mode by reading the data register */
     dev->D;
 
     while (length > 0) {
@@ -227,18 +227,14 @@ static inline int _i2c_receive(I2C_Type *dev, uint8_t *data, int length)
 
         dev->S = I2C_S_IICIF_MASK;
 
-        if (length == 2) {
-            /* no ack signal is sent on the following receiving byte */
+        length--;
+
+        if (length == 1) {
+            /* Send NACK after receiving the next byte */
             dev->C1 |= I2C_C1_TXAK_MASK;
         }
 
-        if (length == 1) {
-            /* generate stop */
-            dev->C1 &= ~I2C_C1_MST_MASK;
-        }
-
         data[n] = (char)dev->D;
-        length--;
         n++;
     }
 
