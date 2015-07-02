@@ -38,20 +38,17 @@ void cpu_init(void)
     /* set pendSV interrupt to lowest possible priority */
     NVIC_SetPriority(PendSV_IRQn, 0xff);
 
-    /* Workaround for FTPAN-32 "DIF: Debug session automatically enables TracePort pins" found at Product Anomaly document
-       for your device located at https://www.nordicsemi.com/ */
+    /* Workaround for FTPAN-32 "DIF: Debug session automatically enables TracePort pins." */
     if (ftpan_32()) {
         CoreDebug->DEMCR &= ~CoreDebug_DEMCR_TRCENA_Msk;
     }
 
-    /* Workaround for FTPAN-37 "AMLI: EasyDMA is slow with Radio, ECB, AAR and CCM." found at Product Anomaly document
-       for your device located at https://www.nordicsemi.com/  */
+    /* Workaround for FTPAN-37 "AMLI: EasyDMA is slow with Radio, ECB, AAR and CCM." */
     if (ftpan_37()) {
         *(volatile uint32_t *)0x400005A0 = 0x3;
     }
 
-    /* Workaround for FTPAN-36 "CLOCK: Some registers are not reset when expected." found at Product Anomaly document
-       for your device located at https://www.nordicsemi.com/  */
+    /* Workaround for FTPAN-36 "CLOCK: Some registers are not reset when expected." */
     if (ftpan_36()) {
         NRF_CLOCK->EVENTS_DONE = 0;
         NRF_CLOCK->EVENTS_CTTO = 0;
@@ -66,15 +63,13 @@ void cpu_init(void)
     __ISB();
 #endif
 
-    /* Enable SWO trace functionality. If ENABLE_SWO is not defined, SWO pin will be used as GPIO (see Product
-       Specification to see which one). */
+    /* Enable SWO trace functionality. If ENABLE_SWO is not defined, SWO pin will be used as GPIO */
 #if (ENABLE_SWO == 1)
     CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
     NRF_CLOCK->TRACECONFIG |= CLOCK_TRACECONFIG_TRACEMUX_Serial << CLOCK_TRACECONFIG_TRACEMUX_Pos;
 #endif
 
-    /* Enable Trace functionality. If ENABLE_TRACE is not defined, TRACE pins will be used as GPIOs (see Product
-       Specification to see which ones). */
+    /* Enable Trace functionality. If ENABLE_TRACE is not defined, TRACE pins will be used as GPIOs */
 #if (ENABLE_TRACE == 1)
     CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
     NRF_CLOCK->TRACECONFIG |= CLOCK_TRACECONFIG_TRACEMUX_Parallel << CLOCK_TRACECONFIG_TRACEMUX_Pos;

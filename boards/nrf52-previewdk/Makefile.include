@@ -1,5 +1,5 @@
 # define the cpu used by the nRF52832 board nrf52-previewdk
-export CPU = nrf52832
+export CPU = nrf52
 export CPU_MODEL = nrf52xxaa
 
 #define the default port depending on the host OS
