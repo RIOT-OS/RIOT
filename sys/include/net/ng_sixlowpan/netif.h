@@ -53,7 +53,7 @@ void ng_sixlowpan_netif_init(void);
 void ng_sixlowpan_netif_add(kernel_pid_t pid, uint16_t max_frag_size);
 
 /**
- * @brief   REmove interface from 6LoWPAN.
+ * @brief   Remove interface from 6LoWPAN.
  *
  * @param[in] pid   The PID to the interface.
  */
