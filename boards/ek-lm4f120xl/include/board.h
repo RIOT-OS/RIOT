@@ -30,15 +30,6 @@ extern "C" {
 #endif
 
 /**
- * @name Define the nominal CPU core clock in this board
- */
-#define F_CPU               (40000000UL)
-#define CLK80				1
-#define CLK50				2
-#define CLK40				3
-#define CLK16				4
-
-/**
  * @name Define the boards stdio
  * @{
  */
@@ -81,10 +72,6 @@ extern "C" {
  * @brief Initialize board specific hardware, including clock, LEDs and std-IO
  */
 extern void board_init(void);
-extern void SetupFPU(void);
-extern void SetupClock(int clk);
-extern void SetupStdio(void);
-extern void SetupSysTick(void);	// Maybe for  later usage
 
 #ifdef __cplusplus
 }

@@ -19,45 +19,27 @@
  */
 
 #include "board.h"
+static void leds_init(void);
 
 void board_init(void)
 {
-	SetupFPU();
-	SetupClock(CLK40);
-	ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
-
-    ROM_GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3);
-	ROM_GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3, 2);
+	/* initialize the boards LEDs, this is done for debugging purpose */
+	leds_init();
 
     /* initialize the CPU */
     cpu_init();
 }
 
-void SetupFPU(void)
+/**
+ * @brief initialize the boards on-boards LEDS.
+ */
+static void leds_init(void)
 {
-	ROM_FPUEnable();
-	ROM_FPULazyStackingEnable();
+	// enable clock for PORTF
+	ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
+
+	//configure the pins as general output
+    ROM_GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3);
+	// Turn Red led on
+	ROM_GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3, 2);
 }
-
-void SetupClock(int clk)
-{
-	switch(clk){
-		case CLK80:
-			ROM_SysCtlClockSet(SYSCTL_SYSDIV_2_5 | SYSCTL_USE_PLL | SYSCTL_XTAL_16MHZ | SYSCTL_OSC_MAIN);
-			break;
-		case CLK50:
-			ROM_SysCtlClockSet(SYSCTL_SYSDIV_4 | SYSCTL_USE_PLL | SYSCTL_XTAL_16MHZ | SYSCTL_OSC_MAIN);
-			break;
-		case CLK40:
-			ROM_SysCtlClockSet(SYSCTL_SYSDIV_5 | SYSCTL_USE_PLL | SYSCTL_XTAL_16MHZ | SYSCTL_OSC_MAIN);
-			break;
-		case CLK16:
-			ROM_SysCtlClockSet(SYSCTL_SYSDIV_1 | SYSCTL_USE_PLL | SYSCTL_XTAL_16MHZ | SYSCTL_OSC_MAIN);
-			break;
-		default:
-			ROM_SysCtlClockSet(SYSCTL_SYSDIV_1 | SYSCTL_USE_PLL | SYSCTL_XTAL_16MHZ | SYSCTL_OSC_MAIN);
-			break;
-	}
-}
-
-

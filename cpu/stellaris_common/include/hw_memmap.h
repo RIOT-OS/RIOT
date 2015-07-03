@@ -135,10 +135,7 @@
 #define FLASH_CTRL_BASE         0x400FD000  // FLASH Controller
 #define SYSCTL_BASE             0x400FE000  // System Control
 #define UDMA_BASE               0x400FF000  // uDMA Controller
-#define ITM_BASE                0xE0000000  // Instrumentation Trace Macrocell
-#define DWT_BASE                0xE0001000  // Data Watchpoint and Trace
 #define FPB_BASE                0xE0002000  // FLASH Patch and Breakpoint
-#define NVIC_BASE               0xE000E000  // Nested Vectored Interrupt Ctrl
 #define TPIU_BASE               0xE0040000  // Trace Port Interface Unit
 
 //*****************************************************************************

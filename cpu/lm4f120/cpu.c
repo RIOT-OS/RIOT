@@ -47,11 +47,60 @@ CPUipsrGet(void)
     return(ulRet);
 }
 
+void __attribute__((naked))
+DisableInterrupts(void)
+{
+    __asm("    CPSID   I\n"
+          "    BX      LR\n");
+}
+
+void __attribute__((naked))
+EnableInterrupts(void)
+{
+    __asm("    CPSIE   I\n"
+          "    BX      LR\n");
+}
 /**
  * @brief Initialize the CPU, set IRQ priorities
  */
 void cpu_init(void)
 {
-    /* set pendSV interrupt to lowest possible priority */
-	ROM_IntPrioritySet(FAULT_PENDSV, 0x80);
+	// initializes the Cortex-M core
+	cortexm_init();
+
+	/* initialize the clock system */
+	cpu_clock_init(CLK40);
 }
+
+void setup_fpu(void)
+{
+	ROM_FPUEnable();
+	ROM_FPULazyStackingEnable();
+}
+
+void cpu_clock_init(int clk)
+{
+	setup_fpu();
+	switch(clk){
+		case CLK80:
+			ROM_SysCtlClockSet(SYSCTL_SYSDIV_2_5 | SYSCTL_USE_PLL | SYSCTL_XTAL_16MHZ | SYSCTL_OSC_MAIN);
+			break;
+		case CLK50:
+			ROM_SysCtlClockSet(SYSCTL_SYSDIV_4 | SYSCTL_USE_PLL | SYSCTL_XTAL_16MHZ | SYSCTL_OSC_MAIN);
+			break;
+		case CLK40:
+			ROM_SysCtlClockSet(SYSCTL_SYSDIV_5 | SYSCTL_USE_PLL | SYSCTL_XTAL_16MHZ | SYSCTL_OSC_MAIN);
+			break;
+		case CLK16:
+			ROM_SysCtlClockSet(SYSCTL_SYSDIV_1 | SYSCTL_USE_PLL | SYSCTL_XTAL_16MHZ | SYSCTL_OSC_MAIN);
+			break;
+		case CLK1:
+			ROM_SysCtlClockSet(SYSCTL_SYSDIV_1 | SYSCTL_USE_PLL | SYSCTL_XTAL_1MHZ | SYSCTL_OSC_MAIN);
+			break;
+		default:
+			ROM_SysCtlClockSet(SYSCTL_SYSDIV_1 | SYSCTL_USE_PLL | SYSCTL_XTAL_16MHZ | SYSCTL_OSC_MAIN);
+			break;
+	}
+}
+
+

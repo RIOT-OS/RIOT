@@ -11,33 +11,34 @@
  * @{
  *
  * @file		startup.c - Startup code
- * @brief       LM4F120H5QR startup code.
+ * @brief       LM4F120H5QR startup code and interrupt vector definition.
  *
  * @author      Rakendra Thapa <rakendrathapa@gmail.com>
  *
  * @}
  */
 
-#include <stdio.h>
 #include <stdint.h>
 #include "cpu.h"
+
+/**
+ * memory markers as defined in the linker script
+ */
+extern uint32_t _sfixed;
+extern uint32_t _efixed;
+extern uint32_t _etext;
+extern uint32_t _srelocate;
+extern uint32_t _erelocate;
+extern uint32_t _szero;
+extern uint32_t _ezero;
+extern uint32_t _sstack;
+extern uint32_t _estack;
+
+
 //-----------------------------------------------------------------------------
 // 							 Functions declarations
 //-----------------------------------------------------------------------------
-
-/**
- * @brief This function is the entry point after a system reset
- *
- * After a system reset, the following steps are necessary and carried out:
- * 1. load data section from flash to ram
- * 2. overwrite uninitialized data section (BSS) with zeros
- * 3. initialize the newlib
- * 4. initialize the board (sync clock, setup std-IO)
- * 5. initialize and start RIOTs kernel
- */
-
-// These functions are called from rst_handler.
-void ResetISR(void);
+void reset_handler(void);
 static void NmiSR(void);
 static void FaultISR(void);
 extern void empty_def_handler(void);
@@ -47,32 +48,30 @@ extern void board_init(void);
 extern void kernel_init(void);
 extern void __libc_init_array(void);
 
+/**
+ * Required by g++ cross compiler
+ */
+void *__dso_handle;
+
+
 // External declaration for the interrupt handler used by the application
 extern void UARTIntHandler(void);  		// UART 0							21
 extern void UART1IntHandler(void);  		// UART 1							21
 extern void	TIMER0IntHandler(void);		// 16 bit timer 0 A
+extern void	WTIMER0IntHandler(void);		// 32 bit timer 0 A
 extern void	TIMER1IntHandler(void);		// 16 bit timer 1 A
 extern void isr_svc(void);				// SV call
 extern void isr_pendsv(void);     		// PendSV
 extern void isr_bus_fault(void);    	// Bus Fault
 extern void isr_usage_fault(void);		// Usage Fault
 
-//-----------------------------------------------------------------------------
-// 						     Variables declarations
-//-----------------------------------------------------------------------------
-
-// defined by the linker it's the stack top variable (End of ram)
-extern unsigned long _stack_top;
-
-// NVIC ISR table
-__attribute__ ((section(".isr_vector")))
-void (* const myvectors[])(void) = {
-	// This are the fixed priority interrupts and the stack pointer loaded at startup at R13 (SP).
-	//												VECTOR N (Check Datasheet)
-	// here the compiler it's boring.. have to figure that out
-	(void (*)(void))((unsigned long) &_stack_top),	// stack pointer should be
-							// placed here at startup.			0
-    ResetISR,				// code entry point					1
+/* interrupt vector table */
+__attribute__ ((section(".vectors")))
+const void *interrupt_vector[] = {
+    /* Stack pointer */
+    (void*) (&_estack),             /* pointer to the top of the empty stack */
+    /* Cortex-M4 handlers */
+    (void*) reset_handler,          /* entry point of the program */
     NmiSR,					// NMI handler.						2
     FaultISR,				// hard fault handler.				3
     // Configurable priority interruts handler start here.
@@ -183,7 +182,7 @@ void (* const myvectors[])(void) = {
 	0,						// Reserved							107
 	empty_def_handler,		// 16/32 bit timer 5 A				108
 	empty_def_handler,		// 16/32 bit timer 5 B				109
-	empty_def_handler,		// 32/64 bit timer 0 A				110
+	WTIMER0IntHandler,		// 32/64 bit timer 0 A				110
 	empty_def_handler,		// 32/64 bit timer 0 B				111
 	empty_def_handler,		// 32/64 bit timer 1 A				112
 	empty_def_handler,		// 32/64 bit timer 1 B				113
@@ -229,63 +228,35 @@ void (* const myvectors[])(void) = {
 	0,						// Reserved							153
 	0						// Reserved							154
 };
-
+//
 //-----------------------------------------------------------------------------
 // 							Function implementations.
 //-----------------------------------------------------------------------------
+/**
+ * @brief This function is the entry point after a system reset
+ *
+ * After a system reset, the following steps are necessary and carried out:
+ * 1. load data section from flash to ram
+ * 2. overwrite uninitialized data section (BSS) with zeros
+ * 3. initialize the newlib
+ * 4. initialize the board (sync clock, setup std-IO)
+ * 5. initialize and start RIOTs kernel
+ */
 
-extern unsigned long _end_text;
-extern unsigned long _srelocate;
-extern unsigned long _erelocate;
-extern unsigned long _szero;
-extern unsigned long _ezero;
-/*
-* System on reset code. NVIC 1
-* Here I prepare the memory for the c compiler.
-* The stack pointer should be set at the beginning with the NVIC table already.
-* Copy the .data segment from flash into ram.
-* 0 to the .bss segment
-*/
+void reset_handler(void)
+{
+    uint32_t *dst;
+    uint32_t *src = &_etext;
 
-void ResetISR(void){
-	// Copy the .data section pointers to ram from flash.
-	// Look at LD manual (Optional Section Attributes).
-
-	// source and destination pointers
-	unsigned long *src;
-	unsigned long *dest;
-
-	// Copy the data segment initializer from flash to RAM
-	src = &_end_text;
-	for(dest = &_srelocate; dest < &_erelocate; )
-	{
-        *dest++ = *src++;
+    /* load data section from flash to ram */
+    for (dst = &_srelocate; dst < &_erelocate; ) {
+        *(dst++) = *(src++);
     }
 
-    // now set the .bss segment to 0!
-	for(dest = &_szero; dest < &_ezero; )
-	{
-		*dest++ = 0;
-	}
-
-	//
-    // Enable the floating-point unit.  This must be done here to handle the
-    // case where main() uses floating-point and the function prologue saves
-    // floating-point registers (which will fault if floating-point is not
-    // enabled).  Any configuration of the floating-point unit using DriverLib
-    // APIs must be done here prior to the floating-point unit being enabled.
-    //
-    // Note that this does not use DriverLib since it might not be included in
-    // this project.
-    //
-    HWREG(NVIC_CPAC) = ((HWREG(NVIC_CPAC) &
-                         ~(NVIC_CPAC_CP10_M | NVIC_CPAC_CP11_M)) |
-                        NVIC_CPAC_CP10_FULL | NVIC_CPAC_CP11_FULL);
-
-    //
-    // Call the application's entry point.
-    //
-
+    /* default bss section to zero */
+    for (dst = &_szero; dst < &_ezero; ) {
+        *(dst++) = 0;
+    }
 
     /* initialize the board and startup the kernel */
     board_init();

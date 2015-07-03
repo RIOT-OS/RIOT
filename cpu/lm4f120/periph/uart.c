@@ -38,6 +38,14 @@ typedef struct {
 } uart_conf_t;
 
 /**
+ * @brief Unified interrupt handler for all UART devices
+ *
+ * @param uartnum       the number of the UART that triggered the ISR
+ * @param uart          the UART device that triggered the ISR
+ */
+//static inline void irq_handler(uart_t uartnum, USART_TypeDef *uart);
+
+/**
  * @brief UART device configurations
  */
 static uart_conf_t config[UART_NUMOF];
@@ -136,64 +144,66 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, uart_tx_cb_t t
 		return -1;
 	}
 
-	// Select the base address of the UART
-//	ulBase = g_ulUARTBase[uart];
+	int res = uart_init_blocking(uart, baudrate);
+	if(res < 0){
+		return res;
+	}
 
-	// Configure the relevant UART pins for operations as a UART rather than GPIOs.
-#if UART_0_EN
-	ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_UART0);
-	ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
-	// Set GPIO A0 and A1 as UART pins
-	ROM_GPIOPinConfigure(GPIO_PA0_U0RX);
-	ROM_GPIOPinConfigure(GPIO_PA1_U0TX);
-	ROM_GPIOPinTypeUART(GPIO_PORTA_BASE, GPIO_PIN_0 | GPIO_PIN_1);
-#endif
-	ROM_UARTDisable(UART0_BASE);
-	// Enable the UART Peripheral for use
-	//	SysCtlPeripheralEnable(g_ulUARTPeriph[uart]);
-	// Configure the UART
 
-	/* save callbacks */
+/* save callbacks */
     config[uart].rx_cb = rx_cb;
     config[uart].tx_cb = tx_cb;
     config[uart].arg = arg;
 
-	ROM_UARTConfigSetExpClk(UART0_BASE,ROM_SysCtlClockGet(), baudrate,
-			(UART_CONFIG_PAR_NONE | UART_CONFIG_STOP_ONE |
-			 UART_CONFIG_WLEN_8));
+// Select the base address of the UART
+//	ulBase = g_ulUARTBase[uart];
 
-
-
-	// Enable the UART interrupt
-	ROM_UARTIntEnable(UART0_BASE, UART_INT_RX | UART_INT_RT);
-	ROM_IntEnable(INT_UART0);
-
-	ROM_UARTEnable(UART0_BASE);
-
-	return 1;
+	// Configure the relevant UART pins for operations as a UART rather than GPIOs.
+	/* enable recieve interrupt */
+	switch (uart){
+#if UART_0_EN
+		case UART_0:
+			NVIC_SetPriority(UART_0_IRQ_CHAN, UART_IRQ_PRIO);
+			// Enable the UART interrupt
+            NVIC_EnableIRQ(UART_0_IRQ_CHAN);
+			//ROM_UARTIntEnable(UART0_BASE, UART_INT_RX | UART_INT_RT);
+			//ROM_IntEnable(INT_UART0);
+			break;
+#endif
+#if UART_1_EN
+		case UART_1:
+            NVIC_SetPriority(UART_1_IRQ_CHAN, UART_IRQ_PRIO);
+			// Enable the UART interrupt
+            NVIC_EnableIRQ(UART_1_IRQ_CHAN);
+		//	ROM_UARTIntEnable(UART1_BASE, UART_INT_RX | UART_INT_RT);
+		//	ROM_IntEnable(INT_UART1);
+			break;
+#endif
+	}
+	return 0;
 }
-
-
 
 int uart_init_blocking(uart_t uart, uint32_t baudrate)
 {
-	ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
-	ROM_GPIOPinConfigure(GPIO_PA0_U0RX);
-	ROM_GPIOPinConfigure(GPIO_PA1_U0TX);
-	ROM_GPIOPinTypeUART(GPIO_PORTA_BASE, GPIO_PIN_0 | GPIO_PIN_1);
+	switch(uart){
+#if UART_0_EN
+		case UART_0:
+			ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_UART0);
+			ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
+			ROM_GPIOPinConfigure(GPIO_PA0_U0RX);
+			ROM_GPIOPinConfigure(GPIO_PA1_U0TX);
+			ROM_GPIOPinTypeUART(GPIO_PORTA_BASE, GPIO_PIN_0 | GPIO_PIN_1);
 
-	ROM_UARTConfigSetExpClk(UART0_BASE,ROM_SysCtlClockGet(), baudrate,
-			(UART_CONFIG_PAR_NONE | UART_CONFIG_STOP_ONE |
-			 UART_CONFIG_WLEN_8));
+			ROM_UARTDisable(UART0_BASE);
+			ROM_UARTConfigSetExpClk(UART0_BASE,ROM_SysCtlClockGet(), baudrate,
+					(UART_CONFIG_PAR_NONE | UART_CONFIG_STOP_ONE |
+					 UART_CONFIG_WLEN_8));
 
-
-	// Enable the UART interrupt
-	//UARTIntEnable(UART0_BASE, UART_INT_RX | UART_INT_RT);
-	//IntEnable(INT_UART0);
-
-	ROM_UARTEnable(UART0_BASE);
-
-    return 1;
+			ROM_UARTEnable(UART0_BASE);
+			break;
+#endif
+		}
+	return 0;
 }
 
 void uart_tx_begin(uart_t uart)
