@@ -18,7 +18,7 @@ some targets to control RIOT experiments on IoT-LAB using the GNU Make build
 system. In order to use this, one has to include this Makefile at the end of
 the application's Makefile, like this:
 ```
-include $(RIOTBASE)/dist/testbed-support/Makefile.iot-lab
+include $(RIOTBASE)/dist/testbed-support/Makefile.iotlab
 ```
 ### Variables
 
