@@ -1,0 +1,23 @@
+# define the cpu used by the ek-lm4f120xl board
+export CPU = lm4f120
+export CPU_MODEL = lm4f120
+
+#define the default port depending on the host OS
+PORT_LINUX ?= /dev/ttyACM0
+PORT_DARWIN ?= $(shell ls -1 /dev/tty.SLAB_USBtoUART* | head -n 1)
+
+# setup serial terminal
+include $(RIOTBOARD)/Makefile.include.serial
+
+# this board uses openocd
+include $(RIOTBOARD)/Makefile.include.openocd
+
+# include cortex defaults
+include $(RIOTBOARD)/Makefile.include.cortexm_common
+
+# define stellaris specific flags and includes
+export STELLARISWARE = $(RIOTCPU)/stellaris_common/include
+
+# define build specific options
+PART = LM4F120H5QR
+export CFLAGS += -I$(STELLARISWARE) -DPART_$(PART) -c -DTARGET_IS_BLIZZARD_RA1
