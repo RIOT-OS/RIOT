@@ -25,9 +25,9 @@
 /*
  * Counting semaphores for inhibiting undesired power modes.
  */
-atomic_int_t kinetis_lpm_inhibit_stop_sema = {0};
-atomic_int_t kinetis_lpm_inhibit_vlps_sema = {0};
-atomic_int_t kinetis_lpm_inhibit_lls_sema  = {0};
+atomic_int_t kinetis_lpm_inhibit_stop_sema = ATOMIC_INIT(0);
+atomic_int_t kinetis_lpm_inhibit_vlps_sema = ATOMIC_INIT(0);
+atomic_int_t kinetis_lpm_inhibit_lls_sema  = ATOMIC_INIT(0);
 
 static inline void wait(void)
 {
@@ -75,15 +75,15 @@ static inline void stop(uint8_t stopmode)
 
 static void kinetis_low_power_mode(void)
 {
-    if (kinetis_lpm_inhibit_stop_sema.value != 0) {
+    if (ATOMIC_VALUE(kinetis_lpm_inhibit_stop_sema) != 0) {
         /* STOP inhibited, go to WAIT mode */
         wait();
     }
-    else if (kinetis_lpm_inhibit_vlps_sema.value != 0) {
+    else if (ATOMIC_VALUE(kinetis_lpm_inhibit_vlps_sema) != 0) {
         /* VLPS inhibited, go to normal STOP mode */
         stop(KINETIS_POWER_MODE_NORMAL);
     }
-    else if (kinetis_lpm_inhibit_lls_sema.value != 0) {
+    else if (ATOMIC_VALUE(kinetis_lpm_inhibit_lls_sema) != 0) {
         /* LLS inhibited, go to VLPS mode */
         stop(KINETIS_POWER_MODE_VLPS);
     }
@@ -98,6 +98,7 @@ void lpm_arch_init(void)
     /* Setup Low Leakage Wake-up Unit (LLWU) */
     LLWU_UNLOCK();           /* Enable LLWU clock gate */
     KINETIS_PMPROT_UNLOCK(); /* Enable all available power modes */
+
     /* Enables wake on LPTMR, to let the hwtimer take the chip out of sleep */
     kinetis_lpm_enable_wakeup_module(KINETIS_LPM_WAKEUP_MODULE_LPTMR);
 
@@ -149,12 +150,23 @@ void lpm_arch_end_awake(void)
     /* TODO */
 }
 
-void kinetis_lpm_enable_wakeup_module(const uint8_t module) {
+void kinetis_lpm_enable_wakeup_module(const uint8_t module)
+{
     /* Use bit-banding for thread-safety instead of disabling interrupts */
-    BITBAND_REG32(LLWU->ME, module) = 1;
+    BITBAND_REG8(LLWU->ME, module) = 1;
 }
 
-void kinetis_lpm_disable_wakeup_module(const uint8_t module) {
+void kinetis_lpm_disable_wakeup_module(const uint8_t module)
+{
     /* Use bit-banding for thread-safety instead of disabling interrupts */
-    BITBAND_REG32(LLWU->ME, module) = 0;
+    BITBAND_REG8(LLWU->ME, module) = 0;
+}
+
+void isr_llwu(void)
+{
+    /* Clear all module wake up flags */
+    LLWU->F1 = 0xFF;
+    LLWU->F2 = 0xFF;
+    /* LLWU->F3 flags are cleared automatically when the modules' interrupt
+     * flags are cleared. */
 }
