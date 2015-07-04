@@ -106,6 +106,8 @@
  * @name GPIO configuration
  * @{
  */
+#define GPIO_IRQ_PRIO       1
+
 #define GPIO_0_EN           1
 #define GPIO_1_EN           1
 #define GPIO_2_EN           1
@@ -118,7 +120,26 @@
 #define GPIO_9_EN           1
 #define GPIO_10_EN          1
 #define GPIO_11_EN          1
-#define GPIO_IRQ_PRIO       1
+#define GPIO_12_EN          1
+#define GPIO_13_EN          1
+#define GPIO_14_EN          1
+#define GPIO_15_EN          1
+#define GPIO_16_EN          1
+#define GPIO_17_EN          1
+#define GPIO_18_EN          1
+#define GPIO_19_EN          1
+#define GPIO_20_EN          1
+#define GPIO_21_EN          1
+#define GPIO_22_EN          1
+#define GPIO_23_EN          1
+#define GPIO_24_EN          1
+#define GPIO_25_EN          1
+#define GPIO_26_EN          1
+#define GPIO_27_EN          1
+#define GPIO_28_EN          1
+#define GPIO_29_EN          1
+#define GPIO_30_EN          1
+#define GPIO_31_EN          1
 
 /* GPIO channel configuration */
 #define GPIO_0_PIN          GPIO_PA0
@@ -133,6 +154,26 @@
 #define GPIO_9_PIN          GPIO_PB1
 #define GPIO_10_PIN         GPIO_PB2
 #define GPIO_11_PIN         GPIO_PB3
+#define GPIO_12_PIN         GPIO_PB4
+#define GPIO_13_PIN         GPIO_PB5
+#define GPIO_14_PIN         GPIO_PB6
+#define GPIO_15_PIN         GPIO_PB7
+#define GPIO_16_PIN         GPIO_PC0
+#define GPIO_17_PIN         GPIO_PC1
+#define GPIO_18_PIN         GPIO_PC2
+#define GPIO_19_PIN         GPIO_PC3
+#define GPIO_20_PIN         GPIO_PC4
+#define GPIO_21_PIN         GPIO_PC5
+#define GPIO_22_PIN         GPIO_PC6
+#define GPIO_23_PIN         GPIO_PC7
+#define GPIO_24_PIN         GPIO_PD0
+#define GPIO_25_PIN         GPIO_PD1
+#define GPIO_26_PIN         GPIO_PD2
+#define GPIO_27_PIN         GPIO_PD3
+#define GPIO_28_PIN         GPIO_PD4
+#define GPIO_29_PIN         GPIO_PD5
+#define GPIO_30_PIN         GPIO_PD6
+#define GPIO_31_PIN         GPIO_PD7
 /** @} */
 
 #ifdef __cplusplus
