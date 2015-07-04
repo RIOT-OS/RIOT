@@ -120,54 +120,19 @@
 #define GPIO_11_EN          1
 #define GPIO_IRQ_PRIO       1
 
-/* GPIO 0 configuration */
-#define GPIO_0_PORT         GPIO_A
-#define GPIO_0_PIN          0
-#define GPIO_0_OVER         PA_OVER
-/* GPIO 1 configuration */
-#define GPIO_1_PORT         GPIO_A
-#define GPIO_1_PIN          1
-#define GPIO_1_OVER         PA_OVER
-/* GPIO 2 configuration */
-#define GPIO_2_PORT         GPIO_A
-#define GPIO_2_PIN          2
-#define GPIO_2_OVER         PA_OVER
-/* GPIO 3 configuration */
-#define GPIO_3_PORT         GPIO_A
-#define GPIO_3_PIN          3
-#define GPIO_3_OVER         PA_OVER
-/* GPIO 4 configuration */
-#define GPIO_4_PORT         GPIO_A
-#define GPIO_4_PIN          4
-#define GPIO_4_OVER         PA_OVER
-/* GPIO 5 configuration */
-#define GPIO_5_PORT         GPIO_A
-#define GPIO_5_PIN          5
-#define GPIO_5_OVER         PA_OVER
-/* GPIO 6 configuration */
-#define GPIO_6_PORT         GPIO_A
-#define GPIO_6_PIN          6
-#define GPIO_6_OVER         PA_OVER
-/* GPIO 7 configuration */
-#define GPIO_7_PORT         GPIO_A
-#define GPIO_7_PIN          7
-#define GPIO_7_OVER         PA_OVER
-/* GPIO 8 configuration */
-#define GPIO_8_PORT         GPIO_B
-#define GPIO_8_PIN          0
-#define GPIO_8_OVER         PB_OVER
-/* GPIO 9 configuration */
-#define GPIO_9_PORT         GPIO_B
-#define GPIO_9_PIN          1
-#define GPIO_9_OVER         PB_OVER
-/* GPIO 10 configuration */
-#define GPIO_10_PORT        GPIO_B
-#define GPIO_10_PIN         2
-#define GPIO_10_OVER        PB_OVER
-/* GPIO 11 configuration */
-#define GPIO_11_PORT        GPIO_B
-#define GPIO_11_PIN         3
-#define GPIO_11_OVER        PB_OVER
+/* GPIO channel configuration */
+#define GPIO_0_PIN          GPIO_PA0
+#define GPIO_1_PIN          GPIO_PA1
+#define GPIO_2_PIN          GPIO_PA2
+#define GPIO_3_PIN          GPIO_PA3
+#define GPIO_4_PIN          GPIO_PA4
+#define GPIO_5_PIN          GPIO_PA5
+#define GPIO_6_PIN          GPIO_PA6
+#define GPIO_7_PIN          GPIO_PA7
+#define GPIO_8_PIN          GPIO_PB0
+#define GPIO_9_PIN          GPIO_PB1
+#define GPIO_10_PIN         GPIO_PB2
+#define GPIO_11_PIN         GPIO_PB3
 /** @} */
 
 #ifdef __cplusplus
