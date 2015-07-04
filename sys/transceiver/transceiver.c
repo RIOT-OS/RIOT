@@ -634,7 +634,7 @@ void receive_mc1322x_packet(ieee802154_packet_t *trans_p)
 {
     maca_packet_t *maca_pkt;
     dINT();
-    maca_pkt = maca_get_rx_packet();
+    maca_pkt = (maca_packet_t *)maca_get_rx_packet();
     trans_p->lqi = maca_pkt->lqi;
     trans_p->length = maca_pkt->length;
     memcpy((void *) &(data_buffer[transceiver_buffer_pos * PAYLOAD_SIZE]), maca_pkt->data, MACA_MAX_PAYLOAD_SIZE);
@@ -748,7 +748,7 @@ static int8_t send_packet(transceiver_type_t t, void *pkt)
     cc110x_packet_t cc110x_pkt;
 #endif
 #ifdef MODULE_MC1322X
-    maca_packet_t *maca_pkt = maca_get_free_packet();
+    maca_packet_t *maca_pkt = (maca_packet_t *)maca_get_free_packet();
 #endif
 
 #ifdef MODULE_CC2420
