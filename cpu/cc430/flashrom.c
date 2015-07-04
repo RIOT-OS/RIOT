@@ -23,8 +23,8 @@
 #include "cpu.h"
 #include "irq.h"
 
-static uint8_t prepare(void);
-static void finish(uint8_t istate);
+static inline uint8_t prepare(void);
+static inline void finish(uint8_t istate);
 static inline void busy_wait(void);
 
 /**
@@ -52,7 +52,7 @@ uint8_t flashrom_write(uint8_t *dst, const uint8_t *src, size_t size)
 /**
  * @TODO implement this function
  */
-static uint8_t prepare(void)
+static inline uint8_t prepare(void)
 {
     return 0;
 }
@@ -60,7 +60,7 @@ static uint8_t prepare(void)
 /**
  * @TODO implement this function
  */
-void finish(uint8_t istate)
+static inline void finish(uint8_t istate)
 {
     (void) istate;
 }
