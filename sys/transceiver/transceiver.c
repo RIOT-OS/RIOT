@@ -239,8 +239,9 @@ kernel_pid_t transceiver_start(void)
 /* Register an upper layer thread */
 uint8_t transceiver_register(transceiver_type_t t, kernel_pid_t pid)
 {
+    unsigned state;
     int result = 0;
-    unsigned state = disableIRQ();
+    state = disableIRQ();
     for (size_t i = 0; i < TRANSCEIVER_MAX_REGISTERED; i++) {
         if ((reg[i].pid == pid) || (reg[i].transceivers == TRANSCEIVER_NONE)) {
             reg[i].transceivers |= t;
@@ -258,8 +259,9 @@ uint8_t transceiver_register(transceiver_type_t t, kernel_pid_t pid)
 /* Unregister an upper layer thread */
 uint8_t transceiver_unregister(transceiver_type_t t, kernel_pid_t pid)
 {
+    unsigned state;
     int result = 0;
-    unsigned state = disableIRQ();
+    state = disableIRQ();
     for (size_t i = 0; i < TRANSCEIVER_MAX_REGISTERED; ++i) {
         if (reg[i].pid == pid) {
             reg[i].transceivers &= ~t;
@@ -539,9 +541,12 @@ static void receive_packet(uint16_t type, uint8_t pos)
  */
 static void receive_cc110x_packet(radio_packet_t *trans_p)
 {
+    unsigned state;
     DEBUG("transceiver: Handling CC1100 packet\n");
+
     /* disable interrupts while copying packet */
-    dINT();
+    state = disableIRQ();
+
     cc110x_packet_t p = cc110x_rx_buffer[rx_buffer_pos].packet;
 
     trans_p->src = p.phy_src;
@@ -550,7 +555,7 @@ static void receive_cc110x_packet(radio_packet_t *trans_p)
     trans_p->lqi = cc110x_rx_buffer[rx_buffer_pos].lqi;
     trans_p->length = p.length - CC1100_HEADER_LENGTH;
     memcpy((void *) &(data_buffer[transceiver_buffer_pos * PAYLOAD_SIZE]), p.data, CC1100_MAX_DATA_LENGTH);
-    eINT();
+    restoreIRQ(state);
 
     trans_p->data = (uint8_t *) &(data_buffer[transceiver_buffer_pos * CC1100_MAX_DATA_LENGTH]);
     DEBUG("transceiver: Packet %p (%p) was from %hu to %hu, size: %u\n", trans_p, trans_p->data, trans_p->src, trans_p->dst, trans_p->length);
@@ -560,14 +565,18 @@ static void receive_cc110x_packet(radio_packet_t *trans_p)
 #ifdef MODULE_CC110X_LEGACY_CSMA
 void receive_cc1100_packet(radio_packet_t *trans_p)
 {
-    dINT();
+    unsigned state;
+
+    /* disable interrupts while copying packet */
+    state = disableIRQ();
+
     trans_p->src = cc1100_packet_info->source;
     trans_p->dst = cc1100_packet_info->destination;
     trans_p->rssi = cc1100_packet_info->rssi;
     trans_p->lqi = cc1100_packet_info->lqi;
     trans_p->length = cc1100_payload_size;
     memcpy((void *) &(data_buffer[transceiver_buffer_pos * PAYLOAD_SIZE]), cc1100_payload, CC1100_MAX_DATA_LENGTH);
-    eINT();
+    restoreIRQ(state);
 
     trans_p->data = (uint8_t *) &(data_buffer[transceiver_buffer_pos * CC1100_MAX_DATA_LENGTH]);
     DEBUG("transceiver: Packet %p (%p) was from %hu to %hu, size: %u\n", trans_p, trans_p->data, trans_p->src, trans_p->dst, trans_p->length);
@@ -578,8 +587,12 @@ void receive_cc1100_packet(radio_packet_t *trans_p)
 #ifdef MODULE_CC2420
 void receive_cc2420_packet(ieee802154_packet_t *trans_p)
 {
+    unsigned state;
     DEBUG("transceiver: Handling CC2420 packet\n");
-    dINT();
+
+    /* disable interrupts while copying packet */
+    state = disableIRQ();
+
     cc2420_packet_t *p = &cc2420_rx_buffer[rx_buffer_pos];
     trans_p->length = p->length;
     memcpy(&trans_p->frame, &p->frame, sizeof(trans_p->frame));
@@ -590,7 +603,7 @@ void receive_cc2420_packet(ieee802154_packet_t *trans_p)
            p->frame.payload, p->frame.payload_len);
     trans_p->frame.payload = (uint8_t *) & (data_buffer[transceiver_buffer_pos * CC2420_MAX_DATA_LENGTH]);
     trans_p->frame.payload_len = p->frame.payload_len;
-    eINT();
+    restoreIRQ(state);
 
 #if ENABLE_DEBUG
 
@@ -632,14 +645,18 @@ void receive_cc2420_packet(ieee802154_packet_t *trans_p)
 #ifdef MODULE_MC1322X
 void receive_mc1322x_packet(ieee802154_packet_t *trans_p)
 {
+    unsigned state;
     maca_packet_t *maca_pkt;
-    dINT();
-    maca_pkt = (maca_packet_t *)maca_get_rx_packet();
+
+    /* disable interrupts while copying packet */
+    state = disableIRQ();
+
+    maca_pkt = maca_get_rx_packet();
     trans_p->lqi = maca_pkt->lqi;
     trans_p->length = maca_pkt->length;
     memcpy((void *) &(data_buffer[transceiver_buffer_pos * PAYLOAD_SIZE]), maca_pkt->data, MACA_MAX_PAYLOAD_SIZE);
     maca_free_packet(maca_pkt);
-    eINT();
+    restoreIRQ(state);
 
     trans_p->frame.payload = (uint8_t *) &(data_buffer[transceiver_buffer_pos * MACA_MAX_PAYLOAD_SIZE]);
 }
@@ -671,8 +688,12 @@ void receive_nativenet_packet(radio_packet_t *trans_p)
 #ifdef MODULE_AT86RF231
 void receive_at86rf231_packet(ieee802154_packet_t *trans_p)
 {
+    unsigned state;
     DEBUG("Handling AT86RF231 packet\n");
-    dINT();
+
+    /* disable interrupts while copying packet */
+    state = disableIRQ();
+
     at86rf231_packet_t *p = &at86rf231_rx_buffer[rx_buffer_pos];
     trans_p->length = p->length;
     trans_p->rssi = p->rssi;
@@ -683,7 +704,7 @@ void receive_at86rf231_packet(ieee802154_packet_t *trans_p)
            p->frame.payload_len);
     trans_p->frame.payload = (uint8_t *) & (data_buffer[transceiver_buffer_pos * AT86RF231_MAX_DATA_LENGTH]);
     trans_p->frame.payload_len = p->frame.payload_len;
-    eINT();
+    restoreIRQ(state);
 
 #if ENABLE_DEBUG
 
@@ -748,7 +769,7 @@ static int8_t send_packet(transceiver_type_t t, void *pkt)
     cc110x_packet_t cc110x_pkt;
 #endif
 #ifdef MODULE_MC1322X
-    maca_packet_t *maca_pkt = (maca_packet_t *)maca_get_free_packet();
+    maca_packet_t *maca_pkt = maca_get_free_packet();
 #endif
 
 #ifdef MODULE_CC2420
