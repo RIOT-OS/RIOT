@@ -29,6 +29,7 @@
 #include "vtimer.h"
 #include "thread.h"
 #include "transceiver.h"
+#include "timex.h"
 
 #include "sixlowpan/ip.h"
 #include "ieee802154_frame.h"
@@ -143,7 +144,7 @@ void etx_show_candidates(void)
 void etx_init_beaconing(ipv6_addr_t *address)
 {
     own_address = address;
-    //set code
+    /* set code */
     DEBUGF("ETX BEACON INIT");
     etx_send_buf[0] = ETX_PKT_OPTVAL;
 
@@ -158,7 +159,7 @@ void etx_init_beaconing(ipv6_addr_t *address)
     etx_clock_pid = thread_create(etx_clock_buf, sizeof(etx_clock_buf),
                                   THREAD_PRIORITY_MAIN - 1, CREATE_STACKTEST,
                                   etx_clock, NULL, "etx_clock");
-    //register at transceiver
+    /* register at transceiver */
     transceiver_register(TRANSCEIVER_CC1100, etx_radio_pid);
     DEBUG("...[DONE]\n");
 }
@@ -178,7 +179,7 @@ static void *etx_beacon(void *arg)
     while (true) {
         thread_sleep();
         mutex_lock(&etx_mutex);
-        //Build etx packet
+        /* Build etx packet */
         uint8_t p_length = 0;
 
         for (uint8_t i = 0; i < ETX_BEST_CANDIDATES; i++) {
@@ -203,7 +204,7 @@ static void *etx_beacon(void *arg)
 
         if (cur_round == ETX_WINDOW) {
             if (reached_window != 1) {
-                //first round is through
+                /* first round is through */
                 reached_window = 1;
             }
 
@@ -257,10 +258,14 @@ static void *etx_clock(void *arg)
          * for now.
          */
         vtimer_usleep(
-            ((ETX_INTERVAL - ETX_MAX_JITTER)*MS) + jittercorrection * MS + jitter * MS - ETX_CLOCK_ADJUST);
+            ((ETX_INTERVAL - ETX_MAX_JITTER) * MS_IN_USEC) +
+            jittercorrection * MS_IN_USEC +
+            jitter * MS_IN_USEC - ETX_CLOCK_ADJUST);
 
-        //hwtimer_wait(
-        //        HWTIMER_TICKS(((ETX_INTERVAL - ETX_MAX_JITTER)*MS) + jittercorrection*MS + jitter*MS - ETX_CLOCK_ADJUST));
+        /* hwtimer_wait(HWTIMER_TICKS(
+            ((ETX_INTERVAL - ETX_MAX_JITTER)*MS_IN_USEC) +
+            jittercorrection*MS_IN_USEC +
+            jitter*MS_IN_USEC - ETX_CLOCK_ADJUST)); */
 
         jittercorrection = (ETX_MAX_JITTER) - jitter;
         jitter = (uint8_t)(rand() % ETX_JITTER_MOD);
@@ -275,12 +280,12 @@ double etx_get_metric(ipv6_addr_t *address)
 
     if (candidate != NULL) {
         if (etx_count_packet_tx(candidate) > 0) {
-            //this means the current etx_value is not outdated
+            /* this means the current etx_value is not outdated */
             return candidate->cur_etx;
         }
         else {
-            //The last time I received a packet is too long ago to give a
-            //good estimate of the etx value
+            /* The last time I received a packet is too long ago to give a */
+            /* good estimate of the etx value */
             return 0;
         }
     }
@@ -319,11 +324,11 @@ etx_neighbor_t *etx_add_candidate(ipv6_addr_t *address)
                                            + ETX_MAX_CANDIDATE_NEIGHBORS; candidate < end;
          candidate++) {
         if (candidate->used) {
-            //skip
+            /* skip */
             continue;
         }
         else {
-            //We still have a free place add the new candidate
+            /* We still have a free place add the new candidate */
             memset(candidate, 0, sizeof(*candidate));
             candidate->addr = *address;
             candidate->cur_etx = 0;
@@ -353,7 +358,7 @@ void etx_handle_beacon(ipv6_addr_t *candidate_address)
     etx_neighbor_t *candidate = etx_find_candidate(candidate_address);
 
     if (candidate == NULL) {
-        //Candidate was not found in my list, I should add it
+        /* Candidate was not found in my list, I should add it */
         candidate = etx_add_candidate(candidate_address);
 
         if (candidate == NULL) {
@@ -363,12 +368,12 @@ void etx_handle_beacon(ipv6_addr_t *candidate_address)
         }
     }
 
-    //I have received 1 packet from this candidate in this round
-    //This value will be reset by etx_update to 0
+    /* I have received 1 packet from this candidate in this round */
+    /* This value will be reset by etx_update to 0 */
     candidate->tx_cur_round = 1;
 
-    // If i find my address in this probe, update the packet_rx value for
-    // this candidate.
+    /*  If i find my address in this probe, update the packet_rx value for */
+    /*  this candidate. */
     etx_probe_t *rec_pkt = etx_get_rec_buf();
 
     for (uint8_t i = 0; i < rec_pkt->length / ETX_TUPLE_SIZE; i++) {
@@ -384,7 +389,7 @@ void etx_handle_beacon(ipv6_addr_t *candidate_address)
         }
     }
 
-    //Last, update the ETX value for this candidate
+    /* Last, update the ETX value for this candidate */
     etx_update(candidate);
 }
 
@@ -414,14 +419,14 @@ static void *etx_radio(void *arg)
             ieee802154_frame_read(p->data, &frame, p->length);
 
             if (frame.payload[0] == ETX_PKT_OPTVAL) {
-                //copy to receive buffer
+                /* copy to receive buffer */
                 memcpy(etx_rec_buf, &frame.payload[0], frame.payload_len);
 
-                //create IPv6 address from radio packet
-                //we can do the cast here since rpl nodes can only have addr
-                //up to 8 bits
+                /* create IPv6 address from radio packet */
+                /* we can do the cast here since rpl nodes can only have addr */
+                /* up to 8 bits */
                 candidate_addr.uint8[ETX_IPV6_LAST_BYTE] = (uint8_t) p->src;
-                //handle the beacon
+                /* handle the beacon */
                 mutex_lock(&etx_mutex);
                 etx_handle_beacon(&candidate_addr);
                 mutex_unlock(&etx_mutex);
@@ -433,7 +438,7 @@ static void *etx_radio(void *arg)
             DEBUGF("Transceiver buffer full\n");
         }
         else {
-            //packet is not for me, whatever
+            /* packet is not for me, whatever */
         }
     }
 
@@ -450,8 +455,8 @@ void etx_update(etx_neighbor_t *candidate)
     double d_r;
 
     if (reached_window != 1 || candidate == NULL) {
-        //We will wait at least ETX_WINDOW beacons until we decide to
-        //calculate an ETX value, so that we have a good estimate
+        /* We will wait at least ETX_WINDOW beacons until we decide to */
+        /* calculate an ETX value, so that we have a good estimate */
         return;
     }
 
@@ -506,9 +511,9 @@ static uint8_t etx_count_packet_tx(etx_neighbor_t *candidate)
             }
         }
         else {
-            //Check if I received something for the current round
+            /* Check if I received something for the current round */
             if (candidate->tx_cur_round == 0) {
-                //Didn't receive a packet, zero the field and don't add
+                /* Didn't receive a packet, zero the field and don't add */
                 candidate->packets_tx[i] = 0;
                 DEBUG("%d!", candidate->packets_tx[i]);
 
@@ -517,7 +522,7 @@ static uint8_t etx_count_packet_tx(etx_neighbor_t *candidate)
                 }
             }
             else {
-                //Add 1 and set field
+                /* Add 1 and set field */
                 pkt_count = pkt_count + 1;
                 candidate->packets_tx[i] = 1;
                 DEBUG("%d!", candidate->packets_tx[i]);

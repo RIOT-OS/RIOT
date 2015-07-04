@@ -21,6 +21,7 @@
 #define ETX_BEACONING_H_
 #include <stdint.h>
 #include "sixlowpan.h"
+#include "timex.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -42,7 +43,6 @@ extern "C" {
 #define ETX_MAX_CANDIDATE_NEIGHBORS (40)
 #endif
 //ETX Interval parameters
-#define MS  (1000)
 
 /*
  * ETX_INTERVAL
@@ -51,13 +51,13 @@ extern "C" {
  * Should be divisible through 2 (For ETX_DEF_JIT_CORRECT)
  * and 5 (For ETX_MAX_JITTER) unless those values are adjusted too.
  */
-#define ETX_INTERVAL        (1000)
+#define ETX_INTERVAL        (1ul * MS_IN_USEC)
 #define ETX_WINDOW          (10)                    //10 is the default value
 #define ETX_BEST_CANDIDATES (15)                    //Sent only 15 candidates in a beaconing packet
 #define ETX_TUPLE_SIZE      (2)                     //1 Byte for Addr, 1 Byte for packets rec.
 #define ETX_PKT_REC_OFFSET  (ETX_TUPLE_SIZE - 1)    //Offset in a tuple of (addr,pkt_rec), will always be the last byte
 #define ETX_IPV6_LAST_BYTE  (15)                    //The last byte for an ipv6 address
-#define ETX_MAX_JITTER      (ETX_INTERVAL / 5)      //The default value is 20% of ETX_INTERVAL
+#define ETX_MAX_JITTER      (ETX_INTERVAL / 5ul)    //The default value is 20% of ETX_INTERVAL
 #define ETX_JITTER_MOD      (ETX_MAX_JITTER + 1)    //The modulo value for jitter computation
 #define ETX_DEF_JIT_CORRECT (ETX_MAX_JITTER / 2)    //Default Jitter correction value (normally ETX_MAX_JITTER / 2)
 #define ETX_CLOCK_ADJUST    (52500)                 //Adjustment for clockthread computations to stay close/near ETX_INTERVAL
