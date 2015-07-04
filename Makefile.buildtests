@@ -42,7 +42,7 @@ buildtest:
 		RIOTNOLINK=$$(echo $(BOARD_INSUFFICIENT_RAM) | grep $${BOARD} 2>&1 >/dev/null && echo 1); \
 		${COLOR_ECHO} -n "Building for $${BOARD} "; \
 		[ -n "$${RIOTNOLINK}" ] && ${COLOR_ECHO} -n "(no linking) "; \
-		for NTH_TRY in 1 2; do \
+		for NTH_TRY in 1 2 3; do \
 			${COLOR_ECHO} -n ".. "; \
 			LOG=$$(env -i \
 					HOME=$${HOME} \
@@ -57,10 +57,10 @@ buildtest:
 					BINDIRBASE=$${BINDIRBASE} \
 					RIOTNOLINK=$${RIOTNOLINK} \
 					RIOT_VERSION=$${RIOT_VERSION} \
-					$(MAKE) -j$(NPROC) 2>&1 >/dev/null) ; \
+					$(MAKE) -j$(NPROC) 2>&1) ; \
 			if [ "$${?}" = "0" ]; then \
 				${COLOR_ECHO} "${COLOR_GREEN}success${COLOR_RESET}"; \
-			elif [ -n "$${RIOT_DO_RETRY}" ] && $${BUILDTESTOK} && [ $${NTH_TRY} = 1 ]; then \
+			elif [ -n "$${RIOT_DO_RETRY}" ] && $${BUILDTESTOK} && [ $${NTH_TRY} != 3 ]; then \
 				${COLOR_ECHO} -n "${COLOR_PURPLE}retrying${COLOR_RESET} "; \
 				continue; \
 			else \
