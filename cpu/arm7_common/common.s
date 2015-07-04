@@ -40,25 +40,6 @@
   .global  cpu_switch_context_exit
   .global  task_return
   .global  ctx_switch
-  .global  dINT
-  .global  eINT
-
-.func
-dINT:
-    mrs     r0,  cpsr
-
-    orr     r0, r0, #NOINT              /* Disable Int */
-    msr     CPSR_c, r0
-    mov     pc,lr
-.endfunc
-
-.func
-eINT:
-    mrs     r0,  cpsr
-    and     r0, r0, #~NOINT              /* Enable Int */
-    msr     CPSR_c, r0
-    mov     pc,lr
-.endfunc
 
 ctx_switch:
     /* Save return address on stack */
