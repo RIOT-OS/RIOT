@@ -88,18 +88,24 @@ static inline size_t __total_sz(_used_t *node)
 }
 
 /**
- * @brief   aligned size with metadata
+ * @brief   aligns @p size to the next word alignment.
  */
-static inline size_t __al_total_sz(_used_t *node)
+static inline size_t _al_sz(size_t size)
 {
-    size_t size = __total_sz(node);
-
     if (size % _PKTBUF_ALIGN_BYTES) {
         return size + (_PKTBUF_ALIGN_BYTES - (size % _PKTBUF_ALIGN_BYTES));
     }
     else {
         return size;
     }
+}
+
+/**
+ * @brief   aligned size with metadata
+ */
+static inline size_t __al_total_sz(_used_t *node)
+{
+    return _al_sz(__total_sz(node));
 }
 
 /**
@@ -141,6 +147,9 @@ static _used_t *_find(_used_t **prev_ptr, _used_t **node_ptr, const void *ptr)
     return NULL;
 }
 
+/**
+ * @brief   Allocate chunk of @p size in _buf
+ */
 void *_pktbuf_internal_alloc(size_t size)
 {
     _used_t *node = _head(), *old_next, *new_next;
@@ -163,9 +172,9 @@ void *_pktbuf_internal_alloc(size_t size)
         }
     }
 
-    while ((node->next != NULL)
+    while ((node->next != NULL) /* while not last chunk allocation */
            /* and if space between current and next allocation is not big enough */
-           && ((_start_idx(node->next) - _end_idx(node)) < _total_sz(size))) {
+           && ((_start_idx(node->next) - _end_idx(node)) < _al_sz(_total_sz(size)))) {
         node = node->next;
     }
 
