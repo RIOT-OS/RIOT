@@ -187,7 +187,7 @@ extern "C" {
 
 #define INPACK(n, x, m) \
    x = in[4 * (n)] ^ (in[4 * (n) + 1] << 8) \
-     ^ (in[4 * (n) + 2] << 16) ^ (in[4 * (n) + 3] << 24) ^ ctx->w[m]
+     ^ ((uint32_t)in[4 * (n) + 2] << 16) ^ ((uint32_t)in[4 * (n) + 3] << 24) ^ ctx->w[m]
 
 #define OUTUNPACK(n, x, m) \
    x ^= ctx->w[m]; \
