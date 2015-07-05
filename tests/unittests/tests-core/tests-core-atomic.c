@@ -162,13 +162,13 @@ static void test_atomic_cas_same(void)
 {
     atomic_int_t res = ATOMIC_INIT(0);
 
-    TEST_ASSERT_EQUAL_INT(1, atomic_cas(&res, 0, 1234567));
-    TEST_ASSERT_EQUAL_INT(1234567, ATOMIC_VALUE(res));
-    TEST_ASSERT_EQUAL_INT(1, atomic_cas(&res, 1234567, -987654321));
-    TEST_ASSERT_EQUAL_INT(-987654321, ATOMIC_VALUE(res));
-    TEST_ASSERT_EQUAL_INT(1, atomic_cas(&res, -987654321, -987654321));
-    TEST_ASSERT_EQUAL_INT(-987654321, ATOMIC_VALUE(res));
-    TEST_ASSERT_EQUAL_INT(1, atomic_cas(&res, -987654321, 0));
+    TEST_ASSERT_EQUAL_INT(1, atomic_cas(&res, 0, 12345));
+    TEST_ASSERT_EQUAL_INT(12345, ATOMIC_VALUE(res));
+    TEST_ASSERT_EQUAL_INT(1, atomic_cas(&res, 12345, -9876));
+    TEST_ASSERT_EQUAL_INT(-9876, ATOMIC_VALUE(res));
+    TEST_ASSERT_EQUAL_INT(1, atomic_cas(&res, -9876, -9876));
+    TEST_ASSERT_EQUAL_INT(-9876, ATOMIC_VALUE(res));
+    TEST_ASSERT_EQUAL_INT(1, atomic_cas(&res, -9876, 0));
     TEST_ASSERT_EQUAL_INT(0, ATOMIC_VALUE(res));
 }
 
@@ -177,15 +177,15 @@ static void test_atomic_cas_diff(void)
 {
     atomic_int_t res = ATOMIC_INIT(32767);
 
-    TEST_ASSERT_EQUAL_INT(0, atomic_cas(&res, 65535, 12345));
+    TEST_ASSERT_EQUAL_INT(0, atomic_cas(&res, 22222, 12345));
     TEST_ASSERT_EQUAL_INT(32767, ATOMIC_VALUE(res));
-    ATOMIC_VALUE(res) = -12345687;
-    TEST_ASSERT_EQUAL_INT(0, atomic_cas(&res, 12345687, 123456789));
-    TEST_ASSERT_EQUAL_INT(-12345687, ATOMIC_VALUE(res));
-    TEST_ASSERT_EQUAL_INT(0, atomic_cas(&res, 12345687, 12345687));
-    TEST_ASSERT_EQUAL_INT(-12345687, ATOMIC_VALUE(res));
-    TEST_ASSERT_EQUAL_INT(0, atomic_cas(&res, 12345687, -12345687));
-    TEST_ASSERT_EQUAL_INT(-12345687, ATOMIC_VALUE(res));
+    ATOMIC_VALUE(res) = -12345;
+    TEST_ASSERT_EQUAL_INT(0, atomic_cas(&res, 12345, 12345));
+    TEST_ASSERT_EQUAL_INT(-12345, ATOMIC_VALUE(res));
+    TEST_ASSERT_EQUAL_INT(0, atomic_cas(&res, 12345, 12345));
+    TEST_ASSERT_EQUAL_INT(-12345, ATOMIC_VALUE(res));
+    TEST_ASSERT_EQUAL_INT(0, atomic_cas(&res, 12345, -12345));
+    TEST_ASSERT_EQUAL_INT(-12345, ATOMIC_VALUE(res));
 }
 
 /* Test ATOMIC_VALUE */
@@ -195,10 +195,10 @@ static void test_atomic_value(void)
     atomic_int_t *ptr = &res;
 
     TEST_ASSERT_EQUAL_INT(12345, ATOMIC_VALUE(res));
-    ATOMIC_VALUE(res) = 54332;
-    TEST_ASSERT_EQUAL_INT(54332, ATOMIC_VALUE(res));
-    TEST_ASSERT_EQUAL_INT(54332, res.value);
-    res.value = 1232342131;
+    ATOMIC_VALUE(res) = 24332;
+    TEST_ASSERT_EQUAL_INT(24332, ATOMIC_VALUE(res));
+    TEST_ASSERT_EQUAL_INT(24332, res.value);
+    res.value = 12323;
     TEST_ASSERT_EQUAL_INT(ATOMIC_VALUE(res), res.value);
     TEST_ASSERT_EQUAL_INT(ATOMIC_VALUE(*ptr), res.value);
 }
