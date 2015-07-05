@@ -244,7 +244,7 @@ static void test_ipv6_hdr_get_fl(void)
      * |  6 |   tc   |     flow label     |
      * +----+--------+--------------------+
      */
-    TEST_ASSERT_EQUAL_INT((OTHER_BYTE & 0x0f) << 16,
+    TEST_ASSERT_EQUAL_INT((uint32_t)(OTHER_BYTE & 0x0f) << 16,
                           ng_ipv6_hdr_get_fl((ng_ipv6_hdr_t *)val));
 }
 
