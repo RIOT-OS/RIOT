@@ -8,7 +8,7 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  *
- * @ingroup arm7_common
+ * @ingroup cpu_arm7_common
  * @{
  * @file
  * @author Kaspar Schleiser <kaspar@schleiser.de>
