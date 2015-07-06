@@ -182,18 +182,20 @@ int cmd_init_master(int argc, char **argv)
     res = spi_init_master(spi_dev, spi_mode, spi_speed);
     spi_release(spi_dev);
     if (res < 0) {
-        printf("spi_init_master: error initializing SPI_%i device (code %i)\n", spi_dev, res);
+        printf("spi_init_master: error initializing SPI_%i device (code %i)\n",
+                spi_dev, res);
         return 1;
     }
     res = gpio_init(spi_cs, GPIO_DIR_OUT, GPIO_PULLUP);
     if (res < 0){
-        printf("gpio_init: error initializing GPIO_%i as CS line (code %i)\n", spi_cs, res);
+        printf("gpio_init: error initializing GPIO_%ld as CS line (code %i)\n",
+                (long)spi_cs, res);
         return 1;
     }
     gpio_set(spi_cs);
     spi_master = 1;
-    printf("SPI_%i successfully initialized as master, cs: GPIO_%i, mode: %i, speed: %i\n",
-            spi_dev, spi_cs, spi_mode, spi_speed);
+    printf("SPI_%i successfully initialized as master, cs: GPIO_%ld, mode: %i, speed: %i\n",
+            spi_dev, (long)spi_cs, spi_mode, spi_speed);
     return 0;
 }
 
@@ -208,17 +210,19 @@ int cmd_init_slave(int argc, char **argv)
     res = spi_init_slave(spi_dev, spi_mode, slave_on_data);
     spi_release(spi_dev);
     if (res < 0) {
-        printf("spi_init_slave: error initializing SPI_%i device (code: %i)\n", spi_dev, res);
+        printf("spi_init_slave: error initializing SPI_%i device (code: %i)\n",
+                spi_dev, res);
         return 1;
     }
     res = gpio_init_int(spi_cs, GPIO_NOPULL, GPIO_FALLING, slave_on_cs, 0);
     if (res < 0){
-        printf("gpio_init_int: error initializing GPIO_%i as CS line (code %i)\n", spi_cs, res);
+        printf("gpio_init_int: error initializing GPIO_%ld as CS line (code %i)\n",
+                (long)spi_cs, res);
         return 1;
     }
     spi_master = 0;
-    printf("SPI_%i successfully initialized as slave, cs: GPIO_%i, mode: %i\n",
-            spi_dev, spi_cs, spi_mode);
+    printf("SPI_%i successfully initialized as slave, cs: GPIO_%ld, mode: %i\n",
+            spi_dev, (long)spi_cs, spi_mode);
     return 0;
 }
 
