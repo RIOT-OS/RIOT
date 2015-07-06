@@ -121,6 +121,9 @@ static int riot_ccn_register_prefix(int argc, char **argv)
     char *faceid = argv[3]; // 0=trans;1=msg
 
     int content_len = ccnl_riot_client_publish(_relay_pid, small_buf, faceid, type, big_buf);
+#if !ENABLE_DEBUG
+    (void) content_len;
+#endif
 
     DEBUG("shell received: '%s'\n", big_buf);
     DEBUG("received %d bytes.\n", content_len);
@@ -145,6 +148,8 @@ static int riot_ccn_relay_config(int argc, char **argv)
     m.content.value = atoi(argv[1]);
     m.type = CCNL_RIOT_CONFIG_CACHE;
     msg_send(&m, _relay_pid);
+
+    return 0;
 }
 
 static void riot_ccn_transceiver_start(kernel_pid_t _relay_pid)
