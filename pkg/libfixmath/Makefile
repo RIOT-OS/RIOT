@@ -28,7 +28,8 @@ $(BINDIR)$(PKG_NAME)-src/Makefile: $(CHECKOUT_FOLDER)/svn_info.xml
 	$(AD)cp $(CHECKOUT_FOLDER)/libfixmath/*.[ch] $(@D)
 	$(AD)rm -f $(BINDIR)$(PKG_NAME)-src/fix16.h
 
-	cd $(@D) && sed -i -e "s/1 <</(uint32_t) 1 <</g" uint32.c
+	cd $(@D) && sed -i -e 's/1 <</(uint32_t) 1 <</g' uint32.c
+	cd $(@D) && sed -i -e 's/is\([a-z]*\)(\*buf)/is\1((unsigned char) *buf)/g' fix16_str.c
 
 $(BINDIR)$(PKG_NAME)-unittests-src/Makefile:
 	@rm -rf $(@D)
