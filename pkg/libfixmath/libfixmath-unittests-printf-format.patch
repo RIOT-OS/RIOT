@@ -1,0 +1,136 @@
+diff --git a/fix16_unittests.c b/fix16_unittests.c
+index 96b5a11..5f3f9fe 100644
+--- a/fix16_unittests.c
++++ b/fix16_unittests.c
+@@ -101,7 +101,7 @@ int fix16_unittests(void)
+             #ifndef FIXMATH_NO_OVERFLOW
+             if (result != fix16_overflow)
+             {
+-              printf("\n%d * %d overflow not detected!\n", a, b);
++              printf("\n%ld * %ld overflow not detected!\n", (long)a, (long)b);
+               failures++;
+             }
+             #endif
+@@ -109,8 +109,8 @@ int fix16_unittests(void)
+             continue;
+           }
+
+-          printf("\n%d * %d = %d\n", a, b, result);
+-          printf("%f * %f = %d\n", fa, fb, fresult);
++          printf("\n%ld * %ld = %ld\n", (long)a, (long)b, (long)result);
++          printf("%f * %f = %ld\n", fa, fb, (long)fresult);
+           failures++;
+         }
+       }
+@@ -176,7 +176,7 @@ int fix16_unittests(void)
+             #ifndef FIXMATH_NO_OVERFLOW
+             if (result != fix16_overflow)
+             {
+-              printf("\n%d / %d overflow not detected!\n", a, b);
++              printf("\n%ld / %ld overflow not detected!\n", (long)a, (long)b);
+               failures++;
+             }
+             #endif
+@@ -222,7 +222,7 @@ int fix16_unittests(void)
+             #ifndef FIXMATH_NO_OVERFLOW
+             if (result != fix16_overflow)
+             {
+-              printf("\n%d + %d overflow not detected!\n", a, b);
++              printf("\n%ld + %ld overflow not detected!\n", (long)a, (long)b);
+               failures++;
+             }
+             #endif
+@@ -230,8 +230,8 @@ int fix16_unittests(void)
+             continue;
+           }
+
+-          printf("\n%d + %d = %d\n", a, b, result);
+-          printf("%f + %f = %d\n", fa, fb, fresult);
++          printf("\n%ld + %ld = %ld\n", (long)a, (long)b, (long)result);
++          printf("%f + %f = %ld\n", fa, fb, (long)fresult);
+           failures++;
+         }
+       }
+@@ -268,7 +268,7 @@ int fix16_unittests(void)
+             #ifndef FIXMATH_NO_OVERFLOW
+             if (result != fix16_overflow)
+             {
+-              printf("\n%d - %d overflow not detected!\n", a, b);
++              printf("\n%ld - %ld overflow not detected!\n", (long)a, (long)b);
+               failures++;
+             }
+             #endif
+@@ -276,8 +276,8 @@ int fix16_unittests(void)
+             continue;
+           }
+
+-          printf("\n%d - %d = %d\n", a, b, result);
+-          printf("%f - %f = %d\n", fa, fb, fresult);
++          printf("\n%ld - %ld = %ld\n", (long)a, (long)b, (long)result);
++          printf("%f - %f = %ld\n", fa, fb, (long)fresult);
+           failures++;
+         }
+       }
+@@ -321,8 +321,8 @@ int fix16_unittests(void)
+
+       if (delta(fresult, result) > max_delta)
+       {
+-        printf("\nfix16_sqrt(%d) = %d\n", a, result);
+-        printf("sqrt(%f) = %d\n", fa, fresult);
++        printf("\nfix16_sqrt(%ld) = %ld\n", (long)a, (long)result);
++        printf("sqrt(%f) = %ld\n", fa, (long)fresult);
+         failures++;
+       }
+     }
+diff --git a/fix16_str_unittests.c b/fix16_str_unittests.c
+index c70da60..c7df566 100644
+--- a/fix16_str_unittests.c
++++ b/fix16_str_unittests.c
+@@ -93,14 +93,14 @@ int fix16_str_unittests(void)
+
+             if (strcmp(goodbuf, testbuf) != 0)
+             {
+-                printf("Value (fix16_t)%d gave %s, should be %s\n", value, testbuf, goodbuf);
++                printf("Value (fix16_t)%ld gave %s, should be %s\n", (long)value, testbuf, goodbuf);
+                 ok = false;
+             }
+
+             fix16_t roundtrip = fix16_from_str(testbuf);
+             if (roundtrip != value)
+             {
+-                printf("Roundtrip failed: (fix16_t)%d -> %s -> (fix16_t)%d\n", value, testbuf, roundtrip);
++                printf("Roundtrip failed: (fix16_t)%ld -> %s -> (fix16_t)%ld\n", (long)value, testbuf, (long)roundtrip);
+                 ok = false;
+             }
+
+diff --git a/fix16_exp_unittests.c b/fix16_exp_unittests.c
+index 01620df..658c873 100644
+--- a/fix16_exp_unittests.c
++++ b/fix16_exp_unittests.c
+@@ -41,7 +41,7 @@ int fix16_exp_unittests(void)
+             count++;
+         }
+
+-        printf("Worst delta %d with input %d\n", max_delta, worst);
++        printf("Worst delta %ld with input %ld\n", (long)max_delta, (long)worst);
+         printf("Average delta %0.2f\n", (float)sum / count);
+
+         TEST(max_delta < 200);
+@@ -80,7 +80,7 @@ int fix16_exp_unittests(void)
+             count++;
+         }
+
+-        printf("Worst delta %0.4f%% with input %d\n", max_delta, worst);
++        printf("Worst delta %0.4f%% with input %ld\n", max_delta, (long)worst);
+         printf("Average delta %0.4f%%\n", sum / count);
+
+         TEST(max_delta < 1);
+@@ -111,7 +111,7 @@ int fix16_exp_unittests(void)
+             count++;
+         }
+
+-        printf("Worst delta %d with input %d\n", max_delta, worst);
++        printf("Worst delta %ld with input %ld\n", (long)max_delta, (long)worst);
+         printf("Average delta %0.2f\n", (float)sum / count);
+
+         TEST(max_delta < 20);
