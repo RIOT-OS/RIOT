@@ -24,10 +24,10 @@
 extern "C" {
 #endif
 
-#define PRIo64  "oll"   /**< Format string for octal 64-bit number */
-#define PRIx64  "xll"   /**< Format string for hexadecimal 64-bit number */
-#define PRIu64  "ull"   /**< Format string for unsigned 64-bit number */
-#define PRId64  "dll"   /**< Format string for signed 64-bit number */
+#define PRIo64  "llo"   /**< Format string for octal 64-bit number */
+#define PRIx64  "llx"   /**< Format string for hexadecimal 64-bit number */
+#define PRIu64  "llu"   /**< Format string for unsigned 64-bit number */
+#define PRId64  "lld"   /**< Format string for signed 64-bit number */
 
 #ifdef __cplusplus
 }
