@@ -32,6 +32,11 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
+#if ENABLE_DEBUG
+/* For PRIu16 etc. */
+#include <inttypes.h>
+#endif
+
 static ng_ipv6_netif_t ipv6_ifs[NG_NETIF_NUMOF];
 
 #if ENABLE_DEBUG
