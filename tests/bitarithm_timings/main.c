@@ -33,9 +33,10 @@
 
 #include "bitarithm.h"
 #include "hwtimer.h"
+#include "timex.h"
 
-#define TIMEOUT_S (5)
-#define TIMEOUT_US (TIMEOUT_S * 1000 * 1000)
+#define TIMEOUT_S (5ul)
+#define TIMEOUT_US (TIMEOUT_S * SEC_IN_USEC)
 #define TIMEOUT (HWTIMER_TICKS(TIMEOUT_US))
 #define PER_ITERATION (4)
 
