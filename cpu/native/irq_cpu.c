@@ -180,12 +180,17 @@ unsigned enableIRQ(void)
     _native_syscall_enter();
     DEBUG("enableIRQ()\n");
 
+    /* Mark the IRQ as enabled first since sigprocmask could call the handler
+     * before returning to userspace.
+     */
+
+    prev_state = native_interrupts_enabled;
+    native_interrupts_enabled = 1;
+
     if (sigprocmask(SIG_SETMASK, &_native_sig_set, NULL) == -1) {
         err(EXIT_FAILURE, "enableIRQ: sigprocmask");
     }
 
-    prev_state = native_interrupts_enabled;
-    native_interrupts_enabled = 1;
     _native_syscall_leave();
 
     DEBUG("enableIRQ(): return\n");
