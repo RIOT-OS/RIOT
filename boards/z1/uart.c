@@ -87,6 +87,15 @@ int putchar(int c)
     return c;
 }
 
+int getchar(void)
+{
+#ifdef MODULE_UART0
+    return uart0_readc();
+#else
+    return UCA0RXBUF;
+#endif
+}
+
 uint8_t uart_readByte(void)
 {
     return UCA0RXBUF;
@@ -95,15 +104,9 @@ uint8_t uart_readByte(void)
 /**
  * \brief the interrupt handler for UART reception
  */
-interrupt(USCIAB0RX_VECTOR) __attribute__ ((naked)) usart1irq(void)
+interrupt(USCIAB0RX_VECTOR) usart1irq(void)
 {
-    __enter_isr();
-
-#ifndef MODULE_UART0
-    int __attribute__ ((unused)) c;
-#else
-    int c;
-#endif
+    volatile int c;
 
     /* Check status register for receive errors. */
     if (UCA0STAT & UCRXERR) {
@@ -121,14 +124,14 @@ interrupt(USCIAB0RX_VECTOR) __attribute__ ((naked)) usart1irq(void)
         }
         /* Clear error flags by forcing a dummy read. */
         c = UCA0RXBUF;
+        (void)c;
+    }
 #ifdef MODULE_UART0
-    } else if (uart0_handler_pid != KERNEL_PID_UNDEF) {
+    else if (uart0_handler_pid != KERNEL_PID_UNDEF) {
         /* All went well -> let's signal the reception to adequate callbacks */
         c = UCA0RXBUF;
         uart0_handle_incoming(c);
         uart0_notify_thread();
-#endif
     }
-
-    __exit_isr();
+#endif
 }
