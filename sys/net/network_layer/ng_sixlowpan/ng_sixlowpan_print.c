@@ -13,6 +13,7 @@
  */
 
 #include <stdio.h>
+#include <inttypes.h>
 
 #include "od.h"
 #include "net/ng_ipv6/hdr.h"

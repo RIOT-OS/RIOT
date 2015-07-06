@@ -25,6 +25,11 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
+#if ENABLE_DEBUG
+/* For PRIu16 etc. */
+#include <inttypes.h>
+#endif
+
 static uint16_t _tag;
 
 static inline uint16_t _floor8(uint16_t length)
