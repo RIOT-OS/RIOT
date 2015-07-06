@@ -72,6 +72,15 @@ int putchar(int c)
     return c;
 }
 
+int getchar(void)
+{
+#ifdef MODULE_UART0
+    return uart0_readc();
+#else
+    return U1RXBUF;
+#endif
+}
+
 uint8_t uart_readByte(void)
 {
     return U1RXBUF;
