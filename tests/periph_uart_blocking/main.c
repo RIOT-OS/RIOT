@@ -26,6 +26,8 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdint.h>
+#include <inttypes.h>
 
 #include "board.h"
 #include "periph/uart.h"
@@ -33,7 +35,7 @@
 /* only build this test, if the target supports the UART driver interface */
 #if UART_NUMOF
 
-static int baudrates[] = {115200, 57600, 9600, 38400, 115200, 115200};
+static uint32_t baudrates[] = {115200, 57600, 9600, 38400, 115200, 115200};
 
 void uart_print(uart_t dev, char *str)
 {
@@ -56,7 +58,7 @@ int main(void)
     puts("Setting up remaining UART devices:");
     for (int i = UART_0; i < UART_NUMOF; i++) {
         if (i != STDIO) {
-            printf("Setting up UART_%i @ %i", i, baudrates[i]);
+            printf("Setting up UART_%d @ %" PRIu32, i, baudrates[i]);
             if (uart_init_blocking(i, baudrates[i]) >= 0) {
                 puts("   ...ok");
             }
@@ -70,7 +72,7 @@ int main(void)
 
     for (i = UART_0; i < UART_NUMOF; i++) {
         if (i != STDIO) {
-            printf("Please Connect to UART_%i @ %i now, press return when done\n", i, baudrates[i]);
+            printf("Please Connect to UART_%d @ %" PRIu32 " now, press return when done\n", i, baudrates[i]);
             do {
                 tmp = getchar();
             } while (tmp != '\n');
