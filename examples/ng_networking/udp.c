@@ -19,6 +19,7 @@
  */
 
 #include <stdio.h>
+#include <inttypes.h>
 
 #include "kernel.h"
 #include "net/ng_netbase.h"
