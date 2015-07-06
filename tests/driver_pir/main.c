@@ -62,7 +62,7 @@ void* pir_handler(void *arg)
 int main(void)
 {
     puts("PIR motion sensor test application\n");
-    printf("Initializing PIR sensor at GPIO_%i... ", PIR_GPIO);
+    printf("Initializing PIR sensor at GPIO_%ld... ", (long)PIR_GPIO);
     if (pir_init(&dev, PIR_GPIO) == 0) {
         puts("[OK]\n");
     }
