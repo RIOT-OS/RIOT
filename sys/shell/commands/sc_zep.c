@@ -15,6 +15,7 @@
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <inttypes.h>
 
 #include "net/ng_ipv6/addr.h"
 #include "net/ng_ipv6/netif.h"
