@@ -30,6 +30,15 @@ int putchar(int c)
     return c;
 }
 
+int getchar(void)
+{
+#ifdef MODULE_UART0
+    return uart0_readc();
+#else
+    return U0RXBUF;
+#endif
+}
+
 void usart0irq(void);
 /**
  * \brief the interrupt function
