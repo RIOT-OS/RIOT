@@ -8,4 +8,7 @@ USEMODULE += uart0
 
 DISABLE_MODULE += auto_init
 
+# chronos is missing a getchar implementation
+BOARD_BLACKLIST += chronos
+
 include $(RIOTBASE)/Makefile.include
