@@ -31,6 +31,11 @@ endif
         info-buildsizes-diff info-build info-boards-supported \
         info-features-missing info-boards-features-missing
 
+# Make buildtests error out on warnings by adding -Werror
+ifeq (, $(filter buildtest, $(MAKECMDGOALS)))
+    CFLAGS+=-Werror
+endif
+
 ifeq ($(BUILD_IN_DOCKER),1)
 buildtest: ..in-docker-container
 else
