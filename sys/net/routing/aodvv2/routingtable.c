@@ -17,6 +17,9 @@
  * @author      Lotte Steenbrink <lotte.steenbrink@fu-berlin.de>
  */
 
+#include <stdio.h>
+#include <inttypes.h>
+
 #include "routingtable.h"
 #include "aodv_debug.h"
 
