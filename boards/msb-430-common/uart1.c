@@ -28,6 +28,14 @@
 #define UART1_TX                        TXBUF1
 #define UART1_WAIT_TXDONE()       while( (UTCTL1 & TXEPT) == 0 ) { _NOP(); }
 
+int getchar(void)
+{
+#ifdef MODULE_UART0
+    return uart0_readc();
+#else
+    return U1RXBUF;
+#endif
+}
 
 int putchar(int c)
 {
