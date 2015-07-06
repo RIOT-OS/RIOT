@@ -22,6 +22,7 @@
 #include <errno.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <inttypes.h>
 
 #ifdef MODULE_NATIVENET
 #include "nativenet.h"
