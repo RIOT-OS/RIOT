@@ -26,7 +26,6 @@
 #define RIOT_CHRONO_HPP
 
 #include <chrono>
-#include <cstdio>
 #include <algorithm>
 
 #include "time.h"
