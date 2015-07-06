@@ -26,6 +26,11 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
+#if ENABLE_DEBUG
+/* For PRIu16 etc. */
+#include <inttypes.h>
+#endif
+
 net_if_t interfaces[NET_IF_MAX];
 
 #if ENABLE_DEBUG
