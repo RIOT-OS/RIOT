@@ -355,10 +355,11 @@ int ccnl_io_loop(struct ccnl_relay_s *ccnl)
 #endif
 
 #if MODULE_AT86RF231 || MODULE_CC2420 || MODULE_MC1322X
+                uint16_t src_addr = ((p->frame.src_addr[1] << 8) | p->frame.src_addr[0]);
                 ccnl_core_RX(ccnl, RIOT_TRANS_IDX,
                              (unsigned char *) p->frame.payload,
                              (int) p->frame.payload_len,
-                             *((uint16_t*) p->frame.src_addr));
+                             src_addr);
 #else
                 ccnl_core_RX(ccnl, RIOT_TRANS_IDX,
                              (unsigned char *) p->data,
