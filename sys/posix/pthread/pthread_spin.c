@@ -27,7 +27,7 @@ int pthread_spin_init(pthread_spinlock_t *lock, int pshared)
     }
 
     (void) pshared;
-    *lock = 0;
+    ATOMIC_VALUE(lock->value) = 0;
     return 0;
 }
 
@@ -47,7 +47,7 @@ int pthread_spin_lock(pthread_spinlock_t *lock)
         return EINVAL;
     }
 
-    while (atomic_set_to_one((int *)lock) == 0) {
+    while (atomic_set_to_one(&(lock->value)) == 0) {
         /* spin */
     }
 
@@ -60,7 +60,7 @@ int pthread_spin_trylock(pthread_spinlock_t *lock)
         return EINVAL;
     }
 
-    if (atomic_set_to_one((int *)lock) == 0) {
+    if (atomic_set_to_one(&(lock->value)) == 0) {
         return EBUSY;
     }
 
@@ -73,7 +73,7 @@ int pthread_spin_unlock(pthread_spinlock_t *lock)
         return EINVAL;
     }
 
-    if (atomic_set_to_zero((int *)lock) == 0) {
+    if (atomic_set_to_zero(&(lock->value)) == 0) {
         return EPERM;
     }
 
