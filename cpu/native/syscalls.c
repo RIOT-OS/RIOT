@@ -149,7 +149,11 @@ void free(void *ptr)
     _native_syscall_leave();
 }
 
+#ifdef NATIVE_IN_CALLOC
+int _native_in_calloc = 1;
+#else
 int _native_in_calloc = 0;
+#endif
 void *calloc(size_t nmemb, size_t size)
 {
     /* dynamically load calloc when it's needed - this is necessary to
