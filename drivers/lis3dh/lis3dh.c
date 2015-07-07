@@ -30,7 +30,7 @@ static int lis3dh_read_regs(const lis3dh_t *dev, const lis3dh_reg_t reg, const u
                             uint8_t *buf);
 
 
-int lis3dh_init(lis3dh_t *dev, spi_t spi, gpio_t cs_pin, gpio_t int1_pin, gpio_t int2_pin, lis3dh_scale_t scale)
+int lis3dh_init(lis3dh_t *dev, spi_t spi, gpio_t cs_pin, gpio_t int1_pin, gpio_t int2_pin, uint8_t scale)
 {
     uint8_t in;
 
@@ -54,11 +54,29 @@ int lis3dh_init(lis3dh_t *dev, spi_t spi, gpio_t cs_pin, gpio_t int1_pin, gpio_t
         return -1;
     }
 
-    /* Set block data update and little endian mode. */
+    /* Clear all settings */
+    lis3dh_write_reg(dev, LIS3DH_REG_CTRL_REG1, LIS3DH_CTRL_REG1_XYZEN_MASK);
+    /* Disable HP filter */
+    lis3dh_write_reg(dev, LIS3DH_REG_CTRL_REG2, 0);
+    /* Disable INT1 interrupt sources */
+    lis3dh_write_reg(dev, LIS3DH_REG_CTRL_REG3, 0);
+    /* Set block data update and little endian, set Normal mode (LP=0, HR=1) */
     lis3dh_write_reg(dev, LIS3DH_REG_CTRL_REG4,
                      (LIS3DH_CTRL_REG4_BDU_ENABLE |
-                      LIS3DH_CTRL_REG4_BLE_LITTLE_ENDIAN));
+                      LIS3DH_CTRL_REG4_BLE_LITTLE_ENDIAN |
+                      LIS3DH_CTRL_REG4_HR_MASK));
+    /* Disable FIFO */
+    lis3dh_write_reg(dev, LIS3DH_REG_CTRL_REG5, 0);
+    /* Reset INT2 settings */
+    lis3dh_write_reg(dev, LIS3DH_REG_CTRL_REG6, 0);
+
+    /* Configure scale */
     lis3dh_set_scale(dev, scale);
+
+    /* Initialize the interrupt pins */
+    gpio_init(dev->int1, GPIO_DIR_IN, GPIO_NOPULL);
+    gpio_init(dev->int2, GPIO_DIR_IN, GPIO_NOPULL);
+
     return 0;
 }
 
@@ -124,27 +142,37 @@ int lis3dh_set_axes(lis3dh_t *dev, const uint8_t axes)
     return lis3dh_write_bits(dev, LIS3DH_REG_CTRL_REG1, LIS3DH_CTRL_REG1_XYZEN_MASK, axes);
 }
 
-int lis3dh_set_fifo_mode(lis3dh_t *dev, const lis3dh_fifo_mode_t mode)
+int lis3dh_set_fifo(lis3dh_t *dev, const uint8_t mode, const uint8_t watermark)
 {
-    return lis3dh_write_bits(dev, LIS3DH_REG_FIFO_CTRL_REG, LIS3DH_FIFO_CTRL_REG_FM_MASK,
-                             mode);
+    int status;
+    uint8_t reg;
+    reg = (watermark << LIS3DH_FIFO_CTRL_REG_FTH_SHIFT)
+            & LIS3DH_FIFO_CTRL_REG_FTH_MASK;
+    reg |= mode;
+    status = lis3dh_write_reg(dev, LIS3DH_REG_FIFO_CTRL_REG, reg);
+    if (status < 0) {
+        /* communication error */
+        return status;
+    }
+    if (mode != 0x00) {
+        status = lis3dh_write_bits(dev, LIS3DH_REG_CTRL_REG5,
+            LIS3DH_CTRL_REG5_FIFO_EN_MASK, LIS3DH_CTRL_REG5_FIFO_EN_MASK);
+    } else {
+        status = lis3dh_write_bits(dev, LIS3DH_REG_CTRL_REG5,
+            LIS3DH_CTRL_REG5_FIFO_EN_MASK, 0);
+    }
+    return status;
 }
 
-int lis3dh_set_fifo(lis3dh_t *dev, const uint8_t enable)
+int lis3dh_set_odr(lis3dh_t *dev, const uint8_t odr)
 {
-    return lis3dh_write_bits(dev, LIS3DH_REG_CTRL_REG5, LIS3DH_CTRL_REG5_FIFO_EN_MASK,
-                             (enable ? LIS3DH_CTRL_REG5_FIFO_EN_MASK : 0));
+    return lis3dh_write_bits(dev, LIS3DH_REG_CTRL_REG1,
+        LIS3DH_CTRL_REG1_ODR_MASK, odr);
 }
 
-int lis3dh_set_odr(lis3dh_t *dev, const lis3dh_odr_t odr)
+int lis3dh_set_scale(lis3dh_t *dev, const uint8_t scale)
 {
-    return lis3dh_write_bits(dev, LIS3DH_REG_CTRL_REG1, LIS3DH_CTRL_REG1_ODR_MASK,
-                             odr);
-}
-
-int lis3dh_set_scale(lis3dh_t *dev, const lis3dh_scale_t scale)
-{
-    /* Sensor full range is -32768 -- +32767 */
+    /* Sensor full range is -32768 -- +32767 (measurements are left adjusted) */
     /*  => Scale factor is scale/32768 */
     switch (scale)
     {
@@ -165,6 +193,23 @@ int lis3dh_set_scale(lis3dh_t *dev, const lis3dh_scale_t scale)
     }
     return lis3dh_write_bits(dev, LIS3DH_REG_CTRL_REG4, LIS3DH_CTRL_REG4_FS_MASK,
                              scale);
+}
+
+int lis3dh_set_int1(lis3dh_t *dev, const uint8_t mode)
+{
+    return lis3dh_write_reg(dev, LIS3DH_REG_CTRL_REG3, mode);
+}
+
+int lis3dh_get_fifo_level(lis3dh_t *dev)
+{
+    uint8_t reg;
+    int level;
+
+    if (lis3dh_read_regs(dev, LIS3DH_REG_FIFO_SRC_REG, 1, &reg) != 0) {
+        return -1;
+    }
+    level = (reg & LIS3DH_FIFO_SRC_REG_FSS_MASK) >> LIS3DH_FIFO_SRC_REG_FSS_SHIFT;
+    return level;
 }
 
 

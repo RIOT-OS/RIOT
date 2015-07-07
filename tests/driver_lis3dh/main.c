@@ -23,6 +23,7 @@
 #include "board.h"
 #include "vtimer.h"
 #include "periph/spi.h"
+#include "periph/gpio.h"
 #include "lis3dh.h"
 
 /* Check for definition of hardware pins, default to board.h values if not set. */
@@ -60,16 +61,26 @@
 #define ODR         LIS3DH_ODR_100Hz
 #define SLEEP       (100 * 1000U)
 #define SPI_CONF    (SPI_CONF_SECOND_FALLING)
+#define SPI_SPEED   (SPI_SPEED_10MHZ)
+
+#define WATERMARK_LEVEL 16
+
+static volatile int int1_count = 0;
+
+static void test_int1(void *arg)
+{
+    volatile int *int1_count_ptr = arg;
+    ++(*int1_count_ptr);
+}
 
 int main(void)
 {
     lis3dh_t dev;
     lis3dh_data_t acc_data;
-    int16_t temperature;
 
     puts("LIS3DH accelerometer driver test application\n");
     printf("Initializing SPI_%i... ", TEST_LIS3DH_SPI);
-    if (spi_init_master(TEST_LIS3DH_SPI, SPI_CONF, SPI_SPEED_10MHZ) == 0) {
+    if (spi_init_master(TEST_LIS3DH_SPI, SPI_CONF, SPI_SPEED) == 0) {
         puts("[OK]");
     }
     else {
@@ -114,8 +125,8 @@ int main(void)
         return 1;
     }
 
-    puts("Disable FIFO mode... ");
-    if (lis3dh_set_fifo(&dev, 0) == 0) {
+    puts("Enable streaming FIFO mode... ");
+    if (lis3dh_set_fifo(&dev, LIS3DH_FIFO_MODE_STREAM, WATERMARK_LEVEL) == 0) {
         puts("[OK]");
     }
     else {
@@ -132,23 +143,49 @@ int main(void)
         return 1;
     }
 
+    puts("Set INT1 watermark function... ");
+    if (lis3dh_set_int1(&dev, LIS3DH_CTRL_REG3_I1_WTM_MASK) == 0) {
+        puts("[OK]");
+    }
+    else {
+        puts("[Failed]\n");
+        return 1;
+    }
+
+    puts("Set INT1 callback");
+    if (gpio_init_int(dev.int1, GPIO_NOPULL, GPIO_RISING, test_int1, (void*)&int1_count) == 0) {
+        puts("[OK]");
+    }
+    else {
+        puts("[Failed]\n");
+        return 1;
+    }
+
     puts("LIS3DH init done.\n");
 
     while (1) {
-        lis3dh_read_xyz(&dev, &acc_data);
-        if (lis3dh_read_xyz(&dev, &acc_data) != 0) {
-            puts("Reading acceleration data... ");
-            puts("[Failed]\n");
-            return 1;
-        }
-        if (lis3dh_read_aux_adc3(&dev, &temperature) != 0) {
-            puts("Reading temperature data... ");
-            puts("[Failed]\n");
-            return 1;
-        }
+        int fifo_level;
 
-        printf("Sensor data - X: %6i   Y: %6i   Z: %6i   Temp: %6i\n",
-               acc_data.acc_x, acc_data.acc_y, acc_data.acc_z, temperature);
+        fifo_level = lis3dh_get_fifo_level(&dev);
+        printf("int1_count = %d\n", int1_count);
+        printf("Reading %d measurements\n", fifo_level);
+        while (fifo_level > 0) {
+            int16_t temperature;
+            int int1;
+            if (lis3dh_read_xyz(&dev, &acc_data) != 0) {
+                puts("Reading acceleration data... ");
+                puts("[Failed]\n");
+            }
+            if (lis3dh_read_aux_adc3(&dev, &temperature) != 0) {
+                puts("Reading temperature data... ");
+                puts("[Failed]\n");
+                return 1;
+            }
+            int1 = gpio_read(dev.int1);
+            printf("X: %6d Y: %6d Z: %6d Temp: %6d, INT1: %08x\n",
+                   acc_data.acc_x, acc_data.acc_y, acc_data.acc_z, temperature, int1);
+            --fifo_level;
+        }
 
         vtimer_usleep(SLEEP);
     }
