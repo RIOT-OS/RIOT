@@ -85,6 +85,13 @@ Test *tests_core_byteorder_tests(void);
  */
 Test *tests_core_ringbuffer_tests(void);
 
+/**
+ *
+ *
+ *
+ */
+Test *tests_core_tcb_tests(void);
+
 #ifdef __cplusplus
 }
 #endif
