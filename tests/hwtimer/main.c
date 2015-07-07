@@ -24,11 +24,12 @@
 
 #include "hwtimer.h"
 
-#define BASE_DELAY (1000UL * 1000UL)
+#define BASE_DELAY  (1000UL * 1000UL)
 #define END_DELAY   (BASE_DELAY + ((HWTIMER_MAXTIMERS - 1) * DELTA_DELAY))
 #define DELTA_DELAY (10UL * 1000UL)
-#define MSGLEN 12 // == strlen("callback %2i")
-char msg[MSGLEN * HWTIMER_MAXTIMERS]; // == [callback  1\0callback  2\0...]
+#define MSGLEN      (12) /* == strlen("callback %2i") */
+
+char msg[MSGLEN * HWTIMER_MAXTIMERS]; /* == [callback  1\0callback  2\0...] */
 
 void callback(void *ptr)
 {
