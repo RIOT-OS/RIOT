@@ -162,6 +162,23 @@ int i2c_init_slave(i2c_t dev, uint8_t address)
     return -1;
 }
 
+/*
+ * Check for bus master arbitration lost.
+ * Arbitration is lost in the following circumstances:
+ * 1. SDA is sampled as low when the master drives high during an
+ *    address or data transmit cycle.
+ * 2. SDA is sampled as low when the master drives high during the
+ *    acknowledge bit of a data receive cycle.
+ * 3. A START cycle is attempted when the bus is busy.
+ * 4. A repeated START cycle is requested in slave mode.
+ * 5. A STOP condition is detected when the master did not request
+ *    it.
+ */
+static inline int _i2c_arbitration_lost(I2C_Type *dev)
+{
+    return (int)(dev->S & I2C_S_ARBL_MASK);
+}
+
 static inline int _i2c_start(I2C_Type *dev, uint8_t address, uint8_t rw_flag)
 {
     /* bus free ? */
@@ -176,21 +193,7 @@ static inline int _i2c_start(I2C_Type *dev, uint8_t address, uint8_t rw_flag)
 
     /* wait for bus-busy to be set */
     while (!(dev->S & I2C_S_BUSY_MASK)) {
-        if (dev->S & I2C_S_ARBL_MASK) {
-            /* Bus master arbitration lost */
-            /*
-             * Arbitration is lost in the following circumstances:
-             * 1. SDA is sampled as low when the master drives high during an
-             *    address or data transmit cycle.
-             * 2. SDA is sampled as low when the master drives high during the
-             *    acknowledge bit of a data receive cycle.
-             * 3. A START cycle is attempted when the bus is busy.
-             * 4. A repeated START cycle is requested in slave mode.
-             * 5. A STOP condition is detected when the master did not request
-             *    it.
-             */
-            /* Clear ARBL flag */
-            dev->S = I2C_S_ARBL_MASK;
+        if (_i2c_arbitration_lost(dev)) {
             return -1;
         }
     }
@@ -200,9 +203,7 @@ static inline int _i2c_start(I2C_Type *dev, uint8_t address, uint8_t rw_flag)
 
     dev->S = I2C_S_IICIF_MASK;
 
-    if ((dev->S & I2C_S_ARBL_MASK) != 0) {
-        /* Bus master arbitration lost */
-        dev->S = I2C_S_ARBL_MASK;
+    if (_i2c_arbitration_lost(dev)) {
         return -1;
     }
 
@@ -225,9 +226,7 @@ static inline int _i2c_restart(I2C_Type *dev, uint8_t address, uint8_t rw_flag)
 
     dev->S = I2C_S_IICIF_MASK;
 
-    if ((dev->S & I2C_S_ARBL_MASK) != 0) {
-        /* Bus master arbitration lost */
-        dev->S = I2C_S_ARBL_MASK;
+    if (_i2c_arbitration_lost(dev)) {
         return -1;
     }
 
@@ -259,9 +258,7 @@ static inline int _i2c_receive(I2C_Type *dev, uint8_t *data, int length)
 
         dev->S = I2C_S_IICIF_MASK;
 
-        if ((dev->S & I2C_S_ARBL_MASK) != 0) {
-            /* Bus master arbitration lost */
-            dev->S = I2C_S_ARBL_MASK;
+        if (_i2c_arbitration_lost(dev)) {
             return -1;
         }
 
@@ -310,6 +307,14 @@ static inline void _i2c_stop(I2C_Type *dev)
     while (dev->S & I2C_S_BUSY_MASK);
 }
 
+static inline void _i2c_reset(I2C_Type *dev)
+{
+    /* put bus in idle state */
+    dev->C1 = I2C_C1_IICEN_MASK;
+    /* reset status flags */
+    dev->S = I2C_S_ARBL_MASK | I2C_S_IICIF_MASK;
+}
+
 
 int i2c_read_byte(i2c_t dev, uint8_t address, char *data)
 {
@@ -334,11 +339,16 @@ int i2c_read_bytes(i2c_t dev, uint8_t address, char *data, int length)
     }
 
     if (_i2c_start(i2c, address, I2C_FLAG_READ)) {
-        _i2c_stop(i2c);
+        _i2c_reset(i2c);
         return -1;
     }
 
     n = _i2c_receive(i2c, (uint8_t *)data, length);
+    if (n < 0) {
+        _i2c_reset(i2c);
+        return -1;
+    }
+
     _i2c_stop(i2c);
 
     return n;
@@ -367,7 +377,7 @@ int i2c_write_bytes(i2c_t dev, uint8_t address, char *data, int length)
     }
 
     if (_i2c_start(i2c, address, I2C_FLAG_WRITE)) {
-        _i2c_stop(i2c);
+        _i2c_reset(i2c);
         return -1;
     }
 
@@ -401,7 +411,7 @@ int i2c_read_regs(i2c_t dev, uint8_t address, uint8_t reg, char *data, int lengt
     }
 
     if (_i2c_start(i2c, address, I2C_FLAG_WRITE)) {
-        _i2c_stop(i2c);
+        _i2c_reset(i2c);
         return -1;
     }
 
@@ -414,16 +424,20 @@ int i2c_read_regs(i2c_t dev, uint8_t address, uint8_t reg, char *data, int lengt
     }
 
     if (_i2c_restart(i2c, address, I2C_FLAG_READ)) {
-        _i2c_stop(i2c);
+        _i2c_reset(i2c);
         return -1;
     }
 
     n = _i2c_receive(i2c, (uint8_t *)data, length);
+    if (n < 0) {
+        _i2c_reset(i2c);
+        return -1;
+    }
+
     _i2c_stop(i2c);
 
     return n;
 }
-
 
 int i2c_write_reg(i2c_t dev, uint8_t address, uint8_t reg, char data)
 {
@@ -448,7 +462,7 @@ int i2c_write_regs(i2c_t dev, uint8_t address, uint8_t reg, char *data, int leng
     }
 
     if (_i2c_start(i2c, address, I2C_FLAG_WRITE)) {
-        _i2c_stop(i2c);
+        _i2c_reset(i2c);
         return -1;
     }
 
