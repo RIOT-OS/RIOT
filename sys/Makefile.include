@@ -103,3 +103,5 @@ endif
 ifneq (,$(filter newlib,$(USEMODULE)))
     include $(RIOTBASE)/sys/newlib/Makefile.include
 endif
+
+INCLUDES += -I$(RIOTBASE)/sys/libc/include
