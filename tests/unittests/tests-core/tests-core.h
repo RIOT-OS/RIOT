@@ -86,9 +86,9 @@ Test *tests_core_byteorder_tests(void);
 Test *tests_core_ringbuffer_tests(void);
 
 /**
+ * @brief   Generates tests for tcb.h
  *
- *
- *
+ * @return  embUnit tests if successful, NULL if not.
  */
 Test *tests_core_tcb_tests(void);
 
