@@ -20,6 +20,8 @@
 
 #if RIOT_CCN_APPSERVER
 
+#include <inttypes.h>
+
 #include "msg.h"
 #include "thread.h"
 #include "ccnl-riot-compat.h"

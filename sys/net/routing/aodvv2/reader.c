@@ -27,6 +27,11 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
+#if ENABLE_DEBUG
+/* For PRIu16 etc. */
+#include <inttypes.h>
+#endif
+
 #define VERBOSE_DEBUG (0)
 #if VERBOSE_DEBUG
 #define VDEBUG(...) AODV_DEBUG(__VA_ARGS__)

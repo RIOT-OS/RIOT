@@ -37,6 +37,11 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
+#if ENABLE_DEBUG
+/* For PRIu16 etc. */
+#include <inttypes.h>
+#endif
+
 #define _EVENT_RX_STARTED       (1)
 #define _EVENT_RX_COMPLETE      (2)
 #define _RX_BUF_SIZE            (16U * sizeof(ng_pktsnip_t *))

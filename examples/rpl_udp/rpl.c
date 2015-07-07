@@ -20,6 +20,8 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <inttypes.h>
+
 #include "vtimer.h"
 #include "thread.h"
 #include "net_if.h"

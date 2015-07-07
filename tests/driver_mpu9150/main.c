@@ -29,6 +29,7 @@
 #endif
 
 #include <stdio.h>
+#include <inttypes.h>
 
 #include "mpu9150.h"
 #include "vtimer.h"

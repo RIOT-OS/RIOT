@@ -23,6 +23,7 @@
 
 #include <stdio.h>
 #include <time.h>
+#include <inttypes.h>
 
 #include "vtimer.h"
 #include "thread.h"
