@@ -29,6 +29,9 @@
 #include "debug.h"
 
 #if ENABLE_DEBUG
+/* For PRIu8 etc. */
+#include <inttypes.h>
+
 static char addr_str[NG_IPV6_ADDR_MAX_STR_LEN];
 #endif
 
