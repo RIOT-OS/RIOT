@@ -13,6 +13,7 @@
  */
 
 #include <stdio.h>
+#include <inttypes.h>
 
 #include "net/ng_netif.h"
 #include "net/ng_netif/hdr.h"
