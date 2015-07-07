@@ -23,9 +23,9 @@
 #include <stdio.h>
 
 #include "hwtimer.h"
-#include "thread.h"
 
 #define BASE_DELAY (1000UL * 1000UL)
+#define END_DELAY   (BASE_DELAY + ((HWTIMER_MAXTIMERS - 1) * DELTA_DELAY))
 #define DELTA_DELAY (10UL * 1000UL)
 #define MSGLEN 12 // == strlen("callback %2i")
 char msg[MSGLEN * HWTIMER_MAXTIMERS]; // == [callback  1\0callback  2\0...]
@@ -70,9 +70,8 @@ int main(void)
     puts("All timers set.");
     puts("");
 
-    hwtimer_wait(HWTIMER_TICKS(BASE_DELAY));
+    hwtimer_wait(HWTIMER_TICKS(END_DELAY));
 
     puts("hwtimer set.");
-    thread_sleep();
     return 0;
 }
