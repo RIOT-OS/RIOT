@@ -1,0 +1,446 @@
+diff --git a/libgloss/arm/_exit.c b/libgloss/arm/_exit.c
+index ed00876..9c59b23 100644
+--- a/libgloss/arm/_exit.c
++++ b/libgloss/arm/_exit.c
+@@ -12,4 +12,5 @@ _exit (int status)
+      Note: The RDI implementation of _kill throws away both its
+      arguments.  */
+   _kill (status, -1);
++  __builtin_unreachable ();
+ }
+diff --git a/libgloss/i386/cygmon-gmon.c b/libgloss/i386/cygmon-gmon.c
+index 480b2ec..a4f615d 100644
+--- a/libgloss/i386/cygmon-gmon.c
++++ b/libgloss/i386/cygmon-gmon.c
+@@ -57,11 +57,12 @@
+  * should be.
+  */
+ 
++#include <string.h>
++
+ #ifndef lint
+ static char sccsid[] = "@(#)gmon.c	5.3 (Berkeley) 5/22/91";
+ #endif /* not lint */
+ 
+-#define DEBUG
+ #ifdef DEBUG
+ #include <stdio.h>
+ #endif
+diff --git a/newlib/libc/include/stdio.h b/newlib/libc/include/stdio.h
+index c2418fa..ba61ab7 100644
+--- a/newlib/libc/include/stdio.h
++++ b/newlib/libc/include/stdio.h
+@@ -613,36 +613,7 @@ _ELIDABLE_INLINE int __sgetc_r(struct _reent *__ptr, FILE *__p)
+ #define __sgetc_r(__ptr, __p) __sgetc_raw_r(__ptr, __p)
+ #endif
+ 
+-#ifdef _never /* __GNUC__ */
+-/* If this inline is actually used, then systems using coff debugging
+-   info get hopelessly confused.  21sept93 rich@cygnus.com.  */
+-_ELIDABLE_INLINE int __sputc_r(struct _reent *_ptr, int _c, FILE *_p) {
+-	if (--_p->_w >= 0 || (_p->_w >= _p->_lbfsize && (char)_c != '\n'))
+-		return (*_p->_p++ = _c);
+-	else
+-		return (__swbuf_r(_ptr, _c, _p));
+-}
+-#else
+-/*
+- * This has been tuned to generate reasonable code on the vax using pcc
+- */
+-#define       __sputc_raw_r(__ptr, __c, __p) \
+-	(--(__p)->_w < 0 ? \
+-		(__p)->_w >= (__p)->_lbfsize ? \
+-			(*(__p)->_p = (__c)), *(__p)->_p != '\n' ? \
+-				(int)*(__p)->_p++ : \
+-				__swbuf_r(__ptr, '\n', __p) : \
+-			__swbuf_r(__ptr, (int)(__c), __p) : \
+-		(*(__p)->_p = (__c), (int)*(__p)->_p++))
+-#ifdef __SCLE
+-#define __sputc_r(__ptr, __c, __p) \
+-        ((((__p)->_flags & __SCLE) && ((__c) == '\n')) \
+-          ? __sputc_raw_r(__ptr, '\r', (__p)) : 0 , \
+-        __sputc_raw_r((__ptr), (__c), (__p)))
+-#else
+-#define __sputc_r(__ptr, __c, __p) __sputc_raw_r(__ptr, __c, __p)
+-#endif
+-#endif
++int _EXFUN(__sputc_r, (struct _reent *, int, FILE *));
+ 
+ #define	__sfeof(p)	(((p)->_flags & __SEOF) != 0)
+ #define	__sferror(p)	(((p)->_flags & __SERR) != 0)
+@@ -655,17 +626,6 @@ _ELIDABLE_INLINE int __sputc_r(struct _reent *_ptr, int _c, FILE *_p) {
+ #define	clearerr(p)	__sclearerr(p)
+ #endif
+ 
+-#if 0 /*ndef __STRICT_ANSI__ - FIXME: must initialize stdio first, use fn */
+-#define	fileno(p)	__sfileno(p)
+-#endif
+-
+-#ifndef __CYGWIN__
+-#ifndef lint
+-#define	getc(fp)	__sgetc_r(_REENT, fp)
+-#define putc(x, fp)	__sputc_r(_REENT, x, fp)
+-#endif /* lint */
+-#endif /* __CYGWIN__ */
+-
+ #ifndef __STRICT_ANSI__
+ /* fast always-buffered version, true iff error */
+ #define	fast_putc(x,p) (--(p)->_w < 0 ? \
+@@ -679,9 +639,6 @@ _ELIDABLE_INLINE int __sputc_r(struct _reent *_ptr, int _c, FILE *_p) {
+ 
+ #endif /* !__CUSTOM_FILE_IO__ */
+ 
+-#define	getchar()	getc(stdin)
+-#define	putchar(x)	putc(x, stdout)
+-
+ _END_STD_C
+ 
+ #endif /* _STDIO_H_ */
+diff --git a/newlib/libc/stdio/putc.c b/newlib/libc/stdio/putc.c
+index 2b1fd1b..f64925e 100644
+--- a/newlib/libc/stdio/putc.c
++++ b/newlib/libc/stdio/putc.c
+@@ -89,6 +89,13 @@ static char sccsid[] = "%W% (Berkeley) %G%";
+ 
+ #undef putc
+ 
++int __sputc_r(struct _reent *_ptr, int _c, FILE *_p) {
++    if (--_p->_w >= 0 || (_p->_w >= _p->_lbfsize && (char)_c != '\\n'))
++        return (*_p->_p++ = _c);
++    else
++        return (__swbuf_r(_ptr, _c, _p));
++}
++
+ int
+ _DEFUN(_putc_r, (ptr, c, fp),
+        struct _reent *ptr _AND
+diff --git a/newlib/libc/stdlib/mallocr.c b/newlib/libc/stdlib/mallocr.c
+index ecc445f..c9f5a00 100644
+--- a/newlib/libc/stdlib/mallocr.c
++++ b/newlib/libc/stdlib/mallocr.c
+@@ -1,6 +1,3 @@
+-#ifdef MALLOC_PROVIDED
+-int _dummy_mallocr = 1;
+-#else
+ /* ---------- To make a malloc.h, start cutting here ------------ */
+ 
+ /* 
+@@ -381,11 +378,7 @@ extern void __malloc_unlock();
+ 
+ */
+ 
+-#if DEBUG 
+-#include <assert.h>
+-#else
+ #define assert(x) ((void)0)
+-#endif
+ 
+ 
+ /*
+@@ -1761,141 +1754,6 @@ extern unsigned long max_mmapped_mem;
+   Debugging support 
+ */
+ 
+-#if DEBUG
+-
+-
+-/*
+-  These routines make a number of assertions about the states
+-  of data structures that should be true at all times. If any
+-  are not true, it's very likely that a user program has somehow
+-  trashed memory. (It's also possible that there is a coding error
+-  in malloc. In which case, please report it!)
+-*/
+-
+-#if __STD_C
+-static void do_check_chunk(mchunkptr p) 
+-#else
+-static void do_check_chunk(p) mchunkptr p;
+-#endif
+-{ 
+-  INTERNAL_SIZE_T sz = p->size & ~PREV_INUSE;
+-
+-  /* No checkable chunk is mmapped */
+-  assert(!chunk_is_mmapped(p));
+-
+-  /* Check for legal address ... */
+-  assert((char*)p >= sbrk_base);
+-  if (p != top) 
+-    assert((char*)p + sz <= (char*)top);
+-  else
+-    assert((char*)p + sz <= sbrk_base + sbrked_mem);
+-
+-}
+-
+-
+-#if __STD_C
+-static void do_check_free_chunk(mchunkptr p) 
+-#else
+-static void do_check_free_chunk(p) mchunkptr p;
+-#endif
+-{ 
+-  INTERNAL_SIZE_T sz = p->size & ~PREV_INUSE;
+-  mchunkptr next = chunk_at_offset(p, sz);
+-
+-  do_check_chunk(p);
+-
+-  /* Check whether it claims to be free ... */
+-  assert(!inuse(p));
+-
+-  /* Unless a special marker, must have OK fields */
+-  if ((long)sz >= (long)MINSIZE)
+-  {
+-    assert((sz & MALLOC_ALIGN_MASK) == 0);
+-    assert(aligned_OK(chunk2mem(p)));
+-    /* ... matching footer field */
+-    assert(next->prev_size == sz);
+-    /* ... and is fully consolidated */
+-    assert(prev_inuse(p));
+-    assert (next == top || inuse(next));
+-    
+-    /* ... and has minimally sane links */
+-    assert(p->fd->bk == p);
+-    assert(p->bk->fd == p);
+-  }
+-  else /* markers are always of size SIZE_SZ */
+-    assert(sz == SIZE_SZ); 
+-}
+-
+-#if __STD_C
+-static void do_check_inuse_chunk(mchunkptr p) 
+-#else
+-static void do_check_inuse_chunk(p) mchunkptr p;
+-#endif
+-{ 
+-  mchunkptr next = next_chunk(p);
+-  do_check_chunk(p);
+-
+-  /* Check whether it claims to be in use ... */
+-  assert(inuse(p));
+-
+-  /* ... and is surrounded by OK chunks.
+-    Since more things can be checked with free chunks than inuse ones,
+-    if an inuse chunk borders them and debug is on, it's worth doing them.
+-  */
+-  if (!prev_inuse(p)) 
+-  {
+-    mchunkptr prv = prev_chunk(p);
+-    assert(next_chunk(prv) == p);
+-    do_check_free_chunk(prv);
+-  }
+-  if (next == top)
+-  {
+-    assert(prev_inuse(next));
+-    assert(chunksize(next) >= MINSIZE);
+-  }
+-  else if (!inuse(next))
+-    do_check_free_chunk(next);
+-
+-}
+-
+-#if __STD_C
+-static void do_check_malloced_chunk(mchunkptr p, INTERNAL_SIZE_T s) 
+-#else
+-static void do_check_malloced_chunk(p, s) mchunkptr p; INTERNAL_SIZE_T s;
+-#endif
+-{
+-  INTERNAL_SIZE_T sz = p->size & ~PREV_INUSE;
+-  long room = long_sub_size_t(sz, s);
+-
+-  do_check_inuse_chunk(p);
+-
+-  /* Legal size ... */
+-  assert((long)sz >= (long)MINSIZE);
+-  assert((sz & MALLOC_ALIGN_MASK) == 0);
+-  assert(room >= 0);
+-  assert(room < (long)MINSIZE);
+-
+-  /* ... and alignment */
+-  assert(aligned_OK(chunk2mem(p)));
+-
+-
+-  /* ... and was allocated at front of an available chunk */
+-  assert(prev_inuse(p));
+-
+-}
+-
+-
+-#define check_free_chunk(P)  do_check_free_chunk(P)
+-#define check_inuse_chunk(P) do_check_inuse_chunk(P)
+-#define check_chunk(P) do_check_chunk(P)
+-#define check_malloced_chunk(P,N) do_check_malloced_chunk(P,N)
+-#else
+-#define check_free_chunk(P) 
+-#define check_inuse_chunk(P)
+-#define check_chunk(P)
+-#define check_malloced_chunk(P,N)
+-#endif
+-
+ 
+ 
+ /* 
+@@ -2126,7 +1984,7 @@ static mchunkptr mremap_chunk(p, new_size) mchunkptr p; size_t new_size;
+ 
+ 
+ 
+-#ifdef DEFINE_MALLOC
++#if defined (DEFINE_MALLOC) && !defined (MALLOC_PROVIDED)
+ 
+ /* 
+   Extend the top-most chunk by obtaining memory from system.
+@@ -3275,99 +3133,7 @@ void cfree(mem) Void_t *mem;
+ #endif
+ 
+ #endif /* DEFINE_CFREE */
+-
+-#ifdef DEFINE_FREE
+-
+-/*
+-
+-    Malloc_trim gives memory back to the system (via negative
+-    arguments to sbrk) if there is unused memory at the `high' end of
+-    the malloc pool. You can call this after freeing large blocks of
+-    memory to potentially reduce the system-level memory requirements
+-    of a program. However, it cannot guarantee to reduce memory. Under
+-    some allocation patterns, some large free blocks of memory will be
+-    locked between two used chunks, so they cannot be given back to
+-    the system.
+-
+-    The `pad' argument to malloc_trim represents the amount of free
+-    trailing space to leave untrimmed. If this argument is zero,
+-    only the minimum amount of memory to maintain internal data
+-    structures will be left (one page or less). Non-zero arguments
+-    can be supplied to maintain enough trailing space to service
+-    future expected allocations without having to re-obtain memory
+-    from the system.
+-
+-    Malloc_trim returns 1 if it actually released any memory, else 0.
+-
+-*/
+-
+-#if __STD_C
+-int malloc_trim(RARG size_t pad)
+-#else
+-int malloc_trim(RARG pad) RDECL size_t pad;
+-#endif
+-{
+-  long  top_size;        /* Amount of top-most memory */
+-  long  extra;           /* Amount to release */
+-  char* current_brk;     /* address returned by pre-check sbrk call */
+-  char* new_brk;         /* address returned by negative sbrk call */
+-
+-  unsigned long pagesz = malloc_getpagesize;
+-
+-  MALLOC_LOCK;
+-
+-  top_size = chunksize(top);
+-  extra = ((top_size - pad - MINSIZE + (pagesz-1)) / pagesz - 1) * pagesz;
+ 
+-  if (extra < (long)pagesz)  /* Not enough memory to release */
+-  {
+-    MALLOC_UNLOCK;
+-    return 0;
+-  }
+-
+-  else
+-  {
+-    /* Test to make sure no one else called sbrk */
+-    current_brk = (char*)(MORECORE (0));
+-    if (current_brk != (char*)(top) + top_size)
+-    {
+-      MALLOC_UNLOCK;
+-      return 0;     /* Apparently we don't own memory; must fail */
+-    }
+-
+-    else
+-    {
+-      new_brk = (char*)(MORECORE (-extra));
+-      
+-      if (new_brk == (char*)(MORECORE_FAILURE)) /* sbrk failed? */
+-      {
+-        /* Try to figure out what we have */
+-        current_brk = (char*)(MORECORE (0));
+-        top_size = current_brk - (char*)top;
+-        if (top_size >= (long)MINSIZE) /* if not, we are very very dead! */
+-        {
+-          sbrked_mem = current_brk - sbrk_base;
+-          set_head(top, top_size | PREV_INUSE);
+-        }
+-        check_chunk(top);
+-	MALLOC_UNLOCK;
+-        return 0; 
+-      }
+-
+-      else
+-      {
+-        /* Success. Adjust top accordingly. */
+-        set_head(top, (top_size - extra) | PREV_INUSE);
+-        sbrked_mem -= extra;
+-        check_chunk(top);
+-	MALLOC_UNLOCK;
+-        return 1;
+-      }
+-    }
+-  }
+-}
+-
+-#endif /* DEFINE_FREE */
+ 
+ #ifdef DEFINE_MALLOC_USABLE_SIZE
+ 
+@@ -3397,11 +3163,6 @@ size_t malloc_usable_size(RARG mem) RDECL Void_t* mem;
+     if(!chunk_is_mmapped(p))
+     {
+       if (!inuse(p)) return 0;
+-#if DEBUG
+-      MALLOC_LOCK;
+-      check_inuse_chunk(p);
+-      MALLOC_UNLOCK;
+-#endif
+       return chunksize(p) - SIZE_SZ;
+     }
+     return chunksize(p) - 2*SIZE_SZ;
+@@ -3419,9 +3180,6 @@ STATIC void malloc_update_mallinfo()
+   int i;
+   mbinptr b;
+   mchunkptr p;
+-#if DEBUG
+-  mchunkptr q;
+-#endif
+ 
+   INTERNAL_SIZE_T avail = chunksize(top);
+   int   navail = ((long)(avail) >= (long)MINSIZE)? 1 : 0;
+@@ -3431,13 +3189,6 @@ STATIC void malloc_update_mallinfo()
+     b = bin_at(i);
+     for (p = last(b); p != b; p = p->bk) 
+     {
+-#if DEBUG
+-      check_free_chunk(p);
+-      for (q = next_chunk(p); 
+-           q < top && inuse(q) && (long)(chunksize(q)) >= (long)MINSIZE; 
+-           q = next_chunk(q))
+-        check_inuse_chunk(q);
+-#endif
+       avail += chunksize(p);
+       navail++;
+     }
+@@ -3697,4 +3448,3 @@ History:
+          structure of old version,  but most details differ.)
+ 
+ */
+-#endif
+diff --git a/newlib/libc/stdlib/mlock.c b/newlib/libc/stdlib/mlock.c
+index 888c986..43e5e39 100644
+--- a/newlib/libc/stdlib/mlock.c
++++ b/newlib/libc/stdlib/mlock.c
+@@ -1,4 +1,3 @@
+-#ifndef MALLOC_PROVIDED
+ /*
+ FUNCTION
+ <<__malloc_lock>>, <<__malloc_unlock>>---lock malloc pool
+@@ -60,5 +59,3 @@ __malloc_unlock (ptr)
+   __lock_release_recursive (__malloc_lock_object);
+ #endif
+ }
+-
+-#endif

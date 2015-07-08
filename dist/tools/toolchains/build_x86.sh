@@ -6,6 +6,7 @@
 [[ -z $BUILDDIR ]] && BUILDDIR=${TMP_DIR}/${TARGET}
 [[ -z $PREFIX ]] && PREFIX=${PWD}/toolchain/${TARGET}
 [[ -z $MAKE_THREADS ]] && MAKE_THREADS=
+PATCHDIR=$(readlink -e "$(dirname $0)/patches")
 
 NEWLIB_VER=2.1.0
 NEWLIB_MD5=c6559d83ecce4728a52f0ce7ec80de97
@@ -28,54 +29,7 @@ NEWLIB_CONFIGURE_FLAGS=(
     --enable-newlib-multithread
 )
 NEWLIB_PATCHES=(
-libgloss/i386/cygmon-gmon.c
-'64d
-59a
-#include <string.h>
-
-.'
-
-libgloss/arm/_exit.c
-'14a
-  __builtin_unreachable ();
-.'
-
-newlib/libc/stdlib/mallocr.c
-'3700d
-3434,3440d
-3422,3424d
-3400,3404d
-3357,3370d
-3278,3355d
-2129c
-#if defined (DEFINE_MALLOC) && !defined (MALLOC_PROVIDED)
-.
-1764,1898d
-388d
-384,386d
-1,3d'
-
-newlib/libc/stdlib/mlock.c
-'63,64d
-1d'
-
-newlib/libc/include/stdio.h
-'681,683d
-658,668d
-616,645c
-int _EXFUN(__sputc_r, (struct _reent *, int, FILE *));
-.'
-
-newlib/libc/stdio/putc.c
-"91a
-int __sputc_r(struct _reent *_ptr, int _c, FILE *_p) {
-    if (--_p->_w >= 0 || (_p->_w >= _p->_lbfsize && (char)_c != '\\n'))
-        return (*_p->_p++ = _c);
-    else
-        return (__swbuf_r(_ptr, _c, _p));
-}
-
-."
+newlib-2.1.0-RIOT-i586-none-elf.patch
 )
 NEWLIB_TARGET_CFLAGS=(
     -DREENTRANT_SYSCALLS_PROVIDED
@@ -335,9 +289,13 @@ extract() {
     fi
     if [[ ! -x ./newlib-${NEWLIB_VER}/configure ]]; then
         tar xzf ${TMP_DIR}/newlib-${NEWLIB_VER}.tar.gz &&
-        for (( I=0; I < ${#NEWLIB_PATCHES[@]}; I+=2 )); do
-            echo "Applying Newlib patch $((${I} / 2 + 1))"
-            echo "${NEWLIB_PATCHES[$I+1]}" | patch -e ./newlib-${NEWLIB_VER}/"${NEWLIB_PATCHES[$I]}" || return $?
+        for (( I=0; I < ${#NEWLIB_PATCHES[@]}; I+=1 )); do
+            echo "Applying Newlib patch ${NEWLIB_PATCHES[$I]}"
+            for (( P=0; P < 4; P+=1 )); do
+                patch -p${P} --dry-run -f < "${PATCHDIR}/${NEWLIB_PATCHES[$I]}" 2>&1 > /dev/null || continue
+                patch -p${P} -f < "${PATCHDIR}/${NEWLIB_PATCHES[$I]}" || return $?
+                break
+            done
         done
     fi
 }
