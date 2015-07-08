@@ -481,6 +481,7 @@ void ng_ipv6_netif_init_by_dev(void)
 
         if ((ng_netapi_get(ifs[i], NETCONF_OPT_IPV6_IID, 0, &iid,
                            sizeof(eui64_t)) < 0)) {
+            mutex_unlock(&ipv6_if->mutex);
             continue;
         }
 
