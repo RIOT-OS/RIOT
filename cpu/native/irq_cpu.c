@@ -464,8 +464,8 @@ void native_interrupt_init(void)
 
     sa.sa_flags = SA_RESTART | SA_SIGINFO | SA_ONSTACK;
 
-    /* get current process interrupt masks */
-    if (sigprocmask(SIG_SETMASK, NULL, &_native_sig_set) == -1) {
+    /* We want to white list authorized signals */
+    if (sigfillset(&_native_sig_set) == -1) {
         err(EXIT_FAILURE, "native_interrupt_init: sigprocmask");
     }
     /* we need to disable all signals during our signal handler as it
