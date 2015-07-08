@@ -32,7 +32,8 @@
 #include "vtimer.h"
 
 static uint16_t id = 0x53;
-static uint16_t seq = 1;
+static uint16_t min_seq_expected = 0;
+static uint16_t max_seq_expected = 0;
 static char ipv6_str[NG_IPV6_ADDR_MAX_STR_LEN];
 
 static void usage(char **argv)
@@ -46,18 +47,29 @@ void _set_payload(ng_icmpv6_echo_t *hdr, size_t payload_len)
     uint8_t *payload = (uint8_t *)(hdr + 1);
 
     while (i < payload_len) {
-        if (seq > 0xff) {
-            payload[i] = (uint8_t)(seq >> 8);
-            payload[i + 1] = (uint8_t)(seq & 0xff);
+        if (id > 0xff) {
+            payload[i] = (uint8_t)(id >> 8);
+            payload[i + 1] = (uint8_t)(id & 0xff);
             i += 2;
         }
         else {
-            payload[i++] = (uint8_t)(seq & 0xff);
+            payload[i++] = (uint8_t)(id & 0xff);
         }
     }
 
-    if (i > payload_len) {
-        payload[payload_len - 1] = seq >> 8;
+    if (i > payload_len) {  /* when id > 0xff and payload_len is odd */
+        payload[payload_len - 1] = id >> 8;
+    }
+}
+
+static inline bool _expected_seq(uint16_t seq)
+{
+    /* take integer overflows in account */
+    if (min_seq_expected > max_seq_expected) {
+        return (seq >= min_seq_expected) || (seq <= max_seq_expected);
+    }
+    else {
+        return (seq >= min_seq_expected) && (seq <= max_seq_expected);
     }
 }
 
@@ -66,6 +78,7 @@ int _handle_reply(ng_pktsnip_t *pkt, uint64_t time)
     ng_pktsnip_t *ipv6, *icmpv6;
     ng_ipv6_hdr_t *ipv6_hdr;
     ng_icmpv6_echo_t *icmpv6_hdr;
+    uint16_t seq;
 
     LL_SEARCH_SCALAR(pkt, ipv6, type, NG_NETTYPE_IPV6);
     LL_SEARCH_SCALAR(pkt, icmpv6, type, NG_NETTYPE_ICMPV6);
@@ -77,15 +90,18 @@ int _handle_reply(ng_pktsnip_t *pkt, uint64_t time)
 
     ipv6_hdr = ipv6->data;
     icmpv6_hdr = icmpv6->data;
+    seq = byteorder_ntohs(icmpv6_hdr->seq);
 
-    if ((byteorder_ntohs(icmpv6_hdr->id) == id) &&
-        (byteorder_ntohs(icmpv6_hdr->seq) == seq)) {
+    if ((byteorder_ntohs(icmpv6_hdr->id) == id) && _expected_seq(seq)) {
+        if (seq <= min_seq_expected) {
+            min_seq_expected++;
+        }
+
         timex_t rt = timex_from_uint64(time);
         printf("%u bytes from %s: id=%" PRIu16 " seq=%" PRIu16 " hop limit=%" PRIu8
                " time = %" PRIu32 ".%03" PRIu32 " ms\n", (unsigned) icmpv6->size,
                ng_ipv6_addr_to_str(ipv6_str, &(ipv6_hdr->src), sizeof(ipv6_str)),
-               byteorder_ntohs(icmpv6_hdr->id), byteorder_ntohs(icmpv6_hdr->seq),
-               ipv6_hdr->hl,
+               byteorder_ntohs(icmpv6_hdr->id), seq, ipv6_hdr->hl,
                (rt.seconds * SEC_IN_MS) + (rt.microseconds / MS_IN_USEC),
                rt.microseconds % MS_IN_USEC);
         ng_ipv6_nc_still_reachable(&ipv6_hdr->src);
@@ -156,7 +172,8 @@ int _icmpv6_ping(int argc, char **argv)
         ng_pktsnip_t *pkt;
         timex_t start, stop, timeout = { 5, 0 };
 
-        pkt = ng_icmpv6_echo_req_build(id, seq, NULL, payload_len);
+        pkt = ng_icmpv6_echo_req_build(id, ++max_seq_expected, NULL,
+                                       payload_len);
 
         if (pkt == NULL) {
             puts("error: packet buffer full");
@@ -207,11 +224,9 @@ int _icmpv6_ping(int argc, char **argv)
         else {
             puts("ping timeout");
         }
-
-        seq++;
     }
 
-    seq = 1;
+    max_seq_expected = 0;
     id++;
 
     ng_netreg_unregister(NG_NETTYPE_ICMPV6, &my_entry);
