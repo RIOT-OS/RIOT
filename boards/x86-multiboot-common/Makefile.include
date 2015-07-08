@@ -3,7 +3,7 @@ ifeq (, $(NEWLIB_BASE))
 endif
 
 ifneq (0, $(shell test -e "$(NEWLIB_BASE)/lib/libc.a" && echo $$?))
-  NEWLIB_PRECOMPILED_NAME := i586-newlib_2.1.0_tlsf-1254.tar.bz2
+  NEWLIB_PRECOMPILED_NAME := i586-newlib_2.2.0.20150623_tlsf-3337.tar.bz2
   NEWLIB_PRECOMPILED := http://download.riot-os.org/$(NEWLIB_PRECOMPILED_NAME)
 
   $(warning Precompiled newlib is missing in $(NEWLIB_BASE))
