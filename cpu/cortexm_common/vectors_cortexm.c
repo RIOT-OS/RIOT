@@ -74,8 +74,12 @@ void reset_handler_default(void)
 
     pre_startup();
 
-    /* fill stack space with canary values */
-    for (dst = &_sstack; dst < &_estack; ) {
+    uint32_t *top;
+    /* Fill stack space with canary values up until the current stack pointer */
+    /* Read current stack pointer from CPU register */
+    asm volatile ("mov %[top], sp" : [top] "=r" (top) : : );
+    dst = &_sstack;
+    while (dst < top) {
         *(dst++) = STACK_CANARY_WORD;
     }
 
