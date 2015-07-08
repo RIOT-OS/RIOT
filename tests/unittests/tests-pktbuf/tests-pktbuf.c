@@ -273,6 +273,25 @@ static void test_pktbuf_add__packed_struct(void)
     TEST_ASSERT_EQUAL_INT(data.s64, data_cpy->s64);
 }
 
+static void test_pktbuf_add__unaligned_in_aligned_hole(void)
+{
+    ng_pktsnip_t *pkt1 = ng_pktbuf_add(NULL, NULL, 8, NG_NETTYPE_UNDEF);
+    ng_pktsnip_t *pkt2 = ng_pktbuf_add(NULL, NULL, 8, NG_NETTYPE_UNDEF);
+    ng_pktsnip_t *pkt3 = ng_pktbuf_add(NULL, NULL, 8, NG_NETTYPE_UNDEF);
+    ng_pktsnip_t *pkt4;
+    void *tmp_data2 = pkt2->data;
+
+    ng_pktbuf_release(pkt2);
+    pkt4 = ng_pktbuf_add(NULL, TEST_STRING8, 9, NG_NETTYPE_UNDEF);
+
+    TEST_ASSERT(tmp_data2 != pkt4->data);
+
+    ng_pktbuf_release(pkt1);
+    ng_pktbuf_release(pkt3);
+    ng_pktbuf_release(pkt4);
+    TEST_ASSERT(ng_pktbuf_is_empty());
+}
+
 static void test_pktbuf_realloc_data__pkt_NULL(void)
 {
     TEST_ASSERT_EQUAL_INT(ENOENT, ng_pktbuf_realloc_data(NULL, 0));
@@ -615,6 +634,7 @@ Test *tests_pktbuf_tests(void)
 #endif
         new_TestFixture(test_pktbuf_add__success),
         new_TestFixture(test_pktbuf_add__packed_struct),
+        new_TestFixture(test_pktbuf_add__unaligned_in_aligned_hole),
         new_TestFixture(test_pktbuf_realloc_data__pkt_NULL),
         new_TestFixture(test_pktbuf_realloc_data__pkt_wrong),
         new_TestFixture(test_pktbuf_realloc_data__pkt_data_wrong),
