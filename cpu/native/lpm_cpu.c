@@ -55,6 +55,7 @@ void _native_lpm_sleep(void)
 
     _native_in_syscall++; // no switching here
     nfds = real_select(nfds, &_native_rfds, NULL, NULL, NULL);
+    int _errno = errno;
     _native_in_syscall--;
 
     DEBUG("_native_lpm_sleep: returned: %i\n", nfds);
@@ -64,7 +65,7 @@ void _native_lpm_sleep(void)
         /* TODO: switch to ISR context */
         _native_handle_uart0_input();
     }
-    else if ((errno == EAGAIN) || (errno == EWOULDBLOCK)) {
+    else if ((_errno == EAGAIN) || (_errno == EWOULDBLOCK)) {
         /* would block / resource unavailable .. it appears a
          * contended socket can show this behavior sometimes */
         _native_in_syscall++;
@@ -72,7 +73,7 @@ void _native_lpm_sleep(void)
         _native_in_syscall--;
         return;
     }
-    else if (errno != EINTR) {
+    else if (_errno != EINTR) {
         /* select failed for reason other than signal */
         err(EXIT_FAILURE, "lpm_set(): select()");
     }
