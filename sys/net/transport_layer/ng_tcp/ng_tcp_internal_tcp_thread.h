@@ -12,8 +12,6 @@ static ng_pktsnip_t* _tcp_build_reset(ng_pktsnip_t *pkt)
     uint16_t ctl = 0;
     size_t seg_len = _get_seg_len(pkt);
 
-
-
     /* Get received tcp header */
     LL_SEARCH_SCALAR(pkt, snp, type, NG_NETTYPE_TCP);
     ng_tcp_hdr_t *tcp_hdr_old = (ng_tcp_hdr_t *)snp->data;
@@ -36,7 +34,7 @@ static ng_pktsnip_t* _tcp_build_reset(ng_pktsnip_t *pkt)
 
     }else {
         tcp_hdr.seq_num = byteorder_htonl(0);
-        tcp_hdr.ack_num = byteorder_htonl(byteorder_ntohl(tcp_hdr_old->seq_num) + seg_len);
+        tcp_hdr.ack_num = byteorder_htonl(byteorder_ntohl(tcp_hdr_old->seq_num) + seg_len + 1);
         tcp_hdr.off_ctl = byteorder_htons(OFFSET_BASE | MSK_RST_ACK);
     }
 
@@ -129,8 +127,8 @@ static void _tcp_receive(ng_pktsnip_t *pkt)
         return;
     }
 
-    /* If SYN only is set, move it to contexts that wait for a initial communication */
-    /* If not, send it to fitting context(src and dst combination) */
+    /* If only SYN is set, move it to contexts that wait for a initial communication */
+    /* If not, send it to fitting context(context = srcport << 16 & dstport) */
     if((ctl & MSK_SYN_ACK) == MSK_SYN){
         context = _build_context(PORT_UNSPEC, byteorder_ntohs(tcp_hdr->dst_port));
     } else {

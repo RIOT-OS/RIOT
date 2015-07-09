@@ -120,6 +120,21 @@ typedef enum {CLOSED,
               TIME_WAIT
 } ng_tcp_states_t;
 
+/**
+ * @brief TCP header definition
+ */
+typedef struct __attribute__((packed)) {
+    network_uint16_t src_port;              /**< source port, in network byte order */
+    network_uint16_t dst_port;              /**< destination port, in network byte order */
+    network_uint32_t seq_num;               /**< sequence number, in network byte order */
+    network_uint32_t ack_num;               /**< acknowledgement number, in network byte order */
+    network_uint16_t off_ctl;               /**< Data Offset and control Bits in network byte order */
+    network_uint16_t window;                /**< window, in network byte order */
+    network_uint16_t checksum;              /**< checksum, in network byte order */
+    network_uint16_t urgent_ptr;            /**< urgent pointer, in network byte order */
+    network_uint32_t options[MAX_OPTIONS];  /**< Option Fields (Optional) */
+} ng_tcp_hdr_t;
+
 typedef struct __attribute__((packed)) {
   uint8_t no_of_retries;
   ng_pktsnip_t* pkt;
@@ -159,6 +174,11 @@ typedef struct __attribute__((packed)) {
     /* Max Window Size */
     uint16_t mss;              /**< Peer Maximum Window Size */
 
+    /* Next paket to send */
+    ng_pktsnip_t *cur_pkt;
+    ng_tcp_hdr_t *cur_tcp_hdr;
+    size_t cur_seg_len;
+
     /* Send and Receive Buffers */
     uint8_t *snd_buf;
     size_t   snd_buf_size;
@@ -167,7 +187,6 @@ typedef struct __attribute__((packed)) {
 
     /* Retransmit Queue */
     ng_tcp_queue_entry_t ret_queue[NG_TCP_RETRANSMIT_QUEUE_SIZE];
-    uint8_t ret_head;
     uint8_t ret_size;
     timex_t ret_tout;
 
@@ -175,23 +194,7 @@ typedef struct __attribute__((packed)) {
     kernel_pid_t owner;
     void* next;
     ng_netreg_entry_t netreg_entry;
-    timex_t timeout;
 } ng_tcp_tcb_t;
-
-/**
- * @brief TCP header definition
- */
-typedef struct __attribute__((packed)) {
-    network_uint16_t src_port;              /**< source port, in network byte order */
-    network_uint16_t dst_port;              /**< destination port, in network byte order */
-    network_uint32_t seq_num;               /**< sequence number, in network byte order */
-    network_uint32_t ack_num;               /**< acknowledgement number, in network byte order */
-    network_uint16_t off_ctl;               /**< Data Offset and control Bits in network byte order */
-    network_uint16_t window;                /**< window, in network byte order */
-    network_uint16_t checksum;              /**< checksum, in network byte order */
-    network_uint16_t urgent_ptr;            /**< urgent pointer, in network byte order */
-    network_uint32_t options[MAX_OPTIONS];  /**< Option Fields (Optional) */
-} ng_tcp_hdr_t;
 
 /**
  * @brief Initialize and start TCP
@@ -261,7 +264,7 @@ int8_t ng_tcp_open(ng_tcp_tcb_t *tcb, uint16_t local_port, uint8_t *peer_addr, s
 /**
  * @brief TODO
  */
-int8_t ng_tcp_send(ng_tcp_tcb/_t *tcb, uint8_t *buf, size_t byte_count, bool push, bool urgent);
+int8_t ng_tcp_send(ng_tcp_tcb_t *tcb, uint8_t *buf, size_t byte_count, bool push, bool urgent);
 
 /**
  * @brief TODO

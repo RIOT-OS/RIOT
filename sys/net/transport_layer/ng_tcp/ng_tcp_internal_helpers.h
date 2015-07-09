@@ -107,47 +107,56 @@ void ng_tcp_hdr_print (const ng_tcp_hdr_t *hdr)
 }
 //#endif
 
+static ng_tcp_hdr_t* _get_tcp_hdr(ng_pktsnip_t* pkt)
+{
+    ng_pktsnip_t* snp = NULL;
+    LL_SEARCH_SCALAR(pkt, snp, type, NG_NETTYPE_TCP);
+    return (ng_tcp_hdr_t*) snp->data;
+}
+
 /* TODO: Rewrite */
 /**
- * @brief Send a segment to a peer
+ * @brief Build and allocate a tcp paket in paketbuffer, tcb stores pointer to new paket.
  *
- * @param[in] tcb           transmission control block that contains segment information
- * @param[in] ctl           control bits to send to peer
+ * @param[in/out] tcb       transmission control block that contains segment information
+ * @param[in] ctl           control bits to set in pkt
+ * @param[in] seq_num       sequence number to use in new paket
+ * @param[in] ack_num       acknowledgment number to use in new paket
  * @param[in] payload       pointer to payload buffer
  * @param[in] payload_len   payload size
  *
  * @return                  Zero on success
  * @return                  -ENOMEM if pktbuf is full.
  */
-static ng_pktsnip_t* _build_pkt(const ng_tcp_tcb_t *tcb,
-                                const uint16_t ctl,
-                                const uint32_t seq_num,
-                                const uint32_t ack_num,
-                                uint8_t *payload,
-                                const size_t payload_len)
+static int8_t _build_pkt(ng_tcp_tcb_t *tcb,
+                         const uint16_t ctl,
+                         const uint32_t seq_num,
+                         const uint32_t ack_num,
+                         uint8_t *payload,
+                         const size_t payload_len)
 {
     ng_pktsnip_t *pkt_snp = NULL;
     ng_tcp_hdr_t  tcp_hdr;
 
-    /* Add payload snip, if supplied */
+    /* Add payload, if supplied */
     if(payload != NULL && payload_len > 0){
         pkt_snp = ng_pktbuf_add(pkt_snp, payload, payload_len, NG_NETTYPE_UNDEF);
         if(pkt_snp == NULL){
             DEBUG("tcp: Can't allocate buffer for Payload Header\n.");
-            return NULL;
+            return -ENOMEM;
         }
     }
 
-    /* Build tcp-header by hand, because of resizing problems, after payload allocation */
+    /* Build tcp-header */
     tcp_hdr.src_port = byteorder_htons(tcb->local_port);
     tcp_hdr.dst_port = byteorder_htons(tcb->peer_port);
     tcp_hdr.checksum = byteorder_htons(0);
-    tcp_hdr.seq_num =  byteorder_htonl(seq_num);
+    tcp_hdr.seq_num = byteorder_htonl(seq_num);
     tcp_hdr.ack_num = byteorder_htonl(ack_num);
     tcp_hdr.window = byteorder_htons(tcb->rcv_wnd);
     tcp_hdr.urgent_ptr = byteorder_htons(0);
 
-    /* tcp option sending */
+    /* tcp option handling */
     /* If this is a syn-message, send mss option */
     uint8_t nopts = 0;
     if(ctl & MSK_SYN){
@@ -158,10 +167,11 @@ static ng_pktsnip_t* _build_pkt(const ng_tcp_tcb_t *tcb,
     }
     tcp_hdr.off_ctl = byteorder_htons( (OFFSET_BASE + nopts) | ctl);
 
-    pkt_snp = ng_pktbuf_add(pkt_snp, &tcp_hdr, (OFFSET_BASE + nopts ) * 4, NG_NETTYPE_TCP);
+    /* allocate tcp header */
+    pkt_snp = ng_pktbuf_add(pkt_snp, &tcp_hdr, (OFFSET_BASE + nopts) * 4, NG_NETTYPE_TCP);
     if(pkt_snp == NULL){
         DEBUG("tcp: Can't allocate buffer for TCP Header\n.");
-        return NULL;
+        return -ENOMEM;
     }
 
     /* Build network layer header */
@@ -169,12 +179,15 @@ static ng_pktsnip_t* _build_pkt(const ng_tcp_tcb_t *tcb,
     pkt_snp = ng_ipv6_hdr_build(pkt_snp, NULL, 0, tcb->peer_addr, tcb->peer_addr_len);
     if(pkt_snp == NULL){
         DEBUG("tcp: Can't allocate buffer for IPv6 Header.\n");
-        return NULL;
+        return -ENOMEM;
     }
 #endif
 
-    /* Send packet */
-    return pkt_snp;
+    /* Assign Pointers to tcb */
+    tcb->cur_pkt = pkt_snp;
+    tcb->cur_tcp_hdr = _get_tcp_hdr(pkt_snp);
+    tcb->cur_seg_len = payload_len;
+    return 0;
 }
 
 /**
@@ -273,22 +286,6 @@ static uint16_t _get_free_port(const uint8_t dst_port)
             rnd_val = (genrand_uint32() >> 16);
         }
         return rnd_val;
-}
-
-/**
- * @brief Sets timeout to a given microsecond value.
- *
- * @param[in/out] tcb    tcb that contians timex_t timout to change
- * @param[in]     msec   microseconds after the timeout should expire.
- */
-static inline void _setup_timeout(ng_tcp_tcb_t *tcb, const uint32_t msec){
-    tcb->timeout.microseconds = msec;
-    timex_normalize(&tcb->timeout);
-}
-
-static inline void _clear_timeout(ng_tcp_tcb_t *tcb){
-    tcb->timeout.seconds = 0;
-    tcb->timeout.microseconds = 0;
 }
 
 /**
@@ -440,6 +437,8 @@ static uint32_t _get_seg_len(ng_pktsnip_t *pkt)
     return seg_len;
 }
 
+/* TCB-Linked-List Handling Functions */
+
 static void _add_tcb_to_list(ng_tcp_tcb_t *tcb)
 {
     ng_tcp_tcb_t** ptr = &_head_tcb_list;
@@ -470,45 +469,101 @@ static ng_tcp_tcb_t* _search_tcb_of_owner(kernel_pid_t owner)
     return ptr;
 }
 
-static void _send_pkt(ng_tcp_tcb_t* tcb, ng_pktsnip_t* pkt)
+static void _dump_ret_queue(ng_tcp_tcb_t* tcb)
 {
-    ng_tcp_queue_entry_t* entry = NULL;
-
-    /* Check if Paket is already in the transmission queue */
-    for(int i=0; i<NG_TCP_RETRANSMIT_QUEUE_SIZE; i++){
-        if(tcb->ret_queue[i].pkt == pkt){
-            entry = &(ret_queue[i]);
-            entry->no_of_retries += 1;
-            break;
-        }
+    printf("Current Buffer Size: %d\n", tcb->ret_size);
+    for(int i=0; i < NG_TCP_RETRANSMIT_QUEUE_SIZE; ++i){
+        printf("%d: pkt: %u, no: %d\n",i ,tcb->ret_queue[i].pkt, tcb->ret_queue[i].no_of_retries);
     }
+}
 
-    /* If not, try to add it */
-    if(entry == NULL){
-        /* If the queue is full: release pkt */
-        if(tcb->size == 0){
-            ng_pktbuf_release(pkt);
+static void _clear_retransmit_queue(ng_tcp_tcb_t* tcb){
+    for(uint8_t i=0; i < tcb->ret_size; i++){
+        ng_pktbuf_release(tcb->ret_queue[i].pkt);
+    }
+    tcb->ret_size = 0;
+}
+
+static void _send_pkt(ng_tcp_tcb_t* tcb, bool retransmit)
+{
+    msg_t msg;
+
+    /* If this is a retransmit, transmit queue head */
+    if(retransmit){
+        tcb->cur_pkt = tcb->ret_queue[0].pkt;
+        tcb->ret_queue[0].no_of_retries += 1;
+
+        /* Calculate new timer: Todo RTT */
+        tcb->ret_tout.seconds = 2;
+        ng_pktbuf_hold(tcb->cur_pkt, 1);
+
+        /* signal user */
+        msg_send(&msg, tcb->owner);
+
+    /* Add Paket to Queue if it contains data, or a SYN Flag*/
+    }else if(tcb->cur_seg_len > 0 || byteorder_ntohs(tcb->cur_tcp_hdr->off_ctl) & MSK_SYN){
+        /* If queue is full -> Release pkt*/
+        if(tcb->ret_size >= NG_TCP_RETRANSMIT_QUEUE_SIZE){
+            ng_pktbuf_release(tcb->cur_pkt);
             DEBUG("_send_pkt: Retransmit Queue is full, release pkt");
             return;
         }
+        /* Increase users to make pkt persistent, add it to queue, update size */
+        tcb->ret_queue[tcb->ret_size].pkt = tcb->cur_pkt;
+        tcb->ret_queue[tcb->ret_size].no_of_retries = 0;
+        ng_pktbuf_hold(tcb->cur_pkt, 1);
+        tcb->ret_size += 1;
 
-        /* Add it to queue. Increase users to make it persistent */
+        /* Calculate new timer */
+        tcb->ret_tout.seconds = 2;
 
+        /* signal user */
+        msg_send(&msg, tcb->owner);
     }
 
-    /* Calculate new timer */
-
-    /* signal user, not in case of a retransmit */
-
     /* Send pkt */
-    ng_netapi_send(_tcp_pid, pkt);
+    ng_netapi_send(_tcp_pid, tcb->cur_pkt);
 }
 
-static void _ack_pkt(uint32_t ack)
+static void _ack_pkt(ng_tcp_tcb_t* tcb, uint32_t ack)
 {
-    /* Remove pakets from retransmission queue */
+    msg_t msg;
+    ng_pktsnip_t* pkt = NULL;
+    ng_tcp_queue_entry_t tmp;
+    uint32_t seg = 0;
 
-    /* Setup Retransmission Timer */
+    /* If queue is empty there is nothing to ack */
+    if(tcb->ret_size <= 0){
+        DEBUG("Queue is empty, this could be an Error");
+        return;
+    }
+
+    /* For queue size, check if pakets are acked */
+    for(uint8_t i=0; i<tcb->ret_size; i++){
+        pkt = tcb->ret_queue[i].pkt;
+        seg = byteorder_ntohl(_get_tcp_hdr(pkt)->seq_num) + _get_seg_len(pkt);
+
+        /*if seq_no + seg_size < ack -> pkt is acked, remove it from queue*/
+        if(seg < ack){
+            ng_pktbuf_release(pkt);
+
+            // Swap entries
+            for(uint8_t j=i; j<tcb->ret_size-1; ++j){
+                tmp = tcb->ret_queue[j];
+                tcb->ret_queue[j] = tcb->ret_queue[j+1];
+                tcb->ret_queue[j+1] = tmp;
+            }
+
+            tcb->ret_size -= 1;
+        }
+    }
+
+    /* Remove timeout, if retransmit queue is empty */
+    if(tcb->ret_size <= 0){
+        tcb->ret_tout.seconds = 0;
+        tcb->ret_tout.microseconds = 0;
+    }
 
     /* Signal User */
+    msg_send(&msg, tcb->owner);
 }

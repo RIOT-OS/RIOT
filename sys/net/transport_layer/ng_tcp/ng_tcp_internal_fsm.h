@@ -9,19 +9,36 @@
 /* FSM */
 /* FSM accroding to rfc. */
 static int8_t _translate_to(ng_tcp_tcb_t *tcb, ng_tcp_states_t state){
+    msg_t msg;
+    bool notify_owner = false;
     switch(state){
-        case CLOSED:   _demux_remove(tcb);
-                       break;
-        case LISTEN:   _demux_change_context(tcb, PORT_UNSPEC, tcb->local_port);
-                       break;
-        default:       break;
+        case CLOSED:        _demux_remove(tcb);
+                            _clear_retransmit_queue(tcb);
+                            notify_owner = true;
+                            break;
+
+        case LISTEN:        _demux_change_context(tcb, PORT_UNSPEC, tcb->local_port);
+                            break;
+
+        case ESTABLISHED:   notify_owner = true;
+        default:            break;
     }
+
+    if(notify_owner){
+        msg_send(&msg, tcb->owner);
+    }
+
     tcb->state = state;
     return 0;
 }
 
 static int8_t _fsm(ng_tcp_tcb_t *tcb, ng_pktsnip_t *pkt, ng_tcp_event_t event)
 {
+    /* Clear current paket pointers. Use _build_pkt()-Function to fill these. */
+    tcb->cur_pkt = NULL;
+    tcb->cur_tcp_hdr = NULL;
+    tcb->cur_seg_len = 0;
+
     if(event == CALL_OPEN){
         /* Common actions */
         _demux_register(tcb);
@@ -35,7 +52,8 @@ static int8_t _fsm(ng_tcp_tcb_t *tcb, ng_pktsnip_t *pkt, ng_tcp_event_t event)
             tcb->iss = genrand_uint32();
             tcb->snd_una = tcb->iss;
             tcb->snd_nxt = tcb->snd_una+1;
-            _send_pkt(tcb, _build_pkt(tcb, MSK_SYN, tcb->iss, 0, NULL, 0));
+            _build_pkt(tcb, MSK_SYN, tcb->iss, 0, NULL, 0);
+            _send_pkt(tcb, false);
             _translate_to(tcb, SYN_SENT);
         }
     }
@@ -90,7 +108,8 @@ static int8_t _fsm(ng_tcp_tcb_t *tcb, ng_pktsnip_t *pkt, ng_tcp_event_t event)
 #endif
                 /* 2) Check ACK: if set, send reset, seq_no = ack_no */
                 if(ctl & MSK_ACK){
-                    _send_pkt(tcb, _build_pkt(tcb, MSK_RST, ack, 0, NULL, 0));
+                    _build_pkt(tcb, MSK_RST, ack, 0, NULL, 0);
+                    _send_pkt(tcb, false);
                     break;
                 }
                 /* 3) Check SYN: Setup incomming connection*/
@@ -112,7 +131,8 @@ static int8_t _fsm(ng_tcp_tcb_t *tcb, ng_pktsnip_t *pkt, ng_tcp_event_t event)
                     tcb->snd_wnd = byteorder_ntohs(tcp->window);
 
                     /* Send SYN+ACK: seq_no = iss, ack_no = rcv_nxt, T: LISTEN -> SYN_RCVD */
-                    _send_pkt(tcb, _build_pkt(tcb, MSK_SYN_ACK, tcb->iss, tcb->rcv_nxt, NULL, 0));
+                    _build_pkt(tcb, MSK_SYN_ACK, tcb->iss, tcb->rcv_nxt, NULL, 0);
+                    _send_pkt(tcb, false); 
                     _translate_to(tcb, SYN_RCVD);
                 }
                 break;
@@ -122,9 +142,10 @@ static int8_t _fsm(ng_tcp_tcb_t *tcb, ng_pktsnip_t *pkt, ng_tcp_event_t event)
                 /* 1) Check ACK: if set, validate it */
                 if(ctl & MSK_ACK){
                     /* If ack invalid and RST not set: send reset, seq_no = ack_no */
-                    if(ack <= tcb->iss || tcb->snd_nxt < ack){
+                    if(ack <= tcb->iss || ack > tcb->snd_nxt){
                         if((ctl & MSK_RST) != MSK_RST){
-                             _send_pkt(tcb, _build_pkt(tcb, MSK_RST, ack, 0, NULL, 0));
+                            _build_pkt(tcb, MSK_RST, ack, 0, NULL, 0);
+                            _send_pkt(tcb, false);
                         }
                         break;
                     }
@@ -142,16 +163,18 @@ static int8_t _fsm(ng_tcp_tcb_t *tcb, ng_pktsnip_t *pkt, ng_tcp_event_t event)
                     tcb->irs = seq;
                     if(ctl & MSK_ACK){
                         tcb->snd_una = ack;
-                        /* TODO: Remove acked pakets */
+                        _ack_pkt(tcb, ack);
                     }
 
                     if(tcb->snd_una > tcb->iss){
                         /* Initial SYN has been acked send ack, T: SYN_SENT -> ESTABLISHED */
-                        _send_pkt(tcb, _build_pkt(tcb, MSK_ACK, tcb->snd_nxt, tcb->rcv_nxt, NULL, 0));
+                        _build_pkt(tcb, MSK_ACK, tcb->snd_nxt, tcb->rcv_nxt, NULL, 0);
+                        _send_pkt(tcb, false);
                         _translate_to(tcb, ESTABLISHED);
                     }else{
                         /* Simultanious SYN received send SYN+ACK, T: SYN_SENT -> SYN_RCVD */
-                        _send_pkt(tcb, _build_pkt(tcb, MSK_SYN_ACK, tcb->iss, tcb->rcv_nxt, NULL, 0));
+                        _build_pkt(tcb, MSK_SYN_ACK, tcb->iss, tcb->rcv_nxt, NULL, 0);
+                        _send_pkt(tcb, false);
                         _translate_to(tcb, SYN_RCVD);
                     }
                 }
@@ -162,7 +185,8 @@ static int8_t _fsm(ng_tcp_tcb_t *tcb, ng_pktsnip_t *pkt, ng_tcp_event_t event)
                 /* 1) Check seq_no: If RST set: return, if seq_no invalid, send ACK*/
                 if(!_is_seq_num_acceptable(tcb, seq, _get_seg_len(pkt))){
                     if((ctl & MSK_RST) != MSK_RST){
-                        _send_pkt(tcb, _build_pkt(tcb, MSK_ACK, tcb->snd_nxt, tcb->rcv_nxt, NULL, 0));
+                        _build_pkt(tcb, MSK_ACK, tcb->snd_nxt, tcb->rcv_nxt, NULL, 0);
+                        _send_pkt(tcb, false);
                     }
                     break;
                 }
@@ -178,7 +202,8 @@ static int8_t _fsm(ng_tcp_tcb_t *tcb, ng_pktsnip_t *pkt, ng_tcp_event_t event)
                 }
                 /* 3) Check SYN: send RST, seq_no = snd_nxt, ack_no = rcv_nxt */
                 if(ctl & MSK_SYN){
-                    _send_pkt(tcb, _build_pkt(tcb, MSK_RST, tcb->snd_nxt, tcb->rcv_nxt, NULL,0));
+                    _build_pkt(tcb, MSK_RST, tcb->snd_nxt, tcb->rcv_nxt, NULL,0);
+                    _send_pkt(tcb, false);
                     _translate_to(tcb, CLOSED);
                     break;
                 }
@@ -190,23 +215,26 @@ static int8_t _fsm(ng_tcp_tcb_t *tcb, ng_pktsnip_t *pkt, ng_tcp_event_t event)
                         if(tcb->snd_una <= ack && ack <= tcb->snd_nxt){
                             _translate_to(tcb, ESTABLISHED);
                         }else{
-                            _send_pkt(tcb, _build_pkt(tcb, MSK_RST, ack, 0, NULL, 0));
+                            _build_pkt(tcb, MSK_RST, ack, 0, NULL, 0);
+                            _send_pkt(tcb, false);
                         }
-                    }else if(tcb->state == ESTABLISHED){
+                    }
+                    if(tcb->state == ESTABLISHED){
                         if(tcb->snd_una < ack && ack <= tcb->snd_nxt){
                             tcb->snd_una = ack;
-                            /* TODO: Remove acked packets, from retrans queue */
-                            /* TODO: Notify User */
+                            _ack_pkt(tcb, ack);
                             if(tcb->snd_wl1 < seq || (tcb->snd_wl1 == seq && tcb->snd_wl2 <= ack)){
                                 tcb->snd_wnd = byteorder_ntohs(tcp->window);
                                 tcb->snd_wl1 = seq;
                                 tcb->snd_wl2 = ack;
                             }
                         }else if(ack < tcb->snd_una){
-                            /* Old Duplicate */
+                            /* Old Duplicate, ignore */
                             break;
                         }else if(tcb->snd_nxt > ack){
-                            _send_pkt(tcb, _build_pkt(tcb, MSK_ACK, tcb->snd_nxt, tcb->rcv_nxt, NULL, 0));
+                            /* Something not yet sent: Send ACK */
+                            _build_pkt(tcb, MSK_ACK, tcb->snd_nxt, tcb->rcv_nxt, NULL, 0);
+                            _send_pkt(tcb, false);
                             break;
                         }/* TODO: Other State Processing */
                     }
@@ -221,9 +249,9 @@ static int8_t _fsm(ng_tcp_tcb_t *tcb, ng_pktsnip_t *pkt, ng_tcp_event_t event)
                 /* 6) Process Payload */
                 if(tcb->state == ESTABLISHED || tcb->state == FIN_WAIT_1 || tcb->state == FIN_WAIT_2){
                     /* Transfer Payload to user buffer */
-                    /* Signal if Push was receivd */
+                    /* Signal if Push was received */
                     /* Update Receive Windows */
-                    /* Ack. Tranfer if possible with other segments */
+                    /* Ack. Transfer if possible with other segments */
                     //_send_pkt(tcb, _build_pkt(tcb, MSK_ACK, tcb->snd_nxt, tcb->rcv_nxt, NULL, 0));
                 }
 
@@ -235,8 +263,8 @@ static int8_t _fsm(ng_tcp_tcb_t *tcb, ng_pktsnip_t *pkt, ng_tcp_event_t event)
 
                     /* Signal User: Connection closing */
                     tcb->rcv_nxt = seq;
-                    _send_pkt(tcb, _build_pkt(tcb, MSK_ACK, tcb->snd_nxt, tcb->rcv_nxt,NULL,0));
-
+                    _build_pkt(tcb, MSK_ACK, tcb->snd_nxt, tcb->rcv_nxt,NULL,0);
+                    _send_pkt(tcb, false);
                     if(tcb->state == SYN_RCVD || tcb->state == ESTABLISHED){
                         _translate_to(tcb, CLOSE_WAIT);
                     }else if(tcb->state == FIN_WAIT_1){
@@ -257,13 +285,12 @@ static int8_t _fsm(ng_tcp_tcb_t *tcb, ng_pktsnip_t *pkt, ng_tcp_event_t event)
     }
 
     if(event == TIME_RETRANSMIT){
-        _send_pkt(tcb, tcb->ret_queue[tcb->ret_head].pkt);
-    }
-
-    /* Cleanup */
-    /* remove received paket from ng_pktbuf */
-    if(pkt){
-        ng_pktbuf_release(pkt);
+        /* Retransmit if maximum number of retries is not exceeded. Else: Translate to -> CLOSED */
+        if(tcb->ret_queue[0].no_of_retries < NG_TCP_MAX_RETRANSMITS){
+            _send_pkt(tcb, true);
+        }else{
+            _translate_to(tcb, CLOSED);
+        }
     }
 
     return 0;

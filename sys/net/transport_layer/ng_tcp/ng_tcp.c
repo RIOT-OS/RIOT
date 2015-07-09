@@ -105,19 +105,19 @@ int8_t ng_tcp_tcb_init(ng_tcp_tcb_t *tcb)
     tcb->rcv_buf = NULL;
     tcb->rcv_buf_size = 0;
 
+    /* Clear Current Packet Pointers */
+    tcb->cur_pkt = NULL;
+    tcb->cur_tcp_hdr = NULL;
+    tcb->cur_seg_len = 0;
+
     /* Clear Retransmission Queue and Timer */
     for(uint8_t i=0; i < NG_TCP_RETRANSMIT_QUEUE_SIZE; i++){
         tcb->ret_queue[i].no_of_retries = 0;
         tcb->ret_queue[i].pkt = NULL;
     }
-    tcb->ret_head = 0;
-    tcb->ret_size = NG_TCP_RETRANSMIT_QUEUE_SIZE;
+    tcb->ret_size = 0;
     tcb->ret_tout.seconds = 0;
     tcb->ret_tout.microseconds = 0;
-
-    /* Clear Timeout */
-    tcb->timeout.seconds = 0;
-    tcb->timeout.microseconds = 0;
 
     /* Clear TCB List variables*/
     tcb->owner = thread_getpid();
@@ -135,14 +135,8 @@ int8_t ng_tcp_tcb_destroy(ng_tcp_tcb_t *tcb)
         return -EPERM;
     }
 
-    /* Release possibly existing retransmission queue entries */
-    for(uint8_t i=0; i < NG_TCP_RETRANSMIT_QUEUE_SIZE; i++){
-        if(tcb->ret_queue[i].pkt != NULL){
-            ng_pktbuf_release(ret_queue[i].pkt);
-            ret_queue[i].pkt = NULL;
-            ret_queue[i].no_of_retries = 0;
-        }
-    }
+    /* Clear possibly existing pakets in retransmit queue */
+    _clear_retransmit_queue(tcb);
 
     /* Remove this tcb from linked tcb list */
     _rem_tcb_from_list(tcb);
@@ -201,7 +195,7 @@ int8_t ng_tcp_open(ng_tcp_tcb_t *tcb, uint16_t local_port, uint8_t *peer_addr,
     /* Wait till connection is established or closed or in close wait*/
     while(tcb->state != CLOSED && tcb->state != ESTABLISHED && tcb->state != CLOSE_WAIT){
         /* Wait for notification(state change or timer expired) */
-        res = vtimer_msg_receive_timeout(&msg, tcb->tout);
+        res = vtimer_msg_receive_timeout(&msg, tcb->ret_tout);
 
         /* Timer expired: Possibly packet loss -> retransmit */
         if(res < 0){
