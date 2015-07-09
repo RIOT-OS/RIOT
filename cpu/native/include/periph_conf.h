@@ -21,6 +21,13 @@
 #endif
 
 /**
+ * @name hardware timer clock skew avoidance
+ * @{
+ */
+#define NATIVE_TIMER_MIN_RES 200
+/** @} */
+
+/**
  * @name Random Number Generator configuration
  * @{
  */

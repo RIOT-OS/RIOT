@@ -46,8 +46,6 @@
 
 #define NATIVE_TIMER_SPEED 1000000
 
-#define NATIVE_TIMER_MIN_RES 200
-
 static unsigned long time_null;
 
 static void (*_callback)(int);

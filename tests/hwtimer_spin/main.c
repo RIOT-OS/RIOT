@@ -32,7 +32,7 @@ int main(void)
             " this test was successful.");
     puts("If you do not see that message, something went wrong.\n");
 
-    for (unsigned long r = 10000; r > 0; r--) {
+    for (unsigned long r = 1000; r > 0; r--) {
         for (unsigned long i = HWTIMER_SPIN_BARRIER; i > 0; i--) {
             hwtimer_wait(i);
         }
