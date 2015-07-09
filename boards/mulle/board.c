@@ -220,7 +220,6 @@ static inline void set_unused_devices_to_sleep(void)
     spi_transfer_byte(SPI_0, 0xb9, NULL); /* DP (Deep Power down) command */
     gpio_set(FLASH0_CS);
 
-#if !(MODULE_NG_AT86RF212B) && !(MODULE_AT86RF231)
     /* Sleep radio */
     uint8_t in = 0;
     gpio_clear(AT86RF231_CS);
@@ -241,7 +240,6 @@ static inline void set_unused_devices_to_sleep(void)
     }
 
     gpio_set(AT86RF231_SLEEP);
-#endif
 }
 
 static inline void init_onboard_spi(void)
@@ -259,4 +257,5 @@ static inline void init_onboard_spi(void)
     gpio_set(FLASH0_CS);
 
     spi_init_master(AT86RF231_SPI, SPI_CONF_FIRST_RISING, SPI_SPEED_5MHZ);
+    spi_init_master(FLASH0_SPI, SPI_CONF_SECOND_RISING, SPI_SPEED_5MHZ);
 }
