@@ -2,14 +2,9 @@
 __sram_start  = ORIGIN(sram);
 __sram_length = LENGTH(sram);
 __sram_end    = __sram_start + __sram_length;
-_ramcode_start = 0x0;
-_ramcode_end = 0x0;
-_ramcode_load = 0x0;
 
-/* Define the default stack size for interrupt mode. As no context is
-   saved on this stack and ISRs are supposed to be short, it can be fairly
-   small. 512 byte should be a safe assumption here */
-STACK_SIZE = DEFINED(STACK_SIZE) ? STACK_SIZE : 0x800;
+/* Define the default stack size for interrupt mode. */
+STACK_SIZE = DEFINED(STACK_SIZE) ? STACK_SIZE : 2048;
 
 RAMVECT_SIZE = DEFINED(RAMVECT_SIZE) ? RAMVECT_SIZE : 0;
 
@@ -19,7 +14,6 @@ SECTIONS
     .vector_table :
     {
         _vector_rom = .;
-        KEEP(*(.isr_vector))
         KEEP(*(.vector_table))
     } > vectors
     ASSERT (SIZEOF(.vector_table) == 0x400, "Interrupt vector table of invalid size.")
@@ -142,12 +136,10 @@ SECTIONS
 
     /*
      * Allocate space for interrupt vector in RAM
-     * This can safely be removed to free up 0x100 bytes of RAM if the code does
-     * not make use of this CPU feature.
      */
     .ramvect :
     {
-        . = ALIGN(4);
+        . = ALIGN(1024);
         _vector_ram_start = .;
         . = _vector_ram_start + RAMVECT_SIZE;
         . = ALIGN(4);
@@ -183,12 +175,6 @@ SECTIONS
         _ezero = .;
     } > sram
 
-    /* Make sure we set _end, in case we want dynamic memory management... */
-    _end = .;
-    __end = .;
-    __end__ = .;
-    PROVIDE(end = .);
-
     /* stack section */
     .stack (NOLOAD):
     {
@@ -201,6 +187,15 @@ SECTIONS
 
     /* heap section */
     . = ALIGN(8);
+
+    /* end is used by newlib's default sbrk_r implementations to find the start
+     * of the heap */
+    _end = .;
+    __end = .;
+    __end__ = .;
+    PROVIDE(end = .);
+
+    /* _sheap and _eheap is used by RIOT's sbrk_r implementation */
     _sheap = . ;
     _eheap = ORIGIN(sram) + LENGTH(sram);
 

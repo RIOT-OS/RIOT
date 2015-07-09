@@ -9,4 +9,4 @@ MEMORY
     sram (rwx)   : ORIGIN = 0x1fffc000, LENGTH = 32K
 }
 
-INCLUDE kinetis-noramcode.ld
+INCLUDE kinetis.ld
