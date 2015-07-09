@@ -200,7 +200,7 @@ static ng_pktsnip_t *_pktbuf_add_unsafe(ng_pktsnip_t *pkt, void *data,
     ng_pktsnip_t *new_pktsnip;
 
     new_pktsnip = (ng_pktsnip_t *)_pktbuf_internal_alloc(sizeof(ng_pktsnip_t));
-    DEBUG("pktbuf: allocated (new_pktsnip = %p) ", (void *)pkt);
+    DEBUG("pktbuf: allocated (new_pktsnip = %p) ", (void *)new_pktsnip);
 
     if (new_pktsnip == NULL) {
         DEBUG("=> failed\n");
@@ -212,7 +212,7 @@ static ng_pktsnip_t *_pktbuf_add_unsafe(ng_pktsnip_t *pkt, void *data,
     if (pkt == NULL || pkt->data != data) {
         if ((size != 0) && (!_pktbuf_internal_contains(data))) {
             new_pktsnip->data = _pktbuf_internal_alloc(size);
-            DEBUG("pktbuf: allocated (new_pktsnip->data = %p) ", pkt->data);
+            DEBUG("pktbuf: allocated (new_pktsnip->data = %p) ", new_pktsnip->data);
 
             if (new_pktsnip->data == NULL) {
                 _pktbuf_internal_free(new_pktsnip);
