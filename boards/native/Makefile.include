@@ -90,6 +90,9 @@ all-debug: export CFLAGS += -g
 all-cachegrind: export CFLAGS += -g
 all-gprof: export CFLAGS += -pg
 all-gprof: export LINKFLAGS += -pg
+all-asan: export CFLAGS += -fsanitize=address -fno-omit-frame-pointer -g
+all-asan: export CFLAGS += -DNATIVE_IN_CALLOC
+all-asan: export LINKFLAGS += -fsanitize=address -fno-omit-frame-pointer -g
 
 export INCLUDES += $(NATIVEINCLUDES)
 
@@ -120,6 +123,8 @@ all: # do not override first target
 all-debug: all
 
 all-gprof: all
+
+all-asan: all
 
 all-valgrind: all
 
