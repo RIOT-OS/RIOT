@@ -21,6 +21,27 @@
 #include "cpu.h"
 #include "arch/lpm_arch.h"
 #include "kinetis_lpm.h"
+#include "board.h"
+#include "periph/gpio.h"
+
+#ifndef LPM_TRACE_LPM_ENTRY
+#define LPM_TRACE_LPM_ENTRY()
+#endif
+#ifndef LPM_TRACE_LPM_EXIT
+#define LPM_TRACE_LPM_EXIT()
+#endif
+#ifndef LPM_TRACE_WAIT
+#define LPM_TRACE_WAIT()
+#endif
+#ifndef LPM_TRACE_STOP
+#define LPM_TRACE_STOP()
+#endif
+#ifndef LPM_TRACE_VLPS
+#define LPM_TRACE_VLPS()
+#endif
+#ifndef LPM_TRACE_LLS
+#define LPM_TRACE_LLS()
+#endif
 
 /*
  * Counting semaphores for inhibiting undesired power modes.
@@ -75,22 +96,30 @@ static inline void stop(uint8_t stopmode)
 
 static void kinetis_low_power_mode(void)
 {
+    unsigned int mask = disableIRQ();
+    LPM_TRACE_LPM_ENTRY()
     if (ATOMIC_VALUE(kinetis_lpm_inhibit_stop_sema) != 0) {
         /* STOP inhibited, go to WAIT mode */
+        LPM_TRACE_WAIT()
         wait();
     }
     else if (ATOMIC_VALUE(kinetis_lpm_inhibit_vlps_sema) != 0) {
         /* VLPS inhibited, go to normal STOP mode */
+        LPM_TRACE_STOP()
         stop(KINETIS_POWER_MODE_NORMAL);
     }
     else if (ATOMIC_VALUE(kinetis_lpm_inhibit_lls_sema) != 0) {
         /* LLS inhibited, go to VLPS mode */
+        LPM_TRACE_VLPS()
         stop(KINETIS_POWER_MODE_VLPS);
     }
     else {
         /* go to LLS mode */
+        LPM_TRACE_LLS()
         stop(KINETIS_POWER_MODE_LLS);
     }
+    LPM_TRACE_LPM_EXIT()
+    restoreIRQ(mask);
 }
 
 void lpm_arch_init(void)
@@ -109,8 +138,8 @@ enum lpm_mode lpm_arch_set(enum lpm_mode target)
 {
     switch (target) {
         case LPM_ON:
-                /* MCU is active, do not go to low power */
-                break;
+            /* MCU is active, do not go to low power */
+            break;
 
         case LPM_IDLE:
         case LPM_SLEEP:
