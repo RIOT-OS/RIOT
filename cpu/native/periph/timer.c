@@ -94,10 +94,8 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
     return 0;
 }
 
-int timer_set(tim_t dev, int channel, unsigned int offset)
+static void do_timer_set(unsigned int offset)
 {
-    (void)dev;
-    (void)channel;
     DEBUG("%s\n", __func__);
 
     if (offset && offset < NATIVE_TIMER_MIN_RES) {
@@ -115,6 +113,19 @@ int timer_set(tim_t dev, int channel, unsigned int offset)
         err(EXIT_FAILURE, "timer_arm: setitimer");
     }
     _native_syscall_leave();
+}
+
+int timer_set(tim_t dev, int channel, unsigned int offset)
+{
+    (void)dev;
+    (void)channel;
+    DEBUG("%s\n", __func__);
+
+    if (!offset) {
+        offset = NATIVE_TIMER_MIN_RES;
+    }
+
+    do_timer_set(offset);
 
     return 1;
 }
@@ -130,7 +141,12 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
 
 int timer_clear(tim_t dev, int channel)
 {
-    return timer_set(dev, channel, 0);
+    (void)dev;
+    (void)channel;
+
+    do_timer_set(0);
+
+    return 1;
 }
 
 void timer_irq_enable(tim_t dev)
