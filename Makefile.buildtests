@@ -37,6 +37,7 @@ else
 buildtest:
 	@ \
 	BUILDTESTOK=true; \
+	APP_RETRY=0; \
 	rm -rf "$$BINDIRBASE"; \
 	for BOARD in $$($(MAKE) -s info-boards-supported); do \
 		RIOTNOLINK=$$(echo $(BOARD_INSUFFICIENT_RAM) | grep $${BOARD} 2>&1 >/dev/null && echo 1); \
@@ -60,12 +61,13 @@ buildtest:
 					$(MAKE) -j$(NPROC) 2>&1) ; \
 			if [ "$${?}" = "0" ]; then \
 				${COLOR_ECHO} "${COLOR_GREEN}success${COLOR_RESET}"; \
-			elif [ -n "$${RIOT_DO_RETRY}" ] && $${BUILDTESTOK} && [ $${NTH_TRY} != 3 ]; then \
+			elif [ -n "$${RIOT_DO_RETRY}" ] && [ "$${APP_RETRY}" -lt "3" ] && [ $${NTH_TRY} != 3 ]; then \
 				${COLOR_ECHO} -n "${COLOR_PURPLE}retrying${COLOR_RESET} "; \
 				continue; \
 			else \
 				${COLOR_ECHO} "${COLOR_RED}failed${COLOR_RESET}"; \
 				echo "$${LOG}" | grep -v -E '^make(\[[[:digit:]]])?:'; \
+				APP_RETRY=`expr $${APP_RETRY} + 1`; \
 				BUILDTESTOK=false; \
 			fi; \
 			break; \

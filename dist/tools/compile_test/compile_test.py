@@ -62,7 +62,7 @@ def get_lines(readline, prefix):
             continue
 
         result = result[len(prefix):].rstrip().split(' .. ')[::-1]
-        if (len(result) == 2) or (len(result) == 3 and 'retrying' in result[1]):
+        if (len(result) > 1) and ('success' in result[0] or 'failed' in result[0]):
             stdout.write('.')
             stdout.flush()
             yield (' .. '.join(result[:-1]), result[-1])
@@ -177,7 +177,6 @@ for folder in ('examples', 'tests'):
                 success.append(application)
             else:
                 failed.append(application)
-                subprocess_env.pop('RIOT_DO_RETRY', None)
         except Exception, e:
             print('\n\t\tException: {}'.format(e))
             exceptions.append(application)
