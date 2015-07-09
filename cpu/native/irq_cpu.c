@@ -180,12 +180,17 @@ unsigned enableIRQ(void)
     _native_syscall_enter();
     DEBUG("enableIRQ()\n");
 
+    /* Mark the IRQ as enabled first since sigprocmask could call the handler
+     * before returning to userspace.
+     */
+
+    prev_state = native_interrupts_enabled;
+    native_interrupts_enabled = 1;
+
     if (sigprocmask(SIG_SETMASK, &_native_sig_set, NULL) == -1) {
         err(EXIT_FAILURE, "enableIRQ: sigprocmask");
     }
 
-    prev_state = native_interrupts_enabled;
-    native_interrupts_enabled = 1;
     _native_syscall_leave();
 
     DEBUG("enableIRQ(): return\n");
@@ -352,6 +357,55 @@ void native_isr_entry(int sig, siginfo_t *info, void *context)
 }
 
 /**
+ * Add or remove handler for signal
+ *
+ * To be called with interrupts disabled
+ *
+ */
+void set_signal_handler(int sig, bool add)
+{
+    struct sigaction sa;
+    int ret;
+
+    /* update the signal mask so enableIRQ()/disableIRQ() will be aware */
+    if (add) {
+        _native_syscall_enter();
+        ret = sigdelset(&_native_sig_set, sig);
+        _native_syscall_leave();
+    } else {
+        _native_syscall_enter();
+        ret = sigaddset(&_native_sig_set, sig);
+        _native_syscall_leave();
+    }
+
+    if (ret == -1) {
+        err(EXIT_FAILURE, "set_signal_handler: sigdelset");
+    }
+
+    memset(&sa, 0, sizeof(sa));
+
+    /* Disable other signal during execution of the handler for this signal. */
+    memcpy(&sa.sa_mask,  &_native_sig_set_dint, sizeof(sa.sa_mask));
+
+    /* restart interrupted systems call and custom signal stack */
+    sa.sa_flags = SA_RESTART | SA_ONSTACK;
+
+    if (add) {
+        sa.sa_flags |= SA_SIGINFO; /* sa.sa_sigaction is used */
+        sa.sa_sigaction = native_isr_entry;
+    } else
+    {
+        sa.sa_handler = SIG_IGN;
+    }
+
+    _native_syscall_enter();
+    if (sigaction(sig, &sa, NULL)) {
+        err(EXIT_FAILURE, "set_signal_handler: sigaction");
+    }
+    _native_syscall_leave();
+}
+
+/**
  * register signal/interrupt handler for signal sig
  *
  * TODO: use appropriate data structure for signal
@@ -361,26 +415,12 @@ int register_interrupt(int sig, _native_callback_t handler)
 {
     DEBUG("register_interrupt\n");
 
-    _native_syscall_enter();
-    if (sigdelset(&_native_sig_set, sig)) {
-        err(EXIT_FAILURE, "register_interrupt: sigdelset");
-    }
+    unsigned state = disableIRQ();
 
     native_irq_handlers[sig] = handler;
+    set_signal_handler(sig, true);
 
-    /* set current dINT sigmask for all signals */
-    struct sigaction sa;
-    sa.sa_sigaction = native_isr_entry;
-    sa.sa_mask = _native_sig_set_dint;
-    sa.sa_flags = SA_RESTART | SA_SIGINFO | SA_ONSTACK;
-    for (int i = 0; i < 255; i++) {
-        if (native_irq_handlers[i] != NULL) {
-            if (sigaction(sig, &sa, NULL)) {
-                err(EXIT_FAILURE, "register_interrupt: sigaction");
-            }
-        }
-    }
-    _native_syscall_leave();
+    restoreIRQ(state);
 
     return 0;
 }
@@ -392,31 +432,12 @@ int unregister_interrupt(int sig)
 {
     DEBUG("unregister_interrupt\n");
 
-    _native_syscall_enter();
-    if (sigaddset(&_native_sig_set, sig) == -1) {
-        err(EXIT_FAILURE, "unregister_interrupt: sigaddset");
-    }
+    unsigned state = disableIRQ();
 
+    set_signal_handler(sig, false);
     native_irq_handlers[sig] = NULL;
 
-    /* reset signal handler for sig */
-    struct sigaction sa;
-    sa.sa_handler = SIG_IGN; /* there may be late signals, so we need to ignore those */
-    sa.sa_mask = _native_sig_set_dint;
-    sa.sa_flags = SA_RESTART | SA_SIGINFO | SA_ONSTACK;
-    if (sigaction(sig, &sa, NULL)) {
-        err(EXIT_FAILURE, "unregister_interrupt: sigaction");
-    }
-    /* change sigmask for remaining signal handlers */
-    sa.sa_sigaction = native_isr_entry;
-    for (int i = 0; i < 255; i++) {
-        if (native_irq_handlers[i] != NULL) {
-            if (sigaction(sig, &sa, NULL)) {
-                err(EXIT_FAILURE, "unregister_interrupt: sigaction");
-            }
-        }
-    }
-    _native_syscall_leave();
+    restoreIRQ(state);
 
     return 0;
 }
@@ -459,8 +480,8 @@ void native_interrupt_init(void)
 
     sa.sa_flags = SA_RESTART | SA_SIGINFO | SA_ONSTACK;
 
-    /* get current process interrupt masks */
-    if (sigprocmask(SIG_SETMASK, NULL, &_native_sig_set) == -1) {
+    /* We want to white list authorized signals */
+    if (sigfillset(&_native_sig_set) == -1) {
         err(EXIT_FAILURE, "native_interrupt_init: sigprocmask");
     }
     /* we need to disable all signals during our signal handler as it
