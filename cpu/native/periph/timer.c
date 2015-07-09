@@ -24,6 +24,7 @@
 
 #ifdef __MACH__
 #include <mach/clock.h>
+#include <mach/mach_host.h>
 #include <mach/mach_init.h>
 #include <mach/mach_port.h>
 #endif
