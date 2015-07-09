@@ -41,6 +41,7 @@ export DOCKER_ENV_VARS = \
   OFLAGS \
   SIZE \
   UNDEF \
+  BUILDTEST_MCU_GROUP \
   #
 
 # Find which variables were set using the command line or the environment and
