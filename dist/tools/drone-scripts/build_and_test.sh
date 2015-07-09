@@ -16,9 +16,16 @@ function exec_build_func {
     fi
 
     echo "Begin group ${group}"
+    # spawn new directory for the group
+    mkdir -p "build_tmp/${group}"
+    rsync -a --exclude="bin" --exclude=build_tmp . "build_tmp/${group}"
+    cd "build_tmp/${group}"
     # For now, just ride on the Travis build scripts
     BUILDTEST_MCU_GROUP=${group} ./dist/tools/travis-scripts/build_and_test.sh "${fileargs}"
     RES=$?
+    # clean temporary build directory for the group
+    cd - 2>&1 >/dev/null
+    rm -rf "build_tmp/${group}"
     echo "Result (${group}): ${RES}"
 }
 
