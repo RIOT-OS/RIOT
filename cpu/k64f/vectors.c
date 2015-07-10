@@ -132,7 +132,7 @@ WEAK_DEFAULT void isr_enet_receive(void);
 WEAK_DEFAULT void isr_enet_error(void);
 
 /* interrupt vector table */
-__attribute__((section(".vector_table")))
+__attribute__((used, section(".vector_table")))
 const void *interrupt_vector[] = {
     /* Stack pointer */
     (void *)(&_estack),             /* pointer to the top of the empty stack */
