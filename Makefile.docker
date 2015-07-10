@@ -46,6 +46,7 @@ export DOCKER_ENV_VARS = \
   LINK \
   LINKFLAGPREFIX \
   LINKFLAGS \
+  LTO \
   OBJCOPY \
   OFLAGS \
   PREFIX \
