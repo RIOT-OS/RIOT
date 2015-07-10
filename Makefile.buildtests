@@ -143,9 +143,9 @@ info-buildsizes-diff:
 					if [[ "$${DIFF}" -gt 0 ]]; then $(COLOR_ECHO) -n "${COLOR_RED}"; fi; \
 					if [[ "$${DIFF}" -lt 0 ]]; then $(COLOR_ECHO) -n "${COLOR_GREEN}"; fi; \
 				else \
-					DIFF="$${RED}ERR"; \
+					DIFF="${COLOR_RED}ERR"; \
 				fi; \
-				echo -ne "$${DIFF}\t$${RESET}"; \
+				echo -ne "$${DIFF}\t${COLOR_RESET}"; \
 			done; \
 			echo "$${BOARD}"; \
 			for I in 0 1 2 3; do echo -ne "$${OLD[I]-${COLOR_RED}ERR${COLOR_RESET}}\t"; done; echo -e "$${OLDBIN}"; \
