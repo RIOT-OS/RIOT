@@ -108,7 +108,7 @@ info-buildsize:
 
 info-buildsizes: SHELL=bash
 info-buildsizes:
-	echo -e "   text\t   data\t    bss\t    dec\tboard"; \
+	@echo -e "   text\t   data\t    bss\t    dec\tboard"; \
 	for BOARD in $$($(MAKE) -s info-boards-supported); do \
 		echo "$$(env -i \
 			HOME=$${HOME} \
@@ -123,7 +123,7 @@ info-buildsizes:
 
 info-buildsizes-diff: SHELL=bash
 info-buildsizes-diff:
-	echo -e "text\tdata\tbss\tdec\tBOARD/BINDIRBASE\n"; \
+	@echo -e "text\tdata\tbss\tdec\tBOARD/BINDIRBASE\n"; \
 	for BOARD in $$($(MAKE) -s info-boards-supported); do \
 		for BINDIRBASE in $${OLDBIN} $${NEWBIN}; do \
 			env -i \
