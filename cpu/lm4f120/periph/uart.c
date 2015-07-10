@@ -80,67 +80,15 @@ static const unsigned long g_ulUARTInt[3] =
 	INT_UART2
 };
 
-int uart_init_testing(uart_t uart, uint32_t baudrate)
-{
-	// Enable lazy stacking for interrupt handlers. This allows floating point instructions to be
-	// used within interrupt handers, but at the expense of extra stack usuage.
-	const unsigned long srcClock = ROM_SysCtlClockGet();
-
-	ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_UART0);
-	ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
-
-    ROM_GPIOPinTypeUART(GPIO_PORTA_BASE, GPIO_PIN_0 | GPIO_PIN_1);
-
-	ROM_UARTDisable(UART0_BASE);
-	ROM_UARTConfigSetExpClk(UART0_BASE,srcClock, baudrate,
-			(UART_CONFIG_PAR_NONE | UART_CONFIG_STOP_ONE |
-			 UART_CONFIG_WLEN_8));
-
-	//Enable the UART interrupt
-	ROM_UARTEnable(UART0_BASE);
-
-    // Prompt for text to be entered.
-    //
-    //UARTSend((unsigned char *)"\033[2JEnter text: ", 16);
-
-    //
-    // Loop forever echoing data through the UART.
-    //
-	printf("Passed Testing\n");
-	return 1;
-}
-
-void UARTSend(const unsigned char *pucBuffer, unsigned long ulCount)
-{
-    //
-    // Loop while there are more characters to send.
-    //
-    while(ulCount--)
-    {
-        //
-        // Write the next character to the UART.
-        //
-        ROM_UARTCharPutNonBlocking(UART0_BASE, *pucBuffer++);
-    }
-}
-
-
-
-
 /**********************************************************************************/
 /* Configuring the UART console
  */
 int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, uart_tx_cb_t tx_cb, void *arg)
 {
-	// The base address of the Choosen UART
-	//	unsigned long ulBase=0;
-
 	// Check the arguments
 	ASSERT(uart == 0);
-
 	// Check to make sure the UART peripheral is present
-	if(!ROM_SysCtlPeripheralPresent(SYSCTL_PERIPH_UART0))
-	{
+	if(!ROM_SysCtlPeripheralPresent(SYSCTL_PERIPH_UART0)){
 		return -1;
 	}
 
@@ -149,13 +97,11 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, uart_tx_cb_t t
 		return res;
 	}
 
-
 /* save callbacks */
     config[uart].rx_cb = rx_cb;
     config[uart].tx_cb = tx_cb;
     config[uart].arg = arg;
 
-// Select the base address of the UART
 //	ulBase = g_ulUARTBase[uart];
 
 	// Configure the relevant UART pins for operations as a UART rather than GPIOs.
@@ -164,10 +110,15 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, uart_tx_cb_t t
 #if UART_0_EN
 		case UART_0:
 			NVIC_SetPriority(UART_0_IRQ_CHAN, UART_IRQ_PRIO);
+
+			ROM_UARTTxIntModeSet(UART0_BASE, UART_TXINT_MODE_EOT);
+			ROM_UARTFIFOLevelSet(UART0_BASE, UART_FIFO_TX4_8, UART_FIFO_RX4_8);	// Set FIFO to 8 Characters
+			ROM_UARTFIFOEnable(UART0_BASE); // Enable FIFOs
+			
 			// Enable the UART interrupt
             NVIC_EnableIRQ(UART_0_IRQ_CHAN);
-			//ROM_UARTIntEnable(UART0_BASE, UART_INT_RX | UART_INT_RT);
-			//ROM_IntEnable(INT_UART0);
+			// Enable RX interrupt
+			UART0_IM_R = UART_IM_RXIM | UART_IM_RTIM;
 			break;
 #endif
 #if UART_1_EN
@@ -175,8 +126,6 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, uart_tx_cb_t t
             NVIC_SetPriority(UART_1_IRQ_CHAN, UART_IRQ_PRIO);
 			// Enable the UART interrupt
             NVIC_EnableIRQ(UART_1_IRQ_CHAN);
-		//	ROM_UARTIntEnable(UART1_BASE, UART_INT_RX | UART_INT_RT);
-		//	ROM_IntEnable(INT_UART1);
 			break;
 #endif
 	}
@@ -199,6 +148,7 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
 					(UART_CONFIG_PAR_NONE | UART_CONFIG_STOP_ONE |
 					 UART_CONFIG_WLEN_8));
 
+
 			ROM_UARTEnable(UART0_BASE);
 			break;
 #endif
@@ -208,14 +158,14 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
 
 void uart_tx_begin(uart_t uart)
 {
-	// enable TX interrupt
-	ROM_UARTIntEnable(UART0_BASE, UART_INT_TX);
+	uart_write(uart, '\0');
+	UART0_IM_R |= UART_IM_TXIM;
 }
 
 int uart_write(uart_t uart, char data)
 {
-	ROM_UARTCharPutNonBlocking(UART0_BASE, data);
-    return 1;
+	int ret=ROM_UARTCharPutNonBlocking(UART0_BASE, data);
+    return ret;
 }
 
 int uart_read_blocking(uart_t uart, char *data)
@@ -254,16 +204,14 @@ void UARTIntHandler(void)
 
 	// Get the interrupt status
 	ulStatus = ROM_UARTIntStatus(UART0_BASE, true);
-
 	// Clear the asserted interrupts
 	ROM_UARTIntClear(UART0_BASE, ulStatus);
 
 	// Are we interrupted due to TX done
 	if(ulStatus & UART_INT_TX)
 	{
-		// Turn off the Transmit Interrupt
 		if (config[UART_0].tx_cb(config[UART_0].arg) == 0){
-			ROM_UARTIntDisable(UART0_BASE, UART_INT_TX);
+			UART0_IM_R &= ~UART_IM_TXIM;
 		}
 	}
 
@@ -283,8 +231,4 @@ void UARTIntHandler(void)
         thread_yield();
     }
 }
-
-
-
-
 #endif /* (UART_0_EN || UART_1_EN) */
