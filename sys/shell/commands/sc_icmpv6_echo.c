@@ -38,9 +38,9 @@ static char ipv6_str[NG_IPV6_ADDR_MAX_STR_LEN];
 
 static void usage(char **argv)
 {
-    printf("%s [<n>] <ipv6 addr> [<payload_len>] [<delay in ms>]\n", argv[0]);
+    printf("%s [<count>] <ipv6 addr> [<payload_len>] [<delay in ms>]\n", argv[0]);
     puts("defaults:");
-    puts("    n = 3");
+    puts("    count = 3");
     puts("    payload_len = 4");
     puts("    delay = 1000");
 }
@@ -120,7 +120,7 @@ int _handle_reply(ng_pktsnip_t *pkt, uint64_t time)
 
 int _icmpv6_ping(int argc, char **argv)
 {
-    int n = 3, success = 0, count;
+    int count = 3, success = 0, remaining;
     size_t payload_len = 4;
     timex_t delay = { 1, 0 };
     char *addr_str;
@@ -143,12 +143,12 @@ int _icmpv6_ping(int argc, char **argv)
             break;
 
         case 3:
-            n = atoi(argv[1]);
-            if (n > 0) {
+            count = atoi(argv[1]);
+            if (count > 0) {
                 addr_str = argv[2];
             }
             else {
-                n = 3;
+                count = 3;
                 addr_str = argv[1];
                 payload_len = atoi(argv[2]);
             }
@@ -156,13 +156,13 @@ int _icmpv6_ping(int argc, char **argv)
             break;
 
         case 4:
-            n = atoi(argv[1]);
-            if (n > 0) {
+            count = atoi(argv[1]);
+            if (count > 0) {
                 addr_str = argv[2];
                 payload_len = atoi(argv[3]);
             }
             else {
-                n = 3;
+                count = 3;
                 addr_str = argv[1];
                 payload_len = atoi(argv[2]);
                 delay.seconds = 0;
@@ -173,7 +173,7 @@ int _icmpv6_ping(int argc, char **argv)
 
         case 5:
         default:
-            n = atoi(argv[1]);
+            count = atoi(argv[1]);
             addr_str = argv[2];
             payload_len = atoi(argv[3]);
             delay.seconds = 0;
@@ -199,11 +199,11 @@ int _icmpv6_ping(int argc, char **argv)
         return 1;
     }
 
-    count = n;
+    remaining = count;
 
     vtimer_now(&start);
 
-    while ((count--) > 0) {
+    while ((remaining--) > 0) {
         msg_t msg;
         ng_pktsnip_t *pkt;
         timex_t start, stop, timeout = { 5, 0 };
@@ -261,7 +261,7 @@ int _icmpv6_ping(int argc, char **argv)
             puts("ping timeout");
         }
 
-        if (count > 0) {
+        if (remaining > 0) {
             vtimer_sleep(delay);
         }
     }
@@ -279,9 +279,9 @@ int _icmpv6_ping(int argc, char **argv)
     if (success > 0) {
         timex_normalize(&sum_rtt);
         printf("%d packets transmitted, %d received, %d%% packet loss, time %"
-               PRIu32 ".06%" PRIu32 " s\n", n, success,
-               (100 - ((success * 100) / n)), stop.seconds, stop.microseconds);
-        timex_t avg_rtt = timex_from_uint64(timex_uint64(sum_rtt) / n);  /* get average */
+               PRIu32 ".06%" PRIu32 " s\n", count, success,
+               (100 - ((success * 100) / count)), stop.seconds, stop.microseconds);
+        timex_t avg_rtt = timex_from_uint64(timex_uint64(sum_rtt) / count);  /* get average */
         printf("rtt min/avg/max = "
                "%" PRIu32 ".%03" PRIu32 "/"
                "%" PRIu32 ".%03" PRIu32 "/"
@@ -294,7 +294,7 @@ int _icmpv6_ping(int argc, char **argv)
                max_rtt.microseconds % MS_IN_USEC);
     }
     else {
-        printf("%d packets transmitted, 0 received, 100%% packet loss\n", n);
+        printf("%d packets transmitted, 0 received, 100%% packet loss\n", count);
         return 1;
     }
 
