@@ -156,6 +156,18 @@ extern "C" {
 #define GPIO_5_IRQ          EXTI4_15_IRQn
 /** @} */
 
+/**
+ * @name RTC configuration
+ * @{
+ */
+/**
+ * Nucleos with MB1136 C-02 or MB1136 C-03 -sticker on it have the required LSE
+ * oscillator provided on the X2 slot.
+ * See Nucleo User Manual UM1724 section 5.6.2.
+ */
+#define RTC_NUMOF           (1U)
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
