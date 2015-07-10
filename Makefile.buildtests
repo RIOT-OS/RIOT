@@ -83,7 +83,7 @@ buildtest:
 			BINDIRBASE=$${BINDIRBASE} \
 			RIOTNOLINK=$${RIOTNOLINK} \
 			RIOT_VERSION=$${RIOT_VERSION} \
-			$(MAKE) clean 2>&1 >/dev/null || true; \
+			$(MAKE) clean-intermediates 2>&1 >/dev/null || true; \
 	done; \
 	$${BUILDTESTOK}
 endif # BUILD_IN_DOCKER
