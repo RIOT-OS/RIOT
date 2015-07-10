@@ -37,6 +37,7 @@
 #include "atomic.h"
 #include "cpu_conf.h"
 #include "net/gnrc/pkt.h"
+#include "net/gnrc/neterr.h"
 #include "net/gnrc/nettype.h"
 #include "utlist.h"
 
@@ -141,13 +142,26 @@ void gnrc_pktbuf_hold(gnrc_pktsnip_t *pkt, unsigned int num);
 
 /**
  * @brief   Decreases gnrc_pktsnip_t::users of @p pkt atomically and removes it if it
- *          reaches 0.
+ *          reaches 0 and reports a possible error through an error code, if
+ *          @ref net_gnrc_neterr is included.
  *
  * @pre All snips of @p pkt must be in the packet buffer.
  *
  * @param[in] pkt   A packet.
+ * @param[in] err   An error code.
  */
-void gnrc_pktbuf_release(gnrc_pktsnip_t *pkt);
+void gnrc_pktbuf_release_error(gnrc_pktsnip_t *pkt, uint32_t err);
+
+/**
+ * @brief   Decreases gnrc_pktsnip_t::users of @p pkt atomically and removes it if it
+ *          reaches 0 and reports @ref GNRC_NETERR_SUCCESS.
+ *
+ * @param[in] pkt   A packet.
+ */
+static inline void gnrc_pktbuf_release(gnrc_pktsnip_t *pkt)
+{
+    gnrc_pktbuf_release_error(pkt, GNRC_NETERR_SUCCESS);
+}
 
 /**
  * @brief   Must be called once before there is a write operation in a thread.
@@ -189,7 +203,7 @@ gnrc_pktsnip_t *gnrc_pktbuf_get_iovec(gnrc_pktsnip_t *pkt, size_t *len);
  * @return  The new reference to @p pkt.
  */
 static inline gnrc_pktsnip_t *gnrc_pktbuf_remove_snip(gnrc_pktsnip_t *pkt,
-        gnrc_pktsnip_t *snip)
+                                                      gnrc_pktsnip_t *snip)
 {
     LL_DELETE(pkt, snip);
     snip->next = NULL;
