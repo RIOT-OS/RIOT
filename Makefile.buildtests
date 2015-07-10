@@ -104,7 +104,7 @@ info-objsize:
 		sort -rnk$${SORTROW}
 
 info-buildsize:
-	@$(SIZE) -dB $(BINDIR)$(APPLICATION).elf
+	@$(SIZE) -dB $(BINDIR)$(APPLICATION).elf || echo ''
 
 info-buildsizes: SHELL=bash
 info-buildsizes:
