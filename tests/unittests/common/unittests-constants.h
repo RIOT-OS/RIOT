@@ -19,7 +19,7 @@ extern "C" {
 #define TEST_STRING4 "J&(d"
 #endif
 #ifndef TEST_STRING8
-#define TEST_STRING8 "o\\rrB/q"
+#define TEST_STRING8 "d)M Fvgh"
 #endif
 #ifndef TEST_STRING12
 #define TEST_STRING12 "50U'HLKC3_ft"
@@ -28,7 +28,7 @@ extern "C" {
 #define TEST_STRING16 "nvxuO*6o3C=a6g7]"
 #endif
 #ifndef TEST_STRING64
-#define TEST_STRING64 "3key9'=4\\wvAM&;.E&U/rOG:>\\C!r{K k.E[%;(}_I(D%XQk8+T>_M^G'Mm49,n:))]}"
+#define TEST_STRING64 "&]x2}L3e>Jj8\"NM}Ngd?)5V5-%:-EZD?V{fda{[JTkN):1}/*5t8Q1>CZu/$s.ML"
 #endif
 #ifndef TEST_INT8
 #define TEST_INT8 (-69)
