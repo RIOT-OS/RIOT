@@ -237,6 +237,11 @@ clean:
 	-@for i in $(USEPKG) ; do "$(MAKE)" -C $(RIOTBASE)/pkg/$$i clean ; done
 	-@rm -rf $(BINDIR)
 
+# Remove intermediates, but keep the .elf, .hex and .map etc.
+clean-intermediates:
+	-@for i in $(USEPKG) ; do "$(MAKE)" -C $(RIOTBASE)/pkg/$$i clean ; done
+	-@rm -rf $(BINDIR)/*.a $(BINDIR)/*/
+
 distclean:
 	-@for i in $(USEPKG) ; do "$(MAKE)" -C $(RIOTBASE)/pkg/$$i distclean ; done
 	-@rm -rf $(BINDIRBASE)

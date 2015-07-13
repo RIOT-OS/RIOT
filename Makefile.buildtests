@@ -85,7 +85,7 @@ buildtest:
 			BINDIRBASE=$${BINDIRBASE} \
 			RIOTNOLINK=$${RIOTNOLINK} \
 			RIOT_VERSION=$${RIOT_VERSION} \
-			$(MAKE) clean 2>&1 >/dev/null || true; \
+			$(MAKE) clean-intermediates 2>&1 >/dev/null || true; \
 	done; \
 	$${BUILDTESTOK}
 endif # BUILD_IN_DOCKER
@@ -106,11 +106,11 @@ info-objsize:
 		sort -rnk$${SORTROW}
 
 info-buildsize:
-	@$(SIZE) -dB $(BINDIR)$(APPLICATION).elf
+	@$(SIZE) -dB $(BINDIR)$(APPLICATION).elf || echo ''
 
 info-buildsizes: SHELL=bash
 info-buildsizes:
-	echo -e "   text\t   data\t    bss\t    dec\tboard"; \
+	@echo -e "   text\t   data\t    bss\t    dec\tboard"; \
 	for BOARD in $$($(MAKE) -s info-boards-supported); do \
 		echo "$$(env -i \
 			HOME=$${HOME} \
@@ -125,7 +125,7 @@ info-buildsizes:
 
 info-buildsizes-diff: SHELL=bash
 info-buildsizes-diff:
-	echo -e "text\tdata\tbss\tdec\tBOARD/BINDIRBASE\n"; \
+	@echo -e "text\tdata\tbss\tdec\tBOARD/BINDIRBASE\n"; \
 	for BOARD in $$($(MAKE) -s info-boards-supported); do \
 		for BINDIRBASE in $${OLDBIN} $${NEWBIN}; do \
 			env -i \
@@ -145,9 +145,9 @@ info-buildsizes-diff:
 					if [[ "$${DIFF}" -gt 0 ]]; then $(COLOR_ECHO) -n "${COLOR_RED}"; fi; \
 					if [[ "$${DIFF}" -lt 0 ]]; then $(COLOR_ECHO) -n "${COLOR_GREEN}"; fi; \
 				else \
-					DIFF="$${RED}ERR"; \
+					DIFF="${COLOR_RED}ERR"; \
 				fi; \
-				echo -ne "$${DIFF}\t$${RESET}"; \
+				echo -ne "$${DIFF}\t${COLOR_RESET}"; \
 			done; \
 			echo "$${BOARD}"; \
 			for I in 0 1 2 3; do echo -ne "$${OLD[I]-${COLOR_RED}ERR${COLOR_RESET}}\t"; done; echo -e "$${OLDBIN}"; \
