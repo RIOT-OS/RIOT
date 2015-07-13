@@ -300,7 +300,7 @@ static void test_pktbuf_realloc_data__pkt_NULL(void)
 
 static void test_pktbuf_realloc_data__pkt_wrong(void)
 {
-    ng_pktsnip_t pkt = { 1, NULL, TEST_STRING8, sizeof(TEST_STRING8), NG_NETTYPE_UNDEF };
+    ng_pktsnip_t pkt = { TEST_STRING8, sizeof(TEST_STRING8), 1, NULL, NG_NETTYPE_UNDEF };
 
     TEST_ASSERT_EQUAL_INT(ENOENT, ng_pktbuf_realloc_data(&pkt, 0));
     TEST_ASSERT(ng_pktbuf_is_empty());
@@ -515,7 +515,7 @@ static void test_pktbuf_hold__pkt_null(void)
 
 static void test_pktbuf_hold__pkt_external(void)
 {
-    ng_pktsnip_t pkt = { 1, NULL, TEST_STRING8, sizeof(TEST_STRING8), NG_NETTYPE_UNDEF };
+    ng_pktsnip_t pkt = { TEST_STRING8, sizeof(TEST_STRING8), 1, NULL, NG_NETTYPE_UNDEF };
 
     ng_pktbuf_hold(&pkt, 1);
     TEST_ASSERT(ng_pktbuf_is_empty());
@@ -549,7 +549,7 @@ static void test_pktbuf_release__pkt_null(void)
 
 static void test_pktbuf_release__pkt_external(void)
 {
-    ng_pktsnip_t pkt = { 1, NULL, TEST_STRING8, sizeof(TEST_STRING8), NG_NETTYPE_UNDEF };
+    ng_pktsnip_t pkt = { TEST_STRING8, sizeof(TEST_STRING8), 1, NULL, NG_NETTYPE_UNDEF };
 
     ng_pktbuf_release(&pkt);
     TEST_ASSERT(ng_pktbuf_is_empty());
