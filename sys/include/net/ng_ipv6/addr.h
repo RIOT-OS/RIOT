@@ -49,7 +49,7 @@ extern "C" {
 /**
  * @brief Data type to represent an IPv6 address.
  */
-typedef union __attribute__((packed)) {
+typedef union {
     uint8_t u8[16];             /**< devided by 16 8-bit words. */
     network_uint16_t u16[8];    /**< devided by 8 16-bit words. */
     network_uint32_t u32[4];    /**< devided by 4 32-bit words. */
