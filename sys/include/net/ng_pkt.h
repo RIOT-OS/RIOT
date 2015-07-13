@@ -22,6 +22,7 @@
 
 #include <inttypes.h>
 #include <stdlib.h>
+#include <sys/uio.h>
 
 #include "net/ng_nettype.h"
 
@@ -128,6 +129,18 @@ static inline size_t ng_pkt_len(ng_pktsnip_t *pkt)
     }
 
     return len;
+}
+
+/**
+ * @brief   Converts a packet snip to an @ref struct iovec.
+ *
+ * @param[in] pkt   A packet snip.
+ *
+ * @return  A corresponding @ref struct iovec
+ */
+static inline struct iovec *ng_pkt_to_iovec(ng_pktsnip_t *pkt)
+{
+    return (struct iovec *)pkt;
 }
 
 #ifdef __cplusplus
