@@ -85,6 +85,10 @@ ifeq ($(PORT),)
     PORT := $(shell ls -1 /dev/tty.usbserial* | head -n 1)
   endif
 endif
+ifeq ($(PORT),)
+  # fall back to a sensible default
+  PORT := /dev/ttyUSB0
+endif
 
 # We need special handling of the watchdog if we want to speed up the flash
 # verification by using the MCU to compute the image checksum after flashing.
