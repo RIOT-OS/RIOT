@@ -1258,7 +1258,7 @@ int spi_transfer_regs(spi_t dev, uint8_t reg, char *out, char *in, unsigned int 
     byte_out = reg;
 
     /* Send register address */
-    byte_in = spi_transfer_internal(spi_dev, flags, byte_out);
+    spi_transfer_internal(spi_dev, flags, byte_out);
 
     /* Default: send idle data */
     byte_out = (uint8_t)SPI_IDLE_DATA;
