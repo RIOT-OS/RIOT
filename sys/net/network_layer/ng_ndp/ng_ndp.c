@@ -283,60 +283,61 @@ void ng_ndp_nbr_adv_handle(kernel_pid_t iface, ng_pktsnip_t *pkt,
 
 void ng_ndp_retrans_nbr_sol(ng_ipv6_nc_t *nc_entry)
 {
-    if ((nc_entry->probes_remaining > 1) &&
-        ((ng_ipv6_nc_get_state(nc_entry) == NG_IPV6_NC_STATE_INCOMPLETE) ||
-         (ng_ipv6_nc_get_state(nc_entry) == NG_IPV6_NC_STATE_PROBE))) {
-        ng_ipv6_addr_t dst;
+    if ((ng_ipv6_nc_get_state(nc_entry) == NG_IPV6_NC_STATE_INCOMPLETE) ||
+        (ng_ipv6_nc_get_state(nc_entry) == NG_IPV6_NC_STATE_PROBE)) {
+        if (nc_entry->probes_remaining > 1) {
+            ng_ipv6_addr_t dst;
 
-        DEBUG("ndp: Retransmit neighbor solicitation for %s\n",
-              ng_ipv6_addr_to_str(addr_str, &nc_entry->ipv6_addr, sizeof(addr_str)));
+            DEBUG("ndp: Retransmit neighbor solicitation for %s\n",
+                  ng_ipv6_addr_to_str(addr_str, &nc_entry->ipv6_addr, sizeof(addr_str)));
 
-        /* retransmit neighbor solicatation */
-        if (ng_ipv6_nc_get_state(nc_entry) == NG_IPV6_NC_STATE_INCOMPLETE) {
-            ng_ipv6_addr_set_solicited_nodes(&dst, &nc_entry->ipv6_addr);
-        }
-        else {
-            dst.u64[0] = nc_entry->ipv6_addr.u64[0];
-            dst.u64[1] = nc_entry->ipv6_addr.u64[1];
-        }
-
-        nc_entry->probes_remaining--;
-
-        if (nc_entry->iface == KERNEL_PID_UNDEF) {
-            timex_t t = { 0, NG_NDP_RETRANS_TIMER };
-            kernel_pid_t ifs[NG_NETIF_NUMOF];
-            size_t ifnum = ng_netif_get(ifs);
-
-            for (size_t i = 0; i < ifnum; i++) {
-                _send_nbr_sol(ifs[i], &nc_entry->ipv6_addr, &dst);
+            /* retransmit neighbor solicatation */
+            if (ng_ipv6_nc_get_state(nc_entry) == NG_IPV6_NC_STATE_INCOMPLETE) {
+                ng_ipv6_addr_set_solicited_nodes(&dst, &nc_entry->ipv6_addr);
+            }
+            else {
+                dst.u64[0] = nc_entry->ipv6_addr.u64[0];
+                dst.u64[1] = nc_entry->ipv6_addr.u64[1];
             }
 
-            vtimer_remove(&nc_entry->nbr_sol_timer);
-            vtimer_set_msg(&nc_entry->nbr_sol_timer, t, ng_ipv6_pid,
-                           NG_NDP_MSG_NBR_SOL_RETRANS, nc_entry);
-        }
-        else {
-            ng_ipv6_netif_t *ipv6_iface = ng_ipv6_netif_get(nc_entry->iface);
+            nc_entry->probes_remaining--;
 
-            _send_nbr_sol(nc_entry->iface, &nc_entry->ipv6_addr, &dst);
+            if (nc_entry->iface == KERNEL_PID_UNDEF) {
+                timex_t t = { 0, NG_NDP_RETRANS_TIMER };
+                kernel_pid_t ifs[NG_NETIF_NUMOF];
+                size_t ifnum = ng_netif_get(ifs);
 
-            mutex_lock(&ipv6_iface->mutex);
-            vtimer_remove(&nc_entry->nbr_sol_timer);
-            vtimer_set_msg(&nc_entry->nbr_sol_timer,
-                           ipv6_iface->retrans_timer, ng_ipv6_pid,
-                           NG_NDP_MSG_NBR_SOL_RETRANS, nc_entry);
-            mutex_unlock(&ipv6_iface->mutex);
+                for (size_t i = 0; i < ifnum; i++) {
+                    _send_nbr_sol(ifs[i], &nc_entry->ipv6_addr, &dst);
+                }
+
+                vtimer_remove(&nc_entry->nbr_sol_timer);
+                vtimer_set_msg(&nc_entry->nbr_sol_timer, t, ng_ipv6_pid,
+                               NG_NDP_MSG_NBR_SOL_RETRANS, nc_entry);
+            }
+            else {
+                ng_ipv6_netif_t *ipv6_iface = ng_ipv6_netif_get(nc_entry->iface);
+
+                _send_nbr_sol(nc_entry->iface, &nc_entry->ipv6_addr, &dst);
+
+                mutex_lock(&ipv6_iface->mutex);
+                vtimer_remove(&nc_entry->nbr_sol_timer);
+                vtimer_set_msg(&nc_entry->nbr_sol_timer,
+                               ipv6_iface->retrans_timer, ng_ipv6_pid,
+                               NG_NDP_MSG_NBR_SOL_RETRANS, nc_entry);
+                mutex_unlock(&ipv6_iface->mutex);
+            }
         }
-    }
-    else if (nc_entry->probes_remaining <= 1) {
-        DEBUG("ndp: Remove nc entry %s for interface %" PRIkernel_pid "\n",
-              ng_ipv6_addr_to_str(addr_str, &nc_entry->ipv6_addr, sizeof(addr_str)),
-              nc_entry->iface);
+        else if (nc_entry->probes_remaining <= 1) {
+            DEBUG("ndp: Remove nc entry %s for interface %" PRIkernel_pid "\n",
+                  ng_ipv6_addr_to_str(addr_str, &nc_entry->ipv6_addr, sizeof(addr_str)),
+                  nc_entry->iface);
 
 #ifdef MODULE_FIB
-        fib_remove_entry((uint8_t *)&(nc_entry->ipv6_addr), sizeof(ng_ipv6_addr_t));
+            fib_remove_entry((uint8_t *) & (nc_entry->ipv6_addr), sizeof(ng_ipv6_addr_t));
 #endif
-        ng_ipv6_nc_remove(nc_entry->iface, &nc_entry->ipv6_addr);
+            ng_ipv6_nc_remove(nc_entry->iface, &nc_entry->ipv6_addr);
+        }
     }
 }
 
