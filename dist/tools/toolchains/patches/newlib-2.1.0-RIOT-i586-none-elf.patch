@@ -15,13 +15,13 @@ index 480b2ec..a4f615d 100644
 @@ -57,11 +57,12 @@
   * should be.
   */
- 
+
 +#include <string.h>
 +
  #ifndef lint
  static char sccsid[] = "@(#)gmon.c	5.3 (Berkeley) 5/22/91";
  #endif /* not lint */
- 
+
 -#define DEBUG
  #ifdef DEBUG
  #include <stdio.h>
@@ -33,7 +33,7 @@ index c2418fa..ba61ab7 100644
 @@ -613,36 +613,7 @@ _ELIDABLE_INLINE int __sgetc_r(struct _reent *__ptr, FILE *__p)
  #define __sgetc_r(__ptr, __p) __sgetc_raw_r(__ptr, __p)
  #endif
- 
+
 -#ifdef _never /* __GNUC__ */
 -/* If this inline is actually used, then systems using coff debugging
 -   info get hopelessly confused.  21sept93 rich@cygnus.com.  */
@@ -65,13 +65,13 @@ index c2418fa..ba61ab7 100644
 -#endif
 -#endif
 +int _EXFUN(__sputc_r, (struct _reent *, int, FILE *));
- 
+
  #define	__sfeof(p)	(((p)->_flags & __SEOF) != 0)
  #define	__sferror(p)	(((p)->_flags & __SERR) != 0)
 @@ -655,17 +626,6 @@ _ELIDABLE_INLINE int __sputc_r(struct _reent *_ptr, int _c, FILE *_p) {
  #define	clearerr(p)	__sclearerr(p)
  #endif
- 
+
 -#if 0 /*ndef __STRICT_ANSI__ - FIXME: must initialize stdio first, use fn */
 -#define	fileno(p)	__sfileno(p)
 -#endif
@@ -87,23 +87,23 @@ index c2418fa..ba61ab7 100644
  /* fast always-buffered version, true iff error */
  #define	fast_putc(x,p) (--(p)->_w < 0 ? \
 @@ -679,9 +639,6 @@ _ELIDABLE_INLINE int __sputc_r(struct _reent *_ptr, int _c, FILE *_p) {
- 
+
  #endif /* !__CUSTOM_FILE_IO__ */
- 
+
 -#define	getchar()	getc(stdin)
 -#define	putchar(x)	putc(x, stdout)
 -
  _END_STD_C
- 
+
  #endif /* _STDIO_H_ */
 diff --git a/newlib/libc/stdio/putc.c b/newlib/libc/stdio/putc.c
 index 2b1fd1b..f64925e 100644
 --- a/newlib/libc/stdio/putc.c
 +++ b/newlib/libc/stdio/putc.c
 @@ -89,6 +89,13 @@ static char sccsid[] = "%W% (Berkeley) %G%";
- 
+
  #undef putc
- 
+
 +int __sputc_r(struct _reent *_ptr, int _c, FILE *_p) {
 +    if (--_p->_w >= 0 || (_p->_w >= _p->_lbfsize && (char)_c != '\\n'))
 +        return (*_p->_p++ = _c);
@@ -123,24 +123,24 @@ index ecc445f..c9f5a00 100644
 -int _dummy_mallocr = 1;
 -#else
  /* ---------- To make a malloc.h, start cutting here ------------ */
- 
- /* 
+
+ /*
 @@ -381,11 +378,7 @@ extern void __malloc_unlock();
- 
+
  */
- 
--#if DEBUG 
+
+-#if DEBUG
 -#include <assert.h>
 -#else
  #define assert(x) ((void)0)
 -#endif
- 
- 
+
+
  /*
 @@ -1761,141 +1754,6 @@ extern unsigned long max_mmapped_mem;
-   Debugging support 
+   Debugging support
  */
- 
+
 -#if DEBUG
 -
 -
@@ -153,11 +153,11 @@ index ecc445f..c9f5a00 100644
 -*/
 -
 -#if __STD_C
--static void do_check_chunk(mchunkptr p) 
+-static void do_check_chunk(mchunkptr p)
 -#else
 -static void do_check_chunk(p) mchunkptr p;
 -#endif
--{ 
+-{
 -  INTERNAL_SIZE_T sz = p->size & ~PREV_INUSE;
 -
 -  /* No checkable chunk is mmapped */
@@ -165,7 +165,7 @@ index ecc445f..c9f5a00 100644
 -
 -  /* Check for legal address ... */
 -  assert((char*)p >= sbrk_base);
--  if (p != top) 
+-  if (p != top)
 -    assert((char*)p + sz <= (char*)top);
 -  else
 -    assert((char*)p + sz <= sbrk_base + sbrked_mem);
@@ -174,11 +174,11 @@ index ecc445f..c9f5a00 100644
 -
 -
 -#if __STD_C
--static void do_check_free_chunk(mchunkptr p) 
+-static void do_check_free_chunk(mchunkptr p)
 -#else
 -static void do_check_free_chunk(p) mchunkptr p;
 -#endif
--{ 
+-{
 -  INTERNAL_SIZE_T sz = p->size & ~PREV_INUSE;
 -  mchunkptr next = chunk_at_offset(p, sz);
 -
@@ -197,21 +197,21 @@ index ecc445f..c9f5a00 100644
 -    /* ... and is fully consolidated */
 -    assert(prev_inuse(p));
 -    assert (next == top || inuse(next));
--    
+-
 -    /* ... and has minimally sane links */
 -    assert(p->fd->bk == p);
 -    assert(p->bk->fd == p);
 -  }
 -  else /* markers are always of size SIZE_SZ */
--    assert(sz == SIZE_SZ); 
+-    assert(sz == SIZE_SZ);
 -}
 -
 -#if __STD_C
--static void do_check_inuse_chunk(mchunkptr p) 
+-static void do_check_inuse_chunk(mchunkptr p)
 -#else
 -static void do_check_inuse_chunk(p) mchunkptr p;
 -#endif
--{ 
+-{
 -  mchunkptr next = next_chunk(p);
 -  do_check_chunk(p);
 -
@@ -222,7 +222,7 @@ index ecc445f..c9f5a00 100644
 -    Since more things can be checked with free chunks than inuse ones,
 -    if an inuse chunk borders them and debug is on, it's worth doing them.
 -  */
--  if (!prev_inuse(p)) 
+-  if (!prev_inuse(p))
 -  {
 -    mchunkptr prv = prev_chunk(p);
 -    assert(next_chunk(prv) == p);
@@ -239,7 +239,7 @@ index ecc445f..c9f5a00 100644
 -}
 -
 -#if __STD_C
--static void do_check_malloced_chunk(mchunkptr p, INTERNAL_SIZE_T s) 
+-static void do_check_malloced_chunk(mchunkptr p, INTERNAL_SIZE_T s)
 -#else
 -static void do_check_malloced_chunk(p, s) mchunkptr p; INTERNAL_SIZE_T s;
 -#endif
@@ -270,29 +270,29 @@ index ecc445f..c9f5a00 100644
 -#define check_chunk(P) do_check_chunk(P)
 -#define check_malloced_chunk(P,N) do_check_malloced_chunk(P,N)
 -#else
--#define check_free_chunk(P) 
+-#define check_free_chunk(P)
 -#define check_inuse_chunk(P)
 -#define check_chunk(P)
 -#define check_malloced_chunk(P,N)
 -#endif
 -
- 
- 
- /* 
+
+
+ /*
 @@ -2126,7 +1984,7 @@ static mchunkptr mremap_chunk(p, new_size) mchunkptr p; size_t new_size;
- 
- 
- 
+
+
+
 -#ifdef DEFINE_MALLOC
 +#if defined (DEFINE_MALLOC) && !defined (MALLOC_PROVIDED)
- 
- /* 
+
+ /*
    Extend the top-most chunk by obtaining memory from system.
 @@ -3275,99 +3133,7 @@ void cfree(mem) Void_t *mem;
  #endif
- 
+
  #endif /* DEFINE_CFREE */
--
+-
 -#ifdef DEFINE_FREE
 -
 -/*
@@ -335,7 +335,7 @@ index ecc445f..c9f5a00 100644
 -
 -  top_size = chunksize(top);
 -  extra = ((top_size - pad - MINSIZE + (pagesz-1)) / pagesz - 1) * pagesz;
- 
+
 -  if (extra < (long)pagesz)  /* Not enough memory to release */
 -  {
 -    MALLOC_UNLOCK;
@@ -355,7 +355,7 @@ index ecc445f..c9f5a00 100644
 -    else
 -    {
 -      new_brk = (char*)(MORECORE (-extra));
--      
+-
 -      if (new_brk == (char*)(MORECORE_FAILURE)) /* sbrk failed? */
 -      {
 -        /* Try to figure out what we have */
@@ -368,7 +368,7 @@ index ecc445f..c9f5a00 100644
 -        }
 -        check_chunk(top);
 -	MALLOC_UNLOCK;
--        return 0; 
+-        return 0;
 -      }
 -
 -      else
@@ -385,9 +385,9 @@ index ecc445f..c9f5a00 100644
 -}
 -
 -#endif /* DEFINE_FREE */
- 
+
  #ifdef DEFINE_MALLOC_USABLE_SIZE
- 
+
 @@ -3397,11 +3163,6 @@ size_t malloc_usable_size(RARG mem) RDECL Void_t* mem;
      if(!chunk_is_mmapped(p))
      {
@@ -407,17 +407,17 @@ index ecc445f..c9f5a00 100644
 -#if DEBUG
 -  mchunkptr q;
 -#endif
- 
+
    INTERNAL_SIZE_T avail = chunksize(top);
    int   navail = ((long)(avail) >= (long)MINSIZE)? 1 : 0;
 @@ -3431,13 +3189,6 @@ STATIC void malloc_update_mallinfo()
      b = bin_at(i);
-     for (p = last(b); p != b; p = p->bk) 
+     for (p = last(b); p != b; p = p->bk)
      {
 -#if DEBUG
 -      check_free_chunk(p);
--      for (q = next_chunk(p); 
--           q < top && inuse(q) && (long)(chunksize(q)) >= (long)MINSIZE; 
+-      for (q = next_chunk(p);
+-           q < top && inuse(q) && (long)(chunksize(q)) >= (long)MINSIZE;
 -           q = next_chunk(q))
 -        check_inuse_chunk(q);
 -#endif
@@ -426,7 +426,7 @@ index ecc445f..c9f5a00 100644
      }
 @@ -3697,4 +3448,3 @@ History:
           structure of old version,  but most details differ.)
- 
+
  */
 -#endif
 diff --git a/newlib/libc/stdlib/mlock.c b/newlib/libc/stdlib/mlock.c
