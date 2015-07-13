@@ -282,7 +282,7 @@ static void test_pktbuf_add__unaligned_in_aligned_hole(void)
     void *tmp_data2 = pkt2->data;
 
     ng_pktbuf_release(pkt2);
-    pkt4 = ng_pktbuf_add(NULL, TEST_STRING8, 9, NG_NETTYPE_UNDEF);
+    pkt4 = ng_pktbuf_add(NULL, TEST_STRING12, 9, NG_NETTYPE_UNDEF);
 
     TEST_ASSERT(tmp_data2 != pkt4->data);
 
@@ -448,13 +448,13 @@ static void test_pktbuf_realloc_data__success(void)
 {
     ng_pktsnip_t *pkt;
 
-    pkt = ng_pktbuf_add(NULL, TEST_STRING8, sizeof(TEST_STRING16), NG_NETTYPE_UNDEF);
+    pkt = ng_pktbuf_add(NULL, TEST_STRING16, sizeof(TEST_STRING16), NG_NETTYPE_UNDEF);
 
     TEST_ASSERT_NOT_NULL(pkt);
 
     TEST_ASSERT_EQUAL_INT(0, ng_pktbuf_realloc_data(pkt, sizeof(TEST_STRING8)));
     TEST_ASSERT_NULL(pkt->next);
-    TEST_ASSERT_EQUAL_STRING(TEST_STRING8, pkt->data);
+    TEST_ASSERT_EQUAL_STRING(TEST_STRING16, pkt->data);
     TEST_ASSERT_EQUAL_INT(sizeof(TEST_STRING8), pkt->size);
     TEST_ASSERT_EQUAL_INT(NG_NETTYPE_UNDEF, pkt->type);
     TEST_ASSERT_EQUAL_INT(1, pkt->users);
