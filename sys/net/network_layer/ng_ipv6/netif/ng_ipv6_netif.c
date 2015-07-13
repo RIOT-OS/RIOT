@@ -473,8 +473,13 @@ void ng_ipv6_netif_init_by_dev(void)
         if ((ng_netapi_get(ifs[i], NETCONF_OPT_PROTO, 0, &if_type,
                            sizeof(if_type)) != -ENOTSUP) &&
             (if_type == NG_NETTYPE_SIXLOWPAN)) {
+            uint16_t src_len = 8;
             DEBUG("Set 6LoWPAN flag\n");
             ipv6_ifs[i].flags |= NG_IPV6_NETIF_FLAGS_SIXLOWPAN;
+            /* use EUI-64 (8-byte address) for IID generation and for sending
+             * packets */
+            ng_netapi_set(ifs[i], NETCONF_OPT_SRC_LEN, 0, &src_len,
+                          sizeof(src_len)); /* don't care for result */
         }
 
 #endif
