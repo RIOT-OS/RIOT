@@ -43,6 +43,7 @@ endif
 CXXUWFLAGS += -std=%
 
 ifeq ($(LTO),yes)
+  $(info Building with Link-Time-Optimizations is currently an experimental feature. Expect broken binaries.)
   LTOFLAGS = -flto -ffat-lto-objects
   CFLAGS += ${LTOFLAGS}
   LINKFLAGS += ${LTOFLAGS}
