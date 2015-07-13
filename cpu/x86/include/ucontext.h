@@ -87,7 +87,7 @@ typedef struct stack {
     void *ss_sp; /* field in ucontext_t: 0*4 */
     //int ss_flags;
     size_t ss_size; /* field in ucontext_t: 1*4 */
-} __attribute__((packed)) stack_t;
+} __attribute__((packed)) stack_info_t;
 
 /**
  * @brief   Extra data to perform an `iret`.
@@ -107,7 +107,7 @@ struct x86_interrupted_interrupt {
  * This datatype stores the machine state of a suspended coroutine.
  */
 typedef struct ucontext {
-    stack_t uc_stack;         /* field in ucontext_t: 0*4 - 1*4 */
+    stack_info_t uc_stack;    /* field in ucontext_t: 0*4 - 1*4 */
     mcontext_t uc_context;    /* field in ucontext_t: 2*4 -> 11*4 */
     struct ucontext *uc_link; /* field in ucontext_t: 12*4 */
     //sigset_t uc_sigmask;

@@ -6,9 +6,11 @@
 [[ -z $BUILDDIR ]] && BUILDDIR=${TMP_DIR}/${TARGET}
 [[ -z $PREFIX ]] && PREFIX=${PWD}/toolchain/${TARGET}
 [[ -z $MAKE_THREADS ]] && MAKE_THREADS=
+PATCHDIR=$(readlink -e "$(dirname $0)/patches")
 
-NEWLIB_VER=2.1.0
-NEWLIB_MD5=c6559d83ecce4728a52f0ce7ec80de97
+NEWLIB_VER=2.2.0.20150623
+NEWLIB_ARCHIVE=newlib-${NEWLIB_VER}.tar.gz
+NEWLIB_MD5=5cf6cd9ded91bca10c9f0a22a9da8e02
 NEWLIB_CONFIGURE_FLAGS=(
     --target=${TARGET}
     --prefix=${PREFIX}
@@ -28,54 +30,7 @@ NEWLIB_CONFIGURE_FLAGS=(
     --enable-newlib-multithread
 )
 NEWLIB_PATCHES=(
-libgloss/i386/cygmon-gmon.c
-'64d
-59a
-#include <string.h>
-
-.'
-
-libgloss/arm/_exit.c
-'14a
-  __builtin_unreachable ();
-.'
-
-newlib/libc/stdlib/mallocr.c
-'3700d
-3434,3440d
-3422,3424d
-3400,3404d
-3357,3370d
-3278,3355d
-2129c
-#if defined (DEFINE_MALLOC) && !defined (MALLOC_PROVIDED)
-.
-1764,1898d
-388d
-384,386d
-1,3d'
-
-newlib/libc/stdlib/mlock.c
-'63,64d
-1d'
-
-newlib/libc/include/stdio.h
-'681,683d
-658,668d
-616,645c
-int _EXFUN(__sputc_r, (struct _reent *, int, FILE *));
-.'
-
-newlib/libc/stdio/putc.c
-"91a
-int __sputc_r(struct _reent *_ptr, int _c, FILE *_p) {
-    if (--_p->_w >= 0 || (_p->_w >= _p->_lbfsize && (char)_c != '\\n'))
-        return (*_p->_p++ = _c);
-    else
-        return (__swbuf_r(_ptr, _c, _p));
-}
-
-."
+newlib-2.2.0.20150623-RIOT-i586-none-elf.patch
 )
 NEWLIB_TARGET_CFLAGS=(
     -DREENTRANT_SYSCALLS_PROVIDED
@@ -90,8 +45,9 @@ NEWLIB_TARGET_CFLAGS=(
     -fdata-sections
 )
 
-GCC_VER=4.8.2
-GCC_MD5=a3d7d63b9cb6b6ea049469a0c4a43c9d
+GCC_VER=4.8.5
+GCC_ARCHIVE=gcc-${GCC_VER}.tar.bz2
+GCC_MD5=80d2c2982a3392bb0b89673ff136e223
 GCC_CONFIGURE_FLAGS=(
     --target=${TARGET}
     --prefix=${PREFIX}
@@ -110,8 +66,9 @@ GCC_CONFIGURE_FLAGS=(
     --disable-nls
 )
 
-BINUTILS_VER=2.24
-BINUTILS_MD5=e0f71a7b2ddab0f8612336ac81d9636b
+BINUTILS_VER=2.25
+BINUTILS_ARCHIVE=binutils-${BINUTILS_VER}.tar.bz2
+BINUTILS_MD5=d9f3303f802a5b6b0bb73a335ab89d66
 BINUTILS_CONFIGURE_FLAGS=(
     --prefix=${PREFIX}
 
@@ -120,8 +77,9 @@ BINUTILS_CONFIGURE_FLAGS=(
     --disable-nls
 )
 
-GDB_VER=7.6
-GDB_MD5=fda57170e4d11cdde74259ca575412a8
+GDB_VER=7.9.1
+GDB_ARCHIVE=gdb-${GDB_VER}.tar.xz
+GDB_MD5=35374c77a70884eb430c97061053a36e
 GDB_CONFIGURE_FLAGS=(
     --target=${TARGET}
     --prefix=${PREFIX}
@@ -135,6 +93,7 @@ GDB_CONFIGURE_FLAGS=(
 )
 
 GMP_VER=5.1.3
+GMP_ARCHIVE=gmp-${GMP_VER}.tar.xz
 GMP_MD5=e5fe367801ff067b923d1e6a126448aa
 GMP_CONFIGURE_FLAGS=(
     --prefix=${PREFIX}
@@ -144,6 +103,7 @@ GMP_CONFIGURE_FLAGS=(
 )
 
 MPFR_VER=3.1.2
+MPFR_ARCHIVE=mpfr-${MPFR_VER}.tar.xz
 MPFR_MD5=e3d203d188b8fe60bb6578dd3152e05c
 MPFR_CONFIGURE_FLAGS=(
     --prefix=${PREFIX}
@@ -153,6 +113,7 @@ MPFR_CONFIGURE_FLAGS=(
 )
 
 MPC_VER=1.0.2
+MPC_ARCHIVE=mpc-${MPC_VER}.tar.gz
 MPC_MD5=68fadff3358fb3e7976c7a398a0af4c3
 MPC_CONFIGURE_FLAGS=(
     --prefix=${PREFIX}
@@ -302,13 +263,13 @@ download() {
     echo
     echo "Downloading TAR files."
 
-    download_file ftp://ftp.cs.tu-berlin.de/pub/gnu/binutils binutils-${BINUTILS_VER}.tar.bz2 ${BINUTILS_MD5} &&
-    download_file ftp://ftp.cs.tu-berlin.de/pub/gnu/gcc/gcc-${GCC_VER} gcc-${GCC_VER}.tar.bz2 ${GCC_MD5} &&
-    download_file ftp://ftp.cs.tu-berlin.de/pub/gnu/gdb gdb-${GDB_VER}.tar.bz2 ${GDB_MD5} &&
-    download_file ftp://ftp.cs.tu-berlin.de/pub/gnu/gmp gmp-${GMP_VER}.tar.xz ${GMP_MD5} &&
-    download_file ftp://ftp.cs.tu-berlin.de/pub/gnu/mpfr mpfr-${MPFR_VER}.tar.xz ${MPFR_MD5} &&
-    download_file ftp://ftp.cs.tu-berlin.de/pub/gnu/mpc mpc-${MPC_VER}.tar.gz ${MPC_MD5} &&
-    download_file ftp://sources.redhat.com/pub/newlib newlib-${NEWLIB_VER}.tar.gz ${NEWLIB_MD5}
+    download_file ftp://ftp.cs.tu-berlin.de/pub/gnu/binutils ${BINUTILS_ARCHIVE} ${BINUTILS_MD5} &&
+    download_file ftp://ftp.cs.tu-berlin.de/pub/gnu/gcc/gcc-${GCC_VER} ${GCC_ARCHIVE} ${GCC_MD5} &&
+    download_file ftp://ftp.cs.tu-berlin.de/pub/gnu/gdb ${GDB_ARCHIVE} ${GDB_MD5} &&
+    download_file ftp://ftp.cs.tu-berlin.de/pub/gnu/gmp ${GMP_ARCHIVE} ${GMP_MD5} &&
+    download_file ftp://ftp.cs.tu-berlin.de/pub/gnu/mpfr ${MPFR_ARCHIVE} ${MPFR_MD5} &&
+    download_file ftp://ftp.cs.tu-berlin.de/pub/gnu/mpc ${MPC_ARCHIVE} ${MPC_MD5} &&
+    download_file ftp://sources.redhat.com/pub/newlib ${NEWLIB_ARCHIVE} ${NEWLIB_MD5}
 }
 
 extract() {
@@ -316,28 +277,32 @@ extract() {
     echo "Extracting TAR files."
 
     if [[ ! -x ./binutils-${BINUTILS_VER}/configure ]]; then
-        tar xjf ${TMP_DIR}/binutils-${BINUTILS_VER}.tar.bz2 || return $?
+        tar axf ${TMP_DIR}/${BINUTILS_ARCHIVE} || return $?
     fi
     if [[ ! -x ./gcc-${GCC_VER}/configure ]]; then
-        tar xjf ${TMP_DIR}/gcc-${GCC_VER}.tar.bz2 || return $?
+        tar axf ${TMP_DIR}/${GCC_ARCHIVE} || return $?
     fi
     if [[ ! -x ./gdb-${GDB_VER}/configure ]]; then
-        tar xjf ${TMP_DIR}/gdb-${GDB_VER}.tar.bz2 || return $?
+        tar axf ${TMP_DIR}/${GDB_ARCHIVE} || return $?
     fi
     if [[ ! -x ./gmp-${GMP_VER}/configure ]]; then
-        tar xJf ${TMP_DIR}/gmp-${GMP_VER}.tar.xz || return $?
+        tar axf ${TMP_DIR}/${GMP_ARCHIVE} || return $?
     fi
     if [[ ! -x ./mpfr-${MPFR_VER}/configure ]]; then
-        tar xJf ${TMP_DIR}/mpfr-${MPFR_VER}.tar.xz || return $?
+        tar axf ${TMP_DIR}/${MPFR_ARCHIVE} || return $?
     fi
     if [[ ! -x ./mpc-${MPC_VER}/configure ]]; then
-        tar xzf ${TMP_DIR}/mpc-${MPC_VER}.tar.gz || return $?
+        tar axf ${TMP_DIR}/${MPC_ARCHIVE} || return $?
     fi
     if [[ ! -x ./newlib-${NEWLIB_VER}/configure ]]; then
-        tar xzf ${TMP_DIR}/newlib-${NEWLIB_VER}.tar.gz &&
-        for (( I=0; I < ${#NEWLIB_PATCHES[@]}; I+=2 )); do
-            echo "Applying Newlib patch $((${I} / 2 + 1))"
-            echo "${NEWLIB_PATCHES[$I+1]}" | patch -e ./newlib-${NEWLIB_VER}/"${NEWLIB_PATCHES[$I]}" || return $?
+        tar axf ${TMP_DIR}/${NEWLIB_ARCHIVE} &&
+        for (( I=0; I < ${#NEWLIB_PATCHES[@]}; I+=1 )); do
+            echo "Applying Newlib patch ${NEWLIB_PATCHES[$I]}"
+            for (( P=0; P < 4; P+=1 )); do
+                patch -p${P} --dry-run -f < "${PATCHDIR}/${NEWLIB_PATCHES[$I]}" 2>&1 > /dev/null || continue
+                patch -p${P} -f < "${PATCHDIR}/${NEWLIB_PATCHES[$I]}" || return $?
+                break
+            done
         done
     fi
 }
