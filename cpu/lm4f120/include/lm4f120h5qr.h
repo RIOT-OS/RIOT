@@ -1,9 +1,6 @@
 /**************************************************************************//**
- * @file     core_cm4.h
- * @brief    CMSIS Cortex-M4 Core Peripheral Access Layer Header File
- * @version  V4.00
- * @date     22. August 2014
- *
+ * @file     lm4f120h5qr.h
+ * @brief    LM4F120H5QR Core Peripheral Access Layer Header File
  * @note
  *
  ******************************************************************************/
@@ -48,13 +45,6 @@
 #define __Vendor_SysTickConfig    0       /*!< Set to 1 if different SysTick Config is used  */
 #define __FPU_PRESENT             1       /*!< FPU present                                   */
 
-/**
-  * @}
-  */
-
-/** @addtogroup cpu_specific_Peripheral_interrupt_number_definition
-  * @{
-  */
 
 /**
  * @brief LM4F120H5QR Interrupt Number Definition, according to the selected device
@@ -123,28 +113,13 @@ typedef enum
 } IRQn_Type;
 
 
- /*
-typedef enum
-{
-// ******  Cortex-M4 Processor Exceptions Numbers ****************************************************************
-  NonMaskableInt_IRQn         = 2,    //!< 2 Non Maskable Interrupt                                          
-  MemoryManagement_IRQn       = 4,    //!< 4 Cortex-M4 Memory Management Interrupt                           
-  BusFault_IRQn               = 5,    //!< 5 Cortex-M4 Bus Fault Interrupt                                   
-  UsageFault_IRQn             = 6,    //!< 6 Cortex-M4 Usage Fault Interrupt                                 
-  SVCall_IRQn                 = 11,     //!< 11 Cortex-M4 SV Call Interrupt                                    
-  DebugMonitor_IRQn           = 12,     //!< 12 Cortex-M4 Debug Monitor Interrupt                              
-  PendSV_IRQn                 = 14,     //!< 14 Cortex-M4 Pend SV Interrupt                                    
-  SysTick_IRQn                = 15,     //!< 15 Cortex-M4 System Tick Interrupt                                
-} IRQn_Type;
-*/
-
+#include <stdint.h>               /* standard types definitions              */
 #include "core_cm4.h"             /* Cortex-M4 processor and core peripherals */
-#include <stdint.h>                      /* standard types definitions                      */
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __CORE_CM4_H_GENERIC */
+#endif /* __LM4F120H5QR_H__*/
 
 

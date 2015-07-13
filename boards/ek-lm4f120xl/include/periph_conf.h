@@ -37,14 +37,14 @@ extern "C" {
 #define TIMER_0_CHANNELS    2
 #define TIMER_0_PRESCALER   (39U)
 #define TIMER_0_MAX_VALUE   (0xffffffff)
-#define TIMER_0_ISR         WTIMER0IntHandler
+#define TIMER_0_ISR         isr_wtimer0
 #define TIMER_0_IRQ_CHAN    Timer0A_IRQn
 
 /* Timer 1 configuration */
 #define TIMER_1_CHANNELS    2
 #define TIMER_1_PRESCALER   (39U)
 #define TIMER_1_MAX_VALUE   (0xffffffff)
-#define TIMER_1_ISR         TIMER1IntHandler
+#define TIMER_1_ISR         isr_wtimer1
 #define TIMER_1_IRQ_CHAN    Timer1A_IRQn
 /** @} */
 
@@ -63,7 +63,7 @@ extern "C" {
 #define UART_0_DEV          UART0_BASE
 #define UART_0_CLK          (40000000)          /* UART clock runs with 42MHz (F_CPU / 4) */
 #define UART_0_IRQ_CHAN     UART0_IRQn
-#define UART_0_ISR          UARTIntHandler
+#define UART_0_ISR          isr_usart0
 /* UART 0 pin configuration */
 #define UART_0_PORT         GPIOA
 #define UART_0_TX_PIN       UART_PA1_U0TX
@@ -76,7 +76,7 @@ extern "C" {
 #define UART_1_DEV          UART1_BASE
 #define UART_1_CLK          (40000000)          /* UART clock runs with 40MHz (F_CPU / 4) */
 #define UART_1_IRQ_CHAN     UART1_IRQn
-#define UART_1_ISR          UART1IntHandler
+#define UART_1_ISR          isr_usart1
 /* UART 1 pin configuration */
 #define UART_1_PORT         GPIOD
 #define UART_1_TX_PIN       8

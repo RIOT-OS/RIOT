@@ -141,7 +141,7 @@ void timer_reset(tim_t dev)
 }
 
 #if TIMER_0_EN
-void TIMER0IntHandler(void)
+void isr_timer0(void)
 {
 	TIMER0_ICR_R = TIMER_ICR_TATOCINT;	// acknowledge timer0A timeout
 	config[TIMER_0].cb(0);
@@ -150,7 +150,7 @@ void TIMER0IntHandler(void)
 		thread_yield();
 	}
 }
-void WTIMER0IntHandler(void)
+void isr_wtimer0(void)
 {
 	WTIMER0_ICR_R = TIMER_ICR_TATOCINT;	// acknowledge timer0A timeout
 	

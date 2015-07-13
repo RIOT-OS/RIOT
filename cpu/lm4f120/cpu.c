@@ -26,40 +26,6 @@
 #include "arch/thread_arch.h"
 #include "arch/irq_arch.h"
 
-unsigned long __attribute__((naked))
-CPUipsrGet(void)
-{
-    unsigned long ulRet;
-
-    //
-    // Read IPSR
-    //
-    __asm("    mrs     r0, IPSR\n"
-          "    bx      lr\n"
-          : "=r" (ulRet));
-
-    //
-    // The return is handled in the inline assembly, but the compiler will
-    // still complain if there is not an explicit return here (despite the fact
-    // that this does not result in any code being produced because of the
-    // naked attribute).
-    //
-    return(ulRet);
-}
-
-void __attribute__((naked))
-DisableInterrupts(void)
-{
-    __asm("    CPSID   I\n"
-          "    BX      LR\n");
-}
-
-void __attribute__((naked))
-EnableInterrupts(void)
-{
-    __asm("    CPSIE   I\n"
-          "    BX      LR\n");
-}
 /**
  * @brief Initialize the CPU, set IRQ priorities
  */

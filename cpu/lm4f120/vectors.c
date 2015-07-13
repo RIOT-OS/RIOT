@@ -35,11 +35,11 @@ WEAK_DEFAULT void isr_svc(void);
 WEAK_DEFAULT void isr_pendsv(void);
 WEAK_DEFAULT void isr_systick(void);
 /* LM4F120 specific interrupt vectors */
-WEAK_DEFAULT void UARTIntHandler(void);  		// UART 0
-WEAK_DEFAULT void UART1IntHandler(void);  		// UART 1
-WEAK_DEFAULT void TIMER0IntHandler(void);		// 16 bit timer 0 A
-WEAK_DEFAULT void WTIMER0IntHandler(void);		// 32 bit timer 0 A
-WEAK_DEFAULT void TIMER1IntHandler(void);		// 16 bit timer 1 A
+WEAK_DEFAULT void isr_usart0(void);  		// UART 0
+WEAK_DEFAULT void isr_usart1(void);  		// UART 1
+WEAK_DEFAULT void isr_timer0(void); 		// 16 bit timer 0 A
+WEAK_DEFAULT void isr_timer1(void);		    // 16 bit timer 1 A
+WEAK_DEFAULT void isr_wtimer0(void);		// 32 bit timer 0 A
 WEAK_DEFAULT void isr_wwdg(void);
 WEAK_DEFAULT void isr_pvd(void);
 WEAK_DEFAULT void isr_tamp_stamp(void);
@@ -72,7 +72,6 @@ WEAK_DEFAULT void isr_i2c2_ev(void);
 WEAK_DEFAULT void isr_i2c2_er(void);
 WEAK_DEFAULT void isr_spi1(void);
 WEAK_DEFAULT void isr_spi2(void);
-WEAK_DEFAULT void isr_usart1(void);
 WEAK_DEFAULT void isr_usart2(void);
 WEAK_DEFAULT void isr_usart3(void);
 WEAK_DEFAULT void isr_rtc_alarm(void);
@@ -145,8 +144,8 @@ ISR_VECTORS const void *interrupt_vector[] = {
 	(void *) dummy_handler,			// GPIO Port C						18
 	(void *) dummy_handler,			// GPIO Port D						19
 	(void *) dummy_handler,			// GPIO Port E						20
-	(void *) UARTIntHandler,  		// UART 0							21
-	(void *) UART1IntHandler,		// UART 1							22
+	(void *) isr_usart0,    		// UART 0							21
+	(void *) isr_usart1,     		// UART 1							22
 	(void *) dummy_handler,			// SSI 0							23
 	(void *) dummy_handler,			// I2C 0							24
 	(void *) (0UL),					// Reserved							25
@@ -159,9 +158,9 @@ ISR_VECTORS const void *interrupt_vector[] = {
 	(void *) dummy_handler,			// ADC 0 Seq 2						32
 	(void *) dummy_handler,			// ADC 0 Seq 3						33
 	(void *) dummy_handler,			// WDT 0 and 1						34
-	(void *) TIMER0IntHandler,				// 16/32 bit timer 0 A				35
+	(void *) isr_timer0,			// 16/32 bit timer 0 A				35
 	(void *) dummy_handler,			// 16/32 bit timer 0 B				36
-	(void *) TIMER1IntHandler,				// 16/32 bit timer 1 A				37
+	(void *) isr_timer1,			// 16/32 bit timer 1 A				37
 	(void *) dummy_handler,			// 16/32 bit timer 1 B				38
 	(void *) dummy_handler,			// 16/32 bit timer 2 A				39
 	(void *) dummy_handler,			// 16/32 bit timer 2 B				40
@@ -234,7 +233,7 @@ ISR_VECTORS const void *interrupt_vector[] = {
 	(void *) (0UL),					// Reserved							107
 	(void *) dummy_handler,			// 16/32 bit timer 5 A				108
 	(void *) dummy_handler,			// 16/32 bit timer 5 B				109
-	(void *) WTIMER0IntHandler,		// 32/64 bit timer 0 A				110
+	(void *) isr_wtimer0,		// 32/64 bit timer 0 A				110
 	(void *) dummy_handler,			// 32/64 bit timer 0 B				111
 	(void *) dummy_handler,			// 32/64 bit timer 1 A				112
 	(void *) dummy_handler,			// 32/64 bit timer 1 B				113

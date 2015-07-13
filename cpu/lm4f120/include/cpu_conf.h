@@ -83,17 +83,11 @@ extern "C" {
 #define CLK1							5
 
 
-extern unsigned long CPUipsrGet(void);
-extern void DisableInterrupts(void);
-extern void EnableInterrupts(void);
 extern void setup_fpu(void);
 extern void cpu_clock_init(int);
-extern int uart_init_testing(uart_t uart, uint32_t baudrate);
-extern void UARTSend(const unsigned char *pucBuffer, unsigned long ulCount);
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif /* __CPU_CONF_H */
-/** @} */

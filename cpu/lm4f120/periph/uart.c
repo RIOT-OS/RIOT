@@ -196,7 +196,7 @@ void uart_poweroff(uart_t uart)
 //
 //*****************************************************************************
 
-void UARTIntHandler(void)
+void isr_usart0(void)
 {
 	unsigned long ulStatus;
 	char cChar;
