@@ -22,6 +22,7 @@
 
 #include <inttypes.h>
 #include <stdlib.h>
+#include <sys/uio.h>
 
 #include "net/ng_nettype.h"
 
@@ -98,6 +99,9 @@ extern "C" {
  */
 /* packed to be aligned correctly in the static packet buffer */
 typedef struct __attribute__((packed)) ng_pktsnip {
+    void *data;                     /**< pointer to the data of the snip */
+    size_t size;                    /**< the length of the snip in byte */
+
     /**
      * @brief   Counter of threads currently having control over this packet.
      *
@@ -105,8 +109,6 @@ typedef struct __attribute__((packed)) ng_pktsnip {
      */
     unsigned int users;
     struct ng_pktsnip *next;        /**< next snip in the packet */
-    void *data;                     /**< pointer to the data of the snip */
-    size_t size;                    /**< the length of the snip in byte */
     ng_nettype_t type;              /**< protocol of the packet snip */
 } ng_pktsnip_t;
 
@@ -127,6 +129,18 @@ static inline size_t ng_pkt_len(ng_pktsnip_t *pkt)
     }
 
     return len;
+}
+
+/**
+ * @brief   Converts a packet snip to an @ref struct iovec.
+ *
+ * @param[in] pkt   A packet snip.
+ *
+ * @return  A corresponding @ref struct iovec
+ */
+static inline struct iovec *ng_pkt_to_iovec(ng_pktsnip_t *pkt)
+{
+    return (struct iovec *)pkt;
 }
 
 #ifdef __cplusplus
