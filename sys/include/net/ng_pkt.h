@@ -97,7 +97,7 @@ extern "C" {
  *          as factory.
  */
 /* packed to be aligned correctly in the static packet buffer */
-typedef struct __attribute__((packed)) ng_pktsnip {
+typedef struct ng_pktsnip {
     /**
      * @brief   Counter of threads currently having control over this packet.
      *

@@ -75,7 +75,7 @@ extern "C" {
  * The link layer addresses included in this header are put in memory directly
  * following this struct.
  */
-typedef struct __attribute__((packed)) {
+typedef struct {
     uint8_t src_l2addr_len;     /**< length of l2 source address in byte */
     uint8_t dst_l2addr_len;     /**< length of l2 destination address in byte */
     kernel_pid_t if_pid;        /**< PID of network interface */
