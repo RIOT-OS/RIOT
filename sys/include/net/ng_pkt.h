@@ -98,6 +98,9 @@ extern "C" {
  */
 /* packed to be aligned correctly in the static packet buffer */
 typedef struct __attribute__((packed)) ng_pktsnip {
+    void *data;                     /**< pointer to the data of the snip */
+    size_t size;                    /**< the length of the snip in byte */
+
     /**
      * @brief   Counter of threads currently having control over this packet.
      *
@@ -105,8 +108,6 @@ typedef struct __attribute__((packed)) ng_pktsnip {
      */
     unsigned int users;
     struct ng_pktsnip *next;        /**< next snip in the packet */
-    void *data;                     /**< pointer to the data of the snip */
-    size_t size;                    /**< the length of the snip in byte */
     ng_nettype_t type;              /**< protocol of the packet snip */
 } ng_pktsnip_t;
 
