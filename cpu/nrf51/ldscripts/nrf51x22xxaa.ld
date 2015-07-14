@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief           Memory definitions for the NRF51822QFAA
+ * @brief           Memory definitions for the NRF51X22XXAA
  *
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
