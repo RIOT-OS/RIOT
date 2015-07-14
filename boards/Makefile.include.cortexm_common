@@ -11,6 +11,12 @@ ifeq (clang,$(TOOLCHAIN))
 # opposed to one set in the environment)
 override TOOLCHAIN := llvm
 endif
+# TOOLCHAIN = gcc is an alias for TOOLCHAIN = gnu
+ifeq (gcc,$(TOOLCHAIN))
+# use override so that we can redefine a variable set on the command line (as
+# opposed to one set in the environment)
+override TOOLCHAIN := gnu
+endif
 
 export TOOLCHAIN
 
