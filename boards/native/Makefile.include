@@ -45,7 +45,6 @@ export GPROF ?= gprof
 
 # basic cflags:
 export CFLAGS += -Wall -Wextra -pedantic
-export CFLAGS += -ffunction-sections -fdata-sections
 ifeq ($(shell uname -m),x86_64)
 export CFLAGS += -m32
 endif
@@ -76,6 +75,10 @@ export LINKFLAGS += -L $(BINDIR)
 else
 export LINKFLAGS += -ldl
 endif
+
+# clean up unused functions
+export CFLAGS += -ffunction-sections -fdata-sections
+export LINKFLAGS += -Wl,--gc-sections
 
 # set the tap interface for term/valgrind
 ifneq (,$(filter netdev2_tap,$(USEMODULE)))
