@@ -264,6 +264,8 @@ int gpio_init(gpio_t dev, gpio_dir_t dir, gpio_pp_t pushpull)
             PMC->PMC_PCER0 = (1 << GPIO_31_IRQ);
             break;
 #endif
+        default:
+            return -2;
     }
 
     /* give the PIO module the power over the corresponding pin */
@@ -793,6 +795,8 @@ int gpio_read(gpio_t dev)
             pin = GPIO_31_PIN;
             break;
 #endif
+        default:
+            return -1;
     }
 
     if (port->PIO_OSR & pin) {
@@ -1656,6 +1660,7 @@ void isr_pioa(void)
         gpio_config[GPIO_A31_MAP].cb(gpio_config[GPIO_A31_MAP].arg);
     }
 #endif
+    (void)status;       /* added to suppress cppcheck warnings */
     if (sched_context_switch_request) {
         thread_yield();
     }
@@ -1824,6 +1829,7 @@ void isr_piob(void)
         gpio_config[GPIO_B31_MAP].cb(gpio_config[GPIO_B31_MAP].arg);
     }
 #endif
+    (void)status;       /* added to suppress cppcheck warnings */
     if (sched_context_switch_request) {
         thread_yield();
     }
@@ -1992,6 +1998,7 @@ void isr_pioc(void)
         gpio_config[GPIO_C31_MAP].cb(gpio_config[GPIO_C31_MAP].arg);
     }
 #endif
+    (void)status;       /* added to suppress cppcheck warnings */
     if (sched_context_switch_request) {
         thread_yield();
     }
@@ -2160,6 +2167,7 @@ void isr_piod(void)
         gpio_config[GPIO_D31_MAP].cb(gpio_config[GPIO_D31_MAP].arg);
     }
 #endif
+    (void)status;       /* added to suppress cppcheck warnings */
     if (sched_context_switch_request) {
         thread_yield();
     }
