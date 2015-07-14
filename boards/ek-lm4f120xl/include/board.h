@@ -48,8 +48,8 @@ extern "C" {
  * @{
  */
 #define LED_GREEN_PIN       0x08
-#define LED_BLUE_PIN	    0x04
-#define LED_RED_PIN			0x02
+#define LED_BLUE_PIN        0x04
+#define LED_RED_PIN         0x02
 
 #define LED_GREEN_ON        GPIO_PORTF_DATA_R |= LED_GREEN_PIN
 #define LED_GREEN_OFF       GPIO_PORTF_DATA_R &= ~(LED_GREEN_PIN)
@@ -63,10 +63,10 @@ extern "C" {
 #define LED_RED_OFF         GPIO_PORTF_DATA_R &= ~(LED_RED_PIN)
 #define LED_RED_TOGGLE      /* not available */
 /* @} */
-#define TRACE	printf("TRACE %s:%d: %s\n", __FILE__, __LINE__, __FUNCTION__)
-#define VAL_I(x)	printf(#x ": %d\n",x);
-#define VAL_X(x)	printf(#x ":0x%X\n", (unsigned int)x);
-#define VAL_S(x)	printf(#x ":%s\n", x);
+#define TRACE   printf("TRACE %s:%d: %s\n", __FILE__, __LINE__, __FUNCTION__)
+#define VAL_I(x)    printf(#x ": %d\n",x);
+#define VAL_X(x)    printf(#x ":0x%X\n", (unsigned int)x);
+#define VAL_S(x)    printf(#x ":%s\n", x);
 
 /**
  * @brief Initialize board specific hardware, including clock, LEDs and std-IO

@@ -61,7 +61,7 @@ extern "C" {
  * @brief Length for reading CPU_ID
  */
 #define CPUID_ID_LEN                    (12)
-#define CPUID_ADDR						NVIC_CPUID
+#define CPUID_ADDR                      NVIC_CPUID
 
 /**
  * @name CC110X buffer size definitions for the stm32f4
@@ -75,12 +75,12 @@ extern "C" {
 /** 
  * @name Define the nominal CPU core clock in this board
  */
-#define F_CPU							1000000
-#define CLK80							1
-#define CLK50							2
-#define CLK40							3
-#define CLK16							4
-#define CLK1							5
+#define F_CPU                           1000000
+#define CLK80                           1
+#define CLK50                           2
+#define CLK40                           3
+#define CLK16                           4
+#define CLK1                            5
 
 
 extern void setup_fpu(void);
