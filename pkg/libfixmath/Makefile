@@ -49,8 +49,8 @@ $(BINDIR)$(PKG_NAME)-headers/fix16.h: $(CHECKOUT_FOLDER)/svn_info.xml
 	@rm -rf $(@D)
 	@mkdir -p $(@D)
 	$(AD)cp $(CHECKOUT_FOLDER)/libfixmath/fix16.h $(@D)
-	@echo $(patsubst %,'extern int %(void);',$(shell basename -a -s .c $(CHECKOUT_FOLDER)/unittests/*.c)) \
-	      $(patsubst %,'%();',$(shell basename -a -s .c $(CHECKOUT_FOLDER)/unittests/*.c)) | sed -e 's/;\s*/;\n/g' > $(@D)/fix16_unittests.inc
+	@echo $(patsubst %,'extern int %(void);',$(shell for f in $(CHECKOUT_FOLDER)/unittests/*.c; do basename $${f} .c; done )) \
+	      $(patsubst %,'%();',$(shell for f in $(CHECKOUT_FOLDER)/unittests/*.c; do basename $${f} .c; done)) | sed -e 's/;\s*/;\n/g' > $(@D)/fix16_unittests.inc
 
 $(CHECKOUT_FOLDER)/svn_info.xml:
 	@mkdir -p $(@D)
