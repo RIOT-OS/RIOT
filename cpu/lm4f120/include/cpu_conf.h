@@ -72,7 +72,7 @@ extern "C" {
 #define RX_BUF_SIZE                     (10)
 #endif
 
-/** 
+/**
  * @name Define the nominal CPU core clock in this board
  */
 #define F_CPU                           1000000
