@@ -47,7 +47,7 @@ trap 'rm -rf "$MYTMPDIR"' EXIT
 # Check for PRs and labels
 FULL_CHECK=true
 if [ -z "$FORCE_FULL_CHECK" ]; then
-    if [ $CI_PULL_REQUEST != false ] && ! [ -z "$CI_PULL_REQUEST" ]; then
+    if [ "$CI_PULL_REQUEST" != false ] && ! [ -z "$CI_PULL_REQUEST" ]; then
         # Pull request
         # Check for labels
         . ./dist/tools/pr_check/check_labels.sh
@@ -70,6 +70,7 @@ if $FULL_CHECK; then
     |& tee -a "$MYTMPDIR/output.log"
 else
     echo "PR not ready for CI build. Only static-tests will be executed!"
+    ((FAILURES++))
     exec_build_func static-tests "$@" |& tee -a "$MYTMPDIR/output.log"
 fi
 
