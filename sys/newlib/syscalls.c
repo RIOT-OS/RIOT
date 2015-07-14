@@ -107,7 +107,7 @@ void _fini(void)
 void _exit(int n)
 {
     printf("#! exit %i: resetting\n", n);
-    NVIC_SystemReset();
+    reboot(RB_AUTOBOOT);
     while(1);
 }
 
