@@ -53,16 +53,12 @@
 
 #define SHELL_BUFFER_SIZE        128
 
-static int shell_read(void);
-static void shell_write(int);
 static int cmd_send(int argc, char **argv);
 static int cmd_print_regs(int argc, char **argv);
 static int cmd_its(int argc, char **argv);
 
-
 void printbin(unsigned byte);
 void print_register(char reg, int num_bytes);
-
 
 static nrf24l01p_t nrf24l01p_0;
 
@@ -192,7 +188,7 @@ int cmd_its(int argc, char **argv)
     /* initialize transceiver device */
     if (nrf24l01p_init(&nrf24l01p_0, SPI_PORT, CE_PIN, CS_PIN, IRQ_PIN) < 0) {
         puts("Error in nrf24l01p_init");
-        return;
+        return 1;
     }
 
     /* create thread that gets msg when data arrives */
@@ -200,7 +196,7 @@ int cmd_its(int argc, char **argv)
         rx_handler_stack, sizeof(rx_handler_stack), THREAD_PRIORITY_MAIN - 1, 0,
         nrf24l01p_rx_handler, 0, "nrf24l01p_rx_handler") < 0) {
         puts("Error in thread_create");
-        return;
+        return 1;
     }
 
     /* setup device as receiver */
@@ -232,17 +228,17 @@ int cmd_send(int argc, char **argv)
     /* power on the device */
     if (nrf24l01p_on(&nrf24l01p_0) < 0) {
         puts("Error in nrf24l01p_on");
-        return;
+        return 1;
     }
     /* setup device as transmitter */
     if (nrf24l01p_set_txmode(&nrf24l01p_0) < 0) {
         puts("Error in nrf24l01p_set_txmode");
-        return;
+        return 1;
     }
     /* load data to transmit into device */
     if (nrf24l01p_preload(&nrf24l01p_0, tx_buf, NRF24L01P_MAX_DATA_LENGTH) < 0) {
         puts("Error in nrf24l01p_preload");
-        return;
+        return 1;
     }
     /* trigger transmitting */
     nrf24l01p_transmit(&nrf24l01p_0);

@@ -6,10 +6,10 @@ export PREFIX = arm-none-eabi-
 export CC = $(PREFIX)gcc
 export AR = $(PREFIX)ar
 export CFLAGS += -march=armv4t -mtune=arm7tdmi-s -mlong-calls \
-		-msoft-float -mthumb-interwork -fno-strict-aliasing -fno-common \
-		-ffixed-r8 -ffunction-sections -ffreestanding -fno-builtin \
-		-nodefaultlibs -Wcast-align -Wall -Wstrict-prototypes -Wextra \
-		-Os -pipe
+  -msoft-float -mthumb-interwork -fno-strict-aliasing -fno-common \
+  -ffixed-r8 -ffunction-sections -ffreestanding -fno-builtin \
+  -nodefaultlibs -Wall -Wstrict-prototypes \
+  -Os -pipe
 export CFLAGS_MTHUMB ?= -mthumb
 # TODO add -mthumb
 export AFLAGS = -Wa,-gstabs $(CFLAGS)

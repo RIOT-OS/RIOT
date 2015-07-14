@@ -56,21 +56,6 @@ static int print_echo(int argc, char **argv)
     return 0;
 }
 
-static int shell_readc(void)
-{
-    char c;
-    int result = posix_read(uart0_handler_pid, &c, 1);
-    if (result != 1) {
-        return -1;
-    }
-    return (unsigned char) c;
-}
-
-static void shell_putchar(int c)
-{
-    putchar(c);
-}
-
 static const shell_command_t shell_commands[] = {
     { "start_test", "starts a test", print_teststart },
     { "end_test", "ends a test", print_testend },
@@ -89,8 +74,7 @@ int main(void)
 
     /* define own shell commands */
     shell_t shell;
-    shell_init(&shell, shell_commands, SHELL_BUFSIZE, shell_readc,
-               shell_putchar);
+    shell_init(&shell, shell_commands, SHELL_BUFSIZE, getchar, putchar);
     shell_run(&shell);
 
     /* or use only system shell commands */

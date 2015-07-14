@@ -40,7 +40,7 @@ int main(void)
 
     puts("DHT temperature and humidity sensor test application\n");
 
-    printf("Initializing DHT sensor at GPIO_%i... ", DHT_GPIO);
+    printf("Initializing DHT sensor at GPIO_%ld... ", (long)DHT_GPIO);
     if (dht_init(&dev, DHT_TYPE, DHT_GPIO) == 0) {
         puts("[OK]\n");
     }

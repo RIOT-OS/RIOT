@@ -123,6 +123,7 @@ void cc110x_write_reg(uint8_t addr, uint8_t value)
     /* cppcheck-suppress unreadVariable */
     i = RF1ADOUTB;                            /* Reset RFDOUTIFG flag which contains status byte */
 
+    (void)i; /* Ignore variable 'i' set but not used [-Werror=unused-but-set-variable] */
     restoreIRQ(int_state);
 }
 

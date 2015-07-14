@@ -31,6 +31,11 @@ endif
         info-buildsizes-diff info-build info-boards-supported \
         info-features-missing info-boards-features-missing
 
+# Make buildtests error out on warnings by adding -Werror
+ifeq (, $(filter buildtest, $(MAKECMDGOALS)))
+    CFLAGS+=-Werror
+endif
+
 ifeq ($(BUILD_IN_DOCKER),1)
 buildtest: ..in-docker-container
 else
@@ -40,70 +45,70 @@ buildtest:
 	APP_RETRY=0; \
 	rm -rf "$$BINDIRBASE"; \
 	for BOARD in $$($(MAKE) -s info-boards-supported); do \
-		RIOTNOLINK=$$(echo $(BOARD_INSUFFICIENT_RAM) | grep $${BOARD} 2>&1 >/dev/null && echo 1); \
-		${COLOR_ECHO} -n "Building for $${BOARD} "; \
-		[ -n "$${RIOTNOLINK}" ] && ${COLOR_ECHO} -n "(no linking) "; \
-		for NTH_TRY in 1 2 3; do \
-			${COLOR_ECHO} -n ".. "; \
-			LOG=$$(env -i \
-					HOME=$${HOME} \
-					PATH=$${PATH} \
-					BOARD=$${BOARD} \
-					CCACHE=$${CCACHE} \
-					CCACHE_DIR=$${CCACHE_DIR} \
-					CCACHE_BASEDIR=$${CCACHE_BASEDIR} \
-					RIOTBASE=$${RIOTBASE} \
-					RIOTBOARD=$${RIOTBOARD} \
-					RIOTCPU=$${RIOTCPU} \
-					BINDIRBASE=$${BINDIRBASE} \
-					RIOTNOLINK=$${RIOTNOLINK} \
-					RIOT_VERSION=$${RIOT_VERSION} \
-					$(MAKE) -j$(NPROC) 2>&1) ; \
-			if [ "$${?}" = "0" ]; then \
-				${COLOR_ECHO} "${COLOR_GREEN}success${COLOR_RESET}"; \
-			elif [ -n "$${RIOT_DO_RETRY}" ] && [ "$${APP_RETRY}" -lt "3" ] && [ $${NTH_TRY} != 3 ]; then \
-				${COLOR_ECHO} -n "${COLOR_PURPLE}retrying${COLOR_RESET} "; \
-				continue; \
-			else \
-				${COLOR_ECHO} "${COLOR_RED}failed${COLOR_RESET}"; \
-				echo "$${LOG}" | grep -v -E '^make(\[[[:digit:]]])?:'; \
-				APP_RETRY=`expr $${APP_RETRY} + 1`; \
-				BUILDTESTOK=false; \
-			fi; \
-			break; \
-		done; \
-		env -i \
-			HOME=$${HOME} \
-			PATH=$${PATH} \
-			BOARD=$${BOARD} \
-			CCACHE=$${CCACHE} \
-			CCACHE_DIR=$${CCACHE_DIR} \
-			CCACHE_BASEDIR=$${CCACHE_BASEDIR} \
-			RIOTBASE=$${RIOTBASE} \
-			RIOTBOARD=$${RIOTBOARD} \
-			RIOTCPU=$${RIOTCPU} \
-			BINDIRBASE=$${BINDIRBASE} \
-			RIOTNOLINK=$${RIOTNOLINK} \
-			RIOT_VERSION=$${RIOT_VERSION} \
-			$(MAKE) clean-intermediates 2>&1 >/dev/null || true; \
+	  RIOTNOLINK=$$(echo $(BOARD_INSUFFICIENT_RAM) | grep $${BOARD} 2>&1 >/dev/null && echo 1); \
+	  ${COLOR_ECHO} -n "Building for $${BOARD} "; \
+	  [ -n "$${RIOTNOLINK}" ] && ${COLOR_ECHO} -n "(no linking) "; \
+	  for NTH_TRY in 1 2 3; do \
+	    ${COLOR_ECHO} -n ".. "; \
+	    LOG=$$(env -i \
+	        HOME=$${HOME} \
+	        PATH=$${PATH} \
+	        BOARD=$${BOARD} \
+	        CCACHE=$${CCACHE} \
+	        CCACHE_DIR=$${CCACHE_DIR} \
+	        CCACHE_BASEDIR=$${CCACHE_BASEDIR} \
+	        RIOTBASE=$${RIOTBASE} \
+	        RIOTBOARD=$${RIOTBOARD} \
+	        RIOTCPU=$${RIOTCPU} \
+	        BINDIRBASE=$${BINDIRBASE} \
+	        RIOTNOLINK=$${RIOTNOLINK} \
+	        RIOT_VERSION=$${RIOT_VERSION} \
+	        $(MAKE) -j$(NPROC) 2>&1) ; \
+	    if [ "$${?}" = "0" ]; then \
+	      ${COLOR_ECHO} "${COLOR_GREEN}success${COLOR_RESET}"; \
+	    elif [ -n "$${RIOT_DO_RETRY}" ] && [ "$${APP_RETRY}" -lt "3" ] && [ $${NTH_TRY} != 3 ]; then \
+	      ${COLOR_ECHO} -n "${COLOR_PURPLE}retrying${COLOR_RESET} "; \
+	      continue; \
+	    else \
+	      ${COLOR_ECHO} "${COLOR_RED}failed${COLOR_RESET}"; \
+	      echo "$${LOG}" | grep -v -E '^make(\[[[:digit:]]])?:'; \
+	      APP_RETRY=`expr $${APP_RETRY} + 1`; \
+	      BUILDTESTOK=false; \
+	    fi; \
+	    break; \
+	  done; \
+	  env -i \
+	    HOME=$${HOME} \
+	    PATH=$${PATH} \
+	    BOARD=$${BOARD} \
+	    CCACHE=$${CCACHE} \
+	    CCACHE_DIR=$${CCACHE_DIR} \
+	    CCACHE_BASEDIR=$${CCACHE_BASEDIR} \
+	    RIOTBASE=$${RIOTBASE} \
+	    RIOTBOARD=$${RIOTBOARD} \
+	    RIOTCPU=$${RIOTCPU} \
+	    BINDIRBASE=$${BINDIRBASE} \
+	    RIOTNOLINK=$${RIOTNOLINK} \
+	    RIOT_VERSION=$${RIOT_VERSION} \
+	    $(MAKE) clean-intermediates 2>&1 >/dev/null || true; \
 	done; \
 	$${BUILDTESTOK}
 endif # BUILD_IN_DOCKER
 
 info-objsize:
 	@case "${SORTROW}" in \
-		text) SORTROW=1 ;; \
-		data) SORTROW=2 ;; \
-		bss) SORTROW=3 ;; \
-		dec) SORTROW=4 ;; \
-		"") SORTROW=4 ;; \
-		*) echo "Usage: $(MAKE) info-objsize SORTROW=[text|data|bss|dec]" ; return ;; \
+	  text) SORTROW=1 ;; \
+	  data) SORTROW=2 ;; \
+	  bss) SORTROW=3 ;; \
+	  dec) SORTROW=4 ;; \
+	  "") SORTROW=4 ;; \
+	  *) echo "Usage: $(MAKE) info-objsize SORTROW=[text|data|bss|dec]" ; return ;; \
 	esac; \
 	echo '   text\t   data\t    bss\t    dec\t    hex\tfilename'; \
 	$(SIZE) -dB $(BASELIBS) | \
-		tail -n+2 | \
-		sed -e 's#$(BINDIR)##' | \
-		sort -rnk$${SORTROW}
+	  tail -n+2 | \
+	  sed -e 's#$(BINDIR)##' | \
+	  sort -rnk$${SORTROW}
 
 info-buildsize:
 	@$(SIZE) -dB $(BINDIR)$(APPLICATION).elf || echo ''
@@ -112,47 +117,47 @@ info-buildsizes: SHELL=bash
 info-buildsizes:
 	@echo -e "   text\t   data\t    bss\t    dec\tboard"; \
 	for BOARD in $$($(MAKE) -s info-boards-supported); do \
-		echo "$$(env -i \
-			HOME=$${HOME} \
-			PATH=$${PATH} \
-			BOARD=$${BOARD} \
-			RIOTBASE=$${RIOTBASE} \
-			RIOTBOARD=$${RIOTBOARD} \
-			RIOTCPU=$${RIOTCPU} \
-			BINDIRBASE=$${BINDIRBASE} \
-			$(MAKE) info-buildsize 2>/dev/null | tail -n-1 | cut -f-4)" "$${BOARD}"; \
+	  echo "$$(env -i \
+	    HOME=$${HOME} \
+	    PATH=$${PATH} \
+	    BOARD=$${BOARD} \
+	    RIOTBASE=$${RIOTBASE} \
+	    RIOTBOARD=$${RIOTBOARD} \
+	    RIOTCPU=$${RIOTCPU} \
+	    BINDIRBASE=$${BINDIRBASE} \
+	    $(MAKE) info-buildsize 2>/dev/null | tail -n-1 | cut -f-4)" "$${BOARD}"; \
 	done;
 
 info-buildsizes-diff: SHELL=bash
 info-buildsizes-diff:
 	@echo -e "text\tdata\tbss\tdec\tBOARD/BINDIRBASE\n"; \
 	for BOARD in $$($(MAKE) -s info-boards-supported); do \
-		for BINDIRBASE in $${OLDBIN} $${NEWBIN}; do \
-			env -i \
-				HOME=$${HOME} \
-				PATH=$${PATH} \
-				BOARD=$${BOARD} \
-				RIOTBASE=$${RIOTBASE} \
-				RIOTBOARD=$${RIOTBOARD} \
-				RIOTCPU=$${RIOTCPU} \
-				BINDIRBASE=$${BINDIRBASE} \
-				$(MAKE) info-buildsize 2>/dev/null | tail -n-1 | cut -f-4; \
-		done | \
-		while read -a OLD && read -a NEW; do \
-			for I in 0 1 2 3; do \
-				if [[ -n "$${NEW[I]}" && -n "$${OLD[I]}" ]]; then \
-					DIFF=$$(($${NEW[I]} - $${OLD[I]})); \
-					if [[ "$${DIFF}" -gt 0 ]]; then $(COLOR_ECHO) -n "${COLOR_RED}"; fi; \
-					if [[ "$${DIFF}" -lt 0 ]]; then $(COLOR_ECHO) -n "${COLOR_GREEN}"; fi; \
-				else \
-					DIFF="${COLOR_RED}ERR"; \
-				fi; \
-				echo -ne "$${DIFF}\t${COLOR_RESET}"; \
-			done; \
-			echo "$${BOARD}"; \
-			for I in 0 1 2 3; do echo -ne "$${OLD[I]-${COLOR_RED}ERR${COLOR_RESET}}\t"; done; echo -e "$${OLDBIN}"; \
-			for I in 0 1 2 3; do echo -ne "$${NEW[I]-${COLOR_RED}ERR${COLOR_RESET}}\t"; done; echo -e "$${NEWBIN}\n"; \
-		done; \
+	  for BINDIRBASE in $${OLDBIN} $${NEWBIN}; do \
+	    env -i \
+	      HOME=$${HOME} \
+	      PATH=$${PATH} \
+	      BOARD=$${BOARD} \
+	      RIOTBASE=$${RIOTBASE} \
+	      RIOTBOARD=$${RIOTBOARD} \
+	      RIOTCPU=$${RIOTCPU} \
+	      BINDIRBASE=$${BINDIRBASE} \
+	      $(MAKE) info-buildsize 2>/dev/null | tail -n-1 | cut -f-4; \
+	  done | \
+	  while read -a OLD && read -a NEW; do \
+	    for I in 0 1 2 3; do \
+	      if [[ -n "$${NEW[I]}" && -n "$${OLD[I]}" ]]; then \
+	        DIFF=$$(($${NEW[I]} - $${OLD[I]})); \
+	        if [[ "$${DIFF}" -gt 0 ]]; then $(COLOR_ECHO) -n "${COLOR_RED}"; fi; \
+	        if [[ "$${DIFF}" -lt 0 ]]; then $(COLOR_ECHO) -n "${COLOR_GREEN}"; fi; \
+	      else \
+	        DIFF="${COLOR_RED}ERR"; \
+	      fi; \
+	      echo -ne "$${DIFF}\t${COLOR_RESET}"; \
+	    done; \
+	    echo "$${BOARD}"; \
+	    for I in 0 1 2 3; do echo -ne "$${OLD[I]-${COLOR_RED}ERR${COLOR_RESET}}\t"; done; echo -e "$${OLDBIN}"; \
+	    for I in 0 1 2 3; do echo -ne "$${NEW[I]-${COLOR_RED}ERR${COLOR_RESET}}\t"; done; echo -e "$${NEWBIN}\n"; \
+	  done; \
 	done;
 
 info-build:
@@ -243,10 +248,10 @@ ifneq (, $(filter info-boards-supported info-boards-features-missing info-build,
     FEATURES_PROVIDED := $(FEATURES_PROVIDED_BAK)
     -include $${RIOTBOARD}/${1}/Makefile.features
     ifdef BUILDTEST_MCU_GROUP
-       ifneq ($(BUILDTEST_MCU_GROUP), $$(FEATURES_MCU_GROUP))
-          BOARDS_FEATURES_MISSING += "${1} $${BUILDTEST_MCU_GROUP}"
-          BOARDS_WITH_MISSING_FEATURES += ${1}
-       endif
+      ifneq ($(BUILDTEST_MCU_GROUP), $$(FEATURES_MCU_GROUP))
+        BOARDS_FEATURES_MISSING += "${1} $${BUILDTEST_MCU_GROUP}"
+        BOARDS_WITH_MISSING_FEATURES += ${1}
+      endif
     endif
 
     FEATURES_MISSING := $$(filter-out $$(FEATURES_PROVIDED), $$(FEATURES_REQUIRED))
@@ -276,17 +281,17 @@ info-concurrency:
 info-files: QUITE := 0
 info-files:
 	@( \
-		echo "$(abspath $(shell echo "$(MAKEFILE_LIST)"))" | tr ' ' '\n'; \
-		CSRC="$$($(MAKE) USEPKG="" -Bn | grep -o -e "[^ ]\+\.[csS]$$" -e "[^ ]\+\.[csS][ \']" | grep -v -e "^\s*-D")"; \
-		echo "$$CSRC"; \
-		echo "$(RIOTBASE)/Makefile.base"; \
-		echo "$$CSRC" | xargs dirname -- | sort | uniq | xargs -I{} find {} -name "Makefile*"; \
-		echo "$$CSRC" | xargs $(CC) $(CFLAGS) $(INCLUDES) -MM 2> /dev/null | grep -o "[^ ]\+\.h"; \
-		if [ -n "$$SRCXX" ]; then \
-			CPPSRC="$$($(MAKE) -Bn USEPKG="" | grep -o -e "[^ ]\+\.cpp" | grep -v -e "^\s*-D")"; \
-			echo "$$CPPSRC"; \
-			echo "$$CPPSRC" | xargs dirname -- | sort | uniq | xargs -I{} find {} -name "Makefile*"; \
-			echo "$$CPPSRC" | xargs $(CXX) $(CXXFLAGS) $(INCLUDES) -MM 2> /dev/null | grep -o "[^ ]\+\.h"; \
-		fi; \
-		$(foreach pkg,$(USEPKG),find $(RIOTBASE)/pkg/$(pkg) -type f;) \
+	  echo "$(abspath $(shell echo "$(MAKEFILE_LIST)"))" | tr ' ' '\n'; \
+	  CSRC="$$($(MAKE) USEPKG="" -Bn | grep -o -e "[^ ]\+\.[csS]$$" -e "[^ ]\+\.[csS][ \']" | grep -v -e "^\s*-D")"; \
+	  echo "$$CSRC"; \
+	  echo "$(RIOTBASE)/Makefile.base"; \
+	  echo "$$CSRC" | xargs dirname -- | sort | uniq | xargs -I{} find {} -name "Makefile*"; \
+	  echo "$$CSRC" | xargs $(CC) $(CFLAGS) $(INCLUDES) -MM 2> /dev/null | grep -o "[^ ]\+\.h"; \
+	  if [ -n "$$SRCXX" ]; then \
+	    CPPSRC="$$($(MAKE) -Bn USEPKG="" | grep -o -e "[^ ]\+\.cpp" | grep -v -e "^\s*-D")"; \
+	    echo "$$CPPSRC"; \
+	    echo "$$CPPSRC" | xargs dirname -- | sort | uniq | xargs -I{} find {} -name "Makefile*"; \
+	    echo "$$CPPSRC" | xargs $(CXX) $(CXXFLAGS) $(INCLUDES) -MM 2> /dev/null | grep -o "[^ ]\+\.h"; \
+	  fi; \
+	  $(foreach pkg,$(USEPKG),find $(RIOTBASE)/pkg/$(pkg) -type f;) \
 	) | sort | uniq | sed 's#$(RIOTBASE)/##'

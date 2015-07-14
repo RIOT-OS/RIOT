@@ -299,8 +299,8 @@ extract() {
         for (( I=0; I < ${#NEWLIB_PATCHES[@]}; I+=1 )); do
             echo "Applying Newlib patch ${NEWLIB_PATCHES[$I]}"
             for (( P=0; P < 4; P+=1 )); do
-                patch -p${P} --dry-run -f < "${PATCHDIR}/${NEWLIB_PATCHES[$I]}" 2>&1 > /dev/null || continue
-                patch -p${P} -f < "${PATCHDIR}/${NEWLIB_PATCHES[$I]}" || return $?
+                patch -p${P} --ignore-whitespace --dry-run -f < "${PATCHDIR}/${NEWLIB_PATCHES[$I]}" 2>&1 > /dev/null || continue
+                patch -p${P} --ignore-whitespace -f < "${PATCHDIR}/${NEWLIB_PATCHES[$I]}" || return $?
                 break
             done
         done

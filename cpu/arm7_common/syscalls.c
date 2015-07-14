@@ -27,7 +27,7 @@
 
 #include "arm_cpu.h"
 #include "board_uart0.h"
-// core
+/* core */
 #include "kernel.h"
 #include "irq.h"
 #if defined MODULE_RTC
@@ -216,10 +216,11 @@ pid_t _getpid(void)
 __attribute__ ((weak))
 int _kill_r(struct _reent *r, int pid, int sig)
 {
+    (void) r;
     (void) pid;
     (void) sig;
     /* not implemented */
-    r->_errno = ESRCH;      // no such process
+    r->_errno = ESRCH;      /* no such process */
     return -1;
 }
 
@@ -237,6 +238,9 @@ void _fini(void) {}
 __attribute__ ((weak))
 int _kill(int pid, int sig)
 {
-    errno = ESRCH;                         /* not implemented yet */
+    (void) pid;
+    (void) sig;
+    /* not implemented */
+    errno = ESRCH;      /* no such process */
     return -1;
 }

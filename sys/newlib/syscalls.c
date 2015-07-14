@@ -202,6 +202,8 @@ int _open_r(struct _reent *r, const char *name, int mode)
  */
 int _read_r(struct _reent *r, int fd, void *buffer, unsigned int count)
 {
+    (void)r;
+    (void)fd;
 #ifndef MODULE_UART0
     int res;
     mutex_lock(&uart_rx_mutex);

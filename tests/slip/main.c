@@ -31,22 +31,6 @@
 #define SHELL_BUFSIZE           (64U)
 
 /**
- * @brief   Read chars from STDIO
- */
-int shell_read(void)
-{
-    return (int)getchar();
-}
-
-/**
- * @brief   Write chars to STDIO
- */
-void shell_put(int c)
-{
-    putchar((char)c);
-}
-
-/**
  * @brief   Maybe you are a golfer?!
  */
 int main(void)
@@ -69,7 +53,7 @@ int main(void)
 
     /* start the shell */
     puts("Initialization OK, starting shell now");
-    shell_init(&shell, NULL, SHELL_BUFSIZE, shell_read, shell_put);
+    shell_init(&shell, NULL, SHELL_BUFSIZE, getchar, putchar);
     shell_run(&shell);
 
     return 0;

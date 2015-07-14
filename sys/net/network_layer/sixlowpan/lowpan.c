@@ -57,7 +57,7 @@ static char addr_str[IPV6_MAX_ADDR_STR_LEN];
 
 #define SIXLOWPAN_MAX_REGISTERED        (4)
 
-#define LOWPAN_REAS_BUF_TIMEOUT         (15 * 1000 * 1000)
+#define LOWPAN_REAS_BUF_TIMEOUT         (15ul * 1000ul * 1000ul)
 /* TODO: Set back to 3 * 1000 * (1000) */
 
 #define IPV6_LL_ADDR_LEN                (8)
