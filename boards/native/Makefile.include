@@ -51,6 +51,9 @@ ifeq ($(shell uname -m),amd64)
 export CFLAGS += -m32 -DCOMPAT_32BIT -B/usr/lib32
 endif
 endif
+ifeq ($(shell uname -s),Darwin)
+export CFLAGS += -Wno-deprecated-declarations
+endif
 
 # unwanted (CXXUWFLAGS) and extra (CXXEXFLAGS) flags for c++
 export CXXUWFLAGS +=
