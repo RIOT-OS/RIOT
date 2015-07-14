@@ -119,7 +119,7 @@ extern "C" {
 /* PWM 0 device configuration */
 #define PWM_0_DEV           TIM3
 #define PWM_0_CHANNELS      4
-#define PWM_0_CLK           (36000000U)
+#define PWM_0_CLK           (72000000U)
 #define PWM_0_CLKEN()       (RCC->APB1ENR |= RCC_APB1ENR_TIM3EN)
 #define PWM_0_CLKDIS()      (RCC->APB1ENR &= ~(RCC_APB1ENR_TIM3EN))
 /* PWM 0 pin configuration */
