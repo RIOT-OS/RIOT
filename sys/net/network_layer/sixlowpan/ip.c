@@ -772,9 +772,7 @@ void ipv6_net_if_get_best_src_addr(ipv6_addr_t *src, const ipv6_addr_t *dest)
                        (net_if_addr_t **) &addr))) {
             if (addr->ndp_state == NDP_ADDR_STATE_PREFERRED) {
                 if (!ipv6_addr_is_link_local(addr->addr_data)
-                    && !ipv6_addr_is_multicast(addr->addr_data)
-                    && !ipv6_addr_is_unique_local_unicast(
-                        addr->addr_data)) {
+                    && !ipv6_addr_is_multicast(addr->addr_data)) {
 
                     if (addr->addr_protocol == NET_IF_L3P_IPV6_PREFIX) {
                         continue;
