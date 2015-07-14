@@ -54,7 +54,7 @@ $(BINDIR)$(PKG_NAME)-headers/fix16.h: $(CHECKOUT_FOLDER)/svn_info.xml
 
 $(CHECKOUT_FOLDER)/svn_info.xml:
 	@mkdir -p $(@D)
-	svn checkout -r $(PKG_VERSION) $(PKG_URL) $(@D)
+	svn checkout -q -r $(PKG_VERSION) $(PKG_URL) $(@D)
 	@svn info --xml $(@D) > $@
 
 clean::
