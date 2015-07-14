@@ -24,7 +24,9 @@ from itertools import groupby
 from os import devnull, environ, listdir
 from os.path import abspath, dirname, isfile, join
 from subprocess import CalledProcessError, check_call, check_output, PIPE, Popen
-from sys import exit, stdout, argv
+from sys import exit, stdout, argv, exc_info
+from StringIO import StringIO
+from itertools import tee
 
 riotbase = environ.get('RIOTBASE') or abspath(join(dirname(abspath(__file__)), '../' * 3))
 
@@ -42,6 +44,9 @@ failed = []
 skipped = []
 exceptions = []
 
+warnings = []
+errors = []
+
 def is_tracked(application_folder):
     if not isfile(join(application_folder, 'Makefile')):
         return False
@@ -53,19 +58,31 @@ def is_tracked(application_folder):
     else:
         return True
 
-def get_lines(readline, prefix):
+def get_results_and_output_from(fd):
+    results_prefix = 'Building for '
+    output_prefix = 'Building application '
+    prev_results = False
+    result = ['']
+    output = StringIO()
     while 1:
-        result = readline()
-        if not result:
+        line = fd.readline()
+        if not line:
+            if prev_results:
+                yield (' .. '.join(result[:-1]), result[-1], output)
             break
-        elif not result.startswith(prefix):
-            continue
-
-        result = result[len(prefix):].rstrip().split(' .. ')[::-1]
-        if (len(result) > 1) and ('success' in result[0] or 'failed' in result[0]):
-            stdout.write('.')
-            stdout.flush()
-            yield (' .. '.join(result[:-1]), result[-1])
+        elif line.startswith(results_prefix):
+            if prev_results:
+                yield (' .. '.join(result[:-1]), result[-1], output)
+            prev_results = True
+            result = line[len(results_prefix):].rstrip().split(' .. ')[::-1]
+            if (len(result) > 1) and ('success' in result[0] or 'failed' in result[0]):
+                stdout.write('.')
+                stdout.flush()
+        elif line.startswith(output_prefix):
+            output = StringIO()
+            output.write(line)
+        else:
+            output.write(line)
 
 def _get_common_user(common):
     return [f for f in check_output(r'grep -l "{}" cpu/*/Makefile* boards/*/Makefile*'.format(common),
@@ -151,6 +168,7 @@ for folder in ('examples', 'tests'):
 
     subprocess_env = environ.copy()
     subprocess_env['RIOT_DO_RETRY'] = '1'
+    subprocess_env['BUILDTEST_VERBOSE'] = '1'
 
     for nth, application in enumerate(applications, 1):
         stdout.write('\tBuilding application: \033[1;34m{}\033[0m ({}/{}) '.format(application, nth, len(applications)))
@@ -165,18 +183,22 @@ for folder in ('examples', 'tests'):
                                cwd=join(riotbase, folder, application),
                                env=subprocess_env)
 
-            lines = get_lines(subprocess.stdout.readline, 'Building for ')
-            lines = groupby(sorted(lines), lambda (outcome, board): outcome)
-
+            results, results_with_output = tee(get_results_and_output_from(subprocess.stdout))
+            results = groupby(sorted(results), lambda (outcome, board, output): outcome)
+            results_with_output = filter(lambda (outcome, board, output): output.getvalue(), results_with_output)
+            failed_with_output = filter(lambda (outcome, board, output): 'failed' in outcome, results_with_output)
+            success_with_output = filter(lambda (outcome, board, output): 'success' in outcome, results_with_output)
             print()
-            for group, results in lines:
-                print('\t\t{}: {}'.format(group, ', '.join(sorted(board for outcome, board in results))))
-
+            for group, results in results:
+                print('\t\t{}: {}'.format(group, ', '.join(sorted(board for outcome, board, output in results))))
             returncode = subprocess.wait()
+            if success_with_output:
+                warnings.append((application, success_with_output))
             if returncode == 0:
                 success.append(application)
             else:
                 failed.append(application)
+                errors.append((application, failed_with_output))
         except Exception, e:
             print('\n\t\tException: {}'.format(e))
             exceptions.append(application)
@@ -185,12 +207,42 @@ for folder in ('examples', 'tests'):
                 subprocess.kill()
             except:
                 pass
-
+if warnings:
+    print('Warnings:')
+    for application, details in warnings:
+        for outcome, board, output in details:
+            print()
+            print("\033[1;33m%s:%s:\033[0m" % (application, board))
+            print("%s"  % output.getvalue())
+print()
+if errors:
+    print('Errors:')
+    for application, details in errors:
+        for outcome, board, output in details:
+            print()
+            print("\033[1;31m%s:%s:\033[0m" % (application, board))
+            print("%s"  % output.getvalue())
+print()
 print('Outcome:')
 for color, group in (('3', 'skipped'), ('2', 'success'), ('1', 'failed'), ('4', 'exceptions')):
     applications = locals()[group]
     if applications:
         print('\t\033[1;3{}m{}\033[0m: {}'.format(color, group, ', '.join(applications)))
+
+stdout.write('Errors: ')
+if errors:
+    num_of_errors = sum(map(lambda x: len(x[1]), errors))
+    stdout.write('\033[1;31m%d\033[0m' % num_of_errors)
+else:
+    stdout.write('0')
+stdout.write(' Warnings: ')
+if warnings:
+    num_of_warnings = sum(map(lambda x: len(x[1]), warnings))
+    stdout.write('\033[1;33m%d\033[0m' % num_of_warnings)
+else:
+    stdout.write('0')
+stdout.write('\n')
+
 
 if exceptions:
     exit(2)
