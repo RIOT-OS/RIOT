@@ -325,3 +325,7 @@ ifneq (,$(filter cpp11-compat,$(USEMODULE)))
   USEMODULE += timex
   FEATURES_REQUIRED += cpp
 endif
+
+ifneq (,$(filter newlib,$(USEMODULE)))
+  USEMODULE += uart_stdio
+endif
