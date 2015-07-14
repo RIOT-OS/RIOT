@@ -29,6 +29,11 @@ extern "C" {
 #endif
 
 /**
+ * @brief Default shell buffer size (maximum line length shell can handle)
+ */
+#define SHELL_DEFAULT_BUFSIZE   (128)
+
+/**
  * @brief           Protype of a shell callback handler.
  * @details         The functions supplied to shell_init() must use this signature.
  *                  The argument list is terminated with a NULL, i.e ``argv[argc] == NULL`.
@@ -59,42 +64,15 @@ typedef struct shell_command_t {
 } shell_command_t;
 
 /**
- * @brief           The internal state of a shell session.
- * @details         Use shell_init() to initialize the datum,
- *                  and shell_run() to run the REPL session.
- */
-typedef struct shell_t {
-    const shell_command_t *command_list; /**< The commandlist supplied to shell_init(). */
-    uint16_t shell_buffer_size;          /**< The maximum line length supplied to shell_init(). */
-    int (*readchar)(void);               /**< The read function supplied to shell_init(). */
-    int (*put_char)(int);                /**< The write function supplied to shell_init(). */
-} shell_t;
-
-/**
- * @brief           Initialize a shell session state.
- * @param[out]      shell               The datum to initialize.
- * @param[in]       shell_commands      Null-terminated list of commands to understand.
- *                                      Supply `NULL` to only feature the default commands.
- * @param           shell_buffer_size   The backing buffer for the command line.
- *                                      Allocated on the stack!
- * @param           read_char           A blocking function that reads one 8-bit character at a time.
- *                                      The valid code range is [0;255].
- *                                      A value of `< 0` denotes a read error.
- * @param           put_char            Function used to print back the last read character.
- *                                      Only valid unsigned chars in [0;255] will be supplied.
- */
-void shell_init(shell_t *shell,
-                const shell_command_t *shell_commands,
-                uint16_t shell_buffer_size,
-                int (*read_char)(void),
-                int (*put_char)(int));
-
-/**
- * @brief           Start the shell session.
- * @param[in]       shell   The session that was previously initialized with shell_init().
+ * @brief           Start a shell.
+ *
+ * @param[in]       commands    ptr to array of command structs
+ * @param[in]       line_buf    Buffer that will be used for reading a line
+ * @param[in]       len         nr of bytes that fit in line_buf
+ *
  * @returns         This function does not return.
  */
-void shell_run(shell_t *shell) NORETURN;
+void shell_run(const shell_command_t *commands, char *line_buf, int len) NORETURN;
 
 #ifdef __cplusplus
 }
