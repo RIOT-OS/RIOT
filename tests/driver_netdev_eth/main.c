@@ -34,16 +34,10 @@
 #include "dev_eth_tap.h"
 
 /**
- * @brief   Buffer size used by the shell
- */
-#define SHELL_BUFSIZE           (64U)
-
-/**
  * @brief   Maybe you are a golfer?!
  */
 int main(void)
 {
-    shell_t shell;
     gnrc_netreg_entry_t dump;
 
     puts("netdev ethernet device driver test");
@@ -60,8 +54,8 @@ int main(void)
     gnrc_netreg_register(GNRC_NETTYPE_UNDEF, &dump);
 
     /* start the shell */
-    shell_init(&shell, NULL, SHELL_BUFSIZE, getchar, putchar);
-    shell_run(&shell);
+    char line_buf[SHELL_DEFAULT_BUFSIZE];
+    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
 
     return 0;
 }

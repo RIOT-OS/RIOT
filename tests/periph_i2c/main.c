@@ -24,8 +24,6 @@
 #include "periph_conf.h"
 #include "periph/i2c.h"
 #include "shell.h"
-#include "posix_io.h"
-#include "board_uart0.h"
 
 #define BUFSIZE        (128U)
 
@@ -306,17 +304,11 @@ static const shell_command_t shell_commands[] = {
 
 int main(void)
 {
-    shell_t shell;
-
     puts("Test for the low-level I2C driver");
 
-    /* prepare I/O for shell */
-    board_uart0_init();
-    (void) posix_open(uart0_handler_pid, 0);
-
     /* define own shell commands */
-    shell_init(&shell, shell_commands, UART0_BUFSIZE, uart0_readc, uart0_putc);
-    shell_run(&shell);
+    char line_buf[SHELL_DEFAULT_BUFSIZE];
+    shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
 
     return 0;
 }

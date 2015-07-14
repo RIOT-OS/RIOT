@@ -51,8 +51,6 @@
 
 #define TEST_RX_MSG                1
 
-#define SHELL_BUFFER_SIZE        128
-
 static int cmd_send(int argc, char **argv);
 static int cmd_print_regs(int argc, char **argv);
 static int cmd_its(int argc, char **argv);
@@ -325,14 +323,10 @@ int cmd_print_regs(int argc, char **argv)
 
 int main(void)
 {
-    shell_t shell;
-
     puts("Welcome to RIOT!");
 
-    puts("Initializing shell...");
-    shell_init(&shell, shell_commands, SHELL_BUFFER_SIZE, getchar, putchar);
-
     puts("Starting shell...");
-    shell_run(&shell);
+    char line_buf[SHELL_DEFAULT_BUFSIZE];
+    shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
     return 0;
 }
