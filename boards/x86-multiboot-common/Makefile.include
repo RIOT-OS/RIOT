@@ -50,6 +50,11 @@ LINKFLAGS += -m32 -nostdlib -nostdinc -nostartfiles -nodefaultlibs \
              --prefix=$(NEWLIB_BASE) \
              -Wl,-rpath,$(NEWLIB_BASE)/lib \
              -T$(RIOTBASE)/boards/x86-multiboot-common/linker.ld
+
+# clean up unused functions
+export CFLAGS += -ffunction-sections -fdata-sections
+export LINKFLAGS += -Wl,--gc-sections
+
 UNDEF += $(BINDIR)x86-multiboot-common/startup.o
 
 BASELIBS += $(NEWLIB_BASE)/lib/libc.a \
