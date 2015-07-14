@@ -152,8 +152,8 @@ void uart_write(uart_t uart, char data);
 /**
  * @brief   Write a single byte to the given UART device (blocking)
  *
- * In contrast *uart_write*, this function will block (active waiting) until the
- * UART device is ready to send the new byte.
+ * In contrast to *uart_write*, this function will block (active waiting) until
+ * the UART device is ready to send the new byte.
  *
  * @note Use for testing purposes only!
  *
