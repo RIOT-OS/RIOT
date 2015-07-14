@@ -72,6 +72,8 @@ const ng_netdev_driver_t ng_netdev_eth_driver = {
     _isr_event,
 };
 
+/* These functions are not used */
+#if !(defined(__FreeBSD__) || defined(__MACH__))
 /* internal function definitions */
 static inline bool _is_addr_broadcast(uint8_t *addr)
 {
@@ -84,6 +86,7 @@ static inline bool _is_addr_multicast(uint8_t *addr)
     /* source: http://ieee802.org/secmail/pdfocSP2xXA6d.pdf */
     return (addr[0] & 0x01);
 }
+#endif
 
 /* build Ethernet packet from pkt */
 static int _marshall_ethernet(ng_netdev_eth_t *dev, uint8_t *buffer, ng_pktsnip_t *pkt);
