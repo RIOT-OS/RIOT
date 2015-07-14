@@ -160,11 +160,6 @@ int spi_conf_pins(spi_t dev)
     return 0;
 }
 
-int spi_transfer_byte(spi_t dev, char out, char *in)
-{
-    return spi_transfer_bytes(dev, &out, in, 1);
-}
-
 int spi_acquire(spi_t dev)
 {
     if (dev >= SPI_NUMOF) {
@@ -183,16 +178,19 @@ int spi_release(spi_t dev)
     return 0;
 }
 
+int spi_transfer_byte(spi_t dev, char out, char *in)
+{
+    return spi_transfer_bytes(dev, &out, in, 1);
+}
+
 int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length)
 {
-    char tmp;
-
     if (dev >= SPI_NUMOF) {
         return -1;
     }
 
     for (int i = 0; i < length; i++) {
-        tmp = (out) ? out[i] : 0;
+        char tmp = (out) ? out[i] : 0;
         spi[dev]->EVENTS_READY = 0;
         spi[dev]->TXD = (uint8_t)tmp;
         while (spi[dev]->EVENTS_READY != 1);
