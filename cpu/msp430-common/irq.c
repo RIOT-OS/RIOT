@@ -22,6 +22,10 @@
 #include "irq.h"
 #include "cpu.h"
 
+volatile int __inISR = 0;
+
+char __isr_stack[MSP430_ISR_STACK_SIZE];
+
 unsigned int disableIRQ(void)
 {
     unsigned int state;
@@ -29,7 +33,11 @@ unsigned int disableIRQ(void)
     state &= GIE;
 
     if (state) {
-        dINT();
+        /*    puts("-"); */
+        __asm__ __volatile__("bic  %0, r2" : : "i"(GIE));
+       /* this NOP is needed to handle a "delay slot" that all MSP430 MCUs
+          impose silently after messing with the GIE bit, DO NOT REMOVE IT! */
+        __asm__ __volatile__("nop");
     }
 
     return state;
@@ -42,7 +50,10 @@ unsigned int enableIRQ(void)
     state &= GIE;
 
     if (!state) {
-        eINT();
+        __asm__ __volatile__("bis  %0, r2" : : "i"(GIE));
+        /* this NOP is needed to handle a "delay slot" that all MSP430 MCUs
+           impose silently after messing with the GIE bit, DO NOT REMOVE IT! */
+        __asm__ __volatile__("nop");
     }
 
     return state;
@@ -51,6 +62,14 @@ unsigned int enableIRQ(void)
 void restoreIRQ(unsigned int state)
 {
     if (state) {
-        eINT();
+        __asm__ __volatile__("bis  %0, r2" : : "i"(GIE));
+        /* this NOP is needed to handle a "delay slot" that all MSP430 MCUs
+           impose silently after messing with the GIE bit, DO NOT REMOVE IT! */
+        __asm__ __volatile__("nop");
     }
+}
+
+int inISR(void)
+{
+    return __inISR;
 }

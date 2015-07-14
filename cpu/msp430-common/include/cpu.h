@@ -51,6 +51,13 @@ extern volatile int __inISR;
 extern char __isr_stack[MSP430_ISR_STACK_SIZE];
 
 /**
+ * @brief   definition of legacy interrupt control functions
+ */
+#define eINT            enableIRQ
+#define dINT            disableIRQ
+/** @} */
+
+/**
  * @brief   Save the current thread context from inside an ISR
  */
 inline void __save_context_isr(void)
@@ -149,40 +156,6 @@ inline void __restore_context(unsigned int irqen)
 
     __asm__("reti");
 }
-
-/**
- * @brief   Enable interrupts
- */
-inline void eINT(void)
-{
-    /*    puts("+"); */
-/*    eint();   // problem with MSPGCC intrinsics? */
-    __asm__ __volatile__("bis  %0, r2" : : "i"(GIE));
-    __asm__ __volatile__("nop");
-       /* this NOP is needed to handle a "delay slot" that all MSP430 MCUs
-          impose silently after messing with the GIE bit, DO NOT REMOVE IT! */
-}
-
-/**
- * @brief   Disable interrupts
- */
-inline void dINT(void)
-{
-    /*    puts("-"); */
-/*    dint();   // problem with MSPGCC intrinsics? */
-    __asm__ __volatile__("bic  %0, r2" : : "i"(GIE));
-    __asm__ __volatile__("nop");
-       /* this NOP is needed to handle a "delay slot" that all MSP430 MCUs
-          impose silently after messing with the GIE bit, DO NOT REMOVE IT! */
-}
-
-/**
- * @brief   Check if currently inside an interrupt routine
- *
- * @return  0 if not in interrupt context
- * @return  1 if in interrupt context
- */
-int inISR(void);
 
 /**
  * @brief   Initialize the cpu
