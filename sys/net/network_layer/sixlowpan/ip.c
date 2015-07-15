@@ -60,12 +60,9 @@ kernel_pid_t udp_packet_handler_pid = KERNEL_PID_UNDEF;
 kernel_pid_t tcp_packet_handler_pid = KERNEL_PID_UNDEF;
 
 static volatile kernel_pid_t _rpl_process_pid = KERNEL_PID_UNDEF;
-<<<<<<< HEAD
 #ifndef FIB_COMPAT
 ipv6_addr_t *(*ip_get_next_hop)(ipv6_addr_t *);
 #endif
-=======
->>>>>>> routing/rpl: adjusted RPL to use the FIB
 uint8_t (*ip_srh_indicator)(void);
 
 static ipv6_net_if_ext_t ipv6_net_if_ext[NET_IF_MAX];
@@ -550,7 +547,7 @@ void *ipv6_process(void *arg)
                     continue;
                 }
 
-                nce = ndp_get_ll_address(&nxt);
+                nce = ndp_get_ll_address(dest);
 
                 /* copy received packet to send buffer */
                 memcpy(ipv6_get_buf_send(), ipv6_get_buf(), packet_length);
@@ -564,7 +561,7 @@ void *ipv6_process(void *arg)
                 else {
                     /* XXX: this is wrong, but until ND does work correctly,
                      *      this is the only way (aka the old way)*/
-                    uint16_t raddr = nxt.uint16[7];
+                    uint16_t raddr = dest->uint16[7];
                     sixlowpan_lowpan_sendto(0, &raddr, 2,
                                             (uint8_t *) ipv6_get_buf_send(), packet_length);
                 }
