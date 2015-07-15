@@ -129,8 +129,8 @@ ifneq (0,$(shell test -d $(RIOTBOARD)/$(BOARD); echo $$?))
 endif
 
 # mandatory includes!
-include $(RIOTBASE)/Makefile.modules
 include $(RIOTBOARD)/$(BOARD)/Makefile.include
+include $(RIOTBOARD)/$(BOARD)/Makefile.features
 include $(RIOTCPU)/$(CPU)/Makefile.include
 
 # get number of interfaces straight before resolving dependencies
@@ -141,6 +141,7 @@ ifneq ($(GNRC_NETIF_NUMOF),1)
 endif
 
 include $(RIOTBASE)/Makefile.dep
+include $(RIOTBASE)/Makefile.modules
 
 USEMODULE += $(filter-out $(DISABLE_MODULE), $(DEFAULT_MODULE))
 
@@ -330,9 +331,6 @@ $(CURDIR)/eclipsesym.xml:
 
 # Extra make goals for testing and comparing changes.
 include $(RIOTBASE)/Makefile.buildtests
-
-# import list of provided features
--include $(RIOTBOARD)/$(BOARD)/Makefile.features
 
 # Export variables used throughout the whole make system:
 include $(RIOTBASE)/Makefile.vars
