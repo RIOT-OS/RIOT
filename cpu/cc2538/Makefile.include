@@ -1,3 +1,6 @@
 export CPU_ARCH := cortex-m3
 
+# we need to include the peripheral timer in order for the hwtimer to work
+USEMODULE += periph_timer
+
 include $(RIOTCPU)/Makefile.include.cortexm_common
