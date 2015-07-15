@@ -573,11 +573,11 @@ bool ng_sixlowpan_iphc_encode(ng_pktsnip_t *pkt)
             }
             /* if multicast address is of format ffXX::XX:XXXX:XXXX */
             else if (ipv6_hdr->dst.u8[10] == 0) {
-                /* 32 bits. The address is derived using 32 bits carried inline */
-                iphc_hdr[IPHC2_IDX] |= IPHC_M_DAC_DAM_M_32;
+                /* 48 bits. The address is derived using 48 bits carried inline */
+                iphc_hdr[IPHC2_IDX] |= IPHC_M_DAC_DAM_M_48;
                 iphc_hdr[inline_pos++] = ipv6_hdr->dst.u8[1];
-                memcpy(iphc_hdr + inline_pos, ipv6_hdr->dst.u8 + 13, 3);
-                inline_pos += 3;
+                memcpy(iphc_hdr + inline_pos, ipv6_hdr->dst.u8 + 11, 5);
+                inline_pos += 5;
                 addr_comp = true;
             }
         }
