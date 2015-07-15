@@ -43,7 +43,7 @@ static timer_conf_t config[TIMER_NUMOF];
 int timer_init(tim_t dev, unsigned int us_per_tick, void (*callback)(int))
 {
     if (dev == TIMER_0) {
-        config[dev].cb = callback;                          // User Function 
+        config[dev].cb = callback;                          // User Function
         ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_WTIMER0);  // Activate Timer0
         WTIMER0_CTL_R &= ~0x00000001;                       // Disable timer0A during setup
         WTIMER0_CFG_R  = TIMER_CFG_16_BIT;
@@ -153,7 +153,7 @@ void isr_timer0(void)
 void isr_wtimer0(void)
 {
     WTIMER0_ICR_R = TIMER_ICR_TATOCINT; // acknowledge timer0A timeout
-    
+
     config[TIMER_0].cb(0);
     if (sched_context_switch_request){
         thread_yield();
