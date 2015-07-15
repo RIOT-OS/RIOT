@@ -8,7 +8,7 @@
 
 /**
  * @defgroup    net_rpl_srh RPL source routing header extension
- * @ingroup     net_rpl
+ * @ingroup     net_ng_rpl
  * @brief       Implementation of RPL source routing extension headers
  * @see <a href="https://tools.ietf.org/html/rfc6554">
  *          RFC 6554
