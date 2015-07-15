@@ -399,7 +399,7 @@ bool ng_sixlowpan_iphc_encode(ng_pktsnip_t *pkt)
 
     /* set initial dispatch value*/
     iphc_hdr[IPHC1_IDX] = NG_SIXLOWPAN_IPHC1_DISP;
-    iphc_hdr[2] = 0;
+    iphc_hdr[IPHC2_IDX] = 0;
 
     /* check for available contexts */
     if (!ng_ipv6_addr_is_unspecified(&(ipv6_hdr->src))) {
