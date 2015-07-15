@@ -121,5 +121,3 @@ typedef enum
 #endif
 
 #endif /* __LM4F120H5QR_H__*/
-
-

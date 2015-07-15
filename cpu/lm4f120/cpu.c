@@ -68,5 +68,3 @@ void cpu_clock_init(int clk)
             break;
     }
 }
-
-
