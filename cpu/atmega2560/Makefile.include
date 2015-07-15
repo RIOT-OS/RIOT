@@ -1,9 +1,12 @@
-
 # this CPU implementation is using the new core/CPU interface
 export CFLAGS += -DCOREIF_NG=1
 
 # tell the build system that the CPU depends on the atmega common files
-export USEMODULE += atmega_common
+USEMODULE += atmega_common
+# use hwtimer compatibility module
+USEMODULE += hwtimer_compat
+# export the peripheral drivers to be linked into the final binary
+export USEMODULE += periph
 
 # define path to atmega common module, which is needed for this CPU
 export ATMEGA_COMMON = $(RIOTCPU)/atmega_common/
@@ -18,8 +21,6 @@ export INCLUDES += -I$(RIOTCPU)/$(CPU)/include
 #   Without this the interrupt vectors will not be linked correctly!
 export UNDEF += $(BINDIR)cpu/startup.o
 
-# export the peripheral drivers to be linked into the final binary
-export USEMODULE += periph
 
 # CPU depends on the atmega common module, so include it
 include $(ATMEGA_COMMON)Makefile.include
