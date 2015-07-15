@@ -1,5 +1,2 @@
-# define the module name
-MODULE = periph
-
-# include RIOTs generic Makefile
+SRC = $(patsubst periph_%,%.c, $(filter periph_%, $(USEMODULE)))
 include $(RIOTBASE)/Makefile.base
