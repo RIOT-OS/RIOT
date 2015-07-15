@@ -23,6 +23,7 @@
 
 #include "reader.h"
 #include "aodv_debug.h"
+#include "ng_fib.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -69,6 +70,7 @@ static uint8_t _get_route_cost(aodvv2_metric_t metricType, uint8_t metric);
 static struct aodvv2_packet_data packet_data;
 static struct unreachable_node unreachable_nodes[AODVV2_MAX_UNREACHABLE_NODES];
 static int num_unreachable_nodes;
+static int aodvv2_validity_t = (AODVV2_ACTIVE_INTERVAL + AODVV2_MAX_IDLETIME) * 1000; /* milliseconds */
 
 static struct rfc5444_reader reader;
 #if ENABLE_DEBUG
@@ -351,6 +353,10 @@ static enum rfc5444_result _cb_rreq_end_callback(
         routingtable_fill_routing_entry_t_rreq(&packet_data, tmp_rt_entry);
         routingtable_add_entry(tmp_rt_entry);
 
+        /* add entry to FIB */
+        fib_add_entry(aodvv2_if_id, tmp_rt_entry->addr._addr, sizeof(ipv6_addr_t), 0,
+                      tmp_rt_entry->nextHopAddr._addr, sizeof(ipv6_addr_t), 0, aodvv2_validity_t);
+
         free(tmp_rt_entry);
     }
     else {
@@ -362,6 +368,10 @@ static enum rfc5444_result _cb_rreq_end_callback(
          * table information and SHOULD be used to improve the route table. */
         VDEBUG("\tUpdating Routing Table entry...\n");
         routingtable_fill_routing_entry_t_rreq(&packet_data, rt_entry);
+
+        /* update the FIB */
+        fib_update_entry(rt_entry->addr._addr, sizeof(ipv6_addr_t), rt_entry->nextHopAddr._addr,
+                         sizeof(ipv6_addr_t), 0, aodvv2_validity_t);
     }
 
     /*
@@ -555,6 +565,10 @@ static enum rfc5444_result _cb_rrep_end_callback(
         routingtable_fill_routing_entry_t_rrep(&packet_data, tmp_rt_entry);
         routingtable_add_entry(tmp_rt_entry);
 
+        /* add entry to FIB */
+        fib_add_entry(aodvv2_if_id, tmp_rt_entry->addr._addr, sizeof(ipv6_addr_t), 0,
+                      tmp_rt_entry->nextHopAddr._addr, sizeof(ipv6_addr_t), 0, aodvv2_validity_t);
+
         free(tmp_rt_entry);
     }
     else {
@@ -566,6 +580,10 @@ static enum rfc5444_result _cb_rrep_end_callback(
          * table information and SHOULD be used to improve the route table. */
         VDEBUG("\tUpdating Routing Table entry...\n");
         routingtable_fill_routing_entry_t_rrep(&packet_data, rt_entry);
+
+        /* update the FIB */
+        fib_update_entry(rt_entry->addr._addr, sizeof(ipv6_addr_t), rt_entry->nextHopAddr._addr,
+                         sizeof(ipv6_addr_t), 0, aodvv2_validity_t);
     }
 
     /* If HandlingRtr is RREQ_Gen then the RREP satisfies RREQ_Gen's
@@ -660,7 +678,11 @@ static enum rfc5444_result _cb_rerr_blocktlv_addresstlvs_okay(struct rfc5444_rea
             unreachable_nodes[num_unreachable_nodes].seqnum = packet_data.origNode.seqnum;
             num_unreachable_nodes++;
         }
+
+        /* remove entry from FIB */
+        fib_remove_entry(packet_data.origNode.addr._addr, sizeof(ipv6_addr_t));
     }
+
     return RFC5444_OKAY;
 }
 

@@ -54,6 +54,9 @@ enum tlv_index
 /* my multicast address */
 extern struct netaddr na_mcast;
 
+/* the interface this protocol operates on */
+extern kernel_pid_t aodvv2_if_id;
+
 #ifdef  __cplusplus
 }
 #endif

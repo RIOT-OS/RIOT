@@ -20,6 +20,7 @@
 #include "aodv.h"
 #include "aodvv2/aodvv2.h"
 #include "aodv_debug.h"
+#include "ng_fib.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -31,6 +32,8 @@ static void _init_addresses(void);
 static void _init_sock_snd(void);
 static void *_aodv_receiver_thread(void *arg);
 static void *_aodv_sender_thread(void *arg);
+static void *fib_signal_handler_thread(void *arg);
+
 static void _deep_free_msg_container(struct msg_container *msg_container);
 static void _write_packet(struct rfc5444_writer *wr __attribute__ ((unused)),
                           struct rfc5444_writer_target *iface __attribute__((unused)),
@@ -43,6 +46,7 @@ static struct netaddr_str nbuf;
 
 static char aodv_rcv_stack_buf[THREAD_STACKSIZE_MAIN];
 static char aodv_snd_stack_buf[THREAD_STACKSIZE_MAIN];
+static char aodv_fib_stack_buf[THREAD_STACKSIZE_MAIN];
 
 static aodvv2_metric_t _metric_type;
 static int sender_thread;
@@ -58,14 +62,23 @@ static mutex_t rrep_mutex;
 static mutex_t rerr_mutex;
 
 struct netaddr na_mcast;
+kernel_pid_t aodvv2_if_id;
+ipv6_addr_t aodvv2_prefix;
+int aodvv2_prefix_len;
 
 void aodv_init(void)
 {
     AODV_DEBUG("%s()\n", __func__);
 
-    /* TODO: set if_id properly */
-    int if_id = 0;
-    net_if_set_src_address_mode(if_id, NET_IF_TRANS_ADDR_M_SHORT);
+    /* init this thread's IPC msg queue (TODO: do I need to do this?) */
+    msg_t msgq[RCV_MSG_Q_SIZE];
+    msg_init_queue(msgq, sizeof msgq);
+
+    /* TODO: set & handle prefix and prefix_len properly (consider AODVV2_RIOT_PREFIXLEN!) */
+    aodvv2_prefix_len = 0;
+    /* TODO: set if_id properly (as param of aodv_init) */
+    aodvv2_if_id = 0;
+    net_if_set_src_address_mode(aodvv2_if_id, NET_IF_TRANS_ADDR_M_SHORT);
 
     mutex_init(&rreq_mutex);
     mutex_init(&rrep_mutex);
@@ -95,10 +108,9 @@ void aodv_init(void)
     sender_thread = thread_create(aodv_snd_stack_buf, sizeof(aodv_snd_stack_buf),
                                   THREAD_PRIORITY_MAIN, CREATE_STACKTEST, _aodv_sender_thread,
                                   NULL, "_aodv_sender_thread");
-
-    /* register aodv for routing */
-    ipv6_iface_set_routing_provider(aodv_get_next_hop);
-
+    thread_create(aodv_fib_stack_buf, sizeof(aodv_fib_stack_buf),
+                                  THREAD_PRIORITY_MAIN, CREATE_STACKTEST, fib_signal_handler_thread,
+                                  NULL, "fib_signal_handler_thread");
 }
 
 void aodv_set_metric_type(aodvv2_metric_t metric_type)
@@ -107,6 +119,64 @@ void aodv_set_metric_type(aodvv2_metric_t metric_type)
         return;
     }
     _metric_type = metric_type;
+}
+/*
+ * @brief handles callbacks from the FIB when it needs a route
+ */
+void *fib_signal_handler_thread(void *arg)
+{
+    (void) arg;
+    ipv6_addr_t dest;
+    struct netaddr na_dest;
+
+    fib_register_rp((uint8_t*) &aodvv2_prefix, aodvv2_prefix_len);
+
+    while (true) {
+        AODV_DEBUG("%s()\n", __func__);
+        msg_t msg;
+        msg_receive(&msg);
+
+        if (msg.type == FIB_MSG_RP_SIGNAL) {
+            rp_address_msg_t* rp_msg = (rp_address_msg_t*)msg.content.ptr;
+            if (rp_msg->address_size == sizeof(ipv6_addr_t)) {
+                /* We currently only support IPv6*/
+                memcpy(&dest, rp_msg->address, rp_msg->address_size);
+                /* Reply to the FIB so that it can stop blocking */
+                msg_reply(&msg, &msg);
+
+                /* perform/initiate a rreq for dst here*/
+                ipv6_addr_t_to_netaddr(&dest, &na_dest);
+
+                aodvv2_seqnum_t seqnum = seqnum_get();
+                seqnum_inc();
+
+                /* Build new RREQ */
+                struct aodvv2_packet_data rreq_data = (struct aodvv2_packet_data) {
+                    .hoplimit = AODVV2_MAX_HOPCOUNT,
+                    .metricType = _metric_type,
+                    .origNode = (struct node_data) {
+                        .addr = na_local,
+                        .metric = 0,
+                        .seqnum = seqnum,
+                    },
+                    .targNode = (struct node_data) {
+                        .addr = na_dest,
+                    },
+                    .timestamp = (timex_t) {0,0} /* this timestamp is never used, it exists
+                                                  * merely to make the compiler shut up */
+                };
+
+                DEBUG("\tstarting route discovery towards %s... \n",
+                      ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, &dest));
+                aodv_send_rreq(&rreq_data);
+            }
+            else {
+                /* Reply to the FIB so that it can stop blocking */
+                msg_reply(&msg, &msg);
+            }
+        }
+    }
+    return NULL;
 }
 
 void aodv_send_rreq(struct aodvv2_packet_data *packet_data)
@@ -324,116 +394,6 @@ static void *_aodv_receiver_thread(void *arg)
     }
 
     socket_base_close(sock_rcv);
-
-    return NULL;
-}
-
-ipv6_addr_t *aodv_get_next_hop(ipv6_addr_t *dest)
-{
-    AODV_DEBUG("aodv_get_next_hop() %s:",
-          ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, &_v6_addr_local));
-    DEBUG(" getting next hop for %s\n",
-          ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, dest));
-
-    struct netaddr _tmp_dest;
-    ipv6_addr_t_to_netaddr(dest, &_tmp_dest);
-    timex_t now;
-    struct unreachable_node unreachable_nodes[AODVV2_MAX_UNREACHABLE_NODES];
-    size_t len;
-
-    /* The network stack sometimes asks us for the next hop towards our own IP */
-    if (memcmp(dest, &_v6_addr_local, sizeof(ipv6_addr_t)) == 0) {
-        AODV_DEBUG("That's me, returning loopback\n");
-        return &_v6_addr_loopback;
-    }
-
-    /*
-     * TODO use ndp_neighbor_get_ll_address() as soon as it's available.
-     * note: delete check for active/stale/delayed entries, get_ll_address
-     * does that for us then
-    */
-    ndp_neighbor_cache_t *ndp_nc_entry = ndp_neighbor_cache_search(dest);
-    struct aodvv2_routing_entry_t *rt_entry = routingtable_get_entry(&_tmp_dest, _metric_type);
-
-    if (ndp_nc_entry != NULL) {
-        /* Case 2: Broken Link (detected by lower layer) */
-        int link_broken = (ndp_nc_entry->state == NDP_NCE_STATUS_INCOMPLETE ||
-                           ndp_nc_entry->state == NDP_NCE_STATUS_PROBE) &&
-                          (rt_entry != NULL && rt_entry->state != ROUTE_STATE_INVALID);
-
-        if (link_broken) {
-            DEBUG("\tNeighbor Cache entry found, but invalid (state: %i). Sending RERR.\n",
-                  ndp_nc_entry->state);
-
-            /* mark all routes (active, idle, expired) that use next_hop as broken
-             * and add all *Active* routes to the list of unreachable nodes */
-            routingtable_break_and_get_all_hopping_over(&_tmp_dest, unreachable_nodes, &len);
-
-            aodv_send_rerr(unreachable_nodes, len, &na_mcast);
-            return NULL;
-        }
-
-        DEBUG("[aodvv2][ndp] found NC entry. Returning dest addr.\n");
-        return dest;
-    }
-
-    DEBUG("\t[ndp] no entry for addr %s found\n",
-          ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, dest));
-    if (rt_entry) {
-        /* Case 1: Undeliverable Packet */
-        int packet_indeliverable = rt_entry->state == ROUTE_STATE_INVALID;
-        if (packet_indeliverable) {
-            DEBUG("\tRouting table entry found, but invalid (state %i). Sending RERR.\n",
-                  rt_entry->state);
-            unreachable_nodes[0].addr = _tmp_dest;
-            unreachable_nodes[0].seqnum = rt_entry->seqnum;
-            aodv_send_rerr(unreachable_nodes, 1, &na_mcast);
-            return NULL;
-        }
-
-        DEBUG("\tfound dest %s in routing table\n",
-              ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, dest));
-
-        vtimer_now(&now);
-        rt_entry->lastUsed = now;
-        if (rt_entry->state == ROUTE_STATE_IDLE) {
-            rt_entry->state = ROUTE_STATE_ACTIVE;
-        }
-
-        /* Currently, there is no way to do this, so I'm doing it the worst
-         * possible, but safe way: I can't make sure that the current call to
-         * aodv_get_next_hop() is overridden by another call to aodv_get_next_hop()
-         * by a thread with higher priority, thus messing up return values if I just
-         * use a static ipv6_addr_t.
-         * The following malloc will never be free()'d. TODO: FIX THIS ASAP.
-        */
-        ipv6_addr_t *next_hop = (ipv6_addr_t *) malloc(sizeof(ipv6_addr_t));
-        netaddr_to_ipv6_addr_t(&rt_entry->nextHopAddr, next_hop);
-
-        return next_hop;
-    }
-
-    aodvv2_seqnum_t seqnum = seqnum_get();
-    seqnum_inc();
-
-    struct aodvv2_packet_data rreq_data = (struct aodvv2_packet_data) {
-        .hoplimit = AODVV2_MAX_HOPCOUNT,
-        .metricType = _metric_type,
-        .origNode = (struct node_data) {
-            .addr = na_local,
-            .metric = 0,
-            .seqnum = seqnum,
-        },
-        .targNode = (struct node_data) {
-            .addr = _tmp_dest,
-        },
-        .timestamp = (timex_t) {0,0} /* this timestamp is never used, it exists
-                                      * merely to make the compiler shut up */
-    };
-
-    DEBUG("\tNo route found towards %s, starting route discovery... \n",
-          ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, dest));
-    aodv_send_rreq(&rreq_data);
 
     return NULL;
 }
