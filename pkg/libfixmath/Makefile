@@ -31,7 +31,7 @@ $(BINDIR)$(PKG_NAME)-src/Makefile: $(CHECKOUT_FOLDER)/svn_info.xml
 	$(AD)cd $(@D) && sed -i -e 's/1 <</(uint32_t) 1 <</g' uint32.c
 	$(AD)cd $(@D) && sed -i -e 's/is\([a-z]*\)(\*buf)/is\1((unsigned char) *buf)/g' fix16_str.c
 
-$(BINDIR)$(PKG_NAME)-unittests-src/Makefile:
+$(BINDIR)$(PKG_NAME)-unittests-src/Makefile: $(CHECKOUT_FOLDER)/svn_info.xml
 	@rm -rf $(@D)
 	@mkdir -p $(@D)
 	$(AD)cp $(CURDIR)/Makefile.template-unittests $@
