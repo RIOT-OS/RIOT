@@ -357,6 +357,13 @@ ifneq (, $(filter all, $(if $(MAKECMDGOALS), $(MAKECMDGOALS), all)))
     EXPECT_ERRORS := 1
   endif
 
+  # Test if all used peripherals are provided by the board
+  ifneq (, $(filter-out $(FEATURES_PROVIDED), $(filter periph_%,$(USEMODULE))))
+    $(shell $(COLOR_ECHO) "$(COLOR_RED)These needed MCU peripherals are not supported by your board:$(COLOR_RESET)"\
+                          "$(sort $(filter-out $(FEATURES_PROVIDED), $(filter periph_%,$(USEMODULE))))" 1>&2)
+    EXPECT_ERRORS := 1
+  endif
+
   # Test if any required feature conflict with another one.
   CONFLICT := $(foreach var,$(FEATURES_CONFLICT),$(if $(filter $(words $(subst :, ,$(var))),$(words $(filter $(FEATURES_REQUIRED),$(subst :, ,$(var))))),$(subst :, ,$(var))))
   ifneq (, $(strip $(CONFLICT)))
