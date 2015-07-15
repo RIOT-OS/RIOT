@@ -121,24 +121,22 @@ static void _receive(ng_pktsnip_t *pkt)
         return;
     }
 #endif
-    else {
-        DEBUG("6lo: dispatch %02x ... is not supported\n",
-              dispatch[0]);
-        ng_pktbuf_release(pkt);
-        return;
-    }
-
 #ifdef MODULE_NG_SIXLOWPAN_IPHC
-    if (ng_sixlowpan_iphc_is(payload->data)) {
+    else if (ng_sixlowpan_iphc_is(dispatch)) {
         if (!ng_sixlowpan_iphc_decode(pkt)) {
             DEBUG("6lo: error on IPHC decoding\n");
             ng_pktbuf_release(pkt);
             return;
         }
         LL_SEARCH_SCALAR(pkt, payload, type, NG_NETTYPE_IPV6);
-
     }
 #endif
+    else {
+        DEBUG("6lo: dispatch %02" PRIx8 " ... is not supported\n",
+              dispatch[0]);
+        ng_pktbuf_release(pkt);
+        return;
+    }
 
     payload->type = NG_NETTYPE_IPV6;
 
