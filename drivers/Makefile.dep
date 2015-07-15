@@ -1,0 +1,163 @@
+# driver dependencies (in alphabetical order)
+
+ifneq (,$(filter adt7310,$(USEMODULE)))
+  USEMODULE += periph_gpio
+  USEMODULE += periph_spi
+endif
+
+ifneq (,$(filter at86rf231,$(USEMODULE)))
+  USEMODULE += periph_gpio
+  USEMODULE += periph_spi
+endif
+
+ifneq (,$(filter cc110x,$(USEMODULE)))
+  USEMODULE += periph_gpio
+  USEMODULE += periph_spi
+  USEMODULE += protocol_multiplex
+  USEMODULE += vtimer
+  USEMODULE += transceiver
+endif
+
+ifneq (,$(filter dht,$(USEMODULE)))
+  USEMODULE += periph_gpio
+endif
+
+ifneq (,$(filter hdc1000,$(USEMODULE)))
+  USEMODULE += periph_i2c
+endif
+
+ifneq (,$(filter ina220,$(USEMODULE)))
+  USEMODULE += periph_i2c
+endif
+
+ifneq (,$(filter isl29020,$(USEMODULE)))
+  USEMODULE += periph_i2c
+endif
+
+ifneq (,$(filter isl29125,$(USEMODULE)))
+  USEMODULE += periph_gpio
+endif
+
+ifneq (,$(filter kw2xrf,$(USEMODULE)))
+  USEMODULE += periph_gpio
+  USEMODULE += ng_ieee802154
+endif
+
+ifneq (,$(filter l3g4200d,$(USEMODULE)))
+  USEMODULE += periph_gpio
+  USEMODULE += periph_i2c
+endif
+
+ifneq (,$(filter lis3dh,$(USEMODULE)))
+  USEMODULE += periph_gpio
+  USEMODULE += periph_spi
+endif
+
+ifneq (,$(filter lps331ap,$(USEMODULE)))
+  USEMODULE += periph_i2c
+endif
+
+ifneq (,$(filter lsm303dlhc,$(USEMODULE)))
+  USEMODULE += periph_gpio
+  USEMODULE += periph_i2c
+endif
+
+ifneq (,$(filter mag3110,$(USEMODULE)))
+  USEMODULE += periph_i2c
+endif
+
+ifneq (,$(filter mma8652,$(USEMODULE)))
+  USEMODULE += periph_i2c
+endif
+
+ifneq (,$(filter mpl3115a2,$(USEMODULE)))
+  USEMODULE += periph_i2c
+endif
+
+ifneq (,$(filter mpu9150,$(USEMODULE)))
+  USEMODULE += periph_i2c
+endif
+
+ifneq (,$(filter mq3,$(USEMODULE)))
+  USEMODULE += periph_adc
+endif
+
+ifneq (,$(filter ng_at86rf2%,$(USEMODULE)))
+  USEMODULE += ng_at86rf2xx
+endif
+
+ifneq (,$(filter ng_at86rf2xx,$(USEMODULE)))
+  USEMODULE += periph_gpio
+  USEMODULE += periph_spi
+  USEMODULE += ng_ieee802154
+endif
+
+ifneq (,$(filter nrf24l01p,$(USEMODULE)))
+  USEMODULE += periph_gpio
+  USEMODULE += periph_spi
+endif
+
+ifneq (,$(filter nvram_spi,$(USEMODULE)))
+  USEMODULE += periph_gpio
+  USEMODULE += periph_spi
+endif
+
+ifneq (,$(filter pcd8544,$(USEMODULE)))
+  USEMODULE += periph_gpio
+  USEMODULE += periph_spi
+endif
+
+ifneq (,$(filter pir,$(USEMODULE)))
+  USEMODULE += periph_gpio
+endif
+
+ifneq (,$(filter rgbled,$(USEMODULE)))
+  USEMODULE += periph_pwm
+  USEMODULE += color
+endif
+
+ifneq (,$(filter servo,$(USEMODULE)))
+  USEMODULE += periph_pwm
+endif
+
+ifneq (,$(filter srf02,$(USEMODULE)))
+  USEMODULE += periph_i2c
+endif
+
+ifneq (,$(filter srf08,$(USEMODULE)))
+  USEMODULE += periph_i2c
+endif
+
+ifneq (,$(filter tmp006,$(USEMODULE)))
+  USEMODULE += periph_i2c
+endif
+
+ifneq (,$(filter xbee,$(USEMODULE)))
+  USEMODULE += periph_gpio
+  USEMODULE += periph_uart
+  USEMODULE += ng_ieee802154
+endif
+
+
+# Deprecated drivers
+
+ifneq (,$(filter at86rf231,$(USEMODULE)))
+  USEMODULE += periph_gpio
+  USEMODULE += periph_spi
+  USEMODULE += netdev_802154
+  USEMODULE += ieee802154
+endif
+
+ifneq (,$(filter cc110x%,$(USEMODULE)))
+  USEMODULE += protocol_multiplex
+  USEMODULE += vtimer
+endif
+
+ifneq (,$(filter cc110x_legacy,$(USEMODULE)))
+  USEMODULE += transceiver
+endif
+
+ifneq (,$(filter cc2420,$(USEMODULE)))
+  USEMODULE += transceiver
+  USEMODULE += ieee802154
+endif
