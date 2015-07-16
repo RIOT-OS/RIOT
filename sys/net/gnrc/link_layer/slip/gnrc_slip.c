@@ -110,7 +110,6 @@ int _slip_tx_cb(void *arg)
 static void _slip_receive(gnrc_slip_dev_t *dev, size_t bytes)
 {
     gnrc_netif_hdr_t *hdr;
-    gnrc_netreg_entry_t *sendto;
     gnrc_pktsnip_t *pkt, *netif_hdr;
 
     pkt = gnrc_pktbuf_add(NULL, NULL, bytes, GNRC_NETTYPE_UNDEF);
@@ -151,20 +150,9 @@ static void _slip_receive(gnrc_slip_dev_t *dev, size_t bytes)
     }
 #endif
 
-    sendto = gnrc_netreg_lookup(pkt->type, GNRC_NETREG_DEMUX_CTX_ALL);
-
-    if (sendto == NULL) {
+    if (gnrc_netapi_dispatch_receive(pkt->type, GNRC_NETREG_DEMUX_CTX_ALL, pkt) == 0) {
         DEBUG("slip: unable to forward packet of type %i\n", pkt->type);
         gnrc_pktbuf_release(pkt);
-    }
-
-    gnrc_pktbuf_hold(pkt, gnrc_netreg_num(pkt->type, GNRC_NETREG_DEMUX_CTX_ALL) - 1);
-
-    while (sendto != NULL) {
-        DEBUG("slip: sending pkt %p to PID %" PRIkernel_pid "\n", (void *)pkt,
-              sendto->pid);
-        gnrc_netapi_receive(sendto->pid, pkt);
-        sendto = gnrc_netreg_getnext(sendto);
     }
 }
 
