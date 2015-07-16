@@ -739,6 +739,151 @@ static void test_fib_18_get_next_hop_invalid_parameters(void)
     fib_deinit();
 }
 
+/*
+* @brief testing default gateway address
+*/
+static void test_fib_19_default_gateway(void)
+{
+    size_t add_buf_size = 16;
+    char addr_dst[add_buf_size];
+    char addr_nxt_hop[add_buf_size];
+    char addr_nxt[add_buf_size];
+    char addr_lookup[add_buf_size];
+    kernel_pid_t iface_id = KERNEL_PID_UNDEF;
+    uint32_t next_hop_flags = 0;
+
+    memset(addr_dst, 0, add_buf_size);
+    memset(addr_nxt, 0, add_buf_size);
+    memset(addr_nxt_hop, 0, add_buf_size);
+    memset(addr_lookup, 0, add_buf_size);
+
+    snprintf(addr_lookup, add_buf_size, "Some address X1");
+
+    /* set the bytes to 0x01..0x10 of the next-hop */
+    for(size_t i = 0; i < add_buf_size; i++) {
+        addr_nxt[i] = i+1;
+    }
+
+    /* add a default gateway entry */
+    fib_add_entry(42, (uint8_t *)addr_dst, add_buf_size, 0x123,
+                  (uint8_t *)addr_nxt, add_buf_size, 0x23, 100000);
+
+    /* check if it matches all */
+    int ret = fib_get_next_hop(&iface_id,
+                               (uint8_t *)addr_nxt_hop, &add_buf_size, &next_hop_flags,
+                               (uint8_t *)addr_lookup, add_buf_size, 0x123);
+
+    TEST_ASSERT_EQUAL_INT(0, ret);
+    TEST_ASSERT_EQUAL_INT(0, memcmp(addr_nxt, addr_nxt_hop, add_buf_size));
+
+    memset(addr_nxt_hop, 0, add_buf_size);
+
+    /* set the bytes to 0x02..0x11 of the new next-hop for the default gateway */
+    for(size_t i = 0; i < add_buf_size; ++i) {
+        addr_nxt[i] = i+2;
+    }
+
+    /* change the default gateway entry */
+    fib_add_entry(42, (uint8_t *)addr_dst, add_buf_size, 0x123,
+                  (uint8_t *)addr_nxt, add_buf_size, 0x24, 100000);
+
+    /* and check again if it matches all */
+    ret = fib_get_next_hop(&iface_id,
+                           (uint8_t *)addr_nxt_hop, &add_buf_size, &next_hop_flags,
+                           (uint8_t *)addr_lookup, add_buf_size, 0x123);
+
+    TEST_ASSERT_EQUAL_INT(0, ret);
+    TEST_ASSERT_EQUAL_INT(0, memcmp(addr_nxt, addr_nxt_hop, add_buf_size));
+
+#if (TEST_FIB_SHOW_OUTPUT == 1)
+    fib_print_fib_table();
+    puts("");
+    universal_address_print_table();
+    puts("");
+#endif
+    fib_deinit();
+}
+
+/*
+* @brief testing prefix entry changing
+*/
+static void test_fib_20_replace_prefix(void)
+{
+    size_t add_buf_size = 16;
+    char addr_dst[add_buf_size];
+    char addr_nxt_hop[add_buf_size];
+    char addr_nxt[add_buf_size];
+    char addr_lookup[add_buf_size];
+    kernel_pid_t iface_id = KERNEL_PID_UNDEF;
+    uint32_t next_hop_flags = 0;
+
+    memset(addr_dst, 0, add_buf_size);
+    memset(addr_nxt, 0, add_buf_size);
+    memset(addr_nxt_hop, 0, add_buf_size);
+    memset(addr_lookup, 0, add_buf_size);
+
+    /* set the bytes to 0x01..0x10 of the next-hop */
+    for(size_t i = 0; i < add_buf_size; i++) {
+        addr_nxt[i] = i+1;
+    }
+
+    /* set the bytes to 0x01..0x08 of the destination prefix */
+    for(size_t i = 0; i < add_buf_size/2; i++) {
+        addr_dst[i] = i+1;
+    }
+
+    /* set the bytes to 0x01..0x0e of the lookup address */
+    for(size_t i = 0; i < 14; i++) {
+        addr_lookup[i] = i+1;
+    }
+
+    /* add a prefix entry */
+    fib_add_entry(42, (uint8_t *)addr_dst, add_buf_size, 0x123,
+                  (uint8_t *)addr_nxt, add_buf_size, 0x23, 100000);
+
+    /* check if it matches */
+    int ret = fib_get_next_hop(&iface_id,
+                               (uint8_t *)addr_nxt_hop, &add_buf_size, &next_hop_flags,
+                               (uint8_t *)addr_lookup, add_buf_size, 0x123);
+
+    TEST_ASSERT_EQUAL_INT(0, ret);
+    TEST_ASSERT_EQUAL_INT(0, memcmp(addr_nxt, addr_nxt_hop, add_buf_size));
+
+    fib_remove_entry((uint8_t *)addr_dst, add_buf_size);
+
+    memset(addr_nxt_hop, 0, add_buf_size);
+
+    /* set the bytes to 0x02..0x11 of the new next-hop */
+    for(size_t i = 0; i < add_buf_size; ++i) {
+        addr_nxt[i] = i+2;
+    }
+
+    /* set the bytes to 0x01..0x0d of the new destination prefix */
+    for(size_t i = 0; i < 13; i++) {
+        addr_dst[i] = i+1;
+    }
+
+    /* change the prefix entry */
+    fib_add_entry(42, (uint8_t *)addr_dst, add_buf_size, 0x123,
+                  (uint8_t *)addr_nxt, add_buf_size, 0x24, 100000);
+
+    /* and check again if it matches  */
+    ret = fib_get_next_hop(&iface_id,
+                           (uint8_t *)addr_nxt_hop, &add_buf_size, &next_hop_flags,
+                           (uint8_t *)addr_lookup, add_buf_size, 0x123);
+
+    TEST_ASSERT_EQUAL_INT(0, ret);
+    TEST_ASSERT_EQUAL_INT(0, memcmp(addr_nxt, addr_nxt_hop, add_buf_size));
+
+#if (TEST_FIB_SHOW_OUTPUT == 1)
+    fib_print_fib_table();
+    puts("");
+    universal_address_print_table();
+    puts("");
+#endif
+    fib_deinit();
+}
+
 Test *tests_fib_tests(void)
 {
     fib_init();
@@ -761,6 +906,8 @@ Test *tests_fib_tests(void)
                         new_TestFixture(test_fib_16_prefix_match),
                         new_TestFixture(test_fib_17_get_entry_set),
                         new_TestFixture(test_fib_18_get_next_hop_invalid_parameters),
+                        new_TestFixture(test_fib_19_default_gateway),
+                        new_TestFixture(test_fib_20_replace_prefix),
     };
 
     EMB_UNIT_TESTCALLER(fib_tests, NULL, NULL, fixtures);
