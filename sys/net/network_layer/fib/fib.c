@@ -321,7 +321,7 @@ static int fib_signal_rp(uint8_t *dst, size_t dst_size, uint32_t dst_flags)
                  * will lead to errors
                  */
                 msg_send_receive(&msg, &reply, notify_rp[i]);
-                DEBUG("[fib_signal_rp] got reply.");
+                DEBUG("[fib_signal_rp] got reply.\n");
             }
         }
     }
@@ -334,7 +334,7 @@ int fib_add_entry(kernel_pid_t iface_id, uint8_t *dst, size_t dst_size, uint32_t
                   uint32_t lifetime)
 {
     mutex_lock(&mtx_access);
-    DEBUG("[fib_add_entry]");
+    DEBUG("[fib_add_entry]\n");
     size_t count = 1;
     fib_entry_t *entry[count];
 
@@ -358,7 +358,7 @@ int fib_update_entry(uint8_t *dst, size_t dst_size,
                      uint32_t lifetime)
 {
     mutex_lock(&mtx_access);
-    DEBUG("[fib_update_entry]");
+    DEBUG("[fib_update_entry]\n");
     size_t count = 1;
     fib_entry_t *entry[count];
     int ret = -ENOMEM;
@@ -372,7 +372,7 @@ int fib_update_entry(uint8_t *dst, size_t dst_size,
         /* we have ambiguous entries, i.e. count > 1
          * this should never happen
          */
-        DEBUG("[fib_update_entry] ambigious entries detected!!!");
+        DEBUG("[fib_update_entry] ambigious entries detected!!!\n");
     }
 
     mutex_unlock(&mtx_access);
@@ -382,7 +382,7 @@ int fib_update_entry(uint8_t *dst, size_t dst_size,
 void fib_remove_entry(uint8_t *dst, size_t dst_size)
 {
     mutex_lock(&mtx_access);
-    DEBUG("[fib_remove_entry]");
+    DEBUG("[fib_remove_entry]\n");
     size_t count = 1;
     fib_entry_t *entry[count];
 
@@ -396,7 +396,7 @@ void fib_remove_entry(uint8_t *dst, size_t dst_size)
         /* we have ambiguous entries, i.e. count > 1
          * this should never happen
          */
-        DEBUG("[fib_update_entry] ambigious entries detected!!!");
+        DEBUG("[fib_update_entry] ambigious entries detected!!!\n");
     }
 
     mutex_unlock(&mtx_access);
@@ -407,7 +407,7 @@ int fib_get_next_hop(kernel_pid_t *iface_id,
                      uint8_t *dst, size_t dst_size, uint32_t dst_flags)
 {
     mutex_lock(&mtx_access);
-    DEBUG("[fib_get_next_hop]");
+    DEBUG("[fib_get_next_hop]\n");
     size_t count = 1;
     fib_entry_t *entry[count];
 
@@ -487,7 +487,7 @@ int fib_get_destination_set(uint8_t *prefix, size_t prefix_size,
 
 void fib_init(void)
 {
-    DEBUG("[fib_init] hello. Initializing some stuff.");
+    DEBUG("[fib_init] hello. Initializing some stuff.\n");
     mutex_lock(&mtx_access);
 
     for (size_t i = 0; i < FIB_MAX_REGISTERED_RP; ++i) {
@@ -511,7 +511,7 @@ void fib_init(void)
 
 void fib_deinit(void)
 {
-    DEBUG("[fib_deinit] hello. De-Initializing stuff.");
+    DEBUG("[fib_deinit] hello. De-Initializing stuff.\n");
     mutex_lock(&mtx_access);
 
     for (size_t i = 0; i < FIB_MAX_REGISTERED_RP; ++i) {
