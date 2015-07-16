@@ -92,10 +92,16 @@ void ng_at86rf2xx_reset(ng_at86rf2xx_t *dev)
     eui64_t addr_long;
 #endif
 
+    /* wake from sleep in case radio is sleeping */
+    gpio_clear(dev->sleep_pin);
     /* trigger hardware reset */
     gpio_clear(dev->reset_pin);
     hwtimer_wait(HWTIMER_TICKS(RESET_DELAY));
     gpio_set(dev->reset_pin);
+
+    /* Reset state machine to ensure a known state */
+    ng_at86rf2xx_reset_state_machine(dev);
+
     /* reset options and sequence number */
     dev->seq_nr = 0;
     dev->options = 0;
@@ -206,7 +212,7 @@ void ng_at86rf2xx_tx_prepare(ng_at86rf2xx_t *dev)
 
     /* make sure ongoing transmissions are finished */
     do {
-        state = ng_at86rf2xx_get_state(dev);
+        state = ng_at86rf2xx_get_status(dev);
     }
     while (state == NG_AT86RF2XX_STATE_BUSY_RX_AACK);
     dev->idle_state = state;

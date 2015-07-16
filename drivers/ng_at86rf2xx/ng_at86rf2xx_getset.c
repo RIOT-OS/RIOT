@@ -334,43 +334,68 @@ void ng_at86rf2xx_set_option(ng_at86rf2xx_t *dev, uint16_t option, bool state)
     }
 }
 
-uint8_t ng_at86rf2xx_get_state(ng_at86rf2xx_t *dev)
-{
-    uint8_t status = ng_at86rf2xx_get_status(dev);
-    return (status & 0x1f);
-}
-
 static inline void _set_state(ng_at86rf2xx_t *dev, uint8_t state)
 {
     ng_at86rf2xx_reg_write(dev, NG_AT86RF2XX_REG__TRX_STATE, state);
-    while (ng_at86rf2xx_get_state(dev) != state);
+    while (ng_at86rf2xx_get_status(dev) != state);
+}
+
+static inline void _force_trx_off(ng_at86rf2xx_t *dev)
+{
+    ng_at86rf2xx_reg_write(dev, NG_AT86RF2XX_REG__TRX_STATE, NG_AT86RF2XX_TRX_STATE__FORCE_TRX_OFF);
+    while (ng_at86rf2xx_get_status(dev) != NG_AT86RF2XX_STATE_TRX_OFF);
 }
 
 void ng_at86rf2xx_set_state(ng_at86rf2xx_t *dev, uint8_t state)
 {
-    uint8_t old_state = ng_at86rf2xx_get_state(dev);
+    uint8_t old_state = ng_at86rf2xx_get_status(dev);
 
     if (state == old_state) {
         return;
     }
-    /* make sure there is no ongoing transmission */
+    /* make sure there is no ongoing transmission, or state transition already
+     * in progress */
     while (old_state == NG_AT86RF2XX_STATE_BUSY_RX_AACK ||
-           old_state == NG_AT86RF2XX_STATE_BUSY_TX_ARET) {
-        old_state = ng_at86rf2xx_get_state(dev);
+           old_state == NG_AT86RF2XX_STATE_BUSY_TX_ARET ||
+           old_state == NG_AT86RF2XX_STATE_IN_PROGRESS) {
+        old_state = ng_at86rf2xx_get_status(dev);
+    }
+
+    /* we need to go via PLL_ON if we are moving between RX_AACK_ON <-> TX_ARET_ON */
+    if ((old_state == NG_AT86RF2XX_STATE_RX_AACK_ON &&
+             state == NG_AT86RF2XX_STATE_TX_ARET_ON) ||
+        (old_state == NG_AT86RF2XX_STATE_TX_ARET_ON &&
+             state == NG_AT86RF2XX_STATE_RX_AACK_ON)) {
+        _set_state(dev, NG_AT86RF2XX_STATE_PLL_ON);
     }
     /* check if we need to wake up from sleep mode */
-    if (old_state == NG_AT86RF2XX_STATE_SLEEP) {
+    else if (old_state == NG_AT86RF2XX_STATE_SLEEP) {
         DEBUG("at86rf2xx: waking up from sleep mode\n");
         gpio_clear(dev->sleep_pin);
-        while (ng_at86rf2xx_get_state(dev) != NG_AT86RF2XX_STATE_TRX_OFF);
+        while (ng_at86rf2xx_get_status(dev) != NG_AT86RF2XX_STATE_TRX_OFF);
     }
-    /* go to neutral TRX_OFF state */
-    _set_state(dev, NG_AT86RF2XX_STATE_TRX_OFF);
-    if (state == NG_AT86RF2XX_STATE_RX_AACK_ON ||
-        state == NG_AT86RF2XX_STATE_TX_ARET_ON) {
-        _set_state(dev, state);
-    } else if (state == NG_AT86RF2XX_STATE_SLEEP) {
+
+    if (state == NG_AT86RF2XX_STATE_SLEEP) {
+        /* First go to TRX_OFF */
+        _force_trx_off(dev);
+        /* Go to SLEEP mode from TRX_OFF */
         gpio_set(dev->sleep_pin);
-        while (ng_at86rf2xx_get_state(dev) != NG_AT86RF2XX_STATE_SLEEP);
+    } else {
+        _set_state(dev, state);
     }
+}
+
+void ng_at86rf2xx_reset_state_machine(ng_at86rf2xx_t *dev)
+{
+    uint8_t old_state;
+
+    /* Wake up */
+    gpio_clear(dev->sleep_pin);
+
+    /* Wait for any state transitions to complete before forcing TRX_OFF */
+    do {
+        old_state = ng_at86rf2xx_get_status(dev);
+    } while (old_state == NG_AT86RF2XX_STATE_IN_PROGRESS);
+
+    _force_trx_off(dev);
 }

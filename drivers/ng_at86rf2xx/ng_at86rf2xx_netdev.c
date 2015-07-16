@@ -337,7 +337,7 @@ static int _set_state(ng_at86rf2xx_t *dev, ng_netconf_state_t state)
 
 ng_netconf_state_t _get_state(ng_at86rf2xx_t *dev)
 {
-    switch (ng_at86rf2xx_get_state(dev)) {
+    switch (ng_at86rf2xx_get_status(dev)) {
         case NG_AT86RF2XX_STATE_SLEEP:
             return NETCONF_STATE_SLEEP;
         case NG_AT86RF2XX_STATE_BUSY_RX_AACK:
@@ -691,7 +691,7 @@ static void _isr_event(ng_netdev_t *device, uint32_t event_type)
 
     /* read (consume) device status */
     irq_mask = ng_at86rf2xx_reg_read(dev, NG_AT86RF2XX_REG__IRQ_STATUS);
-    state = ng_at86rf2xx_get_state(dev);
+    state = ng_at86rf2xx_get_status(dev);
 
     if (irq_mask & NG_AT86RF2XX_IRQ_STATUS_MASK__RX_START) {
         dev->event_cb(NETDEV_EVENT_RX_STARTED, NULL);
