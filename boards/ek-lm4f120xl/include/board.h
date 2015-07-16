@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Rakendra Thapa <rakendrathapa@gmail.com
+ * Copyright (C) 2015 Rakendra Thapa <rakendrathapa@gmail.com>
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -12,14 +12,14 @@
  * @brief       Board specific files for the Stellaris Launchpad LM4F120 board
  * @{
  *
- * @file
+ * @file        board.h
  * @brief       Board specific definitions for the Stellaris Launchpad LM4F120 board
  *
  * @author      Rakendra Thapa <rakendrathapa@gmail.com>
  */
 
-#ifndef __BOARD_H
-#define __BOARD_H
+#ifndef BOARD_H
+#define BOARD_H
 
 #include "cpu.h"
 #include "periph/uart.h"
@@ -63,10 +63,16 @@ extern "C" {
 #define LED_RED_OFF         GPIO_PORTF_DATA_R &= ~(LED_RED_PIN)
 #define LED_RED_TOGGLE      /* not available */
 /* @} */
-#define TRACE   printf("TRACE %s:%d: %s\n", __FILE__, __LINE__, __FUNCTION__)
-#define VAL_I(x)    printf(#x ": %d\n",x);
-#define VAL_X(x)    printf(#x ":0x%X\n", (unsigned int)x);
-#define VAL_S(x)    printf(#x ":%s\n", x);
+
+/**
+ * @name Macros defined for quick debugging purposes.
+ * @{
+ */
+#define TRACE               printf("TRACE %s:%d: %s\n", __FILE__, __LINE__, __FUNCTION__)
+#define VAL_I(x)            printf(#x ": %d\n",x);
+#define VAL_X(x)            printf(#x ":0x%X\n", (unsigned int)x);
+#define VAL_S(x)            printf(#x ":%s\n", x);
+/* @} */
 
 /**
  * @brief Initialize board specific hardware, including clock, LEDs and std-IO
@@ -77,5 +83,5 @@ extern void board_init(void);
 }
 #endif
 
-#endif /** __BOARD_H */
+#endif /** BOARD_H */
 /** @} */

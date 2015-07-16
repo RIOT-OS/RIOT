@@ -10,12 +10,10 @@
  * @ingroup     cpu_lm4f120
  * @{
  *
- * @file
+ * @file        adc.c
  * @brief       Low-level ADC driver implementation
  *
  * @author      Rakendra Thapa <rakendrathapa@gmail.com>
- *
- * @}
  */
 
 #include "cpu.h"
@@ -219,3 +217,4 @@ float adc_mapf(adc_t dev, int value, float min, float max)
 }
 
 #endif /* ADC_NUMOF */
+/** @} */

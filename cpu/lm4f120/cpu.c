@@ -10,11 +10,10 @@
  * @ingroup     cpu_lm4f120
  * @{
  *
- * @file
+ * @file        cpu.c
  * @brief       Implementation of the CPU initialization
  *
  * @author      Rakendra Thapa <rakendrathapa@gmail.com>
- * @}
  */
 
 #include "cpu.h"
@@ -31,7 +30,7 @@
  */
 void cpu_init(void)
 {
-    // initializes the Cortex-M core
+    /* initializes the Cortex-M core */
     cortexm_init();
 
     /* initialize the clock system */
@@ -68,3 +67,4 @@ void cpu_clock_init(int clk)
             break;
     }
 }
+/** @} */

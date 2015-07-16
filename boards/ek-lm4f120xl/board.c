@@ -35,11 +35,9 @@ void board_init(void)
  */
 static void leds_init(void)
 {
-    // enable clock for PORTF
+    /* enable clock for PORTF */
     ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
 
-    //configure the pins as general output
+    /*configure the pins as general output */
     ROM_GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3);
-    // Turn Red led on
-    ROM_GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3, 2);
 }

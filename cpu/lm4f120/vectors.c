@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2(void *) (0UL)14-2(void *) (0UL)15 Freie Universität Berlin
+ * Copyright (C) 2015 Rakendra Thapa <rakendrathapa#gmail.com>
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -10,12 +10,10 @@
  * @ingroup     cpu_stm32f4
  * @{
  *
- * @file
+ * @file        vectors.c
  * @brief       Interrupt vector definitions
  *
- * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
- *
- * @}
+ * @author      Rakendra Thapa <rakendrathapa@gmail.com>
  */
 
 #include <stdint.h>
@@ -138,7 +136,7 @@ ISR_VECTORS const void *interrupt_vector[] = {
     (void*) isr_pendsv,             /* pendSV interrupt, in RIOT the actual
                                      * context switching is happening here */
     (void*) isr_systick,            /* SysTick interrupt, not used in RIOT */
-    // Peripherial interrupts start here.
+    /* Peripherial interrupts start here.*/
     (void *) dummy_handler,         // GPIO Port A                      16
     (void *) dummy_handler,         // GPIO Port B                      17
     (void *) dummy_handler,         // GPIO Port C                      18
@@ -233,7 +231,7 @@ ISR_VECTORS const void *interrupt_vector[] = {
     (void *) (0UL),                 // Reserved                         107
     (void *) dummy_handler,         // 16/32 bit timer 5 A              108
     (void *) dummy_handler,         // 16/32 bit timer 5 B              109
-    (void *) isr_wtimer0,       // 32/64 bit timer 0 A              110
+    (void *) isr_wtimer0,           // 32/64 bit timer 0 A              110
     (void *) dummy_handler,         // 32/64 bit timer 0 B              111
     (void *) dummy_handler,         // 32/64 bit timer 1 A              112
     (void *) dummy_handler,         // 32/64 bit timer 1 B              113
@@ -279,3 +277,4 @@ ISR_VECTORS const void *interrupt_vector[] = {
     (void *) (0UL),                 // Reserved                         153
     (void *) (0UL)                  // Reserved                         154
 };
+/** @} */

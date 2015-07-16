@@ -10,12 +10,10 @@
  * @ingroup     cpu_lm4f120
  * @{
  *
- * @file
+ * @file        lpm_arch.c
  * @brief       Implementation of the kernels power management interface
  *
  * @author      Rakendra Thapa <rakendrathapa@gmail.com>
- *
- * @}
  */
 
 #include "cpu.h"
@@ -52,3 +50,4 @@ void lpm_arch_end_awake(void)
 {
     /* TODO */
 }
+/** @} */

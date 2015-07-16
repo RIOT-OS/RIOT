@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Rakendra Thapa <rakendrathapa@gmail.com
+ * Copyright (C) 2015 Rakendra Thapa <rakendrathapa@gmail.com>
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -10,11 +10,10 @@
  * @ingroup     cpu_lm4f120
  * @{
  *
- * @file
+ * @file        uart.c
  * @brief       Implementation of the low-level UART driver for the LM4F120
  *
  * @author      Rakendra Thapa <rakendrathapa@gmail.com>
- * @}
  */
 
 #include <stdint.h>
@@ -26,24 +25,18 @@
 #include "periph_conf.h"
 
 /* guard the file in case no UART is defined */
-#if (UART_0_EN)
+#if UART_0_EN
 
 /**
  * @brief Struct holding the configuration data for a UART device
+ * @{
  */
 typedef struct {
     uart_rx_cb_t rx_cb;         /**< receive callback */
     uart_tx_cb_t tx_cb;         /**< transmit callback */
     void *arg;                  /**< callback argument */
 } uart_conf_t;
-
-/**
- * @brief Unified interrupt handler for all UART devices
- *
- * @param uartnum       the number of the UART that triggered the ISR
- * @param uart          the UART device that triggered the ISR
- */
-//static inline void irq_handler(uart_t uartnum, USART_TypeDef *uart);
+/**@}*/
 
 /**
  * @brief UART device configurations
@@ -70,9 +63,9 @@ static const unsigned long g_ulUARTBase[3] =
     UART2_BASE
 };
 
-// The list of possible interrupts for the console UART.
-//
-//*****************************************************************************
+/**
+ * The list of possible interrupts for the console UART.
+ */
 static const unsigned long g_ulUARTInt[3] =
 {
     INT_UART0,
@@ -80,8 +73,8 @@ static const unsigned long g_ulUARTInt[3] =
     INT_UART2
 };
 
-/**********************************************************************************/
-/* Configuring the UART console
+/**
+ * Configuring the UART console
  */
 int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, uart_tx_cb_t tx_cb, void *arg)
 {
@@ -103,28 +96,25 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, uart_tx_cb_t t
     config[uart].arg = arg;
 
 //  ulBase = g_ulUARTBase[uart];
-
-    // Configure the relevant UART pins for operations as a UART rather than GPIOs.
-    /* enable recieve interrupt */
     switch (uart){
 #if UART_0_EN
         case UART_0:
             NVIC_SetPriority(UART_0_IRQ_CHAN, UART_IRQ_PRIO);
 
             ROM_UARTTxIntModeSet(UART0_BASE, UART_TXINT_MODE_EOT);
-            ROM_UARTFIFOLevelSet(UART0_BASE, UART_FIFO_TX4_8, UART_FIFO_RX4_8); // Set FIFO to 8 Characters
-            ROM_UARTFIFOEnable(UART0_BASE); // Enable FIFOs
+            ROM_UARTFIFOLevelSet(UART0_BASE, UART_FIFO_TX4_8, UART_FIFO_RX4_8);
+            ROM_UARTFIFOEnable(UART0_BASE);
 
-            // Enable the UART interrupt
+            /* Enable the UART interrupt */ 
             NVIC_EnableIRQ(UART_0_IRQ_CHAN);
-            // Enable RX interrupt
+            /* Enable RX interrupt */
             UART0_IM_R = UART_IM_RXIM | UART_IM_RTIM;
             break;
 #endif
 #if UART_1_EN
         case UART_1:
             NVIC_SetPriority(UART_1_IRQ_CHAN, UART_IRQ_PRIO);
-            // Enable the UART interrupt
+            /* Enable the UART interrupt */
             NVIC_EnableIRQ(UART_1_IRQ_CHAN);
             break;
 #endif
@@ -190,21 +180,16 @@ void uart_poweroff(uart_t uart)
     ROM_UARTDisable(UART0_BASE);
 }
 
-//*****************************************************************************
-//
-// The UART interrupt handler.
-//
-//*****************************************************************************
-
+/**
+ * The UART interrupt handler.
+ */
 void isr_usart0(void)
 {
     unsigned long ulStatus;
     char cChar;
     long lChar;
 
-    // Get the interrupt status
     ulStatus = ROM_UARTIntStatus(UART0_BASE, true);
-    // Clear the asserted interrupts
     ROM_UARTIntClear(UART0_BASE, ulStatus);
 
     // Are we interrupted due to TX done
@@ -218,10 +203,8 @@ void isr_usart0(void)
     // Are we interrupted due to a recieved character
     if(ulStatus & (UART_INT_RX | UART_INT_RT))
     {
-        // Get all the available characters from the UART
         while(ROM_UARTCharsAvail(UART0_BASE))
         {
-            // Read a character
             lChar = ROM_UARTCharGetNonBlocking(UART0_BASE);
             cChar = (unsigned char)(lChar & 0xFF);
             config[UART_0].rx_cb(config[UART_0].arg, cChar);
@@ -231,4 +214,5 @@ void isr_usart0(void)
         thread_yield();
     }
 }
-#endif /* (UART_0_EN || UART_1_EN) */
+#endif /*UART_0_EN*/
+/** @} */

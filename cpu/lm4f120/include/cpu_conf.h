@@ -8,19 +8,20 @@
 
 /**
  * @defgroup        cpu_lm4f120
- * @ingroup         cpu
- * @brief           CPU specific implementations for the Stellaris Launchpad LM4F120 board
+ * @ingroup         cpu cpu_lm4f120
  * @{
  *
- * @file
- * @brief           CPU specific hwtimer configuration options
- *12
+ * @file            cpu_conf.h
+ * @brief           CPU specific implementations for LM4F120
+ *
  * @author          Rakendra Thapa <rakendrathapa@gmail.com>
  */
 
-#ifndef __CPU_CONF_H
-#define __CPU_CONF_H
+#ifndef CPU_CONF_H
+#define CPU_CONF_H
 
+#include <stdio.h>
+#include <stdlib.h>
 #include "hw_ints.h"
 #include "hw_memmap.h"
 #include "hw_nvic.h"
@@ -41,8 +42,6 @@
 #include "stellaris_periph/rom.h"
 #include "hwtimer_cpu.h"
 #include "periph/uart.h"
-#include "stdio.h"
-#include "stdlib.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -59,9 +58,11 @@ extern "C" {
 
 /**
  * @brief Length for reading CPU_ID
+ * @{
  */
 #define CPUID_ID_LEN                    (12)
 #define CPUID_ADDR                      NVIC_CPUID
+/** @} */
 
 /**
  * @name CC110X buffer size definitions for the stm32f4
@@ -71,9 +72,11 @@ extern "C" {
 #define TRANSCEIVER_BUFFER_SIZE         (10)
 #define RX_BUF_SIZE                     (10)
 #endif
+/** @} */
 
 /**
  * @name Define the nominal CPU core clock in this board
+ * @{
  */
 #define F_CPU                           1000000
 #define CLK80                           1
@@ -81,13 +84,19 @@ extern "C" {
 #define CLK40                           3
 #define CLK16                           4
 #define CLK1                            5
+/** @} */
 
-
+/**
+ * @name cpu functions
+ * @{
+ */
 extern void setup_fpu(void);
 extern void cpu_clock_init(int);
+/** @} */
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __CPU_CONF_H */
+#endif /* CPU_CONF_H */
+/** @} */

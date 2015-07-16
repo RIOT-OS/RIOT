@@ -1,10 +1,5 @@
-/**************************************************************************//**
- * @file     lm4f120h5qr.h
- * @brief    LM4F120H5QR Core Peripheral Access Layer Header File
- * @note
- *
- ******************************************************************************/
-/* Copyright (c) 2009 - 2014 ARM LIMITED
+/* 
+ * Copyright (c) 2009 - 2014 ARM LIMITED
 
    All rights reserved.
    Redistribution and use in source and binary forms, with or without
@@ -30,20 +25,27 @@
    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
    POSSIBILITY OF SUCH DAMAGE.
    ---------------------------------------------------------------------------*/
+/**************************************************************************
+ * @ingroup  cpu_lm4f120
+ * @{
+ * @file     lm4f120h5qr.h
+ * @brief    LM4F120H5QR Core Peripheral Access Layer Header File
+ * @note
+ *
+ **************************************************************************/
 
-
-#ifndef __LM4F120H5QR_H__
-#define __LM4F120H5QR_H__
+#ifndef LM4F120H5QR_H
+#define LM4F120H5QR_H
 
 #ifdef __cplusplus
  extern "C" {
 #endif
 
-#define __CM4_REV                 0x0001  /*!< Core revision r0p1                            */
+#define __CM4_REV                 0x0001  /*!< Core revision r0p1                              */
 #define __MPU_PRESENT             1       /*!< LM4F120H5QR provides an MPU                     */
 #define __NVIC_PRIO_BITS          3       /*!< LM4F120H5QR uses 4 Bits for the Priority Levels */
-#define __Vendor_SysTickConfig    0       /*!< Set to 1 if different SysTick Config is used  */
-#define __FPU_PRESENT             1       /*!< FPU present                                   */
+#define __Vendor_SysTickConfig    0       /*!< Set to 1 if different SysTick Config is used    */
+#define __FPU_PRESENT             1       /*!< FPU present                                     */
 
 
 /**
@@ -61,7 +63,7 @@ typedef enum
   DebugMonitor_IRQn           = -4,     /*!< 12 Cortex-M4 Debug Monitor Interrupt                              */
   PendSV_IRQn                 = -2,     /*!< 14 Cortex-M4 Pend SV Interrupt                                    */
   SysTick_IRQn                = -1,     /*!< 15 Cortex-M4 System Tick Interrupt                                */
-/******  LM4F specific Interrupt Numbers **********************************************************************/
+/******  LM4F specific Interrupt Numbers ***********************************************************************/
   GPIOPortA_IRQn              = 0,
   GPIOPortB_IRQn              = 1,
   GPIOPortC_IRQn              = 2,
@@ -113,11 +115,11 @@ typedef enum
 } IRQn_Type;
 
 
-#include <stdint.h>               /* standard types definitions              */
+#include <stdint.h>               /* standard types definitions               */
 #include "core_cm4.h"             /* Cortex-M4 processor and core peripherals */
 
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* __LM4F120H5QR_H__*/
+#endif /* LM4F120H5QR_H*/
+/** @} */

@@ -10,11 +10,10 @@
  * @ingroup     cpu_lm4f120
  * @{
  *
- * @file
+ * @file        timer.c
  * @brief       Implementation of the low-level timer driver for the LM4F120
  *
  * @author      Rakendra Thapa <rakendrathapa@gmail.com>
- * @}
  */
 
 #include <stdint.h>
@@ -33,12 +32,14 @@
 
 /**
  * @brief Struct holding the configuration data
+ * @{
  */
 typedef struct {
     void (*cb)(int);            /**< timeout callback */
 } timer_conf_t;
 
 static timer_conf_t config[TIMER_NUMOF];
+/**@}*/
 
 int timer_init(tim_t dev, unsigned int us_per_tick, void (*callback)(int))
 {
@@ -48,7 +49,7 @@ int timer_init(tim_t dev, unsigned int us_per_tick, void (*callback)(int))
         WTIMER0_CTL_R &= ~0x00000001;                       // Disable timer0A during setup
         WTIMER0_CFG_R  = TIMER_CFG_16_BIT;
         WTIMER0_TAMR_R = TIMER_TAMR_TAMR_PERIOD;            // Configure for periodic mode
-        WTIMER0_TAPR_R = TIMER_0_PRESCALER;                             // 1us timer0A
+        WTIMER0_TAPR_R = TIMER_0_PRESCALER;                 // 1us timer0A
         WTIMER0_ICR_R  = 0x00000001;                        // clear timer0A timeout flag
         WTIMER0_IMR_R |= 0x00000001;                        // arm timeout interrupt
         ROM_IntPrioritySet(INT_WTIMER0A, 32);
@@ -84,7 +85,7 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
 int timer_clear(tim_t dev, int channel)
 {
     if (dev == TIMER_0){
-        WTIMER0_ICR_R = TIMER_ICR_TATOCINT;     // clear timer0A timeout flag
+        WTIMER0_ICR_R = TIMER_ICR_TATOCINT;
         return 1;
     }
     return -1;
@@ -135,7 +136,7 @@ void timer_irq_disable(tim_t dev)
 void timer_reset(tim_t dev)
 {
     if (dev == TIMER_0) {
-        // Performs a software reset of a peripheral
+        /* Performs a software reset of a peripheral */
         ROM_SysCtlPeripheralReset(SYSCTL_PERIPH_WTIMER0);
     }
 }
@@ -143,7 +144,7 @@ void timer_reset(tim_t dev)
 #if TIMER_0_EN
 void isr_timer0(void)
 {
-    TIMER0_ICR_R = TIMER_ICR_TATOCINT;  // acknowledge timer0A timeout
+    TIMER0_ICR_R = TIMER_ICR_TATOCINT;  
     config[TIMER_0].cb(0);
 
     if (sched_context_switch_request){
@@ -152,13 +153,14 @@ void isr_timer0(void)
 }
 void isr_wtimer0(void)
 {
-    WTIMER0_ICR_R = TIMER_ICR_TATOCINT; // acknowledge timer0A timeout
+    WTIMER0_ICR_R = TIMER_ICR_TATOCINT;
 
     config[TIMER_0].cb(0);
     if (sched_context_switch_request){
         thread_yield();
     }
 }
-#endif
+#endif /* TIMER_0_EN */
 
 #endif /* TIMER_0_EN */
+/** @} */
