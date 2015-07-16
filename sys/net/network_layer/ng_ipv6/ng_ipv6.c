@@ -450,6 +450,22 @@ static void _send_multicast(kernel_pid_t iface, ng_pktsnip_t *pkt,
 #endif  /* NG_NETIF_NUMOF */
 }
 
+static inline kernel_pid_t _next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_len,
+                                            kernel_pid_t iface, ng_ipv6_addr_t *dst,
+                                            ng_pktsnip_t *pkt)
+{
+#ifdef MODULE_NG_NDP_NODE
+    return ng_ndp_node_next_hop_l2addr(l2addr, l2addr_len, iface, dst, pkt);
+#else
+    (void)l2addr;
+    (void)iface;
+    (void)dst;
+    (void)pkt;
+    *l2addr_len = 0;
+    return KERNEL_PID_UNDEF;
+#endif
+}
+
 static void _send(ng_pktsnip_t *pkt, bool prep_hdr)
 {
     kernel_pid_t iface = KERNEL_PID_UNDEF;
@@ -537,8 +553,7 @@ static void _send(ng_pktsnip_t *pkt, bool prep_hdr)
         uint8_t l2addr_len = NG_IPV6_NC_L2_ADDR_MAX;
         uint8_t l2addr[l2addr_len];
 
-        iface = ng_ndp_next_hop_l2addr(l2addr, &l2addr_len, iface, &hdr->dst,
-                                       pkt);
+        iface = _next_hop_l2addr(l2addr, &l2addr_len, iface, &hdr->dst, pkt);
 
         if (iface == KERNEL_PID_UNDEF) {
             DEBUG("ipv6: error determining next hop's link layer address\n");
