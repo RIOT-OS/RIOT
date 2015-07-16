@@ -314,7 +314,8 @@ static int fib_signal_rp(uint8_t *dst, size_t dst_size, uint32_t dst_flags)
                   msg.content.ptr, (int)i, (int)notify_rp[i]);
 
             /* do only signal a RP if its registered prefix matches */
-            if (universal_address_compare(prefix_rp[i], dst, &dst_size) == 0) {
+            size_t dst_size_in_bits = dst_size<<3;
+            if (universal_address_compare(prefix_rp[i], dst, &dst_size_in_bits) == 1) {
                 /* the receiver, i.e. the RP, MUST copy the content value.
                  * using the provided pointer after replying this message
                  * will lead to errors
