@@ -278,7 +278,13 @@ endif
 ifneq (,$(filter gnrc_ipv6_hdr,$(USEMODULE)))
   USEMODULE += ipv6_hdr
   USEMODULE += gnrc_pktbuf
-endif
+
+ifneq (,$(filter aodvv2,$(USEMODULE)))
+  USEMODULE += ng_sixlowpan_default
+  USEMODULE += vtimer
+  USEMODULE += oonf_common
+  USEMODULE += oonf_rfc5444
+  USEMODULE += fib
 
 ifneq (,$(filter sixlowpan,$(USEMODULE)))
   USEMODULE += ipv6_hdr
