@@ -4,3 +4,4 @@ export CPU_ARCH = cortex-m4f
 USEMODULE += hwtimer_compat
 
 include $(RIOTCPU)/Makefile.include.cortexm_common
+include $(RIOTCPU)/stellaris_common/Makefile
