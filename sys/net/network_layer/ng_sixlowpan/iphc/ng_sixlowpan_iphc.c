@@ -329,10 +329,10 @@ bool ng_sixlowpan_iphc_decode(ng_pktsnip_t *pkt)
             break;
 
         case IPHC_M_DAC_DAM_M_8:
-            /* ffXX::XX: */
+            /* ff02::XX: */
             ng_ipv6_addr_set_unspecified(&ipv6_hdr->dst);
             ipv6_hdr->dst.u8[0] = 0xff;
-            ipv6_hdr->dst.u8[1] = iphc_hdr[payload_offset++];
+            ipv6_hdr->dst.u8[1] = 0x02;
             ipv6_hdr->dst.u8[15] = iphc_hdr[payload_offset++];
             break;
 
@@ -556,7 +556,7 @@ bool ng_sixlowpan_iphc_encode(ng_pktsnip_t *pkt)
             (ipv6_hdr->dst.u32[1].u32 == 0) &&
             (ipv6_hdr->dst.u16[4].u16 == 0)) {
             /* if multicast address is of format ff02::XX */
-            if ((ipv6_hdr->dst.u8[1] == 2) &&
+            if ((ipv6_hdr->dst.u8[1] == 0x02) &&
                 (ipv6_hdr->dst.u32[2].u32 == 0) &&
                 (ipv6_hdr->dst.u16[6].u16 == 0) &&
                 (ipv6_hdr->dst.u8[14] == 0)) {
