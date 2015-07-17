@@ -147,7 +147,7 @@ static void _assert_float(float expected, float actual, bool *okay)
     if (diff > 1e-7) {
         *okay = false;
         char err[64];
-        snprintf(err, sizeof(err), "Expected=%.7e, Actual=%.7e", expected, actual);
+        snprintf(err, sizeof(err), "Expected=%.7e, Actual=%.7e", (double) expected, (double) actual);
         TEST_FAIL(err);
     }
 }

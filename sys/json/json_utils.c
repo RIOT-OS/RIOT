@@ -18,8 +18,6 @@
 
 #include "json.h"
 
-#include <string.h>
-
 #define ADVANCE(RESULT)                                                       \
     do {                                                                      \
         ++str;                                                                \
@@ -132,26 +130,57 @@ json_result_t json_codepoint_to_utf8(uint32_t codepoint, char *output, size_t *l
     return JSON_OKAY;
 }
 
-#ifndef MODULE_ATMEGA_COMMON
 int64_t json_number_to_int(const char *str, size_t len)
 {
-    char s[len + 1];
-    if (len > 0) {
-        memcpy(s, str, len);
-        s[len] = 0;
-        str = s;
+    if (len == 0) {
+        len = strlen(str);
     }
-    return strtoll(str, NULL, 10);
+
+    bool neg = false;
+    if (*str == '-') {
+        neg = true;
+        ++str;
+        --len;
+    }
+
+    uint64_t result = 0;
+    while (len > 0) {
+        result *= 10;
+        result += *str - '0';
+        --len, ++str;
+    }
+
+    return (int64_t) (neg ? ~result + 1 : result);
 }
 
 float json_number_to_float(const char *str, size_t len)
 {
-    char s[len + 1];
-    if (len > 0) {
-        memcpy(s, str, len);
-        s[len] = 0;
-        str = s;
+    if (len == 0) {
+        len = strlen(str);
     }
-    return strtof(str, NULL);
+
+    bool neg = false;
+    if (*str == '-') {
+        neg = true;
+        ++str;
+        --len;
+    }
+
+    float result = 0.0;
+    while ((len > 0) && (*str != '.')) {
+        result *= 10.f;
+        result += *str - '0';
+        --len, ++str;
+    }
+
+    if ((len > 0) && (*str == 0)) {
+        float factor = 1.f;
+        while ((len > 0) && (*str != '.')) {
+            factor /= 10.f;
+            result += (*str - '0') * factor;
+            --len, ++str;
+        }
+    }
+
+    return neg ? -result : result;
 }
-#endif /*ifndef MODULE_ATMEGA_COMMON*/
