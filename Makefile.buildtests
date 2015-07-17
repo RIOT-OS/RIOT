@@ -45,52 +45,57 @@ buildtest:
 	APP_RETRY=0; \
 	rm -rf "$$BINDIRBASE"; \
 	for BOARD in $$($(MAKE) -s info-boards-supported); do \
-	  RIOTNOLINK=$$(echo $(BOARD_INSUFFICIENT_RAM) | grep $${BOARD} 2>&1 >/dev/null && echo 1); \
-	  ${COLOR_ECHO} -n "Building for $${BOARD} "; \
-	  [ -n "$${RIOTNOLINK}" ] && ${COLOR_ECHO} -n "(no linking) "; \
-	  for NTH_TRY in 1 2 3; do \
-	    ${COLOR_ECHO} -n ".. "; \
-	    LOG=$$(env -i \
-	        HOME=$${HOME} \
-	        PATH=$${PATH} \
-	        BOARD=$${BOARD} \
-	        CCACHE=$${CCACHE} \
-	        CCACHE_DIR=$${CCACHE_DIR} \
-	        CCACHE_BASEDIR=$${CCACHE_BASEDIR} \
-	        RIOTBASE=$${RIOTBASE} \
-	        RIOTBOARD=$${RIOTBOARD} \
-	        RIOTCPU=$${RIOTCPU} \
-	        BINDIRBASE=$${BINDIRBASE} \
-	        RIOTNOLINK=$${RIOTNOLINK} \
-	        RIOT_VERSION=$${RIOT_VERSION} \
-	        $(MAKE) -j$(NPROC) 2>&1) ; \
-	    if [ "$${?}" = "0" ]; then \
-	      ${COLOR_ECHO} "${COLOR_GREEN}success${COLOR_RESET}"; \
-	    elif [ -n "$${RIOT_DO_RETRY}" ] && [ "$${APP_RETRY}" -lt "3" ] && [ $${NTH_TRY} != 3 ]; then \
-	      ${COLOR_ECHO} -n "${COLOR_PURPLE}retrying${COLOR_RESET} "; \
-	      continue; \
-	    else \
-	      ${COLOR_ECHO} "${COLOR_RED}failed${COLOR_RESET}"; \
-	      echo "$${LOG}" | grep -v -E '^make(\[[[:digit:]]])?:'; \
-	      APP_RETRY=`expr $${APP_RETRY} + 1`; \
-	      BUILDTESTOK=false; \
-	    fi; \
-	    break; \
-	  done; \
-	  env -i \
-	    HOME=$${HOME} \
-	    PATH=$${PATH} \
-	    BOARD=$${BOARD} \
-	    CCACHE=$${CCACHE} \
-	    CCACHE_DIR=$${CCACHE_DIR} \
-	    CCACHE_BASEDIR=$${CCACHE_BASEDIR} \
-	    RIOTBASE=$${RIOTBASE} \
-	    RIOTBOARD=$${RIOTBOARD} \
-	    RIOTCPU=$${RIOTCPU} \
-	    BINDIRBASE=$${BINDIRBASE} \
-	    RIOTNOLINK=$${RIOTNOLINK} \
-	    RIOT_VERSION=$${RIOT_VERSION} \
-	    $(MAKE) clean-intermediates 2>&1 >/dev/null || true; \
+		RIOTNOLINK=$$(echo $(BOARD_INSUFFICIENT_RAM) | grep $${BOARD} 2>&1 >/dev/null && echo 1); \
+		${COLOR_ECHO} -n "Building for $${BOARD} "; \
+		[ -n "$${RIOTNOLINK}" ] && ${COLOR_ECHO} -n "(no linking) "; \
+		for NTH_TRY in 1 2 3; do \
+			${COLOR_ECHO} -n ".. "; \
+			LOG=$$(env -i \
+					HOME=$${HOME} \
+					PATH=$${PATH} \
+					BOARD=$${BOARD} \
+					CCACHE=$${CCACHE} \
+					CCACHE_DIR=$${CCACHE_DIR} \
+					CCACHE_BASEDIR=$${CCACHE_BASEDIR} \
+					RIOTBASE=$${RIOTBASE} \
+					RIOTBOARD=$${RIOTBOARD} \
+					RIOTCPU=$${RIOTCPU} \
+					BINDIRBASE=$${BINDIRBASE} \
+					RIOTNOLINK=$${RIOTNOLINK} \
+					RIOT_VERSION=$${RIOT_VERSION} \
+					$(MAKE) -j$(NPROC) 2>&1) ; \
+			if [ "$${?}" = "0" ]; then \
+				${COLOR_ECHO} "${COLOR_GREEN}success${COLOR_RESET}"; \
+				if [ -n "$${BUILDTEST_VERBOSE}" ]; then \
+					echo "$${LOG}" | tail -n +2 | head -n -2 | grep -v -E '^Building application|^\"make|^patching' | awk 'NF'; \
+				fi; \
+			elif [ -n "$${RIOT_DO_RETRY}" ] && [ "$${APP_RETRY}" -lt "3" ] && [ $${NTH_TRY} != 3 ]; then \
+				${COLOR_ECHO} -n "${COLOR_PURPLE}retrying${COLOR_RESET} "; \
+				continue; \
+			else \
+				${COLOR_ECHO} "${COLOR_RED}failed${COLOR_RESET}"; \
+				if [ -n "$${BUILDTEST_VERBOSE}" ]; then \
+					echo "$${LOG}" | grep -v -E '^\"make'; \
+				fi; \
+				APP_RETRY=`expr $${APP_RETRY} + 1`; \
+				BUILDTESTOK=false; \
+			fi; \
+			break; \
+		done; \
+		env -i \
+			HOME=$${HOME} \
+			PATH=$${PATH} \
+			BOARD=$${BOARD} \
+			CCACHE=$${CCACHE} \
+			CCACHE_DIR=$${CCACHE_DIR} \
+			CCACHE_BASEDIR=$${CCACHE_BASEDIR} \
+			RIOTBASE=$${RIOTBASE} \
+			RIOTBOARD=$${RIOTBOARD} \
+			RIOTCPU=$${RIOTCPU} \
+			BINDIRBASE=$${BINDIRBASE} \
+			RIOTNOLINK=$${RIOTNOLINK} \
+			RIOT_VERSION=$${RIOT_VERSION} \
+			$(MAKE) clean-intermediates 2>&1 >/dev/null || true; \
 	done; \
 	$${BUILDTESTOK}
 endif # BUILD_IN_DOCKER
