@@ -5,8 +5,8 @@
  *
  */
 
-#ifndef __ARM_COMMON_H
-#define __ARM_COMMON_H
+#ifndef VIC_H_
+#define VIC_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -30,16 +30,16 @@ extern "C" {
 /**
  * @name    IRQ Priority Mapping
  */
-//@{
+/** @{ */
 #define HIGHEST_PRIORITY    0x01
-#define IRQP_RTIMER         1   // FIQ_PRIORITY // TODO: investigate problems with rtimer and FIQ
+#define IRQP_RTIMER         1   /* FIQ_PRIORITY // TODO: investigate problems with rtimer and FIQ */
 #define IRQP_TIMER1         1
 #define IRQP_WATCHDOG       1
 #define IRQP_CLOCK          3
 #define IRQP_GPIO           4
 #define IRQP_RTC            8
 #define LOWEST_PRIORITY     0x0F
-// @}
+/** @} */
 
 
 #define WDT_INT         0
@@ -89,4 +89,4 @@ bool cpu_install_irq(int IntNumber, void *HandlerAddr, int Priority);
 #endif
 
 /** @} */
-#endif /*ARMVIC_H_*/
+#endif /* VIC_H_*/

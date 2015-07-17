@@ -24,7 +24,6 @@
 #include "VIC.h"
 #include "cpu.h"
 
-#define PCRTC         BIT9
 #define CL_CPU_DIV    4
 
 /*---------------------------------------------------------------------------*/

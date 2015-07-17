@@ -26,8 +26,6 @@
 /* guard file in case no PWM device is defined */
 #if PWM_NUMOF
 
-#define PCPWM1      BIT6
-
 /**
  * @note The PWM is always initialized with left-aligned mode.
  *

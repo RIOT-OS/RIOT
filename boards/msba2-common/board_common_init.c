@@ -28,10 +28,9 @@
 #include "cpu.h"
 #include "config.h"
 
-#define PCRTC           BIT9
 #define CL_CPU_DIV      4
 
-#define WD_INTERVAL     10      ///< number of seconds before WD triggers
+#define WD_INTERVAL     10      /**< number of seconds before WD triggers */
 
 /*---------------------------------------------------------------------------*/
 /**
