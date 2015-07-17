@@ -499,7 +499,8 @@ bool ng_sixlowpan_iphc_encode(ng_pktsnip_t *pkt)
         }
 
         if ((src_ctx != NULL) || ng_ipv6_addr_is_link_local(&(ipv6_hdr->src))) {
-            eui64_t iid = { 0 };
+            eui64_t iid;
+            iid.uint64.u64 = 0;
 
             if ((netif_hdr->src_l2addr_len == 2) ||
                 (netif_hdr->src_l2addr_len == 4) ||
