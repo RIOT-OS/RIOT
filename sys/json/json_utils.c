@@ -18,6 +18,8 @@
 
 #include "json.h"
 
+#include <string.h>
+
 #define ADVANCE(RESULT)                                                       \
     do {                                                                      \
         ++str;                                                                \
