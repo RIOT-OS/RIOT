@@ -1,0 +1,31 @@
+include $(RIOTBOARD)/$(BOARD)/Makefile.dep
+## the cpu to build for
+export CPU = msp430fxyz
+export MCU = msp430f5437
+
+# toolchain config
+export PREFIX = msp430-
+export CC = $(PREFIX)gcc
+export AR = $(PREFIX)ar
+export CFLAGS += -Wstrict-prototypes -gdwarf-2 -Os -Wall -mmcu=$(MCU)
+export CFLAGS += -mmemory-model=medium -ffunction-sections -fdata-sections -mcode-region=any -mdata-region=any
+
+export ASFLAGS += -mmcu=$(MCU) --defsym $(MCU)=1 --gdwarf-2
+export AS = $(PREFIX)as
+export LINK = $(PREFIX)gcc
+export SIZE = $(PREFIX)size
+export OBJCOPY = $(PREFIX)objcopy
+export LINKFLAGS += -mmcu=$(MCU) -lgcc -mmemory-model=medium -mcode-region=any -mdata-region=any $(BINDIR)msp430_common/startup.o
+export TERMPROG = $(RIOTBASE)/dist/tools/pyterm/pyterm
+export FLASHER = msp430flasher
+export FFLAGS = -n msp430x5437 -e ERASE_MAIN -w $(HEXFILE) -v -z [VCC]
+
+export INCLUDES += -I$(RIOTCPU)/msp430-common/include -I$(RIOTBOARD)/$(BOARD)/include -I$(RIOTBASE)/drivers/cc2520/include -I$(RIOTBASE)/sys/net/include
+export OFLAGS = -O ihex
+
+ifneq (,$(filter defaulttransceiver,$(USEMODULE)))
+	USEMODULE += cc2520
+	USEMODULE += transceiver
+endif
+
+export UNDEF += $(BINDIR)msp430_common/startup.o

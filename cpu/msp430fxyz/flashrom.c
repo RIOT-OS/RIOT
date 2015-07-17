@@ -75,29 +75,33 @@ static uint8_t prepare(void)
     /* Disable all interrupts. */
 
     /* Clear interrupt flag1. */
+    #ifndef __MSP430F5437__
     IFG1 = 0;
-
     /* DCO(SMCLK) is 2,4576MHz, /6 = 409600 Hz
      select SMCLK for flash timing, divider 4+1 */
     FCTL2 = FWKEY | FSSEL_3 | FN2 | FN0;
-
+    #endif
     /* disable all interrupts to protect CPU
      during programming from system crash */
     istate = disableIRQ();
 
     /* disable all NMI-Interrupt sources */
+    #ifndef __MSP430F5437__
     ie1 = IE1;
     ie2 = IE2;
     IE1 = 0x00;
     IE2 = 0x00;
+    #endif
     return istate;
 }
 /*---------------------------------------------------------------------------*/
 void finish(uint8_t istate)
 {
     /* Enable interrupts. */
+    #ifndef __MSP430F5437__
     IE1 = ie1;
     IE2 = ie2;
+    #endif
     restoreIRQ(istate);
 }
 
