@@ -34,7 +34,6 @@ USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += ps
 USEMODULE += vtimer
-USEMODULE += defaulttransceiver
 USEMODULE += config
 
 FEATURES_OPTIONAL += config
