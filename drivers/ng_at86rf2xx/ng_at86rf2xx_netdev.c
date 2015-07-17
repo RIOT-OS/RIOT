@@ -712,8 +712,8 @@ static void _isr_event(ng_netdev_t *device, uint32_t event_type)
             if (dev->event_cb && (dev->options & NG_AT86RF2XX_OPT_TELL_TX_END)) {
                 dev->event_cb(NETDEV_EVENT_TX_COMPLETE, NULL);
             }
-            DEBUG("[ng_at86rf2xx] EVT - TX_END\n");
             ng_at86rf2xx_set_state(dev, dev->idle_state);
+            DEBUG("[ng_at86rf2xx] EVT - TX_END\n");
         }
     }
 }
