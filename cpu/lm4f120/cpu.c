@@ -34,7 +34,7 @@ void cpu_init(void)
     cortexm_init();
 
     /* initialize the clock system */
-    cpu_clock_init(CLK40);
+    cpu_clock_init(CLOCK_SOURCE);
 }
 
 void setup_fpu(void)
