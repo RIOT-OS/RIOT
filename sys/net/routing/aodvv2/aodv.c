@@ -173,7 +173,7 @@ void *fib_signal_handler_thread(void *arg)
                 };
 
                 AODV_DEBUG("\tstarting route discovery towards %s... \n",
-                      ng_ipv6_addr_to_str(addr_str, &dest, IPV6_MAX_ADDR_STR_LEN));
+                      ng_ipv6_addr_to_str(addr_str, &dest, NG_IPV6_ADDR_MAX_STR_LEN));
                 aodv_send_rreq(&rreq_data);
             }
             else {
@@ -277,12 +277,12 @@ static void _init_addresses(void)
     /* init multicast address: set to to a link-local all nodes multicast address */
     ng_ipv6_addr_set_all_nodes_multicast(&_v6_addr_mcast, NG_IPV6_ADDR_MCAST_SCP_LINK_LOCAL);
     AODV_DEBUG("my multicast address is: %s\n",
-        ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, &_v6_addr_mcast));
+        ng_ipv6_addr_to_str(addr_str, &_v6_addr_mcast, NG_IPV6_ADDR_MAX_STR_LEN));
 
     /* get best IP for sending */
     _v6_addr_local = ng_ipv6_netif_find_best_src_addr(aodvv2_if_id,&_v6_addr_mcast);
     AODV_DEBUG("my src address is:       %s\n",
-        ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, _v6_addr_local));
+        ng_ipv6_addr_to_str(addr_str, _v6_addr_local, NG_IPV6_ADDR_MAX_STR_LEN));
 
     /* store src & multicast address as netaddr as well for easy interaction
      * with oonf based stuff */
