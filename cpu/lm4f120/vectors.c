@@ -33,86 +33,71 @@ WEAK_DEFAULT void isr_svc(void);
 WEAK_DEFAULT void isr_pendsv(void);
 WEAK_DEFAULT void isr_systick(void);
 /* LM4F120 specific interrupt vectors */
-WEAK_DEFAULT void isr_usart0(void);         // UART 0
-WEAK_DEFAULT void isr_usart1(void);         // UART 1
-WEAK_DEFAULT void isr_timer0(void);         // 16 bit timer 0 A
-WEAK_DEFAULT void isr_timer1(void);         // 16 bit timer 1 A
-WEAK_DEFAULT void isr_wtimer0(void);        // 32 bit timer 0 A
-WEAK_DEFAULT void isr_wwdg(void);
-WEAK_DEFAULT void isr_pvd(void);
-WEAK_DEFAULT void isr_tamp_stamp(void);
-WEAK_DEFAULT void isr_rtc_wkup(void);
-WEAK_DEFAULT void isr_flash(void);
-WEAK_DEFAULT void isr_rcc(void);
-WEAK_DEFAULT void isr_exti(void);
-WEAK_DEFAULT void isr_dma1_stream0(void);
-WEAK_DEFAULT void isr_dma1_stream1(void);
-WEAK_DEFAULT void isr_dma1_stream2(void);
-WEAK_DEFAULT void isr_dma1_stream3(void);
-WEAK_DEFAULT void isr_dma1_stream4(void);
-WEAK_DEFAULT void isr_dma1_stream5(void);
-WEAK_DEFAULT void isr_dma1_stream6(void);
-WEAK_DEFAULT void isr_adc(void);
-WEAK_DEFAULT void isr_can1_tx(void);
-WEAK_DEFAULT void isr_can1_rx0(void);
-WEAK_DEFAULT void isr_can1_rx1(void);
-WEAK_DEFAULT void isr_can1_sce(void);
-WEAK_DEFAULT void isr_tim1_brk_tim9(void);
-WEAK_DEFAULT void isr_tim1_up_tim10(void);
-WEAK_DEFAULT void isr_tim1_trg_com_tim11(void);
-WEAK_DEFAULT void isr_tim1_cc(void);
-WEAK_DEFAULT void isr_tim2(void);
-WEAK_DEFAULT void isr_tim3(void);
-WEAK_DEFAULT void isr_tim4(void);
-WEAK_DEFAULT void isr_i2c1_ev(void);
-WEAK_DEFAULT void isr_i2c1_er(void);
-WEAK_DEFAULT void isr_i2c2_ev(void);
-WEAK_DEFAULT void isr_i2c2_er(void);
-WEAK_DEFAULT void isr_spi1(void);
-WEAK_DEFAULT void isr_spi2(void);
-WEAK_DEFAULT void isr_usart2(void);
-WEAK_DEFAULT void isr_usart3(void);
-WEAK_DEFAULT void isr_rtc_alarm(void);
-WEAK_DEFAULT void isr_otg_fs_wkup(void);
-WEAK_DEFAULT void isr_tim8_brk_tim12(void);
-WEAK_DEFAULT void isr_tim8_up_tim13(void);
-WEAK_DEFAULT void isr_tim8_trg_com_tim14(void);
-WEAK_DEFAULT void isr_tim8_cc(void);
-WEAK_DEFAULT void isr_dma1_stream7(void);
-WEAK_DEFAULT void isr_fsmc(void);
-WEAK_DEFAULT void isr_sdio(void);
-WEAK_DEFAULT void isr_tim5(void);
-WEAK_DEFAULT void isr_spi3(void);
+WEAK_DEFAULT void isr_gpio_porta(void);
+WEAK_DEFAULT void isr_gpio_portb(void);
+WEAK_DEFAULT void isr_gpio_portc(void);
+WEAK_DEFAULT void isr_gpio_portd(void);
+WEAK_DEFAULT void isr_gpio_porte(void);
+WEAK_DEFAULT void isr_uart0(void);
+WEAK_DEFAULT void isr_uart1(void);
+WEAK_DEFAULT void isr_ssi0(void);
+WEAK_DEFAULT void isr_i2c0(void);
+WEAK_DEFAULT void isr_adc0_seq0(void);
+WEAK_DEFAULT void isr_adc0_seq1(void);
+WEAK_DEFAULT void isr_adc0_seq2(void);
+WEAK_DEFAULT void isr_adc0_seq3(void);
+WEAK_DEFAULT void isr_wdt(void);
+WEAK_DEFAULT void isr_timer0a(void);
+WEAK_DEFAULT void isr_timer0b(void);
+WEAK_DEFAULT void isr_timer1a(void);
+WEAK_DEFAULT void isr_timer1b(void);
+WEAK_DEFAULT void isr_timer2a(void);
+WEAK_DEFAULT void isr_timer2b(void);
+WEAK_DEFAULT void isr_comp0(void);
+WEAK_DEFAULT void isr_comp1(void);
+WEAK_DEFAULT void isr_sysctl(void);
+WEAK_DEFAULT void isr_flashctl(void);
+WEAK_DEFAULT void isr_gpio_portf(void);
+WEAK_DEFAULT void isr_uart2(void);
+WEAK_DEFAULT void isr_ssi1(void);
+WEAK_DEFAULT void isr_timer3a(void);
+WEAK_DEFAULT void isr_timer3b(void);
+WEAK_DEFAULT void isr_i2c1(void);
+WEAK_DEFAULT void isr_can0(void);
+WEAK_DEFAULT void isr_hibernate(void);
+WEAK_DEFAULT void isr_usb(void);
+WEAK_DEFAULT void isr_udma_sw(void);
+WEAK_DEFAULT void isr_udma_error(void);
+WEAK_DEFAULT void isr_adc1_seq0(void);
+WEAK_DEFAULT void isr_adc1_seq1(void);
+WEAK_DEFAULT void isr_adc1_seq2(void);
+WEAK_DEFAULT void isr_adc1_seq3(void);
+WEAK_DEFAULT void isr_ssi2(void);
+WEAK_DEFAULT void isr_ssi3(void);
+WEAK_DEFAULT void isr_uart3(void);
 WEAK_DEFAULT void isr_uart4(void);
 WEAK_DEFAULT void isr_uart5(void);
-WEAK_DEFAULT void isr_tim6_dac(void);
-WEAK_DEFAULT void isr_tim7(void);
-WEAK_DEFAULT void isr_dma2_stream0(void);
-WEAK_DEFAULT void isr_dma2_stream1(void);
-WEAK_DEFAULT void isr_dma2_stream2(void);
-WEAK_DEFAULT void isr_dma2_stream3(void);
-WEAK_DEFAULT void isr_dma2_stream4(void);
-WEAK_DEFAULT void isr_eth(void);
-WEAK_DEFAULT void isr_eth_wkup(void);
-WEAK_DEFAULT void isr_can2_tx(void);
-WEAK_DEFAULT void isr_can2_rx0(void);
-WEAK_DEFAULT void isr_can2_rx1(void);
-WEAK_DEFAULT void isr_can2_sce(void);
-WEAK_DEFAULT void isr_otg_fs(void);
-WEAK_DEFAULT void isr_dma2_stream5(void);
-WEAK_DEFAULT void isr_dma2_stream6(void);
-WEAK_DEFAULT void isr_dma2_stream7(void);
-WEAK_DEFAULT void isr_usart6(void);
-WEAK_DEFAULT void isr_i2c3_ev(void);
-WEAK_DEFAULT void isr_i2c3_er(void);
-WEAK_DEFAULT void isr_otg_hs_ep1_out(void);
-WEAK_DEFAULT void isr_otg_hs_ep1_in(void);
-WEAK_DEFAULT void isr_otg_hs_wkup(void);
-WEAK_DEFAULT void isr_otg_hs(void);
-WEAK_DEFAULT void isr_dcmi(void);
-WEAK_DEFAULT void isr_cryp(void);
-WEAK_DEFAULT void isr_hash_rng(void);
-WEAK_DEFAULT void isr_fpu(void);
+WEAK_DEFAULT void isr_uart6(void);
+WEAK_DEFAULT void isr_uart7(void);
+WEAK_DEFAULT void isr_i2c2(void);
+WEAK_DEFAULT void isr_i2c4(void);
+WEAK_DEFAULT void isr_timer4a(void);
+WEAK_DEFAULT void isr_timer4b(void);
+WEAK_DEFAULT void isr_timer5a(void);
+WEAK_DEFAULT void isr_timer5b(void);
+WEAK_DEFAULT void isr_wtimer0a(void);
+WEAK_DEFAULT void isr_wtimer0b(void);
+WEAK_DEFAULT void isr_wtimer1a(void);
+WEAK_DEFAULT void isr_wtimer1b(void);
+WEAK_DEFAULT void isr_wtimer2a(void);
+WEAK_DEFAULT void isr_wtimer2b(void);
+WEAK_DEFAULT void isr_wtimer3a(void);
+WEAK_DEFAULT void isr_wtimer3b(void);
+WEAK_DEFAULT void isr_wtimer4a(void);
+WEAK_DEFAULT void isr_wtimer4b(void);
+WEAK_DEFAULT void isr_wtimer5a(void);
+WEAK_DEFAULT void isr_wtimer5b(void);
+WEAK_DEFAULT void isr_sysex(void);
 
 /* interrupt vector table */
 ISR_VECTORS const void *interrupt_vector[] = {
@@ -137,78 +122,78 @@ ISR_VECTORS const void *interrupt_vector[] = {
                                      * context switching is happening here */
     (void*) isr_systick,            /* SysTick interrupt, not used in RIOT */
     /* Peripherial interrupts start here.*/
-    (void *) dummy_handler,         // GPIO Port A                      16
-    (void *) dummy_handler,         // GPIO Port B                      17
-    (void *) dummy_handler,         // GPIO Port C                      18
-    (void *) dummy_handler,         // GPIO Port D                      19
-    (void *) dummy_handler,         // GPIO Port E                      20
-    (void *) isr_usart0,            // UART 0                           21
-    (void *) isr_usart1,            // UART 1                           22
-    (void *) dummy_handler,         // SSI 0                            23
-    (void *) dummy_handler,         // I2C 0                            24
+    (void *) isr_gpio_porta,        // GPIO Port A                      16
+    (void *) isr_gpio_portb,        // GPIO Port B                      17
+    (void *) isr_gpio_portc,        // GPIO Port C                      18
+    (void *) isr_gpio_portd,        // GPIO Port D                      19
+    (void *) isr_gpio_porte,        // GPIO Port E                      20
+    (void *) isr_uart0,             // UART 0                           21
+    (void *) isr_uart1,             // UART 1                           22
+    (void *) isr_ssi0,              // SSI 0                            23
+    (void *) isr_i2c0,              // I2C 0                            24
     (void *) (0UL),                 // Reserved                         25
     (void *) (0UL),                 // Reserved                         26
     (void *) (0UL),                 // Reserved                         27
     (void *) (0UL),                 // Reserved                         28
     (void *) (0UL),                 // Reserved                         29
-    (void *) dummy_handler,         // ADC 0 Seq 0                      30
-    (void *) dummy_handler,         // ADC 0 Seq 1                      31
-    (void *) dummy_handler,         // ADC 0 Seq 2                      32
-    (void *) dummy_handler,         // ADC 0 Seq 3                      33
-    (void *) dummy_handler,         // WDT 0 and 1                      34
-    (void *) isr_timer0,            // 16/32 bit timer 0 A              35
-    (void *) dummy_handler,         // 16/32 bit timer 0 B              36
-    (void *) isr_timer1,            // 16/32 bit timer 1 A              37
-    (void *) dummy_handler,         // 16/32 bit timer 1 B              38
-    (void *) dummy_handler,         // 16/32 bit timer 2 A              39
-    (void *) dummy_handler,         // 16/32 bit timer 2 B              40
-    (void *) dummy_handler,         // Analog comparator 0              41
-    (void *) dummy_handler,         // Analog comparator 1              42
+    (void *) isr_adc0_seq0,         // ADC 0 Seq 0                      30
+    (void *) isr_adc0_seq1,         // ADC 0 Seq 1                      31
+    (void *) isr_adc0_seq2,         // ADC 0 Seq 2                      32
+    (void *) isr_adc0_seq3,         // ADC 0 Seq 3                      33
+    (void *) isr_wdt,               // WDT 0 and 1                      34
+    (void *) isr_timer0a,           // 16/32 bit timer 0 A              35
+    (void *) isr_timer0b,           // 16/32 bit timer 0 B              36
+    (void *) isr_timer1a,           // 16/32 bit timer 1 A              37
+    (void *) isr_timer1b,           // 16/32 bit timer 1 B              38
+    (void *) isr_timer2a,           // 16/32 bit timer 2 A              39
+    (void *) isr_timer2b,           // 16/32 bit timer 2 B              40
+    (void *) isr_comp0,             // Analog comparator 0              41
+    (void *) isr_comp1,             // Analog comparator 1              42
     (void *) (0UL),                 // Reserved                         43
-    (void *) dummy_handler,         // System control                   44
-    (void *) dummy_handler,         // Flash + EEPROM control           45
-    (void *) dummy_handler,         // GPIO Port F                      46
+    (void *) isr_sysctl,            // System control                   44
+    (void *) isr_flashctl,          // Flash + EEPROM control           45
+    (void *) isr_gpio_portf,        // GPIO Port F                      46
     (void *) (0UL),                 // Reserved                         47
     (void *) (0UL),                 // Reserved                         48
-    (void *) dummy_handler,         // UART 2                           49
-    (void *) dummy_handler,         // SSI 1                            50
-    (void *) dummy_handler,         // 16/32 bit timer 3 A              51
-    (void *) dummy_handler,         // 16/32 bit timer 3 B              52
-    (void *) dummy_handler,         // I2C 1                            53
+    (void *) isr_uart2,             // UART 2                           49
+    (void *) isr_ssi2,              // SSI 1                            50
+    (void *) isr_timer3a,           // 16/32 bit timer 3 A              51
+    (void *) isr_timer3b,           // 16/32 bit timer 3 B              52
+    (void *) isr_i2c1,              // I2C 1                            53
     (void *) (0UL),                 // Reserved                         54
-    (void *) dummy_handler,         // CAN 0                            55
+    (void *) isr_can0,              // CAN 0                            55
     (void *) (0UL),                 // Reserved                         56
     (void *) (0UL),                 // Reserved                         57
     (void *) (0UL),                 // Reserved                         58
-    (void *) dummy_handler,         // Hibernation module               59
-    (void *) dummy_handler,         // USB                              60
+    (void *) isr_hibernate,         // Hibernation module               59
+    (void *) isr_usb,               // USB                              60
     (void *) (0UL),                 // Reserved                         61
-    (void *) dummy_handler,         // UDMA SW                          62
-    (void *) dummy_handler,         // UDMA Error                       63
-    (void *) dummy_handler,         // ADC 1 Seq 0)                     64
-    (void *) dummy_handler,         // ADC 1 Seq 1                      65
-    (void *) dummy_handler,         // ADC 1 Seq 2                      66
-    (void *) dummy_handler,         // ADC 1 Seq 3                      67
+    (void *) isr_udma_sw,           // UDMA SW                          62
+    (void *) isr_udma_error,        // UDMA Error                       63
+    (void *) isr_adc1_seq0,         // ADC 1 Seq 0                      64
+    (void *) isr_adc1_seq1,         // ADC 1 Seq 1                      65
+    (void *) isr_adc1_seq2,         // ADC 1 Seq 2                      66
+    (void *) isr_adc1_seq3,         // ADC 1 Seq 3                      67
     (void *) (0UL),                 // Reserved                         68
     (void *) (0UL),                 // Reserved                         69
     (void *) (0UL),                 // Reserved                         70
     (void *) (0UL),                 // Reserved                         71
     (void *) (0UL),                 // Reserved                         72
-    (void *) dummy_handler,         // SSI 2                            73
-    (void *) dummy_handler,         // SSI 2                            74
-    (void *) dummy_handler,         // UART 3                           75
-    (void *) dummy_handler,         // UART 4                           76
-    (void *) dummy_handler,         // UART 5                           77
-    (void *) dummy_handler,         // UART 6                           78
-    (void *) dummy_handler,         // UART 7                           79
+    (void *) isr_ssi2,              // SSI 2                            73
+    (void *) isr_ssi3,              // SSI 3                            74
+    (void *) isr_uart3,             // UART 3                           75
+    (void *) isr_uart4,             // UART 4                           76
+    (void *) isr_uart5,             // UART 5                           77
+    (void *) isr_uart6,             // UART 6                           78
+    (void *) isr_uart7,             // UART 7                           79
     (void *) (0UL),                 // Reserved                         80
     (void *) (0UL),                 // Reserved                         81
     (void *) (0UL),                 // Reserved                         82
     (void *) (0UL),                 // Reserved                         83
-    (void *) dummy_handler,         // I2C 2                            84
-    (void *) dummy_handler,         // I2C 4                            85
-    (void *) dummy_handler,         // 16/32 bit timer 4 A              86
-    (void *) dummy_handler,         // 16/32 bit timer 4 B              87
+    (void *) isr_i2c2,              // I2C 2                            84
+    (void *) isr_i2c4,              // I2C 4                            85
+    (void *) isr_timer4a,           // 16/32 bit timer 4 A              86
+    (void *) isr_timer4b,           // 16/32 bit timer 4 B              87
     (void *) (0UL),                 // Reserved                         88
     (void *) (0UL),                 // Reserved                         89
     (void *) (0UL),                 // Reserved                         90
@@ -229,21 +214,21 @@ ISR_VECTORS const void *interrupt_vector[] = {
     (void *) (0UL),                 // Reserved                         105
     (void *) (0UL),                 // Reserved                         106
     (void *) (0UL),                 // Reserved                         107
-    (void *) dummy_handler,         // 16/32 bit timer 5 A              108
-    (void *) dummy_handler,         // 16/32 bit timer 5 B              109
-    (void *) isr_wtimer0,           // 32/64 bit timer 0 A              110
-    (void *) dummy_handler,         // 32/64 bit timer 0 B              111
-    (void *) dummy_handler,         // 32/64 bit timer 1 A              112
-    (void *) dummy_handler,         // 32/64 bit timer 1 B              113
-    (void *) dummy_handler,         // 32/64 bit timer 2 A              114
-    (void *) dummy_handler,         // 32/64 bit timer 2 B              115
-    (void *) dummy_handler,         // 32/64 bit timer 3 A              116
-    (void *) dummy_handler,         // 32/64 bit timer 3 B              117
-    (void *) dummy_handler,         // 32/64 bit timer 4 A              118
-    (void *) dummy_handler,         // 32/64 bit timer 4 B              119
-    (void *) dummy_handler,         // 32/64 bit timer 5 A              120
-    (void *) dummy_handler,         // 32/64 bit timer 5 B              121
-    (void *) dummy_handler,         // System Exception                 122
+    (void *) isr_timer5a,           // 16/32 bit timer 5 A              108
+    (void *) isr_timer5b,           // 16/32 bit timer 5 B              109
+    (void *) isr_wtimer0a,          // 32/64 bit timer 0 A              110
+    (void *) isr_wtimer0b,          // 32/64 bit timer 0 B              111
+    (void *) isr_wtimer1a,          // 32/64 bit timer 1 A              112
+    (void *) isr_wtimer1b,          // 32/64 bit timer 1 B              113
+    (void *) isr_wtimer2a,          // 32/64 bit timer 2 A              114
+    (void *) isr_wtimer2b,          // 32/64 bit timer 2 B              115
+    (void *) isr_wtimer3a,          // 32/64 bit timer 3 A              116
+    (void *) isr_wtimer3b,          // 32/64 bit timer 3 B              117
+    (void *) isr_wtimer4a,          // 32/64 bit timer 4 A              118
+    (void *) isr_wtimer4b,          // 32/64 bit timer 4 B              119
+    (void *) isr_wtimer5a,          // 32/64 bit timer 5 A              120
+    (void *) isr_wtimer5b,          // 32/64 bit timer 5 B              121
+    (void *) isr_sysex,             // System Exception                 122
     (void *) (0UL),                 // Reserved                         123
     (void *) (0UL),                 // Reserved                         124
     (void *) (0UL),                 // Reserved                         125

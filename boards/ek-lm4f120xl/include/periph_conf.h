@@ -49,14 +49,14 @@ extern "C" {
 #define TIMER_0_CHANNELS    1
 #define TIMER_0_PRESCALER   (39U)
 #define TIMER_0_MAX_VALUE   (0xffffffff)
-#define TIMER_0_ISR         isr_wtimer0
+#define TIMER_0_ISR         isr_wtimer0a
 #define TIMER_0_IRQ_CHAN    Timer0A_IRQn
 
 /* Timer 1 configuration */
 #define TIMER_1_CHANNELS    1
 #define TIMER_1_PRESCALER   (39U)
 #define TIMER_1_MAX_VALUE   (0xffffffff)
-#define TIMER_1_ISR         isr_wtimer1
+#define TIMER_1_ISR         isr_wtimer1a
 #define TIMER_1_IRQ_CHAN    Timer1A_IRQn
 /** @} */
 
@@ -73,7 +73,7 @@ extern "C" {
 #define UART_0_DEV          UART0_BASE
 #define UART_0_CLK          (40000000)
 #define UART_0_IRQ_CHAN     UART0_IRQn
-#define UART_0_ISR          isr_usart0
+#define UART_0_ISR          isr_uart0
 /* UART 0 pin configuration */
 #define UART_0_PORT         GPIOA
 #define UART_0_TX_PIN       UART_PA1_U0TX
@@ -83,7 +83,7 @@ extern "C" {
 #define UART_1_DEV          UART1_BASE
 #define UART_1_CLK          (40000000)
 #define UART_1_IRQ_CHAN     UART1_IRQn
-#define UART_1_ISR          isr_usart1
+#define UART_1_ISR          isr_uart1
 /** @} */
 
 #ifdef __cplusplus

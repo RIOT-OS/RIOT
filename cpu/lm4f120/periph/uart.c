@@ -183,7 +183,7 @@ void uart_poweroff(uart_t uart)
 /**
  * The UART interrupt handler.
  */
-void isr_usart0(void)
+void isr_uart0(void)
 {
     unsigned long ulStatus;
     char cChar;

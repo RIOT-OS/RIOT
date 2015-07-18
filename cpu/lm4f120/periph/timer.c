@@ -142,7 +142,7 @@ void timer_reset(tim_t dev)
 }
 
 #if TIMER_0_EN
-void isr_timer0(void)
+void isr_timer0a(void)
 {
     TIMER0_ICR_R = TIMER_ICR_TATOCINT;
     config[TIMER_0].cb(0);
@@ -151,7 +151,7 @@ void isr_timer0(void)
         thread_yield();
     }
 }
-void isr_wtimer0(void)
+void isr_wtimer0a(void)
 {
     WTIMER0_ICR_R = TIMER_ICR_TATOCINT;
 
