@@ -73,22 +73,6 @@ extern "C" {
 #define UART_1_ISR          isr_usart1
 /** @} */
 
-/**
- * @name ADC configuration
- * @{
- */
-#define ADC_NUMOF           (2U)
-#define ADC_0_EN            1
-#define ADC_1_EN            1
-/* ADC 0 configuration */
-#define ADC_0_DEV           ADC0_BASE
-#define ADC_0_PORT          GPIO_PORTE_BASE
-
-/* ADC 1 configuration */
-#define ADC_1_DEV           ADC1_BASE
-#define ADC_1_PORT          GPIO_PORTE_BASE
-/** @} */
-
 #ifdef __cplusplus
 }
 #endif
