@@ -105,7 +105,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, uart_tx_cb_t t
             ROM_UARTFIFOLevelSet(UART0_BASE, UART_FIFO_TX4_8, UART_FIFO_RX4_8);
             ROM_UARTFIFOEnable(UART0_BASE);
 
-            /* Enable the UART interrupt */ 
+            /* Enable the UART interrupt */
             NVIC_EnableIRQ(UART_0_IRQ_CHAN);
             /* Enable RX interrupt */
             UART0_IM_R = UART_IM_RXIM | UART_IM_RTIM;

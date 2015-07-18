@@ -144,7 +144,7 @@ void timer_reset(tim_t dev)
 #if TIMER_0_EN
 void isr_timer0(void)
 {
-    TIMER0_ICR_R = TIMER_ICR_TATOCINT;  
+    TIMER0_ICR_R = TIMER_ICR_TATOCINT;
     config[TIMER_0].cb(0);
 
     if (sched_context_switch_request){
