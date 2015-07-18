@@ -54,6 +54,20 @@ void genrand_init_by_array(uint32_t init_key[], int key_length);
  */
 uint32_t genrand_uint32(void);
 
+/**
+ * @brief   generates a random number r with a < r <= b.
+ *
+ * @param[in] a minimum for random number
+ * @param[in] b upper bound for random number
+ *
+ * @pre     a < b
+ *
+ * @return  a random number on [a,b)-interval
+ */
+static inline uint32_t genrand_uint32_range(uint32_t a, uint32_t b)
+{
+    return (genrand_uint32() % (b - a)) + a;
+}
 
 #if PRNG_FLOAT
 /* These real versions are due to Isaku Wada, 2002/01/09 added */
