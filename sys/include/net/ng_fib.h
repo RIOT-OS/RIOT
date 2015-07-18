@@ -93,6 +93,7 @@ int fib_register_rp(uint8_t *prefix, size_t prefix_size);
  *
  * @return 0 on success
  *         -ENOMEM if the entry cannot be created due to insufficient RAM
+ *         -EFAULT if dst and/or next_hop is not a valid pointer
  */
 int fib_add_entry(kernel_pid_t iface_id, uint8_t *dst, size_t dst_size, uint32_t dst_flags,
                   uint8_t *next_hop, size_t next_hop_size, uint32_t next_hop_flags,
@@ -110,6 +111,7 @@ int fib_add_entry(kernel_pid_t iface_id, uint8_t *dst, size_t dst_size, uint32_t
  *
  * @return 0 on success
  *         -ENOMEM if the entry cannot be updated due to insufficient RAM
+ *         -EFAULT if dst and/or next_hop is not a valid pointer
  */
 int fib_update_entry(uint8_t *dst, size_t dst_size,
                      uint8_t *next_hop, size_t next_hop_size, uint32_t next_hop_flags,
@@ -139,7 +141,8 @@ void fib_remove_entry(uint8_t *dst, size_t dst_size);
  *         -EHOSTUNREACH if no next hop is available in any FIB table
  *                                           all RRPs are notified before the return
  *         -ENOBUFS if the size for the next hop address is insufficient low
- *         -EINVAL if one of the passed out pointers is NULL
+ *         -EFAULT if dst and/or next_hop is not a valid pointer
+ *         -EINVAL if one of the other passed out pointers is NULL
  */
 int fib_get_next_hop(kernel_pid_t *iface_id,
                      uint8_t *next_hop, size_t *next_hop_size, uint32_t* next_hop_flags,
