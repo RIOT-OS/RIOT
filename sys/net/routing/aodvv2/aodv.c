@@ -15,6 +15,7 @@
  * @brief       aodvv2 routing protocol
  *
  * @author      Lotte Steenbrink <lotte.steenbrink@fu-berlin.de>
+ * @author      Martin Landsmann <Martin.Landsmann@HAW-Hamburg.de>
  */
 
 #include "aodv.h"
