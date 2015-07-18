@@ -55,7 +55,7 @@ void genrand_init_by_array(uint32_t init_key[], int key_length);
 uint32_t genrand_uint32(void);
 
 /**
- * @brief   generates a random number r with a < r <= b.
+ * @brief   generates a random number r with a <= r < b.
  *
  * @param[in] a minimum for random number
  * @param[in] b upper bound for random number
