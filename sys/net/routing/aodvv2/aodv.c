@@ -107,7 +107,7 @@ void aodv_init(kernel_pid_t interface)
     /* start listening & enable sending */
     thread_create(aodv_rcv_stack_buf, sizeof(aodv_rcv_stack_buf), THREAD_PRIORITY_MAIN,
                   CREATE_STACKTEST, _aodv_receiver_thread, NULL, "_aodv_receiver_thread");
-    AODV_DEBUG("listening on port %d\n", HTONS(MANET_PORT));
+    AODV_DEBUG("listening on port %d\n", MANET_PORT);
     sender_thread = thread_create(aodv_snd_stack_buf, sizeof(aodv_snd_stack_buf),
                                   THREAD_PRIORITY_MAIN, CREATE_STACKTEST, _aodv_sender_thread,
                                   NULL, "_aodv_sender_thread");
@@ -360,7 +360,7 @@ static void *_aodv_receiver_thread(void *arg)
 
     /* start server (which means registering AODVv2 receiver for the chosen port) */
     server.pid = sched_active_pid; /* sched_active_pid is our pid, since we are currently act */
-    server.demux_ctx = (uint32_t)HTONS(MANET_PORT);
+    server.demux_ctx = (uint32_t) MANET_PORT;
     ng_netreg_register(NG_NETTYPE_UDP, &server);
 
     while (1) {
@@ -409,7 +409,7 @@ static void send(ng_ipv6_addr_t addr, uint16_t port, void *data, size_t data_len
     ng_pktsnip_t *payload, *pkt_with_udp, *pkt_with_ip;
 
     /* convert to correct byteorder */
-    port = HTONS(port);
+    port = port;
 
     /* allocate payload */
     payload = ng_pktbuf_add(NULL, data, data_length, NG_NETTYPE_UNDEF);
