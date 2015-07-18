@@ -27,7 +27,6 @@
 #include "hw_nvic.h"
 #include "hw_sysctl.h"
 #include "hw_types.h"
-#include "lm4f120h5qr.h"
 #include "cortex-m4-def.h"
 #include "stellaris_periph/cpu.h"
 #include "stellaris_periph/debug.h"
@@ -42,6 +41,10 @@
 #include "stellaris_periph/rom.h"
 #include "hwtimer_cpu.h"
 #include "periph/uart.h"
+
+#ifdef CPU_MODEL_LM4F120H5QR
+#include "lm4f120h5qr.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -62,16 +65,6 @@ extern "C" {
  */
 #define CPUID_ID_LEN                    (12)
 #define CPUID_ADDR                      NVIC_CPUID
-/** @} */
-
-/**
- * @name CC110X buffer size definitions for the stm32f4
- * @{
- */
-#ifdef MODULE_CC110X
-#define TRANSCEIVER_BUFFER_SIZE         (10)
-#define RX_BUF_SIZE                     (10)
-#endif
 /** @} */
 
 /**
