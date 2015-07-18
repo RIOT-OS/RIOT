@@ -56,7 +56,7 @@ static bool _is_iface(kernel_pid_t dev)
     kernel_pid_t ifs[NG_NETIF_NUMOF];
     size_t numof = ng_netif_get(ifs);
 
-    for (size_t i = 0; i < numof; i++) {
+    for (size_t i = 0; i < numof && i < NG_NETIF_NUMOF; i++) {
         if (ifs[i] == dev) {
             return true;
         }
@@ -704,7 +704,7 @@ int _netif_config(int argc, char **argv)
         kernel_pid_t ifs[NG_NETIF_NUMOF];
         size_t numof = ng_netif_get(ifs);
 
-        for (size_t i = 0; i < numof; i++) {
+        for (size_t i = 0; i < numof && i < NG_NETIF_NUMOF; i++) {
             _netif_list(ifs[i]);
         }
 
