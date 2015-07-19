@@ -138,6 +138,10 @@ typedef struct eth_driver {
      */
     int (*init)(dev_eth_t *dev);
     /**
+     * @brief the driver's cleanup function (optional)
+     */
+    void (*cleanup)(dev_eth_t *dev);
+    /**
      * @brief a driver's user-space ISR handler
      *
      * This function will be called from a network stack's loop when being notified
@@ -160,6 +164,19 @@ typedef struct eth_driver {
  */
 static inline int dev_eth_init(dev_eth_t *dev) {
     return dev->driver->init(dev);
+}
+
+/**
+ * @brief Cleanup a device given by dev (convenience function)
+ *
+ * This function is to be called on reboot if the init function is not
+ * idempotent.
+ *
+ */
+static inline void dev_eth_cleanup(dev_eth_t *dev) {
+    if (dev->driver->cleanup) {
+        dev->driver->cleanup(dev);
+    }
 }
 
 /**
