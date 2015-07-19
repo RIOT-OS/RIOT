@@ -368,7 +368,7 @@ static void *_aodv_receiver_thread(void *arg)
         msg_receive(&msg);
         switch (msg.type) {
             case NG_NETAPI_MSG_TYPE_RCV:
-                AODV_DEBUG("received data:");
+                AODV_DEBUG("received data:\n");
                 ng_pktsnip_t *pkt = ((ng_pktsnip_t *)msg.content.ptr);
                 if (pkt->size <= UDP_BUFFER_SIZE) {
                     memcpy(buf_rcv, pkt->data, pkt->size);
@@ -393,7 +393,7 @@ static void *_aodv_receiver_thread(void *arg)
                 msg_reply(&msg, &reply);
                 break;
             default:
-                AODV_DEBUG("received something unexpected");
+                AODV_DEBUG("received something unexpected\n");
                 break;
         }
     }
@@ -434,7 +434,7 @@ static void send(ng_ipv6_addr_t addr, uint16_t port, void *data, size_t data_len
     }
     /* all headers are set, send packet */
     if(!ng_netapi_dispatch_send(NG_NETTYPE_UDP, NG_NETREG_DEMUX_CTX_ALL, pkt_with_ip)) {
-        DEBUG("Error sending packet");
+        DEBUG("Error sending packet\n");
     }
 }
 
