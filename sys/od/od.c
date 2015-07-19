@@ -184,7 +184,7 @@ static void _print_date(void *data, size_t offset, char *format, uint8_t length,
     switch (length) {
         case 1:
             if (flags & OD_FLAGS_BYTES_CHAR) {
-                switch (((char *)data)[offset]) {
+                switch (((signed char *)data)[offset]) {
                     case '\0':
                         printf("   \\0");
                         return;
@@ -218,11 +218,11 @@ static void _print_date(void *data, size_t offset, char *format, uint8_t length,
                         return;
 
                     default:
-                        if (((char *)data)[offset] < 0) {
+                        if (((signed char *)data)[offset] < 0) {
                             printf("  %03o", ((unsigned char *)data)[offset]);
                             return;
                         }
-                        else if (((char *)data)[offset] < 32) {
+                        else if (((signed char *)data)[offset] < 32) {
                             printf("  %03o", ((char *)data)[offset]);
                             return;
                         }
