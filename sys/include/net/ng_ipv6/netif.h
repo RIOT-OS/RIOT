@@ -254,6 +254,52 @@ void ng_ipv6_netif_remove(kernel_pid_t pid);
 ng_ipv6_netif_t *ng_ipv6_netif_get(kernel_pid_t pid);
 
 /**
+ * @brief   Set interface to router mode.
+ *
+ * @details This sets/unsets the NG_IPV6_NETIF_FLAGS_ROUTER and initializes
+ *          or ceases router behavior for neighbor discovery.
+ *
+ * @param[in] The interface.
+ * @param[in] Status for the NG_IPV6_NETIF_FLAGS_ROUTER flag.
+ */
+static inline void ng_ipv6_netif_set_rtr(ng_ipv6_netif_t *netif, bool enable)
+{
+    (void)netif;    /* Don't do anything for non-routers */
+    (void)enable;
+}
+
+/**
+ * @brief   Set interface to router advertisement mode.
+ *
+ * @details If NG_IPV6_NETIF_FLAGS_ROUTER is set this sets/unsets the
+ *          NG_IPV6_NETIF_FLAGS_RTR_ADV and initializes or ceases router
+ *          advertising behavior for neighbor discovery.
+ *
+ * @param[in] The interface.
+ * @param[in] Status for the NG_IPV6_NETIF_FLAGS_RTR flag.
+ */
+static inline void ng_ipv6_netif_set_rtr_adv(ng_ipv6_netif_t *netif, bool enable)
+{
+    (void)netif;    /* Don't do anything for non-routers */
+    (void)enable;
+}
+
+/**
+ * @brief   Solicitates an advertisement of a neighboring router on this
+ *          interface.
+ *
+ * @param[in] netif The interface.
+ * @param[in] dst   The address of the neighboring router.
+ *                  May be NULL for @ref NG_IPV6_ADDR_ALL_ROUTERS_LINK_LOCAL.
+ */
+static inline void ng_ipv6_netif_sol_router(ng_ipv6_netif_t *netif,
+        ng_ipv6_addr_t *dst)
+{
+    (void)netif;    /* TODO */
+    (void)dst;
+}
+
+/**
  * @brief   Adds an address to an interface.
  *
  * @param[in] pid           The PID to the interface.
