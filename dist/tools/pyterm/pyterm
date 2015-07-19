@@ -71,6 +71,13 @@ default_fmt_str = '%(asctime)s - %(levelname)s # %(message)s'
 defaultnewline = "LF"
 
 
+def exit_handler_factory(cmd):
+    def exit_handler(signal, frame):
+        cmd.do_PYTERM_exit("/exit")
+        sys.exit(0)
+
+    return exit_handler
+
 class SerCmd(cmd.Cmd):
     """Main class for pyterm based on Python's Cmd class.
 
@@ -159,6 +166,7 @@ class SerCmd(cmd.Cmd):
         ch.setFormatter(formatter)
         # add ch to logger
         self.logger.addHandler(ch)
+        signal.signal(signal.SIGINT, exit_handler_factory(self))
 
     def preloop(self):
         """Executed bat program start.
@@ -725,7 +733,6 @@ if __name__ == "__main__":
         myshell.factory = myfactory
         reactor.callInThread(myshell.cmdloop, "Welcome to pyterm!\n"
                                               "Type '/exit' to exit.")
-        signal.signal(signal.SIGINT, __stop_reactor)
         reactor.run()
     else:
         myshell.cmdloop("Welcome to pyterm!\nType '/exit' to exit.")
