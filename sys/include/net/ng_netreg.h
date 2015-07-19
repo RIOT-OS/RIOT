@@ -75,6 +75,9 @@ void ng_netreg_init(void);
  * @param[in] entry     An entry you want to add to the registry with
  *                      ng_netreg_entry_t::pid and ng_netreg_entry_t::demux_ctx set.
  *
+ * @warning Call ng_netreg_unregister() *before* you leave the context you
+ *          allocated @p entry in. Otherwise it might get overwritten.
+ *
  * @return  0 on success
  * @return  -EINVAL if @p type was < NG_NETTYPE_UNDEF or >= NG_NETTYPE_NUMOF
  */
