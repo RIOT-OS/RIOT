@@ -73,9 +73,7 @@ int reboot_arch(int mode)
     /* TODO: close stdio fds */
 #endif
 #ifdef MODULE_NATIVENET
-    if (_native_tap_fd != -1) {
-        real_close(_native_tap_fd);
-    }
+    tap_cleanup();
 #endif
 
     if (real_execve(_native_argv[0], _native_argv, NULL) == -1) {

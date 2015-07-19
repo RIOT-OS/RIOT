@@ -351,4 +351,15 @@ int tap_init(char *name)
     DEBUG("RIOT native tap initialized.\n");
     return _native_tap_fd;
 }
+
+void tap_cleanup(void)
+{
+    if (_native_tap_fd == -1) {
+        return;
+    }
+
+    real_close(_native_tap_fd);
+    _native_tap_fd = -1;
+
+}
 /** @} */

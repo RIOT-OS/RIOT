@@ -36,7 +36,11 @@ extern "C" {
  */
 int tap_init(char *name);
 
-extern int _native_tap_fd;
+/**
+ * Close tap device
+ */
+void tap_cleanup(void);
+
 extern unsigned char _native_tap_mac[ETHER_ADDR_LEN];
 
 struct nativenet_header {
