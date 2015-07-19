@@ -354,6 +354,11 @@ int tap_init(char *name)
 
 void tap_cleanup(void)
 {
+    unregister_interrupt(SIGIO);
+#ifdef __MACH__
+    kill(sigio_child_pid, SIGKILL);
+#endif
+
     if (_native_tap_fd == -1) {
         return;
     }
