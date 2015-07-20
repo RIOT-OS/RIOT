@@ -16,9 +16,6 @@ env:
 before_install:
     - source ./dist/tools/pr_check/check_labels.sh
     - test -z "$TRAVIS_PULL_REQUEST" || test "$BUILDTEST_MCU_GROUP" = "static-tests" || check_gh_label "Ready for CI build" || exit 1
-    - sudo apt-get install emdebian-archive-keyring
-    - echo 'deb http://ftp.uk.debian.org/emdebian/toolchains wheezy main' | sudo tee /etc/apt/sources.list.d/emdebian.list > /dev/null
-
     - echo 'deb http://us.archive.ubuntu.com/ubuntu trusty           main restricted universe multiverse' | sudo tee    /etc/apt/sources.list.d/trusty.list > /dev/null
     - echo 'deb http://us.archive.ubuntu.com/ubuntu trusty-backports main restricted universe multiverse' | sudo tee -a /etc/apt/sources.list.d/trusty.list > /dev/null
     - echo 'deb http://us.archive.ubuntu.com/ubuntu trusty-security  main restricted universe multiverse' | sudo tee -a /etc/apt/sources.list.d/trusty.list > /dev/null
