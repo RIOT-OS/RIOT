@@ -1,5 +1,5 @@
 PKG_NAME=libcoap
-PKG_URL=http://github.com/RIOT-OS/libcoap
+PKG_URL=https://github.com/obgm/libcoap
 PKG_VERSION=ef41ce5d02d64cec0751882ae8fd95f6c32bc018
 PKG_DIR=$(CURDIR)/$(PKG_NAME)
 
