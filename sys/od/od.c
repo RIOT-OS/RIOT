@@ -178,13 +178,13 @@ static inline void _bytes_format(char *format, uint16_t flags)
     }
 }
 
-static void _print_date(void *data, size_t offset, char *format, uint8_t length,
+static void _print_date(const void *data, size_t offset, char *format, uint8_t length,
                         uint16_t flags)
 {
     switch (length) {
         case 1:
             if (flags & OD_FLAGS_BYTES_CHAR) {
-                switch (((char *)data)[offset]) {
+                switch (((signed char *)data)[offset]) {
                     case '\0':
                         printf("   \\0");
                         return;
@@ -218,11 +218,11 @@ static void _print_date(void *data, size_t offset, char *format, uint8_t length,
                         return;
 
                     default:
-                        if (((char *)data)[offset] < 0) {
+                        if (((signed char *)data)[offset] < 0) {
                             printf("  %03o", ((unsigned char *)data)[offset]);
                             return;
                         }
-                        else if (((char *)data)[offset] < 32) {
+                        else if (((signed char *)data)[offset] < 32) {
                             printf("  %03o", ((char *)data)[offset]);
                             return;
                         }
@@ -287,7 +287,7 @@ static int _log10(uint8_t a)
     return ++res;
 }
 
-void od(void *data, size_t data_len, uint8_t width, uint16_t flags)
+void od(const void *data, size_t data_len, uint8_t width, uint16_t flags)
 {
     char address_format[5];
     uint8_t date_length = _length(flags);
