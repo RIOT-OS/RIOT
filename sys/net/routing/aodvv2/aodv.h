@@ -27,6 +27,7 @@
 #include "net/ng_netif.h"
 #include "net/ng_udp.h"
 #include "net/ng_pkt.h"
+#include "net/eui64.h"
 
 #include "aodvv2/types.h"
 #include "constants.h"

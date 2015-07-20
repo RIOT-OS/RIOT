@@ -28,6 +28,7 @@
 
 #define UDP_BUFFER_SIZE     (128) /** with respect to IEEE 802.15.4's MTU */
 #define RCV_MSG_Q_SIZE      (32)  /* TODO: check if smaller values work, too */
+#define AODVV2_PREFIX {{ 0xbe, 0xe2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }}
 
 static void _init_addresses(void);
 static void _init_sock_snd(void);
@@ -67,10 +68,12 @@ static mutex_t rreq_mutex;
 static mutex_t rrep_mutex;
 static mutex_t rerr_mutex;
 
+static ng_ipv6_addr_t aodvv2_prefix = AODVV2_PREFIX;
+static int aodvv2_prefix_len;
+static int aodvv2_address_type_size;
+
 struct netaddr na_mcast;
 kernel_pid_t aodvv2_if_id;
-ng_ipv6_addr_t aodvv2_prefix;
-int aodvv2_prefix_len;
 
 void aodv_init(kernel_pid_t interface)
 {
@@ -80,9 +83,14 @@ void aodv_init(kernel_pid_t interface)
     msg_t msgq[RCV_MSG_Q_SIZE];
     msg_init_queue(msgq, sizeof msgq);
 
-    aodvv2_prefix_len = sizeof(ng_ipv6_addr_t);
+    if (!interface) {
+        AODV_DEBUG("Error: AODVv2 interface pid is invalid.\n");
+        return;
+    }
     aodvv2_if_id = interface;
-    ng_ipv6_addr_from_str(&aodvv2_prefix, "fe80:0000:0000:0000:0000:0000:0000:0000");
+
+    aodvv2_address_type_size = sizeof(ng_ipv6_addr_t);
+    aodvv2_prefix_len = 16;
 
     mutex_init(&rreq_mutex);
     mutex_init(&rrep_mutex);
@@ -275,13 +283,25 @@ void aodv_send_rerr(struct unreachable_node unreachable_nodes[], size_t len, str
  */
 static void _init_addresses(void)
 {
+    eui64_t iid;
+
     /* init multicast address: set to to a link-local all nodes multicast address */
     ng_ipv6_addr_set_all_nodes_multicast(&_v6_addr_mcast, NG_IPV6_ADDR_MCAST_SCP_LINK_LOCAL);
     AODV_DEBUG("my multicast address is: %s\n",
         ng_ipv6_addr_to_str(addr_str, &_v6_addr_mcast, NG_IPV6_ADDR_MAX_STR_LEN));
 
     /* get best IP for sending */
-    _v6_addr_local = ng_ipv6_netif_find_best_src_addr(aodvv2_if_id,&_v6_addr_mcast);
+    if (!(ng_netapi_get(aodvv2_if_id, NETCONF_OPT_IPV6_IID, 0, &iid,
+                       sizeof(eui64_t)) < 0)) {
+        AODV_DEBUG("Error: failed to get iid\n");
+        return;
+    }
+
+    /* Set addr according to our interface id */
+    ng_ipv6_addr_set_aiid(_v6_addr_local, iid.uint8);
+    /* Set (global!) prefix */
+    ng_ipv6_addr_init_prefix(_v6_addr_local, &aodvv2_prefix, aodvv2_prefix_len);
+
     AODV_DEBUG("my src address is:       %s\n",
         ng_ipv6_addr_to_str(addr_str, _v6_addr_local, NG_IPV6_ADDR_MAX_STR_LEN));
 
