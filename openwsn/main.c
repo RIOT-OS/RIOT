@@ -40,9 +40,11 @@ static int shell_readc(void)
     return c;
 }
 
-static void shell_putchar(int c)
+static int shell_putchar(int c)
 {
     (void) putchar(c);
+
+    return c;
 }
 
 int main(void) {
