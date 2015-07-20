@@ -61,6 +61,7 @@ int ng_at86rf2xx_init(ng_at86rf2xx_t *dev, spi_t spi, spi_speed_t spi_speed,
     dev->int_pin = int_pin;
     dev->sleep_pin = sleep_pin;
     dev->reset_pin = reset_pin;
+    dev->idle_state = NG_AT86RF2XX_STATE_TRX_OFF;
 
     /* initialise SPI */
     spi_init_master(dev->spi, SPI_CONF_FIRST_RISING, spi_speed);
