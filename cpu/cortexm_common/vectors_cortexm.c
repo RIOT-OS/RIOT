@@ -16,6 +16,7 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Daniel Krebs <github@daniel-krebs.net>
+ * @author      Joakim Gebart <joakim.gebart@eistec.se>
  *
  * @}
  */
@@ -23,6 +24,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
+#include "cpu.h"
 #include "board.h"
 #include "panic.h"
 #include "kernel_internal.h"
@@ -45,7 +47,8 @@ extern uint32_t _sram;
 extern uint32_t _eram;
 /** @} */
 
-/** @brief Interrupt stack canary value
+/**
+ * @brief Interrupt stack canary value
  *
  * @note 0xe7fe is the ARM Thumb machine code equivalent of asm("bl #-2\n") or
  * 'while (1);', i.e. an infinite loop.
@@ -113,90 +116,177 @@ void nmi_default(void)
 
 #ifdef DEVELHELP
 
-/* Trampoline function to save stackpointer before calling hardfault handler */
+/* The hard fault handler requires some stack space as a working area for local
+ * variables and printf function calls etc. If the stack pointer is located
+ * closer than HARDFAULT_HANDLER_REQUIRED_STACK_SPACE from the lowest address of
+ * RAM we will reset the stack pointer to the top of available RAM. */
+#define HARDFAULT_HANDLER_REQUIRED_STACK_SPACE (THREAD_EXTRA_STACKSIZE_PRINTF)
+
+/* Trampoline function to save stack pointer before calling hard fault handler */
 void hard_fault_default(void)
 {
-    /* Get stackpointer where exception stackframe lies */
+    /* Get stack pointer where exception stack frame lies */
     __ASM volatile
     (
+        /* Check that msp is valid first because we want to stack all the
+         * r4-r11 registers so that we can use r0, r1, r2, r3 for other things. */
+        "mov r0, sp                         \n" /* r0 = msp                   */
+        "cmp r0, %[eram]                    \n" /* if(msp > &_eram) {         */
+        "bhi fix_msp                        \n" /*   goto fix_msp }           */
+        "cmp r0, %[sram]                    \n" /* if(msp <= &_sram) {        */
+        "bls fix_msp                        \n" /*   goto fix_msp }           */
+        "mov r1, #0                         \n" /* else { corrupted = false   */
+        "b   test_sp                        \n" /*   goto test_sp     }       */
+        " fix_msp:                          \n" /*                            */
+        "mov r1, %[estack]                  \n" /*     r1 = _estack           */
+        "mov sp, r1                         \n" /*     sp = r1                */
+        "mov r1, #1                         \n" /*     corrupted = true       */
+        " test_sp:                          \n" /*                            */
         "movs r0, #4                        \n" /* r0 = 0x4                   */
-        "mov r1, lr                         \n" /* r1 = lr                    */
-        "tst r1, r0                         \n" /* if(lr & 0x4)               */
+        "mov r2, lr                         \n" /* r2 = lr                    */
+        "tst r2, r0                         \n" /* if(lr & 0x4)               */
         "bne use_psp                        \n" /* {                          */
         "mrs r0, msp                        \n" /*   r0 = msp                 */
         "b out                              \n" /* }                          */
         " use_psp:                          \n" /* else {                     */
         "mrs r0, psp                        \n" /*   r0 = psp                 */
         " out:                              \n" /* }                          */
-        "mov r1, #0                         \n" /* corrupted = false          */
-        "mov r2, sp                         \n" /* Cmp with SP is deprecated  */
-        "cmp r0, r2                         \n" /* If msp is active stack-    */
-        "bne hardfault                      \n" /* pointer, check if valid so */
-        "cmp r0, %[eram]                    \n" /* so calling c-func works .  */
-        "bge fix_msp                        \n" /* if(r0 == msp) {            */
-        "cmn r0, %[sram]                    \n" /*   if( (r0 >= estack) ||    */
-        "bl hardfault                       \n" /*       (r0 <  sstack) ) {   */
-        " fix_msp:                          \n" /*     corrupted = true       */
-        "mov r0, %[estack]                  \n" /*     r0 = _estack           */
-        "mov sp, r0                         \n" /*     sp = _estack           */
-        "mov r1, #1                         \n" /*   }                        */
-        " hardfault:                        \n" /* }                          */
+#if (__CORTEX_M == 0)
+        "push {r4-r7}                       \n" /* save r4..r7 to the stack   */
+        "mov r4, r8                         \n" /*                            */
+        "mov r5, r9                         \n" /*                            */
+        "mov r6, r10                        \n" /*                            */
+        "mov r7, r11                        \n" /*                            */
+        "push {r4-r7}                       \n" /* save r8..r11 to the stack  */
+#else
+        "push {r4-r11}                      \n" /* save r4..r11 to the stack  */
+#endif
+        "mov r3, sp                         \n" /* r4_to_r11_stack parameter  */
         "b hard_fault_handler               \n" /* hard_fault_handler(r0)     */
           :
-          : [sram]   "r" (&_sram),
+          : [sram]   "r" (&_sram + HARDFAULT_HANDLER_REQUIRED_STACK_SPACE),
             [eram]   "r" (&_eram),
             [estack] "r" (&_estack)
-          : "r0","r1","r2"
+          : "r4","r5","r6","r7","r8","r9","r10","r11","lr"
     );
 }
 
-void hard_fault_handler(uint32_t* sp, uint32_t corrupted)
-{
-    /* Make them volatile so that they won't get optimized out */
-    volatile unsigned int r0;
-    volatile unsigned int r1;
-    volatile unsigned int r2;
-    volatile unsigned int r3;
-    volatile unsigned int r12;
-    volatile unsigned int lr; /* Link register. */
-    volatile unsigned int pc; /* Program counter. */
-    volatile unsigned int psr;/* Program status register. */
+#if (__CORTEX_M == 0)
+/* Cortex-M0 and Cortex-M0+ lack the extended fault status registers found in
+ * Cortex-M3 and above. */
+#define CPU_HAS_EXTENDED_FAULT_REGISTERS 0
+#else
+#define CPU_HAS_EXTENDED_FAULT_REGISTERS 1
+#endif
 
-    /* Sanity check stackpointer and give additional feedback about hardfault */
+void hard_fault_handler(uint32_t* sp, uint32_t corrupted, uint32_t exc_return, uint32_t* r4_to_r11_stack)
+{
+
+    /* Sanity check stack pointer and give additional feedback about hard fault */
     if( corrupted ) {
-        puts("Stackpointer corrupted, reset to top of stack");
+        puts("Stack pointer corrupted, reset to top of stack");
     } else {
-        r0  = sp[0];
-        r1  = sp[1];
-        r2  = sp[2];
-        r3  = sp[3];
-        r12 = sp[4];
-        lr  = sp[5];
-        pc  = sp[6];
-        psr = sp[7];
+#if CPU_HAS_EXTENDED_FAULT_REGISTERS
+        /* Copy status register contents to local stack storage, this must be
+         * done before any calls to other functions to avoid corrupting the
+         * register contents. */
+        uint32_t bfar  = SCB->BFAR;
+        uint32_t mmfar = SCB->MMFAR;
+        uint32_t cfsr  = SCB->CFSR;
+        uint32_t hfsr  = SCB->HFSR;
+        uint32_t dfsr  = SCB->DFSR;
+        uint32_t afsr  = SCB->AFSR;
+#endif
+
+        uint32_t  r0 = sp[0];
+        uint32_t  r1 = sp[1];
+        uint32_t  r2 = sp[2];
+        uint32_t  r3 = sp[3];
+        uint32_t r12 = sp[4];
+        uint32_t  lr = sp[5];  /* Link register. */
+        uint32_t  pc = sp[6];  /* Program counter. */
+        uint32_t psr = sp[7];  /* Program status register. */
+
+        /* Reconstruct original stack pointer before fault occurred */
+        uint32_t* orig_sp = sp + 8;
+        if (psr & SCB_CCR_STKALIGN_Msk) {
+            /* Stack was not 8-byte aligned */
+            orig_sp += 1;
+        }
 
         puts("\nContext before hardfault:");
 
         /* TODO: printf in ISR context might be a bad idea */
-        printf("r0:  0x%x\n"
-               "r1:  0x%x\n"
-               "r2:  0x%x\n"
-               "r3:  0x%x\n",
+        printf("   r0: 0x%08lx\n"
+               "   r1: 0x%08lx\n"
+               "   r2: 0x%08lx\n"
+               "   r3: 0x%08lx\n",
                r0, r1, r2, r3);
-        printf("r12: 0x%x\n"
-               "lr : 0x%x\n"
-               "pc : 0x%x\n"
-               "psr: 0x%x\n\n",
+        printf("  r12: 0x%08lx\n"
+               "   lr: 0x%08lx\n"
+               "   pc: 0x%08lx\n"
+               "  psr: 0x%08lx\n\n",
                r12, lr, pc, psr);
+#if CPU_HAS_EXTENDED_FAULT_REGISTERS
+        puts("FSR/FAR:");
+        printf(" CFSR: 0x%08" PRIx32 "\n", cfsr);
+        printf(" HFSR: 0x%08" PRIx32 "\n", hfsr);
+        printf(" DFSR: 0x%08" PRIx32 "\n", dfsr);
+        printf(" AFSR: 0x%08" PRIx32 "\n", afsr);
+        if (((cfsr & SCB_CFSR_BUSFAULTSR_Msk) >> SCB_CFSR_BUSFAULTSR_Pos) & 0x80) {
+            /* BFAR valid flag set */
+            printf(" BFAR: 0x%08" PRIx32 "\n", bfar);
+        }
+        if (((cfsr & SCB_CFSR_MEMFAULTSR_Msk) >> SCB_CFSR_MEMFAULTSR_Pos) & 0x80) {
+            /* MMFAR valid flag set */
+            printf("MMFAR: 0x%08" PRIx32 "\n", mmfar);
+        }
+#endif
+        puts("Misc");
+        printf("EXC_RET: 0x%08" PRIx32 "\n", exc_return);
+        puts("Attempting to reconstruct state for debugging...");
+        printf("In GDB:\n  set $pc=0x%lx\n  frame 0\n  bt\n", pc);
+        __ASM volatile (
+            "mov r0, %[sp]\n"
+            "ldr r2, [r0, #8]\n"
+            "ldr r3, [r0, #12]\n"
+            "ldr r1, [r0, #16]\n"
+            "mov r12, r1\n"
+            "ldr r1, [r0, #20]\n"
+            "mov lr, r1\n"
+            "mov sp, %[orig_sp]\n"
+            "mov r1, %[extra_stack]\n"
+#if (__CORTEX_M == 0)
+            "ldm r1!, {r4-r7}\n"
+            "mov r8, r4\n"
+            "mov r9, r5\n"
+            "mov r10, r6\n"
+            "mov r11, r7\n"
+            "ldm r1!, {r4-r7}\n"
+#else
+            "ldm r1, {r4-r11}\n"
+#endif
+            "ldr r1, [r0, #4]\n"
+            "ldr r0, [r0, #0]\n"
+            :
+            : [sp] "r" (sp),
+              [orig_sp] "r" (orig_sp),
+              [extra_stack] "r" (r4_to_r11_stack)
+            : "r0","r1","r2","r3","r12"
+            );
+        __BKPT(1);
     }
 
     core_panic(PANIC_HARD_FAULT, "HARD FAULT HANDLER");
 }
+
 #else
+
 void hard_fault_default(void)
 {
     core_panic(PANIC_HARD_FAULT, "HARD FAULT HANDLER");
 }
+
 #endif /* DEVELHELP */
 
 #if defined(CPU_ARCH_CORTEX_M3) || defined(CPU_ARCH_CORTEX_M4) || \
