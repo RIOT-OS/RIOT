@@ -338,6 +338,12 @@ int fib_add_entry(kernel_pid_t iface_id, uint8_t *dst, size_t dst_size, uint32_t
     size_t count = 1;
     fib_entry_t *entry[count];
 
+    /* check if dst and next_hop are valid pointers */
+    if ((dst == NULL) || (next_hop == NULL)) {
+        mutex_unlock(&mtx_access);
+        return -EFAULT;
+    }
+
     int ret = fib_find_entry(dst, dst_size, &(entry[0]), &count);
 
     if (ret == 1) {
@@ -362,6 +368,12 @@ int fib_update_entry(uint8_t *dst, size_t dst_size,
     size_t count = 1;
     fib_entry_t *entry[count];
     int ret = -ENOMEM;
+
+    /* check if dst and next_hop are valid pointers */
+    if ((dst == NULL) || (next_hop == NULL)) {
+        mutex_unlock(&mtx_access);
+        return -EFAULT;
+    }
 
     if (fib_find_entry(dst, dst_size, &(entry[0]), &count) == 1) {
         DEBUG("[fib_update_entry] found entry: %p\n", (void *)(entry[0]));
@@ -411,14 +423,17 @@ int fib_get_next_hop(kernel_pid_t *iface_id,
     size_t count = 1;
     fib_entry_t *entry[count];
 
-    if( iface_id == NULL
-        || next_hop == NULL
-        || next_hop_size == NULL
-        || next_hop_flags == NULL
-        || dst == NULL) {
+    if ((iface_id == NULL)
+        || (next_hop_size == NULL)
+        || (next_hop_flags == NULL)) {
             mutex_unlock(&mtx_access);
             return -EINVAL;
         }
+
+    if ((dst == NULL) || (next_hop == NULL)) {
+        mutex_unlock(&mtx_access);
+        return -EFAULT;
+    }
 
     int ret = fib_find_entry(dst, dst_size, &(entry[0]), &count);
     if (!(ret == 0 || ret == 1)) {
