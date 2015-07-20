@@ -694,6 +694,7 @@ static void _isr_event(ng_netdev_t *device, uint32_t event_type)
 
     /* read (consume) device status */
     irq_mask = ng_at86rf2xx_reg_read(dev, NG_AT86RF2XX_REG__IRQ_STATUS);
+
     state = ng_at86rf2xx_get_status(dev);
 
     if (irq_mask & NG_AT86RF2XX_IRQ_STATUS_MASK__RX_START) {
@@ -709,10 +710,10 @@ static void _isr_event(ng_netdev_t *device, uint32_t event_type)
             _receive_data(dev);
         }
         else if (state == NG_AT86RF2XX_STATE_TX_ARET_ON) {
+            ng_at86rf2xx_set_state(dev, dev->idle_state);
             if (dev->event_cb && (dev->options & NG_AT86RF2XX_OPT_TELL_TX_END)) {
                 dev->event_cb(NETDEV_EVENT_TX_COMPLETE, NULL);
             }
-            ng_at86rf2xx_set_state(dev, dev->idle_state);
             DEBUG("[ng_at86rf2xx] EVT - TX_END\n");
         }
     }
