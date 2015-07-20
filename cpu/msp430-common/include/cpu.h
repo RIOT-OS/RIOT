@@ -7,11 +7,11 @@
  * directory for more details.
  */
 
-#ifndef _CPU_H
-#define _CPU_H
+#ifndef CPU_H_
+#define CPU_H_
 
 /**
- * @defgroup    msp430 TI MSP430
+ * @defgroup    cpu_msp430_common TI MSP430
  * @ingroup     cpu
  * @brief       Texas Instruments MSP430 specific code
 
@@ -167,4 +167,4 @@ void msp430_cpu_init(void);
 #endif
 
 /** @} */
-#endif // _CPU_H
+#endif /* CPU_H_ */

@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     msp430
+ * @ingroup     cpu_msp430_common
  * @{
  *
  * @file

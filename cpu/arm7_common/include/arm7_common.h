@@ -6,11 +6,11 @@
  * more details.
  */
 
-#ifndef __ARM_COMMON_H
-#define __ARM_COMMON_H
+#ifndef ARM7_COMMON_H_
+#define ARM7_COMMON_H_
 
 /**
- * @defgroup    arm7_common ARM CPU common
+ * @defgroup    cpu_arm7_common ARM7 CPU common
  * @brief       Common implementations and headers for ARM based micro-controllers
  * @ingroup     cpu
  * @{
@@ -18,7 +18,7 @@
 
 /**
  * @file
- * @brief       ARM CPU common declarations
+ * @brief       ARM7 CPU common declarations
  *
  * @author      Freie Universität Berlin, Computer Systems & Telematics
  *
@@ -100,4 +100,4 @@ extern "C" {
 #endif
 
 /** @} */
-#endif // __ARM_COMMON_H
+#endif /* ARM7_COMMON_H_ */

@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup arm7_common
+ * @ingroup cpu_arm7_common
  * @{
  *
  * @file

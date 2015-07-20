@@ -7,7 +7,7 @@
 \li <a href="http://www.nxp.com/pip/LPC2387_2.html">Documentation</a>
 
 <h2>Components</h2>
-\li \ref arm7_common
+\li \ref cpu_arm7_common
 \li \ref lpc2387_rtc
 
 <h2>Memory layout</h2>

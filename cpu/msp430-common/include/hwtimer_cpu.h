@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup cpu
+ * @ingroup cpu_msp430_common
  * @{
  */
 
@@ -21,8 +21,8 @@
  *
  */
 
-#ifndef __HWTIMER_CPU_H
-#define __HWTIMER_CPU_H
+#ifndef HWTIMER_CPU_H_
+#define HWTIMER_CPU_H_
 
 #include <stdint.h>
 
@@ -72,4 +72,4 @@ typedef struct {
 }
 #endif
 
-#endif // __HWTIMER_CPU_H
+#endif /* HWTIMER_CPU_H_ */
