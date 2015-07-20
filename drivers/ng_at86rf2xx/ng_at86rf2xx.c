@@ -215,8 +215,11 @@ void ng_at86rf2xx_tx_prepare(ng_at86rf2xx_t *dev)
     do {
         state = ng_at86rf2xx_get_status(dev);
     }
-    while (state == NG_AT86RF2XX_STATE_BUSY_RX_AACK);
-    dev->idle_state = state;
+    while (state == NG_AT86RF2XX_STATE_BUSY_RX_AACK ||
+           state == NG_AT86RF2XX_STATE_BUSY_TX_ARET);
+    if (state != NG_AT86RF2XX_STATE_TX_ARET_ON) {
+        dev->idle_state = state;
+    }
     ng_at86rf2xx_set_state(dev, NG_AT86RF2XX_STATE_TX_ARET_ON);
     dev->frame_len = NG_IEEE802154_FCS_LEN;
 }
