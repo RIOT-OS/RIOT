@@ -24,38 +24,38 @@ export DOCKER_MAKECMDGOALS ?= all
 # Docker container, they will only be passed if they are set from the
 # environment, not if they are only default Makefile values.
 export DOCKER_ENV_VARS = \
-  BINDIRBASE \
-  BOARD \
-  QUIET \
-  RIOT_VERSION \
   APPDIR \
-  BINDIR \
-  BUILDRELPATH \
-  ELFFILE \
-  HEXFILE \
-  LINKFLAGPREFIX \
-  CPPMIX \
-  PREFIX \
-  CC \
-  CXX \
-  CFLAGS \
-  CXXUWFLAGS \
-  CXXEXFLAGS \
   AR \
   ARFLAGS \
   AS \
   ASFLAGS \
+  BINDIR \
+  BINDIRBASE \
+  BOARD \
+  BUILDRELPATH \
+  BUILDTEST_MCU_GROUP \
+  BUILDTEST_VERBOSE \
+  CC \
+  CFLAGS \
+  CPPMIX \
+  CXX \
+  CXXEXFLAGS \
+  CXXUWFLAGS \
+  ELFFILE \
+  HEXFILE \
   LINK \
+  LINKFLAGPREFIX \
   LINKFLAGS \
   OBJCOPY \
   OFLAGS \
-  SIZE \
-  UNDEF \
-  BUILDTEST_MCU_GROUP \
-  BUILDTEST_VERBOSE \
-  TOOLCHAIN \
-  SCANBUILD_OUTPUTDIR \
+  PREFIX \
+  QUIET \
+  RIOT_VERSION \
   SCANBUILD_ARGS \
+  SCANBUILD_OUTPUTDIR \
+  SIZE \
+  TOOLCHAIN \
+  UNDEF \
   #
 
 # Find which variables were set using the command line or the environment and
