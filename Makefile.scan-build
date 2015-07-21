@@ -1,0 +1,91 @@
+SCANBUILD_ENV_VARS := \
+  APPDIR \
+  AR \
+  ARFLAGS \
+  AS \
+  ASFLAGS \
+  BINDIR \
+  BINDIRBASE \
+  BOARD \
+  BUILDRELPATH \
+  CC \
+  CFLAGS \
+  CPPMIX \
+  CXX \
+  CXXEXFLAGS \
+  CXXUWFLAGS \
+  ELFFILE \
+  HEXFILE \
+  HOME \
+  LINK \
+  LINKFLAGPREFIX \
+  LINKFLAGS \
+  OBJCOPY \
+  OFLAGS \
+  PATH \
+  PREFIX \
+  QUIET \
+  RIOT_VERSION \
+  SIZE \
+  TOOLCHAIN \
+  UNDEF \
+  USER \
+  #
+
+SCANBUILD_ARGS ?= \
+  -analyze-headers \
+  --use-cc=$(CC) \
+  --use-c++=$(CXX) \
+  -analyzer-config stable-report-filename=true \
+  #
+
+export SCANBUILD_OUTPUTDIR = $(CURDIR)/scan-build/
+
+# Find all variables given on the command line and recreate the command.
+CMDVARS := $(strip $(foreach varname, $(SCANBUILD_ENV_VARS), \
+  $(if $(filter command, $(origin $(varname))), \
+  '$(varname)=$(subst ','\'',$($(varname)))', \
+  )))
+ENVVARS := $(strip $(foreach varname, $(SCANBUILD_ENV_VARS), \
+  $(if $(filter environment, $(origin $(varname))), \
+  '$(varname)=$(subst ','\'',$($(varname)))', \
+  )))
+
+.PHONY: scan-build scan-build-analyze scan-build-view
+scan-build: scan-build-view scan-build-analyze
+scan-build-view: scan-build-analyze
+ifeq ($(BUILD_IN_DOCKER),1)
+scan-build-analyze: ..in-docker-container
+else # BUILD_IN_DOCKER
+scan-build-analyze: clean
+	@$(COLOR_ECHO) '$(COLOR_GREEN)Performing Clang static code analysis using toolchain "$(TOOLCHAIN)".$(COLOR_RESET)'
+# ccc-analyzer needs to be told the proper -target setting for best results,
+# otherwise false error reports about unknown register names etc will be produced.
+# These kinds of errors can be safely ignored as long as they only come from LLVM
+	@if [ "$${TOOLCHAIN}" != "llvm" -a "$${BOARD}" != "native" ]; then \
+	  $(COLOR_ECHO) '$(COLOR_YELLOW)Recommend using TOOLCHAIN=llvm for best results.$(COLOR_RESET)'; \
+	  $(COLOR_ECHO) '$(COLOR_YELLOW)Ignore any "error: unknown register name '\''rX'\'' in asm" messages.$(COLOR_RESET)'; \
+	fi
+	$(AD)mkdir -p '$(SCANBUILD_OUTPUTDIR)'
+	$(AD)env -i $(ENVVARS) \
+	    scan-build -o '$(SCANBUILD_OUTPUTDIR)' $(SCANBUILD_ARGS) \
+	      make -C $(CURDIR) all $(strip $(CMDVARS));
+endif # BUILD_IN_DOCKER
+
+ifeq (1,$(INSIDE_DOCKER))
+scan-build-view:
+	@
+else
+	@echo "Showing most recent report in your web browser..."
+	@REPORT_FILE="$$(find '$(SCANBUILD_OUTPUTDIR)' -maxdepth 2 -mindepth 2 \
+	            -type f -name 'index.html' 2>/dev/null | sort | tail -n 1)"; \
+	  if [ -n "$${REPORT_FILE}" ]; then \
+	    echo "$(OPEN) $${REPORT_FILE}"; \
+	    $(OPEN) "$${REPORT_FILE}"; \
+	  else \
+	    echo "No report found"; \
+	  fi
+endif
+
+# Reset the default goal.
+.DEFAULT_GOAL :=

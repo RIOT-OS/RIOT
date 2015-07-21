@@ -18,6 +18,9 @@ RIOTPROJECT := $(abspath $(RIOTPROJECT))
 # using abspath, strip etc.
 include $(RIOTBASE)/Makefile.docker
 
+# Static code analysis tools provided by LLVM
+include $(RIOTBASE)/Makefile.scan-build
+
 # Path to the current directory relative to the git root
 BUILDRELPATH ?= $(shell git rev-parse --show-prefix)
 
@@ -52,6 +55,12 @@ ifeq (, ${JENKINS_URL})
       COLOR_ECHO   := /bin/echo -e
     endif
   endif
+endif
+
+ifeq ($(OS),Darwin)
+  OPEN   := open
+else
+  OPEN   := xdg-open
 endif
 
 ifeq ($(QUIET),1)

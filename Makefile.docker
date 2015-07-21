@@ -5,6 +5,8 @@ export DOCKER_FLAGS ?= --rm
 export DOCKER_MAKECMDGOALS_POSSIBLE = \
   all \
   buildtest \
+  scan-build \
+  scan-build-analyze \
   #
 export DOCKER_MAKECMDGOALS = $(filter $(MAKECMDGOALS),$(DOCKER_MAKECMDGOALS_POSSIBLE))
 
@@ -52,6 +54,8 @@ export DOCKER_ENV_VARS = \
   BUILDTEST_MCU_GROUP \
   BUILDTEST_VERBOSE \
   TOOLCHAIN \
+  SCANBUILD_OUTPUTDIR \
+  SCANBUILD_ARGS \
   #
 
 # Find which variables were set using the command line or the environment and
