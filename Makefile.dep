@@ -302,6 +302,22 @@ ifneq (,$(filter oonf_common,$(USEMODULE)))
   USEMODULE += socket_base
 endif
 
+ifneq (,$(filter %_conn_ip,$(USEMODULE)))
+  USEMODULE += conn_ip
+endif
+
+ifneq (,$(filter %_conn_tcp,$(USEMODULE)))
+  USEMODULE += conn_tcp
+endif
+
+ifneq (,$(filter %_conn_udp,$(USEMODULE)))
+  USEMODULE += conn_udp
+endif
+
+ifneq (,$(filter conn_%,$(USEMODULE)))
+  USEMODULE += conn
+endif
+
 # if any log_* is used, also use LOG pseudomodule
 ifneq (,$(filter log_%,$(USEMODULE)))
   USEMODULE += log
