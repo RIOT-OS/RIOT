@@ -852,7 +852,7 @@ int spi_init_slave(spi_t dev, spi_conf_t conf, char(*cb)(char data))
 
 int spi_acquire(spi_t dev)
 {
-    if (dev >= SPI_NUMOF) {
+    if ((unsigned int)dev >= SPI_NUMOF) {
         return -1;
     }
 
@@ -862,7 +862,7 @@ int spi_acquire(spi_t dev)
 
 int spi_release(spi_t dev)
 {
-    if (dev >= SPI_NUMOF) {
+    if ((unsigned int)dev >= SPI_NUMOF) {
         return -1;
     }
 
