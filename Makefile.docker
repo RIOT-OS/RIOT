@@ -51,6 +51,7 @@ export DOCKER_ENV_VARS = \
   UNDEF \
   BUILDTEST_MCU_GROUP \
   BUILDTEST_VERBOSE \
+  TOOLCHAIN \
   #
 
 # Find which variables were set using the command line or the environment and
@@ -59,9 +60,9 @@ export DOCKER_ENV_VARS = \
 # of the environment variables will be overwritten by Makefile.include and their
 # origin is changed to "file"
 DOCKER_ENVIRONMENT_CMDLINE := $(foreach varname,$(DOCKER_ENV_VARS), \
-    $(if $(filter environment command,$(origin $(varname))), \
-    -e '$(varname)=$($(varname))', \
-    ))
+  $(if $(filter environment command,$(origin $(varname))), \
+  -e '$(varname)=$(subst ','\'',$($(varname)))', \
+  ))
 DOCKER_ENVIRONMENT_CMDLINE := $(strip $(DOCKER_ENVIRONMENT_CMDLINE))
 
 # This will execute `make $(DOCKER_MAKECMDGOALS)` inside a Docker container.
