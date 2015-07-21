@@ -448,7 +448,7 @@ kernel_pid_t ng_ndp_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_len,
 
 #endif
 
-    if ((next_hop_ip == NULL)) {            /* no route to host */
+    if (next_hop_ip == NULL) {            /* no route to host */
         if (iface == KERNEL_PID_UNDEF) {
             /* ng_ipv6_netif_t doubles as prefix list */
             iface = ng_ipv6_netif_find_by_prefix(&prefix, dst);

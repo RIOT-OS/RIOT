@@ -57,7 +57,7 @@ static mutex_t mtx_access = MUTEX_INIT;
 static universal_address_container_t *universal_address_find_entry(uint8_t *addr, size_t addr_size)
 {
     for (size_t i = 0; i < UNIVERSAL_ADDRESS_MAX_ENTRIES; ++i) {
-        if ((universal_address_table[i].address_size == addr_size) && (universal_address_table[i].address != NULL)) {
+        if (universal_address_table[i].address_size == addr_size) {
             if (memcmp((universal_address_table[i].address), addr, addr_size) == 0) {
                 return &(universal_address_table[i]);
             }
