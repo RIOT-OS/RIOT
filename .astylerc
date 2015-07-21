@@ -4,10 +4,9 @@
 --indent-labels
 --indent-col1-comments
 --min-conditional-indent=0
---break-blocks
+--unpad-paren
 --pad-oper
 --pad-header
---unpad-paren
 --break-closing-brackets
 --add-brackets
 --align-pointer=name
