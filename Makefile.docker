@@ -79,6 +79,7 @@ DOCKER_ENVIRONMENT_CMDLINE := $(strip $(DOCKER_ENVIRONMENT_CMDLINE))
 	    -v '$(RIOTCPU):$(DOCKER_BUILD_ROOT)/riotcpu' \
 	    -v '$(RIOTBOARD):$(DOCKER_BUILD_ROOT)/riotboard' \
 	    -v '$(RIOTPROJECT):$(DOCKER_BUILD_ROOT)/riotproject' \
+	    -v /etc/localtime:/etc/localtime:ro \
 	    -e 'RIOTBASE=$(DOCKER_BUILD_ROOT)/riotbase' \
 	    -e 'RIOTCPU=$(DOCKER_BUILD_ROOT)/riotcpu' \
 	    -e 'RIOTBOARD=$(DOCKER_BUILD_ROOT)/riotboard' \
