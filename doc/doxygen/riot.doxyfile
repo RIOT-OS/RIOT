@@ -816,7 +816,7 @@ EXCLUDE_PATTERNS       = */board/*/tools/* \
                          */cpu/*/include/instance/* \
                          */cpu/*/include/pio/* \
                          */cpu/*/include/atmel/* \
-                         */cpu/sam3/include/sam3*.h \
+                         */cpu/sam3/include/sam3* \
                          */cpu/sam3/include/system_sam*.h \
                          */cpu/lpc*/include/core_cm*.h \
                          */cpu/cortexm_common/include/core_cm*.h \
