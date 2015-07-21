@@ -10,7 +10,7 @@
  * @ingroup         cpu_lm4f120
  * @{
  *
- * @file			hwtimer_cpu.h
+ * @file
  * @brief           CPU specific hwtimer configuration options
  *
  * @author          Rakendra Thapa <rakendrathapa@gmail.com>

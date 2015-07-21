@@ -14,6 +14,7 @@
  * @brief       Implementation of the CPU initialization
  *
  * @author      Rakendra Thapa <rakendrathapa@gmail.com>
+ * @}
  */
 
 #include "cpu.h"
@@ -67,4 +68,3 @@ void cpu_clock_init(int clk)
             break;
     }
 }
-/** @} */

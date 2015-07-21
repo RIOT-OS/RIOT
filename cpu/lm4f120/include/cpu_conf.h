@@ -7,12 +7,13 @@
  */
 
 /**
- * @defgroup        cpu_lm4f120
- * @ingroup         cpu cpu_lm4f120
+ * @defgroup        cpu_lm4f120 LM4F
+ * @ingroup         cpu
+ * @brief           CPU specific implementations for LM4F120
  * @{
  *
- * @file            cpu_conf.h
- * @brief           CPU specific implementations for LM4F120
+ * @file
+ * @brief           Implementation specific CPU configuration options
  *
  * @author          Rakendra Thapa <rakendrathapa@gmail.com>
  */

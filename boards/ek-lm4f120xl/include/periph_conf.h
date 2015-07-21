@@ -10,7 +10,7 @@
  * @ingroup     boards_ek-lm4f120xl
  * @{
  *
- * @file        periph_conf.h
+ * @file
  * @name        Peripheral MCU configuration for the ek-lm4f120xl board
  *
  * @author      Rakendra Thapa <rakendrathapa@gmail.com>
@@ -33,7 +33,7 @@ extern "C" {
 #define CLK40                           3
 #define CLK16                           4
 #define CLK1                            5
-#define CLOCK_SOURCE					CLK40
+#define CLOCK_SOURCE                    CLK40
 /** @} */
 
 /**
