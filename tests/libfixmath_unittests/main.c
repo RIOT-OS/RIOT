@@ -28,9 +28,12 @@
  * @}
  */
 
+#include <stdio.h>
+
 int main(void)
 {
 #include "fix16_unittests.inc"
 
+    puts("All tests executed.");
     return 0;
 }
