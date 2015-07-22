@@ -138,38 +138,38 @@ ng_at86rf2xx_freq_t ng_at86rf2xx_get_freq(ng_at86rf2xx_t *dev)
 
 void ng_at86rf2xx_set_freq(ng_at86rf2xx_t *dev, ng_at86rf2xx_freq_t freq)
 {
-    uint8_t tmp1 = 0, tmp2 = 0;
-    tmp1 = ng_at86rf2xx_reg_read(dev, NG_AT86RF2XX_REG__TRX_CTRL_2);
-    tmp1 &= ~(NG_AT86RF2XX_TRX_CTRL_2_MASK__FREQ_MODE);
-    tmp2 = ng_at86rf2xx_reg_read(dev, NG_AT86RF2XX_REG__RF_CTRL_0);
+    uint8_t trx_ctrl2 = 0, rf_ctrl0 = 0;
+    trx_ctrl2 = ng_at86rf2xx_reg_read(dev, NG_AT86RF2XX_REG__TRX_CTRL_2);
+    trx_ctrl2 &= ~(NG_AT86RF2XX_TRX_CTRL_2_MASK__FREQ_MODE);
+    rf_ctrl0 = ng_at86rf2xx_reg_read(dev, NG_AT86RF2XX_REG__RF_CTRL_0);
     /* Erase previous conf for GC_TX_OFFS */
-    tmp2 &= ~NG_AT86RF2XX_RF_CTRL_0_MASK__GC_TX_OFFS;
+    rf_ctrl0 &= ~NG_AT86RF2XX_RF_CTRL_0_MASK__GC_TX_OFFS;
 
-    if (freq == NG_AT86RF2XX_FREQ_915MHZ) {
-        dev->freq = NG_AT86RF2XX_FREQ_915MHZ;
-        /* settings used by Linux 4.0rc at86rf212b driver - BPSK-40*/
-        tmp1 |= NG_AT86RF2XX_TRX_CTRL_2_MASK__SUB_MODE
-              | NG_AT86RF2XX_TRX_CTRL_2_MASK__OQPSK_SCRAM_EN;
-        tmp2 |= NG_AT86RF2XX_RF_CTRL_0_GC_TX_OFFS__2DB;
+    trx_ctrl2 |= NG_AT86RF2XX_TRX_CTRL_2_MASK__SUB_MODE;
+    rf_ctrl0 |= NG_AT86RF2XX_RF_CTRL_0_GC_TX_OFFS__2DB;
 
-        if (dev->chan == 0) {
-            ng_at86rf2xx_set_chan(dev,NG_AT86RF2XX_DEFAULT_CHANNEL);
-        } else {
-            ng_at86rf2xx_set_chan(dev,dev->chan);
-        }
-    } else if (freq == NG_AT86RF2XX_FREQ_868MHZ) {
-        dev->freq = NG_AT86RF2XX_FREQ_868MHZ;
-        /* OQPSK-SIN-RC-100 IEEE802.15.4 for 868,3MHz */
-        tmp1 |= NG_AT86RF2XX_TRX_CTRL_2_MASK__BPSK_OQPSK;
-        tmp2 |= NG_AT86RF2XX_RF_CTRL_0_GC_TX_OFFS__1DB;
+    switch(freq) {
+        case NG_AT86RF2XX_FREQ_915MHZ:
+            if (dev->chan == 0) {
+                ng_at86rf2xx_set_chan(dev,NG_AT86RF2XX_DEFAULT_CHANNEL);
+            } else {
+                ng_at86rf2xx_set_chan(dev,dev->chan);
+            }
+            break;
 
-        /* Channel = 0 for 868MHz means 868.3MHz, only one available */
-        ng_at86rf2xx_set_chan(dev,0x00);
-    } else {
-        return;
+        case NG_AT86RF2XX_FREQ_868MHZ:
+            /* Channel = 0 for 868MHz means 868.3MHz, only one available */
+            ng_at86rf2xx_set_chan(dev,0x00);
+            break;
+
+        default:
+            DEBUG("ng_at86rf2xx: Trying to set unknown frequency 0x%lx\n",
+                (unsigned long) freq);
+            return;
     }
-    ng_at86rf2xx_reg_write(dev, NG_AT86RF2XX_REG__TRX_CTRL_2, tmp1);
-    ng_at86rf2xx_reg_write(dev, NG_AT86RF2XX_REG__RF_CTRL_0, tmp2);
+    dev->freq = freq;
+    ng_at86rf2xx_reg_write(dev, NG_AT86RF2XX_REG__TRX_CTRL_2, trx_ctrl2);
+    ng_at86rf2xx_reg_write(dev, NG_AT86RF2XX_REG__RF_CTRL_0, rf_ctrl0);
 }
 #endif
 
@@ -334,43 +334,68 @@ void ng_at86rf2xx_set_option(ng_at86rf2xx_t *dev, uint16_t option, bool state)
     }
 }
 
-uint8_t ng_at86rf2xx_get_state(ng_at86rf2xx_t *dev)
-{
-    uint8_t status = ng_at86rf2xx_get_status(dev);
-    return (status & 0x1f);
-}
-
 static inline void _set_state(ng_at86rf2xx_t *dev, uint8_t state)
 {
     ng_at86rf2xx_reg_write(dev, NG_AT86RF2XX_REG__TRX_STATE, state);
-    while (ng_at86rf2xx_get_state(dev) != state);
+    while (ng_at86rf2xx_get_status(dev) != state);
+}
+
+static inline void _force_trx_off(ng_at86rf2xx_t *dev)
+{
+    ng_at86rf2xx_reg_write(dev, NG_AT86RF2XX_REG__TRX_STATE, NG_AT86RF2XX_TRX_STATE__FORCE_TRX_OFF);
+    while (ng_at86rf2xx_get_status(dev) != NG_AT86RF2XX_STATE_TRX_OFF);
 }
 
 void ng_at86rf2xx_set_state(ng_at86rf2xx_t *dev, uint8_t state)
 {
-    uint8_t old_state = ng_at86rf2xx_get_state(dev);
+    uint8_t old_state = ng_at86rf2xx_get_status(dev);
 
     if (state == old_state) {
         return;
     }
-    /* make sure there is no ongoing transmission */
+    /* make sure there is no ongoing transmission, or state transition already
+     * in progress */
     while (old_state == NG_AT86RF2XX_STATE_BUSY_RX_AACK ||
-           old_state == NG_AT86RF2XX_STATE_BUSY_TX_ARET) {
-        old_state = ng_at86rf2xx_get_state(dev);
+           old_state == NG_AT86RF2XX_STATE_BUSY_TX_ARET ||
+           old_state == NG_AT86RF2XX_STATE_IN_PROGRESS) {
+        old_state = ng_at86rf2xx_get_status(dev);
+    }
+
+    /* we need to go via PLL_ON if we are moving between RX_AACK_ON <-> TX_ARET_ON */
+    if ((old_state == NG_AT86RF2XX_STATE_RX_AACK_ON &&
+             state == NG_AT86RF2XX_STATE_TX_ARET_ON) ||
+        (old_state == NG_AT86RF2XX_STATE_TX_ARET_ON &&
+             state == NG_AT86RF2XX_STATE_RX_AACK_ON)) {
+        _set_state(dev, NG_AT86RF2XX_STATE_PLL_ON);
     }
     /* check if we need to wake up from sleep mode */
-    if (old_state == NG_AT86RF2XX_STATE_SLEEP) {
+    else if (old_state == NG_AT86RF2XX_STATE_SLEEP) {
         DEBUG("at86rf2xx: waking up from sleep mode\n");
         gpio_clear(dev->sleep_pin);
-        while (ng_at86rf2xx_get_state(dev) != NG_AT86RF2XX_STATE_TRX_OFF);
+        while (ng_at86rf2xx_get_status(dev) != NG_AT86RF2XX_STATE_TRX_OFF);
     }
-    /* go to neutral TRX_OFF state */
-    _set_state(dev, NG_AT86RF2XX_STATE_TRX_OFF);
-    if (state == NG_AT86RF2XX_STATE_RX_AACK_ON ||
-        state == NG_AT86RF2XX_STATE_TX_ARET_ON) {
-        _set_state(dev, state);
-    } else if (state == NG_AT86RF2XX_STATE_SLEEP) {
+
+    if (state == NG_AT86RF2XX_STATE_SLEEP) {
+        /* First go to TRX_OFF */
+        _force_trx_off(dev);
+        /* Go to SLEEP mode from TRX_OFF */
         gpio_set(dev->sleep_pin);
-        while (ng_at86rf2xx_get_state(dev) != NG_AT86RF2XX_STATE_SLEEP);
+    } else {
+        _set_state(dev, state);
     }
+}
+
+void ng_at86rf2xx_reset_state_machine(ng_at86rf2xx_t *dev)
+{
+    uint8_t old_state;
+
+    /* Wake up */
+    gpio_clear(dev->sleep_pin);
+
+    /* Wait for any state transitions to complete before forcing TRX_OFF */
+    do {
+        old_state = ng_at86rf2xx_get_status(dev);
+    } while (old_state == NG_AT86RF2XX_STATE_IN_PROGRESS);
+
+    _force_trx_off(dev);
 }

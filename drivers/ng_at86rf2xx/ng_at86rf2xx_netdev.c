@@ -38,7 +38,7 @@ static size_t _make_data_frame_hdr(ng_at86rf2xx_t *dev, uint8_t *buf,
 
     /* we are building a data frame here */
     buf[0] = NG_IEEE802154_FCF_TYPE_DATA;
-    buf[1] = 0x88;      /* use short src and dst addresses as starting point */
+    buf[1] = NG_IEEE802154_FCF_VERS_V1;
 
     /* if AUTOACK is enabled, then we also expect ACKs for this packet */
     if (!(hdr->flags & NG_NETIF_HDR_FLAGS_BROADCAST) &&
@@ -55,16 +55,18 @@ static size_t _make_data_frame_hdr(ng_at86rf2xx_t *dev, uint8_t *buf,
     /* fill in destination address */
     if (hdr->flags &
         (NG_NETIF_HDR_FLAGS_BROADCAST | NG_NETIF_HDR_FLAGS_MULTICAST)) {
+        buf[1] |= NG_IEEE802154_FCF_DST_ADDR_SHORT;
         buf[pos++] = 0xff;
         buf[pos++] = 0xff;
     }
     else if (hdr->dst_l2addr_len == 2) {
         uint8_t *dst_addr = ng_netif_hdr_get_dst_addr(hdr);
+        buf[1] |= NG_IEEE802154_FCF_DST_ADDR_SHORT;
         buf[pos++] = dst_addr[1];
         buf[pos++] = dst_addr[0];
     }
     else if (hdr->dst_l2addr_len == 8) {
-        buf[1] |= 0x04;
+        buf[1] |= NG_IEEE802154_FCF_DST_ADDR_LONG;
         uint8_t *dst_addr = ng_netif_hdr_get_dst_addr(hdr);
         for (int i = 7;  i >= 0; i--) {
             buf[pos++] = dst_addr[i];
@@ -85,11 +87,12 @@ static size_t _make_data_frame_hdr(ng_at86rf2xx_t *dev, uint8_t *buf,
 
     /* fill in source address */
     if (dev->options & NG_AT86RF2XX_OPT_SRC_ADDR_LONG) {
-        buf[1] |= 0x40;
+        buf[1] |= NG_IEEE802154_FCF_SRC_ADDR_LONG;
         memcpy(&(buf[pos]), dev->addr_long, 8);
         pos += 8;
     }
     else {
+        buf[1] |= NG_IEEE802154_FCF_SRC_ADDR_SHORT;
         buf[pos++] = dev->addr_short[0];
         buf[pos++] = dev->addr_short[1];
     }
@@ -153,7 +156,7 @@ static ng_pktsnip_t *_make_netif_hdr(uint8_t *mhr)
     else if (tmp == NG_IEEE802154_FCF_SRC_ADDR_LONG) {
         src_len = 8;
     }
-    else if (tmp == 0) {
+    else if (tmp == NG_IEEE802154_FCF_SRC_ADDR_VOID) {
         src_len = 0;
     }
     else {
@@ -166,7 +169,7 @@ static ng_pktsnip_t *_make_netif_hdr(uint8_t *mhr)
     else if (tmp == NG_IEEE802154_FCF_DST_ADDR_LONG) {
         dst_len = 8;
     }
-    else if (tmp == 0) {
+    else if (tmp == NG_IEEE802154_FCF_DST_ADDR_VOID) {
         dst_len = 0;
     }
     else {
@@ -337,7 +340,7 @@ static int _set_state(ng_at86rf2xx_t *dev, ng_netconf_state_t state)
 
 ng_netconf_state_t _get_state(ng_at86rf2xx_t *dev)
 {
-    switch (ng_at86rf2xx_get_state(dev)) {
+    switch (ng_at86rf2xx_get_status(dev)) {
         case NG_AT86RF2XX_STATE_SLEEP:
             return NETCONF_STATE_SLEEP;
         case NG_AT86RF2XX_STATE_BUSY_RX_AACK:
@@ -691,7 +694,8 @@ static void _isr_event(ng_netdev_t *device, uint32_t event_type)
 
     /* read (consume) device status */
     irq_mask = ng_at86rf2xx_reg_read(dev, NG_AT86RF2XX_REG__IRQ_STATUS);
-    state = ng_at86rf2xx_get_state(dev);
+
+    state = ng_at86rf2xx_get_status(dev);
 
     if (irq_mask & NG_AT86RF2XX_IRQ_STATUS_MASK__RX_START) {
         dev->event_cb(NETDEV_EVENT_RX_STARTED, NULL);
@@ -706,11 +710,11 @@ static void _isr_event(ng_netdev_t *device, uint32_t event_type)
             _receive_data(dev);
         }
         else if (state == NG_AT86RF2XX_STATE_TX_ARET_ON) {
+            ng_at86rf2xx_set_state(dev, dev->idle_state);
             if (dev->event_cb && (dev->options & NG_AT86RF2XX_OPT_TELL_TX_END)) {
                 dev->event_cb(NETDEV_EVENT_TX_COMPLETE, NULL);
             }
             DEBUG("[ng_at86rf2xx] EVT - TX_END\n");
-            ng_at86rf2xx_set_state(dev, dev->idle_state);
         }
     }
 }
