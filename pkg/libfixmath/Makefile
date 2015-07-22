@@ -1,9 +1,10 @@
-PKG_NAME    := libfixmath
-PKG_VERSION := 91
-PKG_BRANCH  := trunk
-PKG_URL     := http://libfixmath.googlecode.com/svn/$(PKG_BRANCH)/
+export PKG_NAME    := libfixmath
+export PKG_VERSION := 91
+export PKG_BRANCH  := trunk
+export PKG_URL     := http://libfixmath.googlecode.com/svn/$(PKG_BRANCH)/
 
-CHECKOUT_FOLDER := $(CURDIR)/checkout/$(PKG_BRANCH)-r$(PKG_VERSION)
+export CHECKOUT_FOLDER := $(CURDIR)/checkout/$(PKG_BRANCH)-r$(PKG_VERSION)
+export SVN_INFO_FILE   := $(CHECKOUT_FOLDER)/svn_info.xml
 
 .PHONY: all clean distclean
 
@@ -52,10 +53,9 @@ $(BINDIR)$(PKG_NAME)-headers/fix16.h: $(CHECKOUT_FOLDER)/svn_info.xml
 	$(AD)echo $(patsubst %,'extern int %(void);',$(shell for f in $(CHECKOUT_FOLDER)/unittests/*.c; do basename $${f} .c; done )) \
 	      $(patsubst %,'%();',$(shell for f in $(CHECKOUT_FOLDER)/unittests/*.c; do basename $${f} .c; done)) | sed -e 's/;\s*/;\n/g' > $(@D)/fix16_unittests.inc
 
-$(CHECKOUT_FOLDER)/svn_info.xml:
+$(SVN_INFO_FILE):
 	$(AD)mkdir -p $(@D)
-	$(AD)svn checkout -q -r $(PKG_VERSION) $(PKG_URL) $(@D)
-	$(AD)svn info --xml $(@D) > $@
+	$(AD)$(CURDIR)/checkout.sh
 
 clean::
 	$(AD)rm -rf $(BINDIR)$(PKG_NAME)-src/ $(BINDIR)$(PKG_NAME)-headers/
