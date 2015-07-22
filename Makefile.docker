@@ -5,8 +5,18 @@ export DOCKER_FLAGS ?= --rm
 export DOCKER_MAKECMDGOALS_POSSIBLE = \
   all \
   buildtest \
+  scan-build \
+  scan-build-analyze \
   #
 export DOCKER_MAKECMDGOALS = $(filter $(MAKECMDGOALS),$(DOCKER_MAKECMDGOALS_POSSIBLE))
+
+# Docker creates the files .dockerinit and .dockerenv in the root directory of
+# the container, we check for the files to determine if we are inside a container.
+ifneq (,$(wildcard /.dockerinit /.dockerenv))
+  export INSIDE_DOCKER := 1
+else
+  export INSIDE_DOCKER := 0
+endif
 
 # Default target for building inside a Docker container if nothing was given
 export DOCKER_MAKECMDGOALS ?= all
@@ -14,35 +24,38 @@ export DOCKER_MAKECMDGOALS ?= all
 # Docker container, they will only be passed if they are set from the
 # environment, not if they are only default Makefile values.
 export DOCKER_ENV_VARS = \
-  BINDIRBASE \
-  BOARD \
-  QUIET \
-  RIOT_VERSION \
   APPDIR \
-  BINDIR \
-  BUILDRELPATH \
-  ELFFILE \
-  HEXFILE \
-  LINKFLAGPREFIX \
-  CPPMIX \
-  PREFIX \
-  CC \
-  CXX \
-  CFLAGS \
-  CXXUWFLAGS \
-  CXXEXFLAGS \
   AR \
   ARFLAGS \
   AS \
   ASFLAGS \
+  BINDIR \
+  BINDIRBASE \
+  BOARD \
+  BUILDRELPATH \
+  BUILDTEST_MCU_GROUP \
+  BUILDTEST_VERBOSE \
+  CC \
+  CFLAGS \
+  CPPMIX \
+  CXX \
+  CXXEXFLAGS \
+  CXXUWFLAGS \
+  ELFFILE \
+  HEXFILE \
   LINK \
+  LINKFLAGPREFIX \
   LINKFLAGS \
   OBJCOPY \
   OFLAGS \
+  PREFIX \
+  QUIET \
+  RIOT_VERSION \
+  SCANBUILD_ARGS \
+  SCANBUILD_OUTPUTDIR \
   SIZE \
+  TOOLCHAIN \
   UNDEF \
-  BUILDTEST_MCU_GROUP \
-  BUILDTEST_VERBOSE \
   #
 
 # Find which variables were set using the command line or the environment and
@@ -51,9 +64,9 @@ export DOCKER_ENV_VARS = \
 # of the environment variables will be overwritten by Makefile.include and their
 # origin is changed to "file"
 DOCKER_ENVIRONMENT_CMDLINE := $(foreach varname,$(DOCKER_ENV_VARS), \
-    $(if $(filter environment command,$(origin $(varname))), \
-    -e '$(varname)=$($(varname))', \
-    ))
+  $(if $(filter environment command,$(origin $(varname))), \
+  -e '$(varname)=$(subst ','\'',$($(varname)))', \
+  ))
 DOCKER_ENVIRONMENT_CMDLINE := $(strip $(DOCKER_ENVIRONMENT_CMDLINE))
 
 # This will execute `make $(DOCKER_MAKECMDGOALS)` inside a Docker container.
@@ -70,6 +83,7 @@ DOCKER_ENVIRONMENT_CMDLINE := $(strip $(DOCKER_ENVIRONMENT_CMDLINE))
 	    -v '$(RIOTCPU):$(DOCKER_BUILD_ROOT)/riotcpu' \
 	    -v '$(RIOTBOARD):$(DOCKER_BUILD_ROOT)/riotboard' \
 	    -v '$(RIOTPROJECT):$(DOCKER_BUILD_ROOT)/riotproject' \
+	    -v /etc/localtime:/etc/localtime:ro \
 	    -e 'RIOTBASE=$(DOCKER_BUILD_ROOT)/riotbase' \
 	    -e 'RIOTCPU=$(DOCKER_BUILD_ROOT)/riotcpu' \
 	    -e 'RIOTBOARD=$(DOCKER_BUILD_ROOT)/riotboard' \
