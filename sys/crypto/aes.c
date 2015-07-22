@@ -40,14 +40,14 @@
 /**
  * Interface to the aes cipher
  */
-block_cipher_interface_t aes_interface = {
-    "AES",
+static const cipher_interface_t aes_interface = {
+    AES_BLOCK_SIZE,
+    AES_KEY_SIZE,
     aes_init,
     aes_encrypt,
-    aes_decrypt,
-    aes_setup_key,
-    aes_get_preferred_block_size
+    aes_decrypt
 };
+const cipher_id_t CIPHER_AES_128 = &aes_interface;
 
 static const u32 Te0[256] = {
     0xc66363a5U, 0xf87c7c84U, 0xee777799U, 0xf67b7b8dU,
@@ -720,37 +720,30 @@ static const u32 rcon[] = {
 };
 
 
-int aes_init(cipher_context_t *context, uint8_t blockSize, uint8_t keySize,
-             uint8_t *key)
+int aes_init(cipher_context_t *context, const uint8_t *key, uint8_t keySize)
 {
-    //printf("%-40s: Entry\r\n", __FUNCTION__);
-    // 16 byte blocks only
-    if (blockSize != AES_BLOCK_SIZE) {
-        printf("%-40s: blockSize != AES_BLOCK_SIZE...\r\n", __FUNCTION__);
+    uint8_t i;
+
+    // Make sure that context is large enough. If this is not the case,
+    // you should build with -DAES
+    if(CIPHER_MAX_CONTEXT_SIZE < AES_KEY_SIZE) {
         return 0;
     }
 
-    uint8_t i;
-
-    //key must be at least CIPHERS_KEYSIZE Bytes long
-    if (keySize < CIPHERS_KEYSIZE) {
+    //key must be at least CIPHERS_MAX_KEY_SIZE Bytes long
+    if (keySize < CIPHERS_MAX_KEY_SIZE) {
         //fill up by concatenating key to as long as needed
-        for (i = 0; i < CIPHERS_KEYSIZE; i++) {
+        for (i = 0; i < CIPHERS_MAX_KEY_SIZE; i++) {
             context->context[i] = key[(i % keySize)];
         }
     }
     else {
-        for (i = 0; i < CIPHERS_KEYSIZE; i++) {
+        for (i = 0; i < CIPHERS_MAX_KEY_SIZE; i++) {
             context->context[i] = key[i];
         }
     }
 
     return 1;
-}
-
-int aes_setup_key(cipher_context_t *context, uint8_t *key, uint8_t keysize)
-{
-    return aes_init(context, aes_get_preferred_block_size(), keysize, key);
 }
 
 /**
@@ -943,7 +936,7 @@ static int aes_set_decrypt_key(const unsigned char *userKey, const int bits,
  * Encrypt a single block
  * in and out can overlap
  */
-int aes_encrypt(cipher_context_t *context, uint8_t *plainBlock,
+int aes_encrypt(const cipher_context_t *context, const uint8_t *plainBlock,
                 uint8_t *cipherBlock)
 {
     //setup AES_KEY
@@ -1202,7 +1195,7 @@ int aes_encrypt(cipher_context_t *context, uint8_t *plainBlock,
  * Decrypt a single block
  * in and out can overlap
  */
-int aes_decrypt(cipher_context_t *context, uint8_t *cipherBlock,
+int aes_decrypt(const cipher_context_t *context, const uint8_t *cipherBlock,
                 uint8_t *plainBlock)
 {
     //setup AES_KEY
@@ -1456,11 +1449,6 @@ int aes_decrypt(cipher_context_t *context, uint8_t *cipherBlock,
         rk[3];
     PUTU32(plainBlock + 12, s3);
     return 1;
-}
-
-uint8_t aes_get_preferred_block_size(void)
-{
-    return AES_BLOCK_SIZE;
 }
 
 #endif /* AES_ASM */
