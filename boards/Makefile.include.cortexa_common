@@ -1,0 +1,49 @@
+# Target triple for the build. Use arm-none-eabi if you are unsure.
+export TARGET_TRIPLE ?= arm-none-eabi
+
+# Use TOOLCHAIN environment variable to select the toolchain to use.
+# Default: gnu
+TOOLCHAIN ?= gnu
+
+# TOOLCHAIN = clang is an alias for TOOLCHAIN = llvm
+ifeq (clang,$(TOOLCHAIN))
+# use override so that we can redefine a variable set on the command line (as
+# opposed to one set in the environment)
+override TOOLCHAIN := llvm
+endif
+
+export TOOLCHAIN
+
+# default toolchain prefix, defaults to target triple followed by a dash, you
+# will most likely not need to touch this.
+export PREFIX ?= $(if $(TARGET_TRIPLE),$(TARGET_TRIPLE)-)
+
+# define build specific options
+export CFLAGS_CPU   = -mcpu=$(MCPU) -mlittle-endian #-mthumb $(CFLAGS_FPU)
+ifneq (llvm,$(TOOLCHAIN))
+# Clang (observed with v3.7) does not understand  -mno-thumb-interwork, only add if
+# not building with LLVM
+#export CFLAGS_CPU  += -mno-thumb-interwork
+endif
+export CFLAGS_STYLE = -std=gnu99 -Wall -Wstrict-prototypes #-Werror=implicit-function-declaration
+export CFLAGS_LINK  = -ffunction-sections -fdata-sections -fno-builtin -fshort-enums
+export CFLAGS_DBG   = -ggdb -g3
+export CFLAGS_OPT  ?= -Os
+
+export CFLAGS += $(CFLAGS_CPU) $(CFLAGS_STYLE) $(CFLAGS_LINK) $(CFLAGS_DBG) $(CFLAGS_OPT)
+
+export ASFLAGS += $(CFLAGS_CPU) $(CFLAGS_DEBUG)
+export LINKFLAGS += -L$(RIOTCPU)/$(CPU)/ldscripts -Lbin/$(BOARD)/$(PROJECT) -v
+export LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ldscripts/$(CPU_MODEL).ld -Wl,--fatal-warnings
+export LINKFLAGS += $(CFLAGS_DEBUG) $(CFLAGS_CPU) $(CFLAGS_STYLE) -static -lgcc -nostartfiles
+
+# Import all toolchain settings
+include $(RIOTBOARD)/Makefile.include.$(TOOLCHAIN)
+
+# use the nano-specs of Newlib when available
+ifeq ($(shell $(LINK) -specs=nano.specs -E - 2>/dev/null >/dev/null </dev/null ; echo $$?),0)
+export LINKFLAGS += -specs=nano.specs -lc -lnosys
+endif
+
+# export board specific includes to the global includes-listing
+export INCLUDES += -I$(RIOTBOARD)/$(BOARD)/include

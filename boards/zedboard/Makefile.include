@@ -1,0 +1,11 @@
+# define the cpu used by the zedboard board
+export CPU = zynq7000
+
+export TERMPROG = qemu-system-arm 
+export TERMFLAGS = -M xilinx-zynq-a9 -m 1024 -nographic -kernel bin/$(BOARD)/$(PROJECT)$(APPLICATION).elf
+
+export DEBUGGER = arm-none-eabi-gdb -ex "target remote localhost:1234"
+export DEBUGSERVER = qemu-system-arm -M xilinx-zynq-a9 -m 1024 -nographic -kernel bin/$(BOARD)/$(PROJECT)$(APPLICATION).elf -s -S
+
+# include cortex defaults
+include $(RIOTBOARD)/Makefile.include.cortexa_common

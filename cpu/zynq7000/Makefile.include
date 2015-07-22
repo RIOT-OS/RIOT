@@ -1,0 +1,11 @@
+export CPU_ARCH = cortex-a9
+
+export USEMODULE += ZYNQ7000_PERIPH
+
+# Explicitly tell the linker to link the vectors.
+#   Without this the interrupt vectors will not be linked correctly!
+#ifeq ($(COMMON_STARTUP),)
+export UNDEF += $(BINDIR)cpu/asm_vectors.o
+#endif
+
+include $(RIOTCPU)/Makefile.include.cortexa_common

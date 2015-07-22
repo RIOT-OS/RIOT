@@ -1,0 +1,27 @@
+# This CPU implementation is using the new core/CPU interface:
+export CFLAGS += -DCOREIF_NG=1
+
+# use newlib as libc
+export USEMODULE += newlib
+
+# set default for CPU_MODEL
+export CPU_MODEL ?= $(CPU)
+
+# export the CPU model and architecture
+MODEL = $(shell echo $(CPU_MODEL) | tr 'a-z' 'A-Z')
+export CFLAGS += -DCPU_MODEL_$(MODEL)
+ARCH = $(shell echo $(CPU_ARCH) | tr 'a-z-' 'A-Z_')
+export CFLAGS += -DCPU_ARCH_$(ARCH)
+
+CFLAGS_FPU ?= -mfloat-abi=soft
+export MCPU ?= $(CPU_ARCH)
+
+# Include CPU specific includes:
+export INCLUDES += -I$(RIOTCPU)/$(CPU)/include
+
+# Avoid overriding the default rule:
+all:
+
+# Rule to generate assembly listings from ELF files:
+%.lst: %.elf
+	$(OBJDUMP) $(OBJDUMPFLAGS) $< > $@
