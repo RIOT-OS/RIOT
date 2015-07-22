@@ -21,6 +21,7 @@
 #include <string.h>
 #include <stdio.h>
 
+#include "od.h"
 #include "net/ng_pktbuf.h"
 #include "_pktbuf_internal.h"
 
@@ -282,8 +283,17 @@ bool _pktbuf_internal_contains(const void *ptr)
 #ifdef DEVELHELP
 void _pktbuf_internal_stats(void)
 {
-    printf("Static packet buffer\n");
-    printf(" * Maximum number of reserved bytes: %u\n", _pktbuf_max_bytes);
+    _used_t *ptr = _head();
+
+    printf("== Static packet buffer ==\n");
+    printf("--- Maximum number of reserved bytes: %u ---\n", _pktbuf_max_bytes);
+    while (ptr) {
+        printf("**** %p: next: %p, size: %" PRIu16 ", pkts: %" PRIu8 " ****\n",
+               (void *)ptr, (void *)ptr->next, ptr->size, ptr->pkts);
+        od_hex_dump(_data(ptr), ptr->size, OD_WIDTH_DEFAULT);
+        puts("");
+        ptr = ptr->next;
+    }
 }
 #endif
 
