@@ -30,6 +30,8 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
+#define _MAX_MHR_OVERHEAD   (25)
+
 /* TODO: generalize and move to ng_ieee802154 */
 static size_t _make_data_frame_hdr(ng_at86rf2xx_t *dev, uint8_t *buf,
                                    ng_netif_hdr_t *hdr)
@@ -232,7 +234,8 @@ static int _send(ng_netdev_t *netdev, ng_pktsnip_t *pkt)
     /* check if packet (header + payload + FCS) fits into FIFO */
     snip = pkt->next;
     if ((ng_pkt_len(snip) + len + 2) > NG_AT86RF2XX_MAX_PKT_LENGTH) {
-        DEBUG("[ng_at86rf2xx] error: packet too large to be send\n");
+        printf("[ng_at86rf2xx] error: packet too large (%u byte) to be send\n",
+               ng_pkt_len(snip) + len + 2);
         ng_pktbuf_release(pkt);
         return -EOVERFLOW;
     }
@@ -444,7 +447,7 @@ static int _get(ng_netdev_t *device, ng_netconf_opt_t opt,
             if (max_len < sizeof(int16_t)) {
                 return -EOVERFLOW;
             }
-            *((uint16_t *)val) = NG_AT86RF2XX_MAX_PKT_LENGTH;
+            *((uint16_t *)val) = NG_AT86RF2XX_MAX_PKT_LENGTH - _MAX_MHR_OVERHEAD;
             return sizeof(uint16_t);
 
         case NETCONF_OPT_STATE:
