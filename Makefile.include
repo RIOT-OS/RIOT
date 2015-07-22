@@ -245,6 +245,7 @@ $(USEPKG:%=${BINDIR}%.a):
 clean:
 	-@for i in $(USEPKG) ; do "$(MAKE)" -C $(RIOTBASE)/pkg/$$i clean ; done
 	-@rm -rf $(BINDIR)
+	-@rm -rf $(SCANBUILD_OUTPUTDIR)
 
 # Remove intermediates, but keep the .elf, .hex and .map etc.
 clean-intermediates:
