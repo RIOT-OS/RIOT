@@ -186,8 +186,6 @@ void uart_poweroff(uart_t uart)
 void isr_uart0(void)
 {
     unsigned long ulStatus;
-    char cChar;
-    long lChar;
 
     ulStatus = ROM_UARTIntStatus(UART0_BASE, true);
     ROM_UARTIntClear(UART0_BASE, ulStatus);
@@ -205,6 +203,8 @@ void isr_uart0(void)
     {
         while(ROM_UARTCharsAvail(UART0_BASE))
         {
+            char cChar;
+            long lChar;
             lChar = ROM_UARTCharGetNonBlocking(UART0_BASE);
             cChar = (unsigned char)(lChar & 0xFF);
             config[UART_0].rx_cb(config[UART_0].arg, cChar);
