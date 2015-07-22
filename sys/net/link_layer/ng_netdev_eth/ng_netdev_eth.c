@@ -364,7 +364,9 @@ static inline void _addr_set_multicast(uint8_t *dst, ng_pktsnip_t *payload)
         case NG_NETTYPE_IPV6:
             dst[0] = 0x33;
             dst[1] = 0x33;
-            memcpy(dst + 2, ((uint8_t *)payload->data) + _IPV6_DST_OFFSET, 4);
+            if ((payload != NULL) && (payload->data != NULL)) {
+                memcpy(dst + 2, ((uint8_t *)payload->data) + _IPV6_DST_OFFSET, 4);
+            }
             /* TODO change to proper types when ng_ipv6_hdr_t got merged */
             break;
 #endif

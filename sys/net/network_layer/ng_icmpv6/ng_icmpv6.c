@@ -62,9 +62,13 @@ void ng_icmpv6_demux(kernel_pid_t iface, ng_pktsnip_t *pkt)
 
     LL_SEARCH_SCALAR(pkt, icmpv6, type, NG_NETTYPE_ICMPV6);
 
+    assert(icmpv6 != NULL);
+
     /* there can be extension headers between IPv6 and ICMPv6 header so we have
      * to search it */
     LL_SEARCH_SCALAR(icmpv6, ipv6, type, NG_NETTYPE_IPV6);
+
+    assert(ipv6 != NULL);
 
     hdr = (ng_icmpv6_hdr_t *)icmpv6->data;
 
