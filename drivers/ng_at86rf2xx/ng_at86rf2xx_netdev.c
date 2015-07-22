@@ -222,28 +222,37 @@ static int _send(ng_netdev_t *netdev, ng_pktsnip_t *pkt)
         return -ENODEV;
     }
 
-    /* create 802.15.4 header */
-    len = _make_data_frame_hdr(dev, mhr, (ng_netif_hdr_t *)pkt->data);
-    if (len == 0) {
-        DEBUG("[ng_at86rf2xx] error: unable to create 802.15.4 header\n");
-        ng_pktbuf_release(pkt);
-        return -ENOMSG;
+    if (dev->options & NG_AT86RF2XX_OPT_RAWMODE) {
+        DEBUG("[ng_at86rf2xx] info: attempt to send raw data\n");
+        /* change to sending state */
+        ng_at86rf2xx_tx_prepare(dev);
+        /* load raw data into FIFO */
+        len = ng_at86rf2xx_tx_load(dev, pkt->data, pkt->size, 0);
     }
-    /* check if packet (header + payload + FCS) fits into FIFO */
-    snip = pkt->next;
-    if ((ng_pkt_len(snip) + len + 2) > NG_AT86RF2XX_MAX_PKT_LENGTH) {
-        DEBUG("[ng_at86rf2xx] error: packet too large to be send\n");
-        ng_pktbuf_release(pkt);
-        return -EOVERFLOW;
-    }
+    else {
+        /* create 802.15.4 header */
+        len = _make_data_frame_hdr(dev, mhr, (ng_netif_hdr_t *)pkt->data);
+        if (len == 0) {
+            DEBUG("[ng_at86rf2xx] error: unable to create 802.15.4 header\n");
+            ng_pktbuf_release(pkt);
+            return -ENOMSG;
+        }
+        /* check if packet (header + payload + FCS) fits into FIFO */
+        snip = pkt->next;
+        if ((ng_pkt_len(snip) + len + 2) > NG_AT86RF2XX_MAX_PKT_LENGTH) {
+            DEBUG("[ng_at86rf2xx] error: packet too large to be send\n");
+            ng_pktbuf_release(pkt);
+            return -EOVERFLOW;
+        }
 
-    ng_at86rf2xx_tx_prepare(dev);
-    /* put header into FIFO */
-    len = ng_at86rf2xx_tx_load(dev, mhr, len, 0);
-    /* load packet data into FIFO */
-    while (snip) {
-        len = ng_at86rf2xx_tx_load(dev, snip->data, snip->size, len);
-        snip = snip->next;
+        ng_at86rf2xx_tx_prepare(dev);
+        /* put header into FIFO */
+        len = ng_at86rf2xx_tx_load(dev, mhr, len, 0);
+        /* load packet data into FIFO */
+        while (snip) {
+            len = ng_at86rf2xx_tx_load(dev, snip->data, snip->size, len);
+            snip = snip->next;
+        }
     }
     /* send data out directly if pre-loading id disabled */
     if (!(dev->options & NG_AT86RF2XX_OPT_PRELOADING)) {
@@ -271,7 +280,7 @@ static void _receive_data(ng_at86rf2xx_t *dev)
     }
 
     /* in raw mode, just read the binary dump into the packet buffer */
-    if (dev->options & NG_AT86RF2XX_OPT_RAWDUMP) {
+    if (dev->options & NG_AT86RF2XX_OPT_RAWMODE) {
         payload = ng_pktbuf_add(NULL, NULL, pkt_len, NG_NETTYPE_UNDEF);
         if (payload == NULL ) {
             DEBUG("[ng_at86rf2xx] error: unable to allocate RAW data\n");
@@ -489,7 +498,7 @@ static int _get(ng_netdev_t *device, ng_netconf_opt_t opt,
             return sizeof(ng_netconf_enable_t);
 
         case NETCONF_OPT_RAWMODE:
-            if (dev->options & NG_AT86RF2XX_OPT_RAWDUMP) {
+            if (dev->options & NG_AT86RF2XX_OPT_RAWMODE) {
                 *((ng_netconf_enable_t *)val) = NETCONF_ENABLE;
             }
             else {
@@ -629,7 +638,7 @@ static int _set(ng_netdev_t *device, ng_netconf_opt_t opt,
             return sizeof(ng_netconf_enable_t);
 
         case NETCONF_OPT_RAWMODE:
-            ng_at86rf2xx_set_option(dev, NG_AT86RF2XX_OPT_RAWDUMP,
+            ng_at86rf2xx_set_option(dev, NG_AT86RF2XX_OPT_RAWMODE,
                                     ((bool *)val)[0]);
             return sizeof(ng_netconf_enable_t);
 

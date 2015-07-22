@@ -122,8 +122,8 @@ typedef enum {
                                                      *   start */
 #define NG_AT86RF2XX_OPT_TELL_RX_END    (0x0080)    /**< notify MAC layer on RX
                                                      *   finished */
-#define NG_AT86RF2XX_OPT_RAWDUMP        (0x0100)    /**< pass RAW frame data to
-                                                     *   upper layer */
+#define NG_AT86RF2XX_OPT_RAWMODE        (0x0100)    /**< get/pass RAW frame data
+                                                     *   from/to upper layer */
 #define NG_AT86RF2XX_OPT_SRC_ADDR_LONG  (0x0200)    /**< send data using long
                                                      *   source address */
 #define NG_AT86RF2XX_OPT_USE_SRC_PAN    (0x0400)    /**< do not compress source
