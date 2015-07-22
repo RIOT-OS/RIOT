@@ -40,6 +40,11 @@
 #ifndef __CORTEX_M4_DEF_H__
 #define __CORTEX_M4_DEF_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 //*****************************************************************************
 //
 // Watchdog Timer registers (WATCHDOG0)
@@ -10020,6 +10025,10 @@
 #define EEPROM_EEPROMPP_SIZE_M  0x0000001F  // EEPROM Size
 #define EEPROM_EEPROMPP_SIZE_S  0
 
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif // __LM4F120H5QR_H__
