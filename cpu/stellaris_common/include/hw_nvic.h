@@ -40,6 +40,10 @@
 #ifndef __HW_NVIC_H__
 #define __HW_NVIC_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //*****************************************************************************
 //
 // The following are defines for the NVIC register addresses.
@@ -1713,5 +1717,9 @@
 #define NVIC_FPDSC_RMODE_RM     0x00800000  // Round towards Minus Infinity
                                             // (RM) mode
 #define NVIC_FPDSC_RMODE_RZ     0x00C00000  // Round towards Zero (RZ) mode
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // __HW_NVIC_H__

@@ -40,6 +40,10 @@
 #ifndef __HW_PWM_H__
 #define __HW_PWM_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //*****************************************************************************
 //
 // The following are defines for the PWM register offsets.
@@ -2015,6 +2019,10 @@
 #define PWM_RV_INTEN            0x00000000  // Interrupt enable
 #define PWM_RV_X_COUNT          0x00000000  // The current counter value
 
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif // __HW_PWM_H__

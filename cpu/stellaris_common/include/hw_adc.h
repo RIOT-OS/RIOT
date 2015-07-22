@@ -40,6 +40,10 @@
 #ifndef __HW_ADC_H__
 #define __HW_ADC_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //*****************************************************************************
 //
 // The following are defines for the ADC register offsets.
@@ -1347,6 +1351,10 @@
 #define ADC_LB_CNT_SHIFT        6           // Sample counter shift
 #define ADC_LB_MUX_SHIFT        0           // Input channel number shift
 
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif // __HW_ADC_H__

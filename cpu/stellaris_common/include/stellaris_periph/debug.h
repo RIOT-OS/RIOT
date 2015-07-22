@@ -40,6 +40,10 @@
 #ifndef __DEBUG_H__
 #define __DEBUG_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //*****************************************************************************
 //
 // Prototype for the function that is called when an invalid argument is passed
@@ -63,6 +67,10 @@ extern void __error__(char *pcFilename, unsigned long ulLine);
                      }
 #else
 #define ASSERT(expr)
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif // __DEBUG_H__

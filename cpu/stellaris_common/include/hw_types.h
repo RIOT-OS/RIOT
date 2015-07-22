@@ -40,6 +40,10 @@
 #ifndef __HW_TYPES_H__
 #define __HW_TYPES_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //*****************************************************************************
 //
 // Define a boolean type, and values for true and false.
@@ -213,6 +217,10 @@ typedef unsigned char tBoolean;
 #define DEVICE_IS_REVA2         REVISION_IS_A2
 #define DEVICE_IS_REVC1         REVISION_IS_C1
 #define DEVICE_IS_REVC2         REVISION_IS_C2
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif // __HW_TYPES_H__

@@ -40,6 +40,10 @@
 #ifndef __HW_GPIO_H__
 #define __HW_GPIO_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //*****************************************************************************
 //
 // The following are defines for the GPIO register offsets.
@@ -187,6 +191,10 @@
 #define GPIO_RV_DATA            0x00000000  // Data register reset value
 #define GPIO_RV_MIS             0x00000000  // Masked interrupt status reg RV
 
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif // __HW_GPIO_H__

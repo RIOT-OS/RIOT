@@ -40,6 +40,10 @@
 #ifndef __HW_UART_H__
 #define __HW_UART_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //*****************************************************************************
 //
 // The following are defines for the UART register offsets.
@@ -517,6 +521,10 @@
 #define UART_RV_PeriphID7       0x00000000
 #define UART_RV_IBRD            0x00000000
 
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif // __HW_UART_H__

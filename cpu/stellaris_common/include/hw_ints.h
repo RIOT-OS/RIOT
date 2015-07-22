@@ -40,6 +40,10 @@
 #ifndef __HW_INTS_H__
 #define __HW_INTS_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //*****************************************************************************
 //
 // The following are defines for the fault assignments.
@@ -212,6 +216,10 @@
 #define INT_ADC3                33          // ADC Sequence 3
 #define INT_PWM3                61          // PWM Generator 3
 
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif // __HW_INTS_H__

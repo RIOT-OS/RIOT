@@ -40,6 +40,10 @@
 #ifndef __HW_I2C_H__
 #define __HW_I2C_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //*****************************************************************************
 //
 // The following are defines for the I2C register offsets.
@@ -484,6 +488,10 @@
 //*****************************************************************************
 #define I2C_SLAVE_SICR_IC       0x00000001  // Slave interrupt clear
 
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif // __HW_I2C_H__

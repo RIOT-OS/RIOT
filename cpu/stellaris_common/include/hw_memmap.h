@@ -40,6 +40,10 @@
 #ifndef __HW_MEMMAP_H__
 #define __HW_MEMMAP_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //*****************************************************************************
 //
 // The following are defines for the base address of the memories and
@@ -159,6 +163,10 @@
 #define QEI_BASE                0x4002C000  // QEI
 #define ADC_BASE                0x40038000  // ADC
 
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif // __HW_MEMMAP_H__

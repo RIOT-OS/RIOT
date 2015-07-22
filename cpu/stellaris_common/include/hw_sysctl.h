@@ -40,6 +40,10 @@
 #ifndef __HW_SYSCTL_H__
 #define __HW_SYSCTL_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //*****************************************************************************
 //
 // The following are defines for the System Control register addresses.
@@ -3671,6 +3675,10 @@
 #define SYSCTL_INT_BOR          0x00000002  // Brown out interrupt
 #define SYSCTL_INT_PLL_FAIL     0x00000001  // PLL failure interrupt
 
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif // __HW_SYSCTL_H__

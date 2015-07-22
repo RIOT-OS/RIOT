@@ -40,6 +40,10 @@
 #ifndef __ROM_H__
 #define __ROM_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //*****************************************************************************
 //
 // Pointers to the main API tables.
@@ -6739,6 +6743,10 @@
 #define ROM_USBHostPwrFaultConfig \
         ROM_USBHostPwrConfig
 #endif
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif // __ROM_H__

@@ -40,6 +40,10 @@
 #ifndef __HW_WATCHDOG_H__
 #define __HW_WATCHDOG_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //*****************************************************************************
 //
 // The following are defines for the Watchdog Timer register offsets.
@@ -186,6 +190,10 @@
 #define WDT_RV_LOCK             0x00000000  // Lock register
 #define WDT_RV_MIS              0x00000000  // Masked interrupt status register
 
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif // __HW_WATCHDOG_H__

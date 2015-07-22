@@ -40,6 +40,10 @@
 #ifndef __HW_SYSEXC_H__
 #define __HW_SYSEXC_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //*****************************************************************************
 //
 // The following are defines for the System Exception Module register
@@ -128,5 +132,8 @@
                                             // Exception Interrupt Clear
 #define SYSEXC_IC_FPIDCIC       0x00000001  // Floating-Point Input Denormal
                                             // Exception Interrupt Clear
+#ifdef __cplusplus
+}
+#endif
 
 #endif // __HW_SYSEXC_H__

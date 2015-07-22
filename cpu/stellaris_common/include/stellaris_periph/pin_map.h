@@ -40,6 +40,10 @@
 #ifndef __PIN_MAP_H__
 #define __PIN_MAP_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //*****************************************************************************
 //
 // LM4F120H5QR Port/Pin Mapping Definitions
@@ -445,5 +449,9 @@
 //*****************************************************************************
 #define PeripheralEnable(ulName)                                    \
                                 SysCtlPeripheralEnable(ulName##_PERIPH)
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // __PIN_MAP_H__

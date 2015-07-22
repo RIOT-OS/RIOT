@@ -40,6 +40,10 @@
 #ifndef __HW_SSI_H__
 #define __HW_SSI_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //*****************************************************************************
 //
 // The following are defines for the SSI register offsets.
@@ -239,6 +243,10 @@
 #define SSI_INT_RXTO            0x00000002  // RX timeout interrupt
 #define SSI_INT_RXOR            0x00000001  // RX overrun interrupt
 
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif // __HW_SSI_H__

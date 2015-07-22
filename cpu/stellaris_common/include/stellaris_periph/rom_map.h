@@ -41,6 +41,10 @@
 #ifndef __ROM_MAP_H__
 #define __ROM_MAP_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //*****************************************************************************
 //
 // Macros for the ADC API.
@@ -5070,6 +5074,10 @@
 #else
 #define MAP_Crc8CCITT \
         Crc8CCITT
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif // __ROM_MAP_H__

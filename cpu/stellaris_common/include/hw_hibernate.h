@@ -40,6 +40,10 @@
 #ifndef __HW_HIBERNATE_H__
 #define __HW_HIBERNATE_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //*****************************************************************************
 //
 // The following are defines for the Hibernation module register addresses.
@@ -281,6 +285,10 @@
 //*****************************************************************************
 #define HIB_DATA_MASK           0xFFFFFFFF  // NV memory data mask
 
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif // __HW_HIBERNATE_H__

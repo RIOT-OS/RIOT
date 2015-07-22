@@ -40,6 +40,10 @@
 #ifndef __HW_TIMER_H__
 #define __HW_TIMER_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //*****************************************************************************
 //
 // The following are defines for the Timer register offsets.
@@ -754,6 +758,10 @@
 //*****************************************************************************
 #define TIMER_TNPMR_TNPSMR      0x000000FF  // TimerN prescale match value
 
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif // __HW_TIMER_H__
