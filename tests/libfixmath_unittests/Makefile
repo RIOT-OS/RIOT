@@ -13,4 +13,8 @@ BOARD_INSUFFICIENT_RAM += redbee-econotag stm32f0discovery
 
 USEMODULE += libfixmath-unittests
 
+ifneq (,$(filter native qemu-i386,$(BOARD)))
+  export LINKFLAGS += -lm
+endif
+
 include $(RIOTBASE)/Makefile.include
