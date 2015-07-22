@@ -23,6 +23,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "hw_ints.h"
 #include "hw_memmap.h"
 #include "hw_nvic.h"
@@ -45,10 +50,6 @@
 
 #ifdef CPU_MODEL_LM4F120H5QR
 #include "lm4f120h5qr.h"
-#endif
-
-#ifdef __cplusplus
-extern "C" {
 #endif
 
 /**
