@@ -550,7 +550,7 @@ void fib_deinit(void)
     mutex_unlock(&mtx_access);
 }
 
-int fib_register_rp(uint8_t *prefix, size_t prefix_size)
+int fib_register_rp(uint8_t *prefix, size_t prefix_addr_type_size)
 {
     mutex_lock(&mtx_access);
 
@@ -559,14 +559,14 @@ int fib_register_rp(uint8_t *prefix, size_t prefix_size)
         return -ENOMEM;
     }
 
-    if ((prefix == NULL) || (prefix_size == 0)) {
+    if ((prefix == NULL) || (prefix_addr_type_size == 0)) {
         mutex_unlock(&mtx_access);
         return -EINVAL;
     }
 
     if (notify_rp_pos < FIB_MAX_REGISTERED_RP) {
         notify_rp[notify_rp_pos] = sched_active_pid;
-        universal_address_container_t *container = universal_address_add(prefix, prefix_size);
+        universal_address_container_t *container = universal_address_add(prefix, prefix_addr_type_size);
         prefix_rp[notify_rp_pos] = container;
         notify_rp_pos++;
     }
