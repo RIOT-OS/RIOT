@@ -11,33 +11,77 @@
 #include "net/ng_pkt.h"
 #include "net/ng_ipv6.h"
 #include "net/ng_ipv6/addr.h"
+#include "net/ng_ipv6/nc.h"
+#include "net/ng_netbase.h"
+#include "net/ng_netif.h"
+#include "transceiver.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-#define PORT_SRV 1000
+#define PORT_SRV 2000
+//#define PEER_ADDR "2000::1000"
+#define LOCL_ADDR "fe80::0001"
+#define PEER_MAC  "d4:4f:40:b6:1b:f0:98:59"
+#define PEER_ADDR "fe80::51b6:e9ac:f7b1:961" 
 
 kernel_pid_t main_pid = KERNEL_PID_UNDEF;
 
-static char _stack_srv[THREAD_STACKSIZE_MAIN];
+//static char _stack_srv[THREAD_STACKSIZE_MAIN];
 static char _stack_cli[THREAD_STACKSIZE_MAIN];
-static char _stack_fake_ip6[THREAD_STACKSIZE_MAIN];
+//static char _stack_fake_ip6[THREAD_STACKSIZE_MAIN];
+
+void setLocalAddr(char *addr_str, ng_ipv6_addr_t* peer_addr)
+{
+    uint16_t data = 0;
+
+    /* Get Network Interface PID */
+    kernel_pid_t ifs[NG_NETIF_NUMOF]; 
+    ng_netif_get(ifs);
+
+    /* Set channel */
+    data = 17;
+    ng_netapi_set(ifs[0], NETCONF_OPT_CHANNEL, 0, &data, sizeof(uint16_t));
+
+    /* Set Pan ID */
+    data = 0xbeee;
+    ng_netapi_set(ifs[0], NETCONF_OPT_NID, 0, &data, sizeof(uint16_t));
+
+    /* Set Address */
+    ng_ipv6_addr_t addr;
+    ng_ipv6_addr_from_str(&addr, addr_str);
+    ng_ipv6_netif_add_addr(ifs[0], &addr, 64, NG_IPV6_NETIF_ADDR_FLAGS_UNICAST);
+
+    /* Add Destination to Neighbor Cache */
+    char* l2_addr_str = PEER_MAC ;
+    uint8_t l2_addr[8U];
+    size_t l2_addr_len = 0;
+    l2_addr_len = ng_netif_addr_from_str(l2_addr, sizeof(l2_addr), l2_addr_str);
+
+    ng_ipv6_nc_add(ifs[0], peer_addr, l2_addr, l2_addr_len, 0);
+    
+}
 
 void *cli(__attribute__((unused))void *arg)
 {
     msg_t msg;
     ng_tcp_tcb_t tcb;
     ng_ipv6_addr_t peer_addr;
-
-    /* Setup Peer Addr */
-    ng_ipv6_addr_from_string(&peer_addr, "2000::1000");
+    
+    /* Config Peer Address */
+    ng_ipv6_addr_from_str(&peer_addr, PEER_ADDR);
+    
+    /* Config Local Address */
+    setLocalAddr(LOCL_ADDR, &peer_addr);
 
     /* Initialize TCB and connect to peer */
     ng_tcp_tcb_init(&tcb);
     ng_tcp_open(&tcb, 0, (uint8_t *) &peer_addr, sizeof(peer_addr), PORT_SRV, 0);
 
     if(tcb.state == ESTABLISHED){
-        printf("Cli: Connection Established\n");
+        printf("Cli: Connection established\n");
+    }else if(tcb.state == CLOSED){
+        printf("Cli: Connection closed\n");
     }
 
     // Destroy Transmission Control Block

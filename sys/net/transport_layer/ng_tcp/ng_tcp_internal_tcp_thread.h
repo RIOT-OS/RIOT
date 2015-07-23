@@ -66,6 +66,7 @@ static void _tcp_send(ng_pktsnip_t *pkt)
 {
     /* NOTE: Sending Direction: pkt = nw, nw->next = tcp, tcp->next = payload */
     ng_pktsnip_t* tcp_snp = NULL;
+    ng_pktsnip_t* ip6_snp = NULL;
     ng_netreg_entry_t* sendto = NULL;
 
     /* Search for tcp header */
@@ -75,6 +76,11 @@ static void _tcp_send(ng_pktsnip_t *pkt)
         ng_pktbuf_release(pkt);
         return;
     }
+
+    /* Print TCP Header */
+    ng_tcp_hdr_print((ng_tcp_hdr_t *) tcp_snp->data);
+    LL_SEARCH_SCALAR(pkt, ip6_snp, type, NG_NETTYPE_IPV6);
+    ng_ipv6_hdr_print((ng_ipv6_hdr_t *) ip6_snp->data);
 
     /* Send Message down the network stack */
     sendto = ng_netreg_lookup(pkt->type, NG_NETREG_DEMUX_CTX_ALL);
@@ -109,8 +115,11 @@ static void _tcp_receive(ng_pktsnip_t *pkt)
         return;
     }
 
+    printf("Received Packet!!!\n");
+
     /* We found a tcp header */
     tcp_hdr = (ng_tcp_hdr_t*) tcp_snp->data;
+    ng_tcp_hdr_print(tcp_hdr);
     ctl = byteorder_ntohs(tcp_hdr->off_ctl);
 
     /* Validate Checksum */
@@ -121,7 +130,7 @@ static void _tcp_receive(ng_pktsnip_t *pkt)
     }
 
     /* Validate Offset */
-    if((ctl & MSK_OFFSET) < OFFSET_BASE ){
+    if(GET_OFFSET(ctl) < OFFSET_BASE ){
         DEBUG("tcp: received packet with offset < 5, discarding it\n");
         ng_pktbuf_release(pkt);
         return;

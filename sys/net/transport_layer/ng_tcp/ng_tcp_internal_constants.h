@@ -20,25 +20,22 @@ typedef enum {
 } ng_tcp_event_t;
 
 /* Offset without Options(in 32-Bit words) */
- #define OFFSET_BASE 0x0005
- #define OFFSET_MAX  0x000f
+ #define OFFSET_BASE 0x5
+ #define OFFSET_MAX  0xF
 
  /* Makros to deal with Control Bits */
-#define MSK_FIN      0x8000
-#define MSK_SYN      0x4000
-#define MSK_RST      0x2000
-#define MSK_PSH      0x1000
-#define MSK_ACK      0x0800
-#define MSK_URG      0x0400
-#define MSK_SYN_ACK  0x4800
-#define MSK_RST_ACK  0x2800
-#define MSK_CTL      0xfc00
-#define MSK_OFFSET   0x000F
-#define MSK_RESERVED 0x03F0
+#define MSK_FIN      0x0001
+#define MSK_SYN      0x0002
+#define MSK_RST      0x0004
+#define MSK_PSH      0x0008
+#define MSK_ACK      0x0010
+#define MSK_URG      0x0020
+#define MSK_SYN_ACK  0x0012
+#define MSK_RST_ACK  0x0014
+#define MSK_CTL      0x003F
+#define MSK_OFFSET   0xF000
 
-/* TODO: Find real Timeout times */
-#define TIMEOUT_SYN_SENT   2000000
-#define TIMEOUT_SYN_RCVD   2000000
+#define GET_OFFSET( x ) ((( x ) & MSK_OFFSET) >> 24)
 
 /* Default Window Size */
 #define DEFAULT_WINDOW 250
@@ -63,9 +60,9 @@ typedef enum {
 #define OPT_LENGTH_MSS 04      /* MSS Option Size is 4 byte */
 
 /* Complete Option Macros */
-#define OPT_MSS( x ) (((x) << 16) | (OPT_LENGTH_MSS << 8) | OPT_KIND_MSS)
+#define OPT_MSS( x ) ((OPT_KIND_MSS << 24) | (OPT_LENGTH_MSS << 16) | ( x ))
 
 /* Value Extraction Macros */
-#define OPT_GET_KIND( x )   ( (x) & 0x000000FF)
-#define OPT_GET_LENGTH( x ) (((x) & 0x0000FF00) >> 8)
-#define OPT_GET_VAL_2B( x ) (((x) & 0xFFFF0000) >> 16)
+#define OPT_GET_KIND( x )   (((x) & 0xFF000000) >> 24)
+#define OPT_GET_LENGTH( x ) (((x) & 0x00FF0000) >> 16)
+#define OPT_GET_VAL_2B( x ) (((x) & 0x0000FFFF))

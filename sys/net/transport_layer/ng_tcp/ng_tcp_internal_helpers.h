@@ -8,20 +8,22 @@
 
 /* TODO: Currently Unused: Maybe removable in final version */
 //#if ENABLE_DEBUG
+
 typedef union {
     struct __attribute__((packed)) {
-        uint16_t data_offset : 4;
-        uint16_t reserved    : 6;
-        uint16_t urg         : 1;
-        uint16_t ack         : 1;
-        uint16_t psh         : 1;
-        uint16_t rst         : 1;
-        uint16_t syn         : 1;
         uint16_t fin         : 1;
+        uint16_t syn         : 1;
+        uint16_t rst         : 1;
+        uint16_t psh         : 1;
+        uint16_t ack         : 1;
+        uint16_t urg         : 1;
+        uint16_t reserved    : 6;
+        uint16_t data_offset : 4;
     }as_bits;
     uint16_t as_uint;
 } off_ctl_t;
 
+/*
 static void _dump_tcb (const ng_tcp_tcb_t *tcb)
 {
     char bufAddr[tcb->peer_addr_len];
@@ -50,22 +52,23 @@ static void _dump_tcb (const ng_tcp_tcb_t *tcb)
 #endif
     printf("| peer_port = %u\n",tcb->peer_port);
     printf("| local_port = %u\n", tcb->local_port);
-    printf("| snd_una = %u\n", tcb->snd_una);
-    printf("| snd_nxt = %u\n", tcb->snd_nxt);
+    printf("| snd_una = %lu\n", tcb->snd_una);
+    printf("| snd_nxt = %lu\n", tcb->snd_nxt);
     printf("| snd_wnd = %u\n", tcb->snd_wnd);
     printf("| snd_ur = %u\n", tcb->snd_ur);
-    printf("| snd_wl1 = %u\n", tcb->snd_wl1);
-    printf("| snd_wl2 = %u\n", tcb->snd_wl2);
-    printf("| iss = %u\n", tcb->iss);
-    printf("| rcv_nxt = %u\n", tcb->rcv_nxt);
+    printf("| snd_wl1 = %lu\n", tcb->snd_wl1);
+    printf("| snd_wl2 = %lu\n", tcb->snd_wl2);
+    printf("| iss = %lu\n", tcb->iss);
+    printf("| rcv_nxt = %lu\n", tcb->rcv_nxt);
     printf("| rcv_wnd = %u\n", tcb->rcv_wnd);
-    printf("| irs = %u\n", tcb->irs);
+    printf("| irs = %lu\n", tcb->irs);
     printf("| mss = %u\n", tcb->mss);
-    printf("| netreg_entry.pid = %x\n", tcb->netreg_entry.pid);
-    printf("| netreg_entry.demux_ctx = %x\n", tcb->netreg_entry.demux_ctx);
+    printf("| netreg_entry.pid = %u\n", tcb->netreg_entry.pid);
+    printf("| netreg_entry.demux_ctx = %lu\n", tcb->netreg_entry.demux_ctx);
     printf("| netreg_entry.next = %p\n", (void *)tcb->netreg_entry.next);
     printf("+--------------------------------\n\n");
 }
+*/
 
 /**
  * TODO: Make Optional, should not be in working release except for Debug reasons.
@@ -82,8 +85,8 @@ void ng_tcp_hdr_print (const ng_tcp_hdr_t *hdr)
     printf("+--------------------------------\n");
     printf("| src_port = %u\n", byteorder_ntohs(hdr->src_port));
     printf("| dst_port = %u\n", byteorder_ntohs(hdr->dst_port));
-    printf("| seq_num = %u\n", byteorder_ntohl(hdr->seq_num));
-    printf("| ack_num = %u\n", byteorder_ntohl(hdr->ack_num));
+    printf("| seq_num = %lu\n", byteorder_ntohl(hdr->seq_num));
+    printf("| ack_num = %lu\n", byteorder_ntohl(hdr->ack_num));
     printf("| off_ctl = %u\n", byteorder_ntohs(hdr->off_ctl));
     printf("|\n");
     printf("| Offset and Control Bits detailed\n");
@@ -101,7 +104,7 @@ void ng_tcp_hdr_print (const ng_tcp_hdr_t *hdr)
     printf("| urgent_ptr = %u\n", byteorder_ntohs(hdr->urgent_ptr));
 
     for(int i=0; i<nopts; i++){
-        printf("| options[%0d] = 0x%x\n", i, byteorder_ntohl(hdr->options[i]));
+        printf("| options[%0d] = %lu\n", i, byteorder_ntohl(hdr->options[i]));
     }
     printf("+--------------------------------\n\n");
 }
@@ -135,13 +138,16 @@ static int8_t _build_pkt(ng_tcp_tcb_t *tcb,
                          uint8_t *payload,
                          const size_t payload_len)
 {
-    ng_pktsnip_t *pkt_snp = NULL;
+    ng_pktsnip_t *pay_snp = NULL;
+    ng_pktsnip_t *tcp_snp = NULL;
+    ng_pktsnip_t *ip6_snp = NULL;
     ng_tcp_hdr_t  tcp_hdr;
+    uint8_t nopts = 0;
 
     /* Add payload, if supplied */
     if(payload != NULL && payload_len > 0){
-        pkt_snp = ng_pktbuf_add(pkt_snp, payload, payload_len, NG_NETTYPE_UNDEF);
-        if(pkt_snp == NULL){
+        pay_snp = ng_pktbuf_add(pay_snp, payload, payload_len, NG_NETTYPE_UNDEF);
+        if(pay_snp == NULL){
             DEBUG("tcp: Can't allocate buffer for Payload Header\n.");
             return -ENOMEM;
         }
@@ -158,34 +164,35 @@ static int8_t _build_pkt(ng_tcp_tcb_t *tcb,
 
     /* tcp option handling */
     /* If this is a syn-message, send mss option */
-    uint8_t nopts = 0;
     if(ctl & MSK_SYN){
         /* NOTE: "path MTU Discorvery" usable in the future? MSS Depends on Link-Layer */
         /* TODO: lookup via IP-Layer */
         tcp_hdr.options[nopts] = byteorder_htonl(OPT_MSS(NG_TCP_DEFAULT_MSS));
         nopts += 1;
     }
-    tcp_hdr.off_ctl = byteorder_htons( (OFFSET_BASE + nopts) | ctl);
+    tcp_hdr.off_ctl = byteorder_htons( ((OFFSET_BASE + nopts) << 12) | ctl);
 
     /* allocate tcp header */
-    pkt_snp = ng_pktbuf_add(pkt_snp, &tcp_hdr, (OFFSET_BASE + nopts) * 4, NG_NETTYPE_TCP);
-    if(pkt_snp == NULL){
+    tcp_snp = ng_pktbuf_add(pay_snp, &tcp_hdr, (OFFSET_BASE + nopts) * 4, NG_NETTYPE_TCP);
+    if(tcp_snp == NULL){
         DEBUG("tcp: Can't allocate buffer for TCP Header\n.");
+        ng_pktbuf_release(pay_snp);
         return -ENOMEM;
     }
 
     /* Build network layer header */
 #ifdef MODULE_NG_IPV6
-    pkt_snp = ng_ipv6_hdr_build(pkt_snp, NULL, 0, tcb->peer_addr, tcb->peer_addr_len);
-    if(pkt_snp == NULL){
+    ip6_snp = ng_ipv6_hdr_build(tcp_snp, NULL, 0, tcb->peer_addr, sizeof(ng_ipv6_addr_t));
+    if(ip6_snp == NULL){
         DEBUG("tcp: Can't allocate buffer for IPv6 Header.\n");
+        ng_pktbuf_release(tcp_snp);
         return -ENOMEM;
     }
 #endif
 
     /* Assign Pointers to tcb */
-    tcb->cur_pkt = pkt_snp;
-    tcb->cur_tcp_hdr = _get_tcp_hdr(pkt_snp);
+    tcb->cur_pkt = ip6_snp;
+    tcb->cur_tcp_hdr = (ng_tcp_hdr_t *) tcp_snp->data;
     tcb->cur_seg_len = payload_len;
     return 0;
 }
@@ -345,8 +352,9 @@ static int8_t _parse_options(ng_tcp_tcb_t *tcb, ng_tcp_hdr_t *hdr)
     uint8_t byte_idx = 0;
     uint8_t word_end = 0;
     uint32_t word = 0;
+    uint16_t off_ctl = byteorder_ntohs(hdr->off_ctl);
 
-    word_end = ((byteorder_ntohs(hdr->off_ctl) & MSK_OFFSET) - OFFSET_BASE);
+    word_end = GET_OFFSET(off_ctl) - OFFSET_BASE;
 
     /* There are existing options */
     while(word_idx < word_end){
@@ -469,13 +477,15 @@ static ng_tcp_tcb_t* _search_tcb_of_owner(kernel_pid_t owner)
     return ptr;
 }
 
+/*
 static void _dump_ret_queue(ng_tcp_tcb_t* tcb)
 {
     printf("Current Buffer Size: %d\n", tcb->ret_size);
     for(int i=0; i < NG_TCP_RETRANSMIT_QUEUE_SIZE; ++i){
-        printf("%d: pkt: %u, no: %d\n",i ,tcb->ret_queue[i].pkt, tcb->ret_queue[i].no_of_retries);
+        printf("%d: pkt: %lu, no: %d\n",i ,(uint32_t) tcb->ret_queue[i].pkt, tcb->ret_queue[i].no_of_retries);
     }
 }
+*/
 
 static void _clear_retransmit_queue(ng_tcp_tcb_t* tcb){
     for(uint8_t i=0; i < tcb->ret_size; i++){
