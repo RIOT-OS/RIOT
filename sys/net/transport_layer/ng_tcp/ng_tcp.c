@@ -194,15 +194,21 @@ int8_t ng_tcp_open(ng_tcp_tcb_t *tcb, uint16_t local_port, uint8_t *peer_addr,
 
     /* Wait till connection is established or closed or in close wait*/
     while(tcb->state != CLOSED && tcb->state != ESTABLISHED && tcb->state != CLOSE_WAIT){
-        /* Wait for notification(state change or timer expired) */
-        res = vtimer_msg_receive_timeout(&msg, tcb->ret_tout);
 
-        /* Timer expired: Possibly packet loss -> retransmit */
-        if(res < 0){
-            res = _fsm(tcb, NULL, TIME_RETRANSMIT);
+        // If Retransmission Queue is not empty.
+        if(tcb->ret_size > 0){
+            /* Wait for notification(state change or timer expired) */
+            res = vtimer_msg_receive_timeout(&msg, tcb->ret_tout);
+
+            /* Timer expired: Possibly packet loss -> retransmit */
+            if(res < 0){
+                printf("Retransmit\n");
+                res = _fsm(tcb, NULL, TIME_RETRANSMIT);
+            }
+        }else{
+            res = msg_receive(&msg);
         }
     }
-
     return res;
 }
 

@@ -35,7 +35,7 @@ typedef enum {
 #define MSK_CTL      0x003F
 #define MSK_OFFSET   0xF000
 
-#define GET_OFFSET( x ) ((( x ) & MSK_OFFSET) >> 24)
+#define GET_OFFSET( x ) ((( x ) & MSK_OFFSET) >> 12)
 
 /* Default Window Size */
 #define DEFAULT_WINDOW 250

@@ -1,5 +1,5 @@
 # name of your application
-APPLICATION = handshake
+APPLICATION = handshake_client
 
 # If no BOARD is found in the environment, use this default:
 BOARD ?= native
@@ -18,12 +18,14 @@ QUIET ?= 1
 # Modules to include
 USEMODULE += vtimer
 USEMODULE += random
+
 USEMODULE += ng_netif_default
 USEMODULE += auto_init_ng_netif
+
 USEMODULE += ng_ipv6_default
 USEMODULE += ng_tcp
-USEMODULE += od
 
-CFLAGS += -DDEVELHELP
+USEMODULE += ng_pktdump
+USEMODULE += ng_icmpv6_echo
 
 include $(RIOTBASE)/Makefile.include

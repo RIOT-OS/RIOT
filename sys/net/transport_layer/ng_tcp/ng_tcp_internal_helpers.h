@@ -85,8 +85,8 @@ void ng_tcp_hdr_print (const ng_tcp_hdr_t *hdr)
     printf("+--------------------------------\n");
     printf("| src_port = %u\n", byteorder_ntohs(hdr->src_port));
     printf("| dst_port = %u\n", byteorder_ntohs(hdr->dst_port));
-    printf("| seq_num = %lu\n", byteorder_ntohl(hdr->seq_num));
-    printf("| ack_num = %lu\n", byteorder_ntohl(hdr->ack_num));
+//    printf("| seq_num = %lu\n", byteorder_ntohl(hdr->seq_num));
+//    printf("| ack_num = %lu\n", byteorder_ntohl(hdr->ack_num));
     printf("| off_ctl = %u\n", byteorder_ntohs(hdr->off_ctl));
     printf("|\n");
     printf("| Offset and Control Bits detailed\n");
@@ -104,7 +104,7 @@ void ng_tcp_hdr_print (const ng_tcp_hdr_t *hdr)
     printf("| urgent_ptr = %u\n", byteorder_ntohs(hdr->urgent_ptr));
 
     for(int i=0; i<nopts; i++){
-        printf("| options[%0d] = %lu\n", i, byteorder_ntohl(hdr->options[i]));
+//        printf("| options[%0d] = %lu\n", i, byteorder_ntohl(hdr->options[i]));
     }
     printf("+--------------------------------\n\n");
 }

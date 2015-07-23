@@ -115,11 +115,8 @@ static void _tcp_receive(ng_pktsnip_t *pkt)
         return;
     }
 
-    printf("Received Packet!!!\n");
-
     /* We found a tcp header */
     tcp_hdr = (ng_tcp_hdr_t*) tcp_snp->data;
-    ng_tcp_hdr_print(tcp_hdr);
     ctl = byteorder_ntohs(tcp_hdr->off_ctl);
 
     /* Validate Checksum */
