@@ -429,9 +429,6 @@ static void send(ng_ipv6_addr_t addr, uint16_t port, void *data, size_t data_len
 {
     ng_pktsnip_t *payload, *pkt_with_udp, *pkt_with_ip;
 
-    /* convert to correct byteorder */
-    port = port;
-
     /* allocate payload */
     payload = ng_pktbuf_add(NULL, data, data_length, NG_NETTYPE_UNDEF);
     if (payload == NULL) {
