@@ -26,6 +26,7 @@
 #include "net/ng_netapi.h"
 #include "net/ng_netif.h"
 #include "net/ng_netif/hdr.h"
+#include "net/ng_sixlowpan/netif.h"
 
 #include "net/ng_ipv6/netif.h"
 
@@ -474,14 +475,24 @@ void ng_ipv6_netif_init_by_dev(void)
                            sizeof(if_type)) != -ENOTSUP) &&
             (if_type == NG_NETTYPE_SIXLOWPAN)) {
             uint16_t src_len = 8;
-            DEBUG("Set 6LoWPAN flag\n");
+            uint16_t max_frag_size = UINT16_MAX;
+
+            DEBUG("ipv6 netif: Set 6LoWPAN flag\n");
             ipv6_ifs[i].flags |= NG_IPV6_NETIF_FLAGS_SIXLOWPAN;
             /* use EUI-64 (8-byte address) for IID generation and for sending
              * packets */
             ng_netapi_set(ifs[i], NG_NETOPT_SRC_LEN, 0, &src_len,
                           sizeof(src_len)); /* don't care for result */
-        }
 
+            if (ng_netapi_get(ifs[i], NG_NETOPT_MAX_PACKET_SIZE,
+                              0, &max_frag_size, sizeof(max_frag_size)) < 0) {
+                /* if error we assume it works */
+                DEBUG("ipv6 netif: Can not get max packet size from interface %"
+                      PRIkernel_pid "\n", ifs[i]);
+            }
+
+            ng_sixlowpan_netif_add(ifs[i], max_frag_size);
+        }
 #endif
 
         if ((ng_netapi_get(ifs[i], NG_NETOPT_IPV6_IID, 0, &iid,
