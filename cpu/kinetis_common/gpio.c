@@ -675,7 +675,7 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pushpull, gpio_flank_t flank, gpio_cb_t 
 
 void gpio_irq_enable(gpio_t dev)
 {
-    if (dev >= GPIO_NUMOF) {
+    if ((unsigned int)dev >= GPIO_NUMOF) {
         DEBUG("gpio_t out of range: %d >= %d\n", dev, GPIO_NUMOF);
         return;
     }
@@ -689,7 +689,7 @@ void gpio_irq_enable(gpio_t dev)
 
 void gpio_irq_disable(gpio_t dev)
 {
-    if (dev >= GPIO_NUMOF) {
+    if ((unsigned int)dev >= GPIO_NUMOF) {
         DEBUG("gpio_t out of range: %d >= %d\n", dev, GPIO_NUMOF);
         return;
     }
@@ -703,7 +703,7 @@ void gpio_irq_disable(gpio_t dev)
 
 int gpio_read(gpio_t dev)
 {
-    if (dev >= GPIO_NUMOF) {
+    if ((unsigned int)dev >= GPIO_NUMOF) {
         DEBUG("gpio_t out of range: %d >= %d\n", dev, GPIO_NUMOF);
         return -1;
     }
@@ -722,7 +722,7 @@ int gpio_read(gpio_t dev)
 
 void gpio_set(gpio_t dev)
 {
-    if (dev >= GPIO_NUMOF) {
+    if ((unsigned int)dev >= GPIO_NUMOF) {
         DEBUG("gpio_t out of range: %d >= %d\n", dev, GPIO_NUMOF);
         return;
     }
@@ -731,7 +731,7 @@ void gpio_set(gpio_t dev)
 
 void gpio_clear(gpio_t dev)
 {
-    if (dev >= GPIO_NUMOF) {
+    if ((unsigned int)dev >= GPIO_NUMOF) {
         DEBUG("gpio_t out of range: %d >= %d\n", dev, GPIO_NUMOF);
         return;
     }
@@ -740,7 +740,7 @@ void gpio_clear(gpio_t dev)
 
 void gpio_toggle(gpio_t dev)
 {
-    if (dev >= GPIO_NUMOF) {
+    if ((unsigned int)dev >= GPIO_NUMOF) {
         DEBUG("gpio_t out of range: %d >= %d\n", dev, GPIO_NUMOF);
         return;
     }

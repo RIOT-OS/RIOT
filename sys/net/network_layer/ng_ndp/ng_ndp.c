@@ -434,7 +434,7 @@ kernel_pid_t ng_ndp_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_len,
     next_hop_ip = ng_ipv6_ext_rh_next_hop(hdr);
 #endif
 #ifdef MODULE_FIB
-    size_t next_hop_size;
+    size_t next_hop_size = sizeof(ng_ipv6_addr_t);
     uint32_t next_hop_flags = 0;
     ng_ipv6_addr_t next_hop_actual; /* FIB copies address into this variable */
 
@@ -448,7 +448,7 @@ kernel_pid_t ng_ndp_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_len,
 
 #endif
 
-    if ((next_hop_ip == NULL)) {            /* no route to host */
+    if (next_hop_ip == NULL) {            /* no route to host */
         if (iface == KERNEL_PID_UNDEF) {
             /* ng_ipv6_netif_t doubles as prefix list */
             iface = ng_ipv6_netif_find_by_prefix(&prefix, dst);

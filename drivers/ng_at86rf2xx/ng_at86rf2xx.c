@@ -61,6 +61,7 @@ int ng_at86rf2xx_init(ng_at86rf2xx_t *dev, spi_t spi, spi_speed_t spi_speed,
     dev->int_pin = int_pin;
     dev->sleep_pin = sleep_pin;
     dev->reset_pin = reset_pin;
+    dev->idle_state = NG_AT86RF2XX_STATE_TRX_OFF;
 
     /* initialise SPI */
     spi_init_master(dev->spi, SPI_CONF_FIRST_RISING, spi_speed);
@@ -92,10 +93,16 @@ void ng_at86rf2xx_reset(ng_at86rf2xx_t *dev)
     eui64_t addr_long;
 #endif
 
+    /* wake from sleep in case radio is sleeping */
+    gpio_clear(dev->sleep_pin);
     /* trigger hardware reset */
     gpio_clear(dev->reset_pin);
     hwtimer_wait(HWTIMER_TICKS(RESET_DELAY));
     gpio_set(dev->reset_pin);
+
+    /* Reset state machine to ensure a known state */
+    ng_at86rf2xx_reset_state_machine(dev);
+
     /* reset options and sequence number */
     dev->seq_nr = 0;
     dev->options = 0;
@@ -206,10 +213,13 @@ void ng_at86rf2xx_tx_prepare(ng_at86rf2xx_t *dev)
 
     /* make sure ongoing transmissions are finished */
     do {
-        state = ng_at86rf2xx_get_state(dev);
+        state = ng_at86rf2xx_get_status(dev);
     }
-    while (state == NG_AT86RF2XX_STATE_BUSY_RX_AACK);
-    dev->idle_state = state;
+    while (state == NG_AT86RF2XX_STATE_BUSY_RX_AACK ||
+           state == NG_AT86RF2XX_STATE_BUSY_TX_ARET);
+    if (state != NG_AT86RF2XX_STATE_TX_ARET_ON) {
+        dev->idle_state = state;
+    }
     ng_at86rf2xx_set_state(dev, NG_AT86RF2XX_STATE_TX_ARET_ON);
     dev->frame_len = NG_IEEE802154_FCS_LEN;
 }

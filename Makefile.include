@@ -18,6 +18,9 @@ RIOTPROJECT := $(abspath $(RIOTPROJECT))
 # using abspath, strip etc.
 include $(RIOTBASE)/Makefile.docker
 
+# Static code analysis tools provided by LLVM
+include $(RIOTBASE)/Makefile.scan-build
+
 # Path to the current directory relative to the git root
 BUILDRELPATH ?= $(shell git rev-parse --show-prefix)
 
@@ -52,6 +55,12 @@ ifeq (, ${JENKINS_URL})
       COLOR_ECHO   := /bin/echo -e
     endif
   endif
+endif
+
+ifeq ($(OS),Darwin)
+  OPEN   := open
+else
+  OPEN   := xdg-open
 endif
 
 ifeq ($(QUIET),1)
@@ -189,7 +198,7 @@ ifeq (,$(RIOTNOLINK))
 ifeq ($(BUILDOSXNATIVE),1)
 	$(AD)$(if $(CPPMIX),$(CXX),$(LINK)) $(UNDEF) -o $(ELFFILE) $(BASELIBS) $(LINKFLAGS) $(LINKFLAGPREFIX)-no_pie
 else
-	$(AD)$(if $(CPPMIX),$(CXX),$(LINK)) $(UNDEF) -o $(ELFFILE) $(LINKFLAGPREFIX)--start-group $(BASELIBS) -lm $(LINKFLAGPREFIX)--end-group  $(LINKFLAGPREFIX)-Map=$(BINDIR)$(APPLICATION).map $(LINKFLAGS)
+	$(AD)$(if $(CPPMIX),$(CXX),$(LINK)) $(UNDEF) -o $(ELFFILE) $(LINKFLAGPREFIX)--start-group $(BASELIBS) -lm $(LINKFLAGPREFIX)--end-group  $(LINKFLAGPREFIX)-Map=$(BINDIR)$(APPLICATION).map $(LINKFLAGPREFIX)--cref $(LINKFLAGS)
 endif
 	$(AD)$(SIZE) $(ELFFILE)
 	$(AD)$(OBJCOPY) $(OFLAGS) $(ELFFILE) $(HEXFILE)

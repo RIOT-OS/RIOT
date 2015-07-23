@@ -58,7 +58,7 @@ static mutex_t locks[] =  {
 
 int i2c_acquire(i2c_t dev)
 {
-    if (dev >= I2C_NUMOF) {
+    if ((unsigned int)dev >= I2C_NUMOF) {
         return -1;
     }
     mutex_lock(&locks[dev]);
@@ -67,7 +67,7 @@ int i2c_acquire(i2c_t dev)
 
 int i2c_release(i2c_t dev)
 {
-    if (dev >= I2C_NUMOF) {
+    if ((unsigned int)dev >= I2C_NUMOF) {
         return -1;
     }
     mutex_unlock(&locks[dev]);

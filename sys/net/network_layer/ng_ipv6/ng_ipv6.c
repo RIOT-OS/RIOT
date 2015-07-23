@@ -593,6 +593,8 @@ static void _receive(ng_pktsnip_t *pkt)
     ng_pktsnip_t *ipv6, *netif;
     ng_ipv6_hdr_t *hdr;
 
+    assert(pkt != NULL);
+
     LL_SEARCH_SCALAR(pkt, netif, type, NG_NETTYPE_NETIF);
 
     if (netif != NULL) {

@@ -120,6 +120,8 @@ static void _receive(ng_pktsnip_t *pkt)
 
     LL_SEARCH_SCALAR(pkt, ipv6, type, NG_NETTYPE_IPV6);
 
+    assert(ipv6 != NULL);
+
     /* validate checksum */
     if (_calc_csum(udp, ipv6, pkt)) {
         DEBUG("udp: received packet with invalid checksum, dropping it\n");
@@ -144,6 +146,9 @@ static void _send(ng_pktsnip_t *pkt)
 
     /* get udp snip and hdr */
     LL_SEARCH_SCALAR(pkt, udp_snip, type, NG_NETTYPE_UDP);
+
+    assert(udp_snip != NULL);
+
     udp_snip = ng_pktbuf_start_write(udp_snip);
     if (udp_snip == NULL) {
         DEBUG("udp: cannot send packet: unable to allocate packet\n");

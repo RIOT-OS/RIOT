@@ -42,9 +42,9 @@ extern "C" {
  */
 #ifndef NG_IPV6_NETIF_ADDR_NUMOF
 #ifdef MODULE_NG_IPV6_ROUTER
-#define NG_IPV6_NETIF_ADDR_NUMOF    (5) /* router needs all-routers multicast address */
+#define NG_IPV6_NETIF_ADDR_NUMOF    (7) /* router needs all-routers multicast address */
 #else
-#define NG_IPV6_NETIF_ADDR_NUMOF    (4)
+#define NG_IPV6_NETIF_ADDR_NUMOF    (6)
 #endif
 #endif
 

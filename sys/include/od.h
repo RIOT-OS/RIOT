@@ -136,7 +136,7 @@ extern "C" {
  * @param[in] flags     Flags as defined in @ref od_flags_address and
  *                      @ref od_flags_bytes
  */
-void od(void *data, size_t data_len, uint8_t width, uint16_t flags);
+void od(const void *data, size_t data_len, uint8_t width, uint16_t flags);
 
 /**
  * @brief Dumps memory stored at *data* up to *data_len* in octal, decimal, or
@@ -148,7 +148,7 @@ void od(void *data, size_t data_len, uint8_t width, uint16_t flags);
  * @param[in] width     Number of bytes per line. If *width* is 0,
  *                      @ref OD_WIDTH_DEFAULT is assumed as a default value.
  */
-static inline void od_hex_dump(void *data, size_t data_len, uint8_t width)
+static inline void od_hex_dump(const void *data, size_t data_len, uint8_t width)
 {
     od(data, data_len, width, OD_FLAGS_ADDRESS_HEX | OD_FLAGS_BYTES_HEX | OD_FLAGS_LENGTH_1);
 }

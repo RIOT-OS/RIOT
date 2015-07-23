@@ -347,20 +347,23 @@ void ng_at86rf2xx_set_max_retries(ng_at86rf2xx_t *dev, uint8_t max);
 void ng_at86rf2xx_set_option(ng_at86rf2xx_t *dev, uint16_t option, bool state);
 
 /**
- * @brief   Get the given devices current internal state
- *
- * @param[in] dev           device to get state of
- * @return                  the current state of the given device
- */
-uint8_t ng_at86rf2xx_get_state(ng_at86rf2xx_t *dev);
-
-/**
  * @brief   Set the state of the given device (trigger a state change)
  *
  * @param[in] dev           device to change state of
  * @param[in] state         the targeted new state
  */
 void ng_at86rf2xx_set_state(ng_at86rf2xx_t *dev, uint8_t state);
+
+/**
+ * @brief   Reset the internal state machine to TRX_OFF mode.
+ *
+ * This will force a transition to TRX_OFF regardless of whether the transceiver
+ * is currently busy sending or receiving. This function is used to get back to
+ * a known state during driver initialization.
+ *
+ * @param[in] dev           device to operate on
+ */
+void ng_at86rf2xx_reset_state_machine(ng_at86rf2xx_t *dev);
 
 /**
  * @brief   Convenience function for simply sending data

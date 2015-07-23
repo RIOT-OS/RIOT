@@ -237,6 +237,9 @@ static void _send(ng_pktsnip_t *pkt)
         payload_len++;
     }
 #else
+    /* suppress clang-analyzer report about iface being not read */
+    (void) iface;
+
     DEBUG("6lo: Send uncompressed\n");
 
     sixlowpan = ng_pktbuf_add(NULL, NULL, sizeof(uint8_t), NG_NETTYPE_SIXLOWPAN);

@@ -199,7 +199,7 @@ do_debug() {
             -c 'gdb_port ${GDB_PORT}' \
             -c 'init' \
             -c 'targets' \
-            -c 'reset halt' \
+            -c 'halt' \
             -l /dev/null" &
     # save PID for terminating the server afterwards
     OCD_PID=$?

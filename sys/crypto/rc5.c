@@ -36,29 +36,17 @@
 /**
  * @brief Interface to the rc5 cipher
  */
-block_cipher_interface_t rc5_interface = {
-    "RC5",
+static const cipher_interface_t rc5_interface = {
+    BLOCK_SIZE,
+    CIPHERS_MAX_KEY_SIZE,
     rc5_init,
     rc5_encrypt,
-    rc5_decrypt,
-    rc5_setup_key,
-    rc5_get_preferred_block_size
+    rc5_decrypt
 };
+const cipher_id_t CIPHER_RC5 = &rc5_interface;
 
 
-int rc5_init(cipher_context_t *context, uint8_t blockSize, uint8_t keySize, uint8_t *key)
-{
-    (void)keySize;
-    // 8 byte blocks only
-    if (blockSize != BLOCK_SIZE) {
-        return 0;
-    }
-
-    return rc5_setup_key(context, key, 0);
-}
-
-
-int rc5_encrypt(cipher_context_t *context, uint8_t *block,
+int rc5_encrypt(const cipher_context_t *context, const uint8_t *block,
                 uint8_t *cipherBlock)
 {
     register uint32_t l;
@@ -91,7 +79,7 @@ int rc5_encrypt(cipher_context_t *context, uint8_t *block,
     return 1;
 }
 
-int rc5_decrypt(cipher_context_t *context, uint8_t *cipherBlock,
+int rc5_decrypt(const cipher_context_t *context, const uint8_t *cipherBlock,
                 uint8_t *plainBlock)
 {
     register uint32_t l;
@@ -125,13 +113,20 @@ int rc5_decrypt(cipher_context_t *context, uint8_t *cipherBlock,
     return 1;
 }
 
-int rc5_setup_key(cipher_context_t *context, uint8_t *key, uint8_t keysize)
+int rc5_init(cipher_context_t *context, const uint8_t *key, uint8_t keySize)
 {
-    (void)keysize;
+    (void) keySize;
     uint32_t *L, l, A, B, *S;
     uint8_t ii, jj;
     int8_t i;
     uint8_t tmp[8];
+
+    // Make sure that context is large enough. If this is not the case,
+    // you should build with -DRC5.
+    if(CIPHER_MAX_CONTEXT_SIZE < RC5_CONTEXT_SIZE) {
+        return 0;
+    }
+
     rc5_context_t *rc5_context = (rc5_context_t *) context->context;
     S = rc5_context->skey;
 
@@ -178,17 +173,4 @@ int rc5_setup_key(cipher_context_t *context, uint8_t *key, uint8_t keysize)
     }
 
     return 1;
-}
-
-/**
- * Returns the preferred block size that this cipher operates with. It is
- * always safe to call this function before the init() call has been made.
- *
- * @return the preferred block size for this cipher. In the case where the
- *         cipher operates with multiple block sizes, this will pick one
- *         particular size (deterministically).
- */
-uint8_t rc5_get_preferred_block_size(void)
-{
-    return BLOCK_SIZE;
 }

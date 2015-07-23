@@ -816,7 +816,7 @@ EXCLUDE_PATTERNS       = */board/*/tools/* \
                          */cpu/*/include/instance/* \
                          */cpu/*/include/pio/* \
                          */cpu/*/include/atmel/* \
-                         */cpu/sam3/include/sam3*.h \
+                         */cpu/sam3/include/sam3* \
                          */cpu/sam3/include/system_sam*.h \
                          */cpu/lpc*/include/core_cm*.h \
                          */cpu/cortexm_common/include/core_cm*.h \
@@ -1039,7 +1039,7 @@ IGNORE_PREFIX          =
 # If the GENERATE_HTML tag is set to YES doxygen will generate HTML output
 # The default value is: YES.
 
-GENERATE_HTML          = YES
+GENERATE_HTML          = NO
 
 # The HTML_OUTPUT tag is used to specify where the HTML docs will be put. If a
 # relative path is entered the value of OUTPUT_DIRECTORY will be put in front of

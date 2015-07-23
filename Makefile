@@ -1,6 +1,6 @@
 .all:
 
-.PHONY: all doc docclean welcome
+.PHONY: all doc doc-man doc-latex docclean welcome
 
 all: welcome
 	@echo ""
@@ -8,6 +8,12 @@ all: welcome
 
 doc:
 	"$(MAKE)" -BC doc/doxygen
+
+doc-man:
+	"$(MAKE)" -BC doc/doxygen man
+
+doc-latex:
+	"$(MAKE)" -BC doc/doxygen latex
 
 docclean:
 	"$(MAKE)" -BC doc/doxygen clean

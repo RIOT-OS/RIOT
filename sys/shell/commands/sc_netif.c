@@ -39,6 +39,11 @@
  */
 #define MAX_ADDR_LEN            (8U)
 
+/**
+ * @brief   The default IPv6 prefix length if not specified.
+ */
+#define SC_NETIF_IPV6_DEFAULT_PREFIX_LEN     (64)
+
 /* utility functions */
 static bool _is_number(char *str)
 {
@@ -539,7 +544,7 @@ static int _netif_flag(char *cmd, kernel_pid_t dev, char *flag)
 #ifdef MODULE_NG_IPV6_NETIF
 static uint8_t _get_prefix_len(char *addr)
 {
-    int prefix_len = 128;
+    int prefix_len = SC_NETIF_IPV6_DEFAULT_PREFIX_LEN;
 
     while ((*addr != '/') && (*addr != '\0')) {
         addr++;
@@ -549,8 +554,8 @@ static uint8_t _get_prefix_len(char *addr)
         *addr = '\0';
         prefix_len = atoi(addr + 1);
 
-        if ((prefix_len < 1) || (prefix_len > 128)) {
-            prefix_len = 128;
+        if ((prefix_len < 1) || (prefix_len > NG_IPV6_ADDR_BIT_LEN)) {
+            prefix_len = SC_NETIF_IPV6_DEFAULT_PREFIX_LEN;
         }
     }
 
