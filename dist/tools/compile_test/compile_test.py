@@ -65,12 +65,12 @@ def get_results_and_output_from(fd):
             if prev_results:
                 yield (' .. '.join(result[:-1]), result[-1], output)
             prev_results = True
+            output = StringIO()
             result = line[len(results_prefix):].rstrip().split(' .. ')[::-1]
             if (len(result) > 1) and ('success' in result[0] or 'failed' in result[0]):
                 stdout.write('.')
                 stdout.flush()
         elif line.startswith(output_prefix):
-            output = StringIO()
             output.write(line)
             read_more_output = True
         elif read_more_output:
