@@ -96,7 +96,7 @@ void thread_print_stack(void)
 
 char *thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_start, int stacksize)
 {
-    unsigned int *stk;
+    char *stk;
     ucontext_t *p;
 
     VALGRIND_STACK_REGISTER(stack_start, (char *) stack_start + stacksize);
@@ -104,16 +104,10 @@ char *thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_sta
 
     DEBUG("thread_stack_init\n");
 
-    stk = (unsigned int *)stack_start;
+    stk = stack_start;
 
-#ifdef NATIVESPONTOP
-    p = (ucontext_t *)stk;
-    stk += sizeof(ucontext_t) / sizeof(void *);
-    stacksize -= sizeof(ucontext_t);
-#else
     p = (ucontext_t *)(stk + ((stacksize - sizeof(ucontext_t)) / sizeof(void *)));
     stacksize -= sizeof(ucontext_t);
-#endif
 
     if (getcontext(p) == -1) {
         err(EXIT_FAILURE, "thread_stack_init: getcontext");

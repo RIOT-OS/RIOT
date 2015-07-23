@@ -25,6 +25,10 @@
 #ifndef NATIVENET_H
 #define NATIVENET_H
 
+#if defined(__FreeBSD__)
+#include <sys/types.h>
+#endif
+
 #include <net/ethernet.h>
 
 #include "radio/types.h"
