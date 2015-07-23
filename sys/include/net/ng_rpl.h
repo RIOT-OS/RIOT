@@ -210,6 +210,16 @@ static inline bool NG_RPL_COUNTER_GREATER_THAN(uint8_t A, uint8_t B)
 #define NG_RPL_LIFETIME_STEP (2)
 
 /**
+ * @brief Default prefix length for the DODAG id
+ */
+#define NG_RPL_DEFAULT_PREFIX_LEN   (64)
+
+/**
+ * @brief Default prefix valid and preferred time for the DODAG id
+ */
+#define NG_RPL_DEFAULT_PREFIX_LIFETIME  (0xFFFFFFFF)
+
+/**
  * @brief A DODAG can be grounded or floating
  * @see <a href="https://tools.ietf.org/html/rfc6550#section-3.2.4">
  *          Grounded and Floating DODAGs

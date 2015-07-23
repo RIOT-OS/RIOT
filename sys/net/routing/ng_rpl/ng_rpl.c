@@ -106,6 +106,7 @@ static ng_rpl_dodag_t *_root_dodag_init(uint8_t instance_id, ipv6_addr_t *dodag_
     }
 
     ipv6_addr_t *configured_addr;
+    ng_ipv6_netif_addr_t *netif_addr = NULL;
     ng_rpl_instance_t *inst = NULL;
     ng_rpl_dodag_t *dodag = NULL;
 
@@ -117,6 +118,12 @@ static ng_rpl_dodag_t *_root_dodag_init(uint8_t instance_id, ipv6_addr_t *dodag_
     if (ng_ipv6_netif_find_by_addr(&configured_addr, dodag_id) == KERNEL_PID_UNDEF) {
         DEBUG("RPL: no IPv6 address configured to match the given dodag id: %s\n",
               ipv6_addr_to_str(addr_str, dodag_id, sizeof(addr_str)));
+        return NULL;
+    }
+
+    if ((netif_addr = ng_ipv6_netif_addr_get(configured_addr)) == NULL) {
+        DEBUG("RPL: no netif address found for %s\n", ipv6_addr_to_str(addr_str, configured_addr,
+                sizeof(addr_str)));
         return NULL;
     }
 
@@ -140,6 +147,10 @@ static ng_rpl_dodag_t *_root_dodag_init(uint8_t instance_id, ipv6_addr_t *dodag_
                 ipv6_addr_to_str(addr_str, dodag_id, sizeof(addr_str)));
         return NULL;
     }
+
+    dodag->prefix_len = netif_addr->prefix_len;
+    dodag->addr_preferred = netif_addr->preferred;
+    dodag->addr_valid = netif_addr->valid;
 
     return dodag;
 }
