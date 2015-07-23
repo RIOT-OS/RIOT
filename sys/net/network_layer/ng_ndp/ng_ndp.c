@@ -441,7 +441,7 @@ kernel_pid_t ng_ndp_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_len,
     if ((next_hop_ip == NULL) &&
         (fib_get_next_hop(&iface, next_hop_actual.u8, &next_hop_size,
                           &next_hop_flags, (uint8_t *)dst,
-                          &next_hop_size, 0) >= 0) &&
+                          sizeof(ng_ipv6_addr_t), 0) >= 0) &&
         (next_hop_size == sizeof(ng_ipv6_addr_t))) {
         next_hop_ip = &next_hop_actual;
     }
