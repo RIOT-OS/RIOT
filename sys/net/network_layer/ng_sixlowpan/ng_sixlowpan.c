@@ -141,7 +141,7 @@ static void _receive(ng_pktsnip_t *pkt)
     payload->type = NG_NETTYPE_IPV6;
 
     if (!ng_netapi_dispatch_receive(NG_NETTYPE_IPV6, NG_NETREG_DEMUX_CTX_ALL, pkt)) {
-        DEBUG("ipv6: No receivers for this packet found\n");
+        DEBUG("6lo: No receivers for this packet found\n");
         ng_pktbuf_release(pkt);
     }
 }
