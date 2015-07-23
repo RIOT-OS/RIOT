@@ -29,8 +29,8 @@ extern "C"
  * @{
  */
 #define UART_NUMOF          (1U)
-#define UART_0_EN           1
-#define UART_1_EN           0
+#define UART_0_EN           0
+#define UART_1_EN           1
 #define UART_0_DEV         UART0
 #define UART_1_DEV         UART1
 /** @} */

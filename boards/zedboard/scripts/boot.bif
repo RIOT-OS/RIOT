@@ -1,0 +1,5 @@
+image:
+{
+[bootloader] cache/ws/FSBL/Release/FSBL.elf
+cache/riot.elf
+}
