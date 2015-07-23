@@ -33,6 +33,7 @@
 #include "net/ng_pkt.h"
 #include "net/ng_pktbuf.h"
 #include "net/ng_netif/hdr.h"
+#include "net/ng_sixlowpan/netif.h"
 
 /**
  * @brief   The maximal expected link layer address length in byte
@@ -90,7 +91,7 @@ static void _set_usage(char *cmd_name)
 
 static void _flag_usage(char *cmd_name)
 {
-    printf("usage: %s <if_id> [-]{promisc|autoack|preload}\n", cmd_name);
+    printf("usage: %s <if_id> [-]{promisc|autoack|preload|6lo|iphc}\n", cmd_name);
 }
 
 static void _add_usage(char *cmd_name)
@@ -260,6 +261,15 @@ static void _netif_list(kernel_pid_t dev)
 #ifdef MODULE_NG_IPV6_NETIF
     if ((entry != NULL) && (entry->flags & NG_IPV6_NETIF_FLAGS_SIXLOWPAN)) {
         printf("6LO ");
+        linebreak = true;
+    }
+#endif
+
+#if defined(MODULE_NG_SIXLOWPAN_NETIF) && defined(MODULE_NG_SIXLOWPAN_IPHC)
+    ng_sixlowpan_netif_t *sixlo_entry = ng_sixlowpan_netif_get(dev);
+
+    if ((sixlo_entry != NULL) && (sixlo_entry->iphc_enabled)) {
+        printf("IPHC ");
         linebreak = true;
     }
 #endif
@@ -533,6 +543,29 @@ static int _netif_flag(char *cmd, kernel_pid_t dev, char *flag)
 #else
         puts("error: unable to (un)set 6LoWPAN support");
 
+        return 1;
+#endif
+    }
+    else if (strcmp(flag, "iphc") == 0) {
+#if defined(MODULE_NG_SIXLOWPAN_NETIF) && defined(MODULE_NG_SIXLOWPAN_IPHC)
+        ng_sixlowpan_netif_t *entry = ng_sixlowpan_netif_get(dev);
+
+        if (entry == NULL) {
+            puts("error: unable to (un)set IPHC");
+            return 1;
+        }
+
+        if (set) {
+            entry->iphc_enabled = true;
+            printf("success: enable IPHC on interface %" PRIkernel_pid "\n", dev);
+        }
+        else {
+            entry->iphc_enabled = false;
+            printf("success: disable IPHC on interface %" PRIkernel_pid "\n", dev);
+        }
+        return 0;
+#else
+        puts("error: unable to (un)set IPHC.");
         return 1;
 #endif
     }
