@@ -304,6 +304,7 @@ static void test_ipv6_hdr_build__wrong_src_len(void)
     ng_ipv6_addr_t src = DEFAULT_TEST_SRC;
     ng_ipv6_addr_t dst = DEFAULT_TEST_DST;
 
+    ng_pktbuf_init();
     TEST_ASSERT_NULL(ng_ipv6_hdr_build(NULL, (uint8_t *)&src,
                                        sizeof(ng_ipv6_addr_t) + TEST_UINT8,
                                        (uint8_t *)&dst,
@@ -316,6 +317,7 @@ static void test_ipv6_hdr_build__wrong_dst_len(void)
     ng_ipv6_addr_t src = DEFAULT_TEST_SRC;
     ng_ipv6_addr_t dst = DEFAULT_TEST_DST;
 
+    ng_pktbuf_init();
     TEST_ASSERT_NULL(ng_ipv6_hdr_build(NULL, (uint8_t *)&src,
                                        sizeof(ng_ipv6_addr_t),
                                        (uint8_t *)&dst,
@@ -329,7 +331,7 @@ static void test_ipv6_hdr_build__src_NULL(void)
     ng_pktsnip_t *pkt;
     ng_ipv6_hdr_t *hdr;
 
-    TEST_ASSERT(ng_pktbuf_is_empty());
+    ng_pktbuf_init();
     TEST_ASSERT_NOT_NULL((pkt = ng_ipv6_hdr_build(NULL, NULL, 0, (uint8_t *)&dst,
                                 sizeof(ng_ipv6_addr_t))));
     hdr = pkt->data;
@@ -341,7 +343,6 @@ static void test_ipv6_hdr_build__src_NULL(void)
     TEST_ASSERT_EQUAL_INT(0, hdr->hl);
     TEST_ASSERT(ng_ipv6_addr_equal(&dst, &hdr->dst));
     TEST_ASSERT(!ng_pktbuf_is_empty());
-    ng_pktbuf_reset();
 }
 
 static void test_ipv6_hdr_build__dst_NULL(void)
@@ -350,7 +351,7 @@ static void test_ipv6_hdr_build__dst_NULL(void)
     ng_pktsnip_t *pkt;
     ng_ipv6_hdr_t *hdr;
 
-    TEST_ASSERT(ng_pktbuf_is_empty());
+    ng_pktbuf_init();
     TEST_ASSERT_NOT_NULL((pkt = ng_ipv6_hdr_build(NULL, (uint8_t *)&src,
                                 sizeof(ng_ipv6_addr_t),
                                 NULL, 0)));
@@ -363,7 +364,6 @@ static void test_ipv6_hdr_build__dst_NULL(void)
     TEST_ASSERT_EQUAL_INT(0, hdr->hl);
     TEST_ASSERT(ng_ipv6_addr_equal(&src, &hdr->src));
     TEST_ASSERT(!ng_pktbuf_is_empty());
-    ng_pktbuf_reset();
 }
 
 static void test_ipv6_hdr_build__complete(void)
@@ -373,7 +373,7 @@ static void test_ipv6_hdr_build__complete(void)
     ng_pktsnip_t *pkt;
     ng_ipv6_hdr_t *hdr;
 
-    TEST_ASSERT(ng_pktbuf_is_empty());
+    ng_pktbuf_init();
     TEST_ASSERT_NOT_NULL((pkt = ng_ipv6_hdr_build(NULL, (uint8_t *)&src,
                                 sizeof(ng_ipv6_addr_t),
                                 (uint8_t *)&dst,
@@ -388,7 +388,6 @@ static void test_ipv6_hdr_build__complete(void)
     TEST_ASSERT(ng_ipv6_addr_equal(&src, &hdr->src));
     TEST_ASSERT(ng_ipv6_addr_equal(&dst, &hdr->dst));
     TEST_ASSERT(!ng_pktbuf_is_empty());
-    ng_pktbuf_reset();
 }
 
 Test *tests_ipv6_hdr_tests(void)
