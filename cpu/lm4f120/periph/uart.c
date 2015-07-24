@@ -78,9 +78,9 @@ static const unsigned long g_ulUARTInt[3] =
  */
 int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, uart_tx_cb_t tx_cb, void *arg)
 {
-    // Check the arguments
+    /* Check the arguments */
     ASSERT(uart == 0);
-    // Check to make sure the UART peripheral is present
+    /* Check to make sure the UART peripheral is present */
     if(!ROM_SysCtlPeripheralPresent(SYSCTL_PERIPH_UART0)){
         return -1;
     }
@@ -95,7 +95,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, uart_tx_cb_t t
     config[uart].tx_cb = tx_cb;
     config[uart].arg = arg;
 
-//  ulBase = g_ulUARTBase[uart];
+/*  ulBase = g_ulUARTBase[uart]; */
     switch (uart){
 #if UART_0_EN
         case UART_0:
@@ -190,7 +190,7 @@ void isr_uart0(void)
     ulStatus = ROM_UARTIntStatus(UART0_BASE, true);
     ROM_UARTIntClear(UART0_BASE, ulStatus);
 
-    // Are we interrupted due to TX done
+    /* Are we interrupted due to TX done */
     if(ulStatus & UART_INT_TX)
     {
         if (config[UART_0].tx_cb(config[UART_0].arg) == 0){
@@ -198,7 +198,7 @@ void isr_uart0(void)
         }
     }
 
-    // Are we interrupted due to a recieved character
+    /* Are we interrupted due to a recieved character */
     if(ulStatus & (UART_INT_RX | UART_INT_RT))
     {
         while(ROM_UARTCharsAvail(UART0_BASE))
