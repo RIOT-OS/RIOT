@@ -113,8 +113,8 @@ endif
 ifneq (,$(filter cipher_modes,$(USEMODULE)))
     DIRS += crypto/modes
 endif
-ifneq (,$(filter ng_pktbuf,$(USEMODULE)))
-    DIRS += net/crosslayer/ng_pktbuf
+ifneq (,$(filter ng_pktbuf_static,$(USEMODULE)))
+    DIRS += net/crosslayer/ng_pktbuf_static
 endif
 ifneq (,$(filter ng_zep,$(USEMODULE)))
     DIRS += net/application_layer/ng_zep
