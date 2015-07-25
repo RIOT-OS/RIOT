@@ -54,7 +54,7 @@ bool ng_ipv6_ext_demux(kernel_pid_t iface, ng_pktsnip_t *pkt,
         }
     }
 
-    ext_snip = ng_pktbuf_add(pkt, pkt->data, offset, NG_NETTYPE_IPV6);
+    ext_snip = ng_pktbuf_mark(pkt, offset, NG_NETTYPE_IPV6);
 
     if (ext_snip == NULL) {
         return false;

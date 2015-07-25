@@ -728,7 +728,7 @@ static ng_pktsnip_t *_create_received(ng_zep_t *dev, ng_pktsnip_t *pkt,
         return NULL;
     }
 
-    payload = ng_pktbuf_add(pkt, pkt->data, pkt->size - 2, dev->proto);
+    payload = ng_pktbuf_mark(pkt, pkt->size - 2, dev->proto);
 
     if (payload == NULL) {
         return NULL;
@@ -742,7 +742,7 @@ static ng_pktsnip_t *_create_received(ng_zep_t *dev, ng_pktsnip_t *pkt,
         return NULL;
     }
 
-    mhr = ng_pktbuf_add(pkt, pkt->data, mhr_len, NG_NETTYPE_UNDEF);
+    mhr = ng_pktbuf_mark(pkt, mhr_len, NG_NETTYPE_UNDEF);
 
     /* TODO: send ACK */
 
@@ -776,7 +776,7 @@ static ng_pktsnip_t *_recv_v1(ng_zep_t *dev, ng_pktsnip_t *pkt)
         return NULL;
     }
 
-    zep = ng_pktbuf_add(pkt, pkt->data, sizeof(ng_zep_v1_hdr_t), NG_NETTYPE_UNDEF);
+    zep = ng_pktbuf_mark(pkt, sizeof(ng_zep_v1_hdr_t), NG_NETTYPE_UNDEF);
 
     if (zep == NULL) {
         return NULL;
@@ -807,7 +807,7 @@ static ng_pktsnip_t *_recv_v2(ng_zep_t *dev, ng_pktsnip_t *pkt)
             return NULL;
         }
 
-        zep = ng_pktbuf_add(pkt, pkt->data, sizeof(ng_zep_v2_data_hdr_t), NG_NETTYPE_UNDEF);
+        zep = ng_pktbuf_mark(pkt, sizeof(ng_zep_v2_data_hdr_t), NG_NETTYPE_UNDEF);
 
         if (zep == NULL) {
             return NULL;

@@ -235,7 +235,7 @@ ng_pktsnip_t *ng_pktbuf_start_write(ng_pktsnip_t *pkt)
 
 #ifdef DEVELHELP
 #ifdef MODULE_OD
-void _print_chunk(void *chunk, size_t size, int num)
+static inline void _print_chunk(void *chunk, size_t size, int num)
 {
     printf("================ chunk %3d (size: %4u) ================\n", num,
            (unsigned int)size);
@@ -243,7 +243,7 @@ void _print_chunk(void *chunk, size_t size, int num)
        OD_FLAGS_ADDRESS_HEX | OD_FLAGS_BYTES_HEX | OD_FLAGS_LENGTH_1);
 }
 
-void _print_unused(_unused_t *ptr)
+static inline void _print_unused(_unused_t *ptr)
 {
     printf("~ unused: %p (next: %p, size: %4u) ~\n", (void *)ptr,
            (void *)ptr->next, ptr->size);
@@ -283,7 +283,7 @@ void ng_pktbuf_stats(void)
     }
 
     if (chunk <= &_pktbuf[NG_PKTBUF_SIZE - 1]) {
-        _print_chunk(chunk, &_pktbuf[NG_PKTBUF_SIZE] - chunk, count++);
+        _print_chunk(chunk, &_pktbuf[NG_PKTBUF_SIZE] - chunk, count);
     }
 #else
     DEBUG("pktbuf: needs od module\n");
