@@ -467,27 +467,37 @@ static void _send(ng_pktsnip_t *pkt, bool prep_hdr)
     ng_pktsnip_t *ipv6, *payload;
     ng_ipv6_addr_t *tmp;
     ng_ipv6_hdr_t *hdr;
-    /* seize payload as temporary variable */
-    payload = ng_pktbuf_start_write(pkt);
-
-    if (payload == NULL) {
-        DEBUG("ipv6: unable to get write access to packet, dropping packet\n");
-        ng_pktbuf_release(pkt);
-        return;
-    }
-
-    pkt = payload;  /* Reset pkt from temporary variable */
-
     /* get IPv6 snip and (if present) generic interface header */
     if (pkt->type == NG_NETTYPE_NETIF) {
         /* If there is already a netif header (routing protocols and
          * neighbor discovery might add them to preset sending interface) */
         iface = ((ng_netif_hdr_t *)pkt->data)->if_pid;
+        /* seize payload as temporary variable */
+        ipv6 = ng_pktbuf_start_write(pkt);   /* write protect for later removal
+                                              * in _send_unicast() */
+        if (ipv6 == NULL) {
+            DEBUG("ipv6: unable to get write access to netif header, dropping packet\n");
+            ng_pktbuf_release(pkt);
+            return;
+        }
+        pkt = ipv6;  /* Reset pkt from temporary variable */
+
         ipv6 = pkt->next;
     }
     else {
         ipv6 = pkt;
     }
+    /* seize payload as temporary variable */
+    payload = ng_pktbuf_start_write(ipv6);
+    if (payload == NULL) {
+        DEBUG("ipv6: unable to get write access to IPv6 header, dropping packet\n");
+        ng_pktbuf_release(pkt);
+        return;
+    }
+    if (ipv6 != pkt) {      /* in case packet has netif header */
+        pkt->next = payload;/* pkt is already write-protected so we can do that */
+    }
+    ipv6 = payload;  /* Reset ipv6 from temporary variable */
 
     hdr = ipv6->data;
     payload = ipv6->next;
