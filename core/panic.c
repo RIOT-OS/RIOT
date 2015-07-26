@@ -30,9 +30,15 @@
 #include "panic.h"
 #include "arch/panic_arch.h"
 
-#if DEVELHELP && defined MODULE_PS
+#ifdef DEVELHELP
+#ifdef MODULE_PS
 #include "ps.h"
 #endif
+#ifdef MODULE_NG_PKTBUF
+#include "net/ng_pktbuf.h"
+#endif
+#endif
+
 
 /* flag preventing "recursive crash printing loop" */
 static int crashed = 0;
@@ -51,6 +57,9 @@ NORETURN void core_panic(int crash_code, const char *message)
 #ifdef MODULE_PS
         ps();
         puts("");
+#endif
+#ifdef MODULE_NG_PKTBUF
+        ng_pktbuf_stats();
 #endif
 
         puts("*** halted.\n");
