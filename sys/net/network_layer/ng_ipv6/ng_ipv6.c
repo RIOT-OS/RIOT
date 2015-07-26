@@ -66,7 +66,7 @@ kernel_pid_t ng_ipv6_init(void)
 {
     if (ng_ipv6_pid == KERNEL_PID_UNDEF) {
         ng_ipv6_pid = thread_create(_stack, sizeof(_stack), NG_IPV6_PRIO,
-                             CREATE_STACKTEST, _event_loop, NULL, "ipv6");
+                                    CREATE_STACKTEST, _event_loop, NULL, "ipv6");
     }
 
     return ng_ipv6_pid;
@@ -332,7 +332,7 @@ static int _fill_ipv6_hdr(kernel_pid_t iface, ng_pktsnip_t *ipv6,
 }
 
 static inline void _send_multicast_over_iface(kernel_pid_t iface, ng_pktsnip_t *pkt,
-                                              ng_pktsnip_t *netif)
+        ng_pktsnip_t *netif)
 {
     DEBUG("ipv6: send multicast over interface %" PRIkernel_pid "\n", iface);
     /* mark as multicast */
