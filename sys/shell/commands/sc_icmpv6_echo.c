@@ -286,11 +286,11 @@ int _icmpv6_ping(int argc, char **argv)
                "%" PRIu32 ".%03" PRIu32 "/"
                "%" PRIu32 ".%03" PRIu32 "/"
                "%" PRIu32 ".%03" PRIu32 " ms\n",
-               (min_rtt.seconds * SEC_IN_MS) + (min_rtt.seconds / MS_IN_USEC),
+               (min_rtt.seconds * SEC_IN_MS) + (min_rtt.microseconds / MS_IN_USEC),
                min_rtt.microseconds % MS_IN_USEC,
-               (avg_rtt.seconds * SEC_IN_MS) + (avg_rtt.seconds / MS_IN_USEC),
+               (avg_rtt.seconds * SEC_IN_MS) + (avg_rtt.microseconds / MS_IN_USEC),
                avg_rtt.microseconds % MS_IN_USEC,
-               (max_rtt.seconds * SEC_IN_MS) + (max_rtt.seconds / MS_IN_USEC),
+               (max_rtt.seconds * SEC_IN_MS) + (max_rtt.microseconds / MS_IN_USEC),
                max_rtt.microseconds % MS_IN_USEC);
     }
     else {
