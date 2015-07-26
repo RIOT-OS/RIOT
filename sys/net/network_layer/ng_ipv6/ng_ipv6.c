@@ -201,20 +201,9 @@ static void _send_to_iface(kernel_pid_t iface, ng_pktsnip_t *pkt)
 
     if ((if_entry != NULL) && (if_entry->flags & NG_IPV6_NETIF_FLAGS_SIXLOWPAN)) {
         DEBUG("ipv6: send to 6LoWPAN instead\n");
-        ng_netreg_entry_t *reg = ng_netreg_lookup(NG_NETTYPE_SIXLOWPAN,
-                                                  NG_NETREG_DEMUX_CTX_ALL);
-
-        if (reg != NULL) {
-            ng_pktbuf_hold(pkt, ng_netreg_num(NG_NETTYPE_SIXLOWPAN,
-                                              NG_NETREG_DEMUX_CTX_ALL) - 1);
-        }
-        else {
+        if (!ng_netapi_dispatch_send(NG_NETTYPE_SIXLOWPAN, NG_NETREG_DEMUX_CTX_ALL, pkt)) {
             DEBUG("ipv6: no 6LoWPAN thread found");
-        }
-
-        while (reg) {
-            ng_netapi_send(reg->pid, pkt);
-            reg = ng_netreg_getnext(reg);
+            ng_pktbuf_release(pkt);
         }
     }
     else {
