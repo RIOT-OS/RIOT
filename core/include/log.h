@@ -49,6 +49,7 @@
  */
 enum {
     LOG_NONE,       /**< Lowest log level, will output nothing */
+    LOG_KERNEL,     /**< Kernel log level, will print only kernel messages */
     LOG_ERROR,      /**< Error log level, will print only critical,
                          non-recoverable errors like hardware initialization
                          failures */
@@ -78,6 +79,7 @@ enum {
  * @brief logging convenience defines
  * @{
  */
+#define LOG_KERNEL(...) LOG(LOG_KERNEL, __VA_ARGS__)
 #define LOG_ERROR(...) LOG(LOG_ERROR, __VA_ARGS__)
 #define LOG_WARNING(...) LOG(LOG_WARNING, __VA_ARGS__)
 #define LOG_INFO(...) LOG(LOG_INFO, __VA_ARGS__)
