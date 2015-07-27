@@ -162,7 +162,9 @@ int cc2420_set_channel(unsigned int chan)
     /*
      * calculation from http://www.ti.com/lit/ds/symlink/cc2420.pdf p.50
      */
-    uint16_t freq = 357 + (5 * (chan - 11));
+    uint16_t freq= cc2420_read_reg(CC2420_REG_FSCTRL);
+    freq &= ~CC2420_FREQ_MASK;
+    freq |= (357 + (5 * (chan - 11)));
     cc2420_write_reg(CC2420_REG_FSCTRL, freq);
     return ((unsigned int) chan);
 }
@@ -170,7 +172,7 @@ int cc2420_set_channel(unsigned int chan)
 unsigned int cc2420_get_channel(void)
 {
     /* undo calculation from cc2420_set_channel() */
-    return ((cc2420_read_reg(CC2420_REG_FSCTRL) - 357) / 5) + 11;
+    return (((cc2420_read_reg(CC2420_REG_FSCTRL) & CC2420_FREQ_MASK) - 357) / 5) + 11;
 }
 
 uint16_t cc2420_set_address(uint16_t addr)
