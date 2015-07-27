@@ -24,9 +24,6 @@
 
 #include "net/ng_sixlowpan/iphc.h"
 
-#define ENABLE_DEBUG    (0)
-#include "debug.h"
-
 /* dispatch byte definitions */
 #define IPHC1_IDX                   (0U)
 #define IPHC2_IDX                   (1U)

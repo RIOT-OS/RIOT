@@ -35,10 +35,7 @@
 
 #include "net/ng_zep.h"
 
-#define ENABLE_DEBUG    (0)
-#include "debug.h"
-
-#if ENABLE_DEBUG || (LOG_LEVEL > LOG_NONE)
+#if (LOG_LEVEL > LOG_LEVEL_KERNEL)
 /* For PRIu16 etc. */
 #include <inttypes.h>
 #endif
@@ -147,7 +144,7 @@ kernel_pid_t ng_zep_init(ng_zep_t *dev, uint16_t src_port, ng_ipv6_addr_t *dst,
     dev->addr = NG_ZEP_DEFAULT_ADDR_SHORT;
     dev->eui64 = NG_ZEP_DEFAULT_ADDR_LONG;
 #endif
-    DEBUG("zep: initialized radio parameters: chan: %" PRIu8 ", pan: 0x%04" PRIx16
+    LOG_DEBUG("zep: initialized radio parameters: chan: %" PRIu8 ", pan: 0x%04" PRIx16
           "addr: 0x%04" PRIx16 ", eui64: %016" PRIx64 "\n", dev->chan,
           dev->pan, byteorder_ltobs(dev->addr).u16,
           byteorder_ltobll(dev->eui64).u64);
@@ -169,7 +166,7 @@ kernel_pid_t ng_zep_init(ng_zep_t *dev, uint16_t src_port, ng_ipv6_addr_t *dst,
     _pid = thread_create(_rx_stack, NG_ZEP_STACK_SIZE, NG_ZEP_PRIO,
                          CREATE_STACKTEST, _event_loop, dev, "zep_app");
 
-    DEBUG("zep: started thread with PID %" PRIkernel_pid "\n", _pid);
+    LOG_DEBUG("zep: started thread with PID %" PRIkernel_pid "\n", _pid);
 
     return _pid;
 }
@@ -288,7 +285,7 @@ static int _send(ng_netdev_t *netdev, ng_pktsnip_t *pkt)
 
     ng_pktbuf_release(pkt);
 
-    DEBUG("zep: set frame FCS to 0x%04 " PRIx16 "\n", fcs);
+    LOG_DEBUG("zep: set frame FCS to 0x%04 " PRIx16 "\n", fcs);
     _set_uint16_ptr((uint16_t *)data, byteorder_btols(byteorder_htons(fcs)).u16);
 
     if (!ng_netapi_dispatch_send(NG_NETTYPE_UDP, NG_NETREG_DEMUX_CTX_ALL, new_pkt)) {
@@ -556,7 +553,7 @@ static void _isr_event(ng_netdev_t *dev, uint32_t event_type)
 {
     switch (event_type) {
         case _EVENT_RX_STARTED:
-            DEBUG("zep: ISR event: RX started\n");
+            LOG_DEBUG("zep: ISR event: RX started\n");
             _rx_started_event((ng_zep_t *)dev);
             break;
 
@@ -588,7 +585,7 @@ void *_event_loop(void *args)
 
         switch (msg.type) {
             case NG_NETAPI_MSG_TYPE_RCV:
-                DEBUG("zep: NG_NETAPI_MSG_TYPE_RCV\n");
+                LOG_DEBUG("zep: NG_NETAPI_MSG_TYPE_RCV\n");
                 ringbuffer_add(&_rx_buf, (char *)(&msg.content.ptr),
                                sizeof(ng_pktsnip_t *));
                 ack.type = NG_NETDEV_MSG_TYPE_EVENT;
@@ -597,12 +594,12 @@ void *_event_loop(void *args)
                 break;
 
             case NG_NETAPI_MSG_TYPE_SND:
-                DEBUG("zep: NG_NETAPI_MSG_TYPE_SND\n");
+                LOG_DEBUG("zep: NG_NETAPI_MSG_TYPE_SND\n");
                 _send(dev, (ng_pktsnip_t *)msg.content.ptr);
                 break;
 
             case NG_NETAPI_MSG_TYPE_GET:
-                DEBUG("zep: NG_NETAPI_MSG_TYPE_GET\n");
+                LOG_DEBUG("zep: NG_NETAPI_MSG_TYPE_GET\n");
                 opt = (ng_netapi_opt_t *)msg.content.ptr;
                 ack.type = NG_NETAPI_MSG_TYPE_ACK;
                 ack.content.value = _get(dev, opt->opt, opt->data, opt->data_len);
@@ -610,7 +607,7 @@ void *_event_loop(void *args)
                 break;
 
             case NG_NETAPI_MSG_TYPE_SET:
-                DEBUG("zep: NG_NETAPI_MSG_TYPE_SET\n");
+                LOG_DEBUG("zep: NG_NETAPI_MSG_TYPE_SET\n");
                 opt = (ng_netapi_opt_t *)msg.content.ptr;
                 ack.type = NG_NETAPI_MSG_TYPE_ACK;
                 ack.content.value = _set(dev, opt->opt, opt->data, opt->data_len);
@@ -633,19 +630,19 @@ static ng_pktsnip_t *_zep_hdr_build(ng_zep_t *dev, size_t size, bool ack)
 
     switch (dev->version) {
         case 1:
-            DEBUG("zep: Build ZEPv1 data header in pktbuf\n");
+            LOG_DEBUG("zep: Build ZEPv1 data header in pktbuf\n");
             zep = ng_pktbuf_add(NULL, NULL, sizeof(ng_zep_v1_hdr_t) + size,
                                 NG_NETTYPE_UNDEF);
             break;
 
         case 2:
             if (ack) {
-                DEBUG("zep: Build ZEPv2 ACK header in pktbuf\n");
+                LOG_DEBUG("zep: Build ZEPv2 ACK header in pktbuf\n");
                 zep = ng_pktbuf_add(NULL, NULL, sizeof(ng_zep_v2_ack_hdr_t) + size,
                                     NG_NETTYPE_UNDEF);
             }
             else {
-                DEBUG("zep: Build ZEPv2 data header in pktbuf\n");
+                LOG_DEBUG("zep: Build ZEPv2 data header in pktbuf\n");
                 zep = ng_pktbuf_add(NULL, NULL, sizeof(ng_zep_v2_data_hdr_t) + size,
                                     NG_NETTYPE_UNDEF);
             }

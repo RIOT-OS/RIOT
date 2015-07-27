@@ -23,17 +23,14 @@
 #include "net/ng_sixlowpan/iphc.h"
 #include "net/ng_sixlowpan/netif.h"
 
-#define ENABLE_DEBUG    (0)
-#include "debug.h"
-
-#if ENABLE_DEBUG || (LOG_LEVEL > LOG_NONE)
+#if (LOG_LEVEL >= LOG_LEVEL_KERNEL)
 /* For PRIu16 etc. */
 #include <inttypes.h>
 #endif
 
 static kernel_pid_t _pid = KERNEL_PID_UNDEF;
 
-#if ENABLE_DEBUG || (LOG_LEVEL > LOG_NONE)
+#if (LOG_LEVEL >= LOG_LEVEL_KERNEL)
 static char _stack[NG_SIXLOWPAN_STACK_SIZE + THREAD_EXTRA_STACKSIZE_PRINTF];
 #else
 static char _stack[NG_SIXLOWPAN_STACK_SIZE];
@@ -70,7 +67,7 @@ static void _receive(ng_pktsnip_t *pkt)
 
     if (payload == NULL) {
         LOG_ERROR("6lo: can not get write access on received packet\n");
-#if defined(DEVELHELP) && defined(ENABLE_DEBUG)
+#if defined(DEVELHELP) && (LOG_LEVEL >= LOG_DEBUG)
         ng_pktbuf_stats();
 #endif
         ng_pktbuf_release(pkt);
@@ -91,12 +88,12 @@ static void _receive(ng_pktsnip_t *pkt)
 
     if (dispatch[0] == NG_SIXLOWPAN_UNCOMPRESSED) {
         ng_pktsnip_t *sixlowpan;
-        DEBUG("6lo: received uncompressed IPv6 packet\n");
+        LOG_DEBUG("6lo: received uncompressed IPv6 packet\n");
         payload = ng_pktbuf_start_write(payload);
 
         if (payload == NULL) {
             LOG_ERROR("6lo: can not get write access on received packet\n");
-#if defined(DEVELHELP) && defined(ENABLE_DEBUG)
+#if defined(DEVELHELP) && (LOG_LEVEL >= LOG_DEBUG)
             ng_pktbuf_stats();
 #endif
             ng_pktbuf_release(pkt);
@@ -117,7 +114,7 @@ static void _receive(ng_pktsnip_t *pkt)
     }
 #ifdef MODULE_NG_SIXLOWPAN_FRAG
     else if (ng_sixlowpan_frag_is((ng_sixlowpan_frag_t *)dispatch)) {
-        DEBUG("6lo: received 6LoWPAN fragment\n");
+        LOG_DEBUG("6lo: received 6LoWPAN fragment\n");
         ng_sixlowpan_frag_handle_pkt(pkt);
         return;
     }
@@ -219,7 +216,7 @@ static void _send(ng_pktsnip_t *pkt)
         }
     }
     else {
-        DEBUG("6lo: Send uncompressed\n");
+        LOG_DEBUG("6lo: Send uncompressed\n");
 
         sixlowpan = ng_pktbuf_add(NULL, NULL, sizeof(uint8_t),
                                   NG_NETTYPE_SIXLOWPAN);
@@ -240,7 +237,7 @@ static void _send(ng_pktsnip_t *pkt)
     /* suppress clang-analyzer report about iface being not read */
     (void) iface;
 
-    DEBUG("6lo: Send uncompressed\n");
+    LOG_DEBUG("6lo: Send uncompressed\n");
 
     sixlowpan = ng_pktbuf_add(NULL, NULL, sizeof(uint8_t), NG_NETTYPE_SIXLOWPAN);
 
@@ -257,22 +254,22 @@ static void _send(ng_pktsnip_t *pkt)
     payload_len++;
 #endif
 
-    DEBUG("6lo: max_frag_size = %" PRIu16 " for interface %"
-          PRIkernel_pid "\n", max_frag_size, hdr->if_pid);
+    LOG_DEBUG("6lo: max_frag_size = %" PRIu16 " for interface %"
+              PRIkernel_pid "\n", max_frag_size, hdr->if_pid);
 
     /* IP should not send anything here if it is not a 6LoWPAN interface,
      * so we don't need to check for NULL pointers */
     if (payload_len <= max_frag_size) {
-        DEBUG("6lo: Send SND command for %p to %" PRIu16 "\n",
-              (void *)pkt, hdr->if_pid);
+        LOG_DEBUG("6lo: Send SND command for %p to %" PRIu16 "\n",
+                  (void *)pkt, hdr->if_pid);
         ng_netapi_send(hdr->if_pid, pkt);
 
         return;
     }
 #ifdef MODULE_NG_SIXLOWPAN_FRAG
     else {
-        DEBUG("6lo: Send fragmented (%u > %" PRIu16 ")\n",
-              (unsigned int)payload_len, max_frag_size);
+        LOG_DEBUG("6lo: Send fragmented (%u > %" PRIu16 ")\n",
+                  (unsigned int)payload_len, max_frag_size);
         ng_sixlowpan_frag_send(hdr->if_pid, pkt, payload_len, datagram_size);
     }
 #else
@@ -301,17 +298,17 @@ static void *_event_loop(void *args)
 
     /* start event loop */
     while (1) {
-        DEBUG("6lo: waiting for incoming message.\n");
+        LOG_DEBUG("6lo: waiting for incoming message.\n");
         msg_receive(&msg);
 
         switch (msg.type) {
             case NG_NETAPI_MSG_TYPE_RCV:
-                DEBUG("6lo: NG_NETDEV_MSG_TYPE_RCV received\n");
+                LOG_DEBUG("6lo: NG_NETDEV_MSG_TYPE_RCV received\n");
                 _receive((ng_pktsnip_t *)msg.content.ptr);
                 break;
 
             case NG_NETAPI_MSG_TYPE_SND:
-                DEBUG("6lo: NG_NETDEV_MSG_TYPE_SND received\n");
+                LOG_DEBUG("6lo: NG_NETDEV_MSG_TYPE_SND received\n");
                 _send((ng_pktsnip_t *)msg.content.ptr);
                 break;
 

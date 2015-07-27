@@ -32,10 +32,7 @@
 #include "net/ng_ndp.h"
 #include "net/ng_fib.h"
 
-#define ENABLE_DEBUG    (0)
-#include "debug.h"
-
-#if ENABLE_DEBUG || (LOG_LEVEL > LOG_NONE)
+#if (LOG_LEVEL >= LOG_LEVEL_KERNEL)
 /* For PRIu8 etc. */
 #include <inttypes.h>
 
@@ -88,12 +85,12 @@ void ng_ndp_nbr_sol_handle(kernel_pid_t iface, ng_pktsnip_t *pkt,
     ng_ipv6_addr_t *tgt;
     int sicmpv6_size = (int)icmpv6_size;
 
-    DEBUG("ndp: received neighbor solicitation (src: %s, ",
-          ng_ipv6_addr_to_str(addr_str, &ipv6->src, sizeof(addr_str)));
-    DEBUG("dst: %s, ",
-          ng_ipv6_addr_to_str(addr_str, &ipv6->dst, sizeof(addr_str)));
-    DEBUG("tgt: %s)\n",
-          ng_ipv6_addr_to_str(addr_str, &nbr_sol->tgt, sizeof(addr_str)));
+    LOG_DEBUG("ndp: received neighbor solicitation (src: %s, ",
+              ng_ipv6_addr_to_str(addr_str, &ipv6->src, sizeof(addr_str)));
+    LOG_DEBUG("dst: %s, ",
+              ng_ipv6_addr_to_str(addr_str, &ipv6->dst, sizeof(addr_str)));
+    LOG_DEBUG("tgt: %s)\n",
+              ng_ipv6_addr_to_str(addr_str, &nbr_sol->tgt, sizeof(addr_str)));
 
     /* check validity */
     if ((ipv6->hl != 255) || (nbr_sol->code != 0) ||
@@ -161,12 +158,12 @@ void ng_ndp_nbr_adv_handle(kernel_pid_t iface, ng_pktsnip_t *pkt,
     ng_pktsnip_t *netif;
     ng_netif_hdr_t *netif_hdr = NULL;
 
-    DEBUG("ndp: received neighbor advertisement (src: %s, ",
-          ng_ipv6_addr_to_str(addr_str, &ipv6->src, sizeof(addr_str)));
-    DEBUG("dst: %s, ",
-          ng_ipv6_addr_to_str(addr_str, &ipv6->dst, sizeof(addr_str)));
-    DEBUG("tgt: %s)\n",
-          ng_ipv6_addr_to_str(addr_str, &nbr_adv->tgt, sizeof(addr_str)));
+    LOG_DEBUG("ndp: received neighbor advertisement (src: %s, ",
+              ng_ipv6_addr_to_str(addr_str, &ipv6->src, sizeof(addr_str)));
+    LOG_DEBUG("dst: %s, ",
+              ng_ipv6_addr_to_str(addr_str, &ipv6->dst, sizeof(addr_str)));
+    LOG_DEBUG("tgt: %s)\n",
+              ng_ipv6_addr_to_str(addr_str, &nbr_adv->tgt, sizeof(addr_str)));
 
     /* check validity */
     if ((ipv6->hl != 255) || (nbr_adv->code != 0) ||
@@ -303,8 +300,8 @@ void ng_ndp_retrans_nbr_sol(ng_ipv6_nc_t *nc_entry)
         if (nc_entry->probes_remaining > 1) {
             ng_ipv6_addr_t dst;
 
-            DEBUG("ndp: Retransmit neighbor solicitation for %s\n",
-                  ng_ipv6_addr_to_str(addr_str, &nc_entry->ipv6_addr, sizeof(addr_str)));
+            LOG_DEBUG("ndp: Retransmit neighbor solicitation for %s\n",
+                      ng_ipv6_addr_to_str(addr_str, &nc_entry->ipv6_addr, sizeof(addr_str)));
 
             /* retransmit neighbor solicatation */
             if (ng_ipv6_nc_get_state(nc_entry) == NG_IPV6_NC_STATE_INCOMPLETE) {
@@ -344,7 +341,7 @@ void ng_ndp_retrans_nbr_sol(ng_ipv6_nc_t *nc_entry)
             }
         }
         else if (nc_entry->probes_remaining <= 1) {
-            DEBUG("ndp: Remove nc entry %s for interface %" PRIkernel_pid "\n",
+            LOG_DEBUG("ndp: Remove nc entry %s for interface %" PRIkernel_pid "\n",
                   ng_ipv6_addr_to_str(addr_str, &nc_entry->ipv6_addr, sizeof(addr_str)),
                   nc_entry->iface);
 
@@ -488,11 +485,11 @@ kernel_pid_t ng_ndp_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_len,
         ng_ipv6_nc_t *nc_entry = ng_ipv6_nc_get(iface, next_hop_ip);
 
         if ((nc_entry != NULL) && ng_ipv6_nc_is_reachable(nc_entry)) {
-            DEBUG("ndp: found reachable neighbor (%s => ",
-                  ng_ipv6_addr_to_str(addr_str, &nc_entry->ipv6_addr, sizeof(addr_str)));
-            DEBUG("%s)\n",
-                  ng_netif_addr_to_str(addr_str, sizeof(addr_str),
-                                       nc_entry->l2_addr, nc_entry->l2_addr_len));
+            LOG_DEBUG("ndp: found reachable neighbor (%s => ",
+                      ng_ipv6_addr_to_str(addr_str, &nc_entry->ipv6_addr, sizeof(addr_str)));
+            LOG_DEBUG("%s)\n",
+                       ng_netif_addr_to_str(addr_str, sizeof(addr_str),
+                                            nc_entry->l2_addr, nc_entry->l2_addr_len));
 
             if (ng_ipv6_nc_get_state(nc_entry) == NG_IPV6_NC_STATE_STALE) {
                 _set_state(nc_entry, NG_IPV6_NC_STATE_DELAY);
@@ -564,7 +561,7 @@ ng_pktsnip_t *ng_ndp_nbr_sol_build(ng_ipv6_addr_t *tgt, ng_pktsnip_t *options)
 {
     ng_pktsnip_t *pkt;
 
-    DEBUG("ndp: building neighbor solicitation message\n");
+    LOG_DEBUG("ndp: building neighbor solicitation message\n");
 
     if (ng_ipv6_addr_is_multicast(tgt)) {
         LOG_ERROR("ndp: tgt must not be multicast\n");
@@ -588,7 +585,7 @@ ng_pktsnip_t *ng_ndp_nbr_adv_build(uint8_t flags, ng_ipv6_addr_t *tgt,
 {
     ng_pktsnip_t *pkt;
 
-    DEBUG("ndp: building neighbor advertisement message\n");
+    LOG_DEBUG("ndp: building neighbor advertisement message\n");
 
     if (ng_ipv6_addr_is_multicast(tgt)) {
         LOG_ERROR("ndp: tgt must not be multicast\n");
@@ -670,9 +667,9 @@ static void _send_nbr_sol(kernel_pid_t iface, ng_ipv6_addr_t *tgt,
     ng_ipv6_addr_t *src = NULL;
     size_t src_len = 0;
 
-    DEBUG("ndp: send neighbor solicitation (iface: %" PRIkernel_pid ", tgt: %s, ",
-          iface, ng_ipv6_addr_to_str(addr_str, tgt, sizeof(addr_str)));
-    DEBUG("dst: %s)\n", ng_ipv6_addr_to_str(addr_str, dst, sizeof(addr_str)));
+    LOG_DEBUG("ndp: send neighbor solicitation (iface: %" PRIkernel_pid ", tgt: %s, ",
+              iface, ng_ipv6_addr_to_str(addr_str, tgt, sizeof(addr_str)));
+    LOG_DEBUG("dst: %s)\n", ng_ipv6_addr_to_str(addr_str, dst, sizeof(addr_str)));
 
     /* check if there is a fitting source address to target */
     if ((src = ng_ipv6_netif_find_best_src_addr(iface, tgt)) != NULL) {
@@ -735,10 +732,10 @@ static void _send_nbr_adv(kernel_pid_t iface, ng_ipv6_addr_t *tgt,
     ng_pktsnip_t *hdr, *pkt = NULL;
     uint8_t adv_flags = 0;
 
-    DEBUG("ndp: send neighbor advertisement (iface: %" PRIkernel_pid ", tgt: %s, ",
-          iface, ng_ipv6_addr_to_str(addr_str, tgt, sizeof(addr_str)));
-    DEBUG("dst: %s, supply_tl2a: %d)\n",
-          ng_ipv6_addr_to_str(addr_str, dst, sizeof(addr_str)), supply_tl2a);
+    LOG_DEBUG("ndp: send neighbor advertisement (iface: %" PRIkernel_pid ", tgt: %s, ",
+              iface, ng_ipv6_addr_to_str(addr_str, tgt, sizeof(addr_str)));
+    LOG_DEBUG("dst: %s, supply_tl2a: %d)\n",
+              ng_ipv6_addr_to_str(addr_str, dst, sizeof(addr_str)), supply_tl2a);
 
     if (ng_ipv6_netif_get(iface)->flags & NG_IPV6_NETIF_FLAGS_ROUTER) {
         adv_flags |= NG_NDP_NBR_ADV_FLAGS_R;
@@ -814,8 +811,8 @@ static void _send_nbr_adv(kernel_pid_t iface, ng_ipv6_addr_t *tgt,
          * (see https://tools.ietf.org/html/rfc4861#section-7.2.7) */
         timex_t delay = { _rand(0, NG_NDP_MAX_AC_TGT_DELAY), 0 };
         ng_ipv6_nc_t *nc_entry = ng_ipv6_nc_get(iface, tgt);
-        DEBUG("ndp: delay neighbor advertisement for %" PRIu32 " sec.",
-              delay.seconds);
+        LOG_DEBUG("ndp: delay neighbor advertisement for %" PRIu32 " sec.",
+                  delay.seconds);
 
         /* nc_entry must be set so no need to check it */
         _send_delayed(&nc_entry->nbr_adv_timer, delay, pkt);
@@ -844,8 +841,8 @@ static inline ng_pktsnip_t *_opt_l2a_build(uint8_t type, const uint8_t *l2addr,
 ng_pktsnip_t *ng_ndp_opt_sl2a_build(const uint8_t *l2addr, uint8_t l2addr_len,
                                     ng_pktsnip_t *next)
 {
-    DEBUG("ndp: building source link-layer address option (l2addr: %s)\n",
-          ng_netif_addr_to_str(addr_str, sizeof(addr_str), l2addr, l2addr_len));
+    LOG_DEBUG("ndp: building source link-layer address option (l2addr: %s)\n",
+              ng_netif_addr_to_str(addr_str, sizeof(addr_str), l2addr, l2addr_len));
 
     return _opt_l2a_build(NG_NDP_OPT_SL2A, l2addr, l2addr_len, next);
 }
@@ -853,8 +850,8 @@ ng_pktsnip_t *ng_ndp_opt_sl2a_build(const uint8_t *l2addr, uint8_t l2addr_len,
 ng_pktsnip_t *ng_ndp_opt_tl2a_build(const uint8_t *l2addr, uint8_t l2addr_len,
                                     ng_pktsnip_t *next)
 {
-    DEBUG("ndp: building target link-layer address option (l2addr: %s)\n",
-          ng_netif_addr_to_str(addr_str, sizeof(addr_str), l2addr, l2addr_len));
+    LOG_DEBUG("ndp: building target link-layer address option (l2addr: %s)\n",
+              ng_netif_addr_to_str(addr_str, sizeof(addr_str), l2addr, l2addr_len));
 
     return _opt_l2a_build(NG_NDP_OPT_TL2A, l2addr, l2addr_len, next);
 }
@@ -903,8 +900,8 @@ static bool _handle_sl2a_opt(kernel_pid_t iface, ng_pktsnip_t *pkt,
         for (; sl2a[sl2a_len - 1] == 0x00; sl2a_len--);
     }
 
-    DEBUG("ndp: received SL2A (link-layer address: %s)\n",
-          ng_netif_addr_to_str(addr_str, sizeof(addr_str), sl2a, sl2a_len));
+    LOG_DEBUG("ndp: received SL2A (link-layer address: %s)\n",
+              ng_netif_addr_to_str(addr_str, sizeof(addr_str), sl2a, sl2a_len));
 
     switch (icmpv6_type) {
         case NG_ICMPV6_NBR_SOL:
@@ -964,8 +961,8 @@ static int _handle_tl2a_opt(ng_pktsnip_t *pkt, ng_ipv6_hdr_t *ipv6,
                 for (; tl2a[tl2a_len - 1] == 0x00; tl2a_len--);
             }
 
-            DEBUG("ndp: received TL2A (link-layer address: %s)\n",
-                  ng_netif_addr_to_str(addr_str, sizeof(addr_str), tl2a, tl2a_len));
+            LOG_DEBUG("ndp: received TL2A (link-layer address: %s)\n",
+                      ng_netif_addr_to_str(addr_str, sizeof(addr_str), tl2a, tl2a_len));
 
             memcpy(l2addr, tl2a, tl2a_len);
 
@@ -986,22 +983,22 @@ static void _set_state(ng_ipv6_nc_t *nc_entry, uint8_t state)
     nc_entry->flags &= ~NG_IPV6_NC_STATE_MASK;
     nc_entry->flags |= state;
 
-    DEBUG("ndp: set %s state to ",
-          ng_ipv6_addr_to_str(addr_str, &nc_entry->ipv6_addr, sizeof(addr_str)));
+    LOG_DEBUG("ndp: set %s state to ",
+              ng_ipv6_addr_to_str(addr_str, &nc_entry->ipv6_addr, sizeof(addr_str)));
 
     switch (state) {
         case NG_IPV6_NC_STATE_REACHABLE:
             ipv6_iface = ng_ipv6_netif_get(nc_entry->iface);
-            DEBUG("REACHABLE (reachable time = %" PRIu32 ".%06" PRIu32 ")\n",
-                  ipv6_iface->reach_time.seconds,
-                  ipv6_iface->reach_time.microseconds);
+            LOG_DEBUG("REACHABLE (reachable time = %" PRIu32 ".%06" PRIu32 ")\n",
+                      ipv6_iface->reach_time.seconds,
+                      ipv6_iface->reach_time.microseconds);
             t = ipv6_iface->reach_time;
             /* we intentionally fall through here to set the desired timeout t */
         case NG_IPV6_NC_STATE_DELAY:
-#if ENABLE_DEBUG
+#if (LOG_LEVEL >= LOG_LEVEL_DEBUG)
             if (state == NG_IPV6_NC_STATE_DELAY) {
-                DEBUG("DELAY (probe with unicast NS in %u seconds)\n",
-                      NG_NDP_FIRST_PROBE_DELAY);
+                LOG_DEBUG("DELAY (probe with unicast NS in %u seconds)\n",
+                          NG_NDP_FIRST_PROBE_DELAY);
             }
 #endif
             vtimer_remove(&nc_entry->nbr_sol_timer);
@@ -1013,8 +1010,8 @@ static void _set_state(ng_ipv6_nc_t *nc_entry, uint8_t state)
             ipv6_iface = ng_ipv6_netif_get(nc_entry->iface);
 
             nc_entry->probes_remaining = NG_NDP_MAX_UC_NBR_SOL_NUMOF;
-            DEBUG("PROBE (probe with %" PRIu8 " unicast NS every %" PRIu32
-                  ".%06" PRIu32 " seconds)\n", nc_entry->probes_remaining,
+            LOG_DEBUG("PROBE (probe with %" PRIu8 " unicast NS every %" PRIu32
+                      ".%06" PRIu32 " seconds)\n", nc_entry->probes_remaining,
                   ipv6_iface->retrans_timer.seconds,
                   ipv6_iface->retrans_timer.microseconds);
 
@@ -1029,9 +1026,9 @@ static void _set_state(ng_ipv6_nc_t *nc_entry, uint8_t state)
             mutex_unlock(&ipv6_iface->mutex);
             break;
 
-#ifdef ENABLE_DEBUG
+#if (LOG_LEVEL >= LOG_LEVEL_DEBUG)
         case NG_IPV6_NC_STATE_STALE:
-            DEBUG("STALE (go into DELAY on next packet)\n");
+            LOG_DEBUG("STALE (go into DELAY on next packet)\n");
             break;
 #endif
 

@@ -22,9 +22,6 @@
 
 #include "rbuf.h"
 
-#define ENABLE_DEBUG    (0)
-#include "debug.h"
-
 #if ENABLE_DEBUG
 /* For PRIu16 etc. */
 #include <inttypes.h>
@@ -87,7 +84,7 @@ static uint16_t _send_1st_fragment(ng_sixlowpan_netif_t *iface, ng_pktsnip_t *pk
     ng_sixlowpan_frag_t *hdr;
     uint8_t *data;
 
-    DEBUG("6lo frag: determined max_frag_size = %" PRIu16 "\n", max_frag_size);
+    LOG_DEBUG("6lo frag: determined max_frag_size = %" PRIu16 "\n", max_frag_size);
 
     /* 6LoWPAN dispatches don't count into that */
     max_frag_size += (payload_len - datagram_size);
@@ -121,9 +118,9 @@ static uint16_t _send_1st_fragment(ng_sixlowpan_netif_t *iface, ng_pktsnip_t *pk
         pkt = pkt->next;
     }
 
-    DEBUG("6lo frag: send first fragment (datagram size: %u, "
-          "datagram tag: %" PRIu16 ", fragment size: %" PRIu16 ")\n",
-          (unsigned int)datagram_size, _tag, local_offset);
+    LOG_DEBUG("6lo frag: send first fragment (datagram size: %u, "
+              "datagram tag: %" PRIu16 ", fragment size: %" PRIu16 ")\n",
+              (unsigned int)datagram_size, _tag, local_offset);
     ng_netapi_send(iface->pid, frag);
 
     return local_offset;
@@ -139,7 +136,7 @@ static uint16_t _send_nth_fragment(ng_sixlowpan_netif_t *iface, ng_pktsnip_t *pk
     ng_sixlowpan_frag_n_t *hdr;
     uint8_t *data;
 
-    DEBUG("6lo frag: determined max_frag_size = %" PRIu16 "\n", max_frag_size);
+    LOG_DEBUG("6lo frag: determined max_frag_size = %" PRIu16 "\n", max_frag_size);
 
     frag = _build_frag_pkt(pkt,
                            payload_len - offset + sizeof(ng_sixlowpan_frag_n_t),
@@ -191,11 +188,11 @@ static uint16_t _send_nth_fragment(ng_sixlowpan_netif_t *iface, ng_pktsnip_t *pk
         }
     }
 
-    DEBUG("6lo frag: send first fragment (datagram size: %u, "
-          "datagram tag: %" PRIu16 ", offset: %" PRIu8 " (%u bytes), "
-          "fragment size: %" PRIu16 ")\n",
-          (unsigned int)datagram_size, _tag, hdr->offset, hdr->offset << 3,
-          local_offset);
+    LOG_DEBUG("6lo frag: send first fragment (datagram size: %u, "
+              "datagram tag: %" PRIu16 ", offset: %" PRIu8 " (%u bytes), "
+              "fragment size: %" PRIu16 ")\n",
+              (unsigned int)datagram_size, _tag, hdr->offset, hdr->offset << 3,
+              local_offset);
     ng_netapi_send(iface->pid, frag);
 
     return local_offset;
@@ -207,7 +204,7 @@ void ng_sixlowpan_frag_send(kernel_pid_t pid, ng_pktsnip_t *pkt,
     ng_sixlowpan_netif_t *iface = ng_sixlowpan_netif_get(pid);
     uint16_t offset = 0, res;
 
-#if defined(DEVELHELP) && defined(ENABLE_DEBUG)
+#if defined(DEVELHELP) && (LOG_LEVEL >= LOG_DEBUG)
     if (iface == NULL) {
         LOG_ERROR("6lo frag: iface == NULL, expect segmentation fault.\n");
         ng_pktbuf_release(pkt);

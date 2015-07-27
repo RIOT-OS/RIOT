@@ -23,8 +23,6 @@
 #include "log.h"
 #include "mutex.h"
 
-#define ENABLE_DEBUG (0)
-#include "debug.h"
 #include "ng_fib/ng_universal_address.h"
 
 /**
@@ -132,7 +130,7 @@ universal_address_container_t *universal_address_add(uint8_t *addr, size_t addr_
 void universal_address_rem(universal_address_container_t *entry)
 {
     mutex_lock(&mtx_access);
-    DEBUG("[universal_address_rem] entry: %p\n", (void *)entry);
+    LOG_DEBUG("[universal_address_rem] entry: %p\n", (void *)entry);
 
     /* we do not delete anything on remove */
     if (entry != NULL) {

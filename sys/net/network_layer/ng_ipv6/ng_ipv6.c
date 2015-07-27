@@ -31,18 +31,15 @@
 
 #include "net/ng_ipv6.h"
 
-#define ENABLE_DEBUG    (0)
-#include "debug.h"
-
 #define _MAX_L2_ADDR_LEN    (8U)
 
-#if ENABLE_DEBUG || (LOG_LEVEL > LOG_NONE)
+#if (LOG_LEVEL >= LOG_LEVEL_KERNEL)
 static char _stack[NG_IPV6_STACK_SIZE + THREAD_EXTRA_STACKSIZE_PRINTF];
 #else
 static char _stack[NG_IPV6_STACK_SIZE];
 #endif
 
-#if ENABLE_DEBUG
+#if (LOG_LEVEL >= LOG_DEBUG)
 static char addr_str[NG_IPV6_ADDR_MAX_STR_LEN];
 #endif
 
@@ -81,7 +78,7 @@ void ng_ipv6_demux(kernel_pid_t iface, ng_pktsnip_t *pkt, uint8_t nh)
 
     switch (nh) {
         case NG_PROTNUM_ICMPV6:
-            DEBUG("ipv6: handle ICMPv6 packet (nh = %" PRIu8 ")\n", nh);
+            LOG_DEBUG("ipv6: handle ICMPv6 packet (nh = %" PRIu8 ")\n", nh);
             ng_icmpv6_demux(iface, pkt);
             break;
 #ifdef MODULE_NG_IPV6_EXT
@@ -92,7 +89,7 @@ void ng_ipv6_demux(kernel_pid_t iface, ng_pktsnip_t *pkt, uint8_t nh)
         case NG_PROTNUM_IPV6_EXT_AH:
         case NG_PROTNUM_IPV6_EXT_ESP:
         case NG_PROTNUM_IPV6_EXT_MOB:
-            DEBUG("ipv6: handle extension header (nh = %" PRIu8 ")\n", nh);
+            LOG_DEBUG("ipv6: handle extension header (nh = %" PRIu8 ")\n", nh);
             if (!ng_ipv6_ext_demux(iface, pkt, nh)) {
                 LOG_ERROR("ipv6: unable to parse extension headers.\n");
                 ng_pktbuf_release(pkt);
@@ -100,14 +97,14 @@ void ng_ipv6_demux(kernel_pid_t iface, ng_pktsnip_t *pkt, uint8_t nh)
             }
 #endif
         case NG_PROTNUM_IPV6:
-            DEBUG("ipv6: handle encapsulated IPv6 packet (nh = %" PRIu8 ")\n", nh);
+            LOG_DEBUG("ipv6: handle encapsulated IPv6 packet (nh = %" PRIu8 ")\n", nh);
             _decapsulate(pkt);
             break;
         default:
             break;
     }
 
-    DEBUG("ipv6: forward nh = %" PRIu8 " to other threads\n", nh);
+    LOG_DEBUG("ipv6: forward nh = %" PRIu8 " to other threads\n", nh);
     receiver_num = ng_netreg_num(pkt->type, NG_NETREG_DEMUX_CTX_ALL) +
                    ng_netreg_num(NG_NETTYPE_IPV6, nh);
 
@@ -143,17 +140,17 @@ static void *_event_loop(void *args)
 
     /* start event loop */
     while (1) {
-        DEBUG("ipv6: waiting for incoming message.\n");
+        LOG_DEBUG("ipv6: waiting for incoming message.\n");
         msg_receive(&msg);
 
         switch (msg.type) {
             case NG_NETAPI_MSG_TYPE_RCV:
-                DEBUG("ipv6: NG_NETAPI_MSG_TYPE_RCV received\n");
+                LOG_DEBUG("ipv6: NG_NETAPI_MSG_TYPE_RCV received\n");
                 _receive((ng_pktsnip_t *)msg.content.ptr);
                 break;
 
             case NG_NETAPI_MSG_TYPE_SND:
-                DEBUG("ipv6: NG_NETAPI_MSG_TYPE_SND received\n");
+                LOG_DEBUG("ipv6: NG_NETAPI_MSG_TYPE_SND received\n");
                 _send((ng_pktsnip_t *)msg.content.ptr, true);
                 break;
 
@@ -165,23 +162,23 @@ static void *_event_loop(void *args)
                 break;
 
             case NG_NDP_MSG_RTR_TIMEOUT:
-                DEBUG("ipv6: Router timeout received\n");
+                LOG_DEBUG("ipv6: Router timeout received\n");
                 ((ng_ipv6_nc_t *)msg.content.ptr)->flags &= ~NG_IPV6_NC_IS_ROUTER;
                 break;
 
             case NG_NDP_MSG_ADDR_TIMEOUT:
-                DEBUG("ipv6: Router advertisement timer event received\n");
+                LOG_DEBUG("ipv6: Router advertisement timer event received\n");
                 ng_ipv6_netif_remove_addr(KERNEL_PID_UNDEF,
                                           (ng_ipv6_addr_t *)msg.content.ptr);
                 break;
 
             case NG_NDP_MSG_NBR_SOL_RETRANS:
-                DEBUG("ipv6: Neigbor solicitation retransmission timer event received\n");
+                LOG_DEBUG("ipv6: Neigbor solicitation retransmission timer event received\n");
                 ng_ndp_retrans_nbr_sol((ng_ipv6_nc_t *)msg.content.ptr);
                 break;
 
             case NG_NDP_MSG_NC_STATE_TIMEOUT:
-                DEBUG("ipv6: Neigbor cace state timeout received\n");
+                LOG_DEBUG("ipv6: Neigbor cace state timeout received\n");
                 ng_ndp_state_timeout((ng_ipv6_nc_t *)msg.content.ptr);
                 break;
 
@@ -201,7 +198,7 @@ static void _send_to_iface(kernel_pid_t iface, ng_pktsnip_t *pkt)
     ((ng_netif_hdr_t *)pkt->data)->if_pid = iface;
 
     if ((if_entry != NULL) && (if_entry->flags & NG_IPV6_NETIF_FLAGS_SIXLOWPAN)) {
-        DEBUG("ipv6: send to 6LoWPAN instead\n");
+        LOG_DEBUG("ipv6: send to 6LoWPAN instead\n");
         if (!ng_netapi_dispatch_send(NG_NETTYPE_SIXLOWPAN, NG_NETREG_DEMUX_CTX_ALL, pkt)) {
             LOG_ERROR("ipv6: no 6LoWPAN thread found");
             ng_pktbuf_release(pkt);
@@ -231,11 +228,11 @@ static void _send_unicast(kernel_pid_t iface, uint8_t *dst_l2addr,
          * XXX: alternative would be to check if ng_netif_hdr_t::dst_l2addr_len
          * is long enough and only then to throw away the header. This causes
          * to much overhead IMHO */
-        DEBUG("ipv6: removed old interface header\n");
+        LOG_DEBUG("ipv6: removed old interface header\n");
         pkt = ng_pktbuf_remove_snip(pkt, pkt);
     }
 
-    DEBUG("ipv6: add to interface header to packet\n");
+    LOG_DEBUG("ipv6: add to interface header to packet\n");
     netif = ng_netif_hdr_build(NULL, 0, dst_l2addr, dst_l2addr_len);
 
     if (netif == NULL) {
@@ -247,7 +244,7 @@ static void _send_unicast(kernel_pid_t iface, uint8_t *dst_l2addr,
     /* add netif to front of the pkt list */
     LL_PREPEND(pkt, netif);
 
-    DEBUG("ipv6: send unicast over interface %" PRIkernel_pid "\n", iface);
+    LOG_DEBUG("ipv6: send unicast over interface %" PRIkernel_pid "\n", iface);
     /* and send to interface */
     _send_to_iface(iface, pkt);
 }
@@ -259,7 +256,7 @@ static int _fill_ipv6_hdr(kernel_pid_t iface, ng_pktsnip_t *ipv6,
     ng_ipv6_hdr_t *hdr = ipv6->data;
 
     hdr->len = byteorder_htons(ng_pkt_len(payload));
-    DEBUG("ipv6: set payload length to %zu (network byteorder %04" PRIx16 ")\n",
+    LOG_DEBUG("ipv6: set payload length to %zu (network byteorder %04" PRIx16 ")\n",
           ng_pkt_len(payload), hdr->len.u16);
 
     /* check if e.g. extension header was not already marked */
@@ -272,7 +269,7 @@ static int _fill_ipv6_hdr(kernel_pid_t iface, ng_pktsnip_t *ipv6,
         }
     }
 
-    DEBUG("ipv6: set next header to %" PRIu8 "\n", hdr->nh);
+    LOG_DEBUG("ipv6: set next header to %" PRIu8 "\n", hdr->nh);
 
     if (hdr->hl == 0) {
         if (iface == KERNEL_PID_UNDEF) {
@@ -291,7 +288,7 @@ static int _fill_ipv6_hdr(kernel_pid_t iface, ng_pktsnip_t *ipv6,
             ng_ipv6_addr_t *src = ng_ipv6_netif_find_best_src_addr(iface, &hdr->dst);
 
             if (src != NULL) {
-                DEBUG("ipv6: set packet source to %s\n",
+                LOG_DEBUG("ipv6: set packet source to %s\n",
                       ng_ipv6_addr_to_str(addr_str, src, sizeof(addr_str)));
                 memcpy(&hdr->src, src, sizeof(ng_ipv6_addr_t));
             }
@@ -299,7 +296,7 @@ static int _fill_ipv6_hdr(kernel_pid_t iface, ng_pktsnip_t *ipv6,
         }
     }
 
-    DEBUG("ipv6: calculate checksum for upper header.\n");
+    LOG_DEBUG("ipv6: calculate checksum for upper header.\n");
 
 #if NG_NETIF_NUMOF > 1
     if (payload->users > 1) {
@@ -335,7 +332,7 @@ static int _fill_ipv6_hdr(kernel_pid_t iface, ng_pktsnip_t *ipv6,
 static inline void _send_multicast_over_iface(kernel_pid_t iface, ng_pktsnip_t *pkt,
         ng_pktsnip_t *netif)
 {
-    DEBUG("ipv6: send multicast over interface %" PRIkernel_pid "\n", iface);
+    LOG_DEBUG("ipv6: send multicast over interface %" PRIkernel_pid "\n", iface);
     /* mark as multicast */
     ((ng_netif_hdr_t *)netif->data)->flags |= NG_NETIF_HDR_FLAGS_MULTICAST;
     /* and send to interface */
@@ -530,7 +527,7 @@ static void _send(ng_pktsnip_t *pkt, bool prep_hdr)
 
         ng_pktbuf_release(pkt);
 
-        DEBUG("ipv6: packet is addressed to myself => loopback\n");
+        LOG_INFO("ipv6: packet is addressed to myself => loopback\n");
 
         ng_netapi_receive(ng_ipv6_pid, rcv_pkt);
     }
@@ -580,7 +577,7 @@ static void _dispatch_rcv_pkt(ng_nettype_t type, uint32_t demux_ctx,
     ng_netreg_entry_t *entry = ng_netreg_lookup(type, demux_ctx);
 
     while (entry) {
-        DEBUG("ipv6: Send receive command for %p to %" PRIu16 "\n", (void *)pkt,
+        LOG_DEBUG("ipv6: Send receive command for %p to %" PRIu16 "\n", (void *)pkt,
               entry->pid);
         ng_netapi_receive(entry->pid, pkt);
         entry = ng_netreg_getnext(entry);
@@ -643,24 +640,24 @@ static void _receive(ng_pktsnip_t *pkt)
     /* extract header */
     hdr = (ng_ipv6_hdr_t *)ipv6->data;
 
-    DEBUG("ipv6: Received (src = %s, ",
+    LOG_DEBUG("ipv6: Received (src = %s, ",
           ng_ipv6_addr_to_str(addr_str, &(hdr->src), sizeof(addr_str)));
-    DEBUG("dst = %s, next header = %" PRIu8 ", length = %" PRIu16 ")\n",
+    LOG_DEBUG("dst = %s, next header = %" PRIu8 ", length = %" PRIu16 ")\n",
           ng_ipv6_addr_to_str(addr_str, &(hdr->dst), sizeof(addr_str)),
           hdr->nh, byteorder_ntohs(hdr->len));
 
     if (_pkt_not_for_me(&iface, hdr)) { /* if packet is not for me */
-        DEBUG("ipv6: packet destination not this host\n");
+        LOG_INFO("ipv6: packet destination not this host\n");
 
 #ifdef MODULE_NG_IPV6_ROUTER    /* only routers redirect */
         /* redirect to next hop */
-        DEBUG("ipv6: decrement hop limit to %" PRIu8 "\n", hdr->hl - 1);
+        LOG_DEBUG("ipv6: decrement hop limit to %" PRIu8 "\n", hdr->hl - 1);
 
         /* TODO: check if receiving interface is router */
         if (--(hdr->hl) > 0) {  /* drop packets that *reach* Hop Limit 0 */
             ng_pktsnip_t *tmp = pkt;
 
-            DEBUG("ipv6: forward packet to next hop\n");
+            LOG_DEBUG("ipv6: forward packet to next hop\n");
 
             /* pkt might not be writable yet, if header was given above */
             pkt = ng_pktbuf_start_write(tmp);

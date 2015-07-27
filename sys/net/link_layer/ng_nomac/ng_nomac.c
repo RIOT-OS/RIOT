@@ -25,10 +25,7 @@
 #include "net/ng_nomac.h"
 #include "net/ng_netbase.h"
 
-#define ENABLE_DEBUG    (0)
-#include "debug.h"
-
-#if ENABLE_DEBUG || (LOG_LEVEL > LOG_NONE)
+#if (LOG_LEVEL > LOG_LEVEL_KERNEL)
 /* For PRIu16 etc. */
 #include <inttypes.h>
 #endif
@@ -41,7 +38,7 @@
  */
 static void _event_cb(ng_netdev_event_t event, void *data)
 {
-    DEBUG("nomac: event triggered -> %i\n", event);
+    LOG_DEBUG("nomac: event triggered -> %i\n", event);
     /* NOMAC only understands the RX_COMPLETE event... */
     if (event == NETDEV_EVENT_RX_COMPLETE) {
         ng_pktsnip_t *pkt;
@@ -80,27 +77,27 @@ static void *_nomac_thread(void *args)
 
     /* start the event loop */
     while (1) {
-        DEBUG("nomac: waiting for incoming messages\n");
+        LOG_DEBUG("nomac: waiting for incoming messages\n");
         msg_receive(&msg);
         /* dispatch NETDEV and NETAPI messages */
         switch (msg.type) {
             case NG_NETDEV_MSG_TYPE_EVENT:
-                DEBUG("nomac: NG_NETDEV_MSG_TYPE_EVENT received\n");
+                LOG_DEBUG("nomac: NG_NETDEV_MSG_TYPE_EVENT received\n");
                 dev->driver->isr_event(dev, msg.content.value);
                 break;
             case NG_NETAPI_MSG_TYPE_SND:
-                DEBUG("nomac: NG_NETAPI_MSG_TYPE_SND received\n");
+                LOG_DEBUG("nomac: NG_NETAPI_MSG_TYPE_SND received\n");
                 dev->driver->send_data(dev, (ng_pktsnip_t *)msg.content.ptr);
                 break;
             case NG_NETAPI_MSG_TYPE_SET:
                 /* TODO: filter out MAC layer options -> for now forward
                          everything to the device driver */
-                DEBUG("nomac: NG_NETAPI_MSG_TYPE_SET received\n");
+                LOG_DEBUG("nomac: NG_NETAPI_MSG_TYPE_SET received\n");
                 /* read incoming options */
                 opt = (ng_netapi_opt_t *)msg.content.ptr;
                 /* set option for device driver */
                 res = dev->driver->set(dev, opt->opt, opt->data, opt->data_len);
-                DEBUG("nomac: response of netdev->set: %i\n", res);
+                LOG_DEBUG("nomac: response of netdev->set: %i\n", res);
                 /* send reply to calling thread */
                 reply.type = NG_NETAPI_MSG_TYPE_ACK;
                 reply.content.value = (uint32_t)res;
@@ -109,12 +106,12 @@ static void *_nomac_thread(void *args)
             case NG_NETAPI_MSG_TYPE_GET:
                 /* TODO: filter out MAC layer options -> for now forward
                          everything to the device driver */
-                DEBUG("nomac: NG_NETAPI_MSG_TYPE_GET received\n");
+                LOG_DEBUG("nomac: NG_NETAPI_MSG_TYPE_GET received\n");
                 /* read incoming options */
                 opt = (ng_netapi_opt_t *)msg.content.ptr;
                 /* get option from device driver */
                 res = dev->driver->get(dev, opt->opt, opt->data, opt->data_len);
-                DEBUG("nomac: response of netdev->get: %i\n", res);
+                LOG_DEBUG("nomac: response of netdev->get: %i\n", res);
                 /* send reply to calling thread */
                 reply.type = NG_NETAPI_MSG_TYPE_ACK;
                 reply.content.value = (uint32_t)res;

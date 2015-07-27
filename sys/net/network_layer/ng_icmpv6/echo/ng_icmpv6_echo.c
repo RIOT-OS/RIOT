@@ -20,10 +20,7 @@
 #include "net/ng_icmpv6/echo.h"
 #include "utlist.h"
 
-#define ENABLE_DEBUG    (0)
-#include "debug.h"
-
-#if ENABLE_DEBUG || (LOG_LEVEL > LOG_NONE)
+#if (LOG_LEVEL >= LOG_LEVEL_KERNEL)
 /* For PRIu16 etc. */
 #include <inttypes.h>
 #endif
@@ -38,23 +35,23 @@ ng_pktsnip_t *ng_icmpv6_echo_build(uint8_t type, uint16_t id, uint16_t seq,
         return NULL;
     }
 
-    DEBUG("icmpv6_echo: Building echo message with type=%" PRIu8 "id=%" PRIu16
-          ", seq=%" PRIu16, type, id, seq);
+    LOG_DEBUG("icmpv6_echo: Building echo message with type=%" PRIu8 "id=%" PRIu16
+              ", seq=%" PRIu16, type, id, seq);
     echo = (ng_icmpv6_echo_t *)pkt->data;
     echo->id = byteorder_htons(id);
     echo->seq = byteorder_htons(seq);
 
     if (data != NULL) {
         memcpy(echo + 1, data, data_len);
-#if defined(MODULE_OD) && ENABLE_DEBUG
-        DEBUG(", payload:\n");
+#if defined(MODULE_OD) && (LOG_LEVEL >= LOG_DEBUG)
+        LOG_DEBUG(", payload:\n");
         od_hex_dump(data, data_len, OD_WIDTH_DEFAULT);
 #endif
-        DEBUG("\n");
+        LOG_DEBUG("\n");
     }
-#if ENABLE_DEBUG
+#if (LOG_LEVEL >= LOG_DEBUG)
     else {
-        DEBUG("\n");
+        LOG_DEBUG("\n");
     }
 #endif
 

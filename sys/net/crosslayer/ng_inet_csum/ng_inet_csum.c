@@ -19,20 +19,17 @@
 #include "od.h"
 #include "net/ng_inet_csum.h"
 
-#define ENABLE_DEBUG    (0)
-#include "debug.h"
-
 uint16_t ng_inet_csum(uint16_t sum, const uint8_t *buf, uint16_t len)
 {
     uint32_t csum = sum;
 
-    DEBUG("inet_sum: sum = 0x%04" PRIx16 ", len = %" PRIu16, sum, len);
-#if ENABLE_DEBUG
+    LOG_DEBUG("inet_sum: sum = 0x%04" PRIx16 ", len = %" PRIu16, sum, len);
+#if (LOG_LEVEL >= LOG_DEBUG)
 #ifdef MODULE_OD
-    DEBUG(", buf:\n");
+    LOG_DEBUG(", buf:\n");
     od_hex_dump(buf, len, OD_WIDTH_DEFAULT);
 #else
-    DEBUG(", buf output only with od module\n");
+    LOG_DEBUG(", buf output only with od module\n");
 #endif
 #endif
 
@@ -50,7 +47,7 @@ uint16_t ng_inet_csum(uint16_t sum, const uint8_t *buf, uint16_t len)
         csum = (csum & 0xffff) + carry;
     }
 
-    DEBUG("inet_sum: new sum = 0x%04" PRIx32 "\n", csum);
+    LOG_DEBUG("inet_sum: new sum = 0x%04" PRIx32 "\n", csum);
 
     return csum;
 }

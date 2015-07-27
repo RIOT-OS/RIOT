@@ -26,13 +26,9 @@
 #include "timex.h"
 #include "vtimer.h"
 
-#define ENABLE_DEBUG    (0)
-#include "debug.h"
-
-#if ENABLE_DEBUG
+#if (LOG_LEVEL > LOG_LEVEL_KERNEL)
 /* For PRIu8 etc. */
 #include <inttypes.h>
-
 static char addr_str[NG_IPV6_ADDR_MAX_STR_LEN];
 #endif
 
@@ -75,14 +71,14 @@ ng_ipv6_nc_t *ng_ipv6_nc_add(kernel_pid_t iface, const ng_ipv6_addr_t *ipv6_addr
                   ng_ipv6_addr_to_str(addr_str, ipv6_addr, sizeof(addr_str)));
 
             if ((l2_addr != NULL) && (l2_addr_len > 0)) {
-                DEBUG("ipv6_nc: Update to L2 address %s",
+                LOG_DEBUG("ipv6_nc: Update to L2 address %s",
                       ng_netif_addr_to_str(addr_str, sizeof(addr_str),
                                            l2_addr, l2_addr_len));
 
                 memcpy(&(ncache[i].l2_addr), l2_addr, l2_addr_len);
                 ncache[i].l2_addr_len = l2_addr_len;
                 ncache[i].flags = flags;
-                DEBUG(" with flags = 0x%0x\n", flags);
+                LOG_DEBUG(" with flags = 0x%0x\n", flags);
 
             }
             return &ncache[i];
@@ -105,12 +101,12 @@ ng_ipv6_nc_t *ng_ipv6_nc_add(kernel_pid_t iface, const ng_ipv6_addr_t *ipv6_addr
 
     free_entry->pkts = NULL;
     memcpy(&(free_entry->ipv6_addr), ipv6_addr, sizeof(ng_ipv6_addr_t));
-    DEBUG("ipv6_nc: Register %s for interface %" PRIkernel_pid,
+    LOG_DEBUG("ipv6_nc: Register %s for interface %" PRIkernel_pid,
           ng_ipv6_addr_to_str(addr_str, ipv6_addr, sizeof(addr_str)),
           iface);
 
     if ((l2_addr != NULL) && (l2_addr_len > 0)) {
-        DEBUG(" to L2 address %s",
+        LOG_DEBUG(" to L2 address %s",
               ng_netif_addr_to_str(addr_str, sizeof(addr_str),
                                    l2_addr, l2_addr_len));
         memcpy(&(free_entry->l2_addr), l2_addr, l2_addr_len);
@@ -119,10 +115,10 @@ ng_ipv6_nc_t *ng_ipv6_nc_add(kernel_pid_t iface, const ng_ipv6_addr_t *ipv6_addr
 
     free_entry->flags = flags;
 
-    DEBUG(" with flags = 0x%0x\n", flags);
+    LOG_DEBUG(" with flags = 0x%0x\n", flags);
 
     if (ng_ipv6_nc_get_state(free_entry) == NG_IPV6_NC_STATE_INCOMPLETE) {
-        DEBUG("ipv6_nc: Set remaining probes to %" PRIu8 "\n");
+        LOG_DEBUG("ipv6_nc: Set remaining probes to %" PRIu8 "\n", NG_NDP_MAX_MC_NBR_SOL_NUMOF);
         free_entry->probes_remaining = NG_NDP_MAX_MC_NBR_SOL_NUMOF;
     }
 
@@ -134,7 +130,7 @@ void ng_ipv6_nc_remove(kernel_pid_t iface, const ng_ipv6_addr_t *ipv6_addr)
     ng_ipv6_nc_t *entry = ng_ipv6_nc_get(iface, ipv6_addr);
 
     if (entry != NULL) {
-        DEBUG("ipv6_nc: Remove %s for interface %" PRIkernel_pid "\n",
+        LOG_DEBUG("ipv6_nc: Remove %s for interface %" PRIkernel_pid "\n",
               ng_ipv6_addr_to_str(addr_str, ipv6_addr, sizeof(addr_str)),
               iface);
 
@@ -162,7 +158,7 @@ ng_ipv6_nc_t *ng_ipv6_nc_get(kernel_pid_t iface, const ng_ipv6_addr_t *ipv6_addr
     for (int i = 0; i < NG_IPV6_NC_SIZE; i++) {
         if (((iface == KERNEL_PID_UNDEF) || (iface == ncache[i].iface)) &&
             ng_ipv6_addr_equal(&(ncache[i].ipv6_addr), ipv6_addr)) {
-            DEBUG("ipv6_nc: Found entry for %s on interface %" PRIkernel_pid
+            LOG_DEBUG("ipv6_nc: Found entry for %s on interface %" PRIkernel_pid
                   " (0 = all interfaces) [%p]\n",
                   ng_ipv6_addr_to_str(addr_str, ipv6_addr, sizeof(addr_str)),
                   iface, (void *)(ncache + i));
@@ -226,7 +222,7 @@ ng_ipv6_nc_t *ng_ipv6_nc_still_reachable(const ng_ipv6_addr_t *ipv6_addr)
                        NG_NDP_MSG_NC_STATE_TIMEOUT, entry);
 #endif
 
-        DEBUG("ipv6_nc: Marking entry %s as reachable\n",
+        LOG_DEBUG("ipv6_nc: Marking entry %s as reachable\n",
               ng_ipv6_addr_to_str(addr_str, ipv6_addr, sizeof(addr_str)));
         entry->flags &= ~(NG_IPV6_NC_STATE_MASK >> NG_IPV6_NC_STATE_POS);
         entry->flags |= (NG_IPV6_NC_STATE_REACHABLE >> NG_IPV6_NC_STATE_POS);

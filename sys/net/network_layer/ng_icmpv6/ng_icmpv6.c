@@ -32,9 +32,6 @@
 #include "net/ng_icmpv6.h"
 #include "net/ng_icmpv6/echo.h"
 
-#define ENABLE_DEBUG    (0)
-#include "debug.h"
-
 static inline uint16_t _calc_csum(ng_pktsnip_t *hdr,
                                   ng_pktsnip_t *pseudo_hdr,
                                   ng_pktsnip_t *payload)
@@ -83,42 +80,42 @@ void ng_icmpv6_demux(kernel_pid_t iface, ng_pktsnip_t *pkt)
         /* TODO: handle ICMPv6 errors */
 #ifdef MODULE_NG_ICMPV6_ECHO
         case NG_ICMPV6_ECHO_REQ:
-            DEBUG("icmpv6: handle echo request.\n");
+            LOG_DEBUG("icmpv6: handle echo request.\n");
             ng_icmpv6_echo_req_handle(iface, (ng_ipv6_hdr_t *)ipv6->data,
                                       (ng_icmpv6_echo_t *)hdr, icmpv6->size);
             break;
 #endif
 
         case NG_ICMPV6_RTR_SOL:
-            DEBUG("icmpv6: router solicitation received\n");
+            LOG_DEBUG("icmpv6: router solicitation received\n");
             /* TODO */
             break;
 
         case NG_ICMPV6_RTR_ADV:
-            DEBUG("icmpv6: router advertisement received\n");
+            LOG_DEBUG("icmpv6: router advertisement received\n");
             /* TODO */
             break;
 
         case NG_ICMPV6_NBR_SOL:
-            DEBUG("icmpv6: neighbor solicitation received\n");
+            LOG_DEBUG("icmpv6: neighbor solicitation received\n");
             ng_ndp_nbr_sol_handle(iface, pkt, ipv6->data, (ng_ndp_nbr_sol_t *)hdr,
                                   icmpv6->size);
             break;
 
         case NG_ICMPV6_NBR_ADV:
-            DEBUG("icmpv6: neighbor advertisement received\n");
+            LOG_DEBUG("icmpv6: neighbor advertisement received\n");
             ng_ndp_nbr_adv_handle(iface, pkt, ipv6->data, (ng_ndp_nbr_adv_t *)hdr,
                                   icmpv6->size);
             break;
 
         case NG_ICMPV6_REDIRECT:
-            DEBUG("icmpv6: redirect message received\n");
+            LOG_DEBUG("icmpv6: redirect message received\n");
             /* TODO */
             break;
 
 #ifdef MODULE_NG_RPL
         case NG_ICMPV6_RPL_CTRL:
-            DEBUG("icmpv6: RPL control message received\n");
+            LOG_DEBUG("icmpv6: RPL control message received\n");
             /* TODO */
             break;
 #endif
@@ -161,7 +158,7 @@ ng_pktsnip_t *ng_icmpv6_build(ng_pktsnip_t *next, uint8_t type, uint8_t code,
         return NULL;
     }
 
-    DEBUG("icmpv6: Building ICMPv6 message with type=%" PRIu8 ", code=%" PRIu8 "\n",
+    LOG_DEBUG("icmpv6: Building ICMPv6 message with type=%" PRIu8 ", code=%" PRIu8 "\n",
           type, code);
     icmpv6 = (ng_icmpv6_hdr_t *)pkt->data;
     icmpv6->type = type;

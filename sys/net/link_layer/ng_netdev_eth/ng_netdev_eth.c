@@ -43,9 +43,6 @@
 #include "thread.h"
 #include "utlist.h"
 
-#define ENABLE_DEBUG    (0)
-#include "debug.h"
-
 ng_netdev_eth_t ng_netdev_eth;
 
 static uint8_t send_buffer[NG_ETHERNET_MAX_LEN];
@@ -100,7 +97,7 @@ static int _send_data(ng_netdev_t *netdev, ng_pktsnip_t *pkt)
     int nsent, to_send;
     ng_netdev_eth_t *dev = (ng_netdev_eth_t *)netdev;
 
-    DEBUG("ng_netdev_eth: send data ");
+    LOG_DEBUG("ng_netdev_eth: send data ");
 
     if (pkt == NULL) {
         return -EFAULT;
@@ -112,7 +109,7 @@ static int _send_data(ng_netdev_t *netdev, ng_pktsnip_t *pkt)
         return -ENODEV;
     }
 
-    DEBUG("\n");
+    LOG_DEBUG("\n");
 
     to_send = _marshall_ethernet(dev, send_buffer, pkt);
     ng_pktbuf_release(pkt);
@@ -123,14 +120,14 @@ static int _send_data(ng_netdev_t *netdev, ng_pktsnip_t *pkt)
         return to_send;
     }
 
-    DEBUG("ng_netdev_eth: send %d bytes\n", to_send);
-#if defined(MODULE_OD) && ENABLE_DEBUG
+    LOG_DEBUG("ng_netdev_eth: send %d bytes\n", to_send);
+#if defined(MODULE_OD) && (LOG_LEVEL >= LOG_DEBUG)
     od_hex_dump(send_buffer, to_send, OD_WIDTH_DEFAULT);
 #endif
 
     dev_eth_t *ethdev = dev->ethdev;
     if ((nsent = ethdev->driver->send(ethdev, (char*)send_buffer, to_send)) < 0) {
-        DEBUG("write\n");
+        LOG_DEBUG("write\n");
         return -EIO;
     }
 
@@ -139,7 +136,7 @@ static int _send_data(ng_netdev_t *netdev, ng_pktsnip_t *pkt)
 
 static int _add_event_callback(ng_netdev_t *dev, ng_netdev_event_cb_t cb)
 {
-    DEBUG("ng_netdev_eth: add event callback");
+    LOG_DEBUG("ng_netdev_eth: add event callback");
 
     if ((dev == NULL) || (dev->driver != &ng_netdev_eth_driver)) {
         LOG_ERROR(" [wrong device descriptor]\n");
@@ -151,7 +148,7 @@ static int _add_event_callback(ng_netdev_t *dev, ng_netdev_event_cb_t cb)
         return -ENOBUFS;
     }
 
-    DEBUG("\n");
+    LOG_DEBUG("\n");
     dev->event_cb = cb;
 
     return 0;
@@ -159,7 +156,7 @@ static int _add_event_callback(ng_netdev_t *dev, ng_netdev_event_cb_t cb)
 
 static int _rem_event_callback(ng_netdev_t *dev, ng_netdev_event_cb_t cb)
 {
-    DEBUG("ng_netdev_eth: remove event callback");
+    LOG_DEBUG("ng_netdev_eth: remove event callback");
 
     if ((dev == NULL) || (dev->driver != &ng_netdev_eth_driver)) {
         LOG_ERROR(" [wrong device descriptor]\n");
@@ -171,7 +168,7 @@ static int _rem_event_callback(ng_netdev_t *dev, ng_netdev_event_cb_t cb)
         return -ENOENT;
     }
 
-    DEBUG("\n");
+    LOG_DEBUG("\n");
     dev->event_cb = NULL;
 
     return 0;
@@ -248,7 +245,7 @@ static inline int _get_promiscousmode(ng_netdev_eth_t *netdev, ng_netconf_enable
 static int _get(ng_netdev_t *dev, ng_netconf_opt_t opt, void *value,
                 size_t max_len)
 {
-    DEBUG("ng_netdev_eth: get ");
+    LOG_DEBUG("ng_netdev_eth: get ");
 
     if ((dev == NULL) || (dev->driver != &ng_netdev_eth_driver)) {
         LOG_ERROR("[wrong device descriptor]\n");
@@ -257,27 +254,27 @@ static int _get(ng_netdev_t *dev, ng_netconf_opt_t opt, void *value,
 
     switch (opt) {
         case NETCONF_OPT_ADDRESS:
-            DEBUG("address\n");
+            LOG_DEBUG("address\n");
             return _get_addr((ng_netdev_eth_t *)dev, value, max_len);
 
         case NETCONF_OPT_ADDR_LEN:
-            DEBUG("address length\n");
+            LOG_DEBUG("address length\n");
             return _get_addr_len(value, max_len);
 
         case NETCONF_OPT_IPV6_IID:
-            DEBUG("IPv6 IID\n");
+            LOG_DEBUG("IPv6 IID\n");
             return _get_iid((ng_netdev_eth_t *)dev, value, max_len);
 
         case NETCONF_OPT_MAX_PACKET_SIZE:
-            DEBUG("maximum packet size\n");
+            LOG_DEBUG("maximum packet size\n");
             return _get_max_pkt_sz(value, max_len);
 
         case NETCONF_OPT_PROMISCUOUSMODE:
-            DEBUG("promiscous mode\n");
+            LOG_DEBUG("promiscous mode\n");
             return _get_promiscousmode((ng_netdev_eth_t *)dev, value, max_len);
 
         default:
-            LOG_WARNING("[not supported: %d]\n", opt);
+            LOG_DEBUG("[not supported: %d]\n", opt);
             return -ENOTSUP;
     }
 }
@@ -301,7 +298,7 @@ static inline int _set_promiscousmode(ng_netdev_eth_t *netdev, ng_netconf_enable
 static int _set(ng_netdev_t *dev, ng_netconf_opt_t opt, void *value,
                 size_t value_len)
 {
-    DEBUG("ng_netdev_eth: set ");
+    LOG_DEBUG("ng_netdev_eth: set ");
 
     if ((dev == NULL) || (dev->driver != &ng_netdev_eth_driver)) {
         LOG_ERROR("[wrong device descriptor]\n");
@@ -310,7 +307,7 @@ static int _set(ng_netdev_t *dev, ng_netconf_opt_t opt, void *value,
 
     switch (opt) {
         case NETCONF_OPT_PROMISCUOUSMODE:
-            DEBUG("promiscous mode\n");
+            LOG_DEBUG("promiscous mode\n");
             return _set_promiscousmode((ng_netdev_eth_t *)dev, value, value_len);
 
         default:
@@ -324,7 +321,7 @@ static void _rx_event(ng_netdev_eth_t *dev);
 
 static void _isr_event(ng_netdev_t *dev, uint32_t event_type)
 {
-    DEBUG("ng_netdev_eth: ISR event ");
+    LOG_DEBUG("ng_netdev_eth: ISR event ");
 
     if ((dev == NULL) || (dev->driver != &ng_netdev_eth_driver)) {
         return;
@@ -335,13 +332,13 @@ static void _isr_event(ng_netdev_t *dev, uint32_t event_type)
     switch (event_type) {
         case _ISR_EVENT_RX:
 
-            DEBUG("[ISR]\n");
+            LOG_DEBUG("[ISR]\n");
 
 #ifdef NETDEV_ETH_DELAY_SEND
-            DEBUG("netdev_eth: delaying send...\n");
+            LOG_DEBUG("netdev_eth: delaying send...\n");
             volatile int i = NETDEV_ETH_DELAY_SEND;
             while(i--);
-            DEBUG("netdev_eth: delay done.\n");
+            LOG_DEBUG("netdev_eth: delay done.\n");
 #endif
 
             dev_eth_t *ethdev = netdev->ethdev;
@@ -433,7 +430,7 @@ static int _marshall_ethernet(ng_netdev_eth_t *dev, uint8_t *buffer, ng_pktsnip_
         return -EBADMSG;
     }
 
-    DEBUG("ng_netdev_eth: send to %02x:%02x:%02x:%02x:%02x:%02x\n",
+    LOG_DEBUG("ng_netdev_eth: send to %02x:%02x:%02x:%02x:%02x:%02x\n",
           hdr->dst[0], hdr->dst[1], hdr->dst[2],
           hdr->dst[3], hdr->dst[4], hdr->dst[5]);
 
@@ -455,10 +452,10 @@ static int _marshall_ethernet(ng_netdev_eth_t *dev, uint8_t *buffer, ng_pktsnip_
      * Linux does this on its own, but it doesn't hurt to do it here.
      * As of now only tuntaposx needs this. */
     if (data_len < (NG_ETHERNET_MIN_LEN)) {
-        DEBUG("ng_netdev_eth: padding data! (%d -> ", data_len);
+        LOG_DEBUG("ng_netdev_eth: padding data! (%d -> ", data_len);
         memset(send_buffer + data_len, 0, NG_ETHERNET_MIN_LEN - data_len);
         data_len = NG_ETHERNET_MIN_LEN;
-        DEBUG("%d)\n", data_len);
+        LOG_DEBUG("%d)\n", data_len);
     }
 
     return data_len;
@@ -469,7 +466,7 @@ void dev_eth_isr(dev_eth_t* dev)
     (void)dev;
     msg_t msg;
 
-    DEBUG("ng_netdev_eth: Trigger ISR event\n");
+    LOG_DEBUG("ng_netdev_eth: Trigger ISR event\n");
 
     /* TODO: check whether this is an input or an output event
        TODO: refactor this into general io-signal multiplexer */
@@ -489,7 +486,7 @@ void dev_eth_rx_handler(dev_eth_t* dev) {
 
 void dev_eth_linkstate_handler(dev_eth_t *dev, int newstate)
 {
-    DEBUG("ng_dev_eth: dev=0x%08x link %s\n", (unsigned)dev, newstate ? "UP" : "DOWN");
+    LOG_DEBUG("ng_dev_eth: dev=0x%08x link %s\n", (unsigned)dev, newstate ? "UP" : "DOWN");
     (void)dev; (void)newstate;
 }
 
@@ -498,7 +495,7 @@ static void _rx_event(ng_netdev_eth_t *netdev)
     dev_eth_t *dev = netdev->ethdev;
     int nread = dev->driver->recv(dev, (char*)recv_buffer, NG_ETHERNET_MAX_LEN);
 
-    DEBUG("ng_netdev_eth: read %d bytes\n", nread);
+    LOG_DEBUG("ng_netdev_eth: read %d bytes\n", nread);
 
     if (nread > 0) {
         ng_ethernet_hdr_t *hdr = (ng_ethernet_hdr_t *)recv_buffer;
@@ -524,11 +521,11 @@ static void _rx_event(ng_netdev_eth_t *netdev)
 
         receive_type = ng_nettype_from_ethertype(byteorder_ntohs(hdr->type));
 
-        DEBUG("ng_netdev_eth: received packet from %02x:%02x:%02x:%02x:%02x:%02x "
+        LOG_DEBUG("ng_netdev_eth: received packet from %02x:%02x:%02x:%02x:%02x:%02x "
               "of length %zu\n",
               hdr->src[0], hdr->src[1], hdr->src[2], hdr->src[3], hdr->src[4],
               hdr->src[5], data_len);
-#if defined(MODULE_OD) && ENABLE_DEBUG
+#if defined(MODULE_OD) && (LOG_LEVEL >= LOG_DEBUG)
         od_hex_dump(hdr, nread, OD_WIDTH_DEFAULT);
 #endif
 
@@ -564,7 +561,7 @@ int ng_netdev_eth_init(ng_netdev_eth_t *netdev, dev_eth_t *ethdev) {
     netdev->driver = (ng_netdev_driver_t *)(&ng_netdev_eth_driver);
     netdev->ethdev = ethdev;
 
-    DEBUG("ng_netdev_eth: initialized.\n");
+    LOG_DEBUG("ng_netdev_eth: initialized.\n");
 
     return 0;
 }

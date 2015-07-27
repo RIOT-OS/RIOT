@@ -34,9 +34,6 @@
 #include "net/ng_ipv6/hdr.h"
 #endif
 
-#define ENABLE_DEBUG    (0)
-#include "debug.h"
-
 /**
  * @brief   Save the UDP's thread PID for later reference
  */
@@ -45,7 +42,7 @@ static kernel_pid_t _pid = KERNEL_PID_UNDEF;
 /**
  * @brief   Allocate memory for the UDP thread's stack
  */
-#if ENABLE_DEBUG || (LOG_LEVEL > LOG_NONE)
+#if (LOG_LEVEL > LOG_LEVEL_KERNEL)
 static char _stack[NG_UDP_STACK_SIZE + THREAD_EXTRA_STACKSIZE_PRINTF];
 #else
 static char _stack[NG_UDP_STACK_SIZE];
@@ -189,11 +186,11 @@ static void *_event_loop(void *arg)
         msg_receive(&msg);
         switch (msg.type) {
             case NG_NETAPI_MSG_TYPE_RCV:
-                DEBUG("udp: NG_NETAPI_MSG_TYPE_RCV\n");
+                LOG_DEBUG("udp: NG_NETAPI_MSG_TYPE_RCV\n");
                 _receive((ng_pktsnip_t *)msg.content.ptr);
                 break;
             case NG_NETAPI_MSG_TYPE_SND:
-                DEBUG("udp: NG_NETAPI_MSG_TYPE_SND\n");
+                LOG_DEBUG("udp: NG_NETAPI_MSG_TYPE_SND\n");
                 _send((ng_pktsnip_t *)msg.content.ptr);
                 break;
             case NG_NETAPI_MSG_TYPE_SET:

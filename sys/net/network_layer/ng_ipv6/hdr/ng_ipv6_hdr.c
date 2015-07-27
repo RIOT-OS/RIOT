@@ -19,10 +19,7 @@
 #include "net/ng_pktbuf.h"
 #include "net/ng_protnum.h"
 
-#define ENABLE_DEBUG    (0)
-#include "debug.h"
-
-#if (ENABLE_DEBUG || (LOG_LEVEL > LOG_NONE)) && defined(MODULE_NG_IPV6_ADDR)
+#if (LOG_LEVEL >= LOG_DEBUG) && defined(MODULE_NG_IPV6_ADDR)
 static char addr_str[NG_IPV6_ADDR_MAX_STR_LEN];
 #endif
 
@@ -58,14 +55,14 @@ ng_pktsnip_t *ng_ipv6_hdr_build(ng_pktsnip_t *payload,
 
     if ((src != NULL) && (src_len != 0)) {
 #ifdef MODULE_NG_IPV6_ADDR
-        DEBUG("ipv6_hdr: set packet source to %s\n",
+        LOG_DEBUG("ipv6_hdr: set packet source to %s\n",
               ng_ipv6_addr_to_str(addr_str, (ng_ipv6_addr_t *)src,
                                   sizeof(addr_str)));
 #endif
         memcpy(&hdr->src, src, src_len);
     }
     else {
-        DEBUG("ipv6_hdr: set packet source to ::\n");
+        LOG_DEBUG("ipv6_hdr: set packet source to ::\n");
         ng_ipv6_addr_set_unspecified(&hdr->src);
     }
 
@@ -73,14 +70,14 @@ ng_pktsnip_t *ng_ipv6_hdr_build(ng_pktsnip_t *payload,
 
     if ((dst != NULL) && (dst_len != 0)) {
 #ifdef MODULE_NG_IPV6_ADDR
-        DEBUG("ipv6_hdr: set packet destination to %s\n",
+        LOG_DEBUG("ipv6_hdr: set packet destination to %s\n",
               ng_ipv6_addr_to_str(addr_str, (ng_ipv6_addr_t *)dst,
                                   sizeof(addr_str)));
 #endif
         memcpy(&hdr->dst, dst, dst_len);
     }
     else {
-        DEBUG("ipv6_hdr: set packet destination to ::1\n");
+        LOG_DEBUG("ipv6_hdr: set packet destination to ::1\n");
         ng_ipv6_addr_set_loopback(&hdr->dst);
     }
 
