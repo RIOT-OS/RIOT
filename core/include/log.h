@@ -67,7 +67,11 @@ enum {
 /**
  * @brief Default log level define
  */
-#define LOG_LEVEL LOG_INFO
+#ifdef DEVELHELP
+#   define LOG_LEVEL    LOG_INFO
+#else
+#   define LOG_LEVEL    LOG_KERNEL
+#endif
 #endif
 
 /**
