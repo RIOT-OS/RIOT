@@ -13,6 +13,7 @@
  */
 
 #include "kernel_types.h"
+#include "log.h"
 
 #include "net/ng_netif.h"
 #include "net/ng_sixlowpan/netif.h"
@@ -46,7 +47,7 @@ void ng_sixlowpan_netif_add(kernel_pid_t pid, uint16_t max_frag_size)
     }
 
     if (!free_entry) {
-        DEBUG("ng_sixlowpan_netif_add: couldn't add interface with PID %d: No space left.\n", pid);
+        LOG_ERROR("ng_sixlowpan_netif_add: couldn't add interface with PID %d: No space left.\n", pid);
         return;
     }
 

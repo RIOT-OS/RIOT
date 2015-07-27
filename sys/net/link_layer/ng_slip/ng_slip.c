@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "log.h"
 #include "kernel.h"
 #include "kernel_types.h"
 #include "msg.h"
@@ -116,7 +117,7 @@ static void _slip_receive(ng_slip_dev_t *dev, size_t bytes)
     pkt = ng_pktbuf_add(NULL, NULL, bytes, NG_NETTYPE_UNDEF);
 
     if (pkt == NULL) {
-        DEBUG("slip: no space left in packet buffer\n");
+        LOG_ERROR("slip: no space left in packet buffer\n");
         return;
     }
 
@@ -124,7 +125,7 @@ static void _slip_receive(ng_slip_dev_t *dev, size_t bytes)
                               NG_NETTYPE_NETIF);
 
     if (netif_hdr == NULL) {
-        DEBUG("slip: no space left in packet buffer\n");
+        LOG_ERROR("slip: no space left in packet buffer\n");
         ng_pktbuf_release(pkt);
         return;
     }
@@ -134,7 +135,7 @@ static void _slip_receive(ng_slip_dev_t *dev, size_t bytes)
     hdr->if_pid = thread_getpid();
 
     if (ringbuffer_get(dev->in_buf, pkt->data, bytes) != bytes) {
-        DEBUG("slip: could not read %zu bytes from ringbuffer\n", bytes);
+        LOG_ERROR("slip: could not read %zu bytes from ringbuffer\n", bytes);
         ng_pktbuf_release(pkt);
         return;
     }
@@ -148,7 +149,7 @@ static void _slip_receive(ng_slip_dev_t *dev, size_t bytes)
     sendto = ng_netreg_lookup(pkt->type, NG_NETREG_DEMUX_CTX_ALL);
 
     if (sendto == NULL) {
-        DEBUG("slip: unable to forward packet of type %i\n", pkt->type);
+        LOG_ERROR("slip: unable to forward packet of type %i\n", pkt->type);
         ng_pktbuf_release(pkt);
     }
 
@@ -238,7 +239,7 @@ static void *_slip(void *args)
                 DEBUG("slip: NG_NETAPI_MSG_TYPE_GET or NG_NETAPI_MSG_TYPE_SET received\n");
                 reply.type = NG_NETAPI_MSG_TYPE_ACK;
                 reply.content.value = (uint32_t)(-ENOTSUP);
-                DEBUG("slip: I don't support these but have to reply.\n");
+                LOG_WARNING("slip: I don't support these but have to reply.\n");
                 msg_reply(&msg, &reply);
                 break;
         }
@@ -267,7 +268,7 @@ kernel_pid_t ng_slip_init(ng_slip_dev_t *dev, uart_t uart, uint32_t baudrate,
     DEBUG("slip: initialize UART_%d\n", uart);
     res = uart_init(uart, baudrate, _slip_rx_cb, _slip_tx_cb, dev);
     if (res < 0) {
-        DEBUG("slip: error initializing UART_%i with baudrate %u\n",
+        LOG_ERROR("slip: error initializing UART_%i with baudrate %u\n",
               uart, baudrate);
         return -ENODEV;
     }
@@ -277,7 +278,7 @@ kernel_pid_t ng_slip_init(ng_slip_dev_t *dev, uart_t uart, uint32_t baudrate,
     pid = thread_create(stack, stack_size, priority, CREATE_STACKTEST,
                         _slip, dev, _SLIP_NAME);
     if (pid < 0) {
-        DEBUG("slip: unable to create SLIP thread\n");
+        LOG_ERROR("slip: unable to create SLIP thread\n");
         return -EFAULT;
     }
     return res;

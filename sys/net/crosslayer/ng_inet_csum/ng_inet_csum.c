@@ -14,6 +14,8 @@
 
 #include <inttypes.h>
 #include <stdio.h>
+
+#include "log.h"
 #include "od.h"
 #include "net/ng_inet_csum.h"
 

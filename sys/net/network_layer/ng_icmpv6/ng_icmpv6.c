@@ -19,6 +19,7 @@
 #include <inttypes.h>
 #include <stdlib.h>
 
+#include "log.h"
 #include "byteorder.h"
 #include "kernel_types.h"
 #include "net/ng_netbase.h"
@@ -73,7 +74,7 @@ void ng_icmpv6_demux(kernel_pid_t iface, ng_pktsnip_t *pkt)
     hdr = (ng_icmpv6_hdr_t *)icmpv6->data;
 
     if (_calc_csum(icmpv6, ipv6, pkt)) {
-        DEBUG("icmpv6: wrong checksum.\n");
+        LOG_WARNING("icmpv6: wrong checksum.\n");
         /* don't release: IPv6 does this */
         return;
     }
@@ -123,7 +124,7 @@ void ng_icmpv6_demux(kernel_pid_t iface, ng_pktsnip_t *pkt)
 #endif
 
         default:
-            DEBUG("icmpv6: unknown type field %" PRIu8 "\n", hdr->type);
+            LOG_WARNING("icmpv6: unknown type field %" PRIu8 "\n", hdr->type);
             break;
     }
 
@@ -133,7 +134,7 @@ void ng_icmpv6_demux(kernel_pid_t iface, ng_pktsnip_t *pkt)
     sendto = ng_netreg_lookup(NG_NETTYPE_ICMPV6, hdr->type);
 
     if (sendto == NULL) {
-        DEBUG("icmpv6: no receivers for ICMPv6 type %" PRIu8 "\n", hdr->type);
+        LOG_WARNING("icmpv6: no receivers for ICMPv6 type %" PRIu8 "\n", hdr->type);
         /* don't release: IPv6 does this */
         return;
     }
@@ -156,7 +157,7 @@ ng_pktsnip_t *ng_icmpv6_build(ng_pktsnip_t *next, uint8_t type, uint8_t code,
     pkt = ng_pktbuf_add(next, NULL, size, NG_NETTYPE_ICMPV6);
 
     if (pkt == NULL) {
-        DEBUG("icmpv6_echo: no space left in packet buffer\n");
+        LOG_ERROR("icmpv6_echo: no space left in packet buffer\n");
         return NULL;
     }
 

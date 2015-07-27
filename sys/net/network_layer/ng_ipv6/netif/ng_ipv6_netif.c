@@ -20,6 +20,7 @@
 
 #include "kernel_types.h"
 #include "mutex.h"
+#include "log.h"
 #include "net/eui64.h"
 #include "net/ng_ipv6/addr.h"
 #include "net/ng_ndp.h"
@@ -32,7 +33,7 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-#if ENABLE_DEBUG
+#if ENABLE_DEBUG || (LOG_LEVEL > LOG_NONE)
 /* For PRIu16 etc. */
 #include <inttypes.h>
 #endif
@@ -59,7 +60,7 @@ static ng_ipv6_addr_t *_add_addr_to_entry(ng_ipv6_netif_t *entry, const ng_ipv6_
     }
 
     if (!tmp_addr) {
-        DEBUG("ipv6 netif: couldn't add %s/%" PRIu8 " to interface %" PRIkernel_pid "\n: No space left.",
+        LOG_ERROR("ipv6 netif: couldn't add %s/%" PRIu8 " to interface %" PRIkernel_pid "\n: No space left.",
               ng_ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)),
               prefix_len, entry->pid);
         return NULL;
@@ -134,7 +135,7 @@ void ng_ipv6_netif_add(kernel_pid_t pid)
     }
 
     if (!free_entry) {
-        DEBUG("ipv6 netif: Could not add %" PRIkernel_pid " to IPv6: No space left.\n", pid);
+        LOG_ERROR("ipv6 netif: Could not add %" PRIkernel_pid " to IPv6: No space left.\n", pid);
         return;
     }
 
@@ -368,7 +369,7 @@ static uint8_t _find_by_prefix_unsafe(ng_ipv6_addr_t **res, ng_ipv6_netif_t *ifa
               (only_unicast) ? "true" : "false");
     }
     else {
-        DEBUG("ipv6 netif: Did not found any address on interface %" PRIkernel_pid
+        LOG_WARNING("ipv6 netif: Did not found any address on interface %" PRIkernel_pid
               " matching %s (used as source address = %s)\n",
               iface->pid,
               ng_ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)),
@@ -414,7 +415,7 @@ kernel_pid_t ng_ipv6_netif_find_by_prefix(ng_ipv6_addr_t **out, const ng_ipv6_ad
               best_match);
     }
     else {
-        DEBUG("ipv6 netif: Did not found any address globally matching %s\n",
+        LOG_WARNING("ipv6 netif: Did not found any address globally matching %s\n",
               ng_ipv6_addr_to_str(addr_str, prefix, sizeof(addr_str)));
     }
 #endif

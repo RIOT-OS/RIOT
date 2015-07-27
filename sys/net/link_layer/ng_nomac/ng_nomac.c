@@ -18,6 +18,7 @@
 
 #include <errno.h>
 
+#include "log.h"
 #include "kernel.h"
 #include "msg.h"
 #include "thread.h"
@@ -27,7 +28,7 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-#if ENABLE_DEBUG
+#if ENABLE_DEBUG || (LOG_LEVEL > LOG_NONE)
 /* For PRIu16 etc. */
 #include <inttypes.h>
 #endif
@@ -49,7 +50,7 @@ static void _event_cb(ng_netdev_event_t event, void *data)
         pkt = (ng_pktsnip_t *)data;
         /* send the packet to everyone interested in it's type */
         if (!ng_netapi_dispatch_receive(pkt->type, NG_NETREG_DEMUX_CTX_ALL, pkt)) {
-            DEBUG("nomac: unable to forward packet of type %i\n", pkt->type);
+            LOG_WARNING("nomac: unable to forward packet of type %i\n", pkt->type);
             ng_pktbuf_release(pkt);
         }
     }
@@ -120,7 +121,7 @@ static void *_nomac_thread(void *args)
                 msg_reply(&msg, &reply);
                 break;
             default:
-                DEBUG("nomac: Unknown command %" PRIu16 "\n", msg.type);
+                LOG_WARNING("nomac: Unknown command %" PRIu16 "\n", msg.type);
                 break;
         }
     }

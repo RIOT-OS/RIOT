@@ -15,6 +15,7 @@
 #include <inttypes.h>
 #include <stdbool.h>
 
+#include "log.h"
 #include "rbuf.h"
 #include "net/ng_netapi.h"
 #include "net/ng_netif.h"
@@ -39,7 +40,7 @@ static rbuf_int_t rbuf_int[RBUF_INT_SIZE];
 
 static rbuf_t rbuf[RBUF_SIZE];
 
-#if ENABLE_DEBUG
+#if ENABLE_DEBUG || (LOG_LEVEL > LOG_NONE)
 static char l2addr_str[3 * RBUF_L2ADDR_MAX_LEN];
 #endif
 
@@ -76,7 +77,7 @@ void rbuf_add(ng_netif_hdr_t *netif_hdr, ng_sixlowpan_frag_t *frag,
                       byteorder_ntohs(frag->tag));
 
     if (entry == NULL) {
-        DEBUG("6lo rbuf: reassembly buffer full.\n");
+        LOG_ERROR("6lo rbuf: reassembly buffer full.\n");
         return;
     }
 
@@ -110,7 +111,7 @@ void rbuf_add(ng_netif_hdr_t *netif_hdr, ng_sixlowpan_frag_t *frag,
     }
 
     if ((offset + frag_size) > entry->pkt->size) {
-        DEBUG("6lo rfrag: fragment too big for resulting datagram, discarding datagram\n");
+        LOG_ERROR("6lo rfrag: fragment too big for resulting datagram, discarding datagram\n");
         ng_pktbuf_release(entry->pkt);
         _rbuf_rem(entry);
         return;
@@ -118,7 +119,7 @@ void rbuf_add(ng_netif_hdr_t *netif_hdr, ng_sixlowpan_frag_t *frag,
 
     while (ptr != NULL) {
         if (_rbuf_int_in(ptr, offset, offset + dg_frag_size - 1)) {
-            DEBUG("6lo rfrag: overlapping or same intervals, discarding datagram\n");
+            LOG_ERROR("6lo rfrag: overlapping or same intervals, discarding datagram\n");
             ng_pktbuf_release(entry->pkt);
             _rbuf_rem(entry);
             return;
@@ -133,7 +134,7 @@ void rbuf_add(ng_netif_hdr_t *netif_hdr, ng_sixlowpan_frag_t *frag,
              * more space because of that */
             if (ng_pktbuf_realloc_data(entry->pkt, entry->pkt->size +
                                        (frag_size - dg_frag_size)) < 0) {
-                DEBUG("6lo rbuf: could not reallocate packet data.\n");
+                LOG_ERROR("6lo rbuf: could not reallocate packet data.\n");
                 return;
             }
 
@@ -157,7 +158,7 @@ void rbuf_add(ng_netif_hdr_t *netif_hdr, ng_sixlowpan_frag_t *frag,
                               entry->dst, entry->dst_len);
 
         if (netif == NULL) {
-            DEBUG("6lo rbuf: error allocating netif header\n");
+            LOG_ERROR("6lo rbuf: error allocating netif header\n");
             ng_pktbuf_release(entry->pkt);
             return;
         }
@@ -212,7 +213,7 @@ static bool _rbuf_update_ints(rbuf_t *entry, uint16_t offset, size_t frag_size)
     new = _rbuf_int_get_free();
 
     if (new == NULL) {
-        DEBUG("6lo rfrag: no space left in rbuf interval buffer.\n");
+        LOG_ERROR("6lo rfrag: no space left in rbuf interval buffer.\n");
         return false;
     }
 
@@ -245,9 +246,9 @@ static void _rbuf_gc(void)
         }
         else if ((rbuf[i].pkt != NULL) &&
                  ((now.seconds - rbuf[i].arrival) > RBUF_TIMEOUT)) {
-            DEBUG("6lo rfrag: entry (%s, ", ng_netif_addr_to_str(l2addr_str,
+            LOG_WARNING("6lo rfrag: entry (%s, ", ng_netif_addr_to_str(l2addr_str,
                   sizeof(l2addr_str), rbuf[i].src, rbuf[i].src_len));
-            DEBUG("%s, %u, %" PRIu16 ") timed out\n",
+            LOG_WARNING("%s, %u, %" PRIu16 ") timed out\n",
                   ng_netif_addr_to_str(l2addr_str, sizeof(l2addr_str), rbuf[i].dst,
                                        rbuf[i].dst_len),
                   rbuf[i].datagram_size, rbuf[i].tag);
@@ -261,7 +262,7 @@ static void _rbuf_gc(void)
     }
 
     if ((i >= RBUF_SIZE) && (oldest != NULL) && (oldest->pkt != NULL)) {
-        DEBUG("6lo rfrag: reassembly buffer full, remove oldest entry\n");
+        LOG_WARNING("6lo rfrag: reassembly buffer full, remove oldest entry\n");
         ng_pktbuf_release(oldest->pkt);
         _rbuf_rem(oldest);
     }
@@ -303,7 +304,7 @@ static rbuf_t *_rbuf_get(const void *src, size_t src_len,
     if (res != NULL) { /* entry not in buffer but found empty spot */
         res->pkt = ng_pktbuf_add(NULL, NULL, size, NG_NETTYPE_SIXLOWPAN);
         if (res->pkt == NULL) {
-            DEBUG("6lo rfrag: can not allocate reassembly buffer space.\n");
+            LOG_ERROR("6lo rfrag: can not allocate reassembly buffer space.\n");
             return NULL;
         }
 

@@ -15,6 +15,7 @@
 #include <inttypes.h>
 #include <stdbool.h>
 
+#include "log.h"
 #include "byteorder.h"
 #include "cpu_conf.h"
 #include "kernel_types.h"
@@ -35,7 +36,7 @@
 
 #define _MAX_L2_ADDR_LEN    (8U)
 
-#if ENABLE_DEBUG
+#if ENABLE_DEBUG || (LOG_LEVEL > LOG_NONE)
 static char _stack[NG_IPV6_STACK_SIZE + THREAD_EXTRA_STACKSIZE_PRINTF];
 #else
 static char _stack[NG_IPV6_STACK_SIZE];
@@ -93,7 +94,7 @@ void ng_ipv6_demux(kernel_pid_t iface, ng_pktsnip_t *pkt, uint8_t nh)
         case NG_PROTNUM_IPV6_EXT_MOB:
             DEBUG("ipv6: handle extension header (nh = %" PRIu8 ")\n", nh);
             if (!ng_ipv6_ext_demux(iface, pkt, nh)) {
-                DEBUG("ipv6: unable to parse extension headers.\n");
+                LOG_ERROR("ipv6: unable to parse extension headers.\n");
                 ng_pktbuf_release(pkt);
                 return;
             }
@@ -111,7 +112,7 @@ void ng_ipv6_demux(kernel_pid_t iface, ng_pktsnip_t *pkt, uint8_t nh)
                    ng_netreg_num(NG_NETTYPE_IPV6, nh);
 
     if (receiver_num == 0) {
-        DEBUG("ipv6: unable to forward packet as no one is interested in it\n");
+        LOG_WARNING("ipv6: unable to forward packet as no one is interested in it\n");
         ng_pktbuf_release(pkt);
         return;
     }
@@ -158,7 +159,7 @@ static void *_event_loop(void *args)
 
             case NG_NETAPI_MSG_TYPE_GET:
             case NG_NETAPI_MSG_TYPE_SET:
-                DEBUG("ipv6: reply to unsupported get/set\n");
+                LOG_WARNING("ipv6: reply to unsupported get/set\n");
                 reply.content.value = -ENOTSUP;
                 msg_reply(&msg, &reply);
                 break;
@@ -202,7 +203,7 @@ static void _send_to_iface(kernel_pid_t iface, ng_pktsnip_t *pkt)
     if ((if_entry != NULL) && (if_entry->flags & NG_IPV6_NETIF_FLAGS_SIXLOWPAN)) {
         DEBUG("ipv6: send to 6LoWPAN instead\n");
         if (!ng_netapi_dispatch_send(NG_NETTYPE_SIXLOWPAN, NG_NETREG_DEMUX_CTX_ALL, pkt)) {
-            DEBUG("ipv6: no 6LoWPAN thread found");
+            LOG_ERROR("ipv6: no 6LoWPAN thread found");
             ng_pktbuf_release(pkt);
         }
     }
@@ -238,7 +239,7 @@ static void _send_unicast(kernel_pid_t iface, uint8_t *dst_l2addr,
     netif = ng_netif_hdr_build(NULL, 0, dst_l2addr, dst_l2addr_len);
 
     if (netif == NULL) {
-        DEBUG("ipv6: error on interface header allocation, dropping packet\n");
+        LOG_ERROR("ipv6: error on interface header allocation, dropping packet\n");
         ng_pktbuf_release(pkt);
         return;
     }
@@ -312,7 +313,7 @@ static int _fill_ipv6_hdr(kernel_pid_t iface, ng_pktsnip_t *ipv6,
             ptr->next = ng_pktbuf_start_write(ptr->next);
 
             if (ptr->next == NULL) {
-                DEBUG("ipv6: unable to get write access to payload, drop it\n");
+                LOG_ERROR("ipv6: unable to get write access to payload, drop it\n");
                 return -ENOBUFS;
             }
 
@@ -323,7 +324,7 @@ static int _fill_ipv6_hdr(kernel_pid_t iface, ng_pktsnip_t *ipv6,
 
     if ((res = ng_netreg_calc_csum(payload, ipv6)) < 0) {
         if (res != -ENOENT) {   /* if there is no checksum we are okay */
-            DEBUG("ipv6: checksum calculation failed.\n");
+            LOG_ERROR("ipv6: checksum calculation failed.\n");
             return res;
         }
     }
@@ -355,7 +356,7 @@ static void _send_multicast(kernel_pid_t iface, ng_pktsnip_t *pkt,
 
         /* throw away packet if no one is interested */
         if (ifnum == 0) {
-            DEBUG("ipv6: no interfaces registered, dropping packet\n");
+            LOG_WARNING("ipv6: no interfaces registered, dropping packet\n");
             ng_pktbuf_release(pkt);
             return;
         }
@@ -375,7 +376,7 @@ static void _send_multicast(kernel_pid_t iface, ng_pktsnip_t *pkt,
                 ipv6 = ng_pktbuf_start_write(ipv6);
 
                 if (ipv6 == NULL) {
-                    DEBUG("ipv6: unable to get write access to IPv6 header, "
+                    LOG_ERROR("ipv6: unable to get write access to IPv6 header, "
                           "for interface %" PRIkernel_pid "\n", ifs[i]);
                     ng_pktbuf_release(pkt);
                     return;
@@ -392,7 +393,7 @@ static void _send_multicast(kernel_pid_t iface, ng_pktsnip_t *pkt,
             netif = ng_netif_hdr_build(NULL, 0, NULL, 0);
 
             if (netif == NULL) {
-                DEBUG("ipv6: error on interface header allocation, "
+                LOG_ERROR("ipv6: error on interface header allocation, "
                       "dropping packet\n");
                 ng_pktbuf_release(pkt);
                 return;
@@ -426,7 +427,7 @@ static void _send_multicast(kernel_pid_t iface, ng_pktsnip_t *pkt,
         netif = ng_netif_hdr_build(NULL, 0, NULL, 0);
 
         if (netif == NULL) {
-            DEBUG("ipv6: error on interface header allocation, "
+            LOG_ERROR("ipv6: error on interface header allocation, "
                   "dropping packet\n");
             ng_pktbuf_release(pkt);
             return;
@@ -513,7 +514,7 @@ static void _send(ng_pktsnip_t *pkt, bool prep_hdr)
         rcv_pkt = ng_pktbuf_add(NULL, NULL, ng_pkt_len(ipv6), NG_NETTYPE_IPV6);
 
         if (rcv_pkt == NULL) {
-            DEBUG("ipv6: error on generating loopback packet\n");
+            LOG_ERROR("ipv6: error on generating loopback packet\n");
             ng_pktbuf_release(pkt);
             return;
         }
@@ -541,7 +542,7 @@ static void _send(ng_pktsnip_t *pkt, bool prep_hdr)
                                        pkt);
 
         if (iface == KERNEL_PID_UNDEF) {
-            DEBUG("ipv6: error determining next hop's link layer address\n");
+            LOG_ERROR("ipv6: error determining next hop's link layer address\n");
             ng_pktbuf_release(pkt);
             return;
         }
@@ -606,14 +607,14 @@ static void _receive(ng_pktsnip_t *pkt)
         ipv6 = pkt->next;
 
         if (!ng_ipv6_hdr_is(ipv6->data)) {
-            DEBUG("ipv6: Received packet was not IPv6, dropping packet\n");
+            LOG_WARNING("ipv6: Received packet was not IPv6, dropping packet\n");
             ng_pktbuf_release(pkt);
             return;
         }
     }
     else {
         if (!ng_ipv6_hdr_is(pkt->data)) {
-            DEBUG("ipv6: Received packet was not IPv6, dropping packet\n");
+            LOG_WARNING("ipv6: Received packet was not IPv6, dropping packet\n");
             ng_pktbuf_release(pkt);
             return;
         }
@@ -622,7 +623,7 @@ static void _receive(ng_pktsnip_t *pkt)
         ipv6 = ng_pktbuf_start_write(pkt);
 
         if (ipv6 == NULL) {
-            DEBUG("ipv6: unable to get write access to packet, drop it\n");
+            LOG_ERROR("ipv6: unable to get write access to packet, drop it\n");
             ng_pktbuf_release(pkt);
             return;
         }
@@ -633,7 +634,7 @@ static void _receive(ng_pktsnip_t *pkt)
                              NG_NETTYPE_IPV6);
 
         if (ipv6 == NULL) {
-            DEBUG("ipv6: error marking IPv6 header, dropping packet\n");
+            LOG_ERROR("ipv6: error marking IPv6 header, dropping packet\n");
             ng_pktbuf_release(pkt);
             return;
         }
@@ -666,7 +667,7 @@ static void _receive(ng_pktsnip_t *pkt)
             ipv6 = ng_pktbuf_start_write(ipv6);
 
             if ((ipv6 == NULL) || (pkt == NULL)) {
-                DEBUG("ipv6: unable to get write access to packet: dropping it\n");
+                LOG_ERROR("ipv6: unable to get write access to packet: dropping it\n");
                 ng_pktbuf_release(tmp);
                 return;
             }
@@ -677,13 +678,13 @@ static void _receive(ng_pktsnip_t *pkt)
             _send(ipv6, false);
         }
         else {
-            DEBUG("ipv6: hop limit reached 0: drop packet\n");
+            LOG_WARNING("ipv6: hop limit reached 0: drop packet\n");
             ng_pktbuf_release(pkt);
             return;
         }
 
 #else  /* MODULE_NG_IPV6_ROUTER */
-        DEBUG("ipv6: dropping packet\n");
+        LOG_WARNING("ipv6: dropping packet\n");
         /* non rounting hosts just drop the packet */
         ng_pktbuf_release(pkt);
         return;

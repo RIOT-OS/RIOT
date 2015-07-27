@@ -28,6 +28,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "log.h"
 #include "byteorder.h"
 #include "net/eui64.h"
 #include "net/ng_ethernet.h"
@@ -106,7 +107,7 @@ static int _send_data(ng_netdev_t *netdev, ng_pktsnip_t *pkt)
     }
 
     if ((dev == NULL) || (netdev->driver != &ng_netdev_eth_driver)) {
-        DEBUG("[wrong device descriptor]\n");
+        LOG_ERROR("[wrong device descriptor]\n");
         ng_pktbuf_release(pkt);
         return -ENODEV;
     }
@@ -118,7 +119,7 @@ static int _send_data(ng_netdev_t *netdev, ng_pktsnip_t *pkt)
 
     if (to_send < 0) {
         errno = -to_send;
-        DEBUG("marshall\n");
+        LOG_ERROR("marshall\n");
         return to_send;
     }
 
@@ -141,12 +142,12 @@ static int _add_event_callback(ng_netdev_t *dev, ng_netdev_event_cb_t cb)
     DEBUG("ng_netdev_eth: add event callback");
 
     if ((dev == NULL) || (dev->driver != &ng_netdev_eth_driver)) {
-        DEBUG(" [wrong device descriptor]\n");
+        LOG_ERROR(" [wrong device descriptor]\n");
         return -ENODEV;
     }
 
     if (dev->event_cb != NULL) {
-        DEBUG(" [no space left]\n");
+        LOG_ERROR(" [no space left]\n");
         return -ENOBUFS;
     }
 
@@ -161,12 +162,12 @@ static int _rem_event_callback(ng_netdev_t *dev, ng_netdev_event_cb_t cb)
     DEBUG("ng_netdev_eth: remove event callback");
 
     if ((dev == NULL) || (dev->driver != &ng_netdev_eth_driver)) {
-        DEBUG(" [wrong device descriptor]\n");
+        LOG_ERROR(" [wrong device descriptor]\n");
         return -ENODEV;
     }
 
     if (dev->event_cb != cb) {
-        DEBUG(" [not found]\n");
+        LOG_ERROR(" [not found]\n");
         return -ENOENT;
     }
 
@@ -250,7 +251,7 @@ static int _get(ng_netdev_t *dev, ng_netconf_opt_t opt, void *value,
     DEBUG("ng_netdev_eth: get ");
 
     if ((dev == NULL) || (dev->driver != &ng_netdev_eth_driver)) {
-        DEBUG("[wrong device descriptor]\n");
+        LOG_ERROR("[wrong device descriptor]\n");
         return -ENODEV;
     }
 
@@ -276,7 +277,7 @@ static int _get(ng_netdev_t *dev, ng_netconf_opt_t opt, void *value,
             return _get_promiscousmode((ng_netdev_eth_t *)dev, value, max_len);
 
         default:
-            DEBUG("[not supported: %d]\n", opt);
+            LOG_WARNING("[not supported: %d]\n", opt);
             return -ENOTSUP;
     }
 }
@@ -303,7 +304,7 @@ static int _set(ng_netdev_t *dev, ng_netconf_opt_t opt, void *value,
     DEBUG("ng_netdev_eth: set ");
 
     if ((dev == NULL) || (dev->driver != &ng_netdev_eth_driver)) {
-        DEBUG("[wrong device descriptor]\n");
+        LOG_ERROR("[wrong device descriptor]\n");
         return -ENODEV;
     }
 
@@ -313,7 +314,7 @@ static int _set(ng_netdev_t *dev, ng_netconf_opt_t opt, void *value,
             return _set_promiscousmode((ng_netdev_eth_t *)dev, value, value_len);
 
         default:
-            DEBUG("[not supported: %d]\n", opt);
+            LOG_WARNING("[not supported: %d]\n", opt);
             return -ENOTSUP;
     }
 }
@@ -348,7 +349,7 @@ static void _isr_event(ng_netdev_t *dev, uint32_t event_type)
             break;
 
         default:
-            DEBUG("[unknown event_type]\n");
+            LOG_WARNING("[unknown event_type]\n");
             break;
     }
 }
@@ -387,14 +388,14 @@ static int _marshall_ethernet(ng_netdev_eth_t *dev, uint8_t *buffer, ng_pktsnip_
     ng_pktsnip_t *payload;
 
     if (pkt == NULL) {
-        DEBUG("ng_netdev_eth: pkt was NULL");
+        LOG_ERROR("ng_netdev_eth: pkt was NULL");
         return -EINVAL;
     }
 
     payload = pkt->next;
 
     if (pkt->type != NG_NETTYPE_NETIF) {
-        DEBUG("ng_netdev_eth: First header was not generic netif header\n");
+        LOG_ERROR("ng_netdev_eth: First header was not generic netif header\n");
         return -EBADMSG;
     }
 
@@ -428,7 +429,7 @@ static int _marshall_ethernet(ng_netdev_eth_t *dev, uint8_t *buffer, ng_pktsnip_
                NG_ETHERNET_ADDR_LEN);
     }
     else {
-        DEBUG("ng_netdev_eth: destination address had unexpected format\n");
+        LOG_ERROR("ng_netdev_eth: destination address had unexpected format\n");
         return -EBADMSG;
     }
 
@@ -440,7 +441,7 @@ static int _marshall_ethernet(ng_netdev_eth_t *dev, uint8_t *buffer, ng_pktsnip_
 
     while (payload != NULL) {
         if ((data_len + payload->size) > NG_ETHERNET_MAX_LEN) {
-            DEBUG("ng_netdev_eth: Packet too big for ethernet frame\n");
+            LOG_ERROR("ng_netdev_eth: Packet too big for ethernet frame\n");
             return -ENOBUFS;
         }
 
@@ -512,7 +513,7 @@ static void _rx_event(ng_netdev_eth_t *netdev)
                                   NG_NETTYPE_NETIF);
 
         if (netif_hdr == NULL) {
-            DEBUG("ng_netdev_eth: no space left in packet buffer\n");
+            LOG_ERROR("ng_netdev_eth: no space left in packet buffer\n");
             return;
         }
 
@@ -535,7 +536,7 @@ static void _rx_event(ng_netdev_eth_t *netdev)
         if ((pkt = ng_pktbuf_add(netif_hdr, recv_buffer + sizeof(ng_ethernet_hdr_t),
                                  data_len, receive_type)) == NULL) {
             ng_pktbuf_release(netif_hdr);
-            DEBUG("ng_netdev_eth: no space left in packet buffer\n");
+            LOG_ERROR("ng_netdev_eth: no space left in packet buffer\n");
             return;
         }
 
@@ -547,7 +548,7 @@ static void _rx_event(ng_netdev_eth_t *netdev)
         }
     }
     else {
-        DEBUG("ng_netdev_eth: spurious _rx_event: %d\n", nread);
+        LOG_WARNING("ng_netdev_eth: spurious _rx_event: %d\n", nread);
     }
 }
 

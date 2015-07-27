@@ -20,6 +20,8 @@
 #include <string.h>
 #include <inttypes.h>
 #include <errno.h>
+
+#include "log.h"
 #include "thread.h"
 #include "mutex.h"
 #include "msg.h"
@@ -384,7 +386,7 @@ int fib_update_entry(uint8_t *dst, size_t dst_size,
         /* we have ambiguous entries, i.e. count > 1
          * this should never happen
          */
-        DEBUG("[fib_update_entry] ambigious entries detected!!!\n");
+        LOG_WARNING("[fib_update_entry] ambigious entries detected!!!\n");
     }
 
     mutex_unlock(&mtx_access);
@@ -408,7 +410,7 @@ void fib_remove_entry(uint8_t *dst, size_t dst_size)
         /* we have ambiguous entries, i.e. count > 1
          * this should never happen
          */
-        DEBUG("[fib_update_entry] ambigious entries detected!!!\n");
+        LOG_WARNING("[fib_update_entry] ambigious entries detected!!!\n");
     }
 
     mutex_unlock(&mtx_access);

@@ -18,6 +18,7 @@
 #include <errno.h>
 #include <string.h>
 
+#include "log.h"
 #include "byteorder.h"
 #include "net/ng_icmpv6.h"
 #include "net/ng_ipv6.h"
@@ -34,7 +35,7 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-#if ENABLE_DEBUG
+#if ENABLE_DEBUG || (LOG_LEVEL > LOG_NONE)
 /* For PRIu8 etc. */
 #include <inttypes.h>
 
@@ -100,14 +101,14 @@ void ng_ndp_nbr_sol_handle(kernel_pid_t iface, ng_pktsnip_t *pkt,
         ng_ipv6_addr_is_multicast(&nbr_sol->tgt) ||
         (ng_ipv6_addr_is_unspecified(&ipv6->src) &&
          ng_ipv6_addr_is_solicited_node(&ipv6->dst))) {
-        DEBUG("ndp: neighbor solicitation was invalid.\n");
+        LOG_ERROR("ndp: neighbor solicitation was invalid.\n");
         /* ipv6 releases */
         return;
     }
 
     if ((tgt = ng_ipv6_netif_find_addr(iface, &nbr_sol->tgt)) == NULL) {
-        DEBUG("ndp: Target address is not to interface %" PRIkernel_pid "\n",
-              iface);
+        LOG_ERROR("ndp: Target address is not to interface %" PRIkernel_pid "\n",
+                  iface);
         /* ipv6 releases */
         return;
     }
@@ -171,14 +172,14 @@ void ng_ndp_nbr_adv_handle(kernel_pid_t iface, ng_pktsnip_t *pkt,
     if ((ipv6->hl != 255) || (nbr_adv->code != 0) ||
         (icmpv6_size < sizeof(ng_ndp_nbr_adv_t)) ||
         ng_ipv6_addr_is_multicast(&nbr_adv->tgt)) {
-        DEBUG("ndp: neighbor advertisement was invalid.\n");
+        LOG_ERROR("ndp: neighbor advertisement was invalid.\n");
         /* ipv6 releases */
         return;
     }
 
     if (nc_entry == NULL) {
         /* see https://tools.ietf.org/html/rfc4861#section-7.2.5 */
-        DEBUG("ndp: no neighbor cache entry found for advertisement's target\n");
+        LOG_ERROR("ndp: no neighbor cache entry found for advertisement's target\n");
         /* ipv6 releases */
         return;
     }
@@ -510,14 +511,14 @@ kernel_pid_t ng_ndp_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_len,
                                       NG_IPV6_NC_STATE_INCOMPLETE << NG_IPV6_NC_STATE_POS);
 
             if (nc_entry == NULL) {
-                DEBUG("ndp: could not create neighbor cache entry\n");
+                LOG_ERROR("ndp: could not create neighbor cache entry\n");
                 return KERNEL_PID_UNDEF;
             }
 
             pkt_node = _alloc_pkt_node(pkt);
 
             if (pkt_node == NULL) {
-                DEBUG("ndp: could not add packet to packet queue\n");
+                LOG_ERROR("ndp: could not add packet to packet queue\n");
             }
             else {
                 /* prevent packet from being released by IPv6 */
@@ -566,7 +567,7 @@ ng_pktsnip_t *ng_ndp_nbr_sol_build(ng_ipv6_addr_t *tgt, ng_pktsnip_t *options)
     DEBUG("ndp: building neighbor solicitation message\n");
 
     if (ng_ipv6_addr_is_multicast(tgt)) {
-        DEBUG("ndp: tgt must not be multicast\n");
+        LOG_ERROR("ndp: tgt must not be multicast\n");
         return NULL;
     }
 
@@ -590,7 +591,7 @@ ng_pktsnip_t *ng_ndp_nbr_adv_build(uint8_t flags, ng_ipv6_addr_t *tgt,
     DEBUG("ndp: building neighbor advertisement message\n");
 
     if (ng_ipv6_addr_is_multicast(tgt)) {
-        DEBUG("ndp: tgt must not be multicast\n");
+        LOG_ERROR("ndp: tgt must not be multicast\n");
         return NULL;
     }
 
@@ -619,7 +620,7 @@ ng_pktsnip_t *ng_ndp_opt_build(uint8_t type, size_t size, ng_pktsnip_t *next)
     ng_pktsnip_t *pkt = ng_pktbuf_add(next, NULL, _ceil8(size), NG_NETTYPE_UNDEF);
 
     if (pkt == NULL) {
-        DEBUG("ndp: no space left in packet buffer\n");
+        LOG_ERROR("ndp: no space left in packet buffer\n");
         return NULL;
     }
 
@@ -655,7 +656,7 @@ static uint16_t _get_l2src(uint8_t *l2src, size_t l2src_size, kernel_pid_t iface
         l2src_len = (uint16_t)res;
     }
     else {
-        DEBUG("ndp: no link-layer address found.\n");
+        LOG_ERROR("ndp: no link-layer address found.\n");
         l2src_len = 0;
     }
 
@@ -685,7 +686,7 @@ static void _send_nbr_sol(kernel_pid_t iface, ng_ipv6_addr_t *tgt,
             pkt = ng_ndp_opt_sl2a_build(l2src, l2src_len, NULL);
 
             if (pkt == NULL) {
-                DEBUG("ndp: error allocating Source Link-layer address option.\n");
+                LOG_ERROR("ndp: error allocating Source Link-layer address option.\n");
                 ng_pktbuf_release(pkt);
                 return;
             }
@@ -695,7 +696,7 @@ static void _send_nbr_sol(kernel_pid_t iface, ng_ipv6_addr_t *tgt,
     hdr = ng_ndp_nbr_sol_build(tgt, pkt);
 
     if (hdr == NULL) {
-        DEBUG("ndp: error allocating Neighbor solicitation.\n");
+        LOG_ERROR("ndp: error allocating Neighbor solicitation.\n");
         ng_pktbuf_release(pkt);
         return;
     }
@@ -705,7 +706,7 @@ static void _send_nbr_sol(kernel_pid_t iface, ng_ipv6_addr_t *tgt,
                             sizeof(ng_ipv6_addr_t));
 
     if (hdr == NULL) {
-        DEBUG("ndp: error allocating IPv6 header.\n");
+        LOG_ERROR("ndp: error allocating IPv6 header.\n");
         ng_pktbuf_release(pkt);
         return;
     }
@@ -717,7 +718,7 @@ static void _send_nbr_sol(kernel_pid_t iface, ng_ipv6_addr_t *tgt,
     hdr = ng_netif_hdr_build(NULL, 0, NULL, 0);
 
     if (hdr == NULL) {
-        DEBUG("ndp: error allocating netif header.\n");
+        LOG_ERROR("ndp: error allocating netif header.\n");
         return;
     }
 
@@ -762,7 +763,7 @@ static void _send_nbr_adv(kernel_pid_t iface, ng_ipv6_addr_t *tgt,
             pkt = ng_ndp_opt_tl2a_build(l2src, l2src_len, NULL);
 
             if (pkt == NULL) {
-                DEBUG("ndp: error allocating Target Link-layer address option.\n");
+                LOG_ERROR("ndp: error allocating Target Link-layer address option.\n");
                 ng_pktbuf_release(pkt);
                 return;
             }
@@ -778,7 +779,7 @@ static void _send_nbr_adv(kernel_pid_t iface, ng_ipv6_addr_t *tgt,
     hdr = ng_ndp_nbr_adv_build(adv_flags, tgt, pkt);
 
     if (hdr == NULL) {
-        DEBUG("ndp: error allocating Neighbor advertisement.\n");
+        LOG_ERROR("ndp: error allocating Neighbor advertisement.\n");
         ng_pktbuf_release(pkt);
         return;
     }
@@ -788,7 +789,7 @@ static void _send_nbr_adv(kernel_pid_t iface, ng_ipv6_addr_t *tgt,
                             sizeof(ng_ipv6_addr_t));
 
     if (hdr == NULL) {
-        DEBUG("ndp: error allocating IPv6 header.\n");
+        LOG_ERROR("ndp: error allocating IPv6 header.\n");
         ng_pktbuf_release(pkt);
         return;
     }
@@ -800,7 +801,7 @@ static void _send_nbr_adv(kernel_pid_t iface, ng_ipv6_addr_t *tgt,
     hdr = ng_netif_hdr_build(NULL, 0, NULL, 0);
 
     if (hdr == NULL) {
-        DEBUG("ndp: error allocating netif header.\n");
+        LOG_ERROR("ndp: error allocating netif header.\n");
         return;
     }
 
@@ -882,7 +883,7 @@ static bool _handle_sl2a_opt(kernel_pid_t iface, ng_pktsnip_t *pkt,
     uint8_t *sl2a = (uint8_t *)(sl2a_opt + 1);
 
     if ((sl2a_opt->len == 0) || ng_ipv6_addr_is_unspecified(&ipv6->src)) {
-        DEBUG("ndp: invalid source link-layer address option received\n");
+        LOG_ERROR("ndp: invalid source link-layer address option received\n");
         return false;
     }
 
@@ -927,8 +928,8 @@ static bool _handle_sl2a_opt(kernel_pid_t iface, ng_pktsnip_t *pkt,
             return true;
 
         default:    /* wrong encapsulating message: silently discard */
-            DEBUG("ndp: silently discard sl2a_opt for ICMPv6 message type %"
-                  PRIu8 "\n", icmpv6_type);
+            LOG_WARNING("ndp: silently discard sl2a_opt for ICMPv6 message type %"
+                        PRIu8 "\n", icmpv6_type);
             return true;
     }
 }
@@ -941,7 +942,7 @@ static int _handle_tl2a_opt(ng_pktsnip_t *pkt, ng_ipv6_hdr_t *ipv6,
     uint8_t *tl2a = (uint8_t *)(tl2a_opt + 1);
 
     if ((tl2a_opt->len == 0) || ng_ipv6_addr_is_unspecified(&ipv6->src)) {
-        DEBUG("ndp: invalid target link-layer address option received\n");
+        LOG_ERROR("ndp: invalid target link-layer address option received\n");
         return -EINVAL;
     }
 
@@ -971,8 +972,8 @@ static int _handle_tl2a_opt(ng_pktsnip_t *pkt, ng_ipv6_hdr_t *ipv6,
             return (int)tl2a_len;
 
         default:    /* wrong encapsulating message: silently discard */
-            DEBUG("ndp: silently discard tl2a_opt for ICMPv6 message type %"
-                  PRIu8 "\n", icmpv6_type);
+            LOG_WARNING("ndp: silently discard tl2a_opt for ICMPv6 message type %"
+                        PRIu8 "\n", icmpv6_type);
             return 0;
     }
 }
@@ -1035,7 +1036,7 @@ static void _set_state(ng_ipv6_nc_t *nc_entry, uint8_t state)
 #endif
 
         default:
-            DEBUG("errorneous or unknown\n");
+            LOG_WARNING("errorneous or unknown\n");
             break;
     }
 }

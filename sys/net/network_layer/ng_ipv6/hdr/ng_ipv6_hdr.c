@@ -12,6 +12,7 @@
  * @file
  */
 
+#include "log.h"
 #include "net/ng_ipv6/addr.h"
 #include "net/ng_ipv6/hdr.h"
 #include "net/ng_nettype.h"
@@ -21,7 +22,7 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-#if ENABLE_DEBUG && defined(MODULE_NG_IPV6_ADDR)
+#if (ENABLE_DEBUG || (LOG_LEVEL > LOG_NONE)) && defined(MODULE_NG_IPV6_ADDR)
 static char addr_str[NG_IPV6_ADDR_MAX_STR_LEN];
 #endif
 
@@ -41,7 +42,7 @@ ng_pktsnip_t *ng_ipv6_hdr_build(ng_pktsnip_t *payload,
 
     if (((src_len != 0) && (src_len != sizeof(ng_ipv6_addr_t))) ||
         ((dst_len != 0) && (dst_len != sizeof(ng_ipv6_addr_t)))) {
-        DEBUG("ipv6_hdr: Address length was not 0 or %zu byte.\n",
+        LOG_ERROR("ipv6_hdr: Address length was not 0 or %zu byte.\n",
               sizeof(ng_ipv6_addr_t));
         return NULL;
     }
@@ -49,7 +50,7 @@ ng_pktsnip_t *ng_ipv6_hdr_build(ng_pktsnip_t *payload,
     ipv6 = ng_pktbuf_add(payload, NULL, sizeof(ng_ipv6_hdr_t), HDR_NETTYPE);
 
     if (ipv6 == NULL) {
-        DEBUG("ipv6_hdr: no space left in packet buffer\n");
+        LOG_ERROR("ipv6_hdr: no space left in packet buffer\n");
         return NULL;
     }
 

@@ -15,6 +15,7 @@
 #include <errno.h>
 #include <string.h>
 
+#include "log.h"
 #include "net/ng_ipv6.h"
 #include "net/ng_ipv6/addr.h"
 #include "net/ng_ipv6/nc.h"
@@ -59,18 +60,18 @@ ng_ipv6_nc_t *ng_ipv6_nc_add(kernel_pid_t iface, const ng_ipv6_addr_t *ipv6_addr
     ng_ipv6_nc_t *free_entry = NULL;
 
     if (ipv6_addr == NULL) {
-        DEBUG("ipv6_nc: address was NULL\n");
+        LOG_ERROR("ipv6_nc: address was NULL\n");
         return NULL;
     }
 
     if ((l2_addr_len > NG_IPV6_NC_L2_ADDR_MAX) || ng_ipv6_addr_is_unspecified(ipv6_addr)) {
-        DEBUG("ipv6_nc: invalid parameters\n");
+        LOG_ERROR("ipv6_nc: invalid parameters\n");
         return NULL;
     }
 
     for (int i = 0; i < NG_IPV6_NC_SIZE; i++) {
         if (ng_ipv6_addr_equal(&(ncache[i].ipv6_addr), ipv6_addr)) {
-            DEBUG("ipv6_nc: Address %s already registered.\n",
+            LOG_WARNING("ipv6_nc: Address %s already registered.\n",
                   ng_ipv6_addr_to_str(addr_str, ipv6_addr, sizeof(addr_str)));
 
             if ((l2_addr != NULL) && (l2_addr_len > 0)) {
@@ -95,7 +96,7 @@ ng_ipv6_nc_t *ng_ipv6_nc_add(kernel_pid_t iface, const ng_ipv6_addr_t *ipv6_addr
 
     if (!free_entry) {
         /* reached end of NC without finding updateable or free entry */
-        DEBUG("ipv6_nc: neighbor cache full.\n");
+        LOG_ERROR("ipv6_nc: neighbor cache full.\n");
         return NULL;
     }
 
@@ -154,7 +155,7 @@ void ng_ipv6_nc_remove(kernel_pid_t iface, const ng_ipv6_addr_t *ipv6_addr)
 ng_ipv6_nc_t *ng_ipv6_nc_get(kernel_pid_t iface, const ng_ipv6_addr_t *ipv6_addr)
 {
     if (ipv6_addr == NULL) {
-        DEBUG("ipv6_nc: address was NULL\n");
+        LOG_ERROR("ipv6_nc: address was NULL\n");
         return NULL;
     }
 
@@ -210,7 +211,7 @@ ng_ipv6_nc_t *ng_ipv6_nc_still_reachable(const ng_ipv6_addr_t *ipv6_addr)
     ng_ipv6_nc_t *entry = ng_ipv6_nc_get(KERNEL_PID_UNDEF, ipv6_addr);
 
     if (entry == NULL) {
-        DEBUG("ipv6_nc: No entry found for %s\n",
+        LOG_WARNING("ipv6_nc: No entry found for %s\n",
               ng_ipv6_addr_to_str(addr_str, ipv6_addr, sizeof(addr_str)));
         return NULL;
     }

@@ -12,6 +12,7 @@
  * @file
  */
 
+#include "log.h"
 #include "kernel_types.h"
 #include "net/ng_netbase.h"
 #include "thread.h"
@@ -25,14 +26,14 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-#if ENABLE_DEBUG
+#if ENABLE_DEBUG || (LOG_LEVEL > LOG_NONE)
 /* For PRIu16 etc. */
 #include <inttypes.h>
 #endif
 
 static kernel_pid_t _pid = KERNEL_PID_UNDEF;
 
-#if ENABLE_DEBUG
+#if ENABLE_DEBUG || (LOG_LEVEL > LOG_NONE)
 static char _stack[NG_SIXLOWPAN_STACK_SIZE + THREAD_EXTRA_STACKSIZE_PRINTF];
 #else
 static char _stack[NG_SIXLOWPAN_STACK_SIZE];
@@ -68,7 +69,7 @@ static void _receive(ng_pktsnip_t *pkt)
                                              * might get replaced */
 
     if (payload == NULL) {
-        DEBUG("6lo: can not get write access on received packet\n");
+        LOG_ERROR("6lo: can not get write access on received packet\n");
 #if defined(DEVELHELP) && defined(ENABLE_DEBUG)
         ng_pktbuf_stats();
 #endif
@@ -81,7 +82,7 @@ static void _receive(ng_pktsnip_t *pkt)
     LL_SEARCH_SCALAR(pkt, payload, type, NG_NETTYPE_SIXLOWPAN);
 
     if ((payload == NULL) || (payload->size < 1)) {
-        DEBUG("6lo: Received packet has no 6LoWPAN payload\n");
+        LOG_ERROR("6lo: Received packet has no 6LoWPAN payload\n");
         ng_pktbuf_release(pkt);
         return;
     }
@@ -94,7 +95,7 @@ static void _receive(ng_pktsnip_t *pkt)
         payload = ng_pktbuf_start_write(payload);
 
         if (payload == NULL) {
-            DEBUG("6lo: can not get write access on received packet\n");
+            LOG_ERROR("6lo: can not get write access on received packet\n");
 #if defined(DEVELHELP) && defined(ENABLE_DEBUG)
             ng_pktbuf_stats();
 #endif
@@ -107,7 +108,7 @@ static void _receive(ng_pktsnip_t *pkt)
                                   NG_NETTYPE_SIXLOWPAN);
 
         if (sixlowpan == NULL) {
-            DEBUG("6lo: can not mark 6LoWPAN dispatch\n");
+            LOG_ERROR("6lo: cannot mark 6LoWPAN dispatch\n");
             ng_pktbuf_release(pkt);
             return;
         }
@@ -124,7 +125,7 @@ static void _receive(ng_pktsnip_t *pkt)
 #ifdef MODULE_NG_SIXLOWPAN_IPHC
     else if (ng_sixlowpan_iphc_is(dispatch)) {
         if (!ng_sixlowpan_iphc_decode(pkt)) {
-            DEBUG("6lo: error on IPHC decoding\n");
+            LOG_ERROR("6lo: error on IPHC decoding\n");
             ng_pktbuf_release(pkt);
             return;
         }
@@ -132,8 +133,7 @@ static void _receive(ng_pktsnip_t *pkt)
     }
 #endif
     else {
-        DEBUG("6lo: dispatch %02" PRIx8 " ... is not supported\n",
-              dispatch[0]);
+        LOG_WARNING("6lo: dispatch %02" PRIx8 " ... is not supported\n", dispatch[0]);
         ng_pktbuf_release(pkt);
         return;
     }
@@ -141,7 +141,7 @@ static void _receive(ng_pktsnip_t *pkt)
     payload->type = NG_NETTYPE_IPV6;
 
     if (!ng_netapi_dispatch_receive(NG_NETTYPE_IPV6, NG_NETREG_DEMUX_CTX_ALL, pkt)) {
-        DEBUG("ipv6: No receivers for this packet found\n");
+        LOG_WARNING("ipv6: No receivers for this packet found\n");
         ng_pktbuf_release(pkt);
     }
 }
@@ -160,7 +160,7 @@ static void _send(ng_pktsnip_t *pkt)
     uint8_t *disp;
 
     if ((pkt == NULL) || (pkt->size < sizeof(ng_netif_hdr_t))) {
-        DEBUG("6lo: Sending packet has no netif header\n");
+        LOG_ERROR("6lo: Sending packet has no netif header\n");
         ng_pktbuf_release(pkt);
         return;
     }
@@ -169,7 +169,7 @@ static void _send(ng_pktsnip_t *pkt)
     ipv6 = pkt->next;
 
     if ((ipv6 == NULL) || (ipv6->type != NG_NETTYPE_IPV6)) {
-        DEBUG("6lo: Sending packet has no IPv6 header\n");
+        LOG_ERROR("6lo: Sending packet has no IPv6 header\n");
         ng_pktbuf_release(pkt);
         return;
     }
@@ -186,7 +186,7 @@ static void _send(ng_pktsnip_t *pkt)
     sixlowpan = ng_pktbuf_start_write(pkt);
 
     if (sixlowpan == NULL) {
-        DEBUG("6lo: no space left in packet buffer\n");
+        LOG_ERROR("6lo: no space left in packet buffer\n");
         ng_pktbuf_release(pkt);
         return;
     }
@@ -198,8 +198,8 @@ static void _send(ng_pktsnip_t *pkt)
         if (ng_netapi_get(hdr->if_pid, NETCONF_OPT_MAX_PACKET_SIZE,
                           0, &max_frag_size, sizeof(max_frag_size)) < 0) {
             /* if error we assume it works */
-            DEBUG("6lo: can not get max packet size from interface %"
-                  PRIkernel_pid "\n", hdr->if_pid);
+            LOG_WARNING("6lo: can not get max packet size from interface %"
+                        PRIkernel_pid "\n", hdr->if_pid);
             max_frag_size = UINT16_MAX;
         }
 
@@ -213,7 +213,7 @@ static void _send(ng_pktsnip_t *pkt)
 #ifdef MODULE_NG_SIXLOWPAN_IPHC
     if (iface->iphc_enabled) {
         if (!ng_sixlowpan_iphc_encode(pkt)) {
-            DEBUG("6lo: error on IPHC encoding\n");
+            LOG_ERROR("6lo: error on IPHC encoding\n");
             ng_pktbuf_release(pkt);
             return;
         }
@@ -225,7 +225,7 @@ static void _send(ng_pktsnip_t *pkt)
                                   NG_NETTYPE_SIXLOWPAN);
 
         if (sixlowpan == NULL) {
-            DEBUG("6lo: no space left in packet buffer\n");
+            LOG_ERROR("6lo: no space left in packet buffer\n");
             ng_pktbuf_release(pkt);
             return;
         }
@@ -245,7 +245,7 @@ static void _send(ng_pktsnip_t *pkt)
     sixlowpan = ng_pktbuf_add(NULL, NULL, sizeof(uint8_t), NG_NETTYPE_SIXLOWPAN);
 
     if (sixlowpan == NULL) {
-        DEBUG("6lo: no space left in packet buffer\n");
+        LOG_ERROR("6lo: no space left in packet buffer\n");
         ng_pktbuf_release(pkt);
         return;
     }
@@ -277,7 +277,7 @@ static void _send(ng_pktsnip_t *pkt)
     }
 #else
     (void)datagram_size;
-    DEBUG("6lo: packet too big (%u> %" PRIu16 ")\n",
+    LOG_ERROR("6lo: packet too big (%u> %" PRIu16 ")\n",
           (unsigned int)payload_len, max_frag_size);
 #endif
 }
@@ -317,13 +317,13 @@ static void *_event_loop(void *args)
 
             case NG_NETAPI_MSG_TYPE_GET:
             case NG_NETAPI_MSG_TYPE_SET:
-                DEBUG("6lo: reply to unsupported get/set\n");
+                LOG_WARNING("6lo: reply to unsupported get/set\n");
                 reply.content.value = -ENOTSUP;
                 msg_reply(&msg, &reply);
                 break;
 
             default:
-                DEBUG("6lo: operation not supported\n");
+                LOG_WARNING("6lo: operation not supported\n");
                 break;
         }
     }

@@ -52,7 +52,7 @@ static ng_pktsnip_t *_build_frag_pkt(ng_pktsnip_t *pkt, size_t payload_len,
                                ng_netif_hdr_get_dst_addr(hdr), hdr->dst_l2addr_len);
 
     if (netif == NULL) {
-        DEBUG("6lo frag: error allocating new link-layer header\n");
+        LOG_ERROR("6lo frag: error allocating new link-layer header\n");
         return NULL;
     }
 
@@ -66,7 +66,7 @@ static ng_pktsnip_t *_build_frag_pkt(ng_pktsnip_t *pkt, size_t payload_len,
                          NG_NETTYPE_SIXLOWPAN);
 
     if (frag == NULL) {
-        DEBUG("6lo frag: error allocating first fragment\n");
+        LOG_ERROR("6lo frag: error allocating first fragment\n");
         ng_pktbuf_release(netif);
         return NULL;
     }
@@ -209,7 +209,7 @@ void ng_sixlowpan_frag_send(kernel_pid_t pid, ng_pktsnip_t *pkt,
 
 #if defined(DEVELHELP) && defined(ENABLE_DEBUG)
     if (iface == NULL) {
-        DEBUG("6lo frag: iface == NULL, expect segmentation fault.\n");
+        LOG_ERROR("6lo frag: iface == NULL, expect segmentation fault.\n");
         ng_pktbuf_release(pkt);
         return;
     }
@@ -257,7 +257,7 @@ void ng_sixlowpan_frag_handle_pkt(ng_pktsnip_t *pkt)
             break;
 
         default:
-            DEBUG("6lo rbuf: Not a fragment header.\n");
+            LOG_WARNING("6lo rbuf: Not a fragment header.\n");
             ng_pktbuf_release(pkt);
 
             return;

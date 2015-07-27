@@ -15,6 +15,7 @@
 #include <stdbool.h>
 #include <inttypes.h>
 
+#include "log.h"
 #include "mutex.h"
 #include "net/ng_sixlowpan/ctx.h"
 #include "vtimer.h"
@@ -29,7 +30,7 @@ static mutex_t _ctx_mutex = MUTEX_INIT;
 static uint32_t _current_minute(void);
 static void _update_lifetime(uint8_t id);
 
-#if ENABLE_DEBUG
+#if ENABLE_DEBUG || (LOG_LEVEL > LOG_NONE)
 static char ipv6str[NG_IPV6_ADDR_MAX_STR_LEN];
 #endif
 

@@ -20,6 +20,7 @@
 #include <stdint.h>
 #include <errno.h>
 
+#include "log.h"
 #include "kernel.h"
 #include "byteorder.h"
 #include "msg.h"
@@ -44,7 +45,7 @@ static kernel_pid_t _pid = KERNEL_PID_UNDEF;
 /**
  * @brief   Allocate memory for the UDP thread's stack
  */
-#if ENABLE_DEBUG
+#if ENABLE_DEBUG || (LOG_LEVEL > LOG_NONE)
 static char _stack[NG_UDP_STACK_SIZE + THREAD_EXTRA_STACKSIZE_PRINTF];
 #else
 static char _stack[NG_UDP_STACK_SIZE];
@@ -102,14 +103,14 @@ static void _receive(ng_pktsnip_t *pkt)
     /* mark UDP header */
     udp = ng_pktbuf_start_write(pkt);
     if (udp == NULL) {
-        DEBUG("udp: unable to get write access to packet\n");
+        LOG_ERROR("udp: unable to get write access to packet\n");
         ng_pktbuf_release(pkt);
         return;
     }
     pkt = udp;
     udp = ng_pktbuf_add(pkt, pkt->data, sizeof(ng_udp_hdr_t), NG_NETTYPE_UDP);
     if (udp == NULL) {
-        DEBUG("udp: error marking UDP header, dropping packet\n");
+        LOG_ERROR("udp: error marking UDP header, dropping packet\n");
         ng_pktbuf_release(pkt);
         return;
     }
@@ -124,7 +125,7 @@ static void _receive(ng_pktsnip_t *pkt)
 
     /* validate checksum */
     if (_calc_csum(udp, ipv6, pkt)) {
-        DEBUG("udp: received packet with invalid checksum, dropping it\n");
+        LOG_WARNING("udp: received packet with invalid checksum, dropping it\n");
         ng_pktbuf_release(pkt);
         return;
     }
@@ -134,7 +135,7 @@ static void _receive(ng_pktsnip_t *pkt)
 
     /* send payload to receivers */
     if (!ng_netapi_dispatch_receive(NG_NETTYPE_UDP, port, pkt)) {
-        DEBUG("udp: unable to forward packet as no one is interested in it\n");
+        LOG_WARNING("udp: unable to forward packet as no one is interested in it\n");
         ng_pktbuf_release(pkt);
     }
 }
@@ -151,7 +152,7 @@ static void _send(ng_pktsnip_t *pkt)
 
     udp_snip = ng_pktbuf_start_write(udp_snip);
     if (udp_snip == NULL) {
-        DEBUG("udp: cannot send packet: unable to allocate packet\n");
+        LOG_ERROR("udp: cannot send packet: unable to allocate packet\n");
         ng_pktbuf_release(pkt);
         return;
     }
@@ -161,7 +162,7 @@ static void _send(ng_pktsnip_t *pkt)
 
     /* and forward packet to the network layer */
     if (!ng_netapi_dispatch_send(pkt->type, NG_NETREG_DEMUX_CTX_ALL, pkt)) {
-        DEBUG("udp: cannot send packet: network layer not found\n");
+        LOG_ERROR("udp: cannot send packet: network layer not found\n");
         ng_pktbuf_release(pkt);
     }
 }
@@ -200,7 +201,7 @@ static void *_event_loop(void *arg)
                 msg_reply(&msg, &reply);
                 break;
             default:
-                DEBUG("udp: received unidentified message\n");
+                LOG_WARNING("udp: received unidentified message\n");
                 break;
         }
     }
