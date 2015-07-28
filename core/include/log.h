@@ -87,6 +87,11 @@
 #define LOG_DEBUG(...) LOG(LOG_LEVEL_DEBUG, __VA_ARGS__)
 /** @} */
 
+#if (LOG_LEVEL > LOG_LEVEL_NONE)
+/* Logging is likely to make use of PRIu16 etc. */
+#   include <inttypes.h>
+#endif
+
 #ifdef MODULE_LOG
 #include "log_module.h"
 #else
