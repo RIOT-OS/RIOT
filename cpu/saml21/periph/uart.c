@@ -153,42 +153,42 @@ static inline void irq_handler(int uart)
 
 
 
-#if UART_0_ISR
+#ifdef UART_0_ISR
 void UART_0_ISR(void)
 {
     irq_handler(0);
 }
 #endif
 
-#if UART_1_ISR
+#ifdef UART_1_ISR
 void UART_1_ISR(void)
 {
     irq_handler(1);
 }
 #endif
 
-#if UART_2_ISR
+#ifdef UART_2_ISR
 void UART_2_ISR(void)
 {
     irq_handler(2);
 }
 #endif
 
-#if UART_3_ISR
+#ifdef UART_3_ISR
 void UART_3_ISR(void)
 {
     irq_handler(3);
 }
 #endif
 
-#if UART_4_ISR
+#ifdef UART_4_ISR
 void UART_4_ISR(void)
 {
     irq_handler(4);
 }
 #endif
 
-#if UART_5_ISR
+#ifdef UART_5_ISR
 void UART_5_ISR(void)
 {
     irq_handler(5);
