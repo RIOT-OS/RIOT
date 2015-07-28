@@ -118,6 +118,17 @@ int _handle_reply(ng_pktsnip_t *pkt, uint64_t time)
     return 1;
 }
 
+static inline void _a_to_timex(timex_t *delay, const char *a)
+{
+    int ms = atoi(a);
+
+    if (ms >= 0) {
+        delay->seconds = 0;
+        delay->microseconds = ms * 1000;
+        timex_normalize(delay);
+    }
+}
+
 int _icmpv6_ping(int argc, char **argv)
 {
     int count = 3, success = 0, remaining;
@@ -165,9 +176,7 @@ int _icmpv6_ping(int argc, char **argv)
                 count = 3;
                 addr_str = argv[1];
                 payload_len = atoi(argv[2]);
-                delay.seconds = 0;
-                delay.microseconds = atoi(argv[3]) * 1000;
-                timex_normalize(&delay);
+                _a_to_timex(&delay, argv[3]);
             }
             break;
 
@@ -176,13 +185,11 @@ int _icmpv6_ping(int argc, char **argv)
             count = atoi(argv[1]);
             addr_str = argv[2];
             payload_len = atoi(argv[3]);
-            delay.seconds = 0;
-            delay.microseconds = atoi(argv[4]) * 1000;
-            timex_normalize(&delay);
+            _a_to_timex(&delay, argv[4]);
             break;
     }
 
-    if (ng_ipv6_addr_from_str(&addr, addr_str) == NULL) {
+    if ((ng_ipv6_addr_from_str(&addr, addr_str) == NULL) || (((int)payload_len) < 0)) {
         usage(argv);
         return 1;
     }
