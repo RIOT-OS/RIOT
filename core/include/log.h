@@ -65,7 +65,9 @@
 /**
  * @brief Default log level define
  */
-#ifdef DEVELHELP
+#if ENABLE_DEBUG
+#   define LOG_LEVEL    LOG_LEVEL_DEBUG
+#elif defined(DEVELHELP)
 #   define LOG_LEVEL    LOG_LEVEL_INFO
 #else
 #   define LOG_LEVEL    LOG_LEVEL_NONE
