@@ -56,7 +56,7 @@ const char *thread_getname(kernel_pid_t pid)
 
 void thread_sleep(void)
 {
-    if (inISR()) {
+    if (!inISR()) {
         return;
     }
 
