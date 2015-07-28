@@ -597,8 +597,7 @@ static int _rem_cb(ng_netdev_t *dev, ng_netdev_event_cb_t cb)
     return 0;
 }
 
-static int _get(ng_netdev_t *netdev, ng_netconf_opt_t opt,
-                void *value, size_t max_len)
+static int _get(ng_netdev_t *netdev, ng_netopt_t opt, void *value, size_t max_len)
 {
     xbee_t *dev = (xbee_t *)netdev;
     if (dev == NULL) {
@@ -606,12 +605,12 @@ static int _get(ng_netdev_t *netdev, ng_netconf_opt_t opt,
     }
 
     switch (opt) {
-        case NETCONF_OPT_ADDRESS:
+        case NG_NETOPT_ADDRESS:
             return _get_addr_short(dev, (uint8_t *)value, max_len);
-        case NETCONF_OPT_ADDRESS_LONG:
+        case NG_NETOPT_ADDRESS_LONG:
             return _get_addr_long(dev, (uint8_t *)value, max_len);
-        case NETCONF_OPT_ADDR_LEN:
-        case NETCONF_OPT_SRC_LEN:
+        case NG_NETOPT_ADDR_LEN:
+        case NG_NETOPT_SRC_LEN:
             if (max_len < sizeof(uint16_t)) {
                 return -EOVERFLOW;
             }
@@ -622,7 +621,7 @@ static int _get(ng_netdev_t *netdev, ng_netconf_opt_t opt,
                 *((uint16_t *)value) = 2;
             }
             return sizeof(uint16_t);
-        case NETCONF_OPT_IPV6_IID:
+        case NG_NETOPT_IPV6_IID:
             if (max_len < sizeof(eui64_t)) {
                 return -EOVERFLOW;
             }
@@ -634,25 +633,24 @@ static int _get(ng_netdev_t *netdev, ng_netconf_opt_t opt,
             }
 
             return sizeof(eui64_t);
-        case NETCONF_OPT_CHANNEL:
+        case NG_NETOPT_CHANNEL:
             return _get_channel(dev, (uint8_t *)value, max_len);
-        case NETCONF_OPT_MAX_PACKET_SIZE:
+        case NG_NETOPT_MAX_PACKET_SIZE:
             if (max_len < sizeof(uint16_t)) {
                 return -EOVERFLOW;
             }
             *((uint16_t *)value) = XBEE_MAX_PAYLOAD_LENGTH;
             return sizeof(uint16_t);
-        case NETCONF_OPT_NID:
+        case NG_NETOPT_NID:
             return _get_panid(dev, (uint8_t *)value, max_len);
-        case NETCONF_OPT_PROTO:
+        case NG_NETOPT_PROTO:
             return _get_proto(dev, (uint8_t *)value, max_len);
         default:
             return -ENOTSUP;
     }
 }
 
-static int _set(ng_netdev_t *netdev, ng_netconf_opt_t opt,
-                void *value, size_t value_len)
+static int _set(ng_netdev_t *netdev, ng_netopt_t opt, void *value, size_t value_len)
 {
     xbee_t *dev = (xbee_t *)netdev;
     if (dev == NULL) {
@@ -660,16 +658,16 @@ static int _set(ng_netdev_t *netdev, ng_netconf_opt_t opt,
     }
 
     switch (opt) {
-        case NETCONF_OPT_ADDRESS:
+        case NG_NETOPT_ADDRESS:
             return _set_addr(dev, (uint8_t *)value, value_len);
-        case NETCONF_OPT_ADDR_LEN:
-        case NETCONF_OPT_SRC_LEN:
+        case NG_NETOPT_ADDR_LEN:
+        case NG_NETOPT_SRC_LEN:
             return _set_addr_len(dev, value, value_len);
-        case NETCONF_OPT_CHANNEL:
+        case NG_NETOPT_CHANNEL:
             return _set_channel(dev, (uint8_t *)value, value_len);
-        case NETCONF_OPT_NID:
+        case NG_NETOPT_NID:
             return _set_panid(dev, (uint8_t *)value, value_len);
-        case NETCONF_OPT_PROTO:
+        case NG_NETOPT_PROTO:
             return _set_proto(dev, (uint8_t *)value, value_len);
         default:
             return -ENOTSUP;

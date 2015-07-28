@@ -211,52 +211,52 @@ static void _switch_to_rx(void)
  */
 int _get_state(uint8_t *val, size_t max_len)
 {
-    ng_netconf_state_t state;
+    ng_netopt_state_t state;
 
-    if (max_len < sizeof(ng_netconf_state_t)) {
+    if (max_len < sizeof(ng_netopt_state_t)) {
         return -EOVERFLOW;
     }
     switch (_state) {
         case STATE_OFF:
-            state = NETCONF_STATE_OFF;
+            state = NG_NETOPT_STATE_OFF;
             break;
         case STATE_IDLE:
-            state = NETCONF_STATE_SLEEP;
+            state = NG_NETOPT_STATE_SLEEP;
             break;
         case STATE_RX:
-            state = NETCONF_STATE_IDLE;
+            state = NG_NETOPT_STATE_IDLE;
             break;
         case STATE_TX:
-            state = NETCONF_STATE_TX;
+            state = NG_NETOPT_STATE_TX;
             break;
         default:
             return -ECANCELED;
     }
-    memcpy(val, &state, sizeof(ng_netconf_state_t));
-    return sizeof(ng_netconf_state_t);
+    memcpy(val, &state, sizeof(ng_netopt_state_t));
+    return sizeof(ng_netopt_state_t);
 }
 
 int _set_state(uint8_t *val, size_t len)
 {
-    ng_netconf_state_t state;
+    ng_netopt_state_t state;
 
-    if (len != sizeof(ng_netconf_state_t)) {
+    if (len != sizeof(ng_netopt_state_t)) {
         return -EINVAL;
     }
     /* get target state */
     memcpy(&state, val, len);
     /* switch to target state */
     switch (state) {
-        case NETCONF_STATE_SLEEP:
+        case NG_NETOPT_STATE_SLEEP:
             _switch_to_idle();
             break;
-        case NETCONF_STATE_IDLE:
+        case NG_NETOPT_STATE_IDLE:
             _switch_to_rx();
             break;
         default:
             return -ENOTSUP;
     }
-    return sizeof(ng_netconf_state_t);
+    return sizeof(ng_netopt_state_t);
 }
 
 int _get_address(uint8_t *val, size_t max_len)
@@ -662,42 +662,40 @@ int _rem_event_cb(ng_netdev_t *dev, ng_netdev_event_cb_t cb)
     return -ENOENT;
 }
 
-int _get(ng_netdev_t *dev, ng_netconf_opt_t opt,
-                void *value, size_t max_len)
+int _get(ng_netdev_t *dev, ng_netopt_t opt, void *value, size_t max_len)
 {
     (void)dev;
 
     switch (opt) {
-        case NETCONF_OPT_ADDRESS:
+        case NG_NETOPT_ADDRESS:
             return _get_address(value, max_len);
-        case NETCONF_OPT_CHANNEL:
+        case NG_NETOPT_CHANNEL:
             return _get_channel(value, max_len);
-        case NETCONF_OPT_NID:
+        case NG_NETOPT_NID:
             return _get_pan(value, max_len);
-        case NETCONF_OPT_TX_POWER:
+        case NG_NETOPT_TX_POWER:
             return _get_txpower(value, max_len);
-        case NETCONF_OPT_STATE:
+        case NG_NETOPT_STATE:
             return _get_state(value, max_len);
         default:
             return -ENOTSUP;
     }
 }
 
-int _set(ng_netdev_t *dev, ng_netconf_opt_t opt,
-                void *value, size_t value_len)
+int _set(ng_netdev_t *dev, ng_netopt_t opt, void *value, size_t value_len)
 {
     (void)dev;
 
     switch (opt) {
-        case NETCONF_OPT_ADDRESS:
+        case NG_NETOPT_ADDRESS:
             return _set_address(value, value_len);
-        case NETCONF_OPT_CHANNEL:
+        case NG_NETOPT_CHANNEL:
             return _set_channel(value, value_len);
-        case NETCONF_OPT_NID:
+        case NG_NETOPT_NID:
             return _set_pan(value, value_len);
-        case NETCONF_OPT_TX_POWER:
+        case NG_NETOPT_TX_POWER:
             return _set_txpower(value, value_len);
-        case NETCONF_OPT_STATE:
+        case NG_NETOPT_STATE:
             return _set_state(value, value_len);
         default:
             return -ENOTSUP;

@@ -184,32 +184,32 @@ void kw2xrf_set_sequence(kw2xrf_t *dev, kw2xrf_physeq_t seq)
     /* Progrmm new sequence */
     switch (seq) {
         case XCVSEQ_IDLE:
-            dev->state = NETCONF_STATE_SLEEP;
+            dev->state = NG_NETOPT_STATE_SLEEP;
             break;
 
         case XCVSEQ_RECEIVE:
-            dev->state = NETCONF_STATE_IDLE;
+            dev->state = NG_NETOPT_STATE_IDLE;
             break;
 
         case XCVSEQ_TRANSMIT:
-            dev->state = NETCONF_STATE_TX;
+            dev->state = NG_NETOPT_STATE_TX;
             break;
 
         case XCVSEQ_CCA:
-            dev->state = NETCONF_STATE_TX;
+            dev->state = NG_NETOPT_STATE_TX;
             break;
 
         case XCVSEQ_TX_RX:
-            dev->state = NETCONF_STATE_TX;
+            dev->state = NG_NETOPT_STATE_TX;
             break;
 
         case XCVSEQ_CONTINUOUS_CCA:
-            dev->state = NETCONF_STATE_TX;
+            dev->state = NG_NETOPT_STATE_TX;
             break;
 
         default:
             DEBUG("kw2xrf: undefined state assigned to phy\n");
-            dev->state = NETCONF_STATE_IDLE;
+            dev->state = NG_NETOPT_STATE_IDLE;
     }
 
     /* Mapping of TX-sequences depending on AUTOACK flag */
@@ -352,7 +352,7 @@ int kw2xrf_on(kw2xrf_t *dev)
     /* abort any ongoing sequence */
     kw2xrf_set_sequence(dev, XCVSEQ_IDLE);
 
-    dev->state = NETCONF_STATE_SLEEP;
+    dev->state = NG_NETOPT_STATE_SLEEP;
     return 0;
 }
 
@@ -508,7 +508,7 @@ uint64_t kw2xrf_get_addr_long(kw2xrf_t *dev)
     return addr;
 }
 
-int kw2xrf_get(ng_netdev_t *netdev, ng_netconf_opt_t opt, void *value, size_t max_len)
+int kw2xrf_get(ng_netdev_t *netdev, ng_netopt_t opt, void *value, size_t max_len)
 {
     kw2xrf_t *dev = (kw2xrf_t *)netdev;
 
@@ -517,7 +517,7 @@ int kw2xrf_get(ng_netdev_t *netdev, ng_netconf_opt_t opt, void *value, size_t ma
     }
 
     switch (opt) {
-        case NETCONF_OPT_ADDRESS:
+        case NG_NETOPT_ADDRESS:
             if (max_len < sizeof(uint16_t)) {
                 return -EOVERFLOW;
             }
@@ -525,7 +525,7 @@ int kw2xrf_get(ng_netdev_t *netdev, ng_netconf_opt_t opt, void *value, size_t ma
             *((uint16_t *)value) = ((dev->addr_short[0] << 8) | dev->addr_short[1]);
             return sizeof(uint16_t);
 
-        case NETCONF_OPT_ADDRESS_LONG:
+        case NG_NETOPT_ADDRESS_LONG:
             if (max_len < sizeof(uint64_t)) {
                 return -EOVERFLOW;
             }
@@ -533,7 +533,7 @@ int kw2xrf_get(ng_netdev_t *netdev, ng_netconf_opt_t opt, void *value, size_t ma
             *((uint64_t *)value) = kw2xrf_get_addr_long(dev);
             return sizeof(uint64_t);
 
-        case NETCONF_OPT_ADDR_LEN:
+        case NG_NETOPT_ADDR_LEN:
             if (max_len < sizeof(uint16_t)) {
                 return -EOVERFLOW;
             }
@@ -541,7 +541,7 @@ int kw2xrf_get(ng_netdev_t *netdev, ng_netconf_opt_t opt, void *value, size_t ma
             *((uint16_t *)value) = 2;
             return sizeof(uint16_t);
 
-        case NETCONF_OPT_SRC_LEN:
+        case NG_NETOPT_SRC_LEN:
             if (max_len < sizeof(uint16_t)) {
                 return -EOVERFLOW;
             }
@@ -555,7 +555,7 @@ int kw2xrf_get(ng_netdev_t *netdev, ng_netconf_opt_t opt, void *value, size_t ma
 
             return sizeof(uint16_t);
 
-        case NETCONF_OPT_NID:
+        case NG_NETOPT_NID:
             if (max_len < sizeof(uint16_t)) {
                 return -EOVERFLOW;
             }
@@ -563,21 +563,21 @@ int kw2xrf_get(ng_netdev_t *netdev, ng_netconf_opt_t opt, void *value, size_t ma
             *((uint16_t *)value) = dev->radio_pan;
             return sizeof(uint16_t);
 
-        case NETCONF_OPT_CHANNEL:
+        case NG_NETOPT_CHANNEL:
             return kw2xrf_get_channel(dev, (uint8_t *)value, max_len);
 
-        case NETCONF_OPT_PROTO:
+        case NG_NETOPT_PROTO:
             return kw2xrf_get_proto(dev, (uint8_t *)value, max_len);
 
-        case NETCONF_OPT_STATE:
-            if (max_len < sizeof(ng_netconf_state_t)) {
+        case NG_NETOPT_STATE:
+            if (max_len < sizeof(ng_netopt_state_t)) {
                 return -EOVERFLOW;
             }
 
-            *(ng_netconf_state_t *)value = *(ng_netconf_state_t *) & (dev->state);
+            *(ng_netopt_state_t *)value = *(ng_netopt_state_t *) & (dev->state);
             return 0;
 
-        case NETCONF_OPT_TX_POWER:
+        case NG_NETOPT_TX_POWER:
             if (max_len < 1) {
                 return -EOVERFLOW;
             }
@@ -585,7 +585,7 @@ int kw2xrf_get(ng_netdev_t *netdev, ng_netconf_opt_t opt, void *value, size_t ma
             *(int16_t *)value = dev->tx_power;
             return 0;
 
-        case NETCONF_OPT_MAX_PACKET_SIZE:
+        case NG_NETOPT_MAX_PACKET_SIZE:
             if (max_len < sizeof(int16_t)) {
                 return -EOVERFLOW;
             }
@@ -593,21 +593,21 @@ int kw2xrf_get(ng_netdev_t *netdev, ng_netconf_opt_t opt, void *value, size_t ma
             *((uint16_t *)value) = KW2XRF_MAX_PKT_LENGTH;
             return sizeof(uint16_t);
 
-        case NETCONF_OPT_PRELOADING:
-            *((ng_netconf_enable_t *)value) = !!(dev->option & KW2XRF_OPT_PRELOADING);
-            return sizeof(ng_netconf_enable_t);
+        case NG_NETOPT_PRELOADING:
+            *((ng_netopt_enable_t *)value) = !!(dev->option & KW2XRF_OPT_PRELOADING);
+            return sizeof(ng_netopt_enable_t);
 
-        case NETCONF_OPT_AUTOACK:
-            *((ng_netconf_enable_t *)value) = !!(dev->option & KW2XRF_OPT_AUTOACK);
-            return sizeof(ng_netconf_enable_t);
+        case NG_NETOPT_AUTOACK:
+            *((ng_netopt_enable_t *)value) = !!(dev->option & KW2XRF_OPT_AUTOACK);
+            return sizeof(ng_netopt_enable_t);
 
-        case NETCONF_OPT_PROMISCUOUSMODE:
-            *((ng_netconf_enable_t *)value) = !!(dev->option & KW2XRF_OPT_PROMISCUOUS);
-            return sizeof(ng_netconf_enable_t);
+        case NG_NETOPT_PROMISCUOUSMODE:
+            *((ng_netopt_enable_t *)value) = !!(dev->option & KW2XRF_OPT_PROMISCUOUS);
+            return sizeof(ng_netopt_enable_t);
 
-        case NETCONF_OPT_RAWMODE:
-            *((ng_netconf_enable_t *)value) = !!(dev->option & KW2XRF_OPT_RAWDUMP);
-            return sizeof(ng_netconf_enable_t);
+        case NG_NETOPT_RAWMODE:
+            *((ng_netopt_enable_t *)value) = !!(dev->option & KW2XRF_OPT_RAWDUMP);
+            return sizeof(ng_netopt_enable_t);
 
         default:
             return -ENOTSUP;
@@ -696,7 +696,7 @@ void kw2xrf_set_option(kw2xrf_t *dev, uint16_t option, bool state)
     }
 }
 
-int kw2xrf_set(ng_netdev_t *netdev, ng_netconf_opt_t opt, void *value, size_t value_len)
+int kw2xrf_set(ng_netdev_t *netdev, ng_netopt_t opt, void *value, size_t value_len)
 {
     kw2xrf_t *dev = (kw2xrf_t *)netdev;
 
@@ -705,24 +705,24 @@ int kw2xrf_set(ng_netdev_t *netdev, ng_netconf_opt_t opt, void *value, size_t va
     }
 
     switch (opt) {
-        case NETCONF_OPT_CHANNEL:
+        case NG_NETOPT_CHANNEL:
             return kw2xrf_set_channel(dev, (uint8_t *)value, value_len);
 
-        case NETCONF_OPT_ADDRESS:
+        case NG_NETOPT_ADDRESS:
             if (value_len > sizeof(uint16_t)) {
                 return -EOVERFLOW;
             }
 
             return kw2xrf_set_addr(dev, *((uint16_t *)value));
 
-        case NETCONF_OPT_ADDRESS_LONG:
+        case NG_NETOPT_ADDRESS_LONG:
             if (value_len > sizeof(uint64_t)) {
                 return -EOVERFLOW;
             }
 
             return kw2xrf_set_addr_long(dev, *((uint64_t *)value));
 
-        case NETCONF_OPT_SRC_LEN:
+        case NG_NETOPT_SRC_LEN:
             if (value_len > sizeof(uint16_t)) {
                 return -EOVERFLOW;
             }
@@ -741,14 +741,14 @@ int kw2xrf_set(ng_netdev_t *netdev, ng_netconf_opt_t opt, void *value, size_t va
 
             return sizeof(uint16_t);
 
-        case NETCONF_OPT_NID:
+        case NG_NETOPT_NID:
             if (value_len > sizeof(uint16_t)) {
                 return -EOVERFLOW;
             }
 
             return kw2xrf_set_pan(dev, *((uint16_t *)value));
 
-        case NETCONF_OPT_TX_POWER:
+        case NG_NETOPT_TX_POWER:
             if (value_len < sizeof(uint16_t)) {
                 return -EOVERFLOW;
             }
@@ -756,48 +756,48 @@ int kw2xrf_set(ng_netdev_t *netdev, ng_netconf_opt_t opt, void *value, size_t va
             kw2xrf_set_tx_power(dev, (int8_t *)value, value_len);
             return sizeof(uint16_t);
 
-        case NETCONF_OPT_PROTO:
+        case NG_NETOPT_PROTO:
             return kw2xrf_set_proto(dev, (uint8_t *)value, value_len);
 
-        case NETCONF_OPT_AUTOACK:
+        case NG_NETOPT_AUTOACK:
             /* Set up HW generated automatic ACK after Receive */
             kw2xrf_set_option(dev, KW2XRF_OPT_AUTOACK,
                               ((bool *)value)[0]);
-            return sizeof(ng_netconf_enable_t);
+            return sizeof(ng_netopt_enable_t);
 
-        case NETCONF_OPT_PROMISCUOUSMODE:
+        case NG_NETOPT_PROMISCUOUSMODE:
             kw2xrf_set_option(dev, KW2XRF_OPT_PROMISCUOUS,
                               ((bool *)value)[0]);
-            return sizeof(ng_netconf_enable_t);
+            return sizeof(ng_netopt_enable_t);
 
-        case NETCONF_OPT_RAWMODE:
+        case NG_NETOPT_RAWMODE:
             kw2xrf_set_option(dev, KW2XRF_OPT_RAWDUMP,
                               ((bool *)value)[0]);
-            return sizeof(ng_netconf_enable_t);
+            return sizeof(ng_netopt_enable_t);
 
-        case NETCONF_OPT_PRELOADING:
+        case NG_NETOPT_PRELOADING:
             kw2xrf_set_option(dev, KW2XRF_OPT_PRELOADING,
                               ((bool *)value)[0]);
-            return sizeof(ng_netconf_enable_t);
+            return sizeof(ng_netopt_enable_t);
 
-        case NETCONF_OPT_AUTOCCA:
+        case NG_NETOPT_AUTOCCA:
             kw2xrf_set_option(dev, KW2XRF_OPT_CSMA,
                               ((bool *)value)[0]);
-            return sizeof(ng_netconf_enable_t);
+            return sizeof(ng_netopt_enable_t);
 
-        case NETCONF_OPT_STATE:
-            if (*((ng_netconf_state_t *)value) == NETCONF_STATE_TX) {
+        case NG_NETOPT_STATE:
+            if (*((ng_netopt_state_t *)value) == NG_NETOPT_STATE_TX) {
                 DEBUG("kw2xrf: Sending now.\n");
                 kw2xrf_set_sequence(dev, XCVSEQ_TRANSMIT);
-                return sizeof(ng_netconf_state_t);
+                return sizeof(ng_netopt_state_t);
             }
-            else if (*((ng_netconf_state_t *)value) == NETCONF_STATE_SLEEP) {
+            else if (*((ng_netopt_state_t *)value) == NG_NETOPT_STATE_SLEEP) {
                 kw2xrf_set_sequence(dev, XCVSEQ_IDLE);
-                return sizeof(ng_netconf_state_t);
+                return sizeof(ng_netopt_state_t);
             }
-            else if (*((ng_netconf_state_t *)value) == NETCONF_STATE_IDLE) {
+            else if (*((ng_netopt_state_t *)value) == NG_NETOPT_STATE_IDLE) {
                 kw2xrf_set_sequence(dev, XCVSEQ_RECEIVE);
-                return sizeof(ng_netconf_state_t);
+                return sizeof(ng_netopt_state_t);
             }
 
             /* TODO: Implement Off state here, when LPM functions are implemented */
@@ -1188,7 +1188,7 @@ int kw2xrf_send(ng_netdev_t *netdev, ng_pktsnip_t *pkt)
     DEBUG("kw2xrf: packet with size %i loaded to tx_buf\n", dev->buf[0]);
     kw2xrf_write_fifo(dev->buf, dev->buf[0]);
 
-    if ((dev->option & KW2XRF_OPT_PRELOADING) == NETCONF_DISABLE) {
+    if ((dev->option & KW2XRF_OPT_PRELOADING) == NG_NETOPT_DISABLE) {
         DEBUG("kw2xrf: Sending now.\n");
         kw2xrf_set_sequence(dev, XCVSEQ_TRANSMIT);
     }

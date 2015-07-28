@@ -195,7 +195,7 @@ static void _send(ng_pktsnip_t *pkt)
     iface = ng_sixlowpan_netif_get(hdr->if_pid);
 
     if (iface == NULL) {
-        if (ng_netapi_get(hdr->if_pid, NETCONF_OPT_MAX_PACKET_SIZE,
+        if (ng_netapi_get(hdr->if_pid, NG_NETOPT_MAX_PACKET_SIZE,
                           0, &max_frag_size, sizeof(max_frag_size)) < 0) {
             /* if error we assume it works */
             DEBUG("6lo: can not get max packet size from interface %"

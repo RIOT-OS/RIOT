@@ -510,7 +510,7 @@ bool ng_sixlowpan_iphc_encode(ng_pktsnip_t *pkt)
             }
             else {
                 /* but take from driver otherwise */
-                ng_netapi_get(netif_hdr->if_pid, NETCONF_OPT_IPV6_IID, 0, &iid,
+                ng_netapi_get(netif_hdr->if_pid, NG_NETOPT_IPV6_IID, 0, &iid,
                               sizeof(eui64_t));
             }
 

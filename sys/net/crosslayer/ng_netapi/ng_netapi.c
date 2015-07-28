@@ -36,7 +36,7 @@
  * @return              the value from the received ACK message
  */
 static inline int _get_set(kernel_pid_t pid, uint16_t type,
-                           ng_netconf_opt_t opt, uint16_t context,
+                           ng_netopt_t opt, uint16_t context,
                            void *data, size_t data_len)
 {
     msg_t cmd;
@@ -107,14 +107,14 @@ int ng_netapi_dispatch_receive(ng_nettype_t type, uint32_t demux_ctx,
     return _snd_rcv_dispatch(type, demux_ctx, NG_NETAPI_MSG_TYPE_RCV, pkt);
 }
 
-int ng_netapi_get(kernel_pid_t pid, ng_netconf_opt_t opt, uint16_t context,
+int ng_netapi_get(kernel_pid_t pid, ng_netopt_t opt, uint16_t context,
                   void *data, size_t data_len)
 {
     return _get_set(pid, NG_NETAPI_MSG_TYPE_GET, opt, context,
                     data, data_len);
 }
 
-int ng_netapi_set(kernel_pid_t pid, ng_netconf_opt_t opt, uint16_t context,
+int ng_netapi_set(kernel_pid_t pid, ng_netopt_t opt, uint16_t context,
                   void *data, size_t data_len)
 {
     return _get_set(pid, NG_NETAPI_MSG_TYPE_SET, opt, context,
