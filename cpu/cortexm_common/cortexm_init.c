@@ -41,8 +41,8 @@ void cortexm_init(void)
 #endif
 
     /* initialize the interrupt priorities */
-    /* set pendSV interrupt to lowest possible priority */
-    NVIC_SetPriority(PendSV_IRQn, 0xff);
+    /* set pendSV interrupt to same priority as the rest */
+    NVIC_SetPriority(PendSV_IRQn, CPU_DEFAULT_IRQ_PRIO);
     /* set SVC interrupt to same priority as the rest */
     NVIC_SetPriority(SVCall_IRQn, CPU_DEFAULT_IRQ_PRIO);
     /* initialize all vendor specific interrupts with the same value */
