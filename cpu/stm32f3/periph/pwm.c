@@ -98,7 +98,8 @@ int pwm_init(pwm_t dev, pwm_mode_t mode, unsigned int frequency, unsigned int re
         return -2;
     }
     tim->PSC = (pwm_clk / (resolution * frequency)) - 1;
-    tim->ARR = resolution;
+    tim->ARR = resolution - 1;
+    frequency = (pwm_clk / (resolution * (tim->PSC + 1)));
 
     /* set PWM mode */
     switch (mode) {
@@ -147,7 +148,9 @@ int pwm_set(pwm_t dev, int channel, unsigned int value)
             return -1;
     }
 
-    /* norm value to maximum possible value */
+    /* norm value to maximum possible value
+     * Caution! A duty cycle exceeding the period length can lead to unexpected
+     * behaviour on other MCUs. */
     if (value > 0xffff) {
         value = 0xffff;
     }
