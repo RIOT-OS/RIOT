@@ -26,6 +26,16 @@
 #endif
 
 /**
+ * @brief   Kernel print function
+ *          Will only print if #KERNEL_MUTE is not set.
+ */
+#ifndef KERNEL_MUTE
+#   define printk(...) printf(__VA_ARGS__)
+#else
+#   define printk(...)
+#endif
+
+/**
  * @brief   Initializes scheduler and creates main and idle task
  */
 void kernel_init(void);

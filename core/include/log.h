@@ -49,18 +49,17 @@
  * time, so a lower log level might result in smaller code size.
  */
 #define LOG_LEVEL_NONE    (0)    /**< Lowest log level, will output nothing */
-#define LOG_LEVEL_KERNEL  (1)    /**< Kernel log level, will print only kernel messages */
-#define LOG_LEVEL_ERROR   (2)    /**< Error log level, will print only critical,
+#define LOG_LEVEL_ERROR   (1)    /**< Error log level, will print only critical,
                                       non-recoverable errors like hardware initialization
                                       failures */
-#define LOG_LEVEL_WARNING (3)    /**< Warning log level, will print warning messages for
+#define LOG_LEVEL_WARNING (2)    /**< Warning log level, will print warning messages for
                                       temporary errors */
-#define LOG_LEVEL_INFO    (4)    /**< Informational log level, will print purely
+#define LOG_LEVEL_INFO    (3)    /**< Informational log level, will print purely
                                       informational messages like successful system bootup,
                                       network link state, ...*/
-#define LOG_LEVEL_DEBUG   (5)    /**< Debug log level, printing developer stuff considered
+#define LOG_LEVEL_DEBUG   (4)    /**< Debug log level, printing developer stuff considered
                                       too verbose for production use */
-#define LOG_LEVEL_ALL     (6)    /**< print everything */
+#define LOG_LEVEL_ALL     (5)    /**< print everything */
 
 #ifndef LOG_LEVEL
 /**
@@ -69,7 +68,7 @@
 #ifdef DEVELHELP
 #   define LOG_LEVEL    LOG_LEVEL_INFO
 #else
-#   define LOG_LEVEL    LOG_LEVEL_KERNEL
+#   define LOG_LEVEL    LOG_LEVEL_NONE
 #endif
 #endif
 
@@ -82,7 +81,6 @@
  * @brief logging convenience defines
  * @{
  */
-#define LOG_KERNEL(...) LOG(LOG_LEVEL_KERNEL, __VA_ARGS__)
 #define LOG_ERROR(...) LOG(LOG_LEVEL_ERROR, __VA_ARGS__)
 #define LOG_WARNING(...) LOG(LOG_LEVEL_WARNING, __VA_ARGS__)
 #define LOG_INFO(...) LOG(LOG_LEVEL_INFO, __VA_ARGS__)
