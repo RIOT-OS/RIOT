@@ -191,7 +191,7 @@ static uint16_t _send_nth_fragment(ng_sixlowpan_netif_t *iface, ng_pktsnip_t *pk
         }
     }
 
-    DEBUG("6lo frag: send first fragment (datagram size: %u, "
+    DEBUG("6lo frag: send subsequent fragment (datagram size: %u, "
           "datagram tag: %" PRIu16 ", offset: %" PRIu8 " (%u bytes), "
           "fragment size: %" PRIu16 ")\n",
           (unsigned int)datagram_size, _tag, hdr->offset, hdr->offset << 3,
@@ -217,6 +217,7 @@ void ng_sixlowpan_frag_send(kernel_pid_t pid, ng_pktsnip_t *pkt,
 
     if ((res = _send_1st_fragment(iface, pkt, payload_len, datagram_size)) == 0) {
         /* error sending first fragment */
+        DEBUG("6lo frag: error sending 1st fragment\n");
         ng_pktbuf_release(pkt);
         return;
     }
@@ -226,7 +227,9 @@ void ng_sixlowpan_frag_send(kernel_pid_t pid, ng_pktsnip_t *pkt,
     while (offset < datagram_size) {
         if ((res = _send_nth_fragment(iface, pkt, payload_len, datagram_size,
                                       offset)) == 0) {
-            /* error sending first fragment */
+            /* error sending subsequent fragment */
+            DEBUG("6lo frag: error sending subsequent fragment (offset = %" PRIu16
+                  ")\n", offset);
             ng_pktbuf_release(pkt);
             return;
         }
