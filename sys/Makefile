@@ -140,9 +140,6 @@ endif
 ifneq (,$(filter ng_slip,$(USEMODULE)))
     DIRS += net/link_layer/ng_slip
 endif
-ifneq (,$(filter netapi,$(USEMODULE)))
-    DIRS += net/crosslayer/netapi
-endif
 ifneq (,$(filter trickle,$(USEMODULE)))
     DIRS += trickle
 endif
