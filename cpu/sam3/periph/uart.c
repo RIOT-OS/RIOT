@@ -45,8 +45,6 @@ static uart_conf_t uart_config[UART_NUMOF];
 
 int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, uart_tx_cb_t tx_cb, void *arg)
 {
-    uint16_t clock_divider = F_CPU / (16 * baudrate);
-
     /* register callbacks */
     uart_config[uart].rx_cb = rx_cb;
     uart_config[uart].tx_cb = tx_cb;
