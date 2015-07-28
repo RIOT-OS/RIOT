@@ -15,12 +15,10 @@
 #include <stdbool.h>
 #include <inttypes.h>
 
+#include "log.h"
 #include "mutex.h"
 #include "net/ng_sixlowpan/ctx.h"
 #include "vtimer.h"
-
-#define ENABLE_DEBUG    (0)
-#include "debug.h"
 
 static ng_sixlowpan_ctx_t _ctxs[NG_SIXLOWPAN_CTX_SIZE];
 static uint32_t _ctx_inval_times[NG_SIXLOWPAN_CTX_SIZE];
@@ -29,7 +27,7 @@ static mutex_t _ctx_mutex = MUTEX_INIT;
 static uint32_t _current_minute(void);
 static void _update_lifetime(uint8_t id);
 
-#if ENABLE_DEBUG
+#if (LOG_LEVEL >= LOG_DEBUG)
 static char ipv6str[NG_IPV6_ADDR_MAX_STR_LEN];
 #endif
 
@@ -59,12 +57,12 @@ ng_sixlowpan_ctx_t *ng_sixlowpan_ctx_lookup_addr(const ng_ipv6_addr_t *addr)
 
     mutex_unlock(&_ctx_mutex);
 
-#if ENABLE_DEBUG
+#if (LOG_LEVEL >= LOG_DEBUG)
     if (res != NULL) {
-        DEBUG("6lo ctx: found context (%u, %s/%" PRIu8 ") ", res->id,
-              ng_ipv6_addr_to_str(ipv6str, &res->prefix, sizeof(ipv6str)),
-              res->prefix_len);
-        DEBUG("for address %s\n", ng_ipv6_addr_to_str(ipv6str, addr, sizeof(ipv6str)));
+        LOG_DEBUG("6lo ctx: found context (%u, %s/%" PRIu8 ") ", res->id,
+                  ng_ipv6_addr_to_str(ipv6str, &res->prefix, sizeof(ipv6str)),
+                  res->prefix_len);
+        LOG_DEBUG("for address %s\n", ng_ipv6_addr_to_str(ipv6str, addr, sizeof(ipv6str)));
     }
 #endif
 
@@ -80,9 +78,9 @@ ng_sixlowpan_ctx_t *ng_sixlowpan_ctx_lookup_id(uint8_t id)
     mutex_lock(&_ctx_mutex);
 
     if (_valid(id)) {
-        DEBUG("6lo ctx: found context (%u, %s/%" PRIu8 ")\n", id,
-              ng_ipv6_addr_to_str(ipv6str, &_ctxs[id].prefix, sizeof(ipv6str)),
-              _ctxs[id].prefix_len);
+        LOG_DEBUG("6lo ctx: found context (%u, %s/%" PRIu8 ")\n", id,
+                  ng_ipv6_addr_to_str(ipv6str, &_ctxs[id].prefix, sizeof(ipv6str)),
+                  _ctxs[id].prefix_len);
         mutex_unlock(&_ctx_mutex);
         return &(_ctxs[id]);
     }
@@ -122,9 +120,9 @@ ng_sixlowpan_ctx_t *ng_sixlowpan_ctx_update(uint8_t id, const ng_ipv6_addr_t *pr
         ng_ipv6_addr_init_prefix(&(_ctxs[id].prefix), prefix,
                                  _ctxs[id].prefix_len);
     }
-    DEBUG("6lo ctx: update context (%u, %s/%" PRIu8 "), lifetime: %" PRIu16 " min\n",
-          id, ng_ipv6_addr_to_str(ipv6str, &_ctxs[id].prefix, sizeof(ipv6str)),
-          _ctxs[id].prefix_len, _ctxs[id].ltime);
+    LOG_DEBUG("6lo ctx: update context (%u, %s/%" PRIu8 "), lifetime: %" PRIu16 " min\n",
+              id, ng_ipv6_addr_to_str(ipv6str, &_ctxs[id].prefix, sizeof(ipv6str)),
+              _ctxs[id].prefix_len, _ctxs[id].ltime);
     _ctx_inval_times[id] = ltime + _current_minute();
 
     mutex_unlock(&_ctx_mutex);
@@ -151,7 +149,7 @@ static void _update_lifetime(uint8_t id)
     now = _current_minute();
 
     if (now >= _ctx_inval_times[id]) {
-        DEBUG("6lo ctx: context %u was invalidated for compression\n", id);
+        LOG_DEBUG("6lo ctx: context %u was invalidated for compression\n", id);
         _ctxs[id].ltime = 0;
         _ctxs[id].flags_id &= ~NG_SIXLOWPAN_CTX_FLAGS_COMP;
     }

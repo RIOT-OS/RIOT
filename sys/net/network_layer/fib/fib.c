@@ -20,12 +20,11 @@
 #include <string.h>
 #include <inttypes.h>
 #include <errno.h>
+
+#include "log.h"
 #include "thread.h"
 #include "mutex.h"
 #include "msg.h"
-
-#define ENABLE_DEBUG (0)
-#include "debug.h"
 
 #include "ng_fib.h"
 #include "ng_fib/ng_fib_table.h"
@@ -310,7 +309,7 @@ static int fib_signal_rp(uint8_t *dst, size_t dst_size, uint32_t dst_flags)
 
     for (size_t i = 0; i < FIB_MAX_REGISTERED_RP; ++i) {
         if (notify_rp[i] != KERNEL_PID_UNDEF) {
-            DEBUG("[fib_signal_rp] send msg@: %p to pid[%d]: %d\n", \
+            LOG_DEBUG("[fib_signal_rp] send msg@: %p to pid[%d]: %d\n", \
                   msg.content.ptr, (int)i, (int)notify_rp[i]);
 
             /* do only signal a RP if its registered prefix matches */
@@ -321,7 +320,7 @@ static int fib_signal_rp(uint8_t *dst, size_t dst_size, uint32_t dst_flags)
                  * will lead to errors
                  */
                 msg_send_receive(&msg, &reply, notify_rp[i]);
-                DEBUG("[fib_signal_rp] got reply.\n");
+                LOG_DEBUG("[fib_signal_rp] got reply.\n");
             }
         }
     }
@@ -334,7 +333,7 @@ int fib_add_entry(kernel_pid_t iface_id, uint8_t *dst, size_t dst_size, uint32_t
                   uint32_t lifetime)
 {
     mutex_lock(&mtx_access);
-    DEBUG("[fib_add_entry]\n");
+    LOG_DEBUG("[fib_add_entry]\n");
     size_t count = 1;
     fib_entry_t *entry[count];
 
@@ -364,7 +363,7 @@ int fib_update_entry(uint8_t *dst, size_t dst_size,
                      uint32_t lifetime)
 {
     mutex_lock(&mtx_access);
-    DEBUG("[fib_update_entry]\n");
+    LOG_DEBUG("[fib_update_entry]\n");
     size_t count = 1;
     fib_entry_t *entry[count];
     int ret = -ENOMEM;
@@ -376,7 +375,7 @@ int fib_update_entry(uint8_t *dst, size_t dst_size,
     }
 
     if (fib_find_entry(dst, dst_size, &(entry[0]), &count) == 1) {
-        DEBUG("[fib_update_entry] found entry: %p\n", (void *)(entry[0]));
+        LOG_DEBUG("[fib_update_entry] found entry: %p\n", (void *)(entry[0]));
         /* we must take the according entry and update the values */
         ret = fib_upd_entry(entry[0], next_hop, next_hop_size, next_hop_flags, lifetime);
     }
@@ -384,7 +383,7 @@ int fib_update_entry(uint8_t *dst, size_t dst_size,
         /* we have ambiguous entries, i.e. count > 1
          * this should never happen
          */
-        DEBUG("[fib_update_entry] ambigious entries detected!!!\n");
+        LOG_WARNING("[fib_update_entry] ambigious entries detected!!!\n");
     }
 
     mutex_unlock(&mtx_access);
@@ -394,7 +393,7 @@ int fib_update_entry(uint8_t *dst, size_t dst_size,
 void fib_remove_entry(uint8_t *dst, size_t dst_size)
 {
     mutex_lock(&mtx_access);
-    DEBUG("[fib_remove_entry]\n");
+    LOG_DEBUG("[fib_remove_entry]\n");
     size_t count = 1;
     fib_entry_t *entry[count];
 
@@ -408,7 +407,7 @@ void fib_remove_entry(uint8_t *dst, size_t dst_size)
         /* we have ambiguous entries, i.e. count > 1
          * this should never happen
          */
-        DEBUG("[fib_update_entry] ambigious entries detected!!!\n");
+        LOG_WARNING("[fib_update_entry] ambigious entries detected!!!\n");
     }
 
     mutex_unlock(&mtx_access);
@@ -419,7 +418,7 @@ int fib_get_next_hop(kernel_pid_t *iface_id,
                      uint8_t *dst, size_t dst_size, uint32_t dst_flags)
 {
     mutex_lock(&mtx_access);
-    DEBUG("[fib_get_next_hop]\n");
+    LOG_DEBUG("[fib_get_next_hop]\n");
     size_t count = 1;
     fib_entry_t *entry[count];
 
@@ -502,7 +501,7 @@ int fib_get_destination_set(uint8_t *prefix, size_t prefix_size,
 
 void fib_init(void)
 {
-    DEBUG("[fib_init] hello. Initializing some stuff.\n");
+    LOG_DEBUG("[fib_init] hello. Initializing some stuff.\n");
     mutex_lock(&mtx_access);
 
     for (size_t i = 0; i < FIB_MAX_REGISTERED_RP; ++i) {
@@ -526,7 +525,7 @@ void fib_init(void)
 
 void fib_deinit(void)
 {
-    DEBUG("[fib_deinit] hello. De-Initializing stuff.\n");
+    LOG_DEBUG("[fib_deinit] hello. De-Initializing stuff.\n");
     mutex_lock(&mtx_access);
 
     for (size_t i = 0; i < FIB_MAX_REGISTERED_RP; ++i) {

@@ -82,7 +82,7 @@ static char idle_stack[THREAD_STACKSIZE_IDLE];
 void kernel_init(void)
 {
     (void) disableIRQ();
-    LOG_INFO("kernel_init(): This is RIOT! (Version: %s)\n", RIOT_VERSION);
+    LOG_KERNEL("kernel_init(): This is RIOT! (Version: %s)\n", RIOT_VERSION);
 
     hwtimer_init();
 
@@ -94,7 +94,7 @@ void kernel_init(void)
         printf("kernel_init(): error creating main task.\n");
     }
 
-    LOG_INFO("kernel_init(): jumping into first task...\n");
+    LOG_KERNEL("kernel_init(): jumping into first task...\n");
 
     cpu_switch_context_exit();
 }

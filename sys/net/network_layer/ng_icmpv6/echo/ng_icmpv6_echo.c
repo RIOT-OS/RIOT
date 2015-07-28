@@ -12,6 +12,7 @@
  * @file
  */
 
+#include "log.h"
 #include "net/ng_netbase.h"
 
 #include "od.h"
@@ -19,10 +20,7 @@
 #include "net/ng_icmpv6/echo.h"
 #include "utlist.h"
 
-#define ENABLE_DEBUG    (0)
-#include "debug.h"
-
-#if ENABLE_DEBUG
+#if (LOG_LEVEL >= LOG_LEVEL_KERNEL)
 /* For PRIu16 etc. */
 #include <inttypes.h>
 #endif
@@ -37,23 +35,23 @@ ng_pktsnip_t *ng_icmpv6_echo_build(uint8_t type, uint16_t id, uint16_t seq,
         return NULL;
     }
 
-    DEBUG("icmpv6_echo: Building echo message with type=%" PRIu8 "id=%" PRIu16
-          ", seq=%" PRIu16, type, id, seq);
+    LOG_DEBUG("icmpv6_echo: Building echo message with type=%" PRIu8 "id=%" PRIu16
+              ", seq=%" PRIu16, type, id, seq);
     echo = (ng_icmpv6_echo_t *)pkt->data;
     echo->id = byteorder_htons(id);
     echo->seq = byteorder_htons(seq);
 
     if (data != NULL) {
         memcpy(echo + 1, data, data_len);
-#if defined(MODULE_OD) && ENABLE_DEBUG
-        DEBUG(", payload:\n");
+#if defined(MODULE_OD) && (LOG_LEVEL >= LOG_DEBUG)
+        LOG_DEBUG(", payload:\n");
         od_hex_dump(data, data_len, OD_WIDTH_DEFAULT);
 #endif
-        DEBUG("\n");
+        LOG_DEBUG("\n");
     }
-#if ENABLE_DEBUG
+#if (LOG_LEVEL >= LOG_DEBUG)
     else {
-        DEBUG("\n");
+        LOG_DEBUG("\n");
     }
 #endif
 
@@ -68,7 +66,7 @@ void ng_icmpv6_echo_req_handle(kernel_pid_t iface, ng_ipv6_hdr_t *ipv6_hdr,
     ng_netreg_entry_t *sendto = NULL;
 
     if ((echo == NULL) || (len < sizeof(ng_icmpv6_echo_t))) {
-        DEBUG("icmpv6_echo: echo was NULL or len (%" PRIu16
+        LOG_WARNING("icmpv6_echo: echo was NULL or len (%" PRIu16
               ") was < sizeof(ng_icmpv6_echo_t)\n", len);
         return;
     }
@@ -78,7 +76,7 @@ void ng_icmpv6_echo_req_handle(kernel_pid_t iface, ng_ipv6_hdr_t *ipv6_hdr,
                                len - sizeof(ng_icmpv6_echo_t));
 
     if (pkt == NULL) {
-        DEBUG("icmpv6_echo: no space left in packet buffer\n");
+        LOG_ERROR("icmpv6_echo: no space left in packet buffer\n");
         return;
     }
 
@@ -93,7 +91,7 @@ void ng_icmpv6_echo_req_handle(kernel_pid_t iface, ng_ipv6_hdr_t *ipv6_hdr,
     }
 
     if (hdr == NULL) {
-        DEBUG("icmpv6_echo: no space left in packet buffer\n");
+        LOG_ERROR("icmpv6_echo: no space left in packet buffer\n");
         ng_pktbuf_release(pkt);
         return;
     }
@@ -108,7 +106,7 @@ void ng_icmpv6_echo_req_handle(kernel_pid_t iface, ng_ipv6_hdr_t *ipv6_hdr,
     sendto = ng_netreg_lookup(NG_NETTYPE_IPV6, NG_NETREG_DEMUX_CTX_ALL);
 
     if (sendto == NULL) {
-        DEBUG("icmpv6_echo: no receivers for IPv6 packets\n");
+        LOG_WARNING("icmpv6_echo: no receivers for IPv6 packets\n");
         ng_pktbuf_release(pkt);
         return;
     }

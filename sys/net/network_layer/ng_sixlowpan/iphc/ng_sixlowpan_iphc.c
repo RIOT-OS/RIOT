@@ -14,6 +14,7 @@
 
 #include <stdbool.h>
 
+#include "log.h"
 #include "byteorder.h"
 #include "net/ng_ieee802154.h"
 #include "net/ng_ipv6/hdr.h"
@@ -22,9 +23,6 @@
 #include "utlist.h"
 
 #include "net/ng_sixlowpan/iphc.h"
-
-#define ENABLE_DEBUG    (0)
-#include "debug.h"
 
 /* dispatch byte definitions */
 #define IPHC1_IDX                   (0U)
@@ -101,7 +99,7 @@ bool ng_sixlowpan_iphc_decode(ng_pktsnip_t *pkt)
                                        NG_NETTYPE_IPV6);
 
     if (ipv6 == NULL) {
-        DEBUG("6lo iphc: error allocating ipv6 header space\n");
+        LOG_ERROR("6lo iphc: error allocating ipv6 header space\n");
         return false;
     }
 
@@ -173,7 +171,7 @@ bool ng_sixlowpan_iphc_decode(ng_pktsnip_t *pkt)
             ctx = ng_sixlowpan_ctx_lookup_id(sci);
 
             if (ctx == NULL) {
-                DEBUG("6lo iphc: could not find source context\n");
+                LOG_ERROR("6lo iphc: could not find source context\n");
                 return false;
             }
         }
@@ -247,7 +245,7 @@ bool ng_sixlowpan_iphc_decode(ng_pktsnip_t *pkt)
             ctx = ng_sixlowpan_ctx_lookup_id(dci);
 
             if (ctx == NULL) {
-                DEBUG("6lo iphc: could not find destination context\n");
+                LOG_ERROR("6lo iphc: could not find destination context\n");
                 return false;
             }
         }
@@ -361,7 +359,7 @@ bool ng_sixlowpan_iphc_decode(ng_pktsnip_t *pkt)
             break;
 
         default:
-            DEBUG("6lo iphc: unspecified or reserved M, DAC, DAM combination\n");
+            LOG_WARNING("6lo iphc: unspecified or reserved M, DAC, DAM combination\n");
             return false;
 
     }
@@ -395,7 +393,7 @@ bool ng_sixlowpan_iphc_encode(ng_pktsnip_t *pkt)
                                            NG_NETTYPE_SIXLOWPAN);
 
     if (dispatch == NULL) {
-        DEBUG("6lo iphc: error allocating dispatch space\n");
+        LOG_ERROR("6lo iphc: error allocating dispatch space\n");
         return false;
     }
 

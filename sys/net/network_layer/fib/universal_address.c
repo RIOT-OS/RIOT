@@ -19,10 +19,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+
+#include "log.h"
 #include "mutex.h"
 
-#define ENABLE_DEBUG (0)
-#include "debug.h"
 #include "ng_fib/ng_universal_address.h"
 
 /**
@@ -118,7 +118,7 @@ universal_address_container_t *universal_address_add(uint8_t *addr, size_t addr_
     pEntry->use_count++;
 
     if (pEntry->use_count == 1) {
-        DEBUG("[universal_address_add] universal_address_table_filled: %d\n", \
+        LOG_WARNING("[universal_address_add] universal_address_table_filled: %d\n", \
               (int)universal_address_table_filled);
         universal_address_table_filled++;
     }
@@ -130,7 +130,7 @@ universal_address_container_t *universal_address_add(uint8_t *addr, size_t addr_
 void universal_address_rem(universal_address_container_t *entry)
 {
     mutex_lock(&mtx_access);
-    DEBUG("[universal_address_rem] entry: %p\n", (void *)entry);
+    LOG_DEBUG("[universal_address_rem] entry: %p\n", (void *)entry);
 
     /* we do not delete anything on remove */
     if (entry != NULL) {
@@ -142,7 +142,7 @@ void universal_address_rem(universal_address_container_t *entry)
             }
         }
         else {
-            DEBUG("[universal_address_rem] universal_address_table_filled: %d\n", \
+            LOG_WARNING("[universal_address_rem] universal_address_table_filled: %d\n", \
                   (int)universal_address_table_filled);
         }
     }
