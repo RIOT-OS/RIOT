@@ -213,7 +213,7 @@ int _icmpv6_ping(int argc, char **argv)
 
         if (pkt == NULL) {
             puts("error: packet buffer full");
-            return 1;
+            continue;
         }
 
         _set_payload(pkt->data, payload_len);
@@ -223,7 +223,7 @@ int _icmpv6_ping(int argc, char **argv)
 
         if (pkt == NULL) {
             puts("error: packet buffer full");
-            return 1;
+            continue;
         }
 
         vtimer_now(&start);
