@@ -22,7 +22,7 @@
 
 #include "net/ng_netdev.h"
 #include "net/ng_netapi.h"
-#include "net/ng_netconf.h"
+#include "net/ng_netopt.h"
 #include "net/ng_netreg.h"
 #include "net/ng_nettype.h"
 #include "net/ng_netif.h"

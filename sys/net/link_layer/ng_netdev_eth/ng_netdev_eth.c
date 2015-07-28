@@ -56,10 +56,8 @@ static uint8_t recv_buffer[NG_ETHERNET_MAX_LEN];
 static int _send_data(ng_netdev_t *netdev, ng_pktsnip_t *pkt);
 static int _add_event_callback(ng_netdev_t *dev, ng_netdev_event_cb_t cb);
 static int _rem_event_callback(ng_netdev_t *dev, ng_netdev_event_cb_t cb);
-static int _get(ng_netdev_t *dev, ng_netconf_opt_t opt, void *value,
-                size_t max_len);
-static int _set(ng_netdev_t *dev, ng_netconf_opt_t opt, void *value,
-                size_t value_len);
+static int _get(ng_netdev_t *dev, ng_netopt_t opt, void *value, size_t max_len);
+static int _set(ng_netdev_t *dev, ng_netopt_t opt, void *value, size_t value_len);
 static void _isr_event(ng_netdev_t *dev, uint32_t event_type);
 
 /* netdev driver struct */
@@ -229,23 +227,22 @@ static inline int _get_max_pkt_sz(uint16_t *value, size_t max_len)
     return sizeof(uint16_t);
 }
 
-static inline int _get_promiscousmode(ng_netdev_eth_t *netdev, ng_netconf_enable_t *value,
+static inline int _get_promiscousmode(ng_netdev_eth_t *netdev, ng_netopt_enable_t *value,
                                       size_t max_len)
 {
-    if (max_len != sizeof(ng_netconf_enable_t)) {
+    if (max_len != sizeof(ng_netopt_enable_t)) {
         /* value buffer not big enough */
         return -EOVERFLOW;
     }
 
 
     dev_eth_t *dev = netdev->ethdev;
-    *value = (ng_netconf_enable_t)dev->driver->get_promiscous(dev);
+    *value = (ng_netopt_enable_t)dev->driver->get_promiscous(dev);
 
-    return sizeof(ng_netconf_enable_t);
+    return sizeof(ng_netopt_enable_t);
 }
 
-static int _get(ng_netdev_t *dev, ng_netconf_opt_t opt, void *value,
-                size_t max_len)
+static int _get(ng_netdev_t *dev, ng_netopt_t opt, void *value, size_t max_len)
 {
     DEBUG("ng_netdev_eth: get ");
 
@@ -255,23 +252,23 @@ static int _get(ng_netdev_t *dev, ng_netconf_opt_t opt, void *value,
     }
 
     switch (opt) {
-        case NETCONF_OPT_ADDRESS:
+        case NG_NETOPT_ADDRESS:
             DEBUG("address\n");
             return _get_addr((ng_netdev_eth_t *)dev, value, max_len);
 
-        case NETCONF_OPT_ADDR_LEN:
+        case NG_NETOPT_ADDR_LEN:
             DEBUG("address length\n");
             return _get_addr_len(value, max_len);
 
-        case NETCONF_OPT_IPV6_IID:
+        case NG_NETOPT_IPV6_IID:
             DEBUG("IPv6 IID\n");
             return _get_iid((ng_netdev_eth_t *)dev, value, max_len);
 
-        case NETCONF_OPT_MAX_PACKET_SIZE:
+        case NG_NETOPT_MAX_PACKET_SIZE:
             DEBUG("maximum packet size\n");
             return _get_max_pkt_sz(value, max_len);
 
-        case NETCONF_OPT_PROMISCUOUSMODE:
+        case NG_NETOPT_PROMISCUOUSMODE:
             DEBUG("promiscous mode\n");
             return _get_promiscousmode((ng_netdev_eth_t *)dev, value, max_len);
 
@@ -282,10 +279,10 @@ static int _get(ng_netdev_t *dev, ng_netconf_opt_t opt, void *value,
 }
 
 /* individual option getters to be called by _get() */
-static inline int _set_promiscousmode(ng_netdev_eth_t *netdev, ng_netconf_enable_t *value,
+static inline int _set_promiscousmode(ng_netdev_eth_t *netdev, ng_netopt_enable_t *value,
                                       size_t value_len)
 {
-    if (value_len != sizeof(ng_netconf_enable_t)) {
+    if (value_len != sizeof(ng_netopt_enable_t)) {
         /* value buffer not big enough */
         return -EOVERFLOW;
     }
@@ -294,11 +291,10 @@ static inline int _set_promiscousmode(ng_netdev_eth_t *netdev, ng_netconf_enable
 
     dev->driver->set_promiscous(dev, (uint8_t)*value);
 
-    return sizeof(ng_netconf_enable_t);
+    return sizeof(ng_netopt_enable_t);
 }
 
-static int _set(ng_netdev_t *dev, ng_netconf_opt_t opt, void *value,
-                size_t value_len)
+static int _set(ng_netdev_t *dev, ng_netopt_t opt, void *value, size_t value_len)
 {
     DEBUG("ng_netdev_eth: set ");
 
@@ -308,7 +304,7 @@ static int _set(ng_netdev_t *dev, ng_netconf_opt_t opt, void *value,
     }
 
     switch (opt) {
-        case NETCONF_OPT_PROMISCUOUSMODE:
+        case NG_NETOPT_PROMISCUOUSMODE:
             DEBUG("promiscous mode\n");
             return _set_promiscousmode((ng_netdev_eth_t *)dev, value, value_len);
 

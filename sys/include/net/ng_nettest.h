@@ -26,7 +26,7 @@
 
 #include "kernel_types.h"
 #include "net/ng_netapi.h"
-#include "net/ng_netconf.h"
+#include "net/ng_netopt.h"
 #include "net/ng_nettype.h"
 #include "net/ng_pkt.h"
 #include "thread.h"
@@ -105,7 +105,7 @@ typedef enum {
  * @param[in] opt   The option to register the getter for.
  * @param[in] cb    An option getter. NULL to delete.
  */
-void ng_nettest_register_get(ng_netconf_opt_t opt, ng_nettest_opt_cb_t cb);
+void ng_nettest_register_get(ng_netopt_t opt, ng_nettest_opt_cb_t cb);
 
 /**
  * @brief   Registers a setter for an option.
@@ -115,7 +115,7 @@ void ng_nettest_register_get(ng_netconf_opt_t opt, ng_nettest_opt_cb_t cb);
  * @param[in] opt   The option to register the setter for.
  * @param[in] cb    An option setter. NULL to delete.
  */
-void ng_nettest_register_set(ng_netconf_opt_t opt, ng_nettest_opt_cb_t cb);
+void ng_nettest_register_set(ng_netopt_t opt, ng_nettest_opt_cb_t cb);
 
 /**
  * @brief   Test @ref NG_NETAPI_MSG_TYPE_SND command to @p pid.
@@ -223,7 +223,7 @@ ng_nettest_res_t ng_nettest_receive(kernel_pid_t pid, ng_pktsnip_t *in,
  *
  * @return  @see ng_nettest_res_t
  */
-ng_nettest_res_t ng_nettest_get(kernel_pid_t pid, ng_netconf_opt_t opt,
+ng_nettest_res_t ng_nettest_get(kernel_pid_t pid, ng_netopt_t opt,
                                 uint16_t context, void *data, size_t data_len,
                                 void *exp_data, int exp_res);
 
@@ -242,7 +242,7 @@ ng_nettest_res_t ng_nettest_get(kernel_pid_t pid, ng_netconf_opt_t opt,
  *
  * @return  @see ng_nettest_res_t
  */
-ng_nettest_res_t ng_nettest_set(kernel_pid_t pid, ng_netconf_opt_t opt,
+ng_nettest_res_t ng_nettest_set(kernel_pid_t pid, ng_netopt_t opt,
                                 uint16_t context, void *data, size_t data_len,
                                 int exp_res);
 
