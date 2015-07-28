@@ -218,7 +218,7 @@ static void _send(ng_pktsnip_t *pkt)
             ng_pktbuf_release(pkt2);
             return;
         }
-        dispatch_len += 1;
+        dispatch_len++;
     }
 #else
     /* suppress clang-analyzer report about iface being not read */
@@ -229,7 +229,7 @@ static void _send(ng_pktsnip_t *pkt)
         ng_pktbuf_release(pkt2);
         return;
     }
-    dispatch_len += 1;
+    dispatch_len++;
 #endif
     datagram_size = ng_pkt_len(pkt2->next);
 
@@ -238,7 +238,7 @@ static void _send(ng_pktsnip_t *pkt)
 
     /* IP should not send anything here if it is not a 6LoWPAN interface,
      * so we don't need to check for NULL pointers */
-    if ((datagram_size + dispatch_len) <= iface->max_frag_size) {
+    if (datagram_size <= iface->max_frag_size) {
         DEBUG("6lo: Send SND command for %p to %" PRIu16 "\n",
               (void *)pkt2, hdr->if_pid);
         ng_netapi_send(hdr->if_pid, pkt2);
@@ -248,14 +248,14 @@ static void _send(ng_pktsnip_t *pkt)
 #ifdef MODULE_NG_SIXLOWPAN_FRAG
     else {
         DEBUG("6lo: Send fragmented (%u > %" PRIu16 ")\n",
-              (unsigned int)datagram_size + dispatch_len, iface->max_frag_size);
-        ng_sixlowpan_frag_send(hdr->if_pid, pkt2, datagram_size + dispatch_len,
-                               datagram_size);
+              (unsigned int)datagram_size, iface->max_frag_size);
+        ng_sixlowpan_frag_send(hdr->if_pid, pkt2, datagram_size,
+                               datagram_size - dispatch_len);
     }
 #else
     (void)datagram_size;
     DEBUG("6lo: packet too big (%u> %" PRIu16 ")\n",
-          (unsigned int)(datagram_size + dispatch_len), iface->max_frag_size);
+          (unsigned int)datagram_size, iface->max_frag_size);
 #endif
 }
 
