@@ -70,10 +70,9 @@ static inline int _snd_rcv_dispatch(ng_nettype_t type, uint32_t demux_ctx,
                                     uint16_t cmd, ng_pktsnip_t *pkt)
 {
     int numof = ng_netreg_num(type, demux_ctx);
-    ng_netreg_entry_t *sendto;
 
     if (numof != 0) {
-        sendto = ng_netreg_lookup(type, demux_ctx);
+        ng_netreg_entry_t *sendto = ng_netreg_lookup(type, demux_ctx);
 
         ng_pktbuf_hold(pkt, numof - 1);
 
