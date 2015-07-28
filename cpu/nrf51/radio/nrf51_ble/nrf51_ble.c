@@ -7,11 +7,11 @@
  */
 
 /**
- * @ingroup     cpu_nrf51822_blemin
+ * @ingroup     cpu_nrf51_ble
  * @{
  *
  * @file
- * @brief       Implementation of the blemin NRF51822 minimal BLE radio driver
+ * @brief       Implementation of the NRF51822 minimal BLE radio driver
  *
  * @author      Jan Wagner <mail@jwagner.eu>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
@@ -26,12 +26,11 @@
 #include "kernel.h"
 #include "periph_conf.h"
 #include "periph/cpuid.h"
-#include "net/ng_ble.h"
 #include "net/gnrc.h"
 #include "hwtimer.h"
+#include "net/ble_ll.h"
 
-#define ENABLE_DEBUG		(1)
-#define ENABLE_BLE_PKT_DEBUG	(0)
+#define ENABLE_DEBUG		(0)
 #include "debug.h"
 
 /**
@@ -74,27 +73,6 @@ typedef enum {
 } state_t;
 
 /**
- * @brief   Possible BLE link layer states
- */
-typedef enum {
-    LL_STANDBY,		    /**< link layer is in standby mode */
-    LL_ADVERTISING,         /**< link layer is in advertising mode */
-    LL_CONNECTION,          /**< link layer is in connection mode */
-    LL_INITIATING,          /**< link layer is in initiating mode */
-    LL_SCANNING,            /**< link layer is in scanning mode */
-} ll_state_t;
-
-/**
- * @brief   In-memory structure of a blemin radio packet
- */
-typedef struct __attribute__((packed))
-{
-    PDU_header header;                  /**< BLE pdu header */
-    uint8_t payload[CONF_PAYLOAD_LEN];  /**< actual payload */
-}
-ble_pkt_t;
-
-/**
  * @brief   Pointer to the MAC layer event callback
  */
 static gnrc_netdev_t *_netdev = NULL;
@@ -103,41 +81,6 @@ static gnrc_netdev_t *_netdev = NULL;
  * @brief   Current state of the device
  */
 static volatile state_t _state = STATE_OFF;
-
-/**
- * @brief   Current state of the BLE Link Layer
- */
-static volatile ll_state_t _ll_state = LL_ADVERTISING;
-
-/**
- * @brief   BLE Address of the device
- */
-static uint32_t _access_addr = BLE_DEFAULT_ACCESS_ADDR;
-
-/**
- * @brief   BLE Advertising address
- */
-static uint8_t _adv_addr[BLE_ADDR_LEN + 1];
-
-/**
- * @brief   BLE Advertising interval (ms)
- */
-static uint32_t _advertising_interval = 20;
-
-/**
- * @brief   BLE Advertising delay (ms)
- */
-static uint8_t _advertising_delay = 10;
-
-/**
- * @brief   BLE Advertising packet buffer
- */
-static ble_pkt_t _advertising_pkt;
-
-/**
- * @brief   BLE Scan Response packet buffer
- */
-static ble_pkt_t _scanresponse_pkt;
 
 /**
  * @brief   Hold the state before sending to return to it afterwards
@@ -150,14 +93,20 @@ static state_t _tx_prestate;
 static ble_pkt_t _rx_buf[2];
 
 /**
+ * @brief   BLE Address of the device
+ */
+static uint32_t _access_addr = BLE_DEFAULT_ACCESS_ADDR;
+
+/**
  * @brief   Pointer to the free receive buffer
  */
 static volatile int _rx_next = 0;
 
+
 /* Switch the BLE radio state to idle */
 static void _switch_to_idle(void)
 {
-    // DEBUG("blemin: switch_to_idle\n");
+    // DEBUG("nrf51_ble: switch_to_idle\n");
 
     /* switch to idle state */
     NRF_RADIO->EVENTS_DISABLED = 0;
@@ -171,7 +120,7 @@ static void _switch_to_idle(void)
 /* Switch the BLE radio state to receive */
 static void _switch_to_rx(void)
 {
-    // DEBUG("blemin: switch_to_rx\n");
+    // DEBUG("nrf51_ble: switch_to_rx\n");
 
     /* set pointer to receive buffer */
     NRF_RADIO->PACKETPTR = (uint32_t) & (_rx_buf[_rx_next]);
@@ -287,7 +236,6 @@ int _set_access_address(uint8_t *val, size_t len)
     NRF_RADIO->PREFIX0 = ((_access_addr >> 24) & 0x000000FF);
     NRF_RADIO->BASE0   = ((_access_addr << 8) & 0xFFFFFF00);
 
-    /* restore old state */
     if (is_rx) {
         _switch_to_rx();
     }
@@ -295,43 +243,7 @@ int _set_access_address(uint8_t *val, size_t len)
     return BLE_ACCESS_ADDR_LEN;
 }
 
-/* Get the BLE Advertising Address of the interface */
-int _get_adv_address(uint8_t *val, size_t max_len)
-{
-    /* check parameters */
-    if (max_len < BLE_ADDR_LEN) {
-        return -EOVERFLOW;
-    }
 
-    /* get address */
-    val[0] = _adv_addr[0];
-    val[1] = _adv_addr[1];
-    val[2] = _adv_addr[2];
-    val[3] = _adv_addr[3];
-    val[4] = _adv_addr[4];
-    val[5] = _adv_addr[5];
-
-    return BLE_ADDR_LEN;
-}
-
-/* Set the BLE Advertising Address of the interface */
-int _set_adv_address(uint8_t *val, size_t len)
-{
-    /* check parameters */
-    if (len != BLE_ADDR_LEN) {
-        return -EINVAL;
-    }
-
-    /* set address */
-    _adv_addr[0] = val[5];
-    _adv_addr[1] = val[4];
-    _adv_addr[2] = val[3];
-    _adv_addr[3] = val[2];
-    _adv_addr[4] = val[1];
-    _adv_addr[5] = val[0];
-
-    return BLE_ADDR_LEN;
-}
 
 /* Get the current BLE channel number of the interface */
 int _get_channel(uint8_t *val, size_t max_len)
@@ -447,7 +359,7 @@ void isr_radio(void)
 
         /* did we just send or receive something? */
         if (_state == STATE_RX) {
-            // DEBUG("blemin: isr_radio: STATE_RX\n");
+            // DEBUG("nrf51_ble: isr_radio: STATE_RX\n");
 
             /* drop packet on invalid CRC */
             if (NRF_RADIO->CRCSTATUS != 1) {
@@ -464,7 +376,7 @@ void isr_radio(void)
             NRF_RADIO->TASKS_START = 1;
         }
         else if (_state == STATE_TX) {
-            // DEBUG("blemin: isr_radio: STATE_TX\n");
+            // DEBUG("nrf51_ble: isr_radio: STATE_TX\n");
 
             /* disable radio again */
             _switch_to_idle();
@@ -481,94 +393,8 @@ void isr_radio(void)
     }
 }
 
-/* Prepare buffer for BLE Advertising packets */
-void _prepare_advertising_pkt(void)
-{
-    DEBUG("blemin: _prepare_advertising_pkt\n");
-
-    _advertising_pkt.header.pdu_type = BLE_DEFAULT_ADV_PDU_TYPE;
-    _advertising_pkt.header.tx_add = BLE_DEFAULT_ADV_TXADD;
-    _advertising_pkt.header.rx_add = BLE_DEFAULT_ADV_RXADD;
-    _advertising_pkt.header.length = (BLE_ADDR_LEN + BLE_DEFAULT_ADV_DATA_LEN);
-    _advertising_pkt.header.RFU1 = BLE_DEFAULT_RFU;
-    _advertising_pkt.header.RFU2 = BLE_DEFAULT_RFU;
-
-    memcpy(_advertising_pkt.payload, BLE_DEFAULT_ADV_ADDRESS, BLE_ADDR_LEN);
-    memcpy((_advertising_pkt.payload + BLE_ADDR_LEN), BLE_DEFAULT_ADV_DATA, BLE_DEFAULT_ADV_DATA_LEN);
-}
-
-/* Send BLE Advertising packet from corresponding packet buffer */
-void _send_advertising_pkt(void *channel)
-{
-    DEBUG("blemin: _send_advertising_pkt (channel: %u)\n", (unsigned int)channel);
-
-    if (_ll_state == LL_ADVERTISING) {
-        _tx_prestate = _state;
-
-        if (_tx_prestate == STATE_RX) {
-            _switch_to_idle();
-        }
-
-        /* set packet pointer to TX buffer and write destination address */
-        NRF_RADIO->PACKETPTR = (uint32_t)(&_advertising_pkt);
-
-        /* start transmission */
-        _state = STATE_TX;
-        NRF_RADIO->TASKS_TXEN = 1;
-    }
-}
-
-/* Callback function triggered by (self repeating) hwtimer event based on BLE Advertising Interval value */
-void _call_advertising_event(void *ptr)
-{
-    // DEBUG("blemin: _call_advertising_event\n");
-
-    if (_ll_state == LL_ADVERTISING) {
-        _send_advertising_pkt((void *) 37);
-
-        hwtimer_set(HWTIMER_TICKS((_advertising_interval + _advertising_delay) * 1000UL),
-                    _call_advertising_event, (void *) NULL);
-    }
-}
-
-/* Prepare buffer for BLE Scan Response packets */
-void _prepare_scanresponse_pkt(void)
-{
-    DEBUG("blemin: _prepare_scanresponse_pkt\n");
-
-    _scanresponse_pkt.header.pdu_type = SCAN_RSP_TYPE;
-    _scanresponse_pkt.header.tx_add = BLE_DEFAULT_SCAN_RSP_TXADD;
-    _scanresponse_pkt.header.rx_add = BLE_DEFAULT_SCAN_RSP_RXADD;
-    _scanresponse_pkt.header.length = BLE_ADDR_LEN;
-    _scanresponse_pkt.header.RFU1 = BLE_DEFAULT_RFU;
-    _scanresponse_pkt.header.RFU2 = BLE_DEFAULT_RFU;
-
-    memcpy(_scanresponse_pkt.payload, BLE_DEFAULT_ADV_ADDRESS, BLE_ADDR_LEN);
-}
-
-/* Send BLE Scan Response packet from corresponding packet buffer */
-void _send_scanresponse_pkt(void)
-{
-    DEBUG("blemin: _send_scanresponse_pkt\n");
-
-    if (_ll_state == LL_ADVERTISING) {
-        _tx_prestate = _state;
-
-        if (_tx_prestate == STATE_RX) {
-            _switch_to_idle();
-        }
-
-        /* set packet pointer to TX buffer and write destination address */
-        NRF_RADIO->PACKETPTR = (uint32_t)(&_scanresponse_pkt);
-
-        /* start transmission */
-        _state = STATE_TX;
-        NRF_RADIO->TASKS_TXEN = 1;
-    }
-}
-
 /* Initialize BLE interface */
-int blemin_init(gnrc_netdev_t *dev)
+int nrf51_ble_init(gnrc_netdev_t *dev)
 {
     /* check given device descriptor */
     if (dev == NULL) {
@@ -576,7 +402,7 @@ int blemin_init(gnrc_netdev_t *dev)
     }
 
     /* set initial values */
-    dev->driver = &blemin_driver;
+    dev->driver = &ble_driver;
     dev->event_cb = NULL;
     dev->mac_pid = KERNEL_PID_UNDEF;
     /* keep a pointer for future reference */
@@ -624,13 +450,6 @@ int blemin_init(gnrc_netdev_t *dev)
     NRF_RADIO->EVENTS_END = 0;
     NRF_RADIO->INTENSET = (1 << RADIO_INTENSET_END_Pos);
 
-    /* if BLE Link State is ADVERTISING prepare and start sending packets */
-    if (_ll_state == LL_ADVERTISING) {
-        _prepare_advertising_pkt();
-        _prepare_scanresponse_pkt();
-        _call_advertising_event(NULL);
-    }
-
     /* put device in receive mode */
     _switch_to_rx();
 
@@ -640,59 +459,26 @@ int blemin_init(gnrc_netdev_t *dev)
 /* BLE interface low-level receive function */
 static void _receive_data(void)
 {
-    // DEBUG("blemin: receive_data\n");
+    // DEBUG("nrf51_ble: receive_data\n");
 
     ble_pkt_t *data;
     gnrc_pktsnip_t *pkt;
 
     /* only read data if we have somewhere to send it to */
     if (_netdev->event_cb == NULL) {
-        DEBUG("blemin: receive_data (return)\n");
+        DEBUG("nrf51_ble: receive_data (return)\n");
         return;
     }
 
     /* get pointer to RX data buffer */
     data = &(_rx_buf[_rx_next ^ 1]);
 
-    if (_ll_state == LL_ADVERTISING) {
-        /* Send respone to received BLE SCAN_REQ packet */
-        if (data->header.pdu_type == SCAN_REQ_TYPE) {
-            DEBUG("blemin: receive_data -> SCAN_REQ received\n");
-            _send_scanresponse_pkt();
-        }
-
-        /* Send respone to received BLE CONNECT_REQ packet */
-        else if (data->header.pdu_type == CONNECT_REQ_TYPE) {
-            DEBUG("blemin: receive_data -> CONNECT_REQ received\n");
-        }
-    }
-
-#if ENABLE_BLE_PKT_DEBUG
-    int i;
-    static const char *pdu_type_name[] = {
-        "ADV_IND", "ADV_DIRECT_IND", "ADV_NONCONN_IND", "SCAN_REQ", "SCAN_RSP",
-        "CONNECT_REQ", "ADV_SCAN_IND"
-    };
-
-    printf("Type: %s  Len: %u  Access Address: %08x  %s Address: %02x:%02x:%02x:%02x:%02x:%02x\n",
-           pdu_type_name[data->header.pdu_type], data->header.length, (unsigned int)_access_addr,
-           (data->header.pdu_type == SCAN_REQ_TYPE) ? "Scanning" : "Advertising",
-           data->payload[5], data->payload[4], data->payload[3], data->payload[2], data->payload[1],
-           data->payload[0]);
-
-    for (i = 0; i < data->header.length; i++) {
-        printf("%02x ", data->payload[i]);
-    }
-
-    printf("\n");
-#endif
-
     /* allocate and fill payload */
     pkt = gnrc_pktbuf_add(NULL, data->payload, data->header.length, GNRC_NETTYPE_UNDEF);
     pkt = gnrc_pktbuf_add(pkt, data, BLE_PDU_HDR_LEN, GNRC_NETTYPE_UNDEF);
 
     if (pkt == NULL) {
-        DEBUG("blemin: Error allocating packet payload on RX\n");
+        DEBUG("nrf51_ble: Error allocating packet payload on RX\n");
         gnrc_pktbuf_release(pkt);
         return;
     }
@@ -704,17 +490,16 @@ static void _receive_data(void)
 /* BLE interface low-level send function */
 int _send(gnrc_netdev_t *dev, gnrc_pktsnip_t *pkt)
 {
-    // DEBUG("blemin: send\n");
+    // DEBUG("nrf51_ble: send\n");
 
     (void)dev;
     size_t size;
-    gnrc_pktsnip_t *pkt_payload;
 
-    uint8_t payload[CONF_PAYLOAD_LEN];  /**< actual payload */
+    uint8_t payload[CONF_PAYLOAD_LEN]; /**< actual payload */
 
     /* check packet */
     if (pkt == NULL) {
-        DEBUG("blemin: Error sending packet: packet incomplete\n");
+        DEBUG("nrf51_ble: Error sending packet: packet incomplete\n");
         return -ENOMSG;
     }
 
@@ -722,57 +507,15 @@ int _send(gnrc_netdev_t *dev, gnrc_pktsnip_t *pkt)
     size = gnrc_pkt_len(pkt);
 
     if (size > CONF_PAYLOAD_LEN) {
+        DEBUG("nrf51_ble: Error sending packet: invalid BLE pdu header length\n");
         gnrc_pktbuf_release(pkt);
-        DEBUG("blemin: Error sending packet: invalid BLE pdu header length\n");
         return -EOVERFLOW;
     }
 
     /* wait for any ongoing transmission to finish */
     while (_state == STATE_TX);
 
-    pkt_payload = pkt;
-
-    /* write BLE header data into TX buffer */
-    memcpy(payload, pkt_payload->data, BLE_PDU_HDR_LEN);
-    memcpy((payload + BLE_PDU_HDR_LEN), _adv_addr, BLE_ADDR_LEN);
-
-    size = 0;
-
-    /* write optional payload data into TX buffer */
-    if (pkt->next != NULL) {
-        size = gnrc_pkt_len(pkt->next);
-
-        if (size > CONF_PAYLOAD_LEN) {
-            gnrc_pktbuf_release(pkt);
-            DEBUG("blemin: Error sending packet: payload to large\n");
-            return -EOVERFLOW;
-        }
-
-        pkt_payload = pkt->next;
-        memcpy((void *)(payload + BLE_PDU_HDR_LEN + BLE_ADDR_LEN), pkt_payload->data, size);
-    }
-
-#if ENABLE_BLE_PKT_DEBUG
-    int i;
-    uint8_t pdu_type = payload[0] & 0x0f;
-    static const char *pdu_type_name[] = {
-        "ADV_IND", "ADV_DIRECT_IND", "ADV_NONCONN_IND", "SCAN_REQ", "SCAN_RSP",
-        "CONNECT_REQ", "ADV_SCAN_IND"
-    };
-
-    printf("Type: %s  Len: %u  Access Address: %08x  %s Address: %02x:%02x:%02x:%02x:%02x:%02x\n",
-           pdu_type_name[pdu_type], (payload[1] & 0x3f), (unsigned int)_access_addr,
-           (pdu_type == SCAN_REQ_TYPE) ? "Scanning" : "Advertising",
-           _adv_addr[5], _adv_addr[4], _adv_addr[3],
-           _adv_addr[2], _adv_addr[1], _adv_addr[0]);
-
-    /* output TX buffer bytes */
-    for (i = 0; i < (BLE_PDU_HDR_LEN + BLE_ADDR_LEN + size); i++) {
-        printf("%02x ", payload[i]);
-    }
-
-    printf("\n");
-#endif
+    memcpy(payload, pkt->data, pkt->size);
 
     /* save old state and switch to idle if applicable */
     _tx_prestate = _state;
@@ -825,9 +568,6 @@ int _get(gnrc_netdev_t *dev, netopt_t opt,
         case NETOPT_BLE_ACCESS_ADDRESS:
             return _get_access_address(value, max_len);
 
-        case NETOPT_BLE_ADV_ADDRESS:
-            return _get_adv_address(value, max_len);
-
         case NETOPT_CHANNEL:
             return _get_channel(value, max_len);
 
@@ -852,9 +592,6 @@ int _set(gnrc_netdev_t *dev, netopt_t opt,
         case NETOPT_BLE_ACCESS_ADDRESS:
             return _set_access_address(value, value_len);
 
-        case NETOPT_BLE_ADV_ADDRESS:
-            return _set_adv_address(value, value_len);
-
         case NETOPT_CHANNEL:
             return _set_channel(value, value_len);
 
@@ -874,7 +611,7 @@ void _isr_event(gnrc_netdev_t *dev, uint32_t event_type)
 {
     switch (event_type) {
         case ISR_EVENT_RX_DONE:
-            // DEBUG("blemin; isr_event -> ISR_EVENT_RX_DONE\n");
+            // DEBUG("nrf51_ble; isr_event -> ISR_EVENT_RX_DONE\n");
             _receive_data();
             break;
 

@@ -24,31 +24,15 @@
 #include "shell.h"
 #include "posix_io.h"
 #include "board_uart0.h"
-#include "net/ng_ble.h"
 #include "net/gnrc.h"
 #include "net/gnrc/nomac.h"
 #include "net/gnrc/pktdump.h"
+#include "net/ble_ll.h"
 
 #define SHELL_BUFSIZE       (UART0_BUFSIZE)
 
+//static char dump_stack[KERNEL_CONF_STACKSIZE_MAIN];
 static char nomac_stack[THREAD_STACKSIZE_DEFAULT];
-
-int shell_read(void)
-{
-    char c;
-    int result = posix_read(uart0_handler_pid, &c, 1);
-
-    if (result != 1) {
-        return -1;
-    }
-
-    return (unsigned char) c;
-}
-
-void shell_put(int c)
-{
-    putchar(c);
-}
 
 int main(void)
 {
@@ -60,9 +44,9 @@ int main(void)
 
     /* initialize network device */
     /* interface should have already been initialized by auto-init module */
-    /* blemin_init(&dev); */
 
-    gnrc_nomac_init(nomac_stack, sizeof(nomac_stack), 5, "nomac", &dev);
+    nrf51_ble_init(&dev);
+    ble_ll_init(nomac_stack, sizeof(nomac_stack), 5, "ble_ll", &dev);
 
     /* initialize and run the shell */
     board_uart0_init();
