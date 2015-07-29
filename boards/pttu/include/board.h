@@ -50,11 +50,6 @@ void init_clks2(void);
  */
 void bl_init_clks(void);
 
-/**
- * @brief   Define the type for the radio packet length for the transceiver
- */
-typedef uint8_t radio_packet_length_t;
-
 #ifdef __cplusplus
 }
 #endif

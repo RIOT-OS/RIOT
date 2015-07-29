@@ -33,8 +33,6 @@ extern "C" {
 #define IBIAS       0x1f
 #define FTUNE       0x7
 
-typedef uint8_t radio_packet_length_t;
-
 #ifdef __cplusplus
 }
 #endif

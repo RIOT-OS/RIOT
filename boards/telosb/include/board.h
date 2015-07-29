@@ -67,7 +67,5 @@ extern "C" {
 
 #include <stdint.h>
 
-typedef uint8_t radio_packet_length_t;
-
 /** @} */
 #endif /*  TELOSB_BOARD_H_ */

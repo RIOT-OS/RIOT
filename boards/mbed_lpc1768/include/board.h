@@ -89,11 +89,6 @@ extern "C" {
 /** @} */
 
 /**
- * @brief define radio packet length
- */
-typedef uint8_t radio_packet_length_t;
-
-/**
  * @brief Initialize board specific hardware, include clocks, LEDs and stdio
  */
 void board_init(void);
