@@ -26,11 +26,6 @@
 #include "ng_fib/ng_universal_address.h"
 
 /**
- * @brief Maximum number of entries handled
- */
-#define UNIVERSAL_ADDRESS_MAX_ENTRIES (40)
-
-/**
  * @brief counter indicating the number of entries allocated
  */
 static size_t universal_address_table_filled = 0;

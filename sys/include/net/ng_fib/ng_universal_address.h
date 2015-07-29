@@ -21,14 +21,14 @@
 #ifndef UNIVERSAL_ADDRESS_H_
 #define UNIVERSAL_ADDRESS_H_
 
+#include "ng_fib_config.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#define UNIVERSAL_ADDRESS_SIZE (16)         /**< size of the used addresses in bytes        */
-
 /**
- * @brief The container descriptor used to identify a universal address entry
+ * @brief The container descriptor used to identify an universal address entry
  */
 typedef struct universal_address_container_t {
     uint8_t use_count;                       /**< The number of entries link here */
