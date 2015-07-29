@@ -107,7 +107,7 @@ static void _receive(ng_pktsnip_t *pkt)
         return;
     }
     pkt = udp;
-    udp = ng_pktbuf_add(pkt, pkt->data, sizeof(ng_udp_hdr_t), NG_NETTYPE_UDP);
+    udp = ng_pktbuf_mark(pkt, sizeof(ng_udp_hdr_t), NG_NETTYPE_UDP);
     if (udp == NULL) {
         DEBUG("udp: error marking UDP header, dropping packet\n");
         ng_pktbuf_release(pkt);

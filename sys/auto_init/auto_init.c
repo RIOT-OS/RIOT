@@ -99,6 +99,10 @@
 #include "l2_ping.h"
 #endif
 
+#ifdef MODULE_NG_PKTBUF
+#include "net/ng_pktbuf.h"
+#endif
+
 #ifdef MODULE_NG_PKTDUMP
 #include "net/ng_pktdump.h"
 #endif
@@ -304,6 +308,10 @@ void auto_init(void)
 #ifdef MODULE_TCP
     DEBUG("Auto init transport layer module: [tcp].\n");
     tcp_init_transport_layer();
+#endif
+#ifdef MODULE_NG_PKTBUF
+    DEBUG("Auto init ng_pktbuf module\n");
+    ng_pktbuf_init();
 #endif
 #ifdef MODULE_NG_PKTDUMP
     DEBUG("Auto init ng_pktdump module.\n");

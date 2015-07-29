@@ -218,6 +218,16 @@ ifneq (,$(filter ng_pktdump,$(USEMODULE)))
   USEMODULE += od
 endif
 
+ifneq (,$(filter ng_pktbuf, $(USEMODULE)))
+  ifeq (,$(filter ng_pktbuf_%, $(USEMODULE)))
+    USEMODULE += ng_pktbuf_static
+  endif
+endif
+
+ifneq (,$(filter ng_pktbuf_%, $(USEMODULE)))
+  USEMODULE += ng_pktbuf # make MODULE_NG_PKTBUF macro available for all implementations
+endif
+
 ifneq (,$(filter ng_slip,$(USEMODULE)))
   USEMODULE += ng_netbase
 endif

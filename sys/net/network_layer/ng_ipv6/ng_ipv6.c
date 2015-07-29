@@ -629,8 +629,7 @@ static void _receive(ng_pktsnip_t *pkt)
 
         pkt = ipv6;     /* reset pkt from temporary variable */
 
-        ipv6 = ng_pktbuf_add(pkt, pkt->data, sizeof(ng_ipv6_hdr_t),
-                             NG_NETTYPE_IPV6);
+        ipv6 = ng_pktbuf_mark(pkt, sizeof(ng_ipv6_hdr_t), NG_NETTYPE_IPV6);
 
         if (ipv6 == NULL) {
             DEBUG("ipv6: error marking IPv6 header, dropping packet\n");

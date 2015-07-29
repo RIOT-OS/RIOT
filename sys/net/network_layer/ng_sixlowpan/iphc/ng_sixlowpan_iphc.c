@@ -369,7 +369,7 @@ bool ng_sixlowpan_iphc_decode(ng_pktsnip_t *pkt)
     /* TODO: add next header decoding */
 
     /* remove 6LoWPAN dispatch */
-    payload = ng_pktbuf_add(pkt, pkt->data, payload_offset, NG_NETTYPE_SIXLOWPAN);
+    payload = ng_pktbuf_mark(pkt, payload_offset, NG_NETTYPE_SIXLOWPAN);
     pkt = ng_pktbuf_remove_snip(pkt, payload);
 
     /* set IPv6 header payload length field to the length of whatever is left
