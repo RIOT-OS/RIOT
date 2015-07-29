@@ -58,6 +58,9 @@ endif
 ifneq (,$(filter log_%,$(USEMODULE)))
     DIRS += log
 endif
+ifneq (,$(filter vtimer,$(USEMODULE)))
+    DIRS += compat/vtimer
+endif
 ifneq (,$(filter cpp11-compat,$(USEMODULE)))
     DIRS += cpp11-compat
 endif
