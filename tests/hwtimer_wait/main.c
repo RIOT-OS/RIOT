@@ -29,7 +29,7 @@ int main(void)
     puts("This is a regression test for a race condition in hwtimer_wait.");
     puts("When the race condition is hit, the timer will wait for a very very long time.");
 
-    long iterations = 10000;
+    long iterations = 1000;
     long start_duration = (HWTIMER_SPIN_BARRIER + 1) << 5;
     long duration = iterations * start_duration * 2L;
 
