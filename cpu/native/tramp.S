@@ -21,7 +21,7 @@ __native_sig_leave_tramp:
     call _swapcontext
     addl $8, %esp
 
-    call _eINT
+    call _enableIRQ
 
     movl $0x0, __native_in_isr
     popal
@@ -53,7 +53,7 @@ _native_sig_leave_tramp:
     bl      swapcontext
 
     /* reeanble interrupts */
-    bl      eINT
+    bl      enableIRQ
 
     /* _native_in_isr = 0 */
     eor     r0, r0, r0
@@ -78,7 +78,7 @@ _native_sig_leave_tramp:
     call swapcontext
     addl $8, %esp
 
-    call eINT
+    call enableIRQ
 
     movl $0x0, _native_in_isr
     popal
