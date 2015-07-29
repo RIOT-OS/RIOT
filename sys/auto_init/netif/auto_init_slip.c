@@ -38,7 +38,7 @@ static ng_slip_dev_t slip_devs[SLIP_NUM];
  * @{
  */
 #define SLIP_STACKSIZE          (KERNEL_CONF_STACKSIZE_DEFAULT)
-#define SLIP_PRIO               (PRIORITY_MAIN - 3)
+#define SLIP_PRIO               (PRIORITY_MAIN - 4)
 
 /**
  * @brief   Stacks for the MAC layer threads

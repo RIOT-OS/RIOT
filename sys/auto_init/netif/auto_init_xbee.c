@@ -38,7 +38,7 @@ static xbee_t xbee_devs[XBEE_NUM];
  * @{
  */
 #define XBEE_MAC_STACKSIZE           (THREAD_STACKSIZE_DEFAULT)
-#define XBEE_MAC_PRIO                (THREAD_PRIORITY_MAIN - 3)
+#define XBEE_MAC_PRIO                (THREAD_PRIORITY_MAIN - 4)
 
 /**
  * @brief   Stacks for the MAC layer threads
