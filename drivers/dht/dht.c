@@ -23,7 +23,7 @@
 
 #include <stdint.h>
 
-#include "hwtimer.h"
+#include "xtimer.h"
 #include "timex.h"
 #include "periph/gpio.h"
 
@@ -79,9 +79,9 @@ static void dht_read_data(gpio_t dev, uint32_t *data, uint8_t *checksum)
 {
     /* send init signal to device */
     gpio_clear(dev);
-    hwtimer_wait(HWTIMER_TICKS(20 * MS_IN_USEC));
+    xtimer_usleep(20 * MS_IN_USEC);
     gpio_set(dev);
-    hwtimer_wait(HWTIMER_TICKS(40));
+    xtimer_usleep(40);
 
     /* sync on device */
     gpio_init(dev, GPIO_DIR_IN, GPIO_PULLUP);
@@ -101,14 +101,14 @@ static void dht_read_data(gpio_t dev, uint32_t *data, uint8_t *checksum)
                            we must not shift the last bit */
         /* wait for start of bit */
         while (!gpio_read(dev)) ;
-        unsigned long start = hwtimer_now();
+        unsigned long start = xtimer_now();
         /* wait for end of bit */
         while (gpio_read(dev)) ;
         /* calculate bit length (long 1, short 0) */
-        unsigned long stop = hwtimer_now();
+        unsigned long stop = xtimer_now();
         /* compensate for overflow if needed */
         if (stop < start) {
-            stop = HWTIMER_MAXTICKS - stop;
+            stop = UINT32_MAX - stop;
             start = 0;
         }
         if ((stop - start) > 40) {
@@ -143,7 +143,7 @@ int dht_init(dht_t *dev, dht_type_t type, gpio_t gpio)
     }
     gpio_set(gpio);
 
-    hwtimer_wait(HWTIMER_TICKS(2000 * MS_IN_USEC));
+    xtimer_usleep(2000 * MS_IN_USEC);
 
     DEBUG("dht_init: success\n");
     return 0;

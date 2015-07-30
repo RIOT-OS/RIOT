@@ -341,3 +341,7 @@ endif
 ifneq (,$(filter srf02,$(USEMODULE)))
   USEMODULE += xtimer
 endif
+
+ifneq (,$(filter dht,$(USEMODULE)))
+    USEMODULE += xtimer
+endif
