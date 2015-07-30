@@ -328,14 +328,14 @@ ng_ipv6_addr_t *ng_ipv6_netif_find_addr(kernel_pid_t pid, const ng_ipv6_addr_t *
 }
 
 static uint8_t _find_by_prefix_unsafe(ng_ipv6_addr_t **res, ng_ipv6_netif_t *iface,
-                                      const ng_ipv6_addr_t *addr, bool only_unicast)
+                                      const ng_ipv6_addr_t *addr, bool src_search)
 {
     uint8_t best_match = 0;
 
     for (int i = 0; i < NG_IPV6_NETIF_ADDR_NUMOF; i++) {
         uint8_t match;
 
-        if ((only_unicast &&
+        if ((src_search &&
              ng_ipv6_netif_addr_is_non_unicast(&(iface->addrs[i].addr))) ||
             ng_ipv6_addr_is_unspecified(&(iface->addrs[i].addr))) {
             continue;
@@ -343,7 +343,7 @@ static uint8_t _find_by_prefix_unsafe(ng_ipv6_addr_t **res, ng_ipv6_netif_t *ifa
 
         match = ng_ipv6_addr_match_prefix(&(iface->addrs[i].addr), addr);
 
-        if (only_unicast && !ng_ipv6_addr_is_multicast(addr) &&
+        if (!src_search && !ng_ipv6_addr_is_multicast(addr) &&
             (match < iface->addrs[i].prefix_len)) {
             /* match but not of same subnet */
             continue;
@@ -366,14 +366,14 @@ static uint8_t _find_by_prefix_unsafe(ng_ipv6_addr_t **res, ng_ipv6_netif_t *ifa
         DEBUG("%s by %" PRIu8 " bits (used as source address = %s)\n",
               ng_ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)),
               best_match,
-              (only_unicast) ? "true" : "false");
+              (src_search) ? "true" : "false");
     }
     else {
         DEBUG("ipv6 netif: Did not found any address on interface %" PRIkernel_pid
               " matching %s (used as source address = %s)\n",
               iface->pid,
               ng_ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)),
-              (only_unicast) ? "true" : "false");
+              (src_search) ? "true" : "false");
     }
 #endif
 
@@ -424,14 +424,14 @@ kernel_pid_t ng_ipv6_netif_find_by_prefix(ng_ipv6_addr_t **out, const ng_ipv6_ad
 }
 
 static ng_ipv6_addr_t *_match_prefix(kernel_pid_t pid, const ng_ipv6_addr_t *addr,
-                                     bool only_unicast)
+                                     bool src_search)
 {
     ng_ipv6_addr_t *res = NULL;
     ng_ipv6_netif_t *iface = ng_ipv6_netif_get(pid);
 
     mutex_lock(&(iface->mutex));
 
-    if (_find_by_prefix_unsafe(&res, iface, addr, only_unicast) > 0) {
+    if (_find_by_prefix_unsafe(&res, iface, addr, src_search) > 0) {
         mutex_unlock(&(iface->mutex));
         return res;
     }

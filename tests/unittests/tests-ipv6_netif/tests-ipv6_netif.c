@@ -462,6 +462,22 @@ static void test_ipv6_netif_find_best_src_addr__multicast_input(void)
     TEST_ASSERT_EQUAL_INT(false, ng_ipv6_addr_is_unspecified(out));
 }
 
+static void test_ipv6_netif_find_best_src_addr__other_subnet(void)
+{
+    ng_ipv6_addr_t addr1 = DEFAULT_TEST_IPV6_ADDR;
+    ng_ipv6_addr_t addr2 = OTHER_TEST_IPV6_ADDR;
+
+    ng_ipv6_addr_t *out = NULL;
+
+    test_ipv6_netif_add__success(); /* adds DEFAULT_TEST_NETIF as interface */
+    TEST_ASSERT_NOT_NULL(ng_ipv6_netif_add_addr(DEFAULT_TEST_NETIF, &addr1, DEFAULT_TEST_PREFIX_LEN,
+                         0));
+
+    TEST_ASSERT_NOT_NULL((out = ng_ipv6_netif_find_best_src_addr(DEFAULT_TEST_NETIF, &addr2)));
+    TEST_ASSERT(out != &addr1);
+    TEST_ASSERT_EQUAL_INT(true, ng_ipv6_addr_equal(out, &addr1));
+}
+
 static void test_ipv6_netif_addr_is_non_unicast__unicast(void)
 {
     ng_ipv6_addr_t addr = DEFAULT_TEST_IPV6_ADDR;
@@ -549,6 +565,7 @@ Test *tests_ipv6_netif_tests(void)
         new_TestFixture(test_ipv6_netif_find_best_src_addr__no_unicast),
         new_TestFixture(test_ipv6_netif_find_best_src_addr__success),
         new_TestFixture(test_ipv6_netif_find_best_src_addr__multicast_input),
+        new_TestFixture(test_ipv6_netif_find_best_src_addr__other_subnet),
         new_TestFixture(test_ipv6_netif_addr_is_non_unicast__unicast),
         new_TestFixture(test_ipv6_netif_addr_is_non_unicast__anycast),
         new_TestFixture(test_ipv6_netif_addr_is_non_unicast__multicast1),
