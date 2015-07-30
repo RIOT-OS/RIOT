@@ -53,13 +53,6 @@ extern "C" {
 /** @} */
 
 /**
- * @name Assign the hardware timer
- * @{
- */
-#define HW_TIMER            TIMER_0
-/** @} */
-
-/**
  * @name Define the interface to the AT86RF231 radio
  * @{
  */
