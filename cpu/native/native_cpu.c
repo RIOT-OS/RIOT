@@ -160,7 +160,7 @@ void cpu_switch_context_exit(void)
 #endif
 
     if (_native_in_isr == 0) {
-        dINT();
+        disableIRQ();
         _native_in_isr = 1;
         native_isr_context.uc_stack.ss_sp = __isr_stack;
         native_isr_context.uc_stack.ss_size = SIGSTKSZ;
@@ -197,7 +197,7 @@ void thread_yield_higher(void)
     ucontext_t *ctx = (ucontext_t *)(sched_active_thread->sp);
     if (_native_in_isr == 0) {
         _native_in_isr = 1;
-        dINT();
+        disableIRQ();
         native_isr_context.uc_stack.ss_sp = __isr_stack;
         native_isr_context.uc_stack.ss_size = SIGSTKSZ;
         native_isr_context.uc_stack.ss_flags = 0;
@@ -205,7 +205,7 @@ void thread_yield_higher(void)
         if (swapcontext(ctx, &native_isr_context) == -1) {
             err(EXIT_FAILURE, "thread_yield_higher: swapcontext");
         }
-        eINT();
+        enableIRQ();
     }
     else {
         isr_thread_yield();
