@@ -13,6 +13,7 @@ endif
 ifneq (,$(filter at86rf2%,$(USEMODULE)))
   USEMODULE += at86rf2xx
   USEMODULE += ieee802154
+  USEMODULE += xtimer
 endif
 
 ifneq (,$(filter kw2xrf,$(USEMODULE)))

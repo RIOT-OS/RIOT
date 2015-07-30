@@ -23,7 +23,7 @@
  * @}
  */
 
-#include "hwtimer.h"
+#include "xtimer.h"
 #include "periph/cpuid.h"
 #include "byteorder.h"
 #include "net/ieee802154.h"
@@ -97,7 +97,7 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
     gpio_clear(dev->sleep_pin);
     /* trigger hardware reset */
     gpio_clear(dev->reset_pin);
-    hwtimer_wait(HWTIMER_TICKS(RESET_DELAY));
+    xtimer_usleep(RESET_DELAY);
     gpio_set(dev->reset_pin);
 
     /* Reset state machine to ensure a known state */
