@@ -68,18 +68,6 @@ extern "C" {
 /** @} */
 
 /**
-  * @brief   Frequency configuration
-  * @{
-  */
-#ifdef MODULE_NG_AT86RF212B
-typedef enum {
-    NG_AT86RF2XX_FREQ_915MHZ,    /**< frequency 915MHz enabled */
-    NG_AT86RF2XX_FREQ_868MHZ,    /**< frequency 868MHz enabled */
-} ng_at86rf2xx_freq_t;
-#endif
-/** @} */
-
-/**
  * @brief   Default PAN ID
  *
  * TODO: Read some global network stack specific configuration value
@@ -131,6 +119,18 @@ typedef enum {
 /** @} */
 
 /**
+  * @brief   Frequency configuration
+  * @{
+  */
+#ifdef MODULE_NG_AT86RF212B
+typedef enum {
+    NG_AT86RF2XX_FREQ_915MHZ,    /**< frequency 915MHz enabled */
+    NG_AT86RF2XX_FREQ_868MHZ,    /**< frequency 868MHz enabled */
+} ng_at86rf2xx_freq_t;
+#endif
+/** @} */
+
+/**
  * @brief   Device descriptor for AT86RF2XX radio devices
  */
 typedef struct {
@@ -159,6 +159,17 @@ typedef struct {
     uint8_t idle_state;                 /**< state to return to after sending */
 } ng_at86rf2xx_t;
 
+/**
+ * @brief struct holding all params needed for device initialization
+ */
+typedef struct at86rf2xx_params {
+    spi_t spi;              /**< SPI bus the device is connected to */
+    spi_speed_t spi_speed;  /**< SPI speed to use */
+    gpio_t cs_pin;          /**< GPIO pin connected to chip select */
+    gpio_t int_pin;         /**< GPIO pin connected to the interrupt pin */
+    gpio_t sleep_pin;       /**< GPIO pin connected to the sleep pin */
+    gpio_t reset_pin;       /**< GPIO pin connected to the reset pin */
+} at86rf2xx_params_t;
 
 /**
  * @brief   Initialize a given AT86RF2xx device
@@ -177,18 +188,6 @@ typedef struct {
 int ng_at86rf2xx_init(ng_at86rf2xx_t *dev, spi_t spi, spi_speed_t spi_speed,
                       gpio_t cs_pin, gpio_t int_pin,
                       gpio_t sleep_pin, gpio_t reset_pin);
-
-/**
- * @brief struct holding all params needed for device initialization
- */
-typedef struct at86rf2xx_params {
-    spi_t spi;              /**< SPI bus the device is connected to */
-    spi_speed_t spi_speed;  /**< SPI speed to use */
-    gpio_t cs_pin;          /**< GPIO pin connected to chip select */
-    gpio_t int_pin;         /**< GPIO pin connected to the interrupt pin */
-    gpio_t sleep_pin;       /**< GPIO pin connected to the sleep pin */
-    gpio_t reset_pin;       /**< GPIO pin connected to the reset pin */
-} at86rf2xx_params_t;
 
 /**
  * @brief   Trigger a hardware reset and configure radio with default values
