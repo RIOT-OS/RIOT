@@ -59,13 +59,13 @@ ifneq (,$(filter ng_netif,$(USEMODULE)))
   SRC += sc_netif.c
 endif
 ifneq (,$(filter fib,$(USEMODULE)))
-	SRC += sc_fib.c
+  SRC += sc_fib.c
 endif
 ifneq (,$(filter ng_ipv6_nc,$(USEMODULE)))
-    SRC += sc_ipv6_nc.c
+  SRC += sc_ipv6_nc.c
 endif
 ifneq (,$(filter ng_icmpv6_echo vtimer,$(USEMODULE)))
-    SRC += sc_icmpv6_echo.c
+  SRC += sc_icmpv6_echo.c
 endif
 ifneq (,$(filter ng_zep ng_ipv6_addr,$(USEMODULE)))
   SRC += sc_zep.c
