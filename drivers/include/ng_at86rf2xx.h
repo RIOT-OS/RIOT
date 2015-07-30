@@ -119,15 +119,13 @@ extern "C" {
 /** @} */
 
 /**
-  * @brief   Frequency configuration
+  * @brief   Frequency configuration for sub-GHz devices.
   * @{
   */
-#ifdef MODULE_NG_AT86RF212B
 typedef enum {
     NG_AT86RF2XX_FREQ_915MHZ,    /**< frequency 915MHz enabled */
     NG_AT86RF2XX_FREQ_868MHZ,    /**< frequency 868MHz enabled */
 } ng_at86rf2xx_freq_t;
-#endif
 /** @} */
 
 /**
