@@ -618,7 +618,7 @@ void fib_print_fib_table(void)
     mutex_unlock(&mtx_access);
 }
 
-static void fib_print_adress(universal_address_container_t *entry)
+static void fib_print_address(universal_address_container_t *entry)
 {
     uint8_t address[UNIVERSAL_ADDRESS_SIZE];
     size_t addr_size = UNIVERSAL_ADDRESS_SIZE;
@@ -647,9 +647,9 @@ void fib_print_routes(void)
 
     for (size_t i = 0; i < FIB_MAX_FIB_TABLE_ENTRIES; ++i) {
         if (fib_table[i].lifetime.seconds != 0 || fib_table[i].lifetime.microseconds != 0) {
-            fib_print_adress(fib_table[i].global);
+            fib_print_address(fib_table[i].global);
             printf(" 0x%04"PRIx32" ", fib_table[i].global_flags);
-            fib_print_adress(fib_table[i].next_hop);
+            fib_print_address(fib_table[i].next_hop);
             printf(" 0x%04"PRIx32" ", fib_table[i].next_hop_flags);
 
             if ((fib_table[i].lifetime.seconds != FIB_LIFETIME_NO_EXPIRE)
