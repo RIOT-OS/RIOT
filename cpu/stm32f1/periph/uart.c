@@ -204,14 +204,14 @@ static inline void irq_handler(uart_t uartnum, USART_TypeDef *dev)
     }
 }
 
-#if UART_0_ISR
+#if UART_0_EN
 void UART_0_ISR(void)
 {
     irq_handler(UART_0, UART_0_DEV);
 }
 #endif
 
-#if UART_1_ISR
+#if UART_1_EN
 void UART_1_ISR(void)
 {
     irq_handler(UART_1, UART_1_DEV);
