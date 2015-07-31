@@ -55,7 +55,7 @@ extern "C" {
 #define TIMER_0_DEV_1       TIM3
 #define TIMER_0_CHANNELS    4
 #define TIMER_0_PRESCALER   (72U)
-#define TIMER_0_MAX_VALUE   (0xffff)
+#define TIMER_0_MAX_VALUE   (0xffffffff)
 #define TIMER_0_CLKEN()     (RCC->APB1ENR |= (RCC_APB1ENR_TIM2EN | RCC_APB1ENR_TIM3EN))
 #define TIMER_0_ISR_0       isr_tim2
 #define TIMER_0_ISR_1       isr_tim3
@@ -69,7 +69,7 @@ extern "C" {
 #define TIMER_1_DEV_1       TIM5
 #define TIMER_1_CHANNELS    4
 #define TIMER_1_PRESCALER   (72U)
-#define TIMER_1_MAX_VALUE   (0xffff)
+#define TIMER_1_MAX_VALUE   (0xffffffff)
 #define TIMER_1_CLKEN()     (RCC->APB1ENR |= (RCC_APB1ENR_TIM4EN | RCC_APB1ENR_TIM5EN))
 #define TIMER_1_ISR_0       isr_tim4
 #define TIMER_1_ISR_1       isr_tim5

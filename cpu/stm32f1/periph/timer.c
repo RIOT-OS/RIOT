@@ -94,7 +94,7 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
     /* send update event as trigger output */
     timer0->CR2 |= TIM_CR2_MMS_1;
     /* set auto-reload and prescaler values and load new values */
-    timer0->ARR = TIMER_0_MAX_VALUE;
+    timer0->ARR = 0xFFFF;
     timer0->PSC = TIMER_0_PRESCALER * ticks_per_us;
     // timer->EGR |= TIM_EGR_UG;
 
