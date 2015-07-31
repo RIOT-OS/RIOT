@@ -51,13 +51,13 @@ static void leds_init(void)
     RCC->APB2ENR |= RCC_APB2ENR_IOPAEN;
 
     /* reset pins */
-    LED_PORT->CRH &= ~(0xf << (4*(LED_RED_PIN - 8)) |
+    LED_PORT->CR[1] &= ~(0xf << (4*(LED_RED_PIN - 8)) |
                        0xf << (4*(LED_GREEN_PIN - 8)) |
                        0xf << (4*(LED_BLUE_PIN - 8)) |
                        0xf << (4*(LED_WHITE_PIN - 8)));
 
     /* set pins to out */
-    LED_PORT->CRH |= (0x3 << (4*(LED_RED_PIN - 8)) |
+    LED_PORT->CR[1] |= (0x3 << (4*(LED_RED_PIN - 8)) |
                       0x3 << (4*(LED_GREEN_PIN - 8)) |
                       0x3 << (4*(LED_BLUE_PIN - 8)) |
                       0x3 << (4*(LED_WHITE_PIN - 8)));

@@ -15,6 +15,7 @@
  *
  * @author      Christian Mehlis <mehlis@inf.fu-berlin.de>
  */
+
 #ifndef PERIPH_CONF_H_
 #define PERIPH_CONF_H_
 
@@ -76,8 +77,10 @@
 #define TIMER_1_IRQ_PRIO    1
 #define TIMER_1_TRIG_SEL    TIM_SMCR_TS_1
 /** @} */
+
 /**
  * @brief UART configuration
+ * @{
  */
 #define UART_NUMOF          (1U)
 #define UART_0_EN           1
@@ -95,134 +98,7 @@
 #define UART_0_RX_PIN       3
 #define UART_0_TX_PIN       2
 #define UART_0_AF           0
-
-/**
- * @brief GPIO configuration
- */
-#define GPIO_0_EN           1
-#define GPIO_1_EN           1
-#define GPIO_2_EN           1
-#define GPIO_3_EN           1
-#define GPIO_4_EN           1
-#define GPIO_5_EN           1
-#define GPIO_6_EN           1
-#define GPIO_7_EN           1
-#define GPIO_8_EN           1
-#define GPIO_9_EN           1
-#define GPIO_10_EN          1
-#define GPIO_11_EN          1
-#define GPIO_12_EN          1
-#define GPIO_IRQ_PRIO       1
-
-/* IRQ config */
-#define GPIO_IRQ_0          0 /* not used */
-#define GPIO_IRQ_1          0 /* not used */
-#define GPIO_IRQ_2          GPIO_0
-#define GPIO_IRQ_3          GPIO_9
-#define GPIO_IRQ_4          GPIO_8
-#define GPIO_IRQ_5          GPIO_7
-#define GPIO_IRQ_6          GPIO_6
-#define GPIO_IRQ_7          GPIO_5
-#define GPIO_IRQ_8          GPIO_2
-#define GPIO_IRQ_9          GPIO_4
-#define GPIO_IRQ_10         0 /* not used */
-#define GPIO_IRQ_11         GPIO_3
-#define GPIO_IRQ_12         GPIO_1
-#define GPIO_IRQ_13         GPIO_12
-#define GPIO_IRQ_14         GPIO_11
-#define GPIO_IRQ_15         GPIO_10
-
-/* GPIO channel 0 config */
-#define GPIO_0_PORT         GPIOB                   /* Used for user button 1 */
-#define GPIO_0_PIN          2
-#define GPIO_0_CLKEN()      (RCC->APB2ENR |= RCC_APB2ENR_IOPBEN)
-#define GPIO_0_EXTI_CFG()   (AFIO->EXTICR[0] |= AFIO_EXTICR1_EXTI2_PB)
-#define GPIO_0_EXTI_LINE    2
-#define GPIO_0_IRQ          EXTI4_IRQn
-/* GPIO channel 1 config */
-#define GPIO_1_PORT         GPIOB                   /* Used for CC3000 CS */
-#define GPIO_1_PIN          12
-#define GPIO_1_CLKEN()      (RCC->APB2ENR |= RCC_APB2ENR_IOPBEN)
-#define GPIO_1_EXTI_CFG()   (AFIO->EXTICR[3] |= AFIO_EXTICR4_EXTI12_PB)
-#define GPIO_1_EXTI_LINE    12
-#define GPIO_1_IRQ          EXTI4_IRQn
-/* GPIO channel 2 config */
-#define GPIO_2_PORT         GPIOB                   /* Used for CC3000 EN */
-#define GPIO_2_PIN          8
-#define GPIO_2_CLKEN()      (RCC->APB2ENR |= RCC_APB2ENR_IOPBEN)
-#define GPIO_2_EXTI_CFG()   (AFIO->EXTICR[2] |= AFIO_EXTICR3_EXTI8_PB)
-#define GPIO_2_EXTI_LINE    8
-#define GPIO_2_IRQ          EXTI4_IRQn
-/* GPIO channel 3 config */
-#define GPIO_3_PORT         GPIOB                   /* Used for CC3000 INT */
-#define GPIO_3_PIN          11
-#define GPIO_3_CLKEN()      (RCC->APB2ENR |= RCC_APB2ENR_IOPBEN)
-#define GPIO_3_EXTI_CFG()   (AFIO->EXTICR[2] |= AFIO_EXTICR3_EXTI11_PB)
-#define GPIO_3_EXTI_LINE    11
-#define GPIO_3_IRQ          EXTI4_IRQn
-/* GPIO channel 4 config */
-#define GPIO_4_PORT         GPIOB                   /* Used for EXTFLASH CS */
-#define GPIO_4_PIN          9
-#define GPIO_4_CLKEN()      (RCC->APB2ENR |= RCC_APB2ENR_IOPBEN)
-#define GPIO_4_EXTI_CFG()   (AFIO->EXTICR[2] |= AFIO_EXTICR3_EXTI9_PB)
-#define GPIO_4_EXTI_LINE    9
-#define GPIO_4_IRQ          EXTI4_IRQn
-/* GPIO channel 5 config */
-#define GPIO_5_PORT         GPIOB                   /* D0 */
-#define GPIO_5_PIN          7
-#define GPIO_5_CLKEN()      (RCC->APB2ENR |= RCC_APB2ENR_IOPBEN)
-#define GPIO_5_EXTI_CFG()   (AFIO->EXTICR[1] |= AFIO_EXTICR2_EXTI7_PB)
-#define GPIO_5_EXTI_LINE    7
-#define GPIO_5_IRQ          EXTI4_IRQn
-/* GPIO channel 6 config */
-#define GPIO_6_PORT         GPIOB                   /* D1 */
-#define GPIO_6_PIN          6
-#define GPIO_6_CLKEN()      (RCC->APB2ENR |= RCC_APB2ENR_IOPBEN)
-#define GPIO_6_EXTI_CFG()   (AFIO->EXTICR[1] |= AFIO_EXTICR2_EXTI6_PB)
-#define GPIO_6_EXTI_LINE    6
-#define GPIO_6_IRQ          EXTI3_IRQn
-/* GPIO channel 7 config */
-#define GPIO_7_PORT         GPIOB                   /* D2 */
-#define GPIO_7_PIN          5
-#define GPIO_7_CLKEN()      (RCC->APB2ENR |= RCC_APB2ENR_IOPBEN)
-#define GPIO_7_EXTI_CFG()   (AFIO->EXTICR[1] |= AFIO_EXTICR2_EXTI5_PB)
-#define GPIO_7_EXTI_LINE    5
-#define GPIO_7_IRQ          EXTI3_IRQn
-/* GPIO channel 8 config */
-#define GPIO_8_PORT         GPIOB                   /* D3 */
-#define GPIO_8_PIN          4
-#define GPIO_8_CLKEN()      (RCC->APB2ENR |= RCC_APB2ENR_IOPBEN)
-#define GPIO_8_EXTI_CFG()   (AFIO->EXTICR[1] |= AFIO_EXTICR2_EXTI4_PB)
-#define GPIO_8_EXTI_LINE    4
-#define GPIO_8_IRQ          EXTI4_IRQn
-/* GPIO channel 9 config */
-#define GPIO_9_PORT         GPIOB                   /* D4 */
-#define GPIO_9_PIN          3
-#define GPIO_9_CLKEN()      (RCC->APB2ENR |= RCC_APB2ENR_IOPBEN)
-#define GPIO_9_EXTI_CFG()   (AFIO->EXTICR[0] |= AFIO_EXTICR1_EXTI3_PB)
-#define GPIO_9_EXTI_LINE    3
-#define GPIO_9_IRQ          EXTI4_IRQn
-/* GPIO channel 10 config */
-#define GPIO_10_PORT        GPIOA                   /* D5 */
-#define GPIO_10_PIN         15
-#define GPIO_10_CLKEN()     (RCC->APB2ENR |= RCC_APB2ENR_IOPAEN)
-#define GPIO_10_EXTI_CFG()  (AFIO->EXTICR[3] |= AFIO_EXTICR4_EXTI15_PA)
-#define GPIO_10_EXTI_LINE   15
-#define GPIO_10_IRQ         EXTI4_IRQn
-/* GPIO channel 11 config */
-#define GPIO_11_PORT        GPIOA                   /* D6 */
-#define GPIO_11_PIN         14
-#define GPIO_11_CLKEN()     (RCC->APB2ENR |= RCC_APB2ENR_IOPAEN)
-#define GPIO_11_EXTI_CFG()  (AFIO->EXTICR[3] |= AFIO_EXTICR4_EXTI14_PA)
-#define GPIO_11_EXTI_LINE   14
-#define GPIO_11_IRQ         EXTI4_IRQn
-/* GPIO channel 12 config */
-#define GPIO_12_PORT        GPIOA                   /* D7 */
-#define GPIO_12_PIN         13
-#define GPIO_12_CLKEN()     (RCC->APB2ENR |= RCC_APB2ENR_IOPAEN)
-#define GPIO_12_EXTI_CFG()  (AFIO->EXTICR[3] |= AFIO_EXTICR4_EXTI13_PA)
-#define GPIO_12_EXTI_LINE   13
-#define GPIO_12_IRQ         EXTI4_IRQn
+/** @} */
 
 /**
  * @brief SPI configuration
