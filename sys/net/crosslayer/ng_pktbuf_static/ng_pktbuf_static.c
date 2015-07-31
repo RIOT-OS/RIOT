@@ -52,8 +52,7 @@ static void _pktbuf_free(void *data, size_t size);
 
 static inline bool _pktbuf_contains(void *ptr)
 {
-    return (&_pktbuf[0] <= (uint8_t *)ptr) &&
-           ((uint8_t *)ptr <= &_pktbuf[NG_PKTBUF_SIZE - 1]);
+    return (unsigned)((uint8_t *)ptr - _pktbuf) < NG_PKTBUF_SIZE;
 }
 
 /* fits size to byte alignment */
