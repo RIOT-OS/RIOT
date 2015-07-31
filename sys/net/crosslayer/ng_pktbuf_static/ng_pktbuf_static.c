@@ -112,7 +112,7 @@ ng_pktsnip_t *ng_pktbuf_mark(ng_pktsnip_t *pkt, size_t size, ng_nettype_t type)
         mutex_unlock(&_mutex);
         return NULL;
     }
-    if ((size < required_new_size)) { /* would not fit unused marker => move data around */
+    if (size < required_new_size) { /* would not fit unused marker => move data around */
         void *new_data_marked, *new_data_rest;
         new_data_marked = _pktbuf_alloc(size);
         if (new_data_marked == NULL) {
