@@ -117,7 +117,7 @@ ng_pktsnip_t *ng_pktbuf_mark(ng_pktsnip_t *pkt, size_t size, ng_nettype_t type);
  * @pre ng_pktsnip_t::data of @p pkt is in the packet buffer.
  *
  * @details If enough memory is available behind it or @p size is smaller than
- *          the original size the packet then ng_pktsnip_t::data of @p pkt will
+ *          the original size of the packet then ng_pktsnip_t::data of @p pkt will
  *          not be moved. Otherwise, it will be moved. If no space is available
  *          nothing happens.
  *
@@ -156,7 +156,7 @@ void ng_pktbuf_release(ng_pktsnip_t *pkt);
  * @param[in] pkt   The packet you want to write into.
  *
  * @return  The (new) pointer to the pkt.
- * @return  NULL, if ng_pktsnip_t::users of @p pkt > 1 and if there is not anough
+ * @return  NULL, if ng_pktsnip_t::users of @p pkt > 1 and if there is not enough
  *          space in the packet buffer.
  */
 ng_pktsnip_t *ng_pktbuf_start_write(ng_pktsnip_t *pkt);
@@ -201,7 +201,7 @@ void ng_pktbuf_stats(void);
 bool ng_pktbuf_is_empty(void);
 
 /**
- * @brief   Checks if the implenation's internal invariants still uphold
+ * @brief   Checks if the implementation's internal invariants still uphold
  *
  * @return  true, the packet buffer is sane.
  * @return  false, the packet buffer is insane.
