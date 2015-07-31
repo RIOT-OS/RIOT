@@ -37,7 +37,7 @@ extern "C" {
  * @name    Define the boards STDIO
  * @{
  */
-#define STDIO               UART_0
+#define STDIO               UART_DEV(0)
 #define STDIO_BAUDRATE      (115200U)
 #define STDIO_RX_BUFSIZE    (64U)
 /** @} */
