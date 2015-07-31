@@ -94,7 +94,7 @@
  * -  24-31: (Reserved)      - No support
  * - 32-255: (Unassigned)    - No support
  *
- * TODO: API for Indefinite-Length Byte Strings and Text Strings
+ * @todo API for Indefinite-Length Byte Strings and Text Strings
  *       (see https://tools.ietf.org/html/rfc7049#section-2.2.2)
  */
 
