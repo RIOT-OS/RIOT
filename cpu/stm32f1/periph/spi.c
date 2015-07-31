@@ -131,12 +131,12 @@ int spi_conf_pins(spi_t dev)
     for (int i = 0; i < 3; i++) {
         int crbitval = (i < 2) ? 0xb : 0x4;
         if (pin[i] < 8) {
-            port[i]->CRL &= ~(0xf << (pin[i] * 4));
-            port[i]->CRL |= (crbitval << (pin[i] * 4));
+            port[i]->CR[0] &= ~(0xf << (pin[i] * 4));
+            port[i]->CR[0] |= (crbitval << (pin[i] * 4));
         }
         else {
-            port[i]->CRH &= ~(0xf << ((pin[i] - 8) * 4));
-            port[i]->CRH |= (crbitval << ((pin[i] - 8) * 4));
+            port[i]->CR[1] &= ~(0xf << ((pin[i] - 8) * 4));
+            port[i]->CR[1] |= (crbitval << ((pin[i] - 8) * 4));
         }
     }
 
