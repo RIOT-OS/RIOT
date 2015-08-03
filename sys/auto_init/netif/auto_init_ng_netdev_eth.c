@@ -36,7 +36,7 @@
  * @{
  */
 #define NETDEV_ETH_MAC_STACKSIZE     (THREAD_STACKSIZE_DEFAULT)
-#define NETDEV_ETH_MAC_PRIO          (THREAD_PRIORITY_MAIN - 3)
+#define NETDEV_ETH_MAC_PRIO          (THREAD_PRIORITY_MAIN - 4)
 
 static char _nomac_stack[NETDEV_ETH_MAC_STACKSIZE];
 

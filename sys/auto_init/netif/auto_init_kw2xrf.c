@@ -36,7 +36,7 @@
  * @{
  */
 #define KW2XRF_MAC_STACKSIZE     (THREAD_STACKSIZE_DEFAULT)
-#define KW2XRF_MAC_PRIO          (THREAD_PRIORITY_MAIN - 3)
+#define KW2XRF_MAC_PRIO          (THREAD_PRIORITY_MAIN - 4)
 
 #define KW2XRF_NUM (sizeof(kw2xrf_params)/sizeof(kw2xrf_params[0]))
 

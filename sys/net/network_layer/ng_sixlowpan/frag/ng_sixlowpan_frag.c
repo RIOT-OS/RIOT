@@ -223,6 +223,7 @@ void ng_sixlowpan_frag_send(kernel_pid_t pid, ng_pktsnip_t *pkt,
     }
 
     offset += res;
+    thread_yield();
 
     while (offset < datagram_size) {
         if ((res = _send_nth_fragment(iface, pkt, payload_len, datagram_size,
@@ -235,6 +236,7 @@ void ng_sixlowpan_frag_send(kernel_pid_t pid, ng_pktsnip_t *pkt,
         }
 
         offset += res;
+        thread_yield();
     }
 
     /* remove original packet from packet buffer */
