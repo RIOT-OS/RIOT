@@ -354,6 +354,11 @@ ifneq (,$(filter posix_semaphore,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
+ifneq (,$(filter lwip,$(USEMODULE)))
+  USEPKG += lwip
+  USEMODULE += lwip_core
+endif
+
 ifneq (,$(filter sema,$(USEMODULE)))
   USEMODULE += xtimer
 endif

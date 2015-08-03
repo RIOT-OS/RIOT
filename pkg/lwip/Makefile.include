@@ -1,0 +1,2 @@
+INCLUDES += -I$(RIOTBASE)/pkg/lwip/include \
+            -I$(BINDIRBASE)/pkg/$(BOARD)/lwip/src/include
