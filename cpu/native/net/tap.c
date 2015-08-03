@@ -351,4 +351,20 @@ int tap_init(char *name)
     DEBUG("RIOT native tap initialized.\n");
     return _native_tap_fd;
 }
+
+void tap_cleanup(void)
+{
+    unregister_interrupt(SIGIO);
+#ifdef __MACH__
+    kill(sigio_child_pid, SIGKILL);
+#endif
+
+    if (_native_tap_fd == -1) {
+        return;
+    }
+
+    real_close(_native_tap_fd);
+    _native_tap_fd = -1;
+
+}
 /** @} */

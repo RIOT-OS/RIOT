@@ -51,6 +51,10 @@
 #ifdef MODULE_NATIVENET
 #include "tap.h"
 #endif
+#ifdef MODULE_NG_NATIVENET
+#include "dev_eth_tap.h"
+extern dev_eth_tap_t dev_eth_tap;
+#endif
 
 #include "native_internal.h"
 
@@ -73,9 +77,10 @@ int reboot_arch(int mode)
     /* TODO: close stdio fds */
 #endif
 #ifdef MODULE_NATIVENET
-    if (_native_tap_fd != -1) {
-        real_close(_native_tap_fd);
-    }
+    tap_cleanup();
+#endif
+#ifdef MODULE_NG_NATIVENET
+    dev_eth_tap_cleanup(&dev_eth_tap);
 #endif
 
     if (real_execve(_native_argv[0], _native_argv, NULL) == -1) {

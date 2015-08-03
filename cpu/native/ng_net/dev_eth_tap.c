@@ -57,6 +57,7 @@ dev_eth_tap_t dev_eth_tap;
 
 /* dev_eth interface */
 static int _init(dev_eth_t *ethdev);
+static void _cleanup(dev_eth_t *ethdev);
 static int _send(dev_eth_t *ethdev, char* buf, int n);
 static int _recv(dev_eth_t *ethdev, char* buf, int n);
 
@@ -82,6 +83,7 @@ static inline void _isr(dev_eth_t *ethdev) {
 
 static eth_driver_t eth_driver_tap = {
     .init = _init,
+    .cleanup = _cleanup,
     .send = _send,
     .recv = _recv,
     .get_mac_addr = _get_mac_addr,
@@ -177,6 +179,13 @@ void dev_eth_tap_setup(dev_eth_tap_t *dev, const char *name) {
     strncpy(dev->tap_name, name, IFNAMSIZ);
 }
 
+void dev_eth_tap_cleanup(dev_eth_tap_t *dev) {
+    if (!dev) {
+        return;
+    }
+    dev_eth_cleanup((dev_eth_t *) dev);
+}
+
 static void _tap_isr(void) {
     dev_eth_isr(((dev_eth_t *) &dev_eth_tap));
 }
@@ -267,6 +276,25 @@ static int _init(dev_eth_t *ethdev)
 #endif /* not OSX */
     DEBUG("ng_tapnet: initialized.\n");
     return 0;
+}
+
+static void _cleanup(dev_eth_t *ethdev)
+{
+    dev_eth_tap_t *dev = (dev_eth_tap_t*)ethdev;
+
+    /* Do we have a device */
+    if (!dev) {
+        return;
+    }
+
+    /* cleanup signal handling */
+    unregister_interrupt(SIGIO);
+#ifdef __MACH__
+    kill(_sigio_child_pid, SIGKILL);
+#endif
+
+    /* close the tap device */
+    real_close(dev->tap_fd);
 }
 
 #ifdef __MACH__

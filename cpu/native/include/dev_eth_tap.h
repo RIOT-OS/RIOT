@@ -53,6 +53,13 @@ extern dev_eth_tap_t dev_eth_tap;
  */
 void dev_eth_tap_setup(dev_eth_tap_t *dev, const char *name);
 
+/**
+ * @brief Cleanup dev_eth_tap_t structure.
+ *
+ * @param dev  the dev_eth_tap device handle to cleanup
+ */
+void dev_eth_tap_cleanup(dev_eth_tap_t *dev);
+
 #ifdef __cplusplus
 }
 #endif
