@@ -119,7 +119,6 @@ void ng_ipv6_demux(kernel_pid_t iface, ng_pktsnip_t *pkt, uint8_t nh)
     ng_pktbuf_hold(pkt, receiver_num - 1);
     /* IPv6 is not interested anymore so `- 1` */
     _dispatch_rcv_pkt(pkt->type, NG_NETREG_DEMUX_CTX_ALL, pkt);
-    _dispatch_rcv_pkt(NG_NETTYPE_IPV6, nh, pkt);
 }
 
 /* internal functions */
