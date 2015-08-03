@@ -22,7 +22,7 @@
 
 #include <stdint.h>
 #include "vtimer.h"
-#include "ng_universal_address.h"
+#include "universal_address.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -17,7 +17,7 @@
 
 #include "thread.h"
 #include "ng_fib.h"
-#include "ng_fib/ng_universal_address.h"
+#include "universal_address.h"
 
 /*
 * @brief helper to fill FIB with unique entries

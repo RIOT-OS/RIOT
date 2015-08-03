@@ -317,6 +317,7 @@ ifneq (,$(filter nhdp,$(USEMODULE)))
 endif
 
 ifneq (,$(filter fib,$(USEMODULE)))
+  USEMODULE += universal_address
   USEMODULE += timex
   USEMODULE += vtimer
   USEMODULE += net_help

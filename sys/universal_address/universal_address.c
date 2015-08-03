@@ -7,7 +7,7 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  *
- * @ingroup fib
+ * @ingroup sys_universal_address
  * @{
  * @file
  * @brief   Functions to manage universal address container
@@ -23,7 +23,7 @@
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
-#include "ng_fib/ng_universal_address.h"
+#include "universal_address.h"
 
 /**
  * @brief Maximum number of entries handled
