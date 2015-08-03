@@ -30,6 +30,25 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Legacy definition of timers
+ */
+enum {
+#if TIMER_0_EN
+    TIMER_0,                /**< 1st timer */
+#endif
+#if TIMER_1_EN
+    TIMER_1,                /**< 2nd timer */
+#endif
+#if TIMER_2_EN
+    TIMER_2,                /**< 3rd timer */
+#endif
+#if TIMER_3_EN
+    TIMER_3,                /**< 4th timer */
+#endif
+    TIMER_UNDEFINED,        /**< deprecated legacy undefined values */
+};
+
+/**
  * @brief   Legacy definition of GPIO pins.
  */
 enum {
