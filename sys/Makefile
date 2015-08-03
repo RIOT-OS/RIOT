@@ -1,3 +1,6 @@
+ifneq (,$(filter posix_semaphore,$(USEMODULE)))
+    DIRS += posix/semaphore
+endif
 ifneq (,$(filter posix_sockets,$(USEMODULE)))
     DIRS += posix/sockets
 endif
