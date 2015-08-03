@@ -42,8 +42,16 @@ SECTIONS
     .text :
     {
         . = ALIGN(4);
-        _sfixed = .;
-        KEEP(*(.vectors .vectors.*))
+        _stack_base = .;
+        LONG(ABSOLUTE(_estack))
+
+        _vectors_common = .;
+        KEEP(*(.vectors.common))
+
+        _vectors_vendor = .;
+        KEEP(*(.vectors.vendor))
+        
+        . = ALIGN(4);
         *(.text .text.* .gnu.linkonce.t.*)
         *(.glue_7t) *(.glue_7)
         *(.rodata .rodata* .gnu.linkonce.r.*)
@@ -87,6 +95,15 @@ SECTIONS
         . = ALIGN(4);
         _efixed = .;            /* End of text section */
     } > rom
+
+    /* Cortex-M expects the initial stack pointer at 0x0. */
+    ASSERT(_stack_base == ORIGIN(rom),
+           "ld script assert failed, check cortexm_base.ld for explanation.")
+    /* The vendor interrupt table has to start at 0x40. If it doesn't,
+       something is overflowing after the SysTick slot at 0x3c and this
+       assert will trigger. */
+    ASSERT(vectors_vendor == ORIGIN(rom) + 0x40,
+           "ld script assert failed, check cortexm_base.ld for explanation.")
 
     /* .ARM.exidx is sorted, so has to go in its own output section.  */
     PROVIDE_HIDDEN (__exidx_start = .);
