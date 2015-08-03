@@ -301,6 +301,10 @@ ifneq (,$(filter posix,$(USEMODULE)))
   USEMODULE += vtimer
 endif
 
+ifneq (,$(filter sem,$(USEMODULE)))
+  USEMODULE += vtimer
+endif
+
 ifneq (,$(filter vtimer,$(USEMODULE)))
   USEMODULE += xtimer
   USEMODULE += timex
