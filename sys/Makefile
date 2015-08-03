@@ -136,9 +136,6 @@ endif
 ifneq (,$(filter ng_slip,$(USEMODULE)))
     DIRS += net/link_layer/ng_slip
 endif
-ifneq (,$(filter trickle,$(USEMODULE)))
-    DIRS += trickle
-endif
 ifneq (,$(filter nhdp,$(USEMODULE)))
     DIRS += net/routing/nhdp
 endif
