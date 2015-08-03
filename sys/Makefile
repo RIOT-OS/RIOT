@@ -160,9 +160,6 @@ endif
 ifneq (,$(filter ng_netdev_eth,$(USEMODULE)))
     DIRS += net/link_layer/ng_netdev_eth
 endif
-ifneq (,$(filter universal_address,$(USEMODULE)))
-    DIRS += universal_address
-endif
 
 DIRS += $(dir $(wildcard $(addsuffix /Makefile, ${USEMODULE})))
 
