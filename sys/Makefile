@@ -13,10 +13,6 @@ endif
 ifneq (,$(filter l2_ping,$(USEMODULE)))
     DIRS += net/link_layer/ping
 endif
-ifneq (,$(filter transport_layer,$(USEMODULE)))
-    USEMODULE += udp
-    USEMODULE += tcp
-endif
 ifneq (,$(filter socket_base,$(USEMODULE)))
     DIRS += net/transport_layer/socket_base
 endif
