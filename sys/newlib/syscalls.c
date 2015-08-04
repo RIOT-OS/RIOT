@@ -108,7 +108,7 @@ caddr_t _sbrk_r(struct _reent *r, ptrdiff_t incr)
  *
  * @return      the process ID of the current thread
  */
-int _getpid(void)
+pid_t _getpid(void)
 {
     return sched_active_pid;
 }
@@ -134,7 +134,7 @@ pid_t _getpid_r(struct _reent *ptr)
  * @return      TODO
  */
 __attribute__ ((weak))
-int _kill_r(struct _reent *r, int pid, int sig)
+int _kill_r(struct _reent *r, pid_t pid, int sig)
 {
     (void) pid;
     (void) sig;
@@ -316,7 +316,7 @@ int _unlink_r(struct _reent *r, char *path)
  * @return TODO
  */
 __attribute__ ((weak))
-int _kill(int pid, int sig)
+int _kill(pid_t pid, int sig)
 {
     (void) pid;
     (void) sig;
