@@ -36,6 +36,7 @@ extern uint32_t _erelocate;
 extern uint32_t _szero;
 extern uint32_t _ezero;
 extern uint32_t _sstack;
+extern uint32_t _estack;
 /** @} */
 
 /** @brief Interrupt stack canary value
@@ -151,6 +152,8 @@ WEAK __attribute__((alias("dummy_handler_default"))) void isr_svc(void);
 WEAK __attribute__((alias("dummy_handler_default"))) void isr_systick(void);
 
 __attribute__((used, section(".vectors.common"))) const void *vectors_common[] = {
+    (void*) (&_estack),      /*  0 initial stack pointer value */
+    
 #if defined(CPU_ARCH_CORTEX_M3) || defined(CPU_ARCH_CORTEX_M4) || defined(CPU_ARCH_CORTEX_M4F)
     /* Cortex-M3/4 handlers */
     (void*) reset_handler,   /*  1 entry point of the program */
@@ -169,8 +172,8 @@ __attribute__((used, section(".vectors.common"))) const void *vectors_common[] =
     (void*) debug_mon,       /* 12 debug monitor exception */
     (void*) (0UL),           /* 13 Reserved */
     (void*) isr_pendsv,      /* 14 pendSV interrupt, in RIOT the actual
-                              * 15 context switching is happening here */
-    (void*) isr_systick      /* 16 SysTick interrupt, not used in RIOT */
+                                   context switching is happening here */
+    (void*) isr_systick      /* 15 SysTick interrupt, not used in RIOT */
 #else
     /* Cortex-M0 handlers  */
     (void*) reset_handler,   /*  1 entry point of the program */

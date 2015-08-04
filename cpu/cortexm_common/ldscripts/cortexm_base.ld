@@ -41,13 +41,14 @@ SECTIONS
 {
     .text :
     {
+        /* Contains the initial stack pointer and the Cortex-M
+           architecture-defined exceptions 1 through 15 (16 words) */
         . = ALIGN(4);
-        _stack_base = .;
-        LONG(ABSOLUTE(_estack))
-
         _vectors_common = .;
         KEEP(*(.vectors.common))
 
+        /* Contains the cpu-specific IRQs 0 up to 15/240 (M0../M3..) */
+        . = ALIGN(4);
         _vectors_vendor = .;
         KEEP(*(.vectors.vendor))
         
@@ -96,14 +97,12 @@ SECTIONS
         _efixed = .;            /* End of text section */
     } > rom
 
-    /* Cortex-M expects the initial stack pointer at 0x0. */
-    ASSERT(_stack_base == ORIGIN(rom),
-           "ld script assert failed, check cortexm_base.ld for explanation.")
-    /* The vendor interrupt table has to start at 0x40. If it doesn't,
-       something is overflowing after the SysTick slot at 0x3c and this
-       assert will trigger. */
-    ASSERT(vectors_vendor == ORIGIN(rom) + 0x40,
-           "ld script assert failed, check cortexm_base.ld for explanation.")
+    /* Verify correct placement of .vectors.vendor */
+    ASSERT(vectors_vendor == ORIGIN(rom) + 0x40, "
+           ld script assert failed:
+           The cpu-specific part of the interrupt vector table has to
+           start at offset 0x40 of ROM memory. Check the size of the
+           preceding symbol .vectors.common (must be 16 words).")
 
     /* .ARM.exidx is sorted, so has to go in its own output section.  */
     PROVIDE_HIDDEN (__exidx_start = .);
