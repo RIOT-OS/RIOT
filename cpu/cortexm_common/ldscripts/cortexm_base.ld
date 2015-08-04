@@ -97,13 +97,6 @@ SECTIONS
         _efixed = .;            /* End of text section */
     } > rom
 
-    /* Verify correct placement of .vectors.vendor */
-    ASSERT(vectors_vendor == ORIGIN(rom) + 0x40, "
-           ld script assert failed:
-           The cpu-specific part of the interrupt vector table has to
-           start at offset 0x40 of ROM memory. Check the size of the
-           preceding symbol .vectors.common (must be 16 words).")
-
     /* .ARM.exidx is sorted, so has to go in its own output section.  */
     PROVIDE_HIDDEN (__exidx_start = .);
     .ARM.exidx :
