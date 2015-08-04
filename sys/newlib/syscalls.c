@@ -114,6 +114,17 @@ int _getpid(void)
 }
 
 /**
+ * @brief Get the process-ID of the current thread
+ *
+ * @return      the process ID of the current thread
+ */
+pid_t _getpid_r(struct _reent *ptr)
+{
+    (void) ptr;
+    return sched_active_pid;
+}
+
+/**
  * @brief Send a signal to a given thread
  *
  * @param r     TODO
