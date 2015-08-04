@@ -17,6 +17,7 @@
  *
  * @author Christian Mehlis <mehlis@inf.fu-berlin.de>
  * @author René Kijewski <rene.kijewski@fu-berlin.de>
+ * @author Martine Lenders <mlenders@inf.fu-berlin.de>
  *
  * @}
  */
@@ -24,8 +25,10 @@
 #include <stdio.h>
 
 #include "msg.h"
+#include "timex.h"
 #include "thread.h"
 #include "semaphore.h"
+#include "vtimer.h"
 
 #define SEMAPHORE_MSG_QUEUE_SIZE        (8)
 #define SEMAPHORE_TEST_THREADS          (5)
@@ -230,6 +233,30 @@ void test3(void)
     sem_post(&s1);
 }
 
+void test4(void)
+{
+    struct timespec abs;
+    char timestamp[TIMEX_MAX_STR_LEN];
+    timex_t now, start, stop, exp = { 1, 0 };
+    vtimer_now(&now);
+    abs.tv_sec = now.seconds + 1;
+    abs.tv_nsec = now.microseconds * 1000;
+    puts("first: sem_init s1");
+    if (sem_init(&s1, 0, 0) != 0) {
+        puts("first: sem_init FAILED");
+    }
+    vtimer_now(&start);
+    puts("first: wait 1 sec for s1");
+    sem_timedwait(&s1, &abs);
+    vtimer_now(&stop);
+    stop = timex_sub(stop, start);
+    if (timex_cmp(stop, exp) < 0) {
+        printf("first: waited only %s => FAILED\n",
+               timex_to_str(stop, timestamp));
+    }
+    printf("first: waited %s\n", timex_to_str(stop, timestamp));
+}
+
 int main(void)
 {
     msg_init_queue(main_msg_queue, SEMAPHORE_MSG_QUEUE_SIZE);
@@ -239,6 +266,8 @@ int main(void)
     test2();
     puts("######################### TEST3:");
     test3();
+    puts("######################### TEST4:");
+    test4();
     puts("######################### DONE");
     return 0;
 }
