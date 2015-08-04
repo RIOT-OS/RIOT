@@ -23,18 +23,23 @@
 
 #include <stdio.h>
 
+#include "msg.h"
 #include "thread.h"
 #include "semaphore.h"
 
-#define SEMAPHORE_TEST_THREADS 5
-char test1_thread_stack[THREAD_STACKSIZE_MAIN];
-char test2_thread_stack[SEMAPHORE_TEST_THREADS][THREAD_STACKSIZE_MAIN];
+#define SEMAPHORE_MSG_QUEUE_SIZE        (8)
+#define SEMAPHORE_TEST_THREADS          (5)
+static char test1_thread_stack[THREAD_STACKSIZE_MAIN];
+static char test2_thread_stack[SEMAPHORE_TEST_THREADS][THREAD_STACKSIZE_MAIN];
+static msg_t main_msg_queue[SEMAPHORE_MSG_QUEUE_SIZE];
+static msg_t test1_msg_queue[SEMAPHORE_MSG_QUEUE_SIZE];
 
-sem_t s;
+static sem_t s;
 
 static void *test1_second_thread(void *arg)
 {
     (void) arg;
+    msg_init_queue(test1_msg_queue, SEMAPHORE_MSG_QUEUE_SIZE);
     puts("second: sem_trywait");
 
     if (sem_trywait(&s) == 0) {
@@ -120,6 +125,8 @@ static void test1(void)
 
 static void *priority_sema_thread(void *name)
 {
+    msg_t msg_queue[SEMAPHORE_MSG_QUEUE_SIZE];
+    msg_init_queue(msg_queue, SEMAPHORE_MSG_QUEUE_SIZE);
     sem_wait(&s);
     printf("Thread '%s' woke up.\n", (const char *) name);
     return NULL;
@@ -165,6 +172,7 @@ void test2(void)
 
 int main(void)
 {
+    msg_init_queue(main_msg_queue, SEMAPHORE_MSG_QUEUE_SIZE);
     puts("######################### TEST1:");
     test1();
     puts("######################### TEST2:");
