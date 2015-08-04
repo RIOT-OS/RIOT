@@ -21,19 +21,12 @@
 #include <stdint.h>
 #include "vectors_cortexm.h"
 
-/* get the start of the ISR stack as defined in the linkerscript */
-extern uint32_t _estack;
-
 /* define a local dummy handler as it needs to be in the same compilation unit
  * as the alias definition */
 void dummy_handler(void) {
     dummy_handler_default();
 }
 
-/* Cortex-M common interrupt vectors */
-WEAK_DEFAULT void isr_svc(void);
-WEAK_DEFAULT void isr_pendsv(void);
-WEAK_DEFAULT void isr_systick(void);
 /* LPC1768 specific interrupt vector */
 WEAK_DEFAULT void isr_wdt(void);
 WEAK_DEFAULT void isr_timer0(void);
@@ -70,28 +63,7 @@ WEAK_DEFAULT void isr_qei(void);
 WEAK_DEFAULT void isr_pll1(void);
 
 /* interrupt vector table */
-__attribute__ ((section(".vectors")))
-const void *interrupt_vector[] = {
-    /* Exception stack pointer */
-    (void*) (&_estack),             /* pointer to the top of the stack */
-    /* Cortex-M3 handlers */
-    (void*) reset_handler_default,  /* entry point of the program */
-    (void*) nmi_default,            /* non maskable interrupt handler */
-    (void*) hard_fault_default,     /* hard fault exception */
-    (void*) mem_manage_default,     /* memory manage exception */
-    (void*) bus_fault_default,      /* bus fault exception */
-    (void*) usage_fault_default,    /* usage fault exception */
-    (void*) (0UL),                  /* Reserved */
-    (void*) (0UL),                  /* Reserved */
-    (void*) (0UL),                  /* Reserved */
-    (void*) (0UL),                  /* Reserved */
-    (void*) isr_svc,                /* system call interrupt, in RIOT used for
-                                     * switching into thread context on boot */
-    (void*) debug_mon_default,      /* debug monitor exception */
-    (void*) (0UL),                  /* Reserved */
-    (void*) isr_pendsv,             /* pendSV interrupt, in RIOT the actual
-                                     * context switching is happening here */
-    (void*) isr_systick,            /* SysTick interrupt, not used in RIOT */
+ISR_VECTORS const void *interrupt_vector[] = {
     /* LPC specific peripheral handlers */
     (void*) isr_wdt,                /* watchdog timer */
     (void*) isr_timer0,             /* timer0 */
