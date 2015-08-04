@@ -709,7 +709,7 @@ void check_timeout(void)
             if (smallest_time == NULL) {
                 smallest_time = temp_buf;
             }
-            else if (timex_cmp(temp_buf->timestamp, smallest_time->timestamp) < 0) {
+            else if (timex_cmp(&temp_buf->timestamp, &smallest_time->timestamp) < 0) {
                 smallest_time = temp_buf;
             }
 

@@ -1735,7 +1735,7 @@ void def_rtr_lst_add(ipv6_addr_t *ipaddr, uint32_t rtr_ltime)
         timex_t now;
         vtimer_now(&now);
 
-        def_rtr_lst[def_rtr_count].inval_time = timex_add(now, rltime);
+        timex_add(&now, &rltime, &def_rtr_lst[def_rtr_count].inval_time);
 
         def_rtr_count++;
     }

@@ -216,11 +216,12 @@ static void _reset_entry_if_stale(uint8_t i)
 {
     vtimer_now(&now);
 
-    if (timex_cmp(rreq_table[i].timestamp, null_time) == 0) {
+    if (timex_cmp(&rreq_table[i].timestamp, &null_time) == 0) {
         return;
     }
-    timex_t expiration_time = timex_add(rreq_table[i].timestamp, _max_idletime);
-    if (timex_cmp(expiration_time, now) < 0) {
+    timex_t expiration_time;
+    timex_add(&rreq_table[i].timestamp, &_max_idletime, &expiration_time);
+    if (timex_cmp(&expiration_time, &now) < 0) {
         /* timestamp+expiration time is in the past: this entry is stale */
         DEBUG("\treset rreq table entry %s\n",
               netaddr_to_string(&nbuf, &rreq_table[i].origNode));

@@ -139,9 +139,9 @@ void routingtable_break_and_get_all_hopping_over(struct netaddr *hop,
 static void _reset_entry_if_stale(uint8_t i)
 {
     vtimer_now(&now);
-    timex_t lastUsed, expirationTime;
+    timex_t lastUsed, expirationTime, diff, sum;
 
-    if (timex_cmp(routing_table[i].expirationTime, null_time) == 0) {
+    if (timex_cmp(&routing_table[i].expirationTime, &null_time) == 0) {
         return;
     }
 
@@ -153,12 +153,13 @@ static void _reset_entry_if_stale(uint8_t i)
      * during every ACTIVE_INTERVAL. When a route is no longer Active, it becomes an Idle route. */
 
     /* if the node is younger than the active interval, don't bother */
-    if (timex_cmp(now, active_interval) < 0) {
+    if (timex_cmp(&now, &active_interval) < 0) {
         return;
     }
 
+    timex_sub(&now, &active_interval, &diff);
     if ((state == ROUTE_STATE_ACTIVE) &&
-        (timex_cmp(timex_sub(now, active_interval), lastUsed) == 1)) {
+        (timex_cmp(&diff, &lastUsed) == 1)) {
         DEBUG("\t[routing] route towards %s Idle\n",
               netaddr_to_string(&nbuf, &routing_table[i].addr));
         routing_table[i].state = ROUTE_STATE_IDLE;
@@ -168,13 +169,13 @@ static void _reset_entry_if_stale(uint8_t i)
     /* After an Idle route remains Idle for MAX_IDLETIME, it becomes an Invalid route. */
 
     /* if the node is younger than the expiration time, don't bother */
-    if (timex_cmp(now, expirationTime) < 0) {
+    if (timex_cmp(&now, &expirationTime) < 0) {
         return;
     }
 
     /* If Current_Time > Route.ExpirationTime, set Route.State := Invalid. */
     if ((state == ROUTE_STATE_IDLE) &&
-        (timex_cmp(now, expirationTime) > 0)) {
+        (timex_cmp(&now, &expirationTime) > 0)) {
         DEBUG("\t[routing] route towards %s became Invalid\n",
               netaddr_to_string(&nbuf, &routing_table[i].addr));
         routing_table[i].state = ROUTE_STATE_INVALID;
@@ -183,14 +184,17 @@ static void _reset_entry_if_stale(uint8_t i)
 
     /* If (Current_Time - Route.LastUsed) > (ACTIVE_INTERVAL + MAX_IDLETIME),
      * and if (Route.Timed == FALSE), set Route.State := Invalid. */
-    if ((timex_cmp(timex_sub(now, lastUsed), timex_add(active_interval, max_idletime)) > 0) &&
+    timex_sub(&now, &lastUsed, &diff);
+    timex_add(&active_interval, &max_idletime, &sum);
+    if ((timex_cmp(&diff, &sum) > 0) &&
         (state != ROUTE_STATE_TIMED)) {
         routing_table[i].state = ROUTE_STATE_INVALID;
     }
 
     /* After that time, old sequence number information is considered no longer
      * valid and the Invalid route MUST BE expunged */
-    if (timex_cmp(timex_sub(now, lastUsed), max_seqnum_lifetime) >= 0) {
+    timex_sub(&now, &lastUsed, &diff);
+    if (timex_cmp(&diff, &max_seqnum_lifetime) >= 0) {
         DEBUG("\t[routing] Expunged routing table entry for %s at %i\n",
               netaddr_to_string(&nbuf, &routing_table[i].addr), i);
         memset(&routing_table[i], 0, sizeof(routing_table[i]));
@@ -222,7 +226,7 @@ void routingtable_fill_routing_entry_t_rreq(struct aodvv2_packet_data *packet_da
     rt_entry->seqnum = packet_data->origNode.seqnum;
     rt_entry->nextHopAddr = packet_data->sender;
     rt_entry->lastUsed = packet_data->timestamp;
-    rt_entry->expirationTime = timex_add(packet_data->timestamp, validity_t);
+    timex_add(&packet_data->timestamp, &validity_t, &rt_entry->expirationTime);
     rt_entry->metricType = packet_data->metricType;
     rt_entry->metric = packet_data->origNode.metric;
     rt_entry->state = ROUTE_STATE_ACTIVE;
@@ -235,7 +239,7 @@ void routingtable_fill_routing_entry_t_rrep(struct aodvv2_packet_data *packet_da
     rt_entry->seqnum = packet_data->targNode.seqnum;
     rt_entry->nextHopAddr = packet_data->sender;
     rt_entry->lastUsed = packet_data->timestamp;
-    rt_entry->expirationTime = timex_add(packet_data->timestamp, validity_t);
+    timex_add(&packet_data->timestamp, &validity_t, &rt_entry->expirationTime);
     rt_entry->metricType = packet_data->metricType;
     rt_entry->metric = packet_data->targNode.metric;
     rt_entry->state = ROUTE_STATE_ACTIVE;

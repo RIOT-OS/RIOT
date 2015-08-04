@@ -629,8 +629,8 @@ int ipv6_net_if_add_addr(int if_id, const ipv6_addr_t *addr,
         }
 
         addr_entry->ndp_state = state;
-        addr_entry->valid_lifetime = timex_add(now, valtime);
-        addr_entry->preferred_lifetime = timex_add(now, preftime);
+        timex_add(&now, &valtime, &addr_entry->valid_lifetime);
+        timex_add(&now, &preftime, &addr_entry->preferred_lifetime);
         addr_entry->is_anycast = is_anycast;
 
         ipv6_net_if_addr_buffer_count++;
@@ -826,7 +826,10 @@ uint32_t get_remaining_time(timex_t *t)
     timex_t now;
     vtimer_now(&now);
 
-    return (timex_sub(*t, now).seconds);
+    timex_t rem;
+    timex_sub(t, &now, &rem);
+
+    return rem.seconds;
 }
 
 void set_remaining_time(timex_t *t, uint32_t time)
@@ -835,7 +838,7 @@ void set_remaining_time(timex_t *t, uint32_t time)
 
     timex_t now;
     vtimer_now(&now);
-    *t = timex_add(now, tmp);
+    timex_add(&now, &tmp, t);
 }
 
 int ipv6_init_as_router(void)

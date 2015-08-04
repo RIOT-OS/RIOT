@@ -93,9 +93,11 @@ int cc1100_send_csmaca(radio_address_t address, protocol_t protocol, int priorit
     else if (collision_state == COLLISION_STATE_MEASURE) {
         timex_t now;
         vtimer_now(&now);
-        timex_t timespan = timex_sub(now, collision_measurement_start);
+        timex_t timespan, one_sec;
+        timex_sub(&now, &collision_measurement_start, &timespan);
 
-        if (timex_cmp(timespan, timex_set(1, 0)) > 0) {
+        one_sec = timex_set(1, 0);
+        if (timex_cmp(&timespan, &one_sec) > 0) {
             collisions_per_sec = (collision_count * 1000000) / (double) timex_uint64(timespan);
 
             if (collisions_per_sec > 0.5 && collisions_per_sec <= 2.2) {
@@ -118,9 +120,11 @@ int cc1100_send_csmaca(radio_address_t address, protocol_t protocol, int priorit
     else if (collision_state == COLLISION_STATE_KEEP) {
         timex_t now;
         vtimer_now(&now);
-        timex_t timespan = timex_sub(now, collision_measurement_start);
+        timex_t timespan, five_sec;
+        timex_sub(&now, &collision_measurement_start, &timespan);
 
-        if (timex_cmp(timespan, timex_set(5, 0)) > 0) {
+        five_sec = timex_set(5, 0);
+        if (timex_cmp(&timespan, &five_sec) > 0) {
             collision_state = COLLISION_STATE_INITIAL;
         }
     }

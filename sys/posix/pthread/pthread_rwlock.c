@@ -193,11 +193,12 @@ static int pthread_rwlock_timedlock(pthread_rwlock_t *rwlock,
 
     vtimer_now(&now);
 
-    if (timex_cmp(then, now) <= 0) {
+    if (timex_cmp(&then, &now) <= 0) {
         return ETIMEDOUT;
     }
     else {
-        timex_t reltime = timex_sub(then, now);
+        timex_t reltime;
+        timex_sub(&then, &now, &reltime);
 
         vtimer_t timer;
         vtimer_set_wakeup(&timer, reltime, sched_active_pid);

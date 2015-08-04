@@ -74,22 +74,20 @@ typedef struct {
  *
  * @param[in] a     First summand
  * @param[in] b     Second summand
+ * @param[out] r    Sum of first and second addend
  *
- * @return The sum of the two timestamps
  */
-/* cppcheck-suppress passedByValue */
-timex_t timex_add(const timex_t a, const timex_t b);
+void timex_add(const timex_t *a, const timex_t *b, timex_t *r);
 
 /**
  * @brief Subtracts two timestamps
  *
  * @param[in] a     The minuend
  * @param[in] b     The subtrahend
+ * @param[out] r    Difference of minuend and subtrahend
  *
- * @return The difference a - b
  */
-/* cppcheck-suppress passedByValue */
-timex_t timex_sub(const timex_t a, const timex_t b);
+void timex_sub(const timex_t *a, const timex_t *b, timex_t *r);
 
 /**
  * @brief Initializes a timex timestamp
@@ -111,8 +109,7 @@ timex_t timex_set(uint32_t seconds, uint32_t microseconds);
  * @return 0 if equal
  * @return 1 if a is bigger
  */
-/* cppcheck-suppress passedByValue */
-int timex_cmp(const timex_t a, const timex_t b);
+int timex_cmp(const timex_t *a, const timex_t *b);
 
 /**
  * @brief Corrects timex structure so that microseconds < 1000000
