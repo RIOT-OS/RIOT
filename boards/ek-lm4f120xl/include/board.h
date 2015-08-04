@@ -65,16 +65,6 @@ extern "C" {
 /* @} */
 
 /**
- * @name Macros defined for quick debugging purposes.
- * @{
- */
-#define TRACE               printf("TRACE %s:%d: %s\n", __FILE__, __LINE__, __FUNCTION__)
-#define VAL_I(x)            printf(#x ": %d\n",x);
-#define VAL_X(x)            printf(#x ":0x%X\n", (unsigned int)x);
-#define VAL_S(x)            printf(#x ":%s\n", x);
-/* @} */
-
-/**
  * @brief Initialize board specific hardware, including clock, LEDs and std-IO
  */
 extern void board_init(void);
