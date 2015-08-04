@@ -20,6 +20,7 @@
 
 #include <stdio.h>
 
+#include "kernel.h"
 #include "shell.h"
 #ifdef MODULE_NEWLIB
 #   include "uart_stdio.h"
