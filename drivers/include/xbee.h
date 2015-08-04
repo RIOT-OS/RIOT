@@ -68,7 +68,7 @@
 /**
  * @brief   Default channel used after initialization
  */
-#define XBEE_DEFAULT_CHANNEL        (17U)
+#define XBEE_DEFAULT_CHANNEL        (26U)
 
 /**
  * @name    Address flags

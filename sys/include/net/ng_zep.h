@@ -84,7 +84,7 @@ extern "C" {
  */
 #define NG_ZEP_MIN_CHANNEL      (11U)
 #define NG_ZEP_MAX_CHANNEL      (26U)
-#define NG_ZEP_DEFAULT_CHANNEL  (17U)
+#define NG_ZEP_DEFAULT_CHANNEL  (26U)
 /**
  * @}
  */
