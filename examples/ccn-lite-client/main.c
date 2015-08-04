@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include <inttypes.h>
 
+#include "kernel.h"
 #include "msg.h"
 #include "thread.h"
 #ifdef MODULE_NEWLIB
@@ -363,10 +364,10 @@ int main(void)
 #ifndef MODULE_NEWLIB
     (void) posix_open(uart0_handler_pid, 0);
     puts("  shell init");
-    shell_init(&shell, NULL, SHELL_BUFSIZE, uart0_readc, uart0_putc);
+    shell_init(&shell, NULL, UART0_BUFSIZE, uart0_readc, uart0_putc);
 #else
     puts("  shell init");
-    shell_init(&shell, NULL, SHELL_BUFSIZE, getchar, putchar);
+    shell_init(&shell, NULL, UART0_BUFSIZE, getchar, putchar);
 #endif
     puts("  shell run");
     shell_run(&shell);
