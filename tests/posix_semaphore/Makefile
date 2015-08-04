@@ -9,3 +9,6 @@ USEMODULE += posix_semaphore
 DISABLE_MODULE += auto_init
 
 include $(RIOTBASE)/Makefile.include
+
+test:
+	python tests/01-run.py
