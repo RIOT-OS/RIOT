@@ -21,10 +21,14 @@
 #include <stdio.h>
 
 #include "net_if.h"
-#include "posix_io.h"
+#ifdef MODULE_NEWLIB
+#   include "uart_stdio.h"
+#else
+#   include "posix_io.h"
+#   include "board_uart0.h"
+#endif
 #include "shell.h"
 #include "shell_commands.h"
-#include "board_uart0.h"
 #include "udp.h"
 
 #include "rpl_udp.h"
@@ -43,13 +47,17 @@ int main(void)
 {
     puts("RPL router v"APP_VERSION);
 
-    /* start shell */
-    posix_open(uart0_handler_pid, 0);
     net_if_set_src_address_mode(0, NET_IF_TRANS_ADDR_M_SHORT);
     id = net_if_get_hardware_address(0);
 
     shell_t shell;
-    shell_init(&shell, shell_commands, UART0_BUFSIZE, uart0_readc, uart0_putc);
+    /* start shell */
+#ifndef MODULE_NEWLIB
+    (void) posix_open(uart0_handler_pid, 0);
+    shell_init(&shell, NULL, UART0_BUFSIZE, uart0_readc, uart0_putc);
+#else
+    shell_init(&shell, NULL, UART0_BUFSIZE, getchar, putchar);
+#endif
 
     shell_run(&shell);
     return 0;
