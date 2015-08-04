@@ -69,7 +69,7 @@ static void _receive(ng_pktsnip_t *pkt)
 
     if (payload == NULL) {
         DEBUG("6lo: can not get write access on received packet\n");
-#if defined(DEVELHELP) && defined(ENABLE_DEBUG)
+#if defined(DEVELHELP) && ENABLE_DEBUG
         ng_pktbuf_stats();
 #endif
         ng_pktbuf_release(pkt);
@@ -95,7 +95,7 @@ static void _receive(ng_pktsnip_t *pkt)
 
         if (payload == NULL) {
             DEBUG("6lo: can not get write access on received packet\n");
-#if defined(DEVELHELP) && defined(ENABLE_DEBUG)
+#if defined(DEVELHELP) && ENABLE_DEBUG
             ng_pktbuf_stats();
 #endif
             ng_pktbuf_release(pkt);
