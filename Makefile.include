@@ -64,10 +64,17 @@ else
 endif
 
 ifeq ($(QUIET),1)
-	AD=@
-	MAKEFLAGS += --no-print-directory
+  AD=@
+  MAKEFLAGS += --no-print-directory
 else
-	AD=
+  AD=
+endif
+
+# Fail on warnings. Can be overridden by `make WERROR=0`.
+WERROR ?= 1
+export WERROR
+ifeq ($(WERROR),1)
+  CFLAGS += -Werror
 endif
 
 ifneq (10,$(if ${RIOT_VERSION},1,0)$(if ${__RIOTBUILD_FLAG},1,0))
