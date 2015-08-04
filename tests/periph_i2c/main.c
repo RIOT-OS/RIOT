@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "kernel.h"
 #include "periph_conf.h"
 #include "periph/i2c.h"
 #include "shell.h"
