@@ -40,6 +40,9 @@
 #include "crypto/3des.h"
 #include "crypto/ciphers.h"
 
+#define ENABLE_DEBUG    (0)
+#include "debug.h"
+
 /*************** GLOBALS ******************/
 /**
  * @brief Interface to the 3DES cipher
@@ -282,8 +285,7 @@ int tripledes_encrypt(const cipher_context_t *context, const uint8_t *plain, uin
     uint32_t work[2];
 
     if (!key) {
-        printf("%-40s: [ERROR] Could NOT malloc space for the des3_key_s \
-                   struct.\r\n", __FUNCTION__);
+        DEBUGF("[ERROR] Could NOT malloc space for the des3_key_s struct.\r\n");
         return -1;
     }
 
@@ -291,8 +293,7 @@ int tripledes_encrypt(const cipher_context_t *context, const uint8_t *plain, uin
     res = des3_key_setup(context->context, key);
 
     if (res < 0) {
-        printf("%-40s: [ERROR] des3_key_setup failed with Code %i\r\n",
-               __FUNCTION__, res);
+        DEBUGF("[ERROR] des3_key_setup failed with Code %i\r\n", res);
         free(key);
         return -2;
     }
@@ -317,8 +318,7 @@ int tripledes_decrypt(const cipher_context_t *context, const uint8_t *crypt, uin
     uint32_t work[2];
 
     if (!key) {
-        printf("%-40s: [ERROR] Could NOT malloc space for the des3_key_s \
-                        struct.\r\n", __FUNCTION__);
+        DEBUGF("[ERROR] Could NOT malloc space for the des3_key_s struct.\r\n");
         return -1;
     }
 
@@ -326,8 +326,7 @@ int tripledes_decrypt(const cipher_context_t *context, const uint8_t *crypt, uin
     res = des3_key_setup(context->context, key);
 
     if (res < 0) {
-        printf("%-40s: [ERROR] des3_key_setup failed with Code %i\r\n",
-               __FUNCTION__, res);
+        DEBUGF("[ERROR] des3_key_setup failed with Code %i\r\n", res);
         free(key);
         return -2;
     }

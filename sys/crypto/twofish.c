@@ -30,6 +30,8 @@
 #include "crypto/twofish.h"
 #include "crypto/ciphers.h"
 
+#define ENABLE_DEBUG    (0)
+#include "debug.h"
 
 //prototype
 static int twofish_setup_key(twofish_context_t *ctx, const uint8_t *key, uint8_t keylen);
@@ -538,7 +540,7 @@ static int twofish_setup_key(twofish_context_t *ctx, const uint8_t *key, uint8_t
 
     /* Check key length. */
     if (((keylen - 16) | 16) != 16) {
-        printf("%-40s: [ERROR] invalid key-length!\r\n", __FUNCTION__);
+        DEBUGF("[ERROR] invalid key-length!\r\n");
         return -1;//GPG_ERR_INV_KEYLEN;
     }
 
@@ -658,16 +660,15 @@ int twofish_encrypt(const cipher_context_t *context, const uint8_t *in, uint8_t 
     twofish_context_t *ctx = malloc(sizeof(twofish_context_t));
 
     if (!ctx) {
-        printf("%-40s: [ERROR] Could NOT malloc space for the twofish_context_t \
-                struct.\r\n", __FUNCTION__);
+        DEBUGF("[ERROR] Could NOT malloc space for the twofish_context_t \
+                struct.\r\n");
         return -1;
     }
 
     res = twofish_setup_key(ctx, context->context, TWOFISH_KEY_SIZE);
 
     if (res < 0) {
-        printf("%-40s: [ERROR] twofish_setKey failed with Code %i\r\n",
-               __FUNCTION__, res);
+        DEBUGF("[ERROR] twofish_setKey failed with Code %i\r\n", res);
         free(ctx);
         return -2;
     }
@@ -715,16 +716,15 @@ int twofish_decrypt(const cipher_context_t *context, const uint8_t *in, uint8_t 
     twofish_context_t *ctx = malloc(sizeof(twofish_context_t));
 
     if (!ctx) {
-        printf("%-40s: [ERROR] Could NOT malloc space for the twofish_context_t \
-                struct.\r\n", __FUNCTION__);
+        DEBUGF("[ERROR] Could NOT malloc space for the twofish_context_t \
+                struct.\r\n");
         return -1;
     }
 
     res = twofish_setup_key(ctx, context->context, TWOFISH_KEY_SIZE);
 
     if (res < 0) {
-        printf("%-40s: [ERROR] twofish_setKey failed with Code %i\r\n",
-               __FUNCTION__, res);
+        DEBUGF("[ERROR] twofish_setKey failed with Code %i\r\n", res);
         free(ctx);
         return -2;
     }
