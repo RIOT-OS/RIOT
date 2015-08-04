@@ -59,7 +59,7 @@ WEAK_DEFAULT void isr_ptc(void);
 WEAK_DEFAULT void isr_i2c(void);
 
 /* interrupt vector table */
-ISR_VECTORS const void *vectors_vendor[] = {
+ISR_VECTORS const void *interrupt_vector[] = {
     /* Atmel specific peripheral handlers */
     (void*) isr_pm,                 /*  0 Power Manager */
     (void*) isr_sysctrl,            /*  1 System Control */
