@@ -20,9 +20,14 @@
 
 #include <stdio.h>
 
+#include "kernel.h"
 #include "shell.h"
-#include "board_uart0.h"
-#include "posix_io.h"
+#ifdef MODULE_NEWLIB
+#   include "uart_stdio.h"
+#else
+#   include "posix_io.h"
+#   include "board_uart0.h"
+#endif
 
 extern int udp_cmd(int argc, char **argv);
 
@@ -39,8 +44,12 @@ int main(void)
 
     /* start shell */
     puts("All up, running the shell now");
-    posix_open(uart0_handler_pid, 0);
-    shell_init(&shell, shell_commands, UART0_BUFSIZE, uart0_readc, uart0_putc);
+#ifndef MODULE_NEWLIB
+    (void) posix_open(uart0_handler_pid, 0);
+    shell_init(&shell, NULL, UART0_BUFSIZE, uart0_readc, uart0_putc);
+#else
+    shell_init(&shell, NULL, UART0_BUFSIZE, getchar, putchar);
+#endif
     shell_run(&shell);
 
     /* should be never reached */
