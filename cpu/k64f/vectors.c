@@ -137,19 +137,19 @@ const void *interrupt_vector[] = {
     /* Stack pointer */
     (void *)(&_estack),             /* pointer to the top of the empty stack */
     /* Cortex-M4 handlers */
-    (void*) reset_handler_default,  /* entry point of the program */
-    (void*) nmi_default,            /* non maskable interrupt handler */
-    (void*) hard_fault_default,     /* hard fault exception */
-    (void*) mem_manage_default,     /* memory manage exception */
-    (void*) bus_fault_default,      /* bus fault exception */
-    (void*) usage_fault_default,    /* usage fault exception */
+    (void*) reset_handler,          /* entry point of the program */
+    (void*) isr_nmi,                /* non maskable interrupt handler */
+    (void*) hard_fault,             /* hard fault exception */
+    (void*) mem_manage_fault,       /* memory manage exception */
+    (void*) bus_fault,              /* bus fault exception */
+    (void*) usage_fault,            /* usage fault exception */
     (void*) (0UL),                  /* Reserved */
     (void*) (0UL),                  /* Reserved */
     (void*) (0UL),                  /* Reserved */
     (void*) (0UL),                  /* Reserved */
     (void*) isr_svc,                /* system call interrupt, in RIOT used for
                                      * switching into thread context on boot */
-    (void*) debug_mon_default,      /* debug monitor exception */
+    (void*) debug_mon,              /* debug monitor exception */
     (void*) (0UL),                  /* Reserved */
     (void*) isr_pendsv,             /* pendSV interrupt, in RIOT the actual
                                      * context switching is happening here */
