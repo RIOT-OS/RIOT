@@ -22,6 +22,8 @@
 #define PERIPH_TIMER_H
 
 #include "periph_cpu.h"
+/** @todo remove dev_enums.h include once all platforms are ported to the updated periph interface */
+#include "periph/dev_enums.h"
 
 #ifdef __cplusplus
 extern "C" {
