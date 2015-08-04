@@ -43,7 +43,7 @@
  */
 extern char _sheap;                 /* start of the heap */
 extern char _eheap;                 /* end of the heap */
-caddr_t heap_top = (caddr_t)&_sheap + 4;
+char *heap_top = &_sheap + 4;
 
 /**
  * @brief Initialize NewLib, called by __libc_init_array() from the startup script
@@ -85,15 +85,14 @@ void _exit(int n)
  *
  * @return [description]
  */
-caddr_t _sbrk_r(struct _reent *r, ptrdiff_t incr)
+void *_sbrk_r(struct _reent *r, ptrdiff_t incr)
 {
     unsigned int state = disableIRQ();
-    caddr_t res = heap_top;
+    void *res = heap_top;
 
-    if (((incr > 0) && ((heap_top + incr > &_eheap) || (heap_top + incr < res))) ||
-        ((incr < 0) && ((heap_top + incr < &_sheap) || (heap_top + incr > res)))) {
+    if ((heap_top + incr > &_eheap) || (heap_top + incr < &_sheap)) {
         r->_errno = ENOMEM;
-        res = (void *) -1;
+        res = (void *)-1;
     }
     else {
         heap_top += incr;
