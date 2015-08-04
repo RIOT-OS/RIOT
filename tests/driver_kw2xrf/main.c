@@ -56,7 +56,6 @@ int main(void)
 #else
     shell_init(&shell, NULL, SHELL_BUFSIZE, getchar, putchar);
 #endif
-    (void) posix_open(uart0_handler_pid, 0);
     shell_init(&shell, NULL, SHELL_BUFSIZE, uart0_readc, uart0_putc);
     shell_run(&shell);
 
