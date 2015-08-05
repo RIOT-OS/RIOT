@@ -168,13 +168,35 @@ static int _ipv6_nc_del(char *ipv6_addr_str)
     return 0;
 }
 
+static int _ipv6_nc_reset(void)
+{
+    ng_ipv6_nc_t *tmp = NULL;
+
+    for (ng_ipv6_nc_t *entry = ng_ipv6_nc_get_next(NULL);
+         entry != NULL;
+         tmp = entry, entry = ng_ipv6_nc_get_next(entry)) {
+        if (tmp) {
+            ng_ipv6_nc_remove(tmp->iface, &tmp->ipv6_addr);
+        }
+    }
+
+    /* remove last entry */
+    if (tmp) {
+        ng_ipv6_nc_remove(tmp->iface, &tmp->ipv6_addr);
+    }
+
+    printf("success: reset neighbor cache\n");
+
+    return 0;
+}
+
 int _ipv6_nc_manage(int argc, char **argv)
 {
     if ((argc == 1) || (strcmp("list", argv[1]) == 0)) {
         return _ipv6_nc_list();
     }
 
-    if (argc > 2) {
+    if (argc > 1) {
         if ((argc == 4) && (strcmp("add", argv[1]) == 0)) {
             kernel_pid_t ifs[NG_NETIF_NUMOF];
             size_t ifnum = ng_netif_get(ifs);
@@ -199,12 +221,17 @@ int _ipv6_nc_manage(int argc, char **argv)
         if (strcmp("del", argv[1]) == 0) {
             return _ipv6_nc_del(argv[2]);
         }
+
+        if (strcmp("reset", argv[1]) == 0) {
+            return _ipv6_nc_reset();
+        }
     }
 
     printf("usage: %s [list]\n"
            "   or: %s add [<iface pid>] <ipv6_addr> <l2_addr>\n"
            "      * <iface pid> is optional if only one interface exists.\n"
-           "   or: %s del <ipv6_addr>\n", argv[0], argv[0], argv[0]);
+           "   or: %s del <ipv6_addr>\n"
+           "   or: %s reset\n", argv[0], argv[0], argv[0], argv[0]);
     return 1;
 }
 
