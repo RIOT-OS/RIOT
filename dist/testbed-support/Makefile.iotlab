@@ -11,7 +11,7 @@ IOTLAB_EXP_ID   ?= $(shell experiment-cli get -l --state Running | grep -m 1 '"i
 $(IOTLAB_AUTH):
 	auth-cli -u $(IOTLAB_USER)
 
-iotlab-exp: $(IOTLAB_AUTH)
+iotlab-exp: $(IOTLAB_AUTH) all
     ifeq (,$(AD))
 	    @echo "experiment-cli submit -d $(IOTLAB_DURATION) -l $(IOTLAB_NODES),archi=$(IOTLAB_TYPE)+site=$(IOTLAB_SITE),$(ELFFILE),$(IOTLAB_PROFILE) -n riot_makefile_experiment"
     endif
