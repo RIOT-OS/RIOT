@@ -195,16 +195,8 @@ ifneq (,$(filter cbor,$(USEMODULE)))
   USEMODULE += net_help
 endif
 
-ifneq (,$(filter l2_ping,$(USEMODULE)))
-  USEMODULE += vtimer
-endif
-
 ifneq (,$(filter vtimer,$(USEMODULE)))
   USEMODULE += timex
-endif
-
-ifneq (,$(filter ccn_lite,$(USEMODULE)))
-  USEMODULE += crypto
 endif
 
 ifneq (,$(filter rgbled,$(USEMODULE)))
