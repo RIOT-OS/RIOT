@@ -293,7 +293,6 @@ unsigned char SSP0_write(const uint16_t data, uint8_t device)
             case BMA180_EXTERN:
             case L3G_EXTERN:
             case NANOPAN: {
-                printf("[%s] line: %d\n", __FUNCTION__, __LINE__);
                 FIO0CLR = SSP0_SELN;
                 break;
             }
