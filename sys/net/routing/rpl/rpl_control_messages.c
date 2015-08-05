@@ -28,6 +28,7 @@
 
 #include "sixlowpan.h"
 #include "net_help.h"
+#include "ng_fib.h"
 
 #define ENABLE_DEBUG    (0)
 #if ENABLE_DEBUG
@@ -395,13 +396,13 @@ void rpl_send_DAO(rpl_dodag_t *my_dodag, ipv6_addr_t *destination, uint8_t lifet
     uint8_t entries = 0;
     uint8_t continue_index = 0;
 
-    for (uint8_t i = start_index; i < rpl_max_routing_entries; i++) {
-        if (rpl_get_routing_table()[i].used) {
+    for (uint8_t i = start_index; i < RPL_MAX_PARENTS; i++) {
+        if(rpl_parents[i].used) {
             rpl_send_opt_target_buf->type = RPL_OPT_TARGET;
             rpl_send_opt_target_buf->length = RPL_OPT_TARGET_LEN;
             rpl_send_opt_target_buf->flags = 0x00;
             rpl_send_opt_target_buf->prefix_length = RPL_DODAG_ID_LEN;
-            memcpy(&rpl_send_opt_target_buf->target, &rpl_get_routing_table()[i].address,
+            memcpy(&rpl_send_opt_target_buf->target, &rpl_parents[i].addr,
                    sizeof(ipv6_addr_t));
             opt_len += RPL_OPT_TARGET_LEN_WITH_OPT_LEN;
             rpl_send_opt_transit_buf = get_rpl_send_opt_transit_buf(DAO_BASE_LEN + opt_len);
@@ -415,7 +416,6 @@ void rpl_send_DAO(rpl_dodag_t *my_dodag, ipv6_addr_t *destination, uint8_t lifet
             rpl_send_opt_target_buf = get_rpl_send_opt_target_buf(DAO_BASE_LEN + opt_len);
             entries++;
         }
-
         /* Split DAO, so packages don't get too big.
          * The value 5 is based on experience. */
         if (entries >= 5) {
@@ -826,8 +826,17 @@ void rpl_recv_DAO(void)
                       ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, &rpl_opt_target_buf->target),
                       ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, &ipv6_buf->srcaddr),
                       (rpl_opt_transit_buf->path_lifetime * my_dodag->lifetime_unit));
-                rpl_add_routing_entry(&rpl_opt_target_buf->target, &ipv6_buf->srcaddr,
-                                      rpl_opt_transit_buf->path_lifetime * my_dodag->lifetime_unit);
+
+                /* If we are the target we don't need to add a new FIB entry
+                 * This is a bit hack-ish, but sufficient for now
+                */
+                if ( my_address.uint32[3] != rpl_opt_target_buf->target.uint32[3] ) {
+                      fib_add_entry(rpl_if_id,
+                         &rpl_opt_target_buf->target.uint8[0], sizeof(ipv6_addr_t), AF_INET6,
+                         &ipv6_buf->srcaddr.uint8[0], sizeof(ipv6_addr_t), AF_INET6,
+                         (rpl_opt_transit_buf->path_lifetime * my_dodag->lifetime_unit * 1000));
+                }
+
 #endif
                 increment_seq = 1;
                 break;

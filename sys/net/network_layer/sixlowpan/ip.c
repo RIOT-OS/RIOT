@@ -37,6 +37,7 @@
 #endif
 
 #include "net_help.h"
+#include "ng_fib.h"
 
 #define ENABLE_DEBUG    (0)
 #if ENABLE_DEBUG

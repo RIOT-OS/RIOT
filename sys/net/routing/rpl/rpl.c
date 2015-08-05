@@ -49,7 +49,7 @@ char rpl_process_buf[RPL_PROCESS_STACKSIZE];
 uint8_t rpl_buffer[BUFFER_SIZE - LL_HDR_LEN];
 static timex_t rt_time;
 static vtimer_t rt_timer;
-uint8_t rpl_if_id;
+kernel_pid_t rpl_if_id = KERNEL_PID_UNDEF;
 
 static void _dao_handle_send(rpl_dodag_t *dodag);
 static void _rpl_update_routing_table(void);
@@ -64,22 +64,18 @@ static ipv6_srh_t *srh_header;
 static msg_t srh_m_send, srh_m_recv;
 #endif
 
-#if RPL_MAX_ROUTING_ENTRIES != 0
-static rpl_routing_entry_t rpl_routing_table[RPL_MAX_ROUTING_ENTRIES];
-#endif
-uint8_t rpl_max_routing_entries;
 ipv6_addr_t my_address;
 
 /* IPv6 message buffer */
 static ipv6_hdr_t *ipv6_buf;
 
-uint8_t rpl_init(int if_id, ipv6_addr_t *address)
+uint8_t rpl_init(kernel_pid_t if_id, ipv6_addr_t *address)
 {
     rpl_if_id = if_id;
 
     /* initialize routing table */
 #if RPL_MAX_ROUTING_ENTRIES != 0
-    rpl_max_routing_entries = RPL_MAX_ROUTING_ENTRIES;
+    fib_init();
 #endif
 
     rpl_process_pid = thread_create(rpl_process_buf, sizeof(rpl_process_buf),
@@ -102,7 +98,6 @@ uint8_t rpl_init(int if_id, ipv6_addr_t *address)
 #if (RPL_DEFAULT_MOP == RPL_MOP_NON_STORING_MODE)
     ipv6_iface_set_srh_indicator(rpl_is_root);
 #endif
-    ipv6_iface_set_routing_provider(rpl_get_next_hop);
     DEBUGF("All addresses set!\n");
 
     /* initialize objective function manager */
@@ -276,29 +271,15 @@ void *rpl_process(void *arg)
 
 void _rpl_update_routing_table(void)
 {
+    timex_t now;
+    vtimer_now(&now);
     rpl_dodag_t *my_dodag, *end;
-    rpl_routing_entry_t *rt = rpl_get_routing_table();
-
-    for (unsigned int i = 0; i < rpl_max_routing_entries; i++) {
-        if (rt[i].used) {
-            if (rt[i].lifetime <= 1) {
-                memset(&rt[i], 0, sizeof(rt[i]));
-            }
-            else {
-                rt[i].lifetime = rt[i].lifetime - RPL_LIFETIME_STEP;
-            }
-        }
-    }
 
     for (my_dodag = rpl_dodags, end = my_dodag + RPL_MAX_DODAGS; my_dodag < end; my_dodag++) {
         if ((my_dodag->used) && (my_dodag->my_preferred_parent != NULL)) {
-            if (my_dodag->my_preferred_parent->lifetime <= 1) {
+            if (my_dodag->my_preferred_parent->lifetime.seconds - now.seconds <= 1) {
                 DEBUGF("parent lifetime timeout\n");
                 rpl_parent_update(my_dodag, NULL);
-            }
-            else {
-                my_dodag->my_preferred_parent->lifetime =
-                    my_dodag->my_preferred_parent->lifetime - RPL_LIFETIME_STEP;
             }
         }
     }
@@ -351,129 +332,39 @@ void _dao_handle_send(rpl_dodag_t *dodag)
     }
 }
 
-ipv6_addr_t *rpl_get_next_hop(ipv6_addr_t *addr)
-{
-
-    DEBUGF("Looking up the next hop to %s\n",
-           ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, addr));
-
-#if RPL_MAX_ROUTING_ENTRIES != 0
-
-    for (uint8_t i = 0; i < rpl_max_routing_entries; i++) {
-        if (rpl_routing_table[i].used) {
-            DEBUGF("checking %d: %s\n", i,
-                   ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, &rpl_routing_table[i].address));
-        }
-
-        if ((RPL_DEFAULT_MOP == RPL_MOP_NON_STORING_MODE) && rpl_is_root()) {
-            if (rpl_routing_table[i].used && rpl_equal_id(&rpl_routing_table[i].address, addr)) {
-                DEBUGF("found %d: %s\n", i,
-                       ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
-                                        &rpl_routing_table[i].address));
-                return &rpl_routing_table[i].address;
-            }
-        }
-        else {
-            if (rpl_routing_table[i].used && rpl_equal_id(&rpl_routing_table[i].address, addr)) {
-                DEBUGF("found %d: %s\n", i,
-                       ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
-                                        &rpl_routing_table[i].next_hop));
-                return &rpl_routing_table[i].next_hop;
-            }
-        }
-    }
-
-#else
-    (void) addr;
-#endif
-
-    return (rpl_get_my_preferred_parent());
-}
-
-#if RPL_MAX_ROUTING_ENTRIES != 0
-void rpl_add_routing_entry(ipv6_addr_t *addr, ipv6_addr_t *next_hop, uint16_t lifetime)
-{
-    rpl_routing_entry_t *entry = rpl_find_routing_entry(addr);
-
-    if (entry != NULL) {
-        entry->lifetime = lifetime;
-        return;
-    }
-
-    DEBUGF("Adding routing entry %s\n", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, addr));
-
-    for (uint8_t i = 0; i < rpl_max_routing_entries; i++) {
-        if (!rpl_routing_table[i].used) {
-            memcpy(&rpl_routing_table[i].address, addr, sizeof(ipv6_addr_t));
-            memcpy(&rpl_routing_table[i].next_hop, next_hop, sizeof(ipv6_addr_t));
-            rpl_routing_table[i].lifetime = lifetime;
-            rpl_routing_table[i].used = 1;
-            break;
-        }
-    }
-}
-#endif
-
-#if RPL_MAX_ROUTING_ENTRIES != 0
-void rpl_del_routing_entry(ipv6_addr_t *addr)
-{
-
-    DEBUGF("Deleting routing entry %s\n", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, addr));
-
-    for (uint8_t i = 0; i < rpl_max_routing_entries; i++) {
-        if (rpl_routing_table[i].used && rpl_equal_id(&rpl_routing_table[i].address, addr)) {
-            memset(&rpl_routing_table[i], 0, sizeof(rpl_routing_table[i]));
-            return;
-        }
-    }
-}
-#endif
-
-#if RPL_MAX_ROUTING_ENTRIES != 0
-rpl_routing_entry_t *rpl_find_routing_entry(ipv6_addr_t *addr)
-{
-
-    DEBUGF("Finding routing entry %s\n", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, addr));
-
-    for (uint8_t i = 0; i < rpl_max_routing_entries; i++) {
-        if (rpl_routing_table[i].used && rpl_equal_id(&rpl_routing_table[i].address, addr)) {
-            return &rpl_routing_table[i];
-        }
-    }
-
-    return NULL;
-}
-#endif
-
-rpl_routing_entry_t *rpl_get_routing_table(void)
-{
-#if RPL_MAX_ROUTING_ENTRIES != 0
-    return rpl_routing_table;
-#else
-    return NULL;
-#endif
-}
-
 #if RPL_DEFAULT_MOP == RPL_MOP_NON_STORING_MODE
 /* everything from here on is non-storing mode related */
 
 #if RPL_MAX_ROUTING_ENTRIES != 0
 void rpl_add_srh_entry(ipv6_addr_t *child, ipv6_addr_t *parent, uint16_t lifetime)
 {
+    timex_t now;
+    vtimer_now(&now);
+    size_t addr_buf_size_nxt = sizeof(ipv6_addr_t);
+    uint32_t next_hop_flags;
+    ipv6_addr_t next_hop;
+    kernel_pid_t iface_id;
 
-    rpl_routing_entry_t *entry = rpl_find_routing_entry(child);
+    int ret = fib_get_next_hop(&iface_id,
+                               &next_hop.uint8[0], &addr_buf_size_nxt, &next_hop_flags,
+                               &child->uint8[0], sizeof(ipv6_addr_t), AF_INET6);
 
     /* If we already have this entry and the parent from parent/child is the same as already
      * registered, we only update the lifetime. If only the parent of the child changes, we
      * delete the previous entry and add it below.
      */
-    if (entry != NULL) {
-        if (ipv6_addr_is_equal(parent, &entry->next_hop)) {
-            entry->lifetime = lifetime;
+    if (ret != -EHOSTUNREACH) {
+        if (ipv6_addr_is_equal(parent, &next_hop)) {
+            rpl_dodag_t *my_dodag = rpl_get_my_dodag();
+            rpl_parent_t *par = rpl_find_parent(my_dodag, parent);
+            fib_update_entry(&child->uint8[0], sizeof(ipv6_addr_t),
+                             &parent->uint8[0], sizeof(ipv6_addr_t),
+                             AF_INET6, lifetime);
+            par->lifetime.seconds = now.seconds + lifetime;
             return;
         }
         else {
-            rpl_del_routing_entry(child);
+            fib_remove_entry(&child->uint8[0], sizeof(ipv6_addr_t));
         }
     }
 
@@ -488,15 +379,8 @@ void rpl_add_srh_entry(ipv6_addr_t *child, ipv6_addr_t *parent, uint16_t lifetim
     DEBUGF("Adding source-routing entry parent: %s\n",
            ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, parent));
 
-    for (uint8_t i = 0; i < rpl_max_routing_entries; i++) {
-        if (!rpl_routing_table[i].used) {
-            memcpy(&rpl_routing_table[i].address, child, sizeof(ipv6_addr_t));
-            memcpy(&rpl_routing_table[i].next_hop, parent, sizeof(ipv6_addr_t));
-            rpl_routing_table[i].lifetime = lifetime;
-            rpl_routing_table[i].used = 1;
-            break;
-        }
-    }
+    fib_add_entry(rpl_if_id, &child->uint8[0], sizeof(ipv6_addr_t), AF_INET6,
+                  &parent->uint8[0], sizeof(ipv6_addr_t), AF_INET6, lifetime);
 }
 #endif
 
