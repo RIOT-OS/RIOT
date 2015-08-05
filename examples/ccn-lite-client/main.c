@@ -23,11 +23,16 @@
 #include <stdlib.h>
 #include <inttypes.h>
 
+#include "kernel.h"
 #include "msg.h"
 #include "thread.h"
-#include "posix_io.h"
+#ifdef MODULE_NEWLIB
+#   include "uart_stdio.h"
+#else
+#   include "posix_io.h"
+#   include "board_uart0.h"
+#endif
 #include "shell.h"
-#include "board_uart0.h"
 #include "transceiver.h"
 #include "vtimer.h"
 #include "ps.h"
@@ -356,9 +361,14 @@ int main(void)
 
     puts("starting shell...");
     puts("  posix open");
-    posix_open(uart0_handler_pid, 0);
+#ifndef MODULE_NEWLIB
+    (void) posix_open(uart0_handler_pid, 0);
     puts("  shell init");
-    shell_init(&shell, sc, UART0_BUFSIZE, uart0_readc, uart0_putc);
+    shell_init(&shell, NULL, UART0_BUFSIZE, uart0_readc, uart0_putc);
+#else
+    puts("  shell init");
+    shell_init(&shell, NULL, UART0_BUFSIZE, getchar, putchar);
+#endif
     puts("  shell run");
     shell_run(&shell);
 
