@@ -307,7 +307,7 @@ extern "C" {
 
 
 /* Various configuration settings for the CC2420 drivers  */
-#define CC2420_DEFAULT_CHANNR   18
+#define CC2420_DEFAULT_CHANNR   (26U)
 #define CC2420_SYNC_WORD_TX_TIME 900000
 #define CC2420_RX_BUF_SIZE      3
 #define CC2420_WAIT_TIME        500

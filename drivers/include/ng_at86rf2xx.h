@@ -63,7 +63,7 @@ extern "C" {
 #else
 #define NG_AT86RF2XX_MIN_CHANNEL        (11U)
 #define NG_AT86RF2XX_MAX_CHANNEL        (26U)
-#define NG_AT86RF2XX_DEFAULT_CHANNEL    (17U)
+#define NG_AT86RF2XX_DEFAULT_CHANNEL    (26U)
 #endif
 /** @} */
 
