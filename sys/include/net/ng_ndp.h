@@ -222,7 +222,7 @@ ng_pktsnip_t *ng_ndp_nbr_sol_build(ng_ipv6_addr_t *tgt, ng_pktsnip_t *options);
  * @param[in] tgt       For solicited advertisements, the Target Address field
  *                      in the neighbor solicitaton.
  *                      For and unsolicited advertisement, the address whose
- *                      link-layer addres has changed.
+ *                      link-layer address has changed.
  *                      MUST NOT be multicast.
  * @param[in] options   Options to append to the neighbor advertisement.
  *

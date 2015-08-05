@@ -180,7 +180,7 @@ static void *_event_loop(void *args)
                 break;
 
             case NG_NDP_MSG_NC_STATE_TIMEOUT:
-                DEBUG("ipv6: Neigbor cace state timeout received\n");
+                DEBUG("ipv6: Neigbor cache state timeout received\n");
                 ng_ndp_state_timeout((ng_ipv6_nc_t *)msg.content.ptr);
                 break;
 
@@ -234,7 +234,7 @@ static void _send_unicast(kernel_pid_t iface, uint8_t *dst_l2addr,
         pkt = ng_pktbuf_remove_snip(pkt, pkt);
     }
 
-    DEBUG("ipv6: add to interface header to packet\n");
+    DEBUG("ipv6: add interface header to packet\n");
     netif = ng_netif_hdr_build(NULL, 0, dst_l2addr, dst_l2addr_len);
 
     if (netif == NULL) {
