@@ -20,6 +20,8 @@
  * @brief       Definitions for ICMPv6
  *
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
+ *
+ * @todo build error messages
  */
 
 #ifndef NG_ICMPV6_H_
@@ -76,8 +78,6 @@ void ng_icmpv6_demux(kernel_pid_t iface, ng_pktsnip_t *pkt);
  * @return  NULL, on failure
  */
 ng_pktsnip_t *ng_icmpv6_build(ng_pktsnip_t *next, uint8_t type, uint8_t code, size_t size);
-
-/* TODO: build error messages */
 
 /**
  * @brief   Calculates the checksum for an ICMPv6 packet.

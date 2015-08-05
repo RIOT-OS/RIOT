@@ -16,6 +16,8 @@
  * @brief   ICMPv6 error message definitions
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
+ *
+ * @todo implement build and handle functions
  */
 #ifndef NG_ICMPV6_ERROR_H_
 #define NG_ICMPV6_ERROR_H_
@@ -145,8 +147,6 @@ typedef struct __attribute__((packed)) {
     network_uint16_t csum;  /**< checksum */
     network_uint32_t ptr;   /**< pointer */
 } ng_icmpv6_error_param_prob_t;
-
-/* TODO: implement build and handle functions */
 
 #ifdef __cplusplus
 }

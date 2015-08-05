@@ -40,7 +40,7 @@ typedef struct rp_address_msg_t {
 
 /**
  * @brief the size in bytes of a full address
- * TODO: replace with UNIVERSAL_ADDRESS_SIZE (#3022)
+ * @todo replace with UNIVERSAL_ADDRESS_SIZE (#3022)
 */
 #define FIB_DESTINATION_SIZE_SUBSTITUTE (16)
 

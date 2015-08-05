@@ -23,16 +23,14 @@
  * @author      Stefan Pfeiffer <stefan.pfeiffer@fu-berlin.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Joakim Gebart <joakim.gebart@eistec.se>
+ *
+ * @todo        remove include irq.h once core was adjusted
  */
 
 #ifndef CPU_H_
 #define CPU_H_
 
 #include "cpu_conf.h"
-
-/*
- * TODO: remove once core was adjusted
- */
 #include "irq.h"
 
 #ifdef __cplusplus
@@ -49,8 +47,8 @@ extern "C" {
  * If needed, you can overwrite these values the the `cpu_conf.h` file of the
  * specific CPU implementation.
  *
- * TODO: Adjust values for Cortex-M4F with FPU?
- * TODO: Configure second set if no newlib nano.specs are available?
+ * @todo Adjust values for Cortex-M4F with FPU?
+ * @todo Configure second set if no newlib nano.specs are available?
  * @{
  */
 #ifndef THREAD_EXTRA_STACKSIZE_PRINTF
@@ -67,7 +65,7 @@ extern "C" {
 /**
  * @brief   UART0 buffer size definition for compatibility reasons
  *
- * TODO: remove once the remodeling of the uart0 driver is done
+ * @todo remove once the remodeling of the uart0 driver is done
  * @{
  */
 #ifndef UART0_BUFSIZE

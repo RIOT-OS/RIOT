@@ -173,6 +173,8 @@ static inline timex_t timex_from_uint64(const uint64_t timestamp)
  * @note The buffer must have a size of TIMEX_MAX_STR_LEN characters
  *
  * @return A pointer to the string representation of the timestamp
+ *
+ * @todo replace call to snprintf by something more efficient
  */
 static inline const char *timex_to_str(timex_t t, char *timestamp)
 {
@@ -180,7 +182,6 @@ static inline const char *timex_to_str(timex_t t, char *timestamp)
     /* 2^32 seconds have maximum 10 digits, microseconds are always < 1000000
      * in a normalized timestamp, plus two chars for the point and terminator
      * => 10 + 6 + 2 = 20 */
-    /* TODO: replace call to snprintf by something more efficient */
     snprintf(timestamp, TIMEX_MAX_STR_LEN, "%" PRIu32 ".%06" PRIu32 " s",
              t.seconds, t.microseconds);
     return timestamp;

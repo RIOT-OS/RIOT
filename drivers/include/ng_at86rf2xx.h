@@ -70,7 +70,7 @@ extern "C" {
 /**
  * @brief   Default PAN ID
  *
- * TODO: Read some global network stack specific configuration value
+ * @todo    Read some global network stack specific configuration value
  */
 #define NG_AT86RF2XX_DEFAULT_PANID      (0x0023)
 
