@@ -175,7 +175,17 @@ int _ipv6_nc_manage(int argc, char **argv)
     }
 
     if (argc > 2) {
-        if ((argc > 4) && (strcmp("add", argv[1]) == 0)) {
+        if ((argc == 4) && (strcmp("add", argv[1]) == 0)) {
+            kernel_pid_t ifs[NG_NETIF_NUMOF];
+            size_t ifnum = ng_netif_get(ifs);
+            if (ifnum > 1) {
+                puts("error: multiple interfaces exist.");
+                return 1;
+            }
+
+            return _ipv6_nc_add(ifs[0], argv[2], argv[3]);
+        }
+        else if ((argc > 4) && (strcmp("add", argv[1]) == 0)) {
             kernel_pid_t iface = (kernel_pid_t)atoi(argv[2]);
 
             if (!_is_iface(iface)) {
@@ -192,7 +202,8 @@ int _ipv6_nc_manage(int argc, char **argv)
     }
 
     printf("usage: %s [list]\n"
-           "   or: %s add <iface pid> <ipv6_addr> <l2_addr>\n"
+           "   or: %s add [<iface pid>] <ipv6_addr> <l2_addr>\n"
+           "      * <iface pid> is optional if only one interface exists.\n"
            "   or: %s del <ipv6_addr>\n", argv[0], argv[0], argv[0]);
     return 1;
 }
