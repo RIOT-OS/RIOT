@@ -25,6 +25,7 @@
 #include "board.h"
 #include "periph_conf.h"
 #include "periph/uart.h"
+#include "periph/gpio.h"
 
 #include "sched.h"
 #include "thread.h"
@@ -99,8 +100,8 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb,
 int uart_init_blocking(uart_t uart, uint32_t baudrate)
 {
     USART_TypeDef *dev;
-    GPIO_TypeDef *port;
-    uint32_t rx_pin, tx_pin, bus_freq;
+    uint32_t bus_freq;
+    gpio_t rx_pin, tx_pin;
     float divider;
     uint16_t mantissa;
     uint8_t fraction;
@@ -110,48 +111,29 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
 #if UART_0_EN
         case UART_0:
             dev = UART_0_DEV;
-            port = UART_0_PORT;
             rx_pin = UART_0_RX_PIN;
             tx_pin = UART_0_TX_PIN;
             bus_freq = UART_0_BUS_FREQ;
             /* enable clocks */
             UART_0_CLKEN();
-            UART_0_PORT_CLKEN();
             break;
 #endif
 #if UART_1_EN
         case UART_1:
             dev = UART_1_DEV;
-            port = UART_1_PORT;
             tx_pin = UART_1_TX_PIN;
             rx_pin = UART_1_RX_PIN;
             bus_freq = UART_1_BUS_FREQ;
             /* enable clocks */
             UART_1_CLKEN();
-            UART_1_PORT_CLKEN();
             break;
 #endif
         default:
             return -2;
     }
-    /* Configure USART Tx as alternate function push-pull and 50MHz*/
-    if (tx_pin < 8) {
-        port->CR[0] &= ~(0xf << (tx_pin * 4));
-        port->CR[0] |= (0xB << (tx_pin * 4));
-    }
-    else {
-        port->CR[1] &= ~(0xf << ((tx_pin-8) * 4));
-        port->CR[1] |= (0xB << ((tx_pin-8) * 4));
-    }
-    /* Configure USART Rx as floating input */
-    if (rx_pin < 8) {
-        port->CR[0] &= ~(0xf << (rx_pin * 4));
-        port->CR[0] |= (0x4 << (rx_pin * 4));
-    }
-    else {
-        port->CR[1] &= ~(0xf << ((rx_pin-8) * 4));
-        port->CR[1] |= (0x4 << ((rx_pin-8) * 4));
-    }
+    /* configure RX and TX pin */
+    gpio_init_af(tx_pin, GPIO_AF_OUT_PP);
+    gpio_init(rx_pin, GPIO_DIR_IN, GPIO_NOPULL);
 
     /* configure UART to mode 8N1 with given baudrate */
     divider = ((float)bus_freq) / (16 * baudrate);
@@ -162,7 +144,6 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
 
     /* enable receive and transmit mode */
     dev->CR1 |= USART_CR1_UE | USART_CR1_TE | USART_CR1_RE;
-
     return 0;
 }
 
