@@ -43,7 +43,7 @@
  */
 extern char _sheap;                 /* start of the heap */
 extern char _eheap;                 /* end of the heap */
-caddr_t heap_top = (caddr_t)&_sheap + 4;
+char *heap_top = &_sheap + 4;
 
 /**
  * @brief Initialize NewLib, called by __libc_init_array() from the startup script
@@ -85,15 +85,14 @@ void _exit(int n)
  *
  * @return [description]
  */
-caddr_t _sbrk_r(struct _reent *r, ptrdiff_t incr)
+void *_sbrk_r(struct _reent *r, ptrdiff_t incr)
 {
     unsigned int state = disableIRQ();
-    caddr_t res = heap_top;
+    void *res = heap_top;
 
-    if (((incr > 0) && ((heap_top + incr > &_eheap) || (heap_top + incr < res))) ||
-        ((incr < 0) && ((heap_top + incr < &_sheap) || (heap_top + incr > res)))) {
+    if ((heap_top + incr > &_eheap) || (heap_top + incr < &_sheap)) {
         r->_errno = ENOMEM;
-        res = (void *) -1;
+        res = (void *)-1;
     }
     else {
         heap_top += incr;
@@ -108,8 +107,19 @@ caddr_t _sbrk_r(struct _reent *r, ptrdiff_t incr)
  *
  * @return      the process ID of the current thread
  */
-int _getpid(void)
+pid_t _getpid(void)
 {
+    return sched_active_pid;
+}
+
+/**
+ * @brief Get the process-ID of the current thread
+ *
+ * @return      the process ID of the current thread
+ */
+pid_t _getpid_r(struct _reent *ptr)
+{
+    (void) ptr;
     return sched_active_pid;
 }
 
@@ -123,7 +133,7 @@ int _getpid(void)
  * @return      TODO
  */
 __attribute__ ((weak))
-int _kill_r(struct _reent *r, int pid, int sig)
+int _kill_r(struct _reent *r, pid_t pid, int sig)
 {
     (void) pid;
     (void) sig;
@@ -305,7 +315,7 @@ int _unlink_r(struct _reent *r, char *path)
  * @return TODO
  */
 __attribute__ ((weak))
-int _kill(int pid, int sig)
+int _kill(pid_t pid, int sig)
 {
     (void) pid;
     (void) sig;
