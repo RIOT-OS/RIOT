@@ -254,9 +254,6 @@ typedef enum llwu_wakeup_pin {
 #define ISR_PORT_E isr_porte_pin_detect
 /** @} */
 
-/** @brief Number of packets in transceiver queue */
-#define TRANSCEIVER_BUFFER_SIZE (3)
-
 /**
  * @name Bit band macros
  * @{

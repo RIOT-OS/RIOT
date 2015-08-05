@@ -61,8 +61,6 @@ extern "C"
  */
 #define CPUID_ID_PTR                     ((void *)(&(SIM_UIDH)))
 
-#define TRANSCEIVER_BUFFER_SIZE          (3) /**< Buffer Size for Transceiver Module */
-
 /**
  * @brief MCU specific Low Power Timer settings.
  */

@@ -61,14 +61,6 @@ extern "C" {
 /** @} */
 
 /**
- * @brief Transceiver configuration
- * @{
- */
-#define TRANSCEIVER_BUFFER_SIZE (10)
-#define RX_BUF_SIZE  (10)
-/** @} */
-
-/**
  * @name UART0 buffer size definition for compatibility reasons
  *
  * TODO: remove once the remodeling of the uart0 driver is done
