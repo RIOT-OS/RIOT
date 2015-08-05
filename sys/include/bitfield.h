@@ -98,6 +98,17 @@ static inline bool bf_isset(uint8_t field[], size_t idx)
  */
 int bf_get_unset(uint8_t field[], int size);
 
+/**
+ * @brief  Get the number of the first set bit
+ *
+ * @param[in,out] field The bitfield
+ * @param[in]     size  The size of the bitfield
+ *
+ * @return      number of the first set bit
+ * @return      -1 if bitfield does not contain a set bit
+ */
+int bf_get_first_set(uint8_t field[], int size);
+
 #ifdef __cplusplus
 }
 #endif

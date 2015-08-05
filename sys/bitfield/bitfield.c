@@ -46,3 +46,27 @@ int bf_get_unset(uint8_t field[], int size)
     restoreIRQ(state);
     return(result);
 }
+
+int bf_get_first_set(uint8_t field[], int size)
+{
+    int result = -1;
+    int nbytes = (size + 7) / 8;
+    int i = 0;
+
+    unsigned state = disableIRQ();
+
+    /* skip full bytes */
+    for (int j = 0; (j < nbytes) && (field[j] == 0); j++) {
+        i += 8;
+    }
+
+    for (; i < size; i++) {
+        if (bf_isset(field, i)) {
+            result = i;
+            break;
+        }
+    }
+
+    restoreIRQ(state);
+    return(result);
+}
