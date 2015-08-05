@@ -721,7 +721,8 @@ int ccnl_face_enqueue(struct ccnl_relay_s *ccnl, struct ccnl_face_s *to,
 int ccnl_nonce_find_or_append(struct ccnl_relay_s *ccnl,
                               struct ccnl_buf_s *nonce)
 {
-    struct ccnl_nonce_s *n, *last;
+    struct ccnl_nonce_s *n;
+    struct ccnl_nonce_s *last = NULL;
     int i;
     DEBUGMSG(99, "ccnl_nonce_find_or_append: %u:%u:%u:%u\n",
              nonce->data[0], nonce->data[1], nonce->data[2], nonce->data[3]);
