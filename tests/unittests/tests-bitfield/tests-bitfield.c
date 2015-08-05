@@ -13,10 +13,12 @@
 
 #include "bitfield.h"
 
+#define BF_SIZE (5)
+
 static void test_bf_get_unset_empty(void)
 {
     int res = 0;
-    uint8_t field[5];
+    uint8_t field[BF_SIZE];
 
     memset(field, 0, sizeof(field));
     res = bf_get_unset(field, 0);
@@ -39,80 +41,80 @@ static void test_bf_get_unset_empty(void)
     TEST_ASSERT_EQUAL_INT(0, res);
 
     memset(field, 0, sizeof(field));
-    res = bf_get_unset(field, 40);
+    res = bf_get_unset(field, (BF_SIZE * 8));
     TEST_ASSERT_EQUAL_INT(0, res);
 }
 
 static void test_bf_get_unset_firstbyte(void)
 {
     int res = 0;
-    uint8_t field[5];
+    uint8_t field[BF_SIZE];
     memset(field, 0xff, sizeof(field));
 
     field[0] = 0x00;
-    res = bf_get_unset(field, 40);
+    res = bf_get_unset(field, (BF_SIZE * 8));
     TEST_ASSERT_EQUAL_INT(0, res);
 
     field[0] = 0x01;
-    res = bf_get_unset(field, 40);
+    res = bf_get_unset(field, (BF_SIZE * 8));
     TEST_ASSERT_EQUAL_INT(1, res);
 
     field[0] = 0x0f;
-    res = bf_get_unset(field, 40);
+    res = bf_get_unset(field, (BF_SIZE * 8));
     TEST_ASSERT_EQUAL_INT(4, res);
 
     field[0] = 0x7f;
-    res = bf_get_unset(field, 40);
+    res = bf_get_unset(field, (BF_SIZE * 8));
     TEST_ASSERT_EQUAL_INT(7, res);
 
     field[0] = 0xff;
-    res = bf_get_unset(field, 40);
+    res = bf_get_unset(field, (BF_SIZE * 8));
     TEST_ASSERT_EQUAL_INT(-1, res);
 }
 
 static void test_bf_get_unset_middle(void)
 {
     int res = 0;
-    uint8_t field[5];
+    uint8_t field[BF_SIZE];
     memset(field, 0xff, sizeof(field));
 
     field[2] = 0x00;
-    res = bf_get_unset(field, 40);
+    res = bf_get_unset(field, (BF_SIZE * 8));
     TEST_ASSERT_EQUAL_INT(16, res);
 
     field[2] = 0x01;
-    res = bf_get_unset(field, 40);
+    res = bf_get_unset(field, (BF_SIZE * 8));
     TEST_ASSERT_EQUAL_INT(17, res);
 
     field[2] = 0x0f;
-    res = bf_get_unset(field, 40);
+    res = bf_get_unset(field, (BF_SIZE * 8));
     TEST_ASSERT_EQUAL_INT(20, res);
 
     field[2] = 0x7f;
-    res = bf_get_unset(field, 40);
+    res = bf_get_unset(field, (BF_SIZE * 8));
     TEST_ASSERT_EQUAL_INT(23, res);
 }
 
 static void test_bf_get_unset_lastbyte(void)
 {
     int res = 0;
-    uint8_t field[5];
+    uint8_t field[BF_SIZE];
     memset(field, 0xff, sizeof(field));
 
     field[4] = 0x00;
-    res = bf_get_unset(field, 40);
+    res = bf_get_unset(field, (BF_SIZE * 8));
     TEST_ASSERT_EQUAL_INT(32, res);
 
     field[4] = 0x01;
-    res = bf_get_unset(field, 40);
+    res = bf_get_unset(field, (BF_SIZE * 8));
     TEST_ASSERT_EQUAL_INT(33, res);
 
     field[4] = 0x0f;
-    res = bf_get_unset(field, 40);
+    res = bf_get_unset(field, (BF_SIZE * 8));
     TEST_ASSERT_EQUAL_INT(36, res);
 
     field[4] = 0x7f;
-    res = bf_get_unset(field, 40);
+    res = bf_get_unset(field, (BF_SIZE * 8));
     TEST_ASSERT_EQUAL_INT(39, res);
 }
 
