@@ -88,7 +88,8 @@ kernel_pid_t gnrc_ipv6_init(void)
     }
 
 #ifdef MODULE_FIB
-    gnrc_ipv6_fib_table.entries = _fib_entries;
+    gnrc_ipv6_fib_table.data.entries = _fib_entries;
+    gnrc_ipv6_fib_table.table_type = FIB_TABLE_TYPE_SH;
     gnrc_ipv6_fib_table.size = GNRC_IPV6_FIB_TABLE_SIZE;
     fib_init(&gnrc_ipv6_fib_table);
 #endif
