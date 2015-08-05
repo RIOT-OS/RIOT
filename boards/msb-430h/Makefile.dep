@@ -1,8 +1,0 @@
-ifneq (,$(filter defaulttransceiver,$(USEMODULE)))
-	USEMODULE += cc110x_legacy
-	USEMODULE += transceiver
-endif
-
-ifneq (,$(filter cc110x_legacy,$(USEMODULE)))
-	USEMODULE += cc110x_spi
-endif

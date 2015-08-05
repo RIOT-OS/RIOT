@@ -1,8 +1,3 @@
-ifneq (,$(filter defaulttransceiver,$(USEMODULE)))
-    USEMODULE += ng_nativenet
-    USEMODULE += ng_netdev_eth
-endif
-
 ifneq (,$(filter ng_netif_default,$(USEMODULE)))
     USEMODULE += ng_nativenet
     USEMODULE += ng_netdev_eth

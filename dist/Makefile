@@ -36,8 +36,6 @@ QUIET ?= 1
 #USEMODULE += uart0
 #USEMODULE += posix
 #USEMODULE += vtimer
-#USEMODULE += defaulttransceiver
-#USEMODULE += sixlowpan
 
 #export INCLUDES += -Iapplication_include
 
