@@ -22,6 +22,7 @@ endif
 export FFLAGS = --telosb -c $(PORT) -r -e -I -p $(HEXFILE)
 export TERMFLAGS += -p "$(PORT)"
 
+export INCLUDES += -I$(RIOTCPU)/$(CPU)/include/ -I$(RIOTBOARD)/$(BOARD)/include/
 export INCLUDES += -I$(RIOTCPU)/msp430-common/include
 export OFLAGS = -O ihex
 

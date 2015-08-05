@@ -28,6 +28,7 @@ export FFLAGS = -t $(PORT) -f $(HEXFILE) -c 'bbmc -l redbee-econotag reset'
 export OFLAGS = -O binary --gap-fill=0xff
 export TERMFLAGS += -p "$(PORT)"
 
+export INCLUDES += -I$(RIOTCPU)/$(CPU)/include/ -I$(RIOTBOARD)/$(BOARD)/include/
 export INCLUDES += -I$(RIOTCPU)/$(CPU)/maca/include
 export INCLUDES += -I$(RIOTBOARD)/$(BOARD)/drivers/include
 

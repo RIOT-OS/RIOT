@@ -1,1 +1,2 @@
+export INCLUDES += -I$(RIOTCPU)/$(CPU)/include/ -I$(RIOTBOARD)/$(BOARD)/include/
 include $(RIOTBOARD)/msba2-common/Makefile.include

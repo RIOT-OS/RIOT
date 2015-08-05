@@ -23,6 +23,7 @@ export FFLAGS = --z1 -I -c $(PORT) -r -e -p $(HEXFILE)
 export OFLAGS = -O ihex
 export TERMFLAGS += -p "$(PORT)"
 
+export INCLUDES += -I$(RIOTCPU)/$(CPU)/include/ -I$(RIOTBOARD)/$(BOARD)/include/
 export INCLUDES += -I $(RIOTCPU)/msp430-common/include
 
 export UNDEF += $(BINDIR)msp430_common/startup.o
