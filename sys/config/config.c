@@ -20,10 +20,5 @@
 
 config_t sysconfig  = {
     0,      /**< default ID */
-#ifdef FEATURE_TRANSCEIVER
-    0,      /**< default radio address */
-    0,      /**< default radio channel */
-    1,      /**< default radio PAN id   */
-#endif
     "foobar",   /**< default name */
 };

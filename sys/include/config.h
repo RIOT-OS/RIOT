@@ -20,9 +20,6 @@
 #define CONFIG_H
 
 #include <stdint.h>
-#ifdef FEATURE_TRANSCEIVER
-#include "radio/types.h"
-#endif
 
 #ifdef __cplusplus
  extern "C" {
@@ -41,11 +38,6 @@ extern char configmem[];
  */
 typedef struct {
     uint16_t id;                    /**< unique node identifier          */
-#ifdef FEATURE_TRANSCEIVER
-    radio_address_t radio_address;  /**< address for radio communication */
-    uint8_t radio_channel;          /**< current frequency               */
-    uint16_t radio_pan_id;          /**< PAN id for radio communication  */
-#endif
     char name[CONFIG_NAME_LEN];     /**< name of the node                */
 } config_t;
 
