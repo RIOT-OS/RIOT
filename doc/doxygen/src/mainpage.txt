@@ -180,18 +180,6 @@
  * to your Makefile. Auto-init calls all module initialization functions with a
  * `void` parameter just before the main thread gets executed.
  *
- * ####The transceiver module
- *
- * The transceiver module is an abstraction layer and multiplexer between the
- * network stack and the radio driver. It runs in a single thread with the PID
- * `transceiver_pid`. It provides an IPC interface that enables to configure and
- * use available radio drivers, e.g. setting the radio channel or sending a packet.
- * A thread may also register at the transceiver module, in order to get notified
- * whenever a packet for a particular radio transceiver is received. The
- * notification message contains a pointer to the packet struct. After processing
- * the packet, the registered thread needs to decrease this struct's member
- * `processing` which acts as a semaphore for the packet's memory buffer.
- *
  * \section info_sec Community
  *
  * Whether you are looking for help with writing an application for RIOT, want to learn more about it, or just stay in the loop you are invited to join the RIOT-users mailing list. For developers who want to participate and contribute to the kernel development or integrate new MCU and platform support the [RIOT-devel mailing list](http://lists.riot-os.org/mailman/listinfo/devel) is the right place.
