@@ -26,6 +26,7 @@ USEMODULE += ng_udp
 USEMODULE += ng_pktdump
 # Additional networking modules that can be dropped if not needed
 USEMODULE += ng_icmpv6_echo
+USEMODULE += fib
 # Add also the shell, some shell commands (which are based on uart0 in this app)
 USEMODULE += uart0
 USEMODULE += shell
