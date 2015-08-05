@@ -15,6 +15,7 @@
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 
+#include <stdio.h>
 #include <string.h>
 
 #include "kernel_types.h"
