@@ -86,7 +86,7 @@
 #endif
 
 #ifdef MODULE_FIB
-#include "net/ng_fib.h"
+#include "net/fib.h"
 #endif
 
 #define ENABLE_DEBUG (0)

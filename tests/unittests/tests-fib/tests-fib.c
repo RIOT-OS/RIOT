@@ -16,7 +16,7 @@
 #include "vtimer.h"
 
 #include "thread.h"
-#include "ng_fib.h"
+#include "net/fib.h"
 #include "universal_address.h"
 
 /*

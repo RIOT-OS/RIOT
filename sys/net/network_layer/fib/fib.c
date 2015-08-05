@@ -1,17 +1,20 @@
 /**
- * FIB implementation
- *
  * Copyright (C) 2014 Martin Landsmann <Martin.Landsmann@HAW-Hamburg.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
- *
- * @ingroup fib
+ */
+
+/**
+ * @ingroup     net_fib
  * @{
+ *
  * @file
- * @brief   Functions to manage FIB entries
- * @author  Martin Landsmann <Martin.Landsmann@HAW-Hamburg.de>
+ * @brief       Functions to manage FIB entries
+ *
+ * @author      Martin Landsmann <martin.landsmann@haw-hamburg.de>
+ *
  * @}
  */
 
@@ -27,8 +30,8 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-#include "ng_fib.h"
-#include "ng_fib/ng_fib_table.h"
+#include "net/fib.h"
+#include "net/fib/table.h"
 
 #ifdef MODULE_NG_IPV6_ADDR
 #include "net/ng_ipv6/addr.h"
