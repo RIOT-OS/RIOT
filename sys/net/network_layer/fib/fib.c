@@ -27,8 +27,8 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-#include "ng_fib.h"
-#include "ng_fib/ng_fib_table.h"
+#include "net/ng_fib.h"
+#include "net/ng_fib/ng_fib_table.h"
 
 /**
  * @brief access mutex to control exclusive operations on calls

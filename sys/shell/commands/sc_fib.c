@@ -24,7 +24,7 @@
 #include <stdlib.h>
 #include "thread.h"
 #include "inet_pton.h"
-#include "ng_fib.h"
+#include "net/ng_fib.h"
 
 #define INFO1_TXT "fibroute add <destination> via <next hop> dev <device>"
 #define INFO2_TXT " [lifetime <lifetime>]"

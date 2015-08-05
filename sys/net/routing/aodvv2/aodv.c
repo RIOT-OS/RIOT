@@ -20,7 +20,7 @@
 #include "aodv.h"
 #include "aodvv2/aodvv2.h"
 #include "aodv_debug.h"
-#include "ng_fib.h"
+#include "net/ng_fib.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"

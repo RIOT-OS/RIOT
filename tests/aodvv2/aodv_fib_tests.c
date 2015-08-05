@@ -28,7 +28,7 @@
 #include "common/autobuf.h"
 #include "rfc5444/rfc5444_writer.h"
 #include "rfc5444/rfc5444_print.h"
-#include "ng_fib.h"
+#include "net/ng_fib.h"
 
 #include "reader.h"
 #include "utils.h"

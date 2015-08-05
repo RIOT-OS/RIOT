@@ -33,7 +33,7 @@
 #include "lowpan.h"
 
 #ifdef FIB_COMPAT
-#include "ng_fib.h"
+#include "net/ng_fib.h"
 #endif
 
 #include "net_help.h"
