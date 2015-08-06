@@ -28,9 +28,6 @@ endif
 ifneq (,$(filter ps,$(USEMODULE)))
   SRC += sc_ps.c
 endif
-ifneq (,$(filter rpl,$(USEMODULE)))
-  SRC += sc_rpl.c
-endif
 ifneq (,$(filter sht11,$(USEMODULE)))
   SRC += sc_sht11.c
 endif
