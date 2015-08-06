@@ -136,21 +136,21 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
     }
     /* Configure USART Tx as alternate function push-pull and 50MHz*/
     if (tx_pin < 8) {
-        port->CRL &= ~(0xf << (tx_pin * 4));
-        port->CRL |= (0xB << (tx_pin * 4));
+        port->CR[0] &= ~(0xf << (tx_pin * 4));
+        port->CR[0] |= (0xB << (tx_pin * 4));
     }
     else {
-        port->CRH &= ~(0xf << ((tx_pin-8) * 4));
-        port->CRH |= (0xB << ((tx_pin-8) * 4));
+        port->CR[1] &= ~(0xf << ((tx_pin-8) * 4));
+        port->CR[1] |= (0xB << ((tx_pin-8) * 4));
     }
     /* Configure USART Rx as floating input */
     if (rx_pin < 8) {
-        port->CRL &= ~(0xf << (rx_pin * 4));
-        port->CRL |= (0x4 << (rx_pin * 4));
+        port->CR[0] &= ~(0xf << (rx_pin * 4));
+        port->CR[0] |= (0x4 << (rx_pin * 4));
     }
     else {
-        port->CRH &= ~(0xf << ((rx_pin-8) * 4));
-        port->CRH |= (0x4 << ((rx_pin-8) * 4));
+        port->CR[1] &= ~(0xf << ((rx_pin-8) * 4));
+        port->CR[1] |= (0x4 << ((rx_pin-8) * 4));
     }
 
     /* configure UART to mode 8N1 with given baudrate */

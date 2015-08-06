@@ -147,16 +147,16 @@ static void _pin_config(GPIO_TypeDef *port_scl, GPIO_TypeDef *port_sda, int pin_
 {
     /* configure pins, alternate output, open-drain, output mode with 50MHz */
     if (pin_scl < 8) {
-        port_scl->CRL |= (0xf << (pin_scl * 4));
+        port_scl->CR[0] |= (0xf << (pin_scl * 4));
     }
     else {
-        port_scl->CRH |= (0xf << ((pin_scl - 8) * 4));
+        port_scl->CR[1] |= (0xf << ((pin_scl - 8) * 4));
     }
     if (pin_sda < 8) {
-        port_sda->CRL |= (0xf << (pin_sda * 4));
+        port_sda->CR[0] |= (0xf << (pin_sda * 4));
     }
     else {
-        port_sda->CRH |= (0xf << ((pin_sda - 8) * 4));
+        port_sda->CR[1] |= (0xf << ((pin_sda - 8) * 4));
     }
 }
 
@@ -164,16 +164,16 @@ static void _toggle_pins(GPIO_TypeDef *port_scl, GPIO_TypeDef *port_sda, int pin
 {
     /* configure pins, output, open-drain, output mode with 50MHz */
     if (pin_scl < 8) {
-        port_scl->CRL |= (0x7 << (pin_scl * 4));
+        port_scl->CR[0] |= (0x7 << (pin_scl * 4));
     }
     else {
-        port_scl->CRH |= (0x7 << ((pin_scl - 8) * 4));
+        port_scl->CR[1] |= (0x7 << ((pin_scl - 8) * 4));
     }
     if (pin_sda < 8) {
-        port_sda->CRL |= (0x7 << (pin_sda * 4));
+        port_sda->CR[0] |= (0x7 << (pin_sda * 4));
     }
     else {
-        port_sda->CRH |= (0x7 << ((pin_sda - 8) * 4));
+        port_sda->CR[1] |= (0x7 << ((pin_sda - 8) * 4));
     }
     /* set both to high */
     port_scl->ODR |= (1 << pin_scl);
