@@ -109,7 +109,7 @@ typedef struct {
     kernel_pid_t mac_pid;                 /**< The driver's thread's PID */
     /* driver specific fields */
     uint8_t buf[KW2XRF_MAX_PKT_LENGTH];   /**< Buffer for incoming or outgoing packets */
-    ng_netopt_state_t state;              /**< Variable to keep radio driver's state */
+    netopt_state_t state;                 /**< Variable to keep radio driver's state */
     uint8_t seq_nr;                       /**< Next packets sequence number */
     uint16_t radio_pan;                   /**< The PAN the radio device is using */
     uint8_t radio_channel;                /**< The channel the radio device is using */
