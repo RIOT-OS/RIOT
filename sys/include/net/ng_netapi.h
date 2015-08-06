@@ -30,7 +30,7 @@
 
 #include "kernel.h"
 #include "thread.h"
-#include "net/ng_netopt.h"
+#include "net/netopt.h"
 #include "net/ng_nettype.h"
 #include "net/ng_pkt.h"
 
@@ -67,7 +67,7 @@ extern "C" {
  * @brief   Data structure to be send for setting and getting options
  */
 typedef struct {
-    ng_netopt_t opt;            /**< the option to get/set */
+    netopt_t opt;               /**< the option to get/set */
     uint16_t context;           /**< (optional) context for that option */
     void *data;                 /**< data to set or buffer to read into */
     uint16_t data_len;          /**< size of the data / the buffer */
@@ -133,7 +133,7 @@ int ng_netapi_dispatch_receive(ng_nettype_t type, uint32_t demux_ctx,
  *
  * @return              value returned by the @ref NG_NETAPI_MSG_TYPE_ACK message
  */
-int ng_netapi_get(kernel_pid_t pid, ng_netopt_t opt, uint16_t context,
+int ng_netapi_get(kernel_pid_t pid, netopt_t opt, uint16_t context,
                   void *data, size_t max_len);
 
 /**
@@ -148,7 +148,7 @@ int ng_netapi_get(kernel_pid_t pid, ng_netopt_t opt, uint16_t context,
  *
  * @return              value returned by the @ref NG_NETAPI_MSG_TYPE_ACK message
  */
-int ng_netapi_set(kernel_pid_t pid, ng_netopt_t opt, uint16_t context,
+int ng_netapi_set(kernel_pid_t pid, netopt_t opt, uint16_t context,
                   void *data, size_t data_len);
 
 #ifdef __cplusplus

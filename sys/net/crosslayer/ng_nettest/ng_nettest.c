@@ -19,7 +19,7 @@
 #include "mutex.h"
 #include "net/ng_netapi.h"
 #include "net/ng_netif.h"
-#include "net/ng_netopt.h"
+#include "net/netopt.h"
 #include "net/ng_netreg.h"
 #include "net/ng_pktbuf.h"
 #include "timex.h"
@@ -28,21 +28,21 @@
 
 #include "net/ng_nettest.h"
 
-static ng_nettest_opt_cbs_t _opt_cbs[NG_NETOPT_NUMOF];
+static ng_nettest_opt_cbs_t _opt_cbs[NETOPT_NUMOF];
 static mutex_t _mutex = MUTEX_INIT;
 static kernel_pid_t _pid = KERNEL_PID_UNDEF;
 static char _stack[NG_NETTEST_STACK_SIZE];
 
 static void *_event_loop(void *arg);
 
-void ng_nettest_register_get(ng_netopt_t opt, ng_nettest_opt_cb_t cb)
+void ng_nettest_register_get(netopt_t opt, ng_nettest_opt_cb_t cb)
 {
     mutex_lock(&_mutex);
     _opt_cbs[opt].get = cb;
     mutex_unlock(&_mutex);
 }
 
-void ng_nettest_register_set(ng_netopt_t opt, ng_nettest_opt_cb_t cb)
+void ng_nettest_register_set(netopt_t opt, ng_nettest_opt_cb_t cb)
 {
     mutex_lock(&_mutex);
     _opt_cbs[opt].set = cb;
@@ -163,7 +163,7 @@ ng_nettest_res_t ng_nettest_receive(kernel_pid_t pid, ng_pktsnip_t *in,
     return res;
 }
 
-ng_nettest_res_t ng_nettest_get(kernel_pid_t pid, ng_netopt_t opt,
+ng_nettest_res_t ng_nettest_get(kernel_pid_t pid, netopt_t opt,
                                 uint16_t context, void *data, size_t data_len,
                                 void *exp_data, int exp_res)
 {
@@ -175,7 +175,7 @@ ng_nettest_res_t ng_nettest_get(kernel_pid_t pid, ng_netopt_t opt,
     return NG_NETTEST_SUCCESS;
 }
 
-ng_nettest_res_t ng_nettest_set(kernel_pid_t pid, ng_netopt_t opt,
+ng_nettest_res_t ng_nettest_set(kernel_pid_t pid, netopt_t opt,
                                 uint16_t context, void *data, size_t data_len,
                                 int exp_res)
 {
@@ -198,7 +198,7 @@ int ng_nettest_init(void)
 
 void ng_nettest_reset(void)
 {
-    for (int i = 0; i < NG_NETOPT_NUMOF; i++) {
+    for (int i = 0; i < NETOPT_NUMOF; i++) {
         _opt_cbs[i].get = NULL;
         _opt_cbs[i].set = NULL;
     }

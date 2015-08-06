@@ -29,7 +29,7 @@
 #include "net/ng_ipv6/netif.h"
 #include "net/ng_netif.h"
 #include "net/ng_netapi.h"
-#include "net/ng_netopt.h"
+#include "net/netopt.h"
 #include "net/ng_pkt.h"
 #include "net/ng_pktbuf.h"
 #include "net/ng_netif/hdr.h"
@@ -106,30 +106,30 @@ static void _del_usage(char *cmd_name)
            cmd_name);
 }
 
-static void _print_netopt(ng_netopt_t opt)
+static void _print_netopt(netopt_t opt)
 {
     switch (opt) {
-        case NG_NETOPT_ADDRESS:
+        case NETOPT_ADDRESS:
             printf("(short) address");
             break;
 
-        case NG_NETOPT_ADDRESS_LONG:
+        case NETOPT_ADDRESS_LONG:
             printf("long address");
             break;
 
-        case NG_NETOPT_SRC_LEN:
+        case NETOPT_SRC_LEN:
             printf("source address length");
             break;
 
-        case NG_NETOPT_CHANNEL:
+        case NETOPT_CHANNEL:
             printf("channel");
             break;
 
-        case NG_NETOPT_NID:
+        case NETOPT_NID:
             printf("network identifier");
             break;
 
-        case NG_NETOPT_TX_POWER:
+        case NETOPT_TX_POWER:
             printf("TX power [in dBm]");
             break;
 
@@ -139,25 +139,25 @@ static void _print_netopt(ng_netopt_t opt)
     }
 }
 
-static void _print_netopt_state(ng_netopt_state_t state)
+static void _print_netopt_state(netopt_state_t state)
 {
     switch (state) {
-        case NG_NETOPT_STATE_OFF:
+        case NETOPT_STATE_OFF:
             printf("OFF");
             break;
-        case NG_NETOPT_STATE_SLEEP:
+        case NETOPT_STATE_SLEEP:
             printf("SLEEP");
             break;
-        case NG_NETOPT_STATE_IDLE:
+        case NETOPT_STATE_IDLE:
             printf("IDLE");
             break;
-        case NG_NETOPT_STATE_RX:
+        case NETOPT_STATE_RX:
             printf("RX");
             break;
-        case NG_NETOPT_STATE_TX:
+        case NETOPT_STATE_TX:
             printf("TX");
             break;
-        case NG_NETOPT_STATE_RESET:
+        case NETOPT_STATE_RESET:
             printf("RESET");
             break;
         default:
@@ -172,8 +172,8 @@ static void _netif_list(kernel_pid_t dev)
     uint16_t u16;
     int16_t i16;
     int res;
-    ng_netopt_state_t state;
-    ng_netopt_enable_t enable;
+    netopt_state_t state;
+    netopt_enable_t enable;
     bool linebreak = false;
 #ifdef MODULE_NG_IPV6_NETIF
     ng_ipv6_netif_t *entry = ng_ipv6_netif_get(dev);
@@ -183,7 +183,7 @@ static void _netif_list(kernel_pid_t dev)
 
     printf("Iface %2d  ", dev);
 
-    res = ng_netapi_get(dev, NG_NETOPT_ADDRESS, 0, hwaddr, sizeof(hwaddr));
+    res = ng_netapi_get(dev, NETOPT_ADDRESS, 0, hwaddr, sizeof(hwaddr));
 
     if (res >= 0) {
         char hwaddr_str[res * 3];
@@ -193,25 +193,25 @@ static void _netif_list(kernel_pid_t dev)
         printf(" ");
     }
 
-    res = ng_netapi_get(dev, NG_NETOPT_CHANNEL, 0, &u16, sizeof(u16));
+    res = ng_netapi_get(dev, NETOPT_CHANNEL, 0, &u16, sizeof(u16));
 
     if (res >= 0) {
         printf(" Channel: %" PRIu16 " ", u16);
     }
 
-    res = ng_netapi_get(dev, NG_NETOPT_NID, 0, &u16, sizeof(u16));
+    res = ng_netapi_get(dev, NETOPT_NID, 0, &u16, sizeof(u16));
 
     if (res >= 0) {
         printf(" NID: 0x%" PRIx16 " ", u16);
     }
 
-    res = ng_netapi_get(dev, NG_NETOPT_TX_POWER, 0, &i16, sizeof(i16));
+    res = ng_netapi_get(dev, NETOPT_TX_POWER, 0, &i16, sizeof(i16));
 
     if (res >= 0) {
         printf(" TX-Power: %" PRIi16 "dBm ", i16);
     }
 
-    res = ng_netapi_get(dev, NG_NETOPT_STATE, 0, &state, sizeof(state));
+    res = ng_netapi_get(dev, NETOPT_STATE, 0, &state, sizeof(state));
 
     if (res >= 0) {
         printf(" State: ");
@@ -220,7 +220,7 @@ static void _netif_list(kernel_pid_t dev)
 
     printf("\n           ");
 
-    res = ng_netapi_get(dev, NG_NETOPT_ADDRESS_LONG, 0, hwaddr, sizeof(hwaddr));
+    res = ng_netapi_get(dev, NETOPT_ADDRESS_LONG, 0, hwaddr, sizeof(hwaddr));
 
     if (res >= 0) {
         char hwaddr_str[res * 3];
@@ -230,30 +230,30 @@ static void _netif_list(kernel_pid_t dev)
         printf("\n           ");
     }
 
-    res = ng_netapi_get(dev, NG_NETOPT_PROMISCUOUSMODE, 0, &enable, sizeof(enable));
+    res = ng_netapi_get(dev, NETOPT_PROMISCUOUSMODE, 0, &enable, sizeof(enable));
 
-    if ((res >= 0) && (enable == NG_NETOPT_ENABLE)) {
+    if ((res >= 0) && (enable == NETOPT_ENABLE)) {
         printf("PROMISC  ");
         linebreak = true;
     }
 
-    res = ng_netapi_get(dev, NG_NETOPT_AUTOACK, 0, &enable, sizeof(enable));
+    res = ng_netapi_get(dev, NETOPT_AUTOACK, 0, &enable, sizeof(enable));
 
-    if ((res >= 0) && (enable == NG_NETOPT_ENABLE)) {
+    if ((res >= 0) && (enable == NETOPT_ENABLE)) {
         printf("AUTOACK  ");
         linebreak = true;
     }
 
-    res = ng_netapi_get(dev, NG_NETOPT_PRELOADING, 0, &enable, sizeof(enable));
+    res = ng_netapi_get(dev, NETOPT_PRELOADING, 0, &enable, sizeof(enable));
 
-    if ((res >= 0) && (enable == NG_NETOPT_ENABLE)) {
+    if ((res >= 0) && (enable == NETOPT_ENABLE)) {
         printf("PRELOAD  ");
         linebreak = true;
     }
 
-    res = ng_netapi_get(dev, NG_NETOPT_RAWMODE, 0, &enable, sizeof(enable));
+    res = ng_netapi_get(dev, NETOPT_RAWMODE, 0, &enable, sizeof(enable));
 
-    if ((res >= 0) && (enable == NG_NETOPT_ENABLE)) {
+    if ((res >= 0) && (enable == NETOPT_ENABLE)) {
         printf("RAWMODE  ");
         linebreak = true;
     }
@@ -278,7 +278,7 @@ static void _netif_list(kernel_pid_t dev)
         printf("\n           ");
     }
 
-    res = ng_netapi_get(dev, NG_NETOPT_SRC_LEN, 0, &u16, sizeof(u16));
+    res = ng_netapi_get(dev, NETOPT_SRC_LEN, 0, &u16, sizeof(u16));
 
     if (res >= 0) {
         printf("Source address length: %" PRIu16 "\n           ", u16);
@@ -322,7 +322,7 @@ static void _netif_list(kernel_pid_t dev)
     puts("");
 }
 
-static int _netif_set_u16(kernel_pid_t dev, ng_netopt_t opt, char *u16_str)
+static int _netif_set_u16(kernel_pid_t dev, netopt_t opt, char *u16_str)
 {
     unsigned int res;
     bool hex = false;
@@ -371,7 +371,7 @@ static int _netif_set_u16(kernel_pid_t dev, ng_netopt_t opt, char *u16_str)
     return 0;
 }
 
-static int _netif_set_i16(kernel_pid_t dev, ng_netopt_t opt, char *i16_str)
+static int _netif_set_i16(kernel_pid_t dev, netopt_t opt, char *i16_str)
 {
     int16_t val = (int16_t)atoi(i16_str);
 
@@ -389,10 +389,10 @@ static int _netif_set_i16(kernel_pid_t dev, ng_netopt_t opt, char *i16_str)
     return 0;
 }
 
-static int _netif_set_flag(kernel_pid_t dev, ng_netopt_t opt,
-                           ng_netopt_enable_t set)
+static int _netif_set_flag(kernel_pid_t dev, netopt_t opt,
+                           netopt_enable_t set)
 {
-    if (ng_netapi_set(dev, opt, 0, &set, sizeof(ng_netopt_enable_t)) < 0) {
+    if (ng_netapi_set(dev, opt, 0, &set, sizeof(netopt_enable_t)) < 0) {
         puts("error: unable to set option");
         return 1;
     }
@@ -400,7 +400,7 @@ static int _netif_set_flag(kernel_pid_t dev, ng_netopt_t opt,
     return 0;
 }
 
-static int _netif_set_addr(kernel_pid_t dev, ng_netopt_t opt, char *addr_str)
+static int _netif_set_addr(kernel_pid_t dev, netopt_t opt, char *addr_str)
 {
     uint8_t addr[MAX_ADDR_LEN];
     size_t addr_len = ng_netif_addr_from_str(addr, sizeof(addr), addr_str);
@@ -428,28 +428,28 @@ static int _netif_set_addr(kernel_pid_t dev, ng_netopt_t opt, char *addr_str)
 
 static int _netif_set_state(kernel_pid_t dev, char *state_str)
 {
-    ng_netopt_state_t state;
+    netopt_state_t state;
     if ((strcmp("off", state_str) == 0) || (strcmp("OFF", state_str) == 0)) {
-        state = NG_NETOPT_STATE_OFF;
+        state = NETOPT_STATE_OFF;
     }
     else if ((strcmp("sleep", state_str) == 0) ||
              (strcmp("SLEEP", state_str) == 0)) {
-        state = NG_NETOPT_STATE_SLEEP;
+        state = NETOPT_STATE_SLEEP;
     }
     else if ((strcmp("idle", state_str) == 0) ||
              (strcmp("IDLE", state_str) == 0)) {
-        state = NG_NETOPT_STATE_IDLE;
+        state = NETOPT_STATE_IDLE;
     }
     else if ((strcmp("reset", state_str) == 0) ||
              (strcmp("RESET", state_str) == 0)) {
-        state = NG_NETOPT_STATE_RESET;
+        state = NETOPT_STATE_RESET;
     }
     else {
         puts("usage: ifconfig <if_id> set state [off|sleep|idle|reset]");
         return 1;
     }
-    if (ng_netapi_set(dev, NG_NETOPT_STATE, 0,
-                      &state, sizeof(ng_netopt_state_t)) < 0) {
+    if (ng_netapi_set(dev, NETOPT_STATE, 0,
+                      &state, sizeof(netopt_state_t)) < 0) {
         printf("error: unable to set state to ");
         _print_netopt_state(state);
         puts("");
@@ -465,23 +465,23 @@ static int _netif_set_state(kernel_pid_t dev, char *state_str)
 static int _netif_set(char *cmd_name, kernel_pid_t dev, char *key, char *value)
 {
     if ((strcmp("addr", key) == 0) || (strcmp("addr_short", key) == 0)) {
-        return _netif_set_addr(dev, NG_NETOPT_ADDRESS, value);
+        return _netif_set_addr(dev, NETOPT_ADDRESS, value);
     }
     else if (strcmp("addr_long", key) == 0) {
-        return _netif_set_addr(dev, NG_NETOPT_ADDRESS_LONG, value);
+        return _netif_set_addr(dev, NETOPT_ADDRESS_LONG, value);
     }
     else if ((strcmp("channel", key) == 0) || (strcmp("chan", key) == 0)) {
-        return _netif_set_u16(dev, NG_NETOPT_CHANNEL, value);
+        return _netif_set_u16(dev, NETOPT_CHANNEL, value);
     }
     else if ((strcmp("nid", key) == 0) || (strcmp("pan", key) == 0) ||
              (strcmp("pan_id", key) == 0)) {
-        return _netif_set_u16(dev, NG_NETOPT_NID, value);
+        return _netif_set_u16(dev, NETOPT_NID, value);
     }
     else if (strcmp("power", key) == 0) {
-        return _netif_set_i16(dev, NG_NETOPT_TX_POWER, value);
+        return _netif_set_i16(dev, NETOPT_TX_POWER, value);
     }
     else if (strcmp("src_len", key) == 0) {
-        return _netif_set_u16(dev, NG_NETOPT_SRC_LEN, value);
+        return _netif_set_u16(dev, NETOPT_SRC_LEN, value);
     }
     else if (strcmp("state", key) == 0) {
         return _netif_set_state(dev, value);
@@ -493,24 +493,24 @@ static int _netif_set(char *cmd_name, kernel_pid_t dev, char *key, char *value)
 
 static int _netif_flag(char *cmd, kernel_pid_t dev, char *flag)
 {
-    ng_netopt_enable_t set = NG_NETOPT_ENABLE;
+    netopt_enable_t set = NETOPT_ENABLE;
 
     if (flag[0] == '-') {
-        set = NG_NETOPT_DISABLE;
+        set = NETOPT_DISABLE;
         flag++;
     }
 
     if (strcmp(flag, "promisc") == 0) {
-        return _netif_set_flag(dev, NG_NETOPT_PROMISCUOUSMODE, set);
+        return _netif_set_flag(dev, NETOPT_PROMISCUOUSMODE, set);
     }
     else if (strcmp(flag, "preload") == 0) {
-        return _netif_set_flag(dev, NG_NETOPT_PRELOADING, set);
+        return _netif_set_flag(dev, NETOPT_PRELOADING, set);
     }
     else if (strcmp(flag, "autoack") == 0) {
-        return _netif_set_flag(dev, NG_NETOPT_AUTOACK, set);
+        return _netif_set_flag(dev, NETOPT_AUTOACK, set);
     }
     else if (strcmp(flag, "raw") == 0) {
-        return _netif_set_flag(dev, NG_NETOPT_RAWMODE, set);
+        return _netif_set_flag(dev, NETOPT_RAWMODE, set);
     }
     else if (strcmp(flag, "6lo") == 0) {
 #ifdef MODULE_NG_IPV6_NETIF

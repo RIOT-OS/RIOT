@@ -93,7 +93,7 @@ typedef enum {
     NETOPT_PROTO,               /**< get/set the protocol for the layer
                                  *   as type ng_nettype_t. */
     NETOPT_STATE,               /**< get/set the state of network devices as
-                                 *   type ng_netopt_state_t */
+                                 *   type netopt_state_t */
     NETOPT_RAWMODE,             /**< en/disable the pre-processing of data
                                  *   in a network device driver as type
                                  *   ng_nettype_t */
@@ -145,7 +145,7 @@ typedef enum {
      * @note    Interfaces are not meant to respond to that.
      */
     NETOPT_NUMOF,
-} ng_netopt_t;
+} netopt_t;
 
 /**
  * @brief   Binary parameter for enabling and disabling options
@@ -153,7 +153,7 @@ typedef enum {
 typedef enum {
     NETOPT_DISABLE = 0,         /**< disable a given option */
     NETOPT_ENABLE = 1,          /**< enable a given option */
-} ng_netopt_enable_t;
+} netopt_enable_t;
 
 /**
  * @brief   Option parameter to be used with @ref NETOPT_STATE to set or get
@@ -175,7 +175,7 @@ typedef enum {
     NETOPT_STATE_RESET,         /**< triggers a hardware reset. The resulting
                                  *   state of the network device is @ref NETOPT_STATE_IDLE */
     /* add other states if needed */
-} ng_netopt_state_t;
+} netopt_state_t;
 
 #ifdef __cplusplus
 }

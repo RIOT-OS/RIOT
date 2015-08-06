@@ -28,7 +28,7 @@
 
 #include "kernel.h"
 #include "net/ng_pkt.h"
-#include "net/ng_netopt.h"
+#include "net/netopt.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -127,7 +127,7 @@ typedef struct {
      *                      @p max_len is too small to store the option value
      * @return              -ECANCELED if internal driver error occurred
      */
-    int (*get)(ng_netdev_t *dev, ng_netopt_t opt, void *value, size_t max_len);
+    int (*get)(ng_netdev_t *dev, netopt_t opt, void *value, size_t max_len);
 
     /**
      * @brief   Set an option value for a given network device
@@ -143,7 +143,7 @@ typedef struct {
      * @return              -EINVAL if @p value is invalid
      * @return              -ECANCELED if internal driver error occurred
      */
-    int (*set)(ng_netdev_t *dev, ng_netopt_t opt, void *value, size_t value_len);
+    int (*set)(ng_netdev_t *dev, netopt_t opt, void *value, size_t value_len);
 
     /**
      * @brief   This function is called by a MAC layer when a message of type
