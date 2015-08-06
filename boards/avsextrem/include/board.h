@@ -47,13 +47,6 @@ extern "C" {
 #define LED_RED_TOGGLE (FIO3PIN ^= LED_RED_PIN)
 /** @} */
 
-#ifdef MODULE_FAT
-#define CFG_CONF_MEM_SIZE             0x7FFFFFFF
-#define SYSLOG_CONF_NUM_INTERFACES        2
-#else
-#define SYSLOG_CONF_NUM_INTERFACES        1
-#endif
-
 /**
  * @name Define UART device and baudrate for stdio
  * @{
