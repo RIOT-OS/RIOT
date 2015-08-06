@@ -41,8 +41,6 @@ extern "C" {
  */
 #define CPUID_ID_LEN                      (12)
 
-#define TRANSCEIVER_BUFFER_SIZE (3)
-
 #ifdef __cplusplus
 }
 #endif

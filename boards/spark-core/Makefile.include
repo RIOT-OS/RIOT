@@ -16,8 +16,7 @@ export OFLAGS = -O binary
 export FFLAGS = -d 1d50:607f -a 0 -s 0x08005000:leave -D "$(HEXFILE)"
 export TERMFLAGS = -p $(PORT)
 
-# export board specific includes to the global includes-listing
-export INCLUDES += -I$(RIOTBASE)/drivers/at86rf231/include -I$(RIOTBASE)/sys/net/include
+export INCLUDES += -I$(RIOTCPU)/$(CPU)/include/ -I$(RIOTBOARD)/$(BOARD)/include/
 
 # setup serial terminal
 include $(RIOTBOARD)/Makefile.include.serial

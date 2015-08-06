@@ -54,7 +54,5 @@ extern "C" {
 
 #include "board-conf.h"
 
-typedef uint8_t radio_packet_length_t;
-
 /** @} */
 #endif /* MSB_BOARD_H_ */

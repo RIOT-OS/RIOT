@@ -1,56 +1,9 @@
-ifneq (,$(filter nomac,$(USEMODULE)))
-    USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/include
-endif
-ifneq (,$(filter transport_layer,$(USEMODULE)))
-    USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/include
-endif
-ifneq (,$(filter socket_base,$(USEMODULE)))
-    USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/include
-endif
-ifneq (,$(filter tcp,$(USEMODULE)))
-    USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/include
-endif
-ifneq (,$(filter udp,$(USEMODULE)))
-    USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/include
-endif
 ifneq (,$(filter net_help,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/include
-    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/cc110x
-    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/cc110x_legacy_csma
-    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/cc110x_legacy/include
-endif
-ifneq (,$(filter net_if,$(USEMODULE)))
-    USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/include
-endif
-ifneq (,$(filter pktqueue,$(USEMODULE)))
-    USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/include
-endif
-ifneq (,$(filter protocol_multiplex,$(USEMODULE)))
-    USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/include
-endif
-ifneq (,$(filter sixlowpan,$(USEMODULE)))
-    USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/include
-endif
-ifneq (,$(filter rpl,$(USEMODULE)))
-    USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/include
-    USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/routing/rpl
 endif
 ifneq (,$(filter nhdp,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/include
     USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/routing/nhdp
-endif
-ifneq (,$(filter ieee802154,$(USEMODULE)))
-    USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/include
-endif
-ifneq (,$(filter l2_ping,$(USEMODULE)))
-    USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/include
-endif
-ifneq (,$(filter ccn_lite,$(USEMODULE)))
-    USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/include
-    USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/ccn_lite
-endif
-ifneq (,$(filter ccn_lite_client,$(USEMODULE)))
-    USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/include
 endif
 
 ifneq (,$(filter crypto,$(USEMODULE)))

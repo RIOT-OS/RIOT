@@ -7,7 +7,6 @@ BOARD_BLACKLIST := arduino-mega2560 chronos msb-430 msb-430h telosb \
 
 BOARD_INSUFFICIENT_RAM := redbee-econotag
 
-USEMODULE += defaulttransceiver
 USEPKG += libcoap
 
 include $(RIOTBASE)/Makefile.include

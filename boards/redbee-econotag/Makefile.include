@@ -31,11 +31,5 @@ export TERMFLAGS += -p "$(PORT)"
 export INCLUDES += -I$(RIOTCPU)/$(CPU)/include/ -I$(RIOTBOARD)/$(BOARD)/include/
 export INCLUDES += -I$(RIOTCPU)/$(CPU)/maca/include
 export INCLUDES += -I$(RIOTBOARD)/$(BOARD)/drivers/include
-export INCLUDES += -I$(RIOTBASE)/sys/net/include
-
-ifneq (,$(filter defaulttransceiver,$(USEMODULE)))
-	USEMODULE += mc1322x
-	USEMODULE += transceiver
-endif
 
 export UNDEF += $(BINDIR)cpu/startup.o

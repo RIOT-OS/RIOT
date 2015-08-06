@@ -22,12 +22,8 @@ endif
 export FFLAGS = --telosb -c $(PORT) -r -e -I -p $(HEXFILE)
 export TERMFLAGS += -p "$(PORT)"
 
-export INCLUDES += -I$(RIOTCPU)/msp430-common/include -I$(RIOTBOARD)/$(BOARD)/include -I$(RIOTBASE)/drivers/cc2420/include -I$(RIOTBASE)/sys/net/include
+export INCLUDES += -I$(RIOTCPU)/$(CPU)/include/ -I$(RIOTBOARD)/$(BOARD)/include/
+export INCLUDES += -I$(RIOTCPU)/msp430-common/include
 export OFLAGS = -O ihex
-
-ifneq (,$(filter defaulttransceiver,$(USEMODULE)))
-	USEMODULE += cc2420
-	USEMODULE += transceiver
-endif
 
 export UNDEF += $(BINDIR)msp430_common/startup.o

@@ -5,20 +5,6 @@ SRC = shell_commands.c sc_sys.c
 ifneq (,$(filter config,$(USEMODULE)))
   SRC += sc_id.c
 endif
-ifneq (,$(filter transceiver,$(USEMODULE)))
-  SRC += sc_transceiver.c
-endif
-ifneq (,$(filter cc110x_legacy_csma,$(USEMODULE)))
-  ifeq (,$(filter transceiver,$(USEMODULE)))
-    SRC += sc_cc110x_legacy_csma.c
-  endif
-endif
-ifneq (,$(filter l2_ping,$(USEMODULE)))
-  SRC += sc_l2_ping.c
-endif
-ifneq (,$(filter net_if,$(USEMODULE)))
-  SRC += sc_net_if.c
-endif
 ifneq (,$(filter mci,$(USEMODULE)))
   SRC += sc_disk.c
 endif
@@ -27,9 +13,6 @@ ifneq (,$(filter ltc4150,$(USEMODULE)))
 endif
 ifneq (,$(filter ps,$(USEMODULE)))
   SRC += sc_ps.c
-endif
-ifneq (,$(filter rpl,$(USEMODULE)))
-  SRC += sc_rpl.c
 endif
 ifneq (,$(filter sht11,$(USEMODULE)))
   SRC += sc_sht11.c

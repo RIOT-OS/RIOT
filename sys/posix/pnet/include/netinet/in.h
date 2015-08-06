@@ -26,7 +26,7 @@
 #include <inttypes.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
-#include "ipv6.h"
+#include "net/ng_ipv6.h"
 #include "socket_base/socket.h"
 
 #ifdef __cplusplus
@@ -49,7 +49,7 @@ struct in6_addr {
     /**
      * Private RIOT-internal data, needs not to be touched by the user.
      */
-    ipv6_addr_t     __in6_u;
+    ng_ipv6_addr_t     __in6_u;
 
     /**
      * IPv6 Address represented as sequence of 8-bit numbers. Member of

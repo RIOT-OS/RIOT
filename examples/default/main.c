@@ -39,102 +39,6 @@
 #include "ltc4150.h"
 #endif
 
-#if MODULE_AT86RF231 || MODULE_CC2420 || MODULE_MC1322X
-#include "ieee802154_frame.h"
-#endif
-
-#ifdef MODULE_TRANSCEIVER
-#include "transceiver.h"
-#endif
-
-#define SND_BUFFER_SIZE     (100)
-#define RCV_BUFFER_SIZE     (64)
-#define RADIO_STACK_SIZE    (THREAD_STACKSIZE_MAIN)
-
-#ifdef MODULE_TRANSCEIVER
-
-static char radio_stack_buffer[RADIO_STACK_SIZE];
-static msg_t msg_q[RCV_BUFFER_SIZE];
-
-void *radio(void *arg)
-{
-    (void) arg;
-
-    msg_t m;
-
-#if MODULE_AT86RF231 || MODULE_CC2420 || MODULE_MC1322X
-    ieee802154_packet_t *p;
-#else
-    radio_packet_t *p;
-    radio_packet_length_t i;
-#endif
-
-    msg_init_queue(msg_q, RCV_BUFFER_SIZE);
-
-    while (1) {
-        msg_receive(&m);
-
-        if (m.type == PKT_PENDING) {
-#if MODULE_AT86RF231 || MODULE_CC2420 || MODULE_MC1322X
-            p = (ieee802154_packet_t*) m.content.ptr;
-            printf("Got radio packet:\n");
-            printf("\tLength:\t%u\n", p->length);
-            printf("\tSrc:\t%u\n", (p->frame.src_addr[0])|(p->frame.src_addr[1]<<8));
-            printf("\tDst:\t%u\n", (p->frame.dest_addr[0])|(p->frame.dest_addr[1]<<8));
-            printf("\tLQI:\t%u\n", p->lqi);
-            printf("\tRSSI:\t%u\n", p->rssi);
-
-            printf("Payload Length:%u\n", p->frame.payload_len);
-            printf("Payload:%s\n", p->frame.payload);
-
-            p->processing--;
-#else
-            p = (radio_packet_t *) m.content.ptr;
-
-            printf("Got radio packet:\n");
-            printf("\tLength:\t%u\n", p->length);
-            printf("\tSrc:\t%u\n", p->src);
-            printf("\tDst:\t%u\n", p->dst);
-            printf("\tLQI:\t%u\n", p->lqi);
-            printf("\tRSSI:\t%u\n", p->rssi);
-
-            for (i = 0; i < p->length; i++) {
-                printf("%02X ", p->data[i]);
-            }
-
-            p->processing--;
-            puts("\n");
-#endif
-
-        }
-        else if (m.type == ENOBUFFER) {
-            puts("Transceiver buffer full");
-        }
-        else {
-            puts("Unknown message received");
-        }
-    }
-}
-
-void init_transceiver(void)
-{
-    kernel_pid_t radio_pid = thread_create(
-                        radio_stack_buffer,
-                        sizeof(radio_stack_buffer),
-                        THREAD_PRIORITY_MAIN - 2,
-                        CREATE_STACKTEST,
-                        radio,
-                        NULL,
-                        "radio");
-
-    uint16_t transceivers = TRANSCEIVER_DEFAULT;
-
-    transceiver_init(transceivers);
-    (void) transceiver_start();
-    transceiver_register(transceivers, radio_pid);
-}
-#endif /* MODULE_TRANSCEIVER */
-
 int main(void)
 {
     shell_t shell;
@@ -142,10 +46,6 @@ int main(void)
 
 #ifdef MODULE_LTC4150
     ltc4150_start();
-#endif
-
-#ifdef MODULE_TRANSCEIVER
-    init_transceiver();
 #endif
 
 #ifdef FEATURE_PERIPH_RTC

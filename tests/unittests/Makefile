@@ -20,12 +20,6 @@ DISABLE_MODULE += auto_init
 # Pull in `Makefile.include`s from the test suites:
 -include $(UNIT_TESTS:%=$(RIOTBASE)/tests/unittests/%/Makefile.include)
 
-ifneq (,$(filter netdev_dummy,$(USEMODULE)))
-    USEMODULE += netdev_base
-    DIRS += netdev_dummy
-    INCLUDES += -I$(RIOTBASE)/tests/unittests/netdev_dummy/include
-endif
-
 DIRS += $(UNIT_TESTS)
 BASELIBS += $(UNIT_TESTS:%=$(BINDIR)%.a)
 

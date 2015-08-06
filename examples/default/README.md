@@ -54,12 +54,6 @@ Running the `help` command on an msba2:
 2014-05-06 13:14:38,548 - INFO # hum                  Prints measured humidity.
 2014-05-06 13:14:38,553 - INFO # weather              Prints measured humidity and temperature.
 2014-05-06 13:14:38,557 - INFO # offset               Set temperature offset.
-2014-05-06 13:14:38,563 - INFO # cur                  Prints current and average power consumption.
-2014-05-06 13:14:38,567 - INFO # rstcur               Resets coulomb counter.
-2014-05-06 13:14:38,573 - INFO # addr                 Gets or sets the address for the transceiver
-2014-05-06 13:14:38,579 - INFO # chan                 Gets or sets the channel for the transceiver
-2014-05-06 13:14:38,585 - INFO # txtsnd               Sends a text message to a given node via the transceiver
-2014-05-06 13:14:38,592 - INFO # monitor              Enables or disables address checking for the transceiver
 2014-05-06 13:14:38,598 - INFO # dread_sec            Reads the specified sector of inserted memory card
 2014-05-06 13:14:38,605 - INFO # dread                Reads the specified bytes from inserted memory card
 2014-05-06 13:14:38,610 - INFO # dget_ssize           Get the sector size of inserted memory card
@@ -78,8 +72,6 @@ Running the `ps` command on an msba2:
 2014-05-09 17:38:33,401 - INFO #      0 | idle                 | pending  Q |  31 |   160 (  148) 0x40000014
 2014-05-09 17:38:33,407 - INFO #      1 | main                 | running  Q |  15 |  2560 (  848) 0x400000b4
 2014-05-09 17:38:33,414 - INFO #      2 | uart0                | bl rx    _ |  14 |   512 (  296) 0x40000ce0
-2014-05-09 17:38:33,420 - INFO #      3 | radio                | bl rx    _ |  13 |   512 (  188) 0x40001a74
-2014-05-09 17:38:33,427 - INFO #      4 | Transceiver          | bl rx    _ |  12 |   512 (  300) 0x40001f98
 2014-05-09 17:38:33,431 - INFO #        | SUM                  |            |     |  4256
 ```
 
@@ -98,21 +90,4 @@ status.
 Networking
 ==========
 
-The default application does not include any upper network layers, but
-you can use the transceiver directly to communicate with the nodes
-neighbourhood.
-
-The application comes with a thread that prints out any packets the
-node receives automatically.  The `monitor` command can be used to
-change this to only printing packets addressed for this node.  Use
-`monitor 0` to disable monitoring and `monitor 1` to reenable it.
-
-`txtsnd`  can be used to send network packets using the boards default
-transceiver.  Use `txtsnd 0 hello world` to broadcast the string
-`hello world`.  Type `txtsnd 42 hello forty-two` to send a message to
-the node with network address 42.
-
-The nodes address can be configured using `addr`.  Call `addr` without
-a parameter to see the current address, or `addr 42` to set it to 42.
-The `chan` and `pan` (where available) commands can be used likewise
-to set channel and personal area network identifier respectively.
+(networking is being reworked, stay tuned!)
