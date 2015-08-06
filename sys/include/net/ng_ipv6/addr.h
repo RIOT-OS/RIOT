@@ -47,6 +47,19 @@ extern "C" {
                                             "ffff:ffff:255.255.255.255"))
 
 /**
+ * @brief The first 10 bits of a site-local IPv6 unicast address
+ *
+ * @see <a href="http://tools.ietf.org/html/rfc4291#section-2.5.7">
+ *          RFC 4291, section 2.5.7
+ *      </a>
+ *
+ * @note Site-local addresses are now deprecated as defined in <a
+ *       href="http://tools.ietf.org/html/rfc3879">SLDEP</a>. They are only
+ *       defined here for the distinction of global unicast addresses.
+ */
+#define NG_IPV6_ADDR_SITE_LOCAL_PREFIX  (0xFEC0)
+
+/**
  * @brief Data type to represent an IPv6 address.
  */
 typedef union {
@@ -225,23 +238,6 @@ static inline bool ng_ipv6_addr_is_unspecified(const ng_ipv6_addr_t *addr)
 }
 
 /**
- * @brief   Check if @p addr is a multicast address.
- *
- * @see <a href="http://tools.ietf.org/html/rfc4291#section-2.7">
- *          RFC 4291, section 2.7
- *      </a>
- *
- * @param[in] addr  An IPv6 address.
- *
- * @return  true, if @p addr is multicast address,
- * @return  false, otherwise.
- */
-static inline bool ng_ipv6_addr_is_multicast(const ng_ipv6_addr_t *addr)
-{
-    return (addr->u8[0] == 0xff);
-}
-
-/**
  * @brief   Checks if @p addr is a loopback address.
  *
  * @see <a href="http://tools.ietf.org/html/rfc4291#section-2.5.3">
@@ -257,6 +253,74 @@ static inline bool ng_ipv6_addr_is_loopback(const ng_ipv6_addr_t *addr)
 {
     return (addr->u64[0].u64 == 0) &&
            (byteorder_ntohll(addr->u64[1]) == 1);
+}
+
+/**
+ * @brief   Check if @p addr is global unicast address.
+ *
+ * @see <a href="http://tools.ietf.org/html/rfc4291#section-2.5.4">
+ *          RFC 4291, section 2.5.4
+ *      </a>
+ *
+ * @param[in] addr  An IPv6 address.
+ *
+ * @return  true, if @p addr is global unicast address,
+ * @return  false, otherwise.
+ */
+bool ng_ipv6_addr_is_global_unicast(const ng_ipv6_addr_t *addr);
+
+/**
+ * @brief   Checks if @p addr is a IPv4-compatible IPv6 address.
+ *
+ * @see <a href="http://tools.ietf.org/html/rfc4291#section-2.5.5.1">
+ *          RFC 4291, section 2.5.5.1
+ *      </a>
+ *
+ * @param[in] addr  An IPv6 address.
+ *
+ * @return  true, if @p addr is an IPv4-compatible IPv6 address,
+ * @return  false, otherwise.
+ */
+static inline bool ng_ipv6_addr_is_ipv4_compat(const ng_ipv6_addr_t *addr)
+{
+    return (addr->u64[0].u64 == 0) &&
+           (addr->u32[2].u32 == 0);
+}
+
+/**
+ * @brief   Checks if @p addr is a IPv4-mapped IPv6 address.
+ *
+ * @see <a href="http://tools.ietf.org/html/rfc4291#section-2.5.5.2">
+ *          RFC 4291, section 2.5.5.2
+ *      </a>
+ *
+ * @param[in] addr  An IPv6 address.
+ *
+ * @return  true, if @p addr is an IPv4-compatible IPv6 address,
+ * @return  false, otherwise.
+ */
+static inline bool ng_ipv6_addr_is_ipv4_mapped(const ng_ipv6_addr_t *addr)
+{
+    return ((addr->u64[0].u64 == 0) &&
+            (addr->u16[4].u16 == 0) &&
+            (addr->u16[5].u16 == 0xFFFF));
+}
+
+/**
+ * @brief   Check if @p addr is a multicast address.
+ *
+ * @see <a href="http://tools.ietf.org/html/rfc4291#section-2.7">
+ *          RFC 4291, section 2.7
+ *      </a>
+ *
+ * @param[in] addr  An IPv6 address.
+ *
+ * @return  true, if @p addr is multicast address,
+ * @return  false, otherwise.
+ */
+static inline bool ng_ipv6_addr_is_multicast(const ng_ipv6_addr_t *addr)
+{
+    return (addr->u8[0] == 0xff);
 }
 
 /**
@@ -279,6 +343,30 @@ static inline bool ng_ipv6_addr_is_link_local(const ng_ipv6_addr_t *addr)
     return (byteorder_ntohll(addr->u64[0]) == 0xfe80000000000000) ||
            (ng_ipv6_addr_is_multicast(addr) &&
             (addr->u8[1] & 0x0f) == NG_IPV6_ADDR_MCAST_SCP_LINK_LOCAL);
+}
+
+/**
+ * @brief   Checks if @p addr is a site-local address.
+ *
+ * @see <a href="http://tools.ietf.org/html/rfc4291#section-2.5.7">
+ *          RFC 4291, section 2.5.7
+ *      </a>
+ *
+ * @note Site-local addresses are now deprecated as defined in <a
+ *       href="http://tools.ietf.org/html/rfc3879">SLDEP</a>. They are only
+ *       defined here for the distinction of global unicast addresses.
+ *
+ * @param[in] addr  An IPv6 address.
+ *
+ * @return  true, if @p addr is a site-local unicast address,
+ * @return  false, otherwise.
+ */
+static inline bool ng_ipv6_addr_is_site_local(const ng_ipv6_addr_t *addr)
+{
+    return (((byteorder_ntohs(addr->u16[0]) & 0xFFC0) ==
+             NG_IPV6_ADDR_SITE_LOCAL_PREFIX) ||
+            (ng_ipv6_addr_is_multicast(addr) &&
+            (addr->u8[1] & 0x0f) == NG_IPV6_ADDR_MCAST_SCP_SITE_LOCAL));
 }
 
 /**
@@ -316,6 +404,7 @@ static inline bool ng_ipv6_addr_is_solicited_node(const ng_ipv6_addr_t *addr)
            (byteorder_ntohl(addr->u32[2]) == 1) &&
            (addr->u8[12] == 0xff);
 }
+
 
 /**
  * @brief   Checks up to which bit-count two IPv6 addresses match in their
