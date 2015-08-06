@@ -151,7 +151,7 @@ WEAK __attribute__((alias("dummy_handler_default"))) void isr_svc(void);
 
 WEAK __attribute__((alias("dummy_handler_default"))) void isr_systick(void);
 
-__attribute__((used, section(".vectors.common"))) const void *vectors_common[] = {
+__attribute__((used, section(".vector_table_common"))) const void *vectors_common[] = {
     (void*) (&_estack),      /*  0 initial stack pointer value */
 
 #if defined(CPU_ARCH_CORTEX_M3) || defined(CPU_ARCH_CORTEX_M4) || defined(CPU_ARCH_CORTEX_M4F)

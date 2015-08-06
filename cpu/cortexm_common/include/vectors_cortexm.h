@@ -33,7 +33,7 @@ extern "C" {
  * @brief   Put this macro in front of the array holding the device
  *          specific interrupt vectors
  */
-#define ISR_VECTORS     __attribute__((used,section(".vectors.vendor")))
+#define ISR_VECTORS     __attribute__((used,section(".vector_table_vendor")))
 
 /**
  * @brief   This function is the default entry point after a system reset

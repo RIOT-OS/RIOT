@@ -39,19 +39,35 @@ STACK_SIZE = DEFINED(STACK_SIZE) ? STACK_SIZE : 0x200; /* 512 byte */
 /* Section Definitions */
 SECTIONS
 {
+    /* Contains the initial stack pointer and the Cortex-M
+       architecture-defined exceptions 1 through 15 (16 words) */
+    .vector_table_common : {
+        . = ALIGN(4);
+        _vector_table_common = .;
+        KEEP(*(.vector_table_common))
+    } > rom
+
+    ASSERT(ADDR(.vector_table_common) == ORIGIN(rom),
+           "Section .vector_table_common at invalid location (must be at beginning of ROM)")
+
+    ASSERT(SIZEOF(.vector_table_common) == 0x40,
+           "Section .vector_table_common has wrong size! (must be 0x40)")
+
+    /* Contains the cpu-specific IRQs 0 up to 15/240 (M0../M3..) */
+    .vector_table_vendor : {
+        . = ALIGN(4);
+        _vector_table_vendor = .;
+        KEEP(*(.vector_table_vendor))
+    } > rom
+
+    ASSERT(SIZEOF(.vector_table_vendor) > 0,
+           "No section .vector_table_vendor present! (define with ISR_VECTORS in cpu-specific)")
+
+    ASSERT(ADDR(.vector_table_vendor) == (ORIGIN(rom) + SIZEOF(.vector_table_common)),
+           "Section .vector_table_vendor at invalid location (must be at offset 0x40 of ROM)")
+    
     .text :
     {
-        /* Contains the initial stack pointer and the Cortex-M
-           architecture-defined exceptions 1 through 15 (16 words) */
-        . = ALIGN(4);
-        _vectors_common = .;
-        KEEP(*(.vectors.common))
-
-        /* Contains the cpu-specific IRQs 0 up to 15/240 (M0../M3..) */
-        . = ALIGN(4);
-        _vectors_vendor = .;
-        KEEP(*(.vectors.vendor))
-
         . = ALIGN(4);
         *(.text .text.* .gnu.linkonce.t.*)
         *(.glue_7t) *(.glue_7)
