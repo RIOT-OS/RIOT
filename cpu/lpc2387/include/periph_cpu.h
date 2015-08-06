@@ -1,18 +1,50 @@
-#ifndef PERIPH_CPU_H
-#define PERIPH_CPU_H
+/*
+ * Copyright (C) 2015 Kaspar Schleiser <kaspar@schleiser.de>
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
+/**
+ * @ingroup         cpu_lpc2387
+ * @{
+ *
+ * @file
+ * @brief           CPU specific definitions for internal peripheral handling
+ *
+ * @author          Kaspar Schleiser <kaspar@schleiser.de>
+ */
+
+#ifndef PERIPH_CPU_H_
+#define PERIPH_CPU_H_
+
+#include "cpu.h"
+#include "periph/dev_enums.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include <stdint.h>
 #include "cpu.h"
 
+/**
+ * @brief   LPC2387 MCU defines
+ * @{
+ */
 #define __IO volatile
 
+/**
+ * @brief Fast GPIO register definition struct
+ */
 typedef struct {
-    __IO uint32_t DIR;
-    uint32_t _reserved[3];
-    __IO uint32_t MASK;
-    __IO uint32_t PIN;
-    __IO uint32_t SET;
-    __IO uint32_t CLR;
+    __IO uint32_t DIR;      /**< he */
+    uint32_t _reserved[3];  /**< really */
+    __IO uint32_t MASK;     /**< wants */
+    __IO uint32_t PIN;      /**< to */
+    __IO uint32_t SET;      /**< know */
+    __IO uint32_t CLR;      /**< everything */
 } FIO_PORT_t;
 
 #define FIO_PORTS   ((FIO_PORT_t*)FIO_BASE_ADDR)
@@ -45,4 +77,12 @@ typedef enum {
 #define PERIPH_SPI_NEEDS_TRANSFER_BYTES
 #define PERIPH_SPI_NEEDS_TRANSFER_REG
 #define PERIPH_SPI_NEEDS_TRANSFER_REGS
+/* @} */
+
+/* @} */
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* PERIPH_CPU_H_ */
 /** @} */

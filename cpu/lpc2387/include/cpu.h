@@ -26,7 +26,15 @@ extern "C" {
 
 extern uintptr_t __stack_start;     ///< end of user stack memory space
 
+/**
+ * @brief Scale lpc2387 cpu speed
+ */
 void lpc2387_pclk_scale(uint32_t source, uint32_t target, uint32_t *pclksel, uint32_t *prescale);
+
+
+/**
+ * @brief install lpc2387 irq
+ */
 bool install_irq(int IntNumber, void (*HandlerAddr)(void), int Priority);
 
 #ifdef MODULE_PERIPH
