@@ -11,6 +11,8 @@
  * @ingroup     sys
  * @brief       Bitfields of arbitrary length
  * @file
+ * @note        If the bitfield has always less than 32 entries, bitarithm from
+ *              @ref from core_util is more efficient.
  * @{
  *
  * @brief       bitfields operations on bitfields of arbitrary length
