@@ -48,9 +48,7 @@
 
 #include "cpu.h"
 #include "cpu_conf.h"
-#ifdef MODULE_NATIVENET
-#include "tap.h"
-#endif
+
 #ifdef MODULE_NG_NATIVENET
 #include "dev_eth_tap.h"
 extern dev_eth_tap_t dev_eth_tap;
@@ -76,9 +74,7 @@ int reboot_arch(int mode)
 #ifdef MODULE_UART0
     /* TODO: close stdio fds */
 #endif
-#ifdef MODULE_NATIVENET
-    tap_cleanup();
-#endif
+
 #ifdef MODULE_NG_NATIVENET
     dev_eth_tap_cleanup(&dev_eth_tap);
 #endif

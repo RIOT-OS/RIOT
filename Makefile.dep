@@ -1,53 +1,3 @@
-ifneq (,$(filter libcoap,$(USEPKG)))
-  USEMODULE += pnet
-endif
-
-ifneq (,$(filter pnet,$(USEMODULE)))
-  USEMODULE += posix
-  USEMODULE += socket_base
-  USEMODULE += net_help
-endif
-
-ifneq (,$(filter transport_layer,$(USEMODULE)))
-  USEMODULE += tcp
-  USEMODULE += udp
-endif
-
-ifneq (,$(filter udp,$(USEMODULE)))
-  USEMODULE += socket_base
-endif
-
-ifneq (,$(filter tcp,$(USEMODULE)))
-  USEMODULE += socket_base
-endif
-
-ifneq (,$(filter socket_base,$(USEMODULE)))
-  USEMODULE += sixlowpan
-  USEMODULE += net_help
-  USEMODULE += vtimer
-endif
-
-ifneq (,$(filter sixlowborder,$(USEMODULE)))
-  USEMODULE += sixlowpan
-endif
-
-ifneq (,$(filter rpl,$(USEMODULE)))
-  USEMODULE += trickle
-  USEMODULE += routing
-endif
-
-ifneq (,$(filter routing,$(USEMODULE)))
-  USEMODULE += sixlowpan
-endif
-
-ifneq (,$(filter sixlowpan,$(USEMODULE)))
-  USEMODULE += ieee802154
-  USEMODULE += net_help
-  USEMODULE += net_if
-  USEMODULE += posix
-  USEMODULE += vtimer
-endif
-
 ifneq (,$(filter ng_netif_default,$(USEMODULE)))
   USEMODULE += ng_netif
 endif
@@ -232,14 +182,6 @@ ifneq (,$(filter ng_slip,$(USEMODULE)))
   USEMODULE += ng_netbase
 endif
 
-ifneq (,$(filter aodvv2,$(USEMODULE)))
-  USEMODULE += vtimer
-  USEMODULE += sixlowpan
-  USEMODULE += oonf_common
-  USEMODULE += oonf_rfc5444
-  USEMODULE += fib
-endif
-
 ifneq (,$(filter uart0,$(USEMODULE)))
   USEMODULE += posix
 endif
@@ -253,29 +195,6 @@ ifneq (,$(filter cbor,$(USEMODULE)))
   USEMODULE += net_help
 endif
 
-ifneq (,$(filter cc110x%,$(USEMODULE)))
-  USEMODULE += protocol_multiplex
-  USEMODULE += vtimer
-endif
-
-ifneq (,$(filter cc110x,$(USEMODULE)))
-  USEMODULE += transceiver
-endif
-
-ifneq (,$(filter cc110x_legacy,$(USEMODULE)))
-  USEMODULE += transceiver
-endif
-
-ifneq (,$(filter cc2420,$(USEMODULE)))
-  USEMODULE += transceiver
-  USEMODULE += ieee802154
-endif
-
-ifneq (,$(filter at86rf231,$(USEMODULE)))
-  USEMODULE += netdev_802154
-  USEMODULE += ieee802154
-endif
-
 ifneq (,$(filter l2_ping,$(USEMODULE)))
   USEMODULE += vtimer
 endif
@@ -284,18 +203,8 @@ ifneq (,$(filter vtimer,$(USEMODULE)))
   USEMODULE += timex
 endif
 
-ifneq (,$(filter net_if,$(USEMODULE)))
-  USEMODULE += transceiver
-  USEMODULE += net_help
-  USEMODULE += hashes
-endif
-
 ifneq (,$(filter ccn_lite,$(USEMODULE)))
   USEMODULE += crypto
-endif
-
-ifneq (,$(filter netdev_802154,$(USEMODULE)))
-  USEMODULE += netdev_base
 endif
 
 ifneq (,$(filter rgbled,$(USEMODULE)))
@@ -304,10 +213,6 @@ endif
 
 ifneq (,$(filter libfixmath-unittests,$(USEMODULE)))
   USEPKG += libfixmath
-endif
-
-ifneq (,$(filter defaulttransceiver,$(USEMODULE)))
-  FEATURES_REQUIRED += transceiver
 endif
 
 ifneq (,$(filter nhdp,$(USEMODULE)))
@@ -341,6 +246,10 @@ endif
 
 ifneq (,$(filter newlib,$(USEMODULE)))
   USEMODULE += uart_stdio
+endif
+
+ifneq (,$(filter ng_netdev_eth,$(USEMODULE)))
+  USEMODULE += ng_pktbuf
 endif
 
 ifneq (,$(filter hih6130,$(USEMODULE)))

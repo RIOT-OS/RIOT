@@ -22,10 +22,6 @@
 
 #include "config.h"
 
-#ifdef MODULE_NATIVENET
-#include "nativenet.h"
-#include "nativenet_internal.h"
-#endif
 #include "native_internal.h"
 
 #define ENABLE_DEBUG (0)
@@ -39,10 +35,6 @@ void config_load(void)
     DEBUG("config_load()\n");
 
     sysconfig.id = _native_id;
-
-#ifdef MODULE_NATIVENET
-    _nativenet_default_dev_more._radio_addr = _native_id;
-#endif
 
     return;
 }

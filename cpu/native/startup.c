@@ -35,7 +35,6 @@
 
 #include "board_internal.h"
 #include "native_internal.h"
-#include "tap.h"
 
 int _native_null_in_pipe[2];
 int _native_null_out_file;
@@ -197,7 +196,7 @@ void usage_exit(void)
 {
     real_printf("usage: %s", _progname);
 
-#if defined(MODULE_NATIVENET) || defined(MODULE_NG_NATIVENET)
+#if defined(MODULE_NG_NATIVENET)
     real_printf(" <tap interface>");
 #endif
 
@@ -257,7 +256,7 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
     int replay = 0;
 #endif
 
-#if defined(MODULE_NATIVENET) || defined(MODULE_NG_NATIVENET)
+#if defined(MODULE_NG_NATIVENET)
     if (
             (argc < 2)
             || (
@@ -368,13 +367,7 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
 
     native_cpu_init();
     native_interrupt_init();
-#ifdef MODULE_NATIVENET
-    tap_init(argv[1]);
-#endif
 #ifdef MODULE_NG_NATIVENET
-# ifdef MODULE_NATIVENET
-#  error  "Modules nativenet and ng_nativenet are mutually exclusive."
-# endif
     dev_eth_tap_setup(&dev_eth_tap, argv[1]);
 #endif
 

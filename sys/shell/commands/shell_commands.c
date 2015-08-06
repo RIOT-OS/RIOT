@@ -77,66 +77,6 @@ extern int _rtc_handler(int argc, char **argv);
 extern int _x86_lspci(int argc, char **argv);
 #endif
 
-/* configure available commands for each transceiver device: */
-#ifdef MODULE_TRANSCEIVER
-#ifdef DBG_IGNORE
-#define _TC_IGN
-#endif
-#if (defined(MODULE_CC110X) || defined(MODULE_CC110X_LEGACY) || defined(MODULE_CC2420) || defined(MODULE_AT86RF231) || defined(MODULE_NATIVENET))
-#define _TC_ADDR
-#define _TC_CHAN
-#define _TC_MON
-#define _TC_SEND
-#endif
-#if (defined(MODULE_CC2420) || defined(MODULE_AT86RF231) || defined(MODULE_NATIVENET))
-#define _TC_LONG_ADDR
-#define _TC_PAN
-#endif
-#else /* WITHOUT MODULE_TRANSCEIVER */
-#ifdef MODULE_CC110X_LEGACY_CSMA
-extern int _cc110x_get_set_address_handler(int argc, char **argv);
-extern int _cc110x_get_set_channel_handler(int argc, char **argv);
-#endif
-#endif
-
-#ifdef MODULE_TRANSCEIVER
-#ifdef _TC_ADDR
-extern int _transceiver_get_set_address_handler(int argc, char **argv);
-#endif
-#ifdef _TC_LONG_ADDR
-extern int _transceiver_get_set_long_addr_handler(int argc, char **argv);
-#endif
-#ifdef _TC_CHAN
-extern int _transceiver_get_set_channel_handler(int argc, char **argv);
-#endif
-#ifdef _TC_SEND
-extern int _transceiver_send_handler(int argc, char **argv);
-#endif
-#ifdef _TC_MON
-extern int _transceiver_monitor_handler(int argc, char **argv);
-#endif
-#ifdef _TC_PAN
-extern int _transceiver_get_set_pan_handler(int argc, char **argv);
-#endif
-#ifdef _TC_IGN
-extern int _transceiver_set_ignore_handler(int argc, char **argv);
-#endif
-#endif
-
-#ifdef MODULE_L2_PING
-extern int _l2_ping_req_handler(int argc, char **argv);
-extern int _l2_ping_probe_handler(int argc, char **argv);
-extern int _l2_ping_get_probe_handler(int argc, char **argv);
-#endif
-
-#ifdef MODULE_NET_IF
-extern int _net_if_ifconfig(int argc, char **argv);
-#endif
-
-#ifdef MODULE_RPL
-extern int _rpl_route_handler(int argc, char **argv);
-#endif
-
 #ifdef MODULE_MCI
 extern int _get_sectorsize(int argc, char **argv);
 extern int _get_blocksize(int argc, char **argv);
@@ -157,12 +97,8 @@ extern int _mersenne_get(int argc, char **argv);
 #endif
 
 #ifdef MODULE_NG_NETIF
-#ifndef MODULE_NET_IF
 extern int _netif_config(int argc, char **argv);
-#endif
-#ifndef MODULE_TRANSCEIVER
 extern int _netif_send(int argc, char **argv);
-#endif
 #endif
 
 #ifdef MODULE_FIB
@@ -217,45 +153,6 @@ const shell_command_t _shell_command_list[] = {
     {"cur", "Prints current and average power consumption.", _get_current_handler},
     {"rstcur", "Resets coulomb counter.", _reset_current_handler},
 #endif
-#ifdef MODULE_TRANSCEIVER
-#ifdef _TC_ADDR
-    {"addr", "Gets or sets the address for the transceiver", _transceiver_get_set_address_handler},
-#endif
-#ifdef _TC_LONG_ADDR
-    {"eui64", "Gets or sets the EUI-64 for the transceiver", _transceiver_get_set_long_addr_handler},
-#endif
-#ifdef _TC_CHAN
-    {"chan", "Gets or sets the channel for the transceiver", _transceiver_get_set_channel_handler},
-#endif
-#ifdef _TC_SEND
-    {"txtsnd", "Sends a text message to a given node via the transceiver", _transceiver_send_handler},
-#endif
-#ifdef _TC_PAN
-    {"pan", "Gets or sets the pan id for the transceiver", _transceiver_get_set_pan_handler},
-#endif
-#ifdef _TC_MON
-    {"monitor", "Enables or disables address checking for the transceiver", _transceiver_monitor_handler},
-#endif
-#ifdef _TC_IGN
-    {"ign", "Ignore the address at the transceiver", _transceiver_set_ignore_handler},
-#endif
-#else /* WITHOUT MODULE_TRANSCEIVER */
-#ifdef MODULE_CC110X_LEGACY_CSMA
-    {"addr", "Gets or sets the address for the CC1100 transceiver", _cc110x_get_set_address_handler},
-    {"chan", "Gets or sets the channel for the CC1100 transceiver", _cc110x_get_set_channel_handler},
-#endif
-#endif
-#ifdef MODULE_L2_PING
-    {"l2_ping", "Sends link layer ping requests", _l2_ping_req_handler},
-    {"l2_probe", "Sends link layer probes", _l2_ping_probe_handler},
-    {"l2_probe_stats", "Get statistics about received probes", _l2_ping_get_probe_handler},
-#endif
-#ifdef MODULE_NET_IF
-    {"ifconfig", "Configures a network interface", _net_if_ifconfig},
-#endif
-#ifdef MODULE_RPL
-    {"route", "Shows the routing table", _rpl_route_handler},
-#endif
 #ifdef MODULE_MCI
     {DISK_READ_SECTOR_CMD, "Reads the specified sector of inserted memory card", _read_sector},
     {DISK_READ_BYTES_CMD, "Reads the specified bytes from inserted memory card", _read_bytes},
@@ -279,12 +176,8 @@ const shell_command_t _shell_command_list[] = {
     {"lspci", "Lists PCI devices", _x86_lspci},
 #endif
 #ifdef MODULE_NG_NETIF
-#ifndef MODULE_NET_IF
     {"ifconfig", "Configure network interfaces", _netif_config},
-#endif
-#ifndef MODULE_TRANSCEIVER
     {"txtsnd", "send raw data", _netif_send },
-#endif
 #endif
 #ifdef MODULE_FIB
     {"fibroute", "Manipulate the FIB (info: 'fibroute [add|del]')", _fib_route_handler},
