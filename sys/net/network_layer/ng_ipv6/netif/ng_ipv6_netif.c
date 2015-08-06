@@ -287,8 +287,7 @@ kernel_pid_t ng_ipv6_netif_find_by_addr(ng_ipv6_addr_t **out, const ng_ipv6_addr
         }
         else {
             if (ng_ipv6_netif_find_addr(ipv6_ifs[i].pid, addr) != NULL) {
-                DEBUG("ipv6 netif: Found %s on interface %" PRIkernel_pid "\n",
-                      ng_ipv6_addr_to_str(addr_str, *out, sizeof(addr_str)),
+                DEBUG("ipv6 netif: Found :: on interface %" PRIkernel_pid "\n",
                       ipv6_ifs[i].pid);
                 return ipv6_ifs[i].pid;
             }
