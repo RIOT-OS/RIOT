@@ -153,7 +153,7 @@ WEAK __attribute__((alias("dummy_handler_default"))) void isr_systick(void);
 
 __attribute__((used, section(".vectors.common"))) const void *vectors_common[] = {
     (void*) (&_estack),      /*  0 initial stack pointer value */
-    
+
 #if defined(CPU_ARCH_CORTEX_M3) || defined(CPU_ARCH_CORTEX_M4) || defined(CPU_ARCH_CORTEX_M4F)
     /* Cortex-M3/4 handlers */
     (void*) reset_handler,   /*  1 entry point of the program */

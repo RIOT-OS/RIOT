@@ -51,7 +51,7 @@ SECTIONS
         . = ALIGN(4);
         _vectors_vendor = .;
         KEEP(*(.vectors.vendor))
-        
+
         . = ALIGN(4);
         *(.text .text.* .gnu.linkonce.t.*)
         *(.glue_7t) *(.glue_7)
