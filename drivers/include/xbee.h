@@ -30,10 +30,10 @@
 #include "periph/uart.h"
 #include "periph/gpio.h"
 #include "net/ng_netbase.h"
-#include "net/ng_ieee802154.h"
+#include "net/ieee802154.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /**

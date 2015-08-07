@@ -20,7 +20,7 @@
  */
 
 #include "net/eui64.h"
-#include "net/ng_ieee802154.h"
+#include "net/ieee802154.h"
 #include "net/ng_netbase.h"
 #include "ng_at86rf2xx.h"
 #include "ng_at86rf2xx_netdev.h"
@@ -32,21 +32,21 @@
 
 #define _MAX_MHR_OVERHEAD   (25)
 
-/* TODO: generalize and move to ng_ieee802154 */
+/* TODO: generalize and move to (gnrc_)ieee802154 */
 static size_t _make_data_frame_hdr(ng_at86rf2xx_t *dev, uint8_t *buf,
                                    ng_netif_hdr_t *hdr)
 {
     int pos = 0;
 
     /* we are building a data frame here */
-    buf[0] = NG_IEEE802154_FCF_TYPE_DATA;
-    buf[1] = NG_IEEE802154_FCF_VERS_V1;
+    buf[0] = IEEE802154_FCF_TYPE_DATA;
+    buf[1] = IEEE802154_FCF_VERS_V1;
 
     /* if AUTOACK is enabled, then we also expect ACKs for this packet */
     if (!(hdr->flags & NG_NETIF_HDR_FLAGS_BROADCAST) &&
         !(hdr->flags & NG_NETIF_HDR_FLAGS_MULTICAST) &&
         (dev->options & NG_AT86RF2XX_OPT_AUTOACK)) {
-        buf[0] |= NG_IEEE802154_FCF_ACK_REQ;
+        buf[0] |= IEEE802154_FCF_ACK_REQ;
     }
 
     /* fill in destination PAN ID */
@@ -57,18 +57,18 @@ static size_t _make_data_frame_hdr(ng_at86rf2xx_t *dev, uint8_t *buf,
     /* fill in destination address */
     if (hdr->flags &
         (NG_NETIF_HDR_FLAGS_BROADCAST | NG_NETIF_HDR_FLAGS_MULTICAST)) {
-        buf[1] |= NG_IEEE802154_FCF_DST_ADDR_SHORT;
+        buf[1] |= IEEE802154_FCF_DST_ADDR_SHORT;
         buf[pos++] = 0xff;
         buf[pos++] = 0xff;
     }
     else if (hdr->dst_l2addr_len == 2) {
         uint8_t *dst_addr = ng_netif_hdr_get_dst_addr(hdr);
-        buf[1] |= NG_IEEE802154_FCF_DST_ADDR_SHORT;
+        buf[1] |= IEEE802154_FCF_DST_ADDR_SHORT;
         buf[pos++] = dst_addr[1];
         buf[pos++] = dst_addr[0];
     }
     else if (hdr->dst_l2addr_len == 8) {
-        buf[1] |= NG_IEEE802154_FCF_DST_ADDR_LONG;
+        buf[1] |= IEEE802154_FCF_DST_ADDR_LONG;
         uint8_t *dst_addr = ng_netif_hdr_get_dst_addr(hdr);
         for (int i = 7;  i >= 0; i--) {
             buf[pos++] = dst_addr[i];
@@ -84,17 +84,17 @@ static size_t _make_data_frame_hdr(ng_at86rf2xx_t *dev, uint8_t *buf,
         buf[pos++] = (uint8_t)((dev->pan) & 0xff);
         buf[pos++] = (uint8_t)((dev->pan) >> 8);
     } else {
-        buf[0] |= NG_IEEE802154_FCF_PAN_COMP;
+        buf[0] |= IEEE802154_FCF_PAN_COMP;
     }
 
     /* fill in source address */
     if (dev->options & NG_AT86RF2XX_OPT_SRC_ADDR_LONG) {
-        buf[1] |= NG_IEEE802154_FCF_SRC_ADDR_LONG;
+        buf[1] |= IEEE802154_FCF_SRC_ADDR_LONG;
         memcpy(&(buf[pos]), dev->addr_long, 8);
         pos += 8;
     }
     else {
-        buf[1] |= NG_IEEE802154_FCF_SRC_ADDR_SHORT;
+        buf[1] |= IEEE802154_FCF_SRC_ADDR_SHORT;
         buf[pos++] = dev->addr_short[0];
         buf[pos++] = dev->addr_short[1];
     }
@@ -105,7 +105,7 @@ static size_t _make_data_frame_hdr(ng_at86rf2xx_t *dev, uint8_t *buf,
     return pos;
 }
 
-/* TODO: generalize and move to ng_ieee802154 */
+/* TODO: generalize and move to ieee802154 */
 /* TODO: include security header implications */
 static size_t _get_frame_hdr_len(uint8_t *mhr)
 {
@@ -113,35 +113,35 @@ static size_t _get_frame_hdr_len(uint8_t *mhr)
     size_t len = 3;
 
     /* figure out address sizes */
-    tmp = (mhr[1] & NG_IEEE802154_FCF_DST_ADDR_MASK);
-    if (tmp == NG_IEEE802154_FCF_DST_ADDR_SHORT) {
+    tmp = (mhr[1] & IEEE802154_FCF_DST_ADDR_MASK);
+    if (tmp == IEEE802154_FCF_DST_ADDR_SHORT) {
         len += 4;
     }
-    else if (tmp == NG_IEEE802154_FCF_DST_ADDR_LONG) {
+    else if (tmp == IEEE802154_FCF_DST_ADDR_LONG) {
         len += 10;
     }
-    else if (tmp != NG_IEEE802154_FCF_DST_ADDR_VOID) {
+    else if (tmp != IEEE802154_FCF_DST_ADDR_VOID) {
         return 0;
     }
-    tmp = (mhr[1] & NG_IEEE802154_FCF_SRC_ADDR_MASK);
-    if (tmp == NG_IEEE802154_FCF_SRC_ADDR_VOID) {
+    tmp = (mhr[1] & IEEE802154_FCF_SRC_ADDR_MASK);
+    if (tmp == IEEE802154_FCF_SRC_ADDR_VOID) {
         return len;
     }
     else {
-        if (!(mhr[0] & NG_IEEE802154_FCF_PAN_COMP)) {
+        if (!(mhr[0] & IEEE802154_FCF_PAN_COMP)) {
             len += 2;
         }
-        if (tmp == NG_IEEE802154_FCF_SRC_ADDR_SHORT) {
+        if (tmp == IEEE802154_FCF_SRC_ADDR_SHORT) {
             return (len + 2);
         }
-        else if (tmp == NG_IEEE802154_FCF_SRC_ADDR_LONG) {
+        else if (tmp == IEEE802154_FCF_SRC_ADDR_LONG) {
             return (len + 8);
         }
     }
     return 0;
 }
 
-/* TODO: generalize and move to ng_ieee802154 */
+/* TODO: generalize and move to (gnrc_)ieee802154 */
 static ng_pktsnip_t *_make_netif_hdr(uint8_t *mhr)
 {
     uint8_t tmp;
@@ -151,27 +151,27 @@ static ng_pktsnip_t *_make_netif_hdr(uint8_t *mhr)
     ng_netif_hdr_t *hdr;
 
     /* figure out address sizes */
-    tmp = mhr[1] & NG_IEEE802154_FCF_SRC_ADDR_MASK;
-    if (tmp == NG_IEEE802154_FCF_SRC_ADDR_SHORT) {
+    tmp = mhr[1] & IEEE802154_FCF_SRC_ADDR_MASK;
+    if (tmp == IEEE802154_FCF_SRC_ADDR_SHORT) {
         src_len = 2;
     }
-    else if (tmp == NG_IEEE802154_FCF_SRC_ADDR_LONG) {
+    else if (tmp == IEEE802154_FCF_SRC_ADDR_LONG) {
         src_len = 8;
     }
-    else if (tmp == NG_IEEE802154_FCF_SRC_ADDR_VOID) {
+    else if (tmp == IEEE802154_FCF_SRC_ADDR_VOID) {
         src_len = 0;
     }
     else {
         return NULL;
     }
-    tmp = mhr[1] & NG_IEEE802154_FCF_DST_ADDR_MASK;
-    if (tmp == NG_IEEE802154_FCF_DST_ADDR_SHORT) {
+    tmp = mhr[1] & IEEE802154_FCF_DST_ADDR_MASK;
+    if (tmp == IEEE802154_FCF_DST_ADDR_SHORT) {
         dst_len = 2;
     }
-    else if (tmp == NG_IEEE802154_FCF_DST_ADDR_LONG) {
+    else if (tmp == IEEE802154_FCF_DST_ADDR_LONG) {
         dst_len = 8;
     }
-    else if (tmp == NG_IEEE802154_FCF_DST_ADDR_VOID) {
+    else if (tmp == IEEE802154_FCF_DST_ADDR_VOID) {
         dst_len = 0;
     }
     else {
@@ -196,7 +196,7 @@ static ng_pktsnip_t *_make_netif_hdr(uint8_t *mhr)
     else {
         tmp = 3;
     }
-    if (!(mhr[0] & NG_IEEE802154_FCF_PAN_COMP)) {
+    if (!(mhr[0] & IEEE802154_FCF_PAN_COMP)) {
         tmp += 2;
     }
     if (src_len > 0) {
@@ -213,7 +213,7 @@ static int _send(ng_netdev_t *netdev, ng_pktsnip_t *pkt)
 {
     ng_at86rf2xx_t *dev = (ng_at86rf2xx_t *)netdev;
     ng_pktsnip_t *snip;
-    uint8_t mhr[NG_IEEE802154_MAX_HDR_LEN];
+    uint8_t mhr[IEEE802154_MAX_HDR_LEN];
     size_t len;
 
     if (pkt == NULL) {
@@ -260,7 +260,7 @@ static int _send(ng_netdev_t *netdev, ng_pktsnip_t *pkt)
 
 static void _receive_data(ng_at86rf2xx_t *dev)
 {
-    uint8_t mhr[NG_IEEE802154_MAX_HDR_LEN];
+    uint8_t mhr[IEEE802154_MAX_HDR_LEN];
     size_t pkt_len, hdr_len;
     ng_pktsnip_t *hdr, *payload = NULL;
     ng_netif_hdr_t *netif;
@@ -412,11 +412,11 @@ static int _get(ng_netdev_t *device, netopt_t opt, void *val, size_t max_len)
             }
             if (dev->options & NG_AT86RF2XX_OPT_SRC_ADDR_LONG) {
                 uint64_t addr = ng_at86rf2xx_get_addr_long(dev);
-                ng_ieee802154_get_iid(val, (uint8_t *)&addr, 8);
+                ieee802154_get_iid(val, (uint8_t *)&addr, 8);
             }
             else {
                 uint16_t addr = ng_at86rf2xx_get_addr_short(dev);
-                ng_ieee802154_get_iid(val, (uint8_t *)&addr, 2);
+                ieee802154_get_iid(val, (uint8_t *)&addr, 2);
             }
             return sizeof(eui64_t);
 

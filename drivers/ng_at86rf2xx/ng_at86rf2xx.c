@@ -26,7 +26,7 @@
 #include "hwtimer.h"
 #include "periph/cpuid.h"
 #include "byteorder.h"
-#include "net/ng_ieee802154.h"
+#include "net/ieee802154.h"
 #include "net/ng_netbase.h"
 #include "ng_at86rf2xx_registers.h"
 #include "ng_at86rf2xx_internal.h"
@@ -221,7 +221,7 @@ void ng_at86rf2xx_tx_prepare(ng_at86rf2xx_t *dev)
         dev->idle_state = state;
     }
     ng_at86rf2xx_set_state(dev, NG_AT86RF2XX_STATE_TX_ARET_ON);
-    dev->frame_len = NG_IEEE802154_FCS_LEN;
+    dev->frame_len = IEEE802154_FCS_LEN;
 }
 
 size_t ng_at86rf2xx_tx_load(ng_at86rf2xx_t *dev, uint8_t *data,

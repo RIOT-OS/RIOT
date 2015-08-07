@@ -25,7 +25,7 @@
 #include "periph/gpio.h"
 #include "periph/cpuid.h"
 #include "net/ng_netbase.h"
-#include "net/ng_ieee802154.h"
+#include "net/ieee802154.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
@@ -216,8 +216,8 @@ void kw2xrf_set_sequence(kw2xrf_t *dev, kw2xrf_physeq_t seq)
     /* TODO: This should only used in combination with
      *       an CSMA-MAC layer. Currently not working
      */
-    /*if((seq == XCVSEQ_TRANSMIT) || (seq == XCVSEQ_TX_RX)) {
-        if((dev->option) & KW2XRF_OPT_AUTOACK) {
+    /*if ((seq == XCVSEQ_TRANSMIT) || (seq == XCVSEQ_TX_RX)) {
+        if ((dev->option) & KW2XRF_OPT_AUTOACK) {
             seq = XCVSEQ_TX_RX;
         }
         else {
@@ -807,7 +807,7 @@ int kw2xrf_set(ng_netdev_t *netdev, netopt_t opt, void *value, size_t value_len)
     }
 }
 
-/* TODO: generalize and move to ng_ieee802154 */
+/* TODO: generalize and move to ieee802154 */
 /* TODO: include security header implications */
 static size_t _get_frame_hdr_len(uint8_t *mhr)
 {
@@ -815,32 +815,32 @@ static size_t _get_frame_hdr_len(uint8_t *mhr)
     size_t len = 3;
 
     /* figure out address sizes */
-    tmp = (mhr[1] & NG_IEEE802154_FCF_DST_ADDR_MASK);
+    tmp = (mhr[1] & IEEE802154_FCF_DST_ADDR_MASK);
 
-    if (tmp == NG_IEEE802154_FCF_DST_ADDR_SHORT) {
+    if (tmp == IEEE802154_FCF_DST_ADDR_SHORT) {
         len += 4;
     }
-    else if (tmp == NG_IEEE802154_FCF_DST_ADDR_LONG) {
+    else if (tmp == IEEE802154_FCF_DST_ADDR_LONG) {
         len += 10;
     }
-    else if (tmp != NG_IEEE802154_FCF_DST_ADDR_VOID) {
+    else if (tmp != IEEE802154_FCF_DST_ADDR_VOID) {
         return 0;
     }
 
-    tmp = (mhr[1] & NG_IEEE802154_FCF_SRC_ADDR_MASK);
+    tmp = (mhr[1] & IEEE802154_FCF_SRC_ADDR_MASK);
 
-    if (tmp == NG_IEEE802154_FCF_SRC_ADDR_VOID) {
+    if (tmp == IEEE802154_FCF_SRC_ADDR_VOID) {
         return len;
     }
     else {
-        if (!(mhr[0] & NG_IEEE802154_FCF_PAN_COMP)) {
+        if (!(mhr[0] & IEEE802154_FCF_PAN_COMP)) {
             len += 2;
         }
 
-        if (tmp == NG_IEEE802154_FCF_SRC_ADDR_SHORT) {
+        if (tmp == IEEE802154_FCF_SRC_ADDR_SHORT) {
             return (len + 2);
         }
-        else if (tmp == NG_IEEE802154_FCF_SRC_ADDR_LONG) {
+        else if (tmp == IEEE802154_FCF_SRC_ADDR_LONG) {
             return (len + 8);
         }
     }
@@ -848,7 +848,7 @@ static size_t _get_frame_hdr_len(uint8_t *mhr)
     return 0;
 }
 
-/* TODO: generalize and move to ng_ieee802154 */
+/* TODO: generalize and move to (gnrc_)ieee802154 */
 static ng_pktsnip_t *_make_netif_hdr(uint8_t *mhr)
 {
     uint8_t tmp;
@@ -858,12 +858,12 @@ static ng_pktsnip_t *_make_netif_hdr(uint8_t *mhr)
     ng_netif_hdr_t *hdr;
 
     /* figure out address sizes */
-    tmp = mhr[1] & NG_IEEE802154_FCF_SRC_ADDR_MASK;
+    tmp = mhr[1] & IEEE802154_FCF_SRC_ADDR_MASK;
 
-    if (tmp == NG_IEEE802154_FCF_SRC_ADDR_SHORT) {
+    if (tmp == IEEE802154_FCF_SRC_ADDR_SHORT) {
         src_len = 2;
     }
-    else if (tmp == NG_IEEE802154_FCF_SRC_ADDR_LONG) {
+    else if (tmp == IEEE802154_FCF_SRC_ADDR_LONG) {
         src_len = 8;
     }
     else if (tmp == 0) {
@@ -873,12 +873,12 @@ static ng_pktsnip_t *_make_netif_hdr(uint8_t *mhr)
         return NULL;
     }
 
-    tmp = mhr[1] & NG_IEEE802154_FCF_DST_ADDR_MASK;
+    tmp = mhr[1] & IEEE802154_FCF_DST_ADDR_MASK;
 
-    if (tmp == NG_IEEE802154_FCF_DST_ADDR_SHORT) {
+    if (tmp == IEEE802154_FCF_DST_ADDR_SHORT) {
         dst_len = 2;
     }
-    else if (tmp == NG_IEEE802154_FCF_DST_ADDR_LONG) {
+    else if (tmp == IEEE802154_FCF_DST_ADDR_LONG) {
         dst_len = 8;
     }
     else if (tmp == 0) {
@@ -912,7 +912,7 @@ static ng_pktsnip_t *_make_netif_hdr(uint8_t *mhr)
         tmp = 3;
     }
 
-    if (!(mhr[0] & NG_IEEE802154_FCF_PAN_COMP)) {
+    if (!(mhr[0] & IEEE802154_FCF_PAN_COMP)) {
         tmp += 2;
     }
 
@@ -1060,7 +1060,7 @@ int _assemble_tx_buf(kw2xrf_t *dev, ng_pktsnip_t *pkt)
      * since this is a soft_mac device this has to be
      * handled in a upcoming CSMA-MAC layer.
      */
-    /*if(dev->option & KW2XRF_OPT_AUTOACK) {
+    /*if (dev->option & KW2XRF_OPT_AUTOACK) {
         dev->buf[1] = 0x61;
     }
     else {

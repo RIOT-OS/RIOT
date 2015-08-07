@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    net_ng_ieee802154 IEEE802.15.4
+ * @defgroup    net_ieee802154 IEEE802.15.4
  * @ingroup     net
  * @brief       IEEE802.15.4 header definitions and utility functions
  * @{
@@ -18,8 +18,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef NG_IEEE802154_H_
-#define NG_IEEE802154_H_
+#ifndef IEEE802154_H_
+#define IEEE802154_H_
 
 #include <stdlib.h>
 
@@ -33,33 +33,33 @@ extern "C" {
  * @brief IEEE802.15.4 FCF field definitions
  * @{
  */
-#define NG_IEEE802154_MAX_HDR_LEN           (23U)
-#define NG_IEEE802154_FCF_LEN               (2U)
-#define NG_IEEE802154_FCS_LEN               (2U)
+#define IEEE802154_MAX_HDR_LEN              (23U)
+#define IEEE802154_FCF_LEN                  (2U)
+#define IEEE802154_FCS_LEN                  (2U)
 
-#define NG_IEEE802154_FCF_TYPE_MASK         (0x07)
-#define NG_IEEE802154_FCF_TYPE_BEACON       (0x00)
-#define NG_IEEE802154_FCF_TYPE_DATA         (0x01)
-#define NG_IEEE802154_FCF_TYPE_ACK          (0x02)
-#define NG_IEEE802154_FCF_TYPE_MACCMD       (0x03)
+#define IEEE802154_FCF_TYPE_MASK            (0x07)
+#define IEEE802154_FCF_TYPE_BEACON          (0x00)
+#define IEEE802154_FCF_TYPE_DATA            (0x01)
+#define IEEE802154_FCF_TYPE_ACK             (0x02)
+#define IEEE802154_FCF_TYPE_MACCMD          (0x03)
 
-#define NG_IEEE802154_FCF_SECURITY_EN       (0x08)
-#define NG_IEEE802154_FCF_FRAME_PEND        (0x10)
-#define NG_IEEE802154_FCF_ACK_REQ           (0x20)
-#define NG_IEEE802154_FCF_PAN_COMP          (0x40)
+#define IEEE802154_FCF_SECURITY_EN          (0x08)
+#define IEEE802154_FCF_FRAME_PEND           (0x10)
+#define IEEE802154_FCF_ACK_REQ              (0x20)
+#define IEEE802154_FCF_PAN_COMP             (0x40)
 
-#define NG_IEEE802154_FCF_DST_ADDR_MASK     (0x0c)
-#define NG_IEEE802154_FCF_DST_ADDR_VOID     (0x00)
-#define NG_IEEE802154_FCF_DST_ADDR_SHORT    (0x08)
-#define NG_IEEE802154_FCF_DST_ADDR_LONG     (0x0c)
+#define IEEE802154_FCF_DST_ADDR_MASK        (0x0c)
+#define IEEE802154_FCF_DST_ADDR_VOID        (0x00)
+#define IEEE802154_FCF_DST_ADDR_SHORT       (0x08)
+#define IEEE802154_FCF_DST_ADDR_LONG        (0x0c)
 
-#define NG_IEEE802154_FCF_VERS_V0           (0x00)
-#define NG_IEEE802154_FCF_VERS_V1           (0x10)
+#define IEEE802154_FCF_VERS_V0              (0x00)
+#define IEEE802154_FCF_VERS_V1              (0x10)
 
-#define NG_IEEE802154_FCF_SRC_ADDR_MASK     (0xc0)
-#define NG_IEEE802154_FCF_SRC_ADDR_VOID     (0x00)
-#define NG_IEEE802154_FCF_SRC_ADDR_SHORT    (0x80)
-#define NG_IEEE802154_FCF_SRC_ADDR_LONG     (0xc0)
+#define IEEE802154_FCF_SRC_ADDR_MASK        (0xc0)
+#define IEEE802154_FCF_SRC_ADDR_VOID        (0x00)
+#define IEEE802154_FCF_SRC_ADDR_SHORT       (0x80)
+#define IEEE802154_FCF_SRC_ADDR_LONG        (0xc0)
 /** @} */
 
 /**
@@ -80,8 +80,8 @@ extern "C" {
  * @return Copy of @p eui64 on success.
  * @return NULL, if @p addr_len was of illegal length.
  */
-static inline eui64_t *ng_ieee802154_get_iid(eui64_t *eui64, uint8_t *addr,
-                                             size_t addr_len)
+static inline eui64_t *ieee802154_get_iid(eui64_t *eui64, uint8_t *addr,
+        size_t addr_len)
 {
     int i = 0;
 
@@ -124,5 +124,5 @@ static inline eui64_t *ng_ieee802154_get_iid(eui64_t *eui64, uint8_t *addr,
 }
 #endif
 
-#endif /* NG_IEEE802154_H_ */
+#endif /* IEEE802154_H_ */
 /** @} */
