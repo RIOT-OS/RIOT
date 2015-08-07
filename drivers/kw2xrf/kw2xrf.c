@@ -216,8 +216,8 @@ void kw2xrf_set_sequence(kw2xrf_t *dev, kw2xrf_physeq_t seq)
     /* TODO: This should only used in combination with
      *       an CSMA-MAC layer. Currently not working
      */
-    /*if((seq == XCVSEQ_TRANSMIT) || (seq == XCVSEQ_TX_RX)) {
-        if((dev->option) & KW2XRF_OPT_AUTOACK) {
+    /*if ((seq == XCVSEQ_TRANSMIT) || (seq == XCVSEQ_TX_RX)) {
+        if ((dev->option) & KW2XRF_OPT_AUTOACK) {
             seq = XCVSEQ_TX_RX;
         }
         else {
@@ -1060,7 +1060,7 @@ int _assemble_tx_buf(kw2xrf_t *dev, ng_pktsnip_t *pkt)
      * since this is a soft_mac device this has to be
      * handled in a upcoming CSMA-MAC layer.
      */
-    /*if(dev->option & KW2XRF_OPT_AUTOACK) {
+    /*if (dev->option & KW2XRF_OPT_AUTOACK) {
         dev->buf[1] = 0x61;
     }
     else {

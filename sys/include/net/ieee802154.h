@@ -81,7 +81,7 @@ extern "C" {
  * @return NULL, if @p addr_len was of illegal length.
  */
 static inline eui64_t *ieee802154_get_iid(eui64_t *eui64, uint8_t *addr,
-                                             size_t addr_len)
+        size_t addr_len)
 {
     int i = 0;
 
