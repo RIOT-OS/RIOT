@@ -43,8 +43,8 @@ endif
 ifneq (,$(filter ng_ipv6_netif,$(USEMODULE)))
     DIRS += net/network_layer/ng_ipv6/netif
 endif
-ifneq (,$(filter ng_inet_csum,$(USEMODULE)))
-    DIRS += net/crosslayer/ng_inet_csum
+ifneq (,$(filter inet_csum,$(USEMODULE)))
+    DIRS += net/crosslayer/inet_csum
 endif
 ifneq (,$(filter ng_ndp,$(USEMODULE)))
     DIRS += net/network_layer/ng_ndp

@@ -15,12 +15,12 @@
 #include <inttypes.h>
 #include <stdio.h>
 #include "od.h"
-#include "net/ng_inet_csum.h"
+#include "net/inet_csum.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-uint16_t ng_inet_csum(uint16_t sum, const uint8_t *buf, uint16_t len)
+uint16_t inet_csum(uint16_t sum, const uint8_t *buf, uint16_t len)
 {
     uint32_t csum = sum;
 
