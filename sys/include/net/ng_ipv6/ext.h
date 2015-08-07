@@ -60,7 +60,7 @@ typedef struct __attribute__((packed)) {
  *
  * @param[in] iface The receiving interface.
  * @param[in] pkt   A packet.
- * @param[in] nh    A protocol number (see @ref net_ng_protnum).
+ * @param[in] nh    A protocol number (see @ref net_protnum).
  *
  * @return  true, on success.
  * @return  false, on failure.
@@ -88,7 +88,7 @@ static inline ng_ipv6_ext_t *ng_ipv6_ext_get_next(ng_ipv6_ext_t *ext)
  * @param[in] ipv6  The IPv6 header. Can be NULL.
  * @param[in] next  The next header. Must be a successor to @p ipv6 if it is
  *                  not NULL.
- * @param[in] nh    @ref net_ng_protnum of the next header.
+ * @param[in] nh    @ref net_protnum of the next header.
  * @param[in] size  Size of the extension header.
  *
  * @return  The extension header on success.

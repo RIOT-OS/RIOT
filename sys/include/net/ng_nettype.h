@@ -25,7 +25,7 @@
 #include <inttypes.h>
 
 #include "net/ng_ethertype.h"
-#include "net/ng_protnum.h"
+#include "net/protnum.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -149,19 +149,19 @@ static inline ng_nettype_t ng_nettype_from_protnum(uint8_t num)
 {
     switch (num) {
 #ifdef MODULE_NG_ICMPV6
-        case NG_PROTNUM_ICMPV6:
+        case PROTNUM_ICMPV6:
             return NG_NETTYPE_ICMPV6;
 #endif
 #ifdef MODULE_NG_IPV6
-        case NG_PROTNUM_IPV6:
+        case PROTNUM_IPV6:
             return NG_NETTYPE_IPV6;
 #endif
 #ifdef MODULE_NG_TCP
-        case NG_PROTNUM_TCP:
+        case PROTNUM_TCP:
             return NG_NETTYPE_TCP;
 #endif
 #ifdef MODULE_NG_UDP
-        case NG_PROTNUM_UDP:
+        case PROTNUM_UDP:
             return NG_NETTYPE_UDP;
 #endif
         default:
@@ -178,29 +178,29 @@ static inline ng_nettype_t ng_nettype_from_protnum(uint8_t num)
  * @param[in] type  A protocol type
  *
  * @return  The corresponding Protocol Number to @p type.
- * @return  @ref NG_PROTNUM_RESERVED if @p type not translatable.
+ * @return  @ref PROTNUM_RESERVED if @p type not translatable.
  */
 static inline uint8_t ng_nettype_to_protnum(ng_nettype_t type)
 {
     switch (type) {
 #ifdef MODULE_NG_ICMPV6
         case NG_NETTYPE_ICMPV6:
-            return NG_PROTNUM_ICMPV6;
+            return PROTNUM_ICMPV6;
 #endif
 #ifdef MODULE_NG_IPV6
         case NG_NETTYPE_IPV6:
-            return NG_PROTNUM_IPV6;
+            return PROTNUM_IPV6;
 #endif
 #ifdef MODULE_NG_TCP
         case NG_NETTYPE_TCP:
-            return NG_PROTNUM_TCP;
+            return PROTNUM_TCP;
 #endif
 #ifdef MODULE_NG_UDP
         case NG_NETTYPE_UDP:
-            return NG_PROTNUM_UDP;
+            return PROTNUM_UDP;
 #endif
         default:
-            return NG_PROTNUM_RESERVED;
+            return PROTNUM_RESERVED;
     }
 }
 

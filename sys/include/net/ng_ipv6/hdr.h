@@ -274,7 +274,7 @@ static inline uint32_t ng_ipv6_hdr_get_fl(const ng_ipv6_hdr_t *hdr)
  *      </a>
  *
  * @param[in] sum       Preinialized value of the sum.
- * @param[in] prot_num  The @ref net_ng_protnum you want to calculate the
+ * @param[in] prot_num  The @ref net_protnum you want to calculate the
  *                      checksum for. Can not be inferred from
  *                      ng_ipv6_hdr_t::nh, since it can be an IPv6 exentension
  *                      header.
@@ -302,7 +302,7 @@ static inline uint16_t ng_ipv6_hdr_inet_csum(uint16_t sum, ng_ipv6_hdr_t *hdr,
  * @brief   Builds an IPv6 header for sending and adds it to the packet buffer.
  *
  * @details Initializes version field with 6, traffic class, flow label, and
- *          hop limit with 0, and next header with @ref NG_PROTNUM_RESERVED.
+ *          hop limit with 0, and next header with @ref PROTNUM_RESERVED.
  *
  * @param[in] payload   Payload for the packet.
  * @param[in] src       Source address for the header. Can be NULL if not
