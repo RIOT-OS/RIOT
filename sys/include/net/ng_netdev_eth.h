@@ -31,7 +31,7 @@
 
 #include "kernel_types.h"
 #include "net/ng_netdev.h"
-#include "net/ng_ethernet/hdr.h"
+#include "net/ethernet/hdr.h"
 #include "net/dev_eth.h"
 
 #ifdef __cplusplus

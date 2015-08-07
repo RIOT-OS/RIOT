@@ -7,8 +7,8 @@
  */
 
 /**
- * @defgroup    net_ng_ethernet_hdr Ethernet header
- * @ingroup     net_ng_ethernet
+ * @defgroup    net_ethernet_hdr Ethernet header
+ * @ingroup     net_ethernet
  * @brief       Ethernet header
  * @{
  *
@@ -19,8 +19,8 @@
  */
 
 
-#ifndef NG_ETHERNET_HDR_H_
-#define NG_ETHERNET_HDR_H_
+#ifndef ETHERNET_HDR_H_
+#define ETHERNET_HDR_H_
 
 #include <inttypes.h>
 
@@ -30,22 +30,22 @@
 extern "C" {
 #endif
 
-#define NG_ETHERNET_ADDR_LEN    (6)     /**< Length of an Ethernet address */
+#define ETHERNET_ADDR_LEN       (6)     /**< Length of an Ethernet address */
 
 /**
  * @brief   Ethernet header
  */
 typedef struct __attribute__((packed)) {
-    uint8_t dst[NG_ETHERNET_ADDR_LEN];  /**< destination address */
-    uint8_t src[NG_ETHERNET_ADDR_LEN];  /**< source address */
-    network_uint16_t type;              /**< ether type (see @ref net_ng_ethertype) */
-} ng_ethernet_hdr_t;
+    uint8_t dst[ETHERNET_ADDR_LEN];     /**< destination address */
+    uint8_t src[ETHERNET_ADDR_LEN];     /**< source address */
+    network_uint16_t type;              /**< ether type (see @ref net_ethertype) */
+} ethernet_hdr_t;
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* NG_ETHERNET_HDR_H_ */
+#endif /* ETHERNET_HDR_H_ */
 /**
  * @}
  */

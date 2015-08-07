@@ -8,7 +8,7 @@
 
 /**
  * @defgroup    sys_net_dev_eth dev_eth auto setup
- * @ingroup     net_ng_ethernet
+ * @ingroup     net_ethernet
  * @file
  * @brief       Automatically setup available ethernet devices
  * @{

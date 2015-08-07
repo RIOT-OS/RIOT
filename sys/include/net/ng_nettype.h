@@ -24,7 +24,7 @@
 
 #include <inttypes.h>
 
-#include "net/ng_ethertype.h"
+#include "net/ethertype.h"
 #include "net/protnum.h"
 
 #ifdef __cplusplus
@@ -103,7 +103,7 @@ static inline ng_nettype_t ng_nettype_from_ethertype(uint16_t type)
 {
     switch (type) {
 #ifdef MODULE_NG_IPV6
-        case NG_ETHERTYPE_IPV6:
+        case ETHERTYPE_IPV6:
             return NG_NETTYPE_IPV6;
 #endif
         default:
@@ -120,17 +120,17 @@ static inline ng_nettype_t ng_nettype_from_ethertype(uint16_t type)
  * @param[in] type  A protocol type
  *
  * @return  The corresponding Ether Type number to @p type.
- * @return  @ref NG_ETHERTYPE_RESERVED if @p type not translatable.
+ * @return  @ref ETHERTYPE_RESERVED if @p type not translatable.
  */
 static inline uint16_t ng_nettype_to_ethertype(ng_nettype_t type)
 {
     switch (type) {
 #ifdef MODULE_NG_IPV6
         case NG_NETTYPE_IPV6:
-            return NG_ETHERTYPE_IPV6;
+            return ETHERTYPE_IPV6;
 #endif
         default:
-            return NG_ETHERTYPE_UNKNOWN;
+            return ETHERTYPE_UNKNOWN;
     }
 }
 

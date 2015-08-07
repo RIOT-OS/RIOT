@@ -9,7 +9,7 @@
 
 /**
  * @defgroup    net_dev_eth_ll Low-Level Driver Inteface
- * @ingroup     net_ng_ethernet
+ * @ingroup     net_ethernet
  * @file
  * @brief       Low-level ethernet driver interface
  * @{
@@ -58,7 +58,7 @@ extern "C" {
 #endif
 
 #include <stdint.h>
-#include "ng_ethernet/hdr.h"
+#include "ethernet/hdr.h"
 
 /**
  * @brief Structure to hold driver state

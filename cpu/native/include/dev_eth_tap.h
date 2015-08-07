@@ -36,7 +36,7 @@ typedef struct dev_eth_tap {
     dev_eth_t ethdev;                   /**< dev_eth internal member */
     char tap_name[IFNAMSIZ];            /**< host dev file name */
     int tap_fd;                         /**< host file descriptor for the TAP */
-    uint8_t addr[NG_ETHERNET_ADDR_LEN]; /**< The MAC address of the TAP */
+    uint8_t addr[ETHERNET_ADDR_LEN];    /**< The MAC address of the TAP */
     uint8_t promiscous;                 /**< Flag for promiscous mode */
 } dev_eth_tap_t;
 

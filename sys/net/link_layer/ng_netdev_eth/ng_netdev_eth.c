@@ -30,8 +30,8 @@
 
 #include "byteorder.h"
 #include "net/eui64.h"
-#include "net/ng_ethernet.h"
-#include "net/ng_ethertype.h"
+#include "net/ethernet.h"
+#include "net/ethertype.h"
 #include "net/ng_netdev.h"
 #include "net/ng_netif/hdr.h"
 #include "net/ng_pkt.h"
@@ -47,8 +47,8 @@
 
 ng_netdev_eth_t ng_netdev_eth;
 
-static uint8_t send_buffer[NG_ETHERNET_MAX_LEN];
-static uint8_t recv_buffer[NG_ETHERNET_MAX_LEN];
+static uint8_t send_buffer[ETHERNET_MAX_LEN];
+static uint8_t recv_buffer[ETHERNET_MAX_LEN];
 
 #define _ISR_EVENT_RX (1U)
 
@@ -177,7 +177,7 @@ static int _rem_event_callback(ng_netdev_t *dev, ng_netdev_event_cb_t cb)
 /* individual option getters to be called by _get() */
 static inline int _get_addr(ng_netdev_eth_t *netdev, uint8_t *value, size_t max_len)
 {
-    if (max_len < NG_ETHERNET_ADDR_LEN) {
+    if (max_len < ETHERNET_ADDR_LEN) {
         /* value buffer not big enough */
         return -EOVERFLOW;
     }
@@ -185,7 +185,7 @@ static inline int _get_addr(ng_netdev_eth_t *netdev, uint8_t *value, size_t max_
     dev_eth_t *dev = netdev->ethdev;
     dev->driver->get_mac_addr(dev, value);
 
-    return NG_ETHERNET_ADDR_LEN;
+    return ETHERNET_ADDR_LEN;
 }
 
 static inline int _get_addr_len(uint16_t *value, size_t max_len)
@@ -195,7 +195,7 @@ static inline int _get_addr_len(uint16_t *value, size_t max_len)
         return -EOVERFLOW;
     }
 
-    *value = NG_ETHERNET_ADDR_LEN;
+    *value = ETHERNET_ADDR_LEN;
 
     return sizeof(uint16_t);
 }
@@ -208,9 +208,9 @@ static inline int _get_iid(ng_netdev_eth_t *netdev, eui64_t *value, size_t max_l
     }
 
     dev_eth_t *dev = netdev->ethdev;
-    uint8_t addr[NG_ETHERNET_ADDR_LEN];
+    uint8_t addr[ETHERNET_ADDR_LEN];
     dev->driver->get_mac_addr(dev, addr);
-    ng_ethernet_get_iid(value, addr);
+    ethernet_get_iid(value, addr);
 
     return sizeof(eui64_t);
 }
@@ -222,7 +222,7 @@ static inline int _get_max_pkt_sz(uint16_t *value, size_t max_len)
         return -EOVERFLOW;
     }
 
-    *value = NG_ETHERNET_MAX_LEN;
+    *value = ETHERNET_MAX_LEN;
 
     return sizeof(uint16_t);
 }
@@ -351,7 +351,7 @@ static void _isr_event(ng_netdev_t *dev, uint32_t event_type)
 
 static inline void _addr_set_broadcast(uint8_t *dst)
 {
-    memset(dst, 0xff, NG_ETHERNET_ADDR_LEN);
+    memset(dst, 0xff, ETHERNET_ADDR_LEN);
 }
 
 #define _IPV6_DST_OFFSET    (36)    /* sizeof(ipv6_hdr_t) - 4  */
@@ -378,7 +378,7 @@ static inline void _addr_set_multicast(uint8_t *dst, ng_pktsnip_t *payload)
 static int _marshall_ethernet(ng_netdev_eth_t *dev, uint8_t *buffer, ng_pktsnip_t *pkt)
 {
     int data_len = 0;
-    ng_ethernet_hdr_t *hdr = (ng_ethernet_hdr_t *)buffer;
+    ethernet_hdr_t *hdr = (ethernet_hdr_t *)buffer;
     ng_netif_hdr_t *netif_hdr;
     ng_pktsnip_t *payload;
 
@@ -398,13 +398,13 @@ static int _marshall_ethernet(ng_netdev_eth_t *dev, uint8_t *buffer, ng_pktsnip_
         hdr->type = byteorder_htons(ng_nettype_to_ethertype(payload->type));
     }
     else {
-        hdr->type = byteorder_htons(NG_ETHERTYPE_UNKNOWN);
+        hdr->type = byteorder_htons(ETHERTYPE_UNKNOWN);
     }
 
     netif_hdr = pkt->data;
 
     /* set ethernet header */
-    if (netif_hdr->src_l2addr_len == NG_ETHERNET_ADDR_LEN) {
+    if (netif_hdr->src_l2addr_len == ETHERNET_ADDR_LEN) {
         memcpy(hdr->dst, ng_netif_hdr_get_src_addr(netif_hdr),
                netif_hdr->src_l2addr_len);
     }
@@ -419,9 +419,9 @@ static int _marshall_ethernet(ng_netdev_eth_t *dev, uint8_t *buffer, ng_pktsnip_
     else if (netif_hdr->flags & NG_NETIF_HDR_FLAGS_MULTICAST) {
         _addr_set_multicast(hdr->dst, payload);
     }
-    else if (netif_hdr->dst_l2addr_len == NG_ETHERNET_ADDR_LEN) {
+    else if (netif_hdr->dst_l2addr_len == ETHERNET_ADDR_LEN) {
         memcpy(hdr->dst, ng_netif_hdr_get_dst_addr(netif_hdr),
-               NG_ETHERNET_ADDR_LEN);
+               ETHERNET_ADDR_LEN);
     }
     else {
         DEBUG("ng_netdev_eth: destination address had unexpected format\n");
@@ -432,10 +432,10 @@ static int _marshall_ethernet(ng_netdev_eth_t *dev, uint8_t *buffer, ng_pktsnip_
           hdr->dst[0], hdr->dst[1], hdr->dst[2],
           hdr->dst[3], hdr->dst[4], hdr->dst[5]);
 
-    data_len += sizeof(ng_ethernet_hdr_t);
+    data_len += sizeof(ethernet_hdr_t);
 
     while (payload != NULL) {
-        if ((data_len + payload->size) > NG_ETHERNET_MAX_LEN) {
+        if ((data_len + payload->size) > ETHERNET_MAX_LEN) {
             DEBUG("ng_netdev_eth: Packet too big for ethernet frame\n");
             return -ENOBUFS;
         }
@@ -449,10 +449,10 @@ static int _marshall_ethernet(ng_netdev_eth_t *dev, uint8_t *buffer, ng_pktsnip_
     /* Pad to minimum payload size.
      * Linux does this on its own, but it doesn't hurt to do it here.
      * As of now only tuntaposx needs this. */
-    if (data_len < (NG_ETHERNET_MIN_LEN)) {
+    if (data_len < (ETHERNET_MIN_LEN)) {
         DEBUG("ng_netdev_eth: padding data! (%d -> ", data_len);
-        memset(send_buffer + data_len, 0, NG_ETHERNET_MIN_LEN - data_len);
-        data_len = NG_ETHERNET_MIN_LEN;
+        memset(send_buffer + data_len, 0, ETHERNET_MIN_LEN - data_len);
+        data_len = ETHERNET_MIN_LEN;
         DEBUG("%d)\n", data_len);
     }
 
@@ -491,20 +491,20 @@ void dev_eth_linkstate_handler(dev_eth_t *dev, int newstate)
 static void _rx_event(ng_netdev_eth_t *netdev)
 {
     dev_eth_t *dev = netdev->ethdev;
-    int nread = dev->driver->recv(dev, (char*)recv_buffer, NG_ETHERNET_MAX_LEN);
+    int nread = dev->driver->recv(dev, (char*)recv_buffer, ETHERNET_MAX_LEN);
 
     DEBUG("ng_netdev_eth: read %d bytes\n", nread);
 
     if (nread > 0) {
-        ng_ethernet_hdr_t *hdr = (ng_ethernet_hdr_t *)recv_buffer;
+        ethernet_hdr_t *hdr = (ethernet_hdr_t *)recv_buffer;
         ng_pktsnip_t *netif_hdr, *pkt;
         ng_nettype_t receive_type = NG_NETTYPE_UNDEF;
-        size_t data_len = (nread - sizeof(ng_ethernet_hdr_t));
+        size_t data_len = (nread - sizeof(ethernet_hdr_t));
 
         /* TODO: implement multicast groups? */
 
         netif_hdr = ng_pktbuf_add(NULL, NULL,
-                                  sizeof(ng_netif_hdr_t) + (2 * NG_ETHERNET_ADDR_LEN),
+                                  sizeof(ng_netif_hdr_t) + (2 * ETHERNET_ADDR_LEN),
                                   NG_NETTYPE_NETIF);
 
         if (netif_hdr == NULL) {
@@ -512,9 +512,9 @@ static void _rx_event(ng_netdev_eth_t *netdev)
             return;
         }
 
-        ng_netif_hdr_init(netif_hdr->data, NG_ETHERNET_ADDR_LEN, NG_ETHERNET_ADDR_LEN);
-        ng_netif_hdr_set_src_addr(netif_hdr->data, hdr->src, NG_ETHERNET_ADDR_LEN);
-        ng_netif_hdr_set_dst_addr(netif_hdr->data, hdr->dst, NG_ETHERNET_ADDR_LEN);
+        ng_netif_hdr_init(netif_hdr->data, ETHERNET_ADDR_LEN, ETHERNET_ADDR_LEN);
+        ng_netif_hdr_set_src_addr(netif_hdr->data, hdr->src, ETHERNET_ADDR_LEN);
+        ng_netif_hdr_set_dst_addr(netif_hdr->data, hdr->dst, ETHERNET_ADDR_LEN);
         ((ng_netif_hdr_t *)netif_hdr->data)->if_pid = thread_getpid();
 
         receive_type = ng_nettype_from_ethertype(byteorder_ntohs(hdr->type));
@@ -528,7 +528,7 @@ static void _rx_event(ng_netdev_eth_t *netdev)
 #endif
 
         /* Mark netif header and payload for next layer */
-        if ((pkt = ng_pktbuf_add(netif_hdr, recv_buffer + sizeof(ng_ethernet_hdr_t),
+        if ((pkt = ng_pktbuf_add(netif_hdr, recv_buffer + sizeof(ethernet_hdr_t),
                                  data_len, receive_type)) == NULL) {
             ng_pktbuf_release(netif_hdr);
             DEBUG("ng_netdev_eth: no space left in packet buffer\n");
