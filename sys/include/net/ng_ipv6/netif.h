@@ -109,42 +109,42 @@ extern "C" {
 /**
  * @brief   Interface is 6LoWPAN interface.
  */
-#define NG_IPV6_NETIF_FLAGS_SIXLOWPAN           (0x0001)
+#define NG_IPV6_NETIF_FLAGS_SIXLOWPAN           (0x01)
 
 /**
  * @brief   Flag to indicate that routing is enabled on the interface.
  */
-#define NG_IPV6_NETIF_FLAGS_ROUTER              (0x0002)
+#define NG_IPV6_NETIF_FLAGS_ROUTER              (0x02)
 
 /**
  * @brief   Flag to indicate that the interface sends periodic router
  *          advertisements and in response to router solicitations.
  */
-#define NG_IPV6_NETIF_FLAGS_RTR_ADV             (0x0004)
+#define NG_IPV6_NETIF_FLAGS_RTR_ADV             (0x04)
 
 /**
  * @brief   Flag to indicate that ng_ipv6_netif_t::mtu shall be propagated
  *          with the MTU options in router advertisements.
  */
-#define NG_IPV6_NETIF_FLAGS_ADV_MTU             (0x0008)
+#define NG_IPV6_NETIF_FLAGS_ADV_MTU             (0x08)
 
 /**
  * @brief   Flag to indicate that ng_ipv6_netif_t::cur_hl shall be propagated
  *          in router advertisements.
  */
-#define NG_IPV6_NETIF_FLAGS_ADV_CUR_HL          (0x0010)
+#define NG_IPV6_NETIF_FLAGS_ADV_CUR_HL          (0x10)
 
 /**
  * @brief   Flag to indicate that the interface has other address
  *          configuration.
  */
-#define NG_IPV6_NETIF_FLAGS_OTHER_CONF          (0x4000)
+#define NG_IPV6_NETIF_FLAGS_OTHER_CONF          (0x40)
 
 /**
  * @brief   Flag to indicate that the interface has managed address
  *          configuration (e.g. via DHCPv6).
  */
-#define NG_IPV6_NETIF_FLAGS_MANAGED             (0x8000)
+#define NG_IPV6_NETIF_FLAGS_MANAGED             (0x80)
 /**
  * @}
  */
