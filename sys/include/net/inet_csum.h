@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    net_ng_inet_csum    Internet Checksum
+ * @defgroup    net_inet_csum    Internet Checksum
  * @ingroup     net
  * @brief   Provides a function to calculate the Internet Checksum
  * @{
@@ -17,8 +17,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef NG_INET_CSUM_H_
-#define NG_INET_CSUM_H_
+#ifndef INET_CSUM_H_
+#define INET_CSUM_H_
 
 #include <inttypes.h>
 
@@ -42,11 +42,11 @@ extern "C" {
  *
  * @return  The unnormalized Internet Checksum of @p buf.
  */
-uint16_t ng_inet_csum(uint16_t sum, const uint8_t *buf, uint16_t len);
+uint16_t inet_csum(uint16_t sum, const uint8_t *buf, uint16_t len);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* NG_INET_CSUM_H_ */
+#endif /* INET_CSUM_H_ */
 /** @} */

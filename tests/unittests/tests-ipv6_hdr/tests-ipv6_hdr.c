@@ -20,7 +20,7 @@
 #include "net/ng_ipv6/hdr.h"
 #include "net/ng_pktbuf.h"
 #include "net/protnum.h"
-#include "net/ng_inet_csum.h"
+#include "net/inet_csum.h"
 
 #include "unittests-constants.h"
 #include "tests-ipv6_hdr.h"
@@ -293,7 +293,7 @@ static void test_ipv6_hdr_inet_csum__initial_sum_0(void)
     res = ng_ipv6_hdr_inet_csum(0, (ng_ipv6_hdr_t *)&val, PROTNUM_ICMPV6,
                                 payload_len);
     /* calculate checksum of payload */
-    res = ng_inet_csum(res, val + sizeof(ng_ipv6_hdr_t), payload_len);
+    res = inet_csum(res, val + sizeof(ng_ipv6_hdr_t), payload_len);
     res = ~res;     /* take 1's-complement for correct checksum */
 
     TEST_ASSERT_EQUAL_INT(0xab32, res);

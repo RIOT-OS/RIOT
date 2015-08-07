@@ -24,7 +24,7 @@
 
 #include "byteorder.h"
 #include "net/ng_ipv6/addr.h"
-#include "net/ng_inet_csum.h"
+#include "net/inet_csum.h"
 #include "net/ng_pkt.h"
 
 #ifdef __cplusplus
@@ -294,8 +294,8 @@ static inline uint16_t ng_ipv6_hdr_inet_csum(uint16_t sum, ng_ipv6_hdr_t *hdr,
         sum++;
     }
 
-    return ng_inet_csum(sum + len + prot_num, hdr->src.u8,
-                        (2 * sizeof(ng_ipv6_addr_t)));
+    return inet_csum(sum + len + prot_num, hdr->src.u8,
+                     (2 * sizeof(ng_ipv6_addr_t)));
 }
 
 /**

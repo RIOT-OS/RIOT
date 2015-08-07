@@ -99,12 +99,12 @@ ifneq (,$(filter ng_icmpv6_echo,$(USEMODULE)))
 endif
 
 ifneq (,$(filter ng_icmpv6,$(USEMODULE)))
-  USEMODULE += ng_inet_csum
+  USEMODULE += inet_csum
   USEMODULE += ng_ipv6
 endif
 
 ifneq (,$(filter ng_ipv6_hdr,$(USEMODULE)))
-  USEMODULE += ng_inet_csum
+  USEMODULE += inet_csum
   USEMODULE += ng_pktbuf
 endif
 
@@ -125,7 +125,7 @@ ifneq (,$(filter ng_ipv6_router,$(USEMODULE)))
 endif
 
 ifneq (,$(filter ng_ipv6,$(USEMODULE)))
-  USEMODULE += ng_inet_csum
+  USEMODULE += inet_csum
   USEMODULE += ng_ipv6_addr
   USEMODULE += ng_ipv6_hdr
   USEMODULE += ng_ipv6_nc
@@ -144,7 +144,7 @@ endif
 
 ifneq (,$(filter ng_udp,$(USEMODULE)))
   USEMODULE += ng_netbase
-  USEMODULE += ng_inet_csum
+  USEMODULE += inet_csum
 endif
 
 ifneq (,$(filter ng_nettest,$(USEMODULE)))

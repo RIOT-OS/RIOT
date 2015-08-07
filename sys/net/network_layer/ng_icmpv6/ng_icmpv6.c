@@ -42,12 +42,12 @@ static inline uint16_t _calc_csum(ng_pktsnip_t *hdr,
     uint16_t len = (uint16_t)hdr->size;
 
     while (payload && (payload != hdr)) {
-        csum = ng_inet_csum(csum, payload->data, payload->size);
+        csum = inet_csum(csum, payload->data, payload->size);
         len += (uint16_t)payload->size;
         payload = payload->next;
     }
 
-    csum = ng_inet_csum(csum, hdr->data, hdr->size);
+    csum = inet_csum(csum, hdr->data, hdr->size);
     csum = ng_ipv6_hdr_inet_csum(csum, pseudo_hdr->data, PROTNUM_ICMPV6,
                                  len);
 
