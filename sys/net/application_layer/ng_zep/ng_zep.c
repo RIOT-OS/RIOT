@@ -56,8 +56,8 @@ static ringbuffer_t _rx_buf = RINGBUFFER_INIT(_rx_buf_array);
 static int _send(ng_netdev_t *dev, ng_pktsnip_t *pkt);
 static int _add_cb(ng_netdev_t *dev, ng_netdev_event_cb_t cb);
 static int _rem_cb(ng_netdev_t *dev, ng_netdev_event_cb_t cb);
-static int _get(ng_netdev_t *dev, ng_netopt_t opt, void *value, size_t max_len);
-static int _set(ng_netdev_t *dev, ng_netopt_t opt, void *value, size_t value_len);
+static int _get(ng_netdev_t *dev, netopt_t opt, void *value, size_t max_len);
+static int _set(ng_netdev_t *dev, netopt_t opt, void *value, size_t value_len);
 static void _isr_event(ng_netdev_t *dev, uint32_t event_type);
 
 static const ng_netdev_driver_t _zep_driver = {
@@ -182,14 +182,14 @@ static inline void _set_uint64_ptr(uint64_t *ptr, uint64_t val)
     *ptr = val;
 }
 
-static inline void _set_flag_ptr(ng_netopt_enable_t *enable,
+static inline void _set_flag_ptr(netopt_enable_t *enable,
                                  uint16_t flag_field, uint16_t flag)
 {
     if (flag_field & flag) {
-        *enable = NG_NETOPT_ENABLE;
+        *enable = NETOPT_ENABLE;
     }
     else {
-        *enable = NG_NETOPT_DISABLE;
+        *enable = NETOPT_DISABLE;
     }
 }
 
@@ -327,7 +327,7 @@ static int _rem_cb(ng_netdev_t *dev, ng_netdev_event_cb_t cb)
     return 0;
 }
 
-static int _get(ng_netdev_t *netdev, ng_netopt_t opt, void *value, size_t max_len)
+static int _get(ng_netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
 {
     ng_zep_t *dev = (ng_zep_t *)netdev;
 
@@ -336,7 +336,7 @@ static int _get(ng_netdev_t *netdev, ng_netopt_t opt, void *value, size_t max_le
     }
 
     switch (opt) {
-        case NG_NETOPT_CHANNEL:
+        case NETOPT_CHANNEL:
             if (max_len < sizeof(uint16_t)) {
                 return -EOVERFLOW;
             }
@@ -344,7 +344,7 @@ static int _get(ng_netdev_t *netdev, ng_netopt_t opt, void *value, size_t max_le
             _set_uint16_ptr(value, (uint16_t)dev->chan);
             return sizeof(uint16_t);
 
-        case NG_NETOPT_ADDRESS:
+        case NETOPT_ADDRESS:
             if (max_len < sizeof(uint16_t)) {
                 return -EOVERFLOW;
             }
@@ -352,7 +352,7 @@ static int _get(ng_netdev_t *netdev, ng_netopt_t opt, void *value, size_t max_le
             _set_uint16_ptr(value, byteorder_ltobs(dev->addr).u16);
             return sizeof(uint16_t);
 
-        case NG_NETOPT_ADDRESS_LONG:
+        case NETOPT_ADDRESS_LONG:
             if (max_len < sizeof(uint64_t)) {
                 return -EOVERFLOW;
             }
@@ -360,7 +360,7 @@ static int _get(ng_netdev_t *netdev, ng_netopt_t opt, void *value, size_t max_le
             _set_uint64_ptr(value, byteorder_ltobll(dev->eui64).u64);
             return sizeof(uint64_t);
 
-        case NG_NETOPT_ADDR_LEN:
+        case NETOPT_ADDR_LEN:
             if (max_len < sizeof(uint16_t)) {
                 return -EOVERFLOW;
             }
@@ -374,7 +374,7 @@ static int _get(ng_netdev_t *netdev, ng_netopt_t opt, void *value, size_t max_le
 
             return sizeof(uint16_t);
 
-        case NG_NETOPT_SRC_LEN:
+        case NETOPT_SRC_LEN:
             if (max_len < sizeof(uint16_t)) {
                 return -EOVERFLOW;
             }
@@ -388,7 +388,7 @@ static int _get(ng_netdev_t *netdev, ng_netopt_t opt, void *value, size_t max_le
 
             return sizeof(uint16_t);
 
-        case NG_NETOPT_PROTO:
+        case NETOPT_PROTO:
             if (max_len < sizeof(ng_nettype_t)) {
                 return -EOVERFLOW;
             }
@@ -396,7 +396,7 @@ static int _get(ng_netdev_t *netdev, ng_netopt_t opt, void *value, size_t max_le
             *((ng_nettype_t *)value) = dev->proto;
             return sizeof(ng_nettype_t);
 
-        case NG_NETOPT_NID:
+        case NETOPT_NID:
             if (max_len < sizeof(uint16_t)) {
                 return -EOVERFLOW;
             }
@@ -404,7 +404,7 @@ static int _get(ng_netdev_t *netdev, ng_netopt_t opt, void *value, size_t max_le
             _set_uint16_ptr(value, byteorder_ltobs(dev->pan).u16);
             return sizeof(uint16_t);
 
-        case NG_NETOPT_IPV6_IID:
+        case NETOPT_IPV6_IID:
             if (max_len < sizeof(eui64_t)) {
                 return -EOVERFLOW;
             }
@@ -418,7 +418,7 @@ static int _get(ng_netdev_t *netdev, ng_netopt_t opt, void *value, size_t max_le
             }
             return sizeof(eui64_t);
 
-        case NG_NETOPT_MAX_PACKET_SIZE:
+        case NETOPT_MAX_PACKET_SIZE:
             if (max_len < sizeof(uint16_t)) {
                 return -EOVERFLOW;
             }
@@ -426,8 +426,8 @@ static int _get(ng_netdev_t *netdev, ng_netopt_t opt, void *value, size_t max_le
             _set_uint16_ptr(value, NG_ZEP_MAX_PKT_LENGTH);
             return sizeof(uint16_t);
 
-        case NG_NETOPT_AUTOACK:
-            if (max_len < sizeof(ng_netopt_enable_t)) {
+        case NETOPT_AUTOACK:
+            if (max_len < sizeof(netopt_enable_t)) {
                 return -EOVERFLOW;
             }
 
@@ -439,7 +439,7 @@ static int _get(ng_netdev_t *netdev, ng_netopt_t opt, void *value, size_t max_le
     }
 }
 
-static int _set(ng_netdev_t *netdev, ng_netopt_t opt, void *value, size_t value_len)
+static int _set(ng_netdev_t *netdev, netopt_t opt, void *value, size_t value_len)
 {
     ng_zep_t *dev = (ng_zep_t *)netdev;
 
@@ -448,7 +448,7 @@ static int _set(ng_netdev_t *netdev, ng_netopt_t opt, void *value, size_t value_
     }
 
     switch (opt) {
-        case NG_NETOPT_CHANNEL:
+        case NETOPT_CHANNEL:
             if (value_len < sizeof(uint16_t)) {
                 return -EOVERFLOW;
             }
@@ -461,7 +461,7 @@ static int _set(ng_netdev_t *netdev, ng_netopt_t opt, void *value, size_t value_
             dev->chan = *_get_uint16_ptr(value);
             return sizeof(uint16_t);
 
-        case NG_NETOPT_ADDRESS:
+        case NETOPT_ADDRESS:
             if (value_len < sizeof(be_uint16_t)) {
                 return -EOVERFLOW;
             }
@@ -472,7 +472,7 @@ static int _set(ng_netdev_t *netdev, ng_netopt_t opt, void *value, size_t value_
                 return sizeof(be_uint16_t);
             }
 
-        case NG_NETOPT_ADDRESS_LONG:
+        case NETOPT_ADDRESS_LONG:
             if (value_len < sizeof(be_uint64_t)) {
                 return -EOVERFLOW;
             }
@@ -483,7 +483,7 @@ static int _set(ng_netdev_t *netdev, ng_netopt_t opt, void *value, size_t value_
                 return sizeof(be_uint64_t);
             }
 
-        case NG_NETOPT_ADDR_LEN:
+        case NETOPT_ADDR_LEN:
             if (value_len < sizeof(uint16_t)) {
                 return -EOVERFLOW;
             }
@@ -503,7 +503,7 @@ static int _set(ng_netdev_t *netdev, ng_netopt_t opt, void *value, size_t value_
 
             return sizeof(uint16_t);
 
-        case NG_NETOPT_SRC_LEN:
+        case NETOPT_SRC_LEN:
             if (value_len < sizeof(uint16_t)) {
                 return -EOVERFLOW;
             }
@@ -523,7 +523,7 @@ static int _set(ng_netdev_t *netdev, ng_netopt_t opt, void *value, size_t value_
 
             return sizeof(uint16_t);
 
-        case NG_NETOPT_NID:
+        case NETOPT_NID:
             if (value_len < sizeof(be_uint16_t)) {
                 return -EOVERFLOW;
             }
@@ -534,8 +534,8 @@ static int _set(ng_netdev_t *netdev, ng_netopt_t opt, void *value, size_t value_
                 return sizeof(be_uint16_t);
             }
 
-        case NG_NETOPT_AUTOACK:
-            if (value_len < sizeof(ng_netopt_enable_t)) {
+        case NETOPT_AUTOACK:
+            if (value_len < sizeof(netopt_enable_t)) {
                 return -EOVERFLOW;
             }
 

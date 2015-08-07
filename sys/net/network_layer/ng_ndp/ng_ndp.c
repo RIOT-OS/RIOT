@@ -640,17 +640,17 @@ static uint16_t _get_l2src(uint8_t *l2src, size_t l2src_size, kernel_pid_t iface
     const uint16_t max_short_len = 6;
 
     /* try getting source address */
-    if ((ng_netapi_get(iface, NG_NETOPT_SRC_LEN, 0, &l2src_len,
+    if ((ng_netapi_get(iface, NETOPT_SRC_LEN, 0, &l2src_len,
                        sizeof(l2src_len)) >= 0) &&
         (l2src_len > max_short_len)) {
         try_long = true;
     }
 
-    if (try_long && ((res = ng_netapi_get(iface, NG_NETOPT_ADDRESS_LONG, 0,
+    if (try_long && ((res = ng_netapi_get(iface, NETOPT_ADDRESS_LONG, 0,
                                           l2src, l2src_size)) > max_short_len)) {
         l2src_len = (uint16_t)res;
     }
-    else if ((res = ng_netapi_get(iface, NG_NETOPT_ADDRESS, 0, l2src,
+    else if ((res = ng_netapi_get(iface, NETOPT_ADDRESS, 0, l2src,
                                   l2src_size)) >= 0) {
         l2src_len = (uint16_t)res;
     }
