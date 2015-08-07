@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    net_ng_ethertype Ether types
+ * @defgroup    net_ethertype Ether types
  * @ingroup     net
  * @brief       Ether types
  * @see         <a href="http://www.iana.org/assignments/ieee-802-numbers/ieee-802-numbers.xhtml#ieee-802-numbers-1">
@@ -23,25 +23,25 @@
  */
 
 
-#ifndef NG_ETHERTYPE_H_
-#define NG_ETHERTYPE_H_
+#ifndef ETHERTYPE_H_
+#define ETHERTYPE_H_
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /* expand at will ;-) */
-#define NG_ETHERTYPE_RESERVED   (0x0000)    /**< Reserved */
-#define NG_ETHERTYPE_IPV4       (0x0800)    /**< Internet protocol version 4 */
-#define NG_ETHERTYPE_ARP        (0x0806)    /**< Address resolution protocol */
-#define NG_ETHERTYPE_IPV6       (0x86dd)    /**< Internet protocol version 6 */
-#define NG_ETHERTYPE_UNKNOWN    (0xffff)    /**< Reserved (no protocol specified) */
+#define ETHERTYPE_RESERVED      (0x0000)    /**< Reserved */
+#define ETHERTYPE_IPV4          (0x0800)    /**< Internet protocol version 4 */
+#define ETHERTYPE_ARP           (0x0806)    /**< Address resolution protocol */
+#define ETHERTYPE_IPV6          (0x86dd)    /**< Internet protocol version 6 */
+#define ETHERTYPE_UNKNOWN       (0xffff)    /**< Reserved (no protocol specified) */
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* NG_ETHERTYPE_H_ */
+#endif /* ETHERTYPE_H_ */
 /**
  * @}
  */

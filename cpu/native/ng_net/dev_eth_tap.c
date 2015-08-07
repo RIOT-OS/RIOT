@@ -63,7 +63,7 @@ static int _recv(dev_eth_t *ethdev, char* buf, int n);
 
 static inline void _get_mac_addr(dev_eth_t *ethdev, uint8_t *dst) {
     dev_eth_tap_t *dev = (dev_eth_tap_t*)ethdev;
-    memcpy(dst, dev->addr, NG_ETHERNET_ADDR_LEN);
+    memcpy(dst, dev->addr, ETHERNET_ADDR_LEN);
 }
 
 static inline int _get_promiscous(dev_eth_t *ethdev) {
@@ -112,10 +112,10 @@ static int _recv(dev_eth_t *dev_eth, char *buf, int len) {
     DEBUG("ng_tapnet: read %d bytes\n", nread);
 
     if (nread > 0) {
-        ng_ethernet_hdr_t *hdr = (ng_ethernet_hdr_t *)buf;
+        ethernet_hdr_t *hdr = (ethernet_hdr_t *)buf;
         if (!(dev->promiscous) && !_is_addr_multicast(hdr->dst) &&
             !_is_addr_broadcast(hdr->dst) &&
-            (memcmp(hdr->dst, dev->addr, NG_ETHERNET_ADDR_LEN) != 0)) {
+            (memcmp(hdr->dst, dev->addr, ETHERNET_ADDR_LEN) != 0)) {
             DEBUG("ng_eth_dev: received for %02x:%02x:%02x:%02x:%02x:%02x\n"
                   "That's not me => Dropped\n",
                   hdr->dst[0], hdr->dst[1], hdr->dst[2],
@@ -250,7 +250,7 @@ static int _init(dev_eth_t *ethdev)
         }
         real_exit(EXIT_FAILURE);
     }
-    memcpy(dev->addr, ifr.ifr_hwaddr.sa_data, NG_ETHERNET_ADDR_LEN);
+    memcpy(dev->addr, ifr.ifr_hwaddr.sa_data, ETHERNET_ADDR_LEN);
 
     /* change mac addr so it differs from what the host is using */
     dev->addr[5]++;
