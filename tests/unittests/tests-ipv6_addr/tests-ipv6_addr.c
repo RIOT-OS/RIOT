@@ -115,6 +115,138 @@ static void test_ipv6_addr_is_unspecified_unspecified(void)
     TEST_ASSERT_EQUAL_INT(true, ng_ipv6_addr_is_unspecified(&a));
 }
 
+static void test_ipv6_addr_is_global_unicast_is_link_local(void)
+{
+    ng_ipv6_addr_t a = { {
+            0xfe, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
+        }
+    };
+    TEST_ASSERT_EQUAL_INT(false, ng_ipv6_addr_is_global_unicast(&a));
+}
+
+static void test_ipv6_addr_is_global_unicast1(void)
+{
+    /* riot-os.org has IPv6 address 2a01:4f8:151:64::11 */
+    ng_ipv6_addr_t a = { {
+            0x2a, 0x01, 0x04, 0xf8, 0x01, 0x51, 0x00, 0x64,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x11
+    }
+    };
+    TEST_ASSERT_EQUAL_INT(true, ng_ipv6_addr_is_global_unicast(&a));
+}
+
+static void test_ipv6_addr_is_global_unicast2(void)
+{
+    ng_ipv6_addr_t a = { {
+            0xaf, 0xfe, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0xbe, 0xef, 0xca, 0xfe, 0x12, 0x34, 0xab, 0xcd
+    }
+    };
+    TEST_ASSERT_EQUAL_INT(true, ng_ipv6_addr_is_global_unicast(&a));
+}
+
+static void test_ipv6_addr_is_ipv4_compat_not_ipv4_compat1(void)
+{
+    ng_ipv6_addr_t a = { {
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0xff, 0xff, 0xc0, 0xa8, 0x00, 0x01
+        }
+    };
+    TEST_ASSERT_EQUAL_INT(false, ng_ipv6_addr_is_ipv4_compat(&a));
+}
+
+static void test_ipv6_addr_is_ipv4_compat_not_ipv4_compat2(void)
+{
+    ng_ipv6_addr_t a = { {
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x01, 0xc0, 0xa8, 0x00, 0x01
+        }
+    };
+    TEST_ASSERT_EQUAL_INT(false, ng_ipv6_addr_is_ipv4_compat(&a));
+}
+
+static void test_ipv6_addr_is_ipv4_compat_ipv4_compat(void)
+{
+    ng_ipv6_addr_t a = { {
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0xc0, 0xa8, 0x00, 0x01
+        }
+    };
+    TEST_ASSERT_EQUAL_INT(true, ng_ipv6_addr_is_ipv4_compat(&a));
+}
+
+static void test_ipv6_addr_is_ipv4_mapped_not_ipv4_mapped1(void)
+{
+    ng_ipv6_addr_t a = { {
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0xc0, 0xa8, 0x00, 0x01
+        }
+    };
+    TEST_ASSERT_EQUAL_INT(false, ng_ipv6_addr_is_ipv4_mapped(&a));
+}
+
+static void test_ipv6_addr_is_ipv4_mapped_not_ipv4_mapped2(void)
+{
+    ng_ipv6_addr_t a = { {
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x01, 0xff, 0xff, 0xc0, 0xa8, 0x00, 0x01
+        }
+    };
+    TEST_ASSERT_EQUAL_INT(false, ng_ipv6_addr_is_ipv4_mapped(&a));
+}
+
+static void test_ipv6_addr_is_ipv4_mapped_ipv4_mapped(void)
+{
+    ng_ipv6_addr_t a = { {
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0xff, 0xff, 0xc0, 0xa8, 0x00, 0x01
+        }
+    };
+    TEST_ASSERT_EQUAL_INT(true, ng_ipv6_addr_is_ipv4_mapped(&a));
+}
+
+static void test_ipv6_addr_is_site_local_is_link_local(void)
+{
+    ng_ipv6_addr_t a = { {
+            0xfe, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
+        }
+    };
+    TEST_ASSERT_EQUAL_INT(false, ng_ipv6_addr_is_site_local(&a));
+}
+
+static void test_ipv6_addr_is_site_local_not_site_local(void)
+{
+    ng_ipv6_addr_t a = { {
+            0xff, 0xc0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
+        }
+    };
+    TEST_ASSERT_EQUAL_INT(false, ng_ipv6_addr_is_site_local(&a));
+}
+
+static void test_ipv6_addr_is_site_local_site_local_multicast(void)
+{
+    ng_ipv6_addr_t a = { {
+            0xff, 0x15, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
+            0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
+        }
+    };
+    TEST_ASSERT_EQUAL_INT(true, ng_ipv6_addr_is_site_local(&a));
+}
+
+
+static void test_ipv6_addr_is_site_local(void)
+{
+    ng_ipv6_addr_t a = { {
+            0xfe, 0xc0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
+        }
+    };
+    TEST_ASSERT_EQUAL_INT(true, ng_ipv6_addr_is_site_local(&a));
+}
+
 static void test_ipv6_addr_is_multicast_not_multicast(void)
 {
     ng_ipv6_addr_t a = { {
@@ -842,6 +974,19 @@ Test *tests_ipv6_addr_tests(void)
         new_TestFixture(test_ipv6_addr_equal_equal),
         new_TestFixture(test_ipv6_addr_is_unspecified_not_unspecified),
         new_TestFixture(test_ipv6_addr_is_unspecified_unspecified),
+        new_TestFixture(test_ipv6_addr_is_global_unicast_is_link_local),
+        new_TestFixture(test_ipv6_addr_is_global_unicast1),
+        new_TestFixture(test_ipv6_addr_is_global_unicast2),
+        new_TestFixture(test_ipv6_addr_is_ipv4_compat_not_ipv4_compat1),
+        new_TestFixture(test_ipv6_addr_is_ipv4_compat_not_ipv4_compat2),
+        new_TestFixture(test_ipv6_addr_is_ipv4_compat_ipv4_compat),
+        new_TestFixture(test_ipv6_addr_is_ipv4_mapped_not_ipv4_mapped1),
+        new_TestFixture(test_ipv6_addr_is_ipv4_mapped_not_ipv4_mapped2),
+        new_TestFixture(test_ipv6_addr_is_ipv4_mapped_ipv4_mapped),
+        new_TestFixture(test_ipv6_addr_is_site_local_is_link_local),
+        new_TestFixture(test_ipv6_addr_is_site_local_site_local_multicast),
+        new_TestFixture(test_ipv6_addr_is_site_local_not_site_local),
+        new_TestFixture(test_ipv6_addr_is_site_local),
         new_TestFixture(test_ipv6_addr_is_multicast_not_multicast),
         new_TestFixture(test_ipv6_addr_is_multicast_multicast),
         new_TestFixture(test_ipv6_addr_is_loopback_not_loopback),

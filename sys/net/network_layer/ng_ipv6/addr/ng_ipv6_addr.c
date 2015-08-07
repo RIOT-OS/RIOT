@@ -78,6 +78,19 @@ void ng_ipv6_addr_init_prefix(ng_ipv6_addr_t *out, const ng_ipv6_addr_t *prefix,
     }
 }
 
+
+bool ng_ipv6_addr_is_global_unicast(const ng_ipv6_addr_t *addr)
+{
+    return (!(ng_ipv6_addr_is_unique_local_unicast(addr)) &&
+            !(ng_ipv6_addr_is_unspecified(addr)) &&
+            !(ng_ipv6_addr_is_loopback(addr)) &&
+            !(ng_ipv6_addr_is_ipv4_compat(addr)) &&
+            !(ng_ipv6_addr_is_ipv4_mapped(addr)) &&
+            !(ng_ipv6_addr_is_site_local(addr)) &&
+            !(ng_ipv6_addr_is_link_local(addr)) &&
+            !(ng_ipv6_addr_is_multicast(addr)));
+}
+
 /**
  * @}
  */
