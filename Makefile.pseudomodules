@@ -1,5 +1,5 @@
 PSEUDOMODULES += ng_netif_default
-PSEUDOMODULES += ng_ieee802154
+PSEUDOMODULES += ieee802154
 PSEUDOMODULES += ng_ipv6_default
 PSEUDOMODULES += ng_ipv6_router
 PSEUDOMODULES += ng_ipv6_router_default

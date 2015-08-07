@@ -12,26 +12,26 @@ endif
 
 ifneq (,$(filter ng_at86rf2%,$(USEMODULE)))
   USEMODULE += ng_at86rf2xx
-  USEMODULE += ng_ieee802154
+  USEMODULE += ieee802154
 endif
 
 ifneq (,$(filter kw2xrf,$(USEMODULE)))
-  USEMODULE += ng_ieee802154
+  USEMODULE += ieee802154
 endif
 
 ifneq (,$(filter xbee,$(USEMODULE)))
-  USEMODULE += ng_ieee802154
+  USEMODULE += ieee802154
 endif
 
 ifneq (,$(filter ng_zep,$(USEMODULE)))
   USEMODULE += hashes
-  USEMODULE += ng_ieee802154
+  USEMODULE += ieee802154
   USEMODULE += ng_udp
   USEMODULE += random
   USEMODULE += vtimer
 endif
 
-ifneq (,$(filter ng_ieee802154,$(USEMODULE)))
+ifneq (,$(filter ieee802154,$(USEMODULE)))
   ifneq (,$(filter ng_ipv6, $(USEMODULE)))
     USEMODULE += ng_sixlowpan
   endif

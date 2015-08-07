@@ -15,7 +15,7 @@
 #include <stdbool.h>
 
 #include "byteorder.h"
-#include "net/ng_ieee802154.h"
+#include "net/ieee802154.h"
 #include "net/ng_ipv6/hdr.h"
 #include "net/ng_netbase.h"
 #include "net/ng_sixlowpan/ctx.h"
@@ -201,7 +201,7 @@ bool ng_sixlowpan_iphc_decode(ng_pktsnip_t *pkt)
             break;
 
         case IPHC_SAC_SAM_L2:
-            ng_ieee802154_get_iid((eui64_t *)(&ipv6_hdr->src.u64[1]),
+            ieee802154_get_iid((eui64_t *)(&ipv6_hdr->src.u64[1]),
                                   ng_netif_hdr_get_src_addr(netif_hdr),
                                   netif_hdr->src_l2addr_len);
             ng_ipv6_addr_set_link_local_prefix(&ipv6_hdr->src);
@@ -228,7 +228,7 @@ bool ng_sixlowpan_iphc_decode(ng_pktsnip_t *pkt)
             break;
 
         case IPHC_SAC_SAM_CTX_L2:
-            ng_ieee802154_get_iid((eui64_t *)(&ipv6_hdr->src.u64[1]),
+            ieee802154_get_iid((eui64_t *)(&ipv6_hdr->src.u64[1]),
                                   ng_netif_hdr_get_src_addr(netif_hdr),
                                   netif_hdr->src_l2addr_len);
             ng_ipv6_addr_init_prefix(&ipv6_hdr->src, &ctx->prefix,
@@ -276,7 +276,7 @@ bool ng_sixlowpan_iphc_decode(ng_pktsnip_t *pkt)
             break;
 
         case IPHC_M_DAC_DAM_U_L2:
-            ng_ieee802154_get_iid((eui64_t *)(&ipv6_hdr->dst.u64[1]),
+            ieee802154_get_iid((eui64_t *)(&ipv6_hdr->dst.u64[1]),
                                   ng_netif_hdr_get_dst_addr(netif_hdr),
                                   netif_hdr->dst_l2addr_len);
             ng_ipv6_addr_set_link_local_prefix(&ipv6_hdr->dst);
@@ -299,7 +299,7 @@ bool ng_sixlowpan_iphc_decode(ng_pktsnip_t *pkt)
             break;
 
         case IPHC_M_DAC_DAM_U_CTX_L2:
-            ng_ieee802154_get_iid((eui64_t *)(&ipv6_hdr->dst.u64[1]),
+            ieee802154_get_iid((eui64_t *)(&ipv6_hdr->dst.u64[1]),
                                   ng_netif_hdr_get_dst_addr(netif_hdr),
                                   netif_hdr->dst_l2addr_len);
             ng_ipv6_addr_init_prefix(&ipv6_hdr->dst, &ctx->prefix,
@@ -510,7 +510,7 @@ bool ng_sixlowpan_iphc_encode(ng_pktsnip_t *pkt)
                 (netif_hdr->src_l2addr_len == 4) ||
                 (netif_hdr->src_l2addr_len == 8)) {
                 /* prefer to create IID from netif header if available */
-                ng_ieee802154_get_iid(&iid, ng_netif_hdr_get_src_addr(netif_hdr),
+                ieee802154_get_iid(&iid, ng_netif_hdr_get_src_addr(netif_hdr),
                                       netif_hdr->src_l2addr_len);
             }
             else {
@@ -619,7 +619,7 @@ bool ng_sixlowpan_iphc_encode(ng_pktsnip_t *pkt)
               ng_ipv6_addr_is_link_local(&ipv6_hdr->dst)) && (netif_hdr->dst_l2addr_len > 0)) {
         eui64_t iid;
 
-        ng_ieee802154_get_iid(&iid, ng_netif_hdr_get_dst_addr(netif_hdr),
+        ieee802154_get_iid(&iid, ng_netif_hdr_get_dst_addr(netif_hdr),
                               netif_hdr->dst_l2addr_len);
 
         if ((ipv6_hdr->dst.u64[1].u64 == iid.uint64.u64) ||

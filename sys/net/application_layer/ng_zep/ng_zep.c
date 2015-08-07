@@ -23,7 +23,7 @@
 #include "hashes.h"
 #include "kernel.h"
 #include "msg.h"
-#include "net/ng_ieee802154.h"
+#include "net/ieee802154.h"
 #include "net/ng_ipv6/addr.h"
 #include "net/ng_ipv6/hdr.h"
 #include "net/ng_netbase.h"
@@ -82,7 +82,7 @@ static size_t _zep_hdr_fill(ng_zep_t *dev, ng_zep_hdr_t *hdr,
 /* Event handlers for ISR events */
 static void _rx_started_event(ng_zep_t *dev);
 
-/* IEEE 802.15.4 helper functions: TODO: generalize add to ng_ieee802154 */
+/* IEEE 802.15.4 helper functions: TODO: generalize add to (gnrc_)ieee802154 */
 static size_t _make_data_frame_hdr(ng_zep_t *dev, uint8_t *buf,
                                    ng_netif_hdr_t *hdr);
 static size_t _get_frame_hdr_len(uint8_t *mhr);
@@ -209,7 +209,7 @@ static int _send(ng_netdev_t *netdev, ng_pktsnip_t *pkt)
     ng_pktsnip_t *ptr, *new_pkt, *hdr;
     ng_zep_hdr_t *zep;
     size_t payload_len = ng_pkt_len(pkt->next), hdr_len, mhr_offset;
-    uint8_t mhr[NG_IEEE802154_MAX_HDR_LEN], *data;
+    uint8_t mhr[IEEE802154_MAX_HDR_LEN], *data;
     uint16_t fcs = 0;
 
     if ((netdev == NULL) || (netdev->driver != &_zep_driver)) {
@@ -227,7 +227,7 @@ static int _send(ng_netdev_t *netdev, ng_pktsnip_t *pkt)
         return -ENOMSG;
     }
 
-    new_pkt = _zep_hdr_build(dev, hdr_len + payload_len + NG_IEEE802154_FCS_LEN, false);
+    new_pkt = _zep_hdr_build(dev, hdr_len + payload_len + IEEE802154_FCS_LEN, false);
 
     if (new_pkt == NULL) {
         DEBUG("zep: could not allocate ZEP header in pktbuf\n");
@@ -261,7 +261,7 @@ static int _send(ng_netdev_t *netdev, ng_pktsnip_t *pkt)
 
     new_pkt = hdr;
 
-    mhr_offset = _zep_hdr_fill(dev, zep, payload_len + hdr_len + NG_IEEE802154_FCS_LEN);
+    mhr_offset = _zep_hdr_fill(dev, zep, payload_len + hdr_len + IEEE802154_FCS_LEN);
 
     if (mhr_offset == 0) {
         DEBUG("zep: error filling ZEP header\n");
@@ -294,7 +294,7 @@ static int _send(ng_netdev_t *netdev, ng_pktsnip_t *pkt)
         return -ENOENT;
     }
 
-    return payload_len + hdr_len + NG_IEEE802154_FCS_LEN;
+    return payload_len + hdr_len + IEEE802154_FCS_LEN;
 }
 
 static int _add_cb(ng_netdev_t *dev, ng_netdev_event_cb_t cb)
@@ -410,11 +410,11 @@ static int _get(ng_netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
             }
             if (dev->flags & NG_ZEP_FLAGS_SRC_ADDR_LONG) {
                 uint64_t addr = byteorder_ltobll(dev->eui64).u64;
-                ng_ieee802154_get_iid(value, (uint8_t *)&addr, 8);
+                ieee802154_get_iid(value, (uint8_t *)&addr, 8);
             }
             else {
                 uint16_t addr = byteorder_ltobs(dev->addr).u16;
-                ng_ieee802154_get_iid(value, (uint8_t *)&addr, 2);
+                ieee802154_get_iid(value, (uint8_t *)&addr, 2);
             }
             return sizeof(eui64_t);
 
@@ -872,19 +872,19 @@ static void _rx_started_event(ng_zep_t *dev)
     }
 }
 
-/* TODO: Generalize and move all below to ng_ieee802154 */
+/* TODO: Generalize and move all below to ieee802154 */
 static size_t _make_data_frame_hdr(ng_zep_t *dev, uint8_t *buf,
                                    ng_netif_hdr_t *hdr)
 {
     int pos = 0;
 
     /* we are building a data frame here */
-    buf[0] = NG_IEEE802154_FCF_TYPE_DATA;
+    buf[0] = IEEE802154_FCF_TYPE_DATA;
     buf[1] = 0x88;      /* use short src and dst addresses as starting point */
 
     /* if AUTOACK is enabled, then we also expect ACKs for this packet */
     if (dev->flags & NG_ZEP_FLAGS_AUTOACK) {
-        buf[0] |= NG_IEEE802154_FCF_ACK_REQ;
+        buf[0] |= IEEE802154_FCF_ACK_REQ;
     }
 
     /* fill in destination PAN ID */
@@ -922,7 +922,7 @@ static size_t _make_data_frame_hdr(ng_zep_t *dev, uint8_t *buf,
         buf[pos++] = dev->pan.u8[1];
     }
     else {
-        buf[0] |= NG_IEEE802154_FCF_PAN_COMP;
+        buf[0] |= IEEE802154_FCF_PAN_COMP;
     }
 
     /* fill in source address */
@@ -948,32 +948,32 @@ static size_t _get_frame_hdr_len(uint8_t *mhr)
     size_t len = 3;
 
     /* figure out address sizes */
-    tmp = (mhr[1] & NG_IEEE802154_FCF_DST_ADDR_MASK);
+    tmp = (mhr[1] & IEEE802154_FCF_DST_ADDR_MASK);
 
-    if (tmp == NG_IEEE802154_FCF_DST_ADDR_SHORT) {
+    if (tmp == IEEE802154_FCF_DST_ADDR_SHORT) {
         len += 4;
     }
-    else if (tmp == NG_IEEE802154_FCF_DST_ADDR_LONG) {
+    else if (tmp == IEEE802154_FCF_DST_ADDR_LONG) {
         len += 10;
     }
-    else if (tmp != NG_IEEE802154_FCF_DST_ADDR_VOID) {
+    else if (tmp != IEEE802154_FCF_DST_ADDR_VOID) {
         return 0;
     }
 
-    tmp = (mhr[1] & NG_IEEE802154_FCF_SRC_ADDR_MASK);
+    tmp = (mhr[1] & IEEE802154_FCF_SRC_ADDR_MASK);
 
-    if (tmp == NG_IEEE802154_FCF_SRC_ADDR_VOID) {
+    if (tmp == IEEE802154_FCF_SRC_ADDR_VOID) {
         return len;
     }
     else {
-        if (!(mhr[0] & NG_IEEE802154_FCF_PAN_COMP)) {
+        if (!(mhr[0] & IEEE802154_FCF_PAN_COMP)) {
             len += 2;
         }
 
-        if (tmp == NG_IEEE802154_FCF_SRC_ADDR_SHORT) {
+        if (tmp == IEEE802154_FCF_SRC_ADDR_SHORT) {
             return (len + 2);
         }
-        else if (tmp == NG_IEEE802154_FCF_SRC_ADDR_LONG) {
+        else if (tmp == IEEE802154_FCF_SRC_ADDR_LONG) {
             return (len + 8);
         }
     }
@@ -990,12 +990,12 @@ ng_pktsnip_t *_make_netif_hdr(uint8_t *mhr)
     ng_netif_hdr_t *hdr;
 
     /* figure out address sizes */
-    tmp = mhr[1] & NG_IEEE802154_FCF_SRC_ADDR_MASK;
+    tmp = mhr[1] & IEEE802154_FCF_SRC_ADDR_MASK;
 
-    if (tmp == NG_IEEE802154_FCF_SRC_ADDR_SHORT) {
+    if (tmp == IEEE802154_FCF_SRC_ADDR_SHORT) {
         src_len = 2;
     }
-    else if (tmp == NG_IEEE802154_FCF_SRC_ADDR_LONG) {
+    else if (tmp == IEEE802154_FCF_SRC_ADDR_LONG) {
         src_len = 8;
     }
     else if (tmp == 0) {
@@ -1005,12 +1005,12 @@ ng_pktsnip_t *_make_netif_hdr(uint8_t *mhr)
         return NULL;
     }
 
-    tmp = mhr[1] & NG_IEEE802154_FCF_DST_ADDR_MASK;
+    tmp = mhr[1] & IEEE802154_FCF_DST_ADDR_MASK;
 
-    if (tmp == NG_IEEE802154_FCF_DST_ADDR_SHORT) {
+    if (tmp == IEEE802154_FCF_DST_ADDR_SHORT) {
         dst_len = 2;
     }
-    else if (tmp == NG_IEEE802154_FCF_DST_ADDR_LONG) {
+    else if (tmp == IEEE802154_FCF_DST_ADDR_LONG) {
         dst_len = 8;
     }
     else if (tmp == 0) {
@@ -1044,7 +1044,7 @@ ng_pktsnip_t *_make_netif_hdr(uint8_t *mhr)
         tmp = 3;
     }
 
-    if (!(mhr[0] & NG_IEEE802154_FCF_PAN_COMP)) {
+    if (!(mhr[0] & IEEE802154_FCF_PAN_COMP)) {
         tmp += 2;
     }
 
