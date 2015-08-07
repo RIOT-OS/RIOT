@@ -22,7 +22,7 @@
 #include "byteorder.h"
 #include "kernel_types.h"
 #include "net/ng_netbase.h"
-#include "net/ng_protnum.h"
+#include "net/protnum.h"
 #include "net/ng_ipv6/hdr.h"
 #include "net/ng_ndp.h"
 #include "od.h"
@@ -48,7 +48,7 @@ static inline uint16_t _calc_csum(ng_pktsnip_t *hdr,
     }
 
     csum = ng_inet_csum(csum, hdr->data, hdr->size);
-    csum = ng_ipv6_hdr_inet_csum(csum, pseudo_hdr->data, NG_PROTNUM_ICMPV6,
+    csum = ng_ipv6_hdr_inet_csum(csum, pseudo_hdr->data, PROTNUM_ICMPV6,
                                  len);
 
     return ~csum;

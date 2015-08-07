@@ -33,13 +33,13 @@ bool ng_ipv6_ext_demux(kernel_pid_t iface, ng_pktsnip_t *pkt,
 
     while (c) {
         switch (nh) {
-            case NG_PROTNUM_IPV6_EXT_HOPOPT:
-            case NG_PROTNUM_IPV6_EXT_DST:
-            case NG_PROTNUM_IPV6_EXT_RH:
-            case NG_PROTNUM_IPV6_EXT_FRAG:
-            case NG_PROTNUM_IPV6_EXT_AH:
-            case NG_PROTNUM_IPV6_EXT_ESP:
-            case NG_PROTNUM_IPV6_EXT_MOB:
+            case PROTNUM_IPV6_EXT_HOPOPT:
+            case PROTNUM_IPV6_EXT_DST:
+            case PROTNUM_IPV6_EXT_RH:
+            case PROTNUM_IPV6_EXT_FRAG:
+            case PROTNUM_IPV6_EXT_AH:
+            case PROTNUM_IPV6_EXT_ESP:
+            case PROTNUM_IPV6_EXT_MOB:
                 /* TODO: add handling of types */
                 nh = ext->nh;
                 offset += ((ext->len * NG_IPV6_EXT_LEN_UNIT) + NG_IPV6_EXT_LEN_UNIT);

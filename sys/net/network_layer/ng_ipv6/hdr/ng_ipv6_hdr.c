@@ -16,7 +16,7 @@
 #include "net/ng_ipv6/hdr.h"
 #include "net/ng_nettype.h"
 #include "net/ng_pktbuf.h"
-#include "net/ng_protnum.h"
+#include "net/protnum.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
@@ -84,7 +84,7 @@ ng_pktsnip_t *ng_ipv6_hdr_build(ng_pktsnip_t *payload,
     }
 
     hdr->v_tc_fl = byteorder_htonl(0x60000000); /* set version, tc and fl in one go*/
-    hdr->nh = NG_PROTNUM_RESERVED;
+    hdr->nh = PROTNUM_RESERVED;
     hdr->hl = 0;
 
     return ipv6;

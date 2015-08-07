@@ -19,7 +19,7 @@
 #include "net/ng_ipv6/addr.h"
 #include "net/ng_ipv6/hdr.h"
 #include "net/ng_pktbuf.h"
-#include "net/ng_protnum.h"
+#include "net/protnum.h"
 #include "net/ng_inet_csum.h"
 
 #include "unittests-constants.h"
@@ -261,7 +261,7 @@ static void test_ipv6_hdr_inet_csum__initial_sum_overflows(void)
     };
 
     /* calculate checksum of pseudo header */
-    res = ng_ipv6_hdr_inet_csum(sum, (ng_ipv6_hdr_t *)&val, NG_PROTNUM_ICMPV6,
+    res = ng_ipv6_hdr_inet_csum(sum, (ng_ipv6_hdr_t *)&val, PROTNUM_ICMPV6,
                                 payload_len);
     res = ~res;     /* take 1's-complement for correct checksum */
 
@@ -290,7 +290,7 @@ static void test_ipv6_hdr_inet_csum__initial_sum_0(void)
     payload_len = sizeof(val) - sizeof(ng_ipv6_hdr_t);
 
     /* calculate checksum of pseudo header */
-    res = ng_ipv6_hdr_inet_csum(0, (ng_ipv6_hdr_t *)&val, NG_PROTNUM_ICMPV6,
+    res = ng_ipv6_hdr_inet_csum(0, (ng_ipv6_hdr_t *)&val, PROTNUM_ICMPV6,
                                 payload_len);
     /* calculate checksum of payload */
     res = ng_inet_csum(res, val + sizeof(ng_ipv6_hdr_t), payload_len);
@@ -339,7 +339,7 @@ static void test_ipv6_hdr_build__src_NULL(void)
     TEST_ASSERT(ng_ipv6_hdr_is(hdr));
     TEST_ASSERT_EQUAL_INT(0, ng_ipv6_hdr_get_tc(hdr));
     TEST_ASSERT_EQUAL_INT(0, ng_ipv6_hdr_get_fl(hdr));
-    TEST_ASSERT_EQUAL_INT(NG_PROTNUM_RESERVED, hdr->nh);
+    TEST_ASSERT_EQUAL_INT(PROTNUM_RESERVED, hdr->nh);
     TEST_ASSERT_EQUAL_INT(0, hdr->hl);
     TEST_ASSERT(ng_ipv6_addr_equal(&dst, &hdr->dst));
     TEST_ASSERT(!ng_pktbuf_is_empty());
@@ -360,7 +360,7 @@ static void test_ipv6_hdr_build__dst_NULL(void)
     TEST_ASSERT(ng_ipv6_hdr_is(hdr));
     TEST_ASSERT_EQUAL_INT(0, ng_ipv6_hdr_get_tc(hdr));
     TEST_ASSERT_EQUAL_INT(0, ng_ipv6_hdr_get_fl(hdr));
-    TEST_ASSERT_EQUAL_INT(NG_PROTNUM_RESERVED, hdr->nh);
+    TEST_ASSERT_EQUAL_INT(PROTNUM_RESERVED, hdr->nh);
     TEST_ASSERT_EQUAL_INT(0, hdr->hl);
     TEST_ASSERT(ng_ipv6_addr_equal(&src, &hdr->src));
     TEST_ASSERT(!ng_pktbuf_is_empty());
@@ -383,7 +383,7 @@ static void test_ipv6_hdr_build__complete(void)
     TEST_ASSERT(ng_ipv6_hdr_is(hdr));
     TEST_ASSERT_EQUAL_INT(0, ng_ipv6_hdr_get_tc(hdr));
     TEST_ASSERT_EQUAL_INT(0, ng_ipv6_hdr_get_fl(hdr));
-    TEST_ASSERT_EQUAL_INT(NG_PROTNUM_RESERVED, hdr->nh);
+    TEST_ASSERT_EQUAL_INT(PROTNUM_RESERVED, hdr->nh);
     TEST_ASSERT_EQUAL_INT(0, hdr->hl);
     TEST_ASSERT(ng_ipv6_addr_equal(&src, &hdr->src));
     TEST_ASSERT(ng_ipv6_addr_equal(&dst, &hdr->dst));

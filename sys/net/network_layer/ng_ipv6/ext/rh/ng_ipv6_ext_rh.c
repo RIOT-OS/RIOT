@@ -14,7 +14,7 @@
 
 #include <stdbool.h>
 
-#include "net/ng_protnum.h"
+#include "net/protnum.h"
 #include "net/ng_rpl/srh.h"
 #include "net/ng_ipv6/ext/rh.h"
 
@@ -25,16 +25,16 @@ ng_ipv6_addr_t *ng_ipv6_ext_rh_next_hop(ng_ipv6_hdr_t *ipv6)
 
     while (c) {
         switch (ext->type) {
-            case NG_PROTNUM_IPV6_EXT_HOPOPT:
-            case NG_PROTNUM_IPV6_EXT_DST:
-            case NG_PROTNUM_IPV6_EXT_FRAG:
-            case NG_PROTNUM_IPV6_EXT_AH:
-            case NG_PROTNUM_IPV6_EXT_ESP:
-            case NG_PROTNUM_IPV6_EXT_MOB:
+            case PROTNUM_IPV6_EXT_HOPOPT:
+            case PROTNUM_IPV6_EXT_DST:
+            case PROTNUM_IPV6_EXT_FRAG:
+            case PROTNUM_IPV6_EXT_AH:
+            case PROTNUM_IPV6_EXT_ESP:
+            case PROTNUM_IPV6_EXT_MOB:
                 ext = (ng_ipv6_ext_rh_t *)ng_ipv6_ext_get_next((ng_ipv6_ext_t *)ext);
                 break;
 
-            case NG_PROTNUM_IPV6_EXT_RH:
+            case PROTNUM_IPV6_EXT_RH:
                 c = false;
                 break;
 
@@ -44,7 +44,7 @@ ng_ipv6_addr_t *ng_ipv6_ext_rh_next_hop(ng_ipv6_hdr_t *ipv6)
         }
     }
 
-    if (ipv6->nh == NG_PROTNUM_IPV6_EXT_RH) {
+    if (ipv6->nh == PROTNUM_IPV6_EXT_RH) {
         switch (ext->type) {
 #ifdef MODULE_NG_RPL_SRH
             case NG_RPL_SRH_TYPE:

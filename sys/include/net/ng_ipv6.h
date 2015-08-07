@@ -93,7 +93,7 @@ kernel_pid_t ng_ipv6_init(void);
  *
  * @param[in] iface     The receiving interface.
  * @param[in] pkt       A packet.
- * @param[in] nh        A protocol number (see @ref net_ng_protnum).
+ * @param[in] nh        A protocol number (see @ref net_protnum).
  */
 void ng_ipv6_demux(kernel_pid_t iface, ng_pktsnip_t *pkt, uint8_t nh);
 

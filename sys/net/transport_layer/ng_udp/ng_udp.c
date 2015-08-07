@@ -82,7 +82,7 @@ static uint16_t _calc_csum(ng_pktsnip_t *hdr, ng_pktsnip_t *pseudo_hdr,
 #ifdef MODULE_NG_IPV6
         case NG_NETTYPE_IPV6:
             csum = ng_ipv6_hdr_inet_csum(csum, pseudo_hdr->data,
-                                         NG_PROTNUM_UDP, len);
+                                         PROTNUM_UDP, len);
             break;
 #endif
         default:

@@ -21,7 +21,7 @@
 #include "net/ng_icmpv6.h"
 #include "net/ng_netbase.h"
 #include "net/ng_ndp.h"
-#include "net/ng_protnum.h"
+#include "net/protnum.h"
 #include "thread.h"
 #include "utlist.h"
 
@@ -79,18 +79,18 @@ void ng_ipv6_demux(kernel_pid_t iface, ng_pktsnip_t *pkt, uint8_t nh)
     pkt->type = ng_nettype_from_protnum(nh);
 
     switch (nh) {
-        case NG_PROTNUM_ICMPV6:
+        case PROTNUM_ICMPV6:
             DEBUG("ipv6: handle ICMPv6 packet (nh = %" PRIu8 ")\n", nh);
             ng_icmpv6_demux(iface, pkt);
             break;
 #ifdef MODULE_NG_IPV6_EXT
-        case NG_PROTNUM_IPV6_EXT_HOPOPT:
-        case NG_PROTNUM_IPV6_EXT_DST:
-        case NG_PROTNUM_IPV6_EXT_RH:
-        case NG_PROTNUM_IPV6_EXT_FRAG:
-        case NG_PROTNUM_IPV6_EXT_AH:
-        case NG_PROTNUM_IPV6_EXT_ESP:
-        case NG_PROTNUM_IPV6_EXT_MOB:
+        case PROTNUM_IPV6_EXT_HOPOPT:
+        case PROTNUM_IPV6_EXT_DST:
+        case PROTNUM_IPV6_EXT_RH:
+        case PROTNUM_IPV6_EXT_FRAG:
+        case PROTNUM_IPV6_EXT_AH:
+        case PROTNUM_IPV6_EXT_ESP:
+        case PROTNUM_IPV6_EXT_MOB:
             DEBUG("ipv6: handle extension header (nh = %" PRIu8 ")\n", nh);
             if (!ng_ipv6_ext_demux(iface, pkt, nh)) {
                 DEBUG("ipv6: unable to parse extension headers.\n");
@@ -98,7 +98,7 @@ void ng_ipv6_demux(kernel_pid_t iface, ng_pktsnip_t *pkt, uint8_t nh)
                 return;
             }
 #endif
-        case NG_PROTNUM_IPV6:
+        case PROTNUM_IPV6:
             DEBUG("ipv6: handle encapsulated IPv6 packet (nh = %" PRIu8 ")\n", nh);
             _decapsulate(pkt);
             break;
@@ -262,12 +262,12 @@ static int _fill_ipv6_hdr(kernel_pid_t iface, ng_pktsnip_t *ipv6,
           ng_pkt_len(payload), hdr->len.u16);
 
     /* check if e.g. extension header was not already marked */
-    if (hdr->nh == NG_PROTNUM_RESERVED) {
+    if (hdr->nh == PROTNUM_RESERVED) {
         hdr->nh = ng_nettype_to_protnum(payload->type);
 
         /* if still reserved: mark no next header */
-        if (hdr->nh == NG_PROTNUM_RESERVED) {
-            hdr->nh = NG_PROTNUM_IPV6_NONXT;
+        if (hdr->nh == PROTNUM_RESERVED) {
+            hdr->nh = PROTNUM_IPV6_NONXT;
         }
     }
 
