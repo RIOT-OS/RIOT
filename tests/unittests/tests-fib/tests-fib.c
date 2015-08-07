@@ -668,7 +668,6 @@ static void test_fib_17_get_entry_set(void)
     TEST_ASSERT_EQUAL_INT(10, arr_size);
     arr_size = 20;
 
-    memset(prefix,0, addr_buf_size);
     snprintf(prefix, addr_buf_size, "Test address 0");
 
     ret = fib_get_destination_set((uint8_t *)prefix, addr_buf_size-1, &arr_dst[0], &arr_size);
@@ -678,7 +677,6 @@ static void test_fib_17_get_entry_set(void)
     TEST_ASSERT_EQUAL_INT(20, arr_size);
     arr_size = 20;
 
-    memset(prefix,0, addr_buf_size);
     snprintf(prefix, addr_buf_size, "Test address");
 
     ret = fib_get_destination_set((uint8_t *)prefix, addr_buf_size-1, &arr_dst[0], &arr_size);
