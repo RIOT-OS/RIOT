@@ -1,7 +1,7 @@
 From e6d36f466b2c1568cb4cfc3a3f1f9348e71db037 Mon Sep 17 00:00:00 2001
 From: Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
 Date: Tue, 15 Jul 2014 17:06:51 +0200
-Subject: [PATCH] fix old-style function declarations
+Subject: [PATCH 5/8] fix old-style function declarations
 
 ---
  async.c | 2 +-

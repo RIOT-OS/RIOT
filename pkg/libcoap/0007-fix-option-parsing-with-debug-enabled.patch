@@ -1,0 +1,26 @@
+From e5adb25f18ff979b2777f7161b1038611c84a450 Mon Sep 17 00:00:00 2001
+From: Oleg Hahm <oleg@hobbykeller.org>
+Date: Tue, 4 Aug 2015 23:07:24 +0200
+Subject: [PATCH 7/8] fix option parsing with debug enabled
+
+---
+ option.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/option.c b/option.c
+index a03fc9e..b825eac 100644
+--- a/option.c
++++ b/option.c
+@@ -57,8 +57,9 @@ coap_opt_parse(const coap_opt_t *opt, size_t length, coap_option_t *result) {
+
+   switch(result->delta) {
+   case 15:
+-    if (*opt != COAP_PAYLOAD_START)
++    if (*opt != COAP_PAYLOAD_START) {
+       debug("ignored reserved option delta 15\n");
++    }
+     return 0;
+   case 14:
+     /* Handle two-byte value: First, the MSB + 269 is stored as delta value.
+--
+2.5.0
