@@ -56,6 +56,7 @@ void rtt_init(void)
 {
     RTC_Type *rtt = RTT_DEV;
 
+    NVIC_DisableIRQ(RTT_IRQ);
     RTT_UNLOCK();
     /* Reset RTC */
     rtt->CR = RTC_CR_SWR_MASK;
@@ -75,6 +76,11 @@ void rtt_init(void)
 
     /* Disable all RTC interrupts. */
     rtt->IER = 0;
+
+    /* Enable RTC interrupts */
+    NVIC_SetPriority(RTT_IRQ, RTT_IRQ_PRIO);
+    NVIC_ClearPendingIRQ(RTT_IRQ);
+    NVIC_EnableIRQ(RTT_IRQ);
 
     rtt_poweron();
 }
@@ -137,10 +143,6 @@ void rtt_set_alarm(uint32_t alarm, rtt_cb_t cb, void *arg)
 
     /* Enable Timer Alarm Interrupt */
     rtt->IER |= RTC_IER_TAIE_MASK;
-
-    /* Enable RTC interrupts */
-    NVIC_SetPriority(RTT_IRQ, RTT_IRQ_PRIO);
-    NVIC_EnableIRQ(RTT_IRQ);
 }
 
 uint32_t rtt_get_alarm(void)

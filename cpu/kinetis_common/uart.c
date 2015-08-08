@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2015 Eistec AB
  * Copyright (C) 2014 PHYTEC Messtechnik GmbH
  * Copyright (C) 2014 Freie Universität Berlin
  *
@@ -17,6 +18,7 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Johann Fischer <j.fischer@phytec.de>
+ * @author      Joakim Gebart <joakim.gebart@eistec.se>
  *
  * @}
  */
@@ -28,6 +30,7 @@
 #include "sched.h"
 #include "periph_conf.h"
 #include "periph/uart.h"
+#include "kinetis_lpm.h"
 
 #ifndef KINETIS_UART_ADVANCED
 /**
@@ -61,6 +64,14 @@ static inline void irq_handler(uart_t uartnum, KINETIS_UART *uart);
  */
 static uart_conf_t config[UART_NUMOF];
 
+/**
+ * @brief 1 character TX queue.
+ *
+ * Works well enough for now, possible improvements include using the ringbuffer
+ * library or DMA transfers.
+ */
+static atomic_int_t uart_next_tx_char[UART_NUMOF];
+
 static inline void kinetis_set_brfa(KINETIS_UART *dev, uint32_t baudrate, uint32_t clk)
 {
 #if KINETIS_UART_ADVANCED
@@ -89,23 +100,30 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, uart_tx_cb_t t
 #if UART_0_EN
 
         case UART_0:
-            NVIC_SetPriority(UART_0_IRQ_CHAN, UART_IRQ_PRIO);
-            NVIC_EnableIRQ(UART_0_IRQ_CHAN);
             UART_0_DEV->C2 |= (1 << UART_C2_RIE_SHIFT);
+            /* Enable receiver edge detect interrupt */
+            UART_0_DEV->BDH |= UART_BDH_RXEDGIE_MASK;
             break;
 #endif
 #if UART_1_EN
 
         case UART_1:
-            NVIC_SetPriority(UART_1_IRQ_CHAN, UART_IRQ_PRIO);
-            NVIC_EnableIRQ(UART_1_IRQ_CHAN);
             UART_1_DEV->C2 |= (1 << UART_C2_RIE_SHIFT);
+            /* Enable receiver edge detect interrupt */
+            UART_1_DEV->BDH |= UART_BDH_RXEDGIE_MASK;
             break;
 #endif
 
         default:
             return -2;
             break;
+    }
+
+    if (config[uart].rx_cb != NULL) {
+        /* Disable LLS if we have an RX callback configured since the UART can
+         * not wake the CPU from LLS. */
+        /* The RXEDGIF interrupt only works in VLPS and higher modes */
+        kinetis_lpm_inhibit_lls();
     }
 
     return 0;
@@ -133,6 +151,10 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
             af = UART_0_AF;
             UART_0_PORT_CLKEN();
             UART_0_CLKEN();
+            /* Enable IRQs in the NVIC because we are using TX IRQs for blocking
+             * transfers as well */
+            NVIC_SetPriority(UART_0_IRQ_CHAN, UART_IRQ_PRIO);
+            NVIC_EnableIRQ(UART_0_IRQ_CHAN);
             break;
 #endif
 #if UART_1_EN
@@ -146,12 +168,19 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
             af = UART_1_AF;
             UART_1_PORT_CLKEN();
             UART_1_CLKEN();
+            /* Enable IRQs in the NVIC because we are using TX IRQs for blocking
+             * transfers as well */
+            NVIC_SetPriority(UART_1_IRQ_CHAN, UART_IRQ_PRIO);
+            NVIC_EnableIRQ(UART_1_IRQ_CHAN);
             break;
 #endif
 
         default:
             return -1;
     }
+
+    /* Initialize TX "queue" */
+    uart_next_tx_char[uart].value = -1;
 
     /* configure RX and TX pins, set pin to use alternative function mode */
     port->PCR[rx_pin] = PORT_PCR_MUX(af);
@@ -242,23 +271,20 @@ void uart_tx_end(uart_t uart)
 
 int uart_write(uart_t uart, char data)
 {
+    UART_Type* dev;
+    int qval;
+
     switch (uart) {
 #if UART_0_EN
 
         case UART_0:
-            if (UART_0_DEV->S1 & UART_S1_TDRE_MASK) {
-                UART_0_DEV->D = (uint8_t)data;
-            }
-
+            dev = UART_0_DEV;
             break;
 #endif
 #if UART_1_EN
 
         case UART_1:
-            if (UART_1_DEV->S1 & UART_S1_TDRE_MASK) {
-                UART_1_DEV->D = (uint8_t)data;
-            }
-
+            dev = UART_1_DEV;
             break;
 #endif
 
@@ -266,6 +292,16 @@ int uart_write(uart_t uart, char data)
             return -2;
             break;
     }
+
+    /* Avoid sign extension when converting from char, regardless of char signedness */
+    qval = (unsigned char)data;
+
+    /* Try to write to the TX buffer */
+    atomic_cas(&uart_next_tx_char[uart], -1, qval);
+
+    /* Enable TX interrupt, the ISR will push data to the transfer register if
+     * the atomic write operation was successful. */
+    dev->C2 |= UART_C2_TIE_MASK;
 
     return 0;
 }
@@ -300,27 +336,45 @@ int uart_read_blocking(uart_t uart, char *data)
 
 int uart_write_blocking(uart_t uart, char data)
 {
+    UART_Type* dev;
+    int qval;
+
     switch (uart) {
 #if UART_0_EN
 
         case UART_0:
-            while (!(UART_0_DEV->S1 & UART_S1_TDRE_MASK));
-
-            UART_0_DEV->D = (uint8_t)data;
+            dev = UART_0_DEV;
             break;
 #endif
 #if UART_1_EN
 
         case UART_1:
-            while (!(UART_1_DEV->S1 & UART_S1_TDRE_MASK));
-
-            UART_1_DEV->D = (uint8_t)data;
+            dev = UART_1_DEV;
             break;
 #endif
 
         default:
             return -2;
             break;
+    }
+
+    /* Avoid sign extension when converting from char, regardless of char signedness */
+    qval = (unsigned char)data;
+    /* Check if interrupts are enabled */
+    uint8_t mask = __get_PRIMASK();
+
+    if (mask == 0) {
+        /* Try to write to the TX buffer until we succeed */
+        while (!atomic_cas(&uart_next_tx_char[uart], -1, qval)) {
+            /* TODO: sleep for a bit */
+        }
+        /* Enable TX interrupt, the ISR will push data to the transfer register. */
+        dev->C2 |= UART_C2_TIE_MASK;
+    } else {
+        /* Interrupts are disabled, do a busy wait */
+        while ((dev->S1 & UART_S1_TDRE_MASK) == 0) {
+        }
+        dev->D = data;
     }
 
     return 1;
@@ -340,32 +394,85 @@ void UART_1_ISR(void)
 }
 #endif
 
-static inline void irq_handler(uart_t uartnum, KINETIS_UART *dev)
+static inline void irq_rx_handler(uart_t uartnum, KINETIS_UART *dev)
 {
+    /* Flag used for keeping track of when we may sleep */
+    static uint8_t receiving[UART_NUMOF] = {0};
+
     /*
-    * On Cortex-M0, it happens that S1 is read with LDR
-    * instruction instead of LDRB. This will read the data register
-    * at the same time and arrived byte will be lost. Maybe it's a GCC bug.
-    *
-    * Observed with: arm-none-eabi-gcc (4.8.3-8+..)
-    * It does not happen with: arm-none-eabi-gcc (4.8.3-9+11)
-    */
+     * On Cortex-M0, it happens that S1 is read with LDR
+     * instruction instead of LDRB. This will read the data register
+     * at the same time and arrived byte will be lost. Maybe it's a GCC bug.
+     *
+     * Observed with: arm-none-eabi-gcc (4.8.3-8+..)
+     * It does not happen with: arm-none-eabi-gcc (4.8.3-9+11)
+     */
 
-    if (dev->S1 & UART_S1_RDRF_MASK) {
-        /* RDRF flag will be cleared when dev-D was read */
-        uint8_t data = dev->D;
-
+    if(dev->S1 & UART_S1_RDRF_MASK) {
+        /* RDRF flag is cleared by first reading S1, then reading D */
+        volatile uint8_t c = dev->D;
         if (config[uartnum].rx_cb != NULL) {
-            config[uartnum].rx_cb(config[uartnum].arg, data);
+            config[uartnum].rx_cb(config[uartnum].arg, c);
         }
     }
 
-    if (dev->S1 & UART_S1_TDRE_MASK) {
-        if (config[uartnum].tx_cb == NULL) {
-            dev->C2 &= ~(UART_C2_TIE_MASK);
+    if ((dev->S2 & UART_S2_RAF_MASK) == 0) {
+        /* Receiver idle */
+        if (receiving[uartnum] != 0) {
+            receiving[uartnum] = 0;
+            kinetis_lpm_uninhibit_stop();
         }
-        else if (config[uartnum].tx_cb(config[uartnum].arg) == 0) {
+    }
+
+    if((dev->S2 & UART_S2_RXEDGIF_MASK)) {
+        /* Woken up by edge detect */
+        if (receiving[uartnum] == 0) {
+            receiving[uartnum] = 1;
+            kinetis_lpm_inhibit_stop();
+        }
+        /* Clear RX wake-up flag by writing a 1 to it */
+        dev->S2 = UART_S2_RXEDGIF_MASK;
+    }
+}
+
+static inline void irq_tx_handler(uart_t uartnum, KINETIS_UART *dev)
+{
+    /* Flag used for keeping track of when we may sleep */
+    static uint8_t transmitting[UART_NUMOF] = {0};
+
+    if((dev->C2 & UART_C2_TCIE_MASK) && (dev->S1 & UART_S1_TC_MASK)) {
+        if (transmitting[uartnum] != 0) {
+            /* transmission complete, allow STOP modes again */
+            transmitting[uartnum] = 0;
+            kinetis_lpm_uninhibit_stop();
+        }
+        /* Disable transmission complete interrupt */
+        dev->C2 &= ~(UART_C2_TCIE_MASK);
+    }
+
+    if((dev->C2 & UART_C2_TIE_MASK) && (dev->S1 & UART_S1_TDRE_MASK)) {
+        /* Pop the transfer queue */
+        int qval = uart_next_tx_char[uartnum].value;
+        uart_next_tx_char[uartnum].value = -1;
+        if (qval < 0) {
+            /* Empty buffer, disable this interrupt */
             dev->C2 &= ~(UART_C2_TIE_MASK);
+            /* Enable transmission complete interrupt. */
+            dev->C2 |= UART_C2_TCIE_MASK;
+        } else {
+            /* queue next byte to the hardware FIFO */
+            dev->D = (uint8_t)(qval & 0xff);
+            if (transmitting[uartnum] == 0) {
+                transmitting[uartnum] = 1;
+                kinetis_lpm_inhibit_stop();
+            }
+        }
+        /* Run TX callback if it is set */
+        if (config[uartnum].tx_cb != NULL) {
+            if (config[uartnum].tx_cb(config[uartnum].arg)) {
+                /* Enable TX IRQ, disabling is performed when the queue is empty above. */
+                dev->C2 |= UART_C2_TIE_MASK;
+            }
         }
     }
 
@@ -375,6 +482,14 @@ static inline void irq_handler(uart_t uartnum, KINETIS_UART *dev)
         dev->S1 = UART_S1_OR_MASK;
     }
 #endif
+
+}
+
+static inline void irq_handler(uart_t uartnum, KINETIS_UART *dev)
+{
+    irq_rx_handler(uartnum, dev);
+
+    irq_tx_handler(uartnum, dev);
 
     if (sched_context_switch_request) {
         thread_yield();

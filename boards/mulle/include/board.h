@@ -124,6 +124,26 @@ void board_init(void);
 /** @} */
 
 /**
+ * @name External NVRAM configuration
+ * @{
+ */
+
+#define NVRAM0_CS     GPIO_16
+#define NVRAM0_SPI    SPI_2
+
+/** @} */
+
+/**
+ * @name External flash memory configuration
+ * @{
+ */
+
+#define FLASH0_CS     GPIO_17
+#define FLASH0_SPI    SPI_2
+
+/** @} */
+
+/**
  * @name Mulle power control configuration
  */
 /** @{ */
@@ -155,6 +175,38 @@ void board_init(void);
  * Flash clock divider setting, the actual hardware register value, see reference manual for details
  */
 #define CONFIG_CLOCK_K60_FLASH_DIV 0x03
+
+/** @} */
+
+/**
+ * @name LPM output pins for tracing power mode transitions
+ */
+/** @{ */
+#define LPM_TRACE_GPIO_ENABLE 1
+
+#if LPM_TRACE_GPIO_ENABLE
+
+#define LPM_TRACE_LPM_ENTRY_GPIO  (GPIO_24)
+#define LPM_TRACE_LPM_EXIT_GPIO   (GPIO_24)
+#define LPM_TRACE_WAIT_GPIO       (GPIO_20)
+#define LPM_TRACE_STOP_GPIO       (GPIO_21)
+#define LPM_TRACE_VLPS_GPIO       (GPIO_22)
+#define LPM_TRACE_LLS_GPIO        (GPIO_23)
+
+/** @brief Called on entry into kinetis_low_power_mode() */
+#define LPM_TRACE_LPM_ENTRY() {gpio_set(LPM_TRACE_LPM_ENTRY_GPIO);}
+/** @brief Called on exit from kinetis_low_power_mode() */
+#define LPM_TRACE_LPM_EXIT() {gpio_clear(LPM_TRACE_LPM_EXIT_GPIO);}
+/** @brief Called on transition into WAIT */
+#define LPM_TRACE_WAIT() {gpio_toggle(LPM_TRACE_WAIT_GPIO);}
+/** @brief Called on transition into STOP */
+#define LPM_TRACE_STOP() {gpio_toggle(LPM_TRACE_STOP_GPIO);}
+/** @brief Called on transition into VLPS */
+#define LPM_TRACE_VLPS() {gpio_toggle(LPM_TRACE_VLPS_GPIO);}
+/** @brief Called on transition into LLS */
+#define LPM_TRACE_LLS() {gpio_toggle(LPM_TRACE_LLS_GPIO);}
+
+#endif
 
 /** @} */
 
