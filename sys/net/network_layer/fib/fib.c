@@ -30,6 +30,24 @@
 #include "ng_fib.h"
 #include "ng_fib/ng_fib_table.h"
 
+#ifdef MODULE_NG_IPV6_ADDR
+#include "net/ng_ipv6/addr.h"
+static char addr_str[NG_IPV6_ADDR_MAX_STR_LEN];
+#endif
+
+#ifdef MODULE_NG_IPV6_ADDR
+    #define NG_FIB_ADDR_PRINT_LEN       39
+#else
+    #define NG_FIB_ADDR_PRINT_LEN       32
+    #if NG_FIB_ADDR_PRINT_LEN != (UNIVERSAL_ADDRESS_SIZE * 2)
+        #error "NG_FIB_ADDR_PRINT_LEN MUST BE (UNIVERSAL_ADDRESS_SIZE * 2)"
+    #endif
+#endif
+
+#define NG_FIB_ADDR_PRINT_LENS1(X)      #X
+#define NG_FIB_ADDR_PRINT_LENS2(X)      NG_FIB_ADDR_PRINT_LENS1(X)
+#define NG_FIB_ADDR_PRINT_LENS          NG_FIB_ADDR_PRINT_LENS2(NG_FIB_ADDR_PRINT_LEN)
+
 /**
  * @brief access mutex to control exclusive operations on calls
  */
@@ -625,6 +643,13 @@ static void fib_print_address(universal_address_container_t *entry)
     uint8_t *ret = universal_address_get_address(entry, address, &addr_size);
 
     if (ret == address) {
+#ifdef MODULE_NG_IPV6_ADDR
+        if (addr_size == sizeof(ng_ipv6_addr_t)) {
+            printf("%-" NG_FIB_ADDR_PRINT_LENS "s",
+                    ng_ipv6_addr_to_str(addr_str, (ng_ipv6_addr_t *) address, sizeof(addr_str)));
+            return;
+        }
+#endif
         for (size_t i = 0; i < UNIVERSAL_ADDRESS_SIZE; ++i) {
             if (i <= addr_size) {
                 printf("%02x", address[i]);
@@ -633,13 +658,19 @@ static void fib_print_address(universal_address_container_t *entry)
                 printf("  ");
             }
         }
+#ifdef MODULE_NG_IPV6_ADDR
+        /* print trailing whitespaces */
+        for (size_t i = 0; i < NG_FIB_ADDR_PRINT_LEN - (UNIVERSAL_ADDRESS_SIZE * 2); ++i) {
+            printf(" ");
+        }
+#endif
     }
 }
 
 void fib_print_routes(void)
 {
     mutex_lock(&mtx_access);
-    printf("%-32s %-6s %-32s %-6s %-16s Interface\n"
+    printf("%-" NG_FIB_ADDR_PRINT_LENS "s %-6s %-" NG_FIB_ADDR_PRINT_LENS "s %-6s %-16s Interface\n"
            , "Destination", "Flags", "Next Hop", "Flags", "Expires");
 
     timex_t now;
