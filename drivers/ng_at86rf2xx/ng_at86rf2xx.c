@@ -246,9 +246,11 @@ void ng_at86rf2xx_tx_exec(ng_at86rf2xx_t *dev)
 
 size_t ng_at86rf2xx_rx_len(ng_at86rf2xx_t *dev)
 {
-    uint8_t res;
-    ng_at86rf2xx_fb_read(dev, &res, 1);
-    return (size_t)(res - 2);           /* extract the PHR and LQI field */
+    uint8_t phr;
+    ng_at86rf2xx_fb_read(dev, &phr, 1);
+
+    /* ignore MSB (see datasheets section 8.1.1.2) and substract length of FCS field */
+    return (size_t)((phr - 2) & 0x7f);
 }
 
 void ng_at86rf2xx_rx_read(ng_at86rf2xx_t *dev, uint8_t *data, size_t len,
