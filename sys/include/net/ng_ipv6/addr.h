@@ -256,20 +256,6 @@ static inline bool ng_ipv6_addr_is_loopback(const ng_ipv6_addr_t *addr)
 }
 
 /**
- * @brief   Check if @p addr is global unicast address.
- *
- * @see <a href="http://tools.ietf.org/html/rfc4291#section-2.5.4">
- *          RFC 4291, section 2.5.4
- *      </a>
- *
- * @param[in] addr  An IPv6 address.
- *
- * @return  true, if @p addr is global unicast address,
- * @return  false, otherwise.
- */
-bool ng_ipv6_addr_is_global_unicast(const ng_ipv6_addr_t *addr);
-
-/**
  * @brief   Checks if @p addr is a IPv4-compatible IPv6 address.
  *
  * @see <a href="http://tools.ietf.org/html/rfc4291#section-2.5.5.1">
@@ -385,6 +371,38 @@ static inline bool ng_ipv6_addr_is_unique_local_unicast(const ng_ipv6_addr_t *ad
 {
     return ((addr->u8[0] == 0xfc) || (addr->u8[0] == 0xfd));
 }
+
+/**
+ * @brief   Check if @p addr is global unicast address.
+ *
+ * @see <a href="http://tools.ietf.org/html/rfc4291#section-2.5.4">
+ *          RFC 4291, section 2.5.4
+ *      </a>
+ *
+ * @param[in] addr  An IPv6 address.
+ *
+ * @return  true, if @p addr is global unicast address,
+ * @return  false, otherwise.
+ */
+static inline bool ng_ipv6_addr_is_global(const ng_ipv6_addr_t *addr)
+{
+    /* first check for multicast with global scope */
+    if (ng_ipv6_addr_is_multicast(addr)) {
+        return ((addr->u8[1] & 0x0f) == NG_IPV6_ADDR_MCAST_SCP_GLOBAL);
+    }
+    else {
+        /* for unicast check if: */
+        /* - not unspecific or loopback */
+        return (!((addr->u64[0].u64 == 0) &&
+                    ((byteorder_ntohll(addr->u64[1]) & (0xfffffffffffffffe)) == 0)) &&
+                /* - not link-local */
+                (byteorder_ntohll(addr->u64[0]) != 0xfe80000000000000) &&
+                /* - not site-local */
+                ((byteorder_ntohs(addr->u16[0]) & 0xffc0) !=
+                 NG_IPV6_ADDR_SITE_LOCAL_PREFIX));
+    }
+}
+
 
 /**
  * @brief   Check if @p addr is solicited-node multicast address.
