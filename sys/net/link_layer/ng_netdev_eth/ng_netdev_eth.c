@@ -32,6 +32,7 @@
 #include "net/eui64.h"
 #include "net/ethernet.h"
 #include "net/ethertype.h"
+#include "net/ipv6/hdr.h"
 #include "net/ng_netdev.h"
 #include "net/ng_netif/hdr.h"
 #include "net/ng_pkt.h"
@@ -354,8 +355,6 @@ static inline void _addr_set_broadcast(uint8_t *dst)
     memset(dst, 0xff, ETHERNET_ADDR_LEN);
 }
 
-#define _IPV6_DST_OFFSET    (36)    /* sizeof(ipv6_hdr_t) - 4  */
-
 static inline void _addr_set_multicast(uint8_t *dst, ng_pktsnip_t *payload)
 {
     switch (payload->type) {
@@ -364,9 +363,11 @@ static inline void _addr_set_multicast(uint8_t *dst, ng_pktsnip_t *payload)
             dst[0] = 0x33;
             dst[1] = 0x33;
             if ((payload != NULL) && (payload->data != NULL)) {
-                memcpy(dst + 2, ((uint8_t *)payload->data) + _IPV6_DST_OFFSET, 4);
+                ipv6_hdr_t *hdr = payload->data;
+                uint16_t *prefix = (uint16_t *)(&dst[2]);
+                prefix[0] = hdr->dst.u16[6];
+                prefix[1] = hdr->dst.u16[7];
             }
-            /* TODO change to proper types when ng_ipv6_hdr_t got merged */
             break;
 #endif
         default:

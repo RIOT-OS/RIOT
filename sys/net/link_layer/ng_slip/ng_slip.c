@@ -31,7 +31,7 @@
 #include "periph/uart.h"
 #include "ringbuffer.h"
 #include "thread.h"
-#include "net/ng_ipv6/hdr.h"
+#include "net/ipv6/hdr.h"
 
 #include "net/ng_slip.h"
 
@@ -140,7 +140,7 @@ static void _slip_receive(ng_slip_dev_t *dev, size_t bytes)
     }
 
 #ifdef MODULE_NG_IPV6
-    if ((pkt->size >= sizeof(ng_ipv6_hdr_t)) && ng_ipv6_hdr_is_ipv6_hdr(pkt->data)) {
+    if ((pkt->size >= sizeof(ipv6_hdr_t)) && ipv6_hdr_is(pkt->data)) {
         pkt->type = NG_NETTYPE_IPV6;
     }
 #endif

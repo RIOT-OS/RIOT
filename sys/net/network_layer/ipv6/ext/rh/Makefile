@@ -1,3 +1,3 @@
-MODULE = ng_ipv6_ext_rh
+MODULE = ipv6_ext_rh
 
 include $(RIOTBASE)/Makefile.base

@@ -16,7 +16,7 @@
 #include <inttypes.h>
 
 #include "od.h"
-#include "net/ng_ipv6/hdr.h"
+#include "net/ipv6/hdr.h"
 #include "net/ng_sixlowpan.h"
 
 void ng_sixlowpan_print(uint8_t *data, size_t size)
@@ -25,10 +25,10 @@ void ng_sixlowpan_print(uint8_t *data, size_t size)
         puts("Uncompressed IPv6 packet");
 
         /* might just be the dispatch (or fragmented) so better check */
-        if (size > sizeof(ng_ipv6_hdr_t)) {
-            ng_ipv6_hdr_print((ng_ipv6_hdr_t *)(data + 1));
-            od_hex_dump(data + sizeof(ng_ipv6_hdr_t) + 1,
-                        size - sizeof(ng_ipv6_hdr_t) - 1,
+        if (size > sizeof(ipv6_hdr_t)) {
+            ipv6_hdr_print((ipv6_hdr_t *)(data + 1));
+            od_hex_dump(data + sizeof(ipv6_hdr_t) + 1,
+                        size - sizeof(ipv6_hdr_t) - 1,
                         OD_WIDTH_DEFAULT);
         }
     }

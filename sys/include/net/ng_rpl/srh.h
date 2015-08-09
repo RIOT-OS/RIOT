@@ -24,7 +24,6 @@
 #define NG_RPL_SRH_H_
 
 #include "net/ipv6/addr.h"
-#include "net/ng_ipv6/ext.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -42,7 +41,7 @@ extern "C" {
  *          RFC 6554
  *      </a>
  *
- * @extends ng_ipv6_ext_rh_t
+ * @extends ipv6_ext_rh_t
  */
 typedef struct __attribute__((packed)) {
     uint8_t nh;         /**< next header */

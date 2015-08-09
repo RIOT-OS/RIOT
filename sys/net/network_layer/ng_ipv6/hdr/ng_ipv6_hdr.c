@@ -37,7 +37,7 @@ ng_pktsnip_t *ng_ipv6_hdr_build(ng_pktsnip_t *payload,
                                 uint8_t *dst, uint8_t dst_len)
 {
     ng_pktsnip_t *ipv6;
-    ng_ipv6_hdr_t *hdr;
+    ipv6_hdr_t *hdr;
 
     if (((src_len != 0) && (src_len != sizeof(ipv6_addr_t))) ||
         ((dst_len != 0) && (dst_len != sizeof(ipv6_addr_t)))) {
@@ -46,14 +46,14 @@ ng_pktsnip_t *ng_ipv6_hdr_build(ng_pktsnip_t *payload,
         return NULL;
     }
 
-    ipv6 = ng_pktbuf_add(payload, NULL, sizeof(ng_ipv6_hdr_t), HDR_NETTYPE);
+    ipv6 = ng_pktbuf_add(payload, NULL, sizeof(ipv6_hdr_t), HDR_NETTYPE);
 
     if (ipv6 == NULL) {
         DEBUG("ipv6_hdr: no space left in packet buffer\n");
         return NULL;
     }
 
-    hdr = (ng_ipv6_hdr_t *)ipv6->data;
+    hdr = (ipv6_hdr_t *)ipv6->data;
 
     if ((src != NULL) && (src_len != 0)) {
 #ifdef MODULE_IPV6_ADDR

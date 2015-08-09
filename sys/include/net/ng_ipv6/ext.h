@@ -25,33 +25,17 @@
 #ifndef NG_IPV6_EXT_H_
 #define NG_IPV6_EXT_H_
 
-#include <inttypes.h>
 #include <stdbool.h>
+#include <stdint.h>
+#include <stdlib.h>
 
-#include "byteorder.h"
 #include "kernel_types.h"
 #include "net/ng_pkt.h"
-
-#include "net/ng_ipv6/ext/rh.h"
+#include "net/ipv6/ext.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#define NG_IPV6_EXT_LEN_UNIT    (8U)    /**< Unit in byte for the extension header's
-                                         *   length field */
-
-/**
- * @brief   IPv6 extension headers.
- *
- * @see <a href="https://tools.ietf.org/html/rfc2460#section-4">
- *          RFC 2460, section 4.1
- *      </a>
- */
-typedef struct __attribute__((packed)) {
-    uint8_t nh;     /**< next header */
-    uint8_t len;    /**< length in 8 octets without first octet */
-} ng_ipv6_ext_t;
 
 /**
  * @brief   Demultiplex extension headers according to @p nh.
@@ -67,20 +51,6 @@ typedef struct __attribute__((packed)) {
  */
 bool ng_ipv6_ext_demux(kernel_pid_t iface, ng_pktsnip_t *pkt,
                        uint8_t nh);
-
-/**
- * @brief   Gets the next extension header in a packet.
- *
- * @param[in] ext   The current extension header.
- *
- * @return  The next extension header.
- */
-static inline ng_ipv6_ext_t *ng_ipv6_ext_get_next(ng_ipv6_ext_t *ext)
-{
-    return (ng_ipv6_ext_t *)((uint8_t *)(ext) +
-                             (ext->len * NG_IPV6_EXT_LEN_UNIT) +
-                             NG_IPV6_EXT_LEN_UNIT);
-}
 
 /**
  * @brief   Builds an extension header for sending.

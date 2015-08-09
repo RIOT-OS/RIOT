@@ -29,7 +29,7 @@
 #include "net/ng_pktdump.h"
 #include "net/ng_netbase.h"
 #include "net/ipv6/addr.h"
-#include "net/ng_ipv6/hdr.h"
+#include "net/ipv6/hdr.h"
 #include "net/ng_sixlowpan.h"
 #include "net/ng_udp.h"
 #include "od.h"
@@ -66,7 +66,7 @@ static void _dump_snip(ng_pktsnip_t *pkt)
 #ifdef MODULE_NG_IPV6
         case NG_NETTYPE_IPV6:
             printf("NETTYPE_IPV6 (%i)\n", pkt->type);
-            ng_ipv6_hdr_print(pkt->data);
+            ipv6_hdr_print(pkt->data);
             break;
 #endif
 #ifdef MODULE_NG_ICMPV6
