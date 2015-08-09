@@ -17,14 +17,14 @@
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-#ifdef MODULE_NG_AT86RF2XX
+#ifdef MODULE_AT86RF2XX
 
 #include "board.h"
 #include "net/ng_nomac.h"
 #include "net/ng_netbase.h"
 
-#include "ng_at86rf2xx.h"
-#include "ng_at86rf2xx_params.h"
+#include "at86rf2xx.h"
+#include "at86rf2xx_params.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -38,34 +38,34 @@
 
 #define AT86RF2XX_NUM (sizeof(at86rf2xx_params)/sizeof(at86rf2xx_params[0]))
 
-static ng_at86rf2xx_t ng_at86rf2xx_devs[AT86RF2XX_NUM];
+static at86rf2xx_t at86rf2xx_devs[AT86RF2XX_NUM];
 static char _nomac_stacks[AT86RF2XX_MAC_STACKSIZE][AT86RF2XX_NUM];
 
-void auto_init_ng_at86rf2xx(void)
+void auto_init_at86rf2xx(void)
 {
     for (int i = 0; i < AT86RF2XX_NUM; i++) {
         DEBUG("Initializing AT86RF2xx radio at SPI_%i\n", i);
         const at86rf2xx_params_t *p = &at86rf2xx_params[i];
-        int res = ng_at86rf2xx_init(&ng_at86rf2xx_devs[i],
-                p->spi,
-                p->spi_speed,
-                p->cs_pin,
-                p->int_pin,
-                p->sleep_pin,
-                p->reset_pin);
+        int res = at86rf2xx_init(&at86rf2xx_devs[i],
+                                 p->spi,
+                                 p->spi_speed,
+                                 p->cs_pin,
+                                 p->int_pin,
+                                 p->sleep_pin,
+                                 p->reset_pin);
 
         if (res < 0) {
             DEBUG("Error initializing AT86RF2xx radio device!");
         }
         else {
             ng_nomac_init(_nomac_stacks[i],
-                    AT86RF2XX_MAC_STACKSIZE, AT86RF2XX_MAC_PRIO,
-                    "at86rfxx", (ng_netdev_t *)&ng_at86rf2xx_devs[i]);
+                          AT86RF2XX_MAC_STACKSIZE, AT86RF2XX_MAC_PRIO,
+                          "at86rfxx", (ng_netdev_t *)&at86rf2xx_devs[i]);
         }
     }
 }
 #else
 typedef int dont_be_pedantic;
-#endif /* MODULE_NG_AT86RF2XX */
+#endif /* MODULE_AT86RF2XX */
 
 /** @} */

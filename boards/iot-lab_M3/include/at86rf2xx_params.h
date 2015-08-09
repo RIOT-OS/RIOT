@@ -7,17 +7,17 @@
  */
 
 /**
- * @ingroup   board_samr21-xpro
+ * @ingroup   board_iot-lab_M3
  * @{
  *
  * @file
- * @brief     at86rf233 board specific configuration
+ * @brief     at86rf231 board specific configuration
  *
  * @author    Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-#ifndef NG_AT86RF2XX_PARAMS_H_
-#define NG_AT86RF2XX_PARAMS_H_
+#ifndef AT86RF2XX_PARAMS_H_
+#define AT86RF2XX_PARAMS_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -29,12 +29,12 @@ extern "C" {
 static const  at86rf2xx_params_t at86rf2xx_params[] =
     {
         {
-            .spi = NG_AT86RF233_SPI,
-            .spi_speed = NG_AT86RF233_SPI_CLK,
-            .cs_pin = NG_AT86RF233_CS,
-            .int_pin = NG_AT86RF233_INT,
-            .sleep_pin = NG_AT86RF233_SLEEP,
-            .reset_pin = NG_AT86RF233_RESET,
+            .spi = AT86RF231_SPI,
+            .spi_speed = AT86RF231_SPI_CLK,
+            .cs_pin = AT86RF231_CS,
+            .int_pin = AT86RF231_INT,
+            .sleep_pin = AT86RF231_SLEEP,
+            .reset_pin = AT86RF231_RESET,
         },
     };
 /** @} */
@@ -42,5 +42,5 @@ static const  at86rf2xx_params_t at86rf2xx_params[] =
 #ifdef __cplusplus
 }
 #endif
-#endif /* NG_AT86RF2XX_PARAMS_H */
+#endif /* AT86RF2XX_PARAMS_H_ */
 /** @} */

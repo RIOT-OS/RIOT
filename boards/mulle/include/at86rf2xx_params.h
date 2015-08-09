@@ -18,8 +18,8 @@
  * @author    Joakim Gebart <joakim.gebart@eistec.se>
  */
 
-#ifndef NG_AT86RF2XX_PARAMS_H_
-#define NG_AT86RF2XX_PARAMS_H_
+#ifndef AT86RF2XX_PARAMS_H_
+#define AT86RF2XX_PARAMS_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -44,5 +44,5 @@ static const  at86rf2xx_params_t at86rf2xx_params[] =
 #ifdef __cplusplus
 }
 #endif
-#endif /* NG_AT86RF2XX_PARAMS_H */
+#endif /* AT86RF2XX_PARAMS_H */
 /** @} */

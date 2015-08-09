@@ -21,7 +21,7 @@
 #include <stdio.h>
 
 #include "kernel.h"
-#include "ng_at86rf2xx.h"
+#include "at86rf2xx.h"
 #include "net/ng_nomac.h"
 #include "net/ng_netbase.h"
 
@@ -56,7 +56,7 @@
 /**
  * @brief   Allocate the AT86RF2xx device descriptor
  */
-static ng_at86rf2xx_t dev;
+static at86rf2xx_t dev;
 
 /**
  * @brief   Stack for the nomac thread
@@ -71,9 +71,9 @@ void auto_init_ng_netif(void)
 
     /* initialize the AT86RF2xx device */
     printf("Initializing the AT86RF2xx radio at SPI_%i... \n", ATRF_SPI);
-    res = ng_at86rf2xx_init(&dev, ATRF_SPI, ATRF_SPI_SPEED,
-                            ATRF_CS, ATRF_INT,
-                            ATRF_SLEEP, ATRF_RESET);
+    res = at86rf2xx_init(&dev, ATRF_SPI, ATRF_SPI_SPEED,
+                         ATRF_CS, ATRF_INT,
+                         ATRF_SLEEP, ATRF_RESET);
     if (res < 0) {
         puts("Error initializing AT86RF2xx radio device");
         return;

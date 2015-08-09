@@ -8,7 +8,7 @@
  */
 
 /**
- * @ingroup     drivers_ng_at86rf2xx
+ * @ingroup     drivers_at86rf2xx
  * @{
  *
  * @file
@@ -24,30 +24,30 @@
 
 #include "periph/spi.h"
 #include "periph/gpio.h"
-#include "ng_at86rf2xx_internal.h"
-#include "ng_at86rf2xx_registers.h"
+#include "at86rf2xx_internal.h"
+#include "at86rf2xx_registers.h"
 
-void ng_at86rf2xx_reg_write(const ng_at86rf2xx_t *dev,
-                            const uint8_t addr,
-                            const uint8_t value)
+void at86rf2xx_reg_write(const at86rf2xx_t *dev,
+                         const uint8_t addr,
+                         const uint8_t value)
 {
     spi_acquire(dev->spi);
     gpio_clear(dev->cs_pin);
     spi_transfer_reg(dev->spi,
-                     NG_AT86RF2XX_ACCESS_REG | NG_AT86RF2XX_ACCESS_WRITE | addr,
+                     AT86RF2XX_ACCESS_REG | AT86RF2XX_ACCESS_WRITE | addr,
                      value, 0);
     gpio_set(dev->cs_pin);
     spi_release(dev->spi);
 }
 
-uint8_t ng_at86rf2xx_reg_read(const ng_at86rf2xx_t *dev, const uint8_t addr)
+uint8_t at86rf2xx_reg_read(const at86rf2xx_t *dev, const uint8_t addr)
 {
     char value;
 
     spi_acquire(dev->spi);
     gpio_clear(dev->cs_pin);
     spi_transfer_reg(dev->spi,
-                     NG_AT86RF2XX_ACCESS_REG | NG_AT86RF2XX_ACCESS_READ | addr,
+                     AT86RF2XX_ACCESS_REG | AT86RF2XX_ACCESS_READ | addr,
                      0, &value);
     gpio_set(dev->cs_pin);
     spi_release(dev->spi);
@@ -55,52 +55,52 @@ uint8_t ng_at86rf2xx_reg_read(const ng_at86rf2xx_t *dev, const uint8_t addr)
     return (uint8_t)value;
 }
 
-void ng_at86rf2xx_sram_read(const ng_at86rf2xx_t *dev,
-                            const uint8_t offset,
-                            uint8_t *data,
-                            const size_t len)
+void at86rf2xx_sram_read(const at86rf2xx_t *dev,
+                         const uint8_t offset,
+                         uint8_t *data,
+                         const size_t len)
 {
     spi_acquire(dev->spi);
     gpio_clear(dev->cs_pin);
     spi_transfer_reg(dev->spi,
-                     NG_AT86RF2XX_ACCESS_SRAM | NG_AT86RF2XX_ACCESS_READ,
+                     AT86RF2XX_ACCESS_SRAM | AT86RF2XX_ACCESS_READ,
                      (char)offset, NULL);
-    spi_transfer_bytes(dev->spi, NULL, (char*)data, len);
+    spi_transfer_bytes(dev->spi, NULL, (char *)data, len);
     gpio_set(dev->cs_pin);
     spi_release(dev->spi);
 }
 
-void ng_at86rf2xx_sram_write(const ng_at86rf2xx_t *dev,
-                             const uint8_t offset,
-                             const uint8_t *data,
-                             const size_t len)
-{
-    spi_acquire(dev->spi);
-    gpio_clear(dev->cs_pin);
-    spi_transfer_reg(dev->spi,
-                     NG_AT86RF2XX_ACCESS_SRAM | NG_AT86RF2XX_ACCESS_WRITE,
-                     (char)offset, NULL);
-    spi_transfer_bytes(dev->spi, (char*)data, NULL, len);
-    gpio_set(dev->cs_pin);
-    spi_release(dev->spi);
-}
-
-void ng_at86rf2xx_fb_read(const ng_at86rf2xx_t *dev,
-                          uint8_t *data,
+void at86rf2xx_sram_write(const at86rf2xx_t *dev,
+                          const uint8_t offset,
+                          const uint8_t *data,
                           const size_t len)
 {
     spi_acquire(dev->spi);
     gpio_clear(dev->cs_pin);
+    spi_transfer_reg(dev->spi,
+                     AT86RF2XX_ACCESS_SRAM | AT86RF2XX_ACCESS_WRITE,
+                     (char)offset, NULL);
+    spi_transfer_bytes(dev->spi, (char *)data, NULL, len);
+    gpio_set(dev->cs_pin);
+    spi_release(dev->spi);
+}
+
+void at86rf2xx_fb_read(const at86rf2xx_t *dev,
+                       uint8_t *data,
+                       const size_t len)
+{
+    spi_acquire(dev->spi);
+    gpio_clear(dev->cs_pin);
     spi_transfer_byte(dev->spi,
-                      NG_AT86RF2XX_ACCESS_FB | NG_AT86RF2XX_ACCESS_READ,
+                      AT86RF2XX_ACCESS_FB | AT86RF2XX_ACCESS_READ,
                       NULL);
     spi_transfer_bytes(dev->spi, NULL, (char *)data, len);
     gpio_set(dev->cs_pin);
     spi_release(dev->spi);
 }
 
-uint8_t ng_at86rf2xx_get_status(const ng_at86rf2xx_t *dev)
+uint8_t at86rf2xx_get_status(const at86rf2xx_t *dev)
 {
-    return (ng_at86rf2xx_reg_read(dev, NG_AT86RF2XX_REG__TRX_STATUS)
-            & NG_AT86RF2XX_TRX_STATUS_MASK__TRX_STATUS);
+    return (at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_STATUS)
+            & AT86RF2XX_TRX_STATUS_MASK__TRX_STATUS);
 }

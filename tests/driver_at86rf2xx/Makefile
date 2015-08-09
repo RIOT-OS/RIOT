@@ -24,7 +24,7 @@ else
 endif
 
 ifneq (true,$(USE_BOARD_PARAMETERS))
-  # This adds . to include path so generic ng_at86rf2xx_params.h gets picked
+  # This adds . to include path so generic at86rf2xx_params.h gets picked
   # up.  All boards actually having such a device on board should define
   # USE_BOARD_PARAMETERS=true above to skip this step, as the board provides
   # this header.

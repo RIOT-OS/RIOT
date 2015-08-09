@@ -8,7 +8,7 @@
  */
 
 /**
- * @ingroup     drivers_ng_at86rf2xx
+ * @ingroup     drivers_at86rf2xx
  * @{
  *
  * @file
@@ -28,9 +28,9 @@
 #include "byteorder.h"
 #include "net/ieee802154.h"
 #include "net/ng_netbase.h"
-#include "ng_at86rf2xx_registers.h"
-#include "ng_at86rf2xx_internal.h"
-#include "ng_at86rf2xx_netdev.h"
+#include "at86rf2xx_registers.h"
+#include "at86rf2xx_internal.h"
+#include "at86rf2xx_netdev.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -42,18 +42,18 @@
 static void _irq_handler(void *arg)
 {
     msg_t msg;
-    ng_at86rf2xx_t *dev = (ng_at86rf2xx_t *) arg;
+    at86rf2xx_t *dev = (at86rf2xx_t *) arg;
 
     /* tell driver thread about the interrupt */
     msg.type = NG_NETDEV_MSG_TYPE_EVENT;
     msg_send(&msg, dev->mac_pid);
 }
 
-int ng_at86rf2xx_init(ng_at86rf2xx_t *dev, spi_t spi, spi_speed_t spi_speed,
-                      gpio_t cs_pin, gpio_t int_pin,
-                      gpio_t sleep_pin, gpio_t reset_pin)
+int at86rf2xx_init(at86rf2xx_t *dev, spi_t spi, spi_speed_t spi_speed,
+                   gpio_t cs_pin, gpio_t int_pin,
+                   gpio_t sleep_pin, gpio_t reset_pin)
 {
-    dev->driver = &ng_at86rf2xx_driver;
+    dev->driver = &at86rf2xx_driver;
 
     /* initialize device descriptor */
     dev->spi = spi;
@@ -61,7 +61,7 @@ int ng_at86rf2xx_init(ng_at86rf2xx_t *dev, spi_t spi, spi_speed_t spi_speed,
     dev->int_pin = int_pin;
     dev->sleep_pin = sleep_pin;
     dev->reset_pin = reset_pin;
-    dev->idle_state = NG_AT86RF2XX_STATE_TRX_OFF;
+    dev->idle_state = AT86RF2XX_STATE_TRX_OFF;
 
     /* initialise SPI */
     spi_init_master(dev->spi, SPI_CONF_FIRST_RISING, spi_speed);
@@ -75,18 +75,18 @@ int ng_at86rf2xx_init(ng_at86rf2xx_t *dev, spi_t spi, spi_speed_t spi_speed,
     gpio_init_int(dev->int_pin, GPIO_NOPULL, GPIO_RISING, _irq_handler, dev);
 
     /* test if the SPI is set up correctly and the device is responding */
-    if (ng_at86rf2xx_reg_read(dev, NG_AT86RF2XX_REG__PART_NUM) !=
-        NG_AT86RF2XX_PARTNUM) {
-        DEBUG("[ng_at86rf2xx] error: unable to read correct part number\n");
+    if (at86rf2xx_reg_read(dev, AT86RF2XX_REG__PART_NUM) !=
+        AT86RF2XX_PARTNUM) {
+        DEBUG("[at86rf2xx] error: unable to read correct part number\n");
         return -1;
     }
 
     /* reset device to default values and put it into RX state */
-    ng_at86rf2xx_reset(dev);
+    at86rf2xx_reset(dev);
     return 0;
 }
 
-void ng_at86rf2xx_reset(ng_at86rf2xx_t *dev)
+void at86rf2xx_reset(at86rf2xx_t *dev)
 {
 #if CPUID_ID_LEN
     uint8_t cpuid[CPUID_ID_LEN];
@@ -101,7 +101,7 @@ void ng_at86rf2xx_reset(ng_at86rf2xx_t *dev)
     gpio_set(dev->reset_pin);
 
     /* Reset state machine to ensure a known state */
-    ng_at86rf2xx_reset_state_machine(dev);
+    at86rf2xx_reset_state_machine(dev);
 
     /* reset options and sequence number */
     dev->seq_nr = 0;
@@ -125,23 +125,23 @@ void ng_at86rf2xx_reset(ng_at86rf2xx_t *dev)
     cpuid[0] |= 0x02;
     /* copy and set long address */
     memcpy(&addr_long, cpuid, 8);
-    ng_at86rf2xx_set_addr_long(dev, NTOHLL(addr_long.uint64.u64));
-    ng_at86rf2xx_set_addr_short(dev, NTOHS(addr_long.uint16[0].u16));
+    at86rf2xx_set_addr_long(dev, NTOHLL(addr_long.uint64.u64));
+    at86rf2xx_set_addr_short(dev, NTOHS(addr_long.uint16[0].u16));
 #else
-    ng_at86rf2xx_set_addr_long(dev, NG_AT86RF2XX_DEFAULT_ADDR_LONG);
-    ng_at86rf2xx_set_addr_short(dev, NG_AT86RF2XX_DEFAULT_ADDR_SHORT);
+    at86rf2xx_set_addr_long(dev, AT86RF2XX_DEFAULT_ADDR_LONG);
+    at86rf2xx_set_addr_short(dev, AT86RF2XX_DEFAULT_ADDR_SHORT);
 #endif
     /* set default PAN id */
-    ng_at86rf2xx_set_pan(dev, NG_AT86RF2XX_DEFAULT_PANID);
+    at86rf2xx_set_pan(dev, AT86RF2XX_DEFAULT_PANID);
     /* set default channel */
-    ng_at86rf2xx_set_chan(dev, NG_AT86RF2XX_DEFAULT_CHANNEL);
+    at86rf2xx_set_chan(dev, AT86RF2XX_DEFAULT_CHANNEL);
     /* set default TX power */
-    ng_at86rf2xx_set_txpower(dev, NG_AT86RF2XX_DEFAULT_TXPOWER);
+    at86rf2xx_set_txpower(dev, AT86RF2XX_DEFAULT_TXPOWER);
     /* set default options */
-    ng_at86rf2xx_set_option(dev, NG_AT86RF2XX_OPT_AUTOACK, true);
-    ng_at86rf2xx_set_option(dev, NG_AT86RF2XX_OPT_CSMA, true);
-    ng_at86rf2xx_set_option(dev, NG_AT86RF2XX_OPT_TELL_RX_START, false);
-    ng_at86rf2xx_set_option(dev, NG_AT86RF2XX_OPT_TELL_RX_END, true);
+    at86rf2xx_set_option(dev, AT86RF2XX_OPT_AUTOACK, true);
+    at86rf2xx_set_option(dev, AT86RF2XX_OPT_CSMA, true);
+    at86rf2xx_set_option(dev, AT86RF2XX_OPT_TELL_RX_START, false);
+    at86rf2xx_set_option(dev, AT86RF2XX_OPT_TELL_RX_END, true);
     /* set default protocol */
 #ifdef MODULE_NG_SIXLOWPAN
     dev->proto = NG_NETTYPE_SIXLOWPAN;
@@ -149,44 +149,44 @@ void ng_at86rf2xx_reset(ng_at86rf2xx_t *dev)
     dev->proto = NG_NETTYPE_UNDEF;
 #endif
     /* enable safe mode (protect RX FIFO until reading data starts) */
-    ng_at86rf2xx_reg_write(dev, NG_AT86RF2XX_REG__TRX_CTRL_2,
-                          NG_AT86RF2XX_TRX_CTRL_2_MASK__RX_SAFE_MODE);
+    at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_CTRL_2,
+                        AT86RF2XX_TRX_CTRL_2_MASK__RX_SAFE_MODE);
 #ifdef MODULE_NG_AT86RF212B
-    ng_at86rf2xx_set_freq(dev,NG_AT86RF2XX_FREQ_915MHZ);
+    at86rf2xx_set_freq(dev, AT86RF2XX_FREQ_915MHZ);
 #endif
 
     /* don't populate masked interrupt flags to IRQ_STATUS register */
-    uint8_t tmp = ng_at86rf2xx_reg_read(dev, NG_AT86RF2XX_REG__TRX_CTRL_1);
-    tmp &= ~(NG_AT86RF2XX_TRX_CTRL_1_MASK__IRQ_MASK_MODE);
-    ng_at86rf2xx_reg_write(dev, NG_AT86RF2XX_REG__TRX_CTRL_1, tmp);
+    uint8_t tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_CTRL_1);
+    tmp &= ~(AT86RF2XX_TRX_CTRL_1_MASK__IRQ_MASK_MODE);
+    at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_CTRL_1, tmp);
 
     /* enable interrupts */
-    ng_at86rf2xx_reg_write(dev, NG_AT86RF2XX_REG__IRQ_MASK,
-                          NG_AT86RF2XX_IRQ_STATUS_MASK__TRX_END);
+    at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK,
+                        AT86RF2XX_IRQ_STATUS_MASK__TRX_END);
     /* clear interrupt flags */
-    ng_at86rf2xx_reg_read(dev, NG_AT86RF2XX_REG__IRQ_STATUS);
+    at86rf2xx_reg_read(dev, AT86RF2XX_REG__IRQ_STATUS);
 
     /* go into RX state */
-    ng_at86rf2xx_set_state(dev, NG_AT86RF2XX_STATE_RX_AACK_ON);
+    at86rf2xx_set_state(dev, AT86RF2XX_STATE_RX_AACK_ON);
 
-    DEBUG("ng_at86rf2xx_reset(): reset complete.\n");
+    DEBUG("at86rf2xx_reset(): reset complete.\n");
 }
 
-bool ng_at86rf2xx_cca(ng_at86rf2xx_t *dev)
+bool at86rf2xx_cca(at86rf2xx_t *dev)
 {
     uint8_t tmp;
     uint8_t status;
 
     /* trigger CCA measurment */
-    tmp = ng_at86rf2xx_reg_read(dev, NG_AT86RF2XX_REG__PHY_CC_CCA);
-    tmp &= NG_AT86RF2XX_PHY_CC_CCA_MASK__CCA_REQUEST;
-    ng_at86rf2xx_reg_write(dev, NG_AT86RF2XX_REG__PHY_CC_CCA, tmp);
+    tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__PHY_CC_CCA);
+    tmp &= AT86RF2XX_PHY_CC_CCA_MASK__CCA_REQUEST;
+    at86rf2xx_reg_write(dev, AT86RF2XX_REG__PHY_CC_CCA, tmp);
     /* wait for result to be ready */
     do {
-        status = ng_at86rf2xx_reg_read(dev, NG_AT86RF2XX_REG__TRX_STATUS);
-    } while (!(status & NG_AT86RF2XX_TRX_STATUS_MASK__CCA_DONE));
+        status = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_STATUS);
+    } while (!(status & AT86RF2XX_TRX_STATUS_MASK__CCA_DONE));
     /* return according to measurement */
-    if (status & NG_AT86RF2XX_TRX_STATUS_MASK__CCA_STATUS) {
+    if (status & AT86RF2XX_TRX_STATUS_MASK__CCA_STATUS) {
         return true;
     }
     else {
@@ -194,65 +194,65 @@ bool ng_at86rf2xx_cca(ng_at86rf2xx_t *dev)
     }
 }
 
-size_t ng_at86rf2xx_send(ng_at86rf2xx_t *dev, uint8_t *data, size_t len)
+size_t at86rf2xx_send(at86rf2xx_t *dev, uint8_t *data, size_t len)
 {
     /* check data length */
-    if (len > NG_AT86RF2XX_MAX_PKT_LENGTH) {
-        DEBUG("[ng_at86rf2xx] Error: data to send exceeds max packet size\n");
+    if (len > AT86RF2XX_MAX_PKT_LENGTH) {
+        DEBUG("[at86rf2xx] Error: data to send exceeds max packet size\n");
         return 0;
     }
-    ng_at86rf2xx_tx_prepare(dev);
-    ng_at86rf2xx_tx_load(dev, data, len, 0);
-    ng_at86rf2xx_tx_exec(dev);
+    at86rf2xx_tx_prepare(dev);
+    at86rf2xx_tx_load(dev, data, len, 0);
+    at86rf2xx_tx_exec(dev);
     return len;
 }
 
-void ng_at86rf2xx_tx_prepare(ng_at86rf2xx_t *dev)
+void at86rf2xx_tx_prepare(at86rf2xx_t *dev)
 {
     uint8_t state;
 
     /* make sure ongoing transmissions are finished */
     do {
-        state = ng_at86rf2xx_get_status(dev);
+        state = at86rf2xx_get_status(dev);
     }
-    while (state == NG_AT86RF2XX_STATE_BUSY_RX_AACK ||
-           state == NG_AT86RF2XX_STATE_BUSY_TX_ARET);
-    if (state != NG_AT86RF2XX_STATE_TX_ARET_ON) {
+    while (state == AT86RF2XX_STATE_BUSY_RX_AACK ||
+           state == AT86RF2XX_STATE_BUSY_TX_ARET);
+    if (state != AT86RF2XX_STATE_TX_ARET_ON) {
         dev->idle_state = state;
     }
-    ng_at86rf2xx_set_state(dev, NG_AT86RF2XX_STATE_TX_ARET_ON);
+    at86rf2xx_set_state(dev, AT86RF2XX_STATE_TX_ARET_ON);
     dev->frame_len = IEEE802154_FCS_LEN;
 }
 
-size_t ng_at86rf2xx_tx_load(ng_at86rf2xx_t *dev, uint8_t *data,
-                            size_t len, size_t offset)
+size_t at86rf2xx_tx_load(at86rf2xx_t *dev, uint8_t *data,
+                         size_t len, size_t offset)
 {
     dev->frame_len += (uint8_t)len;
-    ng_at86rf2xx_sram_write(dev, offset + 1, data, len);
+    at86rf2xx_sram_write(dev, offset + 1, data, len);
     return offset + len;
 }
 
-void ng_at86rf2xx_tx_exec(ng_at86rf2xx_t *dev)
+void at86rf2xx_tx_exec(at86rf2xx_t *dev)
 {
     /* write frame length field in FIFO */
-    ng_at86rf2xx_sram_write(dev, 0, &(dev->frame_len), 1);
+    at86rf2xx_sram_write(dev, 0, &(dev->frame_len), 1);
     /* trigger sending of pre-loaded frame */
-    ng_at86rf2xx_reg_write(dev, NG_AT86RF2XX_REG__TRX_STATE,
-                           NG_AT86RF2XX_TRX_STATE__TX_START);
-    if (dev->event_cb && (dev->options & NG_AT86RF2XX_OPT_TELL_TX_START)) {
+    at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_STATE,
+                        AT86RF2XX_TRX_STATE__TX_START);
+    if (dev->event_cb && (dev->options & AT86RF2XX_OPT_TELL_TX_START)) {
         dev->event_cb(NETDEV_EVENT_TX_STARTED, NULL);
     }
 }
 
-size_t ng_at86rf2xx_rx_len(ng_at86rf2xx_t *dev)
+size_t at86rf2xx_rx_len(at86rf2xx_t *dev)
 {
     uint8_t res;
-    ng_at86rf2xx_fb_read(dev, &res, 1);
+    at86rf2xx_fb_read(dev, &res, 1);
     return (size_t)(res - 2);           /* extract the PHR and LQI field */
 }
 
-void ng_at86rf2xx_rx_read(ng_at86rf2xx_t *dev, uint8_t *data, size_t len,
-                          size_t offset)
+void at86rf2xx_rx_read(at86rf2xx_t *dev, uint8_t *data, size_t len,
+                       size_t offset)
 {
     /* when reading from SRAM, the different chips from the AT86RF2xx family
      * behave differently: the AT86F233, the AT86RF232 and the ATRF86212B return
@@ -262,8 +262,8 @@ void ng_at86rf2xx_rx_read(ng_at86rf2xx_t *dev, uint8_t *data, size_t len,
      * the first data byte at position 0.
      */
 #ifndef MODULE_NG_AT86RF231
-    ng_at86rf2xx_sram_read(dev, offset + 1, data, len);
+    at86rf2xx_sram_read(dev, offset + 1, data, len);
 #else
-    ng_at86rf2xx_sram_read(dev, offset, data, len);
+    at86rf2xx_sram_read(dev, offset, data, len);
 #endif
 }
