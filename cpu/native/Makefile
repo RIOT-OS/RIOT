@@ -2,8 +2,8 @@ MODULE = cpu
 
 DIRS += periph
 
-ifneq (,$(filter ng_nativenet,$(USEMODULE)))
-	DIRS += ng_net
+ifneq (,$(filter dev_eth_tap,$(USEMODULE)))
+	DIRS += dev_eth_tap
 endif
 
 include $(RIOTBASE)/Makefile.base

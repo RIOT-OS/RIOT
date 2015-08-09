@@ -1,5 +1,5 @@
 ifneq (,$(filter ng_netif_default,$(USEMODULE)))
-    USEMODULE += ng_nativenet
+    USEMODULE += dev_eth_tap
     USEMODULE += ng_netdev_eth
     USEMODULE += ng_nomac
 endif

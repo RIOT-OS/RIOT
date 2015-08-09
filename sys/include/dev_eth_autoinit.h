@@ -29,7 +29,7 @@ extern "C" {
  * @brief enum for available ethernet devices
  */
 enum {
-#ifdef MODULE_NG_NATIVENET
+#ifdef MODULE_DEV_ETH_TAP
     DEV_ETH_TAP,
 #endif
 #ifdef MODULE_ENCX24J600

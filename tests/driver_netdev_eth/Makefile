@@ -3,7 +3,7 @@ include ../Makefile.tests_common
 
 BOARD_WHITELIST := native
 
-USEMODULE += ng_nativenet
+USEMODULE += dev_eth_tap
 USEMODULE += ng_netbase
 USEMODULE += ng_nomac
 USEMODULE += ng_pktdump
