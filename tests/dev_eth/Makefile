@@ -5,7 +5,7 @@ BOARD_WHITELIST = native
 FEATURES_REQUIRED += ethernet
 
 ifneq (,$(filter native,$(BOARD)))
-USEMODULE += ng_nativenet
+USEMODULE += dev_eth_tap
 endif
 
 USEMODULE += dev_eth_autoinit

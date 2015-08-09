@@ -8,11 +8,9 @@
  */
 
 /**
- * @defgroup    net_dev_eth_ll Low-Level Driver Inteface
+ * @defgroup    net_dev_eth Low-Level Driver Interface
  * @ingroup     net_ethernet
- * @file
  * @brief       Low-level ethernet driver interface
- * @{
  *
  * This interface is supposed to be a low-level interface for ethernet drivers.
  * In order to be universally usable, it leaves out many implementation details
@@ -43,6 +41,8 @@
  *    dev_eth_linkstate_handler and / or dev_eth_rx_handler
  *
  * Check out the dev_eth test application as example.
+ *
+ * @{
  *
  * @file
  * @brief       Definitions low-level ethernet driver interface

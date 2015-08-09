@@ -7,13 +7,14 @@
  */
 
 /**
- * @defgroup    net_dev_eth_impl Low-level Ethernet driver implementations
- * @ingroup     net_dev_eth_ll
+ * @defgroup    dev_eth_tap     Ethernet driver for TAP interfaces
+ * @ingroup     native_cpu
  * @brief       Low-level ethernet driver for native tap interfaces
  * @{
  *
  * @file
- * @brief       Definitions for low-level ethernet driver for native tap interfaces
+ * @brief       Definitions for @ref net_dev_eth driver for host system's
+ *              TAP interfaces
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
