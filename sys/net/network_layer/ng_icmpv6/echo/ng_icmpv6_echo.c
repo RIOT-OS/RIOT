@@ -82,14 +82,14 @@ void ng_icmpv6_echo_req_handle(kernel_pid_t iface, ng_ipv6_hdr_t *ipv6_hdr,
         return;
     }
 
-    if (ng_ipv6_addr_is_multicast(&ipv6_hdr->dst)) {
+    if (ipv6_addr_is_multicast(&ipv6_hdr->dst)) {
         hdr = ng_ipv6_hdr_build(pkt, NULL, 0, (uint8_t *)&ipv6_hdr->src,
-                                sizeof(ng_ipv6_addr_t));
+                                sizeof(ipv6_addr_t));
     }
     else {
         hdr = ng_ipv6_hdr_build(pkt, (uint8_t *)&ipv6_hdr->dst,
-                                sizeof(ng_ipv6_addr_t), (uint8_t *)&ipv6_hdr->src,
-                                sizeof(ng_ipv6_addr_t));
+                                sizeof(ipv6_addr_t), (uint8_t *)&ipv6_hdr->src,
+                                sizeof(ipv6_addr_t));
     }
 
     if (hdr == NULL) {

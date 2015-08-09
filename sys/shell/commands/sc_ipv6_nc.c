@@ -19,7 +19,7 @@
 #include <string.h>
 
 #include "kernel_types.h"
-#include "net/ng_ipv6/addr.h"
+#include "net/ipv6/addr.h"
 #include "net/ng_ipv6/nc.h"
 #include "net/ng_netif.h"
 #include "thread.h"
@@ -105,7 +105,7 @@ static bool _is_iface(kernel_pid_t iface)
 
 static int _ipv6_nc_list(void)
 {
-    char ipv6_str[NG_IPV6_ADDR_MAX_STR_LEN];
+    char ipv6_str[IPV6_ADDR_MAX_STR_LEN];
     char l2addr_str[3 * MAX_L2_ADDR_LEN];
 
     puts("IPv6 address                    if  L2 address                state       type");
@@ -115,7 +115,7 @@ static int _ipv6_nc_list(void)
          entry != NULL;
          entry = ng_ipv6_nc_get_next(entry)) {
         printf("%-30s  %2" PRIkernel_pid "  %-24s  ",
-               ng_ipv6_addr_to_str(ipv6_str, &entry->ipv6_addr, sizeof(ipv6_str)),
+               ipv6_addr_to_str(ipv6_str, &entry->ipv6_addr, sizeof(ipv6_str)),
                entry->iface,
                ng_netif_addr_to_str(l2addr_str, sizeof(l2addr_str),
                                     entry->l2_addr, entry->l2_addr_len));
@@ -130,11 +130,11 @@ static int _ipv6_nc_list(void)
 static int _ipv6_nc_add(kernel_pid_t iface, char *ipv6_addr_str,
                         char *l2_addr_str)
 {
-    ng_ipv6_addr_t ipv6_addr;
+    ipv6_addr_t ipv6_addr;
     uint8_t l2_addr[MAX_L2_ADDR_LEN];
     size_t l2_addr_len;
 
-    if (ng_ipv6_addr_from_str(&ipv6_addr, ipv6_addr_str) == NULL) {
+    if (ipv6_addr_from_str(&ipv6_addr, ipv6_addr_str) == NULL) {
         puts("error: unable to parse IPv6 address.");
         return 1;
     }
@@ -156,9 +156,9 @@ static int _ipv6_nc_add(kernel_pid_t iface, char *ipv6_addr_str,
 
 static int _ipv6_nc_del(char *ipv6_addr_str)
 {
-    ng_ipv6_addr_t ipv6_addr;
+    ipv6_addr_t ipv6_addr;
 
-    if (ng_ipv6_addr_from_str(&ipv6_addr, ipv6_addr_str) == NULL) {
+    if (ipv6_addr_from_str(&ipv6_addr, ipv6_addr_str) == NULL) {
         puts("error: unable to parse IPv6 address.");
         return 1;
     }
@@ -239,7 +239,7 @@ int _ipv6_nc_manage(int argc, char **argv)
 int _ipv6_nc_routers(int argc, char **argv)
 {
     kernel_pid_t iface = KERNEL_PID_UNDEF;
-    char ipv6_str[NG_IPV6_ADDR_MAX_STR_LEN];
+    char ipv6_str[IPV6_ADDR_MAX_STR_LEN];
 
     if (argc > 1) {
         iface = atoi(argv[1]);
@@ -261,7 +261,7 @@ int _ipv6_nc_routers(int argc, char **argv)
         }
 
         printf("%2" PRIkernel_pid "  %-30s  ", entry->iface,
-               ng_ipv6_addr_to_str(ipv6_str, &entry->ipv6_addr, sizeof(ipv6_str)));
+               ipv6_addr_to_str(ipv6_str, &entry->ipv6_addr, sizeof(ipv6_str)));
         _print_nc_state(entry);
         _print_nc_type(entry);
         puts("");

@@ -23,7 +23,7 @@
 
 #include "byteorder.h"
 #include "net/ng_icmpv6.h"
-#include "net/ng_ipv6/addr.h"
+#include "net/ipv6/addr.h"
 #include "net/ng_ipv6/nc.h"
 #include "net/ng_ipv6/hdr.h"
 #include "net/ng_netbase.h"
@@ -34,7 +34,7 @@
 static uint16_t id = 0x53;
 static uint16_t min_seq_expected = 0;
 static uint16_t max_seq_expected = 0;
-static char ipv6_str[NG_IPV6_ADDR_MAX_STR_LEN];
+static char ipv6_str[IPV6_ADDR_MAX_STR_LEN];
 
 static void usage(char **argv)
 {
@@ -104,7 +104,7 @@ int _handle_reply(ng_pktsnip_t *pkt, uint64_t time)
         timex_t rt = timex_from_uint64(time);
         printf("%u bytes from %s: id=%" PRIu16 " seq=%" PRIu16 " hop limit=%" PRIu8
                " time = %" PRIu32 ".%03" PRIu32 " ms\n", (unsigned) icmpv6->size,
-               ng_ipv6_addr_to_str(ipv6_str, &(ipv6_hdr->src), sizeof(ipv6_str)),
+               ipv6_addr_to_str(ipv6_str, &(ipv6_hdr->src), sizeof(ipv6_str)),
                byteorder_ntohs(icmpv6_hdr->id), seq, ipv6_hdr->hl,
                (rt.seconds * SEC_IN_MS) + (rt.microseconds / MS_IN_USEC),
                rt.microseconds % MS_IN_USEC);
@@ -135,7 +135,7 @@ int _icmpv6_ping(int argc, char **argv)
     size_t payload_len = 4;
     timex_t delay = { 1, 0 };
     char *addr_str;
-    ng_ipv6_addr_t addr;
+    ipv6_addr_t addr;
     ng_netreg_entry_t *ipv6_entry, my_entry = { NULL, NG_ICMPV6_ECHO_REP,
                                                 thread_getpid()
                                               };
@@ -189,7 +189,7 @@ int _icmpv6_ping(int argc, char **argv)
             break;
     }
 
-    if ((ng_ipv6_addr_from_str(&addr, addr_str) == NULL) || (((int)payload_len) < 0)) {
+    if ((ipv6_addr_from_str(&addr, addr_str) == NULL) || (((int)payload_len) < 0)) {
         usage(argv);
         return 1;
     }
@@ -226,7 +226,7 @@ int _icmpv6_ping(int argc, char **argv)
         _set_payload(pkt->data, payload_len);
 
         pkt = ng_netreg_hdr_build(NG_NETTYPE_IPV6, pkt, NULL, 0, addr.u8,
-                                  sizeof(ng_ipv6_addr_t));
+                                  sizeof(ipv6_addr_t));
 
         if (pkt == NULL) {
             puts("error: packet buffer full");

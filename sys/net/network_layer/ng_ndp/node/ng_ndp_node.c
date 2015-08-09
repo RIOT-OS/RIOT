@@ -30,7 +30,7 @@
 #include "debug.h"
 
 #if ENABLE_DEBUG
-static char addr_str[NG_IPV6_ADDR_MAX_STR_LEN];
+static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 #endif
 
 static ng_pktqueue_t _pkt_nodes[NG_IPV6_NC_SIZE * 2];
@@ -56,10 +56,10 @@ static ng_pktqueue_t *_alloc_pkt_node(ng_pktsnip_t *pkt)
 }
 
 kernel_pid_t ng_ndp_node_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_len,
-                                         kernel_pid_t iface, ng_ipv6_addr_t *dst,
+                                         kernel_pid_t iface, ipv6_addr_t *dst,
                                          ng_pktsnip_t *pkt)
 {
-    ng_ipv6_addr_t *next_hop_ip = NULL, *prefix = NULL;
+    ipv6_addr_t *next_hop_ip = NULL, *prefix = NULL;
 
 #ifdef MODULE_NG_IPV6_EXT_RH
     next_hop_ip = ng_ipv6_ext_rh_next_hop(hdr);
@@ -67,13 +67,13 @@ kernel_pid_t ng_ndp_node_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_len,
 #ifdef MODULE_FIB
     size_t next_hop_size;
     uint32_t next_hop_flags = 0;
-    ng_ipv6_addr_t next_hop_actual; /* FIB copies address into this variable */
+    ipv6_addr_t next_hop_actual;    /* FIB copies address into this variable */
 
     if ((next_hop_ip == NULL) &&
         (fib_get_next_hop(&iface, next_hop_actual.u8, &next_hop_size,
                           &next_hop_flags, (uint8_t *)dst,
-                          sizeof(ng_ipv6_addr_t), 0) >= 0) &&
-        (next_hop_size == sizeof(ng_ipv6_addr_t))) {
+                          sizeof(ipv6_addr_t), 0) >= 0) &&
+        (next_hop_size == sizeof(ipv6_addr_t))) {
         next_hop_ip = &next_hop_actual;
     }
 
@@ -96,8 +96,8 @@ kernel_pid_t ng_ndp_node_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_len,
 #ifdef MODULE_FIB
             /* We don't care if FIB is full, this is just for efficiency
              * for later sends */
-            fib_add_entry(iface, (uint8_t *)dst, sizeof(ng_ipv6_addr_t), 0,
-                          (uint8_t *)next_hop_ip, sizeof(ng_ipv6_addr_t), 0,
+            fib_add_entry(iface, (uint8_t *)dst, sizeof(ipv6_addr_t), 0,
+                          (uint8_t *)next_hop_ip, sizeof(ipv6_addr_t), 0,
                           FIB_LIFETIME_NO_EXPIRE);
 #endif
         }
@@ -108,8 +108,8 @@ kernel_pid_t ng_ndp_node_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_len,
 #ifdef MODULE_FIB
         /* We don't care if FIB is full, this is just for efficiency for later
          * sends */
-        fib_add_entry(iface, (uint8_t *)dst, sizeof(ng_ipv6_addr_t), 0,
-                      (uint8_t *)next_hop_ip, sizeof(ng_ipv6_addr_t), 0,
+        fib_add_entry(iface, (uint8_t *)dst, sizeof(ipv6_addr_t), 0,
+                      (uint8_t *)next_hop_ip, sizeof(ipv6_addr_t), 0,
                       FIB_LIFETIME_NO_EXPIRE);
 #endif
     }
@@ -119,7 +119,7 @@ kernel_pid_t ng_ndp_node_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_len,
 
         if ((nc_entry != NULL) && ng_ipv6_nc_is_reachable(nc_entry)) {
             DEBUG("ndp node: found reachable neighbor (%s => ",
-                  ng_ipv6_addr_to_str(addr_str, &nc_entry->ipv6_addr, sizeof(addr_str)));
+                  ipv6_addr_to_str(addr_str, &nc_entry->ipv6_addr, sizeof(addr_str)));
             DEBUG("%s)\n",
                   ng_netif_addr_to_str(addr_str, sizeof(addr_str),
                                        nc_entry->l2_addr, nc_entry->l2_addr_len));
@@ -135,7 +135,7 @@ kernel_pid_t ng_ndp_node_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_len,
         }
         else if (nc_entry == NULL) {
             ng_pktqueue_t *pkt_node;
-            ng_ipv6_addr_t dst_sol;
+            ipv6_addr_t dst_sol;
 
             nc_entry = ng_ipv6_nc_add(iface, next_hop_ip, NULL, 0,
                                       NG_IPV6_NC_STATE_INCOMPLETE << NG_IPV6_NC_STATE_POS);
@@ -157,7 +157,7 @@ kernel_pid_t ng_ndp_node_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_len,
             }
 
             /* address resolution */
-            ng_ipv6_addr_set_solicited_nodes(&dst_sol, next_hop_ip);
+            ipv6_addr_set_solicited_nodes(&dst_sol, next_hop_ip);
 
             if (iface == KERNEL_PID_UNDEF) {
                 timex_t t = { 0, NG_NDP_RETRANS_TIMER };

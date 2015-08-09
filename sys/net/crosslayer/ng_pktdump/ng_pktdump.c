@@ -28,7 +28,7 @@
 #include "kernel.h"
 #include "net/ng_pktdump.h"
 #include "net/ng_netbase.h"
-#include "net/ng_ipv6/addr.h"
+#include "net/ipv6/addr.h"
 #include "net/ng_ipv6/hdr.h"
 #include "net/ng_sixlowpan.h"
 #include "net/ng_udp.h"

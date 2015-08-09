@@ -25,7 +25,7 @@
 #include <inttypes.h>
 
 #include "thread.h"
-#include "net/ng_ipv6/addr.h"
+#include "net/ipv6/addr.h"
 #include "net/ng_ipv6/netif.h"
 #include "net/ng_netif.h"
 #include "net/ng_netapi.h"
@@ -177,7 +177,7 @@ static void _netif_list(kernel_pid_t dev)
     bool linebreak = false;
 #ifdef MODULE_NG_IPV6_NETIF
     ng_ipv6_netif_t *entry = ng_ipv6_netif_get(dev);
-    char ipv6_addr[NG_IPV6_ADDR_MAX_STR_LEN];
+    char ipv6_addr[IPV6_ADDR_MAX_STR_LEN];
 #endif
 
 
@@ -286,15 +286,15 @@ static void _netif_list(kernel_pid_t dev)
 
 #ifdef MODULE_NG_IPV6_NETIF
     for (int i = 0; i < NG_IPV6_NETIF_ADDR_NUMOF; i++) {
-        if (!ng_ipv6_addr_is_unspecified(&entry->addrs[i].addr)) {
+        if (!ipv6_addr_is_unspecified(&entry->addrs[i].addr)) {
             printf("inet6 addr: ");
 
-            if (ng_ipv6_addr_to_str(ipv6_addr, &entry->addrs[i].addr,
-                                    NG_IPV6_ADDR_MAX_STR_LEN)) {
+            if (ipv6_addr_to_str(ipv6_addr, &entry->addrs[i].addr,
+                                 IPV6_ADDR_MAX_STR_LEN)) {
                 printf("%s/%" PRIu8 "  scope: ", ipv6_addr,
                        entry->addrs[i].prefix_len);
 
-                if ((ng_ipv6_addr_is_link_local(&entry->addrs[i].addr))) {
+                if ((ipv6_addr_is_link_local(&entry->addrs[i].addr))) {
                     printf("local");
                 }
                 else {
@@ -302,7 +302,7 @@ static void _netif_list(kernel_pid_t dev)
                 }
 
                 if (entry->addrs[i].flags & NG_IPV6_NETIF_ADDR_FLAGS_NON_UNICAST) {
-                    if (ng_ipv6_addr_is_multicast(&entry->addrs[i].addr)) {
+                    if (ipv6_addr_is_multicast(&entry->addrs[i].addr)) {
                         printf(" [multicast]");
                     }
                     else {
@@ -584,7 +584,7 @@ static uint8_t _get_prefix_len(char *addr)
         *addr = '\0';
         prefix_len = atoi(addr + 1);
 
-        if ((prefix_len < 1) || (prefix_len > NG_IPV6_ADDR_BIT_LEN)) {
+        if ((prefix_len < 1) || (prefix_len > IPV6_ADDR_BIT_LEN)) {
             prefix_len = SC_NETIF_IPV6_DEFAULT_PREFIX_LEN;
         }
     }
@@ -602,7 +602,7 @@ static int _netif_add(char *cmd_name, kernel_pid_t dev, int argc, char **argv)
         _ANYCAST
     } type = _UNICAST;
     char *addr_str = argv[0];
-    ng_ipv6_addr_t addr;
+    ipv6_addr_t addr;
     uint8_t prefix_len;
 
     if (argc > 1) {
@@ -626,12 +626,12 @@ static int _netif_add(char *cmd_name, kernel_pid_t dev, int argc, char **argv)
 
     prefix_len = _get_prefix_len(addr_str);
 
-    if (ng_ipv6_addr_from_str(&addr, addr_str) == NULL) {
+    if (ipv6_addr_from_str(&addr, addr_str) == NULL) {
         puts("error: unable to parse IPv6 address.");
         return 1;
     }
 
-    if ((argc > 1) && (ng_ipv6_addr_is_multicast(&addr)) && (type != _MULTICAST)) {
+    if ((argc > 1) && (ipv6_addr_is_multicast(&addr)) && (type != _MULTICAST)) {
         puts("error: address was not a multicast address.");
         return 1;
     }
@@ -662,9 +662,9 @@ static int _netif_add(char *cmd_name, kernel_pid_t dev, int argc, char **argv)
 static int _netif_del(kernel_pid_t dev, char *addr_str)
 {
 #ifdef MODULE_NG_IPV6_NETIF
-    ng_ipv6_addr_t addr;
+    ipv6_addr_t addr;
 
-    if (ng_ipv6_addr_from_str(&addr, addr_str) == NULL) {
+    if (ipv6_addr_from_str(&addr, addr_str) == NULL) {
         puts("error: unable to parse IPv6 address.");
         return 1;
     }

@@ -26,7 +26,7 @@
 #include "debug.h"
 
 #if ENABLE_DEBUG
-static char addr_str[NG_IPV6_ADDR_MAX_STR_LEN];
+static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 #endif
 
 static ng_ipv6_nc_t *_last_router = NULL;   /* last router chosen as default
@@ -53,7 +53,7 @@ static inline void _send_delayed(vtimer_t *t, timex_t interval, ng_pktsnip_t *pk
 }
 
 
-ng_ipv6_addr_t *ng_ndp_internal_default_router(void)
+ipv6_addr_t *ng_ndp_internal_default_router(void)
 {
     ng_ipv6_nc_t *router = ng_ipv6_nc_get_next_router(NULL);
 
@@ -94,7 +94,7 @@ void ng_ndp_internal_set_state(ng_ipv6_nc_t *nc_entry, uint8_t state)
     nc_entry->flags |= state;
 
     DEBUG("ndp internal: set %s state to ",
-          ng_ipv6_addr_to_str(addr_str, &nc_entry->ipv6_addr, sizeof(addr_str)));
+          ipv6_addr_to_str(addr_str, &nc_entry->ipv6_addr, sizeof(addr_str)));
 
     switch (state) {
         case NG_IPV6_NC_STATE_REACHABLE:
@@ -149,24 +149,23 @@ void ng_ndp_internal_set_state(ng_ipv6_nc_t *nc_entry, uint8_t state)
     }
 }
 
-void ng_ndp_internal_send_nbr_adv(kernel_pid_t iface, ng_ipv6_addr_t *tgt,
-                                  ng_ipv6_addr_t *dst, bool supply_tl2a)
+void ng_ndp_internal_send_nbr_adv(kernel_pid_t iface, ipv6_addr_t *tgt,
+                                  ipv6_addr_t *dst, bool supply_tl2a)
 {
     ng_pktsnip_t *hdr, *pkt = NULL;
     uint8_t adv_flags = 0;
 
     DEBUG("ndp internal: send neighbor advertisement (iface: %" PRIkernel_pid ", tgt: %s, ",
-          iface, ng_ipv6_addr_to_str(addr_str, tgt, sizeof(addr_str)));
+          iface, ipv6_addr_to_str(addr_str, tgt, sizeof(addr_str)));
     DEBUG("dst: %s, supply_tl2a: %d)\n",
-          ng_ipv6_addr_to_str(addr_str, dst, sizeof(addr_str)), supply_tl2a);
+          ipv6_addr_to_str(addr_str, dst, sizeof(addr_str)), supply_tl2a);
 
     if (ng_ipv6_netif_get(iface)->flags & NG_IPV6_NETIF_FLAGS_ROUTER) {
         adv_flags |= NG_NDP_NBR_ADV_FLAGS_R;
     }
 
-    if (ng_ipv6_addr_is_unspecified(dst)) {
-        ng_ipv6_addr_set_all_nodes_multicast(dst,
-                                             NG_IPV6_ADDR_MCAST_SCP_LINK_LOCAL);
+    if (ipv6_addr_is_unspecified(dst)) {
+        ipv6_addr_set_all_nodes_multicast(dst, IPV6_ADDR_MCAST_SCP_LINK_LOCAL);
     }
     else {
         adv_flags |= NG_NDP_NBR_ADV_FLAGS_S;
@@ -206,7 +205,7 @@ void ng_ndp_internal_send_nbr_adv(kernel_pid_t iface, ng_ipv6_addr_t *tgt,
 
     pkt = hdr;
     hdr = ng_ipv6_hdr_build(pkt, NULL, 0, (uint8_t *)dst,
-                            sizeof(ng_ipv6_addr_t));
+                            sizeof(ipv6_addr_t));
 
     if (hdr == NULL) {
         DEBUG("ndp internal: error allocating IPv6 header.\n");
@@ -246,22 +245,22 @@ void ng_ndp_internal_send_nbr_adv(kernel_pid_t iface, ng_ipv6_addr_t *tgt,
     }
 }
 
-void ng_ndp_internal_send_nbr_sol(kernel_pid_t iface, ng_ipv6_addr_t *tgt,
-                                  ng_ipv6_addr_t *dst)
+void ng_ndp_internal_send_nbr_sol(kernel_pid_t iface, ipv6_addr_t *tgt,
+                                  ipv6_addr_t *dst)
 {
     ng_pktsnip_t *hdr, *pkt = NULL;
-    ng_ipv6_addr_t *src = NULL;
+    ipv6_addr_t *src = NULL;
     size_t src_len = 0;
 
     DEBUG("ndp internal: send neighbor solicitation (iface: %" PRIkernel_pid ", tgt: %s, ",
-          iface, ng_ipv6_addr_to_str(addr_str, tgt, sizeof(addr_str)));
-    DEBUG("dst: %s)\n", ng_ipv6_addr_to_str(addr_str, dst, sizeof(addr_str)));
+          iface, ipv6_addr_to_str(addr_str, tgt, sizeof(addr_str)));
+    DEBUG("dst: %s)\n", ipv6_addr_to_str(addr_str, dst, sizeof(addr_str)));
 
     /* check if there is a fitting source address to target */
     if ((src = ng_ipv6_netif_find_best_src_addr(iface, tgt)) != NULL) {
         uint8_t l2src[8];
         uint16_t l2src_len;
-        src_len = sizeof(ng_ipv6_addr_t);
+        src_len = sizeof(ipv6_addr_t);
         l2src_len = _get_l2src(l2src, sizeof(l2src), iface);
 
         if (l2src_len > 0) {
@@ -286,7 +285,7 @@ void ng_ndp_internal_send_nbr_sol(kernel_pid_t iface, ng_ipv6_addr_t *tgt,
 
     pkt = hdr;
     hdr = ng_ipv6_hdr_build(pkt, (uint8_t *)src, src_len, (uint8_t *)dst,
-                            sizeof(ng_ipv6_addr_t));
+                            sizeof(ipv6_addr_t));
 
     if (hdr == NULL) {
         DEBUG("ndp internal: error allocating IPv6 header.\n");
@@ -320,7 +319,7 @@ bool ng_ndp_internal_sl2a_opt_handle(kernel_pid_t iface, ng_pktsnip_t *pkt,
     uint8_t sl2a_len = 0;
     uint8_t *sl2a = (uint8_t *)(sl2a_opt + 1);
 
-    if ((sl2a_opt->len == 0) || ng_ipv6_addr_is_unspecified(&ipv6->src)) {
+    if ((sl2a_opt->len == 0) || ipv6_addr_is_unspecified(&ipv6->src)) {
         DEBUG("ndp: invalid source link-layer address option received\n");
         return false;
     }
@@ -379,7 +378,7 @@ int ng_ndp_internal_tl2a_opt_handle(ng_pktsnip_t *pkt, ng_ipv6_hdr_t *ipv6,
     uint8_t tl2a_len = 0;
     uint8_t *tl2a = (uint8_t *)(tl2a_opt + 1);
 
-    if ((tl2a_opt->len == 0) || ng_ipv6_addr_is_unspecified(&ipv6->src)) {
+    if ((tl2a_opt->len == 0) || ipv6_addr_is_unspecified(&ipv6->src)) {
         DEBUG("ndp: invalid target link-layer address option received\n");
         return -EINVAL;
     }

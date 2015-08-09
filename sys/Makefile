@@ -25,8 +25,8 @@ endif
 ifneq (,$(filter ng_ipv6,$(USEMODULE)))
     DIRS += net/network_layer/ng_ipv6
 endif
-ifneq (,$(filter ng_ipv6_addr,$(USEMODULE)))
-    DIRS += net/network_layer/ng_ipv6/addr
+ifneq (,$(filter ipv6_addr,$(USEMODULE)))
+    DIRS += net/network_layer/ipv6/addr
 endif
 ifneq (,$(filter ng_ipv6_ext,$(USEMODULE)))
     DIRS += net/network_layer/ng_ipv6/ext

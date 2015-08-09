@@ -1,3 +1,3 @@
-MODULE = ng_ipv6_addr
+MODULE = ipv6_addr
 
 include $(RIOTBASE)/Makefile.base

@@ -30,10 +30,10 @@
 #include <string.h>
 
 #include "byteorder.h"
-#include "net/ng_ipv6/addr.h"
+#include "net/ipv6/addr.h"
 
 /* Length of an IPv6 address in 16-bit words */
-#define IPV6_ADDR_WORD_LEN  (sizeof(ng_ipv6_addr_t) / sizeof(uint16_t))
+#define IPV6_ADDR_WORD_LEN  (sizeof(ipv6_addr_t) / sizeof(uint16_t))
 
 #define IPV4_ADDR_MIN_STR_LEN   (sizeof("255.255.255.255"))
 
@@ -75,10 +75,9 @@ static char *ipv4_addr_to_str(char *result, const network_uint32_t *addr,
 }
 
 /* based on inet_ntop6() by Paul Vixie */
-char *ng_ipv6_addr_to_str(char *result, const ng_ipv6_addr_t *addr,
-                          uint8_t result_len)
+char *ipv6_addr_to_str(char *result, const ipv6_addr_t *addr, uint8_t result_len)
 {
-    char tmp[NG_IPV6_ADDR_MAX_STR_LEN], *tp;
+    char tmp[IPV6_ADDR_MAX_STR_LEN], *tp;
     struct {
         int16_t base, len;
     } best = { -1, 0}, cur = { -1, 0};

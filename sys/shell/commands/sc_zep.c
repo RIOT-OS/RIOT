@@ -17,7 +17,7 @@
 #include <stdlib.h>
 #include <inttypes.h>
 
-#include "net/ng_ipv6/addr.h"
+#include "net/ipv6/addr.h"
 #include "net/ng_ipv6/netif.h"
 #include "net/ng_nomac.h"
 #include "net/ng_zep.h"
@@ -30,7 +30,7 @@ int _zep_init(int argc, char **argv)
 {
     uint16_t src_port = NG_ZEP_DEFAULT_PORT;
     uint16_t dst_port = NG_ZEP_DEFAULT_PORT;
-    ng_ipv6_addr_t dst_addr;
+    ipv6_addr_t dst_addr;
     int res;
 
     if (argc < 2) {
@@ -46,7 +46,7 @@ int _zep_init(int argc, char **argv)
         dst_port = (uint16_t)atoi(argv[3]);
     }
 
-    ng_ipv6_addr_from_str(&dst_addr, argv[1]);
+    ipv6_addr_from_str(&dst_addr, argv[1]);
 
     if ((res = ng_zep_init(&zep, src_port, &dst_addr, dst_port)) < 0) {
         switch (res) {

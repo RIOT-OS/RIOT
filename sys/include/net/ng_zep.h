@@ -34,7 +34,7 @@
 
 #include "byteorder.h"
 #include "kernel_types.h"
-#include "net/ng_ipv6/addr.h"
+#include "net/ipv6/addr.h"
 #include "net/ng_nettype.h"
 #include "thread.h"
 
@@ -198,7 +198,7 @@ typedef struct {
     le_uint16_t pan;                /**< the device's PAN ID */
     uint16_t flags;                 /**< the device's option flags */
     uint32_t seq;                   /**< the current sequence number for frames */
-    ng_ipv6_addr_t dst;             /**< destination IPv6 address */
+    ipv6_addr_t dst;                /**< destination IPv6 address */
     uint16_t src_port;              /**< source UDP port */
     uint16_t dst_port;              /**< destination UDP port */
     ng_nettype_t proto;             /**< the target protocol for received packets */
@@ -229,7 +229,7 @@ typedef struct {
  * @return  -ENOTSUP, if @p dst is NULL or unspecified address (::).
  * @return  -EOVERFLOW, if there are too many threads running already
  */
-kernel_pid_t ng_zep_init(ng_zep_t *dev, uint16_t src_port, ng_ipv6_addr_t *dst,
+kernel_pid_t ng_zep_init(ng_zep_t *dev, uint16_t src_port, ipv6_addr_t *dst,
                          uint16_t dst_port);
 
 #ifdef __cplusplus

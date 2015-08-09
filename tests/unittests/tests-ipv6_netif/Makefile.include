@@ -1,4 +1,4 @@
-USEMODULE += ng_ipv6_addr
+USEMODULE += ipv6_addr
 USEMODULE += ng_ipv6_netif
 USEMODULE += ng_netif
 

@@ -33,12 +33,12 @@
 #include "net/fib.h"
 #include "net/fib/table.h"
 
-#ifdef MODULE_NG_IPV6_ADDR
-#include "net/ng_ipv6/addr.h"
-static char addr_str[NG_IPV6_ADDR_MAX_STR_LEN];
+#ifdef MODULE_IPV6_ADDR
+#include "net/ipv6/addr.h"
+static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 #endif
 
-#ifdef MODULE_NG_IPV6_ADDR
+#ifdef MODULE_IPV6_ADDR
     #define NG_FIB_ADDR_PRINT_LEN       39
 #else
     #define NG_FIB_ADDR_PRINT_LEN       32
@@ -646,10 +646,10 @@ static void fib_print_address(universal_address_container_t *entry)
     uint8_t *ret = universal_address_get_address(entry, address, &addr_size);
 
     if (ret == address) {
-#ifdef MODULE_NG_IPV6_ADDR
-        if (addr_size == sizeof(ng_ipv6_addr_t)) {
+#ifdef MODULE_IPV6_ADDR
+        if (addr_size == sizeof(ipv6_addr_t)) {
             printf("%-" NG_FIB_ADDR_PRINT_LENS "s",
-                    ng_ipv6_addr_to_str(addr_str, (ng_ipv6_addr_t *) address, sizeof(addr_str)));
+                    ipv6_addr_to_str(addr_str, (ipv6_addr_t *) address, sizeof(addr_str)));
             return;
         }
 #endif
@@ -661,7 +661,7 @@ static void fib_print_address(universal_address_container_t *entry)
                 printf("  ");
             }
         }
-#ifdef MODULE_NG_IPV6_ADDR
+#ifdef MODULE_IPV6_ADDR
         /* print trailing whitespaces */
         for (size_t i = 0; i < NG_FIB_ADDR_PRINT_LEN - (UNIVERSAL_ADDRESS_SIZE * 2); ++i) {
             printf(" ");

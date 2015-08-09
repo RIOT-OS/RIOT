@@ -28,7 +28,7 @@
 #include "kernel_macros.h"
 #include "kernel_types.h"
 #include "mutex.h"
-#include "net/ng_ipv6/addr.h"
+#include "net/ipv6/addr.h"
 #include "vtimer.h"
 
 #ifdef __cplusplus
@@ -153,7 +153,7 @@ extern "C" {
  * @brief   Type to represent an IPv6 address registered to an interface.
  */
 typedef struct {
-    ng_ipv6_addr_t addr;    /**< The address data */
+    ipv6_addr_t addr;       /**< The address data */
     uint8_t flags;          /**< flags */
     uint8_t prefix_len;     /**< length of the prefix of the address */
     /**
@@ -290,10 +290,9 @@ static inline void ng_ipv6_netif_set_rtr_adv(ng_ipv6_netif_t *netif, bool enable
  *
  * @param[in] netif The interface.
  * @param[in] dst   The address of the neighboring router.
- *                  May be NULL for @ref NG_IPV6_ADDR_ALL_ROUTERS_LINK_LOCAL.
+ *                  May be NULL for @ref IPV6_ADDR_ALL_ROUTERS_LINK_LOCAL.
  */
-static inline void ng_ipv6_netif_sol_router(ng_ipv6_netif_t *netif,
-        ng_ipv6_addr_t *dst)
+static inline void ng_ipv6_netif_sol_router(ng_ipv6_netif_t *netif, ipv6_addr_t *dst)
 {
     (void)netif;    /* TODO */
     (void)dst;
@@ -321,8 +320,8 @@ static inline void ng_ipv6_netif_sol_router(ng_ipv6_netif_t *netif,
  * @return  The address on the interface, on success.
  * @return  NULL, on failure
  */
-ng_ipv6_addr_t *ng_ipv6_netif_add_addr(kernel_pid_t pid, const ng_ipv6_addr_t *addr,
-                                       uint8_t prefix_len, uint8_t flags);
+ipv6_addr_t *ng_ipv6_netif_add_addr(kernel_pid_t pid, const ipv6_addr_t *addr, uint8_t prefix_len,
+                                    uint8_t flags);
 
 /**
  * @brief   Remove an address from the interface.
@@ -331,7 +330,7 @@ ng_ipv6_addr_t *ng_ipv6_netif_add_addr(kernel_pid_t pid, const ng_ipv6_addr_t *a
  *                      it will be removed from all interfaces.
  * @param[in] addr      An address you want to remove from interface.
  */
-void ng_ipv6_netif_remove_addr(kernel_pid_t pid, ng_ipv6_addr_t *addr);
+void ng_ipv6_netif_remove_addr(kernel_pid_t pid, ipv6_addr_t *addr);
 
 /**
  * @brief   Removes all addresses from the interface.
@@ -349,8 +348,7 @@ void ng_ipv6_netif_reset_addr(kernel_pid_t pid);
  * @return  The PID to the interface the address is registered to.
  * @return  KERNEL_PID_UNDEF, if the address can not be found on any interface.
  */
-kernel_pid_t ng_ipv6_netif_find_by_addr(ng_ipv6_addr_t **out,
-                                        const ng_ipv6_addr_t *addr);
+kernel_pid_t ng_ipv6_netif_find_by_addr(ipv6_addr_t **out, const ipv6_addr_t *addr);
 
 /**
  * @brief   Searches for an address on an interface.
@@ -362,8 +360,7 @@ kernel_pid_t ng_ipv6_netif_find_by_addr(ng_ipv6_addr_t **out,
  * @return  NULL, if the address can not be found on the interface.
  * @return  NULL, if @p pid is no interface.
  */
-ng_ipv6_addr_t *ng_ipv6_netif_find_addr(kernel_pid_t pid,
-                                        const ng_ipv6_addr_t *addr);
+ipv6_addr_t *ng_ipv6_netif_find_addr(kernel_pid_t pid, const ipv6_addr_t *addr);
 
 /**
  * @brief   Searches for the first address matching a prefix best on all
@@ -376,8 +373,7 @@ ng_ipv6_addr_t *ng_ipv6_netif_find_addr(kernel_pid_t pid,
  * @return  KERNEL_PID_UNDEF, if no matching address can not be found on any
  *          interface.
  */
-kernel_pid_t ng_ipv6_netif_find_by_prefix(ng_ipv6_addr_t **out,
-        const ng_ipv6_addr_t *prefix);
+kernel_pid_t ng_ipv6_netif_find_by_prefix(ipv6_addr_t **out, const ipv6_addr_t *prefix);
 
 /**
  * @brief   Searches for the first address matching a prefix best on an
@@ -390,8 +386,7 @@ kernel_pid_t ng_ipv6_netif_find_by_prefix(ng_ipv6_addr_t **out,
  * @return  NULL, if no matching address can be found on the interface.
  * @return  NULL, if @p pid is no interface.
  */
-ng_ipv6_addr_t *ng_ipv6_netif_match_prefix(kernel_pid_t pid,
-        const ng_ipv6_addr_t *prefix);
+ipv6_addr_t *ng_ipv6_netif_match_prefix(kernel_pid_t pid, const ipv6_addr_t *prefix);
 
 /**
  * @brief   Searches for the best address on an interface usable as a
@@ -405,7 +400,7 @@ ng_ipv6_addr_t *ng_ipv6_netif_match_prefix(kernel_pid_t pid,
  * @return  NULL, if no matching address can be found on the interface.
  * @return  NULL, if @p pid is no interface.
  */
-ng_ipv6_addr_t *ng_ipv6_netif_find_best_src_addr(kernel_pid_t pid, const ng_ipv6_addr_t *dest);
+ipv6_addr_t *ng_ipv6_netif_find_best_src_addr(kernel_pid_t pid, const ipv6_addr_t *dest);
 
 /**
  * @brief   Get interface specific meta-information on an address
@@ -426,7 +421,7 @@ ng_ipv6_addr_t *ng_ipv6_netif_find_best_src_addr(kernel_pid_t pid, const ng_ipv6
  *
  * @return  Interface specific meta-information on @p addr
  */
-static inline ng_ipv6_netif_addr_t *ng_ipv6_netif_addr_get(const ng_ipv6_addr_t *addr)
+static inline ng_ipv6_netif_addr_t *ng_ipv6_netif_addr_get(const ipv6_addr_t *addr)
 {
     return container_of(addr, ng_ipv6_netif_addr_t, addr);
 }
@@ -451,7 +446,7 @@ static inline ng_ipv6_netif_addr_t *ng_ipv6_netif_addr_get(const ng_ipv6_addr_t 
  * @return true, if address is anycast or multicast.
  * @return false, if address is unicast.
  */
-static inline bool ng_ipv6_netif_addr_is_non_unicast(const ng_ipv6_addr_t *addr)
+static inline bool ng_ipv6_netif_addr_is_non_unicast(const ipv6_addr_t *addr)
 {
     return (bool)(container_of(addr, ng_ipv6_netif_addr_t, addr)->flags &
                   NG_IPV6_NETIF_ADDR_FLAGS_NON_UNICAST);

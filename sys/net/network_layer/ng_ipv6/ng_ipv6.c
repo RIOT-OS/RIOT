@@ -42,7 +42,7 @@ static char _stack[NG_IPV6_STACK_SIZE];
 #endif
 
 #if ENABLE_DEBUG
-static char addr_str[NG_IPV6_ADDR_MAX_STR_LEN];
+static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 #endif
 
 kernel_pid_t ng_ipv6_pid = KERNEL_PID_UNDEF;
@@ -171,7 +171,7 @@ static void *_event_loop(void *args)
             case NG_NDP_MSG_ADDR_TIMEOUT:
                 DEBUG("ipv6: Router advertisement timer event received\n");
                 ng_ipv6_netif_remove_addr(KERNEL_PID_UNDEF,
-                                          (ng_ipv6_addr_t *)msg.content.ptr);
+                                          (ipv6_addr_t *)msg.content.ptr);
                 break;
 
             case NG_NDP_MSG_NBR_SOL_RETRANS:
@@ -282,17 +282,17 @@ static int _fill_ipv6_hdr(kernel_pid_t iface, ng_pktsnip_t *ipv6,
         }
     }
 
-    if (ng_ipv6_addr_is_unspecified(&hdr->src)) {
-        if (ng_ipv6_addr_is_loopback(&hdr->dst)) {
-            ng_ipv6_addr_set_loopback(&hdr->src);
+    if (ipv6_addr_is_unspecified(&hdr->src)) {
+        if (ipv6_addr_is_loopback(&hdr->dst)) {
+            ipv6_addr_set_loopback(&hdr->src);
         }
         else {
-            ng_ipv6_addr_t *src = ng_ipv6_netif_find_best_src_addr(iface, &hdr->dst);
+            ipv6_addr_t *src = ng_ipv6_netif_find_best_src_addr(iface, &hdr->dst);
 
             if (src != NULL) {
                 DEBUG("ipv6: set packet source to %s\n",
-                      ng_ipv6_addr_to_str(addr_str, src, sizeof(addr_str)));
-                memcpy(&hdr->src, src, sizeof(ng_ipv6_addr_t));
+                      ipv6_addr_to_str(addr_str, src, sizeof(addr_str)));
+                memcpy(&hdr->src, src, sizeof(ipv6_addr_t));
             }
             /* Otherwise leave unspecified */
         }
@@ -451,7 +451,7 @@ static void _send_multicast(kernel_pid_t iface, ng_pktsnip_t *pkt,
 }
 
 static inline kernel_pid_t _next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_len,
-                                            kernel_pid_t iface, ng_ipv6_addr_t *dst,
+                                            kernel_pid_t iface, ipv6_addr_t *dst,
                                             ng_pktsnip_t *pkt)
 {
 #ifdef MODULE_NG_NDP_NODE
@@ -470,7 +470,7 @@ static void _send(ng_pktsnip_t *pkt, bool prep_hdr)
 {
     kernel_pid_t iface = KERNEL_PID_UNDEF;
     ng_pktsnip_t *ipv6, *payload;
-    ng_ipv6_addr_t *tmp;
+    ipv6_addr_t *tmp;
     ng_ipv6_hdr_t *hdr;
     /* get IPv6 snip and (if present) generic interface header */
     if (pkt->type == NG_NETTYPE_NETIF) {
@@ -507,10 +507,10 @@ static void _send(ng_pktsnip_t *pkt, bool prep_hdr)
     hdr = ipv6->data;
     payload = ipv6->next;
 
-    if (ng_ipv6_addr_is_multicast(&hdr->dst)) {
+    if (ipv6_addr_is_multicast(&hdr->dst)) {
         _send_multicast(iface, pkt, ipv6, payload, prep_hdr);
     }
-    else if ((ng_ipv6_addr_is_loopback(&hdr->dst)) ||   /* dst is loopback address */
+    else if ((ipv6_addr_is_loopback(&hdr->dst)) ||      /* dst is loopback address */
              ((iface == KERNEL_PID_UNDEF) && /* or dst registered to any local interface */
               ((iface = ng_ipv6_netif_find_by_addr(&tmp, &hdr->dst)) != KERNEL_PID_UNDEF)) ||
              ((iface != KERNEL_PID_UNDEF) && /* or dst registered to given interface */
@@ -576,7 +576,7 @@ static void _send(ng_pktsnip_t *pkt, bool prep_hdr)
 /* functions for receiving */
 static inline bool _pkt_not_for_me(kernel_pid_t *iface, ng_ipv6_hdr_t *hdr)
 {
-    if (ng_ipv6_addr_is_loopback(&hdr->dst)) {
+    if (ipv6_addr_is_loopback(&hdr->dst)) {
         return false;
     }
     else if (*iface == KERNEL_PID_UNDEF) {
@@ -657,9 +657,9 @@ static void _receive(ng_pktsnip_t *pkt)
     hdr = (ng_ipv6_hdr_t *)ipv6->data;
 
     DEBUG("ipv6: Received (src = %s, ",
-          ng_ipv6_addr_to_str(addr_str, &(hdr->src), sizeof(addr_str)));
+          ipv6_addr_to_str(addr_str, &(hdr->src), sizeof(addr_str)));
     DEBUG("dst = %s, next header = %" PRIu8 ", length = %" PRIu16 ")\n",
-          ng_ipv6_addr_to_str(addr_str, &(hdr->dst), sizeof(addr_str)),
+          ipv6_addr_to_str(addr_str, &(hdr->dst), sizeof(addr_str)),
           hdr->nh, byteorder_ntohs(hdr->len));
 
     if (_pkt_not_for_me(&iface, hdr)) { /* if packet is not for me */

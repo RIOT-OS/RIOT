@@ -7,8 +7,8 @@
  */
 
 /**
- * @defgroup    net_ng_ipv6_addr    IPv6 addresses
- * @ingroup     net_ng_ipv6
+ * @defgroup    net_ipv6_addr    IPv6 addresses
+ * @ingroup     net_ipv6
  * @brief       IPv6 address architecture
  *
  * @see <a href="http://tools.ietf.org/html/rfc4291">
@@ -24,8 +24,8 @@
  */
 
 
-#ifndef NG_IPV6_ADDR_H_
-#define NG_IPV6_ADDR_H_
+#ifndef IPV6_ADDR_H_
+#define IPV6_ADDR_H_
 
 #include <stdbool.h>
 
@@ -38,12 +38,12 @@ extern "C" {
 /**
  * @brief   Length of an IPv6 address in bit.
  */
-#define NG_IPV6_ADDR_BIT_LEN        (128)
+#define IPV6_ADDR_BIT_LEN           (128)
 
 /**
  * @brief   Maximum length of an IPv6 address as string.
  */
-#define NG_IPV6_ADDR_MAX_STR_LEN    (sizeof("ffff:ffff:ffff:ffff:" \
+#define IPV6_ADDR_MAX_STR_LEN       (sizeof("ffff:ffff:ffff:ffff:" \
                                             "ffff:ffff:255.255.255.255"))
 
 /**
@@ -57,7 +57,7 @@ extern "C" {
  *       href="http://tools.ietf.org/html/rfc3879">SLDEP</a>. They are only
  *       defined here for the distinction of global unicast addresses.
  */
-#define NG_IPV6_ADDR_SITE_LOCAL_PREFIX  (0xFEC0)
+#define IPV6_ADDR_SITE_LOCAL_PREFIX (0xfec0)
 
 /**
  * @brief Data type to represent an IPv6 address.
@@ -67,7 +67,7 @@ typedef union {
     network_uint16_t u16[8];    /**< divided by 8 16-bit words. */
     network_uint32_t u32[4];    /**< divided by 4 32-bit words. */
     network_uint64_t u64[2];    /**< divided by 2 64-bit words. */
-} ng_ipv6_addr_t;
+} ipv6_addr_t;
 
 /**
  * @brief   Static initializer for the unspecified IPv6 address (::)
@@ -76,7 +76,10 @@ typedef union {
  *          RFC 4291, section 2.5.2
  *      </a>
  */
-#define NG_IPV6_ADDR_UNSPECIFIED {{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }}
+#define IPV6_ADDR_UNSPECIFIED               {{ 0x00, 0x00, 0x00, 0x00, \
+                                               0x00, 0x00, 0x00, 0x00, \
+                                               0x00, 0x00, 0x00, 0x00, \
+                                               0x00, 0x00, 0x00, 0x00 }}
 
 /**
  * @brief   Static initializer for the loopback IPv6 address (::1)
@@ -85,8 +88,10 @@ typedef union {
  *          RFC 4291, section 2.5.3
  *      </a>
  */
-#define NG_IPV6_ADDR_LOOPBACK {{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 }}
-
+#define IPV6_ADDR_LOOPBACK                  {{ 0x00, 0x00, 0x00, 0x00, \
+                                               0x00, 0x00, 0x00, 0x00, \
+                                               0x00, 0x00, 0x00, 0x00, \
+                                               0x00, 0x00, 0x00, 0x01 }}
 /**
  * @brief   Static initializer for the interface-local all nodes multicast IPv6
  *          address (ff01::1)
@@ -95,8 +100,10 @@ typedef union {
  *          RFC 4291, section 2.7
  *      </a>
  */
-#define NG_IPV6_ADDR_ALL_NODES_IF_LOCAL {{ 0xff, 0x01, 0, 0, 0, 0, 0, 0, \
-                                           0, 0, 0, 0, 0, 0, 0, 1 }}
+#define IPV6_ADDR_ALL_NODES_IF_LOCAL        {{ 0xff, 0x01, 0x00, 0x00, \
+                                               0x00, 0x00, 0x00, 0x00, \
+                                               0x00, 0x00, 0x00, 0x00, \
+                                               0x00, 0x00, 0x00, 0x01 }}
 
 /**
  * @brief   Static initializer for the link-local all nodes multicast IPv6
@@ -106,8 +113,10 @@ typedef union {
  *          RFC 4291, section 2.7
  *      </a>
  */
-#define NG_IPV6_ADDR_ALL_NODES_LINK_LOCAL {{ 0xff, 0x02, 0, 0, 0, 0, 0, 0, \
-                                             0, 0, 0, 0, 0, 0, 0, 1 }}
+#define IPV6_ADDR_ALL_NODES_LINK_LOCAL      {{ 0xff, 0x02, 0x00, 0x00, \
+                                               0x00, 0x00, 0x00, 0x00, \
+                                               0x00, 0x00, 0x00, 0x00, \
+                                               0x00, 0x00, 0x00, 0x01 }}
 
 /**
  * @brief   Static initializer for the interface-local all routers multicast IPv6
@@ -117,8 +126,10 @@ typedef union {
  *          RFC 4291, section 2.7
  *      </a>
  */
-#define NG_IPV6_ADDR_ALL_ROUTERS_IF_LOCAL {{ 0xff, 0x01, 0, 0, 0, 0, 0, 0, \
-                                             0, 0, 0, 0, 0, 0, 0, 2 }}
+#define IPV6_ADDR_ALL_ROUTERS_IF_LOCAL      {{ 0xff, 0x01, 0x00, 0x00, \
+                                               0x00, 0x00, 0x00, 0x00, \
+                                               0x00, 0x00, 0x00, 0x00, \
+                                               0x00, 0x00, 0x00, 0x02 }}
 
 /**
  * @brief   Static initializer for the link-local all routers multicast IPv6
@@ -128,8 +139,10 @@ typedef union {
  *          RFC 4291, section 2.7
  *      </a>
  */
-#define NG_IPV6_ADDR_ALL_ROUTERS_LINK_LOCAL {{ 0xff, 0x02, 0, 0, 0, 0, 0, 0, \
-                                               0, 0, 0, 0, 0, 0, 0, 2 }}
+#define IPV6_ADDR_ALL_ROUTERS_LINK_LOCAL    {{ 0xff, 0x02, 0x00, 0x00, \
+                                               0x00, 0x00, 0x00, 0x00, \
+                                               0x00, 0x00, 0x00, 0x00, \
+                                               0x00, 0x00, 0x00, 0x02 }}
 
 
 /**
@@ -140,68 +153,73 @@ typedef union {
  *          RFC 4291, section 2.7
  *      </a>
  */
-#define NG_IPV6_ADDR_ALL_ROUTERS_SITE_LOCAL {{ 0xff, 0x05, 0, 0, 0, 0, 0, 0, \
-                                               0, 0, 0, 0, 0, 0, 0, 2 }}
+#define IPV6_ADDR_ALL_ROUTERS_SITE_LOCAL    {{ 0xff, 0x05, 0x00, 0x00, \
+                                               0x00, 0x00, 0x00, 0x00, \
+                                               0x00, 0x00, 0x00, 0x00, \
+                                               0x00, 0x00, 0x00, 0x02 }}
 
 /**
+ * @name    Multicast address flags
  * @brief   Values for the flag field in multicast addresses.
+ * @{
  *
  * @see <a href="http://tools.ietf.org/html/rfc4291#section-2.7">
  *          RFC 4291, section 2.7
  *      </a>
  */
-typedef enum {
-    /**
-     * @brief   The address is transient, i.e. not well-known, permanantly
-     *          assigned address by IANA.
-     */
-    NG_IPV6_ADDR_MCAST_FLAG_TRANSIENT = 0x01,
-
-    /**
-     * @brief   The address is based on a network prefix
-     *
-     * @see <a href="http://tools.ietf.org/html/rfc3306#section-4">
-     *          RFC 3306, section 4
-     *      </a>
-     */
-    NG_IPV6_ADDR_MCAST_FLAG_PREFIX_BASED = 0x02,
-
-    /**
-     * @brief   The address embeds the address on the rendezvous point
-     *
-     * @see <a href="http://tools.ietf.org/html/rfc3956#section-3">
-     *          RFC 3956, section 3
-     *      </a>
-     */
-    NG_IPV6_ADDR_MCAST_FLAG_EMBED_ON_RP = 0x04,
-} ng_ipv6_addr_mcast_flag_t;
+/**
+ * @brief   The address is transient, i.e. not well-known, permanantly
+ *          assigned address by IANA.
+ */
+#define IPV6_ADDR_MCAST_FLAG_TRANSIENT      (0x01)
 
 /**
+ * @brief   The address is based on a network prefix
+ *
+ * @see <a href="http://tools.ietf.org/html/rfc3306#section-4">
+ *          RFC 3306, section 4
+ *      </a>
+ */
+#define IPV6_ADDR_MCAST_FLAG_PREFIX_BASED   (0x02)
+
+/**
+ * @brief   The address embeds the address on the rendezvous point
+ *
+ * @see <a href="http://tools.ietf.org/html/rfc3956#section-3">
+ *          RFC 3956, section 3
+ *      </a>
+ */
+#define IPV6_ADDR_MCAST_FLAG_EMBED_ON_RP    (0x04)
+/** @} */
+
+/**
+ * @name    Multicast address scopes
  * @brief   Values for the scope field in multicast addresses.
+ * @{
  *
  * @see <a href="http://tools.ietf.org/html/rfc4291#section-2.7">
  *          RFC 4291, section 2.7
  *      </a>
  */
-typedef enum {
-    NG_IPV6_ADDR_MCAST_SCP_IF_LOCAL    = 0x1,      /**< interface-local scope */
-    NG_IPV6_ADDR_MCAST_SCP_LINK_LOCAL  = 0x2,      /**< link-local scope */
-    /**
-     * @brief realm-local scope
-     *
-     * @see <a href="http://tools.ietf.org/html/rfc7346#section-3">
-     *          RFC 7346, section 3
-     *      </a> and
-     *      <a href="http://tools.ietf.org/html/rfc7346#section-5">
-     *          RFC 7346, section 5
-     *      </a> and
-     */
-    NG_IPV6_ADDR_MCAST_SCP_REALM_LOCAL = 0x3,
-    NG_IPV6_ADDR_MCAST_SCP_ADMIN_LOCAL = 0x4,      /**< admin-local scope */
-    NG_IPV6_ADDR_MCAST_SCP_SITE_LOCAL  = 0x5,      /**< site-local scope */
-    NG_IPV6_ADDR_MCAST_SCP_ORG_LOCAL   = 0x8,      /**< organization-local scope */
-    NG_IPV6_ADDR_MCAST_SCP_GLOBAL      = 0xe,      /**< global scope */
-} ng_ipv6_addr_mcast_scp_t;
+#define IPV6_ADDR_MCAST_SCP_IF_LOCAL        (0x1)   /**< interface-local scope */
+#define IPV6_ADDR_MCAST_SCP_LINK_LOCAL      (0x2)   /**< link-local scope */
+
+/**
+ * @brief realm-local scope
+ *
+ * @see <a href="http://tools.ietf.org/html/rfc7346#section-3">
+ *          RFC 7346, section 3
+ *      </a> and
+ *      <a href="http://tools.ietf.org/html/rfc7346#section-5">
+ *          RFC 7346, section 5
+ *      </a> and
+ */
+#define IPV6_ADDR_MCAST_SCP_REALM_LOCAL (0x3)
+#define IPV6_ADDR_MCAST_SCP_ADMIN_LOCAL (0x4)      /**< admin-local scope */
+#define IPV6_ADDR_MCAST_SCP_SITE_LOCAL  (0x5)      /**< site-local scope */
+#define IPV6_ADDR_MCAST_SCP_ORG_LOCAL   (0x8)      /**< organization-local scope */
+#define IPV6_ADDR_MCAST_SCP_GLOBAL      (0xe)      /**< global scope */
+/** @} */
 
 /**
  * @brief   Checks if two IPv6 addresses are equal.
@@ -212,8 +230,7 @@ typedef enum {
  * @return  true, if @p a and @p b are equal
  * @return  false, otherwise.
  */
-static inline bool ng_ipv6_addr_equal(const ng_ipv6_addr_t *a,
-                                      const ng_ipv6_addr_t *b)
+static inline bool ipv6_addr_equal(const ipv6_addr_t *a, const ipv6_addr_t *b)
 {
     return (a->u64[0].u64 == b->u64[0].u64) &&
            (a->u64[1].u64 == b->u64[1].u64);
@@ -231,7 +248,7 @@ static inline bool ng_ipv6_addr_equal(const ng_ipv6_addr_t *a,
  * @return  true, if @p addr is unspecified address
  * @return  false, otherwise.
  */
-static inline bool ng_ipv6_addr_is_unspecified(const ng_ipv6_addr_t *addr)
+static inline bool ipv6_addr_is_unspecified(const ipv6_addr_t *addr)
 {
     return (addr->u64[0].u64 == 0) &&
            (addr->u64[1].u64 == 0);
@@ -249,7 +266,7 @@ static inline bool ng_ipv6_addr_is_unspecified(const ng_ipv6_addr_t *addr)
  * @return  true, if @p addr is loopback address,
  * @return  false, otherwise.
  */
-static inline bool ng_ipv6_addr_is_loopback(const ng_ipv6_addr_t *addr)
+static inline bool ipv6_addr_is_loopback(const ipv6_addr_t *addr)
 {
     return (addr->u64[0].u64 == 0) &&
            (byteorder_ntohll(addr->u64[1]) == 1);
@@ -267,7 +284,7 @@ static inline bool ng_ipv6_addr_is_loopback(const ng_ipv6_addr_t *addr)
  * @return  true, if @p addr is an IPv4-compatible IPv6 address,
  * @return  false, otherwise.
  */
-static inline bool ng_ipv6_addr_is_ipv4_compat(const ng_ipv6_addr_t *addr)
+static inline bool ipv6_addr_is_ipv4_compat(const ipv6_addr_t *addr)
 {
     return (addr->u64[0].u64 == 0) &&
            (addr->u32[2].u32 == 0);
@@ -285,11 +302,11 @@ static inline bool ng_ipv6_addr_is_ipv4_compat(const ng_ipv6_addr_t *addr)
  * @return  true, if @p addr is an IPv4-compatible IPv6 address,
  * @return  false, otherwise.
  */
-static inline bool ng_ipv6_addr_is_ipv4_mapped(const ng_ipv6_addr_t *addr)
+static inline bool ipv6_addr_is_ipv4_mapped(const ipv6_addr_t *addr)
 {
     return ((addr->u64[0].u64 == 0) &&
             (addr->u16[4].u16 == 0) &&
-            (addr->u16[5].u16 == 0xFFFF));
+            (addr->u16[5].u16 == 0xffff));
 }
 
 /**
@@ -304,7 +321,7 @@ static inline bool ng_ipv6_addr_is_ipv4_mapped(const ng_ipv6_addr_t *addr)
  * @return  true, if @p addr is multicast address,
  * @return  false, otherwise.
  */
-static inline bool ng_ipv6_addr_is_multicast(const ng_ipv6_addr_t *addr)
+static inline bool ipv6_addr_is_multicast(const ipv6_addr_t *addr)
 {
     return (addr->u8[0] == 0xff);
 }
@@ -324,11 +341,11 @@ static inline bool ng_ipv6_addr_is_multicast(const ng_ipv6_addr_t *addr)
  * @return  true, if @p addr is link-local address,
  * @return  false, otherwise.
  */
-static inline bool ng_ipv6_addr_is_link_local(const ng_ipv6_addr_t *addr)
+static inline bool ipv6_addr_is_link_local(const ipv6_addr_t *addr)
 {
     return (byteorder_ntohll(addr->u64[0]) == 0xfe80000000000000) ||
-           (ng_ipv6_addr_is_multicast(addr) &&
-            (addr->u8[1] & 0x0f) == NG_IPV6_ADDR_MCAST_SCP_LINK_LOCAL);
+           (ipv6_addr_is_multicast(addr) &&
+            (addr->u8[1] & 0x0f) == IPV6_ADDR_MCAST_SCP_LINK_LOCAL);
 }
 
 /**
@@ -347,12 +364,12 @@ static inline bool ng_ipv6_addr_is_link_local(const ng_ipv6_addr_t *addr)
  * @return  true, if @p addr is a site-local unicast address,
  * @return  false, otherwise.
  */
-static inline bool ng_ipv6_addr_is_site_local(const ng_ipv6_addr_t *addr)
+static inline bool ipv6_addr_is_site_local(const ipv6_addr_t *addr)
 {
-    return (((byteorder_ntohs(addr->u16[0]) & 0xFFC0) ==
-             NG_IPV6_ADDR_SITE_LOCAL_PREFIX) ||
-            (ng_ipv6_addr_is_multicast(addr) &&
-            (addr->u8[1] & 0x0f) == NG_IPV6_ADDR_MCAST_SCP_SITE_LOCAL));
+    return (((byteorder_ntohs(addr->u16[0]) & 0xffc0) ==
+             IPV6_ADDR_SITE_LOCAL_PREFIX) ||
+            (ipv6_addr_is_multicast(addr) &&
+             (addr->u8[1] & 0x0f) == IPV6_ADDR_MCAST_SCP_SITE_LOCAL));
 }
 
 /**
@@ -367,7 +384,7 @@ static inline bool ng_ipv6_addr_is_site_local(const ng_ipv6_addr_t *addr)
  * @return  true, if @p addr is unique local unicast address,
  * @return  false, otherwise.
  */
-static inline bool ng_ipv6_addr_is_unique_local_unicast(const ng_ipv6_addr_t *addr)
+static inline bool ipv6_addr_is_unique_local_unicast(const ipv6_addr_t *addr)
 {
     return ((addr->u8[0] == 0xfc) || (addr->u8[0] == 0xfd));
 }
@@ -384,22 +401,22 @@ static inline bool ng_ipv6_addr_is_unique_local_unicast(const ng_ipv6_addr_t *ad
  * @return  true, if @p addr is global unicast address,
  * @return  false, otherwise.
  */
-static inline bool ng_ipv6_addr_is_global(const ng_ipv6_addr_t *addr)
+static inline bool ipv6_addr_is_global(const ipv6_addr_t *addr)
 {
     /* first check for multicast with global scope */
-    if (ng_ipv6_addr_is_multicast(addr)) {
-        return ((addr->u8[1] & 0x0f) == NG_IPV6_ADDR_MCAST_SCP_GLOBAL);
+    if (ipv6_addr_is_multicast(addr)) {
+        return ((addr->u8[1] & 0x0f) == IPV6_ADDR_MCAST_SCP_GLOBAL);
     }
     else {
         /* for unicast check if: */
         /* - not unspecific or loopback */
         return (!((addr->u64[0].u64 == 0) &&
-                    ((byteorder_ntohll(addr->u64[1]) & (0xfffffffffffffffe)) == 0)) &&
+                  ((byteorder_ntohll(addr->u64[1]) & (0xfffffffffffffffe)) == 0)) &&
                 /* - not link-local */
                 (byteorder_ntohll(addr->u64[0]) != 0xfe80000000000000) &&
                 /* - not site-local */
                 ((byteorder_ntohs(addr->u16[0]) & 0xffc0) !=
-                 NG_IPV6_ADDR_SITE_LOCAL_PREFIX));
+                 IPV6_ADDR_SITE_LOCAL_PREFIX));
     }
 }
 
@@ -416,7 +433,7 @@ static inline bool ng_ipv6_addr_is_global(const ng_ipv6_addr_t *addr)
  * @return  true, if @p addr is solicited-node multicast address,
  * @return  false, otherwise.
  */
-static inline bool ng_ipv6_addr_is_solicited_node(const ng_ipv6_addr_t *addr)
+static inline bool ipv6_addr_is_solicited_node(const ipv6_addr_t *addr)
 {
     return (byteorder_ntohll(addr->u64[0]) == 0xff02000000000000) &&
            (byteorder_ntohl(addr->u32[2]) == 1) &&
@@ -433,7 +450,7 @@ static inline bool ng_ipv6_addr_is_solicited_node(const ng_ipv6_addr_t *addr)
  *
  * @return  The number of bits @p a and @p b match in their prefix
  */
-uint8_t ng_ipv6_addr_match_prefix(const ng_ipv6_addr_t *a, const ng_ipv6_addr_t *b);
+uint8_t ipv6_addr_match_prefix(const ipv6_addr_t *a, const ipv6_addr_t *b);
 
 /**
  * @brief   Sets IPv6 address @p out with the first @p bits taken
@@ -444,8 +461,7 @@ uint8_t ng_ipv6_addr_match_prefix(const ng_ipv6_addr_t *a, const ng_ipv6_addr_t 
  * @param[in]   bits    Bits to be copied from @p prefix to @p out
  *                      (set to 128 when greater than 128).
  */
-void ng_ipv6_addr_init_prefix(ng_ipv6_addr_t *out, const ng_ipv6_addr_t *prefix,
-                              uint8_t bits);
+void ipv6_addr_init_prefix(ipv6_addr_t *out, const ipv6_addr_t *prefix, uint8_t bits);
 
 /**
  * @brief   Sets @p addr dynamically to the unspecified IPv6 address (::).
@@ -456,7 +472,7 @@ void ng_ipv6_addr_init_prefix(ng_ipv6_addr_t *out, const ng_ipv6_addr_t *prefix,
  *
  * @param[in,out] addr  The address to set.
  */
-static inline void ng_ipv6_addr_set_unspecified(ng_ipv6_addr_t *addr)
+static inline void ipv6_addr_set_unspecified(ipv6_addr_t *addr)
 {
     addr->u64[0].u64 = 0;
     addr->u64[1].u64 = 0;
@@ -471,7 +487,7 @@ static inline void ng_ipv6_addr_set_unspecified(ng_ipv6_addr_t *addr)
  *
  * @param[in,out] addr  The address to set.
  */
-static inline void ng_ipv6_addr_set_loopback(ng_ipv6_addr_t *addr)
+static inline void ipv6_addr_set_loopback(ipv6_addr_t *addr)
 {
     addr->u64[0].u64 = 0;
     addr->u64[1] = byteorder_htonll(1);
@@ -486,7 +502,7 @@ static inline void ng_ipv6_addr_set_loopback(ng_ipv6_addr_t *addr)
  *
  * @param[in,out] addr  The address to set.
  */
-static inline void ng_ipv6_addr_set_link_local_prefix(ng_ipv6_addr_t *addr)
+static inline void ipv6_addr_set_link_local_prefix(ipv6_addr_t *addr)
 {
     addr->u64[0] = byteorder_htonll(0xfe80000000000000);
 }
@@ -502,7 +518,7 @@ static inline void ng_ipv6_addr_set_link_local_prefix(ng_ipv6_addr_t *addr)
  * @param[in,out] addr  The address to set.
  * @param[in] iid       The interface ID as integer to set.
  */
-static inline void ng_ipv6_addr_set_iid(ng_ipv6_addr_t *addr, uint64_t iid)
+static inline void ipv6_addr_set_iid(ipv6_addr_t *addr, uint64_t iid)
 {
     addr->u64[1] = byteorder_htonll(iid);
 }
@@ -518,7 +534,7 @@ static inline void ng_ipv6_addr_set_iid(ng_ipv6_addr_t *addr, uint64_t iid)
  * @param[in,out] addr  The address to set.
  * @param[in] iid       The interface ID as array of at least length 8 to set.
  */
-static inline void ng_ipv6_addr_set_aiid(ng_ipv6_addr_t *addr, uint8_t *iid)
+static inline void ipv6_addr_set_aiid(ipv6_addr_t *addr, uint8_t *iid)
 {
     addr->u8[8]  = iid[0];
     addr->u8[9]  = iid[1];
@@ -541,9 +557,8 @@ static inline void ng_ipv6_addr_set_aiid(ng_ipv6_addr_t *addr, uint8_t *iid)
  * @param[in] flags     The multicast address' flags.
  * @param[in] scope     The multicast address' scope.
  */
-static inline void ng_ipv6_addr_set_multicast(ng_ipv6_addr_t *addr,
-        ng_ipv6_addr_mcast_flag_t flags,
-        ng_ipv6_addr_mcast_scp_t scope)
+static inline void ipv6_addr_set_multicast(ipv6_addr_t *addr, unsigned int flags,
+                                           unsigned int scope)
 {
     addr->u8[0] = 0xff;
     addr->u8[1] = (((uint8_t)flags) << 4) | (((uint8_t) scope) & 0x0f);
@@ -560,8 +575,7 @@ static inline void ng_ipv6_addr_set_multicast(ng_ipv6_addr_t *addr,
  * @param[in,out] addr  The address to set.
  * @param[in] scope     The multicast address' scope.
  */
-static inline void ng_ipv6_addr_set_all_nodes_multicast(ng_ipv6_addr_t *addr,
-        ng_ipv6_addr_mcast_scp_t scope)
+static inline void ipv6_addr_set_all_nodes_multicast(ipv6_addr_t *addr, unsigned int scope)
 {
     addr->u64[0] = byteorder_htonll(0xff00000000000000);
     addr->u8[1] = (uint8_t)scope;
@@ -579,8 +593,7 @@ static inline void ng_ipv6_addr_set_all_nodes_multicast(ng_ipv6_addr_t *addr,
  * @param[in,out] addr  The address to set.
  * @param[in] scope     The multicast address' scope.
  */
-static inline void ng_ipv6_addr_set_all_routers_multicast(ng_ipv6_addr_t *addr,
-        ng_ipv6_addr_mcast_scp_t scope)
+static inline void ipv6_addr_set_all_routers_multicast(ipv6_addr_t *addr, unsigned int scope)
 {
     addr->u64[0] = byteorder_htonll(0xff00000000000000);
     addr->u8[1] = (uint8_t)scope;
@@ -598,8 +611,7 @@ static inline void ng_ipv6_addr_set_all_routers_multicast(ng_ipv6_addr_t *addr,
  * @param[out]  out   Is set to solicited-node address of this node.
  * @param[in]   in    The IPv6 address the solicited-node address.
  */
-static inline void ng_ipv6_addr_set_solicited_nodes(ng_ipv6_addr_t *out,
-        const ng_ipv6_addr_t *in)
+static inline void ipv6_addr_set_solicited_nodes(ipv6_addr_t *out, const ipv6_addr_t *in)
 {
     out->u64[0] = byteorder_htonll(0xff02000000000000);
     out->u32[2] = byteorder_htonl(1);
@@ -623,8 +635,7 @@ static inline void ng_ipv6_addr_set_solicited_nodes(ng_ipv6_addr_t *out,
  * @return  NULL, if @p result_len was smaller than needed
  * @return  NULL, if @p result or @p addr was NULL
  */
-char *ng_ipv6_addr_to_str(char *result, const ng_ipv6_addr_t *addr,
-                          uint8_t result_len);
+char *ipv6_addr_to_str(char *result, const ipv6_addr_t *addr, uint8_t result_len);
 
 /**
  * @brief   Converts an IPv6 address string representation to a byte-represented
@@ -641,13 +652,13 @@ char *ng_ipv6_addr_to_str(char *result, const ng_ipv6_addr_t *addr,
  * @return  NULL, if @p addr was malformed
  * @return  NULL, if @p result or @p addr was NULL
  */
-ng_ipv6_addr_t *ng_ipv6_addr_from_str(ng_ipv6_addr_t *result, const char *addr);
+ipv6_addr_t *ipv6_addr_from_str(ipv6_addr_t *result, const char *addr);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* NG_IPV6_ADDR_H_ */
+#endif /* IPV6_ADDR_H_ */
 /**
  * @}
  */

@@ -23,7 +23,7 @@
 #include <stdbool.h>
 
 #include "byteorder.h"
-#include "net/ng_ipv6/addr.h"
+#include "net/ipv6/addr.h"
 #include "net/inet_csum.h"
 #include "net/ng_pkt.h"
 
@@ -92,8 +92,8 @@ typedef struct __attribute__((packed)) {
     network_uint16_t len;   /**< payload length of this packet. */
     uint8_t nh;             /**< type of next header in this packet. */
     uint8_t hl;             /**< hop limit for this packet. */
-    ng_ipv6_addr_t src;     /**< source address of this packet. */
-    ng_ipv6_addr_t dst;     /**< destination address of this packet. */
+    ipv6_addr_t src;        /**< source address of this packet. */
+    ipv6_addr_t dst;        /**< destination address of this packet. */
 } ng_ipv6_hdr_t;
 
 /**
@@ -295,7 +295,7 @@ static inline uint16_t ng_ipv6_hdr_inet_csum(uint16_t sum, ng_ipv6_hdr_t *hdr,
     }
 
     return inet_csum(sum + len + prot_num, hdr->src.u8,
-                     (2 * sizeof(ng_ipv6_addr_t)));
+                     (2 * sizeof(ipv6_addr_t)));
 }
 
 /**
@@ -308,11 +308,11 @@ static inline uint16_t ng_ipv6_hdr_inet_csum(uint16_t sum, ng_ipv6_hdr_t *hdr,
  * @param[in] src       Source address for the header. Can be NULL if not
  *                      known or required.
  * @param[in] src_len   Length of @p src. Can be 0 if not known or required or
- *                      must be `sizeof(ng_ipv6_addr_t)`.
+ *                      must be `sizeof(ipv6_addr_t)`.
  * @param[in] dst       Destination address for the header. Can be NULL if not
  *                      known or required.
  * @param[in] dst_len   Length of @p dst. Can be 0 if not known or required or
- *                      must be `sizeof(ng_ipv6_addr_t)`.
+ *                      must be `sizeof(ipv6_addr_t)`.
  *
  * @return  The an IPv6 header in packet buffer on success.
  * @return  NULL on error.
