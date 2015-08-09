@@ -1,7 +1,5 @@
 /*
- * Copyright (c) 2010, Mariano Alvira <mar@devl.org> and other contributors to
- * the MC1322x project (http://mc1322x.devl.org)
- * Copyright (C) 2014 Oliver Hahm <oliver.hahm@inria.fr>
+ * Copyright (C) 2015 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -9,170 +7,120 @@
  */
 
 /**
- * @ingroup     examples
+ * @defgroup    app_sniffer
+ * @brief       Sniffer application based on the new network stack
  * @{
  *
- * @file        main.c
+ * @file
+ * @brief       Sniffer application for RIOT
  *
- * @brief       Sniffer application for MSB-A2 and Wireshark
- *
- * @author      Oliver Hahm <oliver.hahm@inria.fr>
- * @author      Mariano Alvira <mar@devl.org>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
  * @}
  */
 
 #include <stdio.h>
-#include <string.h>
 
 #include "thread.h"
-#include "posix_io.h"
+#include "hwtimer.h"
 #include "shell.h"
 #include "shell_commands.h"
-#include "board_uart0.h"
-#include "hwtimer.h"
-#include "transceiver.h"
-#if MODULE_AT86RF231 || MODULE_CC2420 || MODULE_MC1322X
-#include "ieee802154_frame.h"
-#endif
-
-#define RCV_BUFFER_SIZE     (64)
-#define RADIO_STACK_SIZE    (KERNEL_CONF_STACKSIZE_MAIN)
-#define PER_ROW             (16)
-
-char radio_stack_buffer[RADIO_STACK_SIZE];
-msg_t msg_q[RCV_BUFFER_SIZE];
-transceiver_command_t tcmd;
-
-#if MODULE_AT86RF231 || MODULE_CC2420 || MODULE_MC1322X
-void print_packet(ieee802154_packet_t *p)
+#ifdef MODULE_NEWLIB
+#   include "uart_stdio.h"
 #else
-void print_packet(radio_packet_t *p)
+#   include "posix_io.h"
+#   include "board_uart0.h"
 #endif
+#include "net/ng_netbase.h"
+
+/**
+ * @brief   Buffer size used by the shell
+ */
+#define SHELL_BUFSIZE           (64U)
+
+/**
+ * @brief   Priority of the RAW dump thread
+ */
+#define RAWDUMP_PRIO            (THREAD_PRIORITY_MAIN - 1)
+
+/**
+ * @brief   Stack for the raw dump thread
+ */
+static char rawdmp_stack[THREAD_STACKSIZE_MAIN];
+
+/**
+ * @brief   Make a raw dump of the given packet contents
+ */
+void dump_pkt(ng_pktsnip_t *pkt)
 {
-    volatile uint8_t i, j, k;
+    ng_pktsnip_t *snip = pkt;
 
-    if (p) {
-        printf("len 0x%02x lqi 0x%02x rx_time 0x%08lx", p->length, p->lqi, hwtimer_now());
+    printf("rftest-rx --- len 0x%02x lqi 0x%02x rx_time 0x%08lx\n\n",
+           ng_pkt_len(pkt), 0, hwtimer_now());
 
-        for (j = 0, k = 0; j <= ((p->length) / PER_ROW); j++) {
-            printf("\n\r");
-
-            for (i = 0; i < PER_ROW; i++, k++) {
-                if (k >= p->length) {
-                    printf("\n\r");
-                    return;
-                }
-
-#if MODULE_AT86RF231 || MODULE_CC2420 || MODULE_MC1322X
-                printf("%02x ", p->frame.payload[j * PER_ROW + i]);
-#else
-                printf("%02x ", p->data[j * PER_ROW + i]);
-#endif
-            }
+    while (snip) {
+        for (size_t i = 0; i < snip->size; i++) {
+            printf("0x%02x ", ((uint8_t *)(snip->data))[i]);
         }
+        snip = snip->next;
     }
+    puts("\n");
 
-    printf("\n\r");
-    return;
+    ng_pktbuf_release(pkt);
 }
 
-void *radio(void *unused)
+/**
+ * @brief   Event loop of the RAW dump thread
+ *
+ * @param[in] arg   unused parameter
+ */
+void *rawdump(void *arg)
 {
-    (void) unused;
-
-    msg_t m;
-#if MODULE_AT86RF231 || MODULE_CC2420 || MODULE_MC1322X
-    ieee802154_packet_t  *p;
-#else
-    radio_packet_t *p;
-#endif
-
-    msg_init_queue(msg_q, RCV_BUFFER_SIZE);
+    (void)arg;
+    msg_t msg;
 
     while (1) {
-        msg_receive(&m);
+        msg_receive(&msg);
 
-        if (m.type == PKT_PENDING) {
-#if MODULE_AT86RF231 || MODULE_CC2420 || MODULE_MC1322X
-            p = (ieee802154_packet_t *) m.content.ptr;
-#else
-            p = (radio_packet_t *) m.content.ptr;
-#endif
-            printf("rftest-rx --- ");
-            print_packet(p);
-            p->processing--;
-        }
-        else if (m.type == ENOBUFFER) {
-            puts("Transceiver buffer full");
-        }
-        else {
-            puts("Unknown packet received");
+        switch (msg.type) {
+            case NG_NETAPI_MSG_TYPE_RCV:
+                dump_pkt((ng_pktsnip_t *)msg.content.ptr);
+                break;
+            default:
+                /* do nothing */
+                break;
         }
     }
 
+    /* never reached */
     return NULL;
 }
 
-void init_transceiver(void)
-{
-    kernel_pid_t radio_pid = thread_create(
-                        radio_stack_buffer,
-                        sizeof(radio_stack_buffer),
-                        PRIORITY_MAIN - 2,
-                        CREATE_STACKTEST,
-                        radio,
-                        NULL,
-                        "radio");
-
-    uint16_t transceivers = TRANSCEIVER_DEFAULT;
-
-    transceiver_init(transceivers);
-    transceiver_start();
-    transceiver_register(transceivers, radio_pid);
-
-    msg_t mesg;
-    mesg.type = SET_CHANNEL;
-    mesg.content.ptr = (char *) &tcmd;
-
-    uint16_t c = 10;
-
-    tcmd.transceivers = TRANSCEIVER_DEFAULT;
-    tcmd.data = &c;
-    printf("Set transceiver to channel %u\n", c);
-    msg_send(&mesg, transceiver_pid);
-
-    mesg.type = SET_MONITOR;
-    mesg.content.ptr = (char *) &tcmd;
-
-    uint16_t v = 1;
-
-    tcmd.data = &v;
-    printf("Set transceiver into monitor mode\n");
-    msg_send(&mesg, transceiver_pid);
-}
-
-static int shell_readc(void)
-{
-    char c = 0;
-    posix_read(uart0_handler_pid, &c, 1);
-    return c;
-}
-
-static void shell_putchar(int c)
-{
-    putchar(c);
-}
-
+/**
+ * @brief   Maybe you are a golfer?!
+ */
 int main(void)
 {
     shell_t shell;
-    posix_open(uart0_handler_pid, 0);
-    init_transceiver();
+    ng_netreg_entry_t dump;
 
-    puts("Welcome to RIOT!");
+    puts("RIOT sniffer application");
 
-    shell_init(&shell, NULL, UART0_BUFSIZE, shell_readc, shell_putchar);
+    /* start and register rawdump thread */
+    puts("Run the rawdump thread and register it");
+    dump.pid = thread_create(rawdmp_stack, sizeof(rawdmp_stack), RAWDUMP_PRIO,
+                             CREATE_STACKTEST, rawdump, NULL, "rawdump");
+    dump.demux_ctx = NG_NETREG_DEMUX_CTX_ALL;
+    ng_netreg_register(NG_NETTYPE_UNDEF, &dump);
+
+    /* start the shell */
+    puts("All ok, starting the shell now");
+#ifndef MODULE_NEWLIB
+    (void) posix_open(uart0_handler_pid, 0);
+    shell_init(&shell, NULL, SHELL_BUFSIZE, uart0_readc, uart0_putc);
+#else
+    shell_init(&shell, NULL, SHELL_BUFSIZE, getchar, putchar);
+#endif
     shell_run(&shell);
 
     return 0;
