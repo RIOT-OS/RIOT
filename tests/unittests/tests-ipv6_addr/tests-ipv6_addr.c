@@ -115,17 +115,17 @@ static void test_ipv6_addr_is_unspecified_unspecified(void)
     TEST_ASSERT_EQUAL_INT(true, ng_ipv6_addr_is_unspecified(&a));
 }
 
-static void test_ipv6_addr_is_global_unicast_is_link_local(void)
+static void test_ipv6_addr_is_global_is_link_local(void)
 {
     ng_ipv6_addr_t a = { {
             0xfe, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
             0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
         }
     };
-    TEST_ASSERT_EQUAL_INT(false, ng_ipv6_addr_is_global_unicast(&a));
+    TEST_ASSERT_EQUAL_INT(false, ng_ipv6_addr_is_global(&a));
 }
 
-static void test_ipv6_addr_is_global_unicast1(void)
+static void test_ipv6_addr_is_global1(void)
 {
     /* riot-os.org has IPv6 address 2a01:4f8:151:64::11 */
     ng_ipv6_addr_t a = { {
@@ -133,17 +133,37 @@ static void test_ipv6_addr_is_global_unicast1(void)
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x11
     }
     };
-    TEST_ASSERT_EQUAL_INT(true, ng_ipv6_addr_is_global_unicast(&a));
+    TEST_ASSERT_EQUAL_INT(true, ng_ipv6_addr_is_global(&a));
 }
 
-static void test_ipv6_addr_is_global_unicast2(void)
+static void test_ipv6_addr_is_global2(void)
 {
     ng_ipv6_addr_t a = { {
             0xaf, 0xfe, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
             0xbe, 0xef, 0xca, 0xfe, 0x12, 0x34, 0xab, 0xcd
     }
     };
-    TEST_ASSERT_EQUAL_INT(true, ng_ipv6_addr_is_global_unicast(&a));
+    TEST_ASSERT_EQUAL_INT(true, ng_ipv6_addr_is_global(&a));
+}
+
+static void test_ipv6_addr_is_global_multicast_not_global(void)
+{
+    ng_ipv6_addr_t a = { {
+            0xff, 0x15, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
+            0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
+        }
+    };
+    TEST_ASSERT_EQUAL_INT(false, ng_ipv6_addr_is_global(&a));
+}
+
+static void test_ipv6_addr_is_global_multicast(void)
+{
+    ng_ipv6_addr_t a = { {
+            0xff, 0x1e, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
+            0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
+        }
+    };
+    TEST_ASSERT_EQUAL_INT(true, ng_ipv6_addr_is_global(&a));
 }
 
 static void test_ipv6_addr_is_ipv4_compat_not_ipv4_compat1(void)
@@ -974,9 +994,11 @@ Test *tests_ipv6_addr_tests(void)
         new_TestFixture(test_ipv6_addr_equal_equal),
         new_TestFixture(test_ipv6_addr_is_unspecified_not_unspecified),
         new_TestFixture(test_ipv6_addr_is_unspecified_unspecified),
-        new_TestFixture(test_ipv6_addr_is_global_unicast_is_link_local),
-        new_TestFixture(test_ipv6_addr_is_global_unicast1),
-        new_TestFixture(test_ipv6_addr_is_global_unicast2),
+        new_TestFixture(test_ipv6_addr_is_global_is_link_local),
+        new_TestFixture(test_ipv6_addr_is_global1),
+        new_TestFixture(test_ipv6_addr_is_global2),
+        new_TestFixture(test_ipv6_addr_is_global_multicast_not_global),
+        new_TestFixture(test_ipv6_addr_is_global_multicast),
         new_TestFixture(test_ipv6_addr_is_ipv4_compat_not_ipv4_compat1),
         new_TestFixture(test_ipv6_addr_is_ipv4_compat_not_ipv4_compat2),
         new_TestFixture(test_ipv6_addr_is_ipv4_compat_ipv4_compat),
