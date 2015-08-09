@@ -403,24 +403,20 @@ static void test_ipv6_netif_match_prefix__success3(void)
 
 static void test_ipv6_netif_find_best_src_addr__no_unicast(void)
 {
-    ipv6_addr_t ll_addr1 = IPV6_ADDR_UNSPECIFIED;
-    ipv6_addr_t ll_addr2 = IPV6_ADDR_UNSPECIFIED;
-    ipv6_addr_t mc_addr = IPV6_ADDR_ALL_NODES_LINK_LOCAL;
+    ipv6_addr_t ll_dst_addr = IPV6_ADDR_UNSPECIFIED;
+    ipv6_addr_t mc_addr1 = IPV6_ADDR_ALL_NODES_LINK_LOCAL;
+    ipv6_addr_t mc_addr2 = IPV6_ADDR_ALL_ROUTERS_SITE_LOCAL;
 
-    ll_addr1.u8[15] = 1;
-    ipv6_addr_set_link_local_prefix(&ll_addr1);
-    ll_addr2.u8[15] = 2;
-    ipv6_addr_set_link_local_prefix(&ll_addr2);
-
-    TEST_ASSERT_EQUAL_INT(126, ipv6_addr_match_prefix(&ll_addr2, &ll_addr1));
+    ll_dst_addr.u8[15] = 1;
+    ipv6_addr_set_link_local_prefix(&ll_dst_addr);
 
     test_ipv6_netif_add__success(); /* adds DEFAULT_TEST_NETIF as interface */
-    TEST_ASSERT_NOT_NULL(ng_ipv6_netif_add_addr(DEFAULT_TEST_NETIF, &mc_addr, DEFAULT_TEST_PREFIX_LEN,
+    TEST_ASSERT_NOT_NULL(ng_ipv6_netif_add_addr(DEFAULT_TEST_NETIF, &mc_addr1, DEFAULT_TEST_PREFIX_LEN,
                          0));
-    TEST_ASSERT_NOT_NULL(ng_ipv6_netif_add_addr(DEFAULT_TEST_NETIF, &ll_addr1, DEFAULT_TEST_PREFIX_LEN,
-                         NG_IPV6_NETIF_ADDR_FLAGS_NON_UNICAST));
+    TEST_ASSERT_NOT_NULL(ng_ipv6_netif_add_addr(DEFAULT_TEST_NETIF, &mc_addr2, DEFAULT_TEST_PREFIX_LEN,
+                         0));
 
-    TEST_ASSERT_NULL(ng_ipv6_netif_find_best_src_addr(DEFAULT_TEST_NETIF, &ll_addr2));
+    TEST_ASSERT_NULL(ng_ipv6_netif_find_best_src_addr(DEFAULT_TEST_NETIF, &ll_dst_addr));
 }
 
 static void test_ipv6_netif_find_best_src_addr__success(void)
