@@ -145,6 +145,7 @@ endif
 ifneq (,$(filter ng_udp,$(USEMODULE)))
   USEMODULE += ng_netbase
   USEMODULE += inet_csum
+  USEMODULE += udp
 endif
 
 ifneq (,$(filter ng_nettest,$(USEMODULE)))
