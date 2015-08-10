@@ -26,7 +26,7 @@
 #include "kernel.h"
 #include "shell.h"
 #include "shell_commands.h"
-#include "net/ng_netbase.h"
+#include "net/gnrc.h"
 #include "net/ng_nomac.h"
 #include "net/ng_pktdump.h"
 #include "net/ng_netdev_eth.h"

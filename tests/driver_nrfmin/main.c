@@ -24,7 +24,7 @@
 #include "posix_io.h"
 #include "board_uart0.h"
 #include "nrfmin.h"
-#include "net/ng_netbase.h"
+#include "net/gnrc.h"
 #include "net/ng_nomac.h"
 #include "net/ng_pktdump.h"
 

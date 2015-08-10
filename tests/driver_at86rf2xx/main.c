@@ -25,7 +25,7 @@
 #include "posix_io.h"
 #include "board_uart0.h"
 #include "net/ng_pktdump.h"
-#include "net/ng_netbase.h"
+#include "net/gnrc.h"
 
 /**
  * @brief   Buffer size used by the shell

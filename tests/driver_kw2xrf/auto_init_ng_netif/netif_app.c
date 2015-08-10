@@ -25,7 +25,7 @@
 #include "kernel.h"
 #include "kw2xrf.h"
 #include "net/ng_nomac.h"
-#include "net/ng_netbase.h"
+#include "net/gnrc.h"
 
 /* make sure the SPI port and the needed GPIO pins are defined */
 #ifndef KWRF_SPI

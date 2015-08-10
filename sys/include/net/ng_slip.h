@@ -26,7 +26,7 @@
 
 #include <inttypes.h>
 
-#include "net/ng_netbase.h"
+#include "net/gnrc.h"
 #include "periph/uart.h"
 #include "ringbuffer.h"
 

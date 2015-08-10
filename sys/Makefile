@@ -28,6 +28,9 @@ endif
 ifneq (,$(filter ipv6_hdr,$(USEMODULE)))
     DIRS += net/network_layer/ipv6/hdr
 endif
+ifneq (,$(filter gnrc gnrc_%,$(USEMODULE)))
+    DIRS += net/gnrc
+endif
 ifneq (,$(filter ng_icmpv6,$(USEMODULE)))
     DIRS += net/network_layer/ng_icmpv6
 endif

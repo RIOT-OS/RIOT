@@ -8,7 +8,7 @@ USEMODULE += shell_commands
 USEMODULE += ps
 USEMODULE += uart0
 USEMODULE += radio_nrfmin
-USEMODULE += ng_netbase
+USEMODULE += gnrc
 USEMODULE += ng_nomac
 USEMODULE += ng_pktdump
 

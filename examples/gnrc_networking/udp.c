@@ -22,7 +22,7 @@
 #include <inttypes.h>
 
 #include "kernel.h"
-#include "net/ng_netbase.h"
+#include "net/gnrc.h"
 #include "net/ng_ipv6.h"
 #include "net/ng_udp.h"
 #include "net/ng_pktdump.h"

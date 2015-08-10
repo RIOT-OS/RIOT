@@ -24,7 +24,7 @@
 #include "msg.h"
 #include "periph/gpio.h"
 #include "periph/cpuid.h"
-#include "net/ng_netbase.h"
+#include "net/gnrc.h"
 #include "net/ieee802154.h"
 
 #define ENABLE_DEBUG    (0)

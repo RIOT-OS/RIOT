@@ -26,7 +26,7 @@
 #include "periph_conf.h"
 #include "periph/cpuid.h"
 #include "nrfmin.h"
-#include "net/ng_netbase.h"
+#include "net/gnrc.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
