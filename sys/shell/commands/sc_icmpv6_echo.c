@@ -80,7 +80,7 @@ static inline bool _expected_seq(uint16_t seq)
 int _handle_reply(ng_pktsnip_t *pkt, uint64_t time)
 {
     ng_pktsnip_t *ipv6, *icmpv6;
-    ng_ipv6_hdr_t *ipv6_hdr;
+    ipv6_hdr_t *ipv6_hdr;
     ng_icmpv6_echo_t *icmpv6_hdr;
     uint16_t seq;
 

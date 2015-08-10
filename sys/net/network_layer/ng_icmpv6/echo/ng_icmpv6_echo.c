@@ -17,6 +17,7 @@
 #include "od.h"
 #include "net/ng_icmpv6.h"
 #include "net/ng_icmpv6/echo.h"
+#include "net/ng_ipv6/hdr.h"
 #include "utlist.h"
 
 #define ENABLE_DEBUG    (0)

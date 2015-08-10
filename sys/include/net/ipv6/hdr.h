@@ -23,6 +23,7 @@
 #include <stdint.h>
 
 #include "byteorder.h"
+#include "net/inet_csum.h"
 #include "net/ipv6/addr.h"
 
 #ifdef __cplusplus

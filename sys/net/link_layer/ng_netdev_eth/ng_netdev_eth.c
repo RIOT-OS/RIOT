@@ -365,8 +365,8 @@ static inline void _addr_set_multicast(uint8_t *dst, ng_pktsnip_t *payload)
             if ((payload != NULL) && (payload->data != NULL)) {
                 ipv6_hdr_t *hdr = payload->data;
                 uint16_t *prefix = (uint16_t *)(&dst[2]);
-                prefix[0] = hdr->dst.u16[6];
-                prefix[1] = hdr->dst.u16[7];
+                prefix[0] = hdr->dst.u16[6].u16;
+                prefix[1] = hdr->dst.u16[7].u16;
             }
             break;
 #endif

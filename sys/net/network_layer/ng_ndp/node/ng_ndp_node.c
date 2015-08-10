@@ -63,7 +63,12 @@ kernel_pid_t ng_ndp_node_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_len,
     ipv6_addr_t *next_hop_ip = NULL, *prefix = NULL;
 
 #ifdef MODULE_NG_IPV6_EXT_RH
-    next_hop_ip = ng_ipv6_ext_rh_next_hop(hdr);
+    ipv6_hdr_t *hdr;
+    ng_pktsnip_t *ipv6;
+    LL_SEARCH_SCALAR(pkt, ipv6, type, NG_NETTYPE_IPV6);
+    assert(ipv6);
+    hdr = ipv6->data;
+    next_hop_ip = ipv6_ext_rh_next_hop(hdr);
 #endif
 #ifdef MODULE_FIB
     /* don't look-up link local addresses in FIB */

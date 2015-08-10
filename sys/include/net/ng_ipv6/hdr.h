@@ -21,6 +21,7 @@
 
 #include <stdint.h>
 
+#include "net/ipv6/hdr.h"
 #include "net/ng_pkt.h"
 
 #ifdef __cplusplus
