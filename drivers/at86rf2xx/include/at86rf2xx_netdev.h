@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     drivers_ng_at86rf2xx
+ * @ingroup     drivers_at86rf2xx
  * @{
  *
  * @file
@@ -16,8 +16,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef NG_AT86RF2XX_NETDEV_H_
-#define NG_AT86RF2XX_NETDEV_H_
+#ifndef AT86RF2XX_NETDEV_H_
+#define AT86RF2XX_NETDEV_H_
 
 #include "net/ng_netdev.h"
 
@@ -28,11 +28,11 @@ extern "C" {
 /**
  * @brief   Reference to the netdev device driver struct
  */
-extern const ng_netdev_driver_t ng_at86rf2xx_driver;
+extern const ng_netdev_driver_t at86rf2xx_driver;
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* NG_AT86RF2XX_NETDEV_H_ */
+#endif /* AT86RF2XX_NETDEV_H_ */
 /** @} */

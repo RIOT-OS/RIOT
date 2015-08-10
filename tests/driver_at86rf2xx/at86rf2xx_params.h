@@ -20,8 +20,8 @@
 extern "C" {
 #endif
 
-#ifndef NG_AT86RF2XX_PARAMS_H
-#define NG_AT86RF2XX_PARAMS_H
+#ifndef AT86RF2XX_PARAMS_H
+#define AT86RF2XX_PARAMS_H
 
 /**
  * @brief make sure the SPI port and the needed GPIO pins are defined
@@ -66,5 +66,5 @@ static const  at86rf2xx_params_t at86rf2xx_params[] =
 #ifdef __cplusplus
 }
 #endif
-#endif /* NG_AT86RF2XX_PARAMS_H */
+#endif /* AT86RF2XX_PARAMS_H */
 /** @} */

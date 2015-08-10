@@ -11,7 +11,7 @@ ifneq (,$(filter ng_nomac,$(USEMODULE)))
 endif
 
 ifneq (,$(filter ng_at86rf2%,$(USEMODULE)))
-  USEMODULE += ng_at86rf2xx
+  USEMODULE += at86rf2xx
   USEMODULE += ieee802154
 endif
 

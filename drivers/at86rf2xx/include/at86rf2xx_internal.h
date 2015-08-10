@@ -8,7 +8,7 @@
  */
 
 /**
- * @ingroup     drivers_ng_at86rf2xx
+ * @ingroup     drivers_at86rf2xx
  * @{
  *
  * @file
@@ -19,12 +19,12 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef NG_AT86RF2XX_INTERNAL_H_
-#define NG_AT86RF2XX_INTERNAL_H_
+#ifndef AT86RF2XX_INTERNAL_H_
+#define AT86RF2XX_INTERNAL_H_
 
 #include <stdint.h>
 
-#include "ng_at86rf2xx.h"
+#include "at86rf2xx.h"
 
 
 #ifdef __cplusplus
@@ -39,7 +39,7 @@ extern "C" {
  *
  * @return              the value of the specified register
  */
-uint8_t ng_at86rf2xx_reg_read(const ng_at86rf2xx_t *dev, const uint8_t addr);
+uint8_t at86rf2xx_reg_read(const at86rf2xx_t *dev, const uint8_t addr);
 
 /**
  * @brief   Write to a register at address `addr` from device `dev`.
@@ -48,8 +48,8 @@ uint8_t ng_at86rf2xx_reg_read(const ng_at86rf2xx_t *dev, const uint8_t addr);
  * @param[in] addr      address of the register to write
  * @param[in] value     value to write to the given register
  */
-void ng_at86rf2xx_reg_write(const ng_at86rf2xx_t *dev, const uint8_t addr,
-                            const uint8_t value);
+void at86rf2xx_reg_write(const at86rf2xx_t *dev, const uint8_t addr,
+                         const uint8_t value);
 
 /**
  * @brief   Read a chunk of data from the SRAM of the given device
@@ -59,10 +59,10 @@ void ng_at86rf2xx_reg_write(const ng_at86rf2xx_t *dev, const uint8_t addr,
  * @param[out] data     buffer to read data into
  * @param[in]  len      number of bytes to read from SRAM
  */
-void ng_at86rf2xx_sram_read(const ng_at86rf2xx_t *dev,
-                            const uint8_t offset,
-                            uint8_t *data,
-                            const size_t len);
+void at86rf2xx_sram_read(const at86rf2xx_t *dev,
+                         const uint8_t offset,
+                         uint8_t *data,
+                         const size_t len);
 
 /**
  * @brief   Write a chunk of data into the SRAM of the given device
@@ -72,10 +72,10 @@ void ng_at86rf2xx_sram_read(const ng_at86rf2xx_t *dev,
  * @param[in] data      data to copy into SRAM
  * @param[in] len       number of bytes to write to SRAM
  */
-void ng_at86rf2xx_sram_write(const ng_at86rf2xx_t *dev,
-                             const uint8_t offset,
-                             const uint8_t *data,
-                             const size_t len);
+void at86rf2xx_sram_write(const at86rf2xx_t *dev,
+                          const uint8_t offset,
+                          const uint8_t *data,
+                          const size_t len);
 
 /**
  * @brief   Read the internal frame buffer of the given device
@@ -87,8 +87,8 @@ void ng_at86rf2xx_sram_write(const ng_at86rf2xx_t *dev,
  * @param[out] data     buffer to copy the data to
  * @param[in]  len      number of bytes to read from the frame buffer
  */
-void ng_at86rf2xx_fb_read(const ng_at86rf2xx_t *dev,
-                          uint8_t *data, const size_t len);
+void at86rf2xx_fb_read(const at86rf2xx_t *dev,
+                       uint8_t *data, const size_t len);
 
 /**
  * @brief   Convenience function for reading the status of the given device
@@ -97,11 +97,11 @@ void ng_at86rf2xx_fb_read(const ng_at86rf2xx_t *dev,
  *
  * @return              internal status of the given device
  */
-uint8_t ng_at86rf2xx_get_status(const ng_at86rf2xx_t *dev);
+uint8_t at86rf2xx_get_status(const at86rf2xx_t *dev);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* NG_AT86RF2XX_INTERNAL_H_ */
+#endif /* AT86RF2XX_INTERNAL_H_ */
 /** @} */
