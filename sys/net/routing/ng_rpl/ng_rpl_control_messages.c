@@ -15,6 +15,8 @@
  * @author  Cenk Gündoğan <cnkgndgn@gmail.com>
  */
 
+#include "net/icmpv6.h"
+#include "net/ng_icmpv6.h"
 #include "net/ng_rpl.h"
 #include "inet_ntop.h"
 
@@ -91,21 +93,21 @@ void ng_rpl_send_DIO(ng_rpl_dodag_t *dodag, ipv6_addr_t *destination)
     }
 
     ng_pktsnip_t *pkt;
-    ng_icmpv6_hdr_t *icmp;
+    icmpv6_hdr_t *icmp;
     ng_rpl_dio_t *dio;
     uint8_t *pos;
-    int size = sizeof(ng_icmpv6_hdr_t) + sizeof(ng_rpl_dio_t);
+    int size = sizeof(icmpv6_hdr_t) + sizeof(ng_rpl_dio_t);
 
     if ((dodag->dodag_conf_counter % 3) == 0) {
         size += sizeof(ng_rpl_opt_dodag_conf_t);
     }
 
-    if ((pkt = ng_icmpv6_build(NULL, NG_ICMPV6_RPL_CTRL, NG_RPL_ICMPV6_CODE_DIO, size)) == NULL) {
+    if ((pkt = ng_icmpv6_build(NULL, ICMPV6_RPL_CTRL, NG_RPL_ICMPV6_CODE_DIO, size)) == NULL) {
         DEBUG("RPL: Send DIO - no space left in packet buffer\n");
         return;
     }
 
-    icmp = (ng_icmpv6_hdr_t *)pkt->data;
+    icmp = (icmpv6_hdr_t *)pkt->data;
     dio = (ng_rpl_dio_t *)(icmp + 1);
     pos = (uint8_t *) dio;
     dio->instance_id = dodag->instance->id;
@@ -146,19 +148,19 @@ void ng_rpl_send_DIS(ng_rpl_dodag_t *dodag, ipv6_addr_t *destination)
 {
     (void) dodag;
     ng_pktsnip_t *pkt;
-    ng_icmpv6_hdr_t *icmp;
+    icmpv6_hdr_t *icmp;
     ng_rpl_dis_t *dis;
     /* TODO: Currently the DIS is too small so that wireshark complains about an incorrect
      * ethernet frame check sequence. In order to prevent this, 4 PAD1 options are added.
      * This will be addressed in follow-up PRs */
-    int size = sizeof(ng_icmpv6_hdr_t) + sizeof(ng_rpl_dis_t) + 4;
+    int size = sizeof(icmpv6_hdr_t) + sizeof(ng_rpl_dis_t) + 4;
 
-    if ((pkt = ng_icmpv6_build(NULL, NG_ICMPV6_RPL_CTRL, NG_RPL_ICMPV6_CODE_DIS, size)) == NULL) {
+    if ((pkt = ng_icmpv6_build(NULL, ICMPV6_RPL_CTRL, NG_RPL_ICMPV6_CODE_DIS, size)) == NULL) {
         DEBUG("RPL: Send DIS - no space left in packet buffer\n");
         return;
     }
 
-    icmp = (ng_icmpv6_hdr_t *)pkt->data;
+    icmp = (icmpv6_hdr_t *)pkt->data;
     dis = (ng_rpl_dis_t *)(icmp + 1);
     dis->flags = 0;
     dis->reserved = 0;
@@ -301,7 +303,7 @@ void ng_rpl_recv_DIO(ng_rpl_dio_t *dio, ipv6_addr_t *src, uint16_t len)
     ng_rpl_instance_t *inst = NULL;
     ng_rpl_dodag_t *dodag = NULL;
 
-    len -= (sizeof(ng_rpl_dio_t) + sizeof(ng_icmpv6_hdr_t));
+    len -= (sizeof(ng_rpl_dio_t) + sizeof(icmpv6_hdr_t));
 
     if (ng_rpl_instance_add(dio->instance_id, &inst)) {
         inst->mop = (dio->g_mop_prf >> NG_RPL_MOP_SHIFT) & NG_RPL_SHIFTED_MOP_MASK;
@@ -451,7 +453,7 @@ void ng_rpl_send_DAO(ng_rpl_dodag_t *dodag, ipv6_addr_t *destination, uint8_t li
     }
 
     ng_pktsnip_t *pkt;
-    ng_icmpv6_hdr_t *icmp;
+    icmpv6_hdr_t *icmp;
     ng_rpl_dao_t *dao;
     ng_rpl_opt_target_t *target;
     ng_rpl_opt_transit_t *transit;
@@ -476,15 +478,15 @@ void ng_rpl_send_DAO(ng_rpl_dodag_t *dodag, ipv6_addr_t *destination, uint8_t li
     ipv6_addr_init_prefix(&prefix, me, me_netif->prefix_len);
     fib_get_destination_set(prefix.u8, sizeof(ipv6_addr_t), fib_dest_set, &dst_size);
 
-    int size = sizeof(ng_icmpv6_hdr_t) + sizeof(ng_rpl_dao_t) +
+    int size = sizeof(icmpv6_hdr_t) + sizeof(ng_rpl_dao_t) +
         (sizeof(ng_rpl_opt_target_t) * (dst_size + 1)) + sizeof(ng_rpl_opt_transit_t);
 
-    if ((pkt = ng_icmpv6_build(NULL, NG_ICMPV6_RPL_CTRL, NG_RPL_ICMPV6_CODE_DAO, size)) == NULL) {
+    if ((pkt = ng_icmpv6_build(NULL, ICMPV6_RPL_CTRL, NG_RPL_ICMPV6_CODE_DAO, size)) == NULL) {
         DEBUG("RPL: Send DAO - no space left in packet buffer\n");
         return;
     }
 
-    icmp = (ng_icmpv6_hdr_t *)pkt->data;
+    icmp = (icmpv6_hdr_t *)pkt->data;
     dao = (ng_rpl_dao_t *)(icmp + 1);
 
     dao->instance_id = dodag->instance->id;
@@ -526,16 +528,16 @@ void ng_rpl_send_DAO_ACK(ng_rpl_dodag_t *dodag, ipv6_addr_t *destination, uint8_
     }
 
     ng_pktsnip_t *pkt;
-    ng_icmpv6_hdr_t *icmp;
+    icmpv6_hdr_t *icmp;
     ng_rpl_dao_ack_t *dao_ack;
-    int size = sizeof(ng_icmpv6_hdr_t) + sizeof(ng_rpl_dao_ack_t);
+    int size = sizeof(icmpv6_hdr_t) + sizeof(ng_rpl_dao_ack_t);
 
-    if ((pkt = ng_icmpv6_build(NULL, NG_ICMPV6_RPL_CTRL, NG_RPL_ICMPV6_CODE_DAO_ACK, size)) == NULL) {
+    if ((pkt = ng_icmpv6_build(NULL, ICMPV6_RPL_CTRL, NG_RPL_ICMPV6_CODE_DAO_ACK, size)) == NULL) {
         DEBUG("RPL: Send DAOACK - no space left in packet buffer\n");
         return;
     }
 
-    icmp = (ng_icmpv6_hdr_t *)pkt->data;
+    icmp = (icmpv6_hdr_t *)pkt->data;
     dao_ack = (ng_rpl_dao_ack_t *)(icmp + 1);
 
     dao_ack->instance_id = dodag->instance->id;
@@ -569,7 +571,7 @@ void ng_rpl_recv_DAO(ng_rpl_dao_t *dao, ipv6_addr_t *src, uint16_t len)
         return;
     }
 
-    len -= (sizeof(ng_rpl_dao_t) + sizeof(ng_icmpv6_hdr_t));
+    len -= (sizeof(ng_rpl_dao_t) + sizeof(icmpv6_hdr_t));
     if(!_parse_options(NG_RPL_ICMPV6_CODE_DAO, dodag, (ng_rpl_opt_t *) (dao + 1), len, src)) {
         ng_rpl_dodag_remove(dodag);
         return;

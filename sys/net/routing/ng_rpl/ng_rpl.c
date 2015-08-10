@@ -13,6 +13,7 @@
  *
  * @author  Cenk Gündoğan <cnkgndgn@gmail.com>
  */
+#include "net/icmpv6.h"
 #include "net/ng_rpl.h"
 
 #define ENABLE_DEBUG    (0)
@@ -52,7 +53,7 @@ kernel_pid_t ng_rpl_init(kernel_pid_t if_pid)
             return KERNEL_PID_UNDEF;
         }
 
-        _me_reg.demux_ctx = NG_ICMPV6_RPL_CTRL;
+        _me_reg.demux_ctx = ICMPV6_RPL_CTRL;
         _me_reg.pid = ng_rpl_pid;
         /* register interest in all ICMPv6 packets */
         ng_netreg_register(NG_NETTYPE_ICMPV6, &_me_reg);
@@ -147,12 +148,12 @@ static void _receive(ng_pktsnip_t *icmpv6)
 {
     ng_pktsnip_t *ipv6 = NULL;
     ipv6_hdr_t *ipv6_hdr = NULL;
-    ng_icmpv6_hdr_t *icmpv6_hdr = NULL;
+    icmpv6_hdr_t *icmpv6_hdr = NULL;
 
     LL_SEARCH_SCALAR(icmpv6, ipv6, type, NG_NETTYPE_IPV6);
     ipv6_hdr = (ipv6_hdr_t *)ipv6->data;
 
-    icmpv6_hdr = (ng_icmpv6_hdr_t *)icmpv6->data;
+    icmpv6_hdr = (icmpv6_hdr_t *)icmpv6->data;
     switch (icmpv6_hdr->code) {
         case NG_RPL_ICMPV6_CODE_DIS:
             DEBUG("RPL: DIS received\n");

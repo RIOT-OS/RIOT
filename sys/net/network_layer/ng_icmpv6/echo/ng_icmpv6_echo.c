@@ -32,15 +32,15 @@ ng_pktsnip_t *ng_icmpv6_echo_build(uint8_t type, uint16_t id, uint16_t seq,
                                    uint8_t *data, size_t data_len)
 {
     ng_pktsnip_t *pkt;
-    ng_icmpv6_echo_t *echo;
+    icmpv6_echo_t *echo;
 
-    if ((pkt = ng_icmpv6_build(NULL, type, 0, data_len + sizeof(ng_icmpv6_echo_t))) == NULL) {
+    if ((pkt = ng_icmpv6_build(NULL, type, 0, data_len + sizeof(icmpv6_echo_t))) == NULL) {
         return NULL;
     }
 
     DEBUG("icmpv6_echo: Building echo message with type=%" PRIu8 "id=%" PRIu16
           ", seq=%" PRIu16, type, id, seq);
-    echo = (ng_icmpv6_echo_t *)pkt->data;
+    echo = (icmpv6_echo_t *)pkt->data;
     echo->id = byteorder_htons(id);
     echo->seq = byteorder_htons(seq);
 
@@ -62,21 +62,21 @@ ng_pktsnip_t *ng_icmpv6_echo_build(uint8_t type, uint16_t id, uint16_t seq,
 }
 
 void ng_icmpv6_echo_req_handle(kernel_pid_t iface, ipv6_hdr_t *ipv6_hdr,
-                               ng_icmpv6_echo_t *echo, uint16_t len)
+                               icmpv6_echo_t *echo, uint16_t len)
 {
-    uint8_t *payload = ((uint8_t *)echo) + sizeof(ng_icmpv6_echo_t);
+    uint8_t *payload = ((uint8_t *)echo) + sizeof(icmpv6_echo_t);
     ng_pktsnip_t *hdr, *pkt;
     ng_netreg_entry_t *sendto = NULL;
 
-    if ((echo == NULL) || (len < sizeof(ng_icmpv6_echo_t))) {
+    if ((echo == NULL) || (len < sizeof(icmpv6_echo_t))) {
         DEBUG("icmpv6_echo: echo was NULL or len (%" PRIu16
-              ") was < sizeof(ng_icmpv6_echo_t)\n", len);
+              ") was < sizeof(icmpv6_echo_t)\n", len);
         return;
     }
 
-    pkt = ng_icmpv6_echo_build(NG_ICMPV6_ECHO_REP, byteorder_ntohs(echo->id),
+    pkt = ng_icmpv6_echo_build(ICMPV6_ECHO_REP, byteorder_ntohs(echo->id),
                                byteorder_ntohs(echo->seq), payload,
-                               len - sizeof(ng_icmpv6_echo_t));
+                               len - sizeof(icmpv6_echo_t));
 
     if (pkt == NULL) {
         DEBUG("icmpv6_echo: no space left in packet buffer\n");

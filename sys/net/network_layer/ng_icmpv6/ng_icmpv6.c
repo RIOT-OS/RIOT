@@ -56,7 +56,7 @@ static inline uint16_t _calc_csum(ng_pktsnip_t *hdr,
 void ng_icmpv6_demux(kernel_pid_t iface, ng_pktsnip_t *pkt)
 {
     ng_pktsnip_t *icmpv6, *ipv6;
-    ng_icmpv6_hdr_t *hdr;
+    icmpv6_hdr_t *hdr;
     ng_netreg_entry_t *sendto;
 
     LL_SEARCH_SCALAR(pkt, icmpv6, type, NG_NETTYPE_ICMPV6);
@@ -69,7 +69,7 @@ void ng_icmpv6_demux(kernel_pid_t iface, ng_pktsnip_t *pkt)
 
     assert(ipv6 != NULL);
 
-    hdr = (ng_icmpv6_hdr_t *)icmpv6->data;
+    hdr = (icmpv6_hdr_t *)icmpv6->data;
 
     if (_calc_csum(icmpv6, ipv6, pkt)) {
         DEBUG("icmpv6: wrong checksum.\n");
@@ -80,36 +80,36 @@ void ng_icmpv6_demux(kernel_pid_t iface, ng_pktsnip_t *pkt)
     switch (hdr->type) {
         /* TODO: handle ICMPv6 errors */
 #ifdef MODULE_NG_ICMPV6_ECHO
-        case NG_ICMPV6_ECHO_REQ:
+        case ICMPV6_ECHO_REQ:
             DEBUG("icmpv6: handle echo request.\n");
             ng_icmpv6_echo_req_handle(iface, (ipv6_hdr_t *)ipv6->data,
-                                      (ng_icmpv6_echo_t *)hdr, icmpv6->size);
+                                      (icmpv6_echo_t *)hdr, icmpv6->size);
             break;
 #endif
 
-        case NG_ICMPV6_RTR_SOL:
+        case ICMPV6_RTR_SOL:
             DEBUG("icmpv6: router solicitation received\n");
             /* TODO */
             break;
 
-        case NG_ICMPV6_RTR_ADV:
+        case ICMPV6_RTR_ADV:
             DEBUG("icmpv6: router advertisement received\n");
             /* TODO */
             break;
 
-        case NG_ICMPV6_NBR_SOL:
+        case ICMPV6_NBR_SOL:
             DEBUG("icmpv6: neighbor solicitation received\n");
             ng_ndp_nbr_sol_handle(iface, pkt, ipv6->data, (ng_ndp_nbr_sol_t *)hdr,
                                   icmpv6->size);
             break;
 
-        case NG_ICMPV6_NBR_ADV:
+        case ICMPV6_NBR_ADV:
             DEBUG("icmpv6: neighbor advertisement received\n");
             ng_ndp_nbr_adv_handle(iface, pkt, ipv6->data, (ng_ndp_nbr_adv_t *)hdr,
                                   icmpv6->size);
             break;
 
-        case NG_ICMPV6_REDIRECT:
+        case ICMPV6_REDIRECT:
             DEBUG("icmpv6: redirect message received\n");
             /* TODO */
             break;
@@ -143,7 +143,7 @@ ng_pktsnip_t *ng_icmpv6_build(ng_pktsnip_t *next, uint8_t type, uint8_t code,
                               size_t size)
 {
     ng_pktsnip_t *pkt;
-    ng_icmpv6_hdr_t *icmpv6;
+    icmpv6_hdr_t *icmpv6;
 
     pkt = ng_pktbuf_add(next, NULL, size, NG_NETTYPE_ICMPV6);
 
@@ -154,7 +154,7 @@ ng_pktsnip_t *ng_icmpv6_build(ng_pktsnip_t *next, uint8_t type, uint8_t code,
 
     DEBUG("icmpv6: Building ICMPv6 message with type=%" PRIu8 ", code=%" PRIu8 "\n",
           type, code);
-    icmpv6 = (ng_icmpv6_hdr_t *)pkt->data;
+    icmpv6 = (icmpv6_hdr_t *)pkt->data;
     icmpv6->type = type;
     icmpv6->code = code;
     icmpv6->csum.u16 = 0;
@@ -179,7 +179,7 @@ int ng_icmpv6_calc_csum(ng_pktsnip_t *hdr, ng_pktsnip_t *pseudo_hdr)
         return -ENOENT;
     }
 
-    ((ng_icmpv6_hdr_t *)hdr->data)->csum = byteorder_htons(csum);
+    ((icmpv6_hdr_t *)hdr->data)->csum = byteorder_htons(csum);
 
     return 0;
 }

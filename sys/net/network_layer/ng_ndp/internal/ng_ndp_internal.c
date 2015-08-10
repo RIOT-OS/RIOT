@@ -344,7 +344,7 @@ bool ng_ndp_internal_sl2a_opt_handle(kernel_pid_t iface, ng_pktsnip_t *pkt,
           ng_netif_addr_to_str(addr_str, sizeof(addr_str), sl2a, sl2a_len));
 
     switch (icmpv6_type) {
-        case NG_ICMPV6_NBR_SOL:
+        case ICMPV6_NBR_SOL:
             nc_entry = ng_ipv6_nc_get(iface, &ipv6->src);
 
             if (nc_entry != NULL) {
@@ -384,7 +384,7 @@ int ng_ndp_internal_tl2a_opt_handle(ng_pktsnip_t *pkt, ipv6_hdr_t *ipv6,
     }
 
     switch (icmpv6_type) {
-        case NG_ICMPV6_NBR_ADV:
+        case ICMPV6_NBR_ADV:
             while (pkt) {
                 if (pkt->type == NG_NETTYPE_NETIF) {
                     ng_netif_hdr_t *hdr = pkt->data;
