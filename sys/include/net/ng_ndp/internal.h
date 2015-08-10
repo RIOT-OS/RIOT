@@ -24,7 +24,7 @@
 
 #include "net/ipv6/addr.h"
 #include "net/ipv6/hdr.h"
-#include "net/ng_ndp/types.h"
+#include "net/ndp.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -98,7 +98,7 @@ void ng_ndp_internal_send_nbr_adv(kernel_pid_t iface, ipv6_addr_t *tgt,
  */
 bool ng_ndp_internal_sl2a_opt_handle(kernel_pid_t iface, ng_pktsnip_t *pkt,
                                      ipv6_hdr_t *ipv6, uint8_t icmpv6_type,
-                                     ng_ndp_opt_t *sl2a_opt);
+                                     ndp_opt_t *sl2a_opt);
 
 /**
  * @brief   Handles a TL2A option.
@@ -114,7 +114,7 @@ bool ng_ndp_internal_sl2a_opt_handle(kernel_pid_t iface, ng_pktsnip_t *pkt,
  * @return  -EINVAL, if TL2A was not valid.
  */
 int ng_ndp_internal_tl2a_opt_handle(ng_pktsnip_t *pkt, ipv6_hdr_t *ipv6,
-                                    uint8_t icmpv6_type, ng_ndp_opt_t *tl2a_opt,
+                                    uint8_t icmpv6_type, ndp_opt_t *tl2a_opt,
                                     uint8_t *l2addr);
 
 #ifdef __cplusplus

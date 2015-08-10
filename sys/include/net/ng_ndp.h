@@ -18,9 +18,13 @@
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 
+#ifndef NG_NDP_H_
+#define NG_NDP_H_
+
 #include <inttypes.h>
 
 #include "byteorder.h"
+#include "net/ndp.h"
 #include "net/ng_pkt.h"
 #include "net/ng_icmpv6.h"
 #include "net/ipv6/addr.h"
@@ -28,10 +32,6 @@
 #include "net/ng_ipv6/netif.h"
 
 #include "net/ng_ndp/node.h"
-#include "net/ng_ndp/types.h"
-
-#ifndef NG_NDP_H_
-#define NG_NDP_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -116,7 +116,7 @@ extern "C" {
  * @param[in] icmpv6_size   The overall size of the neighbor solicitation.
  */
 void ng_ndp_nbr_sol_handle(kernel_pid_t iface, ng_pktsnip_t *pkt,
-                           ipv6_hdr_t *ipv6, ng_ndp_nbr_sol_t *nbr_sol,
+                           ipv6_hdr_t *ipv6, ndp_nbr_sol_t *nbr_sol,
                            size_t icmpv6_size);
 
 /**
@@ -129,7 +129,7 @@ void ng_ndp_nbr_sol_handle(kernel_pid_t iface, ng_pktsnip_t *pkt,
  * @param[in] icmpv6_size   The overall size of the neighbor advertisement.
  */
 void ng_ndp_nbr_adv_handle(kernel_pid_t iface, ng_pktsnip_t *pkt,
-                           ipv6_hdr_t *ipv6, ng_ndp_nbr_adv_t *nbr_adv,
+                           ipv6_hdr_t *ipv6, ndp_nbr_adv_t *nbr_adv,
                            size_t icmpv6_size);
 
 /**
@@ -169,6 +169,27 @@ void ng_ndp_netif_add(ng_ipv6_netif_t *iface);
 void ng_ndp_netif_remove(ng_ipv6_netif_t *iface);
 
 /**
+ * @brief   Get link-layer address and interface for next hop to destination
+ *          IPv6 address.
+ *
+ * @param[out] l2addr           The link-layer for the next hop to @p dst.
+ * @param[out] l2addr_len       Length of @p l2addr.
+ * @param[in] iface             The interface to search the next hop on.
+ *                              May be @ref KERNEL_PID_UNDEF if not specified.
+ * @param[in] dst               An IPv6 address to search the next hop for.
+ * @param[in] pkt               Packet to send to @p dst. Leave NULL if you
+ *                              just want to get the addresses.
+ *
+ * @return  The PID of the interface, on success.
+ * @return  -EHOSTUNREACH, if @p dst is not reachable.
+ * @return  -ENOBUFS, if @p l2addr_len was smaller than the resulting @p l2addr
+ *          would be long.
+ */
+kernel_pid_t ng_ndp_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_len,
+                                    kernel_pid_t iface, ipv6_addr_t *dst,
+                                    ng_pktsnip_t *pkt);
+
+/**
  * @brief   Builds a neighbor solicitation message for sending.
  *
  * @see <a href="https://tools.ietf.org/html/rfc4861#section-4.3">
@@ -190,13 +211,13 @@ ng_pktsnip_t *ng_ndp_nbr_sol_build(ipv6_addr_t *tgt, ng_pktsnip_t *options);
  *          RFC 4861, section 4.4
  *      </a>
  *
- * @param[in] flags     Flags as defined above.
- *                      @ref NG_NDP_NBR_ADV_FLAGS_R == 1 indicates, that the
+ * @param[in] flags     Neighbor advertisement flags:
+ *                      @ref NDP_NBR_ADV_FLAGS_R == 1 indicates, that the
  *                      sender is a router,
- *                      @ref NG_NDP_NBR_ADV_FLAGS_S == 1 indicates that the
+ *                      @ref NDP_NBR_ADV_FLAGS_S == 1 indicates that the
  *                      advertisement was sent in response to a neighbor
  *                      solicitation,
- *                      @ref NG_NDP_NBR_ADV_FLAGS_O == 1 indicates that the
+ *                      @ref NDP_NBR_ADV_FLAGS_O == 1 indicates that the
  *                      advertisement should override an existing cache entry
  *                      and update the cached link-layer address.
  * @param[in] tgt       For solicited advertisements, the Target Address field
