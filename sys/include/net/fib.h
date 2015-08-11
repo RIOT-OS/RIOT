@@ -22,6 +22,7 @@
 #ifndef FIB_H_
 #define FIB_H_
 
+#include "kernel_types.h"
 #include "timex.h"
 
 #ifdef __cplusplus

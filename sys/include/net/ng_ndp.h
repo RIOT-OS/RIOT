@@ -27,6 +27,7 @@
 #include "net/ng_ipv6/nc.h"
 #include "net/ng_ipv6/netif.h"
 
+#include "net/ng_ndp/node.h"
 #include "net/ng_ndp/types.h"
 
 #ifndef NG_NDP_H_
@@ -166,27 +167,6 @@ void ng_ndp_netif_add(ng_ipv6_netif_t *iface);
  * @param[in] iface     An IPv6 interface descriptor. Must not be NULL.
  */
 void ng_ndp_netif_remove(ng_ipv6_netif_t *iface);
-
-/**
- * @brief   Get link-layer address and interface for next hop to destination
- *          IPv6 address.
- *
- * @param[out] l2addr           The link-layer for the next hop to @p dst.
- * @param[out] l2addr_len       Length of @p l2addr.
- * @param[in] iface             The interface to search the next hop on.
- *                              May be @ref KERNEL_PID_UNDEF if not specified.
- * @param[in] dst               An IPv6 address to search the next hop for.
- * @param[in] pkt               Packet to send to @p dst. Leave NULL if you
- *                              just want to get the addresses.
- *
- * @return  The PID of the interface, on success.
- * @return  -EHOSTUNREACH, if @p dst is not reachable.
- * @return  -ENOBUFS, if @p l2addr_len was smaller than the resulting @p l2addr
- *          would be long.
- */
-kernel_pid_t ng_ndp_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_len,
-                                    kernel_pid_t iface, ng_ipv6_addr_t *dst,
-                                    ng_pktsnip_t *pkt);
 
 /**
  * @brief   Builds a neighbor solicitation message for sending.

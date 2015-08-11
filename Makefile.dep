@@ -78,12 +78,16 @@ ifneq (,$(filter ng_ipv6_default,$(USEMODULE)))
   USEMODULE += ng_ipv6
   USEMODULE += ng_icmpv6
   USEMODULE += ng_ndp
+  USEMODULE += ng_ndp_internal
+  USEMODULE += ng_ndp_node
 endif
 
 ifneq (,$(filter ng_ipv6_router_default,$(USEMODULE)))
   USEMODULE += ng_ipv6_router
   USEMODULE += ng_icmpv6
   USEMODULE += ng_ndp
+  USEMODULE += ng_ndp_internal
+  USEMODULE += ng_ndp_node
 endif
 
 ifneq (,$(filter ng_ndp,$(USEMODULE)))
