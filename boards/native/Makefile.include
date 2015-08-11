@@ -69,7 +69,7 @@ export LINKFLAGS += -ldl
 endif
 
 # set the tap interface for term/valgrind
-ifneq (,$(filter %nativenet,$(USEMODULE)))
+ifneq (,$(filter dev_eth_tap,$(USEMODULE)))
 	export PORT ?= tap0
 else
 	export PORT =
