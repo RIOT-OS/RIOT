@@ -156,10 +156,11 @@ int fib_get_next_hop(kernel_pid_t *iface_id,
 * the function will continue to count the number of matching entries
 * and provide the number to the caller.
 *
-* @param[in] prefix           the destination address
-* @param[in] prefix_size      the destination address size
-* @param[out] dst_set         the destination addresses matching the prefix
-* @param[in, out] dst_size    the number of entries available on in and used on out
+* @param[in] prefix             the destination address
+* @param[in] prefix_size        the destination address size
+* @param[out] dst_set           the destination addresses matching the prefix
+* @param[in,out] dst_set_size   the number of entries available on in and used
+*                               on out
 *
 * @return 0 on success
 *         -EHOSTUNREACH if no entry matches the type in the FIB
