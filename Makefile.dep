@@ -205,6 +205,10 @@ ifneq (,$(filter newlib,$(USEMODULE)))
   USEMODULE += uart_stdio
 endif
 
+ifneq (,$(filter ipv6_addr,$(USEMODULE)))
+  USEMODULE += ipv4_addr
+endif
+
 ifneq (,$(filter posix,$(USEMODULE)))
   USEMODULE += timex
   USEMODULE += vtimer
