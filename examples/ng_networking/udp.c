@@ -36,11 +36,11 @@ static void send(char *addr_str, char *port_str, char *data)
     uint8_t port[2];
     uint16_t tmp;
     ng_pktsnip_t *payload, *udp, *ip;
-    ng_ipv6_addr_t addr;
+    ipv6_addr_t addr;
     ng_netreg_entry_t *sendto;
 
     /* parse destination address */
-    if (ng_ipv6_addr_from_str(&addr, addr_str) == NULL) {
+    if (ipv6_addr_from_str(&addr, addr_str) == NULL) {
         puts("Error: unable to parse destination address");
         return;
     }

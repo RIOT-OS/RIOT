@@ -142,7 +142,7 @@ typedef struct __attribute__((packed)) {
     uint8_t code;           /**< message code */
     network_uint16_t csum;  /**< checksum */
     network_uint32_t resv;  /**< reserved field */
-    ng_ipv6_addr_t tgt;     /**< target address */
+    ipv6_addr_t tgt;        /**< target address */
 } ng_ndp_nbr_sol_t;
 
 /**
@@ -159,7 +159,7 @@ typedef struct __attribute__((packed)) {
     network_uint16_t csum;  /**< checksum */
     uint8_t flags;          /**< flags */
     uint8_t resv[3];        /**< reserved fields */
-    ng_ipv6_addr_t tgt;     /**< target address */
+    ipv6_addr_t tgt;        /**< target address */
 } ng_ndp_nbr_adv_t;
 
 /**
@@ -175,8 +175,8 @@ typedef struct __attribute__((packed)) {
     uint8_t code;           /**< message code */
     network_uint16_t csum;  /**< checksum */
     network_uint32_t resv;  /**< reserved field */
-    ng_ipv6_addr_t tgt;     /**< target address */
-    ng_ipv6_addr_t dst;     /**< destination address */
+    ipv6_addr_t tgt;        /**< target address */
+    ipv6_addr_t dst;        /**< destination address */
 } ng_ndp_redirect_t;
 
 /**
@@ -209,7 +209,7 @@ typedef struct __attribute__((packed)) {
     network_uint32_t valid_ltime;   /**< valid lifetime */
     network_uint32_t pref_ltime;    /**< preferred lifetime */
     network_uint32_t resv;          /**< reserved field */
-    ng_ipv6_addr_t prefix;          /**< prefix */
+    ipv6_addr_t prefix;             /**< prefix */
 } ng_ndp_opt_pi_t;
 
 /**

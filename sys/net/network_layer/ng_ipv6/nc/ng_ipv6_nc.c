@@ -16,7 +16,7 @@
 #include <string.h>
 
 #include "net/ng_ipv6.h"
-#include "net/ng_ipv6/addr.h"
+#include "net/ipv6/addr.h"
 #include "net/ng_ipv6/nc.h"
 #include "net/ng_ipv6/netif.h"
 #include "net/ng_ndp.h"
@@ -32,7 +32,7 @@
 /* For PRIu8 etc. */
 #include <inttypes.h>
 
-static char addr_str[NG_IPV6_ADDR_MAX_STR_LEN];
+static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 #endif
 
 static ng_ipv6_nc_t ncache[NG_IPV6_NC_SIZE];
@@ -45,7 +45,7 @@ void ng_ipv6_nc_init(void)
 ng_ipv6_nc_t *_find_free_entry(void)
 {
     for (int i = 0; i < NG_IPV6_NC_SIZE; i++) {
-        if (ng_ipv6_addr_is_unspecified(&(ncache[i].ipv6_addr))) {
+        if (ipv6_addr_is_unspecified(&(ncache[i].ipv6_addr))) {
             return ncache + i;
         }
     }
@@ -53,7 +53,7 @@ ng_ipv6_nc_t *_find_free_entry(void)
     return NULL;
 }
 
-ng_ipv6_nc_t *ng_ipv6_nc_add(kernel_pid_t iface, const ng_ipv6_addr_t *ipv6_addr,
+ng_ipv6_nc_t *ng_ipv6_nc_add(kernel_pid_t iface, const ipv6_addr_t *ipv6_addr,
                              const void *l2_addr, size_t l2_addr_len, uint8_t flags)
 {
     ng_ipv6_nc_t *free_entry = NULL;
@@ -63,15 +63,15 @@ ng_ipv6_nc_t *ng_ipv6_nc_add(kernel_pid_t iface, const ng_ipv6_addr_t *ipv6_addr
         return NULL;
     }
 
-    if ((l2_addr_len > NG_IPV6_NC_L2_ADDR_MAX) || ng_ipv6_addr_is_unspecified(ipv6_addr)) {
+    if ((l2_addr_len > NG_IPV6_NC_L2_ADDR_MAX) || ipv6_addr_is_unspecified(ipv6_addr)) {
         DEBUG("ipv6_nc: invalid parameters\n");
         return NULL;
     }
 
     for (int i = 0; i < NG_IPV6_NC_SIZE; i++) {
-        if (ng_ipv6_addr_equal(&(ncache[i].ipv6_addr), ipv6_addr)) {
+        if (ipv6_addr_equal(&(ncache[i].ipv6_addr), ipv6_addr)) {
             DEBUG("ipv6_nc: Address %s already registered.\n",
-                  ng_ipv6_addr_to_str(addr_str, ipv6_addr, sizeof(addr_str)));
+                  ipv6_addr_to_str(addr_str, ipv6_addr, sizeof(addr_str)));
 
             if ((l2_addr != NULL) && (l2_addr_len > 0)) {
                 DEBUG("ipv6_nc: Update to L2 address %s",
@@ -87,7 +87,7 @@ ng_ipv6_nc_t *ng_ipv6_nc_add(kernel_pid_t iface, const ng_ipv6_addr_t *ipv6_addr
             return &ncache[i];
         }
 
-        if (ng_ipv6_addr_is_unspecified(&(ncache[i].ipv6_addr)) && !free_entry) {
+        if (ipv6_addr_is_unspecified(&(ncache[i].ipv6_addr)) && !free_entry) {
             /* found the first free entry */
             free_entry = &ncache[i];
         }
@@ -103,9 +103,9 @@ ng_ipv6_nc_t *ng_ipv6_nc_add(kernel_pid_t iface, const ng_ipv6_addr_t *ipv6_addr
     free_entry->iface = iface;
 
     free_entry->pkts = NULL;
-    memcpy(&(free_entry->ipv6_addr), ipv6_addr, sizeof(ng_ipv6_addr_t));
+    memcpy(&(free_entry->ipv6_addr), ipv6_addr, sizeof(ipv6_addr_t));
     DEBUG("ipv6_nc: Register %s for interface %" PRIkernel_pid,
-          ng_ipv6_addr_to_str(addr_str, ipv6_addr, sizeof(addr_str)),
+          ipv6_addr_to_str(addr_str, ipv6_addr, sizeof(addr_str)),
           iface);
 
     if ((l2_addr != NULL) && (l2_addr_len > 0)) {
@@ -128,13 +128,13 @@ ng_ipv6_nc_t *ng_ipv6_nc_add(kernel_pid_t iface, const ng_ipv6_addr_t *ipv6_addr
     return free_entry;
 }
 
-void ng_ipv6_nc_remove(kernel_pid_t iface, const ng_ipv6_addr_t *ipv6_addr)
+void ng_ipv6_nc_remove(kernel_pid_t iface, const ipv6_addr_t *ipv6_addr)
 {
     ng_ipv6_nc_t *entry = ng_ipv6_nc_get(iface, ipv6_addr);
 
     if (entry != NULL) {
         DEBUG("ipv6_nc: Remove %s for interface %" PRIkernel_pid "\n",
-              ng_ipv6_addr_to_str(addr_str, ipv6_addr, sizeof(addr_str)),
+              ipv6_addr_to_str(addr_str, ipv6_addr, sizeof(addr_str)),
               iface);
 
         while (entry->pkts != NULL) {
@@ -145,13 +145,13 @@ void ng_ipv6_nc_remove(kernel_pid_t iface, const ng_ipv6_addr_t *ipv6_addr)
             ng_pktqueue_remove_head(&entry->pkts);
         }
 
-        ng_ipv6_addr_set_unspecified(&(entry->ipv6_addr));
+        ipv6_addr_set_unspecified(&(entry->ipv6_addr));
         entry->iface = KERNEL_PID_UNDEF;
         entry->flags = 0;
     }
 }
 
-ng_ipv6_nc_t *ng_ipv6_nc_get(kernel_pid_t iface, const ng_ipv6_addr_t *ipv6_addr)
+ng_ipv6_nc_t *ng_ipv6_nc_get(kernel_pid_t iface, const ipv6_addr_t *ipv6_addr)
 {
     if (ipv6_addr == NULL) {
         DEBUG("ipv6_nc: address was NULL\n");
@@ -160,10 +160,10 @@ ng_ipv6_nc_t *ng_ipv6_nc_get(kernel_pid_t iface, const ng_ipv6_addr_t *ipv6_addr
 
     for (int i = 0; i < NG_IPV6_NC_SIZE; i++) {
         if (((iface == KERNEL_PID_UNDEF) || (iface == ncache[i].iface)) &&
-            ng_ipv6_addr_equal(&(ncache[i].ipv6_addr), ipv6_addr)) {
+            ipv6_addr_equal(&(ncache[i].ipv6_addr), ipv6_addr)) {
             DEBUG("ipv6_nc: Found entry for %s on interface %" PRIkernel_pid
                   " (0 = all interfaces) [%p]\n",
-                  ng_ipv6_addr_to_str(addr_str, ipv6_addr, sizeof(addr_str)),
+                  ipv6_addr_to_str(addr_str, ipv6_addr, sizeof(addr_str)),
                   iface, (void *)(ncache + i));
 
             return ncache + i;
@@ -183,7 +183,7 @@ ng_ipv6_nc_t *ng_ipv6_nc_get_next(ng_ipv6_nc_t *prev)
     }
 
     while (prev < (ncache + NG_IPV6_NC_SIZE)) { /* while not reached end */
-        if (!ng_ipv6_addr_is_unspecified(&(prev->ipv6_addr))) {
+        if (!ipv6_addr_is_unspecified(&(prev->ipv6_addr))) {
             return prev;
         }
 
@@ -205,13 +205,13 @@ ng_ipv6_nc_t *ng_ipv6_nc_get_next_router(ng_ipv6_nc_t *prev)
     return NULL;
 }
 
-ng_ipv6_nc_t *ng_ipv6_nc_still_reachable(const ng_ipv6_addr_t *ipv6_addr)
+ng_ipv6_nc_t *ng_ipv6_nc_still_reachable(const ipv6_addr_t *ipv6_addr)
 {
     ng_ipv6_nc_t *entry = ng_ipv6_nc_get(KERNEL_PID_UNDEF, ipv6_addr);
 
     if (entry == NULL) {
         DEBUG("ipv6_nc: No entry found for %s\n",
-              ng_ipv6_addr_to_str(addr_str, ipv6_addr, sizeof(addr_str)));
+              ipv6_addr_to_str(addr_str, ipv6_addr, sizeof(addr_str)));
         return NULL;
     }
 
@@ -226,7 +226,7 @@ ng_ipv6_nc_t *ng_ipv6_nc_still_reachable(const ng_ipv6_addr_t *ipv6_addr)
 #endif
 
         DEBUG("ipv6_nc: Marking entry %s as reachable\n",
-              ng_ipv6_addr_to_str(addr_str, ipv6_addr, sizeof(addr_str)));
+              ipv6_addr_to_str(addr_str, ipv6_addr, sizeof(addr_str)));
         entry->flags &= ~(NG_IPV6_NC_STATE_MASK >> NG_IPV6_NC_STATE_POS);
         entry->flags |= (NG_IPV6_NC_STATE_REACHABLE >> NG_IPV6_NC_STATE_POS);
     }

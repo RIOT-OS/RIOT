@@ -20,7 +20,7 @@
 #ifndef NG_IPV6_EXT_RH_H_
 #define NG_IPV6_EXT_RH_H_
 
-#include "net/ng_ipv6/addr.h"
+#include "net/ipv6/addr.h"
 #include "net/ng_ipv6/hdr.h"
 
 #ifdef __cplusplus
@@ -51,7 +51,7 @@ typedef struct __attribute__((packed)) {
  * @return  next hop on success, on success
  * @return  NULL, if not found.
  */
-ng_ipv6_addr_t *ng_ipv6_ext_rh_next_hop(ng_ipv6_hdr_t *ipv6);
+ipv6_addr_t *ng_ipv6_ext_rh_next_hop(ng_ipv6_hdr_t *ipv6);
 
 #ifdef __cplusplus
 }

@@ -42,7 +42,7 @@ extern "C" {
  *          would be long.
  */
 kernel_pid_t ng_ndp_node_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_len,
-                                         kernel_pid_t iface, ng_ipv6_addr_t *dst,
+                                         kernel_pid_t iface, ipv6_addr_t *dst,
                                          ng_pktsnip_t *pkt);
 
 #ifdef __cplusplus

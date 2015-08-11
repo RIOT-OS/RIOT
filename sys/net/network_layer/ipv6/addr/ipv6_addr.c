@@ -17,9 +17,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "net/ng_ipv6/addr.h"
+#include "net/ipv6/addr.h"
 
-uint8_t ng_ipv6_addr_match_prefix(const ng_ipv6_addr_t *a, const ng_ipv6_addr_t *b)
+uint8_t ipv6_addr_match_prefix(const ipv6_addr_t *a, const ipv6_addr_t *b)
 {
     uint8_t prefix_len = 0;
 
@@ -57,8 +57,8 @@ uint8_t ng_ipv6_addr_match_prefix(const ng_ipv6_addr_t *a, const ng_ipv6_addr_t 
     return prefix_len;
 }
 
-void ng_ipv6_addr_init_prefix(ng_ipv6_addr_t *out, const ng_ipv6_addr_t *prefix,
-                              uint8_t bits)
+void ipv6_addr_init_prefix(ipv6_addr_t *out, const ipv6_addr_t *prefix,
+                           uint8_t bits)
 {
     uint8_t bytes;
 

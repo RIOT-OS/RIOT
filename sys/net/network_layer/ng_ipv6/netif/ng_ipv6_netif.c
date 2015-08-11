@@ -21,7 +21,7 @@
 #include "kernel_types.h"
 #include "mutex.h"
 #include "net/eui64.h"
-#include "net/ng_ipv6/addr.h"
+#include "net/ipv6/addr.h"
 #include "net/ng_ndp.h"
 #include "net/ng_netapi.h"
 #include "net/ng_netif.h"
@@ -41,51 +41,51 @@
 static ng_ipv6_netif_t ipv6_ifs[NG_NETIF_NUMOF];
 
 #if ENABLE_DEBUG
-static char addr_str[NG_IPV6_ADDR_MAX_STR_LEN];
+static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 #endif
 
-static ng_ipv6_addr_t *_add_addr_to_entry(ng_ipv6_netif_t *entry, const ng_ipv6_addr_t *addr,
-                                          uint8_t prefix_len, uint8_t flags)
+static ipv6_addr_t *_add_addr_to_entry(ng_ipv6_netif_t *entry, const ipv6_addr_t *addr,
+                                       uint8_t prefix_len, uint8_t flags)
 {
     ng_ipv6_netif_addr_t *tmp_addr = NULL;
 
     for (int i = 0; i < NG_IPV6_NETIF_ADDR_NUMOF; i++) {
-        if (ng_ipv6_addr_equal(&(entry->addrs[i].addr), addr)) {
+        if (ipv6_addr_equal(&(entry->addrs[i].addr), addr)) {
             return &(entry->addrs[i].addr);
         }
 
-        if (ng_ipv6_addr_is_unspecified(&(entry->addrs[i].addr)) && !tmp_addr) {
+        if (ipv6_addr_is_unspecified(&(entry->addrs[i].addr)) && !tmp_addr) {
             tmp_addr = &(entry->addrs[i]);
         }
     }
 
     if (!tmp_addr) {
         DEBUG("ipv6 netif: couldn't add %s/%" PRIu8 " to interface %" PRIkernel_pid "\n: No space left.",
-              ng_ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)),
+              ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)),
               prefix_len, entry->pid);
         return NULL;
     }
 
-    memcpy(&(tmp_addr->addr), addr, sizeof(ng_ipv6_addr_t));
+    memcpy(&(tmp_addr->addr), addr, sizeof(ipv6_addr_t));
     DEBUG("ipv6 netif: Added %s/%" PRIu8 " to interface %" PRIkernel_pid "\n",
-          ng_ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)),
+          ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)),
           prefix_len, entry->pid);
 
     tmp_addr->prefix_len = prefix_len;
     tmp_addr->flags = flags;
 
-    if (ng_ipv6_addr_is_multicast(addr)) {
+    if (ipv6_addr_is_multicast(addr)) {
         tmp_addr->flags |= NG_IPV6_NETIF_ADDR_FLAGS_NON_UNICAST;
     }
     else {
-        ng_ipv6_addr_t sol_node;
+        ipv6_addr_t sol_node;
 
-        if (!ng_ipv6_addr_is_link_local(addr)) {
+        if (!ipv6_addr_is_link_local(addr)) {
             /* add also corresponding link-local address */
-            ng_ipv6_addr_t ll_addr;
+            ipv6_addr_t ll_addr;
 
             ll_addr.u64[1] = addr->u64[1];
-            ng_ipv6_addr_set_link_local_prefix(&ll_addr);
+            ipv6_addr_set_link_local_prefix(&ll_addr);
 
             _add_addr_to_entry(entry, &ll_addr, 64,
                                flags | NG_IPV6_NETIF_ADDR_FLAGS_NDP_ON_LINK);
@@ -94,8 +94,8 @@ static ng_ipv6_addr_t *_add_addr_to_entry(ng_ipv6_netif_t *entry, const ng_ipv6_
             tmp_addr->flags |= NG_IPV6_NETIF_ADDR_FLAGS_NDP_ON_LINK;
         }
 
-        ng_ipv6_addr_set_solicited_nodes(&sol_node, addr);
-        _add_addr_to_entry(entry, &sol_node, NG_IPV6_ADDR_BIT_LEN, 0);
+        ipv6_addr_set_solicited_nodes(&sol_node, addr);
+        _add_addr_to_entry(entry, &sol_node, IPV6_ADDR_BIT_LEN, 0);
     }
 
     return &(tmp_addr->addr);
@@ -141,7 +141,7 @@ void ng_ipv6_netif_add(kernel_pid_t pid)
 
     /* Otherwise, fill the free entry */
 
-    ng_ipv6_addr_t addr = NG_IPV6_ADDR_ALL_NODES_LINK_LOCAL;
+    ipv6_addr_t addr = IPV6_ADDR_ALL_NODES_LINK_LOCAL;
     mutex_lock(&free_entry->mutex);
 
     DEBUG("ipv6 netif: Add IPv6 interface %" PRIkernel_pid " (i = %d)\n", pid,
@@ -151,7 +151,7 @@ void ng_ipv6_netif_add(kernel_pid_t pid)
     free_entry->cur_hl = NG_IPV6_NETIF_DEFAULT_HL;
     free_entry->flags = 0;
 
-    _add_addr_to_entry(free_entry, &addr, NG_IPV6_ADDR_BIT_LEN, 0);
+    _add_addr_to_entry(free_entry, &addr, IPV6_ADDR_BIT_LEN, 0);
 
     mutex_unlock(&free_entry->mutex);
 
@@ -200,13 +200,13 @@ ng_ipv6_netif_t *ng_ipv6_netif_get(kernel_pid_t pid)
     return NULL;
 }
 
-ng_ipv6_addr_t *ng_ipv6_netif_add_addr(kernel_pid_t pid, const ng_ipv6_addr_t *addr,
-                                       uint8_t prefix_len, uint8_t flags)
+ipv6_addr_t *ng_ipv6_netif_add_addr(kernel_pid_t pid, const ipv6_addr_t *addr,
+                                    uint8_t prefix_len, uint8_t flags)
 {
     ng_ipv6_netif_t *entry = ng_ipv6_netif_get(pid);
-    ng_ipv6_addr_t *res;
+    ipv6_addr_t *res;
 
-    if ((entry == NULL) || (addr == NULL) || (ng_ipv6_addr_is_unspecified(addr)) ||
+    if ((entry == NULL) || (addr == NULL) || (ipv6_addr_is_unspecified(addr)) ||
         ((prefix_len - 1) > 127)) {    /* prefix_len < 1 || prefix_len > 128 */
         return NULL;
     }
@@ -220,15 +220,15 @@ ng_ipv6_addr_t *ng_ipv6_netif_add_addr(kernel_pid_t pid, const ng_ipv6_addr_t *a
     return res;
 }
 
-static void _remove_addr_from_entry(ng_ipv6_netif_t *entry, ng_ipv6_addr_t *addr)
+static void _remove_addr_from_entry(ng_ipv6_netif_t *entry, ipv6_addr_t *addr)
 {
     mutex_lock(&entry->mutex);
 
     for (int i = 0; i < NG_IPV6_NETIF_ADDR_NUMOF; i++) {
-        if (ng_ipv6_addr_equal(&(entry->addrs[i].addr), addr)) {
+        if (ipv6_addr_equal(&(entry->addrs[i].addr), addr)) {
             DEBUG("ipv6 netif: Remove %s to interface %" PRIkernel_pid "\n",
-                  ng_ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)), entry->pid);
-            ng_ipv6_addr_set_unspecified(&(entry->addrs[i].addr));
+                  ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)), entry->pid);
+            ipv6_addr_set_unspecified(&(entry->addrs[i].addr));
             entry->addrs[i].flags = 0;
 
             mutex_unlock(&entry->mutex);
@@ -239,7 +239,7 @@ static void _remove_addr_from_entry(ng_ipv6_netif_t *entry, ng_ipv6_addr_t *addr
     mutex_unlock(&entry->mutex);
 }
 
-void ng_ipv6_netif_remove_addr(kernel_pid_t pid, ng_ipv6_addr_t *addr)
+void ng_ipv6_netif_remove_addr(kernel_pid_t pid, ipv6_addr_t *addr)
 {
     if (pid == KERNEL_PID_UNDEF) {
         for (int i = 0; i < NG_NETIF_NUMOF; i++) {
@@ -272,7 +272,7 @@ void ng_ipv6_netif_reset_addr(kernel_pid_t pid)
     mutex_unlock(&entry->mutex);
 }
 
-kernel_pid_t ng_ipv6_netif_find_by_addr(ng_ipv6_addr_t **out, const ng_ipv6_addr_t *addr)
+kernel_pid_t ng_ipv6_netif_find_by_addr(ipv6_addr_t **out, const ipv6_addr_t *addr)
 {
     for (int i = 0; i < NG_NETIF_NUMOF; i++) {
         if (out != NULL) {
@@ -280,7 +280,7 @@ kernel_pid_t ng_ipv6_netif_find_by_addr(ng_ipv6_addr_t **out, const ng_ipv6_addr
 
             if (*out != NULL) {
                 DEBUG("ipv6 netif: Found %s on interface %" PRIkernel_pid "\n",
-                      ng_ipv6_addr_to_str(addr_str, *out, sizeof(addr_str)),
+                      ipv6_addr_to_str(addr_str, *out, sizeof(addr_str)),
                       ipv6_ifs[i].pid);
                 return ipv6_ifs[i].pid;
             }
@@ -301,7 +301,7 @@ kernel_pid_t ng_ipv6_netif_find_by_addr(ng_ipv6_addr_t **out, const ng_ipv6_addr
     return KERNEL_PID_UNDEF;
 }
 
-ng_ipv6_addr_t *ng_ipv6_netif_find_addr(kernel_pid_t pid, const ng_ipv6_addr_t *addr)
+ipv6_addr_t *ng_ipv6_netif_find_addr(kernel_pid_t pid, const ipv6_addr_t *addr)
 {
     ng_ipv6_netif_t *entry = ng_ipv6_netif_get(pid);
 
@@ -312,10 +312,10 @@ ng_ipv6_addr_t *ng_ipv6_netif_find_addr(kernel_pid_t pid, const ng_ipv6_addr_t *
     mutex_lock(&entry->mutex);
 
     for (int i = 0; i < NG_IPV6_NETIF_ADDR_NUMOF; i++) {
-        if (ng_ipv6_addr_equal(&(entry->addrs[i].addr), addr)) {
+        if (ipv6_addr_equal(&(entry->addrs[i].addr), addr)) {
             mutex_unlock(&entry->mutex);
             DEBUG("ipv6 netif: Found %s on interface %" PRIkernel_pid "\n",
-                  ng_ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)),
+                  ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)),
                   pid);
             return &(entry->addrs[i].addr);
         }
@@ -326,8 +326,8 @@ ng_ipv6_addr_t *ng_ipv6_netif_find_addr(kernel_pid_t pid, const ng_ipv6_addr_t *
     return NULL;
 }
 
-static uint8_t _find_by_prefix_unsafe(ng_ipv6_addr_t **res, ng_ipv6_netif_t *iface,
-                                      const ng_ipv6_addr_t *addr, bool src_search)
+static uint8_t _find_by_prefix_unsafe(ipv6_addr_t **res, ng_ipv6_netif_t *iface,
+                                      const ipv6_addr_t *addr, bool src_search)
 {
     uint8_t best_match = 0;
 
@@ -336,13 +336,13 @@ static uint8_t _find_by_prefix_unsafe(ng_ipv6_addr_t **res, ng_ipv6_netif_t *ifa
 
         if ((src_search &&
              ng_ipv6_netif_addr_is_non_unicast(&(iface->addrs[i].addr))) ||
-            ng_ipv6_addr_is_unspecified(&(iface->addrs[i].addr))) {
+            ipv6_addr_is_unspecified(&(iface->addrs[i].addr))) {
             continue;
         }
 
-        match = ng_ipv6_addr_match_prefix(&(iface->addrs[i].addr), addr);
+        match = ipv6_addr_match_prefix(&(iface->addrs[i].addr), addr);
 
-        if (!src_search && !ng_ipv6_addr_is_multicast(addr) &&
+        if (!src_search && !ipv6_addr_is_multicast(addr) &&
             (match < iface->addrs[i].prefix_len)) {
             /* match but not of same subnet */
             continue;
@@ -360,10 +360,10 @@ static uint8_t _find_by_prefix_unsafe(ng_ipv6_addr_t **res, ng_ipv6_netif_t *ifa
 #if ENABLE_DEBUG
     if (*res != NULL) {
         DEBUG("ipv6 netif: Found %s on interface %" PRIkernel_pid " matching ",
-              ng_ipv6_addr_to_str(addr_str, *res, sizeof(addr_str)),
+              ipv6_addr_to_str(addr_str, *res, sizeof(addr_str)),
               iface->pid);
         DEBUG("%s by %" PRIu8 " bits (used as source address = %s)\n",
-              ng_ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)),
+              ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)),
               best_match,
               (src_search) ? "true" : "false");
     }
@@ -371,7 +371,7 @@ static uint8_t _find_by_prefix_unsafe(ng_ipv6_addr_t **res, ng_ipv6_netif_t *ifa
         DEBUG("ipv6 netif: Did not found any address on interface %" PRIkernel_pid
               " matching %s (used as source address = %s)\n",
               iface->pid,
-              ng_ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)),
+              ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)),
               (src_search) ? "true" : "false");
     }
 #endif
@@ -379,10 +379,10 @@ static uint8_t _find_by_prefix_unsafe(ng_ipv6_addr_t **res, ng_ipv6_netif_t *ifa
     return best_match;
 }
 
-kernel_pid_t ng_ipv6_netif_find_by_prefix(ng_ipv6_addr_t **out, const ng_ipv6_addr_t *prefix)
+kernel_pid_t ng_ipv6_netif_find_by_prefix(ipv6_addr_t **out, const ipv6_addr_t *prefix)
 {
     uint8_t best_match = 0;
-    ng_ipv6_addr_t *tmp_res = NULL;
+    ipv6_addr_t *tmp_res = NULL;
     kernel_pid_t res = KERNEL_PID_UNDEF;
 
     for (int i = 0; i < NG_NETIF_NUMOF; i++) {
@@ -407,25 +407,25 @@ kernel_pid_t ng_ipv6_netif_find_by_prefix(ng_ipv6_addr_t **out, const ng_ipv6_ad
 #if ENABLE_DEBUG
     if (res != KERNEL_PID_UNDEF) {
         DEBUG("ipv6 netif: Found %s on interface %" PRIkernel_pid " globally matching ",
-              ng_ipv6_addr_to_str(addr_str, *out, sizeof(addr_str)),
+              ipv6_addr_to_str(addr_str, *out, sizeof(addr_str)),
               res);
         DEBUG("%s by %" PRIu8 " bits\n",
-              ng_ipv6_addr_to_str(addr_str, prefix, sizeof(addr_str)),
+              ipv6_addr_to_str(addr_str, prefix, sizeof(addr_str)),
               best_match);
     }
     else {
         DEBUG("ipv6 netif: Did not found any address globally matching %s\n",
-              ng_ipv6_addr_to_str(addr_str, prefix, sizeof(addr_str)));
+              ipv6_addr_to_str(addr_str, prefix, sizeof(addr_str)));
     }
 #endif
 
     return res;
 }
 
-static ng_ipv6_addr_t *_match_prefix(kernel_pid_t pid, const ng_ipv6_addr_t *addr,
-                                     bool src_search)
+static ipv6_addr_t *_match_prefix(kernel_pid_t pid, const ipv6_addr_t *addr,
+                                  bool src_search)
 {
-    ng_ipv6_addr_t *res = NULL;
+    ipv6_addr_t *res = NULL;
     ng_ipv6_netif_t *iface = ng_ipv6_netif_get(pid);
 
     mutex_lock(&(iface->mutex));
@@ -440,13 +440,12 @@ static ng_ipv6_addr_t *_match_prefix(kernel_pid_t pid, const ng_ipv6_addr_t *add
     return NULL;
 }
 
-ng_ipv6_addr_t *ng_ipv6_netif_match_prefix(kernel_pid_t pid,
-        const ng_ipv6_addr_t *prefix)
+ipv6_addr_t *ng_ipv6_netif_match_prefix(kernel_pid_t pid, const ipv6_addr_t *prefix)
 {
     return _match_prefix(pid, prefix, false);
 }
 
-ng_ipv6_addr_t *ng_ipv6_netif_find_best_src_addr(kernel_pid_t pid, const ng_ipv6_addr_t *dest)
+ipv6_addr_t *ng_ipv6_netif_find_best_src_addr(kernel_pid_t pid, const ipv6_addr_t *dest)
 {
     return _match_prefix(pid, dest, true);
 }
@@ -457,7 +456,7 @@ void ng_ipv6_netif_init_by_dev(void)
     size_t ifnum = ng_netif_get(ifs);
 
     for (size_t i = 0; i < ifnum; i++) {
-        ng_ipv6_addr_t addr;
+        ipv6_addr_t addr;
         eui64_t iid;
         ng_ipv6_netif_t *ipv6_if = ng_ipv6_netif_get(ifs[i]);
 
@@ -500,8 +499,8 @@ void ng_ipv6_netif_init_by_dev(void)
             continue;
         }
 
-        ng_ipv6_addr_set_aiid(&addr, iid.uint8);
-        ng_ipv6_addr_set_link_local_prefix(&addr);
+        ipv6_addr_set_aiid(&addr, iid.uint8);
+        ipv6_addr_set_link_local_prefix(&addr);
         _add_addr_to_entry(ipv6_if, &addr, 64, 0);
 
         mutex_unlock(&ipv6_if->mutex);

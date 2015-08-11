@@ -18,7 +18,7 @@
 #include "net/ng_rpl/srh.h"
 #include "net/ng_ipv6/ext/rh.h"
 
-ng_ipv6_addr_t *ng_ipv6_ext_rh_next_hop(ng_ipv6_hdr_t *ipv6)
+ipv6_addr_t *ng_ipv6_ext_rh_next_hop(ng_ipv6_hdr_t *ipv6)
 {
     ng_ipv6_ext_rh_t *ext = (ng_ipv6_ext_rh_t *)(ipv6 + 1);
     bool c = true;

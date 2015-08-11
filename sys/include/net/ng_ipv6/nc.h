@@ -25,7 +25,7 @@
 #include <stdint.h>
 
 #include "kernel_types.h"
-#include "net/ng_ipv6/addr.h"
+#include "net/ipv6/addr.h"
 #include "net/ng_netif.h"
 #include "net/ng_pktqueue.h"
 #include "vtimer.h"
@@ -119,7 +119,7 @@ extern "C" {
  */
 typedef struct {
     ng_pktqueue_t *pkts;                    /**< Packets waiting for address resolution */
-    ng_ipv6_addr_t ipv6_addr;               /**< IPv6 address of the neighbor */
+    ipv6_addr_t ipv6_addr;                  /**< IPv6 address of the neighbor */
     uint8_t l2_addr[NG_IPV6_NC_L2_ADDR_MAX];/**< Link layer address of the neighbor */
     uint8_t l2_addr_len;                    /**< Length of ng_ipv6_nc_t::l2_addr */
     uint8_t flags;                          /**< Flags as defined above */
@@ -167,7 +167,7 @@ void ng_ipv6_nc_init(void);
  * @return  Pointer to new neighbor cache entry on success
  * @return  NULL, on failure
  */
-ng_ipv6_nc_t *ng_ipv6_nc_add(kernel_pid_t iface, const ng_ipv6_addr_t *ipv6_addr,
+ng_ipv6_nc_t *ng_ipv6_nc_add(kernel_pid_t iface, const ipv6_addr_t *ipv6_addr,
                              const void *l2_addr, size_t l2_addr_len, uint8_t flags);
 
 /**
@@ -178,7 +178,7 @@ ng_ipv6_nc_t *ng_ipv6_nc_add(kernel_pid_t iface, const ng_ipv6_addr_t *ipv6_addr
  *                          interfaces.
  * @param[in] ipv6_addr     IPv6 address of the neighbor
  */
-void ng_ipv6_nc_remove(kernel_pid_t iface, const ng_ipv6_addr_t *ipv6_addr);
+void ng_ipv6_nc_remove(kernel_pid_t iface, const ipv6_addr_t *ipv6_addr);
 
 /**
  * @brief   Searches for any neighbor cache entry fitting the @p ipv6_addr.
@@ -191,7 +191,7 @@ void ng_ipv6_nc_remove(kernel_pid_t iface, const ng_ipv6_addr_t *ipv6_addr);
  * @return  The neighbor cache entry, if one is found.
  * @return  NULL, if none is found.
  */
-ng_ipv6_nc_t *ng_ipv6_nc_get(kernel_pid_t iface, const ng_ipv6_addr_t *ipv6_addr);
+ng_ipv6_nc_t *ng_ipv6_nc_get(kernel_pid_t iface, const ipv6_addr_t *ipv6_addr);
 
 /**
  * @brief   Gets next entry in neighbor cache after @p prev.
@@ -273,7 +273,7 @@ static inline bool ng_ipv6_nc_is_reachable(const ng_ipv6_nc_t *entry)
  * @return  The neighbor cache entry, if one is found.
  * @return  NULL, if none is found.
  */
-ng_ipv6_nc_t *ng_ipv6_nc_still_reachable(const ng_ipv6_addr_t *ipv6_addr);
+ng_ipv6_nc_t *ng_ipv6_nc_still_reachable(const ipv6_addr_t *ipv6_addr);
 
 #ifdef __cplusplus
 }

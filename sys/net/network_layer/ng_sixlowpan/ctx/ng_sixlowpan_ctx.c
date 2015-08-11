@@ -30,7 +30,7 @@ static uint32_t _current_minute(void);
 static void _update_lifetime(uint8_t id);
 
 #if ENABLE_DEBUG
-static char ipv6str[NG_IPV6_ADDR_MAX_STR_LEN];
+static char ipv6str[IPV6_ADDR_MAX_STR_LEN];
 #endif
 
 static inline bool _valid(uint8_t id)
@@ -39,7 +39,7 @@ static inline bool _valid(uint8_t id)
     return (_ctxs[id].prefix_len > 0);
 }
 
-ng_sixlowpan_ctx_t *ng_sixlowpan_ctx_lookup_addr(const ng_ipv6_addr_t *addr)
+ng_sixlowpan_ctx_t *ng_sixlowpan_ctx_lookup_addr(const ipv6_addr_t *addr)
 {
     uint8_t best = 0;
     ng_sixlowpan_ctx_t *res = NULL;
@@ -48,7 +48,7 @@ ng_sixlowpan_ctx_t *ng_sixlowpan_ctx_lookup_addr(const ng_ipv6_addr_t *addr)
 
     for (unsigned int id = 0; id < NG_SIXLOWPAN_CTX_SIZE; id++) {
         if (_valid(id)) {
-            uint8_t match = ng_ipv6_addr_match_prefix(&_ctxs[id].prefix, addr);
+            uint8_t match = ipv6_addr_match_prefix(&_ctxs[id].prefix, addr);
 
             if ((_ctxs[id].prefix_len <= match) && (match > best)) {
                 best = match;
@@ -62,9 +62,9 @@ ng_sixlowpan_ctx_t *ng_sixlowpan_ctx_lookup_addr(const ng_ipv6_addr_t *addr)
 #if ENABLE_DEBUG
     if (res != NULL) {
         DEBUG("6lo ctx: found context (%u, %s/%" PRIu8 ") ", res->id,
-              ng_ipv6_addr_to_str(ipv6str, &res->prefix, sizeof(ipv6str)),
+              ipv6_addr_to_str(ipv6str, &res->prefix, sizeof(ipv6str)),
               res->prefix_len);
-        DEBUG("for address %s\n", ng_ipv6_addr_to_str(ipv6str, addr, sizeof(ipv6str)));
+        DEBUG("for address %s\n", ipv6_addr_to_str(ipv6str, addr, sizeof(ipv6str)));
     }
 #endif
 
@@ -81,7 +81,7 @@ ng_sixlowpan_ctx_t *ng_sixlowpan_ctx_lookup_id(uint8_t id)
 
     if (_valid(id)) {
         DEBUG("6lo ctx: found context (%u, %s/%" PRIu8 ")\n", id,
-              ng_ipv6_addr_to_str(ipv6str, &_ctxs[id].prefix, sizeof(ipv6str)),
+              ipv6_addr_to_str(ipv6str, &_ctxs[id].prefix, sizeof(ipv6str)),
               _ctxs[id].prefix_len);
         mutex_unlock(&_ctx_mutex);
         return &(_ctxs[id]);
@@ -92,7 +92,7 @@ ng_sixlowpan_ctx_t *ng_sixlowpan_ctx_lookup_id(uint8_t id)
     return NULL;
 }
 
-ng_sixlowpan_ctx_t *ng_sixlowpan_ctx_update(uint8_t id, const ng_ipv6_addr_t *prefix,
+ng_sixlowpan_ctx_t *ng_sixlowpan_ctx_update(uint8_t id, const ipv6_addr_t *prefix,
                                             uint8_t prefix_len, uint16_t ltime,
                                             bool comp)
 {
@@ -108,8 +108,8 @@ ng_sixlowpan_ctx_t *ng_sixlowpan_ctx_update(uint8_t id, const ng_ipv6_addr_t *pr
         comp = false;
     }
 
-    if (prefix_len > NG_IPV6_ADDR_BIT_LEN) {
-        _ctxs[id].prefix_len = NG_IPV6_ADDR_BIT_LEN;
+    if (prefix_len > IPV6_ADDR_BIT_LEN) {
+        _ctxs[id].prefix_len = IPV6_ADDR_BIT_LEN;
     }
     else {
         _ctxs[id].prefix_len = prefix_len;
@@ -117,13 +117,12 @@ ng_sixlowpan_ctx_t *ng_sixlowpan_ctx_update(uint8_t id, const ng_ipv6_addr_t *pr
 
     _ctxs[id].flags_id = (comp) ? (NG_SIXLOWPAN_CTX_FLAGS_COMP | id) : id;
 
-    if (!ng_ipv6_addr_equal(&(_ctxs[id].prefix), prefix)) {
-        ng_ipv6_addr_set_unspecified(&(_ctxs[id].prefix));
-        ng_ipv6_addr_init_prefix(&(_ctxs[id].prefix), prefix,
-                                 _ctxs[id].prefix_len);
+    if (!ipv6_addr_equal(&(_ctxs[id].prefix), prefix)) {
+        ipv6_addr_set_unspecified(&(_ctxs[id].prefix));
+        ipv6_addr_init_prefix(&(_ctxs[id].prefix), prefix, _ctxs[id].prefix_len);
     }
     DEBUG("6lo ctx: update context (%u, %s/%" PRIu8 "), lifetime: %" PRIu16 " min\n",
-          id, ng_ipv6_addr_to_str(ipv6str, &_ctxs[id].prefix, sizeof(ipv6str)),
+          id, ipv6_addr_to_str(ipv6str, &_ctxs[id].prefix, sizeof(ipv6str)),
           _ctxs[id].prefix_len, _ctxs[id].ltime);
     _ctx_inval_times[id] = ltime + _current_minute();
 

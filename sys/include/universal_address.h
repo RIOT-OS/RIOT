@@ -113,7 +113,7 @@ int universal_address_compare(universal_address_container_t *entry,
 * @param[in] prefix      pointer to the address for compare
 * @param[in] prefix_size_in_bits the number of bits used for the prefix entry.
 *                                This size MUST be the full address size including trailing '0's,
-*                                e.g. for an ng_ipv6_addr_t it would be sizeof(ng_ipv6_addr_t)
+*                                e.g. for an ipv6_addr_t it would be sizeof(ipv6_addr_t)
 *                                regardless if the stored prefix is < ::/128
 *
 * @return 0 if the entries are equal

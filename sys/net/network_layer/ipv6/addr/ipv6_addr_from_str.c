@@ -31,7 +31,7 @@
 #include <string.h>
 
 #include "byteorder.h"
-#include "net/ng_ipv6/addr.h"
+#include "net/ipv6/addr.h"
 
 #define DEC     "0123456789"
 #define HEX_L   "0123456789abcdef"
@@ -91,7 +91,7 @@ static network_uint32_t *ipv4_addr_from_str(network_uint32_t *result,
 }
 
 /* based on inet_pton6() by Paul Vixie */
-ng_ipv6_addr_t *ng_ipv6_addr_from_str(ng_ipv6_addr_t *result, const char *addr)
+ipv6_addr_t *ipv6_addr_from_str(ipv6_addr_t *result, const char *addr)
 {
     uint8_t *colonp = 0;
     const char *curtok = addr;
@@ -104,7 +104,7 @@ ng_ipv6_addr_t *ng_ipv6_addr_from_str(ng_ipv6_addr_t *result, const char *addr)
         return NULL;
     }
 
-    ng_ipv6_addr_set_unspecified(result);
+    ipv6_addr_set_unspecified(result);
 
     /* Leading :: requires some special handling. */
     if (*addr == ':') {
@@ -145,7 +145,7 @@ ng_ipv6_addr_t *ng_ipv6_addr_from_str(ng_ipv6_addr_t *result, const char *addr)
                 continue;
             }
 
-            if (i > sizeof(ng_ipv6_addr_t)) {
+            if (i > sizeof(ipv6_addr_t)) {
                 return NULL;
             }
 
@@ -156,7 +156,7 @@ ng_ipv6_addr_t *ng_ipv6_addr_from_str(ng_ipv6_addr_t *result, const char *addr)
             continue;
         }
 
-        if (ch == '.' && (i <= sizeof(ng_ipv6_addr_t)) &&
+        if (ch == '.' && (i <= sizeof(ipv6_addr_t)) &&
             ipv4_addr_from_str((network_uint32_t *)(&(result->u8[i])),
                                curtok) != NULL) {
             i += sizeof(network_uint32_t);
@@ -168,7 +168,7 @@ ng_ipv6_addr_t *ng_ipv6_addr_from_str(ng_ipv6_addr_t *result, const char *addr)
     }
 
     if (saw_xdigit) {
-        if (i + sizeof(uint16_t) > sizeof(ng_ipv6_addr_t)) {
+        if (i + sizeof(uint16_t) > sizeof(ipv6_addr_t)) {
             return NULL;
         }
 
@@ -184,14 +184,14 @@ ng_ipv6_addr_t *ng_ipv6_addr_from_str(ng_ipv6_addr_t *result, const char *addr)
         const int32_t n = &(result->u8[i++]) - colonp;
 
         for (int32_t j = 1; j <= n; j++) {
-            result->u8[sizeof(ng_ipv6_addr_t) - j] = colonp[n - j];
+            result->u8[sizeof(ipv6_addr_t) - j] = colonp[n - j];
             colonp[n - j] = 0;
         }
 
-        i = sizeof(ng_ipv6_addr_t);
+        i = sizeof(ipv6_addr_t);
     }
 
-    if (i != sizeof(ng_ipv6_addr_t)) {
+    if (i != sizeof(ipv6_addr_t)) {
         return NULL;
     }
 

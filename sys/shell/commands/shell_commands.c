@@ -111,7 +111,7 @@ extern int _ipv6_nc_routers(int argc, char **argv);
 #endif
 
 #ifdef MODULE_NG_ZEP
-#ifdef MODULE_NG_IPV6_ADDR
+#ifdef MODULE_IPV6_ADDR
 extern int _zep_init(int argc, char **argv);
 #endif
 #endif
@@ -187,7 +187,7 @@ const shell_command_t _shell_command_list[] = {
     {"routers", "IPv6 default router list", _ipv6_nc_routers },
 #endif
 #ifdef MODULE_NG_ZEP
-#ifdef MODULE_NG_IPV6_ADDR
+#ifdef MODULE_IPV6_ADDR
     {"zep_init", "initializes ZEP (Zigbee Encapsulation Protocol)", _zep_init },
 #endif
 #endif

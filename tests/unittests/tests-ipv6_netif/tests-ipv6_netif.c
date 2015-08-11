@@ -83,7 +83,7 @@ static void test_netif_add__success_with_ipv6(void)
     kernel_pid_t pids[NG_NETIF_NUMOF];
     size_t pid_num;
     ng_ipv6_netif_t *entry;
-    ng_ipv6_addr_t exp_addr = NG_IPV6_ADDR_ALL_NODES_LINK_LOCAL;
+    ipv6_addr_t exp_addr = IPV6_ADDR_ALL_NODES_LINK_LOCAL;
 
     ng_netif_add(DEFAULT_TEST_NETIF);
 
@@ -137,7 +137,7 @@ static void test_ipv6_netif_get__empty(void)
 
 static void test_ipv6_netif_add_addr__no_iface1(void)
 {
-    ng_ipv6_addr_t addr = DEFAULT_TEST_IPV6_ADDR;
+    ipv6_addr_t addr = DEFAULT_TEST_IPV6_ADDR;
 
     TEST_ASSERT_NULL(ng_ipv6_netif_add_addr(DEFAULT_TEST_NETIF, &addr, DEFAULT_TEST_PREFIX_LEN, 0));
 }
@@ -156,7 +156,7 @@ static void test_ipv6_netif_add_addr__addr_NULL(void)
 
 static void test_ipv6_netif_add_addr__addr_unspecified(void)
 {
-    ng_ipv6_addr_t addr = NG_IPV6_ADDR_UNSPECIFIED;
+    ipv6_addr_t addr = IPV6_ADDR_UNSPECIFIED;
 
     test_ipv6_netif_add__success(); /* adds DEFAULT_TEST_NETIF as interface */
 
@@ -165,11 +165,11 @@ static void test_ipv6_netif_add_addr__addr_unspecified(void)
 
 static void test_ipv6_netif_add_addr__full(void)
 {
-    ng_ipv6_addr_t addr = DEFAULT_TEST_IPV6_ADDR, *res = &addr;
+    ipv6_addr_t addr = DEFAULT_TEST_IPV6_ADDR, *res = &addr;
     int i;
 
     /* make link local to avoid automatic link local adding */
-    ng_ipv6_addr_set_link_local_prefix(&addr);
+    ipv6_addr_set_link_local_prefix(&addr);
 
     test_ipv6_netif_add__success(); /* adds DEFAULT_TEST_NETIF as interface */
 
@@ -180,7 +180,7 @@ static void test_ipv6_netif_add_addr__full(void)
 
 static void test_ipv6_netif_add_addr__success(void)
 {
-    ng_ipv6_addr_t addr = DEFAULT_TEST_IPV6_ADDR;
+    ipv6_addr_t addr = DEFAULT_TEST_IPV6_ADDR;
 
     test_ipv6_netif_add__success(); /* adds DEFAULT_TEST_NETIF as interface */
 
@@ -190,11 +190,11 @@ static void test_ipv6_netif_add_addr__success(void)
 static void test_ipv6_netif_add_addr__despite_free_entry(void)
 {
     /* Tests for possible duplicates as described in http://github.com/RIOT-OS/RIOT/issues/2965 */
-    ng_ipv6_addr_t *entry_1;
-    ng_ipv6_addr_t *entry_2;
+    ipv6_addr_t *entry_1;
+    ipv6_addr_t *entry_2;
 
-    ng_ipv6_addr_t default_addr = DEFAULT_TEST_IPV6_ADDR;
-    ng_ipv6_addr_t ll_addr;
+    ipv6_addr_t default_addr = DEFAULT_TEST_IPV6_ADDR;
+    ipv6_addr_t ll_addr;
 
     test_ipv6_netif_add__success(); /* adds DEFAULT_TEST_NETIF as interface */
 
@@ -208,7 +208,7 @@ static void test_ipv6_netif_add_addr__despite_free_entry(void)
     /* create and re-add corresponding lla and check that it hasn't taken
      * the old place of default_addr*/
     ll_addr.u64[1] = default_addr.u64[1];
-    ng_ipv6_addr_set_link_local_prefix(&ll_addr);
+    ipv6_addr_set_link_local_prefix(&ll_addr);
     TEST_ASSERT_NOT_NULL((entry_2 = ng_ipv6_netif_add_addr(DEFAULT_TEST_NETIF, &ll_addr, DEFAULT_TEST_PREFIX_LEN, 0)));
 
     TEST_ASSERT(entry_1 != entry_2);
@@ -216,8 +216,8 @@ static void test_ipv6_netif_add_addr__despite_free_entry(void)
 
 static void test_ipv6_netif_remove_addr__not_allocated(void)
 {
-    ng_ipv6_addr_t addr = DEFAULT_TEST_IPV6_ADDR;
-    ng_ipv6_addr_t other_addr = OTHER_TEST_IPV6_ADDR;
+    ipv6_addr_t addr = DEFAULT_TEST_IPV6_ADDR;
+    ipv6_addr_t other_addr = OTHER_TEST_IPV6_ADDR;
 
     test_ipv6_netif_add_addr__success(); /* adds DEFAULT_TEST_IPV6_ADDR to
                                           * DEFAULT_TEST_NETIF */
@@ -230,7 +230,7 @@ static void test_ipv6_netif_remove_addr__not_allocated(void)
 
 static void test_ipv6_netif_remove_addr__success(void)
 {
-    ng_ipv6_addr_t addr = DEFAULT_TEST_IPV6_ADDR;
+    ipv6_addr_t addr = DEFAULT_TEST_IPV6_ADDR;
 
     test_ipv6_netif_add_addr__success(); /* adds DEFAULT_TEST_IPV6_ADDR to
                                           * DEFAULT_TEST_NETIF */
@@ -242,7 +242,7 @@ static void test_ipv6_netif_remove_addr__success(void)
 
 static void test_ipv6_netif_reset_addr__success(void)
 {
-    ng_ipv6_addr_t addr = DEFAULT_TEST_IPV6_ADDR;
+    ipv6_addr_t addr = DEFAULT_TEST_IPV6_ADDR;
 
     test_ipv6_netif_add_addr__success(); /* adds DEFAULT_TEST_IPV6_ADDR to
                                           * DEFAULT_TEST_NETIF */
@@ -254,8 +254,8 @@ static void test_ipv6_netif_reset_addr__success(void)
 
 static void test_ipv6_netif_find_by_addr__empty(void)
 {
-    ng_ipv6_addr_t addr = DEFAULT_TEST_IPV6_ADDR;
-    ng_ipv6_addr_t *out = NULL;
+    ipv6_addr_t addr = DEFAULT_TEST_IPV6_ADDR;
+    ipv6_addr_t *out = NULL;
 
     TEST_ASSERT_EQUAL_INT(KERNEL_PID_UNDEF, ng_ipv6_netif_find_by_addr(&out, &addr));
     TEST_ASSERT_NULL(out);
@@ -263,8 +263,8 @@ static void test_ipv6_netif_find_by_addr__empty(void)
 
 static void test_ipv6_netif_find_by_addr__success(void)
 {
-    ng_ipv6_addr_t addr = DEFAULT_TEST_IPV6_ADDR;
-    ng_ipv6_addr_t *out = NULL;
+    ipv6_addr_t addr = DEFAULT_TEST_IPV6_ADDR;
+    ipv6_addr_t *out = NULL;
 
     test_ipv6_netif_add_addr__success(); /* adds DEFAULT_TEST_IPV6_ADDR to
                                           * DEFAULT_TEST_NETIF */
@@ -272,19 +272,19 @@ static void test_ipv6_netif_find_by_addr__success(void)
     TEST_ASSERT_EQUAL_INT(DEFAULT_TEST_NETIF, ng_ipv6_netif_find_by_addr(&out, &addr));
     TEST_ASSERT_NOT_NULL(out);
     TEST_ASSERT(out != &addr);
-    TEST_ASSERT_EQUAL_INT(true, ng_ipv6_addr_equal(out, &addr));
+    TEST_ASSERT_EQUAL_INT(true, ipv6_addr_equal(out, &addr));
 }
 
 static void test_ipv6_netif_find_addr__no_iface(void)
 {
-    ng_ipv6_addr_t addr = DEFAULT_TEST_IPV6_ADDR;
+    ipv6_addr_t addr = DEFAULT_TEST_IPV6_ADDR;
 
     TEST_ASSERT_NULL(ng_ipv6_netif_find_addr(DEFAULT_TEST_NETIF, &addr));
 }
 
 static void test_ipv6_netif_find_addr__wrong_iface(void)
 {
-    ng_ipv6_addr_t addr = DEFAULT_TEST_IPV6_ADDR;
+    ipv6_addr_t addr = DEFAULT_TEST_IPV6_ADDR;
 
     test_ipv6_netif_add_addr__success(); /* adds DEFAULT_TEST_IPV6_ADDR to
                                           * DEFAULT_TEST_NETIF */
@@ -294,7 +294,7 @@ static void test_ipv6_netif_find_addr__wrong_iface(void)
 
 static void test_ipv6_netif_find_addr__wrong_addr(void)
 {
-    ng_ipv6_addr_t addr = OTHER_TEST_IPV6_ADDR;
+    ipv6_addr_t addr = OTHER_TEST_IPV6_ADDR;
 
     test_ipv6_netif_add_addr__success(); /* adds DEFAULT_TEST_IPV6_ADDR to
                                           * DEFAULT_TEST_NETIF */
@@ -304,26 +304,26 @@ static void test_ipv6_netif_find_addr__wrong_addr(void)
 
 static void test_ipv6_netif_find_addr__success(void)
 {
-    ng_ipv6_addr_t addr = DEFAULT_TEST_IPV6_ADDR;
-    ng_ipv6_addr_t *out = NULL;
+    ipv6_addr_t addr = DEFAULT_TEST_IPV6_ADDR;
+    ipv6_addr_t *out = NULL;
 
     test_ipv6_netif_add_addr__success(); /* adds DEFAULT_TEST_IPV6_ADDR to
                                           * DEFAULT_TEST_NETIF */
 
     TEST_ASSERT_NOT_NULL((out = ng_ipv6_netif_find_addr(DEFAULT_TEST_NETIF, &addr)));
     TEST_ASSERT(out != &addr);
-    TEST_ASSERT_EQUAL_INT(true, ng_ipv6_addr_equal(out, &addr));
+    TEST_ASSERT_EQUAL_INT(true, ipv6_addr_equal(out, &addr));
 
     /* also test for link local address */
-    ng_ipv6_addr_set_link_local_prefix(&addr);
+    ipv6_addr_set_link_local_prefix(&addr);
     TEST_ASSERT_NOT_NULL((out = ng_ipv6_netif_find_addr(DEFAULT_TEST_NETIF, &addr)));
-    TEST_ASSERT_EQUAL_INT(true, ng_ipv6_addr_equal(out, &addr));
+    TEST_ASSERT_EQUAL_INT(true, ipv6_addr_equal(out, &addr));
 }
 
 static void test_ipv6_netif_find_by_prefix__success1(void)
 {
-    ng_ipv6_addr_t addr = DEFAULT_TEST_IPV6_PREFIX23;
-    ng_ipv6_addr_t *out = NULL;
+    ipv6_addr_t addr = DEFAULT_TEST_IPV6_PREFIX23;
+    ipv6_addr_t *out = NULL;
 
     test_ipv6_netif_add_addr__success(); /* adds DEFAULT_TEST_IPV6_ADDR to
                                           * DEFAULT_TEST_NETIF */
@@ -331,13 +331,13 @@ static void test_ipv6_netif_find_by_prefix__success1(void)
     TEST_ASSERT_EQUAL_INT(DEFAULT_TEST_NETIF, ng_ipv6_netif_find_by_prefix(&out, &addr));
     TEST_ASSERT_NOT_NULL(out);
     TEST_ASSERT(out != &addr);
-    TEST_ASSERT_EQUAL_INT(23, ng_ipv6_addr_match_prefix(out, &addr));
+    TEST_ASSERT_EQUAL_INT(23, ipv6_addr_match_prefix(out, &addr));
 }
 
 static void test_ipv6_netif_find_by_prefix__success2(void)
 {
-    ng_ipv6_addr_t addr = DEFAULT_TEST_IPV6_PREFIX18;
-    ng_ipv6_addr_t *out = NULL;
+    ipv6_addr_t addr = DEFAULT_TEST_IPV6_PREFIX18;
+    ipv6_addr_t *out = NULL;
 
     test_ipv6_netif_add_addr__success(); /* adds DEFAULT_TEST_IPV6_ADDR to
                                           * DEFAULT_TEST_NETIF */
@@ -345,13 +345,13 @@ static void test_ipv6_netif_find_by_prefix__success2(void)
     TEST_ASSERT_EQUAL_INT(DEFAULT_TEST_NETIF, ng_ipv6_netif_find_by_prefix(&out, &addr));
     TEST_ASSERT_NOT_NULL(out);
     TEST_ASSERT(out != &addr);
-    TEST_ASSERT_EQUAL_INT(18, ng_ipv6_addr_match_prefix(out, &addr));
+    TEST_ASSERT_EQUAL_INT(18, ipv6_addr_match_prefix(out, &addr));
 }
 
 static void test_ipv6_netif_find_by_prefix__success3(void)
 {
-    ng_ipv6_addr_t addr = DEFAULT_TEST_IPV6_PREFIX64;
-    ng_ipv6_addr_t *out = NULL;
+    ipv6_addr_t addr = DEFAULT_TEST_IPV6_PREFIX64;
+    ipv6_addr_t *out = NULL;
 
     test_ipv6_netif_add_addr__success(); /* adds DEFAULT_TEST_IPV6_ADDR to
                                           * DEFAULT_TEST_NETIF */
@@ -359,60 +359,60 @@ static void test_ipv6_netif_find_by_prefix__success3(void)
     TEST_ASSERT_EQUAL_INT(DEFAULT_TEST_NETIF, ng_ipv6_netif_find_by_prefix(&out, &addr));
     TEST_ASSERT_NOT_NULL(out);
     TEST_ASSERT(out != &addr);
-    TEST_ASSERT_EQUAL_INT(64, ng_ipv6_addr_match_prefix(out, &addr));
+    TEST_ASSERT_EQUAL_INT(64, ipv6_addr_match_prefix(out, &addr));
 }
 
 static void test_ipv6_netif_match_prefix__success1(void)
 {
-    ng_ipv6_addr_t addr = DEFAULT_TEST_IPV6_PREFIX23;
-    ng_ipv6_addr_t *out = NULL;
+    ipv6_addr_t addr = DEFAULT_TEST_IPV6_PREFIX23;
+    ipv6_addr_t *out = NULL;
 
     test_ipv6_netif_add_addr__success(); /* adds DEFAULT_TEST_IPV6_ADDR to
                                           * DEFAULT_TEST_NETIF */
 
     TEST_ASSERT_NOT_NULL((out = ng_ipv6_netif_match_prefix(DEFAULT_TEST_NETIF, &addr)));
     TEST_ASSERT(out != &addr);
-    TEST_ASSERT_EQUAL_INT(23, ng_ipv6_addr_match_prefix(out, &addr));
+    TEST_ASSERT_EQUAL_INT(23, ipv6_addr_match_prefix(out, &addr));
 }
 
 static void test_ipv6_netif_match_prefix__success2(void)
 {
-    ng_ipv6_addr_t addr = DEFAULT_TEST_IPV6_PREFIX18;
-    ng_ipv6_addr_t *out = NULL;
+    ipv6_addr_t addr = DEFAULT_TEST_IPV6_PREFIX18;
+    ipv6_addr_t *out = NULL;
 
     test_ipv6_netif_add_addr__success(); /* adds DEFAULT_TEST_IPV6_ADDR to
                                           * DEFAULT_TEST_NETIF */
 
     TEST_ASSERT_NOT_NULL((out = ng_ipv6_netif_match_prefix(DEFAULT_TEST_NETIF, &addr)));
     TEST_ASSERT(out != &addr);
-    TEST_ASSERT_EQUAL_INT(18, ng_ipv6_addr_match_prefix(out, &addr));
+    TEST_ASSERT_EQUAL_INT(18, ipv6_addr_match_prefix(out, &addr));
 }
 
 static void test_ipv6_netif_match_prefix__success3(void)
 {
-    ng_ipv6_addr_t addr = DEFAULT_TEST_IPV6_PREFIX64;
-    ng_ipv6_addr_t *out = NULL;
+    ipv6_addr_t addr = DEFAULT_TEST_IPV6_PREFIX64;
+    ipv6_addr_t *out = NULL;
 
     test_ipv6_netif_add_addr__success(); /* adds DEFAULT_TEST_IPV6_ADDR to
                                           * DEFAULT_TEST_NETIF */
 
     TEST_ASSERT_NOT_NULL((out = ng_ipv6_netif_match_prefix(DEFAULT_TEST_NETIF, &addr)));
     TEST_ASSERT(out != &addr);
-    TEST_ASSERT_EQUAL_INT(64, ng_ipv6_addr_match_prefix(out, &addr));
+    TEST_ASSERT_EQUAL_INT(64, ipv6_addr_match_prefix(out, &addr));
 }
 
 static void test_ipv6_netif_find_best_src_addr__no_unicast(void)
 {
-    ng_ipv6_addr_t ll_addr1 = NG_IPV6_ADDR_UNSPECIFIED;
-    ng_ipv6_addr_t ll_addr2 = NG_IPV6_ADDR_UNSPECIFIED;
-    ng_ipv6_addr_t mc_addr = NG_IPV6_ADDR_ALL_NODES_LINK_LOCAL;
+    ipv6_addr_t ll_addr1 = IPV6_ADDR_UNSPECIFIED;
+    ipv6_addr_t ll_addr2 = IPV6_ADDR_UNSPECIFIED;
+    ipv6_addr_t mc_addr = IPV6_ADDR_ALL_NODES_LINK_LOCAL;
 
     ll_addr1.u8[15] = 1;
-    ng_ipv6_addr_set_link_local_prefix(&ll_addr1);
+    ipv6_addr_set_link_local_prefix(&ll_addr1);
     ll_addr2.u8[15] = 2;
-    ng_ipv6_addr_set_link_local_prefix(&ll_addr2);
+    ipv6_addr_set_link_local_prefix(&ll_addr2);
 
-    TEST_ASSERT_EQUAL_INT(126, ng_ipv6_addr_match_prefix(&ll_addr2, &ll_addr1));
+    TEST_ASSERT_EQUAL_INT(126, ipv6_addr_match_prefix(&ll_addr2, &ll_addr1));
 
     test_ipv6_netif_add__success(); /* adds DEFAULT_TEST_NETIF as interface */
     TEST_ASSERT_NOT_NULL(ng_ipv6_netif_add_addr(DEFAULT_TEST_NETIF, &mc_addr, DEFAULT_TEST_PREFIX_LEN,
@@ -425,17 +425,17 @@ static void test_ipv6_netif_find_best_src_addr__no_unicast(void)
 
 static void test_ipv6_netif_find_best_src_addr__success(void)
 {
-    ng_ipv6_addr_t ll_addr1 = NG_IPV6_ADDR_UNSPECIFIED;
-    ng_ipv6_addr_t ll_addr2 = NG_IPV6_ADDR_UNSPECIFIED;
-    ng_ipv6_addr_t mc_addr = NG_IPV6_ADDR_ALL_NODES_LINK_LOCAL;
-    ng_ipv6_addr_t *out = NULL;
+    ipv6_addr_t ll_addr1 = IPV6_ADDR_UNSPECIFIED;
+    ipv6_addr_t ll_addr2 = IPV6_ADDR_UNSPECIFIED;
+    ipv6_addr_t mc_addr = IPV6_ADDR_ALL_NODES_LINK_LOCAL;
+    ipv6_addr_t *out = NULL;
 
     ll_addr1.u8[15] = 1;
-    ng_ipv6_addr_set_link_local_prefix(&ll_addr1);
+    ipv6_addr_set_link_local_prefix(&ll_addr1);
     ll_addr2.u8[15] = 2;
-    ng_ipv6_addr_set_link_local_prefix(&ll_addr2);
+    ipv6_addr_set_link_local_prefix(&ll_addr2);
 
-    TEST_ASSERT_EQUAL_INT(126, ng_ipv6_addr_match_prefix(&ll_addr2, &ll_addr1));
+    TEST_ASSERT_EQUAL_INT(126, ipv6_addr_match_prefix(&ll_addr2, &ll_addr1));
 
     test_ipv6_netif_add__success(); /* adds DEFAULT_TEST_NETIF as interface */
     TEST_ASSERT_NOT_NULL(ng_ipv6_netif_add_addr(DEFAULT_TEST_NETIF, &mc_addr, DEFAULT_TEST_PREFIX_LEN,
@@ -446,28 +446,28 @@ static void test_ipv6_netif_find_best_src_addr__success(void)
     TEST_ASSERT_NOT_NULL((out = ng_ipv6_netif_find_best_src_addr(DEFAULT_TEST_NETIF, &ll_addr2)));
     TEST_ASSERT(out != &ll_addr1);
     TEST_ASSERT(out != &ll_addr2);
-    TEST_ASSERT_EQUAL_INT(true, ng_ipv6_addr_equal(out, &ll_addr1));
+    TEST_ASSERT_EQUAL_INT(true, ipv6_addr_equal(out, &ll_addr1));
 }
 
 static void test_ipv6_netif_find_best_src_addr__multicast_input(void)
 {
-    ng_ipv6_addr_t mc_addr = NG_IPV6_ADDR_ALL_ROUTERS_LINK_LOCAL;
-    ng_ipv6_addr_t *out = NULL;
+    ipv6_addr_t mc_addr = IPV6_ADDR_ALL_ROUTERS_LINK_LOCAL;
+    ipv6_addr_t *out = NULL;
 
     /* Adds DEFAULT_TEST_NETIF as interface and to it fe80::1, fe80::2 and ff02::1 */
     test_ipv6_netif_find_best_src_addr__success();
 
     TEST_ASSERT_NOT_NULL((out = ng_ipv6_netif_find_best_src_addr(DEFAULT_TEST_NETIF, &mc_addr)));
-    TEST_ASSERT_EQUAL_INT(false, ng_ipv6_addr_equal(&mc_addr, out));
-    TEST_ASSERT_EQUAL_INT(false, ng_ipv6_addr_is_unspecified(out));
+    TEST_ASSERT_EQUAL_INT(false, ipv6_addr_equal(&mc_addr, out));
+    TEST_ASSERT_EQUAL_INT(false, ipv6_addr_is_unspecified(out));
 }
 
 static void test_ipv6_netif_find_best_src_addr__other_subnet(void)
 {
-    ng_ipv6_addr_t addr1 = DEFAULT_TEST_IPV6_ADDR;
-    ng_ipv6_addr_t addr2 = OTHER_TEST_IPV6_ADDR;
+    ipv6_addr_t addr1 = DEFAULT_TEST_IPV6_ADDR;
+    ipv6_addr_t addr2 = OTHER_TEST_IPV6_ADDR;
 
-    ng_ipv6_addr_t *out = NULL;
+    ipv6_addr_t *out = NULL;
 
     test_ipv6_netif_add__success(); /* adds DEFAULT_TEST_NETIF as interface */
     TEST_ASSERT_NOT_NULL(ng_ipv6_netif_add_addr(DEFAULT_TEST_NETIF, &addr1, DEFAULT_TEST_PREFIX_LEN,
@@ -475,13 +475,13 @@ static void test_ipv6_netif_find_best_src_addr__other_subnet(void)
 
     TEST_ASSERT_NOT_NULL((out = ng_ipv6_netif_find_best_src_addr(DEFAULT_TEST_NETIF, &addr2)));
     TEST_ASSERT(out != &addr1);
-    TEST_ASSERT_EQUAL_INT(true, ng_ipv6_addr_equal(out, &addr1));
+    TEST_ASSERT_EQUAL_INT(true, ipv6_addr_equal(out, &addr1));
 }
 
 static void test_ipv6_netif_addr_is_non_unicast__unicast(void)
 {
-    ng_ipv6_addr_t addr = DEFAULT_TEST_IPV6_ADDR;
-    ng_ipv6_addr_t *out = NULL;
+    ipv6_addr_t addr = DEFAULT_TEST_IPV6_ADDR;
+    ipv6_addr_t *out = NULL;
 
     test_ipv6_netif_add_addr__success(); /* adds DEFAULT_TEST_IPV6_ADDR to
                                           * DEFAULT_TEST_NETIF */
@@ -492,8 +492,8 @@ static void test_ipv6_netif_addr_is_non_unicast__unicast(void)
 
 static void test_ipv6_netif_addr_is_non_unicast__anycast(void)
 {
-    ng_ipv6_addr_t addr = DEFAULT_TEST_IPV6_ADDR;
-    ng_ipv6_addr_t *out = NULL;
+    ipv6_addr_t addr = DEFAULT_TEST_IPV6_ADDR;
+    ipv6_addr_t *out = NULL;
 
     test_ipv6_netif_add__success(); /* adds DEFAULT_TEST_NETIF as interface */
 
@@ -506,8 +506,8 @@ static void test_ipv6_netif_addr_is_non_unicast__anycast(void)
 
 static void test_ipv6_netif_addr_is_non_unicast__multicast1(void)
 {
-    ng_ipv6_addr_t addr = NG_IPV6_ADDR_ALL_ROUTERS_LINK_LOCAL;
-    ng_ipv6_addr_t *out = NULL;
+    ipv6_addr_t addr = IPV6_ADDR_ALL_ROUTERS_LINK_LOCAL;
+    ipv6_addr_t *out = NULL;
 
     test_ipv6_netif_add__success(); /* adds DEFAULT_TEST_NETIF as interface */
 
@@ -519,8 +519,8 @@ static void test_ipv6_netif_addr_is_non_unicast__multicast1(void)
 
 static void test_ipv6_netif_addr_is_non_unicast__multicast2(void)
 {
-    ng_ipv6_addr_t addr = NG_IPV6_ADDR_ALL_ROUTERS_LINK_LOCAL;
-    ng_ipv6_addr_t *out = NULL;
+    ipv6_addr_t addr = IPV6_ADDR_ALL_ROUTERS_LINK_LOCAL;
+    ipv6_addr_t *out = NULL;
 
     test_ipv6_netif_add__success(); /* adds DEFAULT_TEST_NETIF as interface */
 

@@ -32,7 +32,7 @@
 #include <inttypes.h>
 #include <stdbool.h>
 
-#include "net/ng_ipv6/addr.h"
+#include "net/ipv6/addr.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -56,7 +56,7 @@ extern "C" {
  * @brief   Entry in the 6LoWPAN context buffer.
  */
 typedef struct {
-    ng_ipv6_addr_t prefix;  /**< The prefix associated to this context. */
+    ipv6_addr_t prefix;     /**< The prefix associated to this context. */
     uint8_t prefix_len;     /**< Length of ng_sixlowpan_ctx_t::prefix in bit. */
     /**
      * @brief   4-bit flags, 4-bit Context ID.
@@ -85,7 +85,7 @@ typedef struct {
  * @return  The context associated with the best prefix for @p addr.
  * @return  NULL if there is no such context.
  */
-ng_sixlowpan_ctx_t *ng_sixlowpan_ctx_lookup_addr(const ng_ipv6_addr_t *addr);
+ng_sixlowpan_ctx_t *ng_sixlowpan_ctx_lookup_addr(const ipv6_addr_t *addr);
 
 /**
  * @brief   Gets context by ID.
@@ -112,7 +112,7 @@ ng_sixlowpan_ctx_t *ng_sixlowpan_ctx_lookup_id(uint8_t id);
  * @return  The new context on success.
  * @return  NULL, on error or on removal.
  */
-ng_sixlowpan_ctx_t *ng_sixlowpan_ctx_update(uint8_t id, const ng_ipv6_addr_t *prefix,
+ng_sixlowpan_ctx_t *ng_sixlowpan_ctx_update(uint8_t id, const ipv6_addr_t *prefix,
                                             uint8_t prefix_len, uint16_t ltime,
                                             bool comp);
 

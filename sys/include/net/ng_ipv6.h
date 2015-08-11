@@ -32,7 +32,7 @@
 #include "net/ng_netbase.h"
 #include "thread.h"
 
-#include "net/ng_ipv6/addr.h"
+#include "net/ipv6.h"
 #include "net/ng_ipv6/ext.h"
 #include "net/ng_ipv6/hdr.h"
 #include "net/ng_ipv6/nc.h"

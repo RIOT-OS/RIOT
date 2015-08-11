@@ -40,7 +40,7 @@
 /* For PRIu8 etc. */
 #include <inttypes.h>
 
-static char addr_str[NG_IPV6_ADDR_MAX_STR_LEN];
+static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 #endif
 
 /* random helper function */
@@ -50,22 +50,22 @@ void ng_ndp_nbr_sol_handle(kernel_pid_t iface, ng_pktsnip_t *pkt,
 {
     uint16_t opt_offset = 0;
     uint8_t *buf = ((uint8_t *)nbr_sol) + sizeof(ng_ndp_nbr_sol_t);
-    ng_ipv6_addr_t *tgt;
+    ipv6_addr_t *tgt;
     int sicmpv6_size = (int)icmpv6_size;
 
     DEBUG("ndp: received neighbor solicitation (src: %s, ",
-          ng_ipv6_addr_to_str(addr_str, &ipv6->src, sizeof(addr_str)));
+          ipv6_addr_to_str(addr_str, &ipv6->src, sizeof(addr_str)));
     DEBUG("dst: %s, ",
-          ng_ipv6_addr_to_str(addr_str, &ipv6->dst, sizeof(addr_str)));
+          ipv6_addr_to_str(addr_str, &ipv6->dst, sizeof(addr_str)));
     DEBUG("tgt: %s)\n",
-          ng_ipv6_addr_to_str(addr_str, &nbr_sol->tgt, sizeof(addr_str)));
+          ipv6_addr_to_str(addr_str, &nbr_sol->tgt, sizeof(addr_str)));
 
     /* check validity */
     if ((ipv6->hl != 255) || (nbr_sol->code != 0) ||
         (icmpv6_size < sizeof(ng_ndp_nbr_sol_t)) ||
-        ng_ipv6_addr_is_multicast(&nbr_sol->tgt) ||
-        (ng_ipv6_addr_is_unspecified(&ipv6->src) &&
-         ng_ipv6_addr_is_solicited_node(&ipv6->dst))) {
+        ipv6_addr_is_multicast(&nbr_sol->tgt) ||
+        (ipv6_addr_is_unspecified(&ipv6->src) &&
+         ipv6_addr_is_solicited_node(&ipv6->dst))) {
         DEBUG("ndp: neighbor solicitation was invalid.\n");
         /* ipv6 releases */
         return;
@@ -102,7 +102,7 @@ void ng_ndp_nbr_sol_handle(kernel_pid_t iface, ng_pktsnip_t *pkt,
     }
 
     ng_ndp_internal_send_nbr_adv(iface, tgt, &ipv6->src,
-                                 ng_ipv6_addr_is_multicast(&ipv6->dst));
+                                 ipv6_addr_is_multicast(&ipv6->dst));
 
     return;
 }
@@ -127,16 +127,16 @@ void ng_ndp_nbr_adv_handle(kernel_pid_t iface, ng_pktsnip_t *pkt,
     ng_netif_hdr_t *netif_hdr = NULL;
 
     DEBUG("ndp: received neighbor advertisement (src: %s, ",
-          ng_ipv6_addr_to_str(addr_str, &ipv6->src, sizeof(addr_str)));
+          ipv6_addr_to_str(addr_str, &ipv6->src, sizeof(addr_str)));
     DEBUG("dst: %s, ",
-          ng_ipv6_addr_to_str(addr_str, &ipv6->dst, sizeof(addr_str)));
+          ipv6_addr_to_str(addr_str, &ipv6->dst, sizeof(addr_str)));
     DEBUG("tgt: %s)\n",
-          ng_ipv6_addr_to_str(addr_str, &nbr_adv->tgt, sizeof(addr_str)));
+          ipv6_addr_to_str(addr_str, &nbr_adv->tgt, sizeof(addr_str)));
 
     /* check validity */
     if ((ipv6->hl != 255) || (nbr_adv->code != 0) ||
         (icmpv6_size < sizeof(ng_ndp_nbr_adv_t)) ||
-        ng_ipv6_addr_is_multicast(&nbr_adv->tgt)) {
+        ipv6_addr_is_multicast(&nbr_adv->tgt)) {
         DEBUG("ndp: neighbor advertisement was invalid.\n");
         /* ipv6 releases */
         return;
@@ -265,14 +265,14 @@ void ng_ndp_retrans_nbr_sol(ng_ipv6_nc_t *nc_entry)
     if ((ng_ipv6_nc_get_state(nc_entry) == NG_IPV6_NC_STATE_INCOMPLETE) ||
         (ng_ipv6_nc_get_state(nc_entry) == NG_IPV6_NC_STATE_PROBE)) {
         if (nc_entry->probes_remaining > 1) {
-            ng_ipv6_addr_t dst;
+            ipv6_addr_t dst;
 
             DEBUG("ndp: Retransmit neighbor solicitation for %s\n",
-                  ng_ipv6_addr_to_str(addr_str, &nc_entry->ipv6_addr, sizeof(addr_str)));
+                  ipv6_addr_to_str(addr_str, &nc_entry->ipv6_addr, sizeof(addr_str)));
 
             /* retransmit neighbor solicatation */
             if (ng_ipv6_nc_get_state(nc_entry) == NG_IPV6_NC_STATE_INCOMPLETE) {
-                ng_ipv6_addr_set_solicited_nodes(&dst, &nc_entry->ipv6_addr);
+                ipv6_addr_set_solicited_nodes(&dst, &nc_entry->ipv6_addr);
             }
             else {
                 dst.u64[0] = nc_entry->ipv6_addr.u64[0];
@@ -309,11 +309,11 @@ void ng_ndp_retrans_nbr_sol(ng_ipv6_nc_t *nc_entry)
         }
         else if (nc_entry->probes_remaining <= 1) {
             DEBUG("ndp: Remove nc entry %s for interface %" PRIkernel_pid "\n",
-                  ng_ipv6_addr_to_str(addr_str, &nc_entry->ipv6_addr, sizeof(addr_str)),
+                  ipv6_addr_to_str(addr_str, &nc_entry->ipv6_addr, sizeof(addr_str)),
                   nc_entry->iface);
 
 #ifdef MODULE_FIB
-            fib_remove_entry((uint8_t *) & (nc_entry->ipv6_addr), sizeof(ng_ipv6_addr_t));
+            fib_remove_entry((uint8_t *) & (nc_entry->ipv6_addr), sizeof(ipv6_addr_t));
 #endif
             ng_ipv6_nc_remove(nc_entry->iface, &nc_entry->ipv6_addr);
         }
@@ -357,13 +357,13 @@ void ng_ndp_netif_remove(ng_ipv6_netif_t *iface)
     (void) iface;
 }
 
-ng_pktsnip_t *ng_ndp_nbr_sol_build(ng_ipv6_addr_t *tgt, ng_pktsnip_t *options)
+ng_pktsnip_t *ng_ndp_nbr_sol_build(ipv6_addr_t *tgt, ng_pktsnip_t *options)
 {
     ng_pktsnip_t *pkt;
 
     DEBUG("ndp: building neighbor solicitation message\n");
 
-    if (ng_ipv6_addr_is_multicast(tgt)) {
+    if (ipv6_addr_is_multicast(tgt)) {
         DEBUG("ndp: tgt must not be multicast\n");
         return NULL;
     }
@@ -380,14 +380,14 @@ ng_pktsnip_t *ng_ndp_nbr_sol_build(ng_ipv6_addr_t *tgt, ng_pktsnip_t *options)
     return pkt;
 }
 
-ng_pktsnip_t *ng_ndp_nbr_adv_build(uint8_t flags, ng_ipv6_addr_t *tgt,
+ng_pktsnip_t *ng_ndp_nbr_adv_build(uint8_t flags, ipv6_addr_t *tgt,
                                    ng_pktsnip_t *options)
 {
     ng_pktsnip_t *pkt;
 
     DEBUG("ndp: building neighbor advertisement message\n");
 
-    if (ng_ipv6_addr_is_multicast(tgt)) {
+    if (ipv6_addr_is_multicast(tgt)) {
         DEBUG("ndp: tgt must not be multicast\n");
         return NULL;
     }

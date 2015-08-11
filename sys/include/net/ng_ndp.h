@@ -23,7 +23,7 @@
 #include "byteorder.h"
 #include "net/ng_pkt.h"
 #include "net/ng_icmpv6.h"
-#include "net/ng_ipv6/addr.h"
+#include "net/ipv6/addr.h"
 #include "net/ng_ipv6/nc.h"
 #include "net/ng_ipv6/netif.h"
 
@@ -181,7 +181,7 @@ void ng_ndp_netif_remove(ng_ipv6_netif_t *iface);
  * @return  The resulting ICMPv6 packet on success.
  * @return  NULL, on failure.
  */
-ng_pktsnip_t *ng_ndp_nbr_sol_build(ng_ipv6_addr_t *tgt, ng_pktsnip_t *options);
+ng_pktsnip_t *ng_ndp_nbr_sol_build(ipv6_addr_t *tgt, ng_pktsnip_t *options);
 
 /**
  * @brief   Builds a neighbor advertisement message for sending.
@@ -209,7 +209,7 @@ ng_pktsnip_t *ng_ndp_nbr_sol_build(ng_ipv6_addr_t *tgt, ng_pktsnip_t *options);
  * @return  The resulting ICMPv6 packet on success.
  * @return  NULL, on failure.
  */
-ng_pktsnip_t *ng_ndp_nbr_adv_build(uint8_t flags, ng_ipv6_addr_t *tgt,
+ng_pktsnip_t *ng_ndp_nbr_adv_build(uint8_t flags, ipv6_addr_t *tgt,
                                    ng_pktsnip_t *options);
 
 /**

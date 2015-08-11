@@ -14,7 +14,7 @@
 
 #include "net/ng_rpl/srh.h"
 
-ng_ipv6_addr_t *ng_rpl_srh_next_hop(ng_rpl_srh_t *rh)
+ipv6_addr_t *ng_rpl_srh_next_hop(ng_rpl_srh_t *rh)
 {
     /* TODO */
 

@@ -17,7 +17,7 @@
 
 #include "embUnit.h"
 
-#include "net/ng_ipv6/addr.h"
+#include "net/ipv6/addr.h"
 #include "net/ng_sixlowpan/ctx.h"
 
 #include "unittests-constants.h"
@@ -50,7 +50,7 @@ static void tear_down(void)
 
 static void test_sixlowpan_ctx_update__success(void)
 {
-    ng_ipv6_addr_t addr = DEFAULT_TEST_PREFIX;
+    ipv6_addr_t addr = DEFAULT_TEST_PREFIX;
 
     TEST_ASSERT_NOT_NULL(ng_sixlowpan_ctx_update(DEFAULT_TEST_ID, &addr,
                                                  DEFAULT_TEST_PREFIX_LEN,
@@ -60,7 +60,7 @@ static void test_sixlowpan_ctx_update__success(void)
 
 static void test_sixlowpan_ctx_update__ltime0(void)
 {
-    ng_ipv6_addr_t addr = DEFAULT_TEST_PREFIX;
+    ipv6_addr_t addr = DEFAULT_TEST_PREFIX;
 
     TEST_ASSERT_NOT_NULL(ng_sixlowpan_ctx_update(DEFAULT_TEST_ID, &addr,
                                                  DEFAULT_TEST_PREFIX_LEN,
@@ -71,7 +71,7 @@ static void test_sixlowpan_ctx_update__ltime0(void)
 
 static void test_sixlowpan_ctx_update__wrong_id1(void)
 {
-    ng_ipv6_addr_t addr = DEFAULT_TEST_PREFIX;
+    ipv6_addr_t addr = DEFAULT_TEST_PREFIX;
 
     /* add context DEFAULT_TEST_PREFIX to DEFAULT_TEST_ID */
     test_sixlowpan_ctx_update__success();
@@ -90,7 +90,7 @@ static void test_sixlowpan_ctx_update__wrong_id1(void)
 
 static void test_sixlowpan_ctx_update__wrong_id2(void)
 {
-    ng_ipv6_addr_t addr = DEFAULT_TEST_PREFIX;
+    ipv6_addr_t addr = DEFAULT_TEST_PREFIX;
 
     /* add context DEFAULT_TEST_PREFIX to DEFAULT_TEST_ID */
     test_sixlowpan_ctx_update__success();
@@ -109,7 +109,7 @@ static void test_sixlowpan_ctx_update__wrong_id2(void)
 
 static void test_sixlowpan_ctx_update__wrong_prefix_len(void)
 {
-    ng_ipv6_addr_t addr = DEFAULT_TEST_PREFIX;
+    ipv6_addr_t addr = DEFAULT_TEST_PREFIX;
 
     TEST_ASSERT_NULL(ng_sixlowpan_ctx_update(DEFAULT_TEST_ID, &addr,
                                              0, TEST_UINT16, true));
@@ -118,14 +118,14 @@ static void test_sixlowpan_ctx_update__wrong_prefix_len(void)
 
 static void test_sixlowpan_ctx_lookup_addr__empty(void)
 {
-    ng_ipv6_addr_t addr = DEFAULT_TEST_PREFIX;
+    ipv6_addr_t addr = DEFAULT_TEST_PREFIX;
 
     TEST_ASSERT_NULL(ng_sixlowpan_ctx_lookup_addr(&addr));
 }
 
 static void test_sixlowpan_ctx_lookup_addr__same_addr(void)
 {
-    ng_ipv6_addr_t addr = DEFAULT_TEST_PREFIX;
+    ipv6_addr_t addr = DEFAULT_TEST_PREFIX;
     ng_sixlowpan_ctx_t *ctx;
 
     /* add context DEFAULT_TEST_PREFIX to DEFAULT_TEST_ID */
@@ -134,13 +134,13 @@ static void test_sixlowpan_ctx_lookup_addr__same_addr(void)
     TEST_ASSERT_EQUAL_INT(NG_SIXLOWPAN_CTX_FLAGS_COMP | DEFAULT_TEST_ID, ctx->flags_id);
     TEST_ASSERT_EQUAL_INT(DEFAULT_TEST_PREFIX_LEN, ctx->prefix_len);
     TEST_ASSERT(TEST_UINT16 >= ctx->ltime);
-    TEST_ASSERT(DEFAULT_TEST_PREFIX_LEN >= ng_ipv6_addr_match_prefix(&addr, &ctx->prefix));
+    TEST_ASSERT(DEFAULT_TEST_PREFIX_LEN >= ipv6_addr_match_prefix(&addr, &ctx->prefix));
 }
 
 static void test_sixlowpan_ctx_lookup_addr__other_addr_same_prefix(void)
 {
-    ng_ipv6_addr_t addr1 = DEFAULT_TEST_PREFIX;
-    ng_ipv6_addr_t addr2 = OTHER_TEST_PREFIX;
+    ipv6_addr_t addr1 = DEFAULT_TEST_PREFIX;
+    ipv6_addr_t addr2 = OTHER_TEST_PREFIX;
     ng_sixlowpan_ctx_t *ctx;
 
     /* add context DEFAULT_TEST_PREFIX to DEFAULT_TEST_ID */
@@ -149,12 +149,12 @@ static void test_sixlowpan_ctx_lookup_addr__other_addr_same_prefix(void)
     TEST_ASSERT_EQUAL_INT(NG_SIXLOWPAN_CTX_FLAGS_COMP | DEFAULT_TEST_ID, ctx->flags_id);
     TEST_ASSERT_EQUAL_INT(DEFAULT_TEST_PREFIX_LEN, ctx->prefix_len);
     TEST_ASSERT(TEST_UINT16 >= ctx->ltime);
-    TEST_ASSERT(DEFAULT_TEST_PREFIX_LEN >= ng_ipv6_addr_match_prefix(&addr1, &ctx->prefix));
+    TEST_ASSERT(DEFAULT_TEST_PREFIX_LEN >= ipv6_addr_match_prefix(&addr1, &ctx->prefix));
 }
 
 static void test_sixlowpan_ctx_lookup_addr__other_addr_other_prefix(void)
 {
-    ng_ipv6_addr_t addr = WRONG_TEST_PREFIX;
+    ipv6_addr_t addr = WRONG_TEST_PREFIX;
 
     /* add context DEFAULT_TEST_PREFIX to DEFAULT_TEST_ID */
     test_sixlowpan_ctx_update__success();
@@ -175,7 +175,7 @@ static void test_sixlowpan_ctx_lookup_id__wrong_id(void)
 
 static void test_sixlowpan_ctx_lookup_id__success(void)
 {
-    ng_ipv6_addr_t addr = DEFAULT_TEST_PREFIX;
+    ipv6_addr_t addr = DEFAULT_TEST_PREFIX;
     ng_sixlowpan_ctx_t *ctx;
 
     /* add context DEFAULT_TEST_PREFIX to DEFAULT_TEST_ID */
@@ -184,12 +184,12 @@ static void test_sixlowpan_ctx_lookup_id__success(void)
     TEST_ASSERT_EQUAL_INT(NG_SIXLOWPAN_CTX_FLAGS_COMP | DEFAULT_TEST_ID, ctx->flags_id);
     TEST_ASSERT_EQUAL_INT(DEFAULT_TEST_PREFIX_LEN, ctx->prefix_len);
     TEST_ASSERT(TEST_UINT16 >= ctx->ltime);
-    TEST_ASSERT(DEFAULT_TEST_PREFIX_LEN >= ng_ipv6_addr_match_prefix(&addr, &ctx->prefix));
+    TEST_ASSERT(DEFAULT_TEST_PREFIX_LEN >= ipv6_addr_match_prefix(&addr, &ctx->prefix));
 }
 
 static void test_sixlowpan_ctx_remove(void)
 {
-    ng_ipv6_addr_t addr = DEFAULT_TEST_PREFIX;
+    ipv6_addr_t addr = DEFAULT_TEST_PREFIX;
 
     /* add context DEFAULT_TEST_PREFIX to DEFAULT_TEST_ID */
     test_sixlowpan_ctx_update__success();

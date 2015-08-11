@@ -23,7 +23,7 @@
 #ifndef NG_RPL_SRH_H_
 #define NG_RPL_SRH_H_
 
-#include "net/ng_ipv6/addr.h"
+#include "net/ipv6/addr.h"
 #include "net/ng_ipv6/ext.h"
 
 #ifdef __cplusplus
@@ -59,7 +59,7 @@ typedef struct __attribute__((packed)) {
  * @return  next hop, on success
  * @return  NULL, if not found.
  */
-ng_ipv6_addr_t *ng_rpl_srh_next_hop(ng_rpl_srh_t *rh);
+ipv6_addr_t *ng_rpl_srh_next_hop(ng_rpl_srh_t *rh);
 
 #ifdef __cplusplus
 }

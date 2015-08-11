@@ -24,7 +24,7 @@
 #include "kernel.h"
 #include "msg.h"
 #include "net/ieee802154.h"
-#include "net/ng_ipv6/addr.h"
+#include "net/ipv6/addr.h"
 #include "net/ng_ipv6/hdr.h"
 #include "net/ng_netbase.h"
 #include "net/ng_udp.h"
@@ -89,7 +89,7 @@ static size_t _get_frame_hdr_len(uint8_t *mhr);
 ng_pktsnip_t *_make_netif_hdr(uint8_t *mhr);
 static uint16_t _calc_fcs(uint16_t fcs, const uint8_t *frame, uint8_t frame_len);
 
-kernel_pid_t ng_zep_init(ng_zep_t *dev, uint16_t src_port, ng_ipv6_addr_t *dst,
+kernel_pid_t ng_zep_init(ng_zep_t *dev, uint16_t src_port, ipv6_addr_t *dst,
                          uint16_t dst_port)
 {
 #if CPUID_ID_LEN
@@ -107,7 +107,7 @@ kernel_pid_t ng_zep_init(ng_zep_t *dev, uint16_t src_port, ng_ipv6_addr_t *dst,
         return -ENODEV;
     }
 
-    if ((dst == NULL) || (ng_ipv6_addr_is_unspecified(dst))) {
+    if ((dst == NULL) || (ipv6_addr_is_unspecified(dst))) {
         DEBUG("zep: dst (%s) was NULL or unspecified\n", dst);
         return -ENOTSUP;
     }
@@ -250,7 +250,7 @@ static int _send(ng_netdev_t *netdev, ng_pktsnip_t *pkt)
     new_pkt = hdr;
 
     hdr = ng_ipv6_hdr_build(new_pkt, NULL, 0, (uint8_t *) &(dev->dst),
-                            sizeof(ng_ipv6_addr_t));
+                            sizeof(ipv6_addr_t));
 
     if (hdr == NULL) {
         DEBUG("zep: could not allocate IPv6 header in pktbuf\n");

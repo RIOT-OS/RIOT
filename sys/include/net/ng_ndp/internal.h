@@ -22,7 +22,7 @@
 #ifndef INTERNAL_H_
 #define INTERNAL_H_
 
-#include "net/ng_ipv6/addr.h"
+#include "net/ipv6/addr.h"
 #include "net/ng_ndp/types.h"
 
 #ifdef __cplusplus
@@ -41,7 +41,7 @@ extern "C" {
  * @return  Address to a default router.
  * @return  NULL, if the default router list is empty.
  */
-ng_ipv6_addr_t *ng_ndp_internal_default_router(void);
+ipv6_addr_t *ng_ndp_internal_default_router(void);
 
 /**
  * @brief   Sets state of a neighbor cache entry and triggers required actions.
@@ -64,8 +64,8 @@ void ng_ndp_internal_set_state(ng_ipv6_nc_t *nc_entry, uint8_t state);
  * @param[in] dst   Destination address for neighbor solicitation. May not be
  *                  NULL.
  */
-void ng_ndp_internal_send_nbr_sol(kernel_pid_t iface, ng_ipv6_addr_t *tgt,
-                                  ng_ipv6_addr_t *dst);
+void ng_ndp_internal_send_nbr_sol(kernel_pid_t iface, ipv6_addr_t *tgt,
+                                  ipv6_addr_t *dst);
 
 /**
  * @brief   Send precompiled neighbor advertisement.
@@ -80,8 +80,8 @@ void ng_ndp_internal_send_nbr_sol(kernel_pid_t iface, ng_ipv6_addr_t *tgt,
  * @param[in] supply_tl2a   Add target link-layer address option to neighbor
  *                          advertisement if link-layer has addresses.
  */
-void ng_ndp_internal_send_nbr_adv(kernel_pid_t iface, ng_ipv6_addr_t *tgt,
-                                  ng_ipv6_addr_t *dst, bool supply_tl2a);
+void ng_ndp_internal_send_nbr_adv(kernel_pid_t iface, ipv6_addr_t *tgt,
+                                  ipv6_addr_t *dst, bool supply_tl2a);
 
 /**
  * @brief   Handles a SL2A option.
