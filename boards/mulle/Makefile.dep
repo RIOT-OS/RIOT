@@ -1,5 +1,5 @@
 ifneq (,$(filter ng_netif_default,$(USEMODULE)))
-  USEMODULE += ng_at86rf212b
+  USEMODULE += at86rf212b
   USEMODULE += ng_nomac
 endif
 

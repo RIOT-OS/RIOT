@@ -8,19 +8,19 @@ BOARD_BLACKLIST        := nucleo-f334
 # nucleo-f334:  not enough GPIO pins defined
 
 ifneq (,$(filter samr21-xpro,$(BOARD)))
-  DRIVER ?= ng_at86rf233
+  DRIVER ?= at86rf233
   USE_BOARD_PARAMETERS:=true
 endif
 ifneq (,$(filter iot-lab_M3,$(BOARD)))
-  DRIVER ?= ng_at86rf231
+  DRIVER ?= at86rf231
   USE_BOARD_PARAMETERS:=true
 endif
 
 ifneq (,$(DRIVER))
   USEMODULE += $(DRIVER)
 else
-  # default to ng_at86rf231
-  USEMODULE += ng_at86rf231
+  # default to at86rf231
+  USEMODULE += at86rf231
 endif
 
 ifneq (true,$(USE_BOARD_PARAMETERS))
