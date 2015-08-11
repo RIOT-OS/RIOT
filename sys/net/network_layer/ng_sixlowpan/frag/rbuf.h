@@ -78,7 +78,6 @@ typedef struct {
     uint8_t dst_len;                    /**< length of destination address */
     uint16_t tag;                       /**< the datagram's tag */
     uint16_t cur_size;                  /**< the datagram's current size */
-    uint16_t compressed;                /**< the datagram has a compressed header */
 } rbuf_t;
 
 /**
@@ -91,7 +90,7 @@ typedef struct {
  * @param[in] frag_size     The fragment's size.
  * @param[in] offset        The fragment's offset.
  */
-void rbuf_add(ng_netif_hdr_t *netif_hdr, ng_sixlowpan_frag_t *frag,
+void rbuf_add(ng_netif_hdr_t *netif_hdr, ng_pktsnip_t *frag,
               size_t frag_size, size_t offset);
 
 #ifdef __cplusplus

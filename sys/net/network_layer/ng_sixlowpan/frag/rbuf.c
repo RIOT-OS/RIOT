@@ -17,6 +17,7 @@
 
 #include "rbuf.h"
 #include "net/ng_netbase.h"
+#include "net/ng_ipv6/hdr.h"
 #include "net/ng_ipv6/netif.h"
 #include "net/ng_sixlowpan.h"
 #include "net/ng_sixlowpan/frag.h"
@@ -58,12 +59,16 @@ static rbuf_t *_rbuf_get(const void *src, size_t src_len,
                          const void *dst, size_t dst_len,
                          size_t size, uint16_t tag);
 
-void rbuf_add(ng_netif_hdr_t *netif_hdr, ng_sixlowpan_frag_t *frag,
+void rbuf_add(ng_netif_hdr_t *netif_hdr, ng_pktsnip_t *pkt,
               size_t frag_size, size_t offset)
 {
     rbuf_t *entry;
+    /* cppcheck is clearly wrong here */
+    /* cppcheck-suppress variableScope */
+    unsigned int data_offset = 0;
+    ng_sixlowpan_frag_t *frag = pkt->data;
     rbuf_int_t *ptr;
-    uint8_t *data = ((uint8_t *)frag) + sizeof(ng_sixlowpan_frag_t);
+    uint8_t *data = ((uint8_t *)pkt->data) + sizeof(ng_sixlowpan_frag_t);
 
     _rbuf_gc();
     entry = _rbuf_get(ng_netif_hdr_get_src_addr(netif_hdr), netif_hdr->src_l2addr_len,
@@ -80,18 +85,27 @@ void rbuf_add(ng_netif_hdr_t *netif_hdr, ng_sixlowpan_frag_t *frag,
 
     /* dispatches in the first fragment are ignored */
     if (offset == 0) {
-        switch (data[0]) {
-            case NG_SIXLOWPAN_UNCOMPRESSED:
-                data++;             /* skip 6LoWPAN dispatch */
-                frag_size--;
-                entry->compressed = 0;  /* datagram is not compressed */
-
-                break;
-
-            default:
-                break;
+        if (data[0] == NG_SIXLOWPAN_UNCOMPRESSED) {
+            data++;             /* skip 6LoWPAN dispatch */
+            frag_size--;
         }
-
+#ifdef MODULE_NG_SIXLOWPAN_IPHC
+        else if (ng_sixlowpan_iphc_is(data)) {
+            size_t iphc_len;
+            iphc_len = ng_sixlowpan_iphc_decode(entry->pkt, pkt,
+                                                sizeof(ng_sixlowpan_frag_t));
+            if (iphc_len == 0) {
+                DEBUG("6lo rfrag: could not decode IPHC dispatch\n");
+                ng_pktbuf_release(entry->pkt);
+                _rbuf_rem(entry);
+                return;
+            }
+            data += iphc_len;       /* take remaining data as data */
+            frag_size -= iphc_len;  /* and reduce frag size by IPHC dispatch length */
+            frag_size += sizeof(ipv6_hdr_t);    /* but add IPv6 header length */
+            data_offset += sizeof(ipv6_hdr_t);  /* start copying after IPv6 header */
+        }
+#endif
     }
     else {
         data++; /* FRAGN header is one byte longer (offset) */
@@ -118,7 +132,8 @@ void rbuf_add(ng_netif_hdr_t *netif_hdr, ng_sixlowpan_frag_t *frag,
     if (_rbuf_update_ints(entry, offset, frag_size)) {
         DEBUG("6lo rbuf: add fragment data\n");
         entry->cur_size += (uint16_t)frag_size;
-        memcpy(((uint8_t *)entry->pkt->data) + offset, data, frag_size);
+        memcpy(((uint8_t *)entry->pkt->data) + offset + data_offset, data,
+               frag_size - data_offset);
     }
 
     if (entry->cur_size == entry->pkt->size) {
@@ -137,18 +152,12 @@ void rbuf_add(ng_netif_hdr_t *netif_hdr, ng_sixlowpan_frag_t *frag,
         netif_hdr->if_pid = iface;
         LL_APPEND(entry->pkt, netif);
 
-        if (entry->compressed) {
-            DEBUG("6lo rbuf: datagram complete, send to self for decompression\n");
-            ng_netapi_receive(thread_getpid(), entry->pkt);
+        if (!ng_netapi_dispatch_receive(NG_NETTYPE_IPV6, NG_NETREG_DEMUX_CTX_ALL,
+                                        entry->pkt)) {
+            DEBUG("6lo rbuf: No receivers for this packet found\n");
+            ng_pktbuf_release(entry->pkt);
         }
-        else {
-            DEBUG("6lo rbuf: datagram complete, send to IPv6 listeners\n");
-            if (!ng_netapi_dispatch_receive(NG_NETTYPE_IPV6, NG_NETREG_DEMUX_CTX_ALL,
-                                            entry->pkt)) {
-                DEBUG("6lo rbuf: No receivers for this packet found\n");
-                ng_pktbuf_release(entry->pkt);
-            }
-        }
+
         _rbuf_rem(entry);
     }
 }
@@ -204,7 +213,7 @@ static bool _rbuf_update_ints(rbuf_t *entry, uint16_t offset, size_t frag_size)
           new->start, new->end, ng_netif_addr_to_str(l2addr_str,
                   sizeof(l2addr_str), entry->src, entry->src_len));
     DEBUG("%s, %u, %u)\n", ng_netif_addr_to_str(l2addr_str,
-          sizeof(l2addr_str), entry->dst, entry->dst_len),
+            sizeof(l2addr_str), entry->dst, entry->dst_len),
           (unsigned)entry->pkt->size, entry->tag);
 
     LL_PREPEND(entry->ints, new);
@@ -227,7 +236,7 @@ static void _rbuf_gc(void)
         else if ((rbuf[i].pkt != NULL) &&
                  ((now.seconds - rbuf[i].arrival) > RBUF_TIMEOUT)) {
             DEBUG("6lo rfrag: entry (%s, ", ng_netif_addr_to_str(l2addr_str,
-                  sizeof(l2addr_str), rbuf[i].src, rbuf[i].src_len));
+                    sizeof(l2addr_str), rbuf[i].src, rbuf[i].src_len));
             DEBUG("%s, %u, %u) timed out\n",
                   ng_netif_addr_to_str(l2addr_str, sizeof(l2addr_str), rbuf[i].dst,
                                        rbuf[i].dst_len),
@@ -297,7 +306,6 @@ static rbuf_t *_rbuf_get(const void *src, size_t src_len,
         res->dst_len = dst_len;
         res->tag = tag;
         res->cur_size = 0;
-        res->compressed = 1;
 
         DEBUG("6lo rfrag: entry %p (%s, ", (void *)res,
               ng_netif_addr_to_str(l2addr_str, sizeof(l2addr_str), res->src,
@@ -305,7 +313,7 @@ static rbuf_t *_rbuf_get(const void *src, size_t src_len,
         DEBUG("%s, %u, %u) created\n",
               ng_netif_addr_to_str(l2addr_str, sizeof(l2addr_str), res->dst,
                                    res->dst_len), (unsigned)res->pkt->size,
-                                   res->tag);
+              res->tag);
     }
 
     return res;

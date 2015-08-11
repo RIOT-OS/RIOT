@@ -80,17 +80,18 @@ static uint16_t _send_1st_fragment(ng_sixlowpan_netif_t *iface, ng_pktsnip_t *pk
                                    size_t payload_len, size_t datagram_size)
 {
     ng_pktsnip_t *frag;
-    uint16_t max_frag_size = _floor8(iface->max_frag_size -
-                                     (payload_len - datagram_size) -
-                                     sizeof(ng_sixlowpan_frag_t));
     uint16_t local_offset = 0;
+    /* payload_len: actual size of the packet vs
+     * datagram_size: size of the uncompressed IPv6 packet */
+    int payload_diff = (datagram_size - payload_len);
+    /* virtually add payload_diff to flooring to account for offset (must be divisable by 8)
+     * in uncompressed datagram */
+    uint16_t max_frag_size = _floor8(iface->max_frag_size + payload_diff -
+                                     sizeof(ng_sixlowpan_frag_t)) - payload_diff;
     ng_sixlowpan_frag_t *hdr;
     uint8_t *data;
 
     DEBUG("6lo frag: determined max_frag_size = %" PRIu16 "\n", max_frag_size);
-
-    /* 6LoWPAN dispatches don't count into that */
-    max_frag_size += (payload_len - datagram_size);
 
     frag = _build_frag_pkt(pkt, payload_len,
                            max_frag_size + sizeof(ng_sixlowpan_frag_t));
@@ -134,6 +135,8 @@ static uint16_t _send_nth_fragment(ng_sixlowpan_netif_t *iface, ng_pktsnip_t *pk
                                    uint16_t offset)
 {
     ng_pktsnip_t *frag;
+    /* since dispatches aren't supposed to go into subsequent fragments, we need not account
+     * for payload difference as for the first fragment */
     uint16_t max_frag_size = _floor8(iface->max_frag_size - sizeof(ng_sixlowpan_frag_n_t));
     uint16_t local_offset = 0, offset_count = 0;
     ng_sixlowpan_frag_n_t *hdr;
@@ -156,7 +159,8 @@ static uint16_t _send_nth_fragment(ng_sixlowpan_netif_t *iface, ng_pktsnip_t *pk
     hdr->disp_size = byteorder_htons((uint16_t)datagram_size);
     hdr->disp_size.u8[0] |= NG_SIXLOWPAN_FRAG_N_DISP;
     hdr->tag = byteorder_htons(_tag);
-    hdr->offset = (uint8_t)(offset >> 3);
+    /* don't mention payload diff in offset */
+    hdr->offset = (uint8_t)((offset + (datagram_size - payload_len)) >> 3);
     pkt = pkt->next;    /* don't copy netif header */
 
     while ((pkt != NULL) && (offset_count != offset)) {   /* go to offset */
@@ -202,10 +206,13 @@ static uint16_t _send_nth_fragment(ng_sixlowpan_netif_t *iface, ng_pktsnip_t *pk
 }
 
 void ng_sixlowpan_frag_send(kernel_pid_t pid, ng_pktsnip_t *pkt,
-                            size_t payload_len, size_t datagram_size)
+                            size_t datagram_size)
 {
     ng_sixlowpan_netif_t *iface = ng_sixlowpan_netif_get(pid);
     uint16_t offset = 0, res;
+    /* payload_len: actual size of the packet vs
+     * datagram_size: size of the uncompressed IPv6 packet */
+    size_t payload_len = ng_pkt_len(pkt->next);
 
 #if defined(DEVELHELP) && defined(ENABLE_DEBUG)
     if (iface == NULL) {
@@ -225,7 +232,8 @@ void ng_sixlowpan_frag_send(kernel_pid_t pid, ng_pktsnip_t *pkt,
     offset += res;
     thread_yield();
 
-    while (offset < datagram_size) {
+    /* (offset + (datagram_size - payload_len) < datagram_size) simplified */
+    while (offset < payload_len) {
         if ((res = _send_nth_fragment(iface, pkt, payload_len, datagram_size,
                                       offset)) == 0) {
             /* error sending subsequent fragment */
@@ -268,7 +276,7 @@ void ng_sixlowpan_frag_handle_pkt(ng_pktsnip_t *pkt)
             return;
     }
 
-    rbuf_add(hdr, frag, frag_size, offset);
+    rbuf_add(hdr, pkt, frag_size, offset);
 
     ng_pktbuf_release(pkt);
 }

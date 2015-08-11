@@ -105,16 +105,12 @@ static inline bool ng_sixlowpan_frag_is(ng_sixlowpan_frag_t *hdr)
  *
  * @param[in] pid           The interface to send the packet over.
  * @param[in] pkt           The packet to send.
- * @param[in] payload_len   The length of the payload to send (IPv6 packet size
- *                          + inner 6LoWPAN dispatches).
- *                          This value is purely given to not calculate the
- *                          payload length using @ref ng_pkt_len() repeatedly.
  * @param[in] datagram_size The length of just the IPv6 packet. It is the value
- *                          set that the ng_sixlowpan_frag_t::disp_size will be
+ *                          that the ng_sixlowpan_frag_t::disp_size field will be
  *                          set to.
  */
 void ng_sixlowpan_frag_send(kernel_pid_t pid, ng_pktsnip_t *pkt,
-                            size_t payload_len, size_t datagram_size);
+                            size_t datagram_size);
 
 /**
  * @brief   Handles a packet containing a fragment header.
