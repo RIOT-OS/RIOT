@@ -39,32 +39,33 @@ extern "C" {
 #endif
 
 /**
- * @brief   Message type for passing data up the network stack
+ * @brief   @ref core_msg type for passing a @ref net_ng_pkt up the network stack
  */
 #define NG_NETAPI_MSG_TYPE_RCV          (0x0201)
 
 /**
- * @brief   Message type for passing data down the network stack
+ * @brief   @ref core_msg type for passing a @ref net_ng_pkt down the network stack
  */
 #define NG_NETAPI_MSG_TYPE_SND          (0x0202)
 
 /**
- * @brief   Message type for setting options of network modules
+ * @brief   @ref core_msg type for setting options of network modules
  */
 #define NG_NETAPI_MSG_TYPE_SET          (0x0203)
 
 /**
- * @brief   Message type for getting options from network modules
+ * @brief   @ref core_msg type for getting options from network modules
  */
 #define NG_NETAPI_MSG_TYPE_GET          (0x0204)
 
 /**
- * @brief   Message type for replying to get and set option messages
+ * @brief   @ref core_msg type for replying to get and set option messages
  */
 #define NG_NETAPI_MSG_TYPE_ACK          (0x0205)
 
 /**
- * @brief   Data structure to be send for setting and getting options
+ * @brief   Data structure to be send for setting (@ref NG_NETAPI_MSG_TYPE_SET)
+ *          and getting (@ref NG_NETAPI_MSG_TYPE_GET) options
  */
 typedef struct {
     netopt_t opt;               /**< the option to get/set */
