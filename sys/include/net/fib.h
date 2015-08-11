@@ -15,7 +15,8 @@
  *
  * @file
  * @brief       Types and functions for FIB
- * @author      Martin Landsmann
+ *
+ * @author      Martin Landsmann <martin.landsmann@haw-hamburg.de>
  */
 
 #ifndef FIB_H_

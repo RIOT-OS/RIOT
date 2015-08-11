@@ -7,14 +7,13 @@
  */
 
 /**
- * @brief       forwarding table structs
  * @ingroup     net_fib
- *
  * @{
  *
  * @file
  * @brief       Types and functions for operating fib tables
- * @author      Martin Landsmann
+ *
+ * @author      Martin Landsmann <martin.landsmann@haw-hamburg.de>
  */
 
 #ifndef FIB_TABLE_H_

@@ -24,10 +24,10 @@
 #include <stdlib.h>
 #include "thread.h"
 #include "inet_pton.h"
-#include "ng_fib.h"
 #ifdef MODULE_NG_NETIF
-#include "ng_netif.h"
+#include "net/ng_netif.h"
 #endif
+#include "net/fib.h"
 
 #define INFO1_TXT "fibroute add <destination> via <next hop> [dev <device>]"
 #define INFO2_TXT " [lifetime <lifetime>]"

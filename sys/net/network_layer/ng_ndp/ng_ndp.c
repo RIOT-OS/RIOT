@@ -29,7 +29,7 @@
 #include "vtimer.h"
 
 #include "net/ng_ndp.h"
-#include "net/ng_fib.h"
+#include "net/fib.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
