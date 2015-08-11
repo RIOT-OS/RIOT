@@ -133,9 +133,8 @@ index dedab2c..1b602ec 100644
 +#ifndef RIOT_VERSION
  #include <net/if.h>
 +#else
++#include <arpa/inet.h>
 +#include "net/af.h"
-+#include "inet_ntop.h"
-+#include "inet_pton.h"
 +#define DONT_HAVE_SIN6_SCOPE_ID
 +#endif
  
