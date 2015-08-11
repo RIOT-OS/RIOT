@@ -15,9 +15,6 @@
  * @file
  * @brief           Interface definition for the ble link layer
  *
- * This driver enables the use of the ble radio protocol.
- * - development in progress / experimental
- *
  * @author          Jan Wagner <mail@jwagner.eu>
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
@@ -34,12 +31,12 @@ extern "C" {
 /**
  * @brief   Default channel set after initialization
  */
-#define BLEMIN_DEFAULT_CHANNEL	37	/* 2402MHz */
+#define BLE_DEFAULT_CHANNEL         37  /* 2402MHz */
 
 /**
  * @brief   Default transmission power used
  */
-#define BLEMIN_DEFAULT_TXPOWER	(0)	/* 0dBm */
+#define BLE_DEFAULT_TXPOWER         0 /* 0dBm */
 
 /**
  * @brief   BLE Advertising channel PDU types
@@ -60,29 +57,30 @@ enum pdu_types {
  * @brief   BLE constant lengths and limits
  * @{
  */
-#define BLE_PDU_HDR_LEN			2
-#define BLE_ACCESS_ADDR_LEN		4
-#define BLE_ADDR_LEN			6
-#define BLE_PAYLOAD_LEN_MIN     	(BLE_ADDR_LEN)
-#define BLE_PAYLOAD_LEN_MAX     	37
-#define BLE_MAX_DATA_LEN		(BLE_PAYLOAD_LEN_MAX - BLE_ADDR_LEN)
-#define BLE_MAX_PKT_LEN         275
+#define BLE_MAX_CHANNELS            39
+#define BLE_PDU_HDR_LEN             2
+#define BLE_ACCESS_ADDR_LEN         4
+#define BLE_ADDR_LEN                6
+#define BLE_PAYLOAD_LEN_MIN         (BLE_ADDR_LEN)
+#define BLE_PAYLOAD_LEN_MAX         37
+#define BLE_MAX_DATA_LEN            (BLE_PAYLOAD_LEN_MAX - BLE_ADDR_LEN)
+#define BLE_MAX_PKT_LEN             275
 
-#define BLE_DEFAULT_ACCESS_ADDR		0x8E89BED6
+#define BLE_DEFAULT_ACCESS_ADDR     0x8E89BED6
 
-#define BLE_DEFAULT_ADV_ADDRESS		"\x28\x7c\x97\x38\x5e\xc2"
-#define BLE_DEFAULT_ADV_PDU_TYPE	ADV_IND_TYPE
-#define BLE_DEFAULT_ADV_TXADD		1
-#define BLE_DEFAULT_ADV_RXADD		0
-#define BLE_DEFAULT_RFU			0
-#define BLE_DEFAULT_ADV_DATA_LEN	27
-#define BLE_DEFAULT_ADV_DATA		"\x08\x09\x52\x49\x4f\x54\x2d\x4f" \
+#define BLE_DEFAULT_ADV_ADDRESS     "\x28\x7c\x97\x38\x5e\xc2"
+#define BLE_DEFAULT_ADV_PDU_TYPE    ADV_IND_TYPE
+#define BLE_DEFAULT_ADV_TXADD       1
+#define BLE_DEFAULT_ADV_RXADD       0
+#define BLE_DEFAULT_RFU             0
+#define BLE_DEFAULT_ADV_DATA_LEN    27
+#define BLE_DEFAULT_ADV_DATA        "\x08\x09\x52\x49\x4f\x54\x2d\x4f" \
                                         "\x53\x02\x01\x06\x02\x0a\x04\x03" \
                                         "\x03\x20\x22\x07\xff\x00\x00\x64" \
                                         "\x61\x74\x61"
 
-#define BLE_DEFAULT_SCAN_RSP_TXADD	1
-#define BLE_DEFAULT_SCAN_RSP_RXADD	0
+#define BLE_DEFAULT_SCAN_RSP_TXADD  1
+#define BLE_DEFAULT_SCAN_RSP_RXADD  0
 
 /** @} */
 
@@ -151,19 +149,6 @@ ble_pkt_t;
 extern const gnrc_netdev_driver_t ble_driver;
 
 /**
- * @brief   Initialize the NRF51822 radio
- *
- * The initialization uses static configuration values.
- * TODO: Move to another header file?
- *
- * @param dev[out]      pointer to the netdev device descriptor
- *
- * @return              0 on success
- * @return              -ENODEV if @p dev is invalid
- */
-int nrf51_ble_init(gnrc_netdev_t *dev);
-
-/**
  * @brief   Initialize an instance of the ble link layer
  *
  * The initialization starts a new thread that connects to the given netdev
@@ -181,7 +166,6 @@ int nrf51_ble_init(gnrc_netdev_t *dev);
  */
 kernel_pid_t ble_ll_init(char *stack, int stacksize, char priority,
                            const char *name, gnrc_netdev_t *dev);
-
 
 #ifdef __cplusplus
 }

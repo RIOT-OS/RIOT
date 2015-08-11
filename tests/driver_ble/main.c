@@ -28,10 +28,10 @@
 #include "net/gnrc/nomac.h"
 #include "net/gnrc/pktdump.h"
 #include "net/ble_ll.h"
+#include "nrf51_ble.h"
 
 #define SHELL_BUFSIZE       (UART0_BUFSIZE)
 
-//static char dump_stack[KERNEL_CONF_STACKSIZE_MAIN];
 static char nomac_stack[THREAD_STACKSIZE_DEFAULT];
 
 int main(void)
@@ -43,8 +43,6 @@ int main(void)
     puts("Use the 'ifconfig' and 'blesnd' shell commands to verify the driver");
 
     /* initialize network device */
-    /* interface should have already been initialized by auto-init module */
-
     nrf51_ble_init(&dev);
     ble_ll_init(nomac_stack, sizeof(nomac_stack), 5, "ble_ll", &dev);
 

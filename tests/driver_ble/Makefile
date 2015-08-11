@@ -1,4 +1,4 @@
-APPLICATION = driver_blemin
+APPLICATION = driver_ble
 include ../Makefile.tests_common
 
 BOARD = yunjia-nrf51822
@@ -11,7 +11,6 @@ USEMODULE += ps
 USEMODULE += uart0
 USEMODULE += nrf51_ble
 USEMODULE += gnrc
-USEMODULE += gnrc_nomac
 USEMODULE += gnrc_pktdump
 USEMODULE += ble_ll
 

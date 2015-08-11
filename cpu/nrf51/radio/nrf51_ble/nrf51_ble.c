@@ -106,7 +106,7 @@ static volatile int _rx_next = 0;
 /* Switch the BLE radio state to idle */
 static void _switch_to_idle(void)
 {
-    // DEBUG("nrf51_ble: switch_to_idle\n");
+    DEBUG("nrf51_ble: switch_to_idle\n");
 
     /* switch to idle state */
     NRF_RADIO->EVENTS_DISABLED = 0;
@@ -120,7 +120,7 @@ static void _switch_to_idle(void)
 /* Switch the BLE radio state to receive */
 static void _switch_to_rx(void)
 {
-    // DEBUG("nrf51_ble: switch_to_rx\n");
+    DEBUG("nrf51_ble: switch_to_rx\n");
 
     /* set pointer to receive buffer */
     NRF_RADIO->PACKETPTR = (uint32_t) & (_rx_buf[_rx_next]);
@@ -128,6 +128,55 @@ static void _switch_to_rx(void)
     /* switch int RX mode */
     NRF_RADIO->TASKS_RXEN = 1;
     _state = STATE_RX;
+}
+
+/* Get the BLE Access Address of the interface */
+int _get_access_address(uint8_t *val, size_t max_len)
+{
+    /* check parameters */
+    if (max_len < BLE_ACCESS_ADDR_LEN) {
+        return -EOVERFLOW;
+    }
+
+    /* get address */
+    val[0] = (uint8_t)(_access_addr >> 24);
+    val[1] = (uint8_t)(_access_addr >> 16);
+    val[2] = (uint8_t)(_access_addr >> 8);
+    val[3] = (uint8_t)(_access_addr);
+    return BLE_ACCESS_ADDR_LEN;
+}
+
+/* Set the BLE Access Address of the interface */
+int _set_access_address(uint8_t *val, size_t len)
+{
+    int is_rx = 0;
+
+    /* check parameters */
+    if (len != BLE_ACCESS_ADDR_LEN) {
+        return -EINVAL;
+    }
+
+    /* keep track of state */
+    while (_state == STATE_TX);
+
+    if (_state == STATE_RX) {
+        is_rx = 1;
+        _switch_to_idle();
+    }
+
+    /* set BLE access address */
+    _access_addr = (((uint32_t)val[0]) << 24) | (((uint32_t)val[1]) << 16) |
+                   (((uint32_t)val[2]) << 8) | val[3];
+
+    NRF_RADIO->PREFIX0 = ((_access_addr >> 24) & 0x000000FF);
+    NRF_RADIO->BASE0   = ((_access_addr << 8) & 0xFFFFFF00);
+
+    /* restore original state */
+    if (is_rx) {
+        _switch_to_rx();
+    }
+
+    return BLE_ACCESS_ADDR_LEN;
 }
 
 /* Get the BLE radio state */
@@ -195,56 +244,6 @@ int _set_state(uint8_t *val, size_t len)
     return sizeof(netopt_state_t);
 }
 
-/* Get the BLE Access Address of the interface */
-int _get_access_address(uint8_t *val, size_t max_len)
-{
-    /* check parameters */
-    if (max_len < BLE_ACCESS_ADDR_LEN) {
-        return -EOVERFLOW;
-    }
-
-    /* get address */
-    val[0] = (uint8_t)(_access_addr >> 24);
-    val[1] = (uint8_t)(_access_addr >> 16);
-    val[2] = (uint8_t)(_access_addr >> 8);
-    val[3] = (uint8_t)(_access_addr);
-    return BLE_ACCESS_ADDR_LEN;
-}
-
-/* Set the BLE Access Address of the interface */
-int _set_access_address(uint8_t *val, size_t len)
-{
-    int is_rx = 0;
-
-    /* check parameters */
-    if (len != BLE_ACCESS_ADDR_LEN) {
-        return -EINVAL;
-    }
-
-    /* keep track of state */
-    while (_state == STATE_TX);
-
-    if (_state == STATE_RX) {
-        is_rx = 1;
-        _switch_to_idle();
-    }
-
-    /* set BLE access address */
-    _access_addr = (((uint32_t)val[0]) << 24) | (((uint32_t)val[1]) << 16) |
-                   (((uint32_t)val[2]) << 8) | val[3];
-
-    NRF_RADIO->PREFIX0 = ((_access_addr >> 24) & 0x000000FF);
-    NRF_RADIO->BASE0   = ((_access_addr << 8) & 0xFFFFFF00);
-
-    if (is_rx) {
-        _switch_to_rx();
-    }
-
-    return BLE_ACCESS_ADDR_LEN;
-}
-
-
-
 /* Get the current BLE channel number of the interface */
 int _get_channel(uint8_t *val, size_t max_len)
 {
@@ -265,7 +264,7 @@ int _set_channel(uint8_t *val, size_t len)
     int is_rx = 0;
 
     /* check parameter */
-    if (len != 2 || val[0] > 39) {
+    if (len != 2 || val[0] > BLE_MAX_CHANNELS) {
         return -EINVAL;
     }
 
@@ -294,7 +293,7 @@ int _get_txpower(uint8_t *val, size_t len)
 {
     /* check parameters */
     if (len < 2) {
-        return 0;
+        return -EINVAL;
     }
 
     /* get value */
@@ -413,8 +412,8 @@ int nrf51_ble_init(gnrc_netdev_t *dev)
     /* load driver specific configuration */
     NRF_RADIO->MODE = CONF_MODE;
     /* configure variable parameters to default values */
-    NRF_RADIO->TXPOWER = BLEMIN_DEFAULT_TXPOWER;
-    NRF_RADIO->FREQUENCY = chan_to_freq[BLEMIN_DEFAULT_CHANNEL];
+    NRF_RADIO->TXPOWER = BLE_DEFAULT_TXPOWER;
+    NRF_RADIO->FREQUENCY = chan_to_freq[BLE_DEFAULT_CHANNEL];
 
     /* pre-configure radio addresses */
     NRF_RADIO->PREFIX0 = ((_access_addr >> 24) & 0x000000FF);
@@ -439,12 +438,11 @@ int nrf51_ble_init(gnrc_netdev_t *dev)
 
     NRF_RADIO->CRCPOLY = CONF_CRC_POLY;
     NRF_RADIO->CRCINIT = CONF_CRC_INIT;
-    NRF_RADIO->DATAWHITEIV = BLEMIN_DEFAULT_CHANNEL;
+    NRF_RADIO->DATAWHITEIV = BLE_DEFAULT_CHANNEL;
 
     /* set shortcuts for more efficient transfer */
     NRF_RADIO->SHORTS = (1 << RADIO_SHORTS_READY_START_Pos);
     /* enable interrupts */
-    NVIC_SetPriority(RADIO_IRQn, RADIO_IRQ_PRIO);
     NVIC_EnableIRQ(RADIO_IRQn);
     /* enable END interrupt */
     NRF_RADIO->EVENTS_END = 0;
@@ -459,8 +457,6 @@ int nrf51_ble_init(gnrc_netdev_t *dev)
 /* BLE interface low-level receive function */
 static void _receive_data(void)
 {
-    // DEBUG("nrf51_ble: receive_data\n");
-
     ble_pkt_t *data;
     gnrc_pktsnip_t *pkt;
 
@@ -490,8 +486,6 @@ static void _receive_data(void)
 /* BLE interface low-level send function */
 int _send(gnrc_netdev_t *dev, gnrc_pktsnip_t *pkt)
 {
-    // DEBUG("nrf51_ble: send\n");
-
     (void)dev;
     size_t size;
 
@@ -507,8 +501,8 @@ int _send(gnrc_netdev_t *dev, gnrc_pktsnip_t *pkt)
     size = gnrc_pkt_len(pkt);
 
     if (size > CONF_PAYLOAD_LEN) {
-        DEBUG("nrf51_ble: Error sending packet: invalid BLE pdu header length\n");
         gnrc_pktbuf_release(pkt);
+        DEBUG("nrf51_ble: Error sending packet: invalid packet length\n");
         return -EOVERFLOW;
     }
 
@@ -611,7 +605,7 @@ void _isr_event(gnrc_netdev_t *dev, uint32_t event_type)
 {
     switch (event_type) {
         case ISR_EVENT_RX_DONE:
-            // DEBUG("nrf51_ble; isr_event -> ISR_EVENT_RX_DONE\n");
+             DEBUG("nrf51_ble; isr_event -> ISR_EVENT_RX_DONE\n");
             _receive_data();
             break;
 
@@ -622,7 +616,7 @@ void _isr_event(gnrc_netdev_t *dev, uint32_t event_type)
 }
 
 /* Mapping of netdev interface */
-const gnrc_netdev_driver_t blemin_driver = {
+const gnrc_netdev_driver_t ble_driver = {
     .send_data = _send,
     .add_event_callback = _add_event_cb,
     .rem_event_callback = _rem_event_cb,

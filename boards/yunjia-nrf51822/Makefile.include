@@ -14,5 +14,3 @@ include $(RIOTBOARD)/Makefile.include.openocd
 
 # include cortex defaults
 include $(RIOTBOARD)/Makefile.include.cortexm_common
-
-include $(RIOTBOARD)/$(BOARD)/Makefile.dep
