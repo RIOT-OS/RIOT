@@ -199,8 +199,7 @@ static void handle_input_line(shell_t *shell, char *line)
             print_help(shell->command_list);
         }
         else {
-            puts("shell: command not found:");
-            puts(argv[0]);
+            printf("shell: command not found: %s\n", argv[0]);
         }
     }
 }
