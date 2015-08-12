@@ -23,6 +23,10 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#ifdef MODULE_GNRC_CONN_IP
+#include "net/gnrc/conn.h"
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
