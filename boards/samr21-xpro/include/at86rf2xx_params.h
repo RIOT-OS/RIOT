@@ -29,12 +29,12 @@ extern "C" {
 static const  at86rf2xx_params_t at86rf2xx_params[] =
     {
         {
-            .spi = NG_AT86RF233_SPI,
-            .spi_speed = NG_AT86RF233_SPI_CLK,
-            .cs_pin = NG_AT86RF233_CS,
-            .int_pin = NG_AT86RF233_INT,
-            .sleep_pin = NG_AT86RF233_SLEEP,
-            .reset_pin = NG_AT86RF233_RESET,
+            .spi = AT86RF233_SPI,
+            .spi_speed = AT86RF233_SPI_CLK,
+            .cs_pin = AT86RF233_CS,
+            .int_pin = AT86RF233_INT,
+            .sleep_pin = AT86RF233_SLEEP,
+            .reset_pin = AT86RF233_RESET,
         },
     };
 /** @} */

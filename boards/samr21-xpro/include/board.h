@@ -41,15 +41,15 @@ extern "C" {
 #define HW_TIMER            TIMER_1
 
 /**
-* @name NG_AT86RF233 configuration
+* @name AT86RF233 configuration
 * @{
 */
-#define NG_AT86RF233_SPI        (SPI_0)
-#define NG_AT86RF233_CS         GPIO(PB, 31)
-#define NG_AT86RF233_INT        GPIO(PB, 0)
-#define NG_AT86RF233_RESET      GPIO(PB, 15)
-#define NG_AT86RF233_SLEEP      GPIO(PA, 20)
-#define NG_AT86RF233_SPI_CLK    (SPI_SPEED_1MHZ)
+#define AT86RF233_SPI        (SPI_0)
+#define AT86RF233_CS         GPIO(PB, 31)
+#define AT86RF233_INT        GPIO(PB, 0)
+#define AT86RF233_RESET      GPIO(PB, 15)
+#define AT86RF233_SLEEP      GPIO(PA, 20)
+#define AT86RF233_SPI_CLK    (SPI_SPEED_1MHZ)
 /** @}*/
 
 /**

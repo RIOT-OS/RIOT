@@ -28,7 +28,7 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-#ifdef MODULE_NG_AT86RF212B
+#ifdef MODULE_AT86RF212B
 /* See: Table 9-15. Recommended Mapping of TX Power, Frequency Band, and
  * PHY_TX_PWR (register 0x05), AT86RF212B data sheet. */
 static const uint8_t dbm_to_tx_pow_868[] = {0x1d, 0x1c, 0x1b, 0x1a, 0x19, 0x18,
@@ -60,7 +60,7 @@ int16_t tx_pow_to_dbm(at86rf2xx_freq_t freq, uint8_t reg) {
     return 0;
 }
 
-#elif MODULE_NG_AT86RF233
+#elif MODULE_AT86RF233
 static const int16_t tx_pow_to_dbm[] = {4, 4, 3, 3, 2, 2, 1,
                                         0, -1, -2, -3, -4, -6, -8, -12, -17};
 static const uint8_t dbm_to_tx_pow[] = {0x0f, 0x0f, 0x0f, 0x0e, 0x0e, 0x0e,
@@ -130,7 +130,7 @@ void at86rf2xx_set_chan(at86rf2xx_t *dev, uint8_t channel)
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__PHY_CC_CCA, tmp);
 }
 
-#ifdef MODULE_NG_AT86RF212B
+#ifdef MODULE_AT86RF212B
 at86rf2xx_freq_t at86rf2xx_get_freq(at86rf2xx_t *dev)
 {
     return dev->freq;
@@ -188,7 +188,7 @@ void at86rf2xx_set_pan(at86rf2xx_t *dev, uint16_t pan)
 
 int16_t at86rf2xx_get_txpower(at86rf2xx_t *dev)
 {
-#ifdef MODULE_NG_AT86RF212B
+#ifdef MODULE_AT86RF212B
     uint8_t txpower = at86rf2xx_reg_read(dev, AT86RF2XX_REG__PHY_TX_PWR);
     DEBUG("txpower value: %x\n", txpower);
     return tx_pow_to_dbm(dev->freq, txpower);
@@ -201,18 +201,18 @@ int16_t at86rf2xx_get_txpower(at86rf2xx_t *dev)
 
 void at86rf2xx_set_txpower(at86rf2xx_t *dev, int16_t txpower)
 {
-#ifdef MODULE_NG_AT86RF212B
+#ifdef MODULE_AT86RF212B
     txpower += 25;
 #else
     txpower += 17;
 #endif
     if (txpower < 0) {
         txpower = 0;
-#ifdef MODULE_NG_AT86RF212B
+#ifdef MODULE_AT86RF212B
     }
     else if (txpower > 36) {
         txpower = 36;
-#elif MODULE_NG_AT86RF233
+#elif MODULE_AT86RF233
     }
     else if (txpower > 21) {
         txpower = 21;
@@ -222,7 +222,7 @@ void at86rf2xx_set_txpower(at86rf2xx_t *dev, int16_t txpower)
         txpower = 20;
 #endif
     }
-#ifdef MODULE_NG_AT86RF212B
+#ifdef MODULE_AT86RF212B
     if (dev->freq == AT86RF2XX_FREQ_915MHZ) {
         at86rf2xx_reg_write(dev, AT86RF2XX_REG__PHY_TX_PWR,
                             dbm_to_tx_pow_915[txpower]);
