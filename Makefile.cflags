@@ -55,6 +55,10 @@ CFLAGS += -fno-common
 # Enable all default warnings
 CFLAGS += -Wall
 
+ifeq (,$(filter -DDEVELHELP,$(CFLAGS)))
+	CFLAGS += -DNDEBUG
+endif
+
 # Default ARFLAGS for platforms which do not specify it.
 # Note: make by default provides ARFLAGS=rv which we want to override
 ifeq ($(origin ARFLAGS),default)
