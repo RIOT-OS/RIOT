@@ -10,7 +10,7 @@ ifneq (,$(filter ng_nomac,$(USEMODULE)))
   USEMODULE += ng_netbase
 endif
 
-ifneq (,$(filter ng_at86rf2%,$(USEMODULE)))
+ifneq (,$(filter at86rf2%,$(USEMODULE)))
   USEMODULE += at86rf2xx
   USEMODULE += ieee802154
 endif
