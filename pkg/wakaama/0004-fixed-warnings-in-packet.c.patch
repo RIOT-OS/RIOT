@@ -1,0 +1,34 @@
+From dd5fd3021b0473c0bd6278fe574acbb8a9aa3504 Mon Sep 17 00:00:00 2001
+From: Darredevil <alex.darredevil@gmail.com>
+Date: Thu, 13 Aug 2015 12:43:09 +0100
+Subject: [PATCH 4/6] fixed warnings in packet.c
+
+---
+ core/packet.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/core/packet.c b/core/packet.c
+index 76715ff..886d17b 100644
+--- a/core/packet.c
++++ b/core/packet.c
+@@ -97,6 +97,9 @@ static void handle_reset(lwm2m_context_t * contextP,
+                          void * fromSessionH,
+                          coap_packet_t * message)
+ {
++    (void)contextP;
++    (void)fromSessionH;
++    (void)message;
+ #ifdef LWM2M_CLIENT_MODE
+     cancel_observe(contextP, message->mid, fromSessionH);
+ #endif
+@@ -107,6 +110,8 @@ static coap_status_t handle_request(lwm2m_context_t * contextP,
+                                     coap_packet_t * message,
+                                     coap_packet_t * response)
+ {
++    (void)contextP;
++    (void)fromSessionH;
+     lwm2m_uri_t * uriP;
+     coap_status_t result = NOT_FOUND_4_04;
+
+--
+1.9.1

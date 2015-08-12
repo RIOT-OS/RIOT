@@ -1,0 +1,33 @@
+From 2f8c7bd7eabd55f2f4dd0da5e2a252b95f0e51c9 Mon Sep 17 00:00:00 2001
+From: Darredevil <alex.darredevil@gmail.com>
+Date: Thu, 13 Aug 2015 13:03:42 +0100
+Subject: [PATCH 6/6] fixed warnings in utils.c
+
+---
+ core/utils.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/core/utils.c b/core/utils.c
+index f62e932..c07ef4b 100644
+--- a/core/utils.c
++++ b/core/utils.c
+@@ -13,7 +13,7 @@
+  * Contributors:
+  *    David Navarro, Intel Corporation - initial API and implementation
+  *    Toby Jaffey - Please refer to git log
+- *
++ *
+  *******************************************************************************/
+
+ /*
+@@ -357,6 +357,8 @@ lwm2m_server_t * prv_findServer(lwm2m_context_t * contextP,
+ lwm2m_server_t * utils_findBootstrapServer(lwm2m_context_t * contextP,
+                                            void * fromSessionH)
+ {
++    (void)contextP;
++    (void)fromSessionH;
+ #ifdef LWM2M_CLIENT_MODE
+
+     lwm2m_server_t * targetP;
+--
+1.9.1

@@ -1,0 +1,50 @@
+From 26d765aee65ef8eeae0f8b61c885c017ad938c94 Mon Sep 17 00:00:00 2001
+From: Darredevil <alex.darredevil@gmail.com>
+Date: Thu, 13 Aug 2015 12:58:42 +0100
+Subject: [PATCH 5/6] fixed warnings in tlv.c
+
+---
+ pkg/wakaama/wakaama/tlv.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/core/tlv.c b/core/tlv.c
+index 91a0ee9..0586f3d 100644
+--- a/core/tlv.c
++++ b/core/tlv.c
+@@ -14,7 +14,7 @@
+  *    David Navarro, Intel Corporation - initial API and implementation
+  *    Fabien Fleutot - Please refer to git log
+  *    Bosch Software Innovations GmbH - Please refer to git log
+- *
++ *
+  *******************************************************************************/
+
+ #include "internals.h"
+@@ -307,6 +307,7 @@ int lwm2m_opaqueToFloat(uint8_t * buffer,
+                         size_t buffer_len,
+                         double * dataP)
+ {
++    (void)buffer;
+     switch (buffer_len)
+     {
+     case 4:
+@@ -614,7 +615,7 @@ int lwm2m_tlv_decode_int(lwm2m_tlv_t * tlvP,
+     else
+     {
+         result = lwm2m_opaqueToInt(tlvP->value, tlvP->length, dataP);
+-        if (result == tlvP->length)
++        if ((size_t)result == tlvP->length)
+         {
+             result = 1;
+         }
+@@ -710,7 +711,7 @@ int lwm2m_tlv_decode_float(lwm2m_tlv_t * tlvP,
+     else
+     {
+         result = lwm2m_opaqueToFloat(tlvP->value, tlvP->length, dataP);
+-        if (result == tlvP->length)
++        if ((size_t)result == tlvP->length)
+         {
+             result = 1;
+         }
+--
+1.9.1
