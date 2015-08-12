@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014, 2015 Martine Lenders <mail@martine-lenders.eu>
+ * *             2015       Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -82,6 +83,28 @@ static void test_pkt_len__3_elem(void)
     TEST_ASSERT_EQUAL_INT(sizeof(TEST_STRING8) + sizeof(TEST_STRING12), ng_pkt_len(&snip2));
     TEST_ASSERT_EQUAL_INT(sizeof(TEST_STRING8), ng_pkt_len(&snip1));
 }
+static void test_pkt_count__1_elem(void)
+{
+    ng_pktsnip_t snip1 = _INIT_ELEM_STATIC_DATA(TEST_STRING8, NULL);
+
+    TEST_ASSERT_EQUAL_INT(1, ng_pkt_count(&snip1));
+}
+
+static void test_pkt_count__5_elem(void)
+{
+    ng_pktsnip_t snip1 = _INIT_ELEM_STATIC_DATA(TEST_STRING8, NULL);
+    ng_pktsnip_t snip2 = _INIT_ELEM_STATIC_DATA(TEST_STRING12, &snip1);
+    ng_pktsnip_t snip3 = _INIT_ELEM(sizeof("a"), "a", &snip2);
+    ng_pktsnip_t snip4 = _INIT_ELEM_STATIC_DATA(TEST_STRING8, &snip3);
+    ng_pktsnip_t snip5 = _INIT_ELEM_STATIC_DATA(TEST_STRING8, &snip4);
+
+    TEST_ASSERT_EQUAL_INT(5, ng_pkt_count(&snip5));
+}
+
+static void test_pkt_count__null(void)
+{
+    TEST_ASSERT_EQUAL_INT(0, ng_pkt_count(NULL));
+}
 
 Test *tests_pkt_tests(void)
 {
@@ -93,6 +116,9 @@ Test *tests_pkt_tests(void)
         new_TestFixture(test_pkt_len__2_elem),
         new_TestFixture(test_pkt_len__2_elem__overflow),
         new_TestFixture(test_pkt_len__3_elem),
+        new_TestFixture(test_pkt_count__1_elem),
+        new_TestFixture(test_pkt_count__5_elem),
+        new_TestFixture(test_pkt_count__null),
     };
 
     EMB_UNIT_TESTCALLER(pkt_tests, NULL, NULL, fixtures);

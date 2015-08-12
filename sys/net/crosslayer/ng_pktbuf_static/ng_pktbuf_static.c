@@ -22,6 +22,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <sys/types.h>
+#include <sys/uio.h>
 
 #include "mutex.h"
 #include "od.h"
@@ -230,6 +231,37 @@ ng_pktsnip_t *ng_pktbuf_start_write(ng_pktsnip_t *pkt)
     }
     mutex_unlock(&_mutex);
     return pkt;
+}
+
+ng_pktsnip_t *ng_pktbuf_get_iovec(ng_pktsnip_t *pkt, size_t *len)
+{
+    size_t length;
+    ng_pktsnip_t *head;
+    struct iovec *vec;
+
+    if (pkt == NULL) {
+        *len = 0;
+        return NULL;
+    }
+
+    /* count the number of snips in the packet and allocate the IOVEC */
+    length = ng_pkt_count(pkt);
+    head = ng_pktbuf_add(pkt, NULL, (length * sizeof(struct iovec)),
+                         NG_NETTYPE_IOVEC);
+    if (head == NULL) {
+        *len = 0;
+        return NULL;
+    }
+    vec = (struct iovec *)(head->data);
+    /* fill the IOVEC */
+    while (pkt != NULL) {
+        vec->iov_base = pkt->data;
+        vec->iov_len = pkt->size;
+        ++vec;
+        pkt = pkt->next;
+    }
+    *len = length;
+    return head;
 }
 
 #ifdef DEVELHELP

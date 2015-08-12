@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014, 2015 Martine Lenders <mlenders@inf.fu-berlin.de>
+ *               2015       Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -16,6 +17,7 @@
  * @brief   General definitions for network packets
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
+ * @author  Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 #ifndef NG_PKT_H_
 #define NG_PKT_H_
@@ -127,6 +129,25 @@ static inline size_t ng_pkt_len(ng_pktsnip_t *pkt)
     }
 
     return len;
+}
+
+/**
+ * @brief Count the numbers of snips in the given packet
+ *
+ * @param[in] pkt   first snip in the packet
+ *
+ * @return  number of snips in the given packet
+ */
+static inline size_t ng_pkt_count(const ng_pktsnip_t *pkt)
+{
+    size_t count = 0;
+
+    while (pkt) {
+        ++count;
+        pkt = pkt->next;
+    }
+
+    return count;
 }
 
 #ifdef __cplusplus
