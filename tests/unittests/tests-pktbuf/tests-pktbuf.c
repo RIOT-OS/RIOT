@@ -570,20 +570,6 @@ static void test_pktbuf_hold__success2(void)
     TEST_ASSERT_EQUAL_INT(TEST_UINT8 + 1, pkt->users);
 }
 
-static void test_pktbuf_release__pkt_null(void)
-{
-    ng_pktbuf_release(NULL);
-    TEST_ASSERT(ng_pktbuf_is_empty());
-}
-
-static void test_pktbuf_release__pkt_external(void)
-{
-    ng_pktsnip_t pkt = { 1, NULL, TEST_STRING8, sizeof(TEST_STRING8), NG_NETTYPE_TEST };
-
-    ng_pktbuf_release(&pkt);
-    TEST_ASSERT(ng_pktbuf_is_empty());
-}
-
 static void test_pktbuf_release__success(void)
 {
     ng_pktsnip_t *pkt = ng_pktbuf_add(NULL, TEST_STRING16, sizeof(TEST_STRING16), NG_NETTYPE_TEST);
@@ -678,8 +664,6 @@ Test *tests_pktbuf_tests(void)
         new_TestFixture(test_pktbuf_hold__pkt_external),
         new_TestFixture(test_pktbuf_hold__success),
         new_TestFixture(test_pktbuf_hold__success2),
-        new_TestFixture(test_pktbuf_release__pkt_null),
-        new_TestFixture(test_pktbuf_release__pkt_external),
         new_TestFixture(test_pktbuf_release__success),
         new_TestFixture(test_pktbuf_start_write__NULL),
         new_TestFixture(test_pktbuf_start_write__pkt_users_1),
