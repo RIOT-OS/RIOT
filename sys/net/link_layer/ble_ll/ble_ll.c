@@ -150,7 +150,7 @@ static int _send(gnrc_netdev_t *dev, gnrc_pktsnip_t *pkt)
             return -EOVERFLOW;
         }
         memcpy((payload + BLE_PDU_HDR_LEN + BLE_ADDR_LEN),
-                pkt->next->data, ng_pkt_len(pkt->next));
+                pkt->next->data, gnrc_pkt_len(pkt->next));
     }
 
     ble_pkt = gnrc_pktbuf_add(NULL, payload, ble_pkt_size, GNRC_NETTYPE_UNDEF);

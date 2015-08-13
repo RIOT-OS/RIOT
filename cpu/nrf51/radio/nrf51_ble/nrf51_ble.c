@@ -358,8 +358,6 @@ void isr_radio(void)
 
         /* did we just send or receive something? */
         if (_state == STATE_RX) {
-            // DEBUG("nrf51_ble: isr_radio: STATE_RX\n");
-
             /* drop packet on invalid CRC */
             if (NRF_RADIO->CRCSTATUS != 1) {
                 return;
@@ -375,8 +373,6 @@ void isr_radio(void)
             NRF_RADIO->TASKS_START = 1;
         }
         else if (_state == STATE_TX) {
-            // DEBUG("nrf51_ble: isr_radio: STATE_TX\n");
-
             /* disable radio again */
             _switch_to_idle();
 
@@ -459,6 +455,7 @@ static void _receive_data(void)
 {
     ble_pkt_t *data;
     gnrc_pktsnip_t *pkt;
+    uint16_t pkt_size;
 
     /* only read data if we have somewhere to send it to */
     if (_netdev->event_cb == NULL) {
@@ -469,9 +466,10 @@ static void _receive_data(void)
     /* get pointer to RX data buffer */
     data = &(_rx_buf[_rx_next ^ 1]);
 
+    pkt_size = BLE_PDU_HDR_LEN + data->header.length;
+
     /* allocate and fill payload */
-    pkt = gnrc_pktbuf_add(NULL, data->payload, data->header.length, GNRC_NETTYPE_UNDEF);
-    pkt = gnrc_pktbuf_add(pkt, data, BLE_PDU_HDR_LEN, GNRC_NETTYPE_UNDEF);
+    pkt = gnrc_pktbuf_add(NULL, data, pkt_size, GNRC_NETTYPE_UNDEF);
 
     if (pkt == NULL) {
         DEBUG("nrf51_ble: Error allocating packet payload on RX\n");
