@@ -4,6 +4,8 @@ all:
 RIOTBASE ?= $(shell dirname "$(lastword $(MAKEFILE_LIST))")
 RIOTBASE := $(abspath $(RIOTBASE))
 
+CCACHE_BASEDIR := $(RIOTBASE)
+
 RIOTCPU ?= $(RIOTBASE)/cpu
 RIOTCPU := $(abspath $(RIOTCPU))
 
