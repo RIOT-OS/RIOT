@@ -87,6 +87,15 @@ typedef enum {
  */
 void gpio_init_mux(gpio_t dev, gpio_mux_t mux);
 
+/**
+ * @brief declare needed generic SPI functions
+ * @{
+ */
+#define PERIPH_SPI_NEEDS_TRANSFER_BYTES
+#define PERIPH_SPI_NEEDS_TRANSFER_REG
+#define PERIPH_SPI_NEEDS_TRANSFER_REGS
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
