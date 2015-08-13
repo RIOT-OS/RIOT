@@ -25,14 +25,33 @@ extern "C" {
 #endif
 
 /**
- * @brief   Get link-layer address and interface for next hop to destination
- *          IPv6 address.
+ * @brief Next hop determination for a destination address that is not on-link.
  *
- * @param[out] l2addr           The link-layer for the next hop to @p dst.
+ * @see <a href="https://tools.ietf.org/html/rfc4861#section-3">
+ * RFC 4861, section 3
+ * </a>
+ *
+ * @param[out] next_hop_ip  Will be filled with IPv6 address of the next hop
+ *                          or NULL if no next hop could be determined.
+ * @param[in,out] iface     Will be filled with the interface id that has to be
+ *                          used for reaching the next hop.
+ * @param[in] dst           The destination IPv6 address.
+ *
+ * @return true, if a next hop could be determined.
+ * @return false otherwise
+ */
+bool ng_ndp_node_next_hop_ipv6_addr(ipv6_addr_t *next_hop_ip,
+                                    kernel_pid_t *iface, ipv6_addr_t *dst);
+
+/**
+ * @brief   Get link-layer address a given IPv6 address.
+ *
+ * @param[out] l2addr           The link-layer of @p dst.
  * @param[out] l2addr_len       Length of @p l2addr.
  * @param[in] iface             The interface to search the next hop on.
  *                              May be @ref KERNEL_PID_UNDEF if not specified.
- * @param[in] dst               An IPv6 address to search the next hop for.
+ * @param[in] dst               The IPv6 address to search the link-layer
+ *                              address hop for.
  * @param[in] pkt               Packet to send to @p dst. Leave NULL if you
  *                              just want to get the addresses.
  *
