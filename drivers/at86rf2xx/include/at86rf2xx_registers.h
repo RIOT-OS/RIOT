@@ -31,24 +31,24 @@ extern "C" {
  * @brief   Constant part numbers of the AT86RF2xx device family
  * @{
  */
-#define NG_AT86RF212B_PARTNUM       (0x07)
-#define NG_AT86RF231_PARTNUM        (0x03)
-#define NG_AT86RF232_PARTNUM        (0x0a)
-#define NG_AT86RF233_PARTNUM        (0x0b)
+#define AT86RF212B_PARTNUM       (0x07)
+#define AT86RF231_PARTNUM        (0x03)
+#define AT86RF232_PARTNUM        (0x0a)
+#define AT86RF233_PARTNUM        (0x0b)
 /** @} */
 
 /**
  * @brief   Assign the part number for the device we are building the driver for
  * @{
  */
-#ifdef MODULE_NG_AT86RF212B
-#define AT86RF2XX_PARTNUM           NG_AT86RF212B_PARTNUM
-#elif MODULE_NG_AT86RF232
-#define AT86RF2XX_PARTNUM           NG_AT86RF232_PARTNUM
-#elif MODULE_NG_AT86RF233
-#define AT86RF2XX_PARTNUM           NG_AT86RF233_PARTNUM
-#else /* MODULE_NG_AT86RF231 as default device */
-#define AT86RF2XX_PARTNUM           NG_AT86RF231_PARTNUM
+#ifdef MODULE_AT86RF212B
+#define AT86RF2XX_PARTNUM           AT86RF212B_PARTNUM
+#elif MODULE_AT86RF232
+#define AT86RF2XX_PARTNUM           AT86RF232_PARTNUM
+#elif MODULE_AT86RF233
+#define AT86RF2XX_PARTNUM           AT86RF233_PARTNUM
+#else /* MODULE_AT86RF231 as default device */
+#define AT86RF2XX_PARTNUM           AT86RF231_PARTNUM
 #endif
 /** @} */
 
@@ -87,7 +87,7 @@ extern "C" {
 #define AT86RF2XX_REG__XOSC_CTRL                                (0x12)
 #define AT86RF2XX_REG__CC_CTRL_1                                (0x14)
 #define AT86RF2XX_REG__RX_SYN                                   (0x15)
-#ifdef MODULE_NG_AT86RF212B
+#ifdef MODULE_AT86RF212B
 #define AT86RF2XX_REG__RF_CTRL_0                                (0x16)
 #endif
 #define AT86RF2XX_REG__XAH_CTRL_1                               (0x17)
@@ -245,11 +245,11 @@ extern "C" {
  * @brief   Bitfield definitions for the PHY_TX_PWR register
  * @{
  */
-#ifdef MODULE_NG_AT86RF212B
+#ifdef MODULE_AT86RF212B
 #define AT86RF2XX_PHY_TX_PWR_MASK__PA_BOOST                     (0x80)
 #define AT86RF2XX_PHY_TX_PWR_MASK__GC_PA                        (0x60)
 #define AT86RF2XX_PHY_TX_PWR_MASK__TX_PWR                       (0x1F)
-#elif  MODULE_NG_AT86RF231
+#elif  MODULE_AT86RF231
 #define AT86RF2XX_PHY_TX_PWR_MASK__PA_BUF_LT                    (0xC0)
 #define AT86RF2XX_PHY_TX_PWR_MASK__PA_LT                        (0x30)
 #define AT86RF2XX_PHY_TX_PWR_MASK__TX_PWR                       (0x0F)
@@ -323,7 +323,7 @@ extern "C" {
  * @brief   Bitfield definitions for the RF_CTRL_0 register
  * @{
  */
-#ifdef MODULE_NG_AT86RF212B
+#ifdef MODULE_AT86RF212B
 #define AT86RF2XX_RF_CTRL_0_MASK__PA_LT                         (0xC0)
 #define AT86RF2XX_RF_CTRL_0_MASK__GC_TX_OFFS                    (0x03)
 

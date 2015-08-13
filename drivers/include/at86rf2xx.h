@@ -55,7 +55,7 @@ extern "C" {
   * @brief   Channel configuration
   * @{
   */
-#ifdef MODULE_NG_AT86RF212B
+#ifdef MODULE_AT86RF212B
 /* the AT86RF212B has a sub-1GHz radio */
 #define AT86RF2XX_MIN_CHANNEL           (0)
 #define AT86RF2XX_MAX_CHANNEL           (10)
@@ -148,7 +148,7 @@ typedef struct {
     uint8_t frame_len;                  /**< length of the current TX frame */
     uint16_t pan;                       /**< currently used PAN ID */
     uint8_t chan;                       /**< currently used channel */
-#ifdef MODULE_NG_AT86RF212B
+#ifdef MODULE_AT86RF212B
     at86rf2xx_freq_t freq;              /**< currently used frequency */
 #endif
     uint8_t addr_short[2];              /**< the radio's short address */
@@ -255,7 +255,7 @@ uint8_t at86rf2xx_get_chan(at86rf2xx_t *dev);
  */
 void at86rf2xx_set_chan(at86rf2xx_t *dev, uint8_t chan);
 
-#ifdef MODULE_NG_AT86RF212B
+#ifdef MODULE_AT86RF212B
 /**
  * @brief   Get the configured frequency of the given device
  *

@@ -151,7 +151,7 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
     /* enable safe mode (protect RX FIFO until reading data starts) */
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_CTRL_2,
                         AT86RF2XX_TRX_CTRL_2_MASK__RX_SAFE_MODE);
-#ifdef MODULE_NG_AT86RF212B
+#ifdef MODULE_AT86RF212B
     at86rf2xx_set_freq(dev, AT86RF2XX_FREQ_915MHZ);
 #endif
 
@@ -261,7 +261,7 @@ void at86rf2xx_rx_read(at86rf2xx_t *dev, uint8_t *data, size_t len,
      * The AT86RF231 does not return the PHR field and return
      * the first data byte at position 0.
      */
-#ifndef MODULE_NG_AT86RF231
+#ifndef MODULE_AT86RF231
     at86rf2xx_sram_read(dev, offset + 1, data, len);
 #else
     at86rf2xx_sram_read(dev, offset, data, len);
