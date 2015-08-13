@@ -24,8 +24,7 @@
 
 #include "hih6130.h"
 #include "periph/i2c.h"
-#include "timex.h"
-#include "vtimer.h"
+#include "xtimer.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
@@ -53,8 +52,7 @@ enum {
 };
 
 /** @brief Delay between requesting a measurement and data becoming ready */
-static const timex_t measurement_delay = {
-        .seconds = 0, .microseconds = 50 * MS_IN_USEC, };
+#define MEASUREMENT_DELAY   (50*1000)
 
 /** @brief Trigger a new measurement on the sensor */
 static inline int hih6130_measurement_request(hih6130_t *dev)
@@ -121,7 +119,7 @@ int hih6130_get_humidity_temperature_float(hih6130_t *dev,
         return -1;
     }
 
-    vtimer_sleep(measurement_delay);
+    xtimer_usleep(MEASUREMENT_DELAY);
 
     status = hih6130_get_humidity_temperature_raw(dev, &hum_raw, &temp_raw);
 
