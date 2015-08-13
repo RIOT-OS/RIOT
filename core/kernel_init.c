@@ -86,13 +86,15 @@ void kernel_init(void)
 
     hwtimer_init();
 
-    if (thread_create(idle_stack, sizeof(idle_stack), THREAD_PRIORITY_IDLE, CREATE_WOUT_YIELD | CREATE_STACKTEST, idle_thread, NULL, idle_name) < 0) {
-        printf("kernel_init(): error creating idle task.\n");
-    }
+    thread_create(idle_stack, sizeof(idle_stack),
+            THREAD_PRIORITY_IDLE,
+            CREATE_WOUT_YIELD | CREATE_STACKTEST,
+            idle_thread, NULL, idle_name);
 
-    if (thread_create(main_stack, sizeof(main_stack), THREAD_PRIORITY_MAIN, CREATE_WOUT_YIELD | CREATE_STACKTEST, main_trampoline, NULL, main_name) < 0) {
-        printf("kernel_init(): error creating main task.\n");
-    }
+    thread_create(main_stack, sizeof(main_stack),
+            THREAD_PRIORITY_MAIN,
+            CREATE_WOUT_YIELD | CREATE_STACKTEST,
+            main_trampoline, NULL, main_name);
 
     LOG_INFO("kernel_init(): jumping into first task...\n");
 
