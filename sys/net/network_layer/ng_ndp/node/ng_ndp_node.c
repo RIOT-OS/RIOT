@@ -96,80 +96,86 @@ kernel_pid_t ng_ndp_node_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_len,
         }
     }
 
+    /* dst has not an on-link prefix  */
     if (next_hop_ip == NULL) {
         next_hop_ip = ng_ndp_internal_default_router();
     }
 
-    if (next_hop_ip != NULL) {
-        ng_ipv6_nc_t *nc_entry = ng_ipv6_nc_get(iface, next_hop_ip);
 
-        if ((nc_entry != NULL) && ng_ipv6_nc_is_reachable(nc_entry)) {
-            DEBUG("ndp node: found reachable neighbor (%s => ",
-                  ipv6_addr_to_str(addr_str, &nc_entry->ipv6_addr, sizeof(addr_str)));
-            DEBUG("%s)\n",
-                  ng_netif_addr_to_str(addr_str, sizeof(addr_str),
-                                       nc_entry->l2_addr, nc_entry->l2_addr_len));
+    if (next_hop_ip == NULL) {
+        next_hop_ip = dst;      /* Just look if it's in the neighbor cache
+                                 * (aka on-link but not registered in prefix list as such) */
+    }
 
-            if (ng_ipv6_nc_get_state(nc_entry) == NG_IPV6_NC_STATE_STALE) {
-                ng_ndp_internal_set_state(nc_entry, NG_IPV6_NC_STATE_DELAY);
-            }
+    /* start address resolution */
+    nc_entry = ng_ipv6_nc_get(iface, next_hop_ip);
 
-            memcpy(l2addr, nc_entry->l2_addr, nc_entry->l2_addr_len);
-            *l2addr_len = nc_entry->l2_addr_len;
-            /* TODO: unreachability check */
-            return nc_entry->iface;
+    if ((nc_entry != NULL) && ng_ipv6_nc_is_reachable(nc_entry)) {
+        DEBUG("ndp node: found reachable neighbor (%s => ",
+              ipv6_addr_to_str(addr_str, &nc_entry->ipv6_addr, sizeof(addr_str)));
+        DEBUG("%s)\n",
+              ng_netif_addr_to_str(addr_str, sizeof(addr_str),
+                                   nc_entry->l2_addr, nc_entry->l2_addr_len));
+
+        if (ng_ipv6_nc_get_state(nc_entry) == NG_IPV6_NC_STATE_STALE) {
+            ng_ndp_internal_set_state(nc_entry, NG_IPV6_NC_STATE_DELAY);
         }
-        else if (nc_entry == NULL) {
-            ng_pktqueue_t *pkt_node;
-            ipv6_addr_t dst_sol;
 
-            nc_entry = ng_ipv6_nc_add(iface, next_hop_ip, NULL, 0,
-                                      NG_IPV6_NC_STATE_INCOMPLETE << NG_IPV6_NC_STATE_POS);
+        memcpy(l2addr, nc_entry->l2_addr, nc_entry->l2_addr_len);
+        *l2addr_len = nc_entry->l2_addr_len;
+        /* TODO: unreachability check */
+        return nc_entry->iface;
+    }
+    else if (nc_entry == NULL) {
+        ng_pktqueue_t *pkt_node;
+        ipv6_addr_t dst_sol;
 
-            if (nc_entry == NULL) {
-                DEBUG("ndp node: could not create neighbor cache entry\n");
-                return KERNEL_PID_UNDEF;
+        nc_entry = ng_ipv6_nc_add(iface, next_hop_ip, NULL, 0,
+                                  NG_IPV6_NC_STATE_INCOMPLETE << NG_IPV6_NC_STATE_POS);
+
+        if (nc_entry == NULL) {
+            DEBUG("ndp node: could not create neighbor cache entry\n");
+            return KERNEL_PID_UNDEF;
+        }
+
+        pkt_node = _alloc_pkt_node(pkt);
+
+        if (pkt_node == NULL) {
+            DEBUG("ndp node: could not add packet to packet queue\n");
+        }
+        else {
+            /* prevent packet from being released by IPv6 */
+            ng_pktbuf_hold(pkt_node->pkt, 1);
+            ng_pktqueue_add(&nc_entry->pkts, pkt_node);
+        }
+
+        /* address resolution */
+        ipv6_addr_set_solicited_nodes(&dst_sol, next_hop_ip);
+
+        if (iface == KERNEL_PID_UNDEF) {
+            timex_t t = { 0, NG_NDP_RETRANS_TIMER };
+            kernel_pid_t ifs[NG_NETIF_NUMOF];
+            size_t ifnum = ng_netif_get(ifs);
+
+            for (size_t i = 0; i < ifnum; i++) {
+                ng_ndp_internal_send_nbr_sol(ifs[i], next_hop_ip, &dst_sol);
             }
 
-            pkt_node = _alloc_pkt_node(pkt);
+            vtimer_remove(&nc_entry->nbr_sol_timer);
+            vtimer_set_msg(&nc_entry->nbr_sol_timer, t, ng_ipv6_pid,
+                           NG_NDP_MSG_NBR_SOL_RETRANS, nc_entry);
+        }
+        else {
+            ng_ipv6_netif_t *ipv6_iface = ng_ipv6_netif_get(iface);
 
-            if (pkt_node == NULL) {
-                DEBUG("ndp node: could not add packet to packet queue\n");
-            }
-            else {
-                /* prevent packet from being released by IPv6 */
-                ng_pktbuf_hold(pkt_node->pkt, 1);
-                ng_pktqueue_add(&nc_entry->pkts, pkt_node);
-            }
+            ng_ndp_internal_send_nbr_sol(iface, next_hop_ip, &dst_sol);
 
-            /* address resolution */
-            ipv6_addr_set_solicited_nodes(&dst_sol, next_hop_ip);
-
-            if (iface == KERNEL_PID_UNDEF) {
-                timex_t t = { 0, NG_NDP_RETRANS_TIMER };
-                kernel_pid_t ifs[NG_NETIF_NUMOF];
-                size_t ifnum = ng_netif_get(ifs);
-
-                for (size_t i = 0; i < ifnum; i++) {
-                    ng_ndp_internal_send_nbr_sol(ifs[i], next_hop_ip, &dst_sol);
-                }
-
-                vtimer_remove(&nc_entry->nbr_sol_timer);
-                vtimer_set_msg(&nc_entry->nbr_sol_timer, t, ng_ipv6_pid,
-                               NG_NDP_MSG_NBR_SOL_RETRANS, nc_entry);
-            }
-            else {
-                ng_ipv6_netif_t *ipv6_iface = ng_ipv6_netif_get(iface);
-
-                ng_ndp_internal_send_nbr_sol(iface, next_hop_ip, &dst_sol);
-
-                mutex_lock(&ipv6_iface->mutex);
-                vtimer_remove(&nc_entry->nbr_sol_timer);
-                vtimer_set_msg(&nc_entry->nbr_sol_timer,
-                               ipv6_iface->retrans_timer, ng_ipv6_pid,
-                               NG_NDP_MSG_NBR_SOL_RETRANS, nc_entry);
-                mutex_unlock(&ipv6_iface->mutex);
-            }
+            mutex_lock(&ipv6_iface->mutex);
+            vtimer_remove(&nc_entry->nbr_sol_timer);
+            vtimer_set_msg(&nc_entry->nbr_sol_timer,
+                           ipv6_iface->retrans_timer, ng_ipv6_pid,
+                           NG_NDP_MSG_NBR_SOL_RETRANS, nc_entry);
+            mutex_unlock(&ipv6_iface->mutex);
         }
     }
 
