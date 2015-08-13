@@ -25,7 +25,14 @@
 extern "C" {
 #endif
 
-/* nothing to do here, yet */
+/**
+ * @brief declare needed generic SPI functions
+ * @{
+ */
+#define PERIPH_SPI_NEEDS_TRANSFER_BYTES
+#define PERIPH_SPI_NEEDS_TRANSFER_REG
+#define PERIPH_SPI_NEEDS_TRANSFER_REGS
+/** @} */
 
 #ifdef __cplusplus
 }
