@@ -149,8 +149,8 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
 #if TIMER_0_EN
 
         case TIMER_0:
-            pit_timer_stop(TIMER_0_COUNTER_CH);
             cu_timer[dev].counter32b = pit_timer_read(dev, TIMER_0_COUNTER_CH);
+            pit_timer_stop(TIMER_0_COUNTER_CH);
             cu_timer[dev].diff = value - cu_timer[dev].counter32b;
             TIMER_DEV->CHANNEL[TIMER_0_COUNTER_CH].LDVAL = cu_timer[dev].diff;
             pit_timer_start(TIMER_0_COUNTER_CH);
@@ -159,8 +159,8 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
 #if TIMER_1_EN
 
         case TIMER_1:
-            pit_timer_stop(TIMER_1_COUNTER_CH);
             cu_timer[dev].counter32b = pit_timer_read(dev, TIMER_1_COUNTER_CH);
+            pit_timer_stop(TIMER_1_COUNTER_CH);
             cu_timer[dev].diff = value - cu_timer[dev].counter32b;
             TIMER_DEV->CHANNEL[TIMER_1_COUNTER_CH].LDVAL = cu_timer[dev].diff;
             pit_timer_start(TIMER_1_COUNTER_CH);
