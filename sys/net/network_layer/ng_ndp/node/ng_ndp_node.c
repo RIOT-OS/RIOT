@@ -93,25 +93,11 @@ kernel_pid_t ng_ndp_node_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_len,
             (ng_ipv6_netif_addr_get(prefix)->flags &
              NG_IPV6_NETIF_ADDR_FLAGS_NDP_ON_LINK)) {
             next_hop_ip = dst;
-#ifdef MODULE_FIB
-            /* We don't care if FIB is full, this is just for efficiency
-             * for later sends */
-            fib_add_entry(iface, (uint8_t *)dst, sizeof(ipv6_addr_t), 0,
-                          (uint8_t *)next_hop_ip, sizeof(ipv6_addr_t), 0,
-                          FIB_LIFETIME_NO_EXPIRE);
-#endif
         }
     }
 
     if (next_hop_ip == NULL) {
         next_hop_ip = ng_ndp_internal_default_router();
-#ifdef MODULE_FIB
-        /* We don't care if FIB is full, this is just for efficiency for later
-         * sends */
-        fib_add_entry(iface, (uint8_t *)dst, sizeof(ipv6_addr_t), 0,
-                      (uint8_t *)next_hop_ip, sizeof(ipv6_addr_t), 0,
-                      FIB_LIFETIME_NO_EXPIRE);
-#endif
     }
 
     if (next_hop_ip != NULL) {

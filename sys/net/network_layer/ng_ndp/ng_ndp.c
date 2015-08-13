@@ -19,7 +19,6 @@
 #include <string.h>
 
 #include "byteorder.h"
-#include "net/fib.h"
 #include "net/ng_icmpv6.h"
 #include "net/ng_ipv6.h"
 #include "net/ng_ipv6/ext/rh.h"
@@ -312,9 +311,6 @@ void ng_ndp_retrans_nbr_sol(ng_ipv6_nc_t *nc_entry)
                   ipv6_addr_to_str(addr_str, &nc_entry->ipv6_addr, sizeof(addr_str)),
                   nc_entry->iface);
 
-#ifdef MODULE_FIB
-            fib_remove_entry((uint8_t *) & (nc_entry->ipv6_addr), sizeof(ipv6_addr_t));
-#endif
             ng_ipv6_nc_remove(nc_entry->iface, &nc_entry->ipv6_addr);
         }
     }
