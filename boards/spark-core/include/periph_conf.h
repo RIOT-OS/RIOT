@@ -93,11 +93,8 @@
 #define UART_0_ISR          isr_usart2
 #define UART_0_BUS_FREQ     (CLOCK_CORECLOCK/2)
 /* UART 0 pin configuration */
-#define UART_0_PORT         GPIOA
-#define UART_0_PORT_CLKEN() (RCC->APB2ENR |= RCC_APB2ENR_IOPAEN)
-#define UART_0_RX_PIN       3
-#define UART_0_TX_PIN       2
-#define UART_0_AF           0
+#define UART_0_RX_PIN       GPIO(PORT_A,3)
+#define UART_0_TX_PIN       GPIO(PORT_A,2)
 /** @} */
 
 /**
@@ -113,15 +110,9 @@
 #define SPI_0_CLKDIS()          (RCC->APB2ENR &= ~(RCC_APB2ENR_SPI1EN))
 #define SPI_0_BUS_DIV           0   /* 1 -> SPI runs with full CPU clock, 0 -> half CPU clock */
 /* SPI 0 pin configuration */
-#define SPI_0_CLK_PORT          GPIOB
-#define SPI_0_CLK_PIN           15
-#define SPI_0_CLK_PORT_CLKEN()  (RCC->APB2ENR |= RCC_APB2ENR_IOPBEN)
-#define SPI_0_MOSI_PORT         GPIOB
-#define SPI_0_MOSI_PIN          17
-#define SPI_0_MOSI_PORT_CLKEN() (RCC->APB2ENR |= RCC_APB2ENR_IOPBEN)
-#define SPI_0_MISO_PORT         GPIOB
-#define SPI_0_MISO_PIN          16
-#define SPI_0_MISO_PORT_CLKEN() (RCC->APB2ENR |= RCC_APB2ENR_IOPBEN)
+#define SPI_0_CLK_PIN           GPIO(PORT_B,15)
+#define SPI_0_MOSI_PIN          GPIO(PORT_B,17)
+#define SPI_0_MISO_PIN          GPIO(PORT_B,16)
 /** @} */
 
 #ifdef __cplusplus
