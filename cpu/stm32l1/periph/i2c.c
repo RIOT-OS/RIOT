@@ -414,6 +414,11 @@ int i2c_write_bytes(i2c_t dev, uint8_t address, char *data, int length)
             i2c = I2C_0_DEV;
             break;
 #endif
+#if I2C_1_EN
+        case I2C_1:
+            i2c = I2C_1_DEV;
+            break;
+#endif
 
         default:
             return -1;
@@ -473,6 +478,11 @@ void i2c_poweron(i2c_t dev)
             I2C_0_CLKEN();
             break;
 #endif
+#if I2C_1_EN
+        case I2C_1:
+            I2C_1_CLKEN();
+            break;
+#endif
     }
 }
 
@@ -482,7 +492,12 @@ void i2c_poweroff(i2c_t dev)
 #if I2C_0_EN
         case I2C_0:
             while (I2C_0_DEV->SR2 & I2C_SR2_BUSY);
-
+            I2C_0_CLKDIS();
+            break;
+#endif
+#if I2C_1_EN
+        case I2C_1:
+            while (I2C_0_DEV->SR2 & I2C_SR2_BUSY);
             I2C_0_CLKDIS();
             break;
 #endif

@@ -42,11 +42,7 @@ WEAK_DEFAULT void isr_tamper_stamp(void);
 WEAK_DEFAULT void isr_rtc_wkup(void);
 WEAK_DEFAULT void isr_flash(void);
 WEAK_DEFAULT void isr_rcc(void);
-WEAK_DEFAULT void isr_exti0(void);
-WEAK_DEFAULT void isr_exti1(void);
-WEAK_DEFAULT void isr_exti2(void);
-WEAK_DEFAULT void isr_exti3(void);
-WEAK_DEFAULT void isr_exti4(void);
+WEAK_DEFAULT void isr_exti(void);
 WEAK_DEFAULT void isr_dma1_ch1(void);
 WEAK_DEFAULT void isr_dma1_ch2(void);
 WEAK_DEFAULT void isr_dma1_ch3(void);
@@ -59,7 +55,6 @@ WEAK_DEFAULT void isr_usb_hp(void);
 WEAK_DEFAULT void isr_usb_lp(void);
 WEAK_DEFAULT void isr_dac(void);
 WEAK_DEFAULT void isr_comp(void);
-WEAK_DEFAULT void isr_exti9_5(void);
 WEAK_DEFAULT void isr_lcd(void);
 WEAK_DEFAULT void isr_tim9(void);
 WEAK_DEFAULT void isr_tim10(void);
@@ -76,7 +71,6 @@ WEAK_DEFAULT void isr_spi2(void);
 WEAK_DEFAULT void isr_usart1(void);
 WEAK_DEFAULT void isr_usart2(void);
 WEAK_DEFAULT void isr_usart3(void);
-WEAK_DEFAULT void isr_exti15_10(void);
 WEAK_DEFAULT void isr_rtc_alarm(void);
 WEAK_DEFAULT void isr_usb_fs_wkup(void);
 WEAK_DEFAULT void isr_tim6(void);
@@ -123,11 +117,11 @@ ISR_VECTORS const void *interrupt_vector[] = {
     (void*) isr_rtc_wkup,
     (void*) isr_flash,
     (void*) isr_rcc,
-    (void*) isr_exti0,
-    (void*) isr_exti1,
-    (void*) isr_exti2,
-    (void*) isr_exti3,
-    (void*) isr_exti4,
+    (void*) isr_exti,
+    (void*) isr_exti,
+    (void*) isr_exti,
+    (void*) isr_exti,
+    (void*) isr_exti,
     (void*) isr_dma1_ch1,
     (void*) isr_dma1_ch2,
     (void*) isr_dma1_ch3,
@@ -140,7 +134,7 @@ ISR_VECTORS const void *interrupt_vector[] = {
     (void*) isr_usb_lp,
     (void*) isr_dac,
     (void*) isr_comp,
-    (void*) isr_exti9_5,
+    (void*) isr_exti,
     (void*) isr_lcd,
     (void*) isr_tim9,
     (void*) isr_tim10,
@@ -157,7 +151,7 @@ ISR_VECTORS const void *interrupt_vector[] = {
     (void*) isr_usart1,
     (void*) isr_usart2,
     (void*) isr_usart3,
-    (void*) isr_exti15_10,
+    (void*) isr_exti,
     (void*) isr_rtc_alarm,
     (void*) isr_usb_fs_wkup,
     (void*) isr_tim6,
