@@ -48,8 +48,12 @@
 #define TIMER_NUMOF        (1U)
 #define TIMER_0_EN         1
 
-/** @def set TIMER0 for hwtimer wrapper */
-#define HW_TIMER TIMER_0
+/**
+ * @brief xtimer configuration
+ * @{
+ */
+#define XTIMER_OVERHEAD 14
+#define XTIMER_USLEEP_UNTIL_OVERHEAD 1
 /** @} */
 
 #ifdef __cplusplus
