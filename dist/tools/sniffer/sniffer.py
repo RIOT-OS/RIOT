@@ -86,7 +86,7 @@ def generate_pcap(port, out):
         if pkt_header:
             now = time()
             sec = int(now)
-            usec = (int(now) - sec) * 100000
+            usec = int((now - sec) * 1000000)
             length = int(pkt_header.group(1), 16)
             out.write(pack('<LLLL', sec, usec, length, length))
             out.flush()
