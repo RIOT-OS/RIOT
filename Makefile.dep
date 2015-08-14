@@ -370,3 +370,7 @@ endif
 ifneq (,$(filter nvram_spi,$(USEMODULE)))
     USEMODULE += xtimer
 endif
+
+ifneq (,$(filter ltc4150,$(USEMODULE)))
+    USEMODULE += xtimer
+endif
