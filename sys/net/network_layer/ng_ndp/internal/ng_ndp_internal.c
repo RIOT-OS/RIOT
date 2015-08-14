@@ -16,6 +16,7 @@
 
 #include "net/ng_ipv6.h"
 #include "net/ng_ndp.h"
+#include "net/fib.h"
 #include "random.h"
 #include "timex.h"
 #include "vtimer.h"
@@ -55,6 +56,21 @@ static inline void _send_delayed(vtimer_t *t, timex_t interval, ng_pktsnip_t *pk
 
 void ng_ndp_internal_default_router(ipv6_addr_t *default_router)
 {
+#ifdef MODULE_FIB
+    ipv6_addr_t unspec, next_hop;
+    kernel_pid_t iface;
+    ipv6_addr_set_unspecified(&unspec);
+    size_t next_hop_size = sizeof(ipv6_addr_t);
+    uint32_t next_hop_flags = 0;
+
+    if ((fib_get_next_hop(&iface, next_hop.u8, &next_hop_size, &next_hop_flags,
+                         (uint8_t *)&unspec, sizeof(ipv6_addr_t), 0) >= 0) &&
+         (next_hop_size == sizeof(ipv6_addr_t))) {
+        memcpy(default_router, &next_hop, sizeof(ipv6_addr_t));
+        return;
+    }
+#endif
+
     ng_ipv6_nc_t *router = ng_ipv6_nc_get_next_router(NULL);
 
     /* first look if there is any reachable router */
