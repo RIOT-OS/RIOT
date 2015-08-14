@@ -1,0 +1,79 @@
+From a20abf688bb2543f1bdf3e05d237092421408f2e Mon Sep 17 00:00:00 2001
+From: Darredevil <alex.darredevil@gmail.com>
+Date: Thu, 13 Aug 2015 12:36:31 +0100
+Subject: [PATCH 3/6] fixed warnings in er-coap-13.c
+
+---
+ core/er-coap-13/er-coap-13.c | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
+
+diff --git a/core/er-coap-13/er-coap-13.c b/core/er-coap-13/er-coap-13.c
+index cef62cc..0df7e4f 100644
+--- a/core/er-coap-13/er-coap-13.c
++++ b/core/er-coap-13/er-coap-13.c
+@@ -382,7 +382,7 @@ coap_get_variable(const uint8_t *buffer, size_t length, const char *name, const
+
+ /*-----------------------------------------------------------------------------------*/
+ uint16_t
+-coap_get_mid()
++coap_get_mid(void)
+ {
+   return ++current_mid;
+ }
+@@ -750,6 +750,9 @@ coap_get_query_variable(void *packet, const char *name, const char **output)
+     return coap_get_variable(coap_pkt->uri_query, coap_pkt->uri_query_len, name, output);
+   }
+ */
++  (void)packet;
++  (void)name;
++  (void)output;
+   return 0;
+ }
+
+@@ -939,7 +942,7 @@ coap_get_header_proxy_uri(void *packet, const char **uri)
+
+   if (!IS_OPTION(coap_pkt, COAP_OPTION_PROXY_URI)) return 0;
+
+-  *uri = coap_pkt->proxy_uri;
++  *uri = (const char *)coap_pkt->proxy_uri;
+   return coap_pkt->proxy_uri_len;
+ }
+
+@@ -948,7 +951,7 @@ coap_set_header_proxy_uri(void *packet, const char *uri)
+ {
+   coap_packet_t *const coap_pkt = (coap_packet_t *) packet;
+
+-  coap_pkt->proxy_uri = uri;
++  coap_pkt->proxy_uri = (const uint8_t *)uri;
+   coap_pkt->proxy_uri_len = strlen(uri);
+
+   SET_OPTION(coap_pkt, COAP_OPTION_PROXY_URI);
+@@ -1120,7 +1123,7 @@ coap_get_header_location_query(void *packet, const char **query)
+
+   if (!IS_OPTION(coap_pkt, COAP_OPTION_LOCATION_QUERY)) return 0;
+
+-  *query = coap_pkt->location_query;
++  *query = (const char *)coap_pkt->location_query;
+   return coap_pkt->location_query_len;
+ }
+
+@@ -1131,7 +1134,7 @@ coap_set_header_location_query(void *packet, char *query)
+
+   while (query[0]=='?') ++query;
+
+-  coap_pkt->location_query = query;
++  coap_pkt->location_query = (uint8_t *)query;
+   coap_pkt->location_query_len = strlen(query);
+
+   SET_OPTION(coap_pkt, COAP_OPTION_LOCATION_QUERY);
+@@ -1231,7 +1234,7 @@ coap_get_header_size(void *packet, uint32_t *size)
+   coap_packet_t *const coap_pkt = (coap_packet_t *) packet;
+
+   if (!IS_OPTION(coap_pkt, COAP_OPTION_SIZE)) return 0;
+-
++
+   *size = coap_pkt->size;
+   return 1;
+ }
+--
+1.9.1
