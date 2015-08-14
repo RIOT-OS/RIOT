@@ -53,7 +53,7 @@ static inline void _send_delayed(vtimer_t *t, timex_t interval, ng_pktsnip_t *pk
 }
 
 
-ipv6_addr_t *ng_ndp_internal_default_router(void)
+void ng_ndp_internal_default_router(ipv6_addr_t *default_router)
 {
     ng_ipv6_nc_t *router = ng_ipv6_nc_get_next_router(NULL);
 
@@ -63,7 +63,7 @@ ipv6_addr_t *ng_ndp_internal_default_router(void)
             (ng_ipv6_nc_get_state(router) != NG_IPV6_NC_STATE_UNREACHABLE)) {
             _last_router = NULL;
 
-            return &router->ipv6_addr;
+            memcpy(default_router, &(router->ipv6_addr), sizeof(ipv6_addr_t));
         }
 
         router = ng_ipv6_nc_get_next_router(router);
@@ -76,13 +76,14 @@ ipv6_addr_t *ng_ndp_internal_default_router(void)
         router = ng_ipv6_nc_get_next_router(router);
 
         if (router == NULL) {   /* still nothing found => no router in list */
-            return NULL;
+            default_router = NULL;
+            return;
         }
     }
 
     _last_router = router;
 
-    return &router->ipv6_addr;
+    memcpy(default_router, &(router->ipv6_addr), sizeof(ipv6_addr_t));
 }
 
 void ng_ndp_internal_set_state(ng_ipv6_nc_t *nc_entry, uint8_t state)
