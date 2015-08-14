@@ -190,47 +190,6 @@ int spi_transfer_byte(spi_t dev, char out, char *in)
     return transferred;
 }
 
-int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length)
-{
-    int transferred = 0;
-
-    if (out != NULL) {
-        DEBUG("out*: %p out: %x length: %x\n", out, *out, length);
-        while (length--) {
-            int ret = spi_transfer_byte(dev, *(out)++, 0);
-            if (ret <  0) {
-                return ret;
-            }
-            transferred += ret;
-        }
-    }
-    if (in != NULL) {
-        while (length--) {
-            int ret = spi_transfer_byte(dev, 0, in++);
-            if (ret <  0) {
-                return ret;
-            }
-            transferred += ret;
-        }
-        DEBUG("in*: %p in: %x transferred: %x\n", in, *(in-transferred), transferred);
-    }
-
-    DEBUG("sent %x byte(s)\n", transferred);
-    return transferred;
-}
-
-int spi_transfer_reg(spi_t dev, uint8_t reg, char out, char *in)
-{
-    spi_transfer_byte(dev, reg, NULL);
-    return spi_transfer_byte(dev, out, in);
-}
-
-int spi_transfer_regs(spi_t dev, uint8_t reg, char *out, char *in, unsigned int length)
-{
-    spi_transfer_byte(dev, reg, NULL);
-    return spi_transfer_bytes(dev, out, in, length);
-}
-
 void spi_transmission_begin(spi_t dev, char reset_val)
 {
     /* slave mode not implemented, yet */
