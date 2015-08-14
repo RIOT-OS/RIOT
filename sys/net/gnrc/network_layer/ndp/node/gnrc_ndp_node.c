@@ -114,7 +114,7 @@ kernel_pid_t gnrc_ndp_node_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_len,
         ipv6_addr_t dst_sol;
 
         nc_entry = gnrc_ipv6_nc_add(iface, dst, NULL, 0,
-                GNRC_IPV6_NC_STATE_INCOMPLETE << GNRC_IPV6_NC_STATE_POS);
+                                    GNRC_IPV6_NC_STATE_INCOMPLETE << GNRC_IPV6_NC_STATE_POS);
 
         if (nc_entry == NULL) {
             DEBUG("ndp node: could not create neighbor cache entry\n");
@@ -160,9 +160,9 @@ kernel_pid_t gnrc_ndp_node_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_len,
                            GNRC_NDP_MSG_NBR_SOL_RETRANS, nc_entry);
             mutex_unlock(&ipv6_iface->mutex);
         }
-}
+    }
 
-return KERNEL_PID_UNDEF;
+    return KERNEL_PID_UNDEF;
 }
 
 
