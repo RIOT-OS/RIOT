@@ -23,7 +23,7 @@
 #include <string.h>
 
 #include "xbee.h"
-#include "hwtimer.h"
+#include "xtimer.h"
 #include "msg.h"
 #include "net/eui64.h"
 #include "net/ieee802154.h"
@@ -455,13 +455,13 @@ int xbee_init(xbee_t *dev, uart_t uart, uint32_t baudrate,
     /* if reset pin is connected, do a hardware reset */
     if (reset_pin != GPIO_UNDEF) {
         gpio_clear(reset_pin);
-        hwtimer_wait(HWTIMER_TICKS(RESET_DELAY));
+        xtimer_usleep(RESET_DELAY);
         gpio_set(reset_pin);
     }
     /* put the XBee device into command mode */
-    hwtimer_wait(HWTIMER_TICKS(ENTER_CMD_MODE_DELAY));
+    xtimer_usleep(ENTER_CMD_MODE_DELAY);
     _at_cmd(dev, "+++");
-    hwtimer_wait(HWTIMER_TICKS(ENTER_CMD_MODE_DELAY));
+    xtimer_usleep(ENTER_CMD_MODE_DELAY);
     /* disable non IEEE802.15.4 extensions */
     _at_cmd(dev, "ATMM2\r");
     /* put XBee module in "API mode without escaped characters" */

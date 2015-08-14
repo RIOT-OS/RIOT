@@ -22,6 +22,7 @@ endif
 
 ifneq (,$(filter xbee,$(USEMODULE)))
   USEMODULE += ieee802154
+  USEMODULE += xtimer
 endif
 
 ifneq (,$(filter gnrc_zep,$(USEMODULE)))
