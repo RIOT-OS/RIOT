@@ -350,3 +350,7 @@ endif
 ifneq (,$(filter lm75a,$(USEMODULE)))
     USEMODULE += xtimer
 endif
+
+ifneq (,$(filter mpu9150,$(USEMODULE)))
+    USEMODULE += xtimer
+endif
