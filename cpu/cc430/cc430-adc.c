@@ -51,7 +51,7 @@
 #include "irq.h"
 #include "cpu.h"
 #include "cc430-adc.h"
-#include "hwtimer.h"
+#include "xtimer.h"
 
 uint16_t adc12_result;
 uint8_t  adc12_data_ready;
@@ -74,8 +74,8 @@ uint16_t adc12_single_conversion(uint16_t ref, uint16_t sht, uint16_t channel)
     ADC12IE = 0x001;                            /* ADC_IFG upon conv result-ADCMEMO */
     enableIRQ();
 
-    /* Wait 2 ticks (66us) to allow internal reference to settle */
-    hwtimer_wait(2);
+    /* Wait 66us to allow internal reference to settle */
+    xtimer_usleep(66);
 
     /* Start ADC12 */
     ADC12CTL0 |= ADC12ENC;
@@ -87,7 +87,7 @@ uint16_t adc12_single_conversion(uint16_t ref, uint16_t sht, uint16_t channel)
     ADC12CTL0 |= ADC12SC;
 
     /* Wait until ADC12 has finished */
-    hwtimer_wait(5);
+    xtimer_usleep(150);
 
     while (!adc12_data_ready);
 
