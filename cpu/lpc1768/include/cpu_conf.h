@@ -13,7 +13,7 @@
  * @{
  *
  * @file
- * @brief           CPU specific hwtimer configuration options
+ * @brief           CPU specific configuration options
  *
  * @author          Hauke Petersen <hauke.peterse@fu-berlin.de>
  */
