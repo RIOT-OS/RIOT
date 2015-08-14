@@ -101,7 +101,7 @@ kernel_pid_t ng_ndp_node_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_len,
 
     /* dst has not an on-link prefix  */
     if (next_hop_ip == NULL) {
-        next_hop_ip = ng_ndp_internal_default_router();
+        ng_ndp_internal_default_router(next_hop_ip);
     }
 
 

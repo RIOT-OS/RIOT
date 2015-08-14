@@ -38,10 +38,10 @@ extern "C" {
  *          RFC 4861, section 6.3.6
  *      </a>
  *
- * @return  Address to a default router.
- * @return  NULL, if the default router list is empty.
+ * @param[out] default_router  Pointer to store the address of a default router,
+ *                             may be NULL, if no default router was found.
  */
-ipv6_addr_t *ng_ndp_internal_default_router(void);
+void ng_ndp_internal_default_router(ipv6_addr_t *default_router);
 
 /**
  * @brief   Sets state of a neighbor cache entry and triggers required actions.
