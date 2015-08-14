@@ -689,6 +689,7 @@ static void _receive(ng_pktsnip_t *pkt)
             ipv6->next = pkt;           /* reorder for sending */
             pkt->next = NULL;
             _send(ipv6, false);
+            return;
         }
         else {
             DEBUG("ipv6: hop limit reached 0: drop packet\n");
