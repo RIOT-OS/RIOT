@@ -136,6 +136,8 @@ typedef struct {
     const ng_netdev_driver_t *driver;   /**< pointer to the devices interface */
     ng_netdev_event_cb_t event_cb;      /**< netdev event callback */
     kernel_pid_t mac_pid;               /**< the driver's thread's PID */
+    uint8_t flags;                      /**< additional information about the
+                                             interface */
     /* device specific fields */
     spi_t spi;                          /**< used SPI device */
     gpio_t cs_pin;                      /**< chip select pin */

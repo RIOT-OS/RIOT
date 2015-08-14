@@ -54,6 +54,7 @@ int at86rf2xx_init(at86rf2xx_t *dev, spi_t spi, spi_speed_t spi_speed,
                    gpio_t sleep_pin, gpio_t reset_pin)
 {
     dev->driver = &at86rf2xx_driver;
+    dev->flags |= NG_NETDEV_FLAG_WIRELESS;
 
     /* initialize device descriptor */
     dev->spi = spi;
