@@ -4,9 +4,6 @@ export CFLAGS += -DCOREIF_NG=1
 # tell the build system that the CPU depends on the atmega common files
 USEMODULE += atmega_common
 
-# use hwtimer compatibility module
-USEMODULE += hwtimer_compat
-
 # export the peripheral drivers to be linked into the final binary
 export USEMODULE += periph
 
