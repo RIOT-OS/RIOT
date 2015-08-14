@@ -40,6 +40,11 @@ extern "C" {
 #define NG_NETDEV_MSG_TYPE_EVENT    (0x0100)
 
 /**
+ * @brief   Flag for indicating a wireless network interface
+ */
+#define NG_NETDEV_FLAG_WIRELESS     (0x01)
+
+/**
  * @brief   Possible event types that are send from the device driver to the
  *          MAC layer
  */
@@ -169,6 +174,8 @@ struct ng_netdev {
     ng_netdev_driver_t const *driver;   /**< pointer to the devices interface */
     ng_netdev_event_cb_t event_cb;      /**< netdev event callback */
     kernel_pid_t mac_pid;               /**< the driver's thread's PID */
+    uint8_t flags;                      /**< additional information about the
+                                             device */
 };
 
 #ifdef __cplusplus
