@@ -55,7 +55,7 @@ typedef int uart_t;
  * @{
  */
 #ifndef UART_UNDEF
-#define UART_UNDEF      (-1)
+#define UART_UNDEF          (-1)
 #endif
 /** @} */
 
@@ -64,9 +64,14 @@ typedef int uart_t;
  * @{
  */
 #ifndef UART_DEV
-#define UART_DEV(x)     (x)
+#define UART_DEV(x)         (x)
 #endif
 /** @} */
+
+/**
+ * @brief   MSB value of the TX callback in case more data is ready to be send
+ */
+#define UART_TX_MORE_DATA   (0xff00)
 
 /**
  * @brief   Signature for receive interrupt callback
@@ -79,12 +84,22 @@ typedef void(*uart_rx_cb_t)(void *arg, char data);
 /**
  * @brief   Signature for the transmit complete interrupt callback
  *
+ * When this callback is called, we have two possibilities: (i) there is more
+ * data to be send, and (ii) we have no more data to send.
+ *
+ * In case (i), we return the next byte to send ORed with UART_TX_MORE_DATA, so
+ * setting the MSB to all ones. This is needed to be able to send a zero byte
+ * via UART.
+ *
+ * In case (ii) we just return 0 and therefore signal to the UART
+ * driver, that no more bytes should be send.
+ *
  * @param[in] arg           context to the callback (optional)
  *
- * @return                  1 if more data is to be send
+ * @return                  next byte to send ORed with UART_TX_MORE_DATA
  * @return                  0 if no more data is to be send
  */
-typedef int(*uart_tx_cb_t)(void *arg);
+typedef uint16_t(*uart_tx_cb_t)(void *arg);
 
 /**
  * @brief   Interrupt context for a UART device
@@ -132,23 +147,12 @@ int uart_init(uart_t uart, uint32_t baudrate,
  * called. On most platforms this function will simply enable the TX interrupt
  * leading to a call of the TX callback function.
  *
+ * The actual passing of data to the UART device will then handled by the TX
+ * callback function.
+ *
  * @param[in] uart          UART device that will start a transmission
  */
-void uart_tx_begin(uart_t uart);
-
-/**
- * @brief   Write a byte into the UART's send register
- *
- * Calling this function while another byte is still waiting to be transferred,
- * this call will overwrite the waiting byte. This method should be used in the
- * TX callback routine, as here it is made sure that no old byte is waiting to
- * be transferred.
- *
- * @param[in] uart          UART device to use for transmission
- * @param[in] data          data byte to send
- */
-void uart_write(uart_t uart, char data);
-
+void uart_tx(uart_t uart);
 /**
  * @brief   Write a single byte to the given UART device (blocking)
  *
