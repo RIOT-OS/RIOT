@@ -92,7 +92,7 @@ static uint16_t _calc_fcs(uint16_t fcs, const uint8_t *frame, uint8_t frame_len)
 kernel_pid_t gnrc_zep_init(gnrc_zep_t *dev, uint16_t src_port, ipv6_addr_t *dst,
                            uint16_t dst_port)
 {
-#if MODULE_PERIPH_CPUID
+#ifdef MODULE_PERIPH_CPUID
     uint8_t cpuid[CPUID_ID_LEN];
     uint32_t hash1, hash2;
 #endif
@@ -122,7 +122,7 @@ kernel_pid_t gnrc_zep_init(gnrc_zep_t *dev, uint16_t src_port, ipv6_addr_t *dst,
     dev->pan = byteorder_btols(byteorder_htons(GNRC_ZEP_DEFAULT_PANID));
     dev->flags = GNRC_ZEP_FLAGS_USE_SRC_PAN
 
-#if MODULE_PERIPH_CPUID
+#ifdef MODULE_PERIPH_CPUID
     /* initialize dev->addr and dev->eui64 from cpuid if available */
     cpuid_get(cpuid);
 
