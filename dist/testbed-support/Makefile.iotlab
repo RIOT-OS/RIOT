@@ -7,15 +7,19 @@ IOTLAB_TYPE     ?= "m3:at86rf231"
 IOTLAB_AUTH     ?= $(HOME)/.iotlabrc
 IOTLAB_USER     ?= $(shell cut -f1 -d: $(IOTLAB_AUTH))
 IOTLAB_EXP_ID   ?= $(shell experiment-cli get -l --state Running | grep -m 1 '"id"' | grep -Eo '[[:digit:]]+')
+IOTLAB_EXP_NAME ?= RIOT_EXP
 
 $(IOTLAB_AUTH):
 	auth-cli -u $(IOTLAB_USER)
 
 iotlab-exp: $(IOTLAB_AUTH) all
-    ifeq (,$(AD))
-	    @echo "experiment-cli submit -d $(IOTLAB_DURATION) -l $(IOTLAB_NODES),archi=$(IOTLAB_TYPE)+site=$(IOTLAB_SITE),$(ELFFILE),$(IOTLAB_PROFILE) -n riot_makefile_experiment"
+    ifneq (RIOT_EXP,$(IOTLAB_EXP_NAME))
+	    $(eval IOTLAB_EXP_NAME := RIOT_EXP_$(IOTLAB_EXP_NAME))
     endif
-	$(eval NEW_ID := $(shell experiment-cli submit -d $(IOTLAB_DURATION) -l $(IOTLAB_NODES),archi=$(IOTLAB_TYPE)+site=$(IOTLAB_SITE),$(ELFFILE),$(IOTLAB_PROFILE) -n riot_makefile_experiment | grep -Eo '[[:digit:]]+'))
+    ifeq (,$(AD))
+	    @echo "experiment-cli submit -d $(IOTLAB_DURATION) -l $(IOTLAB_NODES),archi=$(IOTLAB_TYPE)+site=$(IOTLAB_SITE),$(ELFFILE),$(IOTLAB_PROFILE) -n $(IOTLAB_EXP_NAME)"
+    endif
+	$(eval NEW_ID := $(shell experiment-cli submit -d $(IOTLAB_DURATION) -l $(IOTLAB_NODES),archi=$(IOTLAB_TYPE)+site=$(IOTLAB_SITE),$(ELFFILE),$(IOTLAB_PROFILE) -n $(IOTLAB_EXP_NAME) | grep -Eo '[[:digit:]]+'))
 	$(AD)experiment-cli wait -i $(NEW_ID)
 
 iotlab-flash: $(IOTLAB_AUTH) all
