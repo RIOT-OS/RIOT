@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2015 Rakendra Thapa <rakendrathapa@gmail.com>
+ *               2015 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -14,6 +15,9 @@
  * @brief       Implementation of the low-level UART driver for the LM4F120
  *
  * @author      Rakendra Thapa <rakendrathapa@gmail.com>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ *
+ * @}
  */
 
 #include <stdint.h>
@@ -23,9 +27,6 @@
 #include "thread.h"
 #include "periph/uart.h"
 #include "periph_conf.h"
-
-/* guard the file in case no UART is defined */
-#if UART_0_EN
 
 /**
  * @brief Struct holding the configuration data for a UART device
@@ -80,94 +81,55 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, uart_tx_cb_t t
 {
     /* Check the arguments */
     ASSERT(uart == 0);
+
     /* Check to make sure the UART peripheral is present */
     if(!ROM_SysCtlPeripheralPresent(SYSCTL_PERIPH_UART0)){
         return -1;
     }
 
-    int res = uart_init_blocking(uart, baudrate);
-    if(res < 0){
-        return res;
-    }
+    /* do simple UART configuration */
+    ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_UART0);
+    ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
+    ROM_GPIOPinConfigure(GPIO_PA0_U0RX);
+    ROM_GPIOPinConfigure(GPIO_PA1_U0TX);
+    ROM_GPIOPinTypeUART(GPIO_PORTA_BASE, GPIO_PIN_0 | GPIO_PIN_1);
 
-/* save callbacks */
+    ROM_UARTDisable(UART0_BASE);
+    ROM_UARTConfigSetExpClk(UART0_BASE,ROM_SysCtlClockGet(), baudrate,
+                           (UART_CONFIG_PAR_NONE | UART_CONFIG_STOP_ONE |
+                            UART_CONFIG_WLEN_8));
+
+    ROM_UARTEnable(UART0_BASE);
+
+    /* save callbacks */
     config[uart].rx_cb = rx_cb;
     config[uart].tx_cb = tx_cb;
     config[uart].arg = arg;
 
-/*  ulBase = g_ulUARTBase[uart]; */
-    switch (uart){
-#if UART_0_EN
-        case UART_0:
-            NVIC_SetPriority(UART_0_IRQ_CHAN, UART_IRQ_PRIO);
+    /*  ulBase = g_ulUARTBase[uart]; */
+    ROM_UARTTxIntModeSet(UART0_BASE, UART_TXINT_MODE_EOT);
+    ROM_UARTFIFOLevelSet(UART0_BASE, UART_FIFO_TX4_8, UART_FIFO_RX4_8);
+    ROM_UARTFIFOEnable(UART0_BASE);
 
-            ROM_UARTTxIntModeSet(UART0_BASE, UART_TXINT_MODE_EOT);
-            ROM_UARTFIFOLevelSet(UART0_BASE, UART_FIFO_TX4_8, UART_FIFO_RX4_8);
-            ROM_UARTFIFOEnable(UART0_BASE);
+    /* Enable the UART interrupt */
+    NVIC_EnableIRQ(UART_0_IRQ_CHAN);
+    /* Enable RX interrupt */
+    UART0_IM_R = UART_IM_RXIM | UART_IM_RTIM;
 
-            /* Enable the UART interrupt */
-            NVIC_EnableIRQ(UART_0_IRQ_CHAN);
-            /* Enable RX interrupt */
-            UART0_IM_R = UART_IM_RXIM | UART_IM_RTIM;
-            break;
-#endif
-#if UART_1_EN
-        case UART_1:
-            NVIC_SetPriority(UART_1_IRQ_CHAN, UART_IRQ_PRIO);
-            /* Enable the UART interrupt */
-            NVIC_EnableIRQ(UART_1_IRQ_CHAN);
-            break;
-#endif
-    }
     return 0;
 }
 
-int uart_init_blocking(uart_t uart, uint32_t baudrate)
+void uart_tx(uart_t uart)
 {
-    switch(uart){
-#if UART_0_EN
-        case UART_0:
-            ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_UART0);
-            ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
-            ROM_GPIOPinConfigure(GPIO_PA0_U0RX);
-            ROM_GPIOPinConfigure(GPIO_PA1_U0TX);
-            ROM_GPIOPinTypeUART(GPIO_PORTA_BASE, GPIO_PIN_0 | GPIO_PIN_1);
+    (void)uart;
 
-            ROM_UARTDisable(UART0_BASE);
-            ROM_UARTConfigSetExpClk(UART0_BASE,ROM_SysCtlClockGet(), baudrate,
-                    (UART_CONFIG_PAR_NONE | UART_CONFIG_STOP_ONE |
-                     UART_CONFIG_WLEN_8));
-
-
-            ROM_UARTEnable(UART0_BASE);
-            break;
-#endif
-        }
-    return 0;
-}
-
-void uart_tx_begin(uart_t uart)
-{
-    uart_write(uart, '\0');
+    ROM_UARTCharPutNonBlocking(UART0_BASE, '\0');
     UART0_IM_R |= UART_IM_TXIM;
 }
 
-int uart_write(uart_t uart, char data)
-{
-    int ret=ROM_UARTCharPutNonBlocking(UART0_BASE, data);
-    return ret;
-}
-
-int uart_read_blocking(uart_t uart, char *data)
-{
-    *data = (char)ROM_UARTCharGet(UART0_BASE);
-    return 1;
-}
-
-int uart_write_blocking(uart_t uart, char data)
+void uart_write_blocking(uart_t uart, char data)
 {
     ROM_UARTCharPut(UART0_BASE, data);
-    return 1;
 }
 
 void uart_poweron(uart_t uart)
@@ -193,7 +155,11 @@ void isr_uart0(void)
     /* Are we interrupted due to TX done */
     if(ulStatus & UART_INT_TX)
     {
-        if (config[UART_0].tx_cb(config[UART_0].arg) == 0){
+        uint16_t data = config[UART_0].tx_cb(config[UART_0].arg);
+        if (data){
+            ROM_UARTCharPutNonBlocking(UART0_BASE, (uint8_t)data);
+        }
+        else {
             UART0_IM_R &= ~UART_IM_TXIM;
         }
     }
@@ -203,16 +169,11 @@ void isr_uart0(void)
     {
         while(ROM_UARTCharsAvail(UART0_BASE))
         {
-            char cChar;
-            long lChar;
-            lChar = ROM_UARTCharGetNonBlocking(UART0_BASE);
-            cChar = (unsigned char)(lChar & 0xFF);
-            config[UART_0].rx_cb(config[UART_0].arg, cChar);
+            char data = (char)ROM_UARTCharGetNonBlocking(UART0_BASE);
+            config[UART_0].rx_cb(config[UART_0].arg, data);
         }
     }
     if (sched_context_switch_request) {
         thread_yield();
     }
 }
-#endif /*UART_0_EN*/
-/** @} */

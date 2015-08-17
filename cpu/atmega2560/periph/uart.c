@@ -117,35 +117,9 @@ int uart_init(uart_t uart, uint32_t baudrate,
     return 0;
 }
 
-void uart_tx_begin(uart_t uart)
+void uart_tx(uart_t uart)
 {
-
-}
-
-void uart_write(uart_t uart, char data)
-{
-    switch (uart) {
-#if UART_0_EN
-        case UART_0:
-            UART0_DATA_REGISTER = data;
-            break;
-#endif /* UART_0_EN */
-#if UART_1_EN
-        case UART_1:
-            UART1_DATA_REGISTER = data;
-            break;
-#endif /* UART_1_EN */
-#if UART_2_EN
-        case UART_2:
-            UART2_DATA_REGISTER = data;
-            break;
-#endif /* UART_2_EN */
-#if UART_3_EN
-        case UART_3:
-            UART3_DATA_REGISTER = data;
-            break;
-#endif /* UART_3_EN */
-    }
+    /* TODO: implement this */
 }
 
 void uart_write_blocking(uart_t uart, char data)
@@ -204,7 +178,7 @@ ISR(USART1_RX_vect, ISR_BLOCK)
 }
 #endif /* UART_1_EN */
 
-#if UART_1_EN
+#if UART_2_EN
 ISR(USART2_RX_vect, ISR_BLOCK)
 {
     __enter_isr();
@@ -217,8 +191,8 @@ ISR(USART2_RX_vect, ISR_BLOCK)
 }
 #endif /* UART_2_EN */
 
-#if UART_2_EN
-ISR(USART2_RX_vect, ISR_BLOCK)
+#if UART_3_EN
+ISR(USART3_RX_vect, ISR_BLOCK)
 {
     __enter_isr();
     config[UART_3].rx_cb(config[UART_3].arg, UART0_DATA_REGISTER);

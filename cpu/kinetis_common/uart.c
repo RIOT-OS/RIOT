@@ -183,7 +183,7 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
     return 0;
 }
 
-void uart_tx_begin(uart_t uart)
+void uart_tx(uart_t uart)
 {
     switch (uart) {
 #if UART_0_EN
@@ -201,30 +201,6 @@ void uart_tx_begin(uart_t uart)
 
         default:
             break;
-    }
-}
-
-void uart_write(uart_t uart, char data)
-{
-    switch (uart) {
-#if UART_0_EN
-
-        case UART_0:
-            if (UART_0_DEV->S1 & UART_S1_TDRE_MASK) {
-                UART_0_DEV->D = (uint8_t)data;
-            }
-
-            break;
-#endif
-#if UART_1_EN
-
-        case UART_1:
-            if (UART_1_DEV->S1 & UART_S1_TDRE_MASK) {
-                UART_1_DEV->D = (uint8_t)data;
-            }
-
-            break;
-#endif
     }
 }
 
@@ -288,8 +264,14 @@ static inline void irq_handler(uart_t uartnum, KINETIS_UART *dev)
         if (config[uartnum].tx_cb == NULL) {
             dev->C2 &= ~(UART_C2_TIE_MASK);
         }
-        else if (config[uartnum].tx_cb(config[uartnum].arg) == 0) {
-            dev->C2 &= ~(UART_C2_TIE_MASK);
+        else {
+            uint16_t data = config[uartnum].tx_cb(config[uartnum].arg);
+             if (data) {
+                dev->D = (uint8_t)data;
+             }
+             else {
+                dev->C2 &= ~(UART_C2_TIE_MASK);
+             }
         }
     }
 

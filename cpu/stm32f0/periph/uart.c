@@ -135,17 +135,10 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, uart_tx_cb_t t
     return 0;
 }
 
-void uart_tx_begin(uart_t dev)
+void uart_tx(uart_t dev)
 {
     USART_TypeDef *uart = uart_port[dev];
     uart->CR1 |= USART_CR1_TXEIE;
-}
-
-void uart_write(uart_t dev, char data)
-{
-    USART_TypeDef *uart = uart_port[dev];
-
-    uart->TDR = (uint8_t)data;
 }
 
 void uart_write_blocking(uart_t dev, char data)
@@ -199,7 +192,11 @@ static inline void irq_handler(uart_t uartnum, USART_TypeDef *dev)
         dev->ICR |= USART_ICR_ORECF;
     }
     else if (dev->ISR & USART_ISR_TXE) {
-        if (uart_config[uartnum].tx_cb(uart_config[uartnum].arg) == 0) {
+        uint16_t data = uart_config[uartnum].tx_cb(uart_config[uartnum].arg);
+        if (data) {
+            dev->TDR = (uint8_t)data;
+        }
+        else {
             dev->CR1 &= ~USART_CR1_TXEIE;
         }
     }

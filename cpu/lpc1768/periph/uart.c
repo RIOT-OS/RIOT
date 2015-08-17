@@ -129,7 +129,7 @@ int uart_init(uart_t uart, uint32_t baudrate,
     return 0;
 }
 
-void uart_tx_begin(uart_t uart)
+void uart_tx(uart_t uart)
 {
     switch (uart) {
 #if UART_0_EN
@@ -142,22 +142,6 @@ void uart_tx_begin(uart_t uart)
         case UART_1:
             /* enable TX interrupt */
             UART_1_DEV->IER |= (1 << 1);
-            break;
-#endif
-    }
-}
-
-void uart_write(uart_t uart, char data)
-{
-    switch (uart) {
-#if UART_0_EN
-        case UART_0:
-            UART_0_DEV->THR = (uint8_t)data;;
-            break;
-#endif
-#if UART_1_EN
-        case UART_1:
-            UART_1_DEV->THR = (uint8_t)data;;
             break;
 #endif
     }
@@ -215,48 +199,39 @@ void uart_poweroff(uart_t uart)
     }
 }
 
-#if UART_0_EN
-void UART_0_ISR(void)
+static inline void isr_func(int num, LPC_UART_TypeDef *dev)
 {
-    if (UART_0_DEV->LSR & (1 << 0)) {       /* is RDR flag set? */
-        char data = (char)UART_0_DEV->RBR;
-        config[UART_0].rx_cb(config[UART_0].arg, data);
+    if (dev->LSR & (1 << 0)) {       /* is RDR flag set? */
+        char data = (char)dev->RBR;
+        config[num].rx_cb(config[num].arg, data);
     }
-
-    if (UART_0_DEV->LSR & (1 << 5)) {       /* THRE flag set? */
-        if (UART_0_DEV->IER & (1 << 1)) {
-            if (config[UART_0].tx_cb(config[UART_0].arg) == 0) {
+    if (dev->LSR & (1 << 5)) {       /* THRE flag set? */
+        if (dev->IER & (1 << 1)) {
+            uint16_t data = config[num].tx_cb(config[num].arg);
+            if (data) {
+                dev->THR = (uint8_t)data;
+            }
+            else {
                 /* disable TX interrupt */
-                UART_0_DEV->IER &= ~(1 << 1);
+                dev->IER &= ~(1 << 1);
             }
         }
     }
-
     if (sched_context_switch_request) {
         thread_yield();
     }
+}
+
+#if UART_0_EN
+void UART_0_ISR(void)
+{
+    isr_func(UART_0, (LPC_UART_TypeDef *)UART_0_DEV);
 }
 #endif
 
 #if UART_1_EN
 void UART_1_ISR(void)
 {
-    if (UART_1_DEV->LSR & (1 << 0)) {       /* is RDR flag set? */
-        char data = (char)UART_1_DEV->RBR;
-        config[UART_1].rx_cb(config[UART_1].arg, data);
-    }
-
-    if (UART_1_DEV->LSR & (1 << 5)) {       /* THRE flag set? */
-        if (UART_1_DEV->IER & (1 << 1)) {
-            if (config[UART_1].tx_cb(config[UART_1].arg) == 0) {
-                /* disable TX interrupt */
-                UART_1_DEV->IER &= ~(1 << 1);
-            }
-        }
-    }
-
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    isr_func(UART_1, UART_1_DEV);
 }
 #endif

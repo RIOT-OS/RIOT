@@ -121,7 +121,7 @@ int uart_init(uart_t uart, uint32_t baudrate,
     return 0;
 }
 
-void uart_tx_begin(uart_t uart)
+void uart_tx(uart_t uart)
 {
     switch (uart) {
 #if UART_0_EN
@@ -134,30 +134,6 @@ void uart_tx_begin(uart_t uart)
             UART_1_DEV->CR1 |= USART_CR1_TXEIE;
             break;
 #endif
-    }
-}
-
-void uart_write(uart_t uart, char data)
-{
-    USART_TypeDef *dev;
-
-    switch (uart) {
-#if UART_0_EN
-        case UART_0:
-            dev = UART_0_DEV;
-            break;
-#endif
-#if UART_1_EN
-        case UART_1:
-            dev = UART_1_DEV;
-            break;
-#endif
-        default:
-            return;
-    }
-
-    if (dev->SR & USART_SR_TXE) {
-        dev->DR = (uint8_t)data;
     }
 }
 
@@ -195,7 +171,10 @@ static inline void irq_handler(uart_t uartnum, USART_TypeDef *dev)
         dev->DR;
     }
     else if (dev->SR & USART_SR_TXE) {
-        if (config[uartnum].tx_cb(config[uartnum].arg) == 0) {
+        uint16_t data = config[uartnum].tx_cb(config[uartnum].arg);
+        if (data) {
+            dev->DR = (uint8_t)data;
+        } else {
             dev->CR1 &= ~(USART_CR1_TXEIE);
         }
     }

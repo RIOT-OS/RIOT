@@ -133,17 +133,10 @@ int uart_init(uart_t uart, uint32_t baudrate,
     return 0;
 }
 
-void uart_tx_begin(uart_t uart)
+void uart_tx(uart_t uart)
 {
     (void)uart;
     NRF_UART0->INTENSET = UART_INTENSET_TXDRDY_Msk;
-}
-
-void uart_write(uart_t uart, char data)
-{
-    (void)uart;
-    NRF_UART0->TXD = (uint8_t)data;
-    NRF_UART0->EVENTS_TXDRDY = 0;
 }
 
 void uart_write_blocking(uart_t uart, char data)
@@ -178,7 +171,11 @@ void isr_uart0(void)
     }
     if (NRF_UART0->EVENTS_TXDRDY == 1) {
         NRF_UART0->EVENTS_TXDRDY = 0;
-        if (uart_ctx.tx_cb(uart_ctx.arg) == 0) {
+        uint16_t res = uart_ctx.tx_cb(uart_ctx.arg);
+        if (res) {
+            NRF_UART0->TXD = (uint8_t)res;
+        }
+        else {
             NRF_UART0->INTENCLR = UART_INTENSET_TXDRDY_Msk;
         }
     }

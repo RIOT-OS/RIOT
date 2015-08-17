@@ -96,14 +96,9 @@ int uart_init(uart_t uart, uint32_t baudrate,
     return 0;
 }
 
-void uart_tx_begin(uart_t uart)
+void uart_tx(uart_t uart)
 {
     _uart(uart)->INTENSET.reg = SERCOM_USART_INTENSET_TXC;
-}
-
-void uart_write(uart_t uart, char data)
-{
-    _uart(uart)->DATA.reg = (uint8_t)data;
 }
 
 void uart_write_blocking(uart_t uart, char data)
@@ -137,7 +132,11 @@ static inline void irq_handler(int uart)
         uart_ctx[uart].rx_cb(uart_ctx[uart].arg, (char)(dev->DATA.reg));
     }
     else if (dev->INTFLAG.reg & SERCOM_USART_INTFLAG_TXC) {
-        if (uart_ctx[uart].tx_cb(uart_ctx[uart].arg) == 0) {
+        uint16_t data = uart_ctx[uart].tx_cb(uart_ctx[uart].arg);
+        if (data) {
+            dev->DATA.reg = (uint8_t)data;
+        }
+        else {
             /* disable the TXC interrupt */
             dev->INTENCLR.reg = SERCOM_USART_INTENCLR_TXC;
         }
@@ -150,8 +149,6 @@ static inline void irq_handler(int uart)
         thread_yield();
     }
 }
-
-
 
 #ifdef UART_0_ISR
 void UART_0_ISR(void)

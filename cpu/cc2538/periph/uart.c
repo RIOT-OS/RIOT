@@ -255,36 +255,9 @@ int uart_init(uart_t uart, uint32_t baudrate,
     return 0;
 }
 
-void uart_tx_begin(uart_t uart)
+void uart_tx(uart_t uart)
 {
     /* TODO: implement interrupt based TX */
-}
-
-void uart_write(uart_t uart, char data)
-{
-    cc2538_uart_t *u;
-
-    switch (uart) {
-#if UART_0_EN
-        case UART_0:
-            u = UART_0_DEV;
-            break;
-#endif
-#if UART_1_EN
-        case UART_1:
-            u = UART_1_DEV;
-            break;
-#endif
-
-        default:
-            return;
-    }
-
-    if (u->FRbits.TXFF) {
-        return;
-    }
-
-    u->DR = data;
 }
 
 void uart_write_blocking(uart_t uart, char data)
