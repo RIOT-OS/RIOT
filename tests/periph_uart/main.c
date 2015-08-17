@@ -76,15 +76,16 @@ static void rx_cb(void *arg, char data)
     }
 }
 
-static int tx_cb(void *arg)
+static uint16_t tx_cb(void *arg)
 {
     int dev = (int)arg;
     int c = ringbuffer_get_one(&(ctx[dev].tx_buf));
     if (c == -1) {
         return 0;
     }
-    uart_write(UART_DEV(dev), (char)c);
-    return 1;
+    else {
+        return (UART_TX_MORE_DATA | (c & 0xff));
+    }
 }
 
 static void *printer(void *arg)
@@ -170,7 +171,7 @@ static int cmd_send(int argc, char **argv)
         ++s;
     }
     ringbuffer_add_one(&(ctx[dev].tx_buf), '\n');
-    uart_tx_begin(UART_DEV(dev));
+    uart_tx(UART_DEV(dev));
     return 0;
 }
 
