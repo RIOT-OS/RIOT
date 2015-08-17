@@ -71,6 +71,14 @@ extern "C"
 /** @} */
 
 /**
+ * @name Length and address for reading CPU_ID (named UID in Freescale documents)
+ * @{
+ */
+#define CPUID_ID_LEN                    (16)
+#define CPUID_ID_PTR                    ((void *)(&(SIM->UIDH)))
+/** @} */
+
+/**
  * @name GPIO pin mux function numbers
  */
 /** @{ */
@@ -86,12 +94,13 @@ extern "C"
 #define PIN_INTERRUPT_EDGE 0b1011
 /** @} */
 
-/**
- * @name Length and address for reading CPU_ID (named UID in Freescale documents)
- * @{
- */
-#define CPUID_ID_LEN                    (16)
-#define CPUID_ID_PTR                    ((void *)(&(SIM->UIDH)))
+/** @name PORT module clock gates */
+/** @{ */
+#define PORTA_CLOCK_GATE (BITBAND_REG32(SIM->SCGC5, SIM_SCGC5_PORTA_SHIFT))
+#define PORTB_CLOCK_GATE (BITBAND_REG32(SIM->SCGC5, SIM_SCGC5_PORTB_SHIFT))
+#define PORTC_CLOCK_GATE (BITBAND_REG32(SIM->SCGC5, SIM_SCGC5_PORTC_SHIFT))
+#define PORTD_CLOCK_GATE (BITBAND_REG32(SIM->SCGC5, SIM_SCGC5_PORTD_SHIFT))
+#define PORTE_CLOCK_GATE (BITBAND_REG32(SIM->SCGC5, SIM_SCGC5_PORTE_SHIFT))
 /** @} */
 
 /**
@@ -243,15 +252,6 @@ typedef enum llwu_wakeup_pin {
     KINETIS_LPM_WAKEUP_PIN_END
 } llwu_wakeup_pin_t;
 
-/** @} */
-
-/** @name K60 PORT ISR names
- * @{ */
-#define ISR_PORT_A isr_porta_pin_detect
-#define ISR_PORT_B isr_portb_pin_detect
-#define ISR_PORT_C isr_portc_pin_detect
-#define ISR_PORT_D isr_portd_pin_detect
-#define ISR_PORT_E isr_porte_pin_detect
 /** @} */
 
 /**

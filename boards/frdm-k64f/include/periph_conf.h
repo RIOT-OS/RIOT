@@ -258,60 +258,7 @@ extern "C"
  * @name GPIO configuration
  * @{
  */
-#define GPIO_0_EN                    1
-#define GPIO_1_EN                    1
-#define GPIO_2_EN                    1
-#define GPIO_3_EN                    1
-#define GPIO_4_EN                    1
-#define GPIO_5_EN                    1
-#define GPIO_IRQ_PRIO                1
-#define ISR_PORT_A                   isr_porta
-#define ISR_PORT_B                   isr_portb
-#define ISR_PORT_C                   isr_portc
-#define ISR_PORT_D                   isr_portd
-
-/* GPIO channel 0 config */
-#define GPIO_0_DEV                   GPIOB   /* LED_R */
-#define GPIO_0_PORT                  PORTB
-#define GPIO_0_PORT_BASE             PORTB_BASE
-#define GPIO_0_PIN                   22
-#define GPIO_0_CLKEN()               (SIM->SCGC5 |= (SIM_SCGC5_PORTB_MASK))
-#define GPIO_0_IRQ                   PORTB_IRQn
-/* GPIO channel 1 config */
-#define GPIO_1_DEV                   GPIOE   /* LED_G */
-#define GPIO_1_PORT                  PORTE
-#define GPIO_1_PORT_BASE             PORTE_BASE
-#define GPIO_1_PIN                   26
-#define GPIO_1_CLKEN()               (SIM->SCGC5 |= (SIM_SCGC5_PORTE_MASK))
-#define GPIO_1_IRQ                   PORTE_IRQn
-/* GPIO channel 2 config */
-#define GPIO_2_DEV                   GPIOB   /* LED_B */
-#define GPIO_2_PORT                  PORTB
-#define GPIO_2_PORT_BASE             PORTB_BASE
-#define GPIO_2_PIN                   21
-#define GPIO_2_CLKEN()               (SIM->SCGC5 |= (SIM_SCGC5_PORTB_MASK))
-#define GPIO_2_IRQ                   PORTB_IRQn
-/* GPIO channel 3 config */
-#define GPIO_3_DEV                   GPIOC   /* SW2 */
-#define GPIO_3_PORT                  PORTC
-#define GPIO_3_PORT_BASE             PORTC_BASE
-#define GPIO_3_PIN                   6
-#define GPIO_3_CLKEN()               (SIM->SCGC5 |= (SIM_SCGC5_PORTC_MASK))
-#define GPIO_3_IRQ                   PORTC_IRQn
-/* GPIO channel 4 config */
-#define GPIO_4_DEV                   GPIOB   /* A0 (Arduino Headers) */
-#define GPIO_4_PORT                  PORTB
-#define GPIO_4_PORT_BASE             PORTB_BASE
-#define GPIO_4_PIN                   2
-#define GPIO_4_CLKEN()               (SIM->SCGC5 |= (SIM_SCGC5_PORTB_MASK))
-#define GPIO_4_IRQ                   PORTB_IRQn
-/* GPIO channel 5 config */
-#define GPIO_5_DEV                   GPIOB   /* A1 (Arduino Headers) */
-#define GPIO_5_PORT                  PORTB
-#define GPIO_5_PORT_BASE             PORTB_BASE
-#define GPIO_5_PIN                   3
-#define GPIO_5_CLKEN()               (SIM->SCGC5 |= (SIM_SCGC5_PORTB_MASK))
-#define GPIO_5_IRQ                   PORTB_IRQn
+#define GPIO_IRQ_PRIO                CPU_DEFAULT_IRQ_PRIO
 /** @} */
 
 /**

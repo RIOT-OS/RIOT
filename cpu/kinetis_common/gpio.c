@@ -19,7 +19,7 @@
  * @author      Hauke Petersen <mail@haukepetersen.de>
  * @author      Johann Fischer <j.fischer@phytec.de>
  * @author      Jonas Remmert <j.remmert@phytec.de>
- * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se
+ * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  *
  * @}
  */
@@ -27,6 +27,8 @@
 #include "cpu.h"
 #include "sched.h"
 #include "thread.h"
+#include "utlist.h"
+#include "mutex.h"
 #include "periph/gpio.h"
 #include "periph_conf.h"
 
@@ -41,332 +43,142 @@
 #define PIN_MUX_FUNCTION_GPIO       1
 #endif
 
-#ifndef PIN_INTERRUPT_RISING
-#define PIN_INTERRUPT_RISING        0x9
-#endif
-
-#ifndef PIN_INTERRUPT_FALLING
-#define PIN_INTERRUPT_FALLING       0xa
-#endif
-
-#ifndef PIN_INTERRUPT_EDGE
-#define PIN_INTERRUPT_EDGE          0xb
-#endif
-
 /**
- * @brief Look up table entry for a GPIO configuration
+ * @brief Linked list entry for interrupt configurations.
  */
-typedef struct kinetis_gpio_lut_entry {
-    PORT_Type* port; /**< PORT module */
-    GPIO_Type* gpio; /**< GPIO module */
-    uint8_t pin;     /**< Pin number within the port */
-} kinetis_gpio_lut_entry_t;
-
-typedef struct {
+typedef struct gpio_int_config_entry {
+    struct gpio_int_config_entry* next; /**< pointer to next entry */
     gpio_cb_t cb;    /**< callback called from GPIO interrupt */
     void *arg;       /**< argument passed to the callback */
     uint32_t irqc;   /**< remember interrupt configuration between disable/enable */
-} gpio_state_t;
+    uint8_t pin;     /**< pin number within the port */
+} gpio_int_config_entry_t;
 
-static const kinetis_gpio_lut_entry_t kinetis_gpio_lut[GPIO_NUMOF] = {
-#if GPIO_0_EN
-    { .port = GPIO_0_PORT, .gpio = GPIO_0_DEV, .pin = GPIO_0_PIN },
-#endif
-#if GPIO_1_EN
-    { .port = GPIO_1_PORT, .gpio = GPIO_1_DEV, .pin = GPIO_1_PIN },
-#endif
-#if GPIO_2_EN
-    { .port = GPIO_2_PORT, .gpio = GPIO_2_DEV, .pin = GPIO_2_PIN },
-#endif
-#if GPIO_3_EN
-    { .port = GPIO_3_PORT, .gpio = GPIO_3_DEV, .pin = GPIO_3_PIN },
-#endif
-#if GPIO_4_EN
-    { .port = GPIO_4_PORT, .gpio = GPIO_4_DEV, .pin = GPIO_4_PIN },
-#endif
-#if GPIO_5_EN
-    { .port = GPIO_5_PORT, .gpio = GPIO_5_DEV, .pin = GPIO_5_PIN },
-#endif
-#if GPIO_6_EN
-    { .port = GPIO_6_PORT, .gpio = GPIO_6_DEV, .pin = GPIO_6_PIN },
-#endif
-#if GPIO_7_EN
-    { .port = GPIO_7_PORT, .gpio = GPIO_7_DEV, .pin = GPIO_7_PIN },
-#endif
-#if GPIO_8_EN
-    { .port = GPIO_8_PORT, .gpio = GPIO_8_DEV, .pin = GPIO_8_PIN },
-#endif
-#if GPIO_9_EN
-    { .port = GPIO_9_PORT, .gpio = GPIO_9_DEV, .pin = GPIO_9_PIN },
-#endif
-#if GPIO_10_EN
-    { .port = GPIO_10_PORT, .gpio = GPIO_10_DEV, .pin = GPIO_10_PIN },
-#endif
-#if GPIO_11_EN
-    { .port = GPIO_11_PORT, .gpio = GPIO_11_DEV, .pin = GPIO_11_PIN },
-#endif
-#if GPIO_12_EN
-    { .port = GPIO_12_PORT, .gpio = GPIO_12_DEV, .pin = GPIO_12_PIN },
-#endif
-#if GPIO_13_EN
-    { .port = GPIO_13_PORT, .gpio = GPIO_13_DEV, .pin = GPIO_13_PIN },
-#endif
-#if GPIO_14_EN
-    { .port = GPIO_14_PORT, .gpio = GPIO_14_DEV, .pin = GPIO_14_PIN },
-#endif
-#if GPIO_15_EN
-    { .port = GPIO_15_PORT, .gpio = GPIO_15_DEV, .pin = GPIO_15_PIN },
-#endif
-#if GPIO_16_EN
-    { .port = GPIO_16_PORT, .gpio = GPIO_16_DEV, .pin = GPIO_16_PIN },
-#endif
-#if GPIO_17_EN
-    { .port = GPIO_17_PORT, .gpio = GPIO_17_DEV, .pin = GPIO_17_PIN },
-#endif
-#if GPIO_18_EN
-    { .port = GPIO_18_PORT, .gpio = GPIO_18_DEV, .pin = GPIO_18_PIN },
-#endif
-#if GPIO_19_EN
-    { .port = GPIO_19_PORT, .gpio = GPIO_19_DEV, .pin = GPIO_19_PIN },
-#endif
-#if GPIO_20_EN
-    { .port = GPIO_20_PORT, .gpio = GPIO_20_DEV, .pin = GPIO_20_PIN },
-#endif
-#if GPIO_21_EN
-    { .port = GPIO_21_PORT, .gpio = GPIO_21_DEV, .pin = GPIO_21_PIN },
-#endif
-#if GPIO_22_EN
-    { .port = GPIO_22_PORT, .gpio = GPIO_22_DEV, .pin = GPIO_22_PIN },
-#endif
-#if GPIO_23_EN
-    { .port = GPIO_23_PORT, .gpio = GPIO_23_DEV, .pin = GPIO_23_PIN },
-#endif
-#if GPIO_24_EN
-    { .port = GPIO_24_PORT, .gpio = GPIO_24_DEV, .pin = GPIO_24_PIN },
-#endif
-#if GPIO_25_EN
-    { .port = GPIO_25_PORT, .gpio = GPIO_25_DEV, .pin = GPIO_25_PIN },
-#endif
-#if GPIO_26_EN
-    { .port = GPIO_26_PORT, .gpio = GPIO_26_DEV, .pin = GPIO_26_PIN },
-#endif
-#if GPIO_27_EN
-    { .port = GPIO_27_PORT, .gpio = GPIO_27_DEV, .pin = GPIO_27_PIN },
-#endif
-#if GPIO_28_EN
-    { .port = GPIO_28_PORT, .gpio = GPIO_28_DEV, .pin = GPIO_28_PIN },
-#endif
-#if GPIO_29_EN
-    { .port = GPIO_29_PORT, .gpio = GPIO_29_DEV, .pin = GPIO_29_PIN },
-#endif
-#if GPIO_30_EN
-    { .port = GPIO_30_PORT, .gpio = GPIO_30_DEV, .pin = GPIO_30_PIN },
-#endif
-#if GPIO_31_EN
-    { .port = GPIO_31_PORT, .gpio = GPIO_31_DEV, .pin = GPIO_31_PIN },
-#endif
-};
+/* Linked list of interrupt handlers for each port.
+ * Using a linked list saves memory when less than 80% of all GPIO pins on the
+ * CPU are configured for interrupts, which is true for (almost) all real world
+ * applications. */
+static gpio_int_config_entry_t* gpio_interrupts[PORT_NUMOF];
 
-/**
- * @brief Unified IRQ handler shared by all interrupt routines
- *
- * @param[in] dev   the device that triggered the interrupt
+static mutex_t int_config_lock = MUTEX_INIT;
+
+/* Maximum number of simultaneously enabled GPIO interrupts. Each pool entry
+ * uses 20 bytes of RAM.
  */
-static inline void irq_handler(gpio_t dev);
+#ifndef GPIO_INT_POOL_SIZE
+#define GPIO_INT_POOL_SIZE 16
+#endif
 
-/**
- * @brief Hold one callback function pointer for each gpio device
- */
-static gpio_state_t config[GPIO_NUMOF];
+/* Pool of linked list entries which can be used by any port configuration.
+ * Rationale: Avoid dynamic memory inside low level periph drivers. */
+gpio_int_config_entry_t config_pool[GPIO_INT_POOL_SIZE];
+
+static PORT_Type * const _port_ptrs[] = PORT_BASE_PTRS;
+static GPIO_Type * const _gpio_ptrs[] = GPIO_BASE_PTRS;
+
+static inline uint32_t _port_num(gpio_t dev) {
+    return (uint32_t)((dev & GPIO_PORT_MASK) >> GPIO_PORT_SHIFT);
+}
+
+static inline uint8_t _pin_num(gpio_t dev) {
+    return (uint8_t)((dev & GPIO_PIN_MASK) >> GPIO_PIN_SHIFT);
+}
+
+static inline PORT_Type *_port(gpio_t dev) {
+    return _port_ptrs[_port_num(dev)];
+}
+
+static inline GPIO_Type *_gpio(gpio_t dev) {
+    return _gpio_ptrs[_port_num(dev)];
+}
+
+static void _clear_interrupt_config(gpio_t dev) {
+    gpio_int_config_entry_t* entry = NULL;
+    uint8_t pin_number = _pin_num(dev);
+    mutex_lock(&int_config_lock);
+    /* Search for the given pin in the port's interrupt configuration */
+    LL_SEARCH_SCALAR(gpio_interrupts[_port_num(dev)], entry, pin, pin_number);
+    if (entry != NULL) {
+        LL_DELETE(gpio_interrupts[_port_num(dev)], entry);
+        /* pin == 0 means the entry is available */
+        entry->pin = 0;
+    }
+    mutex_unlock(&int_config_lock);
+}
+
+static gpio_int_config_entry_t* _allocate_interrupt_config(uint8_t port) {
+    gpio_int_config_entry_t* ret = NULL;
+
+    mutex_lock(&int_config_lock);
+    for (uint8_t i = 0; i < GPIO_INT_POOL_SIZE; ++i) {
+        if (config_pool[i].pin == 0) {
+            /* temporarily set pin to something non-zero until the proper pin
+             * number is set by the init code */
+            config_pool[i].pin = 200;
+            ret = &config_pool[i];
+            LL_PREPEND(gpio_interrupts[port], ret);
+            break;
+        }
+    }
+    mutex_unlock(&int_config_lock);
+
+    return ret;
+}
 
 int gpio_init(gpio_t dev, gpio_dir_t dir, gpio_pp_t pushpull)
 {
-    switch (dev) {
-#if GPIO_0_EN
-        case GPIO_0:
-            GPIO_0_CLKEN();
+    switch (_port_num(dev)) {
+#ifdef PORTA_BASE
+        case PORT_A:
+            PORTA_CLOCK_GATE = 1;
             break;
 #endif
-#if GPIO_1_EN
-        case GPIO_1:
-            GPIO_1_CLKEN();
-            break;
-#endif
-#if GPIO_2_EN
-        case GPIO_2:
-            GPIO_2_CLKEN();
-            break;
-#endif
-#if GPIO_3_EN
 
-        case GPIO_3:
-            GPIO_3_CLKEN();
+#ifdef PORTB_BASE
+        case PORT_B:
+            PORTB_CLOCK_GATE = 1;
             break;
 #endif
-#if GPIO_4_EN
-        case GPIO_4:
-            GPIO_4_CLKEN();
-            break;
-#endif
-#if GPIO_5_EN
-        case GPIO_5:
-            GPIO_5_CLKEN();
-            break;
-#endif
-#if GPIO_6_EN
-        case GPIO_6:
-            GPIO_6_CLKEN();
-            break;
-#endif
-#if GPIO_7_EN
 
-        case GPIO_7:
-            GPIO_7_CLKEN();
+#ifdef PORTC_BASE
+        case PORT_C:
+            PORTC_CLOCK_GATE = 1;
             break;
 #endif
-#if GPIO_8_EN
 
-        case GPIO_8:
-            GPIO_8_CLKEN();
+#ifdef PORTD_BASE
+        case PORT_D:
+            PORTD_CLOCK_GATE = 1;
             break;
 #endif
-#if GPIO_9_EN
 
-        case GPIO_9:
-            GPIO_9_CLKEN();
+#ifdef PORTE_BASE
+        case PORT_E:
+            PORTE_CLOCK_GATE = 1;
             break;
 #endif
-#if GPIO_10_EN
 
-        case GPIO_10:
-            GPIO_10_CLKEN();
+#ifdef PORTF_BASE
+        case PORT_F:
+            PORTF_CLOCK_GATE = 1;
             break;
 #endif
-#if GPIO_11_EN
 
-        case GPIO_11:
-            GPIO_11_CLKEN();
+#ifdef PORTG_BASE
+        case PORT_G:
+            PORTG_CLOCK_GATE = 1;
             break;
 #endif
-#if GPIO_12_EN
 
-        case GPIO_12:
-            GPIO_12_CLKEN();
-            break;
-#endif
-#if GPIO_13_EN
-
-        case GPIO_13:
-            GPIO_13_CLKEN();
-            break;
-#endif
-#if GPIO_14_EN
-
-        case GPIO_14:
-            GPIO_14_CLKEN();
-            break;
-#endif
-#if GPIO_15_EN
-
-        case GPIO_15:
-            GPIO_15_CLKEN();
-            break;
-#endif
-#if GPIO_16_EN
-
-        case GPIO_16:
-            GPIO_16_CLKEN();
-            break;
-#endif
-#if GPIO_17_EN
-
-        case GPIO_17:
-            GPIO_17_CLKEN();
-            break;
-#endif
-#if GPIO_18_EN
-
-        case GPIO_18:
-            GPIO_18_CLKEN();
-            break;
-#endif
-#if GPIO_19_EN
-        case GPIO_19:
-            GPIO_19_CLKEN();
-            break;
-#endif
-#if GPIO_20_EN
-        case GPIO_20:
-            GPIO_20_CLKEN();
-            break;
-#endif
-#if GPIO_21_EN
-        case GPIO_21:
-            GPIO_21_CLKEN();
-            break;
-#endif
-#if GPIO_22_EN
-        case GPIO_22:
-            GPIO_22_CLKEN();
-            break;
-#endif
-#if GPIO_23_EN
-        case GPIO_23:
-            GPIO_23_CLKEN();
-            break;
-#endif
-#if GPIO_24_EN
-        case GPIO_24:
-            GPIO_24_CLKEN();
-            break;
-#endif
-#if GPIO_25_EN
-        case GPIO_25:
-            GPIO_25_CLKEN();
-            break;
-#endif
-#if GPIO_26_EN
-        case GPIO_26:
-            GPIO_26_CLKEN();
-            break;
-#endif
-#if GPIO_27_EN
-        case GPIO_27:
-            GPIO_27_CLKEN();
-            break;
-#endif
-#if GPIO_28_EN
-        case GPIO_28:
-            GPIO_28_CLKEN();
-            break;
-#endif
-#if GPIO_29_EN
-        case GPIO_29:
-            GPIO_29_CLKEN();
-            break;
-#endif
-#if GPIO_30_EN
-        case GPIO_30:
-            GPIO_30_CLKEN();
-            break;
-#endif
-#if GPIO_31_EN
-        case GPIO_31:
-            GPIO_31_CLKEN();
-            break;
-#endif
         default:
             return -1;
     }
 
-    uint8_t pin = kinetis_gpio_lut[dev].pin;
-    PORT_Type *port = kinetis_gpio_lut[dev].port;
-    GPIO_Type *gpio = kinetis_gpio_lut[dev].gpio;
+    uint8_t pin = _pin_num(dev);
+    PORT_Type *port = _port(dev);
+    GPIO_Type *gpio = _gpio(dev);
 
-    /* Clear interrupt config */
-    config[dev].cb = NULL;
-    config[dev].arg = NULL;
-    config[dev].irqc = 0;
+    _clear_interrupt_config(dev);
 
     /* Reset all pin control settings for the pin */
     /* Switch to analog input function while fiddling with the settings, to be safe. */
@@ -387,11 +199,11 @@ int gpio_init(gpio_t dev, gpio_dir_t dir, gpio_pp_t pushpull)
     }
 
     if (dir == GPIO_DIR_OUT) {
-        gpio->PDDR |= GPIO_PDDR_PDD(1 << pin);     /* set pin to output mode */
-        gpio->PCOR |= GPIO_PCOR_PTCO(1 << pin);    /* set output to low */
+        BITBAND_REG32(gpio->PDDR, pin) = 1;    /* set pin to output mode */
+        gpio->PCOR = GPIO_PCOR_PTCO(1 << pin); /* set output to low */
     }
     else {
-        gpio->PDDR &= ~(GPIO_PDDR_PDD(1 << pin));     /* set pin to input mode */
+        BITBAND_REG32(gpio->PDDR, pin) = 0;    /* set pin to input mode */
     }
 
     /* Select GPIO function for the pin */
@@ -403,6 +215,7 @@ int gpio_init(gpio_t dev, gpio_dir_t dir, gpio_pp_t pushpull)
 int gpio_init_int(gpio_t dev, gpio_pp_t pushpull, gpio_flank_t flank, gpio_cb_t cb, void *arg)
 {
     int res;
+    IRQn_Type irqn;
 
     res = gpio_init(dev, GPIO_DIR_IN, pushpull);
 
@@ -410,259 +223,66 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pushpull, gpio_flank_t flank, gpio_cb_t 
         return res;
     }
 
-    switch (dev) {
-#if GPIO_0_EN
-        case GPIO_0:
-            NVIC_SetPriority(GPIO_0_IRQ, GPIO_IRQ_PRIO);
-            NVIC_EnableIRQ(GPIO_0_IRQ);
+    switch (_port_num(dev)) {
+#ifdef PORTA_BASE
+        case PORT_A:
+            irqn = PORTA_IRQn;
             break;
 #endif
-#if GPIO_1_EN
-        case GPIO_1:
-            NVIC_SetPriority(GPIO_1_IRQ, GPIO_IRQ_PRIO);
-            NVIC_EnableIRQ(GPIO_1_IRQ);
-            break;
-#endif
-#if GPIO_2_EN
-        case GPIO_2:
-            NVIC_SetPriority(GPIO_2_IRQ, GPIO_IRQ_PRIO);
-            NVIC_EnableIRQ(GPIO_2_IRQ);
-            break;
-#endif
-#if GPIO_3_EN
 
-        case GPIO_3:
-            NVIC_SetPriority(GPIO_3_IRQ, GPIO_IRQ_PRIO);
-            NVIC_EnableIRQ(GPIO_3_IRQ);
+#ifdef PORTB_BASE
+        case PORT_B:
+            irqn = PORTB_IRQn;
             break;
 #endif
-#if GPIO_4_EN
 
-        case GPIO_4:
-            NVIC_SetPriority(GPIO_4_IRQ, GPIO_IRQ_PRIO);
-            NVIC_EnableIRQ(GPIO_4_IRQ);
+#ifdef PORTC_BASE
+        case PORT_C:
+            irqn = PORTC_IRQn;
             break;
 #endif
-#if GPIO_5_EN
 
-        case GPIO_5:
-            NVIC_SetPriority(GPIO_5_IRQ, GPIO_IRQ_PRIO);
-            NVIC_EnableIRQ(GPIO_5_IRQ);
+#ifdef PORTD_BASE
+        case PORT_D:
+            irqn = PORTD_IRQn;
             break;
 #endif
-#if GPIO_6_EN
 
-        case GPIO_6:
-            NVIC_SetPriority(GPIO_6_IRQ, GPIO_IRQ_PRIO);
-            NVIC_EnableIRQ(GPIO_6_IRQ);
+#ifdef PORTE_BASE
+        case PORT_E:
+            irqn = PORTE_IRQn;
             break;
 #endif
-#if GPIO_7_EN
 
-        case GPIO_7:
-            NVIC_SetPriority(GPIO_7_IRQ, GPIO_IRQ_PRIO);
-            NVIC_EnableIRQ(GPIO_7_IRQ);
+#ifdef PORTF_BASE
+        case PORT_F:
+            irqn = PORTF_IRQn;
             break;
 #endif
-#if GPIO_8_EN
 
-        case GPIO_8:
-            NVIC_SetPriority(GPIO_8_IRQ, GPIO_IRQ_PRIO);
-            NVIC_EnableIRQ(GPIO_8_IRQ);
+#ifdef PORTG_BASE
+        case PORT_G:
+            irqn = PORTG_IRQn;
             break;
 #endif
-#if GPIO_9_EN
 
-        case GPIO_9:
-            NVIC_SetPriority(GPIO_9_IRQ, GPIO_IRQ_PRIO);
-            NVIC_EnableIRQ(GPIO_9_IRQ);
-            break;
-#endif
-#if GPIO_10_EN
-
-        case GPIO_10:
-            NVIC_SetPriority(GPIO_10_IRQ, GPIO_IRQ_PRIO);
-            NVIC_EnableIRQ(GPIO_10_IRQ);
-            break;
-#endif
-#if GPIO_11_EN
-
-        case GPIO_11:
-            NVIC_SetPriority(GPIO_11_IRQ, GPIO_IRQ_PRIO);
-            NVIC_EnableIRQ(GPIO_11_IRQ);
-            break;
-#endif
-#if GPIO_12_EN
-
-        case GPIO_12:
-            NVIC_SetPriority(GPIO_12_IRQ, GPIO_IRQ_PRIO);
-            NVIC_EnableIRQ(GPIO_12_IRQ);
-            break;
-#endif
-#if GPIO_13_EN
-
-        case GPIO_13:
-            NVIC_SetPriority(GPIO_13_IRQ, GPIO_IRQ_PRIO);
-            NVIC_EnableIRQ(GPIO_13_IRQ);
-            break;
-#endif
-#if GPIO_14_EN
-
-        case GPIO_14:
-            NVIC_SetPriority(GPIO_14_IRQ, GPIO_IRQ_PRIO);
-            NVIC_EnableIRQ(GPIO_14_IRQ);
-            break;
-#endif
-#if GPIO_15_EN
-
-        case GPIO_15:
-            NVIC_SetPriority(GPIO_15_IRQ, GPIO_IRQ_PRIO);
-            NVIC_EnableIRQ(GPIO_15_IRQ);
-            break;
-#endif
-#if GPIO_16_EN
-
-        case GPIO_16:
-            NVIC_SetPriority(GPIO_16_IRQ, GPIO_IRQ_PRIO);
-            NVIC_EnableIRQ(GPIO_16_IRQ);
-            break;
-#endif
-#if GPIO_17_EN
-
-        case GPIO_17:
-            NVIC_SetPriority(GPIO_17_IRQ, GPIO_IRQ_PRIO);
-            NVIC_EnableIRQ(GPIO_17_IRQ);
-            break;
-#endif
-#if GPIO_18_EN
-
-        case GPIO_18:
-            NVIC_SetPriority(GPIO_18_IRQ, GPIO_IRQ_PRIO);
-            NVIC_EnableIRQ(GPIO_18_IRQ);
-            break;
-#endif
-#if GPIO_19_EN
-
-        case GPIO_19:
-            NVIC_SetPriority(GPIO_19_IRQ, GPIO_IRQ_PRIO);
-            NVIC_EnableIRQ(GPIO_19_IRQ);
-            break;
-#endif
-#if GPIO_20_EN
-
-        case GPIO_20:
-            NVIC_SetPriority(GPIO_20_IRQ, GPIO_IRQ_PRIO);
-            NVIC_EnableIRQ(GPIO_20_IRQ);
-            break;
-#endif
-#if GPIO_21_EN
-
-        case GPIO_21:
-            NVIC_SetPriority(GPIO_21_IRQ, GPIO_IRQ_PRIO);
-            NVIC_EnableIRQ(GPIO_21_IRQ);
-            break;
-#endif
-#if GPIO_22_EN
-
-        case GPIO_22:
-            NVIC_SetPriority(GPIO_22_IRQ, GPIO_IRQ_PRIO);
-            NVIC_EnableIRQ(GPIO_22_IRQ);
-            break;
-#endif
-#if GPIO_23_EN
-
-        case GPIO_23:
-            NVIC_SetPriority(GPIO_23_IRQ, GPIO_IRQ_PRIO);
-            NVIC_EnableIRQ(GPIO_23_IRQ);
-            break;
-#endif
-#if GPIO_24_EN
-
-        case GPIO_24:
-            NVIC_SetPriority(GPIO_24_IRQ, GPIO_IRQ_PRIO);
-            NVIC_EnableIRQ(GPIO_24_IRQ);
-            break;
-#endif
-#if GPIO_25_EN
-
-        case GPIO_25:
-            NVIC_SetPriority(GPIO_25_IRQ, GPIO_IRQ_PRIO);
-            NVIC_EnableIRQ(GPIO_25_IRQ);
-            break;
-#endif
-#if GPIO_26_EN
-
-        case GPIO_26:
-            NVIC_SetPriority(GPIO_26_IRQ, GPIO_IRQ_PRIO);
-            NVIC_EnableIRQ(GPIO_26_IRQ);
-            break;
-#endif
-#if GPIO_27_EN
-
-        case GPIO_27:
-            NVIC_SetPriority(GPIO_27_IRQ, GPIO_IRQ_PRIO);
-            NVIC_EnableIRQ(GPIO_27_IRQ);
-            break;
-#endif
-#if GPIO_28_EN
-
-        case GPIO_28:
-            NVIC_SetPriority(GPIO_28_IRQ, GPIO_IRQ_PRIO);
-            NVIC_EnableIRQ(GPIO_28_IRQ);
-            break;
-#endif
-#if GPIO_29_EN
-
-        case GPIO_29:
-            NVIC_SetPriority(GPIO_29_IRQ, GPIO_IRQ_PRIO);
-            NVIC_EnableIRQ(GPIO_29_IRQ);
-            break;
-#endif
-#if GPIO_30_EN
-
-        case GPIO_30:
-            NVIC_SetPriority(GPIO_30_IRQ, GPIO_IRQ_PRIO);
-            NVIC_EnableIRQ(GPIO_30_IRQ);
-            break;
-#endif
-#if GPIO_31_EN
-        case GPIO_31:
-            NVIC_SetPriority(GPIO_31_IRQ, GPIO_IRQ_PRIO);
-            NVIC_EnableIRQ(GPIO_31_IRQ);
-            break;
-#endif
         default:
             return -1;
     }
 
-    uint8_t pin = kinetis_gpio_lut[dev].pin;
-    PORT_Type *port = kinetis_gpio_lut[dev].port;
-
-    /* set callback */
-    config[dev].cb = cb;
-    config[dev].arg = arg;
-
+    uint32_t irqc;
     /* configure the active edges */
     switch (flank) {
         case GPIO_RISING:
-            port->PCR[pin] &= ~(PORT_PCR_IRQC_MASK); /* Disable interrupt */
-            port->PCR[pin] |= PORT_PCR_ISF_MASK; /* Clear interrupt flag */
-            port->PCR[pin] |= PORT_PCR_IRQC(PIN_INTERRUPT_RISING); /* Enable interrupt */
-            config[dev].irqc = PORT_PCR_IRQC(PIN_INTERRUPT_RISING);
+            irqc = PORT_PCR_IRQC(PIN_INTERRUPT_RISING);
             break;
 
         case GPIO_FALLING:
-            port->PCR[pin] &= ~(PORT_PCR_IRQC_MASK); /* Disable interrupt */
-            port->PCR[pin] |= PORT_PCR_ISF_MASK; /* Clear interrupt flag */
-            port->PCR[pin] |= PORT_PCR_IRQC(PIN_INTERRUPT_FALLING); /* Enable interrupt */
-            config[dev].irqc = PORT_PCR_IRQC(PIN_INTERRUPT_FALLING);
+            irqc = PORT_PCR_IRQC(PIN_INTERRUPT_FALLING);
             break;
 
         case GPIO_BOTH:
-            port->PCR[pin] &= ~(PORT_PCR_IRQC_MASK); /* Disable interrupt */
-            port->PCR[pin] |= PORT_PCR_ISF_MASK; /* Clear interrupt flag */
-            port->PCR[pin] |= PORT_PCR_IRQC(PIN_INTERRUPT_EDGE); /* Enable interrupt */
-            config[dev].irqc = PORT_PCR_IRQC(PIN_INTERRUPT_EDGE);
+            irqc = PORT_PCR_IRQC(PIN_INTERRUPT_EDGE);
             break;
 
         default:
@@ -670,1209 +290,168 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pushpull, gpio_flank_t flank, gpio_cb_t 
             return -1;
     }
 
+    gpio_int_config_entry_t* config = _allocate_interrupt_config(_port_num(dev));
+    if (config == NULL) {
+        /* No free interrupt config entries */
+        return -1;
+    }
+
+    /* Enable port interrupts in the NVIC */
+    NVIC_SetPriority(irqn, GPIO_IRQ_PRIO);
+    NVIC_EnableIRQ(irqn);
+
+    uint8_t pin = _pin_num(dev);
+    PORT_Type *port = _port(dev);
+
+    config->cb = cb;
+    config->arg = arg;
+    config->irqc = irqc;
+    /* Allow the callback to be found by the IRQ handler by setting the proper
+     * pin number */
+    config->pin = pin;
+
+    port->PCR[pin] &= ~(PORT_PCR_IRQC_MASK); /* Disable interrupt */
+    BITBAND_REG32(port->PCR[pin], PORT_PCR_ISF_SHIFT) = 1; /* Clear interrupt flag */
+    port->PCR[pin] |= config->irqc; /* Enable interrupt */
+
     return 0;
 }
 
 void gpio_irq_enable(gpio_t dev)
 {
-    if ((unsigned int)dev >= GPIO_NUMOF) {
-        DEBUG("gpio_t out of range: %d >= %d\n", dev, GPIO_NUMOF);
+    /* Restore saved state */
+    PORT_Type *port = _port(dev);
+    gpio_int_config_entry_t* entry = NULL;
+    uint8_t pin_number = _pin_num(dev);
+    mutex_lock(&int_config_lock);
+    /* Search for the given pin in the port's interrupt configuration */
+    LL_SEARCH_SCALAR(gpio_interrupts[_port_num(dev)], entry, pin, pin_number);
+    uint32_t irqc = entry->irqc;
+    mutex_unlock(&int_config_lock);
+    if (entry == NULL) {
+        /* Pin has not been configured for interrupts */
         return;
     }
-    uint8_t pin = kinetis_gpio_lut[dev].pin;
-    PORT_Type *port = kinetis_gpio_lut[dev].port;
-
-    /* Restore saved state */
-    port->PCR[pin] &= ~(PORT_PCR_IRQC_MASK);
-    port->PCR[pin] |= PORT_PCR_IRQC_MASK & config[dev].irqc;
+    port->PCR[pin_number] &= ~(PORT_PCR_IRQC_MASK);
+    port->PCR[pin_number] |= irqc;
 }
 
 void gpio_irq_disable(gpio_t dev)
 {
-    if ((unsigned int)dev >= GPIO_NUMOF) {
-        DEBUG("gpio_t out of range: %d >= %d\n", dev, GPIO_NUMOF);
+    /* Save irqc state before disabling to allow enabling with the same trigger
+     * settings later. */
+    PORT_Type *port = _port(dev);
+    uint8_t pin_number = _pin_num(dev);
+    uint32_t irqc = PORT_PCR_IRQC_MASK & port->PCR[pin_number];
+    gpio_int_config_entry_t* entry = NULL;
+    mutex_lock(&int_config_lock);
+    /* Search for the given pin in the port's interrupt configuration */
+    LL_SEARCH_SCALAR(gpio_interrupts[_port_num(dev)], entry, pin, pin_number);
+    if (entry == NULL) {
+        /* Pin has not been configured for interrupts */
+        mutex_unlock(&int_config_lock);
         return;
     }
-    uint8_t pin = kinetis_gpio_lut[dev].pin;
-    PORT_Type *port = kinetis_gpio_lut[dev].port;
-
-    /* Save irqc state before disabling to allow enabling with the same trigger settings later. */
-    config[dev].irqc = PORT_PCR_IRQC_MASK & port->PCR[pin];
-    port->PCR[pin] &= ~(PORT_PCR_IRQC_MASK);
+    entry->irqc = irqc;
+    mutex_unlock(&int_config_lock);
+    port->PCR[pin_number] &= ~(PORT_PCR_IRQC_MASK);
 }
 
 int gpio_read(gpio_t dev)
 {
-    if ((unsigned int)dev >= GPIO_NUMOF) {
-        DEBUG("gpio_t out of range: %d >= %d\n", dev, GPIO_NUMOF);
-        return -1;
-    }
-    uint8_t pin = kinetis_gpio_lut[dev].pin;
-    GPIO_Type *gpio = kinetis_gpio_lut[dev].gpio;
-
-    if (gpio->PDDR & GPIO_PDDR_PDD(1 << pin)) { /* if configured as output */
-        /* read output data register */
-        return gpio->PDOR & GPIO_PDOR_PDO(1 << pin);
-    }
-    else {
-        /* else read input data register */
-        return gpio->PDIR & GPIO_PDIR_PDI(1 << pin);
-    }
+    return ((_gpio(dev)->PDIR & GPIO_PDIR_PDI(1 << _pin_num(dev))) ? 1 : 0);
 }
 
 void gpio_set(gpio_t dev)
 {
-    if ((unsigned int)dev >= GPIO_NUMOF) {
-        DEBUG("gpio_t out of range: %d >= %d\n", dev, GPIO_NUMOF);
-        return;
-    }
-    kinetis_gpio_lut[dev].gpio->PSOR = (1 << kinetis_gpio_lut[dev].pin);
+    _gpio(dev)->PSOR = (1 << _pin_num(dev));
 }
 
 void gpio_clear(gpio_t dev)
 {
-    if ((unsigned int)dev >= GPIO_NUMOF) {
-        DEBUG("gpio_t out of range: %d >= %d\n", dev, GPIO_NUMOF);
-        return;
-    }
-    kinetis_gpio_lut[dev].gpio->PCOR = (1 << kinetis_gpio_lut[dev].pin);
+    _gpio(dev)->PCOR = (1 << _pin_num(dev));
 }
 
 void gpio_toggle(gpio_t dev)
 {
-    if ((unsigned int)dev >= GPIO_NUMOF) {
-        DEBUG("gpio_t out of range: %d >= %d\n", dev, GPIO_NUMOF);
-        return;
-    }
-    kinetis_gpio_lut[dev].gpio->PTOR = (1 << kinetis_gpio_lut[dev].pin);
+    _gpio(dev)->PTOR = (1 << _pin_num(dev));
 }
 
 void gpio_write(gpio_t dev, int value)
 {
     if (value) {
-        gpio_set(dev);
+        _gpio(dev)->PSOR = (1 << _pin_num(dev));
     }
     else {
-        gpio_clear(dev);
+        _gpio(dev)->PCOR = (1 << _pin_num(dev));
     }
 }
 
-static inline void irq_handler(gpio_t dev)
+static inline void irq_handler(uint8_t port_num)
 {
-    config[dev].cb(config[dev].arg);
+    gpio_int_config_entry_t *entry;
+    PORT_Type *port = _port_ptrs[port_num];
+    uint32_t isf = port->ISFR; /* Interrupt status flags */
+    LL_FOREACH(gpio_interrupts[port_num], entry) {
+        if (isf & (1 << entry->pin)) {
+            if (entry->cb != NULL) {
+                entry->cb(entry->arg);
+            }
+        }
+    }
+    /* Clear interrupt flags */
+    port->ISFR = isf;
 
     if (sched_context_switch_request) {
         thread_yield();
     }
 }
 
-
-/* the following interrupt handlers are quite ugly, the preprocessor is used to
- * insert only the relevant checks in each isr, however, in the source all of
- * the ISRs contain all GPIO checks...
- */
-#define GPIO_ISR_TEMPLATE(gpio) \
-    if (gpio##_PORT->ISFR & PORT_ISFR_ISF(1 << gpio##_PIN)) { \
-        irq_handler(gpio); \
-        /* clear status bit by writing a 1 to it */ \
-        gpio##_PORT->ISFR = PORT_ISFR_ISF(1 << gpio##_PIN); \
-    }
-
-/* Generate the below part with: (in bash or zsh)
-for p in $(seq 8 | tr 123456789 abcdefghi); do echo -n "
-#if PORT$(echo $p | tr '[:lower:]' '[:upper:]')_BASE
-void ISR_PORT_${p}(void)
+#ifdef PORTA_BASE
+void isr_porta(void)
 {
-"; for f in $(seq 0 31); do echo -n "
-#if GPIO_${f}_EN && (GPIO_${f}_PORT_BASE == PORT$(echo $p | tr '[:lower:]' '[:upper:]')_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_${f})
-#endif
-"; done;
-echo -n "
-}
-#endif // PORT$(echo $p | tr '[:lower:]' '[:upper:]')_BASE
-"; done > gpio-isr.c
-*/
-
-/* Script generated code below. */
-/* -------------------------------------------------------------------------- */
-
-#if PORTA_BASE
-void ISR_PORT_A(void)
-{
-
-#if GPIO_0_EN && (GPIO_0_PORT_BASE == PORTA_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_0)
-#endif
-
-#if GPIO_1_EN && (GPIO_1_PORT_BASE == PORTA_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_1)
-#endif
-
-#if GPIO_2_EN && (GPIO_2_PORT_BASE == PORTA_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_2)
-#endif
-
-#if GPIO_3_EN && (GPIO_3_PORT_BASE == PORTA_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_3)
-#endif
-
-#if GPIO_4_EN && (GPIO_4_PORT_BASE == PORTA_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_4)
-#endif
-
-#if GPIO_5_EN && (GPIO_5_PORT_BASE == PORTA_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_5)
-#endif
-
-#if GPIO_6_EN && (GPIO_6_PORT_BASE == PORTA_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_6)
-#endif
-
-#if GPIO_7_EN && (GPIO_7_PORT_BASE == PORTA_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_7)
-#endif
-
-#if GPIO_8_EN && (GPIO_8_PORT_BASE == PORTA_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_8)
-#endif
-
-#if GPIO_9_EN && (GPIO_9_PORT_BASE == PORTA_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_9)
-#endif
-
-#if GPIO_10_EN && (GPIO_10_PORT_BASE == PORTA_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_10)
-#endif
-
-#if GPIO_11_EN && (GPIO_11_PORT_BASE == PORTA_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_11)
-#endif
-
-#if GPIO_12_EN && (GPIO_12_PORT_BASE == PORTA_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_12)
-#endif
-
-#if GPIO_13_EN && (GPIO_13_PORT_BASE == PORTA_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_13)
-#endif
-
-#if GPIO_14_EN && (GPIO_14_PORT_BASE == PORTA_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_14)
-#endif
-
-#if GPIO_15_EN && (GPIO_15_PORT_BASE == PORTA_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_15)
-#endif
-
-#if GPIO_16_EN && (GPIO_16_PORT_BASE == PORTA_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_16)
-#endif
-
-#if GPIO_17_EN && (GPIO_17_PORT_BASE == PORTA_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_17)
-#endif
-
-#if GPIO_18_EN && (GPIO_18_PORT_BASE == PORTA_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_18)
-#endif
-
-#if GPIO_19_EN && (GPIO_19_PORT_BASE == PORTA_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_19)
-#endif
-
-#if GPIO_20_EN && (GPIO_20_PORT_BASE == PORTA_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_20)
-#endif
-
-#if GPIO_21_EN && (GPIO_21_PORT_BASE == PORTA_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_21)
-#endif
-
-#if GPIO_22_EN && (GPIO_22_PORT_BASE == PORTA_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_22)
-#endif
-
-#if GPIO_23_EN && (GPIO_23_PORT_BASE == PORTA_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_23)
-#endif
-
-#if GPIO_24_EN && (GPIO_24_PORT_BASE == PORTA_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_24)
-#endif
-
-#if GPIO_25_EN && (GPIO_25_PORT_BASE == PORTA_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_25)
-#endif
-
-#if GPIO_26_EN && (GPIO_26_PORT_BASE == PORTA_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_26)
-#endif
-
-#if GPIO_27_EN && (GPIO_27_PORT_BASE == PORTA_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_27)
-#endif
-
-#if GPIO_28_EN && (GPIO_28_PORT_BASE == PORTA_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_28)
-#endif
-
-#if GPIO_29_EN && (GPIO_29_PORT_BASE == PORTA_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_29)
-#endif
-
-#if GPIO_30_EN && (GPIO_30_PORT_BASE == PORTA_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_30)
-#endif
-
-#if GPIO_31_EN && (GPIO_31_PORT_BASE == PORTA_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_31)
-#endif
-
+    irq_handler(PORT_A);
 }
 #endif /* PORTA_BASE */
 
-#if PORTB_BASE
-void ISR_PORT_B(void)
+#ifdef PORTB_BASE
+void isr_portb(void)
 {
-
-#if GPIO_0_EN && (GPIO_0_PORT_BASE == PORTB_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_0)
-#endif
-
-#if GPIO_1_EN && (GPIO_1_PORT_BASE == PORTB_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_1)
-#endif
-
-#if GPIO_2_EN && (GPIO_2_PORT_BASE == PORTB_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_2)
-#endif
-
-#if GPIO_3_EN && (GPIO_3_PORT_BASE == PORTB_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_3)
-#endif
-
-#if GPIO_4_EN && (GPIO_4_PORT_BASE == PORTB_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_4)
-#endif
-
-#if GPIO_5_EN && (GPIO_5_PORT_BASE == PORTB_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_5)
-#endif
-
-#if GPIO_6_EN && (GPIO_6_PORT_BASE == PORTB_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_6)
-#endif
-
-#if GPIO_7_EN && (GPIO_7_PORT_BASE == PORTB_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_7)
-#endif
-
-#if GPIO_8_EN && (GPIO_8_PORT_BASE == PORTB_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_8)
-#endif
-
-#if GPIO_9_EN && (GPIO_9_PORT_BASE == PORTB_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_9)
-#endif
-
-#if GPIO_10_EN && (GPIO_10_PORT_BASE == PORTB_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_10)
-#endif
-
-#if GPIO_11_EN && (GPIO_11_PORT_BASE == PORTB_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_11)
-#endif
-
-#if GPIO_12_EN && (GPIO_12_PORT_BASE == PORTB_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_12)
-#endif
-
-#if GPIO_13_EN && (GPIO_13_PORT_BASE == PORTB_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_13)
-#endif
-
-#if GPIO_14_EN && (GPIO_14_PORT_BASE == PORTB_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_14)
-#endif
-
-#if GPIO_15_EN && (GPIO_15_PORT_BASE == PORTB_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_15)
-#endif
-
-#if GPIO_16_EN && (GPIO_16_PORT_BASE == PORTB_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_16)
-#endif
-
-#if GPIO_17_EN && (GPIO_17_PORT_BASE == PORTB_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_17)
-#endif
-
-#if GPIO_18_EN && (GPIO_18_PORT_BASE == PORTB_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_18)
-#endif
-
-#if GPIO_19_EN && (GPIO_19_PORT_BASE == PORTB_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_19)
-#endif
-
-#if GPIO_20_EN && (GPIO_20_PORT_BASE == PORTB_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_20)
-#endif
-
-#if GPIO_21_EN && (GPIO_21_PORT_BASE == PORTB_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_21)
-#endif
-
-#if GPIO_22_EN && (GPIO_22_PORT_BASE == PORTB_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_22)
-#endif
-
-#if GPIO_23_EN && (GPIO_23_PORT_BASE == PORTB_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_23)
-#endif
-
-#if GPIO_24_EN && (GPIO_24_PORT_BASE == PORTB_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_24)
-#endif
-
-#if GPIO_25_EN && (GPIO_25_PORT_BASE == PORTB_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_25)
-#endif
-
-#if GPIO_26_EN && (GPIO_26_PORT_BASE == PORTB_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_26)
-#endif
-
-#if GPIO_27_EN && (GPIO_27_PORT_BASE == PORTB_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_27)
-#endif
-
-#if GPIO_28_EN && (GPIO_28_PORT_BASE == PORTB_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_28)
-#endif
-
-#if GPIO_29_EN && (GPIO_29_PORT_BASE == PORTB_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_29)
-#endif
-
-#if GPIO_30_EN && (GPIO_30_PORT_BASE == PORTB_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_30)
-#endif
-
-#if GPIO_31_EN && (GPIO_31_PORT_BASE == PORTB_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_31)
-#endif
-
+    irq_handler(PORT_B);
 }
-#endif /* PORTB_BASE */
+#endif /* ISR_PORT_B */
 
-#if PORTC_BASE
-void ISR_PORT_C(void)
+#ifdef PORTC_BASE
+void isr_portc(void)
 {
-
-#if GPIO_0_EN && (GPIO_0_PORT_BASE == PORTC_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_0)
-#endif
-
-#if GPIO_1_EN && (GPIO_1_PORT_BASE == PORTC_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_1)
-#endif
-
-#if GPIO_2_EN && (GPIO_2_PORT_BASE == PORTC_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_2)
-#endif
-
-#if GPIO_3_EN && (GPIO_3_PORT_BASE == PORTC_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_3)
-#endif
-
-#if GPIO_4_EN && (GPIO_4_PORT_BASE == PORTC_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_4)
-#endif
-
-#if GPIO_5_EN && (GPIO_5_PORT_BASE == PORTC_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_5)
-#endif
-
-#if GPIO_6_EN && (GPIO_6_PORT_BASE == PORTC_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_6)
-#endif
-
-#if GPIO_7_EN && (GPIO_7_PORT_BASE == PORTC_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_7)
-#endif
-
-#if GPIO_8_EN && (GPIO_8_PORT_BASE == PORTC_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_8)
-#endif
-
-#if GPIO_9_EN && (GPIO_9_PORT_BASE == PORTC_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_9)
-#endif
-
-#if GPIO_10_EN && (GPIO_10_PORT_BASE == PORTC_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_10)
-#endif
-
-#if GPIO_11_EN && (GPIO_11_PORT_BASE == PORTC_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_11)
-#endif
-
-#if GPIO_12_EN && (GPIO_12_PORT_BASE == PORTC_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_12)
-#endif
-
-#if GPIO_13_EN && (GPIO_13_PORT_BASE == PORTC_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_13)
-#endif
-
-#if GPIO_14_EN && (GPIO_14_PORT_BASE == PORTC_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_14)
-#endif
-
-#if GPIO_15_EN && (GPIO_15_PORT_BASE == PORTC_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_15)
-#endif
-
-#if GPIO_16_EN && (GPIO_16_PORT_BASE == PORTC_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_16)
-#endif
-
-#if GPIO_17_EN && (GPIO_17_PORT_BASE == PORTC_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_17)
-#endif
-
-#if GPIO_18_EN && (GPIO_18_PORT_BASE == PORTC_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_18)
-#endif
-
-#if GPIO_19_EN && (GPIO_19_PORT_BASE == PORTC_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_19)
-#endif
-
-#if GPIO_20_EN && (GPIO_20_PORT_BASE == PORTC_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_20)
-#endif
-
-#if GPIO_21_EN && (GPIO_21_PORT_BASE == PORTC_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_21)
-#endif
-
-#if GPIO_22_EN && (GPIO_22_PORT_BASE == PORTC_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_22)
-#endif
-
-#if GPIO_23_EN && (GPIO_23_PORT_BASE == PORTC_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_23)
-#endif
-
-#if GPIO_24_EN && (GPIO_24_PORT_BASE == PORTC_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_24)
-#endif
-
-#if GPIO_25_EN && (GPIO_25_PORT_BASE == PORTC_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_25)
-#endif
-
-#if GPIO_26_EN && (GPIO_26_PORT_BASE == PORTC_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_26)
-#endif
-
-#if GPIO_27_EN && (GPIO_27_PORT_BASE == PORTC_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_27)
-#endif
-
-#if GPIO_28_EN && (GPIO_28_PORT_BASE == PORTC_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_28)
-#endif
-
-#if GPIO_29_EN && (GPIO_29_PORT_BASE == PORTC_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_29)
-#endif
-
-#if GPIO_30_EN && (GPIO_30_PORT_BASE == PORTC_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_30)
-#endif
-
-#if GPIO_31_EN && (GPIO_31_PORT_BASE == PORTC_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_31)
-#endif
-
+    irq_handler(PORT_C);
 }
-#endif /* PORTC_BASE */
+#endif /* ISR_PORT_C */
 
-#if PORTD_BASE
-void ISR_PORT_D(void)
+#ifdef PORTD_BASE
+void isr_portd(void)
 {
-
-#if GPIO_0_EN && (GPIO_0_PORT_BASE == PORTD_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_0)
-#endif
-
-#if GPIO_1_EN && (GPIO_1_PORT_BASE == PORTD_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_1)
-#endif
-
-#if GPIO_2_EN && (GPIO_2_PORT_BASE == PORTD_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_2)
-#endif
-
-#if GPIO_3_EN && (GPIO_3_PORT_BASE == PORTD_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_3)
-#endif
-
-#if GPIO_4_EN && (GPIO_4_PORT_BASE == PORTD_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_4)
-#endif
-
-#if GPIO_5_EN && (GPIO_5_PORT_BASE == PORTD_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_5)
-#endif
-
-#if GPIO_6_EN && (GPIO_6_PORT_BASE == PORTD_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_6)
-#endif
-
-#if GPIO_7_EN && (GPIO_7_PORT_BASE == PORTD_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_7)
-#endif
-
-#if GPIO_8_EN && (GPIO_8_PORT_BASE == PORTD_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_8)
-#endif
-
-#if GPIO_9_EN && (GPIO_9_PORT_BASE == PORTD_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_9)
-#endif
-
-#if GPIO_10_EN && (GPIO_10_PORT_BASE == PORTD_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_10)
-#endif
-
-#if GPIO_11_EN && (GPIO_11_PORT_BASE == PORTD_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_11)
-#endif
-
-#if GPIO_12_EN && (GPIO_12_PORT_BASE == PORTD_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_12)
-#endif
-
-#if GPIO_13_EN && (GPIO_13_PORT_BASE == PORTD_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_13)
-#endif
-
-#if GPIO_14_EN && (GPIO_14_PORT_BASE == PORTD_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_14)
-#endif
-
-#if GPIO_15_EN && (GPIO_15_PORT_BASE == PORTD_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_15)
-#endif
-
-#if GPIO_16_EN && (GPIO_16_PORT_BASE == PORTD_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_16)
-#endif
-
-#if GPIO_17_EN && (GPIO_17_PORT_BASE == PORTD_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_17)
-#endif
-
-#if GPIO_18_EN && (GPIO_18_PORT_BASE == PORTD_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_18)
-#endif
-
-#if GPIO_19_EN && (GPIO_19_PORT_BASE == PORTD_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_19)
-#endif
-
-#if GPIO_20_EN && (GPIO_20_PORT_BASE == PORTD_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_20)
-#endif
-
-#if GPIO_21_EN && (GPIO_21_PORT_BASE == PORTD_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_21)
-#endif
-
-#if GPIO_22_EN && (GPIO_22_PORT_BASE == PORTD_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_22)
-#endif
-
-#if GPIO_23_EN && (GPIO_23_PORT_BASE == PORTD_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_23)
-#endif
-
-#if GPIO_24_EN && (GPIO_24_PORT_BASE == PORTD_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_24)
-#endif
-
-#if GPIO_25_EN && (GPIO_25_PORT_BASE == PORTD_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_25)
-#endif
-
-#if GPIO_26_EN && (GPIO_26_PORT_BASE == PORTD_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_26)
-#endif
-
-#if GPIO_27_EN && (GPIO_27_PORT_BASE == PORTD_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_27)
-#endif
-
-#if GPIO_28_EN && (GPIO_28_PORT_BASE == PORTD_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_28)
-#endif
-
-#if GPIO_29_EN && (GPIO_29_PORT_BASE == PORTD_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_29)
-#endif
-
-#if GPIO_30_EN && (GPIO_30_PORT_BASE == PORTD_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_30)
-#endif
-
-#if GPIO_31_EN && (GPIO_31_PORT_BASE == PORTD_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_31)
-#endif
-
+    irq_handler(PORT_D);
 }
-#endif /* PORTD_BASE */
+#endif /* ISR_PORT_D */
 
-#if PORTE_BASE
-void ISR_PORT_E(void)
+#ifdef PORTE_BASE
+void isr_porte(void)
 {
-
-#if GPIO_0_EN && (GPIO_0_PORT_BASE == PORTE_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_0)
-#endif
-
-#if GPIO_1_EN && (GPIO_1_PORT_BASE == PORTE_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_1)
-#endif
-
-#if GPIO_2_EN && (GPIO_2_PORT_BASE == PORTE_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_2)
-#endif
-
-#if GPIO_3_EN && (GPIO_3_PORT_BASE == PORTE_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_3)
-#endif
-
-#if GPIO_4_EN && (GPIO_4_PORT_BASE == PORTE_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_4)
-#endif
-
-#if GPIO_5_EN && (GPIO_5_PORT_BASE == PORTE_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_5)
-#endif
-
-#if GPIO_6_EN && (GPIO_6_PORT_BASE == PORTE_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_6)
-#endif
-
-#if GPIO_7_EN && (GPIO_7_PORT_BASE == PORTE_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_7)
-#endif
-
-#if GPIO_8_EN && (GPIO_8_PORT_BASE == PORTE_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_8)
-#endif
-
-#if GPIO_9_EN && (GPIO_9_PORT_BASE == PORTE_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_9)
-#endif
-
-#if GPIO_10_EN && (GPIO_10_PORT_BASE == PORTE_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_10)
-#endif
-
-#if GPIO_11_EN && (GPIO_11_PORT_BASE == PORTE_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_11)
-#endif
-
-#if GPIO_12_EN && (GPIO_12_PORT_BASE == PORTE_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_12)
-#endif
-
-#if GPIO_13_EN && (GPIO_13_PORT_BASE == PORTE_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_13)
-#endif
-
-#if GPIO_14_EN && (GPIO_14_PORT_BASE == PORTE_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_14)
-#endif
-
-#if GPIO_15_EN && (GPIO_15_PORT_BASE == PORTE_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_15)
-#endif
-
-#if GPIO_16_EN && (GPIO_16_PORT_BASE == PORTE_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_16)
-#endif
-
-#if GPIO_17_EN && (GPIO_17_PORT_BASE == PORTE_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_17)
-#endif
-
-#if GPIO_18_EN && (GPIO_18_PORT_BASE == PORTE_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_18)
-#endif
-
-#if GPIO_19_EN && (GPIO_19_PORT_BASE == PORTE_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_19)
-#endif
-
-#if GPIO_20_EN && (GPIO_20_PORT_BASE == PORTE_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_20)
-#endif
-
-#if GPIO_21_EN && (GPIO_21_PORT_BASE == PORTE_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_21)
-#endif
-
-#if GPIO_22_EN && (GPIO_22_PORT_BASE == PORTE_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_22)
-#endif
-
-#if GPIO_23_EN && (GPIO_23_PORT_BASE == PORTE_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_23)
-#endif
-
-#if GPIO_24_EN && (GPIO_24_PORT_BASE == PORTE_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_24)
-#endif
-
-#if GPIO_25_EN && (GPIO_25_PORT_BASE == PORTE_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_25)
-#endif
-
-#if GPIO_26_EN && (GPIO_26_PORT_BASE == PORTE_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_26)
-#endif
-
-#if GPIO_27_EN && (GPIO_27_PORT_BASE == PORTE_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_27)
-#endif
-
-#if GPIO_28_EN && (GPIO_28_PORT_BASE == PORTE_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_28)
-#endif
-
-#if GPIO_29_EN && (GPIO_29_PORT_BASE == PORTE_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_29)
-#endif
-
-#if GPIO_30_EN && (GPIO_30_PORT_BASE == PORTE_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_30)
-#endif
-
-#if GPIO_31_EN && (GPIO_31_PORT_BASE == PORTE_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_31)
-#endif
-
+    irq_handler(PORT_E);
 }
-#endif /* PORTE_BASE */
+#endif /* ISR_PORT_E */
 
-#if PORTF_BASE
-void ISR_PORT_F(void)
+#ifdef PORTF_BASE
+void isr_portf(void)
 {
-
-#if GPIO_0_EN && (GPIO_0_PORT_BASE == PORTF_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_0)
-#endif
-
-#if GPIO_1_EN && (GPIO_1_PORT_BASE == PORTF_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_1)
-#endif
-
-#if GPIO_2_EN && (GPIO_2_PORT_BASE == PORTF_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_2)
-#endif
-
-#if GPIO_3_EN && (GPIO_3_PORT_BASE == PORTF_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_3)
-#endif
-
-#if GPIO_4_EN && (GPIO_4_PORT_BASE == PORTF_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_4)
-#endif
-
-#if GPIO_5_EN && (GPIO_5_PORT_BASE == PORTF_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_5)
-#endif
-
-#if GPIO_6_EN && (GPIO_6_PORT_BASE == PORTF_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_6)
-#endif
-
-#if GPIO_7_EN && (GPIO_7_PORT_BASE == PORTF_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_7)
-#endif
-
-#if GPIO_8_EN && (GPIO_8_PORT_BASE == PORTF_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_8)
-#endif
-
-#if GPIO_9_EN && (GPIO_9_PORT_BASE == PORTF_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_9)
-#endif
-
-#if GPIO_10_EN && (GPIO_10_PORT_BASE == PORTF_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_10)
-#endif
-
-#if GPIO_11_EN && (GPIO_11_PORT_BASE == PORTF_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_11)
-#endif
-
-#if GPIO_12_EN && (GPIO_12_PORT_BASE == PORTF_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_12)
-#endif
-
-#if GPIO_13_EN && (GPIO_13_PORT_BASE == PORTF_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_13)
-#endif
-
-#if GPIO_14_EN && (GPIO_14_PORT_BASE == PORTF_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_14)
-#endif
-
-#if GPIO_15_EN && (GPIO_15_PORT_BASE == PORTF_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_15)
-#endif
-
-#if GPIO_16_EN && (GPIO_16_PORT_BASE == PORTF_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_16)
-#endif
-
-#if GPIO_17_EN && (GPIO_17_PORT_BASE == PORTF_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_17)
-#endif
-
-#if GPIO_18_EN && (GPIO_18_PORT_BASE == PORTF_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_18)
-#endif
-
-#if GPIO_19_EN && (GPIO_19_PORT_BASE == PORTF_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_19)
-#endif
-
-#if GPIO_20_EN && (GPIO_20_PORT_BASE == PORTF_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_20)
-#endif
-
-#if GPIO_21_EN && (GPIO_21_PORT_BASE == PORTF_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_21)
-#endif
-
-#if GPIO_22_EN && (GPIO_22_PORT_BASE == PORTF_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_22)
-#endif
-
-#if GPIO_23_EN && (GPIO_23_PORT_BASE == PORTF_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_23)
-#endif
-
-#if GPIO_24_EN && (GPIO_24_PORT_BASE == PORTF_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_24)
-#endif
-
-#if GPIO_25_EN && (GPIO_25_PORT_BASE == PORTF_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_25)
-#endif
-
-#if GPIO_26_EN && (GPIO_26_PORT_BASE == PORTF_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_26)
-#endif
-
-#if GPIO_27_EN && (GPIO_27_PORT_BASE == PORTF_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_27)
-#endif
-
-#if GPIO_28_EN && (GPIO_28_PORT_BASE == PORTF_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_28)
-#endif
-
-#if GPIO_29_EN && (GPIO_29_PORT_BASE == PORTF_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_29)
-#endif
-
-#if GPIO_30_EN && (GPIO_30_PORT_BASE == PORTF_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_30)
-#endif
-
-#if GPIO_31_EN && (GPIO_31_PORT_BASE == PORTF_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_31)
-#endif
-
+    irq_handler(PORT_F);
 }
-#endif /* PORTF_BASE */
+#endif /* ISR_PORT_F */
 
-#if PORTG_BASE
-void ISR_PORT_G(void)
+#ifdef PORTG_BASE
+void isr_portg(void)
 {
-
-#if GPIO_0_EN && (GPIO_0_PORT_BASE == PORTG_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_0)
-#endif
-
-#if GPIO_1_EN && (GPIO_1_PORT_BASE == PORTG_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_1)
-#endif
-
-#if GPIO_2_EN && (GPIO_2_PORT_BASE == PORTG_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_2)
-#endif
-
-#if GPIO_3_EN && (GPIO_3_PORT_BASE == PORTG_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_3)
-#endif
-
-#if GPIO_4_EN && (GPIO_4_PORT_BASE == PORTG_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_4)
-#endif
-
-#if GPIO_5_EN && (GPIO_5_PORT_BASE == PORTG_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_5)
-#endif
-
-#if GPIO_6_EN && (GPIO_6_PORT_BASE == PORTG_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_6)
-#endif
-
-#if GPIO_7_EN && (GPIO_7_PORT_BASE == PORTG_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_7)
-#endif
-
-#if GPIO_8_EN && (GPIO_8_PORT_BASE == PORTG_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_8)
-#endif
-
-#if GPIO_9_EN && (GPIO_9_PORT_BASE == PORTG_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_9)
-#endif
-
-#if GPIO_10_EN && (GPIO_10_PORT_BASE == PORTG_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_10)
-#endif
-
-#if GPIO_11_EN && (GPIO_11_PORT_BASE == PORTG_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_11)
-#endif
-
-#if GPIO_12_EN && (GPIO_12_PORT_BASE == PORTG_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_12)
-#endif
-
-#if GPIO_13_EN && (GPIO_13_PORT_BASE == PORTG_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_13)
-#endif
-
-#if GPIO_14_EN && (GPIO_14_PORT_BASE == PORTG_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_14)
-#endif
-
-#if GPIO_15_EN && (GPIO_15_PORT_BASE == PORTG_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_15)
-#endif
-
-#if GPIO_16_EN && (GPIO_16_PORT_BASE == PORTG_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_16)
-#endif
-
-#if GPIO_17_EN && (GPIO_17_PORT_BASE == PORTG_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_17)
-#endif
-
-#if GPIO_18_EN && (GPIO_18_PORT_BASE == PORTG_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_18)
-#endif
-
-#if GPIO_19_EN && (GPIO_19_PORT_BASE == PORTG_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_19)
-#endif
-
-#if GPIO_20_EN && (GPIO_20_PORT_BASE == PORTG_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_20)
-#endif
-
-#if GPIO_21_EN && (GPIO_21_PORT_BASE == PORTG_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_21)
-#endif
-
-#if GPIO_22_EN && (GPIO_22_PORT_BASE == PORTG_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_22)
-#endif
-
-#if GPIO_23_EN && (GPIO_23_PORT_BASE == PORTG_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_23)
-#endif
-
-#if GPIO_24_EN && (GPIO_24_PORT_BASE == PORTG_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_24)
-#endif
-
-#if GPIO_25_EN && (GPIO_25_PORT_BASE == PORTG_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_25)
-#endif
-
-#if GPIO_26_EN && (GPIO_26_PORT_BASE == PORTG_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_26)
-#endif
-
-#if GPIO_27_EN && (GPIO_27_PORT_BASE == PORTG_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_27)
-#endif
-
-#if GPIO_28_EN && (GPIO_28_PORT_BASE == PORTG_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_28)
-#endif
-
-#if GPIO_29_EN && (GPIO_29_PORT_BASE == PORTG_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_29)
-#endif
-
-#if GPIO_30_EN && (GPIO_30_PORT_BASE == PORTG_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_30)
-#endif
-
-#if GPIO_31_EN && (GPIO_31_PORT_BASE == PORTG_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_31)
-#endif
-
+    irq_handler(PORT_G);
 }
-#endif /* PORTG_BASE */
-
-#if PORTH_BASE
-void ISR_PORT_H(void)
-{
-
-#if GPIO_0_EN && (GPIO_0_PORT_BASE == PORTH_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_0)
-#endif
-
-#if GPIO_1_EN && (GPIO_1_PORT_BASE == PORTH_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_1)
-#endif
-
-#if GPIO_2_EN && (GPIO_2_PORT_BASE == PORTH_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_2)
-#endif
-
-#if GPIO_3_EN && (GPIO_3_PORT_BASE == PORTH_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_3)
-#endif
-
-#if GPIO_4_EN && (GPIO_4_PORT_BASE == PORTH_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_4)
-#endif
-
-#if GPIO_5_EN && (GPIO_5_PORT_BASE == PORTH_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_5)
-#endif
-
-#if GPIO_6_EN && (GPIO_6_PORT_BASE == PORTH_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_6)
-#endif
-
-#if GPIO_7_EN && (GPIO_7_PORT_BASE == PORTH_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_7)
-#endif
-
-#if GPIO_8_EN && (GPIO_8_PORT_BASE == PORTH_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_8)
-#endif
-
-#if GPIO_9_EN && (GPIO_9_PORT_BASE == PORTH_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_9)
-#endif
-
-#if GPIO_10_EN && (GPIO_10_PORT_BASE == PORTH_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_10)
-#endif
-
-#if GPIO_11_EN && (GPIO_11_PORT_BASE == PORTH_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_11)
-#endif
-
-#if GPIO_12_EN && (GPIO_12_PORT_BASE == PORTH_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_12)
-#endif
-
-#if GPIO_13_EN && (GPIO_13_PORT_BASE == PORTH_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_13)
-#endif
-
-#if GPIO_14_EN && (GPIO_14_PORT_BASE == PORTH_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_14)
-#endif
-
-#if GPIO_15_EN && (GPIO_15_PORT_BASE == PORTH_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_15)
-#endif
-
-#if GPIO_16_EN && (GPIO_16_PORT_BASE == PORTH_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_16)
-#endif
-
-#if GPIO_17_EN && (GPIO_17_PORT_BASE == PORTH_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_17)
-#endif
-
-#if GPIO_18_EN && (GPIO_18_PORT_BASE == PORTH_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_18)
-#endif
-
-#if GPIO_19_EN && (GPIO_19_PORT_BASE == PORTH_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_19)
-#endif
-
-#if GPIO_20_EN && (GPIO_20_PORT_BASE == PORTH_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_20)
-#endif
-
-#if GPIO_21_EN && (GPIO_21_PORT_BASE == PORTH_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_21)
-#endif
-
-#if GPIO_22_EN && (GPIO_22_PORT_BASE == PORTH_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_22)
-#endif
-
-#if GPIO_23_EN && (GPIO_23_PORT_BASE == PORTH_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_23)
-#endif
-
-#if GPIO_24_EN && (GPIO_24_PORT_BASE == PORTH_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_24)
-#endif
-
-#if GPIO_25_EN && (GPIO_25_PORT_BASE == PORTH_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_25)
-#endif
-
-#if GPIO_26_EN && (GPIO_26_PORT_BASE == PORTH_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_26)
-#endif
-
-#if GPIO_27_EN && (GPIO_27_PORT_BASE == PORTH_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_27)
-#endif
-
-#if GPIO_28_EN && (GPIO_28_PORT_BASE == PORTH_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_28)
-#endif
-
-#if GPIO_29_EN && (GPIO_29_PORT_BASE == PORTH_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_29)
-#endif
-
-#if GPIO_30_EN && (GPIO_30_PORT_BASE == PORTH_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_30)
-#endif
-
-#if GPIO_31_EN && (GPIO_31_PORT_BASE == PORTH_BASE)
-    GPIO_ISR_TEMPLATE(GPIO_31)
-#endif
-
-}
-#endif /* PORTH_BASE */
+#endif /* ISR_PORT_G */
