@@ -122,7 +122,7 @@ static void _api_at_cmd(xbee_t *dev, uint8_t *cmd, uint8_t size, resp_t *resp)
     dev->tx_count = 0;
     dev->resp_count = 0;
     /* start send data */
-    uart_tx_begin(dev->uart);
+    uart_tx(dev->uart);
 
     /* wait for results */
     while (dev->resp_limit != dev->resp_count) {
@@ -140,14 +140,14 @@ static void _api_at_cmd(xbee_t *dev, uint8_t *cmd, uint8_t size, resp_t *resp)
 /*
  * Interrupt callbacks
  */
-static int _tx_cb(void *arg)
+static uint16_t _tx_cb(void *arg)
 {
     xbee_t *dev = (xbee_t *)arg;
+
     if (dev->tx_count < dev->tx_limit) {
         /* more data to send */
-        char c = (char)(dev->tx_buf[dev->tx_count++]);
-        uart_write(dev->uart, c);
-        return 1;
+        uint16_t c = (uint16_t)(dev->tx_buf[dev->tx_count++]);
+        return (UART_TX_MORE_DATA | (c & 0xff));
     }
     /* release TX lock */
     mutex_unlock(&(dev->tx_lock));
@@ -568,7 +568,7 @@ static int _send(gnrc_netdev_t *netdev, gnrc_pktsnip_t *pkt)
     dev->tx_limit = (uint16_t)pos + 1;
     dev->tx_count = 0;
     /* start transmission */
-    uart_tx_begin(dev->uart);
+    uart_tx(dev->uart);
     /* release data */
     gnrc_pktbuf_release(pkt);
     /* return number of payload byte */
