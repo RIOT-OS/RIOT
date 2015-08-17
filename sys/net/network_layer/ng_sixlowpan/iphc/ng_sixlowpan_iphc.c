@@ -89,23 +89,19 @@ static inline bool _context_overlaps_iid(ng_sixlowpan_ctx_t *ctx,
              (iid->uint8[(ctx->prefix_len / 8) - 8] & byte_mask[ctx->prefix_len % 8])));
 }
 
-bool ng_sixlowpan_iphc_decode(ng_pktsnip_t *pkt)
+size_t ng_sixlowpan_iphc_decode(ng_pktsnip_t *ipv6, ng_pktsnip_t *pkt, size_t offset)
 {
     ng_netif_hdr_t *netif_hdr = pkt->next->data;
     ipv6_hdr_t *ipv6_hdr;
     uint8_t *iphc_hdr = pkt->data;
-    uint16_t payload_offset = NG_SIXLOWPAN_IPHC_HDR_LEN;
+    size_t payload_offset = NG_SIXLOWPAN_IPHC_HDR_LEN;
     ng_sixlowpan_ctx_t *ctx = NULL;
-    ng_pktsnip_t *payload;
-    ng_pktsnip_t *ipv6 = ng_pktbuf_add(NULL, NULL, sizeof(ipv6_hdr_t),
-                                       NG_NETTYPE_IPV6);
 
-    if (ipv6 == NULL) {
-        DEBUG("6lo iphc: error allocating ipv6 header space\n");
-        return false;
-    }
+    assert(ipv6 != NULL);
+    assert(ipv6->size >= sizeof(ipv6_hdr_t));
 
     ipv6_hdr = ipv6->data;
+    iphc_hdr += offset;
 
     if (iphc_hdr[IPHC2_IDX] & NG_SIXLOWPAN_IPHC2_CID_EXT) {
         payload_offset++;
@@ -174,7 +170,7 @@ bool ng_sixlowpan_iphc_decode(ng_pktsnip_t *pkt)
 
             if (ctx == NULL) {
                 DEBUG("6lo iphc: could not find source context\n");
-                return false;
+                return 0;
             }
         }
     }
@@ -248,7 +244,7 @@ bool ng_sixlowpan_iphc_decode(ng_pktsnip_t *pkt)
 
             if (ctx == NULL) {
                 DEBUG("6lo iphc: could not find destination context\n");
-                return false;
+                return 0;
             }
         }
     }
@@ -362,25 +358,18 @@ bool ng_sixlowpan_iphc_decode(ng_pktsnip_t *pkt)
 
         default:
             DEBUG("6lo iphc: unspecified or reserved M, DAC, DAM combination\n");
-            return false;
+            return 0;
 
     }
 
     /* TODO: add next header decoding */
 
-    /* remove 6LoWPAN dispatch */
-    payload = ng_pktbuf_mark(pkt, payload_offset, NG_NETTYPE_SIXLOWPAN);
-    pkt = ng_pktbuf_remove_snip(pkt, payload);
-
     /* set IPv6 header payload length field to the length of whatever is left
      * after removing the 6LoWPAN header */
-    ipv6_hdr->len = byteorder_htons(pkt->size);
+    ipv6_hdr->len = byteorder_htons((uint16_t)(pkt->size - payload_offset));
 
-    /* insert IPv6 header */
-    ipv6->next = pkt->next;
-    pkt->next = ipv6;
 
-    return true;
+    return payload_offset;
 }
 
 bool ng_sixlowpan_iphc_encode(ng_pktsnip_t *pkt)

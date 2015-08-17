@@ -144,13 +144,18 @@ static inline bool ng_sixlowpan_iphc_is(uint8_t *data)
 /**
  * @brief   Decompresses a received 6LoWPAN IPHC frame.
  *
- * @param[in,out] pkt   A received 6LoWPAN IPHC frame. Will be translated
- *                      into an IPv6 packet.
+ * @pre (ipv6 != NULL) && (ipv6->size >= sizeof(ng_ipv6_hdr_t))
  *
- * @return  true, on success
- * @return  false, on error.
+ * @param[out] ipv6     A pre-allocated IPv6 header. Will not be inserted into
+ *                      @p pkt
+ * @param[in,out] pkt   A received 6LoWPAN IPHC frame. IPHC dispatch will not
+ *                      be marked.
+ * @param[in] size      Offset of the IPHC dispatch in 6LoWPaN frame.
+ *
+ * @return  length of the HC dispatches + inline values on success.
+ * @return  0 on error.
  */
-bool ng_sixlowpan_iphc_decode(ng_pktsnip_t *pkt);
+size_t ng_sixlowpan_iphc_decode(ng_pktsnip_t *ipv6, ng_pktsnip_t *pkt, size_t offset);
 
 /**
  * @brief   Compresses a 6LoWPAN for IPHC.

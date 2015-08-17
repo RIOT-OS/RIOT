@@ -17,6 +17,7 @@
 #include "thread.h"
 #include "utlist.h"
 
+#include "net/ng_ipv6/hdr.h"
 #include "net/ng_sixlowpan.h"
 #include "net/ng_sixlowpan/frag.h"
 #include "net/ng_sixlowpan/iphc.h"
@@ -122,12 +123,32 @@ static void _receive(ng_pktsnip_t *pkt)
 #endif
 #ifdef MODULE_NG_SIXLOWPAN_IPHC
     else if (ng_sixlowpan_iphc_is(dispatch)) {
-        if (!ng_sixlowpan_iphc_decode(pkt)) {
+        size_t dispatch_size;
+        ng_pktsnip_t *sixlowpan;
+        ng_pktsnip_t *ipv6 = ng_pktbuf_add(NULL, NULL, sizeof(ipv6_hdr_t),
+                                           NG_NETTYPE_IPV6);
+        if ((ipv6 == NULL) ||
+            (dispatch_size = ng_sixlowpan_iphc_decode(ipv6, pkt, 0)) == 0) {
             DEBUG("6lo: error on IPHC decoding\n");
+            if (ipv6 != NULL) {
+                ng_pktbuf_release(ipv6);
+            }
             ng_pktbuf_release(pkt);
             return;
         }
-        LL_SEARCH_SCALAR(pkt, payload, type, NG_NETTYPE_IPV6);
+        sixlowpan = ng_pktbuf_mark(pkt, dispatch_size, NG_NETTYPE_SIXLOWPAN);
+        if (sixlowpan == NULL) {
+            DEBUG("6lo: error on marking IPHC dispatch\n");
+            ng_pktbuf_release(ipv6);
+            ng_pktbuf_release(pkt);
+            return;
+        }
+
+        /* Remove IPHC dispatch */
+        ng_pktbuf_remove_snip(pkt, sixlowpan);
+        /* Insert IPv6 header instead */
+        ipv6->next = pkt->next;
+        pkt->next = ipv6;
     }
 #endif
     else {
@@ -169,7 +190,8 @@ static void _send(ng_pktsnip_t *pkt)
     ng_netif_hdr_t *hdr;
     ng_pktsnip_t *pkt2;
     ng_sixlowpan_netif_t *iface;
-    size_t datagram_size, dispatch_len = 0;
+    /* datagram_size: pure IPv6 packet without 6LoWPAN dispatches or compression */
+    size_t datagram_size;
 
     if ((pkt == NULL) || (pkt->size < sizeof(ng_netif_hdr_t))) {
         DEBUG("6lo: Sending packet has no netif header\n");
@@ -193,6 +215,7 @@ static void _send(ng_pktsnip_t *pkt)
 
     hdr = pkt2->data;
     iface = ng_sixlowpan_netif_get(hdr->if_pid);
+    datagram_size = ng_pkt_len(pkt2->next);
 
     if (iface == NULL) {
         DEBUG("6lo: Can not get 6LoWPAN specific interface information.\n");
@@ -217,7 +240,6 @@ static void _send(ng_pktsnip_t *pkt)
             ng_pktbuf_release(pkt2);
             return;
         }
-        dispatch_len++;
     }
 #else
     /* suppress clang-analyzer report about iface being not read */
@@ -228,10 +250,7 @@ static void _send(ng_pktsnip_t *pkt)
         ng_pktbuf_release(pkt2);
         return;
     }
-    dispatch_len++;
 #endif
-    datagram_size = ng_pkt_len(pkt2->next);
-
     DEBUG("6lo: iface->max_frag_size = %" PRIu16 " for interface %"
           PRIkernel_pid "\n", iface->max_frag_size, hdr->if_pid);
 
@@ -248,8 +267,7 @@ static void _send(ng_pktsnip_t *pkt)
     else {
         DEBUG("6lo: Send fragmented (%u > %" PRIu16 ")\n",
               (unsigned int)datagram_size, iface->max_frag_size);
-        ng_sixlowpan_frag_send(hdr->if_pid, pkt2, datagram_size,
-                               datagram_size - dispatch_len);
+        ng_sixlowpan_frag_send(hdr->if_pid, pkt2, datagram_size);
     }
 #else
     (void)datagram_size;
