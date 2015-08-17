@@ -149,6 +149,7 @@ endif
 ifneq (,$(filter ng_ipv6_netif,$(USEMODULE)))
   USEMODULE += ipv6_addr
   USEMODULE += ng_netif
+  USEMODULE += bitfield
 endif
 
 ifneq (,$(filter ng_udp,$(USEMODULE)))

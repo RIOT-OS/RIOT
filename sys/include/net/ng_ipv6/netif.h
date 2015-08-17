@@ -396,6 +396,15 @@ ipv6_addr_t *ng_ipv6_netif_match_prefix(kernel_pid_t pid, const ipv6_addr_t *pre
  * @param[in] dest  The destination address you want to find a destination
  *                  address for.
  *
+ * @todo Rule 4 from RFC 6724 is currently not implemented. Has to updated as
+ *       soon as gnrc supports Mobile IP.
+ *
+ * @todo Rule 6 from RFC 6724 is currently not implemented. Has to updated as
+ *       soon as gnrc supports flow labels.
+ *
+ * @todo Rule 7 from RFC 6724 is currently not implemented. Has to updated as
+ *       soon as gnrc supports temporary addresses.
+ *
  * @return  The reference to the found address on the interface.
  * @return  NULL, if no matching address can be found on the interface.
  * @return  NULL, if @p pid is no interface.

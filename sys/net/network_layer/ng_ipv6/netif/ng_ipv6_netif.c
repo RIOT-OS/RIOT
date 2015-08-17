@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014 Martin Lenders <mlenders@inf.fu-berlin.de>
+ * Copyright (C) 2015 Oliver Hahm <oliver.hahm@inria.fr>
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for
@@ -13,6 +14,7 @@
  * @file
  *
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
+ * @author      Oliver Hahm <oliver.hahm@inria.fr>
  */
 
 #include <errno.h>
@@ -20,6 +22,8 @@
 
 #include "kernel_types.h"
 #include "mutex.h"
+#include "bitfield.h"
+
 #include "net/eui64.h"
 #include "net/ipv6/addr.h"
 #include "net/ng_ndp.h"
@@ -37,6 +41,15 @@
 /* For PRIu16 etc. */
 #include <inttypes.h>
 #endif
+
+/* number of "points" assigned to an source address candidate with equal scope
+ * than destination address */
+#define RULE_2A_PTS         (4)
+/* number of "points" assigned to an source address candidate with smaller scope
+ * than destination address */
+#define RULE_2B_PTS         (2)
+/* number of "points" assigned to an source address candidate in preferred state */
+#define RULE_3_PTS          (1)
 
 static ng_ipv6_netif_t ipv6_ifs[NG_NETIF_NUMOF];
 
@@ -327,14 +340,18 @@ ipv6_addr_t *ng_ipv6_netif_find_addr(kernel_pid_t pid, const ipv6_addr_t *addr)
 }
 
 static uint8_t _find_by_prefix_unsafe(ipv6_addr_t **res, ng_ipv6_netif_t *iface,
-                                      const ipv6_addr_t *addr, bool src_search)
+                                      const ipv6_addr_t *addr, uint8_t *only)
 {
     uint8_t best_match = 0;
 
     for (int i = 0; i < NG_IPV6_NETIF_ADDR_NUMOF; i++) {
         uint8_t match;
 
-        if ((src_search &&
+        if ((only != NULL) && !(bf_isset(only, i))) {
+            continue;
+        }
+
+        if (((only != NULL) &&
              ng_ipv6_netif_addr_is_non_unicast(&(iface->addrs[i].addr))) ||
             ipv6_addr_is_unspecified(&(iface->addrs[i].addr))) {
             continue;
@@ -342,7 +359,7 @@ static uint8_t _find_by_prefix_unsafe(ipv6_addr_t **res, ng_ipv6_netif_t *iface,
 
         match = ipv6_addr_match_prefix(&(iface->addrs[i].addr), addr);
 
-        if (!src_search && !ipv6_addr_is_multicast(addr) &&
+        if ((only == NULL) && !ipv6_addr_is_multicast(addr) &&
             (match < iface->addrs[i].prefix_len)) {
             /* match but not of same subnet */
             continue;
@@ -365,14 +382,14 @@ static uint8_t _find_by_prefix_unsafe(ipv6_addr_t **res, ng_ipv6_netif_t *iface,
         DEBUG("%s by %" PRIu8 " bits (used as source address = %s)\n",
               ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)),
               best_match,
-              (src_search) ? "true" : "false");
+              (only != NULL) ? "true" : "false");
     }
     else {
         DEBUG("ipv6 netif: Did not found any address on interface %" PRIkernel_pid
               " matching %s (used as source address = %s)\n",
               iface->pid,
               ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)),
-              (src_search) ? "true" : "false");
+              (only != NULL) ? "true" : "false");
     }
 #endif
 
@@ -390,7 +407,7 @@ kernel_pid_t ng_ipv6_netif_find_by_prefix(ipv6_addr_t **out, const ipv6_addr_t *
 
         mutex_lock(&(ipv6_ifs[i].mutex));
 
-        match = _find_by_prefix_unsafe(&tmp_res, ipv6_ifs + i, prefix, false);
+        match = _find_by_prefix_unsafe(&tmp_res, ipv6_ifs + i, prefix, NULL);
 
         if (match > best_match) {
             if (out != NULL) {
@@ -422,15 +439,78 @@ kernel_pid_t ng_ipv6_netif_find_by_prefix(ipv6_addr_t **out, const ipv6_addr_t *
     return res;
 }
 
-static ipv6_addr_t *_match_prefix(kernel_pid_t pid, const ipv6_addr_t *addr,
-                                  bool src_search)
+/**
+ * @brief selects potential source address candidates
+ * @see <a href="http://tools.ietf.org/html/rfc6724#section-4">
+ *      RFC6724, section 4
+ *      </a>
+ * @param[in]  iface            the interface used for sending
+ * @param[in]  dst              the destination address
+ * @param[out] candidate_set    a bitfield representing all addresses
+ *                              configured to @p iface, potential candidates
+ *                              will be marked as 1
+ *
+ * @return false if no candidates were found
+ * @return true otherwise
+ *
+ * @pre the interface entry and its set of addresses must not be changed during
+ *      runtime of this function
+ */
+static int _create_candidate_set(ng_ipv6_netif_t *iface,
+                                 const ipv6_addr_t *dst,
+                                 uint8_t *candidate_set)
+{
+    int res = -1;
+
+    DEBUG("gathering candidates\n");
+
+    /* currently this implementation supports only addresses as source address
+     * candidates assigned to this interface. Thus we assume all addresses to be
+     * on interface @p iface */
+    (void) dst;
+
+    for (int i = 0; i < NG_IPV6_NETIF_ADDR_NUMOF; i++) {
+        ng_ipv6_netif_addr_t *iter = &(iface->addrs[i]);
+
+        DEBUG("Checking address: %s\n",
+              ipv6_addr_to_str(addr_str, &(iter->addr), sizeof(addr_str)));
+
+        /* "In any case, multicast addresses and the unspecified address MUST NOT
+         *  be included in a candidate set."
+         */
+        if (ipv6_addr_is_multicast(&(iter->addr)) ||
+            ipv6_addr_is_unspecified(&(iter->addr))) {
+            continue;
+        }
+
+        /* "For all multicast and link-local destination addresses, the set of
+         *  candidate source addresses MUST only include addresses assigned to
+         *  interfaces belonging to the same link as the outgoing interface."
+         *
+         * "For site-local unicast destination addresses, the set of candidate
+         *  source addresses MUST only include addresses assigned to interfaces
+         *  belonging to the same site as the outgoing interface."
+         *  -> we should also be fine, since we're only iterating addresses of
+         *     the sending interface
+         */
+
+        /* put all other addresses into the candidate set */
+        DEBUG("add to candidate set\n");
+        bf_set(candidate_set, i);
+        res = i;
+    }
+
+    return res;
+}
+
+ipv6_addr_t *ng_ipv6_netif_match_prefix(kernel_pid_t pid, const ipv6_addr_t *prefix)
 {
     ipv6_addr_t *res = NULL;
     ng_ipv6_netif_t *iface = ng_ipv6_netif_get(pid);
 
     mutex_lock(&(iface->mutex));
 
-    if (_find_by_prefix_unsafe(&res, iface, addr, src_search) > 0) {
+    if (_find_by_prefix_unsafe(&res, iface, prefix, NULL) > 0) {
         mutex_unlock(&(iface->mutex));
         return res;
     }
@@ -440,14 +520,174 @@ static ipv6_addr_t *_match_prefix(kernel_pid_t pid, const ipv6_addr_t *addr,
     return NULL;
 }
 
-ipv6_addr_t *ng_ipv6_netif_match_prefix(kernel_pid_t pid, const ipv6_addr_t *prefix)
+/**
+ * @brief Determines the scope of the given address.
+ *
+ * @param[in] addr              The IPv6 address to check.
+ * @param[in] maybe_multicast   False if @p addr is definitely no multicast
+ *                              address, true otherwise.
+ *
+ * @return The scope of the address.
+ *
+ * @pre address is not loopback or unspecified.
+ * see http://tools.ietf.org/html/rfc6724#section-4
+ */
+static uint8_t _get_scope(const ipv6_addr_t *addr, const bool maybe_multicast)
 {
-    return _match_prefix(pid, prefix, false);
+    if (maybe_multicast && ipv6_addr_is_multicast(addr)) {
+        return (addr->u8[1] & 0x0f);
+    }
+    else if (ipv6_addr_is_link_local(addr)) {
+        return IPV6_ADDR_MCAST_SCP_LINK_LOCAL;
+    }
+    else if (ipv6_addr_is_site_local(addr)) {
+        return IPV6_ADDR_MCAST_SCP_SITE_LOCAL;
+    }
+    else {
+        return IPV6_ADDR_MCAST_SCP_GLOBAL;
+    }
 }
 
-ipv6_addr_t *ng_ipv6_netif_find_best_src_addr(kernel_pid_t pid, const ipv6_addr_t *dest)
+/** @brief Find the best candidate among the configured addresses
+ *          for a certain destination address according to the 8 rules
+ *          specified in RFC 6734, section 5.
+ * @see <a href="http://tools.ietf.org/html/rfc6724#section-5">
+ *      RFC6724, section 5
+ *      </a>
+ *
+ * @param[in] iface              The interface for sending.
+ * @param[in] dst                The destination IPv6 address.
+ * @param[in, out] candidate_set The preselected set of candidate addresses as
+ *                               a bitfield.
+ *
+ * @pre @p dst is not unspecified.
+ *
+ * @return The best matching candidate found on @p iface, may be NULL if none
+ *         is found.
+ */
+static ipv6_addr_t *_source_address_selection(ng_ipv6_netif_t *iface,
+                                              const ipv6_addr_t *dst,
+                                              uint8_t *candidate_set)
 {
-    return _match_prefix(pid, dest, true);
+    /* create temporary set for assigning "points" to candidates wining in the
+     * corresponding rules.
+     */
+    uint8_t winner_set[NG_IPV6_NETIF_ADDR_NUMOF];
+    memset(winner_set, 0, NG_IPV6_NETIF_ADDR_NUMOF);
+
+    uint8_t max_pts = 0;
+
+    /* _create_candidate_set() assures that `dest` is not unspecified and if
+     * `dst` is loopback rule 1 will fire anyway.  */
+    uint8_t dst_scope = _get_scope(dst, true);
+    DEBUG("finding the best match within the source address candidates\n");
+
+    for (int i = 0; i < NG_IPV6_NETIF_ADDR_NUMOF; i++) {
+        ng_ipv6_netif_addr_t *iter = &(iface->addrs[i]);
+        DEBUG("Checking address: %s\n",
+              ipv6_addr_to_str(addr_str, &(iter->addr), sizeof(addr_str)));
+        /* entries which are not  part of the candidate set can be ignored */
+        if (!(bf_isset(candidate_set, i))) {
+            DEBUG("Not part of the candidate set - skipping\n");
+            continue;
+        }
+
+        /* Rule 1: if we have an address configured that equals the destination
+         * use this one as source */
+        if (ipv6_addr_equal(&(iter->addr), dst)) {
+            DEBUG("Ease one - rule 1\n");
+            return &(iter->addr);
+        }
+
+        /* Rule 2: Prefer appropriate scope. */
+        /* both link local */
+        uint8_t candidate_scope = _get_scope(&(iter->addr), false);
+        if (candidate_scope == dst_scope) {
+            DEBUG("winner for rule 2 (same scope) found\n");
+            winner_set[i] += RULE_2A_PTS;
+            if (winner_set[i] > max_pts) {
+                max_pts = RULE_2A_PTS;
+            }
+        }
+        else if (candidate_scope < dst_scope) {
+            DEBUG("winner for rule 2 (smaller scope) found\n");
+            winner_set[i] += RULE_2B_PTS;
+            if (winner_set[i] > max_pts) {
+                max_pts = winner_set[i];
+            }
+        }
+
+        /* Rule 3: Avoid deprecated addresses. */
+        if (iter->preferred > 0) {
+            DEBUG("winner for rule 3 found\n");
+            winner_set[i] += RULE_3_PTS;
+            if (winner_set[i] > max_pts) {
+                max_pts = winner_set[i];
+            }
+        }
+
+        /* Rule 4: Prefer home addresses.
+         * Does not apply, gnrc does not support Mobile IP.
+         * TODO: update as soon as gnrc supports Mobile IP
+         */
+
+        /* Rule 5: Prefer outgoing interface.
+         * RFC 6724 says:
+         * "It is RECOMMENDED that the candidate source addresses be the set of
+         *  unicast addresses assigned to the interface that will be used to
+         *  send to the destination (the "outgoing" interface).  On routers,
+         *  the candidate set MAY include unicast addresses assigned to any
+         *  interface that forwards packets, subject to the restrictions
+         *  described below."
+         *  Currently this implementation uses ALWAYS source addresses assigned
+         *  to the outgoing interface. Hence, Rule 5 is always fulfilled.
+         */
+
+        /* Rule 6: Prefer matching label.
+         * Flow labels are currently not supported by gnrc.
+         * TODO: update as soon as gnrc supports flow labels
+         */
+
+        /* Rule 7: Prefer temporary addresses.
+         * Temporary addresses are currently not supported by gnrc.
+         * TODO: update as soon as gnrc supports temporary addresses
+         */
+    }
+
+    /* reset candidate set to mark winners */
+    memset(candidate_set, 0, (NG_IPV6_NETIF_ADDR_NUMOF / 8) + 1);
+    /* check if we have a clear winner */
+    /* collect candidates with maximum points */
+    for (int i = 0; i < NG_IPV6_NETIF_ADDR_NUMOF; i++) {
+        if (winner_set[i] == max_pts) {
+            bf_set(candidate_set, i);
+        }
+    }
+
+    /* otherwise apply rule 8: Use longest matching prefix. */
+    ipv6_addr_t *res = NULL;
+    _find_by_prefix_unsafe(&res, iface, dst, candidate_set);
+    return res;
+}
+
+ipv6_addr_t *ng_ipv6_netif_find_best_src_addr(kernel_pid_t pid, const ipv6_addr_t *dst)
+{
+    ng_ipv6_netif_t *iface = ng_ipv6_netif_get(pid);
+    ipv6_addr_t *best_src = NULL;
+    mutex_lock(&(iface->mutex));
+    BITFIELD(candidate_set, NG_IPV6_NETIF_ADDR_NUMOF);
+    memset(candidate_set, 0, sizeof(candidate_set));
+
+    int first_candidate = _create_candidate_set(iface, dst, candidate_set);
+    if (first_candidate >= 0) {
+        best_src = _source_address_selection(iface, dst, candidate_set);
+        if (best_src == NULL) {
+            best_src = &(iface->addrs[first_candidate].addr);
+        }
+    }
+    mutex_unlock(&(iface->mutex));
+
+    return best_src;
 }
 
 void ng_ipv6_netif_init_by_dev(void)
