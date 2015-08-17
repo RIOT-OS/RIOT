@@ -10,14 +10,6 @@ ifneq (,$(filter at86rf231,$(USEMODULE)))
   USEMODULE += periph_spi
 endif
 
-ifneq (,$(filter cc110x,$(USEMODULE)))
-  USEMODULE += periph_gpio
-  USEMODULE += periph_spi
-  USEMODULE += protocol_multiplex
-  USEMODULE += vtimer
-  USEMODULE += transceiver
-endif
-
 ifneq (,$(filter dht,$(USEMODULE)))
   USEMODULE += periph_gpio
 endif
@@ -136,28 +128,4 @@ ifneq (,$(filter xbee,$(USEMODULE)))
   USEMODULE += periph_gpio
   USEMODULE += periph_uart
   USEMODULE += ng_ieee802154
-endif
-
-
-# Deprecated drivers
-
-ifneq (,$(filter at86rf231,$(USEMODULE)))
-  USEMODULE += periph_gpio
-  USEMODULE += periph_spi
-  USEMODULE += netdev_802154
-  USEMODULE += ieee802154
-endif
-
-ifneq (,$(filter cc110x%,$(USEMODULE)))
-  USEMODULE += protocol_multiplex
-  USEMODULE += vtimer
-endif
-
-ifneq (,$(filter cc110x_legacy,$(USEMODULE)))
-  USEMODULE += transceiver
-endif
-
-ifneq (,$(filter cc2420,$(USEMODULE)))
-  USEMODULE += transceiver
-  USEMODULE += ieee802154
 endif
