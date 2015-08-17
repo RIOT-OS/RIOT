@@ -40,27 +40,32 @@ void cpu_init(void)
 
 static inline void modem_clock_init(void)
 {
-    SIM->SCGC5 |= (SIM_SCGC5_PORTC_MASK);
-    SIM->SCGC5 |= (SIM_SCGC5_PORTB_MASK);
     /* Use the CLK_OUT of the modem as the clock source. */
+
+    /* Enable GPIO clock gates */
+    KW2XDRF_PORT_CLKEN();
+    KW2XDRF_CLK_CTRL_CLKEN();
+
     /* Modem RST_B is connected to PTB19 and can be used to reset the modem. */
-    PORTB->PCR[19] = PORT_PCR_MUX(1);
-    GPIOB->PDDR |= (1 << 19);
-    GPIOB->PCOR |= (1 << 19);
+    KW2XDRF_PORT_DEV->PCR[KW2XDRF_RST_PIN] = PORT_PCR_MUX(1);
+    BITBAND_REG32(KW2XDRF_GPIO->PDDR, KW2XDRF_RST_PIN) = 1;
+    KW2XDRF_GPIO->PCOR = (1 << KW2XDRF_RST_PIN);
+
     /* Modem GPIO5 is connected to PTC0 and can be used to select CLK_OUT frequency, */
     /* set PTC0 high for CLK_OUT=32.787kHz and low for CLK_OUT=4MHz. */
-    PORTC->PCR[0] = PORT_PCR_MUX(1);
-    GPIOC->PDDR |= (1 << 0);
-    GPIOC->PCOR |= (1 << 0);
+    KW2XDRF_CLK_CTRL_PORT_DEV->PCR[KW2XDRF_CLK_CTRL_PIN] = PORT_PCR_MUX(1);
+    BITBAND_REG32(KW2XDRF_CLK_CTRL_GPIO->PDDR, KW2XDRF_CLK_CTRL_PIN) = 1;
+    KW2XDRF_CLK_CTRL_GPIO->PCOR = (1 << KW2XDRF_CLK_CTRL_PIN);
+
     /* Modem IRQ_B is connected to PTB3, modem interrupt request to the MCU. */
-    PORTB->PCR[KW2XDRF_IRQ_PIN] = PORT_PCR_MUX(1);
-    GPIOB->PDDR &= ~(1 << KW2XDRF_IRQ_PIN);
+    KW2XDRF_PORT_DEV->PCR[KW2XDRF_IRQ_PIN] = PORT_PCR_MUX(1);
+    BITBAND_REG32(KW2XDRF_GPIO->PDDR, KW2XDRF_IRQ_PIN) = 0;
 
     /* release the reset */
-    GPIOB->PSOR |= (1 << 19);
+    KW2XDRF_GPIO->PSOR = (1 << KW2XDRF_RST_PIN);
 
     /* wait for modem IRQ_B interrupt request */
-    while (GPIOB->PDIR & (1 << KW2XDRF_IRQ_PIN));
+    while (KW2XDRF_GPIO->PDIR & (1 << KW2XDRF_IRQ_PIN));
 }
 
 /**

@@ -66,15 +66,15 @@ extern "C"
  * @name Macros for controlling the on-board LEDs.
  * @{
  */
-#define LED_B_ON            (LED_B_GPIO->PCOR |= (1 << LED_B_PIN))
-#define LED_B_OFF           (LED_B_GPIO->PSOR |= (1 << LED_B_PIN))
-#define LED_B_TOGGLE        (LED_B_GPIO->PTOR |= (1 << LED_B_PIN))
-#define LED_G_ON            (LED_G_GPIO->PCOR |= (1 << LED_G_PIN))
-#define LED_G_OFF           (LED_G_GPIO->PSOR |= (1 << LED_G_PIN))
-#define LED_G_TOGGLE        (LED_G_GPIO->PTOR |= (1 << LED_G_PIN))
-#define LED_R_ON            (LED_R_GPIO->PCOR |= (1 << LED_R_PIN))
-#define LED_R_OFF           (LED_R_GPIO->PSOR |= (1 << LED_R_PIN))
-#define LED_R_TOGGLE        (LED_R_GPIO->PTOR |= (1 << LED_R_PIN))
+#define LED_B_ON            (LED_B_GPIO->PCOR = (1 << LED_B_PIN))
+#define LED_B_OFF           (LED_B_GPIO->PSOR = (1 << LED_B_PIN))
+#define LED_B_TOGGLE        (LED_B_GPIO->PTOR = (1 << LED_B_PIN))
+#define LED_G_ON            (LED_G_GPIO->PCOR = (1 << LED_G_PIN))
+#define LED_G_OFF           (LED_G_GPIO->PSOR = (1 << LED_G_PIN))
+#define LED_G_TOGGLE        (LED_G_GPIO->PTOR = (1 << LED_G_PIN))
+#define LED_R_ON            (LED_R_GPIO->PCOR = (1 << LED_R_PIN))
+#define LED_R_OFF           (LED_R_GPIO->PSOR = (1 << LED_R_PIN))
+#define LED_R_TOGGLE        (LED_R_GPIO->PTOR = (1 << LED_R_PIN))
 
 /* for compatability to other boards */
 #define LED_GREEN_ON        LED_G_ON
@@ -90,8 +90,8 @@ extern "C"
 @{
 */
 #define KW2XRF_SPI        (SPI_1)
-#define KW2XRF_CS         (GPIO_24)
-#define KW2XRF_INT        (GPIO_23)
+#define KW2XRF_CS         (GPIO_PIN(KW2XDRF_PORT, KW2XDRF_PCS0_PIN))
+#define KW2XRF_INT        (GPIO_PIN(KW2XDRF_PORT, KW2XDRF_IRQ_PIN))
 #define KW2XRF_SPI_SPEED  (SPI_SPEED_10MHZ)
 #define KW2XRF_SHARED_SPI 0
 /** @}*/

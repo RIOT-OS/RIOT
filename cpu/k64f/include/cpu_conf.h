@@ -56,6 +56,30 @@ extern "C"
  */
 #define CPUID_ID_PTR                     ((void *)(&(SIM_UIDH)))
 
+/**
+ * @name GPIO pin mux function numbers
+ */
+/** @{ */
+#define PIN_MUX_FUNCTION_ANALOG 0
+#define PIN_MUX_FUNCTION_GPIO 1
+/** @} */
+/**
+ * @name GPIO interrupt flank settings
+ */
+/** @{ */
+#define PIN_INTERRUPT_RISING 0b1001
+#define PIN_INTERRUPT_FALLING 0b1010
+#define PIN_INTERRUPT_EDGE 0b1011
+/** @} */
+
+/** @name PORT module clock gates */
+/** @{ */
+#define PORTA_CLOCK_GATE (BITBAND_REG32(SIM->SCGC5, SIM_SCGC5_PORTA_SHIFT))
+#define PORTB_CLOCK_GATE (BITBAND_REG32(SIM->SCGC5, SIM_SCGC5_PORTB_SHIFT))
+#define PORTC_CLOCK_GATE (BITBAND_REG32(SIM->SCGC5, SIM_SCGC5_PORTC_SHIFT))
+#define PORTD_CLOCK_GATE (BITBAND_REG32(SIM->SCGC5, SIM_SCGC5_PORTD_SHIFT))
+#define PORTE_CLOCK_GATE (BITBAND_REG32(SIM->SCGC5, SIM_SCGC5_PORTE_SHIFT))
+/** @} */
 
 /**
  * @brief MCU specific Low Power Timer settings.
