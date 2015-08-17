@@ -54,10 +54,10 @@ extern "C" {
 /**
  * @brief   Default protocol for data that is coming in
  */
-#ifdef MODULE_NG_SIXLOWPAN
-#define XBEE_DEFAULT_PROTOCOL       (NG_NETTYPE_SIXLOWPAN)
+#ifdef MODULE_GNRC_SIXLOWPAN
+#define XBEE_DEFAULT_PROTOCOL       (GNRC_NETTYPE_SIXLOWPAN)
 #else
-#define XBEE_DEFAULT_PROTOCOL       (NG_NETTYPE_UNDEF)
+#define XBEE_DEFAULT_PROTOCOL       (GNRC_NETTYPE_UNDEF)
 #endif
 
 /**
@@ -108,14 +108,14 @@ typedef enum {
  */
 typedef struct {
     /* netdev fields */
-    ng_netdev_driver_t const *driver;   /**< pointer to the devices interface */
-    ng_netdev_event_cb_t event_cb;      /**< netdev event callback */
+    gnrc_netdev_driver_t const *driver; /**< pointer to the devices interface */
+    gnrc_netdev_event_cb_t event_cb;    /**< netdev event callback */
     kernel_pid_t mac_pid;               /**< the driver's thread's PID */
     /* device driver specific fields */
     uart_t uart;                        /**< UART interfaced used */
     gpio_t reset_pin;                   /**< GPIO pin connected to RESET */
     gpio_t sleep_pin;                   /**< GPIO pin connected to SLEEP */
-    ng_nettype_t proto;                 /**< protocol the interface speaks */
+    gnrc_nettype_t proto;               /**< protocol the interface speaks */
     uint8_t options;                    /**< options field */
     uint8_t addr_flags;                 /**< address flags as defined above */
     uint8_t addr_short[2];              /**< onw 802.15.4 short address */
@@ -145,7 +145,7 @@ typedef struct {
 /**
  * @brief   Reference to the XBee driver interface
  */
-extern const ng_netdev_driver_t xbee_driver;
+extern const gnrc_netdev_driver_t xbee_driver;
 
 /**
  * @brief   Initialize the given Xbee device

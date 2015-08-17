@@ -52,32 +52,32 @@
 #include "periph/rtc.h"
 #endif
 
-#ifdef MODULE_NG_SIXLOWPAN
-#include "net/ng_sixlowpan.h"
+#ifdef MODULE_GNRC_SIXLOWPAN
+#include "net/gnrc/sixlowpan.h"
 #endif
 
-#ifdef MODULE_NG_IPV6
-#include "net/ng_ipv6.h"
+#ifdef MODULE_GNRC_IPV6
+#include "net/gnrc/ipv6.h"
 #endif
 
-#ifdef MODULE_NG_IPV6_NETIF
-#include "net/ng_ipv6/netif.h"
+#ifdef MODULE_GNRC_IPV6_NETIF
+#include "net/gnrc/ipv6/netif.h"
 #endif
 
 #ifdef MODULE_L2_PING
 #include "l2_ping.h"
 #endif
 
-#ifdef MODULE_NG_PKTBUF
-#include "net/ng_pktbuf.h"
+#ifdef MODULE_GNRC_PKTBUF
+#include "net/gnrc/pktbuf.h"
 #endif
 
-#ifdef MODULE_NG_PKTDUMP
-#include "net/ng_pktdump.h"
+#ifdef MODULE_GNRC_PKTDUMP
+#include "net/gnrc/pktdump.h"
 #endif
 
-#ifdef MODULE_NG_UDP
-#include "net/ng_udp.h"
+#ifdef MODULE_GNRC_UDP
+#include "net/gnrc/udp.h"
 #endif
 
 #ifdef MODULE_DEV_ETH_AUTOINIT
@@ -133,25 +133,25 @@ void auto_init(void)
     extern void profiling_init(void);
     profiling_init();
 #endif
-#ifdef MODULE_NG_PKTBUF
-    DEBUG("Auto init ng_pktbuf module\n");
-    ng_pktbuf_init();
+#ifdef MODULE_GNRC_PKTBUF
+    DEBUG("Auto init gnrc_pktbuf module\n");
+    gnrc_pktbuf_init();
 #endif
-#ifdef MODULE_NG_PKTDUMP
-    DEBUG("Auto init ng_pktdump module.\n");
-    ng_pktdump_init();
+#ifdef MODULE_GNRC_PKTDUMP
+    DEBUG("Auto init gnrc_pktdump module.\n");
+    gnrc_pktdump_init();
 #endif
-#ifdef MODULE_NG_SIXLOWPAN
-    DEBUG("Auto init ng_sixlowpan module.\n");
-    ng_sixlowpan_init();
+#ifdef MODULE_GNRC_SIXLOWPAN
+    DEBUG("Auto init gnrc_sixlowpan module.\n");
+    gnrc_sixlowpan_init();
 #endif
-#ifdef MODULE_NG_IPV6
-    DEBUG("Auto init ng_ipv6 module.\n");
-    ng_ipv6_init();
+#ifdef MODULE_GNRC_IPV6
+    DEBUG("Auto init gnrc_ipv6 module.\n");
+    gnrc_ipv6_init();
 #endif
-#ifdef MODULE_NG_UDP
+#ifdef MODULE_GNRC_UDP
     DEBUG("Auto init UDP module.\n");
-    ng_udp_init();
+    gnrc_udp_init();
 #endif
 #ifdef MODULE_FIB
     DEBUG("Auto init FIB module.\n");
@@ -177,14 +177,14 @@ void auto_init(void)
     auto_init_kw2xrf();
 #endif
 
-#ifdef MODULE_NG_NETDEV_ETH
+#ifdef MODULE_GNRC_NETDEV_ETH
     extern void auto_init_ng_netdev_eth(void);
     auto_init_ng_netdev_eth();
 #endif
 
 #endif /* MODULE_AUTO_INIT_NG_NETIF */
 
-#ifdef MODULE_NG_IPV6_NETIF
-    ng_ipv6_netif_init_by_dev();
+#ifdef MODULE_GNRC_IPV6_NETIF
+    gnrc_ipv6_netif_init_by_dev();
 #endif
 }

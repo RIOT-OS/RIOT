@@ -1,1 +1,1 @@
-USEMODULE += ng_pktbuf_static
+USEMODULE += gnrc_pktbuf_static

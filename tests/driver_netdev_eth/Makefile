@@ -5,9 +5,9 @@ BOARD_WHITELIST := native
 
 USEMODULE += dev_eth_tap
 USEMODULE += gnrc
-USEMODULE += ng_nomac
-USEMODULE += ng_pktdump
-USEMODULE += ng_netdev_eth
+USEMODULE += gnrc_nomac
+USEMODULE += gnrc_pktdump
+USEMODULE += gnrc_netdev_eth
 USEMODULE += auto_init_ng_netif
 USEMODULE += shell
 USEMODULE += shell_commands

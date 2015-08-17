@@ -109,14 +109,14 @@ static int _recv(dev_eth_t *dev_eth, char *buf, int len) {
     dev_eth_tap_t *dev = (dev_eth_tap_t*)dev_eth;
 
     int nread = real_read(dev->tap_fd, buf, len);
-    DEBUG("ng_tapnet: read %d bytes\n", nread);
+    DEBUG("gnrc_tapnet: read %d bytes\n", nread);
 
     if (nread > 0) {
         ethernet_hdr_t *hdr = (ethernet_hdr_t *)buf;
         if (!(dev->promiscous) && !_is_addr_multicast(hdr->dst) &&
             !_is_addr_broadcast(hdr->dst) &&
             (memcmp(hdr->dst, dev->addr, ETHERNET_ADDR_LEN) != 0)) {
-            DEBUG("ng_eth_dev: received for %02x:%02x:%02x:%02x:%02x:%02x\n"
+            DEBUG("gnrc_eth_dev: received for %02x:%02x:%02x:%02x:%02x:%02x\n"
                   "That's not me => Dropped\n",
                   hdr->dst[0], hdr->dst[1], hdr->dst[2],
                   hdr->dst[3], hdr->dst[4], hdr->dst[5]);
@@ -255,7 +255,7 @@ static int _init(dev_eth_t *ethdev)
     /* change mac addr so it differs from what the host is using */
     dev->addr[5]++;
 #endif
-    DEBUG("ng_tapnet_init(): dev->addr = %02x:%02x:%02x:%02x:%02x:%02x\n",
+    DEBUG("gnrc_tapnet_init(): dev->addr = %02x:%02x:%02x:%02x:%02x:%02x\n",
             dev->addr[0], dev->addr[1], dev->addr[2],
             dev->addr[3], dev->addr[4], dev->addr[5]);
     /* configure signal handler for fds */
@@ -267,14 +267,14 @@ static int _init(dev_eth_t *ethdev)
 #else
     /* configure fds to send signals on io */
     if (fcntl(dev->tap_fd, F_SETOWN, _native_pid) == -1) {
-        err(EXIT_FAILURE, "ng_tapnet_init(): fcntl(F_SETOWN)");
+        err(EXIT_FAILURE, "gnrc_tapnet_init(): fcntl(F_SETOWN)");
     }
     /* set file access mode to non-blocking */
     if (fcntl(dev->tap_fd, F_SETFL, O_NONBLOCK | O_ASYNC) == -1) {
-        err(EXIT_FAILURE, "ng_tabnet_init(): fcntl(F_SETFL)");
+        err(EXIT_FAILURE, "gnrc_tabnet_init(): fcntl(F_SETFL)");
     }
 #endif /* not OSX */
-    DEBUG("ng_tapnet: initialized.\n");
+    DEBUG("gnrc_tapnet: initialized.\n");
     return 0;
 }
 
@@ -298,7 +298,7 @@ static void _cleanup(dev_eth_t *ethdev)
 }
 
 #ifdef __MACH__
-static void _sigio_child(ng_tapnet_t *dev)
+static void _sigio_child(gnrc_tapnet_t *dev)
 {
     pid_t parent = _native_pid;
     if ((_sigio_child_pid = real_fork()) == -1) {

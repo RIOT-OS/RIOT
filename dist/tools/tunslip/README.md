@@ -1,7 +1,7 @@
 Creating a SLIP network interface
 =================================
 
-The module `ng_slip` (Serial line IP) enables the RIOT network stack to
+The module `gnrc_slip` (Serial line IP) enables the RIOT network stack to
 communicate IP packets over the serial interface. This collection of tools
 originally from Contiki [1] enables Linux to interpret this data. Though there
 is a tool for such operations on Linux (`slattach`) it is only able to handle

@@ -24,7 +24,7 @@
 
 #include "kernel.h"
 #include "kw2xrf.h"
-#include "net/ng_nomac.h"
+#include "net/gnrc/nomac.h"
 #include "net/gnrc.h"
 
 /* make sure the SPI port and the needed GPIO pins are defined */
@@ -76,8 +76,8 @@ void auto_init_ng_netif(void)
 
     /* start MAC layer */
     puts("Starting the NOMAC layer on top of the driver");
-    iface = ng_nomac_init(nomac_stack, sizeof(nomac_stack), PRIO, "kw2xrf",
-                          (ng_netdev_t *)(&dev));
+    iface = gnrc_nomac_init(nomac_stack, sizeof(nomac_stack), PRIO, "kw2xrf",
+                            (gnrc_netdev_t *)(&dev));
     if (iface <= KERNEL_PID_UNDEF) {
         puts("Error initializing MAC layer");
         return;

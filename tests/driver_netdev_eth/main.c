@@ -27,9 +27,9 @@
 #include "shell.h"
 #include "shell_commands.h"
 #include "net/gnrc.h"
-#include "net/ng_nomac.h"
-#include "net/ng_pktdump.h"
-#include "net/ng_netdev_eth.h"
+#include "net/gnrc/nomac.h"
+#include "net/gnrc/pktdump.h"
+#include "net/gnrc/netdev_eth.h"
 #include "net/dev_eth.h"
 #include "dev_eth_tap.h"
 
@@ -44,20 +44,20 @@
 int main(void)
 {
     shell_t shell;
-    ng_netreg_entry_t dump;
+    gnrc_netreg_entry_t dump;
 
     puts("netdev ethernet device driver test");
 
     /* initialize and register pktdump */
-    dump.pid = ng_pktdump_init();
-    dump.demux_ctx = NG_NETREG_DEMUX_CTX_ALL;
+    dump.pid = gnrc_pktdump_init();
+    dump.demux_ctx = GNRC_NETREG_DEMUX_CTX_ALL;
 
     if (dump.pid <= KERNEL_PID_UNDEF) {
         puts("Error starting pktdump thread");
         return -1;
     }
 
-    ng_netreg_register(NG_NETTYPE_UNDEF, &dump);
+    gnrc_netreg_register(GNRC_NETTYPE_UNDEF, &dump);
 
     /* start the shell */
     shell_init(&shell, NULL, SHELL_BUFSIZE, getchar, putchar);

@@ -134,10 +134,10 @@ include $(RIOTBOARD)/$(BOARD)/Makefile.include
 include $(RIOTCPU)/$(CPU)/Makefile.include
 
 # get number of interfaces straight before resolving dependencies
-NG_NETIF_NUMOF ?= 1
+GNRC_NETIF_NUMOF ?= 1
 
-ifneq ($(NG_NETIF_NUMOF),1)
-  CFLAGS += -DNG_NETIF_NUMOF=$(NG_NETIF_NUMOF)
+ifneq ($(GNRC_NETIF_NUMOF),1)
+  CFLAGS += -DGNRC_NETIF_NUMOF=$(GNRC_NETIF_NUMOF)
 endif
 
 include $(RIOTBASE)/Makefile.dep

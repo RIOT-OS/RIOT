@@ -62,9 +62,9 @@ endif
 endif # USE_BOARD_PARAMETERS=false
 
 USEMODULE += auto_init_ng_netif
-USEMODULE += ng_netif
-USEMODULE += ng_nomac
-USEMODULE += ng_pktdump
+USEMODULE += gnrc_netif
+USEMODULE += gnrc_nomac
+USEMODULE += gnrc_pktdump
 USEMODULE += uart0
 USEMODULE += shell
 USEMODULE += shell_commands

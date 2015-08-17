@@ -20,7 +20,7 @@
 #ifdef MODULE_AT86RF2XX
 
 #include "board.h"
-#include "net/ng_nomac.h"
+#include "net/gnrc/nomac.h"
 #include "net/gnrc.h"
 
 #include "at86rf2xx.h"
@@ -58,9 +58,9 @@ void auto_init_at86rf2xx(void)
             DEBUG("Error initializing AT86RF2xx radio device!");
         }
         else {
-            ng_nomac_init(_nomac_stacks[i],
-                          AT86RF2XX_MAC_STACKSIZE, AT86RF2XX_MAC_PRIO,
-                          "at86rfxx", (ng_netdev_t *)&at86rf2xx_devs[i]);
+            gnrc_nomac_init(_nomac_stacks[i],
+                            AT86RF2XX_MAC_STACKSIZE, AT86RF2XX_MAC_PRIO,
+                            "at86rfxx", (gnrc_netdev_t *)&at86rf2xx_devs[i]);
         }
     }
 }

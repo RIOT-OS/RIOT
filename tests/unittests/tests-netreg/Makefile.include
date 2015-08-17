@@ -1,1 +1,1 @@
-USEMODULE += ng_netreg
+USEMODULE += gnrc_netreg

@@ -18,13 +18,13 @@
  * @author  Oliver Hahm <oliver.hahm@inria.fr>
  */
 
-#ifdef MODULE_NG_NETDEV_ETH
+#ifdef MODULE_GNRC_NETDEV_ETH
 
 #include "board.h"
-#include "net/ng_nomac.h"
+#include "net/gnrc/nomac.h"
 #include "net/gnrc.h"
 
-#include "net/ng_netdev_eth.h"
+#include "net/gnrc/netdev_eth.h"
 #include "net/dev_eth.h"
 #include "dev_eth_tap.h"
 
@@ -43,18 +43,18 @@ static char _nomac_stack[NETDEV_ETH_MAC_STACKSIZE];
 void auto_init_ng_netdev_eth(void)
 {
     DEBUG("Initializing NETDEV_ETH device\n");
-    int res = ng_netdev_eth_init(&ng_netdev_eth, (dev_eth_t*)&dev_eth_tap);
+    int res = gnrc_netdev_eth_init(&gnrc_netdev_eth, (dev_eth_t*)&dev_eth_tap);
 
     if (res < 0) {
         DEBUG("Error initializing NETDEV_ETH device!");
     }
     else {
-        ng_nomac_init(_nomac_stack, NETDEV_ETH_MAC_STACKSIZE, NETDEV_ETH_MAC_PRIO,
-                "tapnet", (ng_netdev_t *)&ng_netdev_eth);
+        gnrc_nomac_init(_nomac_stack, NETDEV_ETH_MAC_STACKSIZE, NETDEV_ETH_MAC_PRIO,
+                        "tapnet", (gnrc_netdev_t *)&gnrc_netdev_eth);
     }
 }
 #else
 typedef int dont_be_pedantic;
-#endif /* MODULE_NG_NETDEV_ETH */
+#endif /* MODULE_GNRC_NETDEV_ETH */
 
 /** @} */

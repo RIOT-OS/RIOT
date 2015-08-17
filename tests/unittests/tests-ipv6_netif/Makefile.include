@@ -1,5 +1,5 @@
 USEMODULE += ipv6_addr
-USEMODULE += ng_ipv6_netif
-USEMODULE += ng_netif
+USEMODULE += gnrc_ipv6_netif
+USEMODULE += gnrc_netif
 
-CFLAGS += -DNG_NETIF_NUMOF=3
+CFLAGS += -DGNRC_NETIF_NUMOF=3

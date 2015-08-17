@@ -9,7 +9,7 @@ USEMODULE += ps
 USEMODULE += uart0
 USEMODULE += radio_nrfmin
 USEMODULE += gnrc
-USEMODULE += ng_nomac
-USEMODULE += ng_pktdump
+USEMODULE += gnrc_nomac
+USEMODULE += gnrc_pktdump
 
 include $(RIOTBASE)/Makefile.include

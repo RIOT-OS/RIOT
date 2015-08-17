@@ -2,16 +2,8 @@ ifneq (,$(filter gnrc_%,$(filter-out gnrc_netapi gnrc_netreg gnrc_netif% gnrc_pk
   USEMODULE += gnrc
 endif
 
-ifneq (,$(filter ng_netif_default,$(USEMODULE)))
-  USEMODULE += ng_netif
-endif
-
-ifneq (,$(filter ng_netif,$(USEMODULE)))
-  USEMODULE += gnrc
-endif
-
-ifneq (,$(filter ng_nomac,$(USEMODULE)))
-  USEMODULE += gnrc
+ifneq (,$(filter gnrc_netif_default,$(USEMODULE)))
+  USEMODULE += gnrc_netif
 endif
 
 ifneq (,$(filter at86rf2%,$(USEMODULE)))
@@ -27,100 +19,97 @@ ifneq (,$(filter xbee,$(USEMODULE)))
   USEMODULE += ieee802154
 endif
 
-ifneq (,$(filter ng_zep,$(USEMODULE)))
+ifneq (,$(filter gnrc_zep,$(USEMODULE)))
   USEMODULE += hashes
   USEMODULE += ieee802154
-  USEMODULE += ng_udp
+  USEMODULE += gnrc_udp
   USEMODULE += random
   USEMODULE += vtimer
 endif
 
-ifneq (,$(filter ng_rpl,$(USEMODULE)))
+ifneq (,$(filter gnrc_rpl,$(USEMODULE)))
   USEMODULE += fib
-  USEMODULE += gnrc
-  USEMODULE += ng_ipv6_router_default
+  USEMODULE += gnrc_ipv6_router_default
   USEMODULE += trickle
   USEMODULE += vtimer
 endif
 
 ifneq (,$(filter ieee802154,$(USEMODULE)))
-  ifneq (,$(filter ng_ipv6, $(USEMODULE)))
-    USEMODULE += ng_sixlowpan
+  ifneq (,$(filter gnrc_ipv6, $(USEMODULE)))
+    USEMODULE += gnrc_sixlowpan
   endif
-  ifneq (,$(filter ng_ipv6_router, $(USEMODULE)))
-    USEMODULE += ng_sixlowpan   # TODO: replace with ng_sixlowpan_router
+  ifneq (,$(filter gnrc_ipv6_router, $(USEMODULE)))
+    USEMODULE += gnrc_sixlowpan   # TODO: replace with gnrc_sixlowpan_router
   endif
-  ifneq (,$(filter ng_ipv6_default, $(USEMODULE)))
-    USEMODULE += ng_sixlowpan_default
+  ifneq (,$(filter gnrc_ipv6_default, $(USEMODULE)))
+    USEMODULE += gnrc_sixlowpan_default
   endif
-  ifneq (,$(filter ng_ipv6_router_default, $(USEMODULE)))
-    USEMODULE += ng_sixlowpan_default   # TODO: replace with ng_sixlowpan_router_default
+  ifneq (,$(filter gnrc_ipv6_router_default, $(USEMODULE)))
+    USEMODULE += gnrc_sixlowpan_default   # TODO: replace with gnrc_sixlowpan_router_default
   endif
 endif
 
-ifneq (,$(filter ng_sixlowpan_default,$(USEMODULE)))
-  USEMODULE += ng_ipv6_default
-  USEMODULE += ng_sixlowpan
-  USEMODULE += ng_sixlowpan_frag
-  USEMODULE += ng_sixlowpan_iphc
+ifneq (,$(filter gnrc_sixlowpan_default,$(USEMODULE)))
+  USEMODULE += gnrc_ipv6_default
+  USEMODULE += gnrc_sixlowpan
+  USEMODULE += gnrc_sixlowpan_frag
+  USEMODULE += gnrc_sixlowpan_iphc
 endif
 
-ifneq (,$(filter ng_sixlowpan_frag,$(USEMODULE)))
-  USEMODULE += ng_sixlowpan
+ifneq (,$(filter gnrc_sixlowpan_frag,$(USEMODULE)))
+  USEMODULE += gnrc_sixlowpan
   USEMODULE += vtimer
 endif
 
-ifneq (,$(filter ng_sixlowpan_iphc,$(USEMODULE)))
-  USEMODULE += ng_sixlowpan
-  USEMODULE += ng_sixlowpan_ctx
+ifneq (,$(filter gnrc_sixlowpan_iphc,$(USEMODULE)))
+  USEMODULE += gnrc_sixlowpan
+  USEMODULE += gnrc_sixlowpan_ctx
 endif
 
-ifneq (,$(filter ng_sixlowpan,$(USEMODULE)))
-  USEMODULE += ng_ipv6
-  USEMODULE += ng_sixlowpan_netif
-  USEMODULE += gnrc
+ifneq (,$(filter gnrc_sixlowpan,$(USEMODULE)))
+  USEMODULE += gnrc_ipv6
+  USEMODULE += gnrc_sixlowpan_netif
   USEMODULE += sixlowpan
 endif
 
-ifneq (,$(filter ng_sixlowpan_ctx,$(USEMODULE)))
+ifneq (,$(filter gnrc_sixlowpan_ctx,$(USEMODULE)))
   USEMODULE += ipv6_addr
   USEMODULE += vtimer
 endif
 
-ifneq (,$(filter ng_ipv6_default,$(USEMODULE)))
-  USEMODULE += ng_ipv6
-  USEMODULE += ng_icmpv6
-  USEMODULE += ng_ndp
-  USEMODULE += ng_ndp_internal
-  USEMODULE += ng_ndp_node
+ifneq (,$(filter gnrc_ipv6_default,$(USEMODULE)))
+  USEMODULE += gnrc_ipv6
+  USEMODULE += gnrc_icmpv6
+  USEMODULE += gnrc_ndp
+  USEMODULE += gnrc_ndp_internal
+  USEMODULE += gnrc_ndp_node
 endif
 
-ifneq (,$(filter ng_ipv6_router_default,$(USEMODULE)))
-  USEMODULE += ng_ipv6_router
-  USEMODULE += ng_icmpv6
-  USEMODULE += ng_ndp
-  USEMODULE += ng_ndp_internal
-  USEMODULE += ng_ndp_node
+ifneq (,$(filter gnrc_ipv6_router_default,$(USEMODULE)))
+  USEMODULE += gnrc_ipv6_router
+  USEMODULE += gnrc_icmpv6
+  USEMODULE += gnrc_ndp
+  USEMODULE += gnrc_ndp_internal
+  USEMODULE += gnrc_ndp_node
 endif
 
-ifneq (,$(filter ng_ndp,$(USEMODULE)))
-  USEMODULE += ng_icmpv6
+ifneq (,$(filter gnrc_ndp,$(USEMODULE)))
+  USEMODULE += gnrc_icmpv6
   USEMODULE += random
   USEMODULE += timex
   USEMODULE += vtimer
 endif
 
-ifneq (,$(filter ng_icmpv6_echo,$(USEMODULE)))
-  USEMODULE += ng_icmpv6
-  USEMODULE += gnrc
+ifneq (,$(filter gnrc_icmpv6_echo,$(USEMODULE)))
+  USEMODULE += gnrc_icmpv6
 endif
 
-ifneq (,$(filter ng_icmpv6,$(USEMODULE)))
+ifneq (,$(filter gnrc_icmpv6,$(USEMODULE)))
   USEMODULE += inet_csum
-  USEMODULE += ng_ipv6
+  USEMODULE += gnrc_ipv6
 endif
 
-ifneq (,$(filter ng_rpl_srh,$(USEMODULE)))
+ifneq (,$(filter gnrc_rpl_srh,$(USEMODULE)))
   USEMODULE += ipv6_ext_rh
 endif
 
@@ -128,27 +117,26 @@ ifneq (,$(filter ipv6_ext_rh,$(USEMODULE)))
   USEMODULE += ipv6_ext
 endif
 
-ifneq (,$(filter ng_ipv6_ext,$(USEMODULE)))
+ifneq (,$(filter gnrc_ipv6_ext,$(USEMODULE)))
   USEMODULE += ipv6_ext
-  USEMODULE += ng_ipv6
+  USEMODULE += gnrc_ipv6
 endif
 
-ifneq (,$(filter ng_ipv6_router,$(USEMODULE)))
-  USEMODULE += ng_ipv6
+ifneq (,$(filter gnrc_ipv6_router,$(USEMODULE)))
+  USEMODULE += gnrc_ipv6
 endif
 
-ifneq (,$(filter ng_ipv6,$(USEMODULE)))
+ifneq (,$(filter gnrc_ipv6,$(USEMODULE)))
   USEMODULE += inet_csum
   USEMODULE += ipv6_addr
-  USEMODULE += ng_ipv6_hdr
-  USEMODULE += ng_ipv6_nc
-  USEMODULE += ng_ipv6_netif
-  USEMODULE += gnrc
+  USEMODULE += gnrc_ipv6_hdr
+  USEMODULE += gnrc_ipv6_nc
+  USEMODULE += gnrc_ipv6_netif
 endif
 
-ifneq (,$(filter ng_ipv6_hdr,$(USEMODULE)))
+ifneq (,$(filter gnrc_ipv6_hdr,$(USEMODULE)))
   USEMODULE += ipv6_hdr
-  USEMODULE += ng_pktbuf
+  USEMODULE += gnrc_pktbuf
 endif
 
 ifneq (,$(filter sixlowpan,$(USEMODULE)))
@@ -159,55 +147,42 @@ ifneq (,$(filter ipv6_hdr,$(USEMODULE)))
   USEMODULE += inet_csum
 endif
 
-ifneq (,$(filter ng_ipv6_nc,$(USEMODULE)))
+ifneq (,$(filter gnrc_ipv6_nc,$(USEMODULE)))
   USEMODULE += ipv6_addr
 endif
 
-ifneq (,$(filter ng_ipv6_netif,$(USEMODULE)))
+ifneq (,$(filter gnrc_ipv6_netif,$(USEMODULE)))
   USEMODULE += ipv6_addr
-  USEMODULE += ng_netif
+  USEMODULE += gnrc_netif
   USEMODULE += bitfield
 endif
 
-ifneq (,$(filter ng_udp,$(USEMODULE)))
-  USEMODULE += gnrc
+ifneq (,$(filter gnrc_udp,$(USEMODULE)))
   USEMODULE += inet_csum
   USEMODULE += udp
 endif
 
-ifneq (,$(filter ng_nettest,$(USEMODULE)))
-  USEMODULE += ng_netapi
-  USEMODULE += ng_netreg
-  USEMODULE += ng_netif
-  USEMODULE += ng_pktbuf
+ifneq (,$(filter gnrc_nettest,$(USEMODULE)))
+  USEMODULE += gnrc_netapi
+  USEMODULE += gnrc_netreg
+  USEMODULE += gnrc_netif
+  USEMODULE += gnrc_pktbuf
   USEMODULE += vtimer
 endif
 
-ifneq (,$(filter gnrc,$(USEMODULE)))
-  USEMODULE += ng_netapi
-  USEMODULE += ng_netreg
-  USEMODULE += ng_netif
-  USEMODULE += ng_netif_hdr
-  USEMODULE += ng_pktbuf
-endif
-
-ifneq (,$(filter ng_pktdump,$(USEMODULE)))
-  USEMODULE += ng_pktbuf
+ifneq (,$(filter gnrc_pktdump,$(USEMODULE)))
+  USEMODULE += gnrc_pktbuf
   USEMODULE += od
 endif
 
-ifneq (,$(filter ng_pktbuf, $(USEMODULE)))
-  ifeq (,$(filter ng_pktbuf_%, $(USEMODULE)))
-    USEMODULE += ng_pktbuf_static
+ifneq (,$(filter gnrc_pktbuf, $(USEMODULE)))
+  ifeq (,$(filter gnrc_pktbuf_%, $(USEMODULE)))
+    USEMODULE += gnrc_pktbuf_static
   endif
 endif
 
-ifneq (,$(filter ng_pktbuf_%, $(USEMODULE)))
-  USEMODULE += ng_pktbuf # make MODULE_NG_PKTBUF macro available for all implementations
-endif
-
-ifneq (,$(filter ng_slip,$(USEMODULE)))
-  USEMODULE += gnrc
+ifneq (,$(filter gnrc_pktbuf_%, $(USEMODULE)))
+  USEMODULE += gnrc_pktbuf # make MODULE_GNRC_PKTBUF macro available for all implementations
 endif
 
 ifneq (,$(filter uart0,$(USEMODULE)))
@@ -268,8 +243,16 @@ ifneq (,$(filter newlib,$(USEMODULE)))
   USEMODULE += uart_stdio
 endif
 
-ifneq (,$(filter ng_netdev_eth,$(USEMODULE)))
-  USEMODULE += ng_pktbuf
+ifneq (,$(filter gnrc_netdev_eth,$(USEMODULE)))
+  USEMODULE += gnrc_pktbuf
+endif
+
+ifneq (,$(filter gnrc,$(USEMODULE)))
+  USEMODULE += gnrc_netapi
+  USEMODULE += gnrc_netreg
+  USEMODULE += gnrc_netif
+  USEMODULE += gnrc_netif_hdr
+  USEMODULE += gnrc_pktbuf
 endif
 
 ifneq (,$(filter hih6130,$(USEMODULE)))

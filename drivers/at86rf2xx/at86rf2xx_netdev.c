@@ -34,7 +34,7 @@
 
 /* TODO: generalize and move to (gnrc_)ieee802154 */
 static size_t _make_data_frame_hdr(at86rf2xx_t *dev, uint8_t *buf,
-                                   ng_netif_hdr_t *hdr)
+                                   gnrc_netif_hdr_t *hdr)
 {
     int pos = 0;
 
@@ -43,8 +43,8 @@ static size_t _make_data_frame_hdr(at86rf2xx_t *dev, uint8_t *buf,
     buf[1] = IEEE802154_FCF_VERS_V1;
 
     /* if AUTOACK is enabled, then we also expect ACKs for this packet */
-    if (!(hdr->flags & NG_NETIF_HDR_FLAGS_BROADCAST) &&
-        !(hdr->flags & NG_NETIF_HDR_FLAGS_MULTICAST) &&
+    if (!(hdr->flags & GNRC_NETIF_HDR_FLAGS_BROADCAST) &&
+        !(hdr->flags & GNRC_NETIF_HDR_FLAGS_MULTICAST) &&
         (dev->options & AT86RF2XX_OPT_AUTOACK)) {
         buf[0] |= IEEE802154_FCF_ACK_REQ;
     }
@@ -56,20 +56,20 @@ static size_t _make_data_frame_hdr(at86rf2xx_t *dev, uint8_t *buf,
 
     /* fill in destination address */
     if (hdr->flags &
-        (NG_NETIF_HDR_FLAGS_BROADCAST | NG_NETIF_HDR_FLAGS_MULTICAST)) {
+        (GNRC_NETIF_HDR_FLAGS_BROADCAST | GNRC_NETIF_HDR_FLAGS_MULTICAST)) {
         buf[1] |= IEEE802154_FCF_DST_ADDR_SHORT;
         buf[pos++] = 0xff;
         buf[pos++] = 0xff;
     }
     else if (hdr->dst_l2addr_len == 2) {
-        uint8_t *dst_addr = ng_netif_hdr_get_dst_addr(hdr);
+        uint8_t *dst_addr = gnrc_netif_hdr_get_dst_addr(hdr);
         buf[1] |= IEEE802154_FCF_DST_ADDR_SHORT;
         buf[pos++] = dst_addr[1];
         buf[pos++] = dst_addr[0];
     }
     else if (hdr->dst_l2addr_len == 8) {
         buf[1] |= IEEE802154_FCF_DST_ADDR_LONG;
-        uint8_t *dst_addr = ng_netif_hdr_get_dst_addr(hdr);
+        uint8_t *dst_addr = gnrc_netif_hdr_get_dst_addr(hdr);
         for (int i = 7;  i >= 0; i--) {
             buf[pos++] = dst_addr[i];
         }
@@ -142,13 +142,13 @@ static size_t _get_frame_hdr_len(uint8_t *mhr)
 }
 
 /* TODO: generalize and move to (gnrc_)ieee802154 */
-static ng_pktsnip_t *_make_netif_hdr(uint8_t *mhr)
+static gnrc_pktsnip_t *_make_netif_hdr(uint8_t *mhr)
 {
     uint8_t tmp;
     uint8_t *addr;
     uint8_t src_len, dst_len;
-    ng_pktsnip_t *snip;
-    ng_netif_hdr_t *hdr;
+    gnrc_pktsnip_t *snip;
+    gnrc_netif_hdr_t *hdr;
 
     /* figure out address sizes */
     tmp = mhr[1] & IEEE802154_FCF_SRC_ADDR_MASK;
@@ -178,17 +178,17 @@ static ng_pktsnip_t *_make_netif_hdr(uint8_t *mhr)
         return NULL;
     }
     /* allocate space for header */
-    snip = ng_pktbuf_add(NULL, NULL, sizeof(ng_netif_hdr_t) + src_len + dst_len,
-                         NG_NETTYPE_NETIF);
+    snip = gnrc_pktbuf_add(NULL, NULL, sizeof(gnrc_netif_hdr_t) + src_len + dst_len,
+                           GNRC_NETTYPE_NETIF);
     if (snip == NULL) {
         return NULL;
     }
     /* fill header */
-    hdr = (ng_netif_hdr_t *)snip->data;
-    ng_netif_hdr_init(hdr, src_len, dst_len);
+    hdr = (gnrc_netif_hdr_t *)snip->data;
+    gnrc_netif_hdr_init(hdr, src_len, dst_len);
     if (dst_len > 0) {
         tmp = 5 + dst_len;
-        addr = ng_netif_hdr_get_dst_addr(hdr);
+        addr = gnrc_netif_hdr_get_dst_addr(hdr);
         for (int i = 0; i < dst_len; i++) {
             addr[i] = mhr[5 + (dst_len - i) - 1];
         }
@@ -200,7 +200,7 @@ static ng_pktsnip_t *_make_netif_hdr(uint8_t *mhr)
         tmp += 2;
     }
     if (src_len > 0) {
-        addr = ng_netif_hdr_get_src_addr(hdr);
+        addr = gnrc_netif_hdr_get_src_addr(hdr);
         for (int i = 0; i < src_len; i++) {
             addr[i] = mhr[tmp + (src_len - i) - 1];
         }
@@ -209,10 +209,10 @@ static ng_pktsnip_t *_make_netif_hdr(uint8_t *mhr)
 }
 
 
-static int _send(ng_netdev_t *netdev, ng_pktsnip_t *pkt)
+static int _send(gnrc_netdev_t *netdev, gnrc_pktsnip_t *pkt)
 {
     at86rf2xx_t *dev = (at86rf2xx_t *)netdev;
-    ng_pktsnip_t *snip;
+    gnrc_pktsnip_t *snip;
     uint8_t mhr[IEEE802154_MAX_HDR_LEN];
     size_t len;
 
@@ -220,23 +220,23 @@ static int _send(ng_netdev_t *netdev, ng_pktsnip_t *pkt)
         return -ENOMSG;
     }
     if (dev == NULL) {
-        ng_pktbuf_release(pkt);
+        gnrc_pktbuf_release(pkt);
         return -ENODEV;
     }
 
     /* create 802.15.4 header */
-    len = _make_data_frame_hdr(dev, mhr, (ng_netif_hdr_t *)pkt->data);
+    len = _make_data_frame_hdr(dev, mhr, (gnrc_netif_hdr_t *)pkt->data);
     if (len == 0) {
         DEBUG("[at86rf2xx] error: unable to create 802.15.4 header\n");
-        ng_pktbuf_release(pkt);
+        gnrc_pktbuf_release(pkt);
         return -ENOMSG;
     }
     /* check if packet (header + payload + FCS) fits into FIFO */
     snip = pkt->next;
-    if ((ng_pkt_len(snip) + len + 2) > AT86RF2XX_MAX_PKT_LENGTH) {
+    if ((gnrc_pkt_len(snip) + len + 2) > AT86RF2XX_MAX_PKT_LENGTH) {
         printf("[at86rf2xx] error: packet too large (%u byte) to be send\n",
-               ng_pkt_len(snip) + len + 2);
-        ng_pktbuf_release(pkt);
+               gnrc_pkt_len(snip) + len + 2);
+        gnrc_pktbuf_release(pkt);
         return -EOVERFLOW;
     }
 
@@ -253,7 +253,7 @@ static int _send(ng_netdev_t *netdev, ng_pktsnip_t *pkt)
         at86rf2xx_tx_exec(dev);
     }
     /* release packet */
-    ng_pktbuf_release(pkt);
+    gnrc_pktbuf_release(pkt);
     /* return the number of bytes that were actually send out */
     return (int)len;
 }
@@ -262,8 +262,8 @@ static void _receive_data(at86rf2xx_t *dev)
 {
     uint8_t mhr[IEEE802154_MAX_HDR_LEN];
     size_t pkt_len, hdr_len;
-    ng_pktsnip_t *hdr, *payload = NULL;
-    ng_netif_hdr_t *netif;
+    gnrc_pktsnip_t *hdr, *payload = NULL;
+    gnrc_netif_hdr_t *netif;
 
     /* get the size of the received packet (unlocks frame buffer protection) */
     pkt_len = at86rf2xx_rx_len(dev);
@@ -275,7 +275,7 @@ static void _receive_data(at86rf2xx_t *dev)
 
     /* in raw mode, just read the binary dump into the packet buffer */
     if (dev->options & AT86RF2XX_OPT_RAWDUMP) {
-        payload = ng_pktbuf_add(NULL, NULL, pkt_len, NG_NETTYPE_UNDEF);
+        payload = gnrc_pktbuf_add(NULL, NULL, pkt_len, GNRC_NETTYPE_UNDEF);
         if (payload == NULL ) {
             DEBUG("[at86rf2xx] error: unable to allocate RAW data\n");
             return;
@@ -300,16 +300,16 @@ static void _receive_data(at86rf2xx_t *dev)
         return;
     }
     /* fill missing fields in netif header */
-    netif = (ng_netif_hdr_t *)hdr->data;
+    netif = (gnrc_netif_hdr_t *)hdr->data;
     netif->if_pid = dev->mac_pid;
     at86rf2xx_rx_read(dev, &(netif->lqi), 1, pkt_len);
     netif->rssi = at86rf2xx_reg_read(dev, AT86RF2XX_REG__PHY_ED_LEVEL);
 
     /* allocate payload */
-    payload = ng_pktbuf_add(hdr, NULL, (pkt_len - hdr_len), dev->proto);
+    payload = gnrc_pktbuf_add(hdr, NULL, (pkt_len - hdr_len), dev->proto);
     if (payload == NULL) {
         DEBUG("[at86rf2xx] error: unable to allocate incoming payload\n");
-        ng_pktbuf_release(hdr);
+        gnrc_pktbuf_release(hdr);
         return;
     }
     /* copy payload */
@@ -357,7 +357,7 @@ netopt_state_t _get_state(at86rf2xx_t *dev)
     }
 }
 
-static int _get(ng_netdev_t *device, netopt_t opt, void *val, size_t max_len)
+static int _get(gnrc_netdev_t *device, netopt_t opt, void *val, size_t max_len)
 {
     if (device == NULL) {
         return -ENODEV;
@@ -421,11 +421,11 @@ static int _get(ng_netdev_t *device, netopt_t opt, void *val, size_t max_len)
             return sizeof(eui64_t);
 
         case NETOPT_PROTO:
-            if (max_len < sizeof(ng_nettype_t)) {
+            if (max_len < sizeof(gnrc_nettype_t)) {
                 return -EOVERFLOW;
             }
-            *((ng_nettype_t *)val) = dev->proto;
-            return sizeof(ng_nettype_t);
+            *((gnrc_nettype_t *)val) = dev->proto;
+            return sizeof(gnrc_nettype_t);
 
         case NETOPT_CHANNEL:
             if (max_len < sizeof(uint16_t)) {
@@ -535,7 +535,7 @@ static int _get(ng_netdev_t *device, netopt_t opt, void *val, size_t max_len)
     return 0;
 }
 
-static int _set(ng_netdev_t *device, netopt_t opt, void *val, size_t len)
+static int _set(gnrc_netdev_t *device, netopt_t opt, void *val, size_t len)
 {
     at86rf2xx_t *dev = (at86rf2xx_t *) device;
 
@@ -661,7 +661,7 @@ static int _set(ng_netdev_t *device, netopt_t opt, void *val, size_t len)
     return 0;
 }
 
-static int _add_event_cb(ng_netdev_t *dev, ng_netdev_event_cb_t cb)
+static int _add_event_cb(gnrc_netdev_t *dev, gnrc_netdev_event_cb_t cb)
 {
     if (dev == NULL) {
         return -ENODEV;
@@ -674,7 +674,7 @@ static int _add_event_cb(ng_netdev_t *dev, ng_netdev_event_cb_t cb)
     return 0;
 }
 
-static int _rem_event_cb(ng_netdev_t *dev, ng_netdev_event_cb_t cb)
+static int _rem_event_cb(gnrc_netdev_t *dev, gnrc_netdev_event_cb_t cb)
 {
     if (dev == NULL) {
         return -ENODEV;
@@ -687,7 +687,7 @@ static int _rem_event_cb(ng_netdev_t *dev, ng_netdev_event_cb_t cb)
     return 0;
 }
 
-static void _isr_event(ng_netdev_t *device, uint32_t event_type)
+static void _isr_event(gnrc_netdev_t *device, uint32_t event_type)
 {
     at86rf2xx_t *dev = (at86rf2xx_t *) device;
     uint8_t irq_mask;
@@ -720,7 +720,7 @@ static void _isr_event(ng_netdev_t *device, uint32_t event_type)
     }
 }
 
-const ng_netdev_driver_t at86rf2xx_driver = {
+const gnrc_netdev_driver_t at86rf2xx_driver = {
     .send_data = _send,
     .add_event_callback = _add_event_cb,
     .rem_event_callback = _rem_event_cb,
