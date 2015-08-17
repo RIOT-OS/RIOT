@@ -5,7 +5,10 @@ ifneq (,$(filter adt7310,$(USEMODULE)))
   USEMODULE += periph_spi
 endif
 
-ifneq (,$(filter at86rf231,$(USEMODULE)))
+
+ifneq (,$(filter at86rf2%,$(USEMODULE)))
+  USEMODULE += at86rf2xx
+  USEMODULE += ieee802154
   USEMODULE += periph_gpio
   USEMODULE += periph_spi
 endif
@@ -72,16 +75,6 @@ endif
 
 ifneq (,$(filter mq3,$(USEMODULE)))
   USEMODULE += periph_adc
-endif
-
-ifneq (,$(filter ng_at86rf2%,$(USEMODULE)))
-  USEMODULE += ng_at86rf2xx
-endif
-
-ifneq (,$(filter ng_at86rf2xx,$(USEMODULE)))
-  USEMODULE += periph_gpio
-  USEMODULE += periph_spi
-  USEMODULE += ng_ieee802154
 endif
 
 ifneq (,$(filter nrf24l01p,$(USEMODULE)))
