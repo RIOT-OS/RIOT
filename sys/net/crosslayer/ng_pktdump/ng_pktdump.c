@@ -30,8 +30,8 @@
 #include "net/gnrc.h"
 #include "net/ipv6/addr.h"
 #include "net/ipv6/hdr.h"
-#include "net/ng_sixlowpan.h"
 #include "net/udp.h"
+#include "net/sixlowpan.h"
 #include "od.h"
 
 /**
@@ -60,7 +60,7 @@ static void _dump_snip(ng_pktsnip_t *pkt)
 #ifdef MODULE_NG_SIXLOWPAN
         case NG_NETTYPE_SIXLOWPAN:
             printf("NETTYPE_SIXLOWPAN (%i)\n", pkt->type);
-            ng_sixlowpan_print(pkt->data, pkt->size);
+            sixlowpan_print(pkt->data, pkt->size);
             break;
 #endif
 #ifdef MODULE_NG_IPV6
