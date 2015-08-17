@@ -143,6 +143,8 @@ void ng_pktbuf_hold(ng_pktsnip_t *pkt, unsigned int num);
  * @brief   Decreases ng_pktsnip_t::users of @p pkt atomically and removes it if it
  *          reaches 0.
  *
+ * @pre All snips of @p pkt must be in the packet buffer.
+ *
  * @param[in] pkt   A packet.
  */
 void ng_pktbuf_release(ng_pktsnip_t *pkt);

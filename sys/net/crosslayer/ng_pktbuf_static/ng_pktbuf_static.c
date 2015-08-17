@@ -199,7 +199,9 @@ void ng_pktbuf_release(ng_pktsnip_t *pkt)
 {
     mutex_lock(&_mutex);
     while (pkt) {
-        ng_pktsnip_t *tmp = pkt->next;
+        ng_pktsnip_t *tmp;
+        assert(_pktbuf_contains(pkt));
+        tmp = pkt->next;
         if (pkt->users == 1) {
             pkt->users = 0; /* not necessary but to be on the safe side */
             _pktbuf_free(pkt->data, pkt->size);
