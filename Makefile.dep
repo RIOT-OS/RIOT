@@ -24,6 +24,9 @@ ifneq (,$(filter gnrc_zep,$(USEMODULE)))
   USEMODULE += gnrc_udp
   USEMODULE += random
   USEMODULE += vtimer
+  ifneq (,$(filter periph_cpuid,$(FEATURES_PROVIDED)))
+    USEMODULE += periph_cpuid
+  endif
 endif
 
 ifneq (,$(filter gnrc_rpl,$(USEMODULE)))
