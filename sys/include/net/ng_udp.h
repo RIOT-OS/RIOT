@@ -26,6 +26,7 @@
 
 #include "byteorder.h"
 #include "net/ng_netbase.h"
+#include "net/udp.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -51,17 +52,6 @@ extern "C" {
 #ifndef NG_UDP_STACK_SIZE
 #define NG_UDP_STACK_SIZE       (THREAD_STACKSIZE_DEFAULT)
 #endif
-
-/**
- * @brief   UDP header definition
- */
-typedef struct __attribute__((packed)) {
-    network_uint16_t src_port;      /**< source port, in network byte order */
-    network_uint16_t dst_port;      /**< destination port, network byte order */
-    network_uint16_t length;        /**< payload length (including the header),
-                                     *   network byte order */
-    network_uint16_t checksum;      /**< checksum */
-} ng_udp_hdr_t;
 
 /**
  * @brief   Calculate the checksum for the given packet
@@ -92,13 +82,6 @@ int ng_udp_calc_csum(ng_pktsnip_t *hdr, ng_pktsnip_t *pseudo_hdr);
 ng_pktsnip_t *ng_udp_hdr_build(ng_pktsnip_t *payload,
                                uint8_t *src, size_t src_len,
                                uint8_t *dst, size_t dst_len);
-
-/**
- * @brief   Print the given UDP header to STDOUT
- *
- * @param[in] hdr           UDP header to print
- */
-void ng_udp_hdr_print(ng_udp_hdr_t *hdr);
 
 /**
  * @brief   Initialize and start UDP

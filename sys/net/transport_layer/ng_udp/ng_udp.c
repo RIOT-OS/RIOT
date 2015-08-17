@@ -74,7 +74,7 @@ static uint16_t _calc_csum(ng_pktsnip_t *hdr, ng_pktsnip_t *pseudo_hdr,
         payload = payload->next;
     }
     /* process applicable UDP header bytes */
-    csum = inet_csum(csum, (uint8_t *)hdr->data, sizeof(ng_udp_hdr_t));
+    csum = inet_csum(csum, (uint8_t *)hdr->data, sizeof(udp_hdr_t));
 
     switch (pseudo_hdr->type) {
 #ifdef MODULE_NG_IPV6
@@ -93,7 +93,7 @@ static uint16_t _calc_csum(ng_pktsnip_t *hdr, ng_pktsnip_t *pseudo_hdr,
 static void _receive(ng_pktsnip_t *pkt)
 {
     ng_pktsnip_t *udp, *ipv6;
-    ng_udp_hdr_t *hdr;
+    udp_hdr_t *hdr;
     uint32_t port;
 
     /* mark UDP header */
@@ -104,7 +104,7 @@ static void _receive(ng_pktsnip_t *pkt)
         return;
     }
     pkt = udp;
-    udp = ng_pktbuf_mark(pkt, sizeof(ng_udp_hdr_t), NG_NETTYPE_UDP);
+    udp = ng_pktbuf_mark(pkt, sizeof(udp_hdr_t), NG_NETTYPE_UDP);
     if (udp == NULL) {
         DEBUG("udp: error marking UDP header, dropping packet\n");
         ng_pktbuf_release(pkt);
@@ -113,7 +113,7 @@ static void _receive(ng_pktsnip_t *pkt)
     /* mark payload as Type: UNDEF */
     pkt->type = NG_NETTYPE_UNDEF;
     /* get explicit pointer to UDP header */
-    hdr = (ng_udp_hdr_t *)udp->data;
+    hdr = (udp_hdr_t *)udp->data;
 
     LL_SEARCH_SCALAR(pkt, ipv6, type, NG_NETTYPE_IPV6);
 
@@ -138,7 +138,7 @@ static void _receive(ng_pktsnip_t *pkt)
 
 static void _send(ng_pktsnip_t *pkt)
 {
-    ng_udp_hdr_t *hdr;
+    udp_hdr_t *hdr;
     ng_pktsnip_t *udp_snip;
 
     /* get udp snip and hdr */
@@ -152,7 +152,7 @@ static void _send(ng_pktsnip_t *pkt)
         ng_pktbuf_release(pkt);
         return;
     }
-    hdr = (ng_udp_hdr_t *)udp_snip->data;
+    hdr = (udp_hdr_t *)udp_snip->data;
     /* fill in size field */
     hdr->length = byteorder_htons(ng_pkt_len(udp_snip));
 
@@ -221,7 +221,7 @@ int ng_udp_calc_csum(ng_pktsnip_t *hdr, ng_pktsnip_t *pseudo_hdr)
     if (csum == 0) {
         return -ENOENT;
     }
-    ((ng_udp_hdr_t *)hdr->data)->checksum = byteorder_htons(csum);
+    ((udp_hdr_t *)hdr->data)->checksum = byteorder_htons(csum);
     return 0;
 }
 
@@ -230,7 +230,7 @@ ng_pktsnip_t *ng_udp_hdr_build(ng_pktsnip_t *payload,
                                uint8_t *dst, size_t dst_len)
 {
     ng_pktsnip_t *res;
-    ng_udp_hdr_t *hdr;
+    udp_hdr_t *hdr;
 
     /* check parameters */
     if (src == NULL || dst == NULL ||
@@ -238,12 +238,12 @@ ng_pktsnip_t *ng_udp_hdr_build(ng_pktsnip_t *payload,
         return NULL;
     }
     /* allocate header */
-    res = ng_pktbuf_add(payload, NULL, sizeof(ng_udp_hdr_t), NG_NETTYPE_UDP);
+    res = ng_pktbuf_add(payload, NULL, sizeof(udp_hdr_t), NG_NETTYPE_UDP);
     if (res == NULL) {
         return NULL;
     }
     /* initialize header */
-    hdr = (ng_udp_hdr_t *)res->data;
+    hdr = (udp_hdr_t *)res->data;
     hdr->src_port = byteorder_htons(*((uint16_t *)src));
     hdr->dst_port = byteorder_htons(*((uint16_t *)dst));
     hdr->checksum = byteorder_htons(0);

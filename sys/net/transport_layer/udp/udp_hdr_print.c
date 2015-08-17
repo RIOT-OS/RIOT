@@ -21,9 +21,9 @@
 #include <stdio.h>
 #include <inttypes.h>
 
-#include "net/ng_udp.h"
+#include "net/udp.h"
 
-void ng_udp_hdr_print(ng_udp_hdr_t *hdr)
+void udp_hdr_print(udp_hdr_t *hdr)
 {
     printf("   src-port: %5" PRIu16 "  dst-port: %5" PRIu16 "\n",
            byteorder_ntohs(hdr->src_port), byteorder_ntohs(hdr->dst_port));
