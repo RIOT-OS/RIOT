@@ -218,17 +218,6 @@ int inISR(void)
     return _native_in_isr;
 }
 
-
-void dINT(void)
-{
-    disableIRQ();
-}
-
-void eINT(void)
-{
-    enableIRQ();
-}
-
 int _native_popsig(void)
 {
     int nread, nleft, i;
