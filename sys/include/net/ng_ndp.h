@@ -116,7 +116,7 @@ extern "C" {
  * @param[in] icmpv6_size   The overall size of the neighbor solicitation.
  */
 void ng_ndp_nbr_sol_handle(kernel_pid_t iface, ng_pktsnip_t *pkt,
-                           ng_ipv6_hdr_t *ipv6, ng_ndp_nbr_sol_t *nbr_sol,
+                           ipv6_hdr_t *ipv6, ng_ndp_nbr_sol_t *nbr_sol,
                            size_t icmpv6_size);
 
 /**
@@ -129,7 +129,7 @@ void ng_ndp_nbr_sol_handle(kernel_pid_t iface, ng_pktsnip_t *pkt,
  * @param[in] icmpv6_size   The overall size of the neighbor advertisement.
  */
 void ng_ndp_nbr_adv_handle(kernel_pid_t iface, ng_pktsnip_t *pkt,
-                           ng_ipv6_hdr_t *ipv6, ng_ndp_nbr_adv_t *nbr_adv,
+                           ipv6_hdr_t *ipv6, ng_ndp_nbr_adv_t *nbr_adv,
                            size_t icmpv6_size);
 
 /**

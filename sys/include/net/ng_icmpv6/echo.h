@@ -24,8 +24,8 @@
 
 #include "byteorder.h"
 #include "kernel_types.h"
+#include "net/ipv6/hdr.h"
 #include "net/ng_icmpv6/types.h"
-#include "net/ng_ipv6/hdr.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -115,10 +115,10 @@ static inline ng_pktsnip_t *ng_icmpv6_echo_rep_build(uint16_t id, uint16_t seq,
  * @param[in] iface     The interface the echo requuest was received on.
  * @param[in] ipv6_hdr  The IPv6 header of the echo request.
  * @param[in] echo      The Echo Request message.
- * @param[in] len       Length of the echo request message (ng_ipv6_hdr_t::len
+ * @param[in] len       Length of the echo request message (ipv6_hdr_t::len
  *                      of @p ipv6_hdr minus length of extension headers).
  */
-void ng_icmpv6_echo_req_handle(kernel_pid_t iface, ng_ipv6_hdr_t *ipv6_hdr,
+void ng_icmpv6_echo_req_handle(kernel_pid_t iface, ipv6_hdr_t *ipv6_hdr,
                                ng_icmpv6_echo_t *echo, uint16_t len);
 
 #ifdef __cplusplus

@@ -255,7 +255,7 @@ static int _fill_ipv6_hdr(kernel_pid_t iface, ng_pktsnip_t *ipv6,
                           ng_pktsnip_t *payload)
 {
     int res;
-    ng_ipv6_hdr_t *hdr = ipv6->data;
+    ipv6_hdr_t *hdr = ipv6->data;
 
     hdr->len = byteorder_htons(ng_pkt_len(payload));
     DEBUG("ipv6: set payload length to %zu (network byteorder %04" PRIx16 ")\n",
@@ -471,7 +471,7 @@ static void _send(ng_pktsnip_t *pkt, bool prep_hdr)
     kernel_pid_t iface = KERNEL_PID_UNDEF;
     ng_pktsnip_t *ipv6, *payload;
     ipv6_addr_t *tmp;
-    ng_ipv6_hdr_t *hdr;
+    ipv6_hdr_t *hdr;
     /* get IPv6 snip and (if present) generic interface header */
     if (pkt->type == NG_NETTYPE_NETIF) {
         /* If there is already a netif header (routing protocols and
@@ -574,7 +574,7 @@ static void _send(ng_pktsnip_t *pkt, bool prep_hdr)
 }
 
 /* functions for receiving */
-static inline bool _pkt_not_for_me(kernel_pid_t *iface, ng_ipv6_hdr_t *hdr)
+static inline bool _pkt_not_for_me(kernel_pid_t *iface, ipv6_hdr_t *hdr)
 {
     if (ipv6_addr_is_loopback(&hdr->dst)) {
         return false;
@@ -605,7 +605,7 @@ static void _receive(ng_pktsnip_t *pkt)
 {
     kernel_pid_t iface = KERNEL_PID_UNDEF;
     ng_pktsnip_t *ipv6, *netif;
-    ng_ipv6_hdr_t *hdr;
+    ipv6_hdr_t *hdr;
 
     assert(pkt != NULL);
 
@@ -616,18 +616,18 @@ static void _receive(ng_pktsnip_t *pkt)
     }
 
     if ((pkt->next != NULL) && (pkt->next->type == NG_NETTYPE_IPV6) &&
-        (pkt->next->size == sizeof(ng_ipv6_hdr_t))) {
+        (pkt->next->size == sizeof(ipv6_hdr_t))) {
         /* IP header was already marked. Take it. */
         ipv6 = pkt->next;
 
-        if (!ng_ipv6_hdr_is(ipv6->data)) {
+        if (!ipv6_hdr_is(ipv6->data)) {
             DEBUG("ipv6: Received packet was not IPv6, dropping packet\n");
             ng_pktbuf_release(pkt);
             return;
         }
     }
     else {
-        if (!ng_ipv6_hdr_is(pkt->data)) {
+        if (!ipv6_hdr_is(pkt->data)) {
             DEBUG("ipv6: Received packet was not IPv6, dropping packet\n");
             ng_pktbuf_release(pkt);
             return;
@@ -644,7 +644,7 @@ static void _receive(ng_pktsnip_t *pkt)
 
         pkt = ipv6;     /* reset pkt from temporary variable */
 
-        ipv6 = ng_pktbuf_mark(pkt, sizeof(ng_ipv6_hdr_t), NG_NETTYPE_IPV6);
+        ipv6 = ng_pktbuf_mark(pkt, sizeof(ipv6_hdr_t), NG_NETTYPE_IPV6);
 
         if (ipv6 == NULL) {
             DEBUG("ipv6: error marking IPv6 header, dropping packet\n");
@@ -654,7 +654,7 @@ static void _receive(ng_pktsnip_t *pkt)
     }
 
     /* extract header */
-    hdr = (ng_ipv6_hdr_t *)ipv6->data;
+    hdr = (ipv6_hdr_t *)ipv6->data;
 
     DEBUG("ipv6: Received (src = %s, ",
           ipv6_addr_to_str(addr_str, &(hdr->src), sizeof(addr_str)));

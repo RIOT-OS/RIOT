@@ -1,1 +1,1 @@
-USEMODULE += ng_ipv6_hdr
+USEMODULE += ipv6_hdr

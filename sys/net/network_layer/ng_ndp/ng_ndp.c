@@ -19,9 +19,10 @@
 #include <string.h>
 
 #include "byteorder.h"
+#include "net/fib.h"
+#include "net/ipv6/ext/rh.h"
 #include "net/ng_icmpv6.h"
 #include "net/ng_ipv6.h"
-#include "net/ng_ipv6/ext/rh.h"
 #include "net/ng_netbase.h"
 #include "random.h"
 #include "utlist.h"
@@ -44,7 +45,7 @@ static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 
 /* random helper function */
 void ng_ndp_nbr_sol_handle(kernel_pid_t iface, ng_pktsnip_t *pkt,
-                           ng_ipv6_hdr_t *ipv6, ng_ndp_nbr_sol_t *nbr_sol,
+                           ipv6_hdr_t *ipv6, ng_ndp_nbr_sol_t *nbr_sol,
                            size_t icmpv6_size)
 {
     uint16_t opt_offset = 0;
@@ -113,7 +114,7 @@ static inline bool _pkt_has_l2addr(ng_netif_hdr_t *netif_hdr)
 }
 
 void ng_ndp_nbr_adv_handle(kernel_pid_t iface, ng_pktsnip_t *pkt,
-                           ng_ipv6_hdr_t *ipv6, ng_ndp_nbr_adv_t *nbr_adv,
+                           ipv6_hdr_t *ipv6, ng_ndp_nbr_adv_t *nbr_adv,
                            size_t icmpv6_size)
 {
     uint16_t opt_offset = 0;

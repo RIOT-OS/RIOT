@@ -17,6 +17,7 @@
 #include "od.h"
 #include "net/ng_icmpv6.h"
 #include "net/ng_icmpv6/echo.h"
+#include "net/ng_ipv6/hdr.h"
 #include "utlist.h"
 
 #define ENABLE_DEBUG    (0)
@@ -60,7 +61,7 @@ ng_pktsnip_t *ng_icmpv6_echo_build(uint8_t type, uint16_t id, uint16_t seq,
     return pkt;
 }
 
-void ng_icmpv6_echo_req_handle(kernel_pid_t iface, ng_ipv6_hdr_t *ipv6_hdr,
+void ng_icmpv6_echo_req_handle(kernel_pid_t iface, ipv6_hdr_t *ipv6_hdr,
                                ng_icmpv6_echo_t *echo, uint16_t len)
 {
     uint8_t *payload = ((uint8_t *)echo) + sizeof(ng_icmpv6_echo_t);

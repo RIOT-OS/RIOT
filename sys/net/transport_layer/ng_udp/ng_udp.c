@@ -25,13 +25,11 @@
 #include "msg.h"
 #include "thread.h"
 #include "utlist.h"
+#include "net/ipv6/hdr.h"
 #include "net/ng_udp.h"
 #include "net/ng_netbase.h"
 #include "net/inet_csum.h"
 
-#ifdef MODULE_NG_IPV6
-#include "net/ng_ipv6/hdr.h"
-#endif
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
@@ -81,8 +79,7 @@ static uint16_t _calc_csum(ng_pktsnip_t *hdr, ng_pktsnip_t *pseudo_hdr,
     switch (pseudo_hdr->type) {
 #ifdef MODULE_NG_IPV6
         case NG_NETTYPE_IPV6:
-            csum = ng_ipv6_hdr_inet_csum(csum, pseudo_hdr->data,
-                                         PROTNUM_UDP, len);
+            csum = ipv6_hdr_inet_csum(csum, pseudo_hdr->data, PROTNUM_UDP, len);
             break;
 #endif
         default:

@@ -21,10 +21,10 @@
 
 #include "byteorder.h"
 #include "kernel_types.h"
+#include "net/ipv6/hdr.h"
 #include "net/ng_netbase.h"
-#include "net/protnum.h"
-#include "net/ng_ipv6/hdr.h"
 #include "net/ng_ndp.h"
+#include "net/protnum.h"
 #include "od.h"
 #include "utlist.h"
 
@@ -48,8 +48,7 @@ static inline uint16_t _calc_csum(ng_pktsnip_t *hdr,
     }
 
     csum = inet_csum(csum, hdr->data, hdr->size);
-    csum = ng_ipv6_hdr_inet_csum(csum, pseudo_hdr->data, PROTNUM_ICMPV6,
-                                 len);
+    csum = ipv6_hdr_inet_csum(csum, pseudo_hdr->data, PROTNUM_ICMPV6, len);
 
     return ~csum;
 }
@@ -83,7 +82,7 @@ void ng_icmpv6_demux(kernel_pid_t iface, ng_pktsnip_t *pkt)
 #ifdef MODULE_NG_ICMPV6_ECHO
         case NG_ICMPV6_ECHO_REQ:
             DEBUG("icmpv6: handle echo request.\n");
-            ng_icmpv6_echo_req_handle(iface, (ng_ipv6_hdr_t *)ipv6->data,
+            ng_icmpv6_echo_req_handle(iface, (ipv6_hdr_t *)ipv6->data,
                                       (ng_icmpv6_echo_t *)hdr, icmpv6->size);
             break;
 #endif

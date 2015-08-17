@@ -16,7 +16,7 @@
 
 #include "byteorder.h"
 #include "net/ieee802154.h"
-#include "net/ng_ipv6/hdr.h"
+#include "net/ipv6/hdr.h"
 #include "net/ng_netbase.h"
 #include "net/ng_sixlowpan/ctx.h"
 #include "utlist.h"
@@ -92,12 +92,12 @@ static inline bool _context_overlaps_iid(ng_sixlowpan_ctx_t *ctx,
 bool ng_sixlowpan_iphc_decode(ng_pktsnip_t *pkt)
 {
     ng_netif_hdr_t *netif_hdr = pkt->next->data;
-    ng_ipv6_hdr_t *ipv6_hdr;
+    ipv6_hdr_t *ipv6_hdr;
     uint8_t *iphc_hdr = pkt->data;
     uint16_t payload_offset = NG_SIXLOWPAN_IPHC_HDR_LEN;
     ng_sixlowpan_ctx_t *ctx = NULL;
     ng_pktsnip_t *payload;
-    ng_pktsnip_t *ipv6 = ng_pktbuf_add(NULL, NULL, sizeof(ng_ipv6_hdr_t),
+    ng_pktsnip_t *ipv6 = ng_pktbuf_add(NULL, NULL, sizeof(ipv6_hdr_t),
                                        NG_NETTYPE_IPV6);
 
     if (ipv6 == NULL) {
@@ -111,32 +111,32 @@ bool ng_sixlowpan_iphc_decode(ng_pktsnip_t *pkt)
         payload_offset++;
     }
 
-    ng_ipv6_hdr_set_version(ipv6_hdr);
+    ipv6_hdr_set_version(ipv6_hdr);
 
     switch (iphc_hdr[IPHC1_IDX] & NG_SIXLOWPAN_IPHC1_TF) {
         case IPHC_TF_ECN_DSCP_FL:
-            ng_ipv6_hdr_set_tc(ipv6_hdr, iphc_hdr[payload_offset++]);
+            ipv6_hdr_set_tc(ipv6_hdr, iphc_hdr[payload_offset++]);
             ipv6_hdr->v_tc_fl.u8[1] |= iphc_hdr[payload_offset++] & 0x0f;
             ipv6_hdr->v_tc_fl.u8[2] |= iphc_hdr[payload_offset++];
             ipv6_hdr->v_tc_fl.u8[3] |= iphc_hdr[payload_offset++];
             break;
 
         case IPHC_TF_ECN_FL:
-            ng_ipv6_hdr_set_tc_ecn(ipv6_hdr, iphc_hdr[payload_offset] >> 6);
-            ng_ipv6_hdr_set_tc_dscp(ipv6_hdr, 0);
+            ipv6_hdr_set_tc_ecn(ipv6_hdr, iphc_hdr[payload_offset] >> 6);
+            ipv6_hdr_set_tc_dscp(ipv6_hdr, 0);
             ipv6_hdr->v_tc_fl.u8[1] |= iphc_hdr[payload_offset++] & 0x0f;
             ipv6_hdr->v_tc_fl.u8[2] |= iphc_hdr[payload_offset++];
             ipv6_hdr->v_tc_fl.u8[3] |= iphc_hdr[payload_offset++];
             break;
 
         case IPHC_TF_ECN_DSCP:
-            ng_ipv6_hdr_set_tc(ipv6_hdr, iphc_hdr[payload_offset++]);
-            ng_ipv6_hdr_set_fl(ipv6_hdr, 0);
+            ipv6_hdr_set_tc(ipv6_hdr, iphc_hdr[payload_offset++]);
+            ipv6_hdr_set_fl(ipv6_hdr, 0);
             break;
 
         case IPHC_TF_ECN_ELIDE:
-            ng_ipv6_hdr_set_tc(ipv6_hdr, 0);
-            ng_ipv6_hdr_set_fl(ipv6_hdr, 0);
+            ipv6_hdr_set_tc(ipv6_hdr, 0);
+            ipv6_hdr_set_fl(ipv6_hdr, 0);
             break;
     }
 
@@ -386,7 +386,7 @@ bool ng_sixlowpan_iphc_decode(ng_pktsnip_t *pkt)
 bool ng_sixlowpan_iphc_encode(ng_pktsnip_t *pkt)
 {
     ng_netif_hdr_t *netif_hdr = pkt->data;
-    ng_ipv6_hdr_t *ipv6_hdr = pkt->next->data;
+    ipv6_hdr_t *ipv6_hdr = pkt->next->data;
     uint8_t *iphc_hdr;
     uint16_t inline_pos = NG_SIXLOWPAN_IPHC_HDR_LEN;
     bool addr_comp = false;
@@ -431,34 +431,34 @@ bool ng_sixlowpan_iphc_encode(ng_pktsnip_t *pkt)
     }
 
     /* compress flow label and traffic class */
-    if (ng_ipv6_hdr_get_fl(ipv6_hdr) == 0) {
-        if (ng_ipv6_hdr_get_tc(ipv6_hdr) == 0) {
+    if (ipv6_hdr_get_fl(ipv6_hdr) == 0) {
+        if (ipv6_hdr_get_tc(ipv6_hdr) == 0) {
             /* elide both traffic class and flow label */
             iphc_hdr[IPHC1_IDX] |= IPHC_TF_ECN_ELIDE;
         }
         else {
             /* elide flow label, traffic class (ECN + DSCP) inline (1 byte) */
             iphc_hdr[IPHC1_IDX] |= IPHC_TF_ECN_DSCP;
-            iphc_hdr[inline_pos++] = ng_ipv6_hdr_get_tc(ipv6_hdr);
+            iphc_hdr[inline_pos++] = ipv6_hdr_get_tc(ipv6_hdr);
         }
     }
     else {
-        if (ng_ipv6_hdr_get_tc_dscp(ipv6_hdr) == 0) {
+        if (ipv6_hdr_get_tc_dscp(ipv6_hdr) == 0) {
             /* elide DSCP, ECN + 2-bit pad + flow label inline (3 byte) */
             iphc_hdr[IPHC1_IDX] |= IPHC_TF_ECN_FL;
-            iphc_hdr[inline_pos++] = (uint8_t)((ng_ipv6_hdr_get_tc_ecn(ipv6_hdr) << 6) |
-                                               ((ng_ipv6_hdr_get_fl(ipv6_hdr) & 0x000f0000) >> 16));
+            iphc_hdr[inline_pos++] = (uint8_t)((ipv6_hdr_get_tc_ecn(ipv6_hdr) << 6) |
+                                               ((ipv6_hdr_get_fl(ipv6_hdr) & 0x000f0000) >> 16));
         }
         else {
             /* ECN + DSCP + 4-bit pad + flow label (4 bytes) */
             iphc_hdr[IPHC1_IDX] |= IPHC_TF_ECN_DSCP_FL;
-            iphc_hdr[inline_pos++] = ng_ipv6_hdr_get_tc(ipv6_hdr);
-            iphc_hdr[inline_pos++] = (uint8_t)((ng_ipv6_hdr_get_fl(ipv6_hdr) & 0x000f0000) >> 16);
+            iphc_hdr[inline_pos++] = ipv6_hdr_get_tc(ipv6_hdr);
+            iphc_hdr[inline_pos++] = (uint8_t)((ipv6_hdr_get_fl(ipv6_hdr) & 0x000f0000) >> 16);
         }
 
         /* copy remaining byteos of flow label */
-        iphc_hdr[inline_pos++] = (uint8_t)((ng_ipv6_hdr_get_fl(ipv6_hdr) & 0x0000ff00) >> 8);
-        iphc_hdr[inline_pos++] = (uint8_t)((ng_ipv6_hdr_get_fl(ipv6_hdr) & 0x000000ff) >> 8);
+        iphc_hdr[inline_pos++] = (uint8_t)((ipv6_hdr_get_fl(ipv6_hdr) & 0x0000ff00) >> 8);
+        iphc_hdr[inline_pos++] = (uint8_t)((ipv6_hdr_get_fl(ipv6_hdr) & 0x000000ff) >> 8);
     }
 
     /* compress next header */

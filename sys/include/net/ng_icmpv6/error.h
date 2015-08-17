@@ -27,7 +27,6 @@
 #include "byteorder.h"
 #include "kernel_types.h"
 #include "net/ng_icmpv6/types.h"
-#include "net/ng_ipv6/hdr.h"
 
 #ifdef __cplusplus
 extern "C" {

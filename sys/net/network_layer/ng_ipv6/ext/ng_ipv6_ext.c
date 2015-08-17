@@ -24,10 +24,10 @@ bool ng_ipv6_ext_demux(kernel_pid_t iface, ng_pktsnip_t *pkt,
                        uint8_t nh)
 {
     ng_pktsnip_t *ext_snip;
-    ng_ipv6_ext_t *ext;
+    ipv6_ext_t *ext;
     unsigned int offset = 0;
 
-    ext = ((ng_ipv6_ext_t *)(((uint8_t *)pkt->data) + sizeof(ng_ipv6_hdr_t)));
+    ext = ((ipv6_ext_t *)(((uint8_t *)pkt->data) + sizeof(ipv6_hdr_t)));
 
     bool c = true;
 
@@ -42,14 +42,14 @@ bool ng_ipv6_ext_demux(kernel_pid_t iface, ng_pktsnip_t *pkt,
             case PROTNUM_IPV6_EXT_MOB:
                 /* TODO: add handling of types */
                 nh = ext->nh;
-                offset += ((ext->len * NG_IPV6_EXT_LEN_UNIT) + NG_IPV6_EXT_LEN_UNIT);
-                ext = ng_ipv6_ext_get_next((ng_ipv6_ext_t *)ext);
+                offset += ((ext->len * IPV6_EXT_LEN_UNIT) + IPV6_EXT_LEN_UNIT);
+                ext = ipv6_ext_get_next((ipv6_ext_t *)ext);
                 break;
 
             default:
                 c = false;
-                offset += ((ext->len * NG_IPV6_EXT_LEN_UNIT) + NG_IPV6_EXT_LEN_UNIT);
-                ext = ng_ipv6_ext_get_next((ng_ipv6_ext_t *)ext);
+                offset += ((ext->len * IPV6_EXT_LEN_UNIT) + IPV6_EXT_LEN_UNIT);
+                ext = ipv6_ext_get_next((ipv6_ext_t *)ext);
                 break;
         }
     }
@@ -69,9 +69,9 @@ ng_pktsnip_t *ng_ipv6_ext_build(ng_pktsnip_t *ipv6, ng_pktsnip_t *next,
                                 uint8_t nh, size_t size)
 {
     ng_pktsnip_t *prev = NULL, *snip;
-    ng_ipv6_ext_t *ext;
+    ipv6_ext_t *ext;
 
-    if (size < NG_IPV6_EXT_LEN_UNIT) {
+    if (size < IPV6_EXT_LEN_UNIT) {
         return NULL;
     }
 
@@ -94,10 +94,10 @@ ng_pktsnip_t *ng_ipv6_ext_build(ng_pktsnip_t *ipv6, ng_pktsnip_t *next,
     ext->nh = nh;
 
     if (size & 0x7) { /* not divisible by eight */
-        ext->len = (size / NG_IPV6_EXT_LEN_UNIT);
+        ext->len = (size / IPV6_EXT_LEN_UNIT);
     }
     else {
-        ext->len = (size / NG_IPV6_EXT_LEN_UNIT) - 1;
+        ext->len = (size / IPV6_EXT_LEN_UNIT) - 1;
     }
 
     if (prev != NULL) {

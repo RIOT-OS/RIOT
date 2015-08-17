@@ -11,7 +11,7 @@
  * @ingroup     net
  * @brief       Defines for the Protocol Numbers as they are used in the
  *              IPv4 protocol field and the IPv6 next header field
- *              (ng_ipv6_hdr_t::nh).
+ *              (ipv6_hdr_t::nh).
  * @see         <a href="http://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml">
  *                  IANA, Assigned Internet Protocol Numbers
  *              </a>

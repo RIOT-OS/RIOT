@@ -31,8 +31,6 @@
 
 #include "byteorder.h"
 #include "kernel_types.h"
-#include "net/ng_ipv6/hdr.h"
-#include "net/ng_nettype.h"
 #include "net/ng_nettype.h"
 #include "net/ng_pkt.h"
 

@@ -213,7 +213,7 @@ void ng_ndp_internal_send_nbr_adv(kernel_pid_t iface, ipv6_addr_t *tgt,
         return;
     }
 
-    ((ng_ipv6_hdr_t *)hdr->data)->hl = 255;
+    ((ipv6_hdr_t *)hdr->data)->hl = 255;
 
     pkt = hdr;
     /* add netif header for send interface specification */
@@ -293,7 +293,7 @@ void ng_ndp_internal_send_nbr_sol(kernel_pid_t iface, ipv6_addr_t *tgt,
         return;
     }
 
-    ((ng_ipv6_hdr_t *)hdr->data)->hl = 255;
+    ((ipv6_hdr_t *)hdr->data)->hl = 255;
 
     pkt = hdr;
     /* add netif header for send interface specification */
@@ -312,7 +312,7 @@ void ng_ndp_internal_send_nbr_sol(kernel_pid_t iface, ipv6_addr_t *tgt,
 }
 
 bool ng_ndp_internal_sl2a_opt_handle(kernel_pid_t iface, ng_pktsnip_t *pkt,
-                                     ng_ipv6_hdr_t *ipv6, uint8_t icmpv6_type,
+                                     ipv6_hdr_t *ipv6, uint8_t icmpv6_type,
                                      ng_ndp_opt_t *sl2a_opt)
 {
     ng_ipv6_nc_t *nc_entry = NULL;
@@ -371,7 +371,7 @@ bool ng_ndp_internal_sl2a_opt_handle(kernel_pid_t iface, ng_pktsnip_t *pkt,
     }
 }
 
-int ng_ndp_internal_tl2a_opt_handle(ng_pktsnip_t *pkt, ng_ipv6_hdr_t *ipv6,
+int ng_ndp_internal_tl2a_opt_handle(ng_pktsnip_t *pkt, ipv6_hdr_t *ipv6,
                                     uint8_t icmpv6_type, ng_ndp_opt_t *tl2a_opt,
                                     uint8_t *l2addr)
 {
