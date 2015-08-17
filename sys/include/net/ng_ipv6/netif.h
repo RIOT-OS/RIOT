@@ -259,8 +259,8 @@ ng_ipv6_netif_t *ng_ipv6_netif_get(kernel_pid_t pid);
  * @details This sets/unsets the NG_IPV6_NETIF_FLAGS_ROUTER and initializes
  *          or ceases router behavior for neighbor discovery.
  *
- * @param[in] The interface.
- * @param[in] Status for the NG_IPV6_NETIF_FLAGS_ROUTER flag.
+ * @param[in] netif     The interface.
+ * @param[in] enable    Status for the NG_IPV6_NETIF_FLAGS_ROUTER flag.
  */
 static inline void ng_ipv6_netif_set_rtr(ng_ipv6_netif_t *netif, bool enable)
 {
@@ -275,8 +275,8 @@ static inline void ng_ipv6_netif_set_rtr(ng_ipv6_netif_t *netif, bool enable)
  *          NG_IPV6_NETIF_FLAGS_RTR_ADV and initializes or ceases router
  *          advertising behavior for neighbor discovery.
  *
- * @param[in] The interface.
- * @param[in] Status for the NG_IPV6_NETIF_FLAGS_RTR flag.
+ * @param[in] netif     The interface.
+ * @param[in] enable    Status for the NG_IPV6_NETIF_FLAGS_RTR flag.
  */
 static inline void ng_ipv6_netif_set_rtr_adv(ng_ipv6_netif_t *netif, bool enable)
 {
