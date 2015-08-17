@@ -79,7 +79,6 @@ void abtorigin(const char *vector, u_long *lnk_ptr1)
     printf("#!%s abort at %p (0x%08lX) originating from %p (0x%08lX) in mode 0x%X\n",
            vector, (void *)lnk_ptr1, *(lnk_ptr1), (void *)lnk_ptr2, *(lnk_ptr2), spsr
           );
-    stdio_flush();
 
     exit(1);
 }
@@ -178,10 +177,10 @@ void bootloader(void)
     /* board specific setup of i/o pins */
     bl_init_ports();
 
-    /* UART setup */
-    bl_uart_init();
-
-    puts("Board initialized.");
+#ifdef MODULE_NEWLIB
+    extern void __libc_init_array(void);
+    __libc_init_array();
+#endif
 }
 
 /** @} */

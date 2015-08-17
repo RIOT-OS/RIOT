@@ -50,6 +50,27 @@ void init_clks2(void);
  */
 void bl_init_clks(void);
 
+/**
+ * @name Define UART device and baudrate for stdio
+ * @{
+ */
+#define STDIO               UART_0
+#define STDIO_BAUDRATE      (115200U)
+#define STDIO_RX_BUFSIZE    (64U)
+/** @} */
+
+/**
+ * @name dummy-defines for LEDs
+ * @{
+ */
+#define LED_GREEN_ON        /* not available */
+#define LED_GREEN_OFF       /* not available */
+#define LED_GREEN_TOGGLE    /* not available */
+#define LED_RED_ON          /* not available */
+#define LED_RED_OFF         /* not available */
+#define LED_RED_TOGGLE      /* not available */
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif

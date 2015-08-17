@@ -28,6 +28,10 @@
 extern "C" {
 #endif
 
+/**
+ * @brief Board LED defines
+ * @{
+ */
 #define LED_RED_PIN (BIT25)
 #define LED_GREEN_PIN (BIT26)
 
@@ -38,7 +42,20 @@ extern "C" {
 #define LED_RED_OFF (FIO3SET = LED_RED_PIN)
 #define LED_RED_ON (FIO3CLR = LED_RED_PIN)
 #define LED_RED_TOGGLE (FIO3PIN ^= LED_RED_PIN)
+/** @} */
 
+/**
+ * @name Define UART device and baudrate for stdio
+ * @{
+ */
+#define STDIO               UART_0
+#define STDIO_BAUDRATE      (115200U)
+#define STDIO_RX_BUFSIZE    (64U)
+/** @} */
+
+/**
+ * @brief initialize the board's clock system
+ */
 void init_clks1(void);
 
 #ifdef __cplusplus

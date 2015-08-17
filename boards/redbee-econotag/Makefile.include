@@ -1,8 +1,12 @@
 ## the cpu to build for
 export CPU = mc1322x
 
+# Target triple for the build. Use arm-none-eabi if you are unsure.
+export TARGET_TRIPLE ?= arm-none-eabi
+
 # toolchain config
-export PREFIX = arm-none-eabi-
+export PREFIX = $(if $(TARGET_TRIPLE),$(TARGET_TRIPLE)-)
+
 export CC = $(PREFIX)gcc
 export AR = $(PREFIX)ar
 export CFLAGS += -march=armv4t -mtune=arm7tdmi-s -mlong-calls \

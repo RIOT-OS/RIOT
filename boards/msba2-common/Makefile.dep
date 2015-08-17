@@ -1,3 +1,0 @@
-ifneq (,$(filter ltc4150,$(USEMODULE)))
-	USEMODULE += gpioint
-endif
