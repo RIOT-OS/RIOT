@@ -39,6 +39,10 @@ ifneq (,$(filter embunit,$(USEMODULE)))
         CFLAGS += -DOUTPUT=OUTPUT_TEXT
     else ifeq ($(OUTPUT),COMPILER)
         CFLAGS += -DOUTPUT=OUTPUT_COMPILER
+    else ifeq ($(OUTPUT),COLORTEXT)
+        CFLAGS += -DOUTPUT=OUTPUT_COLORTEXT
+    else ifeq ($(OUTPUT),COLOR)
+        CFLAGS += -DOUTPUT=OUTPUT_COLOR
     endif
 endif
 

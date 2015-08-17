@@ -22,9 +22,11 @@
 #include "embUnit/embUnit.h"
 
 #ifdef OUTPUT
-#   define OUTPUT_XML      (1)
-#   define OUTPUT_TEXT     (2)
-#   define OUTPUT_COMPILER (4)
+#   define OUTPUT_XML       (1)
+#   define OUTPUT_TEXT      (2)
+#   define OUTPUT_COMPILER  (4)
+#   define OUTPUT_COLORTEXT (8)
+#   define OUTPUT_COLOR     (16)
 
 #   if (OUTPUT==OUTPUT_XML)
 #       include "embUnit/XMLOutputter.h"
@@ -35,6 +37,12 @@
 #   elif (OUTPUT==OUTPUT_COMPILER)
 #       include "embUnit/CompilerOutputter.h"
 #       define OUTPUTTER   (CompilerOutputter_outputter())
+#   elif (OUTPUT==OUTPUT_COLORTEXT)
+#       include "embUnit/ColorTextOutputter.h"
+#       define OUTPUTTER   (ColorTextOutputter_outputter())
+#   elif (OUTPUT==OUTPUT_COLOR)
+#       include "embUnit/ColorOutputter.h"
+#       define OUTPUTTER   (ColorOutputter_outputter())
 #   endif
 
 #   include "embUnit/TextUIRunner.h"
