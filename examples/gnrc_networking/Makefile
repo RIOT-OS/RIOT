@@ -1,5 +1,5 @@
 # name of your application
-APPLICATION = ng_networking
+APPLICATION = gnrc_networking
 
 # If no BOARD is found in the environment, use this default:
 BOARD ?= native
