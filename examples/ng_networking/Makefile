@@ -20,7 +20,7 @@ BOARD_BLACKLIST        := arduino-mega2560
 USEMODULE += ng_netif_default
 USEMODULE += auto_init_ng_netif
 # Specify the mandatory networking modules for IPv6 and UDP
-USEMODULE += ng_ipv6_default
+USEMODULE += ng_ipv6_router_default
 USEMODULE += ng_udp
 # This application dumps received packets to STDIO using the pktdump module
 USEMODULE += ng_pktdump
