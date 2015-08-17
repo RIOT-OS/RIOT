@@ -1,4 +1,4 @@
-# ng_networking example
+# gnrc_networking example
 
 ## Connecting RIOT native and the Linux host
 
@@ -6,7 +6,7 @@
 you will need `netcat` (with IPv6 support). Ubuntu 14.04 comes with netcat IPv6 support pre-installed. On Debian it's available in the
 package `netcat-openbsd`. Be aware that many programs require you to add an option such as -6 to tell them to use IPv6, otherwise they
 will fail. If you're using a _Raspberry Pi_, run `sudo modprobe ipv6` before trying this example, because raspbian does not load the
-IPv6 module automatically.  
+IPv6 module automatically.
 On some systems (openSUSE for example), the _firewall_ may interfere, and prevent some packets to arrive at the application (they will
 however show up in Wireshark, which can be confusing). So be sure to adjust your firewall rules, or turn it off (who needs security anyway).
 
@@ -15,8 +15,8 @@ First, create a tap interface (to which RIOT will connect) and a bridge (to whic
     sudo ip tuntap add tap0 mode tap user ${USER}
     sudo ip link set tap0 up
 
-Now you can start the `ng_networking` example by invoking `make term`. This should automatically connect to the `tap0` interface. If
-this doesn't work for some reason, run `make` without any arguments, and then run the binary manually like so (assuming you are in the `examples/ng_networking` directory):
+Now you can start the `gnrc_networking` example by invoking `make term`. This should automatically connect to the `tap0` interface. If
+this doesn't work for some reason, run `make` without any arguments, and then run the binary manually like so (assuming you are in the `examples/gnrc_networking` directory):
 
 To verify that there is connectivity between RIOT and Linux, go to the RIOT console and run `ifconfig`:
 
@@ -63,4 +63,3 @@ Now, on the RIOT side, send a UDP packet using:
     udp send fe80::4049:5fff:fe17:b3ae 8808 testmessage
 
 You should see `testmessage` appear in netcat. Instead of using netcat, you can of course write your own software, but you may have to bind the socket to a specific interface (tap0 in this case). For an example that shows how to do so, see [here](https://gist.github.com/backenklee/dad5e80b764b3b3d0d3e).
-
