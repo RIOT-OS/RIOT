@@ -16,11 +16,12 @@
 #include <stdbool.h>
 
 #include "rbuf.h"
+#include "net/ipv6/hdr.h"
 #include "net/gnrc.h"
-#include "net/ng_ipv6/hdr.h"
 #include "net/ng_ipv6/netif.h"
 #include "net/ng_sixlowpan.h"
 #include "net/ng_sixlowpan/frag.h"
+#include "net/sixlowpan.h"
 #include "thread.h"
 #include "timex.h"
 #include "vtimer.h"
@@ -66,14 +67,14 @@ void rbuf_add(ng_netif_hdr_t *netif_hdr, ng_pktsnip_t *pkt,
     /* cppcheck is clearly wrong here */
     /* cppcheck-suppress variableScope */
     unsigned int data_offset = 0;
-    ng_sixlowpan_frag_t *frag = pkt->data;
+    sixlowpan_frag_t *frag = pkt->data;
     rbuf_int_t *ptr;
-    uint8_t *data = ((uint8_t *)pkt->data) + sizeof(ng_sixlowpan_frag_t);
+    uint8_t *data = ((uint8_t *)pkt->data) + sizeof(sixlowpan_frag_t);
 
     _rbuf_gc();
     entry = _rbuf_get(ng_netif_hdr_get_src_addr(netif_hdr), netif_hdr->src_l2addr_len,
                       ng_netif_hdr_get_dst_addr(netif_hdr), netif_hdr->dst_l2addr_len,
-                      byteorder_ntohs(frag->disp_size) & NG_SIXLOWPAN_FRAG_SIZE_MASK,
+                      byteorder_ntohs(frag->disp_size) & SIXLOWPAN_FRAG_SIZE_MASK,
                       byteorder_ntohs(frag->tag));
 
     if (entry == NULL) {
@@ -85,15 +86,15 @@ void rbuf_add(ng_netif_hdr_t *netif_hdr, ng_pktsnip_t *pkt,
 
     /* dispatches in the first fragment are ignored */
     if (offset == 0) {
-        if (data[0] == NG_SIXLOWPAN_UNCOMPRESSED) {
+        if (data[0] == SIXLOWPAN_UNCOMP) {
             data++;             /* skip 6LoWPAN dispatch */
             frag_size--;
         }
 #ifdef MODULE_NG_SIXLOWPAN_IPHC
-        else if (ng_sixlowpan_iphc_is(data)) {
+        else if (sixlowpan_iphc_is(data)) {
             size_t iphc_len;
             iphc_len = ng_sixlowpan_iphc_decode(entry->pkt, pkt,
-                                                sizeof(ng_sixlowpan_frag_t));
+                                                sizeof(sixlowpan_frag_t));
             if (iphc_len == 0) {
                 DEBUG("6lo rfrag: could not decode IPHC dispatch\n");
                 ng_pktbuf_release(entry->pkt);

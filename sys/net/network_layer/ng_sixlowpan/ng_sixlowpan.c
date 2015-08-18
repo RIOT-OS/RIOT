@@ -22,6 +22,7 @@
 #include "net/ng_sixlowpan/frag.h"
 #include "net/ng_sixlowpan/iphc.h"
 #include "net/ng_sixlowpan/netif.h"
+#include "net/sixlowpan.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
@@ -89,7 +90,7 @@ static void _receive(ng_pktsnip_t *pkt)
 
     dispatch = payload->data;
 
-    if (dispatch[0] == NG_SIXLOWPAN_UNCOMPRESSED) {
+    if (dispatch[0] == SIXLOWPAN_UNCOMP) {
         ng_pktsnip_t *sixlowpan;
         DEBUG("6lo: received uncompressed IPv6 packet\n");
         payload = ng_pktbuf_start_write(payload);
@@ -115,14 +116,14 @@ static void _receive(ng_pktsnip_t *pkt)
         pkt = ng_pktbuf_remove_snip(pkt, sixlowpan);
     }
 #ifdef MODULE_NG_SIXLOWPAN_FRAG
-    else if (ng_sixlowpan_frag_is((ng_sixlowpan_frag_t *)dispatch)) {
+    else if (sixlowpan_frag_is((sixlowpan_frag_t *)dispatch)) {
         DEBUG("6lo: received 6LoWPAN fragment\n");
         ng_sixlowpan_frag_handle_pkt(pkt);
         return;
     }
 #endif
 #ifdef MODULE_NG_SIXLOWPAN_IPHC
-    else if (ng_sixlowpan_iphc_is(dispatch)) {
+    else if (sixlowpan_iphc_is(dispatch)) {
         size_t dispatch_size;
         ng_pktsnip_t *sixlowpan;
         ng_pktsnip_t *ipv6 = ng_pktbuf_add(NULL, NULL, sizeof(ipv6_hdr_t),
@@ -181,7 +182,7 @@ static inline bool _add_uncompr_disp(ng_pktsnip_t *pkt)
     sixlowpan->next = pkt->next;
     pkt->next = sixlowpan;
     disp = sixlowpan->data;
-    disp[0] = NG_SIXLOWPAN_UNCOMPRESSED;
+    disp[0] = SIXLOWPAN_UNCOMP;
     return true;
 }
 

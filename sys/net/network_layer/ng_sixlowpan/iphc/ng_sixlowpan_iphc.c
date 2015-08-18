@@ -19,6 +19,7 @@
 #include "net/ipv6/hdr.h"
 #include "net/gnrc.h"
 #include "net/ng_sixlowpan/ctx.h"
+#include "net/sixlowpan.h"
 #include "utlist.h"
 
 #include "net/ng_sixlowpan/iphc.h"
@@ -94,7 +95,7 @@ size_t ng_sixlowpan_iphc_decode(ng_pktsnip_t *ipv6, ng_pktsnip_t *pkt, size_t of
     ng_netif_hdr_t *netif_hdr = pkt->next->data;
     ipv6_hdr_t *ipv6_hdr;
     uint8_t *iphc_hdr = pkt->data;
-    size_t payload_offset = NG_SIXLOWPAN_IPHC_HDR_LEN;
+    size_t payload_offset = SIXLOWPAN_IPHC_HDR_LEN;
     ng_sixlowpan_ctx_t *ctx = NULL;
 
     assert(ipv6 != NULL);
@@ -103,13 +104,13 @@ size_t ng_sixlowpan_iphc_decode(ng_pktsnip_t *ipv6, ng_pktsnip_t *pkt, size_t of
     ipv6_hdr = ipv6->data;
     iphc_hdr += offset;
 
-    if (iphc_hdr[IPHC2_IDX] & NG_SIXLOWPAN_IPHC2_CID_EXT) {
+    if (iphc_hdr[IPHC2_IDX] & SIXLOWPAN_IPHC2_CID_EXT) {
         payload_offset++;
     }
 
     ipv6_hdr_set_version(ipv6_hdr);
 
-    switch (iphc_hdr[IPHC1_IDX] & NG_SIXLOWPAN_IPHC1_TF) {
+    switch (iphc_hdr[IPHC1_IDX] & SIXLOWPAN_IPHC1_TF) {
         case IPHC_TF_ECN_DSCP_FL:
             ipv6_hdr_set_tc(ipv6_hdr, iphc_hdr[payload_offset++]);
             ipv6_hdr->v_tc_fl.u8[1] |= iphc_hdr[payload_offset++] & 0x0f;
@@ -136,11 +137,11 @@ size_t ng_sixlowpan_iphc_decode(ng_pktsnip_t *ipv6, ng_pktsnip_t *pkt, size_t of
             break;
     }
 
-    if (!(iphc_hdr[IPHC1_IDX] & NG_SIXLOWPAN_IPHC1_NH)) {
+    if (!(iphc_hdr[IPHC1_IDX] & SIXLOWPAN_IPHC1_NH)) {
         ipv6_hdr->nh = iphc_hdr[payload_offset++];
     }
 
-    switch (iphc_hdr[IPHC1_IDX] & NG_SIXLOWPAN_IPHC1_HL) {
+    switch (iphc_hdr[IPHC1_IDX] & SIXLOWPAN_IPHC1_HL) {
         case IPHC_HL_INLINE:
             ipv6_hdr->hl = iphc_hdr[payload_offset++];
             break;
@@ -158,14 +159,14 @@ size_t ng_sixlowpan_iphc_decode(ng_pktsnip_t *ipv6, ng_pktsnip_t *pkt, size_t of
             break;
     }
 
-    if (iphc_hdr[IPHC2_IDX] & NG_SIXLOWPAN_IPHC2_SAC) {
+    if (iphc_hdr[IPHC2_IDX] & SIXLOWPAN_IPHC2_SAC) {
         uint8_t sci = 0;
 
-        if (iphc_hdr[IPHC2_IDX] & NG_SIXLOWPAN_IPHC2_CID_EXT) {
+        if (iphc_hdr[IPHC2_IDX] & SIXLOWPAN_IPHC2_CID_EXT) {
             sci = iphc_hdr[CID_EXT_IDX] >> 4;
         }
 
-        if (iphc_hdr[IPHC2_IDX] & NG_SIXLOWPAN_IPHC2_SAM) {
+        if (iphc_hdr[IPHC2_IDX] & SIXLOWPAN_IPHC2_SAM) {
             ctx = ng_sixlowpan_ctx_lookup_id(sci);
 
             if (ctx == NULL) {
@@ -175,7 +176,7 @@ size_t ng_sixlowpan_iphc_decode(ng_pktsnip_t *ipv6, ng_pktsnip_t *pkt, size_t of
         }
     }
 
-    switch (iphc_hdr[IPHC2_IDX] & (NG_SIXLOWPAN_IPHC2_SAC | NG_SIXLOWPAN_IPHC2_SAM)) {
+    switch (iphc_hdr[IPHC2_IDX] & (SIXLOWPAN_IPHC2_SAC | SIXLOWPAN_IPHC2_SAM)) {
         /* should be asserted by line 168 anyway */
         assert(ctx != NULL);
 
@@ -235,14 +236,14 @@ size_t ng_sixlowpan_iphc_decode(ng_pktsnip_t *ipv6, ng_pktsnip_t *pkt, size_t of
             break;
     }
 
-    if (iphc_hdr[IPHC2_IDX] & NG_SIXLOWPAN_IPHC2_DAC) {
+    if (iphc_hdr[IPHC2_IDX] & SIXLOWPAN_IPHC2_DAC) {
         uint8_t dci = 0;
 
-        if (iphc_hdr[IPHC2_IDX] & NG_SIXLOWPAN_IPHC2_CID_EXT) {
+        if (iphc_hdr[IPHC2_IDX] & SIXLOWPAN_IPHC2_CID_EXT) {
             dci = iphc_hdr[CID_EXT_IDX] & 0x0f;
         }
 
-        if (iphc_hdr[IPHC2_IDX] & NG_SIXLOWPAN_IPHC2_DAM) {
+        if (iphc_hdr[IPHC2_IDX] & SIXLOWPAN_IPHC2_DAM) {
             ctx = ng_sixlowpan_ctx_lookup_id(dci);
 
             if (ctx == NULL) {
@@ -252,8 +253,8 @@ size_t ng_sixlowpan_iphc_decode(ng_pktsnip_t *ipv6, ng_pktsnip_t *pkt, size_t of
         }
     }
 
-    switch (iphc_hdr[IPHC2_IDX] & (NG_SIXLOWPAN_IPHC2_M | NG_SIXLOWPAN_IPHC2_DAC |
-                                   NG_SIXLOWPAN_IPHC2_DAM)) {
+    switch (iphc_hdr[IPHC2_IDX] & (SIXLOWPAN_IPHC2_M | SIXLOWPAN_IPHC2_DAC |
+                                   SIXLOWPAN_IPHC2_DAM)) {
         case IPHC_M_DAC_DAM_U_FULL:
         case IPHC_M_DAC_DAM_M_FULL:
             memcpy(&(ipv6_hdr->dst.u8), iphc_hdr + payload_offset, 16);
@@ -380,7 +381,7 @@ bool ng_sixlowpan_iphc_encode(ng_pktsnip_t *pkt)
     ng_netif_hdr_t *netif_hdr = pkt->data;
     ipv6_hdr_t *ipv6_hdr = pkt->next->data;
     uint8_t *iphc_hdr;
-    uint16_t inline_pos = NG_SIXLOWPAN_IPHC_HDR_LEN;
+    uint16_t inline_pos = SIXLOWPAN_IPHC_HDR_LEN;
     bool addr_comp = false;
     ng_sixlowpan_ctx_t *src_ctx = NULL, *dst_ctx = NULL;
     ng_pktsnip_t *dispatch = ng_pktbuf_add(NULL, NULL, pkt->next->size,
@@ -394,7 +395,7 @@ bool ng_sixlowpan_iphc_encode(ng_pktsnip_t *pkt)
     iphc_hdr = dispatch->data;
 
     /* set initial dispatch value*/
-    iphc_hdr[IPHC1_IDX] = NG_SIXLOWPAN_IPHC1_DISP;
+    iphc_hdr[IPHC1_IDX] = SIXLOWPAN_IPHC1_DISP;
     iphc_hdr[IPHC2_IDX] = 0;
 
     /* check for available contexts */
@@ -415,11 +416,11 @@ bool ng_sixlowpan_iphc_encode(ng_pktsnip_t *pkt)
          ((dst_ctx->flags_id & NG_SIXLOWPAN_CTX_FLAGS_CID_MASK) != 0) &&
          (dst_ctx->flags_id & NG_SIXLOWPAN_CTX_FLAGS_COMP))) {
         /* add context identifier extension */
-        iphc_hdr[IPHC2_IDX] |= NG_SIXLOWPAN_IPHC2_CID_EXT;
+        iphc_hdr[IPHC2_IDX] |= SIXLOWPAN_IPHC2_CID_EXT;
         iphc_hdr[CID_EXT_IDX] = 0;
 
         /* move position to behind CID extension */
-        inline_pos += NG_SIXLOWPAN_IPHC_CID_EXT_LEN;
+        inline_pos += SIXLOWPAN_IPHC_CID_EXT_LEN;
     }
 
     /* compress flow label and traffic class */
@@ -487,7 +488,7 @@ bool ng_sixlowpan_iphc_encode(ng_pktsnip_t *pkt)
     else {
         if ((src_ctx != NULL) && (src_ctx->flags_id & NG_SIXLOWPAN_CTX_FLAGS_COMP)) {
             /* stateful source address compression */
-            iphc_hdr[IPHC2_IDX] |= NG_SIXLOWPAN_IPHC2_SAC;
+            iphc_hdr[IPHC2_IDX] |= SIXLOWPAN_IPHC2_SAC;
 
             if (((src_ctx->flags_id & NG_SIXLOWPAN_CTX_FLAGS_CID_MASK) != 0)) {
                 iphc_hdr[CID_EXT_IDX] |= ((src_ctx->flags_id & NG_SIXLOWPAN_CTX_FLAGS_CID_MASK) << 4);
@@ -546,7 +547,7 @@ bool ng_sixlowpan_iphc_encode(ng_pktsnip_t *pkt)
 
     /* M: Multicast compression */
     if (ipv6_addr_is_multicast(&(ipv6_hdr->dst))) {
-        iphc_hdr[IPHC2_IDX] |= NG_SIXLOWPAN_IPHC2_M;
+        iphc_hdr[IPHC2_IDX] |= SIXLOWPAN_IPHC2_M;
 
         /* if multicast address is of format ffXX::XXXX:XXXX:XXXX */
         if ((ipv6_hdr->dst.u16[1].u16 == 0) &&
@@ -598,7 +599,7 @@ bool ng_sixlowpan_iphc_encode(ng_pktsnip_t *pkt)
                 /* Unicast prefix based IPv6 multicast address
                  * (https://tools.ietf.org/html/rfc3306) with given context
                  * for unicast prefix -> context based compression */
-                iphc_hdr[IPHC2_IDX] |= NG_SIXLOWPAN_IPHC2_DAC;
+                iphc_hdr[IPHC2_IDX] |= SIXLOWPAN_IPHC2_DAC;
                 iphc_hdr[inline_pos++] = ipv6_hdr->dst.u8[1];
                 iphc_hdr[inline_pos++] = ipv6_hdr->dst.u8[2];
                 memcpy(iphc_hdr + inline_pos, ipv6_hdr->dst.u16 + 6, 4);

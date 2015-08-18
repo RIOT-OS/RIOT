@@ -26,6 +26,7 @@
 
 #include "net/ng_sixlowpan/frag.h"
 #include "net/ng_sixlowpan/iphc.h"
+#include "net/sixlowpan.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -53,24 +54,6 @@ extern "C" {
 #endif
 
 /**
- * @brief   Dispatch for uncompressed 6LoWPAN frame.
- */
-#define NG_SIXLOWPAN_UNCOMPRESSED   (0x41)
-
-/**
- * @brief   Checks if dispatch indicates that frame is not a 6LoWPAN (NALP) frame.
- *
- * @param[in] disp  The first byte of a frame.
- *
- * @return  true, if frame is a NALP.
- * @return  false, if frame is not a NALP.
- */
-static inline bool ng_sixlowpan_nalp(uint8_t disp)
-{
-    return (disp & 0x3f);
-}
-
-/**
  * @brief   Initialization of the 6LoWPAN thread.
  *
  * @details If 6LoWPAN was already initialized, it will just return the PID of
@@ -82,14 +65,6 @@ static inline bool ng_sixlowpan_nalp(uint8_t disp)
  * @return  -EOVERFLOW, if there are too many threads running already in general
  */
 kernel_pid_t ng_sixlowpan_init(void);
-
-/**
- * @brief   Prints 6LoWPAN dispatch to stdout.
- *
- * @param[in] data  A 6LoWPAN frame.
- * @param[in] size  Size of @p data.
- */
-void ng_sixlowpan_print(uint8_t *data, size_t size);
 
 #ifdef __cplusplus
 }
