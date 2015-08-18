@@ -7,9 +7,9 @@
  */
 
 /**
- * @defgroup    net_ng_ndp_types    Types for IPv6 neighbor discovery
- * @ingroup     net_ng_ndp
- * @brief       IPv6 neighbor discovery message types
+ * @defgroup    net_ndp IPv6 neighbor discovery messages
+ * @ingroup     net_ipv6
+ * @brief       Provides IPv6 neighbor discovery message types
  * @{
  *
  * @file
@@ -17,8 +17,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef NG_NDP_TYPES_H_
-#define NG_NDP_TYPES_H_
+#ifndef NDP_H_
+#define NDP_H_
 
 #include <stdint.h>
 
@@ -29,46 +29,46 @@ extern "C" {
 #endif
 
 /**
- * @{
- * @name    Flags for router advertisement messages
+ * @name    Router advertisement flags
  * @see <a href="https://tools.ietf.org/html/rfc4861#section-4.2">
  *          RFC 4861, section 4.2
  *      </a>
+ * @{
  */
-#define NG_NDP_RTR_ADV_FLAGS_MASK   (0xc0)
-#define NG_NDP_RTR_ADV_FLAGS_M      (0x80)  /**< managed address configuration */
-#define NG_NDP_RTR_ADV_FLAGS_O      (0x40)  /**< other configuration */
+#define NDP_RTR_ADV_FLAGS_MASK      (0xc0)
+#define NDP_RTR_ADV_FLAGS_M         (0x80)  /**< managed address configuration */
+#define NDP_RTR_ADV_FLAGS_O         (0x40)  /**< other configuration */
 /**
  * @}
  */
 
 /**
- * @{
- * @name    Flags for neighbor advertisement messages
+ * @name    Neighbor advertisement flags
  * @see <a href="https://tools.ietf.org/html/rfc4861#section-4.4">
  *          RFC 4861, section 4.2
  *      </a>
+ * @{
  */
-#define NG_NDP_NBR_ADV_FLAGS_MASK   (0xe0)
-#define NG_NDP_NBR_ADV_FLAGS_R      (0x80)  /**< router */
-#define NG_NDP_NBR_ADV_FLAGS_S      (0x40)  /**< solicited */
-#define NG_NDP_NBR_ADV_FLAGS_O      (0x20)  /**< override */
+#define NDP_NBR_ADV_FLAGS_MASK      (0xe0)
+#define NDP_NBR_ADV_FLAGS_R         (0x80)  /**< router */
+#define NDP_NBR_ADV_FLAGS_S         (0x40)  /**< solicited */
+#define NDP_NBR_ADV_FLAGS_O         (0x20)  /**< override */
 /**
  * @}
  */
 
 /**
- * @{
  * @name    NDP option types
+ * @{
  * @see <a href="http://www.iana.org/assignments/icmpv6-parameters/icmpv6-parameters.xhtml#icmpv6-parameters-5">
  *          IANA, IPv6 Neighbor Discovery Option Formats
  *      </a>
  */
-#define NG_NDP_OPT_SL2A             (1)     /**< source link-layer address option */
-#define NG_NDP_OPT_TL2A             (2)     /**< target link-layer address option */
-#define NG_NDP_OPT_PI               (3)     /**< prefix information option */
-#define NG_NDP_OPT_RH               (4)     /**< redirected option */
-#define NG_NDP_OPT_MTU              (5)     /**< MTU option */
+#define NDP_OPT_SL2A                (1)     /**< source link-layer address option */
+#define NDP_OPT_TL2A                (2)     /**< target link-layer address option */
+#define NDP_OPT_PI                  (3)     /**< prefix information option */
+#define NDP_OPT_RH                  (4)     /**< redirected option */
+#define NDP_OPT_MTU                 (5)     /**< MTU option */
 /**
  * @}
  */
@@ -77,9 +77,9 @@ extern "C" {
  * @{
  * @name    Flags for prefix information option
  */
-#define NG_NDP_OPT_PI_FLAGS_MASK    (0xc0)
-#define NG_NDP_OPT_PI_FLAGS_L       (0x80)  /**< on-link */
-#define NG_NDP_OPT_PI_FLAGS_A       (0x40)  /**< autonomous address configuration */
+#define NDP_OPT_PI_FLAGS_MASK       (0xc0)
+#define NDP_OPT_PI_FLAGS_L          (0x80)  /**< on-link */
+#define NDP_OPT_PI_FLAGS_A          (0x40)  /**< autonomous address configuration */
 /**
  * @}
  */
@@ -89,8 +89,8 @@ extern "C" {
  * @name    Lengths for fixed length options
  * @brief   Options don't use bytes as their length unit, but 8 bytes.
  */
-#define NG_NDP_OPT_PI_LEN           (4U)
-#define NG_NDP_OPT_MTU_LEN          (1U)
+#define NDP_OPT_PI_LEN              (4U)
+#define NDP_OPT_MTU_LEN             (1U)
 /**
  * @}
  */
@@ -108,7 +108,7 @@ typedef struct __attribute__((packed)) {
     uint8_t code;           /**< message code */
     network_uint16_t csum;  /**< checksum */
     network_uint32_t resv;  /**< reserved field */
-} ng_ndp_rtr_sol_t;
+} ndp_rtr_sol_t;
 
 /**
  * @brief   Router advertisement message format.
@@ -127,7 +127,7 @@ typedef struct __attribute__((packed)) {
     network_uint16_t ltime;             /**< router lifetime */
     network_uint32_t reach_time;        /**< reachable time */
     network_uint32_t retrans_timer;     /**< retransmission timer */
-} ng_ndp_rtr_adv_t;
+} ndp_rtr_adv_t;
 
 /**
  * @brief   Neighbor solicitation message format.
@@ -143,7 +143,7 @@ typedef struct __attribute__((packed)) {
     network_uint16_t csum;  /**< checksum */
     network_uint32_t resv;  /**< reserved field */
     ipv6_addr_t tgt;        /**< target address */
-} ng_ndp_nbr_sol_t;
+} ndp_nbr_sol_t;
 
 /**
  * @brief   Neighbor advertisement message format.
@@ -160,7 +160,7 @@ typedef struct __attribute__((packed)) {
     uint8_t flags;          /**< flags */
     uint8_t resv[3];        /**< reserved fields */
     ipv6_addr_t tgt;        /**< target address */
-} ng_ndp_nbr_adv_t;
+} ndp_nbr_adv_t;
 
 /**
  * @brief   Neighbor advertisement message format.
@@ -177,7 +177,7 @@ typedef struct __attribute__((packed)) {
     network_uint32_t resv;  /**< reserved field */
     ipv6_addr_t tgt;        /**< target address */
     ipv6_addr_t dst;        /**< destination address */
-} ng_ndp_redirect_t;
+} ndp_redirect_t;
 
 /**
  * @brief   General NDP option format
@@ -188,14 +188,14 @@ typedef struct __attribute__((packed)) {
 typedef struct __attribute__((packed)) {
     uint8_t type;   /**< option type */
     uint8_t len;    /**< length in units of 8 octets */
-} ng_ndp_opt_t;
+} ndp_opt_t;
 
-/* XXX: slla and tlla are just ng_ndp_opt_t with variable link layer address
+/* XXX: slla and tlla are just ndp_opt_t with variable link layer address
  * appended */
 
 /**
  * @brief   Prefix information option format
- * @extends ng_ndp_opt_t
+ * @extends ndp_opt_t
  *
  * @see <a href="https://tools.ietf.org/html/rfc4861#section-4.6.2">
  *          RFC 4861, section 4.6.2
@@ -210,11 +210,11 @@ typedef struct __attribute__((packed)) {
     network_uint32_t pref_ltime;    /**< preferred lifetime */
     network_uint32_t resv;          /**< reserved field */
     ipv6_addr_t prefix;             /**< prefix */
-} ng_ndp_opt_pi_t;
+} ndp_opt_pi_t;
 
 /**
  * @brief   Redirected header option format
- * @extends ng_ndp_opt_t
+ * @extends ndp_opt_t
  *
  * @see <a href="https://tools.ietf.org/html/rfc4861#section-4.6.3">
  *          RFC 4861, section 4.6.3
@@ -224,11 +224,11 @@ typedef struct __attribute__((packed)) {
     uint8_t type;           /**< option type */
     uint8_t len;            /**< length in units of 8 octets */
     uint8_t resv[6];        /**< reserved field */
-} ng_ndp_opt_rh_t;
+} ndp_opt_rh_t;
 
 /**
  * @brief   MTU option format
- * @extends ng_ndp_opt_t
+ * @extends ndp_opt_t
  *
  * @see <a href="https://tools.ietf.org/html/rfc4861#section-4.6.4">
  *          RFC 4861, section 4.6.4
@@ -239,12 +239,12 @@ typedef struct __attribute__((packed)) {
     uint8_t len;            /**< length in units of 8 octets */
     network_uint16_t resv;  /**< reserved field */
     network_uint32_t mtu;   /**< MTU */
-} ng_ndp_opt_mtu_t;
+} ndp_opt_mtu_t;
 
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* NG_NDP_TYPES_H_ */
+#endif /* NDP_H_ */
 /** @} */

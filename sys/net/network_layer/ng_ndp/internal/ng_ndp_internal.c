@@ -161,14 +161,14 @@ void ng_ndp_internal_send_nbr_adv(kernel_pid_t iface, ipv6_addr_t *tgt,
           ipv6_addr_to_str(addr_str, dst, sizeof(addr_str)), supply_tl2a);
 
     if (ng_ipv6_netif_get(iface)->flags & NG_IPV6_NETIF_FLAGS_ROUTER) {
-        adv_flags |= NG_NDP_NBR_ADV_FLAGS_R;
+        adv_flags |= NDP_NBR_ADV_FLAGS_R;
     }
 
     if (ipv6_addr_is_unspecified(dst)) {
         ipv6_addr_set_all_nodes_multicast(dst, IPV6_ADDR_MCAST_SCP_LINK_LOCAL);
     }
     else {
-        adv_flags |= NG_NDP_NBR_ADV_FLAGS_S;
+        adv_flags |= NDP_NBR_ADV_FLAGS_S;
     }
 
     if (supply_tl2a) {
@@ -192,7 +192,7 @@ void ng_ndp_internal_send_nbr_adv(kernel_pid_t iface, ipv6_addr_t *tgt,
     /* TODO: also check if the node provides proxy servies for tgt */
     if ((pkt != NULL) && !ng_ipv6_netif_addr_is_non_unicast(tgt)) {
         /* TL2A is not supplied and tgt is not anycast */
-        adv_flags |= NG_NDP_NBR_ADV_FLAGS_O;
+        adv_flags |= NDP_NBR_ADV_FLAGS_O;
     }
 
     hdr = ng_ndp_nbr_adv_build(adv_flags, tgt, pkt);
@@ -313,7 +313,7 @@ void ng_ndp_internal_send_nbr_sol(kernel_pid_t iface, ipv6_addr_t *tgt,
 
 bool ng_ndp_internal_sl2a_opt_handle(kernel_pid_t iface, ng_pktsnip_t *pkt,
                                      ipv6_hdr_t *ipv6, uint8_t icmpv6_type,
-                                     ng_ndp_opt_t *sl2a_opt)
+                                     ndp_opt_t *sl2a_opt)
 {
     ng_ipv6_nc_t *nc_entry = NULL;
     uint8_t sl2a_len = 0;
@@ -334,7 +334,7 @@ bool ng_ndp_internal_sl2a_opt_handle(kernel_pid_t iface, ng_pktsnip_t *pkt,
     }
 
     if (sl2a_len == 0) {  /* in case there was no source address in l2 */
-        sl2a_len = (sl2a_opt->len / 8) - sizeof(ng_ndp_opt_t);
+        sl2a_len = (sl2a_opt->len / 8) - sizeof(ndp_opt_t);
 
         /* ignore all zeroes at the end for length */
         for (; sl2a[sl2a_len - 1] == 0x00; sl2a_len--);
@@ -372,7 +372,7 @@ bool ng_ndp_internal_sl2a_opt_handle(kernel_pid_t iface, ng_pktsnip_t *pkt,
 }
 
 int ng_ndp_internal_tl2a_opt_handle(ng_pktsnip_t *pkt, ipv6_hdr_t *ipv6,
-                                    uint8_t icmpv6_type, ng_ndp_opt_t *tl2a_opt,
+                                    uint8_t icmpv6_type, ndp_opt_t *tl2a_opt,
                                     uint8_t *l2addr)
 {
     uint8_t tl2a_len = 0;
@@ -395,7 +395,7 @@ int ng_ndp_internal_tl2a_opt_handle(ng_pktsnip_t *pkt, ipv6_hdr_t *ipv6,
             }
 
             if (tl2a_len == 0) {  /* in case there was no source address in l2 */
-                tl2a_len = (tl2a_opt->len / 8) - sizeof(ng_ndp_opt_t);
+                tl2a_len = (tl2a_opt->len / 8) - sizeof(ndp_opt_t);
 
                 /* ignore all zeroes at the end for length */
                 for (; tl2a[tl2a_len - 1] == 0x00; tl2a_len--);

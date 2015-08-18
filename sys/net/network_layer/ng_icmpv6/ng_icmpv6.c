@@ -99,13 +99,13 @@ void ng_icmpv6_demux(kernel_pid_t iface, ng_pktsnip_t *pkt)
 
         case ICMPV6_NBR_SOL:
             DEBUG("icmpv6: neighbor solicitation received\n");
-            ng_ndp_nbr_sol_handle(iface, pkt, ipv6->data, (ng_ndp_nbr_sol_t *)hdr,
+            ng_ndp_nbr_sol_handle(iface, pkt, ipv6->data, (ndp_nbr_sol_t *)hdr,
                                   icmpv6->size);
             break;
 
         case ICMPV6_NBR_ADV:
             DEBUG("icmpv6: neighbor advertisement received\n");
-            ng_ndp_nbr_adv_handle(iface, pkt, ipv6->data, (ng_ndp_nbr_adv_t *)hdr,
+            ng_ndp_nbr_adv_handle(iface, pkt, ipv6->data, (ndp_nbr_adv_t *)hdr,
                                   icmpv6->size);
             break;
 
