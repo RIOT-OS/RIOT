@@ -45,7 +45,7 @@ static void usage(char **argv)
     puts("    delay = 1000");
 }
 
-void _set_payload(ng_icmpv6_echo_t *hdr, size_t payload_len)
+void _set_payload(icmpv6_echo_t *hdr, size_t payload_len)
 {
     size_t i = 0;
     uint8_t *payload = (uint8_t *)(hdr + 1);
@@ -81,7 +81,7 @@ int _handle_reply(ng_pktsnip_t *pkt, uint64_t time)
 {
     ng_pktsnip_t *ipv6, *icmpv6;
     ipv6_hdr_t *ipv6_hdr;
-    ng_icmpv6_echo_t *icmpv6_hdr;
+    icmpv6_echo_t *icmpv6_hdr;
     uint16_t seq;
 
     LL_SEARCH_SCALAR(pkt, ipv6, type, NG_NETTYPE_IPV6);
@@ -136,7 +136,7 @@ int _icmpv6_ping(int argc, char **argv)
     timex_t delay = { 1, 0 };
     char *addr_str;
     ipv6_addr_t addr;
-    ng_netreg_entry_t *ipv6_entry, my_entry = { NULL, NG_ICMPV6_ECHO_REP,
+    ng_netreg_entry_t *ipv6_entry, my_entry = { NULL, ICMPV6_ECHO_REP,
                                                 thread_getpid()
                                               };
     timex_t min_rtt = { UINT32_MAX, UINT32_MAX }, max_rtt = { 0, 0 };

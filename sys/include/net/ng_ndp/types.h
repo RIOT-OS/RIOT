@@ -97,7 +97,7 @@ extern "C" {
 
 /**
  * @brief   Router solicitation message format.
- * @extends ng_icmpv6_hdr_t
+ * @extends icmpv6_hdr_t
  *
  * @see <a href="https://tools.ietf.org/html/rfc4861#section-4.1">
  *          RFC 4861, section 4.1
@@ -112,7 +112,7 @@ typedef struct __attribute__((packed)) {
 
 /**
  * @brief   Router advertisement message format.
- * @extends ng_icmpv6_hdr_t
+ * @extends icmpv6_hdr_t
  *
  * @see <a href="https://tools.ietf.org/html/rfc4861#section-4.2">
  *          RFC 4861, section 4.2
@@ -131,7 +131,7 @@ typedef struct __attribute__((packed)) {
 
 /**
  * @brief   Neighbor solicitation message format.
- * @extends ng_icmpv6_hdr_t
+ * @extends icmpv6_hdr_t
  *
  * @see <a href="https://tools.ietf.org/html/rfc4861#section-4.3">
  *          RFC 4861, section 4.3
@@ -147,7 +147,7 @@ typedef struct __attribute__((packed)) {
 
 /**
  * @brief   Neighbor advertisement message format.
- * @extends ng_icmpv6_hdr_t
+ * @extends icmpv6_hdr_t
  *
  * @see <a href="https://tools.ietf.org/html/rfc4861#section-4.4">
  *          RFC 4861, section 4.4
@@ -164,7 +164,7 @@ typedef struct __attribute__((packed)) {
 
 /**
  * @brief   Neighbor advertisement message format.
- * @extends ng_icmpv6_hdr_t
+ * @extends icmpv6_hdr_t
  *
  * @see <a href="https://tools.ietf.org/html/rfc4861#section-4.5">
  *          RFC 4861, section 4.5

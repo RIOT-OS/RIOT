@@ -25,36 +25,16 @@
 #include "byteorder.h"
 #include "kernel_types.h"
 #include "net/ipv6/hdr.h"
-#include "net/ng_icmpv6/types.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /**
- * @brief   Echo request and response message format.
- * @extends ng_icmpv6_hdr_t
- *
- * @see <a href="https://tools.ietf.org/html/rfc4443#section-4.1">
- *          RFC 4443, section 4.1
- *      </a>
- * @see <a href="https://tools.ietf.org/html/rfc4443#section-4.2">
- *          RFC 4443, section 4.2
- *      </a>
- */
-typedef struct __attribute__((packed)) {
-    uint8_t type;           /**< message type */
-    uint8_t code;           /**< message code */
-    network_uint16_t csum;  /**< checksum */
-    network_uint16_t id;    /**< identifier */
-    network_uint16_t seq;   /**< Sequence number */
-} ng_icmpv6_echo_t;
-
-/**
  * @brief   Builds an ICMPv6 echo message of type @p type for sending.
  *
  * @param[in] type      Type of the echo message. Expected to be either
- *                      NG_ICMPV6_ECHO_REQ or NG_ICMPV6_ECHO_REP.
+ *                      ICMPV6_ECHO_REQ or ICMPV6_ECHO_REP.
  * @param[in] id        ID for the echo message in host byte-order
  * @param[in] seq       Sequence number for the echo message in host byte-order
  * @param[in] data      Payload for the echo message
@@ -84,7 +64,7 @@ ng_pktsnip_t *ng_icmpv6_echo_build(uint8_t type, uint16_t id, uint16_t seq,
 static inline ng_pktsnip_t *ng_icmpv6_echo_req_build(uint16_t id, uint16_t seq,
         uint8_t *data, size_t data_len)
 {
-    return ng_icmpv6_echo_build(NG_ICMPV6_ECHO_REQ, id, seq, data, data_len);
+    return ng_icmpv6_echo_build(ICMPV6_ECHO_REQ, id, seq, data, data_len);
 }
 
 /**
@@ -105,7 +85,7 @@ static inline ng_pktsnip_t *ng_icmpv6_echo_req_build(uint16_t id, uint16_t seq,
 static inline ng_pktsnip_t *ng_icmpv6_echo_rep_build(uint16_t id, uint16_t seq,
         uint8_t *data, size_t data_len)
 {
-    return ng_icmpv6_echo_build(NG_ICMPV6_ECHO_REP, id, seq, data, data_len);
+    return ng_icmpv6_echo_build(ICMPV6_ECHO_REP, id, seq, data, data_len);
 }
 
 
@@ -119,7 +99,7 @@ static inline ng_pktsnip_t *ng_icmpv6_echo_rep_build(uint16_t id, uint16_t seq,
  *                      of @p ipv6_hdr minus length of extension headers).
  */
 void ng_icmpv6_echo_req_handle(kernel_pid_t iface, ipv6_hdr_t *ipv6_hdr,
-                               ng_icmpv6_echo_t *echo, uint16_t len);
+                               icmpv6_echo_t *echo, uint16_t len);
 
 #ifdef __cplusplus
 }

@@ -31,7 +31,6 @@
 #include <string.h>
 #include <stdint.h>
 #include "net/ng_ipv6.h"
-#include "net/ng_icmpv6.h"
 #include "net/ng_nettype.h"
 #include "net/ng_rpl/structs.h"
 #include "net/ng_rpl/dodag.h"

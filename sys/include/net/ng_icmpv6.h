@@ -27,33 +27,16 @@
 #ifndef NG_ICMPV6_H_
 #define NG_ICMPV6_H_
 
-#include <inttypes.h>
-
-#include "byteorder.h"
 #include "kernel_types.h"
-#include "net/ng_nettype.h"
+#include "net/icmpv6.h"
 #include "net/ng_pkt.h"
 
 #include "net/ng_icmpv6/echo.h"
 #include "net/ng_icmpv6/error.h"
-#include "net/ng_icmpv6/types.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/**
- * @brief   General ICMPv6 message format.
- *
- * @see <a href="https://tools.ietf.org/html/rfc4443#section-2.1">
- *          RFC 4443, section 2.1
- *      </a>
- */
-typedef struct __attribute__((packed)) {
-    uint8_t type;           /**< message type */
-    uint8_t code;           /**< message code */
-    network_uint16_t csum;  /**< checksum */
-} ng_icmpv6_hdr_t;
 
 /**
  * @brief   Demultiplexes a received ICMPv6 packet according to its type field.
@@ -70,7 +53,7 @@ void ng_icmpv6_demux(kernel_pid_t iface, ng_pktsnip_t *pkt);
  * @param[in] type  Type for the ICMPv6 message.
  * @param[in] code  Code for the ICMPv6 message.
  * @param[in] size  Size of the ICMPv6 message (needs do be >
- *                  `sizeof(ng_icmpv6_hdr_t)`).
+ *                  `sizeof(icmpv6_hdr_t)`).
  *
  * @return  The ICMPv6 message on success
  * @return  NULL, on failure

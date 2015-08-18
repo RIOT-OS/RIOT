@@ -365,7 +365,7 @@ ng_pktsnip_t *ng_ndp_nbr_sol_build(ipv6_addr_t *tgt, ng_pktsnip_t *options)
         return NULL;
     }
 
-    pkt = ng_icmpv6_build(options, NG_ICMPV6_NBR_SOL, 0, sizeof(ng_ndp_nbr_sol_t));
+    pkt = ng_icmpv6_build(options, ICMPV6_NBR_SOL, 0, sizeof(ng_ndp_nbr_sol_t));
 
     if (pkt != NULL) {
         ng_ndp_nbr_sol_t *nbr_sol = pkt->data;
@@ -389,7 +389,7 @@ ng_pktsnip_t *ng_ndp_nbr_adv_build(uint8_t flags, ipv6_addr_t *tgt,
         return NULL;
     }
 
-    pkt = ng_icmpv6_build(options, NG_ICMPV6_NBR_ADV, 0, sizeof(ng_ndp_nbr_adv_t));
+    pkt = ng_icmpv6_build(options, ICMPV6_NBR_ADV, 0, sizeof(ng_ndp_nbr_adv_t));
 
     if (pkt != NULL) {
         ng_ndp_nbr_adv_t *nbr_adv = pkt->data;
