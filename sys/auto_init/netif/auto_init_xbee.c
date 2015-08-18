@@ -20,7 +20,7 @@
 #ifdef MODULE_XBEE
 
 #include "board.h"
-#include "net/ng_nomac.h"
+#include "net/gnrc/nomac.h"
 #include "net/gnrc.h"
 
 #include "xbee.h"
@@ -60,9 +60,9 @@ void auto_init_xbee(void)
             DEBUG("Error initializing XBee radio device!");
         }
         else {
-            ng_nomac_init(_nomac_stacks[i],
-                    XBEE_MAC_STACKSIZE, XBEE_MAC_PRIO, "xbee",
-                    (ng_netdev_t *)&xbee_devs[i]);
+            gnrc_nomac_init(_nomac_stacks[i],
+                            XBEE_MAC_STACKSIZE, XBEE_MAC_PRIO, "xbee",
+                            (gnrc_netdev_t *)&xbee_devs[i]);
         }
     }
 }

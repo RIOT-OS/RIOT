@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief       Unittests for the ``ng_ipv6_netif`` module
+ * @brief       Unittests for the ``gnrc_ipv6_netif`` module
  *
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */

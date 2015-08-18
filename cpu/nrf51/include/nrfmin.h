@@ -55,7 +55,7 @@
 #ifndef NRFMIN_H_
 #define NRFMIN_H_
 
-#include "net/ng_netdev.h"
+#include "net/gnrc/netdev.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -79,7 +79,7 @@ extern "C" {
 /**
  * @brief   Reference to the netdev driver interface
  */
-extern const ng_netdev_driver_t nrfmin_driver;
+extern const gnrc_netdev_driver_t nrfmin_driver;
 
 /**
  * @brief   Initialize the NRF51822 radio
@@ -91,7 +91,7 @@ extern const ng_netdev_driver_t nrfmin_driver;
  * @return              0 on success
  * @return              -ENODEV if @p dev is invalid
  */
-int nrfmin_init(ng_netdev_t *dev);
+int nrfmin_init(gnrc_netdev_t *dev);
 
 #ifdef __cplusplus
 }

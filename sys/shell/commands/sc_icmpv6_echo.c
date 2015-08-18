@@ -19,13 +19,13 @@
 #include <stdlib.h>
 #include <inttypes.h>
 
-#ifdef MODULE_NG_ICMPV6
+#ifdef MODULE_GNRC_ICMPV6
 
 #include "byteorder.h"
-#include "net/ng_icmpv6.h"
+#include "net/gnrc/icmpv6.h"
 #include "net/ipv6/addr.h"
-#include "net/ng_ipv6/nc.h"
-#include "net/ng_ipv6/hdr.h"
+#include "net/gnrc/ipv6/nc.h"
+#include "net/gnrc/ipv6/hdr.h"
 #include "net/gnrc.h"
 #include "thread.h"
 #include "utlist.h"
@@ -77,15 +77,15 @@ static inline bool _expected_seq(uint16_t seq)
     }
 }
 
-int _handle_reply(ng_pktsnip_t *pkt, uint64_t time)
+int _handle_reply(gnrc_pktsnip_t *pkt, uint64_t time)
 {
-    ng_pktsnip_t *ipv6, *icmpv6;
+    gnrc_pktsnip_t *ipv6, *icmpv6;
     ipv6_hdr_t *ipv6_hdr;
     icmpv6_echo_t *icmpv6_hdr;
     uint16_t seq;
 
-    LL_SEARCH_SCALAR(pkt, ipv6, type, NG_NETTYPE_IPV6);
-    LL_SEARCH_SCALAR(pkt, icmpv6, type, NG_NETTYPE_ICMPV6);
+    LL_SEARCH_SCALAR(pkt, ipv6, type, GNRC_NETTYPE_IPV6);
+    LL_SEARCH_SCALAR(pkt, icmpv6, type, GNRC_NETTYPE_ICMPV6);
 
     if ((ipv6 == NULL) || (icmpv6 == NULL)) {
         puts("error: IPv6 header or ICMPv6 header not found in reply");
@@ -108,7 +108,7 @@ int _handle_reply(ng_pktsnip_t *pkt, uint64_t time)
                byteorder_ntohs(icmpv6_hdr->id), seq, ipv6_hdr->hl,
                (rt.seconds * SEC_IN_MS) + (rt.microseconds / MS_IN_USEC),
                rt.microseconds % MS_IN_USEC);
-        ng_ipv6_nc_still_reachable(&ipv6_hdr->src);
+        gnrc_ipv6_nc_still_reachable(&ipv6_hdr->src);
     }
     else {
         puts("error: unexpected parameters");
@@ -136,9 +136,9 @@ int _icmpv6_ping(int argc, char **argv)
     timex_t delay = { 1, 0 };
     char *addr_str;
     ipv6_addr_t addr;
-    ng_netreg_entry_t *ipv6_entry, my_entry = { NULL, ICMPV6_ECHO_REP,
-                                                thread_getpid()
-                                              };
+    gnrc_netreg_entry_t *ipv6_entry, my_entry = { NULL, ICMPV6_ECHO_REP,
+                                                  thread_getpid()
+                                                };
     timex_t min_rtt = { UINT32_MAX, UINT32_MAX }, max_rtt = { 0, 0 };
     timex_t sum_rtt = { 0, 0 };
     timex_t start, stop;
@@ -194,12 +194,12 @@ int _icmpv6_ping(int argc, char **argv)
         return 1;
     }
 
-    if (ng_netreg_register(NG_NETTYPE_ICMPV6, &my_entry) < 0) {
+    if (gnrc_netreg_register(GNRC_NETTYPE_ICMPV6, &my_entry) < 0) {
         puts("error: network registry is full");
         return 1;
     }
 
-    ipv6_entry = ng_netreg_lookup(NG_NETTYPE_IPV6, NG_NETREG_DEMUX_CTX_ALL);
+    ipv6_entry = gnrc_netreg_lookup(GNRC_NETTYPE_IPV6, GNRC_NETREG_DEMUX_CTX_ALL);
 
     if (ipv6_entry == NULL) {
         puts("error: ipv6 thread missing");
@@ -212,11 +212,11 @@ int _icmpv6_ping(int argc, char **argv)
 
     while ((remaining--) > 0) {
         msg_t msg;
-        ng_pktsnip_t *pkt;
+        gnrc_pktsnip_t *pkt;
         timex_t start, stop, timeout = { 5, 0 };
 
-        pkt = ng_icmpv6_echo_req_build(id, ++max_seq_expected, NULL,
-                                       payload_len);
+        pkt = gnrc_icmpv6_echo_req_build(id, ++max_seq_expected, NULL,
+                                         payload_len);
 
         if (pkt == NULL) {
             puts("error: packet buffer full");
@@ -225,8 +225,8 @@ int _icmpv6_ping(int argc, char **argv)
 
         _set_payload(pkt->data, payload_len);
 
-        pkt = ng_netreg_hdr_build(NG_NETTYPE_IPV6, pkt, NULL, 0, addr.u8,
-                                  sizeof(ipv6_addr_t));
+        pkt = gnrc_netreg_hdr_build(GNRC_NETTYPE_IPV6, pkt, NULL, 0, addr.u8,
+                                    sizeof(ipv6_addr_t));
 
         if (pkt == NULL) {
             puts("error: packet buffer full");
@@ -234,17 +234,17 @@ int _icmpv6_ping(int argc, char **argv)
         }
 
         vtimer_now(&start);
-        ng_netapi_send(ipv6_entry->pid, pkt);
+        gnrc_netapi_send(ipv6_entry->pid, pkt);
 
         if (vtimer_msg_receive_timeout(&msg, timeout) >= 0) {
             switch (msg.type) {
-                case NG_NETAPI_MSG_TYPE_RCV:
+                case GNRC_NETAPI_MSG_TYPE_RCV:
                     vtimer_now(&stop);
                     stop = timex_sub(stop, start);
 
-                    ng_pktsnip_t *pkt = (ng_pktsnip_t *)msg.content.ptr;
+                    gnrc_pktsnip_t *pkt = (gnrc_pktsnip_t *)msg.content.ptr;
                     success += _handle_reply(pkt, timex_uint64(stop));
-                    ng_pktbuf_release(pkt);
+                    gnrc_pktbuf_release(pkt);
 
                     if (timex_cmp(stop, max_rtt) > 0) {
                         max_rtt = stop;
@@ -279,7 +279,7 @@ int _icmpv6_ping(int argc, char **argv)
     id++;
     stop = timex_sub(stop, start);
 
-    ng_netreg_unregister(NG_NETTYPE_ICMPV6, &my_entry);
+    gnrc_netreg_unregister(GNRC_NETTYPE_ICMPV6, &my_entry);
 
     printf("--- %s ping statistics ---\n", addr_str);
 

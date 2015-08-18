@@ -1,6 +1,6 @@
-ifneq (,$(filter ng_netif_default,$(USEMODULE)))
+ifneq (,$(filter gnrc_netif_default,$(USEMODULE)))
   USEMODULE += at86rf212b
-  USEMODULE += ng_nomac
+  USEMODULE += gnrc_nomac
 endif
 
 # The RTT clock drives the core clock in the default configuration

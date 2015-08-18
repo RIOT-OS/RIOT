@@ -18,8 +18,8 @@
 
 #include "net/ipv6/addr.h"
 #include "net/ipv6/hdr.h"
-#include "net/ng_ipv6/hdr.h"
-#include "net/ng_pktbuf.h"
+#include "net/gnrc/ipv6/hdr.h"
+#include "net/gnrc/pktbuf.h"
 
 #include "unittests-constants.h"
 #include "tests-gnrc_ipv6_hdr.h"
@@ -40,12 +40,12 @@ static void test_gnrc_ipv6_hdr_build__wrong_src_len(void)
     ipv6_addr_t src = DEFAULT_TEST_SRC;
     ipv6_addr_t dst = DEFAULT_TEST_DST;
 
-    ng_pktbuf_init();
-    TEST_ASSERT_NULL(ng_ipv6_hdr_build(NULL, (uint8_t *)&src,
-                                       sizeof(ipv6_addr_t) + TEST_UINT8,
-                                       (uint8_t *)&dst,
-                                       sizeof(ipv6_addr_t)));
-    TEST_ASSERT(ng_pktbuf_is_empty());
+    gnrc_pktbuf_init();
+    TEST_ASSERT_NULL(gnrc_ipv6_hdr_build(NULL, (uint8_t *)&src,
+                                         sizeof(ipv6_addr_t) + TEST_UINT8,
+                                         (uint8_t *)&dst,
+                                         sizeof(ipv6_addr_t)));
+    TEST_ASSERT(gnrc_pktbuf_is_empty());
 }
 
 static void test_gnrc_ipv6_hdr_build__wrong_dst_len(void)
@@ -53,22 +53,22 @@ static void test_gnrc_ipv6_hdr_build__wrong_dst_len(void)
     ipv6_addr_t src = DEFAULT_TEST_SRC;
     ipv6_addr_t dst = DEFAULT_TEST_DST;
 
-    ng_pktbuf_init();
-    TEST_ASSERT_NULL(ng_ipv6_hdr_build(NULL, (uint8_t *)&src,
-                                       sizeof(ipv6_addr_t),
-                                       (uint8_t *)&dst,
-                                       sizeof(ipv6_addr_t) + TEST_UINT8));
-    TEST_ASSERT(ng_pktbuf_is_empty());
+    gnrc_pktbuf_init();
+    TEST_ASSERT_NULL(gnrc_ipv6_hdr_build(NULL, (uint8_t *)&src,
+                                         sizeof(ipv6_addr_t),
+                                         (uint8_t *)&dst,
+                                         sizeof(ipv6_addr_t) + TEST_UINT8));
+    TEST_ASSERT(gnrc_pktbuf_is_empty());
 }
 
 static void test_gnrc_ipv6_hdr_build__src_NULL(void)
 {
     ipv6_addr_t dst = DEFAULT_TEST_DST;
-    ng_pktsnip_t *pkt;
+    gnrc_pktsnip_t *pkt;
     ipv6_hdr_t *hdr;
 
-    ng_pktbuf_init();
-    TEST_ASSERT_NOT_NULL((pkt = ng_ipv6_hdr_build(NULL, NULL, 0, (uint8_t *)&dst,
+    gnrc_pktbuf_init();
+    TEST_ASSERT_NOT_NULL((pkt = gnrc_ipv6_hdr_build(NULL, NULL, 0, (uint8_t *)&dst,
                                 sizeof(ipv6_addr_t))));
     hdr = pkt->data;
     TEST_ASSERT_NOT_NULL(hdr);
@@ -78,17 +78,17 @@ static void test_gnrc_ipv6_hdr_build__src_NULL(void)
     TEST_ASSERT_EQUAL_INT(PROTNUM_RESERVED, hdr->nh);
     TEST_ASSERT_EQUAL_INT(0, hdr->hl);
     TEST_ASSERT(ipv6_addr_equal(&dst, &hdr->dst));
-    TEST_ASSERT(!ng_pktbuf_is_empty());
+    TEST_ASSERT(!gnrc_pktbuf_is_empty());
 }
 
 static void test_gnrc_ipv6_hdr_build__dst_NULL(void)
 {
     ipv6_addr_t src = DEFAULT_TEST_SRC;
-    ng_pktsnip_t *pkt;
+    gnrc_pktsnip_t *pkt;
     ipv6_hdr_t *hdr;
 
-    ng_pktbuf_init();
-    TEST_ASSERT_NOT_NULL((pkt = ng_ipv6_hdr_build(NULL, (uint8_t *)&src,
+    gnrc_pktbuf_init();
+    TEST_ASSERT_NOT_NULL((pkt = gnrc_ipv6_hdr_build(NULL, (uint8_t *)&src,
                                 sizeof(ipv6_addr_t),
                                 NULL, 0)));
     hdr = pkt->data;
@@ -99,18 +99,18 @@ static void test_gnrc_ipv6_hdr_build__dst_NULL(void)
     TEST_ASSERT_EQUAL_INT(PROTNUM_RESERVED, hdr->nh);
     TEST_ASSERT_EQUAL_INT(0, hdr->hl);
     TEST_ASSERT(ipv6_addr_equal(&src, &hdr->src));
-    TEST_ASSERT(!ng_pktbuf_is_empty());
+    TEST_ASSERT(!gnrc_pktbuf_is_empty());
 }
 
 static void test_gnrc_ipv6_hdr_build__complete(void)
 {
     ipv6_addr_t src = DEFAULT_TEST_SRC;
     ipv6_addr_t dst = DEFAULT_TEST_DST;
-    ng_pktsnip_t *pkt;
+    gnrc_pktsnip_t *pkt;
     ipv6_hdr_t *hdr;
 
-    ng_pktbuf_init();
-    TEST_ASSERT_NOT_NULL((pkt = ng_ipv6_hdr_build(NULL, (uint8_t *)&src,
+    gnrc_pktbuf_init();
+    TEST_ASSERT_NOT_NULL((pkt = gnrc_ipv6_hdr_build(NULL, (uint8_t *)&src,
                                 sizeof(ipv6_addr_t),
                                 (uint8_t *)&dst,
                                 sizeof(ipv6_addr_t))));
@@ -123,7 +123,7 @@ static void test_gnrc_ipv6_hdr_build__complete(void)
     TEST_ASSERT_EQUAL_INT(0, hdr->hl);
     TEST_ASSERT(ipv6_addr_equal(&src, &hdr->src));
     TEST_ASSERT(ipv6_addr_equal(&dst, &hdr->dst));
-    TEST_ASSERT(!ng_pktbuf_is_empty());
+    TEST_ASSERT(!gnrc_pktbuf_is_empty());
 }
 
 Test *tests_gnrc_ipv6_hdr_tests(void)

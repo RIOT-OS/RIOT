@@ -10,7 +10,7 @@
  * @defgroup    net_netopt   Configuration options for network APIs
  * @ingroup     net
  * @brief       List of available configuration options for the
- *              @ref net_ng_netdev and the @ref net_ng_netapi
+ *              @ref net_gnrc_netdev and the @ref net_gnrc_netapi
  * @{
  *
  * @file
@@ -80,7 +80,7 @@ typedef enum {
     /**
      * @brief en/disable preloading or read the current state.
      *
-     * Preload using ng_netdev_driver_t::send_data() or ng_netapi_send()
+     * Preload using gnrc_netdev_driver_t::send_data() or gnrc_netapi_send()
      * respectively, send setting state to @ref NETOPT_STATE_TX
      */
     NETOPT_PRELOADING,
@@ -91,12 +91,12 @@ typedef enum {
     NETOPT_RETRANS,             /**< get/set the maximum number of
                                  *   retransmissions. */
     NETOPT_PROTO,               /**< get/set the protocol for the layer
-                                 *   as type ng_nettype_t. */
+                                 *   as type gnrc_nettype_t. */
     NETOPT_STATE,               /**< get/set the state of network devices as
                                  *   type netopt_state_t */
     NETOPT_RAWMODE,             /**< en/disable the pre-processing of data
                                  *   in a network device driver as type
-                                 *   ng_nettype_t */
+                                 *   gnrc_nettype_t */
     /**
      * @brief en/disable the interrupt at reception start.
      *

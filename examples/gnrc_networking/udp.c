@@ -23,11 +23,11 @@
 
 #include "kernel.h"
 #include "net/gnrc.h"
-#include "net/ng_ipv6.h"
-#include "net/ng_udp.h"
-#include "net/ng_pktdump.h"
+#include "net/gnrc/ipv6.h"
+#include "net/gnrc/udp.h"
+#include "net/gnrc/pktdump.h"
 
-static ng_netreg_entry_t server = {NULL, NG_NETREG_DEMUX_CTX_ALL,
+static gnrc_netreg_entry_t server = {NULL, GNRC_NETREG_DEMUX_CTX_ALL,
                                    KERNEL_PID_UNDEF};
 
 
@@ -35,9 +35,9 @@ static void send(char *addr_str, char *port_str, char *data)
 {
     uint8_t port[2];
     uint16_t tmp;
-    ng_pktsnip_t *payload, *udp, *ip;
+    gnrc_pktsnip_t *payload, *udp, *ip;
     ipv6_addr_t addr;
-    ng_netreg_entry_t *sendto;
+    gnrc_netreg_entry_t *sendto;
 
     /* parse destination address */
     if (ipv6_addr_from_str(&addr, addr_str) == NULL) {
@@ -54,37 +54,37 @@ static void send(char *addr_str, char *port_str, char *data)
     port[1] = tmp >> 8;
 
     /* allocate payload */
-    payload = ng_pktbuf_add(NULL, data, strlen(data), NG_NETTYPE_UNDEF);
+    payload = gnrc_pktbuf_add(NULL, data, strlen(data), GNRC_NETTYPE_UNDEF);
     if (payload == NULL) {
         puts("Error: unable to copy data to packet buffer");
         return;
     }
     /* allocate UDP header, set source port := destination port */
-    udp = ng_udp_hdr_build(payload, port, 2, port, 2);
+    udp = gnrc_udp_hdr_build(payload, port, 2, port, 2);
     if (udp == NULL) {
         puts("Error: unable to allocate UDP header");
-        ng_pktbuf_release(payload);
+        gnrc_pktbuf_release(payload);
         return;
     }
     /* allocate IPv6 header */
-    ip = ng_ipv6_hdr_build(udp, NULL, 0, (uint8_t *)&addr, sizeof(addr));
+    ip = gnrc_ipv6_hdr_build(udp, NULL, 0, (uint8_t *)&addr, sizeof(addr));
     if (ip == NULL) {
         puts("Error: unable to allocate IPv6 header");
-        ng_pktbuf_release(udp);
+        gnrc_pktbuf_release(udp);
         return;
     }
     /* send packet */
-    sendto = ng_netreg_lookup(NG_NETTYPE_UDP, NG_NETREG_DEMUX_CTX_ALL);
+    sendto = gnrc_netreg_lookup(GNRC_NETTYPE_UDP, GNRC_NETREG_DEMUX_CTX_ALL);
     if (sendto == NULL) {
         puts("Error: unable to locate UDP thread");
-        ng_pktbuf_release(ip);
+        gnrc_pktbuf_release(ip);
         return;
     }
-    ng_pktbuf_hold(ip, ng_netreg_num(NG_NETTYPE_UDP,
-                                     NG_NETREG_DEMUX_CTX_ALL) - 1);
+    gnrc_pktbuf_hold(ip, gnrc_netreg_num(GNRC_NETTYPE_UDP,
+                                         GNRC_NETREG_DEMUX_CTX_ALL) - 1);
     while (sendto != NULL) {
-        ng_netapi_send(sendto->pid, ip);
-        sendto = ng_netreg_getnext(sendto);
+        gnrc_netapi_send(sendto->pid, ip);
+        sendto = gnrc_netreg_getnext(sendto);
     }
     printf("Success: send %i byte to %s:%u\n", payload->size, addr_str, tmp);
 }
@@ -106,9 +106,9 @@ static void start_server(char *port_str)
         return;
     }
     /* start server (which means registering pktdump for the chosen port) */
-    server.pid = ng_pktdump_getpid();
+    server.pid = gnrc_pktdump_getpid();
     server.demux_ctx = (uint32_t)port;
-    ng_netreg_register(NG_NETTYPE_UDP, &server);
+    gnrc_netreg_register(GNRC_NETTYPE_UDP, &server);
     printf("Success: started UDP server on port %" PRIu16 "\n", port);
 }
 
@@ -120,7 +120,7 @@ static void stop_server(void)
         return;
     }
     /* stop server */
-    ng_netreg_unregister(NG_NETTYPE_UDP, &server);
+    gnrc_netreg_unregister(GNRC_NETTYPE_UDP, &server);
     server.pid = KERNEL_PID_UNDEF;
     puts("Success: stopped UDP server");
 }

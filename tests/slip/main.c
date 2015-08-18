@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief       Test application for ng_tapnet network device driver
+ * @brief       Test application for gnrc_tapnet network device driver
  *
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  *
@@ -23,7 +23,7 @@
 #include "shell.h"
 #include "shell_commands.h"
 #include "net/gnrc.h"
-#include "net/ng_pktdump.h"
+#include "net/gnrc/pktdump.h"
 
 /**
  * @brief   Buffer size used by the shell
@@ -36,20 +36,20 @@
 int main(void)
 {
     shell_t shell;
-    ng_netreg_entry_t dump;
+    gnrc_netreg_entry_t dump;
 
     puts("SLIP test");
 
     /* initialize and register pktdump */
-    dump.pid = ng_pktdump_getpid();
-    dump.demux_ctx = NG_NETREG_DEMUX_CTX_ALL;
+    dump.pid = gnrc_pktdump_getpid();
+    dump.demux_ctx = GNRC_NETREG_DEMUX_CTX_ALL;
 
     if (dump.pid <= KERNEL_PID_UNDEF) {
         puts("Error starting pktdump thread");
         return -1;
     }
 
-    ng_netreg_register(NG_NETTYPE_UNDEF, &dump);
+    gnrc_netreg_register(GNRC_NETTYPE_UNDEF, &dump);
 
     /* start the shell */
     puts("Initialization OK, starting shell now");

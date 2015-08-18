@@ -16,7 +16,7 @@
 
 #include "net/protnum.h"
 #include "net/ipv6/ext/rh.h"
-#include "net/ng_rpl/srh.h"
+#include "net/gnrc/rpl/srh.h"
 
 ipv6_addr_t *ipv6_ext_rh_next_hop(ipv6_hdr_t *ipv6)
 {
@@ -46,9 +46,9 @@ ipv6_addr_t *ipv6_ext_rh_next_hop(ipv6_hdr_t *ipv6)
 
     if (ipv6->nh == PROTNUM_IPV6_EXT_RH) {
         switch (ext->type) {
-#ifdef MODULE_NG_RPL_SRH
-            case NG_RPL_SRH_TYPE:
-                return ng_rpl_srh_next_hop((ng_rpl_srh_t *)ext);
+#ifdef MODULE_GNRC_RPL_SRH
+            case GNRC_RPL_SRH_TYPE:
+                return gnrc_rpl_srh_next_hop((gnrc_rpl_srh_t *)ext);
 #endif
 
             default:

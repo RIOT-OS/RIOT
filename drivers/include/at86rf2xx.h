@@ -31,7 +31,7 @@
 #include "board.h"
 #include "periph/spi.h"
 #include "periph/gpio.h"
-#include "net/ng_netdev.h"
+#include "net/gnrc/netdev.h"
 #include "at86rf2xx.h"
 
 #ifdef __cplusplus
@@ -133,8 +133,8 @@ typedef enum {
  */
 typedef struct {
     /* netdev fields */
-    const ng_netdev_driver_t *driver;   /**< pointer to the devices interface */
-    ng_netdev_event_cb_t event_cb;      /**< netdev event callback */
+    const gnrc_netdev_driver_t *driver; /**< pointer to the devices interface */
+    gnrc_netdev_event_cb_t event_cb;    /**< netdev event callback */
     kernel_pid_t mac_pid;               /**< the driver's thread's PID */
     /* device specific fields */
     spi_t spi;                          /**< used SPI device */
@@ -142,7 +142,7 @@ typedef struct {
     gpio_t sleep_pin;                   /**< sleep pin */
     gpio_t reset_pin;                   /**< reset pin */
     gpio_t int_pin;                     /**< external interrupt pin */
-    ng_nettype_t proto;                 /**< protocol the radio expects */
+    gnrc_nettype_t proto;               /**< protocol the radio expects */
     uint8_t state;                      /**< current state of the radio */
     uint8_t seq_nr;                     /**< sequence number to use next */
     uint8_t frame_len;                  /**< length of the current TX frame */

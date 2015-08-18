@@ -24,7 +24,7 @@
 #include "shell_commands.h"
 #include "posix_io.h"
 #include "board_uart0.h"
-#include "net/ng_pktdump.h"
+#include "net/gnrc/pktdump.h"
 #include "net/gnrc.h"
 
 /**
@@ -38,15 +38,15 @@
 int main(void)
 {
     shell_t shell;
-    ng_netreg_entry_t dump;
+    gnrc_netreg_entry_t dump;
 
     puts("AT86RF2xx device driver test");
 
     /* register the pktdump thread */
-    puts("Register the packet dump thread for NG_NETTYPE_UNDEF packets");
-    dump.pid = ng_pktdump_getpid();
-    dump.demux_ctx = NG_NETREG_DEMUX_CTX_ALL;
-    ng_netreg_register(NG_NETTYPE_UNDEF, &dump);
+    puts("Register the packet dump thread for GNRC_NETTYPE_UNDEF packets");
+    dump.pid = gnrc_pktdump_getpid();
+    dump.demux_ctx = GNRC_NETREG_DEMUX_CTX_ALL;
+    gnrc_netreg_register(GNRC_NETTYPE_UNDEF, &dump);
 
     /* start the shell */
     puts("Initialization successful - starting the shell now");

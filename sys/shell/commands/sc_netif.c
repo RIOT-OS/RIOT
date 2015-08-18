@@ -26,14 +26,14 @@
 
 #include "thread.h"
 #include "net/ipv6/addr.h"
-#include "net/ng_ipv6/netif.h"
-#include "net/ng_netif.h"
-#include "net/ng_netapi.h"
+#include "net/gnrc/ipv6/netif.h"
+#include "net/gnrc/netif.h"
+#include "net/gnrc/netapi.h"
 #include "net/netopt.h"
-#include "net/ng_pkt.h"
-#include "net/ng_pktbuf.h"
-#include "net/ng_netif/hdr.h"
-#include "net/ng_sixlowpan/netif.h"
+#include "net/gnrc/pkt.h"
+#include "net/gnrc/pktbuf.h"
+#include "net/gnrc/netif/hdr.h"
+#include "net/gnrc/sixlowpan/netif.h"
 
 /**
  * @brief   The maximal expected link layer address length in byte
@@ -59,10 +59,10 @@ static bool _is_number(char *str)
 
 static bool _is_iface(kernel_pid_t dev)
 {
-    kernel_pid_t ifs[NG_NETIF_NUMOF];
-    size_t numof = ng_netif_get(ifs);
+    kernel_pid_t ifs[GNRC_NETIF_NUMOF];
+    size_t numof = gnrc_netif_get(ifs);
 
-    for (size_t i = 0; i < numof && i < NG_NETIF_NUMOF; i++) {
+    for (size_t i = 0; i < numof && i < GNRC_NETIF_NUMOF; i++) {
         if (ifs[i] == dev) {
             return true;
         }
@@ -175,43 +175,43 @@ static void _netif_list(kernel_pid_t dev)
     netopt_state_t state;
     netopt_enable_t enable;
     bool linebreak = false;
-#ifdef MODULE_NG_IPV6_NETIF
-    ng_ipv6_netif_t *entry = ng_ipv6_netif_get(dev);
+#ifdef MODULE_GNRC_IPV6_NETIF
+    gnrc_ipv6_netif_t *entry = gnrc_ipv6_netif_get(dev);
     char ipv6_addr[IPV6_ADDR_MAX_STR_LEN];
 #endif
 
 
     printf("Iface %2d  ", dev);
 
-    res = ng_netapi_get(dev, NETOPT_ADDRESS, 0, hwaddr, sizeof(hwaddr));
+    res = gnrc_netapi_get(dev, NETOPT_ADDRESS, 0, hwaddr, sizeof(hwaddr));
 
     if (res >= 0) {
         char hwaddr_str[res * 3];
         printf(" HWaddr: ");
-        printf("%s", ng_netif_addr_to_str(hwaddr_str, sizeof(hwaddr_str),
-                                          hwaddr, res));
+        printf("%s", gnrc_netif_addr_to_str(hwaddr_str, sizeof(hwaddr_str),
+                                            hwaddr, res));
         printf(" ");
     }
 
-    res = ng_netapi_get(dev, NETOPT_CHANNEL, 0, &u16, sizeof(u16));
+    res = gnrc_netapi_get(dev, NETOPT_CHANNEL, 0, &u16, sizeof(u16));
 
     if (res >= 0) {
         printf(" Channel: %" PRIu16 " ", u16);
     }
 
-    res = ng_netapi_get(dev, NETOPT_NID, 0, &u16, sizeof(u16));
+    res = gnrc_netapi_get(dev, NETOPT_NID, 0, &u16, sizeof(u16));
 
     if (res >= 0) {
         printf(" NID: 0x%" PRIx16 " ", u16);
     }
 
-    res = ng_netapi_get(dev, NETOPT_TX_POWER, 0, &i16, sizeof(i16));
+    res = gnrc_netapi_get(dev, NETOPT_TX_POWER, 0, &i16, sizeof(i16));
 
     if (res >= 0) {
         printf(" TX-Power: %" PRIi16 "dBm ", i16);
     }
 
-    res = ng_netapi_get(dev, NETOPT_STATE, 0, &state, sizeof(state));
+    res = gnrc_netapi_get(dev, NETOPT_STATE, 0, &state, sizeof(state));
 
     if (res >= 0) {
         printf(" State: ");
@@ -220,53 +220,53 @@ static void _netif_list(kernel_pid_t dev)
 
     printf("\n           ");
 
-    res = ng_netapi_get(dev, NETOPT_ADDRESS_LONG, 0, hwaddr, sizeof(hwaddr));
+    res = gnrc_netapi_get(dev, NETOPT_ADDRESS_LONG, 0, hwaddr, sizeof(hwaddr));
 
     if (res >= 0) {
         char hwaddr_str[res * 3];
         printf("Long HWaddr: ");
-        printf("%s", ng_netif_addr_to_str(hwaddr_str, sizeof(hwaddr_str),
-                                          hwaddr, res));
+        printf("%s", gnrc_netif_addr_to_str(hwaddr_str, sizeof(hwaddr_str),
+                                            hwaddr, res));
         printf("\n           ");
     }
 
-    res = ng_netapi_get(dev, NETOPT_PROMISCUOUSMODE, 0, &enable, sizeof(enable));
+    res = gnrc_netapi_get(dev, NETOPT_PROMISCUOUSMODE, 0, &enable, sizeof(enable));
 
     if ((res >= 0) && (enable == NETOPT_ENABLE)) {
         printf("PROMISC  ");
         linebreak = true;
     }
 
-    res = ng_netapi_get(dev, NETOPT_AUTOACK, 0, &enable, sizeof(enable));
+    res = gnrc_netapi_get(dev, NETOPT_AUTOACK, 0, &enable, sizeof(enable));
 
     if ((res >= 0) && (enable == NETOPT_ENABLE)) {
         printf("AUTOACK  ");
         linebreak = true;
     }
 
-    res = ng_netapi_get(dev, NETOPT_PRELOADING, 0, &enable, sizeof(enable));
+    res = gnrc_netapi_get(dev, NETOPT_PRELOADING, 0, &enable, sizeof(enable));
 
     if ((res >= 0) && (enable == NETOPT_ENABLE)) {
         printf("PRELOAD  ");
         linebreak = true;
     }
 
-    res = ng_netapi_get(dev, NETOPT_RAWMODE, 0, &enable, sizeof(enable));
+    res = gnrc_netapi_get(dev, NETOPT_RAWMODE, 0, &enable, sizeof(enable));
 
     if ((res >= 0) && (enable == NETOPT_ENABLE)) {
         printf("RAWMODE  ");
         linebreak = true;
     }
 
-#ifdef MODULE_NG_IPV6_NETIF
-    if ((entry != NULL) && (entry->flags & NG_IPV6_NETIF_FLAGS_SIXLOWPAN)) {
+#ifdef MODULE_GNRC_IPV6_NETIF
+    if ((entry != NULL) && (entry->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN)) {
         printf("6LO ");
         linebreak = true;
     }
 #endif
 
-#if defined(MODULE_NG_SIXLOWPAN_NETIF) && defined(MODULE_NG_SIXLOWPAN_IPHC)
-    ng_sixlowpan_netif_t *sixlo_entry = ng_sixlowpan_netif_get(dev);
+#if defined(MODULE_GNRC_SIXLOWPAN_NETIF) && defined(MODULE_GNRC_SIXLOWPAN_IPHC)
+    gnrc_sixlowpan_netif_t *sixlo_entry = gnrc_sixlowpan_netif_get(dev);
 
     if ((sixlo_entry != NULL) && (sixlo_entry->iphc_enabled)) {
         printf("IPHC ");
@@ -278,14 +278,14 @@ static void _netif_list(kernel_pid_t dev)
         printf("\n           ");
     }
 
-    res = ng_netapi_get(dev, NETOPT_SRC_LEN, 0, &u16, sizeof(u16));
+    res = gnrc_netapi_get(dev, NETOPT_SRC_LEN, 0, &u16, sizeof(u16));
 
     if (res >= 0) {
         printf("Source address length: %" PRIu16 "\n           ", u16);
     }
 
-#ifdef MODULE_NG_IPV6_NETIF
-    for (int i = 0; i < NG_IPV6_NETIF_ADDR_NUMOF; i++) {
+#ifdef MODULE_GNRC_IPV6_NETIF
+    for (int i = 0; i < GNRC_IPV6_NETIF_ADDR_NUMOF; i++) {
         if (!ipv6_addr_is_unspecified(&entry->addrs[i].addr)) {
             printf("inet6 addr: ");
 
@@ -301,7 +301,7 @@ static void _netif_list(kernel_pid_t dev)
                     printf("global");
                 }
 
-                if (entry->addrs[i].flags & NG_IPV6_NETIF_ADDR_FLAGS_NON_UNICAST) {
+                if (entry->addrs[i].flags & GNRC_IPV6_NETIF_ADDR_FLAGS_NON_UNICAST) {
                     if (ipv6_addr_is_multicast(&entry->addrs[i].addr)) {
                         printf(" [multicast]");
                     }
@@ -350,7 +350,7 @@ static int _netif_set_u16(kernel_pid_t dev, netopt_t opt, char *u16_str)
         return 1;
     }
 
-    if (ng_netapi_set(dev, opt, 0, (uint16_t *)&res, sizeof(uint16_t)) < 0) {
+    if (gnrc_netapi_set(dev, opt, 0, (uint16_t *)&res, sizeof(uint16_t)) < 0) {
         printf("error: unable to set ");
         _print_netopt(opt);
         puts("");
@@ -375,7 +375,7 @@ static int _netif_set_i16(kernel_pid_t dev, netopt_t opt, char *i16_str)
 {
     int16_t val = (int16_t)atoi(i16_str);
 
-    if (ng_netapi_set(dev, opt, 0, (int16_t *)&val, sizeof(int16_t)) < 0) {
+    if (gnrc_netapi_set(dev, opt, 0, (int16_t *)&val, sizeof(int16_t)) < 0) {
         printf("error: unable to set ");
         _print_netopt(opt);
         puts("");
@@ -392,7 +392,7 @@ static int _netif_set_i16(kernel_pid_t dev, netopt_t opt, char *i16_str)
 static int _netif_set_flag(kernel_pid_t dev, netopt_t opt,
                            netopt_enable_t set)
 {
-    if (ng_netapi_set(dev, opt, 0, &set, sizeof(netopt_enable_t)) < 0) {
+    if (gnrc_netapi_set(dev, opt, 0, &set, sizeof(netopt_enable_t)) < 0) {
         puts("error: unable to set option");
         return 1;
     }
@@ -403,7 +403,7 @@ static int _netif_set_flag(kernel_pid_t dev, netopt_t opt,
 static int _netif_set_addr(kernel_pid_t dev, netopt_t opt, char *addr_str)
 {
     uint8_t addr[MAX_ADDR_LEN];
-    size_t addr_len = ng_netif_addr_from_str(addr, sizeof(addr), addr_str);
+    size_t addr_len = gnrc_netif_addr_from_str(addr, sizeof(addr), addr_str);
 
     if (addr_len == 0) {
         puts("error: unable to parse address.\n"
@@ -412,7 +412,7 @@ static int _netif_set_addr(kernel_pid_t dev, netopt_t opt, char *addr_str)
         return 1;
     }
 
-    if (ng_netapi_set(dev, opt, 0, addr, addr_len) < 0) {
+    if (gnrc_netapi_set(dev, opt, 0, addr, addr_len) < 0) {
         printf("error: unable to set ");
         _print_netopt(opt);
         puts("");
@@ -448,8 +448,8 @@ static int _netif_set_state(kernel_pid_t dev, char *state_str)
         puts("usage: ifconfig <if_id> set state [off|sleep|idle|reset]");
         return 1;
     }
-    if (ng_netapi_set(dev, NETOPT_STATE, 0,
-                      &state, sizeof(netopt_state_t)) < 0) {
+    if (gnrc_netapi_set(dev, NETOPT_STATE, 0,
+                        &state, sizeof(netopt_state_t)) < 0) {
         printf("error: unable to set state to ");
         _print_netopt_state(state);
         puts("");
@@ -513,8 +513,8 @@ static int _netif_flag(char *cmd, kernel_pid_t dev, char *flag)
         return _netif_set_flag(dev, NETOPT_RAWMODE, set);
     }
     else if (strcmp(flag, "6lo") == 0) {
-#ifdef MODULE_NG_IPV6_NETIF
-        ng_ipv6_netif_t *entry = ng_ipv6_netif_get(dev);
+#ifdef MODULE_GNRC_IPV6_NETIF
+        gnrc_ipv6_netif_t *entry = gnrc_ipv6_netif_get(dev);
 
         if (entry == NULL) {
             puts("error: unable to (un)set 6LoWPAN support");
@@ -524,12 +524,12 @@ static int _netif_flag(char *cmd, kernel_pid_t dev, char *flag)
         mutex_lock(&entry->mutex);
 
         if (set) {
-            entry->flags |= NG_IPV6_NETIF_FLAGS_SIXLOWPAN;
+            entry->flags |= GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN;
             printf("success: set 6LoWPAN support on interface %" PRIkernel_pid
                    "\n", dev);
         }
         else {
-            entry->flags &= ~NG_IPV6_NETIF_FLAGS_SIXLOWPAN;
+            entry->flags &= ~GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN;
             printf("success: unset 6LoWPAN support on interface %" PRIkernel_pid
                    "\n", dev);
         }
@@ -544,8 +544,8 @@ static int _netif_flag(char *cmd, kernel_pid_t dev, char *flag)
 #endif
     }
     else if (strcmp(flag, "iphc") == 0) {
-#if defined(MODULE_NG_SIXLOWPAN_NETIF) && defined(MODULE_NG_SIXLOWPAN_IPHC)
-        ng_sixlowpan_netif_t *entry = ng_sixlowpan_netif_get(dev);
+#if defined(MODULE_GNRC_SIXLOWPAN_NETIF) && defined(MODULE_GNRC_SIXLOWPAN_IPHC)
+        gnrc_sixlowpan_netif_t *entry = gnrc_sixlowpan_netif_get(dev);
 
         if (entry == NULL) {
             puts("error: unable to (un)set IPHC");
@@ -571,7 +571,7 @@ static int _netif_flag(char *cmd, kernel_pid_t dev, char *flag)
     return 1;
 }
 
-#ifdef MODULE_NG_IPV6_NETIF
+#ifdef MODULE_GNRC_IPV6_NETIF
 static uint8_t _get_prefix_len(char *addr)
 {
     int prefix_len = SC_NETIF_IPV6_DEFAULT_PREFIX_LEN;
@@ -595,7 +595,7 @@ static uint8_t _get_prefix_len(char *addr)
 
 static int _netif_add(char *cmd_name, kernel_pid_t dev, int argc, char **argv)
 {
-#ifdef MODULE_NG_IPV6_NETIF
+#ifdef MODULE_GNRC_IPV6_NETIF
     enum {
         _UNICAST = 0,
         _MULTICAST,     /* multicast value just to check if given addr is mc */
@@ -636,10 +636,10 @@ static int _netif_add(char *cmd_name, kernel_pid_t dev, int argc, char **argv)
         return 1;
     }
 
-    if (ng_ipv6_netif_add_addr(dev, &addr, prefix_len,
-                               (type == _ANYCAST) ?
-                               NG_IPV6_NETIF_ADDR_FLAGS_NON_UNICAST :
-                               NG_IPV6_NETIF_ADDR_FLAGS_UNICAST) == NULL) {
+    if (gnrc_ipv6_netif_add_addr(dev, &addr, prefix_len,
+                                 (type == _ANYCAST) ?
+                                 GNRC_IPV6_NETIF_ADDR_FLAGS_NON_UNICAST :
+                                 GNRC_IPV6_NETIF_ADDR_FLAGS_UNICAST) == NULL) {
         printf("error: unable to add IPv6 address\n");
         return 1;
     }
@@ -661,7 +661,7 @@ static int _netif_add(char *cmd_name, kernel_pid_t dev, int argc, char **argv)
 
 static int _netif_del(kernel_pid_t dev, char *addr_str)
 {
-#ifdef MODULE_NG_IPV6_NETIF
+#ifdef MODULE_GNRC_IPV6_NETIF
     ipv6_addr_t addr;
 
     if (ipv6_addr_from_str(&addr, addr_str) == NULL) {
@@ -669,7 +669,7 @@ static int _netif_del(kernel_pid_t dev, char *addr_str)
         return 1;
     }
 
-    ng_ipv6_netif_remove_addr(dev, &addr);
+    gnrc_ipv6_netif_remove_addr(dev, &addr);
 
     printf("success: removed %s to interface %" PRIkernel_pid "\n", addr_str,
            dev);
@@ -689,8 +689,8 @@ int _netif_send(int argc, char **argv)
     kernel_pid_t dev;
     uint8_t addr[MAX_ADDR_LEN];
     size_t addr_len;
-    ng_pktsnip_t *pkt;
-    ng_netif_hdr_t *nethdr;
+    gnrc_pktsnip_t *pkt;
+    gnrc_netif_hdr_t *nethdr;
     uint8_t flags = 0x00;
 
     if (argc < 4) {
@@ -707,11 +707,11 @@ int _netif_send(int argc, char **argv)
     }
 
     /* parse address */
-    addr_len = ng_netif_addr_from_str(addr, sizeof(addr), argv[2]);
+    addr_len = gnrc_netif_addr_from_str(addr, sizeof(addr), argv[2]);
 
     if (addr_len == 0) {
         if (strcmp(argv[2], "bcast") == 0) {
-            flags |= NG_NETIF_HDR_FLAGS_BROADCAST;
+            flags |= GNRC_NETIF_HDR_FLAGS_BROADCAST;
         }
         else {
             puts("error: invalid address given");
@@ -720,15 +720,15 @@ int _netif_send(int argc, char **argv)
     }
 
     /* put packet together */
-    pkt = ng_pktbuf_add(NULL, argv[3], strlen(argv[3]), NG_NETTYPE_UNDEF);
-    pkt = ng_pktbuf_add(pkt, NULL, sizeof(ng_netif_hdr_t) + addr_len,
-                        NG_NETTYPE_NETIF);
-    nethdr = (ng_netif_hdr_t *)pkt->data;
-    ng_netif_hdr_init(nethdr, 0, addr_len);
-    ng_netif_hdr_set_dst_addr(nethdr, addr, addr_len);
+    pkt = gnrc_pktbuf_add(NULL, argv[3], strlen(argv[3]), GNRC_NETTYPE_UNDEF);
+    pkt = gnrc_pktbuf_add(pkt, NULL, sizeof(gnrc_netif_hdr_t) + addr_len,
+                          GNRC_NETTYPE_NETIF);
+    nethdr = (gnrc_netif_hdr_t *)pkt->data;
+    gnrc_netif_hdr_init(nethdr, 0, addr_len);
+    gnrc_netif_hdr_set_dst_addr(nethdr, addr, addr_len);
     nethdr->flags = flags;
     /* and send it */
-    ng_netapi_send(dev, pkt);
+    gnrc_netapi_send(dev, pkt);
 
     return 0;
 }
@@ -736,10 +736,10 @@ int _netif_send(int argc, char **argv)
 int _netif_config(int argc, char **argv)
 {
     if (argc < 2) {
-        kernel_pid_t ifs[NG_NETIF_NUMOF];
-        size_t numof = ng_netif_get(ifs);
+        kernel_pid_t ifs[GNRC_NETIF_NUMOF];
+        size_t numof = gnrc_netif_get(ifs);
 
-        for (size_t i = 0; i < numof && i < NG_NETIF_NUMOF; i++) {
+        for (size_t i = 0; i < numof && i < GNRC_NETIF_NUMOF; i++) {
             _netif_list(ifs[i]);
         }
 

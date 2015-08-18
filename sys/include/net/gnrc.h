@@ -18,18 +18,18 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef NG_NETBASE_H_
-#define NG_NETBASE_H_
+#ifndef GNRC_NETBASE_H_
+#define GNRC_NETBASE_H_
 
 #include "net/netopt.h"
-#include "net/ng_netdev.h"
-#include "net/ng_netapi.h"
-#include "net/ng_netreg.h"
-#include "net/ng_nettype.h"
-#include "net/ng_netif.h"
-#include "net/ng_netif/hdr.h"
-#include "net/ng_pktbuf.h"
-#include "net/ng_pkt.h"
+#include "net/gnrc/netdev.h"
+#include "net/gnrc/netapi.h"
+#include "net/gnrc/netreg.h"
+#include "net/gnrc/nettype.h"
+#include "net/gnrc/netif.h"
+#include "net/gnrc/netif/hdr.h"
+#include "net/gnrc/pktbuf.h"
+#include "net/gnrc/pkt.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -41,5 +41,5 @@ extern "C" {
 }
 #endif
 
-#endif /* NG_NETBASE_H_ */
+#endif /* GNRC_NETBASE_H_ */
 /** @} */

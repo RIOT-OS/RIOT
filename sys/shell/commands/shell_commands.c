@@ -85,7 +85,7 @@ extern int _read_sector(int argc, char **argv);
 extern int _read_bytes(int argc, char **argv);
 #endif
 
-#ifdef MODULE_NG_ICMPV6_ECHO
+#ifdef MODULE_GNRC_ICMPV6_ECHO
 #ifdef MODULE_VTIMER
 extern int _icmpv6_ping(int argc, char **argv);
 #endif
@@ -96,7 +96,7 @@ extern int _mersenne_init(int argc, char **argv);
 extern int _mersenne_get(int argc, char **argv);
 #endif
 
-#ifdef MODULE_NG_NETIF
+#ifdef MODULE_GNRC_NETIF
 extern int _netif_config(int argc, char **argv);
 extern int _netif_send(int argc, char **argv);
 #endif
@@ -105,19 +105,19 @@ extern int _netif_send(int argc, char **argv);
 extern int _fib_route_handler(int argc, char **argv);
 #endif
 
-#ifdef MODULE_NG_IPV6_NC
+#ifdef MODULE_GNRC_IPV6_NC
 extern int _ipv6_nc_manage(int argc, char **argv);
 extern int _ipv6_nc_routers(int argc, char **argv);
 #endif
 
-#ifdef MODULE_NG_ZEP
+#ifdef MODULE_GNRC_ZEP
 #ifdef MODULE_IPV6_ADDR
 extern int _zep_init(int argc, char **argv);
 #endif
 #endif
 
-#ifdef MODULE_NG_RPL
-extern int _ng_rpl(int argc, char **argv);
+#ifdef MODULE_GNRC_RPL
+extern int _gnrc_rpl(int argc, char **argv);
 #endif
 
 const shell_command_t _shell_command_list[] = {
@@ -164,7 +164,7 @@ const shell_command_t _shell_command_list[] = {
     {DISK_GET_SECTOR_COUNT, "Get the sector count of inserted memory card", _get_sectorcount},
     {DISK_GET_BLOCK_SIZE, "Get the block size of inserted memory card", _get_blocksize},
 #endif
-#ifdef MODULE_NG_ICMPV6_ECHO
+#ifdef MODULE_GNRC_ICMPV6_ECHO
 #ifdef MODULE_VTIMER
     { "ping6", "Ping via ICMPv6", _icmpv6_ping },
 #endif
@@ -179,24 +179,24 @@ const shell_command_t _shell_command_list[] = {
 #ifdef CPU_X86
     {"lspci", "Lists PCI devices", _x86_lspci},
 #endif
-#ifdef MODULE_NG_NETIF
+#ifdef MODULE_GNRC_NETIF
     {"ifconfig", "Configure network interfaces", _netif_config},
     {"txtsnd", "send raw data", _netif_send },
 #endif
 #ifdef MODULE_FIB
     {"fibroute", "Manipulate the FIB (info: 'fibroute [add|del]')", _fib_route_handler},
 #endif
-#ifdef MODULE_NG_IPV6_NC
+#ifdef MODULE_GNRC_IPV6_NC
     {"ncache", "manage neighbor cache by hand", _ipv6_nc_manage },
     {"routers", "IPv6 default router list", _ipv6_nc_routers },
 #endif
-#ifdef MODULE_NG_ZEP
+#ifdef MODULE_GNRC_ZEP
 #ifdef MODULE_IPV6_ADDR
     {"zep_init", "initializes ZEP (Zigbee Encapsulation Protocol)", _zep_init },
 #endif
 #endif
-#ifdef MODULE_NG_RPL
-    {"rpl", "rpl configuration tool [help|init|rm|root|show]", _ng_rpl },
+#ifdef MODULE_GNRC_RPL
+    {"rpl", "rpl configuration tool [help|init|rm|root|show]", _gnrc_rpl },
 #endif
     {NULL, NULL, NULL}
 };

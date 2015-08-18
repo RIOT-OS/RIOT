@@ -176,7 +176,7 @@ static inline void ipv6_hdr_set_tc_ecn(ipv6_hdr_t *hdr, uint8_t ecn)
  *      </a>
  *
  * @param[out] hdr  Pointer to an IPv6 header.
- * @param[in] dscp  The new value for the 6-bit DSCP ng_part of the traffic class
+ * @param[in] dscp  The new value for the 6-bit DSCP part of the traffic class
  *                  field.
  */
 static inline void ipv6_hdr_set_tc_dscp(ipv6_hdr_t *hdr, uint8_t dscp)

@@ -18,18 +18,18 @@
 #include <inttypes.h>
 
 #include "net/ipv6/addr.h"
-#include "net/ng_ipv6/netif.h"
-#include "net/ng_nomac.h"
-#include "net/ng_zep.h"
+#include "net/gnrc/ipv6/netif.h"
+#include "net/gnrc/nomac.h"
+#include "net/gnrc/zep.h"
 #include "thread.h"
 
-static ng_zep_t zep;
+static gnrc_zep_t zep;
 static char zep_stack[THREAD_STACKSIZE_DEFAULT];
 
 int _zep_init(int argc, char **argv)
 {
-    uint16_t src_port = NG_ZEP_DEFAULT_PORT;
-    uint16_t dst_port = NG_ZEP_DEFAULT_PORT;
+    uint16_t src_port = GNRC_ZEP_DEFAULT_PORT;
+    uint16_t dst_port = GNRC_ZEP_DEFAULT_PORT;
     ipv6_addr_t dst_addr;
     int res;
 
@@ -48,7 +48,7 @@ int _zep_init(int argc, char **argv)
 
     ipv6_addr_from_str(&dst_addr, argv[1]);
 
-    if ((res = ng_zep_init(&zep, src_port, &dst_addr, dst_port)) < 0) {
+    if ((res = gnrc_zep_init(&zep, src_port, &dst_addr, dst_port)) < 0) {
         switch (res) {
             case -EADDRINUSE:
                 printf("error: Source port %" PRIu16 " already in use\n", src_port);
@@ -74,8 +74,8 @@ int _zep_init(int argc, char **argv)
         return 1;
     }
 
-    if ((res = ng_nomac_init(zep_stack, sizeof(zep_stack), THREAD_PRIORITY_MAIN - 3,
-                             "zep_l2", (ng_netdev_t *)&zep)) < 0) {
+    if ((res = gnrc_nomac_init(zep_stack, sizeof(zep_stack), THREAD_PRIORITY_MAIN - 3,
+                               "zep_l2", (gnrc_netdev_t *)&zep)) < 0) {
         switch (res) {
             case -EOVERFLOW:
                 puts("error: too many threads running");
@@ -89,8 +89,8 @@ int _zep_init(int argc, char **argv)
         return 1;
     }
 
-#ifdef MODULE_NG_IPV6_NETIF
-    ng_ipv6_netif_init_by_dev();
+#ifdef MODULE_GNRC_IPV6_NETIF
+    gnrc_ipv6_netif_init_by_dev();
 #endif
 
     return 0;

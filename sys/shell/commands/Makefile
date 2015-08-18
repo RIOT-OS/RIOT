@@ -38,23 +38,23 @@ endif
 ifneq (,$(filter lsm303dlhc,$(USEMODULE)))
   SRC += sc_lsm303dlhc.c
 endif
-ifneq (,$(filter ng_netif,$(USEMODULE)))
+ifneq (,$(filter gnrc_netif,$(USEMODULE)))
   SRC += sc_netif.c
 endif
 ifneq (,$(filter fib,$(USEMODULE)))
   SRC += sc_fib.c
 endif
-ifneq (,$(filter ng_ipv6_nc,$(USEMODULE)))
+ifneq (,$(filter gnrc_ipv6_nc,$(USEMODULE)))
   SRC += sc_ipv6_nc.c
 endif
-ifneq (,$(filter ng_icmpv6_echo vtimer,$(USEMODULE)))
+ifneq (,$(filter gnrc_icmpv6_echo vtimer,$(USEMODULE)))
   SRC += sc_icmpv6_echo.c
 endif
-ifneq (,$(filter ng_zep ipv6_addr,$(USEMODULE)))
+ifneq (,$(filter gnrc_zep ipv6_addr,$(USEMODULE)))
   SRC += sc_zep.c
 endif
-ifneq (,$(filter ng_rpl,$(USEMODULE)))
-    SRC += sc_ng_rpl.c
+ifneq (,$(filter gnrc_rpl,$(USEMODULE)))
+    SRC += sc_gnrc_rpl.c
 endif
 
 # TODO

@@ -1,14 +1,14 @@
-PSEUDOMODULES += ng_netif_default
+PSEUDOMODULES += gnrc_netif_default
+PSEUDOMODULES += gnrc_ipv6_default
+PSEUDOMODULES += gnrc_ipv6_router
+PSEUDOMODULES += gnrc_ipv6_router_default
+PSEUDOMODULES += gnrc_sixlowpan_default
+PSEUDOMODULES += gnrc_pktbuf
 PSEUDOMODULES += ieee802154
-PSEUDOMODULES += ng_ipv6_default
-PSEUDOMODULES += ng_ipv6_router
-PSEUDOMODULES += ng_ipv6_router_default
-PSEUDOMODULES += pktqueue
-PSEUDOMODULES += ng_pktbuf
-PSEUDOMODULES += newlib
-PSEUDOMODULES += ng_sixlowpan_default
 PSEUDOMODULES += log
 PSEUDOMODULES += log_printfnoformat
+PSEUDOMODULES += newlib
+PSEUDOMODULES += pktqueue
 
 # include variants of the AT86RF2xx drivers as pseudo modules
 PSEUDOMODULES += at86rf23%

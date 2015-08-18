@@ -17,17 +17,17 @@ BOARD_BLACKLIST        := arduino-mega2560 spark-core
 
 # Include packages that pull up and auto-init the link layer.
 # NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present
-USEMODULE += ng_netif_default
+USEMODULE += gnrc_netif_default
 USEMODULE += auto_init_ng_netif
 # Specify the mandatory networking modules for IPv6 and UDP
-USEMODULE += ng_ipv6_router_default
-USEMODULE += ng_udp
+USEMODULE += gnrc_ipv6_router_default
+USEMODULE += gnrc_udp
 # Add a routing protocol
-USEMODULE += ng_rpl
+USEMODULE += gnrc_rpl
 # This application dumps received packets to STDIO using the pktdump module
-USEMODULE += ng_pktdump
+USEMODULE += gnrc_pktdump
 # Additional networking modules that can be dropped if not needed
-USEMODULE += ng_icmpv6_echo
+USEMODULE += gnrc_icmpv6_echo
 # Add also the shell, some shell commands (which are based on uart0 in this app)
 USEMODULE += uart0
 USEMODULE += shell

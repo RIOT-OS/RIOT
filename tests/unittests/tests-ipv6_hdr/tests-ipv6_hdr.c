@@ -18,7 +18,7 @@
 
 #include "net/ipv6/addr.h"
 #include "net/ipv6/hdr.h"
-#include "net/ng_pktbuf.h"
+#include "net/gnrc/pktbuf.h"
 #include "net/protnum.h"
 #include "net/inet_csum.h"
 

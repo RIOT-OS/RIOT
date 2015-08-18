@@ -26,7 +26,7 @@
 #include <inttypes.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
-#include "net/ng_ipv6.h"
+#include "net/gnrc/ipv6.h"
 #include "socket_base/socket.h"
 
 #ifdef __cplusplus

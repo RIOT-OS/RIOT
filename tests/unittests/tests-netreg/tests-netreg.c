@@ -15,128 +15,128 @@
 
 #include "embUnit.h"
 
-#include "net/ng_netreg.h"
-#include "net/ng_nettype.h"
+#include "net/gnrc/netreg.h"
+#include "net/gnrc/nettype.h"
 
 #include "unittests-constants.h"
 #include "tests-netreg.h"
 
-static ng_netreg_entry_t entries[] = {
+static gnrc_netreg_entry_t entries[] = {
     { NULL, TEST_UINT16, TEST_UINT8 },
     { NULL, TEST_UINT16, TEST_UINT8 + 1 }
 };
 
 static void set_up(void)
 {
-    ng_netreg_init();
+    gnrc_netreg_init();
 }
 
 static void test_netreg_register__inval_numof(void)
 {
-    TEST_ASSERT_EQUAL_INT(-EINVAL, ng_netreg_register(NG_NETTYPE_NUMOF, &entries[0]));
+    TEST_ASSERT_EQUAL_INT(-EINVAL, gnrc_netreg_register(GNRC_NETTYPE_NUMOF, &entries[0]));
 }
 
 static void test_netreg_register__success(void)
 {
-    ng_netreg_entry_t *res = ng_netreg_lookup(NG_NETTYPE_TEST, TEST_UINT16);
+    gnrc_netreg_entry_t *res = gnrc_netreg_lookup(GNRC_NETTYPE_TEST, TEST_UINT16);
 
     TEST_ASSERT_NULL(res);
 
-    TEST_ASSERT_EQUAL_INT(0, ng_netreg_register(NG_NETTYPE_TEST, &entries[0]));
-    TEST_ASSERT_NOT_NULL((res = ng_netreg_lookup(NG_NETTYPE_TEST, TEST_UINT16)));
+    TEST_ASSERT_EQUAL_INT(0, gnrc_netreg_register(GNRC_NETTYPE_TEST, &entries[0]));
+    TEST_ASSERT_NOT_NULL((res = gnrc_netreg_lookup(GNRC_NETTYPE_TEST, TEST_UINT16)));
     TEST_ASSERT_EQUAL_INT(TEST_UINT16, res->demux_ctx);
     TEST_ASSERT_EQUAL_INT(TEST_UINT8, res->pid);
-    TEST_ASSERT_NULL((ng_netreg_getnext(res)));
+    TEST_ASSERT_NULL((gnrc_netreg_getnext(res)));
 }
 
 void test_netreg_unregister__success(void)
 {
-    TEST_ASSERT_EQUAL_INT(0, ng_netreg_register(NG_NETTYPE_TEST, &entries[0]));
-    TEST_ASSERT_NOT_NULL(ng_netreg_lookup(NG_NETTYPE_TEST, TEST_UINT16));
-    ng_netreg_unregister(NG_NETTYPE_TEST, &entries[0]);
-    TEST_ASSERT_NULL(ng_netreg_lookup(NG_NETTYPE_TEST, TEST_UINT16));
+    TEST_ASSERT_EQUAL_INT(0, gnrc_netreg_register(GNRC_NETTYPE_TEST, &entries[0]));
+    TEST_ASSERT_NOT_NULL(gnrc_netreg_lookup(GNRC_NETTYPE_TEST, TEST_UINT16));
+    gnrc_netreg_unregister(GNRC_NETTYPE_TEST, &entries[0]);
+    TEST_ASSERT_NULL(gnrc_netreg_lookup(GNRC_NETTYPE_TEST, TEST_UINT16));
 }
 
 void test_netreg_unregister__success2(void)
 {
-    ng_netreg_entry_t *res = NULL;
+    gnrc_netreg_entry_t *res = NULL;
 
-    TEST_ASSERT_EQUAL_INT(0, ng_netreg_register(NG_NETTYPE_TEST, &entries[0]));
-    TEST_ASSERT_EQUAL_INT(0, ng_netreg_register(NG_NETTYPE_TEST, &entries[1]));
-    ng_netreg_unregister(NG_NETTYPE_TEST, &entries[0]);
-    TEST_ASSERT_NOT_NULL((res = ng_netreg_lookup(NG_NETTYPE_TEST, TEST_UINT16)));
+    TEST_ASSERT_EQUAL_INT(0, gnrc_netreg_register(GNRC_NETTYPE_TEST, &entries[0]));
+    TEST_ASSERT_EQUAL_INT(0, gnrc_netreg_register(GNRC_NETTYPE_TEST, &entries[1]));
+    gnrc_netreg_unregister(GNRC_NETTYPE_TEST, &entries[0]);
+    TEST_ASSERT_NOT_NULL((res = gnrc_netreg_lookup(GNRC_NETTYPE_TEST, TEST_UINT16)));
     TEST_ASSERT_EQUAL_INT(TEST_UINT16, res->demux_ctx);
     TEST_ASSERT_EQUAL_INT(TEST_UINT8 + 1, res->pid);
-    ng_netreg_unregister(NG_NETTYPE_TEST, &entries[1]);
-    TEST_ASSERT_NULL(ng_netreg_lookup(NG_NETTYPE_TEST, TEST_UINT16));
+    gnrc_netreg_unregister(GNRC_NETTYPE_TEST, &entries[1]);
+    TEST_ASSERT_NULL(gnrc_netreg_lookup(GNRC_NETTYPE_TEST, TEST_UINT16));
 }
 
 void test_netreg_unregister__success3(void)
 {
-    ng_netreg_entry_t *res = NULL;
+    gnrc_netreg_entry_t *res = NULL;
 
-    TEST_ASSERT_EQUAL_INT(0, ng_netreg_register(NG_NETTYPE_TEST, &entries[0]));
-    TEST_ASSERT_EQUAL_INT(0, ng_netreg_register(NG_NETTYPE_TEST, &entries[1]));
-    ng_netreg_unregister(NG_NETTYPE_TEST, &entries[1]);
-    TEST_ASSERT_NOT_NULL((res = ng_netreg_lookup(NG_NETTYPE_TEST, TEST_UINT16)));
+    TEST_ASSERT_EQUAL_INT(0, gnrc_netreg_register(GNRC_NETTYPE_TEST, &entries[0]));
+    TEST_ASSERT_EQUAL_INT(0, gnrc_netreg_register(GNRC_NETTYPE_TEST, &entries[1]));
+    gnrc_netreg_unregister(GNRC_NETTYPE_TEST, &entries[1]);
+    TEST_ASSERT_NOT_NULL((res = gnrc_netreg_lookup(GNRC_NETTYPE_TEST, TEST_UINT16)));
     TEST_ASSERT_EQUAL_INT(TEST_UINT16, res->demux_ctx);
     TEST_ASSERT_EQUAL_INT(TEST_UINT8, res->pid);
-    ng_netreg_unregister(NG_NETTYPE_TEST, &entries[0]);
-    TEST_ASSERT_NULL(ng_netreg_lookup(NG_NETTYPE_TEST, TEST_UINT16));
+    gnrc_netreg_unregister(GNRC_NETTYPE_TEST, &entries[0]);
+    TEST_ASSERT_NULL(gnrc_netreg_lookup(GNRC_NETTYPE_TEST, TEST_UINT16));
 }
 
 void test_netreg_lookup__wrong_type_undef(void)
 {
-    TEST_ASSERT_EQUAL_INT(0, ng_netreg_register(NG_NETTYPE_TEST, &entries[0]));
-    TEST_ASSERT_NULL(ng_netreg_lookup(NG_NETTYPE_UNDEF, TEST_UINT16));
+    TEST_ASSERT_EQUAL_INT(0, gnrc_netreg_register(GNRC_NETTYPE_TEST, &entries[0]));
+    TEST_ASSERT_NULL(gnrc_netreg_lookup(GNRC_NETTYPE_UNDEF, TEST_UINT16));
 }
 
 void test_netreg_lookup__wrong_type_numof(void)
 {
-    TEST_ASSERT_EQUAL_INT(0, ng_netreg_register(NG_NETTYPE_TEST, &entries[0]));
-    TEST_ASSERT_NULL(ng_netreg_lookup(NG_NETTYPE_NUMOF, TEST_UINT16));
+    TEST_ASSERT_EQUAL_INT(0, gnrc_netreg_register(GNRC_NETTYPE_TEST, &entries[0]));
+    TEST_ASSERT_NULL(gnrc_netreg_lookup(GNRC_NETTYPE_NUMOF, TEST_UINT16));
 }
 
 void test_netreg_num__empty(void)
 {
-    TEST_ASSERT_EQUAL_INT(0, ng_netreg_num(NG_NETTYPE_TEST, TEST_UINT16));
-    TEST_ASSERT_EQUAL_INT(0, ng_netreg_num(NG_NETTYPE_TEST, TEST_UINT16 + 1));
-    TEST_ASSERT_EQUAL_INT(0, ng_netreg_num(NG_NETTYPE_TEST, NG_NETREG_DEMUX_CTX_ALL));
+    TEST_ASSERT_EQUAL_INT(0, gnrc_netreg_num(GNRC_NETTYPE_TEST, TEST_UINT16));
+    TEST_ASSERT_EQUAL_INT(0, gnrc_netreg_num(GNRC_NETTYPE_TEST, TEST_UINT16 + 1));
+    TEST_ASSERT_EQUAL_INT(0, gnrc_netreg_num(GNRC_NETTYPE_TEST, GNRC_NETREG_DEMUX_CTX_ALL));
 }
 
 void test_netreg_num__wrong_type_undef(void)
 {
-    TEST_ASSERT_EQUAL_INT(0, ng_netreg_register(NG_NETTYPE_TEST, &entries[0]));
-    TEST_ASSERT_EQUAL_INT(0, ng_netreg_num(NG_NETTYPE_UNDEF, TEST_UINT16));
+    TEST_ASSERT_EQUAL_INT(0, gnrc_netreg_register(GNRC_NETTYPE_TEST, &entries[0]));
+    TEST_ASSERT_EQUAL_INT(0, gnrc_netreg_num(GNRC_NETTYPE_UNDEF, TEST_UINT16));
 }
 
 void test_netreg_num__wrong_type_numof(void)
 {
-    TEST_ASSERT_EQUAL_INT(0, ng_netreg_register(NG_NETTYPE_TEST, &entries[0]));
-    TEST_ASSERT_EQUAL_INT(0, ng_netreg_num(NG_NETTYPE_NUMOF, TEST_UINT16));
+    TEST_ASSERT_EQUAL_INT(0, gnrc_netreg_register(GNRC_NETTYPE_TEST, &entries[0]));
+    TEST_ASSERT_EQUAL_INT(0, gnrc_netreg_num(GNRC_NETTYPE_NUMOF, TEST_UINT16));
 }
 
 void test_netreg_num__2_entries(void)
 {
-    TEST_ASSERT_EQUAL_INT(0, ng_netreg_register(NG_NETTYPE_TEST, &entries[0]));
-    TEST_ASSERT_EQUAL_INT(1, ng_netreg_num(NG_NETTYPE_TEST, TEST_UINT16));
-    TEST_ASSERT_EQUAL_INT(0, ng_netreg_register(NG_NETTYPE_TEST, &entries[1]));
-    TEST_ASSERT_EQUAL_INT(2, ng_netreg_num(NG_NETTYPE_TEST, TEST_UINT16));
+    TEST_ASSERT_EQUAL_INT(0, gnrc_netreg_register(GNRC_NETTYPE_TEST, &entries[0]));
+    TEST_ASSERT_EQUAL_INT(1, gnrc_netreg_num(GNRC_NETTYPE_TEST, TEST_UINT16));
+    TEST_ASSERT_EQUAL_INT(0, gnrc_netreg_register(GNRC_NETTYPE_TEST, &entries[1]));
+    TEST_ASSERT_EQUAL_INT(2, gnrc_netreg_num(GNRC_NETTYPE_TEST, TEST_UINT16));
 }
 
 void test_netreg_getnext__NULL(void)
 {
-    TEST_ASSERT_EQUAL_INT(0, ng_netreg_register(NG_NETTYPE_TEST, &entries[0]));
-    TEST_ASSERT_NULL(ng_netreg_getnext(NULL));
+    TEST_ASSERT_EQUAL_INT(0, gnrc_netreg_register(GNRC_NETTYPE_TEST, &entries[0]));
+    TEST_ASSERT_NULL(gnrc_netreg_getnext(NULL));
 }
 
 void test_netreg_getnext__2_entries(void)
 {
-    ng_netreg_entry_t *res = NULL;
+    gnrc_netreg_entry_t *res = NULL;
 
     test_netreg_num__2_entries();
-    TEST_ASSERT_NOT_NULL((res = ng_netreg_lookup(NG_NETTYPE_TEST, TEST_UINT16)));
-    TEST_ASSERT_NOT_NULL(ng_netreg_getnext(res));
+    TEST_ASSERT_NOT_NULL((res = gnrc_netreg_lookup(GNRC_NETTYPE_TEST, TEST_UINT16)));
+    TEST_ASSERT_NOT_NULL(gnrc_netreg_getnext(res));
 }
 
 Test *tests_netreg_tests(void)

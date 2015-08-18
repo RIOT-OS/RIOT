@@ -39,17 +39,17 @@ static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 #endif
 
 #ifdef MODULE_IPV6_ADDR
-    #define NG_FIB_ADDR_PRINT_LEN       39
+    #define FIB_ADDR_PRINT_LEN      39
 #else
-    #define NG_FIB_ADDR_PRINT_LEN       32
-    #if NG_FIB_ADDR_PRINT_LEN != (UNIVERSAL_ADDRESS_SIZE * 2)
-        #error "NG_FIB_ADDR_PRINT_LEN MUST BE (UNIVERSAL_ADDRESS_SIZE * 2)"
+    #define FIB_ADDR_PRINT_LEN      32
+    #if FIB_ADDR_PRINT_LEN != (UNIVERSAL_ADDRESS_SIZE * 2)
+        #error "FIB_ADDR_PRINT_LEN MUST BE (UNIVERSAL_ADDRESS_SIZE * 2)"
     #endif
 #endif
 
-#define NG_FIB_ADDR_PRINT_LENS1(X)      #X
-#define NG_FIB_ADDR_PRINT_LENS2(X)      NG_FIB_ADDR_PRINT_LENS1(X)
-#define NG_FIB_ADDR_PRINT_LENS          NG_FIB_ADDR_PRINT_LENS2(NG_FIB_ADDR_PRINT_LEN)
+#define FIB_ADDR_PRINT_LENS1(X)     #X
+#define FIB_ADDR_PRINT_LENS2(X)     FIB_ADDR_PRINT_LENS1(X)
+#define FIB_ADDR_PRINT_LENS         FIB_ADDR_PRINT_LENS2(FIB_ADDR_PRINT_LEN)
 
 /**
  * @brief access mutex to control exclusive operations on calls
@@ -648,7 +648,7 @@ static void fib_print_address(universal_address_container_t *entry)
     if (ret == address) {
 #ifdef MODULE_IPV6_ADDR
         if (addr_size == sizeof(ipv6_addr_t)) {
-            printf("%-" NG_FIB_ADDR_PRINT_LENS "s",
+            printf("%-" FIB_ADDR_PRINT_LENS "s",
                     ipv6_addr_to_str(addr_str, (ipv6_addr_t *) address, sizeof(addr_str)));
             return;
         }
@@ -663,7 +663,7 @@ static void fib_print_address(universal_address_container_t *entry)
         }
 #ifdef MODULE_IPV6_ADDR
         /* print trailing whitespaces */
-        for (size_t i = 0; i < NG_FIB_ADDR_PRINT_LEN - (UNIVERSAL_ADDRESS_SIZE * 2); ++i) {
+        for (size_t i = 0; i < FIB_ADDR_PRINT_LEN - (UNIVERSAL_ADDRESS_SIZE * 2); ++i) {
             printf(" ");
         }
 #endif
@@ -673,7 +673,7 @@ static void fib_print_address(universal_address_container_t *entry)
 void fib_print_routes(void)
 {
     mutex_lock(&mtx_access);
-    printf("%-" NG_FIB_ADDR_PRINT_LENS "s %-6s %-" NG_FIB_ADDR_PRINT_LENS "s %-6s %-16s Interface\n"
+    printf("%-" FIB_ADDR_PRINT_LENS "s %-6s %-" FIB_ADDR_PRINT_LENS "s %-6s %-16s Interface\n"
            , "Destination", "Flags", "Next Hop", "Flags", "Expires");
 
     timex_t now;

@@ -24,7 +24,7 @@
 
 #include <stdint.h>
 
-#include "net/ng_ipv6.h"
+#include "net/gnrc/ipv6.h"
 
 #include "socket_base/in.h"
 

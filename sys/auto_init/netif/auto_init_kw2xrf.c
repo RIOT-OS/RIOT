@@ -22,7 +22,7 @@
 #ifdef MODULE_KW2XRF
 
 #include "board.h"
-#include "net/ng_nomac.h"
+#include "net/gnrc/nomac.h"
 #include "net/gnrc.h"
 
 #include "kw2xrf.h"
@@ -59,14 +59,14 @@ void auto_init_kw2xrf(void)
             DEBUG("Error initializing KW2xrf radio device!");
         }
         else {
-            ng_nomac_init(_nomac_stacks[i],
-                    KW2XRF_MAC_STACKSIZE, KW2XRF_MAC_PRIO,
-                    "kw2xrf", (ng_netdev_t *)&kw2xrf_devs[i]);
+            gnrc_nomac_init(_nomac_stacks[i],
+                            KW2XRF_MAC_STACKSIZE, KW2XRF_MAC_PRIO,
+                            "kw2xrf", (gnrc_netdev_t *)&kw2xrf_devs[i]);
         }
     }
 }
 #else
 typedef int dont_be_pedantic;
-#endif /* MODULE_NG_KW2XRF */
+#endif /* MODULE_GNRC_KW2XRF */
 
 /** @} */
