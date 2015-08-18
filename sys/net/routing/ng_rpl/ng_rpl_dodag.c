@@ -20,6 +20,7 @@
 #include "net/ng_rpl/dodag.h"
 #include "net/ng_rpl/structs.h"
 #include "utlist.h"
+#include "net/ng_rpl.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
@@ -136,6 +137,9 @@ bool ng_rpl_dodag_add(ng_rpl_instance_t *instance, ipv6_addr_t *dodag_id, ng_rpl
         LL_APPEND(instance->dodags, *dodag);
         (*dodag)->state = 1;
         (*dodag)->dodag_id = *dodag_id;
+        (*dodag)->prefix_len = NG_RPL_DEFAULT_PREFIX_LEN;
+        (*dodag)->addr_preferred = NG_RPL_DEFAULT_PREFIX_LIFETIME;
+        (*dodag)->addr_valid = NG_RPL_DEFAULT_PREFIX_LIFETIME;
         (*dodag)->my_rank = NG_RPL_INFINITE_RANK;
         (*dodag)->trickle.callback.func = &rpl_trickle_send_dio;
         (*dodag)->trickle.callback.args = *dodag;

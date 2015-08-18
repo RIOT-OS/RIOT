@@ -147,6 +147,23 @@ typedef struct __attribute__((packed)) {
     uint8_t path_lifetime;      /**< lifetime of routes */
 } ng_rpl_opt_transit_t;
 
+/**
+ * @brief Prefix Information Option
+ * @see <a href="https://tools.ietf.org/html/rfc6550#section-6.7.10">
+ *          RFC6550, section 6.7.10, Prefix Information
+ *      </a>
+ */
+typedef struct __attribute__((packed)) {
+    uint8_t type;               /**< option type */
+    uint8_t length;             /**< option length without the first two bytes */
+    uint8_t prefix_len;         /**< prefix length */
+    uint8_t LAR_flags;          /**< flags and resereved */
+    uint32_t valid_lifetime;    /**< valid lifetime */
+    uint32_t pref_lifetime;     /**< preferred lifetime */
+    uint32_t reserved;          /**< reserved */
+    ipv6_addr_t prefix;         /**< prefix used for Stateless Address Autoconfiguration */
+} ng_rpl_opt_prefix_info_t;
+
 typedef struct ng_rpl_dodag ng_rpl_dodag_t;
 typedef struct ng_rpl_parent ng_rpl_parent_t;
 
@@ -201,6 +218,9 @@ struct ng_rpl_dodag {
     ng_rpl_dodag_t *next;           /**< pointer to the next dodag */
     ng_rpl_parent_t *parents;       /**< pointer to the parents list of this DODAG */
     ipv6_addr_t dodag_id;           /**< id of the DODAG */
+    uint8_t prefix_len;             /**< length of the prefix for the DODAG id */
+    uint32_t addr_preferred;        /**< time in seconds the DODAG id is preferred */
+    uint32_t addr_valid;            /**< time in seconds the DODAG id is valid */
     uint8_t state;                  /**< 0 for unused, 1 for used */
     uint8_t dtsn;                   /**< DAO Trigger Sequence Number */
     uint8_t prf;                    /**< preferred flag */

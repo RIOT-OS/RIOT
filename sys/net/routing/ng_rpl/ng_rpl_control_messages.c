@@ -19,6 +19,7 @@
 #include "net/ng_icmpv6.h"
 #include "net/ng_rpl.h"
 #include "inet_ntop.h"
+#include "net/eui64.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
@@ -30,8 +31,10 @@ static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 #define NG_RPL_GROUNDED_SHIFT           (7)
 #define NG_RPL_MOP_SHIFT                (3)
 #define NG_RPL_OPT_DODAG_CONF_LEN       (14)
+#define NG_RPL_OPT_PREFIX_INFO_LEN      (30)
 #define NG_RPL_SHIFTED_MOP_MASK         (0x7)
 #define NG_RPL_PRF_MASK                 (0x7)
+#define NG_RPL_PREFIX_AUTO_ADDRESS_BIT  (1 << 6)
 
 void _ng_rpl_send(ng_pktsnip_t *pkt, ipv6_addr_t *src, ipv6_addr_t *dst,
         ipv6_addr_t *dodag_id)
@@ -100,6 +103,7 @@ void ng_rpl_send_DIO(ng_rpl_dodag_t *dodag, ipv6_addr_t *destination)
 
     if ((dodag->dodag_conf_counter % 3) == 0) {
         size += sizeof(ng_rpl_opt_dodag_conf_t);
+        size += sizeof(ng_rpl_opt_prefix_info_t);
     }
 
     if ((pkt = ng_icmpv6_build(NULL, ICMPV6_RPL_CTRL, NG_RPL_ICMPV6_CODE_DIO, size)) == NULL) {
@@ -137,6 +141,21 @@ void ng_rpl_send_DIO(ng_rpl_dodag_t *dodag, ipv6_addr_t *destination)
         dodag_conf->reserved = 0;
         dodag_conf->default_lifetime = dodag->default_lifetime;
         dodag_conf->lifetime_unit = byteorder_htons(dodag->lifetime_unit);
+        pos += sizeof(*dodag_conf);
+
+        ng_rpl_opt_prefix_info_t *prefix_info;
+        prefix_info = (ng_rpl_opt_prefix_info_t *) pos;
+        prefix_info->type = NG_RPL_OPT_PREFIX_INFO;
+        prefix_info->length = NG_RPL_OPT_PREFIX_INFO_LEN;
+        /* auto-address configuration */
+        prefix_info->LAR_flags = NG_RPL_PREFIX_AUTO_ADDRESS_BIT;
+        prefix_info->valid_lifetime = dodag->addr_valid;
+        prefix_info->pref_lifetime = dodag->addr_preferred;
+        prefix_info->prefix_len = dodag->prefix_len;
+        prefix_info->reserved = 0;
+
+        memset(&prefix_info->prefix, 0, sizeof(prefix_info->prefix));
+        ipv6_addr_init_prefix(&prefix_info->prefix, &dodag->dodag_id, dodag->prefix_len);
     }
 
     dodag->dodag_conf_counter++;
@@ -198,6 +217,7 @@ bool _parse_options(int msg_type, ng_rpl_dodag_t *dodag, ng_rpl_opt_t *opt, uint
 {
     uint16_t l = 0;
     ng_rpl_opt_target_t *first_target = NULL;
+    eui64_t iid;
     while(l < len) {
         if ((opt->type != NG_RPL_OPT_PAD1) && (len < opt->length + sizeof(ng_rpl_opt_t) + l)) {
             /* return false to delete the dodag,
@@ -241,6 +261,25 @@ bool _parse_options(int msg_type, ng_rpl_dodag_t *dodag, ng_rpl_opt_t *opt, uint
                 dodag->trickle.Imin = (1 << dodag->dio_min);
                 dodag->trickle.Imax = dodag->dio_interval_doubl;
                 dodag->trickle.k = dodag->dio_redun;
+                break;
+            }
+            case (NG_RPL_OPT_PREFIX_INFO): {
+                if (msg_type != NG_RPL_ICMPV6_CODE_DIO) {
+                    DEBUG("RPL: Ignore Prefix Information DIO option\n");
+                    return true;
+                }
+                DEBUG("RPL: Prefix Information DIO option parsed\n");
+                ng_rpl_opt_prefix_info_t *pi = (ng_rpl_opt_prefix_info_t *) opt;
+                ipv6_addr_t all_RPL_nodes = NG_IPV6_ADDR_ALL_RPL_NODES;
+                kernel_pid_t if_id = ng_ipv6_netif_find_by_addr(NULL, &all_RPL_nodes);
+                /* check for the auto address-configuration flag */
+                if ((ng_netapi_get(if_id, NETOPT_IPV6_IID, 0, &iid, sizeof(eui64_t)) < 0) &&
+                        !(pi->LAR_flags & NG_RPL_PREFIX_AUTO_ADDRESS_BIT)) {
+                    break;
+                }
+                ipv6_addr_set_aiid(&pi->prefix, iid.uint8);
+                ng_ipv6_netif_add_addr(if_id, &pi->prefix, pi->prefix_len, 0);
+
                 break;
             }
             case (NG_RPL_OPT_TARGET): {
