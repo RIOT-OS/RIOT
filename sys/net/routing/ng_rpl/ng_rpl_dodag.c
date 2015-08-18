@@ -16,6 +16,7 @@
  */
 
 #include <stdbool.h>
+#include "inet_pton.h"
 #include "net/ng_rpl/dodag.h"
 #include "net/ng_rpl/structs.h"
 #include "utlist.h"
