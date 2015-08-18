@@ -29,7 +29,18 @@ extern "C" {
 #include <stdlib.h>
 #include "net/ipv6/addr.h"
 
-#define UNIVERSAL_ADDRESS_SIZE (16)         /**< size of the used addresses in bytes */
+/** @brief  size of the used addresses in bytes */
+/* determine the widest possible address type */
+#ifndef UNIVERSAL_ADDRESS_SIZE
+#define UNIVERSAL_ADDRESS_SIZE (0)       /* rather senseless default, should
+                                            trigger warnings */
+#endif
+
+/* IPv6 address has 128 bit -> 16 bytes */
+#if defined(MODULE_IPV6_ADDR) && ((IPV6_ADDR_BIT_LEN >> 3) > UNIVERSAL_ADDRESS_SIZE)
+#undef UNIVERSAL_ADDRESS_SIZE
+#define UNIVERSAL_ADDRESS_SIZE (IPV6_ADDR_BIT_LEN >> 3)
+#endif
 
 /**
  * @brief The container descriptor used to identify a universal address entry
