@@ -1,0 +1,32 @@
+From 913baf8fb537fc8a4d5d01b9ad96829df3a43ebe Mon Sep 17 00:00:00 2001
+From: Darredevil <alex.darredevil@gmail.com>
+Date: Tue, 18 Aug 2015 11:57:23 +0100
+Subject: [PATCH 3/4] fixed errors in internals.h
+
+---
+ core/internals.h | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/core/internals.h b/core/internals.h
+index 36d7d12..d924481 100644
+--- a/core/internals.h
++++ b/core/internals.h
+@@ -16,7 +16,7 @@
+  *    Toby Jaffey - Please refer to git log
+  *    Bosch Software Innovations GmbH - Please refer to git log
+  *    Pascal Rieux - Please refer to git log
+- *
++ *
+  *******************************************************************************/
+ /*
+  Copyright (c) 2013, 2014 Intel Corporation
+@@ -178,6 +178,7 @@ void reset_bootstrap_timer(lwm2m_context_t * context);
+ void update_bootstrap_state(lwm2m_context_t * contextP, uint32_t currentTime, time_t* timeoutP);
+ void delete_bootstrap_server_list(lwm2m_context_t * contextP);
+ uint8_t handle_bootstrap_request(lwm2m_context_t * contextP, lwm2m_uri_t * uriP, void * fromSessionH, coap_packet_t * message, coap_packet_t * response);
++coap_status_t handle_bootstrap_finish(lwm2m_context_t * context, void * fromSessionH);
+
+ // defined in liblwm2m.c
+ void delete_transaction_list(lwm2m_context_t * context);
+--
+1.9.1

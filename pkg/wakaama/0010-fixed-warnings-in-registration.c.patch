@@ -1,0 +1,32 @@
+From 13a55d7a07fbfb4af77d51825633bd5e30661023 Mon Sep 17 00:00:00 2001
+From: Darredevil <alex.darredevil@gmail.com>
+Date: Tue, 18 Aug 2015 12:00:23 +0100
+Subject: [PATCH 4/4] fixed warnings in registration.c
+
+---
+ core/registration.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/core/registration.c b/core/registration.c
+index 2ec7295..abdad48 100644
+--- a/core/registration.c
++++ b/core/registration.c
+@@ -389,6 +389,7 @@ void registration_update(lwm2m_context_t * contextP,
+ static void prv_handleDeregistrationReply(lwm2m_transaction_t * transacP,
+                                         void * message)
+ {
++    (void)message;
+     lwm2m_server_t * targetP;
+
+     targetP = (lwm2m_server_t *)(transacP->peerP);
+@@ -529,7 +530,7 @@ static int prv_getId(uint8_t * data,
+     {
+         data++;
+         length-=2;
+-    }
++    }
+     else
+     {
+         return 0;
+--
+1.9.1

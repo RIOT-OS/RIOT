@@ -1,0 +1,51 @@
+From 7e378684d09226d699e566f30bd190acaab05e10 Mon Sep 17 00:00:00 2001
+From: Darredevil <alex.darredevil@gmail.com>
+Date: Tue, 18 Aug 2015 11:46:44 +0100
+Subject: [PATCH 2/4] fixed warnings in objects.c
+
+---
+ core/objects.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/core/objects.c b/core/objects.c
+index cb22444..95e093e 100644
+--- a/core/objects.c
++++ b/core/objects.c
+@@ -17,7 +17,7 @@
+  *    Benjamin Cabé - Please refer to git log
+  *    Bosch Software Innovations GmbH - Please refer to git log
+  *    Pascal Rieux - Please refer to git log
+- *
++ *
+  *******************************************************************************/
+
+ /*
+@@ -380,7 +380,7 @@ int prv_getRegisterPayload(lwm2m_context_t * contextP,
+      && (contextP->altPath[0] != 0))
+     {
+         result = snprintf((char *)buffer, length, REG_ALT_PATH_LINK, contextP->altPath);
+-        if (result > 0 && result <= length)
++        if (result > 0 && (size_t)result <= length)
+         {
+             index = result;
+         }
+@@ -398,7 +398,7 @@ int prv_getRegisterPayload(lwm2m_context_t * contextP,
+             result = snprintf((char *)buffer + index, length - index,
+                               REG_OBJECT_PATH,
+                               contextP->altPath?contextP->altPath:"", contextP->objectList[i]->objID);
+-            if (result > 0 && result <= length - index)
++            if (result > 0 && (size_t)result <= length - index)
+             {
+                 index += result;
+             }
+@@ -415,7 +415,7 @@ int prv_getRegisterPayload(lwm2m_context_t * contextP,
+                 result = snprintf((char *)buffer + index, length - index,
+                                   REG_OBJECT_INSTANCE_PATH,
+                                   contextP->altPath?contextP->altPath:"", contextP->objectList[i]->objID, targetP->id);
+-                if (result > 0 && result <= length - index)
++                if (result > 0 && (size_t)result <= length - index)
+                 {
+                     index += result;
+                 }
+--
+1.9.1
