@@ -457,7 +457,7 @@ static void _pktbuf_free(void *data, size_t size)
             new = _merge(prev, new);
         }
     }
-    if (_too_small_hole(new, new->next)) {
+    if ((new->next != NULL) && (_too_small_hole(new, new->next))) {
         _merge(new, new->next);
     }
 }
