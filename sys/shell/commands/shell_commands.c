@@ -116,6 +116,10 @@ extern int _zep_init(int argc, char **argv);
 #endif
 #endif
 
+#ifdef MODULE_NG_RPL
+extern int _ng_rpl(int argc, char **argv);
+#endif
+
 const shell_command_t _shell_command_list[] = {
     {"reboot", "Reboot the node", _reboot_handler},
 #ifdef MODULE_CONFIG
@@ -190,6 +194,9 @@ const shell_command_t _shell_command_list[] = {
 #ifdef MODULE_IPV6_ADDR
     {"zep_init", "initializes ZEP (Zigbee Encapsulation Protocol)", _zep_init },
 #endif
+#endif
+#ifdef MODULE_NG_RPL
+    {"rpl", "rpl configuration tool [help|init|rm|root|show]", _ng_rpl },
 #endif
     {NULL, NULL, NULL}
 };

@@ -53,6 +53,9 @@ endif
 ifneq (,$(filter ng_zep ipv6_addr,$(USEMODULE)))
   SRC += sc_zep.c
 endif
+ifneq (,$(filter ng_rpl,$(USEMODULE)))
+    SRC += sc_ng_rpl.c
+endif
 
 # TODO
 # Conditional building not possible at the moment due to

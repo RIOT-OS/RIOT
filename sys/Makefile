@@ -88,6 +88,9 @@ endif
 ifneq (,$(filter ng_zep,$(USEMODULE)))
     DIRS += net/application_layer/ng_zep
 endif
+ifneq (,$(filter ng_rpl,$(USEMODULE)))
+    DIRS += net/routing/ng_rpl
+endif
 ifneq (,$(filter ng_rpl_srh,$(USEMODULE)))
     DIRS += net/routing/ng_rpl/srh
 endif
