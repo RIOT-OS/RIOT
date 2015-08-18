@@ -627,12 +627,13 @@ static inline void ipv6_addr_set_solicited_nodes(ipv6_addr_t *out, const ipv6_ad
  *          RFC 5952
  *      </a>
  *
- * @param[out] result       The resulting string representation
+ * @param[out] result       The resulting string representation of at least
+ *                          @ref IPV6_ADDR_MAX_STR_LEN
  * @param[in] addr          An IPv6 address
  * @param[in] result_len    Length of @p result_len
  *
  * @return  @p result, on success
- * @return  NULL, if @p result_len was smaller than needed
+ * @return  NULL, if @p result_len was lesser than IPV6_ADDR_MAX_STR_LEN
  * @return  NULL, if @p result or @p addr was NULL
  */
 char *ipv6_addr_to_str(char *result, const ipv6_addr_t *addr, uint8_t result_len);
