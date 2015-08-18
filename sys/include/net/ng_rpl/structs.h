@@ -33,7 +33,7 @@ extern "C" {
 /**
  * @brief RPL-Option Generic Format
  * @see <a href="https://tools.ietf.org/html/rfc6550#section-6.7.1">
- *          RPL Control Message Option Generic Format
+ *          RFC6550, section 6.7.1, RPL Control Message Option Generic Format
  *      </a>
  */
 typedef struct __attribute__((packed)) {
@@ -44,7 +44,7 @@ typedef struct __attribute__((packed)) {
 /**
  * @brief DIO Base Object
  * @see <a href="https://tools.ietf.org/html/rfc6550#section-6.3.1">
- *          Format of the DIO Base Object
+ *          RFC6550, section 6.3.1, Format of the DIO Base Object
  *      </a>
  */
 typedef struct __attribute__((packed)) {
@@ -61,7 +61,7 @@ typedef struct __attribute__((packed)) {
 /**
  * @brief DODAG Configuration Option
  * @see <a href="https://tools.ietf.org/html/rfc6550#section-6.7.6">
- *          DODAG Configuration
+ *          RFC6550, section 6.7.6, DODAG Configuration
  *      </a>
  */
 typedef struct __attribute__((packed)) {
@@ -82,7 +82,7 @@ typedef struct __attribute__((packed)) {
 /**
  * @brief DODAG Information Solicitation
  * @see <a href="https://tools.ietf.org/html/rfc6550#section-6.2">
- *          DODAG Information Solicitation
+ *          RFC6550, section 6.2, DODAG Information Solicitation
  *      </a>
  */
 typedef struct __attribute__((packed)) {
@@ -93,7 +93,7 @@ typedef struct __attribute__((packed)) {
 /**
  * @brief Destination Advertisement Object
  * @see <a href="https://tools.ietf.org/html/rfc6550#section-6.4">
- *          Destination Advertisement Object
+ *          RFC6550, section 6.4, Destination Advertisement Object
  *      </a>
  */
 typedef struct __attribute__((packed)) {
@@ -107,7 +107,7 @@ typedef struct __attribute__((packed)) {
 /**
  * @brief Destination Advertisement Object Acknowledgement
  * @see <a href="https://tools.ietf.org/html/rfc6550#section-6.5">
- *          Destination Advertisement Object Acknowledgement
+ *          RFC6550, section 6.5, Destination Advertisement Object Acknowledgement
  *      </a>
  */
 typedef struct __attribute__((packed)) {
@@ -121,7 +121,7 @@ typedef struct __attribute__((packed)) {
 /**
  * @brief Target Option
  * @see <a href="https://tools.ietf.org/html/rfc6550#section-6.7.7">
- *          RPL Target
+ *          RFC6550, section 6.7.7, RPL Target
  *      </a>
  */
 typedef struct __attribute__((packed)) {
@@ -135,7 +135,7 @@ typedef struct __attribute__((packed)) {
 /**
  * @brief Transit Option
  * @see <a href="https://tools.ietf.org/html/rfc6550#section-6.7.8">
- *          Transit Information
+ *          RFC6550, section 6.7.8, Transit Information
  *      </a>
  */
 typedef struct __attribute__((packed)) {
