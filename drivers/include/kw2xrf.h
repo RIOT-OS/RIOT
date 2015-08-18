@@ -107,6 +107,8 @@ typedef struct {
     ng_netdev_driver_t const *driver;     /**< Pointer to the devices interface */
     ng_netdev_event_cb_t event_cb;        /**< Netdev event callback */
     kernel_pid_t mac_pid;                 /**< The driver's thread's PID */
+    uint8_t flags;                        /**< additional information about the
+                                             interface */
     /* driver specific fields */
     uint8_t buf[KW2XRF_MAX_PKT_LENGTH];   /**< Buffer for incoming or outgoing packets */
     netopt_state_t state;                 /**< Variable to keep radio driver's state */

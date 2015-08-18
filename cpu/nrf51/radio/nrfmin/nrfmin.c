@@ -522,6 +522,7 @@ int nrfmin_init(ng_netdev_t *dev)
     dev->driver = &nrfmin_driver;
     dev->event_cb = NULL;
     dev->mac_pid = KERNEL_PID_UNDEF;
+    dev->flags |= NG_NETDEV_FLAG_WIRELESS;
     /* keep a pointer for future reference */
     _netdev = dev;
 

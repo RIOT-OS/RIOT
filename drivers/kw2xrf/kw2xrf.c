@@ -407,6 +407,8 @@ int kw2xrf_init(kw2xrf_t *dev, spi_t spi, spi_speed_t spi_speed,
 
     /* set device driver */
     dev->driver = &kw2xrf_driver;
+    /* configure the device as wireless */
+    dev->flags |= NG_NETDEV_FLAG_WIRELESS;
     /* set default option */
     dev->proto = KW2XRF_DEFAULT_PROTOCOL;
     dev->option = 0;
