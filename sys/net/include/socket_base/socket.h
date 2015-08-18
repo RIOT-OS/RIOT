@@ -24,7 +24,8 @@
 
 #include <stdint.h>
 
-#include "net/gnrc/ipv6.h"
+#include "net/af.h"
+#include "net/ipv6/addr.h"
 
 #include "socket_base/in.h"
 
@@ -41,127 +42,6 @@ typedef uint32_t  socklen_t;    ///< POSIX compatible type for address length.
 #define SOCK_RAW        3   ///< POSIX compatible raw-protocol interface type.
 #define SOCK_RDM        4   ///< POSIX compatible reliably-delivered message type.
 #define SOCK_SEQPACKET  5   ///< POSIX compatible sequenced packet stream type.
-
-#define AF_UNSPEC           0           ///< unspecified address family.
-#define AF_LOCAL            1           ///< local to host (pipes, portals) address family.
-#define AF_UNIX             AF_LOCAL    ///< alias for AF_LOCAL for backward compatibility.
-#ifndef AF_INET
-#define AF_INET             2           ///< internetwork address family: UDP, TCP, etc.
-#endif
-#define AF_IMPLINK          3           ///< ARPAnet IMP address family.
-#define AF_PUP              4           ///< PUP protocols address family: e.g. BSP
-#define AF_CHAOS            5           ///< MIT CHAOS protocols address family
-#define AF_NS               6           ///< XEROX NS protocols address family
-#define AF_ISO              7           ///< ISO protocols address family
-#define AF_OSI              AF_ISO      ///< alias for AF_ISO
-#define AF_ECMA             8           ///< European computer manufacturers address family
-#define AF_DATAKIT          9           ///< datakit protocols address family
-#define AF_CCITT            10          ///< CCITT protocols address family, X.25 etc
-#define AF_SNA              11          ///< IBM SNA address family
-#define AF_DECnet           12          ///< DECnet address family
-#define AF_DLI              13          ///< DEC Direct data link interface address family
-#define AF_LAT              14          ///< LAT address family
-#define AF_HYLINK           15          ///< NSC Hyperchannel address family
-#define AF_APPLETALK        16          ///< Apple Talk address family
-#define AF_ROUTE            17          ///< Internal Routing Protocol address family
-#define AF_LINK             18          ///< Link layer interface address family
-#define pseudo_AF_XTP       19          ///< eXpress Transfer Protocol (no AF)
-#define AF_COIP             20          ///< connection-oriented IP, aka ST II address family.
-#define AF_CNT              21          ///< Computer Network Technology address family
-#define pseudo_AF_RTIP      22          ///< Help Identify RTIP packets address family
-#define AF_IPX              23          ///< Novell Internet Protocol (no AF)
-#define AF_SIP              24          ///< Simple Internet Protocol address family
-#define pseudo_AF_PIP       25          ///< Help Identify PIP packets (no AF)
-#define AF_ISDN             26          ///< Integrated Services Digital Network address family
-#define AF_E164             AF_ISDN     ///< CCITT E.164 recommendation
-#define pseudo_AF_KEY       27          ///< Internal key-management function (no AF)
-#ifndef AF_INET6
-/**
- * IPv6 address family.
- *
- * @see AF_INET
- */
-#define AF_INET6            28
-#endif
-#define AF_NATM             29          ///< native ATM access address family
-#define AF_ATM              30          ///< ATM address family
-#define pseudo_AF_HDRCMPLT  31          ///< Used by BPF to not rewrite headers in interface output routine
-#define AF_NETGRAPH         32          ///< Netgraph sockets address family
-#define AF_MAX              33          ///< Maximum for address families
-
-/*
- * Protocol families, same as address families for now.
- */
-#define PF_UNSPEC       AF_UNSPEC       ///< protocol family
-                                        ///< @see AF_UNSPEC
-#define PF_LOCAL        AF_LOCAL        ///< protocol family
-                                        ///< @see AF_LOCAL
-#define PF_UNIX         PF_LOCAL        ///< alias for PF_LOCAL for backward compatibility
-#define PF_INET         AF_INET         ///< protocol family
-                                        ///< @see AF_INET
-#define PF_IMPLINK      AF_IMPLINK      ///< protocol family
-                                        ///< @see AF_IMPLINK
-#define PF_PUP          AF_PUP          ///< protocol family
-                                        ///< @see AF_PUP
-#define PF_CHAOS        AF_CHAOS        ///< protocol family
-                                        ///< @see AF_CHAOS
-#define PF_NS           AF_NS           ///< protocol family
-                                        ///< @see AF_NS
-#define PF_ISO          AF_ISO          ///< protocol family
-                                        ///< @see AF_ISO
-#define PF_OSI          AF_OSI          ///< protocol family
-                                        ///< @see AF_OSI
-#define PF_ECMA         AF_ECMA         ///< protocol family
-                                        ///< @see AF_ECMA
-#define PF_DATAKIT      AF_DATAKIT      ///< protocol family
-                                        ///< @see AF_DATAKIT
-#define PF_CCITT        AF_CCITT        ///< protocol family
-                                        ///< @see AF_CCITT
-#define PF_SNA          AF_SNA          ///< protocol family
-                                        ///< @see AF_SNA
-#define PF_DECnet       AF_DECnet       ///< protocol family
-                                        ///< @see AF_DECnet
-#define PF_DLI          AF_DLI          ///< protocol family
-                                        ///< @see AF_DLI
-#define PF_LAT          AF_LAT          ///< protocol family
-                                        ///< @see AF_LAT
-#define PF_HYLINK       AF_HYLINK       ///< protocol family
-                                        ///< @see AF_HYLINK
-#define PF_APPLETALK    AF_APPLETALK    ///< protocol family
-                                        ///< @see AF_APPLETALK
-#define PF_ROUTE        AF_ROUTE        ///< protocol family
-                                        ///< @see AF_ROUTE
-#define PF_LINK         AF_LINK         ///< protocol family
-                                        ///< @see AF_LINK
-#define PF_XTP          pseudo_AF_XTP   ///< protocol family (no address family defined, only PF)
-                                        ///< @see pseudo_AF_XTP
-#define PF_COIP         AF_COIP         ///< protocol family
-                                        ///< @see AF_COIP
-#define PF_CNT          AF_CNT          ///< protocol family
-                                        ///< @see AF_CNT
-#define PF_SIP          AF_SIP          ///< protocol family
-                                        ///< @see AF_SIP
-#define PF_IPX          AF_IPX          ///< protocol family (same format as AF_NS)
-                                        ///< @see AF_IPX
-                                        ///< @see AF_NS
-#define PF_RTIP         pseudo_AF_RTIP  ///< protocol family (same format as AF_INET)
-                                        ///< @see pseudo_AF_RTIP
-#define PF_PIP          pseudo_AF_PIP   ///< protocol family
-                                        ///< @see pseudo_AF_PIP
-#define PF_ISDN         AF_ISDN         ///< protocol family
-                                        ///< @see AF_ISDN
-#define PF_KEY          pseudo_AF_KEY   ///< protocol family
-                                        ///< @see pseudo_AF_KEY
-#define PF_INET6        AF_INET6        ///< protocol family
-                                        ///< @see AF_INET6
-#define PF_NATM         AF_NATM         ///< protocol family
-                                        ///< @see AF_NATM
-#define PF_ATM          AF_ATM          ///< protocol family
-                                        ///< @see AF_ATM
-#define PF_NETGRAPH     AF_NETGRAPH     ///< protocol family
-                                        ///< @see AF_NETGRAPH
-#define PF_MAX          AF_MAX          ///< maximum of protocol families
-                                        ///< @see AF_MAX
 
 #define TRANSPORT_LAYER_SOCKET_STATIC_MSS       48  ///< Static TCP maxmimum segment size.
 
