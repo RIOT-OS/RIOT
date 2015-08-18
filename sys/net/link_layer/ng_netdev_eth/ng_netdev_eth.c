@@ -362,7 +362,7 @@ static inline void _addr_set_multicast(uint8_t *dst, ng_pktsnip_t *payload)
         case NG_NETTYPE_IPV6:
             dst[0] = 0x33;
             dst[1] = 0x33;
-            if ((payload != NULL) && (payload->data != NULL)) {
+            if (payload->data != NULL) {
                 ipv6_hdr_t *hdr = payload->data;
                 uint16_t *prefix = (uint16_t *)(&dst[2]);
                 prefix[0] = hdr->dst.u16[6].u16;
@@ -418,6 +418,12 @@ static int _marshall_ethernet(ng_netdev_eth_t *dev, uint8_t *buffer, ng_pktsnip_
         _addr_set_broadcast(hdr->dst);
     }
     else if (netif_hdr->flags & NG_NETIF_HDR_FLAGS_MULTICAST) {
+        if (payload == NULL) {
+            DEBUG("ng_netdev_eth: empty multicast packets over Ethernet are "\
+                  "not yet supported\n");
+            return -ENOTSUP;
+
+        }
         _addr_set_multicast(hdr->dst, payload);
     }
     else if (netif_hdr->dst_l2addr_len == ETHERNET_ADDR_LEN) {

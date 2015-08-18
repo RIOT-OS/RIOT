@@ -176,6 +176,9 @@ size_t ng_sixlowpan_iphc_decode(ng_pktsnip_t *ipv6, ng_pktsnip_t *pkt, size_t of
     }
 
     switch (iphc_hdr[IPHC2_IDX] & (NG_SIXLOWPAN_IPHC2_SAC | NG_SIXLOWPAN_IPHC2_SAM)) {
+        /* should be asserted by line 168 anyway */
+        assert(ctx != NULL);
+
         case IPHC_SAC_SAM_FULL:
             /* take full 128 from inline */
             memcpy(&(ipv6_hdr->src), iphc_hdr + payload_offset, 16);

@@ -429,6 +429,8 @@ static inline bool _too_small_hole(_unused_t *a, _unused_t *b)
 
 static inline _unused_t *_merge(_unused_t *a, _unused_t *b)
 {
+    assert(b != NULL);
+
     a->next = b->next;
     a->size = b->size + ((uint8_t *)b - (uint8_t *)a);
     return a;
@@ -455,7 +457,7 @@ static void _pktbuf_free(void *data, size_t size)
             new = _merge(prev, new);
         }
     }
-    if (_too_small_hole(new, new->next)) {
+    if ((new->next != NULL) && (_too_small_hole(new, new->next))) {
         _merge(new, new->next);
     }
 }
