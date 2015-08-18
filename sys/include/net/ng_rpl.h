@@ -35,7 +35,6 @@
 #include "net/ng_rpl/structs.h"
 #include "net/ng_rpl/dodag.h"
 #include "net/ng_rpl/of_manager.h"
-#include "inet_ntop.h"
 #include "net/fib.h"
 #include "vtimer.h"
 #include "trickle.h"

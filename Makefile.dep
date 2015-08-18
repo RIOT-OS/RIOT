@@ -35,6 +35,14 @@ ifneq (,$(filter ng_zep,$(USEMODULE)))
   USEMODULE += vtimer
 endif
 
+ifneq (,$(filter ng_rpl,$(USEMODULE)))
+  USEMODULE += fib
+  USEMODULE += gnrc
+  USEMODULE += ng_ipv6_router_default
+  USEMODULE += trickle
+  USEMODULE += vtimer
+endif
+
 ifneq (,$(filter ieee802154,$(USEMODULE)))
   ifneq (,$(filter ng_ipv6, $(USEMODULE)))
     USEMODULE += ng_sixlowpan
@@ -266,14 +274,4 @@ endif
 
 ifneq (,$(filter hih6130,$(USEMODULE)))
   USEMODULE += vtimer
-endif
-
-ifneq (,$(filter ng_rpl,$(USEMODULE)))
-  USEMODULE += timex
-  USEMODULE += vtimer
-  USEMODULE += ng_ipv6_router_default
-  USEMODULE += trickle
-  USEMODULE += net_help
-  USEMODULE += universal_address
-  USEMODULE += fib
 endif
