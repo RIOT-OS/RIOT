@@ -27,6 +27,7 @@ extern "C" {
 
 #include <stdint.h>
 #include <stdlib.h>
+#include "net/ipv6/addr.h"
 
 #define UNIVERSAL_ADDRESS_SIZE (16)         /**< size of the used addresses in bytes */
 
