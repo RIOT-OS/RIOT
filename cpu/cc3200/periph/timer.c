@@ -1,0 +1,723 @@
+/*
+ * Copyright (C) 2015
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License v2.1. See the file LICENSE in the top level directory for more
+ * details.
+ */
+
+/**
+ * @ingroup     cpu_cc3200
+ * @{
+ *
+ * @file
+ * @brief       Low-level timer driver implementation
+ *
+ * @author
+ *
+ * @}
+ */
+
+#include <stdlib.h>
+#include <sys/types.h>
+
+#if 0
+#include "cpu.h"
+#include "board.h"
+#include "sched.h"
+#include "thread.h"
+#endif
+
+#include "periph_conf.h"
+#include "periph/timer.h"
+
+//#include "signal_error.h"
+
+// CC3200 SDK
+#include "inc/hw_types.h"
+#include "inc/hw_memmap.h"
+
+#include "inc/hw_timer.h"
+
+#include "driverlib/timer.h"
+#include "driverlib/prcm.h"
+
+#define MAX_TIMERS TIMER_UNDEFINED
+
+void signal_error(const char* err);
+
+#define EMPTY_VALUE -1
+
+#define MAX_TIMER_VALUE 0xFFFFFFFF;
+
+#define CALIBRATION 111
+
+// ticks calibration for time elapsed between TAR read and TIMER_MATCH value written to register
+#define ELAPSED_TICKS 20
+
+/** Type for timer state */
+typedef struct {
+	void (*cb)(int);
+} timer_conf_t;
+
+/** Timer state memory */
+timer_conf_t config[MAX_TIMERS];
+
+typedef struct channel_struct {
+	unsigned int value;
+	int channel;
+} channel_struct;
+
+channel_struct timer_list[NUM_CHANNELS];
+
+#define TIM2_CHANNELS 6
+#define TIM3_CHANNELS 32
+
+channel_struct timer2_slot[TIM2_CHANNELS];
+
+u_char header_slot;
+
+typedef struct timer_queue_item {
+	unsigned long long value;
+	int channel;
+	struct timer_queue_item *next;
+} timer_queue_item;
+
+timer_queue_item timer2_queue[TIM2_CHANNELS];
+
+timer_queue_item *freeq2;
+timer_queue_item *busyq2;
+
+timer_queue_item timer3_queue[TIM3_CHANNELS];
+
+timer_queue_item *freeq3;
+timer_queue_item *busyq3;
+
+void irq_timer0_handler(void) {
+	timer_clear(TIMER_0, 0);
+	config[TIMER_0].cb(0); // timer has one hw channel
+}
+
+void irq_timer1_handler(void) {
+	config[TIMER_1].cb(0); // timer has one hw channel
+	timer_clear(TIMER_1, 0);
+}
+
+void irq_timer2_handler(void) {
+
+	int sts = HWREG(TIMERA2_BASE + TIMER_O_MIS);
+
+	timer_queue_item *curr_ptr = busyq2;
+
+	if (sts & TIMER_MIS_TATOMIS) {
+		// timeout, re-evaluate counters
+		while (curr_ptr) {
+			curr_ptr->value = curr_ptr->value % MAX_TIMER_VALUE;
+			curr_ptr = curr_ptr->next;
+		}
+
+		// clears the flag
+		MAP_TimerIntClear(TIMERA2_BASE, TIMER_TIMA_TIMEOUT);
+		return;
+	}
+
+	timer_queue_item *active = busyq2;
+
+	config[TIMER_2].cb(active->channel);
+
+	busyq2 = active->next;
+	active->next = freeq2;
+	freeq2 = active;
+
+	timer_clear(TIMER_2, 0);
+
+	sts = HWREG(TIMERA2_BASE + TIMER_O_TAR);
+	//HWREG(TIMERA2_BASE + TIMER_O_TAMATCHR) = (sts > busyq2->value) ? sts + 40 : busyq->value;
+
+	while (busyq2 && sts > (busyq2->value - ELAPSED_TICKS)) {
+		config[TIMER_2].cb(busyq2->channel);
+		active = busyq2;
+		busyq2 = active->next;
+		active->next = freeq2;
+		freeq2 = active;
+		sts = HWREG(TIMERA2_BASE + TIMER_O_TAR);
+	}
+	if(busyq2) {
+		HWREG(TIMERA2_BASE + TIMER_O_TAMATCHR) = busyq2->value;
+	} else {
+		// no timer left into buffer
+		MAP_TimerIntDisable(TIMERA2_BASE, TIMER_TIMA_MATCH);
+	}
+}
+
+void irq_timer3_handler(void) {
+
+	int sts = HWREG(TIMERA3_BASE + TIMER_O_MIS);
+
+	timer_queue_item *curr_ptr = busyq3;
+
+	if (sts & TIMER_MIS_TATOMIS) {
+		// timeout, re-evaluate counters
+		while (curr_ptr) {
+			curr_ptr->value = curr_ptr->value % MAX_TIMER_VALUE;
+			curr_ptr = curr_ptr->next;
+		}
+
+		// clears the flag
+		MAP_TimerIntClear(TIMERA3_BASE, TIMER_TIMA_TIMEOUT);
+		return;
+	}
+
+	timer_queue_item *active = busyq3;
+
+	config[TIMER_3].cb(active->channel);
+
+	busyq3 = active->next;
+	active->next = freeq3;
+	freeq3 = active;
+
+	timer_clear(TIMER_3, 0);
+
+	sts = HWREG(TIMERA3_BASE + TIMER_O_TAR);
+
+	while (busyq3 && sts > busyq3->value) {
+		config[TIMER_3].cb(busyq3->channel);
+		active = busyq3;
+		busyq3 = active->next;
+		active->next = freeq3;
+		freeq3 = active;
+		sts = HWREG(TIMERA3_BASE + TIMER_O_TAR);
+	}
+	if (busyq3) {
+		HWREG(TIMERA3_BASE + TIMER_O_TAMATCHR) = busyq3->value;
+	}
+}
+
+
+int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int)) {
+	int j;
+
+	switch (dev) {
+	case TIMER_0:
+		//
+		// Enable and Reset the timer block
+		//
+		MAP_PRCMPeripheralClkEnable(PRCM_TIMERA0, PRCM_RUN_MODE_CLK);
+		MAP_PRCMPeripheralReset(PRCM_TIMERA0);
+
+		MAP_TimerConfigure(TIMERA0_BASE, TIMER_CFG_PERIODIC_UP);
+
+		MAP_TimerControlStall(TIMERA0_BASE, TIMER_A, true);
+		// register the handler
+		MAP_TimerIntRegister(TIMERA0_BASE, TIMER_A, irq_timer0_handler);
+
+		config[TIMER_0].cb = callback;
+
+		MAP_IntPriorityGroupingSet(3);
+		MAP_IntPrioritySet(INT_TIMERA0A, 0xFF);
+
+		// enable the match interrupt
+		//MAP_TimerIntEnable(TIMERA0_BASE, TIMER_TIMA_MATCH);
+
+		// enable the timer
+		MAP_TimerEnable(TIMERA0_BASE, TIMER_A);
+
+		break;
+	case TIMER_1:
+		//
+		// Enable and Reset the timer block
+		//
+		MAP_PRCMPeripheralClkEnable(PRCM_TIMERA1, PRCM_RUN_MODE_CLK);
+		MAP_PRCMPeripheralReset(PRCM_TIMERA1);
+
+		MAP_TimerConfigure(TIMERA1_BASE, TIMER_CFG_PERIODIC_UP);
+
+		MAP_TimerControlStall(TIMERA1_BASE, TIMER_A, true);
+
+		// register the handler
+		MAP_TimerIntRegister(TIMERA1_BASE, TIMER_A, irq_timer1_handler);
+
+		config[TIMER_1].cb = callback;
+
+		MAP_IntPriorityGroupingSet(3);
+		MAP_IntPrioritySet(INT_TIMERA1A, 0xFF);
+
+		// enable the match interrupt
+		//MAP_TimerIntEnable(TIMERA0_BASE, TIMER_TIMA_MATCH);
+
+		// enable the timer
+		MAP_TimerEnable(TIMERA1_BASE, TIMER_A);
+
+		break;
+	case TIMER_2:
+		j = TIM2_CHANNELS;
+
+		while (--j) {
+			timer2_queue[j - 1].next = &timer2_queue[j];
+		}
+
+		freeq2 = timer2_queue;
+		busyq2 = NULL;
+
+		MAP_PRCMPeripheralClkEnable(PRCM_TIMERA2, PRCM_RUN_MODE_CLK);
+		MAP_PRCMPeripheralReset(PRCM_TIMERA2);
+
+		MAP_TimerConfigure(TIMERA2_BASE, TIMER_CFG_PERIODIC_UP);
+
+		MAP_TimerControlStall(TIMERA2_BASE, TIMER_A, true);
+
+		// register the handler
+		MAP_TimerIntRegister(TIMERA2_BASE, TIMER_A, irq_timer2_handler);
+
+		config[TIMER_2].cb = callback;
+
+		MAP_IntPriorityGroupingSet(3);
+		MAP_IntPrioritySet(INT_TIMERA2A, 0xFF);
+
+		// enable the timeout interrupt
+		MAP_TimerIntEnable(TIMERA2_BASE, TIMER_TIMA_TIMEOUT);
+
+		// enable the timer
+		MAP_TimerEnable(TIMERA2_BASE, TIMER_A);
+
+		break;
+	case TIMER_3:
+		j = TIM3_CHANNELS;
+
+		while (--j) {
+			timer3_queue[j - 1].next = &timer3_queue[j];
+		}
+
+		freeq3 = timer3_queue;
+		busyq3 = NULL;
+
+		MAP_PRCMPeripheralClkEnable(PRCM_TIMERA3, PRCM_RUN_MODE_CLK);
+		MAP_PRCMPeripheralReset(PRCM_TIMERA3);
+
+		MAP_TimerConfigure(TIMERA3_BASE, TIMER_CFG_PERIODIC_UP);
+
+		MAP_TimerControlStall(TIMERA3_BASE, TIMER_A, true);
+
+		// register the handler
+		MAP_TimerIntRegister(TIMERA3_BASE, TIMER_A, irq_timer3_handler);
+
+		config[TIMER_3].cb = callback;
+
+		MAP_IntPriorityGroupingSet(3);
+		MAP_IntPrioritySet(INT_TIMERA3A, 0xFF);
+
+		// enable the timeout interrupt
+		MAP_TimerIntEnable(TIMERA3_BASE, TIMER_TIMA_TIMEOUT);
+
+		// enable the timer
+		MAP_TimerEnable(TIMERA3_BASE, TIMER_A);
+
+		break;
+	default:
+		break;
+	}
+
+	return 0;
+}
+
+
+int timer_set(tim_t dev, int channel, unsigned int timeout) {
+#if 1
+	switch (dev) {
+	case TIMER_0:
+		return timer_set_absolute(dev, channel, HWREG(TIMERA0_BASE + TIMER_O_TAR) + timeout);
+	case TIMER_1:
+		return timer_set_absolute(dev, channel, HWREG(TIMERA1_BASE + TIMER_O_TAR) + timeout);
+	case TIMER_2:
+		return timer_set_absolute(dev, channel, HWREG(TIMERA2_BASE + TIMER_O_TAR) + timeout);
+	case TIMER_3:
+		return timer_set_absolute(dev, channel, HWREG(TIMERA3_BASE + TIMER_O_TAR) + timeout);
+	default:
+		break;
+	}
+#endif
+#if 0
+	unsigned long long abstimeout;
+
+	switch (dev) {
+	case TIMER_0:
+		abstimeout = HWREG(TIMERA0_BASE + TIMER_O_TAR) + timeout;
+		MAP_TimerMatchSet(TIMERA0_BASE, TIMER_A, abstimeout);
+		HWREG(TIMERA0_BASE + TIMER_O_IMR) |= TIMER_TIMA_MATCH; // enable the match timer
+		break;
+	case TIMER_1:
+		abstimeout = HWREG(TIMERA1_BASE + TIMER_O_TAR) + timeout;
+		MAP_TimerMatchSet(TIMERA1_BASE, TIMER_A, abstimeout);
+		HWREG(TIMERA1_BASE + TIMER_O_IMR) |= TIMER_TIMA_MATCH; // enable the match timer
+		break;
+	case TIMER_2:
+
+		if (freeq2 == NULL) {
+			// no free timer left
+			signal_error("ERR: timer not scheduled");
+			break;
+		}
+		abstimeout = (unsigned long long)(timeout) + (unsigned long long)(HWREG(TIMERA2_BASE + TIMER_O_TAR)) - CALIBRATION;
+
+		if (busyq2) {
+			// some timers already activated
+			timer_queue_item *ptr = busyq2;
+			timer_queue_item *prev = NULL;
+			while (ptr && ptr->value < abstimeout) {
+				prev = ptr;
+				ptr = ptr->next;
+			}
+			if (prev) {
+				// not the shortest timer
+				prev->next = freeq2;
+				freeq2->channel = channel;
+				freeq2->value = abstimeout;
+				freeq2 = freeq2->next;
+
+				prev->next->next = ptr;
+			} else {
+				// insert into the first position
+				busyq2 = freeq2;
+				freeq2->channel = channel;
+				freeq2->value = abstimeout;
+				freeq2 = freeq2->next;
+
+				busyq2->next = ptr;
+			}
+
+		} else {
+			// insert the first one
+
+			MAP_TimerMatchSet(TIMERA2_BASE, TIMER_A, abstimeout);
+			HWREG(TIMERA2_BASE + TIMER_O_IMR) |= TIMER_TIMA_MATCH; // enable the match timer
+
+			busyq2 = freeq2;
+			freeq2 = freeq2->next;
+			busyq2->next = NULL;
+			busyq2->channel = channel;
+			busyq2->value = abstimeout;
+
+		}
+
+		break;
+	case TIMER_3:
+		if (freeq3 == NULL) {
+			// no free timer left
+			signal_error("ERR: timer not scheduled");
+			break;
+		}
+		abstimeout = (unsigned long long)(timeout) + (unsigned long long)(HWREG(TIMERA3_BASE + TIMER_O_TAR)) - CALIBRATION;
+
+		if (busyq3) {
+			// some timers already activated
+			timer_queue_item *ptr = busyq3;
+			timer_queue_item *prev = NULL;
+			while (ptr && ptr->value < abstimeout) {
+				prev = ptr;
+				ptr = ptr->next;
+			}
+			if (prev) {
+				// not the shortest timer
+				prev->next = freeq3;
+				freeq3->channel = channel;
+				freeq3->value = abstimeout;
+				freeq3 = freeq3->next;
+
+				prev->next->next = ptr;
+			} else {
+				// insert into the first position
+				busyq3 = freeq3;
+				freeq3->channel = channel;
+				freeq3->value = abstimeout;
+				freeq3 = freeq3->next;
+
+				busyq3->next = ptr;
+			}
+
+		} else {
+			// insert the first one
+
+			MAP_TimerMatchSet(TIMERA3_BASE, TIMER_A, abstimeout);
+			HWREG(TIMERA3_BASE + TIMER_O_IMR) |= TIMER_TIMA_MATCH; // enable the match timer
+
+			busyq3 = freeq3;
+			freeq3 = freeq3->next;
+			busyq3->next = NULL;
+			busyq3->channel = channel;
+			busyq3->value = abstimeout;
+
+		}
+
+		break;
+	default:
+		break;
+	}
+
+#endif
+	return 0;
+}
+
+int timer_set_absolute(tim_t dev, int channel, unsigned int value) {
+	unsigned long long abstimeout;
+
+	switch (dev) {
+	case TIMER_0:
+		MAP_TimerMatchSet(TIMERA0_BASE, TIMER_A, value);
+		HWREG(TIMERA0_BASE + TIMER_O_IMR) |= TIMER_TIMA_MATCH; // enable the match timer
+		break;
+	case TIMER_1:
+		MAP_TimerMatchSet(TIMERA1_BASE, TIMER_A, value);
+		HWREG(TIMERA1_BASE + TIMER_O_IMR) |= TIMER_TIMA_MATCH; // enable the match timer
+		break;
+	case TIMER_2:
+
+		if (freeq2 == NULL) {
+			// no free timer left
+			signal_error("ERR: timer not scheduled");
+			break;
+		}
+		abstimeout = (unsigned long long)(value) - CALIBRATION;
+
+		if (busyq2) {
+			// some timers already activated
+			timer_queue_item *ptr = busyq2;
+			timer_queue_item *prev = NULL;
+			while (ptr && ptr->value < abstimeout) {
+				prev = ptr;
+				ptr = ptr->next;
+			}
+			if (prev) {
+				// not the shortest timer
+				prev->next = freeq2;
+				freeq2->channel = channel;
+				freeq2->value = abstimeout;
+				freeq2 = freeq2->next;
+
+				prev->next->next = ptr;
+			} else {
+				// insert into the first position
+				busyq2 = freeq2;
+				freeq2->channel = channel;
+				freeq2->value = abstimeout;
+				freeq2 = freeq2->next;
+
+				busyq2->next = ptr;
+			}
+
+		} else {
+			// insert the first one
+
+			MAP_TimerMatchSet(TIMERA2_BASE, TIMER_A, abstimeout);
+			HWREG(TIMERA2_BASE + TIMER_O_IMR) |= TIMER_TIMA_MATCH; // enable the match timer
+
+			busyq2 = freeq2;
+			freeq2 = freeq2->next;
+			busyq2->next = NULL;
+			busyq2->channel = channel;
+			busyq2->value = abstimeout;
+
+		}
+
+		break;
+	case TIMER_3:
+		if (freeq3 == NULL) {
+			// no free timer left
+			signal_error("ERR: timer not scheduled");
+			break;
+		}
+		abstimeout = (unsigned long long)(value) - CALIBRATION;
+
+		if (busyq3) {
+			// some timers already activated
+			timer_queue_item *ptr = busyq3;
+			timer_queue_item *prev = NULL;
+			while (ptr && ptr->value < abstimeout) {
+				prev = ptr;
+				ptr = ptr->next;
+			}
+			if (prev) {
+				// not the shortest timer
+				prev->next = freeq3;
+				freeq3->channel = channel;
+				freeq3->value = abstimeout;
+				freeq3 = freeq3->next;
+
+				prev->next->next = ptr;
+			} else {
+				// insert into the first position
+				busyq3 = freeq3;
+				freeq3->channel = channel;
+				freeq3->value = abstimeout;
+				freeq3 = freeq3->next;
+
+				busyq3->next = ptr;
+			}
+
+		} else {
+			// insert the first one
+
+			MAP_TimerMatchSet(TIMERA3_BASE, TIMER_A, abstimeout);
+			HWREG(TIMERA3_BASE + TIMER_O_IMR) |= TIMER_TIMA_MATCH; // enable the match timer
+
+			busyq3 = freeq3;
+			freeq3 = freeq3->next;
+			busyq3->next = NULL;
+			busyq3->channel = channel;
+			busyq3->value = abstimeout;
+		}
+
+		break;
+	default:
+		break;
+	}
+
+	return 0;
+}
+
+int timer_clear(tim_t dev, int channel) {
+	switch (dev) {
+	case TIMER_0:
+		MAP_TimerIntClear(TIMERA0_BASE, TIMER_TIMA_MATCH);
+		HWREG(TIMERA0_BASE + TIMER_O_IMR) &= ~(TIMER_TIMA_MATCH); // disable the match timer
+		break;
+	case TIMER_1:
+		MAP_TimerIntClear(TIMERA1_BASE, TIMER_TIMA_MATCH);
+		HWREG(TIMERA1_BASE + TIMER_O_IMR) &= ~(TIMER_TIMA_MATCH); // disable the match timer
+		break;
+	case TIMER_2:
+		MAP_TimerIntClear(TIMERA2_BASE, TIMER_TIMA_MATCH);
+
+		if (busyq2 == NULL) {
+			// no timer left into buffer
+			MAP_TimerIntDisable(TIMERA2_BASE, TIMER_TIMA_MATCH);
+		}
+		break;
+	case TIMER_3:
+		MAP_TimerIntClear(TIMERA3_BASE, TIMER_TIMA_MATCH);
+
+		if (busyq3 == NULL) {
+			// no timer left into buffer
+			MAP_TimerIntDisable(TIMERA3_BASE, TIMER_TIMA_MATCH);
+		}
+		break;
+	default:
+		break;
+	}
+	return 0;
+}
+
+unsigned int timer_read(tim_t dev) {
+	switch (dev) {
+	case TIMER_0:
+		return TimerValueGet(TIMERA0_BASE, TIMER_A);
+		break;
+	case TIMER_1:
+		return TimerValueGet(TIMERA1_BASE, TIMER_A);
+		break;
+	case TIMER_2:
+		return TimerValueGet(TIMERA2_BASE, TIMER_A);
+		break;
+	case TIMER_3:
+		return TimerValueGet(TIMERA3_BASE, TIMER_A);
+		break;
+	case MAX_TIMERS:
+	default:
+		return 0;
+	}
+}
+
+void timer_start(tim_t dev) {
+	switch (dev) {
+	case TIMER_0:
+		MAP_TimerEnable(TIMERA0_BASE, TIMER_A);
+		break;
+	case TIMER_1:
+		MAP_TimerEnable(TIMERA1_BASE, TIMER_A);
+		break;
+	case TIMER_2:
+		MAP_TimerEnable(TIMERA2_BASE, TIMER_A);
+		break;
+	case TIMER_3:
+		MAP_TimerEnable(TIMERA3_BASE, TIMER_A);
+		break;
+	default:
+		break;
+	}
+}
+
+void timer_stop(tim_t dev) {
+	switch (dev) {
+	case TIMER_0:
+		MAP_TimerDisable(TIMERA0_BASE, TIMER_A);
+		break;
+	case TIMER_1:
+		MAP_TimerDisable(TIMERA1_BASE, TIMER_A);
+		break;
+	case TIMER_2:
+		MAP_TimerDisable(TIMERA2_BASE, TIMER_A);
+		break;
+	case TIMER_3:
+		MAP_TimerDisable(TIMERA3_BASE, TIMER_A);
+		break;
+	default:
+		break;
+	}
+}
+
+void timer_irq_enable(tim_t dev) {
+	switch (dev) {
+	case TIMER_0:
+		MAP_TimerIntEnable(TIMERA0_BASE, TIMER_TIMA_MATCH);
+		break;
+	case TIMER_1:
+		MAP_TimerIntEnable(TIMERA1_BASE, TIMER_TIMA_MATCH);
+		break;
+	case TIMER_2:
+		MAP_TimerIntEnable(TIMERA2_BASE, TIMER_TIMA_MATCH);
+		break;
+	case TIMER_3:
+		MAP_TimerIntEnable(TIMERA3_BASE, TIMER_TIMA_MATCH);
+		break;
+	default:
+		break;
+	}
+}
+
+void timer_irq_disable(tim_t dev) {
+	switch (dev) {
+	case TIMER_0:
+		MAP_TimerIntDisable(TIMERA0_BASE, TIMER_TIMA_MATCH);
+		break;
+	case TIMER_1:
+		MAP_TimerIntDisable(TIMERA1_BASE, TIMER_TIMA_MATCH);
+		break;
+	case TIMER_2:
+		MAP_TimerIntDisable(TIMERA2_BASE, TIMER_TIMA_MATCH);
+		break;
+	case TIMER_3:
+		MAP_TimerIntDisable(TIMERA3_BASE, TIMER_TIMA_MATCH);
+		break;
+	default:
+		break;
+	}
+}
+
+void timer_reset(tim_t dev) {
+	switch (dev) {
+	case TIMER_0:
+		TimerValueSet(TIMERA0_BASE, TIMER_A, 0);
+		break;
+	case TIMER_1:
+		TimerValueSet(TIMERA1_BASE, TIMER_A, 0);
+		break;
+	case TIMER_2:
+		TimerValueSet(TIMERA2_BASE, TIMER_A, 0);
+		break;
+	case TIMER_3:
+		TimerValueSet(TIMERA3_BASE, TIMER_A, 0);
+		break;
+	default:
+		break;
+	}
+}
+

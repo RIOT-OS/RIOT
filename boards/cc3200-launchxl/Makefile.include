@@ -1,0 +1,33 @@
+# Define the cpu used by the CC2538DK board:
+export CPU        = cc3200
+# export CPU_MODEL ?= cc2538nf53
+
+# setup serial terminal
+export PORT      ?= /dev/ttyUSB1
+include $(RIOTBOARD)/Makefile.include.serial
+
+# debugger config
+export DEBUGGER = $(RIOTBOARD)/$(BOARD)/dist/debug.sh
+export DEBUGSERVER = JLinkGDBServer -device CC2538SF53
+export RESET = $(RIOTBOARD)/$(BOARD)/dist/reset.sh
+
+# Define the flash-tool and default port:
+export PROGRAMMER ?= cc2538-bsl
+
+ifeq ($(PROGRAMMER),cc2538-bsl)
+  export FLASHER = python $(RIOTBOARD)/$(BOARD)/dist/cc2538-bsl.py
+  export FFLAGS  = -p "$(PORT)" -e -w -v $(HEXFILE)
+else ifeq ($(PROGRAMMER),jlink)
+  export FLASHER = $(RIOTBOARD)/$(BOARD)/dist/flash.sh
+  export FFLAGS  = $(BINDIR) $(HEXFILE)
+endif
+
+export OFLAGS    = -O binary --gap-fill 0xff
+export HEXFILE = $(ELFFILE:.elf=.bin)
+export DEBUGGER_FLAGS = $(BINDIR) $(ELFFILE)
+export RESET_FLAGS = $(BINDIR)
+
+export OBJDUMPFLAGS += --disassemble --source --disassembler-options=force-thumb
+
+# include cortex defaults
+include $(RIOTBOARD)/Makefile.include.cortexm_common

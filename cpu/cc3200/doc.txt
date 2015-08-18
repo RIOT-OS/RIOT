@@ -1,0 +1,10 @@
+/**
+ * @defgroup        cpu_cc2538 Texas Instruments CC2538
+ * @ingroup         cpu
+ * @brief           Texas Instruments CC2538 Cortex-M3 MCU specific code
+ */
+
+/**
+ * @defgroup        cpu_cc2538_definitions Texas Instruments CC2538 Definitions
+ * @ingroup         cpu_cc2538
+ */
