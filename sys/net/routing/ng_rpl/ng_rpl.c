@@ -151,6 +151,9 @@ static void _receive(ng_pktsnip_t *icmpv6)
     icmpv6_hdr_t *icmpv6_hdr = NULL;
 
     LL_SEARCH_SCALAR(icmpv6, ipv6, type, NG_NETTYPE_IPV6);
+
+    assert(ipv6 != NULL);
+
     ipv6_hdr = (ipv6_hdr_t *)ipv6->data;
 
     icmpv6_hdr = (icmpv6_hdr_t *)icmpv6->data;

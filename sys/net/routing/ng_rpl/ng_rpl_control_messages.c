@@ -137,7 +137,6 @@ void ng_rpl_send_DIO(ng_rpl_dodag_t *dodag, ipv6_addr_t *destination)
         dodag_conf->reserved = 0;
         dodag_conf->default_lifetime = dodag->default_lifetime;
         dodag_conf->lifetime_unit = byteorder_htons(dodag->lifetime_unit);
-        pos += sizeof(*dodag_conf);
     }
 
     dodag->dodag_conf_counter++;
@@ -402,6 +401,9 @@ void ng_rpl_recv_DIO(ng_rpl_dio_t *dio, ipv6_addr_t *src, uint16_t len)
     else if (parent != NULL) {
         trickle_increment_counter(&dodag->trickle);
     }
+
+    /* ng_rpl_parent_add_by_addr should have set this already */
+    assert(parent != NULL);
 
     parent->rank = byteorder_ntohs(dio->rank);
 
