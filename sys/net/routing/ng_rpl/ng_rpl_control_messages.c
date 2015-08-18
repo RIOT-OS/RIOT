@@ -401,6 +401,9 @@ void ng_rpl_recv_DIO(ng_rpl_dio_t *dio, ipv6_addr_t *src, uint16_t len)
         trickle_increment_counter(&dodag->trickle);
     }
 
+    /* ng_rpl_parent_add_by_addr should have set this already */
+    assert(parent != NULL);
+
     parent->rank = byteorder_ntohs(dio->rank);
 
     if(!_parse_options(NG_RPL_ICMPV6_CODE_DIO, dodag, (ng_rpl_opt_t *)(dio + 1), len, NULL)) {
