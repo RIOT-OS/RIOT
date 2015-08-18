@@ -55,17 +55,17 @@
 #define UART_IRQ_PRIO       1
 
 /* UART 0 device configuration */
-#define UART_0_DEV          USART1
-#define UART_0_CLKEN()      (RCC->APB2ENR |= RCC_APB2ENR_USART1EN)
-#define UART_0_CLKDIS()     (RCC->APB2ENR &= (~RCC_APB2ENR_USART1EN))
-#define UART_0_IRQ          USART1_IRQn
-#define UART_0_ISR          isr_usart1
+#define UART_0_DEV          USART2
+#define UART_0_CLKEN()      (RCC->APB1ENR |= RCC_APB1ENR_USART2EN)
+#define UART_0_CLKDIS()     (RCC->APB1ENR &= (~RCC_APB1ENR_USART2EN))
+#define UART_0_IRQ          USART2_IRQn
+#define UART_0_ISR          isr_usart2
 /* UART 0 pin configuration */
 #define UART_0_PORT         GPIOA
 #define UART_0_PORT_CLKEN() (RCC->AHBENR |= RCC_AHBENR_GPIOAEN)
 #define UART_0_RX_PIN       15
 #define UART_0_TX_PIN       14
-#define UART_0_AF           0
+#define UART_0_AF           1
 /** @} */
 
 
@@ -167,7 +167,7 @@
 #define GPIO_9_IRQ          EXTI0_1_IRQn
 /* GPIO channel 10 config */
 #define GPIO_10_PORT        GPIOA
-#define GPIO_10_PIN         15
+#define GPIO_10_PIN         6
 #define GPIO_10_CLK			17
 #define GPIO_10_EXTI_CFG()   (SYSCFG->EXTICR[0] |= SYSCFG_EXTICR1_EXTI0_PA)
 #define GPIO_10_IRQ          EXTI0_1_IRQn
