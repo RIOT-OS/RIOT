@@ -135,7 +135,6 @@ void ng_rpl_send_DIO(ng_rpl_dodag_t *dodag, ipv6_addr_t *destination)
         dodag_conf->reserved = 0;
         dodag_conf->default_lifetime = dodag->default_lifetime;
         dodag_conf->lifetime_unit = byteorder_htons(dodag->lifetime_unit);
-        pos += sizeof(*dodag_conf);
     }
 
     dodag->dodag_conf_counter++;
