@@ -22,7 +22,7 @@
 
 #include "board.h"
 #include "net/ng_nomac.h"
-#include "net/ng_netbase.h"
+#include "net/gnrc.h"
 
 #include "net/ng_netdev_eth.h"
 #include "net/dev_eth.h"

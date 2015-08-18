@@ -19,7 +19,7 @@
 #include "cpu_conf.h"
 #include "kernel_types.h"
 #include "net/ng_icmpv6.h"
-#include "net/ng_netbase.h"
+#include "net/gnrc.h"
 #include "net/ng_ndp.h"
 #include "net/protnum.h"
 #include "thread.h"

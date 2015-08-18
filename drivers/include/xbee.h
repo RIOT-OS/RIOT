@@ -29,7 +29,7 @@
 #include "mutex.h"
 #include "periph/uart.h"
 #include "periph/gpio.h"
-#include "net/ng_netbase.h"
+#include "net/gnrc.h"
 #include "net/ieee802154.h"
 
 #ifdef __cplusplus

@@ -23,7 +23,7 @@
 
 #include "board.h"
 #include "net/ng_nomac.h"
-#include "net/ng_netbase.h"
+#include "net/gnrc.h"
 
 #include "kw2xrf.h"
 #include "kw2xrf_params.h"

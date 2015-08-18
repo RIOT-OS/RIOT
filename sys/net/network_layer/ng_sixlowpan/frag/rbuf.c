@@ -16,7 +16,7 @@
 #include <stdbool.h>
 
 #include "rbuf.h"
-#include "net/ng_netbase.h"
+#include "net/gnrc.h"
 #include "net/ng_ipv6/hdr.h"
 #include "net/ng_ipv6/netif.h"
 #include "net/ng_sixlowpan.h"

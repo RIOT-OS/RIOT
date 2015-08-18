@@ -7,12 +7,13 @@
  */
 
 /**
- * @defgroup    net_ng_netbase  Network Stack Pseudo Header
+ * @defgroup    net_gnrc    Generic (gnrc) network stack.
  * @ingroup     net
+ * @brief       RIOT's modular default IP network stack.
  * @{
  *
  * @file
- * @brief       Pseudo header that includes all network stack base modules
+ * @brief       Pseudo header that includes all gnrc network stack base modules
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */

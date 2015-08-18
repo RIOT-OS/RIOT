@@ -21,7 +21,7 @@
 
 #include "board.h"
 #include "net/ng_nomac.h"
-#include "net/ng_netbase.h"
+#include "net/gnrc.h"
 
 #include "at86rf2xx.h"
 #include "at86rf2xx_params.h"

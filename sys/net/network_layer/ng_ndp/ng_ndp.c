@@ -23,7 +23,7 @@
 #include "net/ipv6/ext/rh.h"
 #include "net/ng_icmpv6.h"
 #include "net/ng_ipv6.h"
-#include "net/ng_netbase.h"
+#include "net/gnrc.h"
 #include "random.h"
 #include "utlist.h"
 #include "thread.h"

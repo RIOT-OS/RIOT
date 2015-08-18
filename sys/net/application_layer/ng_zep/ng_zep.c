@@ -26,7 +26,7 @@
 #include "net/ieee802154.h"
 #include "net/ipv6/addr.h"
 #include "net/ng_ipv6/hdr.h"
-#include "net/ng_netbase.h"
+#include "net/gnrc.h"
 #include "net/ng_udp.h"
 #include "periph/cpuid.h"
 #include "random.h"

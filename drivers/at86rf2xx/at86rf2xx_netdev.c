@@ -21,7 +21,7 @@
 
 #include "net/eui64.h"
 #include "net/ieee802154.h"
-#include "net/ng_netbase.h"
+#include "net/gnrc.h"
 #include "at86rf2xx.h"
 #include "at86rf2xx_netdev.h"
 #include "at86rf2xx_internal.h"

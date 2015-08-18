@@ -27,7 +27,7 @@
 #include "utlist.h"
 #include "net/ipv6/hdr.h"
 #include "net/ng_udp.h"
-#include "net/ng_netbase.h"
+#include "net/gnrc.h"
 #include "net/inet_csum.h"
 
 

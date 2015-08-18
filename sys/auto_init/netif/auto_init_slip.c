@@ -21,7 +21,7 @@
 
 #include "board.h"
 #include "net/ng_nomac.h"
-#include "net/ng_netbase.h"
+#include "net/gnrc.h"
 
 #include "slip.h"
 #include "slip_params.h"

@@ -27,7 +27,7 @@
 #include "periph/cpuid.h"
 #include "byteorder.h"
 #include "net/ieee802154.h"
-#include "net/ng_netbase.h"
+#include "net/gnrc.h"
 #include "at86rf2xx_registers.h"
 #include "at86rf2xx_internal.h"
 #include "at86rf2xx_netdev.h"

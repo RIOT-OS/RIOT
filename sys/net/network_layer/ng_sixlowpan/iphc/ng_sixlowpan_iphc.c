@@ -17,7 +17,7 @@
 #include "byteorder.h"
 #include "net/ieee802154.h"
 #include "net/ipv6/hdr.h"
-#include "net/ng_netbase.h"
+#include "net/gnrc.h"
 #include "net/ng_sixlowpan/ctx.h"
 #include "utlist.h"
 

@@ -12,7 +12,7 @@
  * @file
  */
 
-#include "net/ng_netbase.h"
+#include "net/gnrc.h"
 
 #include "od.h"
 #include "net/ng_icmpv6.h"

@@ -13,7 +13,7 @@
  */
 
 #include "kernel_types.h"
-#include "net/ng_netbase.h"
+#include "net/gnrc.h"
 #include "thread.h"
 #include "utlist.h"
 

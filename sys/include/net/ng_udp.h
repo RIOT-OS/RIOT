@@ -25,7 +25,7 @@
 #include <stdint.h>
 
 #include "byteorder.h"
-#include "net/ng_netbase.h"
+#include "net/gnrc.h"
 #include "net/udp.h"
 
 #ifdef __cplusplus

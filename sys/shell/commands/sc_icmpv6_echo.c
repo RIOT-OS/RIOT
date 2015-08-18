@@ -26,7 +26,7 @@
 #include "net/ipv6/addr.h"
 #include "net/ng_ipv6/nc.h"
 #include "net/ng_ipv6/hdr.h"
-#include "net/ng_netbase.h"
+#include "net/gnrc.h"
 #include "thread.h"
 #include "utlist.h"
 #include "vtimer.h"

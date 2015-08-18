@@ -23,7 +23,7 @@
 #include "kernel.h"
 #include "at86rf2xx.h"
 #include "net/ng_nomac.h"
-#include "net/ng_netbase.h"
+#include "net/gnrc.h"
 
 /* make sure the SPI port and the needed GPIO pins are defined */
 #ifndef ATRF_SPI

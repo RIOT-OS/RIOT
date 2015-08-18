@@ -22,7 +22,7 @@
 #include "byteorder.h"
 #include "kernel_types.h"
 #include "net/ipv6/hdr.h"
-#include "net/ng_netbase.h"
+#include "net/gnrc.h"
 #include "net/ng_ndp.h"
 #include "net/protnum.h"
 #include "od.h"
