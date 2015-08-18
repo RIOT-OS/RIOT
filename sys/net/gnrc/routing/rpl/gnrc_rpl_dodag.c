@@ -199,6 +199,16 @@ gnrc_rpl_dodag_t *gnrc_rpl_dodag_get(gnrc_rpl_instance_t *instance, ipv6_addr_t 
         return NULL;
     }
 
+    /* check if global instance id */
+    if ((dodag_id == NULL) && ((instance->id & NG_RPL_INSTANCE_ID_MSB) == 0)) {
+#if defined(DEVELHELP) && defined(ENABLE_DEBUG)
+        if ((instance->dodags != NULL) && (instance->dodags->next != NULL)) {
+            DEBUG("RPL: More than one DODAG available for the global instance (%d)", instance->id);
+        }
+#endif
+        return instance->dodags;
+    }
+
     gnrc_rpl_dodag_t *dodag = NULL;
     LL_FOREACH(instance->dodags, dodag) {
         if (ipv6_addr_equal(&dodag->dodag_id, dodag_id)) {

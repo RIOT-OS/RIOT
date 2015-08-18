@@ -101,7 +101,6 @@ typedef struct __attribute__((packed)) {
     uint8_t k_d_flags;          /**< K and D flags */
     uint8_t reserved;           /**< reserved */
     uint8_t dao_sequence;       /**< sequence of the DAO, needs to be used for DAO-ACK */
-    ipv6_addr_t dodag_id;       /**< id of the DODAG */
 } gnrc_rpl_dao_t;
 
 /**
@@ -115,7 +114,6 @@ typedef struct __attribute__((packed)) {
     uint8_t d_reserved;         /**< if set, indicates that the DODAG id should be included */
     uint8_t dao_sequence;       /**< sequence must be equal to the sequence from the DAO object */
     uint8_t status;             /**< indicates completion */
-    ipv6_addr_t dodag_id;       /**< id of the DODAG */
 } gnrc_rpl_dao_ack_t;
 
 /**
