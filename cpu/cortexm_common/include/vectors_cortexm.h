@@ -30,9 +30,10 @@ extern "C" {
 #define WEAK_DEFAULT    __attribute__((weak,alias("dummy_handler")))
 
 /**
- * @brief   Put this macro in front of the array holding the interrupt vectors
+ * @brief   Put this macro in front of the array holding the device
+ *          specific interrupt vectors
  */
-#define ISR_VECTORS     __attribute__((used,section(".vectors")))
+#define ISR_VECTORS     __attribute__((used,section(".vector_table_vendor")))
 
 /**
  * @brief   This function is the default entry point after a system reset
@@ -44,7 +45,7 @@ extern "C" {
  * 4. initialize the newlib (optional, on when newlib is used)
  * 5. initialize and start RIOTs kernel
  */
-void reset_handler_default(void);
+void reset_handler(void);
 
 /**
  * @brief   Non-maskable interrupt handler
@@ -53,7 +54,7 @@ void reset_handler_default(void);
  * and can not be masked (surprise surprise...). They can be triggered by
  * software and some peripherals. So far, they are not used in RIOT.
  */
-void nmi_default(void);
+void isr_nmi(void);
 
 /**
  * @brief   Hard fault exception handler
@@ -62,7 +63,7 @@ void nmi_default(void);
  * causes of hard faults are access to un-aligned pointers on Cortex-M0 CPUs
  * and calls of function pointers that are set to NULL.
  */
-void hard_fault_default(void);
+void hard_fault(void);
 
 /* The following four exceptions are only present for Cortex-M3 and -M4 CPUs */
 #if defined(CPU_ARCH_CORTEX_M3) || defined(CPU_ARCH_CORTEX_M4) || \
@@ -73,14 +74,14 @@ void hard_fault_default(void);
  * Memory management exceptions are triggered on access to protected memory
  * regions.
  */
-void mem_manage_default(void);
+void mem_manage_fault(void);
 
 /**
  * @brief   Bus fault exception handler
  *
  * Bus faults are triggered on errors that are related to memory transactions.
  */
-void bus_fault_default(void);
+void bus_fault(void);
 
 /**
  * @brief   Usage fault exception handler
@@ -89,7 +90,7 @@ void bus_fault_default(void);
  * instructions, e.g. execution of undefined opcodes, illegal alignment, or
  * or invalid exception return codes.
  */
-void usage_fault_default(void);
+void usage_fault(void);
 
 /**
  * @brief   Debug monitor exception handler
@@ -97,7 +98,7 @@ void usage_fault_default(void);
  * The debug monitor exception is triggered, when a software debug event occurs
  * while in debug mode.
  */
-void debug_mon_default(void);
+void debug_mon(void);
 #endif
 
 /**

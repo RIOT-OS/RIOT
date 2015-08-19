@@ -7,20 +7,19 @@
  */
 
 /**
- * @ingroup     cpu_stm32f4
+ * @ingroup     cpu_lm4f120
  * @{
  *
  * @file        vectors.c
  * @brief       Interrupt vector definitions
  *
  * @author      Rakendra Thapa <rakendrathapa@gmail.com>
+ *
+ * @}
  */
 
 #include <stdint.h>
 #include "vectors_cortexm.h"
-
-/* get the start of the ISR stack as defined in the linkerscript */
-extern uint32_t _estack;
 
 /* define a local dummy handler as it needs to be in the same compilation unit
  * as the alias definition */
@@ -28,10 +27,6 @@ void dummy_handler(void) {
     dummy_handler_default();
 }
 
-/* Cortex-M common interrupt vectors */
-WEAK_DEFAULT void isr_svc(void);
-WEAK_DEFAULT void isr_pendsv(void);
-WEAK_DEFAULT void isr_systick(void);
 /* LM4F120 specific interrupt vectors */
 WEAK_DEFAULT void isr_gpio_porta(void);
 WEAK_DEFAULT void isr_gpio_portb(void);
@@ -101,27 +96,7 @@ WEAK_DEFAULT void isr_sysex(void);
 
 /* interrupt vector table */
 ISR_VECTORS const void *interrupt_vector[] = {
-    /* Exception stack pointer */
-    (void*) (&_estack),             /* pointer to the top of the stack */
-    /* Cortex-M4 handlers */
-    (void*) reset_handler_default,  /* entry point of the program */
-    (void*) nmi_default,            /* non maskable interrupt handler */
-    (void*) hard_fault_default,     /* hard fault exception */
-    (void*) mem_manage_default,     /* memory manage exception */
-    (void*) bus_fault_default,      /* bus fault exception */
-    (void*) usage_fault_default,    /* usage fault exception */
-    (void*) (0UL),                  /* Reserved */
-    (void*) (0UL),                  /* Reserved */
-    (void*) (0UL),                  /* Reserved */
-    (void*) (0UL),                  /* Reserved */
-    (void*) isr_svc,                /* system call interrupt, in RIOT used for
-                                     * switching into thread context on boot */
-    (void*) debug_mon_default,      /* debug monitor exception */
-    (void*) (0UL),                  /* Reserved */
-    (void*) isr_pendsv,             /* pendSV interrupt, in RIOT the actual
-                                     * context switching is happening here */
-    (void*) isr_systick,            /* SysTick interrupt, not used in RIOT */
-    /* Peripherial interrupts start here.*/
+    /* LM4F120 specific peripheral handlers */
     (void *) isr_gpio_porta,        /* GPIO Port A                      16 */
     (void *) isr_gpio_portb,        /* GPIO Port B                      17 */
     (void *) isr_gpio_portc,        /* GPIO Port C                      18 */
@@ -262,4 +237,3 @@ ISR_VECTORS const void *interrupt_vector[] = {
     (void *) (0UL),                 /* Reserved                         153 */
     (void *) (0UL)                  /* Reserved                         154 */
 };
-/** @} */

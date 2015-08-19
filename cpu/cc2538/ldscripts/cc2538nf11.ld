@@ -25,6 +25,13 @@ MEMORY
     ram   (rwx) : ORIGIN = 0x20004000, LENGTH = 16K
 }
 
-INCLUDE cc2538.ld
+INCLUDE cortexm_base.ld
 
+SECTIONS
+{
+    .flashcca :
+    {
+        KEEP(*(.flashcca))
+    } > cca
+}
 /* @} */
