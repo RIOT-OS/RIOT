@@ -57,11 +57,9 @@ void cpu_init(void)
 	/* initialize the interrupt priorities */
 	/* set pendSV interrupt to same priority as the rest */
 	MAP_IntPrioritySet(FAULT_PENDSV, CPU_DEFAULT_IRQ_PRIO);
-	MAP_IntEnable(FAULT_PENDSV);
 
 	/* set SVC interrupt to same priority as the rest */
 	MAP_IntPrioritySet(FAULT_SVCALL, CPU_DEFAULT_IRQ_PRIO);
-	MAP_IntEnable(FAULT_SVCALL);
 
 	/* initialize all vendor specific interrupts with the same value */
 	for (unsigned long i = INT_GPIOA0; i < NUM_INTERRUPTS; i++) {
