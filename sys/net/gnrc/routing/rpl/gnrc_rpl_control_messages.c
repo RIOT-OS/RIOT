@@ -641,10 +641,32 @@ void gnrc_rpl_send_DAO_ACK(gnrc_rpl_dodag_t *dodag, ipv6_addr_t *destination, ui
     gnrc_rpl_send(pkt, NULL, destination, &dodag->dodag_id);
 }
 
+static bool _gnrc_rpl_check_DAO_validity(gnrc_rpl_dao_t *dao, uint16_t len)
+{
+    uint16_t expected_len = sizeof(*dao) + sizeof(icmpv6_hdr_t);
+
+    if ((dao->k_d_flags & GNRC_RPL_DAO_D_BIT)) {
+        expected_len += sizeof(ipv6_addr_t);
+    }
+
+    if (expected_len <= len) {
+        return true;
+    }
+
+    DEBUG("RPL: wrong DAO len: %d, expected: %d\n", len, expected_len);
+
+    return false;
+}
+
 void gnrc_rpl_recv_DAO(gnrc_rpl_dao_t *dao, ipv6_addr_t *src, uint16_t len)
 {
     gnrc_rpl_instance_t *inst = NULL;
     gnrc_rpl_dodag_t *dodag = NULL;
+
+    if (!_gnrc_rpl_check_DAO_validity(dao, len)) {
+        return;
+    }
+
     gnrc_rpl_opt_t *opts = (gnrc_rpl_opt_t *) (dao + 1);
 
     if ((inst = gnrc_rpl_instance_get(dao->instance_id)) == NULL) {
