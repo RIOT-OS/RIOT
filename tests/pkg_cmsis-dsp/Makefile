@@ -9,7 +9,7 @@ BOARD_WHITELIST := \
   cc2538dk \
   f4vi1 \
   fox \
-  iotlab_m3 \
+  iotlab-m3 \
   mbed_lpc1768 \
   msbiot \
   mulle \

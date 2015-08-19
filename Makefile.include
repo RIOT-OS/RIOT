@@ -426,6 +426,6 @@ endif
 help:
 	@$(MAKE) -qp | sed -ne 's/\(^[a-z][a-z_-]*\):.*/\1/p' | sort | uniq
 
-ifneq (,$(filter iotlab_m3 wsn430-v1_3b wsn430-v1_4,$(BOARD)))
+ifneq (,$(filter iotlab-m3 wsn430-v1_3b wsn430-v1_4,$(BOARD)))
   include $(RIOTBASE)/dist/testbed-support/Makefile.iotlab
 endif

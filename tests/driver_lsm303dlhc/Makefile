@@ -4,7 +4,7 @@ include ../Makefile.tests_common
 FEATURES_REQUIRED = periph_i2c
 
 # Define default pin mappings for some boards:
-ifneq (,$(filter iotlab_m3,$(BOARD)))
+ifneq (,$(filter iotlab-m3,$(BOARD)))
   export TEST_LSM303DLHC_MAG_ADDR=30
   export TEST_LSM303DLHC_ACC_ADDR=25
   export TEST_LSM303DLHC_I2C ?=I2C_0

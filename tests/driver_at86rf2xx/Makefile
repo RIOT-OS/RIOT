@@ -11,7 +11,7 @@ ifneq (,$(filter samr21-xpro,$(BOARD)))
   DRIVER ?= at86rf233
   USE_BOARD_PARAMETERS:=true
 endif
-ifneq (,$(filter iotlab_m3,$(BOARD)))
+ifneq (,$(filter iotlab-m3,$(BOARD)))
   DRIVER ?= at86rf231
   USE_BOARD_PARAMETERS:=true
 endif
