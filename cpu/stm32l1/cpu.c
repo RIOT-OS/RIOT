@@ -22,6 +22,15 @@
 #include "board.h"
 #include "periph_conf.h"
 
+/* Check the source to be used for the PLL */
+#ifdef CLOCK_LSI
+#define CLOCK_CR_SOURCE     RCC_CR_HSION
+#define CLOCK_PLL_SOURCE    RCC_CFGR_PLLSRC_HSI_Div2
+#else
+#define CLOCK_CR_SOURCE     RCC_CR_HSEON
+#define CLOCK_PLL_SOURCE    RCC_CFGR_PLLSRC_HSE
+#endif
+
 static void clk_init(void);
 
 void cpu_init(void)
@@ -50,10 +59,10 @@ static void clk_init(void)
 
     /* SYSCLK, HCLK, PCLK2 and PCLK1 configuration */
     /* Enable HSE */
-    RCC->CR |= RCC_CR_HSION;
+    RCC->CR |= CLOCK_CR_SOURCE;
     /* Wait till HSE is ready,
      * NOTE: the MCU will stay here forever if no HSE clock is connected */
-    while (!(RCC->CR & RCC_CR_HSIRDY));
+    while (!(RCC->CR & RCC_CR_HSERDY));
     FLASH->ACR |= FLASH_ACR_ACC64;
     /* Enable Prefetch Buffer */
     FLASH->ACR |= FLASH_ACR_PRFTEN;
@@ -67,14 +76,13 @@ static void clk_init(void)
     while((PWR->CSR & PWR_CSR_VOSF) != 0);
     /* HCLK = SYSCLK */
     RCC->CFGR |= (uint32_t)CLOCK_AHB_DIV;
-
     /* PCLK2 = HCLK */
     RCC->CFGR |= (uint32_t)CLOCK_APB2_DIV;
     /* PCLK1 = HCLK */
     RCC->CFGR |= (uint32_t)CLOCK_APB1_DIV;
     /*  PLL configuration: PLLCLK = HSE / HSE_DIV * HSE_MUL */
     RCC->CFGR &= ~((uint32_t)(RCC_CFGR_PLLSRC | RCC_CFGR_PLLDIV | RCC_CFGR_PLLMUL));
-    RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLSRC_HSI | CLOCK_PLL_HSE_DIV | CLOCK_PLL_HSE_MUL);
+    RCC->CFGR |= (uint32_t)(CLOCK_PLL_SOURCE | CLOCK_PLL_DIV | CLOCK_PLL_MUL);
     /* Enable PLL */
     RCC->CR |= RCC_CR_PLLON;
     /* Wait till PLL is ready */

@@ -1,6 +1,6 @@
 ## the cpu to build for
 export CPU = stm32l1
-export CPU_MODEL = stm32l151rbt6
+export CPU_MODEL = stm32l151rb
 
 # define the default port depending on the host OS
 PORT_LINUX ?= /dev/ttyACM0

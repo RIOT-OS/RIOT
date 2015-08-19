@@ -74,7 +74,7 @@ static void clk_init(void)
     RCC->CFGR |= (uint32_t)CLOCK_APB1_DIV;
     /*  PLL configuration: PLLCLK = HSE / HSE_DIV * HSE_MUL */
     RCC->CFGR &= ~((uint32_t)(RCC_CFGR_PLLSRC | RCC_CFGR_PLLXTPRE | RCC_CFGR_PLLMULL));
-    RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLSRC_HSE | CLOCK_PLL_HSE_DIV | CLOCK_PLL_HSE_MUL);
+    RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLSRC_HSE | CLOCK_PLL_DIV | CLOCK_PLL_MUL);
     /* Enable PLL */
     RCC->CR |= RCC_CR_PLLON;
     /* Wait till PLL is ready */
