@@ -15,11 +15,13 @@
  *              exception handlers
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Daniel Krebs <github@daniel-krebs.net>
  *
  * @}
  */
 
 #include <stdint.h>
+#include <stdio.h>
 
 #include "board.h"
 #include "panic.h"
@@ -39,6 +41,8 @@ extern uint32_t _szero;
 extern uint32_t _ezero;
 extern uint32_t _sstack;
 extern uint32_t _estack;
+extern uint32_t _sram;
+extern uint32_t _eram;
 /** @} */
 
 /** @brief Interrupt stack canary value
@@ -112,10 +116,92 @@ void nmi_default(void)
     core_panic(PANIC_NMI_HANDLER, "NMI HANDLER");
 }
 
+#ifdef DEVELHELP
+
+/* Trampoline function to save stackpointer before calling hardfault handler */
+void hard_fault_default(void)
+{
+    /* Get stackpointer where exception stackframe lies */
+    __ASM volatile
+    (
+        "movs r0, #4                        \n" /* r0 = 0x4                   */
+        "mov r1, lr                         \n" /* r1 = lr                    */
+        "tst r1, r0                         \n" /* if(lr & 0x4)               */
+        "bne use_psp                        \n" /* {                          */
+        "mrs r0, msp                        \n" /*   r0 = msp                 */
+        "b out                              \n" /* }                          */
+        " use_psp:                          \n" /* else {                     */
+        "mrs r0, psp                        \n" /*   r0 = psp                 */
+        " out:                              \n" /* }                          */
+        "mov r1, #0                         \n" /* corrupted = false          */
+        "cmp r0, sp                         \n" /* If msp is active stack-    */
+        "bne hardfault                      \n" /* pointer, check if valid so */
+        "cmp r0, %[eram]                    \n" /* so calling c-func works .  */
+        "bge fix_msp                        \n" /* if(r0 == msp) {            */
+        "cmn r0, %[sram]                    \n" /*   if( (r0 >= estack) ||    */
+        "bl hardfault                       \n" /*       (r0 <  sstack) ) {   */
+        " fix_msp:                          \n" /*     corrupted = true       */
+        "mov r0, %[estack]                  \n" /*     r0 = _estack           */
+        "mov sp, r0                         \n" /*     sp = _estack           */
+        "mov r1, #1                         \n" /*   }                        */
+        " hardfault:                        \n" /* }                          */
+        "b hard_fault_handler               \n" /* hard_fault_handler(r0)     */
+          :
+          : [sram]   "r" (&_sram),
+            [eram]   "r" (&_eram),
+            [estack] "r" (&_estack)
+          : "r0","r1"
+    );
+}
+
+void hard_fault_handler(uint32_t* sp, uint32_t corrupted)
+{
+    /* Make them volatile so that they won't get optimized out */
+    volatile unsigned int r0;
+    volatile unsigned int r1;
+    volatile unsigned int r2;
+    volatile unsigned int r3;
+    volatile unsigned int r12;
+    volatile unsigned int lr; /* Link register. */
+    volatile unsigned int pc; /* Program counter. */
+    volatile unsigned int psr;/* Program status register. */
+
+    /* Sanity check stackpointer and give additional feedback about hardfault */
+    if( corrupted ) {
+        puts("Stackpointer corrupted, reset to top of stack");
+    } else {
+        r0  = sp[0];
+        r1  = sp[1];
+        r2  = sp[2];
+        r3  = sp[3];
+        r12 = sp[4];
+        lr  = sp[5];
+        pc  = sp[6];
+        psr = sp[7];
+
+        puts("\nContext before hardfault:");
+
+        /* TODO: printf in ISR context might be a bad idea */
+        printf("r0:  0x%x\n"
+               "r1:  0x%x\n"
+               "r2:  0x%x\n"
+               "r3:  0x%x\n",
+               r0, r1, r2, r3);
+        printf("r12: 0x%x\n"
+               "lr : 0x%x\n"
+               "pc : 0x%x\n"
+               "psr: 0x%x\n\n",
+               r12, lr, pc, psr);
+    }
+
+    core_panic(PANIC_HARD_FAULT, "HARD FAULT HANDLER");
+}
+#else
 void hard_fault_default(void)
 {
     core_panic(PANIC_HARD_FAULT, "HARD FAULT HANDLER");
 }
+#endif /* DEVELHELP */
 
 #if defined(CPU_ARCH_CORTEX_M3) || defined(CPU_ARCH_CORTEX_M4) || \
     defined(CPU_ARCH_CORTEX_M4F)
