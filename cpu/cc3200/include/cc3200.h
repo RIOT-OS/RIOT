@@ -1,13 +1,24 @@
 /*
- * cc3200.h
+ * Copyright (C) 2015 Attilio Dona'
  *
- *  Created on: 15/ago/2015
- *      Author: SO000112
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ *
+ *
+ * @ingroup     cpu_cc3200
+ * @{
+ *
+ * @file
+ * @brief       CC3200 MCU definitions
+ *
+ * @author      Attilio Dona' <@attiliodona>
+ * @}
+ *
  */
 
 #ifndef CPU_INCLUDE_CC3200_H_
 #define CPU_INCLUDE_CC3200_H_
-
 
 #include "inc/hw_types.h"
 #include "inc/hw_ints.h"
@@ -20,12 +31,7 @@
 #include "driverlib/gpio.h"
 #include "driverlib/prcm.h"
 
-/**
- * @brief CMSIS includes
- */
-
-//#include <core_cm4.h>
-
 #define __ASM            __asm
+#define __STATIC_INLINE  static inline
 
 #endif /* CPU_INCLUDE_CC3200_H_ */

@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2014 Freie Universität Berlin
+ * Original work Copyright (C) 2014 Freie Universität Berlin
+ * Modified work Copyright 2015 Attilio Dona
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -7,7 +8,7 @@
  */
 
 /**
- * @ingroup     cpu_cc2538
+ * @ingroup     cpu_cc3200
  * @{
  *
  * @file
@@ -16,6 +17,7 @@
  * The hardware timer implementation uses the Cortex build-in system timer as back-end.
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Attilio Dona' <@attiliodona>
  *
  * @}
  */

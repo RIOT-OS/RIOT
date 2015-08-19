@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015
+ * Copyright (C) 2015 Attilio Dona'
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -13,7 +13,7 @@
  * @file
  * @brief       Low-level timer driver implementation
  *
- * @author
+ * @author      Attilio Dona' <@attiliodona>
  *
  * @}
  */
@@ -21,17 +21,8 @@
 #include <stdlib.h>
 #include <sys/types.h>
 
-#if 0
-#include "cpu.h"
-#include "board.h"
-#include "sched.h"
-#include "thread.h"
-#endif
-
 #include "periph_conf.h"
 #include "periph/timer.h"
-
-//#include "signal_error.h"
 
 // CC3200 SDK
 #include "inc/hw_types.h"
@@ -322,7 +313,7 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int)) {
 
 
 int timer_set(tim_t dev, int channel, unsigned int timeout) {
-#if 1
+
 	switch (dev) {
 	case TIMER_0:
 		return timer_set_absolute(dev, channel, HWREG(TIMERA0_BASE + TIMER_O_TAR) + timeout);
@@ -335,125 +326,7 @@ int timer_set(tim_t dev, int channel, unsigned int timeout) {
 	default:
 		break;
 	}
-#endif
-#if 0
-	unsigned long long abstimeout;
 
-	switch (dev) {
-	case TIMER_0:
-		abstimeout = HWREG(TIMERA0_BASE + TIMER_O_TAR) + timeout;
-		MAP_TimerMatchSet(TIMERA0_BASE, TIMER_A, abstimeout);
-		HWREG(TIMERA0_BASE + TIMER_O_IMR) |= TIMER_TIMA_MATCH; // enable the match timer
-		break;
-	case TIMER_1:
-		abstimeout = HWREG(TIMERA1_BASE + TIMER_O_TAR) + timeout;
-		MAP_TimerMatchSet(TIMERA1_BASE, TIMER_A, abstimeout);
-		HWREG(TIMERA1_BASE + TIMER_O_IMR) |= TIMER_TIMA_MATCH; // enable the match timer
-		break;
-	case TIMER_2:
-
-		if (freeq2 == NULL) {
-			// no free timer left
-			signal_error("ERR: timer not scheduled");
-			break;
-		}
-		abstimeout = (unsigned long long)(timeout) + (unsigned long long)(HWREG(TIMERA2_BASE + TIMER_O_TAR)) - CALIBRATION;
-
-		if (busyq2) {
-			// some timers already activated
-			timer_queue_item *ptr = busyq2;
-			timer_queue_item *prev = NULL;
-			while (ptr && ptr->value < abstimeout) {
-				prev = ptr;
-				ptr = ptr->next;
-			}
-			if (prev) {
-				// not the shortest timer
-				prev->next = freeq2;
-				freeq2->channel = channel;
-				freeq2->value = abstimeout;
-				freeq2 = freeq2->next;
-
-				prev->next->next = ptr;
-			} else {
-				// insert into the first position
-				busyq2 = freeq2;
-				freeq2->channel = channel;
-				freeq2->value = abstimeout;
-				freeq2 = freeq2->next;
-
-				busyq2->next = ptr;
-			}
-
-		} else {
-			// insert the first one
-
-			MAP_TimerMatchSet(TIMERA2_BASE, TIMER_A, abstimeout);
-			HWREG(TIMERA2_BASE + TIMER_O_IMR) |= TIMER_TIMA_MATCH; // enable the match timer
-
-			busyq2 = freeq2;
-			freeq2 = freeq2->next;
-			busyq2->next = NULL;
-			busyq2->channel = channel;
-			busyq2->value = abstimeout;
-
-		}
-
-		break;
-	case TIMER_3:
-		if (freeq3 == NULL) {
-			// no free timer left
-			signal_error("ERR: timer not scheduled");
-			break;
-		}
-		abstimeout = (unsigned long long)(timeout) + (unsigned long long)(HWREG(TIMERA3_BASE + TIMER_O_TAR)) - CALIBRATION;
-
-		if (busyq3) {
-			// some timers already activated
-			timer_queue_item *ptr = busyq3;
-			timer_queue_item *prev = NULL;
-			while (ptr && ptr->value < abstimeout) {
-				prev = ptr;
-				ptr = ptr->next;
-			}
-			if (prev) {
-				// not the shortest timer
-				prev->next = freeq3;
-				freeq3->channel = channel;
-				freeq3->value = abstimeout;
-				freeq3 = freeq3->next;
-
-				prev->next->next = ptr;
-			} else {
-				// insert into the first position
-				busyq3 = freeq3;
-				freeq3->channel = channel;
-				freeq3->value = abstimeout;
-				freeq3 = freeq3->next;
-
-				busyq3->next = ptr;
-			}
-
-		} else {
-			// insert the first one
-
-			MAP_TimerMatchSet(TIMERA3_BASE, TIMER_A, abstimeout);
-			HWREG(TIMERA3_BASE + TIMER_O_IMR) |= TIMER_TIMA_MATCH; // enable the match timer
-
-			busyq3 = freeq3;
-			freeq3 = freeq3->next;
-			busyq3->next = NULL;
-			busyq3->channel = channel;
-			busyq3->value = abstimeout;
-
-		}
-
-		break;
-	default:
-		break;
-	}
-
-#endif
 	return 0;
 }
 

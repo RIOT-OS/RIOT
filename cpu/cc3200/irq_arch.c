@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Freie Universität Berlin
+ * Copyright (C) 2015 Attilio Dona'
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -7,13 +7,13 @@
  */
 
 /**
- * @ingroup     cpu_cortexm_common
+ * @ingroup     cpu_cc3200
  * @{
  *
  * @file
  * @brief       Implementation of the kernels irq interface
  *
- * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Attilio Dona' <@attiliodona>
  *
  * @}
  */

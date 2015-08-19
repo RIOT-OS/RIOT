@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015
+ * Copyright (C) 2015 Attilio Dona'
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -13,7 +13,7 @@
  * @file
  * @brief       Low-level UART driver implementation
  *
- * @author      Attilio Dona'
+ * @author      Attilio Dona' <@attiliodona>
  *
  * @}
  */
@@ -31,6 +31,7 @@
 /* guard file in case no UART device was specified */
 #if UART_NUMOF
 
+#if 0
 #undef BIT
 #define BIT(n) ( 1 << (n) )
 
@@ -66,6 +67,7 @@ enum {
 
 /** @brief Read one byte from the UART1 receive FIFO */
 #define uart1_read()     ( UART1->DR )
+#endif
 
 /*---------------------------------------------------------------------------*/
 
@@ -83,12 +85,15 @@ typedef struct {
  */
 static uart_conf_t uart_config[UART_NUMOF];
 
-#if 0
+
 /*---------------------------------------------------------------------------*/
 static void reset(unsigned long uart_base)
 {
+	UARTDisable(uart_base);
+	UARTRxErrorClear(uart_base);
+	UARTEnable(uart_base);
 }
-#endif
+
 
 /*---------------------------------------------------------------------------*/
 
@@ -101,12 +106,9 @@ void UART_0_ISR(void)
         uart_config[0].rx_cb(uart_config[0].arg, MAP_UARTCharGet(UARTA0_BASE));
     }
 
-#if 0
-    if (mis & (OEMIS | BEMIS | FEMIS)) {
-        /* ISR triggered due to some error condition */
-        reset(UART_0_DEV);
+    if (UARTRxErrorGet(UARTA0_BASE)) {
+    	reset(UARTA0_BASE);
     }
-#endif
 
     if (sched_context_switch_request) {
         thread_yield();
@@ -117,21 +119,14 @@ void UART_0_ISR(void)
 #if UART_1_EN
 void UART_1_ISR(void)
 {
-    uint_fast16_t mis;
+	MAP_UARTIntClear(UARTA1_BASE, UART_INT_RX);
 
-    /* Store the current MIS and clear all flags early, except the RTM flag.
-     * This will clear itself when we read out the entire FIFO contents */
-    mis = UART_1_DEV->MIS;
-
-    UART_1_DEV->ICR = 0x0000FFBF;
-
-    while (UART_1_DEV->FRbits.RXFE == 0) {
-        uart_config[1].rx_cb(uart_config[1].arg, UART_1_DEV->DR);
+    while (UARTCharsAvail(UARTA1_BASE)) {
+        uart_config[1].rx_cb(uart_config[1].arg, MAP_UARTCharGet(UARTA1_BASE));
     }
 
-    if (mis & (OEMIS | BEMIS | FEMIS)) {
-        /* ISR triggered due to some error condition */
-        reset(UART_1_DEV);
+    if (UARTRxErrorGet(UARTA1_BASE)) {
+    	reset(UARTA1_BASE);
     }
 
     if (sched_context_switch_request) {
@@ -164,8 +159,8 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, uart_tx_cb_t t
 #endif
 #if UART_1_EN
         case UART_1:
-            NVIC_SetPriority(UART1_IRQn, UART_IRQ_PRIO);
-            NVIC_EnableIRQ(UART1_IRQn);
+            IntPrioritySet(INT_UARTA1, UART_IRQ_PRIO);
+            IntEnable(INT_UARTA1);
             break;
 #endif
     }
@@ -206,41 +201,26 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
 #endif
 #if UART_1_EN
         case UART_1:
-            u = UART_1_DEV;
+            u = UARTA1_BASE;
 
-            /* Run on SYS_DIV */
-            u->CC = 0;
+        	//
+            // Enable Peripheral Clocks
+            //
+        	PRCMPeripheralClkEnable(PRCM_UARTA1, PRCM_RUN_MODE_CLK);
 
-            /*
-             * Select the UARTx RX pin by writing to the IOC_UARTRXD_UARTn register
-             */
-            IOC_UARTRXD_UART1 = UART_1_RX_PIN;
+        	//
+            // Configure PIN_07 for UART1 UART1_TX
+            //
+        	PinTypeUART(PIN_07, PIN_MODE_5);
 
-            /*
-             * Pad Control for the TX pin:
-             * - Set function to UARTn TX
-             * - Output Enable
-             */
-            IOC_PXX_SEL[UART_1_TX_PIN] = UART1_TXD;
-            IOC_PXX_OVER[UART_1_TX_PIN] = IOC_OVERRIDE_OE;
+        	//
+            // Configure PIN_08 for UART1 UART1_RX
+            //
+        	PinTypeUART(PIN_08, PIN_MODE_5);
 
-            /* Set RX and TX pins to peripheral mode */
-            gpio_hardware_control(UART_1_TX_PIN);
-            gpio_hardware_control(UART_1_RX_PIN);
-
-#if ( defined(UART_1_RTS_PORT) && defined(UART_1_RTS_PIN) )
-            IOC_PXX_SEL[UART_1_RTS_PIN] = UART1_RTS;
-            gpio_hardware_control(UART_1_RTS_PIN);
-            IOC_PXX_OVER[UART_1_RTS_PIN] = IOC_OVERRIDE_OE;
-            u->CTLbits.RTSEN = 1;
-#endif
-
-#if ( defined(UART_1_CTS_PORT) && defined(UART_1_CTS_PIN) )
-            IOC_UARTCTS_UART1 = UART_1_CTS_PIN;
-            gpio_hardware_control(UART_1_CTS_PIN);
-            IOC_PXX_OVER[UART_1_CTS_PIN] = IOC_OVERRIDE_DIS;
-            u->CTLbits.CTSEN = 1;
-#endif
+            MAP_UARTConfigSetExpClk(u,MAP_PRCMPeripheralClockGet(PRCM_UARTA1),
+            		baudrate, (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE |
+                             UART_CONFIG_PAR_NONE));
 
             break;
 #endif
@@ -248,53 +228,6 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
         default:
             return -1;
     }
-
-#if 0
-    /* Enable clock for the UART while Running, in Sleep and Deep Sleep */
-    uart_num = ( (uintptr_t)u - (uintptr_t)UART0 ) / 0x1000;
-    SYS_CTRL_RCGCUART |= (1 << uart_num);
-    SYS_CTRL_SCGCUART |= (1 << uart_num);
-    SYS_CTRL_DCGCUART |= (1 << uart_num);
-
-    /*
-     * UART Interrupt Masks:
-     * Acknowledge RX and RX Timeout
-     * Acknowledge Framing, Overrun and Break Errors
-     */
-    u->IM = 0;
-    u->IMbits.RXIM = 1; /**< UART receive interrupt mask */
-    u->IMbits.RTIM = 1; /**< UART receive time-out interrupt mask */
-    u->IMbits.OEIM = 1; /**< UART overrun error interrupt mask */
-    u->IMbits.BEIM = 1; /**< UART break error interrupt mask */
-    u->IMbits.FEIM = 1; /**< UART framing error interrupt mask */
-
-    /* Set FIFO interrupt levels: */
-    u->IFLSbits.RXIFLSEL = FIFO_LEVEL_1_8TH;
-    u->IFLSbits.TXIFLSEL = FIFO_LEVEL_4_8TH;
-
-    /* Make sure the UART is disabled before trying to configure it */
-    u->CTL = 0;
-
-    u->CTLbits.RXE = 1;
-    u->CTLbits.TXE = 1;
-    u->CTLbits.HSE = UART_CTL_HSE_VALUE;
-
-    /* Set the divisor for the baud rate generator */
-    divisor = sys_clock_freq();
-    divisor <<= UART_CTL_HSE_VALUE + 2;
-    divisor /= baudrate;
-    u->IBRD = divisor >> DIVFRAC_NUM_BITS;
-    u->FBRD = divisor & DIVFRAC_MASK;
-
-    /* Configure line control for 8-bit, no parity, 1 stop bit and enable  */
-    u->LCRH = 0;
-    u->LCRHbits.WLEN = UART_WORD_LENGTH - 5;
-    u->LCRHbits.FEN  = 1;                    /**< Enable FIFOs */
-    u->LCRHbits.PEN  = 0;                    /**< No parity */
-
-    /* UART Enable */
-    u->CTLbits.UARTEN = 1;
-#endif
 
     return 0;
 }
@@ -351,10 +284,6 @@ int uart_read_blocking(uart_t uart, char *data)
         default:
             return -1;
     }
-
-    //while (u->FRbits.RXFE);
-
-    //*data = u->DR;
 
     *data = MAP_UARTCharGet(u);
 

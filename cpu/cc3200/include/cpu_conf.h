@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015
+ * Copyright (C) 2015 Attilio Dona'
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -13,7 +13,7 @@
  * @file
  * @brief           Implementation specific CPU configuration options
  *
- * @author          Attilio Dona'
+ * @author          Attilio Dona' <@attiliodona>
  */
 
 #ifndef __CPU_CONF_H
@@ -21,27 +21,16 @@
 
 #include "cc3200.h"
 
-//#include "cc2538.h"
-//#include "cc2538-gpio.h"
-//#include "cc2538-uart.h"
-//#include "gptimer.h"
-//#include "ioc.h"
-//#include "soc-adc.h"
-//#include "rfcore.h"
-//#include "sys-ctrl.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /**
- * @brief   ARM Cortex-M specific CPU configuration
+ * @brief   ARM Cortex-M cc3200 specific CPU configuration
  * @{
  */
 #define CPU_DEFAULT_IRQ_PRIO            INT_PRIORITY_LVL_1
 
-//#define CPU_IRQ_NUMOF                   PERIPH_COUNT_IRQn
-//#define CPU_FLASH_BASE                  FLASH_BASE
 
 /** @} */
 

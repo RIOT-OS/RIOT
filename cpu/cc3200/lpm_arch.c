@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2014 Loci Controls Inc.
+ * Original work Copyright (C) 2014 Loci Controls Inc.
+ * Modified work Copyright 2015 Attilio Dona'
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,6 +15,7 @@
  * @brief       Implementation of the kernels power management interface
  *
  * @author      Ian Martin <ian@locicontrols.com>
+ * @author      Attilio Dona' <@attiliodona>
  *
  * @}
  */

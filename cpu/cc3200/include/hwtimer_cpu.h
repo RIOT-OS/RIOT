@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Loci Controls Inc.
+ * Copyright (C) 2015 Attilio Dona'
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -7,13 +7,13 @@
  */
 
 /**
- * @ingroup         cpu_cc2538
+ * @ingroup         cpu_cc3200
  * @{
  *
  * @file
  * @brief           CPU specific hwtimer configuration options
  *
- * @author          Ian Martin <ian@locicontrols.com>
+ * @author          Attilio Dona' <@attiliodona>
  */
 
 #ifndef __HWTIMER_CPU_H
@@ -27,8 +27,8 @@ extern "C" {
  * @name Hardware timer configuration
  * @{
  */
-#define HWTIMER_MAXTIMERS   2               /**< Number of hwtimers */
-#define HWTIMER_SPEED       1000000         /**< The hardware timer runs at 1MHz */
+#define HWTIMER_MAXTIMERS   4               /**< Number of hwtimers */
+#define HWTIMER_SPEED       F_CPU             /**< The hardware timer runs at cpu clock (80MHz) */
 #define HWTIMER_MAXTICKS    0xFFFFFFFF      /**< 32-bit timer */
 /** @} */
 

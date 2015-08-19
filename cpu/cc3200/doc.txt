@@ -1,10 +1,10 @@
 /**
- * @defgroup        cpu_cc2538 Texas Instruments CC2538
+ * @defgroup        cpu_cc3200 Texas Instruments CC3200
  * @ingroup         cpu
- * @brief           Texas Instruments CC2538 Cortex-M3 MCU specific code
+ * @brief           Texas Instruments CC3200 Cortex-M4 MCU specific code
  */
 
 /**
- * @defgroup        cpu_cc2538_definitions Texas Instruments CC2538 Definitions
- * @ingroup         cpu_cc2538
+ * @defgroup        cpu_cc3200_definitions Texas Instruments CC3200 Definitions
+ * @ingroup         cpu_cc3200
  */

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Loci Controls Inc.
+ * Copyright (C) 2015 Attilio Dona'
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -7,13 +7,13 @@
  */
 
 /**
- * @ingroup     boards_cc2538dk
+ * @ingroup     boards_cc3200
  * @{
  *
  * @file
- * @brief       Board specific implementations for the CC2538DK board
+ * @brief       Board specific implementations for the CC3200 launchpad board
  *
- * @author      Ian Martin <ian@locicontrols.com>
+ * @author      Attilio Dona' <@attiliodona>
  */
 
 #include <stdio.h>
@@ -28,9 +28,7 @@
 #include "board.h"
 #include "cpu.h"
 
-//#include "ioc.h"
 #include "lpm.h"
-//#include "cc2538-gpio.h"
 
 extern void (* const g_pfnVectors[])(void);
 

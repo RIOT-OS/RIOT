@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Loci Controls Inc.
+ * Copyright (C) 2015 Attilio Dona'
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -7,14 +7,14 @@
  */
 
 /**
- * @defgroup    boards_cc2538dk CC2538DK
+ * @defgroup    boards_cc3200 CC32000 launchpad
  * @ingroup     boards
- * @brief       Support for the Texas Instruments CC2538DK board.
+ * @brief       Support for the Texas Instruments CC3200 launchpad board.
  * @{
  *
  * @file
  *
- * @author      Ian Martin <ian@locicontrols.com>
+ * @author      Attilio Dona' <@attiliodona>
  */
 
 #ifndef BOARD_H_
@@ -55,40 +55,26 @@ extern "C" {
 #define LED_GREEN_GPIO      GPIO_PC2 /**< Green LED GPIO pin */
 #define LED_ORANGE_GPIO     GPIO_PC3 /**< Orange LED GPIO pin */
 
-#define LED_RED_ON          cc2538_gpio_set(LED_GREEN_GPIO)
-#define LED_RED_OFF         cc2538_gpio_clear(LED_GREEN_GPIO)
-#define LED_RED_TOGGLE      cc2538_gpio_toggle(LED_GREEN_GPIO)
+#define LED_RED_ON          cc3200_gpio_set(LED_GREEN_GPIO)
+#define LED_RED_OFF         cc3200_gpio_clear(LED_GREEN_GPIO)
+#define LED_RED_TOGGLE      cc3200_gpio_toggle(LED_GREEN_GPIO)
 
-#define LED_YELLOW_ON       cc2538_gpio_set(LED_YELLOW_GPIO)
-#define LED_YELLOW_OFF      cc2538_gpio_clear(LED_YELLOW_GPIO)
-#define LED_YELLOW_TOGGLE   cc2538_gpio_toggle(LED_YELLOW_GPIO)
+#define LED_YELLOW_ON       cc3200_gpio_set(LED_YELLOW_GPIO)
+#define LED_YELLOW_OFF      cc3200_gpio_clear(LED_YELLOW_GPIO)
+#define LED_YELLOW_TOGGLE   cc3200_gpio_toggle(LED_YELLOW_GPIO)
 
-#define LED_GREEN_ON        cc2538_gpio_set(LED_GREEN_GPIO)
-#define LED_GREEN_OFF       cc2538_gpio_clear(LED_GREEN_GPIO)
-#define LED_GREEN_TOGGLE    cc2538_gpio_toggle(LED_GREEN_GPIO)
+#define LED_GREEN_ON        cc3200_gpio_set(LED_GREEN_GPIO)
+#define LED_GREEN_OFF       cc3200_gpio_clear(LED_GREEN_GPIO)
+#define LED_GREEN_TOGGLE    cc3200_gpio_toggle(LED_GREEN_GPIO)
 
-#define LED_ORANGE_ON       cc2538_gpio_set(LED_ORANGE_GPIO)
-#define LED_ORANGE_OFF      cc2538_gpio_clear(LED_ORANGE_GPIO)
-#define LED_ORANGE_TOGGLE   cc2538_gpio_toggle(LED_ORANGE_GPIO)
+#define LED_ORANGE_ON       cc3200_gpio_set(LED_ORANGE_GPIO)
+#define LED_ORANGE_OFF      cc3200_gpio_clear(LED_ORANGE_GPIO)
+#define LED_ORANGE_TOGGLE   cc3200_gpio_toggle(LED_ORANGE_GPIO)
 
 /* Default to red if the color is not specified: */
 #define LED_ON              LED_RED_ON
 #define LED_OFF             LED_RED_OFF
 #define LED_TOGGLE          LED_RED_TOGGLE
-/** @} */
-
-/**
- * @name Flash Customer Configuration Area (CCA) parameters
- * @{
- */
-
-#ifndef UPDATE_CCA
-#define UPDATE_CCA                1
-#endif
-
-#define CCA_BACKDOOR_ENABLE       1
-#define CCA_BACKDOOR_PORT_A_PIN   3 /**< Select button */
-#define CCA_BACKDOOR_ACTIVE_LEVEL 0 /**< Active low */
 /** @} */
 
 /**

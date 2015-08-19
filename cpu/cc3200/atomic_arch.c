@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2014-2015 Freie Universität Berlin
+ * Original work Copyright (c) 2014-2015 Freie Universität Berlin
+ * Modified work Copyright 2015 Attilio Dona'
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -7,7 +8,7 @@
  */
 
 /**
- * @ingroup     cpu_cortexm_common
+ * @ingroup     cpu_cc3200
  * @{
  *
  * @file
@@ -16,6 +17,7 @@
  * @author      Stefan Pfeiffer <stefan.pfeiffer@fu-berlin.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Joakim Gebart <joakim.gebart@eistec.se>
+ * @author      Attilio Dona' <@attiliodona>
  *
  * @}
  */
@@ -26,9 +28,6 @@
 #include "cpu.h"
 
 #if ARCH_HAS_ATOMIC_COMPARE_AND_SWAP
-
-#define __STATIC_INLINE  static inline
-#define __ASM            __asm
 
 /** \brief  LDR Exclusive (32 bit)
 

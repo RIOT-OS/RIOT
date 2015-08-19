@@ -3,8 +3,8 @@
 //
 // Startup code for use with GCC.
 //
-// Copyright (C) 2014 Texas Instruments Incorporated - http://www.ti.com/ 
-// 
+// Original work Copyright (C) 2014 Texas Instruments Incorporated - http://www.ti.com/
+// Modified work Copyright 2015 Attilio Dona'
 // 
 //  Redistribution and use in source and binary forms, with or without 
 //  modification, are permitted provided that the following conditions 
