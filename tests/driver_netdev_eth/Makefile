@@ -8,7 +8,7 @@ USEMODULE += gnrc
 USEMODULE += gnrc_nomac
 USEMODULE += gnrc_pktdump
 USEMODULE += gnrc_netdev_eth
-USEMODULE += auto_init_ng_netif
+USEMODULE += auto_init_gnrc_netif
 USEMODULE += shell
 USEMODULE += shell_commands
 
