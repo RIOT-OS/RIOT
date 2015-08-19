@@ -46,9 +46,9 @@ unsigned int irq_arch_enable(void)
 /**
  * @brief Restore the state of the IRQ flags
  */
-void irq_arch_restore(unsigned int state)
+void irq_arch_restore(unsigned int priMask)
 {
-	IntPriorityMaskSet(state);
+	__ASM volatile ("MSR primask, %0" : : "r" (priMask) : "memory");
 }
 
 /**

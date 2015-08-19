@@ -28,3 +28,9 @@ cachegrind.out*
 # Eclipse symbol file (output from make eclipsesym)
 eclipsesym.xml
 /toolchain
+
+#ccsstudio
+.ccsproject
+.launches
+targetConfigs
+.gitignore

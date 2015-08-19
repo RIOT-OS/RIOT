@@ -63,6 +63,8 @@ ifeq ($(COMMON_STARTUP),)
 export UNDEF += $(BINDIR)cpu/startup_gcc.o
 endif
 
+export LINKFLAGS += --entry ResetISR
+
 # CPU depends on the cortex-m common module, so include it:
 # include $(RIOTCPU)/cortexm_common/Makefile.include
 

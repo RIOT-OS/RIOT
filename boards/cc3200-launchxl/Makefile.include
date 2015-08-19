@@ -12,14 +12,18 @@ export DEBUGSERVER = JLinkGDBServer -device CC2538SF53
 export RESET = $(RIOTBOARD)/$(BOARD)/dist/reset.sh
 
 # Define the flash-tool and default port:
-export PROGRAMMER ?= cc2538-bsl
+export PROGRAMMER ?= cc3200prog
 
-ifeq ($(PROGRAMMER),cc2538-bsl)
-  export FLASHER = python $(RIOTBOARD)/$(BOARD)/dist/cc2538-bsl.py
+ifeq ($(PROGRAMMER),openocd)
+  export FLASHER = TBD
   export FFLAGS  = -p "$(PORT)" -e -w -v $(HEXFILE)
-else ifeq ($(PROGRAMMER),jlink)
+else ifeq ($(PROGRAMMER),cc3200prog)
+
+  export ENERGIA_ROOT?=/c/opt/energia-0101E0014/
+  export UART_PORT?=29 # on my machine the lauanchpad is on COM29
+
   export FLASHER = $(RIOTBOARD)/$(BOARD)/dist/flash.sh
-  export FFLAGS  = $(BINDIR) $(HEXFILE)
+  export FFLAGS  = $(ENERGIA_ROOT) $(UART_PORT) $(HEXFILE)
 endif
 
 export OFLAGS    = -O binary --gap-fill 0xff
