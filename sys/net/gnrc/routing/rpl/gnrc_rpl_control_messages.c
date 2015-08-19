@@ -363,10 +363,27 @@ a preceding RPL TARGET DAO option\n");
     return true;
 }
 
+static bool _gnrc_rpl_check_DIO_validity(gnrc_rpl_dio_t *dio, uint16_t len)
+{
+    uint16_t expected_len = sizeof(*dio) + sizeof(icmpv6_hdr_t);
+
+    if (expected_len <= len) {
+        return true;
+    }
+
+    DEBUG("RPL: wrong DIO len: %d, expected: %d\n", len, expected_len);
+
+    return false;
+}
+
 void gnrc_rpl_recv_DIO(gnrc_rpl_dio_t *dio, ipv6_addr_t *src, uint16_t len)
 {
     gnrc_rpl_instance_t *inst = NULL;
     gnrc_rpl_dodag_t *dodag = NULL;
+
+    if (!_gnrc_rpl_check_DIO_validity(dio, len)) {
+        return;
+    }
 
     len -= (sizeof(gnrc_rpl_dio_t) + sizeof(icmpv6_hdr_t));
 
