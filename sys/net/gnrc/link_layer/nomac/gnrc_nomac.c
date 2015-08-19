@@ -40,7 +40,7 @@
  */
 static void _event_cb(gnrc_netdev_event_t event, void *data)
 {
-    DEBUG("nomac: event triggered -> RX_COMPLETE\n");
+    DEBUG("nomac: event triggered -> %i\n", event);
     /* NOMAC only understands the RX_COMPLETE event... */
     if (event == NETDEV_EVENT_RX_COMPLETE) {
         gnrc_pktsnip_t *pkt;
@@ -78,9 +78,8 @@ static void *_nomac_thread(void *args)
     dev->driver->add_event_callback(dev, _event_cb);
 
     /* start the event loop */
-    DEBUG("nomac: starting main event loop...\n");
     while (1) {
-        DEBUG("\nnomac: waiting for next incoming message (msg_receive)...\n");
+        DEBUG("nomac: waiting for incoming messages\n");
         msg_receive(&msg);
         /* dispatch NETDEV and NETAPI messages */
         switch (msg.type) {
@@ -121,7 +120,7 @@ static void *_nomac_thread(void *args)
                 msg_reply(&msg, &reply);
                 break;
             default:
-                DEBUG("nomac: unknown command %" PRIu16 "\n", msg.type);
+                DEBUG("nomac: Unknown command %" PRIu16 "\n", msg.type);
                 break;
         }
     }

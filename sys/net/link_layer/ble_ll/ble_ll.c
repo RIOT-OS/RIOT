@@ -25,7 +25,7 @@
 #include "net/gnrc.h"
 #include "net/ble_ll.h"
 
-#define ENABLE_DEBUG    (1)
+#define ENABLE_DEBUG    (0)
 #define ENABLE_BLE_PKT_DEBUG	(0)
 #include "debug.h"
 
@@ -33,7 +33,7 @@
  * @brief   Possible BLE link layer states
  */
 typedef enum {
-    LL_STANDBY,		    /**< link layer is in standby mode */
+    LL_STANDBY,		        /**< link layer is in standby mode */
     LL_ADVERTISING,         /**< link layer is in advertising mode */
     LL_CONNECTION,          /**< link layer is in connection mode */
     LL_INITIATING,          /**< link layer is in initiating mode */
@@ -48,13 +48,13 @@ static volatile ll_state_t _ll_state = LL_ADVERTISING;
 /**
  * @brief   BLE Advertising address
  */
-static uint8_t _adv_addr[BLE_ADDR_LEN + 1];
+static uint8_t _adv_addr[BLE_ADV_ADDR_LEN];
 
 /* Get the BLE Advertising Address of the interface */
 static int _get_adv_address(uint8_t *val, size_t max_len)
 {
     /* check parameters */
-    if (max_len < BLE_ADDR_LEN) {
+    if (max_len < BLE_ADV_ADDR_LEN) {
         return -EOVERFLOW;
     }
 
@@ -66,14 +66,14 @@ static int _get_adv_address(uint8_t *val, size_t max_len)
     val[4] = _adv_addr[4];
     val[5] = _adv_addr[5];
 
-    return BLE_ADDR_LEN;
+    return BLE_ADV_ADDR_LEN;
 }
 
 /* Set the BLE Advertising Address of the interface */
 static int _set_adv_address(uint8_t *val, size_t len)
 {
     /* check parameters */
-    if (len != BLE_ADDR_LEN) {
+    if (len != BLE_ADV_ADDR_LEN) {
         return -EINVAL;
     }
 
@@ -85,7 +85,7 @@ static int _set_adv_address(uint8_t *val, size_t len)
     _adv_addr[4] = val[1];
     _adv_addr[5] = val[0];
 
-    return BLE_ADDR_LEN;
+    return BLE_ADV_ADDR_LEN;
 }
 
 /* Set netopt parameter value in current BLE interface configuration */
@@ -119,41 +119,43 @@ static int _get(gnrc_netdev_t *dev, netopt_t opt,
  */
 static int _send(gnrc_netdev_t *dev, gnrc_pktsnip_t *pkt)
 {
-    uint8_t payload[BLE_MAX_PKT_LEN];
+    uint8_t payload[BLE_PDU_LEN_MAX];
     gnrc_pktsnip_t *ble_pkt = NULL;
-    uint8_t ble_pkt_size;
+    uint16_t pkt_len;
+    uint8_t payload_len;
 
     if (pkt == NULL) {
         DEBUG("ble_ll: Error handling packet: packet incomplete\n");
         return -ENOMSG;
     }
 
-    ble_pkt_size = gnrc_pkt_len(pkt);
+    pkt_len = gnrc_pkt_len(pkt);
 
-    if (ble_pkt_size > BLE_MAX_PKT_LEN) {
+    if (pkt_len > BLE_PDU_LEN_MAX) {
         gnrc_pktbuf_release(pkt);
         DEBUG("ble_ll: Error sending packet: invalid BLE pdu header length\n");
         return -EOVERFLOW;
     }
 
-    memcpy(payload, pkt->data, BLE_PDU_HDR_LEN);
+    /* write advertising pdu header to payload */
+    memcpy(payload, pkt->data, BLE_ADV_HDR_LEN);
     /* write advertising address to payload */
-    memcpy((payload + BLE_PDU_HDR_LEN), _adv_addr, BLE_ADDR_LEN);
-    ble_pkt_size += BLE_ADDR_LEN;
+    memcpy((payload + BLE_ADV_HDR_LEN), _adv_addr, BLE_ADV_ADDR_LEN);
+    pkt_len += BLE_ADV_ADDR_LEN;
 
     /* write optional payload data */
     if (pkt->next != NULL) {
-        ble_pkt_size += gnrc_pkt_len(pkt->next);
-        if (ble_pkt_size > BLE_MAX_PKT_LEN) {
+        payload_len = pkt->next->size;
+        if (payload_len > BLE_ADV_PAYLOAD_LEN_MAX) {
             gnrc_pktbuf_release(pkt);
-            DEBUG("ble_ll: Error handling packet: payload too large\n");
+            DEBUG("ble_ll: Error handling packet: advertising payload too large\n");
             return -EOVERFLOW;
         }
-        memcpy((payload + BLE_PDU_HDR_LEN + BLE_ADDR_LEN),
-                pkt->next->data, gnrc_pkt_len(pkt->next));
+        memcpy((payload + BLE_ADV_HDR_LEN + BLE_ADV_ADDR_LEN),
+                pkt->next->data, payload_len);
     }
 
-    ble_pkt = gnrc_pktbuf_add(NULL, payload, ble_pkt_size, GNRC_NETTYPE_UNDEF);
+    ble_pkt = gnrc_pktbuf_add(NULL, payload, pkt_len, GNRC_NETTYPE_UNDEF);
     gnrc_pktbuf_release(pkt);
 
     return dev->driver->send_data(dev, ble_pkt);
@@ -164,9 +166,9 @@ static int _send(gnrc_netdev_t *dev, gnrc_pktsnip_t *pkt)
  */
 static void _receive(gnrc_pktsnip_t *pkt)
 {
-    ble_pkt_t *data;
+    ble_adv_pkt_t *data;
 
-    data = (ble_pkt_t *)pkt->data;
+    data = (ble_adv_pkt_t *)pkt->data;
 
     if (_ll_state == LL_ADVERTISING) {
         /* Send respone to received BLE SCAN_REQ packet */
@@ -237,7 +239,8 @@ static void _event_cb(gnrc_netdev_event_t event, void *data)
             gnrc_netapi_receive(sendto->pid, pkt);
             sendto = gnrc_netreg_getnext(sendto);
         }
-    } else {
+    }
+    else {
        DEBUG("ble_ll: event triggered -> unknown event (%i)\n", event);
     }
 }

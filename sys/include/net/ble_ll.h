@@ -42,7 +42,7 @@ extern "C" {
  * @brief   BLE Advertising channel PDU types
  * @{
  */
-enum pdu_types {
+enum ble_adv_pdu_types {
     ADV_IND_TYPE,
     ADV_DIRECT_IND_TYPE,
     ADV_NONCONN_IND_TYPE,
@@ -58,13 +58,14 @@ enum pdu_types {
  * @{
  */
 #define BLE_MAX_CHANNELS            39
-#define BLE_PDU_HDR_LEN             2
+
 #define BLE_ACCESS_ADDR_LEN         4
-#define BLE_ADDR_LEN                6
-#define BLE_PAYLOAD_LEN_MIN         (BLE_ADDR_LEN)
-#define BLE_PAYLOAD_LEN_MAX         37
-#define BLE_MAX_DATA_LEN            (BLE_PAYLOAD_LEN_MAX - BLE_ADDR_LEN)
-#define BLE_MAX_PKT_LEN             275
+#define BLE_ADV_HDR_LEN             2
+#define BLE_ADV_ADDR_LEN            6
+#define BLE_ADV_PAYLOAD_LEN_MIN     (BLE_ADV_ADDR_LEN)
+#define BLE_ADV_PAYLOAD_LEN_MAX     37
+#define BLE_ADV_DATA_LEN_MAX        (BLE_ADV_PAYLOAD_LEN_MAX - BLE_ADV_ADDR_LEN)
+#define BLE_PDU_LEN_MAX             257
 
 #define BLE_DEFAULT_ACCESS_ADDR     0x8E89BED6
 
@@ -75,9 +76,9 @@ enum pdu_types {
 #define BLE_DEFAULT_RFU             0
 #define BLE_DEFAULT_ADV_DATA_LEN    27
 #define BLE_DEFAULT_ADV_DATA        "\x08\x09\x52\x49\x4f\x54\x2d\x4f" \
-                                        "\x53\x02\x01\x06\x02\x0a\x04\x03" \
-                                        "\x03\x20\x22\x07\xff\x00\x00\x64" \
-                                        "\x61\x74\x61"
+                                    "\x53\x02\x01\x06\x02\x0a\x04\x03" \
+                                    "\x03\x20\x22\x07\xff\x00\x00\x64" \
+                                    "\x61\x74\x61"
 
 #define BLE_DEFAULT_SCAN_RSP_TXADD  1
 #define BLE_DEFAULT_SCAN_RSP_RXADD  0
@@ -112,8 +113,7 @@ typedef struct __attribute__((packed))
     uint8_t rx_add:   1;                   /**< TXAdd field */
     uint8_t length:   6;                   /**< Payload length */
     uint8_t RFU2:     2;                   /**< Reserved for future use (2) */
-}
-PDU_header;
+} ble_adv_hdr_t;
 
 /**
  * @brief   Structure of a BLE connection request Link Layer field
@@ -130,18 +130,16 @@ typedef struct __attribute__((packed))
     uint8_t ChM[4];                         /**< Channel map */
     uint8_t Hop: 5;                         /**< Hop increment */
     uint8_t SCA: 3;                         /**< Sleep clock accuracy */
-}
-LL_data;
+} ble_conn_req_data_t;
 
 /**
  * @brief   In-memory structure of a ble radio packet
  */
 typedef struct __attribute__((packed))
 {
-    PDU_header header;                  /**< BLE pdu header */
-    uint8_t payload[BLE_PAYLOAD_LEN_MAX];  /**< actual payload */
-}
-ble_pkt_t;
+    ble_adv_hdr_t header;                       /**< BLE pdu header */
+    uint8_t payload[BLE_ADV_PAYLOAD_LEN_MAX];   /**< actual payload */
+} ble_adv_pkt_t;
 
 /**
  * @brief   Reference to the netdev driver interface

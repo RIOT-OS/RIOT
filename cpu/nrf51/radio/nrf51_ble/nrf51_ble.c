@@ -90,7 +90,12 @@ static state_t _tx_prestate;
 /**
  * @brief    Double receive buffers
  */
-static ble_pkt_t _rx_buf[2];
+static ble_adv_pkt_t _rx_buf[2];
+
+/**
+ * @brief Transmission buffer
+ */
+static uint8_t _tx_buf[CONF_PAYLOAD_LEN];
 
 /**
  * @brief   BLE Address of the device
@@ -101,6 +106,7 @@ static uint32_t _access_addr = BLE_DEFAULT_ACCESS_ADDR;
  * @brief   Pointer to the free receive buffer
  */
 static volatile int _rx_next = 0;
+
 
 
 /* Switch the BLE radio state to idle */
@@ -453,7 +459,7 @@ int nrf51_ble_init(gnrc_netdev_t *dev)
 /* BLE interface low-level receive function */
 static void _receive_data(void)
 {
-    ble_pkt_t *data;
+    ble_adv_pkt_t *data;
     gnrc_pktsnip_t *pkt;
     uint16_t pkt_size;
 
@@ -466,7 +472,7 @@ static void _receive_data(void)
     /* get pointer to RX data buffer */
     data = &(_rx_buf[_rx_next ^ 1]);
 
-    pkt_size = BLE_PDU_HDR_LEN + data->header.length;
+    pkt_size = BLE_ADV_HDR_LEN + data->header.length;
 
     /* allocate and fill payload */
     pkt = gnrc_pktbuf_add(NULL, data, pkt_size, GNRC_NETTYPE_UNDEF);
@@ -487,8 +493,6 @@ int _send(gnrc_netdev_t *dev, gnrc_pktsnip_t *pkt)
     (void)dev;
     size_t size;
 
-    uint8_t payload[CONF_PAYLOAD_LEN]; /**< actual payload */
-
     /* check packet */
     if (pkt == NULL) {
         DEBUG("nrf51_ble: Error sending packet: packet incomplete\n");
@@ -504,10 +508,10 @@ int _send(gnrc_netdev_t *dev, gnrc_pktsnip_t *pkt)
         return -EOVERFLOW;
     }
 
+    memcpy(&(_tx_buf), pkt->data, size);
+
     /* wait for any ongoing transmission to finish */
     while (_state == STATE_TX);
-
-    memcpy(payload, pkt->data, pkt->size);
 
     /* save old state and switch to idle if applicable */
     _tx_prestate = _state;
@@ -517,7 +521,7 @@ int _send(gnrc_netdev_t *dev, gnrc_pktsnip_t *pkt)
     }
 
     /* set packet pointer to TX buffer and write destination address */
-    NRF_RADIO->PACKETPTR = (uint32_t)(&payload);
+    NRF_RADIO->PACKETPTR = (uint32_t)(&_tx_buf);
 
     /* start transmission */
     _state = STATE_TX;

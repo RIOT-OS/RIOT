@@ -34,11 +34,11 @@ Examples
 
 Shell commnad: `ifconfig 4 set adv_addr c2:5e:72:69:6f:74`
 ```
-  success: set BLE advertising address on interface 5 to c2:5e:72:69:6f:74
+  success: set BLE advertising address on interface 4 to c2:5e:72:69:6f:74
 ```
 Shell command: `blesnd 4 0`
 ```
-40 06 74 6f 69 72 5e c2 85 0d da 
+40 06 74 6f 69 72 5e c2 85 0d da
 Advertising / AA 8e89bed6 (valid)/  6 bytes
     Channel Index: 37
     Type:  ADV_IND
@@ -49,7 +49,7 @@ Advertising / AA 8e89bed6 (valid)/  6 bytes
 ```
 Shell command: `blesnd 4 0 08:09:52:49:4f:54:2d:4f:53:02:01:06:02:0a:00:03:03:20:22:07:ff:00:00:64:61:74:61`
 ```
-40 21 74 6f 69 72 5e c2 08 09 52 49 4f 54 2d 4f 53 02 01 06 02 0a 00 03 03 20 22 07 ff 00 00 64 61 74 61 86 53 d7 
+40 21 74 6f 69 72 5e c2 08 09 52 49 4f 54 2d 4f 53 02 01 06 02 0a 00 03 03 20 22 07 ff 00 00 64 61 74 61 86 53 d7
 Advertising / AA 8e89bed6 (valid)/ 33 bytes
     Channel Index: 37
     Type:  ADV_IND
@@ -71,7 +71,7 @@ Advertising / AA 8e89bed6 (valid)/ 33 bytes
 ```
 Shell command: `blesnd 4 1 02:5f:31:6c:a7:26`
 ```
-41 0c 74 6f 69 72 5e c2 02 5f 31 6c a7 26 b5 d2 bf 
+41 0c 74 6f 69 72 5e c2 02 5f 31 6c a7 26 b5 d2 bf
 Advertising / AA 8e89bed6 (valid)/ 12 bytes
     Channel Index: 37
     Type:  ADV_DIRECT_IND
@@ -81,7 +81,7 @@ Advertising / AA 8e89bed6 (valid)/ 12 bytes
 ```
 Shell command: `blesnd 4 2`
 ```
-42 06 74 6f 69 72 5e c2 b8 3d f8 
+42 06 74 6f 69 72 5e c2 b8 3d f8
 Advertising / AA 8e89bed6 (valid)/  6 bytes
     Channel Index: 37
     Type:  ADV_NONCONN_IND
@@ -91,7 +91,7 @@ Advertising / AA 8e89bed6 (valid)/  6 bytes
 ```
 Shell command: `blesnd 4 3 02:5f:31:6c:a7:26`
 ```
-43 0c 74 6f 69 72 5e c2 02 5f 31 6c a7 26 36 73 99 
+43 0c 74 6f 69 72 5e c2 02 5f 31 6c a7 26 36 73 99
 Advertising / AA 8e89bed6 (valid)/ 12 bytes
     Channel Index: 37
     Type:  SCAN_REQ
@@ -103,7 +103,7 @@ Advertising / AA 8e89bed6 (valid)/ 12 bytes
 ```
 Shell command: `blesnd 4 4`
 ```
-44 06 74 6f 69 72 5e c2 ff 6d 9e 
+44 06 74 6f 69 72 5e c2 ff 6d 9e
 Advertising / AA 8e89bed6 (valid)/  6 bytes
     Channel Index: 37
     Type:  SCAN_RSP
