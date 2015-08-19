@@ -194,11 +194,28 @@ void gnrc_rpl_send_DIS(gnrc_rpl_dodag_t *dodag, ipv6_addr_t *destination)
     gnrc_rpl_send(pkt, NULL, destination, (dodag ? &dodag->dodag_id : NULL));
 }
 
+static bool _gnrc_rpl_check_DIS_validity(gnrc_rpl_dis_t *dis, uint16_t len)
+{
+    uint16_t expected_len = sizeof(*dis) + sizeof(icmpv6_hdr_t);
+
+    if (expected_len <= len) {
+        return true;
+    }
+
+    DEBUG("RPL: wrong DIS len: %d, expected: %d\n", len, expected_len);
+
+    return false;
+}
+
 void gnrc_rpl_recv_DIS(gnrc_rpl_dis_t *dis, ipv6_addr_t *src, ipv6_addr_t *dst, uint16_t len)
 {
     /* TODO handle Solicited Information Option */
     (void) dis;
     (void) len;
+
+    if (!_gnrc_rpl_check_DIS_validity(dis, len)) {
+        return;
+    }
 
     if (ipv6_addr_is_multicast(dst)) {
         for (uint8_t i = 0; i < GNRC_RPL_DODAGS_NUMOF; ++i) {
