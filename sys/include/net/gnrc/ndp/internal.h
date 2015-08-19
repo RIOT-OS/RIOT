@@ -99,6 +99,30 @@ void gnrc_ndp_internal_send_nbr_adv(kernel_pid_t iface, ipv6_addr_t *tgt, ipv6_a
  */
 void gnrc_ndp_internal_send_rtr_sol(kernel_pid_t iface, ipv6_addr_t *dst);
 
+#if (defined(MODULE_GNRC_NDP_ROUTER) || defined(MODULE_GNRC_SIXLOWPAN_ND_ROUTER))
+/**
+ * @brief   Handles received router solicitations.
+ *
+ * @param[in] iface         Interface to send over. May not be KERNEL_PID_UNDEF.
+ * @param[in] src           Source address for the router advertisement. May be NULL to be determined
+ *                          by source address selection (:: if no @p iface has no address).
+ * @param[in] dst           Destination address for router advertisement.
+ *                          @ref IPV6_ADDR_ALL_NODES_LINK_LOCAL if NULL.
+ * @param[in] fin           This is part of the router's final batch of router advertisements
+ *                          before ceising to be a router (set's router lifetime field to 0).
+ */
+void gnrc_ndp_internal_send_rtr_adv(kernel_pid_t iface, ipv6_addr_t *src,
+                                    ipv6_addr_t *dst, bool fin);
+#else
+/**
+ * @brief   A host *must not* send router advertisements at any time.
+ *
+ * This macro is primarily an optimization to not go into the function defined
+ * above.
+ */
+#define gnrc_ndp_internal_send_rtr_adv(iface, dst, fin)
+#endif
+
 /**
  * @brief   Handles a SL2A option.
  *

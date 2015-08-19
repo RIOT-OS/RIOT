@@ -311,6 +311,145 @@ void gnrc_ndp_internal_send_rtr_sol(kernel_pid_t iface, ipv6_addr_t *dst)
     gnrc_netapi_send(gnrc_ipv6_pid, hdr);
 }
 
+#if (defined(MODULE_GNRC_NDP_ROUTER) || defined(MODULE_GNRC_SIXLOWPAN_ND_ROUTER))
+static bool _pio_from_iface_addr(gnrc_pktsnip_t **res, gnrc_ipv6_netif_addr_t *addr,
+                                 gnrc_pktsnip_t *next)
+{
+    if (((addr->prefix_len - 1U) > 127U) && /* 0 < prefix_len < 128 */
+        !ipv6_addr_is_unspecified(&addr->addr) &&
+        !ipv6_addr_is_link_local(&addr->addr) &&
+        !gnrc_ipv6_netif_addr_is_non_unicast(&addr->addr)) {
+        DEBUG(" - PIO for %s/%" PRIu8 "\n", ipv6_addr_to_str(addr_str, &addr->addr,
+                                                             sizeof(addr_str)),
+              addr->prefix_len);
+        *res = gnrc_ndp_opt_pi_build(addr->prefix_len, (addr->flags &
+                                     (GNRC_IPV6_NETIF_ADDR_FLAGS_NDP_AUTO |
+                                      GNRC_IPV6_NETIF_ADDR_FLAGS_NDP_ON_LINK)),
+                                     addr->valid, addr->preferred, &addr->addr, next);
+        return true;
+    }
+    return false;
+}
+
+static gnrc_pktsnip_t *_add_pios(gnrc_ipv6_netif_t *ipv6_iface, gnrc_pktsnip_t *pkt)
+{
+    gnrc_pktsnip_t *tmp;
+    for (int i = 0; i < GNRC_IPV6_NETIF_ADDR_NUMOF; i++) {
+        if (_pio_from_iface_addr(&tmp, &ipv6_iface->addrs[i], pkt)) {
+            if (tmp != NULL) {
+                pkt = tmp;
+            }
+            else {
+                DEBUG("ndp rtr: error allocating PIO\n");
+                gnrc_pktbuf_release(pkt);
+                return NULL;
+            }
+        }
+    }
+    return pkt;
+}
+
+void gnrc_ndp_internal_send_rtr_adv(kernel_pid_t iface, ipv6_addr_t *src, ipv6_addr_t *dst,
+                                    bool fin)
+{
+    gnrc_pktsnip_t *hdr, *pkt = NULL;
+    ipv6_addr_t all_nodes = IPV6_ADDR_ALL_NODES_LINK_LOCAL;
+    gnrc_ipv6_netif_t *ipv6_iface = gnrc_ipv6_netif_get(iface);
+    uint32_t reach_time = 0, retrans_timer = 0;
+    uint16_t adv_ltime = 0;
+    uint8_t cur_hl = 0;
+
+    if (dst == NULL) {
+        dst = &all_nodes;
+    }
+    DEBUG("ndp internal: send router advertisement (iface: %" PRIkernel_pid ", dst: %s%s\n",
+          iface, ipv6_addr_to_str(addr_str, dst, sizeof(addr_str)), fin ? ", final" : "");
+    mutex_lock(&ipv6_iface->mutex);
+    hdr = _add_pios(ipv6_iface, pkt);
+    if (hdr == NULL) {
+        /* pkt already released in _add_pios */
+        mutex_unlock(&ipv6_iface->mutex);
+        return;
+    }
+    pkt = hdr;
+    if (ipv6_iface->flags & GNRC_IPV6_NETIF_FLAGS_ADV_MTU) {
+        if ((hdr = gnrc_ndp_opt_mtu_build(ipv6_iface->mtu, pkt)) == NULL) {
+            DEBUG("ndp rtr: no space left in packet buffer\n");
+            mutex_unlock(&ipv6_iface->mutex);
+            gnrc_pktbuf_release(pkt);
+            return;
+        }
+        pkt = hdr;
+    }
+    if (src == NULL) {
+        /* get address from source selection algorithm */
+        src = gnrc_ipv6_netif_find_best_src_addr(iface, dst);
+    }
+    /* add SL2A for source address */
+    if (src != NULL) {
+        DEBUG(" - SL2A\n");
+        uint8_t l2src[8];
+        size_t l2src_len;
+        /* optimization note: MAY also be omitted to facilitate in-bound load balancing over
+         * replicated interfaces.
+         * source: https://tools.ietf.org/html/rfc4861#section-6.2.3 */
+        l2src_len = _get_l2src(iface, l2src, sizeof(l2src));
+        if (l2src_len > 0) {
+            /* add source address link-layer address option */
+            hdr = gnrc_ndp_opt_sl2a_build(l2src, l2src_len, NULL);
+
+            if (hdr == NULL) {
+                DEBUG("ndp internal: error allocating Source Link-layer address option.\n");
+                mutex_unlock(&ipv6_iface->mutex);
+                gnrc_pktbuf_release(pkt);
+                return;
+            }
+            pkt = hdr;
+        }
+    }
+    if (ipv6_iface->flags & GNRC_IPV6_NETIF_FLAGS_ADV_CUR_HL) {
+        cur_hl = ipv6_iface->cur_hl;
+    }
+    if (ipv6_iface->flags & GNRC_IPV6_NETIF_FLAGS_ADV_REACH_TIME) {
+        uint64_t tmp = timex_uint64(ipv6_iface->reach_time) / MS_IN_USEC;
+
+        if (tmp > (3600 * SEC_IN_MS)) { /* tmp > 1 hour */
+            tmp = (3600 * SEC_IN_MS);
+        }
+
+        reach_time = (uint32_t)tmp;
+    }
+    if (ipv6_iface->flags & GNRC_IPV6_NETIF_FLAGS_ADV_RETRANS_TIMER) {
+        uint64_t tmp = timex_uint64(ipv6_iface->retrans_timer) / MS_IN_USEC;
+        if (tmp > UINT32_MAX) {
+            tmp = UINT32_MAX;
+        }
+        retrans_timer = (uint32_t)tmp;
+    }
+    if (!fin) {
+        adv_ltime = ipv6_iface->adv_ltime;
+    }
+    mutex_unlock(&ipv6_iface->mutex);
+    hdr = gnrc_ndp_rtr_adv_build(cur_hl,
+                                 (ipv6_iface->flags & (GNRC_IPV6_NETIF_FLAGS_OTHER_CONF |
+                                                       GNRC_IPV6_NETIF_FLAGS_MANAGED)) >> 8,
+                                 adv_ltime, reach_time, retrans_timer, pkt);
+    if (hdr == NULL) {
+        DEBUG("ndp internal: error allocating router advertisement.\n");
+        gnrc_pktbuf_release(pkt);
+        return;
+    }
+    pkt = hdr;
+    hdr = _build_headers(iface, pkt, dst, src);
+    if (hdr == NULL) {
+        DEBUG("ndp internal: error adding lower-layer headers.\n");
+        gnrc_pktbuf_release(pkt);
+        return;
+    }
+    gnrc_netapi_send(gnrc_ipv6_pid, hdr);
+}
+#endif
+
 int gnrc_ndp_internal_sl2a_opt_handle(gnrc_pktsnip_t *pkt, ipv6_hdr_t *ipv6, uint8_t icmpv6_type,
                                       ndp_opt_t *sl2a_opt, uint8_t *l2src)
 {
@@ -335,6 +474,7 @@ int gnrc_ndp_internal_sl2a_opt_handle(gnrc_pktsnip_t *pkt, ipv6_hdr_t *ipv6, uin
           gnrc_netif_addr_to_str(addr_str, sizeof(addr_str), sl2a, sl2a_len));
 
     switch (icmpv6_type) {
+        case ICMPV6_RTR_SOL:
         case ICMPV6_RTR_ADV:
         case ICMPV6_NBR_SOL:
             if (sl2a_len == 0) {  /* in case there was no source address in l2 */
@@ -403,7 +543,6 @@ bool gnrc_ndp_internal_mtu_opt_handle(kernel_pid_t iface, uint8_t icmpv6_type,
 {
     gnrc_ipv6_netif_t *if_entry = gnrc_ipv6_netif_get(iface);
 
-    assert(if_entry != NULL);
     if ((mtu_opt->len != NDP_OPT_MTU_LEN)) {
         DEBUG("ndp: invalid MTU option received\n");
         return false;

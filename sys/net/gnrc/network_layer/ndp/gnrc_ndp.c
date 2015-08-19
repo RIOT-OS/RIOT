@@ -275,6 +275,70 @@ void gnrc_ndp_nbr_adv_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
     return;
 }
 
+#if (defined(MODULE_GNRC_NDP_ROUTER) || defined(MODULE_GNRC_SIXLOWPAN_ND_ROUTER))
+void gnrc_ndp_rtr_sol_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
+                             ipv6_hdr_t *ipv6, ndp_rtr_sol_t *rtr_sol,
+                             size_t icmpv6_size)
+{
+    gnrc_ipv6_netif_t *if_entry = gnrc_ipv6_netif_get(iface);
+
+    if (if_entry->flags & GNRC_IPV6_NETIF_FLAGS_ROUTER) {
+        int sicmpv6_size = (int)icmpv6_size, l2src_len = 0;
+        uint8_t l2src[GNRC_IPV6_NC_L2_ADDR_MAX];
+        uint16_t opt_offset = 0;
+        uint8_t *buf = (uint8_t *)(rtr_sol + 1);
+        /* check validity */
+        if ((ipv6->hl != 255) || (rtr_sol->code != 0) ||
+            (icmpv6_size < sizeof(ndp_rtr_sol_t))) {
+            DEBUG("ndp: router solicitation was invalid\n");
+            return;
+        }
+        sicmpv6_size -= sizeof(ndp_rtr_sol_t);
+        while (sicmpv6_size > 0) {
+            ndp_opt_t *opt = (ndp_opt_t *)(buf + opt_offset);
+
+            switch (opt->type) {
+                case NDP_OPT_SL2A:
+                    if ((l2src_len = gnrc_ndp_internal_sl2a_opt_handle(pkt, ipv6, rtr_sol->type, opt,
+                                                                       l2src)) < 0) {
+                        /* -ENOTSUP can not happen */
+                        /* invalid source link-layer address option */
+                        return;
+                    }
+                    break;
+
+                default:
+                    /* silently discard all other options */
+                    break;
+            }
+
+            opt_offset += (opt->len * 8);
+            sicmpv6_size -= (opt->len * 8);
+        }
+        _stale_nc(iface, &ipv6->src, l2src, l2src_len);
+        /* send delayed */
+        if (if_entry->flags & GNRC_IPV6_NETIF_FLAGS_RTR_ADV) {
+            timex_t delay = timex_set(0, genrand_uint32_range(0, GNRC_NDP_MAX_RTR_ADV_DELAY));
+            vtimer_remove(&if_entry->rtr_adv_timer);
+            if (ipv6_addr_is_unspecified(&ipv6->src)) {
+                /* either multicast, if source unspecified */
+                vtimer_set_msg(&if_entry->rtr_adv_timer, delay, gnrc_ipv6_pid,
+                               GNRC_NDP_MSG_RTR_ADV_RETRANS, if_entry);
+            }
+            else {
+                /* or unicast, if source is known */
+                /* XXX: can't just use GNRC_NETAPI_MSG_TYPE_SND, since the next retransmission
+                 * must also be set. */
+                gnrc_ipv6_nc_t *nc_entry = gnrc_ipv6_nc_get(iface, &ipv6->src);
+                vtimer_set_msg(&if_entry->rtr_adv_timer, delay, gnrc_ipv6_pid,
+                               GNRC_NDP_MSG_RTR_ADV_DELAY, nc_entry);
+            }
+        }
+    }
+    /* otherwise ignore silently */
+}
+#endif
+
 static inline void _set_reach_time(gnrc_ipv6_netif_t *if_entry, uint32_t mean)
 {
     uint32_t reach_time = genrand_uint32_range(GNRC_NDP_MIN_RAND, GNRC_NDP_MAX_RAND);
@@ -297,7 +361,6 @@ void gnrc_ndp_rtr_adv_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt, ipv6_hdr_t
     int sicmpv6_size = (int)icmpv6_size, l2src_len = 0;
     uint16_t opt_offset = 0;
 
-    assert(if_entry != NULL);
     if (!ipv6_addr_is_link_local(&ipv6->src) ||
         ipv6_addr_is_multicast(&ipv6->src) ||
         (ipv6->hl != 255) || (rtr_adv->code != 0) ||
@@ -585,6 +648,58 @@ gnrc_pktsnip_t *gnrc_ndp_opt_tl2a_build(const uint8_t *l2addr, uint8_t l2addr_le
 
     return _opt_l2a_build(NDP_OPT_TL2A, l2addr, l2addr_len, next);
 }
+
+#if (defined(MODULE_GNRC_NDP_ROUTER) || defined(MODULE_GNRC_SIXLOWPAN_ND_ROUTER))
+gnrc_pktsnip_t *gnrc_ndp_rtr_adv_build(uint8_t cur_hl, uint8_t flags,
+                                       uint16_t ltime, uint32_t reach_time,
+                                       uint32_t retrans_timer, gnrc_pktsnip_t *options)
+{
+    gnrc_pktsnip_t *pkt;
+    DEBUG("ndp rtr: building router advertisement message\n");
+    pkt = gnrc_icmpv6_build(options, ICMPV6_RTR_ADV, 0, sizeof(ndp_rtr_adv_t));
+    if (pkt != NULL) {
+        ndp_rtr_adv_t *rtr_adv = pkt->data;
+        rtr_adv->cur_hl = cur_hl;
+        rtr_adv->flags = (flags & NDP_RTR_ADV_FLAGS_MASK);
+        rtr_adv->ltime = byteorder_htons(ltime);
+        rtr_adv->reach_time = byteorder_htonl(reach_time);
+        rtr_adv->retrans_timer = byteorder_htonl(retrans_timer);
+    }
+    return pkt;
+}
+
+gnrc_pktsnip_t *gnrc_ndp_opt_pi_build(uint8_t prefix_len, uint8_t flags,
+                                      uint32_t valid_ltime, uint32_t pref_ltime,
+                                      ipv6_addr_t *prefix, gnrc_pktsnip_t *next)
+{
+    gnrc_pktsnip_t *pkt = gnrc_ndp_opt_build(NDP_OPT_PI, sizeof(ndp_opt_pi_t),
+                                             next);
+    if (pkt != NULL) {
+        ndp_opt_pi_t *pi_opt = pkt->data;
+        pi_opt->prefix_len = prefix_len;
+        pi_opt->flags = (flags & NDP_OPT_PI_FLAGS_MASK);
+        pi_opt->valid_ltime = byteorder_htonl(valid_ltime);
+        pi_opt->pref_ltime = byteorder_htonl(pref_ltime);
+        pi_opt->resv.u32 = 0;
+        /* Bits beyond prefix_len MUST be 0 */
+        ipv6_addr_set_unspecified(&pi_opt->prefix);
+        ipv6_addr_init_prefix(&pi_opt->prefix, prefix, prefix_len);
+    }
+    return pkt;
+}
+
+gnrc_pktsnip_t *gnrc_ndp_opt_mtu_build(uint32_t mtu, gnrc_pktsnip_t *next)
+{
+    gnrc_pktsnip_t *pkt = gnrc_ndp_opt_build(NDP_OPT_MTU, sizeof(ndp_opt_mtu_t),
+                                             next);
+    if (pkt != NULL) {
+        ndp_opt_mtu_t *mtu_opt = pkt->data;
+        mtu_opt->resv.u16 = 0;
+        mtu_opt->mtu = byteorder_htonl(mtu);
+    }
+    return pkt;
+}
+#endif
 
 /**
  * @}
