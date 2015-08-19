@@ -62,7 +62,7 @@ The script has the following parameters:
 ### Examples
 
 The following examples are made when using the sniffer application together with
-an `iot-lab_M3` node that is connected to /dev/ttyUSB1 (or COM1) and runs per
+an `iotlab_m3` node that is connected to /dev/ttyUSB1 (or COM1) and runs per
 default with a baudrate of 500000.
 
 #### Linux
