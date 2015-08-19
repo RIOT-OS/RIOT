@@ -304,7 +304,7 @@ static void _cleanup(dev_eth_t *ethdev)
 }
 
 #ifdef __MACH__
-static void _sigio_child(gnrc_tapnet_t *dev)
+static void _sigio_child(dev_eth_tap_t *dev)
 {
     pid_t parent = _native_pid;
     if ((_sigio_child_pid = real_fork()) == -1) {
