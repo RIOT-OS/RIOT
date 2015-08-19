@@ -134,7 +134,8 @@ void hard_fault_default(void)
         "mrs r0, psp                        \n" /*   r0 = psp                 */
         " out:                              \n" /* }                          */
         "mov r1, #0                         \n" /* corrupted = false          */
-        "cmp r0, sp                         \n" /* If msp is active stack-    */
+        "mov r2, sp                         \n" /* Cmp with SP is deprecated  */
+        "cmp r0, r2                         \n" /* If msp is active stack-    */
         "bne hardfault                      \n" /* pointer, check if valid so */
         "cmp r0, %[eram]                    \n" /* so calling c-func works .  */
         "bge fix_msp                        \n" /* if(r0 == msp) {            */
@@ -150,7 +151,7 @@ void hard_fault_default(void)
           : [sram]   "r" (&_sram),
             [eram]   "r" (&_eram),
             [estack] "r" (&_estack)
-          : "r0","r1"
+          : "r0","r1","r2"
     );
 }
 
