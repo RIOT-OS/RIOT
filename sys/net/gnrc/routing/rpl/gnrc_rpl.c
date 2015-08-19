@@ -133,7 +133,8 @@ static void _receive(gnrc_pktsnip_t *icmpv6)
             break;
         case GNRC_RPL_ICMPV6_CODE_DAO_ACK:
             DEBUG("RPL: DAO-ACK received\n");
-            gnrc_rpl_recv_DAO_ACK((gnrc_rpl_dao_ack_t *)(icmpv6_hdr + 1));
+            gnrc_rpl_recv_DAO_ACK((gnrc_rpl_dao_ack_t *)(icmpv6_hdr + 1),
+                    byteorder_ntohs(ipv6_hdr->len));
             break;
         default:
             DEBUG("RPL: Unknown ICMPV6 code received\n");

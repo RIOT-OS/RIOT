@@ -707,10 +707,32 @@ void gnrc_rpl_recv_DAO(gnrc_rpl_dao_t *dao, ipv6_addr_t *src, uint16_t len)
     gnrc_rpl_delay_dao(dodag);
 }
 
-void gnrc_rpl_recv_DAO_ACK(gnrc_rpl_dao_ack_t *dao_ack)
+static bool _gnrc_rpl_check_DAO_ACK_validity(gnrc_rpl_dao_ack_t *dao_ack, uint16_t len)
+{
+    uint16_t expected_len = sizeof(*dao_ack) + sizeof(icmpv6_hdr_t);
+
+    if ((dao_ack->d_reserved & GNRC_RPL_DAO_ACK_D_BIT)) {
+        expected_len += sizeof(ipv6_addr_t);
+    }
+
+    if (expected_len == len) {
+        return true;
+    }
+
+    DEBUG("RPL: wrong DAO-ACK len: %d, expected: %d\n", len, expected_len);
+
+    return false;
+}
+
+void gnrc_rpl_recv_DAO_ACK(gnrc_rpl_dao_ack_t *dao_ack, uint16_t len)
 {
     gnrc_rpl_instance_t *inst = NULL;
     gnrc_rpl_dodag_t *dodag = NULL;
+
+    if (!_gnrc_rpl_check_DAO_ACK_validity(dao_ack, len)) {
+        return;
+    }
+
     if ((inst = gnrc_rpl_instance_get(dao_ack->instance_id)) == NULL) {
         DEBUG("RPL: DAO-ACK with unknown instance id (%d) received\n", dao_ack->instance_id);
         return;
