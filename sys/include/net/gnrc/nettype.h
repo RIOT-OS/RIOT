@@ -9,9 +9,12 @@
 /**
  * @defgroup    net_gnrc_nettype  Protocol type
  * @ingroup     net_gnrc
- * @brief       Protocol type definitions to be used with the @ref net_gnrc_netapi,
- *              the @ref net_gnrc_netdev, the @ref net_gnrc_netreg, and
- *              the @ref net_gnrc_pkt
+ * @brief       Protocol type definitions and helper functions
+ *
+ * The protocol types are used with the @ref net_gnrc_netapi, the @ref net_gnrc_netdev,
+ * the @ref net_gnrc_netreg, and the @ref net_gnrc_pkt to identify network protocols
+ * throughout the network stack.
+ *
  * @{
  *
  * @file
