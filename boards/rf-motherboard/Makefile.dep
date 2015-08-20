@@ -1,0 +1,4 @@
+ifneq (,$(filter gnrc_netif_default,$(USEMODULE)))
+  USEMODULE += at86rf212b
+  USEMODULE += gnrc_nomac
+endif
