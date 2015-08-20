@@ -7,9 +7,9 @@
  */
 
 /**
- * @defgroup    net_gnrc__icmpv6  Internet Control Message Protocol for IPv6
- * @ingroup     net_gnrc__ipv6
- * @brief       Basic implementation of ICMPv6
+ * @defgroup    net_gnrc_icmpv6  ICMPv6
+ * @ingroup     net_gnrc_ipv6
+ * @brief       GNRC's implementation of ICMPv6
  *
  * @see <a href="https://tools.ietf.org/html/rfc4443">
  *          RFC 4443
@@ -17,7 +17,7 @@
  * @{
  *
  * @file
- * @brief       Definitions for ICMPv6
+ * @brief       Definitions for GNRC's ICMPv6 implementation
  *
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  *

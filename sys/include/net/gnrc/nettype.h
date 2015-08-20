@@ -8,7 +8,7 @@
 
 /**
  * @defgroup    net_gnrc_nettype  Protocol type
- * @ingroup     net
+ * @ingroup     net_gnrc
  * @brief       Protocol type definitions to be used with the @ref net_gnrc_netapi,
  *              the @ref net_gnrc_netdev, the @ref net_gnrc_netreg, and
  *              the @ref net_gnrc_pkt

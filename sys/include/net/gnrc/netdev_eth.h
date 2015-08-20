@@ -9,11 +9,10 @@
  */
 
 /**
- * @defgroup gnrc_netdev_eth dev_eth ethernet interface as netdev device.
- * @ingroup net
+ * @defgroup    net_gnrc_netdev_eth dev_eth as netdev device.
+ * @ingroup     net_gnrc_netdev
  *
- * @brief Allows for usage of dev_eth ethernet interfaces as ethernet netdev
- * devices.
+ * @brief Allows for usage of @p dev_eth as ethernet netdev devices.
  *
  * @{
  *

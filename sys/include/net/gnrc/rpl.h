@@ -9,8 +9,9 @@
  */
 
 /**
- * @defgroup    net_gnrc_rpl  New RPL
- * @ingroup     net
+ * @defgroup    net_gnrc_rpl  RPL
+ * @ingroup     net_gnrc
+ * @brief       RPL implementation for GNRC
  * @{
  *
  * @file

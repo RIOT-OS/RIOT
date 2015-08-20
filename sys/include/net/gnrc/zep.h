@@ -8,7 +8,7 @@
 
 /**
  * @defgroup    net_gnrc_zep  Zigbee Encapsulation Protocol
- * @ingroup     net
+ * @ingroup     net_gnrc
  * @brief       Transports IEEE 802.15.4 frames over UDP (can be parsed by
  *              Wireshark)
  * @note        Stability uncertain

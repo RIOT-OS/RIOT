@@ -8,13 +8,13 @@
  */
 
 /**
- * @defgroup    net_gnrc_pkt Packet
- * @brief       Network packet abstraction types
- * @ingroup     net
+ * @defgroup    net_gnrc_pkt Packets
+ * @ingroup     net_gnrc_pktbuf
+ * @brief       Network packet abstraction type and helper functions
  * @{
  *
  * @file
- * @brief   General definitions for network packets
+ * @brief   General definitions for network packets and their helper functions
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  * @author  Hauke Petersen <hauke.petersen@fu-berlin.de>
