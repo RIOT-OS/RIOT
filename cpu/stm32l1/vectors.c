@@ -95,7 +95,7 @@ ISR_VECTORS const void *interrupt_vector[] = {
     /* Cortex-M3 handlers */
     (void*) reset_handler_default,  /* entry point of the program */
     (void*) nmi_default,            /* non maskable interrupt handler */
-    (void*) hard_fault_default,     /* hard fault exception */
+    (void*) decode_hard_fault,     /* hard fault exception */
     (void*) mem_manage_default,     /* memory manage exception */
     (void*) bus_fault_default,      /* bus fault exception */
     (void*) usage_fault_default,    /* usage fault exception */

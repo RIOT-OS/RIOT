@@ -74,7 +74,7 @@ ISR_VECTORS const void *interrupt_vector[] = {
     /* Cortex-M0 handlers */
     (void*) reset_handler_default,  /* entry point of the program */
     (void*) nmi_default,            /* non maskable interrupt handler */
-    (void*) hard_fault_default,     /* hard fault exception */
+    (void*) decode_hard_fault,     /* hard fault exception */
     (void*) (0UL),                  /* reserved */
     (void*) (0UL),                  /* reserved */
     (void*) (0UL),                  /* reserved */

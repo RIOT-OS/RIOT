@@ -23,6 +23,18 @@
 extern "C" {
 #endif
 
+typedef struct __register_dump
+{
+	uint32_t r0;
+	uint32_t r1;
+	uint32_t r2;
+	uint32_t r3;
+	uint32_t r12;
+	void* lr;
+	void* pc;
+	uint32_t psr;
+} register_dump, * ptr_register_dump;
+
 /**
  * @brief   Use this macro to make interrupt functions overridable with the
  *          dummy_handler as fallback in case they are not implemented
@@ -62,7 +74,8 @@ void nmi_default(void);
  * causes of hard faults are access to un-aligned pointers on Cortex-M0 CPUs
  * and calls of function pointers that are set to NULL.
  */
-void hard_fault_default(void);
+void decode_hard_fault(void);
+void hard_fault_default(ptr_register_dump registers);
 
 /* The following four exceptions are only present for Cortex-M3 and -M4 CPUs */
 #if defined(CPU_ARCH_CORTEX_M3) || defined(CPU_ARCH_CORTEX_M4) || \
