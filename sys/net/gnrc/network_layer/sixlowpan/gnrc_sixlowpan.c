@@ -129,7 +129,7 @@ static void _receive(gnrc_pktsnip_t *pkt)
         gnrc_pktsnip_t *ipv6 = gnrc_pktbuf_add(NULL, NULL, sizeof(ipv6_hdr_t),
                                                GNRC_NETTYPE_IPV6);
         if ((ipv6 == NULL) ||
-            (dispatch_size = gnrc_sixlowpan_iphc_decode(ipv6, pkt, 0)) == 0) {
+            (dispatch_size = gnrc_sixlowpan_iphc_decode(ipv6, pkt, 0, 0)) == 0) {
             DEBUG("6lo: error on IPHC decoding\n");
             if (ipv6 != NULL) {
                 gnrc_pktbuf_release(ipv6);
