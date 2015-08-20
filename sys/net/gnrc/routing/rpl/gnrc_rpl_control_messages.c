@@ -28,17 +28,20 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-#if ENABLE_DEBUG && defined(MODULE_IPV6_ADDR)
+#if ENABLE_DEBUG
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 #endif
 
-#define GNRC_RPL_GROUNDED_SHIFT           (7)
-#define GNRC_RPL_MOP_SHIFT                (3)
-#define GNRC_RPL_OPT_DODAG_CONF_LEN       (14)
-#define GNRC_RPL_OPT_PREFIX_INFO_LEN      (30)
-#define GNRC_RPL_SHIFTED_MOP_MASK         (0x7)
-#define GNRC_RPL_PRF_MASK                 (0x7)
-#define GNRC_RPL_PREFIX_AUTO_ADDRESS_BIT  (1 << 6)
+#define GNRC_RPL_GROUNDED_SHIFT             (7)
+#define GNRC_RPL_MOP_SHIFT                  (3)
+#define GNRC_RPL_OPT_DODAG_CONF_LEN         (14)
+#define GNRC_RPL_OPT_PREFIX_INFO_LEN        (30)
+#define GNRC_RPL_SHIFTED_MOP_MASK           (0x7)
+#define GNRC_RPL_PRF_MASK                   (0x7)
+#define GNRC_RPL_PREFIX_AUTO_ADDRESS_BIT    (1 << 6)
+#define GNRC_RPL_DAO_D_BIT                  (1 << 6)
+#define GNRC_RPL_DAO_K_BIT                  (1 << 7)
+#define GNRC_RPL_DAO_ACK_D_BIT              (1 << 7)
 
 void _gnrc_rpl_send(gnrc_pktsnip_t *pkt, ipv6_addr_t *src, ipv6_addr_t *dst,
         ipv6_addr_t *dodag_id)
@@ -226,6 +229,7 @@ bool _parse_options(int msg_type, gnrc_rpl_dodag_t *dodag, gnrc_rpl_opt_t *opt, 
         if ((opt->type != GNRC_RPL_OPT_PAD1) && (len < opt->length + sizeof(gnrc_rpl_opt_t) + l)) {
             /* return false to delete the dodag,
              * because former options may also contain errors */
+            DEBUG("RPL: Wrong option length encountered\n");
             return false;
         }
 
@@ -380,6 +384,7 @@ void gnrc_rpl_recv_DIO(gnrc_rpl_dio_t *dio, ipv6_addr_t *src, uint16_t len)
         parent->rank = byteorder_ntohs(dio->rank);
 
         if(!_parse_options(GNRC_RPL_ICMPV6_CODE_DIO, dodag, (gnrc_rpl_opt_t *)(dio + 1), len, NULL)) {
+            DEBUG("RPL: Error encountered during DIO option parsing - remove DODAG\n");
             gnrc_rpl_dodag_remove(dodag);
             return;
         }
@@ -451,6 +456,7 @@ void gnrc_rpl_recv_DIO(gnrc_rpl_dio_t *dio, ipv6_addr_t *src, uint16_t len)
     parent->rank = byteorder_ntohs(dio->rank);
 
     if(!_parse_options(GNRC_RPL_ICMPV6_CODE_DIO, dodag, (gnrc_rpl_opt_t *)(dio + 1), len, NULL)) {
+        DEBUG("RPL: Error encountered during DIO option parsing - remove DODAG\n");
         gnrc_rpl_dodag_remove(dodag);
         return;
     }
@@ -526,6 +532,12 @@ void gnrc_rpl_send_DAO(gnrc_rpl_dodag_t *dodag, ipv6_addr_t *destination, uint8_
     int size = sizeof(icmpv6_hdr_t) + sizeof(gnrc_rpl_dao_t) +
         (sizeof(gnrc_rpl_opt_target_t) * (dst_size + 1)) + sizeof(gnrc_rpl_opt_transit_t);
 
+    bool local_instance = (dodag->instance->id & NG_RPL_INSTANCE_ID_MSB) ? true : false;
+
+    if (local_instance) {
+        size += sizeof(ipv6_addr_t);
+    }
+
     if ((pkt = gnrc_icmpv6_build(NULL, ICMPV6_RPL_CTRL, GNRC_RPL_ICMPV6_CODE_DAO, size)) == NULL) {
         DEBUG("RPL: Send DAO - no space left in packet buffer\n");
         return;
@@ -533,18 +545,27 @@ void gnrc_rpl_send_DAO(gnrc_rpl_dodag_t *dodag, ipv6_addr_t *destination, uint8_
 
     icmp = (icmpv6_hdr_t *)pkt->data;
     dao = (gnrc_rpl_dao_t *)(icmp + 1);
+    target = (gnrc_rpl_opt_target_t *) (dao + 1);
 
     dao->instance_id = dodag->instance->id;
-    /* set the D flag to indicate that a DODAG id is present */
-    /* set the K flag to indicate that a ACKs are required */
-    dao->k_d_flags = ((1 << 6) | (1 << 7));
+    if (local_instance) {
+        /* set the D flag to indicate that a DODAG id is present */
+        dao->k_d_flags = GNRC_RPL_DAO_D_BIT;
+        memcpy((dao + 1), &dodag->dodag_id, sizeof(ipv6_addr_t));
+        target = (gnrc_rpl_opt_target_t *)(((uint8_t *) target) + sizeof(ipv6_addr_t));
+    }
+    else {
+        dao->k_d_flags = 0;
+    }
+
+    /* set the K flag to indicate that ACKs are required */
+    dao->k_d_flags |= GNRC_RPL_DAO_K_BIT;
     dao->dao_sequence = dodag->dao_seq;
-    dao->dodag_id = dodag->dodag_id;
     dao->reserved = 0;
 
     /* add own address */
-    target = (gnrc_rpl_opt_target_t *) (dao + 1);
     _dao_fill_target(target, me);
+
     /* add children */
     for (size_t i = 0; i < dst_size; ++i) {
         target = (target + 1);
@@ -576,6 +597,11 @@ void gnrc_rpl_send_DAO_ACK(gnrc_rpl_dodag_t *dodag, ipv6_addr_t *destination, ui
     icmpv6_hdr_t *icmp;
     gnrc_rpl_dao_ack_t *dao_ack;
     int size = sizeof(icmpv6_hdr_t) + sizeof(gnrc_rpl_dao_ack_t);
+    bool local_instance = (dodag->instance->id & NG_RPL_INSTANCE_ID_MSB) ? true : false;
+
+    if (local_instance) {
+        size += sizeof(ipv6_addr_t);
+    }
 
     if ((pkt = gnrc_icmpv6_build(NULL, ICMPV6_RPL_CTRL, GNRC_RPL_ICMPV6_CODE_DAO_ACK, size)) == NULL) {
         DEBUG("RPL: Send DAOACK - no space left in packet buffer\n");
@@ -586,11 +612,17 @@ void gnrc_rpl_send_DAO_ACK(gnrc_rpl_dodag_t *dodag, ipv6_addr_t *destination, ui
     dao_ack = (gnrc_rpl_dao_ack_t *)(icmp + 1);
 
     dao_ack->instance_id = dodag->instance->id;
-    /* set the D flag to indicate that a DODAG id is present */
-    dao_ack->d_reserved = (1 << 7);
+    if (local_instance) {
+        /* set the D flag to indicate that a DODAG id is present */
+        dao_ack->d_reserved = GNRC_RPL_DAO_ACK_D_BIT;
+        memcpy((dao_ack + 1), &dodag->dodag_id, sizeof(ipv6_addr_t));
+    }
+    else {
+        dao_ack->d_reserved = 0;
+    }
+
     dao_ack->dao_sequence = seq;
     dao_ack->status = 0;
-    dao_ack->dodag_id = dodag->dodag_id;
 
     _gnrc_rpl_send(pkt, NULL, destination, &dodag->dodag_id);
 }
@@ -599,31 +631,40 @@ void gnrc_rpl_recv_DAO(gnrc_rpl_dao_t *dao, ipv6_addr_t *src, uint16_t len)
 {
     gnrc_rpl_instance_t *inst = NULL;
     gnrc_rpl_dodag_t *dodag = NULL;
+    gnrc_rpl_opt_t *opts = (gnrc_rpl_opt_t *) (dao + 1);
+
     if ((inst = gnrc_rpl_instance_get(dao->instance_id)) == NULL) {
         DEBUG("RPL: DAO with unknown instance id (%d) received\n", dao->instance_id);
         return;
     }
 
-    /* check if the D flag is set before accessing the DODAG id */
-    if (!(dao->k_d_flags & (1 << 6))) {
-        DEBUG("RPL: DAO with D flag unset - global instances not supported\n");
-        return;
-    }
-
-    if ((dodag = gnrc_rpl_dodag_get(inst, &dao->dodag_id)) == NULL) {
-        DEBUG("RPL: DAO with unknown DODAG id (%s)\n", ipv6_addr_to_str(addr_str,
-                    &dao->dodag_id, sizeof(addr_str)));
-        return;
-    }
-
     len -= (sizeof(gnrc_rpl_dao_t) + sizeof(icmpv6_hdr_t));
-    if(!_parse_options(GNRC_RPL_ICMPV6_CODE_DAO, dodag, (gnrc_rpl_opt_t *) (dao + 1), len, src)) {
+
+    /* check if the D flag is set before accessing the DODAG id */
+    if ((dao->k_d_flags & GNRC_RPL_DAO_D_BIT)) {
+        if ((dodag = gnrc_rpl_dodag_get(inst, (ipv6_addr_t *)(dao + 1))) == NULL) {
+            DEBUG("RPL: DAO with unknown DODAG id (%s)\n", ipv6_addr_to_str(addr_str,
+                        (ipv6_addr_t *)(dao + 1), sizeof(addr_str)));
+            return;
+        }
+        opts = (gnrc_rpl_opt_t *)(((uint8_t *) opts) + sizeof(ipv6_addr_t));
+        len -= sizeof(ipv6_addr_t);
+    }
+    else {
+        if ((dodag = gnrc_rpl_dodag_get(inst, NULL)) == NULL) {
+            DEBUG("RPL: DAO for instance (%d) without DODAGs\n", dao->instance_id);
+            return;
+        }
+    }
+
+    if(!_parse_options(GNRC_RPL_ICMPV6_CODE_DAO, dodag, opts, len, src)) {
+        DEBUG("RPL: Error encountered during DAO option parsing - remove DODAG\n");
         gnrc_rpl_dodag_remove(dodag);
         return;
     }
 
     /* send a DAO-ACK if K flag is set */
-    if (dao->k_d_flags & (1 << 7)) {
+    if (dao->k_d_flags & GNRC_RPL_DAO_K_BIT) {
         gnrc_rpl_send_DAO_ACK(dodag, src, dao->dao_sequence);
     }
 
@@ -640,14 +681,16 @@ void gnrc_rpl_recv_DAO_ACK(gnrc_rpl_dao_ack_t *dao_ack)
     }
 
     /* check if the D flag is set before accessing the DODAG id */
-    if (!(dao_ack->d_reserved & (1 << 7))) {
-        DEBUG("RPL: DAO-ACK with D flag unset - global instances not supported\n");
-        return;
+    if ((dao_ack->d_reserved & GNRC_RPL_DAO_ACK_D_BIT)) {
+        if ((dodag = gnrc_rpl_dodag_get(inst, (ipv6_addr_t *)(dao_ack + 1))) == NULL) {
+            DEBUG("RPL: DAO-ACK with unknown DODAG id (%s)\n", ipv6_addr_to_str(addr_str,
+                        (ipv6_addr_t *)(dao_ack + 1), sizeof(addr_str)));
+            return;
+        }
     }
-
-    if ((dodag = gnrc_rpl_dodag_get(inst, &dao_ack->dodag_id)) == NULL) {
-        DEBUG("RPL: DAO-ACK with unknown DODAG id (%s)\n", ipv6_addr_to_str(addr_str,
-                    &dao_ack->dodag_id, sizeof(addr_str)));
+    /* D flag not set - global instance id */
+    else if ((dodag = gnrc_rpl_dodag_get(inst, NULL)) == NULL) {
+        DEBUG("RPL: DAO-ACK for instance (%d) without DODAGs\n", dao_ack->instance_id);
         return;
     }
 
