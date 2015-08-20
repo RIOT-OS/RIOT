@@ -656,6 +656,12 @@ static void _receive(gnrc_pktsnip_t *pkt)
     /* extract header */
     hdr = (ipv6_hdr_t *)ipv6->data;
 
+    /* if available, remove any padding that was added by lower layers
+     * to fulfill their minimum size requirements (e.g. ethernet) */
+    if (byteorder_ntohs(hdr->len) < pkt->size) {
+        gnrc_pktbuf_realloc_data(pkt, byteorder_ntohs(hdr->len));
+    }
+
     DEBUG("ipv6: Received (src = %s, ",
           ipv6_addr_to_str(addr_str, &(hdr->src), sizeof(addr_str)));
     DEBUG("dst = %s, next header = %" PRIu8 ", length = %" PRIu16 ")\n",
