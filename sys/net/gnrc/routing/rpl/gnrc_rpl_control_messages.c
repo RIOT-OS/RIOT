@@ -307,9 +307,11 @@ bool _parse_options(int msg_type, gnrc_rpl_dodag_t *dodag, gnrc_rpl_opt_t *opt, 
                     first_target = target;
                 }
 
-                fib_add_entry(if_id, target->target.u8, sizeof(ipv6_addr_t), AF_INET6, src->u8,
-                        sizeof(ipv6_addr_t), AF_INET6,
-                        (dodag->default_lifetime * dodag->lifetime_unit) * SEC_IN_MS);
+                fib_add_entry(gnrc_ipv6_fib_table, if_id, target->target.u8,
+                              sizeof(ipv6_addr_t), AF_INET6, src->u8,
+                              sizeof(ipv6_addr_t), AF_INET6,
+                              (dodag->default_lifetime * dodag->lifetime_unit) *
+                              SEC_IN_MS);
                 break;
             }
             case (GNRC_RPL_OPT_TRANSIT): {
@@ -326,8 +328,9 @@ a preceding RPL TARGET DAO option\n");
                 }
 
                 do {
-                    fib_update_entry(first_target->target.u8, sizeof(ipv6_addr_t),
-                            src->u8, sizeof(ipv6_addr_t), AF_INET6,
+                    fib_update_entry(gnrc_ipv6_fib_table, first_target->target.u8,
+                                     sizeof(ipv6_addr_t), src->u8,
+                                     sizeof(ipv6_addr_t), AF_INET6,
                             (transit->path_lifetime * dodag->lifetime_unit * SEC_IN_MS));
                     first_target = (gnrc_rpl_opt_target_t *) (((uint8_t *) (first_target)) +
                         sizeof(gnrc_rpl_opt_t) + first_target->length);
@@ -527,7 +530,7 @@ void gnrc_rpl_send_DAO(gnrc_rpl_dodag_t *dodag, ipv6_addr_t *destination, uint8_
     /* find prefix for my address */
     ipv6_addr_t prefix;
     ipv6_addr_init_prefix(&prefix, me, me_netif->prefix_len);
-    fib_get_destination_set(prefix.u8, sizeof(ipv6_addr_t), fib_dest_set, &dst_size);
+    fib_get_destination_set(gnrc_ipv6_fib_table, prefix.u8, sizeof(ipv6_addr_t), fib_dest_set, &dst_size);
 
     int size = sizeof(icmpv6_hdr_t) + sizeof(gnrc_rpl_dao_t) +
         (sizeof(gnrc_rpl_opt_target_t) * (dst_size + 1)) + sizeof(gnrc_rpl_opt_transit_t);
