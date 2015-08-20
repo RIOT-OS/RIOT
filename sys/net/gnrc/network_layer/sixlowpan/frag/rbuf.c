@@ -93,7 +93,7 @@ void rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
 #ifdef MODULE_GNRC_SIXLOWPAN_IPHC
         else if (sixlowpan_iphc_is(data)) {
             size_t iphc_len;
-            iphc_len = gnrc_sixlowpan_iphc_decode(entry->pkt, pkt,
+            iphc_len = gnrc_sixlowpan_iphc_decode(entry->pkt, pkt, entry->pkt->size,
                                                   sizeof(sixlowpan_frag_t));
             if (iphc_len == 0) {
                 DEBUG("6lo rfrag: could not decode IPHC dispatch\n");

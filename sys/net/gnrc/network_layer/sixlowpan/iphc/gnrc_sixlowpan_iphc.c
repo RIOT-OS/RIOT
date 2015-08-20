@@ -90,7 +90,8 @@ static inline bool _context_overlaps_iid(gnrc_sixlowpan_ctx_t *ctx,
              (iid->uint8[(ctx->prefix_len / 8) - 8] & byte_mask[ctx->prefix_len % 8])));
 }
 
-size_t gnrc_sixlowpan_iphc_decode(gnrc_pktsnip_t *ipv6, gnrc_pktsnip_t *pkt, size_t offset)
+size_t gnrc_sixlowpan_iphc_decode(gnrc_pktsnip_t *ipv6, gnrc_pktsnip_t *pkt, size_t datagram_size,
+                                  size_t offset)
 {
     gnrc_netif_hdr_t *netif_hdr = pkt->next->data;
     ipv6_hdr_t *ipv6_hdr;
@@ -370,7 +371,12 @@ size_t gnrc_sixlowpan_iphc_decode(gnrc_pktsnip_t *ipv6, gnrc_pktsnip_t *pkt, siz
 
     /* set IPv6 header payload length field to the length of whatever is left
      * after removing the 6LoWPAN header */
-    ipv6_hdr->len = byteorder_htons((uint16_t)(pkt->size - payload_offset));
+    if (datagram_size == 0) {
+        ipv6_hdr->len = byteorder_htons((uint16_t)(pkt->size - payload_offset));
+    }
+    else {
+        ipv6_hdr->len = byteorder_htons((uint16_t)(datagram_size - sizeof(ipv6_hdr_t)));
+    }
 
 
     return payload_offset;
