@@ -91,6 +91,7 @@ long int (*real_random)(void);
 const char* (*real_gai_strerror)(int errcode);
 FILE* (*real_fopen)(const char *path, const char *mode);
 mode_t (*real_umask)(mode_t cmask);
+ssize_t (*real_writev)(int fildes, const struct iovec *iov, int iovcnt);
 
 #ifdef __MACH__
 #else
@@ -204,6 +205,17 @@ ssize_t _native_write(int fd, const void *buf, size_t count)
 
     _native_syscall_enter();
     r = real_write(fd, buf, count);
+    _native_syscall_leave();
+
+    return r;
+}
+
+ssize_t _native_writev(int fd, const struct iovec *iov, int iovcnt)
+{
+    ssize_t r;
+
+    _native_syscall_enter();
+    r = real_writev(fd, iov, iovcnt);
     _native_syscall_leave();
 
     return r;
@@ -424,6 +436,7 @@ void _native_init_syscalls(void)
     *(void **)(&real_ferror) = dlsym(RTLD_NEXT, "ferror");
     *(void **)(&real_clearerr) = dlsym(RTLD_NEXT, "clearerr");
     *(void **)(&real_umask) = dlsym(RTLD_NEXT, "umask");
+    *(void **)(&real_writev) = dlsym(RTLD_NEXT, "writev");
 #ifdef __MACH__
 #else
     *(void **)(&real_clock_gettime) = dlsym(RTLD_NEXT, "clock_gettime");

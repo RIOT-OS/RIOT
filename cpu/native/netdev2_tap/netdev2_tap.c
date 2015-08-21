@@ -10,12 +10,13 @@
  */
 
 /*
- * @ingroup net_dev_eth
+ * @ingroup netdev2
  * @{
  * @brief   Low-level ethernet driver for tap interfaces
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
  * @}
  */
+#include <assert.h>
 #include <err.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -47,55 +48,157 @@
 
 #include "native_internal.h"
 
-#include "net/dev_eth.h"
-#include "dev_eth_tap.h"
+#include "net/eui64.h"
+#include "net/netdev2.h"
+#include "net/ethernet.h"
+#include "net/ethernet/hdr.h"
+#include "netdev2_tap.h"
+#include "net/netopt.h"
+#include "net/eui64.h"
 
-#define ENABLE_DEBUG 0
+#define ENABLE_DEBUG (0)
 #include "debug.h"
 
 /* support one tap interface for now */
-dev_eth_tap_t dev_eth_tap;
+netdev2_tap_t netdev2_tap;
 
 #ifdef __MACH__
 pid_t _sigio_child_pid;
-static void _sigio_child(dev_eth_tap_t *dev);
+static void _sigio_child(netdev2_tap_t *dev);
 #endif
 
-/* dev_eth interface */
-static int _init(dev_eth_t *ethdev);
-static void _cleanup(dev_eth_t *ethdev);
-static int _send(dev_eth_t *ethdev, char* buf, int n);
-static int _recv(dev_eth_t *ethdev, char* buf, int n);
+/* netdev2 interface */
+static int _init(netdev2_t *netdev);
+static int _send(netdev2_t *netdev, const struct iovec *vector, int n);
+static int _recv(netdev2_t *netdev, char* buf, int n);
 
-static inline void _get_mac_addr(dev_eth_t *ethdev, uint8_t *dst) {
-    dev_eth_tap_t *dev = (dev_eth_tap_t*)ethdev;
+static inline void _get_mac_addr(netdev2_t *netdev, uint8_t *dst)
+{
+    netdev2_tap_t *dev = (netdev2_tap_t*)netdev;
     memcpy(dst, dev->addr, ETHERNET_ADDR_LEN);
 }
 
-static inline int _get_promiscous(dev_eth_t *ethdev) {
-    dev_eth_tap_t *dev = (dev_eth_tap_t*)ethdev;
+static inline void _set_mac_addr(netdev2_t *netdev, uint8_t *src)
+{
+    netdev2_tap_t *dev = (netdev2_tap_t*)netdev;
+    memcpy(dev->addr, src, ETHERNET_ADDR_LEN);
+}
+
+static inline int _get_promiscous(netdev2_t *netdev)
+{
+    netdev2_tap_t *dev = (netdev2_tap_t*)netdev;
     return dev->promiscous;
 }
 
-static inline int _set_promiscous(dev_eth_t *ethdev, int value) {
-    dev_eth_tap_t *dev = (dev_eth_tap_t*)ethdev;
+static inline int _set_promiscous(netdev2_t *netdev, int value)
+{
+    netdev2_tap_t *dev = (netdev2_tap_t*)netdev;
     dev->promiscous = value;
     return value;
 }
 
-static inline void _isr(dev_eth_t *ethdev) {
-    dev_eth_rx_handler(ethdev);
+static inline int _get_iid(netdev2_t *netdev, eui64_t *value, size_t max_len)
+{
+    if (max_len < sizeof(eui64_t)) {
+        return -EOVERFLOW;
+    }
+
+    uint8_t addr[ETHERNET_ADDR_LEN];
+    _get_mac_addr(netdev, addr);
+    ethernet_get_iid(value, addr);
+
+    return sizeof(eui64_t);
+}
+static inline void _isr(netdev2_t *netdev)
+{
+    if (netdev->event_callback) {
+        netdev->event_callback(netdev, NETDEV2_EVENT_RX_COMPLETE, (void*)NETDEV2_TYPE_ETHERNET);
+    }
+#if DEVELHELP
+    else {
+        puts("netdev2_tap: _isr(): no event_callback set.");
+    }
+#endif
 }
 
-static eth_driver_t eth_driver_tap = {
-    .init = _init,
-    .cleanup = _cleanup,
+int _get(netdev2_t *dev, netopt_t opt, void *value, size_t max_len)
+{
+    if (dev != (netdev2_t *)&netdev2_tap) {
+        return -ENODEV;
+    }
+
+    int res = 0;
+
+    switch (opt) {
+        case NETOPT_DEVICE_TYPE:
+            {
+               uint16_t *tgt = (uint16_t *)value;
+                *tgt = NETDEV2_TYPE_ETHERNET;
+                res = 2;
+                break;
+            }
+        case NETOPT_ADDRESS:
+            if (max_len < ETHERNET_ADDR_LEN) {
+                res = -EINVAL;
+            }
+            else {
+                _get_mac_addr(dev, (uint8_t*)value);
+                res = ETHERNET_ADDR_LEN;
+            }
+            break;
+        case NETOPT_ADDR_LEN:
+        case NETOPT_SRC_LEN:
+            assert(max_len == 2);
+            uint16_t *tgt = (uint16_t*)value;
+            *tgt=6;
+            res = sizeof(uint16_t);
+            break;
+        case NETOPT_PROMISCUOUSMODE:
+            *((bool*)value) = (bool)_get_promiscous(dev);
+            res = sizeof(bool);
+            break;
+        case NETOPT_IPV6_IID:
+            return _get_iid(dev, value, max_len);
+        default:
+            res = -ENOTSUP;
+            break;
+    }
+
+    return res;
+}
+
+int _set(netdev2_t *dev, netopt_t opt, void *value, size_t value_len)
+{
+    (void)value_len;
+
+    if (dev != (netdev2_t *)&netdev2_tap) {
+        return -ENODEV;
+    }
+
+    int res = 0;
+
+    switch (opt) {
+        case NETOPT_ADDRESS:
+            assert(value_len==ETHERNET_ADDR_LEN);
+            _set_mac_addr(dev, (uint8_t*)value);
+            break;
+        case NETOPT_PROMISCUOUSMODE:
+            _set_promiscous(dev, ((bool *)value)[0]);
+            break;
+        default:
+            return -ENOTSUP;
+    }
+
+    return res;
+}
+
+static netdev2_driver_t netdev2_driver_tap = {
     .send = _send,
     .recv = _recv,
-    .get_mac_addr = _get_mac_addr,
-    .get_promiscous = _get_promiscous,
-    .set_promiscous = _set_promiscous,
+    .init = _init,
     .isr = _isr,
+    .get = _get,
+    .set = _set,
 };
 
 /* driver implementation */
@@ -111,18 +214,25 @@ static inline bool _is_addr_multicast(uint8_t *addr)
     return (addr[0] & 0x01);
 }
 
-static int _recv(dev_eth_t *dev_eth, char *buf, int len) {
-    dev_eth_tap_t *dev = (dev_eth_tap_t*)dev_eth;
+static int _recv(netdev2_t *netdev2, char *buf, int len)
+{
+    netdev2_tap_t *dev = (netdev2_tap_t*)netdev2;
+
+    if (!buf) {
+        /* no way of figuring out packet size without racey buffering,
+         * so we return the maximum possible size */
+        return 576;
+    }
 
     int nread = real_read(dev->tap_fd, buf, len);
-    DEBUG("gnrc_tapnet: read %d bytes\n", nread);
+    DEBUG("netdev2_tap: read %d bytes\n", nread);
 
     if (nread > 0) {
         ethernet_hdr_t *hdr = (ethernet_hdr_t *)buf;
         if (!(dev->promiscous) && !_is_addr_multicast(hdr->dst) &&
             !_is_addr_broadcast(hdr->dst) &&
             (memcmp(hdr->dst, dev->addr, ETHERNET_ADDR_LEN) != 0)) {
-            DEBUG("gnrc_eth_dev: received for %02x:%02x:%02x:%02x:%02x:%02x\n"
+            DEBUG("netdev2_tap: received for %02x:%02x:%02x:%02x:%02x:%02x\n"
                   "That's not me => Dropped\n",
                   hdr->dst[0], hdr->dst[1], hdr->dst[2],
                   hdr->dst[3], hdr->dst[4], hdr->dst[5]);
@@ -146,7 +256,7 @@ static int _recv(dev_eth_t *dev_eth, char *buf, int len) {
             extern ssize_t (*real_write)(int fd, const void * buf, size_t count);
             real_write(_sig_pipefd[1], &sig, sizeof(int));
             _native_sigpend++;
-            DEBUG("dev_eth_tap: sigpend++\n");
+            DEBUG("netdev2_tap: sigpend++\n");
         }
         else {
 #ifdef __MACH__
@@ -162,7 +272,7 @@ static int _recv(dev_eth_t *dev_eth, char *buf, int len) {
         if ((errno == EAGAIN) || (errno == EWOULDBLOCK)) {
         }
         else {
-            err(EXIT_FAILURE, "dev_eth_tap: read");
+            err(EXIT_FAILURE, "netdev2_tap: read");
         }
     }
     else if (nread == 0) {
@@ -175,30 +285,33 @@ static int _recv(dev_eth_t *dev_eth, char *buf, int len) {
     return -1;
 }
 
-static int _send(dev_eth_t *ethdev, char* buf, int n) {
-    dev_eth_tap_t *dev = (dev_eth_tap_t*)ethdev;
-    return _native_write(dev->tap_fd, buf, n);
+static int _send(netdev2_t *netdev, const struct iovec *vector, int n)
+{
+    netdev2_tap_t *dev = (netdev2_tap_t*)netdev;
+    return _native_writev(dev->tap_fd, vector, n);
 }
 
-void dev_eth_tap_setup(dev_eth_tap_t *dev, const char *name) {
-    dev->ethdev.driver = &eth_driver_tap;
+void netdev2_tap_setup(netdev2_tap_t *dev, const char *name) {
+    dev->netdev.driver = &netdev2_driver_tap;
     strncpy(dev->tap_name, name, IFNAMSIZ);
 }
 
-void dev_eth_tap_cleanup(dev_eth_tap_t *dev) {
-    if (!dev) {
-        return;
-    }
-    dev_eth_cleanup((dev_eth_t *) dev);
-}
-
 static void _tap_isr(void) {
-    dev_eth_isr(((dev_eth_t *) &dev_eth_tap));
+    netdev2_t *netdev = (netdev2_t *)&netdev2_tap;
+
+    if (netdev->event_callback) {
+        netdev->event_callback(netdev, NETDEV2_EVENT_ISR, netdev->isr_arg);
+    }
+    else {
+        puts("netdev2_tap: _isr: no event callback.");
+    }
 }
 
-static int _init(dev_eth_t *ethdev)
+static int _init(netdev2_t *netdev)
 {
-    dev_eth_tap_t *dev = (dev_eth_tap_t*)ethdev;
+    DEBUG("%s:%s:%u\n", RIOT_FILE_RELATIVE, __func__, __LINE__);
+
+    netdev2_tap_t *dev = (netdev2_tap_t*)netdev;
 
     /* check device parametrs */
     if (dev == NULL) {
@@ -284,10 +397,8 @@ static int _init(dev_eth_t *ethdev)
     return 0;
 }
 
-static void _cleanup(dev_eth_t *ethdev)
+void netdev2_tap_cleanup(netdev2_tap_t *dev)
 {
-    dev_eth_tap_t *dev = (dev_eth_tap_t*)ethdev;
-
     /* Do we have a device */
     if (!dev) {
         return;
@@ -304,7 +415,7 @@ static void _cleanup(dev_eth_t *ethdev)
 }
 
 #ifdef __MACH__
-static void _sigio_child(dev_eth_tap_t *dev)
+static void _sigio_child(netdev2_tap_t *dev)
 {
     pid_t parent = _native_pid;
     if ((_sigio_child_pid = real_fork()) == -1) {

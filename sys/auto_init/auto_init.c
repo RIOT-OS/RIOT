@@ -84,9 +84,8 @@
 #include "net/gnrc/udp.h"
 #endif
 
-#ifdef MODULE_DEV_ETH_AUTOINIT
-#include "net/dev_eth.h"
-#include "dev_eth_autoinit.h"
+#ifdef MODULE_FIB
+#include "net/fib.h"
 #endif
 
 #define ENABLE_DEBUG (0)
@@ -182,9 +181,9 @@ void auto_init(void)
     auto_init_kw2xrf();
 #endif
 
-#ifdef MODULE_GNRC_NETDEV_ETH
-    extern void auto_init_gnrc_netdev_eth(void);
-    auto_init_gnrc_netdev_eth();
+#ifdef MODULE_NETDEV2_TAP
+    extern void auto_init_netdev2_tap(void);
+    auto_init_netdev2_tap();
 #endif
 
 #endif /* MODULE_AUTO_INIT_GNRC_NETIF */

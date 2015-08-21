@@ -47,6 +47,7 @@
 #include <time.h>
 #include <sys/time.h>
 #include <sys/stat.h>
+#include <sys/uio.h>
 
 #include "kernel_types.h"
 
@@ -123,6 +124,7 @@ extern long int (*real_random)(void);
 extern const char* (*real_gai_strerror)(int errcode);
 extern FILE* (*real_fopen)(const char *path, const char *mode);
 extern mode_t (*real_umask)(mode_t cmask);
+extern ssize_t (*real_writev)(int fildes, const struct iovec *iov, int iovcnt);
 
 #ifdef __MACH__
 #else
@@ -160,6 +162,7 @@ extern fd_set _native_rfds;
 
 ssize_t _native_read(int fd, void *buf, size_t count);
 ssize_t _native_write(int fd, const void *buf, size_t count);
+ssize_t _native_writev(int fildes, const struct iovec *iov, int iovcnt);
 
 /**
  * register interrupt handler handler for interrupt sig

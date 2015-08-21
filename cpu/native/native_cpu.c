@@ -49,9 +49,9 @@
 #include "cpu.h"
 #include "cpu_conf.h"
 
-#ifdef MODULE_DEV_ETH_TAP
-#include "dev_eth_tap.h"
-extern dev_eth_tap_t dev_eth_tap;
+#ifdef MODULE_NETDEV2_TAP
+#include "netdev2_tap.h"
+extern netdev2_tap_t netdev2_tap;
 #endif
 
 #include "native_internal.h"
@@ -75,8 +75,8 @@ int reboot_arch(int mode)
     /* TODO: close stdio fds */
 #endif
 
-#ifdef MODULE_DEV_ETH_TAP
-    dev_eth_tap_cleanup(&dev_eth_tap);
+#ifdef MODULE_NETDEV2_TAP
+    netdev2_tap_cleanup(&netdev2_tap);
 #endif
 
     if (real_execve(_native_argv[0], _native_argv, NULL) == -1) {
