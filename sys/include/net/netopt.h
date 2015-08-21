@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2015 Freie Universität Berlin
+ *               2015 Kaspar Schleiser <kaspar@schleiser.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -18,6 +19,7 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
+ * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
 #ifndef NETOPT_H_
@@ -176,6 +178,15 @@ typedef enum {
                                  *   state of the network device is @ref NETOPT_STATE_IDLE */
     /* add other states if needed */
 } netopt_state_t;
+
+/**
+ * @brief   Get a string ptr corresponding to opt, for debugging
+ *
+ * @param[in] opt   The option to get a string representation for
+ *
+ * @return          ptr to string representation for given option or "unknown"
+ */
+const char *netopt2str(netopt_t opt);
 
 #ifdef __cplusplus
 }
