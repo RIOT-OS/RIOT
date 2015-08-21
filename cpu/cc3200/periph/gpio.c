@@ -46,6 +46,7 @@
 #include "sched.h"
 #include "thread.h"
 #include "periph/gpio.h"
+#include "board.h"
 #include "periph_conf.h"
 
 /**
@@ -61,13 +62,6 @@
 
 #define NOT_A_PORT 0
 #define NOT_A_PIN 0
-
-#define CHANGE 4
-#define FALLING 3
-#define RISING 2
-#define HIGH 0x1
-#define LOW  0x0
-
 
 #define S0 1
 #define S1 2
@@ -227,6 +221,12 @@ int gpio_init(gpio_t dev, gpio_dir_t dir, gpio_pp_t pushpull)
 	uint8_t bit = digitalPinToBitMask(dev);
 	uint8_t port = digitalPinToPort(dev);
 
+//	MAP_PRCMPeripheralClkEnable(PRCM_GPIOA0, PRCM_RUN_MODE_CLK);
+//	MAP_PRCMPeripheralClkEnable(PRCM_GPIOA1, PRCM_RUN_MODE_CLK);
+//	MAP_PRCMPeripheralClkEnable(PRCM_GPIOA2, PRCM_RUN_MODE_CLK);
+//	MAP_PRCMPeripheralClkEnable(PRCM_GPIOA3, PRCM_RUN_MODE_CLK);
+
+
 	if (port == NOT_A_PORT) return -1;
 
 	uint32_t portBase = (uint32_t) portBASERegister(port);
@@ -242,7 +242,7 @@ int gpio_init(gpio_t dev, gpio_dir_t dir, gpio_pp_t pushpull)
 
 	switch (pushpull) {
 	case GPIO_NOPULL:
-		MAP_PinConfigSet(pinNum, PIN_STRENGTH_2MA, PIN_TYPE_STD_PU);
+		//MAP_PinConfigSet(pinNum, PIN_STRENGTH_2MA, PIN_TYPE_STD_PU);
 		break;
 	case GPIO_PULLUP:
 		MAP_PinConfigSet(pinNum, PIN_STRENGTH_2MA, PIN_TYPE_STD_PU);
@@ -414,26 +414,28 @@ int gpio_read(gpio_t dev)
 
 void gpio_set(gpio_t dev)
 {
-	uint8_t bit = digitalPinToBitMask(dev);
-	uint8_t port = digitalPinToPort(dev);
-
-	if (port == NOT_A_PORT) return;
-
-	uint32_t portBase = (uint32_t) portBASERegister(port);
-
-	MAP_GPIOPinWrite(portBase, bit, HIGH);
+//	uint8_t bit = digitalPinToBitMask(dev);
+//	uint8_t port = digitalPinToPort(dev);
+//
+//	if (port == NOT_A_PORT) return;
+//
+//	uint32_t portBase = (uint32_t) portBASERegister(port);
+//
+//	MAP_GPIOPinWrite(portBase, bit, HIGH);
+	gpio_write(dev, HIGH);
 }
 
 void gpio_clear(gpio_t dev)
 {
-	uint8_t bit = digitalPinToBitMask(dev);
-	uint8_t port = digitalPinToPort(dev);
-
-	if (port == NOT_A_PORT) return;
-
-	uint32_t portBase = (uint32_t) portBASERegister(port);
-
-	MAP_GPIOPinWrite(portBase, bit, LOW);
+//	uint8_t bit = digitalPinToBitMask(dev);
+//	uint8_t port = digitalPinToPort(dev);
+//
+//	if (port == NOT_A_PORT) return;
+//
+//	uint32_t portBase = (uint32_t) portBASERegister(port);
+//
+//	MAP_GPIOPinWrite(portBase, bit, LOW);
+	gpio_write(dev, LOW);
 }
 
 void gpio_toggle(gpio_t dev)
@@ -458,11 +460,11 @@ void gpio_write(gpio_t dev, int value)
 
 	MAP_GPIOPinWrite(portBase, bit, mask);
 
-    if (value) {
-        gpio_set(dev);
-    }
-    else {
-        gpio_clear(dev);
-    }
+//    if (value) {
+//        gpio_set(dev);
+//    }
+//    else {
+//        gpio_clear(dev);
+//    }
 }
 

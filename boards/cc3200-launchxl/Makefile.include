@@ -1,6 +1,6 @@
-# Define the cpu used by the CC2538DK board:
+# Define the cpu used by the CC3200 board:
 export CPU        = cc3200
-# export CPU_MODEL ?= cc2538nf53
+# export CPU_MODEL ?= cc3200
 
 # setup serial terminal
 export PORT      ?= /dev/ttyUSB1
@@ -8,7 +8,7 @@ include $(RIOTBOARD)/Makefile.include.serial
 
 # debugger config
 export DEBUGGER = $(RIOTBOARD)/$(BOARD)/dist/debug.sh
-export DEBUGSERVER = JLinkGDBServer -device CC2538SF53
+export DEBUGSERVER = JLinkGDBServer -device CC3200
 export RESET = $(RIOTBOARD)/$(BOARD)/dist/reset.sh
 
 # Define the flash-tool and default port:

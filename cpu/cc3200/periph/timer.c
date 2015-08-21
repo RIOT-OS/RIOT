@@ -19,6 +19,8 @@
  */
 
 #include <stdlib.h>
+
+#include "panic.h"
 #include <sys/types.h>
 
 #include "periph_conf.h"
@@ -46,6 +48,9 @@ void signal_error(const char* err);
 // ticks calibration for time elapsed between TAR read and TIMER_MATCH value written to register
 #define ELAPSED_TICKS 20
 
+#define TIM2_CHANNELS 6
+#define TIM3_CHANNELS 32
+
 /** Type for timer state */
 typedef struct {
 	void (*cb)(int);
@@ -54,19 +59,6 @@ typedef struct {
 /** Timer state memory */
 timer_conf_t config[MAX_TIMERS];
 
-typedef struct channel_struct {
-	unsigned int value;
-	int channel;
-} channel_struct;
-
-channel_struct timer_list[NUM_CHANNELS];
-
-#define TIM2_CHANNELS 6
-#define TIM3_CHANNELS 32
-
-channel_struct timer2_slot[TIM2_CHANNELS];
-
-u_char header_slot;
 
 typedef struct timer_queue_item {
 	unsigned long long value;
@@ -90,13 +82,13 @@ void irq_timer0_handler(void) {
 }
 
 void irq_timer1_handler(void) {
-	config[TIMER_1].cb(0); // timer has one hw channel
 	timer_clear(TIMER_1, 0);
+	config[TIMER_1].cb(0); // timer has one hw channel
 }
 
 void irq_timer2_handler(void) {
 
-	int sts = HWREG(TIMERA2_BASE + TIMER_O_MIS);
+	unsigned long sts = HWREG(TIMERA2_BASE + TIMER_O_MIS);
 
 	timer_queue_item *curr_ptr = busyq2;
 
@@ -114,36 +106,40 @@ void irq_timer2_handler(void) {
 
 	timer_queue_item *active = busyq2;
 
-	config[TIMER_2].cb(active->channel);
+	//config[TIMER_2].cb(active->channel);
+	int ch = active->channel;
 
 	busyq2 = active->next;
 	active->next = freeq2;
 	freeq2 = active;
 
+	config[TIMER_2].cb(ch);
+
 	timer_clear(TIMER_2, 0);
 
 	sts = HWREG(TIMERA2_BASE + TIMER_O_TAR);
-	//HWREG(TIMERA2_BASE + TIMER_O_TAMATCHR) = (sts > busyq2->value) ? sts + 40 : busyq->value;
 
 	while (busyq2 && sts > (busyq2->value - ELAPSED_TICKS)) {
-		config[TIMER_2].cb(busyq2->channel);
+		ch = busyq2->channel;
+		//config[TIMER_2].cb(busyq2->channel);
+
 		active = busyq2;
 		busyq2 = active->next;
 		active->next = freeq2;
 		freeq2 = active;
+
+		config[TIMER_2].cb(ch);
+
 		sts = HWREG(TIMERA2_BASE + TIMER_O_TAR);
 	}
 	if(busyq2) {
 		HWREG(TIMERA2_BASE + TIMER_O_TAMATCHR) = busyq2->value;
-	} else {
-		// no timer left into buffer
-		MAP_TimerIntDisable(TIMERA2_BASE, TIMER_TIMA_MATCH);
 	}
 }
 
 void irq_timer3_handler(void) {
 
-	int sts = HWREG(TIMERA3_BASE + TIMER_O_MIS);
+	unsigned long sts = HWREG(TIMERA3_BASE + TIMER_O_MIS);
 
 	timer_queue_item *curr_ptr = busyq3;
 
@@ -161,22 +157,30 @@ void irq_timer3_handler(void) {
 
 	timer_queue_item *active = busyq3;
 
-	config[TIMER_3].cb(active->channel);
+	//config[TIMER_3].cb(active->channel);
+	int ch = active->channel;
 
 	busyq3 = active->next;
 	active->next = freeq3;
 	freeq3 = active;
 
+	config[TIMER_3].cb(ch);
+
 	timer_clear(TIMER_3, 0);
 
 	sts = HWREG(TIMERA3_BASE + TIMER_O_TAR);
 
-	while (busyq3 && sts > busyq3->value) {
-		config[TIMER_3].cb(busyq3->channel);
+	while (busyq3 && sts > (busyq3->value - ELAPSED_TICKS)) {
+		//config[TIMER_3].cb(busyq3->channel);
+		ch = busyq3->channel;
+
 		active = busyq3;
 		busyq3 = active->next;
 		active->next = freeq3;
 		freeq3 = active;
+
+		config[TIMER_3].cb(ch);
+
 		sts = HWREG(TIMERA3_BASE + TIMER_O_TAR);
 	}
 	if (busyq3) {
@@ -311,26 +315,7 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int)) {
 	return 0;
 }
 
-
-int timer_set(tim_t dev, int channel, unsigned int timeout) {
-
-	switch (dev) {
-	case TIMER_0:
-		return timer_set_absolute(dev, channel, HWREG(TIMERA0_BASE + TIMER_O_TAR) + timeout);
-	case TIMER_1:
-		return timer_set_absolute(dev, channel, HWREG(TIMERA1_BASE + TIMER_O_TAR) + timeout);
-	case TIMER_2:
-		return timer_set_absolute(dev, channel, HWREG(TIMERA2_BASE + TIMER_O_TAR) + timeout);
-	case TIMER_3:
-		return timer_set_absolute(dev, channel, HWREG(TIMERA3_BASE + TIMER_O_TAR) + timeout);
-	default:
-		break;
-	}
-
-	return 0;
-}
-
-int timer_set_absolute(tim_t dev, int channel, unsigned int value) {
+int set_absolute(tim_t dev, int channel, unsigned long long value) {
 	unsigned long long abstimeout;
 
 	switch (dev) {
@@ -346,10 +331,10 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value) {
 
 		if (freeq2 == NULL) {
 			// no free timer left
-			signal_error("ERR: timer not scheduled");
+			core_panic(SW_TIMERS_EXAUSTED, "TIM2: timer no space left");
 			break;
 		}
-		abstimeout = (unsigned long long)(value) - CALIBRATION;
+		abstimeout = value - CALIBRATION;
 
 		if (busyq2) {
 			// some timers already activated
@@ -395,10 +380,10 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value) {
 	case TIMER_3:
 		if (freeq3 == NULL) {
 			// no free timer left
-			signal_error("ERR: timer not scheduled");
+			core_panic(SW_TIMERS_EXAUSTED, "TIM3: timer no space left");
 			break;
 		}
-		abstimeout = (unsigned long long)(value) - CALIBRATION;
+		abstimeout = value - CALIBRATION;
 
 		if (busyq3) {
 			// some timers already activated
@@ -445,7 +430,31 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value) {
 	}
 
 	return 0;
+
 }
+
+int timer_set(tim_t dev, int channel, unsigned int timeout) {
+
+	switch (dev) {
+	case TIMER_0:
+		return timer_set_absolute(dev, channel, HWREG(TIMERA0_BASE + TIMER_O_TAR) + timeout);
+	case TIMER_1:
+		return timer_set_absolute(dev, channel, HWREG(TIMERA1_BASE + TIMER_O_TAR) + timeout);
+	case TIMER_2:
+		return set_absolute(dev, channel, HWREG(TIMERA2_BASE + TIMER_O_TAR) + (unsigned long long)timeout);
+	case TIMER_3:
+		return set_absolute(dev, channel, HWREG(TIMERA3_BASE + TIMER_O_TAR) + (unsigned long long)timeout);
+	default:
+		break;
+	}
+
+	return 0;
+}
+
+int timer_set_absolute(tim_t dev, int channel, unsigned int value) {
+	return set_absolute(dev,channel,value);
+}
+
 
 int timer_clear(tim_t dev, int channel) {
 	switch (dev) {

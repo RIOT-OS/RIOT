@@ -18,14 +18,28 @@
  */
 
 #ifndef BOARD_H_
-#define BOARD_H_
+#define BOARD_H
 
+#include <stdint.h>
 #include "cpu.h"
 //#include "periph/gpio.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#define CHANGE 4
+#define FALLING 3
+#define RISING 2
+#define HIGH 0x1
+#define LOW  0x0
+
+#define RED_LED 29
+#define GREEN_LED 10
+#define YELLOW_LED 9
+#define PUSH1 3
+#define PUSH2 11
+
 
 /**
  * Define the nominal CPU core clock in this board
@@ -45,6 +59,18 @@ extern "C" {
 #define STDIO_BAUDRATE      115200
 #define STDIO_RX_BUFSIZE    (64U)
 /** @} */
+
+
+
+
+
+
+
+
+
+
+
+
 
 /**
  * @name Macros for controlling the on-board LEDs.
@@ -76,6 +102,18 @@ extern "C" {
 #define LED_OFF             LED_RED_OFF
 #define LED_TOGGLE          LED_RED_TOGGLE
 /** @} */
+
+
+
+
+
+
+
+
+
+
+
+
 
 /**
  * @brief Initialize board specific hardware, including clock, LEDs and std-IO

@@ -31,7 +31,11 @@
 #include "driverlib/gpio.h"
 #include "driverlib/prcm.h"
 
+#include "board.h"
+
 #define __ASM            __asm
 #define __STATIC_INLINE  static inline
+
+#define SW_TIMERS_EXAUSTED 111
 
 #endif /* CPU_INCLUDE_CC3200_H_ */
