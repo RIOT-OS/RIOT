@@ -1,0 +1,23 @@
+From f3298fc4bdea6a73c85ffc2e48228dff208389d0 Mon Sep 17 00:00:00 2001
+From: Frank Holtz <d00616@users.noreply.github.com>
+Date: Fri, 21 Aug 2015 14:23:30 +0200
+Subject: [PATCH] Makefile
+
+---
+ Makefile | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/Makefile b/Makefile
+index 33c8152..b89784c 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1,4 +1,6 @@
+ MODULE:=$(shell basename $(CURDIR))
+ INCLUDES += -I$(RIOTBASE) -I$(RIOTBASE)/sys/include -I$(RIOTBASE)/core/include -I$(RIOTBASE)/drivers/include -I$(RIOTCPU)/$(CPU)/include
++CFLAGS += -DRIOT_BUILD
++#FEATURES_REQUIRED += cpp
+ 
+ include $(RIOTBASE)/Makefile.base
+-- 
+1.8.3.1
+

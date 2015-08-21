@@ -1,0 +1,53 @@
+#!/usr/bin/expect
+
+spawn make term
+
+set timeout 5
+expect {
+    "test_shell" {}
+    timeout { exit 1 }
+}
+
+set timeout 1
+
+send "\n"
+expect {
+    ">" {}
+    timeout { exit 1 }
+}
+
+send "start_test\n"
+expect {
+    "\[TEST_START\]" {}
+    timeout { exit 1 }
+}
+expect {
+    ">" {}
+    timeout { exit 1 }
+}
+
+for { set i 0 } { $i < 10 } { incr i 1 } {
+    send "123456789012345678901234567890123456789012345678901234567890\n"
+    expect {
+        "shell: command not found:" {
+            expect {
+                "123456789012345678901234567890123456789012345678901234567890" {}
+                timeout { exit 1 }
+            }
+        }
+        timeout { exit 1 }
+    }
+}
+
+send "end_test\n"
+expect {
+    "\[TEST_END\]" {}
+    timeout { exit 1 }
+}
+expect {
+    ">" {}
+    timeout { exit 1 }
+}
+
+sleep 1
+puts "\nTest successful!\n"
