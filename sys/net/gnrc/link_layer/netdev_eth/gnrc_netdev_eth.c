@@ -223,7 +223,7 @@ static inline int _get_max_pkt_sz(uint16_t *value, size_t max_len)
         return -EOVERFLOW;
     }
 
-    *value = ETHERNET_MAX_LEN;
+    *value = ETHERNET_DATA_LEN;
 
     return sizeof(uint16_t);
 }

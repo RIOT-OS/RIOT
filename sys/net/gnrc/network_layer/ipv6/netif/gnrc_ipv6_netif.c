@@ -695,6 +695,7 @@ void gnrc_ipv6_netif_init_by_dev(void)
     for (size_t i = 0; i < ifnum; i++) {
         ipv6_addr_t addr;
         eui64_t iid;
+        uint16_t mtu;
         gnrc_ipv6_netif_t *ipv6_if = gnrc_ipv6_netif_get(ifs[i]);
 
         if (ipv6_if == NULL) {
@@ -730,6 +731,7 @@ void gnrc_ipv6_netif_init_by_dev(void)
         }
 #endif
 
+        /* set link-local address */
         if ((gnrc_netapi_get(ifs[i], NETOPT_IPV6_IID, 0, &iid,
                              sizeof(eui64_t)) < 0)) {
             mutex_unlock(&ipv6_if->mutex);
@@ -739,6 +741,16 @@ void gnrc_ipv6_netif_init_by_dev(void)
         ipv6_addr_set_aiid(&addr, iid.uint8);
         ipv6_addr_set_link_local_prefix(&addr);
         _add_addr_to_entry(ipv6_if, &addr, 64, 0);
+
+        /* set link MTU */
+        if ((gnrc_netapi_get(ifs[i], NETOPT_MAX_PACKET_SIZE, 0, &mtu,
+                             sizeof(uint16_t)) >= 0)) {
+            if (mtu >= IPV6_MIN_MTU) {
+                ipv6_if->mtu = mtu;
+            }
+            /* otherwise leave at GNRC_IPV6_NETIF_DEFAULT_MTU as initialized in
+             * gnrc_ipv6_netif_add() */
+        }
 
         mutex_unlock(&ipv6_if->mutex);
     }

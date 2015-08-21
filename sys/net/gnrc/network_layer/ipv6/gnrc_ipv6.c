@@ -11,6 +11,7 @@
  *
  * @file
  */
+#include <assert.h>
 #include <errno.h>
 #include <inttypes.h>
 #include <stdbool.h>
@@ -205,31 +206,29 @@ static void *_event_loop(void *args)
     return NULL;
 }
 
-#ifdef MODULE_GNRC_SIXLOWPAN
 static void _send_to_iface(kernel_pid_t iface, gnrc_pktsnip_t *pkt)
 {
+    ((gnrc_netif_hdr_t *)pkt->data)->if_pid = iface;
     gnrc_ipv6_netif_t *if_entry = gnrc_ipv6_netif_get(iface);
 
-    ((gnrc_netif_hdr_t *)pkt->data)->if_pid = iface;
-
+    assert(if_entry != NULL);
+    if (gnrc_pkt_len(pkt->next) > if_entry->mtu) {
+        DEBUG("ipv6: packet too big\n");
+        gnrc_pktbuf_release(pkt);
+        return;
+    }
+#ifdef MODULE_GNRC_SIXLOWPAN
     if ((if_entry != NULL) && (if_entry->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN)) {
         DEBUG("ipv6: send to 6LoWPAN instead\n");
         if (!gnrc_netapi_dispatch_send(GNRC_NETTYPE_SIXLOWPAN, GNRC_NETREG_DEMUX_CTX_ALL, pkt)) {
             DEBUG("ipv6: no 6LoWPAN thread found");
             gnrc_pktbuf_release(pkt);
         }
+        return;
     }
-    else {
-        gnrc_netapi_send(iface, pkt);
-    }
-}
-#else
-static inline void _send_to_iface(kernel_pid_t iface, gnrc_pktsnip_t *pkt)
-{
-    ((gnrc_netif_hdr_t *)pkt->data)->if_pid = iface;
+#endif
     gnrc_netapi_send(iface, pkt);
 }
-#endif
 
 /* functions for sending */
 static void _send_unicast(kernel_pid_t iface, uint8_t *dst_l2addr,
