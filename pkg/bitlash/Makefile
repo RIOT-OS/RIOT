@@ -19,8 +19,8 @@ all: patch
 	make -C $(CURDIR)/$(PKG_NAME)
 	make $(BINDIR)$(MODULE).a
 
-#patch: $(CURDIR)/$(PKG_NAME)/Makefile
-patch:
+patch: $(CURDIR)/$(PKG_NAME)/Makefile
+#patch:
 
 $(CURDIR)/$(PKG_NAME)/Makefile: $(CURDIR)/$(PKG_NAME)
 	$(foreach patch,$(shell ls [0-9][0-9][0-9][0-9]*.patch),cd "$<" && git am "../$(patch)" || { git am --abort; exit 1; };)
