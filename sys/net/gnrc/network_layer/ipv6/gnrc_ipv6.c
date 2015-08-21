@@ -41,6 +41,15 @@ static char _stack[GNRC_IPV6_STACK_SIZE + THREAD_EXTRA_STACKSIZE_PRINTF];
 static char _stack[GNRC_IPV6_STACK_SIZE];
 #endif
 
+#ifdef MODULE_FIB
+#include "net/fib.h"
+#include "net/fib/table.h"
+/**
+ * @brief the IPv6 forwarding table
+ */
+fib_entry_t gnrc_ipv6_fib_table[FIB_MAX_FIB_TABLE_ENTRIES];
+#endif
+
 #if ENABLE_DEBUG
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 #endif
@@ -68,6 +77,10 @@ kernel_pid_t gnrc_ipv6_init(void)
         gnrc_ipv6_pid = thread_create(_stack, sizeof(_stack), GNRC_IPV6_PRIO,
                                       CREATE_STACKTEST, _event_loop, NULL, "ipv6");
     }
+
+#ifdef MODULE_FIB
+    fib_init(gnrc_ipv6_fib_table);
+#endif
 
     return gnrc_ipv6_pid;
 }
@@ -655,6 +668,12 @@ static void _receive(gnrc_pktsnip_t *pkt)
 
     /* extract header */
     hdr = (ipv6_hdr_t *)ipv6->data;
+
+    /* if available, remove any padding that was added by lower layers
+     * to fulfill their minimum size requirements (e.g. ethernet) */
+    if (byteorder_ntohs(hdr->len) < pkt->size) {
+        gnrc_pktbuf_realloc_data(pkt, byteorder_ntohs(hdr->len));
+    }
 
     DEBUG("ipv6: Received (src = %s, ",
           ipv6_addr_to_str(addr_str, &(hdr->src), sizeof(addr_str)));

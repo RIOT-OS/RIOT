@@ -87,7 +87,7 @@ Core
 
 Supported platforms
 -------------------
-* improved iot-lab_M3 support
+* improved iotlab-m3 support
 * major improvements on the mbed LPC1768
 * improved at86rf231 radio driver
 * fixed hwtimer for MSP430

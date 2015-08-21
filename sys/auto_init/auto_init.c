@@ -85,10 +85,6 @@
 #include "dev_eth_autoinit.h"
 #endif
 
-#ifdef MODULE_FIB
-#include "net/fib.h"
-#endif
-
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
@@ -152,10 +148,6 @@ void auto_init(void)
 #ifdef MODULE_GNRC_UDP
     DEBUG("Auto init UDP module.\n");
     gnrc_udp_init();
-#endif
-#ifdef MODULE_FIB
-    DEBUG("Auto init FIB module.\n");
-    fib_init();
 #endif
 
 

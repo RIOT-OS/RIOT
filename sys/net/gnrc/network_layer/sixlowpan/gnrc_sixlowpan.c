@@ -129,7 +129,7 @@ static void _receive(gnrc_pktsnip_t *pkt)
         gnrc_pktsnip_t *ipv6 = gnrc_pktbuf_add(NULL, NULL, sizeof(ipv6_hdr_t),
                                                GNRC_NETTYPE_IPV6);
         if ((ipv6 == NULL) ||
-            (dispatch_size = gnrc_sixlowpan_iphc_decode(ipv6, pkt, 0)) == 0) {
+            (dispatch_size = gnrc_sixlowpan_iphc_decode(ipv6, pkt, 0, 0)) == 0) {
             DEBUG("6lo: error on IPHC decoding\n");
             if (ipv6 != NULL) {
                 gnrc_pktbuf_release(ipv6);
@@ -257,7 +257,7 @@ static void _send(gnrc_pktsnip_t *pkt)
 
     /* IP should not send anything here if it is not a 6LoWPAN interface,
      * so we don't need to check for NULL pointers */
-    if (datagram_size <= iface->max_frag_size) {
+    if (gnrc_pkt_len(pkt2->next) <= iface->max_frag_size) {
         DEBUG("6lo: Send SND command for %p to %" PRIu16 "\n",
               (void *)pkt2, hdr->if_pid);
         gnrc_netapi_send(hdr->if_pid, pkt2);

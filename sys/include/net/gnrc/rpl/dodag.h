@@ -193,16 +193,6 @@ gnrc_rpl_parent_t *gnrc_rpl_parent_get(gnrc_rpl_dodag_t *dodag, ipv6_addr_t *add
 void gnrc_rpl_parent_update(gnrc_rpl_dodag_t *dodag, gnrc_rpl_parent_t *parent);
 
 /**
- * @brief   Find the parent with the lowest rank and update the DODAG's preferred parent
- *
- * @param[in] dodag     Pointer to the DODAG
- *
- * @return  Pointer to the preferred parent, on success.
- * @return  NULL, otherwise.
- */
-gnrc_rpl_parent_t *gnrc_rpl_find_preferred_parent(gnrc_rpl_dodag_t *dodag);
-
-/**
  * @brief   Start a local repair.
  *
  * @param[in] dodag     Pointer to the DODAG

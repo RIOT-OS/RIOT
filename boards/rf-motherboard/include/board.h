@@ -46,11 +46,6 @@ extern "C" {
 
 /**
  * @name Assign the hardware timer
- */
-#define HW_TIMER            TIMER_0
-
-/**
- * @name Assign the hardware timer
  * @{
  */
 #define HW_TIMER            TIMER_0
@@ -61,7 +56,7 @@ extern "C" {
  * @{
  */
 #define AT86RF212B_SPI       SPI_1
-#define AT86RF212B_CS        GPIO(PORT_C,8)  // IO1
+#define AT86RF212B_CS        GPIO(PORT_B,12)  // SPI CS
 #define AT86RF212B_INT       GPIO(PORT_C,10) // IO3
 #define AT86RF212B_RESET     GPIO(PORT_C,7)  // IO0
 #define AT86RF212B_SLEEP     GPIO(PORT_C,9)  // IO2

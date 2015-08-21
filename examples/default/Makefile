@@ -47,7 +47,7 @@ ifneq (,$(filter msba2,$(BOARD)))
 	USEMODULE += mci
 	USEMODULE += random
 endif
-ifneq (,$(filter iot-lab_M3,$(BOARD)))
+ifneq (,$(filter iotlab-m3,$(BOARD)))
 	USEMODULE += isl29020
 	USEMODULE += lps331ap
 	USEMODULE += l3g4200d

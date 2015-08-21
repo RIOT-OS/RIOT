@@ -28,30 +28,30 @@ extern "C" {
 #include <stdint.h>
 #include <stdlib.h>
 
-#define UNIVERSAL_ADDRESS_SIZE (16)         /**< size of the used addresses in bytes        */
+#define UNIVERSAL_ADDRESS_SIZE (16)         /**< size of the used addresses in bytes */
 
 /**
  * @brief The container descriptor used to identify a universal address entry
  */
 typedef struct universal_address_container_t {
     uint8_t use_count;                       /**< The number of entries link here */
-    uint8_t address_size;                    /**< Size in bytes of the used genereic address */
-    uint8_t address[UNIVERSAL_ADDRESS_SIZE]; /**< the genereic address data */
+    uint8_t address_size;                    /**< Size in bytes of the used generic address */
+    uint8_t address[UNIVERSAL_ADDRESS_SIZE]; /**< The generic address data */
 } universal_address_container_t;
 
 /**
- * @brief initializes the datastructure for the entries
+ * @brief Initialize the data structure for the entries
  */
 void universal_address_init(void);
 
 /**
- * @brief resets the usecoumt for all entries
+ * @brief Resets the universal_address_container_t::use_count for all entries
  */
 void universal_address_reset(void);
 
 /**
- * @brief Adds a given address to the universal address entries
- *        if the entry already exists, the use_count will be increased.
+ * @brief Add a given address to the universal address entries. If the entry already exists,
+ *        the universal_address_container_t::use_count will be increased.
  *
  * @param[in] addr       pointer to the address
  * @param[in] addr_size  the number of bytes required for the address entry
@@ -62,15 +62,15 @@ void universal_address_reset(void);
 universal_address_container_t *universal_address_add(uint8_t *addr, size_t addr_size);
 
 /**
- * @brief Adds a given container from the universal address entries
- *        if the entry exists, the use_count will be decreased.
+ * @brief Add a given container from the universal address entries. If the entry exists,
+ *        the universal_address_container_t::use_count will be decreased.
  *
  * @param[in] entry  pointer to the universal_address_container_t to be removed
  */
 void universal_address_rem(universal_address_container_t *entry);
 
 /**
- * @brief copies the address from the given container to the provided pointer
+ * @brief Copy the address from the given container to the provided pointer
  *
  * @param[in] entry          pointer to the universal_address_container_t
  * @param[out] addr          pointer to store the address entry
@@ -84,9 +84,9 @@ uint8_t* universal_address_get_address(universal_address_container_t *entry,
                                        uint8_t *addr, size_t *addr_size);
 
 /**
- * @brief determines if the entry equals the provided address
+ * @brief Determine if the entry equals the provided address
  *        This function requires to be provided with the full size of the used
- *        address type behind *addr to be compareable with the address stored in *entry.
+ *        address type behind @p addr to be comparable with the address stored in @p entry.
  *
  * @param[in] entry       pointer to the universal_address_container_t for compare
  * @param[in] addr        pointer to the address for compare
@@ -104,9 +104,9 @@ int universal_address_compare(universal_address_container_t *entry,
 
 
 /**
-* @brief determines if the entry equals the provided prefix
+* @brief Determine if the entry equals the provided prefix
 *        This function requires to be provided with the full size of the used
-*        address type behind *prefix to be compareable with the address stored in *entry.
+*        address type behind @p prefix to be comparable with the address stored in @p entry.
 *
 *
 * @param[in] entry       pointer to the universal_address_container_t for compare
@@ -124,19 +124,19 @@ int universal_address_compare_prefix(universal_address_container_t *entry,
                             uint8_t *prefix, size_t prefix_size_in_bits);
 
 /**
- * @brief Prints the content of the given entry
+ * @brief Print the content of the given entry
  *
  * @param[in] entry  pointer to the universal_address_container_t to be printed
  */
 void universal_address_print_entry(universal_address_container_t *entry);
 
 /**
- * @brief returns the number of used entries
+ * @brief Return the number of used entries
  */
 int universal_address_get_num_used_entries(void);
 
 /**
- * @brief Prints the content of the genereic address table up to the used element
+ * @brief Print the content of the generic address table up to the used element
  */
 void universal_address_print_table(void);
 

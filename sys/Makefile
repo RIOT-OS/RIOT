@@ -59,6 +59,10 @@ ifneq (,$(filter udp,$(USEMODULE)))
     DIRS += net/transport_layer/udp
 endif
 
+ifneq (,$(filter netopt,$(USEMODULE)))
+    DIRS += net/crosslayer/netopt
+endif
+
 DIRS += $(dir $(wildcard $(addsuffix /Makefile, ${USEMODULE})))
 
 include $(RIOTBASE)/Makefile.base

@@ -15,6 +15,7 @@
  *              exception handlers
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Daniel Krebs <github@daniel-krebs.net>
  *
  * @}
  */
@@ -40,6 +41,8 @@ extern uint32_t _szero;
 extern uint32_t _ezero;
 extern uint32_t _sstack;
 extern uint32_t _estack;
+extern uint32_t _sram;
+extern uint32_t _eram;
 /** @} */
 
 /** @brief Interrupt stack canary value
@@ -83,11 +86,6 @@ const char* _fault_texts[_FAULT_ARRAY_LENGTH] = {
 		"Unaligned access UsageFault",
 		"Divide by zero UsageFault"
 };
-
-/**
- * @brief   Required by g++ cross compiler
- */
-void *__dso_handle;
 
 /**
  * @brief   Pre-start routine for CPU-specific settings

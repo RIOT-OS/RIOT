@@ -313,6 +313,19 @@ static inline bool GNRC_RPL_COUNTER_GREATER_THAN(uint8_t A, uint8_t B)
 #define GNRC_RPL_LIFETIME_UPDATE_STEP (2)
 
 /**
+ *  @name   Global / Local instance id masks
+ *  @see <a href="https://tools.ietf.org/html/rfc6550#section-5.1">
+ *          RFC 6550, section 5.1, RPL Instance ID
+ *      </a>
+ *  @{
+ */
+#define NG_RPL_INSTANCE_ID_MSB      (1 << 7)
+#define NG_RPL_GLOBAL_INSTANCE_MASK (0x7F)
+#define NG_RPL_LOCAL_INSTANCE_MASK  (0x3F)
+#define NG_RPL_INSTANCE_D_FLAG_MASK (1 << 6)
+/** @} */
+
+/**
  * @brief PID of the RPL thread.
  */
 extern kernel_pid_t gnrc_rpl_pid;

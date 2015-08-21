@@ -38,6 +38,10 @@
 #include "net/gnrc/ipv6/nc.h"
 #include "net/gnrc/ipv6/netif.h"
 
+#ifdef MODULE_FIB
+#include "net/fib.h"
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -72,6 +76,15 @@ extern "C" {
  *          Please use @ref net_gnrc_netreg for external communication.
  */
 extern kernel_pid_t gnrc_ipv6_pid;
+
+#ifdef MODULE_FIB
+/**
+ * @brief   The forwarding information base (FIB) for the IPv6 stack.
+ *
+ * @see @ref net_fib
+ */
+extern fib_entry_t gnrc_ipv6_fib_table[FIB_MAX_FIB_TABLE_ENTRIES];
+#endif
 
 /**
  * @brief   Initialization of the IPv6 thread.

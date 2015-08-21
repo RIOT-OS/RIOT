@@ -46,13 +46,17 @@ extern "C" {
  * @brief Timer configuration
  * @{
  */
+#if 1
 #define TIMER_NUMOF         (1U)
 #define TIMER_0_EN          1
-#if 0
+#else
+#define TIMER_NUMOF         (2U)
+#define TIMER_0_EN          1
 #define TIMER_1_EN          1
 #endif
 
 /* Timer 0 configuration */
+#if 0
 #define TIMER_0_DEV_0       TIM4
 #define TIMER_0_DEV_1       TIM5
 #define TIMER_0_CHANNELS    4
@@ -65,6 +69,20 @@ extern "C" {
 #define TIMER_0_IRQ_CHAN_1  TIM5_IRQn
 #define TIMER_0_IRQ_PRIO    1
 #define TIMER_0_TRIG_SEL    TIM_SMCR_TS_1
+#else
+#define TIMER_0_DEV_0       TIM2
+#define TIMER_0_DEV_1       TIM3
+#define TIMER_0_CHANNELS    4
+#define TIMER_0_PRESCALER   (32U)
+#define TIMER_0_MAX_VALUE   (0xffff)
+#define TIMER_0_CLKEN()     (RCC->APB1ENR |= (RCC_APB1ENR_TIM2EN | RCC_APB1ENR_TIM3EN))
+#define TIMER_0_ISR_0       isr_tim2
+#define TIMER_0_ISR_1       isr_tim3
+#define TIMER_0_IRQ_CHAN_0  TIM2_IRQn
+#define TIMER_0_IRQ_CHAN_1  TIM3_IRQn
+#define TIMER_0_IRQ_PRIO    1
+#define TIMER_0_TRIG_SEL    TIM_SMCR_TS_0
+#endif
 /** @} */
 
 /* Timer 1 configuration */

@@ -7,11 +7,11 @@
  */
 
 /**
- * @ingroup     boards_iot-lab_M3
+ * @ingroup     boards_iotlab-m3
  * @{
  *
  * @file
- * @brief       Board specific implementations for the iot-lab_M3 board
+ * @brief       Board specific implementations for the iotlab-m3 board
  *
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  *

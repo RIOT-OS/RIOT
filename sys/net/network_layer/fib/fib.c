@@ -78,16 +78,6 @@ static kernel_pid_t notify_rp[FIB_MAX_REGISTERED_RP];
 static universal_address_container_t* prefix_rp[FIB_MAX_REGISTERED_RP];
 
 /**
- * @brief maximum number of FIB tables entries handled
- */
-#define FIB_MAX_FIB_TABLE_ENTRIES (20)
-
-/**
- * @brief array of the FIB tables
- */
-static fib_entry_t fib_table[FIB_MAX_FIB_TABLE_ENTRIES];
-
-/**
  * @brief convert given ms to a point in time from now on in the future
  * @param[in]  ms     the milliseconds to be converted
  * @param[out] timex  the converted point in time
@@ -112,7 +102,7 @@ static void fib_ms_to_timex(uint32_t ms, timex_t *timex)
  *         1 if we found the exact address next-hop
  *         -EHOSTUNREACH if no fitting next-hop is available
  */
-static int fib_find_entry(uint8_t *dst, size_t dst_size,
+static int fib_find_entry(fib_entry_t table[], uint8_t *dst, size_t dst_size,
                           fib_entry_t **entry_arr, size_t *entry_arr_size)
 {
     timex_t now;
@@ -134,36 +124,36 @@ static int fib_find_entry(uint8_t *dst, size_t dst_size,
     for (size_t i = 0; i < FIB_MAX_FIB_TABLE_ENTRIES; ++i) {
 
         /* autoinvalidate if the entry lifetime is not set to not expire */
-        if ((fib_table[i].lifetime.seconds != FIB_LIFETIME_NO_EXPIRE)
-            || (fib_table[i].lifetime.microseconds != FIB_LIFETIME_NO_EXPIRE)) {
+        if ((table[i].lifetime.seconds != FIB_LIFETIME_NO_EXPIRE)
+            || (table[i].lifetime.microseconds != FIB_LIFETIME_NO_EXPIRE)) {
 
             /* check if the lifetime expired */
-            if (timex_cmp(now, fib_table[i].lifetime) > -1) {
+            if (timex_cmp(now, table[i].lifetime) > -1) {
                 /* remove this entry if its lifetime expired */
-                fib_table[i].lifetime.seconds = 0;
-                fib_table[i].lifetime.microseconds = 0;
-                fib_table[i].global_flags = 0;
-                fib_table[i].next_hop_flags = 0;
-                fib_table[i].iface_id = KERNEL_PID_UNDEF;
+                table[i].lifetime.seconds = 0;
+                table[i].lifetime.microseconds = 0;
+                table[i].global_flags = 0;
+                table[i].next_hop_flags = 0;
+                table[i].iface_id = KERNEL_PID_UNDEF;
 
-                if (fib_table[i].global != NULL) {
-                    universal_address_rem(fib_table[i].global);
-                    fib_table[i].global = NULL;
+                if (table[i].global != NULL) {
+                    universal_address_rem(table[i].global);
+                    table[i].global = NULL;
                 }
 
-                if (fib_table[i].next_hop != NULL) {
-                    universal_address_rem(fib_table[i].next_hop);
-                    fib_table[i].next_hop = NULL;
+                if (table[i].next_hop != NULL) {
+                    universal_address_rem(table[i].next_hop);
+                    table[i].next_hop = NULL;
                 }
             }
         }
 
-        if ((prefix_size < (dst_size<<3)) && (fib_table[i].global != NULL)) {
+        if ((prefix_size < (dst_size<<3)) && (table[i].global != NULL)) {
 
-            int ret_comp = universal_address_compare(fib_table[i].global, dst, &match_size);
+            int ret_comp = universal_address_compare(table[i].global, dst, &match_size);
             /* If we found an exact match */
             if (ret_comp == 0 || (is_all_zeros_addr && match_size == 0)) {
-                entry_arr[0] = &(fib_table[i]);
+                entry_arr[0] = &(table[i]);
                 *entry_arr_size = 1;
                 /* we will not find a better one so we return */
                 return 1;
@@ -171,7 +161,7 @@ static int fib_find_entry(uint8_t *dst, size_t dst_size,
             else {
                 /* we try to find the most fitting prefix */
                 if (ret_comp == 1) {
-                    entry_arr[0] = &(fib_table[i]);
+                    entry_arr[0] = &(table[i]);
                     /* we could find a better one so we move on */
                     ret = 0;
 
@@ -239,32 +229,32 @@ static int fib_upd_entry(fib_entry_t *entry,
  * @return 0 on success
  *         -ENOMEM if no new entry can be created
  */
-static int fib_create_entry(kernel_pid_t iface_id,
+static int fib_create_entry(fib_entry_t table[], kernel_pid_t iface_id,
                             uint8_t *dst, size_t dst_size, uint32_t dst_flags,
                             uint8_t *next_hop, size_t next_hop_size, uint32_t next_hop_flags,
                             uint32_t lifetime)
 {
     for (size_t i = 0; i < FIB_MAX_FIB_TABLE_ENTRIES; ++i) {
-        if (fib_table[i].lifetime.seconds == 0 && fib_table[i].lifetime.microseconds == 0) {
+        if (table[i].lifetime.seconds == 0 && table[i].lifetime.microseconds == 0) {
 
-            fib_table[i].global = universal_address_add(dst, dst_size);
+            table[i].global = universal_address_add(dst, dst_size);
 
-            if (fib_table[i].global != NULL) {
-                fib_table[i].global_flags = dst_flags;
-                fib_table[i].next_hop = universal_address_add(next_hop, next_hop_size);
-                fib_table[i].next_hop_flags = next_hop_flags;
+            if (table[i].global != NULL) {
+                table[i].global_flags = dst_flags;
+                table[i].next_hop = universal_address_add(next_hop, next_hop_size);
+                table[i].next_hop_flags = next_hop_flags;
             }
 
-            if (fib_table[i].next_hop != NULL) {
+            if (table[i].next_hop != NULL) {
                 /* everything worked fine */
-                fib_table[i].iface_id = iface_id;
+                table[i].iface_id = iface_id;
 
                 if (lifetime < FIB_LIFETIME_NO_EXPIRE) {
-                    fib_ms_to_timex(lifetime, &fib_table[i].lifetime);
+                    fib_ms_to_timex(lifetime, &table[i].lifetime);
                 }
                 else {
-                    fib_table[i].lifetime.seconds = FIB_LIFETIME_NO_EXPIRE;
-                    fib_table[i].lifetime.microseconds = FIB_LIFETIME_NO_EXPIRE;
+                    table[i].lifetime.seconds = FIB_LIFETIME_NO_EXPIRE;
+                    table[i].lifetime.microseconds = FIB_LIFETIME_NO_EXPIRE;
                 }
 
                 return 0;
@@ -350,8 +340,9 @@ static int fib_signal_rp(uint8_t *dst, size_t dst_size, uint32_t dst_flags)
     return ret;
 }
 
-int fib_add_entry(kernel_pid_t iface_id, uint8_t *dst, size_t dst_size, uint32_t dst_flags,
-                  uint8_t *next_hop, size_t next_hop_size, uint32_t next_hop_flags,
+int fib_add_entry(fib_entry_t table[], kernel_pid_t iface_id, uint8_t *dst,
+                  size_t dst_size, uint32_t dst_flags, uint8_t *next_hop,
+                  size_t next_hop_size, uint32_t next_hop_flags,
                   uint32_t lifetime)
 {
     mutex_lock(&mtx_access);
@@ -365,14 +356,14 @@ int fib_add_entry(kernel_pid_t iface_id, uint8_t *dst, size_t dst_size, uint32_t
         return -EFAULT;
     }
 
-    int ret = fib_find_entry(dst, dst_size, &(entry[0]), &count);
+    int ret = fib_find_entry(table, dst, dst_size, &(entry[0]), &count);
 
     if (ret == 1) {
         /* we must take the according entry and update the values */
         ret = fib_upd_entry(entry[0], next_hop, next_hop_size, next_hop_flags, lifetime);
     }
     else {
-        ret = fib_create_entry(iface_id, dst, dst_size, dst_flags,
+        ret = fib_create_entry(table, iface_id, dst, dst_size, dst_flags,
                                next_hop, next_hop_size, next_hop_flags, lifetime);
     }
 
@@ -380,7 +371,7 @@ int fib_add_entry(kernel_pid_t iface_id, uint8_t *dst, size_t dst_size, uint32_t
     return ret;
 }
 
-int fib_update_entry(uint8_t *dst, size_t dst_size,
+int fib_update_entry(fib_entry_t table[], uint8_t *dst, size_t dst_size,
                      uint8_t *next_hop, size_t next_hop_size, uint32_t next_hop_flags,
                      uint32_t lifetime)
 {
@@ -396,7 +387,7 @@ int fib_update_entry(uint8_t *dst, size_t dst_size,
         return -EFAULT;
     }
 
-    if (fib_find_entry(dst, dst_size, &(entry[0]), &count) == 1) {
+    if (fib_find_entry(table, dst, dst_size, &(entry[0]), &count) == 1) {
         DEBUG("[fib_update_entry] found entry: %p\n", (void *)(entry[0]));
         /* we must take the according entry and update the values */
         ret = fib_upd_entry(entry[0], next_hop, next_hop_size, next_hop_flags, lifetime);
@@ -412,14 +403,14 @@ int fib_update_entry(uint8_t *dst, size_t dst_size,
     return ret;
 }
 
-void fib_remove_entry(uint8_t *dst, size_t dst_size)
+void fib_remove_entry(fib_entry_t table[], uint8_t *dst, size_t dst_size)
 {
     mutex_lock(&mtx_access);
     DEBUG("[fib_remove_entry]\n");
     size_t count = 1;
     fib_entry_t *entry[count];
 
-    int ret = fib_find_entry(dst, dst_size, &(entry[0]), &count);
+    int ret = fib_find_entry(table, dst, dst_size, &(entry[0]), &count);
 
     if (ret == 1) {
         /* we must take the according entry and update the values */
@@ -435,7 +426,7 @@ void fib_remove_entry(uint8_t *dst, size_t dst_size)
     mutex_unlock(&mtx_access);
 }
 
-int fib_get_next_hop(kernel_pid_t *iface_id,
+int fib_get_next_hop(fib_entry_t table[], kernel_pid_t *iface_id,
                      uint8_t *next_hop, size_t *next_hop_size, uint32_t *next_hop_flags,
                      uint8_t *dst, size_t dst_size, uint32_t dst_flags)
 {
@@ -456,13 +447,13 @@ int fib_get_next_hop(kernel_pid_t *iface_id,
         return -EFAULT;
     }
 
-    int ret = fib_find_entry(dst, dst_size, &(entry[0]), &count);
+    int ret = fib_find_entry(table, dst, dst_size, &(entry[0]), &count);
     if (!(ret == 0 || ret == 1)) {
         /* notify all responsible RPs for unknown  next-hop for the destination address */
         if (fib_signal_rp(dst, dst_size, dst_flags) == 0) {
             count = 1;
             /* now lets see if the RRPs have found a valid next-hop */
-            ret = fib_find_entry(dst, dst_size, &(entry[0]), &count);
+            ret = fib_find_entry(table, dst, dst_size, &(entry[0]), &count);
         }
     }
 
@@ -487,7 +478,7 @@ int fib_get_next_hop(kernel_pid_t *iface_id,
     return 0;
 }
 
-int fib_get_destination_set(uint8_t *prefix, size_t prefix_size,
+int fib_get_destination_set(fib_entry_t table[], uint8_t *prefix, size_t prefix_size,
                             fib_destination_set_entry_t *dst_set, size_t* dst_set_size)
 {
     mutex_lock(&mtx_access);
@@ -495,12 +486,12 @@ int fib_get_destination_set(uint8_t *prefix, size_t prefix_size,
     size_t found_entries = 0;
 
     for (size_t i = 0; i < FIB_MAX_FIB_TABLE_ENTRIES; ++i) {
-        if ((fib_table[i].global != NULL) &&
-            (universal_address_compare_prefix(fib_table[i].global, prefix, prefix_size<<3) >= 0)) {
+        if ((table[i].global != NULL) &&
+            (universal_address_compare_prefix(table[i].global, prefix, prefix_size<<3) >= 0)) {
             if( (dst_set != NULL) && (found_entries < *dst_set_size) ) {
             /* set the size to full byte usage */
             dst_set[found_entries].dest_size = sizeof(dst_set[found_entries].dest);
-            universal_address_get_address(fib_table[i].global,
+            universal_address_get_address(table[i].global,
                                           dst_set[found_entries].dest,
                                           &dst_set[found_entries].dest_size);
             }
@@ -521,7 +512,7 @@ int fib_get_destination_set(uint8_t *prefix, size_t prefix_size,
     return ret;
 }
 
-void fib_init(void)
+void fib_init(fib_entry_t table[])
 {
     DEBUG("[fib_init] hello. Initializing some stuff.\n");
     mutex_lock(&mtx_access);
@@ -532,20 +523,20 @@ void fib_init(void)
     }
 
     for (size_t i = 0; i < FIB_MAX_FIB_TABLE_ENTRIES; ++i) {
-        fib_table[i].iface_id = 0;
-        fib_table[i].lifetime.seconds = 0;
-        fib_table[i].lifetime.microseconds = 0;
-        fib_table[i].global_flags = 0;
-        fib_table[i].global = NULL;
-        fib_table[i].next_hop_flags = 0;
-        fib_table[i].next_hop = NULL;
+        table[i].iface_id = 0;
+        table[i].lifetime.seconds = 0;
+        table[i].lifetime.microseconds = 0;
+        table[i].global_flags = 0;
+        table[i].global = NULL;
+        table[i].next_hop_flags = 0;
+        table[i].next_hop = NULL;
     }
 
     universal_address_init();
     mutex_unlock(&mtx_access);
 }
 
-void fib_deinit(void)
+void fib_deinit(fib_entry_t table[])
 {
     DEBUG("[fib_deinit] hello. De-Initializing stuff.\n");
     mutex_lock(&mtx_access);
@@ -558,13 +549,13 @@ void fib_deinit(void)
     notify_rp_pos = 0;
 
     for (size_t i = 0; i < FIB_MAX_FIB_TABLE_ENTRIES; ++i) {
-        fib_table[i].iface_id = 0;
-        fib_table[i].lifetime.seconds = 0;
-        fib_table[i].lifetime.microseconds = 0;
-        fib_table[i].global_flags = 0;
-        fib_table[i].global = NULL;
-        fib_table[i].next_hop_flags = 0;
-        fib_table[i].next_hop = NULL;
+        table[i].iface_id = 0;
+        table[i].lifetime.seconds = 0;
+        table[i].lifetime.microseconds = 0;
+        table[i].global_flags = 0;
+        table[i].global = NULL;
+        table[i].next_hop_flags = 0;
+        table[i].next_hop = NULL;
     }
 
     universal_address_reset();
@@ -596,13 +587,13 @@ int fib_register_rp(uint8_t *prefix, size_t prefix_addr_type_size)
     return 0;
 }
 
-int fib_get_num_used_entries(void)
+int fib_get_num_used_entries(fib_entry_t table[])
 {
     mutex_lock(&mtx_access);
     size_t used_entries = 0;
 
     for (size_t i = 0; i < FIB_MAX_FIB_TABLE_ENTRIES; ++i) {
-        used_entries += (size_t)(fib_table[i].global != NULL);
+        used_entries += (size_t)(table[i].global != NULL);
     }
 
     mutex_unlock(&mtx_access);
@@ -622,18 +613,18 @@ void fib_print_notify_rp(void)
     mutex_unlock(&mtx_access);
 }
 
-void fib_print_fib_table(void)
+void fib_print_fib_table(fib_entry_t table[])
 {
     mutex_lock(&mtx_access);
 
     for (size_t i = 0; i < FIB_MAX_FIB_TABLE_ENTRIES; ++i) {
-        printf("[fib_print_fib_table] %d) iface_id: %d, global: %p, next hop: %p, lifetime: %d.%d\n", \
+        printf("[fib_print_table] %d) iface_id: %d, global: %p, next hop: %p, lifetime: %d.%d\n", \
                (int)i, \
-               (int)fib_table[i].iface_id, \
-               (void *)fib_table[i].global, \
-               (void *)fib_table[i].next_hop, \
-               (int)fib_table[i].lifetime.seconds, \
-               (int)fib_table[i].lifetime.microseconds);
+               (int)table[i].iface_id, \
+               (void *)table[i].global, \
+               (void *)table[i].next_hop, \
+               (int)table[i].lifetime.seconds, \
+               (int)table[i].lifetime.microseconds);
     }
 
     mutex_unlock(&mtx_access);
@@ -670,7 +661,7 @@ static void fib_print_address(universal_address_container_t *entry)
     }
 }
 
-void fib_print_routes(void)
+void fib_print_routes(fib_entry_t table[])
 {
     mutex_lock(&mtx_access);
     printf("%-" FIB_ADDR_PRINT_LENS "s %-6s %-" FIB_ADDR_PRINT_LENS "s %-6s %-16s Interface\n"
@@ -680,16 +671,16 @@ void fib_print_routes(void)
     vtimer_now(&now);
 
     for (size_t i = 0; i < FIB_MAX_FIB_TABLE_ENTRIES; ++i) {
-        if (fib_table[i].lifetime.seconds != 0 || fib_table[i].lifetime.microseconds != 0) {
-            fib_print_address(fib_table[i].global);
-            printf(" 0x%04"PRIx32" ", fib_table[i].global_flags);
-            fib_print_address(fib_table[i].next_hop);
-            printf(" 0x%04"PRIx32" ", fib_table[i].next_hop_flags);
+        if (table[i].lifetime.seconds != 0 || table[i].lifetime.microseconds != 0) {
+            fib_print_address(table[i].global);
+            printf(" 0x%04"PRIx32" ", table[i].global_flags);
+            fib_print_address(table[i].next_hop);
+            printf(" 0x%04"PRIx32" ", table[i].next_hop_flags);
 
-            if ((fib_table[i].lifetime.seconds != FIB_LIFETIME_NO_EXPIRE)
-                || (fib_table[i].lifetime.microseconds != FIB_LIFETIME_NO_EXPIRE)) {
+            if ((table[i].lifetime.seconds != FIB_LIFETIME_NO_EXPIRE)
+                || (table[i].lifetime.microseconds != FIB_LIFETIME_NO_EXPIRE)) {
 
-                timex_t tm = timex_sub(fib_table[i].lifetime, now);
+                timex_t tm = timex_sub(table[i].lifetime, now);
 
                 /* we must interpret the values as signed */
                 if ((int32_t)tm.seconds < 0
@@ -704,7 +695,7 @@ void fib_print_routes(void)
                 printf("%-16s ", "NEVER");
             }
 
-            printf("%d\n", (int)fib_table[i].iface_id);
+            printf("%d\n", (int)table[i].iface_id);
         }
     }
 
@@ -712,12 +703,12 @@ void fib_print_routes(void)
 }
 
 #if FIB_DEVEL_HELPER
-int fib_devel_get_lifetime(timex_t *lifetime, uint8_t *dst, size_t dst_size)
+int fib_devel_get_lifetime(fib_entry_t table[], timex_t *lifetime, uint8_t *dst, size_t dst_size)
 {
     size_t count = 1;
     fib_entry_t *entry[count];
 
-    int ret = fib_find_entry(dst, dst_size, &(entry[0]), &count);
+    int ret = fib_find_entry(table, dst, dst_size, &(entry[0]), &count);
     if (ret == 1 ) {
         /* only return lifetime of exact matches */
         *lifetime = entry[0]->lifetime;
