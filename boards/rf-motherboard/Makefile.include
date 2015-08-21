@@ -1,6 +1,6 @@
 ## the cpu to build for
 export CPU = stm32l1
-export CPU_MODEL = stm32l151rb
+export CPU_MODEL = stm32l151rba
 
 # define the default port depending on the host OS
 PORT_LINUX ?= /dev/ttyACM0
@@ -11,6 +11,9 @@ include $(RIOTBOARD)/Makefile.include.serial
 
 # this board uses openocd
 include $(RIOTBOARD)/Makefile.include.openocd
+
+# include board dependencies
+include $(RIOTBOARD)/$(BOARD)/Makefile.dep
 
 # include cortex defaults
 include $(RIOTBOARD)/Makefile.include.cortexm_common
