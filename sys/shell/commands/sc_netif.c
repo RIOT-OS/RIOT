@@ -840,7 +840,7 @@ void _netif_send_ble(int argc, char **argv)
         payload_len = gnrc_netif_addr_from_str(payload, sizeof(payload), argv[3]);
 
         if (pkt_type == ADV_DIRECT_IND_TYPE || pkt_type == SCAN_REQ_TYPE) {
-            if (payload_len != 0) {
+            if (payload_len == 0) {
                 puts("error: invalid address argument length");
                 return;
             }
