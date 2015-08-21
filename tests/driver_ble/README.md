@@ -32,11 +32,11 @@ Examples
 ========
 (Transmitted BLE packets were captured using Ubertooth One)
 
-Shell commnad: `ifconfig 4 set adv_addr c2:5e:72:69:6f:74`
+Shell commnad: `ifconfig 3 set adv_addr c2:5e:72:69:6f:74`
 ```
-  success: set BLE advertising address on interface 4 to c2:5e:72:69:6f:74
+  success: set BLE advertising address on interface 3 to c2:5e:72:69:6f:74
 ```
-Shell command: `blesnd 4 0`
+Shell command: `blesnd 3 0`
 ```
 40 06 74 6f 69 72 5e c2 85 0d da
 Advertising / AA 8e89bed6 (valid)/  6 bytes
@@ -47,7 +47,7 @@ Advertising / AA 8e89bed6 (valid)/  6 bytes
     Data:  74 6f 69 72 5e c2
     CRC:   85 0d da
 ```
-Shell command: `blesnd 4 0 08:09:52:49:4f:54:2d:4f:53:02:01:06:02:0a:00:03:03:20:22:07:ff:00:00:64:61:74:61`
+Shell command: `blesnd 3 0 08:09:52:49:4f:54:2d:4f:53:02:01:06:02:0a:00:03:03:20:22:07:ff:00:00:64:61:74:61`
 ```
 40 21 74 6f 69 72 5e c2 08 09 52 49 4f 54 2d 4f 53 02 01 06 02 0a 00 03 03 20 22 07 ff 00 00 64 61 74 61 86 53 d7
 Advertising / AA 8e89bed6 (valid)/ 33 bytes
@@ -69,7 +69,7 @@ Advertising / AA 8e89bed6 (valid)/ 33 bytes
     Data:  74 6f 69 72 5e c2 08 09 52 49 4f 54 2d 4f 53 02 01 06 02 0a 00 03 03 20 22 07 ff 00 00 64 61 74 61
     CRC:   86 53 d7
 ```
-Shell command: `blesnd 4 1 02:5f:31:6c:a7:26`
+Shell command: `blesnd 3 1 02:5f:31:6c:a7:26`
 ```
 41 0c 74 6f 69 72 5e c2 02 5f 31 6c a7 26 b5 d2 bf
 Advertising / AA 8e89bed6 (valid)/ 12 bytes
@@ -79,7 +79,7 @@ Advertising / AA 8e89bed6 (valid)/ 12 bytes
     Data:  74 6f 69 72 5e c2 02 5f 31 6c a7 26
     CRC:   b5 d2 bf
 ```
-Shell command: `blesnd 4 2`
+Shell command: `blesnd 3 2`
 ```
 42 06 74 6f 69 72 5e c2 b8 3d f8
 Advertising / AA 8e89bed6 (valid)/  6 bytes
@@ -89,7 +89,7 @@ Advertising / AA 8e89bed6 (valid)/  6 bytes
     Data:  74 6f 69 72 5e c2
     CRC:   b8 3d f8
 ```
-Shell command: `blesnd 4 3 02:5f:31:6c:a7:26`
+Shell command: `blesnd 3 3 02:5f:31:6c:a7:26`
 ```
 43 0c 74 6f 69 72 5e c2 02 5f 31 6c a7 26 36 73 99
 Advertising / AA 8e89bed6 (valid)/ 12 bytes
@@ -101,7 +101,7 @@ Advertising / AA 8e89bed6 (valid)/ 12 bytes
     Data:  74 6f 69 72 5e c2 02 5f 31 6c a7 26
     CRC:   36 73 99
 ```
-Shell command: `blesnd 4 4`
+Shell command: `blesnd 3 4`
 ```
 44 06 74 6f 69 72 5e c2 ff 6d 9e
 Advertising / AA 8e89bed6 (valid)/  6 bytes

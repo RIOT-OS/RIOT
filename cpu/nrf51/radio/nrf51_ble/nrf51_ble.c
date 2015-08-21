@@ -155,7 +155,7 @@ int _get_access_address(uint8_t *val, size_t max_len)
 /* Set the BLE Access Address of the interface */
 int _set_access_address(uint8_t *val, size_t len)
 {
-    int is_rx = 0;
+    uint8_t is_rx = 0;
 
     /* check parameters */
     if (len != BLE_ACCESS_ADDR_LEN) {
@@ -254,23 +254,23 @@ int _set_state(uint8_t *val, size_t len)
 int _get_channel(uint8_t *val, size_t max_len)
 {
     /* check parameters */
-    if (max_len < 2) {
+    if (max_len < sizeof(uint16_t)) {
         return -EOVERFLOW;
     }
 
     /* get channel */
     val[0] = freq_to_chan[0x3f & NRF_RADIO->FREQUENCY];
     val[1] = 0;
-    return 2;
+    return sizeof(uint16_t);
 }
 
 /* Set the current BLE channel number of the interface */
 int _set_channel(uint8_t *val, size_t len)
 {
-    int is_rx = 0;
+    uint8_t is_rx = 0;
 
     /* check parameter */
-    if (len != 2 || val[0] > BLE_MAX_CHANNELS) {
+    if (len != sizeof(uint16_t) || val[0] > BLE_MAX_CHANNEL) {
         return -EINVAL;
     }
 
@@ -291,28 +291,29 @@ int _set_channel(uint8_t *val, size_t len)
         _switch_to_rx();
     }
 
-    return 2;
+    return sizeof(uint16_t);
 }
 
 /* Set the TX power of the BLE interface */
 int _get_txpower(uint8_t *val, size_t len)
 {
     /* check parameters */
-    if (len < 2) {
+    if (len < sizeof(uint16_t)) {
         return -EINVAL;
     }
 
     /* get value */
     val[0] = NRF_RADIO->TXPOWER;
 
-    if (val[0] & 0x80) {
+    /* If negative dBm, convert to 16 bit signed */
+    if ((int8_t)val[0] < 0) {
         val[1] = 0xff;
     }
     else {
         val[1] = 0x00;
     }
 
-    return 2;
+    return sizeof(uint16_t);
 }
 
 /* Set the TX power of the BLE interface */
@@ -321,7 +322,7 @@ int _set_txpower(uint8_t *val, size_t len)
     int8_t power;
 
     /* check parameters */
-    if (len < 2) {
+    if (len < sizeof(uint16_t)) {
         return -EINVAL;
     }
 
@@ -351,7 +352,7 @@ int _set_txpower(uint8_t *val, size_t len)
     }
 
     NRF_RADIO->TXPOWER = power;
-    return 2;
+    return sizeof(uint16_t);
 }
 
 /* BLE interface interrupt routine */
@@ -508,10 +509,11 @@ int _send(gnrc_netdev_t *dev, gnrc_pktsnip_t *pkt)
         return -EOVERFLOW;
     }
 
-    memcpy(&(_tx_buf), pkt->data, size);
 
     /* wait for any ongoing transmission to finish */
     while (_state == STATE_TX);
+
+    memcpy(&(_tx_buf), pkt->data, size);
 
     /* save old state and switch to idle if applicable */
     _tx_prestate = _state;

@@ -15,7 +15,7 @@
  * @{
  *
  * @file
- * @brief           Interface definition for the RF51822 ble driver
+ * @brief           Interface definition for the NRF51822 ble driver
  *
  * @author          James Hollister <jhollisterjr@gmail.com>
  */

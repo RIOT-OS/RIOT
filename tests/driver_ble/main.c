@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief       Test application for the NRF51822 BLE minimal radio driver (blemin)
+ * @brief       Test application for the BLE link layer and nrf51 BLE driver
  *
  * @author      Jan Wagner <mail@jwagner.eu>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
@@ -25,8 +25,6 @@
 #include "posix_io.h"
 #include "board_uart0.h"
 #include "net/gnrc.h"
-#include "net/gnrc/nomac.h"
-#include "net/gnrc/pktdump.h"
 #include "net/ble_ll.h"
 #include "nrf51_ble.h"
 

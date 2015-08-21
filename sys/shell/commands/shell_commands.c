@@ -189,9 +189,6 @@ const shell_command_t _shell_command_list[] = {
 #ifdef MODULE_BLE_LL
     {"blesnd", "send BLE packets", _netif_send_ble },
 #endif
-#ifdef MODULE_RADIO_BLEMIN
-    {"blesnd", "send BLE packet", _netif_send_ble },
-#endif
 #ifdef MODULE_FIB
     {"fibroute", "Manipulate the FIB (info: 'fibroute [add|del]')", _fib_route_handler},
 #endif

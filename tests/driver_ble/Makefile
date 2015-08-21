@@ -11,7 +11,7 @@ USEMODULE += ps
 USEMODULE += uart0
 USEMODULE += nrf51_ble
 USEMODULE += gnrc
-USEMODULE += gnrc_pktdump
+USEMODULE += gnrc_pktbuf
 USEMODULE += ble_ll
 
 include $(RIOTBASE)/Makefile.include

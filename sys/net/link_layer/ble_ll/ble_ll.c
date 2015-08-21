@@ -26,14 +26,14 @@
 #include "net/ble_ll.h"
 
 #define ENABLE_DEBUG    (0)
-#define ENABLE_BLE_PKT_DEBUG	(0)
+#define ENABLE_BLE_PKT_DEBUG    (0)
 #include "debug.h"
 
 /**
  * @brief   Possible BLE link layer states
  */
 typedef enum {
-    LL_STANDBY,		        /**< link layer is in standby mode */
+    LL_STANDBY,             /**< link layer is in standby mode */
     LL_ADVERTISING,         /**< link layer is in advertising mode */
     LL_CONNECTION,          /**< link layer is in connection mode */
     LL_INITIATING,          /**< link layer is in initiating mode */
@@ -59,12 +59,12 @@ static int _get_adv_address(uint8_t *val, size_t max_len)
     }
 
     /* get address */
-    val[0] = _adv_addr[0];
-    val[1] = _adv_addr[1];
-    val[2] = _adv_addr[2];
-    val[3] = _adv_addr[3];
-    val[4] = _adv_addr[4];
-    val[5] = _adv_addr[5];
+    val[0] = _adv_addr[5];
+    val[1] = _adv_addr[4];
+    val[2] = _adv_addr[3];
+    val[3] = _adv_addr[2];
+    val[4] = _adv_addr[1];
+    val[5] = _adv_addr[0];
 
     return BLE_ADV_ADDR_LEN;
 }
@@ -132,6 +132,12 @@ static int _send(gnrc_netdev_t *dev, gnrc_pktsnip_t *pkt)
     pkt_len = gnrc_pkt_len(pkt);
 
     if (pkt_len > BLE_PDU_LEN_MAX) {
+        gnrc_pktbuf_release(pkt);
+        DEBUG("ble_ll: Error sending packet: invalid BLE pdu length\n");
+        return -EOVERFLOW;
+    }
+
+    if (pkt->size > BLE_ADV_HDR_LEN) {
         gnrc_pktbuf_release(pkt);
         DEBUG("ble_ll: Error sending packet: invalid BLE pdu header length\n");
         return -EOVERFLOW;
@@ -215,7 +221,7 @@ static void _receive(gnrc_pktsnip_t *pkt)
 static void _event_cb(gnrc_netdev_event_t event, void *data)
 {
     DEBUG("ble_ll: event triggered -> RX_COMPLETE\n");
-    /* NOMAC only understands the RX_COMPLETE event... */
+    /* ble_ll only understands the RX_COMPLETE event... */
     if (event == NETDEV_EVENT_RX_COMPLETE) {
         gnrc_pktsnip_t *pkt;
         gnrc_netreg_entry_t *sendto;
@@ -324,7 +330,7 @@ kernel_pid_t ble_ll_init(char *stack, int stacksize, char priority,
     if (dev == NULL || dev->driver == NULL) {
         return -ENODEV;
     }
-    /* create new NOMAC thread */
+    /* create new BLE thread */
     res = thread_create(stack, stacksize, priority, CREATE_STACKTEST,
                          _ble_ll_thread, (void *)dev, name);
     if (res <= 0) {

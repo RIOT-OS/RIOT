@@ -36,7 +36,7 @@ extern "C" {
 /**
  * @brief   Default transmission power used
  */
-#define BLE_DEFAULT_TXPOWER         0 /* 0dBm */
+#define BLE_DEFAULT_TXPOWER         0  /* 0dBm */
 
 /**
  * @brief   BLE Advertising channel PDU types
@@ -57,7 +57,7 @@ enum ble_adv_pdu_types {
  * @brief   BLE constant lengths and limits
  * @{
  */
-#define BLE_MAX_CHANNELS            39
+#define BLE_MAX_CHANNEL             39
 
 #define BLE_ACCESS_ADDR_LEN         4
 #define BLE_ADV_HDR_LEN             2
@@ -120,16 +120,16 @@ typedef struct __attribute__((packed))
  */
 typedef struct __attribute__((packed))
 {
-    uint8_t AA[3];                          /**< Access Address */
-    uint8_t CRCInit[2];                     /**< CRC initialization value */
-    uint8_t WinSize;                        /**< Transmit window size */
-    uint8_t WinOffset[1];                   /**< Transmit window offset */
-    uint8_t Interval[1];                    /**< Connection interval */
-    uint8_t Latency[1];                     /**< Connection slave latency */
-    uint8_t Timeout[1];                     /**< Connection supervision timeout */
-    uint8_t ChM[4];                         /**< Channel map */
-    uint8_t Hop: 5;                         /**< Hop increment */
-    uint8_t SCA: 3;                         /**< Sleep clock accuracy */
+    uint8_t aa[3];                          /**< Access Address */
+    uint8_t crc_init[2];                     /**< CRC initialization value */
+    uint8_t win_size;                        /**< Transmit window size */
+    uint8_t win_offset[1];                   /**< Transmit window offset */
+    uint8_t interval[1];                    /**< Connection interval */
+    uint8_t latency[1];                     /**< Connection slave latency */
+    uint8_t timeout[1];                     /**< Connection supervision timeout */
+    uint8_t chm[4];                         /**< Channel map */
+    uint8_t hop: 5;                         /**< Hop increment */
+    uint8_t sca: 3;                         /**< Sleep clock accuracy */
 } ble_conn_req_data_t;
 
 /**
@@ -154,11 +154,11 @@ extern const gnrc_netdev_driver_t ble_driver;
  *
  * @param[in] stack         stack for the control thread
  * @param[in] stacksize     size of *stack*
- * @param[in] priority      priority for the thread housing the NOMAC instance
- * @param[in] name          name of the thread housing the NOMAC instance
+ * @param[in] priority      priority for the thread housing the BLE instance
+ * @param[in] name          name of the thread housing the BLE instance
  * @param[in] dev           netdev device, needs to be already initialized
  *
- * @return                  PID of NOMAC thread on success
+ * @return                  PID of BLE thread on success
  * @return                  -EINVAL if creation of thread fails
  * @return                  -ENODEV if *dev* is invalid
  */
