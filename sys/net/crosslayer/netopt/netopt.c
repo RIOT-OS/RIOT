@@ -49,6 +49,7 @@ static const char *_netopt_strmap[] = {
     [NETOPT_CSMA]            = "NETOPT_CSMA",
     [NETOPT_CSMA_RETRIES]    = "NETOPT_CSMA_RETRIES",
     [NETOPT_IS_WIRED]        = "NETOPT_IS_WIRED",
+    [NETOPT_DEVICE_TYPE]     = "NETOPT_DEVICE_TYPE",
     [NETOPT_NUMOF]           = "NETOPT_NUMOF",
 };
 

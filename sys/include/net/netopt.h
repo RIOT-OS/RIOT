@@ -172,6 +172,11 @@ typedef enum {
      */
     NETOPT_IS_WIRED,
 
+    /**
+     * @brief get a device's "type", e.g., ethernet, 802.15.4, ...
+     */
+    NETOPT_DEVICE_TYPE,
+
     /* add more options if needed */
 
     /**

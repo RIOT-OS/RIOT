@@ -40,6 +40,9 @@ endif
 ifneq (,$(filter nhdp,$(USEMODULE)))
     DIRS += net/routing/nhdp
 endif
+ifneq (,$(filter gnrc_netdev2,$(USEMODULE)))
+    DIRS += net/gnrc/link_layer/netdev2
+endif
 ifneq (,$(filter fib,$(USEMODULE)))
     DIRS += net/network_layer/fib
 endif
