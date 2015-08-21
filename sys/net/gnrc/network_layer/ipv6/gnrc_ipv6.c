@@ -687,8 +687,18 @@ static void _receive(gnrc_pktsnip_t *pkt)
         /* redirect to next hop */
         DEBUG("ipv6: decrement hop limit to %" PRIu8 "\n", hdr->hl - 1);
 
+        /* RFC 4291, section 2.5.6 states: "Routers must not forward any
+         * packets with Link-Local source or destination addresses to other
+         * links."
+         */
+        if ((ipv6_addr_is_link_local(&(hdr->src))) || (ipv6_addr_is_link_local(&(hdr->dst)))) {
+            DEBUG("ipv6: do not forward packets with link-local source or"\
+                  " destination address\n");
+            gnrc_pktbuf_release(pkt);
+            return;
+        }
         /* TODO: check if receiving interface is router */
-        if (--(hdr->hl) > 0) {  /* drop packets that *reach* Hop Limit 0 */
+        else if (--(hdr->hl) > 0) {  /* drop packets that *reach* Hop Limit 0 */
             gnrc_pktsnip_t *tmp = pkt;
 
             DEBUG("ipv6: forward packet to next hop\n");
