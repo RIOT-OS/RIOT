@@ -28,7 +28,7 @@ typedef int (*f_ptr)(void);
 
 int main(void)
 {
-
+    /* Value added is Decimal value of function addr(From which to execute) + 1*/
     f_ptr ptr = (f_ptr) &app_elf+165 ;
     /* Process internal relocations */
     list_symbol_info((char *)app_elf);
