@@ -32,7 +32,11 @@
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 #endif
 
-void rpl_trickle_send_dio(void *args)
+static gnrc_rpl_parent_t *_gnrc_rpl_find_preferred_parent(gnrc_rpl_dodag_t *dodag);
+static void _rpl_trickle_send_dio(void *args);
+static int _compare_parents(gnrc_rpl_parent_t *p1, gnrc_rpl_parent_t *p2);
+
+static void _rpl_trickle_send_dio(void *args)
 {
     gnrc_rpl_dodag_t *dodag = (gnrc_rpl_dodag_t *) args;
     ipv6_addr_t all_RPL_nodes = GNRC_RPL_ALL_NODES_ADDR;
@@ -144,7 +148,7 @@ bool gnrc_rpl_dodag_add(gnrc_rpl_instance_t *instance, ipv6_addr_t *dodag_id, gn
         (*dodag)->addr_preferred = GNRC_RPL_DEFAULT_PREFIX_LIFETIME;
         (*dodag)->addr_valid = GNRC_RPL_DEFAULT_PREFIX_LIFETIME;
         (*dodag)->my_rank = GNRC_RPL_INFINITE_RANK;
-        (*dodag)->trickle.callback.func = &rpl_trickle_send_dio;
+        (*dodag)->trickle.callback.func = &_rpl_trickle_send_dio;
         (*dodag)->trickle.callback.args = *dodag;
         (*dodag)->dio_interval_doubl = GNRC_RPL_DEFAULT_DIO_INTERVAL_DOUBLINGS;
         (*dodag)->dio_min = GNRC_RPL_DEFAULT_DIO_INTERVAL_MIN;
@@ -352,7 +356,7 @@ void gnrc_rpl_parent_update(gnrc_rpl_dodag_t *dodag, gnrc_rpl_parent_t *parent)
         }
     }
 
-    if (gnrc_rpl_find_preferred_parent(dodag) == NULL) {
+    if (_gnrc_rpl_find_preferred_parent(dodag) == NULL) {
         gnrc_rpl_local_repair(dodag);
     }
 
@@ -361,23 +365,27 @@ void gnrc_rpl_parent_update(gnrc_rpl_dodag_t *dodag, gnrc_rpl_parent_t *parent)
     }
 }
 
-int _compare_parents(gnrc_rpl_parent_t *p1, gnrc_rpl_parent_t *p2)
+static int _compare_parents(gnrc_rpl_parent_t *p1, gnrc_rpl_parent_t *p2)
 {
     return p1->dodag->instance->of->which_parent(p1, p2) == p1 ? -1 : 1;
 }
 
-gnrc_rpl_parent_t *gnrc_rpl_find_preferred_parent(gnrc_rpl_dodag_t *dodag)
+/**
+ * @brief   Find the parent with the lowest rank and update the DODAG's preferred parent
+ *
+ * @param[in] dodag     Pointer to the DODAG
+ *
+ * @return  Pointer to the preferred parent, on success.
+ * @return  NULL, otherwise.
+ */
+static gnrc_rpl_parent_t *_gnrc_rpl_find_preferred_parent(gnrc_rpl_dodag_t *dodag)
 {
     ipv6_addr_t def = IPV6_ADDR_UNSPECIFIED;
     gnrc_rpl_parent_t *old_best = dodag->parents;
 
     LL_SORT(dodag->parents, _compare_parents);
 
-    if (dodag->parents == NULL) {
-        return NULL;
-    }
-    else if (dodag->parents->rank >= dodag->my_rank) {
-        gnrc_rpl_parent_remove(dodag->parents);
+    if ((dodag->parents == NULL) || (dodag->parents->rank >= dodag->my_rank)) {
         return NULL;
     }
 

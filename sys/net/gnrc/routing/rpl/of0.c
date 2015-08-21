@@ -86,7 +86,7 @@ gnrc_rpl_parent_t *which_parent(gnrc_rpl_parent_t *p1, gnrc_rpl_parent_t *p2)
     return p2;
 }
 
-/* Not used yet, as the implementation only makes use of one dodag for now. */
+/* Not used yet */
 gnrc_rpl_dodag_t *which_dodag(gnrc_rpl_dodag_t *d1, gnrc_rpl_dodag_t *d2)
 {
     (void) d2;
