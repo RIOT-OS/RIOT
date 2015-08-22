@@ -189,7 +189,8 @@ static void *_event_loop(void *args)
             case GNRC_RPL_MSG_TYPE_CLEANUP_HANDLE:
                 DEBUG("RPL: GNRC_RPL_MSG_TYPE_CLEANUP received\n");
                 dodag = (gnrc_rpl_dodag_t *) msg.content.ptr;
-                if (dodag && (dodag->state != 0) && (dodag->parents == NULL)) {
+                if (dodag && (dodag->state != 0) && (dodag->parents == NULL)
+                    && (dodag->my_rank == GNRC_RPL_INFINITE_RANK)) {
                     /* no parents - delete this DODAG */
                     gnrc_rpl_dodag_remove(dodag);
                 }
