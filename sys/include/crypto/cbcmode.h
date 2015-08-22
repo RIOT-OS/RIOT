@@ -26,6 +26,8 @@
 #include <stdlib.h>
 #include <stdint.h>
 
+#include "kernel_macros.h"
+
 #ifndef CBCMODE_H_
 #define CBCMODE_H_
 
@@ -34,8 +36,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#define MIN(a, b) ( ((a) < (b)) ? (a) : (b))
 
 #define DBG_CRYPTO      1
 

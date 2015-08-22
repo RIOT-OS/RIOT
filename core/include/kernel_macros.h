@@ -57,6 +57,11 @@ extern "C" {
         ((TYPE *) ((char *) (PTR) - offsetof(TYPE, MEMBER)))
 #endif
 
+/**
+ * @brief   Returns the minimal value of two comparable variables.
+ */
+#define MIN(a, b) (((a) < (b)) ? (a) : (b))
+
 #ifdef __cplusplus
 }
 #endif
