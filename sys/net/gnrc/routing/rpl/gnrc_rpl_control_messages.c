@@ -119,7 +119,9 @@ void gnrc_rpl_send_DIO(gnrc_rpl_dodag_t *dodag, ipv6_addr_t *destination)
     pos = (uint8_t *) dio;
     dio->instance_id = dodag->instance->id;
     dio->version_number = dodag->version;
-    dio->rank = byteorder_htons(dodag->my_rank);
+    /* a leaf node announces an INFINITE_RANK */
+    dio->rank = ((dodag->node_status == GNRC_RPL_LEAF_NODE) ?
+                 byteorder_htons(GNRC_RPL_INFINITE_RANK) : byteorder_htons(dodag->my_rank));
     dio->g_mop_prf = (dodag->grounded << GNRC_RPL_GROUNDED_SHIFT) |
         (dodag->instance->mop << GNRC_RPL_MOP_SHIFT) | dodag->prf;
     dio->dtsn = dodag->dtsn;
@@ -224,7 +226,9 @@ void gnrc_rpl_recv_DIS(gnrc_rpl_dis_t *dis, ipv6_addr_t *src, ipv6_addr_t *dst, 
 
     if (ipv6_addr_is_multicast(dst)) {
         for (uint8_t i = 0; i < GNRC_RPL_DODAGS_NUMOF; ++i) {
-            if (gnrc_rpl_dodags[i].state != 0) {
+            if ((gnrc_rpl_dodags[i].state != 0)
+                /* a leaf node should only react to unicast DIS */
+                 && (gnrc_rpl_dodags[i].node_status != GNRC_RPL_LEAF_NODE)) {
                 trickle_reset_timer(&gnrc_rpl_dodags[i].trickle);
             }
         }
@@ -822,6 +826,11 @@ void gnrc_rpl_recv_DAO(gnrc_rpl_dao_t *dao, ipv6_addr_t *src, uint16_t len)
             DEBUG("RPL: DAO for instance (%d) without DODAGs\n", dao->instance_id);
             return;
         }
+    }
+
+    /* a leaf node should not parse DAOs */
+    if (dodag->node_status == GNRC_RPL_LEAF_NODE) {
+        return;
     }
 
     uint32_t included_opts = 0;

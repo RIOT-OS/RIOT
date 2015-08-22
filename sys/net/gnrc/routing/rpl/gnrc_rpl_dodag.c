@@ -40,6 +40,13 @@ static void _rpl_trickle_send_dio(void *args)
 {
     gnrc_rpl_dodag_t *dodag = (gnrc_rpl_dodag_t *) args;
     ipv6_addr_t all_RPL_nodes = GNRC_RPL_ALL_NODES_ADDR;
+
+    /* a leaf node does not send DIOs periodically */
+    if (dodag->node_status == GNRC_RPL_LEAF_NODE) {
+        trickle_stop(&dodag->trickle);
+        return;
+    }
+
     gnrc_rpl_send_DIO(dodag, &all_RPL_nodes);
     DEBUG("trickle callback: Instance (%d) | DODAG: (%s)\n", dodag->instance->id,
             ipv6_addr_to_str(addr_str,&dodag->dodag_id, sizeof(addr_str)));
@@ -475,6 +482,19 @@ gnrc_rpl_dodag_t *gnrc_rpl_root_dodag_init(uint8_t instance_id, ipv6_addr_t *dod
     return dodag;
 }
 
+void gnrc_rpl_leaf_operation(gnrc_rpl_dodag_t *dodag)
+{
+    dodag->node_status = GNRC_RPL_LEAF_NODE;
+    /* send INFINITE_RANK DIO to current children */
+    gnrc_rpl_send_DIO(dodag, NULL);
+}
+
+void gnrc_rpl_router_operation(gnrc_rpl_dodag_t *dodag)
+{
+    dodag->node_status = GNRC_RPL_NORMAL_NODE;
+    /* announce presence to neighborhood */
+    trickle_reset_timer(&dodag->trickle);
+}
 /**
  * @}
  */
