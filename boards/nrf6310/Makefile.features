@@ -1,0 +1,9 @@
+FEATURES_PROVIDED += cpp
+FEATURES_PROVIDED += radio_nrfmin
+FEATURES_PROVIDED += periph_uart
+FEATURES_PROVIDED += periph_gpio
+FEATURES_PROVIDED += periph_random
+FEATURES_PROVIDED += periph_rtt
+FEATURES_PROVIDED += periph_cpuid
+FEATURES_PROVIDED += periph_spi
+FEATURES_MCU_GROUP = cortex_m0
