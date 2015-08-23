@@ -139,6 +139,17 @@ typedef enum {
     NETOPT_TX_END_IRQ,
     NETOPT_AUTOCCA,             /**< en/disable to check automatically
                                  *   before sending the channel is clear. */
+
+    /**
+     * @brief read-only check for a wired interface.
+     *
+     * If the interface is wireless this function will return -ENOTSUP, a
+     * positive value otherwise.
+     *
+     * @note Setting this option will always return -EONOTSUP.
+     */
+    NETOPT_IS_WIRED,
+
     /* add more options if needed */
 
     /**
