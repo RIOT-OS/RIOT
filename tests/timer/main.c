@@ -20,7 +20,7 @@
  */
 
 #include <stdio.h>
-#include <unistd.h>  /*usleep(), abs()*/
+#include <unistd.h>  /*usleep() */
 
 #include "hwtimer.h" /*HWTIMER_SPEED */
 #include "periph_conf.h" /*TIMER_NUMOF defined here */
@@ -31,10 +31,10 @@
 #define TIMER_MAXTIMERS TIMER_NUMOF 
 //#define TIMER_MAXTIMERS HWTIMER_MAXTIMERS 
 #define US_PER_TICK (1000000L/TIMER_SPEED)  
-#define WAIT (1000000U)
+#define WAIT (1000000L)
 #define TIMEOUT (100U)  
 #define DEV TIMER_0
-#define CHAN 0       /*TODO: define for the native, (example, TIMER_0_CHANNELS) */
+#define CHAN (0)      /*TODO: define for the native, (example, TIMER_0_CHANNELS) */
 
 
 int test_extra (tim_t);
@@ -53,12 +53,12 @@ int main(void)
     puts("Timer test application...");
     puts("--------------------------------------");
     puts("If test is successful, you should not see any error messages.");
-    puts("Then the message \"callback 0\" should be printed three times.");
+    puts("Then the message \"callback 0\" should be printed every second.");
     puts("The first message should be printed immediatly (100 us) and then the next two messages should be printed after a delay of 2 (approximate) seconds.");
     puts(""); 
     
     
-    /*****test for initializing each timers *******/
+    /*****test for initializing each timer *******/
 
     for(unsigned int i=0; i<TIMER_MAXTIMERS; i++) {
         init = timer_init(i, US_PER_TICK, callback);
@@ -67,7 +67,7 @@ int main(void)
             return -1;
         }
     }
-    
+    //puts("All timers initialized successfully");
    
     /********************************************************************************\
      *In the following, test for timer device 0 (TIMER_0) and channel 0 (?) is considered: 
@@ -95,25 +95,26 @@ int main(void)
         puts(" Error while trying to set timer");
         return -1;
     }
-    
    
     /*******test for timer_clear  *********************/
  
-    usleep(WAIT); /*wait until previous interrupt (time_set) fires before overwriting by the next timer_set*/
-    timer_set(DEV,CHAN, TIMEOUT); /*this interrupt should not fire, it will be cleared before it fires */
+    usleep(WAIT);      /* wait to allow the previously issued timer interrupt fires first */
+    timer_set(DEV,CHAN, TIMEOUT);  /*this interrupt should not fire, because it will be cleared before it fires */
     clear = timer_clear(DEV, CHAN);
-    if(clear != 1) {
+    if(clear != 1) {   
         puts(" Error while trying to clear timer");
         return -1;
     }
+
     /*******timer_irg_disable, timer_irq_enable ***************/
+    //while(1) {
     timer_irq_disable(DEV);  /*disables the next interrupt */
     timer_set(DEV, CHAN, TIMEOUT); /* fires if enabled by timer_irq_enable() (in this case, after (TIMEOUT + WAIT) us ~=1 sec), 
                                   otherwise it will stay disabled  */
     usleep(WAIT);              
     timer_irq_enable(DEV);/*enables the timer interrupt and restores interrupts that have been issued previously */ 
     timer_set(DEV, CHAN, TIMEOUT); /*fires after TIMEOUT (almost imediatly)  */                            
-    
+   // }
     return 0;
 }
 
