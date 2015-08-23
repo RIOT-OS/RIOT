@@ -70,8 +70,8 @@ bool gnrc_ndp_node_next_hop_ipv6_addr(ipv6_addr_t *next_hop_ip,
     uint32_t next_hop_flags = 0;
     ipv6_addr_t next_hop_actual;
 
-    if ((fib_get_next_hop(iface, next_hop_actual.u8, &next_hop_size,
-                          &next_hop_flags, (uint8_t *)dst,
+    if ((fib_get_next_hop(gnrc_ipv6_fib_table, iface, next_hop_actual.u8,
+                          &next_hop_size, &next_hop_flags, (uint8_t *)dst,
                           sizeof(ipv6_addr_t), 0) >= 0) &&
         (next_hop_size == sizeof(ipv6_addr_t))) {
             memcpy(next_hop_ip, &next_hop_actual, sizeof(ipv6_addr_t));
