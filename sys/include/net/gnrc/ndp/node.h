@@ -40,8 +40,8 @@ extern "C" {
  * @return true, if a next hop could be determined.
  * @return false otherwise
  */
-bool ng_ndp_node_next_hop_ipv6_addr(ipv6_addr_t *next_hop_ip,
-                                    kernel_pid_t *iface, ipv6_addr_t *dst);
+bool gnrc_ndp_node_next_hop_ipv6_addr(ipv6_addr_t *next_hop_ip,
+                                      kernel_pid_t *iface, ipv6_addr_t *dst);
 
 /**
  * @brief   Get link-layer address a given IPv6 address.
