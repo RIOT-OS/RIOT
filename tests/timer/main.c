@@ -53,10 +53,8 @@ int main(void)
     puts("Timer test application...");
     puts("--------------------------------------");
     puts("If test is successful, you should not see any error messages.");
-    puts("Then the message \"callback 0\" should be printed every second.");
-    puts("The first message should be printed immediatly (100 us) and then the next two messages should be printed after a delay of 2 (approximate) seconds.");
+    puts("Then the message \"callback 0\" should be printed twice after (approximate) 1 second.");
     puts(""); 
-    
     
     /*****test for initializing each timer *******/
 
@@ -90,7 +88,7 @@ int main(void)
     */
     /************testing timer_set***********************************************/
     
-    set = timer_set(DEV, CHAN, TIMEOUT);   /*fires after TIMEOUT (almost immediatly--100 us) */
+    set = timer_set(DEV, CHAN, TIMEOUT);   /*this interrupt does not fire, because it is cleared by the next timer_clear() before it fires */
     if (set != 1) {
         puts(" Error while trying to set timer");
         return -1;
@@ -98,8 +96,6 @@ int main(void)
    
     /*******test for timer_clear  *********************/
  
-    usleep(WAIT);      /* wait to allow the previously issued timer interrupt fires first */
-    timer_set(DEV,CHAN, TIMEOUT);  /*this interrupt should not fire, because it will be cleared before it fires */
     clear = timer_clear(DEV, CHAN);
     if(clear != 1) {   
         puts(" Error while trying to clear timer");
@@ -107,14 +103,16 @@ int main(void)
     }
 
     /*******timer_irg_disable, timer_irq_enable ***************/
-    //while(1) {
-    timer_irq_disable(DEV);  /*disables the next interrupt */
-    timer_set(DEV, CHAN, TIMEOUT); /* fires if enabled by timer_irq_enable() (in this case, after (TIMEOUT + WAIT) us ~=1 sec), 
-                                  otherwise it will stay disabled  */
+   
+    timer_irq_disable(DEV);  /*disables (temporarly) the next interrupt */
+    timer_set(DEV, CHAN, TIMEOUT); /* fires after a delay of (WAIT + TIMEOUT) us ~=1 sec*/
     usleep(WAIT);              
-    timer_irq_enable(DEV);/*enables the timer interrupt and restores interrupts that have been issued previously */ 
-    timer_set(DEV, CHAN, TIMEOUT); /*fires after TIMEOUT (almost imediatly)  */                            
-   // }
+    timer_irq_enable(DEV);/*enables the timer interrupt and restores interrupts that have been disabled previously */ 
+    timer_set(DEV, CHAN, TIMEOUT); /*fires after TIMEOUT (almost imediatly)  */ 
+    usleep (WAIT); /*wait to allow the previously issued interrupts fire first */
+    timer_irq_disable(DEV); /*disables (permanently) the next interrupt  */
+    timer_set(DEV, CHAN, TIMEOUT); /* this interrupt does not fire, because it is disabled above and is not followed by enable */                      
+    
     return 0;
 }
 
