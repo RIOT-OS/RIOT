@@ -25,6 +25,7 @@
 #include "hwtimer.h" /*HWTIMER_SPEED */
 #include "periph_conf.h" /*TIMER_NUMOF defined here */
 #include "periph/timer.h"
+#include "vtimer.h"  /*vtimer_usleep() */
 
 #define TIMER_SPEED HWTIMER_SPEED   /* value dependes on the type of platform architecture */
 #define TIMER_MAXTIMERS TIMER_NUMOF 
@@ -55,7 +56,7 @@ void callback(int val)   /* callback function/ISR */
 
 int main(void)
 {   
-    int init, set;
+    int init, set, clear;
 
     puts("**************************************");
     puts("Timer test application...");
@@ -72,10 +73,15 @@ int main(void)
             return -1;
         }
     }
-    printf("All timers successfully initialized\n\n");
+    //printf("All timers successfully initialized\n\n");
+   
+    /********************************************************************************\
+     *In the following, test for timer device 0 (TIMER_0) and channel 0 (?) is considered: 
+     *It can be extented to test all timer devices on a given platform
+    \******************************************************************************/
     
     /************testing timer_set***********************************************/
-    puts ("Testing timer_set");
+    
     set = timer_set(DEV, CHAN, TIMEOUT);   /*fires after TIMEOUT (almost immediatly--100 us) */
     if (set != 1) {
         puts(" Error while trying to set timer");
@@ -83,6 +89,25 @@ int main(void)
     }
     
    
+ /*******test for timer_clear, timer_irg_disable, timer_irq_enable ***********/
+ 
+    usleep(WAIT); /*wait until previous interrupt (time_set) fires before overwriting by the next timer_set*/
+    timer_set(DEV,CHAN, TIMEOUT); /*this interrupt should not fire, it will be cleared before it fires */
+    clear = timer_clear(DEV, CHAN);
+    if(clear != 1) {
+        puts(" Error while trying to clear timer");
+        return -1;
+    }
+    while(1)  {
+        timer_irq_disable(DEV);  /*disables the next interrupt */
+	timer_set(DEV, CHAN, TIMEOUT); /* fires if enabled by timer_irq_enable() (in this case, after (TIMEOUT + WAIT) us ~=1 sec), 
+	                               otherwise it will stay disabled  */
+        vtimer_usleep(WAIT); 
+                      
+	timer_irq_enable(DEV);/*enables the timer interrupt and restores interrupts that have been issued previously */ 
+        timer_set(DEV, CHAN, TIMEOUT); /*fires after TIMEOUT (almost imediatly)  */                            
+    }
+    
     return 0;
 }
 
