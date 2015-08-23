@@ -535,7 +535,7 @@ void gnrc_rpl_send_DAO(gnrc_rpl_dodag_t *dodag, ipv6_addr_t *destination, uint8_
     int size = sizeof(icmpv6_hdr_t) + sizeof(gnrc_rpl_dao_t) +
         (sizeof(gnrc_rpl_opt_target_t) * (dst_size + 1)) + sizeof(gnrc_rpl_opt_transit_t);
 
-    bool local_instance = (dodag->instance->id & NG_RPL_INSTANCE_ID_MSB) ? true : false;
+    bool local_instance = (dodag->instance->id & GNRC_RPL_INSTANCE_ID_MSB) ? true : false;
 
     if (local_instance) {
         size += sizeof(ipv6_addr_t);
@@ -600,7 +600,7 @@ void gnrc_rpl_send_DAO_ACK(gnrc_rpl_dodag_t *dodag, ipv6_addr_t *destination, ui
     icmpv6_hdr_t *icmp;
     gnrc_rpl_dao_ack_t *dao_ack;
     int size = sizeof(icmpv6_hdr_t) + sizeof(gnrc_rpl_dao_ack_t);
-    bool local_instance = (dodag->instance->id & NG_RPL_INSTANCE_ID_MSB) ? true : false;
+    bool local_instance = (dodag->instance->id & GNRC_RPL_INSTANCE_ID_MSB) ? true : false;
 
     if (local_instance) {
         size += sizeof(ipv6_addr_t);
