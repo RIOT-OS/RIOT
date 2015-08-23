@@ -93,10 +93,12 @@ void gnrc_ipv6_demux(kernel_pid_t iface, gnrc_pktsnip_t *pkt, uint8_t nh)
     pkt->type = gnrc_nettype_from_protnum(nh);
 
     switch (nh) {
+#ifdef MODULE_GNRC_ICMPV6
         case PROTNUM_ICMPV6:
             DEBUG("ipv6: handle ICMPv6 packet (nh = %" PRIu8 ")\n", nh);
             gnrc_icmpv6_demux(iface, pkt);
             break;
+#endif
 #ifdef MODULE_GNRC_IPV6_EXT
         case PROTNUM_IPV6_EXT_HOPOPT:
         case PROTNUM_IPV6_EXT_DST:
@@ -117,6 +119,7 @@ void gnrc_ipv6_demux(kernel_pid_t iface, gnrc_pktsnip_t *pkt, uint8_t nh)
             _decapsulate(pkt);
             break;
         default:
+            (void)iface;
             break;
     }
 
@@ -188,6 +191,7 @@ static void *_event_loop(void *args)
                                             (ipv6_addr_t *)msg.content.ptr);
                 break;
 
+#ifdef MODULE_GNRC_NDP
             case GNRC_NDP_MSG_NBR_SOL_RETRANS:
                 DEBUG("ipv6: Neigbor solicitation retransmission timer event received\n");
                 gnrc_ndp_retrans_nbr_sol((gnrc_ipv6_nc_t *)msg.content.ptr);
@@ -197,6 +201,7 @@ static void *_event_loop(void *args)
                 DEBUG("ipv6: Neigbor cache state timeout received\n");
                 gnrc_ndp_state_timeout((gnrc_ipv6_nc_t *)msg.content.ptr);
                 break;
+#endif
 
             default:
                 break;
