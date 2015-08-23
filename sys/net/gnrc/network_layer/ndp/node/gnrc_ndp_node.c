@@ -65,6 +65,29 @@ bool gnrc_ndp_node_next_hop_ipv6_addr(ipv6_addr_t *next_hop_ip,
         return true;
     }
 #endif
+
+    /* for wired interfaces "perform a longest prefix match against the Prefix
+       List to determine whether the packet's destination is on- or off-link."
+       according to RFC 4861, section 5.2 */
+    ipv6_addr_t *prefix;
+
+    /* determine the longest matching prefix */
+    if (*iface == KERNEL_PID_UNDEF) {
+        /* gnrc_ipv6_netif_t doubles as prefix list */
+        *iface = gnrc_ipv6_netif_find_by_prefix(&prefix, dst);
+    }
+    else {
+        /* gnrc_ipv6_netif_t doubles as prefix list */
+        prefix = gnrc_ipv6_netif_match_prefix(*iface, dst);
+    }
+
+    /* interface is wired and prefix is on-link */
+    if ((gnrc_ipv6_netif_get(*iface)->flags & GNRC_IPV6_NETIF_FLAGS_IS_WIRED) &&
+        (prefix != NULL) &&
+        (gnrc_ipv6_netif_addr_get(prefix)->flags & GNRC_IPV6_NETIF_ADDR_FLAGS_NDP_ON_LINK)) {
+        next_hop_ip = dst;
+    }
+
 #ifdef MODULE_FIB
     size_t next_hop_size = sizeof(ipv6_addr_t);
     uint32_t next_hop_flags = 0;
