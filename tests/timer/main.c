@@ -30,7 +30,10 @@
 #define TIMER_MAXTIMERS TIMER_NUMOF 
 /*#define TIMER_MAXTIMERS HWTIMER_MAXTIMERS */
 //#define US_PER_TICK (1000000L/TIMER_SPEED)  
- 
+#define WAIT (1000000U)
+#define TIMEOUT (100U)  
+#define DEV TIMER_0
+#define CHAN 0       /*TODO: define for the native, (example, TIMER_0_CHANNELS) */
 
 /**
  * @brief       number of us passed for one timer tick
@@ -52,7 +55,7 @@ void callback(int val)   /* callback function/ISR */
 
 int main(void)
 {   
-    int init;
+    int init, set;
 
     puts("**************************************");
     puts("Timer test application...");
@@ -70,6 +73,14 @@ int main(void)
         }
     }
     printf("All timers successfully initialized\n\n");
+    
+    /************testing timer_set***********************************************/
+    puts ("Testing timer_set");
+    set = timer_set(DEV, CHAN, TIMEOUT);   /*fires after TIMEOUT (almost immediatly--100 us) */
+    if (set != 1) {
+        puts(" Error while trying to set timer");
+        return -1;
+    }
     
    
     return 0;
