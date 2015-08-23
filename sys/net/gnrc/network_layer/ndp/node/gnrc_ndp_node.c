@@ -56,8 +56,8 @@ static gnrc_pktqueue_t *_alloc_pkt_node(gnrc_pktsnip_t *pkt)
 }
 
 bool gnrc_ndp_node_next_hop_ipv6_addr(ipv6_addr_t *next_hop_ip,
-                                    kernel_pid_t *iface,
-                                    ipv6_addr_t *dst)
+                                      kernel_pid_t *iface,
+                                      ipv6_addr_t *dst)
 {
 #ifdef MODULE_GNRC_IPV6_EXT_RH
     next_hop_ip = gnrc_ipv6_ext_rh_next_hop(hdr);
