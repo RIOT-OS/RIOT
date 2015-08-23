@@ -43,7 +43,6 @@ static void _update_lifetime(void);
 static void _dao_handle_send(gnrc_rpl_dodag_t *dodag);
 static void _receive(gnrc_pktsnip_t *pkt);
 static void *_event_loop(void *args);
-static gnrc_rpl_dodag_t *_root_dodag_init(uint8_t instance_id, ipv6_addr_t *dodag_id, uint8_t mop);
 
 kernel_pid_t gnrc_rpl_init(kernel_pid_t if_pid)
 {
@@ -78,7 +77,7 @@ kernel_pid_t gnrc_rpl_init(kernel_pid_t if_pid)
 
 gnrc_rpl_dodag_t *gnrc_rpl_root_init(uint8_t instance_id, ipv6_addr_t *dodag_id)
 {
-    gnrc_rpl_dodag_t *dodag = _root_dodag_init(instance_id, dodag_id, GNRC_RPL_DEFAULT_MOP);
+    gnrc_rpl_dodag_t *dodag = gnrc_rpl_root_dodag_init(instance_id, dodag_id, GNRC_RPL_DEFAULT_MOP);
 
     if (!dodag) {
         return NULL;
@@ -99,63 +98,6 @@ gnrc_rpl_dodag_t *gnrc_rpl_root_init(uint8_t instance_id, ipv6_addr_t *dodag_id)
     trickle_start(gnrc_rpl_pid, &dodag->trickle, GNRC_RPL_MSG_TYPE_TRICKLE_INTERVAL,
                   GNRC_RPL_MSG_TYPE_TRICKLE_CALLBACK, (1 << dodag->dio_min),
                   dodag->dio_interval_doubl, dodag->dio_redun);
-
-    return dodag;
-}
-
-static gnrc_rpl_dodag_t *_root_dodag_init(uint8_t instance_id, ipv6_addr_t *dodag_id, uint8_t mop)
-{
-    if (gnrc_rpl_pid == KERNEL_PID_UNDEF) {
-        DEBUG("RPL: RPL thread not started\n");
-        return NULL;
-    }
-
-    ipv6_addr_t *configured_addr;
-    gnrc_ipv6_netif_addr_t *netif_addr = NULL;
-    gnrc_rpl_instance_t *inst = NULL;
-    gnrc_rpl_dodag_t *dodag = NULL;
-
-    if (instance_id == 0) {
-        DEBUG("RPL: instance id (%d) must be a positive number greater than zero\n", instance_id);
-        return NULL;
-    }
-
-    if (gnrc_ipv6_netif_find_by_addr(&configured_addr, dodag_id) == KERNEL_PID_UNDEF) {
-        DEBUG("RPL: no IPv6 address configured to match the given dodag id: %s\n",
-              ipv6_addr_to_str(addr_str, dodag_id, sizeof(addr_str)));
-        return NULL;
-    }
-
-    if ((netif_addr = gnrc_ipv6_netif_addr_get(configured_addr)) == NULL) {
-        DEBUG("RPL: no netif address found for %s\n", ipv6_addr_to_str(addr_str, configured_addr,
-                sizeof(addr_str)));
-        return NULL;
-    }
-
-    if (gnrc_rpl_instance_add(instance_id, &inst)) {
-        inst->of = (gnrc_rpl_of_t *) gnrc_rpl_get_of_for_ocp(GNRC_RPL_DEFAULT_OCP);
-        inst->mop = mop;
-        inst->min_hop_rank_inc = GNRC_RPL_DEFAULT_MIN_HOP_RANK_INCREASE;
-        inst->max_rank_inc = GNRC_RPL_DEFAULT_MAX_RANK_INCREASE;
-    }
-    else if (inst == NULL) {
-        DEBUG("RPL: could not allocate memory for a new instance with id %d", instance_id);
-        return NULL;
-    }
-    else if (inst->mop != mop) {
-        DEBUG("RPL: instance (%d) exists with another MOP", instance_id);
-        return NULL;
-    }
-
-    if (!gnrc_rpl_dodag_add(inst, dodag_id, &dodag)) {
-        DEBUG("RPL: DODAG with id %s exists or no memory left for a new DODAG",
-                ipv6_addr_to_str(addr_str, dodag_id, sizeof(addr_str)));
-        return NULL;
-    }
-
-    dodag->prefix_len = netif_addr->prefix_len;
-    dodag->addr_preferred = netif_addr->preferred;
-    dodag->addr_valid = netif_addr->valid;
 
     return dodag;
 }
