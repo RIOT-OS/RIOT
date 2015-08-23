@@ -51,7 +51,7 @@ int _gnrc_rpl_dodag_root(char *arg1, char *arg2)
     }
 
     gnrc_rpl_dodag_t *dodag = NULL;
-    dodag = gnrc_rpl_root_init(instance_id, &dodag_id);
+    dodag = gnrc_rpl_root_init(instance_id, &dodag_id, false, false);
     if (dodag == NULL) {
         char addr_str[IPV6_ADDR_MAX_STR_LEN];
         printf("error: could not add DODAG (%s) to instance (%d)\n",
