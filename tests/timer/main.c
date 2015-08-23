@@ -29,24 +29,13 @@
 
 #define TIMER_SPEED HWTIMER_SPEED   /* value dependes on the type of platform architecture */
 #define TIMER_MAXTIMERS TIMER_NUMOF 
-/*#define TIMER_MAXTIMERS HWTIMER_MAXTIMERS */
-//#define US_PER_TICK (1000000L/TIMER_SPEED)  
+//#define TIMER_MAXTIMERS HWTIMER_MAXTIMERS 
+#define US_PER_TICK (1000000L/TIMER_SPEED)  
 #define WAIT (1000000U)
 #define TIMEOUT (100U)  
 #define DEV TIMER_0
 #define CHAN 0       /*TODO: define for the native, (example, TIMER_0_CHANNELS) */
 
-/**
- * @brief       number of us passed for one timer tick
- * 
- * @return      microseconds
- */
-
-#if TIMER_SPEED > 1000000L
-#define US_PER_TICK        (TIMER_SPEED / 1000000L)
-#else
-#define US_PER_TICK        (1000000L / TIMER_SPEED)
-#endif
 
 int test_extra (tim_t);
 
@@ -65,7 +54,7 @@ int main(void)
     puts("--------------------------------------");
     puts("If test is successful, you should not see any error messages.");
     puts("Then the message \"callback 0\" should be printed three times.");
-    puts("The first message should be printed immediatly (100 us) and the next two messages should be printed after a delay of 2 (approximate) seconds.");
+    puts("The first message should be printed immediatly (100 us) and then the next two messages should be printed after a delay of 2 (approximate) seconds.");
     puts(""); 
     
     
