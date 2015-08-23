@@ -25,7 +25,7 @@
 #include "hwtimer.h" /*HWTIMER_SPEED */
 #include "periph_conf.h" /*TIMER_NUMOF defined here */
 #include "periph/timer.h"
-#include "vtimer.h"  /*vtimer_usleep() */
+//#include "vtimer.h"  /*vtimer_usleep() */
 
 #define TIMER_SPEED HWTIMER_SPEED   /* value dependes on the type of platform architecture */
 #define TIMER_MAXTIMERS TIMER_NUMOF 
@@ -48,6 +48,7 @@
 #define US_PER_TICK        (1000000L / TIMER_SPEED)
 #endif
 
+int test_extra (tim_t);
 
 void callback(int val)   /* callback function/ISR */
 {  
@@ -57,6 +58,7 @@ void callback(int val)   /* callback function/ISR */
 int main(void)
 {   
     int init, set, clear;
+    //int extra;
 
     puts("**************************************");
     puts("Timer test application...");
@@ -82,7 +84,21 @@ int main(void)
      *In the following, test for timer device 0 (TIMER_0) and channel 0 (?) is considered: 
      *It can be extented to test all timer devices on a given platform
     \******************************************************************************/
-    
+
+    /**********test for stoping and starting timer (NOTE: this test fails)*********/
+
+    /*******************************************************************************\
+     *Unexpected behaviours with timer_stop(), timer_star(), timer_reset()
+     * observed during development or did not implemented yet, and test fails. 
+     *it can be checked by uncommenting the following code block
+    \******************************************************************************/
+    /* 
+    extra = test_extra(DEV);
+    if(extra != 1) {
+        puts(" Error while trying to stop and start timer");
+        return -1;
+    }
+    */
     /************testing timer_set***********************************************/
     
     set = timer_set(DEV, CHAN, TIMEOUT);   /*fires after TIMEOUT (almost immediatly--100 us) */
@@ -108,8 +124,42 @@ int main(void)
     usleep(WAIT);              
     timer_irq_enable(DEV);/*enables the timer interrupt and restores interrupts that have been issued previously */ 
     timer_set(DEV, CHAN, TIMEOUT); /*fires after TIMEOUT (almost imediatly)  */                            
-  
+    
     return 0;
+}
+
+/**
+ * @brief proposed test for timer_stop() and timer_start()
+ *
+ *-There is no real implementation of timer_stop() and timer_start() for the native platform yet. 
+ * Right now, they are only dummy methods and do nothing. 
+ *-Assuming that they will be implemented in the future, I would propose the following method 
+ * for testing the methods.
+ *
+ * @param[in] dev           the timer device to test
+ *
+ * @return                  1 on success
+ * @return                  -1 on error
+ */
+     
+int test_extra (tim_t dev) 
+{
+    unsigned int last, after_stop,after_start;
+      
+    timer_stop(dev);
+    last = timer_read(dev);
+    usleep(WAIT);
+    after_stop = timer_read(dev);
+    if (!(last == after_stop)){
+        return -1;
+    }
+    timer_start(dev);
+    usleep(WAIT);
+    after_start = timer_read(dev);
+    if (after_stop == after_start) {  /* assuming the timer count value takes atleast more than 1 second to overflow and then restart counting up */ 
+        return -1;
+    }
+    return 1;
 }
 
 

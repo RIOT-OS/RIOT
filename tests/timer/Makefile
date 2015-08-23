@@ -1,7 +1,7 @@
 APPLICATION = timer
 include ../Makefile.tests_common
 
-USEMODULE +=vtimer
+#USEMODULE +=vtimer
 
 DISABLE_MODULE += auto_init
 
