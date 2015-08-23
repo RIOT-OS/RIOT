@@ -53,6 +53,10 @@ ifneq (,$(filter gnrc_tftp,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
+ifneq (,$(filter gnrc_rpl_p2p,$(USEMODULE)))
+  USEMODULE += gnrc_rpl
+endif
+
 ifneq (,$(filter gnrc_rpl,$(USEMODULE)))
   USEMODULE += fib
   USEMODULE += gnrc_ipv6_router_default

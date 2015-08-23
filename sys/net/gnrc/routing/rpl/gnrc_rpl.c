@@ -21,6 +21,10 @@
 #include "mutex.h"
 
 #include "net/gnrc/rpl.h"
+#ifdef MODULE_GNRC_RPL_P2P
+#include "net/gnrc/rpl/p2p.h"
+#include "net/gnrc/rpl/p2p_dodag.h"
+#endif
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
@@ -157,6 +161,24 @@ static void _receive(gnrc_pktsnip_t *icmpv6)
             gnrc_rpl_recv_DAO_ACK((gnrc_rpl_dao_ack_t *)(icmpv6_hdr + 1), iface,
                                   byteorder_ntohs(ipv6_hdr->len));
             break;
+#ifdef MODULE_GNRC_RPL_P2P
+        case GNRC_RPL_P2P_ICMPV6_CODE_DRO:
+            DEBUG("RPL: P2P DRO received\n");
+            gnrc_pktsnip_t *icmpv6_snip = gnrc_pktbuf_add(NULL, NULL, icmpv6->size,
+                                                          GNRC_NETTYPE_ICMPV6);
+            if (icmpv6_snip == NULL) {
+                DEBUG("RPL-P2P: cannot copy ICMPv6 packet\n");
+                break;
+            }
+
+            memcpy(icmpv6_snip->data, icmpv6->data, icmpv6->size);
+
+            gnrc_rpl_p2p_recv_DRO(icmpv6_snip, &ipv6_hdr->src);
+            break;
+        case GNRC_RPL_P2P_ICMPV6_CODE_DRO_ACK:
+            DEBUG("RPL: P2P DRO-ACK received\n");
+            break;
+#endif
         default:
             DEBUG("RPL: Unknown ICMPV6 code received\n");
             break;
@@ -265,6 +287,10 @@ void _update_lifetime(void)
         }
     }
 
+#ifdef MODULE_GNRC_RPL_P2P
+    gnrc_rpl_p2p_update();
+#endif
+
     xtimer_set_msg(&_lt_timer, _lt_time, &_lt_msg, gnrc_rpl_pid);
 }
 
@@ -284,6 +310,11 @@ void gnrc_rpl_long_delay_dao(gnrc_rpl_dodag_t *dodag)
 
 void _dao_handle_send(gnrc_rpl_dodag_t *dodag)
 {
+#ifdef MODULE_GNRC_RPL_P2P
+    if (dodag->instance->mop == GNRC_RPL_P2P_MOP) {
+        return;
+    }
+#endif
     if ((dodag->dao_ack_received == false) && (dodag->dao_counter < GNRC_RPL_DAO_SEND_RETRIES)) {
         dodag->dao_counter++;
         gnrc_rpl_send_DAO(dodag->instance, NULL, dodag->default_lifetime);

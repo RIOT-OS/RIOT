@@ -63,6 +63,36 @@ int _gnrc_rpl_dodag_root(char *arg1, char *arg2)
     return 0;
 }
 
+#ifdef MODULE_GNRC_RPL_P2P
+int _gnrc_rpl_find(char *arg1, char *arg2)
+{
+    uint8_t instance_id = (uint8_t) atoi(arg1);
+    ipv6_addr_t dodag_id;
+    ipv6_addr_t target;
+
+    if (ipv6_addr_from_str(&dodag_id, arg1) == NULL) {
+        puts("<dodag_id> must be a valid IPv6 address");
+        return 1;
+    }
+
+    if (ipv6_addr_from_str(&target, arg2) == NULL) {
+        puts("<target> must be a valid IPv6 address");
+        return 1;
+    }
+
+    gnrc_rpl_instance_t *instance = NULL;
+    if ((instance = gnrc_rpl_p2p_root_init(0, &dodag_id, &target, true)) == NULL) {
+        char addr_str[IPV6_ADDR_MAX_STR_LEN];
+        printf("error: could not add DODAG (%s) to instance (%d)\n",
+                ipv6_addr_to_str(addr_str, &dodag_id, sizeof(addr_str)), instance_id);
+        return 1;
+    }
+
+    printf("successfully initiated a P2P-RPL Route Discovery\n");
+    return 0;
+}
+#endif
+
 int _gnrc_rpl_instance_remove(char *arg1)
 {
     uint8_t instance_id = (uint8_t) atoi(arg1);

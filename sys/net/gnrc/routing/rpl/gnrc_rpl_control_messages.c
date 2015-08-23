@@ -25,6 +25,12 @@
 
 #include "net/gnrc/rpl.h"
 
+#ifdef MODULE_GNRC_RPL_P2P
+#include "net/gnrc/rpl/p2p_structs.h"
+#include "net/gnrc/rpl/p2p_dodag.h"
+#include "net/gnrc/rpl/p2p.h"
+#endif
+
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
@@ -161,6 +167,18 @@ void gnrc_rpl_send_DIO(gnrc_rpl_instance_t *inst, ipv6_addr_t *destination)
     gnrc_pktsnip_t *pkt = NULL, *tmp;
     gnrc_rpl_dio_t *dio;
 
+#ifdef MODULE_GNRC_RPL_P2P
+    gnrc_rpl_p2p_ext_t *p2p_ext = gnrc_rpl_p2p_ext_get(dodag);
+    if (dodag->instance->mop == GNRC_RPL_P2P_MOP) {
+        if (!p2p_ext->for_me) {
+            if ((pkt = gnrc_rpl_p2p_rdo_build(pkt, p2p_ext)) == NULL) {
+                return;
+            }
+        }
+        dodag->dio_opts &= ~GNRC_RPL_REQ_DIO_OPT_PREFIX_INFO;
+    }
+#endif
+
 #ifndef GNRC_RPL_WITHOUT_PIO
     if (dodag->dio_opts & GNRC_RPL_REQ_DIO_OPT_PREFIX_INFO) {
         if ((pkt = _dio_prefix_info_build(pkt, dodag)) == NULL) {
@@ -265,6 +283,12 @@ void gnrc_rpl_recv_DIS(gnrc_rpl_dis_t *dis, kernel_pid_t iface, ipv6_addr_t *src
             if ((gnrc_rpl_instances[i].state != 0)
                 /* a leaf node should only react to unicast DIS */
                  && (gnrc_rpl_instances[i].dodag.node_status != GNRC_RPL_LEAF_NODE)) {
+#ifdef MODULE_GNRC_RPL_P2P
+                if (gnrc_rpl_instances[i].mop == GNRC_RPL_P2P_MOP) {
+                    DEBUG("RPL: Not responding to DIS for P2P-RPL DODAG\n");
+                    continue;
+                }
+#endif
                 trickle_reset_timer(&(gnrc_rpl_instances[i].dodag.trickle));
             }
         }
@@ -497,6 +521,11 @@ bool _parse_options(int msg_type, gnrc_rpl_instance_t *inst, gnrc_rpl_opt_t *opt
                 first_target = NULL;
                 break;
 
+#ifdef MODULE_GNRC_RPL_P2P
+            case (GNRC_RPL_P2P_OPT_RDO):
+                gnrc_rpl_p2p_rdo_parse((gnrc_rpl_p2p_opt_rdo_t *) opt, gnrc_rpl_p2p_ext_get(dodag));
+                break;
+#endif
         }
         l += opt->length + sizeof(gnrc_rpl_opt_t);
         opt = (gnrc_rpl_opt_t *) (((uint8_t *) (opt + 1)) + opt->length);
@@ -635,6 +664,13 @@ void gnrc_rpl_recv_DIO(gnrc_rpl_dio_t *dio, kernel_pid_t iface, ipv6_addr_t *src
         return;
     }
 
+#ifdef MODULE_GNRC_RPL_P2P
+    gnrc_rpl_p2p_ext_t *p2p_ext = gnrc_rpl_p2p_ext_get(dodag);
+    if ((dodag->instance->mop == GNRC_RPL_P2P_MOP) && (p2p_ext->lifetime_sec <= 0)) {
+        return;
+    }
+#endif
+
     if (GNRC_RPL_COUNTER_GREATER_THAN(dio->version_number, dodag->version)) {
         if (dodag->node_status == GNRC_RPL_ROOT_NODE) {
             dodag->version = GNRC_RPL_COUNTER_INCREMENT(dio->version_number);
@@ -760,6 +796,12 @@ void gnrc_rpl_send_DAO(gnrc_rpl_instance_t *inst, ipv6_addr_t *destination, uint
         return;
     }
 
+#ifdef MODULE_GNRC_RPL_P2P
+    if (dodag->instance->mop == GNRC_RPL_P2P_MOP) {
+        return;
+    }
+#endif
+
     if (destination == NULL) {
         if (dodag->parents == NULL) {
             DEBUG("RPL: dodag has no preferred parent\n");
@@ -781,14 +823,12 @@ void gnrc_rpl_send_DAO(gnrc_rpl_instance_t *inst, ipv6_addr_t *destination, uint
         return;
     }
 
-    fib_entry_t *fentry = NULL;
-    ipv6_addr_t *addr = NULL;
-
     mutex_lock(&(gnrc_ipv6_fib_table.mtx_access));
 
     /* add external and RPL FIB entries */
     for (size_t i = 0; i < gnrc_ipv6_fib_table.size; ++i) {
-        fentry = &gnrc_ipv6_fib_table.data.entries[i];
+        ipv6_addr_t *addr;
+        fib_entry_t *fentry = &gnrc_ipv6_fib_table.data.entries[i];
         if (fentry->lifetime != 0) {
             if (!(fentry->next_hop_flags & FIB_FLAG_RPL_ROUTE)) {
                 ptr = &tmp;
@@ -1002,6 +1042,12 @@ void gnrc_rpl_recv_DAO(gnrc_rpl_dao_t *dao, kernel_pid_t iface, ipv6_addr_t *src
     if (dodag->node_status == GNRC_RPL_LEAF_NODE) {
         return;
     }
+
+#ifdef MODULE_GNRC_RPL_P2P
+    if (dodag->instance->mop == GNRC_RPL_P2P_MOP) {
+        return;
+    }
+#endif
 
     uint32_t included_opts = 0;
     if(!_parse_options(GNRC_RPL_ICMPV6_CODE_DAO, inst, opts, len, src, &included_opts)) {
