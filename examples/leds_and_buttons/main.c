@@ -51,9 +51,9 @@ void sw2_event(void* arg) {
 
 int main(void) {
 	
-	gpio_init(RED_LED, GPIO_DIR_OUT, GPIO_NOPULL);
-	gpio_init(GREEN_LED, GPIO_DIR_OUT, GPIO_NOPULL);
-	gpio_init(YELLOW_LED, GPIO_DIR_OUT, GPIO_NOPULL);
+//	gpio_init(RED_LED, GPIO_DIR_OUT, GPIO_NOPULL);
+//	gpio_init(GREEN_LED, GPIO_DIR_OUT, GPIO_NOPULL);
+//	gpio_init(YELLOW_LED, GPIO_DIR_OUT, GPIO_NOPULL);
 
 	gpio_init_int(PUSH2, GPIO_NOPULL, GPIO_BOTH, sw2_event, 0);
 

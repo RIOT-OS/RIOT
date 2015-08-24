@@ -27,32 +27,20 @@
 
 #include "board.h"
 #include "cpu.h"
-
 #include "lpm.h"
 
+#include "periph/gpio.h"
+
 extern void (* const g_pfnVectors[])(void);
-
-#if 0
-static void led_init_helper(int gpio_num) {
-    gpio_software_control(gpio_num);
-    gpio_dir_output(gpio_num);
-
-    /* Enable output without any internal pull resistors: */
-    IOC_PXX_OVER[gpio_num] = IOC_OVERRIDE_OE;
-}
-#endif
 
 /**
  * @brief Initialize the SmartRF06's on-board LEDs
  */
 void led_init(void)
 {
-#if 0
-    led_init_helper(LED_RED_GPIO);
-    led_init_helper(LED_GREEN_GPIO);
-    led_init_helper(LED_YELLOW_GPIO);
-    led_init_helper(LED_ORANGE_GPIO);
-#endif
+	gpio_init(RED_LED, GPIO_DIR_OUT, GPIO_NOPULL);
+	gpio_init(GREEN_LED, GPIO_DIR_OUT, GPIO_NOPULL);
+	gpio_init(YELLOW_LED, GPIO_DIR_OUT, GPIO_NOPULL);
 }
 
 /**
