@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Hamburg University of Applied Sciences
+ * Copyright (C) 2015 Engineering-Spirit
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -11,24 +11,24 @@
  * @{
  *
  * @file
- * @brief           Memory definitions for the STM32L151RC
+ * @brief           Memory definitions for the STM32L151RB-A
  *
- * @author          Katja Kirstein <katja.kirstein@haw-hamburg.de>
+ * @author          Nick van IJzendoorn <nijzendoorn@engineering-spirit.nl>
  *
  * @}
  */
 
 MEMORY
 {
-    rom (rx)        : ORIGIN = 0x08000000, LENGTH = 256K
-    ram (xrw)       : ORIGIN = 0x20000000, LENGTH = 32K
+    rom (rx)        : ORIGIN = 0x08000000, LENGTH = 128K
+    ram (rw)        : ORIGIN = 0x20000000, LENGTH = 32K
 
     /* see STM32L1 Reference Manual (31.2 Unique device ID registers (96 bits))
      *    Base address:
      *      - 0x1FF80050 for Cat.1 and Cat.2 devices
      *      - 0x1FF800D0 for Cat.3, Cat.4, Cat.5 and Cat.6 devices
      */
-    cpuid (r)       : ORIGIN = 0x1ff800d0, LENGTH = 12
+    cpuid (r)       : ORIGIN = 0x1ff80050, LENGTH = 12
 }
 
 _cpuid_address = ORIGIN(cpuid);
