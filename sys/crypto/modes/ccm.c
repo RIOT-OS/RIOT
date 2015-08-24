@@ -40,7 +40,7 @@ int ccm_compute_cbc_mac(cipher_t* cipher, uint8_t iv[16],
     uint8_t offset, block_size, mac_enc[16] = {0};
 
     block_size = cipher_get_block_size(cipher);
-    memcpy(mac, iv, 16);
+    memmove(mac, iv, 16);
     offset = 0;
     do {
         uint8_t block_size_input = (length - offset > block_size) ?
