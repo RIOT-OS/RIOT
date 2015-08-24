@@ -24,7 +24,7 @@ extern volatile uint32_t _cpuid_address;
 
 void cpuid_get(void *id)
 {
-    memcpy(id, (void *)(_cpuid_address), CPUID_ID_LEN);
+    memcpy(id, (void *)(&_cpuid_address), CPUID_ID_LEN);
 }
 
 /** @} */
