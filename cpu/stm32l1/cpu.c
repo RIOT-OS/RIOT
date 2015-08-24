@@ -23,12 +23,16 @@
 #include "periph_conf.h"
 
 /* Check the source to be used for the PLL */
-#ifdef CLOCK_LSI
+#if defined(CLOCK_HSI) && defined(CLOCK_HSE)
+#error "Only provide one of two CLOCK_HSI/CLOCK_HSE"
+#elif CLOCK_HSI
 #define CLOCK_CR_SOURCE     RCC_CR_HSION
-#define CLOCK_PLL_SOURCE    RCC_CFGR_PLLSRC_HSI_Div2
-#else
+#define CLOCK_PLL_SOURCE    RCC_CFGR_PLLSRC_HSI
+#elif CLOCK_HSE
 #define CLOCK_CR_SOURCE     RCC_CR_HSEON
 #define CLOCK_PLL_SOURCE    RCC_CFGR_PLLSRC_HSE
+#else
+#error "Please provide CLOCK_HSI or CLOCK_HSE in boards/NAME/includes/perhip_cpu.h"
 #endif
 
 static void clk_init(void);

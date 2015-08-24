@@ -7,11 +7,11 @@
  */
 
 /**
- * @ingroup     boards_nucleo-l1
+ * @ingroup     boards_rf-motherboard
  * @{
  *
  * @file
- * @brief       Peripheral MCU configuration for the nucleo-l1 board
+ * @brief       Peripheral MCU configuration for the rf-motherboard board
  *
  * @author      Nick van IJzendoorn <nijzendoorn@engineering-spirit.nl>
  */
