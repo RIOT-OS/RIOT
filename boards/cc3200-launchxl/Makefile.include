@@ -19,11 +19,10 @@ ifeq ($(PROGRAMMER),openocd)
   export FFLAGS  = -p "$(PORT)" -e -w -v $(HEXFILE)
 else ifeq ($(PROGRAMMER),cc3200prog)
 
-  export ENERGIA_ROOT?=/c/opt/energia-0101E0014/
-  export UART_PORT?=29 # on my machine the lauanchpad is on COM29
-
+  export ENERGIA_ROOT?=/opt/energia-0101E0016/
   export FLASHER = $(RIOTBOARD)/$(BOARD)/dist/flash.sh
-  export FFLAGS  = $(ENERGIA_ROOT) $(UART_PORT) $(HEXFILE)
+  export FFLAGS  = $(ENERGIA_ROOT) $(PORT) $(HEXFILE)
+
 endif
 
 export OFLAGS    = -O binary --gap-fill 0xff

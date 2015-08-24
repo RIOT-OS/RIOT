@@ -34,3 +34,6 @@ eclipsesym.xml
 .launches
 targetConfigs
 .gitignore
+
+#log files
+*.log

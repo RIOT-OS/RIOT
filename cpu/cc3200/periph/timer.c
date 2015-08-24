@@ -87,7 +87,7 @@ void irq_timer1_handler(void) {
 }
 
 void irq_timer2_handler(void) {
-
+#ifdef TIMER_SW_CHANNELS
 	unsigned long sts = HWREG(TIMERA2_BASE + TIMER_O_MIS);
 
 	timer_queue_item *curr_ptr = busyq2;
@@ -135,10 +135,14 @@ void irq_timer2_handler(void) {
 	if(busyq2) {
 		HWREG(TIMERA2_BASE + TIMER_O_TAMATCHR) = busyq2->value;
 	}
+#else
+	timer_clear(TIMER_2, 0);
+	config[TIMER_2].cb(0); // timer has one hw channel
+#endif
 }
 
 void irq_timer3_handler(void) {
-
+#ifdef TIMER_SW_CHANNELS
 	unsigned long sts = HWREG(TIMERA3_BASE + TIMER_O_MIS);
 
 	timer_queue_item *curr_ptr = busyq3;
@@ -186,12 +190,18 @@ void irq_timer3_handler(void) {
 	if (busyq3) {
 		HWREG(TIMERA3_BASE + TIMER_O_TAMATCHR) = busyq3->value;
 	}
+#else
+	timer_clear(TIMER_3, 0);
+	config[TIMER_3].cb(0); // timer has one hw channel
+#endif
+
 }
 
 
 int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int)) {
+#ifdef TIMER_SW_CHANNELS
 	int j;
-
+#endif
 	switch (dev) {
 	case TIMER_0:
 		//
@@ -210,9 +220,6 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int)) {
 
 		MAP_IntPriorityGroupingSet(3);
 		MAP_IntPrioritySet(INT_TIMERA0A, 0xFF);
-
-		// enable the match interrupt
-		//MAP_TimerIntEnable(TIMERA0_BASE, TIMER_TIMA_MATCH);
 
 		// enable the timer
 		MAP_TimerEnable(TIMERA0_BASE, TIMER_A);
@@ -245,6 +252,7 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int)) {
 
 		break;
 	case TIMER_2:
+#ifdef TIMER_SW_CHANNELS
 		j = TIM2_CHANNELS;
 
 		while (--j) {
@@ -253,7 +261,7 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int)) {
 
 		freeq2 = timer2_queue;
 		busyq2 = NULL;
-
+#endif
 		MAP_PRCMPeripheralClkEnable(PRCM_TIMERA2, PRCM_RUN_MODE_CLK);
 		MAP_PRCMPeripheralReset(PRCM_TIMERA2);
 
@@ -269,14 +277,17 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int)) {
 		MAP_IntPriorityGroupingSet(3);
 		MAP_IntPrioritySet(INT_TIMERA2A, 0xFF);
 
+#ifdef TIMER_SW_CHANNELS
 		// enable the timeout interrupt
 		MAP_TimerIntEnable(TIMERA2_BASE, TIMER_TIMA_TIMEOUT);
+#endif
 
 		// enable the timer
 		MAP_TimerEnable(TIMERA2_BASE, TIMER_A);
 
 		break;
 	case TIMER_3:
+#ifdef TIMER_SW_CHANNELS
 		j = TIM3_CHANNELS;
 
 		while (--j) {
@@ -285,7 +296,7 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int)) {
 
 		freeq3 = timer3_queue;
 		busyq3 = NULL;
-
+#endif
 		MAP_PRCMPeripheralClkEnable(PRCM_TIMERA3, PRCM_RUN_MODE_CLK);
 		MAP_PRCMPeripheralReset(PRCM_TIMERA3);
 
@@ -301,9 +312,10 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int)) {
 		MAP_IntPriorityGroupingSet(3);
 		MAP_IntPrioritySet(INT_TIMERA3A, 0xFF);
 
+#ifdef TIMER_SW_CHANNELS
 		// enable the timeout interrupt
 		MAP_TimerIntEnable(TIMERA3_BASE, TIMER_TIMA_TIMEOUT);
-
+#endif
 		// enable the timer
 		MAP_TimerEnable(TIMERA3_BASE, TIMER_A);
 
@@ -316,8 +328,9 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int)) {
 }
 
 int set_absolute(tim_t dev, int channel, unsigned long long value) {
+#ifdef TIMER_SW_CHANNELS
 	unsigned long long abstimeout;
-
+#endif
 	switch (dev) {
 	case TIMER_0:
 		MAP_TimerMatchSet(TIMERA0_BASE, TIMER_A, value);
@@ -328,7 +341,7 @@ int set_absolute(tim_t dev, int channel, unsigned long long value) {
 		HWREG(TIMERA1_BASE + TIMER_O_IMR) |= TIMER_TIMA_MATCH; // enable the match timer
 		break;
 	case TIMER_2:
-
+#ifdef TIMER_SW_CHANNELS
 		if (freeq2 == NULL) {
 			// no free timer left
 			core_panic(SW_TIMERS_EXAUSTED, "TIM2: timer no space left");
@@ -375,9 +388,13 @@ int set_absolute(tim_t dev, int channel, unsigned long long value) {
 			busyq2->value = abstimeout;
 
 		}
-
+#else
+		MAP_TimerMatchSet(TIMERA2_BASE, TIMER_A, value);
+		HWREG(TIMERA2_BASE + TIMER_O_IMR) |= TIMER_TIMA_MATCH; // enable the match timer
+#endif
 		break;
 	case TIMER_3:
+#ifdef TIMER_SW_CHANNELS
 		if (freeq3 == NULL) {
 			// no free timer left
 			core_panic(SW_TIMERS_EXAUSTED, "TIM3: timer no space left");
@@ -423,7 +440,10 @@ int set_absolute(tim_t dev, int channel, unsigned long long value) {
 			busyq3->channel = channel;
 			busyq3->value = abstimeout;
 		}
-
+#else
+		MAP_TimerMatchSet(TIMERA3_BASE, TIMER_A, value);
+		HWREG(TIMERA3_BASE + TIMER_O_IMR) |= TIMER_TIMA_MATCH; // enable the match timer
+#endif
 		break;
 	default:
 		break;
@@ -468,19 +488,25 @@ int timer_clear(tim_t dev, int channel) {
 		break;
 	case TIMER_2:
 		MAP_TimerIntClear(TIMERA2_BASE, TIMER_TIMA_MATCH);
-
+#ifdef TIMER_SW_CHANNELS
 		if (busyq2 == NULL) {
 			// no timer left into buffer
 			MAP_TimerIntDisable(TIMERA2_BASE, TIMER_TIMA_MATCH);
 		}
+#else
+		HWREG(TIMERA2_BASE + TIMER_O_IMR) &= ~(TIMER_TIMA_MATCH); // disable the match timer
+#endif
 		break;
 	case TIMER_3:
 		MAP_TimerIntClear(TIMERA3_BASE, TIMER_TIMA_MATCH);
-
+#ifdef TIMER_SW_CHANNELS
 		if (busyq3 == NULL) {
 			// no timer left into buffer
 			MAP_TimerIntDisable(TIMERA3_BASE, TIMER_TIMA_MATCH);
 		}
+#else
+		HWREG(TIMERA3_BASE + TIMER_O_IMR) &= ~(TIMER_TIMA_MATCH); // disable the match timer
+#endif
 		break;
 	default:
 		break;
