@@ -1,4 +1,1 @@
 USEMODULE += gnrc_ipv6
-
-USEMODULE += gnrc_icmpv6
-USEMODULE += gnrc_ndp
