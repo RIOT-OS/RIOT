@@ -6,4 +6,7 @@ export CFLAGS += -DDONT_USE_CMSIS_INIT
 # use the hwtimer compatibility module
 USEMODULE += hwtimer_compat
 
+# use common periph functions
+USEMODULE += periph_common
+
 include $(RIOTCPU)/Makefile.include.cortexm_common

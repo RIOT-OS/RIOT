@@ -3,4 +3,7 @@ export CPU_ARCH = cortex-m4f
 # use hwtimer compatibility module
 USEMODULE += hwtimer_compat
 
+# includ common periph module
+USEMODULE += periph_common
+
 include $(RIOTCPU)/Makefile.include.cortexm_common

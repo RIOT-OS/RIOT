@@ -1,1 +1,1 @@
-USEMODULE += ng_sixlowpan_ctx
+USEMODULE += gnrc_sixlowpan_ctx

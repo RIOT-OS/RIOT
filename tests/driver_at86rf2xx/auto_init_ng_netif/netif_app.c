@@ -21,9 +21,9 @@
 #include <stdio.h>
 
 #include "kernel.h"
-#include "ng_at86rf2xx.h"
-#include "net/ng_nomac.h"
-#include "net/ng_netbase.h"
+#include "at86rf2xx.h"
+#include "net/gnrc/nomac.h"
+#include "net/gnrc.h"
 
 /* make sure the SPI port and the needed GPIO pins are defined */
 #ifndef ATRF_SPI
@@ -56,7 +56,7 @@
 /**
  * @brief   Allocate the AT86RF2xx device descriptor
  */
-static ng_at86rf2xx_t dev;
+static at86rf2xx_t dev;
 
 /**
  * @brief   Stack for the nomac thread
@@ -71,9 +71,9 @@ void auto_init_ng_netif(void)
 
     /* initialize the AT86RF2xx device */
     printf("Initializing the AT86RF2xx radio at SPI_%i... \n", ATRF_SPI);
-    res = ng_at86rf2xx_init(&dev, ATRF_SPI, ATRF_SPI_SPEED,
-                            ATRF_CS, ATRF_INT,
-                            ATRF_SLEEP, ATRF_RESET);
+    res = at86rf2xx_init(&dev, ATRF_SPI, ATRF_SPI_SPEED,
+                         ATRF_CS, ATRF_INT,
+                         ATRF_SLEEP, ATRF_RESET);
     if (res < 0) {
         puts("Error initializing AT86RF2xx radio device");
         return;
@@ -81,8 +81,8 @@ void auto_init_ng_netif(void)
 
     /* start MAC layer */
     puts("Starting the NOMAC layer on top of the driver");
-    iface = ng_nomac_init(nomac_stack, sizeof(nomac_stack), PRIO, "at86rf2xx",
-                          (ng_netdev_t *)(&dev));
+    iface = gnrc_nomac_init(nomac_stack, sizeof(nomac_stack), PRIO, "at86rf2xx",
+                            (gnrc_netdev_t *)(&dev));
     if (iface <= KERNEL_PID_UNDEF) {
         puts("Error initializing MAC layer");
         return;

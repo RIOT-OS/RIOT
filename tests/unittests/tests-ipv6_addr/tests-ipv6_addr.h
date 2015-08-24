@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief       Unittests for the ``ng_ipv6_addr`` module
+ * @brief       Unittests for the ``ipv6_addr`` module
  *
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */

@@ -20,6 +20,7 @@
 #ifndef UIO_H
 #define UIO_H
 
+#include <stdlib.h>
 #include <sys/types.h>
 
 #ifdef __cplusplus

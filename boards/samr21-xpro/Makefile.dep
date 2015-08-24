@@ -1,4 +1,4 @@
-ifneq (,$(filter ng_netif_default,$(USEMODULE)))
-  USEMODULE += ng_at86rf233
-  USEMODULE += ng_nomac
+ifneq (,$(filter gnrc_netif_default,$(USEMODULE)))
+  USEMODULE += at86rf233
+  USEMODULE += gnrc_nomac
 endif

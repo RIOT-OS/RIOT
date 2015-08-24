@@ -8,7 +8,7 @@
 
 /**
  * @defgroup    sys_net_dev_eth dev_eth auto setup
- * @ingroup     net_ng_ethernet
+ * @ingroup     net_ethernet
  * @file
  * @brief       Automatically setup available ethernet devices
  * @{
@@ -29,7 +29,7 @@ extern "C" {
  * @brief enum for available ethernet devices
  */
 enum {
-#ifdef MODULE_NG_NATIVENET
+#ifdef MODULE_DEV_ETH_TAP
     DEV_ETH_TAP,
 #endif
 #ifdef MODULE_ENCX24J600

@@ -26,7 +26,7 @@
 #include "periph_conf.h"
 #include "periph/cpuid.h"
 #include "nrfmin.h"
-#include "net/ng_netbase.h"
+#include "net/gnrc.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
@@ -107,7 +107,7 @@ typedef struct __attribute__((packed)) {
 /**
  * @brief   Pointer to the MAC layer event callback
  */
-static ng_netdev_t *_netdev = NULL;
+static gnrc_netdev_t *_netdev = NULL;
 
 /**
  * @brief   Current state of the device
@@ -142,39 +142,39 @@ static volatile int _rx_next = 0;
 /*
  * Create an internal mapping between NETTYPE and NRFTYPE
  */
-static inline ng_nettype_t _nrftype_to_nettype(uint8_t nrftype)
+static inline gnrc_nettype_t _nrftype_to_nettype(uint8_t nrftype)
 {
     switch (nrftype) {
-#ifdef MODULE_NG_SIXLOWPAN
+#ifdef MODULE_GNRC_SIXLOWPAN
         case NRFTYPE_SIXLOWPAN:
-            return NG_NETTYPE_SIXLOWPAN;
+            return GNRC_NETTYPE_SIXLOWPAN;
 #endif
-#ifdef MODULE_NG_IPV6
+#ifdef MODULE_GNRC_IPV6
         case NRFTYPE_IPV6:
-            return NG_NETTYPE_IPV6;
+            return GNRC_NETTYPE_IPV6;
 #endif
-#ifdef MODULE_NG_ICMPV6
+#ifdef MODULE_GNRC_ICMPV6
         case NRFTYPE_ICMPV6:
-            return NG_NETTYPE_ICMPV6;
+            return GNRC_NETTYPE_ICMPV6;
 #endif
         default:
-            return NG_NETTYPE_UNDEF;
+            return GNRC_NETTYPE_UNDEF;
     }
 }
 
-static inline uint8_t _nettype_to_nrftype(ng_nettype_t nettype)
+static inline uint8_t _nettype_to_nrftype(gnrc_nettype_t nettype)
 {
     switch (nettype) {
-#ifdef MODULE_NG_SIXLOWPAN
-        case NG_NETTYPE_SIXLOWPAN:
+#ifdef MODULE_GNRC_SIXLOWPAN
+        case GNRC_NETTYPE_SIXLOWPAN:
             return NRFTYPE_SIXLOWPAN;
 #endif
-#ifdef MODULE_NG_IPV6
-        case NG_NETTYPE_IPV6:
+#ifdef MODULE_GNRC_IPV6
+        case GNRC_NETTYPE_IPV6:
             return NRFTYPE_IPV6;
 #endif
-#ifdef MODULE_NG_ICMPV6
-        case NG_NETTYPE_ICMPV6:
+#ifdef MODULE_GNRC_ICMPV6
+        case GNRC_NETTYPE_ICMPV6:
             return NRFTYPE_ICMPV6;
 #endif
         default:
@@ -437,7 +437,7 @@ void isr_radio(void)
             if (NRF_RADIO->CRCSTATUS != 1) {
                 return;
             }
-            msg.type = NG_NETDEV_MSG_TYPE_EVENT;
+            msg.type = GNRC_NETDEV_MSG_TYPE_EVENT;
             msg.content.value = ISR_EVENT_RX_DONE;
             msg_send_int(&msg, _netdev->mac_pid);
             /* switch buffer */
@@ -466,10 +466,10 @@ void isr_radio(void)
 static void _receive_data(void)
 {
     packet_t *data;
-    ng_pktsnip_t *pkt_head;
-    ng_pktsnip_t *pkt;
-    ng_netif_hdr_t *hdr;
-    ng_nettype_t nettype;
+    gnrc_pktsnip_t *pkt_head;
+    gnrc_pktsnip_t *pkt;
+    gnrc_netif_hdr_t *hdr;
+    gnrc_nettype_t nettype;
 
     /* only read data if we have somewhere to send it to */
     if (_netdev->event_cb == NULL) {
@@ -480,24 +480,24 @@ static void _receive_data(void)
     data = &(_rx_buf[_rx_next ^ 1]);
 
     /* allocate and fill netif header */
-    pkt_head = ng_pktbuf_add(NULL, NULL, sizeof(ng_netif_hdr_t) + 4,
-                             NG_NETTYPE_UNDEF);
+    pkt_head = gnrc_pktbuf_add(NULL, NULL, sizeof(gnrc_netif_hdr_t) + 4,
+                               GNRC_NETTYPE_UNDEF);
     if (pkt_head == NULL) {
         DEBUG("nrfmin: Error allocating netif header on RX\n");
         return;
     }
-    hdr = (ng_netif_hdr_t *)pkt_head->data;
-    ng_netif_hdr_init(hdr, 2, 2);
+    hdr = (gnrc_netif_hdr_t *)pkt_head->data;
+    gnrc_netif_hdr_init(hdr, 2, 2);
     hdr->if_pid = _netdev->mac_pid;
-    ng_netif_hdr_set_src_addr(hdr, data->src_addr, 2);
-    ng_netif_hdr_set_dst_addr(hdr, data->dst_addr, 2);
+    gnrc_netif_hdr_set_src_addr(hdr, data->src_addr, 2);
+    gnrc_netif_hdr_set_dst_addr(hdr, data->dst_addr, 2);
 
     /* allocate and fill payload */
     nettype = _nrftype_to_nettype(data->proto);
-    pkt = ng_pktbuf_add(pkt_head, data->payload, data->length - 6, nettype);
+    pkt = gnrc_pktbuf_add(pkt_head, data->payload, data->length - 6, nettype);
     if (pkt == NULL) {
         DEBUG("nrfmin: Error allocating packet payload on RX\n");
-        ng_pktbuf_release(pkt_head);
+        gnrc_pktbuf_release(pkt_head);
         return;
     }
 
@@ -508,7 +508,7 @@ static void _receive_data(void)
 /*
  * Public interface functions
  */
-int nrfmin_init(ng_netdev_t *dev)
+int nrfmin_init(gnrc_netdev_t *dev)
 {
     uint8_t cpuid[CPUID_ID_LEN];
     uint8_t tmp;
@@ -576,14 +576,14 @@ int nrfmin_init(ng_netdev_t *dev)
     return 0;
 }
 
-int _send(ng_netdev_t *dev, ng_pktsnip_t *pkt)
+int _send(gnrc_netdev_t *dev, gnrc_pktsnip_t *pkt)
 {
     (void)dev;
     size_t size;
     size_t pos = 0;
     uint8_t *dst_addr;
-    ng_netif_hdr_t *hdr;
-    ng_pktsnip_t *payload;
+    gnrc_netif_hdr_t *hdr;
+    gnrc_pktsnip_t *payload;
 
     /* check packet */
     if (pkt == NULL || pkt->next == NULL) {
@@ -592,20 +592,20 @@ int _send(ng_netdev_t *dev, ng_pktsnip_t *pkt)
     }
 
     /* check if payload is withing length bounds */
-    size = ng_pkt_len(pkt->next);
+    size = gnrc_pkt_len(pkt->next);
     if (size > CONF_PAYLOAD_LEN) {
-        ng_pktbuf_release(pkt);
+        gnrc_pktbuf_release(pkt);
         DEBUG("nrfmin: Error sending packet: payload to large\n");
         return -EOVERFLOW;
     }
     /* get netif header and check address length */
-    hdr = (ng_netif_hdr_t *)pkt->data;
+    hdr = (gnrc_netif_hdr_t *)pkt->data;
     if (hdr->dst_l2addr_len != 2) {
         DEBUG("nrfmin: Error sending packet: dest address has invalid size\n");
-        ng_pktbuf_release(pkt);
+        gnrc_pktbuf_release(pkt);
         return -ENOMSG;
     }
-    dst_addr = ng_netif_hdr_get_dst_addr(hdr);
+    dst_addr = gnrc_netif_hdr_get_dst_addr(hdr);
 
     DEBUG("nrfmin: Sending packet to %02x:%02x - size %u\n",
            dst_addr[0], dst_addr[1], size);
@@ -640,11 +640,11 @@ int _send(ng_netdev_t *dev, ng_pktsnip_t *pkt)
     NRF_RADIO->TASKS_TXEN = 1;
 
     /* release packet */
-    ng_pktbuf_release(pkt);
+    gnrc_pktbuf_release(pkt);
     return (int)size;
 }
 
-int _add_event_cb(ng_netdev_t *dev, ng_netdev_event_cb_t cb)
+int _add_event_cb(gnrc_netdev_t *dev, gnrc_netdev_event_cb_t cb)
 {
     if (dev->event_cb != NULL) {
         return -ENOBUFS;
@@ -653,7 +653,7 @@ int _add_event_cb(ng_netdev_t *dev, ng_netdev_event_cb_t cb)
     return 0;
 }
 
-int _rem_event_cb(ng_netdev_t *dev, ng_netdev_event_cb_t cb)
+int _rem_event_cb(gnrc_netdev_t *dev, gnrc_netdev_event_cb_t cb)
 {
     if (dev->event_cb == cb) {
         dev->event_cb = NULL;
@@ -662,7 +662,7 @@ int _rem_event_cb(ng_netdev_t *dev, ng_netdev_event_cb_t cb)
     return -ENOENT;
 }
 
-int _get(ng_netdev_t *dev, netopt_t opt, void *value, size_t max_len)
+int _get(gnrc_netdev_t *dev, netopt_t opt, void *value, size_t max_len)
 {
     (void)dev;
 
@@ -682,7 +682,7 @@ int _get(ng_netdev_t *dev, netopt_t opt, void *value, size_t max_len)
     }
 }
 
-int _set(ng_netdev_t *dev, netopt_t opt, void *value, size_t value_len)
+int _set(gnrc_netdev_t *dev, netopt_t opt, void *value, size_t value_len)
 {
     (void)dev;
 
@@ -702,7 +702,7 @@ int _set(ng_netdev_t *dev, netopt_t opt, void *value, size_t value_len)
     }
 }
 
-void _isr_event(ng_netdev_t *dev, uint32_t event_type)
+void _isr_event(gnrc_netdev_t *dev, uint32_t event_type)
 {
     switch (event_type) {
         case ISR_EVENT_RX_DONE:
@@ -717,7 +717,7 @@ void _isr_event(ng_netdev_t *dev, uint32_t event_type)
 /*
  * Mapping of netdev interface
  */
-const ng_netdev_driver_t nrfmin_driver = {
+const gnrc_netdev_driver_t nrfmin_driver = {
     .send_data = _send,
     .add_event_callback = _add_event_cb,
     .rem_event_callback = _rem_event_cb,

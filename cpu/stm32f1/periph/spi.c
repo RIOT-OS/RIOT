@@ -109,18 +109,14 @@ int spi_init_slave(spi_t dev, spi_conf_t conf, char (*cb)(char))
 
 int spi_conf_pins(spi_t dev)
 {
-    GPIO_TypeDef *port[3];
-    int pin[3];
+    gpio_t mosi, miso, clk;
 
     switch(dev) {
 #ifdef SPI_0_EN
         case SPI_0:
-            port[0] = SPI_0_CLK_PORT;
-            pin[0] = SPI_0_CLK_PIN;
-            port[1] = SPI_0_MOSI_PORT;
-            pin[1] = SPI_0_MOSI_PIN;
-            port[2] = SPI_0_MISO_PORT;
-            pin[2] = SPI_0_MISO_PIN;
+            clk = SPI_0_CLK_PIN;
+            mosi = SPI_0_MOSI_PIN;
+            miso = SPI_0_MISO_PIN;
             break;
 #endif
         default:
@@ -128,18 +124,9 @@ int spi_conf_pins(spi_t dev)
     }
 
     /* configure pins for alternate function input (MISO) or output (MOSI, CLK) */
-    for (int i = 0; i < 3; i++) {
-        int crbitval = (i < 2) ? 0xb : 0x4;
-        if (pin[i] < 8) {
-            port[i]->CR[0] &= ~(0xf << (pin[i] * 4));
-            port[i]->CR[0] |= (crbitval << (pin[i] * 4));
-        }
-        else {
-            port[i]->CR[1] &= ~(0xf << ((pin[i] - 8) * 4));
-            port[i]->CR[1] |= (crbitval << ((pin[i] - 8) * 4));
-        }
-    }
-
+    gpio_init_af(clk, GPIO_AF_OUT_PP);
+    gpio_init_af(mosi, GPIO_AF_OUT_PP);
+    gpio_init(miso, GPIO_DIR_IN, GPIO_NOPULL);
     return 0;
 }
 
@@ -201,47 +188,6 @@ int spi_transfer_byte(spi_t dev, char out, char *in)
 #endif /*ENABLE_DEBUG */
 
     return transferred;
-}
-
-int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length)
-{
-    int transferred = 0;
-
-    if (out != NULL) {
-        DEBUG("out*: %p out: %x length: %x\n", out, *out, length);
-        while (length--) {
-            int ret = spi_transfer_byte(dev, *(out)++, 0);
-            if (ret <  0) {
-                return ret;
-            }
-            transferred += ret;
-        }
-    }
-    if (in != NULL) {
-        while (length--) {
-            int ret = spi_transfer_byte(dev, 0, in++);
-            if (ret <  0) {
-                return ret;
-            }
-            transferred += ret;
-        }
-        DEBUG("in*: %p in: %x transferred: %x\n", in, *(in-transferred), transferred);
-    }
-
-    DEBUG("sent %x byte(s)\n", transferred);
-    return transferred;
-}
-
-int spi_transfer_reg(spi_t dev, uint8_t reg, char out, char *in)
-{
-    spi_transfer_byte(dev, reg, NULL);
-    return spi_transfer_byte(dev, out, in);
-}
-
-int spi_transfer_regs(spi_t dev, uint8_t reg, char *out, char *in, unsigned int length)
-{
-    spi_transfer_byte(dev, reg, NULL);
-    return spi_transfer_bytes(dev, out, in, length);
 }
 
 void spi_transmission_begin(spi_t dev, char reset_val)

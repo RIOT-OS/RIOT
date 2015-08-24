@@ -79,6 +79,15 @@ typedef enum {
     GPIO_AF15               /**< use alternate function 14 */
 } gpio_af_t;
 
+/**
+ * @brief declare needed generic SPI functions
+ * @{
+ */
+#define PERIPH_SPI_NEEDS_TRANSFER_BYTES
+#define PERIPH_SPI_NEEDS_TRANSFER_REG
+#define PERIPH_SPI_NEEDS_TRANSFER_REGS
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif

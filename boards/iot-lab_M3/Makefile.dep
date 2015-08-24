@@ -1,4 +1,0 @@
-ifneq (,$(filter ng_netif_default,$(USEMODULE)))
-  USEMODULE += ng_at86rf231
-  USEMODULE += ng_nomac
-endif

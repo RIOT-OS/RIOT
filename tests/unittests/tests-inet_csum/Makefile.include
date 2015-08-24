@@ -1,1 +1,1 @@
-USEMODULE += ng_inet_csum
+USEMODULE += inet_csum

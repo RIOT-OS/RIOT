@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2015 Freie Universität Berlin
+ *               2015 Kaspar Schleiser <kaspar@schleiser.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -10,7 +11,7 @@
  * @defgroup    net_netopt   Configuration options for network APIs
  * @ingroup     net
  * @brief       List of available configuration options for the
- *              @ref net_ng_netdev and the @ref net_ng_netapi
+ *              @ref net_gnrc_netdev and the @ref net_gnrc_netapi
  * @{
  *
  * @file
@@ -18,6 +19,7 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
+ * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
 #ifndef NETOPT_H_
@@ -80,7 +82,7 @@ typedef enum {
     /**
      * @brief en/disable preloading or read the current state.
      *
-     * Preload using ng_netdev_driver_t::send_data() or ng_netapi_send()
+     * Preload using gnrc_netdev_driver_t::send_data() or gnrc_netapi_send()
      * respectively, send setting state to @ref NETOPT_STATE_TX
      */
     NETOPT_PRELOADING,
@@ -91,12 +93,12 @@ typedef enum {
     NETOPT_RETRANS,             /**< get/set the maximum number of
                                  *   retransmissions. */
     NETOPT_PROTO,               /**< get/set the protocol for the layer
-                                 *   as type ng_nettype_t. */
+                                 *   as type gnrc_nettype_t. */
     NETOPT_STATE,               /**< get/set the state of network devices as
                                  *   type netopt_state_t */
     NETOPT_RAWMODE,             /**< en/disable the pre-processing of data
                                  *   in a network device driver as type
-                                 *   ng_nettype_t */
+                                 *   gnrc_nettype_t */
     /**
      * @brief en/disable the interrupt at reception start.
      *
@@ -176,6 +178,15 @@ typedef enum {
                                  *   state of the network device is @ref NETOPT_STATE_IDLE */
     /* add other states if needed */
 } netopt_state_t;
+
+/**
+ * @brief   Get a string ptr corresponding to opt, for debugging
+ *
+ * @param[in] opt   The option to get a string representation for
+ *
+ * @return          ptr to string representation for given option or "unknown"
+ */
+const char *netopt2str(netopt_t opt);
 
 #ifdef __cplusplus
 }

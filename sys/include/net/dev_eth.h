@@ -8,11 +8,9 @@
  */
 
 /**
- * @defgroup    net_dev_eth_ll Low-Level Driver Inteface
- * @ingroup     net_ng_ethernet
- * @file
+ * @defgroup    net_dev_eth Low-Level Driver Interface
+ * @ingroup     net_ethernet
  * @brief       Low-level ethernet driver interface
- * @{
  *
  * This interface is supposed to be a low-level interface for ethernet drivers.
  * In order to be universally usable, it leaves out many implementation details
@@ -44,6 +42,8 @@
  *
  * Check out the dev_eth test application as example.
  *
+ * @{
+ *
  * @file
  * @brief       Definitions low-level ethernet driver interface
  *
@@ -58,7 +58,7 @@ extern "C" {
 #endif
 
 #include <stdint.h>
-#include "ng_ethernet/hdr.h"
+#include "ethernet/hdr.h"
 
 /**
  * @brief Structure to hold driver state

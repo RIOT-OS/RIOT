@@ -4,6 +4,8 @@ all:
 RIOTBASE ?= $(shell dirname "$(lastword $(MAKEFILE_LIST))")
 RIOTBASE := $(abspath $(RIOTBASE))
 
+CCACHE_BASEDIR := $(RIOTBASE)
+
 RIOTCPU ?= $(RIOTBASE)/cpu
 RIOTCPU := $(abspath $(RIOTCPU))
 
@@ -130,6 +132,14 @@ endif
 include $(RIOTBASE)/Makefile.modules
 include $(RIOTBOARD)/$(BOARD)/Makefile.include
 include $(RIOTCPU)/$(CPU)/Makefile.include
+
+# get number of interfaces straight before resolving dependencies
+GNRC_NETIF_NUMOF ?= 1
+
+ifneq ($(GNRC_NETIF_NUMOF),1)
+  CFLAGS += -DGNRC_NETIF_NUMOF=$(GNRC_NETIF_NUMOF)
+endif
+
 include $(RIOTBASE)/Makefile.dep
 
 USEMODULE += $(filter-out $(DISABLE_MODULE), $(DEFAULT_MODULE))
@@ -416,6 +426,6 @@ endif
 help:
 	@$(MAKE) -qp | sed -ne 's/\(^[a-z][a-z_-]*\):.*/\1/p' | sort | uniq
 
-ifneq (,$(filter iot-lab_M3 wsn430-v1_3b wsn430-v1_4,$(BOARD)))
+ifneq (,$(filter iotlab-m3 wsn430-v1_3b wsn430-v1_4,$(BOARD)))
   include $(RIOTBASE)/dist/testbed-support/Makefile.iotlab
 endif

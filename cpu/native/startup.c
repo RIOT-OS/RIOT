@@ -46,7 +46,7 @@ unsigned _native_rng_seed = 0;
 int _native_rng_mode = 0;
 const char *_native_unix_socket_path = NULL;
 
-#ifdef MODULE_NG_NATIVENET
+#ifdef MODULE_DEV_ETH_TAP
 #include "dev_eth_tap.h"
 extern dev_eth_tap_t dev_eth_tap;
 #endif
@@ -196,7 +196,7 @@ void usage_exit(void)
 {
     real_printf("usage: %s", _progname);
 
-#if defined(MODULE_NG_NATIVENET)
+#if defined(MODULE_DEV_ETH_TAP)
     real_printf(" <tap interface>");
 #endif
 
@@ -256,7 +256,7 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
     int replay = 0;
 #endif
 
-#if defined(MODULE_NG_NATIVENET)
+#if defined(MODULE_DEV_ETH_TAP)
     if (
             (argc < 2)
             || (
@@ -367,7 +367,7 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
 
     native_cpu_init();
     native_interrupt_init();
-#ifdef MODULE_NG_NATIVENET
+#ifdef MODULE_DEV_ETH_TAP
     dev_eth_tap_setup(&dev_eth_tap, argv[1]);
 #endif
 

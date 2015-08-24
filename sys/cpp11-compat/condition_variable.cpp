@@ -18,12 +18,12 @@
  * @}
  */
 
-#include <cstdio>
 #include <stdexcept>
 #include <system_error>
 
 #include "irq.h"
 #include "sched.h"
+#include "timex.h"
 #include "vtimer.h"
 #include "priority_queue.h"
 

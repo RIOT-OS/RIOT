@@ -213,38 +213,6 @@ int spi_transfer_byte(spi_t dev, char out, char *in)
     return 1;
 }
 
-int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length)
-{
-    char res;
-    int count = 0;
-
-    for (int i = 0; i < length; i++) {
-        if (out) {
-            count += spi_transfer_byte(dev, out[i], &res);
-        }
-        else {
-            count += spi_transfer_byte(dev, 0, &res);
-        }
-        if (in) {
-            in[i] = res;
-        }
-    }
-
-    return count;
-}
-
-int spi_transfer_reg(spi_t dev, uint8_t reg, char out, char *in)
-{
-    spi_transfer_byte(dev, reg, 0);
-    return spi_transfer_byte(dev, out, in);
-}
-
-int spi_transfer_regs(spi_t dev, uint8_t reg, char *out, char *in, unsigned int length)
-{
-    spi_transfer_byte(dev, reg, 0);
-    return spi_transfer_bytes(dev, out, in, length);
-}
-
 void spi_transmission_begin(spi_t dev, char reset_val)
 {
     /* slave mode is not (yet) supported */

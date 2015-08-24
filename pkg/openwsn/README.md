@@ -1,7 +1,7 @@
 # OpenWSN on RIOT
 
 This port of OpenWSN to RIOT is based on current OpenWSN upstream providing a
-BSP with RIOT's interfaces. Currently supported are iot-lab_M3 and fox. More
+BSP with RIOT's interfaces. Currently supported are iotlab-m3 and fox. More
 boards will follow through improvements in netdev radio driver interface.
 
 # Usage
@@ -11,7 +11,7 @@ as root or listening node. And providing a sample Makefile.
 
 Build using
 ```Bash
-$> export BOARD=iot-lab_M3
+$> export BOARD=iotlab-m3
 $> export PORT=/dev/ttyTHEPORTOFYOURIOTLAB
 $> make -B clean flash term
 ```

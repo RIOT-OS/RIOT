@@ -199,6 +199,10 @@ SECTIONS
     _sheap = . ;
     _eheap = ORIGIN(sram) + LENGTH(sram);
 
+    /* Populate information abour ram size */
+    _sram = ORIGIN(sram);
+    _eram = ORIGIN(sram) + LENGTH(sram);
+
     /* Any debugging sections */
     /* Stabs debugging sections.  */
     .stab          0 : { *(.stab) }

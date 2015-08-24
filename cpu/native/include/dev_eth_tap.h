@@ -7,13 +7,14 @@
  */
 
 /**
- * @defgroup    net_dev_eth_impl Low-level Ethernet driver implementations
- * @ingroup     net_dev_eth_ll
+ * @defgroup    dev_eth_tap     Ethernet driver for TAP interfaces
+ * @ingroup     native_cpu
  * @brief       Low-level ethernet driver for native tap interfaces
  * @{
  *
  * @file
- * @brief       Definitions for low-level ethernet driver for native tap interfaces
+ * @brief       Definitions for @ref net_dev_eth driver for host system's
+ *              TAP interfaces
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
@@ -36,7 +37,7 @@ typedef struct dev_eth_tap {
     dev_eth_t ethdev;                   /**< dev_eth internal member */
     char tap_name[IFNAMSIZ];            /**< host dev file name */
     int tap_fd;                         /**< host file descriptor for the TAP */
-    uint8_t addr[NG_ETHERNET_ADDR_LEN]; /**< The MAC address of the TAP */
+    uint8_t addr[ETHERNET_ADDR_LEN];    /**< The MAC address of the TAP */
     uint8_t promiscous;                 /**< Flag for promiscous mode */
 } dev_eth_tap_t;
 

@@ -30,6 +30,7 @@
 #include "mutex.h"
 #include "periph_conf.h"
 #include "periph/i2c.h"
+#include "periph/gpio.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
@@ -39,8 +40,7 @@
 
 /* static function definitions */
 static void _i2c_init(I2C_TypeDef *i2c, int ccr);
-static void _toggle_pins(GPIO_TypeDef *port_scl, GPIO_TypeDef *port_sda, int pin_scl, int pin_sda);
-static void _pin_config(GPIO_TypeDef *port_scl, GPIO_TypeDef *port_sda, int pin_scl, int pin_sda);
+static void _pin_config(gpio_t pin_scl, gpio_t pin_sda);
 static void _start(I2C_TypeDef *dev, uint8_t address, uint8_t rw_flag);
 static inline void _clear_addr(I2C_TypeDef *dev);
 static inline void _write(I2C_TypeDef *dev, char *data, int length);
@@ -67,9 +67,7 @@ static mutex_t locks[] =  {
 int i2c_init_master(i2c_t dev, i2c_speed_t speed)
 {
     I2C_TypeDef *i2c;
-    GPIO_TypeDef *port_scl;
-    GPIO_TypeDef *port_sda;
-    int pin_scl, pin_sda;
+    gpio_t pin_scl, pin_sda;
     int ccr;
 
     /* read speed configuration */
@@ -89,13 +87,9 @@ int i2c_init_master(i2c_t dev, i2c_speed_t speed)
 #if I2C_0_EN
         case I2C_0:
             i2c = I2C_0_DEV;
-            port_scl = I2C_0_SCL_PORT;
             pin_scl = I2C_0_SCL_PIN;
-            port_sda = I2C_0_SDA_PORT;
             pin_sda = I2C_0_SDA_PIN;
             I2C_0_CLKEN();
-            I2C_0_SCL_CLKEN();
-            I2C_0_SDA_CLKEN();
             NVIC_SetPriority(I2C_0_ERR_IRQ, I2C_IRQ_PRIO);
             NVIC_EnableIRQ(I2C_0_ERR_IRQ);
             break;
@@ -105,8 +99,7 @@ int i2c_init_master(i2c_t dev, i2c_speed_t speed)
     }
 
     /* configure pins */
-    _pin_config(port_scl, port_sda, pin_scl, pin_sda);
-
+    _pin_config(pin_scl, pin_sda);
     /* configure device */
     _i2c_init(i2c, ccr);
 
@@ -115,10 +108,8 @@ int i2c_init_master(i2c_t dev, i2c_speed_t speed)
         DEBUG("LINE BUSY AFTER RESET -> toggle pins now\n");
         /* disable peripheral */
         i2c->CR1 &= ~I2C_CR1_PE;
-        /* toggle both pins to reset analog filter */
-        _toggle_pins(port_scl, port_sda, pin_scl, pin_sda);
-        /* reset pins for alternate function */
-        _pin_config(port_scl, port_sda, pin_scl, pin_sda);
+        /* re-run pin config to toggle and re-configure pins */
+        _pin_config(pin_scl, pin_sda);
         /* make peripheral soft reset */
         i2c->CR1 |= I2C_CR1_SWRST;
         i2c->CR1 &= ~I2C_CR1_SWRST;
@@ -143,49 +134,22 @@ static void _i2c_init(I2C_TypeDef *i2c, int ccr)
     i2c->CR1 |= I2C_CR1_PE;
 }
 
-static void _pin_config(GPIO_TypeDef *port_scl, GPIO_TypeDef *port_sda, int pin_scl, int pin_sda)
+static void _pin_config(gpio_t scl, gpio_t sda)
 {
-    /* configure pins, alternate output, open-drain, output mode with 50MHz */
-    if (pin_scl < 8) {
-        port_scl->CR[0] |= (0xf << (pin_scl * 4));
-    }
-    else {
-        port_scl->CR[1] |= (0xf << ((pin_scl - 8) * 4));
-    }
-    if (pin_sda < 8) {
-        port_sda->CR[0] |= (0xf << (pin_sda * 4));
-    }
-    else {
-        port_sda->CR[1] |= (0xf << ((pin_sda - 8) * 4));
-    }
-}
-
-static void _toggle_pins(GPIO_TypeDef *port_scl, GPIO_TypeDef *port_sda, int pin_scl, int pin_sda)
-{
-    /* configure pins, output, open-drain, output mode with 50MHz */
-    if (pin_scl < 8) {
-        port_scl->CR[0] |= (0x7 << (pin_scl * 4));
-    }
-    else {
-        port_scl->CR[1] |= (0x7 << ((pin_scl - 8) * 4));
-    }
-    if (pin_sda < 8) {
-        port_sda->CR[0] |= (0x7 << (pin_sda * 4));
-    }
-    else {
-        port_sda->CR[1] |= (0x7 << ((pin_sda - 8) * 4));
-    }
-    /* set both to high */
-    port_scl->ODR |= (1 << pin_scl);
-    port_sda->ODR |= (1 << pin_sda);
-    /* set SDA to low */
-    port_sda->ODR &= ~(1 << pin_sda);
-    /* set SCL to low */
-    port_scl->ODR &= ~(1 << pin_scl);
-    /* set SCL to high */
-    port_scl->ODR |= (1 << pin_scl);
-    /* set SDA to high */
-    port_sda->ODR |= (1 << pin_sda);
+    /* toggle pins to reset analog filter -> see datasheet */
+    /* set as output */
+    gpio_init(scl, GPIO_DIR_OUT, GPIO_NOPULL);
+    gpio_init(sda, GPIO_DIR_OUT, GPIO_NOPULL);
+    /* run through toggling sequence */
+    gpio_set(scl);
+    gpio_set(sda);
+    gpio_clear(sda);
+    gpio_clear(scl);
+    gpio_set(scl);
+    gpio_set(sda);
+    /* configure the pins alternate function */
+    gpio_init_af(scl, GPIO_AF_OUT_OD);
+    gpio_init_af(sda, GPIO_AF_OUT_OD);
 }
 
 int i2c_init_slave(i2c_t dev, uint8_t address)

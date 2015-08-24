@@ -16,7 +16,7 @@
 
 #include "embUnit.h"
 
-#include "net/ng_inet_csum.h"
+#include "net/inet_csum.h"
 
 #include "unittests-constants.h"
 #include "tests-inet_csum.h"
@@ -28,7 +28,7 @@ static void test_inet_csum__rfc_example(void)
         0x00, 0x01, 0xf2, 0x03, 0xf4, 0xf5, 0xf6, 0xf7
     };
 
-    TEST_ASSERT_EQUAL_INT(0xddf2, ng_inet_csum(0, data, sizeof(data)));
+    TEST_ASSERT_EQUAL_INT(0xddf2, inet_csum(0, data, sizeof(data)));
 }
 
 static void test_inet_csum__ipv6_pseudo_hdr(void)
@@ -50,7 +50,7 @@ static void test_inet_csum__ipv6_pseudo_hdr(void)
     };
 
     /* result unnormalized: take 1's-complement of 0 */
-    TEST_ASSERT_EQUAL_INT(0xffff, ng_inet_csum(0x0, data, sizeof(data)));
+    TEST_ASSERT_EQUAL_INT(0xffff, inet_csum(0x0, data, sizeof(data)));
 }
 
 static void test_inet_csum__set_initial_sum(void)
@@ -72,7 +72,7 @@ static void test_inet_csum__set_initial_sum(void)
 
     /* result unnormalized: take 1's-complement of 0
      * set next header and payload length as initial value */
-    TEST_ASSERT_EQUAL_INT(0xffff, ng_inet_csum(0x38 + 0x3a, data, sizeof(data)));
+    TEST_ASSERT_EQUAL_INT(0xffff, inet_csum(0x38 + 0x3a, data, sizeof(data)));
 }
 
 static void test_inet_csum__wraps_more_than_once(void)
@@ -87,7 +87,7 @@ static void test_inet_csum__wraps_more_than_once(void)
     };
 
     /* values were taken from a case I encountered in the wild */
-    TEST_ASSERT_EQUAL_INT(0x0002, ng_inet_csum(0x1785, data, sizeof(data)));
+    TEST_ASSERT_EQUAL_INT(0x0002, inet_csum(0x1785, data, sizeof(data)));
 }
 
 static void test_inet_csum__calculate_csum(void)
@@ -101,7 +101,7 @@ static void test_inet_csum__calculate_csum(void)
     };
 
     /* result unnormalized: take 1's-complement of 0xb861 */
-    TEST_ASSERT_EQUAL_INT(0x479e, ng_inet_csum(0, data, sizeof(data)));
+    TEST_ASSERT_EQUAL_INT(0x479e, inet_csum(0, data, sizeof(data)));
 }
 
 static void test_inet_csum__odd_len(void)
@@ -118,7 +118,7 @@ static void test_inet_csum__odd_len(void)
 
     /* result unnormalized: take 1's-complement of 0
      * set next header and payload length as initial value */
-    TEST_ASSERT_EQUAL_INT(0xffff, ng_inet_csum(17 + 39, data, sizeof(data)));
+    TEST_ASSERT_EQUAL_INT(0xffff, inet_csum(17 + 39, data, sizeof(data)));
 }
 
 Test *tests_inet_csum_tests(void)

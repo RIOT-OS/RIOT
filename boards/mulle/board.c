@@ -25,8 +25,7 @@
 #include "mcg.h"
 #include "periph/gpio.h"
 #include "periph/uart.h"
-#include "periph/rtc.h"
-#include "devicemap.h"
+#include "periph/rtt.h"
 
 /**
  * @brief Initialize the boards on-board LEDs
@@ -57,6 +56,15 @@ void board_init(void)
     /* initialize the boards LEDs, this is done first for debugging purposes */
     leds_init();
 
+    /* Initialize power control pins */
+    power_pins_init();
+
+    /* Turn on Vperiph for peripherals */
+    gpio_set(MULLE_POWER_VPERIPH);
+
+    /* Turn on AVDD for reading voltages */
+    gpio_set(MULLE_POWER_AVDD);
+
     LED_RED_ON;
 
     /* Initialize RTC oscillator as early as possible since we are using it as a
@@ -66,7 +74,7 @@ void board_init(void)
      * stuff is initializing. */
     /* If the clock is not stable then the UART will have the wrong baud rate
      * for debug prints as well */
-    rtc_init();
+    rtt_init();
 
     /* Set up clocks */
     set_safe_clock_dividers();
@@ -90,21 +98,15 @@ void board_init(void)
 
     /* initialize the CPU */
     cpu_init();
-
-    LED_YELLOW_ON;
-
-    LED_GREEN_ON;
-
-    /* Initialize power control pins */
-    power_pins_init();
-
-    /* Turn on Vperiph for peripherals */
-    gpio_set(MULLE_POWER_VPERIPH);
-
-    /* Turn on AVDD for reading voltages */
-    gpio_set(MULLE_POWER_AVDD);
 }
 
+/**
+ * @brief Initialize the boards on-board LEDs
+ *
+ * The LEDs are initialized here in order to be able to use them in the early
+ * boot for diagnostics.
+ *
+ */
 static inline void leds_init(void)
 {
     /* The pin configuration can be found in board.h and periph_conf.h */

@@ -3,9 +3,9 @@ include ../Makefile.tests_common
 
 BOARD_INSUFFICIENT_RAM := stm32f0discovery
 
-USEMODULE += ng_netbase
-USEMODULE += ng_pktdump
-USEMODULE += ng_slip
+USEMODULE += gnrc
+USEMODULE += gnrc_pktdump
+USEMODULE += gnrc_slip
 USEMODULE += shell
 USEMODULE += shell_commands
 

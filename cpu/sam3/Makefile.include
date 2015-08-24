@@ -3,4 +3,7 @@ export CPU_ARCH = cortex-m3
 # use hwtimer compatibility module
 USEMODULE += hwtimer_compat
 
+# include common SPI functions
+USEMODULE += periph_common
+
 include $(RIOTCPU)/Makefile.include.cortexm_common

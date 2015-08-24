@@ -5,12 +5,12 @@ include ../Makefile.tests_common
 # time-constraint to put effort into this for other boards.
 BOARD_WHITELIST = native
 
-USEMODULE += ng_zep
-USEMODULE += ng_netif_default
+USEMODULE += gnrc_zep
+USEMODULE += gnrc_netif_default
 USEMODULE += auto_init_ng_netif
-USEMODULE += ng_ipv6_default
-USEMODULE += ng_nomac
-USEMODULE += ng_pktdump
+USEMODULE += gnrc_ipv6_default
+USEMODULE += gnrc_nomac
+USEMODULE += gnrc_pktdump
 USEMODULE += shell
 USEMODULE += shell_commands
 
@@ -23,14 +23,14 @@ endif
 
 ifeq (,$(ZEP_SRC_PORT))
   # set default
-  CFLAGS += -DZEP_SRC_PORT=NG_ZEP_DEFAULT_PORT
+  CFLAGS += -DZEP_SRC_PORT=GNRC_ZEP_DEFAULT_PORT
 else
   CFLAGS += -DZEP_SRC_PORT=$(ZEP_SRC_PORT)
 endif
 
 ifeq (,$(ZEP_DST_PORT))
   # set default
-  CFLAGS += -DZEP_DST_PORT=NG_ZEP_DEFAULT_PORT
+  CFLAGS += -DZEP_DST_PORT=GNRC_ZEP_DEFAULT_PORT
 else
   CFLAGS += -DZEP_DST_PORT=$(ZEP_DST_PORT)
 endif
@@ -40,7 +40,7 @@ endif
 # That way xbee_params.h get's included and auto configuration can pick it up.
 CFLAGS += -I$(CURDIR)
 
-# one for ng_netif_default and one for ZEP
-CFLAGS += -DNG_NETIF_NUMOF=2
+# one for gnrc_netif_default and one for ZEP
+CFLAGS += -DGNRC_NETIF_NUMOF=2
 
 include $(RIOTBASE)/Makefile.include

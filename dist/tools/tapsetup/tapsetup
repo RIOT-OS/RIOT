@@ -1,0 +1,220 @@
+#!/bin/sh
+
+PROGRAM=$(basename $0)
+COUNT="2"
+COMMAND=""
+BRNAME="tapbr0"
+TAPNAME="tap"
+DEACTIVATE_IPV6=""
+
+usage() {
+    echo "usage: ${PROGRAM} [arguments]" >&2
+    echo "" >&2
+    echo "Defaults:"
+    echo "   If no option is given, -c is assumed" >&2
+    echo "" >&2
+    echo "Options:" >&2
+    echo "   -c [<num>], --create [<num>]: Create <num> tap interfaces (default: 2)" >&2
+    echo "   -d, --delete:                 Delete all interface" >&2
+    echo "   -b <name>, --bridge <name>:   Give name for the bridge (default: tapbr)" >&2
+    echo "   -t <name>, --tap <name>:      Name base for the tap interfaces; the" >&2
+    echo "                                 generated names will be <name>x" >&2
+    echo "                                 (default: tap; ignored on OSX and FreeBSD)" >&2
+    echo "   -6, --deactivate-ipv6:        Deactivate IPv6 for the interfaces and bridge" >&2
+    echo "                                 (ignored on OSX and FreeBSD)" >&2
+    echo "   -h, --help:                   Prints this text" >&2
+}
+
+unsupported_plattform() {
+    echo "unsupported platform" >&2
+    echo "(currently supported \`uname -s\` 'Darvin', 'FreeBSD', and 'Linux')" >&2
+}
+
+create_bridge() {
+    echo "creating ${BRNAME}"
+
+    case "${PLATFORM}" in
+        FreeBSD)
+            sudo kldload if_bridge
+            sudo ifconfig ${BRNAME} create || exit 1 ;;
+        Linux)
+            sudo ip link add name ${BRNAME} type bridge || exit 1
+            if [ -n "${DEACTIVATE_IPV6}" ]; then
+                sudo -s sh -c "echo 1  > /proc/sys/net/ipv6/conf/${BRNAME}/disable_ipv6" || exit 1
+            fi ;;
+        OSX)
+            sudo ifconfig ${BRNAME} create || exit 1 ;;
+        *)
+            ;;
+    esac
+}
+
+up_bridge() {
+    case "${PLATFORM}" in
+        FreeBSD|OSX)
+            sudo ifconfig ${BRNAME} up || exit 1 ;;
+        Linux)
+            sudo ip link set ${BRNAME} up || exit 1 ;;
+        *)
+            ;;
+    esac
+}
+
+delete_bridge() {
+    echo "deleting ${BRNAME}"
+
+    case "${PLATFORM}" in
+        FreeBSD)
+            sudo sysctl net.link.tap.user_open=0
+            sudo kldunload if_tap || exit 1
+            sudo kldunload if_bridge || exit 1 ;;
+        Linux)
+            for IF in $(ls /sys/class/net/${BRNAME}/brif); do
+                sudo ip link delete "${IF}"
+            done
+
+            sudo ip link delete ${BRNAME} || exit 1 ;;
+        OSX)
+            sudo ifconfig ${BRNAME} destroy || exit 1 ;;
+        *)
+            ;;
+    esac
+}
+
+begin_tap() {
+    case "${PLATFORM}" in
+        FreeBSD)
+            sudo kldload if_tap || exit 1
+            sudo sysctl net.link.tap.user_open=1 ;;
+        *)
+            ;;
+    esac
+}
+
+create_tap() {
+    case "${PLATFORM}" in
+        FreeBSD)
+            echo "creating ${TAPNAME}${N}" || exit 1
+            sudo ifconfig tap${N} create || exit 1
+            sudo chown ${USER} /dev/tap${N} || exit 1
+            sudo ifconfig ${BRNAME} addm tap${N} || exit 1
+            sudo ifconfig tap${N} up || exit 1 ;;
+        Linux)
+            echo "creating ${TAPNAME}${N}"
+            sudo ip tuntap add dev ${TAPNAME}${N} mode tap user ${USER} || exit 1
+            if [ -n "${DEACTIVATE_IPV6}" ]; then
+                sudo -s sh -c "echo 1  > /proc/sys/net/ipv6/conf/${TAPNAME}${N}/disable_ipv6" || exit 1
+            fi
+            sudo ip link set dev ${TAPNAME}${N} master ${BRNAME} || exit 1
+            sudo ip link set ${TAPNAME}${N} up || exit 1 ;;
+        OSX)
+            sudo chown ${USER} /dev/tap${N} || exit 1
+            echo "start RIOT instance for tap${N} now and hit enter"
+            read
+            sudo ifconfig ${BRNAME} addm tap${N} || exit 1
+            sudo ifconfig tap${N} up || exit 1 ;;
+        *)
+            ;;
+    esac
+}
+
+while true ; do
+    case "$1" in
+        -6)
+            DEACTIVATE_IPV6=1
+            shift ;;
+        -b|--bridge)
+            case "$2" in
+                "")
+                    usage
+                    exit 2 ;;
+                *)
+                    BRNAME="$2"
+                    shift 2 ;;
+            esac ;;
+        -c|--create)
+            if [ -n "${COMMAND}" ]; then
+                usage
+                exit 2
+            fi
+            COMMAND="create"
+            case "$2" in
+                "")
+                    shift ;;
+                *[!0-9]*)
+                    usage
+                    exit 2;;
+                *)
+                    COUNT="$2"
+                    shift 2 ;;
+            esac ;;
+        -d|--delete)
+            if [ -n "${COMMAND}" ]; then
+                usage
+                exit 2
+            fi
+            COMMAND="delete"
+            shift ;;
+        -h|--help)
+            usage
+            exit ;;
+        -t|--tap)
+            case "$2" in
+                "")
+                    usage
+                    exit 2 ;;
+                *)
+                    TAPNAME="$2"
+                    shift 2 ;;
+            esac ;;
+        "")
+            break ;;
+        *)  usage
+            exit 2 ;;
+    esac
+done
+
+if [ -z "${USER}" ]; then
+    echo 'need to export $USER'
+    exit 1
+fi
+if [ -z "${COMMAND}" ]; then
+    COMMAND="create"
+fi
+case "$(uname -s)" in
+    Darwin)
+        PLATFORM="OSX"
+        if echo "$BRNAME" | grep -v -q "^bridge"; then
+            BRNAME=bridge0
+        fi ;;
+    FreeBSD)
+        PLATFORM="FreeBSD"
+        if echo "$BRNAME" | grep -v -q "^bridge"; then
+            BRNAME=bridge0
+        fi ;;
+    Linux)
+        PLATFORM="Linux" ;;
+    *)
+        unsupported_plattform
+        exit 1 ;;
+esac
+
+if [ "${COMMAND}" = 'create' ]; then
+    create_bridge || exit 1
+
+    begin_tap || exit 1
+
+    for N in $(seq 0 "$((COUNT - 1))"); do
+        create_tap || exit 1
+    done
+
+    up_bridge || exit 1
+
+elif [ "${COMMAND}" = 'delete' ]; then
+    delete_bridge
+else
+    echo 'unknown command'
+    exit 1
+fi
+
+exit 0

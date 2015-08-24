@@ -9,7 +9,7 @@
 #include "net/dev_eth.h"
 #include "dev_eth_autoinit.h"
 
-#ifdef MODULE_NG_NATIVENET
+#ifdef MODULE_DEV_ETH_TAP
 #include "dev_eth_tap.h"
 #endif
 
@@ -19,7 +19,7 @@ encx24j600_t dev_eth_encx24j600;
 #endif
 
 dev_eth_t * const dev_eth_devices[] = {
-#ifdef MODULE_NG_NATIVENET
+#ifdef MODULE_DEV_ETH_TAP
     [DEV_ETH_TAP] = (dev_eth_t*)&dev_eth_tap,
 #endif
 #ifdef MODULE_ENCX24J600

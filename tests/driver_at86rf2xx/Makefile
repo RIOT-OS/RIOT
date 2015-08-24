@@ -8,23 +8,23 @@ BOARD_BLACKLIST        := nucleo-f334
 # nucleo-f334:  not enough GPIO pins defined
 
 ifneq (,$(filter samr21-xpro,$(BOARD)))
-  DRIVER ?= ng_at86rf233
+  DRIVER ?= at86rf233
   USE_BOARD_PARAMETERS:=true
 endif
-ifneq (,$(filter iot-lab_M3,$(BOARD)))
-  DRIVER ?= ng_at86rf231
+ifneq (,$(filter iotlab-m3,$(BOARD)))
+  DRIVER ?= at86rf231
   USE_BOARD_PARAMETERS:=true
 endif
 
 ifneq (,$(DRIVER))
   USEMODULE += $(DRIVER)
 else
-  # default to ng_at86rf231
-  USEMODULE += ng_at86rf231
+  # default to at86rf231
+  USEMODULE += at86rf231
 endif
 
 ifneq (true,$(USE_BOARD_PARAMETERS))
-  # This adds . to include path so generic ng_at86rf2xx_params.h gets picked
+  # This adds . to include path so generic at86rf2xx_params.h gets picked
   # up.  All boards actually having such a device on board should define
   # USE_BOARD_PARAMETERS=true above to skip this step, as the board provides
   # this header.
@@ -62,9 +62,9 @@ endif
 endif # USE_BOARD_PARAMETERS=false
 
 USEMODULE += auto_init_ng_netif
-USEMODULE += ng_netif
-USEMODULE += ng_nomac
-USEMODULE += ng_pktdump
+USEMODULE += gnrc_netif
+USEMODULE += gnrc_nomac
+USEMODULE += gnrc_pktdump
 USEMODULE += uart0
 USEMODULE += shell
 USEMODULE += shell_commands

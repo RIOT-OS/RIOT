@@ -1,0 +1,24 @@
+From ff63a7a7d6b23bbc912e950403ccada15c2ce83d Mon Sep 17 00:00:00 2001
+From: Darredevil <alex.darredevil@gmail.com>
+Date: Thu, 13 Aug 2015 12:06:47 +0100
+Subject: [PATCH 1/6] changing header location
+
+---
+ core/internals.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/core/internals.h b/core/internals.h
+index 11b420c..36d7d12 100644
+--- a/core/internals.h
++++ b/core/internals.h
+@@ -60,7 +60,7 @@
+ #include <stddef.h>
+ #include <stdbool.h>
+
+-#include "er-coap-13/er-coap-13.h"
++#include "er-coap-13.h"
+
+ #ifdef WITH_LOGS
+ #define LOG(...) fprintf(stderr, __VA_ARGS__)
+--
+1.9.1

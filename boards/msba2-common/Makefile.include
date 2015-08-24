@@ -1,9 +1,12 @@
 ## the cpu to build for
 export CPU = lpc2387
 
+# Target triple for the build. Use arm-none-eabi if you are unsure.
+export TARGET_TRIPLE ?= arm-none-eabi
+
 # toolchain config
-export PREFIX = arm-none-eabi-
-#export PREFIX = arm-elf-
+export PREFIX = $(if $(TARGET_TRIPLE),$(TARGET_TRIPLE)-)
+
 export CC = $(PREFIX)gcc
 export CXX = $(PREFIX)g++
 export AR = $(PREFIX)ar
