@@ -20,7 +20,7 @@
 
 #include "periph/cpuid.h"
 
-extern volatile uint32_t _cpuid_address;
+extern volatile uint32_t _cpuid_address[3];
 
 void cpuid_get(void *id)
 {
