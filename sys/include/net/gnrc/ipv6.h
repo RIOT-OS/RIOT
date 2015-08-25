@@ -22,6 +22,7 @@
  * @brief       Definitions for IPv6
  *
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
+ * @author      Oliver Hahm <oliver.hahm@inria.fr>
  */
 
 
@@ -78,12 +79,18 @@ extern "C" {
 extern kernel_pid_t gnrc_ipv6_pid;
 
 #ifdef MODULE_FIB
+
+/**
+ * @brief   Maximum number of entries in the IPv6 FIB table.
+ */
+#define GNRC_IPV6_FIB_TABLE_SIZE        (20)
+
 /**
  * @brief   The forwarding information base (FIB) for the IPv6 stack.
  *
  * @see @ref net_fib
  */
-extern fib_entry_t gnrc_ipv6_fib_table[FIB_MAX_FIB_TABLE_ENTRIES];
+extern fib_table_t gnrc_ipv6_fib_table;
 #endif
 
 /**
