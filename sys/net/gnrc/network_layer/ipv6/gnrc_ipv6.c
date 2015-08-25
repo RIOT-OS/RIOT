@@ -588,7 +588,7 @@ static void _send(gnrc_pktsnip_t *pkt, bool prep_hdr)
             }
         }
 
-        _send_unicast(iface, l2addr, l2addr_len, pkt);
+        _send_unicast(iface, l2addr, l2addr_len, ipv6);
     }
 }
 

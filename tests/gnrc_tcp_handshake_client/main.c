@@ -18,30 +18,32 @@
 #include "debug.h"
 
 #define PEER_PORT 2000
-#define PEER_ADDR "fe80::f4c6:4ff:fed2:a73e"
+//#define PEER_ADDR "fe80::f4c6:4ff:fed2:a73e"
+#define PEER_ADDR "fe80::98ef:42ff:fee4:1db3"
+
+gnrc_tcp_tcb_t global_tcp;
 
 int main(void)
 {
     /* Allocate control structres */
-    gnrc_tcp_tcb_t tcb;
     ipv6_addr_t peer_addr;
     
     /* Config Peer Address */
     ipv6_addr_from_str(&peer_addr, PEER_ADDR);
 
     /* Initialize TCB and connect to peer */
-    gnrc_tcp_tcb_init(&tcb);
-    gnrc_tcp_open(&tcb, 0, (uint8_t *) &peer_addr, sizeof(peer_addr), PEER_PORT, 0);
+    gnrc_tcp_tcb_init(&global_tcp);
+    gnrc_tcp_open(&global_tcp, 0, (uint8_t *) &peer_addr, sizeof(peer_addr), PEER_PORT, 0);
 
     /* Call return either after, successful connection establishment or termination */
-    if(tcb.state == ESTABLISHED){
+    if(global_tcp.state == ESTABLISHED){
         printf("Cli: Connection established\n");
-    }else if(tcb.state == CLOSED){
+    }else if(global_tcp.state == CLOSED){
         printf("Cli: Connection closed\n");
     }
 
     // Destroy Tr	ansmission Control Block
-    gnrc_tcp_tcb_destroy(&tcb);
+    gnrc_tcp_tcb_destroy(&global_tcp);
 
     exit(0);
 }

@@ -113,9 +113,9 @@ static int _send_data(gnrc_netdev_t *netdev, gnrc_pktsnip_t *pkt)
     DEBUG("\n");
 
     to_send = _marshall_ethernet(dev, send_buffer, pkt);
+    gnrc_pktbuf_release(pkt);
 
     if (to_send < 0) {
-        gnrc_pktbuf_release(pkt);
         errno = -to_send;
         DEBUG("marshall\n");
         return to_send;
@@ -128,12 +128,9 @@ static int _send_data(gnrc_netdev_t *netdev, gnrc_pktsnip_t *pkt)
 
     dev_eth_t *ethdev = dev->ethdev;
     if ((nsent = ethdev->driver->send(ethdev, (char*)send_buffer, to_send)) < 0) {
-        gnrc_pktbuf_release(pkt);
         DEBUG("write\n");
         return -EIO;
     }
-
-    gnrc_pktbuf_release(pkt);
 
     return nsent;
 }

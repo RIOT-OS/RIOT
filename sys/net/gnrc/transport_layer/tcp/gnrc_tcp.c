@@ -202,7 +202,6 @@ int8_t gnrc_tcp_open(gnrc_tcp_tcb_t *tcb, uint16_t local_port, uint8_t *peer_add
 
             /* Timer expired: Possibly packet loss -> retransmit */
             if(res < 0){
-                printf("Retransmit\n");
                 res = _fsm(tcb, NULL, TIME_RETRANSMIT);
             }
         }else{

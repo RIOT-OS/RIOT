@@ -157,7 +157,7 @@ static void _send(gnrc_pktsnip_t *pkt)
     hdr->length = byteorder_htons(gnrc_pkt_len(udp_snip));
 
     /* and forward packet to the network layer */
-    if (!gnrc_netapi_dispatch_send(pkt->type, GNRC_NETREG_DEMUX_CTX_ALL, pkt)) {
+    if (!gnrc_netapi_dispatch_send(udp_snip->type, GNRC_NETREG_DEMUX_CTX_ALL, udp_snip)) {
         DEBUG("udp: cannot send packet: network layer not found\n");
         gnrc_pktbuf_release(pkt);
     }

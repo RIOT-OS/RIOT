@@ -81,7 +81,7 @@ static void send(char *addr_str, char *port_str, char *data)
         return;
     }
     gnrc_pktbuf_hold(ip, gnrc_netreg_num(GNRC_NETTYPE_UDP,
-                                         GNRC_NETREG_DEMUX_CTX_ALL) - 1);
+                                         GNRC_NETREG_DEMUX_CTX_ALL));
     while (sendto != NULL) {
         gnrc_netapi_send(sendto->pid, ip);
         sendto = gnrc_netreg_getnext(sendto);

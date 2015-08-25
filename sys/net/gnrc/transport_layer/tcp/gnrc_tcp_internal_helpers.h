@@ -505,7 +505,7 @@ static void _send_pkt(gnrc_tcp_tcb_t* tcb, bool retransmit)
 
         /* Calculate new timer: Todo RTT */
         tcb->ret_tout.seconds = 2;
-        gnrc_pktbuf_hold(tcb->cur_pkt, gnrc_netreg_num(tcb->cur_pkt->type, GNRC_NETREG_DEMUX_CTX_ALL));
+        gnrc_pktbuf_hold(tcb->cur_pkt, gnrc_netreg_num(GNRC_NETTYPE_TCP, GNRC_NETREG_DEMUX_CTX_ALL));
 
         /* signal user */
         msg_send(&msg, tcb->owner);
@@ -521,7 +521,7 @@ static void _send_pkt(gnrc_tcp_tcb_t* tcb, bool retransmit)
         /* Increase users to make pkt persistent, add it to queue, update size */
         tcb->ret_queue[tcb->ret_size].pkt = tcb->cur_pkt;
         tcb->ret_queue[tcb->ret_size].no_of_retries = 0;
-        gnrc_pktbuf_hold(tcb->cur_pkt, gnrc_netreg_num(tcb->cur_pkt->type, GNRC_NETREG_DEMUX_CTX_ALL));
+        gnrc_pktbuf_hold(tcb->cur_pkt, gnrc_netreg_num(tcb->cur_pkt->type, GNRC_NETREG_DEMUX_CTX_ALL) + 1);
         tcb->ret_size += 1;
 
         /* Calculate new timer */

@@ -91,7 +91,7 @@ static void _tcp_send(gnrc_pktsnip_t *pkt)
     }
 
     /* Increase users for this pkt. */
-    gnrc_pktbuf_hold(pkt, gnrc_netreg_num(pkt->type, GNRC_NETREG_DEMUX_CTX_ALL)-1);
+    gnrc_pktbuf_hold(pkt, gnrc_netreg_num(GNRC_NETTYPE_TCP, GNRC_NETREG_DEMUX_CTX_ALL));
     while(sendto){
         gnrc_netapi_send(sendto->pid, pkt);
         sendto = gnrc_netreg_getnext(sendto);
