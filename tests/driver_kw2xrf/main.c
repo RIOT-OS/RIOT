@@ -21,8 +21,12 @@
 
 #include "shell.h"
 #include "shell_commands.h"
-#include "posix_io.h"
-#include "board_uart0.h"
+#ifdef MODULE_NEWLIB
+#   include "uart_stdio.h"
+#else
+#   include "posix_io.h"
+#   include "board_uart0.h"
+#endif
 #include "net/gnrc.h"
 #include "net/gnrc/pktdump.h"
 
@@ -46,9 +50,13 @@ int main(void)
 
     /* start the shell */
     puts("Initialization successful - starting the shell now");
+#ifndef MODULE_NEWLIB
     (void) posix_open(uart0_handler_pid, 0);
     shell_init(&shell, NULL, SHELL_BUFSIZE, uart0_readc, uart0_putc);
-    shell_run(&shell);
+#else
+    shell_init(&shell, NULL, SHELL_BUFSIZE, getchar, putchar);
+#endif
+        shell_run(&shell);
 
     return 0;
 }

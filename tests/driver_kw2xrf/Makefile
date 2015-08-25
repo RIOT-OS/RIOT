@@ -50,7 +50,7 @@ endif
 
 endif # USE_BOARD_PARAMETERS=false
 
-USEMODULE += auto_init_ng_netif
+USEMODULE += auto_init_gnrc_netif
 USEMODULE += gnrc_netif
 USEMODULE += gnrc_nomac
 USEMODULE += gnrc_pktdump
