@@ -7,8 +7,8 @@
  */
 
 /**
- * @defgroup    net_nomac Simplest possible MAC layer
- * @ingroup     net
+ * @defgroup    net_gnrc_nomac  Simplest possible MAC layer
+ * @ingroup     net_gnrc
  * @brief       Simplest possible MAC protocol that sends without considering
  *              the state of the medium
  * @{

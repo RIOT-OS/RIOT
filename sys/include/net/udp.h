@@ -9,14 +9,14 @@
 /**
  * @defgroup    net_udp UDP
  * @ingroup     net
- * @brief       UDP header definition
+ * @brief       Provides UDP header and helper functions
  * @see         <a href="https://tools.ietf.org/html/rfc768">
  *                  RFC 768
  *              </a>
  * @{
  *
  * @file
- * @brief   UDP header definition
+ * @brief   UDP header and helper functions definition
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */

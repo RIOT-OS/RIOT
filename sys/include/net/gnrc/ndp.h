@@ -9,11 +9,11 @@
 /**
  * @defgroup    net_gnrc_ndp  IPv6 Neighbor discovery
  * @ingroup     net_gnrc_icmpv6
- * @brief       IPv6 Neighbor Discovery Implementation
+ * @brief       GNRC's IPv6 Neighbor Discovery implementation
  * @{
  *
  * @file
- * @brief       Neighbor Discovery definitions
+ * @brief       Definitions for GNRC's IPv6 Neighbor Discovery
  *
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */

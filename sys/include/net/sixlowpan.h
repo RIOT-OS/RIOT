@@ -9,11 +9,11 @@
 /**
  * @defgroup    net_sixlowpan   6LoWPAN
  * @ingroup     net
- * @brief       Generic 6LoWPAN types and helper functions
+ * @brief       Provides 6LoWPAN dispatch types and helper functions
  * @{
  *
  * @file
- * @brief   6LoWPAN type and helper function definitons.
+ * @brief   6LoWPAN dispatch type and helper function definitons.
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
