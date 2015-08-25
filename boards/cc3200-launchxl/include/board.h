@@ -60,59 +60,28 @@ extern "C" {
 #define STDIO_RX_BUFSIZE    (64U)
 /** @} */
 
-
-
-
-
-
-
-
-
-
-
-
-
 /**
  * @name Macros for controlling the on-board LEDs.
  * @{
  */
-#define LED_RED_GPIO        GPIO_PC0 /**< Red LED GPIO pin */
-#define LED_YELLOW_GPIO     GPIO_PC1 /**< Yellow LED GPIO pin */
-#define LED_GREEN_GPIO      GPIO_PC2 /**< Green LED GPIO pin */
-#define LED_ORANGE_GPIO     GPIO_PC3 /**< Orange LED GPIO pin */
 
-#define LED_RED_ON          cc3200_gpio_set(LED_GREEN_GPIO)
-#define LED_RED_OFF         cc3200_gpio_clear(LED_GREEN_GPIO)
-#define LED_RED_TOGGLE      cc3200_gpio_toggle(LED_GREEN_GPIO)
+#define LED_RED_ON          gpio_set(RED_LED)
+#define LED_RED_OFF         gpio_clear(RED_LED)
+#define LED_RED_TOGGLE      gpio_toggle(RED_LED)
 
-#define LED_YELLOW_ON       cc3200_gpio_set(LED_YELLOW_GPIO)
-#define LED_YELLOW_OFF      cc3200_gpio_clear(LED_YELLOW_GPIO)
-#define LED_YELLOW_TOGGLE   cc3200_gpio_toggle(LED_YELLOW_GPIO)
+#define LED_YELLOW_ON       gpio_set(YELLOW_LED)
+#define LED_YELLOW_OFF      gpio_clear(YELLOW_LED)
+#define LED_YELLOW_TOGGLE   gpio_toggle(YELLOW_LED)
 
-#define LED_GREEN_ON        cc3200_gpio_set(LED_GREEN_GPIO)
-#define LED_GREEN_OFF       cc3200_gpio_clear(LED_GREEN_GPIO)
-#define LED_GREEN_TOGGLE    cc3200_gpio_toggle(LED_GREEN_GPIO)
-
-#define LED_ORANGE_ON       cc3200_gpio_set(LED_ORANGE_GPIO)
-#define LED_ORANGE_OFF      cc3200_gpio_clear(LED_ORANGE_GPIO)
-#define LED_ORANGE_TOGGLE   cc3200_gpio_toggle(LED_ORANGE_GPIO)
+#define LED_GREEN_ON        gpio_set(GREEN_LED)
+#define LED_GREEN_OFF       gpio_clear(GREEN_LED)
+#define LED_GREEN_TOGGLE    gpio_toggle(GREEN_LED)
 
 /* Default to red if the color is not specified: */
 #define LED_ON              LED_RED_ON
 #define LED_OFF             LED_RED_OFF
 #define LED_TOGGLE          LED_RED_TOGGLE
 /** @} */
-
-
-
-
-
-
-
-
-
-
-
 
 
 /**
