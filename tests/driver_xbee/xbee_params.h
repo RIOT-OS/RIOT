@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief   xbee driver parameters example, used by auto_init_ng_netif
+ * @brief   xbee driver parameters example, used by auto_init_gnrc_netif
  *
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
  */

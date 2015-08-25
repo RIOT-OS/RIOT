@@ -21,11 +21,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "kernel.h"
 #include "periph_conf.h"
 #include "periph/i2c.h"
 #include "shell.h"
-#include "posix_io.h"
-#include "board_uart0.h"
+#ifdef MODULE_NEWLIB
+#   include "uart_stdio.h"
+#else
+#   include "posix_io.h"
+#   include "board_uart0.h"
+#endif
 
 #define BUFSIZE        (128U)
 
@@ -310,12 +315,16 @@ int main(void)
 
     puts("Test for the low-level I2C driver");
 
+#ifndef MODULE_NEWLIB
     /* prepare I/O for shell */
     board_uart0_init();
-    posix_open(uart0_handler_pid, 0);
+    (void) posix_open(uart0_handler_pid, 0);
+    shell_init(&shell, NULL, UART0_BUFSIZE, uart0_readc, uart0_putc);
+#else
+    shell_init(&shell, NULL, UART0_BUFSIZE, getchar, putchar);
+#endif
 
     /* define own shell commands */
-    shell_init(&shell, shell_commands, UART0_BUFSIZE, uart0_readc, uart0_putc);
     shell_run(&shell);
 
     return 0;

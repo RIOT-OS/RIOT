@@ -35,7 +35,7 @@
  * @brief   Define stack parameters for the MAC layer thread
  * @{
  */
-#define NETDEV_ETH_MAC_STACKSIZE     (THREAD_STACKSIZE_DEFAULT + THREAD_EXTRA_STACKSIZE_PRINTF)
+#define NETDEV_ETH_MAC_STACKSIZE     (THREAD_STACKSIZE_DEFAULT)
 #define NETDEV_ETH_MAC_PRIO          (THREAD_PRIORITY_MAIN - 4)
 
 static char _nomac_stack[NETDEV_ETH_MAC_STACKSIZE];
