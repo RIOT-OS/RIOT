@@ -8,8 +8,8 @@
 
 /**
  * @defgroup    net_gnrc_ipv6 IPv6
- * @ingroup     net
- * @brief       New IPv6 implementation
+ * @ingroup     net_gnrc
+ * @brief       GNRC's IPv6 implementation
  *
  * The IPv6 control thread understands messages of type
  *
@@ -19,7 +19,7 @@
  * @{
  *
  * @file
- * @brief       Definitions for IPv6
+ * @brief       Definitions for GNRC's IPv6 implementation
  *
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */

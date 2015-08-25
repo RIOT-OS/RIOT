@@ -8,7 +8,7 @@
 
 /**
  * @defgroup    net_gnrc_slip SLIP
- * @ingroup     net
+ * @ingroup     net_gnrc
  * @brief       Provides a SLIP interface over UART utilizing
  *              @ref driver_periph_uart.
  * @see         <a href="https://www.ietf.org/rfc/rfc1055">RFC 1055</a>

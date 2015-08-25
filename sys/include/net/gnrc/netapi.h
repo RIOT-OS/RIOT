@@ -7,9 +7,9 @@
  */
 
 /**
- * @defgroup    net_gnrc_netapi   Generic network module interface
- * @ingroup     net
- * @brief       Generic interface for IPC communication between network modules
+ * @defgroup    net_gnrc_netapi   GNRC communication interface
+ * @ingroup     net_gnrc
+ * @brief       Generic interface for IPC communication between GNRC modules
  *
  * @details     The idea of this interface is that it provides every network
  *              module with a basic set of commands to communicate with its
@@ -19,7 +19,7 @@
  * @{
  *
  * @file
- * @brief       Generic interface to communicate with network modules
+ * @brief       Generic interface to communicate with GNRC modules
  *
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>

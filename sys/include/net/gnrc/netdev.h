@@ -9,7 +9,8 @@
 
 /**
  * @defgroup    net_gnrc_netdev   Network device driver interface
- * @ingroup     net
+ * @ingroup     net_gnrc
+ * @brief       Common network device interface
  * @{
  *
  * @file

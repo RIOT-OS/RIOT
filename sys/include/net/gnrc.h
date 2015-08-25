@@ -13,7 +13,7 @@
  * @{
  *
  * @file
- * @brief       Pseudo header that includes all gnrc network stack base modules
+ * @brief       Includes all essential GNRC network stack base modules
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
