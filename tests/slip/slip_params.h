@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief   slip parameters example, used by auto_init_ng_netif
+ * @brief   slip parameters example, used by auto_init_gnrc_netif
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */

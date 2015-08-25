@@ -8,7 +8,7 @@
  */
 
 /*
- * @ingroup auto_init_ng_netif
+ * @ingroup auto_init_gnrc_netif
  * @{
  *
  * @file
@@ -40,7 +40,7 @@
 
 static char _nomac_stack[NETDEV_ETH_MAC_STACKSIZE];
 
-void auto_init_ng_netdev_eth(void)
+void auto_init_gnrc_netdev_eth(void)
 {
     DEBUG("Initializing NETDEV_ETH device\n");
     int res = gnrc_netdev_eth_init(&gnrc_netdev_eth, (dev_eth_t*)&dev_eth_tap);
