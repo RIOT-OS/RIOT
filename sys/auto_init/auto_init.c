@@ -48,6 +48,10 @@
 #include "vtimer.h"
 #endif
 
+#ifdef MODULE_XTIMER
+#include "xtimer.h"
+#endif
+
 #ifdef MODULE_RTC
 #include "periph/rtc.h"
 #endif
@@ -80,6 +84,10 @@
 #include "net/gnrc/udp.h"
 #endif
 
+#ifdef MODULE_GNRC_TCP
+#include "net/gnrc/tcp.h"
+#endif
+
 #ifdef MODULE_DEV_ETH_AUTOINIT
 #include "net/dev_eth.h"
 #include "dev_eth_autoinit.h"
@@ -104,6 +112,10 @@ void auto_init(void)
     DEBUG("Auto init uart0 module.\n");
     board_uart0_init();
 #endif
+#endif
+#ifdef MODULE_XTIMER
+    DEBUG("Auto init xtimer module.\n");
+    xtimer_init();
 #endif
 #ifdef MODULE_RTC
     DEBUG("Auto init rtc module.\n");
@@ -149,10 +161,14 @@ void auto_init(void)
     DEBUG("Auto init UDP module.\n");
     gnrc_udp_init();
 #endif
+#ifdef MODULE_GNRC_TCP
+    DEBUG("Auto init TCP module.\n");
+    gnrc_tcp_init();
+#endif
 
 
 /* initialize network devices */
-#ifdef MODULE_AUTO_INIT_NG_NETIF
+#ifdef MODULE_AUTO_INIT_GNRC_NETIF
 
 #ifdef MODULE_AT86RF2XX
     extern void auto_init_at86rf2xx(void);
@@ -170,11 +186,11 @@ void auto_init(void)
 #endif
 
 #ifdef MODULE_GNRC_NETDEV_ETH
-    extern void auto_init_ng_netdev_eth(void);
-    auto_init_ng_netdev_eth();
+    extern void auto_init_gnrc_netdev_eth(void);
+    auto_init_gnrc_netdev_eth();
 #endif
 
-#endif /* MODULE_AUTO_INIT_NG_NETIF */
+#endif /* MODULE_AUTO_INIT_GNRC_NETIF */
 
 #ifdef MODULE_GNRC_IPV6_NETIF
     gnrc_ipv6_netif_init_by_dev();

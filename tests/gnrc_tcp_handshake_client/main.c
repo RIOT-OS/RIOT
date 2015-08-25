@@ -19,7 +19,7 @@
 
 #define PEER_PORT 2000
 //#define PEER_ADDR "fe80::f4c6:4ff:fed2:a73e"
-#define PEER_ADDR "fe80::1cf9:9eff:fe07:113a"
+#define PEER_ADDR "fe80::6874:faff:fe20:fe4c"
 
 gnrc_tcp_tcb_t global_tcp;
 

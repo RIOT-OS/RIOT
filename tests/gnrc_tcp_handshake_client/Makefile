@@ -20,7 +20,7 @@ USEMODULE += vtimer
 USEMODULE += random
 
 USEMODULE += gnrc_netif_default
-USEMODULE += auto_init_ng_netif
+USEMODULE += auto_init_gnrc_netif
 
 USEMODULE += gnrc_ipv6_default
 USEMODULE += gnrc_tcp
