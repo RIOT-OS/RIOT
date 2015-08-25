@@ -139,13 +139,34 @@ static void _receive(gnrc_pktsnip_t *pkt)
 static void _send(gnrc_pktsnip_t *pkt)
 {
     udp_hdr_t *hdr;
-    gnrc_pktsnip_t *udp_snip;
+    gnrc_pktsnip_t *udp_snip, *tmp;
 
-    /* get udp snip and hdr */
-    LL_SEARCH_SCALAR(pkt, udp_snip, type, GNRC_NETTYPE_UDP);
+    /* write protect first header */
+    tmp = gnrc_pktbuf_start_write(pkt);
+    if (tmp == NULL) {
+        DEBUG("udp: cannot send packet: unable to allocate packet\n");
+        gnrc_pktbuf_release(pkt);
+        return;
+    }
+    pkt = tmp;
+    udp_snip = tmp->next;
+
+    /* get and write protect until udp snip */
+    while ((udp_snip != NULL) && (udp_snip->type != GNRC_NETTYPE_UDP)) {
+        udp_snip = gnrc_pktbuf_start_write(udp_snip);
+        if (udp_snip == NULL) {
+            DEBUG("udp: cannot send packet: unable to allocate packet\n");
+            gnrc_pktbuf_release(pkt);
+            return;
+        }
+        tmp->next = udp_snip;
+        tmp = udp_snip;
+        udp_snip = udp_snip->next;
+    }
 
     assert(udp_snip != NULL);
 
+    /* write protect UDP snip */
     udp_snip = gnrc_pktbuf_start_write(udp_snip);
     if (udp_snip == NULL) {
         DEBUG("udp: cannot send packet: unable to allocate packet\n");
