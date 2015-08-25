@@ -8,16 +8,16 @@
 
 /**
  * @defgroup    net_gnrc_netif    Network interfaces
- * @ingroup     net
- * @brief       Abstraction layer for network interfaces
+ * @ingroup     net_gnrc
+ * @brief       Abstraction layer for GNRC's network interfaces
  *
- * Network interfaces in this context are threads for protocols that are
+ * Network interfaces in the context of GNRC are threads for protocols that are
  * below the network layer.
  *
  * @{
  *
  * @file
- * @brief   Definitions for network interfaces
+ * @brief   Definitions for GNRC's network interfaces
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */

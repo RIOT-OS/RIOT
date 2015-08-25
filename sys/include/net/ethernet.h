@@ -9,7 +9,7 @@
 /**
  * @defgroup    net_ethernet Ethernet
  * @ingroup     net
- * @brief       Ethernet implementation
+ * @brief       Provides Ethernet header and helper functions
  * @{
  *
  * @file

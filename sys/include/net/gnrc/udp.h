@@ -7,14 +7,14 @@
  */
 
 /**
- * @defgroup    sys_net_udp UDP
- * @ingroup     net
- * @brief       RIOT's implementation of the UDP protocol
+ * @defgroup    net_gnrc_udp UDP
+ * @ingroup     net_gnrc
+ * @brief       GNRC's implementation of the UDP protocol
  *
  * @{
  *
  * @file
- * @brief       UDP interface definition
+ * @brief       UDP GNRC definition
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */

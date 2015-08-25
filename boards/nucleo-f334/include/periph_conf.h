@@ -108,6 +108,15 @@ extern "C" {
 #define SPI_0_MOSI_PORT_CLKEN() (RCC->AHBENR |= RCC_AHBENR_GPIOAEN)
 /** @} */
 
+/**
+ * @name xtimer configuration
+ * @{
+ */
+#define XTIMER_USLEEP_UNTIL_OVERHEAD 10
+#define XTIMER_BACKOFF 15
+#define XTIMER_OVERHEAD 3
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif

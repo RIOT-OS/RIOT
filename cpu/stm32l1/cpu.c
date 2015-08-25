@@ -14,6 +14,7 @@
  * @brief       Implementation of the kernel cpu functions
  *
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
+ * @author      Nick van IJzendoorn <nijzendoorn@engineering-spirit.nl>
  *
  * @}
  */
@@ -26,11 +27,13 @@
 #if defined(CLOCK_HSI) && defined(CLOCK_HSE)
 #error "Only provide one of two CLOCK_HSI/CLOCK_HSE"
 #elif CLOCK_HSI
-#define CLOCK_CR_SOURCE     RCC_CR_HSION
-#define CLOCK_PLL_SOURCE    RCC_CFGR_PLLSRC_HSI
+#define CLOCK_CR_SOURCE            RCC_CR_HSION
+#define CLOCK_CR_SOURCE_RDY        RCC_CR_HSIRDY
+#define CLOCK_PLL_SOURCE           RCC_CFGR_PLLSRC_HSI
 #elif CLOCK_HSE
-#define CLOCK_CR_SOURCE     RCC_CR_HSEON
-#define CLOCK_PLL_SOURCE    RCC_CFGR_PLLSRC_HSE
+#define CLOCK_CR_SOURCE            RCC_CR_HSEON
+#define CLOCK_CR_SOURCE_RDY        RCC_CR_HSERDY
+#define CLOCK_PLL_SOURCE           RCC_CFGR_PLLSRC_HSE
 #else
 #error "Please provide CLOCK_HSI or CLOCK_HSE in boards/NAME/includes/perhip_cpu.h"
 #endif
@@ -47,7 +50,6 @@ void cpu_init(void)
 
 /**
  * @brief Configure the clock system of the stm32f1
- *
  */
 static void clk_init(void)
 {
@@ -58,15 +60,23 @@ static void clk_init(void)
     RCC->CFGR &= ~(RCC_CFGR_PLLSRC | RCC_CFGR_PLLDIV | RCC_CFGR_PLLMUL);
     /* Reset HSION, HSEON, CSSON and PLLON bits */
     RCC->CR &= ~(RCC_CR_HSION | RCC_CR_HSEON | RCC_CR_HSEBYP | RCC_CR_CSSON | RCC_CR_PLLON);
-    /* Disable all interruptss  */
+    /* Disable all interrupts */
     RCC->CIR = 0x0;
 
     /* SYSCLK, HCLK, PCLK2 and PCLK1 configuration */
+<<<<<<< HEAD
     /* Enable HSE */
     RCC->CR |= CLOCK_CR_SOURCE;
     /* Wait till HSE is ready,
      * NOTE: the MCU will stay here forever if no HSE clock is connected */
     while (!(RCC->CR & RCC_CR_HSERDY));
+=======
+    /* Enable high speed clock source */
+    RCC->CR |= CLOCK_CR_SOURCE;
+    /* Wait till the high speed clock source is ready
+     * NOTE: the MCU will stay here forever if you use an external clock source and it's not connected */
+    while (!(RCC->CR & CLOCK_CR_SOURCE_RDY));
+>>>>>>> upstream/master
     FLASH->ACR |= FLASH_ACR_ACC64;
     /* Enable Prefetch Buffer */
     FLASH->ACR |= FLASH_ACR_PRFTEN;
@@ -84,7 +94,7 @@ static void clk_init(void)
     RCC->CFGR |= (uint32_t)CLOCK_APB2_DIV;
     /* PCLK1 = HCLK */
     RCC->CFGR |= (uint32_t)CLOCK_APB1_DIV;
-    /*  PLL configuration: PLLCLK = HSE / HSE_DIV * HSE_MUL */
+    /*  PLL configuration: PLLCLK = CLOCK_SOURCE / PLL_DIV * PLL_MUL */
     RCC->CFGR &= ~((uint32_t)(RCC_CFGR_PLLSRC | RCC_CFGR_PLLDIV | RCC_CFGR_PLLMUL));
     RCC->CFGR |= (uint32_t)(CLOCK_PLL_SOURCE | CLOCK_PLL_DIV | CLOCK_PLL_MUL);
     /* Enable PLL */
