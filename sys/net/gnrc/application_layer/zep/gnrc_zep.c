@@ -120,7 +120,7 @@ kernel_pid_t gnrc_zep_init(gnrc_zep_t *dev, uint16_t src_port, ipv6_addr_t *dst,
     dev->driver = (gnrc_netdev_driver_t *)&_zep_driver;
     dev->chan = GNRC_ZEP_DEFAULT_CHANNEL;
     dev->pan = byteorder_btols(byteorder_htons(GNRC_ZEP_DEFAULT_PANID));
-    dev->flags = GNRC_ZEP_FLAGS_USE_SRC_PAN
+    dev->flags = GNRC_ZEP_FLAGS_USE_SRC_PAN;
 
 #ifdef MODULE_PERIPH_CPUID
     /* initialize dev->addr and dev->eui64 from cpuid if available */
