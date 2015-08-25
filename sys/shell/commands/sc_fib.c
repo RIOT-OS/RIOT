@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include "thread.h"
 #include "inet_pton.h"
+#include "net/af.h"
 #ifdef MODULE_GNRC_NETIF
 #include "net/gnrc/netif.h"
 #endif

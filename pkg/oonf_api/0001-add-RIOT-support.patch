@@ -1,7 +1,7 @@
-From 012da8d41806ae98adab8cb4e88e52c2e675ab4f Mon Sep 17 00:00:00 2001
+From b7ed6eeb4f970bf603da8ec90f4f7e8b862dcdb6 Mon Sep 17 00:00:00 2001
 From: Benjamin Valentin <benpicco@zedat.fu-berlin.de>
 Date: Wed, 5 Feb 2014 20:01:41 +0100
-Subject: [PATCH 1/3] add RIOT support
+Subject: [PATCH 01/10] add RIOT support
 
 ---
  Makefile                             | 29 ++++++++++++++
@@ -24,7 +24,7 @@ Subject: [PATCH 1/3] add RIOT support
 
 diff --git a/Makefile b/Makefile
 new file mode 100644
-index 0000000..cf66baa
+index 0000000..1f1cd9c
 --- /dev/null
 +++ b/Makefile
 @@ -0,0 +1,29 @@
@@ -77,13 +77,13 @@ index 0000000..5e0046d
 +
 +include $(RIOTBASE)/Makefile.base
 diff --git a/src-api/common/autobuf.c b/src-api/common/autobuf.c
-index 77c519b..e09c0c9 100644
+index 77c519b..37e77ac 100644
 --- a/src-api/common/autobuf.c
 +++ b/src-api/common/autobuf.c
 @@ -51,6 +51,12 @@
  #include <winsock2.h>
  #endif
-
+ 
 +#ifdef RIOT_VERSION
 +int getpagesize(void) {
 +	return 512;
@@ -91,10 +91,10 @@ index 77c519b..e09c0c9 100644
 +#endif
 +
  #include "common/autobuf.h"
-
+ 
  /**
 diff --git a/src-api/common/common_types.h b/src-api/common/common_types.h
-index c90cf46..54ce281 100644
+index c90cf46..b5f170a 100644
 --- a/src-api/common/common_types.h
 +++ b/src-api/common/common_types.h
 @@ -77,6 +77,11 @@
@@ -110,20 +110,20 @@ index c90cf46..54ce281 100644
    #define PRINTF_SIZE_T_SPECIFIER     "zu"
    #define PRINTF_SIZE_T_HEX_SPECIFIER "zx"
 diff --git a/src-api/common/daemonize.c b/src-api/common/daemonize.c
-index 103c88f..6ea603d 100644
+index 103c88f..8a6cd2b 100644
 --- a/src-api/common/daemonize.c
 +++ b/src-api/common/daemonize.c
 @@ -48,7 +48,7 @@
  #include "common/common_types.h"
  #include "common/daemonize.h"
-
+ 
 -#ifndef WIN32
 +#if (!defined(_WIN32)) && (!defined(RIOT_VERSION))
  /**
   * Prepare the start of a daemon. Fork into background,
   * but keep stdin/out/err open and a pipe connected to
 diff --git a/src-api/common/netaddr.c b/src-api/common/netaddr.c
-index dedab2c..fdc3e82 100644
+index dedab2c..1b602ec 100644
 --- a/src-api/common/netaddr.c
 +++ b/src-api/common/netaddr.c
 @@ -43,7 +43,14 @@
@@ -133,12 +133,12 @@ index dedab2c..fdc3e82 100644
 +#ifndef RIOT_VERSION
  #include <net/if.h>
 +#else
-+#include "net_help.h"
++#include "net/af.h"
 +#include "inet_ntop.h"
 +#include "inet_pton.h"
 +#define DONT_HAVE_SIN6_SCOPE_ID
 +#endif
-
+ 
  #include "common/common_types.h"
  #include "common/string.h"
 @@ -175,12 +182,12 @@ netaddr_to_binary(void *dst, const struct netaddr *src, size_t len) {
@@ -165,14 +165,14 @@ index dedab2c..fdc3e82 100644
 +  dst->_type = (uint8_t)src->std.sin6_family;
    return 0;
  }
-
+ 
 @@ -204,12 +211,12 @@ netaddr_from_socket(struct netaddr *dst, const union netaddr_socket *src) {
  int
  netaddr_to_socket(union netaddr_socket *dst, const struct netaddr *src) {
    /* copy address type */
 -  dst->std.sa_family = src->_type;
 +  dst->std.sin6_family = src->_type;
-
+ 
    switch (src->_type) {
      case AF_INET:
        /* ipv4 */
@@ -183,13 +183,13 @@ index dedab2c..fdc3e82 100644
        /* ipv6 */
 @@ -221,7 +228,7 @@ netaddr_to_socket(union netaddr_socket *dst, const struct netaddr *src) {
    }
-
+ 
    /* copy address type */
 -  dst->std.sa_family= src->_type;
 +  dst->std.sin6_family= src->_type;
    return 0;
  }
-
+ 
 @@ -319,14 +326,16 @@ netaddr_socket_init(union netaddr_socket *combined, const struct netaddr *addr,
    switch (addr->_type) {
      case AF_INET:
@@ -212,13 +212,13 @@ index dedab2c..fdc3e82 100644
        /* unknown address type */
 @@ -334,7 +343,7 @@ netaddr_socket_init(union netaddr_socket *combined, const struct netaddr *addr,
    }
-
+ 
    /* copy address type */
 -  combined->std.sa_family = addr->_type;
 +  combined->std.sin6_family = addr->_type;
    return 0;
  }
-
+ 
 @@ -344,11 +353,11 @@ netaddr_socket_init(union netaddr_socket *combined, const struct netaddr *addr,
   */
  uint16_t
@@ -237,7 +237,7 @@ index dedab2c..fdc3e82 100644
 @@ -555,28 +564,31 @@ const char *
  netaddr_socket_to_string(struct netaddr_str *dst, const union netaddr_socket *src) {
    struct netaddr_str buf;
-
+ 
 -  if (src->std.sa_family == AF_INET) {
 +  if (src->std.sin6_family == AF_INET) {
      snprintf(dst->buf, sizeof(*dst), "%s:%d",
@@ -251,7 +251,7 @@ index dedab2c..fdc3e82 100644
 +#ifndef DONT_HAVE_SIN6_SCOPE_ID
      if (src->v6.sin6_scope_id) {
        char scope_buf[IF_NAMESIZE];
-
+ 
        snprintf(dst->buf, sizeof(*dst), "[%s]:%d%%%s",
            inet_ntop(AF_INET6, &src->v6.sin6_addr, buf.buf, sizeof(buf)),
 -          ntohs(src->v6.sin6_port),
@@ -272,18 +272,18 @@ index dedab2c..fdc3e82 100644
 -    snprintf(dst->buf, sizeof(*dst), "\"Unknown socket type: %d\"", src->std.sa_family);
 +    snprintf(dst->buf, sizeof(*dst), "\"Unknown socket type: %d\"", src->std.sin6_family);
    }
-
+ 
    return dst->buf;
 @@ -622,13 +634,13 @@ int
  netaddr_cmp_to_socket(const struct netaddr *a1, const union netaddr_socket *a2) {
    int result = 0;
-
+ 
 -  result = (int)a1->_type - (int)a2->std.sa_family;
 +  result = (int)a1->_type - (int)a2->std.sin6_family;
    if (result) {
      return result;
    }
-
+ 
    if (a1->_type == AF_INET) {
 -    result = memcmp(a1->_addr, &a2->v4.sin_addr, 4);
 +    result = memcmp(a1->_addr, &a2->v4.sin6_addr, 4);
@@ -317,7 +317,7 @@ index dedab2c..fdc3e82 100644
      return dst;
    }
 @@ -795,7 +807,7 @@ inet_pton(int af, const char *src, void *dst)
-
+ 
    sock = (union netaddr_socket *)res->ai_addr;
    if (af == AF_INET) {
 -    memcpy(dst, &sock->v4.sin_addr, 4);
@@ -327,21 +327,21 @@ index dedab2c..fdc3e82 100644
      memcpy(dst, &sock->v6.sin6_addr, 16);
 @@ -928,7 +940,7 @@ _subnetmask_to_prefixlen(const char *src) {
    }
-
+ 
    /* transform into host byte order */
 -  v4 = ntohl(v4);
 +  v4 = NTOHL(v4);
-
+ 
    shift = 0xffffffff;
    for (len = 31; len >= 0; len--) {
 diff --git a/src-api/common/netaddr.h b/src-api/common/netaddr.h
-index 78fd5b4..cfba7a9 100644
+index 78fd5b4..e65bf94 100644
 --- a/src-api/common/netaddr.h
 +++ b/src-api/common/netaddr.h
 @@ -43,18 +43,26 @@
  #define NETADDR_H_
-
-
+ 
+ 
 -#ifndef _WIN32
 +#if (!defined(_WIN32)) && (!defined(RIOT_VERSION))
  #include <arpa/inet.h>
@@ -354,10 +354,10 @@ index 78fd5b4..cfba7a9 100644
 +#ifdef _WIN32
  #include <winsock2.h>
  #include <ws2tcpip.h>
-
+ 
  #define IF_NAMESIZE 16
  #endif
-
+ 
 +#ifdef RIOT_VERSION
 +#include "socket_base/socket.h"
 +#define INET_ADDRSTRLEN		(16)
@@ -366,7 +366,7 @@ index 78fd5b4..cfba7a9 100644
 +
  #include <assert.h>
  #include <string.h>
-
+ 
 @@ -97,10 +105,10 @@ struct netaddr {
   * to all variants without casting and compiler warnings.
   */
@@ -380,7 +380,7 @@ index 78fd5b4..cfba7a9 100644
 +  sockaddr6_t std;
 +  sockaddr6_t storage;
  };
-
+ 
  /**
 @@ -337,7 +345,7 @@ netaddr_set_prefix_length(struct netaddr *n, uint8_t prefix_len) {
   */
@@ -389,7 +389,7 @@ index 78fd5b4..cfba7a9 100644
 -  return s->std.sa_family;
 +  return s->std.sin6_family;
  }
-
+ 
  #endif /* NETADDR_H_ */
 diff --git a/src-api/rfc5444/Makefile b/src-api/rfc5444/Makefile
 new file mode 100644
@@ -458,7 +458,7 @@ index 0000000..9bf6622
 +
 +#endif /* RFC5444_API_CONFIG_H_ */
 diff --git a/src-api/rfc5444/rfc5444_print.c b/src-api/rfc5444/rfc5444_print.c
-index 4b3e04d..6b52f72 100644
+index 4b3e04d..7b9a308 100644
 --- a/src-api/rfc5444/rfc5444_print.c
 +++ b/src-api/rfc5444/rfc5444_print.c
 @@ -41,8 +41,13 @@
@@ -472,9 +472,9 @@ index 4b3e04d..6b52f72 100644
  #include <sys/socket.h>
  #include <arpa/inet.h>
 +#endif
-
+ 
  #include "common/netaddr.h"
  #include "rfc5444/rfc5444_reader.h"
---
-1.8.3.2
+-- 
+1.9.1
 
