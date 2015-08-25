@@ -265,15 +265,20 @@ static void _send(gnrc_pktsnip_t *pkt)
         return;
     }
 #ifdef MODULE_GNRC_SIXLOWPAN_FRAG
-    else {
+    else if (datagram_size <= SIXLOWPAN_FRAG_MAX_LEN) {
         DEBUG("6lo: Send fragmented (%u > %" PRIu16 ")\n",
               (unsigned int)datagram_size, iface->max_frag_size);
         gnrc_sixlowpan_frag_send(hdr->if_pid, pkt2, datagram_size);
     }
+    else {
+        DEBUG("6lo: packet too big (%u > %" PRIu16 ")\n",
+              (unsigned int)datagram_size, SIXLOWPAN_FRAG_MAX_LEN);
+        gnrc_pktbuf_release(pkt2);
+    }
 #else
-    (void)datagram_size;
-    DEBUG("6lo: packet too big (%u> %" PRIu16 ")\n",
+    DEBUG("6lo: packet too big (%u > %" PRIu16 ")\n",
           (unsigned int)datagram_size, iface->max_frag_size);
+    gnrc_pktbuf_release(pkt2);
 #endif
 }
 

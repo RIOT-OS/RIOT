@@ -89,6 +89,11 @@ static void _set_usage(char *cmd_name)
          "       * \"state\" - set the device state\n");
 }
 
+static void _mtu_usage(char *cmd_name)
+{
+    printf("usage: %s <if_id> mtu <n>\n", cmd_name);
+}
+
 static void _flag_usage(char *cmd_name)
 {
     printf("usage: %s <if_id> [-]{promisc|autoack|preload|6lo|iphc}\n", cmd_name);
@@ -259,8 +264,11 @@ static void _netif_list(kernel_pid_t dev)
     }
 
 #ifdef MODULE_GNRC_IPV6_NETIF
-    if ((entry != NULL) && (entry->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN)) {
-        printf("6LO ");
+    if (entry != NULL) {
+        printf("MTU:%" PRIu16 "  ", entry->mtu);
+        if (entry->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN) {
+            printf("6LO  ");
+        }
         linebreak = true;
     }
 #endif
@@ -269,7 +277,7 @@ static void _netif_list(kernel_pid_t dev)
     gnrc_sixlowpan_netif_t *sixlo_entry = gnrc_sixlowpan_netif_get(dev);
 
     if ((sixlo_entry != NULL) && (sixlo_entry->iphc_enabled)) {
-        printf("IPHC ");
+        printf("IPHC  ");
         linebreak = true;
     }
 #endif
@@ -683,6 +691,33 @@ static int _netif_del(kernel_pid_t dev, char *addr_str)
 #endif
 }
 
+static int _netif_mtu(kernel_pid_t dev, char *mtu_str)
+{
+#ifdef MODULE_GNRC_IPV6_NETIF
+    int mtu;
+    gnrc_ipv6_netif_t *entry;
+    if (((mtu = atoi(mtu_str)) < IPV6_MIN_MTU) || (mtu > UINT16_MAX)) {
+        printf("error: MTU must be between %" PRIu16 " and %" PRIu16 "\n",
+               IPV6_MIN_MTU, UINT16_MAX);
+        return 1;
+    }
+    if ((entry = gnrc_ipv6_netif_get(dev)) == NULL) {
+        puts("error: unable to set MTU.");
+        return 1;
+    }
+    entry->mtu = IPV6_MIN_MTU;
+    printf("success: set MTU %" PRIu16 " interface %" PRIkernel_pid "\n", mtu,
+           dev);
+    return 0;
+#else
+    (void)dev;
+    (void)mtu_str;
+    puts("error: unable to set MTU.");
+    return 1;
+#endif
+}
+
+
 /* shell commands */
 int _netif_send(int argc, char **argv)
 {
@@ -777,6 +812,14 @@ int _netif_config(int argc, char **argv)
 
                 return _netif_del((kernel_pid_t)dev, argv[3]);
             }
+            else if (strcmp(argv[2], "mtu") == 0) {
+                if (argc < 4) {
+                    _mtu_usage(argv[0]);
+                    return 1;
+                }
+
+                return _netif_mtu((kernel_pid_t)dev, argv[3]);
+            }
             else {
                 return _netif_flag(argv[0], dev, argv[2]);
             }
@@ -789,6 +832,7 @@ int _netif_config(int argc, char **argv)
 
     printf("usage: %s [<if_id>]\n", argv[0]);
     _set_usage(argv[0]);
+    _mtu_usage(argv[0]);
     _flag_usage(argv[0]);
     _add_usage(argv[0]);
     _del_usage(argv[0]);

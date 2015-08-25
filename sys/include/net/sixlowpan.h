@@ -39,6 +39,8 @@ extern "C" {
 #define SIXLOWPAN_FRAG_1_DISP       (0xc0)      /**< dispatch for 1st fragment */
 #define SIXLOWPAN_FRAG_N_DISP       (0xe0)      /**< dispatch for subsequent
                                                  *   fragments */
+#define SIXLOWPAN_FRAG_MAX_LEN      (2047)      /**< Maximum datagram size @f$ (2^{11} - 1) @f$ */
+
 /**
  * @brief   Dispatch mask for LOWPAN_IPHC.
  * @see     <a href="https://tools.ietf.org/html/rfc6282#section-3.1">

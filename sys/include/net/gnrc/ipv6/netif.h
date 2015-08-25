@@ -28,6 +28,7 @@
 #include "kernel_macros.h"
 #include "kernel_types.h"
 #include "mutex.h"
+#include "net/ipv6.h"
 #include "net/ipv6/addr.h"
 #include "vtimer.h"
 
@@ -51,11 +52,19 @@ extern "C" {
 /**
  * @brief   Default MTU
  *
- * @see <a href="https://tools.ietf.org/html/rfc2460#section-5">
- *          RFC 2460, section 5
- *      </a>
+ * An interface will choose this MTU if the link-layer's maximum packet size
+ * (see @ref NETOPT_MAX_PACKET_SIZE) is lesser than the @ref IPV6_MIN_MTU or if it just not
+ * provide it. For RFC-compatible communication it must be at least @ref IPV6_MIN_MTU.
+ *
+ * @note    If the scenario the node is used in allows for it and the packet size is predictable,
+ *          a user might choose to set @ref GNRC_IPV6_NETIF_DEFAULT_MTU to a lesser value than
+ *          @ref IPV6_MIN_MTU to optimize for code size (e.g. because it is then possible to omit
+ *          @ref net_gnrc_sixlowpan_frag) and memory usage (e.g. because @ref GNRC_PKTBUF_SIZE
+ *          can be much smaller).
  */
-#define GNRC_IPV6_NETIF_DEFAULT_MTU (1280)
+#ifndef GNRC_IPV6_NETIF_DEFAULT_MTU
+#define GNRC_IPV6_NETIF_DEFAULT_MTU (IPV6_MIN_MTU)
+#endif
 
 /**
  * @brief   Default hop limit

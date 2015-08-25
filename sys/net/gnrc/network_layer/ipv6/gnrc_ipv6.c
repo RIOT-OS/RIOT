@@ -11,6 +11,7 @@
  *
  * @file
  */
+#include <assert.h>
 #include <errno.h>
 #include <inttypes.h>
 #include <stdbool.h>
@@ -92,10 +93,12 @@ void gnrc_ipv6_demux(kernel_pid_t iface, gnrc_pktsnip_t *pkt, uint8_t nh)
     pkt->type = gnrc_nettype_from_protnum(nh);
 
     switch (nh) {
+#ifdef MODULE_GNRC_ICMPV6
         case PROTNUM_ICMPV6:
             DEBUG("ipv6: handle ICMPv6 packet (nh = %" PRIu8 ")\n", nh);
             gnrc_icmpv6_demux(iface, pkt);
             break;
+#endif
 #ifdef MODULE_GNRC_IPV6_EXT
         case PROTNUM_IPV6_EXT_HOPOPT:
         case PROTNUM_IPV6_EXT_DST:
@@ -116,6 +119,7 @@ void gnrc_ipv6_demux(kernel_pid_t iface, gnrc_pktsnip_t *pkt, uint8_t nh)
             _decapsulate(pkt);
             break;
         default:
+            (void)iface;
             break;
     }
 
@@ -187,6 +191,7 @@ static void *_event_loop(void *args)
                                             (ipv6_addr_t *)msg.content.ptr);
                 break;
 
+#ifdef MODULE_GNRC_NDP
             case GNRC_NDP_MSG_NBR_SOL_RETRANS:
                 DEBUG("ipv6: Neigbor solicitation retransmission timer event received\n");
                 gnrc_ndp_retrans_nbr_sol((gnrc_ipv6_nc_t *)msg.content.ptr);
@@ -196,6 +201,7 @@ static void *_event_loop(void *args)
                 DEBUG("ipv6: Neigbor cache state timeout received\n");
                 gnrc_ndp_state_timeout((gnrc_ipv6_nc_t *)msg.content.ptr);
                 break;
+#endif
 
             default:
                 break;
@@ -205,31 +211,29 @@ static void *_event_loop(void *args)
     return NULL;
 }
 
-#ifdef MODULE_GNRC_SIXLOWPAN
 static void _send_to_iface(kernel_pid_t iface, gnrc_pktsnip_t *pkt)
 {
+    ((gnrc_netif_hdr_t *)pkt->data)->if_pid = iface;
     gnrc_ipv6_netif_t *if_entry = gnrc_ipv6_netif_get(iface);
 
-    ((gnrc_netif_hdr_t *)pkt->data)->if_pid = iface;
-
+    assert(if_entry != NULL);
+    if (gnrc_pkt_len(pkt->next) > if_entry->mtu) {
+        DEBUG("ipv6: packet too big\n");
+        gnrc_pktbuf_release(pkt);
+        return;
+    }
+#ifdef MODULE_GNRC_SIXLOWPAN
     if ((if_entry != NULL) && (if_entry->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN)) {
         DEBUG("ipv6: send to 6LoWPAN instead\n");
         if (!gnrc_netapi_dispatch_send(GNRC_NETTYPE_SIXLOWPAN, GNRC_NETREG_DEMUX_CTX_ALL, pkt)) {
             DEBUG("ipv6: no 6LoWPAN thread found");
             gnrc_pktbuf_release(pkt);
         }
+        return;
     }
-    else {
-        gnrc_netapi_send(iface, pkt);
-    }
-}
-#else
-static inline void _send_to_iface(kernel_pid_t iface, gnrc_pktsnip_t *pkt)
-{
-    ((gnrc_netif_hdr_t *)pkt->data)->if_pid = iface;
+#endif
     gnrc_netapi_send(iface, pkt);
 }
-#endif
 
 /* functions for sending */
 static void _send_unicast(kernel_pid_t iface, uint8_t *dst_l2addr,
@@ -688,8 +692,18 @@ static void _receive(gnrc_pktsnip_t *pkt)
         /* redirect to next hop */
         DEBUG("ipv6: decrement hop limit to %" PRIu8 "\n", hdr->hl - 1);
 
+        /* RFC 4291, section 2.5.6 states: "Routers must not forward any
+         * packets with Link-Local source or destination addresses to other
+         * links."
+         */
+        if ((ipv6_addr_is_link_local(&(hdr->src))) || (ipv6_addr_is_link_local(&(hdr->dst)))) {
+            DEBUG("ipv6: do not forward packets with link-local source or"\
+                  " destination address\n");
+            gnrc_pktbuf_release(pkt);
+            return;
+        }
         /* TODO: check if receiving interface is router */
-        if (--(hdr->hl) > 0) {  /* drop packets that *reach* Hop Limit 0 */
+        else if (--(hdr->hl) > 0) {  /* drop packets that *reach* Hop Limit 0 */
             gnrc_pktsnip_t *tmp = pkt;
 
             DEBUG("ipv6: forward packet to next hop\n");
