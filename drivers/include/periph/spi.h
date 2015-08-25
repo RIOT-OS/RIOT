@@ -48,6 +48,13 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Default SPI chip select pin access macro
+ */
+#ifndef SPI_CS_DEV
+#define SPI_CS_DEV(x)   (-x)
+#endif
+
+/**
  * @brief   Define value for unused CS line
  */
 #ifndef SPI_CS_UNDEF
@@ -139,7 +146,7 @@ typedef enum {
  *                      transfer period. If @p start is false, the return value
  *                      should be ignored
  */
-typedef char(spi_cs_cb_t)(bool start);
+typedef uint8_t(spi_cs_cb_t)(void *arg, bool start);
 
 /**
  * @brief   Prototype for callback that is called after every transfered byte
@@ -151,7 +158,7 @@ typedef char(spi_cs_cb_t)(bool start);
  * @return              The character that is send to the master on the next
  *                      transfer period
  */
-typedef char(spi_data_cb_t)(char data);
+typedef uint8_t(spi_data_cb_t)(void *arg, uint8_t data);
 
 /**
  * @brief   Initialize the given SPI device to work in master mode
@@ -168,7 +175,8 @@ typedef char(spi_data_cb_t)(char data);
  * @return              0 on success
  * @return              -1 on undefined device given
  * @return              -2 on unavailable speed value
- * @return              -3 on other errors
+ * @return              -3 on configuration not supported
+ * @return              -4 on other errors
  */
 int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed);
 
@@ -188,10 +196,11 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed);
  *
  * @return              0 on success
  * @return              -1 on undefined device given
- * @return              -2 on other errors
+ * @return              -2 on slave mode not supported
+ * @return              -3 on other errors
  */
 int spi_init_slave(spi_t dev, spi_cs_t cs, spi_cs_pol_t pol, spi_conf_t conf,
-                   spi_cs_cb_t cs_cb, spi_data_cb_t data_cb);
+                   spi_cs_cb_t cs_cb, spi_data_cb_t data_cb, void *arg);
 
 /**
  * @brief   Initialize the given chip select pin
@@ -233,7 +242,7 @@ void spi_release(spi_t dev);
  *
  * @return              Byte that was read from the slave
  */
-char spi_transfer_byte(spi_t dev, spi_cs_t cs, bool cont, char out);
+uint8_t spi_transfer_byte(spi_t dev, spi_cs_t cs, bool cont, uint8_t out);
 
 /**
  * @brief   Transfer a number bytes on the given SPI bus
@@ -246,7 +255,7 @@ char spi_transfer_byte(spi_t dev, spi_cs_t cs, bool cont, char out);
  * @param[in] len       Number of bytes to transfer
  */
 void spi_transfer_bytes(spi_t dev, spi_cs_t cs, bool cont,
-                        char *out, char *in, size_t len);
+                        uint8_t *out, uint8_t *in, size_t len);
 
 /**
  * @brief   Transfer one byte to/from a given register address
@@ -264,7 +273,8 @@ void spi_transfer_bytes(spi_t dev, spi_cs_t cs, bool cont,
  *
  * @return              Value that was read from the slave's register
  */
-char spi_transfer_reg(spi_t dev, spi_cs_t cs, bool cont, uint8_t reg, char out);
+uint8_t spi_transfer_reg(spi_t dev, spi_cs_t cs, bool cont, uint8_t reg,
+                         uint8_t out);
 
 /**
  * @brief   Transfer a number of bytes from/to a given register address
@@ -282,7 +292,7 @@ char spi_transfer_reg(spi_t dev, spi_cs_t cs, bool cont, uint8_t reg, char out);
  * @param[in] len       Number of bytes to transfer
  */
 void spi_transfer_regs(spi_t dev, spi_cs_t cs, bool cont,
-                       uint8_t reg, char *out, char *in, size_t len);
+                       uint8_t reg, uint8_t *out, uint8_t *in, size_t len);
 
 /**
  * @brief Power on the given SPI device
