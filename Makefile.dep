@@ -185,6 +185,15 @@ ifneq (,$(filter gnrc_pktbuf_%, $(USEMODULE)))
   USEMODULE += gnrc_pktbuf # make MODULE_GNRC_PKTBUF macro available for all implementations
 endif
 
+ifneq (,$(filter newlib,$(USEMODULE)))
+  USEMODULE += uart_stdio
+else
+  ifneq (,$(filter shell,$(USEMODULE)))
+    USEMODULE += uart0
+  endif
+endif
+
+
 ifneq (,$(filter uart0,$(USEMODULE)))
   USEMODULE += posix
 endif
@@ -237,10 +246,6 @@ ifneq (,$(filter cpp11-compat,$(USEMODULE)))
   USEMODULE += vtimer
   USEMODULE += timex
   FEATURES_REQUIRED += cpp
-endif
-
-ifneq (,$(filter newlib,$(USEMODULE)))
-  USEMODULE += uart_stdio
 endif
 
 ifneq (,$(filter gnrc_netdev_eth,$(USEMODULE)))
