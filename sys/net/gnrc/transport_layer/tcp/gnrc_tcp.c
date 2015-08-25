@@ -288,22 +288,19 @@ int gnrc_tcp_init(void)
 
 int gnrc_tcp_calc_csum(const gnrc_pktsnip_t *hdr, const gnrc_pktsnip_t *pseudo_hdr)
 {
-    uint16_t csum = 0;
+    uint16_t csum;
 
-    if (hdr == NULL || pseudo_hdr == NULL) {
-        DEBUG("tcp: hdr or pseudo_hdr were NULL\n");
+    if ((hdr == NULL) || (pseudo_hdr == NULL)) {
         return -EFAULT;
     }
-
     if (hdr->type != GNRC_NETTYPE_TCP) {
-        DEBUG("tcp: header was not tcp header\n");
         return -EBADMSG;
     }
 
-    if((csum = _calc_csum(hdr, pseudo_hdr, hdr->next)) == 0){
+    csum = _calc_csum(hdr, pseudo_hdr, hdr->next);
+    if (csum == 0) {
         return -ENOENT;
     }
-
     ((gnrc_tcp_hdr_t *)hdr->data)->checksum = byteorder_htons(csum);
     return 0;
 }

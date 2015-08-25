@@ -18,7 +18,7 @@
 #include "debug.h"
 
 #define PEER_PORT 2000
-#define PEER_ADDR "fe80::f06a:5bff:fe2d:be90"
+#define PEER_ADDR "fe80::f4c6:4ff:fed2:a73e"
 
 int main(void)
 {
