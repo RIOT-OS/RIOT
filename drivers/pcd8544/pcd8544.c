@@ -204,7 +204,7 @@ static void _write(pcd8544_t *dev, uint8_t is_data, char data)
     /* write byte to LCD */
     spi_acquire(dev->spi);
     gpio_clear(dev->cs);
-    spi_transfer_byte(dev->spi, data, 0);
+    spi_transfer_byte(dev->spi, data);
     gpio_set(dev->cs);
     spi_release(dev->spi);
 }

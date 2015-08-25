@@ -136,7 +136,7 @@ static int nvram_spi_write(nvram_t *dev, uint8_t *src, uint32_t dst, size_t len)
     /* Assert CS */
     gpio_clear(spi_dev->cs);
     /* Enable writes */
-    status = spi_transfer_byte(spi_dev->spi, NVRAM_SPI_CMD_WREN, NULL);
+    spi_transfer_byte(spi_dev->spi, NVRAM_SPI_CMD_WREN);
     if (status < 0)
     {
         return status;
@@ -222,20 +222,12 @@ static int nvram_spi_write_9bit_addr(nvram_t *dev, uint8_t *src, uint32_t dst, s
     spi_acquire(spi_dev->spi);
     gpio_clear(spi_dev->cs);
     /* Enable writes */
-    status = spi_transfer_byte(spi_dev->spi, NVRAM_SPI_CMD_WREN, NULL);
-    if (status < 0)
-    {
-        return status;
-    }
+    spi_transfer_byte(spi_dev->spi, NVRAM_SPI_CMD_WREN);
     gpio_set(spi_dev->cs);
     hwtimer_spin(NVRAM_SPI_CS_TOGGLE_TICKS);
     gpio_clear(spi_dev->cs);
     /* Write command and address */
-    status = spi_transfer_reg(spi_dev->spi, cmd, addr, NULL);
-    if (status < 0)
-    {
-        return status;
-    }
+    spi_transfer_reg(spi_dev->spi, cmd, addr);
     /* Keep holding CS and write data */
     status = spi_transfer_bytes(spi_dev->spi, (char *)src, NULL, len);
     if (status < 0)
@@ -265,11 +257,7 @@ static int nvram_spi_read_9bit_addr(nvram_t *dev, uint8_t *dst, uint32_t src, si
     spi_acquire(spi_dev->spi);
     gpio_clear(spi_dev->cs);
     /* Write command and address */
-    status = spi_transfer_reg(spi_dev->spi, (char)cmd, addr, NULL);
-    if (status < 0)
-    {
-        return status;
-    }
+    spi_transfer_reg(spi_dev->spi, (char)cmd, addr);
     /* Keep holding CS and read data */
     status = spi_transfer_bytes(spi_dev->spi, NULL, (char *)dst, len);
     if (status < 0)

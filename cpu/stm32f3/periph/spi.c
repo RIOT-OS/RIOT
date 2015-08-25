@@ -37,9 +37,6 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-/* guard this file in case no SPI device is defined */
-#if SPI_NUMOF
-
 typedef struct {
     char(*cb)(char data);
 } spi_state_t;
@@ -219,7 +216,7 @@ int spi_init_slave(spi_t dev, spi_conf_t conf, char(*cb)(char data))
     return 0;
 }
 
-int spi_conf_pins(spi_t dev)
+void spi_conf_pins(spi_t dev)
 {
     GPIO_TypeDef *port[3];
     int pin[3], af[3];
@@ -265,7 +262,7 @@ int spi_conf_pins(spi_t dev)
             break;
 #endif /* SPI_2_EN */
         default:
-            return -1;
+            return;
     }
 
     for (int i = 0; i < 3; i++) {
@@ -285,53 +282,33 @@ int spi_conf_pins(spi_t dev)
         port[i]->AFR[hl] &= ~(0xf << ((pin[i] - (hl * 8)) * 4));
         port[i]->AFR[hl] |= (af[i] << ((pin[i] - (hl * 8)) * 4));
     }
-
-    return 0;
 }
 
-int spi_acquire(spi_t dev)
+void spi_acquire(spi_t dev)
 {
-    if (dev >= SPI_NUMOF) {
-        return -1;
-    }
     mutex_lock(&locks[dev]);
-    return 0;
 }
 
-int spi_release(spi_t dev)
+void spi_release(spi_t dev)
 {
-    if (dev >= SPI_NUMOF) {
-        return -1;
-    }
     mutex_unlock(&locks[dev]);
-    return 0;
 }
 
-int spi_transfer_byte(spi_t dev, char out, char *in)
+char spi_transfer_byte(spi_t dev, char out)
 {
     char tmp;
 
     /* recast to uint_8 to force 8bit access */
     volatile uint8_t *DR = (volatile uint8_t*) &spi[dev]->DR;
-
     /* wait for an eventually previous byte to be readily transferred */
     while(!(spi[dev]->SR & SPI_SR_TXE));
-
     /* put next byte into the output register */
     *DR = out;
-
     /* wait until the current byte was successfully transferred */
     while(!(spi[dev]->SR & SPI_SR_RXNE) );
-
     /* read response byte to reset flags */
     tmp = *DR;
-
-    /* 'return' response byte if wished for */
-    if (in) {
-        *in = tmp;
-    }
-
-    return 1;
+    return tmp;
 }
 
 void spi_transmission_begin(spi_t dev, char reset_val)
@@ -421,5 +398,3 @@ void SPI_2_IRQ_HANDLER(void)
     irq_handler_transfer(SPI_2_DEV, SPI_2);
 }
 #endif
-
-#endif /* SPI_NUMOF */

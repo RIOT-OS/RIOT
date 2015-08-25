@@ -29,9 +29,6 @@
 #include "thread.h"
 #include "sched.h"
 
-/* guard file in case no SPI device is defined */
-#if SPI_NUMOF
-
 /**
  * @brief Array holding one pre-initialized mutex for each SPI device
  */
@@ -118,7 +115,7 @@ int spi_init_slave(spi_t dev, spi_conf_t conf, char (*cb)(char data))
     return -1;
 }
 
-int spi_conf_pins(spi_t dev)
+void spi_conf_pins(spi_t dev)
 {
     GPIO_TypeDef *port;
     int pin[3];        /* 3 pins: sck, miso, mosi */
@@ -144,7 +141,7 @@ int spi_conf_pins(spi_t dev)
             break;
 #endif
         default:
-            return -1;
+            return;
     }
 
     /* configure pins for their correct alternate function */
@@ -155,29 +152,19 @@ int spi_conf_pins(spi_t dev)
         port->AFR[hl] &= ~(0xf << ((pin[i] - (hl * 8)) * 4));
         port->AFR[hl] |= (af << ((pin[i] - (hl * 8)) * 4));
     }
-
-    return 0;
 }
 
-int spi_acquire(spi_t dev)
+void spi_acquire(spi_t dev)
 {
-    if (dev >= SPI_NUMOF) {
-        return -1;
-    }
     mutex_lock(&locks[dev]);
-    return 0;
 }
 
-int spi_release(spi_t dev)
+void spi_release(spi_t dev)
 {
-    if (dev >= SPI_NUMOF) {
-        return -1;
-    }
     mutex_unlock(&locks[dev]);
-    return 0;
 }
 
-int spi_transfer_byte(spi_t dev, char out, char *in)
+char spi_transfer_byte(spi_t dev, char out)
 {
     char tmp;
     SPI_TypeDef *spi = 0;
@@ -205,12 +192,7 @@ int spi_transfer_byte(spi_t dev, char out, char *in)
     while(!(spi->SR & SPI_SR_RXNE) );
     /* read response byte to reset flags */
     tmp = *((volatile uint8_t *)(&spi->DR));
-    /* 'return' response byte if wished for */
-    if (in) {
-        *in = tmp;
-    }
-
-    return 1;
+    return tmp;
 }
 
 void spi_transmission_begin(spi_t dev, char reset_val)
@@ -251,5 +233,3 @@ void spi_poweroff(spi_t dev)
 #endif
     }
 }
-
-#endif /* SPI_NUMOF */

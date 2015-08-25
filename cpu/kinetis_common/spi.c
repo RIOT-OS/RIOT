@@ -41,9 +41,6 @@
  * @}
  */
 
-/* guard this file in case no SPI device is defined */
-#if SPI_NUMOF
-
 #if SPI_0_EN
 #ifdef SPI_0_PORT
 #define SPI_0_SCK_PORT          SPI_0_PORT
@@ -850,24 +847,14 @@ int spi_init_slave(spi_t dev, spi_conf_t conf, char(*cb)(char data))
     return 0;
 }
 
-int spi_acquire(spi_t dev)
+void spi_acquire(spi_t dev)
 {
-    if ((unsigned int)dev >= SPI_NUMOF) {
-        return -1;
-    }
-
     mutex_lock(locks_map[dev]);
-    return 0;
 }
 
-int spi_release(spi_t dev)
+void spi_release(spi_t dev)
 {
-    if ((unsigned int)dev >= SPI_NUMOF) {
-        return -1;
-    }
-
     mutex_unlock(locks_map[dev]);
-    return 0;
 }
 
 static inline uint8_t spi_transfer_internal(SPI_Type *spi_dev, uint32_t flags, uint8_t byte_out)
@@ -887,7 +874,7 @@ static inline uint8_t spi_transfer_internal(SPI_Type *spi_dev, uint32_t flags, u
     return (uint8_t)spi_dev->POPR;
 }
 
-int spi_transfer_byte(spi_t dev, char out, char *in)
+char spi_transfer_byte(spi_t dev, char out)
 {
     SPI_Type *spi_dev;
     uint8_t byte_in;
@@ -961,22 +948,17 @@ int spi_transfer_byte(spi_t dev, char out, char *in)
 #endif
 
         default:
-            return -1;
+            return 0;
     }
 
     byte_in = spi_transfer_internal(spi_dev, flags, out);
 
     /* Clear End-of-Queue status flag */
     spi_dev->SR = SPI_SR_EOQF_MASK;
-
-    if (in != NULL) {
-        *in = (char)byte_in;
-    }
-
-    return 1;
+    return (char)byte_in;
 }
 
-int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length)
+void spi_transfer_bytes(spi_t dev, char *out, char *in, size_t len)
 {
     SPI_Type *spi_dev;
     uint8_t byte_in;
@@ -1050,19 +1032,19 @@ int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length)
 #endif
 
         default:
-            return -1;
+            return;
     }
 
     /* Default: send idle data */
     byte_out = (uint8_t)SPI_IDLE_DATA;
 
-    for (i = 0; i < (int)length; i++) {
+    for (i = 0; i < (int)len; i++) {
         if (out != NULL) {
             /* Send given out data */
             byte_out = (uint8_t)out[i];
         }
 
-        if (i >= (int)length - 1) {
+        if (i >= (int)len - 1) {
             /* Last byte, set End-of-Queue flag, clear Continue flag. */
             flags &= ~(SPI_PUSHR_CONT_MASK);
             flags |= SPI_PUSHR_EOQ_MASK;
@@ -1078,11 +1060,9 @@ int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length)
 
     /* Clear End-of-Queue status flag */
     spi_dev->SR = SPI_SR_EOQF_MASK;
-
-    return i;
 }
 
-int spi_transfer_reg(spi_t dev, uint8_t reg, char out, char *in)
+char spi_transfer_reg(spi_t dev, uint8_t reg, char out)
 {
     SPI_Type *spi_dev;
     uint8_t byte_in;
@@ -1154,7 +1134,7 @@ int spi_transfer_reg(spi_t dev, uint8_t reg, char out, char *in)
 #endif
 
         default:
-            return -1;
+            return 0;
     }
 
     /* Transfer the register address first. */
@@ -1167,24 +1147,18 @@ int spi_transfer_reg(spi_t dev, uint8_t reg, char out, char *in)
     /* Transfer the value. */
     byte_in = spi_transfer_internal(spi_dev, flags, out);
 
-    if (in != NULL) {
-        /* Save input byte to buffer */
-        *in = (char)byte_in;
-    }
-
     /* Clear End-of-Queue status flag */
     spi_dev->SR = SPI_SR_EOQF_MASK;
-
-    return 2;
+    return byte_in;
 }
 
-int spi_transfer_regs(spi_t dev, uint8_t reg, char *out, char *in, unsigned int length)
+void spi_transfer_regs(spi_t dev, uint8_t reg, char *out, char *in, size_t len)
 {
     SPI_Type *spi_dev;
     uint8_t byte_in;
     uint8_t byte_out;
     uint32_t flags;
-    int i;
+    size_t i;
 
     switch (dev) {
 #if SPI_0_EN
@@ -1252,7 +1226,7 @@ int spi_transfer_regs(spi_t dev, uint8_t reg, char *out, char *in, unsigned int 
 #endif
 
         default:
-            return -1;
+            return;
     }
 
     byte_out = reg;
@@ -1263,13 +1237,13 @@ int spi_transfer_regs(spi_t dev, uint8_t reg, char *out, char *in, unsigned int 
     /* Default: send idle data */
     byte_out = (uint8_t)SPI_IDLE_DATA;
 
-    for (i = 0; i < (int)length; i++) {
+    for (i = 0; i < (int)len; i++) {
         if (out != NULL) {
             /* Send given out data */
             byte_out = (uint8_t)out[i];
         }
 
-        if (i >= (int)length - 1) {
+        if (i >= (int)len - 1) {
             /* Last byte, set End-of-Queue flag, clear Continue flag. */
             flags &= ~(SPI_PUSHR_CONT_MASK);
             flags |= SPI_PUSHR_EOQ_MASK;
@@ -1285,8 +1259,6 @@ int spi_transfer_regs(spi_t dev, uint8_t reg, char *out, char *in, unsigned int 
 
     /* Clear End-of-Queue status flag */
     spi_dev->SR = SPI_SR_EOQF_MASK;
-
-    return i;
 }
 
 void spi_transmission_begin(spi_t dev, char reset_val)
@@ -1575,5 +1547,3 @@ void SPI_7_IRQ_HANDLER(void)
 }
 #endif
 #endif
-
-#endif /* SPI_NUMOF */

@@ -20,6 +20,8 @@
  * @}
  */
 #include <stdio.h>
+#include <stdint.h>
+#include <stdlib.h>
 
 #include "board.h"
 #include "cpu.h"
@@ -32,9 +34,6 @@
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
-
-/* guard this file in case no SPI device is defined */
-#if SPI_NUMOF
 
 /**
  * @brief Data-structure holding the state for a SPI device
@@ -222,7 +221,7 @@ int spi_init_slave(spi_t dev, spi_conf_t conf, char(*cb)(char data))
     return 0;
 }
 
-int spi_conf_pins(spi_t dev)
+void spi_conf_pins(spi_t dev)
 {
     GPIO_TypeDef *port[3];
     int pin[3], af[3];
@@ -268,7 +267,7 @@ int spi_conf_pins(spi_t dev)
             break;
 #endif /* SPI_2_EN */
         default:
-            return -1;
+            return;
     }
 
     /***************** GPIO-Init *****************/
@@ -289,31 +288,22 @@ int spi_conf_pins(spi_t dev)
         port[i]->AFR[hl] &= ~(0xf << ((pin[i] - (hl * 8)) * 4));
         port[i]->AFR[hl] |= (af[i] << ((pin[i] - (hl * 8)) * 4));
     }
-
-    return 0;
 }
 
-int spi_acquire(spi_t dev)
+void spi_acquire(spi_t dev)
 {
-    if (dev >= SPI_NUMOF) {
-        return -1;
-    }
     mutex_lock(&locks[dev]);
-    return 0;
 }
 
-int spi_release(spi_t dev)
+void spi_release(spi_t dev)
 {
-    if (dev >= SPI_NUMOF) {
-        return -1;
-    }
     mutex_unlock(&locks[dev]);
-    return 0;
 }
 
-int spi_transfer_byte(spi_t dev, char out, char *in)
+char spi_transfer_byte(spi_t dev, char out)
 {
     SPI_TypeDef *spi_port;
+    char tmp;
 
     switch (dev) {
 #if SPI_0_EN
@@ -332,22 +322,14 @@ int spi_transfer_byte(spi_t dev, char out, char *in)
             break;
 #endif
         default:
-            return -1;
+            return 0;
     }
 
     while (!(spi_port->SR & SPI_SR_TXE));
     spi_port->DR = out;
-
     while (!(spi_port->SR & SPI_SR_RXNE));
-
-    if (in != NULL) {
-        *in = spi_port->DR;
-    }
-    else {
-        spi_port->DR;
-    }
-
-    return 1;
+    tmp = (char)spi_port->DR;
+    return tmp;
 }
 
 void spi_transmission_begin(spi_t dev, char reset_val)
@@ -452,5 +434,3 @@ void SPI_2_IRQ_HANDLER(void)
     irq_handler_transfer(SPI_2_DEV, SPI_2);
 }
 #endif
-
-#endif /* SPI_NUMOF */

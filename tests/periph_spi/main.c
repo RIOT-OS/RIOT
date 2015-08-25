@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Freie Universität Berlin
+ * Copyright (C) 2014-2015 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -31,258 +31,316 @@
 
 #define SHELL_BUFSIZE       (128U)
 
-enum {
-    READ = 0,
-    WRITE,
-    INIT
-} rw;
+#define SPI_BUFSIZE         (512U)
 
-static int spi_dev = -1;
-static gpio_t spi_cs = -1;
-static int spi_mode = -1;
-static int spi_speed = -1;
-static int spi_master = -1;     /* 0 for slave, 1 for master, -1 for not initialized */
+/**
+ * @brief   Shared SPI data buffer for SPI master devices
+ */
+static uint8_t buf[SPI_BUFSIZE];
 
-static char buffer[256];       /* temporary buffer */
-static char rx_buffer[256];    /* global receive buffer */
-static int rx_counter = 0;
+/**
+ * @brief   Save the number of received bytes in slave mode
+ */
+static size_t slave_cnt[SPI_NUMOF];
 
-static volatile int state;
-static char* mem = "Hello Master! abcdefghijklmnopqrstuvwxyz 0123456789 "
-                   "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+/**
+ * @brief   Receive buffer in slave mode
+ */
+static uint8_t slave_buf[SPI_NUMOF][SPI_BUFSIZE];
 
-int parse_spi_dev(int argc, char **argv)
+void dump_hex(uint8_t *data, size_t len)
 {
-    /* reset default values */
-    int port, pin;
-    spi_dev = SPI_0;
-    spi_mode = SPI_CONF_FIRST_RISING;
-    spi_speed = SPI_SPEED_1MHZ;
-
-    if (argc < 4) {
-        printf("usage: %s <dev> <cs port> <cs pin> [mode [speed]]\n", argv[0]);
-        puts("        DEV is the SPI device to use:");
-        for (int i = 0; i < SPI_NUMOF; i++) {
-            printf("             %i - SPI_%i\n", i, i);
-        }
-        puts("        cs port:  port to use as the chip select line");
-        puts("        cs pin:   pin to use on th given port as cs line");
-        puts("        mode: must be one of the following options (* marks "
-                      "default value):");
-        puts("            *0 - POL:0, PHASE:0 - ON FIRST RISING EDGE");
-        puts("             1 - POL:0, PHASE:1 - ON SECOND RISING EDGE");
-        puts("             2 - POL:1, PHASE:0 - ON FIRST FALLING EDGE");
-        puts("             3 - POL:1, PHASE:1 - on second falling edge");
-        puts("        speed: must be one of the following options (only used "
-                      "in master mode):");
-        puts("             0 - 100 KHz");
-        puts("             1 - 400 KHz");
-        puts("            *2 - 1 MHz");
-        puts("             3 - 5 MHz");
-        puts("             4 - 10 MHz\n");
-        return -4;
+    for (int i = 0; i < len; i++) {
+        printf("0x%02x ", data[i]);
     }
-    spi_dev = atoi(argv[1]);
-    if (spi_dev < 0 || spi_dev >= SPI_NUMOF) {
-        puts("error: invalid DEV value given");
-        return -1;
-    }
-    port = atoi(argv[2]);
-    pin = atoi(argv[3]);
-    spi_cs = GPIO(port,pin);
-    if (argc >= 5) {
-        spi_mode = argv[4][0] - '0';
-        if (spi_mode < 0 || spi_mode > 3) {
-            puts("error: invalid MODE value given");
-            return -2;
-        }
-    }
-    if (argc >= 6) {
-        spi_speed = argv[5][0] - '0';
-        if (spi_speed < 0 || spi_speed > 4) {
-            puts("error: invalid SPEED value given");
-            return -3;
-        }
-    }
-    return 0;
-}
-
-void print_bytes(char* title, char* chars, int length)
-{
-    printf("%4s", title);
-    for (int i = 0; i < length; i++) {
-        printf("  %2i ", i);
-    }
-    printf("\n    ");
-    for (int i = 0; i < length; i++) {
-        printf(" 0x%02x", (int)chars[i]);
-    }
-    printf("\n    ");
-    for (int i = 0; i < length; i++) {
-        if (chars[i] < ' ' || chars[i] > '~') {
-            printf("  ?? ");
+    puts("");
+    for (int i = 0; i < len; i++) {
+        if (data[i] > ' ' && data[i] <= '~') {
+            printf("  %c  ", (char)data[i]);
         }
         else {
-            printf("   %c ", chars[i]);
+            printf(" --  ");
         }
     }
-    printf("\n\n");
+    puts("");
 }
 
-void slave_on_cs(void *arg)
+/**
+ * @brief   Function called on connection state change in slave mode
+ */
+static uint8_t slave_cs_cb(void *arg, bool start)
 {
-    (void)arg;
-
-    LED_RED_ON;
-    spi_transmission_begin(spi_dev, 'F');
-    state = 0;
-    rw = INIT;
-    LED_RED_OFF;
+    int dev = (int)arg;
+    if (start) {
+        slave_cnt[dev] = 1;
+    }
+    else {
+        puts("RX:");
+        dump_hex(slave_buf[dev], slave_cnt[dev]);
+    }
+    return 1;
 }
 
-char slave_on_data(char data)
+/**
+ * @brief   Function called on byte transferred in slave mode
+ */
+static uint8_t slave_data_cb(void *arg, uint8_t data)
 {
-    rx_buffer[rx_counter] = data;
-    rx_counter++;
-    if (rx_counter >= 256) {
-        rx_counter = 0;
+    int dev = (int)arg;
+    slave_buf[dev][slave_cnt[dev] - 1] = data;
+    return (uint8_t)(slave_cnt[dev]++);
+}
+
+static void print_modes(void)
+{
+    puts("\tconf:");
+    printf("\t%i - POL:0, PHASE:0 - data on first rising edge\n",
+           SPI_CONF_FIRST_RISING);
+    printf("\t%i - POL:0, PHASE:1 - data on second rising edge\n",
+           SPI_CONF_SECOND_RISING);
+    printf("\t%i - POL:1, PHASE:0 - data on fist falling edge\n",
+           SPI_CONF_FIRST_FALLING);
+    printf("\t%i - POL:1, PHASE:1 - data on second falling edge\n",
+           SPI_CONF_SECOND_FALLING);
+}
+
+static void print_speeds(void)
+{
+    puts("\tspeed:");
+    printf("\t%i - ~100KHz\n", SPI_SPEED_100KHZ);
+    printf("\t%i - ~400KHz\n", SPI_SPEED_400KHZ);
+    printf("\t%i - ~1MHz\n", SPI_SPEED_1MHZ);
+    printf("\t%i - ~5MHz\n", SPI_SPEED_5MHZ);
+    printf("\t%i - ~10MHz\n", SPI_SPEED_10MHZ);
+}
+
+static void print_pol(void)
+{
+    puts("\tCS polarity:");
+    printf("\t%i - low active\n", SPI_CS_POL_LOW_ACTIVE);
+    printf("\t%i - high active\n", SPI_CS_POL_HIGH_ACTIVE);
+}
+
+static int parse_dev(const char *str)
+{
+    int res = atoi(str);
+    if (res >= SPI_NUMOF) {
+        puts("error: unable to parse device");
+        return -1;
+    }
+    return res;
+}
+
+static spi_cs_t parse_cs(const char *port_str, const char *pin_str)
+{
+    int pin = atoi(pin_str);
+    int port = atoi(port_str);
+
+    if (pin < 0 || port < 0) {
+        return SPI_CS_UNDEF;
     }
 
-    switch (rw) {
-        case READ:
-            return mem[state++];
-        case WRITE:
-            mem[state++] = data;
-            return 'o';
-        case INIT:
-            if (data == ' ') {
-                rw = READ;
-                return mem[state++];
-            } else if (data & 0x80) {
-                rw = WRITE;
-                state = (data & 0x7f);
-                return 'W';
-            } else {
-                rw = READ;
-                state = data;
-                return mem[state++];
+    if (port_str[0] == 'h') {
+        return SPI_CS_DEV(pin);
+    }
+    else {
+        return (spi_cs_t)GPIO(port, pin);
+    }
+}
+
+static int parse_speed(const char *str)
+{
+    int speed = atoi(str);
+    if (speed == SPI_SPEED_100KHZ || speed == SPI_SPEED_400KHZ ||
+        speed == SPI_SPEED_1MHZ || speed == SPI_SPEED_5MHZ ||
+        speed == SPI_SPEED_10MHZ) {
+        return speed;
+    }
+    puts("error: unable to parse speed value");
+    return -1;
+}
+
+static int parse_conf(const char *str)
+{
+    int conf = atoi(str);
+    if (conf == SPI_CONF_FIRST_RISING || conf == SPI_CONF_SECOND_RISING ||
+        conf == SPI_CONF_FIRST_FALLING || conf == SPI_CONF_SECOND_FALLING) {
+        return conf;
+    }
+    puts("error: unable to parse conf value");
+    return -1;
+}
+
+static int parse_pol(const char *str)
+{
+    int pol = atoi(str);
+    if (pol == SPI_CS_POL_LOW_ACTIVE || pol == SPI_CS_POL_HIGH_ACTIVE) {
+        return pol;
+    }
+    puts("error: unable to parse CS polarity");
+    return -1;
+}
+
+static int send(int argc, char **argv, bool ascii)
+{
+    int dev;
+    spi_cs_t cs;
+    size_t len = 0;
+    bool cont = false;
+
+    if (argc < 5) {
+        printf("usage: %s <dev> <port> <pin> <data> [c]\n", argv[0]);
+        puts("\tdev: SPI device to use");
+        puts("\tport: Port of CS pin, 'h' for HW chip select");
+        puts("\tpin: PIN to use for CS or number of HW CS line");
+        if (ascii) {
+            puts("\tdata: ASCII string of data to send");
+        }
+        else {
+            puts("\tdata: RAW data in hex format, byte wise 0xYY 0xZZ...");
+        }
+        puts("\tc: if c is given, the transfer will not be terminated");
+    }
+
+    /* parse device and chip select pin */
+    dev = parse_dev(argv[1]);
+    cs = parse_cs(argv[2], argv[3]);
+    if (dev < 0 || cs == SPI_CS_UNDEF) {
+        return 1;
+    }
+
+    /* parse data */
+    if (ascii) {
+        strcpy((char *)buf, argv[4]);
+        if (argc >= 5 && argv[5][0] == 'c') {
+            cont = true;
+        }
+    }
+    else {
+        for (int i = 2; i < argc; i++) {
+            if (argv[i][0] == 'c') {
+                cont = true;
+                break;
             }
+            else {
+                buf[len++] = (uint8_t)strtol(argv[i], NULL, 0);
+            }
+        }
     }
-    return 'e';
+
+    /* transfer data */
+    puts("TX:");
+    dump_hex(buf, len);
+    if (len) {
+        spi_acquire(SPI_DEV(dev));
+        spi_transfer_bytes(SPI_DEV(dev), cs, cont, buf, buf, len);
+        spi_release(SPI_DEV(dev));
+    }
+    puts("RX:");
+    dump_hex(buf, len);
+
+    return 0;
 }
 
 int cmd_init_master(int argc, char **argv)
 {
-    int res;
-    spi_master = -1;
-    if (parse_spi_dev(argc, argv) < 0) {
+    int dev, speed, conf, res;
+
+    if (argc < 4) {
+        printf("usage: %s <dev> <conf> <speed>\n", argv[0]);
+        puts("\tdev: SPI device to use");
+        print_modes();
+        print_speeds();
+    }
+
+    /* parse params */
+    dev = parse_dev(argv[1]);
+    speed = parse_speed(argv[2]);
+    conf = parse_conf(argv[3]);
+    if (dev < 0 || speed < 0 || conf < 0) {
         return 1;
     }
-    spi_acquire(spi_dev);
-    res = spi_init_master(spi_dev, spi_mode, spi_speed);
-    spi_release(spi_dev);
-    if (res < 0) {
-        printf("spi_init_master: error initializing SPI_%i device (code %i)\n",
-                spi_dev, res);
+
+    /* initialize device. As this is a manual application, we get away without
+     * locking the bus first... */
+    res = spi_init_master(SPI_DEV(dev), conf, speed);
+    if (res == -1) {
+        puts("error in spi_init_master(): given device invalid");
         return 1;
     }
-    res = gpio_init(spi_cs, GPIO_DIR_OUT, GPIO_PULLUP);
-    if (res < 0){
-        printf("gpio_init: error initializing GPIO_%ld as CS line (code %i)\n",
-                (long)spi_cs, res);
+    if (res == -2) {
+        puts("error in spi_init_master(): given speed no supported");
         return 1;
     }
-    gpio_set(spi_cs);
-    spi_master = 1;
-    printf("SPI_%i successfully initialized as master, cs: GPIO_%ld, mode: %i, speed: %i\n",
-            spi_dev, (long)spi_cs, spi_mode, spi_speed);
+    if (res == -3) {
+        puts("error in spi_init_master(): configuration not supported");
+        return 1;
+    }
+    if (res < -3) {
+        puts("error in spi_init_master(): unspecified error");
+        return 1;
+    }
+    printf("SPI_DEV(%i) successfully initialized as master\n", dev);
     return 0;
 }
 
 int cmd_init_slave(int argc, char **argv)
 {
-    int res;
-    spi_master = -1;
-    if (parse_spi_dev(argc, argv) < 0) {
+    int dev, conf, pol, res;
+    spi_cs_t cs;
+
+    if (argc < 6) {
+        printf("usage: %s <dev> <conf> <port> <pin> <pol>\n", argv[0]);
+        puts("\tdev: SPI device to use");
+        puts("\tport: Port of CS pin, H for HW chip select");
+        puts("\tpin: PIN to use for CS or number of HW CS line");
+        print_modes();
+        print_pol();
+    }
+
+    /* parse parameters */
+    dev = parse_dev(argv[1]);
+    conf = parse_conf(argv[2]);
+    cs = parse_cs(argv[3], argv[4]);
+    pol = parse_pol(argv[5]);
+    if (dev < 0 || conf < 0 || pol < 0 || cs == SPI_CS_UNDEF) {
         return 1;
     }
-    spi_acquire(spi_dev);
-    res = spi_init_slave(spi_dev, spi_mode, slave_on_data);
-    spi_release(spi_dev);
-    if (res < 0) {
-        printf("spi_init_slave: error initializing SPI_%i device (code: %i)\n",
-                spi_dev, res);
+
+    /* initialize device as SPI slave */
+    res = spi_init_slave(SPI_DEV(dev), cs, pol, conf,
+                         slave_cs_cb, slave_data_cb, (void *)dev);
+    if (res == -1) {
+        puts("error in spi_init_slave(): given device invalid");
         return 1;
     }
-    res = gpio_init_int(spi_cs, GPIO_NOPULL, GPIO_FALLING, slave_on_cs, 0);
-    if (res < 0){
-        printf("gpio_init_int: error initializing GPIO_%ld as CS line (code %i)\n",
-                (long)spi_cs, res);
+    if (res == -2) {
+        puts("error in spi_init_slave(): slave mode not supported by device");
         return 1;
     }
-    spi_master = 0;
-    printf("SPI_%i successfully initialized as slave, cs: GPIO_%ld, mode: %i\n",
-            spi_dev, (long)spi_cs, spi_mode);
+    if (res < -2) {
+        puts("error in spi_init_slave(): unspecified error");
+        return 1;
+    }
+    printf("SPI_DEV(%i) successfully initialized as SPI slave\n", dev);
     return 0;
 }
 
-int cmd_transfer(int argc, char **argv)
+int cmd_ascii(int argc, char **argv)
 {
-    int res;
-    char *hello = "Hello";
-
-    if (spi_master != 1) {
-        puts("error: node is not initialized as master, please do so first");
-        return 1;
-    }
-
-    if (argc < 2) {
-        puts("No data to transfer given, will transfer 'Hello' to device");
-    }
-    else {
-        hello = argv[1];
-    }
-
-    /* do the actual data transfer */
-    spi_acquire(spi_dev);
-    gpio_clear(spi_cs);
-    res = spi_transfer_bytes(spi_dev, hello, buffer, strlen(hello));
-    gpio_set(spi_cs);
-    spi_release(spi_dev);
-
-    /* look at the results */
-    if (res < 0) {
-        printf("error: unable to transfer data to slave (code: %i)\n", res);
-        return 1;
-    }
-    else {
-        printf("Transfered %i bytes:\n", res);
-        print_bytes("MOSI", hello, res);
-        print_bytes("MISO", buffer, res);
-        return 0;
-    }
+    return send(argc, argv, true);
 }
 
-int cmd_print(int argc, char **argv)
+int cmd_raw(int argc, char **argv)
 {
-    if (spi_master != 0) {
-        puts("error: node is not initialized as slave");
-        return 1;
-    }
-    else {
-        printf("Received %i bytes:\n", rx_counter);
-        print_bytes("MOSI", rx_buffer, rx_counter);
-    }
-    rx_counter = 0;
-    memset(&rx_buffer, 0, 256);
-    return 0;
+    return send(argc, argv, false);
 }
 
 static const shell_command_t shell_commands[] = {
-    { "init_master", "Initialize node as SPI master", cmd_init_master },
-    { "init_slave", "Initialize node as SPI slave", cmd_init_slave },
-    { "send", "Transfer string to slave (only in master mode)", cmd_transfer },
-    { "print_rx", "Print the received string (only in slave mode)", cmd_print },
+    { "init_master", "initialize SPI device in master mode", cmd_init_master },
+    { "init_slave", "initialize SPI device in slave mode", cmd_init_slave },
+    { "send", "transfer string to slave (only in master mode)", cmd_ascii },
+    { "send_hex", "transfer hex encoded bytes(master mode only)", cmd_raw },
     { NULL, NULL, NULL }
 };
 
@@ -290,9 +348,15 @@ int main(void)
 {
     shell_t shell;
 
-    puts("\nRIOT low-level SPI driver test");
-    puts("This application enables you to test a platforms SPI driver implementation.");
-    puts("Enter 'help' to get started\n");
+    puts("\nManual SPI peripheral driver test application");
+    puts("=============================================");
+    puts("With this application it is possible to test all SPI devices that\n"
+         "may be defined for a platform. You can configure available devices\n"
+         "as master or slave, using the provided shell commands.\n\n"
+         "When configured as master, you can test your SPI device by sending\n"
+         "ASCII strings or by sending hex encoded binary data\n\n"
+         "When configured as slave, the device will simply answer with\n"
+         "counting numbers for each byte transferred, starting with 0x01\n");
 
     /* run the shell */
     shell_init(&shell, shell_commands, SHELL_BUFSIZE, getchar, putchar);

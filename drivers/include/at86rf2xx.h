@@ -138,7 +138,7 @@ typedef struct {
     kernel_pid_t mac_pid;               /**< the driver's thread's PID */
     /* device specific fields */
     spi_t spi;                          /**< used SPI device */
-    gpio_t cs_pin;                      /**< chip select pin */
+    spi_cs_t cs;                        /**< chip select pin */
     gpio_t sleep_pin;                   /**< sleep pin */
     gpio_t reset_pin;                   /**< reset pin */
     gpio_t int_pin;                     /**< external interrupt pin */

@@ -30,9 +30,6 @@
 #include "periph/spi.h"
 #include "sam3x8e.h"
 
-/* guard this file in case no SPI device is defined */
-#if SPI_NUMOF
-
 /**
  * @brief Array holding one pre-initialized mutex for each SPI device
  */
@@ -240,7 +237,7 @@ int spi_init_slave(spi_t dev, spi_conf_t conf, char(*cb)(char data))
     return 0;
 }
 
-int spi_conf_pins(spi_t dev)
+void spi_conf_pins(spi_t dev)
 {
     switch (dev) {
 #if SPI_0_EN
@@ -286,33 +283,24 @@ int spi_conf_pins(spi_t dev)
             break;
 #endif /* SPI_0_EN */
         default:
-            return -1;
+            return;
     }
-
-    return 0;
 }
 
-int spi_acquire(spi_t dev)
+void spi_acquire(spi_t dev)
 {
-    if (dev >= SPI_NUMOF) {
-        return -1;
-    }
     mutex_lock(&locks[dev]);
-    return 0;
 }
 
-int spi_release(spi_t dev)
+void spi_release(spi_t dev)
 {
-    if (dev >= SPI_NUMOF) {
-        return -1;
-    }
     mutex_unlock(&locks[dev]);
-    return 0;
 }
 
-int spi_transfer_byte(spi_t dev, char out, char *in)
+char spi_transfer_byte(spi_t dev, char out)
 {
     Spi *spi_port;
+    char tmp;
 
     switch (dev) {
 #if SPI_0_EN
@@ -321,18 +309,14 @@ int spi_transfer_byte(spi_t dev, char out, char *in)
             break;
 #endif /* SPI_0_EN */
         default:
-            return -1;
+            return 0;
     }
 
     while (!(spi_port->SPI_SR & SPI_SR_TDRE));
-
     spi_port->SPI_TDR = SPI_TDR_TD(out);
-
     while (!(spi_port->SPI_SR & SPI_SR_RDRF));
-
-    *in = spi_port->SPI_RDR & SPI_RDR_RD_Msk;
-
-    return 1;
+    tmp = (char)(spi_port->SPI_RDR & SPI_RDR_RD_Msk);
+    return tmp;
 }
 
 void spi_transmission_begin(spi_t dev, char reset_val)
@@ -369,5 +353,3 @@ void SPI_0_IRQ_HANDLER(void)
     }
 }
 #endif
-
-#endif /* SPI_NUMOF */
