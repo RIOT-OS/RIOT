@@ -127,5 +127,5 @@ endif
 ifneq (,$(filter xbee,$(USEMODULE)))
   USEMODULE += periph_gpio
   USEMODULE += periph_uart
-  USEMODULE += ng_ieee802154
+  USEMODULE += ieee802154
 endif
