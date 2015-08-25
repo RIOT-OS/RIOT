@@ -90,7 +90,7 @@ kernel_pid_t nhdp_start(void)
         ipv6_addr_set_all_nodes_addr(&sa_bcast.sin6_addr);
 
         /* Configure sending/receiving UDP socket */
-        sock_rcv = socket_base_socket(PF_INET6, SOCK_DGRAM, IPPROTO_UDP);
+        sock_rcv = socket_base_socket(AF_INET6, SOCK_DGRAM, IPPROTO_UDP);
 
         /* Start the NHDP thread */
         nhdp_pid = thread_create(nhdp_stack, sizeof(nhdp_stack), THREAD_PRIORITY_MAIN - 1,

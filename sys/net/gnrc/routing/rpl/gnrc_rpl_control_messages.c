@@ -15,12 +15,12 @@
  * @author  Cenk Gündoğan <cnkgndgn@gmail.com>
  */
 
+#include "net/af.h"
 #include "net/icmpv6.h"
 #include "net/ipv6/hdr.h"
 #include "net/gnrc/icmpv6.h"
 #include "net/gnrc/ipv6.h"
 #include "net/gnrc.h"
-#include "inet_ntop.h"
 #include "net/eui64.h"
 
 #include "net/gnrc/rpl.h"

@@ -35,6 +35,7 @@
 #include <sys/types.h>
 
 #include "cpu.h"
+#include "net/af.h"
 
 #include "socket_base/socket.h"
 

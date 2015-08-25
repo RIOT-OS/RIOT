@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Hamburg University of Applied Sciences
+ * Copyright (C) 2015 Engineering-Spirit
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief           Memory definitions for the STM32L151RC
+ * @brief           Memory definitions for the STM32L151RB-A
  *
  * @author          Nick van IJzendoorn <nijzendoorn@engineering-spirit.nl>
  *

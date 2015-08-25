@@ -16,7 +16,7 @@
  */
 
 #include <stdbool.h>
-#include "inet_pton.h"
+#include "net/af.h"
 #include "net/gnrc/ipv6.h"
 #include "net/gnrc/ipv6/netif.h"
 #include "net/gnrc/rpl/dodag.h"
