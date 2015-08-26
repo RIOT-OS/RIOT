@@ -8,10 +8,12 @@
 
 /**
  * @defgroup    sys_crypto Crypto
+ * @ingroup     sys
+ *
  * @brief       RIOT provides a collection of block cipher ciphers, different
    operation modes and cryptographic hash algorithms.
  *
- * \section ciphers Ciphers
+ * @section ciphers Ciphers
  *
  * Riot supports the following block ciphers:
  *  * AES-128
@@ -25,7 +27,7 @@
  * the generic API for block ciphers whenever possible.
  *
  * Example:
- * \code
+ * @code
  *  #include "crypto/ciphers.h"
  *
  *  ciphter_t cipher;
@@ -36,14 +38,14 @@
  *
  *  if (cipher_encrypt(&cipher, plain_text, cipher_text) < 0)
  *      printf("Cipher encryption!\n");
- * \endcode
+ * @endcode
  *
  * If you need to encrypt data of arbitrary size take a look at the different
  * operation modes like: CBC, CTR or CCM.
  *
  * Additional examples can be found in the test suite.
  *
- * \section hashes Hashes
+ * @section hashes Hashes
  *
  * RIOT currently supports sha256 as a cryptographic hash implementation.
  */
