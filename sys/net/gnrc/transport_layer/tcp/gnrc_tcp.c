@@ -19,6 +19,7 @@
 
 #include <stdint.h>
 #include <errno.h>
+#include <string.h>
 #include "kernel.h"
 #include "msg.h"
 #include "thread.h"
@@ -75,56 +76,14 @@ extern "C" {
 /* External GNRC_TCP API */
 int8_t gnrc_tcp_tcb_init(gnrc_tcp_tcb_t *tcb)
 {
-    /* Clear Transmision Control Block */
-    tcb->state = CLOSED;           /* CLOSED: State before any connection occurs */
-    tcb->peer_addr = NULL;         /* Peer Address Unspecified */
-    tcb->peer_addr_len = 0;        /* Peer Address Length is zero */
-    tcb->peer_port = PORT_UNSPEC;  /* Port 0: Reserved. Marks Unassigned Port */
-    tcb->local_port = PORT_UNSPEC; /* Port 0: Reserved. Marks Unassigned Port */
+    /* initialize the struct to 0 */
+    memset(tcb, 0, sizeof(*tcb));
 
-    /* Init Send Pointers */
-    tcb->snd_una = 0;
-    tcb->snd_nxt = 0;
-    tcb->snd_wnd = 0;
-    tcb->snd_ur = 0;
-    tcb->snd_wl1 = 0;
-    tcb->snd_wl2 = 0;
-    tcb->iss = 0;
-
-    /* Init Receive Pointers */
-    tcb->rcv_nxt = 0;
-    tcb->rcv_wnd = 0;
-    tcb->irs = 0;
-
-    /* Maximum Window Sizes */
-    tcb->mss = 0;
-
-    /* Clear Buffers */
-    tcb->snd_buf = NULL;
-    tcb->snd_buf_size = 0;
-    tcb->rcv_buf = NULL;
-    tcb->rcv_buf_size = 0;
-
-    /* Clear Current Packet Pointers */
-    tcb->cur_pkt = NULL;
-    tcb->cur_tcp_hdr = NULL;
-    tcb->cur_seg_len = 0;
-
-    /* Clear Retransmission Queue and Timer */
-    for(uint8_t i=0; i < GNRC_TCP_RETRANSMIT_QUEUE_SIZE; i++){
-        tcb->ret_queue[i].no_of_retries = 0;
-        tcb->ret_queue[i].pkt = NULL;
-    }
-    tcb->ret_size = 0;
-    tcb->ret_tout.seconds = 0;
-    tcb->ret_tout.microseconds = 0;
-
-    /* Clear TCB List variables*/
     tcb->owner = thread_getpid();
-    tcb->next = NULL;
 
     /* Add this tcb to the tcb list */
     _add_tcb_to_list(tcb);
+
     return 0;
 }
 

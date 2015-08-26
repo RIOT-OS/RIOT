@@ -18,8 +18,7 @@
 #include "debug.h"
 
 #define PEER_PORT 2000
-//#define PEER_ADDR "fe80::f4c6:4ff:fed2:a73e"
-#define PEER_ADDR "fe80::6874:faff:fe20:fe4c"
+#define PEER_ADDR "fe80::60ed:6bff:fed1:4c17"
 
 gnrc_tcp_tcb_t global_tcp;
 

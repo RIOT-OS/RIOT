@@ -21,6 +21,8 @@ static int8_t _translate_to(gnrc_tcp_tcb_t *tcb, gnrc_tcp_states_t state){
                             break;
 
         case ESTABLISHED:   notify_owner = true;
+                            break;
+
         default:            break;
     }
 
