@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Freie Universität Berlin
+ * Copyright (C) 2013,2015 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -31,6 +31,21 @@ extern "C" {
 #ifndef __CC430F6137__
 #define __CC430F6137__
 #endif
+
+/**
+ * @brief   Xtimer configuration
+ * @{
+ */
+#define XTIMER                      (0)
+#define XTIMER_CHAN                 (0)
+#define XTIMER_MASK                 (0xffff0000)
+/** @} */
+
+/**
+ * @brief   Defines for compatibility with hwtimer
+ * @deprecated
+ */
+#define HW_TIMER                    (0)
 
 #define MSP430_INITIAL_CPU_SPEED    7372800uL
 #define F_CPU                       MSP430_INITIAL_CPU_SPEED
