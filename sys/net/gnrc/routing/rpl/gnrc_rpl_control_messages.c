@@ -436,9 +436,6 @@ void gnrc_rpl_recv_DIO(gnrc_rpl_dio_t *dio, ipv6_addr_t *src, uint16_t len)
         return;
     }
 
-    dodag->grounded = dio->g_mop_prf >> GNRC_RPL_GROUNDED_SHIFT;
-    dodag->prf = dio->g_mop_prf & GNRC_RPL_PRF_MASK;
-
     gnrc_rpl_parent_t *parent = NULL;
 
     if (!gnrc_rpl_parent_add_by_addr(dodag, src, &parent) && (parent == NULL)) {
@@ -458,19 +455,22 @@ void gnrc_rpl_recv_DIO(gnrc_rpl_dio_t *dio, ipv6_addr_t *src, uint16_t len)
 
     parent->rank = byteorder_ntohs(dio->rank);
 
-    if(!_parse_options(GNRC_RPL_ICMPV6_CODE_DIO, dodag, (gnrc_rpl_opt_t *)(dio + 1), len, NULL)) {
-        DEBUG("RPL: Error encountered during DIO option parsing - remove DODAG\n");
-        gnrc_rpl_dodag_remove(dodag);
-        return;
-    }
-
     gnrc_rpl_parent_update(dodag, parent);
 
-    if (parent->state != 0) {
-        if (dodag->parents && (parent == dodag->parents) && (parent->dtsn != dio->dtsn)) {
+    /* incoming DIO is from pref. parent */
+    if (dodag->parents && (parent == dodag->parents) && (parent->state != 0)) {
+        if (parent->dtsn != dio->dtsn) {
             gnrc_rpl_delay_dao(dodag);
         }
         parent->dtsn = dio->dtsn;
+        dodag->grounded = dio->g_mop_prf >> GNRC_RPL_GROUNDED_SHIFT;
+        dodag->prf = dio->g_mop_prf & GNRC_RPL_PRF_MASK;
+        if(!_parse_options(GNRC_RPL_ICMPV6_CODE_DIO, dodag,
+                           (gnrc_rpl_opt_t *)(dio + 1), len, NULL)) {
+            DEBUG("RPL: Error encountered during DIO option parsing - remove DODAG\n");
+            gnrc_rpl_dodag_remove(dodag);
+            return;
+        }
     }
 }
 
