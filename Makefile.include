@@ -191,7 +191,7 @@ BASELIBS += $(BINDIR)$(BOARD)_base.a
 BASELIBS += $(BINDIR)${APPLICATION}.a
 BASELIBS += $(USEPKG:%=${BINDIR}%.a)
 
-.PHONY: all clean flash term doc debug debug-server reset objdump help
+.PHONY: all clean flash term doc debug debug-server reset objdump help info-modules
 .PHONY: ..in-docker-container
 
 ELFFILE ?= $(BINDIR)$(APPLICATION).elf
@@ -425,6 +425,9 @@ endif
 
 help:
 	@$(MAKE) -qp | sed -ne 's/\(^[a-z][a-z_-]*\):.*/\1/p' | sort | uniq
+
+info-modules:
+	@for i in $(sort $(USEMODULE)); do echo $$i; done
 
 ifneq (,$(filter iotlab-m3 wsn430-v1_3b wsn430-v1_4,$(BOARD)))
   include $(RIOTBASE)/dist/testbed-support/Makefile.iotlab
