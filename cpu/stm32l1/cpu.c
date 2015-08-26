@@ -64,19 +64,11 @@ static void clk_init(void)
     RCC->CIR = 0x0;
 
     /* SYSCLK, HCLK, PCLK2 and PCLK1 configuration */
-<<<<<<< HEAD
-    /* Enable HSE */
-    RCC->CR |= CLOCK_CR_SOURCE;
-    /* Wait till HSE is ready,
-     * NOTE: the MCU will stay here forever if no HSE clock is connected */
-    while (!(RCC->CR & RCC_CR_HSERDY));
-=======
     /* Enable high speed clock source */
     RCC->CR |= CLOCK_CR_SOURCE;
     /* Wait till the high speed clock source is ready
      * NOTE: the MCU will stay here forever if you use an external clock source and it's not connected */
     while (!(RCC->CR & CLOCK_CR_SOURCE_RDY));
->>>>>>> upstream/master
     FLASH->ACR |= FLASH_ACR_ACC64;
     /* Enable Prefetch Buffer */
     FLASH->ACR |= FLASH_ACR_PRFTEN;
