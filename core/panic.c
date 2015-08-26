@@ -38,7 +38,7 @@
 static int crashed = 0;
 
 /* WARNING: this function NEVER returns! */
-NORETURN void core_panic(int crash_code, const char *message)
+NORETURN void core_panic(core_panic_t crash_code, const char *message)
 {
     (void) crash_code;
 
