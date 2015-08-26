@@ -103,7 +103,7 @@ void cpu_init(void);
 void cortexm_init(void);
 
 /**
- * @brief   Returns the current content of the link register (lr)
+ * @brief   Prints the current content of the link register (lr)
  */
 static inline void cpu_print_last_instruction(void)
 {

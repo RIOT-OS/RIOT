@@ -43,7 +43,7 @@ void gpio_init_ports(void);
 #endif
 
 /**
- * @brief   Returns the current content of the link register (lr)
+ * @brief   Prints the current content of the link register (lr)
  */
 static inline void cpu_print_last_instruction(void)
 {

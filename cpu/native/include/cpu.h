@@ -31,7 +31,7 @@ void dINT(void);
 void eINT(void);
 
 /**
- * @brief   Returns the current content of the link register (lr)
+ * @brief   Prints the last instruction's address
  */
 static inline void cpu_print_last_instruction(void)
 {

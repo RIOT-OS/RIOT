@@ -134,7 +134,7 @@ void x86_init_board(void);
 bool x86_get_memory_region(uint64_t *start, uint64_t *len, unsigned long *cnt);
 
 /**
- * @brief   Returns the current content of the link register (lr)
+ * @brief   Prints the last instruction's address
  *
  * @todo:   Not supported
  */

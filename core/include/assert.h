@@ -25,6 +25,8 @@
 extern "C" {
 #endif
 
+extern const char assert_crash_message[];
+
 /**
  * @brief    abort the program if assertion is false
  *
@@ -41,7 +43,7 @@ extern "C" {
 #ifdef NDEBUG
 #define assert(ignore)((void) 0)
 #else
-#define assert(cond) ((cond) ? (void)0 : core_panic(PANIC_ASSERT_FAIL, "assert"))
+#define assert(cond) ((cond) ? (void)0 : core_panic(PANIC_ASSERT_FAIL, assert_crash_message))
 #endif
 
 #ifdef __cplusplus

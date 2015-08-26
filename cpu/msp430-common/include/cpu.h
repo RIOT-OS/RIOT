@@ -168,7 +168,7 @@ inline void __restore_context(unsigned int irqen)
 void msp430_cpu_init(void);
 
 /**
- * @brief   Returns the current content of the link register (lr)
+ * @brief   Print the last instruction's address
  *
  * @todo:   Not supported
  */
