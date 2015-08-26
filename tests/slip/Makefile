@@ -3,7 +3,7 @@ include ../Makefile.tests_common
 
 BOARD_INSUFFICIENT_RAM := stm32f0discovery
 
-USEMODULE += auto_init_ng_netif
+USEMODULE += auto_init_gnrc_netif
 USEMODULE += gnrc
 USEMODULE += gnrc_pktdump
 USEMODULE += gnrc_slip
