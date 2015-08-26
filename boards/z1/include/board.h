@@ -1,6 +1,6 @@
 /*
- * board.h - Zolertia Z1 Board.
  * Copyright (C) 2014 INRIA
+ *               2015 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -20,13 +20,12 @@
 \li CC2420
 
 * @{
-*/
-
-/**
+*
  * @file
  * @brief       Zolertia Z1 board configuration
  *
  * @author      Kévin Roussel <Kevin.Roussel@inria.fr>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
  */
 
@@ -39,6 +38,21 @@ extern "C" {
 #ifndef __MSP430F2617__
 #define __MSP430F2617__
 #endif
+
+/**
+ * @brief   Xtimer configuration
+ * @{
+ */
+#define XTIMER                      (0)
+#define XTIMER_CHAN                 (0)
+#define XTIMER_MASK                 (0xffff0000)
+/** @} */
+
+/**
+ * @brief   Defines for compatibility with hwtimer
+ * @deprecated
+ */
+#define HW_TIMER                    (0)
 
 /*  MSP430 core */
 #define MSP430_INITIAL_CPU_SPEED    8000000uL
