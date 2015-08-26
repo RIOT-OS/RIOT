@@ -31,6 +31,7 @@
 
 #include <string.h>
 #include <stdint.h>
+#include "net/gnrc.h"
 #include "net/ipv6/addr.h"
 #include "net/gnrc/nettype.h"
 #include "net/gnrc/rpl/structs.h"
@@ -342,7 +343,7 @@ extern kernel_pid_t gnrc_rpl_pid;
 kernel_pid_t gnrc_rpl_init(kernel_pid_t if_pid);
 
 /**
- * @brief Initialization of a RPL DODAG as root node. Creates a new instance if necessary.
+ * @brief Initialization of a node as root.
  *
  * @param[in] instance_id       Id of the instance
  * @param[in] dodag_id          Id of the DODAG
@@ -434,6 +435,28 @@ void gnrc_rpl_delay_dao(gnrc_rpl_dodag_t *dodag);
  * @param[in] dodag     The DODAG of the DAO
  */
 void gnrc_rpl_long_delay_dao(gnrc_rpl_dodag_t *dodag);
+
+/**
+ * @brief Creation of a RPL DODAG as root. Creates a new instance if necessary.
+ *
+ * @param[in] instance_id       Id of the instance
+ * @param[in] dodag_id          Id of the DODAG
+ * @param[in] mop               Mode of Operation
+ *
+ * @return  Pointer to the new DODAG, on success.
+ * @return  NULL, otherwise.
+ */
+gnrc_rpl_dodag_t *gnrc_rpl_root_dodag_init(uint8_t instance_id, ipv6_addr_t *dodag_id, uint8_t mop);
+
+/**
+ * @brief Send a control message
+ *
+ * @param[in] pkt               gnrc_pktnsip_t to send
+ * @param[in] src               Source address of the packet
+ * @param[in] dst               Destination address of the packet
+ * @param[in] dodag_id          Id of the DODAG
+ */
+void gnrc_rpl_send(gnrc_pktsnip_t *pkt, ipv6_addr_t *src, ipv6_addr_t *dst, ipv6_addr_t *dodag_id);
 #ifdef __cplusplus
 }
 #endif

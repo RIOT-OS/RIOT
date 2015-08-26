@@ -43,8 +43,7 @@ static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 #define GNRC_RPL_DAO_K_BIT                  (1 << 7)
 #define GNRC_RPL_DAO_ACK_D_BIT              (1 << 7)
 
-void _gnrc_rpl_send(gnrc_pktsnip_t *pkt, ipv6_addr_t *src, ipv6_addr_t *dst,
-        ipv6_addr_t *dodag_id)
+void gnrc_rpl_send(gnrc_pktsnip_t *pkt, ipv6_addr_t *src, ipv6_addr_t *dst, ipv6_addr_t *dodag_id)
 {
     gnrc_pktsnip_t *hdr;
     ipv6_addr_t all_RPL_nodes = GNRC_RPL_ALL_NODES_ADDR, ll_addr;
@@ -166,7 +165,7 @@ void gnrc_rpl_send_DIO(gnrc_rpl_dodag_t *dodag, ipv6_addr_t *destination)
     }
 
     dodag->dodag_conf_counter++;
-    _gnrc_rpl_send(pkt, NULL, destination, &dodag->dodag_id);
+    gnrc_rpl_send(pkt, NULL, destination, &dodag->dodag_id);
 }
 
 void gnrc_rpl_send_DIS(gnrc_rpl_dodag_t *dodag, ipv6_addr_t *destination)
@@ -192,7 +191,7 @@ void gnrc_rpl_send_DIS(gnrc_rpl_dodag_t *dodag, ipv6_addr_t *destination)
     /* TODO: see above TODO */
     memset((dis + 1), 0, 4);
 
-    _gnrc_rpl_send(pkt, NULL, destination, (dodag ? &dodag->dodag_id : NULL));
+    gnrc_rpl_send(pkt, NULL, destination, (dodag ? &dodag->dodag_id : NULL));
 }
 
 void gnrc_rpl_recv_DIS(gnrc_rpl_dis_t *dis, ipv6_addr_t *src, ipv6_addr_t *dst, uint16_t len)
@@ -584,7 +583,7 @@ void gnrc_rpl_send_DAO(gnrc_rpl_dodag_t *dodag, ipv6_addr_t *destination, uint8_
     transit->path_sequence = 0;
     transit->path_lifetime = lifetime;
 
-    _gnrc_rpl_send(pkt, NULL, destination, &dodag->dodag_id);
+    gnrc_rpl_send(pkt, NULL, destination, &dodag->dodag_id);
 
     GNRC_RPL_COUNTER_INCREMENT(dodag->dao_seq);
 }
@@ -627,7 +626,7 @@ void gnrc_rpl_send_DAO_ACK(gnrc_rpl_dodag_t *dodag, ipv6_addr_t *destination, ui
     dao_ack->dao_sequence = seq;
     dao_ack->status = 0;
 
-    _gnrc_rpl_send(pkt, NULL, destination, &dodag->dodag_id);
+    gnrc_rpl_send(pkt, NULL, destination, &dodag->dodag_id);
 }
 
 void gnrc_rpl_recv_DAO(gnrc_rpl_dao_t *dao, ipv6_addr_t *src, uint16_t len)
