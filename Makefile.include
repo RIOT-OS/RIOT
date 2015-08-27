@@ -213,7 +213,7 @@ all: ..compiler-check ..build-message $(USEPKG:%=${BINDIR}%.a) $(APPDEPS)
 	$(AD)DIRS="$(DIRS)" "$(MAKE)" -C $(CURDIR) -f $(RIOTBASE)/Makefile.application
 ifeq (,$(RIOTNOLINK))
 ifeq ($(BUILDOSXNATIVE),1)
-	$(AD)$(if $(CPPMIX),$(CXX),$(LINK)) $(UNDEF) -o $(ELFFILE) $(BASELIBS) $(LINKFLAGS) $(LINKFLAGPREFIX)-no_pie
+	$(AD)$(if $(CPPMIX),$(CXX),$(LINK)) $(UNDEF) -o $(ELFFILE) $$(find $(BASELIBS) -size +8c) $(LINKFLAGS) $(LINKFLAGPREFIX)-no_pie
 else
 	$(AD)$(if $(CPPMIX),$(CXX),$(LINK)) $(UNDEF) -o $(ELFFILE) $(LINKFLAGPREFIX)--start-group $(BASELIBS) -lm $(LINKFLAGPREFIX)--end-group  $(LINKFLAGPREFIX)-Map=$(BINDIR)$(APPLICATION).map $(LINKFLAGPREFIX)--cref $(LINKFLAGS)
 endif
