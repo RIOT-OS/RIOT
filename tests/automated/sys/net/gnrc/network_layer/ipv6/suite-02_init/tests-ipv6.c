@@ -42,7 +42,7 @@ static void tear_down(void)
  */
 
 /**
- * Tests recognition for error condition 2.
+ * Tests check if a free pid is available for module.
  * Deferred!
  *
  * @pre: No IPV6 thread has been initialized and MAXTHREADS threads already
@@ -50,7 +50,6 @@ static void tear_down(void)
  * @post: No IPV6 thread has been initialized.
  *
  * @todo
- *   - Remove thread from former test.
  *   - Controlled creation of precondition.
  */
 static void test_ipv6_init__maxthr(void)

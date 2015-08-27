@@ -42,14 +42,11 @@ static void tear_down(void)
  */
 
 /**
- * @brief Tests normal case.
+ * @brief Tests normal case of successful init.
  *
  * @pre No IPV6 thread has been initialized.
  * @post One single IPV6 thread has been initialized.
  *
- * ENHANCE:
- *   - Provide check for existece of thread.
- *   - Provide check if pid didn't exist before..
  */
 static void test_ipv6_init__first(void)
 {
@@ -64,13 +61,11 @@ static void test_ipv6_init__first(void)
 }
 
 /**
- * @brief Tests check for error condition 2
+ * @brief Test check for prevetion of multiple module instances.
  *
  * @pre IPV6 thread has already been initialized.
  * @post No new IPV6 thread has already been initialized.
  *
- * ENHANCE:
- *   - Provide check for uniqueness of first thread.
  */
 static void test_ipv6_init__uniq(void)
 {
@@ -78,7 +73,7 @@ static void test_ipv6_init__uniq(void)
     kernel_pid_t retval = KERNEL_PID_UNDEF;
 
     /*
-     * ATM the thread has been initialized in test_*__uniq.
+     * ATM the thread has been initialized in test_ipv6_init__first.
      */
     retval = gnrc_ipv6_init();
 

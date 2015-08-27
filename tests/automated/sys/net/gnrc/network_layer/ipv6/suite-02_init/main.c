@@ -22,7 +22,6 @@
 
 #include "net/gnrc/nettest.h"
 #include "embUnit.h"
-#include "msg.h"
 
 #include "../tests-ipv6.h"
 

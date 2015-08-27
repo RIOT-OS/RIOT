@@ -22,7 +22,6 @@
 
 #include "net/gnrc/nettest.h"
 #include "embUnit.h"
-#include "msg.h"
 
 #include "../tests-ipv6.h"
 
@@ -31,8 +30,7 @@ int main(void)
 
     /* Preparing minimal runtime environment for modules using netapi. */
 
-//    if (gnrc_nettest_init() < 0) {
-    if (0) {
+    if (gnrc_nettest_init() < 0) {
         puts("Error initializing nettest thread");
         return 1;
     }
