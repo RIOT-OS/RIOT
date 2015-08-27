@@ -60,7 +60,7 @@ static int sender_thread;
 static int _sock_snd;
 static struct autobuf _hexbuf;
 static ng_ipv6_addr_t _v6_addr_mcast, _v6_addr_loopback;
-static ng_ipv6_addr_t* _v6_addr_local;
+static ng_ipv6_addr_t _v6_addr_local;
 static struct netaddr na_local; /* the same as _v6_addr_local, but to save us
                                  * constant calls to ipv6_addr_t_to_netaddr()... */
 static struct writer_target *wt;
@@ -77,20 +77,20 @@ kernel_pid_t aodvv2_if_id;
 
 void aodv_init(kernel_pid_t interface)
 {
-    AODV_DEBUG("%s()\n", __func__);
+    DEBUG("%s()\n", __func__);
 
     /* init this thread's IPC msg queue */
     msg_t msgq[RCV_MSG_Q_SIZE];
     msg_init_queue(msgq, sizeof msgq);
 
     if (!interface) {
-        AODV_DEBUG("Error: AODVv2 interface pid is invalid.\n");
+        DEBUG("Error: AODVv2 interface pid is invalid.\n");
         return;
     }
     aodvv2_if_id = interface;
 
     aodvv2_address_type_size = sizeof(ng_ipv6_addr_t);
-    aodvv2_prefix_len = 16;
+    aodvv2_prefix_len = 64;
 
     mutex_init(&rreq_mutex);
     mutex_init(&rrep_mutex);
@@ -140,10 +140,11 @@ void *fib_signal_handler_thread(void *arg)
     (void) arg;
     ng_ipv6_addr_t dest;
     struct netaddr na_dest;
+    int address_type_size = 16;
 
-    int err = fib_register_rp(&aodvv2_prefix.u8[0], aodvv2_prefix_len);
+    int err = fib_register_rp(&aodvv2_prefix.u8[0], address_type_size);
     if ( err != 0) {
-        AODV_DEBUG("ERROR: cannot register at fib, error code:\n");
+        DEBUG("ERROR: cannot register at fib, error code:\n");
         exit(1);
     }
 
@@ -287,28 +288,33 @@ static void _init_addresses(void)
 
     /* init multicast address: set to to a link-local all nodes multicast address */
     ng_ipv6_addr_set_all_nodes_multicast(&_v6_addr_mcast, NG_IPV6_ADDR_MCAST_SCP_LINK_LOCAL);
-    AODV_DEBUG("my multicast address is: %s\n",
+    DEBUG("my multicast address is: %s\n",
         ng_ipv6_addr_to_str(addr_str, &_v6_addr_mcast, NG_IPV6_ADDR_MAX_STR_LEN));
 
-    /* get best IP for sending */
-    if (!(ng_netapi_get(aodvv2_if_id, NETCONF_OPT_IPV6_IID, 0, &iid,
-                       sizeof(eui64_t)) < 0)) {
-        AODV_DEBUG("Error: failed to get iid\n");
+    /* get id (of type eui46_t) of the interface we're sending on */
+    int err_code = ng_netapi_get(aodvv2_if_id, NETCONF_OPT_IPV6_IID, 0, &iid,
+                       sizeof(eui64_t));
+    if (err_code < 0) {
+        DEBUG("Error: failed to get iid, error code: %d\n", err_code);
         return;
     }
 
     /* Set addr according to our interface id */
-    ng_ipv6_addr_set_aiid(_v6_addr_local, iid.uint8);
+    ng_ipv6_addr_set_aiid(&_v6_addr_local, &iid.uint8[0]);
     /* Set (global!) prefix */
-    ng_ipv6_addr_init_prefix(_v6_addr_local, &aodvv2_prefix, aodvv2_prefix_len);
+    ng_ipv6_addr_init_prefix(&_v6_addr_local, &aodvv2_prefix, aodvv2_prefix_len);
+    /* Add our homemade address to our interface (aodvv2_if_id) */
+    ng_ipv6_netif_add_addr(aodvv2_if_id, &_v6_addr_local, aodvv2_prefix_len, 0);
 
-    AODV_DEBUG("my src address is:       %s\n",
-        ng_ipv6_addr_to_str(addr_str, _v6_addr_local, NG_IPV6_ADDR_MAX_STR_LEN));
+    DEBUG("my src address is:       %s\n",
+        ng_ipv6_addr_to_str(addr_str, &_v6_addr_local, NG_IPV6_ADDR_MAX_STR_LEN));
 
     /* store src & multicast address as netaddr as well for easy interaction
      * with oonf based stuff */
-    ipv6_addr_t_to_netaddr(_v6_addr_local, &na_local);
+    ipv6_addr_t_to_netaddr(&_v6_addr_local, &na_local);
     ipv6_addr_t_to_netaddr(&_v6_addr_mcast, &na_mcast);
+
+    /* TODO: do I need this?*/
     ng_ipv6_addr_set_loopback(&_v6_addr_loopback);
 }
 
