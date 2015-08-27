@@ -759,7 +759,7 @@ static int _netif_mtu(kernel_pid_t dev, char *mtu_str)
     gnrc_ipv6_netif_t *entry;
     if (((mtu = atoi(mtu_str)) < IPV6_MIN_MTU) || (mtu > UINT16_MAX)) {
         printf("error: MTU must be between %" PRIu16 " and %" PRIu16 "\n",
-               IPV6_MIN_MTU, UINT16_MAX);
+               (uint16_t)IPV6_MIN_MTU, (uint16_t)UINT16_MAX);
         return 1;
     }
     if ((entry = gnrc_ipv6_netif_get(dev)) == NULL) {
@@ -767,7 +767,7 @@ static int _netif_mtu(kernel_pid_t dev, char *mtu_str)
         return 1;
     }
     entry->mtu = IPV6_MIN_MTU;
-    printf("success: set MTU %" PRIu16 " interface %" PRIkernel_pid "\n", mtu,
+    printf("success: set MTU %u interface %" PRIkernel_pid "\n", mtu,
            dev);
     return 0;
 #else
