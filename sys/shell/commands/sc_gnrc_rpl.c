@@ -45,11 +45,6 @@ int _gnrc_rpl_dodag_root(char *arg1, char *arg2)
     uint8_t instance_id = (uint8_t) atoi(arg1);
     ipv6_addr_t dodag_id;
 
-    if (instance_id == 0) {
-        puts("<instance_id> must be a positive number greater than zero");
-        return 1;
-    }
-
     if (ipv6_addr_from_str(&dodag_id, arg2) == NULL) {
         puts("<dodag_id> must be a valid IPv6 address");
         return 1;
