@@ -435,11 +435,6 @@ gnrc_rpl_dodag_t *gnrc_rpl_root_dodag_init(uint8_t instance_id, ipv6_addr_t *dod
     gnrc_rpl_instance_t *inst = NULL;
     gnrc_rpl_dodag_t *dodag = NULL;
 
-    if (instance_id == 0) {
-        DEBUG("RPL: instance id (%d) must be a positive number greater than zero\n", instance_id);
-        return NULL;
-    }
-
     if (gnrc_ipv6_netif_find_by_addr(&configured_addr, dodag_id) == KERNEL_PID_UNDEF) {
         DEBUG("RPL: no IPv6 address configured to match the given dodag id: %s\n",
               ipv6_addr_to_str(addr_str, dodag_id, sizeof(addr_str)));
