@@ -140,9 +140,8 @@ void *fib_signal_handler_thread(void *arg)
     (void) arg;
     ng_ipv6_addr_t dest;
     struct netaddr na_dest;
-    int address_type_size = 16;
 
-    int err = fib_register_rp(&aodvv2_prefix.u8[0], address_type_size);
+    int err = fib_register_rp(&aodvv2_prefix.u8[0], aodvv2_address_type_size);
     if ( err != 0) {
         DEBUG("ERROR: cannot register at fib, error code:\n");
         exit(1);
@@ -438,20 +437,21 @@ static void send(ng_ipv6_addr_t addr, uint16_t port, void *data, size_t data_len
     /* allocate payload */
     payload = ng_pktbuf_add(NULL, data, data_length, NG_NETTYPE_UNDEF);
     if (payload == NULL) {
-        AODV_DEBUG("Error: unable to copy data to packet buffer\n");
+        DEBUG("Error: unable to copy data to packet buffer\n");
         return;
     }
     /* allocate UDP header, set payload, set source port := destination port */
     pkt_with_udp = ng_udp_hdr_build(payload, (uint8_t*)&port, 2, (uint8_t*)&port, 2);
     if (pkt_with_udp == NULL) {
-        AODV_DEBUG("Error: unable to allocate UDP header\n");
+        DEBUG("Error: unable to allocate UDP header\n");
         ng_pktbuf_release(payload);
         return;
     }
     /* allocate IPv6 header, set pkt_with_udp as payload */
-    pkt_with_ip = ng_ipv6_hdr_build(pkt_with_udp, NULL, 0, (uint8_t *)&addr, sizeof(addr));
+    pkt_with_ip = ng_ipv6_hdr_build(pkt_with_udp, (uint8_t*)&_v6_addr_local, aodvv2_address_type_size,
+                                    (uint8_t *)&addr, sizeof(addr));
     if (pkt_with_ip == NULL) {
-        AODV_DEBUG("Error: unable to allocate IPv6 header\n");
+        DEBUG("Error: unable to allocate IPv6 header\n");
         ng_pktbuf_release(pkt_with_udp);
         return;
     }
