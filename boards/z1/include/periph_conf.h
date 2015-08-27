@@ -26,6 +26,16 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Clock configuration
+ *
+ * @todo    Move all clock configuration code here from the board.h
+ */
+#define CLOCK_CORECLOCK     (8000000U)
+
+#define CLOCK_CMCLK         CLOCK_CORECLOCK     /* no divider programmed */
+/** @} */
+
+/**
  * @brief   Timer configuration
  * @{
  */
@@ -33,6 +43,27 @@ extern "C" {
 #define TIMER_CHAN          (3)
 #define TIMER_ISR_CC0       (TIMERA0_VECTOR)
 #define TIMER_ISR_CCX       (TIMERA1_VECTOR)
+/** @} */
+
+/**
+ * @brief   UART configuration
+ * @{
+ */
+#define UART_NUMOF          (1U)
+#define UART_0_EN           (1U)
+
+#define UART_USE_USIC
+#define UART_DEV            (USCI_0)
+#define UART_IE             (SFR->IE2)
+#define UART_IF             (SFR->IFG2)
+#define UART_IE_RX_BIT      (1 << 0)
+#define UART_IE_TX_BIT      (1 << 1)
+#define UART_RX_PORT        ((msp_port_isr_t *)PORT_2)
+#define UART_RX_PIN         (1 << 2)
+#define UART_TX_PORT        ((msp_port_isr_t *)PORT_1)
+#define UART_TX_PIN         (1 << 1)
+#define UART_RX_ISR         (USCIAB0RX_VECTOR)
+#define UART_TX_ISR         (USCIAB0TX_VECTOR)
 /** @} */
 
 #ifdef __cplusplus
