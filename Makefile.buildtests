@@ -40,7 +40,7 @@ buildtest:
 	APP_RETRY=0; \
 	rm -rf "$$BINDIRBASE"; \
 	for BOARD in $$($(MAKE) -s info-boards-supported); do \
-		RIOTNOLINK=$$(echo $(BOARD_INSUFFICIENT_RAM) | grep $${BOARD} 2>&1 >/dev/null && echo 1); \
+		RIOTNOLINK=$$(echo $(BOARD_INSUFFICIENT_MEMORY) | grep $${BOARD} 2>&1 >/dev/null && echo 1); \
 		${COLOR_ECHO} -n "Building for $${BOARD} "; \
 		[ -n "$${RIOTNOLINK}" ] && ${COLOR_ECHO} -n "(no linking) "; \
 		for NTH_TRY in 1 2 3; do \
