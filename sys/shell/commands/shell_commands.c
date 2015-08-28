@@ -134,6 +134,10 @@ extern int _gnrc_6ctx(int argc, char **argv);
 #endif
 #endif
 
+#ifdef MODULE_LWM2M_CLI
+extern int _lwm2m_cli(int argc, char **argv);
+#endif
+
 const shell_command_t _shell_command_list[] = {
     {"reboot", "Reboot the node", _reboot_handler},
 #ifdef MODULE_CONFIG
@@ -222,6 +226,9 @@ const shell_command_t _shell_command_list[] = {
 #ifdef MODULE_GNRC_SIXLOWPAN_ND_BORDER_ROUTER
     {"6ctx", "6LoWPAN context configuration tool", _gnrc_6ctx },
 #endif
+#endif
+#ifdef MODULE_LWM2M_CLI
+    {"lm", "manage LWM2M client", _lwm2m_cli },
 #endif
     {NULL, NULL, NULL}
 };
