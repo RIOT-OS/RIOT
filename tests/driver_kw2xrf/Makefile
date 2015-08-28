@@ -3,7 +3,7 @@ include ../Makefile.tests_common
 
 FEATURES_REQUIRED = periph_spi periph_gpio
 
-BOARD_INSUFFICIENT_RAM := stm32f0discovery nucleo-f334
+BOARD_INSUFFICIENT_MEMORY := stm32f0discovery nucleo-f334
 
 ifneq (,$(filter pba-d-01-kw2x,$(BOARD)))
   DRIVER ?= kw2xrf
