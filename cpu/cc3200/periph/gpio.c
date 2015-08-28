@@ -221,12 +221,6 @@ int gpio_init(gpio_t dev, gpio_dir_t dir, gpio_pp_t pushpull)
 	uint8_t bit = digitalPinToBitMask(dev);
 	uint8_t port = digitalPinToPort(dev);
 
-//	MAP_PRCMPeripheralClkEnable(PRCM_GPIOA0, PRCM_RUN_MODE_CLK);
-//	MAP_PRCMPeripheralClkEnable(PRCM_GPIOA1, PRCM_RUN_MODE_CLK);
-//	MAP_PRCMPeripheralClkEnable(PRCM_GPIOA2, PRCM_RUN_MODE_CLK);
-//	MAP_PRCMPeripheralClkEnable(PRCM_GPIOA3, PRCM_RUN_MODE_CLK);
-
-
 	if (port == NOT_A_PORT) return -1;
 
 	uint32_t portBase = (uint32_t) portBASERegister(port);
