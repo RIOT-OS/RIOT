@@ -86,6 +86,19 @@ typedef struct {
 int gnrc_netapi_send(kernel_pid_t pid, gnrc_pktsnip_t *pkt);
 
 /**
+ * @brief   Sends @p cmd to all subscribers to (@p type, @p demux_ctx).
+ *
+ * @param[in] type      type of the targeted network module.
+ * @param[in] demux_ctx demultiplexing context for @p type.
+ * @param[in] cmd       command for all subscribers
+ * @param[in] pkt       pointer into the packet buffer holding the data to send
+ *
+ * @return Number of subscribers to (@p type, @p demux_ctx).
+ */
+int gnrc_netapi_dispatch(gnrc_nettype_t type, uint32_t demux_ctx, uint16_t cmd,
+                         gnrc_pktsnip_t *pkt);
+
+/**
  * @brief   Sends a @ref GNRC_NETAPI_MSG_TYPE_SND command to all subscribers to
  *          (@p type, @p demux_ctx).
  *
@@ -95,8 +108,11 @@ int gnrc_netapi_send(kernel_pid_t pid, gnrc_pktsnip_t *pkt);
  *
  * @return Number of subscribers to (@p type, @p demux_ctx).
  */
-int gnrc_netapi_dispatch_send(gnrc_nettype_t type, uint32_t demux_ctx,
-                              gnrc_pktsnip_t *pkt);
+static inline int gnrc_netapi_dispatch_send(gnrc_nettype_t type, uint32_t demux_ctx,
+                                            gnrc_pktsnip_t *pkt)
+{
+    return gnrc_netapi_dispatch(type, demux_ctx, GNRC_NETAPI_MSG_TYPE_SND, pkt);
+}
 
 /**
  * @brief   Shortcut function for sending @ref GNRC_NETAPI_MSG_TYPE_RCV messages
@@ -119,8 +135,11 @@ int gnrc_netapi_receive(kernel_pid_t pid, gnrc_pktsnip_t *pkt);
  *
  * @return Number of subscribers to (@p type, @p demux_ctx).
  */
-int gnrc_netapi_dispatch_receive(gnrc_nettype_t type, uint32_t demux_ctx,
-                                 gnrc_pktsnip_t *pkt);
+static inline int gnrc_netapi_dispatch_receive(gnrc_nettype_t type, uint32_t demux_ctx,
+                                               gnrc_pktsnip_t *pkt)
+{
+    return gnrc_netapi_dispatch(type, demux_ctx, GNRC_NETAPI_MSG_TYPE_RCV, pkt);
+}
 
 /**
  * @brief   Shortcut function for sending @ref GNRC_NETAPI_MSG_TYPE_GET messages and
