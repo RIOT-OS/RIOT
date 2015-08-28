@@ -59,9 +59,6 @@ kernel_pid_t gnrc_ipv6_pid = KERNEL_PID_UNDEF;
 
 /* handles GNRC_NETAPI_MSG_TYPE_RCV commands */
 static void _receive(gnrc_pktsnip_t *pkt);
-/* dispatches received IPv6 packet for upper layer */
-static void _dispatch_rcv_pkt(gnrc_nettype_t type, uint32_t demux_ctx,
-                              gnrc_pktsnip_t *pkt);
 /* Sends packet over the appropriate interface(s).
  * prep_hdr: prepare header for sending (call to _fill_ipv6_hdr()), otherwise
  * assume it is already prepared */
@@ -88,8 +85,6 @@ kernel_pid_t gnrc_ipv6_init(void)
 
 void gnrc_ipv6_demux(kernel_pid_t iface, gnrc_pktsnip_t *pkt, uint8_t nh)
 {
-    int receiver_num;
-
     pkt->type = gnrc_nettype_from_protnum(nh);
 
     switch (nh) {
@@ -124,19 +119,13 @@ void gnrc_ipv6_demux(kernel_pid_t iface, gnrc_pktsnip_t *pkt, uint8_t nh)
     }
 
     DEBUG("ipv6: forward nh = %" PRIu8 " to other threads\n", nh);
-    receiver_num = gnrc_netreg_num(pkt->type, GNRC_NETREG_DEMUX_CTX_ALL) +
-                   gnrc_netreg_num(GNRC_NETTYPE_IPV6, nh);
 
-    if (receiver_num == 0) {
+    if ((gnrc_netapi_dispatch_receive(pkt->type, GNRC_NETREG_DEMUX_CTX_ALL, pkt) == 0)
+        && (gnrc_netapi_dispatch_receive(GNRC_NETTYPE_IPV6, nh, pkt) == 0)) {
         DEBUG("ipv6: unable to forward packet as no one is interested in it\n");
         gnrc_pktbuf_release(pkt);
         return;
     }
-
-    gnrc_pktbuf_hold(pkt, receiver_num - 1);
-    /* IPv6 is not interested anymore so `- 1` */
-    _dispatch_rcv_pkt(pkt->type, GNRC_NETREG_DEMUX_CTX_ALL, pkt);
-    _dispatch_rcv_pkt(GNRC_NETTYPE_IPV6, nh, pkt);
 }
 
 /* internal functions */
@@ -602,19 +591,6 @@ static inline bool _pkt_not_for_me(kernel_pid_t *iface, ipv6_hdr_t *hdr)
     }
     else {
         return (gnrc_ipv6_netif_find_addr(*iface, &hdr->dst) == NULL);
-    }
-}
-
-static void _dispatch_rcv_pkt(gnrc_nettype_t type, uint32_t demux_ctx,
-                              gnrc_pktsnip_t *pkt)
-{
-    gnrc_netreg_entry_t *entry = gnrc_netreg_lookup(type, demux_ctx);
-
-    while (entry) {
-        DEBUG("ipv6: Send receive command for %p to %" PRIu16 "\n", (void *)pkt,
-              entry->pid);
-        gnrc_netapi_receive(entry->pid, pkt);
-        entry = gnrc_netreg_getnext(entry);
     }
 }
 
