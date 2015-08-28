@@ -25,6 +25,7 @@
 #include <stdint.h>
 
 #include "kernel_types.h"
+#include "net/eui64.h"
 #include "net/ipv6/addr.h"
 #include "net/gnrc/netif.h"
 #include "net/gnrc/pktqueue.h"
@@ -118,7 +119,9 @@ extern "C" {
  *          </a>.
  */
 typedef struct {
+#ifdef MODULE_GNRC_NDP_NODE
     gnrc_pktqueue_t *pkts;                      /**< Packets waiting for address resolution */
+#endif
     ipv6_addr_t ipv6_addr;                      /**< IPv6 address of the neighbor */
     uint8_t l2_addr[GNRC_IPV6_NC_L2_ADDR_MAX];  /**< Link layer address of the neighbor */
     uint8_t l2_addr_len;                        /**< Length of gnrc_ipv6_nc_t::l2_addr */
@@ -142,6 +145,15 @@ typedef struct {
      *      </a>
      */
     vtimer_t nbr_adv_timer;
+
+#ifdef MODULE_GNRC_SIXLOWPAN_ND
+    vtimer_t rtr_sol_timer; /**< Retransmission timer for unicast router solicitations */
+#endif
+#ifdef MODULE_GNRC_SIXLOWPAN_ND_ROUTER
+    vtimer_t type_timeout;                  /**< Timer for type transissions */
+    eui64_t eui64;                          /**< the unique EUI-64 of the neighbor (might be
+                                             *   different from L2 address, if l2_addr_len == 2) */
+#endif
 
     uint8_t probes_remaining;               /**< remaining number of unanswered probes */
     /**

@@ -195,8 +195,6 @@ void gnrc_ndp_nbr_adv_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
 
     if (l2tgt_len != -ENOTSUP) {
         if (gnrc_ipv6_nc_get_state(nc_entry) == GNRC_IPV6_NC_STATE_INCOMPLETE) {
-            gnrc_pktqueue_t *queued_pkt;
-
             if (_pkt_has_l2addr(netif_hdr) && (l2tgt_len == 0)) {
                 /* link-layer has addresses, but no TLLAO supplied: discard silently
                  * (see https://tools.ietf.org/html/rfc4861#section-7.2.5) */
@@ -221,11 +219,13 @@ void gnrc_ndp_nbr_adv_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
                 nc_entry->flags &= ~GNRC_IPV6_NC_IS_ROUTER;
                 /* TODO: update state of neighbor as router in FIB? */
             }
-
+#ifdef MODULE_GNRC_NDP_NODE
+            gnrc_pktqueue_t *queued_pkt;
             while ((queued_pkt = gnrc_pktqueue_remove_head(&nc_entry->pkts)) != NULL) {
                 gnrc_netapi_send(gnrc_ipv6_pid, queued_pkt->pkt);
                 queued_pkt->pkt = NULL;
             }
+#endif
         }
         else {
             /* first or-term: no link-layer, but nc_entry has l2addr,
