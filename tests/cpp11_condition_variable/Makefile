@@ -10,7 +10,7 @@ BOARD ?= native
 # Debian jessie libstdc++-arm-none-eabi-newlib-4.8.3-9+4 works fine, though.
 # Remove this line if Travis is upgraded to a different toolchain which does
 # not pull in all C++ locale code whenever exceptions are used.
-BOARD_INSUFFICIENT_RAM := stm32f0discovery spark-core nucleo-f334
+BOARD_INSUFFICIENT_MEMORY := stm32f0discovery spark-core nucleo-f334
 
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
