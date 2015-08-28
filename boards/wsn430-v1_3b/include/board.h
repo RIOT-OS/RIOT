@@ -54,6 +54,15 @@ extern "C" {
  */
 #define HW_TIMER                    (0)
 
+/**
+ * @brief   Standard input/output device configuration
+ * @{
+ */
+#define STDIO                       (0)
+#define STDIO_BAUDRATE              (115200U)
+#define STDIO_RX_BUFSIZE            (64U)
+/** @} */
+
 //MSB430 core
 #define MSP430_INITIAL_CPU_SPEED    800000uL
 #define F_CPU                       MSP430_INITIAL_CPU_SPEED
