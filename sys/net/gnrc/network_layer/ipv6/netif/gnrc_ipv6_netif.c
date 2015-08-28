@@ -29,6 +29,7 @@
 #include "net/gnrc/netapi.h"
 #include "net/gnrc/netif.h"
 #include "net/gnrc/netif/hdr.h"
+#include "net/gnrc/sixlowpan/nd.h"
 #include "net/gnrc/sixlowpan/netif.h"
 
 #include "net/gnrc/ipv6/netif.h"
@@ -90,8 +91,6 @@ static ipv6_addr_t *_add_addr_to_entry(gnrc_ipv6_netif_t *entry, const ipv6_addr
         tmp_addr->flags |= GNRC_IPV6_NETIF_ADDR_FLAGS_NON_UNICAST;
     }
     else {
-        ipv6_addr_t sol_node;
-
         if (!ipv6_addr_is_link_local(addr)) {
             /* add also corresponding link-local address */
             ipv6_addr_t ll_addr;
@@ -117,9 +116,18 @@ static ipv6_addr_t *_add_addr_to_entry(gnrc_ipv6_netif_t *entry, const ipv6_addr
         else {
             tmp_addr->flags |= GNRC_IPV6_NETIF_ADDR_FLAGS_NDP_ON_LINK;
         }
-
-        ipv6_addr_set_solicited_nodes(&sol_node, addr);
-        _add_addr_to_entry(entry, &sol_node, IPV6_ADDR_BIT_LEN, 0);
+#if defined(MODULE_GNRC_NDP_NODE) || defined(MODULE_GNRC_SIXLOWPAN_ND)
+        /* add solicited-nodes multicast address for new address if interface is not a
+         * 6LoWPAN host interface (see: https://tools.ietf.org/html/rfc6775#section-5.2) */
+        if (!(entry->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN) ||
+            (entry->flags & GNRC_IPV6_NETIF_FLAGS_ROUTER)) {
+            ipv6_addr_t sol_node;
+            ipv6_addr_set_solicited_nodes(&sol_node, addr);
+            _add_addr_to_entry(entry, &sol_node, IPV6_ADDR_BIT_LEN, 0);
+        }
+#endif
+        /* TODO: send NS with ARO on 6LoWPAN interfaces, but not so many and only for the new
+         *       source address. */
     }
 
     return &(tmp_addr->addr);
@@ -803,6 +811,12 @@ void gnrc_ipv6_netif_init_by_dev(void)
         mutex_unlock(&ipv6_if->mutex);
 #if (defined(MODULE_GNRC_NDP_ROUTER) || defined(MODULE_GNRC_SIXLOWPAN_ND_ROUTER))
         gnrc_ipv6_netif_set_router(ipv6_if, true);
+#endif
+#ifdef MODULE_GNRC_SIXLOWPAN_ND
+        if (ipv6_if->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN) {
+            gnrc_sixlowpan_nd_init(ipv6_if);
+            continue;   /* skip gnrc_ndp_host_init() */
+        }
 #endif
 #ifdef MODULE_GNRC_NDP_HOST
         /* start periodic router solicitations */
