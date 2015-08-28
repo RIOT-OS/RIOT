@@ -176,9 +176,9 @@ int main(void)
     puts("All OK, running shell now");
 #ifndef MODULE_NEWLIB
     (void) posix_open(uart0_handler_pid, 0);
-    shell_init(&shell, NULL, SHELL_BUFSIZE, uart0_readc, uart0_putc);
+    shell_init(&shell, shell_commands, SHELL_BUFSIZE, uart0_readc, uart0_putc);
 #else
-    shell_init(&shell, NULL, SHELL_BUFSIZE, getchar, putchar);
+    shell_init(&shell, shell_commands, SHELL_BUFSIZE, getchar, putchar);
 #endif
     shell_run(&shell);
 
