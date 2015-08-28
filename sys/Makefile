@@ -67,6 +67,9 @@ endif
 ifneq (,$(filter udp,$(USEMODULE)))
     DIRS += net/transport_layer/udp
 endif
+ifneq (,$(filter lwm2m_cli,$(USEMODULE)))
+    DIRS += net/application_layer/lwm2m_cli
+endif
 
 ifneq (,$(filter netopt,$(USEMODULE)))
     DIRS += net/crosslayer/netopt

@@ -14,6 +14,15 @@ endif
 ifneq (,$(filter gnrc_%,$(filter-out gnrc_netapi gnrc_netreg gnrc_netif% gnrc_pktbuf,$(USEMODULE))))
   USEMODULE += gnrc
 endif
+ifneq (,$(filter lwm2m_cli,$(USEMODULE)))
+  USEPKG += wakaama
+  USEMODULE += gnrc_ipv6_default
+  USEMODULE += gnrc_udp
+endif
+
+ifneq (,$(filter ng_netif_default,$(USEMODULE)))
+  USEMODULE += ng_netif
+endif
 
 ifneq (,$(filter gnrc_conn_%,$(USEMODULE)))
   USEMODULE += gnrc_conn

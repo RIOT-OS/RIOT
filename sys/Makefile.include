@@ -61,8 +61,16 @@ ifneq (,$(filter log_%,$(USEMODULE)))
     include $(RIOTBASE)/sys/log/Makefile.include
 endif
 
+ifneq (,$(filter lwm2m,$(USEMODULE)))
+    include $(RIOTBASE)/sys/net/application_layer/lwm2m
+endif
+
 ifneq (,$(filter newlib,$(USEMODULE)))
     include $(RIOTBASE)/sys/newlib/Makefile.include
+endif
+
+ifneq (,$(filter lwm2m_cli,$(USEMODULE)))
+    include $(RIOTBASE)/sys/net/application_layer/lwm2m_cli/Makefile.include
 endif
 
 INCLUDES += -I$(RIOTBASE)/sys/libc/include
