@@ -133,8 +133,11 @@ void gnrc_ipv6_demux(kernel_pid_t iface, gnrc_pktsnip_t *pkt, uint8_t nh)
         return;
     }
 
-    gnrc_pktbuf_hold(pkt, receiver_num - 1);
-    /* IPv6 is not interested anymore so `- 1` */
+    gnrc_pktbuf_hold(pkt, receiver_num - 1);    /* IPv6 is not interested anymore so `- 1` */
+
+    /* XXX can't use gnrc_netapi_dispatch_receive() twice here since a call to that function
+     *     implicitly hands all rights to the packet to one of the receiving threads. As a result,
+     *     the second call to gnrc_netapi_dispatch_receive() would be invalid */
     _dispatch_rcv_pkt(pkt->type, GNRC_NETREG_DEMUX_CTX_ALL, pkt);
     _dispatch_rcv_pkt(GNRC_NETTYPE_IPV6, nh, pkt);
 }
