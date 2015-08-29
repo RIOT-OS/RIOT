@@ -241,7 +241,7 @@ static inline bool GNRC_RPL_COUNTER_GREATER_THAN(uint8_t A, uint8_t B)
 /**
  * @brief Cleanup timeout in seconds
  */
-#define GNRC_RPL_CLEANUP_TIME (30)
+#define GNRC_RPL_CLEANUP_TIME (5)
 
 /**
  * @name Node Status
