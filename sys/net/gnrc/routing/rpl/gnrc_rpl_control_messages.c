@@ -432,6 +432,9 @@ void gnrc_rpl_recv_DIO(gnrc_rpl_dio_t *dio, ipv6_addr_t *src, uint16_t len)
         if (byteorder_ntohs(dio->rank) != GNRC_RPL_INFINITE_RANK) {
             trickle_increment_counter(&dodag->trickle);
         }
+        else {
+            trickle_reset_timer(&dodag->trickle);
+        }
         return;
     }
 
@@ -456,8 +459,17 @@ void gnrc_rpl_recv_DIO(gnrc_rpl_dio_t *dio, ipv6_addr_t *src, uint16_t len)
 
     gnrc_rpl_parent_update(dodag, parent);
 
+    /* sender of incoming DIO is not a parent of mine (anymore) and has an INFINITE rank
+       and I have a rank != INFINITE_RANK */
+    if (parent->state == 0) {
+        if ((byteorder_ntohs(dio->rank) == GNRC_RPL_INFINITE_RANK)
+             && (dodag->my_rank != GNRC_RPL_INFINITE_RANK)) {
+            trickle_reset_timer(&dodag->trickle);
+            return;
+        }
+    }
     /* incoming DIO is from pref. parent */
-    if (dodag->parents && (parent == dodag->parents) && (parent->state != 0)) {
+    else if (parent == dodag->parents) {
         if (parent->dtsn != dio->dtsn) {
             gnrc_rpl_delay_dao(dodag);
         }
