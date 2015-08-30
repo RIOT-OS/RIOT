@@ -149,10 +149,10 @@ void gnrc_ndp_internal_set_state(gnrc_ipv6_nc_t *nc_entry, uint8_t state)
     }
 }
 
-void gnrc_ndp_internal_send_nbr_adv(kernel_pid_t iface, ipv6_addr_t *tgt,
-                                    ipv6_addr_t *dst, bool supply_tl2a)
+void gnrc_ndp_internal_send_nbr_adv(kernel_pid_t iface, ipv6_addr_t *tgt, ipv6_addr_t *dst,
+                                    bool supply_tl2a, gnrc_pktsnip_t *ext_opts)
 {
-    gnrc_pktsnip_t *hdr, *pkt = NULL;
+    gnrc_pktsnip_t *hdr, *pkt = ext_opts;
     uint8_t adv_flags = 0;
 
     DEBUG("ndp internal: send neighbor advertisement (iface: %" PRIkernel_pid ", tgt: %s, ",
@@ -179,11 +179,11 @@ void gnrc_ndp_internal_send_nbr_adv(kernel_pid_t iface, ipv6_addr_t *tgt,
 
         if (l2src_len > 0) {
             /* add target address link-layer address option */
-            pkt = gnrc_ndp_opt_tl2a_build(l2src, l2src_len, NULL);
+            pkt = gnrc_ndp_opt_tl2a_build(l2src, l2src_len, pkt);
 
             if (pkt == NULL) {
                 DEBUG("ndp internal: error allocating Target Link-layer address option.\n");
-                gnrc_pktbuf_release(pkt);
+                gnrc_pktbuf_release(ext_opts);
                 return;
             }
         }
