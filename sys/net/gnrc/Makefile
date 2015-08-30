@@ -82,6 +82,9 @@ endif
 ifneq (,$(filter gnrc_sixlowpan_nd,$(USEMODULE)))
     DIRS += network_layer/sixlowpan/nd
 endif
+ifneq (,$(filter gnrc_sixlowpan_nd_router,$(USEMODULE)))
+    DIRS += network_layer/sixlowpan/nd/router
+endif
 ifneq (,$(filter gnrc_sixlowpan_netif,$(USEMODULE)))
     DIRS += network_layer/sixlowpan/netif
 endif

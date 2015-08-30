@@ -33,6 +33,8 @@
 #include "net/sixlowpan/nd.h"
 #include "timex.h"
 
+#include "net/gnrc/sixlowpan/nd/router.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -51,6 +53,16 @@ extern "C" {
  * @brief   Message type for removing 6LoWPAN contexts.
  */
 #define GNRC_SIXLOWPAN_ND_MSG_DELETE_CTX    (0x0222)
+
+/**
+ * @brief   Message type for authoritative border router timeout
+ */
+#define GNRC_SIXLOWPAN_ND_MSG_ABR_TIMEOUT   (0x0223)
+
+/**
+ * @brief   Message type for address registration timeout
+ */
+#define GNRC_SIXLOWPAN_ND_MSG_AR_TIMEOUT    (0x0224)
 
 #ifndef GNRC_SIXLOWPAN_ND_AR_LTIME
 /**
@@ -77,6 +89,28 @@ extern "C" {
                                                      *   @ref GNRC_NDP_MAX_RTR_SOL_INT */
 #define GNRC_SIXLOWPAN_ND_MAX_RTR_SOL_INT   (60U)   /**< retransmission increment for exponential
                                                      *   backoff of subsequent RS */
+/** @} */
+/**
+ * @name    Router constants
+ * @{
+ * @see     <a href="https://tools.ietf.org/html/rfc6775#section-9">
+ *              RFC 6775, section 9
+ *          </a>
+ */
+#define GNRC_SIXLOWPAN_ND_MIN_RTR_ADV_DELAY (10U)   /**< replacement value (in seconds) for
+                                                     *   @ref GNRC_NDP_MIN_RTR_ADV_DELAY */
+/**
+ * @brief   replacement value (in microseconds) for @ref GNRC_NDP_MAX_RTR_ADV_DELAY
+ */
+#define GNRC_SIXLOWPAN_ND_MAX_RTR_ADV_DELAY (2U * SEC_IN_USEC)
+/**
+ * @brief   Lifetime of a tentative address entry in seconds
+ */
+#define GNRC_SIXLOWPAN_ND_TENTATIVE_NCE_LIFETIME    (20U)
+/**
+ * @brief   6LoWPAN Multihop Hoplimit
+ */
+#define GNRC_SIXLOWPAN_ND_MULTIHOP_HOPLIMIT (64U)
 /** @} */
 
 /**
@@ -181,6 +215,55 @@ bool gnrc_sixlowpan_nd_opt_6ctx_handle(uint8_t icmpv6_type, sixlowpan_nd_opt_6ct
  *          </a>
  */
 void gnrc_sixlowpan_nd_wakeup(void);
+
+#ifdef MODULE_GNRC_SIXLOWPAN_ND_ROUTER
+/**
+ * @brief   Handles authoritative border router option.
+ *
+ * @param[in] iface         Interface the source link-layer option was received
+ *                          on.
+ * @param[in] rtr_adv       The router advertisement containing the ABRO.
+ * @param[in] icmpv6_size   The size of the @p rtr_adv.
+ * @param[in] abr_opt       The ABRO.
+ *
+ * @note    Erroneous ABROs are always ignored silently.
+ */
+void gnrc_sixlowpan_nd_opt_abr_handle(kernel_pid_t iface, ndp_rtr_adv_t *rtr_adv, int icmpv6_size,
+                                      sixlowpan_nd_opt_abr_t *abr_opt);
+
+/**
+ * @brief   Builds the 6LoWPAN context option.
+ *
+ * @param[in] prefix_len    The length of the context's prefix.
+ * @param[in] flags         Flags + CID for the context.
+ * @param[in] ltime         Lifetime of the context.
+ * @param[in] prefix        The context's prefix
+ * @param[in] next      More options in the packet. NULL, if there are none.
+ *
+ * @return  The pkt snip list of options, on success
+ * @return  NULL, if packet buffer is full or on error
+ */
+gnrc_pktsnip_t *gnrc_sixlowpan_nd_opt_6ctx_build(uint8_t prefix_len, uint8_t flags, uint16_t ltime,
+                                                 ipv6_addr_t *prefix, gnrc_pktsnip_t *next);
+
+/**
+ * @brief   Builds the authoritative border router option.
+ *
+ * @param[in] version   Version of the border router information.
+ * @param[in] ltime     Registration lifetime for the border router.
+ * @param[in] braddr    The IPv6 address of the border router.
+ * @param[in] next      More options in the packet. NULL, if there are none.
+ *
+ * @return  The pkt snip list of options, on success
+ * @return  NULL, if packet buffer is full or on error
+ */
+gnrc_pktsnip_t *gnrc_sixlowpan_nd_opt_abr_build(uint32_t version, uint16_t ltime,
+                                                ipv6_addr_t *braddr, gnrc_pktsnip_t *next);
+#else
+#define gnrc_sixlowpan_nd_opt_abr_handle(iface, rtr_adv, icmpv6_size, abr_opt)
+#define gnrc_sixlowpan_nd_opt_6ctx_build(prefix_len, flags, ltime, prefix, next)        (NULL)
+#define gnrc_sixlowpan_nd_opt_abr_build(version, ltime, braddr, next)                   (NULL)
+#endif
 
 #ifdef __cplusplus
 }
