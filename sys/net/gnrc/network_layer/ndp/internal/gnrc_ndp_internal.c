@@ -17,6 +17,7 @@
 #include "net/eui64.h"
 #include "net/gnrc/ipv6.h"
 #include "net/gnrc/ndp.h"
+#include "net/gnrc/sixlowpan/ctx.h"
 #include "net/gnrc/sixlowpan/nd.h"
 #include "random.h"
 #include "timex.h"
@@ -395,6 +396,9 @@ void gnrc_ndp_internal_send_rtr_adv(kernel_pid_t iface, ipv6_addr_t *src, ipv6_a
     DEBUG("ndp internal: send router advertisement (iface: %" PRIkernel_pid ", dst: %s%s\n",
           iface, ipv6_addr_to_str(addr_str, dst, sizeof(addr_str)), fin ? ", final" : "");
     mutex_lock(&ipv6_iface->mutex);
+#ifdef MODULE_GNRC_SIXLOWPAN_ND_ROUTER
+    if (!(ipv6_iface->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN)) {
+#endif
     hdr = _add_pios(ipv6_iface, pkt);
     if (hdr == NULL) {
         /* pkt already released in _add_pios */
@@ -402,6 +406,51 @@ void gnrc_ndp_internal_send_rtr_adv(kernel_pid_t iface, ipv6_addr_t *src, ipv6_a
         return;
     }
     pkt = hdr;
+#ifdef MODULE_GNRC_SIXLOWPAN_ND_ROUTER
+    }
+    else {
+        gnrc_sixlowpan_nd_router_abr_t *abr = gnrc_sixlowpan_nd_router_abr_get();
+        if (abr != NULL) {
+            gnrc_sixlowpan_nd_router_prf_t *prf = abr->prfs;
+            /* add prefixes from border router */
+            while (prf) {
+                if (_pio_from_iface_addr(&hdr, prf->prefix, pkt)) {
+                    if (hdr != NULL) {
+                        pkt = hdr;
+                    }
+                    else {
+                        DEBUG("ndp rtr: error allocating PIO\n");
+                        gnrc_pktbuf_release(pkt);
+                        return;
+                    }
+                }
+                prf = prf->next;
+            }
+            for (unsigned int i = 0; i < GNRC_SIXLOWPAN_CTX_SIZE; i++) {
+                gnrc_sixlowpan_ctx_t *ctx;
+                if (!bf_isset(abr->ctxs, i)) {
+                    continue;
+                }
+                ctx = gnrc_sixlowpan_ctx_lookup_id(i);
+                hdr = gnrc_sixlowpan_nd_opt_6ctx_build(ctx->prefix_len, ctx->flags_id, ctx->ltime,
+                                                       &ctx->prefix, pkt);
+                if (hdr == NULL) {
+                    DEBUG("ndp rtr: error allocating 6CO\n");
+                    gnrc_pktbuf_release(pkt);
+                    return;
+                }
+                pkt = hdr;
+            }
+            hdr = gnrc_sixlowpan_nd_opt_abr_build(abr->version, abr->ltime, &abr->addr, pkt);
+            if (hdr == NULL) {
+                DEBUG("ndp internal: error allocating ABRO.\n");
+                gnrc_pktbuf_release(pkt);
+                return;
+            }
+            pkt = hdr;
+        }
+    }
+#endif /* MODULE_GNRC_SIXLOWPAN_ND_ROUTER */
     if (ipv6_iface->flags & GNRC_IPV6_NETIF_FLAGS_ADV_MTU) {
         if ((hdr = gnrc_ndp_opt_mtu_build(ipv6_iface->mtu, pkt)) == NULL) {
             DEBUG("ndp rtr: no space left in packet buffer\n");
