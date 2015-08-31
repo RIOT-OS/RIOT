@@ -63,7 +63,7 @@ extern "C" {
  *          can be much smaller).
  */
 #ifndef GNRC_IPV6_NETIF_DEFAULT_MTU
-#define GNRC_IPV6_NETIF_DEFAULT_MTU (IPV6_MIN_MTU)
+#define GNRC_IPV6_NETIF_DEFAULT_MTU             (IPV6_MIN_MTU)
 #endif
 
 /**
@@ -76,7 +76,30 @@ extern "C" {
  *          IANA, IP TIME TO LIVE PARAMETER
  *      </a>
  */
-#define GNRC_IPV6_NETIF_DEFAULT_HL  (64)
+#define GNRC_IPV6_NETIF_DEFAULT_HL              (64)
+
+/**
+ * @name    Default values for router configuration
+ * @{
+ * @see <a href="https://tools.ietf.org/html/rfc4861#section-6.2.1">
+ *          RFC 4861, section 6.2.1
+ *      </a>
+ */
+/**
+ * @brief   Maximum time in seconds between sending unsolicited multicast router advertisements.
+ */
+#define GNRC_IPV6_NETIF_DEFAULT_MAX_ADV_INT     (600U)
+
+/**
+ * @brief   Minimum time in seconds between sending unsolicited multicast router advertisements.
+ */
+#define GNRC_IPV6_NETIF_DEFAULT_MIN_ADV_INT     (200U)
+
+/**
+ * @brief   The router lifetime to propagate in router advertisements.
+ */
+#define GNRC_IPV6_NETIF_DEFAULT_ROUTER_LTIME    (1800U)
+/** @} */
 
 /**
  * @{
@@ -144,6 +167,18 @@ extern "C" {
 #define GNRC_IPV6_NETIF_FLAGS_ADV_CUR_HL        (0x0010)
 
 /**
+ * @brief   Flag to indicate that gnrc_ipv6_netif_t::reach_time shall be propagated
+ *          in router advertisements.
+ */
+#define GNRC_IPV6_NETIF_FLAGS_ADV_REACH_TIME    (0x0020)
+
+/**
+ * @brief   Flag to indicate that ng_ipv6_netif_t::retrans_timer shall be propagated
+ *          in router advertisements.
+ */
+#define GNRC_IPV6_NETIF_FLAGS_ADV_RETRANS_TIMER (0x0040)
+
+/**
  * @brief   Flag to indicate if the interface is operating over a wired link
  */
 #define GNRC_IPV6_NETIF_FLAGS_IS_WIRED          (0x2000)
@@ -208,9 +243,44 @@ typedef struct {
     gnrc_ipv6_netif_addr_t addrs[GNRC_IPV6_NETIF_ADDR_NUMOF];
     mutex_t mutex;          /**< mutex for the interface */
     kernel_pid_t pid;       /**< PID of the interface */
+    uint16_t flags;         /**< flags for 6LoWPAN and Neighbor Discovery */
     uint16_t mtu;           /**< Maximum Transmission Unit (MTU) of the interface */
     uint8_t cur_hl;         /**< current hop limit for the interface */
-    uint16_t flags;         /**< flags for 6LoWPAN and Neighbor Discovery */
+#ifdef MODULE_GNRC_NDP_HOST
+    /**
+     * @brief   Counter for send router solicitations.
+     */
+    uint8_t rtr_sol_count;
+#endif
+#ifdef MODULE_GNRC_NDP_ROUTER
+    /**
+     * @brief   Counter for initial router advertisements.
+     */
+    uint8_t rtr_adv_count;
+
+    /**
+     * @brief   Maximum time in seconds between sending unsolicited multicast
+     *          router advertisements. Must be between 4 and 1800 seconds.
+     *          The default value is @ref GNRC_IPV6_NETIF_DEFAULT_MAX_ADV_INT.
+     */
+    uint16_t max_adv_int;
+
+    /**
+     * @brief   Minimum time in seconds between sending unsolicited multicast
+     *          router advertisements. Must be between 3 and
+     *          3/4 * ng_ipv6_netif_t::max_adv_int seconds.
+     *          The default value is @ref GNRC_IPV6_NETIF_DEFAULT_MIN_ADV_INT.
+     */
+    uint16_t min_adv_int;
+
+    /**
+     * @brief   The router lifetime to propagate in router advertisements.
+     *          Must be either 0 or between ng_ipv6_netif_t::max_adv_int and
+     *          9000 seconds. 0 means this router is not to be used as a default
+     *          router. The default value is @ref GNRC_IPV6_NETIF_DEFAULT_ROUTER_LTIME.
+     */
+    uint16_t adv_ltime;
+#endif
     /**
      * @brief   Base value in microseconds for computing random
      *          gnrc_ipv6_netif_t::reach_time.
@@ -234,6 +304,10 @@ typedef struct {
      *          The default value is @ref GNRC_NDP_RETRANS_TIMER.
      */
     timex_t retrans_timer;
+    vtimer_t rtr_sol_timer; /**< Timer for periodic router solicitations */
+#ifdef MODULE_GNRC_NDP_ROUTER
+    vtimer_t rtr_adv_timer; /**< Timer for periodic router advertisements */
+#endif
 } gnrc_ipv6_netif_t;
 
 /**
@@ -269,6 +343,7 @@ void gnrc_ipv6_netif_remove(kernel_pid_t pid);
  */
 gnrc_ipv6_netif_t *gnrc_ipv6_netif_get(kernel_pid_t pid);
 
+#if (defined(MODULE_GNRC_NDP_ROUTER) || defined(MODULE_GNRC_SIXLOWPAN_ND_ROUTER))
 /**
  * @brief   Set interface to router mode.
  *
@@ -278,11 +353,7 @@ gnrc_ipv6_netif_t *gnrc_ipv6_netif_get(kernel_pid_t pid);
  * @param[in] netif     The interface.
  * @param[in] enable    Status for the GNRC_IPV6_NETIF_FLAGS_ROUTER flag.
  */
-static inline void gnrc_ipv6_netif_set_rtr(gnrc_ipv6_netif_t *netif, bool enable)
-{
-    (void)netif;    /* Don't do anything for non-routers */
-    (void)enable;
-}
+void gnrc_ipv6_netif_set_router(gnrc_ipv6_netif_t *netif, bool enable);
 
 /**
  * @brief   Set interface to router advertisement mode.
@@ -294,25 +365,13 @@ static inline void gnrc_ipv6_netif_set_rtr(gnrc_ipv6_netif_t *netif, bool enable
  * @param[in] netif     The interface.
  * @param[in] enable    Status for the GNRC_IPV6_NETIF_FLAGS_RTR flag.
  */
-static inline void gnrc_ipv6_netif_set_rtr_adv(gnrc_ipv6_netif_t *netif, bool enable)
-{
-    (void)netif;    /* Don't do anything for non-routers */
-    (void)enable;
-}
-
-/**
- * @brief   Solicitates an advertisement of a neighboring router on this
- *          interface.
- *
- * @param[in] netif The interface.
- * @param[in] dst   The address of the neighboring router.
- *                  May be NULL for @ref IPV6_ADDR_ALL_ROUTERS_LINK_LOCAL.
- */
-static inline void gnrc_ipv6_netif_sol_router(gnrc_ipv6_netif_t *netif, ipv6_addr_t *dst)
-{
-    (void)netif;    /* TODO */
-    (void)dst;
-}
+void gnrc_ipv6_netif_set_rtr_adv(gnrc_ipv6_netif_t *netif, bool enable);
+#else
+/* dummy macros to be able to "call" these functions when none of the relevant modules
+ * is implemented */
+#define gnrc_ipv6_netif_set_router(netif, enable)
+#define gnrc_ipv6_netif_set_rtr_adv(netif, enable)
+#endif
 
 /**
  * @brief   Adds an address to an interface.
