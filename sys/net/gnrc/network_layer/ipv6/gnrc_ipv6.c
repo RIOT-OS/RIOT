@@ -522,6 +522,9 @@ static void _send(gnrc_pktsnip_t *pkt, bool prep_hdr)
     if (ipv6 != pkt) {      /* in case packet has netif header */
         pkt->next = payload;/* pkt is already write-protected so we can do that */
     }
+    else {
+        pkt = payload;      /* pkt is the IPv6 header so we just write-protected it */
+    }
     ipv6 = payload;  /* Reset ipv6 from temporary variable */
 
     hdr = ipv6->data;
