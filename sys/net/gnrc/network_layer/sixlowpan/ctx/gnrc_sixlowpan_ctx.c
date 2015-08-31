@@ -127,7 +127,6 @@ gnrc_sixlowpan_ctx_t *gnrc_sixlowpan_ctx_update(uint8_t id, const ipv6_addr_t *p
     _ctx_inval_times[id] = ltime + _current_minute();
 
     mutex_unlock(&_ctx_mutex);
-
     return &(_ctxs[id]);
 }
 
