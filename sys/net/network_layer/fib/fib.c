@@ -528,15 +528,7 @@ void fib_init(fib_table_t *table)
         prefix_rp[i] = NULL;
     }
 
-    for (size_t i = 0; i < table->size; ++i) {
-        table->entries[i].iface_id = 0;
-        table->entries[i].lifetime.seconds = 0;
-        table->entries[i].lifetime.microseconds = 0;
-        table->entries[i].global_flags = 0;
-        table->entries[i].global = NULL;
-        table->entries[i].next_hop_flags = 0;
-        table->entries[i].next_hop = NULL;
-    }
+    memset(table->entries, 0, (table->size * sizeof(fib_entry_t)));
 
     universal_address_init();
     mutex_unlock(&mtx_access);
@@ -554,15 +546,7 @@ void fib_deinit(fib_table_t *table)
 
     notify_rp_pos = 0;
 
-    for (size_t i = 0; i < table->size; ++i) {
-        table->entries[i].iface_id = 0;
-        table->entries[i].lifetime.seconds = 0;
-        table->entries[i].lifetime.microseconds = 0;
-        table->entries[i].global_flags = 0;
-        table->entries[i].global = NULL;
-        table->entries[i].next_hop_flags = 0;
-        table->entries[i].next_hop = NULL;
-    }
+    memset(table->entries, 0, (table->size * sizeof(fib_entry_t)));
 
     universal_address_reset();
     mutex_unlock(&mtx_access);
