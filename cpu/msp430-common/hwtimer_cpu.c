@@ -51,10 +51,18 @@ static volatile unsigned int *get_control_reg_for_msp430_timer(int index)
 #ifndef CC430
     switch (msp430_timer[index].base_timer) {
     case TIMER_A:
-        ptr = &TACCTL0;
+    #ifdef __MSP430F5437__
+       ptr = &TA0CCTL0;
+    #else
+       ptr = &TACCTL0;
+    #endif
         break;
     case TIMER_B:
+    #ifdef __MSP430F5437__
+        ptr = &TB0CCTL0;
+    #else
         ptr = &TBCCTL0;
+    #endif
         break;
     default:
         core_panic(0x0, "Wrong timer kind for MSP430");
@@ -72,10 +80,18 @@ static volatile unsigned int *get_comparator_reg_for_msp430_timer(int index)
 #ifndef CC430
     switch (msp430_timer[index].base_timer) {
     case TIMER_A:
+    #ifdef __MSP430F5437__
+        ptr = &TA0CCR0;
+    #else
         ptr = &TACCR0;
+    #endif
         break;
     case TIMER_B:
+    #ifdef __MSP430F5437__
+        ptr = &TB0CCR0;
+    #else
         ptr = &TBCCR0;
+    #endif
         break;
     default:
         core_panic(0x0, "Wrong timer kind for MSP430");

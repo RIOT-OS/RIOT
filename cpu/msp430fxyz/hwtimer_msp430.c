@@ -37,6 +37,7 @@ msp430_timer_t msp430_timer[HWTIMER_MAXTIMERS];
 
 void timerA_init(void)
 {
+    #ifndef __MSP430F5437__
     TACTL = TASSEL_1 + TACLR;                /* Clear the timer counter, set ACLK */
     TACTL &= ~(TAIFG);                       /* Clear the IFG */
     TACTL &= ~(TAIE);                        /* Disable TAIE (overflow IRQ) */
@@ -55,6 +56,11 @@ void timerA_init(void)
     }
 
     TACTL |= MC_2;
+    #else
+      TA1CTL = TASSEL0 | TACLR;
+      TA1CCTL1 = CCIE;
+      TA1CTL |= MC1;
+    #endif
 }
 
 void timerB_init(void)
@@ -80,6 +86,8 @@ void timerB_init(void)
     TBCTL |= MC_2;
 }
 
+
+#ifndef __MSP430F5437__
 interrupt(TIMERA0_VECTOR) __attribute__((naked)) timerA_isr_ccr0(void)
 {
     __enter_isr();
@@ -125,3 +133,4 @@ interrupt(TIMERB1_VECTOR) __attribute__((naked)) timerB_isr(void)
 
     __exit_isr();
 }
+#endif
