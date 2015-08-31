@@ -56,6 +56,11 @@ endif
 ifneq (,$(filter gnrc_rpl,$(USEMODULE)))
     SRC += sc_gnrc_rpl.c
 endif
+ifneq (,$(filter gnrc_sixlowpan_ctx,$(USEMODULE)))
+ifneq (,$(filter gnrc_sixlowpan_nd_border_router,$(USEMODULE)))
+    SRC += sc_gnrc_6ctx.c
+endif
+endif
 
 # TODO
 # Conditional building not possible at the moment due to

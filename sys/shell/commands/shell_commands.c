@@ -120,6 +120,12 @@ extern int _zep_init(int argc, char **argv);
 extern int _gnrc_rpl(int argc, char **argv);
 #endif
 
+#ifdef MODULE_GNRC_SIXLOWPAN_CTX
+#ifdef MODULE_GNRC_SIXLOWPAN_ND_BORDER_ROUTER
+extern int _gnrc_6ctx(int argc, char **argv);
+#endif
+#endif
+
 const shell_command_t _shell_command_list[] = {
     {"reboot", "Reboot the node", _reboot_handler},
 #ifdef MODULE_CONFIG
@@ -197,6 +203,11 @@ const shell_command_t _shell_command_list[] = {
 #endif
 #ifdef MODULE_GNRC_RPL
     {"rpl", "rpl configuration tool [help|init|rm|root|show]", _gnrc_rpl },
+#endif
+#ifdef MODULE_GNRC_SIXLOWPAN_CTX
+#ifdef MODULE_GNRC_SIXLOWPAN_ND_BORDER_ROUTER
+    {"6ctx", "6LoWPAN context configuration tool", _gnrc_6ctx },
+#endif
 #endif
     {NULL, NULL, NULL}
 };
