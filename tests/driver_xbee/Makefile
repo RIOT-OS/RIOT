@@ -3,7 +3,7 @@ include ../Makefile.tests_common
 
 FEATURES_REQUIRED = periph_uart periph_gpio
 
-BOARD_INSUFFICIENT_RAM := stm32f0discovery
+BOARD_INSUFFICIENT_MEMORY := stm32f0discovery
 
 # Define default pin mappings for some boards:
 ifneq (,$(filter stm32f0discovery,$(BOARD)))
