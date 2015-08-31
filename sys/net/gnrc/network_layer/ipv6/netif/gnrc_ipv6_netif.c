@@ -763,6 +763,10 @@ void gnrc_ipv6_netif_init_by_dev(void)
         }
 
         mutex_unlock(&ipv6_if->mutex);
+#ifdef MODULE_GNRC_NDP_HOST
+        /* start periodic router solicitations */
+        gnrc_ndp_host_init(ipv6_if);
+#endif
     }
 }
 

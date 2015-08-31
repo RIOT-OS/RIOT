@@ -92,9 +92,11 @@ void gnrc_icmpv6_demux(kernel_pid_t iface, gnrc_pktsnip_t *pkt)
             /* TODO */
             break;
 
+#ifdef MODULE_GNRC_NDP
         case ICMPV6_RTR_ADV:
             DEBUG("icmpv6: router advertisement received\n");
-            /* TODO */
+            gnrc_ndp_rtr_adv_handle(iface, pkt, ipv6->data, (ndp_rtr_adv_t *)hdr,
+                                    icmpv6->size);
             break;
 
         case ICMPV6_NBR_SOL:
@@ -108,6 +110,7 @@ void gnrc_icmpv6_demux(kernel_pid_t iface, gnrc_pktsnip_t *pkt)
             gnrc_ndp_nbr_adv_handle(iface, pkt, ipv6->data, (ndp_nbr_adv_t *)hdr,
                                     icmpv6->size);
             break;
+#endif
 
         case ICMPV6_REDIRECT:
             DEBUG("icmpv6: redirect message received\n");
