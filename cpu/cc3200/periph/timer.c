@@ -45,11 +45,13 @@ void signal_error(const char* err);
 
 #define CALIBRATION 111
 
+#define TIMER_SW_CHANNELS
+
 // ticks calibration for time elapsed between TAR read and TIMER_MATCH value written to register
 #define ELAPSED_TICKS 20
 
-#define TIM2_CHANNELS 6
-#define TIM3_CHANNELS 32
+#define TIM2_CHANNELS 4
+#define TIM3_CHANNELS 4
 
 /** Type for timer state */
 typedef struct {
@@ -106,23 +108,19 @@ void irq_timer2_handler(void) {
 
 	timer_queue_item *active = busyq2;
 
-	//config[TIMER_2].cb(active->channel);
 	int ch = active->channel;
 
 	busyq2 = active->next;
 	active->next = freeq2;
 	freeq2 = active;
 
-	config[TIMER_2].cb(ch);
-
 	timer_clear(TIMER_2, 0);
+	config[TIMER_2].cb(ch);
 
 	sts = HWREG(TIMERA2_BASE + TIMER_O_TAR);
 
 	while (busyq2 && sts > (busyq2->value - ELAPSED_TICKS)) {
 		ch = busyq2->channel;
-		//config[TIMER_2].cb(busyq2->channel);
-
 		active = busyq2;
 		busyq2 = active->next;
 		active->next = freeq2;
@@ -161,23 +159,19 @@ void irq_timer3_handler(void) {
 
 	timer_queue_item *active = busyq3;
 
-	//config[TIMER_3].cb(active->channel);
 	int ch = active->channel;
 
 	busyq3 = active->next;
 	active->next = freeq3;
 	freeq3 = active;
 
-	config[TIMER_3].cb(ch);
-
 	timer_clear(TIMER_3, 0);
+	config[TIMER_3].cb(ch);
 
 	sts = HWREG(TIMERA3_BASE + TIMER_O_TAR);
 
 	while (busyq3 && sts > (busyq3->value - ELAPSED_TICKS)) {
-		//config[TIMER_3].cb(busyq3->channel);
 		ch = busyq3->channel;
-
 		active = busyq3;
 		busyq3 = active->next;
 		active->next = freeq3;
@@ -342,6 +336,10 @@ int set_absolute(tim_t dev, int channel, unsigned long long value) {
 		break;
 	case TIMER_2:
 #ifdef TIMER_SW_CHANNELS
+
+		// critical section, disable interrupt
+		MAP_TimerIntDisable(TIMERA2_BASE, TIMER_TIMA_MATCH);
+
 		if (freeq2 == NULL) {
 			// no free timer left
 			core_panic(SW_TIMERS_EXAUSTED, "TIM2: timer no space left");
@@ -388,6 +386,10 @@ int set_absolute(tim_t dev, int channel, unsigned long long value) {
 			busyq2->value = abstimeout;
 
 		}
+		// end of critical section, enable interrupt
+		MAP_TimerIntEnable(TIMERA2_BASE, TIMER_TIMA_MATCH);
+
+
 #else
 		MAP_TimerMatchSet(TIMERA2_BASE, TIMER_A, value);
 		HWREG(TIMERA2_BASE + TIMER_O_IMR) |= TIMER_TIMA_MATCH; // enable the match timer
@@ -395,6 +397,9 @@ int set_absolute(tim_t dev, int channel, unsigned long long value) {
 		break;
 	case TIMER_3:
 #ifdef TIMER_SW_CHANNELS
+		// critical section, disable interrupt
+		MAP_TimerIntDisable(TIMERA3_BASE, TIMER_TIMA_MATCH);
+
 		if (freeq3 == NULL) {
 			// no free timer left
 			core_panic(SW_TIMERS_EXAUSTED, "TIM3: timer no space left");
@@ -440,6 +445,9 @@ int set_absolute(tim_t dev, int channel, unsigned long long value) {
 			busyq3->channel = channel;
 			busyq3->value = abstimeout;
 		}
+		// end of critical section, enable interrupt
+		MAP_TimerIntEnable(TIMERA3_BASE, TIMER_TIMA_MATCH);
+
 #else
 		MAP_TimerMatchSet(TIMERA3_BASE, TIMER_A, value);
 		HWREG(TIMERA3_BASE + TIMER_O_IMR) |= TIMER_TIMA_MATCH; // enable the match timer

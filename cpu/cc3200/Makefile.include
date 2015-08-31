@@ -7,7 +7,7 @@ DEFAULT_MODULE += driverlib
 
 # include $(RIOTCPU)/Makefile.include.cortexm_common
 # This CPU implementation is using the new core/CPU interface:
-export CFLAGS += -Dgcc -DCOREIF_NG=1
+export CFLAGS += -Dgcc -DCOREIF_NG=1 -DPART_CC3200 -march=armv7e-m
 
 # Tell the build system that the CPU depends on the Cortex-M common files:
 # export USEMODULE += cortexm_common
