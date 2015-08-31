@@ -573,10 +573,23 @@ static void _send(gnrc_pktsnip_t *pkt, bool prep_hdr)
         gnrc_netapi_receive(gnrc_ipv6_pid, rcv_pkt);
     }
     else {
+        /* forwarding packet */
+        ipv6_addr_t next_hop_ip;
+        /* determining next hop's IP address */
+        if (ipv6_addr_is_link_local(&(hdr->dst))) {
+            memcpy(&next_hop_ip, &(hdr->dst), sizeof(ipv6_addr_t));
+        }
+        else if (!gnrc_ndp_node_next_hop_ipv6_addr(&next_hop_ip, &iface,
+                  &(hdr->dst))) {
+            DEBUG("ipv6: error determining next hop's IPv6 address\n");
+            return;
+        }
+
+        /* determining next hop's layer 2 address */
         uint8_t l2addr_len = GNRC_IPV6_NC_L2_ADDR_MAX;
         uint8_t l2addr[l2addr_len];
 
-        iface = _next_hop_l2addr(l2addr, &l2addr_len, iface, &hdr->dst, pkt);
+        iface = _next_hop_l2addr(l2addr, &l2addr_len, iface, &next_hop_ip, pkt);
 
         if (iface == KERNEL_PID_UNDEF) {
             DEBUG("ipv6: error determining next hop's link layer address\n");

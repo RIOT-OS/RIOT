@@ -270,6 +270,10 @@ static void _netif_list(kernel_pid_t dev)
             printf("6LO  ");
         }
         linebreak = true;
+
+        printf("Link type: %s  ", (entry->flags & GNRC_IPV6_NETIF_FLAGS_IS_WIRED) ?
+                "wired" : "wireless");
+        linebreak= true;
     }
 #endif
 
