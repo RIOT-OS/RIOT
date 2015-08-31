@@ -22,6 +22,7 @@
 #ifndef GNRC_NDP_INTERNAL_H_
 #define GNRC_NDP_INTERNAL_H_
 
+#include "kernel_types.h"
 #include "net/ipv6/addr.h"
 #include "net/ipv6/hdr.h"
 #include "net/ndp.h"
@@ -89,6 +90,16 @@ void gnrc_ndp_internal_send_nbr_adv(kernel_pid_t iface, ipv6_addr_t *tgt, ipv6_a
                                     bool supply_tl2a, gnrc_pktsnip_t *ext_opts);
 
 /**
+ * @brief   Send precompiled router solicitation to @p dst.
+ *
+ * @internal
+ *
+ * @param[in] iface Interface to send over. May not be KERNEL_PID_UNDEF.
+ * @param[in] dst   Destination for the router solicitation. ff02::2 if NULL.
+ */
+void gnrc_ndp_internal_send_rtr_sol(kernel_pid_t iface, ipv6_addr_t *dst);
+
+/**
  * @brief   Handles a SL2A option.
  *
  * @param[in] pkt           Packet the option was received in.
@@ -120,6 +131,36 @@ int gnrc_ndp_internal_sl2a_opt_handle(gnrc_pktsnip_t *pkt, ipv6_hdr_t *ipv6, uin
 int gnrc_ndp_internal_tl2a_opt_handle(gnrc_pktsnip_t *pkt, ipv6_hdr_t *ipv6,
                                       uint8_t icmpv6_type, ndp_opt_t *tl2a_opt,
                                       uint8_t *l2addr);
+
+/**
+ * @brief   Handles a MTU option.
+ *
+ * @internal
+ *
+ * @param[in] iface         Interface the MTU option was received on.
+ * @param[in] icmpv6_type   ICMPv6 type of the message carrying the option.
+ * @param[in] mtu_opt       A MTU option.
+ *
+ * @return  true, on success (or if the node should silently ignore the option).
+ * @return  false, if MTU option was not valid.
+ */
+bool gnrc_ndp_internal_mtu_opt_handle(kernel_pid_t iface, uint8_t icmpv6_type,
+                                      ndp_opt_mtu_t *mtu_opt);
+
+/**
+ * @brief   Handles a PI option.
+ *
+ * @internal
+ *
+ * @param[in] iface         Interface the PI option was received on.
+ * @param[in] icmpv6_type   ICMPv6 type of the message carrying the option.
+ * @param[in] pi_opt        A PI option.
+ *
+ * @return  true, on success (or if the node should silently ignore the option).
+ * @return  false, if PIO was not valid.
+ */
+bool gnrc_ndp_internal_pi_opt_handle(kernel_pid_t iface, uint8_t icmpv6_type,
+                                     ndp_opt_pi_t *pi_opt);
 
 #ifdef __cplusplus
 }
