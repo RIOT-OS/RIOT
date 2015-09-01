@@ -139,6 +139,9 @@ typedef enum {
     NETOPT_TX_END_IRQ,
     NETOPT_AUTOCCA,             /**< en/disable to check automatically
                                  *   before sending the channel is clear. */
+
+    NETOPT_BLE_ACCESS_ADDRESS,     /**< get/set BLE access address */
+    NETOPT_BLE_ADV_ADDRESS,        /**< get/set BLE advertising address */
     /* add more options if needed */
 
     /**

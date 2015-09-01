@@ -34,6 +34,7 @@
 #include "net/gnrc/pktbuf.h"
 #include "net/gnrc/netif/hdr.h"
 #include "net/gnrc/sixlowpan/netif.h"
+#include "net/ble_ll.h"
 
 /**
  * @brief   The maximal expected link layer address length in byte
@@ -76,14 +77,21 @@ static void _set_usage(char *cmd_name)
     printf("usage: %s <if_id> set <key> <value>\n", cmd_name);
     puts("      Sets an hardware specific specific value\n"
          "      <key> may be one of the following\n"
+#ifdef MODULE_BLE_LL
+         "       * \"access_addr\" - sets the BLE access address\n"
+         "       * \"adv_addr\" - sets the BLE advertising address\n"
+#else
          "       * \"addr\" - sets (short) address\n"
          "       * \"addr_long\" - sets long address\n"
          "       * \"addr_short\" - alias for \"addr\"\n"
+#endif
          "       * \"channel\" - sets the frequency channel\n"
-         "       * \"chan\" - alias for \"channel\""
+         "       * \"chan\" - alias for \"channel\"\n"
+#ifndef MODULE_BLE_LL
          "       * \"nid\" - sets the network identifier (or the PAN ID)\n"
          "       * \"pan\" - alias for \"nid\"\n"
          "       * \"pan_id\" - alias for \"nid\"\n"
+#endif
          "       * \"power\" - TX power in dBm\n"
          "       * \"src_len\" - sets the source address length in byte\n"
          "       * \"state\" - set the device state\n");
@@ -124,6 +132,14 @@ static void _print_netopt(netopt_t opt)
 
         case NETOPT_SRC_LEN:
             printf("source address length");
+            break;
+
+         case NETOPT_BLE_ACCESS_ADDRESS:
+            printf("BLE access address");
+            break;
+
+        case NETOPT_BLE_ADV_ADDRESS:
+            printf("BLE advertising address");
             break;
 
         case NETOPT_CHANNEL:
@@ -174,6 +190,10 @@ static void _print_netopt_state(netopt_state_t state)
 static void _netif_list(kernel_pid_t dev)
 {
     uint8_t hwaddr[MAX_ADDR_LEN];
+#ifdef MODULE_BLE_LL
+    uint8_t advaddr[BLE_ADV_ADDR_LEN];
+    uint8_t accessaddr[BLE_ACCESS_ADDR_LEN];
+#endif
     uint16_t u16;
     int16_t i16;
     int res;
@@ -185,9 +205,35 @@ static void _netif_list(kernel_pid_t dev)
     char ipv6_addr[IPV6_ADDR_MAX_STR_LEN];
 #endif
 
-
     printf("Iface %2d  ", dev);
 
+#ifdef MODULE_BLE_LL
+    res = gnrc_netapi_get(dev, NETOPT_BLE_ACCESS_ADDRESS, 0, accessaddr, sizeof(accessaddr));
+
+    if (res >= 0) {
+        char accessaddr_str[res * 3];
+        printf(" Access addr: ");
+        printf("%s", gnrc_netif_addr_to_str(accessaddr_str, sizeof(accessaddr_str),
+                                          accessaddr, res));
+        printf(" ");
+    }
+
+    res = gnrc_netapi_get(dev, NETOPT_BLE_ADV_ADDRESS, 0, advaddr, sizeof(advaddr));
+
+    if (res >= 0) {
+        char advaddr_str[res * 3];
+        printf(" Advr addr: ");
+        printf("%s", gnrc_netif_addr_to_str(advaddr_str, sizeof(advaddr_str),
+                                          advaddr, res));
+        printf(" ");
+    }
+
+    res = gnrc_netapi_get(dev, NETOPT_CHANNEL, 0, &u16, sizeof(u16));
+
+    if (res >= 0) {
+        printf(" Chan: %" PRIu16 " ", u16);
+    }
+#else
     res = gnrc_netapi_get(dev, NETOPT_ADDRESS, 0, hwaddr, sizeof(hwaddr));
 
     if (res >= 0) {
@@ -209,6 +255,7 @@ static void _netif_list(kernel_pid_t dev)
     if (res >= 0) {
         printf(" NID: 0x%" PRIx16 " ", u16);
     }
+#endif
 
     res = gnrc_netapi_get(dev, NETOPT_TX_POWER, 0, &i16, sizeof(i16));
 
@@ -429,7 +476,18 @@ static int _netif_set_addr(kernel_pid_t dev, netopt_t opt, char *addr_str)
 
     printf("success: set ");
     _print_netopt(opt);
+
+#ifdef MODULE_BLE_LL
+    printf(" on interface %" PRIkernel_pid " to ", dev);
+    if (addr_len == BLE_ACCESS_ADDR_LEN) {
+       printf("%02x:%02x:%02x:%02x\n", addr[0], addr[1], addr[2], addr[3]);
+    }
+    else if (addr_len == BLE_ADV_ADDR_LEN) {
+       printf("%02x:%02x:%02x:%02x:%02x:%02x\n", addr[0], addr[1], addr[2], addr[3], addr[4], addr[5]);
+    }
+#else
     printf(" on interface %" PRIkernel_pid " to %s\n", dev, addr_str);
+#endif
 
     return 0;
 }
@@ -478,6 +536,14 @@ static int _netif_set(char *cmd_name, kernel_pid_t dev, char *key, char *value)
     else if (strcmp("addr_long", key) == 0) {
         return _netif_set_addr(dev, NETOPT_ADDRESS_LONG, value);
     }
+#ifdef MODULE_BLE_LL
+    else if (strcmp("access_addr", key) == 0) {
+        return _netif_set_addr(dev, NETOPT_BLE_ACCESS_ADDRESS, value);
+    }
+    else if (strcmp("adv_addr", key) == 0) {
+        return _netif_set_addr(dev, NETOPT_BLE_ADV_ADDRESS, value);
+    }
+#endif
     else if ((strcmp("channel", key) == 0) || (strcmp("chan", key) == 0)) {
         return _netif_set_u16(dev, NETOPT_CHANNEL, value);
     }
@@ -767,6 +833,77 @@ int _netif_send(int argc, char **argv)
 
     return 0;
 }
+
+
+#ifdef MODULE_BLE_LL
+/* BLE shell commands */
+void _netif_send_ble(int argc, char **argv)
+{
+    kernel_pid_t dev;
+    ble_adv_hdr_t *pdu_hdr;
+    uint8_t pkt_type;
+    uint8_t payload_len = 0;
+
+    uint8_t payload[BLE_ADV_PAYLOAD_LEN_MAX];
+    gnrc_pktsnip_t *pkt = NULL;
+
+    /* parse arguments */
+    if(argc < 3) {
+       printf("usage: %s <if> <type>\n", argv[0]);
+       return;
+    }
+
+    /* parse interface */
+    dev = (kernel_pid_t)atoi(argv[1]);
+
+    if (!_is_iface(dev)) {
+        puts("error: invalid interface given");
+        return;
+    }
+
+    /* parse packet type */
+    pkt_type = atoi(argv[2]);
+
+    if (pkt_type == CONNECT_REQ_TYPE) {
+        puts("error: CONNECT_REQ type is not supported yet");
+        return;
+    }
+
+    /* put packet together */
+    if (argc > 3) {
+        bzero(&payload, BLE_ADV_PAYLOAD_LEN_MAX);
+        payload_len = gnrc_netif_addr_from_str(payload, sizeof(payload), argv[3]);
+
+        if (pkt_type == ADV_DIRECT_IND_TYPE || pkt_type == SCAN_REQ_TYPE) {
+            if (payload_len == 0) {
+                puts("error: invalid address argument length");
+                return;
+            }
+        }
+        pkt = gnrc_pktbuf_add(NULL, payload, payload_len, GNRC_NETTYPE_UNDEF);
+        pkt = gnrc_pktbuf_add(pkt, NULL, BLE_ADV_HDR_LEN, GNRC_NETTYPE_UNDEF);
+    }
+    else {
+        if (pkt_type == ADV_DIRECT_IND_TYPE || pkt_type == SCAN_REQ_TYPE) {
+            printf("usage: %s <if> <type> [<init_addr> | <scan_addr]\n", argv[0]);
+            return;
+        }
+        pkt = gnrc_pktbuf_add(pkt, NULL, BLE_ADV_HDR_LEN, GNRC_NETTYPE_UNDEF);
+    }
+
+    /* set BLE pdu header */
+    pdu_hdr = (ble_adv_hdr_t *)pkt->data;
+    bzero((void *)pdu_hdr, BLE_ADV_HDR_LEN);
+
+    pdu_hdr->pdu_type = pkt_type;
+    pdu_hdr->tx_add = 1;
+    pdu_hdr->length = (BLE_ADV_ADDR_LEN + payload_len);
+
+    /* and send it */
+    gnrc_netapi_send(dev, pkt);
+}
+
+#endif
 
 int _netif_config(int argc, char **argv)
 {

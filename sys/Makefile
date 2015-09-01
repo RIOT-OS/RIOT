@@ -58,6 +58,9 @@ endif
 ifneq (,$(filter udp,$(USEMODULE)))
     DIRS += net/transport_layer/udp
 endif
+ifneq (,$(filter ble_ll,$(USEMODULE)))
+    DIRS += net/link_layer/ble_ll
+endif
 
 ifneq (,$(filter netopt,$(USEMODULE)))
     DIRS += net/crosslayer/netopt

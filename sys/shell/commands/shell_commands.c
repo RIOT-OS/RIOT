@@ -100,6 +100,9 @@ extern int _mersenne_get(int argc, char **argv);
 extern int _netif_config(int argc, char **argv);
 extern int _netif_send(int argc, char **argv);
 #endif
+#ifdef MODULE_BLE_LL
+extern int _netif_send_ble(int argc, char **argv);
+#endif
 
 #ifdef MODULE_FIB
 extern int _fib_route_handler(int argc, char **argv);
@@ -182,6 +185,9 @@ const shell_command_t _shell_command_list[] = {
 #ifdef MODULE_GNRC_NETIF
     {"ifconfig", "Configure network interfaces", _netif_config},
     {"txtsnd", "send raw data", _netif_send },
+#endif
+#ifdef MODULE_BLE_LL
+    {"blesnd", "send BLE packets", _netif_send_ble },
 #endif
 #ifdef MODULE_FIB
     {"fibroute", "Manipulate the FIB (info: 'fibroute [add|del]')", _fib_route_handler},
