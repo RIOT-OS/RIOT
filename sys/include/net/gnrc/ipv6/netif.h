@@ -146,7 +146,7 @@ extern "C" {
 /**
  * @brief   Flag to indicate if the interface is operating over a wired link
  */
-#define GNRC_IPV6_NETIF_FLAGS_IS_WIRED          (0x2000)
+#define GNRC_IPV6_NETIF_FLAGS_IS_WIRED          (0x0080)
 
 /**
  * @brief   Flag to indicate that the interface has other address
