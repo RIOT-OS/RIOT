@@ -273,6 +273,10 @@ static int _get(gnrc_netdev_t *dev, netopt_t opt, void *value, size_t max_len)
             DEBUG("promiscous mode\n");
             return _get_promiscousmode((gnrc_netdev_eth_t *)dev, value, max_len);
 
+        case NETOPT_IS_WIRED:
+            DEBUG("is wired\n");
+            return 1;
+
         default:
             DEBUG("[not supported: %d]\n", opt);
             return -ENOTSUP;
