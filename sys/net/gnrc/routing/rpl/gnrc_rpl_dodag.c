@@ -264,12 +264,11 @@ bool gnrc_rpl_parent_add_by_addr(gnrc_rpl_dodag_t *dodag, ipv6_addr_t *addr, gnr
                 DEBUG("RPL: no interface found for the parent addres\n");
                 return false;
             }
-            if (fib_add_entry(gnrc_ipv6_fib_table, if_id, def.u8,
+            if (fib_add_entry(&gnrc_ipv6_fib_table, if_id, def.u8,
                               sizeof(ipv6_addr_t), AF_INET6,
                               dodag->parents->addr.u8, sizeof(ipv6_addr_t),
-                              AF_INET6,
-                              (dodag->default_lifetime * dodag->lifetime_unit) *
-                               SEC_IN_MS) != 0) {
+                              AF_INET6, (dodag->default_lifetime *
+                                         dodag->lifetime_unit) * SEC_IN_MS) != 0) {
                 DEBUG("RPL: error adding parent to FIB\n");
                 gnrc_rpl_parent_remove(*parent);
                 return false;
@@ -304,7 +303,7 @@ bool gnrc_rpl_parent_remove(gnrc_rpl_parent_t *parent)
 {
     if (parent == parent->dodag->parents) {
         ipv6_addr_t def = { .u64 = {{0}, {0}} };
-        fib_remove_entry(gnrc_ipv6_fib_table, def.u8, sizeof(ipv6_addr_t));
+        fib_remove_entry(&gnrc_ipv6_fib_table, def.u8, sizeof(ipv6_addr_t));
     }
     gnrc_rpl_dodag_t *dodag = parent->dodag;
     LL_DELETE(dodag->parents, parent);
@@ -321,7 +320,7 @@ void gnrc_rpl_local_repair(gnrc_rpl_dodag_t *dodag)
     if (dodag->parents) {
         gnrc_rpl_dodag_remove_all_parents(dodag);
         ipv6_addr_t def = IPV6_ADDR_UNSPECIFIED;
-        fib_remove_entry(gnrc_ipv6_fib_table, def.u8, sizeof(ipv6_addr_t));
+        fib_remove_entry(&gnrc_ipv6_fib_table, def.u8, sizeof(ipv6_addr_t));
     }
 
     if (dodag->my_rank != GNRC_RPL_INFINITE_RANK) {
@@ -349,9 +348,11 @@ void gnrc_rpl_parent_update(gnrc_rpl_dodag_t *dodag, gnrc_rpl_parent_t *parent)
             ipv6_addr_t all_RPL_nodes = GNRC_RPL_ALL_NODES_ADDR;
             kernel_pid_t if_id;
             if ((if_id = gnrc_ipv6_netif_find_by_addr(NULL, &all_RPL_nodes)) != KERNEL_PID_UNDEF) {
-                fib_add_entry(gnrc_ipv6_fib_table, if_id, def.u8, sizeof(ipv6_addr_t), AF_INET6,
-                        dodag->parents->addr.u8, sizeof(ipv6_addr_t), AF_INET6,
-                        (dodag->default_lifetime * dodag->lifetime_unit) * SEC_IN_MS);
+                fib_add_entry(&gnrc_ipv6_fib_table, if_id, def.u8,
+                              sizeof(ipv6_addr_t), AF_INET6,
+                              dodag->parents->addr.u8, sizeof(ipv6_addr_t),
+                              AF_INET6, (dodag->default_lifetime *
+                                         dodag->lifetime_unit) * SEC_IN_MS);
             }
         }
     }
@@ -404,7 +405,7 @@ static gnrc_rpl_parent_t *_gnrc_rpl_find_preferred_parent(gnrc_rpl_dodag_t *doda
         }
         trickle_reset_timer(&dodag->trickle);
 
-        fib_remove_entry(gnrc_ipv6_fib_table, def.u8, sizeof(ipv6_addr_t));
+        fib_remove_entry(&gnrc_ipv6_fib_table, def.u8, sizeof(ipv6_addr_t));
         ipv6_addr_t all_RPL_nodes = GNRC_RPL_ALL_NODES_ADDR;
 
         kernel_pid_t if_id = gnrc_ipv6_netif_find_by_addr(NULL, &all_RPL_nodes);
@@ -414,10 +415,10 @@ static gnrc_rpl_parent_t *_gnrc_rpl_find_preferred_parent(gnrc_rpl_dodag_t *doda
             return NULL;
         }
 
-        fib_add_entry(gnrc_ipv6_fib_table, if_id, def.u8, sizeof(ipv6_addr_t),
-                AF_INET6, dodag->parents->addr.u8, sizeof(ipv6_addr_t),
-                AF_INET6,
-                (dodag->default_lifetime * dodag->lifetime_unit) * SEC_IN_MS);
+        fib_add_entry(&gnrc_ipv6_fib_table, if_id, def.u8, sizeof(ipv6_addr_t),
+                      AF_INET6, dodag->parents->addr.u8, sizeof(ipv6_addr_t),
+                      AF_INET6, (dodag->default_lifetime *
+                                 dodag->lifetime_unit) * SEC_IN_MS);
     }
 
     return dodag->parents;

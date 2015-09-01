@@ -17,6 +17,7 @@
  * @brief       Types and functions for FIB
  *
  * @author      Martin Landsmann <martin.landsmann@haw-hamburg.de>
+ * @author      Oliver Hahm <oliver.hahm@inria.fr>
  */
 
 #ifndef FIB_H_
@@ -28,15 +29,6 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
-
-#ifndef FIB_MAX_FIB_TABLE_ENTRIES
-/**
- * @brief maximum number of FIB tables entries handled
- *
- * Might be overwritten by other modules or the application.
- */
-#define FIB_MAX_FIB_TABLE_ENTRIES (20)
 #endif
 
 /**
@@ -72,16 +64,18 @@ typedef struct fib_destination_set_entry_t {
 /**
  * @brief initializes all FIB entries with 0
  *
- * @param[in] table     the fib instance to initialize
+ * @param[in] table         the fib instance to initialize
+ *
+ * @pre @p table is not NULL and points to a pre-filled struct
  */
-void fib_init(fib_entry_t table[]);
+void fib_init(fib_table_t *table);
 
 /**
  * @brief de-initializes the FIB entries
  *
- * @param[in] table     the fib instance to de-initialize
+ * @param[in] table         the fib instance to de-initialize
  */
-void fib_deinit(fib_entry_t table[]);
+void fib_deinit(fib_table_t *table);
 
 /**
  * @brief Registration of a routing protocol handler function
@@ -113,7 +107,7 @@ int fib_register_rp(uint8_t *prefix, size_t prefix_addr_type_size);
  *         -ENOMEM if the entry cannot be created due to insufficient RAM
  *         -EFAULT if dst and/or next_hop is not a valid pointer
  */
-int fib_add_entry(fib_entry_t table[], kernel_pid_t iface_id, uint8_t *dst,
+int fib_add_entry(fib_table_t *table, kernel_pid_t iface_id, uint8_t *dst,
                   size_t dst_size, uint32_t dst_flags, uint8_t *next_hop,
                   size_t next_hop_size, uint32_t next_hop_flags,
                   uint32_t lifetime);
@@ -133,18 +127,18 @@ int fib_add_entry(fib_entry_t table[], kernel_pid_t iface_id, uint8_t *dst,
  *         -ENOMEM if the entry cannot be updated due to insufficient RAM
  *         -EFAULT if dst and/or next_hop is not a valid pointer
  */
-int fib_update_entry(fib_entry_t table[], uint8_t *dst, size_t dst_size,
-                     uint8_t *next_hop, size_t next_hop_size, uint32_t next_hop_flags,
-                     uint32_t lifetime);
+int fib_update_entry(fib_table_t *table, uint8_t *dst, size_t dst_size,
+                     uint8_t *next_hop, size_t next_hop_size,
+                     uint32_t next_hop_flags, uint32_t lifetime);
 
 /**
  * @brief removes an entry from the corresponding FIB table
  *
- * @param[in] table     the fib table containing the entry to remove
- * @param[in] dst       the destination address
- * @param[in] dst_size  the destination address size
+ * @param[in] table         the fib table containing the entry to remove
+ * @param[in] dst           the destination address
+ * @param[in] dst_size      the destination address size
  */
-void fib_remove_entry(fib_entry_t table[], uint8_t *dst, size_t dst_size);
+void fib_remove_entry(fib_table_t *table, uint8_t *dst, size_t dst_size);
 
 /**
  * @brief provides a next hop for a given destination
@@ -166,9 +160,10 @@ void fib_remove_entry(fib_entry_t table[], uint8_t *dst, size_t dst_size);
  *         -EFAULT if dst and/or next_hop is not a valid pointer
  *         -EINVAL if one of the other passed out pointers is NULL
  */
-int fib_get_next_hop(fib_entry_t table[], kernel_pid_t *iface_id,
-                     uint8_t *next_hop, size_t *next_hop_size, uint32_t* next_hop_flags,
-                     uint8_t *dst, size_t dst_size, uint32_t dst_flags);
+int fib_get_next_hop(fib_table_t *table, kernel_pid_t *iface_id,
+                     uint8_t *next_hop, size_t *next_hop_size,
+                     uint32_t* next_hop_flags, uint8_t *dst, size_t dst_size,
+                     uint32_t dst_flags);
 
 /**
 * @brief provides a set of destination addresses matching the given prefix
@@ -189,16 +184,17 @@ int fib_get_next_hop(fib_entry_t table[], kernel_pid_t *iface_id,
 *                  The actual needed size is stored then in dst_set_size,
 *                  however the required size may change in between calls.
 */
-int fib_get_destination_set(fib_entry_t table[], uint8_t *prefix, size_t prefix_size,
-                            fib_destination_set_entry_t *dst_set, size_t* dst_set_size);
-
+int fib_get_destination_set(fib_table_t *table, uint8_t *prefix,
+                            size_t prefix_size,
+                            fib_destination_set_entry_t *dst_set,
+                            size_t *dst_set_size);
 
 /**
  * @brief returns the actual number of used FIB entries
  *
- * @param[in] table     the fib instance to check
+ * @param[in] table         the fib instance to check
  */
-int fib_get_num_used_entries(fib_entry_t table[]);
+int fib_get_num_used_entries(fib_table_t *table);
 
 /**
  * @brief Prints the kernel_pid_t for all registered RRPs
@@ -208,22 +204,22 @@ void fib_print_notify_rrp(void);
 /**
  * @brief Prints the FIB content (does not print the entries)
  *
- * @param[in] table     the fib instance to print
+ * @param[in] table         the fib instance to print
  */
-void fib_print_fib_table(fib_entry_t table[]);
+void fib_print_fib_table(fib_table_t *table);
 
 /**
  * @brief Prints the FIB content
  *
- * @param[in] table     the fib instance to print
+ * @param[in] table         the fib instance to print
  */
-void fib_print_routes(fib_entry_t table[]);
+void fib_print_routes(fib_table_t *table);
 
 #if FIB_DEVEL_HELPER
 /**
  * @brief get the point in time at which the entry for destination dst expires.
  *
- * @param[in] table     the fib instance to check
+ * @param[in]  table     the fib instance to check
  * @param[out] lifetime  pointer where the expiration time is written on success
  * @param[in]  dst       the destination address
  * @param[in]  dst_size  the destination address size
@@ -231,7 +227,9 @@ void fib_print_routes(fib_entry_t table[]);
  * @return 0             on success: entry for dst found and lifetime copied
  *         -EHOSTUNREACH if no fitting entry is available
  */
-int fib_devel_get_lifetime(fib_entry_t table[], timex_t *lifetime, uint8_t *dst, size_t dst_size);
+int fib_devel_get_lifetime(fib_table_t *table, timex_t *lifetime, uint8_t *dst,
+                           size_t dst_size);
+
 #endif
 
 #ifdef __cplusplus

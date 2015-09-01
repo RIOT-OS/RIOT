@@ -105,14 +105,15 @@ static void _fib_add(const char *dest, const char *next, kernel_pid_t pid, uint3
         nxt_flags = AF_INET;
     }
 
-    fib_add_entry(gnrc_ipv6_fib_table, pid, dst, dst_size, dst_flags, nxt, nxt_size, nxt_flags, lifetime);
+    fib_add_entry(&gnrc_ipv6_fib_table, pid, dst, dst_size, dst_flags, nxt,
+                  nxt_size, nxt_flags, lifetime);
 }
 
 int _fib_route_handler(int argc, char **argv)
 {
     /* e.g. fibroute right now dont care about the adress/protocol family */
     if (argc == 1) {
-        fib_print_routes(gnrc_ipv6_fib_table);
+        fib_print_routes(&gnrc_ipv6_fib_table);
         return 0;
     }
 
@@ -139,13 +140,14 @@ int _fib_route_handler(int argc, char **argv)
     /* e.g. fibroute del <destination> */
     if (argc == 3) {
         if (inet_pton(AF_INET6, argv[2], tmp_ipv6_dst)) {
-            fib_remove_entry(gnrc_ipv6_fib_table, tmp_ipv6_dst, IN6ADDRSZ);
+            fib_remove_entry(&gnrc_ipv6_fib_table, tmp_ipv6_dst, IN6ADDRSZ);
         }
         else if (inet_pton(AF_INET, argv[2], tmp_ipv4_dst)) {
-            fib_remove_entry(gnrc_ipv6_fib_table, tmp_ipv4_dst, INADDRSZ);
+            fib_remove_entry(&gnrc_ipv6_fib_table, tmp_ipv4_dst, INADDRSZ);
         }
         else {
-            fib_remove_entry(gnrc_ipv6_fib_table, (uint8_t *)argv[2], (strlen(argv[2])));
+            fib_remove_entry(&gnrc_ipv6_fib_table, (uint8_t *)argv[2],
+                             (strlen(argv[2])));
         }
 
         return 0;
