@@ -28,16 +28,6 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-static int min(int a, int b)
-{
-    if (b > a) {
-        return a;
-    }
-    else {
-        return b;
-    }
-}
-
 void chardev_loop(ringbuffer_t *rb)
 {
     msg_t m;
@@ -106,7 +96,7 @@ void chardev_loop(ringbuffer_t *rb)
         if (rb->avail && (r != NULL)) {
             DEBUG("Data is available\n");
             unsigned state = disableIRQ();
-            int nbytes = min(r->nbytes, rb->avail);
+            int nbytes = MIN(r->nbytes, rb->avail);
             DEBUG("uart0_thread [%i]: sending %i bytes received from %" PRIkernel_pid " to pid %" PRIkernel_pid "\n", thread_getpid(), nbytes, m.sender_pid, reader_pid);
             ringbuffer_get(rb, r->buffer, nbytes);
             r->nbytes = nbytes;

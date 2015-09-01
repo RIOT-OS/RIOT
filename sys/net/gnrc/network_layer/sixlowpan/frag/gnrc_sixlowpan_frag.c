@@ -38,11 +38,6 @@ static inline uint16_t _floor8(uint16_t length)
     return length & 0xf8U;
 }
 
-static inline size_t _min(size_t a, size_t b)
-{
-    return (a < b) ? a : b;
-}
-
 static gnrc_pktsnip_t *_build_frag_pkt(gnrc_pktsnip_t *pkt, size_t payload_len,
                                        size_t size)
 {
@@ -63,7 +58,7 @@ static gnrc_pktsnip_t *_build_frag_pkt(gnrc_pktsnip_t *pkt, size_t payload_len,
     new_hdr->rssi = hdr->rssi;
     new_hdr->lqi = hdr->lqi;
 
-    frag = gnrc_pktbuf_add(NULL, NULL, _min(size, payload_len),
+    frag = gnrc_pktbuf_add(NULL, NULL, MIN(size, payload_len),
                            GNRC_NETTYPE_SIXLOWPAN);
 
     if (frag == NULL) {
@@ -111,7 +106,7 @@ static uint16_t _send_1st_fragment(gnrc_sixlowpan_netif_t *iface, gnrc_pktsnip_t
     pkt = pkt->next;    /* don't copy netif header */
 
     while (pkt != NULL) {
-        size_t clen = _min(max_frag_size - local_offset, pkt->size);
+        size_t clen = MIN(max_frag_size - local_offset, pkt->size);
 
         memcpy(data + local_offset, pkt->data, clen);
         local_offset += clen;
@@ -170,7 +165,7 @@ static uint16_t _send_nth_fragment(gnrc_sixlowpan_netif_t *iface, gnrc_pktsnip_t
         if (offset_count > offset) {    /* we overshot */
             /* => copy rest of partly send packet snip */
             uint16_t pkt_offset = offset - (offset_count - ((uint16_t)pkt->size));
-            size_t clen = _min(max_frag_size, pkt->size - pkt_offset);
+            size_t clen = MIN(max_frag_size, pkt->size - pkt_offset);
 
             memcpy(data, ((uint8_t *)pkt->data) + pkt_offset, clen);
             local_offset = clen;
@@ -183,7 +178,7 @@ static uint16_t _send_nth_fragment(gnrc_sixlowpan_netif_t *iface, gnrc_pktsnip_t
 
     if (local_offset < max_frag_size) { /* copy other packet snips */
         while (pkt != NULL) {
-            size_t clen = _min(max_frag_size - local_offset, pkt->size);
+            size_t clen = MIN(max_frag_size - local_offset, pkt->size);
 
             memcpy(data + local_offset, pkt->data, clen);
             local_offset += clen;

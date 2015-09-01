@@ -24,16 +24,6 @@
 #include "crypto/modes/ctr.h"
 #include "crypto/modes/ccm.h"
 
-static inline int min(int a, int b)
-{
-    if (a < b) {
-        return a;
-    }
-    else {
-        return b;
-    }
-}
-
 int ccm_compute_cbc_mac(cipher_t* cipher, uint8_t iv[16],
                         uint8_t* input, size_t length, uint8_t* mac)
 {
@@ -80,7 +70,7 @@ int ccm_create_mac_iv(cipher_t* cipher, uint8_t auth_data_len, uint8_t M,
     X1[0] = 64 * (auth_data_len > 0) + 8 * M_ + L_;
 
     /* copy nonce to B[1..15-L] */
-    memcpy(&X1[1], nonce, min(nonce_len, 15 - L));
+    memcpy(&X1[1], nonce, MIN(nonce_len, (15 - L)));
 
     /* write plaintext_len to B[15..16-L] */
     for (uint8_t i = 15; i > 16 - L; --i) {
@@ -167,7 +157,7 @@ int cipher_encrypt_ccm(cipher_t* cipher, uint8_t* auth_data, uint32_t auth_data_
     /* Compute first stream block */
     nonce_counter[0] = length_encoding - 1;
     memcpy(&nonce_counter[1], nonce,
-           min(nonce_len, (size_t) 15 - length_encoding));
+           MIN(nonce_len, ((size_t) 15 - length_encoding)));
     len = cipher_encrypt_ctr(cipher, nonce_counter, block_size,
                              zero_block, block_size, stream_block);
     if (len < 0) {
@@ -215,7 +205,7 @@ int cipher_decrypt_ccm(cipher_t* cipher, uint8_t* auth_data,
     /* Compute first stream block */
     nonce_counter[0] = length_encoding - 1;
     block_size = cipher_get_block_size(cipher);
-    memcpy(&nonce_counter[1], nonce, min(nonce_len, (size_t) 15 - length_encoding));
+    memcpy(&nonce_counter[1], nonce, MIN(nonce_len, ((size_t) 15 - length_encoding)));
     len = cipher_encrypt_ctr(cipher, nonce_counter, block_size, zero_block,
                              block_size, stream_block);
     if (len < 0) {

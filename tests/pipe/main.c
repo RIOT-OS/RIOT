@@ -86,11 +86,6 @@ static void *run_end(void *arg)
     return NULL;
 }
 
-static unsigned min(unsigned a, unsigned b)
-{
-    return a < b ? a : b;
-}
-
 int main(void)
 {
     puts("Start.");
@@ -110,7 +105,7 @@ int main(void)
     unsigned total = 0;
     while (total < BYTES_TOTAL) {
         char buf[5];
-        unsigned bytes_cur = min(BYTES_TOTAL - total, sizeof (buf));
+        unsigned bytes_cur = MIN((BYTES_TOTAL - total), sizeof(buf));
         for (unsigned i = 0; i < bytes_cur; ++i) {
             buf[i] = 'A' + total;
             ++total;
