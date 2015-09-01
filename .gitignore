@@ -12,6 +12,7 @@ doc/doxygen/*.tmp
 # Backup files
 *~
 *.orig
+*.old
 .*.swp
 cachegrind.out*
 # Eclipse workspace files
