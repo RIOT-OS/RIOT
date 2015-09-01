@@ -26,7 +26,6 @@
 #include "periph_conf.h"
 #include "periph/timer.h"
 
-// CC3200 SDK
 #include "inc/hw_types.h"
 #include "inc/hw_memmap.h"
 
@@ -37,15 +36,14 @@
 
 #define MAX_TIMERS TIMER_UNDEFINED
 
-void signal_error(const char* err);
-
 #define EMPTY_VALUE -1
 
 #define MAX_TIMER_VALUE 0xFFFFFFFF;
 
 #define CALIBRATION 111
 
-#define TIMER_SW_CHANNELS
+#define TIMER2_SW_CHANNELS
+#define TIMER3_SW_CHANNELS
 
 // ticks calibration for time elapsed between TAR read and TIMER_MATCH value written to register
 #define ELAPSED_TICKS 20
@@ -89,73 +87,76 @@ void irq_timer1_handler(void) {
 }
 
 void irq_timer2_handler(void) {
-#ifdef TIMER_SW_CHANNELS
+#ifdef TIMER2_SW_CHANNELS
 	unsigned long sts = HWREG(TIMERA2_BASE + TIMER_O_MIS);
 
 	timer_queue_item *curr_ptr = busyq2;
 
 	if (sts & TIMER_MIS_TATOMIS) {
+		// clears the flag
+		MAP_TimerIntClear(TIMERA2_BASE, TIMER_TIMA_TIMEOUT);
+
 		// timeout, re-evaluate counters
 		while (curr_ptr) {
 			curr_ptr->value = curr_ptr->value % MAX_TIMER_VALUE;
 			curr_ptr = curr_ptr->next;
 		}
 
-		// clears the flag
-		MAP_TimerIntClear(TIMERA2_BASE, TIMER_TIMA_TIMEOUT);
 		return;
-	}
+	} else if (sts & TIMER_MIS_TAMMIS) {
 
-	timer_queue_item *active = busyq2;
+		timer_queue_item *active = busyq2;
 
-	int ch = active->channel;
+		int ch = active->channel;
 
-	busyq2 = active->next;
-	active->next = freeq2;
-	freeq2 = active;
-
-	timer_clear(TIMER_2, 0);
-	config[TIMER_2].cb(ch);
-
-	sts = HWREG(TIMERA2_BASE + TIMER_O_TAR);
-
-	while (busyq2 && sts > (busyq2->value - ELAPSED_TICKS)) {
-		ch = busyq2->channel;
-		active = busyq2;
 		busyq2 = active->next;
 		active->next = freeq2;
 		freeq2 = active;
 
+		timer_clear(TIMER_2, 0);
 		config[TIMER_2].cb(ch);
 
 		sts = HWREG(TIMERA2_BASE + TIMER_O_TAR);
-	}
-	if(busyq2) {
-		HWREG(TIMERA2_BASE + TIMER_O_TAMATCHR) = busyq2->value;
-	}
+
+		while (busyq2 && sts > (busyq2->value - ELAPSED_TICKS)) {
+			ch = busyq2->channel;
+			active = busyq2;
+			busyq2 = active->next;
+			active->next = freeq2;
+			freeq2 = active;
+
+			config[TIMER_2].cb(ch);
+
+			sts = HWREG(TIMERA2_BASE + TIMER_O_TAR);
+		}
+		if(busyq2) {
+			HWREG(TIMERA2_BASE + TIMER_O_TAMATCHR) = busyq2->value;
+		}
 #else
-	timer_clear(TIMER_2, 0);
-	config[TIMER_2].cb(0); // timer has one hw channel
+		timer_clear(TIMER_2, 0);
+		config[TIMER_2].cb(0); // timer has one hw channel
 #endif
+	}
 }
 
 void irq_timer3_handler(void) {
-#ifdef TIMER_SW_CHANNELS
+#ifdef TIMER3_SW_CHANNELS
 	unsigned long sts = HWREG(TIMERA3_BASE + TIMER_O_MIS);
 
 	timer_queue_item *curr_ptr = busyq3;
 
 	if (sts & TIMER_MIS_TATOMIS) {
+		// clears the flag
+		MAP_TimerIntClear(TIMERA3_BASE, TIMER_TIMA_TIMEOUT);
+
 		// timeout, re-evaluate counters
 		while (curr_ptr) {
 			curr_ptr->value = curr_ptr->value % MAX_TIMER_VALUE;
 			curr_ptr = curr_ptr->next;
 		}
 
-		// clears the flag
-		MAP_TimerIntClear(TIMERA3_BASE, TIMER_TIMA_TIMEOUT);
 		return;
-	}
+	} else if (sts & TIMER_MIS_TAMMIS) {
 
 	timer_queue_item *active = busyq3;
 
@@ -188,12 +189,12 @@ void irq_timer3_handler(void) {
 	timer_clear(TIMER_3, 0);
 	config[TIMER_3].cb(0); // timer has one hw channel
 #endif
-
+	}
 }
 
 
 int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int)) {
-#ifdef TIMER_SW_CHANNELS
+#if defined(TIMER3_SW_CHANNELS) || defined(TIMER2_SW_CHANNELS)
 	int j;
 #endif
 	switch (dev) {
@@ -246,7 +247,7 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int)) {
 
 		break;
 	case TIMER_2:
-#ifdef TIMER_SW_CHANNELS
+#ifdef TIMER2_SW_CHANNELS
 		j = TIM2_CHANNELS;
 
 		while (--j) {
@@ -271,7 +272,7 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int)) {
 		MAP_IntPriorityGroupingSet(3);
 		MAP_IntPrioritySet(INT_TIMERA2A, 0xFF);
 
-#ifdef TIMER_SW_CHANNELS
+#ifdef TIMER2_SW_CHANNELS
 		// enable the timeout interrupt
 		MAP_TimerIntEnable(TIMERA2_BASE, TIMER_TIMA_TIMEOUT);
 #endif
@@ -281,7 +282,7 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int)) {
 
 		break;
 	case TIMER_3:
-#ifdef TIMER_SW_CHANNELS
+#ifdef TIMER3_SW_CHANNELS
 		j = TIM3_CHANNELS;
 
 		while (--j) {
@@ -306,7 +307,7 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int)) {
 		MAP_IntPriorityGroupingSet(3);
 		MAP_IntPrioritySet(INT_TIMERA3A, 0xFF);
 
-#ifdef TIMER_SW_CHANNELS
+#ifdef TIMER3_SW_CHANNELS
 		// enable the timeout interrupt
 		MAP_TimerIntEnable(TIMERA3_BASE, TIMER_TIMA_TIMEOUT);
 #endif
@@ -322,7 +323,7 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int)) {
 }
 
 int set_absolute(tim_t dev, int channel, unsigned long long value) {
-#ifdef TIMER_SW_CHANNELS
+#if defined(TIMER3_SW_CHANNELS) || defined(TIMER2_SW_CHANNELS)
 	unsigned long long abstimeout;
 #endif
 	switch (dev) {
@@ -335,7 +336,7 @@ int set_absolute(tim_t dev, int channel, unsigned long long value) {
 		HWREG(TIMERA1_BASE + TIMER_O_IMR) |= TIMER_TIMA_MATCH; // enable the match timer
 		break;
 	case TIMER_2:
-#ifdef TIMER_SW_CHANNELS
+#ifdef TIMER2_SW_CHANNELS
 
 		// critical section, disable interrupt
 		MAP_TimerIntDisable(TIMERA2_BASE, TIMER_TIMA_MATCH);
@@ -396,7 +397,7 @@ int set_absolute(tim_t dev, int channel, unsigned long long value) {
 #endif
 		break;
 	case TIMER_3:
-#ifdef TIMER_SW_CHANNELS
+#ifdef TIMER3_SW_CHANNELS
 		// critical section, disable interrupt
 		MAP_TimerIntDisable(TIMERA3_BASE, TIMER_TIMA_MATCH);
 
@@ -496,7 +497,7 @@ int timer_clear(tim_t dev, int channel) {
 		break;
 	case TIMER_2:
 		MAP_TimerIntClear(TIMERA2_BASE, TIMER_TIMA_MATCH);
-#ifdef TIMER_SW_CHANNELS
+#ifdef TIMER2_SW_CHANNELS
 		if (busyq2 == NULL) {
 			// no timer left into buffer
 			MAP_TimerIntDisable(TIMERA2_BASE, TIMER_TIMA_MATCH);
@@ -507,7 +508,7 @@ int timer_clear(tim_t dev, int channel) {
 		break;
 	case TIMER_3:
 		MAP_TimerIntClear(TIMERA3_BASE, TIMER_TIMA_MATCH);
-#ifdef TIMER_SW_CHANNELS
+#ifdef TIMER3_SW_CHANNELS
 		if (busyq3 == NULL) {
 			// no timer left into buffer
 			MAP_TimerIntDisable(TIMERA3_BASE, TIMER_TIMA_MATCH);
