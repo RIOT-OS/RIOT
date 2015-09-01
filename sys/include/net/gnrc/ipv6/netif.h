@@ -114,6 +114,17 @@ extern "C" {
 /**
  * @{
  * @name Flags for the interfaces
+ *
+ * @note The most-significant byte of these flags is identical to the flags in
+ *       IPv6 router advertisements. See <a
+ *       href="https://tools.ietf.org/html/rfc4861#section-4.2">RFC4861,
+ *       section 4.2</a>, <a
+ *       href="https://tools.ietf.org/html/rfc6275#section-7.1">RFC6275,
+ *       section 7.1</a>, <a
+ *       href="https://tools.ietf.org/html/rfc4191#section-2.2">RFC4191,
+ *       section 2.2</a>, and <a
+ *       href="https://tools.ietf.org/html/rfc4389#section-4.1.3.3">RFC4389,
+ *       section 4.1.3.3</a>.
  */
 /**
  * @brief   Interface is 6LoWPAN interface.
