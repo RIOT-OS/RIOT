@@ -49,7 +49,7 @@ extern "C" {
 /**
  * Assign the hardware timer
  */
-#define HW_TIMER            TIMER_0
+#define HW_TIMER            TIMER_3
 
 /**
  * @name Define UART device and baudrate for stdio
