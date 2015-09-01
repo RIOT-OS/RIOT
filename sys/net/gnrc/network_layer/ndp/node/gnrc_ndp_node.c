@@ -71,15 +71,15 @@ kernel_pid_t gnrc_ndp_node_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_len,
     next_hop_ip = ipv6_ext_rh_next_hop(hdr);
 #endif
 #ifdef MODULE_FIB
+    ipv6_addr_t next_hop_actual;    /* FIB copies address into this variable */
     /* don't look-up link local addresses in FIB */
     if (!ipv6_addr_is_link_local(dst)) {
         size_t next_hop_size = sizeof(ipv6_addr_t);
         uint32_t next_hop_flags = 0;
-        ipv6_addr_t next_hop_actual;    /* FIB copies address into this variable */
 
         if ((next_hop_ip == NULL) &&
-            (fib_get_next_hop(gnrc_ipv6_fib_table, &iface, next_hop_actual.u8, &next_hop_size,
-                              &next_hop_flags, (uint8_t *)dst,
+            (fib_get_next_hop(&gnrc_ipv6_fib_table, &iface, next_hop_actual.u8,
+                              &next_hop_size, &next_hop_flags, (uint8_t *)dst,
                               sizeof(ipv6_addr_t), 0) >= 0) &&
             (next_hop_size == sizeof(ipv6_addr_t))) {
             next_hop_ip = &next_hop_actual;

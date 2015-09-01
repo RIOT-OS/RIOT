@@ -48,6 +48,10 @@
 #include "vtimer.h"
 #endif
 
+#ifdef MODULE_XTIMER
+#include "xtimer.h"
+#endif
+
 #ifdef MODULE_RTC
 #include "periph/rtc.h"
 #endif
@@ -105,6 +109,10 @@ void auto_init(void)
     board_uart0_init();
 #endif
 #endif
+#ifdef MODULE_XTIMER
+    DEBUG("Auto init xtimer module.\n");
+    xtimer_init();
+#endif
 #ifdef MODULE_RTC
     DEBUG("Auto init rtc module.\n");
     rtc_init();
@@ -152,11 +160,16 @@ void auto_init(void)
 
 
 /* initialize network devices */
-#ifdef MODULE_AUTO_INIT_NG_NETIF
+#ifdef MODULE_AUTO_INIT_GNRC_NETIF
 
 #ifdef MODULE_AT86RF2XX
     extern void auto_init_at86rf2xx(void);
     auto_init_at86rf2xx();
+#endif
+
+#ifdef MODULE_NG_SLIP
+    extern void auto_init_slip(void);
+    auto_init_slip();
 #endif
 
 #ifdef MODULE_XBEE
@@ -170,11 +183,11 @@ void auto_init(void)
 #endif
 
 #ifdef MODULE_GNRC_NETDEV_ETH
-    extern void auto_init_ng_netdev_eth(void);
-    auto_init_ng_netdev_eth();
+    extern void auto_init_gnrc_netdev_eth(void);
+    auto_init_gnrc_netdev_eth();
 #endif
 
-#endif /* MODULE_AUTO_INIT_NG_NETIF */
+#endif /* MODULE_AUTO_INIT_GNRC_NETIF */
 
 #ifdef MODULE_GNRC_IPV6_NETIF
     gnrc_ipv6_netif_init_by_dev();

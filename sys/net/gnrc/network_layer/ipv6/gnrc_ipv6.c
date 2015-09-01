@@ -46,9 +46,14 @@ static char _stack[GNRC_IPV6_STACK_SIZE];
 #include "net/fib.h"
 #include "net/fib/table.h"
 /**
+ * @brief buffer to store the entries in the IPv6 forwarding table
+ */
+static fib_entry_t _fib_entries[GNRC_IPV6_FIB_TABLE_SIZE];
+
+/**
  * @brief the IPv6 forwarding table
  */
-fib_entry_t gnrc_ipv6_fib_table[FIB_MAX_FIB_TABLE_ENTRIES];
+fib_table_t gnrc_ipv6_fib_table;
 #endif
 
 #if ENABLE_DEBUG
@@ -80,7 +85,9 @@ kernel_pid_t gnrc_ipv6_init(void)
     }
 
 #ifdef MODULE_FIB
-    fib_init(gnrc_ipv6_fib_table);
+    gnrc_ipv6_fib_table.entries = _fib_entries;
+    gnrc_ipv6_fib_table.size = GNRC_IPV6_FIB_TABLE_SIZE;
+    fib_init(&gnrc_ipv6_fib_table);
 #endif
 
     return gnrc_ipv6_pid;
@@ -133,8 +140,11 @@ void gnrc_ipv6_demux(kernel_pid_t iface, gnrc_pktsnip_t *pkt, uint8_t nh)
         return;
     }
 
-    gnrc_pktbuf_hold(pkt, receiver_num - 1);
-    /* IPv6 is not interested anymore so `- 1` */
+    gnrc_pktbuf_hold(pkt, receiver_num - 1);    /* IPv6 is not interested anymore so `- 1` */
+
+    /* XXX can't use gnrc_netapi_dispatch_receive() twice here since a call to that function
+     *     implicitly hands all rights to the packet to one of the receiving threads. As a result,
+     *     the second call to gnrc_netapi_dispatch_receive() would be invalid */
     _dispatch_rcv_pkt(pkt->type, GNRC_NETREG_DEMUX_CTX_ALL, pkt);
     _dispatch_rcv_pkt(GNRC_NETTYPE_IPV6, nh, pkt);
 }
@@ -518,6 +528,9 @@ static void _send(gnrc_pktsnip_t *pkt, bool prep_hdr)
     }
     if (ipv6 != pkt) {      /* in case packet has netif header */
         pkt->next = payload;/* pkt is already write-protected so we can do that */
+    }
+    else {
+        pkt = payload;      /* pkt is the IPv6 header so we just write-protected it */
     }
     ipv6 = payload;  /* Reset ipv6 from temporary variable */
 

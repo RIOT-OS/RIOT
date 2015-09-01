@@ -35,8 +35,12 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "posix_io.h"
-#include "board_uart0.h"
+#ifdef MODULE_NEWLIB
+#   include "uart_stdio.h"
+#else
+#   include "posix_io.h"
+#   include "board_uart0.h"
+#endif
 #include "shell.h"
 #include "pcd8544.h"
 
@@ -170,8 +174,12 @@ int main(void)
 
     /* run shell */
     puts("All OK, running shell now");
+#ifndef MODULE_NEWLIB
     (void) posix_open(uart0_handler_pid, 0);
     shell_init(&shell, shell_commands, SHELL_BUFSIZE, uart0_readc, uart0_putc);
+#else
+    shell_init(&shell, shell_commands, SHELL_BUFSIZE, getchar, putchar);
+#endif
     shell_run(&shell);
 
     return 0;

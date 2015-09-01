@@ -28,8 +28,8 @@ extern "C" {
 #endif
 
 /**
-* @brief Container descriptor for a FIB entry
-*/
+ * @brief Container descriptor for a FIB entry
+ */
 typedef struct fib_entry_t {
     /** interface ID */
     kernel_pid_t iface_id;
@@ -44,6 +44,14 @@ typedef struct fib_entry_t {
     /** Pointer to the shared generic address */
     struct universal_address_container_t *next_hop;
 } fib_entry_t;
+
+/**
+ * @brief Meta information about the FIB table
+ */
+typedef struct {
+    fib_entry_t *entries;   /**< array holding the FIB entries */
+    size_t size;            /**< number of entries in this table */
+} fib_table_t;
 
 #ifdef __cplusplus
 }

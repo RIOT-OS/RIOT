@@ -80,9 +80,13 @@ void gnrc_ndp_internal_send_nbr_sol(kernel_pid_t iface, ipv6_addr_t *tgt,
  *                          not be NULL.
  * @param[in] supply_tl2a   Add target link-layer address option to neighbor
  *                          advertisement if link-layer has addresses.
+ * @param[in] ext_opts      External options for the neighbor advertisement. Leave NULL for none.
+ *                          **Warning:** these are not tested if they are suitable for a
+ *                          neighbor advertisement so be sure to check that.
+ *                          **Will be released** in an error case.
  */
-void gnrc_ndp_internal_send_nbr_adv(kernel_pid_t iface, ipv6_addr_t *tgt,
-                                    ipv6_addr_t *dst, bool supply_tl2a);
+void gnrc_ndp_internal_send_nbr_adv(kernel_pid_t iface, ipv6_addr_t *tgt, ipv6_addr_t *dst,
+                                    bool supply_tl2a, gnrc_pktsnip_t *ext_opts);
 
 /**
  * @brief   Handles a SL2A option.

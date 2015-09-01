@@ -101,8 +101,8 @@ void gnrc_ndp_nbr_sol_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
         sicmpv6_size -= (opt->len * 8);
     }
 
-    gnrc_ndp_internal_send_nbr_adv(iface, tgt, &ipv6->src,
-                                   ipv6_addr_is_multicast(&ipv6->dst));
+    gnrc_ndp_internal_send_nbr_adv(iface, tgt, &ipv6->src, ipv6_addr_is_multicast(&ipv6->dst),
+                                   NULL);
 
     return;
 }

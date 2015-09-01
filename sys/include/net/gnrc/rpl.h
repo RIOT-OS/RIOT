@@ -9,8 +9,9 @@
  */
 
 /**
- * @defgroup    net_gnrc_rpl  New RPL
- * @ingroup     net
+ * @defgroup    net_gnrc_rpl  RPL
+ * @ingroup     net_gnrc
+ * @brief       RPL implementation for GNRC
  * @{
  *
  * @file
@@ -30,6 +31,7 @@
 
 #include <string.h>
 #include <stdint.h>
+#include "net/gnrc.h"
 #include "net/ipv6/addr.h"
 #include "net/gnrc/nettype.h"
 #include "net/gnrc/rpl/structs.h"
@@ -239,7 +241,7 @@ static inline bool GNRC_RPL_COUNTER_GREATER_THAN(uint8_t A, uint8_t B)
 /**
  * @brief Cleanup timeout in seconds
  */
-#define GNRC_RPL_CLEANUP_TIME (30)
+#define GNRC_RPL_CLEANUP_TIME (5)
 
 /**
  * @name Node Status
@@ -341,7 +343,7 @@ extern kernel_pid_t gnrc_rpl_pid;
 kernel_pid_t gnrc_rpl_init(kernel_pid_t if_pid);
 
 /**
- * @brief Initialization of a RPL DODAG as root node. Creates a new instance if necessary.
+ * @brief Initialization of a node as root.
  *
  * @param[in] instance_id       Id of the instance
  * @param[in] dodag_id          Id of the DODAG
@@ -417,8 +419,9 @@ void gnrc_rpl_recv_DAO(gnrc_rpl_dao_t *dao, ipv6_addr_t *src, uint16_t len);
  * @brief   Parse a DAO-ACK.
  *
  * @param[in] dao_ack   Pointer to the DAO-ACK message.
+ * @param[in] len       Length of the IPv6 packet.
  */
-void gnrc_rpl_recv_DAO_ACK(gnrc_rpl_dao_ack_t *dao_ack);
+void gnrc_rpl_recv_DAO_ACK(gnrc_rpl_dao_ack_t *dao_ack, uint16_t len);
 
 /**
  * @brief   Delay the DAO sending interval
@@ -433,6 +436,28 @@ void gnrc_rpl_delay_dao(gnrc_rpl_dodag_t *dodag);
  * @param[in] dodag     The DODAG of the DAO
  */
 void gnrc_rpl_long_delay_dao(gnrc_rpl_dodag_t *dodag);
+
+/**
+ * @brief Creation of a RPL DODAG as root. Creates a new instance if necessary.
+ *
+ * @param[in] instance_id       Id of the instance
+ * @param[in] dodag_id          Id of the DODAG
+ * @param[in] mop               Mode of Operation
+ *
+ * @return  Pointer to the new DODAG, on success.
+ * @return  NULL, otherwise.
+ */
+gnrc_rpl_dodag_t *gnrc_rpl_root_dodag_init(uint8_t instance_id, ipv6_addr_t *dodag_id, uint8_t mop);
+
+/**
+ * @brief Send a control message
+ *
+ * @param[in] pkt               gnrc_pktnsip_t to send
+ * @param[in] src               Source address of the packet
+ * @param[in] dst               Destination address of the packet
+ * @param[in] dodag_id          Id of the DODAG
+ */
+void gnrc_rpl_send(gnrc_pktsnip_t *pkt, ipv6_addr_t *src, ipv6_addr_t *dst, ipv6_addr_t *dodag_id);
 #ifdef __cplusplus
 }
 #endif

@@ -3,7 +3,7 @@ include ../Makefile.tests_common
 
 FEATURES_REQUIRED = periph_spi periph_gpio
 
-BOARD_INSUFFICIENT_RAM := stm32f0discovery nucleo-f334
+BOARD_INSUFFICIENT_MEMORY := stm32f0discovery nucleo-f334
 
 ifneq (,$(filter pba-d-01-kw2x,$(BOARD)))
   DRIVER ?= kw2xrf
@@ -50,7 +50,7 @@ endif
 
 endif # USE_BOARD_PARAMETERS=false
 
-USEMODULE += auto_init_ng_netif
+USEMODULE += auto_init_gnrc_netif
 USEMODULE += gnrc_netif
 USEMODULE += gnrc_nomac
 USEMODULE += gnrc_pktdump

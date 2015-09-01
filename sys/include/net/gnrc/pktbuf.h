@@ -9,7 +9,7 @@
 
 /**
  * @defgroup    net_gnrc_pktbuf   Packet buffer
- * @ingroup     net
+ * @ingroup     net_gnrc
  * @brief       A global network packet buffer.
  *
  * @note    **WARNING!!** Do not store data structures that are not packed
