@@ -140,12 +140,27 @@ ifneq ($(GNRC_NETIF_NUMOF),1)
   CFLAGS += -DGNRC_NETIF_NUMOF=$(GNRC_NETIF_NUMOF)
 endif
 
-include $(RIOTBASE)/Makefile.dep
+# Add (transitive) dependencies to USEMODULE
+define __FILL_DEPENDENCIES_LOOP
+  __USEMODULE_BEFORE := $${USEMODULE}
+
+  include $(RIOTBASE)/Makefile.dep
+
+  USEMODULE := $$(sort $${USEMODULE})
+
+  ifneq ($${__USEMODULE_BEFORE},$${USEMODULE})
+    $$(eval $$(__FILL_DEPENDENCIES_LOOP))
+  endif
+endef
+
+USEMODULE := $(sort ${USEMODULE})
+$(eval $(__FILL_DEPENDENCIES_LOOP))
+
 
 USEMODULE += $(filter-out $(DISABLE_MODULE), $(DEFAULT_MODULE))
 
 ifeq ($(strip $(MCU)),)
-	MCU = $(CPU)
+  MCU = $(CPU)
 endif
 
 # if you want to publish the board into the sources as an uppercase #define
