@@ -137,9 +137,31 @@ typedef enum {
      * @note not all transceivers may support this interrupt
      */
     NETOPT_TX_END_IRQ,
-    NETOPT_AUTOCCA,             /**< en/disable to check automatically
-                                 *   before sending the channel is clear. */
 
+    /**
+     * @brief Check automatically before sending if the channel is clear.
+     *
+     * This may be a hardware feature of the given transceiver, or might be
+     * otherwise implemented in software. If the device supports CSMA this
+     * option will enable CSMA with a certain set of parameters to emulate the
+     * desired behaviour.
+     *
+     * @note Be sure not to set NETCONF_OPT_CSMA simultaneously.
+     *
+     * TODO: How to get feedback?
+     */
+    NETOPT_AUTOCCA,
+
+    /**
+     * @brief en/disable CSMA/CA support
+     *
+     * If the device supports CSMA in hardware, this option enables it with
+     * default parameters. For further configuration refer to the other
+     * NETCONF_OPT_CSMA_* options.
+     */
+    NETOPT_CSMA,
+    NETOPT_CSMA_RETRIES,            /**< get/set the number of retries when
+                                         when channel is busy */
     /**
      * @brief read-only check for a wired interface.
      *

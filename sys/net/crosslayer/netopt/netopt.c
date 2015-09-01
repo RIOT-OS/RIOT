@@ -46,6 +46,8 @@ static const char *_netopt_strmap[] = {
     [NETOPT_TX_START_IRQ]    = "NETOPT_TX_START_IRQ",
     [NETOPT_TX_END_IRQ]      = "NETOPT_TX_END_IRQ",
     [NETOPT_AUTOCCA]         = "NETOPT_AUTOCCA",
+    [NETOPT_CSMA]            = "NETOPT_CSMA",
+    [NETOPT_CSMA_RETRIES]    = "NETOPT_CSMA_RETRIES",
     [NETOPT_IS_WIRED]        = "NETOPT_IS_WIRED",
     [NETOPT_NUMOF]           = "NETOPT_NUMOF",
 };
