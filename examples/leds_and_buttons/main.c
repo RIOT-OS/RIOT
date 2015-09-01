@@ -8,30 +8,30 @@
 #include <stdio.h>
 
 #include "periph/gpio.h"
-#include "periph/timer.h"
+#include "hwtimer.h"
 
 
-void green_pulse(int channel) {
+void green_pulse(void* arg) {
 
 	LED_GREEN_TOGGLE;
 
 	// rescheduling needed because timer API does not have PERIODIC vs ONE_SHOT timers
-	timer_set(TIMER_1, 0, SEC_TO_TICKS(2));
+	hwtimer_set(MSEC_TO_TICKS(500), green_pulse, NULL);
 }
 
-void yellow_pulse(int channel) {
-	printf("yellow timer\n");
+void yellow_pulse(void* arg) {
+	//printf("yellow timer\n");
 
 	LED_YELLOW_TOGGLE;
 
 	// rescheduling needed because timer API does not have PERIODIC vs ONE_SHOT timers
-	timer_set(TIMER_3, 0, SEC_TO_TICKS(4));
+	hwtimer_set(SEC_TO_TICKS(1), yellow_pulse, NULL);
 }
 
-void bounce_filter(int channel) {
+void bounce_filter(void* arg) {
 	int val;
 
-	printf("debounce timer\n");
+	//printf("debounce timer\n");
 
 	val = gpio_read(PUSH2);
 
@@ -44,21 +44,16 @@ void bounce_filter(int channel) {
 }
 
 void sw2_event(void* arg) {
-	printf("button push\n");
-	timer_set(TIMER_2, 0, MSEC_TO_TICKS(10));
+	//printf("button push\n");
+	hwtimer_set(MSEC_TO_TICKS(10), bounce_filter, NULL);
 }
 
 int main(void) {
 	
 	gpio_init_int(PUSH2, GPIO_NOPULL, GPIO_BOTH, sw2_event, 0);
 
-	timer_init(TIMER_1, 0, green_pulse);
-	timer_init(TIMER_3, 0, yellow_pulse);
-
-	timer_init(TIMER_2, 0, bounce_filter);
-
-	timer_set(TIMER_1, 0, SEC_TO_TICKS(2));
-	timer_set(TIMER_3, 0, SEC_TO_TICKS(4));
+	hwtimer_set(MSEC_TO_TICKS(500), green_pulse, NULL);
+	hwtimer_set(SEC_TO_TICKS(1), yellow_pulse, NULL);
 
 	return 0;
 }
