@@ -69,6 +69,10 @@ extern int _get_current_handler(int argc, char **argv);
 extern int _reset_current_handler(int argc, char **argv);
 #endif
 
+#ifdef MODULE_AT30TSE75X
+extern int _at30tse75x_handler(int argc, char **argv);
+#endif
+
 #if FEATURE_PERIPH_RTC
 extern int _rtc_handler(int argc, char **argv);
 #endif
@@ -166,6 +170,9 @@ const shell_command_t _shell_command_list[] = {
 #ifdef MODULE_LTC4150
     {"cur", "Prints current and average power consumption.", _get_current_handler},
     {"rstcur", "Resets coulomb counter.", _reset_current_handler},
+#endif
+#ifdef MODULE_AT30TSE75X
+    {"at30tse75x", "Test AT30TSE75X temperature sensor", _at30tse75x_handler},
 #endif
 #ifdef MODULE_MCI
     {DISK_READ_SECTOR_CMD, "Reads the specified sector of inserted memory card", _read_sector},

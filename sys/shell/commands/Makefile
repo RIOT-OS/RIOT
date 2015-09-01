@@ -38,6 +38,9 @@ endif
 ifneq (,$(filter lsm303dlhc,$(USEMODULE)))
   SRC += sc_lsm303dlhc.c
 endif
+ifneq (,$(filter at30tse75x,$(USEMODULE)))
+    SRC += sc_at30tse75x.c
+endif
 ifneq (,$(filter gnrc_netif,$(USEMODULE)))
   SRC += sc_netif.c
 endif
