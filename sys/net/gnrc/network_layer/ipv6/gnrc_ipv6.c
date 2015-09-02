@@ -190,6 +190,7 @@ static void *_event_loop(void *args)
                 msg_reply(&msg, &reply);
                 break;
 
+#ifdef MODULE_GNRC_NDP
             case GNRC_NDP_MSG_RTR_TIMEOUT:
                 DEBUG("ipv6: Router timeout received\n");
                 ((gnrc_ipv6_nc_t *)msg.content.ptr)->flags &= ~GNRC_IPV6_NC_IS_ROUTER;
@@ -201,7 +202,6 @@ static void *_event_loop(void *args)
                                             (ipv6_addr_t *)msg.content.ptr);
                 break;
 
-#ifdef MODULE_GNRC_NDP
             case GNRC_NDP_MSG_NBR_SOL_RETRANS:
                 DEBUG("ipv6: Neigbor solicitation retransmission timer event received\n");
                 gnrc_ndp_retrans_nbr_sol((gnrc_ipv6_nc_t *)msg.content.ptr);
@@ -210,6 +210,12 @@ static void *_event_loop(void *args)
             case GNRC_NDP_MSG_NC_STATE_TIMEOUT:
                 DEBUG("ipv6: Neigbor cache state timeout received\n");
                 gnrc_ndp_state_timeout((gnrc_ipv6_nc_t *)msg.content.ptr);
+                break;
+#endif
+#ifdef MODULE_GNRC_NDP_HOST
+            case GNRC_NDP_MSG_RTR_SOL_RETRANS:
+                DEBUG("ipv6: Router solicitation retransmission event received\n");
+                gnrc_ndp_host_retrans_rtr_sol((gnrc_ipv6_netif_t *)msg.content.ptr);
                 break;
 #endif
 

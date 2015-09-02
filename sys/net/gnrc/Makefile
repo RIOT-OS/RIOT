@@ -25,6 +25,9 @@ endif
 ifneq (,$(filter gnrc_ndp_internal,$(USEMODULE)))
     DIRS += network_layer/ndp/internal
 endif
+ifneq (,$(filter gnrc_ndp_host,$(USEMODULE)))
+    DIRS += network_layer/ndp/host
+endif
 ifneq (,$(filter gnrc_ndp_node,$(USEMODULE)))
     DIRS += network_layer/ndp/node
 endif

@@ -275,6 +275,111 @@ void gnrc_ndp_nbr_adv_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
     return;
 }
 
+static inline void _set_reach_time(gnrc_ipv6_netif_t *if_entry, uint32_t mean)
+{
+    uint32_t reach_time = genrand_uint32_range(GNRC_NDP_MIN_RAND, GNRC_NDP_MAX_RAND);
+
+    if_entry->reach_time_base = mean;
+    /* to avoid floating point number computation and have higher value entropy, the
+     * boundaries for the random value are multiplied by 10 and we need to account for that */
+    reach_time = (reach_time * if_entry->reach_time_base) / 10;
+    if_entry->reach_time = timex_set(0, reach_time);
+    timex_normalize(&if_entry->reach_time);
+}
+
+void gnrc_ndp_rtr_adv_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt, ipv6_hdr_t *ipv6,
+                             ndp_rtr_adv_t *rtr_adv, size_t icmpv6_size)
+{
+    uint8_t *buf = (uint8_t *)(rtr_adv + 1);
+    gnrc_ipv6_nc_t *nc_entry = NULL;
+    gnrc_ipv6_netif_t *if_entry = gnrc_ipv6_netif_get(iface);
+    uint8_t l2src[GNRC_IPV6_NC_L2_ADDR_MAX];
+    int sicmpv6_size = (int)icmpv6_size, l2src_len = 0;
+    uint16_t opt_offset = 0;
+
+    assert(if_entry != NULL);
+    if (!ipv6_addr_is_link_local(&ipv6->src) ||
+        ipv6_addr_is_multicast(&ipv6->src) ||
+        (ipv6->hl != 255) || (rtr_adv->code != 0) ||
+        (icmpv6_size < sizeof(ndp_rtr_adv_t))) {
+        DEBUG("ndp: router advertisement was invalid\n");
+        /* ipv6 releases */
+        return;
+    }
+    /* get source from default router list */
+    nc_entry = gnrc_ipv6_nc_get(iface, &ipv6->src);
+    if (nc_entry == NULL) { /* not in default router list */
+        /* create default router list entry */
+        nc_entry = gnrc_ipv6_nc_add(iface, &ipv6->src, NULL, 0,
+                                    GNRC_IPV6_NC_IS_ROUTER);
+        if (nc_entry == NULL) {
+            DEBUG("ndp: error on default router list entry creation\n");
+            return;
+        }
+    }
+    else if ((nc_entry->flags & GNRC_IPV6_NC_IS_ROUTER) && (byteorder_ntohs(rtr_adv->ltime) == 0)) {
+        nc_entry->flags &= ~GNRC_IPV6_NC_IS_ROUTER;
+    }
+    else {
+        nc_entry->flags |= GNRC_IPV6_NC_IS_ROUTER;
+    }
+    /* set router life timer */
+    if (rtr_adv->ltime.u16 != 0) {
+        vtimer_remove(&nc_entry->rtr_timeout);
+        vtimer_set_msg(&nc_entry->rtr_timeout,
+                       timex_set(byteorder_ntohs(rtr_adv->ltime), 0),
+                       thread_getpid(), GNRC_NDP_MSG_RTR_TIMEOUT, nc_entry);
+    }
+    /* set current hop limit from message if available */
+    if (rtr_adv->cur_hl != 0) {
+        if_entry->cur_hl = rtr_adv->cur_hl;
+    }
+    /* set flags from message */
+    if_entry->flags &= ~GNRC_IPV6_NETIF_FLAGS_RTR_ADV_MASK;
+    if_entry->flags |= (rtr_adv->flags << GNRC_IPV6_NETIF_FLAGS_RTR_ADV_POS) &
+                       GNRC_IPV6_NETIF_FLAGS_RTR_ADV_MASK;
+    /* set reachable time from message if it is not the same as the random base
+     * value */
+    if ((rtr_adv->reach_time.u32 != 0) &&
+        (if_entry->reach_time_base != byteorder_ntohl(rtr_adv->reach_time))) {
+        _set_reach_time(if_entry, byteorder_ntohl(rtr_adv->reach_time));
+    }
+    /* set retransmission timer from message */
+    if (rtr_adv->retrans_timer.u32 != 0) {
+        if_entry->retrans_timer = timex_set(0, byteorder_ntohl(rtr_adv->retrans_timer));
+        timex_normalize(&if_entry->retrans_timer);
+    }
+    mutex_unlock(&if_entry->mutex);
+    sicmpv6_size -= sizeof(ndp_rtr_adv_t);
+    /* parse options */
+    while (sicmpv6_size > 0) {
+        ndp_opt_t *opt = (ndp_opt_t *)(buf + opt_offset);
+        switch (opt->type) {
+            case NDP_OPT_SL2A:
+                if ((l2src_len = gnrc_ndp_internal_sl2a_opt_handle(pkt, ipv6, rtr_adv->type, opt,
+                                                                   l2src)) < 0) {
+                    /* -ENOTSUP can not happen */
+                    /* invalid source link-layer address option */
+                    return;
+                }
+                break;
+            case NDP_OPT_MTU:
+                if (!gnrc_ndp_internal_mtu_opt_handle(iface, rtr_adv->type, (ndp_opt_mtu_t *)opt)) {
+                    /* invalid MTU option */
+                    return;
+                }
+                break;
+            case NDP_OPT_PI:
+                if (!gnrc_ndp_internal_pi_opt_handle(iface, rtr_adv->type, (ndp_opt_pi_t *)opt)) {
+                    /* invalid prefix information option */
+                    return;
+                }
+                break;
+        }
+    }
+    _stale_nc(iface, &ipv6->src, l2src, l2src_len);
+}
+
 void gnrc_ndp_retrans_nbr_sol(gnrc_ipv6_nc_t *nc_entry)
 {
     if ((gnrc_ipv6_nc_get_state(nc_entry) == GNRC_IPV6_NC_STATE_INCOMPLETE) ||
@@ -350,14 +455,9 @@ void gnrc_ndp_state_timeout(gnrc_ipv6_nc_t *nc_entry)
 
 void gnrc_ndp_netif_add(gnrc_ipv6_netif_t *iface)
 {
-    uint32_t reach_time = genrand_uint32_range(GNRC_NDP_MIN_RAND, GNRC_NDP_MAX_RAND);
-
     /* set default values */
     mutex_lock(&iface->mutex);
-    iface->reach_time_base = GNRC_NDP_REACH_TIME;
-    reach_time = (reach_time * iface->reach_time_base) / 10;
-    iface->reach_time = timex_set(0, reach_time);
-    timex_normalize(&iface->reach_time);
+    _set_reach_time(iface, GNRC_NDP_REACH_TIME);
     iface->retrans_timer = timex_set(0, GNRC_NDP_RETRANS_TIMER);
     timex_normalize(&iface->retrans_timer);
     mutex_unlock(&iface->mutex);
@@ -414,6 +514,18 @@ gnrc_pktsnip_t *gnrc_ndp_nbr_adv_build(uint8_t flags, ipv6_addr_t *tgt,
         nbr_adv->tgt.u64[1].u64 = tgt->u64[1].u64;
     }
 
+    return pkt;
+}
+
+gnrc_pktsnip_t *gnrc_ndp_rtr_sol_build(gnrc_pktsnip_t *options)
+{
+    gnrc_pktsnip_t *pkt;
+    DEBUG("ndp: building router solicitation message\n");
+    pkt = gnrc_icmpv6_build(options, ICMPV6_RTR_SOL, 0, sizeof(ndp_rtr_sol_t));
+    if (pkt != NULL) {
+        ndp_rtr_sol_t *rtr_sol = pkt->data;
+        rtr_sol->resv.u32 = 0;
+    }
     return pkt;
 }
 

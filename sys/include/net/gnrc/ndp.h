@@ -22,6 +22,7 @@
 #define GNRC_NDP_H_
 
 #include <inttypes.h>
+#include <stdlib.h>
 
 #include "byteorder.h"
 #include "net/ndp.h"
@@ -31,21 +32,49 @@
 #include "net/gnrc/ipv6/nc.h"
 #include "net/gnrc/ipv6/netif.h"
 
+#include "net/gnrc/ndp/host.h"
+#include "net/gnrc/ndp/internal.h"
 #include "net/gnrc/ndp/node.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#define GNRC_NDP_MSG_RTR_TIMEOUT        (0x0211)    /**< Message type for router timeouts */
-#define GNRC_NDP_MSG_ADDR_TIMEOUT       (0x0212)    /**< Message type for address timeouts */
-#define GNRC_NDP_MSG_NBR_SOL_RETRANS    (0x0213)    /**< Message type for multicast
+#define GNRC_NDP_MSG_RTR_TIMEOUT        (0x0210)    /**< Message type for router timeouts */
+#define GNRC_NDP_MSG_ADDR_TIMEOUT       (0x0211)    /**< Message type for address timeouts */
+#define GNRC_NDP_MSG_NBR_SOL_RETRANS    (0x0212)    /**< Message type for multicast
                                                      *   neighbor solicitation retransmissions */
-#define GNRC_NDP_MSG_NC_STATE_TIMEOUT   (0x0214)    /**< Message type for neighbor cache state timeouts */
+#define GNRC_NDP_MSG_RTR_SOL_RETRANS    (0x0215)    /**< Message type for periodic router solicitations */
+#define GNRC_NDP_MSG_NC_STATE_TIMEOUT   (0x0216)    /**< Message type for neighbor cache state timeouts */
 
 /**
+ * @name    Host constants
  * @{
+ * @see     <a href="https://tools.ietf.org/html/rfc4861#section-10">
+ *              RFC 4861, section 10
+ *          </a>
+ */
+/**
+ * @brief   Upper bound for randomised delay in seconds for initial
+ *          router solicitation transmissions
+ */
+#define GNRC_NDP_MAX_RTR_SOL_DELAY      (1U)
+
+/**
+ * @brief   Interval in seconds between initial router solicitation
+ *          transmissions
+ */
+#define GNRC_NDP_MAX_RTR_SOL_INT        (4U)
+
+/**
+ * @brief   Maximum number of  initial router solicitation transmissions
+ */
+#define GNRC_NDP_MAX_RTR_SOL_NUMOF      (3U)
+/** @} */
+
+/**
  * @name    Node constants
+ * @{
  * @see     <a href="https://tools.ietf.org/html/rfc4861#section-10">
  *              RFC 4861, section 10
  *          </a>
@@ -130,6 +159,21 @@ void gnrc_ndp_nbr_sol_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
  */
 void gnrc_ndp_nbr_adv_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
                              ipv6_hdr_t *ipv6, ndp_nbr_adv_t *nbr_adv,
+                             size_t icmpv6_size);
+
+/**
+ * @brief   Handles received router advertisements
+ *
+ * @todo    As router check consistency as described in RFC 4861, section 6.2.3
+ *
+ * @param[in] iface         The receiving interface.
+ * @param[in] pkt           The received packet.
+ * @param[in] ipv6          The IPv6 header in @p pkt.
+ * @param[in] rtr_adv       The router advertisement in @p pkt.
+ * @param[in] icmpv6_size   The overall size of the router advertisement.
+ */
+void gnrc_ndp_rtr_adv_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
+                             ipv6_hdr_t *ipv6, ndp_rtr_adv_t *rtr_adv,
                              size_t icmpv6_size);
 
 /**
@@ -232,6 +276,20 @@ gnrc_pktsnip_t *gnrc_ndp_nbr_sol_build(ipv6_addr_t *tgt, gnrc_pktsnip_t *options
  */
 gnrc_pktsnip_t *gnrc_ndp_nbr_adv_build(uint8_t flags, ipv6_addr_t *tgt,
                                        gnrc_pktsnip_t *options);
+
+/**
+ * @brief   Builds a router solicitation message for sending.
+ *
+ * @see <a href="https://tools.ietf.org/html/rfc4861#section-4.1">
+ *          RFC 4861, section 4.1
+ *      </a>
+ *
+ * @param[in] options   Options to append to the router solicitation.
+ *
+ * @return  The resulting ICMPv6 packet on success.
+ * @return  NULL, on failure.
+ */
+gnrc_pktsnip_t *gnrc_ndp_rtr_sol_build(gnrc_pktsnip_t *options);
 
 /**
  * @brief   Builds a generic NDP option.

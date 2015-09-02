@@ -80,17 +80,27 @@ endif
 ifneq (,$(filter gnrc_ipv6_default,$(USEMODULE)))
   USEMODULE += gnrc_ipv6
   USEMODULE += gnrc_icmpv6
-  USEMODULE += gnrc_ndp
-  USEMODULE += gnrc_ndp_internal
-  USEMODULE += gnrc_ndp_node
+  USEMODULE += gnrc_ndp_host
 endif
 
 ifneq (,$(filter gnrc_ipv6_router_default,$(USEMODULE)))
   USEMODULE += gnrc_ipv6_router
   USEMODULE += gnrc_icmpv6
-  USEMODULE += gnrc_ndp
-  USEMODULE += gnrc_ndp_internal
   USEMODULE += gnrc_ndp_node
+endif
+
+ifneq (,$(filter gnrc_ndp_host,$(USEMODULE)))
+  USEMODULE += gnrc_ndp_node
+  USEMODULE += random
+  USEMODULE += vtimer
+endif
+
+ifneq (,$(filter gnrc_ndp_node,$(USEMODULE)))
+  USEMODULE += gnrc_ndp_internal
+endif
+
+ifneq (,$(filter gnrc_ndp_%,$(USEMODULE)))
+  USEMODULE += gnrc_ndp
 endif
 
 ifneq (,$(filter gnrc_ndp,$(USEMODULE)))

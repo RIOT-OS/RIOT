@@ -195,6 +195,18 @@ extern "C" {
 #define GNRC_IPV6_NETIF_FLAGS_IS_WIRED          (0x0080)
 
 /**
+ * @brief   Offset of the router advertisement flags compared to the position in router
+ *          advertisements.
+ */
+#define GNRC_IPV6_NETIF_FLAGS_RTR_ADV_POS       (8U)
+
+/**
+ * @brief   Mask for flags intended for router advertisements.
+ * @note    Please expand if more router advertisement flags are introduced.
+ */
+#define GNRC_IPV6_NETIF_FLAGS_RTR_ADV_MASK      (0xc000)
+
+/**
  * @brief   Flag to indicate that the interface has other address
  *          configuration.
  */

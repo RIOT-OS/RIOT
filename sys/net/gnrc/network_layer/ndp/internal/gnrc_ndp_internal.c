@@ -33,11 +33,9 @@ static gnrc_ipv6_nc_t *_last_router = NULL; /* last router chosen as default
                                              * router. Only used if reachability
                                              * is suspect (i. e. incomplete or
                                              * not at all) */
-
-/**
- * @brief   Get L2 address from interface
- */
-static uint16_t _get_l2src(uint8_t *l2src, size_t l2src_size, kernel_pid_t iface);
+static gnrc_pktsnip_t *_build_headers(kernel_pid_t iface, gnrc_pktsnip_t *payload,
+                                      ipv6_addr_t *dst, ipv6_addr_t *src);
+static size_t _get_l2src(kernel_pid_t iface, uint8_t *l2src, size_t l2src_maxlen);
 
 /**
  * @brief   Sends @ref GNRC_NETAPI_MSG_TYPE_SND delayed.
@@ -160,7 +158,8 @@ void gnrc_ndp_internal_send_nbr_adv(kernel_pid_t iface, ipv6_addr_t *tgt, ipv6_a
     DEBUG("dst: %s, supply_tl2a: %d)\n",
           ipv6_addr_to_str(addr_str, dst, sizeof(addr_str)), supply_tl2a);
 
-    if (gnrc_ipv6_netif_get(iface)->flags & GNRC_IPV6_NETIF_FLAGS_ROUTER) {
+    if ((gnrc_ipv6_netif_get(iface)->flags & GNRC_IPV6_NETIF_FLAGS_ROUTER) &&
+        (gnrc_ipv6_netif_get(iface)->flags & GNRC_IPV6_NETIF_FLAGS_RTR_ADV)) {
         adv_flags |= NDP_NBR_ADV_FLAGS_R;
     }
 
@@ -173,9 +172,9 @@ void gnrc_ndp_internal_send_nbr_adv(kernel_pid_t iface, ipv6_addr_t *tgt, ipv6_a
 
     if (supply_tl2a) {
         uint8_t l2src[8];
-        uint16_t l2src_len;
+        size_t l2src_len;
         /* we previously checked if we are the target, so we can take our L2src */
-        l2src_len = _get_l2src(l2src, sizeof(l2src), iface);
+        l2src_len = _get_l2src(iface, l2src, sizeof(l2src));
 
         if (l2src_len > 0) {
             /* add target address link-layer address option */
@@ -202,32 +201,13 @@ void gnrc_ndp_internal_send_nbr_adv(kernel_pid_t iface, ipv6_addr_t *tgt, ipv6_a
         gnrc_pktbuf_release(pkt);
         return;
     }
-
     pkt = hdr;
-    hdr = gnrc_ipv6_hdr_build(pkt, NULL, 0, (uint8_t *)dst,
-                              sizeof(ipv6_addr_t));
-
+    hdr = _build_headers(iface, pkt, dst, NULL);
     if (hdr == NULL) {
-        DEBUG("ndp internal: error allocating IPv6 header.\n");
+        DEBUG("ndp internal: error adding lower-layer headers.\n");
         gnrc_pktbuf_release(pkt);
         return;
     }
-
-    ((ipv6_hdr_t *)hdr->data)->hl = 255;
-
-    pkt = hdr;
-    /* add netif header for send interface specification */
-    hdr = gnrc_netif_hdr_build(NULL, 0, NULL, 0);
-
-    if (hdr == NULL) {
-        DEBUG("ndp internal: error allocating netif header.\n");
-        return;
-    }
-
-    ((gnrc_netif_hdr_t *)hdr->data)->if_pid = iface;
-
-    LL_PREPEND(pkt, hdr);
-
     if (gnrc_ipv6_netif_addr_is_non_unicast(tgt)) {
         /* avoid collision for anycast addresses
          * (see https://tools.ietf.org/html/rfc4861#section-7.2.7) */
@@ -238,10 +218,10 @@ void gnrc_ndp_internal_send_nbr_adv(kernel_pid_t iface, ipv6_addr_t *tgt, ipv6_a
               delay.seconds);
 
         /* nc_entry must be set so no need to check it */
-        _send_delayed(&nc_entry->nbr_adv_timer, delay, pkt);
+        _send_delayed(&nc_entry->nbr_adv_timer, delay, hdr);
     }
     else {
-        gnrc_netapi_send(gnrc_ipv6_pid, pkt);
+        gnrc_netapi_send(gnrc_ipv6_pid, hdr);
     }
 }
 
@@ -250,7 +230,6 @@ void gnrc_ndp_internal_send_nbr_sol(kernel_pid_t iface, ipv6_addr_t *tgt,
 {
     gnrc_pktsnip_t *hdr, *pkt = NULL;
     ipv6_addr_t *src = NULL;
-    size_t src_len = 0;
 
     DEBUG("ndp internal: send neighbor solicitation (iface: %" PRIkernel_pid ", tgt: %s, ",
           iface, ipv6_addr_to_str(addr_str, tgt, sizeof(addr_str)));
@@ -259,9 +238,8 @@ void gnrc_ndp_internal_send_nbr_sol(kernel_pid_t iface, ipv6_addr_t *tgt,
     /* check if there is a fitting source address to target */
     if ((src = gnrc_ipv6_netif_find_best_src_addr(iface, tgt)) != NULL) {
         uint8_t l2src[8];
-        uint16_t l2src_len;
-        src_len = sizeof(ipv6_addr_t);
-        l2src_len = _get_l2src(l2src, sizeof(l2src), iface);
+        size_t l2src_len;
+        l2src_len = _get_l2src(iface, l2src, sizeof(l2src));
 
         if (l2src_len > 0) {
             /* add source address link-layer address option */
@@ -282,33 +260,55 @@ void gnrc_ndp_internal_send_nbr_sol(kernel_pid_t iface, ipv6_addr_t *tgt,
         gnrc_pktbuf_release(pkt);
         return;
     }
-
     pkt = hdr;
-    hdr = gnrc_ipv6_hdr_build(pkt, (uint8_t *)src, src_len, (uint8_t *)dst,
-                              sizeof(ipv6_addr_t));
-
+    hdr = _build_headers(iface, pkt, dst, src);
     if (hdr == NULL) {
-        DEBUG("ndp internal: error allocating IPv6 header.\n");
+        DEBUG("ndp internal: error adding lower-layer headers.\n");
         gnrc_pktbuf_release(pkt);
         return;
     }
+    gnrc_netapi_send(gnrc_ipv6_pid, hdr);
+}
 
-    ((ipv6_hdr_t *)hdr->data)->hl = 255;
+void gnrc_ndp_internal_send_rtr_sol(kernel_pid_t iface, ipv6_addr_t *dst)
+{
+    gnrc_pktsnip_t *hdr, *pkt = NULL;
+    ipv6_addr_t *src = NULL, all_routers = IPV6_ADDR_ALL_ROUTERS_LINK_LOCAL;
+    DEBUG("ndp internal: send router solicitation (iface: %" PRIkernel_pid ", dst: ff02::2)\n",
+          iface);
+    if (dst == NULL) {
+        dst = &all_routers;
+    }
+    /* check if there is a fitting source address to target */
+    if ((src = gnrc_ipv6_netif_find_best_src_addr(iface, dst)) != NULL) {
+        uint8_t l2src[8];
+        size_t l2src_len;
+        l2src_len = _get_l2src(iface, l2src, sizeof(l2src));
+        if (l2src_len > 0) {
+            /* add source address link-layer address option */
+            pkt = gnrc_ndp_opt_sl2a_build(l2src, l2src_len, NULL);
 
-    pkt = hdr;
-    /* add netif header for send interface specification */
-    hdr = gnrc_netif_hdr_build(NULL, 0, NULL, 0);
-
+            if (pkt == NULL) {
+                DEBUG("ndp internal: error allocating Source Link-layer address option.\n");
+                gnrc_pktbuf_release(pkt);
+                return;
+            }
+        }
+    }
+    hdr = gnrc_ndp_rtr_sol_build(pkt);
     if (hdr == NULL) {
-        DEBUG("ndp internal: error allocating netif header.\n");
+        DEBUG("ndp internal: error allocating router solicitation.\n");
+        gnrc_pktbuf_release(pkt);
         return;
     }
-
-    ((gnrc_netif_hdr_t *)hdr->data)->if_pid = iface;
-
-    LL_PREPEND(pkt, hdr);
-
-    gnrc_netapi_send(gnrc_ipv6_pid, pkt);
+    pkt = hdr;
+    hdr = _build_headers(iface, pkt, dst, src);
+    if (hdr == NULL) {
+        DEBUG("ndp internal: error adding lower-layer headers.\n");
+        gnrc_pktbuf_release(pkt);
+        return;
+    }
+    gnrc_netapi_send(gnrc_ipv6_pid, hdr);
 }
 
 int gnrc_ndp_internal_sl2a_opt_handle(gnrc_pktsnip_t *pkt, ipv6_hdr_t *ipv6, uint8_t icmpv6_type,
@@ -335,6 +335,7 @@ int gnrc_ndp_internal_sl2a_opt_handle(gnrc_pktsnip_t *pkt, ipv6_hdr_t *ipv6, uin
           gnrc_netif_addr_to_str(addr_str, sizeof(addr_str), sl2a, sl2a_len));
 
     switch (icmpv6_type) {
+        case ICMPV6_RTR_ADV:
         case ICMPV6_NBR_SOL:
             if (sl2a_len == 0) {  /* in case there was no source address in l2 */
                 sl2a_len = (sl2a_opt->len / 8) - sizeof(ndp_opt_t);
@@ -396,11 +397,81 @@ int gnrc_ndp_internal_tl2a_opt_handle(gnrc_pktsnip_t *pkt, ipv6_hdr_t *ipv6,
             return 0;
     }
 }
-static uint16_t _get_l2src(uint8_t *l2src, size_t l2src_size, kernel_pid_t iface)
+
+bool gnrc_ndp_internal_mtu_opt_handle(kernel_pid_t iface, uint8_t icmpv6_type,
+                                      ndp_opt_mtu_t *mtu_opt)
+{
+    gnrc_ipv6_netif_t *if_entry = gnrc_ipv6_netif_get(iface);
+
+    assert(if_entry != NULL);
+    if ((mtu_opt->len != NDP_OPT_MTU_LEN)) {
+        DEBUG("ndp: invalid MTU option received\n");
+        return false;
+    }
+    if (icmpv6_type != ICMPV6_RTR_ADV) {
+        /* else discard silently */
+        return true;
+    }
+    mutex_lock(&if_entry->mutex);
+    if_entry->mtu = byteorder_ntohl(mtu_opt->mtu);
+    mutex_unlock(&if_entry->mutex);
+    return true;
+}
+
+bool gnrc_ndp_internal_pi_opt_handle(kernel_pid_t iface, uint8_t icmpv6_type,
+                                     ndp_opt_pi_t *pi_opt)
+{
+    ipv6_addr_t *prefix;
+    gnrc_ipv6_netif_addr_t *netif_addr;
+
+    if ((pi_opt->len != NDP_OPT_MTU_LEN)) {
+        DEBUG("ndp: invalid MTU option received\n");
+        return false;
+    }
+    if (icmpv6_type != ICMPV6_RTR_ADV || ipv6_addr_is_link_local(&pi_opt->prefix)) {
+        /* else discard silently */
+        return true;
+    }
+    prefix = gnrc_ipv6_netif_find_addr(iface, &pi_opt->prefix);
+    if (((prefix == NULL) ||
+         (gnrc_ipv6_netif_addr_get(prefix)->prefix_len != pi_opt->prefix_len)) &&
+        (pi_opt->valid_ltime.u32 != 0)) {
+        prefix = gnrc_ipv6_netif_add_addr(iface, &pi_opt->prefix,
+                                          pi_opt->prefix_len,
+                                          pi_opt->flags & NDP_OPT_PI_FLAGS_MASK);
+        if (prefix == NULL) {
+            DEBUG("ndp: could not add prefix to interface %d\n", iface);
+            return false;
+        }
+    }
+    netif_addr = gnrc_ipv6_netif_addr_get(prefix);
+    if (pi_opt->valid_ltime.u32 == 0) {
+        if (prefix != NULL) {
+            gnrc_ipv6_netif_remove_addr(iface, &netif_addr->addr);
+        }
+
+        return true;
+    }
+    netif_addr->valid = byteorder_ntohl(pi_opt->valid_ltime);
+    netif_addr->preferred = byteorder_ntohl(pi_opt->pref_ltime);
+    vtimer_remove(&netif_addr->valid_timeout);
+    if (netif_addr->valid != UINT32_MAX) {
+        vtimer_set_msg(&netif_addr->valid_timeout,
+                       timex_set(byteorder_ntohl(pi_opt->valid_ltime), 0),
+                       thread_getpid(), GNRC_NDP_MSG_ADDR_TIMEOUT, &netif_addr->addr);
+    }
+    /* TODO: preferred lifetime for address auto configuration */
+    /* on-link flag MUST stay set if it was */
+    netif_addr->flags &= ~NDP_OPT_PI_FLAGS_A;
+    netif_addr->flags |= (pi_opt->flags & NDP_OPT_PI_FLAGS_MASK);
+    return true;
+}
+
+static size_t _get_l2src(kernel_pid_t iface, uint8_t *l2src, size_t l2src_maxlen)
 {
     bool try_long = false;
     int res;
-    uint16_t l2src_len;
+    size_t l2src_len;
     /* maximum address length that fits into a minimum length (8) S/TL2A option */
     const uint16_t max_short_len = 6;
 
@@ -412,11 +483,11 @@ static uint16_t _get_l2src(uint8_t *l2src, size_t l2src_size, kernel_pid_t iface
     }
 
     if (try_long && ((res = gnrc_netapi_get(iface, NETOPT_ADDRESS_LONG, 0,
-                                            l2src, l2src_size)) > max_short_len)) {
+                                            l2src, l2src_maxlen)) > max_short_len)) {
         l2src_len = (uint16_t)res;
     }
     else if ((res = gnrc_netapi_get(iface, NETOPT_ADDRESS, 0, l2src,
-                                    l2src_size)) >= 0) {
+                                    l2src_maxlen)) >= 0) {
         l2src_len = (uint16_t)res;
     }
     else {
@@ -425,6 +496,29 @@ static uint16_t _get_l2src(uint8_t *l2src, size_t l2src_size, kernel_pid_t iface
     }
 
     return l2src_len;
+}
+
+static gnrc_pktsnip_t *_build_headers(kernel_pid_t iface, gnrc_pktsnip_t *payload,
+                                      ipv6_addr_t *dst, ipv6_addr_t *src)
+{
+    gnrc_pktsnip_t *l2hdr;
+    gnrc_pktsnip_t *iphdr = gnrc_ipv6_hdr_build(payload, (uint8_t *)src, sizeof(ipv6_addr_t),
+                                                (uint8_t *)dst, sizeof(ipv6_addr_t));
+    if (iphdr == NULL) {
+        DEBUG("ndp internal: error allocating IPv6 header.\n");
+        return NULL;
+    }
+    ((ipv6_hdr_t *)iphdr->data)->hl = 255;
+    /* add netif header for send interface specification */
+    l2hdr = gnrc_netif_hdr_build(NULL, 0, NULL, 0);
+    if (l2hdr == NULL) {
+        DEBUG("ndp internal: error allocating netif header.\n");
+        gnrc_pktbuf_remove_snip(iphdr, iphdr);
+        return NULL;
+    }
+    ((gnrc_netif_hdr_t *)l2hdr->data)->if_pid = iface;
+    LL_PREPEND(iphdr, l2hdr);
+    return l2hdr;
 }
 
 /** @} */
