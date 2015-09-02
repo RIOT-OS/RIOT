@@ -311,17 +311,15 @@ void gnrc_ndp_internal_send_nbr_sol(kernel_pid_t iface, ipv6_addr_t *tgt,
     gnrc_netapi_send(gnrc_ipv6_pid, pkt);
 }
 
-bool gnrc_ndp_internal_sl2a_opt_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
-                                       ipv6_hdr_t *ipv6, uint8_t icmpv6_type,
-                                       ndp_opt_t *sl2a_opt)
+int gnrc_ndp_internal_sl2a_opt_handle(gnrc_pktsnip_t *pkt, ipv6_hdr_t *ipv6, uint8_t icmpv6_type,
+                                      ndp_opt_t *sl2a_opt, uint8_t *l2src)
 {
-    gnrc_ipv6_nc_t *nc_entry = NULL;
-    uint8_t sl2a_len = 0;
+    int sl2a_len = 0;
     uint8_t *sl2a = (uint8_t *)(sl2a_opt + 1);
 
     if ((sl2a_opt->len == 0) || ipv6_addr_is_unspecified(&ipv6->src)) {
         DEBUG("ndp: invalid source link-layer address option received\n");
-        return false;
+        return -EINVAL;
     }
 
     while (pkt) {
@@ -333,41 +331,25 @@ bool gnrc_ndp_internal_sl2a_opt_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
         pkt = pkt->next;
     }
 
-    if (sl2a_len == 0) {  /* in case there was no source address in l2 */
-        sl2a_len = (sl2a_opt->len / 8) - sizeof(ndp_opt_t);
-
-        /* ignore all zeroes at the end for length */
-        for (; sl2a[sl2a_len - 1] == 0x00; sl2a_len--);
-    }
-
     DEBUG("ndp: received SL2A (link-layer address: %s)\n",
           gnrc_netif_addr_to_str(addr_str, sizeof(addr_str), sl2a, sl2a_len));
 
     switch (icmpv6_type) {
         case ICMPV6_NBR_SOL:
-            nc_entry = gnrc_ipv6_nc_get(iface, &ipv6->src);
+            if (sl2a_len == 0) {  /* in case there was no source address in l2 */
+                sl2a_len = (sl2a_opt->len / 8) - sizeof(ndp_opt_t);
 
-            if (nc_entry != NULL) {
-                if ((sl2a_len != nc_entry->l2_addr_len) ||
-                    (memcmp(sl2a, nc_entry->l2_addr, sl2a_len) != 0)) {
-                    /* if entry exists but l2 address differs: set */
-                    nc_entry->l2_addr_len = sl2a_len;
-                    memcpy(nc_entry->l2_addr, sl2a, sl2a_len);
-
-                    gnrc_ndp_internal_set_state(nc_entry, GNRC_IPV6_NC_STATE_STALE);
-                }
-            }
-            else {
-                gnrc_ipv6_nc_add(iface, &ipv6->src, sl2a, sl2a_len,
-                                 GNRC_IPV6_NC_STATE_STALE);
+                /* ignore all zeroes at the end for length */
+                for (; sl2a[sl2a_len - 1] == 0x00; sl2a_len--);
             }
 
-            return true;
+            memcpy(l2src, sl2a, sl2a_len);
+            return sl2a_len;
 
         default:    /* wrong encapsulating message: silently discard */
             DEBUG("ndp: silently discard sl2a_opt for ICMPv6 message type %"
                   PRIu8 "\n", icmpv6_type);
-            return true;
+            return -ENOTSUP;
     }
 }
 

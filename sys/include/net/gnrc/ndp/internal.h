@@ -19,8 +19,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef INTERNAL_H_
-#define INTERNAL_H_
+#ifndef GNRC_NDP_INTERNAL_H_
+#define GNRC_NDP_INTERNAL_H_
 
 #include "net/ipv6/addr.h"
 #include "net/ipv6/hdr.h"
@@ -91,23 +91,22 @@ void gnrc_ndp_internal_send_nbr_adv(kernel_pid_t iface, ipv6_addr_t *tgt, ipv6_a
 /**
  * @brief   Handles a SL2A option.
  *
- * @param[in] iface         Interface the option was received on.
  * @param[in] pkt           Packet the option was received in.
  * @param[in] ipv6          IPv6 header of @p pkt
  * @param[in] icmpv6_type   ICMPv6 type of the message carrying the option.
- * @param[in] sl2a_opt      The SL2A option.
+ * @param[in] tl2a_opt      The TL2A option.
+ * @param[out] l2addr       The L2 address carried in the SL2A option.
  *
- * @return  true, on success.
- * @return  false, if SL2A was not valid.
+ * @return  length of the L2 address, on success.
+ * @return  -EINVAL, if SL2A was not valid.
+ * @return  -ENOTSUP, if node should silently ignore the option.
  */
-bool gnrc_ndp_internal_sl2a_opt_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
-                                       ipv6_hdr_t *ipv6, uint8_t icmpv6_type,
-                                       ndp_opt_t *sl2a_opt);
+int gnrc_ndp_internal_sl2a_opt_handle(gnrc_pktsnip_t *pkt, ipv6_hdr_t *ipv6, uint8_t icmpv6_type,
+                                      ndp_opt_t *sl2a_opt, uint8_t *l2addr);
 
 /**
  * @brief   Handles a TL2A option.
  *
- * @param[in] iface         Interface the option was received on.
  * @param[in] pkt           Packet the option was received in.
  * @param[in] ipv6          IPv6 header of @p pkt
  * @param[in] icmpv6_type   ICMPv6 type of the message carrying the option.
@@ -116,6 +115,7 @@ bool gnrc_ndp_internal_sl2a_opt_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
  *
  * @return  length of the L2 address, on success.
  * @return  -EINVAL, if TL2A was not valid.
+ * @return  -ENOTSUP, if node should silently ignore the option.
  */
 int gnrc_ndp_internal_tl2a_opt_handle(gnrc_pktsnip_t *pkt, ipv6_hdr_t *ipv6,
                                       uint8_t icmpv6_type, ndp_opt_t *tl2a_opt,
@@ -125,5 +125,5 @@ int gnrc_ndp_internal_tl2a_opt_handle(gnrc_pktsnip_t *pkt, ipv6_hdr_t *ipv6,
 }
 #endif
 
-#endif /* INTERNAL_H_ */
+#endif /* GNRC_NDP_INTERNAL_H_ */
 /** @} */
