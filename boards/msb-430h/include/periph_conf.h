@@ -21,6 +21,8 @@
 #ifndef PERIPH_CONF_H
 #define PERIPH_CONF_H
 
+#include "periph_cpu.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -64,6 +66,26 @@ extern "C" {
 #define UART_TX_PIN         (1 << 7)
 #define UART_RX_ISR         (USART1RX_VECTOR)
 #define UART_TX_ISR         (USART1TX_VECTOR)
+/** @} */
+
+/**
+ * @brief   SPI configuration
+ * @{
+ */
+#define SPI_NUMOF           (1U)
+#define SPI_0_EN            (1U)
+
+/* SPI configuration */
+#define SPI_DEV             (USART_0)
+#define SPI_IE              (SFR->IE1)
+#define SPI_IF              (SFR->IFG1)
+#define SPI_IE_RX_BIT       (1 << 6)
+#define SPI_IE_TX_BIT       (1 << 7)
+#define SPI_ME              (SFR->ME1)
+#define SPI_ME_BIT          (1 << 6)
+#define SPI_PIN_MISO        GPIO(P3,2)
+#define SPI_PIN_MOSI        GPIO(P3,1)
+#define SPI_PIN_CLK         GPIO(P3,3)
 /** @} */
 
 #ifdef __cplusplus
