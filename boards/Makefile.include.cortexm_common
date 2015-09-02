@@ -4,6 +4,7 @@ export TARGET_TRIPLE ?= arm-none-eabi
 # Use TOOLCHAIN environment variable to select the toolchain to use.
 # Default: gnu
 TOOLCHAIN ?= gnu
+OPTIMIZE_LVL ?= s
 
 # TOOLCHAIN = clang is an alias for TOOLCHAIN = llvm
 ifeq (clang,$(TOOLCHAIN))
@@ -34,7 +35,7 @@ endif
 export CFLAGS_STYLE = -std=gnu99 -Wall -Wstrict-prototypes -Werror=implicit-function-declaration
 export CFLAGS_LINK  = -ffunction-sections -fdata-sections -fno-builtin -fshort-enums
 export CFLAGS_DBG   = -ggdb -g3
-export CFLAGS_OPT  ?= -Os
+export CFLAGS_OPT  ?= -O$(OPTIMIZE_LVL)
 
 export CFLAGS += $(CFLAGS_CPU) $(CFLAGS_STYLE) $(CFLAGS_LINK) $(CFLAGS_DBG) $(CFLAGS_OPT)
 
