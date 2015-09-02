@@ -1,0 +1,5 @@
+ifneq (,$(filter gnrc_netif_default,$(USEMODULE)))
+  USEMODULE += xtimer
+  USEMODULE += cc2420
+  USEMODULE += gnrc_nomac
+endif
