@@ -22,9 +22,9 @@
 #include "xtimer.h"
 #include "periph_conf.h"
 
-#define N 1000
+#define NUMOF 1000
 
-uint32_t res[N];
+uint32_t res[NUMOF];
 
 int main(void)
 {
@@ -32,7 +32,7 @@ int main(void)
 
     uint32_t interval = 1000;
 
-    for (int i = 0; i < N; i++) {
+    for (int i = 0; i < NUMOF; i++) {
         printf("Testing interval %u...\n", (unsigned)interval);
         uint32_t last_wakeup = xtimer_now();
         uint32_t before = last_wakeup;
@@ -42,7 +42,7 @@ int main(void)
         interval -= 1;
     }
 
-    for (int i = 0; i < N; i++) {
+    for (int i = 0; i < NUMOF; i++) {
         printf("%4d diff=%i\n", i, (int)res[i]);
     }
 
