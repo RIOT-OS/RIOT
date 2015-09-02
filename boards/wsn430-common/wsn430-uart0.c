@@ -43,7 +43,7 @@ void usart0irq(void);
 /**
  * \brief the interrupt function
  */
-interrupt(USART0RX_VECTOR) usart0irq(void) {
+void __attribute__((interrupt(USART0RX_VECTOR))) usart0irq(void) {
     volatile int dummy = 0;
     /* Check status register for receive errors. */
     if(U0RCTL & RXERR) {
