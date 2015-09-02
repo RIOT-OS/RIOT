@@ -47,6 +47,7 @@ void timerA_init(void)
         *(ccr + i) = 0;
         *(ctl + i) &= ~(CCIFG);
         *(ctl + i) &= ~(CCIE);
+        msp430_timer[i].ccr_num = i;
     }
 
     TA0CTL |= MC_2;
