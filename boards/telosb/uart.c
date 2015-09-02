@@ -90,7 +90,7 @@ void usart1irq(void);
 /**
  * \brief the interrupt function
  */
-interrupt(USART1RX_VECTOR) usart1irq(void)
+void __attribute__((interrupt(USART1RX_VECTOR))) usart1irq(void)
 {
     /* Check status register for receive errors. */
     if (U1RCTL & RXERR) {
