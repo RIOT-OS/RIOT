@@ -1,7 +1,7 @@
 APPLICATION = driver_slip
 include ../Makefile.tests_common
 
-BOARD_INSUFFICIENT_MEMORY := stm32f0discovery
+BOARD_INSUFFICIENT_MEMORY := stm32f0discovery nucleo-f334
 
 USEMODULE += auto_init_gnrc_netif
 USEMODULE += gnrc
