@@ -5,7 +5,7 @@ APPLICATION = hello-world
 BOARD ?= native
 
 # Optimazation Level desired
-OPTIMIZE_LVL ?= 0
+OPTIMIZE_LVL ?= g
 
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
