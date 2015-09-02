@@ -21,6 +21,7 @@
  */
 
 #include "cpu.h"
+#include "irq.h"
 #include "board.h"
 #include "kernel_internal.h"
 #include "msp430.h"
@@ -130,7 +131,7 @@ static void msb_ports_init(void)
 
 void msp430_set_cpu_speed(uint32_t speed)
 {
-    dint();
+    disableIRQ();
     __msp430_cpu_speed = speed;
     msp430_init_dco();
     uint16_t br;
@@ -148,7 +149,7 @@ void msp430_set_cpu_speed(uint32_t speed)
 
     IE2 |= URXIE1;
     //clock_init();
-    eint();
+    enableIRQ();
 }
 
 /*---------------------------------------------------------------------------*/
