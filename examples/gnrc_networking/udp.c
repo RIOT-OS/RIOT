@@ -26,18 +26,18 @@
 #include "net/gnrc/ipv6.h"
 #include "net/gnrc/udp.h"
 #include "net/gnrc/pktdump.h"
+#include "timex.h"
+#include "vtimer.h"
 
-static gnrc_netreg_entry_t server = {NULL, GNRC_NETREG_DEMUX_CTX_ALL,
-                                   KERNEL_PID_UNDEF};
+static gnrc_netreg_entry_t server = { NULL, GNRC_NETREG_DEMUX_CTX_ALL, KERNEL_PID_UNDEF };
 
 
-static void send(char *addr_str, char *port_str, char *data)
+static void send(char *addr_str, char *port_str, char *data, unsigned int num,
+                 unsigned int delay)
 {
     uint8_t port[2];
     uint16_t tmp;
-    gnrc_pktsnip_t *payload, *udp, *ip;
     ipv6_addr_t addr;
-    gnrc_netreg_entry_t *sendto;
 
     /* parse destination address */
     if (ipv6_addr_from_str(&addr, addr_str) == NULL) {
@@ -53,40 +53,38 @@ static void send(char *addr_str, char *port_str, char *data)
     port[0] = (uint8_t)tmp;
     port[1] = tmp >> 8;
 
-    /* allocate payload */
-    payload = gnrc_pktbuf_add(NULL, data, strlen(data), GNRC_NETTYPE_UNDEF);
-    if (payload == NULL) {
-        puts("Error: unable to copy data to packet buffer");
-        return;
+    for (unsigned int i = 0; i < num; i++) {
+        gnrc_pktsnip_t *payload, *udp, *ip;
+        /* allocate payload */
+        payload = gnrc_pktbuf_add(NULL, data, strlen(data), GNRC_NETTYPE_UNDEF);
+        if (payload == NULL) {
+            puts("Error: unable to copy data to packet buffer");
+            return;
+        }
+        /* allocate UDP header, set source port := destination port */
+        udp = gnrc_udp_hdr_build(payload, port, 2, port, 2);
+        if (udp == NULL) {
+            puts("Error: unable to allocate UDP header");
+            gnrc_pktbuf_release(payload);
+            return;
+        }
+        /* allocate IPv6 header */
+        ip = gnrc_ipv6_hdr_build(udp, NULL, 0, (uint8_t *)&addr, sizeof(addr));
+        if (ip == NULL) {
+            puts("Error: unable to allocate IPv6 header");
+            gnrc_pktbuf_release(udp);
+            return;
+        }
+        /* send packet */
+        if (!gnrc_netapi_dispatch_send(GNRC_NETTYPE_UDP, GNRC_NETREG_DEMUX_CTX_ALL, ip)) {
+            puts("Error: unable to locate UDP thread");
+            gnrc_pktbuf_release(ip);
+            return;
+        }
+        printf("Success: send %u byte to %s:%u\n", (unsigned)payload->size,
+               addr_str, tmp);
+        vtimer_usleep(delay);
     }
-    /* allocate UDP header, set source port := destination port */
-    udp = gnrc_udp_hdr_build(payload, port, 2, port, 2);
-    if (udp == NULL) {
-        puts("Error: unable to allocate UDP header");
-        gnrc_pktbuf_release(payload);
-        return;
-    }
-    /* allocate IPv6 header */
-    ip = gnrc_ipv6_hdr_build(udp, NULL, 0, (uint8_t *)&addr, sizeof(addr));
-    if (ip == NULL) {
-        puts("Error: unable to allocate IPv6 header");
-        gnrc_pktbuf_release(udp);
-        return;
-    }
-    /* send packet */
-    sendto = gnrc_netreg_lookup(GNRC_NETTYPE_UDP, GNRC_NETREG_DEMUX_CTX_ALL);
-    if (sendto == NULL) {
-        puts("Error: unable to locate UDP thread");
-        gnrc_pktbuf_release(ip);
-        return;
-    }
-    gnrc_pktbuf_hold(ip, gnrc_netreg_num(GNRC_NETTYPE_UDP,
-                                         GNRC_NETREG_DEMUX_CTX_ALL) - 1);
-    while (sendto != NULL) {
-        gnrc_netapi_send(sendto->pid, ip);
-        sendto = gnrc_netreg_getnext(sendto);
-    }
-    printf("Success: send %i byte to %s:%u\n", payload->size, addr_str, tmp);
 }
 
 static void start_server(char *port_str)
@@ -96,7 +94,7 @@ static void start_server(char *port_str)
     /* check if server is already running */
     if (server.pid != KERNEL_PID_UNDEF) {
         printf("Error: server already running on port %" PRIu32 "\n",
-                server.demux_ctx);
+               server.demux_ctx);
         return;
     }
     /* parse port */
@@ -133,11 +131,20 @@ int udp_cmd(int argc, char **argv)
     }
 
     if (strcmp(argv[1], "send") == 0) {
+        uint32_t num = 1;
+        uint32_t delay = 1000000;
         if (argc < 5) {
-            printf("usage: %s send <addr> <port> <data>\n", argv[0]);
+            printf("usage: %s send <addr> <port> <data> [<num> [<delay in us>]]\n",
+                   argv[0]);
             return 1;
         }
-        send(argv[2], argv[3], argv[4]);
+        if (argc > 5) {
+            num = (uint32_t)atoi(argv[5]);
+        }
+        if (argc > 6) {
+            delay = (uint32_t)atoi(argv[6]);
+        }
+        send(argv[2], argv[3], argv[4], num, delay);
     }
     else if (strcmp(argv[1], "server") == 0) {
         if (argc < 3) {
