@@ -384,7 +384,7 @@ int kw2xrf_init(kw2xrf_t *dev, spi_t spi, spi_speed_t spi_speed,
     uint8_t reg = 0;
     uint8_t tmp[2];
     kw2xrf_gpio_int = int_pin;
-#if CPUID_ID_LEN
+#ifdef MODULE_PERIPH_CPUID
     uint8_t cpuid[CPUID_ID_LEN];
     eui64_t addr_long;
 #endif
@@ -411,7 +411,7 @@ int kw2xrf_init(kw2xrf_t *dev, spi_t spi, spi_speed_t spi_speed,
     dev->proto = KW2XRF_DEFAULT_PROTOCOL;
     dev->option = 0;
 
-#if CPUID_ID_LEN
+#ifdef MODULE_PERIPH_CPUID
     cpuid_get(cpuid);
 
 #if CPUID_ID_LEN < 8

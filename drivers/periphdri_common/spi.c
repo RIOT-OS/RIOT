@@ -7,11 +7,11 @@
  */
 
 /**
- * @ingroup drivers
+ * @ingroup     drivers
  * @{
  *
  * @file
- * @brief       common SPI function fallback implementations
+ * @brief       Common SPI function fallback implementations
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  *

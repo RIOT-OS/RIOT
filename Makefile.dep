@@ -1,14 +1,12 @@
+# pull dependencies from drivers
+include $(RIOTBASE)/drivers/Makefile.dep
+
 ifneq (,$(filter gnrc_%,$(filter-out gnrc_netapi gnrc_netreg gnrc_netif% gnrc_pktbuf,$(USEMODULE))))
   USEMODULE += gnrc
 endif
 
 ifneq (,$(filter gnrc_netif_default,$(USEMODULE)))
   USEMODULE += gnrc_netif
-endif
-
-ifneq (,$(filter at86rf2%,$(USEMODULE)))
-  USEMODULE += at86rf2xx
-  USEMODULE += ieee802154
 endif
 
 ifneq (,$(filter kw2xrf,$(USEMODULE)))
@@ -20,11 +18,15 @@ ifneq (,$(filter xbee,$(USEMODULE)))
 endif
 
 ifneq (,$(filter gnrc_zep,$(USEMODULE)))
+  USEMODULE += periph_uart
   USEMODULE += hashes
   USEMODULE += ieee802154
   USEMODULE += gnrc_udp
   USEMODULE += random
   USEMODULE += vtimer
+  ifneq (,$(filter periph_cpuid,$(FEATURES_PROVIDED)))
+    USEMODULE += periph_cpuid
+  endif
 endif
 
 ifneq (,$(filter gnrc_rpl,$(USEMODULE)))
@@ -262,4 +264,12 @@ endif
 
 ifneq (,$(filter hih6130,$(USEMODULE)))
   USEMODULE += vtimer
+endif
+
+ifneq (,$(filter uart_stdio,$(USEMODULE)))
+  USEMODULE += periph_uart
+endif
+
+ifneq (,$(filter hwtimer_compat,$(USEMODULE)))
+  USEMODULE += periph_timer
 endif

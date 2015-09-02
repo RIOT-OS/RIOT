@@ -129,8 +129,8 @@ ifneq (0,$(shell test -d $(RIOTBOARD)/$(BOARD); echo $$?))
 endif
 
 # mandatory includes!
-include $(RIOTBASE)/Makefile.modules
 include $(RIOTBOARD)/$(BOARD)/Makefile.include
+include $(RIOTBOARD)/$(BOARD)/Makefile.features
 include $(RIOTCPU)/$(CPU)/Makefile.include
 
 # get number of interfaces straight before resolving dependencies
@@ -141,6 +141,7 @@ ifneq ($(GNRC_NETIF_NUMOF),1)
 endif
 
 include $(RIOTBASE)/Makefile.dep
+include $(RIOTBASE)/Makefile.modules
 
 USEMODULE += $(filter-out $(DISABLE_MODULE), $(DEFAULT_MODULE))
 
@@ -331,9 +332,6 @@ $(CURDIR)/eclipsesym.xml:
 # Extra make goals for testing and comparing changes.
 include $(RIOTBASE)/Makefile.buildtests
 
-# import list of provided features
--include $(RIOTBOARD)/$(BOARD)/Makefile.features
-
 # Export variables used throughout the whole make system:
 include $(RIOTBASE)/Makefile.vars
 
@@ -354,6 +352,13 @@ ifneq (, $(filter all, $(if $(MAKECMDGOALS), $(MAKECMDGOALS), all)))
   ifneq (, $(filter-out $(FEATURES_PROVIDED) $(FEATURES_OPTIONAL), $(FEATURES_REQUIRED)))
     $(shell $(COLOR_ECHO) "$(COLOR_RED)There are unsatisfied feature requirements:$(COLOR_RESET)"\
                           "$(sort $(filter-out $(FEATURES_PROVIDED) $(FEATURES_OPTIONAL), $(FEATURES_REQUIRED)))" 1>&2)
+    EXPECT_ERRORS := 1
+  endif
+
+  # Test if all used peripherals are provided by the board
+  ifneq (, $(filter-out $(FEATURES_PROVIDED), $(filter periph_%,$(USEMODULE))))
+    $(shell $(COLOR_ECHO) "$(COLOR_RED)These needed MCU peripherals are not supported by your board:$(COLOR_RESET)"\
+                          "$(sort $(filter-out $(FEATURES_PROVIDED), $(filter periph_%,$(USEMODULE))))" 1>&2)
     EXPECT_ERRORS := 1
   endif
 

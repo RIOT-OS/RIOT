@@ -88,7 +88,7 @@ int at86rf2xx_init(at86rf2xx_t *dev, spi_t spi, spi_speed_t spi_speed,
 
 void at86rf2xx_reset(at86rf2xx_t *dev)
 {
-#if CPUID_ID_LEN
+#ifdef MODULE_PERIPH_CPUID
     uint8_t cpuid[CPUID_ID_LEN];
     eui64_t addr_long;
 #endif
@@ -107,7 +107,7 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
     dev->seq_nr = 0;
     dev->options = 0;
     /* set short and long address */
-#if CPUID_ID_LEN
+#ifdef MODULE_PERIPH_CPUID
     cpuid_get(cpuid);
 
 #if CPUID_ID_LEN < 8
