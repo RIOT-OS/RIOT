@@ -756,10 +756,10 @@ void gnrc_ipv6_netif_init_by_dev(void)
         }
 
         if (gnrc_netapi_get(ifs[i], NETOPT_IS_WIRED, 0, &tmp, sizeof(int)) > 0) {
-            ipv6_if->flags = GNRC_IPV6_NETIF_FLAGS_IS_WIRED;
+            ipv6_if->flags |= GNRC_IPV6_NETIF_FLAGS_IS_WIRED;
         }
         else {
-            ipv6_if->flags = 0;
+            ipv6_if->flags &= ~GNRC_IPV6_NETIF_FLAGS_IS_WIRED;
         }
 
         mutex_unlock(&ipv6_if->mutex);
