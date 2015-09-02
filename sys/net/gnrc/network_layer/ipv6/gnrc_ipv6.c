@@ -212,6 +212,16 @@ static void *_event_loop(void *args)
                 gnrc_ndp_state_timeout((gnrc_ipv6_nc_t *)msg.content.ptr);
                 break;
 #endif
+#ifdef MODULE_GNRC_NDP_ROUTER
+            case GNRC_NDP_MSG_RTR_ADV_RETRANS:
+                DEBUG("ipv6: Router advertisement retransmission event received\n");
+                gnrc_ndp_router_retrans_rtr_adv((gnrc_ipv6_netif_t *)msg.content.ptr);
+                break;
+            case GNRC_NDP_MSG_RTR_ADV_DELAY:
+                DEBUG("ipv6: Delayed router advertisement event received\n");
+                gnrc_ndp_router_send_rtr_adv((gnrc_ipv6_nc_t *)msg.content.ptr);
+                break;
+#endif
 #ifdef MODULE_GNRC_NDP_HOST
             case GNRC_NDP_MSG_RTR_SOL_RETRANS:
                 DEBUG("ipv6: Router solicitation retransmission event received\n");

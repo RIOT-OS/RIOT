@@ -87,10 +87,13 @@ void gnrc_icmpv6_demux(kernel_pid_t iface, gnrc_pktsnip_t *pkt)
             break;
 #endif
 
+#if (defined(MODULE_GNRC_NDP_ROUTER) || defined(MODULE_GNRC_SIXLOWPAN_ND_ROUTER))
         case ICMPV6_RTR_SOL:
             DEBUG("icmpv6: router solicitation received\n");
-            /* TODO */
+            gnrc_ndp_rtr_sol_handle(iface, pkt, ipv6->data, (ndp_rtr_sol_t *)hdr,
+                                    icmpv6->size);
             break;
+#endif
 
 #ifdef MODULE_GNRC_NDP
         case ICMPV6_RTR_ADV:

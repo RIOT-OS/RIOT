@@ -86,10 +86,16 @@ endif
 ifneq (,$(filter gnrc_ipv6_router_default,$(USEMODULE)))
   USEMODULE += gnrc_ipv6_router
   USEMODULE += gnrc_icmpv6
-  USEMODULE += gnrc_ndp_node
+  USEMODULE += gnrc_ndp_router
 endif
 
 ifneq (,$(filter gnrc_ndp_host,$(USEMODULE)))
+  USEMODULE += gnrc_ndp_node
+  USEMODULE += random
+  USEMODULE += vtimer
+endif
+
+ifneq (,$(filter gnrc_ndp_router,$(USEMODULE)))
   USEMODULE += gnrc_ndp_node
   USEMODULE += random
   USEMODULE += vtimer
