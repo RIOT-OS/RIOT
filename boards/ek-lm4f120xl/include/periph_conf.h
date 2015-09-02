@@ -64,9 +64,9 @@ extern "C" {
  * @name UART configuration
  * @{
  */
-#define UART_NUMOF          (1U)
+#define UART_NUMOF          (2U)
 #define UART_0_EN           1
-#define UART_1_EN           0
+#define UART_1_EN           1
 #define UART_IRQ_PRIO       1
 #define UART_CLK            ROM_SysCtlClockGet()  /* UART clock runs with 40MHz */
 /* UART 0 device configuration */
@@ -74,16 +74,23 @@ extern "C" {
 #define UART_0_CLK          (40000000)
 #define UART_0_IRQ_CHAN     UART0_IRQn
 #define UART_0_ISR          isr_uart0
+#define UART_0_IM           UART0_IM_R
 /* UART 0 pin configuration */
-#define UART_0_PORT         GPIOA
-#define UART_0_TX_PIN       UART_PA1_U0TX
-#define UART_0_RX_PIN       UART_PA0_U0RX
+#define UART_0_PORT         SYSCTL_PERIPH_GPIOA
+#define UART_0_TX_PIN       GPIO_PA1_U0TX
+#define UART_0_RX_PIN       GPIO_PA0_U0RX
 
 /* UART 1 device configuration */
 #define UART_1_DEV          UART1_BASE
 #define UART_1_CLK          (40000000)
 #define UART_1_IRQ_CHAN     UART1_IRQn
 #define UART_1_ISR          isr_uart1
+#define UART_1_IM           UART1_IM_R
+#
+/* UART 1 pin configuration */
+#define UART_1_PORT         SYSCTL_PERIPH_GPIOB
+#define UART_1_TX_PIN       GPIO_PB1_U1TX
+#define UART_1_RX_PIN       GPIO_PB0_U1RX
 /** @} */
 
 #ifdef __cplusplus
