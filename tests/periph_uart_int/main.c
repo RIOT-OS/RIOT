@@ -36,7 +36,7 @@
 #include "kernel.h"
 #include "thread.h"
 #include "board.h"
-#include "vtimer.h"
+#include "xtimer.h"
 #include "ringbuffer.h"
 #include "periph/uart.h"
 #include "periph_conf.h"
@@ -87,7 +87,7 @@ void *uart_thread(void *arg)
         ringbuffer_add(&tx_buf, status, strlen(status));
         uart_tx_begin(DEV);
 
-        vtimer_usleep(2000ul * 1000ul);
+        xtimer_usleep(2000ul * 1000ul);
     }
 
     return 0;
