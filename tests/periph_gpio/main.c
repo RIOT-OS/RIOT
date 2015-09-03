@@ -23,7 +23,6 @@
 
 #include "shell.h"
 #include "periph/gpio.h"
-#include "hwtimer.h"
 
 static void cb(void *arg)
 {
