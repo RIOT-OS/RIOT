@@ -23,7 +23,7 @@
 #include <ctype.h>
 
 #include "board.h"
-#include "vtimer.h"
+#include "xtimer.h"
 #include "periph/spi.h"
 #include "nvram-spi.h"
 
@@ -118,10 +118,7 @@ int main(void)
         .address_count = TEST_NVRAM_SPI_ADDRESS_COUNT,
     };
     nvram_t dev;
-    timex_t start_delay = {
-        .seconds = 10,
-        .microseconds = 0,
-    };
+    uint32_t start_delay = 10;
 
     puts("NVRAM SPI test application starting...");
     printf("Initializing SPI_%i... ", TEST_NVRAM_SPI_DEV);
@@ -147,7 +144,7 @@ int main(void)
     puts("!!! This test will erase everything on the NVRAM !!!");
     puts("!!! Unplug/reset/halt device now if this is not acceptable !!!");
     puts("Waiting for 10 seconds before continuing...");
-    vtimer_sleep(start_delay);
+    xtimer_sleep(start_delay);
 
     puts("Reading current memory contents...");
     for (i = 0; i < TEST_NVRAM_SPI_SIZE; ++i) {

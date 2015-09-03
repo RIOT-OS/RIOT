@@ -4,7 +4,7 @@ include ../Makefile.tests_common
 FEATURES_REQUIRED = periph_spi periph_gpio
 
 USEMODULE += nvram_spi
-USEMODULE += vtimer
+USEMODULE += xtimer
 
 ifneq (,$(TEST_NVRAM_SPI_DEV))
   CFLAGS += -DTEST_NVRAM_SPI_DEV=$(TEST_NVRAM_SPI_DEV)
