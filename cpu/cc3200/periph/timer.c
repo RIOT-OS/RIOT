@@ -20,6 +20,7 @@
 
 #include <stdlib.h>
 
+#include <thread.h>
 #include "panic.h"
 #include <sys/types.h>
 
@@ -79,11 +80,17 @@ timer_queue_item *busyq3;
 void irq_timer0_handler(void) {
 	timer_clear(TIMER_0, 0);
 	config[TIMER_0].cb(0); // timer has one hw channel
+	if(sched_context_switch_request) {
+		thread_yield();
+	}
 }
 
 void irq_timer1_handler(void) {
 	timer_clear(TIMER_1, 0);
 	config[TIMER_1].cb(0); // timer has one hw channel
+	if(sched_context_switch_request) {
+		thread_yield();
+	}
 }
 
 void irq_timer2_handler(void) {
@@ -132,11 +139,15 @@ void irq_timer2_handler(void) {
 		if(busyq2) {
 			HWREG(TIMERA2_BASE + TIMER_O_TAMATCHR) = busyq2->value;
 		}
-#else
-		timer_clear(TIMER_2, 0);
-		config[TIMER_2].cb(0); // timer has one hw channel
-#endif
 	}
+#else
+	timer_clear(TIMER_2, 0);
+	config[TIMER_2].cb(0); // timer has one hw channel
+#endif
+	if(sched_context_switch_request) {
+		thread_yield();
+	}
+
 }
 
 void irq_timer3_handler(void) {
@@ -158,38 +169,43 @@ void irq_timer3_handler(void) {
 		return;
 	} else if (sts & TIMER_MIS_TAMMIS) {
 
-	timer_queue_item *active = busyq3;
+		timer_queue_item *active = busyq3;
 
-	int ch = active->channel;
+		int ch = active->channel;
 
-	busyq3 = active->next;
-	active->next = freeq3;
-	freeq3 = active;
-
-	timer_clear(TIMER_3, 0);
-	config[TIMER_3].cb(ch);
-
-	sts = HWREG(TIMERA3_BASE + TIMER_O_TAR);
-
-	while (busyq3 && sts > (busyq3->value - ELAPSED_TICKS)) {
-		ch = busyq3->channel;
-		active = busyq3;
 		busyq3 = active->next;
 		active->next = freeq3;
 		freeq3 = active;
 
+		timer_clear(TIMER_3, 0);
 		config[TIMER_3].cb(ch);
 
 		sts = HWREG(TIMERA3_BASE + TIMER_O_TAR);
-	}
-	if (busyq3) {
-		HWREG(TIMERA3_BASE + TIMER_O_TAMATCHR) = busyq3->value;
+
+		while (busyq3 && sts > (busyq3->value - ELAPSED_TICKS)) {
+			ch = busyq3->channel;
+			active = busyq3;
+			busyq3 = active->next;
+			active->next = freeq3;
+			freeq3 = active;
+
+			config[TIMER_3].cb(ch);
+
+			sts = HWREG(TIMERA3_BASE + TIMER_O_TAR);
+		}
+		if (busyq3) {
+			HWREG(TIMERA3_BASE + TIMER_O_TAMATCHR) = busyq3->value;
+		}
 	}
 #else
 	timer_clear(TIMER_3, 0);
 	config[TIMER_3].cb(0); // timer has one hw channel
 #endif
+
+	if(sched_context_switch_request) {
+		thread_yield();
 	}
+
 }
 
 
