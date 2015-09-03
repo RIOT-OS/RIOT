@@ -62,8 +62,8 @@ extern "C" {
 #define UART_PORT           (PORT_3)
 #define UART_RX_PIN         (1 << 4)
 #define UART_TX_PIN         (1 << 5)
-#define UART_RX_ISR         (USART1RX_VECTOR)
-#define UART_TX_ISR         (USART1TX_VECTOR)
+#define UART_RX_ISR         (USART0RX_VECTOR)
+#define UART_TX_ISR         (USART0TX_VECTOR)
 /** @} */
 
 #ifdef __cplusplus
