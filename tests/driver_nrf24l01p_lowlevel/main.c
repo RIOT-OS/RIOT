@@ -42,7 +42,6 @@
 #include "nrf24l01p_settings.h"
 #include "periph/spi.h"
 #include "periph/gpio.h"
-#include "vtimer.h"
 #include "xtimer.h"
 #include "shell.h"
 #include "shell_commands.h"
@@ -85,14 +84,12 @@ void prtbin(unsigned byte)
 void print_register(char reg, int num_bytes)
 {
 
-    vtimer_init();
-
     char buf_return[num_bytes];
     int ret;
 
 
     gpio_clear(CS_PIN);
-    vtimer_usleep(1);
+    xtimer_usleep(1);
     ret = spi_transfer_regs(SPI_PORT, (CMD_R_REGISTER | (REGISTER_MASK & reg)), 0, buf_return, num_bytes);
     gpio_set(CS_PIN);
 
