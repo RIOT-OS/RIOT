@@ -9,7 +9,8 @@
  * provides a microkernel, utilities like cryptographic libraries, data structures
  * (bloom filters, hash tables, priority queues), or a shell, different network
  * stacks, and support for various microcontrollers, radio drivers, sensors, and
- * configurations for entire platforms, e.g. TelosB or STM32 Discovery Boards.
+ * configurations for entire platforms, e.g. Zolertia Z1 or STM32 Discovery
+ * Boards.
  *
  * The microkernel itself comprises thread management, a priority-based scheduler,
  * a powerful API for inter-process communication (IPC), a system timer, and
@@ -84,7 +85,7 @@
  * by invoking make like this:
  *
  * \code
- * make BOARD=telosb
+ * make BOARD=iotlab-m3
  * \endcode
  *
  * Besides typical targets like `clean`, `all`, or `doc`, RIOT provides the special
@@ -100,6 +101,9 @@
  * variables like `INCLUDES`, setting the include paths. `Makefile.dep` serves to
  * define dependencies.
  *
+ * Learn more about the build system in the
+ * [Wiki](https://github.com/RIOT-OS/RIOT/wiki/The-Make-Build-System)
+ *
  * ####Including modules
  *
  * By default a RIOT application comprises only the applications' code itself, the kernel,
@@ -110,7 +114,7 @@
  * these lines:
  * \code
  * USEMODULE += sht11
- * USEMODULE += sixlowpan
+ * USEMODULE += gnrc_udp
  * \endcode
  * To contribute a new module to RIOT, your module's Makefile needs to set the
  * variable `MODULE` to a unique name. If the module depends on other modules, this
