@@ -43,7 +43,7 @@
 #include "periph/spi.h"
 #include "periph/gpio.h"
 #include "vtimer.h"
-#include "hwtimer.h"
+#include "xtimer.h"
 #include "shell.h"
 #include "shell_commands.h"
 #include "thread.h"
@@ -241,7 +241,7 @@ int cmd_send(int argc, char **argv)
     /* trigger transmitting */
     nrf24l01p_transmit(&nrf24l01p_0);
     /* wait while data is pysically transmitted  */
-    hwtimer_wait(DELAY_DATA_ON_AIR);
+    xtimer_usleep(DELAY_DATA_ON_AIR);
     /* get status of the transceiver */
     status = nrf24l01p_get_status(&nrf24l01p_0);
     if (status < 0) {
