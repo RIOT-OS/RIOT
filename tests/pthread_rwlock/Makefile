@@ -5,10 +5,8 @@ BOARD_BLACKLIST := arduino-mega2560
 # arduino-mega2560: unknown type name: clockid_t
 
 USEMODULE += pthread
-USEMODULE += vtimer
+USEMODULE += xtimer
 USEMODULE += random
-
-DISABLE_MODULE += auto_init
 
 CFLAGS += -DNATIVE_AUTO_EXIT
 
