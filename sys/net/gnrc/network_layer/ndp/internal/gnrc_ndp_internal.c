@@ -610,7 +610,7 @@ static size_t _get_l2src(kernel_pid_t iface, uint8_t *l2src, size_t l2src_maxlen
 {
     bool try_long = false;
     int res;
-    size_t l2src_len;
+    uint16_t l2src_len;
     /* maximum address length that fits into a minimum length (8) S/TL2A option */
     const uint16_t max_short_len = 6;
 
