@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     cpu_msp430-common
+ * @ingroup     cpu_msp430fxyz
  * @{
  *
  * @file
@@ -47,17 +47,17 @@ int timer_init(tim_t dev, unsigned int us_per_tick, void (*callback)(int))
     }
 
     /* reset the timer A configuration */
-    TIMER_DEV->CTL = CTL_CLR;
+    TIMER_DEV->CTL = TIMER_CTL_CLR;
     /* save callback */
     isr_cb = callback;
     /* configure timer to use the SMCLK with prescaler of 8 */
-    TIMER_DEV->CTL = (CTL_TASSEL_SMCLK | CTL_ID_DIV8);
+    TIMER_DEV->CTL = (TIMER_CTL_TASSEL_SMCLK | TIMER_CTL_ID_DIV8);
     /* configure CC channels */
     for (int i = 0; i < TIMER_CHAN; i++) {
         TIMER_DEV->CCTL[i] = 0;
     }
     /* start the timer in continuous mode */
-    TIMER_DEV->CTL |= CTL_MC_CONT;
+    TIMER_DEV->CTL |= TIMER_CTL_MC_CONT;
     return 0;
 }
 
@@ -73,8 +73,8 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
         return -1;
     }
     TIMER_DEV->CCR[channel] = value;
-    TIMER_DEV->CCTL[channel] &= ~(CCTL_CCIFG);
-    TIMER_DEV->CCTL[channel] |=  (CCTL_CCIE);
+    TIMER_DEV->CCTL[channel] &= ~(TIMER_CCTL_CCIFG);
+    TIMER_DEV->CCTL[channel] |=  (TIMER_CCTL_CCIE);
     return 0;
 }
 
@@ -83,7 +83,7 @@ int timer_clear(tim_t dev, int channel)
     if (dev != 0 || channel > TIMER_CHAN) {
         return -1;
     }
-    TIMER_DEV->CCTL[channel] &= ~(CCTL_CCIE);
+    TIMER_DEV->CCTL[channel] &= ~(TIMER_CCTL_CCIE);
     return 0;
 }
 
@@ -94,12 +94,12 @@ unsigned int timer_read(tim_t dev)
 
 void timer_start(tim_t dev)
 {
-    TIMER_DEV->CTL |= CTL_MC_CONT;
+    TIMER_DEV->CTL |= TIMER_CTL_MC_CONT;
 }
 
 void timer_stop(tim_t dev)
 {
-    TIMER_DEV->CTL &= ~(CTL_MC_MASK);
+    TIMER_DEV->CTL &= ~(TIMER_CTL_MC_MASK);
 }
 
 void timer_irq_enable(tim_t dev)
@@ -128,7 +128,7 @@ ISR(TIMER_ISR_CC0, isr_timer_a_cc0)
 {
     __enter_isr();
 
-    TIMER_DEV->CCTL[0] &= ~(CCTL_CCIE);
+    TIMER_DEV->CCTL[0] &= ~(TIMER_CCTL_CCIE);
     isr_cb(0);
 
     __exit_isr();
@@ -139,7 +139,7 @@ ISR(TIMER_ISR_CCX, isr_timer_a_ccx)
     __enter_isr();
 
     int chan = (int)(TIMER_IVEC->TAIV >> 1);
-    TIMER_DEV->CCTL[chan] &= ~(CCTL_CCIE);
+    TIMER_DEV->CCTL[chan] &= ~(TIMER_CCTL_CCIE);
     isr_cb(chan);
 
     __exit_isr();

@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     cpu_msp430-common
+ * @ingroup     cpu_msp430fxyz
  * @{
  *
  * @file
@@ -41,12 +41,12 @@ extern "C" {
  * @brief   Special function registers
  */
 typedef struct {
-    REG8    IE1;        /**< interrupt enable 1 */
-    REG8    IE2;        /**< interrupt enable 2 */
-    REG8    IFG1;       /**< interrupt flag 1 */
-    REG8    IFG2;       /**< interrupt flag 2 */
-    REG8    ME1;        /**< module enable 1 */
-    REG8    ME2;        /**< module enable 2 */
+    REG8    IE1;            /**< interrupt enable 1 */
+    REG8    IE2;            /**< interrupt enable 2 */
+    REG8    IFG1;           /**< interrupt flag 1 */
+    REG8    IFG2;           /**< interrupt flag 2 */
+    REG8    ME1;            /**< module enable 1 */
+    REG8    ME2;            /**< module enable 2 */
 } msp_sfr_t;
 
 /**
@@ -81,26 +81,35 @@ typedef struct {
     REG8    RCTL;       /**< receive control */
     REG8    MCTL;       /**< modulation control */
     REG8    BR0;        /**< baud rate control 0 */
-    REG8    RR1;        /**< baud rate control 1 */
+    REG8    BR1;        /**< baud rate control 1 */
     REG8    RXBUF;      /**< receive buffer */
     REG8    TXBUF;      /**< transmit buffer */
 } msp_usart_t;
 
 /**
- * @brief   System clock module configuration registers
+ * @brief   USCI universal serial control interface registers
  */
 typedef struct {
-    REG8    DCOCTL;     /**< digital controlled oscillator control */
-    REG8    BCSCTL1;    /**< basic clock system control 1 */
-    REG8    BCSCTL2;    /**< basic clock system control 2 */
-} msp_clk_t;
-
-/**
- * @brief   Watchdog configuration registers
- */
-typedef struct {
-    REG16   TCTL;       /**< watchdog time control */
-} msp_wd_t;
+    REG8    ABCTL;      /**< auto baud rate control */
+    REG8    IRTCTL;     /**< IrDA transmit control */
+    REG8    IRRCTL;     /**< IrDA receive control */
+    REG8    ACTL0;      /**< A control 0 */
+    REG8    ACTL1;      /**< A control 1 */
+    REG8    ABR0;       /**< A baud rate control 0 */
+    REG8    ABR1;       /**< A baud rate control 1 */
+    REG8    AMCTL;      /**< A modulation control */
+    REG8    ASTAT;      /**< A status */
+    REG8    ARXBUF;     /**< A receive buffer */
+    REG8    ATXBUF;     /**< A transmit buffer */
+    REG8    BCTL0;      /**< B control 0 */
+    REG8    BCTL1;      /**< B control 1 */
+    REG8    BBR0;       /**< B baud rate 0 */
+    REG8    BBR1;       /**< B baud rate 1 */
+    REG8    BI2CIE;     /**< I2C interrupt enable */
+    REG8    BSTAT;      /**< B status */
+    REG8    BRXBUF;     /**< B receive buffer */
+    REG8    BTXBUF;     /**< B transmit buffer */
+} msp_usci_t;
 
 /**
  * @brief   Timer interrupt status registers
@@ -122,52 +131,205 @@ typedef struct {
 } msp_timer_t;
 
 /**
+ * @brief   SFR interrupt enable 1 register bitmap
+ * @{
+ */
+#define SFR_IE1_OFIE                (0x02)
+#define SFR_IE1_URXIE0              (0x40)
+#define SFR_IE1_UTXIE0              (0x80)
+/** @} */
+
+/**
+ * @brief   SFR interrupt enable 2 register bitmap
+ * @{
+ */
+#define SFR_IE2_UCA0RXIE            (0x01)
+#define SFR_IE2_UCA0TXIE            (0x02)
+#define SFR_IE2_URXIE2              (0x10)
+#define SFR_IE2_UTXIE2              (0x20)
+/** @} */
+
+/**
+ * @brief   SFR interrupt flag 1 register bitmap
+ * @{
+ */
+#define SFR_IFG1_OFIFG              (0x02)
+#define SFR_IFG1_URXIFG0            (0x40)
+#define SFR_IFG1_UTXIFG0            (0x80)
+/** @} */
+
+/**
+ * @brief   SFR interrupt flag 2 register bitmap
+ * @{
+ */
+#define SFR_IFG2_UCA0RXIFG          (0x01)
+#define SFR_IFG2_UCA0TXIFG          (0x02)
+#define SFR_IFG2_URXIFG1            (0x10)
+#define SFR_IFG2_UTXIFG1            (0x20)
+/** @} */
+
+/**
+ * @brief   SFR module enable register 1
+ * @{
+ */
+#define SFR_ME1_USPIE0              (0x40)
+/** @} */
+
+/**
+ * @brief   SFR module enable register 2
+ * @{
+ */
+#define SFR_ME2_USPIE1              (0x10)
+/** @} */
+
+/**
+ * @brief   USART control register bitmap
+ * @{
+ */
+#define USART_CTL_SWRST             (0x01)
+#define USART_CTL_MM                (0x02)
+#define USART_CTL_SYNC              (0x04)
+#define USART_CTL_LISTEN            (0x08)
+#define USART_CTL_CHAR              (0x10)
+#define USART_CTL_SPB               (0x20)
+#define USART_CTL_PEV               (0x40)
+#define USART_CTL_PENA              (0x80)
+/** @} */
+
+/**
+ * @brief   USART transmit control register bitmap
+ * @{
+ */
+#define USART_TCTL_TXEPT            (0x01)
+#define USART_TCTL_TXWAKE           (0x04)
+#define USART_TCTL_URXSE            (0x08)
+#define USART_TCTL_SSEL_MASK        (0x30)
+#define USART_TCTL_SSEL_UCLKI       (0x00)
+#define USART_TCTL_SSEL_ACLK        (0x10)
+#define USART_TCTL_SSEL_SMCLK       (0x20)
+#define USART_TCTL_CKPL             (0x40)
+/** @} */
+
+/**
+ * @brief   USART receive control register bitmap
+ * @{
+ */
+#define USART_RCTL_RXERR            (0x01)
+#define USART_RCTL_RXWAKE           (0x02)
+#define USART_RCTL_URXWIE           (0x04)
+#define USART_RCTL_URXEIE           (0x08)
+#define USART_RCTL_BRK              (0x10)
+#define USART_RCTL_OE               (0x20)
+#define USART_RCTL_PE               (0x40)
+#define USART_RCTL_FE               (0x80)
+/** @} */
+
+/**
+ * @brief   USCI control A register 0 bitmap
+ * @{
+ */
+#define USCI_ACTL0_UCSYNC           (0x01)
+#define USCI_ACTL0_MODE_MASK        (0x06)
+#define USCI_ACTL0_MODE_UART        (0x00)
+#define USCI_ACTL0_MODE_ILMM        (0x02)
+#define USCI_ACTL0_MODE_ABMM        (0x04)
+#define USCI_ACTL0_MODE_UART_ABR    (0x06)
+#define USCI_ACTL0_SPB              (0x08)
+#define USCI_ACTL0_7BIT             (0x10)
+#define USCI_ACTL0_MSB              (0x20)
+#define USCI_ACTL0_PAR              (0x40)
+#define USCI_ACTL0_PEN              (0x80)
+/** @} */
+
+/**
+ * @brief   USCI control A register 1 bitmap
+ * @{
+ */
+#define USCI_ACTL1_SWRST            (0x01)
+#define USCI_ACTL1_TXBRK            (0x02)
+#define USCI_ACTL1_TXADDR           (0x04)
+#define USCI_ACTL1_DORM             (0x08)
+#define USCI_ACTL1_BRKIE            (0x10)
+#define USCI_ACTL1_RXEIE            (0x20)
+#define USCI_ACTL1_SSEL_MASK        (0xc0)
+#define USCI_ACTL1_SSEL_UCLK        (0x00)
+#define USCI_ACTL1_SSEL_ACLK        (0x40)
+#define USCI_ACTL1_SSEL_SMCLK       (0xc0)
+/** @} */
+
+/**
+ * @brief   USCI modulation A control register
+ * @{
+ */
+#define USCI_AMCTL_OS16             (0x01)
+#define USCI_AMCTL_BRS_MASK         (0xe0)
+#define USCI_AMCTL_BRS_SHIFT        (1U)
+#define USCI_AMCTL_BRF_MASK         (0xf0)
+#define USCI_AMCTL_BRF_SHIFT        (4U)
+/** @} */
+
+/**
+ * @brief   USCI status A register bitmap
+ * @{
+ */
+#define USCI_ASTAT_BUSY             (0x01)
+#define USCI_ASTAT_IDLE             (0x02)
+#define USCI_ASTAT_ADDR             (0x02)
+#define USCI_ASTAT_RXERR            (0x04)
+#define USCI_ASTAT_BRK              (0x08)
+#define USCI_ASTAT_PE               (0x10)
+#define USCI_ASTAT_OE               (0x20)
+#define USCI_ASTAT_FE               (0x40)
+#define USCI_ASTAT_LISTEN           (0x80)
+/** @} */
+
+/**
  * @brief   Timer Control register bitmap
  * @{
  */
-#define CTL_IFG                 (0x0001)
-#define CTL_IE                  (0x0002)
-#define CTL_CLR                 (0x0004)
-#define CTL_MC_MASK             (0x0030)
-#define CTL_MC_STOP             (0x0000)
-#define CTL_MC_UP               (0x0010)
-#define CTL_MC_CONT             (0x0020)
-#define CTL_MC_UPDOWN           (0x0030)
-#define CTL_ID_MASK             (0x00c0)
-#define CTL_ID_DIV1             (0x0000)
-#define CTL_ID_DIV2             (0x0040)
-#define CTL_ID_DIV4             (0x0080)
-#define CTL_ID_DIV8             (0x00c0)
-#define CTL_TASSEL_MASK         (0x0300)
-#define CTL_TASSEL_TCLK         (0x0000)
-#define CTL_TASSEL_ACLK         (0x0100)
-#define CTL_TASSEL_SMCLK        (0x0200)
-#define CTL_TASSEL_INV_TCLK     (0x0300)
+#define TIMER_CTL_IFG                 (0x0001)
+#define TIMER_CTL_IE                  (0x0002)
+#define TIMER_CTL_CLR                 (0x0004)
+#define TIMER_CTL_MC_MASK             (0x0030)
+#define TIMER_CTL_MC_STOP             (0x0000)
+#define TIMER_CTL_MC_UP               (0x0010)
+#define TIMER_CTL_MC_CONT             (0x0020)
+#define TIMER_CTL_MC_UPDOWN           (0x0030)
+#define TIMER_CTL_ID_MASK             (0x00c0)
+#define TIMER_CTL_ID_DIV1             (0x0000)
+#define TIMER_CTL_ID_DIV2             (0x0040)
+#define TIMER_CTL_ID_DIV4             (0x0080)
+#define TIMER_CTL_ID_DIV8             (0x00c0)
+#define TIMER_CTL_TASSEL_MASK         (0x0300)
+#define TIMER_CTL_TASSEL_TCLK         (0x0000)
+#define TIMER_CTL_TASSEL_ACLK         (0x0100)
+#define TIMER_CTL_TASSEL_SMCLK        (0x0200)
+#define TIMER_CTL_TASSEL_INV_TCLK     (0x0300)
 /** @} */
 
 /**
  * @brief   Timer Channel Control register bitmap
  * @{
  */
-#define CCTL_CCIFG              (0x0001)
-#define CCTL_COV                (0x0002)
-#define CCTL_OUT                (0x0004)
-#define CCTL_CCI                (0x0008)
-#define CCTL_CCIE               (0x0010)
-#define CCTL_OUTMOD_MASK        (0x00e0)
-#define CCTL_OUTMOD_OUTVAL      (0x0000)
-#define CCTL_OUTMOD_SET         (0x0020)
-#define CCTL_OUTMOD_TOG_RESET   (0x0040)
-#define CCTL_OUTMOD_SET_RESET   (0x0060)
-#define CCTL_OUTMOD_TOGGLE      (0x0080)
-#define CCTL_OUTMOD_RESET       (0x00a0)
-#define CCTL_OUTMOD_TOG_SET     (0x00c0)
-#define CCTL_OUTMOD_RESET_SET   (0x00e0)
-#define CCTL_CAP                (0x0100)
-#define CCTL_CLLD_MASK          (0x0600)
-#define CCTL_SCS                (0x0800)
-#define CCTL_CCIS_MASK          (0x3000)
-#define CCTL_CM_MASK            (0xc000)
+#define TIMER_CCTL_CCIFG              (0x0001)
+#define TIMER_CCTL_COV                (0x0002)
+#define TIMER_CCTL_OUT                (0x0004)
+#define TIMER_CCTL_CCI                (0x0008)
+#define TIMER_CCTL_CCIE               (0x0010)
+#define TIMER_CCTL_OUTMOD_MASK        (0x00e0)
+#define TIMER_CCTL_OUTMOD_OUTVAL      (0x0000)
+#define TIMER_CCTL_OUTMOD_SET         (0x0020)
+#define TIMER_CCTL_OUTMOD_TOG_RESET   (0x0040)
+#define TIMER_CCTL_OUTMOD_SET_RESET   (0x0060)
+#define TIMER_CCTL_OUTMOD_TOGGLE      (0x0080)
+#define TIMER_CCTL_OUTMOD_RESET       (0x00a0)
+#define TIMER_CCTL_OUTMOD_TOG_SET     (0x00c0)
+#define TIMER_CCTL_OUTMOD_RESET_SET   (0x00e0)
+#define TIMER_CCTL_CAP                (0x0100)
+#define TIMER_CCTL_CLLD_MASK          (0x0600)
+#define TIMER_CCTL_SCS                (0x0800)
+#define TIMER_CCTL_CCIS_MASK          (0x3000)
+#define TIMER_CCTL_CM_MASK            (0xc000)
 /** @} */
 
 /**
@@ -181,13 +343,15 @@ typedef struct {
 #define PORT_4_BASE             ((uint16_t)0x001c)
 #define PORT_5_BASE             ((uint16_t)0x0030)
 #define PORT_6_BASE             ((uint16_t)0x0034)
-#define CLK_BASE                ((uint16_t)0x0056)
+#define CLK_BASE                ((uint16_t)0x0053)
 #define USART_0_BASE            ((uint16_t)0x0070)
 #define USART_1_BASE            ((uint16_t)0x0078)
 #define TIMER_IVEC_BASE         ((uint16_t)0x011e)
 #define TIMER_A_BASE            ((uint16_t)0x0160)
 #define TIMER_B_BASE            ((uint16_t)0x0180)
 #define WD_BASE                 ((uint16_t)0x0120)
+#define USCI_0_BASE             ((uint16_t)0x005d)
+#define USCI_1_BASE             ((uint16_t)0x00cd)
 /** @} */
 
 /**
@@ -208,6 +372,8 @@ typedef struct {
 #define TIMER_A                 ((msp_timer_t *)TIMER_A_BASE)
 #define TIMER_B                 ((msp_timer_t *)TIMER_B_BASE)
 #define WD                      ((msp_wd_t *)WD_BASE)
+#define USCI_0                  ((msp_usci_t *)USCI_0_BASE)
+#define USCI_1                  ((msp_usci_t *)USCI_1_BASE)
 /** @} */
 
 #ifdef __cplusplus
