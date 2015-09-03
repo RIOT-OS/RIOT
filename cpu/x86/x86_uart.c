@@ -33,7 +33,6 @@
 #include "x86_uart.h"
 
 #include <cpu.h>
-#include <board_uart0.h>
 
 #include <inttypes.h>
 #include <stdint.h>
