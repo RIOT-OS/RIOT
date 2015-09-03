@@ -22,7 +22,7 @@
 
 #include "cpu.h"
 #include "board.h"
-#include "vtimer.h"
+#include "xtimer.h"
 #include "periph/adc.h"
 
 #if ADC_NUMOF < 1
@@ -77,7 +77,7 @@ int main(void)
         printf("\n");
 
         /* sleep a little while */
-        vtimer_usleep(DELAY);
+        xtimer_usleep(DELAY);
     }
 
     return 0;
