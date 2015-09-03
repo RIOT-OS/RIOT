@@ -23,7 +23,7 @@
 
 #include "pthread.h"
 #include "random.h"
-#include "vtimer.h"
+#include "xtimer.h"
 
 #define NUM_CHILDREN 4
 #define NUM_ITERATIONS 5
@@ -45,7 +45,7 @@ static void *run(void *id_)
 
         uint32_t timeout_us = genrand_uint32() % 2500000;
         printf("Child %i sleeps for %8" PRIu32 " µs.\n", id, timeout_us);
-        vtimer_usleep(timeout_us);
+        xtimer_usleep(timeout_us);
     }
 
     printf("Done %i\n", id);
