@@ -3,7 +3,7 @@ include ../Makefile.tests_common
 
 FEATURES_REQUIRED = periph_i2c
 
-USEMODULE += vtimer
+USEMODULE += xtimer
 USEMODULE += srf08
 
 # Define default settings
