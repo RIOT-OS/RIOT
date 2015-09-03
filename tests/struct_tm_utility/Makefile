@@ -4,7 +4,6 @@ include ../Makefile.tests_common
 DISABLE_MODULE += auto_init
 
 USEMODULE += shell
-USEMODULE += uart0
 USEMODULE += timex
 
 # The MSP-430 toolchain lacks sscanf:

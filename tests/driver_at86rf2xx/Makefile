@@ -65,7 +65,6 @@ USEMODULE += auto_init_gnrc_netif
 USEMODULE += gnrc_netif
 USEMODULE += gnrc_nomac
 USEMODULE += gnrc_pktdump
-USEMODULE += uart0
 USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += ps
