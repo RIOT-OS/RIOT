@@ -41,12 +41,20 @@ extern "C" {
  *
  * @brief   Number of IPv6 addresses per interface.
  */
-#ifndef GNRC_IPV6_NETIF_ADDR_NUMOF
-#ifdef MODULE_GNRC_IPV6_ROUTER
-#define GNRC_IPV6_NETIF_ADDR_NUMOF  (7) /* router needs all-routers multicast address */
+#ifdef MODULE_GNRC_RPL
+/* RPL needs all-RPL-nodes multicast address */
+#   define  RPL_ADDR    (1)
 #else
-#define GNRC_IPV6_NETIF_ADDR_NUMOF  (6)
+#   define  RPL_ADDR    (0)
 #endif
+#ifdef MODULE_GNRC_IPV6_ROUTER
+/* routers need all-routers multicast address */
+#   define RTR_ADDR     (1)
+#else
+#   define RTR_ADDR     (0)
+#endif
+#ifndef GNRC_IPV6_NETIF_ADDR_NUMOF
+#define GNRC_IPV6_NETIF_ADDR_NUMOF  (6 + RPL_ADDR + RTR_ADDR)
 #endif
 
 /**
