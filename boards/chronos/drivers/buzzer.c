@@ -26,9 +26,9 @@
 #include <cc430f6137.h>
 
 #include "buzzer.h"
-#include "hwtimer.h"
+#include "xtimer.h"
 
-void buzzer_beep(uint8_t pitch, uint16_t duration)
+void buzzer_beep(uint8_t pitch, uint32_t duration)
 {
     // Reset TA1R, set up mode, TA1 runs from 32768Hz ACLK
     TA1CTL = TACLR | MC_1 | TASSEL__ACLK;
@@ -42,7 +42,7 @@ void buzzer_beep(uint8_t pitch, uint16_t duration)
     // Allow buzzer PWM output on P2.7
     P2SEL |= BIT7;
 
-    hwtimer_wait(duration);
+    xtimer_usleep(duration);
 
     // Stop PWM timer
     TA1CTL &= ~(BIT4 | BIT5);
