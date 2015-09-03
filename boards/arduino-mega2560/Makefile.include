@@ -12,7 +12,7 @@ export LINK = $(PREFIX)gcc
 export SIZE = $(PREFIX)size
 export OBJCOPY = $(PREFIX)objcopy
 export TERMPROG = $(RIOTBASE)/dist/tools/pyterm/pyterm
-export TERMFLAGS = -b 38400 -p $(PORT)
+export TERMFLAGS = -b 9600 -p $(PORT)
 
 #define the flash-tool and default port depending on the host operating system
 OS = $(shell uname)
