@@ -64,17 +64,6 @@ static void BusFaultHandler(void);
 
 //*****************************************************************************
 //
-// External declaration for the reset handler that is to be called when the
-// processor is started
-//
-//*****************************************************************************
-extern void _c_int00(void);
-extern void vPortSVCHandler(void);
-extern void xPortPendSVHandler(void);
-extern void xPortSysTickHandler(void);
-
-//*****************************************************************************
-//
 // The entry point for the application.
 //
 //*****************************************************************************
