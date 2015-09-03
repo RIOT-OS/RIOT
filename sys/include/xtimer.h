@@ -216,6 +216,18 @@ void xtimer_set_msg64(xtimer_t *timer, uint64_t offset, msg_t *msg, kernel_pid_t
 void xtimer_set_wakeup(xtimer_t *timer, uint32_t offset, kernel_pid_t pid);
 
 /**
+ * @brief Set a timer that wakes up a thread, 64bit version
+ *
+ * This function sets a timer that will wake up a thread when the timer has
+ * expired.
+ *
+ * @param[in] timer         timer struct to work with
+ * @param[in] offset        microseconds from now
+ * @param[in] pid           pid of the thread that will be woken up
+ */
+void xtimer_set_wakeup64(xtimer_t *timer, uint64_t offset, kernel_pid_t pid);
+
+/**
  * @brief Set a timer to execute a callback at some time in the future
  *
  * Expects timer->callback to be set.

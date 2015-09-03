@@ -127,6 +127,14 @@ void xtimer_set_wakeup(xtimer_t *timer, uint32_t offset, kernel_pid_t pid)
     xtimer_set(timer, offset);
 }
 
+void xtimer_set_wakeup64(xtimer_t *timer, uint64_t offset, kernel_pid_t pid)
+{
+    timer->callback = _callback_wakeup;
+    timer->arg = (void*) ((intptr_t)pid);
+
+    _xtimer_set64(timer, offset, offset >> 32);
+}
+
 /**
  * see http://www.hackersdelight.org/magic.htm.
  * This is to avoid using long integer division functions
