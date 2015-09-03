@@ -104,7 +104,7 @@ uint8_t uart_readByte(void)
 /**
  * \brief the interrupt handler for UART reception
  */
-interrupt(USCIAB0RX_VECTOR) usart1irq(void)
+void __attribute__((interrupt(USCIAB0RX_VECTOR))) usart1irq(void)
 {
     volatile int c;
 

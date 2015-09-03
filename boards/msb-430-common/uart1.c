@@ -53,7 +53,7 @@ void usart0irq(void);
 /**
  * \brief the interrupt function
  */
-interrupt(USART1RX_VECTOR) usart0irq(void)
+void __attribute__((interrupt(USART1RX_VECTOR))) usart0irq(void)
 {
     U1TCTL &= ~URXSE; /* Clear the URXS signal */
     U1TCTL |= URXSE;  /* Re-enable URXS - needed here?*/

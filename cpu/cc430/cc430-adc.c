@@ -72,7 +72,7 @@ uint16_t adc12_single_conversion(uint16_t ref, uint16_t sht, uint16_t channel)
     ADC12CTL1 = ADC12SHP;                       /* Enable sample timer */
     ADC12MCTL0 = ADC12SREF_1 + channel;         /* ADC input channel   */
     ADC12IE = 0x001;                            /* ADC_IFG upon conv result-ADCMEMO */
-    eINT();
+    enableIRQ();
 
     /* Wait 2 ticks (66us) to allow internal reference to settle */
     hwtimer_wait(2);

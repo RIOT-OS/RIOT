@@ -43,6 +43,7 @@
  */
 
 #include "cpu.h"
+#include "irq.h"
 
 /*---------------------------------------------------------------------------*/
 static void
@@ -109,10 +110,10 @@ static char *cur_break = (char *) &_end;
 
 void msp430_cpu_init(void)
 {
-    dint();
+    disableIRQ();
     init_ports();
     //  lpm_init();
-    eint();
+    enableIRQ();
 
     if ((uintptr_t)cur_break & 1) { /* Workaround for msp430-ld bug!*/
         cur_break++;

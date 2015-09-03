@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2013, 2014 INRIA
+ *               2015 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -21,6 +22,7 @@
  * @brief       Basic definitions for the TelosB board
  *
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
 #ifndef TELOSB_BOARD_H_
@@ -34,6 +36,21 @@ extern "C" {
 #ifndef __MSP430F1611__
 #define __MSP430F1611__
 #endif
+
+/**
+ * @brief   Xtimer configuration
+ * @{
+ */
+#define XTIMER                      (0)
+#define XTIMER_CHAN                 (0)
+#define XTIMER_MASK                 (0xffff0000)
+/** @} */
+
+/**
+ * @brief   Defines for compatibility with hwtimer
+ * @deprecated
+ */
+#define HW_TIMER                    (0)
 
 /* TelosB core */
 #define MSP430_INITIAL_CPU_SPEED    2457600uL

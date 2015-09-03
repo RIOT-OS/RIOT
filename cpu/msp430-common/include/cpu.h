@@ -22,7 +22,6 @@
  */
 
 #include <stdio.h>
-#include <legacymsp430.h>
 
 #include <msp430.h>
 #include "board.h"
@@ -41,6 +40,19 @@ extern "C" {
 #define WORDSIZE 16
 
 /**
+ * @brief   Macro for defining interrupt service routines
+ */
+#define ISR(a,b)        void __attribute__((naked, interrupt (a))) b(void)
+
+/**
+ * @brief   Deprecated interrupt control functions for backward compatibility
+ * @{
+ */
+#define eINT            enableIRQ
+#define dINT            disableIRQ
+/** @} */
+
+/**
  * @brief   The current ISR state (inside or not)
  */
 extern volatile int __inISR;
@@ -49,13 +61,6 @@ extern volatile int __inISR;
  * @brief   Memory used as stack for the interrupt context
  */
 extern char __isr_stack[MSP430_ISR_STACK_SIZE];
-
-/**
- * @brief   definition of legacy interrupt control functions
- */
-#define eINT            enableIRQ
-#define dINT            disableIRQ
-/** @} */
 
 /**
  * @brief   Save the current thread context from inside an ISR
@@ -105,7 +110,7 @@ inline void __restore_context_isr(void)
 inline void __enter_isr(void)
 {
     __save_context_isr();
-    __asm__("mov.w %0,r1" : : "i"(__isr_stack+MSP430_ISR_STACK_SIZE));
+    __asm__("mov.w %0,r1" : : "i"(__isr_stack + MSP430_ISR_STACK_SIZE));
     __inISR = 1;
 }
 
