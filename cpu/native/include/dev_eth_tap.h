@@ -30,6 +30,10 @@ extern "C" {
 
 #include "net/if.h"
 
+#ifdef __MACH__
+#include "net/if_var.h"
+#endif
+
 /**
  * @brief tap interface state
  */

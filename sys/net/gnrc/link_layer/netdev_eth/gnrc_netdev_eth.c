@@ -85,7 +85,8 @@ static inline bool _is_addr_multicast(uint8_t *addr)
     /* source: http://ieee802.org/secmail/pdfocSP2xXA6d.pdf */
     return (addr[0] & 0x01);
 }
-#endif
+#endif /* !(defined(__FreeBSD__) || defined(__MACH__)) */
+
 
 /* build Ethernet packet from pkt */
 static int _marshall_ethernet(gnrc_netdev_eth_t *dev, uint8_t *buffer, gnrc_pktsnip_t *pkt);

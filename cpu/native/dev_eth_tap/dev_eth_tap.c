@@ -31,6 +31,7 @@
 #define _POSIX_C_SOURCE
 #include <net/if.h>
 #undef _POSIX_C_SOURCE
+#include <sys/types.h>
 #include <ifaddrs.h>
 #include <net/if_dl.h>
 #elif defined(__FreeBSD__)
@@ -54,6 +55,11 @@
 
 /* support one tap interface for now */
 dev_eth_tap_t dev_eth_tap;
+
+#ifdef __MACH__
+pid_t _sigio_child_pid;
+static void _sigio_child(dev_eth_tap_t *dev);
+#endif
 
 /* dev_eth interface */
 static int _init(dev_eth_t *ethdev);
@@ -298,7 +304,7 @@ static void _cleanup(dev_eth_t *ethdev)
 }
 
 #ifdef __MACH__
-static void _sigio_child(gnrc_tapnet_t *dev)
+static void _sigio_child(dev_eth_tap_t *dev)
 {
     pid_t parent = _native_pid;
     if ((_sigio_child_pid = real_fork()) == -1) {
