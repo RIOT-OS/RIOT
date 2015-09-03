@@ -27,7 +27,7 @@
 
 #include <stdio.h>
 
-#include "vtimer.h"
+#include "xtimer.h"
 #include "lps331ap.h"
 
 #define RATE        LPS331AP_RATE_7HZ
@@ -61,7 +61,7 @@ int main(void)
         printf("Pressure value: %2i.%03i bar - Temperature: %2i.%03i °C\n",
                pres_abs, pres, temp_abs, temp);
 
-        vtimer_usleep(SLEEP);
+        xtimer_usleep(SLEEP);
     }
 
     return 0;

@@ -4,7 +4,7 @@ include ../Makefile.tests_common
 FEATURES_REQUIRED = periph_i2c
 
 USEMODULE += lps331ap
-USEMODULE += vtimer
+USEMODULE += xtimer
 
 ifneq (,$(TEST_LPS331AP_I2C))
   CFLAGS += -DTEST_LPS331AP_I2C=$(TEST_LPS331AP_I2C)
