@@ -42,12 +42,6 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Defines for compatibility with hwtimer
- * @deprecated
- */
-#define HW_TIMER                    (0)
-
-/**
  * @brief   Standard input/output device configuration
  *
  * This defines are for compatibility with the CPU implementation but they are
