@@ -27,7 +27,7 @@
 
 #include "cpu.h"
 #include "board.h"
-#include "vtimer.h"
+#include "xtimer.h"
 #include "periph/pwm.h"
 
 #define WAIT        (10000)
@@ -68,7 +68,7 @@ int main(void)
             step = -step;
         }
 
-        vtimer_usleep(WAIT);
+        xtimer_usleep(WAIT);
     }
 
     return 0;
