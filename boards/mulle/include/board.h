@@ -33,12 +33,6 @@
 #define DISABLE_WDOG    1
 
 /**
- * @name Assign the first hardware timer.
- * This timer will be used to implement an absolute reference for hwtimer_now() et al.
- */
-#define HW_TIMER            TIMER_0
-
-/**
  * @name Number of subsequent channels of the PIT to assign to the RIOT hardware
  * timer library, starting after the HW_TIMER above.
  */
