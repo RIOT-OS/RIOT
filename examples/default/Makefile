@@ -32,7 +32,6 @@ QUIET ?= 1
 USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += ps
-USEMODULE += vtimer
 USEMODULE += config
 
 FEATURES_OPTIONAL += config
