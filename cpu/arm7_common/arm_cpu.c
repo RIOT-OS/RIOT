@@ -90,13 +90,8 @@ void thread_print_stack(void)
     printf("STACK (%d)= %X \n", i, *s);
 }
 
-int reboot_arch(int mode)
+void reboot_arch(void)
 {
-    (void) mode;
-
-    while (1) {
-        arm_reset();
-    }
-
-    return -1;
+    /* arm reset does loop until the system restarts, so no need to loop here */
+    arm_reset();
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Freie Universität Berlin
+ * Copyright (C) 2014-2015 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -25,14 +25,14 @@
 #endif
 
 /**
- * @brief Reboot the system
- *
- * @param[in] mode  the argument is ignored and only used for conformity
- *                  with existing reboot implementations for now.
- *
- * @return          this call never returns when successful. -1 is returned otherwise.
+ * @brief   Map the kernels reboot interface to the platform specific call
  */
-int reboot_arch(int mode);
+#define reboot          reboot_arch
+
+/**
+ * @brief   Reboot the system, must never return
+ */
+void reboot_arch(void);
 
 #ifdef __cplusplus
 }

@@ -66,10 +66,8 @@ char __end_stack[SIGSTKSZ];
 fd_set _native_rfds;
 #endif
 
-int reboot_arch(int mode)
+void reboot_arch(void)
 {
-    (void) mode;
-
     printf("\n\n\t\t!! REBOOT !!\n\n");
 #ifdef MODULE_UART0
     /* TODO: close stdio fds */
