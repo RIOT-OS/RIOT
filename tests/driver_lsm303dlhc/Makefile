@@ -11,7 +11,7 @@ ifneq (,$(filter iotlab-m3,$(BOARD)))
 endif
 
 USEMODULE += lsm303dlhc
-USEMODULE += vtimer
+USEMODULE += xtimer
 
 ifneq (,$(TEST_LSM303DLHC_I2C))
   CFLAGS += -DTEST_LSM303DLHC_I2C=$(TEST_LSM303DLHC_I2C)

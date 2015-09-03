@@ -36,7 +36,7 @@
 
 #include <stdio.h>
 
-#include "vtimer.h"
+#include "xtimer.h"
 #include "lsm303dlhc.h"
 
 #define SLEEP       (100 * 1000U)
@@ -90,7 +90,7 @@ int main(void)
             puts("\nFailed reading magnetometer values\n");
         }
 
-        vtimer_usleep(SLEEP);
+        xtimer_usleep(SLEEP);
     }
 
     return 0;
