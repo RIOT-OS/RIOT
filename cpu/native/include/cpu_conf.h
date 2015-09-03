@@ -51,18 +51,6 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   UART0 buffer size definition for compatibility reasons
- *
- * TODO: remove once the remodeling of the uart0 driver is done
- * @{
- */
-#ifdef UART0_BUFSIZE
-#undef UART0_BUFSIZE
-#endif
-#define UART0_BUFSIZE                       (128)
-/** @} */
-
-/**
  * @brief   Native internal Ethernet protocol number
  */
 #define NATIVE_ETH_PROTO 0x1234

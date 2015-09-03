@@ -200,10 +200,6 @@ void usage_exit(void)
     real_printf(" <tap interface>");
 #endif
 
-#ifdef MODULE_UART0
-    real_printf(" [-t <port>|-u [path]] [-r]");
-#endif
-
     real_printf(" [-i <id>] [-d] [-e|-E] [-o]\n");
 
     real_printf(" help: %s -h\n", _progname);
@@ -211,14 +207,6 @@ void usage_exit(void)
     real_printf("\nOptions:\n\
 -h          help\n");
 
-#ifdef MODULE_UART0
-    real_printf("\
--t <port>   redirect stdio to TCP socket listening on <port>\n\
--u <path>   redirect stdio to UNIX socket (<path> if given,\n\
-            /tmp/riot.tty.PID otherwise)\n\
--r          replay missed output when (re-)attaching to socket\n\
-            (implies -o)\n");
-#endif
     real_printf("\
 -i <id>     specify instance id (set by config module)\n\
 -s <seed>   specify srandom(3) seed (/dev/random is used instead of\n\
@@ -251,10 +239,6 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
     char *stderrtype = "stdio";
     char *stdouttype = "stdio";
     char *stdiotype = "stdio";
-#ifdef MODULE_UART0
-    char *ioparam = NULL;
-    int replay = 0;
-#endif
 
 #if defined(MODULE_DEV_ETH_TAP)
     if (
@@ -313,41 +297,6 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
         else if (strcmp("-o", arg) == 0) {
             stdouttype = "file";
         }
-#ifdef MODULE_UART0
-        else if (strcmp("-r", arg) == 0) {
-            stdouttype = "file";
-            replay = 1;
-        }
-        else if (strcmp("-t", arg) == 0) {
-            stdiotype = "tcp";
-            if (argp + 1 < argc) {
-                ioparam = argv[++argp];
-            }
-            else {
-                usage_exit();
-            }
-            if (strcmp(stdouttype, "stdio") == 0) {
-                stdouttype = "null";
-            }
-            if (strcmp(stderrtype, "stdio") == 0) {
-                stderrtype = "null";
-            }
-        }
-        else if (strcmp("-u", arg) == 0) {
-            stdiotype = "unix";
-            if (strcmp(stdouttype, "stdio") == 0) {
-                stdouttype = "null";
-            }
-            if (strcmp(stderrtype, "stdio") == 0) {
-                stderrtype = "null";
-            }
-
-            /* parse optional path */
-            if ((argp + 1 < argc) && (argv[argp + 1][0] != '-')) {
-                _native_unix_socket_path = argv[++argp];
-            }
-        }
-#endif
         else {
             usage_exit();
         }
@@ -360,10 +309,6 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
     _native_log_stderr(stderrtype);
     _native_log_stdout(stdouttype);
     _native_null_in(stdiotype);
-
-#ifdef MODULE_UART0
-    _native_init_uart0(stdiotype, ioparam, replay);
-#endif
 
     native_cpu_init();
     native_interrupt_init();
