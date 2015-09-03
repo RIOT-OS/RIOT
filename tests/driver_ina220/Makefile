@@ -4,7 +4,7 @@ include ../Makefile.tests_common
 FEATURES_REQUIRED = periph_i2c
 
 USEMODULE += ina220
-USEMODULE += vtimer
+USEMODULE += xtimer
 
 ifneq (,$(TEST_INA220_I2C))
   CFLAGS += -DTEST_INA220_I2C=$(TEST_INA220_I2C)
