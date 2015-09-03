@@ -203,12 +203,7 @@ endif
 
 ifneq (,$(filter newlib,$(USEMODULE)))
   USEMODULE += uart_stdio
-else
-  ifneq (,$(filter shell,$(USEMODULE)))
-    USEMODULE += uart0
-  endif
 endif
-
 
 ifneq (,$(filter uart0,$(USEMODULE)))
   USEMODULE += posix
