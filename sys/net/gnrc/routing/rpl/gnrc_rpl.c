@@ -30,8 +30,9 @@ static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 
 static char _stack[GNRC_RPL_STACK_SIZE];
 kernel_pid_t gnrc_rpl_pid = KERNEL_PID_UNDEF;
-static timex_t _lt_time;
-static vtimer_t _lt_timer;
+static uint32_t _lt_time = GNRC_RPL_LIFETIME_UPDATE_STEP * SEC_IN_USEC;
+static xtimer_t _lt_timer;
+static msg_t _lt_msg = { .type = GNRC_RPL_MSG_TYPE_LIFETIME_UPDATE };
 static msg_t _msg_q[GNRC_RPL_MSG_QUEUE_SIZE];
 static gnrc_netreg_entry_t _me_reg;
 
@@ -63,8 +64,7 @@ kernel_pid_t gnrc_rpl_init(kernel_pid_t if_pid)
         gnrc_netreg_register(GNRC_NETTYPE_ICMPV6, &_me_reg);
 
         gnrc_rpl_of_manager_init();
-        _lt_time = timex_set(GNRC_RPL_LIFETIME_UPDATE_STEP, 0);
-        vtimer_set_msg(&_lt_timer, _lt_time, gnrc_rpl_pid, GNRC_RPL_MSG_TYPE_LIFETIME_UPDATE, NULL);
+        xtimer_set_msg(&_lt_timer, _lt_time, &_lt_msg, gnrc_rpl_pid);
     }
 
     /* register all_RPL_nodes multicast address */
@@ -217,44 +217,41 @@ static void *_event_loop(void *args)
 
 void _update_lifetime(void)
 {
-    timex_t now;
-    vtimer_now(&now);
+    uint64_t now = xtimer_now64();
     gnrc_rpl_parent_t *parent;
     for (uint8_t i = 0; i < GNRC_RPL_PARENTS_NUMOF; ++i) {
         parent = &gnrc_rpl_parents[i];
         if (parent->state != 0) {
-            if ((signed)(parent->lifetime.seconds - now.seconds) <= GNRC_RPL_LIFETIME_UPDATE_STEP) {
+            if ((int64_t)(parent->lifetime - now) <= (int64_t) (GNRC_RPL_LIFETIME_UPDATE_STEP
+                * SEC_IN_USEC)) {
                 gnrc_rpl_dodag_t *dodag = parent->dodag;
                 gnrc_rpl_parent_remove(parent);
                 gnrc_rpl_parent_update(dodag, NULL);
                 continue;
             }
-            else if (((signed)(parent->lifetime.seconds - now.seconds) <=
-                        GNRC_RPL_LIFETIME_UPDATE_STEP * 2)) {
+            else if ((int64_t)(parent->lifetime - now) <= (int64_t) (GNRC_RPL_LIFETIME_UPDATE_STEP
+                     * SEC_IN_USEC * 2)) {
                 gnrc_rpl_send_DIS(parent->dodag, &parent->addr);
             }
         }
     }
-    vtimer_remove(&_lt_timer);
-    vtimer_set_msg(&_lt_timer, _lt_time, gnrc_rpl_pid, GNRC_RPL_MSG_TYPE_LIFETIME_UPDATE, NULL);
+    xtimer_set_msg(&_lt_timer, _lt_time, &_lt_msg, gnrc_rpl_pid);
 }
 
 void gnrc_rpl_delay_dao(gnrc_rpl_dodag_t *dodag)
 {
-    dodag->dao_time = timex_set(GNRC_RPL_DEFAULT_DAO_DELAY, 0);
+    dodag->dao_time = GNRC_RPL_DEFAULT_DAO_DELAY * SEC_IN_USEC;
     dodag->dao_counter = 0;
     dodag->dao_ack_received = false;
-    vtimer_remove(&dodag->dao_timer);
-    vtimer_set_msg(&dodag->dao_timer, dodag->dao_time, gnrc_rpl_pid, GNRC_RPL_MSG_TYPE_DAO_HANDLE, dodag);
+    xtimer_set_msg64(&dodag->dao_timer, dodag->dao_time, &dodag->dao_msg, gnrc_rpl_pid);
 }
 
 void gnrc_rpl_long_delay_dao(gnrc_rpl_dodag_t *dodag)
 {
-    dodag->dao_time = timex_set(GNRC_RPL_REGULAR_DAO_INTERVAL, 0);
+    dodag->dao_time = GNRC_RPL_REGULAR_DAO_INTERVAL * SEC_IN_USEC;
     dodag->dao_counter = 0;
     dodag->dao_ack_received = false;
-    vtimer_remove(&dodag->dao_timer);
-    vtimer_set_msg(&dodag->dao_timer, dodag->dao_time, gnrc_rpl_pid, GNRC_RPL_MSG_TYPE_DAO_HANDLE, dodag);
+    xtimer_set_msg64(&dodag->dao_timer, dodag->dao_time, &dodag->dao_msg, gnrc_rpl_pid);
 }
 
 void _dao_handle_send(gnrc_rpl_dodag_t *dodag)
@@ -262,10 +259,8 @@ void _dao_handle_send(gnrc_rpl_dodag_t *dodag)
     if ((dodag->dao_ack_received == false) && (dodag->dao_counter < GNRC_RPL_DAO_SEND_RETRIES)) {
         dodag->dao_counter++;
         gnrc_rpl_send_DAO(dodag, NULL, dodag->default_lifetime);
-        dodag->dao_time = timex_set(GNRC_RPL_DEFAULT_WAIT_FOR_DAO_ACK, 0);
-        vtimer_remove(&dodag->dao_timer);
-        vtimer_set_msg(&dodag->dao_timer, dodag->dao_time,
-                       gnrc_rpl_pid, GNRC_RPL_MSG_TYPE_DAO_HANDLE, dodag);
+        dodag->dao_time = GNRC_RPL_DEFAULT_WAIT_FOR_DAO_ACK * SEC_IN_USEC;
+        xtimer_set_msg64(&dodag->dao_timer, dodag->dao_time, &dodag->dao_msg, gnrc_rpl_pid);
     }
     else if (dodag->dao_ack_received == false) {
         gnrc_rpl_long_delay_dao(dodag);
