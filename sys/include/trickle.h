@@ -29,7 +29,7 @@
  extern "C" {
 #endif
 
-#include "vtimer.h"
+#include "xtimer.h"
 #include "thread.h"
 
 /** @brief a generic callback function with arguments that is called by trickle periodically */
@@ -41,20 +41,22 @@ typedef struct {
 /** @brief all state variables for a trickle timer */
 typedef struct {
     uint8_t k;                      /**< redundancy constant */
+    uint8_t Imax;                   /**< maximum interval size, described as doublings */
+    uint16_t c;                     /**< counter */
     uint32_t Imin;                  /**< minimum interval size */
-    uint8_t Imax;                   /**< maximum interval size, described as a number of doublings */
     uint32_t I;                     /**< current interval size */
     uint32_t t;                     /**< time within the current interval */
-    uint16_t c;                     /**< counter */
     kernel_pid_t pid;               /**< pid of trickles target thread */
     trickle_callback_t callback;    /**< the callback function and parameter that trickle is calling
                                          after each interval */
-    uint16_t interval_msg_type;     /**< the msg_t.type that trickle should use after an interval */
-    timex_t msg_interval_time;      /**< interval represented as timex_t */
-    vtimer_t msg_interval_timer;    /**< vtimer to send a msg_t to the target thread for a new interval */
-    uint16_t callback_msg_type;     /**< the msg_t.type that trickle should use after a callback */
-    timex_t msg_callback_time;      /**< callback interval represented as timex_t */
-    vtimer_t msg_callback_timer;    /**< vtimer to send a msg_t to the target thread for a callback */
+    msg_t msg_interval;             /**< the msg_t to use for intervals */
+    uint64_t msg_interval_time;     /**< interval in ms */
+    xtimer_t msg_interval_timer;    /**< xtimer to send a msg_t to the target thread
+                                         for a new interval */
+    msg_t msg_callback;             /**< the msg_t to use for callbacks */
+    uint64_t msg_callback_time;     /**< callback interval in ms */
+    xtimer_t msg_callback_timer;    /**< xtimer to send a msg_t to the target thread
+                                         for a callback */
 } trickle_t;
 
 /**

@@ -53,27 +53,24 @@ void trickle_interval(trickle_t *trickle)
     trickle->c = 0;
     trickle->t = (trickle->I / 2) + (rand() % ((trickle->I / 2) + 1));
 
-    vtimer_remove(&trickle->msg_callback_timer);
-    trickle->msg_callback_time = timex_set(0, trickle->t * 1000);
-    vtimer_set_msg(&trickle->msg_callback_timer, trickle->msg_callback_time, trickle->pid,
-            trickle->callback_msg_type, trickle);
+    trickle->msg_callback_time = trickle->t * SEC_IN_MS;
+    xtimer_set_msg64(&trickle->msg_callback_timer, trickle->msg_callback_time,
+                     &trickle->msg_callback, trickle->pid);
 
-    vtimer_remove(&trickle->msg_interval_timer);
-    trickle->msg_interval_time = timex_set(0, trickle->I * 1000);
-    vtimer_set_msg(&trickle->msg_interval_timer, trickle->msg_interval_time, trickle->pid,
-            trickle->interval_msg_type, trickle);
+    trickle->msg_interval_time = trickle->I * SEC_IN_MS;
+    xtimer_set_msg64(&trickle->msg_interval_timer, trickle->msg_interval_time,
+                     &trickle->msg_interval, trickle->pid);
 }
 
 void trickle_reset_timer(trickle_t *trickle)
 {
-    vtimer_remove(&trickle->msg_interval_timer);
-    vtimer_remove(&trickle->msg_callback_timer);
-    trickle_start(trickle->pid, trickle, trickle->interval_msg_type, trickle->callback_msg_type,
-            trickle->Imin, trickle->Imax, trickle->k);
+    trickle_stop(trickle);
+    trickle_start(trickle->pid, trickle, trickle->msg_interval.type, trickle->msg_callback.type,
+                  trickle->Imin, trickle->Imax, trickle->k);
 }
 
 void trickle_start(kernel_pid_t pid, trickle_t *trickle, uint16_t interval_msg_type,
-        uint16_t callback_msg_type, uint32_t Imin, uint8_t Imax, uint8_t k)
+                   uint16_t callback_msg_type, uint32_t Imin, uint8_t Imax, uint8_t k)
 {
     trickle->pid = pid;
 
@@ -83,16 +80,18 @@ void trickle_start(kernel_pid_t pid, trickle_t *trickle, uint16_t interval_msg_t
     trickle->Imax = Imax;
     trickle->I = trickle->Imin + (rand() % (4 * trickle->Imin));
     trickle->pid = pid;
-    trickle->interval_msg_type = interval_msg_type;
-    trickle->callback_msg_type = callback_msg_type;
+    trickle->msg_interval.content.ptr = (char *)trickle;
+    trickle->msg_interval.type = interval_msg_type;
+    trickle->msg_callback.content.ptr = (char *)trickle;
+    trickle->msg_callback.type = callback_msg_type;
 
     trickle_interval(trickle);
 }
 
 void trickle_stop(trickle_t *trickle)
 {
-    vtimer_remove(&trickle->msg_interval_timer);
-    vtimer_remove(&trickle->msg_callback_timer);
+    xtimer_remove(&trickle->msg_interval_timer);
+    xtimer_remove(&trickle->msg_callback_timer);
 }
 
 void trickle_increment_counter(trickle_t *trickle)
