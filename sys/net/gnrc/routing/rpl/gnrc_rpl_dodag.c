@@ -161,7 +161,11 @@ bool gnrc_rpl_dodag_add(gnrc_rpl_instance_t *instance, ipv6_addr_t *dodag_id, gn
         (*dodag)->dao_ack_received = false;
         (*dodag)->dao_counter = 0;
         (*dodag)->parents = NULL;
-        (*dodag)->cleanup_time = timex_set(GNRC_RPL_CLEANUP_TIME, 0);
+        (*dodag)->dao_msg.type = GNRC_RPL_MSG_TYPE_DAO_HANDLE;
+        (*dodag)->dao_msg.content.ptr = (char *) (*dodag);
+        (*dodag)->cleanup_time = GNRC_RPL_CLEANUP_TIME * SEC_IN_USEC;
+        (*dodag)->cleanup_msg.type = GNRC_RPL_MSG_TYPE_CLEANUP_HANDLE;
+        (*dodag)->cleanup_msg.content.ptr = (char *) (*dodag);
         return true;
     }
 
@@ -177,8 +181,8 @@ bool gnrc_rpl_dodag_remove(gnrc_rpl_dodag_t *dodag)
     gnrc_rpl_instance_t *inst = dodag->instance;
     LL_DELETE(inst->dodags, dodag);
     trickle_stop(&dodag->trickle);
-    vtimer_remove(&dodag->dao_timer);
-    vtimer_remove(&dodag->cleanup_timer);
+    xtimer_remove(&dodag->dao_timer);
+    xtimer_remove(&dodag->cleanup_timer);
     memset(dodag, 0, sizeof(gnrc_rpl_dodag_t));
     if (inst->dodags == NULL) {
         gnrc_rpl_instance_remove(inst);
@@ -192,9 +196,7 @@ void gnrc_rpl_dodag_remove_all_parents(gnrc_rpl_dodag_t *dodag)
     LL_FOREACH_SAFE(dodag->parents, elt, tmp) {
         gnrc_rpl_parent_remove(elt);
     }
-    vtimer_remove(&dodag->cleanup_timer);
-    vtimer_set_msg(&dodag->cleanup_timer, dodag->cleanup_time, gnrc_rpl_pid,
-            GNRC_RPL_MSG_TYPE_CLEANUP_HANDLE, dodag);
+    xtimer_set_msg(&dodag->cleanup_timer, dodag->cleanup_time, &dodag->cleanup_msg, gnrc_rpl_pid);
 }
 
 gnrc_rpl_dodag_t *gnrc_rpl_dodag_get(gnrc_rpl_instance_t *instance, ipv6_addr_t *dodag_id)
@@ -325,9 +327,8 @@ void gnrc_rpl_local_repair(gnrc_rpl_dodag_t *dodag)
 
     if (dodag->my_rank != GNRC_RPL_INFINITE_RANK) {
         trickle_reset_timer(&dodag->trickle);
-        vtimer_remove(&dodag->cleanup_timer);
-        vtimer_set_msg(&dodag->cleanup_timer, dodag->cleanup_time, gnrc_rpl_pid,
-            GNRC_RPL_MSG_TYPE_CLEANUP_HANDLE, dodag);
+        xtimer_set_msg(&dodag->cleanup_timer, dodag->cleanup_time, &dodag->cleanup_msg,
+                       gnrc_rpl_pid);
     }
 
     dodag->my_rank = GNRC_RPL_INFINITE_RANK;
@@ -336,14 +337,12 @@ void gnrc_rpl_local_repair(gnrc_rpl_dodag_t *dodag)
 void gnrc_rpl_parent_update(gnrc_rpl_dodag_t *dodag, gnrc_rpl_parent_t *parent)
 {
     uint16_t old_rank = dodag->my_rank;
-    timex_t now;
-    vtimer_now(&now);
+    uint64_t now = xtimer_now64();
     ipv6_addr_t def = IPV6_ADDR_UNSPECIFIED;
 
     /* update Parent lifetime */
     if (parent != NULL) {
-        parent->lifetime.seconds = now.seconds + (dodag->default_lifetime * dodag->lifetime_unit);
-        parent->lifetime.microseconds = 0;
+        parent->lifetime = now + ((dodag->default_lifetime * dodag->lifetime_unit) * SEC_IN_USEC);
         if (parent == dodag->parents) {
             ipv6_addr_t all_RPL_nodes = GNRC_RPL_ALL_NODES_ADDR;
             kernel_pid_t if_id;
