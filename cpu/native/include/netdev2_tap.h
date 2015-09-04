@@ -7,66 +7,67 @@
  */
 
 /**
- * @defgroup    dev_eth_tap     Ethernet driver for TAP interfaces
- * @ingroup     native_cpu
+ * @ingroup     netdev2
  * @brief       Low-level ethernet driver for native tap interfaces
  * @{
  *
  * @file
- * @brief       Definitions for @ref net_dev_eth driver for host system's
+ * @brief       Definitions for @ref netdev2 ethernet driver for host system's
  *              TAP interfaces
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
-#ifndef DEV_ETH_TAP_H
-#define DEV_ETH_TAP_H
+#ifndef NETDEV2_TAP_H
+#define NETDEV2_TAP_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include <stdint.h>
-#include "net/dev_eth.h"
+#include "net/netdev2.h"
 
-#include "net/if.h"
+#include "net/ethernet/hdr.h"
 
 #ifdef __MACH__
 #include "net/if_var.h"
+#else
+#include "net/if.h"
 #endif
 
 /**
  * @brief tap interface state
  */
-typedef struct dev_eth_tap {
-    dev_eth_t ethdev;                   /**< dev_eth internal member */
+typedef struct netdev2_tap {
+    netdev2_t netdev;                   /**< netdev2 internal member */
     char tap_name[IFNAMSIZ];            /**< host dev file name */
     int tap_fd;                         /**< host file descriptor for the TAP */
     uint8_t addr[ETHERNET_ADDR_LEN];    /**< The MAC address of the TAP */
     uint8_t promiscous;                 /**< Flag for promiscous mode */
-} dev_eth_tap_t;
+} netdev2_tap_t;
 
 /**
  * @brief global device struct. driver only supports one tap device as of now.
  */
-extern dev_eth_tap_t dev_eth_tap;
+extern netdev2_tap_t netdev2_tap;
 
 /**
- * @brief Setup dev_eth_tap_t structure.
+ * @brief Setup netdev2_tap_t structure.
  *
- * @param dev  the preallocated dev_eth_tap device handle to setup
+ * @param dev  the preallocated netdev2_tap device handle to setup
  * @param name Name of the host system's tap inteface to bind to.
  */
-void dev_eth_tap_setup(dev_eth_tap_t *dev, const char *name);
+void netdev2_tap_setup(netdev2_tap_t *dev, const char *name);
 
 /**
- * @brief Cleanup dev_eth_tap_t structure.
+ * @brief Cleanup tap resources
  *
- * @param dev  the dev_eth_tap device handle to cleanup
+ * @param dev  the netdev2_tap device handle to cleanup
  */
-void dev_eth_tap_cleanup(dev_eth_tap_t *dev);
+void netdev2_tap_cleanup(netdev2_tap_t *dev);
 
 #ifdef __cplusplus
 }
 #endif
 /** @} */
-#endif /* DEV_ETH_TAP_H */
+#endif /* NETDEV2_TAP_H */

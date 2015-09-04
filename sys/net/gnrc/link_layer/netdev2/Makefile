@@ -1,3 +1,3 @@
-MODULE = gnrc_netdev_eth
+MODULE = gnrc_netdev2
 
 include $(RIOTBASE)/Makefile.base
