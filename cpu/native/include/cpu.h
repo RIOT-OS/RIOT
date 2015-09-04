@@ -37,7 +37,7 @@ static inline void cpu_print_last_instruction(void)
 {
     void *p;
     __asm__("1: mov 1b, %0" : "=r" (p));
-    printf("%p", p);
+    printf("%p\n", p);
 }
 
 #ifdef __cplusplus

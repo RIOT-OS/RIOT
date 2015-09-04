@@ -55,7 +55,7 @@ void cpu_init(void);
  */
 static inline void cpu_print_last_instruction(void)
 {
-    printf("n/a");
+    puts("n/a");
 }
 
 #ifdef __cplusplus

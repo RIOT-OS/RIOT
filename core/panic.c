@@ -50,6 +50,11 @@ NORETURN void core_panic(core_panic_t crash_code, const char *message)
         crashed = 1;
         puts("*** RIOT kernel panic");
         puts(message);
+#ifndef NDEBUG
+        if (crash_code == PANIC_ASSERT_FAIL) {
+            cpu_print_last_instruction();
+        }
+#endif
 #if DEVELHELP
 #ifdef MODULE_PS
         ps();
