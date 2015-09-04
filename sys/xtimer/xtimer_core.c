@@ -170,19 +170,17 @@ int _xtimer_set_absolute(xtimer_t *timer, uint32_t target)
     }
 
     timer->target = target;
+    timer->long_target = _long_cnt;
+    if (target < now) {
+        timer->long_target++;
+    }
 
     unsigned state = disableIRQ();
     if ( !_this_high_period(target) ) {
         DEBUG("xtimer_set_absolute(): the timer doesn't fit into the low-level timer's mask.\n");
-        timer->long_target = _long_cnt;
         _add_timer_to_long_list(&long_list_head, timer);
     }
     else {
-        if (!target) {
-            /* set long_target != 0 so _is_set() can work */
-            timer->long_target = 1;
-        }
-
         if (_mask(now) >= target) {
             DEBUG("xtimer_set_absolute(): the timer will expire in the next timer period\n");
             _add_timer_to_list(&overflow_list_head, timer);
