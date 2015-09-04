@@ -37,7 +37,7 @@ static void (*isr_cb)(int chan);
 
 int timer_init(tim_t dev, unsigned int us_per_tick, void (*callback)(int))
 {
-    /* using fixed TIMER_DEV for now */
+    /* using fixed TIMER_BASE for now */
     if (dev != 0) {
         return -1;
     }
@@ -47,23 +47,23 @@ int timer_init(tim_t dev, unsigned int us_per_tick, void (*callback)(int))
     }
 
     /* reset the timer A configuration */
-    TIMER_DEV->CTL = TIMER_CTL_CLR;
+    TIMER_BASE->CTL = TIMER_CTL_CLR;
     /* save callback */
     isr_cb = callback;
     /* configure timer to use the SMCLK with prescaler of 8 */
-    TIMER_DEV->CTL = (TIMER_CTL_TASSEL_SMCLK | TIMER_CTL_ID_DIV8);
+    TIMER_BASE->CTL = (TIMER_CTL_TASSEL_SMCLK | TIMER_CTL_ID_DIV8);
     /* configure CC channels */
     for (int i = 0; i < TIMER_CHAN; i++) {
-        TIMER_DEV->CCTL[i] = 0;
+        TIMER_BASE->CCTL[i] = 0;
     }
     /* start the timer in continuous mode */
-    TIMER_DEV->CTL |= TIMER_CTL_MC_CONT;
+    TIMER_BASE->CTL |= TIMER_CTL_MC_CONT;
     return 0;
 }
 
 int timer_set(tim_t dev, int channel, unsigned int timeout)
 {
-    uint16_t target = TIMER_DEV->R + (uint16_t)timeout;
+    uint16_t target = TIMER_BASE->R + (uint16_t)timeout;
     return timer_set_absolute(dev, channel, (unsigned int)target);
 }
 
@@ -72,9 +72,9 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
     if (dev != 0 || channel > TIMER_CHAN) {
         return -1;
     }
-    TIMER_DEV->CCR[channel] = value;
-    TIMER_DEV->CCTL[channel] &= ~(TIMER_CCTL_CCIFG);
-    TIMER_DEV->CCTL[channel] |=  (TIMER_CCTL_CCIE);
+    TIMER_BASE->CCR[channel] = value;
+    TIMER_BASE->CCTL[channel] &= ~(TIMER_CCTL_CCIFG);
+    TIMER_BASE->CCTL[channel] |=  (TIMER_CCTL_CCIE);
     return 0;
 }
 
@@ -83,23 +83,23 @@ int timer_clear(tim_t dev, int channel)
     if (dev != 0 || channel > TIMER_CHAN) {
         return -1;
     }
-    TIMER_DEV->CCTL[channel] &= ~(TIMER_CCTL_CCIE);
+    TIMER_BASE->CCTL[channel] &= ~(TIMER_CCTL_CCIE);
     return 0;
 }
 
 unsigned int timer_read(tim_t dev)
 {
-    return (unsigned int)TIMER_DEV->R;
+    return (unsigned int)TIMER_BASE->R;
 }
 
 void timer_start(tim_t dev)
 {
-    TIMER_DEV->CTL |= TIMER_CTL_MC_CONT;
+    TIMER_BASE->CTL |= TIMER_CTL_MC_CONT;
 }
 
 void timer_stop(tim_t dev)
 {
-    TIMER_DEV->CTL &= ~(TIMER_CTL_MC_MASK);
+    TIMER_BASE->CTL &= ~(TIMER_CTL_MC_MASK);
 }
 
 void timer_irq_enable(tim_t dev)
@@ -121,14 +121,14 @@ void timer_irq_disable(tim_t dev)
 
 void timer_reset(tim_t dev)
 {
-    TIMER_DEV->R = 0;
+    TIMER_BASE->R = 0;
 }
 
 ISR(TIMER_ISR_CC0, isr_timer_a_cc0)
 {
     __enter_isr();
 
-    TIMER_DEV->CCTL[0] &= ~(TIMER_CCTL_CCIE);
+    TIMER_BASE->CCTL[0] &= ~(TIMER_CCTL_CCIE);
     isr_cb(0);
 
     __exit_isr();
@@ -139,7 +139,7 @@ ISR(TIMER_ISR_CCX, isr_timer_a_ccx)
     __enter_isr();
 
     int chan = (int)(TIMER_IVEC->TAIV >> 1);
-    TIMER_DEV->CCTL[chan] &= ~(TIMER_CCTL_CCIE);
+    TIMER_BASE->CCTL[chan] &= ~(TIMER_CCTL_CCIE);
     isr_cb(chan);
 
     __exit_isr();
