@@ -273,7 +273,8 @@ int _gnrc_rpl_dodag_show(void)
 
     gnrc_rpl_dodag_t *dodag = NULL;
     char addr_str[IPV6_ADDR_MAX_STR_LEN];
-    timex_t now, tc, ti, cleanup;
+    timex_t now, cleanup;
+    uint64_t tc, ti, xnow = xtimer_now64();
     vtimer_now(&now);
     for (uint8_t i = 0; i < GNRC_RPL_INSTANCES_NUMOF; ++i) {
         if (gnrc_rpl_instances[i].state == 0) {
@@ -283,20 +284,23 @@ int _gnrc_rpl_dodag_show(void)
                 gnrc_rpl_instances[i].mop, gnrc_rpl_instances[i].of->ocp,
                 gnrc_rpl_instances[i].min_hop_rank_inc, gnrc_rpl_instances[i].max_rank_inc);
         LL_FOREACH(gnrc_rpl_instances[i].dodags, dodag) {
-            tc = timex_sub(dodag->trickle.msg_callback_timer.absolute, now);
-            ti = timex_sub(dodag->trickle.msg_interval_timer.absolute, now);
+
+            tc = (((uint64_t) dodag->trickle.msg_callback_timer.long_target << 32)
+                    | dodag->trickle.msg_callback_timer.target) - xnow;
+            tc = (int64_t) tc < 0 ? 0 : tc / SEC_IN_USEC;
+
+            ti = (((uint64_t) dodag->trickle.msg_interval_timer.long_target << 32)
+                    | dodag->trickle.msg_interval_timer.target) - xnow;
+            ti = (int64_t) ti < 0 ? 0 : ti / SEC_IN_USEC;
+
             cleanup = timex_sub(dodag->cleanup_timer.absolute, now);
-            timex_normalize(&tc);
-            timex_normalize(&ti);
             timex_normalize(&cleanup);
             printf("\tdodag [%s | R: %d | CL: %" PRIu32 "s | \
-TR(I=[%d,%d], k=%d, c=%d, TC=%" PRIu32 "s, TI=%" PRIu32 "s)]\n",
+TR(I=[%d,%d], k=%d, c=%d, TC=%" PRIu64 "s, TI=%" PRIu64 "s)]\n",
                     ipv6_addr_to_str(addr_str, &dodag->dodag_id, sizeof(addr_str)),
                     dodag->my_rank, ((int32_t) cleanup.seconds) > 0 ? cleanup.seconds : 0,
                     (1 << dodag->dio_min), dodag->dio_interval_doubl,
-                    dodag->trickle.k, dodag->trickle.c,
-                    ((int32_t) tc.seconds) > 0 ? tc.seconds : 0,
-                    ((int32_t) ti.seconds) > 0 ? ti.seconds : 0);
+                    dodag->trickle.k, dodag->trickle.c, tc, ti);
             gnrc_rpl_parent_t *parent;
             LL_FOREACH(dodag->parents, parent) {
                 printf("\t\tparent [addr: %s | rank: %d | lifetime: %" PRIu32 "s]\n",
