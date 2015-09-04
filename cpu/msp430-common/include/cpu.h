@@ -167,6 +167,16 @@ inline void __restore_context(unsigned int irqen)
  */
 void msp430_cpu_init(void);
 
+/**
+ * @brief   Returns the current content of the link register (lr)
+ *
+ * @todo:   Not supported
+ */
+static inline void cpu_print_last_instruction(void)
+{
+    printf("n/a");
+}
+
 #ifdef __cplusplus
 }
 #endif
