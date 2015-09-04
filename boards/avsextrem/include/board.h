@@ -57,6 +57,11 @@ extern "C" {
 /** @} */
 
 /**
+ * @brief Deprecated HW_TIMER definition (to be removed)
+ */
+#define HW_TIMER             TIMER_DEV(0)
+
+/**
  * @brief Initialize the board's clock system
  */
 void init_clks1(void);
