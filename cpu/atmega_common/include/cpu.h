@@ -25,8 +25,10 @@
 #ifndef __ATMEGA_COMMON_H
 #define __ATMEGA_COMMON_H
 
-#include "cpu_conf.h"
+#include <stdio.h>
 #include <avr/interrupt.h>
+
+#include "cpu_conf.h"
 
 /**
  * For downwards compatibility with old RIOT code.
@@ -45,6 +47,16 @@ extern "C" {
  * @brief Initialization of the CPU
  */
 void cpu_init(void);
+
+/**
+ * @brief   Print the last instruction's address
+ *
+ * @todo:   Not supported
+ */
+static inline void cpu_print_last_instruction(void)
+{
+    printf("n/a");
+}
 
 #ifdef __cplusplus
 }

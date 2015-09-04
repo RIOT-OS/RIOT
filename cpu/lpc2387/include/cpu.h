@@ -16,7 +16,9 @@
  * @{
  */
 
+#include <stdio.h>
 #include <stdbool.h>
+
 #include "lpc2387.h"
 #include "arm_cpu.h"
 
@@ -40,6 +42,16 @@ bool install_irq(int IntNumber, void (*HandlerAddr)(void), int Priority);
 #ifdef MODULE_PERIPH
 void gpio_init_ports(void);
 #endif
+
+/**
+ * @brief   Prints the current content of the link register (lr)
+ */
+static inline void cpu_print_last_instruction(void)
+{
+    register uint32_t *lr_ptr;
+    __asm__ __volatile__("mov %0, lr" : "=r"(lr_ptr));
+    printf("%p", lr_ptr);
+}
 
 #ifdef __cplusplus
 }

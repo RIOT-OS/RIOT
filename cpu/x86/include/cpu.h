@@ -133,6 +133,16 @@ void x86_init_board(void);
  */
 bool x86_get_memory_region(uint64_t *start, uint64_t *len, unsigned long *cnt);
 
+/**
+ * @brief   Prints the last instruction's address
+ *
+ * @todo:   Not supported
+ */
+static inline void cpu_print_last_instruction(void)
+{
+    printf("n/a");
+}
+
 #ifdef __cplusplus
 }
 #endif
