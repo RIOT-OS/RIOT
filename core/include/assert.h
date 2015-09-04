@@ -26,6 +26,11 @@ extern "C" {
 #endif
 
 /**
+ * @brief   the string that is passed to panic in case of a failing assertion
+ */
+extern const char assert_crash_message[];
+
+/**
  * @brief    abort the program if assertion is false
  *
  * If the macro NDEBUG was defined at the moment <assert.h> was last included,
@@ -41,7 +46,7 @@ extern "C" {
 #ifdef NDEBUG
 #define assert(ignore)((void) 0)
 #else
-#define assert(cond) ((cond) ? (void)0 : core_panic(PANIC_ASSERT_FAIL, "assert"))
+#define assert(cond) ((cond) ? (void)0 : core_panic(PANIC_ASSERT_FAIL, assert_crash_message))
 #endif
 
 #ifdef __cplusplus

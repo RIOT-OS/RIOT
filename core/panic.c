@@ -24,6 +24,7 @@
 #include <string.h>
 #include <stdio.h>
 
+#include "assert.h"
 #include "cpu.h"
 #include "irq.h"
 #include "lpm.h"
@@ -33,6 +34,8 @@
 #if DEVELHELP && defined MODULE_PS
 #include "ps.h"
 #endif
+
+const char assert_crash_message[] = "Failed assertion.";
 
 /* flag preventing "recursive crash printing loop" */
 static int crashed = 0;
