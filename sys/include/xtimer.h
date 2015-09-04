@@ -408,6 +408,20 @@ static inline uint32_t xtimer_now(void)
 #endif
 }
 
+static inline uint32_t xtimer_now_diff(xtimer_t *timer)
+{
+    return timer->target - xtimer_now();
+}
+
+static inline uint64_t xtimer_now_diff64(xtimer_t *timer)
+{
+    if (timer->long_target) {
+        return ((((uint64_t) timer->long_target) << 32) | timer->target) - xtimer_now64();
+    }
+
+    return xtimer_now_diff(timer);
+}
+
 static inline void xtimer_spin_until(uint32_t value) {
     while (_xtimer_now() > value);
     while (_xtimer_now() < value);
