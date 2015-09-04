@@ -41,7 +41,8 @@ extern "C" {
  * @brief   Timer configuration
  * @{
  */
-#define TIMER_DEV           (TIMER_A)
+#define TIMER_NUMOF         (1U)
+#define TIMER_BASE          (TIMER_A)
 #define TIMER_CHAN          (3)
 #define TIMER_ISR_CC0       (TIMERA0_VECTOR)
 #define TIMER_ISR_CCX       (TIMERA1_VECTOR)
