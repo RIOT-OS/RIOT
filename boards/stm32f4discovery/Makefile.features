@@ -8,6 +8,7 @@ FEATURES_PROVIDED += periph_random
 FEATURES_PROVIDED += periph_adc
 FEATURES_PROVIDED += periph_dac
 FEATURES_PROVIDED += periph_cpuid
+FEATURES_PROVIDED += periph_timer
 FEATURES_MCU_GROUP = cortex_m4
 
 FEATURES_CONFLICT += periph_spi:periph_dac
