@@ -20,6 +20,8 @@
 #ifndef _CPU_H
 #define _CPU_H
 
+#include <stdio.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -27,6 +29,16 @@ extern "C" {
 /* TODO: remove once these have been removed from RIOT: */
 void dINT(void);
 void eINT(void);
+
+/**
+ * @brief   Prints the last instruction's address
+ */
+static inline void cpu_print_last_instruction(void)
+{
+    void *p;
+    __asm__("1: mov 1b, %0" : "=r" (p));
+    printf("%p", p);
+}
 
 #ifdef __cplusplus
 }
