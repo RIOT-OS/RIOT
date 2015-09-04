@@ -229,8 +229,8 @@ void _update_lifetime(void)
                 gnrc_rpl_parent_update(dodag, NULL);
                 continue;
             }
-            else if ((int64_t)(parent->lifetime - now) <= (int64_t) (GNRC_RPL_LIFETIME_UPDATE_STEP
-                     * SEC_IN_USEC * 2)) {
+            else if ((int64_t)(parent->lifetime - now) <=
+                     (int64_t) (GNRC_RPL_LIFETIME_UPDATE_STEP * SEC_IN_USEC * 2)) {
                 gnrc_rpl_send_DIS(parent->dodag, &parent->addr);
             }
         }
