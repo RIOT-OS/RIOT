@@ -37,7 +37,7 @@ ifneq (,$(filter gnrc_rpl,$(USEMODULE)))
   USEMODULE += fib
   USEMODULE += gnrc_ipv6_router_default
   USEMODULE += trickle
-  USEMODULE += vtimer
+  USEMODULE += xtimer
 endif
 
 ifneq (,$(filter trickle,$(USEMODULE)))
