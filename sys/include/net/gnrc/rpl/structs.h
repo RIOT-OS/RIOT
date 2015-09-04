@@ -28,6 +28,7 @@ extern "C" {
 #endif
 
 #include "net/ipv6/addr.h"
+#include "vtimer.h"
 #include "trickle.h"
 
 /**

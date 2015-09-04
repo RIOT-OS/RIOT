@@ -34,6 +34,10 @@ ifneq (,$(filter gnrc_rpl,$(USEMODULE)))
   USEMODULE += vtimer
 endif
 
+ifneq (,$(filter trickle,$(USEMODULE)))
+  USEMODULE += xtimer
+endif
+
 ifneq (,$(filter ieee802154,$(USEMODULE)))
   ifneq (,$(filter gnrc_ipv6, $(USEMODULE)))
     USEMODULE += gnrc_sixlowpan
