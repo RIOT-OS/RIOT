@@ -38,7 +38,6 @@ extern "C" {
 #define TIMER_2_EN 1
 #define TIMER_3_EN 1
 
-#define NUM_CHANNELS 6
 
 #define SEC_TO_TICKS(sec)   80000000*sec
 #define MSEC_TO_TICKS(msec) 80000*msec
@@ -56,7 +55,7 @@ extern "C" {
 #define UART_2_EN           0
 #define UART_3_EN           0
 
-#define UART_IRQ_PRIO       INT_PRIORITY_LVL_1
+#define UART_IRQ_PRIO       INT_PRIORITY_LVL_3
 
 #ifdef __cplusplus
 } /* end extern "C" */

@@ -22,7 +22,6 @@
 
 #include <stdint.h>
 #include "cpu.h"
-//#include "periph/gpio.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -50,6 +49,9 @@ extern "C" {
  * Assign the hardware timer
  */
 #define HW_TIMER            TIMER_3
+
+#define TIMER_NUM_CHANNELS 4
+
 
 /**
  * @name Define UART device and baudrate for stdio

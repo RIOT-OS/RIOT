@@ -33,9 +33,12 @@ void cpu_init(void)
 
 	PRCMCC3200MCUInit();
 
+	/* 1 priority group */
+	MAP_IntPriorityGroupingSet(0);
+
 	/* initialize the interrupt priorities */
-	/* set pendSV interrupt to same priority as the rest */
-	MAP_IntPrioritySet(FAULT_PENDSV, CPU_DEFAULT_IRQ_PRIO);
+	/* set pendSV interrupt to lower priority as the rest */
+	MAP_IntPrioritySet(FAULT_PENDSV, INT_PRIORITY_LVL_7);
 
 	/* set SVC interrupt to same priority as the rest */
 	MAP_IntPrioritySet(FAULT_SVCALL, CPU_DEFAULT_IRQ_PRIO);

@@ -49,8 +49,8 @@
 // ticks calibration for time elapsed between TAR read and TIMER_MATCH value written to register
 #define ELAPSED_TICKS 20
 
-#define TIM2_CHANNELS 4
-#define TIM3_CHANNELS 4
+#define TIM2_CHANNELS TIMER_NUM_CHANNELS
+#define TIM3_CHANNELS TIMER_NUM_CHANNELS
 
 /** Type for timer state */
 typedef struct {
@@ -210,6 +210,7 @@ void irq_timer3_handler(void) {
 
 
 int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int)) {
+
 #if defined(TIMER3_SW_CHANNELS) || defined(TIMER2_SW_CHANNELS)
 	int j;
 #endif
@@ -229,8 +230,7 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int)) {
 
 		config[TIMER_0].cb = callback;
 
-		MAP_IntPriorityGroupingSet(3);
-		MAP_IntPrioritySet(INT_TIMERA0A, 0xFF);
+		MAP_IntPrioritySet(INT_TIMERA0A, INT_PRIORITY_LVL_2);
 
 		// enable the timer
 		MAP_TimerEnable(TIMERA0_BASE, TIMER_A);
@@ -252,11 +252,7 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int)) {
 
 		config[TIMER_1].cb = callback;
 
-		MAP_IntPriorityGroupingSet(3);
-		MAP_IntPrioritySet(INT_TIMERA1A, 0xFF);
-
-		// enable the match interrupt
-		//MAP_TimerIntEnable(TIMERA0_BASE, TIMER_TIMA_MATCH);
+		MAP_IntPrioritySet(INT_TIMERA1A, INT_PRIORITY_LVL_2);
 
 		// enable the timer
 		MAP_TimerEnable(TIMERA1_BASE, TIMER_A);
@@ -285,8 +281,7 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int)) {
 
 		config[TIMER_2].cb = callback;
 
-		MAP_IntPriorityGroupingSet(3);
-		MAP_IntPrioritySet(INT_TIMERA2A, 0xFF);
+		MAP_IntPrioritySet(INT_TIMERA2A, INT_PRIORITY_LVL_2);
 
 #ifdef TIMER2_SW_CHANNELS
 		// enable the timeout interrupt
@@ -320,8 +315,7 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int)) {
 
 		config[TIMER_3].cb = callback;
 
-		MAP_IntPriorityGroupingSet(3);
-		MAP_IntPrioritySet(INT_TIMERA3A, 0xFF);
+		MAP_IntPrioritySet(INT_TIMERA3A, INT_PRIORITY_LVL_2);
 
 #ifdef TIMER3_SW_CHANNELS
 		// enable the timeout interrupt

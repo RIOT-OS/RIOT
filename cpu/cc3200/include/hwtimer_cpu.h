@@ -27,9 +27,9 @@ extern "C" {
  * @name Hardware timer configuration
  * @{
  */
-#define HWTIMER_MAXTIMERS   4               /**< Number of hwtimers */
-#define HWTIMER_SPEED       F_CPU             /**< The hardware timer runs at cpu clock (80MHz) */
-#define HWTIMER_MAXTICKS    0xFFFFFFFF      /**< 32-bit timer */
+#define HWTIMER_MAXTIMERS   TIMER_NUM_CHANNELS /**< Number of hwtimers */
+#define HWTIMER_SPEED       F_CPU   /**< The hardware timer runs at cpu clock (80MHz) */
+#define HWTIMER_MAXTICKS    0xFFFFFFFF         /**< 32-bit timer */
 /** @} */
 
 #ifdef __cplusplus
