@@ -62,18 +62,11 @@ extern netdev2_tap_t netdev2_tap;
 ucontext_t end_context;
 char __end_stack[SIGSTKSZ];
 
-#ifdef MODULE_UART0
-fd_set _native_rfds;
-#endif
-
 int reboot_arch(int mode)
 {
     (void) mode;
 
     printf("\n\n\t\t!! REBOOT !!\n\n");
-#ifdef MODULE_UART0
-    /* TODO: close stdio fds */
-#endif
 
 #ifdef MODULE_NETDEV2_TAP
     netdev2_tap_cleanup(&netdev2_tap);

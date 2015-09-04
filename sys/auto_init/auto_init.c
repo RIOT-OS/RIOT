@@ -36,10 +36,6 @@
 #include "ltc4150.h"
 #endif
 
-#ifdef MODULE_UART0
-#include "board_uart0.h"
-#endif
-
 #ifdef MODULE_MCI
 #include "diskio.h"
 #endif
@@ -101,12 +97,6 @@ void auto_init(void)
 #ifdef MODULE_VTIMER
     DEBUG("Auto init vtimer module.\n");
     vtimer_init();
-#endif
-#ifndef MODULE_UART_STDIO
-#ifdef MODULE_UART0
-    DEBUG("Auto init uart0 module.\n");
-    board_uart0_init();
-#endif
 #endif
 #ifdef MODULE_XTIMER
     DEBUG("Auto init xtimer module.\n");

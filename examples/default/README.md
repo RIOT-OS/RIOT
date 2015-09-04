@@ -14,10 +14,6 @@ shell commands. These are included via the `shell_commands` module.
 Additionally, the `ps` module which provides the `ps` shell command is
 included.
 
-Finally, in order for the shell to receive input, the `uart0` module
-is used.
-
-
 Usage
 =====
 
@@ -71,7 +67,6 @@ Running the `ps` command on an msba2:
 2014-05-09 17:38:33,394 - INFO #    pid | name                 | state    Q | pri | stack ( used) location
 2014-05-09 17:38:33,401 - INFO #      0 | idle                 | pending  Q |  31 |   160 (  148) 0x40000014
 2014-05-09 17:38:33,407 - INFO #      1 | main                 | running  Q |  15 |  2560 (  848) 0x400000b4
-2014-05-09 17:38:33,414 - INFO #      2 | uart0                | bl rx    _ |  14 |   512 (  296) 0x40000ce0
 2014-05-09 17:38:33,431 - INFO #        | SUM                  |            |     |  4256
 ```
 
