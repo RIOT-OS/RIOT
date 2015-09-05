@@ -156,6 +156,11 @@ void auto_init(void)
     auto_init_at86rf2xx();
 #endif
 
+#ifdef MODULE_ENCX24J600
+    extern void auto_init_encx24j600(void);
+    auto_init_encx24j600();
+#endif
+
 #ifdef MODULE_GNRC_SLIP
     extern void auto_init_slip(void);
     auto_init_slip();

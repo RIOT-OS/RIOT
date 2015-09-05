@@ -65,6 +65,8 @@ typedef enum {
     NETDEV2_EVENT_RX_COMPLETE,   /**< finished receiving a packet */
     NETDEV2_EVENT_TX_STARTED,    /**< started to transfer a packet */
     NETDEV2_EVENT_TX_COMPLETE,   /**< finished transferring packet */
+    NETDEV2_EVENT_LINK_UP,       /**< link established */
+    NETDEV2_EVENT_LINK_DOWN,     /**< link gone */
     /* expand this list if needed */
 } netdev2_event_t;
 

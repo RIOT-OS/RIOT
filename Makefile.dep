@@ -274,3 +274,8 @@ endif
 ifneq (,$(filter hih6130,$(USEMODULE)))
   USEMODULE += vtimer
 endif
+
+ifneq (,$(filter encx24j600,$(USEMODULE)))
+  USEMODULE += timex
+  USEMODULE += vtimer
+endif
