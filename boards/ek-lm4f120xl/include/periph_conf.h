@@ -42,7 +42,7 @@ extern "C" {
  */
 #define TIMER_NUMOF         (2U)
 #define TIMER_0_EN          1
-#define TIMER_1_EN          0
+#define TIMER_1_EN          1
 #define TIMER_IRQ_PRIO      1
 
 /* Timer 0 configuration */
@@ -50,6 +50,7 @@ extern "C" {
 #define TIMER_0_PRESCALER   (39U)
 #define TIMER_0_MAX_VALUE   (0xffffffff)
 #define TIMER_0_ISR         isr_wtimer0a
+#define TIMER_0_ICR         WTIMER0_ICR_R
 #define TIMER_0_IRQ_CHAN    Timer0A_IRQn
 
 /* Timer 1 configuration */
@@ -57,6 +58,7 @@ extern "C" {
 #define TIMER_1_PRESCALER   (39U)
 #define TIMER_1_MAX_VALUE   (0xffffffff)
 #define TIMER_1_ISR         isr_wtimer1a
+#define TIMER_1_ICR         WTIMER1_ICR_R
 #define TIMER_1_IRQ_CHAN    Timer1A_IRQn
 /** @} */
 
