@@ -37,7 +37,7 @@ int main(void)
         uint32_t last_wakeup = xtimer_now();
         uint32_t before = last_wakeup;
         xtimer_usleep_until(&last_wakeup, (unsigned)interval);
-        uint32_t diff = (last_wakeup-before)-interval;
+        uint32_t diff = (xtimer_now()-before)-interval;
         res[i] = diff;
         interval -= 1;
     }
