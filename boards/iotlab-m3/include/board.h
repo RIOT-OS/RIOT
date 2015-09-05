@@ -145,6 +145,14 @@ extern "C" {
 /** @} */
 
 /**
+ * @name xtimer tuning values
+ * @{
+ */
+#define XTIMER_OVERHEAD     6
+#define XTIMER_SHOOT_EARLY  3
+/** @} */
+
+/**
  * @brief Initialize board specific hardware, including clock, LEDs and std-IO
  */
 void board_init(void);
