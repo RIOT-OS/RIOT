@@ -76,9 +76,6 @@ static const unsigned long g_ulUARTBase[2] =
  */
 int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, uart_tx_cb_t tx_cb, void *arg)
 {
-    /*The base address of the chosen UART */
-    unsigned long ulBase = 0;
-
     /* Check the arguments */
     ASSERT((uart == 0) || (uart == 1));
     /* Check to make sure the UART peripheral is present */
@@ -86,15 +83,12 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, uart_tx_cb_t t
         return -1;
     }
 
-    /* Select the base address of the UART */
-    ulBase = g_ulUARTBase[uart];
-
     int res = uart_init_blocking(uart, baudrate);
     if(res < 0){
         return res;
     }
 
-/* save callbacks */
+    /* save callbacks */
     config[uart].rx_cb = rx_cb;
     config[uart].tx_cb = tx_cb;
     config[uart].arg = arg;
@@ -105,9 +99,9 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, uart_tx_cb_t t
         case UART_0:
             NVIC_SetPriority(UART_0_IRQ_CHAN, UART_IRQ_PRIO);
 
-            ROM_UARTTxIntModeSet(ulBase, UART_TXINT_MODE_EOT);
-            ROM_UARTFIFOLevelSet(ulBase, UART_FIFO_TX4_8, UART_FIFO_RX4_8);
-            ROM_UARTFIFOEnable(ulBase);
+            ROM_UARTTxIntModeSet(g_ulUARTBase[uart], UART_TXINT_MODE_EOT);
+            ROM_UARTFIFOLevelSet(g_ulUARTBase[uart], UART_FIFO_TX4_8, UART_FIFO_RX4_8);
+            ROM_UARTFIFOEnable(g_ulUARTBase[uart]);
 
             /* Enable the UART interrupt */
             NVIC_EnableIRQ(UART_0_IRQ_CHAN);
@@ -119,9 +113,9 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, uart_tx_cb_t t
         case UART_1:
             NVIC_SetPriority(UART_1_IRQ_CHAN, UART_IRQ_PRIO);
 
-            ROM_UARTTxIntModeSet(ulBase, UART_TXINT_MODE_EOT);
-            ROM_UARTFIFOLevelSet(ulBase, UART_FIFO_TX4_8, UART_FIFO_RX4_8);
-            ROM_UARTFIFOEnable(ulBase);
+            ROM_UARTTxIntModeSet(g_ulUARTBase[uart], UART_TXINT_MODE_EOT);
+            ROM_UARTFIFOLevelSet(g_ulUARTBase[uart], UART_FIFO_TX4_8, UART_FIFO_RX4_8);
+            ROM_UARTFIFOEnable(g_ulUARTBase[uart]);
 
             /* Enable the UART interrupt */
             NVIC_EnableIRQ(UART_1_IRQ_CHAN);
