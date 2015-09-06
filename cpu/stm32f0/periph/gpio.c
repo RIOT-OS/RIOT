@@ -479,7 +479,11 @@ void gpio_toggle(gpio_t dev)
             (&GPIO_11_DEV)->OUTTGL.reg = 1 << GPIO_11_PIN;
             break;
 #endif
+<<<<<<< HEAD
 	}
+=======
+    }
+>>>>>>> e43351e9c738a6a12ec72f339c0327bbeb2c9b8d
 }
 
 void gpio_write(gpio_t dev, int value)
