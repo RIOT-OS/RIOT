@@ -19,11 +19,23 @@
 #ifndef PERIPH_CPU_H_
 #define PERIPH_CPU_H_
 
+#include "cpu.h"
 #include "periph/dev_enums.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/**
+ * @brief   Available ports on the STM32F0 family
+ */
+enum {
+    PORT_A = 0,             /**< port A */
+    PORT_B = 1,             /**< port B */
+    PORT_C = 2,             /**< port C */
+    PORT_D = 3,             /**< port D */
+    PORT_F = 4,             /**< port F */
+};
 
 /**
  * @brief declare needed generic SPI functions
