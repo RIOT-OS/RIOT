@@ -43,18 +43,18 @@ extern "C" {
  */
 #ifdef MODULE_GNRC_RPL
 /* RPL needs all-RPL-nodes multicast address */
-#   define  RPL_ADDR    (1)
+#   define  GNRC_IPV6_NETIF_RPL_ADDR    (1)
 #else
-#   define  RPL_ADDR    (0)
+#   define  GNRC_IPV6_NETIF_RPL_ADDR    (0)
 #endif
 #ifdef MODULE_GNRC_IPV6_ROUTER
 /* routers need all-routers multicast address */
-#   define RTR_ADDR     (1)
+#   define GNRC_IPV6_NETIF_RTR_ADDR     (1)
 #else
-#   define RTR_ADDR     (0)
+#   define GNRC_IPV6_NETIF_RTR_ADDR     (0)
 #endif
 #ifndef GNRC_IPV6_NETIF_ADDR_NUMOF
-#define GNRC_IPV6_NETIF_ADDR_NUMOF  (6 + RPL_ADDR + RTR_ADDR)
+#define GNRC_IPV6_NETIF_ADDR_NUMOF  (6 + GNRC_IPV6_NETIF_RPL_ADDR + GNRC_IPV6_NETIF_RTR_ADDR)
 #endif
 
 /**
