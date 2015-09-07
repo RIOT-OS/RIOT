@@ -95,6 +95,7 @@ ISR_VECTORS const void *interrupt_vector[] = {
     (void*) isr_rcc,                /* reset and clock control */
     (void*) isr_exti,            /* external interrupt lines 0 and 15 */
     (void*) isr_ts,                 /* touch sensing input*/
+    (void*) isr_ts,                 /* touch sensing input*/
     (void*) isr_dma1_ch1,           /* direct memory access controller 1, channel 1*/
     (void*) isr_dma1_ch2_3,         /* direct memory access controller 1, channel 2 and 3*/
     (void*) isr_dma1_ch4_5,         /* direct memory access controller 1, channel 4 and 5*/
