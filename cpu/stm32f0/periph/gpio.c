@@ -441,4 +441,5 @@ void isr_exti(void)
             EXTI->PR = (1 << i);        /* clear by writing a 1 */
             exti_ctx[i].cb(exti_ctx[i].arg);
         }
+    }
 }
