@@ -270,26 +270,30 @@ static rbuf_t *_rbuf_get(const void *src, size_t src_len,
 
     for (unsigned int i = 0; i < RBUF_SIZE; i++) {
         /* check first if entry already available */
-        if ((rbuf[i].pkt != NULL) && (rbuf[i].pkt->size == size) &&
-            (rbuf[i].tag == tag) && (rbuf[i].src_len == src_len) &&
-            (rbuf[i].dst_len == dst_len) &&
-            (memcmp(rbuf[i].src, src, src_len) == 0) &&
-            (memcmp(rbuf[i].dst, dst, dst_len) == 0)) {
-            DEBUG("6lo rfrag: entry %p (%s, ", (void *)(&rbuf[i]),
-                  gnrc_netif_addr_to_str(l2addr_str, sizeof(l2addr_str),
+	if (rbuf[i].pkt != NULL) {
+            if ((rbuf[i].pkt->size == size) &&
+                (rbuf[i].tag == tag) && (rbuf[i].src_len == src_len) &&
+                (rbuf[i].dst_len == dst_len) &&
+                (memcmp(rbuf[i].src, src, src_len) == 0) &&
+                (memcmp(rbuf[i].dst, dst, dst_len) == 0)) {
+                DEBUG("6lo rfrag: entry %p (%s, ", (void *)(&rbuf[i]),
+                    gnrc_netif_addr_to_str(l2addr_str, sizeof(l2addr_str),
                                          rbuf[i].src, rbuf[i].src_len));
-            DEBUG("%s, %u, %u) found\n",
-                  gnrc_netif_addr_to_str(l2addr_str, sizeof(l2addr_str),
+                DEBUG("%s, %u, %u) found\n",
+                    gnrc_netif_addr_to_str(l2addr_str, sizeof(l2addr_str),
                                          rbuf[i].dst, rbuf[i].dst_len),
-                  (unsigned)rbuf[i].pkt->size, rbuf[i].tag);
-            rbuf[i].arrival = now_sec;
-            return &(rbuf[i]);
-        }
+                    (unsigned)rbuf[i].pkt->size, rbuf[i].tag);
+                rbuf[i].arrival = now_sec;
+                return &(rbuf[i]);
+            }
+	}
 
         /* if there is a free spot: remember it */
-        if ((res == NULL) && (rbuf[i].pkt == NULL)) {
-            res = &(rbuf[i]);
-        }
+	else{
+            if (res == NULL) {
+                res = &(rbuf[i]);
+            }
+	}
     }
 
     if (res != NULL) { /* entry not in buffer but found empty spot */
