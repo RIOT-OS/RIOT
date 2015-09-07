@@ -155,14 +155,15 @@ static inline void xtimer_spin(uint32_t microseconds);
  * @brief will cause the calling thread to be suspended until the absolute
  * time (@p last_wakeup + @p interval).
  *
- * When the function returns, @p last_wakeup is set to xtimer_now().
+ * When the function returns, @p last_wakeup is set to
+ * (@p last_wakeup + @p interval).
  *
  * This function can be used to create periodic wakeups.
  * @c last_wakeup should be set to xtimer_now() before first call of the
  * function.
  *
  * If the result of (@p last_wakeup + usecs) would be in the past, the function
- * sets @p last_wakeup to xtimer_now() and returns immediately.
+ * sets @p last_wakeup to @p last_wakeup + @p interval and returns immediately.
  *
  * @param[in] last_wakeup   base time for the wakeup
  * @param[in] usecs         time in microseconds that will be added to
