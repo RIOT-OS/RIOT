@@ -46,7 +46,7 @@ int _gnrc_rpl_dodag_root(char *arg1, char *arg2)
     ipv6_addr_t dodag_id;
 
     if (ipv6_addr_from_str(&dodag_id, arg2) == NULL) {
-        puts("<dodag_id> must be a valid IPv6 address");
+        puts("error: <dodag_id> must be a valid IPv6 address");
         return 1;
     }
 
@@ -65,14 +65,8 @@ int _gnrc_rpl_dodag_root(char *arg1, char *arg2)
 
 int _gnrc_rpl_instance_remove(char *arg1)
 {
-    uint8_t instance_id = 0;
+    uint8_t instance_id = (uint8_t) atoi(arg1);
     gnrc_rpl_instance_t *inst;
-
-    instance_id = (uint8_t) atoi(arg1);
-    if (instance_id == 0) {
-        puts("error: <instance_id> must be a positive number greater than zero");
-        return 1;
-    }
 
     if ((inst = gnrc_rpl_instance_get(instance_id)) == NULL) {
         printf("error: could not find the instance (%d)\n", instance_id);
@@ -90,17 +84,11 @@ int _gnrc_rpl_instance_remove(char *arg1)
 
 int _gnrc_rpl_dodag_remove(char *arg1, char *arg2)
 {
-    uint8_t instance_id = 0;
+    uint8_t instance_id = (uint8_t) atoi(arg1);
     ipv6_addr_t dodag_id;
     gnrc_rpl_instance_t *inst;
     gnrc_rpl_dodag_t *dodag = NULL;
     char addr_str[IPV6_ADDR_MAX_STR_LEN];
-
-    instance_id = (uint8_t) atoi(arg1);
-    if (instance_id == 0) {
-        puts("error: <instance_id> must be a positive number greater than zero");
-        return 1;
-    }
 
     if (ipv6_addr_from_str(&dodag_id, arg2) == NULL) {
         puts("error: <dodag_id> must be a valid IPv6 address");
@@ -132,17 +120,11 @@ int _gnrc_rpl_dodag_remove(char *arg1, char *arg2)
 
 int _gnrc_rpl_trickle_reset(char *arg1, char *arg2)
 {
-    uint8_t instance_id = 0;
+    uint8_t instance_id = (uint8_t) atoi(arg1);
     ipv6_addr_t dodag_id;
     gnrc_rpl_instance_t *inst;
     gnrc_rpl_dodag_t *dodag = NULL;
     char addr_str[IPV6_ADDR_MAX_STR_LEN];
-
-    instance_id = (uint8_t) atoi(arg1);
-    if (instance_id == 0) {
-        puts("error: <instance_id> must be a positive number greater than zero");
-        return 1;
-    }
 
     if (ipv6_addr_from_str(&dodag_id, arg2) == NULL) {
         puts("error: <dodag_id> must be a valid IPv6 address");
@@ -169,17 +151,11 @@ int _gnrc_rpl_trickle_reset(char *arg1, char *arg2)
 
 int _gnrc_rpl_trickle_stop(char *arg1, char *arg2)
 {
-    uint8_t instance_id = 0;
+    uint8_t instance_id = (uint8_t) atoi(arg1);
     ipv6_addr_t dodag_id;
     gnrc_rpl_instance_t *inst;
     gnrc_rpl_dodag_t *dodag = NULL;
     char addr_str[IPV6_ADDR_MAX_STR_LEN];
-
-    instance_id = (uint8_t) atoi(arg1);
-    if (instance_id == 0) {
-        puts("error: <instance_id> must be a positive number greater than zero");
-        return 1;
-    }
 
     if (ipv6_addr_from_str(&dodag_id, arg2) == NULL) {
         puts("error: <dodag_id> must be a valid IPv6 address");
@@ -206,17 +182,11 @@ int _gnrc_rpl_trickle_stop(char *arg1, char *arg2)
 
 int _gnrc_rpl_trickle_start(char *arg1, char *arg2)
 {
-    uint8_t instance_id = 0;
+    uint8_t instance_id = (uint8_t) atoi(arg1);
     ipv6_addr_t dodag_id;
     gnrc_rpl_instance_t *inst;
     gnrc_rpl_dodag_t *dodag = NULL;
     char addr_str[IPV6_ADDR_MAX_STR_LEN];
-
-    instance_id = (uint8_t) atoi(arg1);
-    if (instance_id == 0) {
-        puts("error: <instance_id> must be a positive number greater than zero");
-        return 1;
-    }
 
     if (ipv6_addr_from_str(&dodag_id, arg2) == NULL) {
         puts("error: <dodag_id> must be a valid IPv6 address");
