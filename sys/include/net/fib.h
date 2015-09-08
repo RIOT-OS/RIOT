@@ -23,9 +23,10 @@
 #ifndef FIB_H_
 #define FIB_H_
 
+#include <stdint.h>
+
 #include "net/fib/table.h"
 #include "kernel_types.h"
-#include "timex.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -59,7 +60,7 @@ typedef struct fib_destination_set_entry_t {
 /**
  * @brief indicator of a lifetime that does not expire (2^32 - 1)
  */
-#define FIB_LIFETIME_NO_EXPIRE (0xFFFFFFFF)
+#define FIB_LIFETIME_NO_EXPIRE (0xFFFFFFFFffffffff)
 
 /**
  * @brief initializes all FIB entries with 0
@@ -227,7 +228,7 @@ void fib_print_routes(fib_table_t *table);
  * @return 0             on success: entry for dst found and lifetime copied
  *         -EHOSTUNREACH if no fitting entry is available
  */
-int fib_devel_get_lifetime(fib_table_t *table, timex_t *lifetime, uint8_t *dst,
+int fib_devel_get_lifetime(fib_table_t *table, uint64_t *lifetime, uint8_t *dst,
                            size_t dst_size);
 
 #endif

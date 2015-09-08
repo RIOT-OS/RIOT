@@ -159,7 +159,7 @@ int _fib_route_handler(int argc, char **argv)
         kernel_pid_t ifs[GNRC_NETIF_NUMOF];
         size_t ifnum = gnrc_netif_get(ifs);
         if (ifnum == 1) {
-            _fib_add(argv[2], argv[4], ifs[0], FIB_LIFETIME_NO_EXPIRE);
+            _fib_add(argv[2], argv[4], ifs[0], (uint32_t)FIB_LIFETIME_NO_EXPIRE);
         }
         else {
             _fib_usage(1);
@@ -190,7 +190,7 @@ int _fib_route_handler(int argc, char **argv)
     if (argc == 7) {
         if ((strcmp("add", argv[1]) == 0) && (strcmp("via", argv[3]) == 0)
             && (strcmp("dev", argv[5]) == 0)) {
-            _fib_add(argv[2], argv[4], (kernel_pid_t)atoi(argv[6]), FIB_LIFETIME_NO_EXPIRE);
+            _fib_add(argv[2], argv[4], (kernel_pid_t)atoi(argv[6]), (uint32_t)FIB_LIFETIME_NO_EXPIRE);
         }
         else {
             _fib_usage(1);
