@@ -26,6 +26,7 @@
  * See "sys/log/log_printfnoformat" for an example.
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      Oliver Hahm <oliver.hahm@inria.fr>
  */
 
 #ifndef __LOG_H
@@ -47,26 +48,30 @@
  * The log function calls of filtered messages will be optimized out at compile
  * time, so a lower log level might result in smaller code size.
  */
-enum {
-    LOG_NONE,       /**< Lowest log level, will output nothing */
-    LOG_ERROR,      /**< Error log level, will print only critical,
-                         non-recoverable errors like hardware initialization
-                         failures */
-    LOG_WARNING,    /**< Warning log level, will print warning messages for
-                         temporary errors */
-    LOG_INFO,       /**< Informational log level, will print purely
-                         informational messages like successful system bootup,
-                         network link state, ...*/
-    LOG_DEBUG,      /**< Debug log level, printing developer stuff considered
-                         too verbose for production use */
-    LOG_ALL         /**< print everything */
-};
+#define LOG_LEVEL_NONE    (0)    /**< Lowest log level, will output nothing */
+#define LOG_LEVEL_ERROR   (1)    /**< Error log level, will print only critical,
+                                      non-recoverable errors like hardware initialization
+                                      failures */
+#define LOG_LEVEL_WARNING (2)    /**< Warning log level, will print warning messages for
+                                      temporary errors */
+#define LOG_LEVEL_INFO    (3)    /**< Informational log level, will print purely
+                                      informational messages like successful system bootup,
+                                      network link state, ...*/
+#define LOG_LEVEL_DEBUG   (4)    /**< Debug log level, printing developer stuff considered
+                                      too verbose for production use */
+#define LOG_LEVEL_ALL     (5)    /**< print everything */
 
 #ifndef LOG_LEVEL
 /**
  * @brief Default log level define
  */
-#define LOG_LEVEL LOG_INFO
+#if ENABLE_DEBUG
+#   define LOG_LEVEL    LOG_LEVEL_DEBUG
+#elif defined(DEVELHELP)
+#   define LOG_LEVEL    LOG_LEVEL_INFO
+#else
+#   define LOG_LEVEL    LOG_LEVEL_NONE
+#endif
 #endif
 
 /**
@@ -78,11 +83,16 @@ enum {
  * @brief logging convenience defines
  * @{
  */
-#define LOG_ERROR(...) LOG(LOG_ERROR, __VA_ARGS__)
-#define LOG_WARNING(...) LOG(LOG_WARNING, __VA_ARGS__)
-#define LOG_INFO(...) LOG(LOG_INFO, __VA_ARGS__)
-#define LOG_DEBUG(...) LOG(LOG_DEBUG, __VA_ARGS__)
+#define LOG_ERROR(...) LOG(LOG_LEVEL_ERROR, __VA_ARGS__)
+#define LOG_WARNING(...) LOG(LOG_LEVEL_WARNING, __VA_ARGS__)
+#define LOG_INFO(...) LOG(LOG_LEVEL_INFO, __VA_ARGS__)
+#define LOG_DEBUG(...) LOG(LOG_LEVEL_DEBUG, __VA_ARGS__)
 /** @} */
+
+#if (LOG_LEVEL > LOG_LEVEL_NONE)
+/* Logging is likely to make use of PRIu16 etc. */
+#   include <inttypes.h>
+#endif
 
 #ifdef MODULE_LOG
 #include "log_module.h"

@@ -9,3 +9,8 @@
  * @brief   This global macro activates functionality that is needed for
  *          automated testing but not needed otherwise.
  */
+
+/**
+ * @def KERNEL_MUTE
+ * @brief Will disable any output from the kernel itself.
+ */
