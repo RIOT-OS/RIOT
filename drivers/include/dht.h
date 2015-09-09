@@ -33,6 +33,12 @@
 extern "C" {
 #endif
 
+#ifndef DHT_EXT_PULLUP
+#define DHT_PULLUP_MODE GPIO_PULLUP
+#else
+#define DHT_PULLUP_MODE GPIO_NOPULL
+#endif
+
 /**
  * @brief data type for storing DHT sensor readings
  */
