@@ -372,3 +372,9 @@ endif
 ifneq (,$(filter ltc4150,$(USEMODULE)))
     USEMODULE += xtimer
 endif
+
+ifneq (,$(filter pthread,$(USEMODULE)))
+    USEMODULE += xtimer
+    USEMODULE += vtimer
+    USEMODULE += timex
+endif
