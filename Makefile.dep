@@ -191,16 +191,6 @@ ifneq (,$(filter gnrc_pktdump,$(USEMODULE)))
   USEMODULE += od
 endif
 
-ifneq (,$(filter gnrc_pktbuf, $(USEMODULE)))
-  ifeq (,$(filter gnrc_pktbuf_%, $(USEMODULE)))
-    USEMODULE += gnrc_pktbuf_static
-  endif
-endif
-
-ifneq (,$(filter gnrc_pktbuf_%, $(USEMODULE)))
-  USEMODULE += gnrc_pktbuf # make MODULE_GNRC_PKTBUF macro available for all implementations
-endif
-
 ifneq (,$(filter newlib,$(USEMODULE)))
   USEMODULE += uart_stdio
 endif
@@ -265,6 +255,16 @@ ifneq (,$(filter gnrc,$(USEMODULE)))
   USEMODULE += gnrc_netif
   USEMODULE += gnrc_netif_hdr
   USEMODULE += gnrc_pktbuf
+endif
+
+ifneq (,$(filter gnrc_pktbuf, $(USEMODULE)))
+  ifeq (,$(filter gnrc_pktbuf_%, $(USEMODULE)))
+    USEMODULE += gnrc_pktbuf_static
+  endif
+endif
+
+ifneq (,$(filter gnrc_pktbuf_%, $(USEMODULE)))
+  USEMODULE += gnrc_pktbuf # make MODULE_GNRC_PKTBUF macro available for all implementations
 endif
 
 ifneq (,$(filter gnrc_netdev2,$(USEMODULE)))
