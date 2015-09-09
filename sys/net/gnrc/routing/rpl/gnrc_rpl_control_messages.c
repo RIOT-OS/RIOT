@@ -176,10 +176,15 @@ void gnrc_rpl_send_DIS(gnrc_rpl_dodag_t *dodag, ipv6_addr_t *destination)
     gnrc_pktsnip_t *pkt;
     icmpv6_hdr_t *icmp;
     gnrc_rpl_dis_t *dis;
+
     /* TODO: Currently the DIS is too small so that wireshark complains about an incorrect
      * ethernet frame check sequence. In order to prevent this, 4 PAD1 options are added.
      * This will be addressed in follow-up PRs */
-    int size = sizeof(icmpv6_hdr_t) + sizeof(gnrc_rpl_dis_t) + 4;
+    uint8_t padding[] = {
+            0x01, 0x02, 0x00, 0x00
+    };
+
+    int size = sizeof(icmpv6_hdr_t) + sizeof(gnrc_rpl_dis_t) + sizeof(padding);
 
     if ((pkt = gnrc_icmpv6_build(NULL, ICMPV6_RPL_CTRL, GNRC_RPL_ICMPV6_CODE_DIS, size)) == NULL) {
         DEBUG("RPL: Send DIS - no space left in packet buffer\n");
@@ -190,8 +195,9 @@ void gnrc_rpl_send_DIS(gnrc_rpl_dodag_t *dodag, ipv6_addr_t *destination)
     dis = (gnrc_rpl_dis_t *)(icmp + 1);
     dis->flags = 0;
     dis->reserved = 0;
-    /* TODO: see above TODO */
-    memset((dis + 1), 0, 4);
+
+    /* TODO add padding may be removed if packet size grows */
+    memcpy((dis + 1), padding, sizeof(padding));
 
     gnrc_rpl_send(pkt, NULL, destination, (dodag ? &dodag->dodag_id : NULL));
 }

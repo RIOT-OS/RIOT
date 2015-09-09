@@ -127,20 +127,59 @@ static int _ipv6_nc_list(void)
     return 0;
 }
 
-static int _ipv6_nc_add(kernel_pid_t iface, char *ipv6_addr_str,
-                        char *l2_addr_str)
+static inline kernel_pid_t _get_iface(void)
 {
+    kernel_pid_t ifs[GNRC_NETIF_NUMOF];
+    size_t ifnum = gnrc_netif_get(ifs);
+    return (ifnum > 1) ? KERNEL_PID_UNDEF : ifs[0];
+}
+
+static int _ipv6_nc_add(int argc, char **argv)
+{
+    char *ipv6_addr_str;
+    char *l2_addr_str = NULL;
+    kernel_pid_t iface = KERNEL_PID_UNDEF;
     ipv6_addr_t ipv6_addr;
     uint8_t l2_addr[MAX_L2_ADDR_LEN];
     size_t l2_addr_len;
+
+    switch (argc) {
+        case 1:
+            iface = _get_iface();
+            ipv6_addr_str = argv[0];    /* store for output */
+            l2_addr_len = 0;
+            break;
+        case 2:
+            ipv6_addr_str = argv[0];    /* store for output */
+            if (ipv6_addr_from_str(&ipv6_addr, ipv6_addr_str) == NULL) {
+                iface = atoi(argv[0]);
+                ipv6_addr_str = argv[1];
+                l2_addr_len = 0;
+            }
+            else {
+                iface = _get_iface();
+                l2_addr_str = argv[1];
+            }
+            break;
+        default:
+            iface = atoi(argv[0]);
+            ipv6_addr_str = argv[1];
+            l2_addr_str = argv[2];
+            break;
+    }
+
+    if (!_is_iface(iface)) {
+        puts("error: invalid interface given.");
+        return 1;
+    }
 
     if (ipv6_addr_from_str(&ipv6_addr, ipv6_addr_str) == NULL) {
         puts("error: unable to parse IPv6 address.");
         return 1;
     }
 
-    if ((l2_addr_len = gnrc_netif_addr_from_str(l2_addr, sizeof(l2_addr),
-                       l2_addr_str)) == 0) {
+    if ((l2_addr_str != NULL) && (l2_addr_len = gnrc_netif_addr_from_str(l2_addr, sizeof(l2_addr),
+                                                                         argv[1])) == 0) {
         puts("error: unable to parse link-layer address.");
         return 1;
     }
@@ -198,31 +237,12 @@ int _ipv6_nc_manage(int argc, char **argv)
     }
 
     if (argc > 1) {
-        if ((argc == 4) && (strcmp("add", argv[1]) == 0)) {
-            kernel_pid_t ifs[GNRC_NETIF_NUMOF];
-            size_t ifnum = gnrc_netif_get(ifs);
-            if (ifnum > 1) {
-                puts("error: multiple interfaces exist.");
-                return 1;
-            }
-
-            return _ipv6_nc_add(ifs[0], argv[2], argv[3]);
+        if (strcmp("add", argv[1]) == 0) {
+            return _ipv6_nc_add(argc - 2, &argv[2]);
         }
-        else if ((argc > 4) && (strcmp("add", argv[1]) == 0)) {
-            kernel_pid_t iface = (kernel_pid_t)atoi(argv[2]);
-
-            if (!_is_iface(iface)) {
-                puts("error: invalid interface given.");
-                return 1;
-            }
-
-            return _ipv6_nc_add(iface, argv[3], argv[4]);
-        }
-
         if (strcmp("del", argv[1]) == 0) {
             return _ipv6_nc_del(argv[2]);
         }
-
         if (strcmp("reset", argv[1]) == 0) {
             return _ipv6_nc_reset();
         }

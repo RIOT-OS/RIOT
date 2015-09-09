@@ -102,7 +102,9 @@ gnrc_ipv6_nc_t *gnrc_ipv6_nc_add(kernel_pid_t iface, const ipv6_addr_t *ipv6_add
     /* Otherwise, fill free entry with your fresh information */
     free_entry->iface = iface;
 
+#ifdef MODULE_GNRC_NDP_NODE
     free_entry->pkts = NULL;
+#endif
     memcpy(&(free_entry->ipv6_addr), ipv6_addr, sizeof(ipv6_addr_t));
     DEBUG("ipv6_nc: Register %s for interface %" PRIkernel_pid,
           ipv6_addr_to_str(addr_str, ipv6_addr, sizeof(addr_str)),
@@ -137,13 +139,19 @@ void gnrc_ipv6_nc_remove(kernel_pid_t iface, const ipv6_addr_t *ipv6_addr)
               ipv6_addr_to_str(addr_str, ipv6_addr, sizeof(addr_str)),
               iface);
 
+#ifdef MODULE_GNRC_NDP_NODE
         while (entry->pkts != NULL) {
-#ifdef MODULE_GNRC_PKTBUF
             gnrc_pktbuf_release(entry->pkts->pkt);
-#endif
             entry->pkts->pkt = NULL;
             gnrc_pktqueue_remove_head(&entry->pkts);
         }
+#endif
+#ifdef MODULE_GNRC_SIXLOWPAN_ND
+        vtimer_remove(&entry->rtr_sol_timer);
+#endif
+#ifdef MODULE_GNRC_SIXLOWPAN_ND_ROUTER
+        vtimer_remove(&entry->type_timeout);
+#endif
 
         ipv6_addr_set_unspecified(&(entry->ipv6_addr));
         entry->iface = KERNEL_PID_UNDEF;

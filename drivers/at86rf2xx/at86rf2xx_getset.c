@@ -16,6 +16,7 @@
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Baptiste Clenet <bapclenet@gmail.com>
+ * @author      Daniel Krebs <github@daniel-krebs.net>
  *
  * @}
  */
@@ -254,6 +255,56 @@ void at86rf2xx_set_max_retries(at86rf2xx_t *dev, uint8_t max)
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__XAH_CTRL_0, tmp);
 }
 
+uint8_t at86rf2xx_get_csma_max_retries(at86rf2xx_t *dev)
+{
+    uint8_t tmp;
+    tmp  = at86rf2xx_reg_read(dev, AT86RF2XX_REG__XAH_CTRL_0);
+    tmp &= AT86RF2XX_XAH_CTRL_0__MAX_CSMA_RETRIES;
+    tmp >>= 1;
+    return tmp;
+}
+
+void at86rf2xx_set_csma_max_retries(at86rf2xx_t *dev, int8_t retries)
+{
+    retries = (retries > 5) ? 5 : retries; /* valid values: 0-5 */
+    retries = (retries < 0) ? 7 : retries; /* max < 0 => disable CSMA (set to 7) */
+    DEBUG("[at86rf2xx] opt: Set CSMA retries to %u\n", retries);
+
+    uint8_t tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__XAH_CTRL_0);
+    tmp &= ~(AT86RF2XX_XAH_CTRL_0__MAX_CSMA_RETRIES);
+    tmp |= (retries << 1);
+    at86rf2xx_reg_write(dev, AT86RF2XX_REG__XAH_CTRL_0, tmp);
+}
+
+void at86rf2xx_set_csma_backoff_exp(at86rf2xx_t *dev, uint8_t min, uint8_t max)
+{
+    max = (max > 8) ? 8 : max;
+    min = (min > max) ? max : min;
+    DEBUG("[at86rf2xx] opt: Set min BE=%u, max BE=%u\n", min, max);
+
+    at86rf2xx_reg_write(dev,
+            AT86RF2XX_REG__CSMA_BE,
+            (max << 4) | (min));
+}
+
+void at86rf2xx_set_csma_seed(at86rf2xx_t *dev, uint8_t entropy[2])
+{
+    if(entropy == NULL) {
+        DEBUG("[at86rf2xx] opt: CSMA seed entropy is nullpointer\n");
+        return;
+    }
+    DEBUG("[at86rf2xx] opt: Set CSMA seed to 0x%x 0x%x\n", entropy[0], entropy[1]);
+
+    at86rf2xx_reg_write(dev,
+                           AT86RF2XX_REG__CSMA_SEED_0,
+                           entropy[0]);
+
+    uint8_t tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__CSMA_SEED_1);
+    tmp &= ~(AT86RF2XX_CSMA_SEED_1__CSMA_SEED_1);
+    tmp |= entropy[1] & AT86RF2XX_CSMA_SEED_1__CSMA_SEED_1;
+    at86rf2xx_reg_write(dev, AT86RF2XX_REG__CSMA_SEED_1, tmp);
+}
+
 void at86rf2xx_set_option(at86rf2xx_t *dev, uint16_t option, bool state)
 {
     uint8_t tmp;
@@ -266,8 +317,12 @@ void at86rf2xx_set_option(at86rf2xx_t *dev, uint16_t option, bool state)
         /* trigger option specific actions */
         switch (option) {
             case AT86RF2XX_OPT_CSMA:
-                DEBUG("[at86rf2xx] opt: enabling CSMA mode (NOT IMPLEMENTED)\n");
-                /* TODO: en/disable csma */
+                DEBUG("[at86rf2xx] opt: enabling CSMA mode" \
+                      "(4 retries, min BE: 3 max BE: 5)\n");
+                /* Initialize CSMA seed with hardware address */
+                at86rf2xx_set_csma_seed(dev, dev->addr_long);
+                at86rf2xx_set_csma_max_retries(dev, 4);
+                at86rf2xx_set_csma_backoff_exp(dev, 3, 5);
                 break;
             case AT86RF2XX_OPT_PROMISCUOUS:
                 DEBUG("[at86rf2xx] opt: enabling PROMISCUOUS mode\n");
@@ -302,8 +357,9 @@ void at86rf2xx_set_option(at86rf2xx_t *dev, uint16_t option, bool state)
         /* trigger option specific actions */
         switch (option) {
             case AT86RF2XX_OPT_CSMA:
-                DEBUG("[at86rf2xx] opt: disabling CSMA mode (NOT IMPLEMENTED)\n");
-                /* TODO: en/disable csma */
+                DEBUG("[at86rf2xx] opt: disabling CSMA mode\n");
+                /* setting retries to -1 means CSMA disabled */
+                at86rf2xx_set_csma_max_retries(dev, -1);
                 break;
             case AT86RF2XX_OPT_PROMISCUOUS:
                 DEBUG("[at86rf2xx] opt: disabling PROMISCUOUS mode\n");

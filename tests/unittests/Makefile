@@ -2,7 +2,7 @@ APPLICATION = unittests
 include ../Makefile.tests_common
 
 BOARD_INSUFFICIENT_MEMORY := airfy-beacon chronos msb-430 msb-430h pca10000 \
-                          pca10005 redbee-econotag spark-core stm32f0discovery \
+                          pca10005 spark-core stm32f0discovery \
                           telosb wsn430-v1_3b wsn430-v1_4 z1 nucleo-f334 \
                           yunjia-nrf51822 samr21-xpro arduino-mega2560 \
                           airfy-beacon nrf51dongle nrf6310

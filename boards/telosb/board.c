@@ -9,6 +9,7 @@
 
 #include "cpu.h"
 #include "board.h"
+#include "msp430_stdio.h"
 
 void uart_init(void);
 
@@ -25,9 +26,9 @@ static void telosb_ports_init(void)
     P2DIR = 0xFF;    /* Port2 Direction: 11111111 = 0xFF */
 
     /* Port 3: UART and SPI */
-    P3SEL = 0xCE;    /* Port3 Select: 11001110 = 0xCE */
+    P3SEL = 0x0E;    /* Port3 Select: 11001110 = 0xCE */
     P3OUT = 0x00;    /* Port3 Output: 00000000 = 0x00 */
-    P3DIR = 0x4E;    /* Port3 Direction: 01001110 = 0x4E */
+    P3DIR = 0xFE;    /* Port3 Direction: 01001110 = 0x4E */
 
     /* Port 4: CS */
     P4SEL = 0x02;    /* Port4 Select: 00000010 = 0x02 */
@@ -119,11 +120,10 @@ void board_init(void)
     WDTCTL     =  WDTPW + WDTHOLD;
 
     telosb_ports_init();
-
     msp430_init_dco();
 
-    /* initialize bsp modules */
-    uart_init();
+    /* initialize the STDIO */
+    msp430_stdio_init();
 
     /* enable interrupts */
     __bis_SR_register(GIE);

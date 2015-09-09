@@ -22,16 +22,8 @@
 #include <stdlib.h>
 
 #include "shell.h"
-#ifdef MODULE_NEWLIB
-#   include "uart_stdio.h"
-#else
-#   include "posix_io.h"
-#   include "board_uart0.h"
-#endif
 #include "periph/gpio.h"
 #include "hwtimer.h"
-
-#define SHELL_BUFSIZE       (64U)
 
 static void cb(void *arg)
 {
@@ -241,8 +233,6 @@ static const shell_command_t shell_commands[] = {
 
 int main(void)
 {
-    shell_t shell;
-
     puts("GPIO peripheral driver test\n");
     puts("In this test, pins are specified by integer port and pin numbers.\n"
          "So if your platform has a pin PA01, it will be port=0 and pin=1,\n"
@@ -251,13 +241,8 @@ int main(void)
          "      behavior for not existing ports/pins is not defined!");
 
     /* start the shell */
-#ifndef MODULE_NEWLIB
-    (void) posix_open(uart0_handler_pid, 0);
-    shell_init(&shell, shell_commands, SHELL_BUFSIZE, uart0_readc, uart0_putc);
-#else
-    shell_init(&shell, shell_commands, SHELL_BUFSIZE, getchar, putchar);
-#endif
-    shell_run(&shell);
+    char line_buf[SHELL_DEFAULT_BUFSIZE];
+    shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
 
     return 0;
 }

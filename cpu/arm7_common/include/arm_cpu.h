@@ -27,18 +27,6 @@ uint32_t get_system_speed(void);
 void cpu_clock_scale(uint32_t source, uint32_t target, uint32_t *prescale);
 
 void arm_reset(void);
-void stdio_flush(void);
-
-/**
- * @brief Writes an array of characters to the UART0 device
- *
- * @param[in] astring   The string to write
- * @param[in] length    Length of the string
- *
- * @returns Always @p length
- */
-int uart0_puts(char *astring, int length);
-
 
 #ifdef __cplusplus
 }

@@ -26,6 +26,22 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Clock configuration
+ * @{
+ */
+#define CLOCK_CORECLOCK     (72000000U)         /* the msba2 runs with 72MHz */
+
+#define CLOCK_PCLK          (CLOCK_CORECLOCK)
+/** @} */
+
+/**
+ * @brief   Timer configuration, select a number from 1 to 4
+ * @{
+ */
+#define TIMER_NUMOF         (1U)
+/** @} */
+
+/**
  * @brief PWM device and pinout configuration
  */
 #define PWM_NUMOF           (1)

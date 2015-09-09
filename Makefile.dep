@@ -52,6 +52,7 @@ endif
 ifneq (,$(filter gnrc_sixlowpan_default,$(USEMODULE)))
   USEMODULE += gnrc_ipv6_default
   USEMODULE += gnrc_sixlowpan
+  USEMODULE += gnrc_sixlowpan_nd
   USEMODULE += gnrc_sixlowpan_frag
   USEMODULE += gnrc_sixlowpan_iphc
 endif
@@ -77,20 +78,50 @@ ifneq (,$(filter gnrc_sixlowpan_ctx,$(USEMODULE)))
   USEMODULE += vtimer
 endif
 
+ifneq (,$(filter gnrc_sixlowpan_nd,$(USEMODULE)))
+  USEMODULE += gnrc_ndp
+  USEMODULE += gnrc_ndp_internal
+  USEMODULE += gnrc_sixlowpan_ctx
+  USEMODULE += random
+  USEMODULE += vtimer
+endif
+
 ifneq (,$(filter gnrc_ipv6_default,$(USEMODULE)))
   USEMODULE += gnrc_ipv6
   USEMODULE += gnrc_icmpv6
-  USEMODULE += gnrc_ndp
-  USEMODULE += gnrc_ndp_internal
-  USEMODULE += gnrc_ndp_node
+  ifeq (1,$(GNRC_NETIF_NUMOF))
+    ifeq (,$(filter gnrc_sixlowpan_nd,$(USEMODULE)))
+      USEMODULE += gnrc_ndp_host
+    endif
+  else
+    USEMODULE += gnrc_ndp_host
+  endif
 endif
 
 ifneq (,$(filter gnrc_ipv6_router_default,$(USEMODULE)))
   USEMODULE += gnrc_ipv6_router
   USEMODULE += gnrc_icmpv6
-  USEMODULE += gnrc_ndp
-  USEMODULE += gnrc_ndp_internal
+  USEMODULE += gnrc_ndp_router
+endif
+
+ifneq (,$(filter gnrc_ndp_host,$(USEMODULE)))
   USEMODULE += gnrc_ndp_node
+  USEMODULE += random
+  USEMODULE += vtimer
+endif
+
+ifneq (,$(filter gnrc_ndp_router,$(USEMODULE)))
+  USEMODULE += gnrc_ndp_node
+  USEMODULE += random
+  USEMODULE += vtimer
+endif
+
+ifneq (,$(filter gnrc_ndp_node,$(USEMODULE)))
+  USEMODULE += gnrc_ndp_internal
+endif
+
+ifneq (,$(filter gnrc_ndp_%,$(USEMODULE)))
+  USEMODULE += gnrc_ndp
 endif
 
 ifneq (,$(filter gnrc_ndp,$(USEMODULE)))
@@ -187,15 +218,6 @@ endif
 
 ifneq (,$(filter newlib,$(USEMODULE)))
   USEMODULE += uart_stdio
-else
-  ifneq (,$(filter shell,$(USEMODULE)))
-    USEMODULE += uart0
-  endif
-endif
-
-
-ifneq (,$(filter uart0,$(USEMODULE)))
-  USEMODULE += posix
 endif
 
 ifneq (,$(filter posix,$(USEMODULE)))
@@ -260,6 +282,19 @@ ifneq (,$(filter gnrc,$(USEMODULE)))
   USEMODULE += gnrc_pktbuf
 endif
 
+ifneq (,$(filter gnrc_netdev2,$(USEMODULE)))
+  USEMODULE += netopt
+endif
+
 ifneq (,$(filter hih6130,$(USEMODULE)))
   USEMODULE += vtimer
+endif
+
+ifneq (,$(filter encx24j600,$(USEMODULE)))
+  USEMODULE += timex
+  USEMODULE += vtimer
+endif
+
+ifneq (,$(filter srf02,$(USEMODULE)))
+  USEMODULE += xtimer
 endif

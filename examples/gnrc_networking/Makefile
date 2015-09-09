@@ -8,7 +8,7 @@ BOARD ?= native
 RIOTBASE ?= $(CURDIR)/../..
 
 BOARD_INSUFFICIENT_MEMORY := airfy-beacon chronos msb-430 msb-430h nrf51dongle \
-                          nrf6310 nucleo-f334 pca10000 pca10005 redbee-econotag \
+                          nrf6310 nucleo-f334 pca10000 pca10005 \
                           stm32f0discovery telosb wsn430-v1_3b wsn430-v1_4 \
                           yunjia-nrf51822 z1
 
@@ -28,8 +28,7 @@ USEMODULE += gnrc_rpl
 USEMODULE += gnrc_pktdump
 # Additional networking modules that can be dropped if not needed
 USEMODULE += gnrc_icmpv6_echo
-# Add also the shell, some shell commands (which are based on uart0 in this app)
-USEMODULE += uart0
+# Add also the shell, some shell commands
 USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += ps

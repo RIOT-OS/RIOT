@@ -19,9 +19,11 @@
 #include "byteorder.h"
 #include "cpu_conf.h"
 #include "kernel_types.h"
-#include "net/gnrc/icmpv6.h"
 #include "net/gnrc.h"
+#include "net/gnrc/icmpv6.h"
 #include "net/gnrc/ndp.h"
+#include "net/gnrc/sixlowpan/ctx.h"
+#include "net/gnrc/sixlowpan/nd.h"
 #include "net/protnum.h"
 #include "thread.h"
 #include "utlist.h"
@@ -190,6 +192,7 @@ static void *_event_loop(void *args)
                 msg_reply(&msg, &reply);
                 break;
 
+#ifdef MODULE_GNRC_NDP
             case GNRC_NDP_MSG_RTR_TIMEOUT:
                 DEBUG("ipv6: Router timeout received\n");
                 ((gnrc_ipv6_nc_t *)msg.content.ptr)->flags &= ~GNRC_IPV6_NC_IS_ROUTER;
@@ -201,7 +204,6 @@ static void *_event_loop(void *args)
                                             (ipv6_addr_t *)msg.content.ptr);
                 break;
 
-#ifdef MODULE_GNRC_NDP
             case GNRC_NDP_MSG_NBR_SOL_RETRANS:
                 DEBUG("ipv6: Neigbor solicitation retransmission timer event received\n");
                 gnrc_ndp_retrans_nbr_sol((gnrc_ipv6_nc_t *)msg.content.ptr);
@@ -212,7 +214,37 @@ static void *_event_loop(void *args)
                 gnrc_ndp_state_timeout((gnrc_ipv6_nc_t *)msg.content.ptr);
                 break;
 #endif
-
+#ifdef MODULE_GNRC_NDP_ROUTER
+            case GNRC_NDP_MSG_RTR_ADV_RETRANS:
+                DEBUG("ipv6: Router advertisement retransmission event received\n");
+                gnrc_ndp_router_retrans_rtr_adv((gnrc_ipv6_netif_t *)msg.content.ptr);
+                break;
+            case GNRC_NDP_MSG_RTR_ADV_DELAY:
+                DEBUG("ipv6: Delayed router advertisement event received\n");
+                gnrc_ndp_router_send_rtr_adv((gnrc_ipv6_nc_t *)msg.content.ptr);
+                break;
+#endif
+#ifdef MODULE_GNRC_NDP_HOST
+            case GNRC_NDP_MSG_RTR_SOL_RETRANS:
+                DEBUG("ipv6: Router solicitation retransmission event received\n");
+                gnrc_ndp_host_retrans_rtr_sol((gnrc_ipv6_netif_t *)msg.content.ptr);
+                break;
+#endif
+#ifdef MODULE_GNRC_SIXLOWPAN_ND
+            case GNRC_SIXLOWPAN_ND_MSG_MC_RTR_SOL:
+                DEBUG("ipv6: Multicast router solicitation event received\n");
+                gnrc_sixlowpan_nd_mc_rtr_sol((gnrc_ipv6_netif_t *)msg.content.ptr);
+                break;
+            case GNRC_SIXLOWPAN_ND_MSG_UC_RTR_SOL:
+                DEBUG("ipv6: Unicast router solicitation event received\n");
+                gnrc_sixlowpan_nd_uc_rtr_sol((gnrc_ipv6_nc_t *)msg.content.ptr);
+                break;
+            case GNRC_SIXLOWPAN_ND_MSG_DELETE_CTX:
+                DEBUG("ipv6: Delete 6LoWPAN context event received\n");
+                gnrc_sixlowpan_ctx_remove(((((gnrc_sixlowpan_ctx_t *)msg.content.ptr)->flags_id) &
+                                           GNRC_SIXLOWPAN_CTX_FLAGS_CID_MASK));
+                break;
+#endif
             default:
                 break;
         }
@@ -481,16 +513,24 @@ static inline kernel_pid_t _next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_len
                                             kernel_pid_t iface, ipv6_addr_t *dst,
                                             gnrc_pktsnip_t *pkt)
 {
-#ifdef MODULE_GNRC_NDP_NODE
-    return gnrc_ndp_node_next_hop_l2addr(l2addr, l2addr_len, iface, dst, pkt);
-#else
+#if defined(MODULE_GNRC_SIXLOWPAN_ND)
+    (void)pkt;
+    iface = gnrc_sixlowpan_nd_next_hop_l2addr(l2addr, l2addr_len, iface, dst);
+    if (iface <= KERNEL_PID_UNDEF) {
+        return iface;
+    }
+#endif
+#if defined(MODULE_GNRC_NDP_NODE)
+    iface = gnrc_ndp_node_next_hop_l2addr(l2addr, l2addr_len, iface, dst, pkt);
+#elif !defined(MODULE_GNRC_SIXLOWPAN_ND)
+    iface = KERNEL_PID_UNDEF;
     (void)l2addr;
     (void)iface;
     (void)dst;
     (void)pkt;
     *l2addr_len = 0;
-    return KERNEL_PID_UNDEF;
 #endif
+    return iface;
 }
 
 static void _send(gnrc_pktsnip_t *pkt, bool prep_hdr)

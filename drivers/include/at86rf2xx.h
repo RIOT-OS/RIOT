@@ -21,6 +21,7 @@
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      Daniel Krebs <github@daniel-krebs.net>
  */
 
 #ifndef AT86RF2XX_H_
@@ -333,6 +334,48 @@ uint8_t at86rf2xx_get_max_retries(at86rf2xx_t *dev);
  * @param[in] max           the maximum number of retransmissions
  */
 void at86rf2xx_set_max_retries(at86rf2xx_t *dev, uint8_t max);
+
+/**
+ * @brief   Get the maximum number of channel access attempts per frame (CSMA)
+ *
+ * @param[in] dev           device to read from
+ *
+ * @return                  configured number of retries
+ */
+uint8_t at86rf2xx_get_csma_max_retries(at86rf2xx_t *dev);
+
+/**
+ * @brief   Set the maximum number of channel access attempts per frame (CSMA)
+ *
+ * This setting specifies the number of attempts to access the channel to
+ * transmit a frame. If the channel is busy @p retries times, then frame
+ * transmission fails.
+ * Valid values: 0 to 5, -1 means CSMA disabled
+ *
+ * @param[in] dev           device to write to
+ * @param[in] max           the maximum number of retries
+ */
+void at86rf2xx_set_csma_max_retries(at86rf2xx_t *dev, int8_t retries);
+
+/**
+ * @brief   Set the min and max backoff exponent for CSMA/CA
+ *
+ * - Maximum BE: 0 - 8
+ * - Minimum BE: 0 - [max]
+ *
+ * @param[in] dev           device to write to
+ * @param[in] min           the minimum BE
+ * @param[in] max           the maximum BE
+ */
+void at86rf2xx_set_csma_backoff_exp(at86rf2xx_t *dev, uint8_t min, uint8_t max);
+
+/**
+ * @brief   Set seed for CSMA random backoff
+ *
+ * @param[in] dev           device to write to
+ * @param[in] entropy       11 bit of entropy as seed for random backoff
+ */
+void at86rf2xx_set_csma_seed(at86rf2xx_t *dev, uint8_t entropy[2]);
 
 /**
  * @brief   Enable or disable driver specific options

@@ -21,7 +21,10 @@
  */
 
 #include "cpu.h"
+#include "irq.h"
 #include "board.h"
+#include "msp430_stdio.h"
+#include "periph_conf.h"
 #include "kernel_internal.h"
 #include "msp430.h"
 #include "debug.h"
@@ -29,35 +32,6 @@
 static volatile uint32_t __msp430_cpu_speed = MSP430_INITIAL_CPU_SPEED;
 
 void msp430_init_dco(void);
-
-/*---------------------------------------------------------------------------*/
-static uint8_t calc_umctl(uint16_t br)
-{
-    /* from TI slaa049 */
-    register uint8_t CMOD = 256 * br - 256 * (br + 1) / 2;
-    register uint8_t c = 0;
-    register int i = 0;
-    register uint8_t a = CMOD;
-    a <<= 1;
-
-    do {
-        if (a & 0x80) {     /* Overflow to integer? */
-            a = a - 128 + CMOD; /* Yes, subtract 1.000000 */
-            c |= 0x80;
-        }
-        else {
-            a += CMOD;          /* No, add fraction */
-        }
-
-        if (i == 7) {
-            return c;
-        }
-
-        i++;
-        c >>= 1;
-    }
-    while (1);
-}
 
 static void msb_ports_init(void)
 {
@@ -78,9 +52,9 @@ static void msb_ports_init(void)
     /*   0 - P2.6 [IN ] - SDC Protect */
     /*   0 - P2.7 [IN ] - SDC Detect */
 
-    P3SEL = 0xC0;   /* Port3 Pins 6 & 7 for USART */
-    P3OUT = 0x49;   /* Port3 Output register: 01001001: 0x49 */
-    P3DIR = 0xAB;   /* Port3 Direction: 10101011: 0xAB */
+    P3SEL = 0x00;   /* Port3 Pins 6 & 7 for USART */
+    P3OUT = 0x00;   /* Port3 Output register: 01001001: 0x49 */
+    P3DIR = 0xFF;   /* Port3 Direction: 10101011: 0xAB */
     /*   1 - P3.0 */
     /*   1 - P3.1 */
     /*   0 - P3.2 */
@@ -130,25 +104,10 @@ static void msb_ports_init(void)
 
 void msp430_set_cpu_speed(uint32_t speed)
 {
-    dint();
+    disableIRQ();
     __msp430_cpu_speed = speed;
     msp430_init_dco();
-    uint16_t br;
-    UCTL1 = SWRST | CHAR;       /* 8-bit character */
-    UTCTL1 |= SSEL1 | URXSE;    /* UCLK = MCLK */
-    /* activate */
-    U1ME |= UTXE1 | URXE1;      /* Enable USART1 TXD/RXD */
-    br = (uint16_t)(__msp430_cpu_speed / 115200uL);
-    UBR01  = br;                /* set baudrate */
-    UBR11  = br >> 8;
-    UMCTL1 = calc_umctl(br);    /* set modulation */
-
-    ME2 |= (UTXE1 | URXE1);
-    UCTL1 &= ~SWRST;
-
-    IE2 |= URXIE1;
-    //clock_init();
-    eint();
+    enableIRQ();
 }
 
 /*---------------------------------------------------------------------------*/
@@ -243,5 +202,8 @@ void board_init(void)
 
     LED_RED_ON;
 
-    msp430_set_cpu_speed(7372800uL);
+    msp430_set_cpu_speed(CLOCK_CORECLOCK);
+
+    /* finally initialize the STDIO */
+    msp430_stdio_init();
 }

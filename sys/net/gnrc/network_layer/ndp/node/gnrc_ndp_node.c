@@ -87,7 +87,7 @@ kernel_pid_t gnrc_ndp_node_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_len,
     }
 #endif
 
-    if ((next_hop_ip == NULL)) {            /* no route to host */
+    if (next_hop_ip == NULL) {            /* no route to host */
         if (iface == KERNEL_PID_UNDEF) {
             /* gnrc_ipv6_netif_t doubles as prefix list */
             iface = gnrc_ipv6_netif_find_by_prefix(&prefix, dst);
@@ -109,7 +109,6 @@ kernel_pid_t gnrc_ndp_node_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_len,
         next_hop_ip = gnrc_ndp_internal_default_router();
     }
 
-
     if (next_hop_ip == NULL) {
         next_hop_ip = dst;      /* Just look if it's in the neighbor cache
                                  * (aka on-link but not registered in prefix list as such) */
@@ -128,8 +127,9 @@ kernel_pid_t gnrc_ndp_node_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_len,
         if (gnrc_ipv6_nc_get_state(nc_entry) == GNRC_IPV6_NC_STATE_STALE) {
             gnrc_ndp_internal_set_state(nc_entry, GNRC_IPV6_NC_STATE_DELAY);
         }
-
-        memcpy(l2addr, nc_entry->l2_addr, nc_entry->l2_addr_len);
+        if (nc_entry->l2_addr_len > 0) {
+            memcpy(l2addr, nc_entry->l2_addr, nc_entry->l2_addr_len);
+        }
         *l2addr_len = nc_entry->l2_addr_len;
         /* TODO: unreachability check */
         return nc_entry->iface;

@@ -31,8 +31,6 @@ extern "C" {
 #define THREAD_EXTRA_STACKSIZE_PRINTF_FLOAT      (8192)
 #define THREAD_STACKSIZE_MINIMUM                 (8192)
 
-#define UART0_BUFSIZE                      (16)
-
 #define F_CPU (1000000) /* This value is unused in x86 */
 
 #ifdef __cplusplus

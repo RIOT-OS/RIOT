@@ -1,5 +1,4 @@
 ifneq (,$(filter gnrc_netif_default,$(USEMODULE)))
-    USEMODULE += dev_eth_tap
-    USEMODULE += gnrc_netdev_eth
-    USEMODULE += gnrc_nomac
+    USEMODULE += netdev2_tap
+    USEMODULE += gnrc_netdev2
 endif

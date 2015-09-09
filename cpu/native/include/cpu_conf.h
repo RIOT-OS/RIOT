@@ -30,8 +30,8 @@ extern "C" {
 #ifdef __MACH__ /* OSX */
 #define THREAD_STACKSIZE_DEFAULT            (163840)
 #define THREAD_STACKSIZE_IDLE               (163840)
-#define THREAD_EXTRA_STACKSIZE_PRINTF       (163840)
-#define THREAD_EXTRA_STACKSIZE_PRINTF_FLOAT (163840)
+#define THREAD_EXTRA_STACKSIZE_PRINTF       (81920)
+#define THREAD_EXTRA_STACKSIZE_PRINTF_FLOAT (81920)
 /* for core/include/thread.h */
 #define THREAD_STACKSIZE_MINIMUM            (163840)
 /* native internal */
@@ -41,25 +41,13 @@ extern "C" {
 #else /* Linux etc. */
 #define THREAD_STACKSIZE_DEFAULT            (8192)
 #define THREAD_STACKSIZE_IDLE               (8192)
-#define THREAD_EXTRA_STACKSIZE_PRINTF       (8192)
-#define THREAD_EXTRA_STACKSIZE_PRINTF_FLOAT (8192)
+#define THREAD_EXTRA_STACKSIZE_PRINTF       (4096)
+#define THREAD_EXTRA_STACKSIZE_PRINTF_FLOAT (4096)
 /* for core/include/thread.h */
 #define THREAD_STACKSIZE_MINIMUM            (8192)
 /* native internal */
 #define NATIVE_ISR_STACKSIZE                (8192)
 #endif /* OS */
-/** @} */
-
-/**
- * @brief   UART0 buffer size definition for compatibility reasons
- *
- * TODO: remove once the remodeling of the uart0 driver is done
- * @{
- */
-#ifdef UART0_BUFSIZE
-#undef UART0_BUFSIZE
-#endif
-#define UART0_BUFSIZE                       (128)
 /** @} */
 
 /**

@@ -20,14 +20,7 @@
 
 #include <stdio.h>
 
-#include "kernel.h"
 #include "shell.h"
-#ifdef MODULE_NEWLIB
-#   include "uart_stdio.h"
-#else
-#   include "posix_io.h"
-#   include "board_uart0.h"
-#endif
 
 extern int udp_cmd(int argc, char **argv);
 
@@ -38,19 +31,12 @@ static const shell_command_t shell_commands[] = {
 
 int main(void)
 {
-    shell_t shell;
-
     puts("RIOT network stack example application");
 
     /* start shell */
     puts("All up, running the shell now");
-#ifndef MODULE_NEWLIB
-    (void) posix_open(uart0_handler_pid, 0);
-    shell_init(&shell, shell_commands, UART0_BUFSIZE, uart0_readc, uart0_putc);
-#else
-    shell_init(&shell, shell_commands, UART0_BUFSIZE, getchar, putchar);
-#endif
-    shell_run(&shell);
+    char line_buf[SHELL_DEFAULT_BUFSIZE];
+    shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
 
     /* should be never reached */
     return 0;

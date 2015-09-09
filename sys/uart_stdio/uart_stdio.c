@@ -34,12 +34,21 @@
 #include "periph/uart.h"
 
 #include "board.h"
+#include "periph/uart.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
+#ifndef STDIO
+#define STDIO               (0)
+#endif
+
+#ifndef STDIO_BAUDRATE
+#define STDIO_BAUDRATE      (115200)
+#endif
+
 #ifndef STDIO_RX_BUFSIZE
-#define STDIO_RX_BUFSIZE (64)
+#define STDIO_RX_BUFSIZE    (64)
 #endif
 
 /**
