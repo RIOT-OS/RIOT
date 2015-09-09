@@ -269,11 +269,10 @@ static rbuf_t *_rbuf_get(const void *src, size_t src_len,
     uint32_t now_sec = xtimer_now() / SEC_IN_USEC;
 
     for (unsigned int i = 0; i < RBUF_SIZE; i++) {
-        /* check first if entry already available */
-	if (rbuf[i].pkt != NULL) {
-            if ((rbuf[i].pkt->size == size) &&
-                (rbuf[i].tag == tag) && (rbuf[i].src_len == src_len) &&
-                (rbuf[i].dst_len == dst_len) &&
+        /* check first if entry already available */ 
+	if (rbuf[i].pkt != NULL){
+            if ((rbuf[i].tag == tag) && (rbuf[i].pkt->size == size) &&
+                (rbuf[i].src_len == src_len) && (rbuf[i].dst_len == dst_len) &&
                 (memcmp(rbuf[i].src, src, src_len) == 0) &&
                 (memcmp(rbuf[i].dst, dst, dst_len) == 0)) {
                 DEBUG("6lo rfrag: entry %p (%s, ", (void *)(&rbuf[i]),
