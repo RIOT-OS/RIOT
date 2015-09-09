@@ -77,7 +77,7 @@ static inline msp_port_isr_t *_isr_port(gpio_t pin)
 
 static inline uint8_t _pin(gpio_t pin)
 {
-    return (uint8_t)(pin & 0xff);
+    return (uint8_t)(1 << (pin & 0x0f));
 }
 
 static int _ctx(gpio_t pin)
