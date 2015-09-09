@@ -36,7 +36,7 @@ static inline void _rtr_sol_reschedule(gnrc_ipv6_netif_t *iface, uint32_t sec_de
 
 static inline uint32_t _binary_exp_backoff(uint32_t base_sec, unsigned int exp)
 {
-    return genrand_uint32_range(0, (1 << exp) - 1) * base_sec;
+    return genrand_uint32_range(0, (1 << exp)) * base_sec;
 }
 
 static inline void _revert_iid(uint8_t *iid)
@@ -48,7 +48,7 @@ void gnrc_sixlowpan_nd_init(gnrc_ipv6_netif_t *iface)
 {
     assert(iface->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN);
     mutex_lock(&iface->mutex);
-    iface->rtr_sol_count = 0;   /* first will be send immediately */
+    iface->rtr_sol_count = 0;   /* first will be sent immediately */
 
     DEBUG("6lo nd: retransmit multicast rtr sol in 10 sec\n");
     _rtr_sol_reschedule(iface, GNRC_SIXLOWPAN_ND_RTR_SOL_INT);
@@ -69,7 +69,7 @@ void gnrc_sixlowpan_nd_mc_rtr_sol(gnrc_ipv6_netif_t *iface)
     else {
         unsigned int exp = (unsigned int)(iface->rtr_sol_count - GNRC_NDP_MAX_RTR_SOL_NUMOF);
         interval = _binary_exp_backoff(1, exp);
-        if (((1U << exp) - 1U) < GNRC_SIXLOWPAN_ND_MAX_RTR_SOL_INT) {
+        if ((1U << exp) < GNRC_SIXLOWPAN_ND_MAX_RTR_SOL_INT) {
             /* XXX Not sure if this is the correct interpretation of the truncation described in
              * https://tools.ietf.org/html/rfc6775#section-5.3. In every source I've read the
              * truncating value was the exponent, not the target value, so I'm very confused
@@ -78,9 +78,18 @@ void gnrc_sixlowpan_nd_mc_rtr_sol(gnrc_ipv6_netif_t *iface)
              * but not its interoperability. */
             iface->rtr_sol_count++;
         }
+        /* RFC6775, section 5.3 (https://tools.ietf.org/html/rfc6775#section-5.3)
+         * states that router solicitation should be sent slower after the
+         * initial 3 retransmissions (i.e. >= 10 secondes) and truncate "the
+         * increase of the retransmission timer at 60 seconds". */
+        if (interval < GNRC_SIXLOWPAN_ND_RTR_SOL_INT) {
+            interval = GNRC_SIXLOWPAN_ND_RTR_SOL_INT;
+        }
+        else if (interval > GNRC_SIXLOWPAN_ND_MAX_RTR_SOL_INT) {
+            interval = GNRC_SIXLOWPAN_ND_MAX_RTR_SOL_INT;
+        }
 
         DEBUG("6lo nd: retransmit multicast rtr sol in %" PRIu32 " sec\n", interval);
-        iface->rtr_sol_count--;
     }
     _rtr_sol_reschedule(iface, interval);
     mutex_unlock(&iface->mutex);
