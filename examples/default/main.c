@@ -37,6 +37,11 @@
 #include "ltc4150.h"
 #endif
 
+#ifdef MODULE_NETIF
+#include "net/gnrc/pktdump.h"
+#include "net/gnrc.h"
+#endif
+
 int main(void)
 {
 #ifdef MODULE_LTC4150
@@ -45,6 +50,14 @@ int main(void)
 
 #ifdef FEATURE_PERIPH_RTC
     rtc_init();
+#endif
+
+#ifdef MODULE_NETIF
+    gnrc_netreg_entry_t dump;
+
+    dump.pid = gnrc_pktdump_getpid();
+    dump.demux_ctx = GNRC_NETREG_DEMUX_CTX_ALL;
+    gnrc_netreg_register(GNRC_NETTYPE_UNDEF, &dump);
 #endif
 
     (void) puts("Welcome to RIOT!");
