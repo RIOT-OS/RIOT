@@ -495,6 +495,11 @@ void gnrc_ndp_rtr_adv_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt, ipv6_hdr_t
          * not to run out; see https://tools.ietf.org/html/rfc6775#section-5.4.3 */
         next_rtr_sol *= 3;
         next_rtr_sol >>= 2;
+        /* according to https://tools.ietf.org/html/rfc6775#section-5.3:
+         * "In all cases, the RS retransmissions are terminated when an RA is
+         *  received."
+         *  Hence, reset router solicitation counter and reset timer. */
+        &nc_entry->rtr_sol_count = 0;
         gnrc_sixlowpan_nd_rtr_sol_reschedule(nc_entry, next_rtr_sol);
         gnrc_ndp_internal_send_nbr_sol(ifs[i], &nc_entry->ipv6_addr, &nc_entry->ipv6_addr);
         vtimer_remove(&nc_entry->nbr_sol_timer);
