@@ -21,15 +21,16 @@
 #include "sched.h"
 #include "thread.h"
 #include "periph/gpio.h"
+#include "periph_cpu.h"
 #include "periph_conf.h"
 #include "board.h"
 
 typedef struct {
     gpio_cb_t cb;
     void *arg;
-} gpio_state_t;
+} exti_ctx_t;
 
-static gpio_state_t gpio_config[GPIO_NUMOF];
+static exti_ctx_t exti_ctx[GPIO_ISR_CHAN_NUMOF];
 
 /* static port mappings */
 static GPIO_TypeDef *const gpio_port_map[GPIO_NUMOF] = {
@@ -432,119 +433,12 @@ void gpio_write(gpio_t dev, int value)
     }
 }
 
-void isr_exti0_1(void)
+void isr_exti(void)
 {
-#if GPIO_IRQ_0 >= 0
-    if (EXTI->PR & EXTI_PR_PR0) {
-        EXTI->PR |= EXTI_PR_PR0;        /* clear status bit by writing a 1 to it */
-        gpio_config[GPIO_IRQ_0].cb(gpio_config[GPIO_IRQ_0].arg);
-    }
-#endif
-#if GPIO_IRQ_1 >= 0
-    if (EXTI->PR & EXTI_PR_PR1) {
-        EXTI->PR |= EXTI_PR_PR1;        /* clear status bit by writing a 1 to it */
-        gpio_config[GPIO_IRQ_1].cb(gpio_config[GPIO_IRQ_1].arg);
-    }
-#endif
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
-}
-
-void isr_exti2_3(void)
-{
-#if GPIO_IRQ_2 >= 0
-    if (EXTI->PR & EXTI_PR_PR2) {
-        EXTI->PR |= EXTI_PR_PR2;        /* clear status bit by writing a 1 to it */
-        gpio_config[GPIO_IRQ_2].cb(gpio_config[GPIO_IRQ_2].arg);
-    }
-#endif
-#if GPIO_IRQ_3 >= 0
-    if (EXTI->PR & EXTI_PR_PR3) {
-        EXTI->PR |= EXTI_PR_PR3;        /* clear status bit by writing a 1 to it */
-        gpio_config[GPIO_IRQ_3].cb(gpio_config[GPIO_IRQ_3].arg);
-    }
-#endif
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
-}
-
-void isr_exti4_15(void)
-{
-#if GPIO_IRQ_4 >= 0
-    if (EXTI->PR & EXTI_PR_PR4) {
-        EXTI->PR |= EXTI_PR_PR4;        /* clear status bit by writing a 1 to it */
-        gpio_config[GPIO_IRQ_4].cb(gpio_config[GPIO_IRQ_4].arg);
-    }
-#endif
-#if GPIO_IRQ_5 >= 0
-    if (EXTI->PR & EXTI_PR_PR5) {
-        EXTI->PR |= EXTI_PR_PR5;        /* clear status bit by writing a 1 to it */
-        gpio_config[GPIO_IRQ_5].cb(gpio_config[GPIO_IRQ_5].arg);
-    }
-#endif
-#if GPIO_IRQ_6 >= 0
-    if (EXTI->PR & EXTI_PR_PR6) {
-        EXTI->PR |= EXTI_PR_PR6;        /* clear status bit by writing a 1 to it */
-        gpio_config[GPIO_IRQ_6].cb(gpio_config[GPIO_IRQ_6].arg);
-    }
-#endif
-#if GPIO_IRQ_7 >= 0
-    if (EXTI->PR & EXTI_PR_PR7) {
-        EXTI->PR |= EXTI_PR_PR7;        /* clear status bit by writing a 1 to it */
-        gpio_config[GPIO_IRQ_7].cb(gpio_config[GPIO_IRQ_7].arg);
-    }
-#endif
-#if GPIO_IRQ_8 >= 0
-    if (EXTI->PR & EXTI_PR_PR8) {
-        EXTI->PR |= EXTI_PR_PR8;        /* clear status bit by writing a 1 to it */
-        gpio_config[GPIO_IRQ_8].cb(gpio_config[GPIO_IRQ_8].arg);
-    }
-#endif
-#if GPIO_IRQ_9 >= 0
-    if (EXTI->PR & EXTI_PR_PR9) {
-        EXTI->PR |= EXTI_PR_PR9;        /* clear status bit by writing a 1 to it */
-        gpio_config[GPIO_IRQ_9].cb(gpio_config[GPIO_IRQ_9].arg);
-    }
-#endif
-#if GPIO_IRQ_10 >= 0
-    if (EXTI->PR & EXTI_PR_PR10) {
-        EXTI->PR |= EXTI_PR_PR10;        /* clear status bit by writing a 1 to it */
-        gpio_config[GPIO_IRQ_10].cb(gpio_config[GPIO_IRQ_10].arg);
-    }
-#endif
-#if GPIO_IRQ_11 >= 0
-    if (EXTI->PR & EXTI_PR_PR11) {
-        EXTI->PR |= EXTI_PR_PR11;        /* clear status bit by writing a 1 to it */
-        gpio_config[GPIO_IRQ_11].cb(gpio_config[GPIO_IRQ_11].arg);
-    }
-#endif
-#if GPIO_IRQ_12 >= 0
-    if (EXTI->PR & EXTI_PR_PR12) {
-        EXTI->PR |= EXTI_PR_PR12;        /* clear status bit by writing a 1 to it */
-        gpio_config[GPIO_IRQ_12].cb(gpio_config[GPIO_IRQ_12].arg);
-    }
-#endif
-#if GPIO_IRQ_13 >= 0
-    if (EXTI->PR & EXTI_PR_PR13) {
-        EXTI->PR |= EXTI_PR_PR13;        /* clear status bit by writing a 1 to it */
-        gpio_config[GPIO_IRQ_13].cb(gpio_config[GPIO_IRQ_13].arg);
-    }
-#endif
-#if GPIO_IRQ_14 >= 0
-    if (EXTI->PR & EXTI_PR_PR14) {
-        EXTI->PR |= EXTI_PR_PR14;        /* clear status bit by writing a 1 to it */
-        gpio_config[GPIO_IRQ_14].cb(gpio_config[GPIO_IRQ_14].arg);
-    }
-#endif
-#if GPIO_IRQ_15 >= 0
-    if (EXTI->PR & EXTI_PR_PR15) {
-        EXTI->PR |= EXTI_PR_PR15;        /* clear status bit by writing a 1 to it */
-        gpio_config[GPIO_IRQ_15].cb(gpio_config[GPIO_IRQ_15].arg);
-    }
-#endif
-    if (sched_context_switch_request) {
-        thread_yield();
+    for (int i = 0; i < GPIO_ISR_CHAN_NUMOF; i++) {
+        if (EXTI->PR & (1 << i)) {
+            EXTI->PR = (1 << i);        /*clear by writing a 1*/
+            exti_ctx[i].cb(exti_ctx[i].arg);
+        }
     }
 }
