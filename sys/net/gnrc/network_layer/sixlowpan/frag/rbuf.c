@@ -288,10 +288,8 @@ static rbuf_t *_rbuf_get(const void *src, size_t src_len,
 	}
 
         /* if there is a free spot: remember it */
-	else{
-            if (res == NULL) {
+	else if (res == NULL) {
                 res = &(rbuf[i]);
-            }
 	}
     }
 
