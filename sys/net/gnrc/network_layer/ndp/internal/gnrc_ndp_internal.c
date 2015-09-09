@@ -345,7 +345,7 @@ void gnrc_ndp_internal_send_rtr_sol(kernel_pid_t iface, ipv6_addr_t *dst)
 static bool _pio_from_iface_addr(gnrc_pktsnip_t **res, gnrc_ipv6_netif_addr_t *addr,
                                  gnrc_pktsnip_t *next)
 {
-    if (((addr->prefix_len - 1U) > 127U) && /* 0 < prefix_len < 128 */
+    if (((addr->prefix_len - 1U) < 127U) && /* 0 < prefix_len < 128 */
         !ipv6_addr_is_unspecified(&addr->addr) &&
         !ipv6_addr_is_link_local(&addr->addr) &&
         !gnrc_ipv6_netif_addr_is_non_unicast(&addr->addr)) {
