@@ -24,7 +24,7 @@
 #include "periph/gpio.h"
 #include "periph_cpu.h"
 #include "periph_conf.h"
-#include "board.h"
+
 
 typedef struct {
     gpio_cb_t cb;
