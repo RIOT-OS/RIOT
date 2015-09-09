@@ -14,8 +14,10 @@
 
 #include <stdlib.h>
 
+#include "net/eui64.h"
 #include "net/gnrc/ipv6.h"
 #include "net/gnrc/ndp.h"
+#include "net/gnrc/sixlowpan/nd.h"
 #include "random.h"
 #include "timex.h"
 #include "vtimer.h"
@@ -228,8 +230,17 @@ void gnrc_ndp_internal_send_nbr_adv(kernel_pid_t iface, ipv6_addr_t *tgt, ipv6_a
 void gnrc_ndp_internal_send_nbr_sol(kernel_pid_t iface, ipv6_addr_t *tgt,
                                     ipv6_addr_t *dst)
 {
+#ifdef MODULE_GNRC_SIXLOWPAN_ND
+    gnrc_ipv6_netif_t *ipv6_iface = gnrc_ipv6_netif_get(iface);
+    assert(ipv6_iface != NULL);
+#endif
     gnrc_pktsnip_t *hdr, *pkt = NULL;
     ipv6_addr_t *src = NULL;
+    /* both suppressions, since they are needed in the MODULE_GNRC_SIXLOWPAN_ND branch */
+    /* cppcheck-suppress variableScope */
+    uint8_t l2src[8];
+    /* cppcheck-suppress variableScope */
+    size_t l2src_len = 0;
 
     DEBUG("ndp internal: send neighbor solicitation (iface: %" PRIkernel_pid ", tgt: %s, ",
           iface, ipv6_addr_to_str(addr_str, tgt, sizeof(addr_str)));
@@ -237,8 +248,6 @@ void gnrc_ndp_internal_send_nbr_sol(kernel_pid_t iface, ipv6_addr_t *tgt,
 
     /* check if there is a fitting source address to target */
     if ((src = gnrc_ipv6_netif_find_best_src_addr(iface, tgt)) != NULL) {
-        uint8_t l2src[8];
-        size_t l2src_len;
         l2src_len = _get_l2src(iface, l2src, sizeof(l2src));
 
         if (l2src_len > 0) {
@@ -252,6 +261,27 @@ void gnrc_ndp_internal_send_nbr_sol(kernel_pid_t iface, ipv6_addr_t *tgt,
             }
         }
     }
+
+#ifdef MODULE_GNRC_SIXLOWPAN_ND
+    if (ipv6_iface->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN) {
+        if (l2src_len != sizeof(eui64_t)) {
+            l2src_len = (uint16_t)gnrc_netapi_get(iface, NETOPT_ADDRESS_LONG, 0, l2src,
+                                                  sizeof(l2src));
+            if (l2src_len != sizeof(eui64_t)) {
+                DEBUG("ndp internal: can't get EUI-64 of the interface\n");
+                gnrc_pktbuf_release(pkt);
+                return;
+            }
+        }
+        hdr = gnrc_sixlowpan_nd_opt_ar_build(0, GNRC_SIXLOWPAN_ND_AR_LTIME, (eui64_t *)l2src, pkt);
+        if (hdr == NULL) {
+            DEBUG("ndp internal: error allocatin Address Registration option.\n");
+            gnrc_pktbuf_release(pkt);
+            return;
+        }
+        pkt = hdr;
+    }
+#endif
 
     hdr = gnrc_ndp_nbr_sol_build(tgt, pkt);
 
@@ -571,6 +601,13 @@ bool gnrc_ndp_internal_pi_opt_handle(kernel_pid_t iface, uint8_t icmpv6_type,
         /* else discard silently */
         return true;
     }
+#ifdef MODULE_GNRC_SIXLOWPAN_ND
+    if ((gnrc_ipv6_netif_get(iface)->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN) &&
+        (pi_opt->flags & NDP_OPT_PI_FLAGS_L)) {
+        /* ignore: see https://tools.ietf.org/html/rfc6775#section-5.4 */
+        return true;
+    }
+#endif
     prefix = gnrc_ipv6_netif_find_addr(iface, &pi_opt->prefix);
     if (((prefix == NULL) ||
          (gnrc_ipv6_netif_addr_get(prefix)->prefix_len != pi_opt->prefix_len)) &&

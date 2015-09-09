@@ -23,7 +23,9 @@
 #include "net/ipv6/ext/rh.h"
 #include "net/gnrc/icmpv6.h"
 #include "net/gnrc/ipv6.h"
+#include "net/gnrc/sixlowpan/nd.h"
 #include "net/gnrc.h"
+#include "net/sixlowpan/nd.h"
 #include "random.h"
 #include "utlist.h"
 #include "thread.h"
@@ -175,9 +177,14 @@ void gnrc_ndp_nbr_adv_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
                     /* invalid target link-layer address option */
                     return;
                 }
-
                 break;
-
+#ifdef MODULE_GNRC_SIXLOWPAN_ND
+            case NDP_OPT_AR:
+                /* address registration option is always ignored when invalid */
+                gnrc_sixlowpan_nd_opt_ar_handle(iface, ipv6, nbr_adv->type,
+                                                (sixlowpan_nd_opt_ar_t *)opt, NULL, 0);
+                break;
+#endif
             default:
                 /* silently discard all other options */
                 break;
@@ -194,6 +201,13 @@ void gnrc_ndp_nbr_adv_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
     }
 
     if (l2tgt_len != -ENOTSUP) {
+#ifdef MODULE_GNRC_SIXLOWPAN_ND
+        /* check if entry wasn't removed by ARO, ideally there should not be any TL2A in here */
+        nc_entry = gnrc_ipv6_nc_get(iface, &nbr_adv->tgt);
+        if (nc_entry == NULL) {
+            return;
+        }
+#endif
         if (gnrc_ipv6_nc_get_state(nc_entry) == GNRC_IPV6_NC_STATE_INCOMPLETE) {
             if (_pkt_has_l2addr(netif_hdr) && (l2tgt_len == 0)) {
                 /* link-layer has addresses, but no TLLAO supplied: discard silently
@@ -358,6 +372,9 @@ void gnrc_ndp_rtr_adv_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt, ipv6_hdr_t
     gnrc_ipv6_nc_t *nc_entry = NULL;
     gnrc_ipv6_netif_t *if_entry = gnrc_ipv6_netif_get(iface);
     uint8_t l2src[GNRC_IPV6_NC_L2_ADDR_MAX];
+#ifdef MODULE_GNRC_SIXLOWPAN_ND
+    uint32_t next_rtr_sol = 0;
+#endif
     int sicmpv6_size = (int)icmpv6_size, l2src_len = 0;
     uint16_t opt_offset = 0;
 
@@ -388,9 +405,12 @@ void gnrc_ndp_rtr_adv_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt, ipv6_hdr_t
     }
     /* set router life timer */
     if (rtr_adv->ltime.u16 != 0) {
+        uint16_t ltime = byteorder_ntohs(rtr_adv->ltime);
+#ifdef MODULE_GNRC_SIXLOWPAN_ND
+        next_rtr_sol = ltime;
+#endif
         vtimer_remove(&nc_entry->rtr_timeout);
-        vtimer_set_msg(&nc_entry->rtr_timeout,
-                       timex_set(byteorder_ntohs(rtr_adv->ltime), 0),
+        vtimer_set_msg(&nc_entry->rtr_timeout, timex_set(ltime, 0),
                        thread_getpid(), GNRC_NDP_MSG_RTR_TIMEOUT, nc_entry);
     }
     /* set current hop limit from message if available */
@@ -437,10 +457,51 @@ void gnrc_ndp_rtr_adv_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt, ipv6_hdr_t
                     /* invalid prefix information option */
                     return;
                 }
+#ifdef MODULE_GNRC_SIXLOWPAN_ND
+                if (byteorder_ntohl(((ndp_opt_pi_t *)opt)->valid_ltime) <
+                    next_rtr_sol) {
+                    next_rtr_sol = byteorder_ntohl(((ndp_opt_pi_t *)opt)->valid_ltime);
+                }
+#endif
                 break;
+#ifdef MODULE_GNRC_SIXLOWPAN_ND
+            case NDP_OPT_6CTX:
+                if (!gnrc_sixlowpan_nd_opt_6ctx_handle(rtr_adv->type,
+                                                       (sixlowpan_nd_opt_6ctx_t *)opt)) {
+                    /* invalid 6LoWPAN context option */
+                    return;
+                }
+                if (byteorder_ntohs(((sixlowpan_nd_opt_6ctx_t *)opt)->ltime) <
+                    (next_rtr_sol / 60)) {
+                    next_rtr_sol = byteorder_ntohs(((sixlowpan_nd_opt_6ctx_t *)opt)->ltime) * 60;
+                }
+
+                break;
+#endif
         }
     }
+#if ENABLE_DEBUG && defined(MODULE_NG_SIXLOWPAN_ND)
+    if ((if_entry->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN) && (l2src_len <= 0)) {
+        DEBUG("ndp: Router advertisement did not contain any source address information\n");
+    }
+#endif
     _stale_nc(iface, &ipv6->src, l2src, l2src_len);
+#ifdef MODULE_NG_SIXLOWPAN_ND
+    if (if_entry->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN) {
+        timex_t t = { 0, GNRC_NDP_RETRANS_TIMER };
+        /* stop multicast router solicitation retransmission timer */
+        vtimer_remove(&if_entry->rtr_sol_timer);
+        /* 3/4 of the time should be "well before" enough the respective timeout
+         * not to run out; see https://tools.ietf.org/html/rfc6775#section-5.4.3 */
+        next_rtr_sol *= 3;
+        next_rtr_sol >>= 2;
+        gnrc_sixlowpan_nd_rtr_sol_reschedule(nc_entry, next_rtr_sol);
+        gnrc_ndp_internal_send_nbr_sol(ifs[i], &nc_entry->ipv6_addr, &nc_entry->ipv6_addr);
+        vtimer_remove(&nc_entry->nbr_sol_timer);
+        vtimer_set_msg(&nc_entry->nbr_sol_timer, t, gnrc_ipv6_pid, GNRC_NDP_MSG_NBR_SOL_RETRANS,
+                       nc_entry);
+    }
+#endif
 }
 
 void gnrc_ndp_retrans_nbr_sol(gnrc_ipv6_nc_t *nc_entry)

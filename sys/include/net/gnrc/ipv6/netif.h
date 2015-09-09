@@ -277,7 +277,7 @@ typedef struct {
     uint16_t flags;         /**< flags for 6LoWPAN and Neighbor Discovery */
     uint16_t mtu;           /**< Maximum Transmission Unit (MTU) of the interface */
     uint8_t cur_hl;         /**< current hop limit for the interface */
-#ifdef MODULE_GNRC_NDP_HOST
+#if defined(MODULE_GNRC_NDP_HOST) || defined(MODULE_GNRC_SIXLOWPAN_ND)
     /**
      * @brief   Counter for send router solicitations.
      */
