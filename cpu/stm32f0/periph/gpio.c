@@ -5,7 +5,6 @@
  * Public License v2.1. See the file LICENSE in the top level directory for more
  * details.
  */
-
 /**
  * @ingroup     cpu_stm32f0
  * @{
