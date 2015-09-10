@@ -1,3 +1,11 @@
+ifneq (,$(filter libcoap,$(USEPKG)))
+    USEMODULE += pnet
+endif
+
+ifneq (,$(filter pnet,$(USEMODULE)))
+    USEMODULE += vtimer
+endif
+
 ifneq (,$(filter gnrc_%,$(filter-out gnrc_netapi gnrc_netreg gnrc_netif% gnrc_pktbuf,$(USEMODULE))))
   USEMODULE += gnrc
 endif
