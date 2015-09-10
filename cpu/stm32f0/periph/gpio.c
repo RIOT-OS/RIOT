@@ -21,16 +21,14 @@
 #include "sched.h"
 #include "thread.h"
 #include "periph/gpio.h"
-#include "periph_cpu.h"
 #include "periph_conf.h"
-#include "board.h"
 
 typedef struct {
     gpio_cb_t cb;
     void *arg;
-} exti_ctx_t;
+} gpio_state_t;
 
-static exti_ctx_t exti_ctx[GPIO_ISR_CHAN_NUMOF];
+static gpio_state_t gpio_config[GPIO_NUMOF];
 
 /* static port mappings */
 static GPIO_TypeDef *const gpio_port_map[GPIO_NUMOF] = {
