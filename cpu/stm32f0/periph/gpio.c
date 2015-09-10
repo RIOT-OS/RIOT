@@ -26,7 +26,7 @@
 typedef struct {
     gpio_cb_t cb;
     void *arg;
-} gpio_state_t;
+} exti_ctx_t;
 
 static gpio_state_t gpio_config[GPIO_NUMOF];
 
