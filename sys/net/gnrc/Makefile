@@ -25,8 +25,14 @@ endif
 ifneq (,$(filter gnrc_ndp_internal,$(USEMODULE)))
     DIRS += network_layer/ndp/internal
 endif
+ifneq (,$(filter gnrc_ndp_host,$(USEMODULE)))
+    DIRS += network_layer/ndp/host
+endif
 ifneq (,$(filter gnrc_ndp_node,$(USEMODULE)))
     DIRS += network_layer/ndp/node
+endif
+ifneq (,$(filter gnrc_ndp_router,$(USEMODULE)))
+    DIRS += network_layer/ndp/router
 endif
 ifneq (,$(filter gnrc_netapi,$(USEMODULE)))
     DIRS += netapi
@@ -72,6 +78,12 @@ ifneq (,$(filter gnrc_sixlowpan_frag,$(USEMODULE)))
 endif
 ifneq (,$(filter gnrc_sixlowpan_iphc,$(USEMODULE)))
     DIRS += network_layer/sixlowpan/iphc
+endif
+ifneq (,$(filter gnrc_sixlowpan_nd,$(USEMODULE)))
+    DIRS += network_layer/sixlowpan/nd
+endif
+ifneq (,$(filter gnrc_sixlowpan_nd_router,$(USEMODULE)))
+    DIRS += network_layer/sixlowpan/nd/router
 endif
 ifneq (,$(filter gnrc_sixlowpan_netif,$(USEMODULE)))
     DIRS += network_layer/sixlowpan/netif

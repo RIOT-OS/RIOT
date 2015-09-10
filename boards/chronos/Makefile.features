@@ -1,2 +1,3 @@
 FEATURES_PROVIDED += periph_rtc
+FEATURES_PROVIDED += periph_timer
 FEATURES_MCU_GROUP = msp430

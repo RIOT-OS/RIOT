@@ -29,6 +29,7 @@
 #include "net/gnrc/netapi.h"
 #include "net/gnrc/netif.h"
 #include "net/gnrc/netif/hdr.h"
+#include "net/gnrc/sixlowpan/nd.h"
 #include "net/gnrc/sixlowpan/netif.h"
 
 #include "net/gnrc/ipv6/netif.h"
@@ -90,8 +91,6 @@ static ipv6_addr_t *_add_addr_to_entry(gnrc_ipv6_netif_t *entry, const ipv6_addr
         tmp_addr->flags |= GNRC_IPV6_NETIF_ADDR_FLAGS_NON_UNICAST;
     }
     else {
-        ipv6_addr_t sol_node;
-
         if (!ipv6_addr_is_link_local(addr)) {
             /* add also corresponding link-local address */
             ipv6_addr_t ll_addr;
@@ -101,13 +100,34 @@ static ipv6_addr_t *_add_addr_to_entry(gnrc_ipv6_netif_t *entry, const ipv6_addr
 
             _add_addr_to_entry(entry, &ll_addr, 64,
                                flags | GNRC_IPV6_NETIF_ADDR_FLAGS_NDP_ON_LINK);
+#ifdef MODULE_GNRC_NDP_ROUTER
+            /* New prefixes MAY allow the router to retransmit up to
+             * GNRC_NDP_MAX_INIT_RTR_ADV_NUMOF unsolicited RA
+             * (see https://tools.ietf.org/html/rfc4861#section-6.2.4) */
+            if ((entry->flags & GNRC_IPV6_NETIF_FLAGS_ROUTER) &&
+                (entry->flags & GNRC_IPV6_NETIF_FLAGS_RTR_ADV)) {
+                entry->rtr_adv_count = GNRC_NDP_MAX_INIT_RTR_ADV_NUMOF;
+                mutex_unlock(&entry->mutex);    /* function below relocks mutex */
+                gnrc_ndp_router_retrans_rtr_adv(entry);
+                mutex_lock(&entry->mutex);      /* relock mutex */
+            }
+#endif
         }
         else {
             tmp_addr->flags |= GNRC_IPV6_NETIF_ADDR_FLAGS_NDP_ON_LINK;
         }
-
-        ipv6_addr_set_solicited_nodes(&sol_node, addr);
-        _add_addr_to_entry(entry, &sol_node, IPV6_ADDR_BIT_LEN, 0);
+#if defined(MODULE_GNRC_NDP_NODE) || defined(MODULE_GNRC_SIXLOWPAN_ND_ROUTER)
+        /* add solicited-nodes multicast address for new address if interface is not a
+         * 6LoWPAN host interface (see: https://tools.ietf.org/html/rfc6775#section-5.2) */
+        if (!(entry->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN) ||
+            (entry->flags & GNRC_IPV6_NETIF_FLAGS_ROUTER)) {
+            ipv6_addr_t sol_node;
+            ipv6_addr_set_solicited_nodes(&sol_node, addr);
+            _add_addr_to_entry(entry, &sol_node, IPV6_ADDR_BIT_LEN, 0);
+        }
+#endif
+        /* TODO: send NS with ARO on 6LoWPAN interfaces, but not so many and only for the new
+         *       source address. */
     }
 
     return &(tmp_addr->addr);
@@ -190,7 +210,10 @@ void gnrc_ipv6_netif_remove(kernel_pid_t pid)
 #endif
 
     mutex_lock(&entry->mutex);
-
+    vtimer_remove(&entry->rtr_sol_timer);
+#ifdef MODULE_GNRC_NDP_ROUTER
+    vtimer_remove(&entry->rtr_adv_timer);
+#endif
     _reset_addr_from_entry(entry);
     DEBUG("ipv6 netif: Remove IPv6 interface %" PRIkernel_pid "\n", pid);
     entry->pid = KERNEL_PID_UNDEF;
@@ -211,6 +234,30 @@ gnrc_ipv6_netif_t *gnrc_ipv6_netif_get(kernel_pid_t pid)
 
     return NULL;
 }
+
+#if defined(MODULE_GNRC_NDP_ROUTER) || defined(MODULE_GNRC_SIXLOWPAN_ND_ROUTER)
+void gnrc_ipv6_netif_set_router(gnrc_ipv6_netif_t *netif, bool enable)
+{
+#if defined(MODULE_GNRC_SIXLOWPAN_ND_ROUTER)
+    if (netif->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN) {
+        gnrc_sixlowpan_nd_router_set_router(netif, enable);
+        return;
+    }
+#endif
+    gnrc_ndp_router_set_router(netif, enable);
+}
+
+void gnrc_ipv6_netif_set_rtr_adv(gnrc_ipv6_netif_t *netif, bool enable)
+{
+#if defined(MODULE_GNRC_SIXLOWPAN_ND_ROUTER)
+    if (netif->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN) {
+        gnrc_sixlowpan_nd_router_set_rtr_adv(netif, enable);
+        return;
+    }
+#endif
+    gnrc_ndp_router_set_rtr_adv(netif, enable);
+}
+#endif
 
 ipv6_addr_t *gnrc_ipv6_netif_add_addr(kernel_pid_t pid, const ipv6_addr_t *addr,
                                       uint8_t prefix_len, uint8_t flags)
@@ -242,6 +289,20 @@ static void _remove_addr_from_entry(gnrc_ipv6_netif_t *entry, ipv6_addr_t *addr)
                   ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)), entry->pid);
             ipv6_addr_set_unspecified(&(entry->addrs[i].addr));
             entry->addrs[i].flags = 0;
+#ifdef MODULE_GNRC_NDP_ROUTER
+            /* Removal of prefixes MAY allow the router to retransmit up to
+             * GNRC_NDP_MAX_INIT_RTR_ADV_NUMOF unsolicited RA
+             * (see https://tools.ietf.org/html/rfc4861#section-6.2.4) */
+            if ((entry->flags & GNRC_IPV6_NETIF_FLAGS_ROUTER) &&
+                (entry->flags & GNRC_IPV6_NETIF_FLAGS_RTR_ADV) &&
+                (!ipv6_addr_is_multicast(addr) &&
+                 !ipv6_addr_is_link_local(addr))) {
+                entry->rtr_adv_count = GNRC_NDP_MAX_INIT_RTR_ADV_NUMOF;
+                mutex_unlock(&entry->mutex);    /* function below relocks the mutex */
+                gnrc_ndp_router_retrans_rtr_adv(entry);
+                return;
+            }
+#endif
 
             mutex_unlock(&entry->mutex);
             return;
@@ -695,7 +756,7 @@ void gnrc_ipv6_netif_init_by_dev(void)
     for (size_t i = 0; i < ifnum; i++) {
         ipv6_addr_t addr;
         eui64_t iid;
-        uint16_t mtu;
+        uint16_t tmp;
         gnrc_ipv6_netif_t *ipv6_if = gnrc_ipv6_netif_get(ifs[i]);
 
         if (ipv6_if == NULL) {
@@ -743,16 +804,36 @@ void gnrc_ipv6_netif_init_by_dev(void)
         _add_addr_to_entry(ipv6_if, &addr, 64, 0);
 
         /* set link MTU */
-        if ((gnrc_netapi_get(ifs[i], NETOPT_MAX_PACKET_SIZE, 0, &mtu,
+        if ((gnrc_netapi_get(ifs[i], NETOPT_MAX_PACKET_SIZE, 0, &tmp,
                              sizeof(uint16_t)) >= 0)) {
-            if (mtu >= IPV6_MIN_MTU) {
-                ipv6_if->mtu = mtu;
+            if (tmp >= IPV6_MIN_MTU) {
+                ipv6_if->mtu = tmp;
             }
             /* otherwise leave at GNRC_IPV6_NETIF_DEFAULT_MTU as initialized in
              * gnrc_ipv6_netif_add() */
         }
 
+        if (gnrc_netapi_get(ifs[i], NETOPT_IS_WIRED, 0, &tmp, sizeof(int)) > 0) {
+            ipv6_if->flags |= GNRC_IPV6_NETIF_FLAGS_IS_WIRED;
+        }
+        else {
+            ipv6_if->flags &= ~GNRC_IPV6_NETIF_FLAGS_IS_WIRED;
+        }
+
         mutex_unlock(&ipv6_if->mutex);
+#if (defined(MODULE_GNRC_NDP_ROUTER) || defined(MODULE_GNRC_SIXLOWPAN_ND_ROUTER))
+        gnrc_ipv6_netif_set_router(ipv6_if, true);
+#endif
+#ifdef MODULE_GNRC_SIXLOWPAN_ND
+        if (ipv6_if->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN) {
+            gnrc_sixlowpan_nd_init(ipv6_if);
+            continue;   /* skip gnrc_ndp_host_init() */
+        }
+#endif
+#ifdef MODULE_GNRC_NDP_HOST
+        /* start periodic router solicitations */
+        gnrc_ndp_host_init(ipv6_if);
+#endif
     }
 }
 

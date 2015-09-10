@@ -69,6 +69,9 @@ extern "C" {
 #define NDP_OPT_PI                  (3)     /**< prefix information option */
 #define NDP_OPT_RH                  (4)     /**< redirected option */
 #define NDP_OPT_MTU                 (5)     /**< MTU option */
+#define NDP_OPT_AR                  (33)    /**< address registration option */
+#define NDP_OPT_6CTX                (34)    /**< 6LoWPAN context option */
+#define NDP_OPT_ABR                 (35)    /**< authoritative border router option */
 /**
  * @}
  */

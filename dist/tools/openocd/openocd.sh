@@ -191,8 +191,16 @@ do_debug() {
     test_elffile
     test_ports
     test_tui
+    # setsid is needed so that Ctrl+C in GDB doesn't kill OpenOCD
+    [ -z "${SETSID}" ] && SETSID="$(which setsid)"
+    # temporary file that saves OpenOCD pid
+    OCD_PIDFILE=$(mktemp -t "openocd_pid.XXXXXXXXXX")
+    # cleanup after script terminates
+    trap "cleanup ${OCD_PIDFILE}" EXIT
+    # don't trap on Ctrl+C, because GDB keeps running
+    trap '' INT
     # start OpenOCD as GDB server
-    sh -c "${OPENOCD} -f '${OPENOCD_CONFIG}' \
+    ${SETSID} sh -c "${OPENOCD} -f '${OPENOCD_CONFIG}' \
             ${OPENOCD_EXTRA_INIT} \
             -c 'tcl_port ${TCL_PORT}' \
             -c 'telnet_port ${TELNET_PORT}' \
@@ -200,13 +208,17 @@ do_debug() {
             -c 'init' \
             -c 'targets' \
             -c 'halt' \
-            -l /dev/null" &
-    # save PID for terminating the server afterwards
-    OCD_PID=$?
+            -l /dev/null & \
+            echo \$! > $OCD_PIDFILE" &
     # connect to the GDB server
     ${DBG} ${TUI} -ex "tar ext :${GDB_PORT}" ${ELFFILE}
-    # clean up
-    kill ${OCD_PID}
+    # will be called by trap
+    cleanup() {
+        OCD_PID="$(cat $OCD_PIDFILE)"
+        kill ${OCD_PID}
+        rm -f "$OCD_PIDFILE"
+        exit 0
+    }
 }
 
 do_debugserver() {

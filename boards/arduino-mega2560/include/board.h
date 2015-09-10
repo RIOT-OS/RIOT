@@ -42,9 +42,9 @@ extern "C" {
 * @name Define UART device and baudrate for stdio
 * @{
 */
-#define STDIO UART_0
-#define STDIO_BAUDRATE (38400U)
-#define STDIO_RX_BUFSIZE (64U)
+#define STDIO               UART_0
+#define STDIO_BAUDRATE      (9600U)
+#define STDIO_RX_BUFSIZE    (64U)
 /** @} */
 
 /**

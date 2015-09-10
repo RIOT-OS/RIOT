@@ -36,10 +36,6 @@
 #include "ltc4150.h"
 #endif
 
-#ifdef MODULE_UART0
-#include "board_uart0.h"
-#endif
-
 #ifdef MODULE_MCI
 #include "diskio.h"
 #endif
@@ -84,9 +80,8 @@
 #include "net/gnrc/udp.h"
 #endif
 
-#ifdef MODULE_DEV_ETH_AUTOINIT
-#include "net/dev_eth.h"
-#include "dev_eth_autoinit.h"
+#ifdef MODULE_FIB
+#include "net/fib.h"
 #endif
 
 #define ENABLE_DEBUG (0)
@@ -102,12 +97,6 @@ void auto_init(void)
 #ifdef MODULE_VTIMER
     DEBUG("Auto init vtimer module.\n");
     vtimer_init();
-#endif
-#ifndef MODULE_UART_STDIO
-#ifdef MODULE_UART0
-    DEBUG("Auto init uart0 module.\n");
-    board_uart0_init();
-#endif
 #endif
 #ifdef MODULE_XTIMER
     DEBUG("Auto init xtimer module.\n");
@@ -167,7 +156,12 @@ void auto_init(void)
     auto_init_at86rf2xx();
 #endif
 
-#ifdef MODULE_NG_SLIP
+#ifdef MODULE_ENCX24J600
+    extern void auto_init_encx24j600(void);
+    auto_init_encx24j600();
+#endif
+
+#ifdef MODULE_GNRC_SLIP
     extern void auto_init_slip(void);
     auto_init_slip();
 #endif
@@ -182,9 +176,9 @@ void auto_init(void)
     auto_init_kw2xrf();
 #endif
 
-#ifdef MODULE_GNRC_NETDEV_ETH
-    extern void auto_init_gnrc_netdev_eth(void);
-    auto_init_gnrc_netdev_eth();
+#ifdef MODULE_NETDEV2_TAP
+    extern void auto_init_netdev2_tap(void);
+    auto_init_netdev2_tap();
 #endif
 
 #endif /* MODULE_AUTO_INIT_GNRC_NETIF */

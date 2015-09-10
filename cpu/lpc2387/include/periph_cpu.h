@@ -71,7 +71,12 @@ typedef enum {
 } gpio_flank_t;
 
 /**
- * @brief declare needed generic SPI functions
+ * @brief   Number of available timer channels
+ */
+#define TIMER_CHAN_NUMOF        (4U)
+
+/**
+ * @brief   Declare needed generic SPI functions
  * @{
  */
 #define PERIPH_SPI_NEEDS_TRANSFER_BYTES

@@ -63,17 +63,6 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   UART0 buffer size definition for compatibility reasons
- *
- * @todo remove once the remodeling of the uart0 driver is done
- * @{
- */
-#ifndef UART0_BUFSIZE
-#define UART0_BUFSIZE                   (128)
-#endif
-/** @} */
-
-/**
  * @brief   Deprecated interrupt control function for backward compatibility
  * @{
  */

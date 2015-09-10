@@ -71,15 +71,15 @@ kernel_pid_t gnrc_ndp_node_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_len,
     next_hop_ip = ipv6_ext_rh_next_hop(hdr);
 #endif
 #ifdef MODULE_FIB
+    ipv6_addr_t next_hop_actual;    /* FIB copies address into this variable */
     /* don't look-up link local addresses in FIB */
     if (!ipv6_addr_is_link_local(dst)) {
         size_t next_hop_size = sizeof(ipv6_addr_t);
         uint32_t next_hop_flags = 0;
-        ipv6_addr_t next_hop_actual;    /* FIB copies address into this variable */
 
         if ((next_hop_ip == NULL) &&
-            (fib_get_next_hop(gnrc_ipv6_fib_table, &iface, next_hop_actual.u8, &next_hop_size,
-                              &next_hop_flags, (uint8_t *)dst,
+            (fib_get_next_hop(&gnrc_ipv6_fib_table, &iface, next_hop_actual.u8,
+                              &next_hop_size, &next_hop_flags, (uint8_t *)dst,
                               sizeof(ipv6_addr_t), 0) >= 0) &&
             (next_hop_size == sizeof(ipv6_addr_t))) {
             next_hop_ip = &next_hop_actual;
@@ -87,7 +87,7 @@ kernel_pid_t gnrc_ndp_node_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_len,
     }
 #endif
 
-    if ((next_hop_ip == NULL)) {            /* no route to host */
+    if (next_hop_ip == NULL) {            /* no route to host */
         if (iface == KERNEL_PID_UNDEF) {
             /* gnrc_ipv6_netif_t doubles as prefix list */
             iface = gnrc_ipv6_netif_find_by_prefix(&prefix, dst);
@@ -109,7 +109,6 @@ kernel_pid_t gnrc_ndp_node_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_len,
         next_hop_ip = gnrc_ndp_internal_default_router();
     }
 
-
     if (next_hop_ip == NULL) {
         next_hop_ip = dst;      /* Just look if it's in the neighbor cache
                                  * (aka on-link but not registered in prefix list as such) */
@@ -128,8 +127,9 @@ kernel_pid_t gnrc_ndp_node_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_len,
         if (gnrc_ipv6_nc_get_state(nc_entry) == GNRC_IPV6_NC_STATE_STALE) {
             gnrc_ndp_internal_set_state(nc_entry, GNRC_IPV6_NC_STATE_DELAY);
         }
-
-        memcpy(l2addr, nc_entry->l2_addr, nc_entry->l2_addr_len);
+        if (nc_entry->l2_addr_len > 0) {
+            memcpy(l2addr, nc_entry->l2_addr, nc_entry->l2_addr_len);
+        }
         *l2addr_len = nc_entry->l2_addr_len;
         /* TODO: unreachability check */
         return nc_entry->iface;

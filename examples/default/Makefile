@@ -29,7 +29,6 @@ QUIET ?= 1
 
 # Modules to include:
 
-USEMODULE += uart0
 USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += ps

@@ -22,26 +22,14 @@
 
 #include "shell.h"
 #include "shell_commands.h"
-#ifdef MODULE_NEWLIB
-#   include "uart_stdio.h"
-#else
-#   include "posix_io.h"
-#   include "board_uart0.h"
-#endif
 #include "net/gnrc/pktdump.h"
 #include "net/gnrc.h"
-
-/**
- * @brief   Buffer size used by the shell
- */
-#define SHELL_BUFSIZE           (64U)
 
 /**
  * @brief   Maybe you are a golfer?!
  */
 int main(void)
 {
-    shell_t shell;
     gnrc_netreg_entry_t dump;
 
     puts("AT86RF2xx device driver test");
@@ -54,13 +42,9 @@ int main(void)
 
     /* start the shell */
     puts("Initialization successful - starting the shell now");
-#ifndef MODULE_NEWLIB
-    (void) posix_open(uart0_handler_pid, 0);
-    shell_init(&shell, NULL, SHELL_BUFSIZE, uart0_readc, uart0_putc);
-#else
-    shell_init(&shell, NULL, SHELL_BUFSIZE, getchar, putchar);
-#endif
-    shell_run(&shell);
+
+    char line_buf[SHELL_DEFAULT_BUFSIZE];
+    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
 
     return 0;
 }

@@ -2,4 +2,4 @@ INCLUDES += -I$(RIOTBASE)/cpu/cc430/include/
 
 include $(RIOTCPU)/msp430-common/Makefile.include
 
-export USEMODULE += periph
+export USEMODULE += periph hwtimer_compat

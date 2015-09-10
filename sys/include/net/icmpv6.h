@@ -63,6 +63,8 @@ extern "C" {
 #define ICMPV6_NBR_ADV      (136)   /**< NDP neighbor advertisement message */
 #define ICMPV6_REDIRECT     (137)   /**< NDP redirect message */
 #define ICMPV6_RPL_CTRL     (155)   /**< RPL control message */
+#define ICMPV6_DAR          (157)   /**< Duplicate address request */
+#define ICMPV6_DAC          (158)   /**< Duplicate address confirmation */
 #define ICMPV6_INF_EXP1     (200)   /**< message type for private experimentation */
 #define ICMPV6_INF_EXP2     (201)   /**< message type for private experimentation */
 /**

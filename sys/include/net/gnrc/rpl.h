@@ -241,7 +241,7 @@ static inline bool GNRC_RPL_COUNTER_GREATER_THAN(uint8_t A, uint8_t B)
 /**
  * @brief Cleanup timeout in seconds
  */
-#define GNRC_RPL_CLEANUP_TIME (30)
+#define GNRC_RPL_CLEANUP_TIME (5)
 
 /**
  * @name Node Status
@@ -419,8 +419,9 @@ void gnrc_rpl_recv_DAO(gnrc_rpl_dao_t *dao, ipv6_addr_t *src, uint16_t len);
  * @brief   Parse a DAO-ACK.
  *
  * @param[in] dao_ack   Pointer to the DAO-ACK message.
+ * @param[in] len       Length of the IPv6 packet.
  */
-void gnrc_rpl_recv_DAO_ACK(gnrc_rpl_dao_ack_t *dao_ack);
+void gnrc_rpl_recv_DAO_ACK(gnrc_rpl_dao_ack_t *dao_ack, uint16_t len);
 
 /**
  * @brief   Delay the DAO sending interval
