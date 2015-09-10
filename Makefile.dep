@@ -65,7 +65,7 @@ ifneq (,$(filter gnrc_sixlowpan_router_default,$(USEMODULE)))
 endif
 
 ifneq (,$(filter gnrc_sixlowpan_router,$(USEMODULE)))
-  USEMODULE += gnrc_sixlowpan
+  USEMODULE += gnrc_sixlowpan_nd_router
 endif
 
 ifneq (,$(filter gnrc_sixlowpan_frag,$(USEMODULE)))
