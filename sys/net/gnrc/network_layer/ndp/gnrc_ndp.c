@@ -144,6 +144,12 @@ void gnrc_ndp_nbr_sol_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
         }
         opt_offset += (opt->len * 8);
         sicmpv6_size -= (opt->len * 8);
+
+#if ENABLE_DEBUG
+        if (sicmpv6_size < 0) {
+            DEBUG("ndp: Option parsing out of sync.\n");
+        }
+#endif
     }
 #ifdef MODULE_GNRC_SIXLOWPAN_ND_ROUTER
     gnrc_ipv6_netif_t *ipv6_iface = gnrc_ipv6_netif_get(iface);
@@ -247,6 +253,12 @@ void gnrc_ndp_nbr_adv_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
 
         opt_offset += (opt->len * 8);
         sicmpv6_size -= (opt->len * 8);
+
+#if ENABLE_DEBUG
+        if (sicmpv6_size < 0) {
+            DEBUG("ndp: Option parsing out of sync.\n");
+        }
+#endif
     }
 
     LL_SEARCH_SCALAR(pkt, netif, type, GNRC_NETTYPE_NETIF);
@@ -383,6 +395,12 @@ void gnrc_ndp_rtr_sol_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
 
             opt_offset += (opt->len * 8);
             sicmpv6_size -= (opt->len * 8);
+
+#if ENABLE_DEBUG
+            if (sicmpv6_size < 0) {
+                DEBUG("ndp: Option parsing out of sync.\n");
+            }
+#endif
         }
         _stale_nc(iface, &ipv6->src, l2src, l2src_len);
         /* send delayed */
@@ -547,7 +565,15 @@ void gnrc_ndp_rtr_adv_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt, ipv6_hdr_t
                 break;
 #endif
         }
+
+        opt_offset += (opt->len * 8);
         sicmpv6_size -= (opt->len * 8);
+
+#if ENABLE_DEBUG
+        if (sicmpv6_size < 0) {
+            DEBUG("ndp: Option parsing out of sync.\n");
+        }
+#endif
     }
 #if ENABLE_DEBUG && defined(MODULE_NG_SIXLOWPAN_ND)
     if ((if_entry->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN) && (l2src_len <= 0)) {
