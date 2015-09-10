@@ -14,7 +14,8 @@ use() {
 }
 
 used() {
-    echo $DEPS | tr ' ' '\n' | grep -Eq "^$1$"
+    DEPS=" $DEPS"
+    [ "${DEPS#* $1 }" != "$DEPS" ];
 }
 
 used_filter() {
@@ -23,7 +24,7 @@ used_filter() {
     local _tmp_DEPS="$DEPS"
 
     for dep in $*; do
-        _tmp_DEPS=$(echo "$_tmp_DEPS" | tr ' ' '\n' | grep -Ev "^${dep}$" | tr '\n' ' ')
+        _tmp_DEPS="$(echo "$_tmp_DEPS" | tr ' ' '\n' | grep -Ev "^${dep}$" | tr '\n' ' ')"
     done
 
     echo $_tmp_DEPS | tr ' ' '\n' | grep -Eq "^${pattern}$"
@@ -59,7 +60,7 @@ while true; do
 
     . "$DEP_FILE"
 
-    DEPS=$(sort_unique $DEPS)
+    DEPS="$(sort_unique $DEPS)"
     if [ "$DEPS" = "$DEPS_BEFORE" ]; then
         echo "$DEPS"
         exit 0
