@@ -378,3 +378,11 @@ ifneq (,$(filter pthread,$(USEMODULE)))
     USEMODULE += vtimer
     USEMODULE += timex
 endif
+
+ifneq (,$(filter schedstatistics,$(USEMODULE)))
+    USEMODULE += xtimer
+endif
+
+ifneq (,$(filter xtimer,$(USEMODULE)))
+    FEATURES_REQUIRED += periph_timer
+endif
