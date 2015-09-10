@@ -116,7 +116,7 @@ static ipv6_addr_t *_add_addr_to_entry(gnrc_ipv6_netif_t *entry, const ipv6_addr
         else {
             tmp_addr->flags |= GNRC_IPV6_NETIF_ADDR_FLAGS_NDP_ON_LINK;
         }
-#if defined(MODULE_GNRC_NDP_NODE) || defined(MODULE_GNRC_SIXLOWPAN_ND)
+#if defined(MODULE_GNRC_NDP_NODE) || defined(MODULE_GNRC_SIXLOWPAN_ND_ROUTER)
         /* add solicited-nodes multicast address for new address if interface is not a
          * 6LoWPAN host interface (see: https://tools.ietf.org/html/rfc6775#section-5.2) */
         if (!(entry->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN) ||
@@ -235,14 +235,26 @@ gnrc_ipv6_netif_t *gnrc_ipv6_netif_get(kernel_pid_t pid)
     return NULL;
 }
 
-#if defined(MODULE_GNRC_NDP_ROUTER)
+#if defined(MODULE_GNRC_NDP_ROUTER) || defined(MODULE_GNRC_SIXLOWPAN_ND_ROUTER)
 void gnrc_ipv6_netif_set_router(gnrc_ipv6_netif_t *netif, bool enable)
 {
+#if defined(MODULE_GNRC_SIXLOWPAN_ND_ROUTER)
+    if (netif->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN) {
+        gnrc_sixlowpan_nd_router_set_router(netif, enable);
+        return;
+    }
+#endif
     gnrc_ndp_router_set_router(netif, enable);
 }
 
 void gnrc_ipv6_netif_set_rtr_adv(gnrc_ipv6_netif_t *netif, bool enable)
 {
+#if defined(MODULE_GNRC_SIXLOWPAN_ND_ROUTER)
+    if (netif->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN) {
+        gnrc_sixlowpan_nd_router_set_rtr_adv(netif, enable);
+        return;
+    }
+#endif
     gnrc_ndp_router_set_rtr_adv(netif, enable);
 }
 #endif

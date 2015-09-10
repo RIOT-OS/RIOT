@@ -245,6 +245,17 @@ static void *_event_loop(void *args)
                                            GNRC_SIXLOWPAN_CTX_FLAGS_CID_MASK));
                 break;
 #endif
+#ifdef MODULE_GNRC_SIXLOWPAN_ND_ROUTER
+            case GNRC_SIXLOWPAN_ND_MSG_ABR_TIMEOUT:
+                DEBUG("ipv6: border router timeout event received\n");
+                gnrc_sixlowpan_nd_router_abr_remove(
+                        (gnrc_sixlowpan_nd_router_abr_t *)msg.content.ptr);
+                break;
+            case GNRC_SIXLOWPAN_ND_MSG_AR_TIMEOUT:
+                DEBUG("ipv6: address registration timeout received\n");
+                gnrc_sixlowpan_nd_router_gc_nc((gnrc_ipv6_nc_t *)msg.content.ptr);
+                break;
+#endif
             default:
                 break;
         }
