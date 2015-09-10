@@ -642,8 +642,8 @@ bool gnrc_ndp_internal_pi_opt_handle(kernel_pid_t iface, uint8_t icmpv6_type,
     ipv6_addr_t *prefix;
     gnrc_ipv6_netif_addr_t *netif_addr;
 
-    if ((pi_opt->len != NDP_OPT_MTU_LEN)) {
-        DEBUG("ndp: invalid MTU option received\n");
+    if ((pi_opt->len != NDP_OPT_PI_LEN)) {
+        DEBUG("ndp: invalid PI option received\n");
         return false;
     }
     if (icmpv6_type != ICMPV6_RTR_ADV || ipv6_addr_is_link_local(&pi_opt->prefix)) {
