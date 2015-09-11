@@ -22,15 +22,22 @@ ifneq (,$(filter at86rf2%,$(USEMODULE)))
   USEMODULE += at86rf2xx
   USEMODULE += ieee802154
   USEMODULE += xtimer
+  USEMODULE += netif
 endif
 
 ifneq (,$(filter kw2xrf,$(USEMODULE)))
   USEMODULE += ieee802154
+  USEMODULE += netif
 endif
 
 ifneq (,$(filter xbee,$(USEMODULE)))
   USEMODULE += ieee802154
   USEMODULE += xtimer
+  USEMODULE += netif
+endif
+
+ifneq (,$(filter netdev2_tap,$(USEMODULE)))
+  USEMODULE += netif
 endif
 
 ifneq (,$(filter gnrc_zep,$(USEMODULE)))
