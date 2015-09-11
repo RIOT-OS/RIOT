@@ -54,7 +54,7 @@ static inline int _is_set(xtimer_t *timer)
 void xtimer_init(void)
 {
     /* initialize low-level timer */
-    timer_init(XTIMER, 1 /* us_per_tick */, _periph_timer_callback);
+    timer_init(XTIMER, (1 << XTIMER_SHIFT) /* us_per_tick */, _periph_timer_callback);
 
     /* register initial overflow tick */
     _lltimer_set(0xFFFFFFFF);
@@ -290,7 +290,7 @@ static uint32_t _time_left(uint32_t target, uint32_t reference)
 
 static inline int _this_high_period(uint32_t target) {
 #if XTIMER_MASK
-    return (target & XTIMER_MASK) == _high_cnt;
+    return (target & XTIMER_MASK_SHIFTED) == _high_cnt;
 #else
     (void)target;
     return 1;
@@ -394,7 +394,7 @@ static void _next_period(void)
 {
 #if XTIMER_MASK
     /* advance <32bit mask register */
-    _high_cnt += ~XTIMER_MASK + 1;
+    _high_cnt += ~XTIMER_MASK_SHIFTED + 1;
     if (! _high_cnt) {
         /* high_cnt overflowed, so advance >32bit counter */
         _long_cnt++;

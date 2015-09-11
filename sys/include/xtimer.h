@@ -326,6 +326,19 @@ int xtimer_msg_receive_timeout64(msg_t *msg, uint64_t us);
 #define XTIMER_ISR_BACKOFF 20
 #endif
 
+/*
+ * @brief   xtimer prescaler value
+ *
+ * xtimer assumes it is running with an underlying 1MHz timer.
+ * If the timer is slower by a power of two, XTIMER_SHIFT can be used to
+ * adjust the difference.
+ *
+ * For example, if the timer is running with 250khz, set XTIMER_SHIFT to 2.
+ */
+#ifndef XTIMER_SHIFT
+#define XTIMER_SHIFT (0)
+#endif
+
 /**
  * @brief set xtimer default timer configuration
  * @{
@@ -357,8 +370,9 @@ int xtimer_msg_receive_timeout64(msg_t *msg, uint64_t us);
  *
  * This is supposed to be defined per-device in e.g., periph_conf.h.
  */
-#define XTIMER_MASK 0
+#define XTIMER_MASK (0)
 #endif
+#define XTIMER_MASK_SHIFTED (XTIMER_MASK<<XTIMER_SHIFT)
 
 #ifndef XTIMER_USLEEP_UNTIL_OVERHEAD
 /**
@@ -386,8 +400,8 @@ extern volatile uint32_t _high_cnt;
  */
 static inline uint32_t _xtimer_now(void)
 {
-#ifdef XTIMER_SHIFT
-    return timer_read(XTIMER) << XTIMER_SHIFT;
+#if XTIMER_SHIFT
+    return ((uint32_t)timer_read(XTIMER)) << XTIMER_SHIFT;
 #else
     return timer_read(XTIMER);
 #endif
@@ -398,7 +412,7 @@ static inline uint32_t _xtimer_now(void)
  */
 static inline uint32_t _mask(uint32_t val)
 {
-    return val & ~XTIMER_MASK;
+    return val & ~XTIMER_MASK_SHIFTED;
 }
 
 /**
