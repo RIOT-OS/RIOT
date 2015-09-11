@@ -40,11 +40,18 @@ extern "C" {
  */
 #define IPV6_ADDR_BIT_LEN           (128)
 
+#ifdef MODULE_IPV4_ADDR
 /**
  * @brief   Maximum length of an IPv6 address as string.
  */
-#define IPV6_ADDR_MAX_STR_LEN       (sizeof("ffff:ffff:ffff:ffff:" \
-                                            "ffff:ffff:255.255.255.255"))
+#define IPV6_ADDR_MAX_STR_LEN       (sizeof("ffff:ffff:ffff:ffff:ffff:ffff:255.255.255.255"))
+#else
+/**
+ * @brief   Maximum length of an IPv6 address as string.
+ */
+#define IPV6_ADDR_MAX_STR_LEN       (sizeof("ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff"))
+#endif
+
 
 /**
  * @brief The first 10 bits of a site-local IPv6 unicast address
