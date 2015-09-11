@@ -105,9 +105,7 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
     PCONP |= PCSSP0;                /* Enable power for SSP0 (default is on)*/
 
     /* PIN Setup*/
-    PINSEL3 |= BIT8 + BIT9;         /* Set CLK function to SPI*/
-    PINSEL3 |= BIT14 + BIT15;       /* Set MISO function to SPI*/
-    PINSEL3 |= BIT16 + BIT17;       /* Set MOSI function to SPI*/
+    spi_conf_pins(dev);
 
     /* Interface Setup*/
     SSP0CR0 = 7;
@@ -192,6 +190,19 @@ void spi_poweron(spi_t dev)
 
 void spi_poweroff(spi_t dev)
 {
+}
+
+int spi_conf_pins(spi_t dev)
+{
+    switch (dev) {
+        case 0:
+            PINSEL3 |= BIT8 + BIT9;     /* SCLK */
+            PINSEL3 |= BIT14 + BIT15;   /* MISO */
+            PINSEL3 |= BIT16 + BIT17;   /* MOSI */
+            return 0;
+        default:
+            return -1;
+    }
 }
 
 #endif /* SPI_0_EN */
