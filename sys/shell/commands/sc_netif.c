@@ -326,6 +326,11 @@ static void _netif_list(kernel_pid_t dev)
     }
 
 #ifdef MODULE_GNRC_IPV6_NETIF
+    if (entry == NULL) {
+        puts("");
+        return;
+    }
+
     printf("Link type: %s", (entry->flags & GNRC_IPV6_NETIF_FLAGS_IS_WIRED) ?
            "wired" : "wireless");
     printf("\n           ");
