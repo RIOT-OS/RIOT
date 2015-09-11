@@ -475,7 +475,7 @@ void gnrc_ndp_internal_send_rtr_adv(kernel_pid_t iface, ipv6_addr_t *src, ipv6_a
         l2src_len = _get_l2src(iface, l2src, sizeof(l2src));
         if (l2src_len > 0) {
             /* add source address link-layer address option */
-            hdr = gnrc_ndp_opt_sl2a_build(l2src, l2src_len, NULL);
+            hdr = gnrc_ndp_opt_sl2a_build(l2src, l2src_len, pkt);
 
             if (hdr == NULL) {
                 DEBUG("ndp internal: error allocating Source Link-layer address option.\n");
