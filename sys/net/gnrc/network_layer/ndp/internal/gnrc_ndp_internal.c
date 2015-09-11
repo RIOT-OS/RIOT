@@ -661,7 +661,15 @@ bool gnrc_ndp_internal_pi_opt_handle(kernel_pid_t iface, uint8_t icmpv6_type,
     if (((prefix == NULL) ||
          (gnrc_ipv6_netif_addr_get(prefix)->prefix_len != pi_opt->prefix_len)) &&
         (pi_opt->valid_ltime.u32 != 0)) {
-        prefix = gnrc_ipv6_netif_add_addr(iface, &pi_opt->prefix,
+        ipv6_addr_t pref_addr;
+
+        if ((gnrc_netapi_get(iface, NETOPT_IPV6_IID, 0, &pref_addr.u64[1],
+                             sizeof(eui64_t)) < 0)) {
+            DEBUG("ndp: could not get IID from interface %d\n", iface);
+            return false;
+        }
+        ipv6_addr_init_prefix(&pref_addr, &pi_opt->prefix, pi_opt->prefix_len);
+        prefix = gnrc_ipv6_netif_add_addr(iface, &pref_addr,
                                           pi_opt->prefix_len,
                                           pi_opt->flags & NDP_OPT_PI_FLAGS_MASK);
         if (prefix == NULL) {
