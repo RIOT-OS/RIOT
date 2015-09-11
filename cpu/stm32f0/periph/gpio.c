@@ -40,18 +40,26 @@ typedef struct {
 static exti_ctx_t exti_ctx[GPIO_ISR_CHAN_NUMOF];
 
 /**
- * @brief   Extract the port number form the given identifier
- *
- * The port number is extracted by looking at bits 10, 11, 12, 13 of the base
- * register addresses.
+ * @brief   Extract the pin's port base address from the given pin identifier
  */
-static inline int _port_num(gpio_t pin)
+static inline GPIO_TypeDef *_port(gpio_t pin)
 {
-    return ((pin >> 10) & 0x0f);
+    return (GPIO_TypeDef *)(pin & ~(0x0f));
 }
 
 /**
- * @brief   Extract the pin number from the last 4 bit of the pin identifier
+ * @brief   Extract the port number from the given pin identifier
+ *
+ * Isolating bits 10 to 13 of the port base addresses leads to unique port
+ * numbers.
+ */
+static inline int _port_num(gpio_t pin)
+{
+    return (((pin >> 10) & 0x0f) - 2);
+}
+
+/**
+ * @brief   Get the pin number from the pin identifier, encoded in the LSB 4 bit
  */
 static inline int _pin_num(gpio_t pin)
 {
@@ -220,12 +228,6 @@ static const uint8_t gpio_clock_map[GPIO_NUMOF] = {
 
 int gpio_init(gpio_t dev, gpio_dir_t dir, gpio_pp_t pullup)
 {
-    GPIO_TypeDef *port;
-    uint8_t pin;
-
-    GPIO_TypeDef *port = _port(pin);
-    int pin_num = _pin_num(pin);
-
     if (dev >= GPIO_NUMOF) {
         return -1;
     }
@@ -257,7 +259,6 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb
 {
     int res;
     uint8_t pin;
-    int pin_num = _pin_num(pin);
 
     if (dev >= GPIO_NUMOF) {
         return -1;
