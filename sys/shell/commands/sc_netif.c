@@ -229,17 +229,6 @@ static void _netif_list(kernel_pid_t dev)
         _print_netopt_state(state);
     }
 
-    printf("\n           ");
-
-    res = gnrc_netapi_get(dev, NETOPT_ADDRESS_LONG, 0, hwaddr, sizeof(hwaddr));
-
-    if (res >= 0) {
-        char hwaddr_str[res * 3];
-        printf("Long HWaddr: ");
-        printf("%s ", gnrc_netif_addr_to_str(hwaddr_str, sizeof(hwaddr_str),
-                                            hwaddr, res));
-    }
-
     res = gnrc_netapi_get(dev, NETOPT_CSMA_RETRIES, 0, &u8, sizeof(u8));
 
     if (res >= 0) {
@@ -250,6 +239,20 @@ static void _netif_list(kernel_pid_t dev)
     }
 
     printf("\n           ");
+
+    res = gnrc_netapi_get(dev, NETOPT_ADDRESS_LONG, 0, hwaddr, sizeof(hwaddr));
+
+    if (res >= 0) {
+        char hwaddr_str[res * 3];
+        printf("Long HWaddr: ");
+        printf("%s ", gnrc_netif_addr_to_str(hwaddr_str, sizeof(hwaddr_str),
+                                            hwaddr, res));
+        linebreak = true;
+    }
+
+    if (linebreak) {
+        printf("\n           ");
+    }
 
     res = gnrc_netapi_get(dev, NETOPT_PROMISCUOUSMODE, 0, &enable, sizeof(enable));
 
