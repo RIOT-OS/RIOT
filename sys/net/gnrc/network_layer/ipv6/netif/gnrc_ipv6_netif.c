@@ -112,6 +112,12 @@ static ipv6_addr_t *_add_addr_to_entry(gnrc_ipv6_netif_t *entry, const ipv6_addr
                 mutex_lock(&entry->mutex);      /* relock mutex */
             }
 #endif
+#ifdef MODULE_GNRC_SIXLOWPAN_ND_BORDER_ROUTER
+            gnrc_sixlowpan_nd_router_abr_t *abr = gnrc_sixlowpan_nd_router_abr_get();
+            if (gnrc_sixlowpan_nd_router_abr_add_prf(abr, entry, tmp_addr) < 0) {
+                DEBUG("ipv6_netif: error adding prefix to 6LoWPAN-ND management\n");
+            }
+#endif
         }
         else {
             tmp_addr->flags |= GNRC_IPV6_NETIF_ADDR_FLAGS_NDP_ON_LINK;
@@ -302,6 +308,10 @@ static void _remove_addr_from_entry(gnrc_ipv6_netif_t *entry, ipv6_addr_t *addr)
                 gnrc_ndp_router_retrans_rtr_adv(entry);
                 return;
             }
+#endif
+#ifdef MODULE_GNRC_SIXLOWPAN_ND_BORDER_ROUTER
+            gnrc_sixlowpan_nd_router_abr_t *abr = gnrc_sixlowpan_nd_router_abr_get();
+            gnrc_sixlowpan_nd_router_abr_rem_prf(abr, entry, &entry->addrs[i]);
 #endif
 
             mutex_unlock(&entry->mutex);
@@ -752,6 +762,9 @@ void gnrc_ipv6_netif_init_by_dev(void)
 {
     kernel_pid_t ifs[GNRC_NETIF_NUMOF];
     size_t ifnum = gnrc_netif_get(ifs);
+#ifdef MODULE_GNRC_SIXLOWPAN_ND_BORDER_ROUTER
+    bool abr_init = false;
+#endif
 
     for (size_t i = 0; i < ifnum; i++) {
         ipv6_addr_t addr;
@@ -826,6 +839,14 @@ void gnrc_ipv6_netif_init_by_dev(void)
 #endif
 #ifdef MODULE_GNRC_SIXLOWPAN_ND
         if (ipv6_if->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN) {
+#ifdef MODULE_GNRC_SIXLOWPAN_ND_BORDER_ROUTER
+            /* first interface wins */
+            if (!abr_init) {
+                gnrc_sixlowpan_nd_router_abr_create(&addr, 0);
+                gnrc_ipv6_netif_set_rtr_adv(ipv6_if, true);
+                abr_init = true;
+            }
+#endif
             gnrc_sixlowpan_nd_init(ipv6_if);
             continue;   /* skip gnrc_ndp_host_init() */
         }

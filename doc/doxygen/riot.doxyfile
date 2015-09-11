@@ -2005,6 +2005,7 @@ PREDEFINED             = DOXYGEN \
                          MODULE_GNRC_NDP_ROUTER \
                          MODULE_GNRC_SIXLOWPAN \
                          MODULE_GNRC_SIXLOWPAN_ND_ROUTER \
+                         MODULE_GNRC_SIXLOWPAN_ND_BORDER_ROUTER \
                          MODULE_GNRC_UDP
 
 

@@ -95,6 +95,17 @@ static void _add_ctx(gnrc_sixlowpan_nd_router_abr_t *abr, sixlowpan_nd_opt_6ctx_
     bf_set(abr->ctxs, sixlowpan_nd_opt_6ctx_get_cid(ctx_opt));
 }
 
+#ifdef MODULE_GNRC_SIXLOWPAN_ND_BORDER_ROUTER
+static inline bool _is_me(ipv6_addr_t *addr)
+{
+    ipv6_addr_t *res;
+
+    return (gnrc_ipv6_netif_find_by_addr(&res, addr) != KERNEL_PID_UNDEF);
+}
+#else
+#define _is_me(ignore)  (false)
+#endif
+
 gnrc_sixlowpan_nd_router_abr_t *gnrc_sixlowpan_nd_router_abr_get(void)
 {
     if (ipv6_addr_is_unspecified(&_abrs[0].addr)) {
@@ -111,6 +122,10 @@ bool gnrc_sixlowpan_nd_router_abr_older(sixlowpan_nd_opt_abr_t *abr_opt)
     if (abr_opt->len != SIXLOWPAN_ND_OPT_ABR_LEN) {
         /* invalid option received */
         return true;
+    }
+
+    if (_is_me(&abr_opt->braddr)) {
+        return false;
     }
 
     abr = _get_abr(&abr_opt->braddr);
@@ -155,9 +170,11 @@ void gnrc_sixlowpan_nd_opt_abr_handle(kernel_pid_t iface, ndp_rtr_adv_t *rtr_adv
     gnrc_sixlowpan_nd_router_abr_t *abr;
     timex_t t = { 0, 0 };
 
+    if (_is_me(&abr_opt->braddr)) {
+        return;
+    }
     /* validity and version was checked in previously called
      * gnrc_sixlowpan_nd_router_abr_older() */
-
     abr = _get_abr(&abr_opt->braddr);
 
     if (abr == NULL) {
@@ -167,7 +184,7 @@ void gnrc_sixlowpan_nd_opt_abr_handle(kernel_pid_t iface, ndp_rtr_adv_t *rtr_adv
     abr->ltime = byteorder_ntohs(abr_opt->ltime);
 
     if (abr->ltime == 0) {
-        gnrc_sixlowpan_nd_router_abr_remove(abr);
+        abr->ltime = GNRC_SIXLOWPAN_ND_BORDER_ROUTER_DEFAULT_LTIME;
         return;
     }
 
@@ -242,4 +259,99 @@ gnrc_pktsnip_t *gnrc_sixlowpan_nd_opt_abr_build(uint32_t version, uint16_t ltime
     return pkt;
 }
 
+#ifdef MODULE_GNRC_SIXLOWPAN_ND_BORDER_ROUTER
+gnrc_sixlowpan_nd_router_abr_t *gnrc_sixlowpan_nd_router_abr_create(ipv6_addr_t *addr,
+                                                                    unsigned int ltime)
+{
+    assert(addr != NULL);
+    gnrc_sixlowpan_nd_router_abr_t *abr = _get_abr(addr);
+    if (abr == NULL) {
+        return NULL;
+    }
+    /* TODO: store and get this somewhere stable */
+    abr->version = 0;
+    abr->ltime = (uint16_t)ltime;
+    abr->addr.u64[0] = addr->u64[0];
+    abr->addr.u64[1] = addr->u64[1];
+    memset(abr->ctxs, 0, sizeof(abr->ctxs));
+    abr->prfs = NULL;
+    return abr;
+}
+
+int gnrc_sixlowpan_nd_router_abr_add_prf(gnrc_sixlowpan_nd_router_abr_t* abr,
+                                         gnrc_ipv6_netif_t *iface, gnrc_ipv6_netif_addr_t *prefix)
+{
+    assert((iface != NULL) && (prefix != NULL));
+    gnrc_sixlowpan_nd_router_prf_t *prf_ent;
+    if ((abr < _abrs) || (abr > (_abrs + GNRC_SIXLOWPAN_ND_ROUTER_ABR_NUMOF))) {
+        return -ENOENT;
+    }
+    prf_ent = _get_free_prefix(&prefix->addr, prefix->prefix_len);
+    if (prf_ent == NULL) {
+        return -ENOMEM;
+    }
+    prf_ent->iface = iface;
+    prf_ent->prefix = prefix;
+    LL_PREPEND(abr->prfs, prf_ent);
+    abr->version++; /* TODO: store somewhere stable */
+    return 0;
+}
+
+
+void gnrc_sixlowpan_nd_router_abr_rem_prf(gnrc_sixlowpan_nd_router_abr_t *abr,
+                                          gnrc_ipv6_netif_t *iface, gnrc_ipv6_netif_addr_t *prefix)
+{
+    assert((iface != NULL) && (prefix != NULL));
+    gnrc_sixlowpan_nd_router_prf_t *prf_ent = abr->prfs, *prev = NULL;
+    if ((abr < _abrs) || (abr > (_abrs + GNRC_SIXLOWPAN_ND_ROUTER_ABR_NUMOF))) {
+        return;
+    }
+    while (prf_ent) {
+        if (prf_ent->prefix == prefix) {
+            if (prev == NULL) {
+                abr->prfs = prf_ent->next;
+            }
+            else {
+                prev->next = prf_ent->next;
+            }
+            prf_ent->next = NULL;
+            prf_ent->iface = NULL;
+            prf_ent->prefix = NULL;
+            abr->version++; /* TODO: store somewhere stable */
+            break;
+        }
+        prev = prf_ent;
+        prf_ent = prf_ent->next;
+    }
+}
+
+int gnrc_sixlowpan_nd_router_abr_add_ctx(gnrc_sixlowpan_nd_router_abr_t *abr, uint8_t cid)
+{
+    if ((abr < _abrs) || (abr > (_abrs + GNRC_SIXLOWPAN_ND_ROUTER_ABR_NUMOF))) {
+        return -ENOENT;
+    }
+    if (cid >= GNRC_SIXLOWPAN_CTX_SIZE) {
+        return -EINVAL;
+    }
+    if (bf_isset(abr->ctxs, cid)) {
+        return -EADDRINUSE;
+    }
+    bf_set(abr->ctxs, cid);
+    abr->version++; /* TODO: store somewhere stable */
+    return 0;
+}
+
+void gnrc_sixlowpan_nd_router_abr_rem_ctx(gnrc_sixlowpan_nd_router_abr_t *abr, uint8_t cid)
+{
+    if ((abr < _abrs) || (abr > (_abrs + GNRC_SIXLOWPAN_ND_ROUTER_ABR_NUMOF))) {
+        return;
+    }
+    if (cid >= GNRC_SIXLOWPAN_CTX_SIZE) {
+        return;
+    }
+    bf_unset(abr->ctxs, cid);
+    abr->version++; /* TODO: store somewhere stable */
+    return;
+}
+#endif
 /** @} */
