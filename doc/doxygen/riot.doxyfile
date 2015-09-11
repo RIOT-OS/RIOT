@@ -2000,8 +2000,12 @@ PREDEFINED             = DOXYGEN \
                          DEVELHELP \
                          ENABLE_DEBUG \
                          TEST_SUITES \
+                         MODULE_GNRC_ICMPV6 \
+                         MODULE_GNRC_IPV6 \
                          MODULE_GNRC_NDP_ROUTER \
-                         MODULE_GNRC_SIXLOWPAN_ND_ROUTER
+                         MODULE_GNRC_SIXLOWPAN \
+                         MODULE_GNRC_SIXLOWPAN_ND_ROUTER \
+                         MODULE_GNRC_UDP
 
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this

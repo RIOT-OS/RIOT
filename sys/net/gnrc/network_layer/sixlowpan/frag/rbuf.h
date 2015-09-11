@@ -44,6 +44,8 @@ extern "C" {
  * @see <a href="https://tools.ietf.org/html/rfc4944#section-5.3">
  *          RFC 4944, section 5.3
  *      </a>
+ *
+ * @internal
  */
 typedef struct rbuf_int {
     struct rbuf_int *next;  /**< next element in interval list */
@@ -66,6 +68,8 @@ typedef struct rbuf_int {
  * @see <a href="https://tools.ietf.org/html/rfc4944#section-5.3">
  *          RFC 4944, section 5.3
  *      </a>
+ *
+ * @internal
  */
 typedef struct {
     rbuf_int_t *ints;                   /**< intervals of the fragment */
@@ -89,6 +93,8 @@ typedef struct {
  * @param[in] frag          The fragment to add.
  * @param[in] frag_size     The fragment's size.
  * @param[in] offset        The fragment's offset.
+ *
+ * @internal
  */
 void rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *frag,
               size_t frag_size, size_t offset);

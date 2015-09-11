@@ -243,7 +243,8 @@ int gpio_init(gpio_t dev, gpio_dir_t dir, gpio_pp_t pullup)
     if (dir == GPIO_DIR_OUT) {
         port->MODER &= ~(2 << (2 * pin));           /* set pin to output mode */
         port->MODER |= (1 << (2 * pin));
-        port->OTYPER &= ~(1 << pin);                /* set to push-pull configuration */
+        port->OTYPER &= ~(1 << pin);                /* set to push-pull configuBuild and test: 1 failures in total
+ration */
         port->OSPEEDR |= (3 << (2 * pin));          /* set to high speed */
         port->ODR &= ~(1 << pin);                   /* set pin to low signal */
     }
