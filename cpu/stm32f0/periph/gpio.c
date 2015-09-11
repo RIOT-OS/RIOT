@@ -472,5 +472,5 @@ void isr_exti(void)
     }
     if (sched_context_switch_request) {
         thread_yield();
-    }    
+    }
 }
