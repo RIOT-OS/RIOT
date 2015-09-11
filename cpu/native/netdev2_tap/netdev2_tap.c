@@ -224,7 +224,7 @@ static int _recv(netdev2_t *netdev2, char *buf, int len)
     if (!buf) {
         /* no way of figuring out packet size without racey buffering,
          * so we return the maximum possible size */
-        return 576;
+        return ETHERNET_FRAME_LEN;
     }
 
     int nread = real_read(dev->tap_fd, buf, len);
