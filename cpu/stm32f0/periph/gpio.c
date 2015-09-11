@@ -259,6 +259,7 @@ ration */
 int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb, void *arg)
 {
     int res;
+    uint8_t pin;
 
     if (dev >= GPIO_NUMOF) {
         return -1;
