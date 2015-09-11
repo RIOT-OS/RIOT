@@ -234,7 +234,7 @@ static void _netif_list(kernel_pid_t dev)
     if (res >= 0) {
         res = gnrc_netapi_get(dev, NETOPT_CSMA, 0, &enable, sizeof(enable));
         if ((res >= 0) && (enable == NETOPT_ENABLE)) {
-            printf(" CSMA Retries: %" PRIu8 " ", *((uint8_t*) &u8));
+            printf(" CSMA Retries: %" PRIu8 " ", *((uint8_t *) &u8));
         }
     }
 
@@ -246,7 +246,7 @@ static void _netif_list(kernel_pid_t dev)
         char hwaddr_str[res * 3];
         printf("Long HWaddr: ");
         printf("%s ", gnrc_netif_addr_to_str(hwaddr_str, sizeof(hwaddr_str),
-                                            hwaddr, res));
+                                             hwaddr, res));
         linebreak = true;
     }
 
@@ -327,7 +327,7 @@ static void _netif_list(kernel_pid_t dev)
 
 #ifdef MODULE_GNRC_IPV6_NETIF
     printf("Link type: %s", (entry->flags & GNRC_IPV6_NETIF_FLAGS_IS_WIRED) ?
-            "wired" : "wireless");
+           "wired" : "wireless");
     printf("\n           ");
 
     for (int i = 0; i < GNRC_IPV6_NETIF_ADDR_NUMOF; i++) {
