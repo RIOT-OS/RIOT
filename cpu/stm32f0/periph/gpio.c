@@ -218,9 +218,6 @@ int gpio_init(gpio_t dev, gpio_dir_t dir, gpio_pp_t pullup)
     GPIO_TypeDef *port;
     uint8_t pin;
 
-    GPIO_TypeDef *port = _port(pin);
-    int pin_num = _pin_num(pin);
-
     if (dev >= GPIO_NUMOF) {
         return -1;
     }
@@ -242,7 +239,6 @@ int gpio_init(gpio_t dev, gpio_dir_t dir, gpio_pp_t pullup)
     }
     else {
         port->MODER &= ~(3 << (2 * pin));           /* configure pin as input */
-
     }
 
     return 0; /* all OK */
@@ -252,7 +248,6 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb
 {
     int res;
     uint8_t pin;
-    int pin_num = _pin_num(pin);
 
     if (dev >= GPIO_NUMOF) {
         return -1;
