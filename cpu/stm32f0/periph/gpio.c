@@ -24,11 +24,6 @@
 #include "periph/gpio.h"
 #include "periph_conf.h"
 
-/**
- * @brief   Number of available external interrupt lines
- */
-#define GPIO_ISR_CHAN_NUMOF             (16U)
-
 typedef struct {
     gpio_cb_t cb;
     void *arg;
