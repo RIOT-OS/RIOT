@@ -141,7 +141,7 @@ static int _ipv6_nc_add(int argc, char **argv)
     kernel_pid_t iface = KERNEL_PID_UNDEF;
     ipv6_addr_t ipv6_addr;
     uint8_t l2_addr[MAX_L2_ADDR_LEN];
-    size_t l2_addr_len;
+    size_t l2_addr_len = 0;
 
     switch (argc) {
         case 1:

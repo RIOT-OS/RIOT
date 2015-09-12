@@ -170,6 +170,11 @@ static int _send(gnrc_netdev2_t *gnrc_netdev2, gnrc_pktsnip_t *pkt)
         _addr_set_broadcast(hdr.dst);
     }
     else if (netif_hdr->flags & GNRC_NETIF_HDR_FLAGS_MULTICAST) {
+        if (payload == NULL) {
+            DEBUG("gnrc_netdev2_eth: empty multicast packets over Ethernet "\
+                  "are not yet supported\n");
+            return -ENOTSUP;
+        }
         _addr_set_multicast(hdr.dst, payload);
     }
     else if (netif_hdr->dst_l2addr_len == ETHERNET_ADDR_LEN) {
