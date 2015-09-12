@@ -31,7 +31,7 @@
 #include "panic.h"
 #include "arch/panic_arch.h"
 
-#if DEVELHELP && defined MODULE_PS
+#if defined(DEVELHELP) && defined(MODULE_PS)
 #include "ps.h"
 #endif
 
@@ -55,7 +55,7 @@ NORETURN void core_panic(core_panic_t crash_code, const char *message)
             cpu_print_last_instruction();
         }
 #endif
-#if DEVELHELP
+#ifdef DEVELHELP
 #ifdef MODULE_PS
         ps();
         puts("");
