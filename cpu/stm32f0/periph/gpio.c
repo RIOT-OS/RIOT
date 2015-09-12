@@ -228,6 +228,9 @@ static const uint8_t gpio_clock_map[GPIO_NUMOF] = {
 
 int gpio_init(gpio_t dev, gpio_dir_t dir, gpio_pp_t pullup)
 {
+    GPIO_TypeDef *port;
+    uint8_t pin;
+
     if (dev >= GPIO_NUMOF) {
         return -1;
     }
@@ -373,28 +376,14 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb
     return 0;
 }
 
-void gpio_irq_enable(gpio_t dev)
+void gpio_irq_enable(gpio_t pin)
 {
-    uint8_t pin;
-
-    if (dev >= GPIO_NUMOF) {
-        return;
-    }
-
-    pin = gpio_pin_map[dev];
-    EXTI->IMR |= (1 << pin);
+    EXTI->IMR |= (1 << _pin_num(pin));
 }
 
-void gpio_irq_disable(gpio_t dev)
+void gpio_irq_disable(gpio_t pin)
 {
-    uint8_t pin;
-
-    if (dev >= GPIO_NUMOF) {
-        return;
-    }
-
-    pin = gpio_pin_map[dev];
-    EXTI->IMR &= ~(1 << pin);
+    EXTI->IMR &= ~(1 << _pin_num(pin));
 }
 
 int gpio_read(gpio_t dev)
