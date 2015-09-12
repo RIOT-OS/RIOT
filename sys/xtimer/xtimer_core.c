@@ -452,12 +452,18 @@ overflow:
         /* make sure we don't fire too early */
         while (_time_left(_mask(timer_list_head->target), 0));
 
-        xtimer_t *next = timer_list_head->next;
+        /* pick first timer in list */
+        xtimer_t *timer = timer_list_head;
 
-        _shoot(timer_list_head);
+        /* advance list */
+        timer_list_head = timer->next;
 
-        /* advance to next timer in list */
-        timer_list_head = next;
+        /* make sure timer is recognized as being already fired */
+        timer->target = 0;
+        timer->long_target = 0;
+
+        /* fire timer */
+        _shoot(timer);
     }
 
     /* possibly executing all callbacks took enough
