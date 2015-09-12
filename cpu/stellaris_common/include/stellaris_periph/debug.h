@@ -62,7 +62,7 @@ extern void __error__(char *pcFilename, unsigned long ulLine);
 #define ASSERT(expr) {                                      \
                          if(!(expr))                        \
                          {                                  \
-                             __error__(__FILE__, __LINE__); \
+                             __error__(RIOT_FILE_RELATIVE, __LINE__); \
                          }                                  \
                      }
 #else

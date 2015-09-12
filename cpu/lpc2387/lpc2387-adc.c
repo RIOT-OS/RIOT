@@ -134,7 +134,7 @@ uint16_t adc_read(uint8_t channel)
     }
 
     adc_data = (regVal >> 6) & 0x3FF;
-    DEBUG("%s, %d: %lu\n", __FILE__, __LINE__, t1);
-    DEBUG("%s, %d: %lu\n", __FILE__, __LINE__, t2);
+    DEBUG("%s, %d: %lu\n", RIOT_FILE_RELATIVE, __LINE__, t1);
+    DEBUG("%s, %d: %lu\n", RIOT_FILE_RELATIVE, __LINE__, t2);
     return (uint16_t) adc_data;             /* return A/D conversion value */
 }
