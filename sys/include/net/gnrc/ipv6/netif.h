@@ -304,6 +304,8 @@ typedef struct {
      */
     uint16_t min_adv_int;
 
+#endif
+#if defined (MODULE_GNRC_NDP_ROUTER) || defined (MODULE_GNRC_SIXLOWPAN_ND_ROUTER)
     /**
      * @brief   The router lifetime to propagate in router advertisements.
      *          Must be either 0 or between ng_ipv6_netif_t::max_adv_int and
@@ -336,7 +338,7 @@ typedef struct {
      */
     timex_t retrans_timer;
     vtimer_t rtr_sol_timer; /**< Timer for periodic router solicitations */
-#ifdef MODULE_GNRC_NDP_ROUTER
+#if defined (MODULE_GNRC_NDP_ROUTER) || defined (MODULE_GNRC_SIXLOWPAN_ND_ROUTER)
     vtimer_t rtr_adv_timer; /**< Timer for periodic router advertisements */
 #endif
 } gnrc_ipv6_netif_t;

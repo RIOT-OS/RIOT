@@ -244,13 +244,15 @@ gnrc_ipv6_netif_t *gnrc_ipv6_netif_get(kernel_pid_t pid)
 #if defined(MODULE_GNRC_NDP_ROUTER) || defined(MODULE_GNRC_SIXLOWPAN_ND_ROUTER)
 void gnrc_ipv6_netif_set_router(gnrc_ipv6_netif_t *netif, bool enable)
 {
-#if defined(MODULE_GNRC_SIXLOWPAN_ND_ROUTER)
+#ifdef MODULE_GNRC_SIXLOWPAN_ND_ROUTER
     if (netif->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN) {
         gnrc_sixlowpan_nd_router_set_router(netif, enable);
         return;
     }
 #endif
+#ifdef MODULE_GNRC_NDP_ROUTER
     gnrc_ndp_router_set_router(netif, enable);
+#endif
 }
 
 void gnrc_ipv6_netif_set_rtr_adv(gnrc_ipv6_netif_t *netif, bool enable)
@@ -261,7 +263,9 @@ void gnrc_ipv6_netif_set_rtr_adv(gnrc_ipv6_netif_t *netif, bool enable)
         return;
     }
 #endif
+#ifdef MODULE_GNRC_NDP_ROUTER
     gnrc_ndp_router_set_rtr_adv(netif, enable);
+#endif
 }
 #endif
 
@@ -789,6 +793,16 @@ void gnrc_ipv6_netif_init_by_dev(void)
 
             DEBUG("ipv6 netif: Set 6LoWPAN flag\n");
             ipv6_ifs[i].flags |= GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN;
+
+            /* the router flag must be set early here, because otherwise
+             * _add_addr_to_entry() wouldn't set the solicited node address.
+             * However, addresses have to be configured before calling
+             * gnrc_ipv6_netif_set_router().
+             */
+#ifdef MODULE_GNRC_SIXLOWPAN_ND_ROUTER
+            DEBUG("ipv6 netif: Set router flag\n");
+            ipv6_ifs[i].flags |= GNRC_IPV6_NETIF_FLAGS_ROUTER;
+#endif
             /* use EUI-64 (8-byte address) for IID generation and for sending
              * packets */
             gnrc_netapi_set(ifs[i], NETOPT_SRC_LEN, 0, &src_len,
