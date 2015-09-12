@@ -54,7 +54,7 @@ extern "C" {
  * information to stdout after verifying the stack is big enough. If `DEVELHELP`
  * is not set, this check is not performed. (CPU exception may occur)
  */
-#if DEVELHELP
+#ifdef DEVELHELP
 #include "cpu_conf.h"
 #define DEBUG_PRINT(...) \
     do { \

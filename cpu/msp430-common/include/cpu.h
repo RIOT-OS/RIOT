@@ -167,6 +167,16 @@ inline void __restore_context(unsigned int irqen)
  */
 void msp430_cpu_init(void);
 
+/**
+ * @brief   Print the last instruction's address
+ *
+ * @todo:   Not supported
+ */
+static inline void cpu_print_last_instruction(void)
+{
+    puts("n/a");
+}
+
 #ifdef __cplusplus
 }
 #endif

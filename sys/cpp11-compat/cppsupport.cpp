@@ -42,7 +42,7 @@ void *__dso_handle __attribute__((weak)) = NULL;
  */
 extern "C" void __cxa_pure_virtual ()
 {
-    core_panic(123, "PURE VIRTUAL CALL");
+    core_panic(PANIC_GENERAL_ERROR, "PURE VIRTUAL CALL");
 }
 
 /**
@@ -81,7 +81,7 @@ namespace __gnu_cxx {
  */
 void __verbose_terminate_handler()
 {
-    core_panic(123, "UNHANDLED C++ EXCEPTION");
+    core_panic(PANIC_GENERAL_ERROR, "UNHANDLED C++ EXCEPTION");
 }
 } /* namespace __gnu_cxx */
 

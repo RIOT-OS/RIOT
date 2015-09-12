@@ -24,21 +24,24 @@
 #include <string.h>
 #include <stdio.h>
 
+#include "assert.h"
 #include "cpu.h"
 #include "irq.h"
 #include "lpm.h"
 #include "panic.h"
 #include "arch/panic_arch.h"
 
-#if DEVELHELP && defined MODULE_PS
+#if defined(DEVELHELP) && defined(MODULE_PS)
 #include "ps.h"
 #endif
+
+const char assert_crash_message[] = "Failed assertion.";
 
 /* flag preventing "recursive crash printing loop" */
 static int crashed = 0;
 
 /* WARNING: this function NEVER returns! */
-NORETURN void core_panic(int crash_code, const char *message)
+NORETURN void core_panic(core_panic_t crash_code, const char *message)
 {
     (void) crash_code;
 
@@ -47,7 +50,12 @@ NORETURN void core_panic(int crash_code, const char *message)
         crashed = 1;
         puts("*** RIOT kernel panic");
         puts(message);
-#if DEVELHELP
+#ifndef NDEBUG
+        if (crash_code == PANIC_ASSERT_FAIL) {
+            cpu_print_last_instruction();
+        }
+#endif
+#ifdef DEVELHELP
 #ifdef MODULE_PS
         ps();
         puts("");

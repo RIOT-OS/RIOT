@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014, 2015 INRIA
+ * Copyright (C) 2015 INRIA
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -7,28 +7,26 @@
  */
 
 /**
- * @ingroup     cpu_msp430_common
+ * @ingroup x86_cpu
  * @{
  *
  * @file
- * @brief       Crash handling functions implementation for MSP430 MCUs
+ * @brief       Crash handling functions implementation for x86 port
  *
- * @author      Kévin Roussel <Kevin.Roussel@inria.fr>
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  */
 
-#include "cpu.h"
+#include "x86_reboot.h"
 #include "lpm.h"
 
 void panic_arch(void)
 {
-    /* disable watchdog and all possible sources of interrupts */
-    WDTCTL = WDTPW | WDTHOLD;
-#ifdef DEVELHELP
+#if DEVELHELP
     /* enter infinite loop, into deepest possible sleep mode */
     while (1) {
         lpm_set(LPM_OFF);
     }
+#else
+    x86_shutdown();
 #endif
-
 }

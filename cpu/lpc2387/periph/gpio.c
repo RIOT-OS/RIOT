@@ -116,7 +116,7 @@ int gpio_init_int(gpio_t pin, gpio_pp_t pullup, gpio_flank_t flank,
     }
 
     if (_state_index == 0xff) {
-#if DEVELHELP
+#ifdef DEVELHELP
         puts("lpc2387: gpio: warning: no free gpio callback state!");
 #endif
         return -1;

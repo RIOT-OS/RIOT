@@ -170,7 +170,7 @@ unsigned enableIRQ(void)
     unsigned int prev_state;
 
     if (_native_in_isr == 1) {
-#if DEVELHELP
+#ifdef DEVELHELP
         real_write(STDERR_FILENO, "enableIRQ + _native_in_isr\n", 27);
 #else
         DEBUG("enableIRQ + _native_in_isr\n");
