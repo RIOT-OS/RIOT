@@ -112,11 +112,17 @@ static ipv6_addr_t *_add_addr_to_entry(gnrc_ipv6_netif_t *entry, const ipv6_addr
                 mutex_lock(&entry->mutex);      /* relock mutex */
             }
 #endif
+#ifdef MODULE_GNRC_SIXLOWPAN_ND_BORDER_ROUTER
+            gnrc_sixlowpan_nd_router_abr_t *abr = gnrc_sixlowpan_nd_router_abr_get();
+            if (gnrc_sixlowpan_nd_router_abr_add_prf(abr, entry, tmp_addr) < 0) {
+                DEBUG("ipv6_netif: error adding prefix to 6LoWPAN-ND management\n");
+            }
+#endif
         }
         else {
             tmp_addr->flags |= GNRC_IPV6_NETIF_ADDR_FLAGS_NDP_ON_LINK;
         }
-#if defined(MODULE_GNRC_NDP_NODE) || defined(MODULE_GNRC_SIXLOWPAN_ND)
+#if defined(MODULE_GNRC_NDP_NODE) || defined(MODULE_GNRC_SIXLOWPAN_ND_ROUTER)
         /* add solicited-nodes multicast address for new address if interface is not a
          * 6LoWPAN host interface (see: https://tools.ietf.org/html/rfc6775#section-5.2) */
         if (!(entry->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN) ||
@@ -235,14 +241,26 @@ gnrc_ipv6_netif_t *gnrc_ipv6_netif_get(kernel_pid_t pid)
     return NULL;
 }
 
-#if defined(MODULE_GNRC_NDP_ROUTER)
+#if defined(MODULE_GNRC_NDP_ROUTER) || defined(MODULE_GNRC_SIXLOWPAN_ND_ROUTER)
 void gnrc_ipv6_netif_set_router(gnrc_ipv6_netif_t *netif, bool enable)
 {
+#if defined(MODULE_GNRC_SIXLOWPAN_ND_ROUTER)
+    if (netif->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN) {
+        gnrc_sixlowpan_nd_router_set_router(netif, enable);
+        return;
+    }
+#endif
     gnrc_ndp_router_set_router(netif, enable);
 }
 
 void gnrc_ipv6_netif_set_rtr_adv(gnrc_ipv6_netif_t *netif, bool enable)
 {
+#if defined(MODULE_GNRC_SIXLOWPAN_ND_ROUTER)
+    if (netif->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN) {
+        gnrc_sixlowpan_nd_router_set_rtr_adv(netif, enable);
+        return;
+    }
+#endif
     gnrc_ndp_router_set_rtr_adv(netif, enable);
 }
 #endif
@@ -290,6 +308,10 @@ static void _remove_addr_from_entry(gnrc_ipv6_netif_t *entry, ipv6_addr_t *addr)
                 gnrc_ndp_router_retrans_rtr_adv(entry);
                 return;
             }
+#endif
+#ifdef MODULE_GNRC_SIXLOWPAN_ND_BORDER_ROUTER
+            gnrc_sixlowpan_nd_router_abr_t *abr = gnrc_sixlowpan_nd_router_abr_get();
+            gnrc_sixlowpan_nd_router_abr_rem_prf(abr, entry, &entry->addrs[i]);
 #endif
 
             mutex_unlock(&entry->mutex);
@@ -740,6 +762,9 @@ void gnrc_ipv6_netif_init_by_dev(void)
 {
     kernel_pid_t ifs[GNRC_NETIF_NUMOF];
     size_t ifnum = gnrc_netif_get(ifs);
+#ifdef MODULE_GNRC_SIXLOWPAN_ND_BORDER_ROUTER
+    bool abr_init = false;
+#endif
 
     for (size_t i = 0; i < ifnum; i++) {
         ipv6_addr_t addr;
@@ -814,6 +839,14 @@ void gnrc_ipv6_netif_init_by_dev(void)
 #endif
 #ifdef MODULE_GNRC_SIXLOWPAN_ND
         if (ipv6_if->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN) {
+#ifdef MODULE_GNRC_SIXLOWPAN_ND_BORDER_ROUTER
+            /* first interface wins */
+            if (!abr_init) {
+                gnrc_sixlowpan_nd_router_abr_create(&addr, 0);
+                gnrc_ipv6_netif_set_rtr_adv(ipv6_if, true);
+                abr_init = true;
+            }
+#endif
             gnrc_sixlowpan_nd_init(ipv6_if);
             continue;   /* skip gnrc_ndp_host_init() */
         }

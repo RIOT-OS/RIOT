@@ -36,7 +36,7 @@ static inline void _rtr_sol_reschedule(gnrc_ipv6_netif_t *iface, uint32_t sec_de
 
 static inline uint32_t _binary_exp_backoff(uint32_t base_sec, unsigned int exp)
 {
-    return genrand_uint32_range(0, (1 << exp) - 1) * base_sec;
+    return genrand_uint32_range(0, (1 << exp)) * base_sec;
 }
 
 static inline void _revert_iid(uint8_t *iid)
@@ -48,7 +48,7 @@ void gnrc_sixlowpan_nd_init(gnrc_ipv6_netif_t *iface)
 {
     assert(iface->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN);
     mutex_lock(&iface->mutex);
-    iface->rtr_sol_count = 0;   /* first will be send immediately */
+    iface->rtr_sol_count = 0;   /* first will be sent immediately */
 
     DEBUG("6lo nd: retransmit multicast rtr sol in 10 sec\n");
     _rtr_sol_reschedule(iface, GNRC_SIXLOWPAN_ND_RTR_SOL_INT);
@@ -69,7 +69,7 @@ void gnrc_sixlowpan_nd_mc_rtr_sol(gnrc_ipv6_netif_t *iface)
     else {
         unsigned int exp = (unsigned int)(iface->rtr_sol_count - GNRC_NDP_MAX_RTR_SOL_NUMOF);
         interval = _binary_exp_backoff(1, exp);
-        if (((1U << exp) - 1U) < GNRC_SIXLOWPAN_ND_MAX_RTR_SOL_INT) {
+        if ((1U << exp) < GNRC_SIXLOWPAN_ND_MAX_RTR_SOL_INT) {
             /* XXX Not sure if this is the correct interpretation of the truncation described in
              * https://tools.ietf.org/html/rfc6775#section-5.3. In every source I've read the
              * truncating value was the exponent, not the target value, so I'm very confused
@@ -78,9 +78,18 @@ void gnrc_sixlowpan_nd_mc_rtr_sol(gnrc_ipv6_netif_t *iface)
              * but not its interoperability. */
             iface->rtr_sol_count++;
         }
+        /* RFC6775, section 5.3 (https://tools.ietf.org/html/rfc6775#section-5.3)
+         * states that router solicitation should be sent slower after the
+         * initial 3 retransmissions (i.e. >= 10 secondes) and truncate "the
+         * increase of the retransmission timer at 60 seconds". */
+        if (interval < GNRC_SIXLOWPAN_ND_RTR_SOL_INT) {
+            interval = GNRC_SIXLOWPAN_ND_RTR_SOL_INT;
+        }
+        else if (interval > GNRC_SIXLOWPAN_ND_MAX_RTR_SOL_INT) {
+            interval = GNRC_SIXLOWPAN_ND_MAX_RTR_SOL_INT;
+        }
 
         DEBUG("6lo nd: retransmit multicast rtr sol in %" PRIu32 " sec\n", interval);
-        iface->rtr_sol_count--;
     }
     _rtr_sol_reschedule(iface, interval);
     mutex_unlock(&iface->mutex);
@@ -133,6 +142,13 @@ kernel_pid_t gnrc_sixlowpan_nd_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_
         }
     }
 #endif
+#ifdef MODULE_GNRC_SIXLOWPAN_ND_ROUTER
+    /* next hop determination: https://tools.ietf.org/html/rfc6775#section-6.5.4 */
+    nc_entry = gnrc_ipv6_nc_get(iface, dst);
+    if ((nc_entry != NULL) && (gnrc_ipv6_nc_get_type(nc_entry) == GNRC_IPV6_NC_TYPE_REGISTERED)) {
+        next_hop = dst;
+    }
+#endif
     /* next hop determination according to: https://tools.ietf.org/html/rfc6775#section-5.6 */
     if ((next_hop == NULL) && ipv6_addr_is_link_local(dst)) {   /* prefix is "on-link" */
         /* multicast is not handled here anyway so we don't need to check that */
@@ -143,6 +159,14 @@ kernel_pid_t gnrc_sixlowpan_nd_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_
     }
 
     /* address resolution of next_hop: https://tools.ietf.org/html/rfc6775#section-5.7 */
+    if ((nc_entry == NULL) || (next_hop != dst)) {
+        /* get if not gotten from previous check */
+        nc_entry = gnrc_ipv6_nc_get(iface, next_hop);
+    }
+    if ((nc_entry == NULL) || (!gnrc_ipv6_nc_is_reachable(nc_entry)) ||
+        (gnrc_ipv6_nc_get_type(nc_entry) == GNRC_IPV6_NC_TYPE_TENTATIVE)) {
+        return KERNEL_PID_UNDEF;
+    }
     if (ipv6_addr_is_link_local(next_hop)) {
         kernel_pid_t ifs[GNRC_NETIF_NUMOF];
         size_t ifnum = gnrc_netif_get(ifs);
@@ -162,16 +186,12 @@ kernel_pid_t gnrc_sixlowpan_nd_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_
         return iface;
     }
     else {
-        nc_entry = gnrc_ipv6_nc_get(iface, next_hop);
-        if ((nc_entry == NULL) || (!gnrc_ipv6_nc_is_reachable(nc_entry))) {
-            return KERNEL_PID_UNDEF;
-        }
         if (nc_entry->l2_addr_len > 0) {
             memcpy(l2addr, nc_entry->l2_addr, nc_entry->l2_addr_len);
         }
         *l2addr_len = nc_entry->l2_addr_len;
-        return nc_entry->iface;
     }
+    return nc_entry->iface;
 }
 
 void gnrc_sixlowpan_nd_rtr_sol_reschedule(gnrc_ipv6_nc_t *nce, uint32_t sec_delay)
@@ -206,6 +226,7 @@ uint8_t gnrc_sixlowpan_nd_opt_ar_handle(kernel_pid_t iface, ipv6_hdr_t *ipv6, ui
     eui64_t eui64;
     gnrc_ipv6_netif_t *ipv6_iface;
     gnrc_ipv6_nc_t *nc_entry;
+    uint8_t status = 0;
     (void)sl2a;
     (void)sl2a_len;
     if (ar_opt->len != SIXLOWPAN_ND_OPT_AR_LEN) {
@@ -254,11 +275,56 @@ uint8_t gnrc_sixlowpan_nd_opt_ar_handle(kernel_pid_t iface, ipv6_hdr_t *ipv6, ui
                     DEBUG("6lo nd: unknown status for registration received\n");
                     break;
             }
+#ifdef MODULE_GNRC_SIXLOWPAN_ND_ROUTER
+        case ICMPV6_NBR_SOL:
+            if (!(ipv6_iface->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN) &&
+                !(ipv6_iface->flags & GNRC_IPV6_NETIF_FLAGS_ROUTER)) {
+                DEBUG("6lo nd: interface not a 6LoWPAN or forwarding interface\n");
+                return 0;
+            }
+            if ((ar_opt->status != 0) ||
+                ipv6_addr_is_unspecified(&ipv6->src)) {
+                /* discard silently */
+                return 0;
+            }
+            /* TODO multihop DAD */
+            if ((nc_entry != NULL) &&
+                ((gnrc_ipv6_nc_get_type(nc_entry) == GNRC_IPV6_NC_TYPE_REGISTERED) ||
+                 (gnrc_ipv6_nc_get_type(nc_entry) == GNRC_IPV6_NC_TYPE_TENTATIVE)) &&
+                (ar_opt->eui64.uint64.u64 != nc_entry->eui64.uint64.u64)) {
+                /* there is already another node with this address */
+                DEBUG("6lo nd: duplicate address detected\n");
+                status = SIXLOWPAN_ND_STATUS_DUP;
+            }
+            else if ((nc_entry != NULL) && (ar_opt->ltime.u16 == 0)) {
+                gnrc_ipv6_nc_remove(iface, &ipv6->src);
+                /* TODO, notify routing protocol */
+            }
+            else if (ar_opt->ltime.u16 != 0) {
+                /* TODO: multihop DAD behavior */
+                uint16_t reg_ltime;
+                if (nc_entry == NULL) {
+                    if ((nc_entry = gnrc_ipv6_nc_add(iface, &ipv6->src, sl2a, sl2a_len,
+                                                     GNRC_IPV6_NC_STATE_STALE)) == NULL) {
+                        DEBUG("6lo nd: neighbor cache is full\n");
+                        return SIXLOWPAN_ND_STATUS_NC_FULL;
+                    }
+                    nc_entry->eui64 = ar_opt->eui64;
+                }
+                nc_entry->flags &= ~GNRC_IPV6_NC_TYPE_MASK;
+                nc_entry->flags |= GNRC_IPV6_NC_TYPE_REGISTERED;
+                reg_ltime = byteorder_ntohs(ar_opt->ltime);
+                /* TODO: notify routing protocol */
+                vtimer_remove(&nc_entry->type_timeout);
+                vtimer_set_msg(&nc_entry->type_timeout, timex_set(reg_ltime * 60, 0),
+                               gnrc_ipv6_pid, GNRC_SIXLOWPAN_ND_MSG_AR_TIMEOUT, nc_entry);
+            }
+#endif
         default:
             break;
     }
 
-    return 0;
+    return status;
 }
 
 bool gnrc_sixlowpan_nd_opt_6ctx_handle(uint8_t icmpv6_type, sixlowpan_nd_opt_6ctx_t *ctx_opt)
@@ -292,5 +358,7 @@ void gnrc_sixlowpan_nd_wakeup(void)
                        router);
     }
 }
+
+/* gnrc_sixlowpan_nd_opt_abr_handle etc. implemented in gnrc_sixlowpan_nd_router */
 
 /** @} */

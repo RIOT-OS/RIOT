@@ -653,6 +653,7 @@ void gnrc_rpl_send_DAO(gnrc_rpl_dodag_t *dodag, ipv6_addr_t *destination, uint8_
 
     /* find prefix for my address */
     ipv6_addr_t prefix;
+    memset(&prefix, 0, sizeof(prefix));
     ipv6_addr_init_prefix(&prefix, me, me_netif->prefix_len);
     fib_get_destination_set(&gnrc_ipv6_fib_table, prefix.u8,
                             sizeof(ipv6_addr_t), fib_dest_set, &dst_size);

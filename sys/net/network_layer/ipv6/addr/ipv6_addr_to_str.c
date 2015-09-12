@@ -30,49 +30,13 @@
 #include <string.h>
 
 #include "byteorder.h"
+#include "net/ipv4/addr.h"
 #include "net/ipv6/addr.h"
 
 /* Length of an IPv6 address in 16-bit words */
 #define IPV6_ADDR_WORD_LEN  (sizeof(ipv6_addr_t) / sizeof(uint16_t))
 
-#define IPV4_ADDR_MIN_STR_LEN   (sizeof("255.255.255.255"))
-
 #define HEX_L "0123456789abcdef"
-
-/* XXX: move this to IPv4 when we have it */
-/* based on inet_ntop4() by Paul Vixie */
-static char *ipv4_addr_to_str(char *result, const network_uint32_t *addr,
-                              uint8_t result_len)
-{
-    uint8_t n = 0;
-    char *next = result;
-
-    if (result_len < IPV4_ADDR_MIN_STR_LEN) {
-        return NULL;
-    }
-
-    do {
-        uint8_t u = addr->u8[n];
-
-        if (u > 99) {
-            *next++ = '0' + u / 100;
-            u %= 100;
-            *next++ = '0' + u / 10;
-            u %= 10;
-        }
-        else if (u > 9) {
-            *next++ = '0' + u / 10;
-            u %= 10;
-        }
-
-        *next++ = '0' + u;
-        *next++ = '.';
-        n++;
-    } while (n < 4);
-
-    *--next = '\0';
-    return result;
-}
 
 /* based on inet_ntop6() by Paul Vixie */
 char *ipv6_addr_to_str(char *result, const ipv6_addr_t *addr, uint8_t result_len)
@@ -142,7 +106,8 @@ char *ipv6_addr_to_str(char *result, const ipv6_addr_t *addr, uint8_t result_len
         /* Is this address an encapsulated IPv4? */
         if (i == 6 && best.base == 0 &&
             (best.len == 6 || (best.len == 5 && addr->u16[5].u16 == 0xffff))) {
-            if (!ipv4_addr_to_str(tp, &addr->u32[3], sizeof(tmp) - (tp - tmp))) {
+            if (!ipv4_addr_to_str(tp, (const ipv4_addr_t *)&addr->u32[3],
+                                  sizeof(tmp) - (tp - tmp))) {
                 return (NULL);
             }
 

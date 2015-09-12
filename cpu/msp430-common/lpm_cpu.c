@@ -20,9 +20,10 @@
  * @}
  */
 
+#include <assert.h>
 #include <stdio.h>
 #if (__GNUC__ >= 4) && (__GNUC_MINOR__ > 5)
-    #include <intrinsics.h>   // MSP430-gcc compiler instrinsics
+#include <intrinsics.h>   // MSP430-gcc compiler instrinsics
 #endif
 
 #include "board.h"
@@ -47,16 +48,9 @@ enum lpm_mode lpm_set(enum lpm_mode target)
 
     /* ensure that interrupts are enabled before going to sleep,
        or we're bound to hang our MCU! */
-    if (target != LPM_ON) {
-        if ((__read_status_register() & GIE) == 0) {
-            printf("WARNING: entering low-power mode with interrupts disabled!\n");
-            printf("         Forcing GIE bit to 1!\n\n");
-            __bis_status_register(GIE);
-        }
-    }
+    assert((target == LPM_ON) || (__read_status_register() & GIE));
 
-    switch (target)
-    {
+    switch (target) {
     case LPM_ON:
         /* fully running MCU */
         __bic_status_register(CPUOFF | OSCOFF | SCG0 | SCG1);
@@ -85,8 +79,8 @@ enum lpm_mode lpm_set(enum lpm_mode target)
                                /* all blocks off */
         break;
     default:
-        printf("ERROR: trying to set an invalid low-power mode!\n");
-        printf("       Operation aborted.\n\n");
+        assert(0);  /* abort if NDEBUG is not defined */
+        break;
     }
 
     return last_mode;

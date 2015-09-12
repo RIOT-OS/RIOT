@@ -79,6 +79,7 @@ void gnrc_ndp_router_retrans_rtr_adv(gnrc_ipv6_netif_t *iface)
 void gnrc_ndp_router_send_rtr_adv(gnrc_ipv6_nc_t *neighbor)
 {
     gnrc_ipv6_netif_t *iface = gnrc_ipv6_netif_get(neighbor->iface);
+    /* TODO: send one router advertisement per ABR: https://tools.ietf.org/html/rfc6775#section-6.3 */
     _send_rtr_adv(iface, &neighbor->ipv6_addr);
 }
 

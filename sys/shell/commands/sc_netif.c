@@ -229,6 +229,15 @@ static void _netif_list(kernel_pid_t dev)
         _print_netopt_state(state);
     }
 
+    res = gnrc_netapi_get(dev, NETOPT_CSMA_RETRIES, 0, &u8, sizeof(u8));
+
+    if (res >= 0) {
+        res = gnrc_netapi_get(dev, NETOPT_CSMA, 0, &enable, sizeof(enable));
+        if ((res >= 0) && (enable == NETOPT_ENABLE)) {
+            printf(" CSMA Retries: %" PRIu8 " ", *((uint8_t *) &u8));
+        }
+    }
+
     printf("\n           ");
 
     res = gnrc_netapi_get(dev, NETOPT_ADDRESS_LONG, 0, hwaddr, sizeof(hwaddr));
@@ -237,19 +246,13 @@ static void _netif_list(kernel_pid_t dev)
         char hwaddr_str[res * 3];
         printf("Long HWaddr: ");
         printf("%s ", gnrc_netif_addr_to_str(hwaddr_str, sizeof(hwaddr_str),
-                                            hwaddr, res));
+                                             hwaddr, res));
+        linebreak = true;
     }
 
-    res = gnrc_netapi_get(dev, NETOPT_CSMA_RETRIES, 0, &u8, sizeof(u8));
-
-    if (res >= 0) {
-        res = gnrc_netapi_get(dev, NETOPT_CSMA, 0, &enable, sizeof(enable));
-        if ((res >= 0) && (enable == NETOPT_ENABLE)) {
-            printf(" CSMA Retries: %" PRIu8 " ", *((uint8_t*) &u8));
-        }
+    if (linebreak) {
+        printf("\n           ");
     }
-
-    printf("\n           ");
 
     res = gnrc_netapi_get(dev, NETOPT_PROMISCUOUSMODE, 0, &enable, sizeof(enable));
 
@@ -324,7 +327,7 @@ static void _netif_list(kernel_pid_t dev)
 
 #ifdef MODULE_GNRC_IPV6_NETIF
     printf("Link type: %s", (entry->flags & GNRC_IPV6_NETIF_FLAGS_IS_WIRED) ?
-            "wired" : "wireless");
+           "wired" : "wireless");
     printf("\n           ");
 
     for (int i = 0; i < GNRC_IPV6_NETIF_ADDR_NUMOF; i++) {

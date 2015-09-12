@@ -9,7 +9,7 @@ endif
 
 ifneq ($(RIOTBASE),)
 INCLUDES += -I$(RIOTBASE)/sys/include -I$(RIOTBASE)/sys/net/include \
-			-I$(RIOTBASE)/sys/posix/include -I$(RIOTBASE)/sys/posix/pnet/include
+			-I$(RIOTBASE)/sys/posix/include
 endif
 
 .PHONY: all clean patch reset

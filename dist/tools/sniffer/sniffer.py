@@ -127,7 +127,7 @@ def main(argv):
         sys.stderr.write('trying to open file %s\n' % argv[4])
         outfile = open(argv[4], 'w+b')
     except IndexError:
-        if sys.version > (3,):
+        if sys.version_info > (3,):
             outfile = sys.stdout.buffer
         else:
             outfile = sys.stdout
