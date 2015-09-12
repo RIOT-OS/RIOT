@@ -253,7 +253,6 @@ ration */
     }
     else {
         port->MODER &= ~(3 << (2 * pin));           /* configure pin as input */
-
     }
 
     return 0; /* all OK */
