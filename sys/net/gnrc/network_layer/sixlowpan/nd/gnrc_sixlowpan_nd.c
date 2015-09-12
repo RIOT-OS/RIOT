@@ -163,10 +163,6 @@ kernel_pid_t gnrc_sixlowpan_nd_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_
         /* get if not gotten from previous check */
         nc_entry = gnrc_ipv6_nc_get(iface, next_hop);
     }
-    if ((nc_entry == NULL) || (!gnrc_ipv6_nc_is_reachable(nc_entry)) ||
-        (gnrc_ipv6_nc_get_type(nc_entry) == GNRC_IPV6_NC_TYPE_TENTATIVE)) {
-        return KERNEL_PID_UNDEF;
-    }
     if (ipv6_addr_is_link_local(next_hop)) {
         kernel_pid_t ifs[GNRC_NETIF_NUMOF];
         size_t ifnum = gnrc_netif_get(ifs);
@@ -184,6 +180,10 @@ kernel_pid_t gnrc_sixlowpan_nd_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_
             }
         }
         return iface;
+    }
+    else if ((nc_entry == NULL) || (!gnrc_ipv6_nc_is_reachable(nc_entry)) ||
+        (gnrc_ipv6_nc_get_type(nc_entry) == GNRC_IPV6_NC_TYPE_TENTATIVE)) {
+        return KERNEL_PID_UNDEF;
     }
     else {
         if (nc_entry->l2_addr_len > 0) {
