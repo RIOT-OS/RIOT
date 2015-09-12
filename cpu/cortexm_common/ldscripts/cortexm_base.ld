@@ -105,6 +105,7 @@ SECTIONS
     {
         . = ALIGN(4);
         _srelocate = .;
+        KEEP (*(.veneers .veneers.*));
         *(.ramfunc .ramfunc.*);
         *(.data .data.*);
         . = ALIGN(4);
