@@ -64,6 +64,14 @@ ifneq (,$(filter gnrc_sixlowpan_router_default,$(USEMODULE)))
   USEMODULE += gnrc_sixlowpan_iphc
 endif
 
+ifneq (,$(filter gnrc_sixlowpan_border_router_default,$(USEMODULE)))
+  USEMODULE += gnrc_ipv6_router_default
+  USEMODULE += gnrc_sixlowpan_nd_border_router
+  USEMODULE += gnrc_sixlowpan_router
+  USEMODULE += gnrc_sixlowpan_frag
+  USEMODULE += gnrc_sixlowpan_iphc
+endif
+
 ifneq (,$(filter gnrc_sixlowpan_router,$(USEMODULE)))
   USEMODULE += gnrc_sixlowpan
 endif
@@ -87,6 +95,10 @@ endif
 ifneq (,$(filter gnrc_sixlowpan_ctx,$(USEMODULE)))
   USEMODULE += ipv6_addr
   USEMODULE += vtimer
+endif
+
+ifneq (,$(filter gnrc_sixlowpan_nd_border_router,$(USEMODULE)))
+  USEMODULE += gnrc_sixlowpan_nd_router
 endif
 
 ifneq (,$(filter gnrc_sixlowpan_nd_router,$(USEMODULE)))
@@ -227,18 +239,12 @@ ifneq (,$(filter gnrc_pktdump,$(USEMODULE)))
   USEMODULE += od
 endif
 
-ifneq (,$(filter gnrc_pktbuf, $(USEMODULE)))
-  ifeq (,$(filter gnrc_pktbuf_%, $(USEMODULE)))
-    USEMODULE += gnrc_pktbuf_static
-  endif
-endif
-
-ifneq (,$(filter gnrc_pktbuf_%, $(USEMODULE)))
-  USEMODULE += gnrc_pktbuf # make MODULE_GNRC_PKTBUF macro available for all implementations
-endif
-
 ifneq (,$(filter newlib,$(USEMODULE)))
   USEMODULE += uart_stdio
+endif
+
+ifneq (,$(filter ipv6_addr,$(USEMODULE)))
+  USEMODULE += ipv4_addr
 endif
 
 ifneq (,$(filter posix,$(USEMODULE)))
@@ -301,6 +307,16 @@ ifneq (,$(filter gnrc,$(USEMODULE)))
   USEMODULE += gnrc_netif
   USEMODULE += gnrc_netif_hdr
   USEMODULE += gnrc_pktbuf
+endif
+
+ifneq (,$(filter gnrc_pktbuf, $(USEMODULE)))
+  ifeq (,$(filter gnrc_pktbuf_%, $(USEMODULE)))
+    USEMODULE += gnrc_pktbuf_static
+  endif
+endif
+
+ifneq (,$(filter gnrc_pktbuf_%, $(USEMODULE)))
+  USEMODULE += gnrc_pktbuf # make MODULE_GNRC_PKTBUF macro available for all implementations
 endif
 
 ifneq (,$(filter gnrc_netdev2,$(USEMODULE)))

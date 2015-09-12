@@ -156,6 +156,71 @@ bool gnrc_sixlowpan_nd_router_abr_older(sixlowpan_nd_opt_abr_t *abr_opt);
  */
 void gnrc_sixlowpan_nd_router_abr_remove(gnrc_sixlowpan_nd_router_abr_t *abr);
 
+#ifdef MODULE_GNRC_SIXLOWPAN_ND_BORDER_ROUTER
+/**
+ * @brief   Makes this node a new border router.
+ *
+ * @per addr != NULL
+ *
+ * @param[in] addr  The local address to use in the ABROs
+ * @param[in] ltime The lifetime to advertise in the ABROs. 0 assumes a default value of
+ *                  @ref GNRC_SIXLOWPAN_ND_BORDER_ROUTER_DEFAULT_LTIME
+ *
+ * @return  The new border router object.
+ * @return  NULL, on error.
+ */
+gnrc_sixlowpan_nd_router_abr_t *gnrc_sixlowpan_nd_router_abr_create(ipv6_addr_t *addr,
+                                                                    unsigned int ltime);
+
+/**
+ * @brief   Adds a prefix for this border router to manage.
+ *
+ * @pre iface != NULL && prefix != NULL
+ *
+ * @param[in] abr       The local border router
+ * @param[in] iface     The IPv6 interface the prefix was added to.
+ * @param[in] prefix    The prefix.
+ *
+ * @return  0, on success
+ * @return  -ENOMEM, if no space for the new prefix is available.
+ * @return  -ENOENT, if @p abr is not registered.
+ */
+int gnrc_sixlowpan_nd_router_abr_add_prf(gnrc_sixlowpan_nd_router_abr_t* abr,
+                                         gnrc_ipv6_netif_t *iface, gnrc_ipv6_netif_addr_t *prefix);
+
+/**
+ * @brief   Removes a prefix from this border router.
+ *
+ * @param[in] abr       The local border router
+ * @param[in] iface     The IPv6 interface the prefix was added to.
+ * @param[in] prefix    The prefix.
+ */
+void gnrc_sixlowpan_nd_router_abr_rem_prf(gnrc_sixlowpan_nd_router_abr_t *abr,
+                                          gnrc_ipv6_netif_t *iface, gnrc_ipv6_netif_addr_t *prefix);
+
+/**
+ * @brief   Adds a context for this border router to manage.
+ *
+ * @param[in] abr       The local border router
+ * @param[in] ctx       The context to be add.
+ *
+ * @return  0, on success
+ * @return  -EINVAL, if @p ctx is greater than 15.
+ * @return  -ENOENT, if @p abr is not registered.
+ */
+int gnrc_sixlowpan_nd_router_abr_add_ctx(gnrc_sixlowpan_nd_router_abr_t *abr, uint8_t cid);
+
+/**
+ * @brief   Removes a context from this border router.
+ *
+ * @param[in] abr       The local border router
+ * @param[in] ctx       The context to be remove.
+ */
+void gnrc_sixlowpan_nd_router_abr_rem_ctx(gnrc_sixlowpan_nd_router_abr_t *abr, uint8_t cid);
+#else
+#define gnrc_sixlowpan_nd_router_abr_create(addr, ltime)    (NULL)
+#endif
+
 #ifdef __cplusplus
 }
 #endif

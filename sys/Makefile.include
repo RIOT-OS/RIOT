@@ -14,7 +14,7 @@ ifneq (,$(filter posix,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/sys/posix/include
 endif
 ifneq (,$(filter pnet,$(USEMODULE)))
-    USEMODULE_INCLUDES += $(RIOTBASE)/sys/posix/pnet/include
+    USEMODULE_INCLUDES += $(RIOTBASE)/sys/posix/include
 endif
 ifneq (,$(filter pthread,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/sys/posix/pthread/include

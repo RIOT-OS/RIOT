@@ -33,6 +33,7 @@
 #include "net/sixlowpan/nd.h"
 #include "timex.h"
 
+#include "net/gnrc/sixlowpan/nd/border_router.h"
 #include "net/gnrc/sixlowpan/nd/router.h"
 
 #ifdef __cplusplus
@@ -78,6 +79,16 @@ extern "C" {
 #define GNRC_SIXLOWPAN_ND_AR_LTIME          (15U)
 #endif
 
+/**
+ * @name    Border router constants
+ * @{
+ * @see     <a href="https://tools.ietf.org/html/rfc6775#section-9">
+ *              RFC 6775, section 9
+ *          </a>
+ */
+#define GNRC_SIXLOWPAN_ND_RTR_MIN_CTX_DELAY (300U)  /**< minimum delay between context change and
+                                                     *   stop of C=0 dissimination in seconds */
+/** @} */
 /**
  * @name    Host constants
  * @{
