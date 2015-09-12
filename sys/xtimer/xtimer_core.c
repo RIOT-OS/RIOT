@@ -26,6 +26,8 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
+static volatile int _in_handler = 0;
+
 static volatile uint32_t _long_cnt = 0;
 #if XTIMER_MASK
 volatile uint32_t _high_cnt = 0;
@@ -146,6 +148,9 @@ static void _shoot(xtimer_t *timer)
 
 static inline void _lltimer_set(uint32_t target)
 {
+    if (_in_handler) {
+        return;
+    }
     DEBUG("__lltimer_set(): setting %" PRIu32 "\n", _mask(target));
 #ifdef XTIMER_SHIFT
     target >>= XTIMER_SHIFT;
@@ -420,6 +425,8 @@ static void _timer_callback(void)
     uint32_t next_target;
     uint32_t reference;
 
+    _in_handler = 1;
+
     DEBUG("_timer_callback() now=%" PRIu32 " (%" PRIu32 ")pleft=%" PRIu32 "\n", xtimer_now(),
             _mask(xtimer_now()), _mask(0xffffffff-xtimer_now()));
 
@@ -504,6 +511,8 @@ overflow:
             }
         }
     }
+
+    _in_handler = 0;
 
     /* set low level timer */
     _lltimer_set(next_target);
