@@ -385,22 +385,15 @@ void gpio_irq_disable(gpio_t pin)
     EXTI->IMR &= ~(1 << _pin_num(pin));
 }
 
-int gpio_read(gpio_t dev)
+int gpio_read(gpio_t pin)
 {
-    GPIO_TypeDef *port;
-    uint8_t pin;
+    GPIO_TypeDef *port = _port(pin);
+    uint32_t pin_num = _pin_num(pin);
 
-    if (dev >= GPIO_NUMOF) {
-        return -1;
-    }
-
-    port = gpio_port_map[dev];
-    pin = gpio_pin_map[dev];
-
-    if (port->MODER & (1 << (pin * 2))) {       /* if configured as output */
-        return port->ODR & (1 << pin);          /* read output data register */
+    if (port->MODER & (3 << (pin_num * 2))) {   /* if configured as output */
+        return port->ODR & (1 << pin_num);      /* read output data reg */
     } else {
-        return port->IDR & (1 << pin);          /* else read input data register */
+        return port->IDR & (1 << pin_num);      /* else read input data reg */
     }
 }
 
