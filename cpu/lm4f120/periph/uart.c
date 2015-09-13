@@ -18,6 +18,7 @@
 
 #include <stdint.h>
 
+#include "assert.h"
 #include "cpu.h"
 #include "sched.h"
 #include "thread.h"
@@ -79,7 +80,7 @@ static const unsigned long g_ulUARTInt[3] =
 int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, uart_tx_cb_t tx_cb, void *arg)
 {
     /* Check the arguments */
-    ASSERT(uart == 0);
+    assert(uart == 0);
     /* Check to make sure the UART peripheral is present */
     if(!ROM_SysCtlPeripheralPresent(SYSCTL_PERIPH_UART0)){
         return -1;

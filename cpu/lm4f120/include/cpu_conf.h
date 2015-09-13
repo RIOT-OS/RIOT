@@ -35,7 +35,6 @@ extern "C" {
 #include "hw_types.h"
 #include "cortex-m4-def.h"
 #include "stellaris_periph/cpu.h"
-#include "stellaris_periph/debug.h"
 #include "stellaris_periph/interrupt.h"
 #include "stellaris_periph/sysctl.h"
 #include "stellaris_periph/adc.h"
