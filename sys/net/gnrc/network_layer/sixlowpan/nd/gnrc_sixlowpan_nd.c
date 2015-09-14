@@ -164,6 +164,15 @@ kernel_pid_t gnrc_sixlowpan_nd_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_
         nc_entry = gnrc_ipv6_nc_get(iface, next_hop);
     }
     if (ipv6_addr_is_link_local(next_hop)) {
+/* in case of a border router there is no sensible way for address resolution
+ * if the interface is not given */
+#ifdef MODULE_GNRC_SIXLOWPAN_ND_BORDER_ROUTER
+        /* if no interface is specified it is impossible to resolve the
+         * link-layer address for a link-local address on a 6LBR */
+        if (iface == KERNEL_PID_UNDEF) {
+            return KERNEL_PID_UNDEF;
+        }
+#endif
         kernel_pid_t ifs[GNRC_NETIF_NUMOF];
         size_t ifnum = gnrc_netif_get(ifs);
         /* we don't need address resolution, the EUI-64 is in next_hop's IID */
@@ -181,7 +190,7 @@ kernel_pid_t gnrc_sixlowpan_nd_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_
         }
         return iface;
     }
-    else if ((nc_entry == NULL) || (!gnrc_ipv6_nc_is_reachable(nc_entry)) ||
+    if ((nc_entry == NULL) || (!gnrc_ipv6_nc_is_reachable(nc_entry)) ||
         (gnrc_ipv6_nc_get_type(nc_entry) == GNRC_IPV6_NC_TYPE_TENTATIVE)) {
         return KERNEL_PID_UNDEF;
     }
