@@ -20,6 +20,7 @@
  */
 
 #include <stdint.h>
+#include <stdio.h>
 #include "arch/irq_arch.h"
 #include "cpu.h"
 
@@ -28,6 +29,8 @@
  */
 static uint8_t __get_interrupt_state(void);
 static void __set_interrupt_state(uint8_t state);
+
+volatile uint8_t __in_isr = 0;
 
 __attribute__((always_inline)) static inline uint8_t  __get_interrupt_state(void)
 {
@@ -84,9 +87,5 @@ void irq_arch_restore(unsigned int state)
  */
 int irq_arch_in(void)
 {
-    /*
-     * TODO: find a way to implement this function (e.g. a static variable dis- or
-     * set and unset in each ISR)
-     */
-    return 0;
+    return __in_isr;
 }

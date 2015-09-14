@@ -215,7 +215,9 @@ void gpio_write(gpio_t pin, int value)
 
 static inline void irq_handler(uint8_t pin_num)
 {
+    __enter_isr();
     config[pin_num].cb(config[pin_num].arg);
+    __exit_isr();
 }
 
 ISR(INT0_vect, ISR_BLOCK)
