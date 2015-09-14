@@ -460,13 +460,13 @@ static inline uint32_t xtimer_now(void)
 }
 
 static inline void xtimer_spin_until(uint32_t value) {
+    value = _mask(value);
     while (_xtimer_now() > value);
     while (_xtimer_now() < value);
 }
 
 static inline void xtimer_spin(uint32_t offset) {
-    offset = _mask(offset + _xtimer_now());
-    xtimer_spin_until(offset);
+    xtimer_spin_until(_xtimer_now() + offset + 1);
 }
 
 static inline void xtimer_usleep(uint32_t offset)
