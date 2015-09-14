@@ -167,7 +167,7 @@ int _xtimer_set_absolute(xtimer_t *timer, uint32_t target)
     timer->next = NULL;
     if ((target >= now) && ((target - XTIMER_BACKOFF) < now)) {
         /* backoff */
-        xtimer_spin_until(target);
+        xtimer_spin_until(target+XTIMER_BACKOFF);
         _shoot(timer);
         return 0;
     }
@@ -410,7 +410,6 @@ static void _next_period(void)
     overflow_list_head = NULL;
 
     _select_long_timers();
-
 }
 
 /**
@@ -453,7 +452,7 @@ overflow:
     /* check if next timers are close to expiring */
     while (timer_list_head && (_time_left(_mask(timer_list_head->target), reference) < XTIMER_ISR_BACKOFF)) {
         /* make sure we don't fire too early */
-        while (_time_left(_mask(timer_list_head->target), 0));
+        while (_time_left(_mask(timer_list_head->target), reference));
 
         /* pick first timer in list */
         xtimer_t *timer = timer_list_head;

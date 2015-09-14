@@ -333,6 +333,9 @@ int xtimer_msg_receive_timeout64(msg_t *msg, uint64_t us);
  * If the timer is slower by a power of two, XTIMER_SHIFT can be used to
  * adjust the difference.
  *
+ * This will also initialize the underlying periph timer with
+ * us_per_tick == (1<<XTIMER_SHIFT).
+ *
  * For example, if the timer is running with 250khz, set XTIMER_SHIFT to 2.
  */
 #ifndef XTIMER_SHIFT
@@ -372,7 +375,7 @@ int xtimer_msg_receive_timeout64(msg_t *msg, uint64_t us);
  */
 #define XTIMER_MASK (0)
 #endif
-#define XTIMER_MASK_SHIFTED (XTIMER_MASK<<XTIMER_SHIFT)
+#define XTIMER_MASK_SHIFTED (XTIMER_MASK << XTIMER_SHIFT)
 
 #ifndef XTIMER_USLEEP_UNTIL_OVERHEAD
 /**
@@ -441,8 +444,15 @@ static inline void xtimer_spin_until(uint32_t value);
  *
  * Use tests/xtimer_shift_on_compare to find the correct value for your MCU.
  */
-#define XTIMER_SHIFT_ON_COMPARE     0
+#define XTIMER_SHIFT_ON_COMPARE     (0)
 #endif
+#endif
+
+#ifndef XTIMER_MIN_SPIN
+/**
+ * @brief Minimal value xtimer_spin() can spin
+ */
+#define XTIMER_MIN_SPIN (1<<XTIMER_SHIFT)
 #endif
 
 static inline uint32_t xtimer_now(void)
@@ -460,13 +470,16 @@ static inline uint32_t xtimer_now(void)
 }
 
 static inline void xtimer_spin_until(uint32_t value) {
+#if XTIMER_MASK
     value = _mask(value);
+#endif
     while (_xtimer_now() > value);
     while (_xtimer_now() < value);
 }
 
 static inline void xtimer_spin(uint32_t offset) {
-    xtimer_spin_until(_xtimer_now() + offset + 1);
+    uint32_t start = _xtimer_now();
+    while ((_xtimer_now() - start) < offset);
 }
 
 static inline void xtimer_usleep(uint32_t offset)
@@ -489,16 +502,9 @@ static inline void xtimer_nanosleep(uint32_t nanoseconds)
     _xtimer_sleep(nanoseconds/1000, 0);
 }
 
-/** @} */
-
-#if XTIMER_OVERHEAD + XTIMER_USLEEP_UNTIL_OVERHEAD > XTIMER_BACKOFF
-#warning (XTIMER_OVERHEAD + XTIMER_USLEEP_UNTIL_OVERHEAD > XTIMER_BACKOFF !!)
-#warning This will lead to underruns. Check if tests/xtimer_usleep_until runs through.
-#endif
-
-/** @} */
-
 #ifdef __cplusplus
 }
 #endif
+
+/** @} */
 #endif /* XTIMER_H */

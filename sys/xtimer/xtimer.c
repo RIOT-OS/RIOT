@@ -72,11 +72,25 @@ void xtimer_usleep_until(uint32_t *last_wakeup, uint32_t interval) {
         goto out;
     }
 
+    /* For large offsets, set an absolute target time, as
+     * it is more exact.
+     *
+     * As that might cause an underflow, for small offsets,
+     * use a relative offset, as that can never underflow.
+     *
+     * For very small offsets, spin.
+     */
     uint32_t offset = target - now;
 
-    if (offset > XTIMER_BACKOFF+XTIMER_USLEEP_UNTIL_OVERHEAD+1) {
+    if (offset > (XTIMER_BACKOFF * 2)) {
         mutex_lock(&mutex);
-        _xtimer_set_absolute(&timer, target - XTIMER_USLEEP_UNTIL_OVERHEAD);
+        if (offset >> 9) { /* >= 512 */
+            offset = target;
+        }
+        else {
+            offset += xtimer_now();
+        }
+        _xtimer_set_absolute(&timer, offset);
         mutex_lock(&mutex);
     }
     else {
