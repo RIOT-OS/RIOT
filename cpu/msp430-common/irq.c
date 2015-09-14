@@ -33,11 +33,7 @@ unsigned int disableIRQ(void)
     state &= GIE;
 
     if (state) {
-        /*    puts("-"); */
-        __asm__ __volatile__("bic  %0, r2" : : "i"(GIE));
-       /* this NOP is needed to handle a "delay slot" that all MSP430 MCUs
-          impose silently after messing with the GIE bit, DO NOT REMOVE IT! */
-        __asm__ __volatile__("nop");
+        __disable_irq();
     }
 
     return state;
@@ -50,10 +46,7 @@ unsigned int enableIRQ(void)
     state &= GIE;
 
     if (!state) {
-        __asm__ __volatile__("bis  %0, r2" : : "i"(GIE));
-        /* this NOP is needed to handle a "delay slot" that all MSP430 MCUs
-           impose silently after messing with the GIE bit, DO NOT REMOVE IT! */
-        __asm__ __volatile__("nop");
+        __enable_irq();
     }
 
     return state;
@@ -62,10 +55,7 @@ unsigned int enableIRQ(void)
 void restoreIRQ(unsigned int state)
 {
     if (state) {
-        __asm__ __volatile__("bis  %0, r2" : : "i"(GIE));
-        /* this NOP is needed to handle a "delay slot" that all MSP430 MCUs
-           impose silently after messing with the GIE bit, DO NOT REMOVE IT! */
-        __asm__ __volatile__("nop");
+        __enable_irq();
     }
 }
 
