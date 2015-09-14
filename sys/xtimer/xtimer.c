@@ -80,7 +80,7 @@ void xtimer_usleep_until(uint32_t *last_wakeup, uint32_t interval) {
         mutex_lock(&mutex);
     }
     else {
-        xtimer_spin_until(target);
+        xtimer_spin(offset);
     }
 
 out:

@@ -123,11 +123,7 @@ void xtimer_set(xtimer_t *timer, uint32_t offset)
     uint32_t target = xtimer_now() + offset;
 
     if (offset < XTIMER_BACKOFF) {
-        if (offset > 1) {
-            /* spin until timer should be run */
-            xtimer_spin_until(target);
-        }
-
+        xtimer_spin(offset);
         _shoot(timer);
     }
     else {
