@@ -39,6 +39,7 @@ extern "C" {
 #define XTIMER                      (0)
 #define XTIMER_CHAN                 (0)
 #define XTIMER_MASK                 (0xffff0000)
+#define XTIMER_SHIFT_ON_COMPARE     (4)
 /** @} */
 
 /**
