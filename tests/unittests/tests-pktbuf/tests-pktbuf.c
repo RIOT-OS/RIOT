@@ -323,7 +323,7 @@ static void test_pktbuf_mark__success_large(void)
 
     /* check if slightly larger packet would override data */
     gnrc_pktbuf_remove_snip(pkt1, pkt2);
-    pkt2 = gnrc_pktbuf_add(NULL, TEST_STRING12, 12, GNRC_NETTYPE_TEST);
+    pkt2 = gnrc_pktbuf_add(NULL, TEST_STRING12, sizeof(TEST_STRING12), GNRC_NETTYPE_TEST);
     TEST_ASSERT(gnrc_pktbuf_is_sane());
     TEST_ASSERT_NOT_NULL(pkt1->data);
     TEST_ASSERT_EQUAL_INT(0, memcmp(exp_data1, pkt1->data, pkt1->size));

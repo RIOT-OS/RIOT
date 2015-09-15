@@ -90,9 +90,6 @@ gnrc_pktsnip_t *gnrc_pktbuf_add(gnrc_pktsnip_t *next, void *data, size_t size,
 gnrc_pktsnip_t *gnrc_pktbuf_mark(gnrc_pktsnip_t *pkt, size_t size, gnrc_nettype_t type)
 {
     gnrc_pktsnip_t *marked_snip;
-    /* size required for chunk */
-    size_t required_new_size = (size < sizeof(_unused_t)) ?
-                               _align(sizeof(_unused_t)) : _align(size);
     mutex_lock(&_mutex);
     if ((size == 0) || (pkt == NULL) || (size > pkt->size) || (pkt->data == NULL)) {
         DEBUG("pktbuf: size == 0 (was %u) or pkt == NULL (was %p) or "
@@ -112,7 +109,7 @@ gnrc_pktsnip_t *gnrc_pktbuf_mark(gnrc_pktsnip_t *pkt, size_t size, gnrc_nettype_
         mutex_unlock(&_mutex);
         return NULL;
     }
-    if (size < required_new_size) { /* would not fit unused marker => move data around */
+    if (pkt->size < size) { /* would not fit unused marker => move data around */
         void *new_data_marked, *new_data_rest;
         new_data_marked = _pktbuf_alloc(size);
         if (new_data_marked == NULL) {
