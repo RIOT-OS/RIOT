@@ -8,6 +8,7 @@ BOARD ?= native
 RIOTBASE ?= $(CURDIR)/../../RIOT
 
 # Define modules that are used
+USEMODULE += gnrc
 USEMODULE += gnrc_netif_default
 USEMODULE += auto_init_gnrc_netif
 USEMODULE += shell

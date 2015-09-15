@@ -25,12 +25,6 @@
 #include "hwtimer.h"
 #include "shell.h"
 #include "shell_commands.h"
-#ifdef MODULE_NEWLIB
-#   include "uart_stdio.h"
-#else
-#   include "posix_io.h"
-#   include "board_uart0.h"
-#endif
 #include "net/gnrc.h"
 
 /**
