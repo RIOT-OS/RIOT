@@ -54,19 +54,6 @@ extern "C" {
 /** @}*/
 
 /**
-* @name AT86RF231 config
-* @{
-*/
-#define AT86RF231_SPI       SPI_0
-#define AT86RF231_CS        GPIO_PIN(PB, 31)
-#define AT86RF231_INT       GPIO_PIN(PB, 0)
-#define AT86RF231_RESET     GPIO_PIN(PB, 15)
-#define AT86RF231_SLEEP     GPIO_PIN(PA, 20)
-
-#define AT86RF231_SPI_SPEED SPI_SPEED_1MHZ
-/** @} */
-
-/**
  * @name Define UART device and baudrate for stdio
  * @{
  */
