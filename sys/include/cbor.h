@@ -103,7 +103,9 @@
 
 #ifndef CBOR_NO_CTIME
 /* 'strptime' is only declared when this macro is defined */
+#ifndef _XOPEN_SOURCE
 #define _XOPEN_SOURCE
+#endif
 #endif
 
 #include <stdbool.h>
