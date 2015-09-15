@@ -16,6 +16,9 @@ endif
 ifneq (,$(filter oneway_malloc,$(USEMODULE)))
     DIRS += oneway-malloc
 endif
+ifneq (,$(filter ipv4_addr,$(USEMODULE)))
+    DIRS += net/network_layer/ipv4/addr
+endif
 ifneq (,$(filter ipv6_addr,$(USEMODULE)))
     DIRS += net/network_layer/ipv6/addr
 endif
@@ -39,6 +42,9 @@ ifneq (,$(filter cipher_modes,$(USEMODULE)))
 endif
 ifneq (,$(filter nhdp,$(USEMODULE)))
     DIRS += net/routing/nhdp
+endif
+ifneq (,$(filter gnrc_netdev2,$(USEMODULE)))
+    DIRS += net/gnrc/link_layer/netdev2
 endif
 ifneq (,$(filter fib,$(USEMODULE)))
     DIRS += net/network_layer/fib

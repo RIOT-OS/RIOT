@@ -33,7 +33,6 @@ QUIET ?= 1
 # Modules to include:
 
 #USEMODULE += shell
-#USEMODULE += uart0
 #USEMODULE += posix
 #USEMODULE += vtimer
 

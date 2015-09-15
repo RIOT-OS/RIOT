@@ -64,6 +64,8 @@ extern "C" {
 #define TIMER0_COMP_B_EN    OCIE1B
 #define TIMER0_COMP_C_EN    OCIE1C
 #define TIMER0_FREQ_16MHZ   (0 << CS12) | (0 << CS11) | (1 << CS10)
+#define TIMER0_FREQ_2MHZ    (0 << CS12) | (1 << CS11) | (0 << CS10)
+#define TIMER0_FREQ_250KHZ  (0 << CS12) | (1 << CS11) | (1 << CS10)
 #define TIMER0_FREQ_DISABLE (0 << CS12) | (0 << CS11) | (0 << CS10)
 #define TIMER0_COMPA_ISR    TIMER1_COMPA_vect
 #define TIMER0_COMPB_ISR    TIMER1_COMPB_vect
@@ -90,6 +92,8 @@ extern "C" {
 #define TIMER1_COMP_B_EN    OCIE3B
 #define TIMER1_COMP_C_EN    OCIE3C
 #define TIMER1_FREQ_16MHZ   (0 << CS32) | (0 << CS31) | (1 << CS30)
+#define TIMER1_FREQ_2MHZ    (0 << CS32) | (1 << CS31) | (0 << CS30)
+#define TIMER1_FREQ_250KHZ  (0 << CS32) | (1 << CS31) | (1 << CS30)
 #define TIMER1_FREQ_DISABLE (0 << CS32) | (0 << CS31) | (0 << CS30)
 #define TIMER1_COMPA_ISR    TIMER3_COMPA_vect
 #define TIMER1_COMPB_ISR    TIMER3_COMPB_vect
@@ -116,6 +120,8 @@ extern "C" {
 #define TIMER2_COMP_B_EN    OCIE4B
 #define TIMER2_COMP_C_EN    OCIE4C
 #define TIMER2_FREQ_16MHZ   (0 << CS42) | (0 << CS41) | (1 << CS40)
+#define TIMER2_FREQ_2MHZ    (0 << CS42) | (1 << CS41) | (0 << CS40)
+#define TIMER2_FREQ_250KHZ  (0 << CS42) | (1 << CS41) | (1 << CS40)
 #define TIMER2_FREQ_DISABLE (0 << CS42) | (0 << CS41) | (0 << CS40)
 #define TIMER2_COMPA_ISR    TIMER4_COMPA_vect
 #define TIMER2_COMPB_ISR    TIMER4_COMPB_vect
@@ -227,12 +233,6 @@ extern "C" {
 #define UART3_RECEIVED_DATA (UART3_CTRL_STAT_A & (1 << UART3_RX_COMPLETE))
 #define UART3_DTREG_EMPTY   (UART3_CTRL_STAT_A & (1 << UART3_DATA_EMPTY))
 
-
-
-/* TODO: add defines for device agnostic implementation */
-/** @} */
-
-
 /**
  * @brief ADC configuration
  */
@@ -260,26 +260,6 @@ extern "C" {
 #define I2C_NUMOF           (0U)                                                    /* TODO */
 #define I2C_0_EN            0
 #define I2C_0_EN            0
-
-/**
- * @brief GPIO configuration
- */
-#define GPIO_0_EN           0
-#define GPIO_1_EN           0
-#define GPIO_2_EN           0
-#define GPIO_3_EN           0
-#define GPIO_4_EN           0
-#define GPIO_5_EN           0
-#define GPIO_6_EN           0
-#define GPIO_7_EN           0
-#define GPIO_8_EN           0
-#define GPIO_9_EN           0
-#define GPIO_10_EN          0
-#define GPIO_11_EN          0
-#define GPIO_12_EN          0
-#define GPIO_13_EN          0
-#define GPIO_14_EN          0
-#define GPIO_15_EN          0
 
 #ifdef __cplusplus
 }

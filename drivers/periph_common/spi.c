@@ -29,12 +29,12 @@
 #ifdef PERIPH_SPI_NEEDS_TRANSFER_BYTES
 int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length)
 {
-    int i, trans_ret, trans_bytes = 0;
+    int trans_ret, trans_bytes = 0;
     char in_temp;
 
-    for (i = 0; i < length; i++) {
+    for (trans_bytes = 0; trans_bytes < length; trans_bytes++) {
         if (out != NULL) {
-            trans_ret = spi_transfer_byte(dev, out[i], &in_temp);
+            trans_ret = spi_transfer_byte(dev, out[trans_bytes], &in_temp);
         }
         else {
             trans_ret = spi_transfer_byte(dev, 0, &in_temp);
@@ -43,12 +43,11 @@ int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length)
             return -1;
         }
         if (in != NULL) {
-            in[i] = in_temp;
+            in[trans_bytes] = in_temp;
         }
-        trans_bytes++;
     }
 
-    return trans_bytes++;
+    return trans_bytes;
 }
 #endif
 

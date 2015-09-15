@@ -51,6 +51,9 @@ ifeq ($(shell uname -m),amd64)
 export CFLAGS += -m32 -DCOMPAT_32BIT -B/usr/lib32
 endif
 endif
+ifeq ($(shell uname -s),Darwin)
+export CFLAGS += -Wno-deprecated-declarations
+endif
 
 # unwanted (CXXUWFLAGS) and extra (CXXEXFLAGS) flags for c++
 export CXXUWFLAGS +=
@@ -69,7 +72,7 @@ export LINKFLAGS += -ldl
 endif
 
 # set the tap interface for term/valgrind
-ifneq (,$(filter dev_eth_tap,$(USEMODULE)))
+ifneq (,$(filter netdev2_tap,$(USEMODULE)))
 	export PORT ?= tap0
 else
 	export PORT =

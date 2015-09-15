@@ -37,6 +37,30 @@ extern "C" {
 #define __MSP430F1612__
 #endif
 
+/**
+ * @brief   Xtimer configuration
+ * @{
+ */
+#define XTIMER                      (0)
+#define XTIMER_CHAN                 (0)
+#define XTIMER_MASK                 (0xffff0000)
+/** @} */
+
+/**
+ * @brief   Defines for compatibility with hwtimer
+ * @deprecated
+ */
+#define HW_TIMER                    (0)
+
+/**
+ * @brief   Standard input/output device configuration
+ * @{
+ */
+#define STDIO                       (0)
+#define STDIO_BAUDRATE              (115200U)
+#define STDIO_RX_BUFSIZE            (64U)
+/** @} */
+
 /* MSB430 core */
 #define MSP430_INITIAL_CPU_SPEED    2457600uL
 #define F_CPU                       MSP430_INITIAL_CPU_SPEED

@@ -8,10 +8,12 @@
  */
 
 #include "cpu.h"
+#include "irq.h"
 #include "board.h"
 #include "kernel_internal.h"
 #include "msp430.h"
 #include "debug.h"
+#include "msp430_stdio.h"
 
 volatile static uint32_t __msp430_cpu_speed = MSP430_INITIAL_CPU_SPEED;
 
@@ -23,30 +25,6 @@ typedef enum {
     MCLK_8MHZ_SCLK_1MHZ = 1000008uL,
     MCLK_8MHZ_SCLK_8MHZ = 8000000uL
 }speed_t;
-
-/*---------------------------------------------------------------------------*/
-static uint8_t calc_umctl(uint16_t br) {
-    // from TI slaa049
-    register uint8_t CMOD = 256 * br - 256 * (br + 1) / 2;
-    register uint8_t c = 0;
-    register int i = 0;
-    register uint8_t a = CMOD;
-    a <<= 1;
-    do {
-        if( a & 0x80 ) {           // Overflow to integer?
-            a = a - 128 + CMOD;    // Yes, subtract 1.000000
-            c |= 0x80;
-        }
-        else {
-            a += CMOD;              // No, add fraction
-        }
-        if( i == 7 ) {
-            return c;
-        }
-        i++;
-        c >>= 1;
-    } while(1);
-}
 
 static void msb_ports_init(void)
 {
@@ -86,29 +64,10 @@ static void msb_ports_init(void)
 
 void msp430_set_cpu_speed(uint32_t speed)
 {
-
-    dint();
+    disableIRQ();
     __msp430_cpu_speed = speed;
     msp430_init_dco();
-    uint16_t br;
-
-    U0CTL = SWRST;
-    U0CTL = SWRST | CHAR;          // 8-bit character
-    U0TCTL = SSEL1 | TXEPT;        // UCLK = SCLK
-    U0RCTL = 0;
-    // activate
-    ME1 |= UTXE0 + URXE0;          // Enable USART0 TXD/RXD
-    br = (uint16_t)((__msp430_cpu_speed & 0xFFFFF0) / 115200uL);
-    UBR00  = br;                   // set baudrate
-    UBR10  = br>>8;
-    UMCTL0 = calc_umctl(br);       // set modulation
-
-    U0CTL &= ~SWRST;
-
-    //URCTL0 |= URXEIE;            // allow chars to interrupt
-    IE1  |= URXIE0;                // enable rx interrupt
-    IFG1 &= ~UTXIFG0;
-    eint();
+    enableIRQ();
 }
 
 /*---------------------------------------------------------------------------*/
@@ -152,4 +111,7 @@ void board_init(void)
     LED_RED_ON;
 
     msp430_set_cpu_speed(MCLK_8MHZ_SCLK_8MHZ);
+
+    /* initialize the STDIO */
+    msp430_stdio_init();
 }

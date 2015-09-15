@@ -77,7 +77,7 @@ int msg_try_send(msg_t *m, kernel_pid_t target_pid)
 
 static int _msg_send(msg_t *m, kernel_pid_t target_pid, bool block, unsigned state)
 {
-#if DEVELHELP
+#ifdef DEVELHELP
     if (!pid_is_valid(target_pid)) {
         DEBUG("msg_send(): target_pid is invalid, continuing anyways\n");
     }
@@ -179,7 +179,7 @@ int msg_send_to_self(msg_t *m)
 
 int msg_send_int(msg_t *m, kernel_pid_t target_pid)
 {
-#if DEVELHELP
+#ifdef DEVELHELP
     if (!pid_is_valid(target_pid)) {
         DEBUG("msg_send(): target_pid is invalid, continuing anyways\n");
     }

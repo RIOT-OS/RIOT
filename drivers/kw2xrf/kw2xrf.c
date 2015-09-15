@@ -170,7 +170,7 @@ void kw2xrf_set_sequence(kw2xrf_t *dev, kw2xrf_physeq_t seq)
         /* At 10MHz SPI-Clock, 40000 should be in the magnitue of 0.1s */
         if (max_tries == 40000) {
             DEBUG("kw2xrf_error: device does not finish sequence\n");
-            core_panic(-EBUSY, "kw2xrf_error: device does not finish sequence");
+            core_panic(PANIC_GENERAL_ERROR, "kw2xrf_error: device does not finish sequence");
         }
 
 #endif
@@ -397,7 +397,7 @@ int kw2xrf_init(kw2xrf_t *dev, spi_t spi, spi_speed_t spi_speed,
     kw2xrf_spi_init(spi, spi_speed, cs_pin);
 
     if (kw2xrf_on(dev) != 0) {
-        core_panic(0x42, "Could not start MKW2XD radio transceiver");
+        core_panic(PANIC_GENERAL_ERROR, "Could not start MKW2XD radio transceiver");
     }
 
     /* General initialization of interrupt sources.

@@ -18,21 +18,10 @@
 #ifndef INET_NTOP_H_
 #define INET_NTOP_H_
 #include <stdlib.h>
+#include "net/af.h"
 
 #ifdef __cplusplus
 extern "C" {
-#endif
-
-#ifndef AF_INET
-#define AF_INET             2           ///< internetwork address family: UDP, TCP, etc.
-#endif
-#ifndef AF_INET6
-/**
- * IPv6 address family.
- *
- * @see AF_INET
- */
-#define AF_INET6            28
 #endif
 
 #ifndef IN6ADDRSZ

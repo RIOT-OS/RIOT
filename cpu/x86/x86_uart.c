@@ -33,7 +33,6 @@
 #include "x86_uart.h"
 
 #include <cpu.h>
-#include <board_uart0.h>
 
 #include <inttypes.h>
 #include <stdint.h>
@@ -98,39 +97,6 @@ ssize_t x86_uart_read(char *buf, size_t len)
     return read;
 }
 
-#ifdef MODULE_UART0
-static void com_handler(uint8_t irq_num)
-{
-    (void) irq_num; /* == UART_IRQ */
-    switch (inb(UART_PORT + IIR) & IIR_INT_MASK) {
-        case IIR_INT_BR: {
-            while (is_input_empty()) {
-                asm volatile ("pause");
-            }
-            do {
-                uint8_t c = inb(UART_PORT + RBR);
-                uart0_handle_incoming(c);
-            } while (!is_input_empty());
-            uart0_notify_thread();
-            break;
-        }
-        case IIR_INT_TH:
-        case IIR_INT_LS:
-        case IIR_INT_TO:
-        default:
-            break;
-    }
-}
-#endif /* ifdef MODULE_UART0 */
-
 void x86_init_uart(void)
 {
-#ifdef MODULE_UART0
-    x86_pic_set_handler(UART_IRQ, com_handler);
-    x86_pic_enable_irq(UART_IRQ);
-
-    outb(UART_PORT + IER, IER_RECV); /* Enable receive interrupt */
-
-    puts("UART initialized");
-#endif
 }

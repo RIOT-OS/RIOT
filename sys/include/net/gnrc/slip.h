@@ -8,7 +8,7 @@
 
 /**
  * @defgroup    net_gnrc_slip SLIP
- * @ingroup     net
+ * @ingroup     net_gnrc
  * @brief       Provides a SLIP interface over UART utilizing
  *              @ref driver_periph_uart.
  * @see         <a href="https://www.ietf.org/rfc/rfc1055">RFC 1055</a>
@@ -49,8 +49,8 @@ extern "C" {
  */
 typedef struct {
     uart_t uart;                    /**< the UART interface */
-    ringbuffer_t *in_buf;           /**< RX buffer */
-    ringbuffer_t *out_buf;          /**< TX buffer */
+    ringbuffer_t in_buf;            /**< RX buffer */
+    ringbuffer_t out_buf;           /**< TX buffer */
     char rx_mem[GNRC_SLIP_BUFSIZE]; /**< memory used by RX buffer */
     char tx_mem[GNRC_SLIP_BUFSIZE]; /**< memory used by TX buffer */
     uint32_t in_bytes;              /**< the number of bytes received of a

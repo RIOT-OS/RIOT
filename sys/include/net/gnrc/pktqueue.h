@@ -8,8 +8,8 @@
 
 /**
  * @defgroup    net_gnrc_pktqueue Packet Queue
+ * @ingroup     net_gnrc
  * @brief       Packet wrapper for the Priority Queue
- * @ingroup     net
  * @{
  *
  * @file

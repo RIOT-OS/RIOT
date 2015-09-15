@@ -29,6 +29,7 @@
 #include "msg.h"
 #include "net/gnrc.h"
 #include "periph/uart.h"
+#include "od.h"
 #include "ringbuffer.h"
 #include "thread.h"
 #include "net/ipv6/hdr.h"
@@ -62,20 +63,19 @@ static void _slip_rx_cb(void *arg, char data)
 
         _SLIP_DEV(arg)->in_bytes = 0;
     }
-
-    if (_SLIP_DEV(arg)->in_esc) {
+    else if (_SLIP_DEV(arg)->in_esc) {
         _SLIP_DEV(arg)->in_esc = 0;
 
         switch (data) {
             case (_SLIP_END_ESC):
-                if (ringbuffer_add_one(_SLIP_DEV(arg)->in_buf, _SLIP_END) < 0) {
+                if (ringbuffer_add_one(&_SLIP_DEV(arg)->in_buf, _SLIP_END) < 0) {
                     _SLIP_DEV(arg)->in_bytes++;
                 }
 
                 break;
 
             case (_SLIP_ESC_ESC):
-                if (ringbuffer_add_one(_SLIP_DEV(arg)->in_buf, _SLIP_ESC) < 0) {
+                if (ringbuffer_add_one(&_SLIP_DEV(arg)->in_buf, _SLIP_ESC) < 0) {
                     _SLIP_DEV(arg)->in_bytes++;
                 }
 
@@ -89,7 +89,7 @@ static void _slip_rx_cb(void *arg, char data)
         _SLIP_DEV(arg)->in_esc = 1;
     }
     else {
-        if (ringbuffer_add_one(_SLIP_DEV(arg)->in_buf, data) < 0) {
+        if (ringbuffer_add_one(&_SLIP_DEV(arg)->in_buf, data) < 0) {
             _SLIP_DEV(arg)->in_bytes++;
         }
     }
@@ -97,8 +97,8 @@ static void _slip_rx_cb(void *arg, char data)
 
 int _slip_tx_cb(void *arg)
 {
-    if (_SLIP_DEV(arg)->out_buf->avail > 0) {
-        char c = (char)ringbuffer_get_one(_SLIP_DEV(arg)->out_buf);
+    if (_SLIP_DEV(arg)->out_buf.avail > 0) {
+        char c = (char)ringbuffer_get_one(&_SLIP_DEV(arg)->out_buf);
         uart_write((uart_t)(_SLIP_DEV(arg)->uart), c);
         return 1;
     }
@@ -110,7 +110,6 @@ int _slip_tx_cb(void *arg)
 static void _slip_receive(gnrc_slip_dev_t *dev, size_t bytes)
 {
     gnrc_netif_hdr_t *hdr;
-    gnrc_netreg_entry_t *sendto;
     gnrc_pktsnip_t *pkt, *netif_hdr;
 
     pkt = gnrc_pktbuf_add(NULL, NULL, bytes, GNRC_NETTYPE_UNDEF);
@@ -133,11 +132,17 @@ static void _slip_receive(gnrc_slip_dev_t *dev, size_t bytes)
     gnrc_netif_hdr_init(hdr, 0, 0);
     hdr->if_pid = thread_getpid();
 
-    if (ringbuffer_get(dev->in_buf, pkt->data, bytes) != bytes) {
-        DEBUG("slip: could not read %zu bytes from ringbuffer\n", bytes);
+    if (ringbuffer_get(&dev->in_buf, pkt->data, bytes) != bytes) {
+        DEBUG("slip: could not read %u bytes from ringbuffer\n", (unsigned)bytes);
         gnrc_pktbuf_release(pkt);
         return;
     }
+#if ENABLE_DEBUG && defined(MODULE_OD)
+    else {
+        DEBUG("slip: received data\n");
+        od_hex_dump(pkt->data, bytes, OD_WIDTH_DEFAULT);
+    }
+#endif
 
 #ifdef MODULE_GNRC_IPV6
     if ((pkt->size >= sizeof(ipv6_hdr_t)) && ipv6_hdr_is(pkt->data)) {
@@ -145,25 +150,15 @@ static void _slip_receive(gnrc_slip_dev_t *dev, size_t bytes)
     }
 #endif
 
-    sendto = gnrc_netreg_lookup(pkt->type, GNRC_NETREG_DEMUX_CTX_ALL);
-
-    if (sendto == NULL) {
+    if (gnrc_netapi_dispatch_receive(pkt->type, GNRC_NETREG_DEMUX_CTX_ALL, pkt) == 0) {
         DEBUG("slip: unable to forward packet of type %i\n", pkt->type);
         gnrc_pktbuf_release(pkt);
-    }
-
-    gnrc_pktbuf_hold(pkt, gnrc_netreg_num(pkt->type, GNRC_NETREG_DEMUX_CTX_ALL) - 1);
-
-    while (sendto != NULL) {
-        DEBUG("slip: sending pkt %p to PID %u\n", pkt, sendto->pid);
-        gnrc_netapi_receive(sendto->pid, pkt);
-        sendto = gnrc_netreg_getnext(sendto);
     }
 }
 
 static inline void _slip_send_char(gnrc_slip_dev_t *dev, char c)
 {
-    ringbuffer_add_one(dev->out_buf, c);
+    ringbuffer_add_one(&dev->out_buf, c);
     uart_tx_begin(dev->uart);
 }
 
@@ -175,7 +170,7 @@ static void _slip_send(gnrc_slip_dev_t *dev, gnrc_pktsnip_t *pkt)
     ptr = pkt->next;    /* ignore gnrc_netif_hdr_t, we don't need it */
 
     while (ptr != NULL) {
-        DEBUG("slip: send pktsnip of length %zu over UART_%d\n", ptr->size, uart);
+        DEBUG("slip: send pktsnip of length %u over UART_%d\n", (unsigned)ptr->size, dev->uart);
         char *data = ptr->data;
 
         for (size_t i = 0; i < ptr->size; i++) {
@@ -216,7 +211,7 @@ static void *_slip(void *args)
     dev->slip_pid = thread_getpid();
     gnrc_netif_add(dev->slip_pid);
 
-    DEBUG("slip: SLIP runs on UART_%d\n", uart);
+    DEBUG("slip: SLIP runs on UART_%d\n", dev->uart);
 
     while (1) {
         DEBUG("slip: waiting for incoming messages\n");
@@ -224,7 +219,8 @@ static void *_slip(void *args)
 
         switch (msg.type) {
             case _SLIP_MSG_TYPE:
-                DEBUG("slip: incoming message from UART in buffer\n");
+                DEBUG("slip: incoming message of size %" PRIu32 " from UART_%d in buffer\n",
+                      msg.content.value, dev->uart);
                 _slip_receive(dev, (size_t)msg.content.value);
                 break;
 
@@ -251,23 +247,23 @@ static void *_slip(void *args)
 kernel_pid_t gnrc_slip_init(gnrc_slip_dev_t *dev, uart_t uart, uint32_t baudrate,
                             char *stack, size_t stack_size, char priority)
 {
-    int res;
     kernel_pid_t pid;
 
     /* reset device descriptor fields */
+    dev->uart = uart;
     dev->in_bytes = 0;
     dev->in_esc = 0;
     dev->slip_pid = KERNEL_PID_UNDEF;
 
     /* initialize buffers */
-    ringbuffer_init(dev->in_buf, dev->rx_mem, sizeof(dev->rx_mem));
-    ringbuffer_init(dev->out_buf, dev->tx_mem, sizeof(dev->tx_mem));
+    ringbuffer_init(&dev->in_buf, dev->rx_mem, sizeof(dev->rx_mem));
+    ringbuffer_init(&dev->out_buf, dev->tx_mem, sizeof(dev->tx_mem));
 
     /* initialize UART */
-    DEBUG("slip: initialize UART_%d\n", uart);
-    res = uart_init(uart, baudrate, _slip_rx_cb, _slip_tx_cb, dev);
-    if (res < 0) {
-        DEBUG("slip: error initializing UART_%i with baudrate %u\n",
+    DEBUG("slip: initialize UART_%d with baudrate %" PRIu32 "\n", uart,
+          baudrate);
+    if (uart_init(uart, baudrate, _slip_rx_cb, _slip_tx_cb, dev) < 0) {
+        DEBUG("slip: error initializing UART_%i with baudrate %" PRIu32 "\n",
               uart, baudrate);
         return -ENODEV;
     }
@@ -280,5 +276,5 @@ kernel_pid_t gnrc_slip_init(gnrc_slip_dev_t *dev, uart_t uart, uint32_t baudrate
         DEBUG("slip: unable to create SLIP thread\n");
         return -EFAULT;
     }
-    return res;
+    return pid;
 }

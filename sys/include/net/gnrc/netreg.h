@@ -8,7 +8,8 @@
 
 /**
  * @defgroup    net_gnrc_netreg  Network protocol registry
- * @ingroup     net
+ * @ingroup     net_gnrc
+ * @brief       Registry to receive messages of a specified protocol type by GNRC.
  * @{
  *
  * @file

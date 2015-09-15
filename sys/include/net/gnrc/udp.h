@@ -7,14 +7,14 @@
  */
 
 /**
- * @defgroup    sys_net_udp UDP
- * @ingroup     net
- * @brief       RIOT's implementation of the UDP protocol
+ * @defgroup    net_gnrc_udp UDP
+ * @ingroup     net_gnrc
+ * @brief       GNRC's implementation of the UDP protocol
  *
  * @{
  *
  * @file
- * @brief       UDP interface definition
+ * @brief       UDP GNRC definition
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
@@ -40,7 +40,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   Priority of the pktdump thread
+ * @brief   Priority of the UDP thread
  */
 #ifndef GNRC_UDP_PRIO
 #define GNRC_UDP_PRIO           (THREAD_PRIORITY_MAIN - 2)

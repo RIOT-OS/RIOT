@@ -21,20 +21,15 @@
 #include <stdio.h>
 
 #include "shell.h"
-#include "posix_io.h"
-#include "board_uart0.h"
 #include "nrfmin.h"
 #include "net/gnrc.h"
 #include "net/gnrc/nomac.h"
 #include "net/gnrc/pktdump.h"
 
-#define SHELL_BUFSIZE       (UART0_BUFSIZE)
-
 static char nomac_stack[THREAD_STACKSIZE_DEFAULT];
 
 int main(void)
 {
-    shell_t shell;
     gnrc_netdev_t dev;
     gnrc_netreg_entry_t netobj;
 
@@ -51,10 +46,8 @@ int main(void)
     gnrc_netreg_register(GNRC_NETTYPE_UNDEF, &netobj);
 
     /* initialize and run the shell */
-    board_uart0_init();
-    posix_open(uart0_handler_pid, 0);
-    shell_init(&shell, NULL, SHELL_BUFSIZE, uart0_readc, uart0_putc);
-    shell_run(&shell);
+    char line_buf[SHELL_DEFAULT_BUFSIZE];
+    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
 
     return 0;
 }

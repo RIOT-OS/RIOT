@@ -57,12 +57,14 @@ extern "C" {
 #define UART_0_DEV          SERCOM3->USART
 #define UART_0_IRQ          SERCOM3_IRQn
 #define UART_0_ISR          isr_sercom3
+#define UART_0_REF_F        (16000000UL)
+#define UART_0_RUNSTDBY     1
+
 /* UART 0 pin configuration */
 #define UART_0_PORT         (PORT->Group[0])
 #define UART_0_TX_PIN       (22)
 #define UART_0_RX_PIN       (23)
 #define UART_0_PINS         (((PORT_PA22 | PORT_PA23) >> 16) | PORT_WRCONFIG_HWSEL)
-#define UART_0_REF_F        (16000000UL)
 /** @} */
 
 /**
@@ -99,7 +101,7 @@ extern "C" {
  * @{
  */
 #define RTT_FREQUENCY       (32768U)
-#define RTT_MAX_VALUE        (0xffffffffU)
+#define RTT_MAX_VALUE       (0xffffffffU)
 #define RTT_NUMOF           (1)
 /** @} */
 

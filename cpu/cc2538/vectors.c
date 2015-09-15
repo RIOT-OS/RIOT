@@ -19,6 +19,7 @@
 
 #include <stdint.h>
 #include "cpu.h"
+#include "board.h"
 #include "vectors_cortexm.h"
 
 /* get the start of the ISR stack as defined in the linkerscript */

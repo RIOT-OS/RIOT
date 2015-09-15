@@ -60,6 +60,11 @@ void bl_init_clks(void);
 /** @} */
 
 /**
+ * @brief Deprecated HW_TIMER definition (to be removed)
+ */
+#define HW_TIMER             TIMER_DEV(0)
+
+/**
  * @name dummy-defines for LEDs
  * @{
  */

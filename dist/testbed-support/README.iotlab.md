@@ -31,6 +31,8 @@ brackets):
  * IOTLAB_AUTH ($HOME/.iotlabrc)
  * IOTLAB_USER (taken from $IOTLAB_AUTH)
  * IOTLAB_EXP_ID (taken from first experiment in running state)
+ * IOTLAB_EXP_NAME (RIOT_EXP)
+ * IOTLAB_PHY_NODES
 
 ### Targets
 
@@ -48,9 +50,13 @@ if `IOTLAB_EXP_ID` is not set.
 
 This schedules a new experiment on the FIT IoT-LAB and waits until it enters
 "Running" state. It will request `IOTLAB_NODES` nodes of type `IOTLAB_TYPE`
-for `IOTLAB_DURATION` minutes at site `IOTLAB_SITE`. It will also flash the
+for `IOTLAB_DURATION` minutes at site `IOTLAB_SITE`. With `IOTLAB_PHY_NODES`
+it is possible to choose specific nodes for this experiment by using the resourceid
+string format defined in `experiment-cli submit --help` (example: 1-3+7+10-13).
+Note that the usage of `IOTLAB_PHY_NODES` ignores `IOTLAB_NODES`. It will also flash the
 binary of the current application to all registered nodes. The name of the
-experiment is set to "riot_makefile_experiment"
+experiment is set to "RIOT_EXP" or "RIOT_EXP_$(IOTLAB_EXP_NAME)"
+if `IOTLAB_EXP_NAME` is defined.
 
 #### iotlab-flash
 

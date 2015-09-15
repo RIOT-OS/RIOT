@@ -528,6 +528,18 @@ static int _get(gnrc_netdev_t *device, netopt_t opt, void *val, size_t max_len)
                 !!(dev->options & AT86RF2XX_OPT_TELL_TX_END);
             return sizeof(netopt_enable_t);
 
+        case NETOPT_CSMA:
+            *((netopt_enable_t *)val) =
+                !!(dev->options & AT86RF2XX_OPT_CSMA);
+            return sizeof(netopt_enable_t);
+
+        case NETOPT_CSMA_RETRIES:
+            if (max_len < sizeof(uint8_t)) {
+                return -EOVERFLOW;
+            }
+            *((uint8_t *)val) = at86rf2xx_get_csma_max_retries(dev);
+            return sizeof(uint8_t);
+
         default:
             return -ENOTSUP;
     }
@@ -653,6 +665,23 @@ static int _set(gnrc_netdev_t *device, netopt_t opt, void *val, size_t len)
             at86rf2xx_set_option(dev, AT86RF2XX_OPT_TELL_TX_END,
                                  ((bool *)val)[0]);
             return sizeof(netopt_enable_t);
+
+        case NETOPT_CSMA:
+            at86rf2xx_set_option(dev, AT86RF2XX_OPT_CSMA,
+                                    ((bool *)val)[0]);
+            return sizeof(netopt_enable_t);
+
+        case NETOPT_CSMA_RETRIES:
+            if( (len > sizeof(uint8_t)) ||
+                (*((uint8_t *)val) > 5) ) {
+                return -EOVERFLOW;
+            }
+            /* If CSMA is disabled, don't allow setting retries */
+            if( !(dev->options & AT86RF2XX_OPT_CSMA) ) {
+                return -ENOTSUP;
+            }
+            at86rf2xx_set_csma_max_retries(dev, *((uint8_t *)val));
+            return sizeof(uint8_t);
 
         default:
             return -ENOTSUP;

@@ -3,7 +3,7 @@ include ../Makefile.tests_common
 
 FEATURES_REQUIRED = periph_spi periph_gpio
 
-BOARD_INSUFFICIENT_RAM := stm32f0discovery
+BOARD_INSUFFICIENT_MEMORY := stm32f0discovery
 BOARD_BLACKLIST        := nucleo-f334
 # nucleo-f334:  not enough GPIO pins defined
 
@@ -61,11 +61,10 @@ endif
 
 endif # USE_BOARD_PARAMETERS=false
 
-USEMODULE += auto_init_ng_netif
+USEMODULE += auto_init_gnrc_netif
 USEMODULE += gnrc_netif
 USEMODULE += gnrc_nomac
 USEMODULE += gnrc_pktdump
-USEMODULE += uart0
 USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += ps

@@ -22,6 +22,15 @@ MEMORY
 {
     rom (rx)        : ORIGIN = 0x08000000, LENGTH = 256K
     ram (xrw)       : ORIGIN = 0x20000000, LENGTH = 32K
+
+    /* see STM32L1 Reference Manual (31.2 Unique device ID registers (96 bits))
+     *    Base address:
+     *      - 0x1FF80050 for Cat.1 and Cat.2 devices
+     *      - 0x1FF800D0 for Cat.3, Cat.4, Cat.5 and Cat.6 devices
+     */
+    cpuid (r)       : ORIGIN = 0x1ff800d0, LENGTH = 12
 }
+
+_cpuid_address = ORIGIN(cpuid);
 
 INCLUDE cortexm_base.ld

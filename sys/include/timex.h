@@ -31,17 +31,17 @@ extern "C" {
 /**
  * @brief The number of microseconds per second
  */
-#define SEC_IN_USEC 1000000
+#define SEC_IN_USEC (1000000U)
 
 /**
  * @brief The number of milliseconds per second
  */
-#define SEC_IN_MS   (1000)
+#define SEC_IN_MS   (1000U)
 
 /**
  * @brief The number of microseconds per millisecond
  */
-#define MS_IN_USEC  (1000)
+#define MS_IN_USEC  (1000U)
 
 /**
  * @brief The maximum length of the string representation of a timex timestamp

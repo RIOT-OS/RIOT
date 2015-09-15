@@ -25,7 +25,7 @@
 
 void panic_arch(void)
 {
-#if DEVELHELP
+#ifdef DEVELHELP
     /* since we're atop an Unix-like platform,
        just use the (developer-)friendly core-dump feature */
     kill(_native_pid, SIGTRAP);

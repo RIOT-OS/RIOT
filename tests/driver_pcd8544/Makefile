@@ -3,7 +3,6 @@ include ../Makefile.tests_common
 
 FEATURES_REQUIRED = periph_gpio periph_spi
 
-USEMODULE += uart0
 USEMODULE += shell
 USEMODULE += pcd8544
 

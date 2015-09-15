@@ -26,10 +26,8 @@
 #include <string.h>
 
 #include "thread.h"
-#include "posix_io.h"
 #include "shell.h"
 #include "shell_commands.h"
-#include "board_uart0.h"
 
 #if FEATURE_PERIPH_RTC
 #include "periph/rtc.h"
@@ -41,9 +39,6 @@
 
 int main(void)
 {
-    shell_t shell;
-    (void) posix_open(uart0_handler_pid, 0);
-
 #ifdef MODULE_LTC4150
     ltc4150_start();
 #endif
@@ -54,8 +49,8 @@ int main(void)
 
     (void) puts("Welcome to RIOT!");
 
-    shell_init(&shell, NULL, UART0_BUFSIZE, uart0_readc, uart0_putc);
+    char line_buf[SHELL_DEFAULT_BUFSIZE];
+    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
 
-    shell_run(&shell);
     return 0;
 }

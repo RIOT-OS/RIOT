@@ -15,7 +15,7 @@ export RESET = $(RIOTBOARD)/$(BOARD)/dist/reset.sh
 export PROGRAMMER ?= cc2538-bsl
 
 ifeq ($(PROGRAMMER),cc2538-bsl)
-  export FLASHER = python $(RIOTBOARD)/$(BOARD)/dist/cc2538-bsl.py
+  export FLASHER = python $(RIOTBASE)/dist/tools/cc2538-bsl/cc2538-bsl.py
   export FFLAGS  = -p "$(PORT)" -e -w -v $(HEXFILE)
 else ifeq ($(PROGRAMMER),jlink)
   export FLASHER = $(RIOTBOARD)/$(BOARD)/dist/flash.sh
