@@ -16,12 +16,12 @@ export OBJCOPY = $(PREFIX)objcopy
 export LINKFLAGS += -mmcu=$(MCU) -lgcc $(BINDIR)msp430_common/startup.o
 export TERMPROG = $(RIOTBASE)/dist/tools/pyterm/pyterm
 export FLASHER = $(RIOTBASE)/dist/tools/goodfet/goodfet.bsl
-ifeq ($(strip $(PORT)),)
-    export PORT = /dev/ttyUSB0
-endif
 export FFLAGS = --z1 -I -c $(PORT) -r -e -p $(HEXFILE)
 export OFLAGS = -O ihex
-export TERMFLAGS += -p "$(PORT)"
+
+export PORT_LINUX ?= /dev/ttyUSB0
+export PORT_DARWIN ?= /dev/tty.SLAB_USBtoUART
+include $(RIOTBOARD)/Makefile.include.serial
 
 export INCLUDES += -I$(RIOTCPU)/$(CPU)/include/ -I$(RIOTBOARD)/$(BOARD)/include/
 export INCLUDES += -I $(RIOTCPU)/msp430-common/include
