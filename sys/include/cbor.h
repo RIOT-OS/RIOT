@@ -94,7 +94,7 @@
  * -  24-31: (Reserved)      - No support
  * - 32-255: (Unassigned)    - No support
  *
- * TODO: API for Indefinite-Length Byte Strings and Text Strings
+ * @todo: API for Indefinite-Length Byte Strings and Text Strings
  *       (see https://tools.ietf.org/html/rfc7049#section-2.2.2)
  */
 
@@ -402,7 +402,7 @@ size_t cbor_serialize_unicode_string(cbor_stream_t *stream, const char *val);
  * @param[in] stream The stream to deserialize
  * @param[in] offset The offset within the stream where to start deserializing
  * @param[out] val   Pointer to a char *
- * @param[out] length Pointer tp a size_t to store the size of the string
+ * @param[out] length Pointer to a size_t to store the size of the string
  *
  * @return Number of bytes written into @p val
  */
