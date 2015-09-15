@@ -72,7 +72,7 @@ typedef struct spi_saml21 {
 static const spi_saml21_t spi[] = {
 #if SPI_0_EN
     /* SPI device */   /* MCLK flag */        /* GLCK id */         /* SCLK */  /* MISO */  /* MOSI */ /* dipo+dopo */
-    { &(SERCOM0->SPI), MCLK_APBCMASK_SERCOM0, SERCOM0_GCLK_ID_CORE, { GPIO(PA,7), 3 }, { GPIO(PA,4), 3 }, { GPIO(PA,6), 3 }, 0, 1 }
+    { &(SERCOM0->SPI), MCLK_APBCMASK_SERCOM0, SERCOM0_GCLK_ID_CORE, { GPIO_PIN(PA,7), 3 }, { GPIO_PIN(PA,4), 3 }, { GPIO_PIN(PA,6), 3 }, 0, 1 }
 #endif
 };
 

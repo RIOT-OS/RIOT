@@ -29,7 +29,7 @@ extern "C" {
 /**
  * @brief   Define a CPU specific GPIO pin generator macro
  */
-#define GPIO(x, y)          ((x << 4) | y)
+#define GPIO_PIN(x, y)          ((x << 4) | y)
 
 /**
  * @brief   Available ports on the ATmega2560 family
