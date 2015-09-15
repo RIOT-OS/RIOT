@@ -22,7 +22,6 @@
 #define PERIPH_CPU_H_
 
 #include "cpu.h"
-#include "periph/dev_enums.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -80,6 +79,15 @@ typedef enum {
     GPIO_AF13,              /**< use alternate function 13 */
     GPIO_AF14               /**< use alternate function 14 */
 } gpio_af_t;
+
+/**
+ * @brief   Timer configuration data structure
+ */
+typedef struct {
+    TIM_TypeDef *dev;       /**< timer device */
+    uint8_t rcc;            /**< bit in the RCC register */
+    uint8_t irqn;           /**< IRQ vector entry number */
+} timer_conf_t;
 
 /**
  * @brief declare needed generic SPI functions
