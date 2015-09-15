@@ -41,7 +41,9 @@
 ipv6_addr_t *ipv6_addr_from_str(ipv6_addr_t *result, const char *addr)
 {
     uint8_t *colonp = 0;
+#ifdef MODULE_IPV4_ADDR
     const char *curtok = addr;
+#endif
     uint32_t val = 0;
     char ch;
     uint8_t saw_xdigit = 0;
@@ -81,7 +83,9 @@ ipv6_addr_t *ipv6_addr_from_str(ipv6_addr_t *result, const char *addr)
         }
 
         if (ch == ':') {
+#ifdef MODULE_IPV4_ADDR
             curtok = addr;
+#endif
 
             if (!saw_xdigit) {
                 if (colonp != NULL) {
@@ -103,6 +107,7 @@ ipv6_addr_t *ipv6_addr_from_str(ipv6_addr_t *result, const char *addr)
             continue;
         }
 
+#ifdef MODULE_IPV4_ADDR
         if (ch == '.' && (i <= sizeof(ipv6_addr_t)) &&
             ipv4_addr_from_str((ipv4_addr_t *)(&(result->u8[i])),
                                curtok) != NULL) {
@@ -110,6 +115,7 @@ ipv6_addr_t *ipv6_addr_from_str(ipv6_addr_t *result, const char *addr)
             saw_xdigit = 0;
             break;  /* '\0' was seen by ipv4_addr_from_str(). */
         }
+#endif
 
         return NULL;
     }

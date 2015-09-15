@@ -103,6 +103,7 @@ char *ipv6_addr_to_str(char *result, const ipv6_addr_t *addr, uint8_t result_len
             *tp++ = ':';
         }
 
+#ifdef MODULE_IPV4_ADDR
         /* Is this address an encapsulated IPv4? */
         if (i == 6 && best.base == 0 &&
             (best.len == 6 || (best.len == 5 && addr->u16[5].u16 == 0xffff))) {
@@ -114,6 +115,7 @@ char *ipv6_addr_to_str(char *result, const ipv6_addr_t *addr, uint8_t result_len
             tp += strlen(tp);
             break;
         }
+#endif
 
         if ((addr->u16[i].u8[0] & 0xf0) != 0x00) {
             *tp++ = HEX_L[addr->u16[i].u8[0] >> 4];
