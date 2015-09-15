@@ -400,8 +400,9 @@ static size_t decode_bytes(const cbor_stream_t *s, size_t offset, char *out, siz
 }
 
 /* A zero copy version of decode_bytes.
-   Will not null termiante input, but tell you the size of what you read.
-   Great for reading byte strings which could contain nulls inside
+   Will not null termiante input, but will tell you the size of what you read.
+   Great for reading byte strings which could contain nulls inside of unknown size
+   without forced copies.
 */
 static size_t decode_bytes_no_copy(const cbor_stream_t *s, size_t offset, unsigned char **out, size_t *length)
 {
@@ -634,6 +635,11 @@ size_t cbor_deserialize_byte_string_no_copy(const cbor_stream_t *stream, size_t 
 size_t cbor_serialize_byte_string(cbor_stream_t *stream, const char *val)
 {
     return encode_bytes(CBOR_BYTES, stream, val, strlen(val));
+}
+
+size_t cbor_serialize_byte_stringl(cbor_stream_t *stream, const char *val, size_t length)
+{
+    return encode_bytes(CBOR_BYTES, stream, val, length);
 }
 
 size_t cbor_deserialize_unicode_string(const cbor_stream_t *stream, size_t offset, char *val,
