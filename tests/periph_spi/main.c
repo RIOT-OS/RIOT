@@ -87,7 +87,7 @@ int parse_spi_dev(int argc, char **argv)
     }
     port = atoi(argv[2]);
     pin = atoi(argv[3]);
-    spi_cs = GPIO(port,pin);
+    spi_cs = GPIO_PIN(port,pin);
     if (argc >= 5) {
         spi_mode = argv[4][0] - '0';
         if (spi_mode < 0 || spi_mode > 3) {
