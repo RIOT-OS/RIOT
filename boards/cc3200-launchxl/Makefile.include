@@ -9,7 +9,9 @@ include $(RIOTBOARD)/Makefile.include.serial
 # debugger config
 export DEBUGGER = $(RIOTBOARD)/$(BOARD)/dist/debug.sh
 
-#export DEBUGSERVER = JLinkGDBServer -device CC3200
+# board unit test using gdb
+export BOARD_TEST_SCRIPT = $(RIOTBOARD)/$(BOARD)/dist/board_test.sh
+export TEST_SUITE ?= hwtimer
 
 export RESET = $(RIOTBOARD)/$(BOARD)/dist/reset.sh
 
@@ -32,6 +34,9 @@ export OFLAGS    = -O binary --gap-fill 0xff
 export HEXFILE = $(ELFFILE:.elf=.bin)
 export DEBUGGER_FLAGS = $(RIOTBOARD)/$(BOARD)/dist $(ELFFILE)
 export RESET_FLAGS = $(BINDIR)
+
+export BTEST_FLAGS = $(CURDIR)/tests $(ELFFILE) $(TEST_SUITE)
+
 
 export OBJDUMPFLAGS += --disassemble --source --disassembler-options=force-thumb
 

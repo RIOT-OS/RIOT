@@ -39,10 +39,10 @@
 #*****************************************************************************
 #Connect To the target using OpenOCD
 #*****************************************************************************
-#target remote | openocd -c "gdb_port pipe; log_output openocd.log" -f cc3200.cfg
-
-
 target remote | openocd -c "gdb_port pipe; log_output openocd.log" -f cc3200.cfg
+
+# for openocd 0.9.0
+# target remote | openocd -c "gdb_port pipe; log_output openocd.log" -f cc3200-v9.cfg
 
 #*****************************************************************************
 # Load the binary
@@ -59,5 +59,7 @@ set $pc = g_pfnVectors[1]
 #*****************************************************************************
 # Set break point at main and run to main
 #*****************************************************************************
+
+#break ResetISR
 break main
 continue

@@ -39,6 +39,7 @@ extern "C" {
 #define PUSH1 3
 #define PUSH2 11
 
+#define DEBUG_PIN 10 // P1.10 on launchpad (bottom pin on left side)
 
 /**
  * Define the nominal CPU core clock in this board
@@ -49,6 +50,8 @@ extern "C" {
  * Assign the hardware timer
  */
 #define HW_TIMER            TIMER_3
+#define HWTIMER_WAIT_OVERHEAD (1430)
+#define HWTIMER_SPIN_BARRIER HWTIMER_WAIT_OVERHEAD
 
 #define TIMER_NUM_CHANNELS 4
 

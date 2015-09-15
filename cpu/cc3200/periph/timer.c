@@ -382,6 +382,8 @@ int set_absolute(tim_t dev, int channel, unsigned long long value) {
 				freeq2 = freeq2->next;
 
 				busyq2->next = ptr;
+
+				MAP_TimerMatchSet(TIMERA2_BASE, TIMER_A, abstimeout);
 			}
 
 		} else {
@@ -442,6 +444,8 @@ int set_absolute(tim_t dev, int channel, unsigned long long value) {
 				freeq3 = freeq3->next;
 
 				busyq3->next = ptr;
+
+				MAP_TimerMatchSet(TIMERA3_BASE, TIMER_A, abstimeout);
 			}
 
 		} else {

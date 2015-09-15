@@ -11,4 +11,5 @@ ELFFILE=$2
 cd $CFGDIR
 
 # run GDB
-arm-none-eabi-gdb -tui -command=gdbinit $ELFFILE
+#arm-none-eabi-gdb -tui -command=gdbinit $ELFFILE
+arm-none-eabi-gdb -command=gdbinit $ELFFILE
