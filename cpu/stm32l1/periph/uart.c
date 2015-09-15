@@ -99,7 +99,6 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
     gpio_t rx_pin = 0;
     gpio_af_t af = 0;
     float clk = 0;
-    float divider;
     uint16_t mantissa;
     uint8_t fraction;
 

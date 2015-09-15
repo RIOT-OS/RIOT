@@ -81,7 +81,6 @@ typedef enum {
 } gpio_af_t;
 
 /**
- 
  * @brief   Configure the alternate function for the given pin
  *
  * @note    This is meant for internal use in STM32L1 peripheral drivers only
