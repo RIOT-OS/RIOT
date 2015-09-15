@@ -23,6 +23,7 @@
 #include "thread.h"
 #include "periph_conf.h"
 #include "periph/uart.h"
+#include "periph/gpio.h"
 
 /* guard file in case no UART device was specified */
 #if UART_NUMOF
@@ -94,11 +95,11 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, uart_tx_cb_t t
 int uart_init_blocking(uart_t uart, uint32_t baudrate)
 {
     USART_TypeDef *dev = 0;
-    GPIO_TypeDef *port = 0;
-    uint32_t tx_pin = 0;
-    uint32_t rx_pin = 0;
-    uint8_t af = 0;
-    uint32_t clk = 0;
+    gpio_t tx_pin = 0;
+    gpio_t rx_pin = 0;
+    gpio_af_t af = 0;
+    float clk = 0;
+    float divider;
     uint16_t mantissa;
     uint8_t fraction;
 
@@ -106,37 +107,31 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
 #if UART_0_EN
         case UART_0:
             dev = UART_0_DEV;
-            port = UART_0_PORT;
             clk = UART_0_CLK;
             tx_pin = UART_0_TX_PIN;
             rx_pin = UART_0_RX_PIN;
             af = UART_0_AF;
             UART_0_CLKEN();
-            UART_0_PORT_CLKEN();
             break;
 #endif
 #if UART_1_EN
         case UART_1:
             dev = UART_1_DEV;
-            port = UART_1_PORT;
             clk = UART_1_CLK;
             tx_pin = UART_1_TX_PIN;
             rx_pin = UART_1_RX_PIN;
             af = UART_1_AF;
             UART_1_CLKEN();
-            UART_1_PORT_CLKEN();
             break;
 #endif
 #if UART_2_EN
         case UART_2:
             dev = UART_2_DEV;
-            port = UART_2_PORT;
             clk = UART_2_CLK;
             tx_pin = UART_2_TX_PIN;
             rx_pin = UART_2_RX_PIN;
             af = UART_2_AF;
             UART_2_CLKEN();
-            UART_2_PORT_CLKEN();
             break;
 #endif
         default:
@@ -144,25 +139,10 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
     }
 
     /* uart_configure RX and TX pins, set pin to use alternative function mode */
-    port->MODER &= ~(3 << (rx_pin * 2) | 3 << (tx_pin * 2));
-    port->MODER |= 2 << (rx_pin * 2) | 2 << (tx_pin * 2);
-    /* and assign alternative function */
-    if (rx_pin < 8) {
-        port->AFR[0] &= ~(0xf << (rx_pin * 4));
-        port->AFR[0] |= af << (rx_pin * 4);
-    }
-    else {
-        port->AFR[1] &= ~(0xf << ((rx_pin - 8) * 4));
-        port->AFR[1] |= af << ((rx_pin - 8) * 4);
-    }
-    if (tx_pin < 8) {
-        port->AFR[0] &= ~(0xf << (tx_pin * 4));
-        port->AFR[0] |= af << (tx_pin * 4);
-    }
-    else {
-        port->AFR[1] &= ~(0xf << ((tx_pin - 8) * 4));
-        port->AFR[1] |= af << ((tx_pin - 8) * 4);
-    }
+    gpio_init(tx_pin, GPIO_DIR_OUT, GPIO_NOPULL);
+    gpio_init_af(tx_pin, af);
+    gpio_init(rx_pin, GPIO_DIR_IN, GPIO_NOPULL);
+    gpio_init_af(rx_pin, af);
 
     /* uart_configure UART to mode 8N1 with given baudrate */
     clk /= baudrate;
