@@ -30,8 +30,8 @@ extern "C" {
 /**
  * @brief   Default GPIO macro maps port-pin tuples to the pin value
  */
-#ifndef GPIO
-#define GPIO(x,y)       ((x & 0) | y)
+#ifndef GPIO_PIN
+#define GPIO_PIN(x,y)       ((x & 0) | y)
 #endif
 
 /**
