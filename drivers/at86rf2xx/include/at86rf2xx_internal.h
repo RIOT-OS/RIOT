@@ -32,6 +32,23 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Transition time from SLEEP to TRX_OFF in us, refer figure 7-4, p.42.
+ *          For different environments refer figure 13-13, p.201
+ */
+#define AT86RF2XX_WAKEUP_DELAY          (300U)
+
+/**
+ * @brief   Minimum reset pulse width, refer p.190
+ */
+#define AT86RF2XX_RESET_PULSE_WIDTH     (1U)
+
+/**
+ * @brief   Transition time to TRX_OFF after reset pulse in us, refer
+ *          figure 7-8, p. 44.
+ */
+#define AT86RF2XX_RESET_DELAY           (26U)
+
+/**
  * @brief   Read from a register at address `addr` from device `dev`.
  *
  * @param[in] dev       device to read from
@@ -105,6 +122,21 @@ void at86rf2xx_force_trx_off(const at86rf2xx_t *dev);
  * @return              internal status of the given device
  */
 uint8_t at86rf2xx_get_status(const at86rf2xx_t *dev);
+
+/**
+ * @brief   Make sure that device is not sleeping
+ *
+ * @param[in] dev       device to eventually wake up
+ */
+void at86rf2xx_assert_awake(at86rf2xx_t *dev);
+
+/**
+ * @brief   Trigger a hardware reset
+ *
+ * @param[in] dev       device to reset
+ */
+void at86rf2xx_hardware_reset(at86rf2xx_t *dev);
+
 
 #ifdef __cplusplus
 }
