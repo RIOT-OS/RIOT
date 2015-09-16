@@ -1,4 +1,1 @@
-export INCLUDES += -I$(RIOTBOARD)/msb-430h/include
-include $(RIOTBOARD)/$(BOARD)/Makefile.dep
-
 include $(RIOTBOARD)/msb-430-common/Makefile.include
