@@ -255,6 +255,12 @@ static void *_event_loop(void *args)
                 DEBUG("ipv6: address registration timeout received\n");
                 gnrc_sixlowpan_nd_router_gc_nc((gnrc_ipv6_nc_t *)msg.content.ptr);
                 break;
+            case GNRC_NDP_MSG_RTR_ADV_SIXLOWPAN_DELAY:
+                DEBUG("ipv6: Delayed router advertisement event received\n");
+                gnrc_ipv6_nc_t *nc_entry = (gnrc_ipv6_nc_t *)msg.content.ptr;
+                gnrc_ndp_internal_send_rtr_adv(nc_entry->iface, NULL,
+                                               &(nc_entry->ipv6_addr), false);
+                break;
 #endif
             default:
                 break;

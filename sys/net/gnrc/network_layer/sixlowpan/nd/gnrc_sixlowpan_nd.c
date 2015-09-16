@@ -160,8 +160,15 @@ kernel_pid_t gnrc_sixlowpan_nd_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_
 #ifdef MODULE_GNRC_SIXLOWPAN_ND_ROUTER
     /* next hop determination: https://tools.ietf.org/html/rfc6775#section-6.5.4 */
     nc_entry = gnrc_ipv6_nc_get(iface, dst);
-    if ((nc_entry != NULL) && (gnrc_ipv6_nc_get_type(nc_entry) == GNRC_IPV6_NC_TYPE_REGISTERED)) {
+    /* if NCE found */
+    if (nc_entry != NULL) {
+        gnrc_ipv6_netif_t *ipv6_if = gnrc_ipv6_netif_get(nc_entry->iface);
+        /* and interface is not 6LoWPAN */
+        if (!(ipv6_if->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN) ||
+                /* or entry is registered */
+                (gnrc_ipv6_nc_get_type(nc_entry) == GNRC_IPV6_NC_TYPE_REGISTERED)) {
         next_hop = dst;
+        }
     }
 #endif
     /* next hop determination according to: https://tools.ietf.org/html/rfc6775#section-5.6 */
