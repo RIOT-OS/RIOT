@@ -70,7 +70,6 @@ void uart_stdio_rx_cb(void *arg, char data)
 
 void uart_stdio_init(void)
 {
-    mutex_lock(&_rx_mutex);
     uart_init(STDIO, STDIO_BAUDRATE, uart_stdio_rx_cb, NULL);
 }
 
