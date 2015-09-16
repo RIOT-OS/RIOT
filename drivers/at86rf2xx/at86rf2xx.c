@@ -74,6 +74,9 @@ int at86rf2xx_init(at86rf2xx_t *dev, spi_t spi, spi_speed_t spi_speed,
     gpio_set(dev->reset_pin);
     gpio_init_int(dev->int_pin, GPIO_NOPULL, GPIO_RISING, _irq_handler, dev);
 
+    /* reset device to default values and put it into RX state */
+    at86rf2xx_reset(dev);
+
     /* test if the SPI is set up correctly and the device is responding */
     if (at86rf2xx_reg_read(dev, AT86RF2XX_REG__PART_NUM) !=
         AT86RF2XX_PARTNUM) {
@@ -81,8 +84,6 @@ int at86rf2xx_init(at86rf2xx_t *dev, spi_t spi, spi_speed_t spi_speed,
         return -1;
     }
 
-    /* reset device to default values and put it into RX state */
-    at86rf2xx_reset(dev);
     return 0;
 }
 
@@ -159,6 +160,13 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
     uint8_t tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_CTRL_1);
     tmp &= ~(AT86RF2XX_TRX_CTRL_1_MASK__IRQ_MASK_MODE);
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_CTRL_1, tmp);
+
+    /* disable clock output to save power */
+    tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_CTRL_0);
+    tmp &= ~(AT86RF2XX_TRX_CTRL_0_MASK__CLKM_CTRL);
+    tmp &= ~(AT86RF2XX_TRX_CTRL_0_MASK__CLKM_SHA_SEL);
+    tmp |= (AT86RF2XX_TRX_CTRL_0_CLKM_CTRL__OFF);
+    at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_CTRL_0, tmp);
 
     /* enable interrupts */
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK,
