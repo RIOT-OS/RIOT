@@ -462,8 +462,10 @@ void gnrc_ndp_internal_send_rtr_adv(kernel_pid_t iface, ipv6_addr_t *src, ipv6_a
         pkt = hdr;
     }
     if (src == NULL) {
+        mutex_unlock(&ipv6_iface->mutex);
         /* get address from source selection algorithm */
         src = gnrc_ipv6_netif_find_best_src_addr(iface, dst);
+        mutex_lock(&ipv6_iface->mutex);
     }
     /* add SL2A for source address */
     if (src != NULL) {
