@@ -1,7 +1,7 @@
 From e5adb25f18ff979b2777f7161b1038611c84a450 Mon Sep 17 00:00:00 2001
 From: Oleg Hahm <oleg@hobbykeller.org>
 Date: Tue, 4 Aug 2015 23:07:24 +0200
-Subject: [PATCH 7/8] fix option parsing with debug enabled
+Subject: [PATCH 7/9] fix option parsing with debug enabled
 
 ---
  option.c | 3 ++-
