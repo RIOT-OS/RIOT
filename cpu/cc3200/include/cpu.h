@@ -32,6 +32,8 @@
 #ifndef CPU_H_
 #define CPU_H_
 
+#include <stdio.h>
+
 #include "cpu_conf.h"
 #include "irq.h"
 
@@ -115,6 +117,16 @@ typedef enum {
  * @brief   Initialization of the CPU
  */
 void cpu_init(void);
+
+/**
+ * @brief   Prints the current content of the link register (lr)
+ */
+static inline void cpu_print_last_instruction(void)
+{
+    register uint32_t *lr_ptr;
+    __asm__ __volatile__("mov %0, lr" : "=r"(lr_ptr));
+    printf("%p\n", lr_ptr);
+}
 
 
 #ifdef __cplusplus
