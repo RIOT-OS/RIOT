@@ -28,6 +28,7 @@ extern "C" {
 #endif
 
 #include "net/ipv6/addr.h"
+#include "xtimer.h"
 #include "trickle.h"
 
 /**
@@ -169,13 +170,13 @@ typedef struct gnrc_rpl_parent gnrc_rpl_parent_t;
  * @brief Parent representation
  */
 struct gnrc_rpl_parent {
-    gnrc_rpl_parent_t *next;          /**< pointer to the next parent */
+    gnrc_rpl_parent_t *next;        /**< pointer to the next parent */
     uint8_t state;                  /**< 0 for unsued, 1 for used */
     ipv6_addr_t addr;               /**< link-local IPv6 address of this parent */
     uint16_t rank;                  /**< rank of the parent */
     uint8_t dtsn;                   /**< last seen dtsn of this parent */
-    gnrc_rpl_dodag_t *dodag;          /**< DODAG the parent belongs to */
-    timex_t lifetime;               /**< lifetime of this parent */
+    gnrc_rpl_dodag_t *dodag;        /**< DODAG the parent belongs to */
+    uint64_t lifetime;              /**< lifetime of this parent */
     double  link_metric;            /**< metric of the link */
     uint8_t link_metric_type;       /**< type of the metric */
 };
@@ -235,10 +236,12 @@ struct gnrc_rpl_dodag {
     uint8_t dao_counter;            /**< amount of retried DAOs */
     bool dao_ack_received;          /**< flag to check for DAO-ACK */
     uint8_t dodag_conf_counter;     /**< limitation of the sending of DODAG_CONF options */
-    timex_t dao_time;               /**< time to schedule the next DAO */
-    vtimer_t dao_timer;             /**< timer to schedule the next DAO */
-    timex_t cleanup_time;           /**< time to schedula a DODAG cleanup */
-    vtimer_t cleanup_timer;         /**< timer to schedula a DODAG cleanup */
+    msg_t dao_msg;                  /**< msg_t for firing a dao */
+    uint64_t dao_time;              /**< time to schedule the next DAO */
+    xtimer_t dao_timer;             /**< timer to schedule the next DAO */
+    msg_t cleanup_msg;              /**< msg_t for firing a cleanup */
+    uint32_t cleanup_time;          /**< time to schedula a DODAG cleanup */
+    xtimer_t cleanup_timer;         /**< timer to schedula a DODAG cleanup */
     trickle_t trickle;              /**< trickle representation */
 };
 

@@ -4,7 +4,7 @@ include ../Makefile.tests_common
 FEATURES_REQUIRED = periph_spi periph_gpio
 
 USEMODULE += adt7310
-USEMODULE += vtimer
+USEMODULE += xtimer
 
 ifneq (,$(TEST_ADT7310_SPI))
   CFLAGS += -DTEST_ADT7310_SPI=$(TEST_ADT7310_SPI)

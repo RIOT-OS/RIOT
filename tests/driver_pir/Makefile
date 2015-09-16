@@ -12,7 +12,7 @@ ifneq (,$(filter arduino-due,$(BOARD)))
 endif
 
 USEMODULE += pir
-USEMODULE += vtimer
+USEMODULE += xtimer
 
 ifneq (,$(PIR_GPIO))
   CFLAGS += -DPIR_GPIO=$(PIR_GPIO)

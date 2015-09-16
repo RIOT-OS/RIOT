@@ -6,7 +6,7 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  *
- * @ingroup hwtimer
+ * @ingroup timer
  * @ingroup native_cpu
  * @{
  * @author  Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
@@ -17,7 +17,7 @@
  * Uses POSIX realtime clock and POSIX itimer to mimic hardware.
  *
  * This is based on native's hwtimer implementation by Ludwig Ortmann.
- * I removed the multiplexing, as wtimer does the same. (kaspar)
+ * I removed the multiplexing, as xtimer does the same. (kaspar)
  *
  * @}
  */

@@ -31,8 +31,6 @@
 #include "periph/pwm.h"
 #include "periph_conf.h"
 
-#include "hwtimer.h"
-
 /* ignore file in case no PWM devices are defined */
 #if PWM_NUMOF
 

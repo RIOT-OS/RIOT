@@ -45,7 +45,6 @@ extern "C" {
 #include "stellaris_periph/uart.h"
 #include "stellaris_periph/fpu.h"
 #include "stellaris_periph/rom.h"
-#include "hwtimer_cpu.h"
 #include "periph/uart.h"
 
 #ifdef CPU_MODEL_LM4F120H5QR

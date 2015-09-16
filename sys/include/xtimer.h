@@ -216,6 +216,18 @@ void xtimer_set_msg64(xtimer_t *timer, uint64_t offset, msg_t *msg, kernel_pid_t
 void xtimer_set_wakeup(xtimer_t *timer, uint32_t offset, kernel_pid_t pid);
 
 /**
+ * @brief Set a timer that wakes up a thread, 64bit version
+ *
+ * This function sets a timer that will wake up a thread when the timer has
+ * expired.
+ *
+ * @param[in] timer         timer struct to work with
+ * @param[in] offset        microseconds from now
+ * @param[in] pid           pid of the thread that will be woken up
+ */
+void xtimer_set_wakeup64(xtimer_t *timer, uint64_t offset, kernel_pid_t pid);
+
+/**
  * @brief Set a timer to execute a callback at some time in the future
  *
  * Expects timer->callback to be set.
@@ -314,6 +326,22 @@ int xtimer_msg_receive_timeout64(msg_t *msg, uint64_t us);
 #define XTIMER_ISR_BACKOFF 20
 #endif
 
+/*
+ * @brief   xtimer prescaler value
+ *
+ * xtimer assumes it is running with an underlying 1MHz timer.
+ * If the timer is slower by a power of two, XTIMER_SHIFT can be used to
+ * adjust the difference.
+ *
+ * This will also initialize the underlying periph timer with
+ * us_per_tick == (1<<XTIMER_SHIFT).
+ *
+ * For example, if the timer is running with 250khz, set XTIMER_SHIFT to 2.
+ */
+#ifndef XTIMER_SHIFT
+#define XTIMER_SHIFT (0)
+#endif
+
 /**
  * @brief set xtimer default timer configuration
  * @{
@@ -345,8 +373,9 @@ int xtimer_msg_receive_timeout64(msg_t *msg, uint64_t us);
  *
  * This is supposed to be defined per-device in e.g., periph_conf.h.
  */
-#define XTIMER_MASK 0
+#define XTIMER_MASK (0)
 #endif
+#define XTIMER_MASK_SHIFTED (XTIMER_MASK << XTIMER_SHIFT)
 
 #ifndef XTIMER_USLEEP_UNTIL_OVERHEAD
 /**
@@ -374,8 +403,8 @@ extern volatile uint32_t _high_cnt;
  */
 static inline uint32_t _xtimer_now(void)
 {
-#ifdef XTIMER_SHIFT
-    return timer_read(XTIMER) << XTIMER_SHIFT;
+#if XTIMER_SHIFT
+    return ((uint32_t)timer_read(XTIMER)) << XTIMER_SHIFT;
 #else
     return timer_read(XTIMER);
 #endif
@@ -386,7 +415,7 @@ static inline uint32_t _xtimer_now(void)
  */
 static inline uint32_t _mask(uint32_t val)
 {
-    return val & ~XTIMER_MASK;
+    return val & ~XTIMER_MASK_SHIFTED;
 }
 
 /**
@@ -400,23 +429,57 @@ void _xtimer_sleep(uint32_t offset, uint32_t long_offset);
 static inline void xtimer_spin_until(uint32_t value);
 /** @} */
 
+#if XTIMER_MASK
+#ifndef XTIMER_SHIFT_ON_COMPARE
+/**
+ * @brief ignore some bits when comparing timer values
+ *
+ * (only relevant when XTIMER_MASK != 0, e.g., timers < 16bit.)
+ *
+ * When combining _xtimer_now() and _high_cnt, we have to get the same value in
+ * order to work around a race between overflowing _xtimer_now() and OR'ing the
+ * resulting values.
+ * But some platforms are too slow to get the same timer
+ * value twice, so we use this define to ignore some of the bits.
+ *
+ * Use tests/xtimer_shift_on_compare to find the correct value for your MCU.
+ */
+#define XTIMER_SHIFT_ON_COMPARE     (0)
+#endif
+#endif
+
+#ifndef XTIMER_MIN_SPIN
+/**
+ * @brief Minimal value xtimer_spin() can spin
+ */
+#define XTIMER_MIN_SPIN (1<<XTIMER_SHIFT)
+#endif
+
 static inline uint32_t xtimer_now(void)
 {
 #if XTIMER_MASK
-    return _xtimer_now() | _high_cnt;
+    uint32_t a, b;
+    do {
+        a = _xtimer_now() | _high_cnt;
+        b = _xtimer_now() | _high_cnt;
+    } while ((a >> XTIMER_SHIFT_ON_COMPARE) != (b >> XTIMER_SHIFT_ON_COMPARE));
+    return b;
 #else
     return _xtimer_now();
 #endif
 }
 
 static inline void xtimer_spin_until(uint32_t value) {
+#if XTIMER_MASK
+    value = _mask(value);
+#endif
     while (_xtimer_now() > value);
     while (_xtimer_now() < value);
 }
 
 static inline void xtimer_spin(uint32_t offset) {
-    offset = _mask(offset + _xtimer_now());
-    xtimer_spin_until(offset);
+    uint32_t start = _xtimer_now();
+    while ((_xtimer_now() - start) < offset);
 }
 
 static inline void xtimer_usleep(uint32_t offset)
@@ -439,16 +502,9 @@ static inline void xtimer_nanosleep(uint32_t nanoseconds)
     _xtimer_sleep(nanoseconds/1000, 0);
 }
 
-/** @} */
-
-#if XTIMER_OVERHEAD + XTIMER_USLEEP_UNTIL_OVERHEAD > XTIMER_BACKOFF
-#warning (XTIMER_OVERHEAD + XTIMER_USLEEP_UNTIL_OVERHEAD > XTIMER_BACKOFF !!)
-#warning This will lead to underruns. Check if tests/xtimer_usleep_until runs through.
-#endif
-
-/** @} */
-
 #ifdef __cplusplus
 }
 #endif
+
+/** @} */
 #endif /* XTIMER_H */

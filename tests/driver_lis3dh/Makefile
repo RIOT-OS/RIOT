@@ -4,7 +4,7 @@ include ../Makefile.tests_common
 FEATURES_REQUIRED = periph_spi periph_gpio
 
 USEMODULE += lis3dh
-USEMODULE += vtimer
+USEMODULE += xtimer
 
 ifneq (,$(TEST_LIS3DH_SPI))
   CFLAGS += -DTEST_LIS3DH_SPI=$(TEST_LIS3DH_SPI)

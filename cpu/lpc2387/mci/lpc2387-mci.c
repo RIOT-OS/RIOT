@@ -15,13 +15,13 @@
 #include <string.h>
 #include "lpc23xx.h"
 #include "VIC.h"
-#include "hwtimer.h"
+#include "xtimer.h"
 #include "diskio.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-extern unsigned long hwtimer_now(void);
+extern unsigned long xtimer_now(void);
 
 /* --- MCI configurations --- */
 #define N_BUF       4           /* Block transfer FIFO depth (>= 2) */
@@ -334,7 +334,7 @@ static void power_on(void)
     MCI_POWER = 0x01;                   /* Power on */
 
     //for (Timer[0] = 10; Timer[0]; ) ; /* 10ms */
-    hwtimer_wait(1000);
+    xtimer_usleep(1000);
 
     MCI_POWER = 0x03;                   /* Enable signals */
 }
@@ -415,12 +415,12 @@ static int send_cmd(unsigned int idx, unsigned long arg, unsigned int rt, unsign
     MCI_COMMAND = mc;               /* Initiate command transaction */
 
     //Timer[1] = 100;
-    uint32_t timerstart = hwtimer_now();
+    uint32_t timerstart = xtimer_now();
 
     while (1) {                     /* Wait for end of the cmd/resp transaction */
 
         //if (!Timer[1]) return 0;
-        if (hwtimer_now() - timerstart > 10000) {
+        if (xtimer_now() - timerstart > 10000) {
             return 0;
         }
 
@@ -477,10 +477,10 @@ static int wait_ready(unsigned short tmr)
 {
     unsigned long rc;
 
-    uint32_t stoppoll = hwtimer_now() + tmr * 100;
+    uint32_t stoppoll = xtimer_now() + tmr * 100;
     bool bBreak = false;
 
-    while (hwtimer_now() < stoppoll/*Timer[0]*/) {
+    while (xtimer_now() < stoppoll/*Timer[0]*/) {
         if (send_cmd(CMD13, (unsigned long) CardRCA << 16, 1, &rc) && ((rc & 0x01E00) == 0x00800)) {
             bBreak = true;
             break;
@@ -535,12 +535,12 @@ DSTATUS MCI_initialize(void)
 
     power_off();
 
-    hwtimer_wait(HWTIMER_TICKS(1000));
+    xtimer_usleep(1000);
 
     power_on();                             /* Force socket power on */
     MCI_CLOCK = 0x100 | (PCLK / MCLK_ID / 2 - 1);   /* Set MCICLK = MCLK_ID */
     //for (Timer[0] = 2; Timer[0]; );
-    hwtimer_wait(250);
+    xtimer_usleep(250);
 
     send_cmd(CMD0, 0, 0, NULL);             /* Enter idle state */
     CardRCA = 0;
@@ -548,7 +548,7 @@ DSTATUS MCI_initialize(void)
     /*---- Card is 'idle' state ----*/
 
     /* Initialization timeout of 1000 msec */
-    uint32_t start = hwtimer_now();
+    uint32_t start = xtimer_now();
 
     /* SDC Ver2 */
     if (send_cmd(CMD8, 0x1AA, 1, resp) && (resp[0] & 0xFFF) == 0x1AA) {
@@ -557,7 +557,7 @@ DSTATUS MCI_initialize(void)
 
         do {                                    /* Wait while card is busy state (use ACMD41 with HCS bit) */
             /* This loop will take a time. Insert wai_tsk(1) here for multitask envilonment. */
-            if (hwtimer_now() > start + 1000000/*!Timer[0]*/) {
+            if (xtimer_now() > start + 1000000/*!Timer[0]*/) {
                 DEBUG("%s, %d: Timeout #1\n", __FILE__, __LINE__);
                 goto di_fail;
             }
@@ -582,8 +582,8 @@ DSTATUS MCI_initialize(void)
             DEBUG("%s, %d: %lX\n", __FILE__, __LINE__, resp[0]);
 
             /* This loop will take a time. Insert wai_tsk(1) here for multitask envilonment. */
-            if (hwtimer_now() > start + 1000000/*!Timer[0]*/) {
-                DEBUG("now: %lu, started at: %lu\n", hwtimer_now(), start);
+            if (xtimer_now() > start + 1000000/*!Timer[0]*/) {
+                DEBUG("now: %lu, started at: %lu\n", xtimer_now(), start);
                 DEBUG("%s, %d: Timeout #2\n", __FILE__, __LINE__);
                 goto di_fail;
             }

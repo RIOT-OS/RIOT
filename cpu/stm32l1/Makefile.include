@@ -1,8 +1,5 @@
 export CPU_ARCH = cortex-m3
 
-# use hwtimer compatibility module
-USEMODULE += hwtimer_compat
-
 # use common periph functions
 USEMODULE += periph_common
 

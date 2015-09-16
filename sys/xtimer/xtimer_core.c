@@ -26,6 +26,8 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
+static volatile int _in_handler = 0;
+
 static volatile uint32_t _long_cnt = 0;
 #if XTIMER_MASK
 volatile uint32_t _high_cnt = 0;
@@ -54,7 +56,7 @@ static inline int _is_set(xtimer_t *timer)
 void xtimer_init(void)
 {
     /* initialize low-level timer */
-    timer_init(XTIMER, 1 /* us_per_tick */, _periph_timer_callback);
+    timer_init(XTIMER, (1 << XTIMER_SHIFT) /* us_per_tick */, _periph_timer_callback);
 
     /* register initial overflow tick */
     _lltimer_set(0xFFFFFFFF);
@@ -121,9 +123,7 @@ void xtimer_set(xtimer_t *timer, uint32_t offset)
     uint32_t target = xtimer_now() + offset;
 
     if (offset < XTIMER_BACKOFF) {
-        /* spin until timer should be run */
-        xtimer_spin_until(target);
-
+        xtimer_spin(offset);
         _shoot(timer);
     }
     else {
@@ -144,6 +144,9 @@ static void _shoot(xtimer_t *timer)
 
 static inline void _lltimer_set(uint32_t target)
 {
+    if (_in_handler) {
+        return;
+    }
     DEBUG("__lltimer_set(): setting %" PRIu32 "\n", _mask(target));
 #ifdef XTIMER_SHIFT
     target >>= XTIMER_SHIFT;
@@ -164,7 +167,7 @@ int _xtimer_set_absolute(xtimer_t *timer, uint32_t target)
     timer->next = NULL;
     if ((target >= now) && ((target - XTIMER_BACKOFF) < now)) {
         /* backoff */
-        xtimer_spin_until(target);
+        xtimer_spin_until(target+XTIMER_BACKOFF);
         _shoot(timer);
         return 0;
     }
@@ -288,7 +291,7 @@ static uint32_t _time_left(uint32_t target, uint32_t reference)
 
 static inline int _this_high_period(uint32_t target) {
 #if XTIMER_MASK
-    return (target & XTIMER_MASK) == _high_cnt;
+    return (target & XTIMER_MASK_SHIFTED) == _high_cnt;
 #else
     (void)target;
     return 1;
@@ -392,7 +395,7 @@ static void _next_period(void)
 {
 #if XTIMER_MASK
     /* advance <32bit mask register */
-    _high_cnt += ~XTIMER_MASK + 1;
+    _high_cnt += ~XTIMER_MASK_SHIFTED + 1;
     if (! _high_cnt) {
         /* high_cnt overflowed, so advance >32bit counter */
         _long_cnt++;
@@ -407,7 +410,6 @@ static void _next_period(void)
     overflow_list_head = NULL;
 
     _select_long_timers();
-
 }
 
 /**
@@ -417,6 +419,8 @@ static void _timer_callback(void)
 {
     uint32_t next_target;
     uint32_t reference;
+
+    _in_handler = 1;
 
     DEBUG("_timer_callback() now=%" PRIu32 " (%" PRIu32 ")pleft=%" PRIu32 "\n", xtimer_now(),
             _mask(xtimer_now()), _mask(0xffffffff-xtimer_now()));
@@ -448,14 +452,20 @@ overflow:
     /* check if next timers are close to expiring */
     while (timer_list_head && (_time_left(_mask(timer_list_head->target), reference) < XTIMER_ISR_BACKOFF)) {
         /* make sure we don't fire too early */
-        while (_time_left(_mask(timer_list_head->target), 0));
+        while (_time_left(_mask(timer_list_head->target), reference));
 
-        xtimer_t *next = timer_list_head->next;
+        /* pick first timer in list */
+        xtimer_t *timer = timer_list_head;
 
-        _shoot(timer_list_head);
+        /* advance list */
+        timer_list_head = timer->next;
 
-        /* advance to next timer in list */
-        timer_list_head = next;
+        /* make sure timer is recognized as being already fired */
+        timer->target = 0;
+        timer->long_target = 0;
+
+        /* fire timer */
+        _shoot(timer);
     }
 
     /* possibly executing all callbacks took enough
@@ -496,6 +506,8 @@ overflow:
             }
         }
     }
+
+    _in_handler = 0;
 
     /* set low level timer */
     _lltimer_set(next_target);

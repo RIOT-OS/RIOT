@@ -5,4 +5,5 @@ FEATURES_PROVIDED += periph_pwm
 FEATURES_PROVIDED += periph_i2c
 FEATURES_PROVIDED += periph_spi
 FEATURES_PROVIDED += periph_cpuid
+FEATURES_PROVIDED += periph_timer
 FEATURES_MCU_GROUP = cortex_m4

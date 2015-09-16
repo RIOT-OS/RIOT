@@ -1,14 +1,12 @@
-APPLICATION = xtimer_sleep_until
+APPLICATION = xtimer_shift_on_compare
 include ../Makefile.tests_common
+
+BOARD_WHITELIST += msb-430h arduino-mega2560
 
 BOARD ?= native
 RIOTBASE ?= $(CURDIR)/../..
 
-BOARD_INSUFFICIENT_MEMORY := chronos
-
 FEATURES_REQUIRED += periph_timer
 USEMODULE += xtimer
-
-CFLAGS += -DNUMOF=200
 
 include $(RIOTBASE)/Makefile.include

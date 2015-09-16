@@ -26,7 +26,7 @@
 
 #include "cpu.h"
 #include "board.h"
-#include "vtimer.h"
+#include "xtimer.h"
 #include "periph/pwm.h"
 #include "servo.h"
 
@@ -74,7 +74,7 @@ int main(void)
             step = -step;
         }
 
-        vtimer_usleep(WAIT);
+        xtimer_usleep(WAIT);
     }
 
     return 0;

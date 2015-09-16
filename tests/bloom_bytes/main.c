@@ -22,7 +22,7 @@
 #include <string.h>
 #include <inttypes.h>
 
-#include "hwtimer.h"
+#include "xtimer.h"
 
 #include "hashes.h"
 #include "bloom.h"
@@ -48,7 +48,7 @@ static void buf_fill(uint32_t *buf, int len)
 
 int main(void)
 {
-    hwtimer_init();
+    xtimer_init();
 
     bloom_t *bloom = bloom_new(1 << 12, 8, fnv_hash, sax_hash, sdbm_hash,
                                       djb2_hash, kr_hash, dek_hash, rotating_hash, one_at_a_time_hash);
@@ -59,7 +59,7 @@ int main(void)
 
     genrand_init(myseed);
 
-    unsigned long t1 = hwtimer_now();
+    unsigned long t1 = xtimer_now();
 
     for (int i = 0; i < lenB; i++) {
         buf_fill(buf, BUF_SIZE);
@@ -69,14 +69,14 @@ int main(void)
                   BUF_SIZE * sizeof(uint32_t) / sizeof(uint8_t));
     }
 
-    unsigned long t2 = hwtimer_now();
+    unsigned long t2 = xtimer_now();
     printf("adding %d elements took %" PRIu32 "ms\n", lenB,
-           (uint32_t) HWTIMER_TICKS_TO_US(t2 - t1) / 1000);
+           (uint32_t) (t2 - t1) / 1000);
 
     int in = 0;
     int not_in = 0;
 
-    unsigned long t3 = hwtimer_now();
+    unsigned long t3 = xtimer_now();
 
     for (int i = 0; i < lenA; i++) {
         buf_fill(buf, BUF_SIZE);
@@ -92,9 +92,9 @@ int main(void)
         }
     }
 
-    unsigned long t4 = hwtimer_now();
+    unsigned long t4 = xtimer_now();
     printf("checking %d elements took %" PRIu32 "ms\n", lenA,
-           (uint32_t) HWTIMER_TICKS_TO_US(t4 - t3) / 1000);
+           (uint32_t) (t4 - t3) / 1000);
 
     printf("\n");
     printf("%d elements probably in the filter.\n", in);

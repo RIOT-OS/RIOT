@@ -22,28 +22,35 @@
 #include "xtimer.h"
 #include "periph_conf.h"
 
-#define NUMOF 1000
+#ifndef NUMOF
+#define NUMOF   (256)
+#endif
 
-uint32_t res[NUMOF];
+int32_t res[NUMOF];
 
 int main(void)
 {
     puts("xtimer_usleep_until test application.\n");
 
-    uint32_t interval = 1000;
+    uint32_t interval = NUMOF;
 
     for (int i = 0; i < NUMOF; i++) {
-        printf("Testing interval %u...\n", (unsigned)interval);
+        printf("Testing interval %u... (now=%"PRIu32")\n", (unsigned)interval, xtimer_now());
         uint32_t last_wakeup = xtimer_now();
         uint32_t before = last_wakeup;
         xtimer_usleep_until(&last_wakeup, (unsigned)interval);
-        uint32_t diff = (xtimer_now()-before)-interval;
-        res[i] = diff;
+        res[i] = (xtimer_now()-before)-interval;
         interval -= 1;
     }
 
     for (int i = 0; i < NUMOF; i++) {
-        printf("%4d diff=%i\n", i, (int)res[i]);
+        printf("%4d diff=%"PRIi32"\n", NUMOF-i, res[i]);
+
+        if (res[i] < -1000 || res[i] > 1000) {
+            puts("too large difference.\n");
+            puts("Test Failed.\n");
+            return 1;
+        }
     }
 
     printf("\nTest complete.\n");

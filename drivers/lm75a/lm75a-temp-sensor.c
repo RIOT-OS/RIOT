@@ -31,14 +31,12 @@
 #include <math.h>
 #include "msg.h"
 #include "thread.h"
-#include "vtimer.h"
-#include "timex.h"
 #include "lpc2387.h"
 #include "gpioint.h"
 #include "i2c.h"
 #include "lm75a-temp-sensor.h"
-#include "hwtimer.h"
 #include "board.h"
+#include "xtimer.h"
 
 //declaration as volatile is important, otherwise no interrupt is triggered.
 volatile bool my_alarm = false;
@@ -310,8 +308,8 @@ void lm75A_start_sensor_sampling(void (*handler)(void))
             handler();
             my_alarm = false;
         }
-        hwtimer_wait(HWTIMER_TICKS(100000));
+        xtimer_usleep(100000);
         LED_RED_TOGGLE;
-        hwtimer_wait(HWTIMER_TICKS(100000));
+        xtimer_usleep(100000);
     }
 }
