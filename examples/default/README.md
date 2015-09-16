@@ -37,46 +37,39 @@ Example output
 The shell commands come with online help. Call `help` to see which commands
 exist and what they do.
 
-Running the `help` command on an msba2:
+Running the `help` command on an iotlab-m3:
 ```
-2014-05-06 13:14:38,508 - INFO # > help
-2014-05-06 13:14:38,511 - INFO # Command              Description
-2014-05-06 13:14:38,515 - INFO # ---------------------------------------
-2014-05-06 13:14:38,518 - INFO # reboot               Reboot the node
-2014-05-06 13:14:38,522 - INFO # id                   Gets or sets the node's id.
-2014-05-06 13:14:38,529 - INFO # heap                 Shows the heap state for the LPC2387 on the command shell.
-2014-05-06 13:14:38,535 - INFO # ps                   Prints information about running threads.
-2014-05-06 13:14:38,544 - INFO # temp                 Prints measured temperature.
-2014-05-06 13:14:38,548 - INFO # hum                  Prints measured humidity.
-2014-05-06 13:14:38,553 - INFO # weather              Prints measured humidity and temperature.
-2014-05-06 13:14:38,557 - INFO # offset               Set temperature offset.
-2014-05-06 13:14:38,598 - INFO # dread_sec            Reads the specified sector of inserted memory card
-2014-05-06 13:14:38,605 - INFO # dread                Reads the specified bytes from inserted memory card
-2014-05-06 13:14:38,610 - INFO # dget_ssize           Get the sector size of inserted memory card
-2014-05-06 13:14:38,616 - INFO # dget_scount          Get the sector count of inserted memory card
-2014-05-06 13:14:38,622 - INFO # dget_bsize           Get the block size of inserted memory card
-2014-05-06 13:14:38,625 - INFO # mersenne_init        initializes the PRNG
-2014-05-06 13:14:38,630 - INFO # mersenne_get         returns 32 bit of pseudo randomness
-2015-03-09 21:09:52,124 - INFO # rtc                  control RTC peripheral interface.
+2015-09-16 16:57:17,723 - INFO # help
+2015-09-16 16:57:17,725 - INFO # Command              Description
+2015-09-16 16:57:17,726 - INFO # ---------------------------------------
+2015-09-16 16:57:17,727 - INFO # reboot               Reboot the node
+2015-09-16 16:57:17,729 - INFO # ps                   Prints information about running threads.
+2015-09-16 16:57:17,731 - INFO # isl29020_init        Initializes the isl29020 sensor driver.
+2015-09-16 16:57:17,733 - INFO # isl29020_read        Prints data from the isl29020 sensor.
+2015-09-16 16:57:17,735 - INFO # lps331ap_init        Initializes the lps331ap sensor driver.
+2015-09-16 16:57:17,737 - INFO # lps331ap_read        Prints data from the lps331ap sensor.
+2015-09-16 16:57:17,739 - INFO # l3g4200d_init        Initializes the l3g4200d sensor driver.
+2015-09-16 16:57:17,740 - INFO # l3g4200d_read        Prints data from the l3g4200d sensor.
+2015-09-16 16:57:17,742 - INFO # lsm303dlhc_init      Initializes the lsm303dlhc sensor driver.
+2015-09-16 16:57:17,744 - INFO # lsm303dlhc_read      Prints data from the lsm303dlhc sensor.
+2015-09-16 16:57:17,746 - INFO # ifconfig             Configure network interfaces
+2015-09-16 16:57:17,747 - INFO # txtsnd               send raw data
 ```
 
-Running the `ps` command on an msba2:
+Running the `ps` command on an iotlab-m3:
 
 ```
-2014-05-09 17:38:33,388 - INFO # > ps
-2014-05-09 17:38:33,394 - INFO #    pid | name                 | state    Q | pri | stack ( used) location
-2014-05-09 17:38:33,401 - INFO #      0 | idle                 | pending  Q |  31 |   160 (  148) 0x40000014
-2014-05-09 17:38:33,407 - INFO #      1 | main                 | running  Q |  15 |  2560 (  848) 0x400000b4
-2014-05-09 17:38:33,431 - INFO #        | SUM                  |            |     |  4256
+2015-09-16 16:57:57,634 - INFO # ps
+2015-09-16 16:57:57,637 - INFO #    pid | name                 | state    Q | pri | stack ( used) | location   
+2015-09-16 16:57:57,640 - INFO #      1 | idle                 | pending  Q |  15 |   256 (  140) | 0x20000200 
+2015-09-16 16:57:57,642 - INFO #      2 | main                 | pending  Q |   7 |  1536 (  640) | 0x20000300 
+2015-09-16 16:57:57,645 - INFO #      3 | pktdump              | bl rx    _ |   6 |  1536 (  544) | 0x200025e0 
+2015-09-16 16:57:57,647 - INFO #      4 | at86rfxx             | bl rx    _ |   3 |  1024 (  360) | 0x2000099c 
+2015-09-16 16:57:57,649 - INFO #        | SUM                  |            |     |  4352 ( 1684)
 ```
 
 RIOT specific
 =============
-
-The `id` command sets or gets the node's id. It can be used to
-identify a node. Boards that support the `config` module will write
-the id to a persistent memory location so the node keeps it across
-reboots.
 
 The `ps` command is used to analyze the thread's state and memory
 status.
@@ -85,4 +78,33 @@ status.
 Networking
 ==========
 
-(networking is being reworked, stay tuned!)
+The `ifconfig` command will help you to configure all available network
+interfaces. On an iolab-m3 it will print something like:
+```
+2015-09-16 16:58:37,762 - INFO # ifconfig
+2015-09-16 16:58:37,766 - INFO # Iface  4   HWaddr: 9e:72  Channel: 26  NID: 0x23  TX-Power: 0dBm  State: IDLE CSMA Retries: 4 
+2015-09-16 16:58:37,768 - INFO #            Long HWaddr: 36:32:48:33:46:da:9e:72 
+2015-09-16 16:58:37,769 - INFO #            AUTOACK  CSMA  
+2015-09-16 16:58:37,770 - INFO #            Source address length: 2
+```
+
+Type `ifconfig help` to get an online help for all available options (e.g.
+setting the radio channel via `ifconfig 4 set chan 12`).
+
+The `txtsnd` command allows you to send a simple string directly over the link
+layer using unicast or broadcast. The application will also automatically print
+information about any received packet over the serial. This will look like:
+```
+2015-09-16 16:59:29,187 - INFO # PKTDUMP: data received:
+2015-09-16 16:59:29,189 - INFO # ~~ SNIP  0 - size:  28 byte, type:
+NETTYPE_UNDEF (0)
+2015-09-16 16:59:29,190 - INFO # 000000 7b 3b 3a 02 85 00 e7 fb 00 00 00 00 01
+02 5a 55
+2015-09-16 16:59:29,192 - INFO # 000010 40 42 3e 62 f2 1a 00 00 00 00 00 00
+2015-09-16 16:59:29,194 - INFO # ~~ SNIP  1 - size:  18 byte, type:
+NETTYPE_NETIF (-1)
+2015-09-16 16:59:29,195 - INFO # if_pid: 4  rssi: 49  lqi: 78
+2015-09-16 16:59:29,196 - INFO # src_l2addr: 5a:55:40:42:3e:62:f2:1a
+2015-09-16 16:59:29,197 - INFO # dst_l2addr: ff:ff
+2015-09-16 16:59:29,198 - INFO # ~~ PKT    -  2 snips, total size:  46 byte
+```
