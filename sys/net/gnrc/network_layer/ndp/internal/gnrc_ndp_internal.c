@@ -677,6 +677,9 @@ bool gnrc_ndp_internal_pi_opt_handle(kernel_pid_t iface, uint8_t icmpv6_type,
             DEBUG("ndp: could not add prefix to interface %d\n", iface);
             return false;
         }
+#ifdef MODULE_GNRC_SIXLOWPAN_ND_ROUTER
+        gnrc_sixlowpan_nd_router_set_rtr_adv(gnrc_ipv6_netif_get(iface), true);
+#endif
     }
     netif_addr = gnrc_ipv6_netif_addr_get(prefix);
     if (pi_opt->valid_ltime.u32 == 0) {
