@@ -97,7 +97,8 @@ gnrc_pktsnip_t *gnrc_pktbuf_mark(gnrc_pktsnip_t *pkt, size_t size, gnrc_nettype_
     if ((size == 0) || (pkt == NULL) || (size > pkt->size) || (pkt->data == NULL)) {
         DEBUG("pktbuf: size == 0 (was %u) or pkt == NULL (was %p) or "
               "size > pkt->size (was %u) or pkt->data == NULL (was %p)\n",
-              (unsigned)size, (void *)pkt, (unsigned)pkt->size, pkt->data);
+              (unsigned)size, (void *)pkt, (pkt ? (unsigned)pkt->size : 0),
+              (pkt ? pkt->data : NULL));
         mutex_unlock(&_mutex);
         return NULL;
     }
