@@ -312,7 +312,8 @@ uint8_t gnrc_sixlowpan_nd_opt_ar_handle(kernel_pid_t iface, ipv6_hdr_t *ipv6, ui
             if ((nc_entry != NULL) &&
                 ((gnrc_ipv6_nc_get_type(nc_entry) == GNRC_IPV6_NC_TYPE_REGISTERED) ||
                  (gnrc_ipv6_nc_get_type(nc_entry) == GNRC_IPV6_NC_TYPE_TENTATIVE)) &&
-                (ar_opt->eui64.uint64.u64 != nc_entry->eui64.uint64.u64)) {
+                ((nc_entry->eui64.uint64.u64 != 0) &&
+                 (ar_opt->eui64.uint64.u64 != nc_entry->eui64.uint64.u64))) {
                 /* there is already another node with this address */
                 DEBUG("6lo nd: duplicate address detected\n");
                 status = SIXLOWPAN_ND_STATUS_DUP;
