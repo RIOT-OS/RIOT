@@ -11,6 +11,19 @@ export USEMODULE += newlib
 # set default for CPU_MODEL
 export CPU_MODEL ?= $(CPU)
 
+# Temporary LLVM/Clang Workaround:
+# report cortex-m0 instead of cortex-m0plus if llvm/clang (<= 3.6.2) is used
+# llvm/clang version 3.6.2 still does not support the cortex-m0plus mcpu type
+ifeq (llvm,$(TOOLCHAIN))
+ifeq (cortex-m0plus,$(CPU_ARCH))
+LLVM_UNSUP = $(shell clang -target arm-none-eabi -mcpu=$(CPU_ARCH) -c -x c /dev/null -o /dev/null \
+                     > /dev/null 2>&1 || echo 1 )
+ifeq (1,$(LLVM_UNSUP))
+CPU_ARCH = cortex-m0
+endif
+endif
+endif
+
 # export the CPU model and architecture
 MODEL = $(shell echo $(CPU_MODEL) | tr 'a-z' 'A-Z')
 export CFLAGS += -DCPU_MODEL_$(MODEL)
