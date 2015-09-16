@@ -583,7 +583,6 @@ void gnrc_ndp_rtr_adv_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt, ipv6_hdr_t
     _stale_nc(iface, &ipv6->src, l2src, l2src_len);
 #ifdef MODULE_NG_SIXLOWPAN_ND
     if (if_entry->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN) {
-        timex_t t = { 0, GNRC_NDP_RETRANS_TIMER };
         /* stop multicast router solicitation retransmission timer */
         vtimer_remove(&if_entry->rtr_sol_timer);
         /* 3/4 of the time should be "well before" enough the respective timeout
@@ -594,12 +593,9 @@ void gnrc_ndp_rtr_adv_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt, ipv6_hdr_t
          * "In all cases, the RS retransmissions are terminated when an RA is
          *  received."
          *  Hence, reset router solicitation counter and reset timer. */
-        &nc_entry->rtr_sol_count = 0;
+        if_entry->rtr_sol_count = 0;
         gnrc_sixlowpan_nd_rtr_sol_reschedule(nc_entry, next_rtr_sol);
-        gnrc_ndp_internal_send_nbr_sol(ifs[i], &nc_entry->ipv6_addr, &nc_entry->ipv6_addr);
-        vtimer_remove(&nc_entry->nbr_sol_timer);
-        vtimer_set_msg(&nc_entry->nbr_sol_timer, t, gnrc_ipv6_pid, GNRC_NDP_MSG_NBR_SOL_RETRANS,
-                       nc_entry);
+        gnrc_ndp_internal_send_nbr_sol(nc_entry->iface, &nc_entry->ipv6_addr, &nc_entry->ipv6_addr);
     }
 #endif
 }
