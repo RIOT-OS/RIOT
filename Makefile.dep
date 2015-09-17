@@ -6,6 +6,13 @@ ifneq (,$(filter pnet,$(USEMODULE)))
     USEMODULE += vtimer
 endif
 
+ifneq (,$(filter nhdp,$(USEMODULE)))
+  USEMODULE += conn_udp
+  USEMODULE += vtimer
+  USEMODULE += oonf_common
+  USEMODULE += oonf_rfc5444
+endif
+
 ifneq (,$(filter gnrc_%,$(filter-out gnrc_netapi gnrc_netreg gnrc_netif% gnrc_pktbuf,$(USEMODULE))))
   USEMODULE += gnrc
 endif
@@ -292,12 +299,6 @@ endif
 
 ifneq (,$(filter libfixmath-unittests,$(USEMODULE)))
   USEPKG += libfixmath
-endif
-
-ifneq (,$(filter nhdp,$(USEMODULE)))
-  USEMODULE += vtimer
-  USEMODULE += oonf_common
-  USEMODULE += oonf_rfc5444
 endif
 
 ifneq (,$(filter fib,$(USEMODULE)))
