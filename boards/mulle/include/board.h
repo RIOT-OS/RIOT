@@ -33,12 +33,6 @@
 #define DISABLE_WDOG    1
 
 /**
- * @name Number of subsequent channels of the PIT to assign to the RIOT hardware
- * timer library, starting after the HW_TIMER above.
- */
-#define HW_TIMERS_COUNT      1
-
-/**
  * @name Define UART device and baudrate for stdio
  * @{
  */
