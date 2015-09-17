@@ -1,7 +1,7 @@
-From e590e6f26b115da34a943fd4ed6d4c93fd2c64d0 Mon Sep 17 00:00:00 2001
+From d02b58b3cdd26c92f01e812cc1f6cf25703b7431 Mon Sep 17 00:00:00 2001
 From: Hinnerk van Bruinehsen <h.v.bruinehsen@fu-berlin.de>
 Date: Wed, 29 Oct 2014 12:05:11 +0100
-Subject: [PATCH] Dissolve enum into single defines
+Subject: [PATCH 08/10] Dissolve enum into single defines
 
 ---
  src-api/rfc5444/rfc5444.h | 26 ++++++++++++--------------
@@ -50,4 +50,4 @@ index c5d6420..6b5576e 100644
  EXPORT uint8_t rfc5444_timetlv_get_from_vector(
      uint8_t *vector, size_t vector_length, uint8_t hopcount);
 --
-2.1.2
+1.9.1

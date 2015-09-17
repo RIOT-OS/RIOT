@@ -1,7 +1,7 @@
-From 21202804f26b194607a412476a96f03d3df30688 Mon Sep 17 00:00:00 2001
+From 998e5800bedae1d1fb3fddd369ae92ae915ec7fa Mon Sep 17 00:00:00 2001
 From: Hinnerk van Bruinehsen <h.v.bruinehsen@fu-berlin.de>
 Date: Wed, 29 Oct 2014 12:11:29 +0100
-Subject: [PATCH 9/9] Add missing include
+Subject: [PATCH 09/10] Add missing include
 
 ---
  src-api/rfc5444/rfc5444_tlv_writer.h | 1 +
@@ -20,4 +20,4 @@ index ace7313..8d0ce3a 100644
  struct rfc5444_tlv_writer_data {
    uint8_t *buffer;
 --
-2.1.2
+1.9.1
