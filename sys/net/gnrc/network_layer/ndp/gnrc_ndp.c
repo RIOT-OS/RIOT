@@ -610,9 +610,9 @@ void gnrc_ndp_rtr_adv_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt, ipv6_hdr_t
          * "In all cases, the RS retransmissions are terminated when an RA is
          *  received."
          *  Hence, reset router solicitation counter and reset timer. */
-        &nc_entry->rtr_sol_count = 0;
+        if_entry->rtr_sol_count = 0;
         gnrc_sixlowpan_nd_rtr_sol_reschedule(nc_entry, next_rtr_sol);
-        gnrc_ndp_internal_send_nbr_sol(ifs[i], &nc_entry->ipv6_addr, &nc_entry->ipv6_addr);
+        gnrc_ndp_internal_send_nbr_sol(if_entry->pid, &nc_entry->ipv6_addr, &nc_entry->ipv6_addr);
         vtimer_remove(&nc_entry->nbr_sol_timer);
         vtimer_set_msg(&nc_entry->nbr_sol_timer, t, gnrc_ipv6_pid, GNRC_NDP_MSG_NBR_SOL_RETRANS,
                        nc_entry);
