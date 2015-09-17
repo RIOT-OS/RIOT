@@ -1,7 +1,7 @@
 From e53472f0a5f15d2459bf9a9ef40d2b302bb80f8b Mon Sep 17 00:00:00 2001
 From: Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
 Date: Tue, 15 Jul 2014 16:57:07 +0200
-Subject: [PATCH 3/8] Remove two example programs in root
+Subject: [PATCH 3/9] Remove two example programs in root
 
 ---
  coap-observer.c | 185 -----------------------------------------------

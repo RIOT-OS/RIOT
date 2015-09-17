@@ -1,0 +1,36 @@
+From 4e065c420056a5416d9d4b00439042d7adcefddb Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Cenk=20G=C3=BCndo=C4=9Fan?= <cnkgndgn@gmail.com>
+Date: Wed, 16 Sep 2015 19:02:09 +0200
+Subject: [PATCH 9/9] delete unused function check_opt_size
+
+---
+ net.c | 14 --------------
+ 1 file changed, 14 deletions(-)
+
+diff --git a/net.c b/net.c
+index 0b8c99e..18f39a7 100644
+--- a/net.c
++++ b/net.c
+@@ -817,20 +817,6 @@ coap_retransmit( coap_context_t *context, coap_queue_t *node ) {
+   return COAP_INVALID_TID;
+ }
+
+-/**
+- * Checks if @p opt fits into the message that ends with @p maxpos.
+- * This function returns @c 1 on success, or @c 0 if the option @p opt
+- * would exceed @p maxpos.
+- */
+-static inline int
+-check_opt_size(coap_opt_t *opt, unsigned char *maxpos) {
+-  if (opt && opt < maxpos) {
+-    if (((*opt & 0x0f) < 0x0f) || (opt + 1 < maxpos))
+-      return opt + COAP_OPT_SIZE(opt) < maxpos;
+-  }
+-  return 0;
+-}
+-
+ int
+ coap_read( coap_context_t *ctx ) {
+ #ifdef WITH_POSIX
+--
+2.5.2
