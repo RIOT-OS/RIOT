@@ -23,7 +23,9 @@
 #define PERIPH_CONF_H_
 
 #include <stdint.h>
+
 #include "cpu.h"
+#include "periph_cpu.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -101,19 +103,21 @@ extern "C" {
  * @name UART configuration
  * @{
  */
-#define UART_NUMOF          (1U)
+/* deprecated UART enable defines (to be removed) */
+#define UART_NUMOF          (2U)
 #define UART_0_EN           1
-#define UART_IRQ_PRIO       1
+#define UART_1_EN           1
 
-/* UART 0 device configuration */
-#define UART_0_DEV          SERCOM0->USART
-#define UART_0_IRQ          SERCOM0_IRQn
+/* UART device configuration */
+static const uart_conf_t uart_config[] = {
+    /* device, RX pin, TX pin, mux */
+    {&SERCOM0->USART, GPIO(PA,5), GPIO(PA,4), GPIO_MUX_D},
+    {&SERCOM5->USART, GPIO(PA,23), GPIO(PA,22), GPIO_MUX_D},
+};
+
+/* interrupt function name mapping */
 #define UART_0_ISR          isr_sercom0
-/* UART 0 pin configuration */
-#define UART_0_PORT         (PORT->Group[0])
-#define UART_0_TX_PIN       (4)
-#define UART_0_RX_PIN       (5)
-#define UART_0_PINS         (PORT_PA04 | PORT_PA05)
+#define UART_1_ISR          isr_sercom5
 /** @} */
 
 /**
