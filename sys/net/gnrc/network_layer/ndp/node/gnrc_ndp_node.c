@@ -166,7 +166,7 @@ kernel_pid_t gnrc_ndp_node_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_len,
             size_t ifnum = gnrc_netif_get(ifs);
 
             for (size_t i = 0; i < ifnum; i++) {
-                gnrc_ndp_internal_send_nbr_sol(ifs[i], next_hop_ip, &dst_sol);
+                gnrc_ndp_internal_send_nbr_sol(ifs[i], NULL, next_hop_ip, &dst_sol);
             }
 
             vtimer_remove(&nc_entry->nbr_sol_timer);
@@ -176,7 +176,7 @@ kernel_pid_t gnrc_ndp_node_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_len,
         else {
             gnrc_ipv6_netif_t *ipv6_iface = gnrc_ipv6_netif_get(iface);
 
-            gnrc_ndp_internal_send_nbr_sol(iface, next_hop_ip, &dst_sol);
+            gnrc_ndp_internal_send_nbr_sol(iface, NULL, next_hop_ip, &dst_sol);
 
             mutex_lock(&ipv6_iface->mutex);
             vtimer_remove(&nc_entry->nbr_sol_timer);

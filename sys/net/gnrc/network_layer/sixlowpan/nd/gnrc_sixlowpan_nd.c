@@ -273,7 +273,10 @@ uint8_t gnrc_sixlowpan_nd_opt_ar_handle(kernel_pid_t iface, ipv6_hdr_t *ipv6, ui
             switch (ar_opt->status) {
                 case SIXLOWPAN_ND_STATUS_SUCCESS:
                     DEBUG("6lo nd: address registration successful\n");
+                    ipv6_addr_t *netif_addr_entry = gnrc_ipv6_netif_find_addr(iface, &(ipv6->dst));
+                    gnrc_ipv6_netif_addr_t *netif_addr = gnrc_ipv6_netif_addr_get(netif_addr_entry);
                     mutex_lock(&ipv6_iface->mutex);
+                    netif_addr->flags &= ~GNRC_IPV6_NETIF_ADDR_FLAGS_TENTATIVE;
                     /* reschedule 1 minute before lifetime expires */
                     timex_t t = { (uint32_t)(byteorder_ntohs(ar_opt->ltime) - 1) * 60, 0 };
                     vtimer_remove(&nc_entry->nbr_sol_timer);
@@ -377,7 +380,7 @@ void gnrc_sixlowpan_nd_wakeup(void)
         timex_t t = { 0, GNRC_NDP_RETRANS_TIMER };
         vtimer_remove(&router->rtr_sol_timer);
         gnrc_sixlowpan_nd_uc_rtr_sol(router);
-        gnrc_ndp_internal_send_nbr_sol(router->iface, &router->ipv6_addr, &router->ipv6_addr);
+        gnrc_ndp_internal_send_nbr_sol(router->iface, NULL, &router->ipv6_addr, &router->ipv6_addr);
         vtimer_remove(&router->nbr_sol_timer);
         vtimer_set_msg(&router->nbr_sol_timer, t, gnrc_ipv6_pid, GNRC_NDP_MSG_NBR_SOL_RETRANS,
                        router);

@@ -120,6 +120,7 @@ extern "C" {
  */
 #define GNRC_IPV6_NETIF_ADDR_FLAGS_UNICAST      (0x00)  /**< unicast address */
 #define GNRC_IPV6_NETIF_ADDR_FLAGS_NON_UNICAST  (0x01)  /**< non-unicast address */
+#define GNRC_IPV6_NETIF_ADDR_FLAGS_TENTATIVE    (0x02)  /**< address is not fully registered yet */
 
 /**
  * @brief   A prefix information option that propagates the prefix of this
