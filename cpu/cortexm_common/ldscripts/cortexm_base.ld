@@ -54,15 +54,18 @@ SECTIONS
         . = ALIGN(4);
         KEEP(*(.init))
         . = ALIGN(4);
-        __preinit_array_start = .;
-        KEEP (*(.preinit_array))
-        __preinit_array_end = .;
+        /* preinit data */
+        PROVIDE_HIDDEN (__preinit_array_start = .);
+        KEEP(*(SORT(.preinit_array.*)))
+        KEEP(*(.preinit_array))
+        PROVIDE_HIDDEN (__preinit_array_end = .);
 
         . = ALIGN(4);
-        __init_array_start = .;
-        KEEP (*(SORT(.init_array.*)))
-        KEEP (*(.init_array))
-        __init_array_end = .;
+        /* init data */
+        PROVIDE_HIDDEN (__init_array_start = .);
+        KEEP(*(SORT(.init_array.*)))
+        KEEP(*(.init_array))
+        PROVIDE_HIDDEN (__init_array_end = .);
 
         . = ALIGN(0x4);
         KEEP (*crtbegin.o(.ctors))
@@ -74,10 +77,11 @@ SECTIONS
         KEEP(*(.fini))
 
         . = ALIGN(4);
-        __fini_array_start = .;
-        KEEP (*(.fini_array))
-        KEEP (*(SORT(.fini_array.*)))
-        __fini_array_end = .;
+        /* fini data */
+        PROVIDE_HIDDEN (__fini_array_start = .);
+        KEEP(*(SORT(.fini_array.*)))
+        KEEP(*(.fini_array))
+        PROVIDE_HIDDEN (__fini_array_end = .);
 
         KEEP (*crtbegin.o(.dtors))
         KEEP (*(EXCLUDE_FILE (*crtend.o) .dtors))
