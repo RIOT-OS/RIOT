@@ -95,17 +95,6 @@ static void _slip_rx_cb(void *arg, char data)
     }
 }
 
-int _slip_tx_cb(void *arg)
-{
-    if (_SLIP_DEV(arg)->out_buf.avail > 0) {
-        char c = (char)ringbuffer_get_one(&_SLIP_DEV(arg)->out_buf);
-        uart_write((uart_t)(_SLIP_DEV(arg)->uart), c);
-        return 1;
-    }
-
-    return 0;
-}
-
 /* SLIP receive handler */
 static void _slip_receive(gnrc_slip_dev_t *dev, size_t bytes)
 {
@@ -158,8 +147,7 @@ static void _slip_receive(gnrc_slip_dev_t *dev, size_t bytes)
 
 static inline void _slip_send_char(gnrc_slip_dev_t *dev, char c)
 {
-    ringbuffer_add_one(&dev->out_buf, c);
-    uart_tx_begin(dev->uart);
+    uart_write_blocking(dev->uart, c);
 }
 
 /* SLIP send handler */
@@ -257,12 +245,11 @@ kernel_pid_t gnrc_slip_init(gnrc_slip_dev_t *dev, uart_t uart, uint32_t baudrate
 
     /* initialize buffers */
     ringbuffer_init(&dev->in_buf, dev->rx_mem, sizeof(dev->rx_mem));
-    ringbuffer_init(&dev->out_buf, dev->tx_mem, sizeof(dev->tx_mem));
 
     /* initialize UART */
     DEBUG("slip: initialize UART_%d with baudrate %" PRIu32 "\n", uart,
           baudrate);
-    if (uart_init(uart, baudrate, _slip_rx_cb, _slip_tx_cb, dev) < 0) {
+    if (uart_init(uart, baudrate, _slip_rx_cb, NULL, dev) < 0) {
         DEBUG("slip: error initializing UART_%i with baudrate %" PRIu32 "\n",
               uart, baudrate);
         return -ENODEV;
