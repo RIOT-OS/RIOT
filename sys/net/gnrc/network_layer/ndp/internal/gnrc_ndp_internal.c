@@ -127,7 +127,7 @@ void gnrc_ndp_internal_set_state(gnrc_ipv6_nc_t *nc_entry, uint8_t state)
                   ipv6_iface->retrans_timer.seconds,
                   ipv6_iface->retrans_timer.microseconds);
 
-            gnrc_ndp_internal_send_nbr_sol(nc_entry->iface, &nc_entry->ipv6_addr,
+            gnrc_ndp_internal_send_nbr_sol(nc_entry->iface, NULL, &nc_entry->ipv6_addr,
                                            &nc_entry->ipv6_addr);
 
             mutex_lock(&ipv6_iface->mutex);
@@ -228,7 +228,7 @@ void gnrc_ndp_internal_send_nbr_adv(kernel_pid_t iface, ipv6_addr_t *tgt, ipv6_a
     }
 }
 
-void gnrc_ndp_internal_send_nbr_sol(kernel_pid_t iface, ipv6_addr_t *tgt,
+void gnrc_ndp_internal_send_nbr_sol(kernel_pid_t iface, ipv6_addr_t *src, ipv6_addr_t *tgt,
                                     ipv6_addr_t *dst)
 {
 #ifdef MODULE_GNRC_SIXLOWPAN_ND
@@ -236,19 +236,22 @@ void gnrc_ndp_internal_send_nbr_sol(kernel_pid_t iface, ipv6_addr_t *tgt,
     assert(ipv6_iface != NULL);
 #endif
     gnrc_pktsnip_t *hdr, *pkt = NULL;
-    ipv6_addr_t *src = NULL;
     /* both suppressions, since they are needed in the MODULE_GNRC_SIXLOWPAN_ND branch */
     /* cppcheck-suppress variableScope */
     uint8_t l2src[8];
     /* cppcheck-suppress variableScope */
     size_t l2src_len = 0;
 
-    DEBUG("ndp internal: send neighbor solicitation (iface: %" PRIkernel_pid ", tgt: %s, ",
-          iface, ipv6_addr_to_str(addr_str, tgt, sizeof(addr_str)));
+    DEBUG("ndp internal: send neighbor solicitation (iface: %" PRIkernel_pid ", src: %s, ",
+           ipv6_addr_to_str(addr_str, src, sizeof(addr_str)));
+    DEBUG(" tgt: %s, ", ipv6_addr_to_str(addr_str, tgt, sizeof(addr_str)));
     DEBUG("dst: %s)\n", ipv6_addr_to_str(addr_str, dst, sizeof(addr_str)));
 
     /* check if there is a fitting source address to target */
-    if ((src = gnrc_ipv6_netif_find_best_src_addr(iface, tgt)) != NULL) {
+    if (src == NULL) {
+        src = gnrc_ipv6_netif_find_best_src_addr(iface, tgt);
+    }
+    if (src != NULL) {
         l2src_len = _get_l2src(iface, l2src, sizeof(l2src));
 
         if (l2src_len > 0) {

@@ -377,7 +377,7 @@ void gnrc_sixlowpan_nd_wakeup(void)
         timex_t t = { 0, GNRC_NDP_RETRANS_TIMER };
         vtimer_remove(&router->rtr_sol_timer);
         gnrc_sixlowpan_nd_uc_rtr_sol(router);
-        gnrc_ndp_internal_send_nbr_sol(router->iface, &router->ipv6_addr, &router->ipv6_addr);
+        gnrc_ndp_internal_send_nbr_sol(router->iface, NULL, &router->ipv6_addr, &router->ipv6_addr);
         vtimer_remove(&router->nbr_sol_timer);
         vtimer_set_msg(&router->nbr_sol_timer, t, gnrc_ipv6_pid, GNRC_NDP_MSG_NBR_SOL_RETRANS,
                        router);

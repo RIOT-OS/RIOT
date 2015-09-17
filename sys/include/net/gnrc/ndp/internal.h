@@ -61,12 +61,14 @@ void gnrc_ndp_internal_set_state(gnrc_ipv6_nc_t *nc_entry, uint8_t state);
  * @internal
  *
  * @param[in] iface Interface to send over. May not be KERNEL_PID_UNDEF.
+ * @param[in] src   Source address for the neighbor solicitation. Will be chosen from the
+ *                  interface according to @p dst, if NULL.
  * @param[in] tgt   Target address for the neighbor solicitation. May not be
  *                  NULL.
  * @param[in] dst   Destination address for neighbor solicitation. May not be
  *                  NULL.
  */
-void gnrc_ndp_internal_send_nbr_sol(kernel_pid_t iface, ipv6_addr_t *tgt,
+void gnrc_ndp_internal_send_nbr_sol(kernel_pid_t iface, ipv6_addr_t *src, ipv6_addr_t *tgt,
                                     ipv6_addr_t *dst);
 
 /**
