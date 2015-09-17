@@ -591,13 +591,13 @@ void gnrc_ndp_rtr_adv_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt, ipv6_hdr_t
         }
 #endif
     }
-#if ENABLE_DEBUG && defined(MODULE_NG_SIXLOWPAN_ND)
+#if ENABLE_DEBUG && defined(MODULE_GNRC_SIXLOWPAN_ND)
     if ((if_entry->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN) && (l2src_len <= 0)) {
         DEBUG("ndp: Router advertisement did not contain any source address information\n");
     }
 #endif
     _stale_nc(iface, &ipv6->src, l2src, l2src_len);
-#ifdef MODULE_NG_SIXLOWPAN_ND
+#ifdef MODULE_GNRC_SIXLOWPAN_ND
     if (if_entry->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN) {
         /* stop multicast router solicitation retransmission timer */
         vtimer_remove(&if_entry->rtr_sol_timer);
