@@ -65,4 +65,11 @@ ifneq (,$(filter newlib,$(USEMODULE)))
     include $(RIOTBASE)/sys/newlib/Makefile.include
 endif
 
+ifneq (,$(filter usbdev,$(USEMODULE)))
+    USEMODULE_INCLUDES += $(RIOTBASE)/sys/usbdev/include
+    ifneq (,$(filter usbdev-acm,$(USEMODULE)))
+        export UNDEF += $(BINDIR)usbdev/usbdev_acm.o
+    endif
+endif
+
 INCLUDES += -I$(RIOTBASE)/sys/libc/include
