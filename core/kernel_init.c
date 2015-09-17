@@ -39,6 +39,14 @@
 #include <auto_init.h>
 #endif
 
+#ifdef MODULE_PREINIT
+#include "init.h"
+extern void (*__preinit_array_start []) (void) __attribute__((weak));
+extern void (*__preinit_array_end []) (void) __attribute__((weak));
+extern void (*__init_array_start []) (void) __attribute__((weak));
+extern void (*__init_array_end []) (void) __attribute__((weak));
+#endif
+
 volatile int lpm_prevent_sleep = 0;
 
 extern int main(void);
@@ -88,6 +96,18 @@ static char idle_stack[THREAD_STACKSIZE_IDLE];
 void kernel_init(void)
 {
     (void) irq_disable();
+
+#ifdef MODULE_PREINIT
+    size_t array_len = __preinit_array_end - __preinit_array_start;
+    for (size_t i = 0; i < array_len; i++) {
+        __preinit_array_start[i] ();
+    }
+
+    array_len = __init_array_end - __init_array_start;
+    for (size_t i = 0; i < array_len; i++) {
+        __init_array_start[i] ();
+    }
+#endif
 
     thread_create(idle_stack, sizeof(idle_stack),
             THREAD_PRIORITY_IDLE,
