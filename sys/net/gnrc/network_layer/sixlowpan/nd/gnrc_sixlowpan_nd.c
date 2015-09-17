@@ -295,6 +295,7 @@ uint8_t gnrc_sixlowpan_nd_opt_ar_handle(kernel_pid_t iface, ipv6_hdr_t *ipv6, ui
                     DEBUG("6lo nd: unknown status for registration received\n");
                     break;
             }
+            break;
 #ifdef MODULE_GNRC_SIXLOWPAN_ND_ROUTER
         case ICMPV6_NBR_SOL:
             if (!(ipv6_iface->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN) &&
@@ -311,7 +312,8 @@ uint8_t gnrc_sixlowpan_nd_opt_ar_handle(kernel_pid_t iface, ipv6_hdr_t *ipv6, ui
             if ((nc_entry != NULL) &&
                 ((gnrc_ipv6_nc_get_type(nc_entry) == GNRC_IPV6_NC_TYPE_REGISTERED) ||
                  (gnrc_ipv6_nc_get_type(nc_entry) == GNRC_IPV6_NC_TYPE_TENTATIVE)) &&
-                (ar_opt->eui64.uint64.u64 != nc_entry->eui64.uint64.u64)) {
+                ((nc_entry->eui64.uint64.u64 != 0) &&
+                 (ar_opt->eui64.uint64.u64 != nc_entry->eui64.uint64.u64))) {
                 /* there is already another node with this address */
                 DEBUG("6lo nd: duplicate address detected\n");
                 status = SIXLOWPAN_ND_STATUS_DUP;
@@ -339,6 +341,7 @@ uint8_t gnrc_sixlowpan_nd_opt_ar_handle(kernel_pid_t iface, ipv6_hdr_t *ipv6, ui
                 vtimer_set_msg(&nc_entry->type_timeout, timex_set(reg_ltime * 60, 0),
                                gnrc_ipv6_pid, GNRC_SIXLOWPAN_ND_MSG_AR_TIMEOUT, nc_entry);
             }
+            break;
 #endif
         default:
             break;

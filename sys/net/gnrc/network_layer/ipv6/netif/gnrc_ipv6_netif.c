@@ -92,14 +92,6 @@ static ipv6_addr_t *_add_addr_to_entry(gnrc_ipv6_netif_t *entry, const ipv6_addr
     }
     else {
         if (!ipv6_addr_is_link_local(addr)) {
-            /* add also corresponding link-local address */
-            ipv6_addr_t ll_addr;
-
-            ll_addr.u64[1] = addr->u64[1];
-            ipv6_addr_set_link_local_prefix(&ll_addr);
-
-            _add_addr_to_entry(entry, &ll_addr, 64,
-                               flags | GNRC_IPV6_NETIF_ADDR_FLAGS_NDP_ON_LINK);
 #ifdef MODULE_GNRC_NDP_ROUTER
             /* New prefixes MAY allow the router to retransmit up to
              * GNRC_NDP_MAX_INIT_RTR_ADV_NUMOF unsolicited RA
