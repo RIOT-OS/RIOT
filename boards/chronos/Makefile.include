@@ -1,25 +1,11 @@
-export INCLUDES += -I$(RIOTBOARD)/$(BOARD)/include
-
 ## the cpu to build for
 export CPU = cc430
-export MCU = cc430f6137
+export CPU_MODEL = cc430f6137
 
-# toolchain config
-export PREFIX = msp430-
-export CC = $(PREFIX)gcc
-export AR = $(PREFIX)ar
-export CFLAGS += -Wstrict-prototypes -gdwarf-2 -Os -Wall -mmcu=$(MCU) -D CC430
-export ASFLAGS += -mmcu=$(MCU) --defsym $(MCU)=1 --gdwarf-2
-export AS = $(PREFIX)as
-export LINK = $(PREFIX)gcc
-export SIZE = $(PREFIX)size
-export OBJCOPY = $(PREFIX)objcopy
-export LINKFLAGS += -mmcu=$(MCU) -lgcc $(BINDIR)msp430_common/startup.o
-export FLASHER = mspdebug
-export USEMODULE += msp430_common
-export FFLAGS = rf2500 "prog $(HEXFILE)"
+# flasher configuration
 export OFLAGS = -O ihex
+export FLASHER = mspdebug
+export FFLAGS = rf2500 "prog $(HEXFILE)"
 
-export UNDEF += $(BINDIR)msp430_common/startup.o
-
-include $(RIOTBOARD)/$(BOARD)/Makefile.dep
+# include msp430 base makefile
+include $(RIOTBOARD)/Makefile.include.msp430_common
