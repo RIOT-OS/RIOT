@@ -56,22 +56,6 @@ void gnrc_sixlowpan_nd_init(gnrc_ipv6_netif_t *iface)
     gnrc_ndp_internal_send_rtr_sol(iface->pid, NULL);
 }
 
-void gnrc_sixlowpan_nd_router_set_rtr_adv(gnrc_ipv6_netif_t *netif, bool enable)
-{
-    ipv6_addr_t all_routers = IPV6_ADDR_ALL_ROUTERS_LINK_LOCAL;
-
-    if (enable && (gnrc_ipv6_netif_add_addr(netif->pid, &all_routers, 128,
-                                            GNRC_IPV6_NETIF_ADDR_FLAGS_NON_UNICAST) != NULL)) {
-        netif->flags |= GNRC_IPV6_NETIF_FLAGS_RTR_ADV;
-        netif->adv_ltime = GNRC_IPV6_NETIF_DEFAULT_ROUTER_LTIME;
-    }
-    else {
-        netif->flags &= ~GNRC_IPV6_NETIF_FLAGS_RTR_ADV;
-        gnrc_ipv6_netif_remove_addr(netif->pid, &all_routers);
-    }
-}
-
-
 void gnrc_sixlowpan_nd_mc_rtr_sol(gnrc_ipv6_netif_t *iface)
 {
     uint32_t interval;
