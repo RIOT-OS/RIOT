@@ -30,6 +30,8 @@
 extern "C" {
 #endif
 
+#define USBDEV_CTRL_EP              0
+
 typedef enum {
     USBDEV_STRING_IDX_MFR = 1,
     USBDEV_STRING_IDX_PRODUCT,
@@ -158,6 +160,7 @@ typedef struct {
 } usbdev_ops_t;
 
 typedef int (* usbdev_iface_init_t)(usbdev_t *dev);
+typedef usbdev_ops_t *(* usbdev_driver_init_t)(usbdev_t *dev);
 
 /**
  * @brief   Definition of the usb device type
@@ -166,7 +169,7 @@ typedef int (* usbdev_iface_init_t)(usbdev_t *dev);
 struct usbdev_t {
     usbdev_ops_t *driver;      /**< The driver for this device */
     void (*irq_ep_event)(usbdev_t *dev, usb_ep_t ep, uint16_t event_type);
-    void (*irq_mon_event)(usbdev_t *dev, uint16_t event_type);
+    void (*irq_bc_event)(usbdev_t *dev, uint16_t event_type);
 
     uint8_t *string_descriptor;
     usb_device_descriptor_t *device_descriptor;
@@ -174,7 +177,6 @@ struct usbdev_t {
     uint8_t *sdescr_tab[USBDEV_DESCRIPTOR_IDX_MAX];
     uint8_t *cfgdescr_tab[USBDEV_DESCRIPTOR_IDX_MAX];
 
-    kernel_pid_t monitor_pid;
     kernel_pid_t ep_in_pid[USBDEV_MAX_ENDPOINT_IN];
     kernel_pid_t ep_out_pid[USBDEV_MAX_ENDPOINT_OUT];
 
@@ -199,11 +201,12 @@ struct usbdev_t {
     usbdev_stage_t stage;
 };
 
-usbdev_t *usbdev_register(usbdev_ops_t *driver);
 int usbdev_register_iface(usbdev_iface_init_t init);
+int usbdev_register_driver(usbdev_driver_init_t init);
 int usbdev_add_string_descriptor(usbdev_t *dev, uint8_t index, char *string);
 int usbdev_add_cfg_descriptor(usbdev_t *dev, uint8_t *descriptor);
 int usbdev_remove(usbdev_t *dev);
+uint32_t ep_configured(usbdev_t *dev, usb_ep_t ep);
 
 #ifdef __cplusplus
 }
