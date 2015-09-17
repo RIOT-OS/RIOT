@@ -45,7 +45,7 @@ static void cb(int chan)
     fired++;
 }
 
-static int test_timer(int num)
+static int test_timer(unsigned num)
 {
     int set = 0;
 
@@ -58,14 +58,14 @@ static int test_timer(int num)
 
     /* initialize and halt timer */
     if (timer_init(TIMER_DEV(num), TIM_SPEED, cb) < 0) {
-        printf("TIMER_%i: ERROR on initialization - skipping\n\n", num);
+        printf("TIMER_%u: ERROR on initialization - skipping\n\n", num);
         return 0;
     }
     else {
-        printf("TIMER_%i: initialization successful\n", num);
+        printf("TIMER_%u: initialization successful\n", num);
     }
     timer_stop(TIMER_DEV(num));
-    printf("TIMER_%i: stopped\n", num);
+    printf("TIMER_%u: stopped\n", num);
     /* set each available channel */
     for (unsigned i = 0; i < MAX_CHANNELS; i++) {
         unsigned timeout = ((i + 1) * CHAN_OFFSET);
@@ -74,15 +74,15 @@ static int test_timer(int num)
         }
         else {
             ++set;
-            printf("TIMER_%i: set channel %u to %u\n", num, i, timeout);
+            printf("TIMER_%u: set channel %u to %u\n", num, i, timeout);
         }
     }
     if (set == 0) {
-        printf("TIMER_%i: ERROR setting any channel\n\n", num);
+        printf("TIMER_%u: ERROR setting any channel\n\n", num);
         return 0;
     }
     /* start the timer */
-    printf("TIMER_%i: starting\n", num);
+    printf("TIMER_%u: starting\n", num);
     timer_start(TIMER_DEV(num));
     /* wait for all channels to fire */
     do {
@@ -90,7 +90,7 @@ static int test_timer(int num)
     } while (fired != set);
     /* collect results */
     for (int i = 0; i < fired; i++) {
-        printf("TIMER_%i: channel %i fired at SW count %8u",
+        printf("TIMER_%u: channel %i fired at SW count %8u",
                num, i, (unsigned)timeouts[i]);
         if (i == 0) {
             printf(" - init: %8u\n", (unsigned)timeouts[i]);
