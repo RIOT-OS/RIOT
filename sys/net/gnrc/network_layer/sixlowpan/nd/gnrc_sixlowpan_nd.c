@@ -163,7 +163,9 @@ kernel_pid_t gnrc_sixlowpan_nd_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_
         /* get if not gotten from previous check */
         nc_entry = gnrc_ipv6_nc_get(iface, next_hop);
     }
-    if (ipv6_addr_is_link_local(next_hop)) {
+    /* If a NCE for this destination exist, we can use even for link-local
+     * addresses. This should be only the case for 6LBRs. */
+    if ((ipv6_addr_is_link_local(next_hop)) && (nc_entry == NULL)) {
 /* in case of a border router there is no sensible way for address resolution
  * if the interface is not given */
 #ifdef MODULE_GNRC_SIXLOWPAN_ND_BORDER_ROUTER
