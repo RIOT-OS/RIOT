@@ -266,10 +266,6 @@ ifneq (,$(filter posix,$(USEMODULE)))
   USEMODULE += vtimer
 endif
 
-ifneq (,$(filter cbor,$(USEMODULE)))
-  USEMODULE += net_help
-endif
-
 ifneq (,$(filter vtimer,$(USEMODULE)))
   USEMODULE += xtimer
   USEMODULE += timex
@@ -292,7 +288,6 @@ endif
 ifneq (,$(filter fib,$(USEMODULE)))
   USEMODULE += universal_address
   USEMODULE += xtimer
-  USEMODULE += net_help
 endif
 
 ifneq (,$(filter oonf_common,$(USEMODULE)))
