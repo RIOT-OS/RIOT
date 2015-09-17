@@ -261,9 +261,11 @@ uint8_t gnrc_sixlowpan_nd_opt_ar_handle(kernel_pid_t iface, ipv6_hdr_t *ipv6, ui
                 case SIXLOWPAN_ND_STATUS_SUCCESS:
                     DEBUG("6lo nd: address registration successful\n");
                     mutex_lock(&ipv6_iface->mutex);
+                    /* reschedule 1 minute before lifetime expires */
+                    timex_t t = { (uint32_t)(byteorder_ntohs(ar_opt->ltime) - 1) * 60, 0 };
                     vtimer_remove(&nc_entry->nbr_sol_timer);
-                    vtimer_set_msg(&nc_entry->nbr_sol_timer, ipv6_iface->retrans_timer,
-                                   gnrc_ipv6_pid, GNRC_NDP_MSG_NBR_SOL_RETRANS, nc_entry);
+                    vtimer_set_msg(&nc_entry->nbr_sol_timer, t, gnrc_ipv6_pid,
+                                   GNRC_NDP_MSG_NBR_SOL_RETRANS, nc_entry);
                     mutex_unlock(&ipv6_iface->mutex);
                     break;
                 case SIXLOWPAN_ND_STATUS_DUP:
