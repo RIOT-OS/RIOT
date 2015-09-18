@@ -53,45 +53,45 @@ static timer_conf_t config[TIMER_NUMOF];
 
 inline static void pit_timer_start(uint8_t ch)
 {
-    TIMER_DEV->CHANNEL[ch].TCTRL |= (PIT_TCTRL_TEN_MASK);
+    TIMER_BASE->CHANNEL[ch].TCTRL |= (PIT_TCTRL_TEN_MASK);
 }
 
 inline static void pit_timer_stop(uint8_t ch)
 {
-    TIMER_DEV->CHANNEL[ch].TCTRL &= ~(PIT_TCTRL_TEN_MASK);
+    TIMER_BASE->CHANNEL[ch].TCTRL &= ~(PIT_TCTRL_TEN_MASK);
 }
 
 /** use channel n-1 as prescaler */
 inline static void timer_set_prescaler(uint8_t ch, unsigned int ticks_per_us)
 {
-    TIMER_DEV->CHANNEL[ch].TCTRL = 0x0;
-    TIMER_DEV->CHANNEL[ch].LDVAL = (TIMER_CLOCK / 1e6) / ticks_per_us;
-    TIMER_DEV->CHANNEL[ch].TCTRL = (PIT_TCTRL_TEN_MASK);
+    TIMER_BASE->CHANNEL[ch].TCTRL = 0x0;
+    TIMER_BASE->CHANNEL[ch].LDVAL = (TIMER_CLOCK / 1e6) / ticks_per_us;
+    TIMER_BASE->CHANNEL[ch].TCTRL = (PIT_TCTRL_TEN_MASK);
 }
 
 inline static void timer_set_counter(uint8_t ch)
 {
-    TIMER_DEV->CHANNEL[ch].TCTRL = 0x0;
-    TIMER_DEV->CHANNEL[ch].LDVAL = TIMER_MAX_VALUE;
-    TIMER_DEV->CHANNEL[ch].TCTRL = (PIT_TCTRL_TIE_MASK | PIT_TCTRL_CHN_MASK);
+    TIMER_BASE->CHANNEL[ch].TCTRL = 0x0;
+    TIMER_BASE->CHANNEL[ch].LDVAL = TIMER_MAX_VALUE;
+    TIMER_BASE->CHANNEL[ch].TCTRL = (PIT_TCTRL_TIE_MASK | PIT_TCTRL_CHN_MASK);
 }
 
 inline static uint32_t pit_timer_read(tim_t dev, uint8_t ch)
 {
-    return cu_timer[dev].counter32b + (TIMER_DEV->CHANNEL[ch].LDVAL
-                                       - TIMER_DEV->CHANNEL[ch].CVAL);
+    return cu_timer[dev].counter32b + (TIMER_BASE->CHANNEL[ch].LDVAL
+                                       - TIMER_BASE->CHANNEL[ch].CVAL);
 }
 
 inline static void pit_timer_set_max(uint8_t ch)
 {
     pit_timer_stop(ch);
-    TIMER_DEV->CHANNEL[ch].LDVAL = TIMER_MAX_VALUE;
+    TIMER_BASE->CHANNEL[ch].LDVAL = TIMER_MAX_VALUE;
     pit_timer_start(ch);
 }
 
 int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
 {
-    PIT_Type *timer = TIMER_DEV;
+    PIT_Type *timer = TIMER_BASE;
 
     /* enable timer peripheral clock */
     TIMER_CLKEN();
@@ -152,7 +152,7 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
             pit_timer_stop(TIMER_0_COUNTER_CH);
             cu_timer[dev].counter32b = pit_timer_read(dev, TIMER_0_COUNTER_CH);
             cu_timer[dev].diff = value - cu_timer[dev].counter32b;
-            TIMER_DEV->CHANNEL[TIMER_0_COUNTER_CH].LDVAL = cu_timer[dev].diff;
+            TIMER_BASE->CHANNEL[TIMER_0_COUNTER_CH].LDVAL = cu_timer[dev].diff;
             pit_timer_start(TIMER_0_COUNTER_CH);
             break;
 #endif
@@ -162,7 +162,7 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
             pit_timer_stop(TIMER_1_COUNTER_CH);
             cu_timer[dev].counter32b = pit_timer_read(dev, TIMER_1_COUNTER_CH);
             cu_timer[dev].diff = value - cu_timer[dev].counter32b;
-            TIMER_DEV->CHANNEL[TIMER_1_COUNTER_CH].LDVAL = cu_timer[dev].diff;
+            TIMER_BASE->CHANNEL[TIMER_1_COUNTER_CH].LDVAL = cu_timer[dev].diff;
             pit_timer_start(TIMER_1_COUNTER_CH);
             break;
 #endif
@@ -338,9 +338,9 @@ void timer_reset(tim_t dev)
 
 inline static void pit_timer_irq_handler(tim_t dev, uint8_t ch)
 {
-    cu_timer[dev].counter32b += TIMER_DEV->CHANNEL[ch].LDVAL;
+    cu_timer[dev].counter32b += TIMER_BASE->CHANNEL[ch].LDVAL;
 
-    TIMER_DEV->CHANNEL[ch].TFLG = PIT_TFLG_TIF_MASK;
+    TIMER_BASE->CHANNEL[ch].TFLG = PIT_TFLG_TIF_MASK;
 
     if (cu_timer[dev].diff) {
         if (config[dev].cb != NULL) {
