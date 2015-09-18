@@ -103,7 +103,7 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
     uint32_t rx_pin = 0;
     uint32_t tx_pin = 0;
     uint8_t af = 0;
-    float divider;
+    uint32_t mid;
     uint16_t mantissa;
     uint8_t fraction;
 
@@ -157,9 +157,9 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
     }
 
     /* configure UART to mode 8N1 with given baudrate */
-    divider = ((float)F_CPU) / (16 * baudrate);
-    mantissa = (uint16_t)divider;
-    fraction = (uint8_t)((divider - mantissa) * 16);
+    mid = (CLOCK_CORECLOCK / baudrate);
+    mantissa = (uint16_t)(mid / 16);
+    fraction = (uint8_t)(mid - (mantissa * 16));
     dev->BRR = ((mantissa & 0x0fff) << 4) | (0x0f & fraction);
 
     /* enable receive and transmit mode */
