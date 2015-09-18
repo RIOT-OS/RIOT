@@ -69,11 +69,6 @@ typedef int uart_t;
 /** @} */
 
 /**
- * @brief   MSB value of the TX callback in case more data is ready to be send
- */
-#define UART_TX_MORE_DATA   (0xff00)
-
-/**
  * @brief   Signature for receive interrupt callback
  *
  * @param[in] arg           context to the callback (optional)
@@ -82,33 +77,12 @@ typedef int uart_t;
 typedef void(*uart_rx_cb_t)(void *arg, char data);
 
 /**
- * @brief   Signature for the transmit complete interrupt callback
- *
- * When this callback is called, we have two possibilities: (i) there is more
- * data to be send, and (ii) we have no more data to send.
- *
- * In case (i), we return the next byte to send ORed with UART_TX_MORE_DATA, so
- * setting the MSB to all ones. This is needed to be able to send a zero byte
- * via UART.
- *
- * In case (ii) we just return 0 and therefore signal to the UART
- * driver, that no more bytes should be send.
- *
- * @param[in] arg           context to the callback (optional)
- *
- * @return                  next byte to send ORed with UART_TX_MORE_DATA
- * @return                  0 if no more data is to be send
- */
-typedef uint16_t(*uart_tx_cb_t)(void *arg);
-
-/**
  * @brief   Interrupt context for a UART device
  * @{
  */
 #ifndef HAVE_UART_ISR_CTX_T
 typedef struct {
     uart_rx_cb_t rx_cb;     /**< data received interrupt callback */
-    uart_tx_cb_t tx_cb;     /**< data transmission done interrupt callback */
     void *arg;              /**< argument to both callback routines */
 } uart_isr_ctx_t;
 #endif
@@ -127,8 +101,6 @@ typedef struct {
  * @param[in] baudrate      desired baudrate in baud/s
  * @param[in] rx_cb         receive callback, executed in interrupt context once
  *                          for every byte that is received (RX buffer filled)
- * @param[in] tx_cb         transmit callback, executed in interrupt context
- *                          for each finished byte transfer (TX buffer empty)
  * @param[in] arg           optional context passed to the callback functions
  *
  * @return                  0 on success
@@ -136,35 +108,21 @@ typedef struct {
  * @return                  -2 on inapplicable baudrate
  * @return                  -3 on other errors
  */
-int uart_init(uart_t uart, uint32_t baudrate,
-              uart_rx_cb_t rx_cb, uart_tx_cb_t tx_cb, void *arg);
+int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg);
 
 /**
- * @brief   Begin a new transmission
+ * @brief   Write data from the given buffer to the specified UART device
  *
- * When sending buffered data, we need to tell the UART device, whenever there
- * is new data waiting to be transferred. In that case, this function should be
- * called. On most platforms this function will simply enable the TX interrupt
- * leading to a call of the TX callback function.
+ * This function is blocking, as it will only return after @p len bytes from the
+ * given buffer have been send. The way this data is send is up to the
+ * implementation: active waiting, interrupt driven, DMA, etc.
  *
- * The actual passing of data to the UART device will then handled by the TX
- * callback function.
+ * @param[in] uart          UART device to use for transmission
+ * @param[in] data          data buffer to send
+ * @param[in] len           number of bytes to send
  *
- * @param[in] uart          UART device that will start a transmission
  */
-void uart_tx(uart_t uart);
-/**
- * @brief   Write a single byte to the given UART device (blocking)
- *
- * In contrast to *uart_write*, this function will block (active waiting) until
- * the UART device is ready to send the new byte.
- *
- * @note Use for testing purposes only!
- *
- * @param[in] uart          UART device to write to
- * @param[in] data          data byte to send
- */
-void uart_write_blocking(uart_t uart, char data);
+void uart_write(uart_t uart, const char* data, size_t len);
 
 /**
  * @brief   Power on the given UART device
