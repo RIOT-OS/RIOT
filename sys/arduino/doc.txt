@@ -1,0 +1,136 @@
+/**
+ * @defgroup    sys_arduino Arduino
+ * @ingroup     sys
+ * @brief       Arduino in RIOT
+ *
+ * @section sec_about About
+ *
+ * This module enables users to run unmodified Arduino sketches in RIOT. For
+ * this we aim at supporting the full Arduino API.
+ *
+ * The support of the Arduino API in RIOT is useful for multiple reasons:
+ * - starting point for beginners
+ * - run your existing sketches on any non-Arduino hardware supported by RIOT
+ * - makes it easy to move from Arduino to RIOT
+ * - use Ardunio device drivers in RIOT
+ * - is fun to implement :-)
+ *
+ * Refer to @ref sys_arduino_api for the actual API documentation
+ *
+ *
+ * @section sec_usage General usage
+ *
+ * To run you Arduino sketch in RIOT, just follow these steps:
+ *
+ * -# create an empty application
+ * -# add the `arduino` module to your application, your `Makefile` should now
+ *    look something like this:
+ * @code
+ * APPLICATION = YOUR_APP_NAME
+ * BOARD ?= YOUR_TARGET_PLATFORM
+ * RIOTBASE ?= PATH_TO_RIOT_ROOT
+ *
+ * USEMODULE += arduino
+ *
+ * include $(RIOTBASE)/Makefile.include
+ * @endcode
+ *
+ * -# copy you Arduino sktech(es) into your application folder. Currently they
+ *    must have the file ending `*.sketch` to be processed.
+ * -# build, flash, and run your application the usual RIOT-way: simply call
+ *    `make all`, `make flash`, `make term`, etc.
+ *
+ * Thats all. As bonus you can of course use any existing RIOT code inside your
+ * Arduino sketches - you simply have to add the includes to your sketch and
+ * the corresponding modules to your `Makefile`.
+ *
+ * @note  So far, all Arduino sketches MUST have the file ending `*.sketch` to
+ *        be recognized by RIOT's build system
+ *
+ *
+ * @section sec_concept Concept
+ *
+ * For enabling RIOT to run Arduino sketches, we extended the build system to
+ * handle `*.sketch` files and we implemented the Arduino API using RIOT's
+ * native functions.
+ *
+ * @subsection sec_concept_build Extension of the build system
+ *
+ * Building Arduino sketches in RIOT is done in a two step process.
+ *
+ * First, the make system calls a dedicated
+ * [Arduino build script](https://github.com/RIOT-OS/RIOT/tree/master/dist/tools/arduino/pre_build.sh),
+ * which is called from the
+ * [Makefile.include](https://github.com/RIOT-OS/RIOT/tree/master/sys/arduino/Makefile.include)
+ * of the RIOT Arduino module.
+ *
+ * This script creates a temporary file called '_sketches.cpp' inside the
+ * application folder. Into this file, the script copies some Arduino glue code (
+ * [pre.snip](https://github.com/RIOT-OS/RIOT/blob/master/sys/arduino/pre.snip)
+ *  and
+ * [post.snip](https://github.com/RIOT-OS/RIOT/blob/master/sys/arduino/post.snip))
+ * together with the contents of all `*.sketch` files contained in the
+ * application folder.
+ *
+ * Second, the RIOT make system is called as usual, processing the temporary
+ * file containing all the Arduino code. Simple :-)
+ *
+ * @subsection sec_conecpt_api Implementation of the Arduino API
+ *
+ * For supporting the Arduino API, we have created our own function and class
+ * definitions, using the exact same signatures as in the original Arduino
+ * header files. These headers are then implemented using standard RIOT APIs,
+ * e.g. the peripheral drivers, `xtimer`, etc.
+ *
+ *
+ * @section sec_boardsupport Add Arduino support to a board
+ *
+ * @note As prerequisite, the board must have support for C++.
+ *
+ * To add Arduino support to a board, it has to provice the following:
+ *
+ * In `RIOT/board/BOARD/include/arduino_board.h`:
+ * - a mapping of GPIO pins to Arduino pin numbers named `arduino_pinmap`, e.g.
+ * @code{c}
+ *  static const gpio_t arduino_pinmap[] = {
+ *      GPIO_PIN(PORT_D, 12),
+ *      GPIO_PIN(PORT_D, 13),
+ *      GPIO_PIN(PORT_D, 14),
+ *      GPIO_PIN(PORT_D, 15),
+ *      GPIO_PIN(PORT_A, 12),
+ *      GPIO_PIN(PORT_A, 15),
+ *      GPIO_PIN(PORT_B, 1),
+ *      GPIO_PIN(PORT_B, 2),
+ *      ...
+ *  };
+ * @endcode
+ *
+ * - a define `ARDUINO_LED` that is mapped to an Arduino pin number connected to
+ *   any on-board LED, or to pin 0 in case no LED is defined:
+ * @code{c}
+ *  #define ARDUINO_LED         (2)
+ * @endcode
+ *   This links to the third entry in the `arduino_pinmap` array.
+ *
+ * In addition, you have to add the 'arduino' feature to the board. for this,
+ * just add `FEATURES_PROVIDED += arduino` to the 'other features' section in
+ * your boards `Makefile.features'.
+ *
+ * That's it, your board can now run Ardunio sketches.
+ *
+ *
+ * @section sec_todo Open issues
+ *
+ * @todo Make it possible to bootstrap Arduino code manually from any RIOT
+ *       application. Include a pseudomule as e.g. arduino_base, which does not
+ *       implement a main function calling `setup()` and `loop()`, so these
+ *       functions have to be called manually from a RIOT application.
+ * @todo Implement analog outputs (PWM mapping)
+ * @todo Implement analog inputs (ADC mapping)
+ * @todo Implement SPI interface class
+ * @todo Add support for the 'Wrie Library' (I2C)
+ * @todo Add means to include various Arduino Libraries (maybe as pkg?)
+ * @todo Implement anything else that is missing...
+ * @todo Adapt Arduino build script, so sketches do not have to have the file
+ *       ending `*.sketch` anymore
+ */

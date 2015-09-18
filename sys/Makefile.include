@@ -65,4 +65,8 @@ ifneq (,$(filter newlib,$(USEMODULE)))
     include $(RIOTBASE)/sys/newlib/Makefile.include
 endif
 
+ifneq (,$(filter arduino,$(USEMODULE)))
+    include $(RIOTBASE)/sys/arduino/Makefile.include
+endif
+
 INCLUDES += -I$(RIOTBASE)/sys/libc/include
