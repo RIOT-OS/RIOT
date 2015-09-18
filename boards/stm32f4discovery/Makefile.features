@@ -12,6 +12,7 @@ FEATURES_PROVIDED += periph_uart
 
 # Various other features (if any)
 FEATURES_PROVIDED += cpp
+FEATURES_PROVIDED += arduino
 
 # The board MPU family (used for grouping by the CI system)
 FEATURES_MCU_GROUP = cortex_m4
