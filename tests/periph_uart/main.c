@@ -20,6 +20,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "board.h"
 #include "shell.h"
@@ -76,18 +77,6 @@ static void rx_cb(void *arg, char data)
     }
 }
 
-static uint16_t tx_cb(void *arg)
-{
-    int dev = (int)arg;
-    int c = ringbuffer_get_one(&(ctx[dev].tx_buf));
-    if (c == -1) {
-        return 0;
-    }
-    else {
-        return (UART_TX_MORE_DATA | (c & 0xff));
-    }
-}
-
 static void *printer(void *arg)
 {
     (void)arg;
@@ -136,7 +125,7 @@ static int cmd_init(int argc, char **argv)
     baud = (uint32_t)atoi(argv[2]);
 
     /* initialize UART */
-    res = uart_init(UART_DEV(dev), baud, rx_cb, tx_cb, (void *)dev);
+    res = uart_init(UART_DEV(dev), baud, rx_cb, (void *)dev);
     if (res == -1) {
         printf("Error: Given baudrate (%u) not possible\n", (unsigned int)baud);
         return 1;
@@ -152,7 +141,7 @@ static int cmd_init(int argc, char **argv)
 static int cmd_send(int argc, char **argv)
 {
     int dev;
-    char *s;
+    char newline = '\n';
 
     if (argc < 3) {
         printf("usage: %s <dev> <data (string)>\n", argv[0]);
@@ -165,45 +154,14 @@ static int cmd_send(int argc, char **argv)
     }
 
     printf("UART_DEV(%i) TX: %s\n", dev, argv[2]);
-    s = argv[2];
-    while (*s) {
-        ringbuffer_add_one(&(ctx[dev].tx_buf), *s);
-        ++s;
-    }
-    ringbuffer_add_one(&(ctx[dev].tx_buf), '\n');
-    uart_tx(UART_DEV(dev));
-    return 0;
-}
-
-static int cmd_send_blocking(int argc, char **argv)
-{
-    int dev;
-    char *s;
-
-    if (argc < 3) {
-        printf("usage: %s <dev> <data (string)>\n", argv[0]);
-        return 1;
-    }
-    /* parse parameters */
-    dev = parse_dev(argv[1]);
-    if (dev < 0) {
-        return 1;
-    }
-
-    printf("UART_DEV(%i) TX: %s\n", dev, argv[2]);
-    s = argv[2];
-    while (*s) {
-        uart_write_blocking(UART_DEV(dev), *s);
-        ++s;
-    }
-    uart_write_blocking(UART_DEV(dev), '\n');
+    uart_write(UART_DEV(dev), argv[2], strlen(argv[2]));
+    uart_write(UART_DEV(dev), &newline, 1);
     return 0;
 }
 
 static const shell_command_t shell_commands[] = {
     { "init", "Initialize a UART device with a given baudrate", cmd_init },
     { "send", "Send a string (non-blocking)", cmd_send },
-    { "send_blocking", "Send a string (blocking)", cmd_send_blocking },
     { NULL, NULL, NULL }
 };
 
