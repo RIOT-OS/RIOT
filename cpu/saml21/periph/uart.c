@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Freie Universität Berlin
+ * Copyright (C) 2014-2015 Freie Universität Berlin
  *               2015 Kaspar Schleiser <kaspar@schleiser.de>
  *               2015 FreshTemp, LLC.
  *
@@ -12,246 +12,182 @@
  * @ingroup     driver_periph
  * @{
  *
- * @file        uart.c
+ * @file
  * @brief       Low-level UART driver implementation
  *
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  * @author      Troels Hoffmeyer <troels.d.hoffmeyer@gmail.com>
+ * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
  * @}
  */
 
-#include "board.h"
 #include "cpu.h"
-
-#include "periph/uart.h"
-#include "periph_conf.h"
-
 #include "sched.h"
 #include "thread.h"
 
-/* guard file in case no UART device was specified */
-#if UART_NUMOF
-
-/**
- * @brief Each UART device has to store two callbacks.
- */
-typedef struct {
-    uart_rx_cb_t rx_cb;
-    uart_tx_cb_t tx_cb;
-    void *arg;
-} uart_conf_t;
-
-/**
- * @brief Unified interrupt handler for all UART devices
- *
- * @param uartnum       the number of the UART that triggered the ISR
- * @param uart          the UART device that triggered the ISR
- */
-static inline void irq_handler(uart_t uartnum, SercomUsart *uart);
+#include "periph/uart.h"
+#include "periph/gpio.h"
 
 /**
  * @brief Allocate memory to store the callback functions.
  */
-static uart_conf_t uart_config[UART_NUMOF];
+static uart_isr_ctx_t uart_ctx[UART_NUMOF];
 
-static uint64_t _long_division(uint64_t n, uint64_t d);
-
-int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, uart_tx_cb_t tx_cb, void *arg)
+/**
+ * @brief   Get the pointer to the base register of the given UART device
+ *
+ * @param[in] uart      UART device identifier
+ *
+ * @return              base register address
+ */
+static inline SercomUsart *_uart(uart_t uart)
 {
-    /* initialize basic functionality */
-    int res = uart_init_blocking(uart, baudrate);
-    if (res != 0) {
-        return res;
-    }
-
-    /* register callbacks */
-    uart_config[uart].rx_cb = rx_cb;
-    uart_config[uart].tx_cb = tx_cb;
-    uart_config[uart].arg = arg;
-
-    /* configure interrupts and enable RX interrupt */
-    switch (uart) {
-        case UART_0:
-            NVIC_SetPriority(UART_0_IRQ, UART_IRQ_PRIO);
-            NVIC_EnableIRQ(UART_0_IRQ);
-            UART_0_DEV.INTENSET.bit.RXC = 1;
-        break;
-    }
-    return 0;
+    return uart_config[uart].dev;
 }
 
-int uart_init_blocking(uart_t uart, uint32_t baudrate)
+int uart_init(uart_t uart, uint32_t baudrate,
+              uart_rx_cb_t rx_cb, uart_tx_cb_t tx_cb, void *arg)
 {
-    /* Calculate the BAUD value */
-    uint64_t temp1 = ((16 * ((uint64_t)baudrate)) << 32);
-    uint64_t ratio = _long_division(temp1 , UART_0_REF_F);
-    uint64_t scale = ((uint64_t)1 << 32) - ratio;
-    uint64_t baud_calculated = (65536 * scale) >> 32;
+    uint32_t baud;
+    SercomUsart *dev;
 
-    switch (uart) {
-#if UART_0_EN
-        case UART_0:
-            /* Enable the peripheral channel */
-            GCLK->PCHCTRL[SERCOM3_GCLK_ID_CORE].reg |= GCLK_PCHCTRL_CHEN | GCLK_PCHCTRL_GEN_GCLK0;
-
-            while (!(GCLK->PCHCTRL[SERCOM3_GCLK_ID_CORE].reg & GCLK_PCHCTRL_CHEN)) {
-                /* Wait for clock synchronization */
-            }
-
-            MCLK->APBCMASK.reg |= MCLK_APBCMASK_SERCOM3;
-            /* configure PINS to input/output*/
-            UART_0_PORT.DIRSET.reg = (1 << UART_0_TX_PIN);  /* tx's direction is output */
-            UART_0_PORT.PINCFG[UART_0_RX_PIN % 32].bit.INEN = true; /* buffer rx pin's value */
-
-            /* enable PMUX for pins and set to config C. */
-            UART_0_PORT.WRCONFIG.reg = PORT_WRCONFIG_WRPINCFG \
-                                        | PORT_WRCONFIG_WRPMUX \
-                                        | PORT_WRCONFIG_PMUX(0x2) \
-                                        | PORT_WRCONFIG_PMUXEN \
-                                        | UART_0_PINS;
-
-            UART_0_DEV.CTRLA.bit.ENABLE = 0; //Disable to write, need to sync tho
-            while(UART_0_DEV.SYNCBUSY.bit.ENABLE);
-
-            /* set to LSB, asynchronous mode without parity, PAD0 Tx, PAD1 Rx,
-             * 16x over-sampling, internal clk */
-            UART_0_DEV.CTRLA.reg = SERCOM_USART_CTRLA_DORD \
-                                    | SERCOM_USART_CTRLA_FORM(0x0) \
-                                    | SERCOM_USART_CTRLA_SAMPA(0x0) \
-                                    | SERCOM_USART_CTRLA_TXPO(0x0) \
-                                    | SERCOM_USART_CTRLA_RXPO(0x1) \
-                                    | SERCOM_USART_CTRLA_SAMPR(0x0) \
-                                    | SERCOM_USART_CTRLA_MODE(0x1) \
-                                    | (UART_0_RUNSTDBY ? SERCOM_USART_CTRLA_RUNSTDBY : 0);
-
-            /* Set baud rate */
-            UART_0_DEV.BAUD.bit.BAUD = baud_calculated;
-
-            /* enable receiver and transmitter, one stop bit*/
-            UART_0_DEV.CTRLB.reg = (SERCOM_USART_CTRLB_RXEN | SERCOM_USART_CTRLB_TXEN);
-            while(UART_0_DEV.SYNCBUSY.bit.CTRLB);
-
-            break;
-#endif
+    /* check if device is valid */
+    if (uart < 0 || uart >= UART_NUMOF) {
+        return -1;
     }
 
+    /* get base register of Sercom device */
+    dev = _uart(uart);
+    /* calculate baud rate */
+    baud =  ((((uint32_t)GCLK_REF * 10) / baudrate) / 16);
+    /* save context */
+    uart_ctx[uart].rx_cb = rx_cb;
+    uart_ctx[uart].tx_cb = tx_cb;
+    uart_ctx[uart].arg = arg;
+    /* configure pins */
+    gpio_init(uart_config[uart].rx_pin, GPIO_DIR_IN, GPIO_NOPULL);
+    gpio_init_mux(uart_config[uart].rx_pin, GPIO_MUX_D);
+    gpio_init(uart_config[uart].tx_pin, GPIO_DIR_OUT, GPIO_NOPULL);
+    gpio_init_mux(uart_config[uart].tx_pin, GPIO_MUX_D);
+    /* power on the Sercom device */
     uart_poweron(uart);
+    /* reset the Sercom device */
+    dev->CTRLA.reg = SERCOM_USART_CTRLA_SWRST;
+    while (dev->SYNCBUSY.reg & SERCOM_USART_SYNCBUSY_SWRST);
+    /* set asynchronous mode w/o parity, LSB first, PAD0 to TX, PAD1 to RX and
+     * use internal clock */
+    dev->CTRLA.reg = (SERCOM_USART_CTRLA_DORD |
+                       SERCOM_USART_CTRLA_RXPO(0x1) |
+                       SERCOM_USART_CTRLA_SAMPR(0x1) |
+                       SERCOM_USART_CTRLA_MODE(0x1));
+    /* set baudrate */
+    dev->BAUD.FRAC.FP = (baud % 10);
+    dev->BAUD.FRAC.BAUD = (baud / 10);
+    /* enable receiver and transmitter, use 1 stop bit */
+    dev->CTRLB.reg = (SERCOM_USART_CTRLB_RXEN | SERCOM_USART_CTRLB_TXEN);
+    while (dev->SYNCBUSY.reg & SERCOM_USART_SYNCBUSY_CTRLB);
+    /* finally, enable the device */
+    dev->CTRLA.reg |= SERCOM_USART_CTRLA_ENABLE;
+    /* configure interrupts and enable RX interrupt */
+    NVIC_EnableIRQ(SERCOM0_IRQn + _sercom_id(dev));
+    dev->INTENSET.reg = SERCOM_USART_INTENSET_RXC;
     return 0;
 }
 
-void uart_tx_begin(uart_t uart)
+void uart_tx(uart_t uart)
 {
-
+    _uart(uart)->INTENSET.reg = SERCOM_USART_INTENSET_TXC;
 }
 
-void uart_tx_end(uart_t uart)
+void uart_write_blocking(uart_t uart, char data)
 {
-
-}
-
-int uart_write(uart_t uart, char data)
-{
-    switch (uart) {
-        case UART_0:
-            UART_0_DEV.DATA.reg = (uint8_t)data;
-            break;
-    }
-    return 1;
-}
-
-int uart_read_blocking(uart_t uart, char *data)
-{
-    switch (uart) {
-        case UART_0:
-            while (UART_0_DEV.INTFLAG.bit.RXC == 0);
-            *data = (char)(0x00ff & UART_0_DEV.DATA.reg);
-            break;
-    }
-    return 1;
-}
-
-int uart_write_blocking(uart_t uart, char data)
-{
-    switch (uart) {
-        case UART_0:
-            while (UART_0_DEV.INTFLAG.bit.DRE == 0);
-            while(UART_0_DEV.SYNCBUSY.bit.ENABLE);
-            UART_0_DEV.DATA.reg = (uint8_t)data;
-            while (UART_0_DEV.INTFLAG.reg & SERCOM_USART_INTFLAG_TXC);
-            break;
-    }
-    return 1;
+    while (!(_uart(uart)->INTFLAG.reg & SERCOM_USART_INTFLAG_DRE));
+    _uart(uart)->DATA.reg = (uint8_t)data;
 }
 
 void uart_poweron(uart_t uart)
 {
-    while (UART_0_DEV.SYNCBUSY.reg);
-    UART_0_DEV.CTRLA.reg |= SERCOM_USART_CTRLA_ENABLE;
+    MCLK->APBCMASK.reg |= (MCLK_APBCMASK_SERCOM0 << _sercom_id(_uart(uart)));
+    GCLK->PCHCTRL[SERCOM0_GCLK_ID_CORE + _sercom_id(_uart(uart))].reg =
+                                (GCLK_PCHCTRL_CHEN | GCLK_PCHCTRL_GEN_GCLK0);
+    while (!(GCLK->PCHCTRL[SERCOM0_GCLK_ID_CORE + _sercom_id(_uart(uart))].reg &
+             GCLK_PCHCTRL_CHEN));
 }
 
 void uart_poweroff(uart_t uart)
 {
-    while (UART_0_DEV.SYNCBUSY.reg);
-    UART_0_DEV.CTRLA.reg &= ~SERCOM_USART_CTRLA_ENABLE;
+    MCLK->APBCMASK.reg &= ~(MCLK_APBCMASK_SERCOM0 << _sercom_id(_uart(uart)));
+    GCLK->PCHCTRL[SERCOM0_GCLK_ID_CORE + _sercom_id(_uart(uart))].reg &=
+                                                        ~(GCLK_PCHCTRL_CHEN);
 }
 
-#if UART_0_EN
-void UART_0_ISR(void)
+static inline void irq_handler(int uart)
 {
-    irq_handler(UART_0, &UART_0_DEV);
-}
-#endif
+    SercomUsart *dev = _uart(uart);
 
-static inline void irq_handler(uint8_t uartnum, SercomUsart *dev)
-{
-    if (dev->INTFLAG.bit.RXC) {
-        /* cleared by reading DATA regiser */
-        char data = (char)dev->DATA.reg;
-        uart_config[uartnum].rx_cb(uart_config[uartnum].arg, data);
+    if (dev->INTFLAG.reg & SERCOM_USART_INTFLAG_RXC) {
+        /* interrupt flag is cleared by reading the data register */
+        uart_ctx[uart].rx_cb(uart_ctx[uart].arg, (char)(dev->DATA.reg));
     }
-    else if (dev->INTFLAG.bit.TXC) {
-        if (uart_config[uartnum].tx_cb(uart_config[uartnum].arg) == 0) {
-            /* TXC flag is also cleared by writing data to DATA register */
-            if (dev->INTFLAG.bit.TXC) {
-                /* cleared by writing 1 to TXC */
-                dev->INTFLAG.bit.TXC = 1;
-            }
+    else if (dev->INTFLAG.reg & SERCOM_USART_INTFLAG_TXC) {
+        uint16_t data = uart_ctx[uart].tx_cb(uart_ctx[uart].arg);
+        if (data) {
+            dev->DATA.reg = (uint8_t)data;
+        }
+        else {
+            /* disable the TXC interrupt */
+            dev->INTENCLR.reg = SERCOM_USART_INTENCLR_TXC;
         }
     }
-    else if (dev->INTFLAG.bit.ERROR) {
+    else if (dev->INTFLAG.reg & SERCOM_USART_INTFLAG_ERROR) {
         /* clear error flag */
-        dev->INTFLAG.bit.ERROR = 1;
+        dev->INTFLAG.reg = SERCOM_USART_INTFLAG_ERROR;
     }
-
     if (sched_context_switch_request) {
         thread_yield();
     }
 }
 
-
-
-
-static uint64_t _long_division(uint64_t n, uint64_t d)
+#ifdef UART_0_ISR
+void UART_0_ISR(void)
 {
-    int32_t i;
-    uint64_t q = 0, r = 0, bit_shift;
-    for (i = 63; i >= 0; i--) {
-        bit_shift = (uint64_t)1 << i;
-
-        r = r << 1;
-
-        if (n & bit_shift) {
-            r |= 0x01;
-        }
-
-        if (r >= d) {
-            r = r - d;
-            q |= bit_shift;
-        }
-    }
-
-    return q;
+    irq_handler(0);
 }
+#endif
 
-#endif /* UART_NUMOF */
+#ifdef UART_1_ISR
+void UART_1_ISR(void)
+{
+    irq_handler(1);
+}
+#endif
+
+#ifdef UART_2_ISR
+void UART_2_ISR(void)
+{
+    irq_handler(2);
+}
+#endif
+
+#ifdef UART_3_ISR
+void UART_3_ISR(void)
+{
+    irq_handler(3);
+}
+#endif
+
+#ifdef UART_4_ISR
+void UART_4_ISR(void)
+{
+    irq_handler(4);
+}
+#endif
+
+#ifdef UART_5_ISR
+void UART_5_ISR(void)
+{
+    irq_handler(5);
+}
+#endif

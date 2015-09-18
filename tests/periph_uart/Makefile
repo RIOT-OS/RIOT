@@ -1,8 +1,8 @@
-export APPLICATION = periph_uart_blocking
+export APPLICATION = periph_uart
 include ../Makefile.tests_common
 
 FEATURES_REQUIRED = periph_uart
 
-DISABLE_MODULE += auto_init
+USEMODULE += shell
 
 include $(RIOTBASE)/Makefile.include

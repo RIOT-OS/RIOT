@@ -16,8 +16,8 @@
  * @author          Hauke Petersen <hauke.peterse@fu-berlin.de>
  */
 
-#ifndef CPU_PERIPH_H_
-#define CPU_PERIPH_H_
+#ifndef CPU_PERIPH_H
+#define CPU_PERIPH_H
 
 #include "cpu.h"
 
@@ -122,5 +122,5 @@ int gpio_init_mux(gpio_t dev, gpio_mux_t mux);
 }
 #endif
 
-#endif /* CPU_PERIPH_H_ */
+#endif /* CPU_PERIPH_H */
 /** @} */
