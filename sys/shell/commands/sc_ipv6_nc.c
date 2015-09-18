@@ -72,11 +72,11 @@ static void _print_nc_type(gnrc_ipv6_nc_t *entry)
             break;
 
         case GNRC_IPV6_NC_TYPE_TENTATIVE:
-            printf("T");
+            printf("TENT");
             break;
 
         case GNRC_IPV6_NC_TYPE_REGISTERED:
-            printf("R");
+            printf("REG");
             break;
 
         default:
