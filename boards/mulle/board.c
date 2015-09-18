@@ -149,8 +149,6 @@ static inline void set_fll_source(void)
     /* Select FLL as source (as opposed to PLL) */
     SIM->SOPT2 &= ~(SIM_SOPT2_PLLFLLSEL_MASK);
     /* Use external 32kHz RTC clock as source for OSC32K */
-    /* This is also done by hwtimer_arch, but we need it sooner than
-     * hwtimer_init. */
 #if K60_CPU_REV == 1
     SIM->SOPT1 |= SIM_SOPT1_OSC32KSEL_MASK;
 #elif K60_CPU_REV == 2

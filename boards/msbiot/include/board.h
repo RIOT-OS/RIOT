@@ -36,11 +36,6 @@ extern "C" {
 #define F_CPU               CLOCK_CORECLOCK
 
 /**
- * @name Assign the hardware timer
- */
-#define HW_TIMER            TIMER_0
-
-/**
  * @name Configure connected CC1101 (radio) device
  * @{
  */
