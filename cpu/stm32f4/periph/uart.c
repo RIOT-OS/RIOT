@@ -49,8 +49,7 @@ static inline int _bus(uart_t uart)
     return (uart_config[uart].rcc_mask < RCC_APB1ENR_USART2EN) ? 2 : 1;
 }
 
-int uart_init(uart_t uart, uint32_t baudrate,
-              uart_rx_cb_t rx_cb, uart_tx_cb_t tx_cb, void *arg)
+int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 {
     USART_TypeDef *dev;
     float divider;
@@ -66,7 +65,6 @@ int uart_init(uart_t uart, uint32_t baudrate,
     dev = _dev(uart);
     /* remember callback addresses and argument */
     uart_ctx[uart].rx_cb = rx_cb;
-    uart_ctx[uart].tx_cb = tx_cb;
     uart_ctx[uart].arg = arg;
 
     /* configure pins */
@@ -96,15 +94,12 @@ int uart_init(uart_t uart, uint32_t baudrate,
     return 0;
 }
 
-void uart_tx(uart_t uart)
+void uart_write(uart_t uart, const char* data, size_t len)
 {
-    _dev(uart)->CR1 |= USART_CR1_TXEIE;
-}
-
-void uart_write_blocking(uart_t uart, char data)
-{
-    while (!(_dev(uart)->SR & USART_SR_TXE));
-    _dev(uart)->DR = (uint8_t)data;
+    for (int i = 0; i < len; i++) {
+        while (!(_dev(uart)->SR & USART_SR_TXE));
+        _dev(uart)->DR = (uint8_t)data[i];
+    }
 }
 
 void uart_poweron(uart_t uart)
@@ -127,22 +122,11 @@ void uart_poweroff(uart_t uart)
     }
 }
 
-static inline void irq_handler(int uart)
+static inline void irq_handler(int uart, USART_TypeDef *dev)
 {
-    USART_TypeDef *dev = _dev(uart);
-
     if (dev->SR & USART_SR_RXNE) {
         char data = (char)dev->DR;
         uart_ctx[uart].rx_cb(uart_ctx[uart].arg, data);
-    }
-    else if (dev->SR & USART_SR_TXE) {
-        uint16_t data = uart_ctx[uart].tx_cb(uart_ctx[uart].arg);
-        if (data) {
-            dev->DR = (uint8_t)data;
-        }
-        else {
-            dev->CR1 &= ~(USART_CR1_TXEIE);
-        }
     }
     if (sched_context_switch_request) {
         thread_yield();
@@ -152,41 +136,41 @@ static inline void irq_handler(int uart)
 #ifdef UART_0_ISR
 void UART_0_ISR(void)
 {
-    irq_handler(0);
+    irq_handler(0, uart_config[0].dev);
 }
 #endif
 
 #ifdef UART_1_ISR
 void UART_1_ISR(void)
 {
-    irq_handler(1);
+    irq_handler(1, uart_config[1].dev);
 }
 #endif
 
 #ifdef UART_2_ISR
 void UART_2_ISR(void)
 {
-    irq_handler(2);
+    irq_handler(2, uart_config[2].dev);
 }
 #endif
 
 #ifdef UART_3_ISR
 void UART_3_ISR(void)
 {
-    irq_handler(3);
+    irq_handler(3, uart_config[3].dev);
 }
 #endif
 
 #ifdef UART_4_ISR
 void UART_4_ISR(void)
 {
-    irq_handler(4);
+    irq_handler(4, uart_config[4].dev);
 }
 #endif
 
 #ifdef UART_5_ISR
 void UART_5_ISR(void)
 {
-    irq_handler(5);
+    irq_handler(5, uart_config[5].dev);
 }
 #endif
