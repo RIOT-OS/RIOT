@@ -74,6 +74,12 @@ static void _stale_nc(kernel_pid_t iface, ipv6_addr_t *ipaddr, uint8_t *l2addr,
             gnrc_ipv6_nc_add(iface, ipaddr, l2addr, (uint16_t)l2addr_len,
                              GNRC_IPV6_NC_STATE_STALE);
         }
+#ifdef MODULE_GNRC_SIXLOWPAN_ND_ROUTER
+        /* unreachable set in gnrc_ndp_retrans_nbr_sol() will just be staled */
+        else if (gnrc_ipv6_nc_get_state(nc_entry) == GNRC_IPV6_NC_STATE_UNREACHABLE) {
+            gnrc_ndp_internal_set_state(nc_entry, GNRC_IPV6_NC_STATE_STALE);
+        }
+#endif
         else if (((uint16_t)l2addr_len != nc_entry->l2_addr_len) ||
                  (memcmp(l2addr, nc_entry->l2_addr, l2addr_len) != 0)) {
             /* if entry exists but l2 address differs: set */
@@ -673,6 +679,7 @@ void gnrc_ndp_retrans_nbr_sol(gnrc_ipv6_nc_t *nc_entry)
                     (gnrc_ipv6_nc_get_type(nc_entry) != GNRC_IPV6_NC_TYPE_GC)) {
                     /* don't remove non-gc entrys on 6LRs:
                      * https://tools.ietf.org/html/rfc6775#section-6 */
+                    gnrc_ndp_internal_set_state(nc_entry, GNRC_IPV6_NC_STATE_UNREACHABLE);
                     return;
                 }
             }
