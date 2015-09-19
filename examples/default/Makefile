@@ -48,23 +48,23 @@ FEATURES_OPTIONAL += config
 FEATURES_OPTIONAL += periph_rtc
 
 ifneq (,$(filter msb-430,$(BOARD)))
-	USEMODULE += sht11
+  USEMODULE += sht11
 endif
 ifneq (,$(filter msba2,$(BOARD)))
-	USEMODULE += sht11
-	USEMODULE += mci
-	USEMODULE += random
+  USEMODULE += sht11
+  USEMODULE += mci
+  USEMODULE += random
 endif
 ifneq (,$(filter iotlab-m3,$(BOARD)))
-	USEMODULE += isl29020
-	USEMODULE += lps331ap
-	USEMODULE += l3g4200d
-	USEMODULE += lsm303dlhc
+  USEMODULE += isl29020
+  USEMODULE += lps331ap
+  USEMODULE += l3g4200d
+  USEMODULE += lsm303dlhc
 endif
 ifneq (,$(filter fox,$(BOARD)))
-        USEMODULE += lps331ap
-        USEMODULE += l3g4200d
-	USEMODULE += lsm303dlhc
+  USEMODULE += lps331ap
+  USEMODULE += l3g4200d
+  USEMODULE += lsm303dlhc
 endif
 
 include $(RIOTBASE)/Makefile.include
