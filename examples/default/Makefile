@@ -34,15 +34,21 @@ USEMODULE += shell_commands
 USEMODULE += ps
 USEMODULE += config
 
-# Use modules for networking
-# gnrc is a meta module including all required, basic gnrc networking modules
-USEMODULE += gnrc
-# use the default network interface for the board
-USEMODULE += gnrc_netif_default
-# automatically initialize the network interface
-USEMODULE += auto_init_gnrc_netif
-# the application dumps received packets to stdout
-USEMODULE += gnrc_pktdump
+BOARD_PROVIDES_NETIF := airfy-beacon fox iotlab-m3 mulle native nrf51dongle \
+	nrf6310 pba-d-01-kw2x pca10000 pca10005 saml21-xpro samr21-xpro spark-core \
+	yunjia-nrf51822
+
+ifneq (,$(filter $(BOARD),$(BOARD_PROVIDES_NETIF)))
+  # Use modules for networking
+  # gnrc is a meta module including all required, basic gnrc networking modules
+  USEMODULE += gnrc
+  # use the default network interface for the board
+  USEMODULE += gnrc_netif_default
+  # automatically initialize the network interface
+  USEMODULE += auto_init_gnrc_netif
+  # the application dumps received packets to stdout
+  USEMODULE += gnrc_pktdump
+endif
 
 FEATURES_OPTIONAL += config
 FEATURES_OPTIONAL += periph_rtc
