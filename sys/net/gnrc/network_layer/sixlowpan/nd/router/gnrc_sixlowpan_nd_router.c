@@ -149,8 +149,8 @@ bool gnrc_sixlowpan_nd_router_abr_older(sixlowpan_nd_opt_abr_t *abr_opt)
         return false;
     }
 
-    version = byteorder_ntohs(abr_opt->vlow);
-    version |= byteorder_ntohs(abr_opt->vhigh) << 16;
+    version = (uint32_t)byteorder_ntohs(abr_opt->vlow);
+    version |= ((uint32_t)byteorder_ntohs(abr_opt->vhigh)) << 16;
 
     return (version < abr->version);
 }
@@ -223,8 +223,8 @@ void gnrc_sixlowpan_nd_opt_abr_handle(kernel_pid_t iface, ndp_rtr_adv_t *rtr_adv
         sicmpv6_size -= (opt->len * 8);
     }
 
-    abr->version = byteorder_ntohs(abr_opt->vlow);
-    abr->version |= byteorder_ntohs(abr_opt->vhigh) << 16;
+    abr->version = (uint32_t)byteorder_ntohs(abr_opt->vlow);
+    abr->version |= ((uint32_t)byteorder_ntohs(abr_opt->vhigh)) << 16;
     abr->addr.u64[0] = abr_opt->braddr.u64[0];
     abr->addr.u64[1] = abr_opt->braddr.u64[1];
     memset(abr->ctxs, 0, sizeof(abr->ctxs));
