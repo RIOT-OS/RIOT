@@ -71,6 +71,13 @@ void _native_null_in(char *stdiotype)
     }
 }
 
+void _sigio_handler(void)
+{
+#ifdef MODULE_NETDEV2_TAP
+    native_tap_isr();
+#endif
+}
+
 /**
  * set up stdout redirection
  *
@@ -312,6 +319,10 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
 
     native_cpu_init();
     native_interrupt_init();
+
+    /* configure signal handler for fds */
+    register_interrupt(SIGIO, _sigio_handler);
+
 #ifdef MODULE_NETDEV2_TAP
     netdev2_tap_setup(&netdev2_tap, argv[1]);
 #endif
