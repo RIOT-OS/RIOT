@@ -17,7 +17,7 @@
  * 1.000 -- 2.000 ms, roughly -/+ 90 degrees from the middle position if the
  * connected servo is a standard RC servo.
  *
- * @author      Joakim Gebart <joakim.gebart@eistec.se>
+ * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  *
  * @}
  */

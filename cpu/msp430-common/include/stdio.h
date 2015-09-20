@@ -14,7 +14,7 @@
  * @brief       stdio.h wrapper for MSP430
  * @see http://www.cplusplus.com/reference/cstdio/
  *
- * @author      Joakim Gebart <joakim.gebart@eistec.se
+ * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se
  */
 
 #ifndef RIOT_MSP430_STDIO_H_

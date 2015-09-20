@@ -15,7 +15,7 @@
  * @brief       Functions for atomic handling of variables
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
- * @author      Joakim Gebart <joakim.gebart@eistec.se>
+ * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
 #ifndef ATOMIC_H_

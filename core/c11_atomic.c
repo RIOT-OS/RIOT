@@ -29,7 +29,7 @@
  *
  * @see https://gcc.gnu.org/wiki/Atomic/GCCMM/LIbrary
  *
- * @author Joakim Gebart <joakim.gebart@eistec.se>
+ * @author Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
 #include <stdint.h>

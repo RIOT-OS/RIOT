@@ -15,7 +15,7 @@
  * @file
  * @brief           Device I/O helpers for UARTs on K60.
  *
- * @author          Joakim Gebart <joakim.gebart@eistec.se>
+ * @author          Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 #ifndef DEVIO_UART_H_
 #define DEVIO_UART_H_

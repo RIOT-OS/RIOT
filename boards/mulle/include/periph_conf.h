@@ -14,7 +14,7 @@
  * @file
  * @name        Peripheral MCU configuration for the Eistec Mulle
  *
- * @author      Joakim Gebart <joakim.gebart@eistec.se>
+ * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
 #ifndef MULLE_PERIPH_CONF_H_

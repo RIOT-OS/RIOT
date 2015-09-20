@@ -13,7 +13,7 @@
  * @file
  * @brief       Board specific implementations for the Mulle board
  *
- * @author      Joakim Gebart <joakim.gebart@eistec.se>
+ * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  *
  * @}
  */

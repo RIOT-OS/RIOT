@@ -21,7 +21,7 @@
  * @file
  *
  * @brief       Generic non-volatile RAM driver interface
- * @author      Joakim Gebart <joakim.gebart@eistec.se>
+ * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
 #ifndef DRIVERS_NVRAM_H_

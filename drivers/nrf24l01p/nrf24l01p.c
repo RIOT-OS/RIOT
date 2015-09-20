@@ -10,7 +10,7 @@
  * @ingroup     drivers_nrf24l01p
  * @{
  * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
- * @author      Joakim Gebart <joakim.gebart@eistec.se>
+ * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  * @}
  */
 #include "nrf24l01p.h"
