@@ -285,7 +285,8 @@ int tripledes_encrypt(const cipher_context_t *context, const uint8_t *plain, uin
     uint32_t work[2];
 
     if (!key) {
-        DEBUGF("[ERROR] Could NOT malloc space for the des3_key_s struct.\r\n");
+        DEBUG("%s:%d in %s: [ERROR] Could NOT malloc space for the des3_key_s struct.\r\n",
+              RIOT_FILE_RELATIVE, __LINE__, DEBUG_FUNC);
         return -1;
     }
 
@@ -293,7 +294,8 @@ int tripledes_encrypt(const cipher_context_t *context, const uint8_t *plain, uin
     res = des3_key_setup(context->context, key);
 
     if (res < 0) {
-        DEBUGF("[ERROR] des3_key_setup failed with Code %i\r\n", res);
+        DEBUG("%s:%d in %s: [ERROR] des3_key_setup failed with Code %i\r\n",
+              RIOT_FILE_RELATIVE, __LINE__, DEBUG_FUNC, res);
         free(key);
         return -2;
     }
@@ -318,7 +320,8 @@ int tripledes_decrypt(const cipher_context_t *context, const uint8_t *crypt, uin
     uint32_t work[2];
 
     if (!key) {
-        DEBUGF("[ERROR] Could NOT malloc space for the des3_key_s struct.\r\n");
+        DEBUG("%s:%d in %s: [ERROR] Could NOT malloc space for the des3_key_s struct.\r\n",
+              RIOT_FILE_RELATIVE, __LINE__, DEBUG_FUNC);
         return -1;
     }
 
@@ -326,7 +329,8 @@ int tripledes_decrypt(const cipher_context_t *context, const uint8_t *crypt, uin
     res = des3_key_setup(context->context, key);
 
     if (res < 0) {
-        DEBUGF("[ERROR] des3_key_setup failed with Code %i\r\n", res);
+        DEBUG("%s:%d in %s: [ERROR] des3_key_setup failed with Code %i\r\n",
+              RIOT_FILE_RELATIVE, __LINE__, DEBUG_FUNC, res);
         free(key);
         return -2;
     }

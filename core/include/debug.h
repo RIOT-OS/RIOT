@@ -14,15 +14,10 @@
  * @brief       Debug-header
  *
  * @details     If *ENABLE_DEBUG* is defined inside an implementation file, all
- *              calls to ::DEBUG and ::DEBUGF* will work the same as *printf*
- *              and output the given information to stdout. If *ENABLE_DEBUG*
- *              is not defined, all calls to ::DEBUG and ::DEBUGF will be
- *              ignored.
+ *              calls to ::DEBUG will work the same as *printf* and output the
+ *              given information to stdout. If *ENABLE_DEBUG* is not defined,
+ *              all calls to ::DEBUG will be ignored.
  *
- *              In addition to just printing the given information ::DEBUGF
- *              will further print extended debug information about the current
- *              thread and function.
-     *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
@@ -40,8 +35,7 @@ extern "C" {
 /**
  * @def ENABLE_DEBUG
  * @brief   This macro can be defined as 0 or other on a file-based level.
- *          If ENABLE_DEBUG is 0 @ref DEBUG() and @ref DEBUGF() will generate
- *          no output if not they will generate output.
+ *          @ref DEBUG() will generate output only if ENABLE_DEBUG is non-zero.
  */
 
 /**
@@ -100,22 +94,8 @@ extern "C" {
  * @note Another name for ::DEBUG_PRINT
  */
 #define DEBUG(...) DEBUG_PRINT(__VA_ARGS__)
-/**
- * @def DEBUGF
- *
- * @brief Print extended debug information about the current thread and
- *        function to stdout
- */
-#define DEBUGF(...) \
-    do { \
-        DEBUG_PRINT("DEBUG(%s): %s:%d in %s: ", \
-                sched_active_thread ? sched_active_thread->name : "NO THREAD", \
-                __FILE__, __LINE__, DEBUG_FUNC); \
-        DEBUG_PRINT(__VA_ARGS__); \
-    } while (0)
 #else
 #define DEBUG(...)
-#define DEBUGF(...)
 #endif
 /** @} */
 

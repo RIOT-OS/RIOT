@@ -37,10 +37,12 @@ void trickle_interval(trickle_t *trickle)
     DEBUG("TRICKLE new Interval %" PRIu32 "\n", trickle->I);
 
     if (trickle->I == 0) {
-        DEBUGF("[WARNING] Interval was 0\n");
+        DEBUG("%s:%d in %s: [WARNING] Interval was 0\n", RIOT_FILE_RELATIVE,
+              __LINE__, DEBUG_FUNC);
 
         if (trickle->Imax == 0) {
-            DEBUGF("[WARNING] Imax == 0\n");
+            DEBUG("%s:%d in %s: [WARNING] Imax == 0\n", RIOT_FILE_RELATIVE,
+                  __LINE__, DEBUG_FUNC);
         }
 
         trickle->I = (trickle->Imin << trickle->Imax);
