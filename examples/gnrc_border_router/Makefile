@@ -10,8 +10,6 @@ RIOTBASE ?= $(CURDIR)/../..
 BOARD_INSUFFICIENT_MEMORY := airfy-beacon nrf51dongle nrf6310 pca10000 pca10005 nucleo-f334 \
                              spark-core stm32f0discovery yunjia-nrf51822
 
-BOARD_BLACKLIST := arduino-mega2560     # panic_arch not defined
-
 ifeq (,$(SLIP_UART))
   # set default (last available UART)
   SLIP_UART="(UART_NUMOF-1)"
