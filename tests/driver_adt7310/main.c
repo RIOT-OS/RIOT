@@ -13,7 +13,7 @@
  * @file
  * @brief       Test application for the ADT7310 accelerometer driver
  *
- * @author      Joakim Gebart <joakim.gebart@eistec.se
+ * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se
  *
  * @}
  */

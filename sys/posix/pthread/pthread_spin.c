@@ -13,7 +13,7 @@
  * @brief   Spin locks.
  * @author  Christian Mehlis <mehlis@inf.fu-berlin.de>
  * @author  René Kijewski <kijewski@inf.fu-berlin.de>
- * @author  Joakim Gebart <joakim.gebart@eistec.se>
+ * @author  Joakim Nohlgård <joakim.nohlgard@eistec.se>
  * @}
  */
 

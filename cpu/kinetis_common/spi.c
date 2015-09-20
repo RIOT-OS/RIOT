@@ -36,7 +36,7 @@
  *
  * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
  * @author      Johann Fischer <j.fischer@phytec.de>
- * @author      Joakim Gebart <joakim.gebart@eistec.se>
+ * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  *
  * @}
  */

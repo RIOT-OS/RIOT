@@ -26,7 +26,7 @@
  * Tested on:
  * - Cypress/Ramtron FM25L04B.
  *
- * @author      Joakim Gebart <joakim.gebart@eistec.se>
+ * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
 typedef enum {

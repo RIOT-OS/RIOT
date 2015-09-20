@@ -17,7 +17,7 @@
  * @author      Hauke Petersen <mail@haukepetersen.de>
  * @author      Fabian Nack <nack@inf.fu-berlin.de>
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
- * @author      Joakim Gebart <joakim.gebart@eistec.se>
+ * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  *
  * @}
  */

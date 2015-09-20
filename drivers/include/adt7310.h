@@ -44,7 +44,7 @@
  * @file
  * @brief       Interface definition for the ADT7310 sensor driver.
  *
- * @author      Joakim Gebart <joakim.gebart@eistec.se>
+ * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
 #ifndef ADT7310_H_

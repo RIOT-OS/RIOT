@@ -13,7 +13,7 @@
  * @file
  * @brief           Compatibility definitions between MK60D10.h and MK60DZ10.h
  *
- * @author          Joakim Gebart <joakim.gebart@eistec.se>
+ * @author          Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
 #ifndef MK60_COMP_H_

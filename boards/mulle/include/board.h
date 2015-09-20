@@ -15,7 +15,7 @@
  * @file
  * @brief       Board specific definitions for the Eistec Mulle IoT board
  *
- * @author      Joakim Gebart <joakim.gebart@eistec.se>
+ * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
 #ifndef BOARD_H_

@@ -15,7 +15,7 @@
  * @brief       Crash handling functions implementation for ARM Cortex-based MCUs
  *
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
- * @author      Joakim Gebart <joakim.gebart@eistec.se>
+ * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
 #include "cpu.h"

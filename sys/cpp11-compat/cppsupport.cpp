@@ -15,7 +15,7 @@
  *
  * Tested with GCC-4.9.2 and Clang-3.6
  *
- * @author  Joakim Gebart <joakim.gebart@eistec.se>
+ * @author  Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
 #include <new>

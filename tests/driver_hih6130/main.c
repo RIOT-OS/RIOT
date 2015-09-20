@@ -13,7 +13,7 @@
  * @file
  * @brief       Test application for the HIH6130 sensor driver
  *
- * @author      Joakim Gebart <joakim.gebart@eistec.se>
+ * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  *
  * @}
  */

@@ -19,7 +19,7 @@
  * @file
  * @brief           Device operations table.
  *
- * @author          Joakim Gebart <joakim.gebart@eistec.se>
+ * @author          Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 #ifndef DEVOPTTAB_H_
 #define DEVOPTTAB_H_

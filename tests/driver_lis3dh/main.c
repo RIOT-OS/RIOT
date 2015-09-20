@@ -13,7 +13,7 @@
  * @file
  * @brief       Test application for the LIS3DH accelerometer driver
  *
- * @author      Joakim Gebart <joakim.gebart@eistec.se
+ * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se
  *
  * @}
  */

@@ -33,7 +33,7 @@
  * @brief       Interface definition for the Kinetis WDOG driver.
  *
  * @author      Johann Fischer <j.fischer@phytec.de>
- * @author      Joakim Gebart <joakim.gebart@eistec.se>
+ * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
 #ifndef WDOG_H

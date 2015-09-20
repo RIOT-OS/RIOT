@@ -13,7 +13,7 @@
  * @file
  * @brief           Device I/O helpers for a no-op device.
  *
- * @author          Joakim Gebart <joakim.gebart@eistec.se>
+ * @author          Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 #ifndef DEVIO_NULL_H_
 #define DEVIO_NULL_H_

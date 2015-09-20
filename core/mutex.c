@@ -14,7 +14,7 @@
  * @brief       Kernel mutex implementation
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
- * @author      Joakim Gebart <joakim.gebart@eistec.se>
+ * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  *
  * @}
  */

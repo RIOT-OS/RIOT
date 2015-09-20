@@ -19,7 +19,7 @@
  * @brief       Low-level I2C driver implementation
  *
  * @author      Johann Fischer <j.fischer@phytec.de>
- * @author      Joakim Gebart <joakim.gebart@eistec.se>
+ * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  *
  * @}
  */

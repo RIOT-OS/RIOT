@@ -18,7 +18,7 @@
  *              Side, Bi-Directional CURRENT/POWER MONITOR with Two-Wire
  *              Interface
  *
- * @author      Joakim Gebart <joakim.gebart@eistec.se>
+ * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
 #ifndef INA220_H
