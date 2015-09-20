@@ -112,8 +112,15 @@ void gnrc_sixlowpan_nd_router_set_rtr_adv(gnrc_ipv6_netif_t *netif, bool enable)
 
     if (enable && (gnrc_ipv6_netif_add_addr(netif->pid, &all_routers, 128,
                                             GNRC_IPV6_NETIF_ADDR_FLAGS_NON_UNICAST) != NULL)) {
+        mutex_lock(&netif->mutex);
         netif->flags |= GNRC_IPV6_NETIF_FLAGS_RTR_ADV;
         netif->adv_ltime = GNRC_IPV6_NETIF_DEFAULT_ROUTER_LTIME;
+#ifdef MODULE_GNRC_NDP_ROUTER
+        /* for border router these values have to be initialized, too */
+        netif->max_adv_int = GNRC_IPV6_NETIF_DEFAULT_MAX_ADV_INT;
+        netif->min_adv_int = GNRC_IPV6_NETIF_DEFAULT_MIN_ADV_INT;
+#endif
+        mutex_unlock(&netif->mutex);
     }
     else {
         netif->flags &= ~GNRC_IPV6_NETIF_FLAGS_RTR_ADV;
