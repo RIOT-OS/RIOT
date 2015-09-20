@@ -176,29 +176,6 @@ void daemonize(void)
     }
 }
 
-/**
- * Remove any -d options from an argument vector.
- *
- * @param[in][out]  argv    an argument vector
- *
- * @return                  1 if "-d" was found, 0 otherwise
- */
-static int filter_daemonize_argv(char **argv)
-{
-    int ret = 0;
-    for (char **narg = argv; *narg != NULL; narg++) {
-        if (strcmp("-d", narg[0]) == 0) {
-            ret = 1;
-            char **xarg = narg;
-            do {
-                xarg[0] = xarg[1];
-            } while (*xarg++ != NULL);
-            narg--; /* rescan current item to filter out double args */
-        }
-    }
-    return ret;
-}
-
 void usage_exit(void)
 {
     real_printf("usage: %s", _progname);
@@ -246,6 +223,7 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
     char *stderrtype = "stdio";
     char *stdouttype = "stdio";
     char *stdiotype = "stdio";
+    bool daemonize_flag = false;
 
 #if defined(MODULE_NETDEV2_TAP)
     if (
@@ -285,15 +263,7 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
             _native_rng_mode = 1;
         }
         else if (strcmp("-d", arg) == 0) {
-            if (strcmp(stdiotype, "stdio") == 0) {
-                stdiotype = "null";
-            }
-            if (strcmp(stdouttype, "stdio") == 0) {
-                stdouttype = "null";
-            }
-            if (strcmp(stderrtype, "stdio") == 0) {
-                stderrtype = "null";
-            }
+            daemonize_flag = true;
         }
         else if (strcmp("-e", arg) == 0) {
             stderrtype = "file";
@@ -304,12 +274,31 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
         else if (strcmp("-o", arg) == 0) {
             stdouttype = "file";
         }
+        else if (strcmp("-t", arg) == 0) {
+            daemonize_flag = true;
+            stdiotype = "tcp";
+            if (argp + 1 < argc) {
+                _tcpport = argv[++argp];
+            }
+            else {
+                usage_exit();
+            }
+        }
         else {
             usage_exit();
         }
     }
 
-    if (filter_daemonize_argv(_native_argv)) {
+    if (daemonize_flag) {
+        if (strcmp(stdiotype, "stdio") == 0) {
+            stdiotype = "null";
+        }
+        if (strcmp(stdouttype, "stdio") == 0) {
+            stdouttype = "null";
+        }
+        if (strcmp(stderrtype, "stdio") == 0) {
+            stderrtype = "null";
+        }
         daemonize();
     }
 
