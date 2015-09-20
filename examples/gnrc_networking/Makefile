@@ -12,7 +12,7 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon chronos msb-430 msb-430h nrf51dongle \
                           stm32f0discovery telosb wsn430-v1_3b wsn430-v1_4 \
                           yunjia-nrf51822 z1
 
-BOARD_BLACKLIST        := arduino-mega2560 spark-core
+BOARD_BLACKLIST        := spark-core
 # arduino-mega2560: unknown error types (e.g. -EBADMSG)
 
 # Include packages that pull up and auto-init the link layer.
