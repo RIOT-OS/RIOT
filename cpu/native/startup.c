@@ -159,6 +159,19 @@ static void _native_incoming_conn(void)
     }
 }
 
+void _native_fix_io(void)
+{
+    FD_CLR(_native_fd, &_native_fds);
+    real_close(_native_fd);
+    _native_fd = -1;
+    if (real_dup2(_native_null_in_pipe[0], STDIN_FILENO) == -1) {
+        err(EXIT_FAILURE, "native: dup2(STDIN_FILENO)");
+    }
+    if (real_dup2(_native_null_out_file, STDOUT_FILENO) == -1) {
+        err(EXIT_FAILURE, "native: dup2(STDOUT_FILENO)");
+    }
+}
+
 static void _sigio_handler(void)
 {
 #ifdef MODULE_NETDEV2_TAP
@@ -410,6 +423,7 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
 
     /* configure signal handler for fds */
     register_interrupt(SIGIO, _sigio_handler);
+    register_interrupt(SIGPIPE, _native_fix_io);
 
 #ifdef MODULE_NETDEV2_TAP
     netdev2_tap_setup(&netdev2_tap, argv[1]);
