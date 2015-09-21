@@ -92,26 +92,26 @@ static uint16_t _calc_csum(gnrc_pktsnip_t *hdr, gnrc_pktsnip_t *pseudo_hdr,
 
 static void _receive(gnrc_pktsnip_t *pkt)
 {
-    gnrc_pktsnip_t *udp, *ipv6;
+    gnrc_pktsnip_t *udp, *ipv6, *payload;
     udp_hdr_t *hdr;
     uint32_t port;
 
     /* mark UDP header */
-    udp = gnrc_pktbuf_start_write(pkt);
-    if (udp == NULL) {
+    payload = gnrc_pktbuf_start_write(pkt);
+    if (payload == NULL) {
         DEBUG("udp: unable to get write access to packet\n");
         gnrc_pktbuf_release(pkt);
         return;
     }
-    pkt = udp;
-    udp = gnrc_pktbuf_mark(pkt, sizeof(udp_hdr_t), GNRC_NETTYPE_UDP);
+
+    udp = gnrc_pktbuf_mark(payload, sizeof(udp_hdr_t), GNRC_NETTYPE_UDP);
     if (udp == NULL) {
         DEBUG("udp: error marking UDP header, dropping packet\n");
-        gnrc_pktbuf_release(pkt);
+        gnrc_pktbuf_release(payload);
         return;
     }
     /* mark payload as Type: UNDEF */
-    pkt->type = GNRC_NETTYPE_UNDEF;
+    payload->type = GNRC_NETTYPE_UNDEF;
     /* get explicit pointer to UDP header */
     hdr = (udp_hdr_t *)udp->data;
 
@@ -122,7 +122,7 @@ static void _receive(gnrc_pktsnip_t *pkt)
     /* validate checksum */
     if (_calc_csum(udp, ipv6, pkt)) {
         DEBUG("udp: received packet with invalid checksum, dropping it\n");
-        gnrc_pktbuf_release(pkt);
+        gnrc_pktbuf_release(udp);
         return;
     }
 
@@ -130,9 +130,9 @@ static void _receive(gnrc_pktsnip_t *pkt)
     port = (uint32_t)byteorder_ntohs(hdr->dst_port);
 
     /* send payload to receivers */
-    if (!gnrc_netapi_dispatch_receive(GNRC_NETTYPE_UDP, port, pkt)) {
+    if (!gnrc_netapi_dispatch_receive(GNRC_NETTYPE_UDP, port, udp)) {
         DEBUG("udp: unable to forward packet as no one is interested in it\n");
-        gnrc_pktbuf_release(pkt);
+        gnrc_pktbuf_release(udp);
     }
 }
 
