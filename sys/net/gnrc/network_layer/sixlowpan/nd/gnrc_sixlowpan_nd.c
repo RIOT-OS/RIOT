@@ -242,9 +242,10 @@ gnrc_pktsnip_t *gnrc_sixlowpan_nd_opt_ar_build(uint8_t status, uint16_t ltime, e
     return pkt;
 }
 
-uint8_t gnrc_sixlowpan_nd_opt_ar_handle(kernel_pid_t iface, ipv6_hdr_t *ipv6, uint8_t icmpv6_type,
-                                        sixlowpan_nd_opt_ar_t *ar_opt, uint8_t *sl2a,
-                                        size_t sl2a_len)
+uint8_t gnrc_sixlowpan_nd_opt_ar_handle(kernel_pid_t iface, ipv6_hdr_t *ipv6,
+                                        uint8_t icmpv6_type, ipv6_addr_t *addr,
+                                        sixlowpan_nd_opt_ar_t *ar_opt,
+                                        uint8_t *sl2a, size_t sl2a_len)
 {
     eui64_t eui64;
     gnrc_ipv6_netif_t *ipv6_iface;
@@ -262,7 +263,7 @@ uint8_t gnrc_sixlowpan_nd_opt_ar_handle(kernel_pid_t iface, ipv6_hdr_t *ipv6, ui
         return 0;
     }
     ipv6_iface = gnrc_ipv6_netif_get(iface);
-    nc_entry = gnrc_ipv6_nc_get(iface, &ipv6->src);
+    nc_entry = gnrc_ipv6_nc_get(iface, addr);
     switch (icmpv6_type) {
         case ICMPV6_NBR_ADV:
             if (!(ipv6_iface->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN)) {
@@ -271,6 +272,12 @@ uint8_t gnrc_sixlowpan_nd_opt_ar_handle(kernel_pid_t iface, ipv6_hdr_t *ipv6, ui
             }
             if (eui64.uint64.u64 != ar_opt->eui64.uint64.u64) {
                 /* discard silently: see https://tools.ietf.org/html/rfc6775#section-5.5.2 */
+                return 0;
+            }
+            /* we expect the sender to be already in neighbor cache, if not we
+             * ignore it */
+            if (nc_entry == NULL) {
+                DEBUG("6lo nd: sending router not in neighbor cache\n");
                 return 0;
             }
             switch (ar_opt->status) {
