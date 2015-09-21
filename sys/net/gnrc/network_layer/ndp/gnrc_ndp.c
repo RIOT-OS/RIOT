@@ -167,7 +167,9 @@ void gnrc_ndp_nbr_sol_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
     if ((sl2a_opt != NULL) && (ar_opt != NULL) &&
         (ipv6_iface->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN) &&
         (ipv6_iface->flags & GNRC_IPV6_NETIF_FLAGS_ROUTER)) {
-        uint8_t status = gnrc_sixlowpan_nd_opt_ar_handle(iface, ipv6, nbr_sol->type, ar_opt,
+        uint8_t status = gnrc_sixlowpan_nd_opt_ar_handle(iface, ipv6,
+                                                         nbr_sol->type,
+                                                         &ipv6->src, ar_opt,
                                                          l2src, l2src_len);
         /* check for multihop DAD return */
         nbr_adv_opts = gnrc_sixlowpan_nd_opt_ar_build(status, GNRC_SIXLOWPAN_ND_AR_LTIME,
@@ -253,7 +255,9 @@ void gnrc_ndp_nbr_adv_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
             case NDP_OPT_AR:
                 /* address registration option is always ignored when invalid */
                 gnrc_sixlowpan_nd_opt_ar_handle(iface, ipv6, nbr_adv->type,
-                                                (sixlowpan_nd_opt_ar_t *)opt, NULL, 0);
+                                                &nbr_adv->tgt,
+                                                (sixlowpan_nd_opt_ar_t *)opt,
+                                                NULL, 0);
                 break;
 #endif
             default:
