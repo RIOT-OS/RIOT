@@ -109,16 +109,19 @@ static ipv6_addr_t *_add_addr_to_entry(gnrc_ipv6_netif_t *entry, const ipv6_addr
             if ((entry->flags & GNRC_IPV6_NETIF_FLAGS_ROUTER) &&
                 (entry->flags & GNRC_IPV6_NETIF_FLAGS_RTR_ADV)) {
                 mutex_unlock(&entry->mutex);    /* function below relocks mutex */
+#ifdef MODULE_GNRC_SIXLOWPAN_ND_ROUTER
+                if (entry->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN) {
+                    gnrc_ndp_internal_send_rtr_adv(entry->pid, &tmp_addr->addr,
+                                                   NULL, false);
+                }
+#endif
 #ifdef MODULE_GNRC_NDP_ROUTER
                 /* New prefixes MAY allow the router to retransmit up to
                  * GNRC_NDP_MAX_INIT_RTR_ADV_NUMOF unsolicited RA
                  * (see https://tools.ietf.org/html/rfc4861#section-6.2.4) */
-                entry->rtr_adv_count = GNRC_NDP_MAX_INIT_RTR_ADV_NUMOF;
-                gnrc_ndp_router_retrans_rtr_adv(entry);
-#elif defined(MODULE_GNRC_SIXLOWPAN_ND_ROUTER)
-                if (entry->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN) {
-                    gnrc_ndp_internal_send_rtr_adv(entry->pid, &tmp_addr->addr,
-                                                   NULL, false);
+                if (!(entry->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN)) {
+                    entry->rtr_adv_count = GNRC_NDP_MAX_INIT_RTR_ADV_NUMOF;
+                    gnrc_ndp_router_retrans_rtr_adv(entry);
                 }
 #endif
                 mutex_lock(&entry->mutex);      /* relock mutex */
