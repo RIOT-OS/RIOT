@@ -74,10 +74,8 @@ typedef struct tcb_t {
     cib_t msg_queue;            /**< message queue                  */
     msg_t *msg_array;           /**< memory holding messages        */
 
-#if defined DEVELHELP || defined(SCHED_TEST_STACK)
-    char *stack_start;          /**< thread's stack start address   */
-#endif
 #ifdef DEVELHELP
+    char *stack_start;          /**< thread's stack start address   */
     const char *name;           /**< thread's name                  */
     int stack_size;             /**< thread's stack size            */
 #endif
