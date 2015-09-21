@@ -45,6 +45,7 @@ void _xtimer_sleep(uint32_t offset, uint32_t long_offset)
 
     timer.callback = _callback_unlock_mutex;
     timer.arg = (void*) &mutex;
+    timer.target = timer.long_target = 0;
 
     mutex_lock(&mutex);
     _xtimer_set64(&timer, offset, long_offset);
@@ -173,6 +174,7 @@ int xtimer_msg_receive_timeout64(msg_t *m, uint64_t timeout) {
     tmsg.content.ptr = (char *) &tmsg;
 
     xtimer_t t;
+    t.target = t.long_target = 0;
     xtimer_set_msg64(&t, timeout, &tmsg, sched_active_pid);
 
     msg_receive(m);
