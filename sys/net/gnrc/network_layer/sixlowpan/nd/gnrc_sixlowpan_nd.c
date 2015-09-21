@@ -51,9 +51,13 @@ void gnrc_sixlowpan_nd_init(gnrc_ipv6_netif_t *iface)
     iface->rtr_sol_count = 0;   /* first will be sent immediately */
 
     DEBUG("6lo nd: retransmit multicast rtr sol in 10 sec\n");
+#ifndef MODULE_GNRC_SIXLOWPAN_ND_BORDER_ROUTER
     _rtr_sol_reschedule(iface, GNRC_SIXLOWPAN_ND_RTR_SOL_INT);
+#endif
     mutex_unlock(&iface->mutex);
+#ifndef MODULE_GNRC_SIXLOWPAN_ND_BORDER_ROUTER
     gnrc_ndp_internal_send_rtr_sol(iface->pid, NULL);
+#endif
 }
 
 void gnrc_sixlowpan_nd_mc_rtr_sol(gnrc_ipv6_netif_t *iface)
