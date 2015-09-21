@@ -1,3 +1,7 @@
+PSEUDOMODULES += conn
+PSEUDOMODULES += conn_ip
+PSEUDOMODULES += conn_tcp
+PSEUDOMODULES += conn_udp
 PSEUDOMODULES += gnrc_netif_default
 PSEUDOMODULES += gnrc_ipv6_default
 PSEUDOMODULES += gnrc_ipv6_router
