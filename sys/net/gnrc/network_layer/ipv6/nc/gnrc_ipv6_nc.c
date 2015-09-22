@@ -123,7 +123,7 @@ gnrc_ipv6_nc_t *gnrc_ipv6_nc_add(kernel_pid_t iface, const ipv6_addr_t *ipv6_add
     DEBUG(" with flags = 0x%0x\n", flags);
 
     if (gnrc_ipv6_nc_get_state(free_entry) == GNRC_IPV6_NC_STATE_INCOMPLETE) {
-        DEBUG("ipv6_nc: Set remaining probes to %" PRIu8 "\n");
+        DEBUG("ipv6_nc: Set remaining probes to %" PRIu8 "\n", GNRC_NDP_MAX_MC_NBR_SOL_NUMOF);
         free_entry->probes_remaining = GNRC_NDP_MAX_MC_NBR_SOL_NUMOF;
     }
 
