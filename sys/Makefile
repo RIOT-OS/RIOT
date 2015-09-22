@@ -1,5 +1,5 @@
-ifneq (,$(filter pnet,$(USEMODULE)))
-    DIRS += posix/pnet
+ifneq (,$(filter posix_sockets,$(USEMODULE)))
+    DIRS += posix/sockets
 endif
 ifneq (,$(filter pthread,$(USEMODULE)))
     DIRS += posix/pthread

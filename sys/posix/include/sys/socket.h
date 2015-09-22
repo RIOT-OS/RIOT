@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Freie Universität Berlin
+ * Copyright (C) 2013-15 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -7,7 +7,7 @@
  */
 
 /**
- * @addtogroup  pnet
+ * @addtogroup  posix_sockets
  * @{
  */
 
@@ -17,6 +17,12 @@
  * @see     <a href="http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/sys_socket.h.html">
  *              The Open Group Base Specifications Issue 7, <sys/socket.h>
  *          </a>
+ *
+ * @todo Omitted from original specification for now:
+ * * struct msghdr, struct cmesghdr, and struct linger and all related defines
+ * * getsockopt()/setsockopt() and all related defines.
+ * * shutdown() and all related defines.
+ * * sockatmark()
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
@@ -32,135 +38,81 @@
 #define __SOCKADDR_COMMON_SIZE  (sizeof (unsigned short int))
 #endif
 
+#include <stdlib.h>
 #include <sys/types.h>
+#include <sys/uio.h>
 
-#include "cpu.h"
+#include "kernel_types.h"
 #include "net/af.h"
-
-#include "socket_base/socket.h"
+#include "sys/bytes.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /**
+ * @brief   Maximum data length for a socket address.
+ *
+ * It is assumed that struct sockaddr_in6 is currently the longest socket address struct.
+ * As such it's data length is taken consisting of the IPv6 address (16 byte), the port (2 byte),
+ * the flow information (4 byte) and the scope ID (4 byte)
+ */
+#define SOCKADDR_MAX_DATA_LEN   (26)
+
+/**
+ * @name    Socket types
+ * @{
+ */
+#define SOCK_DGRAM      (1)     /**< Datagram socket */
+#define SOCK_RAW        (2)     /**< Raw socket */
+#define SOCK_SEQPACKET  (3)     /**< Sequenced-packet socket */
+#define SOCK_STREAM     (4)     /**< Stream socket */
+/** @} */
+
+#define SOL_SOCKET      (-1)    /**< Options to be accessed at socket level, not protocol level */
+
+/**
+ * @name    Option names
+ * @brief   Option names for getsockopt() and setsockopt()
+ * @{
+ */
+#define SO_ACCEPTCONN   (0)     /**< Socket is accepting connections. */
+#define SO_BROADCAST    (1)     /**< Transmission of broadcast messages is supported. */
+#define SO_DEBUG        (2)     /**< Debugging information is being recorded. */
+#define SO_DONTROUTE    (3)     /**< Bypass normal routing. */
+#define SO_ERROR        (4)     /**< Socket error status. */
+#define SO_KEEPALIVE    (5)     /**< Connections are kept alive with periodic messages. */
+#define SO_LINGER       (6)     /**< Socket lingers on close. */
+#define SO_OOBINLINE    (7)     /**< Out-of-band data is transmitted in line. */
+#define SO_RCVBUF       (8)     /**< Receive buffer size. */
+#define SO_RCVLOWAT     (9)     /**< Receive "low water mark". */
+#define SO_RCVTIMEO     (10)    /**< Receive timeout. */
+#define SO_REUSEADDR    (11)    /**< Reuse of local addresses is supported. */
+#define SO_SNDBUF       (12)    /**< Send buffer size. */
+#define SO_SNDLOWAT     (13)    /**< Send "low water mark". */
+#define SO_SNDTIMEO     (14)    /**< Send timeout. */
+#define SO_TYPE         (15)    /**< Socket type. */
+/** @} */
+
+typedef unsigned int sa_family_t;   /**< address family type */
+
+/**
  * @brief   Used to define the socket address.
  */
-struct __attribute__((packed)) sockaddr {
-    sa_family_t sa_family;  ///< Address family
-    char sa_data[14];       ///< Socket address (variable length data)
+struct sockaddr {
+    sa_family_t sa_family;                  /**< Address family */
+    char sa_data[SOCKADDR_MAX_DATA_LEN];    /**< Socket address (variable length data) */
 };
 
 /**
  * @brief   Implementation based socket address table.
+ * @extends struct sockaddr
  */
-struct __attribute__((packed)) sockaddr_storage {
-    sa_family_t ss_family;  ///< Address family
-    char ss_data[14];       ///< address data
+struct sockaddr_storage {
+    sa_family_t ss_family;                  /**< Address family */
+    uint8_t ss_data[SOCKADDR_MAX_DATA_LEN]; /**< Socket address */
 };
 
-/*
- * Omitted from original specification for now are struct msghdr,
- * struct cmesghdr, and struct linger and all related defines
- */
-
-/**
- * @brief  *level* value for getsockopt() or setsockopt().
- */
-#define SOL_SOCKET 1    ///< Options to be accessed at socket level, not
-                        ///< protocol level.
-
-/**
- * @brief   *option_name* value for getsockopt() or setsockopt()
- */
-#define SO_ACCEPTCONN   1   ///< Socket is accepting connections.
-
-/**
- * @brief   *option_name* value for getsockopt() or setsockopt()
- */
-#define SO_BROADCAST    2   ///< Transmission of broadcast messages is supported.
-
-/**
- * @brief   *option_name* value for getsockopt() or setsockopt()
- */
-#define SO_DEBUG        3   ///< Debugging information is being recorded.
-
-/**
- * @brief   *option_name* value for getsockopt() or setsockopt()
- */
-#define SO_DONTROUTE    4   ///< Bypass normal routing.
-
-/**
- * @brief   *option_name* value for getsockopt() or setsockopt()
- */
-#define SO_ERROR        5   ///< Socket error status.
-
-/**
- * @brief   *option_name* value for getsockopt() or setsockopt()
- */
-#define SO_KEEPALIVE    6   ///< Connections are kept alive with periodic messages.
-
-/**
- * @brief   *option_name* value for getsockopt() or setsockopt()
- */
-#define SO_OOBINLINE    7   ///< Out-of-band data is transmitted in line.
-
-/**
- * @brief   *option_name* value for getsockopt() or setsockopt()
- */
-#define SO_RCVBUF       8   ///< Receive buffer size.
-
-/**
- * @brief   *option_name* value for getsockopt() or setsockopt()
- */
-#define SO_RCVLOWAT     9   ///< Receive "low water mark".
-
-/**
- * @brief   *option_name* value for getsockopt() or setsockopt()
- */
-#define SO_RCVTIMEO    10   ///< Receive timeout.
-
-/**
- * @brief   *option_name* value for getsockopt() or setsockopt()
- */
-#define SO_REUSEADDR   11   ///< Reuse of local addresses is supported.
-
-/**
- * @brief   *option_name* value for getsockopt() or setsockopt()
- */
-#define SO_SNDBUF      12   ///< Send buffer size.
-
-/**
- * @brief   *option_name* value for getsockopt() or setsockopt()
- */
-#define SO_SNDLOWAT    13   ///< Send "low water mark".
-
-/**
- * @brief   *option_name* value for getsockopt() or setsockopt()
- */
-#define SO_SNDTIMEO    14   ///< Send timeout.
-
-/**
- * @brief   *option_name* value for getsockopt() or setsockopt()
- */
-#define SO_TYPE        15   ///< Socket type.
-
-#define SOMAXCONN       16  ///< Maximum *backlog* size for listen()
-
-/**
- * @brief   *how* value for shutdown()
- */
-#define SHUT_WR     1   ///< Disables further send operations.
-
-/**
- * @brief   *how* value for shutdown()
- */
-#define SHUT_RD     2   ///< Disables further receive operations.
-
-/**
- * @brief   *how* value for shutdown()
- */
-#define SHUT_RDWR   3   ///< Disables further send and receive operations.
 
 /**
  * @brief   Accept a new connection on a socket
@@ -260,27 +212,56 @@ int bind(int socket, const struct sockaddr *address,
 int connect(int socket, const struct sockaddr *address, socklen_t address_len);
 
 /**
- * @brief   Get the socket options.
+ * @brief   Get the name of the peer socket.
+ * @details The getpeername() function shall retrieve the peer address of the specified socket,
+ *          store this address in the sockaddr structure pointed to by the @p address argument,
+ *          and store the length of this address in the object pointed to by the @p address_len
+ *          argument.
  *
- * @see <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/getsockopt.html">
- *          The Open Group Base Specification Issue 7, getsockopt
+ * @see <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/getpeername.html">
+ *          The Open Group Base Specification Issue 7, getpeername
  *      </a>
  *
- * @param[in] socket        Specifies the file descriptor associated with the socket.
- * @param[in] level         Protocol level this option applies to. Valid values
- *                          are defined in <sys/socket.h>, prefixed with
- *                          ``SOL_``.
- * @param[in] option_name   Defines the option to get. Valid values are defined
- *                          in <sys/socket.h>, prefixed with ``SO_``.
- * @param[out] option_value Buffer to write the current value of the socket
- *                          option into.
- * @param[out] option_len   Length of the option value in byte.
- *
- * @return  Upon successful completion, getsockopt() shall return 0; otherwise,
+ * @param[in] socket            Specifies the file descriptor associated with the
+ *                              socket.
+ * @param[out] address          Points to a sockaddr structure containing the peer
+ *                              address. The length and format of the address depend
+ *                              on the address family of the socket.
+ * @param[in,out] address_len   Specifies the length of the sockaddr structure on input and the
+ *                              length of the stored address on output. If the address is greater
+ *                              than the length of the supplied sockaddr structure, the stored
+ *                              address shal be truncated.
+ * @return  Upon successful completion, getpeername() shall return 0; otherwise,
  *          -1 shall be returned and errno set to indicate the error.
  */
-int getsockopt(int socket, int level, int option_name,
-               void *__restrict option_value, socklen_t *__restrict option_len);
+int getpeername(int socket, struct sockaddr *__restrict address,
+                socklen_t *__restrict address_len);
+
+/**
+ * @brief   Get the socket name.
+ * @details The getsockname() function shall retrieve the locally-bound name of the specified
+ *          socket, store this address in the sockaddr structure pointed to by the @p address
+ *          argument, and store the length of this address in the object pointed to by the
+ *          @p address_len argument.
+ *
+ * @see <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/getsockname.html">
+ *          The Open Group Base Specification Issue 7, getsockname
+ *      </a>
+ *
+ * @param[in] socket            Specifies the file descriptor associated with the
+ *                              socket.
+ * @param[out] address          Points to a sockaddr structure containing the peer
+ *                              address. The length and format of the address depend
+ *                              on the address family of the socket.
+ * @param[in,out] address_len   Specifies the length of the sockaddr structure on input and the
+ *                              length of the stored address on output. If the address is greater
+ *                              than the length of the supplied sockaddr structure, the stored
+ *                              address shal be truncated.
+ * @return  Upon successful completion, getsockname() shall return 0; otherwise,
+ *          -1 shall be returned and errno set to indicate the error.
+ */
+int getsockname(int socket, struct sockaddr *__restrict address,
+                socklen_t *__restrict address_len);
 
 /**
  * @brief   Listen for socket connections and limit the queue of incoming
@@ -396,9 +377,9 @@ ssize_t send(int socket, const void *buffer, size_t length, int flags);
  * @details Shall send a message through a connection-mode or
  *          connectionless-mode socket. If the socket is a connectionless-mode
  *          socket, the message shall be sent to the address specified by
- *          *dest_addr* if no pre-specified peer address has been set. If a
+ *          @p address if no pre-specified peer address has been set. If a
  *          peer address has been pre-specified, either the message shall be
- *          sent to the address specified by *dest_addr* (overriding the
+ *          sent to the address specified by @p address (overriding the
  *          pre-specified peer address), or the function shall return -1 and
  *          set errno to EISCONN.
  *
@@ -406,45 +387,23 @@ ssize_t send(int socket, const void *buffer, size_t length, int flags);
  *          The Open Group Base Specification Issue 7, sendto
  *      </a>
  *
- * @param[in] socket    Specifies the socket file descriptor.
- * @param[in] message   Points to the buffer containing the message to send.
- * @param[in] length    Specifies the length of the message in bytes.
- * @param[in] flags     Specifies the type of message reception. Support
- *                      for values other than 0 is not implemented yet.
- * @param[in] dest_addr Points to a sockaddr structure containing the
- *                      destination address. The length and format of the
- *                      address depend on the address family of the socket.
- * @param[in] dest_len  Specifies the length of the sockaddr structure pointed
- *                      to by the *dest_addr* argument.
+ * @param[in] socket        Specifies the socket file descriptor.
+ * @param[in] buffer        Points to the buffer containing the message to send.
+ * @param[in] length        Specifies the length of the message in bytes.
+ * @param[in] flags         Specifies the type of message reception. Support
+ *                          for values other than 0 is not implemented yet.
+ * @param[in] address       Points to a sockaddr structure containing the
+ *                          destination address. The length and format of the
+ *                          address depend on the address family of the socket.
+ * @param[in] address_len   Specifies the length of the sockaddr structure pointed
+ *                          to by the @p address argument.
  *
  * @return  Upon successful completion, send() shall return the number of bytes
  *          sent. Otherwise, -1 shall be returned and errno set to indicate the
  *          error.
  */
-ssize_t sendto(int socket, const void *message, size_t length, int flags,
-               const struct sockaddr *dest_addr, socklen_t dest_len);
-
-/**
- * @brief   Set the socket options.
- *
- * @see <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/setsockopt.html">
- *          The Open Group Base Specification Issue 7, setsockopt
- *      </a>
- *
- * @param[in] socket        Specifies the file descriptor associated with the socket.
- * @param[in] level         Protocol level this option applies to. Valid values
- *                          are defined in <sys/socket.h>, prefixed with
- *                          ``SOL_``.
- * @param[in] option_name   Defines the option to set. Valid values are defined
- *                          in <sys/socket.h>, prefixed with ``SO_``.
- * @param[in] option_value  Value for the option to set.
- * @param[in] option_len    Length of the option value in byte.
- *
- * @return  Upon successful completion, setsockopt() shall return 0; otherwise,
- *          -1 shall be returned and errno set to indicate the error.
- */
-int setsockopt(int socket, int level, int option_name, const void *option_value,
-               socklen_t option_len);
+ssize_t sendto(int socket, const void *buffer, size_t length, int flags,
+               const struct sockaddr *address, socklen_t address_len);
 
 /**
  * @brief   Create an endpoint for communication.
@@ -468,6 +427,34 @@ int setsockopt(int socket, int level, int option_name, const void *option_value,
  *          be returned and errno set to indicate the error.
  */
 int socket(int domain, int type, int protocol);
+
+/**
+ * @todo implement out these functions
+ * @{
+ */
+static inline int getsockopt(int socket, int level, int option_name, void *option_value,
+                             socklen_t *option_len)
+{
+    (void)socket;
+    (void)level;
+    (void)option_name;
+    (void)option_value;
+    (void)option_len;
+    return -1;
+}
+
+static inline int setsockopt(int socket, int level, int option_name, const void *option_value,
+                             socklen_t option_len)
+{
+    (void)socket;
+    (void)level;
+    (void)option_name;
+    (void)option_value;
+    (void)option_len;
+    return -1;
+}
+
+/** @} */
 
 #ifdef __cplusplus
 }

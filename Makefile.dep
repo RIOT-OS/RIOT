@@ -1,9 +1,5 @@
 ifneq (,$(filter libcoap,$(USEPKG)))
-    USEMODULE += pnet
-endif
-
-ifneq (,$(filter pnet,$(USEMODULE)))
-    USEMODULE += vtimer
+    USEMODULE += posix_sockets
 endif
 
 ifneq (,$(filter gnrc_%,$(filter-out gnrc_netapi gnrc_netreg gnrc_netif% gnrc_pktbuf,$(USEMODULE))))
@@ -274,6 +270,11 @@ endif
 
 ifneq (,$(filter newlib,$(USEMODULE)))
   USEMODULE += uart_stdio
+endif
+
+ifneq (,$(filter posix_sockets,$(USEMODULE)))
+  USEMODULE += posix
+  USEMODULE += random
 endif
 
 ifneq (,$(filter posix,$(USEMODULE)))

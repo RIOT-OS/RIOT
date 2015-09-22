@@ -31,27 +31,11 @@
 #include "net/af.h"
 #include "net/ipv4/addr.h"
 #include "net/ipv6/addr.h"
-#include "socket_base/socket.h"
+#include "sys/bytes.h"
+#include "netinet/in.h"
 
 #ifdef __cplusplus
 extern "C" {
-#endif
-
-typedef uint16_t in_port_t;         /**< Internet port type */
-typedef uint32_t in_addr_t;         /**< IPv4 address type */
-
-/**
- * @brief   Alias to @ref IPV4_ADDR_MAX_STR_LEN
- */
-#ifndef INET_ADDRSTRLEN
-#define INET_ADDRSTRLEN     (IPV4_ADDR_MAX_STR_LEN)
-#endif
-
-/**
- * @brief   Alias to @ref IPV6_ADDR_MAX_STR_LEN
- */
-#ifndef INET6_ADDRSTRLEN
-#define INET6_ADDRSTRLEN    (IPV6_ADDR_MAX_STR_LEN)
 #endif
 
 /**
@@ -67,66 +51,6 @@ typedef uint32_t in_addr_t;         /**< IPv4 address type */
 #ifndef IN6ADDRSZ
 #define IN6ADDRSZ           (sizeof(ipv6_addr_t))
 #endif
-
-
-/**
- * @brief   IPv4 address structure type.
- */
-struct in_addr {
-    in_addr_t s_addr;       ///< an IPv4 address
-};
-
-/**
- * @brief   Convert values between host and network byte order.
- *
- * @see <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/htonl.html">
- *          The Open Group Base Specification Issue 7, htonl
- *      </a>
- *
- * @param[in] hostlong  A 32 bit number.
- * @return              The argument value converted from host to network byte
- *                      order.
- */
-#define htonl(hostlong)     HTONL(hostlong)
-
-/**
- * @brief   Convert values between host and network byte order.
- *
- * @see <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/htons.html">
- *          The Open Group Base Specification Issue 7, htons
- *      </a>
- *
- * @param[in] hostshort A 16 bit number.
- * @return              The argument value converted from host to network byte
- *                      order.
- */
-#define htons(hostshort)    HTONS(hostshort)
-
-/**
- * @brief   Convert values between host and network byte order.
- *
- * @see <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/ntohl.html">
- *          The Open Group Base Specification Issue 7, ntohl
- *      </a>
- *
- * @param[in] netlong   A 32-bit integer number.
- * @return              The argument value converted from network to host byte
- *                      order.
- */
-#define ntohl(netlong)      NTOHL(netlong)
-
-/**
- * @brief   Convert values between host and network byte order.
- *
- * @see <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/ntohs.html">
- *          The Open Group Base Specification Issue 7, ntohs
- *      </a>
- *
- * @param[in] netshort  A 16-bit integer number.
- * @return              The argument value converted from network to host byte
- *                      order.
- */
-#define ntohs(netshort)     NTOHS(netshort)
 
 /**
  * @brief   Converts an IP address to its string representation
