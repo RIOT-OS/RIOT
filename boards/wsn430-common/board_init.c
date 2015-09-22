@@ -13,7 +13,7 @@
 #include "kernel_internal.h"
 #include "msp430.h"
 #include "debug.h"
-#include "msp430_stdio.h"
+#include "uart_stdio.h"
 
 volatile static uint32_t __msp430_cpu_speed = MSP430_INITIAL_CPU_SPEED;
 
@@ -113,5 +113,5 @@ void board_init(void)
     msp430_set_cpu_speed(MCLK_8MHZ_SCLK_8MHZ);
 
     /* initialize the STDIO */
-    msp430_stdio_init();
+    uart_stdio_init();
 }
