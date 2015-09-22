@@ -21,18 +21,15 @@
  */
 __attribute__((naked)) void thread_yield_higher(void)
 {
-    /*
-     * disable IRQ, remembering if they are
-     * to be reactivated after context switch
-     */
-    unsigned int irqen = disableIRQ();
+    __asm__("push r2"); /* save SR */
+    __disable_irq();
 
     __save_context();
 
     /* have sched_active_thread point to the next thread */
     sched_run();
 
-    __restore_context(irqen);
+    __restore_context();
 
     UNREACHABLE();
 }
@@ -42,7 +39,7 @@ NORETURN void cpu_switch_context_exit(void)
     sched_active_thread = sched_threads[0];
     sched_run();
 
-    __restore_context(GIE);
+    __restore_context();
 
     UNREACHABLE();
 }

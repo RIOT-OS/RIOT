@@ -53,6 +53,28 @@ extern "C" {
 /** @} */
 
 /**
+ * @brief Globally disable IRQs
+ */
+static inline void __attribute__((always_inline)) __disable_irq(void)
+{
+    __asm__ __volatile__("bic  %0, r2" : : "i"(GIE));
+    /* this NOP is needed to handle a "delay slot" that all MSP430 MCUs
+       impose silently after messing with the GIE bit, DO NOT REMOVE IT! */
+    __asm__ __volatile__("nop");
+}
+
+/**
+ * @brief Globally enable IRQs
+ */
+static inline void __attribute__((always_inline)) __enable_irq(void)
+{
+    __asm__ __volatile__("bis  %0, r2" : : "i"(GIE));
+    /* this NOP is needed to handle a "delay slot" that all MSP430 MCUs
+       impose silently after messing with the GIE bit, DO NOT REMOVE IT! */
+    __asm__ __volatile__("nop");
+}
+
+/**
  * @brief   The current ISR state (inside or not)
  */
 extern volatile int __inISR;
@@ -65,7 +87,7 @@ extern char __isr_stack[MSP430_ISR_STACK_SIZE];
 /**
  * @brief   Save the current thread context from inside an ISR
  */
-inline void __save_context_isr(void)
+static inline void __attribute__((always_inline)) __save_context(void)
 {
     __asm__("push r15");
     __asm__("push r14");
@@ -86,7 +108,7 @@ inline void __save_context_isr(void)
 /**
  * @brief   Restore the thread context from inside an ISR
  */
-inline void __restore_context_isr(void)
+static inline void __attribute__((always_inline)) __restore_context(void)
 {
     __asm__("mov.w %0,r1" : : "m"(sched_active_thread->sp));
 
@@ -102,14 +124,15 @@ inline void __restore_context_isr(void)
     __asm__("pop r13");
     __asm__("pop r14");
     __asm__("pop r15");
+    __asm__("reti");
 }
 
 /**
  * @brief   Run this code on entering interrupt routines
  */
-inline void __enter_isr(void)
+static inline void __attribute__((always_inline)) __enter_isr(void)
 {
-    __save_context_isr();
+    __save_context();
     __asm__("mov.w %0,r1" : : "i"(__isr_stack + MSP430_ISR_STACK_SIZE));
     __inISR = 1;
 }
@@ -117,7 +140,7 @@ inline void __enter_isr(void)
 /**
  * @brief   Run this code on exiting interrupt routines
  */
-inline void __exit_isr(void)
+static inline void __attribute__((always_inline)) __exit_isr(void)
 {
     __inISR = 0;
 
@@ -125,41 +148,7 @@ inline void __exit_isr(void)
         sched_run();
     }
 
-    __restore_context_isr();
-    __asm__("reti");
-}
-
-/**
- * @brief   Save the current context on the stack
- */
-inline void __save_context(void)
-{
-    __asm__("push r2"); /* save SR */
-    __save_context_isr();
-}
-
-/**
- * @brief   Restore the thread context from the stack
- *
- * @param[in] irqen     former interrupt state
- */
-inline void __restore_context(unsigned int irqen)
-{
-    __restore_context_isr();
-
-    /*
-     * we want to enable appropriate IRQs *just after*
-     * quitting the interrupt handler; to that end,
-     * we change the GIE bit in the value to be restored
-     * in R2 (a.k.a. SR) by the next RETI instruction
-     */
-    if (irqen) {
-        __asm__("bis.w #8, 0(r1)");
-    } else {
-        __asm__("bic.w #8, 0(r1)");
-    }
-
-    __asm__("reti");
+    __restore_context();
 }
 
 /**
