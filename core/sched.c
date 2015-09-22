@@ -90,7 +90,7 @@ int sched_run(void)
             active_thread->status = STATUS_PENDING;
         }
 
-#ifdef SCHED_TEST_STACK
+#ifdef DEVELHELP
         if (*((uintptr_t *) active_thread->stack_start) != (uintptr_t) active_thread->stack_start) {
             LOG_WARNING("scheduler(): stack overflow detected, pid=%" PRIkernel_pid "\n", active_thread->pid);
         }
