@@ -73,4 +73,15 @@ static void cpu_clock_init(void)
 
     modem_clock_init();
     kinetis_mcg_set_mode(KINETIS_MCG_PEE);
+
+    /*
+     * Setup USBFSOTG clock
+     * USB clock should be 48 MHz, use MCGPLLCLK as clock source
+     * usb_clk = (pll_clk * 1 / 1) = 48MHz * 1 / 1 = 48MHz
+     */
+#if MODULE_USBDEV
+    SIM->SOPT2 &= ~(SIM_SOPT2_USBSRC_MASK | SIM_SOPT2_PLLFLLSEL_MASK);
+    SIM->SOPT2 |= SIM_SOPT2_USBSRC_MASK | SIM_SOPT2_PLLFLLSEL_MASK;
+    SIM->CLKDIV2 = 0;
+#endif
 }
