@@ -14,6 +14,7 @@
  *
  * @author      Johann Fischer <j.fischer@phytec.de>
  * @author      Jonas Remmert <j.remmert@phytec.de>
+ * @author      Oliver Hahm <oliver.hahm@inria.fr>
  * @}
  */
 #include "panic.h"
@@ -496,6 +497,11 @@ int kw2xrf_rem_cb(gnrc_netdev_t *dev, gnrc_netdev_event_cb_t cb)
     return 0;
 }
 
+uint16_t kw2xrf_get_addr_short(kw2xrf_t *dev)
+{
+    return (dev->addr_short[0] << 8) | dev->addr_short[1];
+}
+
 uint64_t kw2xrf_get_addr_long(kw2xrf_t *dev)
 {
     uint64_t addr;
@@ -562,6 +568,20 @@ int kw2xrf_get(gnrc_netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
 
             *((uint16_t *)value) = dev->radio_pan;
             return sizeof(uint16_t);
+
+        case NETOPT_IPV6_IID:
+            if (max_len < sizeof(eui64_t)) {
+                return -EOVERFLOW;
+            }
+            if (dev->option & KW2XRF_OPT_SRC_ADDR_LONG) {
+                uint64_t addr = kw2xrf_get_addr_long(dev);
+                ieee802154_get_iid(value, (uint8_t *)&addr, 8);
+            }
+            else {
+                uint16_t addr = kw2xrf_get_addr_short(dev);
+                ieee802154_get_iid(value, (uint8_t *)&addr, 2);
+            }
+            return sizeof(eui64_t);
 
         case NETOPT_CHANNEL:
             return kw2xrf_get_channel(dev, (uint8_t *)value, max_len);
