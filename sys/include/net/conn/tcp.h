@@ -154,6 +154,25 @@ int conn_tcp_accept(conn_tcp_t *conn, conn_tcp_t *out_conn);
 int conn_tcp_recv(conn_tcp_t *conn, void *data, size_t max_len);
 
 /**
+ * @brief   Receives a TCP message
+ *
+ * @param[in] conn      A TCP connection object.
+ * @param[out] data     Pointer where the received data should be stored.
+ * @param[in] max_len   Maximum space available at @p data.
+ * @param[in] timeout   The timeout in milliseconds the receive should wait, 0 if the function
+ *                      should never block and CONN_NO_TIMEOUT if the function should never timeout.
+ *
+ * @note    Function may block.
+ *
+ * @return  The number of bytes received on success.
+ * @return  0, if no received data is available, but everything is in order.
+ * @return  any other negative number in case of an error. For portability, implementations should
+ *          draw inspiration of the errno values from the POSIX' recv(), recvfrom(), or recvmsg()
+ *          function specification.
+ */
+int conn_tcp_recv_timeout(conn_tcp_t *conn, void *data, size_t max_len, uint32_t timeout);
+
+/**
  * @brief   Sends a TCP message
  *
  * @param[in] conn  A TCP connection object.

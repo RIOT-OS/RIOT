@@ -24,12 +24,49 @@
 int gnrc_conn_recvfrom(conn_t *conn, void *data, size_t max_len, void *addr, size_t *addr_len,
                        uint16_t *port)
 {
+    return gnrc_conn_recvfrom_timeout(conn, data, max_len, addr, addr_len, port, CONN_NO_TIMEOUT);
+}
+
+int gnrc_conn_recvfrom_timeout(conn_t *conn, void *data, size_t max_len, void *addr, size_t *addr_len,
+                               uint16_t *port, uint32_t timeout)
+{
+    return gnrc_conn_recvfrom_timeout(conn, data, max_len, addr, addr_len, port, CONN_NO_TIMEOUT);
+}
+
+int gnrc_conn_recvfrom_timeout(conn_t *conn, void *data, size_t max_len, void *addr, size_t *addr_len,
+                               uint16_t *port, uint32_t timeout)
+{
     msg_t msg;
-    int timeout = 3;
-    while ((timeout--) > 0) {
-        gnrc_pktsnip_t *pkt, *l3hdr;
+    int msg_timeout = 3;
+    /* if all the bits in timeout are set, inverting them would make them 0
+     * so no timeout would be applied to the recvfrom. Because we would want
+     * the timeout to be hard, even when other messages are received, we
+     * calculate the absolute timer value for when the timeout is elapsed.
+     * We later calculate this back because we can only set relative timeouts.
+     */
+    uint64_t _timeout = ~timeout
+            ? xtimer_now64() + (timeout * MS_IN_USEC)
+            : 0;
+
+    while ((msg_timeout--) > 0) {
         size_t size = 0;
-        msg_receive(&msg);
+        gnrc_pktsnip_t *pkt, *l3hdr;
+
+        if (_timeout) {
+            /* if timeout is 0 and no message available return immediately */
+            if (!timeout && !msg_available()) {
+                return -EWOULDBLOCK;
+            }
+            /* wait for a message or stop waiting if a timeout is received */
+            else if (xtimer_msg_receive_timeout64(&msg, _timeout - xtimer_now64()) < 0) {
+                return -ETIMEDOUT;
+            }
+        }
+        else {
+            /* no timeout was given, block till we receive a message */
+            msg_receive(&msg);
+        }
+
         switch (msg.type) {
             case GNRC_NETAPI_MSG_TYPE_RCV:
                 pkt = (gnrc_pktsnip_t *)msg.content.ptr;
@@ -38,7 +75,7 @@ int gnrc_conn_recvfrom(conn_t *conn, void *data, size_t max_len, void *addr, siz
                 }
                 LL_SEARCH_SCALAR(pkt, l3hdr, type, conn->l3_type);
                 if (l3hdr == NULL) {
-                    msg_send_to_self(&msg); /* requeue invalid messages */
+                    msg_send_to_self(&msg); /* requeue invalid messages, wouldn't this make the thread just read the message 3 times and return? */
                     continue;
                 }
 #if defined(MODULE_CONN_UDP) || defined(MODULE_CONN_TCP)
@@ -46,7 +83,7 @@ int gnrc_conn_recvfrom(conn_t *conn, void *data, size_t max_len, void *addr, siz
                     gnrc_pktsnip_t *l4hdr;
                     LL_SEARCH_SCALAR(pkt, l4hdr, type, conn->l4_type);
                     if (l4hdr == NULL) {
-                        msg_send_to_self(&msg); /* requeue invalid messages */
+                        msg_send_to_self(&msg); /* requeue invalid messages, wouldn't this make the thread just read the message 3 times and return? */
                         continue;
                     }
                     *port = byteorder_ntohs(((udp_hdr_t *)l4hdr->data)->src_port);
@@ -62,7 +99,7 @@ int gnrc_conn_recvfrom(conn_t *conn, void *data, size_t max_len, void *addr, siz
                 return (int)size;
             default:
                 (void)port;
-                msg_send_to_self(&msg); /* requeue invalid messages */
+                msg_send_to_self(&msg); /* requeue invalid messages, wouldn't this make the thread just read the message 3 times and return? */
                 break;
         }
     }

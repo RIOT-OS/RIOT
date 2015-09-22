@@ -70,11 +70,17 @@ int conn_udp_getlocaladdr(conn_udp_t *conn, void *addr, uint16_t *port)
 int conn_udp_recvfrom(conn_udp_t *conn, void *data, size_t max_len, void *addr, size_t *addr_len,
                       uint16_t *port)
 {
+    return conn_udp_recvfrom_timeout(conn, data, max_len, addr, addr_len, port, CONN_NO_TIMEOUT);
+}
+
+int conn_udp_recvfrom_timeout(conn_udp_t *conn, void *data, size_t max_len, void *addr, size_t *addr_len,
+                      uint16_t *port, uint32_t timeout)
+{
     assert(conn->l4_type == GNRC_NETTYPE_UDP);
     switch (conn->l3_type) {
 #ifdef MODULE_GNRC_IPV6
         case GNRC_NETTYPE_IPV6:
-            return gnrc_conn_recvfrom((conn_t *)conn, data, max_len, addr, addr_len, port);
+            return gnrc_conn_recvfrom_timeout((conn_t *)conn, data, max_len, addr, addr_len, port, timeout);
 #endif
         default:
             (void)data;

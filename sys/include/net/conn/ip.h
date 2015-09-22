@@ -99,6 +99,28 @@ int conn_ip_getlocaladdr(conn_ip_t *conn, void *addr);
 int conn_ip_recvfrom(conn_ip_t *conn, void *data, size_t max_len, void *addr, size_t *addr_len);
 
 /**
+ * @brief   Receives a message over IPv4/IPv6
+ *
+ * @param[in] conn      A raw IPv4/IPv6 connection object.
+ * @param[out] data     Pointer where the received data should be stored.
+ * @param[in] max_len   Maximum space available at @p data.
+ * @param[out] addr     NULL pointer or the sender's IP address. Must have space for any address
+ *                      of the connection's family.
+ * @param[out] addr_len Length of @p addr. Can be NULL if @p addr is NULL.
+ * @param[in] timeout   The timeout in milliseconds the receive should wait, 0 if the function
+ *                      should never block and CONN_NO_TIMEOUT if the function should never timeout.
+ *
+ * @note    Function may block.
+ *
+ * @return  The number of bytes received on success.
+ * @return  0, if no received data is available, but everything is in order.
+ * @return  any other negative number in case of an error. For portability, implementations should
+ *          draw inspiration of the errno values from the POSIX' recv(), recvfrom(), or recvmsg()
+ *          function specification.
+ */
+int conn_ip_recvfrom_timeout(conn_ip_t *conn, void *data, size_t max_len, void *addr, size_t *addr_len, uint32_t timeout);
+
+/**
  * @brief   Sends a message over IPv4/IPv6
  *
  * @param[in] data      Pointer where the received data should be stored.

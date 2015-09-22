@@ -103,6 +103,30 @@ int conn_udp_recvfrom(conn_udp_t *conn, void *data, size_t max_len, void *addr, 
                       uint16_t *port);
 
 /**
+ * @brief   Receives a UDP message
+ *
+ * @param[in] conn      A UDP connection object.
+ * @param[out] data     Pointer where the received data should be stored.
+ * @param[in] max_len   Maximum space available at @p data.
+ * @param[out] addr     NULL pointer or the sender's network layer address. Must have space
+ *                      for any address of the connection's family.
+ * @param[out] addr_len Length of @p addr. Can be NULL if @p addr is NULL.
+ * @param[out] port     NULL pointer or the sender's UDP port.
+ * @param[in] timeout   The timeout in milliseconds the receive should wait, 0 if the function
+ *                      should never block and CONN_NO_TIMEOUT if the function should never timeout.
+ *
+ * @note    Function may block.
+ *
+ * @return  The number of bytes received on success.
+ * @return  0, if no received data is available, but everything is in order.
+ * @return  any other negative number in case of an error. For portability, implementations should
+ *          draw inspiration of the errno values from the POSIX' recv(), recvfrom(), or recvmsg()
+ *          function specification.
+ */
+int conn_udp_recvfrom_timeout(conn_udp_t *conn, void *data, size_t max_len, void *addr, size_t *addr_len,
+                              uint16_t *port, uint32_t timeout);
+
+/**
  * @brief   Sends a UDP message
  *
  * @param[in] data      Pointer where the received data should be stored.

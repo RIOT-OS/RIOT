@@ -66,11 +66,16 @@ int conn_ip_getlocaladdr(conn_ip_t *conn, void *addr)
 
 int conn_ip_recvfrom(conn_ip_t *conn, void *data, size_t max_len, void *addr, size_t *addr_len)
 {
+    return conn_ip_recvfrom_timeout(conn, data, max_len, addr, addr_len, CONN_NO_TIMEOUT);
+}
+
+int conn_ip_recvfrom_timeout(conn_ip_t *conn, void *data, size_t max_len, void *addr, size_t *addr_len, uint32_t timeout)
+{
     assert(conn->l4_type == GNRC_NETTYPE_UNDEF);
     switch (conn->l3_type) {
 #ifdef MODULE_GNRC_IPV6
         case GNRC_NETTYPE_IPV6:
-            return gnrc_conn_recvfrom((conn_t *)conn, data, max_len, addr, addr_len, NULL);
+            return gnrc_conn_recvfrom_timeout((conn_t *)conn, data, max_len, addr, addr_len, NULL, timeout);
 #endif
         default:
             (void)data;
