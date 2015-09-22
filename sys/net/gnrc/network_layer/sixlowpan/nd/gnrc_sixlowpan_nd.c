@@ -372,8 +372,8 @@ uint8_t gnrc_sixlowpan_nd_opt_ar_handle(kernel_pid_t iface, ipv6_hdr_t *ipv6,
 
 bool gnrc_sixlowpan_nd_opt_6ctx_handle(uint8_t icmpv6_type, sixlowpan_nd_opt_6ctx_t *ctx_opt)
 {
-    if (((ctx_opt->ctx_len < 64) && (ctx_opt->len != 2)) ||
-        ((ctx_opt->ctx_len >= 64) && (ctx_opt->len != 3))) {
+    if (((ctx_opt->ctx_len <= 64) && (ctx_opt->len != 2)) ||
+        ((ctx_opt->ctx_len > 64) && (ctx_opt->len != 3))) {
         DEBUG("6lo nd: invalid 6LoWPAN context option received\n");
         return false;
     }
