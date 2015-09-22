@@ -538,7 +538,9 @@ static inline kernel_pid_t _next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_len
     }
 #endif
 #if defined(MODULE_GNRC_NDP_NODE)
-    iface = gnrc_ndp_node_next_hop_l2addr(l2addr, l2addr_len, iface, dst, pkt);
+    if (iface <= KERNEL_PID_UNDEF) {
+        iface = gnrc_ndp_node_next_hop_l2addr(l2addr, l2addr_len, iface, dst, pkt);
+    }
 #elif !defined(MODULE_GNRC_SIXLOWPAN_ND)
     iface = KERNEL_PID_UNDEF;
     (void)l2addr;
