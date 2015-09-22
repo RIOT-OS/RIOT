@@ -23,6 +23,7 @@
 #define GNRC_NDP_INTERNAL_H_
 
 #include "kernel_types.h"
+#include "net/gnrc/ipv6/nc.h"
 #include "net/ipv6/addr.h"
 #include "net/ipv6/hdr.h"
 #include "net/ndp.h"
