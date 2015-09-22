@@ -574,6 +574,21 @@ static void test_pktbuf_hold__success2(void)
     TEST_ASSERT_EQUAL_INT(TEST_UINT8 + 1, pkt->users);
 }
 
+static void test_pktbuf_release__short_pktsnips(void)
+{
+    gnrc_pktsnip_t *pkt = gnrc_pktbuf_add(NULL, TEST_STRING8, sizeof(TEST_STRING8),
+                                          GNRC_NETTYPE_UNDEF);
+    gnrc_pktsnip_t *hdr = gnrc_pktbuf_mark(pkt, sizeof(TEST_STRING8) - 1, GNRC_NETTYPE_TEST);
+    TEST_ASSERT(pkt);
+    TEST_ASSERT(hdr);
+    TEST_ASSERT(pkt->next == hdr);
+    TEST_ASSERT(hdr->next == NULL);
+    TEST_ASSERT_EQUAL_INT(hdr->size, sizeof(TEST_STRING8) - 1);
+    TEST_ASSERT_EQUAL_INT(pkt->size, 1);
+    gnrc_pktbuf_release(pkt);
+    TEST_ASSERT(gnrc_pktbuf_is_empty());
+}
+
 static void test_pktbuf_release__success(void)
 {
     gnrc_pktsnip_t *pkt = gnrc_pktbuf_add(NULL, TEST_STRING16, sizeof(TEST_STRING16),
@@ -722,6 +737,7 @@ Test *tests_pktbuf_tests(void)
         new_TestFixture(test_pktbuf_hold__pkt_external),
         new_TestFixture(test_pktbuf_hold__success),
         new_TestFixture(test_pktbuf_hold__success2),
+        new_TestFixture(test_pktbuf_release__short_pktsnips),
         new_TestFixture(test_pktbuf_release__success),
         new_TestFixture(test_pktbuf_start_write__NULL),
         new_TestFixture(test_pktbuf_start_write__pkt_users_1),
