@@ -23,10 +23,10 @@
 #include "cpu.h"
 #include "cpu_conf.h"
 
-#define SIM_CLKDIV1_60MHZ      (SIM_CLKDIV1_OUTDIV1(0) | \
-                                SIM_CLKDIV1_OUTDIV2(0) | \
+#define SIM_CLKDIV1_120MHZ     (SIM_CLKDIV1_OUTDIV1(0) | \
+                                SIM_CLKDIV1_OUTDIV2(1) | \
                                 SIM_CLKDIV1_OUTDIV3(1) | \
-                                SIM_CLKDIV1_OUTDIV4(2))
+                                SIM_CLKDIV1_OUTDIV4(4))
 
 static void cpu_clock_init(void);
 
@@ -37,6 +37,10 @@ void cpu_init(void)
 {
     /* initialize the Cortex-M core */
     cortexm_init();
+
+    /* disable MPU */
+    MPU_CESR = 0;
+
     /* initialize the clock system */
     cpu_clock_init();
 }
@@ -55,11 +59,22 @@ void cpu_init(void)
 static void cpu_clock_init(void)
 {
     /* setup system prescalers */
-    SIM->CLKDIV1 = (uint32_t)SIM_CLKDIV1_60MHZ;
+    SIM->CLKDIV1 = (uint32_t)SIM_CLKDIV1_120MHZ;
 
     /* RMII RXCLK */
     SIM->SCGC5 |= SIM_SCGC5_PORTA_MASK;
     PORTA->PCR[18] &= ~(PORT_PCR_ISF_MASK | PORT_PCR_MUX(0x07));
 
     kinetis_mcg_set_mode(KINETIS_MCG_PEE);
+
+    /*
+     * Setup USBFSOTG clock
+     * USB clock should be 48 MHz, use MCGPLLCLK as clock source
+     * usb_clk = (pll_clk * 2 / 5) = 120 * 2 / 5 = 48MHz
+     */
+#if MODULE_USBDEV
+    SIM->SOPT2 &= ~(SIM_SOPT2_USBSRC_MASK | SIM_SOPT2_PLLFLLSEL_MASK);
+    SIM->SOPT2 |= SIM_SOPT2_USBSRC_MASK | SIM_SOPT2_PLLFLLSEL(1);
+    SIM->CLKDIV2 = SIM_CLKDIV2_USBDIV(4) | SIM_CLKDIV2_USBFRAC_MASK;
+#endif
 }

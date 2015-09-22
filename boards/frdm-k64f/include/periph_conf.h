@@ -37,12 +37,12 @@ extern "C"
 #define KINETIS_MCG_USE_PLL          1
 #define KINETIS_MCG_DCO_RANGE        (24000000U)
 #define KINETIS_MCG_ERC_OSCILLATOR   0
-#define KINETIS_MCG_ERC_FRDIV        6           /* ERC devider = 1280 */
+#define KINETIS_MCG_ERC_FRDIV        7           /* ERC devider = 1536 */
 #define KINETIS_MCG_ERC_RANGE        2
 #define KINETIS_MCG_ERC_FREQ         50000000
 #define KINETIS_MCG_PLL_PRDIV        19          /* divide factor = 20 */
-#define KINETIS_MCG_PLL_VDIV0        0           /* multiply factor = 24 */
-#define KINETIS_MCG_PLL_FREQ         60000000
+#define KINETIS_MCG_PLL_VDIV0        24          /* multiply factor = 48 */
+#define KINETIS_MCG_PLL_FREQ         120000000
 
 #define CLOCK_CORECLOCK              KINETIS_MCG_PLL_FREQ
 /** @} */
