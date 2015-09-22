@@ -35,7 +35,7 @@ bloom_t *bloom_new(size_t size, size_t num_hashes, ...)
     }
 
     /* Allocate Bloom array */
-    if (!(bloom->a = calloc(ROUND(size), sizeof(char)))) {
+    if (!(bloom->a = calloc(sizeof(uint8_t), ROUND(size)))) {
         free(bloom);
         return NULL;
     }
