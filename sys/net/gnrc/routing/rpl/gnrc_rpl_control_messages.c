@@ -47,6 +47,7 @@ static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 
 void gnrc_rpl_send(gnrc_pktsnip_t *pkt, ipv6_addr_t *src, ipv6_addr_t *dst, ipv6_addr_t *dodag_id)
 {
+    (void) dodag_id;
     gnrc_pktsnip_t *hdr;
     ipv6_addr_t all_RPL_nodes = GNRC_RPL_ALL_NODES_ADDR, ll_addr;
     kernel_pid_t iface = gnrc_ipv6_netif_find_by_addr(NULL, &all_RPL_nodes);
@@ -57,23 +58,14 @@ void gnrc_rpl_send(gnrc_pktsnip_t *pkt, ipv6_addr_t *src, ipv6_addr_t *dst, ipv6
     }
 
     if (src == NULL) {
-        ipv6_addr_t *tmp = NULL;
-        if (dodag_id != NULL) {
-            tmp = gnrc_ipv6_netif_match_prefix(iface, dodag_id);
-        }
-        else if (dodag_id == NULL) {
-            tmp = gnrc_ipv6_netif_find_best_src_addr(iface, &all_RPL_nodes);
-        }
+        ipv6_addr_set_link_local_prefix(&ll_addr);
+        src = gnrc_ipv6_netif_match_prefix(iface, &ll_addr);
 
-        if (tmp == NULL) {
+        if (src == NULL) {
             DEBUG("RPL: no suitable src address found\n");
             gnrc_pktbuf_release(pkt);
             return;
         }
-
-        memcpy(&ll_addr, tmp, sizeof(ll_addr));
-        ipv6_addr_set_link_local_prefix(&ll_addr);
-        src = &ll_addr;
     }
 
     if (dst == NULL) {
