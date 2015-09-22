@@ -104,6 +104,8 @@ ssize_t ubjson_get_i32(ubjson_cookie_t *restrict cookie, ssize_t content, int32_
             case UBJSON_INT32_INT32:
                 *dest = (int32_t) byteorder_ntohl(value.i32);
                 break;
+            default:
+                return -1;
         }
     }
     return result;
@@ -134,7 +136,9 @@ static ubjson_read_callback_result_t _ubjson_read_length(ubjson_cookie_t *restri
     if (type == UBJSON_TYPE_INT32) {
         int32_t len32;
         read = ubjson_get_i32(cookie, content, &len32);
-        len64 = len32;
+        if (read > 0) {
+            len64 = len32;
+        }
     }
     else if (type == UBJSON_TYPE_INT64) {
         read = ubjson_get_i64(cookie, content, &len64);
