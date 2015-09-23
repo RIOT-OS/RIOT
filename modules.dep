@@ -1,8 +1,10 @@
 #
-# this file contains RIOT's module dependencies.
+# This file contains RIOT's module dependencies.
+#
+# See scripts/deps.sh for function documentions.
 #
 
-used at86rf2.* && use at86rf2xx ieee802154
+used_prefix at86rf2 && use at86rf2xx ieee802154
 used cbor && use net_help
 used cpp11-compat && use FEATURE_cpp
 used cpp11-compat && use vtimer timex
@@ -20,7 +22,7 @@ used gnrc_ipv6_netif && use ipv6_addr gnrc_netif bitfield
 used gnrc_ipv6_router && use gnrc_ipv6
 used gnrc_ipv6_router_default && use gnrc_ipv6_router gnrc_icmpv6 gnrc_ndp_router
 used gnrc_ndp && use gnrc_icmpv6 random timex vtimer
-used gnrc_ndp_.* && use gnrc_ndp
+used_prefix gnrc_ndp_ && use gnrc_ndp
 used gnrc_ndp_host && use gnrc_ndp_node random vtimer
 used gnrc_ndp_node && use gnrc_ndp_internal
 used gnrc_ndp_router && use gnrc_ndp_node random vtimer
@@ -28,7 +30,7 @@ used gnrc_netdev2 && use netopt
 used gnrc_netdev_eth && use gnrc_pktbuf
 used gnrc_netif_default && use gnrc_netif
 used gnrc_nettest && use gnrc_netapi gnrc_netreg gnrc_netif gnrc_pktbuf vtimer
-used gnrc_pktbuf_.* && use gnrc_pktbuf
+used_prefix gnrc_pktbuf_ && use gnrc_pktbuf
 used gnrc_pktdump && use gnrc_pktbuf od
 used gnrc_rpl && use fib gnrc_ipv6_router_default trickle vtimer
 used gnrc_rpl_srh && use ipv6_ext_rh
@@ -45,7 +47,7 @@ used ipv6_ext_rh && use ipv6_ext
 used ipv6_hdr && use inet_csum
 used kw2xrf && use ieee802154
 used libfixmath-unittests && use PKG_libfixmath
-used log_.* && use log
+used_prefix log_ && use log
 used newlib && use uart_stdio
 used nhdp && use vtimer oonf_common oonf_rfc5444
 used oonf_common && use PKG_oonf_api socket_base
@@ -56,7 +58,7 @@ used srf02 && use xtimer
 used vtimer && use xtimer timex
 used xbee && use ieee802154
 used xtimer && use FEATURE_periph_timer
-used_filter gnrc_.* gnrc_netapi gnrc_netreg gnrc_netif.* gnrc_pktbuf && use gnrc
+used_prefix_but gnrc_ netapi netreg 'netif.*' pktbuf && use gnrc
 
 used ieee802154 && {
     used gnrc_ipv6 && use gnrc_sixlowpan
@@ -71,11 +73,11 @@ used gnrc_sixlowpan_router_default && use gnrc_ipv6_router_default \
 
 used gnrc_sixlowpan_nd_router && use gnrc_sixlowpan_nd
 
-used gnrc_pktbuf && not_used gnrc_pktbuf_.* && use gnrc_pktbuf_static
+used gnrc_pktbuf && not used_prefix gnrc_pktbuf_ && use gnrc_pktbuf_static
 
 used gnrc_ipv6_default && {
     if [ "$GNRC_NETIF_NUMOF" = "1" ]; then
-        not_used gnrc_sixlowpan_nd && use gnrc_ndp_host
+        not used gnrc_sixlowpan_nd && use gnrc_ndp_host
     else
         use gnrc_ndp_host
     fi
@@ -83,3 +85,5 @@ used gnrc_ipv6_default && {
 
 # keep this "true" to force positive exit code
 true
+
+# vim: set filetype=sh :
