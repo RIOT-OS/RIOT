@@ -88,7 +88,8 @@ static ipv6_addr_t *_add_addr_to_entry(gnrc_ipv6_netif_t *entry, const ipv6_addr
     tmp_addr->flags = flags;
 
 #ifdef MODULE_GNRC_SIXLOWPAN_ND
-    if (entry->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN) {
+    if (!ipv6_addr_is_multicast(&(tmp_addr->addr)) &&
+        (entry->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN)) {
         ipv6_addr_t *router = gnrc_ndp_internal_default_router();
         if (router != NULL) {
             tmp_addr->flags |= GNRC_IPV6_NETIF_ADDR_FLAGS_TENTATIVE;
