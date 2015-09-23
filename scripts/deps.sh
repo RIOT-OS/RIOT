@@ -1,5 +1,50 @@
 #!/bin/sh
 
+###############################################################################
+# USER INTERFACE FUNCTIONS:
+###############################################################################
+
+# add the arguments to the list of the used modules
+use() {
+    DEPS="$DEPS$* "
+}
+
+# true iff the argument is a used module
+used() {
+    [ "${DEPS#* $1 }" != "$DEPS" ];
+}
+
+# true iff the argument is the prefix of a used module name
+used_prefix() {
+    [ "${DEPS#* $1}" != "$DEPS" ];
+}
+
+# true iff the first argument is a used prefix,
+# but ignore the following argumens as possible suffices
+used_prefix_but() {
+    local prefix=$1
+    shift
+    echo "$DEPS" | grep -qP " $prefix(?!$(join "|" $*)) "
+}
+
+# negate a result, i.e. "not used foo" is true iff "foo" is not used
+not() {
+    if "$@"; then
+        false
+    else
+        true
+    fi
+}
+
+# print a debug message
+msg() {
+    >&2 echo $*
+}
+
+###############################################################################
+# INTERNALS:
+###############################################################################
+
 set -e
 
 [ "$TRACE_DEPS" = yes ] && set -e -x
@@ -7,52 +52,16 @@ set -e
 DEP_FILE="$1"
 shift
 
-DEPS="$*"
+DEPS=" $* "
 
-use() {
-    DEPS="$DEPS $*"
-}
-
-used() {
-    DEPS=" $DEPS"
-    [ "${DEPS#* $1 }" != "$DEPS" ];
-}
-
-used_filter() {
-    local pattern=$1
+join() {
+    local IFS="$1"
     shift
-    local _tmp_DEPS="$DEPS"
-
-    for dep in $*; do
-        _tmp_DEPS="$(echo "$_tmp_DEPS" | tr ' ' '\n' | grep -Ev "^${dep}$" | tr '\n' ' ')"
-    done
-
-    echo $_tmp_DEPS | tr ' ' '\n' | grep -Eq "^${pattern}$"
-}
-
-not_used() {
-    if used $*; then
-        false
-    else
-        true
-    fi
-}
-
-include() {
-    [ "$1" = "maybe" ] && {
-        shift
-        [ -f "$1" ] || return 1
-    }
-
-    . "$1"
+    echo "$*"
 }
 
 sort_unique() {
     echo $* | tr ' ' '\n' | sort -u | tr '\n' ' '
-}
-
-msg() {
-    >&2 echo $*
 }
 
 while true; do
@@ -60,9 +69,9 @@ while true; do
 
     . "$DEP_FILE"
 
-    DEPS="$(sort_unique $DEPS)"
+    DEPS=" $(sort_unique $DEPS) "
     if [ "$DEPS" = "$DEPS_BEFORE" ]; then
-        echo "$DEPS"
+        echo $DEPS
         exit 0
     fi
 done
