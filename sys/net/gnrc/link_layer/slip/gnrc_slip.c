@@ -98,28 +98,23 @@ static void _slip_rx_cb(void *arg, char data)
 /* SLIP receive handler */
 static void _slip_receive(gnrc_slip_dev_t *dev, size_t bytes)
 {
-    gnrc_netif_hdr_t *hdr;
-    gnrc_pktsnip_t *pkt, *netif_hdr;
+    gnrc_pktsnip_t *pkt, *hdr;
 
-    pkt = gnrc_pktbuf_add(NULL, NULL, bytes, GNRC_NETTYPE_UNDEF);
+    hdr = gnrc_netif_hdr_build(NULL, 0, NULL, 0);
+    if (hdr == NULL) {
+        DEBUG("slip: no space left in packet buffer\n");
+        return;
+    }
+
+    ((gnrc_netif_hdr_t *)(hdr->data))->if_pid = thread_getpid();
+
+    pkt = gnrc_pktbuf_add(hdr, NULL, bytes, GNRC_NETTYPE_UNDEF);
 
     if (pkt == NULL) {
         DEBUG("slip: no space left in packet buffer\n");
+        gnrc_pktbuf_release(hdr);
         return;
     }
-
-    netif_hdr = gnrc_pktbuf_add(pkt, NULL, sizeof(gnrc_netif_hdr_t),
-                                GNRC_NETTYPE_NETIF);
-
-    if (netif_hdr == NULL) {
-        DEBUG("slip: no space left in packet buffer\n");
-        gnrc_pktbuf_release(pkt);
-        return;
-    }
-
-    hdr = netif_hdr->data;
-    gnrc_netif_hdr_init(hdr, 0, 0);
-    hdr->if_pid = thread_getpid();
 
     if (ringbuffer_get(&dev->in_buf, pkt->data, bytes) != bytes) {
         DEBUG("slip: could not read %u bytes from ringbuffer\n", (unsigned)bytes);
