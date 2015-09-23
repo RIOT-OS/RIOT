@@ -618,6 +618,15 @@ bool gnrc_sixlowpan_iphc_encode(gnrc_pktsnip_t *pkt)
               ipv6_addr_is_link_local(&ipv6_hdr->dst)) && (netif_hdr->dst_l2addr_len > 0)) {
         eui64_t iid;
 
+        if (dst_ctx != NULL) {
+            /* stateful destination address compression */
+            iphc_hdr[IPHC2_IDX] |= SIXLOWPAN_IPHC2_DAC;
+
+            if (((dst_ctx->flags_id & GNRC_SIXLOWPAN_CTX_FLAGS_CID_MASK) != 0)) {
+                iphc_hdr[CID_EXT_IDX] |= ((dst_ctx->flags_id & GNRC_SIXLOWPAN_CTX_FLAGS_CID_MASK) << 4);
+            }
+        }
+
         ieee802154_get_iid(&iid, gnrc_netif_hdr_get_dst_addr(netif_hdr),
                            netif_hdr->dst_l2addr_len);
 
