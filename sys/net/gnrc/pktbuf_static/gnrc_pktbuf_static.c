@@ -274,7 +274,7 @@ static inline void _print_chunk(void *chunk, size_t size, int num)
 {
     printf("================ chunk %3d (size: %4u) ================\n", num,
            (unsigned int)size);
-    od(chunk, GNRC_PKTBUF_SIZE, OD_WIDTH_DEFAULT,
+    od(chunk, size, OD_WIDTH_DEFAULT,
        OD_FLAGS_ADDRESS_HEX | OD_FLAGS_BYTES_HEX | OD_FLAGS_LENGTH_1);
 }
 
