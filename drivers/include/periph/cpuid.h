@@ -45,7 +45,14 @@ extern "C" {
  *                  defined in the CPU's cpu_conf.h)
  */
 void cpuid_get(void *id);
-#endif /* CPUID_ID_LEN */
+#else
+extern unsigned *RANDOM;
+#define CPUID_ID_LEN (sizeof(&RANDOM))
+static inline void cpuid_get(void* id)
+{
+    *(unsigned*)id = (unsigned) &RANDOM;
+}
+#endif
 
 #ifdef __cplusplus
 }

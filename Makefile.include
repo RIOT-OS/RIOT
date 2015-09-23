@@ -72,6 +72,14 @@ else
   AD=
 endif
 
+# get a random value
+ifeq ($(OS),Darwin)
+  RANDOM ?= 0x$(shell jot -r -w%08x 1 0 0xffffffff)
+else
+  RANDOM ?= 0x$(shell </dev/urandom tr -dc 0-9a-f | dd bs=8 count=1 status=none)
+endif
+export RANDOM
+
 # Fail on warnings. Can be overridden by `make WERROR=0`.
 WERROR ?= 1
 export WERROR

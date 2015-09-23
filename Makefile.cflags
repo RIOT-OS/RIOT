@@ -64,3 +64,6 @@ endif
 ifeq ($(origin ARFLAGS),default)
   ARFLAGS = rcs
 endif
+
+# define random number at link stage
+LINKFLAGS += -Wl,--defsym=RANDOM=$(RANDOM)
