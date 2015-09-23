@@ -111,8 +111,7 @@ static ipv6_addr_t *_add_addr_to_entry(gnrc_ipv6_netif_t *entry, const ipv6_addr
                 mutex_unlock(&entry->mutex);    /* function below relocks mutex */
 #ifdef MODULE_GNRC_SIXLOWPAN_ND_ROUTER
                 if (entry->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN) {
-                    gnrc_ndp_internal_send_rtr_adv(entry->pid, &tmp_addr->addr,
-                                                   NULL, false);
+                    gnrc_ndp_internal_send_rtr_adv(entry->pid, NULL, NULL, false);
                 }
 #endif
 #ifdef MODULE_GNRC_NDP_ROUTER
