@@ -92,7 +92,6 @@ static ipv6_addr_t *_add_addr_to_entry(gnrc_ipv6_netif_t *entry, const ipv6_addr
         (entry->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN)) {
         ipv6_addr_t *router = gnrc_ndp_internal_default_router();
         if (router != NULL) {
-            tmp_addr->flags |= GNRC_IPV6_NETIF_ADDR_FLAGS_TENTATIVE;
             mutex_unlock(&entry->mutex);    /* function below relocks mutex */
             gnrc_ndp_internal_send_nbr_sol(entry->pid, &tmp_addr->addr, router, router);
             mutex_lock(&entry->mutex);      /* relock mutex */
@@ -415,9 +414,6 @@ ipv6_addr_t *gnrc_ipv6_netif_find_addr(kernel_pid_t pid, const ipv6_addr_t *addr
     mutex_lock(&entry->mutex);
 
     for (int i = 0; i < GNRC_IPV6_NETIF_ADDR_NUMOF; i++) {
-        if (entry->addrs[i].flags & GNRC_IPV6_NETIF_ADDR_FLAGS_TENTATIVE) {
-            continue;
-        }
         if (ipv6_addr_equal(&(entry->addrs[i].addr), addr)) {
             mutex_unlock(&entry->mutex);
             DEBUG("ipv6 netif: Found %s on interface %" PRIkernel_pid "\n",
@@ -450,9 +446,6 @@ static uint8_t _find_by_prefix_unsafe(ipv6_addr_t **res, gnrc_ipv6_netif_t *ifac
             continue;
         }
 
-        if (iface->addrs[i].flags & GNRC_IPV6_NETIF_ADDR_FLAGS_TENTATIVE) {
-            continue;
-        }
         match = ipv6_addr_match_prefix(&(iface->addrs[i].addr), addr);
 
         if ((only == NULL) && !ipv6_addr_is_multicast(addr) &&
@@ -573,8 +566,7 @@ static int _create_candidate_set(gnrc_ipv6_netif_t *iface, const ipv6_addr_t *ds
         /* "In any case, multicast addresses and the unspecified address MUST NOT
          *  be included in a candidate set."
          */
-        if ((iter->flags & GNRC_IPV6_NETIF_ADDR_FLAGS_TENTATIVE) ||
-            ipv6_addr_is_multicast(&(iter->addr)) ||
+        if (ipv6_addr_is_multicast(&(iter->addr)) ||
             ipv6_addr_is_unspecified(&(iter->addr))) {
             continue;
         }
