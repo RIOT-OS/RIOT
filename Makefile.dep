@@ -36,6 +36,10 @@ ifneq (,$(filter at86rf2%,$(USEMODULE)))
   USEMODULE += netif
 endif
 
+ifneq (,$(filter cc110x,$(USEMODULE)))
+  USEMODULE += ieee802154
+endif
+
 ifneq (,$(filter kw2xrf,$(USEMODULE)))
   USEMODULE += ieee802154
   USEMODULE += netif

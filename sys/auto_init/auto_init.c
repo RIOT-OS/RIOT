@@ -158,6 +158,11 @@ void auto_init(void)
     auto_init_slip();
 #endif
 
+#ifdef MODULE_CC110X
+    extern void auto_init_cc110x(void);
+    auto_init_cc110x();
+#endif
+
 #ifdef MODULE_XBEE
     extern void auto_init_xbee(void);
     auto_init_xbee();
