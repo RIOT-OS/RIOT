@@ -444,6 +444,10 @@ void gnrc_ndp_internal_send_rtr_adv(kernel_pid_t iface, ipv6_addr_t *src, ipv6_a
             /* add prefixes from border router */
             bool processed_before = false;
             while (prf) {
+                /* skip if prefix does not belong to iface */
+                if (prf->iface != ipv6_iface) {
+                    continue;
+                }
                 /* skip if prefix has been processed already */
                 processed_before = false;
                 for (gnrc_sixlowpan_nd_router_prf_t *tmp = abr->prfs; tmp != prf; tmp = tmp->next) {
