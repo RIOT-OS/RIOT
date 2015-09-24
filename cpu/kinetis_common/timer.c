@@ -144,7 +144,10 @@ int timer_set(tim_t dev, int channel, unsigned int timeout)
 
 int timer_set_absolute(tim_t dev, int channel, unsigned int value)
 {
-    (void) channel; /* we only support one channel */
+    /* we only support one channel */
+    if (channel != 0) {
+        return -1;
+    }
     switch (dev) {
 #if TIMER_0_EN
 
@@ -180,7 +183,10 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
 
 int timer_clear(tim_t dev, int channel)
 {
-    (void) channel; /* we only support one channel */
+    /* we only support one channel */
+    if (channel != 0) {
+        return -1;
+    }
     switch (dev) {
 #if TIMER_0_EN
 
