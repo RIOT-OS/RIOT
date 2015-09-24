@@ -52,7 +52,9 @@ static gnrc_sixlowpan_nd_router_prf_t *_get_free_prefix(ipv6_addr_t *prefix, siz
             return &_prefixes[i];
         }
 
-        if ((prf == NULL) && ipv6_addr_is_unspecified(&_prefixes[i].prefix->addr)) {
+        if ((prf == NULL) &&
+            ((_prefixes[i].prefix == NULL) ||
+             ipv6_addr_is_unspecified(&_prefixes[i].prefix->addr))) {
             prf = &_prefixes[i];
         }
     }
