@@ -606,6 +606,10 @@ bool gnrc_sixlowpan_iphc_encode(gnrc_pktsnip_t *pkt)
                  * (https://tools.ietf.org/html/rfc3306) with given context
                  * for unicast prefix -> context based compression */
                 iphc_hdr[IPHC2_IDX] |= SIXLOWPAN_IPHC2_DAC;
+                if ((ctx->flags_id & GNRC_SIXLOWPAN_CTX_FLAGS_CID_MASK) != 0) {
+                    iphc_hdr[CID_EXT_IDX] |= ((ctx->flags_id & GNRC_SIXLOWPAN_CTX_FLAGS_CID_MASK)
+                                              << 4);
+                }
                 iphc_hdr[inline_pos++] = ipv6_hdr->dst.u8[1];
                 iphc_hdr[inline_pos++] = ipv6_hdr->dst.u8[2];
                 memcpy(iphc_hdr + inline_pos, ipv6_hdr->dst.u16 + 6, 4);
