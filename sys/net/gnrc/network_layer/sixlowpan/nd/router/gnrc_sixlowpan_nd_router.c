@@ -46,13 +46,15 @@ static gnrc_sixlowpan_nd_router_prf_t *_get_free_prefix(ipv6_addr_t *prefix, siz
 {
     gnrc_sixlowpan_nd_router_prf_t *prf = NULL;
 
-    for (int i = 0; i < GNRC_SIXLOWPAN_ND_ROUTER_ABR_NUMOF; i++) {
+    for (int i = 0; i < GNRC_SIXLOWPAN_ND_ROUTER_ABR_PRF_NUMOF; i++) {
         if ((ipv6_addr_match_prefix(&_prefixes[i].prefix->addr, prefix) >= prefix_len) &&
             (_prefixes[i].prefix->prefix_len == prefix_len)) {
             return &_prefixes[i];
         }
 
-        if ((prf == NULL) && ipv6_addr_is_unspecified(&_prefixes[i].prefix->addr)) {
+        if ((prf == NULL) &&
+            ((_prefixes[i].prefix == NULL) ||
+             ipv6_addr_is_unspecified(&_prefixes[i].prefix->addr))) {
             prf = &_prefixes[i];
         }
     }

@@ -128,6 +128,7 @@ static ipv6_addr_t *_add_addr_to_entry(gnrc_ipv6_netif_t *entry, const ipv6_addr
             }
 #endif
 #ifdef MODULE_GNRC_SIXLOWPAN_ND_BORDER_ROUTER
+            tmp_addr->valid = 0xFFFF;
             gnrc_sixlowpan_nd_router_abr_t *abr = gnrc_sixlowpan_nd_router_abr_get();
             if (gnrc_sixlowpan_nd_router_abr_add_prf(abr, entry, tmp_addr) < 0) {
                 DEBUG("ipv6_netif: error adding prefix to 6LoWPAN-ND management\n");
