@@ -204,12 +204,6 @@ int i2c_init_master(i2c_t dev, i2c_speed_t speed)
     return 0;
 }
 
-int i2c_init_slave(i2c_t dev, uint8_t address)
-{
-    /* TODO */
-    return 0;
-}
-
 int i2c_acquire(i2c_t dev)
 {
     if (dev >= I2C_NUMOF) {
