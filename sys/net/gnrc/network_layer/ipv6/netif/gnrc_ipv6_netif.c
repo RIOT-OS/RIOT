@@ -106,6 +106,13 @@ static ipv6_addr_t *_add_addr_to_entry(gnrc_ipv6_netif_t *entry, const ipv6_addr
     }
     else {
         if (!ipv6_addr_is_link_local(addr)) {
+#ifdef MODULE_GNRC_SIXLOWPAN_ND_BORDER_ROUTER
+            tmp_addr->valid = 0xFFFF;
+            gnrc_sixlowpan_nd_router_abr_t *abr = gnrc_sixlowpan_nd_router_abr_get();
+            if (gnrc_sixlowpan_nd_router_abr_add_prf(abr, entry, tmp_addr) < 0) {
+                DEBUG("ipv6_netif: error adding prefix to 6LoWPAN-ND management\n");
+            }
+#endif
 #if defined(MODULE_GNRC_NDP_ROUTER) || defined(MODULE_GNRC_SIXLOWPAN_ND_ROUTER)
             if ((entry->flags & GNRC_IPV6_NETIF_FLAGS_ROUTER) &&
                 (entry->flags & GNRC_IPV6_NETIF_FLAGS_RTR_ADV)) {
@@ -125,13 +132,6 @@ static ipv6_addr_t *_add_addr_to_entry(gnrc_ipv6_netif_t *entry, const ipv6_addr
                 }
 #endif
                 mutex_lock(&entry->mutex);      /* relock mutex */
-            }
-#endif
-#ifdef MODULE_GNRC_SIXLOWPAN_ND_BORDER_ROUTER
-            tmp_addr->valid = 0xFFFF;
-            gnrc_sixlowpan_nd_router_abr_t *abr = gnrc_sixlowpan_nd_router_abr_get();
-            if (gnrc_sixlowpan_nd_router_abr_add_prf(abr, entry, tmp_addr) < 0) {
-                DEBUG("ipv6_netif: error adding prefix to 6LoWPAN-ND management\n");
             }
 #endif
         }
