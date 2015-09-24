@@ -36,7 +36,6 @@ extern "C" {
 // #define CRYPTO_THREEDES
 // #define CRYPTO_AES
 // #define CRYPTO_TWOFISH
-// #define CRYPTO_SKIPJACK
 
 /** @brief the length of keys in bytes */
 #define CIPHERS_MAX_KEY_SIZE 20
@@ -50,7 +49,6 @@ extern "C" {
  * threedes     needs 24  bytes                           <br>
  * aes          needs CIPHERS_MAX_KEY_SIZE bytes          <br>
  * twofish      needs CIPHERS_MAX_KEY_SIZE bytes          <br>
- * skipjack     needs 20 bytes
  */
 #if defined(CRYPTO_THREEDES)
     #define CIPHER_MAX_CONTEXT_SIZE 24
@@ -58,8 +56,6 @@ extern "C" {
     #define CIPHER_MAX_CONTEXT_SIZE CIPHERS_MAX_KEY_SIZE
 #elif defined(CRYPTO_TWOFISH)
     #define CIPHER_MAX_CONTEXT_SIZE CIPHERS_MAX_KEY_SIZE
-#elif defined(CRYPTO_SKIPJACK)
-    #define CIPHER_MAX_CONTEXT_SIZE 20
 #else
     // 0 is not a possibility because 0-sized arrays are not allowed in ISO C
     #define CIPHER_MAX_CONTEXT_SIZE 1
@@ -109,7 +105,6 @@ typedef const cipher_interface_t *cipher_id_t;
 extern const cipher_id_t CIPHER_3DES;
 extern const cipher_id_t CIPHER_AES_128;
 extern const cipher_id_t CIPHER_TWOFISH;
-extern const cipher_id_t CIPHER_SKIPJACK;
 
 
 /**
