@@ -722,8 +722,6 @@ static int _netif_add(char *cmd_name, kernel_pid_t dev, int argc, char **argv)
         printf("error: unable to add IPv6 address\n");
         return 1;
     }
-    gnrc_ipv6_netif_addr_t *netif_addr = gnrc_ipv6_netif_addr_get(assigned_address);
-    netif_addr->flags &= ~GNRC_IPV6_NETIF_ADDR_FLAGS_TENTATIVE;
 
     printf("success: added %s/%d to interface %" PRIkernel_pid "\n", addr_str,
            prefix_len, dev);
