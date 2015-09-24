@@ -213,12 +213,6 @@ static void _toggle_pins(GPIO_TypeDef *port, int pin_scl, int pin_sda)
     port->ODR |= (1 << pin_sda);
 }
 
-int i2c_init_slave(i2c_t dev, uint8_t address)
-{
-    /* TODO: implement slave mode */
-    return -1;
-}
-
 int i2c_acquire(i2c_t dev)
 {
     if (dev >= I2C_NUMOF) {
