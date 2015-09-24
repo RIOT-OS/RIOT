@@ -246,9 +246,11 @@ void at86rf2xx_tx_exec(at86rf2xx_t *dev)
 
 size_t at86rf2xx_rx_len(at86rf2xx_t *dev)
 {
-    uint8_t res;
-    at86rf2xx_fb_read(dev, &res, 1);
-    return (size_t)(res - 2);           /* extract the PHR and LQI field */
+    uint8_t phr;
+    at86rf2xx_fb_read(dev, &phr, 1);
+
+    /* ignore MSB (refer p.80) and substract length of FCS field */
+    return (size_t)((phr & 0x7f) - 2);
 }
 
 void at86rf2xx_rx_read(at86rf2xx_t *dev, uint8_t *data, size_t len,
