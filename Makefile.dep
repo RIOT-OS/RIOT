@@ -5,7 +5,6 @@ endif
 ifneq (,$(filter nhdp,$(USEMODULE)))
   USEMODULE += conn_udp
   USEMODULE += vtimer
-  USEMODULE += oonf_common
   USEMODULE += oonf_rfc5444
 endif
 
@@ -311,9 +310,13 @@ ifneq (,$(filter fib,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
+ifneq (,$(filter oonf_rfc5444,$(USEMODULE)))
+  USEMODULE += oonf_common
+endif
+
 ifneq (,$(filter oonf_common,$(USEMODULE)))
   USEPKG += oonf_api
-  USEMODULE += socket_base
+  USEMODULE += posix_sockets
 endif
 
 ifneq (,$(filter %_conn_ip,$(USEMODULE)))
