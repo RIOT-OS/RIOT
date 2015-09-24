@@ -564,9 +564,9 @@ void gnrc_ndp_rtr_adv_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt, ipv6_hdr_t
                     return;
                 }
 #ifdef MODULE_GNRC_SIXLOWPAN_ND
-                if (byteorder_ntohl(((ndp_opt_pi_t *)opt)->valid_ltime) <
-                    next_rtr_sol) {
-                    next_rtr_sol = byteorder_ntohl(((ndp_opt_pi_t *)opt)->valid_ltime);
+                uint32_t valid_ltime = byteorder_ntohl(((ndp_opt_pi_t *)opt)->valid_ltime);
+                if ((valid_ltime != 0) && (valid_ltime < next_rtr_sol)) {
+                    next_rtr_sol = valid_ltime;
                 }
 #endif
                 break;
@@ -577,9 +577,9 @@ void gnrc_ndp_rtr_adv_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt, ipv6_hdr_t
                     /* invalid 6LoWPAN context option */
                     return;
                 }
-                if (byteorder_ntohs(((sixlowpan_nd_opt_6ctx_t *)opt)->ltime) <
-                    (next_rtr_sol / 60)) {
-                    next_rtr_sol = byteorder_ntohs(((sixlowpan_nd_opt_6ctx_t *)opt)->ltime) * 60;
+                uint16_t ltime = byteorder_ntohs(((sixlowpan_nd_opt_6ctx_t *)opt)->ltime);
+                if ((ltime != 0) && (ltime < (next_rtr_sol / 60))) {
+                    next_rtr_sol = ltime * 60;
                 }
 
                 break;
@@ -614,7 +614,7 @@ void gnrc_ndp_rtr_adv_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt, ipv6_hdr_t
         /* 3/4 of the time should be "well before" enough the respective timeout
          * not to run out; see https://tools.ietf.org/html/rfc6775#section-5.4.3 */
         next_rtr_sol *= 3;
-        next_rtr_sol >>= 2;
+        next_rtr_sol = (next_rtr_sol > 4) ? (next_rtr_sol >> 2) : 1;
         /* according to https://tools.ietf.org/html/rfc6775#section-5.3:
          * "In all cases, the RS retransmissions are terminated when an RA is
          *  received."
