@@ -444,8 +444,8 @@ static void _timer_callback(void)
         /* we ended up in _timer_callback and there is
          * a timer waiting.
          */
-        /* set our period reference to that timer's target time. */
-        reference = _mask(timer_list_head->target);
+        /* set our period reference to the current time. */
+        reference = _xtimer_now();
     }
 
 overflow:
