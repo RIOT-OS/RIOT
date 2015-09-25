@@ -446,6 +446,7 @@ void gnrc_ndp_internal_send_rtr_adv(kernel_pid_t iface, ipv6_addr_t *src, ipv6_a
             while (prf) {
                 /* skip if prefix does not belong to iface */
                 if (prf->iface != ipv6_iface) {
+                    prf = prf->next;
                     continue;
                 }
                 /* skip if prefix has been processed already */
