@@ -46,7 +46,9 @@ extern "C" {
  *          at maximum.
  */
 #ifndef GNRC_SIXLOWPAN_ND_ROUTER_ABR_PRF_NUMOF
-#define GNRC_SIXLOWPAN_ND_ROUTER_ABR_PRF_NUMOF   (GNRC_SIXLOWPAN_ND_ROUTER_ABR_NUMOF)
+/* One prefix per interface */
+#define GNRC_SIXLOWPAN_ND_ROUTER_ABR_PRF_NUMOF   \
+        (GNRC_SIXLOWPAN_ND_ROUTER_ABR_NUMOF * GNRC_NETIF_NUMOF)
 #endif
 
 /**
