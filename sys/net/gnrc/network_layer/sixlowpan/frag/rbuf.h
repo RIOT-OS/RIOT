@@ -85,7 +85,9 @@ typedef struct {
 } rbuf_t;
 
 /**
- * @brief   Adds a new fragment to the reassembly buffer.
+ * @brief   Adds a new fragment to the reassembly buffer. If the packet is
+ *          complete, dispatch the packet with the transmit information of
+ *          the last fragment.
  *
  * @param[in] netif_hdr     The interface header of the fragment, with
  *                          gnrc_netif_hdr_t::if_pid and its source and
