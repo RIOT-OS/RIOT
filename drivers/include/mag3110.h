@@ -8,7 +8,7 @@
 
 /**
  * @defgroup    drivers_mag3110 MAG3110 3-Axis Digital Magnetometer
- * @ingroup     drivers
+ * @ingroup     drivers_sensors
  * @brief       Driver for the Freescale MAG3110 magnetometer.
  *              After initialization and set activ the magnetometer
  *              will make measurements at periodic times.

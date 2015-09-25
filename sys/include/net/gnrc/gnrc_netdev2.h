@@ -7,7 +7,9 @@
  */
 
 /**
+ * @defgroup  net_gnrc_netdev2   Adaption layer for GNRC on top of Netdev2
  * @ingroup   net_gnrc
+ * @brief     Provides the glue code for @ref gnrc on top of @ref drivers_netdev_netdev2
  * @{
  *
  * @file

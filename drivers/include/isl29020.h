@@ -8,7 +8,7 @@
 
 /**
  * @defgroup    driver_isl29020 ISL29020 light sensor
- * @ingroup     drivers
+ * @ingroup     drivers_sensors
  * @brief       Device driver for the ISL29020 light sensor
  * @{
  *

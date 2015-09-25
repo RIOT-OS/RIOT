@@ -8,7 +8,7 @@
 
 /**
  * @defgroup    driver_srf08 SRF08 ultrasonic range sensor
- * @ingroup     drivers
+ * @ingroup     drivers_sensors
  * @brief       Driver for the SRF08 ultrasonic range sensor
  *
  * The connection between the MCU and the SRF08 is based on the i2c-interface.
