@@ -287,6 +287,10 @@ ifneq (,$(filter posix_sockets,$(USEMODULE)))
   USEMODULE += random
 endif
 
+ifneq (,$(filter uart_stdio,$(USEMODULE)))
+  USEMODULE += tsrb
+endif
+
 ifneq (,$(filter posix,$(USEMODULE)))
   USEMODULE += timex
   USEMODULE += vtimer
