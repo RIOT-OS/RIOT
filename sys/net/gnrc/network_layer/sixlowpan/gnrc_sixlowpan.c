@@ -257,7 +257,7 @@ static void _send(gnrc_pktsnip_t *pkt)
 
     /* IP should not send anything here if it is not a 6LoWPAN interface,
      * so we don't need to check for NULL pointers */
-    if (gnrc_pkt_len(pkt2->next) <= iface->max_frag_size) {
+    if (datagram_size <= iface->max_frag_size) {
         DEBUG("6lo: Send SND command for %p to %" PRIu16 "\n",
               (void *)pkt2, hdr->if_pid);
         gnrc_netapi_send(hdr->if_pid, pkt2);
