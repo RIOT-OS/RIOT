@@ -54,6 +54,7 @@ static void reset(unsigned long uart_base)
 	UARTDisable(uart_base);
 	UARTRxErrorClear(uart_base);
 	UARTEnable(uart_base);
+	MAP_UARTFIFODisable(uart_base);
 }
 
 
@@ -62,21 +63,17 @@ static void reset(unsigned long uart_base)
 #if UART_0_EN
 void UART_0_ISR(void)
 {
-	/*
-	 *   When FEN == 0 the interrup flag is never set and
-	 *   UARTCharsAvail always return false also when
-	 *   into DR register there is a RX char
-	 */
-	//MAP_UARTIntClear(UARTA0_BASE, UART_INT_RX|UART_INT_OE|UART_INT_BE|UART_INT_PE|UART_INT_FE);
+	long data;
 
-    //while (UARTCharsAvail(UARTA0_BASE)) {
-    //    uart_config[0].rx_cb(uart_config[0].arg, MAP_UARTCharGet(UARTA0_BASE));
-    //}
+	MAP_UARTIntClear(UARTA0_BASE, UART_INT_RX|UART_INT_OE|UART_INT_BE|UART_INT_PE|UART_INT_FE);
 
     if (UARTRxErrorGet(UARTA0_BASE)) {
     	reset(UARTA0_BASE);
     } else {
-    	uart_config[0].rx_cb(uart_config[0].arg, MAP_UARTCharGet(UARTA0_BASE));
+    	data = MAP_UARTCharGetNonBlocking(UARTA0_BASE);
+    	if (data != -1) {
+    		uart_config[0].rx_cb(uart_config[0].arg, data);
+    	}
     }
 
     if (sched_context_switch_request) {
@@ -88,18 +85,18 @@ void UART_0_ISR(void)
 #if UART_1_EN
 void UART_1_ISR(void)
 {
-	//MAP_UARTIntClear(UARTA1_BASE, UART_INT_RX);
+	long data;
 
-    //while (UARTCharsAvail(UARTA1_BASE)) {
-    //    uart_config[1].rx_cb(uart_config[1].arg, MAP_UARTCharGet(UARTA1_BASE));
-    //}
+	MAP_UARTIntClear(UARTA1_BASE, UART_INT_RX|UART_INT_OE|UART_INT_BE|UART_INT_PE|UART_INT_FE);
 
     if (UARTRxErrorGet(UARTA1_BASE)) {
     	reset(UARTA1_BASE);
     } else {
-    	uart_config[1].rx_cb(uart_config[1].arg, MAP_UARTCharGet(UARTA1_BASE));
+    	data = MAP_UARTCharGetNonBlocking(UARTA1_BASE);
+    	if (data != -1) {
+    		uart_config[1].rx_cb(uart_config[1].arg, data);
+    	}
     }
-
 
     if (sched_context_switch_request) {
         thread_yield();
@@ -125,13 +122,9 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, uart_tx_cb_t t
     switch (uart) {
 #if UART_0_EN
         case UART_0:
+           	MAP_UARTIntEnable(UARTA0_BASE, UART_INT_RX|UART_INT_OE|UART_INT_BE|UART_INT_PE|UART_INT_FE);
             MAP_IntPrioritySet(INT_UARTA0, UART_IRQ_PRIO);
             MAP_IntEnable(INT_UARTA0);
-            MAP_UARTIntClear(UARTA0_BASE, 0xFFFFFFFF);
-        	MAP_UARTIntEnable(UARTA0_BASE, UART_INT_RX|UART_INT_OE|UART_INT_BE|UART_INT_PE|UART_INT_FE);
-
-        	//MAP_UARTIntClear(UARTA0_BASE, UART_INT_RX|UART_INT_OE|UART_INT_BE|UART_INT_PE|UART_INT_FE);
-
             break;
 #endif
 #if UART_1_EN
@@ -155,6 +148,8 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
         case UART_0:
             u = UARTA0_BASE;
 
+            MAP_PRCMPeripheralReset(PRCM_UARTA0);
+
             //
             // Enable Peripheral Clocks
             //
@@ -174,6 +169,7 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
             		baudrate, (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE |
                              UART_CONFIG_PAR_NONE));
 
+            reset(u);
 
             break;
 #endif

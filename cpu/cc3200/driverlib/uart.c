@@ -465,8 +465,7 @@ UARTEnable(unsigned long ulBase)
 
 
     // Enable the FIFO.
-    // attdona: disable the FIFO for RIOT echoing caracters received from serial
-    //HWREG(ulBase + UART_O_LCRH) |= UART_LCRH_FEN;
+    HWREG(ulBase + UART_O_LCRH) |= UART_LCRH_FEN;
 
     //
     // Enable RX, TX, and the UART.
@@ -975,14 +974,12 @@ UARTCharGet(unsigned long ulBase)
     //
     ASSERT(UARTBaseValid(ulBase));
 
-#if 0 // attdona: when FEN == 0 this condition is always true
     //
     // Wait until a char is available.
     //
     while(HWREG(ulBase + UART_O_FR) & UART_FR_RXFE)
     {
     }
-#endif
 
     //
     // Now get the char.
