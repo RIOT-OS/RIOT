@@ -243,7 +243,7 @@ void gnrc_ndp_internal_send_nbr_sol(kernel_pid_t iface, ipv6_addr_t *src, ipv6_a
     size_t l2src_len = 0;
 
     DEBUG("ndp internal: send neighbor solicitation (iface: %" PRIkernel_pid ", src: %s, ",
-           iface, ipv6_addr_to_str(addr_str, src, sizeof(addr_str)));
+          iface, ipv6_addr_to_str(addr_str, src, sizeof(addr_str)));
     DEBUG(" tgt: %s, ", ipv6_addr_to_str(addr_str, tgt, sizeof(addr_str)));
     DEBUG("dst: %s)\n", ipv6_addr_to_str(addr_str, dst, sizeof(addr_str)));
 
@@ -386,7 +386,7 @@ static gnrc_pktsnip_t *_add_pios(gnrc_ipv6_netif_t *ipv6_iface, gnrc_pktsnip_t *
         processed_before = false;
         for (int j = 0; j < i; j++) {
             if ((processed_before =
-                _check_prefixes(&ipv6_iface->addrs[i], &ipv6_iface->addrs[j]))) {
+                     _check_prefixes(&ipv6_iface->addrs[i], &ipv6_iface->addrs[j]))) {
                 break;
             }
         }
@@ -453,7 +453,7 @@ void gnrc_ndp_internal_send_rtr_adv(kernel_pid_t iface, ipv6_addr_t *src, ipv6_a
                 processed_before = false;
                 for (gnrc_sixlowpan_nd_router_prf_t *tmp = abr->prfs; tmp != prf; tmp = tmp->next) {
                     if ((processed_before =
-                        _check_prefixes(prf->prefix, tmp->prefix))) {
+                             _check_prefixes(prf->prefix, tmp->prefix))) {
                         break;
                     }
                 }
