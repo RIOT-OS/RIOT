@@ -243,7 +243,7 @@ void gnrc_ndp_internal_send_nbr_sol(kernel_pid_t iface, ipv6_addr_t *src, ipv6_a
     size_t l2src_len = 0;
 
     DEBUG("ndp internal: send neighbor solicitation (iface: %" PRIkernel_pid ", src: %s, ",
-           iface, ipv6_addr_to_str(addr_str, src, sizeof(addr_str)));
+          iface, ipv6_addr_to_str(addr_str, src, sizeof(addr_str)));
     DEBUG(" tgt: %s, ", ipv6_addr_to_str(addr_str, tgt, sizeof(addr_str)));
     DEBUG("dst: %s)\n", ipv6_addr_to_str(addr_str, dst, sizeof(addr_str)));
 
@@ -379,14 +379,14 @@ static inline bool _check_prefixes(gnrc_ipv6_netif_addr_t *a, gnrc_ipv6_netif_ad
 static gnrc_pktsnip_t *_add_pios(gnrc_ipv6_netif_t *ipv6_iface, gnrc_pktsnip_t *pkt)
 {
     gnrc_pktsnip_t *tmp;
-    bool processed_before = false;
 
     for (int i = 0; i < GNRC_IPV6_NETIF_ADDR_NUMOF; i++) {
         /* skip if prefix has been processed already */
-        processed_before = false;
+        bool processed_before = false;
+
         for (int j = 0; j < i; j++) {
             if ((processed_before =
-                _check_prefixes(&ipv6_iface->addrs[i], &ipv6_iface->addrs[j]))) {
+                     _check_prefixes(&ipv6_iface->addrs[i], &ipv6_iface->addrs[j]))) {
                 break;
             }
         }
@@ -442,17 +442,17 @@ void gnrc_ndp_internal_send_rtr_adv(kernel_pid_t iface, ipv6_addr_t *src, ipv6_a
         if (abr != NULL) {
             gnrc_sixlowpan_nd_router_prf_t *prf = abr->prfs;
             /* add prefixes from border router */
-            bool processed_before = false;
             while (prf) {
+                bool processed_before = false;
                 /* skip if prefix does not belong to iface */
                 if (prf->iface != ipv6_iface) {
+                    prf = prf->next;
                     continue;
                 }
                 /* skip if prefix has been processed already */
-                processed_before = false;
                 for (gnrc_sixlowpan_nd_router_prf_t *tmp = abr->prfs; tmp != prf; tmp = tmp->next) {
                     if ((processed_before =
-                        _check_prefixes(prf->prefix, tmp->prefix))) {
+                             _check_prefixes(prf->prefix, tmp->prefix))) {
                         break;
                     }
                 }
