@@ -62,7 +62,6 @@ extern "C"
  */
 #define TIMER_NUMOF             (1U)
 #define TIMER_0_EN              1
-#define TIMER_1_EN              0
 #define TIMER_IRQ_PRIO          1
 #define TIMER_BASE              PIT
 #define TIMER_MAX_VALUE         (0xffffffff)
@@ -76,10 +75,10 @@ extern "C"
 #define TIMER_0_IRQ_CHAN        PIT1_IRQn
 
 /* Timer 1 configuration */
-#define TIMER_1_PRESCALER_CH    2
-#define TIMER_1_COUNTER_CH      3
-#define TIMER_1_ISR             isr_pit3
-#define TIMER_1_IRQ_CHAN        PIT3_IRQn
+#define TIME_PRESCALER_CH       2
+#define TIME_COUNTER_CH         3
+#define TIME_ISR                isr_pit3
+#define TIME_IRQ_CHAN           PIT3_IRQn
 
 /** @} */
 
