@@ -463,10 +463,9 @@ UARTEnable(unsigned long ulBase)
     //
     ASSERT(UARTBaseValid(ulBase));
 
-    //
+
     // Enable the FIFO.
-    //
-    // attdona: disable the FIFO because RIOT shell needs echoing
+    // attdona: disable the FIFO for RIOT echoing caracters received from serial
     //HWREG(ulBase + UART_O_LCRH) |= UART_LCRH_FEN;
 
     //

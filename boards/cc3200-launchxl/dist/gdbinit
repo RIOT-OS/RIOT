@@ -60,6 +60,6 @@ set $pc = g_pfnVectors[1]
 # Set break point at main and run to main
 #*****************************************************************************
 
-#break ResetISR
 break main
+
 continue

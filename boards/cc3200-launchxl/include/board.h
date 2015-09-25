@@ -55,6 +55,15 @@ extern "C" {
 
 #define TIMER_NUM_CHANNELS 4
 
+#define XTIMER  TIMER_0
+#define XTIMER_CHAN (0)
+
+#if TIMER_0_MAX_VALUE == 0xffffff
+#define XTIMER_MASK 0xff000000
+#elif TIMER_0_MAX_VALUE == 0xffff
+#define XTIMER_MASK 0xffff0000
+#endif
+
 
 /**
  * @name Define UART device and baudrate for stdio
