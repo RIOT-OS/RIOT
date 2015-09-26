@@ -407,12 +407,11 @@ static int _fill_ipv6_hdr(kernel_pid_t iface, gnrc_pktsnip_t *ipv6,
     return 0;
 }
 
-static inline void _send_multicast_over_iface(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
-        gnrc_pktsnip_t *netif)
+static inline void _send_multicast_over_iface(kernel_pid_t iface, gnrc_pktsnip_t *pkt)
 {
     DEBUG("ipv6: send multicast over interface %" PRIkernel_pid "\n", iface);
     /* mark as multicast */
-    ((gnrc_netif_hdr_t *)netif->data)->flags |= GNRC_NETIF_HDR_FLAGS_MULTICAST;
+    ((gnrc_netif_hdr_t *)pkt->data)->flags |= GNRC_NETIF_HDR_FLAGS_MULTICAST;
     /* and send to interface */
     _send_to_iface(iface, pkt);
 }
@@ -421,7 +420,6 @@ static void _send_multicast(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
                             gnrc_pktsnip_t *ipv6, gnrc_pktsnip_t *payload,
                             bool prep_hdr)
 {
-    gnrc_pktsnip_t *netif;
     kernel_pid_t ifs[GNRC_NETIF_NUMOF];
     size_t ifnum = 0;
 
@@ -445,6 +443,7 @@ static void _send_multicast(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
         gnrc_pktbuf_hold(pkt, ifnum - 1);
 
         for (size_t i = 0; i < ifnum; i++) {
+            gnrc_pktsnip_t *netif;
             if (prep_hdr) {
                 /* need to get second write access (duplication) to fill IPv6
                  * header interface-local */
@@ -476,7 +475,7 @@ static void _send_multicast(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
 
             LL_PREPEND(pkt, netif);
 
-            _send_multicast_over_iface(ifs[i], pkt, netif);
+            _send_multicast_over_iface(ifs[i], ipv6);
         }
     }
     else {
@@ -489,13 +488,12 @@ static void _send_multicast(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
             }
         }
 
-        netif = pkt;
-
-        _send_multicast_over_iface(iface, pkt, netif);
+        _send_multicast_over_iface(iface, pkt);
     }
 #else   /* GNRC_NETIF_NUMOF */
     (void)ifnum; /* not used in this build branch */
     if (iface == KERNEL_PID_UNDEF) {
+        gnrc_pktsnip_t *netif;
         iface = ifs[0];
 
         /* allocate interface header */
@@ -510,9 +508,6 @@ static void _send_multicast(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
 
         LL_PREPEND(pkt, netif);
     }
-    else {
-        netif = pkt;
-    }
 
     if (prep_hdr) {
         if (_fill_ipv6_hdr(iface, ipv6, payload) < 0) {
@@ -522,7 +517,7 @@ static void _send_multicast(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
         }
     }
 
-    _send_multicast_over_iface(iface, pkt, netif);
+    _send_multicast_over_iface(iface, pkt);
 #endif  /* GNRC_NETIF_NUMOF */
 }
 
