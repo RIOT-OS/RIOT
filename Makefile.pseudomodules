@@ -1,3 +1,7 @@
+PSEUDOMODULES += conn
+PSEUDOMODULES += conn_ip
+PSEUDOMODULES += conn_tcp
+PSEUDOMODULES += conn_udp
 PSEUDOMODULES += gnrc_netif_default
 PSEUDOMODULES += gnrc_ipv6_default
 PSEUDOMODULES += gnrc_ipv6_router
@@ -13,6 +17,8 @@ PSEUDOMODULES += log
 PSEUDOMODULES += log_printfnoformat
 PSEUDOMODULES += newlib
 PSEUDOMODULES += pktqueue
+PSEUDOMODULES += schedstatistics
+PSEUDOMODULES += netif
 
 # include variants of the AT86RF2xx drivers as pseudo modules
 PSEUDOMODULES += at86rf23%

@@ -606,6 +606,9 @@ bool gnrc_sixlowpan_iphc_encode(gnrc_pktsnip_t *pkt)
                  * (https://tools.ietf.org/html/rfc3306) with given context
                  * for unicast prefix -> context based compression */
                 iphc_hdr[IPHC2_IDX] |= SIXLOWPAN_IPHC2_DAC;
+                if ((ctx->flags_id & GNRC_SIXLOWPAN_CTX_FLAGS_CID_MASK) != 0) {
+                    iphc_hdr[CID_EXT_IDX] |= (ctx->flags_id & GNRC_SIXLOWPAN_CTX_FLAGS_CID_MASK);
+                }
                 iphc_hdr[inline_pos++] = ipv6_hdr->dst.u8[1];
                 iphc_hdr[inline_pos++] = ipv6_hdr->dst.u8[2];
                 memcpy(iphc_hdr + inline_pos, ipv6_hdr->dst.u16 + 6, 4);
@@ -617,6 +620,15 @@ bool gnrc_sixlowpan_iphc_encode(gnrc_pktsnip_t *pkt)
     else if ((((dst_ctx != NULL) && (dst_ctx->flags_id & GNRC_SIXLOWPAN_CTX_FLAGS_COMP)) ||
               ipv6_addr_is_link_local(&ipv6_hdr->dst)) && (netif_hdr->dst_l2addr_len > 0)) {
         eui64_t iid;
+
+        if (dst_ctx != NULL) {
+            /* stateful destination address compression */
+            iphc_hdr[IPHC2_IDX] |= SIXLOWPAN_IPHC2_DAC;
+
+            if (((dst_ctx->flags_id & GNRC_SIXLOWPAN_CTX_FLAGS_CID_MASK) != 0)) {
+                iphc_hdr[CID_EXT_IDX] |= (dst_ctx->flags_id & GNRC_SIXLOWPAN_CTX_FLAGS_CID_MASK);
+            }
+        }
 
         ieee802154_get_iid(&iid, gnrc_netif_hdr_get_dst_addr(netif_hdr),
                            netif_hdr->dst_l2addr_len);

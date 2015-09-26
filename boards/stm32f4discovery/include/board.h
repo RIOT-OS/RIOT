@@ -34,9 +34,14 @@ extern "C" {
 #define F_CPU               CLOCK_CORECLOCK
 
 /**
- * @name Assign the hardware timer
+ * @name xtimer configuration
+ * @{
  */
-#define HW_TIMER            TIMER_0
+#define XTIMER              TIMER_0
+#define XTIMER_CHAN         (0)
+#define XTIMER_OVERHEAD     (6)
+#define XTIMER_BACKOFF      (5)
+/** @} */
 
 /**
  * @name Define UART device and baudrate for stdio

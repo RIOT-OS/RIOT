@@ -123,7 +123,7 @@ gnrc_ipv6_nc_t *gnrc_ipv6_nc_add(kernel_pid_t iface, const ipv6_addr_t *ipv6_add
     DEBUG(" with flags = 0x%0x\n", flags);
 
     if (gnrc_ipv6_nc_get_state(free_entry) == GNRC_IPV6_NC_STATE_INCOMPLETE) {
-        DEBUG("ipv6_nc: Set remaining probes to %" PRIu8 "\n");
+        DEBUG("ipv6_nc: Set remaining probes to %" PRIu8 "\n", GNRC_NDP_MAX_MC_NBR_SOL_NUMOF);
         free_entry->probes_remaining = GNRC_NDP_MAX_MC_NBR_SOL_NUMOF;
     }
 
@@ -223,7 +223,8 @@ gnrc_ipv6_nc_t *gnrc_ipv6_nc_still_reachable(const ipv6_addr_t *ipv6_addr)
         return NULL;
     }
 
-    if (gnrc_ipv6_nc_get_state(entry) != GNRC_IPV6_NC_STATE_INCOMPLETE) {
+    if ((gnrc_ipv6_nc_get_state(entry) != GNRC_IPV6_NC_STATE_INCOMPLETE) &&
+        (gnrc_ipv6_nc_get_state(entry) != GNRC_IPV6_NC_STATE_UNMANAGED)) {
 #if defined(MODULE_GNRC_IPV6_NETIF) && defined(MODULE_VTIMER) && defined(MODULE_GNRC_IPV6)
         gnrc_ipv6_netif_t *iface = gnrc_ipv6_netif_get(entry->iface);
         timex_t t = iface->reach_time;

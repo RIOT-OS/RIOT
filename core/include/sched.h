@@ -164,7 +164,7 @@ extern volatile kernel_pid_t sched_active_pid;
  */
 extern clist_node_t *sched_runqueues[SCHED_PRIO_LEVELS];
 
-#if SCHEDSTATISTICS
+#ifdef MODULE_SCHEDSTATISTICS
 /**
  *  Scheduler statistics
  */

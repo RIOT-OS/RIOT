@@ -70,7 +70,7 @@ scan-build-analyze: clean
 	$(AD)mkdir -p '$(SCANBUILD_OUTPUTDIR)'
 	$(AD)env -i $(ENVVARS) \
 	    scan-build -o '$(SCANBUILD_OUTPUTDIR)' $(SCANBUILD_ARGS) \
-	      make -C $(CURDIR) all $(strip $(CMDVARS));
+	      make -C $(CURDIR) all $(strip $(CMDVARS)) FORCE_ASSERTS=1;
 endif # BUILD_IN_DOCKER
 
 ifeq (1,$(INSIDE_DOCKER))

@@ -32,12 +32,6 @@ extern "C" {
  */
 #define F_CPU               (16000000L)
 
-
-/**
- * Assign the hardware timer
- */
-#define HW_TIMER            TIMER_0
-
 /**
 * @name Define UART device and baudrate for stdio
 * @{
@@ -73,6 +67,14 @@ extern "C" {
 #define LED_RED_TOGGLE      /* not available */
 /** @} */
 
+/**
+ * @brief xtimer configuration values
+ * @{
+ */
+#define XTIMER_SHIFT                (2)
+#define XTIMER_SHIFT_ON_COMPARE     (8)
+#define XTIMER_BACKOFF              (40)
+/** @} */
 
 /**
  * @brief Initialize board specific hardware, including clock, LEDs and std-IO

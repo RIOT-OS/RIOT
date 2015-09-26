@@ -41,14 +41,24 @@
 extern "C" {
 #endif
 
-#define GNRC_NDP_MSG_RTR_TIMEOUT        (0x0210)    /**< Message type for router timeouts */
-#define GNRC_NDP_MSG_ADDR_TIMEOUT       (0x0211)    /**< Message type for address timeouts */
-#define GNRC_NDP_MSG_NBR_SOL_RETRANS    (0x0212)    /**< Message type for multicast
-                                                     *   neighbor solicitation retransmissions */
-#define GNRC_NDP_MSG_RTR_ADV_RETRANS    (0x0213)    /**< Message type for periodic router advertisements */
-#define GNRC_NDP_MSG_RTR_ADV_DELAY      (0x0214)    /**< Message type for delayed router advertisements */
-#define GNRC_NDP_MSG_RTR_SOL_RETRANS    (0x0215)    /**< Message type for periodic router solicitations */
-#define GNRC_NDP_MSG_NC_STATE_TIMEOUT   (0x0216)    /**< Message type for neighbor cache state timeouts */
+/** Message type for router timeouts */
+#define GNRC_NDP_MSG_RTR_TIMEOUT                (0x0210)
+/** Message type for address timeouts */
+#define GNRC_NDP_MSG_ADDR_TIMEOUT               (0x0211)
+/** Message type for multicast neighbor solicitation retransmissions */
+#define GNRC_NDP_MSG_NBR_SOL_RETRANS            (0x0212)
+/** Message type for periodic router advertisements */
+#define GNRC_NDP_MSG_RTR_ADV_RETRANS            (0x0213)
+/** Message type for delayed router advertisements */
+#define GNRC_NDP_MSG_RTR_ADV_DELAY              (0x0214)
+/** Message type for delayed router advertisements in a 6LoWPAN
+ * 6LoWPAN needs a special handling, because router advertisements are only
+ * sent after a short randomized delay, but not periodically. */
+#define GNRC_NDP_MSG_RTR_ADV_SIXLOWPAN_DELAY    (0x0215)
+/** Message type for periodic router solicitations */
+#define GNRC_NDP_MSG_RTR_SOL_RETRANS            (0x0216)
+/** Message type for neighbor cache state timeouts */
+#define GNRC_NDP_MSG_NC_STATE_TIMEOUT           (0x0217)
 
 /**
  * @name    Host constants

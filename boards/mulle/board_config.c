@@ -15,7 +15,7 @@
  * @file
  * @brief       Mulle config module implementation
  *
- * @author      Joakim Gebart <joakim.gebart@eistec.se>
+ * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  *
  * @note Waiting for PR #2353 (NVRAM API) before implementing this.
  */

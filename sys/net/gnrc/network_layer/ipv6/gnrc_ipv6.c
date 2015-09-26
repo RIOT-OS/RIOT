@@ -255,6 +255,12 @@ static void *_event_loop(void *args)
                 DEBUG("ipv6: address registration timeout received\n");
                 gnrc_sixlowpan_nd_router_gc_nc((gnrc_ipv6_nc_t *)msg.content.ptr);
                 break;
+            case GNRC_NDP_MSG_RTR_ADV_SIXLOWPAN_DELAY:
+                DEBUG("ipv6: Delayed router advertisement event received\n");
+                gnrc_ipv6_nc_t *nc_entry = (gnrc_ipv6_nc_t *)msg.content.ptr;
+                gnrc_ndp_internal_send_rtr_adv(nc_entry->iface, NULL,
+                                               &(nc_entry->ipv6_addr), false);
+                break;
 #endif
             default:
                 break;
@@ -524,24 +530,26 @@ static inline kernel_pid_t _next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_len
                                             kernel_pid_t iface, ipv6_addr_t *dst,
                                             gnrc_pktsnip_t *pkt)
 {
+    kernel_pid_t found_iface;
 #if defined(MODULE_GNRC_SIXLOWPAN_ND)
     (void)pkt;
-    iface = gnrc_sixlowpan_nd_next_hop_l2addr(l2addr, l2addr_len, iface, dst);
-    if (iface <= KERNEL_PID_UNDEF) {
-        return iface;
+    found_iface = gnrc_sixlowpan_nd_next_hop_l2addr(l2addr, l2addr_len, iface, dst);
+    if (found_iface > KERNEL_PID_UNDEF) {
+        return found_iface;
     }
 #endif
 #if defined(MODULE_GNRC_NDP_NODE)
-    iface = gnrc_ndp_node_next_hop_l2addr(l2addr, l2addr_len, iface, dst, pkt);
+    found_iface = gnrc_ndp_node_next_hop_l2addr(l2addr, l2addr_len, iface, dst, pkt);
 #elif !defined(MODULE_GNRC_SIXLOWPAN_ND)
-    iface = KERNEL_PID_UNDEF;
+    found_iface = KERNEL_PID_UNDEF;
     (void)l2addr;
+    (void)l2addr_len;
     (void)iface;
     (void)dst;
     (void)pkt;
     *l2addr_len = 0;
 #endif
-    return iface;
+    return found_iface;
 }
 
 static void _send(gnrc_pktsnip_t *pkt, bool prep_hdr)

@@ -3,6 +3,6 @@ include ../Makefile.tests_common
 
 FEATURES_REQUIRED = periph_uart
 
-USEMODULE += vtimer
+USEMODULE += xtimer
 
 include $(RIOTBASE)/Makefile.include

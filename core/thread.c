@@ -29,7 +29,6 @@
 #include "debug.h"
 #include "kernel_internal.h"
 #include "bitarithm.h"
-#include "hwtimer.h"
 #include "sched.h"
 
 volatile tcb_t *thread_get(kernel_pid_t pid)

@@ -34,7 +34,7 @@
 #include "kernel.h"
 #include "ssp0-board.h"
 #include "smb380-board.h"
-#include "hwtimer.h"
+#include "xtimer.h"
 #include "sched.h"
 #include "msg.h"
 #include "irq.h"
@@ -176,7 +176,7 @@ uint8_t SMB380_init_simple(uint16_t samplerate, uint8_t bandwidth, uint8_t
     simple_pid = sched_active_pid;
     gpioint_set(0, BIT1, GPIOINT_RISING_EDGE, &SMB380_simple_interrupthandler);
     SMB380_softReset();
-    hwtimer_wait(HWTIMER_TICKS(100000));
+    xtimer_usleep(100000);
     SMB380_disableUpperLimit();
     SMB380_disableLowerLimit();
     SMB380_setSampleRate(samplerate);
@@ -208,7 +208,7 @@ uint8_t SMB380_init(uint8_t (*func)(int16_t *))
     //smb380function = SMB380_HystereseFunctionSample;  //placeholder
 
     SMB380_softReset();
-    hwtimer_wait(HWTIMER_TICKS(100000));
+    xtimer_usleep(100000);
     SMB380_disableUpperLimit();
     SMB380_disableLowerLimit();
 
@@ -409,7 +409,7 @@ uint8_t writeRingBuff(int16_t *value)
 
         /* measuring temperature dependent internal sample rate of SMB380 */
         if (smb380_mode == SMB380_CONTINOUS) {
-            tickLastSample = hwtimer_now();
+            tickLastSample = xtimer_now();
             tickCurrentSamples++;
         }
 
@@ -1039,7 +1039,7 @@ void SMB380_enableNewDataInt(void)
     SMB380_ssp_read();
     SMB380_Unprepare();
     // measuring temperature dependent internal sample rate of SMB380
-    tickStart = hwtimer_now();
+    tickStart = xtimer_now();
     tickCurrentSamples = 0;
     restoreIRQ(cpsr);
 }
@@ -1198,13 +1198,13 @@ void SMB380_writeOffset(uint16_t *offset, uint8_t EEPROM)
         SMB380_ssp_write(SMB380_OFFSET_LSB_GAIN_X + eeoffset, (uint8_t)uReg,
                          SMB380_WRITE_REGISTER); //write them to image or eeprom
         SMB380_ssp_read();
-        hwtimer_wait(HWTIMER_TICKS(50000));
+        xtimer_usleep(50000);
 
         uReg = (offset[0] & 0x3FC) >> 2; //get MSB Bits
         SMB380_ssp_write(SMB380_OFFSET_MSB_X + eeoffset, (uint8_t)uReg,
                          SMB380_WRITE_REGISTER); //write them to image or eeprom
         SMB380_ssp_read();
-        hwtimer_wait(HWTIMER_TICKS(50000));
+        xtimer_usleep(50000);
 
         //y-Axis
         uReg = (offset[1] & 0x03) << 6; //get both LSB Bits
@@ -1213,13 +1213,13 @@ void SMB380_writeOffset(uint16_t *offset, uint8_t EEPROM)
         SMB380_ssp_write(SMB380_OFFSET_LSB_GAIN_Y + eeoffset, (uint8_t)uReg,
                          SMB380_WRITE_REGISTER); //write them to image or eeprom
         SMB380_ssp_read();
-        hwtimer_wait(HWTIMER_TICKS(50000));
+        xtimer_usleep(50000);
 
         uReg = (offset[1] & 0x3FC) >> 2; //get MSB Bits
         SMB380_ssp_write(SMB380_OFFSET_MSB_Y + eeoffset, (uint8_t)uReg,
                          SMB380_WRITE_REGISTER); //write them to image or eeprom
         SMB380_ssp_read();
-        hwtimer_wait(HWTIMER_TICKS(50000));
+        xtimer_usleep(50000);
 
         //z-Axis
         uReg = (offset[2] & 0x03) << 6; //get both LSB Bits
@@ -1229,13 +1229,13 @@ void SMB380_writeOffset(uint16_t *offset, uint8_t EEPROM)
         SMB380_ssp_write(SMB380_OFFSET_LSB_GAIN_Z + eeoffset, (uint8_t)uReg,
                          SMB380_WRITE_REGISTER); //write them to image or eeprom
         SMB380_ssp_read();
-        hwtimer_wait(HWTIMER_TICKS(50000));
+        xtimer_usleep(50000);
 
         uReg = (offset[2] & 0x3FC) >> 2; //get MSB Bits
         SMB380_ssp_write(SMB380_OFFSET_MSB_Z + eeoffset, (uint8_t)uReg,
                          SMB380_WRITE_REGISTER); //write them to image or eeprom
         SMB380_ssp_read();
-        hwtimer_wait(HWTIMER_TICKS(50000));
+        xtimer_usleep(50000);
 
         SMB380_Unprepare();
         restoreIRQ(cpsr);
@@ -1267,13 +1267,13 @@ void SMB380_writeOffsetTemp(uint16_t *offset, uint8_t EEPROM)
         SMB380_ssp_write(SMB380_OFFSET_LSB_GAIN_T + eeoffset, (uint8_t)uReg,
                          SMB380_WRITE_REGISTER); //write them to image or eeprom
         SMB380_ssp_read();
-        hwtimer_wait(HWTIMER_TICKS(50000));
+        xtimer_usleep(50000);
 
         uReg = (offset[0] & 0x3FC) >> 2; //get MSB Bits
         SMB380_ssp_write(SMB380_OFFSET_MSB_T + eeoffset, (uint8_t)uReg,
                          SMB380_WRITE_REGISTER); //write them to image or eeprom
         SMB380_ssp_read();
-        hwtimer_wait(HWTIMER_TICKS(50000));
+        xtimer_usleep(50000);
 
         SMB380_Unprepare();
         restoreIRQ(cpsr);

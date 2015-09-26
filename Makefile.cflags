@@ -56,7 +56,9 @@ CFLAGS += -fno-common
 CFLAGS += -Wall
 
 ifeq (,$(filter -DDEVELHELP,$(CFLAGS)))
-	CFLAGS += -DNDEBUG
+  ifneq (1,$(FORCE_ASSERTS))
+    CFLAGS += -DNDEBUG
+  endif
 endif
 
 # Default ARFLAGS for platforms which do not specify it.

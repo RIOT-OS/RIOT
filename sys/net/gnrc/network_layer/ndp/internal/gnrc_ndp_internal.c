@@ -127,7 +127,7 @@ void gnrc_ndp_internal_set_state(gnrc_ipv6_nc_t *nc_entry, uint8_t state)
                   ipv6_iface->retrans_timer.seconds,
                   ipv6_iface->retrans_timer.microseconds);
 
-            gnrc_ndp_internal_send_nbr_sol(nc_entry->iface, &nc_entry->ipv6_addr,
+            gnrc_ndp_internal_send_nbr_sol(nc_entry->iface, NULL, &nc_entry->ipv6_addr,
                                            &nc_entry->ipv6_addr);
 
             mutex_lock(&ipv6_iface->mutex);
@@ -228,7 +228,7 @@ void gnrc_ndp_internal_send_nbr_adv(kernel_pid_t iface, ipv6_addr_t *tgt, ipv6_a
     }
 }
 
-void gnrc_ndp_internal_send_nbr_sol(kernel_pid_t iface, ipv6_addr_t *tgt,
+void gnrc_ndp_internal_send_nbr_sol(kernel_pid_t iface, ipv6_addr_t *src, ipv6_addr_t *tgt,
                                     ipv6_addr_t *dst)
 {
 #ifdef MODULE_GNRC_SIXLOWPAN_ND
@@ -236,19 +236,22 @@ void gnrc_ndp_internal_send_nbr_sol(kernel_pid_t iface, ipv6_addr_t *tgt,
     assert(ipv6_iface != NULL);
 #endif
     gnrc_pktsnip_t *hdr, *pkt = NULL;
-    ipv6_addr_t *src = NULL;
     /* both suppressions, since they are needed in the MODULE_GNRC_SIXLOWPAN_ND branch */
     /* cppcheck-suppress variableScope */
     uint8_t l2src[8];
     /* cppcheck-suppress variableScope */
     size_t l2src_len = 0;
 
-    DEBUG("ndp internal: send neighbor solicitation (iface: %" PRIkernel_pid ", tgt: %s, ",
-          iface, ipv6_addr_to_str(addr_str, tgt, sizeof(addr_str)));
+    DEBUG("ndp internal: send neighbor solicitation (iface: %" PRIkernel_pid ", src: %s, ",
+          iface, ipv6_addr_to_str(addr_str, src, sizeof(addr_str)));
+    DEBUG(" tgt: %s, ", ipv6_addr_to_str(addr_str, tgt, sizeof(addr_str)));
     DEBUG("dst: %s)\n", ipv6_addr_to_str(addr_str, dst, sizeof(addr_str)));
 
     /* check if there is a fitting source address to target */
-    if ((src = gnrc_ipv6_netif_find_best_src_addr(iface, tgt)) != NULL) {
+    if (src == NULL) {
+        src = gnrc_ipv6_netif_find_best_src_addr(iface, tgt);
+    }
+    if (src != NULL) {
         l2src_len = _get_l2src(iface, l2src, sizeof(l2src));
 
         if (l2src_len > 0) {
@@ -363,10 +366,35 @@ static bool _pio_from_iface_addr(gnrc_pktsnip_t **res, gnrc_ipv6_netif_addr_t *a
     return false;
 }
 
+static inline bool _check_prefixes(gnrc_ipv6_netif_addr_t *a, gnrc_ipv6_netif_addr_t *b)
+{
+    if ((a->prefix_len == b->prefix_len) &&
+        (ipv6_addr_match_prefix(&a->addr, &b->addr) >= a->prefix_len)) {
+        return true;
+    }
+
+    return false;
+}
+
 static gnrc_pktsnip_t *_add_pios(gnrc_ipv6_netif_t *ipv6_iface, gnrc_pktsnip_t *pkt)
 {
     gnrc_pktsnip_t *tmp;
+
     for (int i = 0; i < GNRC_IPV6_NETIF_ADDR_NUMOF; i++) {
+        /* skip if prefix has been processed already */
+        bool processed_before = false;
+
+        for (int j = 0; j < i; j++) {
+            if ((processed_before =
+                     _check_prefixes(&ipv6_iface->addrs[i], &ipv6_iface->addrs[j]))) {
+                break;
+            }
+        }
+
+        if (processed_before) {
+            continue;
+        }
+
         if (_pio_from_iface_addr(&tmp, &ipv6_iface->addrs[i], pkt)) {
             if (tmp != NULL) {
                 pkt = tmp;
@@ -415,6 +443,25 @@ void gnrc_ndp_internal_send_rtr_adv(kernel_pid_t iface, ipv6_addr_t *src, ipv6_a
             gnrc_sixlowpan_nd_router_prf_t *prf = abr->prfs;
             /* add prefixes from border router */
             while (prf) {
+                bool processed_before = false;
+                /* skip if prefix does not belong to iface */
+                if (prf->iface != ipv6_iface) {
+                    prf = prf->next;
+                    continue;
+                }
+                /* skip if prefix has been processed already */
+                for (gnrc_sixlowpan_nd_router_prf_t *tmp = abr->prfs; tmp != prf; tmp = tmp->next) {
+                    if ((processed_before =
+                             _check_prefixes(prf->prefix, tmp->prefix))) {
+                        break;
+                    }
+                }
+
+                if (processed_before) {
+                    prf = prf->next;
+                    continue;
+                }
+
                 if (_pio_from_iface_addr(&hdr, prf->prefix, pkt)) {
                     if (hdr != NULL) {
                         pkt = hdr;
@@ -462,8 +509,10 @@ void gnrc_ndp_internal_send_rtr_adv(kernel_pid_t iface, ipv6_addr_t *src, ipv6_a
         pkt = hdr;
     }
     if (src == NULL) {
+        mutex_unlock(&ipv6_iface->mutex);
         /* get address from source selection algorithm */
         src = gnrc_ipv6_netif_find_best_src_addr(iface, dst);
+        mutex_lock(&ipv6_iface->mutex);
     }
     /* add SL2A for source address */
     if (src != NULL) {
@@ -677,6 +726,9 @@ bool gnrc_ndp_internal_pi_opt_handle(kernel_pid_t iface, uint8_t icmpv6_type,
             DEBUG("ndp: could not add prefix to interface %d\n", iface);
             return false;
         }
+#ifdef MODULE_GNRC_SIXLOWPAN_ND_ROUTER
+        gnrc_sixlowpan_nd_router_set_rtr_adv(gnrc_ipv6_netif_get(iface), true);
+#endif
     }
     netif_addr = gnrc_ipv6_netif_addr_get(prefix);
     if (pi_opt->valid_ltime.u32 == 0) {

@@ -28,7 +28,6 @@
  * @}
  */
 
-#include "x86_hwtimer.h"
 #include "x86_interrupts.h"
 #include "x86_memory.h"
 #include "x86_pci.h"
@@ -62,7 +61,6 @@ void x86_startup(void)
     x86_init_memory();
     x86_init_rtc();
     x86_init_pit();
-    x86_init_hwtimer();
     x86_init_pci();
     puts("RIOT x86 hardware initialization complete.");
 

@@ -26,7 +26,7 @@
 #include <stdio.h>
 
 #include "cpu_conf.h"
-#include "ringbuffer.h"
+#include "tsrb.h"
 #include "thread.h"
 #include "mutex.h"
 #include "irq.h"
@@ -56,7 +56,7 @@
  */
 static mutex_t _rx_mutex = MUTEX_INIT;
 static char _rx_buf_mem[STDIO_RX_BUFSIZE];
-static ringbuffer_t _rx_buf;
+static tsrb_t _rx_buf = TSRB_INIT(_rx_buf_mem);
 
 /**
  * @brief Receive a new character from the UART and put it into the receive buffer
@@ -64,25 +64,22 @@ static ringbuffer_t _rx_buf;
 void uart_stdio_rx_cb(void *arg, char data)
 {
     (void)arg;
-    ringbuffer_add_one(&_rx_buf, data);
+    tsrb_add_one(&_rx_buf, data);
     mutex_unlock(&_rx_mutex);
 }
 
 void uart_stdio_init(void)
 {
     mutex_lock(&_rx_mutex);
-    ringbuffer_init(&_rx_buf, _rx_buf_mem, STDIO_RX_BUFSIZE);
     uart_init(STDIO, STDIO_BAUDRATE, uart_stdio_rx_cb, 0, 0);
 }
 
 int uart_stdio_read(char* buffer, int count)
 {
     int res;
-    mutex_lock(&_rx_mutex);
-    unsigned state = disableIRQ();
-    count = (count < _rx_buf.avail) ? count : _rx_buf.avail;
-    res = ringbuffer_get(&_rx_buf, (char*)buffer, count);
-    restoreIRQ(state);
+    while (!(res = tsrb_get(&_rx_buf, buffer, count))) {
+        mutex_lock(&_rx_mutex);
+    }
     return res;
 }
 

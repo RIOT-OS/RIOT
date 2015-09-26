@@ -49,14 +49,6 @@
 #define LPM_PREVENT_SLEEP_UART    BIT2
 
 /**
- * @def LPM_PREVENT_SLEEP_HWTIMER
- * @brief This flag tells the kernel that the deepest power saving
- *        mode that currently can be used must still allow the hwtimer
- *        to run. Bitmask to use with `lpm_prevent_sleep` in power management.
- */
-#define LPM_PREVENT_SLEEP_HWTIMER    BIT1
-
-/**
  * @brief This bitfield is used to configure which modules are
  *        currently active and prevent the kernel to go to the
  *        deepest power modes. It is used with `LPM_PREVENT_SLEEP_HWTIMER`

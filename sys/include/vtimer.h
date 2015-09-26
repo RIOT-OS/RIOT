@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009, 2014 Kaspar Schleiser
+ * Copyright (C) 2009, 2014, 2015 Kaspar Schleiser <kaspar@schleiser.de>
  * Copyright (C) 2013, 2014 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
@@ -13,20 +13,24 @@
  * @brief     Provides a high level abstraction timer module to register
  *            timers, get current system time, and let a thread sleep for a certain amount
  *            of time. It does not give any timing guarantees.
+ *
+ * @deprecated
+ *
  * @{
  * @file
+ * @brief     vtimer interface definitions
  * @author Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-#ifndef __VTIMER_H
-#define __VTIMER_H
+#ifndef VTIMER_H
+#define VTIMER_H
+
+#include "msg.h"
+#include "timex.h"
+#include "xtimer.h"
 
 #include <time.h>
 #include <sys/time.h>
-
-#include "priority_queue.h"
-#include "timex.h"
-#include "msg.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -44,58 +48,43 @@ extern "C" {
  * programmers, use the vtimer_set_*-functions instead.
  *
  * \hideinitializer
+ * @deprecated
  */
-typedef struct vtimer_t {
-    /** entry in vtimer's internal priority queue */
-    priority_queue_node_t priority_queue_entry;
-    /** the absoule point in time when the timer expires */
-    timex_t absolute;
-    /** the action to perform when timer fires */
-    void (*action)(struct vtimer_t *timer);
-    /** value for msg_t.type */
-    uint16_t type;
-    /** optional argument for vtimer_t::action */
-    void *arg;
-    /** optional process id for vtimer_t::action to act on */
-    kernel_pid_t pid;
+typedef struct vtimer {
+    xtimer_t timer;
+    msg_t msg;
 } vtimer_t;
 
 /**
  * @brief   Current system time
  * @return  Time as timex_t since system boot
+ * @deprecated
  */
 void vtimer_now(timex_t *out);
-
-/**
- * @brief Get the current time in seconds and microseconds since system start
- * @param[in] tp    Uptime will be stored in the timeval structure pointed to by tp
- */
-void vtimer_gettimeofday(struct timeval *tp);
-
-/**
- * @brief   Returns the current time in broken down format
- * @param[out]  localt      Pointer to structure to receive time
- */
-void vtimer_get_localtime(struct tm *localt);
-
-/**
- * @brief   Initializes the vtimer subsystem. To be called once at system initialization. Will be initialized by auto_init.
- */
-void vtimer_init(void);
-
-/**
- * @brief   will cause the calling thread to be suspended from excecution until the number of microseconds has elapsed
- * @param[in]   us          number of microseconds
- * @return      0 on success, < 0 on error
- */
-int vtimer_usleep(uint32_t us);
 
 /**
  * @brief   will cause the calling thread to be suspended from excecution until the time specified by time has elapsed
  * @param[in]   time    timex_t with time to suspend execution
  * @return      0 on success, < 0 on error
+ * @deprecated
  */
 int vtimer_sleep(timex_t time);
+
+/**
+ * @brief   receive a message but return in case of timeout time is passed by without a new message
+ * @param[out]   m           pointer to a msg_t which will be filled in case of no timeout
+ * @param[in]    timeout     timex_t containing the relative time to fire the timeout
+ * @return       < 0 on error, other value otherwise
+ * @deprecated
+ */
+int vtimer_msg_receive_timeout(msg_t *m, timex_t timeout);
+
+/**
+ * @brief   Returns the current time in broken down format
+ * @param[out]  localt      Pointer to structure to receive time
+ * @deprecated
+ */
+void vtimer_get_localtime(struct tm *localt);
 
 /**
  * @brief   set a vtimer with msg event handler of the specified type
@@ -104,6 +93,7 @@ int vtimer_sleep(timex_t time);
  * @param[in]   pid         process id
  * @param[in]   type        value for the msg_t type
  * @param[in]   ptr         message value
+ * @deprecated
  */
 void vtimer_set_msg(vtimer_t *t, timex_t interval, kernel_pid_t pid, uint16_t type, void *ptr);
 
@@ -117,42 +107,32 @@ void vtimer_set_msg(vtimer_t *t, timex_t interval, kernel_pid_t pid, uint16_t ty
 int vtimer_set_wakeup(vtimer_t *t, timex_t interval, kernel_pid_t pid);
 
 /**
+ * @brief Get the current time in seconds and microseconds since system start
+ * @param[in] tp    Uptime will be stored in the timeval structure pointed to by tp
+ */
+void vtimer_gettimeofday(struct timeval *tp);
+
+/**
  * @brief   remove a vtimer
  * @param[in]   t           pointer to preinitialised vtimer_t
+ * @deprecated
  */
 void vtimer_remove(vtimer_t *t);
 
-
 /**
- * @brief   receive a message but return in case of timeout time is passed by without a new message
- * @param[out]   m           pointer to a msg_t which will be filled in case of no timeout
- * @param[in]    timeout     timex_t containing the relative time to fire the timeout
- * @return       < 0 on error, other value otherwise
+ * @brief   will cause the calling thread to be suspended from excecution until the number of microseconds has elapsed
+ * @param[in]   us          number of microseconds
+ * @return      0 on success, < 0 on error
  */
-int vtimer_msg_receive_timeout(msg_t *m, timex_t timeout);
-
-#if ENABLE_DEBUG
-
-/**
- * @brief Prints a vtimer_t
- */
-void vtimer_print(vtimer_t *t);
-
-/**
- * @brief Prints the vtimer shortterm queue (use for debug purposes)
- */
-void vtimer_print_short_queue(void);
-
-/**
- * @brief Prints the vtimer longterm queue (use for debug purposes)
- */
-void vtimer_print_long_queue(void);
-
-#endif
+static inline int vtimer_usleep(uint32_t us)
+{
+    xtimer_usleep(us);
+    return 0;
+}
 
 #ifdef __cplusplus
 }
 #endif
 
 /** @} */
-#endif /* __VTIMER_H */
+#endif /* VTIMER_H */

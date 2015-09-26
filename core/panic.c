@@ -17,7 +17,7 @@
  *
  * @author      Kévin Roussel <Kevin.Roussel@inria.fr>
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
- * @author      Joakim Gebart <joakim.gebart@eistec.se>
+ * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
@@ -48,13 +48,13 @@ NORETURN void core_panic(core_panic_t crash_code, const char *message)
     if (crashed == 0) {
         /* print panic message to console (if possible) */
         crashed = 1;
-        puts("*** RIOT kernel panic");
-        puts(message);
 #ifndef NDEBUG
         if (crash_code == PANIC_ASSERT_FAIL) {
             cpu_print_last_instruction();
         }
 #endif
+        puts("*** RIOT kernel panic");
+        puts(message);
 #ifdef DEVELHELP
 #ifdef MODULE_PS
         ps();

@@ -19,7 +19,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#include "hwtimer.h"
+#include "xtimer.h"
 #include "periph/spi.h"
 #include "periph/gpio.h"
 #include "pcd8544.h"
@@ -243,7 +243,7 @@ int pcd8544_init(pcd8544_t *dev, spi_t spi, gpio_t cs, gpio_t reset, gpio_t mode
     DEBUG("done initializing SPI master\n");
     /* reset display */
     gpio_clear(reset);
-    hwtimer_wait(RESET_DELAY);
+    xtimer_usleep(RESET_DELAY);
     gpio_set(reset);
 
     /* clear display memory */

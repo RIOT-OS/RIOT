@@ -1,7 +1,7 @@
 From ca876797dbe6ba05f75a451e8724495a0770fe86 Mon Sep 17 00:00:00 2001
 From: Oleg Hahm <oleg@hobbykeller.org>
 Date: Thu, 23 Jul 2015 10:20:38 +0200
-Subject: [PATCH 6/8] debug: do not misuse NDEBUG
+Subject: [PATCH 6/9] debug: do not misuse NDEBUG
 
 ---
  coap_list.c       |  2 +-

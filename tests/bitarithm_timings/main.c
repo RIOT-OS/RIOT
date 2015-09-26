@@ -32,12 +32,10 @@
 #include <stdio.h>
 
 #include "bitarithm.h"
-#include "hwtimer.h"
-#include "timex.h"
+#include "xtimer.h"
 
 #define TIMEOUT_S (5ul)
-#define TIMEOUT_US (TIMEOUT_S * SEC_IN_USEC)
-#define TIMEOUT (HWTIMER_TICKS(TIMEOUT_US))
+#define TIMEOUT (TIMEOUT_S * SEC_IN_USEC)
 #define PER_ITERATION (4)
 
 static void callback(void *done_)
@@ -52,7 +50,12 @@ static void run_test(const char *name, unsigned (*test)(unsigned))
     unsigned i = 0;
     unsigned long count = 0;
 
-    hwtimer_set(TIMEOUT, callback, (void *) &done);
+    xtimer_t xtimer;
+    xtimer.callback = callback;
+    xtimer.arg = (void *) &done;
+
+    xtimer_set(&xtimer, TIMEOUT);
+
     do {
         if (i++ == -1u) {
             i = 1;

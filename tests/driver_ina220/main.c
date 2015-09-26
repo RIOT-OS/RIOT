@@ -13,7 +13,7 @@
  * @file
  * @brief       Test application for the INA220 sensor driver
  *
- * @author      Joakim Gebart <joakim.gebart@eistec.se>
+ * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  *
  * @}
  */
@@ -27,7 +27,7 @@
 
 #include <stdio.h>
 
-#include "vtimer.h"
+#include "xtimer.h"
 #include "ina220.h"
 
 /* Use the following configuration:
@@ -99,7 +99,7 @@ int main(void)
         ina220_read_power(&dev, &val);
         printf("\tpower: %6d\n", val);
 
-        vtimer_usleep(SLEEP);
+        xtimer_usleep(SLEEP);
     }
 
     return 0;

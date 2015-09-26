@@ -20,7 +20,8 @@
 #define FIB_TABLE_H_
 
 #include <stdint.h>
-#include "vtimer.h"
+
+#include "kernel_types.h"
 #include "universal_address.h"
 
 #ifdef __cplusplus
@@ -34,7 +35,7 @@ typedef struct fib_entry_t {
     /** interface ID */
     kernel_pid_t iface_id;
     /** Lifetime of this entry (an absolute time-point is stored by the FIB) */
-    timex_t lifetime;
+    uint64_t lifetime;
     /** Unique identifier for the type of the global address */
     uint32_t global_flags;
     /** Pointer to the shared generic address */

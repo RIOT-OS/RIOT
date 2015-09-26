@@ -1,3 +1,6 @@
-INCLUDES += -I$(RIOTBASE)/cpu/msp430-common/include/
+INCLUDES += -I$(RIOTCPU)/msp430-common/include/
+
+export UNDEF += $(BINDIR)msp430_common/startup.o
+export USEMODULE += msp430_common
 
 DEFAULT_MODULE += oneway_malloc

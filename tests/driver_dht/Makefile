@@ -9,6 +9,7 @@ ifneq (,$(filter stm32f4discovery,$(BOARD)))
 endif
 
 USEMODULE += dht
+USEMODULE += xtimer
 
 ifneq (,$(DHT_TYPE))
   CFLAGS += -DDHT_TYPE=$(DHT_TYPE)

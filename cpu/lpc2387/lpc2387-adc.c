@@ -25,7 +25,7 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 #if ENABLE_DEBUG
-#include "hwtimer.h"
+#include "xtimer.h"
 #endif
 
 /*---------------------------------------------------------------------------*/
@@ -109,12 +109,12 @@ uint16_t adc_read(uint8_t channel)
     /* switch channel, start A/D convert */
     AD0CR &= 0xFFFFFF00;
 #if ENABLE_DEBUG
-    t1 = hwtimer_now();
+    t1 = xtimer_now();
 #endif
     AD0CR |= (1 << 24) | (1 << channel);
 
 #if ENABLE_DEBUG
-    t2 = hwtimer_now();
+    t2 = xtimer_now();
 #endif
 
     while (1) {
@@ -134,7 +134,7 @@ uint16_t adc_read(uint8_t channel)
     }
 
     adc_data = (regVal >> 6) & 0x3FF;
-    DEBUG("%s, %d: %lu\n", __FILE__, __LINE__, t1);
-    DEBUG("%s, %d: %lu\n", __FILE__, __LINE__, t2);
+    DEBUG("%s, %d: %lu\n", RIOT_FILE_RELATIVE, __LINE__, t1);
+    DEBUG("%s, %d: %lu\n", RIOT_FILE_RELATIVE, __LINE__, t2);
     return (uint16_t) adc_data;             /* return A/D conversion value */
 }

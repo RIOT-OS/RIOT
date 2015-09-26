@@ -19,7 +19,7 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-#include <hwtimer.h>
+#include <xtimer.h>
 #include "ltc4150_arch.h"
 
 static volatile unsigned long int_count;
@@ -86,7 +86,7 @@ void ltc4150_start(void)
 {
     ltc4150_disable_int();
     int_count = 0;
-    uint32_t now = hwtimer_now();
+    uint32_t now = xtimer_now();
     ltc4150_sync_blocking();
     start_time = now;
     last_int_time = now;
@@ -100,7 +100,7 @@ void ltc4150_stop(void)
 
 void __attribute__((__no_instrument_function__)) ltc4150_interrupt(void)
 {
-    uint32_t now = hwtimer_now();
+    uint32_t now = xtimer_now();
 
     if (now >= last_int_time) {
         last_int_duration = now - last_int_time;

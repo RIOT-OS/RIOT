@@ -26,7 +26,7 @@
 
 #include "periph_conf.h"
 #include "periph/rtc.h"
-#include "hwtimer.h"
+#include "xtimer.h"
 
 #define TM_YEAR_OFFSET              (1900)
 
@@ -74,7 +74,7 @@ int main(void)
                                                     time.tm_sec);
     rtc_set_time(&time);
 
-    hwtimer_wait(100);
+    xtimer_usleep(100);
 
     rtc_get_time(&time);
     printf("Clock set to %04d-%02d-%02d %02d:%02d:%02d\n",
@@ -97,7 +97,7 @@ int main(void)
                                                     time.tm_sec);
     rtc_set_alarm(&time, cb, 0);
 
-    hwtimer_wait(100);
+    xtimer_usleep(100);
 
     rtc_get_alarm(&time);
     printf("Alarm set to %04d-%02d-%02d %02d:%02d:%02d\n",

@@ -20,7 +20,7 @@
 
 #include <stdio.h>
 
-#include "hwtimer.h"
+#include "xtimer.h"
 #include "thread.h"
 
 char busy_stack[THREAD_STACKSIZE_MAIN];
@@ -58,8 +58,8 @@ int main(void)
                   busy_thread, NULL, "busy_thread");
     puts("busy_thread created");
 
-    puts("hwtimer_wait()");
-    hwtimer_wait(HWTIMER_TICKS(100000));
+    puts("xtimer_wait()");
+    xtimer_usleep(100000);
     busy = 0;
 
     puts("main: return");

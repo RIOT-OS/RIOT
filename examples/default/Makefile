@@ -32,30 +32,45 @@ QUIET ?= 1
 USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += ps
-USEMODULE += vtimer
 USEMODULE += config
+
+BOARD_PROVIDES_NETIF := airfy-beacon fox iotlab-m3 mulle native nrf51dongle \
+	nrf6310 pba-d-01-kw2x pca10000 pca10005 saml21-xpro samr21-xpro spark-core \
+	yunjia-nrf51822
+
+ifneq (,$(filter $(BOARD),$(BOARD_PROVIDES_NETIF)))
+  # Use modules for networking
+  # gnrc is a meta module including all required, basic gnrc networking modules
+  USEMODULE += gnrc
+  # use the default network interface for the board
+  USEMODULE += gnrc_netif_default
+  # automatically initialize the network interface
+  USEMODULE += auto_init_gnrc_netif
+  # the application dumps received packets to stdout
+  USEMODULE += gnrc_pktdump
+endif
 
 FEATURES_OPTIONAL += config
 FEATURES_OPTIONAL += periph_rtc
 
 ifneq (,$(filter msb-430,$(BOARD)))
-	USEMODULE += sht11
+  USEMODULE += sht11
 endif
 ifneq (,$(filter msba2,$(BOARD)))
-	USEMODULE += sht11
-	USEMODULE += mci
-	USEMODULE += random
+  USEMODULE += sht11
+  USEMODULE += mci
+  USEMODULE += random
 endif
 ifneq (,$(filter iotlab-m3,$(BOARD)))
-	USEMODULE += isl29020
-	USEMODULE += lps331ap
-	USEMODULE += l3g4200d
-	USEMODULE += lsm303dlhc
+  USEMODULE += isl29020
+  USEMODULE += lps331ap
+  USEMODULE += l3g4200d
+  USEMODULE += lsm303dlhc
 endif
 ifneq (,$(filter fox,$(BOARD)))
-        USEMODULE += lps331ap
-        USEMODULE += l3g4200d
-	USEMODULE += lsm303dlhc
+  USEMODULE += lps331ap
+  USEMODULE += l3g4200d
+  USEMODULE += lsm303dlhc
 endif
 
 include $(RIOTBASE)/Makefile.include

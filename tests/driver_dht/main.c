@@ -29,8 +29,7 @@
 
 #include <stdio.h>
 
-#include "hwtimer.h"
-#include "timex.h"
+#include "xtimer.h"
 
 #include "dht.h"
 
@@ -59,7 +58,7 @@ int main(void)
         dht_parse(&dev, &data, &hum, &temp);
         printf("raw relative humidity: %i\nraw temperature: %i C\n", data.humidity, data.temperature);
         printf("relative humidity: %i\ntemperature: %i C\n", (int) hum, (int) temp);
-        hwtimer_wait(HWTIMER_TICKS(2000 * MS_IN_USEC));
+        xtimer_usleep(2000 * MS_IN_USEC);
     }
 
     return 0;

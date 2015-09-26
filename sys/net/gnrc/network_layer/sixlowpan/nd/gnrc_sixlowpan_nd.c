@@ -51,9 +51,13 @@ void gnrc_sixlowpan_nd_init(gnrc_ipv6_netif_t *iface)
     iface->rtr_sol_count = 0;   /* first will be sent immediately */
 
     DEBUG("6lo nd: retransmit multicast rtr sol in 10 sec\n");
+#ifndef MODULE_GNRC_SIXLOWPAN_ND_BORDER_ROUTER
     _rtr_sol_reschedule(iface, GNRC_SIXLOWPAN_ND_RTR_SOL_INT);
+#endif
     mutex_unlock(&iface->mutex);
+#ifndef MODULE_GNRC_SIXLOWPAN_ND_BORDER_ROUTER
     gnrc_ndp_internal_send_rtr_sol(iface->pid, NULL);
+#endif
 }
 
 void gnrc_sixlowpan_nd_mc_rtr_sol(gnrc_ipv6_netif_t *iface)
@@ -145,8 +149,15 @@ kernel_pid_t gnrc_sixlowpan_nd_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_
 #ifdef MODULE_GNRC_SIXLOWPAN_ND_ROUTER
     /* next hop determination: https://tools.ietf.org/html/rfc6775#section-6.5.4 */
     nc_entry = gnrc_ipv6_nc_get(iface, dst);
-    if ((nc_entry != NULL) && (gnrc_ipv6_nc_get_type(nc_entry) == GNRC_IPV6_NC_TYPE_REGISTERED)) {
+    /* if NCE found */
+    if (nc_entry != NULL) {
+        gnrc_ipv6_netif_t *ipv6_if = gnrc_ipv6_netif_get(nc_entry->iface);
+        /* and interface is not 6LoWPAN */
+        if (!(ipv6_if->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN) ||
+                /* or entry is registered */
+                (gnrc_ipv6_nc_get_type(nc_entry) == GNRC_IPV6_NC_TYPE_REGISTERED)) {
         next_hop = dst;
+        }
     }
 #endif
     /* next hop determination according to: https://tools.ietf.org/html/rfc6775#section-5.6 */
@@ -163,7 +174,20 @@ kernel_pid_t gnrc_sixlowpan_nd_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_
         /* get if not gotten from previous check */
         nc_entry = gnrc_ipv6_nc_get(iface, next_hop);
     }
-    if (ipv6_addr_is_link_local(next_hop)) {
+    /* If a (non-tentative) NCE for this destination exist, we can use even for
+     * link-local addresses. This should be only the case for 6LBRs. */
+    if ((ipv6_addr_is_link_local(next_hop)) &&
+        ((nc_entry == NULL) ||
+         (gnrc_ipv6_nc_get_type(nc_entry) == GNRC_IPV6_NC_TYPE_TENTATIVE))) {
+/* in case of a border router there is no sensible way for address resolution
+ * if the interface is not given */
+#ifdef MODULE_GNRC_SIXLOWPAN_ND_BORDER_ROUTER
+        /* if no interface is specified it is impossible to resolve the
+         * link-layer address for a link-local address on a 6LBR */
+        if (iface == KERNEL_PID_UNDEF) {
+            return KERNEL_PID_UNDEF;
+        }
+#endif
         kernel_pid_t ifs[GNRC_NETIF_NUMOF];
         size_t ifnum = gnrc_netif_get(ifs);
         /* we don't need address resolution, the EUI-64 is in next_hop's IID */
@@ -181,7 +205,7 @@ kernel_pid_t gnrc_sixlowpan_nd_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_
         }
         return iface;
     }
-    else if ((nc_entry == NULL) || (!gnrc_ipv6_nc_is_reachable(nc_entry)) ||
+    if ((nc_entry == NULL) || (!gnrc_ipv6_nc_is_reachable(nc_entry)) ||
         (gnrc_ipv6_nc_get_type(nc_entry) == GNRC_IPV6_NC_TYPE_TENTATIVE)) {
         return KERNEL_PID_UNDEF;
     }
@@ -190,6 +214,9 @@ kernel_pid_t gnrc_sixlowpan_nd_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_
             memcpy(l2addr, nc_entry->l2_addr, nc_entry->l2_addr_len);
         }
         *l2addr_len = nc_entry->l2_addr_len;
+        if (gnrc_ipv6_nc_get_state(nc_entry) == GNRC_IPV6_NC_STATE_STALE) {
+            gnrc_ndp_internal_set_state(nc_entry, GNRC_IPV6_NC_STATE_DELAY);
+        }
     }
     return nc_entry->iface;
 }
@@ -198,9 +225,10 @@ void gnrc_sixlowpan_nd_rtr_sol_reschedule(gnrc_ipv6_nc_t *nce, uint32_t sec_dela
 {
     assert(nce != NULL);
     assert(sec_delay != 0U);
-    vtimer_remove(&nce->rtr_sol_timer);
-    vtimer_set_msg(&nce->rtr_sol_timer, timex_set(sec_delay, 0), gnrc_ipv6_pid,
-                   GNRC_SIXLOWPAN_ND_MSG_MC_RTR_SOL, nce);
+    gnrc_ipv6_netif_t *iface = gnrc_ipv6_netif_get(nce->iface);
+    vtimer_remove(&iface->rtr_sol_timer);
+    vtimer_set_msg(&iface->rtr_sol_timer, timex_set(sec_delay, 0), gnrc_ipv6_pid,
+                   GNRC_SIXLOWPAN_ND_MSG_MC_RTR_SOL, iface);
 }
 
 gnrc_pktsnip_t *gnrc_sixlowpan_nd_opt_ar_build(uint8_t status, uint16_t ltime, eui64_t *eui64,
@@ -219,9 +247,10 @@ gnrc_pktsnip_t *gnrc_sixlowpan_nd_opt_ar_build(uint8_t status, uint16_t ltime, e
     return pkt;
 }
 
-uint8_t gnrc_sixlowpan_nd_opt_ar_handle(kernel_pid_t iface, ipv6_hdr_t *ipv6, uint8_t icmpv6_type,
-                                        sixlowpan_nd_opt_ar_t *ar_opt, uint8_t *sl2a,
-                                        size_t sl2a_len)
+uint8_t gnrc_sixlowpan_nd_opt_ar_handle(kernel_pid_t iface, ipv6_hdr_t *ipv6,
+                                        uint8_t icmpv6_type, ipv6_addr_t *addr,
+                                        sixlowpan_nd_opt_ar_t *ar_opt,
+                                        uint8_t *sl2a, size_t sl2a_len)
 {
     eui64_t eui64;
     gnrc_ipv6_netif_t *ipv6_iface;
@@ -239,7 +268,7 @@ uint8_t gnrc_sixlowpan_nd_opt_ar_handle(kernel_pid_t iface, ipv6_hdr_t *ipv6, ui
         return 0;
     }
     ipv6_iface = gnrc_ipv6_netif_get(iface);
-    nc_entry = gnrc_ipv6_nc_get(iface, &ipv6->src);
+    nc_entry = gnrc_ipv6_nc_get(iface, addr);
     switch (icmpv6_type) {
         case ICMPV6_NBR_ADV:
             if (!(ipv6_iface->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN)) {
@@ -250,13 +279,21 @@ uint8_t gnrc_sixlowpan_nd_opt_ar_handle(kernel_pid_t iface, ipv6_hdr_t *ipv6, ui
                 /* discard silently: see https://tools.ietf.org/html/rfc6775#section-5.5.2 */
                 return 0;
             }
+            /* we expect the sender to be already in neighbor cache, if not we
+             * ignore it */
+            if (nc_entry == NULL) {
+                DEBUG("6lo nd: sending router not in neighbor cache\n");
+                return 0;
+            }
             switch (ar_opt->status) {
                 case SIXLOWPAN_ND_STATUS_SUCCESS:
                     DEBUG("6lo nd: address registration successful\n");
                     mutex_lock(&ipv6_iface->mutex);
+                    /* reschedule 1 minute before lifetime expires */
+                    timex_t t = { (uint32_t)(byteorder_ntohs(ar_opt->ltime) - 1) * 60, 0 };
                     vtimer_remove(&nc_entry->nbr_sol_timer);
-                    vtimer_set_msg(&nc_entry->nbr_sol_timer, ipv6_iface->retrans_timer,
-                                   gnrc_ipv6_pid, GNRC_NDP_MSG_NBR_SOL_RETRANS, nc_entry);
+                    vtimer_set_msg(&nc_entry->nbr_sol_timer, t, gnrc_ipv6_pid,
+                                   GNRC_NDP_MSG_NBR_SOL_RETRANS, nc_entry);
                     mutex_unlock(&ipv6_iface->mutex);
                     break;
                 case SIXLOWPAN_ND_STATUS_DUP:
@@ -275,6 +312,7 @@ uint8_t gnrc_sixlowpan_nd_opt_ar_handle(kernel_pid_t iface, ipv6_hdr_t *ipv6, ui
                     DEBUG("6lo nd: unknown status for registration received\n");
                     break;
             }
+            break;
 #ifdef MODULE_GNRC_SIXLOWPAN_ND_ROUTER
         case ICMPV6_NBR_SOL:
             if (!(ipv6_iface->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN) &&
@@ -291,7 +329,8 @@ uint8_t gnrc_sixlowpan_nd_opt_ar_handle(kernel_pid_t iface, ipv6_hdr_t *ipv6, ui
             if ((nc_entry != NULL) &&
                 ((gnrc_ipv6_nc_get_type(nc_entry) == GNRC_IPV6_NC_TYPE_REGISTERED) ||
                  (gnrc_ipv6_nc_get_type(nc_entry) == GNRC_IPV6_NC_TYPE_TENTATIVE)) &&
-                (ar_opt->eui64.uint64.u64 != nc_entry->eui64.uint64.u64)) {
+                ((nc_entry->eui64.uint64.u64 != 0) &&
+                 (ar_opt->eui64.uint64.u64 != nc_entry->eui64.uint64.u64))) {
                 /* there is already another node with this address */
                 DEBUG("6lo nd: duplicate address detected\n");
                 status = SIXLOWPAN_ND_STATUS_DUP;
@@ -319,6 +358,7 @@ uint8_t gnrc_sixlowpan_nd_opt_ar_handle(kernel_pid_t iface, ipv6_hdr_t *ipv6, ui
                 vtimer_set_msg(&nc_entry->type_timeout, timex_set(reg_ltime * 60, 0),
                                gnrc_ipv6_pid, GNRC_SIXLOWPAN_ND_MSG_AR_TIMEOUT, nc_entry);
             }
+            break;
 #endif
         default:
             break;
@@ -329,8 +369,8 @@ uint8_t gnrc_sixlowpan_nd_opt_ar_handle(kernel_pid_t iface, ipv6_hdr_t *ipv6, ui
 
 bool gnrc_sixlowpan_nd_opt_6ctx_handle(uint8_t icmpv6_type, sixlowpan_nd_opt_6ctx_t *ctx_opt)
 {
-    if (((ctx_opt->ctx_len < 64) && (ctx_opt->len != 2)) ||
-        ((ctx_opt->ctx_len >= 64) && (ctx_opt->len != 3))) {
+    if (((ctx_opt->ctx_len <= 64) && (ctx_opt->len != 2)) ||
+        ((ctx_opt->ctx_len > 64) && (ctx_opt->len != 3))) {
         DEBUG("6lo nd: invalid 6LoWPAN context option received\n");
         return false;
     }
@@ -352,7 +392,7 @@ void gnrc_sixlowpan_nd_wakeup(void)
         timex_t t = { 0, GNRC_NDP_RETRANS_TIMER };
         vtimer_remove(&router->rtr_sol_timer);
         gnrc_sixlowpan_nd_uc_rtr_sol(router);
-        gnrc_ndp_internal_send_nbr_sol(router->iface, &router->ipv6_addr, &router->ipv6_addr);
+        gnrc_ndp_internal_send_nbr_sol(router->iface, NULL, &router->ipv6_addr, &router->ipv6_addr);
         vtimer_remove(&router->nbr_sol_timer);
         vtimer_set_msg(&router->nbr_sol_timer, t, gnrc_ipv6_pid, GNRC_NDP_MSG_NBR_SOL_RETRANS,
                        router);

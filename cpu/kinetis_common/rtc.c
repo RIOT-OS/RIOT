@@ -14,7 +14,7 @@
  * @file
  * @brief       RTC interface wrapper for use with RTT modules.
  *
- * @author      Joakim Gebart <joakim.gebart@eistec.se>
+ * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  *
  * @}
  */

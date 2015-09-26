@@ -278,7 +278,8 @@ int timer_clear(tim_t dev, int channel)
 
 unsigned int timer_read(tim_t dev)
 {
-    uint16_t value;
+    uint16_t a;
+    uint32_t b;
     /*
      * Disabling interrupts globally because read from 16 Bit register can
      * otherwise be messed up
@@ -289,29 +290,38 @@ unsigned int timer_read(tim_t dev)
 #if TIMER_0_EN
 
         case TIMER_0:
-            value = TIMER0_COUNTER;
+            do {
+                a = TIMER0_COUNTER;
+                b = TIMER0_COUNTER;
+            } while (a != b);
             break;
 #endif
 #if TIMER_1_EN
 
         case TIMER_1:
-            value = TIMER1_COUNTER;
+            do {
+                a = TIMER1_COUNTER;
+                b = TIMER1_COUNTER;
+            } while (a != b);
             break;
 #endif
 #if TIMER_2_EN
 
         case TIMER_2:
-            value = TIMER2_COUNTER;
+            do {
+                a = TIMER2_COUNTER;
+                b = TIMER2_COUNTER;
+            } while (a != b);
             break;
 #endif
 
         case TIMER_UNDEFINED:
         default:
-            value = 0;
+            a = 0;
     }
 
     restoreIRQ(state);
-    return value;
+    return a;
 }
 
 void timer_stop(tim_t dev)

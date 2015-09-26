@@ -23,7 +23,7 @@
 
 #include "cpu.h"
 #include "board.h"
-#include "vtimer.h"
+#include "xtimer.h"
 #include "periph/dac.h"
 #include "periph/adc.h"
 
@@ -101,7 +101,7 @@ int main(void)
             write_value = 0;
         }
         /* sleep a little while */
-        vtimer_usleep(DELAY);
+        xtimer_usleep(DELAY);
     }
 
     return 0;

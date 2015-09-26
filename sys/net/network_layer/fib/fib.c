@@ -27,6 +27,7 @@
 #include "thread.h"
 #include "mutex.h"
 #include "msg.h"
+#include "xtimer.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -79,15 +80,13 @@ static kernel_pid_t notify_rp[FIB_MAX_REGISTERED_RP];
 static universal_address_container_t* prefix_rp[FIB_MAX_REGISTERED_RP];
 
 /**
- * @brief convert given ms to a point in time from now on in the future
- * @param[in]  ms     the milliseconds to be converted
- * @param[out] timex  the converted point in time
+ * @brief convert an offset given in ms to abolute time in time in us
+ * @param[in]  ms       the milliseconds to be converted
+ * @param[out] target   the converted point in time
  */
-static void fib_ms_to_timex(uint32_t ms, timex_t *timex)
+static void fib_lifetime_to_absolute(uint32_t ms, uint64_t *target)
 {
-    vtimer_now(timex);
-    timex->seconds += ms / 1000;
-    timex->microseconds += (ms - timex->seconds * 1000) * 1000;
+    *target = xtimer_now64() + (ms * 1000);
 }
 
 /**
@@ -106,8 +105,7 @@ static void fib_ms_to_timex(uint32_t ms, timex_t *timex)
  */
 static int fib_find_entry(fib_table_t *table, uint8_t *dst, size_t dst_size,
                           fib_entry_t **entry_arr, size_t *entry_arr_size) {
-    timex_t now;
-    vtimer_now(&now);
+    uint64_t now = xtimer_now64();
 
     size_t count = 0;
     size_t prefix_size = 0;
@@ -125,14 +123,12 @@ static int fib_find_entry(fib_table_t *table, uint8_t *dst, size_t dst_size,
     for (size_t i = 0; i < table->size; ++i) {
 
         /* autoinvalidate if the entry lifetime is not set to not expire */
-        if ((table->entries[i].lifetime.seconds != FIB_LIFETIME_NO_EXPIRE)
-            || (table->entries[i].lifetime.microseconds != FIB_LIFETIME_NO_EXPIRE)) {
+        if (table->entries[i].lifetime != FIB_LIFETIME_NO_EXPIRE) {
 
             /* check if the lifetime expired */
-            if (timex_cmp(now, table->entries[i].lifetime) > -1) {
+            if (table->entries[i].lifetime < now) {
                 /* remove this entry if its lifetime expired */
-                table->entries[i].lifetime.seconds = 0;
-                table->entries[i].lifetime.microseconds = 0;
+                table->entries[i].lifetime = 0;
                 table->entries[i].global_flags = 0;
                 table->entries[i].next_hop_flags = 0;
                 table->entries[i].iface_id = KERNEL_PID_UNDEF;
@@ -204,12 +200,11 @@ static int fib_upd_entry(fib_entry_t *entry, uint8_t *next_hop,
     entry->next_hop = container;
     entry->next_hop_flags = next_hop_flags;
 
-    if (lifetime < FIB_LIFETIME_NO_EXPIRE) {
-        fib_ms_to_timex(lifetime, &entry->lifetime);
+    if (lifetime != (uint32_t)FIB_LIFETIME_NO_EXPIRE) {
+        fib_lifetime_to_absolute(lifetime, &entry->lifetime);
     }
     else {
-        entry->lifetime.seconds = FIB_LIFETIME_NO_EXPIRE;
-        entry->lifetime.microseconds = FIB_LIFETIME_NO_EXPIRE;
+        entry->lifetime = FIB_LIFETIME_NO_EXPIRE;
     }
 
     return 0;
@@ -237,8 +232,7 @@ static int fib_create_entry(fib_table_t *table, kernel_pid_t iface_id,
                             next_hop_flags, uint32_t lifetime)
 {
     for (size_t i = 0; i < table->size; ++i) {
-        if ((table->entries[i].lifetime.seconds == 0) &&
-            (table->entries[i].lifetime.microseconds == 0)) {
+        if (table->entries[i].lifetime == 0) {
 
             table->entries[i].global = universal_address_add(dst, dst_size);
 
@@ -252,12 +246,11 @@ static int fib_create_entry(fib_table_t *table, kernel_pid_t iface_id,
                 /* everything worked fine */
                 table->entries[i].iface_id = iface_id;
 
-                if (lifetime < FIB_LIFETIME_NO_EXPIRE) {
-                    fib_ms_to_timex(lifetime, &table->entries[i].lifetime);
+                if (lifetime != (uint32_t) FIB_LIFETIME_NO_EXPIRE) {
+                    fib_lifetime_to_absolute(lifetime, &table->entries[i].lifetime);
                 }
                 else {
-                    table->entries[i].lifetime.seconds = FIB_LIFETIME_NO_EXPIRE;
-                    table->entries[i].lifetime.microseconds = FIB_LIFETIME_NO_EXPIRE;
+                    table->entries[i].lifetime = FIB_LIFETIME_NO_EXPIRE;
                 }
 
                 return 0;
@@ -291,8 +284,7 @@ static int fib_remove(fib_entry_t *entry)
     entry->next_hop_flags = 0;
 
     entry->iface_id = KERNEL_PID_UNDEF;
-    entry->lifetime.seconds = 0;
-    entry->lifetime.microseconds = 0;
+    entry->lifetime = 0;
 
     return 0;
 }
@@ -608,12 +600,11 @@ void fib_print_fib_table(fib_table_t *table)
     mutex_lock(&mtx_access);
 
     for (size_t i = 0; i < table->size; ++i) {
-        printf("[fib_print_table] %d) iface_id: %d, global: %p, next hop: %p, lifetime: %d.%d\n",
+        printf("[fib_print_table] %d) iface_id: %d, global: %p, next hop: %p, lifetime: %"PRIu32"\n",
                (int)i, (int)table->entries[i].iface_id,
                (void *)table->entries[i].global,
                (void *)table->entries[i].next_hop,
-               (int)table->entries[i].lifetime.seconds,
-               (int)table->entries[i].lifetime.microseconds);
+               (uint32_t)(table->entries[i].lifetime / 1000));
     }
 
     mutex_unlock(&mtx_access);
@@ -656,28 +647,25 @@ void fib_print_routes(fib_table_t *table)
     printf("%-" FIB_ADDR_PRINT_LENS "s %-6s %-" FIB_ADDR_PRINT_LENS "s %-6s %-16s Interface\n"
            , "Destination", "Flags", "Next Hop", "Flags", "Expires");
 
-    timex_t now;
-    vtimer_now(&now);
+    uint64_t now = xtimer_now64();
 
     for (size_t i = 0; i < table->size; ++i) {
-        if (table->entries[i].lifetime.seconds != 0 || table->entries[i].lifetime.microseconds != 0) {
+        if (table->entries[i].lifetime != 0) {
             fib_print_address(table->entries[i].global);
             printf(" 0x%04"PRIx32" ", table->entries[i].global_flags);
             fib_print_address(table->entries[i].next_hop);
             printf(" 0x%04"PRIx32" ", table->entries[i].next_hop_flags);
 
-            if ((table->entries[i].lifetime.seconds != FIB_LIFETIME_NO_EXPIRE)
-                || (table->entries[i].lifetime.microseconds != FIB_LIFETIME_NO_EXPIRE)) {
+            if (table->entries[i].lifetime != FIB_LIFETIME_NO_EXPIRE) {
 
-                timex_t tm = timex_sub(table->entries[i].lifetime, now);
+                uint64_t tm = table->entries[i].lifetime - now;
 
                 /* we must interpret the values as signed */
-                if ((int32_t)tm.seconds < 0
-                    || (tm.seconds == 0 && (int32_t)tm.microseconds < 0)) {
+                if ((int64_t)tm < 0 ) {
                     printf("%-16s ", "EXPIRED");
                 }
                 else {
-                    printf("%"PRIu32".%05"PRIu32, tm.seconds, tm.microseconds);
+                    printf("%"PRIu32".%05"PRIu32, (uint32_t)(tm / 1000000), (uint32_t)(tm % 1000000));
                 }
             }
             else {
@@ -692,7 +680,7 @@ void fib_print_routes(fib_table_t *table)
 }
 
 #if FIB_DEVEL_HELPER
-int fib_devel_get_lifetime(fib_table_t *table, timex_t *lifetime, uint8_t *dst,
+int fib_devel_get_lifetime(fib_table_t *table, uint64_t *lifetime, uint8_t *dst,
                            size_t dst_size)
 {
     size_t count = 1;

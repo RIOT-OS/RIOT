@@ -6,7 +6,7 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  *
- * @ingroup hwtimer
+ * @ingroup timer
  * @ingroup native_cpu
  * @{
  * @author  Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
@@ -17,7 +17,7 @@
  * Uses POSIX realtime clock and POSIX itimer to mimic hardware.
  *
  * This is based on native's hwtimer implementation by Ludwig Ortmann.
- * I removed the multiplexing, as wtimer does the same. (kaspar)
+ * I removed the multiplexing, as xtimer does the same. (kaspar)
  *
  * @}
  */
@@ -117,8 +117,11 @@ static void do_timer_set(unsigned int offset)
 int timer_set(tim_t dev, int channel, unsigned int offset)
 {
     (void)dev;
-    (void)channel;
     DEBUG("%s\n", __func__);
+
+    if (channel != 0) {
+        return -1;
+    }
 
     if (!offset) {
         offset = NATIVE_TIMER_MIN_RES;
@@ -140,9 +143,7 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
         target = NATIVE_TIMER_MIN_RES;
     }
 
-    timer_set(dev, channel, target);
-
-    return 1;
+    return timer_set(dev, channel, target);
 }
 
 int timer_clear(tim_t dev, int channel)

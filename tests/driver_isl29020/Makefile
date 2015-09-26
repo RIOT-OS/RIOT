@@ -10,7 +10,7 @@ ifneq (,$(filter iotlab-m3,$(BOARD)))
 endif
 
 USEMODULE += isl29020
-USEMODULE += vtimer
+USEMODULE += xtimer
 
 ifneq (,$(TEST_ISL29020_I2C))
   CFLAGS += -DTEST_ISL29020_I2C=$(TEST_ISL29020_I2C)

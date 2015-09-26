@@ -15,7 +15,7 @@
  * @file
  * @brief       Low-level random number generator driver implementation.
  *
- * @author      Joakim Gebart <joakim.gebart@eistec.se> (adaption for Freescale's RNGB)
+ * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se> (adaption for Freescale's RNGB)
  * @author      Johann Fischer <j.fischer@phytec.de> (adaption for Freescale's RNGA)
  * @author      Hauke Petersen <mail@haukepetersen.de>
  *

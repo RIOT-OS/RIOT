@@ -54,9 +54,12 @@ extern "C" {
 /** @} */
 
 /**
- * @brief Deprecated HW_TIMER definition (to be removed)
+ * @name xtimer tuning values
+ * @{
  */
-#define HW_TIMER             TIMER_DEV(0)
+#define XTIMER_OVERHEAD     7
+#define XTIMER_SHOOT_EARLY  3
+/** @} */
 
 /**
  * @brief initialize the board's clock system

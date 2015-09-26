@@ -68,7 +68,7 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
     dev->CTL = USART_CTL_SWRST;
     /* configure to 8N1 and using the SMCLK*/
     dev->CTL |= USART_CTL_CHAR;
-    dev->TCTL = (USART_TCTL_TXEPT | USART_TCTL_URXSE | USART_TCTL_SSEL_SMCLK);
+    dev->TCTL = (USART_TCTL_TXEPT | USART_TCTL_SSEL_SMCLK);
     dev->RCTL = 0x00;
     /* baudrate configuration */
     uint16_t br = (uint16_t)(CLOCK_CMCLK / baudrate);
@@ -139,10 +139,12 @@ ISR(UART_RX_ISR, isr_uart_0_rx)
 {
     __enter_isr();
 
-    if (UART_IF & UART_IE_RX_BIT) {
-        char data = (char)UART_DEV->RXBUF;
-        UART_IF &= ~(UART_IE_RX_BIT);
-        ctx_rx_cb(ctx_isr_arg, data);
+    /* read character (resets interrupt flag) */
+    char c = UART_DEV->RXBUF;
+
+    /* only call callback if there was no receive error */
+    if(! (UART_DEV->RCTL & RXERR)) {
+        ctx_rx_cb(ctx_isr_arg, c);
     }
 
     __exit_isr();

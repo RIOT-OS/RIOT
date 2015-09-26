@@ -13,7 +13,7 @@
 #include <errno.h>
 #include "embUnit.h"
 #include "tests-fib.h"
-#include "vtimer.h"
+#include "xtimer.h"
 
 #include "thread.h"
 #include "net/fib.h"
@@ -550,7 +550,7 @@ static void test_fib_14_exact_and_prefix_match(void)
 
 static void test_fib_15_get_lifetime(void)
 {
-    timex_t lifetime, now;
+    uint64_t lifetime, now;
     kernel_pid_t iface_id = 1;
     char addr_dst[] = "Test address151";
     char addr_nxt[] = "Test address152";
@@ -568,12 +568,13 @@ static void test_fib_15_get_lifetime(void)
                                                     add_buf_size - 1));
 
     /* assuming some ms passed during these operations... */
-    vtimer_now(&now);
-    timex_t cmp_lifetime = timex_add(now, timex_set(0, 900000));
-    timex_t cmp_max_lifetime = timex_add(now, timex_set(1,1));
-    TEST_ASSERT_EQUAL_INT(1, timex_cmp(lifetime, cmp_lifetime));
+    now = xtimer_now64();
+    uint64_t cmp_lifetime = now + 900000lU;
+    uint64_t cmp_max_lifetime = now + 1100000lU;
+
+    TEST_ASSERT_EQUAL_INT(1, (lifetime > cmp_lifetime));
     /* make sure lifetime hasn't grown magically either */
-    TEST_ASSERT_EQUAL_INT(-1, timex_cmp(lifetime, cmp_max_lifetime));
+    TEST_ASSERT_EQUAL_INT(1, (lifetime < cmp_max_lifetime));
 
     fib_deinit(&test_fib_table);
 }

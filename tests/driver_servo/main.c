@@ -17,7 +17,7 @@
  * 1.000 -- 2.000 ms, roughly -/+ 90 degrees from the middle position if the
  * connected servo is a standard RC servo.
  *
- * @author      Joakim Gebart <joakim.gebart@eistec.se>
+ * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  *
  * @}
  */
@@ -26,7 +26,7 @@
 
 #include "cpu.h"
 #include "board.h"
-#include "vtimer.h"
+#include "xtimer.h"
 #include "periph/pwm.h"
 #include "servo.h"
 
@@ -74,7 +74,7 @@ int main(void)
             step = -step;
         }
 
-        vtimer_usleep(WAIT);
+        xtimer_usleep(WAIT);
     }
 
     return 0;

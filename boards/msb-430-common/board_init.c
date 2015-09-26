@@ -23,7 +23,7 @@
 #include "cpu.h"
 #include "irq.h"
 #include "board.h"
-#include "msp430_stdio.h"
+#include "uart_stdio.h"
 #include "periph_conf.h"
 #include "kernel_internal.h"
 #include "msp430.h"
@@ -205,5 +205,5 @@ void board_init(void)
     msp430_set_cpu_speed(CLOCK_CORECLOCK);
 
     /* finally initialize the STDIO */
-    msp430_stdio_init();
+    uart_stdio_init();
 }

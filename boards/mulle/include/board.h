@@ -15,7 +15,7 @@
  * @file
  * @brief       Board specific definitions for the Eistec Mulle IoT board
  *
- * @author      Joakim Gebart <joakim.gebart@eistec.se>
+ * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
 #ifndef BOARD_H_
@@ -31,18 +31,6 @@
 
 /** Disable hardware watchdog, for debugging purposes, don't use this on production builds. */
 #define DISABLE_WDOG    1
-
-/**
- * @name Assign the first hardware timer.
- * This timer will be used to implement an absolute reference for hwtimer_now() et al.
- */
-#define HW_TIMER            TIMER_0
-
-/**
- * @name Number of subsequent channels of the PIT to assign to the RIOT hardware
- * timer library, starting after the HW_TIMER above.
- */
-#define HW_TIMERS_COUNT      1
 
 /**
  * @name Define UART device and baudrate for stdio

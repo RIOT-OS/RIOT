@@ -17,7 +17,7 @@
  * Tested on:
  * - Cypress/Ramtron FM25L04B.
  *
- * @author      Joakim Gebart <joakim.gebart@eistec.se>
+ * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
 #ifndef DRIVERS_NVRAM_SPI_H_

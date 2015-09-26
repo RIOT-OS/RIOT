@@ -34,9 +34,15 @@ extern "C" {
 #define F_CPU               (16000000UL)
 
 /**
- * @brief   Assign the hardware timer
+ * @brief   Xtimer configuration
+ * @{
  */
-#define HW_TIMER            TIMER_0
+#define XTIMER                      (0)
+#define XTIMER_CHAN                 (0)
+#define XTIMER_MASK                 (0xff000000)
+#define XTIMER_SHIFT_ON_COMPARE     (2)
+#define XTIMER_BACKOFF              (40)
+/** @} */
 
 /**
  * @name    Define the boards stdio
