@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Ludwig Ortmann
+ * Copyright 2015 Ludwig Knüpfer
  * Copyright 2015 Christian Mehlis
  *
  * This file is subject to the terms and conditions of the GNU Lesser
@@ -15,7 +15,7 @@
  * @brief       Device driver implementation for the DHT 11 and 22
  *              temperature and humidity sensor
  *
- * @author      Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ * @author      Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  * @author      Christian Mehlis <mehlis@inf.fu-berlin.de>
  *
  * @}

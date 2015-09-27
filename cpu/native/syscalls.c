@@ -4,7 +4,7 @@
  * Wrap system calls and system call invoking library calls to make
  * sure no context switches happen during a system call.
  *
- * Copyright (C) 2013 Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ * Copyright (C) 2013 Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -13,7 +13,7 @@
  * @ingroup native_cpu
  * @{
  * @file
- * @author  Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ * @author  Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  */
 
 #ifndef _GNU_SOURCE

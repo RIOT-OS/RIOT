@@ -15,7 +15,7 @@
  *
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  * @author      Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
- * @author      Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ * @author      Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  *
  * @}
  */
