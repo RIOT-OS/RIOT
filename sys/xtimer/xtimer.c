@@ -155,16 +155,16 @@ void xtimer_set_wakeup64(xtimer_t *timer, uint64_t offset, kernel_pid_t pid)
  * This is to avoid using long integer division functions
  * the compiler otherwise links in.
  */
-static inline uint64_t _ms_to_sec(uint64_t ms)
+static inline uint64_t _us_to_sec(uint64_t us)
 {
-    return (unsigned long long)(ms * 0x431bde83) >> (0x12 + 32);
+    return (unsigned long long)(us * 0x431bde83) >> (0x12 + 32);
 }
 
 void xtimer_now_timex(timex_t *out)
 {
     uint64_t now = xtimer_now64();
 
-    out->seconds = _ms_to_sec(now);
+    out->seconds = _us_to_sec(now);
     out->microseconds = now - (out->seconds * SEC_IN_USEC);
 }
 
