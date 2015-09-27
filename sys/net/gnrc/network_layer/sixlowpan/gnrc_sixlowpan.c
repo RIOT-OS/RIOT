@@ -256,8 +256,10 @@ static void _send(gnrc_pktsnip_t *pkt)
           PRIkernel_pid "\n", iface->max_frag_size, hdr->if_pid);
 
     /* IP should not send anything here if it is not a 6LoWPAN interface,
-     * so we don't need to check for NULL pointers */
-    if (datagram_size <= iface->max_frag_size) {
+     * so we don't need to check for NULL pointers.
+     * Note, that datagram_size cannot be used here, because the header size
+     * might be changed by IPHC. */
+    if (gnrc_pkt_len(pkt2->next) <= iface->max_frag_size) {
         DEBUG("6lo: Send SND command for %p to %" PRIu16 "\n",
               (void *)pkt2, hdr->if_pid);
         gnrc_netapi_send(hdr->if_pid, pkt2);
@@ -276,6 +278,7 @@ static void _send(gnrc_pktsnip_t *pkt)
         gnrc_pktbuf_release(pkt2);
     }
 #else
+    (void) datagram_size;
     DEBUG("6lo: packet too big (%u > %" PRIu16 ")\n",
           (unsigned int)datagram_size, iface->max_frag_size);
     gnrc_pktbuf_release(pkt2);
