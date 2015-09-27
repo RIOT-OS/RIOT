@@ -8,7 +8,7 @@
 
 /**
  * @defgroup    drivers_adt7310 ADT7310 SPI temperature sensor
- * @ingroup     drivers
+ * @ingroup     drivers_sensors
  * @brief       Driver for the Analog Devices ADT7310 temperature sensor.
  *
  * ## Description

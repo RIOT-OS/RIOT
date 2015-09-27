@@ -8,7 +8,7 @@
 
 /**
  * @defgroup    drivers_mpu9150 MPU-9150
- * @ingroup     drivers
+ * @ingroup     drivers_sensors
  * @brief       Device driver interface for the MPU-9150
  * @{
  *

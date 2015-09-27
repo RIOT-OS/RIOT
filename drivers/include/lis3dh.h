@@ -8,7 +8,7 @@
 
 /**
  * @defgroup    driver_lis3dh LIS3DH accelerometer
- * @ingroup     drivers
+ * @ingroup     drivers_sensors
  * @brief       Device driver for the LIS3DH accelerometer
  * @{
  *

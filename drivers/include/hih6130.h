@@ -8,7 +8,7 @@
 
 /**
  * @defgroup    driver_hih6130 HIH6130 humidity and temperature sensor
- * @ingroup     drivers
+ * @ingroup     drivers_sensors
  * @brief       Device driver for Honeywell HumidIcon Digital
  *              Humidity/Temperature Sensors: HIH-6130/6131 Series
  * @{

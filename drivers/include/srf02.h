@@ -9,7 +9,7 @@
 
 /**
  * @defgroup    driver_srf02 SRF02
- * @ingroup     drivers
+ * @ingroup     drivers_sensors
  * @brief       Driver for the SRF02 ultrasonic range sensor
  * @{
  *

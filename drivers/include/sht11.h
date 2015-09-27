@@ -12,7 +12,7 @@
 /**
  * @defgroup    sht11   SHT11
  * @brief       Driver for Sensirion SHT11 Humidity and Temperature Sensor
- * @ingroup     drivers
+ * @ingroup     drivers_sensors
  * @{
  *
  * @file

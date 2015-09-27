@@ -8,7 +8,7 @@
 
 /**
  * @defgroup    lm75a LM75A
- * @ingroup     drivers
+ * @ingroup     drivers_sensors
  * @brief       Driver for the LM75A digital temperature sensor and thermal watchdog
  *
  * The connection between the MCU and the LM75A is based on the i2c-interface.
