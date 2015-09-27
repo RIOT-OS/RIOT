@@ -120,13 +120,13 @@ void xtimer_set(xtimer_t *timer, uint32_t offset)
     }
 
     xtimer_remove(timer);
-    uint32_t target = xtimer_now() + offset;
 
     if (offset < XTIMER_BACKOFF) {
         xtimer_spin(offset);
         _shoot(timer);
     }
     else {
+        uint32_t target = xtimer_now() + offset;
         _xtimer_set_absolute(timer, target);
     }
 }
