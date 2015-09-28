@@ -10,11 +10,11 @@ run on an Atmel SAM R21 Xplained Pro evaluation board using an external UART
 adapter for the second serial interface. However, it is feasible to run the
 example on any RIOT supported platform that offers either more than one UART or
 be equipped with an IPv6 capable network device. In this case only the Makefile
-of this application has to be slightly modified (e.g. by replacing the line
+of this application has to be slightly modified, e.g. by replacing the line
 ```
 USEMODULE += gnrc_slip
 ```
-by something like
+with something like
 ```
 USEMODULE += encx24j600
 ```
@@ -28,8 +28,8 @@ value has to be bigger than 1.
 In order to connect a RIOT 6LoWPAN border router over SLIP you run a small
 program called tunslip (imported from Contiki) [2] on the Linux host. The
 program can be found in the `dist/tools/tunslip` folder and has to be compiled
-before first use (simple calling `make` should be enough). Now one can start
-the program, by calling something like:
+before first use (simple calling `make` should be enough). Now, one can start
+the program by calling something like:
 ```bash
 cd dist/tools/tunslip
 make
