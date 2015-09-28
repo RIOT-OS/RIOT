@@ -26,6 +26,7 @@
 #include "cpu.h"
 #include "thread.h"
 #include "sched.h"
+#include "init.h"
 #include "periph_conf.h"
 #include "periph/uart.h"
 
@@ -53,12 +54,12 @@ static inline void kinetis_set_brfa(KINETIS_UART *dev, uint32_t baudrate, uint32
 #endif
 }
 
-static int init_base(uart_t uart, uint32_t baudrate);
+static int hw_init_base(uart_t uart, uint32_t baudrate);
 
-int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
+int hw_uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 {
     /* do basic initialization */
-    int res = init_base(uart, baudrate);
+    int res = hw_init_base(uart, baudrate);
 
     if (res < 0) {
         return res;
@@ -95,7 +96,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     return 0;
 }
 
-static int init_base(uart_t uart, uint32_t baudrate)
+static int hw_init_base(uart_t uart, uint32_t baudrate)
 {
     KINETIS_UART *dev;
     PORT_Type *port;
@@ -182,7 +183,7 @@ static int init_base(uart_t uart, uint32_t baudrate)
     return 0;
 }
 
-void uart_write(uart_t uart, const uint8_t *data, size_t len)
+void hw_uart_write(uart_t uart, const uint8_t *data, size_t len)
 {
     KINETIS_UART *dev;
 
@@ -253,3 +254,36 @@ void UART_1_ISR(void)
     irq_handler(UART_1, UART_1_DEV);
 }
 #endif
+
+#if UART_0_EN
+uartdev_ops_t kinetis_uart0_ops = {
+    .dev = UART_0,
+    .uart_init = hw_uart_init,
+    .uart_write = hw_uart_write,
+    .uart_poweron = NULL,
+    .uart_poweroff = NULL,
+};
+#endif
+
+#if UART_1_EN
+uartdev_ops_t kinetis_uart1_ops = {
+    .dev = UART_1,
+    .uart_init = hw_uart_init,
+    .uart_write = hw_uart_write,
+    .uart_poweron = NULL,
+    .uart_poweroff = NULL,
+};
+#endif
+
+int kinetis_uart_init (void)
+{
+#if UART_0_EN
+    uartdev_register_driver(&kinetis_uart0_ops);
+#endif
+#if UART_1_EN
+    uartdev_register_driver(&kinetis_uart1_ops);
+#endif
+    return 0;
+}
+
+driver_init(kinetis_uart_init);
