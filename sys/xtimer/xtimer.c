@@ -1,5 +1,6 @@
 /**
  * Copyright (C) 2015 Kaspar Schleiser <kaspar@schleiser.de>
+ * Copyright (C) 2015 Eistec AB
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -8,8 +9,11 @@
  * @ingroup xtimer
  * @{
  * @file
- * @brief xtimer convenience functionality
- * @author Kaspar Schleiser <kaspar@schleiser.de>
+ * @brief    xtimer convenience functionality
+ *
+ * @author   Kaspar Schleiser <kaspar@schleiser.de>
+ * @author   Joakim Nohlgård <joakim.nohlgard@eistec.se>
+ *
  * @}
  */
 
@@ -28,17 +32,20 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
+void _xtimer_set_ticks(xtimer_t *timer, uint32_t offset);
+void _xtimer_set_ticks64(xtimer_t *timer, uint32_t offset, uint32_t long_offset);
+
 static void _callback_unlock_mutex(void* arg)
 {
     mutex_t *mutex = (mutex_t *) arg;
     mutex_unlock(mutex);
 }
 
-void _xtimer_sleep(uint32_t offset, uint32_t long_offset)
+void _xtimer_sleep_ticks(uint32_t offset, uint32_t long_offset)
 {
     if (inISR()) {
-        assert(!long_offset);
-        xtimer_spin(offset);
+        assert(long_offset == 0);
+        _xtimer_spin_ticks(offset);
     }
 
     xtimer_t timer;
@@ -49,28 +56,29 @@ void _xtimer_sleep(uint32_t offset, uint32_t long_offset)
     timer.target = timer.long_target = 0;
 
     mutex_lock(&mutex);
-    _xtimer_set64(&timer, offset, long_offset);
+    _xtimer_set_ticks64(&timer, offset, long_offset);
     mutex_lock(&mutex);
 }
 
-void xtimer_usleep_until(uint32_t *last_wakeup, uint32_t interval) {
+void xtimer_usleep_until(uint32_t *last_wakeup_us, uint32_t interval) {
     xtimer_t timer;
     mutex_t mutex = MUTEX_INIT;
+    uint32_t last_wakeup = _xtimer_us_to_ticks(*last_wakeup_us);
 
     timer.callback = _callback_unlock_mutex;
     timer.arg = (void*) &mutex;
 
-    uint32_t target = *last_wakeup + interval;
+    uint32_t target = last_wakeup + _xtimer_us_to_ticks(interval);
 
-    uint32_t now = xtimer_now();
+    uint32_t now = _xtimer_now_ticks();
     /* make sure we're not setting a value in the past */
-    if (now < *last_wakeup) {
+    if (now < last_wakeup) {
         /* base timer overflowed */
-        if (!((target < *last_wakeup) && (target > now))) {
+        if (!((target < last_wakeup) && (target > now))) {
             goto out;
         }
     }
-    else if (! ((target < *last_wakeup) || (target > now))) {
+    else if (! ((target < last_wakeup) || (target > now))) {
         goto out;
     }
 
@@ -90,17 +98,17 @@ void xtimer_usleep_until(uint32_t *last_wakeup, uint32_t interval) {
             offset = target;
         }
         else {
-            offset += xtimer_now();
+            offset += _xtimer_now_ticks();
         }
-        _xtimer_set_absolute(&timer, offset);
+        _xtimer_set_absolute_ticks(&timer, offset);
         mutex_lock(&mutex);
     }
     else {
-        xtimer_spin(offset);
+        _xtimer_spin_ticks(offset);
     }
 
 out:
-    *last_wakeup = target;
+    *last_wakeup_us = _xtimer_ticks_to_us(target);
 }
 
 static void _callback_msg(void* arg)
@@ -121,13 +129,15 @@ static inline void _setup_msg(xtimer_t *timer, msg_t *msg, kernel_pid_t target_p
 void xtimer_set_msg(xtimer_t *timer, uint32_t offset, msg_t *msg, kernel_pid_t target_pid)
 {
     _setup_msg(timer, msg, target_pid);
-    xtimer_set(timer, offset);
+    offset = _xtimer_us_to_ticks(offset);
+    _xtimer_set_ticks(timer, offset);
 }
 
 void xtimer_set_msg64(xtimer_t *timer, uint64_t offset, msg_t *msg, kernel_pid_t target_pid)
 {
     _setup_msg(timer, msg, target_pid);
-    _xtimer_set64(timer, offset, offset >> 32);
+    offset = _xtimer_us_to_ticks64(offset);
+    _xtimer_set_ticks64(timer, offset, offset >> 32);
 }
 
 static void _callback_wakeup(void* arg)
@@ -139,16 +149,16 @@ void xtimer_set_wakeup(xtimer_t *timer, uint32_t offset, kernel_pid_t pid)
 {
     timer->callback = _callback_wakeup;
     timer->arg = (void*) ((intptr_t)pid);
-
-    xtimer_set(timer, offset);
+    offset = _xtimer_us_to_ticks(offset);
+    _xtimer_set_ticks(timer, offset);
 }
 
 void xtimer_set_wakeup64(xtimer_t *timer, uint64_t offset, kernel_pid_t pid)
 {
     timer->callback = _callback_wakeup;
     timer->arg = (void*) ((intptr_t)pid);
-
-    _xtimer_set64(timer, offset, offset >> 32);
+    offset = _xtimer_us_to_ticks64(offset);
+    _xtimer_set_ticks64(timer, offset, offset >> 32);
 }
 
 void xtimer_now_timex(timex_t *out)
