@@ -195,6 +195,12 @@ enum {
 #if UART_6_EN
     UART_6,                 /**< UART 6 */
 #endif
+#if UART_ACM_0_EN
+    UART_ACM_0,             /**< UART 0 over USB */
+#endif
+#if UART_ACM_1_EN
+    UART_ACM_1,             /**< UART 1 over USB */
+#endif
     UART_UNDEFINED          /**< Deprecated symbol, use UART_UNDEF instead */
 };
 
