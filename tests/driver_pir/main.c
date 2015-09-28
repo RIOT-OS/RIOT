@@ -13,7 +13,7 @@
  * @file
  * @brief       Test application for the PIR motion sensor driver
  *
- * @author      Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ * @author      Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  *
  * @}
  */

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Ludwig Ortmann, Christian Mehlis
+ * Copyright (C) 2015 Ludwig Knüpfer, Christian Mehlis
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -13,7 +13,7 @@
  * @file
  * @brief       Test application for the dht humidity and temperature sensor driver
  *
- * @author      Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ * @author      Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  * @author      Christian Mehlis <mehlis@inf.fu-berlin.de>
  *
  * @}
