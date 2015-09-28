@@ -163,6 +163,25 @@ void uart_poweron(uart_t uart);
  */
 void uart_poweroff(uart_t uart);
 
+/**
+ * @brief   uart device extended API definition.
+ *
+ * @details This is a set of functions that must be implemented by any driver.
+ */
+typedef struct {
+    uart_t dev;
+
+    int (*uart_init)(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg);
+
+    void (*uart_write)(uart_t uart, const uint8_t *data, size_t len);
+
+    void (*uart_poweron)(uart_t uart);
+
+    void (*uart_poweroff)(uart_t uart);
+} uartdev_ops_t;
+
+int uartdev_register_driver(uartdev_ops_t *uart_ops);
+
 #ifdef __cplusplus
 }
 #endif
