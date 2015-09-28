@@ -47,6 +47,9 @@ endif
 ifneq (,$(filter gnrc_ipv6_nc,$(USEMODULE)))
   SRC += sc_ipv6_nc.c
 endif
+ifneq (,$(filter gnrc_ipv6_whitelist,$(USEMODULE)))
+  SRC += sc_whitelist.c
+endif
 ifneq (,$(filter gnrc_icmpv6_echo vtimer,$(USEMODULE)))
   SRC += sc_icmpv6_echo.c
 endif
