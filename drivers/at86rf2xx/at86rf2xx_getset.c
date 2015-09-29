@@ -401,12 +401,6 @@ static inline void _set_state(at86rf2xx_t *dev, uint8_t state)
     while (at86rf2xx_get_status(dev) != state);
 }
 
-static inline void _force_trx_off(at86rf2xx_t *dev)
-{
-    at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_STATE, AT86RF2XX_TRX_STATE__FORCE_TRX_OFF);
-    while (at86rf2xx_get_status(dev) != AT86RF2XX_STATE_TRX_OFF);
-}
-
 void at86rf2xx_set_state(at86rf2xx_t *dev, uint8_t state)
 {
     uint8_t old_state = at86rf2xx_get_status(dev);
@@ -438,7 +432,7 @@ void at86rf2xx_set_state(at86rf2xx_t *dev, uint8_t state)
 
     if (state == AT86RF2XX_STATE_SLEEP) {
         /* First go to TRX_OFF */
-        _force_trx_off(dev);
+        at86rf2xx_force_trx_off(dev);
         /* Go to SLEEP mode from TRX_OFF */
         gpio_set(dev->sleep_pin);
     } else {
@@ -458,5 +452,5 @@ void at86rf2xx_reset_state_machine(at86rf2xx_t *dev)
         old_state = at86rf2xx_get_status(dev);
     } while (old_state == AT86RF2XX_STATE_IN_PROGRESS);
 
-    _force_trx_off(dev);
+    at86rf2xx_force_trx_off(dev);
 }
