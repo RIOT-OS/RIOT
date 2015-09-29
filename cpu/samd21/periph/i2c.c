@@ -37,9 +37,9 @@
 #define SAMD21_I2C_TIMEOUT  (65535)
 
 /* static function definitions */
-static inline void _start(SercomI2cm *dev, uint8_t address, uint8_t rw_flag);
-static inline void _write(SercomI2cm *dev, char *data, int length);
-static inline void _read(SercomI2cm *dev, char *data, int length);
+static inline int _start(SercomI2cm *dev, uint8_t address, uint8_t rw_flag);
+static inline int _write(SercomI2cm *dev, char *data, int length);
+static inline int _read(SercomI2cm *dev, char *data, int length);
 static inline void _stop(SercomI2cm *dev);
 
 /**
@@ -248,9 +248,9 @@ int i2c_read_bytes(i2c_t dev, uint8_t address, char *data, int length)
     }
 
     /* start transmission and send slave address */
-    _start(i2c, address, I2C_FLAG_READ);
+    if(_start(i2c, address, I2C_FLAG_READ) < 0) return 0;
     /* read data to register */
-    _read(i2c, data, length);
+    if(_read(i2c, data, length) < 0) return 0;
     _stop(i2c);
     /* return number of bytes sent */
     return length;
@@ -276,10 +276,10 @@ int i2c_read_regs(i2c_t dev, uint8_t address, uint8_t reg, char *data, int lengt
     }
 
     /* start transmission and send slave address */
-    _start(i2c, address, I2C_FLAG_WRITE);
+    if(_start(i2c, address, I2C_FLAG_WRITE) < 0) return 0;
     /* send register address/command and wait for complete transfer to
      * be finished */
-    _write(i2c, (char *)(&reg), 1);
+    if(_write(i2c, (char *)(&reg), 1) < 0) return 0;
     return i2c_read_bytes(dev, address, data, length);
 }
 
@@ -302,8 +302,8 @@ int i2c_write_bytes(i2c_t dev, uint8_t address, char *data, int length)
             return -1;
     }
 
-    _start(I2CSercom, address, I2C_FLAG_WRITE);
-    _write(I2CSercom, data, length);
+    if(_start(I2CSercom, address, I2C_FLAG_WRITE) < 0) return 0;
+    if(_write(I2CSercom, data, length) < 0) return 0;
     _stop(I2CSercom);
     return length;
 }
@@ -329,11 +329,11 @@ int i2c_write_regs(i2c_t dev, uint8_t address, uint8_t reg, char *data, int leng
         }
 
     /* start transmission and send slave address */
-    _start(i2c, address, I2C_FLAG_WRITE);
+    if(_start(i2c, address, I2C_FLAG_WRITE) < 0) return 0;
     /* send register address and wait for complete transfer to be finished */
-    _write(i2c, (char *)(&reg), 1);
+    if(_write(i2c, (char *)(&reg), 1) < 0) return 0;
     /* write data to register */
-    _write(i2c, data, length);
+    if(_write(i2c, data, length) < 0) return 0;
     /* finish transfer */
     _stop(i2c);
     return length;
@@ -367,7 +367,7 @@ void i2c_poweroff(i2c_t dev)
     }
 }
 
-static void _start(SercomI2cm *dev, uint8_t address, uint8_t rw_flag)
+static int _start(SercomI2cm *dev, uint8_t address, uint8_t rw_flag)
 {
     uint32_t timeout_counter = 0;
 
@@ -387,7 +387,7 @@ static void _start(SercomI2cm *dev, uint8_t address, uint8_t rw_flag)
            && !(dev->INTFLAG.reg & SERCOM_I2CM_INTFLAG_SB)) {
         if (++timeout_counter >= SAMD21_I2C_TIMEOUT) {
             DEBUG("STATUS_ERR_TIMEOUT\n");
-            return;
+            return -1;
         }
     }
 
@@ -400,7 +400,7 @@ static void _start(SercomI2cm *dev, uint8_t address, uint8_t rw_flag)
         /* Check arbitration. */
         if (dev->STATUS.reg & SERCOM_I2CM_STATUS_ARBLOST) {
             DEBUG("STATUS_ERR_PACKET_COLLISION\n");
-            return;
+            return -2;
         }
     }
     /* Check that slave responded with ack. */
@@ -408,11 +408,12 @@ static void _start(SercomI2cm *dev, uint8_t address, uint8_t rw_flag)
         /* Slave busy. Issue ack and stop command. */
         dev->CTRLB.reg |= SERCOM_I2CM_CTRLB_CMD(3);
         DEBUG("STATUS_ERR_BAD_ADDRESS\n");
-        return;
+        return -3;
     }
+    return 0;
 }
 
-static inline void _write(SercomI2cm *dev, char *data, int length)
+static inline int _write(SercomI2cm *dev, char *data, int length)
 {
     uint16_t tmp_data_length = length;
     uint32_t timeout_counter = 0;
@@ -424,7 +425,7 @@ static inline void _write(SercomI2cm *dev, char *data, int length)
         /* Check that bus ownership is not lost. */
         if (!(dev->STATUS.reg & SERCOM_I2CM_STATUS_BUSSTATE(2))) {
             DEBUG("STATUS_ERR_PACKET_COLLISION\n");
-            return;
+            return -2;
         }
 
         /* Wait for hardware module to sync */
@@ -438,19 +439,20 @@ static inline void _write(SercomI2cm *dev, char *data, int length)
                && !(dev->INTFLAG.reg & SERCOM_I2CM_INTFLAG_SB)) {
             if (++timeout_counter >= SAMD21_I2C_TIMEOUT) {
                 DEBUG("STATUS_ERR_TIMEOUT\n");
-                return;
+                return -1;
             }
         }
 
         /* Check for NACK from slave. */
         if (dev->STATUS.reg & SERCOM_I2CM_STATUS_RXNACK) {
             DEBUG("STATUS_ERR_OVERFLOW\n");
-            return;
+            return -4;
         }
     }
+    return 0;
 }
 
-static inline void _read(SercomI2cm *dev, char *data, int length)
+static inline int _read(SercomI2cm *dev, char *data, int length)
 {
     uint32_t timeout_counter = 0;
     uint8_t count = 0;
@@ -463,7 +465,7 @@ static inline void _read(SercomI2cm *dev, char *data, int length)
         /* Check that bus ownership is not lost. */
         if (!(dev->STATUS.reg & SERCOM_I2CM_STATUS_BUSSTATE(2))) {
             DEBUG("STATUS_ERR_PACKET_COLLISION\n");
-            return;
+            return -2;
         }
 
         /* Wait for hardware module to sync */
@@ -477,13 +479,14 @@ static inline void _read(SercomI2cm *dev, char *data, int length)
                && !(dev->INTFLAG.reg & SERCOM_I2CM_INTFLAG_SB)) {
             if (++timeout_counter >= SAMD21_I2C_TIMEOUT) {
                 DEBUG("STATUS_ERR_TIMEOUT\n");
-                return;
+                return -1;
             }
         }
         count++;
     }
     /* Send NACK before STOP */
     dev->CTRLB.reg |= SERCOM_I2CM_CTRLB_ACKACT;
+    return 0;
 }
 
 static inline void _stop(SercomI2cm *dev)
