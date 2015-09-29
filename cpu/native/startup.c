@@ -45,11 +45,76 @@ pid_t _native_id;
 unsigned _native_rng_seed = 0;
 int _native_rng_mode = 0;
 const char *_native_unix_socket_path = NULL;
+static int _native_fd = -1, _native_socket = -1;
+static fd_set _native_fds;
 
 #ifdef MODULE_NETDEV2_TAP
 #include "netdev2_tap.h"
 extern netdev2_tap_t netdev2_tap;
 #endif
+
+static void _native_init_socket(char *port)
+{
+    struct addrinfo hints, *info, *p;
+    int i;
+
+    memset(&hints, 0, sizeof hints);
+    hints.ai_family = AF_UNSPEC;
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_flags = AI_PASSIVE;
+
+    _native_syscall_enter();
+
+    if ((i = real_getaddrinfo(NULL, port, &hints, &info)) != 0) {
+        errx(EXIT_FAILURE, "native: getaddrinfo: %s", real_gai_strerror(i));
+    }
+
+    for (p = info; p != NULL; p = p->ai_next) {
+        if ((_native_socket = real_socket(p->ai_family, p->ai_socktype, p->ai_protocol)) == -1) {
+            continue;
+        }
+
+        i = 1;
+        if (real_setsockopt(_native_socket, SOL_SOCKET, SO_REUSEADDR, &i, sizeof(int)) == -1) {
+            err(EXIT_FAILURE, "native: setsockopt");
+        }
+
+        if (real_bind(_native_socket, p->ai_addr, p->ai_addrlen) == -1) {
+            real_close(_native_socket);
+            continue;
+        }
+
+        break;
+    }
+
+    if (p == NULL)  {
+        errx(EXIT_FAILURE, "native: failed to bind\n");
+    }
+
+    real_freeaddrinfo(info);
+
+    if (real_listen(_native_socket, 1) == -1) {
+        err(EXIT_FAILURE, "native: listen");
+    }
+
+    FD_ZERO(&_native_fds);
+    FD_SET(_native_socket, &_native_fds);
+
+    int flags = 0;
+    if (fcntl(_native_socket, F_SETOWN, _native_pid) < 0) {
+        err(EXIT_FAILURE, "native: F_SETOWN");
+    }
+
+    if ((flags = fcntl(_native_socket, F_GETFL)) == -1) {
+        err(EXIT_FAILURE, "native: F_GETFL");
+    }
+
+    if (fcntl(_native_socket, F_SETFL, flags | FNDELAY | FASYNC) == -1) {
+        err(EXIT_FAILURE, "native: F_SETFL");
+    }
+
+    _native_syscall_leave();
+}
 
 /**
  * initialize _native_null_in_pipe to allow for reading from stdin
@@ -68,6 +133,53 @@ void _native_null_in(char *stdiotype)
 
     if (real_dup2(_native_null_in_pipe[0], STDIN_FILENO) == -1) {
         err(EXIT_FAILURE, "_native_null_in: dup2(STDIN_FILENO)");
+    }
+}
+
+static void _native_incoming_conn(void)
+{
+    struct sockaddr remote;
+    socklen_t t = sizeof(remote);
+    fd_set read_fds = _native_fds;
+
+    struct timeval ti;
+    memset(&ti, 0, sizeof(ti));
+    if (real_select(FD_SETSIZE, &read_fds, NULL, NULL, &ti) > 0) {
+        if (FD_ISSET(_native_socket, &read_fds)) {
+            if ((_native_fd = real_accept(_native_socket, &remote, &t)) > -1) {
+                FD_SET(_native_fd, &_native_fds);
+                if (real_dup2(_native_fd, STDOUT_FILENO) == -1) {
+                    err(EXIT_FAILURE, "native: dup2");
+                }
+                if (real_dup2(_native_fd, STDIN_FILENO) == -1) {
+                    err(EXIT_FAILURE, "native: dup2");
+                }
+            }
+        }
+    }
+}
+
+void _native_fix_io(void)
+{
+    FD_CLR(_native_fd, &_native_fds);
+    real_close(_native_fd);
+    _native_fd = -1;
+    if (real_dup2(_native_null_in_pipe[0], STDIN_FILENO) == -1) {
+        err(EXIT_FAILURE, "native: dup2(STDIN_FILENO)");
+    }
+    if (real_dup2(_native_null_out_file, STDOUT_FILENO) == -1) {
+        err(EXIT_FAILURE, "native: dup2(STDOUT_FILENO)");
+    }
+}
+
+static void _sigio_handler(void)
+{
+#ifdef MODULE_NETDEV2_TAP
+    native_tap_isr();
+#endif
+
+    if (_native_socket > -1) {
+        _native_incoming_conn();
     }
 }
 
@@ -169,29 +281,6 @@ void daemonize(void)
     }
 }
 
-/**
- * Remove any -d options from an argument vector.
- *
- * @param[in][out]  argv    an argument vector
- *
- * @return                  1 if "-d" was found, 0 otherwise
- */
-static int filter_daemonize_argv(char **argv)
-{
-    int ret = 0;
-    for (char **narg = argv; *narg != NULL; narg++) {
-        if (strcmp("-d", narg[0]) == 0) {
-            ret = 1;
-            char **xarg = narg;
-            do {
-                xarg[0] = xarg[1];
-            } while (*xarg++ != NULL);
-            narg--; /* rescan current item to filter out double args */
-        }
-    }
-    return ret;
-}
-
 void usage_exit(void)
 {
     real_printf("usage: %s", _progname);
@@ -200,6 +289,7 @@ void usage_exit(void)
     real_printf(" <tap interface>");
 #endif
 
+    real_printf(" [-t <port>]");
     real_printf(" [-i <id>] [-d] [-e|-E] [-o]\n");
 
     real_printf(" help: %s -h\n", _progname);
@@ -208,6 +298,7 @@ void usage_exit(void)
 -h          help\n");
 
     real_printf("\
+-t <port>   redirect stdio to TCP socket listening on <port> (implies -d)\n\
 -i <id>     specify instance id (set by config module)\n\
 -s <seed>   specify srandom(3) seed (/dev/random is used instead of\n\
             random(3) if the option is omitted)\n\
@@ -239,6 +330,8 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
     char *stderrtype = "stdio";
     char *stdouttype = "stdio";
     char *stdiotype = "stdio";
+    char *_tcpport = NULL;
+    bool daemonize_flag = false;
 
 #if defined(MODULE_NETDEV2_TAP)
     if (
@@ -278,15 +371,7 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
             _native_rng_mode = 1;
         }
         else if (strcmp("-d", arg) == 0) {
-            if (strcmp(stdiotype, "stdio") == 0) {
-                stdiotype = "null";
-            }
-            if (strcmp(stdouttype, "stdio") == 0) {
-                stdouttype = "null";
-            }
-            if (strcmp(stderrtype, "stdio") == 0) {
-                stderrtype = "null";
-            }
+            daemonize_flag = true;
         }
         else if (strcmp("-e", arg) == 0) {
             stderrtype = "file";
@@ -297,12 +382,31 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
         else if (strcmp("-o", arg) == 0) {
             stdouttype = "file";
         }
+        else if (strcmp("-t", arg) == 0) {
+            daemonize_flag = true;
+            stdiotype = "tcp";
+            if (argp + 1 < argc) {
+                _tcpport = argv[++argp];
+            }
+            else {
+                usage_exit();
+            }
+        }
         else {
             usage_exit();
         }
     }
 
-    if (filter_daemonize_argv(_native_argv)) {
+    if (daemonize_flag) {
+        if (strcmp(stdiotype, "stdio") == 0) {
+            stdiotype = "null";
+        }
+        if (strcmp(stdouttype, "stdio") == 0) {
+            stdouttype = "null";
+        }
+        if (strcmp(stderrtype, "stdio") == 0) {
+            stderrtype = "null";
+        }
         daemonize();
     }
 
@@ -310,8 +414,17 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
     _native_log_stdout(stdouttype);
     _native_null_in(stdiotype);
 
+    if (strcmp("tcp", stdiotype) == 0) {
+        _native_init_socket(_tcpport);
+    }
+
     native_cpu_init();
     native_interrupt_init();
+
+    /* configure signal handler for fds */
+    register_interrupt(SIGIO, _sigio_handler);
+    register_interrupt(SIGPIPE, _native_fix_io);
+
 #ifdef MODULE_NETDEV2_TAP
     netdev2_tap_setup(&netdev2_tap, argv[1]);
 #endif

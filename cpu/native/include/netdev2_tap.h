@@ -66,6 +66,11 @@ void netdev2_tap_setup(netdev2_tap_t *dev, const char *name);
  */
 void netdev2_tap_cleanup(netdev2_tap_t *dev);
 
+/**
+ * @brief Interrupt handler for any IO on the tap socket
+ */
+void native_tap_isr(void);
+
 #ifdef __cplusplus
 }
 #endif

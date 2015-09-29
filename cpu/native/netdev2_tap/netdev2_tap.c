@@ -299,7 +299,7 @@ void netdev2_tap_setup(netdev2_tap_t *dev, const char *name) {
     strncpy(dev->tap_name, name, IFNAMSIZ);
 }
 
-static void _tap_isr(void) {
+void native_tap_isr(void) {
     netdev2_t *netdev = (netdev2_t *)&netdev2_tap;
 
     if (netdev->event_callback) {
@@ -380,8 +380,6 @@ static int _init(netdev2_t *netdev)
     DEBUG("gnrc_tapnet_init(): dev->addr = %02x:%02x:%02x:%02x:%02x:%02x\n",
             dev->addr[0], dev->addr[1], dev->addr[2],
             dev->addr[3], dev->addr[4], dev->addr[5]);
-    /* configure signal handler for fds */
-    register_interrupt(SIGIO, _tap_isr);
 #ifdef __MACH__
     /* tuntap signalled IO is not working in OSX,
      * * check http://sourceforge.net/p/tuntaposx/bugs/17/ */
