@@ -136,11 +136,14 @@ void gnrc_icmpv6_demux(kernel_pid_t iface, gnrc_pktsnip_t *pkt)
         return;
     }
 
-    /* ICMPv6 is not interested anymore so `- 1` */
+    /* IPv6 might still do stuff to the packet, so no `- 1` */
     gnrc_pktbuf_hold(pkt, gnrc_netreg_num(GNRC_NETTYPE_ICMPV6, hdr->type));
 
     while (sendto != NULL) {
-        gnrc_netapi_receive(sendto->pid, pkt);
+        if (gnrc_netapi_receive(sendto->pid, pkt) < 1) {
+            DEBUG("icmpv6: unable to deliver packet\n");
+            gnrc_pktbuf_release(pkt);
+        }
         sendto = gnrc_netreg_getnext(sendto);
     }
 }

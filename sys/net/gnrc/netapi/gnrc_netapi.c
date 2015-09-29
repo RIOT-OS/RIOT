@@ -77,7 +77,10 @@ int gnrc_netapi_dispatch(gnrc_nettype_t type, uint32_t demux_ctx,
         gnrc_pktbuf_hold(pkt, numof - 1);
 
         while (sendto) {
-            _snd_rcv(sendto->pid, cmd, pkt);
+            if (_snd_rcv(sendto->pid, cmd, pkt) < 1) {
+                /* unable to dispatch packet */
+                gnrc_pktbuf_release(pkt);
+            }
             sendto = gnrc_netreg_getnext(sendto);
         }
     }
