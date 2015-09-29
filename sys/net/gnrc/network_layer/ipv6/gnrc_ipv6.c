@@ -30,6 +30,7 @@
 
 #include "net/gnrc/ipv6/nc.h"
 #include "net/gnrc/ipv6/netif.h"
+#include "net/gnrc/ipv6/whitelist.h"
 
 #include "net/gnrc/ipv6.h"
 
@@ -706,6 +707,13 @@ static void _receive(gnrc_pktsnip_t *pkt)
             gnrc_pktbuf_release(pkt);
             return;
         }
+#ifdef MODULE_GNRC_IPV6_WHITELIST
+        if (!gnrc_ipv6_whitelisted(&((ipv6_hdr_t *)(ipv6->data))->src)) {
+            DEBUG("ipv6: Source address not whitelisted, dropping packet\n");
+            gnrc_pktbuf_release(pkt);
+            return;
+        }
+#endif
     }
     else {
         if (!ipv6_hdr_is(pkt->data)) {
@@ -713,7 +721,13 @@ static void _receive(gnrc_pktsnip_t *pkt)
             gnrc_pktbuf_release(pkt);
             return;
         }
-
+#ifdef MODULE_GNRC_IPV6_WHITELIST
+        if (!gnrc_ipv6_whitelisted(&((ipv6_hdr_t *)(pkt->data))->src)) {
+            DEBUG("ipv6: Source address not whitelisted, dropping packet\n");
+            gnrc_pktbuf_release(pkt);
+            return;
+        }
+#endif
         /* seize ipv6 as a temporary variable */
         ipv6 = gnrc_pktbuf_start_write(pkt);
 

@@ -110,6 +110,10 @@ extern int _ipv6_nc_manage(int argc, char **argv);
 extern int _ipv6_nc_routers(int argc, char **argv);
 #endif
 
+#ifdef MODULE_GNRC_IPV6_WHITELIST
+extern int _whitelist(int argc, char **argv);
+#endif
+
 #ifdef MODULE_GNRC_ZEP
 #ifdef MODULE_IPV6_ADDR
 extern int _zep_init(int argc, char **argv);
@@ -195,6 +199,9 @@ const shell_command_t _shell_command_list[] = {
 #ifdef MODULE_GNRC_IPV6_NC
     {"ncache", "manage neighbor cache by hand", _ipv6_nc_manage },
     {"routers", "IPv6 default router list", _ipv6_nc_routers },
+#endif
+#ifdef MODULE_GNRC_IPV6_WHITELIST
+    {"whitelist", "whitelists an address for receival ('whitelist [add|del|help]')", _whitelist },
 #endif
 #ifdef MODULE_GNRC_ZEP
 #ifdef MODULE_IPV6_ADDR
