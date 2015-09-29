@@ -1,19 +1,24 @@
-/**
- * Native CPU kernel_intern.h and sched.h implementation
- *
- * in-process preemptive context switching utilizes POSIX ucontexts.
- * (ucontext provides for architecture independent stack handling)
- *
- * Copyright (C) 2013 Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
+/*
+ * Copyright (C) 2016 Kaspar Schleiser <kaspar@schleiser.de>
+ *               2013 Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
- *
+ */
+
+/**
  * @ingroup native_cpu
  * @{
+ *
  * @file
+ * @brief Native CPU kernel_intern.h and sched.h implementation
+ *
+ * in-process preemptive context switching utilizes POSIX ucontexts.
+ * (ucontext provides for architecture independent stack handling)
+ *
  * @author  Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
+ * @author  Kaspar Schleiser <kaspar@schleiser.de>
  */
 
 #include <stdio.h>
@@ -61,23 +66,6 @@ extern netdev2_tap_t netdev2_tap;
 
 ucontext_t end_context;
 char __end_stack[SIGSTKSZ];
-
-int reboot_arch(int mode)
-{
-    (void) mode;
-
-    printf("\n\n\t\t!! REBOOT !!\n\n");
-
-#ifdef MODULE_NETDEV2_TAP
-    netdev2_tap_cleanup(&netdev2_tap);
-#endif
-
-    if (real_execve(_native_argv[0], _native_argv, NULL) == -1) {
-        err(EXIT_FAILURE, "reboot: execve");
-    }
-
-    errx(EXIT_FAILURE, "reboot: this should not have been reached");
-}
 
 /**
  * TODO: implement

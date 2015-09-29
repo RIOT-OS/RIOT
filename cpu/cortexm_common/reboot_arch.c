@@ -22,15 +22,10 @@
 
 #include <stdio.h>
 
-#include "arch/reboot_arch.h"
+#include "kernel.h"
 #include "cpu.h"
 
-int reboot_arch(int mode)
+void reboot(void)
 {
-    printf("Going into reboot, mode %i\n", mode);
-    /* wait a while to make sure the printf is finished */
-    volatile int n = 100000;
-    while(n--);
     NVIC_SystemReset();
-    return -1;
 }
