@@ -234,7 +234,11 @@ int _icmpv6_ping(int argc, char **argv)
         }
 
         vtimer_now(&start);
-        gnrc_netapi_send(ipv6_entry->pid, pkt);
+        if (gnrc_netapi_send(ipv6_entry->pid, pkt) < 1) {
+            puts("error: unable to send ICMPv6 echo request\n");
+            gnrc_pktbuf_release(pkt);
+            continue;
+        }
 
         if (vtimer_msg_receive_timeout(&msg, timeout) >= 0) {
             switch (msg.type) {

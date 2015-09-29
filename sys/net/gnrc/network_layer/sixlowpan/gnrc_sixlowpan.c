@@ -262,7 +262,10 @@ static void _send(gnrc_pktsnip_t *pkt)
     if (gnrc_pkt_len(pkt2->next) <= iface->max_frag_size) {
         DEBUG("6lo: Send SND command for %p to %" PRIu16 "\n",
               (void *)pkt2, hdr->if_pid);
-        gnrc_netapi_send(hdr->if_pid, pkt2);
+        if (gnrc_netapi_send(hdr->if_pid, pkt2) < 1) {
+            DEBUG("6lo: unable to send %p over %" PRIu16 "\n", (void *)pkt, hdr->if_pid);
+            gnrc_pktbuf_release(pkt2);
+        }
 
         return;
     }
