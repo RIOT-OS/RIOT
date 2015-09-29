@@ -26,10 +26,6 @@
 extern "C" {
 #endif
 
-/* TODO: remove once these have been removed from RIOT: */
-void dINT(void);
-void eINT(void);
-
 /**
  * @brief   Prints the last instruction's address
  */

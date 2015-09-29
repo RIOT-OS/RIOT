@@ -65,14 +65,6 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Deprecated interrupt control function for backward compatibility
- * @{
- */
-#define eINT                            enableIRQ
-#define dINT                            disableIRQ
-/** @} */
-
-/**
  * @brief   Some members of the Cortex-M family have architecture specific
  *          atomic operations in atomic_arch.c
  */
