@@ -32,8 +32,7 @@
 #include "vtimer.h"
 
 static uint16_t id = 0x53;
-static uint16_t min_seq_expected = 0;
-static uint16_t max_seq_expected = 0;
+static uint16_t _seq = 0;
 static char ipv6_str[IPV6_ADDR_MAX_STR_LEN];
 
 static void usage(char **argv)
@@ -66,17 +65,6 @@ void _set_payload(icmpv6_echo_t *hdr, size_t payload_len)
     }
 }
 
-static inline bool _expected_seq(uint16_t seq)
-{
-    /* take integer overflows in account */
-    if (min_seq_expected > max_seq_expected) {
-        return (seq >= min_seq_expected) || (seq <= max_seq_expected);
-    }
-    else {
-        return (seq >= min_seq_expected) && (seq <= max_seq_expected);
-    }
-}
-
 int _handle_reply(gnrc_pktsnip_t *pkt, uint64_t time)
 {
     gnrc_pktsnip_t *ipv6, *icmpv6;
@@ -96,11 +84,7 @@ int _handle_reply(gnrc_pktsnip_t *pkt, uint64_t time)
     icmpv6_hdr = icmpv6->data;
     seq = byteorder_ntohs(icmpv6_hdr->seq);
 
-    if ((byteorder_ntohs(icmpv6_hdr->id) == id) && _expected_seq(seq)) {
-        if (seq <= min_seq_expected) {
-            min_seq_expected++;
-        }
-
+    if ((byteorder_ntohs(icmpv6_hdr->id) == id) && (seq == _seq)) {
         timex_t rt = timex_from_uint64(time);
         printf("%u bytes from %s: id=%" PRIu16 " seq=%" PRIu16 " hop limit=%" PRIu8
                " time = %" PRIu32 ".%03" PRIu32 " ms\n", (unsigned) icmpv6->size,
@@ -194,6 +178,16 @@ int _icmpv6_ping(int argc, char **argv)
         return 1;
     }
 
+    if (ipv6_addr_is_multicast(&addr)) {
+        /* TODO: make it possible to allow that. The problem is, that this application is
+         * synchroneous (for a request there is only one reply expected), which overfills the
+         * the packet queues of the stack and leaks the packet buffer. A dedicated ICMPv6 reply
+         * handler thread would be the cleanest solution, but for this we somehow need to
+         * store information about the pings send out. */
+        puts("error: address must be unicast");
+        return 1;
+    }
+
     if (gnrc_netreg_register(GNRC_NETTYPE_ICMPV6, &my_entry) < 0) {
         puts("error: network registry is full");
         return 1;
@@ -215,8 +209,7 @@ int _icmpv6_ping(int argc, char **argv)
         gnrc_pktsnip_t *pkt;
         timex_t start, stop, timeout = { 5, 0 };
 
-        pkt = gnrc_icmpv6_echo_req_build(id, ++max_seq_expected, NULL,
-                                         payload_len);
+        pkt = gnrc_icmpv6_echo_req_build(id, ++_seq, NULL, payload_len);
 
         if (pkt == NULL) {
             puts("error: packet buffer full");
@@ -275,7 +268,7 @@ int _icmpv6_ping(int argc, char **argv)
 
     vtimer_now(&stop);
 
-    max_seq_expected = 0;
+    _seq = 0;
     id++;
     stop = timex_sub(stop, start);
 
