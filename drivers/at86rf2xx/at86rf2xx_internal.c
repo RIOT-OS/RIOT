@@ -104,3 +104,11 @@ uint8_t at86rf2xx_get_status(const at86rf2xx_t *dev)
     return (at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_STATUS)
             & AT86RF2XX_TRX_STATUS_MASK__TRX_STATUS);
 }
+
+void at86rf2xx_force_trx_off(const at86rf2xx_t *dev)
+{
+    at86rf2xx_reg_write(dev,
+                        AT86RF2XX_REG__TRX_STATE,
+                        AT86RF2XX_TRX_STATE__FORCE_TRX_OFF);
+    while (at86rf2xx_get_status(dev) != AT86RF2XX_STATE_TRX_OFF);
+}
