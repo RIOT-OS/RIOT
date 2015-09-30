@@ -499,7 +499,7 @@ overflow:
             /* check if the end of this period is very soon */
             if (_mask(now + XTIMER_ISR_BACKOFF) < now) {
                 /* spin until next period, then advance */
-                while (_xtimer_now() > now);
+                while (_xtimer_now() >= now);
                 _next_period();
                 reference = 0;
                 goto overflow;
