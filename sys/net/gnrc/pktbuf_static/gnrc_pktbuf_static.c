@@ -313,8 +313,8 @@ void gnrc_pktbuf_stats(void)
         }
         _print_chunk(chunk, size, count++);
         chunk += (size + ptr->size);
-        ptr = ptr->next;
         _print_unused(ptr);
+        ptr = ptr->next;
     }
 
     if (chunk <= &_pktbuf[GNRC_PKTBUF_SIZE - 1]) {
