@@ -85,16 +85,24 @@ void at86rf2xx_sram_write(const at86rf2xx_t *dev,
     spi_release(dev->spi);
 }
 
-void at86rf2xx_fb_read(const at86rf2xx_t *dev,
-                       uint8_t *data,
-                       const size_t len)
+void at86rf2xx_fb_start(const at86rf2xx_t *dev)
 {
     spi_acquire(dev->spi);
     gpio_clear(dev->cs_pin);
     spi_transfer_byte(dev->spi,
                       AT86RF2XX_ACCESS_FB | AT86RF2XX_ACCESS_READ,
                       NULL);
+}
+
+void at86rf2xx_fb_read(const at86rf2xx_t *dev,
+                       uint8_t *data,
+                       const size_t len)
+{
     spi_transfer_bytes(dev->spi, NULL, (char *)data, len);
+}
+
+void at86rf2xx_fb_stop(const at86rf2xx_t *dev)
+{
     gpio_set(dev->cs_pin);
     spi_release(dev->spi);
 }
