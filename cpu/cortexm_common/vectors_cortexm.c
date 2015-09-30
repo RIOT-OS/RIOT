@@ -179,7 +179,7 @@ void hard_fault_default(void)
 #define CPU_HAS_EXTENDED_FAULT_REGISTERS 1
 #endif
 
-void hard_fault_handler(uint32_t* sp, uint32_t corrupted, uint32_t exc_return, uint32_t* r4_to_r11_stack)
+__attribute__((used)) void hard_fault_handler(uint32_t* sp, uint32_t corrupted, uint32_t exc_return, uint32_t* r4_to_r11_stack)
 {
 
     /* Sanity check stack pointer and give additional feedback about hard fault */
