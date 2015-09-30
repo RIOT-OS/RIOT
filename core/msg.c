@@ -370,6 +370,22 @@ static int _msg_receive(msg_t *m, int block)
     DEBUG("This should have never been reached!\n");
 }
 
+int msg_avail(void)
+{
+    DEBUG("msg_available: %" PRIkernel_pid ": msg_available.\n",
+          sched_active_thread->pid);
+
+    tcb_t *me = (tcb_t*) sched_active_thread;
+
+    int queue_index = -1;
+
+    if (me->msg_array) {
+        queue_index = cib_avail(&(me->msg_queue));
+    }
+
+    return queue_index;
+}
+
 int msg_init_queue(msg_t *array, int num)
 {
     /* check if num is a power of two by comparing to its complement */
