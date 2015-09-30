@@ -84,24 +84,11 @@ static void _event_cb(netdev2_t *dev, netdev2_event_t event, void *data)
 
 static void _pass_on_packet(gnrc_pktsnip_t *pkt)
 {
-    gnrc_netreg_entry_t *sendto;
-
-    /* find out, who to send the packet to */
-    sendto = gnrc_netreg_lookup(pkt->type, GNRC_NETREG_DEMUX_CTX_ALL);
-
     /* throw away packet if no one is interested */
-    if (sendto == NULL) {
+    if (!gnrc_netapi_dispatch_receive(pkt->type, GNRC_NETREG_DEMUX_CTX_ALL, pkt)) {
         DEBUG("gnrc_netdev2: unable to forward packet of type %i\n", pkt->type);
         gnrc_pktbuf_release(pkt);
         return;
-    }
-
-    /* send the packet to everyone interested in it's type */
-    gnrc_pktbuf_hold(pkt, gnrc_netreg_num(pkt->type, GNRC_NETREG_DEMUX_CTX_ALL) - 1);
-    while (sendto != NULL) {
-        DEBUG("gnrc_netdev2: sending pkt %p to PID %u\n", (void*)pkt, sendto->pid);
-        gnrc_netapi_receive(sendto->pid, pkt);
-        sendto = gnrc_netreg_getnext(sendto);
     }
 }
 

@@ -834,7 +834,11 @@ int _netif_send(int argc, char **argv)
     gnrc_netif_hdr_set_dst_addr(nethdr, addr, addr_len);
     nethdr->flags = flags;
     /* and send it */
-    gnrc_netapi_send(dev, pkt);
+    if (gnrc_netapi_send(dev, pkt) < 1) {
+        puts("error: unable to send\n");
+        gnrc_pktbuf_release(pkt);
+        return 1;
+    }
 
     return 0;
 }

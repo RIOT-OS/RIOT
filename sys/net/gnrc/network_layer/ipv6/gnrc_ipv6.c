@@ -291,7 +291,10 @@ static void _send_to_iface(kernel_pid_t iface, gnrc_pktsnip_t *pkt)
         return;
     }
 #endif
-    gnrc_netapi_send(iface, pkt);
+    if (gnrc_netapi_send(iface, pkt) < 1) {
+        DEBUG("ipv6: unable to send packet\n");
+        gnrc_pktbuf_release(pkt);
+    }
 }
 
 /* functions for sending */
@@ -628,7 +631,10 @@ static void _send(gnrc_pktsnip_t *pkt, bool prep_hdr)
 
         DEBUG("ipv6: packet is addressed to myself => loopback\n");
 
-        gnrc_netapi_receive(gnrc_ipv6_pid, rcv_pkt);
+        if (gnrc_netapi_receive(gnrc_ipv6_pid, rcv_pkt) < 1) {
+            DEBUG("ipv6: unable to deliver packet\n");
+            gnrc_pktbuf_release(pkt);
+        }
     }
     else {
         uint8_t l2addr_len = GNRC_IPV6_NC_L2_ADDR_MAX;
@@ -677,7 +683,10 @@ static void _dispatch_rcv_pkt(gnrc_nettype_t type, uint32_t demux_ctx,
     while (entry) {
         DEBUG("ipv6: Send receive command for %p to %" PRIu16 "\n", (void *)pkt,
               entry->pid);
-        gnrc_netapi_receive(entry->pid, pkt);
+        if (gnrc_netapi_receive(entry->pid, pkt) < 1) {
+            DEBUG("ipv6: unable to deliver packet\n");
+            gnrc_pktbuf_release(pkt);
+        }
         entry = gnrc_netreg_getnext(entry);
     }
 }
