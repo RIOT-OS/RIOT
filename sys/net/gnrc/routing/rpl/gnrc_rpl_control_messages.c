@@ -625,8 +625,8 @@ void _dao_fill_target(gnrc_rpl_opt_target_t *target, ipv6_addr_t *addr)
 
 void gnrc_rpl_send_DAO(gnrc_rpl_dodag_t *dodag, ipv6_addr_t *destination, uint8_t lifetime)
 {
-    size_t dst_size = GNRC_RPL_PARENTS_NUMOF;
-    fib_destination_set_entry_t fib_dest_set[GNRC_RPL_PARENTS_NUMOF];
+    size_t dst_size = GNRC_IPV6_FIB_TABLE_SIZE;
+    fib_destination_set_entry_t fib_dest_set[GNRC_IPV6_FIB_TABLE_SIZE];
 
     if (dodag == NULL) {
         DEBUG("RPL: Error - trying to send DAO without being part of a dodag.\n");
