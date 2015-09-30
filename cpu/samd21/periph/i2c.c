@@ -102,14 +102,14 @@ int i2c_init_master(i2c_t dev, i2c_speed_t speed)
     PM->APBCMASK.reg |= (PM_APBCMASK_SERCOM0 << (sercom_core - 20));
 
     /* I2C using CLK GEN 0 */
-    GCLK->CLKCTRL.reg = (uint32_t)(GCLK_CLKCTRL_CLKEN
-                                   | GCLK_CLKCTRL_GEN_GCLK0 << GCLK_CLKCTRL_GEN_Pos
-                                   | (sercom_core << GCLK_CLKCTRL_ID_Pos));
+    GCLK->CLKCTRL.reg = (GCLK_CLKCTRL_CLKEN |
+                         GCLK_CLKCTRL_GEN_GCLK0 |
+                         GCLK_CLKCTRL_ID(sercom_core));
     while (GCLK->STATUS.bit.SYNCBUSY);
 
-    GCLK->CLKCTRL.reg = (uint16_t)(GCLK_CLKCTRL_CLKEN
-                                   | GCLK_CLKCTRL_GEN_GCLK0 << GCLK_CLKCTRL_GEN_Pos
-                                   | (sercom_gclk_id_slow << GCLK_CLKCTRL_ID_Pos));
+    GCLK->CLKCTRL.reg = (GCLK_CLKCTRL_CLKEN |
+                         GCLK_CLKCTRL_GEN_GCLK0 |
+                         GCLK_CLKCTRL_ID(sercom_gclk_id_slow));
     while (GCLK->STATUS.bit.SYNCBUSY);
 
 
