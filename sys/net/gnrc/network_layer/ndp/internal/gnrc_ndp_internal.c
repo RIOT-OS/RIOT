@@ -223,8 +223,9 @@ void gnrc_ndp_internal_send_nbr_adv(kernel_pid_t iface, ipv6_addr_t *tgt, ipv6_a
         /* nc_entry must be set so no need to check it */
         _send_delayed(&nc_entry->nbr_adv_timer, delay, hdr);
     }
-    else {
-        gnrc_netapi_send(gnrc_ipv6_pid, hdr);
+    else if (gnrc_netapi_send(gnrc_ipv6_pid, hdr) < 1) {
+        DEBUG("ndp internal: unable to send neighbor advertisement\n");
+        gnrc_pktbuf_release(hdr);
     }
 }
 
@@ -301,7 +302,10 @@ void gnrc_ndp_internal_send_nbr_sol(kernel_pid_t iface, ipv6_addr_t *src, ipv6_a
         gnrc_pktbuf_release(pkt);
         return;
     }
-    gnrc_netapi_send(gnrc_ipv6_pid, hdr);
+    else if (gnrc_netapi_send(gnrc_ipv6_pid, hdr) < 1) {
+        DEBUG("ndp internal: unable to send neighbor solicitation\n");
+        gnrc_pktbuf_release(hdr);
+    }
 }
 
 void gnrc_ndp_internal_send_rtr_sol(kernel_pid_t iface, ipv6_addr_t *dst)
@@ -342,7 +346,10 @@ void gnrc_ndp_internal_send_rtr_sol(kernel_pid_t iface, ipv6_addr_t *dst)
         gnrc_pktbuf_release(pkt);
         return;
     }
-    gnrc_netapi_send(gnrc_ipv6_pid, hdr);
+    else if (gnrc_netapi_send(gnrc_ipv6_pid, hdr) < 1) {
+        DEBUG("ndp internal: unable to send router solicitation\n");
+        gnrc_pktbuf_release(hdr);
+    }
 }
 
 #if (defined(MODULE_GNRC_NDP_ROUTER) || defined(MODULE_GNRC_SIXLOWPAN_ND_ROUTER))
@@ -575,7 +582,10 @@ void gnrc_ndp_internal_send_rtr_adv(kernel_pid_t iface, ipv6_addr_t *src, ipv6_a
         gnrc_pktbuf_release(pkt);
         return;
     }
-    gnrc_netapi_send(gnrc_ipv6_pid, hdr);
+    else if (gnrc_netapi_send(gnrc_ipv6_pid, hdr) < 1) {
+        DEBUG("ndp internal: unable to send router advertisement\n");
+        gnrc_pktbuf_release(hdr);
+    }
 }
 #endif
 
