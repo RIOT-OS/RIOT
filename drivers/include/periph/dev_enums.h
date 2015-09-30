@@ -151,6 +151,25 @@ enum {
     GPIO_NUMOF
 };
 
+/**
+ * @brief   Legacy definitions of I2C devices
+ */
+enum {
+#if I2C_0_EN
+    I2C_0,                  /**< I2C device 0 */
+#endif
+#if I2C_1_EN
+    I2C_1,                  /**< I2C device 1 */
+#endif
+#if I2C_2_EN
+    I2C_2,                  /**< I2C device 2 */
+#endif
+#if I2C_3_EN
+    I2C_3,                  /**< I2C device 3 */
+#endif
+    I2C_UNDEFINED           /**< Deprecated symbol, use I2C_UNDEF instead */
+};
+
 #ifdef __cplusplus
 }
 #endif
