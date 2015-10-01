@@ -35,7 +35,7 @@ unsigned int irq_arch_disable(void)
 /**
  * @brief Enable all maskable interrupts
  */
-unsigned int irq_arch_enable(void)
+__attribute__((used)) unsigned int irq_arch_enable(void)
 {
     __enable_irq();
     return __get_PRIMASK();
