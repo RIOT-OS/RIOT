@@ -1,0 +1,21 @@
+# define the cpu used by the weio board
+export CPU = lpc11u34
+
+export FLASHER =
+export DEBUGGER =
+export DEBUGSERVER =
+
+export OFLAGS = -O binary
+export HEXFILE = $(ELFFILE:.elf=.bin)
+export FFLAGS =
+export DEBUGGER_FLAGS =
+
+# define the default port depending on the host OS
+PORT_LINUX ?= /dev/ttyACM0
+PORT_DARWIN ?= $(shell ls -1 /dev/tty.SLAB_USBtoUART* | head -n 1)
+
+# setup serial terminal
+include $(RIOTBOARD)/Makefile.include.serial
+
+# include cortex defaults
+include $(RIOTBOARD)/Makefile.include.cortexm_common
