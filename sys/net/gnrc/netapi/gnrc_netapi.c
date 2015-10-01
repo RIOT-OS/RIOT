@@ -24,6 +24,9 @@
 #include "net/gnrc/pktbuf.h"
 #include "net/gnrc/netapi.h"
 
+#define ENABLE_DEBUG    (0)
+#include "debug.h"
+
 /**
  * @brief   Unified function for getting and setting netapi options
  *
@@ -63,7 +66,12 @@ static inline int _snd_rcv(kernel_pid_t pid, uint16_t type, gnrc_pktsnip_t *pkt)
     msg.type = type;
     msg.content.ptr = (void *)pkt;
     /* send message */
-    return msg_send(&msg, pid);
+    int ret = msg_try_send(&msg, pid);
+    if (ret < 1) {
+        DEBUG("gnrc_netapi: dropped message to %" PRIkernel_pid " (%s)\n", pid,
+              (ret == 0) ? "receiver queue is full" : "invalid receiver");
+    }
+    return ret;
 }
 
 int gnrc_netapi_dispatch(gnrc_nettype_t type, uint32_t demux_ctx,
