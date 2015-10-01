@@ -131,7 +131,7 @@ static ubjson_read_callback_result_t _ubjson_read_length(ubjson_cookie_t *restri
         return result;
     }
 
-    int64_t len64;
+    int64_t len64 = -1;
     ssize_t read;
     if (type == UBJSON_TYPE_INT32) {
         int32_t len32;
