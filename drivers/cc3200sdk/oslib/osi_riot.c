@@ -14,6 +14,7 @@
 
 #include "mutex.h"
 #include "thread.h"
+#include "xtimer.h"
 
 #include <osi.h>
 
@@ -454,7 +455,6 @@ OsiReturnVal_e osi_Spawn(P_OSI_SPAWN_ENTRY pEntry , void* pValue , unsigned long
 
 	msg_send(&riot_msg, sl_spawn_id);
 
-	// TODO: verify that a context_switch is not needed
 	if (sched_context_switch_request) {
 		thread_yield();
 	}
@@ -508,6 +508,7 @@ OsiReturnVal_e VStartSimpleLinkSpawnTask(unsigned long uxPriority)
 	return OSI_OK;
 }
 
+#if 0
 /*!
 	\brief 	This is the API to delete SL spawn task and delete the SL queue
 
@@ -521,6 +522,7 @@ void VDeleteSimpleLinkSpawnTask( void )
 {
 	while(1) {};
 }
+#endif
 
 /*!
 	\brief 	This function is used to create the MsgQ
@@ -539,7 +541,7 @@ OsiReturnVal_e osi_MsgQCreate(OsiMsgQ_t* 		pMsgQ ,
 			      unsigned long 		MsgSize,
 			      unsigned long		MaxMsgs)
 {
-	while(1) {}
+	*pMsgQ = malloc(sizeof(msg_t));
 
 	return OSI_OK;
 }
@@ -560,7 +562,7 @@ OsiReturnVal_e osi_MsgQDelete(OsiMsgQ_t* pMsgQ)
 		return OSI_INVALID_PARAMS;
 	}
 
-	while(1) {}
+	free(*pMsgQ);
 
     return OSI_OK;
 }
@@ -612,6 +614,7 @@ OsiReturnVal_e osi_MsgQRead(OsiMsgQ_t* pMsgQ, void* pMsg , OsiTime_t Timeout)
 	return OSI_OK;
 }
 
+#if 0
 /*!
 	\brief 	This function to call the memory de-allocation function of the FREERTOS
 
@@ -681,7 +684,7 @@ void  mem_copy(void *pDst, void *pSrc,size_t Size)
 	\note
 	\warning
 */
-
+#endif
 
 /*!
 	\brief 	This function used to suspend the task for the specified number of milli secs
@@ -692,10 +695,10 @@ void  mem_copy(void *pDst, void *pSrc,size_t Size)
 */
 void osi_Sleep(unsigned int MilliSecs)
 {
-
+	xtimer_usleep(MilliSecs*1000);
 }
 
-
+#if 0
 /*!
 	\brief 	This function used to save the OS context before sleep
 	\param	void
@@ -718,3 +721,4 @@ void osi_ContextRestore()
 {
 
 }
+#endif
