@@ -634,7 +634,7 @@ static void _send(gnrc_pktsnip_t *pkt, bool prep_hdr)
 
         if (gnrc_netapi_receive(gnrc_ipv6_pid, rcv_pkt) < 1) {
             DEBUG("ipv6: unable to deliver packet\n");
-            gnrc_pktbuf_release(pkt);
+            gnrc_pktbuf_release(rcv_pkt);
         }
     }
     else {
