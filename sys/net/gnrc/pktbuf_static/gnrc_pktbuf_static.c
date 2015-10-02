@@ -395,7 +395,7 @@ static void *_pktbuf_alloc(size_t size)
 {
     _unused_t *prev = NULL, *ptr = _first_unused;
     size = (size < sizeof(_unused_t)) ? _align(sizeof(_unused_t)) : _align(size);
-    while (ptr && size > ptr->size) {
+    while (ptr && (size > ptr->size)) {
         prev = ptr;
         ptr = ptr->next;
     }
