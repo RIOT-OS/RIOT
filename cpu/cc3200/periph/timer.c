@@ -27,12 +27,11 @@
 #include "periph_conf.h"
 #include "periph/timer.h"
 
-#include "inc/hw_types.h"
-#include "inc/hw_memmap.h"
-
-#include "inc/hw_timer.h"
-
 #include "driverlib/timer.h"
+
+#include <hw_memmap.h>
+#include <hw_timer.h>
+#include <hw_types.h>
 #include "driverlib/prcm.h"
 
 #define MAX_TIMERS TIMER_UNDEFINED

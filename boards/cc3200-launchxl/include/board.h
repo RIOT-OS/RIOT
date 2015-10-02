@@ -37,7 +37,7 @@ extern "C" {
 #define GREEN_LED 10
 #define YELLOW_LED 9
 #define PUSH1 3
-#define PUSH2 11
+#define PUSH2 11 // SW3
 
 #define DEBUG_PIN 10 // P1.10 on launchpad (bottom pin on left side)
 

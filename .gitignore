@@ -13,6 +13,7 @@ doc/doxygen/*.tmp
 *~
 *.orig
 *.old
+*.sav
 .*.swp
 cachegrind.out*
 # Eclipse workspace files
@@ -35,6 +36,8 @@ eclipsesym.xml
 .launches
 targetConfigs
 .gitignore
+/Debug
+/Release
 
 #log files
 *.log

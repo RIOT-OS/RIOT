@@ -264,12 +264,119 @@ int uart_read_blocking(uart_t uart, char *data)
     return 1;
 }
 
+//*****************************************************************************
+//
+//! Get the Command string from UART
+//!
+//! \param  pucBuffer is the command store to which command will be populated
+//! \param  ucBufLen is the length of buffer store available
+//!
+//! \return Length of the bytes received. -1 if buffer length exceeded.
+//!
+//*****************************************************************************
+int uart_read_line(uart_t uart, char *pcBuffer, unsigned int uiBufLen)
+{
+    char cChar;
+    int iLen = 0;
+    unsigned long CONSOLE;
+
+    switch (uart) {
+#if UART_0_EN
+        case UART_0:
+            CONSOLE = UARTA0_BASE;
+            break;
+#endif
+#if UART_1_EN
+        case UART_1:
+            CONSOLE = UARTA1_BASE;
+            break;
+#endif
+
+        default:
+            return -1;
+    }
+
+    //
+    // Wait to receive a character over UART
+    //
+    while(MAP_UARTCharsAvail(CONSOLE) == false)
+    {
+#if defined(USE_FREERTOS) || defined(USE_TI_RTOS)
+    	osi_Sleep(1);
+#endif
+    }
+    cChar = MAP_UARTCharGetNonBlocking(CONSOLE);
+
+    //
+    // Echo the received character
+    //
+    MAP_UARTCharPut(CONSOLE, cChar);
+    iLen = 0;
+
+    //
+    // Checking the end of Command
+    //
+    while((cChar != '\r') && (cChar !='\n') )
+    {
+        //
+        // Handling overflow of buffer
+        //
+        if(iLen >= uiBufLen)
+        {
+            return -1;
+        }
+
+        //
+        // Copying Data from UART into a buffer
+        //
+        if(cChar != '\b')
+        {
+            *(pcBuffer + iLen) = cChar;
+            iLen++;
+        }
+        else
+        {
+            //
+            // Deleting last character when you hit backspace
+            //
+            if(iLen)
+            {
+                iLen--;
+            }
+        }
+        //
+        // Wait to receive a character over UART
+        //
+        while(MAP_UARTCharsAvail(CONSOLE) == false)
+        {
+#if defined(USE_FREERTOS) || defined(USE_TI_RTOS)
+        	osi_Sleep(1);
+#endif
+        }
+        cChar = MAP_UARTCharGetNonBlocking(CONSOLE);
+        //
+        // Echo the received character
+        //
+        MAP_UARTCharPut(CONSOLE, cChar);
+    }
+
+    *(pcBuffer + iLen) = '\0';
+
+    //Report("\n\r");
+    MAP_UARTCharPut(CONSOLE, '\n');
+    MAP_UARTCharPut(CONSOLE, '\r');
+
+    return iLen;
+}
+
+
 int uart_write_blocking(uart_t uart, char data)
 {
     MAP_UARTCharPut(UARTA0_BASE, data);
 
     return 1;
 }
+
 
 void uart_poweron(uart_t uart)
 {

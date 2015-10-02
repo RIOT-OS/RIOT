@@ -269,8 +269,12 @@ void GPIOXIntHandler(uint32_t base, void (**funcs)(void*), void **arg)
 	for (i=0; i<8; i++, isr>>=1) {
 		if ((isr & 0x1) == 0)
 			continue;
-		if (funcs[i])
+		if (funcs[i]) {
 			funcs[i](arg[i]);
+			if (sched_context_switch_request) {
+				thread_yield();
+			}
+		}
 	}
 }
 

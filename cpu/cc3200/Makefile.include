@@ -1,7 +1,7 @@
 export CPU_ARCH := cortex-m4
 
 # Include cc3200 driverlib specific includes:
-export INCLUDES += -I$(RIOTCPU)/$(CPU)
+export INCLUDES += -I$(RIOTBASE)/drivers/cc3200sdk
 
 DEFAULT_MODULE += driverlib
 

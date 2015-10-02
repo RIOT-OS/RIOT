@@ -20,10 +20,9 @@
 #ifndef CPU_INCLUDE_CC3200_H_
 #define CPU_INCLUDE_CC3200_H_
 
-#include "inc/hw_types.h"
-#include "inc/hw_ints.h"
-#include "inc/hw_memmap.h"
-
+#include "../inc/hw_ints.h"
+#include "../inc/hw_memmap.h"
+#include "../inc/hw_types.h"
 #include "driverlib/rom_map.h"
 #include "driverlib/interrupt.h"
 #include "driverlib/uart.h"
