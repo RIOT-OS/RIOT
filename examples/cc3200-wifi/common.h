@@ -58,7 +58,7 @@ extern "C"
 // SimpleLink device will connect to following AP when application is executed
 //
 
-//#error "configure wifi security keys"
+#error "configure wifi security keys"
 
 /* AP SSID */
 #define SSID_NAME           "<YOUR SSID_NAME>"
