@@ -272,6 +272,14 @@ int _icmpv6_ping(int argc, char **argv)
             puts("ping timeout");
         }
 
+        while(msg_try_receive(&msg) > 0) {
+            if (msg.type == GNRC_NETAPI_MSG_TYPE_RCV) {
+                printf("dropping additional response packet (probably caused by duplicates)\n");
+                gnrc_pktsnip_t *pkt = (gnrc_pktsnip_t *)msg.content.ptr;
+                gnrc_pktbuf_release(pkt);
+            }
+        }
+
         if (remaining > 0) {
             vtimer_sleep(delay);
         }
