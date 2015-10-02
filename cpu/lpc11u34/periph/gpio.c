@@ -28,7 +28,7 @@ typedef struct {
 } gpio_state_t;
 
 /* Static IOCON registers definition */
-volatile uint32_t * const lpc_pin_registersS[] = {
+volatile uint32_t * const lpc_pin_registers[] = {
     /* PORT 0 (PIO0_0 -> PIO0_23) */
     &LPC_IOCON->RESET_PIO0_0,  &LPC_IOCON->PIO0_1,
     &LPC_IOCON->PIO0_2,        &LPC_IOCON->PIO0_3,
@@ -280,16 +280,16 @@ int gpio_init(gpio_t dev, gpio_dir_t dir, gpio_pp_t pullup)
     pin = gpio_pin_map[dev];
 
     /* Put pin in the primary function */
-    *lpc_pin_registersS[pin + (port * 24)] = *lpc_pin_registersS[pin + (port * 24)] & ~(0x07);
+    *lpc_pin_registers[pin + (port * 24)] = *lpc_pin_registers[pin + (port * 24)] & ~(0x07);
 
     /* Disable resistors */
-    *lpc_pin_registersS[pin + (port * 24)] &= ~(3 << 3);
+    *lpc_pin_registers[pin + (port * 24)] &= ~(3 << 3);
     /* Set resistors */
     if (pullup == GPIO_PULLUP) {
-        *lpc_pin_registersS[pin + (port * 24)] |= (2 << 3);
+        *lpc_pin_registers[pin + (port * 24)] |= (2 << 3);
     }
     else if (pullup == GPIO_PULLDOWN) {
-        *lpc_pin_registersS[pin + (port * 24)] |= (1 << 3);
+        *lpc_pin_registers[pin + (port * 24)] |= (1 << 3);
     }
 
     /* Set direction */
