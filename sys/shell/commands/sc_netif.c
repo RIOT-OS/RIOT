@@ -649,7 +649,6 @@ static int _netif_add(char *cmd_name, kernel_pid_t dev, int argc, char **argv)
     } type = _UNICAST;
     char *addr_str = argv[0];
     ipv6_addr_t addr;
-    ipv6_addr_t *assigned_address;
     uint8_t prefix_len;
 
     if (argc > 1) {
@@ -683,11 +682,9 @@ static int _netif_add(char *cmd_name, kernel_pid_t dev, int argc, char **argv)
         return 1;
     }
 
-    if ((assigned_address = gnrc_ipv6_netif_add_addr(dev, &addr, prefix_len,
-                                                    (type == _ANYCAST) ?
-                                                    GNRC_IPV6_NETIF_ADDR_FLAGS_NON_UNICAST :
-                                                    GNRC_IPV6_NETIF_ADDR_FLAGS_UNICAST))
-                           == NULL) {
+    if (gnrc_ipv6_netif_add_addr(dev, &addr, prefix_len, (type == _ANYCAST) ?
+                                 GNRC_IPV6_NETIF_ADDR_FLAGS_NON_UNICAST :
+                                 GNRC_IPV6_NETIF_ADDR_FLAGS_UNICAST) == NULL) {
         printf("error: unable to add IPv6 address\n");
         return 1;
     }
