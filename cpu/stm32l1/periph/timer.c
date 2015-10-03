@@ -43,7 +43,7 @@ static inline TIM_TypeDef *_tim(tim_t dev)
     return timer_config[dev].dev;
 }
 
-int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
+int timer_init(tim_t dev, unsigned long freq, void (*callback)(int))
 {
     TIM_TypeDef *tim;
 
@@ -64,7 +64,7 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
     tim->SR = 0;
     /* configure reload and pre-scaler values */
     tim->ARR = 0xffffffff;
-    tim->PSC = (((CLOCK_CORECLOCK / 1000000) * ticks_per_us) - 1);
+    tim->PSC = (CLOCK_CORECLOCK / freq) - 1;
     /* trigger update event to make pre-scaler value effective */
     tim->EGR = TIM_EGR_UG;
     /* enable interrupts and start the timer */
