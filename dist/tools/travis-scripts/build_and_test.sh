@@ -64,11 +64,13 @@ then
 
     if [ "$BUILDTEST_MCU_GROUP" == "x86" ]
     then
-        make -C ./tests/unittests all test BOARD=native || exit
+        echo "would execute unit tests"
+        #make -C ./tests/unittests all test BOARD=native || exit
         # TODO:
         #   Reenable once https://github.com/RIOT-OS/RIOT/issues/2300 is
         #   resolved:
         #   - make -C ./tests/unittests all test BOARD=qemu-i386 || exit
     fi
-    ./dist/tools/compile_test/compile_test.py riot/master
+    echo "would execute build tests"
+    #./dist/tools/compile_test/compile_test.py riot/master
 fi
