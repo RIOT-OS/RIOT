@@ -56,7 +56,7 @@ static inline int _is_set(xtimer_t *timer)
 void xtimer_init(void)
 {
     /* initialize low-level timer */
-    timer_init(XTIMER, (1 << XTIMER_SHIFT) /* us_per_tick */, _periph_timer_callback);
+    timer_init(XTIMER, (1000000ul >> XTIMER_SHIFT), _periph_timer_callback);
 
     /* register initial overflow tick */
     _lltimer_set(0xFFFFFFFF);
