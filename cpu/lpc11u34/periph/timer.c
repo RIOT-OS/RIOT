@@ -50,7 +50,7 @@ typedef struct {
  */
 static timer_conf_t config[TIMER_NUMOF];
 
-int timer_init(tim_t dev, unsigned int us_per_tick, void (*callback)(int))
+int timer_init(tim_t dev, unsigned long freq, void (*callback)(int))
 {
     if (dev == TIMER_0) {
         /* save callback */
@@ -60,7 +60,7 @@ int timer_init(tim_t dev, unsigned int us_per_tick, void (*callback)(int))
         /* set to timer mode */
         TIMER_0_DEV->CTCR = 0;
         /* configure prescaler */
-        TIMER_0_DEV->PR = (us_per_tick * TIMER_0_PRESCALER);
+        TIMER_0_DEV->PR = (TIMER_0_FREQ / freq) - 1;
         /* configure and enable timer interrupts */
         NVIC_SetPriority(TIMER_0_IRQ, TIMER_IRQ_PRIO);
         NVIC_EnableIRQ(TIMER_0_IRQ);
