@@ -74,11 +74,14 @@ void native_isr_timer(void)
     _callback(0);
 }
 
-int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
+int timer_init(tim_t dev, unsigned long freq, void (*callback)(int))
 {
-    (void)ticks_per_us;
+    (void)freq;
     DEBUG("%s\n", __func__);
     if (dev >= TIMER_NUMOF) {
+        return -1;
+    }
+    if (freq != NATIVE_TIMER_SPEED) {
         return -1;
     }
 
