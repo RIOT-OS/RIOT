@@ -52,7 +52,7 @@
 #define TIMER_0_DEV_0       TIM2
 #define TIMER_0_DEV_1       TIM3
 #define TIMER_0_CHANNELS    4
-#define TIMER_0_PRESCALER   (72U)
+#define TIMER_0_FREQ        (CLOCK_CORECLOCK)
 #define TIMER_0_MAX_VALUE   (0xffff)
 #define TIMER_0_CLKEN()     (RCC->APB1ENR |= (RCC_APB1ENR_TIM2EN | RCC_APB1ENR_TIM3EN))
 #define TIMER_0_ISR_0       isr_tim2
