@@ -32,7 +32,7 @@
 #endif
 
 #define MAX_CHANNELS        (10U)
-#define TIM_SPEED           (1U)        /* try to run with 1MHz */
+#define TIM_SPEED           (1000000ul) /* try to run with 1MHz */
 #define CHAN_OFFSET         (5000U)     /* fire every 5ms */
 
 static volatile int fired;
