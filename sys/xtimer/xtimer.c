@@ -31,6 +31,9 @@
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
+#if ENABLE_DEBUG
+#include <inttypes.h>
+#endif
 
 void _xtimer_set_ticks(xtimer_t *timer, uint32_t offset);
 void _xtimer_set_ticks64(xtimer_t *timer, uint32_t offset, uint32_t long_offset);
@@ -69,7 +72,6 @@ void xtimer_usleep_until(uint32_t *last_wakeup_us, uint32_t interval) {
     timer.arg = (void*) &mutex;
 
     uint32_t target = last_wakeup + _xtimer_us_to_ticks(interval);
-
     uint32_t now = _xtimer_now_ticks();
     /* make sure we're not setting a value in the past */
     if (now < last_wakeup) {
@@ -82,25 +84,16 @@ void xtimer_usleep_until(uint32_t *last_wakeup_us, uint32_t interval) {
         goto out;
     }
 
-    /* For large offsets, set an absolute target time, as
-     * it is more exact.
-     *
-     * As that might cause an underflow, for small offsets,
-     * use a relative offset, as that can never underflow.
-     *
-     * For very small offsets, spin.
+    /* For large offsets, set an absolute target time.
+     * As that might cause an underflow, for small offsets, spin.
      */
     uint32_t offset = target - now;
 
+    DEBUG("xuu, now: %9" PRIu32 ", tgt: %9" PRIu32 ", off: %9" PRIu32 "\n", now, target, offset);
     if (offset > (XTIMER_BACKOFF * 2)) {
         mutex_lock(&mutex);
-        if (offset >> 9) { /* >= 512 */
-            offset = target;
-        }
-        else {
-            offset += _xtimer_now_ticks();
-        }
-        _xtimer_set_absolute_ticks(&timer, offset);
+        DEBUG("xuu, abs: %" PRIu32 "\n", target);
+        _xtimer_set_absolute_ticks(&timer, target);
         mutex_lock(&mutex);
     }
     else {
