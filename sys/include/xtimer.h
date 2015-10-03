@@ -394,6 +394,25 @@ int xtimer_msg_receive_timeout64(msg_t *msg, uint64_t us);
 #define XTIMER_USLEEP_UNTIL_OVERHEAD 10
 #endif
 
+#if XTIMER_MASK
+#ifndef XTIMER_SHIFT_ON_COMPARE
+/**
+ * @brief ignore some bits when comparing timer values
+ *
+ * (only relevant when XTIMER_MASK != 0, e.g., timers < 32bit.)
+ *
+ * When combining _lltimer_now_ticks() and _high_cnt, we have to get the same
+ * value in order to work around a race between overflowing _xtimer_now() and
+ * OR'ing the resulting values.
+ * But some platforms are too slow to get the same timer value twice, so we use
+ * this define to ignore some of the bits.
+ *
+ * Use tests/xtimer_shift_on_compare to find the correct value for your MCU.
+ */
+#define XTIMER_SHIFT_ON_COMPARE     (0)
+#endif
+#endif
+
 #ifndef XTIMER_HZ
 /**
  * @brief Tick rate of the underlying hardware timer.
@@ -509,33 +528,6 @@ static inline uint32_t _lltimer_mask(uint32_t val)
 {
     return val & ~XTIMER_MASK_SHIFTED;
 }
-
-
-#if XTIMER_MASK
-#ifndef XTIMER_SHIFT_ON_COMPARE
-/**
- * @brief ignore some bits when comparing timer values
- *
- * (only relevant when XTIMER_MASK != 0, e.g., timers < 32bit.)
- *
- * When combining _lltimer_now() and _high_cnt, we have to get the same value in
- * order to work around a race between overflowing _lltimer_now() and OR'ing the
- * resulting values.
- * But some platforms are too slow to get the same timer
- * value twice, so we use this define to ignore some of the bits.
- *
- * Use tests/xtimer_shift_on_compare to find the correct value for your MCU.
- */
-#define XTIMER_SHIFT_ON_COMPARE     (0)
-#endif
-#endif
-
-#ifndef XTIMER_MIN_SPIN
-/**
- * @brief Minimal value xtimer_spin() can spin
- */
-#define XTIMER_MIN_SPIN (1<<XTIMER_SHIFT)
-#endif
 
 static inline uint32_t xtimer_now(void)
 {
