@@ -135,6 +135,44 @@ static inline int atomic_set_to_zero(atomic_int_t *var)
 }
 
 /**
+ * @brief  Set var to (var & val) atomically and return the old value.
+ *
+ * @param[inout]  var   Pointer to atomic variable
+ * @param[in]     val   Value to AND
+ *
+ * @return The value of *var* before the operation.
+ */
+static inline int atomic_and(atomic_int_t *var, int val)
+{
+    int old;
+
+    do {
+        old = var->value;
+    } while (!atomic_cas(var, old, old & val));
+
+    return old;
+}
+
+/**
+ * @brief  Set var to (var | val) atomically and return the old value.
+ *
+ * @param[inout]  var   Pointer to atomic variable
+ * @param[in]     val   Value to OR
+ *
+ * @return The value of *var* before the operation.
+ */
+static inline int atomic_or(atomic_int_t *var, int val)
+{
+    int old;
+
+    do {
+        old = var->value;
+    } while (!atomic_cas(var, old, old | val));
+
+    return old;
+}
+
+/**
  * @brief Get the value of an atomic int
  *
  * @param[in]  var   Atomic variable
