@@ -39,7 +39,7 @@ typedef struct {
 timer_conf_t config[TIMER_NUMOF];
 
 
-int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
+int timer_init(tim_t dev, unsigned long freq, void (*callback)(int))
 {
     TIM_TypeDef *timer;
 
@@ -52,7 +52,7 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
             NVIC_SetPriority(TIMER_0_IRQ_CHAN, TIMER_IRQ_PRIO);
             /* select timer */
             timer = TIMER_0_DEV;
-            timer->PSC = TIMER_0_PRESCALER * ticks_per_us;
+            timer->PSC = (TIMER_0_FREQ / freq) - 1;
             break;
 #endif
 #if TIMER_1_EN
@@ -63,7 +63,7 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
             NVIC_SetPriority(TIMER_1_IRQ_CHAN, TIMER_IRQ_PRIO);
             /* select timer */
             timer = TIMER_1_DEV;
-            timer->PSC = TIMER_1_PRESCALER * ticks_per_us;
+            timer->PSC = (TIMER_1_FREQ / freq) - 1;
             break;
 #endif
         case TIMER_UNDEFINED:
