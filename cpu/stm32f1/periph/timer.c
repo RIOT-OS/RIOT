@@ -45,7 +45,7 @@ typedef struct {
  */
 static timer_conf_t config[TIMER_NUMOF];
 
-int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
+int timer_init(tim_t dev, unsigned long freq, void (*callback)(int))
 {
     TIM_TypeDef *timer0;
     TIM_TypeDef *timer1;
@@ -95,7 +95,7 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
     timer0->CR2 |= TIM_CR2_MMS_1;
     /* set auto-reload and prescaler values and load new values */
     timer0->ARR = 0xFFFF;
-    timer0->PSC = TIMER_0_PRESCALER * ticks_per_us;
+    timer0->PSC = (TIMER_0_FREQ / freq) - 1;
     // timer->EGR |= TIM_EGR_UG;
 
     /* configure slave timer1 */
