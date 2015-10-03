@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2014 Freie Universität Berlin
- * Copyright (C) 2015 PHYTEC Messtechnik GmbH
+ * Copyright (C) 2014-2015 PHYTEC Messtechnik GmbH
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -57,10 +57,10 @@ inline static void pit_timer_stop(uint8_t ch)
 }
 
 /** use channel n-1 as prescaler */
-inline static void timer_set_prescaler(uint8_t ch, unsigned int ticks_per_us)
+inline static void timer_set_prescaler(uint8_t ch, unsigned long freq)
 {
     TIMER_BASE->CHANNEL[ch].TCTRL = 0x0;
-    TIMER_BASE->CHANNEL[ch].LDVAL = (TIMER_CLOCK / 1e6) / ticks_per_us - 1;
+    TIMER_BASE->CHANNEL[ch].LDVAL = (TIMER_CLOCK / freq) - 1;
     TIMER_BASE->CHANNEL[ch].TCTRL = (PIT_TCTRL_TEN_MASK);
 }
 
@@ -84,7 +84,7 @@ inline static void pit_timer_set_max(uint8_t ch)
     pit_timer_start(ch);
 }
 
-int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
+int timer_init(tim_t dev, unsigned long freq, void (*callback)(int))
 {
     /* enable timer peripheral clock */
     TIMER_CLKEN();
@@ -97,7 +97,7 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
 
         case TIMER_0:
             NVIC_SetPriority(TIMER_0_IRQ_CHAN, TIMER_IRQ_PRIO);
-            timer_set_prescaler(TIMER_0_PRESCALER_CH, ticks_per_us);
+            timer_set_prescaler(TIMER_0_PRESCALER_CH, freq);
             timer_set_counter(TIMER_0_COUNTER_CH);
             break;
 #endif
@@ -105,7 +105,7 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
 
         case TIMER_1:
             NVIC_SetPriority(TIMER_1_IRQ_CHAN, TIMER_IRQ_PRIO);
-            timer_set_prescaler(TIMER_1_PRESCALER_CH, ticks_per_us);
+            timer_set_prescaler(TIMER_1_PRESCALER_CH, freq);
             timer_set_counter(TIMER_1_COUNTER_CH);
             break;
 #endif
