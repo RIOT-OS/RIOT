@@ -15,6 +15,7 @@
  *
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  * @author      René Kijewski <rene.kijewski@fu-berlin.de>
+ * @author      Oliver Hahm <oliver.hahm@inria.fr>
  *
  * @}
  */
@@ -23,6 +24,7 @@
 
 #include "cpu_conf.h"
 #include "thread.h"
+#include "xtimer.h"
 
 #define THREAD1_STACKSIZE   (THREAD_STACKSIZE_MAIN)
 #define THREAD2_STACKSIZE   (THREAD_STACKSIZE_MAIN)
@@ -56,6 +58,7 @@ static void *thread1(void *args)
             success = 0;
             break;
         }
+        xtimer_usleep(200);
     }
 
     if (success) {
