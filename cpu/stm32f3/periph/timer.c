@@ -39,7 +39,7 @@ typedef struct {
 timer_conf_t config[TIMER_NUMOF];
 
 
-int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
+int timer_init(tim_t dev, unsigned long freq, void (*callback)(int))
 {
     TIM_TypeDef *timer;
 
@@ -67,7 +67,7 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
     timer->CR2 = 0;
 
     /* set auto-reload and prescaler values and load new values */
-    timer->PSC = TIMER_0_PRESCALER * ticks_per_us;
+    timer->PSC = (TIMER_0_FREQ / freq) - 1;
     timer->EGR |= TIM_EGR_UG;
 
     /* enable the timer's interrupt */
