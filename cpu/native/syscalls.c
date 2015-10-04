@@ -134,8 +134,25 @@ void _native_syscall_leave(void)
     }
 }
 
+int _native_in_malloc = 0;
 void *malloc(size_t size)
 {
+    /* dynamically load malloc when it's needed - this is necessary to
+     * support g++ 5.2.0 as it uses malloc before startup runs */
+    if (!real_malloc) {
+        if (_native_in_malloc) {
+            /* XXX: This is a dirty hack for behaviour that came along
+             * with g++ 5.2.0.
+             * Throw it out when whatever made it necessary it is fixed. */
+            return NULL;
+        }
+        else {
+            _native_in_malloc = 1;
+            *(void **)(&real_malloc) = dlsym(RTLD_NEXT, "malloc");
+            _native_in_malloc = 0;
+        }
+    }
+
     void *r;
     _native_syscall_enter();
     r = real_malloc(size);
