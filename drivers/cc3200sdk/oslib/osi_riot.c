@@ -35,6 +35,8 @@
 
 #define THREAD_STACKSIZE_SLSPAWN 2048
 
+#define QUEUE_SIZE_SLSPAWN (8U)
+
 typedef struct osi_task_list {
 	char* stack;
 	uint8_t busy;
@@ -44,6 +46,20 @@ static kernel_pid_t sl_spawn_id;
 
 //Local function definition
 static void vSimpleLinkSpawnTask( void *pvParameters );
+
+int init_queue(kernel_pid_t tid, msg_t *array, int num)
+{
+    /* check if num is a power of two by comparing to its complement */
+    if (num && (num & (num - 1)) == 0) {
+        tcb_t *me = (tcb_t*) thread_get(tid);
+        me->msg_array = array;
+        cib_init(&(me->msg_queue), num);
+        return 0;
+    }
+
+    return -1;
+}
+
 
 /*!
 	\brief 	This function registers an interrupt in NVIC table
@@ -309,11 +325,24 @@ OsiReturnVal_e osi_TaskCreate(P_OSI_TASK_ENTRY pEntry,const signed char * const 
                               unsigned long uxPriority,OsiTaskHandle* pTaskHandle)
 {
 	char *stack;
+	msg_t *msg_queue;
+
+	kernel_pid_t tid;
+	tcb_t *cb;
+
 	stack = malloc(usStackDepth);
 
-	if(thread_create(stack, usStackDepth,
-			uxPriority, CREATE_STACKTEST, (thread_task_func_t)pEntry, pvParameters, (const char*)pcName))
+	tid = thread_create(stack, usStackDepth,
+			uxPriority, CREATE_STACKTEST, (thread_task_func_t)pEntry, pvParameters, (const char*)pcName);
+	if(tid)
 	{
+		msg_queue = malloc(sizeof(msg_t)*QUEUE_SIZE_SLSPAWN);
+		init_queue(tid, msg_queue, QUEUE_SIZE_SLSPAWN);
+		if (pTaskHandle) {
+			cb = (tcb_t *) (stack + usStackDepth - sizeof(tcb_t));
+			cb->stack_start = stack;
+			*pTaskHandle = cb;
+		}
 		return OSI_OK;
 	}
 
@@ -333,7 +362,14 @@ OsiReturnVal_e osi_TaskCreate(P_OSI_TASK_ENTRY pEntry,const signed char * const 
 */
 void osi_TaskDelete(OsiTaskHandle* pTaskHandle)
 {
-	while(1) {};
+	tcb_t *tcb = *pTaskHandle;
+
+	if(pTaskHandle == NULL) {
+		return;
+	}
+
+	free(tcb->msg_array);
+	free(tcb->stack_start);
 }
 
 
@@ -473,8 +509,11 @@ OsiReturnVal_e osi_Spawn(P_OSI_SPAWN_ENTRY pEntry , void* pValue , unsigned long
 */
 void vSimpleLinkSpawnTask(void *pvParameters)
 {
-	msg_t msg;
+	msg_t msg, msg_queue[QUEUE_SIZE_SLSPAWN];
 	tSimpleLinkSpawnMsg* msg_ptr;
+
+    /* setup the mqttclient message queue */
+    msg_init_queue(msg_queue, QUEUE_SIZE_SLSPAWN);
 
 	for(;;) {
 		msg_receive(&msg);

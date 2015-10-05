@@ -127,7 +127,7 @@ static const unsigned long g_pulFMPRERegs[] =
 //
 //*****************************************************************************
 void
-FlashDisable()
+FlashDisable(void)
 {
 
   //
@@ -281,7 +281,7 @@ FlashEraseNonBlocking(unsigned long ulAddress)
 //
 //*****************************************************************************
 long
-FlashMassErase()
+FlashMassErase(void)
 {
     //
     // Clear the flash access and error interrupts.
@@ -331,7 +331,7 @@ FlashMassErase()
 //
 //*****************************************************************************
 void
-FlashMassEraseNonBlocking()
+FlashMassEraseNonBlocking(void)
 {
     //
     // Clear the flash access and error interrupts.

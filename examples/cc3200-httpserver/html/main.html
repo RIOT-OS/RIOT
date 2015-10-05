@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+
+<!--[if lte IE 9 ]> <html class="ie"> <![endif]-->
+<!--[if (gt IE 9)|!(IE)]><!--> <html> <!--<![endif]-->
+
+<head>
+<title>SimpleLink(TM) - CC3xxx - TI WiFi On Chip</title>
+<link rel="stylesheet" type="text/css" href="simple_link.css" >
+
+<script>
+
+function myTrim(x) //needed for IE8 and earlier
+{
+ return x.replace(/^\s+|\s+$/gm,'');
+}
+
+function ShowBarInSafeMode()
+{
+	if (myTrim(document.getElementById("safe_status").innerHTML)=="Safe Mode")
+	{
+		document.getElementById("safe_bar").style.visibility="visible";
+	}
+	else
+	{
+	 	document.getElementById("safe_bar").style.visibility="hidden";
+	}
+
+}
+
+function RemoveAllProfiles()
+{
+
+	if (confirm("Warning!\nYou are about to remove all configured profiles...\nDo you wish to proceed?\n"))
+	{
+		var xmlhttp;
+		
+		if (window.XMLHttpRequest)
+		  {// code for IE7+, Firefox, Chrome, Opera, Safari
+			xmlhttp=new XMLHttpRequest();
+		  }
+		else
+		  {// code for IE6, IE5
+			xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+		  }
+		  
+		xmlhttp.onreadystatechange= function()
+		  {
+			if (xmlhttp.readyState==4) 
+			{
+				if ((xmlhttp.status==200) || (xmlhttp.status==204) || (xmlhttp.status==302) || (xmlhttp.status==1223))
+				{
+					location.reload(true);
+				}
+			}		  
+		  }
+		  
+		xmlhttp.open("POST","remove_all_profiles",true);
+		xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+		xmlhttp.send("remove_profiles=remove"); //Name and value not important since NWP check only the action in this case
+	}
+}
+</script>
+
+</head>
+
+<body>
+
+<div id="safe_status" style="display: none" > __SL_G_S.K
+</div>
+
+<div id="safe_bar" style="visibility: hidden">
+ <div class="safe_bar_style">
+	<div class="safe-text"> Safe Mode </div> 
+	<div> <button class="safe-button" type="button" onclick="RemoveAllProfiles()" >Reset All Profiles</button> </div>
+</div>
+</div>
+
+<div class="navbar">
+		<ul class="navbar-menu">
+			<li><a href="main.html">__SL_G_S.H</a></li>
+			<li><a href="status.html" target="config_frame">Status</a></li>
+			<li><a href="dev_config.html" target="config_frame">Device Config</a></li>
+			<li><a href="ip_config.html" target="config_frame">IP Config</a></li>
+			<li><a href="profiles_config.html" target="config_frame">Profiles</a></li>
+			<li><a href="tools.html" target="config_frame">Tools</a></li>
+			<li><a href="led_demo.html" target="config_frame">Demo</a></li>
+		</ul>	
+</div>
+
+<div class ="iframe" >
+		<iframe width="100%" height="1470"name="config_frame" src="status.html" frameborder="0">
+		  <p>Your browser does not support iframes.</p>
+		</iframe>
+</div>
+
+<script>
+ShowBarInSafeMode();
+</script>
+</body>
+</html>

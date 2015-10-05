@@ -16,9 +16,9 @@
  * @author      Attilio Dona' <@attiliodona>
  */
 
-#include <hw_ints.h>
-#include <hw_memmap.h>
-#include <hw_types.h>
+#include <inc/hw_ints.h>
+#include <inc/hw_memmap.h>
+#include <inc/hw_types.h>
 #include <stdio.h>
 
 #include "driverlib/rom_map.h"

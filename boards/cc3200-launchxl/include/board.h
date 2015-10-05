@@ -41,6 +41,22 @@ extern "C" {
 
 #define DEBUG_PIN 10 // P1.10 on launchpad (bottom pin on left side)
 
+
+/*
+ * for easy porting of TI examples
+ */
+#define GPIO_IF_LedOn     gpio_set
+#define GPIO_IF_LedOff    gpio_clear
+#define GPIO_IF_LedStatus gpio_read
+
+#define MCU_RED_LED_GPIO    RED_LED
+#define MCU_GREEN_LED_GPIO  GREEN_LED
+
+// sometimes I suspect to be daltonic
+#define MCU_ORANGE_LED_GPIO YELLOW_LED
+
+#define Report printf
+
 /**
  * Define the nominal CPU core clock in this board
  */

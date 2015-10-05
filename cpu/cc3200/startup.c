@@ -36,8 +36,8 @@
 //
 //*****************************************************************************
 
-#include <hw_nvic.h>
-#include <hw_types.h>
+#include <inc/hw_nvic.h>
+#include <inc/hw_types.h>
 #include <stdint.h>
 #include "kernel_internal.h"
 #include "periph_conf.h"

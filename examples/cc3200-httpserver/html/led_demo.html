@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+
+<!--[if lte IE 9 ]> <html class="ie"> <![endif]-->
+<!--[if (gt IE 9)|!(IE)]><!--> <html> <!--<![endif]-->
+
+<head>
+<style>
+
+.lightSwitch {
+    background: url("images/demo-lightswitch.jpg") no-repeat scroll 0 -72px rgba(0, 0, 0, 0);    
+    height: 70px;
+    width: 30px;    
+}
+.lightOn {
+    margin-top: -10px; 
+   }
+.lightOff{
+margin-top: 0px;
+}
+.lightOn, .lightOff{
+    
+    cursor:pointer;
+    font-weight:bold;
+}
+
+</style>
+<link rel="stylesheet" type="text/css" href="simple_link.css">
+<script type="text/javascript">
+var HTTPrequest = new XMLHttpRequest();
+function UpdateStatus()
+{
+    var status = "__SL_G_ULD";
+	if(status.indexOf("LED1_ON") > -1)
+		document.getElementById("LEDno1").checked = true;
+	else
+		document.getElementById("LEDno1").checked = false;
+	if(status.indexOf("LED2_ON") > -1)
+		document.getElementById("LEDno2").checked = true;
+	else
+		document.getElementById("LEDno2").checked = false;
+}
+function ToggleLED(whichOne)
+{
+var LEDnum = "1";
+var params = "__SL_P_ULD=LED"+LEDnum;
+	if (whichOne == "on") 
+		params = params+"_ON";
+	else
+		params = params+"_OFF";
+	HTTPrequest.open("POST","No_content", true);
+	HTTPrequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	HTTPrequest.setRequestHeader("Content-length", params.length);
+	HTTPrequest.setRequestHeader("Connection", "close");
+	HTTPrequest.onreadystatechange = function()
+	{
+		if (HTTPrequest.readyState==4 && HTTPrequest.status==200)
+		{
+		}
+	}
+	HTTPrequest.send(params);
+
+}
+
+function toggleSwitch (whichOne) {
+	
+	var toggle = "lightSwitch";
+	var lightImage = "light";
+	if (whichOne == "on") {
+		document.getElementById(toggle).style.backgroundPosition = '0 0';		
+
+	} else {
+		document.getElementById(toggle).style.backgroundPosition = '0 -72px';
+			}
+ToggleLED(whichOne);
+
+
+}
+</script>
+
+</head>
+
+<body class="in-frame" onload="UpdateStatus()">
+
+<table border="0"  width="100%" cellpadding="3" cellspacing="0">
+
+<tr>  
+<td class="page-title" colspan=2 >
+	LED Demo</td>
+</tr>
+
+
+<tr>
+<td align=center class = "in-a-box" colspan=2> <br>
+<div class="lightOn" onclick="toggleSwitch('on');">ON
+</div>
+ <div class="lightSwitch" id="lightSwitch" >
+</div>
+<div class="lightOff" onclick="toggleSwitch('off');">OFF
+</div>
+
+</td>
+</tr>
+
+<tr>
+  <td class="in-a-box" colspan=2 align=center> Click the Button to Control Red LED On SimpleLink Device</td>
+ </tr>
+ 
+ <tr >
+  <td class = "border-l-top" colspan=2 >
+  </td>
+</tr>
+</table>
+
+</body>
+</html>

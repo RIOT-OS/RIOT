@@ -3,7 +3,7 @@ export CPU_ARCH := cortex-m4
 # Include cc3200 driverlib specific includes:
 export INCLUDES += -I$(RIOTBASE)/drivers/cc3200sdk
 
-DEFAULT_MODULE += driverlib
+DEFAULT_MODULE += cc3200sdk_driverlib
 
 # include $(RIOTCPU)/Makefile.include.cortexm_common
 # This CPU implementation is using the new core/CPU interface:
