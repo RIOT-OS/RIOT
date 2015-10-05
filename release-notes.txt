@@ -1,3 +1,296 @@
+RIOT-2015.09 - Release Notes
+============================
+RIOT is a real-time multi-threading operating system that supports a range of
+devices that are typically found in the Internet of Things: devices based on
+8-bit microcontrollers, 16-bit microcontrollers and light-weight 32-bit
+processors.
+
+RIOT is based on the following design principles: energy-efficiency, real-time
+capabilities, small memory footprint, modularity, and uniform API access,
+independent of the underlying hardware (this API offers partial POSIX
+compliance).
+
+RIOT is developed by an international open source community which is
+independent of specific vendors (e.g. similarly to the Linux community).
+
+About this release:
+============
+This release introduces the GNRC network stack, a completely new, highly
+modularized and configurable IPv6/6LoWPAN stack. It also includes xtimer as a
+new timer subsystem for accurate short- and long-term timers. Moreover,
+peripheral drivers, board, and CPU support has been tidied up and contains
+about 50% less duplication in the build system.
+
+About 580 pull requests with about 2,500 commits have been merged since the
+last release and 120 additional issues have been solved. 62 people contributed
+code in 278 days. 2578 files have been touched with ~320,000 insertions and
+~134,000 deletions.
+
+Loose notations used below:
+============
++ means new feature/item
+* means modified feature/item
+- means removed feature/item
+
+
+
+New features
+============
+
+General
+-------
++ complete codebase now compiles with -Werror on all platforms
+
+Device support
+--------------
++ vastly improved hardware abstraction, unified over all devices
++ unified most common code
+* complete refactoring of MSP430 and ARM7 code
+
+Core
+----
++ new timer subsystem: xtimer
++ extended atomic API by compare-and-swap, increase/decrease and
+  set-to-one/set-to-zero functions
++ introduced a more energy-saving assert macro
+
+Network Stack
+-------------
++ RFC compliant gnrc network stack (6LoWPAN, IPv6, UDP, RPL) major refactoring
++ 6LoWPAN ND (including SLAAC)
++ example applications working out of the box (gnrc_networking for the full
+  gnrc experience, gnrc_border_router for a 6LoWPAN border router, and default
+  for simple link layer connectivity)
++ explicit support for border router
++ auto-init for the network stack
++ introduction of generic interfaces (netdev, netapi)
++ introduction of a protocol-independent FIB
++ introduction of a central packet buffer
++ wireshark-supported protocol ZEP to send IEEE 802.15.4 frames over UDP on
+  non-IEEE-802.15.4 devices
++ support for SLIP and link-layers without addresses
++ new low-level driver model
++ new nativenet based directly on ethernet
++ conn: general stack-independent transport layer API
++ POSIX sockets ported for conn
++ NHDP support
+
+Packages
+--------
++ support for microCoAP
++ CMSIS DSP
+
+Supported platforms
+-------------------
+Additional support for the following boards:
++ Zolertia ReMote
++ Atmel SAML21 Xplained Pro (saml21-xpro)
++ ST Nucleo L1
++ ST Nucleo F334
++ ST Nucleo F091
++ Phytec phyWAVE KW22
++ Eistec Mulle
++ Freescale Freedom FRDM-K64F
++ TI Stellaris Launchpad LM4F120
++ LimiFrog V1
++ Silabs EZR32WG
+
+Drivers
+-------
++ various peripheral drivers (ADC, UART, timer, SPI, I²C, RTC, RTT, DAC, PWM...)
++ basic NVRAM driver (interface)
+
+Network drivers
++ native ethernet driver
++ ENCx24J600 ethernet driver
+
+Sensors drivers
++ ISL29125 RGB light sensor
++ PDC8544 LCD display
++ INA220 current and power monitor
++ MPU-9150 9-DOF motion sensor
++ LIS3DH accelerometer
++ TMP006 temperature sensor
++ MAG3110 magnetometer
++ MMA8652 accelerometer
++ DHT11/DHT22 temperature-humidity sensor
++ ADT7310 temperature sensor
+
+System libraries
+----------------
++ MD5
++ Fletcher's checksum
++ Unified Cipher API and Block cipher operation modes: ECB, CBC, CTR and CCM
++ Bitfield operations
++ thread safe ringbuffer
++ vtimer compatibility layer
+
+Build System
+------------
++ support for the FIT IoT-LAB testbed by direct integration into the Make build
+  system
++ integrated Docker support
++ integration of llvm's clang static analyzer
++ added target for the address sanitizer
++ indicating possible feature conflicts at compile time
++ unified OpenOCD script
+
+
+Changes
+=======
+
+Core
+----
+* improved documentation
+* fixed several IPC message queue initializations
+- removed hwtimer
+
+Drivers
+-------
+* optimized/remodeled GPIO interface
+* optimized/remodeled TIMER interface
+- temporarily removed CC2420 driver (awaiting last bug fixes for a rewrite)
+* re-implementation of the CC110x driver against the peripheral interface
+
+Network Stack
+-------------
+* temporarily removed and currently being refactored:
+ - TCP support
+ - CCN-lite
+ - AODVv2
+
+System libraries
+----------------
+* new high level UART/stdio interface
+* better modularisation of POSIX wrapper modules
+- removed skipjack crypto library
+
+Packages
+--------
+* updated CMSIS HAL to version 4.3
+
+Other
+-----
+* clean-up of deprecated system and network libraries
+* clean-up of deprecated boards and drivers
+
+Selected Issues Fixed since the Last Release
+============================================
+#21: Deal with stdin in bordermultiplex.c
+    A completely new border router implementation is in place
+#715: test_hwtimer_wait fails on native
+    Fixed by @benoit-canet in #2870
+#861: neighbor discovery for 6LoWPAN not working
+    GNRC implements 6LoWPAN ND in a RFC6775 compliant way
+#1753: vtimer_msg test crashes after ~49'20" and
+#1449: a removed vtimer might still get called back by hwtimer
+    vtimer has been replaced by xtimer which does not have these issues
+#1870: IPv6 neighbor advertisements are malformed
+    According to Wireshark (and reference implementations) GNRC sends
+    well-formed neighbor advertisements
+#1964 and #1955: eventual problems with IoT-LAB M3 nodes in the testbed
+    Solved by new driver versions for UART and radio
+#2228: samd21 stack sizes are too small
+    The stacksize has been adapted in #2229
+
+Known Issues
+============
+
+network related issues
+----------------------
+#3075: nhdp: unnecessary microsecond precision
+    NHDP works with timer values of microsecond precision which is not
+    required. Changing to lower precision would save some memory.
+#3086: Max. packet length for AT86RF2XX
+    The size of the link-layer header is not dynamically calculated, but
+    instead the maximum# size is always assumed.
+#3201: Odd length packet snips cause invalid check sum
+    If an odd length packet snip occurs in a packet and is not the last snip
+    (in the order the packet is supposed to be, not in the list's order) in  a
+    packet it will generate a wrong check sum.
+#4048: potential racey memory leak
+    According to the packet buffer stats, flood-pinging a multicast destination
+    may lead to a memory leak due to a race condition. However, it seems to be
+    a rare case and a completely filled up packet buffer was not observed.
+
+native related issues
+---------------------
+#495: native not float safe
+    When the FPU is used when an asynchronous context switch occurs, either the
+    stack gets corrupted or a floating point exception occurs.
+#499: native is segfaulting on heavy network usage
+    Sending more than 100 packets per second causes a SEGFAULT in RIOT native.
+#534: native debugging on osx fails
+    Using valgrind or gdb with a nativenet target in OSX leads to "the network"
+    being stuck (gdb) or the whole process being stuck (valgrind).
+#3341 and #3824: nativenet crashes when hammered
+    Flood-pinging a native instance from more than one host (either multiple
+    threads on the host system or multiple other native instances), leads to a
+    SEGFAULT.
+
+other platform related issues
+-----------------------------
+#2724: Add support for serial number passing to CMSIS boards, document it
+    Documentation about how to discover and set the serial number of CMSIS-DAP
+    chips is missing
+
+other issues
+------------
+#2761: core: define default flags
+     If a thread is created without the corresponding flag  (CREATE_STACKTEST),
+     the ps command will yield wrong numbers for the  stack usage
+#2927: core: Automatically select the lowest possible LPM mode
+    Not all available low power modes (LPMs) are implemented for each platform
+    and the concept of how the LPM is chosen need some reconsideration
+#2967: Makefile.features: location is not relevant for all features
+    Provided features for the build system should be split up into a board and
+    cpu specific part
+#3109: periph/random: random_read should return unsigned int
+    The documentation of this function does not match corresponding
+    implementation.
+
+Special Thanks
+--------------------
+We like to give our special thanks to all the companies that provided us with
+their hardware for porting and testing, namely the people from (in alphabetical
+order): Atmel, Freescale, Limifrog, Phytec, SiLabs, and Zolertia; and also
+companies that directly sponsored  development time: Cisco Systems, Eistec,
+Ell-i, FreshTemp LLC, and Phytec.
+
+More information
+================
+http://www.riot-os.org
+
+Mailing lists
+-------------
+* RIOT OS kernel developers list
+ * devel@riot-os.org (http://lists.riot-os.org/mailman/listinfo/devel)
+* RIOT OS users list
+ * users@riot-os.org (http://lists.riot-os.org/mailman/listinfo/users)
+* RIOT commits
+ * commits@riot-os.org (http://lists.riot-os.org/mailman/listinfo/commits)
+* Github notifications
+ * notifications@riot-os.org  (http://lists.riot-os.org/mailman/listinfo/notifications)
+
+IRC
+-----
+* Join the RIOT IRC channel at: irc.freenode.net, #riot-os
+
+License
+=======
+
+* Most of the code developed by the RIOT community is licensed under the GNU
+  Lesser General Public License (LGPL) version 2.1 as published by the Free
+  Software Foundation.
+* Some external sources are published under a separate, LGPL compatible license
+  (e.g. some files developed by SICS).
+
+All code files contain licensing information.
+
+
+
+
+
 RIOT-2014.12 - Release Notes
 ============================
 RIOT is a real-time multi-threading operating system that supports a range of
