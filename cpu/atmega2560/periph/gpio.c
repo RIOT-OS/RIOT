@@ -78,7 +78,7 @@ static inline uint16_t _port_addr(gpio_t pin)
 /**
  * @brief     Generate the DDRx address of the given pin
  */
-static inline uint8_t _ddr_addr(gpio_t pin)
+static inline uint16_t _ddr_addr(gpio_t pin)
 {
     return (_port_addr(pin) - 0x01);
 }
@@ -86,7 +86,7 @@ static inline uint8_t _ddr_addr(gpio_t pin)
 /**
  * @brief     Generate the PINx address of the given pin.
  */
-static inline uint8_t _pin_addr(gpio_t pin)
+static inline uint16_t _pin_addr(gpio_t pin)
 {
     return (_port_addr(pin) - 0x02);
 }
