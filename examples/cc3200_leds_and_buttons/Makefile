@@ -16,7 +16,6 @@ CFLAGS += -DDEVELHELP
 QUIET ?= 1
 
 USEMODULE += xtimer
-USEMODULE += cc3200sdk_driverlib
 
 include $(RIOTBASE)/Makefile.include
 
