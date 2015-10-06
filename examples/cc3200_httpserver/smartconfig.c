@@ -34,7 +34,6 @@
 //
 //*****************************************************************************
 
-
 //simplelink include
 #include "simplelink.h"
 
@@ -50,7 +49,6 @@
 #endif
 
 #define WLAN_DEL_ALL_PROFILES        0xff
-
 
 //*****************************************************************************
 //
@@ -70,8 +68,7 @@
 //!                      IP address,We will be stuck in this function forever.
 //!
 //*****************************************************************************
-long SmartConfigConnect()
-{
+long SmartConfigConnect() {
     unsigned char policyVal;
 
     long lRetVal = -1;
@@ -86,25 +83,24 @@ long SmartConfigConnect()
 
     //set AUTO policy
     lRetVal = sl_WlanPolicySet(SL_POLICY_CONNECTION,
-                              SL_CONNECTION_POLICY(1,0,0,0,0),
-                              &policyVal,
-                              1 /*PolicyValLen*/);
+            SL_CONNECTION_POLICY(1, 0, 0, 0, 0), &policyVal,
+            1 /*PolicyValLen*/);
     ASSERT_ON_ERROR(lRetVal);
-     
+
     //
     // Start SmartConfig
     // This example uses the unsecured SmartConfig method
     //
-    lRetVal = sl_WlanSmartConfigStart(0,                /*groupIdBitmask*/
-                           SMART_CONFIG_CIPHER_NONE,    /*cipher*/
-                           0,                           /*publicKeyLen*/
-                           0,                           /*group1KeyLen*/
-                           0,                           /*group2KeyLen */
-                           NULL,                        /*publicKey */
-                           NULL,                        /*group1Key */
-                           NULL);                       /*group2Key*/
-    ASSERT_ON_ERROR(lRetVal);        
-     
+    lRetVal = sl_WlanSmartConfigStart(0, /*groupIdBitmask*/
+    SMART_CONFIG_CIPHER_NONE, /*cipher*/
+    0, /*publicKeyLen*/
+    0, /*group1KeyLen*/
+    0, /*group2KeyLen */
+    NULL, /*publicKey */
+    NULL, /*group1Key */
+    NULL); /*group2Key*/
+    ASSERT_ON_ERROR(lRetVal);
+
     return SUCCESS;
 }
 
@@ -123,8 +119,7 @@ long SmartConfigConnect()
 //!   \note
 //!
 //*****************************************************************************
-long SmartConfigStop()
-{
+long SmartConfigStop() {
     long lRetVal = -1;
     lRetVal = sl_WlanSmartConfigStop();
     ASSERT_ON_ERROR(lRetVal);

@@ -25,7 +25,7 @@
 extern "C" {
 #endif
 
-/* nothing to do here, yet */
+    /* nothing to do here, yet */
 
 #ifdef __cplusplus
 }

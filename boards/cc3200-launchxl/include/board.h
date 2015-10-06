@@ -41,7 +41,6 @@ extern "C" {
 
 #define DEBUG_PIN 10 // P1.10 on launchpad (bottom pin on left side)
 
-
 /*
  * for easy porting of TI examples
  */
@@ -80,7 +79,6 @@ extern "C" {
 #define XTIMER_MASK 0xffff0000
 #endif
 
-
 /**
  * @name Define UART device and baudrate for stdio
  * @{
@@ -112,7 +110,6 @@ extern "C" {
 #define LED_OFF             LED_RED_OFF
 #define LED_TOGGLE          LED_RED_TOGGLE
 /** @} */
-
 
 /**
  * @brief Initialize board specific hardware, including clock, LEDs and std-IO

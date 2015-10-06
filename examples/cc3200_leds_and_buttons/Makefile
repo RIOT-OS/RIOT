@@ -2,7 +2,7 @@
 APPLICATION = leds_and_buttons
 
 # If no BOARD is found in the environment, use this default:
-BOARD ?= native
+BOARD ?= cc3200-launchxl
 
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..

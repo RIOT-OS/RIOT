@@ -53,7 +53,6 @@ static void IntDefaultHandler10(void)
 
 #endif
 
-
 //*****************************************************************************
 //
 // Heap block pointers defined by linker script
@@ -91,9 +90,9 @@ static uint32_t pui32Stack[1024];
 void isr_svc(void);
 void isr_pendsv(void);
 
-static void isr_systick(void)
-{
-    while(1) {}
+static void isr_systick(void) {
+    while (1) {
+    }
 }
 
 //*****************************************************************************
@@ -103,107 +102,106 @@ static void isr_systick(void)
 // for examination by a debugger.
 //
 //*****************************************************************************
-static void IntDefaultHandler(void)
-{
-    while(1) {}
+static void IntDefaultHandler(void) {
+    while (1) {
+    }
 }
-static void IntDefaultHandler1(void)
-{
-    while(1) {}
+static void IntDefaultHandler1(void) {
+    while (1) {
+    }
 }
-static void IntDefaultHandler3(void)
-{
-    while(1) {}
+static void IntDefaultHandler3(void) {
+    while (1) {
+    }
 }
-static void IntDefaultHandler6(void)
-{
-    while(1) {}
+static void IntDefaultHandler6(void) {
+    while (1) {
+    }
 }
-static void IntDefaultHandler7(void)
-{
-    while(1) {}
+static void IntDefaultHandler7(void) {
+    while (1) {
+    }
 }
-static void IntDefaultHandler8(void)
-{
-    while(1) {}
+static void IntDefaultHandler8(void) {
+    while (1) {
+    }
 }
-static void IntDefaultHandler9(void)
-{
-    while(1) {}
+static void IntDefaultHandler9(void) {
+    while (1) {
+    }
 }
-static void IntDefaultHandler11(void)
-{
-    while(1) {}
+static void IntDefaultHandler11(void) {
+    while (1) {
+    }
 }
-static void IntDefaultHandler12(void)
-{
-    while(1) {}
+static void IntDefaultHandler12(void) {
+    while (1) {
+    }
 }
-static void IntDefaultHandler13(void)
-{
-    while(1) {}
+static void IntDefaultHandler13(void) {
+    while (1) {
+    }
 }
-static void IntDefaultHandler14(void)
-{
-    while(1) {}
+static void IntDefaultHandler14(void) {
+    while (1) {
+    }
 }
-static void IntDefaultHandler15(void)
-{
-    while(1) {}
+static void IntDefaultHandler15(void) {
+    while (1) {
+    }
 }
-static void IntDefaultHandler16(void)
-{
-    while(1) {}
+static void IntDefaultHandler16(void) {
+    while (1) {
+    }
 }
-static void IntDefaultHandler17(void)
-{
-    while(1) {}
+static void IntDefaultHandler17(void) {
+    while (1) {
+    }
 }
-static void IntDefaultHandler18(void)
-{
-    while(1) {}
+static void IntDefaultHandler18(void) {
+    while (1) {
+    }
 }
-static void IntDefaultHandler19(void)
-{
-    while(1) {}
+static void IntDefaultHandler19(void) {
+    while (1) {
+    }
 }
-static void IntDefaultHandler20(void)
-{
-    while(1) {}
+static void IntDefaultHandler20(void) {
+    while (1) {
+    }
 }
-static void IntDefaultHandler21(void)
-{
-    while(1) {}
+static void IntDefaultHandler21(void) {
+    while (1) {
+    }
 }
-static void IntDefaultHandler22(void)
-{
-    while(1) {}
+static void IntDefaultHandler22(void) {
+    while (1) {
+    }
 }
-static void IntDefaultHandler23(void)
-{
-    while(1) {}
+static void IntDefaultHandler23(void) {
+    while (1) {
+    }
 }
-static void IntDefaultHandler24(void)
-{
-    while(1) {}
+static void IntDefaultHandler24(void) {
+    while (1) {
+    }
 }
-static void IntDefaultHandler25(void)
-{
-    while(1) {}
+static void IntDefaultHandler25(void) {
+    while (1) {
+    }
 }
-static void IntDefaultHandler26(void)
-{
-    while(1) {}
+static void IntDefaultHandler26(void) {
+    while (1) {
+    }
 }
-static void IntDefaultHandler27(void)
-{
-    while(1) {}
+static void IntDefaultHandler27(void) {
+    while (1) {
+    }
 }
-static void IntDefaultHandler28(void)
-{
-    while(1) {}
+static void IntDefaultHandler28(void) {
+    while (1) {
+    }
 }
-
 
 //*****************************************************************************
 //
@@ -215,89 +213,89 @@ __attribute__ ((section(".intvecs")))
 void (* const g_pfnVectors[256])(void) =
 {
     (void (*)(void))((uint32_t)pui32Stack + sizeof(pui32Stack)),
-                                            // The initial stack pointer
-    ResetISR,                               // The reset handler
-    NmiSR,                                  // The NMI handler
-    FaultISR,                               // The hard fault handler
-    IntDefaultHandler,                      // The MPU fault handler
-    BusFaultHandler,                        // The bus fault handler
-    IntDefaultHandler1,                      // The usage fault handler
-    0,                                      // Reserved
-    0,                                      // Reserved
-    0,                                      // Reserved
-    0,                                      // Reserved
-	isr_svc,                      /* system call interrupt, in RIOT used for
-     	 	 	 	 	 	 	   * switching into thread context on boot */
-    IntDefaultHandler3,                      // Debug monitor handler
-    0,                                      // Reserved
-	isr_pendsv,                              /* pendSV interrupt, in RIOT the actual
-     	 	 	 	 	 	 	 	 	 	  * context switching is happening here */
-	isr_systick,                             /* SysTick interrupt, not used in RIOT */
+    // The initial stack pointer
+        ResetISR,// The reset handler
+        NmiSR,// The NMI handler
+        FaultISR,// The hard fault handler
+        IntDefaultHandler,// The MPU fault handler
+        BusFaultHandler,// The bus fault handler
+        IntDefaultHandler1,// The usage fault handler
+        0,// Reserved
+        0,// Reserved
+        0,// Reserved
+        0,// Reserved
+        isr_svc, /* system call interrupt, in RIOT used for
+         * switching into thread context on boot */
+        IntDefaultHandler3,                      // Debug monitor handler
+        0,// Reserved
+        isr_pendsv, /* pendSV interrupt, in RIOT the actual
+         * context switching is happening here */
+        isr_systick, /* SysTick interrupt, not used in RIOT */
 
-	IntDefaultHandler6,                      // GPIO Port A0
-    IntDefaultHandler7,                      // GPIO Port A1
-    IntDefaultHandler8,                      // GPIO Port A2
-    IntDefaultHandler9,                      // GPIO Port A3
-    0,                                       // Reserved
-	UART_0_ISR,                              // UART0 Rx and Tx
-    IntDefaultHandler11,                     // UART1 Rx and Tx
-    0,                                       // Reserved
-    IntDefaultHandler12,                      // I2C0 Master and Slave
-    0,0,0,0,0,                                // Reserved
-    IntDefaultHandler13,                      // ADC Channel 0
-    IntDefaultHandler14,                      // ADC Channel 1
-    IntDefaultHandler15,                      // ADC Channel 2
-    IntDefaultHandler16,                      // ADC Channel 3
-    IntDefaultHandler17,                      // Watchdog Timer
-    IntDefaultHandler18,                      // Timer 0 subtimer A  35*4 = 0x8C
-    IntDefaultHandler19,                      // Timer 0 subtimer B
-    IntDefaultHandler20,                      // Timer 1 subtimer A
-    IntDefaultHandler21,                      // Timer 1 subtimer B
-    IntDefaultHandler22,                      // Timer 2 subtimer A
-    IntDefaultHandler23,                      // Timer 2 subtimer B
-    0,0,0,0,                                // Reserved
-    IntDefaultHandler24,                      // Flash
-    0,0,0,0,0,                              // Reserved
-    IntDefaultHandler25,                      // Timer 3 subtimer A
-    IntDefaultHandler26,                      // Timer 3 subtimer B
-    0,0,0,0,0,0,0,0,0,                      // Reserved
-    IntDefaultHandler27,                      // uDMA Software Transfer
-    IntDefaultHandler28,                      // uDMA Error
-    0,0,0,0,0,0,0,0,0,0,                    // Reserved
-    0,0,0,0,0,0,0,0,0,0,                    // Reserved
-    0,0,0,0,0,0,0,0,0,0,                    // Reserved
-    0,0,0,0,0,0,0,0,0,0,                    // Reserved
-    0,0,0,0,0,0,0,0,0,0,                    // Reserved
-    0,0,0,0,0,0,0,0,0,0,                    // Reserved
-    0,0,0,0,0,0,0,0,0,0,                    // Reserved
-    0,0,0,0,0,0,0,0,0,0,                    // Reserved
-    0,0,0,0,0,0,0,0,0,0,                    // Reserved
-    0,0,0,0,0,0,0,0,0,0,                    // Reserved
-    IntDefaultHandler,                      // SHA
-    0,0,                                    // Reserved
-    IntDefaultHandler,                      // AES
-    0,                                      // Reserved
-    IntDefaultHandler,                      // DES
-    0,0,0,0,0,                              // Reserved
-    IntDefaultHandler,                      // SDHost
-    0,                                      // Reserved
-    IntDefaultHandler,                      // I2S
-    0,                                      // Reserved
-    IntDefaultHandler,                      // Camera
-    0,0,0,0,0,0,0,                          // Reserved
-    IntDefaultHandler,                      // NWP to APPS Interrupt
-    IntDefaultHandler,                      // Power, Reset and Clock module
-    0,0,                                    // Reserved
-    IntDefaultHandler,                      // Shared SPI
-    IntDefaultHandler,                      // Generic SPI
-    IntDefaultHandler,                      // Link SPI
-    0,0,0,0,0,0,0,0,0,0,                    // Reserved
-    0,0,0,0,0,0,0,0,0,0,                    // Reserved
-    0,0,0,0,0,0,0,0,0,0,                    // Reserved
-    0,0,0,0,0,0,0,0,0,0,                    // Reserved
-    0,0,0,0,0,0,0,0,0,0,                    // Reserved
-    0,0,0,0,0,0,0,0,0,0,                    // Reserved
-    0,0                                     // Reserved
+        IntDefaultHandler6,                      // GPIO Port A0
+        IntDefaultHandler7,// GPIO Port A1
+        IntDefaultHandler8,// GPIO Port A2
+        IntDefaultHandler9,// GPIO Port A3
+        0,// Reserved
+        UART_0_ISR,// UART0 Rx and Tx
+        IntDefaultHandler11,// UART1 Rx and Tx
+        0,// Reserved
+        IntDefaultHandler12,// I2C0 Master and Slave
+        0,0,0,0,0,// Reserved
+        IntDefaultHandler13,// ADC Channel 0
+        IntDefaultHandler14,// ADC Channel 1
+        IntDefaultHandler15,// ADC Channel 2
+        IntDefaultHandler16,// ADC Channel 3
+        IntDefaultHandler17,// Watchdog Timer
+        IntDefaultHandler18,// Timer 0 subtimer A  35*4 = 0x8C
+        IntDefaultHandler19,// Timer 0 subtimer B
+        IntDefaultHandler20,// Timer 1 subtimer A
+        IntDefaultHandler21,// Timer 1 subtimer B
+        IntDefaultHandler22,// Timer 2 subtimer A
+        IntDefaultHandler23,// Timer 2 subtimer B
+        0,0,0,0,// Reserved
+        IntDefaultHandler24,// Flash
+        0,0,0,0,0,// Reserved
+        IntDefaultHandler25,// Timer 3 subtimer A
+        IntDefaultHandler26,// Timer 3 subtimer B
+        0,0,0,0,0,0,0,0,0,// Reserved
+        IntDefaultHandler27,// uDMA Software Transfer
+        IntDefaultHandler28,// uDMA Error
+        0,0,0,0,0,0,0,0,0,0,// Reserved
+        0,0,0,0,0,0,0,0,0,0,// Reserved
+        0,0,0,0,0,0,0,0,0,0,// Reserved
+        0,0,0,0,0,0,0,0,0,0,// Reserved
+        0,0,0,0,0,0,0,0,0,0,// Reserved
+        0,0,0,0,0,0,0,0,0,0,// Reserved
+        0,0,0,0,0,0,0,0,0,0,// Reserved
+        0,0,0,0,0,0,0,0,0,0,// Reserved
+        0,0,0,0,0,0,0,0,0,0,// Reserved
+        0,0,0,0,0,0,0,0,0,0,// Reserved
+        IntDefaultHandler,// SHA
+        0,0,// Reserved
+        IntDefaultHandler,// AES
+        0,// Reserved
+        IntDefaultHandler,// DES
+        0,0,0,0,0,// Reserved
+        IntDefaultHandler,// SDHost
+        0,// Reserved
+        IntDefaultHandler,// I2S
+        0,// Reserved
+        IntDefaultHandler,// Camera
+        0,0,0,0,0,0,0,// Reserved
+        IntDefaultHandler,// NWP to APPS Interrupt
+        IntDefaultHandler,// Power, Reset and Clock module
+        0,0,// Reserved
+        IntDefaultHandler,// Shared SPI
+        IntDefaultHandler,// Generic SPI
+        IntDefaultHandler,// Link SPI
+        0,0,0,0,0,0,0,0,0,0,// Reserved
+        0,0,0,0,0,0,0,0,0,0,// Reserved
+        0,0,0,0,0,0,0,0,0,0,// Reserved
+        0,0,0,0,0,0,0,0,0,0,// Reserved
+        0,0,0,0,0,0,0,0,0,0,// Reserved
+        0,0,0,0,0,0,0,0,0,0,// Reserved
+        0,0// Reserved
 };
 
 //*****************************************************************************
@@ -324,17 +322,14 @@ extern uint32_t __init_data;
 // application.
 //
 //*****************************************************************************
-void
-ResetISR(void)
-{
+void ResetISR(void) {
     uint32_t *pui32Src, *pui32Dest;
 
     //
     // Copy the data segment initializers
     //
     pui32Src = &__init_data;
-    for(pui32Dest = &_data; pui32Dest < &_edata; )
-    {
+    for (pui32Dest = &_data; pui32Dest < &_edata;) {
         *pui32Dest++ = *pui32Src++;
     }
 
@@ -342,15 +337,14 @@ ResetISR(void)
     // Zero fill the bss segment.
     //
     __asm("    ldr     r0, =_bss\n"
-          "    ldr     r1, =_ebss\n"
-          "    mov     r2, #0\n"
-          "    .thumb_func\n"
-          "zero_loop:\n"
-          "        cmp     r0, r1\n"
-          "        it      lt\n"
-          "        strlt   r2, [r0], #4\n"
-          "        blt     zero_loop");
-
+            "    ldr     r1, =_ebss\n"
+            "    mov     r2, #0\n"
+            "    .thumb_func\n"
+            "zero_loop:\n"
+            "        cmp     r0, r1\n"
+            "        it      lt\n"
+            "        strlt   r2, [r0], #4\n"
+            "        blt     zero_loop");
 
     /* initialize the board (which also initiates CPU initialization) */
     board_init();
@@ -373,17 +367,13 @@ ResetISR(void)
 // by a debugger.
 //
 //*****************************************************************************
-static void
-NmiSR(void)
-{
+static void NmiSR(void) {
     //
     // Enter an infinite loop.
     //
-    while(1)
-    {
+    while (1) {
     }
 }
-
 
 //*****************************************************************************
 //
@@ -392,59 +382,50 @@ NmiSR(void)
 // for examination by a debugger.
 //
 //*****************************************************************************
-static void
-FaultISR(void)
-{
-	__asm volatile
-	(
-			" tst lr, #4                                                \n"
-			" ite eq                                                    \n"
-			" mrseq r0, msp                                             \n"
-			" mrsne r0, psp                                             \n"
-			" ldr r1, [r0, #24]                                         \n"
-			" ldr r2, handler2_address_const                            \n"
-			" bx r2                                                     \n"
-			" handler2_address_const: .word prvGetRegistersFromStack    \n"
-	);
+static void FaultISR(void) {
+    __asm volatile
+    (
+            " tst lr, #4                                                \n"
+            " ite eq                                                    \n"
+            " mrseq r0, msp                                             \n"
+            " mrsne r0, psp                                             \n"
+            " ldr r1, [r0, #24]                                         \n"
+            " ldr r2, handler2_address_const                            \n"
+            " bx r2                                                     \n"
+            " handler2_address_const: .word prvGetRegistersFromStack    \n"
+    );
 }
-
 
 #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
-void prvGetRegistersFromStack( uint32_t *pulFaultStackAddress )
-{
-	/* These are volatile to try and prevent the compiler/linker optimising them
-	away as the variables never actually get used.  If the debugger won't show the
-	values of the variables, make them global my moving their declaration outside
-	of this function. */
-	volatile uint32_t r0;
-	volatile uint32_t r1;
-	volatile uint32_t r2;
-	volatile uint32_t r3;
-	volatile uint32_t r12;
-	volatile uint32_t lr; /* Link register. */
-	volatile uint32_t pc; /* Program counter. */
-	volatile uint32_t psr;/* Program status register. */
+void prvGetRegistersFromStack(uint32_t *pulFaultStackAddress) {
+    /* These are volatile to try and prevent the compiler/linker optimising them
+     away as the variables never actually get used.  If the debugger won't show the
+     values of the variables, make them global my moving their declaration outside
+     of this function. */
+    volatile uint32_t r0;
+    volatile uint32_t r1;
+    volatile uint32_t r2;
+    volatile uint32_t r3;
+    volatile uint32_t r12;
+    volatile uint32_t lr; /* Link register. */
+    volatile uint32_t pc; /* Program counter. */
+    volatile uint32_t psr;/* Program status register. */
 
-	r0 = pulFaultStackAddress[ 0 ];
-	r1 = pulFaultStackAddress[ 1 ];
-	r2 = pulFaultStackAddress[ 2 ];
-	r3 = pulFaultStackAddress[ 3 ];
+    r0 = pulFaultStackAddress[0];
+    r1 = pulFaultStackAddress[1];
+    r2 = pulFaultStackAddress[2];
+    r3 = pulFaultStackAddress[3];
 
-	r12 = pulFaultStackAddress[ 4 ];
-	lr = pulFaultStackAddress[ 5 ];
-	pc = pulFaultStackAddress[ 6 ];
-	psr = pulFaultStackAddress[ 7 ];
+    r12 = pulFaultStackAddress[4];
+    lr = pulFaultStackAddress[5];
+    pc = pulFaultStackAddress[6];
+    psr = pulFaultStackAddress[7];
 
-	/* When the following line is hit, the variables contain the register values. */
-	for( ;; );
+    /* When the following line is hit, the variables contain the register values. */
+    for (;;)
+        ;
 }
 #pragma GCC diagnostic pop
-
-
-
-
-
-
 
 //*****************************************************************************
 //
@@ -454,17 +435,13 @@ void prvGetRegistersFromStack( uint32_t *pulFaultStackAddress )
 //
 //*****************************************************************************
 
-static void
-BusFaultHandler(void)
-{
+static void BusFaultHandler(void) {
     //
     // Go into an infinite loop.
     //
-    while(1)
-    {
+    while (1) {
     }
 }
-
 
 //*****************************************************************************
 //
@@ -472,8 +449,7 @@ BusFaultHandler(void)
 // library
 //
 //*****************************************************************************
-void * _sbrk(unsigned int incr)
-{
+void * _sbrk(unsigned int incr) {
 
     char *prev_heap_end;
 
@@ -481,20 +457,18 @@ void * _sbrk(unsigned int incr)
     // Check if this function is calld for the
     // first time and the heap end pointer
     //
-    if (heap_end == 0)
-    {
-        heap_end = (char *)&_heap; 
+    if (heap_end == 0) {
+        heap_end = (char *) &_heap;
     }
 
     //
     // Check if we have enough heap memory available
     //
     prev_heap_end = heap_end;
-    if (heap_end + incr > (char *)&_eheap)
-    {
-    //
-    // Return error
-    //
+    if (heap_end + incr > (char *) &_eheap) {
+        //
+        // Return error
+        //
         return 0;
     }
 
@@ -502,7 +476,7 @@ void * _sbrk(unsigned int incr)
     // Set the new heap end pointer
     //
     heap_end += incr;
-    
+
     //
     // Return the pointer to the newly allocated memory
     //

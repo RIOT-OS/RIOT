@@ -23,10 +23,10 @@
 extern "C" {
 #endif
 
-/**
- * @name Timer peripheral configuration
- * @{
- */
+    /**
+     * @name Timer peripheral configuration
+     * @{
+     */
 
 #include "cc3200.h"
 
@@ -38,16 +38,14 @@ extern "C" {
 #define TIMER_2_EN 1
 #define TIMER_3_EN 1
 
-
 #define SEC_TO_TICKS(sec)   80000000*sec
 #define MSEC_TO_TICKS(msec) 80000*msec
 #define USEC_TO_TICKS(usec) 80*usec
 
-
-/**
- * @name UART configuration
- * @{
- */
+    /**
+     * @name UART configuration
+     * @{
+     */
 #define UART_NUMOF          1
 
 #define UART_0_EN           1
