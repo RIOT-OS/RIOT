@@ -55,4 +55,3 @@
 i32 register_isr(u8 irqvec_id, void (*intr_handler)(void *), void *param);
 
 #endif //_INTERRUPT_HAL_H_
-

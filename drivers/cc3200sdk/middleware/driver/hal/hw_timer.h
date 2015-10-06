@@ -152,4 +152,3 @@ struct hw_timer_cfg {
 };
 
 #endif
-

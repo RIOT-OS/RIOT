@@ -127,4 +127,3 @@ cc_hndl cc_hwt32_init(struct hw_timer_cfg *cfg);
  */
 void cc_hwt32_isr(cc_hndl hndl);
 #endif
-
