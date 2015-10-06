@@ -13,7 +13,7 @@
  * @file
  * @brief       Implementation of the kernels irq interface
  *
- * @author      Attilio Dona' <@attiliodona>
+ * @author      Attilio Dona'
  *
  * @}
  */

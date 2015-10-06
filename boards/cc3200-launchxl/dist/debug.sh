@@ -3,7 +3,7 @@
 # Start in-circuit debugging on this board using openocd
 #
 
-# @author Attilio Dona' <@attiliodona>
+# @author Attilio Dona'
 
 CFGDIR=$1
 ELFFILE=$2

@@ -13,7 +13,7 @@
  * @file
  * @brief           Implementation specific CPU configuration options
  *
- * @author          Attilio Dona' <@attiliodona>
+ * @author          Attilio Dona'
  */
 
 #ifndef __CPU_CONF_H

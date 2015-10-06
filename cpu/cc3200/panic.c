@@ -17,7 +17,7 @@
  *
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  * @author      Joakim Gebart <joakim.gebart@eistec.se>
- * @author      Attilio Dona' <@attiliodona>
+ * @author      Attilio Dona'
  */
 
 #include "cpu.h"

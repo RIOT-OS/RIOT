@@ -13,7 +13,7 @@
  * @file
  * @brief           CPU specific hwtimer configuration options
  *
- * @author          Attilio Dona' <@attiliodona>
+ * @author          Attilio Dona'
  */
 
 #ifndef __HWTIMER_CPU_H

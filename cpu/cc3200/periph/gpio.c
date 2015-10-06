@@ -34,7 +34,7 @@
  * @file
  * @brief       Low-level GPIO driver implementation
  *
- * @author      Attilio Dona' <@attiliodona>
+ * @author      Attilio Dona'
  *
  * @}
  */

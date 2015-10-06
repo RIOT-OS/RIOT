@@ -15,7 +15,7 @@
  * @brief       Implementation of the kernels power management interface
  *
  * @author      Ian Martin <ian@locicontrols.com>
- * @author      Attilio Dona' <@attiliodona>
+ * @author      Attilio Dona'
  *
  * @}
  */

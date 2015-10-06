@@ -5,7 +5,7 @@
  *  Public License v2.1. See the file LICENSE in the top level directory
  *  for more details.
  *
- * @author      Attilio Dona' <@attiliodona>
+ * @author      Attilio Dona'
  *
  *
  */

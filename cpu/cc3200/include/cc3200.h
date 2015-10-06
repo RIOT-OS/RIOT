@@ -12,7 +12,7 @@
  * @file
  * @brief       CC3200 MCU definitions
  *
- * @author      Attilio Dona' <@attiliodona>
+ * @author      Attilio Dona'
  * @}
  *
  */

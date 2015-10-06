@@ -13,7 +13,7 @@
  * @file
  * @brief       Board specific implementations for the CC3200 launchpad board
  *
- * @author      Attilio Dona' <@attiliodona>
+ * @author      Attilio Dona'
  */
 
 #include <inc/hw_ints.h>

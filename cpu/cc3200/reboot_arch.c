@@ -13,7 +13,7 @@
  * @file
  * @brief       Implementation of the kernels reboot interface
  *
- * @author      Attilio Dona' <@attiliodona>
+ * @author      Attilio Dona'
  *
  * @}
  */

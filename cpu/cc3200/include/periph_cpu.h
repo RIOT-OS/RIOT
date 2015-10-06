@@ -13,7 +13,7 @@
  * @file
  * @brief           CPU specific definitions for internal peripheral handling
  *
- * @author          Attilio Dona' <@attiliodona>
+ * @author          Attilio Dona'
  */
 
 #ifndef PERIPH_CPU_H_

@@ -13,7 +13,7 @@
  * @file
  * @brief       Low-level timer driver implementation
  *
- * @author      Attilio Dona' <@attiliodona>
+ * @author      Attilio Dona'
  *
  * @}
  */
