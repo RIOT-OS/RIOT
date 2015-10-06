@@ -3,35 +3,35 @@
 //
 // Networking interface functions for CC3200 device
 //
-// Copyright (C) 2014 Texas Instruments Incorporated - http://www.ti.com/ 
-// 
-// 
-//  Redistribution and use in source and binary forms, with or without 
-//  modification, are permitted provided that the following conditions 
+// Copyright (C) 2014 Texas Instruments Incorporated - http://www.ti.com/
+//
+//
+//  Redistribution and use in source and binary forms, with or without
+//  modification, are permitted provided that the following conditions
 //  are met:
 //
-//    Redistributions of source code must retain the above copyright 
+//    Redistributions of source code must retain the above copyright
 //    notice, this list of conditions and the following disclaimer.
 //
 //    Redistributions in binary form must reproduce the above copyright
-//    notice, this list of conditions and the following disclaimer in the 
-//    documentation and/or other materials provided with the   
+//    notice, this list of conditions and the following disclaimer in the
+//    documentation and/or other materials provided with the
 //    distribution.
 //
 //    Neither the name of Texas Instruments Incorporated nor the names of
 //    its contributors may be used to endorse or promote products derived
 //    from this software without specific prior written permission.
 //
-//  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
-//  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+//  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+//  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 //  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-//  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT 
-//  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
-//  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT 
+//  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+//  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+//  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
 //  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
 //  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-//  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
-//  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+//  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+//  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 //*****************************************************************************
@@ -40,10 +40,10 @@
 #include <string.h>
 #include <stdlib.h>
 
-// Simplelink includes 
+// Simplelink includes
 #include "simplelink.h"
 
-// driverlib includes 
+// driverlib includes
 #include "timer.h"
 #include "rom.h"
 #include "rom_map.h"
@@ -54,7 +54,7 @@
 #include "osi.h"
 #endif
 
-// common interface includes 
+// common interface includes
 #include "network_if.h"
 #ifndef NOTERM
 #include <stdio.h>
@@ -138,7 +138,7 @@ int TrimSpace(char * pcInput) {
 //!
 //! \param[in]  pcFile - Pointer to the File Name
 //! \param[in]  ulLine - Line Number
-//! 
+//!
 //! \return none
 //!
 //*****************************************************************************
@@ -154,9 +154,9 @@ vAssertCalled( const char *pcFile, unsigned long ulLine )
 //*****************************************************************************
 //
 //! \brief Application defined idle task hook
-//! 
+//!
 //! \param  none
-//! 
+//!
 //! \return none
 //!
 //*****************************************************************************
@@ -169,9 +169,9 @@ vApplicationIdleHook( void)
 //*****************************************************************************
 //
 //! \brief Application defined malloc failed hook
-//! 
+//!
 //! \param  none
-//! 
+//!
 //! \return none
 //!
 //*****************************************************************************
@@ -186,9 +186,9 @@ void vApplicationMallocFailedHook()
 //*****************************************************************************
 //
 //! \brief Application defined stack overflow hook
-//! 
+//!
 //! \param  none
-//! 
+//!
 //! \return none
 //!
 //*****************************************************************************
@@ -470,7 +470,7 @@ void SimpleLinkNetAppEventHandler(SlNetAppEvent_t *pNetAppEvent) {
 //
 //! \brief This function handles General Events
 //!
-//! \param[in]     pDevEvent - Pointer to General Event Info 
+//! \param[in]     pDevEvent - Pointer to General Event Info
 //!
 //! \return None
 //!
@@ -616,11 +616,11 @@ long ConfigureSimpleLinkToDefaultState() {
     lMode = sl_Start(0, 0, 0);
     ASSERT_ON_ERROR(lMode);
 
-    // If the device is not in station-mode, try configuring it in station-mode 
+    // If the device is not in station-mode, try configuring it in station-mode
     if (ROLE_STA != lMode) {
         if (ROLE_AP == lMode) {
-            // If the device is in AP mode, we need to wait for this event 
-            // before doing anything 
+            // If the device is in AP mode, we need to wait for this event
+            // before doing anything
             while (!IS_IP_ACQUIRED(g_ulStatus)) {
 #ifndef SL_PLATFORM_MULTI_THREADED
                 _SlNonOsMainLoopTask();
@@ -630,7 +630,7 @@ long ConfigureSimpleLinkToDefaultState() {
             }
         }
 
-        // Switch to STA role and restart 
+        // Switch to STA role and restart
         lRetVal = sl_WlanSetMode(ROLE_STA);
         ASSERT_ON_ERROR(lRetVal);
 
@@ -640,7 +640,7 @@ long ConfigureSimpleLinkToDefaultState() {
         lRetVal = sl_Start(0, 0, 0);
         ASSERT_ON_ERROR(lRetVal);
 
-        // Check if the device is in station again 
+        // Check if the device is in station again
         if (ROLE_STA != lRetVal) {
             // We don't want to proceed if the device is not in STA-mode
             //ASSERT_ON_ERROR(DEVICE_NOT_IN_STATION_MODE);
@@ -670,7 +670,7 @@ long ConfigureSimpleLinkToDefaultState() {
             ver.ChipFwAndPhyVersion.PhyVersion[2],
             ver.ChipFwAndPhyVersion.PhyVersion[3]);
 
-    // Set connection policy to Auto + SmartConfig 
+    // Set connection policy to Auto + SmartConfig
     //      (Device's default connection policy)
     lRetVal = sl_WlanPolicySet(SL_POLICY_CONNECTION,
             SL_CONNECTION_POLICY(1, 0, 0, 0, 1), NULL, 0);
@@ -683,7 +683,7 @@ long ConfigureSimpleLinkToDefaultState() {
     //
     // Device in station-mode. Disconnect previous connection if any
     // The function returns 0 if 'Disconnected done', negative number if already
-    // disconnected Wait for 'disconnection' event if 0 is returned, Ignore 
+    // disconnected Wait for 'disconnection' event if 0 is returned, Ignore
     // other return-codes
     //
     lRetVal = sl_WlanDisconnect();
@@ -711,7 +711,7 @@ long ConfigureSimpleLinkToDefaultState() {
     // Number between 0-15, as dB offset from max power - 0 will set max power
     ucPower = 0;
     lRetVal = sl_WlanSet(SL_WLAN_CFG_GENERAL_PARAM_ID,
-            WLAN_GENERAL_PARAM_OPT_STA_TX_POWER, 1, (unsigned char *) &ucPower);
+    WLAN_GENERAL_PARAM_OPT_STA_TX_POWER, 1, (unsigned char *) &ucPower);
     ASSERT_ON_ERROR(lRetVal);
 
     // Set PM policy to normal
@@ -740,9 +740,9 @@ long ConfigureSimpleLinkToDefaultState() {
 //
 //! Network_IF_InitDriver
 //! The function initializes a CC3200 device and triggers it to start operation
-//!  
+//!
 //! \param  uiMode (device mode in which device will be configured)
-//!  
+//!
 //! \return 0 : sucess, -ve : failure
 //
 //*****************************************************************************
@@ -853,9 +853,9 @@ long Network_IF_InitDriver(unsigned int uiMode) {
 //
 //! Network_IF_DeInitDriver
 //! The function de-initializes a CC3200 device
-//!  
+//!
 //! \param  None
-//!  
+//!
 //! \return On success, zero is returned. On error, other
 //
 //*****************************************************************************
@@ -891,7 +891,7 @@ long Network_IF_DeInitDriver(void) {
 //
 //*****************************************************************************
 long Network_IF_ConnectAP(char *pcSsid, SlSecParams_t SecurityParams) {
-#ifndef NOTERM  
+#ifndef NOTERM
     char acCmdStore[128];
     unsigned short usConnTimeout;
     unsigned char ucRecvdAPDetails;

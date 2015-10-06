@@ -652,4 +652,3 @@ void timer_reset(tim_t dev) {
         break;
     }
 }
-

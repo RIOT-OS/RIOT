@@ -111,4 +111,3 @@ extern unsigned long ADCFIFORead(unsigned long ulBase, unsigned long ulChannel);
 #endif
 
 #endif // __ADC_H__
-

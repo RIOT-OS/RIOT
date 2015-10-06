@@ -449,4 +449,3 @@ void gpio_write(gpio_t dev, int value) {
 //        gpio_clear(dev);
 //    }
 }
-
