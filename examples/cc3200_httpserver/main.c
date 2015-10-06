@@ -1059,8 +1059,6 @@ BoardInit(void)
 int main() {
     long lRetVal = -1;
 
-    ERR_PRINT((long int)100);
-
 #ifdef ORIGINAL_EXAMPLE
     //Board Initialization
     BoardInit();
