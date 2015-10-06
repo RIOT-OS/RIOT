@@ -71,7 +71,7 @@
 long SmartConfigConnect() {
     unsigned char policyVal;
 
-    long lRetVal = -1;
+    long lRetVal;
 
     //
     // Clear all profiles
@@ -120,7 +120,7 @@ long SmartConfigConnect() {
 //!
 //*****************************************************************************
 long SmartConfigStop() {
-    long lRetVal = -1;
+    long lRetVal;
     lRetVal = sl_WlanSmartConfigStop();
     ASSERT_ON_ERROR(lRetVal);
     return SUCCESS;

@@ -134,12 +134,6 @@ int g_iSimplelinkRole = ROLE_INVALID;
 signed int g_uiIpAddress = 0;
 unsigned char g_ucSSID[AP_SSID_LEN_MAX];
 
-#if defined(ccs)
-extern void (* const g_pfnVectors[])(void);
-#endif
-#if defined(ewarm)
-extern uVectorEntry __vector_table;
-#endif
 //*****************************************************************************
 //                 GLOBAL VARIABLES -- End
 //*****************************************************************************
@@ -153,80 +147,6 @@ int g_uiSimplelinkRole = ROLE_INVALID;
 unsigned int g_uiDeviceModeConfig = ROLE_STA; //default is STA mode
 volatile unsigned char g_ucConnectTimeout = 0;
 
-#ifdef USE_FREERTOS
-//*****************************************************************************
-// FreeRTOS User Hook Functions enabled in FreeRTOSConfig.h
-//*****************************************************************************
-
-//*****************************************************************************
-//
-//! \brief Application defined hook (or callback) function - assert
-//!
-//! \param[in]  pcFile - Pointer to the File Name
-//! \param[in]  ulLine - Line Number
-//!
-//! \return none
-//!
-//*****************************************************************************
-void
-vAssertCalled( const char *pcFile, unsigned long ulLine )
-{
-    //Handle Assert here
-    while(1)
-    {
-    }
-}
-
-//*****************************************************************************
-//
-//! \brief Application defined idle task hook
-//!
-//! \param  none
-//!
-//! \return none
-//!
-//*****************************************************************************
-void
-vApplicationIdleHook( void)
-{
-    //Handle Idle Hook for Profiling, Power Management etc
-}
-
-//*****************************************************************************
-//
-//! \brief Application defined malloc failed hook
-//!
-//! \param  none
-//!
-//! \return none
-//!
-//*****************************************************************************
-void vApplicationMallocFailedHook()
-{
-    //Handle Memory Allocation Errors
-    while(1)
-    {
-    }
-}
-
-//*****************************************************************************
-//
-//! \brief Application defined stack overflow hook
-//!
-//! \param  none
-//!
-//! \return none
-//!
-//*****************************************************************************
-void vApplicationStackOverflowHook( OsiTaskHandle *pxTask,
-        signed char *pcTaskName)
-{
-    //Handle FreeRTOS Stack Overflow
-    while(1)
-    {
-    }
-}
-#endif //USE_FREERTOS
 
 //*****************************************************************************
 // SimpleLink Asynchronous Event Handlers -- Start
@@ -285,6 +205,7 @@ void SimpleLinkWlanEventHandler(SlWlanEvent_t *pWlanEvent) {
 
         // If the user has initiated 'Disconnect' request,
         //'reason_code' is SL_USER_INITIATED_DISCONNECTION
+        //cppcheck-suppress duplicateBranch
         if (SL_USER_INITIATED_DISCONNECTION == pEventData->reason_code) {
             UART_PRINT("[WLAN EVENT]Device disconnected from the AP: %s,"
                     "BSSID: %x:%x:%x:%x:%x:%x on application's request \n\r",
@@ -293,7 +214,7 @@ void SimpleLinkWlanEventHandler(SlWlanEvent_t *pWlanEvent) {
                     g_ucConnectionBSSID[3], g_ucConnectionBSSID[4],
                     g_ucConnectionBSSID[5]);
         } else {
-            UART_PRINT("[WLAN ERROR]Device disconnected from the AP AP: %s,"
+            UART_PRINT("[WLAN ERROR]Device disconnected from the AP: %s,"
                     "BSSID: %x:%x:%x:%x:%x:%x on an ERROR..!! \n\r",
                     g_ucConnectionSSID, g_ucConnectionBSSID[0],
                     g_ucConnectionBSSID[1], g_ucConnectionBSSID[2],
@@ -526,12 +447,13 @@ void SimpleLinkHttpServerCallback(SlHttpServerEvent_t *pSlHttpServerEvent,
 
     switch (pSlHttpServerEvent->Event) {
     case SL_NETAPP_HTTPGETTOKENVALUE_EVENT: {
-        unsigned char status, *ptr;
+        unsigned char *ptr;
 
         ptr = pSlHttpServerResponse->ResponseData.token_value.data;
         pSlHttpServerResponse->ResponseData.token_value.len = 0;
         if (memcmp(pSlHttpServerEvent->EventData.httpTokenName.data, GET_token,
                 strlen((const char *) GET_token)) == 0) {
+            unsigned char status;
             status = GPIO_IF_LedStatus(MCU_RED_LED_GPIO);
             strLenVal = strlen(LED1_STRING);
             memcpy(ptr, LED1_STRING, strLenVal);
@@ -575,11 +497,12 @@ void SimpleLinkHttpServerCallback(SlHttpServerEvent_t *pSlHttpServerEvent,
         break;
 
     case SL_NETAPP_HTTPPOSTTOKENVALUE_EVENT: {
-        unsigned char led;
         unsigned char *ptr =
                 pSlHttpServerEvent->EventData.httpPostData.token_name.data;
 
         if (memcmp(ptr, POST_token, strlen((const char *) POST_token)) == 0) {
+            unsigned char led;
+
             ptr = pSlHttpServerEvent->EventData.httpPostData.token_value.data;
             strLenVal = strlen(LED_STRING);
             if (memcmp(ptr, LED_STRING, strLenVal) != 0)
@@ -649,7 +572,7 @@ static long ConfigureSimpleLinkToDefaultState() {
     unsigned char ucPower = 0;
 
     long lRetVal = -1;
-    long lMode = -1;
+    long lMode;
 
     lMode = sl_Start(0, 0, 0);
     ASSERT_ON_ERROR(lMode);
@@ -776,7 +699,6 @@ static long ConfigureSimpleLinkToDefaultState() {
 //
 //****************************************************************************
 long ConnectToNetwork() {
-    char ucAPSSID[32];
     unsigned short len, config_opt;
     long lRetVal = -1;
 
@@ -811,6 +733,7 @@ long ConnectToNetwork() {
 
     //No Mode Change Required
     if (g_uiSimplelinkRole == ROLE_AP) {
+        char ucAPSSID[AP_SSID_LEN_MAX];
         //waiting for the AP to acquire IP address from Internal DHCP Server
         while (!IS_IP_ACQUIRED(g_ulStatus)) {
 
@@ -943,7 +866,7 @@ static void ReadDeviceConfiguration() {
 //
 //****************************************************************************
 static void HTTPServerTask(void *pvParameters) {
-    long lRetVal = -1;
+    long lRetVal;
     InitializeAppVariables();
 
     //
@@ -975,7 +898,7 @@ static void HTTPServerTask(void *pvParameters) {
     ReadDeviceConfiguration();
 
     //Connect to Network
-    lRetVal = ConnectToNetwork();
+    ConnectToNetwork();
 
     //Stop Internal HTTP Server
     lRetVal = sl_NetAppStop(SL_NET_APP_HTTP_SERVER_ID);
@@ -1057,7 +980,7 @@ BoardInit(void)
 //                            MAIN FUNCTION
 //****************************************************************************
 int main() {
-    long lRetVal = -1;
+    long lRetVal;
 
 #ifdef ORIGINAL_EXAMPLE
     //Board Initialization

@@ -58,7 +58,6 @@ static void reset(unsigned long uart_base) {
 
 #if UART_0_EN
 void UART_0_ISR(void) {
-    long data;
 
     MAP_UARTIntClear(UARTA0_BASE,
     UART_INT_RX | UART_INT_OE | UART_INT_BE | UART_INT_PE | UART_INT_FE);
@@ -66,6 +65,8 @@ void UART_0_ISR(void) {
     if (UARTRxErrorGet(UARTA0_BASE)) {
         reset(UARTA0_BASE);
     } else {
+        long data;
+
         data = MAP_UARTCharGetNonBlocking(UARTA0_BASE);
         if (data != -1) {
             uart_config[0].rx_cb(uart_config[0].arg, data);
@@ -81,13 +82,13 @@ void UART_0_ISR(void) {
 #if UART_1_EN
 void UART_1_ISR(void)
 {
-    long data;
-
     MAP_UARTIntClear(UARTA1_BASE, UART_INT_RX|UART_INT_OE|UART_INT_BE|UART_INT_PE|UART_INT_FE);
 
     if (UARTRxErrorGet(UARTA1_BASE)) {
         reset(UARTA1_BASE);
     } else {
+        long data;
+
         data = MAP_UARTCharGetNonBlocking(UARTA1_BASE);
         if (data != -1) {
             uart_config[1].rx_cb(uart_config[1].arg, data);
@@ -137,12 +138,10 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb,
 }
 
 int uart_init_blocking(uart_t uart, uint32_t baudrate) {
-    unsigned long u;
 
     switch (uart) {
 #if UART_0_EN
     case UART_0:
-        u = UARTA0_BASE;
 
         MAP_PRCMPeripheralReset(PRCM_UARTA0);
 
@@ -161,17 +160,16 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate) {
         //
         MAP_PinTypeUART(PIN_57, PIN_MODE_3);
 
-        MAP_UARTConfigSetExpClk(u, MAP_PRCMPeripheralClockGet(PRCM_UARTA0),
+        MAP_UARTConfigSetExpClk(UARTA0_BASE, MAP_PRCMPeripheralClockGet(PRCM_UARTA0),
                 baudrate, (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE |
                 UART_CONFIG_PAR_NONE));
 
-        reset(u);
+        reset(UARTA0_BASE);
 
         break;
 #endif
 #if UART_1_EN
         case UART_1:
-        u = UARTA1_BASE;
 
         //
         // Enable Peripheral Clocks
@@ -188,9 +186,10 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate) {
         //
         PinTypeUART(PIN_08, PIN_MODE_5);
 
-        MAP_UARTConfigSetExpClk(u,MAP_PRCMPeripheralClockGet(PRCM_UARTA1),
+        MAP_UARTConfigSetExpClk(UARTA1_BASE,MAP_PRCMPeripheralClockGet(PRCM_UARTA1),
                 baudrate, (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE |
                         UART_CONFIG_PAR_NONE));
+        reset(UARTA1_BASE);
 
         break;
 #endif
