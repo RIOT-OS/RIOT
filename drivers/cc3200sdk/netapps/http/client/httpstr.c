@@ -34,19 +34,19 @@
  *
  */
 
-const char *CONTENT_TYPE_APPLET  = "application/octet-stream ";
-const char *CONTENT_TYPE_AU      = "audio/au ";
-const char *CONTENT_TYPE_CSS     = "text/css ";
-const char *CONTENT_TYPE_DOC     = "application/msword ";
-const char *CONTENT_TYPE_GIF     = "image/gif ";
-const char *CONTENT_TYPE_HTML    = "text/html ";
-const char *CONTENT_TYPE_JPG     = "image/jpeg ";
-const char *CONTENT_TYPE_MPEG    = "video/mpeg ";
-const char *CONTENT_TYPE_PDF     = "application/pdf ";
-const char *CONTENT_TYPE_WAV     = "audio/wav ";
-const char *CONTENT_TYPE_ZIP     = "application/zip ";
-const char *CONTENT_TYPE_PLAIN   = "text/plain ";
-const char *CONTENT_TYPE         = "Content-type: ";
-const char *CONTENT_LENGTH       = "Content-length: ";
+const char *CONTENT_TYPE_APPLET = "application/octet-stream ";
+const char *CONTENT_TYPE_AU = "audio/au ";
+const char *CONTENT_TYPE_CSS = "text/css ";
+const char *CONTENT_TYPE_DOC = "application/msword ";
+const char *CONTENT_TYPE_GIF = "image/gif ";
+const char *CONTENT_TYPE_HTML = "text/html ";
+const char *CONTENT_TYPE_JPG = "image/jpeg ";
+const char *CONTENT_TYPE_MPEG = "video/mpeg ";
+const char *CONTENT_TYPE_PDF = "application/pdf ";
+const char *CONTENT_TYPE_WAV = "audio/wav ";
+const char *CONTENT_TYPE_ZIP = "application/zip ";
+const char *CONTENT_TYPE_PLAIN = "text/plain ";
+const char *CONTENT_TYPE = "Content-type: ";
+const char *CONTENT_LENGTH = "Content-length: ";
 
-const char *HTTP_VER             = "HTTP/1.1";
+const char *HTTP_VER = "HTTP/1.1";

@@ -55,11 +55,11 @@ CPUcpsid(void)
     // Read PRIMASK and disable interrupts.
     //
     __asm("    mrs     r0, PRIMASK\n"
-          "    cpsid   i\n"
-          "    dsb      \n"
-          "    isb      \n"
-          "    bx      lr\n"
-          : "=r" (ulRet));
+            "    cpsid   i\n"
+            "    dsb      \n"
+            "    isb      \n"
+            "    bx      lr\n"
+            : "=r" (ulRet));
 
     //
     // The return is handled in the inline assembly, but the compiler will
@@ -78,9 +78,9 @@ CPUcpsid(void)
     // Read PRIMASK and disable interrupts.
     //
     __asm("    mrs     r0, PRIMASK\n"
-          "    cpsid   i\n"
-          "    dsb      \n"
-          "    isb      \n");
+            "    cpsid   i\n"
+            "    dsb      \n"
+            "    isb      \n");
 
     //
     // "Warning[Pe940]: missing return statement at end of non-void function"
@@ -99,10 +99,10 @@ CPUcpsid(void)
     // Read PRIMASK and disable interrupts.
     //
     __asm("    mrs     r0, PRIMASK\n"
-          "    cpsid   i\n"
-          "    dsb      \n"
-          "    isb      \n"
-          "    bx      lr\n");
+            "    cpsid   i\n"
+            "    dsb      \n"
+            "    isb      \n"
+            "    bx      lr\n");
 
     //
     // The following keeps the compiler happy, because it wants to see a
@@ -131,8 +131,8 @@ CPUprimask(void)
     // Read PRIMASK and disable interrupts.
     //
     __asm("    mrs     r0, PRIMASK\n"
-          "    bx      lr\n"
-          : "=r" (ulRet));
+            "    bx      lr\n"
+            : "=r" (ulRet));
 
     //
     // The return is handled in the inline assembly, but the compiler will
@@ -169,7 +169,7 @@ CPUprimask(void)
     // Read PRIMASK and disable interrupts.
     //
     __asm("    mrs     r0, PRIMASK\n"
-          "    bx      lr\n");
+            "    bx      lr\n");
 
     //
     // The following keeps the compiler happy, because it wants to see a
@@ -198,11 +198,11 @@ CPUcpsie(void)
     // Read PRIMASK and enable interrupts.
     //
     __asm("    mrs     r0, PRIMASK\n"
-          "    cpsie   i\n"
-          "    dsb      \n"
-          "    isb      \n"
-          "    bx      lr\n"
-          : "=r" (ulRet));
+            "    cpsie   i\n"
+            "    dsb      \n"
+            "    isb      \n"
+            "    bx      lr\n"
+            : "=r" (ulRet));
 
     //
     // The return is handled in the inline assembly, but the compiler will
@@ -221,9 +221,9 @@ CPUcpsie(void)
     // Read PRIMASK and enable interrupts.
     //
     __asm("    mrs     r0, PRIMASK\n"
-          "    cpsie   i\n"
-          "    dsb      \n"
-          "    isb      \n");
+            "    cpsie   i\n"
+            "    dsb      \n"
+            "    isb      \n");
 
     //
     // "Warning[Pe940]: missing return statement at end of non-void function"
@@ -242,10 +242,10 @@ CPUcpsie(void)
     // Read PRIMASK and enable interrupts.
     //
     __asm("    mrs     r0, PRIMASK\n"
-          "    cpsie   i\n"
-          "    dsb      \n"
-          "    isb      \n"
-          "    bx      lr\n");
+            "    cpsie   i\n"
+            "    dsb      \n"
+            "    isb      \n"
+            "    bx      lr\n");
 
     //
     // The following keeps the compiler happy, because it wants to see a
@@ -271,9 +271,9 @@ CPUwfi(void)
     // Wait for the next interrupt.
     //
     __asm("    dsb      \n"
-          "    isb      \n"
-          "    wfi      \n"
-          "    bx      lr\n");
+            "    isb      \n"
+            "    wfi      \n"
+            "    bx      lr\n");
 }
 #endif
 #if defined(ewarm)
@@ -284,8 +284,8 @@ CPUwfi(void)
     // Wait for the next interrupt.
     //
     __asm("    dsb      \n"
-          "    isb      \n"
-          "    wfi      \n");
+            "    isb      \n"
+            "    wfi      \n");
 }
 #endif
 #if defined(ccs)
@@ -296,8 +296,8 @@ CPUwfi(void)
     // Wait for the next interrupt.
     //
     __asm("    dsb      \n"
-          "    isb      \n"
-          "    wfi      \n");
+            "    isb      \n"
+            "    wfi      \n");
 }
 #endif
 
@@ -315,9 +315,9 @@ CPUbasepriSet(unsigned long ulNewBasepri)
     // Set the BASEPRI register
     //
     __asm("    msr     BASEPRI, r0\n"
-          "    dsb      \n"
-          "    isb      \n"
-          "    bx      lr\n");
+            "    dsb      \n"
+            "    isb      \n"
+            "    bx      lr\n");
 }
 #endif
 #if defined(ewarm)
@@ -328,8 +328,8 @@ CPUbasepriSet(unsigned long ulNewBasepri)
     // Set the BASEPRI register
     //
     __asm("    msr     BASEPRI, r0\n"
-          "    dsb      \n"
-          "    isb      \n");
+            "    dsb      \n"
+            "    isb      \n");
 }
 #endif
 #if defined(ccs)
@@ -340,8 +340,8 @@ CPUbasepriSet(unsigned long ulNewBasepri)
     // Set the BASEPRI register
     //
     __asm("    msr     BASEPRI, r0\n"
-          "    dsb      \n"
-          "    isb      \n");
+            "    dsb      \n"
+            "    isb      \n");
 }
 #endif
 
@@ -360,8 +360,8 @@ CPUbasepriGet(void)
     // Read BASEPRI
     //
     __asm("    mrs     r0, BASEPRI\n"
-          "    bx      lr\n"
-          : "=r" (ulRet));
+            "    bx      lr\n"
+            : "=r" (ulRet));
 
     //
     // The return is handled in the inline assembly, but the compiler will
@@ -398,7 +398,7 @@ CPUbasepriGet(void)
     // Read BASEPRI
     //
     __asm("    mrs     r0, BASEPRI\n"
-          "    bx      lr\n");
+            "    bx      lr\n");
 
     //
     // The following keeps the compiler happy, because it wants to see a

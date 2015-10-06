@@ -12,7 +12,7 @@
  * stipulated in the agreement under which this program has been supplied,
  * and under no circumstances can it be used with non-TI connectivity device.
  *
-*/
+ */
 #ifndef __OTA_APP_EXT_H__
 #define __OTA_APP_EXT_H__
 
@@ -38,66 +38,63 @@ extern "C" {
 
 /******************************************************************************
  * Server info Structure
-******************************************************************************/
-typedef struct
-{
-    _i32    ip_address; /* 0x0 – use server name */
-    _i32    secured_connection;
-    _u8   server_domain[MAX_SERVER_NAME];
-    _u8   rest_update_chk[MAX_PATH_PREFIX];
-    _u8   rest_rsrc_metadata[MAX_PATH_PREFIX];
-    _u8   rest_hdr[MAX_REST_HDRS_SIZE];
-    _u8   rest_hdr_val[MAX_REST_HDRS_SIZE];
-    _u8   user_name[MAX_USER_NAME_STR];
-    _u8   user_pass[MAX_USER_PASS_STR];
-    _u8   ca_cert_filename[MAX_CERT_STR];
-    _u8   client_cert_filename[MAX_CERT_STR];
-    _u8   privatekey_filename[MAX_KEY_STR];
+ ******************************************************************************/
+typedef struct {
+    _i32 ip_address; /* 0x0 ï¿½ use server name */
+    _i32 secured_connection;
+    _u8 server_domain[MAX_SERVER_NAME];
+    _u8 rest_update_chk[MAX_PATH_PREFIX];
+    _u8 rest_rsrc_metadata[MAX_PATH_PREFIX];
+    _u8 rest_hdr[MAX_REST_HDRS_SIZE];
+    _u8 rest_hdr_val[MAX_REST_HDRS_SIZE];
+    _u8 user_name[MAX_USER_NAME_STR];
+    _u8 user_pass[MAX_USER_PASS_STR];
+    _u8 ca_cert_filename[MAX_CERT_STR];
+    _u8 client_cert_filename[MAX_CERT_STR];
+    _u8 privatekey_filename[MAX_KEY_STR];
     /* logger */
-    _u8   log_server_name[MAX_SERVER_NAME];
-    _u8   rest_files_put[MAX_REST_HDRS_SIZE];
-    _u8   log_mac_address[6];
+    _u8 log_server_name[MAX_SERVER_NAME];
+    _u8 rest_files_put[MAX_REST_HDRS_SIZE];
+    _u8 log_mac_address[6];
 } OtaOptServerInfo_t;
 
 /******************************************************************************
  * typedefs
-******************************************************************************/
-typedef _i32 (*OpenFileCB)  (_u8 *file_name, _i32 file_size, _u32 *ulToken, _i32
-									*lFileHandle, _i32 open_flags);
-typedef _i32 (*WriteFileCB) (_i32 fileHandle, _i32 offset, _u8 *buf, _i32 len);
-typedef _i32 (*ReadFileCB)  (_i32 fileHandle, _i32 offset, _u8 *buf, _i32 len);
-typedef _i32 (*CloseFileCB) (_i32 fileHandle, _u8 *pCeritificateFileName,
-								_u8 *pSignature ,_u32 SignatureLen);
+ ******************************************************************************/
+typedef _i32 (*OpenFileCB)(_u8 *file_name, _i32 file_size, _u32 *ulToken,
+        _i32 *lFileHandle, _i32 open_flags);
+typedef _i32 (*WriteFileCB)(_i32 fileHandle, _i32 offset, _u8 *buf, _i32 len);
+typedef _i32 (*ReadFileCB)(_i32 fileHandle, _i32 offset, _u8 *buf, _i32 len);
+typedef _i32 (*CloseFileCB)(_i32 fileHandle, _u8 *pCeritificateFileName,
+        _u8 *pSignature, _u32 SignatureLen);
 typedef _i32 (*AbortFileCB)(_i32 fileHandle);
 typedef _i32 (*CheckConvertFileCB)(_u8* file_name);
 
 /******************************************************************************
  * FLC structure
-******************************************************************************/
-typedef struct
-{
-    OpenFileCB   pOpenFile;
-    WriteFileCB  pWriteFile;
-    ReadFileCB   pReadFile;
-    CloseFileCB  pCloseFile;
+ ******************************************************************************/
+typedef struct {
+    OpenFileCB pOpenFile;
+    WriteFileCB pWriteFile;
+    ReadFileCB pReadFile;
+    CloseFileCB pCloseFile;
     AbortFileCB pAbortFile;
 } FlcCb_t;
 
 /******************************************************************************
  * File metadata Structure
-******************************************************************************/
-typedef struct
-{
+ ******************************************************************************/
+typedef struct {
     /* files server name */
     _u8 cdn_url[256];
 
     /* file flags */
-    _i32  flags;
+    _i32 flags;
 
     /* file name */
     _u8 rsrc_file_name[256];
     _u8 *p_file_name;
-    _i32  sflash_file_size;
+    _i32 sflash_file_size;
 
     /* certificate file name */
     _u8 cert1_filename[64];
@@ -108,22 +105,20 @@ typedef struct
     _u8 signature_filename[64];
     _u8 *p_signature;
     _u8 signature[256];
-    _i32  signature_len;
+    _i32 signature_len;
 } OtaFileMetadata_t;
 
 /******************************************************************************
  * Enumerations
-******************************************************************************/
-typedef enum
-{
-    EXTLIB_OTA_SET_OPT_SERVER_INFO = 0,  /* see OtaOptServerInfo_t   */
+ ******************************************************************************/
+typedef enum {
+    EXTLIB_OTA_SET_OPT_SERVER_INFO = 0, /* see OtaOptServerInfo_t   */
     EXTLIB_OTA_SET_OPT_VENDOR_ID,
     EXTLIB_OTA_SET_OPT_IMAGE_TEST,
     EXTLIB_OTA_SET_OPT_IMAGE_COMMIT
 } OtaSetOpt_e;
 
-typedef enum
-{
+typedef enum {
     EXTLIB_OTA_GET_OPT_IS_ACTIVE,
     EXTLIB_OTA_GET_OPT_IS_PENDING_COMMIT,
     EXTLIB_OTA_GET_OPT_PRINT_STAT
@@ -131,7 +126,7 @@ typedef enum
 
 /******************************************************************************
  * Macros
-******************************************************************************/
+ ******************************************************************************/
 /* RunMode bitmap */
 #define RUN_MODE_OS              (0 << 0)        /* bit 0: 1-NoneOs, 0-Os */
 #define RUN_MODE_NONE_OS         (1 << 0)
@@ -165,145 +160,147 @@ typedef enum
 
 /*!
 
-    \addtogroup OTA
-    @{
+ \addtogroup OTA
+ @{
 
-*/
+ */
 
 /*!
-    \brief Initialize OTA application
+ \brief Initialize OTA application
 
-    \param[in] RunMode			Is the run mode for the application
-    \param[in] pFlcHostCb		Pointer to file commit call back functions
+ \param[in] RunMode			Is the run mode for the application
+ \param[in] pFlcHostCb		Pointer to file commit call back functions
 
-	This function initializes the OTA application and modules. The parameter
-	\e RunMode configure the OTA lib to run with OS or noneOS, use blocking or
-	noneBlocking calls. It can be logical OR combination of following:
+ This function initializes the OTA application and modules. The parameter
+ \e RunMode configure the OTA lib to run with OS or noneOS, use blocking or
+ noneBlocking calls. It can be logical OR combination of following:
 
-	-\b RUN_MODE_OS \n
-	-\b RUN_MODE_NONE_OS \n
-	-\b RUN_MODE_BLOCKING \n
-	-\b RUN_MODE_NONE_BLOCKING \n
+ -\b RUN_MODE_OS \n
+ -\b RUN_MODE_NONE_OS \n
+ -\b RUN_MODE_BLOCKING \n
+ -\b RUN_MODE_NONE_BLOCKING \n
 
-	The parameter \e pFlcHostCb is a pointer to FlcCb_t structure containing
-	callback function to download files to storage other than SFLASH.
+ The parameter \e pFlcHostCb is a pointer to FlcCb_t structure containing
+ callback function to download files to storage other than SFLASH.
 
-    \return                OTA control block pointer
+ \return                OTA control block pointer
 
-    \sa
-    \note  Currently OTA supports only NON-OS Blocking mode and pFlcHostCb
-	should be set to NULL.
-    \warning
-    \par                 Example:
-    \code
-    For example: To initialize OTA from host invoke
+ \sa
+ \note  Currently OTA supports only NON-OS Blocking mode and pFlcHostCb
+ should be set to NULL.
+ \warning
+ \par                 Example:
+ \code
+ For example: To initialize OTA from host invoke
 
-    pvOtaApp = sl_extLib_OtaInit(RUN_MODE_NONE_OS | RUN_MODE_BLOCKING, NULL);
+ pvOtaApp = sl_extLib_OtaInit(RUN_MODE_NONE_OS | RUN_MODE_BLOCKING, NULL);
 
-    \endcode
-*/
+ \endcode
+ */
 void *sl_extLib_OtaInit(_i32 runMode, FlcCb_t *pFlcHostCb);
 
 /*!
-    \brief Run the OTA App state machine
+ \brief Run the OTA App state machine
 
-    \param[in] pvOtaApp     Pointer to OTA application pointer
+ \param[in] pvOtaApp     Pointer to OTA application pointer
 
 
-    Run one step from the OTA application state machine. Host should repeat
-	calling this function and examine the return value in order to check if OTA
-	completed or got error or just need to be continued. This pattern is useful
-	in host with NON-OS. In host with OS, host should start OTA task and
-	continuously calling this function till OTA completed.
+ Run one step from the OTA application state machine. Host should repeat
+ calling this function and examine the return value in order to check if OTA
+ completed or got error or just need to be continued. This pattern is useful
+ in host with NON-OS. In host with OS, host should start OTA task and
+ continuously calling this function till OTA completed.
 
-    \return Return zero or +ve bitmap number on success, -ve otherwise.
+ \return Return zero or +ve bitmap number on success, -ve otherwise.
 
-    -\b RUN_STAT_CONTINUE    - Host should continue calling sl_extLib_OtaRun \n
-    -\b RUN_STAT_NO_UPDATES  - No updates for now, host can retry \n
-    -\b RUN_STAT_DOWNLOAD_DONE - Current OTA update completed,
-	host should test bit 2,3 to reset the MCU/NWP \n
-    -\b RUN_STAT_ERROR_CONTINUOUS_ACCESS_FAILURES - Fatal access error,
-	OTA try more than 10 times to reach the OTA server and failed, it is
-	recommended to reset the NWP. \n\n
+ -\b RUN_STAT_CONTINUE    - Host should continue calling sl_extLib_OtaRun \n
+ -\b RUN_STAT_NO_UPDATES  - No updates for now, host can retry \n
+ -\b RUN_STAT_DOWNLOAD_DONE - Current OTA update completed,
+ host should test bit 2,3 to reset the MCU/NWP \n
+ -\b RUN_STAT_ERROR_CONTINUOUS_ACCESS_FAILURES - Fatal access error,
+ OTA try more than 10 times to reach the OTA server and failed, it is
+ recommended to reset the NWP. \n\n
 
-	Other negative value - OTA error, OTA can recover from this failue, host
-	should continue calling sl_extLib_OtaRun.
+ Other negative value - OTA error, OTA can recover from this failue, host
+ should continue calling sl_extLib_OtaRun.
 
-    \sa
-    \note
-    \warning
-    \par                 Example:
-    \code
-    For example: Run OTA from host
+ \sa
+ \note
+ \warning
+ \par                 Example:
+ \code
+ For example: Run OTA from host
 
-    pvOtaApp = sl_extLib_OtaRun(pvOtaApp);
+ pvOtaApp = sl_extLib_OtaRun(pvOtaApp);
 
-    \endcode
-*/
+ \endcode
+ */
 _i32 sl_extLib_OtaRun(void *pvOtaApp);
 
 /*!
-    \brief Set OTA command/parameter
+ \brief Set OTA command/parameter
 
-    \param[in] pvOtaApp     OTA control block pointer
-    \param[in] Option       Select the option
-    \param[in] OptionLen    Option structure length
-    \param[in] pOptionVal   pointer to the option structure
+ \param[in] pvOtaApp     OTA control block pointer
+ \param[in] Option       Select the option
+ \param[in] OptionLen    Option structure length
+ \param[in] pOptionVal   pointer to the option structure
 
-	This function sets OTA command/parameter. The parameter \e Option can be
-	one of the following:
+ This function sets OTA command/parameter. The parameter \e Option can be
+ one of the following:
 
-	\b EXTLIB_OTA_SET_OPT_SERVER_INFO - Set the Server information \n
-	\b EXTLIB_OTA_SET_OPT_VENDOR_ID   - Set the Vendor ID string \n
-	\b EXTLIB_OTA_SET_OPT_COMMITED - Commit the last OTA update & move to idle \n
+ \b EXTLIB_OTA_SET_OPT_SERVER_INFO - Set the Server information \n
+ \b EXTLIB_OTA_SET_OPT_VENDOR_ID   - Set the Vendor ID string \n
+ \b EXTLIB_OTA_SET_OPT_COMMITED - Commit the last OTA update & move to idle \n
 
-    \return         On success, zero is returned. On error, -1 is returned
+ \return         On success, zero is returned. On error, -1 is returned
 
-    \sa
-    \note
-    \warning
-    \par                 Example:
-    \code
-    For example: Set OTA server info from host
+ \sa
+ \note
+ \warning
+ \par                 Example:
+ \code
+ For example: Set OTA server info from host
 
-    sl_extLib_OtaSet(pvOtaApp, EXTLIB_OTA_SET_OPT_SERVER_INFO,sizeof(g_otaOptServerInfo), (_u8 *)&g_otaOptServerInfo);
+ sl_extLib_OtaSet(pvOtaApp, EXTLIB_OTA_SET_OPT_SERVER_INFO,sizeof(g_otaOptServerInfo), (_u8 *)&g_otaOptServerInfo);
 
-    \endcode
-*/
-_i32 sl_extLib_OtaSet(void *pvOtaApp, _i32 Option, _i32  OptionLen, _u8 *pOptionVal);
+ \endcode
+ */
+_i32 sl_extLib_OtaSet(void *pvOtaApp, _i32 Option, _i32 OptionLen,
+        _u8 *pOptionVal);
 
 /*!
-    \brief Get the current OTA status
+ \brief Get the current OTA status
 
 
-    \param[in] pvOtaApp     OTA control block pointer
-    \param[in] Option       Selects the option
-    \param[in] OptionLen    option structure length
-    \param[in] pOptionVal   pointer to the option structure
+ \param[in] pvOtaApp     OTA control block pointer
+ \param[in] Option       Selects the option
+ \param[in] OptionLen    option structure length
+ \param[in] pOptionVal   pointer to the option structure
 
-	This function gets the current OTA of active or Idle.
-	The parameter \e option, could be one of the following:
+ This function gets the current OTA of active or Idle.
+ The parameter \e option, could be one of the following:
 
-    \b EXTLIB_OTA_GET_OPT_IS_ACTIVE - Check if OTA process is active or idle \n
+ \b EXTLIB_OTA_GET_OPT_IS_ACTIVE - Check if OTA process is active or idle \n
 
-	Value at \e pOptionVal will be set to 1 if OTA process is active, 0 if Idle
+ Value at \e pOptionVal will be set to 1 if OTA process is active, 0 if Idle
 
-    \b EXTLIB_OTA_GET_OPT_PRINT_STAT - Prints statistics
+ \b EXTLIB_OTA_GET_OPT_PRINT_STAT - Prints statistics
 
-    \return         Return 0 on success, -1 otherwise.
+ \return         Return 0 on success, -1 otherwise.
 
-    \sa
-    \note
-    \warning
-    \par                 Example:
-    \code
-    For example: Get OTA running status
+ \sa
+ \note
+ \warning
+ \par                 Example:
+ \code
+ For example: Get OTA running status
 
-    sl_extLib_OtaGet(pvOtaApp, EXTLIB_OTA_GET_OPT_IS_ACTIVE, &ProcActiveLen, (_u8 *)&ProcActive);
+ sl_extLib_OtaGet(pvOtaApp, EXTLIB_OTA_GET_OPT_IS_ACTIVE, &ProcActiveLen, (_u8 *)&ProcActive);
 
-    \endcode
-*/
-_i32 sl_extLib_OtaGet(void *pvOtaApp, _i32 Option, _i32 *OptionLen, _u8 *pOptionVal);
+ \endcode
+ */
+_i32 sl_extLib_OtaGet(void *pvOtaApp, _i32 Option, _i32 *OptionLen,
+        _u8 *pOptionVal);
 
 #ifdef  __cplusplus
 }

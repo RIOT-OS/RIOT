@@ -43,18 +43,16 @@
 #include <interrupt.h>
 
 /*!
-*  \brief Register the specified interrupt with NVIC using the global ISR.
-*    Also store the interrupt handler and its parameter for invocation later.
-*  \param  irqvec_id:   Is the interrupt vector index
-*  \param  intr_handler: is the corresponding interrupt service routine pointer
-*  \param  param: is the pointer to the information store to be passed to the
-*          intr_handler registered
-* 
-*  \return 0: on success, -1 on error
-*/
-i32 register_isr(u8 irqvec_id, 
-                        void (*intr_handler)(void *), 
-                        void *param);
+ *  \brief Register the specified interrupt with NVIC using the global ISR.
+ *    Also store the interrupt handler and its parameter for invocation later.
+ *  \param  irqvec_id:   Is the interrupt vector index
+ *  \param  intr_handler: is the corresponding interrupt service routine pointer
+ *  \param  param: is the pointer to the information store to be passed to the
+ *          intr_handler registered
+ * 
+ *  \return 0: on success, -1 on error
+ */
+i32 register_isr(u8 irqvec_id, void (*intr_handler)(void *), void *param);
 
 #endif //_INTERRUPT_HAL_H_
 

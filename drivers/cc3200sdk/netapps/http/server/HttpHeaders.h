@@ -22,51 +22,51 @@
  * @{
  */
 
-char    HTTP_HEADER_DELIMITER[]         =  "\r\n";
+char HTTP_HEADER_DELIMITER[] = "\r\n";
 
 // HTTP method line strings
-char    HTTP_METHOD_GET[]               =  "get";
-char    HTTP_METHOD_POST[]              =  "post";
-char    HTTP_VERSION_1P1[]              =  "http/1.1";
-char    HTTP_VERSION_1P0[]              =  "http/1.0";
+char HTTP_METHOD_GET[] = "get";
+char HTTP_METHOD_POST[] = "post";
+char HTTP_VERSION_1P1[] = "http/1.1";
+char HTTP_VERSION_1P0[] = "http/1.0";
 
 // HTTP request/response header line strings
-char    HTTP_CONTENT_TYPE[]             =  "content-type";
-char    HTTP_CONTENT_LENGTH[]           =  "content-length";
-char    HTTP_ACCEPT_ENCODING[]          =  "accept-encoding";
-char    HTTP_AUTHORIZATION[]            =  "authorization";
-char    HTTP_CONNECTION_CLOSE[]         =  "connection";
-char    HTTP_GZIP[]                     =  "gzip";
-char    HTTP_CLOSE[]                    =  "close";
-char    HTTP_LOCATION[]                 =  "location";
-char    HTTP_CONTENT_ENCODING[]         =  "content-encoding";
+char HTTP_CONTENT_TYPE[] = "content-type";
+char HTTP_CONTENT_LENGTH[] = "content-length";
+char HTTP_ACCEPT_ENCODING[] = "accept-encoding";
+char HTTP_AUTHORIZATION[] = "authorization";
+char HTTP_CONNECTION_CLOSE[] = "connection";
+char HTTP_GZIP[] = "gzip";
+char HTTP_CLOSE[] = "close";
+char HTTP_LOCATION[] = "location";
+char HTTP_CONTENT_ENCODING[] = "content-encoding";
 
 // HTTP response status line strings
-char    HTTP_STATUS_OK_STR[]                   =    "ok";
-char    HTTP_STATUS_REDIRECT_PERMANENT_STR[]   =    "moved permanently";
-char    HTTP_STATUS_REDIRECT_TEMPORARY_STR[]   =    "moved temporarily";
-char    HTTP_STATUS_ERROR_UNAUTHORIZED_STR[]   =    "unauthorized";
-char    HTTP_STATUS_ERROR_NOT_FOUND_STR[]      =    "not found";
-char    HTTP_STATUS_ERROR_NOT_ACCEPTED_STR[]   =    "not accepted";
-char    HTTP_STATUS_ERROR_INTERNAL_STR[]       =    "internal server error";
+char HTTP_STATUS_OK_STR[] = "ok";
+char HTTP_STATUS_REDIRECT_PERMANENT_STR[] = "moved permanently";
+char HTTP_STATUS_REDIRECT_TEMPORARY_STR[] = "moved temporarily";
+char HTTP_STATUS_ERROR_UNAUTHORIZED_STR[] = "unauthorized";
+char HTTP_STATUS_ERROR_NOT_FOUND_STR[] = "not found";
+char HTTP_STATUS_ERROR_NOT_ACCEPTED_STR[] = "not accepted";
+char HTTP_STATUS_ERROR_INTERNAL_STR[] = "internal server error";
 
 //WebSocket upgrade header line strings
-char	WS_HOST[]					= 	"host";
-char	WS_UPGRADE[]				=	"upgrade";
-char 	WS_CONNECTION[]				= 	"connection";
-char 	WS_VERSION_REQUEST[]		=   "sec-websocket-version";
-char	WS_KEY_REQUEST[]			= 	"sec-websocket-key";
-char	WS_ORIGIN[]					= 	"origin";
-char	WS_CACHE_CONTROL[]			= 	"cache-control";
-char	WS_PRAGMA[]					=	"pragma";
-char    WS_EXTENSION[]				=   "sec-websocket-extensions";
-char*	WS_ORIGIN_NAME = NULL;
+char WS_HOST[] = "host";
+char WS_UPGRADE[] = "upgrade";
+char WS_CONNECTION[] = "connection";
+char WS_VERSION_REQUEST[] = "sec-websocket-version";
+char WS_KEY_REQUEST[] = "sec-websocket-key";
+char WS_ORIGIN[] = "origin";
+char WS_CACHE_CONTROL[] = "cache-control";
+char WS_PRAGMA[] = "pragma";
+char WS_EXTENSION[] = "sec-websocket-extensions";
+char* WS_ORIGIN_NAME = NULL;
 
 //WebSocket response line strings
-char 	WS_WEBSOCKET[]				= 	"websocket";
-char	WS_MAGIC_STRING[]			= 	"258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
-char 	WS_VERSION[]				=   "13";
-char 	WS_ACCEPT[]					=   "Sec-websocket-accept";
+char WS_WEBSOCKET[] = "websocket";
+char WS_MAGIC_STRING[] = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
+char WS_VERSION[] = "13";
+char WS_ACCEPT[] = "Sec-websocket-accept";
 
 ///Length of client generated key
 #define WS_KEY_LENGTH 			24

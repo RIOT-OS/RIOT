@@ -25,18 +25,17 @@
 extern "C" {
 #endif
 
-/**
- * @brief   ARM Cortex-M cc3200 specific CPU configuration
- * @{
- */
+    /**
+     * @brief   ARM Cortex-M cc3200 specific CPU configuration
+     * @{
+     */
 #define CPU_DEFAULT_IRQ_PRIO            INT_PRIORITY_LVL_1
 
+    /** @} */
 
-/** @} */
-
-/**
- * @brief   length of CPU ID for @ref cpuid_get() in @ref periph/cpuid.h
- */
+    /**
+     * @brief   length of CPU ID for @ref cpuid_get() in @ref periph/cpuid.h
+     */
 #ifndef CPUID_ID_LEN
 #define CPUID_ID_LEN                    8
 #endif

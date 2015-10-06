@@ -170,9 +170,9 @@ extern "C"
 //*****************************************************************************
 extern void AESConfigSet(uint32_t ui32Base, uint32_t ui32Config);
 extern void AESKey1Set(uint32_t ui32Base, uint8_t *pui8Key,
-                       uint32_t ui32Keysize);
+        uint32_t ui32Keysize);
 extern void AESKey2Set(uint32_t ui32Base, uint8_t *pui8Key,
-                       uint32_t ui32Keysize);
+        uint32_t ui32Keysize);
 extern void AESKey3Set(uint32_t ui32Base, uint8_t *pui8Key);
 extern void AESIVSet(uint32_t ui32Base, uint8_t *pui8IVdata);
 extern void AESIVGet(uint32_t ui32Base, uint8_t *pui8IVdata);
@@ -180,28 +180,23 @@ extern void AESTagRead(uint32_t ui32Base, uint8_t *pui8TagData);
 extern void AESDataLengthSet(uint32_t ui32Base, uint64_t ui64Length);
 extern void AESAuthDataLengthSet(uint32_t ui32Base, uint32_t ui32Length);
 extern bool AESDataReadNonBlocking(uint32_t ui32Base, uint8_t *pui8Dest,
-                                   uint8_t ui8Length);
-extern void AESDataRead(uint32_t ui32Base, uint8_t *pui8Dest,
-                        uint8_t ui8Length);
+        uint8_t ui8Length);
+extern void AESDataRead(uint32_t ui32Base, uint8_t *pui8Dest, uint8_t ui8Length);
 extern bool AESDataWriteNonBlocking(uint32_t ui32Base, uint8_t *pui8Src,
-                                    uint8_t ui8Length);
-extern void AESDataWrite(uint32_t ui32Base, uint8_t *pui8Src,
-                         uint8_t ui8Length);
+        uint8_t ui8Length);
+extern void AESDataWrite(uint32_t ui32Base, uint8_t *pui8Src, uint8_t ui8Length);
 extern bool AESDataProcess(uint32_t ui32Base, uint8_t *pui8Src,
-                           uint8_t *pui8Dest,
-               uint32_t ui32Length);
-extern bool AESDataMAC(uint32_t ui32Base, uint8_t *pui8Src,
-                       uint32_t ui32Length,
-            uint8_t *pui8Tag);
+        uint8_t *pui8Dest, uint32_t ui32Length);
+extern bool AESDataMAC(uint32_t ui32Base, uint8_t *pui8Src, uint32_t ui32Length,
+        uint8_t *pui8Tag);
 extern bool AESDataProcessAE(uint32_t ui32Base, uint8_t *pui8Src,
-                             uint8_t *pui8Dest, uint32_t ui32Length,
-                             uint8_t *pui8AuthSrc, uint32_t ui32AuthLength,
-                             uint8_t *pui8Tag);
+        uint8_t *pui8Dest, uint32_t ui32Length, uint8_t *pui8AuthSrc,
+        uint32_t ui32AuthLength, uint8_t *pui8Tag);
 extern uint32_t AESIntStatus(uint32_t ui32Base, bool bMasked);
 extern void AESIntEnable(uint32_t ui32Base, uint32_t ui32IntFlags);
 extern void AESIntDisable(uint32_t ui32Base, uint32_t ui32IntFlags);
 extern void AESIntClear(uint32_t ui32Base, uint32_t ui32IntFlags);
-extern void AESIntRegister(uint32_t ui32Base, void(*pfnHandler)(void));
+extern void AESIntRegister(uint32_t ui32Base, void (*pfnHandler)(void));
 extern void AESIntUnregister(uint32_t ui32Base);
 extern void AESDMAEnable(uint32_t ui32Base, uint32_t ui32Flags);
 extern void AESDMADisable(uint32_t ui32Base, uint32_t ui32Flags);

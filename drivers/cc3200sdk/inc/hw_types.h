@@ -72,5 +72,4 @@ typedef unsigned char tBoolean;
         HWREGB(((unsigned long)(x) & 0xF0000000) | 0x02000000 |               \
                (((unsigned long)(x) & 0x000FFFFF) << 5) | ((b) << 2))
 
-
 #endif // __HW_TYPES_H__

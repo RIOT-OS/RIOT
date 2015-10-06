@@ -64,8 +64,6 @@
 #define UART_O_PP               0x00000FC0
 #define UART_O_CC               0x00000FC8
 
-
-
 //******************************************************************************
 //
 // The following are defines for the bit fields in the UART_O_DR register.
@@ -135,12 +133,12 @@
 //******************************************************************************
 #define UART_LCRH_SPS           0x00000080  // UART Stick Parity Select
 #define UART_LCRH_WLEN_M      0x00000060  // UART Word Length 0x00000000 :
-                                            // UART_LCRH_WLEN_5 : 5 bits
-                                            // (default) 0x00000020 :
-                                            // UART_LCRH_WLEN_6 : 6 bits
-                                            // 0x00000040 : UART_LCRH_WLEN_7 : 7
-                                            // bits 0x00000060 :
-                                            // UART_LCRH_WLEN_8 : 8 bits
+// UART_LCRH_WLEN_5 : 5 bits
+// (default) 0x00000020 :
+// UART_LCRH_WLEN_6 : 6 bits
+// 0x00000040 : UART_LCRH_WLEN_7 : 7
+// bits 0x00000060 :
+// UART_LCRH_WLEN_8 : 8 bits
 #define UART_LCRH_WLEN_S      5
 #define UART_LCRH_FEN           0x00000010  // UART Enable FIFOs
 #define UART_LCRH_STP2          0x00000008  // UART Two Stop Bits Select
@@ -179,10 +177,10 @@
 //
 //******************************************************************************
 #define UART_IFLS_RX_M        0x00000038  // UART Receive Interrupt FIFO
-                                            // Level Select
+// Level Select
 #define UART_IFLS_RX_S        3
 #define UART_IFLS_TX_M        0x00000007  // UART Transmit Interrupt FIFO
-                                            // Level Select
+// Level Select
 #define UART_IFLS_TX_S        0
 //******************************************************************************
 //
@@ -194,108 +192,108 @@
 #define UART_IM_LME5IM          0x00008000  // LIN Mode Edge 5 Interrupt Mask
 #define UART_IM_LME1IM          0x00004000  // LIN Mode Edge 1 Interrupt Mask
 #define UART_IM_LMSBIM          0x00002000  // LIN Mode Sync Break Interrupt
-                                            // Mask
+// Mask
 #define UART_IM_9BITIM       0x00001000  // 9-Bit Mode Interrupt Mask
 #define UART_IM_EOTIM           0x00000800  // End of Transmission Interrupt
-                                            // Mask
+// Mask
 #define UART_IM_OEIM            0x00000400  // UART Overrun Error Interrupt
-                                            // Mask
+// Mask
 #define UART_IM_BEIM            0x00000200  // UART Break Error Interrupt Mask
 #define UART_IM_PEIM            0x00000100  // UART Parity Error Interrupt Mask
 #define UART_IM_FEIM            0x00000080  // UART Framing Error Interrupt
-                                            // Mask
+// Mask
 #define UART_IM_RTIM            0x00000040  // UART Receive Time-Out Interrupt
-                                            // Mask
+// Mask
 #define UART_IM_TXIM            0x00000020  // UART Transmit Interrupt Mask
 #define UART_IM_RXIM            0x00000010  // UART Receive Interrupt Mask
 #define UART_IM_DSRMIM          0x00000008  // UART Data Set Ready Modem
-                                            // Interrupt Mask
+// Interrupt Mask
 #define UART_IM_DCDMIM          0x00000004  // UART Data Carrier Detect Modem
-                                            // Interrupt Mask
+// Interrupt Mask
 #define UART_IM_CTSMIM          0x00000002  // UART Clear to Send Modem
-                                            // Interrupt Mask
+// Interrupt Mask
 #define UART_IM_RIMIM           0x00000001  // UART Ring Indicator Modem
-                                            // Interrupt Mask
+// Interrupt Mask
 //******************************************************************************
 //
 // The following are defines for the bit fields in the UART_O_RIS register.
 //
 //******************************************************************************
 #define UART_RIS_DMATXRIS       0x00020000  // Transmit DMA Raw Interrupt
-                                            // Status
+// Status
 #define UART_RIS_DMARXRIS       0x00010000  // Receive DMA Raw Interrupt Status
 #define UART_RIS_LME5RIS        0x00008000  // LIN Mode Edge 5 Raw Interrupt
-                                            // Status
+// Status
 #define UART_RIS_LME1RIS        0x00004000  // LIN Mode Edge 1 Raw Interrupt
-                                            // Status
+// Status
 #define UART_RIS_LMSBRIS        0x00002000  // LIN Mode Sync Break Raw
-                                            // Interrupt Status
+// Interrupt Status
 #define UART_RIS_9BITRIS     0x00001000  // 9-Bit Mode Raw Interrupt Status
 #define UART_RIS_EOTRIS         0x00000800  // End of Transmission Raw
-                                            // Interrupt Status
+// Interrupt Status
 #define UART_RIS_OERIS          0x00000400  // UART Overrun Error Raw Interrupt
-                                            // Status
+// Status
 #define UART_RIS_BERIS          0x00000200  // UART Break Error Raw Interrupt
-                                            // Status
+// Status
 #define UART_RIS_PERIS          0x00000100  // UART Parity Error Raw Interrupt
-                                            // Status
+// Status
 #define UART_RIS_FERIS          0x00000080  // UART Framing Error Raw Interrupt
-                                            // Status
+// Status
 #define UART_RIS_RTRIS          0x00000040  // UART Receive Time-Out Raw
-                                            // Interrupt Status
+// Interrupt Status
 #define UART_RIS_TXRIS          0x00000020  // UART Transmit Raw Interrupt
-                                            // Status
+// Status
 #define UART_RIS_RXRIS          0x00000010  // UART Receive Raw Interrupt
-                                            // Status
+// Status
 #define UART_RIS_DSRRIS         0x00000008  // UART Data Set Ready Modem Raw
-                                            // Interrupt Status
+// Interrupt Status
 #define UART_RIS_DCDRIS         0x00000004  // UART Data Carrier Detect Modem
-                                            // Raw Interrupt Status
+// Raw Interrupt Status
 #define UART_RIS_CTSRIS         0x00000002  // UART Clear to Send Modem Raw
-                                            // Interrupt Status
+// Interrupt Status
 #define UART_RIS_RIRIS          0x00000001  // UART Ring Indicator Modem Raw
-                                            // Interrupt Status
+// Interrupt Status
 //******************************************************************************
 //
 // The following are defines for the bit fields in the UART_O_MIS register.
 //
 //******************************************************************************
 #define UART_MIS_DMATXMIS       0x00020000  // Transmit DMA Masked Interrupt
-                                            // Status
+// Status
 #define UART_MIS_DMARXMIS       0x00010000  // Receive DMA Masked Interrupt
-                                            // Status
+// Status
 #define UART_MIS_LME5MIS        0x00008000  // LIN Mode Edge 5 Masked Interrupt
-                                            // Status
+// Status
 #define UART_MIS_LME1MIS        0x00004000  // LIN Mode Edge 1 Masked Interrupt
-                                            // Status
+// Status
 #define UART_MIS_LMSBMIS        0x00002000  // LIN Mode Sync Break Masked
-                                            // Interrupt Status
+// Interrupt Status
 #define UART_MIS_9BITMIS     0x00001000  // 9-Bit Mode Masked Interrupt
-                                            // Status
+// Status
 #define UART_MIS_EOTMIS         0x00000800  // End of Transmission Masked
-                                            // Interrupt Status
+// Interrupt Status
 #define UART_MIS_OEMIS          0x00000400  // UART Overrun Error Masked
-                                            // Interrupt Status
+// Interrupt Status
 #define UART_MIS_BEMIS          0x00000200  // UART Break Error Masked
-                                            // Interrupt Status
+// Interrupt Status
 #define UART_MIS_PEMIS          0x00000100  // UART Parity Error Masked
-                                            // Interrupt Status
+// Interrupt Status
 #define UART_MIS_FEMIS          0x00000080  // UART Framing Error Masked
-                                            // Interrupt Status
+// Interrupt Status
 #define UART_MIS_RTMIS          0x00000040  // UART Receive Time-Out Masked
-                                            // Interrupt Status
+// Interrupt Status
 #define UART_MIS_TXMIS          0x00000020  // UART Transmit Masked Interrupt
-                                            // Status
+// Status
 #define UART_MIS_RXMIS          0x00000010  // UART Receive Masked Interrupt
-                                            // Status
+// Status
 #define UART_MIS_DSRMIS         0x00000008  // UART Data Set Ready Modem Masked
-                                            // Interrupt Status
+// Interrupt Status
 #define UART_MIS_DCDMIS         0x00000004  // UART Data Carrier Detect Modem
-                                            // Masked Interrupt Status
+// Masked Interrupt Status
 #define UART_MIS_CTSMIS         0x00000002  // UART Clear to Send Modem Masked
-                                            // Interrupt Status
+// Interrupt Status
 #define UART_MIS_RIMIS          0x00000001  // UART Ring Indicator Modem Masked
-                                            // Interrupt Status
+// Interrupt Status
 //******************************************************************************
 //
 // The following are defines for the bit fields in the UART_O_ICR register.
@@ -306,10 +304,10 @@
 #define UART_ICR_LME5MIC        0x00008000  // LIN Mode Edge 5 Interrupt Clear
 #define UART_ICR_LME1MIC        0x00004000  // LIN Mode Edge 1 Interrupt Clear
 #define UART_ICR_LMSBMIC        0x00002000  // LIN Mode Sync Break Interrupt
-                                            // Clear
+// Clear
 #define UART_ICR_9BITIC      0x00001000  // 9-Bit Mode Interrupt Clear
 #define UART_ICR_EOTIC          0x00000800  // End of Transmission Interrupt
-                                            // Clear
+// Clear
 #define UART_ICR_OEIC           0x00000400  // Overrun Error Interrupt Clear
 #define UART_ICR_BEIC           0x00000200  // Break Error Interrupt Clear
 #define UART_ICR_PEIC           0x00000100  // Parity Error Interrupt Clear
@@ -318,13 +316,13 @@
 #define UART_ICR_TXIC           0x00000020  // Transmit Interrupt Clear
 #define UART_ICR_RXIC           0x00000010  // Receive Interrupt Clear
 #define UART_ICR_DSRMIC         0x00000008  // UART Data Set Ready Modem
-                                            // Interrupt Clear
+// Interrupt Clear
 #define UART_ICR_DCDMIC         0x00000004  // UART Data Carrier Detect Modem
-                                            // Interrupt Clear
+// Interrupt Clear
 #define UART_ICR_CTSMIC         0x00000002  // UART Clear to Send Modem
-                                            // Interrupt Clear
+// Interrupt Clear
 #define UART_ICR_RIMIC          0x00000001  // UART Ring Indicator Modem
-                                            // Interrupt Clear
+// Interrupt Clear
 //******************************************************************************
 //
 // The following are defines for the bit fields in the UART_O_DMACTL register.
@@ -339,14 +337,14 @@
 //
 //******************************************************************************
 #define UART_LCTL_BLEN_M      0x00000030  // Sync Break Length 0x00000000 :
-                                            // UART_LCTL_BLEN_13T : Sync break
-                                            // length is 13T bits (default)
-                                            // 0x00000010 : UART_LCTL_BLEN_14T :
-                                            // Sync break length is 14T bits
-                                            // 0x00000020 : UART_LCTL_BLEN_15T :
-                                            // Sync break length is 15T bits
-                                            // 0x00000030 : UART_LCTL_BLEN_16T :
-                                            // Sync break length is 16T bits
+// UART_LCTL_BLEN_13T : Sync break
+// length is 13T bits (default)
+// 0x00000010 : UART_LCTL_BLEN_14T :
+// Sync break length is 14T bits
+// 0x00000020 : UART_LCTL_BLEN_15T :
+// Sync break length is 15T bits
+// 0x00000030 : UART_LCTL_BLEN_16T :
+// Sync break length is 16T bits
 #define UART_LCTL_BLEN_S      4
 #define UART_LCTL_MASTER        0x00000001  // LIN Master Enable
 //******************************************************************************
@@ -384,7 +382,7 @@
 //******************************************************************************
 #define UART_9BITAMASK_RANGE_M \
                                 0x0000FF00  // Self Address Range for 9-Bit
-                                            // Mode
+// Mode
 
 #define UART_9BITAMASK_RANGE_S 8
 #define UART_9BITAMASK_MASK_M \
@@ -406,12 +404,10 @@
 //
 //******************************************************************************
 #define UART_CC_CS_M          0x0000000F  // UART Baud Clock Source
-                                            // 0x00000005 : UART_CC_CS_PIOSC :
-                                            // PIOSC 0x00000000 :
-                                            // UART_CC_CS_SYSCLK : The system
-                                            // clock (default)
+// 0x00000005 : UART_CC_CS_PIOSC :
+// PIOSC 0x00000000 :
+// UART_CC_CS_SYSCLK : The system
+// clock (default)
 #define UART_CC_CS_S          0
-
-
 
 #endif // __HW_UART_H__

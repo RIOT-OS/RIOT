@@ -69,7 +69,6 @@ extern "C"
 #define UART_INT_RX             0x010       // Receive Interrupt Mask
 #define UART_INT_CTS            0x002       // CTS Modem Interrupt Mask
 
-
 //*****************************************************************************
 //
 // Values that can be passed to UARTConfigSetExpClk as the ulConfig parameter
@@ -171,7 +170,6 @@ extern "C"
 #define UART_TXINT_MODE_FIFO    0x00000000
 #define UART_TXINT_MODE_EOT     0x00000010
 
-
 //*****************************************************************************
 //
 // API Function prototypes
@@ -180,14 +178,13 @@ extern "C"
 extern void UARTParityModeSet(unsigned long ulBase, unsigned long ulParity);
 extern unsigned long UARTParityModeGet(unsigned long ulBase);
 extern void UARTFIFOLevelSet(unsigned long ulBase, unsigned long ulTxLevel,
-                             unsigned long ulRxLevel);
+        unsigned long ulRxLevel);
 extern void UARTFIFOLevelGet(unsigned long ulBase, unsigned long *pulTxLevel,
-                             unsigned long *pulRxLevel);
+        unsigned long *pulRxLevel);
 extern void UARTConfigSetExpClk(unsigned long ulBase, unsigned long ulUARTClk,
-                                unsigned long ulBaud, unsigned long ulConfig);
+        unsigned long ulBaud, unsigned long ulConfig);
 extern void UARTConfigGetExpClk(unsigned long ulBase, unsigned long ulUARTClk,
-                                unsigned long *pulBaud,
-                                unsigned long *pulConfig);
+        unsigned long *pulBaud, unsigned long *pulConfig);
 extern void UARTEnable(unsigned long ulBase);
 extern void UARTDisable(unsigned long ulBase);
 extern void UARTFIFOEnable(unsigned long ulBase);
@@ -197,11 +194,11 @@ extern tBoolean UARTSpaceAvail(unsigned long ulBase);
 extern long UARTCharGetNonBlocking(unsigned long ulBase);
 extern long UARTCharGet(unsigned long ulBase);
 extern tBoolean UARTCharPutNonBlocking(unsigned long ulBase,
-                                       unsigned char ucData);
+        unsigned char ucData);
 extern void UARTCharPut(unsigned long ulBase, unsigned char ucData);
 extern void UARTBreakCtl(unsigned long ulBase, tBoolean bBreakState);
 extern tBoolean UARTBusy(unsigned long ulBase);
-extern void UARTIntRegister(unsigned long ulBase, void(*pfnHandler)(void));
+extern void UARTIntRegister(unsigned long ulBase, void (*pfnHandler)(void));
 extern void UARTIntUnregister(unsigned long ulBase);
 extern void UARTIntEnable(unsigned long ulBase, unsigned long ulIntFlags);
 extern void UARTIntDisable(unsigned long ulBase, unsigned long ulIntFlags);
@@ -211,10 +208,8 @@ extern void UARTDMAEnable(unsigned long ulBase, unsigned long ulDMAFlags);
 extern void UARTDMADisable(unsigned long ulBase, unsigned long ulDMAFlags);
 extern unsigned long UARTRxErrorGet(unsigned long ulBase);
 extern void UARTRxErrorClear(unsigned long ulBase);
-extern void UARTModemControlSet(unsigned long ulBase,
-                                unsigned long ulControl);
-extern void UARTModemControlClear(unsigned long ulBase,
-                                  unsigned long ulControl);
+extern void UARTModemControlSet(unsigned long ulBase, unsigned long ulControl);
+extern void UARTModemControlClear(unsigned long ulBase, unsigned long ulControl);
 extern unsigned long UARTModemControlGet(unsigned long ulBase);
 extern unsigned long UARTModemStatusGet(unsigned long ulBase);
 extern void UARTFlowControlSet(unsigned long ulBase, unsigned long ulMode);

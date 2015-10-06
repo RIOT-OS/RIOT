@@ -65,7 +65,6 @@
 #define DTHE_O_RAND_KEY2      0x00000F08
 #define DTHE_O_RAND_KEY3      0x00000F0C
 
-
 //******************************************************************************
 //
 // The following are defines for the bit fields in the
@@ -73,16 +72,16 @@
 //
 //******************************************************************************
 #define DTHE_SHAMD5_IMST_DIN  0x00000004  // Data in: this interrupt is
-                                            // raised when DMA writes last word
-                                            // of input data to internal FIFO of
-                                            // the engine
+// raised when DMA writes last word
+// of input data to internal FIFO of
+// the engine
 #define DTHE_SHAMD5_IMST_COUT 0x00000002  // Context out: this interrupt is
-                                            // raised when DMA complets the
-                                            // output context movement from
-                                            // internal register
+// raised when DMA complets the
+// output context movement from
+// internal register
 #define DTHE_SHAMD5_IMST_CIN  0x00000001  // context in: this interrupt is
-                                            // raised when DMA complets Context
-                                            // write to internal register
+// raised when DMA complets Context
+// write to internal register
 //******************************************************************************
 //
 // The following are defines for the bit fields in the
@@ -108,7 +107,7 @@
 //
 //******************************************************************************
 #define DTHE_SHAMD5_ICIS_DIN  0x00000004  // Clear “input Data movement done”
-                                            // flag
+// flag
 #define DTHE_SHAMD5_ICIS_COUT 0x00000002  // Clear “Context output done” flag
 #define DTHE_SHAMD5_ICIS_CIN  0x00000001  // Clear “context input done” flag
 //******************************************************************************
@@ -118,19 +117,19 @@
 //
 //******************************************************************************
 #define DTHE_AES_IMST_DOUT 0x00000008  // Data out: this interrupt is
-                                            // raised when DMA finishes writing
-                                            // last word of the process result
+// raised when DMA finishes writing
+// last word of the process result
 #define DTHE_AES_IMST_DIN  0x00000004  // Data in: this interrupt is
-                                            // raised when DMA writes last word
-                                            // of input data to internal FIFO of
-                                            // the engine
+// raised when DMA writes last word
+// of input data to internal FIFO of
+// the engine
 #define DTHE_AES_IMST_COUT 0x00000002  // Context out: this interrupt is
-                                            // raised when DMA complets the
-                                            // output context movement from
-                                            // internal register
+// raised when DMA complets the
+// output context movement from
+// internal register
 #define DTHE_AES_IMST_CIN  0x00000001  // context in: this interrupt is
-                                            // raised when DMA complets Context
-                                            // write to internal register
+// raised when DMA complets Context
+// write to internal register
 //******************************************************************************
 //
 // The following are defines for the bit fields in the
@@ -158,9 +157,9 @@
 //
 //******************************************************************************
 #define DTHE_AES_ICIS_DOUT 0x00000008  // Clear “output Data movement
-                                            // done” flag
+// done” flag
 #define DTHE_AES_ICIS_DIN  0x00000004  // Clear “input Data movement done”
-                                            // flag
+// flag
 #define DTHE_AES_ICIS_COUT 0x00000002  // Clear “Context output done” flag
 #define DTHE_AES_ICIS_CIN  0x00000001  // Clear “context input done” flag
 //******************************************************************************
@@ -170,15 +169,15 @@
 //
 //******************************************************************************
 #define DTHE_DES_IMST_DOUT 0x00000008  // Data out: this interrupt is
-                                            // raised when DMA finishes writing
-                                            // last word of the process result
+// raised when DMA finishes writing
+// last word of the process result
 #define DTHE_DES_IMST_DIN  0x00000004  // Data in: this interrupt is
-                                            // raised when DMA writes last word
-                                            // of input data to internal FIFO of
-                                            // the engine
+// raised when DMA writes last word
+// of input data to internal FIFO of
+// the engine
 #define DTHE_DES_IMST_CIN  0x00000001  // context in: this interrupt is
-                                            // raised when DMA complets Context
-                                            // write to internal register
+// raised when DMA complets Context
+// write to internal register
 //******************************************************************************
 //
 // The following are defines for the bit fields in the
@@ -204,9 +203,9 @@
 //
 //******************************************************************************
 #define DTHE_DES_ICIS_DOUT 0x00000008  // Clear “output Data movement
-                                            // done” flag
+// done” flag
 #define DTHE_DES_ICIS_DIN  0x00000004  // Clear “input Data movement done”
-                                            // flag
+// flag
 #define DTHE_DES_ICIS_CIN  0x00000001  // Clear "context input done” flag
 //******************************************************************************
 //
@@ -216,33 +215,33 @@
 //******************************************************************************
 #define DTHE_EIP_CGCFG_EIP29_CFG \
                                 0x00000010  // Clock gating protocol setting
-                                            // for EIP29T. 0 – Follow direct
-                                            // protocol 1 – Follow idle_req/ack
-                                            // protocol.
+// for EIP29T. 0 – Follow direct
+// protocol 1 – Follow idle_req/ack
+// protocol.
 
 #define DTHE_EIP_CGCFG_EIP75_CFG \
                                 0x00000008  // Clock gating protocol setting
-                                            // for EIP75T. 0 – Follow direct
-                                            // protocol 1 – Follow idle_req/ack
-                                            // protocol.
+// for EIP75T. 0 – Follow direct
+// protocol 1 – Follow idle_req/ack
+// protocol.
 
 #define DTHE_EIP_CGCFG_EIP16_CFG \
                                 0x00000004  // Clock gating protocol setting
-                                            // for DES. 0 – Follow direct
-                                            // protocol 1 – Follow idle_req/ack
-                                            // protocol.
+// for DES. 0 – Follow direct
+// protocol 1 – Follow idle_req/ack
+// protocol.
 
 #define DTHE_EIP_CGCFG_EIP36_CFG \
                                 0x00000002  // Clock gating protocol setting
-                                            // for AES. 0 – Follow direct
-                                            // protocol 1 – Follow idle_req/ack
-                                            // protocol.
+// for AES. 0 – Follow direct
+// protocol 1 – Follow idle_req/ack
+// protocol.
 
 #define DTHE_EIP_CGCFG_EIP57_CFG \
                                 0x00000001  // Clock gating protocol setting
-                                            // for SHAMD5. 0 – Follow direct
-                                            // protocol 1 – Follow idle_req/ack
-                                            // protocol.
+// for SHAMD5. 0 – Follow direct
+// protocol 1 – Follow idle_req/ack
+// protocol.
 
 //******************************************************************************
 //
@@ -251,33 +250,33 @@
 //
 //******************************************************************************
 #define DTHE_EIP_CGREQ_Key_M  0xF0000000  // When “0x5” write “1” to lower
-                                            // bits [4:0] will set the bit.
-                                            // Write “0” will be ignored When
-                                            // “0x2” write “1” to lower bit
-                                            // [4:0] will clear the bit. Write
-                                            // “0” will be ignored for other key
-                                            // value, regular read write
-                                            // operation
+// bits [4:0] will set the bit.
+// Write “0” will be ignored When
+// “0x2” write “1” to lower bit
+// [4:0] will clear the bit. Write
+// “0” will be ignored for other key
+// value, regular read write
+// operation
 #define DTHE_EIP_CGREQ_Key_S  28
 #define DTHE_EIP_CGREQ_EIP29_REQ \
                                 0x00000010  // 0 – request clock gating 1 –
-                                            // request to un-gate the clock.
+// request to un-gate the clock.
 
 #define DTHE_EIP_CGREQ_EIP75_REQ \
                                 0x00000008  // 0 – request clock gating 1 –
-                                            // request to un-gate the clock.
+// request to un-gate the clock.
 
 #define DTHE_EIP_CGREQ_EIP16_REQ \
                                 0x00000004  // 0 – request clock gating 1 –
-                                            // request to un-gate the clock.
+// request to un-gate the clock.
 
 #define DTHE_EIP_CGREQ_EIP36_REQ \
                                 0x00000002  // 0 – request clock gating 1 –
-                                            // request to un-gate the clock.
+// request to un-gate the clock.
 
 #define DTHE_EIP_CGREQ_EIP57_REQ \
                                 0x00000001  // 0 – request clock gating 1 –
-                                            // request to un-gate the clock.
+// request to un-gate the clock.
 
 //******************************************************************************
 //
@@ -285,37 +284,37 @@
 //
 //******************************************************************************
 #define DTHE_CRC_CTRL_INIT_M  0x00006000  // Initialize the CRC 00 – use SEED
-                                            // register context as starting
-                                            // value 10 – all “zero” 11 – all
-                                            // “one” This is self clearing. With
-                                            // first write to data register this
-                                            // value clears to zero and remain
-                                            // zero for rest of the operation
-                                            // unless written again
+// register context as starting
+// value 10 – all “zero” 11 – all
+// “one” This is self clearing. With
+// first write to data register this
+// value clears to zero and remain
+// zero for rest of the operation
+// unless written again
 #define DTHE_CRC_CTRL_INIT_S  13
 #define DTHE_CRC_CTRL_SIZE    0x00001000  // Input data size 0 – 32 bit 1 – 8
-                                            // bit
+// bit
 #define DTHE_CRC_CTRL_OINV    0x00000200  // Inverse the bits of result
-                                            // before storing to CRC_RSLT_PP0
+// before storing to CRC_RSLT_PP0
 #define DTHE_CRC_CTRL_OBR     0x00000100  // Bit reverse the output result
-                                            // byte before storing to
-                                            // CRC_RSLT_PP0. applicable for all
-                                            // bytes in word
+// byte before storing to
+// CRC_RSLT_PP0. applicable for all
+// bytes in word
 #define DTHE_CRC_CTRL_IBR     0x00000080  // Bit reverse the input byte. For
-                                            // all bytes in word
+// all bytes in word
 #define DTHE_CRC_CTRL_ENDIAN_M \
                                 0x00000030  // Endian control [0] – swap byte
-                                            // in half-word [1] – swap half word
+// in half-word [1] – swap half word
 
 #define DTHE_CRC_CTRL_ENDIAN_S 4
 #define DTHE_CRC_CTRL_TYPE_M  0x0000000F  // Type of operation 0000 –
-                                            // polynomial 0x8005 0001 –
-                                            // polynomial 0x1021 0010 –
-                                            // polynomial 0x4C11DB7 0011 –
-                                            // polynomial 0x1EDC6F41 1000 – TCP
-                                            // checksum TYPE in DTHE_S_CRC_CTRL
-                                            // & DTHE_S_CRC_CTRL should be
-                                            // exclusive
+// polynomial 0x8005 0001 –
+// polynomial 0x1021 0010 –
+// polynomial 0x4C11DB7 0011 –
+// polynomial 0x1EDC6F41 1000 – TCP
+// checksum TYPE in DTHE_S_CRC_CTRL
+// & DTHE_S_CRC_CTRL should be
+// exclusive
 #define DTHE_CRC_CTRL_TYPE_S  0
 //******************************************************************************
 //
@@ -323,11 +322,11 @@
 //
 //******************************************************************************
 #define DTHE_CRC_SEED_SEED_M  0xFFFFFFFF  // Starting seed of CRC and
-                                            // checksum operation. Please see
-                                            // CTRL register for more detail.
-                                            // This resister also holds the
-                                            // latest result of CRC or checksum
-                                            // operation
+// checksum operation. Please see
+// CTRL register for more detail.
+// This resister also holds the
+// latest result of CRC or checksum
+// operation
 #define DTHE_CRC_SEED_SEED_S  0
 //******************************************************************************
 //
@@ -336,7 +335,7 @@
 //******************************************************************************
 #define DTHE_CRC_DIN_DATA_IN_M \
                                 0xFFFFFFFF  // Input data for CRC or checksum
-                                            // operation
+// operation
 
 #define DTHE_CRC_DIN_DATA_IN_S 0
 //******************************************************************************
@@ -347,7 +346,7 @@
 //******************************************************************************
 #define DTHE_CRC_RSLT_PP_RSLT_PP_M \
                                 0xFFFFFFFF  // Input data for CRC or checksum
-                                            // operation
+// operation
 
 #define DTHE_CRC_RSLT_PP_RSLT_PP_S 0
 //******************************************************************************
@@ -357,7 +356,7 @@
 //
 //******************************************************************************
 #define DTHE_RAND_KEY0_KEY_M  0xFFFFFFFF  // Device Specific Randon key
-                                            // [31:0]
+// [31:0]
 #define DTHE_RAND_KEY0_KEY_S  0
 //******************************************************************************
 //
@@ -366,7 +365,7 @@
 //
 //******************************************************************************
 #define DTHE_RAND_KEY1_KEY_M  0xFFFFFFFF  // Device Specific Randon key
-                                            // [63:32]
+// [63:32]
 #define DTHE_RAND_KEY1_KEY_S  0
 //******************************************************************************
 //
@@ -375,7 +374,7 @@
 //
 //******************************************************************************
 #define DTHE_RAND_KEY2_KEY_M  0xFFFFFFFF  // Device Specific Randon key
-                                            // [95:34]
+// [95:34]
 #define DTHE_RAND_KEY2_KEY_S  0
 //******************************************************************************
 //
@@ -384,9 +383,7 @@
 //
 //******************************************************************************
 #define DTHE_RAND_KEY3_KEY_M  0xFFFFFFFF  // Device Specific Randon key
-                                            // [127:96]
+// [127:96]
 #define DTHE_RAND_KEY3_KEY_S  0
-
-
 
 #endif // __HW_DTHE_H__

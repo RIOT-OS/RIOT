@@ -50,7 +50,6 @@ void HttpCore_CloseConnection(UINT16 uConnection);
 
 #define sl_HttpServerCb				SimpleLinkWebSocketEventHandler
 
-
 /// @}
 
 #endif //_HTTP_CORE_H_

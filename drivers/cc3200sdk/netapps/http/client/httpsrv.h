@@ -63,8 +63,7 @@ extern const char *CONTENT_LENGTH;
 extern const char *HTTP_VER;
 
 /* Status codes for HTTPSrv_sendResponse() and HTTPSrv_sendErrorResponse() */
-enum HTTP_STATUS_CODE
-{
+enum HTTP_STATUS_CODE {
     HTTP_OK = 200,
     HTTP_NO_CONTENT = 204,
     HTTP_BAD_REQUEST = 400,
@@ -79,7 +78,7 @@ enum HTTP_STATUS_CODE
 };
 
 typedef struct HTTPSrv_Params {
-    int timeout;   /* receive timeout in seconds */
+    int timeout; /* receive timeout in seconds */
     int maxLineLen;
     int maxURILen;
 } HTTPSrv_Params;
@@ -100,7 +99,7 @@ extern void HTTPSrv_init(void);
  *  @retval NULL if unable to create the instance
  */
 extern HTTPSrv_Handle HTTPSrv_create(const URLHandler_Setup * urlh, int numURLh,
-                                     HTTPSrv_Params * params);
+        HTTPSrv_Params * params);
 
 /*!
  *  @brief Delete an HTTPSrv instance
@@ -122,16 +121,16 @@ extern void HTTPSrv_delete(HTTPSrv_Handle * srv);
  */
 extern int HTTPSrv_processClient(HTTPSrv_Handle srv, int s);
 
-extern void HTTPSrv_sendResponse(Ssock_Handle ssock, int status, const char * type,
-                                 size_t len, const void * buf);
+extern void HTTPSrv_sendResponse(Ssock_Handle ssock, int status,
+        const char * type, size_t len, const void * buf);
 
 extern void HTTPSrv_sendErrorResponse(Ssock_Handle ssock, int status);
 
 extern int HTTPSrv_serve(HTTPSrv_Handle srv, const struct sockaddr * addr,
-                         int len, int backlog);
+        int len, int backlog);
 
 extern int HTTPSrv_serveSelect(HTTPSrv_Handle srv, const struct sockaddr * addr,
-                               int len, int backlog);
+        int len, int backlog);
 
 extern int (*HTTPSrv_errorResponseHook)(Ssock_Handle ssock, int status);
 

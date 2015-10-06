@@ -20,7 +20,6 @@
 
 #include <stddef.h>
 
-
 #include "board.h"
 #include "cpu.h"
 #include "sched.h"
@@ -47,33 +46,30 @@ typedef struct {
  */
 static uart_conf_t uart_config[UART_NUMOF];
 
-
 /*---------------------------------------------------------------------------*/
-static void reset(unsigned long uart_base)
-{
-	UARTDisable(uart_base);
-	UARTRxErrorClear(uart_base);
-	UARTEnable(uart_base);
-	MAP_UARTFIFODisable(uart_base);
+static void reset(unsigned long uart_base) {
+    UARTDisable(uart_base);
+    UARTRxErrorClear(uart_base);
+    UARTEnable(uart_base);
+    MAP_UARTFIFODisable(uart_base);
 }
-
 
 /*---------------------------------------------------------------------------*/
 
 #if UART_0_EN
-void UART_0_ISR(void)
-{
-	long data;
+void UART_0_ISR(void) {
+    long data;
 
-	MAP_UARTIntClear(UARTA0_BASE, UART_INT_RX|UART_INT_OE|UART_INT_BE|UART_INT_PE|UART_INT_FE);
+    MAP_UARTIntClear(UARTA0_BASE,
+            UART_INT_RX | UART_INT_OE | UART_INT_BE | UART_INT_PE | UART_INT_FE);
 
     if (UARTRxErrorGet(UARTA0_BASE)) {
-    	reset(UARTA0_BASE);
+        reset(UARTA0_BASE);
     } else {
-    	data = MAP_UARTCharGetNonBlocking(UARTA0_BASE);
-    	if (data != -1) {
-    		uart_config[0].rx_cb(uart_config[0].arg, data);
-    	}
+        data = MAP_UARTCharGetNonBlocking(UARTA0_BASE);
+        if (data != -1) {
+            uart_config[0].rx_cb(uart_config[0].arg, data);
+        }
     }
 
     if (sched_context_switch_request) {
@@ -85,17 +81,17 @@ void UART_0_ISR(void)
 #if UART_1_EN
 void UART_1_ISR(void)
 {
-	long data;
+    long data;
 
-	MAP_UARTIntClear(UARTA1_BASE, UART_INT_RX|UART_INT_OE|UART_INT_BE|UART_INT_PE|UART_INT_FE);
+    MAP_UARTIntClear(UARTA1_BASE, UART_INT_RX|UART_INT_OE|UART_INT_BE|UART_INT_PE|UART_INT_FE);
 
     if (UARTRxErrorGet(UARTA1_BASE)) {
-    	reset(UARTA1_BASE);
+        reset(UARTA1_BASE);
     } else {
-    	data = MAP_UARTCharGetNonBlocking(UARTA1_BASE);
-    	if (data != -1) {
-    		uart_config[1].rx_cb(uart_config[1].arg, data);
-    	}
+        data = MAP_UARTCharGetNonBlocking(UARTA1_BASE);
+        if (data != -1) {
+            uart_config[1].rx_cb(uart_config[1].arg, data);
+        }
     }
 
     if (sched_context_switch_request) {
@@ -104,8 +100,8 @@ void UART_1_ISR(void)
 }
 #endif /* UART_1_EN */
 
-int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, uart_tx_cb_t tx_cb, void *arg)
-{
+int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb,
+        uart_tx_cb_t tx_cb, void *arg) {
     /* initialize basic functionality */
     int res = uart_init_blocking(uart, baudrate);
 
@@ -121,142 +117,139 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, uart_tx_cb_t t
     /* configure interrupts and enable RX interrupt */
     switch (uart) {
 #if UART_0_EN
-        case UART_0:
-           	MAP_UARTIntEnable(UARTA0_BASE, UART_INT_RX|UART_INT_OE|UART_INT_BE|UART_INT_PE|UART_INT_FE);
-            MAP_IntPrioritySet(INT_UARTA0, UART_IRQ_PRIO);
-            MAP_IntEnable(INT_UARTA0);
-            break;
+    case UART_0:
+        MAP_UARTIntEnable(UARTA0_BASE,
+                UART_INT_RX | UART_INT_OE | UART_INT_BE | UART_INT_PE
+                        | UART_INT_FE);
+        MAP_IntPrioritySet(INT_UARTA0, UART_IRQ_PRIO);
+        MAP_IntEnable(INT_UARTA0);
+        break;
 #endif
 #if UART_1_EN
         case UART_1:
-        	MAP_UARTIntEnable(UARTA1_BASE, UART_INT_RX|UART_INT_OE|UART_INT_BE|UART_INT_PE|UART_INT_FE);
-            MAP_IntPrioritySet(INT_UARTA1, UART_IRQ_PRIO);
-            MAP_IntEnable(INT_UARTA1);
-            break;
+        MAP_UARTIntEnable(UARTA1_BASE, UART_INT_RX|UART_INT_OE|UART_INT_BE|UART_INT_PE|UART_INT_FE);
+        MAP_IntPrioritySet(INT_UARTA1, UART_IRQ_PRIO);
+        MAP_IntEnable(INT_UARTA1);
+        break;
 #endif
     }
 
     return 0;
 }
 
-int uart_init_blocking(uart_t uart, uint32_t baudrate)
-{
-	unsigned long u;
+int uart_init_blocking(uart_t uart, uint32_t baudrate) {
+    unsigned long u;
 
     switch (uart) {
 #if UART_0_EN
-        case UART_0:
-            u = UARTA0_BASE;
+    case UART_0:
+        u = UARTA0_BASE;
 
-            MAP_PRCMPeripheralReset(PRCM_UARTA0);
+        MAP_PRCMPeripheralReset(PRCM_UARTA0);
 
-            //
-            // Enable Peripheral Clocks
-            //
-            MAP_PRCMPeripheralClkEnable(PRCM_UARTA0, PRCM_RUN_MODE_CLK);
+        //
+        // Enable Peripheral Clocks
+        //
+        MAP_PRCMPeripheralClkEnable(PRCM_UARTA0, PRCM_RUN_MODE_CLK);
 
-            //
-            // Configure PIN_55 for UART0 UART0_TX
-            //
-            MAP_PinTypeUART(PIN_55, PIN_MODE_3);
+        //
+        // Configure PIN_55 for UART0 UART0_TX
+        //
+        MAP_PinTypeUART(PIN_55, PIN_MODE_3);
 
-            //
-            // Configure PIN_57 for UART0 UART0_RX
-            //
-            MAP_PinTypeUART(PIN_57, PIN_MODE_3);
+        //
+        // Configure PIN_57 for UART0 UART0_RX
+        //
+        MAP_PinTypeUART(PIN_57, PIN_MODE_3);
 
-            MAP_UARTConfigSetExpClk(u,MAP_PRCMPeripheralClockGet(PRCM_UARTA0),
-            		baudrate, (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE |
-                             UART_CONFIG_PAR_NONE));
+        MAP_UARTConfigSetExpClk(u, MAP_PRCMPeripheralClockGet(PRCM_UARTA0),
+                baudrate, (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE |
+                UART_CONFIG_PAR_NONE));
 
-            reset(u);
+        reset(u);
 
-            break;
+        break;
 #endif
 #if UART_1_EN
         case UART_1:
-            u = UARTA1_BASE;
+        u = UARTA1_BASE;
 
-        	//
-            // Enable Peripheral Clocks
-            //
-        	PRCMPeripheralClkEnable(PRCM_UARTA1, PRCM_RUN_MODE_CLK);
+        //
+        // Enable Peripheral Clocks
+        //
+        PRCMPeripheralClkEnable(PRCM_UARTA1, PRCM_RUN_MODE_CLK);
 
-        	//
-            // Configure PIN_07 for UART1 UART1_TX
-            //
-        	PinTypeUART(PIN_07, PIN_MODE_5);
+        //
+        // Configure PIN_07 for UART1 UART1_TX
+        //
+        PinTypeUART(PIN_07, PIN_MODE_5);
 
-        	//
-            // Configure PIN_08 for UART1 UART1_RX
-            //
-        	PinTypeUART(PIN_08, PIN_MODE_5);
+        //
+        // Configure PIN_08 for UART1 UART1_RX
+        //
+        PinTypeUART(PIN_08, PIN_MODE_5);
 
-            MAP_UARTConfigSetExpClk(u,MAP_PRCMPeripheralClockGet(PRCM_UARTA1),
-            		baudrate, (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE |
-                             UART_CONFIG_PAR_NONE));
+        MAP_UARTConfigSetExpClk(u,MAP_PRCMPeripheralClockGet(PRCM_UARTA1),
+                baudrate, (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE |
+                        UART_CONFIG_PAR_NONE));
 
-            break;
+        break;
 #endif
 
-        default:
-            return -1;
+    default:
+        return -1;
     }
 
     return 0;
 }
 
-void uart_tx_begin(uart_t uart)
-{
+void uart_tx_begin(uart_t uart) {
 
 }
 
-void uart_tx_end(uart_t uart)
-{
+void uart_tx_end(uart_t uart) {
 
 }
 
-int uart_write(uart_t uart, char data)
-{
-	unsigned long u;
+int uart_write(uart_t uart, char data) {
+    unsigned long u;
 
     switch (uart) {
 #if UART_0_EN
-        case UART_0:
-            u = UARTA0_BASE;
-            break;
+    case UART_0:
+        u = UARTA0_BASE;
+        break;
 #endif
 #if UART_1_EN
         case UART_1:
-            u = UARTA1_BASE;
-            break;
+        u = UARTA1_BASE;
+        break;
 #endif
 
-        default:
-            return -1;
+    default:
+        return -1;
     }
 
     return MAP_UARTCharPutNonBlocking(u, data);;
 }
 
-int uart_read_blocking(uart_t uart, char *data)
-{
+int uart_read_blocking(uart_t uart, char *data) {
     unsigned long u;
 
     switch (uart) {
 #if UART_0_EN
-        case UART_0:
-            u = UARTA0_BASE;
-            break;
+    case UART_0:
+        u = UARTA0_BASE;
+        break;
 #endif
 #if UART_1_EN
         case UART_1:
-            u = UARTA1_BASE;
-            break;
+        u = UARTA1_BASE;
+        break;
 #endif
 
-        default:
-            return -1;
+    default:
+        return -1;
     }
 
     *data = MAP_UARTCharGet(u);
@@ -274,35 +267,33 @@ int uart_read_blocking(uart_t uart, char *data)
 //! \return Length of the bytes received. -1 if buffer length exceeded.
 //!
 //*****************************************************************************
-int uart_read_line(uart_t uart, char *pcBuffer, unsigned int uiBufLen)
-{
+int uart_read_line(uart_t uart, char *pcBuffer, unsigned int uiBufLen) {
     char cChar;
     int iLen = 0;
     unsigned long CONSOLE;
 
     switch (uart) {
 #if UART_0_EN
-        case UART_0:
-            CONSOLE = UARTA0_BASE;
-            break;
+    case UART_0:
+        CONSOLE = UARTA0_BASE;
+        break;
 #endif
 #if UART_1_EN
         case UART_1:
-            CONSOLE = UARTA1_BASE;
-            break;
+        CONSOLE = UARTA1_BASE;
+        break;
 #endif
 
-        default:
-            return -1;
+    default:
+        return -1;
     }
 
     //
     // Wait to receive a character over UART
     //
-    while(MAP_UARTCharsAvail(CONSOLE) == false)
-    {
+    while (MAP_UARTCharsAvail(CONSOLE) == false) {
 #if defined(USE_FREERTOS) || defined(USE_TI_RTOS)
-    	osi_Sleep(1);
+        osi_Sleep(1);
 #endif
     }
     cChar = MAP_UARTCharGetNonBlocking(CONSOLE);
@@ -316,41 +307,34 @@ int uart_read_line(uart_t uart, char *pcBuffer, unsigned int uiBufLen)
     //
     // Checking the end of Command
     //
-    while((cChar != '\r') && (cChar !='\n') )
-    {
+    while ((cChar != '\r') && (cChar != '\n')) {
         //
         // Handling overflow of buffer
         //
-        if(iLen >= uiBufLen)
-        {
+        if (iLen >= uiBufLen) {
             return -1;
         }
 
         //
         // Copying Data from UART into a buffer
         //
-        if(cChar != '\b')
-        {
+        if (cChar != '\b') {
             *(pcBuffer + iLen) = cChar;
             iLen++;
-        }
-        else
-        {
+        } else {
             //
             // Deleting last character when you hit backspace
             //
-            if(iLen)
-            {
+            if (iLen) {
                 iLen--;
             }
         }
         //
         // Wait to receive a character over UART
         //
-        while(MAP_UARTCharsAvail(CONSOLE) == false)
-        {
+        while (MAP_UARTCharsAvail(CONSOLE) == false) {
 #if defined(USE_FREERTOS) || defined(USE_TI_RTOS)
-        	osi_Sleep(1);
+            osi_Sleep(1);
 #endif
         }
         cChar = MAP_UARTCharGetNonBlocking(CONSOLE);
@@ -369,22 +353,17 @@ int uart_read_line(uart_t uart, char *pcBuffer, unsigned int uiBufLen)
     return iLen;
 }
 
-
-int uart_write_blocking(uart_t uart, char data)
-{
+int uart_write_blocking(uart_t uart, char data) {
     MAP_UARTCharPut(UARTA0_BASE, data);
 
     return 1;
 }
 
-
-void uart_poweron(uart_t uart)
-{
+void uart_poweron(uart_t uart) {
 
 }
 
-void uart_poweroff(uart_t uart)
-{
+void uart_poweroff(uart_t uart) {
 
 }
 

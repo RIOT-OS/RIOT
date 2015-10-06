@@ -50,8 +50,6 @@
 #define WDT_O_TEST              0x00000418
 #define WDT_O_LOCK              0x00000C00
 
-
-
 //******************************************************************************
 //
 // The following are defines for the bit fields in the WDT_O_LOAD register.
@@ -74,9 +72,9 @@
 #define WDT_CTL_WRC             0x80000000  // Write Complete
 #define WDT_CTL_INTTYPE         0x00000004  // Watchdog Interrupt Type
 #define WDT_CTL_RESEN           0x00000002  // Watchdog Reset Enable. This bit
-                                            // is not used in cc3xx, WDOG shall
-                                            // always generate RESET to system
-                                            // irrespective of this bit setting.
+// is not used in cc3xx, WDOG shall
+// always generate RESET to system
+// irrespective of this bit setting.
 #define WDT_CTL_INTEN           0x00000001  // Watchdog Interrupt Enable
 //******************************************************************************
 //
@@ -123,9 +121,5 @@
 //
 //*****************************************************************************
 #define WDT_INT_TIMEOUT         0x00000001  // Watchdog timer expired
-
-
-
-
 
 #endif // __HW_WDT_H__

@@ -80,11 +80,10 @@ extern "C"
 //*****************************************************************************
 extern void CRCConfigSet(uint32_t ui32Base, uint32_t ui32CRCConfig);
 extern uint32_t CRCDataProcess(uint32_t ui32Base, void *puiDataIn,
-               uint32_t ui32DataLength, uint32_t ui32Config);
+        uint32_t ui32DataLength, uint32_t ui32Config);
 extern void CRCDataWrite(uint32_t ui32Base, uint32_t ui32Data);
 extern uint32_t CRCResultRead(uint32_t ui32Base);
 extern void CRCSeedSet(uint32_t ui32Base, uint32_t ui32Seed);
-
 
 //*****************************************************************************
 //

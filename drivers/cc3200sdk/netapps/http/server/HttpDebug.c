@@ -17,29 +17,24 @@
  * @{
  */
 
-
 #include "HttpDebug.h"
-
 
 #ifdef HTTP_CORE_ENABLE_DEBUG
 
-void HttpDebugStr(const char* pString)
-{
+void HttpDebugStr(const char* pString) {
 #ifndef NOTERM
     Report("%s\n\r", pString);
 #endif
 }
 
-void HttpAssert(int condition)
-{
+void HttpAssert(int condition) {
     if (condition)
         return;
 #ifndef NOTERM
     Report("ASSERTION!\n\r");
 #endif
 
-    while (1)
-    {
+    while (1) {
     }
 }
 

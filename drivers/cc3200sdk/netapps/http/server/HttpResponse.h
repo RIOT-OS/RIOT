@@ -35,7 +35,6 @@
 #define HTTP_STATUS_ERROR_NOT_ACCEPTED 406
 #define HTTP_STATUS_ERROR_INTERNAL     500
 
-
 /// The response data is gzip-compressed. Implies the header Content-Encoding: gzip
 #define HTTP_RESPONSE_FLAG_COMPRESSED   (1 << 0)
 
@@ -48,7 +47,6 @@
 #define WS_STATUS_ERROR_OVERFLOW	   1009			//Data too large for buffer
 #define WS_STATUS_ERROR_UNEXPECTED   1011			//Unexpected event
 
-
 /**
  * Respond with the specified HTTP status and headers
  * @param uConnection The connection number, as it appears in the HttpRequest structure
@@ -58,7 +56,9 @@
  * @param contentType The content type string, or NULL to omit the content type
  * @param location A string which will be used for the Location header, or NULL to omit the Location header
  */
-int HttpResponse_Headers(UINT16 uConnection, UINT16 uHttpStatus, UINT16 uFlags, UINT32 uContentLength, struct HttpBlob contentType, struct HttpBlob location);
+int HttpResponse_Headers(UINT16 uConnection, UINT16 uHttpStatus, UINT16 uFlags,
+        UINT32 uContentLength, struct HttpBlob contentType,
+        struct HttpBlob location);
 
 /**
  * Retrieves the pointer and size of the packet-send buffer
@@ -82,7 +82,8 @@ int HttpResponse_Content(UINT16 uConnection, struct HttpBlob content);
  * @param pLocation The redirect URL
  * @param bPermanent zero for temporary redirect, nonzero for permanent redirect
  */
-int HttpResponse_CannedRedirect(UINT16 uConnection, struct HttpBlob location, UINT16 bPermanent);
+int HttpResponse_CannedRedirect(UINT16 uConnection, struct HttpBlob location,
+        UINT16 bPermanent);
 
 /**
  * Sends a canned response, with an error message

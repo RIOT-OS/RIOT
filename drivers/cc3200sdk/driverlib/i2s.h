@@ -68,7 +68,6 @@ extern "C"
 #define I2S_SLOT_SIZE_16      0x00700074
 #define I2S_SLOT_SIZE_24      0x00B000B6
 
-
 #define I2S_PORT_CPU          0x00080008
 #define I2S_PORT_DMA          0x00000000
 
@@ -122,7 +121,6 @@ extern "C"
 #define I2S_INT_RSTAFRM       0x00800000
 #define I2S_INT_RDMA          0x40000000
 
-
 //*****************************************************************************
 //
 // Values that can be passed to I2SRxActiveSlotSet() and I2STxActiveSlotSet
@@ -162,7 +160,6 @@ extern "C"
 #define I2S_MODE_TX_ONLY      0x00000001
 #define I2S_MODE_TX_RX_SYNC   0x00000003
 
-
 //*****************************************************************************
 //
 // API Function prototypes
@@ -172,29 +169,29 @@ extern void I2SEnable(unsigned long ulBase, unsigned long ulMode);
 extern void I2SDisable(unsigned long ulBase);
 
 extern void I2SDataPut(unsigned long ulBase, unsigned long ulDataLine,
-                unsigned long ulData);
+        unsigned long ulData);
 extern long I2SDataPutNonBlocking(unsigned long ulBase,
-                               unsigned long ulDataLine, unsigned long ulData);
+        unsigned long ulDataLine, unsigned long ulData);
 
 extern void I2SDataGet(unsigned long ulBase, unsigned long ulDataLine,
-                unsigned long *pulData);
+        unsigned long *pulData);
 extern long I2SDataGetNonBlocking(unsigned long ulBase,
-                unsigned long ulDataLine, unsigned long *pulData);
+        unsigned long ulDataLine, unsigned long *pulData);
 
 extern void I2SConfigSetExpClk(unsigned long ulBase, unsigned long ulI2SClk,
-                               unsigned long ulBitClk, unsigned long ulConfig);
+        unsigned long ulBitClk, unsigned long ulConfig);
 
 extern void I2STxFIFOEnable(unsigned long ulBase, unsigned long ulTxLevel,
-                     unsigned long ulWordsPerTransfer);
+        unsigned long ulWordsPerTransfer);
 extern void I2STxFIFODisable(unsigned long ulBase);
 extern void I2SRxFIFOEnable(unsigned long ulBase, unsigned long ulRxLevel,
-                     unsigned long ulWordsPerTransfer);
+        unsigned long ulWordsPerTransfer);
 extern void I2SRxFIFODisable(unsigned long ulBase);
 extern unsigned long I2STxFIFOStatusGet(unsigned long ulBase);
 extern unsigned long I2SRxFIFOStatusGet(unsigned long ulBase);
 
 extern void I2SSerializerConfig(unsigned long ulBase, unsigned long ulDataLine,
-                         unsigned long ulSerMode, unsigned long ulInActState);
+        unsigned long ulSerMode, unsigned long ulInActState);
 
 extern void I2SIntEnable(unsigned long ulBase, unsigned long ulIntFlags);
 extern void I2SIntDisable(unsigned long ulBase, unsigned long ulIntFlags);

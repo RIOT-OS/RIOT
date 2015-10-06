@@ -67,8 +67,7 @@ extern "C"
 // software to directly read or write fields in the table.
 //
 //*****************************************************************************
-typedef struct
-{
+typedef struct {
     //
     // The ending source address of the data transfer.
     //
@@ -88,8 +87,7 @@ typedef struct
     // An unused location.
     //
     volatile unsigned long ulSpare;
-}
-tDMAControlTable;
+} tDMAControlTable;
 
 //*****************************************************************************
 //
@@ -333,7 +331,6 @@ tDMAControlTable;
 #define UDMA_CH7_GPIOA3         0x00020007
 #define UDMA_CH7_SW             0x00030007
 
-
 //
 // Channel 8
 //
@@ -342,7 +339,6 @@ tDMAControlTable;
 #define UDMA_CH8_TIMERA2_A      0x00020008
 #define UDMA_CH8_SW             0x00030008
 
-
 //
 // Channel 9
 //
@@ -350,7 +346,6 @@ tDMAControlTable;
 #define UDMA_CH9_TIMERA0_B      0x00010009
 #define UDMA_CH9_TIMERA2_B      0x00020009
 #define UDMA_CH9_SW             0x00030009
-
 
 //
 // Channel 10
@@ -368,20 +363,17 @@ tDMAControlTable;
 #define UDMA_CH11_TIMERA3_B     0x0002000B
 #define UDMA_CH11_SW            0x0003000B
 
-
 //
 // Channel 12
 //
 #define UDMA_CH12_LSPI_RX       0x0000000C
 #define UDMA_CH12_SW            0x0003000C
 
-
 //
 // Channel 13
 //
 #define UDMA_CH13_LSPI_TX       0x0000000D
 #define UDMA_CH13_SW		0x0003000D
-
 
 //
 // Channel 14
@@ -390,7 +382,6 @@ tDMAControlTable;
 #define UDMA_CH14_SDHOST_RX     0x0002000E
 #define UDMA_CH14_SW            0x0003000E
 
-
 //
 // Channel 15
 //
@@ -398,14 +389,12 @@ tDMAControlTable;
 #define UDMA_CH15_SDHOST_TX     0x0002000F
 #define UDMA_CH15_SW            0x0003000F
 
-
 //
 // Channel 16
 //
 #define UDMA_CH16_ADC_CH2       0x00000010
 #define UDMA_CH16_TIMERA2_A     0x00010010
 #define UDMA_CH16_SW            0x00030010
-
 
 //
 // Channel 17
@@ -422,7 +411,6 @@ tDMAControlTable;
 #define UDMA_CH18_I2S_RX      0x00020012
 #define UDMA_CH18_SW            0x00030012
 
-
 //
 // Channel 19
 //
@@ -431,14 +419,12 @@ tDMAControlTable;
 #define UDMA_CH19_I2S_TX      0x00020013
 #define UDMA_CH19_SW            0x00030013
 
-
 //
 // Channel 20
 //
 #define UDMA_CH20_GPIOA2        0x00000014
 #define UDMA_CH20_AES_DIN       0x00010014
 #define UDMA_CH20_SW            0x00030014
-
 
 //
 // Channel 21
@@ -447,14 +433,12 @@ tDMAControlTable;
 #define UDMA_CH21_AES_DOUT      0x00010015
 #define UDMA_CH21_SW            0x00030015
 
-
 //
 // Channel 22
 //
 #define UDMA_CH22_CAMERA        0x00000016
 #define UDMA_CH22_GPIOA4        0x00010016
 #define UDMA_CH22_SW            0x00030016
-
 
 //
 // Channel 23
@@ -464,7 +448,6 @@ tDMAControlTable;
 #define UDMA_CH23_TIMERA2_A     0x00020017
 #define UDMA_CH23_SW            0x00030017
 
-
 //
 // Channel 24
 //
@@ -473,14 +456,12 @@ tDMAControlTable;
 #define UDMA_CH24_TIMERA2_B     0x00020018
 #define UDMA_CH24_SW            0x00030018
 
-
 //
 // Channel 25
 //
 #define UDMA_CH25_SSPI_RX       0x00000019
 #define UDMA_CH25_I2CA0_RX      0x00010019
 #define UDMA_CH25_SW            0x00030019
-
 
 //
 // Channel 26
@@ -489,13 +470,11 @@ tDMAControlTable;
 #define UDMA_CH26_I2CA0_TX      0x0001001A
 #define UDMA_CH26_SW            0x0003001A
 
-
 //
 // Channel 27
 //
 #define UDMA_CH27_GPIOA0        0x0001001B
 #define UDMA_CH27_SW            0x0003001B
-
 
 //
 // Channel 28
@@ -503,13 +482,11 @@ tDMAControlTable;
 #define UDMA_CH28_GPIOA1        0x0001001C
 #define UDMA_CH28_SW            0x0003001C
 
-
 //
 // Channel 29
 //
 #define UDMA_CH29_GPIOA4        0x0000001D
 #define UDMA_CH29_SW            0x0003001D
-
 
 //
 // Channel 30
@@ -518,7 +495,6 @@ tDMAControlTable;
 #define UDMA_CH30_SDHOST_RX     0x0001001E
 #define UDMA_CH30_I2CA0_RX      0x0002001E
 #define UDMA_CH30_SW            0x0003001E
-
 
 //
 // Channel 31
@@ -534,9 +510,9 @@ tDMAControlTable;
 //
 //*****************************************************************************
 #define UDMA_O_SRCENDP          0x00000000  // DMA Channel Source Address End
-                                            // Pointer
+// Pointer
 #define UDMA_O_DSTENDP          0x00000004  // DMA Channel Destination Address
-                                            // End Pointer
+// End Pointer
 #define UDMA_O_CHCTL            0x00000008  // DMA Channel Control Word
 
 //*****************************************************************************
@@ -609,10 +585,8 @@ tDMAControlTable;
                                 0x00000006  // Peripheral Scatter-Gather
 #define UDMA_CHCTL_XFERMODE_PER_SGA \
                                 0x00000007  // Alternate Peripheral
-                                            // Scatter-Gather
+// Scatter-Gather
 #define UDMA_CHCTL_XFERSIZE_S   4
-
-
 
 //*****************************************************************************
 //
@@ -631,23 +605,21 @@ extern void *uDMAControlBaseGet(void);
 extern void *uDMAControlAlternateBaseGet(void);
 extern void uDMAChannelRequest(unsigned long ulChannelNum);
 extern void uDMAChannelAttributeEnable(unsigned long ulChannelNum,
-                                       unsigned long ulAttr);
+        unsigned long ulAttr);
 extern void uDMAChannelAttributeDisable(unsigned long ulChannelNum,
-                                        unsigned long ulAttr);
+        unsigned long ulAttr);
 extern unsigned long uDMAChannelAttributeGet(unsigned long ulChannelNum);
 extern void uDMAChannelControlSet(unsigned long ulChannelStructIndex,
-                                  unsigned long ulControl);
+        unsigned long ulControl);
 extern void uDMAChannelTransferSet(unsigned long ulChannelStructIndex,
-                                   unsigned long ulMode, void *pvSrcAddr,
-                                   void *pvDstAddr,
-                                   unsigned long ulTransferSize);
+        unsigned long ulMode, void *pvSrcAddr, void *pvDstAddr,
+        unsigned long ulTransferSize);
 extern void uDMAChannelScatterGatherSet(unsigned long ulChannelNum,
-                                        unsigned ulTaskCount, void *pvTaskList,
-                                        unsigned long ulIsPeriphSG);
+        unsigned ulTaskCount, void *pvTaskList, unsigned long ulIsPeriphSG);
 extern unsigned long uDMAChannelSizeGet(unsigned long ulChannelStructIndex);
 extern unsigned long uDMAChannelModeGet(unsigned long ulChannelStructIndex);
 extern void uDMAIntRegister(unsigned long ulIntChannel,
-                            void (*pfnHandler)(void));
+        void (*pfnHandler)(void));
 extern void uDMAIntUnregister(unsigned long ulIntChannel);
 extern unsigned long uDMAIntStatus(void);
 extern void uDMAIntClear(unsigned long ulChanMask);

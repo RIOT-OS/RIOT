@@ -104,7 +104,6 @@
 //*****************************************************************************
 #define NUM_INTERRUPTS          195 //The above number plus 2?
 
-
 //*****************************************************************************
 //
 // The following are defines for the total number of priority levels.
@@ -112,6 +111,5 @@
 //*****************************************************************************
 #define NUM_PRIORITY            8
 #define NUM_PRIORITY_BITS       3
-
 
 #endif // __HW_INTS_H__

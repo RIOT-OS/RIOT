@@ -50,51 +50,51 @@
 #include "hw_timer.h"
 
 /* 
-   Set Wall-Clock Alarm (using absolute time)
+ Set Wall-Clock Alarm (using absolute time)
 
-   Returns 0 on success otherwise -1
-*/
+ Returns 0 on success otherwise -1
+ */
 i32 cc_rtc_set_alarm(struct u64_time *alarm);
 
 /* 
-   Clear a previously configured alarm
+ Clear a previously configured alarm
 
-   Returns 0 on success otherwise -1
-*/
+ Returns 0 on success otherwise -1
+ */
 i32 cc_rtc_clr_alarm(void);
 
 /* 
-   Returns to indicate whether an alarm is active or not
-*/
+ Returns to indicate whether an alarm is active or not
+ */
 bool cc_rtc_has_alarm(void);
 
 /*  
-    Get wall-clock time remaining to expiry of configured alarm.
+ Get wall-clock time remaining to expiry of configured alarm.
 
-    Returns 0 on success otherwise -1
-*/
+ Returns 0 on success otherwise -1
+ */
 i32 cc_rtc_time_to_alarm(struct u64_time *tta);
 
 /*  
-    Get wall-clock time at this instance.
+ Get wall-clock time at this instance.
 
-    Returns 0 on success otherwise -1
-*/
+ Returns 0 on success otherwise -1
+ */
 i32 cc_rtc_get(struct u64_time *rtc_val);
 
 /*  
-    Set wall-clock time at this instance.
+ Set wall-clock time at this instance.
 
-    Returns 0 on success otherwise -1
-*/
+ Returns 0 on success otherwise -1
+ */
 i32 cc_rtc_set(struct u64_time *rtc_val);
 
 /* 
-   Interrupt service routine.
+ Interrupt service routine.
 
-   Should be invoked by platform whenever, a new value for RTC is set or there
-   is a pending HW interrupt 
-*/
+ Should be invoked by platform whenever, a new value for RTC is set or there
+ is a pending HW interrupt 
+ */
 void cc_rtc_isr();
 
 i32 cc_rtc_fast_read_config(bool enable);

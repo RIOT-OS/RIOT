@@ -39,7 +39,6 @@
 #ifndef __COMMON__H__
 #define __COMMON__H__
 
-
 //*****************************************************************************
 //
 // If building with a C++ compiler, make all of the definitions in this header
@@ -51,7 +50,6 @@
 extern "C"
 {
 #endif
-
 
 //
 // Values for below macros shall be modified as per access-point(AP) properties
@@ -69,10 +67,8 @@ extern "C"
 /* Security type (OPEN or WEP or WPA) SL_SEC_TYPE_OPEN*/
 #define SECURITY_TYPE       SL_SEC_TYPE_WPA
 
-
 #define SSID_LEN_MAX        32
 #define BSSID_LEN_MAX       6
-
 
 #ifdef NOTERM
 #define UART_PRINT(x,...)
@@ -81,7 +77,8 @@ extern "C"
 #else
 #define UART_PRINT printf
 #define DBG_PRINT  printf
-#define ERR_PRINT(x) printf("Error [%ld] at line [%d] in function [%s]  \n\r",x,__LINE__,__FUNCTION__)
+#define ERR_PRINT(x) printf("Error [%ld] at line [%d] in function [%s]  \n\r",\
+                            x,__LINE__,__FUNCTION__)
 #endif
 
 // Loop forever, user can change it as per application's requirement
@@ -106,21 +103,20 @@ extern "C"
 #define SUCCESS                 0
 #define FAILURE                 -1
 
-
 // Status bits - These are used to set/reset the corresponding bits in 
 // given variable
-typedef enum{
+typedef enum {
     STATUS_BIT_NWP_INIT = 0, // If this bit is set: Network Processor is 
                              // powered up
-                             
+
     STATUS_BIT_CONNECTION,   // If this bit is set: the device is connected to 
                              // the AP or client is connected to device (AP)
-                             
+
     STATUS_BIT_IP_LEASED,    // If this bit is set: the device has leased IP to 
                              // any connected client
 
-    STATUS_BIT_IP_AQUIRED,   // If this bit is set: the device has acquired an IP
-    
+    STATUS_BIT_IP_AQUIRED,  // If this bit is set: the device has acquired an IP
+
     STATUS_BIT_SMARTCONFIG_START, // If this bit is set: the SmartConfiguration 
                                   // process is started from SmartConfig app
 
@@ -131,13 +127,12 @@ typedef enum{
                                  // found any p2p-negotiation request
 
     STATUS_BIT_CONNECTION_FAILED, // If this bit is set: the device(P2P mode)
-                                  // connection to client(or reverse way) is failed
+                                  // connection to client(or reverse way) failed
 
     STATUS_BIT_PING_DONE         // If this bit is set: the device has completed
                                  // the ping operation
 
-}e_StatusBits;
-
+} e_StatusBits;
 
 #define CLR_STATUS_BIT_ALL(status_variable)  (status_variable = 0)
 #define SET_STATUS_BIT(status_variable, bit) status_variable |= (1<<(bit))

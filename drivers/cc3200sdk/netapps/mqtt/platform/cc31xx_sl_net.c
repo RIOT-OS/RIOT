@@ -69,8 +69,8 @@ static _i32 buf_printf(const _u8 *buf, _u32 len, _u32 idt)
  Returns a valid handle on success, otherwise a negative number.
  -----------------------------------------------------------------------------*/
 
-static _i32 create_socket(_u32 nwconn_opts, struct secure_conn *nw_security_opts)
-{
+static _i32 create_socket(_u32 nwconn_opts,
+        struct secure_conn *nw_security_opts) {
     _i32 MqttSocketFd, Status;
 
     //local variables for creating secure socket
@@ -89,10 +89,9 @@ static _i32 create_socket(_u32 nwconn_opts, struct secure_conn *nw_security_opts
         SecurityMethod = *((_u8 *) (nw_security_opts->method));
         SecurityCypher = *((_u32 *) (nw_security_opts->cipher));
 
-        if (nw_security_opts->n_file < 1  || nw_security_opts->n_file > 4 ) {
+        if (nw_security_opts->n_file < 1 || nw_security_opts->n_file > 4) {
             PRINTF("\n\r ERROR: security files missing or wrong number of\
-                   security files\n\r");
-            PRINTF("\n\r ERROR: Did not create socket\n\r");
+                   security files\n\r"); PRINTF("\n\r ERROR: Did not create socket\n\r");
             return (-1);
         }
 
@@ -111,26 +110,27 @@ static _i32 create_socket(_u32 nwconn_opts, struct secure_conn *nw_security_opts
             return (Status);
         }
 
-        if(nw_security_opts->n_file == 1){
-        	Status = sl_SetSockOpt(MqttSocketFd, SL_SOL_SOCKET, SL_SO_SECURE_FILES_CA_FILE_NAME,
-        			 nw_security_opts->files[0], strlen(nw_security_opts->files[0]));
-        	if (Status < 0) {
-				sl_Close(MqttSocketFd);
-				return (Status);
-			}
-        }else{
-        	for(i=0; i<nw_security_opts->n_file;i++){
-        		if(NULL != nw_security_opts->files[i]){
-        			Status = sl_SetSockOpt(MqttSocketFd, SL_SOL_SOCKET,
-        					(SL_SO_SECURE_FILES_PRIVATE_KEY_FILE_NAME+i),
-        			        nw_security_opts->files[i],
-        			        strlen(nw_security_opts->files[i]));
-        			if (Status < 0) {
-						sl_Close(MqttSocketFd);
-						return (Status);
-					}
-        		}
-        	}
+        if (nw_security_opts->n_file == 1) {
+            Status = sl_SetSockOpt(MqttSocketFd, SL_SOL_SOCKET,
+                    SL_SO_SECURE_FILES_CA_FILE_NAME, nw_security_opts->files[0],
+                    strlen(nw_security_opts->files[0]));
+            if (Status < 0) {
+                sl_Close(MqttSocketFd);
+                return (Status);
+            }
+        } else {
+            for (i = 0; i < nw_security_opts->n_file; i++) {
+                if (NULL != nw_security_opts->files[i]) {
+                    Status = sl_SetSockOpt(MqttSocketFd, SL_SOL_SOCKET,
+                            (SL_SO_SECURE_FILES_PRIVATE_KEY_FILE_NAME + i),
+                            nw_security_opts->files[i],
+                            strlen(nw_security_opts->files[i]));
+                    if (Status < 0) {
+                        sl_Close(MqttSocketFd);
+                        return (Status);
+                    }
+                }
+            }
         }
 
     }
@@ -157,8 +157,7 @@ static _i32 create_socket(_u32 nwconn_opts, struct secure_conn *nw_security_opts
  It returns 0, if a valid ip address is not detected.
  -----------------------------------------------------------------------------*/
 
-static _u32 svr_addr_NB_order_IPV4(char *svr_addr_str)
-{
+static _u32 svr_addr_NB_order_IPV4(char *svr_addr_str) {
     _u8 addr[4];
     _i8 i = 0;
     char *token;
@@ -168,18 +167,18 @@ static _u32 svr_addr_NB_order_IPV4(char *svr_addr_str)
     /*take a temporary copy of the string. strtok modifies the input string*/
     _i8 svr_addr_size = strlen(svr_addr_str);
     char *svr_addr_cpy = malloc(svr_addr_size + 1); //1 for null
-	if(NULL == svr_addr_cpy) return 0;
+    if (NULL == svr_addr_cpy)
+        return 0;
     strcpy(svr_addr_cpy, svr_addr_str);
 
-    PRINTF("\n\r server address = %s\n\r", svr_addr_cpy);
-    PRINTF("\n\r server address string length = %d\n\r", strlen(svr_addr_cpy));
+    PRINTF("\n\r server address = %s\n\r", svr_addr_cpy); PRINTF("\n\r server address string length = %d\n\r", strlen(svr_addr_cpy));
 
     /* get the first token */
-    token = strtok((char*)svr_addr_cpy, ".");
+    token = strtok((char*) svr_addr_cpy, ".");
 
     /* walk through other tokens */
     while (token != NULL) {
-        temp = atoi((const char*)token);
+        temp = atoi((const char*) token);
 
         //check for invalid tokens or if already 4 tokens were obtained
         if ((temp < 0) || (temp > 255) || (i >= 4)) {
@@ -216,8 +215,7 @@ static _u32 svr_addr_NB_order_IPV4(char *svr_addr_str)
  -----------------------------------------------------------------------------*/
 
 _i32 comm_open(_u32 nwconn_opts, const char *server_addr, _u16 port_number,
-        const struct secure_conn *nw_security)
-{
+        const struct secure_conn *nw_security) {
     _i32 Status, MqttSocketFd;
 
     SlSockAddrIn_t LocalAddr; //address of the server to connect to
@@ -314,8 +312,7 @@ _i32 comm_open(_u32 nwconn_opts, const char *server_addr, _u16 port_number,
 
 } // end of function
 
-_i32 tcp_send(_i32 comm, const _u8 *buf, _u32 len, void *ctx)
-{
+_i32 tcp_send(_i32 comm, const _u8 *buf, _u32 len, void *ctx) {
     _i32 Status;
 
     PRINTF("\n\r TCP send invoked for data with len %d\n\r", len);PRINTF("\n\r Sent Data : ");
@@ -331,8 +328,7 @@ _i32 tcp_send(_i32 comm, const _u8 *buf, _u32 len, void *ctx)
 } // end of function
 
 _i32 tcp_recv(_i32 comm, _u8 *buf, _u32 len, _u32 wait_secs, bool *timed_out,
-        void *ctx)
-{
+        void *ctx) {
     _i32 Status;
     _i32 MqttSocketFd = comm;
 
@@ -396,14 +392,13 @@ _i32 comm_close(_i32 comm) {
 }             // end of function
 
 _u32 rtc_secs(void) {
-    return(platform_get_time_in_secs());   
+    return (platform_get_time_in_secs());
 }             // end of function
 
 //--------------------------- adding functions for server functionalities ---------------------------
 
 _i32 tcp_listen(_u32 nwconn_info, _u16 port_number,
-        const struct secure_conn *nw_security)
-{
+        const struct secure_conn *nw_security) {
     SlSockAddrIn_t sLocalAddr;
     _i32 iSockID, iAddrSize;
     _i32 iStatus;
@@ -442,8 +437,8 @@ _i32 tcp_listen(_u32 nwconn_info, _u16 port_number,
 
 }             // end of function
 
-_i32 tcp_select(_i32 *recv_cvec, _i32 *send_cvec, _i32 *rsvd_cvec, _u32 wait_secs)
-{
+_i32 tcp_select(_i32 *recv_cvec, _i32 *send_cvec, _i32 *rsvd_cvec,
+        _u32 wait_secs) {
     struct SlTimeval_t tv, *p_tv;
     SlFdSet_t rdfds;
     _i32 rd_idx = 0, wr_idx = 0, max_fd = 0;
@@ -489,16 +484,15 @@ _i32 tcp_select(_i32 *recv_cvec, _i32 *send_cvec, _i32 *rsvd_cvec, _u32 wait_sec
     return (wr_idx);
 }             // end of function
 
-_i32 tcp_accept(_i32 listen_hnd, _u8 *client_ip, _u32 *ip_length)
-{
+_i32 tcp_accept(_i32 listen_hnd, _u8 *client_ip, _u32 *ip_length) {
     _i32 new_fd;
-    SlSockAddrIn_t client_addr = {0}; // client address
+    SlSockAddrIn_t client_addr = { 0 }; // client address
     SlSocklen_t cl_addr_size;
 
     cl_addr_size = sizeof(client_addr);
 
     new_fd = sl_Accept(listen_hnd, (struct SlSockAddr_t *) &client_addr,
-                       &cl_addr_size);
+            &cl_addr_size);
 
     if (new_fd < 0) {
         PRINTF("\n\r ERROR: in accept \n\r");
@@ -519,8 +513,7 @@ _i32 tcp_accept(_i32 listen_hnd, _u8 *client_ip, _u32 *ip_length)
 //--------------------------- adding functions for udp functionalities ---------------------------
 
 _i32 send_dest(_i32 comm, const _u8 *buf, _u32 len, _u16 dest_port,
-              const _u8 *dest_ip, _u32 ip_len)
-{
+        const _u8 *dest_ip, _u32 ip_len) {
     _i32 iSockID = (_i32) comm;
     _i32 iStatus, iAddrSize;
     SlSockAddrIn_t sAddr;
@@ -564,17 +557,16 @@ _i32 send_dest(_i32 comm, const _u8 *buf, _u32 len, _u16 dest_port,
 } // end of function
 
 _i32 recv_from(_i32 comm, _u8 *buf, _u32 len, _u16 *from_port, _u8 *from_ip,
-               _u32 *ip_len)
-{
+        _u32 *ip_len) {
 
     _i32 iSockID = (_i32) comm;
     _i32 iStatus, iAddrSize;
-    SlSockAddrIn_t fromAddr = {0};
+    SlSockAddrIn_t fromAddr = { 0 };
 
     iAddrSize = sizeof(SlSockAddrIn_t);
 
     iStatus = sl_RecvFrom(iSockID, buf, len, 0, (SlSockAddr_t *) &fromAddr,
-                          (SlSocklen_t*) &iAddrSize);
+            (SlSocklen_t*) &iAddrSize);
 
     if (iStatus < 0) {
         // error

@@ -40,115 +40,107 @@
 
 #include <hw_types.h>
 
-static void apply_io_park(u8 pin_num, 
-                          enum io_park_state park_value)
-{
-        u32 pin_strength, pin_type;
+static void apply_io_park(u8 pin_num, enum io_park_state park_value) {
+    u32 pin_strength, pin_type;
 
-        if(DONT_CARE != park_value) {
-                /* Change the pin mode to GPIO to be safe */
-                //MAP_PinModeSet(pin_num, PIN_MODE_0);
-            
-                /* First apply PullUp/PullDn (or no pull) according 
-                to the default levels specified in the user supplied
-                parking table */
-                MAP_PinConfigGet(pin_num, &pin_strength, &pin_type);
+    if (DONT_CARE != park_value) {
+        /* Change the pin mode to GPIO to be safe */
+        //MAP_PinModeSet(pin_num, PIN_MODE_0);
+        /* First apply PullUp/PullDn (or no pull) according 
+         to the default levels specified in the user supplied
+         parking table */
+        MAP_PinConfigGet(pin_num, &pin_strength, &pin_type);
 
-                if(NO_PULL_HIZ != park_value) {
-                        MAP_PinConfigSet(pin_num, pin_strength, park_value);
-                } else {
-                        MAP_PinConfigSet(pin_num, pin_strength, PIN_TYPE_STD);
-                }
-
-                /* One by one HiZ all the IOs, 
-                  by writing the register that drives IOEN_N control 
-                  pin of the IOs. This register and the signal path is 
-                  always-on and hence not get lost during True-LPDS */
-                MAP_PinDirModeSet(pin_num, PIN_DIR_MODE_IN);
-
-                /* Once all the digital IOs has been made HiZ, 
-                  the desired default PAD levels would be held by 
-                  the weak-pulls. Input buffers would be alive 
-                  (such as auto-SPI or wake-GPIOs) and would not 
-                  have Iddq issue since pulls are present. */
+        if (NO_PULL_HIZ != park_value) {
+            MAP_PinConfigSet(pin_num, pin_strength, park_value);
+        } else {
+            MAP_PinConfigSet(pin_num, pin_strength, PIN_TYPE_STD);
         }
-        return;
+
+        /* One by one HiZ all the IOs, 
+         by writing the register that drives IOEN_N control 
+         pin of the IOs. This register and the signal path is 
+         always-on and hence not get lost during True-LPDS */
+        MAP_PinDirModeSet(pin_num, PIN_DIR_MODE_IN);
+
+        /* Once all the digital IOs has been made HiZ, 
+         the desired default PAD levels would be held by 
+         the weak-pulls. Input buffers would be alive 
+         (such as auto-SPI or wake-GPIOs) and would not 
+         have Iddq issue since pulls are present. */
+    }
+    return;
 }
 
-i32 cc_io_park_safe(struct soc_io_park *io_park_choice,
-                     u8 num_pins)
-{
-        i32 loopcnt;
+i32 cc_io_park_safe(struct soc_io_park *io_park_choice, u8 num_pins) {
+    i32 loopcnt;
 
-        if(NULL == io_park_choice) {
-                return -1;
-        }
+    if (NULL == io_park_choice) {
+        return -1;
+    }
 
-        /* Park the IOs safely as specified by the application */
-        for(loopcnt = 0; loopcnt < num_pins; loopcnt++) {
-                switch(io_park_choice[loopcnt].pin_num) {
-                        /* Shared SPI pins for SFLASH */
-                        case PIN_11:
-                        case PIN_12:
-                        case PIN_13:
-                        case PIN_14:
+    /* Park the IOs safely as specified by the application */
+    for (loopcnt = 0; loopcnt < num_pins; loopcnt++) {
+        switch (io_park_choice[loopcnt].pin_num) {
+        /* Shared SPI pins for SFLASH */
+        case PIN_11:
+        case PIN_12:
+        case PIN_13:
+        case PIN_14:
 #ifdef DEBUG_MODE
-                        /* JTAG pins */
-                        case PIN_16:
-                        case PIN_17:
-                        case PIN_19:
-                        case PIN_20:
+            /* JTAG pins */
+            case PIN_16:
+            case PIN_17:
+            case PIN_19:
+            case PIN_20:
 #endif
-                                /* Do not park these pins as they may 
-                                   have external dependencies */
-                                break;
-                        default:
-                                /* Apply the specified IO parking scheme */
-                                apply_io_park(io_park_choice[loopcnt].pin_num,
-                                        io_park_choice[loopcnt].park_val);
-
-                }
+            /* Do not park these pins as they may 
+             have external dependencies */
+            break;
+        default:
+            /* Apply the specified IO parking scheme */
+            apply_io_park(io_park_choice[loopcnt].pin_num,
+                    io_park_choice[loopcnt].park_val);
 
         }
 
-        /* parking the SFLASH IOs */
-        HWREG(0x4402E0E8) &= ~(0x3 << 8);
-        HWREG(0x4402E0E8) |= (0x2 << 8);
-        HWREG(0x4402E0EC) &= ~(0x3 << 8);
-        HWREG(0x4402E0EC) |= (0x2 << 8);
-        HWREG(0x4402E0F0) &= ~(0x3 << 8);
-        HWREG(0x4402E0F0) |= (0x2 << 8);
-        HWREG(0x4402E0F4) &= ~(0x3 << 8);
-        HWREG(0x4402E0F4) |= (0x1 << 8);
+    }
 
-        return 0;
+    /* parking the SFLASH IOs */
+    HWREG(0x4402E0E8) &= ~(0x3 << 8);
+    HWREG(0x4402E0E8) |= (0x2 << 8);
+    HWREG(0x4402E0EC) &= ~(0x3 << 8);
+    HWREG(0x4402E0EC) |= (0x2 << 8);
+    HWREG(0x4402E0F0) &= ~(0x3 << 8);
+    HWREG(0x4402E0F0) |= (0x2 << 8);
+    HWREG(0x4402E0F4) &= ~(0x3 << 8);
+    HWREG(0x4402E0F4) |= (0x1 << 8);
+
+    return 0;
 
 }
 
+i32 cc_set_default(struct soc_io_park *io_park_choice, u8 num_pins) {
+    i32 loopcnt;
 
-i32 cc_set_default(struct soc_io_park *io_park_choice,
-                     u8 num_pins)
-{
-        i32 loopcnt;
+    if (NULL == io_park_choice) {
+        return -1;
+    }
 
-        if(NULL == io_park_choice) {
-                return -1;
-        }
+    /* Park the IOs safely as specified by the application */
+    for (loopcnt = 0; loopcnt < num_pins; loopcnt++) {
+        /* Change the pin mode to default MODE 1 */
+        MAP_PinModeSet(io_park_choice[loopcnt].pin_num,
+        PIN_MODE_1);
+        /* Change the drive strength and pin type to default */
+        MAP_PinConfigSet(io_park_choice[loopcnt].pin_num,
+                (PIN_STRENGTH_2MA | PIN_STRENGTH_4MA),
+                PIN_TYPE_STD);
+        /* Set the PINs as input */
+        MAP_PinDirModeSet(io_park_choice[loopcnt].pin_num,
+        PIN_DIR_MODE_IN);
+    }
 
-        /* Park the IOs safely as specified by the application */
-        for(loopcnt = 0; loopcnt < num_pins; loopcnt++) {
-                /* Change the pin mode to default MODE 1 */
-                MAP_PinModeSet(io_park_choice[loopcnt].pin_num, 
-                                PIN_MODE_1);
-                /* Change the drive strength and pin type to default */
-                MAP_PinConfigSet(io_park_choice[loopcnt].pin_num,
-                                (PIN_STRENGTH_2MA | PIN_STRENGTH_4MA),
-                                PIN_TYPE_STD);
-                /* Set the PINs as input */
-                MAP_PinDirModeSet(io_park_choice[loopcnt].pin_num, 
-                                PIN_DIR_MODE_IN);
-        }
-
-        return 0;
+    return 0;
 }
 

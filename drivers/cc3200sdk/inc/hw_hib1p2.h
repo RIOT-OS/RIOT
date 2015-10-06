@@ -235,9 +235,6 @@
 #define HIB1P2_O_MEM_CM_TEST_MODE \
                                 0x00000140
 
-
-
-
 //******************************************************************************
 //
 // The following are defines for the bit fields in the
@@ -257,8 +254,8 @@
 
 #define HIB1P2_SRAM_SKA_LDO_PARAMETERS0_mem_sldo_en_lowv_override \
                                 0x04000000  // FSM Override value for SLDO_EN :
-                                            // Applicable only when bit [4] of
-                                            // this register is set to 1.
+// Applicable only when bit [4] of
+// this register is set to 1.
 
 #define HIB1P2_SRAM_SKA_LDO_PARAMETERS0_mem_sldo_en_low_pwr_lowv \
                                 0x02000000
@@ -276,9 +273,9 @@
 #define HIB1P2_SRAM_SKA_LDO_PARAMETERS0_mem_sldo_spare_lowv_S 8
 #define HIB1P2_SRAM_SKA_LDO_PARAMETERS0_mem_skaldo_en_lowv_override \
                                 0x00000080  // FSM Override value for
-                                            // SKA_LDO_EN : Applicable only when
-                                            // bit [3] of this register is set
-                                            // to 1.
+// SKA_LDO_EN : Applicable only when
+// bit [3] of this register is set
+// to 1.
 
 #define HIB1P2_SRAM_SKA_LDO_PARAMETERS0_mem_skaldo_en_cap_ref_lowv \
                                 0x00000040
@@ -288,11 +285,11 @@
 
 #define HIB1P2_SRAM_SKA_LDO_PARAMETERS0_mem_sldo_en_lowv_fsm_override_ctrl \
                                 0x00000010  // When 1, bit[26] of this register
-                                            // will be used as SLDO_EN
+// will be used as SLDO_EN
 
 #define HIB1P2_SRAM_SKA_LDO_PARAMETERS0_mem_skaldo_en_lowv_fsm_override_ctrl \
                                 0x00000008  // When 1, bit[26] of this register
-                                            // will be used as SKA_LDO_EN
+// will be used as SKA_LDO_EN
 
 #define HIB1P2_SRAM_SKA_LDO_PARAMETERS0_NA1_M \
                                 0x00000007
@@ -339,33 +336,33 @@
 //******************************************************************************
 #define HIB1P2_DIG_DCDC_PARAMETERS0_mem_dcdc_dig_en_lowv_override \
                                 0x80000000  // Override value for DCDC_DIG_EN :
-                                            // Applicable only when bit [31] of
-                                            // DIG_DCDC_PARAMETERS1 [0x000C] is
-                                            // set to 1. Else from FSM
+// Applicable only when bit [31] of
+// DIG_DCDC_PARAMETERS1 [0x000C] is
+// set to 1. Else from FSM
 
 #define HIB1P2_DIG_DCDC_PARAMETERS0_mem_dcdc_dig_delayed_en_lowv \
                                 0x40000000
 
 #define HIB1P2_DIG_DCDC_PARAMETERS0_mem_dcdc_dig_en_subreg_1p8v_lowv_override \
                                 0x20000000  // Override value for
-                                            // DCDC_DIG_EN_SUBREG_1P8V :
-                                            // Applicable only when bit [30] of
-                                            // DIG_DCDC_PARAMETERS1 [0x000C] is
-                                            // set to 1. Else from FSM
+// DCDC_DIG_EN_SUBREG_1P8V :
+// Applicable only when bit [30] of
+// DIG_DCDC_PARAMETERS1 [0x000C] is
+// set to 1. Else from FSM
 
 #define HIB1P2_DIG_DCDC_PARAMETERS0_mem_dcdc_dig_en_subreg_1p2v_lowv_override \
                                 0x10000000  // Override value for
-                                            // DCDC_DIG_EN_SUBREG_1P2V :
-                                            // Applicable only when bit [29] of
-                                            // DIG_DCDC_PARAMETERS1 [0x000C] is
-                                            // set to 1. Else from FSM
+// DCDC_DIG_EN_SUBREG_1P2V :
+// Applicable only when bit [29] of
+// DIG_DCDC_PARAMETERS1 [0x000C] is
+// set to 1. Else from FSM
 
 #define HIB1P2_DIG_DCDC_PARAMETERS0_mem_dcdc_dig_en_slp_mode_lowv_override \
                                 0x08000000  // Override value for
-                                            // DCDC_DIG_SLP_EN : Applicable only
-                                            // when bit [28] of
-                                            // DIG_DCDC_PARAMETERS1 [0x000C] is
-                                            // set to 1. Else from FSM
+// DCDC_DIG_SLP_EN : Applicable only
+// when bit [28] of
+// DIG_DCDC_PARAMETERS1 [0x000C] is
+// set to 1. Else from FSM
 
 #define HIB1P2_DIG_DCDC_PARAMETERS0_mem_dcdc_dig_en_ldo_mode_lowv \
                                 0x04000000
@@ -384,10 +381,10 @@
 
 #define HIB1P2_DIG_DCDC_PARAMETERS0_mem_dcdc_dig_vtrim_lowv_override_M \
                                 0x003F0000  // Override value for
-                                            // DCDC_DIG_VTRIM : Applicable only
-                                            // when bit [27] of
-                                            // DIG_DCDC_PARAMETERS1 [0x000C] is
-                                            // set to 1.
+// DCDC_DIG_VTRIM : Applicable only
+// when bit [27] of
+// DIG_DCDC_PARAMETERS1 [0x000C] is
+// set to 1.
 
 #define HIB1P2_DIG_DCDC_PARAMETERS0_mem_dcdc_dig_vtrim_lowv_override_S 16
 #define HIB1P2_DIG_DCDC_PARAMETERS0_mem_dcdc_dig_pfm_ripple_trim_lowv_M \
@@ -489,10 +486,10 @@
 
 #define HIB1P2_DIG_DCDC_PARAMETERS2_mem_dcdc_dig_cot_mode_en_lowv_override \
                                 0x00000001  // Override value for
-                                            // DCDC_DIG_COT_EN : Applicable only
-                                            // when bit[26] of
-                                            // DIG_DCDC_PARAMETERS1 [0x000C] is
-                                            // set to 1.
+// DCDC_DIG_COT_EN : Applicable only
+// when bit[26] of
+// DIG_DCDC_PARAMETERS1 [0x000C] is
+// set to 1.
 
 //******************************************************************************
 //
@@ -515,10 +512,10 @@
 
 #define HIB1P2_DIG_DCDC_PARAMETERS3_mem_dcdc_dig_ilim_trim_lowv_override_M \
                                 0x001FE000  // Override value for
-                                            // DCDC_DIG_ILIM_TRIM : Applicable
-                                            // only when bit [25] of
-                                            // DIG_DCDC_PARAMETERS1 [0x000C] is
-                                            // set to 1
+// DCDC_DIG_ILIM_TRIM : Applicable
+// only when bit [25] of
+// DIG_DCDC_PARAMETERS1 [0x000C] is
+// set to 1
 
 #define HIB1P2_DIG_DCDC_PARAMETERS3_mem_dcdc_dig_ilim_trim_lowv_override_S 13
 #define HIB1P2_DIG_DCDC_PARAMETERS3_mem_dcdc_dig_ilim_mask_dly_sel_lowv_M \
@@ -1379,16 +1376,16 @@
 //******************************************************************************
 #define HIB1P2_HIB1P2_EFUSE_READ_REG0_FUSEFARM_ROW_12_M \
                                 0xFFFFFFFF  // Corresponds to ROW_12 of
-                                            // FUSEFARM. [7:0] :
-                                            // DCDC_DIG_ILIM_TRIM_LOWV(7:0)
-                                            // [15:8] :
-                                            // DCDC_ANA_ILIM_TRIM_LOWV(7:0)
-                                            // [23:16] :
-                                            // DCDC_FLASH_ILIM_TRIM_LOWV(7:0)
-                                            // [24:24] : DTHE SHA DISABLE
-                                            // [25:25] : DTHE DES DISABLE
-                                            // [26:26] : DTHE AES DISABLE
-                                            // [31:27] : HD_BG_RTRIM (4:0)
+// FUSEFARM. [7:0] :
+// DCDC_DIG_ILIM_TRIM_LOWV(7:0)
+// [15:8] :
+// DCDC_ANA_ILIM_TRIM_LOWV(7:0)
+// [23:16] :
+// DCDC_FLASH_ILIM_TRIM_LOWV(7:0)
+// [24:24] : DTHE SHA DISABLE
+// [25:25] : DTHE DES DISABLE
+// [26:26] : DTHE AES DISABLE
+// [31:27] : HD_BG_RTRIM (4:0)
 
 #define HIB1P2_HIB1P2_EFUSE_READ_REG0_FUSEFARM_ROW_12_S 0
 //******************************************************************************
@@ -1399,11 +1396,11 @@
 //******************************************************************************
 #define HIB1P2_HIB1P2_EFUSE_READ_REG1_FUSEFARM_ROW_13_M \
                                 0xFFFFFFFF  // Corresponds to ROW_13 of the
-                                            // FUSEFARM. [7:0] : HD_BG_MAG_TRIM
-                                            // (7:0) [14:8] : HD_BG_TEMP_TRIM
-                                            // (6:0) [15:15] : GREYOUT ENABLE
-                                            // DUTY CYCLING [31:16] :
-                                            // Reserved/Checksum
+// FUSEFARM. [7:0] : HD_BG_MAG_TRIM
+// (7:0) [14:8] : HD_BG_TEMP_TRIM
+// (6:0) [15:15] : GREYOUT ENABLE
+// DUTY CYCLING [31:16] :
+// Reserved/Checksum
 
 #define HIB1P2_HIB1P2_EFUSE_READ_REG1_FUSEFARM_ROW_13_S 0
 //******************************************************************************
@@ -1743,8 +1740,5 @@
 //******************************************************************************
 #define HIB1P2_MEM_CM_TEST_MODE_mem_cm_test_mode \
                                 0x00000001
-
-
-
 
 #endif // __HW_HIB1P2_H__

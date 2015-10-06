@@ -75,43 +75,36 @@ struct Lookup_Field;
 
 #ifndef GPERF_DOWNCASE
 #define GPERF_DOWNCASE 1
-static unsigned char gperf_downcase[256] =
-  {
-      0,   1,   2,   3,   4,   5,   6,   7,   8,   9,  10,  11,  12,  13,  14,
-     15,  16,  17,  18,  19,  20,  21,  22,  23,  24,  25,  26,  27,  28,  29,
-     30,  31,  32,  33,  34,  35,  36,  37,  38,  39,  40,  41,  42,  43,  44,
-     45,  46,  47,  48,  49,  50,  51,  52,  53,  54,  55,  56,  57,  58,  59,
-     60,  61,  62,  63,  64,  97,  98,  99, 100, 101, 102, 103, 104, 105, 106,
-    107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121,
-    122,  91,  92,  93,  94,  95,  96,  97,  98,  99, 100, 101, 102, 103, 104,
-    105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119,
-    120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134,
-    135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149,
-    150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164,
-    165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179,
-    180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194,
-    195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209,
-    210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224,
-    225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239,
-    240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254,
-    255
-  };
+static unsigned char gperf_downcase[256] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+        11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28,
+        29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46,
+        47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64,
+        97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111,
+        112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 91, 92, 93, 94,
+        95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109,
+        110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123,
+        124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137,
+        138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151,
+        152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165,
+        166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179,
+        180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193,
+        194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207,
+        208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221,
+        222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235,
+        236, 237, 238, 239, 240, 241, 242, 243, 244, 245, 246, 247, 248, 249,
+        250, 251, 252, 253, 254, 255 };
 #endif
 
 #ifndef GPERF_CASE_STRCMP
 #define GPERF_CASE_STRCMP 1
-static int
-gperf_case_strcmp (s1, s2)
-     register const char *s1;
-     register const char *s2;
-{
-  for (;;)
-    {
-      unsigned char c1 = gperf_downcase[(unsigned char)*s1++];
-      unsigned char c2 = gperf_downcase[(unsigned char)*s2++];
-      if (c1 != 0 && c1 == c2)
-        continue;
-      return (int)c1 - (int)c2;
+static int gperf_case_strcmp(s1, s2)
+    register const char *s1;register const char *s2; {
+    for (;;) {
+        unsigned char c1 = gperf_downcase[(unsigned char) *s1++];
+        unsigned char c2 = gperf_downcase[(unsigned char) *s2++];
+        if (c1 != 0 && c1 == c2)
+            continue;
+        return (int) c1 - (int) c2;
     }
 }
 #endif
@@ -123,203 +116,187 @@ __inline
 inline
 #endif
 #endif
-static unsigned int
-hash (str, len)
-     register const char *str;
-     register unsigned int len;
-{
-  static const unsigned char asso_values[] =
-    {
-      54, 54, 54, 54, 54, 54, 54, 54, 54, 54,
-      54, 54, 54, 54, 54, 54, 54, 54, 54, 54,
-      54, 54, 54, 54, 54, 54, 54, 54, 54, 54,
-      54, 54, 54, 54, 54, 54, 54, 54, 54, 54,
-      54, 54, 54, 54, 54, 54, 54, 54, 54, 54,
-      54, 54, 54, 30, 54, 54, 54, 54, 54, 54,
-      54, 54, 54, 54, 54,  0, 54,  0,  5,  5,
-      54, 10, 10, 54, 54, 54, 15, 54,  0, 54,
-      30, 54,  0,  0,  0, 54,  0, 10, 54,  0,
-      54, 54, 54, 54, 54, 54, 54,  0, 54,  0,
-       5,  5, 54, 10, 10, 54, 54, 54, 15, 54,
-       0, 54, 30, 54,  0,  0,  0, 54,  0, 10,
-      54,  0, 54, 54, 54, 54, 54, 54, 54, 54,
-      54, 54, 54, 54, 54, 54, 54, 54, 54, 54,
-      54, 54, 54, 54, 54, 54, 54, 54, 54, 54,
-      54, 54, 54, 54, 54, 54, 54, 54, 54, 54,
-      54, 54, 54, 54, 54, 54, 54, 54, 54, 54,
-      54, 54, 54, 54, 54, 54, 54, 54, 54, 54,
-      54, 54, 54, 54, 54, 54, 54, 54, 54, 54,
-      54, 54, 54, 54, 54, 54, 54, 54, 54, 54,
-      54, 54, 54, 54, 54, 54, 54, 54, 54, 54,
-      54, 54, 54, 54, 54, 54, 54, 54, 54, 54,
-      54, 54, 54, 54, 54, 54, 54, 54, 54, 54,
-      54, 54, 54, 54, 54, 54, 54, 54, 54, 54,
-      54, 54, 54, 54, 54, 54, 54, 54, 54, 54,
-      54, 54, 54, 54, 54, 54
-    };
-  return len + asso_values[(unsigned char)str[len - 1]] + asso_values[(unsigned char)str[0]];
+static unsigned int hash(str, len)
+    register const char *str;register unsigned int len; {
+    static const unsigned char asso_values[] = { 54, 54, 54, 54, 54, 54, 54, 54,
+            54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54,
+            54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54,
+            54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 30, 54, 54, 54, 54, 54,
+            54, 54, 54, 54, 54, 54, 0, 54, 0, 5, 5, 54, 10, 10, 54, 54, 54, 15,
+            54, 0, 54, 30, 54, 0, 0, 0, 54, 0, 10, 54, 0, 54, 54, 54, 54, 54,
+            54, 54, 0, 54, 0, 5, 5, 54, 10, 10, 54, 54, 54, 15, 54, 0, 54, 30,
+            54, 0, 0, 0, 54, 0, 10, 54, 0, 54, 54, 54, 54, 54, 54, 54, 54, 54,
+            54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54,
+            54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54,
+            54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54,
+            54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54,
+            54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54,
+            54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54,
+            54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54,
+            54, 54, 54, 54, 54, 54 };
+    return len + asso_values[(unsigned char) str[len - 1]]
+            + asso_values[(unsigned char) str[0]];
 }
 
-static const struct Lookup_Field wordlist[] =
-  {
+static const struct Lookup_Field wordlist[] = {
 #line 36 "lookup.gperf"
-    {"Vary",               24},
+        { "Vary", 24 },
 #line 33 "lookup.gperf"
-    {"Server",             21},
+        { "Server", 21 },
 #line 34 "lookup.gperf"
-    {"Trailer",            22},
+        { "Trailer", 22 },
 #line 14 "lookup.gperf"
-    {"Age",                2},
+        { "Age", 2 },
 #line 17 "lookup.gperf"
-    {"Connection",         5},
+        { "Connection", 5 },
 #line 32 "lookup.gperf"
-    {"Retry-After",        20 },
+        { "Retry-After", 20 },
 #line 27 "lookup.gperf"
-    {"Expires",            15},
+        { "Expires", 15 },
 #line 13 "lookup.gperf"
-    {"Accept-Ranges",      1},
+        { "Accept-Ranges", 1 },
 #line 25 "lookup.gperf"
-    {"Date",               13 },
+        { "Date", 13 },
 #line 15 "lookup.gperf"
-    {"Allow",              3},
+        { "Allow", 3 },
 #line 21 "lookup.gperf"
-    {"Content-Location",   9},
+        { "Content-Location", 9 },
 #line 24 "lookup.gperf"
-    {"Content-Type",       12},
+        { "Content-Type", 12 },
 #line 23 "lookup.gperf"
-    {"Content-Range",      11},
+        { "Content-Range", 11 },
 #line 26 "lookup.gperf"
-    {"ETag",               14},
+        { "ETag", 14 },
 #line 19 "lookup.gperf"
-    {"Content-Language",   7},
+        { "Content-Language", 7 },
 #line 29 "lookup.gperf"
-    {"Location",           17},
+        { "Location", 17 },
 #line 20 "lookup.gperf"
-    {"Content-Length",     8},
+        { "Content-Length", 8 },
 #line 18 "lookup.gperf"
-    {"Content-Encoding",   6},
+        { "Content-Encoding", 6 },
 #line 35 "lookup.gperf"
-    {"Transfer-Encoding",  23},
+        { "Transfer-Encoding", 23 },
 #line 16 "lookup.gperf"
-    {"Cache-Control",      4},
+        { "Cache-Control", 4 },
 #line 37 "lookup.gperf"
-    {"WWW-Authenticate",   25},
+        { "WWW-Authenticate", 25 },
 #line 28 "lookup.gperf"
-    {"Last-Modified",      16},
+        { "Last-Modified", 16 },
 #line 30 "lookup.gperf"
-    {"Pragma",             18},
+        { "Pragma", 18 },
 #line 22 "lookup.gperf"
-    {"Content-MD5",        10 },
+        { "Content-MD5", 10 },
 #line 31 "lookup.gperf"
-    {"Proxy-Authenticate", 19}
-  };
+        { "Proxy-Authenticate", 19 } };
 
 #ifdef __GNUC__
 __inline
+
 #if defined __GNUC_STDC_INLINE__ || defined __GNUC_GNU_INLINE__
 __attribute__ ((__gnu_inline__))
 #endif
 #endif
 const struct Lookup_Field *
 Lookup_getField (str, len)
-     register const char *str;
-     register unsigned int len;
+register const char *str;
+register unsigned int len;
 {
-  if (len <= MAX_WORD_LENGTH && len >= MIN_WORD_LENGTH)
+    if (len <= MAX_WORD_LENGTH && len >= MIN_WORD_LENGTH)
     {
-      register int key = hash (str, len);
+        register int key = hash (str, len);
 
-      if (key <= MAX_HASH_VALUE && key >= MIN_HASH_VALUE)
+        if (key <= MAX_HASH_VALUE && key >= MIN_HASH_VALUE)
         {
-          register const struct Lookup_Field *resword;
+            register const struct Lookup_Field *resword;
 
-          switch (key - 4)
+            switch (key - 4)
             {
-              case 0:
+                case 0:
                 resword = &wordlist[0];
                 goto compare;
-              case 2:
+                case 2:
                 resword = &wordlist[1];
                 goto compare;
-              case 3:
+                case 3:
                 resword = &wordlist[2];
                 goto compare;
-              case 4:
+                case 4:
                 resword = &wordlist[3];
                 goto compare;
-              case 6:
+                case 6:
                 resword = &wordlist[4];
                 goto compare;
-              case 7:
+                case 7:
                 resword = &wordlist[5];
                 goto compare;
-              case 8:
+                case 8:
                 resword = &wordlist[6];
                 goto compare;
-              case 9:
+                case 9:
                 resword = &wordlist[7];
                 goto compare;
-              case 10:
+                case 10:
                 resword = &wordlist[8];
                 goto compare;
-              case 11:
+                case 11:
                 resword = &wordlist[9];
                 goto compare;
-              case 12:
+                case 12:
                 resword = &wordlist[10];
                 goto compare;
-              case 13:
+                case 13:
                 resword = &wordlist[11];
                 goto compare;
-              case 14:
+                case 14:
                 resword = &wordlist[12];
                 goto compare;
-              case 15:
+                case 15:
                 resword = &wordlist[13];
                 goto compare;
-              case 17:
+                case 17:
                 resword = &wordlist[14];
                 goto compare;
-              case 19:
+                case 19:
                 resword = &wordlist[15];
                 goto compare;
-              case 20:
+                case 20:
                 resword = &wordlist[16];
                 goto compare;
-              case 22:
+                case 22:
                 resword = &wordlist[17];
                 goto compare;
-              case 23:
+                case 23:
                 resword = &wordlist[18];
                 goto compare;
-              case 24:
+                case 24:
                 resword = &wordlist[19];
                 goto compare;
-              case 27:
+                case 27:
                 resword = &wordlist[20];
                 goto compare;
-              case 29:
+                case 29:
                 resword = &wordlist[21];
                 goto compare;
-              case 32:
+                case 32:
                 resword = &wordlist[22];
                 goto compare;
-              case 37:
+                case 37:
                 resword = &wordlist[23];
                 goto compare;
-              case 49:
+                case 49:
                 resword = &wordlist[24];
                 goto compare;
             }
-          return 0;
-        compare:
-          {
-            register const char *s = resword->name;
+            return 0;
+            compare:
+            {
+                register const char *s = resword->name;
 
-            if ((((unsigned char)*str ^ (unsigned char)*s) & ~32) == 0 && !gperf_case_strcmp (str, s))
-              return resword;
-          }
+                if ((((unsigned char)*str ^ (unsigned char)*s) & ~32) == 0 && !gperf_case_strcmp (str, s))
+                return resword;
+            }
         }
     }
-  return 0;
+    return 0;
 }

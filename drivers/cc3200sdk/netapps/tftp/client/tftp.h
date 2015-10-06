@@ -11,7 +11,6 @@
 //
 //*****************************************************************************
 
-
 #ifndef _TFTP_H_
 #define _TFTP_H_
 
@@ -23,34 +22,35 @@
 //
 // TFTP Packet types.
 
- void   *mmAlloc( unsigned long Size );
- void   mmFree( void* pv );
- void   mmCopy( void* pDst, void* pSrc, unsigned long Size );
- void   mmZeroInit( void* pDst, unsigned long Size );
+void *mmAlloc(unsigned long Size);
+void mmFree(void* pv);
+void mmCopy(void* pDst, void* pSrc, unsigned long Size);
+void mmZeroInit(void* pDst, unsigned long Size);
 
- /*!
-  * 	\brief Recv data over TFTP
-  * 	This function receives data to a specified filename from the destination IP.
-  *
-  * 	\param[in] TftpIP				Server IP
-  * 	\param[in] *szFileName			Pointer to string holding filename.
-  * 	\param[in] *FileBuffer			Pointer to buffer where received data will be stored
-  * 	\param[in] *FileSize			Pointer to filesize
-  * 	\param[in] *pErrorCode			Pointer to error code that will be populated if receive is unsuccessful
-  *
-  * 	\return							1 - If file was sucessfully transferred
-  *     								0 - If the file was transferred but too large for the buffer
-  * 									<0 - Error
-  *
-  * 	\note							TFTPERROR_ERRORCODE: TFTP server error code. The error code
-  *          						is written to pErrorCode, and an error message is
-  *         							written to FileBuffer. The length of the error message
-  *          						is written to FileSize.
-  *
-  *          						This API is called from the application to initiate the receive.
-  */
+/*!
+ * 	\brief Recv data over TFTP
+ * 	This function receives data to a specified filename from the destination IP.
+ *
+ * 	\param[in] TftpIP				Server IP
+ * 	\param[in] *szFileName			Pointer to string holding filename.
+ * 	\param[in] *FileBuffer			Pointer to buffer where received data will be stored
+ * 	\param[in] *FileSize			Pointer to filesize
+ * 	\param[in] *pErrorCode			Pointer to error code that will be populated if receive is unsuccessful
+ *
+ * 	\return							1 - If file was sucessfully transferred
+ *     								0 - If the file was transferred but too large for the buffer
+ * 									<0 - Error
+ *
+ * 	\note							TFTPERROR_ERRORCODE: TFTP server error code. The error code
+ *          						is written to pErrorCode, and an error message is
+ *         							written to FileBuffer. The length of the error message
+ *          						is written to FileSize.
+ *
+ *          						This API is called from the application to initiate the receive.
+ */
 
-int sl_TftpRecv( unsigned long TftpIP, char *szFileName, char *FileBuffer,unsigned long *FileSize, unsigned short *pErrorCode );
+int sl_TftpRecv(unsigned long TftpIP, char *szFileName, char *FileBuffer,
+        unsigned long *FileSize, unsigned short *pErrorCode);
 
 /*!
  * 	\brief Send data over TFTP
@@ -75,8 +75,8 @@ int sl_TftpRecv( unsigned long TftpIP, char *szFileName, char *FileBuffer,unsign
  *
  */
 
-int sl_TftpSend( unsigned long TftpIP, char *szFileName, char *FileBuffer,unsigned long *FileSize, unsigned short *pErrorCode );
-
+int sl_TftpSend(unsigned long TftpIP, char *szFileName, char *FileBuffer,
+        unsigned long *FileSize, unsigned short *pErrorCode);
 
 #define  bzero(ptr,sz)       mmZeroInit(ptr,sz)
 #define  bcopy(src,dst,sz)   mmCopy(dst,src,sz)
@@ -96,11 +96,10 @@ int sl_TftpSend( unsigned long TftpIP, char *szFileName, char *FileBuffer,unsign
 #define TFTPERROR_OPCODE_FAILED (-6)
 #define TFTPERROR_DATA_FAILED   (-7)
 
-struct tftphdr
-{
-    short   opcode;             // packet type
-    short   block;              // block #
-    char    data[1];            // data or error string
+struct tftphdr {
+    short opcode;             // packet type
+    short block;              // block #
+    char data[1];            // data or error string
 };
 
 //
@@ -116,5 +115,4 @@ struct tftphdr
 #define ENOUSER         7       // no such user
 
 #endif
-
 

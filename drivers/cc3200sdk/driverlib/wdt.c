@@ -64,9 +64,7 @@
 //! if it is not.
 //
 //*****************************************************************************
-tBoolean
-WatchdogRunning(unsigned long ulBase)
-{
+tBoolean WatchdogRunning(unsigned long ulBase) {
     //
     // Check the arguments.
     //
@@ -75,7 +73,7 @@ WatchdogRunning(unsigned long ulBase)
     //
     // See if the watchdog timer module is enabled, and return.
     //
-    return(HWREG(ulBase + WDT_O_CTL) & WDT_CTL_INTEN);
+    return (HWREG(ulBase + WDT_O_CTL) & WDT_CTL_INTEN);
 }
 
 //*****************************************************************************
@@ -94,9 +92,7 @@ WatchdogRunning(unsigned long ulBase)
 //! \return None.
 //
 //*****************************************************************************
-void
-WatchdogEnable(unsigned long ulBase)
-{
+void WatchdogEnable(unsigned long ulBase) {
     //
     // Check the arguments.
     //
@@ -119,9 +115,7 @@ WatchdogEnable(unsigned long ulBase)
 //! \return None.
 //
 //*****************************************************************************
-void
-WatchdogLock(unsigned long ulBase)
-{
+void WatchdogLock(unsigned long ulBase) {
     //
     // Check the arguments.
     //
@@ -145,9 +139,7 @@ WatchdogLock(unsigned long ulBase)
 //! \return None.
 //
 //*****************************************************************************
-void
-WatchdogUnlock(unsigned long ulBase)
-{
+void WatchdogUnlock(unsigned long ulBase) {
     //
     // Check the arguments.
     //
@@ -171,9 +163,7 @@ WatchdogUnlock(unsigned long ulBase)
 //! \b false if they are not locked.
 //
 //*****************************************************************************
-tBoolean
-WatchdogLockState(unsigned long ulBase)
-{
+tBoolean WatchdogLockState(unsigned long ulBase) {
     //
     // Check the arguments.
     //
@@ -182,7 +172,7 @@ WatchdogLockState(unsigned long ulBase)
     //
     // Get the lock state.
     //
-    return((HWREG(ulBase + WDT_O_LOCK) == WDT_LOCK_LOCKED) ? true : false);
+    return ((HWREG(ulBase + WDT_O_LOCK) == WDT_LOCK_LOCKED) ? true : false);
 }
 
 //*****************************************************************************
@@ -206,9 +196,7 @@ WatchdogLockState(unsigned long ulBase)
 //! \return None.
 //
 //*****************************************************************************
-void
-WatchdogReloadSet(unsigned long ulBase, unsigned long ulLoadVal)
-{
+void WatchdogReloadSet(unsigned long ulBase, unsigned long ulLoadVal) {
     //
     // Check the arguments.
     //
@@ -234,9 +222,7 @@ WatchdogReloadSet(unsigned long ulBase, unsigned long ulLoadVal)
 //! \return None.
 //
 //*****************************************************************************
-unsigned long
-WatchdogReloadGet(unsigned long ulBase)
-{
+unsigned long WatchdogReloadGet(unsigned long ulBase) {
     //
     // Check the arguments.
     //
@@ -245,7 +231,7 @@ WatchdogReloadGet(unsigned long ulBase)
     //
     // Get the load register.
     //
-    return(HWREG(ulBase + WDT_O_LOAD));
+    return (HWREG(ulBase + WDT_O_LOAD));
 }
 
 //*****************************************************************************
@@ -259,9 +245,7 @@ WatchdogReloadGet(unsigned long ulBase)
 //! \return Returns the current value of the watchdog timer.
 //
 //*****************************************************************************
-unsigned long
-WatchdogValueGet(unsigned long ulBase)
-{
+unsigned long WatchdogValueGet(unsigned long ulBase) {
     //
     // Check the arguments.
     //
@@ -270,7 +254,7 @@ WatchdogValueGet(unsigned long ulBase)
     //
     // Get the current watchdog timer register value.
     //
-    return(HWREG(ulBase + WDT_O_VALUE));
+    return (HWREG(ulBase + WDT_O_VALUE));
 }
 
 //*****************************************************************************
@@ -297,9 +281,7 @@ WatchdogValueGet(unsigned long ulBase)
 //! \return None.
 //
 //*****************************************************************************
-void
-WatchdogIntRegister(unsigned long ulBase, void (*pfnHandler)(void))
-{
+void WatchdogIntRegister(unsigned long ulBase, void (*pfnHandler)(void)) {
     //
     // Check the arguments.
     //
@@ -334,9 +316,7 @@ WatchdogIntRegister(unsigned long ulBase, void (*pfnHandler)(void))
 //! \return None.
 //
 //*****************************************************************************
-void
-WatchdogIntUnregister(unsigned long ulBase)
-{
+void WatchdogIntUnregister(unsigned long ulBase) {
     //
     // Check the arguments.
     //
@@ -368,9 +348,7 @@ WatchdogIntUnregister(unsigned long ulBase)
 //! watchdog interrupt is active, and a 0 indicates that it is not active.
 //
 //*****************************************************************************
-unsigned long
-WatchdogIntStatus(unsigned long ulBase, tBoolean bMasked)
-{
+unsigned long WatchdogIntStatus(unsigned long ulBase, tBoolean bMasked) {
     //
     // Check the arguments.
     //
@@ -380,13 +358,10 @@ WatchdogIntStatus(unsigned long ulBase, tBoolean bMasked)
     // Return either the interrupt status or the raw interrupt status as
     // requested.
     //
-    if(bMasked)
-    {
-        return(HWREG(ulBase + WDT_O_MIS));
-    }
-    else
-    {
-        return(HWREG(ulBase + WDT_O_RIS));
+    if (bMasked) {
+        return (HWREG(ulBase + WDT_O_MIS));
+    } else {
+        return (HWREG(ulBase + WDT_O_RIS));
     }
 }
 
@@ -411,9 +386,7 @@ WatchdogIntStatus(unsigned long ulBase, tBoolean bMasked)
 //! \return None.
 //
 //*****************************************************************************
-void
-WatchdogIntClear(unsigned long ulBase)
-{
+void WatchdogIntClear(unsigned long ulBase) {
     //
     // Check the arguments.
     //
@@ -442,9 +415,7 @@ WatchdogIntClear(unsigned long ulBase)
 //! \return None.
 //
 //*****************************************************************************
-void
-WatchdogStallEnable(unsigned long ulBase)
-{
+void WatchdogStallEnable(unsigned long ulBase) {
     //
     // Check the arguments.
     //
@@ -469,9 +440,7 @@ WatchdogStallEnable(unsigned long ulBase)
 //! \return None.
 //
 //*****************************************************************************
-void
-WatchdogStallDisable(unsigned long ulBase)
-{
+void WatchdogStallDisable(unsigned long ulBase) {
     //
     // Check the arguments.
     //

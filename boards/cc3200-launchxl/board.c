@@ -35,27 +35,25 @@ extern void (* const g_pfnVectors[])(void);
 /**
  * @brief Initialize the SmartRF06's on-board LEDs
  */
-void led_init(void)
-{
-	gpio_init(RED_LED, GPIO_DIR_OUT, GPIO_NOPULL);
-	gpio_init(GREEN_LED, GPIO_DIR_OUT, GPIO_NOPULL);
-	gpio_init(YELLOW_LED, GPIO_DIR_OUT, GPIO_NOPULL);
+void led_init(void) {
+    gpio_init(RED_LED, GPIO_DIR_OUT, GPIO_NOPULL);
+    gpio_init(GREEN_LED, GPIO_DIR_OUT, GPIO_NOPULL);
+    gpio_init(YELLOW_LED, GPIO_DIR_OUT, GPIO_NOPULL);
 }
 
 /**
  * @brief Initialize the board
  */
-void board_init(void)
-{
-	//
-	// Set vector table base
-	//
-	MAP_IntVTableBaseSet((unsigned long) &g_pfnVectors[0]);
+void board_init(void) {
+    //
+    // Set vector table base
+    //
+    MAP_IntVTableBaseSet((unsigned long) &g_pfnVectors[0]);
 
-	MAP_PRCMPeripheralClkEnable(PRCM_GPIOA0, PRCM_RUN_MODE_CLK);
-	MAP_PRCMPeripheralClkEnable(PRCM_GPIOA1, PRCM_RUN_MODE_CLK);
-	MAP_PRCMPeripheralClkEnable(PRCM_GPIOA2, PRCM_RUN_MODE_CLK);
-	MAP_PRCMPeripheralClkEnable(PRCM_GPIOA3, PRCM_RUN_MODE_CLK);
+    MAP_PRCMPeripheralClkEnable(PRCM_GPIOA0, PRCM_RUN_MODE_CLK);
+    MAP_PRCMPeripheralClkEnable(PRCM_GPIOA1, PRCM_RUN_MODE_CLK);
+    MAP_PRCMPeripheralClkEnable(PRCM_GPIOA2, PRCM_RUN_MODE_CLK);
+    MAP_PRCMPeripheralClkEnable(PRCM_GPIOA3, PRCM_RUN_MODE_CLK);
 
     /* initialize the CPU */
     cpu_init();

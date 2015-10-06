@@ -36,7 +36,6 @@
 #include <osi.h>
 #endif
 
-
 /* Configurable lengths */
 #define CONTENT_BUFLEN 128
 #define URI_BUFLEN 128
@@ -57,13 +56,13 @@
 
 typedef void (*ThreadFxnPtr)(HTTPCli_Handle cli);
 
-static HTTPCli_SecureParams tlsParams = {0};
-static struct sockaddr proxyAddr = {0};
+static HTTPCli_SecureParams tlsParams = { 0 };
+static struct sockaddr proxyAddr = { 0 };
 
 static int checkContentField(HTTPCli_Handle cli, char *fname, char *fvalue,
-        bool moreFlag);
+bool moreFlag);
 static int getChunkedData(HTTPCli_Handle cli, char *body, int len,
-        bool *moreFlag);
+bool *moreFlag);
 static bool getCliState(HTTPCli_Handle cli, int flag);
 static int getStatus(HTTPCli_Handle cli);
 static bool isValidSocket(int skt);
@@ -134,24 +133,20 @@ static int xCyaSSLRecv(void *ctx, int s, void *buf, size_t len, int flags)
  *  ======== asyncThread ========
  *  Thread handling HTTP response asynchronously
  */
-static void asyncThread(HTTPCli_Handle cli)
-{
+static void asyncThread(HTTPCli_Handle cli) {
     int status;
 
     status = getStatus(cli);
 
-    if (is2xx(status)  || (status == HTTP_NOT_MODIFIED)) {
+    if (is2xx(status) || (status == HTTP_NOT_MODIFIED)) {
         if (cli->chandle != NULL) {
             contentHandler(cli, status);
-        }
-        else {
+        } else {
             cli->shandle->handle2xx(cli, status);
         }
-    }
-    else if (is1xx(status)) {
+    } else if (is1xx(status)) {
         cli->shandle->handle1xx(cli, status);
-    }
-    else {
+    } else {
         cli->shandle->handle4xx(cli, status);
     }
 
@@ -162,8 +157,7 @@ static void asyncThread(HTTPCli_Handle cli)
  *  ======== contentHandler ========
  *  Invokes registered content handles based on response content type
  */
-static void contentHandler(HTTPCli_Handle cli, int status)
-{
+static void contentHandler(HTTPCli_Handle cli, int status) {
     bool moreFlag = false;
     char respBuf[CONTENT_BUFLEN];
     int i = 0;
@@ -172,9 +166,7 @@ static void contentHandler(HTTPCli_Handle cli, int status)
     HTTPCli_ContentCallback callback = NULL;
     char **respFields = NULL;
     const char *fields[2] = {
-        HTTPCli_FIELD_NAME_CONTENT_TYPE,
-        NULL
-    };
+    HTTPCli_FIELD_NAME_CONTENT_TYPE, NULL };
 
     if ((status == HTTP_OK) && cli->chandle) {
         /* Save the previously set field Ids by the app */
@@ -202,13 +194,11 @@ static void contentHandler(HTTPCli_Handle cli, int status)
                     }
                 }
             }
-        }
-        while (ret != HTTPCli_FIELD_ID_END);
+        } while (ret != HTTPCli_FIELD_ID_END);
 
         if (respFields) {
-            HTTPCli_setResponseFields(cli, (const char **)respFields);
-        }
-        else {
+            HTTPCli_setResponseFields(cli, (const char **) respFields);
+        } else {
             /* force assign */
             cli->respFields = respFields;
         }
@@ -227,8 +217,7 @@ static void contentHandler(HTTPCli_Handle cli, int status)
                 status = ret;
             }
             i = callback(cli, status, respBuf, ret, moreFlag);
-        }
-        while ((ret > 0) && moreFlag && i);
+        } while ((ret > 0) && moreFlag && i);
 
         /* If the app wants to flush the remaining data */
         if ((ret >= 0) && (i == 0)) {
@@ -239,11 +228,9 @@ static void contentHandler(HTTPCli_Handle cli, int status)
                     status = ret;
                     callback(cli, status, respBuf, ret, moreFlag);
                 }
-            }
-            while ((ret > 0) && moreFlag);
+            } while ((ret > 0) && moreFlag);
         }
-    }
-    else {
+    } else {
         cli->shandle->handle2xx(cli, status);
     }
 
@@ -253,9 +240,8 @@ static void contentHandler(HTTPCli_Handle cli, int status)
 /*
  *  ======== bufferedRecv ========
  */
-ssize_t bufferedRecv(HTTPCli_Handle cli, Ssock_Handle ssock,
-        void *buf, size_t len, int flags)
-{
+ssize_t bufferedRecv(HTTPCli_Handle cli, Ssock_Handle ssock, void *buf,
+        size_t len, int flags) {
     ssize_t numRead = 0;
 
 #ifdef __SLP__
@@ -316,25 +302,22 @@ ssize_t bufferedRecv(HTTPCli_Handle cli, Ssock_Handle ssock,
         if (len > cli->buflen) {
             memcpy(buf, cli->bufptr, cli->buflen);
 
-            numRead = Ssock_recv(ssock, ((uint8_t *)buf + cli->buflen),
+            numRead = Ssock_recv(ssock, ((uint8_t *) buf + cli->buflen),
                     (len - cli->buflen), flags);
             if (numRead >= 0) {
                 numRead += cli->buflen;
                 cli->buflen = 0;
             }
-        }
-        else {
+        } else {
             memcpy(buf, cli->bufptr, len);
             cli->buflen -= len;
             cli->bufptr += len;
             numRead = len;
         }
-    }
-    else {
+    } else {
         if (len > HTTPCli_BUF_LEN) {
             numRead = Ssock_recv(ssock, buf, len, flags);
-        }
-        else {
+        } else {
             numRead = Ssock_recv(ssock, cli->buf, HTTPCli_BUF_LEN,
                     MSG_DONTWAIT);
             if (numRead > 0) {
@@ -342,7 +325,8 @@ ssize_t bufferedRecv(HTTPCli_Handle cli, Ssock_Handle ssock,
                 cli->buflen = numRead;
             }
 
-            if (numRead == Ssock_TIMEOUT || (numRead >= 0 && numRead < (ssize_t)len)) {
+            if (numRead == Ssock_TIMEOUT
+                    || (numRead >= 0 && numRead < (ssize_t) len)) {
                 if (numRead == Ssock_TIMEOUT) {
                     numRead = 0;
                 }
@@ -381,15 +365,13 @@ ssize_t bufferedRecv(HTTPCli_Handle cli, Ssock_Handle ssock,
  *  Check field for information on content length/transfer encoding
  */
 static int checkContentField(HTTPCli_Handle cli, char *fname, char *fvalue,
-        bool moreFlag)
-{
+bool moreFlag) {
     const char chunk[] = "chunked";
 
     if ((strcmp(fname, HTTPCli_FIELD_NAME_TRANSFER_ENCODING) == 0)
             && (strcmp(chunk, fvalue) == 0)) {
         setCliState(cli, CHUNKED_FLAG, true);
-    }
-    else if (strcmp(fname, HTTPCli_FIELD_NAME_CONTENT_LENGTH) == 0) {
+    } else if (strcmp(fname, HTTPCli_FIELD_NAME_CONTENT_LENGTH) == 0) {
         if (moreFlag) {
             return (HTTPCli_ECONTENTLENLARGE);
         }
@@ -404,8 +386,7 @@ static int checkContentField(HTTPCli_Handle cli, char *fname, char *fvalue,
  *  Get chunked transfer encoded data
  */
 static int getChunkedData(HTTPCli_Handle cli, char *body, int len,
-        bool *moreFlag)
-{
+bool *moreFlag) {
     bool lastFlag = true;
     bool mFlag = false;
     char crlf;
@@ -453,8 +434,7 @@ static int getChunkedData(HTTPCli_Handle cli, char *body, int len,
                     lastFlag = true;
                 }
 
-            }
-            while (body[0] == '\0');
+            } while (body[0] == '\0');
 
             *moreFlag = false;
             cli->clen = 0;
@@ -465,7 +445,7 @@ static int getChunkedData(HTTPCli_Handle cli, char *body, int len,
         cli->clen = chunkLen;
     }
 
-    if (chunkLen < (unsigned long)len) {
+    if (chunkLen < (unsigned long) len) {
         len = chunkLen;
     }
 
@@ -488,8 +468,7 @@ static int getChunkedData(HTTPCli_Handle cli, char *body, int len,
  *  ======== getCliState ========
  *  Get the state of HTTP client instance for the input flag
  */
-static bool getCliState(HTTPCli_Handle cli, int flag)
-{
+static bool getCliState(HTTPCli_Handle cli, int flag) {
     return ((cli->state) & flag);
 }
 
@@ -497,8 +476,7 @@ static bool getCliState(HTTPCli_Handle cli, int flag)
  *  ======== getStatus ========
  *  Processes the response line to get the status
  */
-static int getStatus(HTTPCli_Handle cli)
-{
+static int getStatus(HTTPCli_Handle cli) {
     bool moreFlag = false;
     char statusBuf[STATUS_BUFLEN];
     int status;
@@ -542,12 +520,10 @@ static int getStatus(HTTPCli_Handle cli)
             }
         }
 #endif /* HTTPCli_LIBTYPE_MIN */
-    }
-    while (rflag);
+    } while (rflag);
 
     return (status);
 }
-
 
 /*
  *  ======== httpProxyTunnel ========
@@ -601,7 +577,7 @@ static int httpProxyTunnel(HTTPCli_Handle cli, const struct sockaddr *addr)
         if (ret < 0) {
             return (ret);
         }
-    } while (tmpBuf[0] != '\0');
+    }while (tmpBuf[0] != '\0');
 
     return (0);
 }
@@ -610,8 +586,7 @@ static int httpProxyTunnel(HTTPCli_Handle cli, const struct sockaddr *addr)
 /*
  *  ======== isValidSocket ========
  */
-static bool isValidSocket(int skt)
-{
+static bool isValidSocket(int skt) {
 #if defined (__SL__) || defined (__SLP__)
     return (skt >= 0);
 #else /* __SL__ || __SLP__ */
@@ -623,15 +598,14 @@ static bool isValidSocket(int skt)
  *  ======== lookUpResponseFields ========
  *  Is the input field in the set response field array?
  */
-static int lookUpResponseFields(HTTPCli_Handle cli, char *field)
-{
+static int lookUpResponseFields(HTTPCli_Handle cli, char *field) {
     char **respFields = cli->respFields;
     int index;
 
     if (respFields && field) {
         for (index = 0; respFields[index] != NULL; index++) {
-             if (stringCompare(field, respFields[index]) == 0) {
-               return (index);
+            if (stringCompare(field, respFields[index]) == 0) {
+                return (index);
             }
         }
     }
@@ -643,11 +617,10 @@ static int lookUpResponseFields(HTTPCli_Handle cli, char *field)
  *  ======== readLine ========
  *  Read a header line
  */
-static int readLine(HTTPCli_Handle cli, char *line, int len, bool *moreFlag)
-{
-   char c;
-   int i = 0;
-   int ret;
+static int readLine(HTTPCli_Handle cli, char *line, int len, bool *moreFlag) {
+    char c;
+    int i = 0;
+    int ret;
 
     *moreFlag = true;
     setCliState(cli, READ_FLAG, true);
@@ -667,12 +640,10 @@ static int readLine(HTTPCli_Handle cli, char *line, int len, bool *moreFlag)
             *moreFlag = false;
             setCliState(cli, READ_FLAG, false);
             break;
-        }
-        else if ((c == '\r') || (i == 0 && c == ' ')) {
+        } else if ((c == '\r') || (i == 0 && c == ' ')) {
             i--;
             /* drop CR or drop leading SP*/
-        }
-        else {
+        } else {
             line[i] = c;
         }
 
@@ -682,72 +653,63 @@ static int readLine(HTTPCli_Handle cli, char *line, int len, bool *moreFlag)
 }
 
 #ifndef HTTPCli_LIBTYPE_MIN
-static int redirect(HTTPCli_Handle cli, int status)
-{
+static int redirect(HTTPCli_Handle cli, int status) {
     bool moreFlag = false;
-    char uri[URI_BUFLEN] = {0};
-    char buf[16] = {0};
+    char uri[URI_BUFLEN] = { 0 };
+    char buf[16] = { 0 };
     int ret = 0;
     char **respFields;
     const char *fields[2] = {
-        HTTPCli_FIELD_NAME_LOCATION,
-        NULL
-    };
+    HTTPCli_FIELD_NAME_LOCATION, NULL };
 
     switch (status) {
-        case HTTP_MOVED_PERMANENTLY:
-        case HTTP_FOUND:
-        case HTTP_SEE_OTHER:
-        case HTTP_USE_PROXY:
-        case HTTP_TEMPORARY_REDIRECT:
-            respFields = HTTPCli_setResponseFields(cli, fields);
+    case HTTP_MOVED_PERMANENTLY:
+    case HTTP_FOUND:
+    case HTTP_SEE_OTHER:
+    case HTTP_USE_PROXY:
+    case HTTP_TEMPORARY_REDIRECT:
+        respFields = HTTPCli_setResponseFields(cli, fields);
 
-            ret = HTTPCli_getResponseField(cli, uri, sizeof(uri),
-                    &moreFlag);
+        ret = HTTPCli_getResponseField(cli, uri, sizeof(uri), &moreFlag);
+        if (ret < 0) {
+            return (ret);
+        }
+
+        if (moreFlag) {
+            return (HTTPCli_EREDIRECTURILONG);
+        }
+
+        do {
+            ret = HTTPCli_getResponseField(cli, buf, sizeof(buf), &moreFlag);
+            if ((ret != HTTPCli_FIELD_ID_END) && (ret < 0)) {
+                return (ret);
+            }
+        } while (ret != HTTPCli_FIELD_ID_END);
+
+        if (respFields) {
+            HTTPCli_setResponseFields(cli, (const char **) respFields);
+        } else {
+            /* force assign */
+            cli->respFields = respFields;
+        }
+
+        do {
+            ret = HTTPCli_readResponseBody(cli, buf, sizeof(buf), &moreFlag);
             if (ret < 0) {
                 return (ret);
             }
+        } while ((ret > 0) && moreFlag);
 
-            if (moreFlag) {
-                return (HTTPCli_EREDIRECTURILONG);
-            }
+        setCliState(cli, REDIRECT_FLAG, true);
+        cli->rhandle(cli, status, uri);
+        setCliState(cli, REDIRECT_FLAG, false);
 
-            do {
-                ret = HTTPCli_getResponseField(cli, buf, sizeof(buf),
-                        &moreFlag);
-                if ((ret != HTTPCli_FIELD_ID_END) && (ret < 0)) {
-                    return (ret);
-                }
-            }
-            while (ret != HTTPCli_FIELD_ID_END);
+        ret = 1;
+        break;
 
-            if (respFields) {
-                HTTPCli_setResponseFields(cli, (const char **)respFields);
-            }
-            else {
-                /* force assign */
-                cli->respFields = respFields;
-            }
-
-            do {
-                ret = HTTPCli_readResponseBody(cli, buf, sizeof(buf),
-                        &moreFlag);
-                if (ret < 0) {
-                    return (ret);
-                }
-            }
-            while ((ret > 0) && moreFlag);
-
-            setCliState(cli, REDIRECT_FLAG, true);
-            cli->rhandle(cli, status, uri);
-            setCliState(cli, REDIRECT_FLAG, false);
-
-            ret = 1;
-            break;
-
-        default:
-            ret = 0;
-            break;
+    default:
+        ret = 0;
+        break;
     }
 
     return (ret);
@@ -758,8 +720,7 @@ static int redirect(HTTPCli_Handle cli, int status)
  *  ======== startSecureMode ========
  */
 #ifndef __SLP__
-static int startSecureMode(HTTPCli_Handle cli)
-{
+static int startSecureMode(HTTPCli_Handle cli) {
 #ifdef __CYASSL__
     int skt = 0;
     CYASSL *ssl;
@@ -789,50 +750,50 @@ static int startSecureMode(HTTPCli_Handle cli)
 #elif defined(__SL__) /* __CYASSL__ */
     int skt;
 
-    skt =  Ssock_getSocket(&(cli->ssock));
+    skt = Ssock_getSocket(&(cli->ssock));
 
     if (tlsParams.method.secureMethod != 0) {
         if (setsockopt(skt, SL_SOL_SOCKET, SL_SO_SECMETHOD,
-                &(tlsParams.method.secureMethod),
-                sizeof(tlsParams.method.secureMethod)) < 0) {
+                        &(tlsParams.method.secureMethod),
+                        sizeof(tlsParams.method.secureMethod)) < 0) {
             return (HTTPCli_ETLSFAIL);
         }
     }
 
     if (tlsParams.mask.secureMask != 0) {
         if (setsockopt(skt, SL_SOL_SOCKET, SL_SO_SECURE_MASK,
-                &(tlsParams.mask.secureMask), sizeof(tlsParams.mask.secureMask))
-                 < 0) {
+                        &(tlsParams.mask.secureMask), sizeof(tlsParams.mask.secureMask))
+                < 0) {
             return (HTTPCli_ETLSFAIL);
         }
     }
 
     if (tlsParams.cafile[0] != 0) {
         if (setsockopt(skt, SL_SOL_SOCKET, SL_SO_SECURE_FILES_CA_FILE_NAME,
-                tlsParams.cafile, HTTPCli_CERT_NAME_LEN)  < 0) {
+                        tlsParams.cafile, HTTPCli_CERT_NAME_LEN) < 0) {
             return (HTTPCli_ETLSFAIL);
         }
     }
 
     if (tlsParams.privkey[0] != 0) {
         if (setsockopt(skt, SL_SOL_SOCKET,
-                SL_SO_SECURE_FILES_PRIVATE_KEY_FILE_NAME,
-                tlsParams.privkey, HTTPCli_CERT_NAME_LEN)  < 0) {
+                        SL_SO_SECURE_FILES_PRIVATE_KEY_FILE_NAME,
+                        tlsParams.privkey, HTTPCli_CERT_NAME_LEN) < 0) {
             return (HTTPCli_ETLSFAIL);
         }
     }
 
     if (tlsParams.cert[0] != 0) {
         if (setsockopt(skt, SL_SOL_SOCKET,
-                SL_SO_SECURE_FILES_CERTIFICATE_FILE_NAME,
-                tlsParams.cert, HTTPCli_CERT_NAME_LEN)  < 0) {
+                        SL_SO_SECURE_FILES_CERTIFICATE_FILE_NAME,
+                        tlsParams.cert, HTTPCli_CERT_NAME_LEN) < 0) {
             return (HTTPCli_ETLSFAIL);
         }
     }
 
     if (tlsParams.dhkey[0] != 0) {
         if (setsockopt(skt, SL_SOL_SOCKET, SL_SO_SECURE_FILES_DH_KEY_FILE_NAME,
-                tlsParams.dhkey, HTTPCli_CERT_NAME_LEN)  < 0) {
+                        tlsParams.dhkey, HTTPCli_CERT_NAME_LEN) < 0) {
             return (HTTPCli_ETLSFAIL);
         }
     }
@@ -840,7 +801,7 @@ static int startSecureMode(HTTPCli_Handle cli)
     return (0);
 
 #else /* __CYASSL_ */
-    (void)tlsParams;
+    (void) tlsParams;
     return (HTTPCli_ETLSFAIL);
 
 #endif /* __CYASSL__ */
@@ -851,12 +812,10 @@ static int startSecureMode(HTTPCli_Handle cli)
  *  ======== setCliState ========
  *  Set or clear the flag in the HTTP client instance
  */
-static void setCliState(HTTPCli_Handle cli, int flag, bool value)
-{
+static void setCliState(HTTPCli_Handle cli, int flag, bool value) {
     if (value) {
         cli->state |= flag;
-    }
-    else {
+    } else {
         cli->state &= ~flag;
     }
 }
@@ -865,8 +824,7 @@ static void setCliState(HTTPCli_Handle cli, int flag, bool value)
  *  ======== skipLine ========
  *  Skip the rest of the header line
  */
-static int skipLine(HTTPCli_Handle cli)
-{
+static int skipLine(HTTPCli_Handle cli) {
     char c = 0;
     int ret;
 
@@ -884,8 +842,7 @@ static int skipLine(HTTPCli_Handle cli)
  *  ======== sprsend ========
  *  Constructs a HTTP Request line to send
  */
-static int sprsend(HTTPCli_Handle cli, const char * fmt, ...)
-{
+static int sprsend(HTTPCli_Handle cli, const char * fmt, ...) {
     char sendbuf[SEND_BUFLEN];
     int len = 0;
     int ret;
@@ -934,21 +891,20 @@ static int sprsend(HTTPCli_Handle cli, const char * fmt, ...)
  *  ======== stringCompare ========
  *  Case insensitive string compare
  */
-static int stringCompare(const char *str1, const char *str2)
-{
-   unsigned char c1;
-   unsigned char c2;
+static int stringCompare(const char *str1, const char *str2) {
+    unsigned char c1;
+    unsigned char c2;
 
-   for(;;) {
-        c1 = toLowerCase((unsigned char)*str1);
-        c2 = toLowerCase((unsigned char)*str2);
+    for (;;) {
+        c1 = toLowerCase((unsigned char) *str1);
+        c2 = toLowerCase((unsigned char) *str2);
         if (c1 != 0 && c1 == c2) {
             str1++;
             str2++;
             continue;
         }
-        return (int)c1 - (int)c2;
-   }
+        return (int) c1 - (int) c2;
+    }
 }
 
 /*
@@ -956,24 +912,23 @@ static int stringCompare(const char *str1, const char *str2)
  *  Case insensitive string compare upto the input length
  */
 #ifndef __SLP__
-static int stringCompareByLen(const char *str1, const char *str2, int len)
-{
-   unsigned char c1;
-   unsigned char c2;
-   int i;
+static int stringCompareByLen(const char *str1, const char *str2, int len) {
+    unsigned char c1;
+    unsigned char c2;
+    int i;
 
-   for(i = 0; i < len; i++) {
-        c1 = toLowerCase((unsigned char)*str1);
-        c2 = toLowerCase((unsigned char)*str2);
+    for (i = 0; i < len; i++) {
+        c1 = toLowerCase((unsigned char) *str1);
+        c2 = toLowerCase((unsigned char) *str2);
         if (c1 != 0 && c1 == c2) {
             str1++;
             str2++;
             continue;
         }
-        return (int)c1 - (int)c2;
-   }
+        return (int) c1 - (int) c2;
+    }
 
-   return (0);
+    return (0);
 }
 #endif /* __SLP__ */
 
@@ -981,8 +936,7 @@ static int stringCompareByLen(const char *str1, const char *str2, int len)
 /*
  *  ======== threadCreate ========
  */
-static int threadCreate(ThreadFxnPtr fxn, void *cli)
-{
+static int threadCreate(ThreadFxnPtr fxn, void *cli) {
 #if defined(__linux__)
     pthread_t thread;
     int ret;
@@ -996,31 +950,31 @@ static int threadCreate(ThreadFxnPtr fxn, void *cli)
 
 #elif defined(__OSI__)/* __linux__ */
     long lRetVal = -1;
-    
+
     lRetVal = osi_TaskCreate((P_OSI_TASK_ENTRY) fxn,
-                    (const signed char *)"Async HTTP",
-                    ((HTTPCli_Handle)cli)->stackSize,
-                    cli, 
-                    ((HTTPCli_Handle)cli)->priority, 
-                    NULL );
+            (const signed char *)"Async HTTP",
+            ((HTTPCli_Handle)cli)->stackSize,
+            cli,
+            ((HTTPCli_Handle)cli)->priority,
+            NULL );
     if(lRetVal < 0)
     {
-      return (HTTPCli_ETHREADFAIL);
+        return (HTTPCli_ETHREADFAIL);
     }
-    
+
 #else
-    
+
     Task_Handle asyncHandle = NULL;
     Task_Params asyncParams;
     Task_Params_init(&asyncParams);
 
-/*    if (asyncHandle != NULL) {
-        while (Task_getMode(asyncHandle) != Task_Mode_TERMINATED);
-        Task_delete(&asyncHandle);
-    }
-*/
-    asyncParams.arg0 = (UArg)cli;
-    asyncHandle = Task_create((Task_FuncPtr)fxn, &asyncParams, NULL);
+    /*    if (asyncHandle != NULL) {
+     while (Task_getMode(asyncHandle) != Task_Mode_TERMINATED);
+     Task_delete(&asyncHandle);
+     }
+     */
+    asyncParams.arg0 = (UArg) cli;
+    asyncHandle = Task_create((Task_FuncPtr) fxn, &asyncParams, NULL);
     if (asyncHandle == NULL) {
         return (HTTPCli_ETHREADFAIL);
     }
@@ -1032,8 +986,7 @@ static int threadCreate(ThreadFxnPtr fxn, void *cli)
 /*
  *  ======== threadExit ========
  */
-static void threadExit()
-{
+static void threadExit() {
 #if defined(__linux__)
     pthread_exit(NULL);
 #elif defined(__OSI__)    
@@ -1048,8 +1001,7 @@ static void threadExit()
 /*
  *  ======== toLowerCase ========
  */
-static unsigned char toLowerCase(unsigned char c)
-{
+static unsigned char toLowerCase(unsigned char c) {
     if (c >= 65 && c <= 90) {
         c += 32;
     }
@@ -1061,8 +1013,7 @@ static unsigned char toLowerCase(unsigned char c)
  *  ======== HTTPCli_initSockAddr ========
  */
 #ifndef __SLP__
-int HTTPCli_initSockAddr(struct sockaddr *addr, const char *uri, int flags)
-{
+int HTTPCli_initSockAddr(struct sockaddr *addr, const char *uri, int flags) {
     char luri[URI_BUFLEN];
     char *domain;
     char *colon;
@@ -1083,8 +1034,7 @@ int HTTPCli_initSockAddr(struct sockaddr *addr, const char *uri, int flags)
             == 0) {
         port = 80;
         domain = domain + sizeof(HTTP_PREFIX) - 1;
-    }
-    else if (stringCompareByLen(HTTPS_PREFIX, domain,
+    } else if (stringCompareByLen(HTTPS_PREFIX, domain,
             (sizeof(HTTPS_PREFIX) - 1)) == 0) {
         port = 443;
         domain = domain + sizeof(HTTPS_PREFIX) - 1;
@@ -1094,8 +1044,7 @@ int HTTPCli_initSockAddr(struct sockaddr *addr, const char *uri, int flags)
         dlen = colon - domain;
         port = strtoul((colon + 1), NULL, 10);
         domain[dlen] = '\0';
-    }
-    else {
+    } else {
         dlen = strlen(domain);
     }
 
@@ -1163,9 +1112,8 @@ int HTTPCli_initSockAddr(struct sockaddr *addr, const char *uri, int flags)
 /*
  *  ======== HTTPCli_connect ========
  */
-int HTTPCli_connect(HTTPCli_Struct *cli, const struct sockaddr *addr,
-        int flags, const HTTPCli_Params *params)
-{
+int HTTPCli_connect(HTTPCli_Struct *cli, const struct sockaddr *addr, int flags,
+        const HTTPCli_Params *params) {
     int skt;
     int ret;
     int slen;
@@ -1179,15 +1127,13 @@ int HTTPCli_connect(HTTPCli_Struct *cli, const struct sockaddr *addr,
 
     if (proxyAddr.sa_family != 0) {
         sa = &proxyAddr;
-    }
-    else {
-        sa = (struct sockaddr *)addr;
+    } else {
+        sa = (struct sockaddr *) addr;
     }
 
     if (sa->sa_family == AF_INET6) {
         slen = sizeof(struct sockaddr_in6);
-    }
-    else {
+    } else {
         slen = sizeof(struct sockaddr_in);
     }
 
@@ -1201,7 +1147,7 @@ int HTTPCli_connect(HTTPCli_Struct *cli, const struct sockaddr *addr,
 
 #ifndef __linux__
             cli->stackSize = params->stackSize;
-            cli->priority  = params->priority;
+            cli->priority = params->priority;
 #endif /* __linux__ */
 
             if (cli->chandle) {
@@ -1230,8 +1176,8 @@ int HTTPCli_connect(HTTPCli_Struct *cli, const struct sockaddr *addr,
             if (params != NULL && params->timeout) {
                 tv.tv_sec = params->timeout;
                 tv.tv_usec = 0;
-                if (setsockopt(skt, SOL_SOCKET, SO_RCVTIMEO, &tv,
-                        sizeof(tv)) < 0) {
+                if (setsockopt(skt, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv))
+                        < 0) {
                     HTTPCli_disconnect(cli);
 
                     return (HTTPCli_ESOCKETFAIL);
@@ -1249,8 +1195,7 @@ int HTTPCli_connect(HTTPCli_Struct *cli, const struct sockaddr *addr,
                 }
             }
 #endif /*__SL__*/
-        }
-        else {
+        } else {
             return (HTTPCli_ESOCKETFAIL);
         }
     }
@@ -1275,7 +1220,7 @@ int HTTPCli_connect(HTTPCli_Struct *cli, const struct sockaddr *addr,
     if (flags & HTTPCli_TYPE_TLS) {
 
         /* Tunnel using HTTP CONNECT for TLS through proxy */
-        if (proxyAddr.sa_family != 0)  {
+        if (proxyAddr.sa_family != 0) {
             ret = httpProxyTunnel(cli, addr);
             if (ret < 0) {
                 return (HTTPCli_EPROXYTUNNELFAIL);
@@ -1315,15 +1260,13 @@ int HTTPCli_connect(HTTPCli_Struct *cli, const struct sockaddr *addr,
     }
 #endif /* __SLP__ */
 
-
     return (0);
 }
 
 /*
  *  ======== HTTPCli_construct ========
  */
-void HTTPCli_construct(HTTPCli_Handle cli)
-{
+void HTTPCli_construct(HTTPCli_Handle cli) {
     xassert(cli != NULL);
 
     memset(&(cli->ssock), 0, sizeof(Ssock_Struct));
@@ -1348,11 +1291,10 @@ void HTTPCli_construct(HTTPCli_Handle cli)
 /*
  *  ======== HTTPCli_create ========
  */
-HTTPCli_Handle HTTPCli_create()
-{
+HTTPCli_Handle HTTPCli_create() {
     HTTPCli_Handle cli;
 
-    cli = (HTTPCli_Handle)xmalloc(sizeof(HTTPCli_Struct));
+    cli = (HTTPCli_Handle) xmalloc(sizeof(HTTPCli_Struct));
     if (cli != NULL) {
         HTTPCli_construct(cli);
     }
@@ -1363,8 +1305,7 @@ HTTPCli_Handle HTTPCli_create()
 /*
  *  ======== HTTPCli_delete ========
  */
-void HTTPCli_delete(HTTPCli_Handle cli)
-{
+void HTTPCli_delete(HTTPCli_Handle cli) {
     xassert(cli != NULL);
 
     HTTPCli_destruct(cli);
@@ -1375,8 +1316,7 @@ void HTTPCli_delete(HTTPCli_Handle cli)
 /*
  *  ======== HTTPCli_destruct ========
  */
-void HTTPCli_destruct(HTTPCli_Struct *cli)
-{
+void HTTPCli_destruct(HTTPCli_Struct *cli) {
     xassert(cli != NULL);
 
     memset(&(cli->ssock), 0, sizeof(Ssock_Struct));
@@ -1386,7 +1326,6 @@ void HTTPCli_destruct(HTTPCli_Struct *cli)
     cli->respFields = NULL;
     cli->buflen = 0;
     cli->bufptr = cli->buf;
-
 
 #ifndef HTTPCli_LIBTYPE_MIN
     cli->shandle = NULL;
@@ -1402,8 +1341,7 @@ void HTTPCli_destruct(HTTPCli_Struct *cli)
 /*
  *  ======== HTTPCli_disconnect ========
  */
-void HTTPCli_disconnect(HTTPCli_Struct *cli)
-{
+void HTTPCli_disconnect(HTTPCli_Struct *cli) {
     int skt;
 
     xassert(cli != NULL);
@@ -1419,15 +1357,14 @@ void HTTPCli_disconnect(HTTPCli_Struct *cli)
  *  ======== HTTPCli_setRequestFields ========
  */
 HTTPCli_Field *HTTPCli_setRequestFields(HTTPCli_Handle cli,
-        const HTTPCli_Field *fields)
-{
+        const HTTPCli_Field *fields) {
     HTTPCli_Field *prevField;
 
     xassert(cli != NULL);
 
     prevField = cli->fields;
     if (fields) {
-        cli->fields = (HTTPCli_Field *)fields;
+        cli->fields = (HTTPCli_Field *) fields;
     }
 
     return (prevField);
@@ -1436,15 +1373,14 @@ HTTPCli_Field *HTTPCli_setRequestFields(HTTPCli_Handle cli,
 /*
  *  ======== HTTPCli_setResponseFields ========
  */
-char **HTTPCli_setResponseFields(HTTPCli_Handle cli, const char *fields[])
-{
+char **HTTPCli_setResponseFields(HTTPCli_Handle cli, const char *fields[]) {
     char **prevField;
 
     xassert(cli != NULL);
 
     prevField = cli->respFields;
     if (fields) {
-        cli->respFields = (char **)fields;
+        cli->respFields = (char **) fields;
     }
 
     return (prevField);
@@ -1453,8 +1389,7 @@ char **HTTPCli_setResponseFields(HTTPCli_Handle cli, const char *fields[])
 /*
  *  ======== HTTPCli_setSecureParams ========
  */
-void HTTPCli_setSecureParams(HTTPCli_SecureParams *sparams)
-{
+void HTTPCli_setSecureParams(HTTPCli_SecureParams *sparams) {
     xassert(sparams != NULL);
 
     tlsParams = *sparams;
@@ -1464,8 +1399,7 @@ void HTTPCli_setSecureParams(HTTPCli_SecureParams *sparams)
  *  ======== HTTPCli_sendRequest ========
  */
 int HTTPCli_sendRequest(HTTPCli_Handle cli, const char *method,
-        const char *requestURI, bool moreFlag)
-{
+        const char *requestURI, bool moreFlag) {
     int i = 0;
     int ret;
     HTTPCli_Field *fields = NULL;
@@ -1474,8 +1408,8 @@ int HTTPCli_sendRequest(HTTPCli_Handle cli, const char *method,
     xassert(method != NULL);
     xassert(requestURI != NULL);
 
-    ret = sprsend(cli, "%s %s %s\r\n", method, requestURI? requestURI : "/",
-            HTTP_VER);
+    ret = sprsend(cli, "%s %s %s\r\n", method, requestURI ? requestURI : "/",
+    HTTP_VER);
     if (ret < 0) {
         return (ret);
     }
@@ -1484,7 +1418,7 @@ int HTTPCli_sendRequest(HTTPCli_Handle cli, const char *method,
         fields = cli->fields;
         for (i = 0; fields[i].name != NULL; i++) {
             ret = HTTPCli_sendField(cli, fields[i].name, fields[i].value,
-                    false);
+            false);
             if (ret < 0) {
                 return (ret);
             }
@@ -1504,9 +1438,8 @@ int HTTPCli_sendRequest(HTTPCli_Handle cli, const char *method,
 /*
  *  ======== HTTPCli_sendField ========
  */
-int HTTPCli_sendField(HTTPCli_Handle cli, const char *name,
-        const char *value, bool lastFlag)
-{
+int HTTPCli_sendField(HTTPCli_Handle cli, const char *name, const char *value,
+        bool lastFlag) {
     int ret;
 
     xassert(cli != NULL);
@@ -1526,7 +1459,7 @@ int HTTPCli_sendField(HTTPCli_Handle cli, const char *name,
 
 #ifndef HTTPCli_LIBTYPE_MIN
         if (cli->shandle && !(getCliState(cli, REDIRECT_FLAG))) {
-            ret = threadCreate(asyncThread, (void *)cli);
+            ret = threadCreate(asyncThread, (void *) cli);
             if (ret < 0) {
                 return (ret);
             }
@@ -1540,8 +1473,7 @@ int HTTPCli_sendField(HTTPCli_Handle cli, const char *name,
 /*
  *  ======== HTTPCli_sendRequestBody ========
  */
-int HTTPCli_sendRequestBody(HTTPCli_Handle cli, const char *body, int len)
-{
+int HTTPCli_sendRequestBody(HTTPCli_Handle cli, const char *body, int len) {
     int ret;
 
     xassert(cli != NULL);
@@ -1557,8 +1489,7 @@ int HTTPCli_sendRequestBody(HTTPCli_Handle cli, const char *body, int len)
 /*
  *  ======== HTTPCli_getResponseStatus ========
  */
-int HTTPCli_getResponseStatus(HTTPCli_Handle cli)
-{
+int HTTPCli_getResponseStatus(HTTPCli_Handle cli) {
     int ret;
 
     xassert(cli != NULL);
@@ -1578,10 +1509,9 @@ int HTTPCli_getResponseStatus(HTTPCli_Handle cli)
  *  ======== HTTPCli_getResponseField ========
  */
 int HTTPCli_getResponseField(HTTPCli_Handle cli, char *body, int len,
-        bool *moreFlag)
-{
+bool *moreFlag) {
     char c;
-    char name[MAX_FIELD_NAME_LEN] = {0};
+    char name[MAX_FIELD_NAME_LEN] = { 0 };
     int respFieldIndex = HTTPCli_FIELD_ID_DUMMY;
     int i;
     int ret;
@@ -1607,15 +1537,12 @@ int HTTPCli_getResponseField(HTTPCli_Handle cli, char *body, int len,
                 if (c == ':') {
                     name[i] = 0;
                     break;
-                }
-                else if (c == ' ' || c == '\r') {
+                } else if (c == ' ' || c == '\r') {
                     i--;
                     /* drop SP */
-                }
-                else if (c == '\n') {
+                } else if (c == '\n') {
                     return (HTTPCli_FIELD_ID_END);
-                }
-                else {
+                } else {
                     name[i] = c;
                 }
             }
@@ -1634,7 +1561,7 @@ int HTTPCli_getResponseField(HTTPCli_Handle cli, char *body, int len,
             if (ret < 0) {
                 return (ret);
             }
-            
+
             ret = checkContentField(cli, name, body, *moreFlag);
             if (ret < 0) {
                 return (ret);
@@ -1650,8 +1577,7 @@ int HTTPCli_getResponseField(HTTPCli_Handle cli, char *body, int len,
                 }
             }
         }
-    }
-    else {
+    } else {
         /* Read field value */
         ret = readLine(cli, body, len, moreFlag);
         if (ret < 0) {
@@ -1666,8 +1592,7 @@ int HTTPCli_getResponseField(HTTPCli_Handle cli, char *body, int len,
  *  ======== HTTPCli_readResponseBody ========
  */
 int HTTPCli_readResponseBody(HTTPCli_Handle cli, char *body, int len,
-        bool *moreFlag)
-{
+bool *moreFlag) {
     int ret = 0;
 
     xassert(cli != NULL);
@@ -1675,10 +1600,9 @@ int HTTPCli_readResponseBody(HTTPCli_Handle cli, char *body, int len,
     *moreFlag = false;
     if (getCliState(cli, CHUNKED_FLAG)) {
         ret = getChunkedData(cli, body, len, moreFlag);
-    }
-    else {
+    } else {
         if (cli->clen) {
-            if (cli->clen < (unsigned long)len) {
+            if (cli->clen < (unsigned long) len) {
                 len = cli->clen;
             }
             ret = HTTPCli_readRawResponseBody(cli, body, len);
@@ -1695,15 +1619,14 @@ int HTTPCli_readResponseBody(HTTPCli_Handle cli, char *body, int len,
 /*
  *  ======== HTTPCli_readRawResponseBody ========
  */
-int HTTPCli_readRawResponseBody(HTTPCli_Handle cli, char *body, int len)
-{
+int HTTPCli_readRawResponseBody(HTTPCli_Handle cli, char *body, int len) {
     int ret = 0;
 
     xassert(cli != NULL);
 
     ret = bufferedRecv(cli, &(cli->ssock), body, len, 0);
 
-	if (ret < 0) {
+    if (ret < 0) {
         return (ret);
     }
 
@@ -1713,8 +1636,7 @@ int HTTPCli_readRawResponseBody(HTTPCli_Handle cli, char *body, int len)
 /*
  *  ======== HTTPCli_setProxy ========
  */
-void HTTPCli_setProxy(const struct sockaddr *addr)
-{
+void HTTPCli_setProxy(const struct sockaddr *addr) {
     proxyAddr = *addr;
 }
 

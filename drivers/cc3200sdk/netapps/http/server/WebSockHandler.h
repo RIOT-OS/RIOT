@@ -11,7 +11,6 @@
 //
 //*****************************************************************************
 
-
 /**
  * @defgroup WebSocketHandler
  *
@@ -45,8 +44,6 @@ int WSCore_DataRecv(UINT16 uConnection, struct HttpBlob* pData);
 
 void WSStatusString(UINT32 WSStatus, struct HttpBlob* status);
 
-
-
 /*!
  * 	\brief 						 Sends data to a websocket client . * 								
  *
@@ -60,7 +57,6 @@ void WSStatusString(UINT32 WSStatus, struct HttpBlob* status);
 
 int WSCore_DataSend(UINT16 uConnection, struct HttpBlob PayLoad, UINT8 Opcode);
 
-
 /*!
  * 	\brief 							Parses the payload length to the header if it is more than 125 ie (16 bit/64 bit)
  *
@@ -72,7 +68,6 @@ int WSCore_DataSend(UINT16 uConnection, struct HttpBlob PayLoad, UINT8 Opcode);
  * 	\return							size of the payload
  */
 long long Payloadlength(struct HttpBlob * pData, UINT8 iter);
-
 
 /*!
  * 	\brief 					This websocket Event is called when WebSocket Server receives data
@@ -117,7 +112,4 @@ void WebSocketCloseSessionHandler(void);
  * This is a call back function from the library. User is informed that the connection has been closed.
  */
 #define sl_WebSocketCloseEvtHdlr			WebSocketCloseSessionHandler
-
-
-
 

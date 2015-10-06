@@ -39,8 +39,8 @@ extern "C" {
 
 /* Response field holding name and id */
 struct Lookup_Field {
-    char *name;      /* ex: Accept-Ranges */
-    int id;          /* ex: 1 */
+    char *name; /* ex: Accept-Ranges */
+    int id; /* ex: 1 */
 };
 
 /*!
@@ -53,7 +53,7 @@ struct Lookup_Field {
  *  @return Field id on success or -1 on failure
  */
 extern const struct Lookup_Field *Lookup_getField(const char *str,
-                                                  unsigned int len);
+        unsigned int len);
 
 #if defined(__cplusplus)
 }

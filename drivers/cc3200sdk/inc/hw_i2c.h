@@ -74,8 +74,6 @@
 #define I2C_O_PC                0x00000FC4
 #define I2C_O_CC                0x00000FC8
 
-
-
 //******************************************************************************
 //
 // The following are defines for the bit fields in the I2C_O_MSA register.
@@ -121,11 +119,11 @@
 //******************************************************************************
 #define I2C_MIMR_RXFFIM         0x00000800  // Receive FIFO Full Interrupt Mask
 #define I2C_MIMR_TXFEIM         0x00000400  // Transmit FIFO Empty Interrupt
-                                            // Mask
+// Mask
 #define I2C_MIMR_RXIM           0x00000200  // Receive FIFO Request Interrupt
-                                            // Mask
+// Mask
 #define I2C_MIMR_TXIM           0x00000100  // Transmit FIFO Request Interrupt
-                                            // Mask
+// Mask
 #define I2C_MIMR_ARBLOSTIM      0x00000080  // Arbitration Lost Interrupt Mask
 #define I2C_MIMR_STOPIM         0x00000040  // STOP Detection Interrupt Mask
 #define I2C_MIMR_STARTIM        0x00000020  // START Detection Interrupt Mask
@@ -140,26 +138,26 @@
 //
 //******************************************************************************
 #define I2C_MRIS_RXFFRIS        0x00000800  // Receive FIFO Full Raw Interrupt
-                                            // Status
+// Status
 #define I2C_MRIS_TXFERIS        0x00000400  // Transmit FIFO Empty Raw
-                                            // Interrupt Status
+// Interrupt Status
 #define I2C_MRIS_RXRIS          0x00000200  // Receive FIFO Request Raw
-                                            // Interrupt Status
+// Interrupt Status
 #define I2C_MRIS_TXRIS          0x00000100  // Transmit Request Raw Interrupt
-                                            // Status
+// Status
 #define I2C_MRIS_ARBLOSTRIS     0x00000080  // Arbitration Lost Raw Interrupt
-                                            // Status
+// Status
 #define I2C_MRIS_STOPRIS        0x00000040  // STOP Detection Raw Interrupt
-                                            // Status
+// Status
 #define I2C_MRIS_STARTRIS       0x00000020  // START Detection Raw Interrupt
-                                            // Status
+// Status
 #define I2C_MRIS_NACKRIS        0x00000010  // Address/Data NACK Raw Interrupt
-                                            // Status
+// Status
 #define I2C_MRIS_DMATXRIS       0x00000008  // Transmit DMA Raw Interrupt
-                                            // Status
+// Status
 #define I2C_MRIS_DMARXRIS       0x00000004  // Receive DMA Raw Interrupt Status
 #define I2C_MRIS_CLKRIS         0x00000002  // Clock Timeout Raw Interrupt
-                                            // Status
+// Status
 #define I2C_MRIS_RIS            0x00000001  // Master Raw Interrupt Status
 //******************************************************************************
 //
@@ -168,9 +166,9 @@
 //******************************************************************************
 #define I2C_MMIS_RXFFMIS        0x00000800  // Receive FIFO Full Interrupt Mask
 #define I2C_MMIS_TXFEMIS        0x00000400  // Transmit FIFO Empty Interrupt
-                                            // Mask
+// Mask
 #define I2C_MMIS_RXMIS          0x00000200  // Receive FIFO Request Interrupt
-                                            // Mask
+// Mask
 #define I2C_MMIS_TXMIS          0x00000100  // Transmit Request Interrupt Mask
 #define I2C_MMIS_ARBLOSTMIS     0x00000080  // Arbitration Lost Interrupt Mask
 #define I2C_MMIS_STOPMIS        0x00000040  // STOP Detection Interrupt Mask
@@ -179,7 +177,7 @@
 #define I2C_MMIS_DMATXMIS       0x00000008  // Transmit DMA Interrupt Status
 #define I2C_MMIS_DMARXMIS       0x00000004  // Receive DMA Interrupt Status
 #define I2C_MMIS_CLKMIS         0x00000002  // Clock Timeout Masked Interrupt
-                                            // Status
+// Status
 #define I2C_MMIS_MIS            0x00000001  // Masked Interrupt Status
 //******************************************************************************
 //
@@ -187,18 +185,18 @@
 //
 //******************************************************************************
 #define I2C_MICR_RXFFIC         0x00000800  // Receive FIFO Full Interrupt
-                                            // Clear
+// Clear
 #define I2C_MICR_TXFEIC         0x00000400  // Transmit FIFO Empty Interrupt
-                                            // Clear
+// Clear
 #define I2C_MICR_RXIC           0x00000200  // Receive FIFO Request Interrupt
-                                            // Clear
+// Clear
 #define I2C_MICR_TXIC           0x00000100  // Transmit FIFO Request Interrupt
-                                            // Clear
+// Clear
 #define I2C_MICR_ARBLOSTIC      0x00000080  // Arbitration Lost Interrupt Clear
 #define I2C_MICR_STOPIC         0x00000040  // STOP Detection Interrupt Clear
 #define I2C_MICR_STARTIC        0x00000020  // START Detection Interrupt Clear
 #define I2C_MICR_NACKIC         0x00000010  // Address/Data NACK Interrupt
-                                            // Clear
+// Clear
 #define I2C_MICR_DMATXIC        0x00000008  // Transmit DMA Interrupt Clear
 #define I2C_MICR_DMARXIC        0x00000004  // Receive DMA Interrupt Clear
 #define I2C_MICR_CLKIC          0x00000002  // Clock Timeout Interrupt Clear
@@ -274,11 +272,11 @@
 //******************************************************************************
 #define I2C_SIMR_IM             0x00000100  // Interrupt Mask
 #define I2C_SIMR_TXFEIM         0x00000080  // Transmit FIFO Empty Interrupt
-                                            // Mask
+// Mask
 #define I2C_SIMR_RXIM           0x00000040  // Receive FIFO Request Interrupt
-                                            // Mask
+// Mask
 #define I2C_SIMR_TXIM           0x00000020  // Transmit FIFO Request Interrupt
-                                            // Mask
+// Mask
 #define I2C_SIMR_DMATXIM        0x00000010  // Transmit DMA Interrupt Mask
 #define I2C_SIMR_DMARXIM        0x00000008  // Receive DMA Interrupt Mask
 #define I2C_SIMR_STOPIM         0x00000004  // Stop Condition Interrupt Mask
@@ -291,18 +289,18 @@
 //******************************************************************************
 #define I2C_SRIS_RIS            0x00000100  // Raw Interrupt Status
 #define I2C_SRIS_TXFERIS        0x00000080  // Transmit FIFO Empty Raw
-                                            // Interrupt Status
+// Interrupt Status
 #define I2C_SRIS_RXRIS          0x00000040  // Receive FIFO Request Raw
-                                            // Interrupt Status
+// Interrupt Status
 #define I2C_SRIS_TXRIS          0x00000020  // Transmit Request Raw Interrupt
-                                            // Status
+// Status
 #define I2C_SRIS_DMATXRIS       0x00000010  // Transmit DMA Raw Interrupt
-                                            // Status
+// Status
 #define I2C_SRIS_DMARXRIS       0x00000008  // Receive DMA Raw Interrupt Status
 #define I2C_SRIS_STOPRIS        0x00000004  // Stop Condition Raw Interrupt
-                                            // Status
+// Status
 #define I2C_SRIS_STARTRIS       0x00000002  // Start Condition Raw Interrupt
-                                            // Status
+// Status
 #define I2C_SRIS_DATARIS        0x00000001  // Data Raw Interrupt Status
 //******************************************************************************
 //
@@ -311,19 +309,19 @@
 //******************************************************************************
 #define I2C_SMIS_RXFFMIS        0x00000100  // Receive FIFO Full Interrupt Mask
 #define I2C_SMIS_TXFEMIS        0x00000080  // Transmit FIFO Empty Interrupt
-                                            // Mask
+// Mask
 #define I2C_SMIS_RXMIS          0x00000040  // Receive FIFO Request Interrupt
-                                            // Mask
+// Mask
 #define I2C_SMIS_TXMIS          0x00000020  // Transmit FIFO Request Interrupt
-                                            // Mask
+// Mask
 #define I2C_SMIS_DMATXMIS       0x00000010  // Transmit DMA Masked Interrupt
-                                            // Status
+// Status
 #define I2C_SMIS_DMARXMIS       0x00000008  // Receive DMA Masked Interrupt
-                                            // Status
+// Status
 #define I2C_SMIS_STOPMIS        0x00000004  // Stop Condition Masked Interrupt
-                                            // Status
+// Status
 #define I2C_SMIS_STARTMIS       0x00000002  // Start Condition Masked Interrupt
-                                            // Status
+// Status
 #define I2C_SMIS_DATAMIS        0x00000001  // Data Masked Interrupt Status
 //******************************************************************************
 //
@@ -332,7 +330,7 @@
 //******************************************************************************
 #define I2C_SICR_RXFFIC         0x00000100  // Receive FIFO Full Interrupt Mask
 #define I2C_SICR_TXFEIC         0x00000080  // Transmit FIFO Empty Interrupt
-                                            // Mask
+// Mask
 #define I2C_SICR_RXIC           0x00000040  // Receive Request Interrupt Mask
 #define I2C_SICR_TXIC           0x00000020  // Transmit Request Interrupt Mask
 #define I2C_SICR_DMATXIC        0x00000010  // Transmit DMA Interrupt Clear
@@ -425,50 +423,50 @@
 //******************************************************************************
 #define I2C_MUXROUTE_LN7ROUTE_M \
                                 0x70000000  // Lane 7 output is routed to the
-                                            // lane pointed to by the offset in
-                                            // this bit field
+// lane pointed to by the offset in
+// this bit field
 
 #define I2C_MUXROUTE_LN7ROUTE_S 28
 #define I2C_MUXROUTE_LN6ROUTE_M \
                                 0x07000000  // Lane 6 output is routed to the
-                                            // lane pointed to by the offset in
-                                            // this bit field
+// lane pointed to by the offset in
+// this bit field
 
 #define I2C_MUXROUTE_LN6ROUTE_S 24
 #define I2C_MUXROUTE_LN5ROUTE_M \
                                 0x00700000  // Lane 5 output is routed to the
-                                            // lane pointed to by the offset in
-                                            // this bit field
+// lane pointed to by the offset in
+// this bit field
 
 #define I2C_MUXROUTE_LN5ROUTE_S 20
 #define I2C_MUXROUTE_LN4ROUTE_M \
                                 0x00070000  // Lane 4 output is routed to the
-                                            // lane pointed to by the offset in
-                                            // this bit field
+// lane pointed to by the offset in
+// this bit field
 
 #define I2C_MUXROUTE_LN4ROUTE_S 16
 #define I2C_MUXROUTE_LN3ROUTE_M \
                                 0x00007000  // Lane 3 output is routed to the
-                                            // lane pointed to by the offset in
-                                            // this bit field
+// lane pointed to by the offset in
+// this bit field
 
 #define I2C_MUXROUTE_LN3ROUTE_S 12
 #define I2C_MUXROUTE_LN2ROUTE_M \
                                 0x00000700  // Lane 2 output is routed to the
-                                            // lane pointed to by the offset in
-                                            // this bit field
+// lane pointed to by the offset in
+// this bit field
 
 #define I2C_MUXROUTE_LN2ROUTE_S 8
 #define I2C_MUXROUTE_LN1ROUTE_M \
                                 0x00000070  // Lane 1 output is routed to the
-                                            // lane pointed to by the offset in
-                                            // this bit field
+// lane pointed to by the offset in
+// this bit field
 
 #define I2C_MUXROUTE_LN1ROUTE_S 4
 #define I2C_MUXROUTE_LN0ROUTE_M \
                                 0x00000007  // Lane 0 output is routed to the
-                                            // lane pointed to by the offset in
-                                            // this bit field
+// lane pointed to by the offset in
+// this bit field
 
 #define I2C_MUXROUTE_LN0ROUTE_S 0
 //******************************************************************************
@@ -497,7 +495,5 @@
 // The following are defines for the bit fields in the I2C_O_CC register.
 //
 //******************************************************************************
-
-
 
 #endif // __HW_I2C_H__

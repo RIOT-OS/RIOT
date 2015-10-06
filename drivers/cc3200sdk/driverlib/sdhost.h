@@ -40,7 +40,6 @@
 #ifndef __SDHOST_H__
 #define __SDHOST_H__
 
-
 //*****************************************************************************
 //
 // If building with a C++ compiler, make all of the definitions in this header
@@ -52,7 +51,6 @@ extern "C"
 //{
 #endif
 
-
 //*****************************************************************************
 // Values that can be passed to SDHostRespGet().
 //*****************************************************************************
@@ -60,7 +58,6 @@ extern "C"
 #define SDHOST_RESP_32 0x00000002
 #define SDHOST_RESP_54 0x00000001
 #define SDHOST_RESP_76 0x00000000
-
 
 //*****************************************************************************
 // Values that can be passed to SDHostIntEnable(), SDHostIntDisable(),
@@ -160,7 +157,6 @@ extern "C"
 #define SDHOST_RESP_LEN_48  0x00020000
 #define SDHOST_RESP_LEN_48B 0x00030000
 
-
 //*****************************************************************************
 //
 // API Function prototypes
@@ -168,27 +164,26 @@ extern "C"
 //*****************************************************************************
 extern void SDHostCmdReset(unsigned long ulBase);
 extern void SDHostInit(unsigned long ulBase);
-extern long SDHostCmdSend(unsigned long ulBase,unsigned long ulCmd,
-                       unsigned ulArg);
+extern long SDHostCmdSend(unsigned long ulBase, unsigned long ulCmd,
+        unsigned ulArg);
 extern void SDHostIntRegister(unsigned long ulBase, void (*pfnHandler)(void));
 extern void SDHostIntUnregister(unsigned long ulBase);
-extern void SDHostIntEnable(unsigned long ulBase,unsigned long ulIntFlags);
-extern void SDHostIntDisable(unsigned long ulBase,unsigned long ulIntFlags);
+extern void SDHostIntEnable(unsigned long ulBase, unsigned long ulIntFlags);
+extern void SDHostIntDisable(unsigned long ulBase, unsigned long ulIntFlags);
 extern unsigned long SDHostIntStatus(unsigned long ulBase);
-extern void SDHostIntClear(unsigned long ulBase,unsigned long ulIntFlags);
+extern void SDHostIntClear(unsigned long ulBase, unsigned long ulIntFlags);
 extern void SDHostCardErrorMaskSet(unsigned long ulBase,
-                                   unsigned long ulErrMask);
+        unsigned long ulErrMask);
 extern unsigned long SDHostCardErrorMaskGet(unsigned long ulBase);
 extern void SDHostSetExpClk(unsigned long ulBase, unsigned long ulSDHostClk,
-              unsigned long ulCardClk);
+        unsigned long ulCardClk);
 extern void SDHostRespGet(unsigned long ulBase, unsigned long ulRespnse[4]);
 extern void SDHostBlockSizeSet(unsigned long ulBase, unsigned short ulBlkSize);
-extern void SDHostBlockCountSet(unsigned long ulBase,
-                                unsigned short ulBlkCount);
+extern void SDHostBlockCountSet(unsigned long ulBase, unsigned short ulBlkCount);
 extern tBoolean SDHostDataNonBlockingWrite(unsigned long ulBase,
-                                        unsigned long ulData);
+        unsigned long ulData);
 extern tBoolean SDHostDataNonBlockingRead(unsigned long ulBase,
-                                   unsigned long *pulData);
+        unsigned long *pulData);
 extern void SDHostDataWrite(unsigned long ulBase, unsigned long ulData);
 extern void SDHostDataRead(unsigned long ulBase, unsigned long *ulData);
 

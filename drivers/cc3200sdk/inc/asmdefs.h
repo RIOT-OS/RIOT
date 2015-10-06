@@ -53,8 +53,8 @@
 // The assembly code preamble required to put the assembler into the correct
 // configuration.
 //
-    .syntax unified
-    .thumb
+.syntax unified
+.thumb
 
 //
 // Section headers.
@@ -122,8 +122,8 @@
 // The assembly code preamble required to put the assembler into the correct
 // configuration.
 //
-    .syntax unified
-    .thumb
+.syntax unified
+.thumb
 
 //
 // Section headers.
@@ -160,9 +160,9 @@
 // The assembly code preamble required to put the assembler into the correct
 // configuration.
 //
-    thumb
-    require8
-    preserve8
+thumb
+require8
+preserve8
 
 //
 // Section headers.
@@ -199,8 +199,8 @@
 // The assembly code preamble required to put the assembler into the correct
 // configuration.
 //
-    .syntax unified
-    .thumb
+.syntax unified
+.thumb
 
 //
 // Section headers.

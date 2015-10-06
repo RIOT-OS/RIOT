@@ -109,10 +109,10 @@ extern "C"
 //
 //*****************************************************************************
 extern void GPIODirModeSet(unsigned long ulPort, unsigned char ucPins,
-                           unsigned long ulPinIO);
+        unsigned long ulPinIO);
 extern unsigned long GPIODirModeGet(unsigned long ulPort, unsigned char ucPin);
 extern void GPIOIntTypeSet(unsigned long ulPort, unsigned char ucPins,
-                           unsigned long ulIntType);
+        unsigned long ulIntType);
 extern void GPIODMATriggerEnable(unsigned long ulPort);
 extern void GPIODMATriggerDisable(unsigned long ulPort);
 extern unsigned long GPIOIntTypeGet(unsigned long ulPort, unsigned char ucPin);
@@ -120,12 +120,11 @@ extern void GPIOIntEnable(unsigned long ulPort, unsigned long ulIntFlags);
 extern void GPIOIntDisable(unsigned long ulPort, unsigned long ulIntFlags);
 extern long GPIOIntStatus(unsigned long ulPort, tBoolean bMasked);
 extern void GPIOIntClear(unsigned long ulPort, unsigned long ulIntFlags);
-extern void GPIOIntRegister(unsigned long ulPort,
-                                void (*pfnIntHandler)(void));
+extern void GPIOIntRegister(unsigned long ulPort, void (*pfnIntHandler)(void));
 extern void GPIOIntUnregister(unsigned long ulPort);
 extern long GPIOPinRead(unsigned long ulPort, unsigned char ucPins);
 extern void GPIOPinWrite(unsigned long ulPort, unsigned char ucPins,
-                         unsigned char ucVal);
+        unsigned char ucVal);
 
 //*****************************************************************************
 //

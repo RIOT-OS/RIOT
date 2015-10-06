@@ -32,26 +32,23 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
  *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
-*/
- 
-
+ */
 
 #include "simplelink.h"
 
 #ifndef __SIMPLELINK_TRACE_H__
 #define __SIMPLELINK_TRACE_H__
 
-
 #ifdef  __cplusplus
 extern "C" {
 #endif
 
-/*****************************************************************************/
-/* Macro declarations                                                        */
-/*****************************************************************************/
+    /*****************************************************************************/
+    /* Macro declarations                                                        */
+    /*****************************************************************************/
 
 #define SL_SYNC_SCAN_THRESHOLD  (( _u32 )2000)
-  
+
 #define _SlDrvAssert(line )  { while(1); }          
 
 #define _SL_ASSERT(expr)            { if(!(expr)){_SlDrvAssert(__LINE__); } }
@@ -60,7 +57,6 @@ extern "C" {
 #define SL_HANDLING_ASSERT          2
 #define SL_HANDLING_ERROR           1
 #define SL_HANDLING_NONE            0
-
 
 #ifndef SL_TINY_EXT
 #define SL_SELF_COND_HANDLING       SL_HANDLING_ASSERT
@@ -79,7 +75,6 @@ extern "C" {
 #define SL_MALLOC_OK_HANDLING       SL_HANDLING_NONE
 #define SL_USER_ARGS_HANDLING       SL_HANDLING_NONE
 #endif
-
 
 #if (SL_DRV_RET_CODE_HANDLING == SL_HANDLING_ASSERT)
 #define VERIFY_RET_OK(Func)                     {_SlReturnVal_t _RetVal = (Func); _SL_ASSERT((_SlReturnVal_t)SL_OS_RET_CODE_OK == _RetVal)}
@@ -146,7 +141,7 @@ extern "C" {
 #define ARG_CHECK_PTR(Ptr)
 #endif
 
-/*#define SL_DBG_TRACE_ENABLE*/
+    /*#define SL_DBG_TRACE_ENABLE*/
 #ifdef SL_DBG_TRACE_ENABLE
 #define SL_TRACE0(level,msg_id,str)                     printf(str)
 #define SL_TRACE1(level,msg_id,str,p1)                  printf(str,(p1))
@@ -173,7 +168,7 @@ extern "C" {
 #define SL_TRACE_FLUSH()
 #endif
 
-/* #define SL_DBG_CNT_ENABLE */
+    /* #define SL_DBG_CNT_ENABLE */
 #ifdef SL_DBG_CNT_ENABLE
 #define _SL_DBG_CNT_INC(Cnt)            g_DbgCnt. ## Cnt++
 #define _SL_DBG_SYNC_LOG(index,value)   {if(index < SL_DBG_SYNC_LOG_SIZE){*(_u32 *)&g_DbgCnt.SyncLog[index] = *(_u32 *)(value);}}
@@ -196,7 +191,6 @@ extern "C" {
 #ifdef  __cplusplus
 }
 #endif
-
 
 #endif /*__SIMPLELINK_TRACE_H__*/
 

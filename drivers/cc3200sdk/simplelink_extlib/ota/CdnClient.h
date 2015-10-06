@@ -11,7 +11,7 @@
  * stipulated in the agreement under which this program has been supplied,
  * and under no circumstances can it be used with non-TI connectivity device.
  *
-*/
+ */
 #ifndef __CDN_CLIENT_H__
 #define __CDN_CLIENT_H__
 
@@ -33,8 +33,7 @@ extern "C" {
 #define CDN_STATUS_ERROR_CONNECT_CDN    -6
 #define CDN_STATUS_ERROR_READ_HDRS      -7
 
-typedef enum
-{
+typedef enum {
     CDN_STATE_IDLE = 0,
     CDN_STATE_CDN_SERVER_CONNECTED,
     CDN_STATE_FILE_DOWNLOAD_AND_SAVE,
@@ -42,10 +41,9 @@ typedef enum
 } CdnState_e;
 
 /* locals - move to object control block */
-typedef struct
-{
+typedef struct {
     _u8 cdn_server_name[64]; /* save server name in order not to connect every file (if same server) */
-    _i32  port_num;
+    _i32 port_num;
 
     _u8 *p_file_name;
     _i32 file_size;
@@ -55,18 +53,19 @@ typedef struct
     _u8 *recv_buf;
 
     /* states */
-    CdnState_e  state;
+    CdnState_e state;
     _i32 totalBytesReceived;
     OtaFileMetadata_t *pResourceMetadata;
-    FlcCb_t    *pFlcSflashCb;
-    FlcCb_t    *pFlcHostCb;
-    FlcCb_t    *pFlcCb;
+    FlcCb_t *pFlcSflashCb;
+    FlcCb_t *pFlcHostCb;
+    FlcCb_t *pFlcCb;
 } CdnClient_t;
 
 void *CdnClient_Init(FlcCb_t *pFlcSflashCb, FlcCb_t *pFlcHostCb);
-_i32  CdnClient_ConnectByUrl(void *pvCdnClient, OtaFileMetadata_t *pResourceMetadata, _i32 secured_connection);
-_i32  CdnClient_SetFileInfo(void *pvCdnClient, _i32 file_size, _u8 *file_name);
-_i32  CdnClient_Run(void *pvCdnClient);
+_i32 CdnClient_ConnectByUrl(void *pvCdnClient,
+        OtaFileMetadata_t *pResourceMetadata, _i32 secured_connection);
+_i32 CdnClient_SetFileInfo(void *pvCdnClient, _i32 file_size, _u8 *file_name);
+_i32 CdnClient_Run(void *pvCdnClient);
 void CdnClient_CloseServer(void *pvCdnClient);
 
 #ifdef  __cplusplus

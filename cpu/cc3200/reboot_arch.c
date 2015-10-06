@@ -23,12 +23,12 @@
 #include "arch/reboot_arch.h"
 #include "cpu.h"
 
-int reboot_arch(int mode)
-{
+int reboot_arch(int mode) {
     printf("Going into reboot, mode %i\n", mode);
     /* wait a while to make sure the printf is finished */
     volatile int n = 100000;
-    while(n--);
+    while (n--)
+        ;
     PRCMMCUReset(1);
     return -1;
 }

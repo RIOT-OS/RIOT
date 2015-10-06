@@ -44,26 +44,22 @@
 #include "cc_types.h"
 
 enum io_park_state {
-        DONT_CARE,
-        NO_PULL_HIZ,
-        WEAK_PULL_UP_STD = PIN_TYPE_STD_PU,
-        WEAK_PULL_DOWN_STD = PIN_TYPE_STD_PD,
-        WEAK_PULL_UP_OD = PIN_TYPE_OD_PU,
-        WEAK_PULL_DOWN_OD = PIN_TYPE_OD_PD
+    DONT_CARE,
+    NO_PULL_HIZ,
+    WEAK_PULL_UP_STD = PIN_TYPE_STD_PU,
+    WEAK_PULL_DOWN_STD = PIN_TYPE_STD_PD,
+    WEAK_PULL_UP_OD = PIN_TYPE_OD_PU,
+    WEAK_PULL_DOWN_OD = PIN_TYPE_OD_PD
 };
 
 struct soc_io_park {
-        u8 pin_num;
-        i8 *pin_description;
-        enum io_park_state park_val;
+    u8 pin_num;
+    i8 *pin_description;
+    enum io_park_state park_val;
 };
 
+i32 cc_io_park_safe(struct soc_io_park *io_park_choice, u8 num_pins);
 
-i32 cc_io_park_safe(struct soc_io_park *io_park_choice,
-                     u8 num_pins);
-
-
-i32 cc_set_default(struct soc_io_park *io_park_choice,
-                     u8 num_pins);
+i32 cc_set_default(struct soc_io_park *io_park_choice, u8 num_pins);
 
 #endif // __CC_IO_PARK_H__

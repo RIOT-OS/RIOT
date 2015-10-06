@@ -45,8 +45,8 @@
 #include "cc_types.h"
 
 struct isr_handler {
-        void (*reg_intr_handler)(void *);
-        void *intr_param;
+    void (*reg_intr_handler)(void *);
+    void *intr_param;
 };
 
 /* Can make this allocation dynamic to save memory */
@@ -78,7 +78,7 @@ CPUipsr(void)
     // Read IPSR.
     //
     __asm("    mrs     r0, IPSR\n"
-          "    bx      lr\n");
+            "    bx      lr\n");
 
     //
     // The following keeps the compiler happy, because it wants to see a
@@ -91,34 +91,30 @@ CPUipsr(void)
 }
 #endif
 
+void global_intr_handler() {
+    u32 intr_num;
 
-void global_intr_handler()
-{
-        u32 intr_num;
-        
-        /* Get the IPSR register value */
-        intr_num = CPUipsr();
-        /* Get the exception number */
-        intr_num &= 0xFF;
+    /* Get the IPSR register value */
+    intr_num = CPUipsr();
+    /* Get the exception number */
+    intr_num &= 0xFF;
 
-        /* Invoke the registered interrupt handler with the associated param */
-        isr_handler_list[intr_num].reg_intr_handler(
-                isr_handler_list[intr_num].intr_param);
+    /* Invoke the registered interrupt handler with the associated param */
+    isr_handler_list[intr_num].reg_intr_handler(
+            isr_handler_list[intr_num].intr_param);
 }
 
-i32 register_isr(u8 irqvec_id, 
-                        void (*intr_handler)(void *), 
-                        void *param)
-{
-        /* Setup the ISR handler list to be used to invoke on interrupt 
-           occurance. The new setting will override the older ones always */
-        isr_handler_list[irqvec_id].reg_intr_handler = intr_handler;
-        isr_handler_list[irqvec_id].intr_param = param;
+i32 register_isr(u8 irqvec_id, void (*intr_handler)(void *), void *param) {
+    /* Setup the ISR handler list to be used to invoke on interrupt 
+     occurance. The new setting will override the older ones always */
+    isr_handler_list[irqvec_id].reg_intr_handler = intr_handler;
+    isr_handler_list[irqvec_id].intr_param = param;
 
-        osi_InterruptRegister(irqvec_id, (P_OSI_INTR_ENTRY)global_intr_handler, (1 << 5));
-        if(INT_PRCM == irqvec_id) {
-                MAP_PRCMIntEnable(PRCM_INT_SLOW_CLK_CTR);
-        }
+    osi_InterruptRegister(irqvec_id, (P_OSI_INTR_ENTRY) global_intr_handler,
+            (1 << 5));
+    if (INT_PRCM == irqvec_id) {
+        MAP_PRCMIntEnable(PRCM_INT_SLOW_CLK_CTR);
+    }
 
-        return 0;
+    return 0;
 }

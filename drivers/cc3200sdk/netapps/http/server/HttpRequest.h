@@ -39,10 +39,9 @@
 /// The request for websocket upgrade is from a browser client
 #define WS_REQUEST_BROWSER				 (1 << 6)
 
-
 /*
-* defgroup for all WebSocket Opcodes
-*/
+ * defgroup for all WebSocket Opcodes
+ */
 
 ///Continuation frame
 #define WS_CONTINUATION					(0x00)
@@ -63,8 +62,7 @@
  * A structure to hold all data about an HTTP request
  * Note: The request's resource string is not passed as part of this structure, but rather directly to the Http*_InitRequest() function
  */
-struct HttpRequest
-{
+struct HttpRequest {
     /// Flags. See HTTP_REQUEST_FLAG_*
     UINT16 uFlags;
     /// Connection number in HttpCore. This value is guaranteed to satisfy: 0 <= uConnection < HTTP_CORE_MAX_CONNECTIONS

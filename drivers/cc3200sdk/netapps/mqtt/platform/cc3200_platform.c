@@ -18,13 +18,11 @@
 #include "platform.h"
 #include "prcm.h"
 
-void platform_timer_init()
-{
+void platform_timer_init() {
     PRCMRTCInUseSet();
 }
 
-u32 platform_get_time_in_secs()
-{
+u32 platform_get_time_in_secs() {
     u32 Secs = 0;
     u16 Msec = 0;
 

@@ -23,8 +23,7 @@
 
 #include "datatypes.h"
 
-struct HttpBlob
-{
+struct HttpBlob {
     UINT16 uLength;
     UINT8* pData;
 };
@@ -52,9 +51,11 @@ int HttpString_strcmp(struct HttpBlob first, struct HttpBlob second);
  * @param blob Pointer to data of the search string/blob
  * @return pointer if found, otherwize NULL
  */
-UINT8* HttpString_nextToken(char* pToken, UINT16 uTokenLength, struct HttpBlob blob);
+UINT8* HttpString_nextToken(char* pToken, UINT16 uTokenLength,
+        struct HttpBlob blob);
 
-UINT8* HttpString_nextDelimiter(char* pToken, UINT16 uTokenLength, struct HttpBlob blob);
+UINT8* HttpString_nextDelimiter(char* pToken, UINT16 uTokenLength,
+        struct HttpBlob blob);
 
 /**
  * Parse a string representation of an unsigned decimal number

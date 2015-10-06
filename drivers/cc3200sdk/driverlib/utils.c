@@ -45,7 +45,6 @@
 //*****************************************************************************
 #include "utils.h"
 
-
 //*****************************************************************************
 //
 //! Provides a small delay.
@@ -66,7 +65,7 @@ void
 UtilsDelay(unsigned long ulCount)
 {
     __asm("    subs    r0, #1\n"
-          "    bne.n   UtilsDelay\n");
+            "    bne.n   UtilsDelay\n");
 }
 #endif
 
@@ -75,8 +74,8 @@ void __attribute__((naked))
 UtilsDelay(unsigned long ulCount)
 {
     __asm("    subs    r0, #1\n"
-          "    bne     UtilsDelay\n"
-          "    bx      lr");
+            "    bne     UtilsDelay\n"
+            "    bx      lr");
 }
 #endif
 
@@ -85,15 +84,15 @@ UtilsDelay(unsigned long ulCount)
 // compiler from doing funny things with the optimizer.
 //
 #if defined(ccs)
-    __asm("    .sect \".text:UtilsDelay\"\n"
-          "    .clink\n"
-          "    .thumbfunc UtilsDelay\n"
-          "    .thumb\n"
-          "    .global UtilsDelay\n"
-          "UtilsDelay:\n"
-          "    subs r0, #1\n"
-          "    bne.n UtilsDelay\n"
-          "    bx lr\n");
+__asm("    .sect \".text:UtilsDelay\"\n"
+        "    .clink\n"
+        "    .thumbfunc UtilsDelay\n"
+        "    .thumb\n"
+        "    .global UtilsDelay\n"
+        "UtilsDelay:\n"
+        "    subs r0, #1\n"
+        "    bne.n UtilsDelay\n"
+        "    bx lr\n");
 #endif
 
 //*****************************************************************************

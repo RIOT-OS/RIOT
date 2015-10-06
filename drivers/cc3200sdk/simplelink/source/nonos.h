@@ -32,7 +32,7 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
  *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
-*/
+ */
 
 #ifndef __NONOS_H__
 #define	__NONOS_H__
@@ -41,7 +41,6 @@
 extern "C" {
 #endif
 
-
 #ifndef SL_PLATFORM_MULTI_THREADED
 
 /* This function call the user defined function, if defined, from the sync wait loop  */
@@ -49,10 +48,8 @@ extern "C" {
 /* The wake up should be activated after getting an interrupt from the device to Host */
 /* The user function must return without blocking to prevent a delay on the event handling */
 /*
-#define _SlSyncWaitLoopCallback  UserSleepFunction
-*/
-
-
+ #define _SlSyncWaitLoopCallback  UserSleepFunction
+ */
 
 #define NONOS_WAIT_FOREVER   							0xFF
 #define NONOS_NO_WAIT        							0x00
@@ -67,26 +64,25 @@ extern "C" {
 #define __NON_OS_LOCK_OBJ_LOCK_VALUE				0x44
 
 /*!
-	\brief type definition for the return values of this adaptation layer
-*/
+ \brief type definition for the return values of this adaptation layer
+ */
 typedef _i8 _SlNonOsRetVal_t;
 
 /*!
-	\brief type definition for a time value
-*/
+ \brief type definition for a time value
+ */
 typedef _u8 _SlNonOsTime_t;
 
 /*!
-	\brief 	type definition for a sync object container
-	
-	Sync object is object used to synchronize between two threads or thread and interrupt handler.
-	One thread is waiting on the object and the other thread send a signal, which then
-	release the waiting thread.
-	The signal must be able to be sent from interrupt context.
-	This object is generally implemented by binary semaphore or events.
-*/
+ \brief 	type definition for a sync object container
+ 
+ Sync object is object used to synchronize between two threads or thread and interrupt handler.
+ One thread is waiting on the object and the other thread send a signal, which then
+ release the waiting thread.
+ The signal must be able to be sent from interrupt context.
+ This object is generally implemented by binary semaphore or events.
+ */
 typedef _u8 _SlNonOsSemObj_t;
-
 
 #define _SlTime_t       _SlNonOsTime_t
 
@@ -100,185 +96,183 @@ typedef _u8 _SlNonOsSemObj_t;
 
 #define SL_OS_NO_WAIT           NONOS_NO_WAIT
 
-
-
-
-
 /*!
-	\brief 	This function creates a sync object
+ \brief 	This function creates a sync object
 
-	The sync object is used for synchronization between different thread or ISR and 
-	a thread.
+ The sync object is used for synchronization between different thread or ISR and 
+ a thread.
 
-	\param	pSyncObj	-	pointer to the sync object control block
-	
-	\return upon successful creation the function return 0
-			Otherwise, a negative value indicating the error code shall be returned
-	\note
-	\warning
-*/
+ \param	pSyncObj	-	pointer to the sync object control block
+ 
+ \return upon successful creation the function return 0
+ Otherwise, a negative value indicating the error code shall be returned
+ \note
+ \warning
+ */
 #define _SlNonOsSyncObjCreate(pSyncObj)			_SlNonOsSemSet(pSyncObj,__NON_OS_SYNC_OBJ_CLEAR_VALUE)
 
 /*!
-	\brief 	This function deletes a sync object
+ \brief 	This function deletes a sync object
 
-	\param	pSyncObj	-	pointer to the sync object control block
-	
-	\return upon successful deletion the function should return 0
-			Otherwise, a negative value indicating the error code shall be returned
-	\note
-	\warning
-*/
+ \param	pSyncObj	-	pointer to the sync object control block
+ 
+ \return upon successful deletion the function should return 0
+ Otherwise, a negative value indicating the error code shall be returned
+ \note
+ \warning
+ */
 #define _SlNonOsSyncObjDelete(pSyncObj)			_SlNonOsSemSet(pSyncObj,0)
 
 /*!
-	\brief 		This function generates a sync signal for the object. 
-	
-	All suspended threads waiting on this sync object are resumed
+ \brief 		This function generates a sync signal for the object. 
+ 
+ All suspended threads waiting on this sync object are resumed
 
-	\param		pSyncObj	-	pointer to the sync object control block
-	
-	\return 	upon successful signaling the function should return 0
-				Otherwise, a negative value indicating the error code shall be returned
-	\note		the function could be called from ISR context
-	\warning
-*/
+ \param		pSyncObj	-	pointer to the sync object control block
+ 
+ \return 	upon successful signaling the function should return 0
+ Otherwise, a negative value indicating the error code shall be returned
+ \note		the function could be called from ISR context
+ \warning
+ */
 #define _SlNonOsSyncObjSignal(pSyncObj)			_SlNonOsSemSet(pSyncObj,__NON_OS_SYNC_OBJ_SIGNAL_VALUE)
 
 /*!
-	\brief 	This function waits for a sync signal of the specific sync object
+ \brief 	This function waits for a sync signal of the specific sync object
 
-	\param	pSyncObj	-	pointer to the sync object control block
-	\param	Timeout		-	numeric value specifies the maximum number of mSec to 
-							stay suspended while waiting for the sync signal
-							Currently, the simple link driver uses only two values:
-								- NONOS_WAIT_FOREVER
-								- NONOS_NO_WAIT
-	
-	\return upon successful reception of the signal within the timeout window return 0
-			Otherwise, a negative value indicating the error code shall be returned
-	\note
-	\warning
-*/
+ \param	pSyncObj	-	pointer to the sync object control block
+ \param	Timeout		-	numeric value specifies the maximum number of mSec to 
+ stay suspended while waiting for the sync signal
+ Currently, the simple link driver uses only two values:
+ - NONOS_WAIT_FOREVER
+ - NONOS_NO_WAIT
+ 
+ \return upon successful reception of the signal within the timeout window return 0
+ Otherwise, a negative value indicating the error code shall be returned
+ \note
+ \warning
+ */
 #define _SlNonOsSyncObjWait(pSyncObj , Timeout)	_SlNonOsSemGet(pSyncObj,__NON_OS_SYNC_OBJ_SIGNAL_VALUE,__NON_OS_SYNC_OBJ_CLEAR_VALUE,Timeout)
 
 /*!
-	\brief 	This function clears a sync object
+ \brief 	This function clears a sync object
 
-	\param	pSyncObj	-	pointer to the sync object control block
-	
-	\return upon successful clearing the function should return 0
-			Otherwise, a negative value indicating the error code shall be returned
-	\note
-	\warning
-*/
+ \param	pSyncObj	-	pointer to the sync object control block
+ 
+ \return upon successful clearing the function should return 0
+ Otherwise, a negative value indicating the error code shall be returned
+ \note
+ \warning
+ */
 #define _SlNonOsSyncObjClear(pSyncObj)			_SlNonOsSemSet(pSyncObj,__NON_OS_SYNC_OBJ_CLEAR_VALUE)
 
 /*!
-	\brief 	This function creates a locking object.
-	
-	The locking object is used for protecting a shared resources between different 
-	threads.
+ \brief 	This function creates a locking object.
+ 
+ The locking object is used for protecting a shared resources between different 
+ threads.
 
-	\param	pLockObj	-	pointer to the locking object control block
-	
-	\return upon successful creation the function should return 0
-			Otherwise, a negative value indicating the error code shall be returned
-	\note
-	\warning
-*/
+ \param	pLockObj	-	pointer to the locking object control block
+ 
+ \return upon successful creation the function should return 0
+ Otherwise, a negative value indicating the error code shall be returned
+ \note
+ \warning
+ */
 #define _SlNonOsLockObjCreate(pLockObj)			_SlNonOsSemSet(pLockObj,__NON_OS_LOCK_OBJ_UNLOCK_VALUE)
 
 /*!
-	\brief 	This function deletes a locking object.
-	
-	\param	pLockObj	-	pointer to the locking object control block
-	
-	\return upon successful deletion the function should return 0
-			Otherwise, a negative value indicating the error code shall be returned
-	\note
-	\warning
-*/
+ \brief 	This function deletes a locking object.
+ 
+ \param	pLockObj	-	pointer to the locking object control block
+ 
+ \return upon successful deletion the function should return 0
+ Otherwise, a negative value indicating the error code shall be returned
+ \note
+ \warning
+ */
 #define _SlNonOsLockObjDelete(pLockObj)			_SlNonOsSemSet(pLockObj,0)
 
 /*!
-	\brief 	This function locks a locking object. 
-	
-	All other threads that call this function before this thread calls 
-	the _SlNonOsLockObjUnlock would be suspended	
-	
-	\param	pLockObj	-	pointer to the locking object control block
-	\param	Timeout		-	numeric value specifies the maximum number of mSec to 
-							stay suspended while waiting for the locking object
-							Currently, the simple link driver uses only two values:
-								- NONOS_WAIT_FOREVER
-								- NONOS_NO_WAIT
-	
-	
-	\return upon successful reception of the locking object the function should return 0
-			Otherwise, a negative value indicating the error code shall be returned
-	\note
-	\warning
-*/
+ \brief 	This function locks a locking object. 
+ 
+ All other threads that call this function before this thread calls 
+ the _SlNonOsLockObjUnlock would be suspended	
+ 
+ \param	pLockObj	-	pointer to the locking object control block
+ \param	Timeout		-	numeric value specifies the maximum number of mSec to 
+ stay suspended while waiting for the locking object
+ Currently, the simple link driver uses only two values:
+ - NONOS_WAIT_FOREVER
+ - NONOS_NO_WAIT
+ 
+ 
+ \return upon successful reception of the locking object the function should return 0
+ Otherwise, a negative value indicating the error code shall be returned
+ \note
+ \warning
+ */
 #define _SlNonOsLockObjLock(pLockObj , Timeout)	_SlNonOsSemGet(pLockObj,__NON_OS_LOCK_OBJ_UNLOCK_VALUE,__NON_OS_LOCK_OBJ_LOCK_VALUE,Timeout)
 
 /*!
-	\brief 	This function unlock a locking object.
-	
-	\param	pLockObj	-	pointer to the locking object control block
-	
-	\return upon successful unlocking the function should return 0
-			Otherwise, a negative value indicating the error code shall be returned
-	\note
-	\warning
-*/
+ \brief 	This function unlock a locking object.
+ 
+ \param	pLockObj	-	pointer to the locking object control block
+ 
+ \return upon successful unlocking the function should return 0
+ Otherwise, a negative value indicating the error code shall be returned
+ \note
+ \warning
+ */
 #define _SlNonOsLockObjUnlock(pLockObj)			_SlNonOsSemSet(pLockObj,__NON_OS_LOCK_OBJ_UNLOCK_VALUE)
 
+/*!
+ \brief 	This function call the pEntry callback from a different context
+ 
+ \param	pEntry		-	pointer to the entry callback function 
+ 
+ \param	pValue		- 	pointer to any type of memory structure that would be
+ passed to pEntry callback from the execution thread.
+ 
+ \param	flags		- 	execution flags - reserved for future usage
+ 
+ \return upon successful registration of the spawn the function return 0
+ (the function is not blocked till the end of the execution of the function
+ and could be returned before the execution is actually completed)
+ Otherwise, a negative value indicating the error code shall be returned
+ \note
+ \warning
+ */
+_SlNonOsRetVal_t _SlNonOsSpawn(_SlSpawnEntryFunc_t pEntry, void* pValue,
+        _u32 flags);
 
 /*!
-	\brief 	This function call the pEntry callback from a different context
-	
-	\param	pEntry		-	pointer to the entry callback function 
-	
-	\param	pValue		- 	pointer to any type of memory structure that would be
-							passed to pEntry callback from the execution thread.
-							
-	\param	flags		- 	execution flags - reserved for future usage
-	
-	\return upon successful registration of the spawn the function return 0
-			(the function is not blocked till the end of the execution of the function
-			and could be returned before the execution is actually completed)
-			Otherwise, a negative value indicating the error code shall be returned
-	\note
-	\warning
-*/
-_SlNonOsRetVal_t _SlNonOsSpawn(_SlSpawnEntryFunc_t pEntry , void* pValue , _u32 flags);
-
-
-/*!
-	\brief 	This function must be called from the main loop in non-os paltforms
-	
-	\param	None
-	
-	\return 0 - No more activities
-			1 - Activity still in progress
-	\note
-	\warning
-*/
+ \brief 	This function must be called from the main loop in non-os paltforms
+ 
+ \param	None
+ 
+ \return 0 - No more activities
+ 1 - Activity still in progress
+ \note
+ \warning
+ */
 _SlNonOsRetVal_t _SlNonOsMainLoopTask(void);
 
-extern _SlNonOsRetVal_t _SlNonOsSemGet(_SlNonOsSemObj_t* pSyncObj, _SlNonOsSemObj_t WaitValue, _SlNonOsSemObj_t SetValue, _SlNonOsTime_t Timeout);
-extern _SlNonOsRetVal_t _SlNonOsSemSet(_SlNonOsSemObj_t* pSemObj , _SlNonOsSemObj_t Value);
-extern _SlNonOsRetVal_t _SlNonOsSpawn(_SlSpawnEntryFunc_t pEntry , void* pValue , _u32 flags);
-  
+extern _SlNonOsRetVal_t _SlNonOsSemGet(_SlNonOsSemObj_t* pSyncObj,
+        _SlNonOsSemObj_t WaitValue, _SlNonOsSemObj_t SetValue,
+        _SlNonOsTime_t Timeout);
+extern _SlNonOsRetVal_t _SlNonOsSemSet(_SlNonOsSemObj_t* pSemObj,
+        _SlNonOsSemObj_t Value);
+extern _SlNonOsRetVal_t _SlNonOsSpawn(_SlSpawnEntryFunc_t pEntry, void* pValue,
+        _u32 flags);
+
 #if (defined(_SlSyncWaitLoopCallback))
 extern void _SlSyncWaitLoopCallback(void);
 #endif
 
-
 /*****************************************************************************
 
-    Overwrite SimpleLink driver OS adaptation functions
+ Overwrite SimpleLink driver OS adaptation functions
 
 
  *****************************************************************************/

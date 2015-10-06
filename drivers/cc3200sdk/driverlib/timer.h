@@ -59,10 +59,10 @@ extern "C"
 
 #define TIMER_CFG_ONE_SHOT       0x00000021  // Full-width one-shot timer
 #define TIMER_CFG_ONE_SHOT_UP    0x00000031  // Full-width one-shot up-count
-                                             // timer
+// timer
 #define TIMER_CFG_PERIODIC       0x00000022  // Full-width periodic timer
 #define TIMER_CFG_PERIODIC_UP    0x00000032  // Full-width periodic up-count
-                                             // timer
+// timer
 #define TIMER_CFG_SPLIT_PAIR     0x04000000  // Two half-width timers
 
 #define TIMER_CFG_A_ONE_SHOT     0x00000021  // Timer A one-shot timer
@@ -121,7 +121,6 @@ extern "C"
 #define TIMER_B                 0x0000ff00  // Timer B
 #define TIMER_BOTH              0x0000ffff  // Timer Both
 
-
 //*****************************************************************************
 //
 // Values that can be passed to TimerSynchronize as the ulTimers parameter.
@@ -151,7 +150,6 @@ extern "C"
 #define TIMER_DMA_CAPMATCH_A    0x00000002
 #define TIMER_DMA_TIMEOUT_A     0x00000001
 
-
 //*****************************************************************************
 //
 // Prototypes for the APIs.
@@ -161,34 +159,32 @@ extern void TimerEnable(unsigned long ulBase, unsigned long ulTimer);
 extern void TimerDisable(unsigned long ulBase, unsigned long ulTimer);
 extern void TimerConfigure(unsigned long ulBase, unsigned long ulConfig);
 extern void TimerControlLevel(unsigned long ulBase, unsigned long ulTimer,
-                              tBoolean bInvert);
+        tBoolean bInvert);
 extern void TimerControlEvent(unsigned long ulBase, unsigned long ulTimer,
-                              unsigned long ulEvent);
+        unsigned long ulEvent);
 extern void TimerControlStall(unsigned long ulBase, unsigned long ulTimer,
-                              tBoolean bStall);
+        tBoolean bStall);
 extern void TimerPrescaleSet(unsigned long ulBase, unsigned long ulTimer,
-                             unsigned long ulValue);
+        unsigned long ulValue);
 extern unsigned long TimerPrescaleGet(unsigned long ulBase,
-                                      unsigned long ulTimer);
+        unsigned long ulTimer);
 extern void TimerPrescaleMatchSet(unsigned long ulBase, unsigned long ulTimer,
-                                  unsigned long ulValue);
+        unsigned long ulValue);
 extern unsigned long TimerPrescaleMatchGet(unsigned long ulBase,
-                                           unsigned long ulTimer);
+        unsigned long ulTimer);
 extern void TimerLoadSet(unsigned long ulBase, unsigned long ulTimer,
-                         unsigned long ulValue);
+        unsigned long ulValue);
 extern unsigned long TimerLoadGet(unsigned long ulBase, unsigned long ulTimer);
 
-extern unsigned long TimerValueGet(unsigned long ulBase,
-                                   unsigned long ulTimer);
+extern unsigned long TimerValueGet(unsigned long ulBase, unsigned long ulTimer);
 extern void TimerValueSet(unsigned long ulBase, unsigned long ulTimer,
-              unsigned long ulValue);
+        unsigned long ulValue);
 
 extern void TimerMatchSet(unsigned long ulBase, unsigned long ulTimer,
-                          unsigned long ulValue);
-extern unsigned long TimerMatchGet(unsigned long ulBase,
-                                   unsigned long ulTimer);
+        unsigned long ulValue);
+extern unsigned long TimerMatchGet(unsigned long ulBase, unsigned long ulTimer);
 extern void TimerIntRegister(unsigned long ulBase, unsigned long ulTimer,
-                             void (*pfnHandler)(void));
+        void (*pfnHandler)(void));
 extern void TimerIntUnregister(unsigned long ulBase, unsigned long ulTimer);
 extern void TimerIntEnable(unsigned long ulBase, unsigned long ulIntFlags);
 extern void TimerIntDisable(unsigned long ulBase, unsigned long ulIntFlags);
@@ -196,7 +192,6 @@ extern unsigned long TimerIntStatus(unsigned long ulBase, tBoolean bMasked);
 extern void TimerIntClear(unsigned long ulBase, unsigned long ulIntFlags);
 extern void TimerDMAEventSet(unsigned long ulBase, unsigned long ulDMAEvent);
 extern unsigned long TimerDMAEventGet(unsigned long ulBase);
-
 
 //*****************************************************************************
 //

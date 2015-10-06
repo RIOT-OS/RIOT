@@ -46,8 +46,8 @@ typedef ssize_t (*Ssock_SendFxn)(const void * ctx, int s, const void * buf,
 typedef ssize_t (*Ssock_DecryptFxn)(const void * ctx, uint8_t * opt,
         const uint8_t * ict, size_t len);
 
-typedef ssize_t (*Ssock_RecvFxn)(void * ctx, int s, void * buf,
-        size_t len, int flags);
+typedef ssize_t (*Ssock_RecvFxn)(void * ctx, int s, void * buf, size_t len,
+        int flags);
 
 typedef void (*Ssock_DeleteFxn)(void * ctx);
 

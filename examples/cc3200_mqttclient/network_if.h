@@ -51,8 +51,6 @@ extern "C"
 {
 #endif
 
-
-
 //*****************************************************************************
 //
 // API Function prototypes
@@ -62,9 +60,11 @@ extern long Network_IF_InitDriver(unsigned int uiMode);
 extern long Network_IF_DeInitDriver(void);
 extern long Network_IF_ConnectAP(char * pcSsid, SlSecParams_t SecurityParams);
 extern long Network_IF_DisconnectFromAP();
-extern long Network_IF_IpConfigGet(unsigned long *aucIP, unsigned long *aucSubnetMask,
-                unsigned long *aucDefaultGateway, unsigned long *aucDNSServer);
-extern long Network_IF_GetHostIP( char* pcHostName,unsigned long * pDestinationIP);
+extern long Network_IF_IpConfigGet(unsigned long *aucIP,
+        unsigned long *aucSubnetMask, unsigned long *aucDefaultGateway,
+        unsigned long *aucDNSServer);
+extern long Network_IF_GetHostIP(char* pcHostName,
+        unsigned long * pDestinationIP);
 extern unsigned long Network_IF_CurrentMCUState();
 extern void Network_IF_UnsetMCUMachineState(char stat);
 extern void Network_IF_SetMCUMachineState(char stat);
@@ -72,7 +72,6 @@ extern void Network_IF_ResetMCUStateMachine();
 
 // TODO: remove
 //extern unsigned short itoa(short cNum, char *cString);
-
 
 //*****************************************************************************
 //
@@ -83,5 +82,4 @@ extern void Network_IF_ResetMCUStateMachine();
 }
 #endif
 #endif
-
 

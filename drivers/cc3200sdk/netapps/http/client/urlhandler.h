@@ -48,11 +48,11 @@
 typedef struct URLHandler_Object * URLHandler_Handle;
 
 typedef URLHandler_Handle (*URLHandler_CreateFxn)(void * arg);
-typedef int (*URLHandler_ProcessFxn)(URLHandler_Handle u, int method, const char * url,
-                                     const char * urlArgs, int contentLength,
-                                     Ssock_Handle s);
-typedef void (*URLHandler_ScanFieldFxn)(URLHandler_Handle u, int method, const char * url,
-                                        const char * field);
+typedef int (*URLHandler_ProcessFxn)(URLHandler_Handle u, int method,
+        const char * url, const char * urlArgs, int contentLength,
+        Ssock_Handle s);
+typedef void (*URLHandler_ScanFieldFxn)(URLHandler_Handle u, int method,
+        const char * url, const char * field);
 typedef void (*URLHandler_DeleteFxn)(URLHandler_Handle * u);
 
 typedef struct URLHandler_Setup {

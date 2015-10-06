@@ -51,35 +51,48 @@ static const char * defPrefix = "./www/";
  * Fills in the supplied string with a content type string that
  * matches the supplied filename.
  */
-static const char * getContentType(const char * fileName)
-{
-   const char * ext = fileName;
+static const char * getContentType(const char * fileName) {
+    const char * ext = fileName;
 
-   /*  ext will point at the ".xxx" part of filename */
-   /*  If fileName does not have an extension it will point to terminating char */
-   while (*ext && *ext != '.') {
-       ext++;
-   }
+    /*  ext will point at the ".xxx" part of filename */
+    /*  If fileName does not have an extension it will point to terminating char */
+    while (*ext && *ext != '.') {
+        ext++;
+    }
 
-   if      (!strcmp(".au",    ext)) return (CONTENT_TYPE_AU);
-   else if (!strcmp(".class", ext)) return (CONTENT_TYPE_APPLET);
-   else if (!strcmp(".css",   ext)) return (CONTENT_TYPE_CSS);
-   else if (!strcmp(".doc",   ext)) return (CONTENT_TYPE_DOC);
-   else if (!strcmp(".gif",   ext)) return (CONTENT_TYPE_GIF);
-   else if (!strcmp(".htm",   ext)) return (CONTENT_TYPE_HTML);
-   else if (!strcmp(".html",  ext)) return (CONTENT_TYPE_HTML);
-   else if (!strcmp(".jpg",   ext)) return (CONTENT_TYPE_JPG);
-   else if (!strcmp(".mpg",   ext)) return (CONTENT_TYPE_MPEG);
-   else if (!strcmp(".mpeg",  ext)) return (CONTENT_TYPE_MPEG);
-   else if (!strcmp(".pdf",   ext)) return (CONTENT_TYPE_PDF);
-   else if (!strcmp(".wav",   ext)) return (CONTENT_TYPE_WAV);
-   else if (!strcmp(".zip",   ext)) return (CONTENT_TYPE_ZIP);
-   else if (!strcmp(".txt",   ext)) return (CONTENT_TYPE_PLAIN);
-   else return (CONTENT_TYPE_APPLET);
+    if (!strcmp(".au", ext))
+        return (CONTENT_TYPE_AU);
+    else if (!strcmp(".class", ext))
+        return (CONTENT_TYPE_APPLET);
+    else if (!strcmp(".css", ext))
+        return (CONTENT_TYPE_CSS);
+    else if (!strcmp(".doc", ext))
+        return (CONTENT_TYPE_DOC);
+    else if (!strcmp(".gif", ext))
+        return (CONTENT_TYPE_GIF);
+    else if (!strcmp(".htm", ext))
+        return (CONTENT_TYPE_HTML);
+    else if (!strcmp(".html", ext))
+        return (CONTENT_TYPE_HTML);
+    else if (!strcmp(".jpg", ext))
+        return (CONTENT_TYPE_JPG);
+    else if (!strcmp(".mpg", ext))
+        return (CONTENT_TYPE_MPEG);
+    else if (!strcmp(".mpeg", ext))
+        return (CONTENT_TYPE_MPEG);
+    else if (!strcmp(".pdf", ext))
+        return (CONTENT_TYPE_PDF);
+    else if (!strcmp(".wav", ext))
+        return (CONTENT_TYPE_WAV);
+    else if (!strcmp(".zip", ext))
+        return (CONTENT_TYPE_ZIP);
+    else if (!strcmp(".txt", ext))
+        return (CONTENT_TYPE_PLAIN);
+    else
+        return (CONTENT_TYPE_APPLET);
 }
 
-static long getFileSize(FILE * fp)
-{
+static long getFileSize(FILE * fp) {
     long size;
 
     fseek(fp, 0, SEEK_END);
@@ -89,8 +102,7 @@ static long getFileSize(FILE * fp)
     return (size);
 }
 
-URLHandler_Handle URLFile_create(void * params)
-{
+URLHandler_Handle URLFile_create(void * params) {
     URLFile_Handle urlfile;
     const char * prefix = params ? params : defPrefix;
 
@@ -98,13 +110,12 @@ URLHandler_Handle URLFile_create(void * params)
         strcpy(urlfile->prefix, prefix);
     }
 
-    return ((URLHandler_Handle)urlfile);
+    return ((URLHandler_Handle) urlfile);
 }
 
 int URLFile_process(URLHandler_Handle h, int method, const char * url,
-                    const char * urlArgs, int contentLength, Ssock_Handle ssock)
-{
-    URLFile_Handle u = (URLFile_Handle)h;
+        const char * urlArgs, int contentLength, Ssock_Handle ssock) {
+    URLFile_Handle u = (URLFile_Handle) h;
     FILE * fp;
     char buf[BUFSIZE];
     char fileName[PATHSIZE];
@@ -119,7 +130,7 @@ int URLFile_process(URLHandler_Handle h, int method, const char * url,
         if ((fp = fopen(fileName, "rb")) != NULL) {
 
             HTTPSrv_sendResponse(ssock, HTTP_OK, getContentType(fileName),
-                               getFileSize(fp), NULL);
+                    getFileSize(fp), NULL);
 
             while ((numRead = fread(buf, sizeof(char), sizeof(buf), fp)) > 0) {
                 Ssock_send(ssock, buf, numRead, 0);
@@ -133,9 +144,8 @@ int URLFile_process(URLHandler_Handle h, int method, const char * url,
     return (status);
 }
 
-void URLFile_delete(URLHandler_Handle * h)
-{
-    URLFile_Handle * u = (URLFile_Handle *)h;
+void URLFile_delete(URLHandler_Handle * h) {
+    URLFile_Handle * u = (URLFile_Handle *) h;
 
     free(*h);
     *u = NULL;

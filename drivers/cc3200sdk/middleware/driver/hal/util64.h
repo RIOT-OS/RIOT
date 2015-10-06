@@ -39,15 +39,15 @@
 #include "cc_types.h"
 
 /* Construct to refer to timer tick or a generic value */
-struct u64_val {    
-        u32 hi_32;
-        u32 lo_32;
+struct u64_val {
+    u32 hi_32;
+    u32 lo_32;
 };
 
 /* Construct to refer to a time (absolute or interval) */
 struct u64_time {
-        u32 secs;   /* Range: 0 to 0xFFFFFFFF secs */
-        u32 nsec;   /* Range: 0 to  999999999 nsec */
+    u32 secs; /* Range: 0 to 0xFFFFFFFF secs */
+    u32 nsec; /* Range: 0 to  999999999 nsec */
 };
 
 /* Add (32bit) nano-second values. Result may indicate a 'carry' second */
@@ -55,34 +55,30 @@ void util_u32_nsec_add(u32 nsec_1, u32 nsec_2, struct u64_time *result);
 
 /* Add two time values */
 void util_u64_time_add(const struct u64_time *time_1,
-                       const struct u64_time *time_2, 
-                       struct u64_time       *result);
+        const struct u64_time *time_2, struct u64_time *result);
 
 /* Add two 32bit data values. Result may indicate a 'carry' value */
 void util_u32_data_add(u32 data_1, u32 data_2, struct u64_val *result);
 
 /* Add two 64bit data values. */
-void util_u64_data_add(struct u64_val *value1, struct u64_val *value2, 
-                       struct u64_val *result);
+void util_u64_data_add(struct u64_val *value1, struct u64_val *value2,
+        struct u64_val *result);
 
 /* Subtract 32bit nsec values. Result may indicate a 'borrow' value.
-   A 'borrow' value is 0xFFFFFFFF.
-*/
-void util_u32_nsec_sub(u32 from_nsec, u32 this_nsec,
-                       struct u64_time *result);
+ A 'borrow' value is 0xFFFFFFFF.
+ */
+void util_u32_nsec_sub(u32 from_nsec, u32 this_nsec, struct u64_time *result);
 
 /* Subtract 32bit nsec values. Result may indicate a 'borrow' second.
-   A 'borrow' second is 0xFFFFFFFF. */
-void util_u64_time_sub(struct u64_time *from,
-                       struct u64_time *this,
-                       struct u64_time *outp);
+ A 'borrow' second is 0xFFFFFFFF. */
+void util_u64_time_sub(struct u64_time *from, struct u64_time *this,
+        struct u64_time *outp);
 
 /* Returns: 1 for val1 > val2; 0 for val1 = val2; -1 for val1 < val2 */
 i32 util_u32_data_cmp(u32 val1, u32 val2);
 
 /* Returns: 1 for val1 > val2; 0 for val1 = val2; -1 for val1 < val2 */
-i32 util_u64_data_cmp(struct u64_val *u64_val1,
-                             struct u64_val *u64_val2);
+i32 util_u64_data_cmp(struct u64_val *u64_val1, struct u64_val *u64_val2);
 
 /* TBD: u64 sub */
 

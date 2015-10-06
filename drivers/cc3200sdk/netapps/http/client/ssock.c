@@ -35,12 +35,10 @@
 /* should come from some SL header */
 #define MAXSENDLEN 1460
 
-
 /*
  *  ======== Ssock_construct ========
  */
-void Ssock_construct(Ssock_Struct * ssockP, int s)
-{
+void Ssock_construct(Ssock_Struct * ssockP, int s) {
     if (ssockP) {
         ssockP->s = s;
 
@@ -58,8 +56,7 @@ void Ssock_construct(Ssock_Struct * ssockP, int s)
 /*
  *  ======== Ssock_create ========
  */
-Ssock_Handle Ssock_create(int s)
-{
+Ssock_Handle Ssock_create(int s) {
     Ssock_Handle ssock;
 
     if ((ssock = xmalloc(sizeof(Ssock_Struct)))) {
@@ -72,8 +69,7 @@ Ssock_Handle Ssock_create(int s)
 /*
  *  ======== Ssock_delete ========
  */
-void Ssock_delete(Ssock_Handle * ssock)
-{
+void Ssock_delete(Ssock_Handle * ssock) {
     if (ssock && *ssock) {
         Ssock_Handle ss = *ssock;
         Ssock_destruct(ss);
@@ -85,8 +81,7 @@ void Ssock_delete(Ssock_Handle * ssock)
 /*
  *  ======== Ssock_destruct ========
  */
-void Ssock_destruct(Ssock_Struct * ssockP)
-{
+void Ssock_destruct(Ssock_Struct * ssockP) {
     if (ssockP) {
         if (ssockP->ctx && ssockP->sec.del) {
             ssockP->sec.del(ssockP->ctx);
@@ -108,22 +103,19 @@ void Ssock_destruct(Ssock_Struct * ssockP)
 /*
  *  ======== Ssock_getSocket ========
  */
-int Ssock_getSocket(Ssock_Handle ssock)
-{
+int Ssock_getSocket(Ssock_Handle ssock) {
     return (ssock->s);
 }
 
 /*
  *  ======== Ssock_recv ========
  */
-ssize_t Ssock_recv(Ssock_Handle ssock, void * buf, size_t len, int flags)
-{
+ssize_t Ssock_recv(Ssock_Handle ssock, void * buf, size_t len, int flags) {
     ssize_t numRead;
 
     if (ssock->ctx) {
         numRead = ssock->sec.recv(ssock->ctx, ssock->s, buf, len, flags);
-    }
-    else {
+    } else {
         numRead = recv(ssock->s, buf, len, flags);
     }
 
@@ -152,17 +144,15 @@ ssize_t Ssock_recv(Ssock_Handle ssock, void * buf, size_t len, int flags)
 /*
  *  ======== Ssock_recvall ========
  */
-ssize_t Ssock_recvall(Ssock_Handle ssock, void * buf, size_t len, int flags)
-{
+ssize_t Ssock_recvall(Ssock_Handle ssock, void * buf, size_t len, int flags) {
     ssize_t nbytes;
 
     while (len > 0) {
         nbytes = Ssock_recv(ssock, buf, len, flags);
         if (nbytes > 0) {
             len -= nbytes;
-            buf = (uint8_t *)buf + nbytes;
-        }
-        else {
+            buf = (uint8_t *) buf + nbytes;
+        } else {
             break;
         }
     }
@@ -173,8 +163,7 @@ ssize_t Ssock_recvall(Ssock_Handle ssock, void * buf, size_t len, int flags)
 /*
  *  ======== Ssock_send ========
  */
-ssize_t Ssock_send(Ssock_Handle ssock, const void * buf, size_t len, int flags)
-{
+ssize_t Ssock_send(Ssock_Handle ssock, const void * buf, size_t len, int flags) {
     ssize_t nbytes;
     ssize_t status = -1;
     uint8_t * cbuf = NULL;
@@ -209,20 +198,17 @@ ssize_t Ssock_send(Ssock_Handle ssock, const void * buf, size_t len, int flags)
                 /* set to how many bytes actually sent from the input buffer */
                 nbytes = ilen;
             }
-        }
-        else if (ssock->ctx) {
+        } else if (ssock->ctx) {
             nbytes = ssock->sec.send(ssock->ctx, ssock->s, buf, ilen, flags);
-        }
-        else {
+        } else {
             nbytes = send(ssock->s, buf, ilen, flags);
         }
 
         if (nbytes >= 0) {
             len -= nbytes;
-            buf = (uint8_t *)buf + nbytes;
-            status = status == -1? nbytes : (status + nbytes);
-        }
-        else {
+            buf = (uint8_t *) buf + nbytes;
+            status = status == -1 ? nbytes : (status + nbytes);
+        } else {
 #ifdef __SLP__
             nbytes = errno(ssock->s);
             if (nbytes != EWOULDBLOCK) {
@@ -249,8 +235,7 @@ ssize_t Ssock_send(Ssock_Handle ssock, const void * buf, size_t len, int flags)
 /*
  *  ======== Ssock_startSecure ========
  */
-int Ssock_startSecure(Ssock_Handle ssock, Ssock_SecureFxns * sec, void * ctx)
-{
+int Ssock_startSecure(Ssock_Handle ssock, Ssock_SecureFxns * sec, void * ctx) {
     if (ssock->ctx || !sec || !ctx) {
         return (-1);
     }

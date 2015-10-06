@@ -11,7 +11,6 @@
 //
 //*****************************************************************************
 
-
 #ifndef HTTPSOCKET_H_
 #define HTTPSOCKET_H_
 
@@ -22,7 +21,6 @@
  * @{
  */
 
-
 #include "HttpCore.h"
 
 // Max number of times server must retry to setup connection
@@ -30,7 +28,6 @@
 
 #define SL_SSL_SRV_KEY    			"/cert/serverkey.der"   /* Server key file ID */
 #define SL_SSL_SRV_CERT  			  "/cert/servercert.der"  /* Server certificate file ID */
-
 
 //****************************************************************************
 //
@@ -124,9 +121,6 @@ int ClientSocketSend(long socket, char * buffer, unsigned int len);
 //
 //****************************************************************************
 int CloseTCPServerSocket(int iSockDesc);
-
-
-
 
 #endif /* HTTPSOCKET_H_ */
 

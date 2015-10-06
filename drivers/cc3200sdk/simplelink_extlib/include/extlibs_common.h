@@ -11,7 +11,7 @@
  * stipulated in the agreement under which this program has been supplied,
  * and under no circumstances can it be used with non-TI connectivity device.
  *
-*/
+ */
 #ifndef __EXTLIBS_COMMON_H__
 #define __EXTLIBS_COMMON_H__
 
@@ -23,9 +23,8 @@ extern "C" {
 #include <stdio.h>
 #include <string.h>
 
-/* open Report for debug */
+    /* open Report for debug */
 //#define DEBUG_PRINT
-
 #ifdef _WIN32
 
 #ifdef DEBUG_PRINT
@@ -37,11 +36,10 @@ extern "C" {
 #else
 
 #ifdef DEBUG_PRINT
-extern void Report(_u8 *format, ...);
+    extern void Report(_u8 *format, ...);
 #else
 #define Report(...)
 #endif
-
 
 #endif
 
