@@ -1,5 +1,5 @@
 MODULE = cc3200sdk
 
-DIRS += simplelink netapps oslib driverlib
+DIRS += simplelink oslib driverlib
 
 include $(RIOTBASE)/Makefile.base
