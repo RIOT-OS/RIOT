@@ -32,9 +32,17 @@
 
 #include "board.h"
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 #define __ASM            __asm
 #define __STATIC_INLINE  static inline
 
 #define SW_TIMERS_EXAUSTED 111
+
+ #ifdef __cplusplus
+} /* end extern "C" */
+#endif
 
 #endif /* CPU_INCLUDE_CC3200_H_ */
