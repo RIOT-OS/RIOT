@@ -533,4 +533,3 @@ _i16 http_connect_server(_u8 *ServerName, _i32 IpAddr, _i32 port, _i32 secured,
 
     return SockID;
 }
-

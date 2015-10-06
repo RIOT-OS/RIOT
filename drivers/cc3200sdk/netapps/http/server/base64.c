@@ -62,4 +62,3 @@ void ConvertToBase64(char *pcOutStr, const char *pccInStr, int iLen) {
 }
 
 /// @}
-

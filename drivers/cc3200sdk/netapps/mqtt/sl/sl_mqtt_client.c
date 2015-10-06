@@ -691,4 +691,3 @@ _const void *data, _i32 len, char qos_level, bool retain) {
     mqtt_pub_exit1: client_ctx->awaited_ack = 0;
     return (ret < 0) ? -1 : 0;
 }
-

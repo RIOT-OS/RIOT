@@ -1724,4 +1724,3 @@ void _SlDrvMemZero(void* Addr, _u16 size) {
 void _SlDrvResetCmdExt(_SlCmdExt_t* pCmdExt) {
     _SlDrvMemZero(pCmdExt, sizeof(_SlCmdExt_t));
 }
-

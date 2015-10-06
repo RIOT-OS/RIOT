@@ -133,4 +133,3 @@ _i32 sl_NetCfgGet(const _u8 ConfigId, _u8 *pConfigOpt, _u8 *pConfigLen,
     return (_i16) Msg.Rsp.Status;
 }
 #endif
-

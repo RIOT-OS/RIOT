@@ -1540,4 +1540,3 @@ extern "C" {
 #endif /* __cplusplus */
 
 #endif /* __SOCKET_H__ */
-

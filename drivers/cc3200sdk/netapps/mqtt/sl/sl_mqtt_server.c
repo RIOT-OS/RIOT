@@ -145,4 +145,3 @@ _const SlMqttServerCbs_t *app_cbs) {
 void VMqttServerRunTask(void *pvParams) {
     mqtt_server_run(g_srvr_wait_secs);
 }
-

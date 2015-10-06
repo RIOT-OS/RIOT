@@ -192,4 +192,3 @@ i32 plugin_init(const struct plugin_core_msg_cbs *cbs) {
     USR_INFO("Plugin module has been initialized.\n\r");
     return 0;
 }
-

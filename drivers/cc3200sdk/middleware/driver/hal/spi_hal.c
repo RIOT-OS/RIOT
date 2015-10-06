@@ -438,4 +438,3 @@ i32 cc_spi_control(cc_hndl hndl, enum cc_spi_ctl cmd, void *arg) {
 
     return retval;
 }
-

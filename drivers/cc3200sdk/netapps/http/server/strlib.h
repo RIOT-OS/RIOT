@@ -16,4 +16,3 @@ char *strrev(char *str);
 void WordToBytes(void *pBuff, void const*pvalue, unsigned int NumBytes);
 int String_utoa(int uNum, char *pString);
 int iptostring(unsigned char *ip, char *ipstring);
-

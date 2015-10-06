@@ -271,4 +271,3 @@ extern "C" {
 #endif /*  __cplusplus */
 
 #endif    /*  __NETCFG_H__ */
-

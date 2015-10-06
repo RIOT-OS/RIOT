@@ -346,4 +346,3 @@ struct arm_CM4_core_regs {
 };
 
 #endif //__CC_PM_H__
-

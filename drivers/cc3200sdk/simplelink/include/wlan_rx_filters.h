@@ -883,4 +883,3 @@ extern "C" {
 #endif /*  __cplusplus */
 
 #endif /* RX_FILTERS_PREPROCESSOR_CLI_IF_H_ */
-

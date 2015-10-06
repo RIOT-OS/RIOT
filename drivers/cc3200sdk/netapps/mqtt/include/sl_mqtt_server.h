@@ -297,4 +297,3 @@ _i32 sl_ExtLib_MqttServerSend(_const char *topic, _const void *data, _i32 len,
 #endif
 
 #endif // __SL_MQTT_SRVR_H__
-

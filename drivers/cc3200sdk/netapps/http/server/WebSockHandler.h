@@ -112,4 +112,3 @@ void WebSocketCloseSessionHandler(void);
  * This is a call back function from the library. User is informed that the connection has been closed.
  */
 #define sl_WebSocketCloseEvtHdlr			WebSocketCloseSessionHandler
-

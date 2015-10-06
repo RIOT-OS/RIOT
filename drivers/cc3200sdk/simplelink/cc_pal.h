@@ -191,4 +191,3 @@ void NwpPowerOn(void);
 #endif // __cplusplus
 
 #endif
-

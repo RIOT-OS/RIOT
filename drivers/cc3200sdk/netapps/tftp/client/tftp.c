@@ -802,4 +802,3 @@ void mmCopy(void* pDst, void* pSrc, unsigned long Size) {
 void mmZeroInit(void* pDst, unsigned long Size) {
     memset(pDst, 0, Size);
 }
-

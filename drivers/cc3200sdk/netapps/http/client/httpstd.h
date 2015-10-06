@@ -106,4 +106,3 @@ static inline int is5xx(int status) {
 }
 #endif /* __cplusplus */
 #endif /* _HTTPSTD_H_ */
-

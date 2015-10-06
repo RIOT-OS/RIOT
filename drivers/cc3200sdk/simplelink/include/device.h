@@ -632,4 +632,3 @@ extern "C" {
 #endif /*  __cplusplus */
 
 #endif  /*  __DEVICE_H__ */
-

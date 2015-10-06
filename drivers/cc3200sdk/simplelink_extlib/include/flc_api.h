@@ -224,4 +224,3 @@ _i32 sl_extlib_FlcAbortFile(_i32 fileHandle);
 #endif /* __cplusplus */
 
 #endif /*  __FLC_API_H__ */
-

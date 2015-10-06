@@ -591,4 +591,3 @@ _i32 recv_from(_i32 comm, _u8 *buf, _u32 len, _u16 *from_port, _u8 *from_ip,
     return (iStatus);
 
 }    // end of function
-

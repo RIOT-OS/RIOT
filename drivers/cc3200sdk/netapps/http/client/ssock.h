@@ -90,4 +90,3 @@ extern int Ssock_startSecure(Ssock_Handle ss, Ssock_SecureFxns * sec,
         void * ctx);
 
 #endif /* _SSOCK_H */
-

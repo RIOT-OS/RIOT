@@ -143,4 +143,3 @@ long sl_NetAppEmailSend(char* Destination, char* Subject, char* Message,
 #endif // __cplusplus
 
 #endif	// __NETAPP_H__
-

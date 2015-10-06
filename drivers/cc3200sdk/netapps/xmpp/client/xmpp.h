@@ -161,4 +161,3 @@ signed char sl_NetAppXmppSend(unsigned char* pRemoteJid, unsigned short Jidlen,
 #endif // __cplusplus
 
 #endif	// __NETAPP_H__
-

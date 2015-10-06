@@ -113,4 +113,3 @@ i32 cc_get_pm_ops(struct platform_pm_ops *cc_pm_ops);
 void wake_interrupt_handler(void);
 
 #endif // __CC_PM_OPS_H__
-

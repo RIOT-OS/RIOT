@@ -423,4 +423,3 @@ _i32 _ReadStatFile(_u8 *buf, _i32 buf_len) {
     /*Report("_ReadStatFile: success\n"); */
     return OTA_STATUS_OK;
 }
-

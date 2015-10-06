@@ -252,4 +252,3 @@ i32 mqtt_server_init(const struct mqtt_server_lib_cfg *lib_cfg,
 /** @} *//* End of server_daemon */
 
 #endif
-

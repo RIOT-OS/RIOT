@@ -187,4 +187,3 @@ _i32 sl_extlib_FlcAbortFile(_i32 fileHandle) {
     /* Close the file with signature 'A' which is ABORT */
     return sl_extlib_FlcCloseFile(fileHandle, 0, &abortSig, 1);
 }
-

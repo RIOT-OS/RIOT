@@ -69,4 +69,3 @@ i32 plugin_publish(u8 pg_map, const struct utf8_string *topic,
 i32 plugin_disconn(const void *app_usr, bool due2err);
 
 #endif
-

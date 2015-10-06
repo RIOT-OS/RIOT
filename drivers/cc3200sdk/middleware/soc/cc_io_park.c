@@ -143,4 +143,3 @@ i32 cc_set_default(struct soc_io_park *io_park_choice, u8 num_pins) {
 
     return 0;
 }
-

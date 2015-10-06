@@ -1639,4 +1639,3 @@ int HTTPCli_readRawResponseBody(HTTPCli_Handle cli, char *body, int len) {
 void HTTPCli_setProxy(const struct sockaddr *addr) {
     proxyAddr = *addr;
 }
-

@@ -320,4 +320,3 @@ void HttpAuth_RequestAuthenticate(struct HttpRequest* pRequest, struct HttpBlob 
 #endif
 
 /// @}
-

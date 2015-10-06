@@ -1277,4 +1277,3 @@ extern "C" {
 #endif /*  __cplusplus */
 
 #endif    /*  __WLAN_H__ */
-

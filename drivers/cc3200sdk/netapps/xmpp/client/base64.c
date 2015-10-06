@@ -73,4 +73,3 @@ long ConvertToBase64(char *pcOutStr, const char *pccInStr, int iLen) {
     return 0;
 
 }
-

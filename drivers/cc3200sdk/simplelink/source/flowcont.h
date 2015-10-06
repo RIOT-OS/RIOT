@@ -56,4 +56,3 @@ extern "C" {
 #endif /* __cplusplus */
 
 #endif /* __FLOWCONT_H__ */
-

@@ -115,4 +115,3 @@ struct tftphdr {
 #define ENOUSER         7       // no such user
 
 #endif
-

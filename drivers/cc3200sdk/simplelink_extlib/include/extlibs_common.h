@@ -48,4 +48,3 @@ extern "C" {
 #endif /* __cplusplus */
 
 #endif /*  __EXTLIBS_COMMON_H__ */
-

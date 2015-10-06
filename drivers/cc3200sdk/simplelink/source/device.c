@@ -494,4 +494,3 @@ _i16 sl_UartSetMode(const SlUartIfParams_t* pUartParams)
 }
 #endif
 #endif
-

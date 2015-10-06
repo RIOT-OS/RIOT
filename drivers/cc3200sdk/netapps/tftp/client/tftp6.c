@@ -611,4 +611,3 @@ int Nt6TftpRecv (IP6N TftpIP, UINT32 scope_id, char *szFileName, char *FileBuffe
 }
 
 #endif /* _INCLUDE_IPv6_CODE */
-

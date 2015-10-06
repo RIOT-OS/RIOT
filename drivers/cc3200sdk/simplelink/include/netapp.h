@@ -871,4 +871,3 @@ extern "C" {
 #endif /*  __cplusplus */
 
 #endif    /*  __NETAPP_H__ */
-

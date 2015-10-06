@@ -113,4 +113,3 @@ i32 cc_timer_register_hwt_ops(u32 source, cc_hndl hwt_hndl,
         struct hw_timer_ops *hwt_ops);
 
 #endif //_CC_TIMER_H_
-

@@ -841,4 +841,3 @@ long _sendSMTPCommand(long socket, char* cmd, char* cmdparam, char* respBuf) {
 #ifdef  __cplusplus
 }
 #endif // __cplusplus
-
