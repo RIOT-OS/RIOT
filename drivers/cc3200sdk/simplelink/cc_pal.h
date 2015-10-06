@@ -43,147 +43,141 @@
 extern "C" {
 #endif
 
-
-
-
 /*!
-	\brief type definition for the spi channel file descriptor
+ \brief type definition for the spi channel file descriptor
 
-	\note	On each porting or platform the type could be whatever is needed - integer, pointer to structure etc.
-*/
+ \note	On each porting or platform the type could be whatever is needed - integer, pointer to structure etc.
+ */
 typedef int Fd_t;
 
-
 /*!
-	\brief 	type definition for the host interrupt handler
+ \brief 	type definition for the host interrupt handler
 
-	\param 	pValue	-	pointer to any memory strcuture. The value of this pointer is givven on
-						registration of a new interrupt handler
+ \param 	pValue	-	pointer to any memory strcuture. The value of this pointer is givven on
+ registration of a new interrupt handler
 
-	\note
-*/
+ \note
+ */
 
 typedef void (*SL_P_EVENT_HANDLER)(void);
 
 #define P_EVENT_HANDLER SL_P_EVENT_HANDLER
 
 /*!
-    \brief open spi communication port to be used for communicating with a SimpleLink device
+ \brief open spi communication port to be used for communicating with a SimpleLink device
 
-	Given an interface name and option flags, this function opens the spi communication port
-	and creates a file descriptor. This file descriptor can be used afterwards to read and
-	write data from and to this specific spi channel.
-	The SPI speed, clock polarity, clock phase, chip select and all other attributes are all
-	set to hardcoded values in this function.
+ Given an interface name and option flags, this function opens the spi communication port
+ and creates a file descriptor. This file descriptor can be used afterwards to read and
+ write data from and to this specific spi channel.
+ The SPI speed, clock polarity, clock phase, chip select and all other attributes are all
+ set to hardcoded values in this function.
 
-	\param	 		ifName		-	points to the interface name/path. The interface name is an
-									optional attributes that the simple link driver receives
-									on opening the device. in systems that the spi channel is
-									not implemented as part of the os device drivers, this
-									parameter could be NULL.
-	\param			flags		-	option flags
+ \param	 		ifName		-	points to the interface name/path. The interface name is an
+ optional attributes that the simple link driver receives
+ on opening the device. in systems that the spi channel is
+ not implemented as part of the os device drivers, this
+ parameter could be NULL.
+ \param			flags		-	option flags
 
-	\return			upon successful completion, the function shall open the spi channel and return
-					a non-negative integer representing the file descriptor.
-					Otherwise, -1 shall be returned
+ \return			upon successful completion, the function shall open the spi channel and return
+ a non-negative integer representing the file descriptor.
+ Otherwise, -1 shall be returned
 
-    \sa             spi_Close , spi_Read , spi_Write
-	\note
-    \warning
-*/
+ \sa             spi_Close , spi_Read , spi_Write
+ \note
+ \warning
+ */
 Fd_t spi_Open(char *ifName, unsigned long flags);
 
 /*!
-    \brief closes an opened spi communication port
+ \brief closes an opened spi communication port
 
-	\param	 		fd			-	file descriptor of an opened SPI channel
+ \param	 		fd			-	file descriptor of an opened SPI channel
 
-	\return			upon successful completion, the function shall return 0.
-					Otherwise, -1 shall be returned
+ \return			upon successful completion, the function shall return 0.
+ Otherwise, -1 shall be returned
 
-    \sa             spi_Open
-	\note
-    \warning
-*/
+ \sa             spi_Open
+ \note
+ \warning
+ */
 int spi_Close(Fd_t fd);
 
 /*!
-    \brief attempts to read up to len bytes from SPI channel into a buffer starting at pBuff.
+ \brief attempts to read up to len bytes from SPI channel into a buffer starting at pBuff.
 
-	\param	 		fd			-	file descriptor of an opened SPI channel
+ \param	 		fd			-	file descriptor of an opened SPI channel
 
-	\param			pBuff		- 	points to first location to start writing the data
+ \param			pBuff		- 	points to first location to start writing the data
 
-	\param			len			-	number of bytes to read from the SPI channel
+ \param			len			-	number of bytes to read from the SPI channel
 
-	\return			upon successful completion, the function shall return 0.
-					Otherwise, -1 shall be returned
+ \return			upon successful completion, the function shall return 0.
+ Otherwise, -1 shall be returned
 
-    \sa             spi_Open , spi_Write
-	\note
-    \warning
-*/
+ \sa             spi_Open , spi_Write
+ \note
+ \warning
+ */
 int spi_Read(Fd_t fd, unsigned char *pBuff, int len);
 
 /*!
-    \brief attempts to write up to len bytes to the SPI channel
+ \brief attempts to write up to len bytes to the SPI channel
 
-	\param	 		fd			-	file descriptor of an opened SPI channel
+ \param	 		fd			-	file descriptor of an opened SPI channel
 
-	\param			pBuff		- 	points to first location to start getting the data from
+ \param			pBuff		- 	points to first location to start getting the data from
 
-	\param			len			-	number of bytes to write to the SPI channel
+ \param			len			-	number of bytes to write to the SPI channel
 
-	\return			upon successful completion, the function shall return 0.
-					Otherwise, -1 shall be returned
+ \return			upon successful completion, the function shall return 0.
+ Otherwise, -1 shall be returned
 
-    \sa             spi_Open , spi_Read
-	\note			This function could be implemented as zero copy and return only upon successful completion
-					of writing the whole buffer, but in cases that memory allocation is not too tight, the
-					function could copy the data to internal buffer, return back and complete the write in
-					parallel to other activities as long as the other SPI activities would be blocked untill
-					the entire buffer write would be completed
-    \warning
-*/
+ \sa             spi_Open , spi_Read
+ \note			This function could be implemented as zero copy and return only upon successful completion
+ of writing the whole buffer, but in cases that memory allocation is not too tight, the
+ function could copy the data to internal buffer, return back and complete the write in
+ parallel to other activities as long as the other SPI activities would be blocked untill
+ the entire buffer write would be completed
+ \warning
+ */
 int spi_Write(Fd_t fd, unsigned char *pBuff, int len);
 
 /*!
-    \brief register an interrupt handler for the host IRQ
+ \brief register an interrupt handler for the host IRQ
 
-	\param	 		InterruptHdl	-	pointer to interrupt handler function
+ \param	 		InterruptHdl	-	pointer to interrupt handler function
 
-	\param 			pValue			-	pointer to a memory strcuture that is passed to the interrupt handler.
+ \param 			pValue			-	pointer to a memory strcuture that is passed to the interrupt handler.
 
-	\return			upon successful registration, the function shall return 0.
-					Otherwise, -1 shall be returned
+ \return			upon successful registration, the function shall return 0.
+ Otherwise, -1 shall be returned
 
-    \sa
-	\note			If there is already registered interrupt handler, the function should overwrite the old handler
-					with the new one
-    \warning
-*/
-int NwpRegisterInterruptHandler(P_EVENT_HANDLER InterruptHdl , void* pValue);
-
+ \sa
+ \note			If there is already registered interrupt handler, the function should overwrite the old handler
+ with the new one
+ \warning
+ */
+int NwpRegisterInterruptHandler(P_EVENT_HANDLER InterruptHdl, void* pValue);
 
 /*!
-    \brief 				Masks host IRQ
+ \brief 				Masks host IRQ
 
 
-    \sa             		NwpUnMaskInterrupt
+ \sa             		NwpUnMaskInterrupt
 
-    \warning
-*/
+ \warning
+ */
 void NwpMaskInterrupt();
 
-
 /*!
-    \brief 				Unmasks host IRQ
+ \brief 				Unmasks host IRQ
 
 
-    \sa             		NwpMaskInterrupt
+ \sa             		NwpMaskInterrupt
 
-    \warning
-*/
+ \warning
+ */
 void NwpUnMaskInterrupt();
 
 void NwpPowerOnPreamble(void);
@@ -192,11 +186,9 @@ void NwpPowerOff(void);
 
 void NwpPowerOn(void);
 
-
 #ifdef  __cplusplus
 }
 #endif // __cplusplus
-
 
 #endif
 

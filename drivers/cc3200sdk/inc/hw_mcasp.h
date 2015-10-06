@@ -47,29 +47,29 @@
 #define MCASP_O_PDIR            0x00000014
 #define MCASP_O_PDOUT           0x00000018
 #define MCASP_O_PDSET           0x0000001C  // The pin data set register
-                                            // (PDSET) is an alias of the pin
-                                            // data output register (PDOUT) for
-                                            // writes only. Writing a 1 to the
-                                            // PDSET bit sets the corresponding
-                                            // bit in PDOUT and if PFUNC = 1
-                                            // (GPIO function) and PDIR = 1
-                                            // (output) drives a logic high on
-                                            // the pin.
+// (PDSET) is an alias of the pin
+// data output register (PDOUT) for
+// writes only. Writing a 1 to the
+// PDSET bit sets the corresponding
+// bit in PDOUT and if PFUNC = 1
+// (GPIO function) and PDIR = 1
+// (output) drives a logic high on
+// the pin.
 #define MCASP_O_PDIN            0x0000001C  // The pin data input register
-                                            // (PDIN) holds the I/O pin state of
-                                            // each of the McASP pins. PDIN
-                                            // allows the actual value of the
-                                            // pin to be read regardless of the
-                                            // state of PFUNC and PDIR.
+// (PDIN) holds the I/O pin state of
+// each of the McASP pins. PDIN
+// allows the actual value of the
+// pin to be read regardless of the
+// state of PFUNC and PDIR.
 #define MCASP_O_PDCLR           0x00000020  // The pin data clear register
-                                            // (PDCLR) is an alias of the pin
-                                            // data output register (PDOUT) for
-                                            // writes only. Writing a 1 to the
-                                            // PDCLR bit clears the
-                                            // corresponding bit in PDOUT and if
-                                            // PFUNC = 1 (GPIO function) and
-                                            // PDIR = 1 (output) drives a logic
-                                            // low on the pin.
+// (PDCLR) is an alias of the pin
+// data output register (PDOUT) for
+// writes only. Writing a 1 to the
+// PDCLR bit clears the
+// corresponding bit in PDOUT and if
+// PFUNC = 1 (GPIO function) and
+// PDIR = 1 (output) drives a logic
+// low on the pin.
 #define MCASP_O_TLGC            0x00000030  // for IODFT
 #define MCASP_O_TLMR            0x00000034  // for IODFT
 #define MCASP_O_TLEC            0x00000038  // for IODFT
@@ -178,7 +178,6 @@
 #define	MCASP_0_WFIFOSTS	0x00001004
 #define	MCASP_0_RFIFOCTL	0x00001008
 #define	MCASP_0_RFIFOSTS	0x0000100C
-
 
 //******************************************************************************
 //
@@ -403,7 +402,7 @@
 #define MCASP_TLGC_RESV_M       0xFFFF0000  // Reserved
 #define MCASP_TLGC_RESV_S       16
 #define MCASP_TLGC_MT_M         0x0000C000  // MISR on/off trigger command 0x0
-                                            // 0x1 0x2 0x3
+// 0x1 0x2 0x3
 #define MCASP_TLGC_MT_S         14
 #define MCASP_TLGC_RESV1_M      0x00003E00  // Reserved
 #define MCASP_TLGC_RESV1_S      9
@@ -413,10 +412,10 @@
 #define MCASP_TLGC_MC_M         0x00000030  // States of MISR 0x0 0x1 0x2 0x3
 #define MCASP_TLGC_MC_S         4
 #define MCASP_TLGC_PC_M         0x0000000E  // Pattern code 0x0 0x1 0x2 0x3 0x4
-                                            // 0x5 0x6 0x7
+// 0x5 0x6 0x7
 #define MCASP_TLGC_PC_S         1
 #define MCASP_TLGC_TM           0x00000001  // Tie high; do not write to this
-                                            // bit 0 1
+// bit 0 1
 //******************************************************************************
 //
 // The following are defines for the bit fields in the MCASP_O_TLMR register.
@@ -430,8 +429,8 @@
 //
 //******************************************************************************
 #define MCASP_TLEC_TLEC_M       0xFFFFFFFF  // Contains number of cycles during
-                                            // which MISR sig will be
-                                            // accumulated.
+// which MISR sig will be
+// accumulated.
 #define MCASP_TLEC_TLEC_S       0
 //******************************************************************************
 //
@@ -463,7 +462,7 @@
 #define MCASP_AMUTE_ROVRN       0x00000020  // RCV overun occurs 0 1
 #define MCASP_AMUTE_INSTAT      0x00000010
 #define MCASP_AMUTE_INEN        0x00000008  // drive AMUTE active on mute in
-                                            // active 0 1
+// active 0 1
 #define MCASP_AMUTE_INPOL       0x00000004  // Mute input polarity 0 1
 #define MCASP_AMUTE_MUTEN_M     0x00000003  // AMUTE pin enable 0x0 0x1 0x2
 #define MCASP_AMUTE_MUTEN_S     0
@@ -474,7 +473,7 @@
 //******************************************************************************
 #define MCASP_LBCTL_IOLBEN      0x00000010  // IO loopback enable 0 1
 #define MCASP_LBCTL_MODE_M      0x0000000C  // Loop back clock source generator
-                                            // 0x0 0x1 0x2 0x3
+// 0x0 0x1 0x2 0x3
 #define MCASP_LBCTL_MODE_S      2
 #define MCASP_LBCTL_ORD         0x00000002  // Loopback order 0 1
 #define MCASP_LBCTL_DLBEN       0x00000001  // Loop back mode 0 1
@@ -544,8 +543,8 @@
 //
 //******************************************************************************
 #define MCASP_RXFMT_RDATDLY_M   0x00030000  // RCV Frame sync delay 0x0 0 Bit
-                                            // delay 0x1 1 Bit delay 0x2 2 Bit
-                                            // delay
+// delay 0x1 1 Bit delay 0x2 2 Bit
+// delay
 #define MCASP_RXFMT_RDATDLY_S   16
 #define MCASP_RXFMT_RRVRS       0x00008000  // RCV serial stream bit order 0 1
 #define MCASP_RXFMT_RPAD_M      0x00006000  // Pad value 0x0 0x1 0x2
@@ -553,13 +552,13 @@
 #define MCASP_RXFMT_RPBIT_M     0x00001F00  // Pad bit position
 #define MCASP_RXFMT_RPBIT_S     8
 #define MCASP_RXFMT_RSSZ_M      0x000000F0  // RCV slot Size 0x0 0x1 0x2 0x3
-                                            // 0x4 0x5 0x6 0x7 0x8 0x9 0xA 0xB
-                                            // 0xC 0xD 0xE 0xF
+// 0x4 0x5 0x6 0x7 0x8 0x9 0xA 0xB
+// 0xC 0xD 0xE 0xF
 #define MCASP_RXFMT_RSSZ_S      4
 #define MCASP_RXFMT_RBUSEL      0x00000008  // Write to RBUF using CPU/DMA 0
-                                            // DMA port access 1 CPU port Access
+// DMA port access 1 CPU port Access
 #define MCASP_RXFMT_RROT_M      0x00000007  // Right Rotate Value 0x0 0x1 0x2
-                                            // 0x3 0x4 0x5 0x6 0x7
+// 0x3 0x4 0x5 0x6 0x7
 #define MCASP_RXFMT_RROT_S      0
 //******************************************************************************
 //
@@ -603,7 +602,7 @@
 #define MCASP_AHCLKRCTL_HCLKRADJ_S 16
 #define MCASP_AHCLKRCTL_HCLKRM  0x00008000  // High Freq. RCV clock Source 0 1
 #define MCASP_AHCLKRCTL_HCLKRP  0x00004000  // High Freq. clock Polarity Before
-                                            // diviser 0 1
+// diviser 0 1
 #define MCASP_AHCLKRCTL_HCLKRDIV_M \
                                 0x00000FFF  // RCV clock Divide Ratio
 
@@ -614,69 +613,69 @@
 //
 //******************************************************************************
 #define MCASP_RXTDM_RTDMS31     0x80000000  // RCV mode during TDM time slot 31
-                                            // 0 1
+// 0 1
 #define MCASP_RXTDM_RTDMS30     0x40000000  // RCV mode during TDM time slot 30
-                                            // 0 1
+// 0 1
 #define MCASP_RXTDM_RTDMS29     0x20000000  // RCV mode during TDM time slot 29
-                                            // 0 1
+// 0 1
 #define MCASP_RXTDM_RTDMS28     0x10000000  // RCV mode during TDM time slot 28
-                                            // 0 1
+// 0 1
 #define MCASP_RXTDM_RTDMS27     0x08000000  // RCV mode during TDM time slot 27
-                                            // 0 1
+// 0 1
 #define MCASP_RXTDM_RTDMS26     0x04000000  // RCV mode during TDM time slot 26
-                                            // 0 1
+// 0 1
 #define MCASP_RXTDM_RTDMS25     0x02000000  // RCV mode during TDM time slot 25
-                                            // 0 1
+// 0 1
 #define MCASP_RXTDM_RTDMS24     0x01000000  // RCV mode during TDM time slot 24
-                                            // 0 1
+// 0 1
 #define MCASP_RXTDM_RTDMS23     0x00800000  // RCV mode during TDM time slot 23
-                                            // 0 1
+// 0 1
 #define MCASP_RXTDM_RTDMS22     0x00400000  // RCV mode during TDM time slot 22
-                                            // 0 1
+// 0 1
 #define MCASP_RXTDM_RTDMS21     0x00200000  // RCV mode during TDM time slot 21
-                                            // 0 1
+// 0 1
 #define MCASP_RXTDM_RTDMS20     0x00100000  // RCV mode during TDM time slot 20
-                                            // 0 1
+// 0 1
 #define MCASP_RXTDM_RTDMS19     0x00080000  // RCV mode during TDM time slot 19
-                                            // 0 1
+// 0 1
 #define MCASP_RXTDM_RTDMS18     0x00040000  // RCV mode during TDM time slot 18
-                                            // 0 1
+// 0 1
 #define MCASP_RXTDM_RTDMS17     0x00020000  // RCV mode during TDM time slot 17
-                                            // 0 1
+// 0 1
 #define MCASP_RXTDM_RTDMS16     0x00010000  // RCV mode during TDM time slot 16
-                                            // 0 1
+// 0 1
 #define MCASP_RXTDM_RTDMS15     0x00008000  // RCV mode during TDM time slot 15
-                                            // 0 1
+// 0 1
 #define MCASP_RXTDM_RTDMS14     0x00004000  // RCV mode during TDM time slot 14
-                                            // 0 1
+// 0 1
 #define MCASP_RXTDM_RTDMS13     0x00002000  // RCV mode during TDM time slot 13
-                                            // 0 1
+// 0 1
 #define MCASP_RXTDM_RTDMS12     0x00001000  // RCV mode during TDM time slot 12
-                                            // 0 1
+// 0 1
 #define MCASP_RXTDM_RTDMS11     0x00000800  // RCV mode during TDM time slot 11
-                                            // 0 1
+// 0 1
 #define MCASP_RXTDM_RTDMS10     0x00000400  // RCV mode during TDM time slot 10
-                                            // 0 1
+// 0 1
 #define MCASP_RXTDM_RTDMS9      0x00000200  // RCV mode during TDM time slot 9
-                                            // 0 1
+// 0 1
 #define MCASP_RXTDM_RTDMS8      0x00000100  // RCV mode during TDM time slot 8
-                                            // 0 1
+// 0 1
 #define MCASP_RXTDM_RTDMS7      0x00000080  // RCV mode during TDM time slot 7
-                                            // 0 1
+// 0 1
 #define MCASP_RXTDM_RTDMS6      0x00000040  // RCV mode during TDM time slot 6
-                                            // 0 1
+// 0 1
 #define MCASP_RXTDM_RTDMS5      0x00000020  // RCV mode during TDM time slot 5
-                                            // 0 1
+// 0 1
 #define MCASP_RXTDM_RTDMS4      0x00000010  // RCV mode during TDM time slot 4
-                                            // 0 1
+// 0 1
 #define MCASP_RXTDM_RTDMS3      0x00000008  // RCV mode during TDM time slot 3
-                                            // 0 1
+// 0 1
 #define MCASP_RXTDM_RTDMS2      0x00000004  // RCV mode during TDM time slot 2
-                                            // 0 1
+// 0 1
 #define MCASP_RXTDM_RTDMS1      0x00000002  // RCV mode during TDM time slot 1
-                                            // 0 1
+// 0 1
 #define MCASP_RXTDM_RTDMS0      0x00000001  // RCV mode during TDM time slot 0
-                                            // 0 1
+// 0 1
 //******************************************************************************
 //
 // The following are defines for the bit fields in the MCASP_O_EVTCTLR register.
@@ -702,7 +701,7 @@
 #define MCASP_RXSTAT_RTDMSLOT   0x00000008  // EvenOdd Slot 0 1
 #define MCASP_RXSTAT_RCKFAIL    0x00000004  // Bad Transmit Flag 0 1
 #define MCASP_RXSTAT_RSYNCERR   0x00000002  // Unexpected RCV Frame sync flag 0
-                                            // 1
+// 1
 #define MCASP_RXSTAT_ROVRN      0x00000001  // RCV Underrun Flag 0 1
 //******************************************************************************
 //
@@ -725,7 +724,7 @@
 #define MCASP_RXCLKCHK_RMIN_M   0x0000FF00  // RCV clock minimum boundary
 #define MCASP_RXCLKCHK_RMIN_S   8
 #define MCASP_RXCLKCHK_RPS_M    0x0000000F  // RCV clock check prescaler 0x0
-                                            // 0x1 0x2 0x3 0x4 0x5 0x6 0x7 0x8
+// 0x1 0x2 0x3 0x4 0x5 0x6 0x7 0x8
 #define MCASP_RXCLKCHK_RPS_S    0
 //******************************************************************************
 //
@@ -733,8 +732,8 @@
 //
 //******************************************************************************
 #define MCASP_REVTCTL_RDATDMA   0x00000001  // RCV data DMA request 0 Enable
-                                            // DMA Transfer 1 Disable DMA
-                                            // Transfer
+// DMA Transfer 1 Disable DMA
+// Transfer
 //******************************************************************************
 //
 // The following are defines for the bit fields in the MCASP_O_GBLCTLX register.
@@ -793,8 +792,8 @@
 //
 //******************************************************************************
 #define MCASP_TXFMT_XDATDLY_M   0x00030000  // XMT Frame sync delay 0x0 0 Bit
-                                            // delay 0x1 1 Bit delay 0x2 2 Bit
-                                            // delay
+// delay 0x1 1 Bit delay 0x2 2 Bit
+// delay
 #define MCASP_TXFMT_XDATDLY_S   16
 #define MCASP_TXFMT_XRVRS       0x00008000  // XMT serial stream bit order 0 1
 #define MCASP_TXFMT_XPAD_M      0x00006000  // Pad value 0x0 0x1 0x2
@@ -802,13 +801,13 @@
 #define MCASP_TXFMT_XPBIT_M     0x00001F00  // Pad bit position
 #define MCASP_TXFMT_XPBIT_S     8
 #define MCASP_TXFMT_XSSZ_M      0x000000F0  // XMT slot Size 0x0 0x1 0x2 0x3
-                                            // 0x4 0x5 0x6 0x7 0x8 0x9 0xA 0xB
-                                            // 0xC 0xD 0xE 0xF
+// 0x4 0x5 0x6 0x7 0x8 0x9 0xA 0xB
+// 0xC 0xD 0xE 0xF
 #define MCASP_TXFMT_XSSZ_S      4
 #define MCASP_TXFMT_XBUSEL      0x00000008  // Write to XBUF using CPU/DMA 0
-                                            // DMA port access 1 CPU port Access
+// DMA port access 1 CPU port Access
 #define MCASP_TXFMT_XROT_M      0x00000007  // Right Rotate Value 0x0 0x1 0x2
-                                            // 0x3 0x4 0x5 0x6 0x7
+// 0x3 0x4 0x5 0x6 0x7
 #define MCASP_TXFMT_XROT_S      0
 //******************************************************************************
 //
@@ -834,7 +833,7 @@
 #define MCASP_ACLKXCTL_CLKXADJ_S 16
 #define MCASP_ACLKXCTL_CLKXP    0x00000080  // XMT Clock Polarity 0 1
 #define MCASP_ACLKXCTL_ASYNC    0x00000040  // XMT/RCV operation sync /Async 0
-                                            // 1
+// 1
 #define MCASP_ACLKXCTL_CLKXM    0x00000020  // XMT clock source 0 1
 #define MCASP_ACLKXCTL_CLKXDIV_M \
                                 0x0000001F  // XMT clock devide ratio
@@ -854,7 +853,7 @@
 #define MCASP_AHCLKXCTL_HCLKXADJ_S 16
 #define MCASP_AHCLKXCTL_HCLKXM  0x00008000  // High Freq. XMT clock Source 0 1
 #define MCASP_AHCLKXCTL_HCLKXP  0x00004000  // High Freq. clock Polarity Before
-                                            // diviser 0 1
+// diviser 0 1
 #define MCASP_AHCLKXCTL_HCLKXDIV_M \
                                 0x00000FFF  // XMT clock Divide Ratio
 
@@ -865,69 +864,69 @@
 //
 //******************************************************************************
 #define MCASP_TXTDM_XTDMS31     0x80000000  // XMT mode during TDM time slot 31
-                                            // 0 1
+// 0 1
 #define MCASP_TXTDM_XTDMS30     0x40000000  // XMT mode during TDM time slot 30
-                                            // 0 1
+// 0 1
 #define MCASP_TXTDM_XTDMS29     0x20000000  // XMT mode during TDM time slot 29
-                                            // 0 1
+// 0 1
 #define MCASP_TXTDM_XTDMS28     0x10000000  // XMT mode during TDM time slot 28
-                                            // 0 1
+// 0 1
 #define MCASP_TXTDM_XTDMS27     0x08000000  // XMT mode during TDM time slot 27
-                                            // 0 1
+// 0 1
 #define MCASP_TXTDM_XTDMS26     0x04000000  // XMT mode during TDM time slot 26
-                                            // 0 1
+// 0 1
 #define MCASP_TXTDM_XTDMS25     0x02000000  // XMT mode during TDM time slot 25
-                                            // 0 1
+// 0 1
 #define MCASP_TXTDM_XTDMS24     0x01000000  // XMT mode during TDM time slot 24
-                                            // 0 1
+// 0 1
 #define MCASP_TXTDM_XTDMS23     0x00800000  // XMT mode during TDM time slot 23
-                                            // 0 1
+// 0 1
 #define MCASP_TXTDM_XTDMS22     0x00400000  // XMT mode during TDM time slot 22
-                                            // 0 1
+// 0 1
 #define MCASP_TXTDM_XTDMS21     0x00200000  // XMT mode during TDM time slot 21
-                                            // 0 1
+// 0 1
 #define MCASP_TXTDM_XTDMS20     0x00100000  // XMT mode during TDM time slot 20
-                                            // 0 1
+// 0 1
 #define MCASP_TXTDM_XTDMS19     0x00080000  // XMT mode during TDM time slot 19
-                                            // 0 1
+// 0 1
 #define MCASP_TXTDM_XTDMS18     0x00040000  // XMT mode during TDM time slot 18
-                                            // 0 1
+// 0 1
 #define MCASP_TXTDM_XTDMS17     0x00020000  // XMT mode during TDM time slot 17
-                                            // 0 1
+// 0 1
 #define MCASP_TXTDM_XTDMS16     0x00010000  // XMT mode during TDM time slot 16
-                                            // 0 1
+// 0 1
 #define MCASP_TXTDM_XTDMS15     0x00008000  // XMT mode during TDM time slot 15
-                                            // 0 1
+// 0 1
 #define MCASP_TXTDM_XTDMS14     0x00004000  // XMT mode during TDM time slot 14
-                                            // 0 1
+// 0 1
 #define MCASP_TXTDM_XTDMS13     0x00002000  // XMT mode during TDM time slot 13
-                                            // 0 1
+// 0 1
 #define MCASP_TXTDM_XTDMS12     0x00001000  // XMT mode during TDM time slot 12
-                                            // 0 1
+// 0 1
 #define MCASP_TXTDM_XTDMS11     0x00000800  // XMT mode during TDM time slot 11
-                                            // 0 1
+// 0 1
 #define MCASP_TXTDM_XTDMS10     0x00000400  // XMT mode during TDM time slot 10
-                                            // 0 1
+// 0 1
 #define MCASP_TXTDM_XTDMS9      0x00000200  // XMT mode during TDM time slot 9
-                                            // 0 1
+// 0 1
 #define MCASP_TXTDM_XTDMS8      0x00000100  // XMT mode during TDM time slot 8
-                                            // 0 1
+// 0 1
 #define MCASP_TXTDM_XTDMS7      0x00000080  // XMT mode during TDM time slot 7
-                                            // 0 1
+// 0 1
 #define MCASP_TXTDM_XTDMS6      0x00000040  // XMT mode during TDM time slot 6
-                                            // 0 1
+// 0 1
 #define MCASP_TXTDM_XTDMS5      0x00000020  // XMT mode during TDM time slot 5
-                                            // 0 1
+// 0 1
 #define MCASP_TXTDM_XTDMS4      0x00000010  // XMT mode during TDM time slot 4
-                                            // 0 1
+// 0 1
 #define MCASP_TXTDM_XTDMS3      0x00000008  // XMT mode during TDM time slot 3
-                                            // 0 1
+// 0 1
 #define MCASP_TXTDM_XTDMS2      0x00000004  // XMT mode during TDM time slot 2
-                                            // 0 1
+// 0 1
 #define MCASP_TXTDM_XTDMS1      0x00000002  // XMT mode during TDM time slot 1
-                                            // 0 1
+// 0 1
 #define MCASP_TXTDM_XTDMS0      0x00000001  // XMT mode during TDM time slot 0
-                                            // 0 1
+// 0 1
 //******************************************************************************
 //
 // The following are defines for the bit fields in the MCASP_O_EVTCTLX register.
@@ -953,7 +952,7 @@
 #define MCASP_TXSTAT_XTDMSLOT   0x00000008  // EvenOdd Slot 0 1
 #define MCASP_TXSTAT_XCKFAIL    0x00000004  // Bad Transmit Flag 0 1
 #define MCASP_TXSTAT_XSYNCERR   0x00000002  // Unexpected XMT Frame sync flag 0
-                                            // 1
+// 1
 #define MCASP_TXSTAT_XUNDRN     0x00000001  // XMT Underrun Flag 0 1
 //******************************************************************************
 //
@@ -962,9 +961,9 @@
 //******************************************************************************
 #define MCASP_TXTDMSLOT_XSLOTCNT_M \
                                 0x000003FF  // Current XMT time slot count
-                                            // during reset the value of this
-                                            // register is 0b0101111111 (0x17f)
-                                            // and after reset 0
+// during reset the value of this
+// register is 0b0101111111 (0x17f)
+// and after reset 0
 
 #define MCASP_TXTDMSLOT_XSLOTCNT_S 0
 //******************************************************************************
@@ -980,7 +979,7 @@
 #define MCASP_TXCLKCHK_XMIN_S   8
 #define MCASP_TXCLKCHK_RESV     0x00000080  // Reserved
 #define MCASP_TXCLKCHK_XPS_M    0x0000000F  // XMT clock check prescaler 0x0
-                                            // 0x1 0x2 0x3 0x4 0x5 0x6 0x7 0x8
+// 0x1 0x2 0x3 0x4 0x5 0x6 0x7 0x8
 #define MCASP_TXCLKCHK_XPS_S    0
 //******************************************************************************
 //
@@ -988,8 +987,8 @@
 //
 //******************************************************************************
 #define MCASP_XEVTCTL_XDATDMA   0x00000001  // XMT data DMA request 0 Enable
-                                            // DMA Transfer 1 Disable DMA
-                                            // Transfer
+// DMA Transfer 1 Disable DMA
+// Transfer
 //******************************************************************************
 //
 // The following are defines for the bit fields in the MCASP_O_CLKADJEN register.
@@ -1003,7 +1002,7 @@
 //******************************************************************************
 #define MCASP_DITCSRA0_DITCSRA0_M \
                                 0xFFFFFFFF  // Left (Even TDM slot ) Channel
-                                            // status
+// status
 
 #define MCASP_DITCSRA0_DITCSRA0_S 0
 //******************************************************************************
@@ -1013,7 +1012,7 @@
 //******************************************************************************
 #define MCASP_DITCSRA1_DITCSRA1_M \
                                 0xFFFFFFFF  // Left (Even TDM slot ) Channel
-                                            // status
+// status
 
 #define MCASP_DITCSRA1_DITCSRA1_S 0
 //******************************************************************************
@@ -1023,7 +1022,7 @@
 //******************************************************************************
 #define MCASP_DITCSRA2_DITCSRA2_M \
                                 0xFFFFFFFF  // Left (Even TDM slot ) Channel
-                                            // status Register
+// status Register
 
 #define MCASP_DITCSRA2_DITCSRA2_S 0
 //******************************************************************************
@@ -1033,7 +1032,7 @@
 //******************************************************************************
 #define MCASP_DITCSRA3_DITCSRA3_M \
                                 0xFFFFFFFF  // Left (Even TDM slot ) Channel
-                                            // status Register
+// status Register
 
 #define MCASP_DITCSRA3_DITCSRA3_S 0
 //******************************************************************************
@@ -1043,7 +1042,7 @@
 //******************************************************************************
 #define MCASP_DITCSRA4_DITCSRA4_M \
                                 0xFFFFFFFF  // Left (Even TDM slot ) Channel
-                                            // status
+// status
 
 #define MCASP_DITCSRA4_DITCSRA4_S 0
 //******************************************************************************
@@ -1053,7 +1052,7 @@
 //******************************************************************************
 #define MCASP_DITCSRA5_DITCSRA5_M \
                                 0xFFFFFFFF  // Left (Even TDM slot ) Channel
-                                            // status
+// status
 
 #define MCASP_DITCSRA5_DITCSRA5_S 0
 //******************************************************************************
@@ -1063,7 +1062,7 @@
 //******************************************************************************
 #define MCASP_DITCSRB0_DITCSRB0_M \
                                 0xFFFFFFFF  // Right (odd TDM slot ) Channel
-                                            // status
+// status
 
 #define MCASP_DITCSRB0_DITCSRB0_S 0
 //******************************************************************************
@@ -1073,7 +1072,7 @@
 //******************************************************************************
 #define MCASP_DITCSRB1_DITCSRB1_M \
                                 0xFFFFFFFF  // Right (odd TDM slot ) Channel
-                                            // status
+// status
 
 #define MCASP_DITCSRB1_DITCSRB1_S 0
 //******************************************************************************
@@ -1083,7 +1082,7 @@
 //******************************************************************************
 #define MCASP_DITCSRB2_DITCSRB2_M \
                                 0xFFFFFFFF  // Right (odd TDM slot ) Channel
-                                            // status
+// status
 
 #define MCASP_DITCSRB2_DITCSRB2_S 0
 //******************************************************************************
@@ -1093,7 +1092,7 @@
 //******************************************************************************
 #define MCASP_DITCSRB3_DITCSRB3_M \
                                 0xFFFFFFFF  // Right (odd TDM slot ) Channel
-                                            // status
+// status
 
 #define MCASP_DITCSRB3_DITCSRB3_S 0
 //******************************************************************************
@@ -1103,7 +1102,7 @@
 //******************************************************************************
 #define MCASP_DITCSRB4_DITCSRB4_M \
                                 0xFFFFFFFF  // Right (odd TDM slot ) Channel
-                                            // status
+// status
 
 #define MCASP_DITCSRB4_DITCSRB4_S 0
 //******************************************************************************
@@ -1113,7 +1112,7 @@
 //******************************************************************************
 #define MCASP_DITCSRB5_DITCSRB5_M \
                                 0xFFFFFFFF  // Right (odd TDM slot ) Channel
-                                            // status
+// status
 
 #define MCASP_DITCSRB5_DITCSRB5_S 0
 //******************************************************************************
@@ -1232,12 +1231,12 @@
 #define MCASP_XRSRCTL0_RRDY     0x00000020
 #define MCASP_XRSRCTL0_XRDY     0x00000010
 #define MCASP_XRSRCTL0_DISMOD_M 0x0000000C  // Serializer drive state 0x0 Tri
-                                            // state 0x1 Reserved 0x2 Drive pin
-                                            // low 0x3 Drive pin high
+// state 0x1 Reserved 0x2 Drive pin
+// low 0x3 Drive pin high
 #define MCASP_XRSRCTL0_DISMOD_S 2
 #define MCASP_XRSRCTL0_SRMOD_M  0x00000003  // Serializer Mode 0x0 InActive
-                                            // mode 0x1 Transmit mode 0x2
-                                            // Receive mode
+// mode 0x1 Transmit mode 0x2
+// Receive mode
 #define MCASP_XRSRCTL0_SRMOD_S  0
 //******************************************************************************
 //
@@ -1247,12 +1246,12 @@
 #define MCASP_XRSRCTL1_RRDY     0x00000020
 #define MCASP_XRSRCTL1_XRDY     0x00000010
 #define MCASP_XRSRCTL1_DISMOD_M 0x0000000C  // Serializer drive state 0x0 Tri
-                                            // state 0x1 Reserved 0x2 Drive pin
-                                            // low 0x3 Drive pin high
+// state 0x1 Reserved 0x2 Drive pin
+// low 0x3 Drive pin high
 #define MCASP_XRSRCTL1_DISMOD_S 2
 #define MCASP_XRSRCTL1_SRMOD_M  0x00000003  // Serializer Mode 0x0 InActive
-                                            // mode 0x1 Transmit mode 0x2
-                                            // Receive mode
+// mode 0x1 Transmit mode 0x2
+// Receive mode
 #define MCASP_XRSRCTL1_SRMOD_S  0
 //******************************************************************************
 //
@@ -1262,12 +1261,12 @@
 #define MCASP_XRSRCTL2_RRDY     0x00000020
 #define MCASP_XRSRCTL2_XRDY     0x00000010
 #define MCASP_XRSRCTL2_DISMOD_M 0x0000000C  // Serializer drive state 0x0 Tri
-                                            // state 0x1 Reserved 0x2 Drive pin
-                                            // low 0x3 Drive pin high
+// state 0x1 Reserved 0x2 Drive pin
+// low 0x3 Drive pin high
 #define MCASP_XRSRCTL2_DISMOD_S 2
 #define MCASP_XRSRCTL2_SRMOD_M  0x00000003  // Serializer Mode 0x0 InActive
-                                            // mode 0x1 Transmit mode 0x2
-                                            // Receive mode
+// mode 0x1 Transmit mode 0x2
+// Receive mode
 #define MCASP_XRSRCTL2_SRMOD_S  0
 //******************************************************************************
 //
@@ -1277,12 +1276,12 @@
 #define MCASP_XRSRCTL3_RRDY     0x00000020
 #define MCASP_XRSRCTL3_XRDY     0x00000010
 #define MCASP_XRSRCTL3_DISMOD_M 0x0000000C  // Serializer drive state 0x0 Tri
-                                            // state 0x1 Reserved 0x2 Drive pin
-                                            // low 0x3 Drive pin high
+// state 0x1 Reserved 0x2 Drive pin
+// low 0x3 Drive pin high
 #define MCASP_XRSRCTL3_DISMOD_S 2
 #define MCASP_XRSRCTL3_SRMOD_M  0x00000003  // Serializer Mode 0x0 InActive
-                                            // mode 0x1 Transmit mode 0x2
-                                            // Receive mode
+// mode 0x1 Transmit mode 0x2
+// Receive mode
 #define MCASP_XRSRCTL3_SRMOD_S  0
 //******************************************************************************
 //
@@ -1292,12 +1291,12 @@
 #define MCASP_XRSRCTL4_RRDY     0x00000020
 #define MCASP_XRSRCTL4_XRDY     0x00000010
 #define MCASP_XRSRCTL4_DISMOD_M 0x0000000C  // Serializer drive state 0x0 Tri
-                                            // state 0x1 Reserved 0x2 Drive pin
-                                            // low 0x3 Drive pin high
+// state 0x1 Reserved 0x2 Drive pin
+// low 0x3 Drive pin high
 #define MCASP_XRSRCTL4_DISMOD_S 2
 #define MCASP_XRSRCTL4_SRMOD_M  0x00000003  // Serializer Mode 0x0 InActive
-                                            // mode 0x1 Transmit mode 0x2
-                                            // Receive mode
+// mode 0x1 Transmit mode 0x2
+// Receive mode
 #define MCASP_XRSRCTL4_SRMOD_S  0
 //******************************************************************************
 //
@@ -1307,12 +1306,12 @@
 #define MCASP_XRSRCTL5_RRDY     0x00000020
 #define MCASP_XRSRCTL5_XRDY     0x00000010
 #define MCASP_XRSRCTL5_DISMOD_M 0x0000000C  // Serializer drive state 0x0 Tri
-                                            // state 0x1 Reserved 0x2 Drive pin
-                                            // low 0x3 Drive pin high
+// state 0x1 Reserved 0x2 Drive pin
+// low 0x3 Drive pin high
 #define MCASP_XRSRCTL5_DISMOD_S 2
 #define MCASP_XRSRCTL5_SRMOD_M  0x00000003  // Serializer Mode 0x0 InActive
-                                            // mode 0x1 Transmit mode 0x2
-                                            // Receive mode
+// mode 0x1 Transmit mode 0x2
+// Receive mode
 #define MCASP_XRSRCTL5_SRMOD_S  0
 //******************************************************************************
 //
@@ -1322,12 +1321,12 @@
 #define MCASP_XRSRCTL6_RRDY     0x00000020
 #define MCASP_XRSRCTL6_XRDY     0x00000010
 #define MCASP_XRSRCTL6_DISMOD_M 0x0000000C  // Serializer drive state 0x0 Tri
-                                            // state 0x1 Reserved 0x2 Drive pin
-                                            // low 0x3 Drive pin high
+// state 0x1 Reserved 0x2 Drive pin
+// low 0x3 Drive pin high
 #define MCASP_XRSRCTL6_DISMOD_S 2
 #define MCASP_XRSRCTL6_SRMOD_M  0x00000003  // Serializer Mode 0x0 InActive
-                                            // mode 0x1 Transmit mode 0x2
-                                            // Receive mode
+// mode 0x1 Transmit mode 0x2
+// Receive mode
 #define MCASP_XRSRCTL6_SRMOD_S  0
 //******************************************************************************
 //
@@ -1337,12 +1336,12 @@
 #define MCASP_XRSRCTL7_RRDY     0x00000020
 #define MCASP_XRSRCTL7_XRDY     0x00000010
 #define MCASP_XRSRCTL7_DISMOD_M 0x0000000C  // Serializer drive state 0x0 Tri
-                                            // state 0x1 Reserved 0x2 Drive pin
-                                            // low 0x3 Drive pin high
+// state 0x1 Reserved 0x2 Drive pin
+// low 0x3 Drive pin high
 #define MCASP_XRSRCTL7_DISMOD_S 2
 #define MCASP_XRSRCTL7_SRMOD_M  0x00000003  // Serializer Mode 0x0 InActive
-                                            // mode 0x1 Transmit mode 0x2
-                                            // Receive mode
+// mode 0x1 Transmit mode 0x2
+// Receive mode
 #define MCASP_XRSRCTL7_SRMOD_S  0
 //******************************************************************************
 //
@@ -1352,12 +1351,12 @@
 #define MCASP_XRSRCTL8_RRDY     0x00000020
 #define MCASP_XRSRCTL8_XRDY     0x00000010
 #define MCASP_XRSRCTL8_DISMOD_M 0x0000000C  // Serializer drive state 0x0 Tri
-                                            // state 0x1 Reserved 0x2 Drive pin
-                                            // low 0x3 Drive pin high
+// state 0x1 Reserved 0x2 Drive pin
+// low 0x3 Drive pin high
 #define MCASP_XRSRCTL8_DISMOD_S 2
 #define MCASP_XRSRCTL8_SRMOD_M  0x00000003  // Serializer Mode 0x0 InActive
-                                            // mode 0x1 Transmit mode 0x2
-                                            // Receive mode
+// mode 0x1 Transmit mode 0x2
+// Receive mode
 #define MCASP_XRSRCTL8_SRMOD_S  0
 //******************************************************************************
 //
@@ -1367,12 +1366,12 @@
 #define MCASP_XRSRCTL9_RRDY     0x00000020
 #define MCASP_XRSRCTL9_XRDY     0x00000010
 #define MCASP_XRSRCTL9_DISMOD_M 0x0000000C  // Serializer drive state 0x0 Tri
-                                            // state 0x1 Reserved 0x2 Drive pin
-                                            // low 0x3 Drive pin high
+// state 0x1 Reserved 0x2 Drive pin
+// low 0x3 Drive pin high
 #define MCASP_XRSRCTL9_DISMOD_S 2
 #define MCASP_XRSRCTL9_SRMOD_M  0x00000003  // Serializer Mode 0x0 InActive
-                                            // mode 0x1 Transmit mode 0x2
-                                            // Receive mode
+// mode 0x1 Transmit mode 0x2
+// Receive mode
 #define MCASP_XRSRCTL9_SRMOD_S  0
 //******************************************************************************
 //
@@ -1383,13 +1382,13 @@
 #define MCASP_XRSRCTL10_XRDY    0x00000010
 #define MCASP_XRSRCTL10_DISMOD_M \
                                 0x0000000C  // Serializer drive state 0x0 Tri
-                                            // state 0x1 Reserved 0x2 Drive pin
-                                            // low 0x3 Drive pin high
+// state 0x1 Reserved 0x2 Drive pin
+// low 0x3 Drive pin high
 
 #define MCASP_XRSRCTL10_DISMOD_S 2
 #define MCASP_XRSRCTL10_SRMOD_M 0x00000003  // Serializer Mode 0x0 InActive
-                                            // mode 0x1 Transmit mode 0x2
-                                            // Receive mode
+// mode 0x1 Transmit mode 0x2
+// Receive mode
 #define MCASP_XRSRCTL10_SRMOD_S 0
 //******************************************************************************
 //
@@ -1400,13 +1399,13 @@
 #define MCASP_XRSRCTL11_XRDY    0x00000010
 #define MCASP_XRSRCTL11_DISMOD_M \
                                 0x0000000C  // Serializer drive state 0x0 Tri
-                                            // state 0x1 Reserved 0x2 Drive pin
-                                            // low 0x3 Drive pin high
+// state 0x1 Reserved 0x2 Drive pin
+// low 0x3 Drive pin high
 
 #define MCASP_XRSRCTL11_DISMOD_S 2
 #define MCASP_XRSRCTL11_SRMOD_M 0x00000003  // Serializer Mode 0x0 InActive
-                                            // mode 0x1 Transmit mode 0x2
-                                            // Receive mode
+// mode 0x1 Transmit mode 0x2
+// Receive mode
 #define MCASP_XRSRCTL11_SRMOD_S 0
 //******************************************************************************
 //
@@ -1417,13 +1416,13 @@
 #define MCASP_XRSRCTL12_XRDY    0x00000010
 #define MCASP_XRSRCTL12_DISMOD_M \
                                 0x0000000C  // Serializer drive state 0x0 Tri
-                                            // state 0x1 Reserved 0x2 Drive pin
-                                            // low 0x3 Drive pin high
+// state 0x1 Reserved 0x2 Drive pin
+// low 0x3 Drive pin high
 
 #define MCASP_XRSRCTL12_DISMOD_S 2
 #define MCASP_XRSRCTL12_SRMOD_M 0x00000003  // Serializer Mode 0x0 InActive
-                                            // mode 0x1 Transmit mode 0x2
-                                            // Receive mode
+// mode 0x1 Transmit mode 0x2
+// Receive mode
 #define MCASP_XRSRCTL12_SRMOD_S 0
 //******************************************************************************
 //
@@ -1434,13 +1433,13 @@
 #define MCASP_XRSRCTL13_XRDY    0x00000010
 #define MCASP_XRSRCTL13_DISMOD_M \
                                 0x0000000C  // Serializer drive state 0x0 Tri
-                                            // state 0x1 Reserved 0x2 Drive pin
-                                            // low 0x3 Drive pin high
+// state 0x1 Reserved 0x2 Drive pin
+// low 0x3 Drive pin high
 
 #define MCASP_XRSRCTL13_DISMOD_S 2
 #define MCASP_XRSRCTL13_SRMOD_M 0x00000003  // Serializer Mode 0x0 InActive
-                                            // mode 0x1 Transmit mode 0x2
-                                            // Receive mode
+// mode 0x1 Transmit mode 0x2
+// Receive mode
 #define MCASP_XRSRCTL13_SRMOD_S 0
 //******************************************************************************
 //
@@ -1451,13 +1450,13 @@
 #define MCASP_XRSRCTL14_XRDY    0x00000010
 #define MCASP_XRSRCTL14_DISMOD_M \
                                 0x0000000C  // Serializer drive state 0x0 Tri
-                                            // state 0x1 Reserved 0x2 Drive pin
-                                            // low 0x3 Drive pin high
+// state 0x1 Reserved 0x2 Drive pin
+// low 0x3 Drive pin high
 
 #define MCASP_XRSRCTL14_DISMOD_S 2
 #define MCASP_XRSRCTL14_SRMOD_M 0x00000003  // Serializer Mode 0x0 InActive
-                                            // mode 0x1 Transmit mode 0x2
-                                            // Receive mode
+// mode 0x1 Transmit mode 0x2
+// Receive mode
 #define MCASP_XRSRCTL14_SRMOD_S 0
 //******************************************************************************
 //
@@ -1468,13 +1467,13 @@
 #define MCASP_XRSRCTL15_XRDY    0x00000010
 #define MCASP_XRSRCTL15_DISMOD_M \
                                 0x0000000C  // Serializer drive state 0x0 Tri
-                                            // state 0x1 Reserved 0x2 Drive pin
-                                            // low 0x3 Drive pin high
+// state 0x1 Reserved 0x2 Drive pin
+// low 0x3 Drive pin high
 
 #define MCASP_XRSRCTL15_DISMOD_S 2
 #define MCASP_XRSRCTL15_SRMOD_M 0x00000003  // Serializer Mode 0x0 InActive
-                                            // mode 0x1 Transmit mode 0x2
-                                            // Receive mode
+// mode 0x1 Transmit mode 0x2
+// Receive mode
 #define MCASP_XRSRCTL15_SRMOD_S 0
 //******************************************************************************
 //
@@ -1700,7 +1699,5 @@
 //******************************************************************************
 #define MCASP_RXBUF15_RBUF15_M  0xFFFFFFFF  // Receive Buffer 15
 #define MCASP_RXBUF15_RBUF15_S  0
-
-
 
 #endif // __HW_MCASP_H__

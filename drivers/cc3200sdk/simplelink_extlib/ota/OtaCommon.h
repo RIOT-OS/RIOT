@@ -11,7 +11,7 @@
  * stipulated in the agreement under which this program has been supplied,
  * and under no circumstances can it be used with non-TI connectivity device.
  *
-*/
+ */
 #ifndef __OTA_COMMON_H__
 #define __OTA_COMMON_H__
 
@@ -19,9 +19,9 @@
 extern "C" {
 #endif
 
-/* #define TI_OTA_SERVER */
+    /* #define TI_OTA_SERVER */
 
-/* General return values */
+    /* General return values */
 #define OTA_STATUS_OK        0
 #define OTA_STATUS_ERROR    -1
 #define OTA_STATUS_ERROR_CONTINUOUS_ACCESS    -1000

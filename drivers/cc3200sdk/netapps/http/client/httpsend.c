@@ -66,29 +66,24 @@
 #define MAXRESPONSESIZE  128
 
 typedef struct StatusMap {
-    int  status;
+    int status;
     const char * message;
 } StatusMap;
 
-static StatusMap httpStatusMap[] =
-{
-    {HTTP_OK, "OK"},
-    {HTTP_NO_CONTENT, "No Content"},
-    {HTTP_BAD_REQUEST, "Bad Request"},
-    {HTTP_AUTH_REQUIRED, "Authorization Required"},
-    {HTTP_NOT_FOUND, "File Not Found"},
-    {HTTP_NOT_IMPLEMENTED, "Not Implemented"},
-    {HTTP_NOT_ALLOWED, "Not Allowed"},
-    {0, "Unknown"}
-};
+static StatusMap httpStatusMap[] = { { HTTP_OK, "OK" }, { HTTP_NO_CONTENT,
+        "No Content" }, { HTTP_BAD_REQUEST, "Bad Request" }, {
+        HTTP_AUTH_REQUIRED, "Authorization Required" }, { HTTP_NOT_FOUND,
+        "File Not Found" }, { HTTP_NOT_IMPLEMENTED, "Not Implemented" }, {
+        HTTP_NOT_ALLOWED, "Not Allowed" }, { 0, "Unknown" } };
 
 int (*HTTPSrv_errorResponseHook)(Ssock_Handle ssock, int StatusCode) = 0;
 
-static const char * getStatusMessage(int status)
-{
-    int  i;
+static const char * getStatusMessage(int status) {
+    int i;
 
-    for (i = 0; httpStatusMap[i].status && httpStatusMap[i].status != status; i++);
+    for (i = 0; httpStatusMap[i].status && httpStatusMap[i].status != status;
+            i++)
+        ;
 
     return (httpStatusMap[i].message);
 }
@@ -98,13 +93,13 @@ static const char * getStatusMessage(int status)
  * status code and content type. The value of ContentType can
  * be NULL if no ContentType is required.
  */
-static void httpSendStatusLine(Ssock_Handle ssock, int status, const char * contentType)
-{
+static void httpSendStatusLine(Ssock_Handle ssock, int status,
+        const char * contentType) {
     char buf[MAXRESPONSESIZE];
     const char * msg;
     int len;
 
-    Log_print1(Diags_ANALYSIS, "sendStatus> %d", (IArg)status);
+    Log_print1(Diags_ANALYSIS, "sendStatus> %d", (IArg) status);
 
     if (status < 0 || status > 999) {
         status = 999;
@@ -114,15 +109,15 @@ static void httpSendStatusLine(Ssock_Handle ssock, int status, const char * cont
 
     if (contentType) {
         len = esnprintf(buf, sizeof(buf), "%s %3d %s\r\n%s%s\r\n", HTTP_VER,
-                        status, msg, CONTENT_TYPE, contentType);
-    }
-    else {
-        len = esnprintf(buf, sizeof(buf), "%s %3d %s\r\n\r\n", HTTP_VER,
-                        status, msg);
+                status, msg, CONTENT_TYPE, contentType);
+    } else {
+        len = esnprintf(buf, sizeof(buf), "%s %3d %s\r\n\r\n", HTTP_VER, status,
+                msg);
     }
 
     if (len == sizeof(buf)) {
-        Log_print1(Diags_WARNING, "sendStatus> Buffer size too small: %d", sizeof(buf));
+        Log_print1(Diags_WARNING, "sendStatus> Buffer size too small: %d",
+                sizeof(buf));
     }
 
     Ssock_send(ssock, buf, len, 0);
@@ -135,37 +130,36 @@ static void httpSendStatusLine(Ssock_Handle ssock, int status, const char * cont
  * Since the header is terminated, this must be the last tag
  * written. Entity data should follow immediately.
  */
-static void httpSendEntityLength(Ssock_Handle ssock, int32_t entityLen)
-{
+static void httpSendEntityLength(Ssock_Handle ssock, int32_t entityLen) {
     char buf[32]; /* sizeof("Content-length: ") + 10 + 4 + 1]; */
     int len;
 
-    len = esnprintf(buf, sizeof(buf), "%s%d\r\n\r\n", CONTENT_LENGTH, entityLen);
+    len = esnprintf(buf, sizeof(buf), "%s%d\r\n\r\n", CONTENT_LENGTH,
+            entityLen);
     if (len == sizeof(buf)) {
         Log_print1(Diags_WARNING, "sendEntityLength> Buffer size too small: %d",
-                   sizeof(buf));
+                sizeof(buf));
     }
 
     Ssock_send(ssock, buf, len, 0);
 }
 
-void HTTPSrv_sendErrorResponse(Ssock_Handle ssock, int status)
-{
+void HTTPSrv_sendErrorResponse(Ssock_Handle ssock, int status) {
     /* send a default response if there is no user callback */
-    if (!HTTPSrv_errorResponseHook || !HTTPSrv_errorResponseHook(ssock, status)) {
+    if (!HTTPSrv_errorResponseHook
+            || !HTTPSrv_errorResponseHook(ssock, status)) {
         char buf[33];
         int len;
 
         len = esnprintf(buf, sizeof(buf), "Failed: %d %s", status,
-                        getStatusMessage(status));
+                getStatusMessage(status));
         //Log_print2(Diags_ANALYSIS, "len = %d: %s\n", len, (xdc_IArg)buf);
         HTTPSrv_sendResponse(ssock, status, CONTENT_TYPE_PLAIN, len, buf);
     }
 }
 
 void HTTPSrv_sendResponse(Ssock_Handle ssock, int status, const char * type,
-                        size_t len, const void * buf)
-{
+        size_t len, const void * buf) {
     httpSendStatusLine(ssock, status, type);
     httpSendEntityLength(ssock, len);
     if (len > 0 && buf) {

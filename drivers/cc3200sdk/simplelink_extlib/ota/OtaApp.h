@@ -11,7 +11,7 @@
  * stipulated in the agreement under which this program has been supplied,
  * and under no circumstances can it be used with non-TI connectivity device.
  *
-*/
+ */
 #ifndef __OTA_APP_H__
 #define __OTA_APP_H__
 
@@ -19,8 +19,7 @@
 extern "C" {
 #endif
 
-typedef enum
-{
+typedef enum {
     OTA_STATE_IDLE = 0,
     OTA_STATE_CONNECT_SERVER,
     OTA_STATE_RESOURCE_LIST,
@@ -31,8 +30,7 @@ typedef enum
     OTA_STATE_NUMBER_OF_STATES
 } OtaState_e;
 
-typedef struct
-{
+typedef struct {
     _u8 vendorStr[20];
     _i32 startCount;
     _i32 continuousAccessErrorCount;
@@ -52,14 +50,13 @@ typedef struct
     _i32 download_done;
 } OtaApp_statistics_t;
 
-typedef struct
-{
+typedef struct {
     OtaState_e state;
     _i32 runMode;
     _u8 vendorStr[20];
     OtaOptServerInfo_t *pOtaServerInfo;
-    OtaFileMetadata_t  *pResourceMetadata;
-    OtaApp_statistics_t  *pStatistics;
+    OtaFileMetadata_t *pResourceMetadata;
+    OtaApp_statistics_t *pStatistics;
     _i32 resetNwp;
     _i32 resetMcu;
     _u8 isMCUAppUpdate;
@@ -69,9 +66,9 @@ typedef struct
     void *pvLogClient;
 
     /* updateCheck info */
-    _i32  numUpdates;
+    _i32 numUpdates;
     _u8 *file_path;
-    _i32  file_size;
+    _i32 file_size;
 } OtaApp_t;
 
 #ifdef  __cplusplus

@@ -16,9 +16,6 @@
 
 #include "HttpConfig.h"
 
-
-
-
 #ifdef HTTP_CORE_ENABLE_DYNAMIC
 
 /**
@@ -34,18 +31,17 @@
 
 #define 	MAX_RESOURCE		10
 
-typedef struct
-{
-	unsigned char rest_method;
-	unsigned char *ResourceString;
-	unsigned char* (*pCbfunc)(void*);
-}Resource;
+typedef struct {
+    unsigned char rest_method;
+    unsigned char *ResourceString;
+    unsigned char* (*pCbfunc)(void*);
+} Resource;
 
 #define 	POST 	0
 #define		GET 	1
 
-
-int SetResources(unsigned char method, char* pBuf, unsigned char* (*pCbRestFunc)(void *pArgs) );
+int SetResources(unsigned char method, char* pBuf,
+        unsigned char* (*pCbRestFunc)(void *pArgs));
 
 /**
  * Initialize HttpDynamic module state for a new request, and identify the request
@@ -57,7 +53,8 @@ int SetResources(unsigned char method, char* pBuf, unsigned char* (*pCbRestFunc)
  * @param method The HTTP method sent from the client for the resource
  * @return nonzero if request is to be handled by this module. zero if not.
  */
-int HttpDynamic_InitRequest(UINT16 uConnection, struct HttpBlob resource, UINT8 method);
+int HttpDynamic_InitRequest(UINT16 uConnection, struct HttpBlob resource,
+        UINT8 method);
 
 /**
  * Process a dynamic-content HTTP request

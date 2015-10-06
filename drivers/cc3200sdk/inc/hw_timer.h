@@ -85,7 +85,6 @@
 #define TIMER_O_DMAEV           0x0000006C  // GPTM DMA Event
 #define TIMER_O_PP              0x00000FC0  // GPTM Peripheral Properties
 
-
 //*****************************************************************************
 //
 // The following are defines for the bit fields in the TIMER_O_CFG register.
@@ -94,10 +93,10 @@
 #define TIMER_CFG_M             0x00000007  // GPTM Configuration
 #define TIMER_CFG_32_BIT_TIMER  0x00000000  // 32-bit timer configuration
 #define TIMER_CFG_32_BIT_RTC    0x00000001  // 32-bit real-time clock (RTC)
-                                            // counter configuration
+// counter configuration
 #define TIMER_CFG_16_BIT        0x00000004  // 16-bit timer configuration. The
-                                            // function is controlled by bits
-                                            // 1:0 of GPTMTAMR and GPTMTBMR
+// function is controlled by bits
+// 1:0 of GPTMTAMR and GPTMTBMR
 
 //*****************************************************************************
 //
@@ -106,20 +105,20 @@
 //*****************************************************************************
 //##### GARNET BEGIN #####
 #define TIMER_TAMR_TAPLO        0x00000800  // GPTM Timer A PWM Legacy
-                                            // Operation
+// Operation
 #define TIMER_TAMR_TAMRSU       0x00000400  // GPTM Timer A Match Register
-                                            // Update
+// Update
 #define TIMER_TAMR_TAPWMIE      0x00000200  // GPTM Timer A PWM Interrupt
-                                            // Enable
+// Enable
 #define TIMER_TAMR_TAILD        0x00000100  // GPTM Timer A Interval Load Write
 //##### GARNET END #####
 #define TIMER_TAMR_TASNAPS      0x00000080  // GPTM Timer A Snap-Shot Mode
 #define TIMER_TAMR_TAWOT        0x00000040  // GPTM Timer A Wait-on-Trigger
 #define TIMER_TAMR_TAMIE        0x00000020  // GPTM Timer A Match Interrupt
-                                            // Enable
+// Enable
 #define TIMER_TAMR_TACDIR       0x00000010  // GPTM Timer A Count Direction
 #define TIMER_TAMR_TAAMS        0x00000008  // GPTM Timer A Alternate Mode
-                                            // Select
+// Select
 #define TIMER_TAMR_TACMR        0x00000004  // GPTM Timer A Capture Mode
 #define TIMER_TAMR_TAMR_M       0x00000003  // GPTM Timer A Mode
 #define TIMER_TAMR_TAMR_1_SHOT  0x00000001  // One-Shot Timer mode
@@ -133,20 +132,20 @@
 //*****************************************************************************
 //##### GARNET BEGIN #####
 #define TIMER_TBMR_TBPLO        0x00000800  // GPTM Timer B PWM Legacy
-                                            // Operation
+// Operation
 #define TIMER_TBMR_TBMRSU       0x00000400  // GPTM Timer B Match Register
-                                            // Update
+// Update
 #define TIMER_TBMR_TBPWMIE      0x00000200  // GPTM Timer B PWM Interrupt
-                                            // Enable
+// Enable
 #define TIMER_TBMR_TBILD        0x00000100  // GPTM Timer B Interval Load Write
 //##### GARNET END #####
 #define TIMER_TBMR_TBSNAPS      0x00000080  // GPTM Timer B Snap-Shot Mode
 #define TIMER_TBMR_TBWOT        0x00000040  // GPTM Timer B Wait-on-Trigger
 #define TIMER_TBMR_TBMIE        0x00000020  // GPTM Timer B Match Interrupt
-                                            // Enable
+// Enable
 #define TIMER_TBMR_TBCDIR       0x00000010  // GPTM Timer B Count Direction
 #define TIMER_TBMR_TBAMS        0x00000008  // GPTM Timer B Alternate Mode
-                                            // Select
+// Select
 #define TIMER_TBMR_TBCMR        0x00000004  // GPTM Timer B Capture Mode
 #define TIMER_TBMR_TBMR_M       0x00000003  // GPTM Timer B Mode
 #define TIMER_TBMR_TBMR_1_SHOT  0x00000001  // One-Shot Timer mode
@@ -160,7 +159,7 @@
 //*****************************************************************************
 #define TIMER_CTL_TBPWML        0x00004000  // GPTM Timer B PWM Output Level
 #define TIMER_CTL_TBOTE         0x00002000  // GPTM Timer B Output Trigger
-                                            // Enable
+// Enable
 #define TIMER_CTL_TBEVENT_M     0x00000C00  // GPTM Timer B Event Mode
 #define TIMER_CTL_TBEVENT_POS   0x00000000  // Positive edge
 #define TIMER_CTL_TBEVENT_NEG   0x00000400  // Negative edge
@@ -169,7 +168,7 @@
 #define TIMER_CTL_TBEN          0x00000100  // GPTM Timer B Enable
 #define TIMER_CTL_TAPWML        0x00000040  // GPTM Timer A PWM Output Level
 #define TIMER_CTL_TAOTE         0x00000020  // GPTM Timer A Output Trigger
-                                            // Enable
+// Enable
 #define TIMER_CTL_RTCEN         0x00000010  // GPTM RTC Enable
 #define TIMER_CTL_TAEVENT_M     0x0000000C  // GPTM Timer A Event Mode
 #define TIMER_CTL_TAEVENT_POS   0x00000000  // Positive edge
@@ -186,100 +185,100 @@
 //*****************************************************************************
 #define TIMER_SYNC_SYNC11_M     0x00C00000  // Synchronize GPTM Timer 11
 #define TIMER_SYNC_SYNC11_TA    0x00400000  // A timeout event for Timer A of
-                                            // GPTM11 is triggered
+// GPTM11 is triggered
 #define TIMER_SYNC_SYNC11_TB    0x00800000  // A timeout event for Timer B of
-                                            // GPTM11 is triggered
+// GPTM11 is triggered
 #define TIMER_SYNC_SYNC11_TATB  0x00C00000  // A timeout event for both Timer A
-                                            // and Timer B of GPTM11 is
-                                            // triggered
+// and Timer B of GPTM11 is
+// triggered
 #define TIMER_SYNC_SYNC10_M     0x00300000  // Synchronize GPTM Timer 10
 #define TIMER_SYNC_SYNC10_TA    0x00100000  // A timeout event for Timer A of
-                                            // GPTM10 is triggered
+// GPTM10 is triggered
 #define TIMER_SYNC_SYNC10_TB    0x00200000  // A timeout event for Timer B of
-                                            // GPTM10 is triggered
+// GPTM10 is triggered
 #define TIMER_SYNC_SYNC10_TATB  0x00300000  // A timeout event for both Timer A
-                                            // and Timer B of GPTM10 is
-                                            // triggered
+// and Timer B of GPTM10 is
+// triggered
 #define TIMER_SYNC_SYNC9_M      0x000C0000  // Synchronize GPTM Timer 9
 #define TIMER_SYNC_SYNC9_TA     0x00040000  // A timeout event for Timer A of
-                                            // GPTM9 is triggered
+// GPTM9 is triggered
 #define TIMER_SYNC_SYNC9_TB     0x00080000  // A timeout event for Timer B of
-                                            // GPTM9 is triggered
+// GPTM9 is triggered
 #define TIMER_SYNC_SYNC9_TATB   0x000C0000  // A timeout event for both Timer A
-                                            // and Timer B of GPTM9 is
-                                            // triggered
+// and Timer B of GPTM9 is
+// triggered
 #define TIMER_SYNC_SYNC8_M      0x00030000  // Synchronize GPTM Timer 8
 #define TIMER_SYNC_SYNC8_TA     0x00010000  // A timeout event for Timer A of
-                                            // GPTM8 is triggered
+// GPTM8 is triggered
 #define TIMER_SYNC_SYNC8_TB     0x00020000  // A timeout event for Timer B of
-                                            // GPTM8 is triggered
+// GPTM8 is triggered
 #define TIMER_SYNC_SYNC8_TATB   0x00030000  // A timeout event for both Timer A
-                                            // and Timer B of GPTM8 is
-                                            // triggered
+// and Timer B of GPTM8 is
+// triggered
 #define TIMER_SYNC_SYNC7_M      0x0000C000  // Synchronize GPTM Timer 7
 #define TIMER_SYNC_SYNC7_TA     0x00004000  // A timeout event for Timer A of
-                                            // GPTM7 is triggered
+// GPTM7 is triggered
 #define TIMER_SYNC_SYNC7_TB     0x00008000  // A timeout event for Timer B of
-                                            // GPTM7 is triggered
+// GPTM7 is triggered
 #define TIMER_SYNC_SYNC7_TATB   0x0000C000  // A timeout event for both Timer A
-                                            // and Timer B of GPTM7 is
-                                            // triggered
+// and Timer B of GPTM7 is
+// triggered
 #define TIMER_SYNC_SYNC6_M      0x00003000  // Synchronize GPTM Timer 6
 #define TIMER_SYNC_SYNC6_TA     0x00001000  // A timeout event for Timer A of
-                                            // GPTM6 is triggered
+// GPTM6 is triggered
 #define TIMER_SYNC_SYNC6_TB     0x00002000  // A timeout event for Timer B of
-                                            // GPTM6 is triggered
+// GPTM6 is triggered
 #define TIMER_SYNC_SYNC6_TATB   0x00003000  // A timeout event for both Timer A
-                                            // and Timer B of GPTM6 is
-                                            // triggered
+// and Timer B of GPTM6 is
+// triggered
 #define TIMER_SYNC_SYNC5_M      0x00000C00  // Synchronize GPTM Timer 5
 #define TIMER_SYNC_SYNC5_TA     0x00000400  // A timeout event for Timer A of
-                                            // GPTM5 is triggered
+// GPTM5 is triggered
 #define TIMER_SYNC_SYNC5_TB     0x00000800  // A timeout event for Timer B of
-                                            // GPTM5 is triggered
+// GPTM5 is triggered
 #define TIMER_SYNC_SYNC5_TATB   0x00000C00  // A timeout event for both Timer A
-                                            // and Timer B of GPTM5 is
-                                            // triggered
+// and Timer B of GPTM5 is
+// triggered
 #define TIMER_SYNC_SYNC4_M      0x00000300  // Synchronize GPTM Timer 4
 #define TIMER_SYNC_SYNC4_TA     0x00000100  // A timeout event for Timer A of
-                                            // GPTM4 is triggered
+// GPTM4 is triggered
 #define TIMER_SYNC_SYNC4_TB     0x00000200  // A timeout event for Timer B of
-                                            // GPTM4 is triggered
+// GPTM4 is triggered
 #define TIMER_SYNC_SYNC4_TATB   0x00000300  // A timeout event for both Timer A
-                                            // and Timer B of GPTM4 is
-                                            // triggered
+// and Timer B of GPTM4 is
+// triggered
 #define TIMER_SYNC_SYNC3_M      0x000000C0  // Synchronize GPTM Timer 3
 #define TIMER_SYNC_SYNC3_TA     0x00000040  // A timeout event for Timer A of
-                                            // GPTM3 is triggered
+// GPTM3 is triggered
 #define TIMER_SYNC_SYNC3_TB     0x00000080  // A timeout event for Timer B of
-                                            // GPTM3 is triggered
+// GPTM3 is triggered
 #define TIMER_SYNC_SYNC3_TATB   0x000000C0  // A timeout event for both Timer A
-                                            // and Timer B of GPTM3 is
-                                            // triggered
+// and Timer B of GPTM3 is
+// triggered
 #define TIMER_SYNC_SYNC2_M      0x00000030  // Synchronize GPTM Timer 2
 #define TIMER_SYNC_SYNC2_TA     0x00000010  // A timeout event for Timer A of
-                                            // GPTM2 is triggered
+// GPTM2 is triggered
 #define TIMER_SYNC_SYNC2_TB     0x00000020  // A timeout event for Timer B of
-                                            // GPTM2 is triggered
+// GPTM2 is triggered
 #define TIMER_SYNC_SYNC2_TATB   0x00000030  // A timeout event for both Timer A
-                                            // and Timer B of GPTM2 is
-                                            // triggered
+// and Timer B of GPTM2 is
+// triggered
 #define TIMER_SYNC_SYNC1_M      0x0000000C  // Synchronize GPTM Timer 1
 #define TIMER_SYNC_SYNC1_TA     0x00000004  // A timeout event for Timer A of
-                                            // GPTM1 is triggered
+// GPTM1 is triggered
 #define TIMER_SYNC_SYNC1_TB     0x00000008  // A timeout event for Timer B of
-                                            // GPTM1 is triggered
+// GPTM1 is triggered
 #define TIMER_SYNC_SYNC1_TATB   0x0000000C  // A timeout event for both Timer A
-                                            // and Timer B of GPTM1 is
-                                            // triggered
+// and Timer B of GPTM1 is
+// triggered
 #define TIMER_SYNC_SYNC0_M      0x00000003  // Synchronize GPTM Timer 0
 #define TIMER_SYNC_SYNC0_TA     0x00000001  // A timeout event for Timer A of
-                                            // GPTM0 is triggered
+// GPTM0 is triggered
 #define TIMER_SYNC_SYNC0_TB     0x00000002  // A timeout event for Timer B of
-                                            // GPTM0 is triggered
+// GPTM0 is triggered
 #define TIMER_SYNC_SYNC0_TATB   0x00000003  // A timeout event for both Timer A
-                                            // and Timer B of GPTM0 is
-                                            // triggered
+// and Timer B of GPTM0 is
+// triggered
 //##### GARNET END #####
 
 //*****************************************************************************
@@ -289,25 +288,25 @@
 //*****************************************************************************
 //##### GARNET BEGIN #####
 #define TIMER_IMR_WUEIM         0x00010000  // 32/64-Bit GPTM Write Update
-                                            // Error Interrupt Mask
+// Error Interrupt Mask
 //##### GARNET END #####
 #define TIMER_IMR_TBMIM         0x00000800  // GPTM Timer B Mode Match
-                                            // Interrupt Mask
+// Interrupt Mask
 #define TIMER_IMR_CBEIM         0x00000400  // GPTM Capture B Event Interrupt
-                                            // Mask
+// Mask
 #define TIMER_IMR_CBMIM         0x00000200  // GPTM Capture B Match Interrupt
-                                            // Mask
+// Mask
 #define TIMER_IMR_TBTOIM        0x00000100  // GPTM Timer B Time-Out Interrupt
-                                            // Mask
+// Mask
 #define TIMER_IMR_TAMIM         0x00000010  // GPTM Timer A Mode Match
-                                            // Interrupt Mask
+// Interrupt Mask
 #define TIMER_IMR_RTCIM         0x00000008  // GPTM RTC Interrupt Mask
 #define TIMER_IMR_CAEIM         0x00000004  // GPTM Capture A Event Interrupt
-                                            // Mask
+// Mask
 #define TIMER_IMR_CAMIM         0x00000002  // GPTM Capture A Match Interrupt
-                                            // Mask
+// Mask
 #define TIMER_IMR_TATOIM        0x00000001  // GPTM Timer A Time-Out Interrupt
-                                            // Mask
+// Mask
 
 //*****************************************************************************
 //
@@ -316,25 +315,25 @@
 //*****************************************************************************
 //##### GARNET BEGIN #####
 #define TIMER_RIS_WUERIS        0x00010000  // 32/64-Bit GPTM Write Update
-                                            // Error Raw Interrupt Status
+// Error Raw Interrupt Status
 //##### GARNET END #####
 #define TIMER_RIS_TBMRIS        0x00000800  // GPTM Timer B Mode Match Raw
-                                            // Interrupt
+// Interrupt
 #define TIMER_RIS_CBERIS        0x00000400  // GPTM Capture B Event Raw
-                                            // Interrupt
+// Interrupt
 #define TIMER_RIS_CBMRIS        0x00000200  // GPTM Capture B Match Raw
-                                            // Interrupt
+// Interrupt
 #define TIMER_RIS_TBTORIS       0x00000100  // GPTM Timer B Time-Out Raw
-                                            // Interrupt
+// Interrupt
 #define TIMER_RIS_TAMRIS        0x00000010  // GPTM Timer A Mode Match Raw
-                                            // Interrupt
+// Interrupt
 #define TIMER_RIS_RTCRIS        0x00000008  // GPTM RTC Raw Interrupt
 #define TIMER_RIS_CAERIS        0x00000004  // GPTM Capture A Event Raw
-                                            // Interrupt
+// Interrupt
 #define TIMER_RIS_CAMRIS        0x00000002  // GPTM Capture A Match Raw
-                                            // Interrupt
+// Interrupt
 #define TIMER_RIS_TATORIS       0x00000001  // GPTM Timer A Time-Out Raw
-                                            // Interrupt
+// Interrupt
 
 //*****************************************************************************
 //
@@ -343,25 +342,25 @@
 //*****************************************************************************
 //##### GARNET BEGIN #####
 #define TIMER_MIS_WUEMIS        0x00010000  // 32/64-Bit GPTM Write Update
-                                            // Error Masked Interrupt Status
+// Error Masked Interrupt Status
 //##### GARNET END #####
 #define TIMER_MIS_TBMMIS        0x00000800  // GPTM Timer B Mode Match Masked
-                                            // Interrupt
+// Interrupt
 #define TIMER_MIS_CBEMIS        0x00000400  // GPTM Capture B Event Masked
-                                            // Interrupt
+// Interrupt
 #define TIMER_MIS_CBMMIS        0x00000200  // GPTM Capture B Match Masked
-                                            // Interrupt
+// Interrupt
 #define TIMER_MIS_TBTOMIS       0x00000100  // GPTM Timer B Time-Out Masked
-                                            // Interrupt
+// Interrupt
 #define TIMER_MIS_TAMMIS        0x00000010  // GPTM Timer A Mode Match Masked
-                                            // Interrupt
+// Interrupt
 #define TIMER_MIS_RTCMIS        0x00000008  // GPTM RTC Masked Interrupt
 #define TIMER_MIS_CAEMIS        0x00000004  // GPTM Capture A Event Masked
-                                            // Interrupt
+// Interrupt
 #define TIMER_MIS_CAMMIS        0x00000002  // GPTM Capture A Match Masked
-                                            // Interrupt
+// Interrupt
 #define TIMER_MIS_TATOMIS       0x00000001  // GPTM Timer A Time-Out Masked
-                                            // Interrupt
+// Interrupt
 
 //*****************************************************************************
 //
@@ -370,25 +369,25 @@
 //*****************************************************************************
 //##### GARNET BEGIN #####
 #define TIMER_ICR_WUECINT       0x00010000  // 32/64-Bit GPTM Write Update
-                                            // Error Interrupt Clear
+// Error Interrupt Clear
 //##### GARNET END #####
 #define TIMER_ICR_TBMCINT       0x00000800  // GPTM Timer B Mode Match
-                                            // Interrupt Clear
+// Interrupt Clear
 #define TIMER_ICR_CBECINT       0x00000400  // GPTM Capture B Event Interrupt
-                                            // Clear
+// Clear
 #define TIMER_ICR_CBMCINT       0x00000200  // GPTM Capture B Match Interrupt
-                                            // Clear
+// Clear
 #define TIMER_ICR_TBTOCINT      0x00000100  // GPTM Timer B Time-Out Interrupt
-                                            // Clear
+// Clear
 #define TIMER_ICR_TAMCINT       0x00000010  // GPTM Timer A Mode Match
-                                            // Interrupt Clear
+// Interrupt Clear
 #define TIMER_ICR_RTCCINT       0x00000008  // GPTM RTC Interrupt Clear
 #define TIMER_ICR_CAECINT       0x00000004  // GPTM Capture A Event Interrupt
-                                            // Clear
+// Clear
 #define TIMER_ICR_CAMCINT       0x00000002  // GPTM Capture A Match Interrupt
-                                            // Clear
+// Clear
 #define TIMER_ICR_TATOCINT      0x00000001  // GPTM Timer A Time-Out Raw
-                                            // Interrupt
+// Interrupt
 
 //*****************************************************************************
 //
@@ -397,12 +396,12 @@
 //*****************************************************************************
 //##### GARNET BEGIN #####
 #define TIMER_TAILR_M           0xFFFFFFFF  // GPTM Timer A Interval Load
-                                            // Register
+// Register
 //##### GARNET END #####
 #define TIMER_TAILR_TAILRH_M    0xFFFF0000  // GPTM Timer A Interval Load
-                                            // Register High
+// Register High
 #define TIMER_TAILR_TAILRL_M    0x0000FFFF  // GPTM Timer A Interval Load
-                                            // Register Low
+// Register Low
 #define TIMER_TAILR_TAILRH_S    16
 #define TIMER_TAILR_TAILRL_S    0
 //##### GARNET BEGIN #####
@@ -416,10 +415,10 @@
 //*****************************************************************************
 //##### GARNET BEGIN #####
 #define TIMER_TBILR_M           0xFFFFFFFF  // GPTM Timer B Interval Load
-                                            // Register
+// Register
 //##### GARNET END #####
 #define TIMER_TBILR_TBILRL_M    0x0000FFFF  // GPTM Timer B Interval Load
-                                            // Register
+// Register
 #define TIMER_TBILR_TBILRL_S    0
 //##### GARNET BEGIN #####
 #define TIMER_TBILR_S           0
@@ -492,7 +491,7 @@
 //*****************************************************************************
 //##### GARNET BEGIN #####
 #define TIMER_TAPMR_TAPSMRH_M   0x0000FF00  // GPTM Timer A Prescale Match High
-                                            // Byte
+// Byte
 //##### GARNET END #####
 #define TIMER_TAPMR_TAPSMR_M    0x000000FF  // GPTM TimerA Prescale Match
 //##### GARNET BEGIN #####
@@ -507,7 +506,7 @@
 //*****************************************************************************
 //##### GARNET BEGIN #####
 #define TIMER_TBPMR_TBPSMRH_M   0x0000FF00  // GPTM Timer B Prescale Match High
-                                            // Byte
+// Byte
 //##### GARNET END #####
 #define TIMER_TBPMR_TBPSMR_M    0x000000FF  // GPTM TimerB Prescale Match
 //##### GARNET BEGIN #####
@@ -623,11 +622,11 @@
 #define TIMER_PP_CHAIN          0x00000010  // Chain with Other Timers
 #define TIMER_PP_SIZE_M         0x0000000F  // Count Size
 #define TIMER_PP_SIZE__0        0x00000000  // Timer A and Timer B counters are
-                                            // 16 bits each with an 8-bit
-                                            // prescale counter
+// 16 bits each with an 8-bit
+// prescale counter
 #define TIMER_PP_SIZE__1        0x00000001  // Timer A and Timer B counters are
-                                            // 32 bits each with an 16-bit
-                                            // prescale counter
+// 32 bits each with an 16-bit
+// prescale counter
 //##### GARNET END #####
 
 //*****************************************************************************

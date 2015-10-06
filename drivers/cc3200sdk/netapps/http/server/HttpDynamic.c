@@ -37,22 +37,20 @@ Resource g_RestContent[MAX_RESOURCE];
 
 int g_NumResource = 0;
 
-int SetResources(unsigned char method, char* pBuf, unsigned char* (*pCbRestFunc)(void *pArgs) )
-{
+int SetResources(unsigned char method, char* pBuf,
+        unsigned char* (*pCbRestFunc)(void *pArgs)) {
 
-	// POST is 0 and GET is 1
+    // POST is 0 and GET is 1
 
-	if(g_NumResource < MAX_RESOURCE)
-	{
-		g_RestContent[g_NumResource].rest_method = method;
-		g_RestContent[g_NumResource].ResourceString = (unsigned char*)pBuf;
-		g_RestContent[g_NumResource].pCbfunc = pCbRestFunc;
-		g_NumResource++;
-	}
-	else
-		return 0;
+    if (g_NumResource < MAX_RESOURCE) {
+        g_RestContent[g_NumResource].rest_method = method;
+        g_RestContent[g_NumResource].ResourceString = (unsigned char*) pBuf;
+        g_RestContent[g_NumResource].pCbfunc = pCbRestFunc;
+        g_NumResource++;
+    } else
+        return 0;
 
-	return 1;
+    return 1;
 
 }
 
@@ -66,26 +64,28 @@ int SetResources(unsigned char method, char* pBuf, unsigned char* (*pCbRestFunc)
  * @param method The HTTP method sent from the client for the resource
  * @return nonzero if request is to be handled by this module. zero if not.
  */
-int HttpDynamic_InitRequest(UINT16 uConnection, struct HttpBlob resource, UINT8 method)
-{
+int HttpDynamic_InitRequest(UINT16 uConnection, struct HttpBlob resource,
+        UINT8 method) {
 
-	/* look for known resource names according to g_RestContent*/
-	for (g_NumResource = 0; g_NumResource < MAX_RESOURCE; g_NumResource++)
-	{
-		if (HttpString_nextToken((char*)g_RestContent[g_NumResource].ResourceString,  strlen((const char*)g_RestContent[g_NumResource].ResourceString), resource) != NULL)
-			break;
-	}
+    /* look for known resource names according to g_RestContent*/
+    for (g_NumResource = 0; g_NumResource < MAX_RESOURCE; g_NumResource++) {
+        if (HttpString_nextToken(
+                (char*) g_RestContent[g_NumResource].ResourceString,
+                strlen(
+                        (const char*) g_RestContent[g_NumResource].ResourceString),
+                resource) != NULL)
+            break;
+    }
 
-	/* Rest resource not found */
-	if (g_NumResource == MAX_RESOURCE)
-		return 0;
+    /* Rest resource not found */
+    if (g_NumResource == MAX_RESOURCE)
+        return 0;
 
-	/* Method doesn't match */
-	if(g_RestContent[g_NumResource].rest_method != method)
-		return 0;
+    /* Method doesn't match */
+    if (g_RestContent[g_NumResource].rest_method != method)
+        return 0;
 
-
-	return 1;
+    return 1;
 }
 
 /**
@@ -96,34 +96,32 @@ int HttpDynamic_InitRequest(UINT16 uConnection, struct HttpBlob resource, UINT8 
  * Please refer to HttpResponse.h for more information.
  * @param request Pointer to all data available about the request
  */
-int HttpDynamic_ProcessRequest(struct HttpRequest* request)
-{
-	struct HttpBlob contentType,nullBlob;
-	struct HttpBlob contentBody;
-	void *pArgs = NULL;
+int HttpDynamic_ProcessRequest(struct HttpRequest* request) {
+    struct HttpBlob contentType, nullBlob;
+    struct HttpBlob contentBody;
+    void *pArgs = NULL;
 
-	contentType.pData = NULL;
-	contentType.uLength = 0;
-	nullBlob = contentType;
+    contentType.pData = NULL;
+    contentType.uLength = 0;
+    nullBlob = contentType;
 
-	/* 1. Call user defined API */
-	contentBody.pData = g_RestContent[g_NumResource].pCbfunc(pArgs);
-	contentBody.uLength = strlen((const char*)contentBody.pData);
+    /* 1. Call user defined API */
+    contentBody.pData = g_RestContent[g_NumResource].pCbfunc(pArgs);
+    contentBody.uLength = strlen((const char*) contentBody.pData);
 
-	/* 2. Set header for HTTP Response */
-	if(!HttpResponse_Headers(request->uConnection, HTTP_STATUS_OK, 0, contentBody.uLength, contentType, nullBlob))
-		return 0;
+    /* 2. Set header for HTTP Response */
+    if (!HttpResponse_Headers(request->uConnection, HTTP_STATUS_OK, 0,
+            contentBody.uLength, contentType, nullBlob))
+        return 0;
 
-	/* 3. fill the content response (if exists) */
-	if (contentBody.uLength != 0)
-	{
-		if(!HttpResponse_Content(request->uConnection, contentBody))
-			return 0;
-	}
+    /* 3. fill the content response (if exists) */
+    if (contentBody.uLength != 0) {
+        if (!HttpResponse_Content(request->uConnection, contentBody))
+            return 0;
+    }
 
-	return 1;
+    return 1;
 }
-
 
 /// @}
 

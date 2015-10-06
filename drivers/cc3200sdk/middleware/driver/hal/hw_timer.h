@@ -51,52 +51,50 @@
 typedef void (*cc_cb_fn)(cc_hndl);
 
 enum cc_hw_timer_mode {
-        
-        HW_TIMER_NOT_USED = 1, /* Need to be removed from here */
-        HW_TIMER_ONE_SHOT,
-        HW_TIMER_PERIODIC,
-        HW_TIMER_MONOTONE
+
+    HW_TIMER_NOT_USED = 1, /* Need to be removed from here */
+    HW_TIMER_ONE_SHOT, HW_TIMER_PERIODIC, HW_TIMER_MONOTONE
 };
 
 /* Operations supported by hardware timer (HWT) on system. A HWT can be either
-   be 64bits or 32bits capable but not both. Therefore, the HWT  driver should 
-   provide either all 64bits or 32bits routines in conjunction with all common
-   functions.
+ be 64bits or 32bits capable but not both. Therefore, the HWT  driver should 
+ provide either all 64bits or 32bits routines in conjunction with all common
+ functions.
 
-   Unless otherwise stated, operations returns 0 on success and -1 on errors.
-*/
+ Unless otherwise stated, operations returns 0 on success and -1 on errors.
+ */
 struct hw_timer_ops {
-        
-        /* Activate HW Timer in specified mode for indicated absolute expiry */
-        i32  (*start32)(cc_hndl hndl, u32 expires, enum cc_hw_timer_mode mode);
-        i32  (*start64)(cc_hndl hndl, struct u64_val *expires, 
-                        enum cc_hw_timer_mode mode);
 
-        /* Update a running HW Timer with a new absolute expiry value */
-        i32  (*update_exp32)(cc_hndl hndl, u32 expires);
-        i32  (*update_exp64)(cc_hndl hndl, struct u64_val *expires);
+    /* Activate HW Timer in specified mode for indicated absolute expiry */
+    i32 (*start32)(cc_hndl hndl, u32 expires, enum cc_hw_timer_mode mode);
+    i32 (*start64)(cc_hndl hndl, struct u64_val *expires,
+            enum cc_hw_timer_mode mode);
 
-        /* De-activate a running HE Timer */
-        i32  (*stop)(cc_hndl hndl);
+    /* Update a running HW Timer with a new absolute expiry value */
+    i32 (*update_exp32)(cc_hndl hndl, u32 expires);
+    i32 (*update_exp64)(cc_hndl hndl, struct u64_val *expires);
 
-        bool (*is_running)(cc_hndl hndl);
+    /* De-activate a running HE Timer */
+    i32 (*stop)(cc_hndl hndl);
 
-        /* Get time in terms of HW ticks remaining prior to HW Timer expiry */
-        i32  (*get_remaining32)(cc_hndl hndl, u32 *remaining);
-        i32  (*get_remaining64)(cc_hndl hndl, struct u64_val *remaining);
+    bool (*is_running)(cc_hndl hndl);
 
-        /* Get time in terms of HW ticks at the instant of API invocation */
-        i32  (*get_current32)(cc_hndl hndl, u32 *current);
-        i32  (*get_current64)(cc_hndl hndl, struct u64_val *current);
+    /* Get time in terms of HW ticks remaining prior to HW Timer expiry */
+    i32 (*get_remaining32)(cc_hndl hndl, u32 *remaining);
+    i32 (*get_remaining64)(cc_hndl hndl, struct u64_val *remaining);
 
-        /* Returns number of rollovers since, HW Timer was activated */
-        u32  (*get_rollovers)(cc_hndl hndl);
+    /* Get time in terms of HW ticks at the instant of API invocation */
+    i32 (*get_current32)(cc_hndl hndl, u32 *current);
+    i32 (*get_current64)(cc_hndl hndl, struct u64_val *current);
 
-        /* Returns operating frequency in HZ of HW Timer */ 
-        u32  (*get_frequency)(cc_hndl hndl);
+    /* Returns number of rollovers since, HW Timer was activated */
+    u32 (*get_rollovers)(cc_hndl hndl);
 
-        /* Install callback information, if not done as part of module init */
-        i32  (*register_cb)(cc_hndl hwt, cc_cb_fn user_cb, cc_hndl cb_param);
+    /* Returns operating frequency in HZ of HW Timer */
+    u32 (*get_frequency)(cc_hndl hndl);
+
+    /* Install callback information, if not done as part of module init */
+    i32 (*register_cb)(cc_hndl hwt, cc_cb_fn user_cb, cc_hndl cb_param);
 };
 
 #define DEF_HWT32_OPS(start32,   update_exp32, stop, is_running,        \
@@ -117,43 +115,41 @@ struct hw_timer_ops {
                 get_freq, reg_cb                                        \
         };
 
-
 /* Source ID */
 #define HW_REALTIME_CLK   1  /* Hardware RTC ticks - typical 32768 Hz  */
 #define HW_MONOTONE_CTR   0  /* Hardware (high-res) Monotonic counter  */
 
 struct hw_timer_cfg {
 
-        u32            base_addr;
-        u32            freq_hz;
-        u32            source;     /* Clock Source */
-        
-        bool           user_tfw; /* Timer Framework (tfw) is using hwt32 */
-        union {
-                /* Must be provided if 'user_tfw' is asserted. HW Timer 
-                   implementation must invoke this routine to bind system
-                   specific Timer Framework
-                */
-                i32 (*tfw_register_hwt_ops)(u32 source,  cc_hndl hwt_hndl,
-                                            struct hw_timer_ops *hwt_ops);
+    u32 base_addr;
+    u32 freq_hz;
+    u32 source; /* Clock Source */
 
-                /* Must be provided if 'user_tfw' is not set  */
-                cc_cb_fn       timeout_cb;
-        } cb;
+    bool user_tfw; /* Timer Framework (tfw) is using hwt32 */
+    union {
+        /* Must be provided if 'user_tfw' is asserted. HW Timer 
+         implementation must invoke this routine to bind system
+         specific Timer Framework
+         */
+        i32 (*tfw_register_hwt_ops)(u32 source, cc_hndl hwt_hndl,
+                struct hw_timer_ops *hwt_ops);
 
-        cc_hndl        cb_param; /* Used in conjunction with 'timeout_cb */
+        /* Must be provided if 'user_tfw' is not set  */
+        cc_cb_fn timeout_cb;
+    } cb;
 
-        /* 
-           Platform should force set IRQ bit correspoding to timer in interupt
-           controller. This is to ensure that an alarm that might have expired
-           is always handled when a new RTC value is set. 
-        */
-        void          (*set_irq)(void); 
+    cc_hndl cb_param; /* Used in conjunction with 'timeout_cb */
 
-        sys_irq_enbl   enbl_irqc;
-        sys_irq_dsbl   dsbl_irqc;
+    /* 
+     Platform should force set IRQ bit correspoding to timer in interupt
+     controller. This is to ensure that an alarm that might have expired
+     is always handled when a new RTC value is set. 
+     */
+    void (*set_irq)(void);
+
+    sys_irq_enbl enbl_irqc;
+    sys_irq_dsbl dsbl_irqc;
 };
-
 
 #endif
 

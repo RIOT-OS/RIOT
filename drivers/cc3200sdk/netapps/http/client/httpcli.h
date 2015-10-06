@@ -445,8 +445,8 @@ extern "C" {
  *  @brief HTTPCli Request Header Field
  */
 typedef struct HTTPCli_Field {
-    const char *name;      /*!< Field name,  ex: HTTPCli_FIELD_NAME_ACCEPT */
-    const char *value;     /*!< Field value, ex: "text/plain" */
+    const char *name; /*!< Field name,  ex: HTTPCli_FIELD_NAME_ACCEPT */
+    const char *value; /*!< Field value, ex: "text/plain" */
 } HTTPCli_Field;
 
 /*!
@@ -463,9 +463,9 @@ typedef void (*HTTPCli_StatusCallback)(void *cli, int status);
  *  @brief HTTPCli Response status code handlers
  */
 typedef struct HTTPCli_StatusHandler {
-    HTTPCli_StatusCallback  handle1xx;  /*!< 1xx status code callback */
-    HTTPCli_StatusCallback  handle2xx;  /*!< 2xx status code callback */
-    HTTPCli_StatusCallback  handle4xx;  /*!< 4xx/5xx status code callback */
+    HTTPCli_StatusCallback handle1xx; /*!< 1xx status code callback */
+    HTTPCli_StatusCallback handle2xx; /*!< 2xx status code callback */
+    HTTPCli_StatusCallback handle4xx; /*!< 4xx/5xx status code callback */
 } HTTPCli_StatusHandler;
 
 /*!
@@ -490,8 +490,8 @@ typedef int (*HTTPCli_ContentCallback)(void *cli, int status, char *body,
  *  @brief HTTPCli Content Handler type
  */
 typedef struct HTTPCli_ContentHandler {
-    char *contentType;               /*!< ex: application/json */
-    HTTPCli_ContentCallback handle;  /*!< Callback for content Type */
+    char *contentType; /*!< ex: application/json */
+    HTTPCli_ContentCallback handle; /*!< Callback for content Type */
 } HTTPCli_ContentHandler;
 
 /*!
@@ -552,18 +552,18 @@ typedef struct HTTPCli_Params {
     HTTPCli_RedirectCallback rhandle;
 #ifndef __linux__
     unsigned int stackSize; /*!< Async thread stack size. 0 for default */
-    unsigned int priority;  /*!< Async thread priority. 0 for default */
+    unsigned int priority; /*!< Async thread priority. 0 for default */
 #endif /* __linux__ */
 #endif /* HTTPCli_LIBTYPE_MIN */
 
 #ifdef __SLP__
-    HTTPCli_Notify rnotify;   /*!< Async read notify handle */
-    HTTPCli_Notify wnotify;   /*!< Async write notify handle */
-    HTTPCli_Notify enotify;   /*!< Async exception notify handle */
+    HTTPCli_Notify rnotify; /*!< Async read notify handle */
+    HTTPCli_Notify wnotify; /*!< Async write notify handle */
+    HTTPCli_Notify enotify; /*!< Async exception notify handle */
 #endif /* __SLP__ */
 
     int timeout;
-    /*!< Timeout value (in seconds) for socket. Set 0 for default value */
+/*!< Timeout value (in seconds) for socket. Set 0 for default value */
 
 } HTTPCli_Params;
 
@@ -575,15 +575,15 @@ typedef struct HTTPCli_SecureParams {
     CYASSL_CTX *ctx; /* CYASSL context */
 
 #elif defined(__SL__) /* __CYASSL__ */
-    SlSockSecureMethod   method;
-    SlSockSecureMask     mask;
-    char                 cafile[HTTPCli_CERT_NAME_LEN];
+    SlSockSecureMethod method;
+    SlSockSecureMask mask;
+    char cafile[HTTPCli_CERT_NAME_LEN];
     /*!< Set the CA certificate file name, or index 0 to 0 if not used */
-    char                 privkey[HTTPCli_CERT_NAME_LEN];
+    char privkey[HTTPCli_CERT_NAME_LEN];
     /*!< Set the client private key, or index 0 to 0 if not used */
-    char                 cert[HTTPCli_CERT_NAME_LEN];
+    char cert[HTTPCli_CERT_NAME_LEN];
     /*!< Set the client certificate, or index 0 to 0 if not used */
-    char                 dhkey[HTTPCli_CERT_NAME_LEN];
+    char dhkey[HTTPCli_CERT_NAME_LEN];
     /*!< Set the DH key, or index 0 to 0 if not used */
 
 #else /* __CYASSL__ */
@@ -801,8 +801,8 @@ extern int HTTPCli_getResponseStatus(HTTPCli_Handle cli);
  *          @ref HTTPCli_setResponseFields() or @ref HTTPCli_FIELD_ID_END or
  *          @ref HTTPCli_FIELD_ID_DUMMY, or error code on failure.
  */
-extern int HTTPCli_getResponseField(HTTPCli_Handle cli, char *value,
-        int len, bool *moreFlag);
+extern int HTTPCli_getResponseField(HTTPCli_Handle cli, char *value, int len,
+        bool *moreFlag);
 
 /*!
  *  @brief  Read the parsed response body data from the HTTP server
@@ -824,8 +824,8 @@ extern int HTTPCli_getResponseField(HTTPCli_Handle cli, char *value,
  *
  *  @return The number of characters read on success or error code on failure
  */
-extern int HTTPCli_readResponseBody(HTTPCli_Handle cli, char *body,
-        int len, bool *moreFlag);
+extern int HTTPCli_readResponseBody(HTTPCli_Handle cli, char *body, int len,
+        bool *moreFlag);
 
 /*!
  *  @brief  Read the raw response message body from the HTTP server

@@ -31,143 +31,130 @@ extern "C" {
 #define NETAPP_XMPP_RESOURCE		(5)
 #define NETAPP_XMPP_ROSTER			(6)
 
-
 #define SO_SECMETHOD_SSLV3           0  // security metohd SSL v3
 #define SECURE_MASK_SSL_RSA_WITH_RC4_128_SHA                    (1 << 0)
 #define SECURE_MASK_SSL_RSA_WITH_RC4_128_MD5                    (1 << 1)
 
+typedef struct {
+    unsigned long ProtocolSubType;
+    unsigned long Port;
+    unsigned long Family;
+    unsigned long SecurityMethod;
+    unsigned long SecurityCypher;
+    unsigned long Ip; /* IPv4 address or IPv6 first 4 bytes  */
+    unsigned long Ip1OrPaadding;
+    unsigned long Ip2OrPaadding;
+    unsigned long Ip3OrPaadding;
+} SlNetAppXmppOpt_t;
 
-typedef struct
-{
-    unsigned long  ProtocolSubType;
-    unsigned long  Port;
-    unsigned long  Family;
-    unsigned long  SecurityMethod;
-    unsigned long  SecurityCypher;
-    unsigned long  Ip;                     /* IPv4 address or IPv6 first 4 bytes  */
-    unsigned long  Ip1OrPaadding;
-    unsigned long  Ip2OrPaadding;
-    unsigned long  Ip3OrPaadding;
-}SlNetAppXmppOpt_t;
+typedef struct {
+    unsigned char UserName[32];
+    unsigned char Length;
+} SlNetAppXmppUserName_t;
 
-typedef struct
-{
-     unsigned char UserName[32];
-     unsigned char Length;
-}SlNetAppXmppUserName_t;
-
-typedef struct
-{
+typedef struct {
     unsigned char Password[32];
     unsigned char Length;
-}SlNetAppXmppPassword_t;
+} SlNetAppXmppPassword_t;
 
-typedef struct
-{
+typedef struct {
     unsigned char DomainName[32];
     unsigned char Length;
-}SlNetAppXmppDomain_t;
+} SlNetAppXmppDomain_t;
 
-typedef struct
-{
+typedef struct {
     unsigned char Resource[32];
     unsigned char Length;
-}SlNetAppXmppResource_t;
-
-
-/*!
-    \brief     A function for setting XMPP configurations
-
-    \return    On success, zero is returned. On error, -1 is
-               returned
-
-    \param[in] AppId -  application id, should be SL_NET_APP_XMPP_ID
-
-    \param[in] SetOptions - set option, could be one of the following: \n
-							NETAPP_XMPP_ADVANCED_OPT,\n
-							NETAPP_XMPP_USER_NAME,\n
-							NETAPP_XMPP_PASSWORD,\n
-							NETAPP_XMPP_DOMAIN,\n
-							NETAPP_XMPP_RESOURCE,\n
-							NETAPP_XMPP_ROSTER\n
-
-    \param[in] OptionLen - option structure length
-
-    \param[in] pOptionValues -   pointer to the option structure
-
-    \sa
-
-    \note
-
-    \warning
-*/
-long sl_NetAppXmppSet(unsigned char AppId ,unsigned char Option ,
-		        unsigned char OptionLen, unsigned char *pOptionValue);
-
+} SlNetAppXmppResource_t;
 
 /*!
-    \brief Initiates the XMPP connection process
+ \brief     A function for setting XMPP configurations
 
-    Connect to an XMPP server using the all the predefined XMPP parameters.
+ \return    On success, zero is returned. On error, -1 is
+ returned
 
-    \return                     On success, positive is returned.
-                                On error, negative is returned
+ \param[in] AppId -  application id, should be SL_NET_APP_XMPP_ID
 
-    \sa
-    \note
-    \warning
-*/
+ \param[in] SetOptions - set option, could be one of the following: \n
+ NETAPP_XMPP_ADVANCED_OPT,\n
+ NETAPP_XMPP_USER_NAME,\n
+ NETAPP_XMPP_PASSWORD,\n
+ NETAPP_XMPP_DOMAIN,\n
+ NETAPP_XMPP_RESOURCE,\n
+ NETAPP_XMPP_ROSTER\n
+
+ \param[in] OptionLen - option structure length
+
+ \param[in] pOptionValues -   pointer to the option structure
+
+ \sa
+
+ \note
+
+ \warning
+ */
+long sl_NetAppXmppSet(unsigned char AppId, unsigned char Option,
+        unsigned char OptionLen, unsigned char *pOptionValue);
+
+/*!
+ \brief Initiates the XMPP connection process
+
+ Connect to an XMPP server using the all the predefined XMPP parameters.
+
+ \return                     On success, positive is returned.
+ On error, negative is returned
+
+ \sa
+ \note
+ \warning
+ */
 int sl_NetAppXmppConnect();
 
-
 /*!
-    \brief Retrieve XMPP message
+ \brief Retrieve XMPP message
 
 
-    \param[out] pRemoteJid -  The remote user ID that sent us the XMPP message
+ \param[out] pRemoteJid -  The remote user ID that sent us the XMPP message
 
-    \param[in] Jidlen - The size of the pRemoteJid buffer
+ \param[in] Jidlen - The size of the pRemoteJid buffer
 
-    \param[out] pMessage - The buffer which will hold the retreived message
+ \param[out] pMessage - The buffer which will hold the retreived message
 
-    \param[in] Msglen - The maximal size of the message buffer
+ \param[in] Msglen - The maximal size of the message buffer
 
 
-    \return                     On success, positive is returned.
-                                -1 - error, General error, problem in parsing XMPP buffer
-                                -2 - error, Jid buffer too small to hold the remote user id
-                                -3 - error, Message buffer too small to hold the received message
-    \sa
-    \note
-    \warning
-*/
+ \return                     On success, positive is returned.
+ -1 - error, General error, problem in parsing XMPP buffer
+ -2 - error, Jid buffer too small to hold the remote user id
+ -3 - error, Message buffer too small to hold the received message
+ \sa
+ \note
+ \warning
+ */
 signed short sl_NetAppXmppRecv(unsigned char* pRemoteJid, unsigned short Jidlen,
-		                      unsigned char* pMessage, unsigned short Msglen );
-
+        unsigned char* pMessage, unsigned short Msglen);
 
 /*!
-    \brief Send a XMPP message
+ \brief Send a XMPP message
 
 
-    \param[in] pRemoteJid -  The remote user ID that sent us the XMPP message
+ \param[in] pRemoteJid -  The remote user ID that sent us the XMPP message
 
-    \param[in] Jidlen - The size of the pRemoteJid buffer
+ \param[in] Jidlen - The size of the pRemoteJid buffer
 
-    \param[in] pMessage - The buffer which will hold the retreived message
+ \param[in] pMessage - The buffer which will hold the retreived message
 
-    \param[in] Msglen - The maximal size of the message buffer
+ \param[in] Msglen - The maximal size of the message buffer
 
 
-    \return                     On success, positive is returned.
-                                On error, negative is returned
-    \sa
-    \note
-    \warning    The Send function doesn't check the Jid validity or its' status (online, off line, etc.)
-*/
+ \return                     On success, positive is returned.
+ On error, negative is returned
+ \sa
+ \note
+ \warning    The Send function doesn't check the Jid validity or its' status (online, off line, etc.)
+ */
 signed char sl_NetAppXmppSend(unsigned char* pRemoteJid, unsigned short Jidlen,
-		                      unsigned char* pMessage, unsigned short Msglen );
-
-
+        unsigned char* pMessage, unsigned short Msglen);
 
 #ifdef  __cplusplus
 }

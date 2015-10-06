@@ -58,7 +58,6 @@ extern "C"
 //*****************************************************************************
 extern void UtilsDelay(unsigned long ulCount);
 
-
 //*****************************************************************************
 //
 // Mark the end of the C bindings section for C++ compilers.

@@ -11,7 +11,6 @@
 //
 //*****************************************************************************
 
-
 /**
  * @addtogroup sha1
  *
@@ -44,10 +43,10 @@ volatile bool g_bParthashReadyFlag;
 volatile bool g_bInputReadyFlag;
 volatile bool g_bOutputReadyFlag;
 
-
 void SHAMD5IntHandler(void);
-void GenerateHash(unsigned int uiConfig,unsigned char *puiKey1,unsigned char *puiData,
-		unsigned char *puiResult,unsigned int uiDataLength);
+void GenerateHash(unsigned int uiConfig, unsigned char *puiKey1,
+        unsigned char *puiData, unsigned char *puiResult,
+        unsigned int uiDataLength);
 
 //*****************************************************************************
 //
@@ -59,39 +58,33 @@ void GenerateHash(unsigned int uiConfig,unsigned char *puiKey1,unsigned char *pu
 //! \return None
 //
 //*****************************************************************************
-void
-SHAMD5IntHandler(void)
-{
+void SHAMD5IntHandler(void) {
     uint32_t ui32IntStatus;
     //
     // Read the SHA/MD5 masked interrupt status.
     //
     ui32IntStatus = MAP_SHAMD5IntStatus(SHAMD5_BASE, true);
-    if(ui32IntStatus & SHAMD5_INT_CONTEXT_READY)
-    {
+    if (ui32IntStatus & SHAMD5_INT_CONTEXT_READY) {
         MAP_SHAMD5IntDisable(SHAMD5_BASE, SHAMD5_INT_CONTEXT_READY);
         g_bContextReadyFlag = true;
-    
+
     }
-    if(ui32IntStatus & SHAMD5_INT_PARTHASH_READY)
-    {
+    if (ui32IntStatus & SHAMD5_INT_PARTHASH_READY) {
         MAP_SHAMD5IntDisable(SHAMD5_BASE, SHAMD5_INT_PARTHASH_READY);
-        g_bParthashReadyFlag=true;
-    
+        g_bParthashReadyFlag = true;
+
     }
-    if(ui32IntStatus & SHAMD5_INT_INPUT_READY)
-    {
+    if (ui32IntStatus & SHAMD5_INT_INPUT_READY) {
         MAP_SHAMD5IntDisable(SHAMD5_BASE, SHAMD5_INT_INPUT_READY);
         g_bInputReadyFlag = true;
-    
+
     }
-    if(ui32IntStatus & SHAMD5_INT_OUTPUT_READY)
-    {
+    if (ui32IntStatus & SHAMD5_INT_OUTPUT_READY) {
         MAP_SHAMD5IntDisable(SHAMD5_BASE, SHAMD5_INT_OUTPUT_READY);
         g_bOutputReadyFlag = true;
-    
+
     }
-    
+
 }
 
 //*****************************************************************************
@@ -108,11 +101,10 @@ SHAMD5IntHandler(void)
 //
 //*****************************************************************************
 
-void
-GenerateHash(unsigned int uiConfig,unsigned char *puiKey1,unsigned char *puiData,
-		unsigned char *puiResult,unsigned int uiDataLength)
-{
-  
+void GenerateHash(unsigned int uiConfig, unsigned char *puiKey1,
+        unsigned char *puiData, unsigned char *puiResult,
+        unsigned int uiDataLength) {
+
     //
     // Step1: Reset the Module
     // Step2: Enable Interrupts
@@ -131,45 +123,42 @@ GenerateHash(unsigned int uiConfig,unsigned char *puiKey1,unsigned char *puiData
     // Enable interrupts.
     //
     MAP_SHAMD5IntEnable(SHAMD5_BASE, SHAMD5_INT_CONTEXT_READY |
-                    SHAMD5_INT_PARTHASH_READY |
-                    SHAMD5_INT_INPUT_READY |
-                    SHAMD5_INT_OUTPUT_READY);
+    SHAMD5_INT_PARTHASH_READY |
+    SHAMD5_INT_INPUT_READY |
+    SHAMD5_INT_OUTPUT_READY);
     //
     // Wait for the context ready flag.
     //
-    while(!g_bContextReadyFlag)
-    {
+    while (!g_bContextReadyFlag) {
     }
     //
     // Configure the SHA/MD5 module.
     //
-    MAP_SHAMD5ConfigSet(SHAMD5_BASE, uiConfig); 
+    MAP_SHAMD5ConfigSet(SHAMD5_BASE, uiConfig);
 
     //
     // Perform the hashing operation
     //
-    MAP_SHAMD5DataProcess(SHAMD5_BASE, puiData, strlen((const char *)puiData),
-    		puiResult);
-    
-    
+    MAP_SHAMD5DataProcess(SHAMD5_BASE, puiData, strlen((const char *) puiData),
+            puiResult);
 
 }
 
-int SHA1(unsigned char *puiInData,unsigned char *puiOutData)
-{
-	//
-	// Enable the module .
-	//
-	MAP_PRCMPeripheralClkEnable(PRCM_DTHE, PRCM_RUN_MODE_CLK);
-	//
+int SHA1(unsigned char *puiInData, unsigned char *puiOutData) {
+    //
+    // Enable the module .
+    //
+    MAP_PRCMPeripheralClkEnable(PRCM_DTHE, PRCM_RUN_MODE_CLK);
+    //
     // Enable interrupts.
     //
     MAP_SHAMD5IntRegister(SHAMD5_BASE, SHAMD5IntHandler);
 
-	GenerateHash(SHAMD5_ALGO_SHA1,NULL,puiInData,puiOutData,strlen((const char *)puiInData));
+    GenerateHash(SHAMD5_ALGO_SHA1, NULL, puiInData, puiOutData,
+            strlen((const char *) puiInData));
 
-	return 1;
-	
+    return 1;
+
 }
 
 /// @}

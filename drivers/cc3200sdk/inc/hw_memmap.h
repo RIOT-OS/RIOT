@@ -80,5 +80,4 @@
 #define AES_BASE                0x44037000
 #define DES_BASE                0x44039000
 
-
 #endif // __HW_MEMMAP_H__

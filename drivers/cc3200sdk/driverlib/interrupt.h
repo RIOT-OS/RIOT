@@ -53,7 +53,6 @@ extern "C"
 
 #include <inc/hw_types.h>
 
-
 //*****************************************************************************
 //
 // A union that describes the entries of the vector table.  The union is needed
@@ -61,13 +60,10 @@ extern "C"
 // pointers.
 //
 //*****************************************************************************
-typedef union
-{
+typedef union {
     void (*pfnHandler)(void);
     unsigned long ulPtr;
-}
-uVectorEntry;
-
+} uVectorEntry;
 
 //*****************************************************************************
 //
@@ -101,8 +97,7 @@ extern void IntRegister(unsigned long ulInterrupt, void (*pfnHandler)(void));
 extern void IntUnregister(unsigned long ulInterrupt);
 extern void IntPriorityGroupingSet(unsigned long ulBits);
 extern unsigned long IntPriorityGroupingGet(void);
-extern void IntPrioritySet(unsigned long ulInterrupt,
-                           unsigned char ucPriority);
+extern void IntPrioritySet(unsigned long ulInterrupt, unsigned char ucPriority);
 extern long IntPriorityGet(unsigned long ulInterrupt);
 extern void IntEnable(unsigned long ulInterrupt);
 extern void IntDisable(unsigned long ulInterrupt);

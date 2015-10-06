@@ -58,7 +58,7 @@
 #define TAG_HOST        7
 #define TAG_DONTCARE    8
 
- /* end of line - line content in buf */
+/* end of line - line content in buf */
 #define EOLINE  1
 
 /* end of header */
@@ -90,21 +90,15 @@ typedef struct HTTPSrv_Object {
 
 Registry_Desc ti_net_http_HTTPSrv_desc;
 
-static HTTPSrv_Params defParams = {
-    60,
-    128,
-    112,
-};
+static HTTPSrv_Params defParams = { 60, 128, 112, };
 
-static void inline close_socket(int s)
-{
+static void inline close_socket(int s) {
     close(s);
 }
 
-static int httpExtractTag(char * tag)
-{
+static int httpExtractTag(char * tag) {
     if (!strncmp("GET", tag, 3)) {
-        return (TAG_GET) ;
+        return (TAG_GET);
     }
     if (!strncmp("PUT", tag, 3)) {
         return (TAG_PUT);
@@ -125,8 +119,7 @@ static int httpExtractTag(char * tag)
     return (TAG_DONTCARE);
 }
 
-static int handle404(Ssock_Handle ssock, int contentLength)
-{
+static int handle404(Ssock_Handle ssock, int contentLength) {
     int len;
     uint8_t buf[32];
 
@@ -136,8 +129,7 @@ static int handle404(Ssock_Handle ssock, int contentLength)
         len = Ssock_recv(ssock, buf, len, 0);
         if (len > 0) {
             contentLength -= len;
-        }
-        else {
+        } else {
             break;
         }
     }
@@ -147,8 +139,7 @@ static int handle404(Ssock_Handle ssock, int contentLength)
     return (contentLength);
 }
 
-static int httpRecvLine(Ssock_Handle ssock, char * buf, int bufLen)
-{
+static int httpRecvLine(Ssock_Handle ssock, char * buf, int bufLen) {
     ssize_t nbytes;
     int len;
 
@@ -183,8 +174,7 @@ static int httpRecvLine(Ssock_Handle ssock, char * buf, int bufLen)
     return EOLINE;
 }
 
-void HTTPSrv_init(void)
-{
+void HTTPSrv_init(void) {
     static int regInit = false;
 
     if (!regInit) {
@@ -193,17 +183,16 @@ void HTTPSrv_init(void)
     }
 }
 
-void HTTPSrv_exit(void)
-{
+void HTTPSrv_exit(void) {
     /* TODO: can you remove a Registry entry? */
 }
 
 HTTPSrv_Handle HTTPSrv_create(const URLHandler_Setup * setup, int numURLh,
-                              HTTPSrv_Params * params)
-{
+        HTTPSrv_Params * params) {
     HTTPSrv_Handle srv;
 
-    if ((srv = malloc(sizeof(HTTPSrv_Object) + numURLh * sizeof(URLHandler_Setup)))) {
+    if ((srv = malloc(
+            sizeof(HTTPSrv_Object) + numURLh * sizeof(URLHandler_Setup)))) {
         int i;
 
         srv->numURLh = numURLh;
@@ -232,10 +221,9 @@ HTTPSrv_Handle HTTPSrv_create(const URLHandler_Setup * setup, int numURLh,
     return (srv);
 }
 
-void HTTPSrv_delete(HTTPSrv_Handle * srv)
-{
+void HTTPSrv_delete(HTTPSrv_Handle * srv) {
 #ifdef __NDK__
-        fdCloseSession(Task_self());
+    fdCloseSession(Task_self());
 #endif
 
     if (srv && *srv) {
@@ -244,8 +232,8 @@ void HTTPSrv_delete(HTTPSrv_Handle * srv)
     }
 }
 
-int HTTPSrv_serve(HTTPSrv_Handle srv, const struct sockaddr * addr, int len, int backlog)
-{
+int HTTPSrv_serve(HTTPSrv_Handle srv, const struct sockaddr * addr, int len,
+        int backlog) {
     int sl;
     int sc;
     int status;
@@ -283,49 +271,48 @@ int HTTPSrv_serve(HTTPSrv_Handle srv, const struct sockaddr * addr, int len, int
     return (status);
 }
 
-
-Session * createSession(HTTPSrv_Handle srv, int s)
-{
+Session * createSession(HTTPSrv_Handle srv, int s) {
     Session * session;
     int i;
     struct timeval to;
 #ifndef SL_DRIVER_VERSION
-    struct linger  lgr;
+    struct linger lgr;
 #endif
 
-    session = malloc(sizeof(Session) + srv->numURLh * sizeof(URLHandler_Handle));
+    session = malloc(
+            sizeof(Session) + srv->numURLh * sizeof(URLHandler_Handle));
     session->s = s;
     session->line = malloc(srv->maxLineLen + srv->maxURILen);
     session->uri = session->line + srv->maxLineLen;
 
     for (i = 0; i < srv->numURLh; i++) {
         if (srv->setup[i].create) {
-            if ((session->urlh[i] = srv->setup[i].create(srv->setup[i].params)) == NULL) {
+            if ((session->urlh[i] = srv->setup[i].create(srv->setup[i].params))
+                    == NULL) {
                 /* teardown */
             }
-        }
-        else {
+        } else {
             session->urlh[i] = NULL;
         }
     }
 
 #ifndef SL_DRIVER_VERSION
     /* Init the socket parameters */
-    lgr.l_onoff  = 1;
+    lgr.l_onoff = 1;
     lgr.l_linger = 5;
     if (setsockopt(s, SOL_SOCKET, SO_LINGER, &lgr, sizeof(lgr)) < 0) {
         /* teardown */
     }
 
     /* Configure our socket timeout to be 10 seconds */
-    to.tv_sec  = 10;
+    to.tv_sec = 10;
     to.tv_usec = 0;
     if (setsockopt(s, SOL_SOCKET, SO_SNDTIMEO, &to, sizeof(to)) < 0) {
         /* teardown */
     }
 #endif
 
-    to.tv_sec  = srv->timeout;
+    to.tv_sec = srv->timeout;
     to.tv_usec = 0;
     if (setsockopt(s, SOL_SOCKET, SO_RCVTIMEO, &to, sizeof(to)) < 0) {
         /* teardown */
@@ -338,8 +325,7 @@ Session * createSession(HTTPSrv_Handle srv, int s)
     return (session);
 }
 
-void deleteSession(HTTPSrv_Handle srv, Session * session)
-{
+void deleteSession(HTTPSrv_Handle srv, Session * session) {
     int i;
 
     if (session) {
@@ -359,8 +345,7 @@ void deleteSession(HTTPSrv_Handle srv, Session * session)
     }
 }
 
-int addSession(HTTPSrv_Handle srv, int s)
-{
+int addSession(HTTPSrv_Handle srv, int s) {
     int status = 0;
     int i;
 
@@ -369,8 +354,7 @@ int addSession(HTTPSrv_Handle srv, int s)
             if ((srv->sessions[i] = createSession(srv, s))) {
                 Log_print1(Diags_ANALYSIS, "adding %d", i);
                 status = 1;
-            }
-            else {
+            } else {
                 /* silently drop sessions we cannot handle now */
                 close_socket(s);
             }
@@ -379,15 +363,14 @@ int addSession(HTTPSrv_Handle srv, int s)
     }
 
     if (i == srv->numSessions) {
-        Log_print1(Diags_WARNING, "Too many clients: %p", (xdc_IArg)srv);
+        Log_print1(Diags_WARNING, "Too many clients: %p", (xdc_IArg) srv);
         close_socket(s);
     }
 
     return (status);
 }
 
-void removeSession(HTTPSrv_Handle srv, Session * session)
-{
+void removeSession(HTTPSrv_Handle srv, Session * session) {
     int i;
 
     for (i = 0; i < srv->numSessions; i++) {
@@ -400,8 +383,7 @@ void removeSession(HTTPSrv_Handle srv, Session * session)
     }
 }
 
-Session * getSession(HTTPSrv_Handle srv, int n)
-{
+Session * getSession(HTTPSrv_Handle srv, int n) {
     Session * session = NULL;
     int i;
     int cur = 0;
@@ -419,8 +401,7 @@ Session * getSession(HTTPSrv_Handle srv, int n)
     return (session);
 }
 
-int HTTPSrv_transact(HTTPSrv_Handle srv, Session * session)
-{
+int HTTPSrv_transact(HTTPSrv_Handle srv, Session * session) {
     Ssock_Handle ssock = session->ssock;
     char * line = session->line;
     int lineLen = srv->maxLineLen;
@@ -435,7 +416,8 @@ int HTTPSrv_transact(HTTPSrv_Handle srv, Session * session)
     int i;
 
     if ((status = httpRecvLine(ssock, line, lineLen)) <= 0) {
-        Log_print1(Diags_ANALYSIS, "processClient> httpRecvLine %d", (IArg)status);
+        Log_print1(Diags_ANALYSIS, "processClient> httpRecvLine %d",
+                (IArg) status);
         status = 1;
         goto END;
     }
@@ -477,8 +459,7 @@ int HTTPSrv_transact(HTTPSrv_Handle srv, Session * session)
     if (uriLen > (end - beg)) {
         strncpy(uri, beg, end - beg);
         uri[end - beg] = 0;
-    }
-    else {
+    } else {
         HTTPSrv_sendErrorResponse(ssock, HTTP_TOO_BIG);
         status = 1;
         goto END;
@@ -521,39 +502,35 @@ int HTTPSrv_transact(HTTPSrv_Handle srv, Session * session)
         goto END;
     }
 
-    Log_print4(Diags_ANALYSIS, "start handler> %p %d %s %d", (IArg)srv, method,
-               (IArg)uri, contentLength);
+    Log_print4(Diags_ANALYSIS, "start handler> %p %d %s %d", (IArg) srv, method,
+            (IArg) uri, contentLength);
 
     status = URLHandler_ENOTHANDLED;
     for (i = 0; i < srv->numURLh; i++) {
         /* TODO: add uriArgs to the process() call */
-        Log_print1(Diags_ANALYSIS, "urlh: %p\n", (xdc_IArg)session->urlh[i]);
+        Log_print1(Diags_ANALYSIS, "urlh: %p\n", (xdc_IArg) session->urlh[i]);
         status = srv->setup[i].process(session->urlh[i], method, uri, uriArgs,
-                                       contentLength, ssock);
+                contentLength, ssock);
         if (status != URLHandler_ENOTHANDLED) {
             break;
         }
     }
 
-    Log_print2(Diags_ANALYSIS, "finish handler> %p %d", (IArg)srv, status);
+    Log_print2(Diags_ANALYSIS, "finish handler> %p %d", (IArg) srv, status);
 
     if (status == URLHandler_ENOTHANDLED) {
         status = handle404(ssock, contentLength);
-    }
-    else if (status == URLHandler_EERRORHANDLED) {
+    } else if (status == URLHandler_EERRORHANDLED) {
         status = 1;
-    }
-    else {
+    } else {
         status = 0;
     }
 
-END:
-    return (status);
+    END: return (status);
 }
 
 int HTTPSrv_serveSelect(HTTPSrv_Handle srv, const struct sockaddr * addr,
-                        int len, int backlog)
-{
+        int len, int backlog) {
     int sl;
     int sc;
     Session * session;
@@ -635,18 +612,17 @@ int HTTPSrv_serveSelect(HTTPSrv_Handle srv, const struct sockaddr * addr,
     return (status);
 }
 
-int HTTPSrv_processClient(HTTPSrv_Handle srv, int sock)
-{
+int HTTPSrv_processClient(HTTPSrv_Handle srv, int sock) {
     Session * session;
 
     session = createSession(srv, sock);
 
-    Log_print1(Diags_ANALYSIS, "processClient> start %p", (IArg)srv);
+    Log_print1(Diags_ANALYSIS, "processClient> start %p", (IArg) srv);
 
     while (HTTPSrv_transact(srv, session) == 0) {
     }
 
-    Log_print1(Diags_ANALYSIS, "finish processClient> %p", (IArg)srv);
+    Log_print1(Diags_ANALYSIS, "finish processClient> %p", (IArg) srv);
 
     deleteSession(srv, session);
 

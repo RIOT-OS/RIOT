@@ -32,7 +32,7 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
  *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
-*/
+ */
 
 #include <simplelink.h>
 
@@ -43,23 +43,21 @@
 extern "C" {
 #endif
 
-/******************************************************************************
- 
- For future use
-	
-*******************************************************************************/
+    /******************************************************************************
+     
+     For future use
+     
+     *******************************************************************************/
 
 #define __inln        	/* if inline functions requiered: #define __inln inline */
 
 #define SL_DEVICE      	/* Device silo is currently always mandatory */
 
+    /******************************************************************************
 
-
-/******************************************************************************
-
- Qualifiers for package customizations 
-	
-*******************************************************************************/
+     Qualifiers for package customizations 
+     
+     *******************************************************************************/
 
 #if defined (SL_DEVICE)
 #define __dev   1
@@ -72,7 +70,6 @@ extern "C" {
 #else
 #define __dev__ext   0
 #endif
-
 
 #if (!defined (SL_PLATFORM_MULTI_THREADED)) || (!defined (SL_PLATFORM_EXTERNAL_SPAWN))
 #define __int__spwn     1
@@ -97,7 +94,7 @@ extern "C" {
 #else
 #define __nap__ext   0
 #endif
-  
+
 #if defined (SL_INC_NET_CFG_PKG)
 #define __ncg        1
 #else
@@ -164,22 +161,20 @@ extern "C" {
 #define __wln__ext      0
 #endif
 
-/* The return 1 is the function need to be included in the output */
+    /* The return 1 is the function need to be included in the output */
 #define _SL_INCLUDE_FUNC(Name)		(_SL_INC_##Name)
 
-/* Driver */
+    /* Driver */
 #define _SL_INC_sl_NetAppStart          __nap__ext
 #define _SL_INC_sl_NetAppStop           __nap__ext
 
 #define _SL_INC_sl_NetAppDnsGetHostByName   __nap__clt
-
 
 #define _SL_INC_sl_NetAppDnsGetHostByService			__nap__ext
 #define _SL_INC_sl_NetAppMDNSRegisterService		    __nap__ext
 #define _SL_INC_sl_NetAppMDNSUnRegisterService		    __nap__ext
 #define _SL_INC_sl_NetAppMDNSRegisterUnregisterService	__nap__ext
 #define _SL_INC_sl_NetAppGetServiceList	                __nap__ext
-	
 
 #define _SL_INC_sl_DnsGetHostByAddr     __nap__ext
 #define _SL_INC_sl_NetAppPingStart      __nap__ext
@@ -187,8 +182,7 @@ extern "C" {
 #define _SL_INC_sl_NetAppSet            __nap__ext
 #define _SL_INC_sl_NetAppGet            __nap__ext
 
-
-/* FS */
+    /* FS */
 #define _SL_INC_sl_FsOpen            __nvm
 
 #define _SL_INC_sl_FsClose           __nvm
@@ -201,7 +195,7 @@ extern "C" {
 
 #define _SL_INC_sl_FsDel             __nvm
 
-/* netcfg */
+    /* netcfg */
 #define _SL_INC_sl_MacAdrrSet           __ncg
 
 #define _SL_INC_sl_MacAdrrGet           __ncg
@@ -210,8 +204,7 @@ extern "C" {
 
 #define _SL_INC_sl_NetCfgSet          __ncg
 
-
-/* socket */
+    /* socket */
 #define _SL_INC_sl_Socket               __sck
 
 #define _SL_INC_sl_Close                __sck
@@ -243,8 +236,8 @@ extern "C" {
 #define _SL_INC_sl_Htonl                __sck
 
 #define _SL_INC_sl_Htons                __sck
-  
-/* wlan */
+
+    /* wlan */
 #define _SL_INC_sl_WlanConnect          __wln__ext
 
 #define _SL_INC_sl_WlanDisconnect           __wln__ext
@@ -271,7 +264,6 @@ extern "C" {
 
 #define _SL_INC_sl_SmartConfigOptSet    __wln__ext
 
-
 #define _SL_INC_sl_WlanSmartConfigStart  __wln
 
 #define _SL_INC_sl_WlanSmartConfigStop   __wln
@@ -292,8 +284,7 @@ extern "C" {
 
 #define _SL_INC_sl_WlanRxStatGet        __wln__ext
 
-
-/* device */
+    /* device */
 #define _SL_INC_sl_Task                 __int__spwn
 
 #define _SL_INC_sl_Start                __dev
@@ -313,7 +304,6 @@ extern "C" {
 #define _SL_INC_sl_DevGet			    __dev__ext
 
 #define _SL_INC_sl_DevSet			    __dev__ext
-
 
 #ifdef  __cplusplus
 }

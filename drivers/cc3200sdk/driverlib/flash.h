@@ -57,13 +57,11 @@ extern "C"
 // FlashProtectGet().
 //
 //*****************************************************************************
-typedef enum
-{
+typedef enum {
     FlashReadWrite,                         // Flash can be read and written
     FlashReadOnly,                          // Flash can only be read
     FlashExecuteOnly                        // Flash can only be executed
-}
-tFlashProtection;
+} tFlashProtection;
 
 //*****************************************************************************
 //
@@ -79,7 +77,6 @@ tFlashProtection;
 #define FLASH_INT_ERASE_ERR   0x00000800 // Erase Error Interrupt Mask
 #define FLASH_INT_PROGRAM_ERR 0x00002000 // Program Verify Error Interrupt Mask
 
-
 //*****************************************************************************
 //
 // Prototypes for the APIs.
@@ -91,10 +88,9 @@ extern void FlashEraseNonBlocking(unsigned long ulAddress);
 extern long FlashMassErase(void);
 extern void FlashMassEraseNonBlocking(void);
 extern long FlashProgram(unsigned long *pulData, unsigned long ulAddress,
-                         unsigned long ulCount);
+        unsigned long ulCount);
 extern long FlashProgramNonBlocking(unsigned long *pulData,
-                                    unsigned long ulAddress,
-                                    unsigned long ulCount);
+        unsigned long ulAddress, unsigned long ulCount);
 extern void FlashIntRegister(void (*pfnHandler)(void));
 extern void FlashIntUnregister(void);
 extern void FlashIntEnable(unsigned long ulIntFlags);

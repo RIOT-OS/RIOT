@@ -50,34 +50,33 @@
 #define MAX_HWT_PLUG  2    /* Max # of HW timers managed by timer Framework */
 #define MAX_SW_TIMER  6    /* Maximum # of SW Timers at run time in system  */
 
-
 struct cc_timer_cfg {
-        
-        u32      source;      /* REALTIMER or MONOTONIC */
-        cc_cb_fn timeout_cb;
-        cc_hndl  cb_param;
+
+    u32 source; /* REALTIMER or MONOTONIC */
+    cc_cb_fn timeout_cb;
+    cc_hndl cb_param;
 };
 
 struct cc_timer_setup {
-        sys_irq_enbl enbl_irqc;
-        sys_irq_dsbl dsbl_irqc;        
+    sys_irq_enbl enbl_irqc;
+    sys_irq_dsbl dsbl_irqc;
 };
 
 /*
-  Create a software timer context.
-  
-  returns a valid handle on success otherwise NULL
-*/
+ Create a software timer context.
+ 
+ returns a valid handle on success otherwise NULL
+ */
 cc_hndl cc_timer_create(struct cc_timer_cfg *cfg);
 
 /* 
-   Kick start or activate a timer that was already created. 
+ Kick start or activate a timer that was already created. 
 
-   Note: A timer can't be marked periodic with an absolute time. In other words,
-   flags can't be enabled for both periodicity and absolute time.
+ Note: A timer can't be marked periodic with an absolute time. In other words,
+ flags can't be enabled for both periodicity and absolute time.
 
-   returns 0 on success otherwise -1.
-*/
+ returns 0 on success otherwise -1.
+ */
 #define OPT_TIMER_ONE_SHOT	0x00
 #define OPT_TIMER_PERIODIC  0x01
 #define OPT_TIME_ABS_VALUE  0x02
@@ -85,35 +84,33 @@ cc_hndl cc_timer_create(struct cc_timer_cfg *cfg);
 i32 cc_timer_start(cc_hndl hndl, struct u64_time *time_u64, u32 options);
 
 /* 
-   Stop an active timer.
+ Stop an active timer.
 
-   returns 0 on success otherwise -1.
-*/
+ returns 0 on success otherwise -1.
+ */
 i32 cc_timer_stop(cc_hndl hndl);
 
-
 /*
-  Deletes an inactive timer
+ Deletes an inactive timer
 
-  returns 0 on success otherwise -1.
-*/
+ returns 0 on success otherwise -1.
+ */
 i32 cc_timer_delete(cc_hndl hndl);
 
 /* 
-   Initialize SW Timer Framework.
+ Initialize SW Timer Framework.
 
-   Returns 0 on success otherwise -1.
-*/
+ Returns 0 on success otherwise -1.
+ */
 i32 cc_timer_module_init(struct cc_timer_setup *timer_setup);
 
 /*
-  Register context, source and operations of the HW Timer (hwt).
+ Register context, source and operations of the HW Timer (hwt).
 
-  Returns 0 on success otherwise -1.
-*/
-i32 cc_timer_register_hwt_ops(u32 source, cc_hndl hwt_hndl, 
-                              struct hw_timer_ops *hwt_ops);
-
+ Returns 0 on success otherwise -1.
+ */
+i32 cc_timer_register_hwt_ops(u32 source, cc_hndl hwt_hndl,
+        struct hw_timer_ops *hwt_ops);
 
 #endif //_CC_TIMER_H_
 

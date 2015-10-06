@@ -82,28 +82,23 @@ extern "C" {
 #define HTTP_PORT  80
 #define HTTPS_PORT 443
 
-static inline int is1xx(int status)
-{
+static inline int is1xx(int status) {
     return ((status >= 100) && (status < 200));
 }
 
-static inline int is2xx(int status)
-{
+static inline int is2xx(int status) {
     return ((status >= 200) && (status < 300));
 }
 
-static inline int is3xx(int status)
-{
+static inline int is3xx(int status) {
     return ((status >= 300) && (status < 400));
 }
 
-static inline int is4xx(int status)
-{
+static inline int is4xx(int status) {
     return ((status >= 400) && (status < 500));
 }
 
-static inline int is5xx(int status)
-{
+static inline int is5xx(int status) {
     return ((status >= 500) && (status < 600));
 }
 

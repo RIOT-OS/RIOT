@@ -58,13 +58,12 @@ extern "C"
 // Peripheral clock and reset control registers
 //
 //*****************************************************************************
-typedef struct _PRCM_PeripheralRegs_
-{
+typedef struct _PRCM_PeripheralRegs_ {
 
-unsigned long ulClkReg;
-unsigned long ulRstReg;
+    unsigned long ulClkReg;
+    unsigned long ulRstReg;
 
-}PRCM_PeriphRegs_t;
+} PRCM_PeriphRegs_t;
 
 //*****************************************************************************
 // Values that can be passed to PRCMPeripheralEnable() and
@@ -204,9 +203,9 @@ extern void PRCMMCUReset(tBoolean bIncludeSubsystem);
 extern unsigned long PRCMSysResetCauseGet(void);
 
 extern void PRCMPeripheralClkEnable(unsigned long ulPeripheral,
-                                    unsigned long ulClkFlags);
+        unsigned long ulClkFlags);
 extern void PRCMPeripheralClkDisable(unsigned long ulPeripheral,
-                                     unsigned long ulClkFlags);
+        unsigned long ulClkFlags);
 extern void PRCMPeripheralReset(unsigned long ulPeripheral);
 extern tBoolean PRCMPeripheralStatusGet(unsigned long ulPeripheral);
 
@@ -217,24 +216,24 @@ extern void PRCMSleepEnter(void);
 extern void PRCMDeepSleepEnter(void);
 
 extern void PRCMSRAMRetentionEnable(unsigned long ulSramColSel,
-                                    unsigned long ulFlags);
+        unsigned long ulFlags);
 extern void PRCMSRAMRetentionDisable(unsigned long ulSramColSel,
-                                     unsigned long ulFlags);
+        unsigned long ulFlags);
 extern void PRCMLPDSRestoreInfoSet(unsigned long ulRestoreSP,
-                                   unsigned long ulRestorePC);
+        unsigned long ulRestorePC);
 extern void PRCMLPDSEnter(void);
 extern void PRCMLPDSIntervalSet(unsigned long ulTicks);
 extern void PRCMLPDSWakeupSourceEnable(unsigned long ulLpdsWakeupSrc);
 extern unsigned long PRCMLPDSWakeupCauseGet(void);
 extern void PRCMLPDSWakeUpGPIOSelect(unsigned long ulGPIOPin,
-                                     unsigned long ulType);
+        unsigned long ulType);
 extern void PRCMLPDSWakeupSourceDisable(unsigned long ulLpdsWakeupSrc);
 
 extern void PRCMHibernateEnter(void);
 extern void PRCMHibernateWakeupSourceEnable(unsigned long ulHIBWakupSrc);
 extern unsigned long PRCMHibernateWakeupCauseGet(void);
 extern void PRCMHibernateWakeUpGPIOSelect(unsigned long ulMultiGPIOBitMap,
-                                          unsigned long ulType);
+        unsigned long ulType);
 extern void PRCMHibernateWakeupSourceDisable(unsigned long ulHIBWakupSrc);
 extern void PRCMHibernateIntervalSet(unsigned long long ullTicks);
 
@@ -244,7 +243,7 @@ extern void PRCMSlowClkCtrMatchSet(unsigned long long ullTicks);
 extern unsigned long long PRCMSlowClkCtrMatchGet(void);
 
 extern void PRCMOCRRegisterWrite(unsigned char ucIndex,
-                                 unsigned long ulRegValue);
+        unsigned long ulRegValue);
 extern unsigned long PRCMOCRRegisterRead(unsigned char ucIndex);
 
 extern void PRCMIntRegister(void (*pfnHandler)(void));
@@ -262,8 +261,7 @@ extern void PRCMCC3200MCUInit(void);
 extern unsigned long PRCMHIBRegRead(unsigned long ulRegAddr);
 extern void PRCMHIBRegWrite(unsigned long ulRegAddr, unsigned long ulValue);
 extern unsigned long PRCMCameraFreqSet(unsigned char ulDivider,
-                                                unsigned char ulWidth);
-
+        unsigned char ulWidth);
 
 //*****************************************************************************
 //

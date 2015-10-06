@@ -17,7 +17,7 @@
  * @{
  */
 
-int SHA1(unsigned char *puiInData,unsigned char *puiOutData);
+int SHA1(unsigned char *puiInData, unsigned char *puiOutData);
 void ConvertToBase64(char *pcOutStr, const char *pccInStr, int iLen);
 
 /// @}

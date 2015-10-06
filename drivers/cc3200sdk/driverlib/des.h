@@ -109,22 +109,20 @@ extern "C"
 //
 //*****************************************************************************
 extern void DESConfigSet(uint32_t ui32Base, uint32_t ui32Config);
-extern void DESDataRead(uint32_t ui32Base, uint8_t *pui8Dest,
-                        uint8_t ui8Length);
+extern void DESDataRead(uint32_t ui32Base, uint8_t *pui8Dest, uint8_t ui8Length);
 extern bool DESDataReadNonBlocking(uint32_t ui32Base, uint8_t *pui8Dest,
-                                   uint8_t ui8Length);
+        uint8_t ui8Length);
 extern bool DESDataProcess(uint32_t ui32Base, uint8_t *pui8Src,
-                           uint8_t *pui8Dest, uint32_t ui32Length);
-extern void DESDataWrite(uint32_t ui32Base, uint8_t *pui8Src,
-                         uint8_t ui8Length);
+        uint8_t *pui8Dest, uint32_t ui32Length);
+extern void DESDataWrite(uint32_t ui32Base, uint8_t *pui8Src, uint8_t ui8Length);
 extern bool DESDataWriteNonBlocking(uint32_t ui32Base, uint8_t *pui8Src,
-                                    uint8_t ui8Length);
+        uint8_t ui8Length);
 extern void DESDMADisable(uint32_t ui32Base, uint32_t ui32Flags);
 extern void DESDMAEnable(uint32_t ui32Base, uint32_t ui32Flags);
 extern void DESIntClear(uint32_t ui32Base, uint32_t ui32IntFlags);
 extern void DESIntDisable(uint32_t ui32Base, uint32_t ui32IntFlags);
 extern void DESIntEnable(uint32_t ui32Base, uint32_t ui32IntFlags);
-extern void DESIntRegister(uint32_t ui32Base, void(*pfnHandler)(void));
+extern void DESIntRegister(uint32_t ui32Base, void (*pfnHandler)(void));
 extern uint32_t DESIntStatus(uint32_t ui32Base, bool bMasked);
 extern void DESIntUnregister(uint32_t ui32Base);
 extern bool DESIVSet(uint32_t ui32Base, uint8_t *pui8IVdata);

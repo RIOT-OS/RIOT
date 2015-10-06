@@ -55,10 +55,8 @@
 //*****************************************************************************
 // Global semaphore register list
 //*****************************************************************************
-static const uint32_t HwSpinLock_RegLst[]=
-{
-    COMMON_REG_BASE + COMMON_REG_O_SPI_Properties_Register
-};
+static const uint32_t HwSpinLock_RegLst[] = {
+COMMON_REG_BASE + COMMON_REG_O_SPI_Properties_Register };
 
 //*****************************************************************************
 //
@@ -74,33 +72,30 @@ static const uint32_t HwSpinLock_RegLst[]=
 //! return None.
 //
 //*****************************************************************************
-void HwSpinLockAcquire(uint32_t ui32LockID)
-{
-  uint32_t ui32BitPos;
-  uint32_t ui32SemVal;
-  uint32_t ui32RegAddr;
+void HwSpinLockAcquire(uint32_t ui32LockID) {
+    uint32_t ui32BitPos;
+    uint32_t ui32SemVal;
+    uint32_t ui32RegAddr;
 
-  //
-  // Extract the bit position from the
-  // LockID
-  //
-  ui32BitPos  = ((ui32LockID >> 16) & 0x0FFF);
-  ui32RegAddr = HwSpinLock_RegLst[ui32LockID & 0xF];
+    //
+    // Extract the bit position from the
+    // LockID
+    //
+    ui32BitPos = ((ui32LockID >> 16) & 0x0FFF);
+    ui32RegAddr = HwSpinLock_RegLst[ui32LockID & 0xF];
 
-  //
-  // Set the corresponding
-  // ownership bits to 'b01
-  //
-  ui32SemVal = (0xFFFFFFFF ^ (0x2 << ui32BitPos));
+    //
+    // Set the corresponding
+    // ownership bits to 'b01
+    //
+    ui32SemVal = (0xFFFFFFFF ^ (0x2 << ui32BitPos));
 
-  //
-  // Retry untill we succeed
-  //
-  do
-  {
-    HWREG(ui32RegAddr) = ui32SemVal;
-  }
-  while( !(HWREG(ui32RegAddr) & (1 << ui32BitPos )) );
+    //
+    // Retry untill we succeed
+    //
+    do {
+        HWREG(ui32RegAddr) = ui32SemVal;
+    } while (!(HWREG(ui32RegAddr) & (1 << ui32BitPos)));
 
 }
 
@@ -118,55 +113,47 @@ void HwSpinLockAcquire(uint32_t ui32LockID)
 //! return Returns 0 on success, -1 otherwise.
 //
 //*****************************************************************************
-int32_t HwSpinLockTryAcquire(uint32_t ui32LockID, uint32_t ui32Retry)
-{
-  uint32_t ui32BitPos;
-  uint32_t ui32SemVal;
-  uint32_t ui32RegAddr;
+int32_t HwSpinLockTryAcquire(uint32_t ui32LockID, uint32_t ui32Retry) {
+    uint32_t ui32BitPos;
+    uint32_t ui32SemVal;
+    uint32_t ui32RegAddr;
 
-  //
-  // Extract the bit position from the
-  // LockID
-  //
-  ui32BitPos  = ((ui32LockID >> 16) & 0x0FFF);
-  ui32RegAddr = HwSpinLock_RegLst[ui32LockID & 0xF];
+    //
+    // Extract the bit position from the
+    // LockID
+    //
+    ui32BitPos = ((ui32LockID >> 16) & 0x0FFF);
+    ui32RegAddr = HwSpinLock_RegLst[ui32LockID & 0xF];
 
-  //
-  // Set the corresponding
-  // ownership bits to 'b01
-  //
-  ui32SemVal = (0xFFFFFFFF ^ (0x2 << ui32BitPos));
+    //
+    // Set the corresponding
+    // ownership bits to 'b01
+    //
+    ui32SemVal = (0xFFFFFFFF ^ (0x2 << ui32BitPos));
 
-  //
-  // Check for 0 retry.
-  //
-  if(ui32Retry == 0)
-  {
-    ui32Retry = 1;
-  }
+    //
+    // Check for 0 retry.
+    //
+    if (ui32Retry == 0) {
+        ui32Retry = 1;
+    }
 
-  //
-  // Retry the number of times specified
-  //
-  do
-  {
-    HWREG(ui32RegAddr) = ui32SemVal;
-    ui32Retry--;
-  }
-  while( !(HWREG(ui32RegAddr) & (1 << ui32BitPos )) && ui32Retry );
+    //
+    // Retry the number of times specified
+    //
+    do {
+        HWREG(ui32RegAddr) = ui32SemVal;
+        ui32Retry--;
+    } while (!(HWREG(ui32RegAddr) & (1 << ui32BitPos)) && ui32Retry);
 
-
-  //
-  // Check the semaphore status
-  //
-  if(HWREG(ui32RegAddr) & (1 << ui32BitPos ))
-  {
-    return 0;
-  }
-  else
-  {
-    return -1;
-  }
+    //
+    // Check the semaphore status
+    //
+    if (HWREG(ui32RegAddr) & (1 << ui32BitPos)) {
+        return 0;
+    } else {
+        return -1;
+    }
 }
 
 //*****************************************************************************
@@ -180,25 +167,23 @@ int32_t HwSpinLockTryAcquire(uint32_t ui32LockID, uint32_t ui32Retry)
 //! \return None.
 //
 //*****************************************************************************
-void HwSpinLockRelease(uint32_t ui32LockID)
-{
-  uint32_t ui32BitPos;
-  uint32_t ui32SemVal;
+void HwSpinLockRelease(uint32_t ui32LockID) {
+    uint32_t ui32BitPos;
+    uint32_t ui32SemVal;
 
-  //
-  // Extract the bit position from the
-  // lock id.
-  //
-  ui32BitPos = ((ui32LockID >> 16) & 0x00FF);
+    //
+    // Extract the bit position from the
+    // lock id.
+    //
+    ui32BitPos = ((ui32LockID >> 16) & 0x00FF);
 
-  //
-  // Release the spin lock, only if already owned
-  //
-  if(HWREG(HwSpinLock_RegLst[ui32LockID & 0xF]) & (1 << ui32BitPos ))
-  {
-    ui32SemVal = (0xFFFFFFFF & ~(0x3 << ui32BitPos));
-    HWREG(HwSpinLock_RegLst[ui32LockID & 0xF]) = ui32SemVal;
-  }
+    //
+    // Release the spin lock, only if already owned
+    //
+    if (HWREG(HwSpinLock_RegLst[ui32LockID & 0xF]) & (1 << ui32BitPos)) {
+        ui32SemVal = (0xFFFFFFFF & ~(0x3 << ui32BitPos));
+        HWREG(HwSpinLock_RegLst[ui32LockID & 0xF]) = ui32SemVal;
+    }
 }
 
 //*****************************************************************************
@@ -215,50 +200,43 @@ void HwSpinLockRelease(uint32_t ui32LockID)
 //! \b HWSPINLOCK_OWNER_NONE.
 //
 //*****************************************************************************
-uint32_t HwSpinLockTest(uint32_t ui32LockID, bool bCurrentStatus)
-{
-  uint32_t ui32BitPos;
-  uint32_t ui32SemVal;
+uint32_t HwSpinLockTest(uint32_t ui32LockID, bool bCurrentStatus) {
+    uint32_t ui32BitPos;
+    uint32_t ui32SemVal;
 
-  if(bCurrentStatus)
-  {
-    //
-    // Extract the bit position from the
-    // lock id.
-    //
-    ui32BitPos = ((ui32LockID >> 16) & 0x00FF);
+    if (bCurrentStatus) {
+        //
+        // Extract the bit position from the
+        // lock id.
+        //
+        ui32BitPos = ((ui32LockID >> 16) & 0x00FF);
 
-    //
-    // return semaphore
-    //
-    return((HWREG(HwSpinLock_RegLst[ui32LockID & 0xF]) >> ui32BitPos ) & 0x3 );
-  }
-  else
-  {
-    //
-    // Extract the bit position
-    //
-    ui32BitPos = ((ui32LockID >> 24) & 0xFF);
+        //
+        // return semaphore
+        //
+        return ((HWREG(HwSpinLock_RegLst[ui32LockID & 0xF]) >> ui32BitPos) & 0x3);
+    } else {
+        //
+        // Extract the bit position
+        //
+        ui32BitPos = ((ui32LockID >> 24) & 0xFF);
 
-    //
-    // Identify which register to read
-    //
-    if((ui32LockID & 0xF) > 4)
-    {
-      ui32SemVal = ((HWREG(COMMON_REG_BASE +
-                     COMMON_REG_O_SEMAPHORE_PREV_OWNER1) >> ui32BitPos ) & 0x3);
+        //
+        // Identify which register to read
+        //
+        if ((ui32LockID & 0xF) > 4) {
+            ui32SemVal = ((HWREG(COMMON_REG_BASE +
+                    COMMON_REG_O_SEMAPHORE_PREV_OWNER1) >> ui32BitPos) & 0x3);
+        } else {
+            ui32SemVal = ((HWREG(COMMON_REG_BASE +
+                    COMMON_REG_O_SEMAPHORE_PREV_OWNER2) >> ui32BitPos) & 0x3);
+        }
+
+        //
+        // return the owner
+        //
+        return ui32SemVal;
     }
-    else
-    {
-      ui32SemVal = ((HWREG(COMMON_REG_BASE +
-                     COMMON_REG_O_SEMAPHORE_PREV_OWNER2) >> ui32BitPos ) & 0x3);
-    }
-
-    //
-    // return the owner
-    //
-    return ui32SemVal;
-  }
 }
 
 //*****************************************************************************

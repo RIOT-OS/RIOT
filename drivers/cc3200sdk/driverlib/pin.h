@@ -95,8 +95,6 @@ extern "C"
 #define PIN_63	 0x0000003E
 #define PIN_64	 0x0000003F
 
-
-
 //*****************************************************************************
 // Macros that can be used with PinConfigSet(), PinTypeGet(), PinStrengthGet()
 //*****************************************************************************
@@ -145,7 +143,6 @@ extern "C"
 #define PIN_TYPE_OD_PD    0x00000210
 #define PIN_TYPE_ANALOG   0x10000000
 
-
 //*****************************************************************************
 //
 // API Function prototypes
@@ -155,21 +152,20 @@ extern void PinModeSet(unsigned long ulPin, unsigned long ulPinMode);
 extern void PinDirModeSet(unsigned long ulPin, unsigned long ulPinIO);
 extern unsigned long PinDirModeGet(unsigned long ulPin);
 extern unsigned long PinModeGet(unsigned long ulPin);
-extern void PinConfigGet(unsigned long ulPin,unsigned long  *pulPinStrength,
-	       					unsigned long *pulPinType);
-extern void PinConfigSet(unsigned long ulPin,unsigned long  ulPinStrength,
-						unsigned long ulPinType);
-extern void PinTypeUART(unsigned long ulPin,unsigned long ulPinMode);
-extern void PinTypeI2C(unsigned long ulPin,unsigned long ulPinMode);
-extern void PinTypeSPI(unsigned long ulPin,unsigned long ulPinMode);
-extern void PinTypeI2S(unsigned long ulPin,unsigned long ulPinMode);
-extern void PinTypeTimer(unsigned long ulPin,unsigned long ulPinMode);
-extern void PinTypeCamera(unsigned long ulPin,unsigned long ulPinMode);
-extern void PinTypeGPIO(unsigned long ulPin,unsigned long ulPinMode,
-                        tBoolean bOpenDrain);
-extern void PinTypeADC(unsigned long ulPin,unsigned long ulPinMode);
-extern void PinTypeSDHost(unsigned long ulPin,unsigned long ulPinMode);
-
+extern void PinConfigGet(unsigned long ulPin, unsigned long *pulPinStrength,
+        unsigned long *pulPinType);
+extern void PinConfigSet(unsigned long ulPin, unsigned long ulPinStrength,
+        unsigned long ulPinType);
+extern void PinTypeUART(unsigned long ulPin, unsigned long ulPinMode);
+extern void PinTypeI2C(unsigned long ulPin, unsigned long ulPinMode);
+extern void PinTypeSPI(unsigned long ulPin, unsigned long ulPinMode);
+extern void PinTypeI2S(unsigned long ulPin, unsigned long ulPinMode);
+extern void PinTypeTimer(unsigned long ulPin, unsigned long ulPinMode);
+extern void PinTypeCamera(unsigned long ulPin, unsigned long ulPinMode);
+extern void PinTypeGPIO(unsigned long ulPin, unsigned long ulPinMode,
+        tBoolean bOpenDrain);
+extern void PinTypeADC(unsigned long ulPin, unsigned long ulPinMode);
+extern void PinTypeSDHost(unsigned long ulPin, unsigned long ulPinMode);
 
 #ifdef __cplusplus
 }

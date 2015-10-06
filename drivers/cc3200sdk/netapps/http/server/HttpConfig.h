@@ -32,7 +32,6 @@
 /// Use WebSocket module for using ws connection
 #define HTTP_CORE_ENABLE_WS
 
-
 /// @}
 
 #endif //_HTTP_CONFIG_H_

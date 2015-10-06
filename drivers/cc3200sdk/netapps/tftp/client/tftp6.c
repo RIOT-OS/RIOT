@@ -11,20 +11,19 @@
 //
 //*****************************************************************************
 
-
 #include "simplelink.h"
 #include "tftpinc.h"
 
 #ifdef _INCLUDE_IPv6_CODE
 
-static int  tftp6GetFile( TFTP *pTftp);
-static int  tftp6SocketSetup( TFTP *pTftp, UINT32 scope_id );
+static int tftp6GetFile( TFTP *pTftp);
+static int tftp6SocketSetup( TFTP *pTftp, UINT32 scope_id );
 static void tftp6RRQBuild(TFTP *pTftp);
 static void tftp6ACKBuild(TFTP *pTftp);
 static void tftp6FlushPackets(TFTP *pTftp);
-static int  tftp6ReadPacket( TFTP *pTftp );
-static int  tftp6ProcessPacket( TFTP *pTftp );
-static int  tftp6Send( TFTP *pTftp);
+static int tftp6ReadPacket( TFTP *pTftp );
+static int tftp6ProcessPacket( TFTP *pTftp );
+static int tftp6Send( TFTP *pTftp);
 
 /** 
  *  @b Description
@@ -44,7 +43,7 @@ static int  tftp6Send( TFTP *pTftp);
  */
 static int tftp6SocketSetup( TFTP *pTftp, UINT32 scope_id )
 {
-    int            rc;   // Return Code
+    int rc;   // Return Code
     struct timeval timeout;
 
     // Create UDP socket
@@ -57,7 +56,7 @@ static int tftp6SocketSetup( TFTP *pTftp, UINT32 scope_id )
 
     // Initialize the bind the local address
     bzero( &pTftp->tmp6addr, sizeof(struct sockaddr_in6) );
-    pTftp->tmp6addr.sin6_family   = AF_INET6;    
+    pTftp->tmp6addr.sin6_family = AF_INET6;
 
     // Assign local name to the unnamed socket
     // Do not care about local Host Address or Port (both 0)
@@ -69,7 +68,7 @@ static int tftp6SocketSetup( TFTP *pTftp, UINT32 scope_id )
     }
 
     // Set the socket IO timeout
-    timeout.tv_sec  = TFTP_SOCK_TIMEOUT;
+    timeout.tv_sec = TFTP_SOCK_TIMEOUT;
     timeout.tv_usec = 0;
     if( setsockopt( pTftp->Sock, SOL_SOCKET, SO_SNDTIMEO, &timeout, sizeof(timeout)) < 0 )
     {
@@ -85,13 +84,13 @@ static int tftp6SocketSetup( TFTP *pTftp, UINT32 scope_id )
     // Initialize the foreign address - we don't use "connect", since
     // the peer port will change. We use sendto()
     bzero( &pTftp->peer6addr, sizeof(struct sockaddr_in) );
-    pTftp->peer6addr.sin6_family      = AF_INET6;
-    pTftp->peer6addr.sin6_port        = htons(PORT_TFTP);
-    pTftp->peer6addr.sin6_scope_id    = scope_id;
+    pTftp->peer6addr.sin6_family = AF_INET6;
+    pTftp->peer6addr.sin6_port = htons(PORT_TFTP);
+    pTftp->peer6addr.sin6_scope_id = scope_id;
     mmCopy((void *)&pTftp->peer6addr.sin6_addr, &pTftp->Peer6Address, sizeof(struct in6_addr));
     rc = 0;
 
-ABORT:
+    ABORT:
     return(rc);
 }
 
@@ -110,7 +109,7 @@ static void tftp6RRQBuild(TFTP *pTftp)
 {
     struct tftphdr *RRQ_Packet;
     static char *pszOctet = "octet";
-    char   *pRRQ_Data;
+    char *pRRQ_Data;
 
     RRQ_Packet = (struct tftphdr *)pTftp->PacketBuffer;
 
@@ -164,7 +163,7 @@ static void tftp6ACKBuild(TFTP *pTftp)
     ACK_Packet->block = htons( pTftp->NextBlock );
 
     //  Set length of packet
-    pTftp->Length = 4;  //  Opcode + Block
+    pTftp->Length = 4;//  Opcode + Block
 }
 
 /** 
@@ -186,11 +185,11 @@ static int tftp6Send( TFTP *pTftp)
     int BytesSent;
 
     BytesSent = sendto(pTftp->Sock, pTftp->PacketBuffer,
-                       (int)pTftp->Length, 0,(struct sockaddr *)&pTftp->peer6addr,
-                       sizeof(pTftp->peer6addr));
+            (int)pTftp->Length, 0,(struct sockaddr *)&pTftp->peer6addr,
+            sizeof(pTftp->peer6addr));
 
     if ( BytesSent != (int)pTftp->Length )
-        rc = TFTPERROR_SOCKET;
+    rc = TFTPERROR_SOCKET;
 
     return(rc);
 }
@@ -210,29 +209,29 @@ static int tftp6Send( TFTP *pTftp)
  */
 static int tftp6ReadPacket( TFTP *pTftp )
 {
-    int                rc = 0;
-    int                addrLength;
-    struct tftphdr     *ReadBuffer;
-    INT32              BytesRead;
-    UINT32             TimeStart;
-    IP6N               TmpAddress;
+    int rc = 0;
+    int addrLength;
+    struct tftphdr *ReadBuffer;
+    INT32 BytesRead;
+    UINT32 TimeStart;
+    IP6N TmpAddress;
 
     ReadBuffer = (struct tftphdr *)pTftp->PacketBuffer;
- //   TimeStart = llTimerGetTime(0);
+    //   TimeStart = llTimerGetTime(0);
 
-RETRY:
-/*
-    // Don't allow stray traffic to keep us alive
-    if( (TimeStart+TFTP_SOCK_TIMEOUT) <= llTimerGetTime(0) )
-    {
-        BytesRead = 0;
-        goto ABORT;
-    }
-*/
+    RETRY:
+    /*
+     // Don't allow stray traffic to keep us alive
+     if( (TimeStart+TFTP_SOCK_TIMEOUT) <= llTimerGetTime(0) )
+     {
+     BytesRead = 0;
+     goto ABORT;
+     }
+     */
     // Attempt to read data
     addrLength = sizeof(pTftp->tmp6addr);
-    BytesRead  = recvfrom( pTftp->Sock, ReadBuffer, DATA_SIZE, 0,
-                           (struct sockaddr *)&pTftp->tmp6addr, &addrLength );
+    BytesRead = recvfrom( pTftp->Sock, ReadBuffer, DATA_SIZE, 0,
+            (struct sockaddr *)&pTftp->tmp6addr, &addrLength );
 
     // Handle read errors first
     if( BytesRead < 0 )
@@ -240,26 +239,26 @@ RETRY:
         // On a timeout error, ABORT with no error
         // Else report error
         if( BytesRead == EWOULDBLOCK )
-            BytesRead = 0;
+        BytesRead = 0;
         else
-            rc = TFTPERROR_SOCKET;
+        rc = TFTPERROR_SOCKET;
         goto ABORT;
     }
 
     // If this packet is not from our peer, retry
     mmCopy ((void *)&TmpAddress, (void *)&pTftp->tmp6addr.sin6_addr, sizeof(IP6N));
     if (IPv6CompareAddress(TmpAddress, pTftp->Peer6Address) == 0)
-        goto RETRY;
+    goto RETRY;
 
     // If the peer port is NOT TFTP, then it must match our expected
     // peer.
     if( pTftp->peer6addr.sin6_port != htons(PORT_TFTP) )
     {
         if( pTftp->tmp6addr.sin6_port != pTftp->peer6addr.sin6_port )
-            goto RETRY;
+        goto RETRY;
     }
 
-ABORT:
+    ABORT:
     pTftp->Length = (UINT32)BytesRead;  //  Store number of bytes read
     return(rc);
 }
@@ -286,8 +285,8 @@ static void tftp6FlushPackets(TFTP *pTftp)
     do
     {
         bytesread = recv( pTftp->Sock, pTftp->PacketBuffer,
-                          DATA_SIZE, MSG_DONTWAIT );
-    } while( bytesread > 0 );
+                DATA_SIZE, MSG_DONTWAIT );
+    }while( bytesread > 0 );
 }
 
 /** 
@@ -324,18 +323,18 @@ static int tftp6ReSync( TFTP *pTftp )
     // Resend last packet - if we're on block ZERO, resend the initial
     // request.
     if( !pTftp->NextBlock )
-        tftp6RRQBuild( pTftp );
+    tftp6RRQBuild( pTftp );
     else
-        tftp6ACKBuild( pTftp );
+    tftp6ACKBuild( pTftp );
 
     // Send the packet
     rc = tftp6Send( pTftp );
     if( rc < 0 )
-        goto ABORT;
+    goto ABORT;
 
-    pTftp->NextBlock++;  //  Increment next expected BLOCK
+    pTftp->NextBlock++;//  Increment next expected BLOCK
 
-ABORT:
+    ABORT:
     return(rc);
 }
 
@@ -356,7 +355,7 @@ ABORT:
  */
 static int tftp6ProcessPacket( TFTP *pTftp )
 {
-    int    rc = 0, done = 0;
+    int rc = 0, done = 0;
     UINT16 OpCode;
     UINT16 ServerBlock;
     UINT32 CopySize;
@@ -366,17 +365,17 @@ static int tftp6ProcessPacket( TFTP *pTftp )
 
     // Check for a bad packet - resynch on error
     if( !pTftp->Length )
-        return( tftp6ReSync( pTftp ) );
+    return( tftp6ReSync( pTftp ) );
 
     OpCode = (UINT16) ntohs(ReadBuffer->opcode);
     switch (OpCode)
     {
-    case ERROR :
+        case ERROR :
         // Copy the error code
         pTftp->ErrorCode = (UINT16) ntohs(ReadBuffer->block);
 
         // If the buffer is large enough, copy the error message
-        pTftp->Length -= TFTP_HEADER;          // Get payload length
+        pTftp->Length -= TFTP_HEADER;// Get payload length
 
         // Copy file data if room left in buffer is large enough
         if( pTftp->BufferSize >= pTftp->Length )
@@ -385,12 +384,12 @@ static int tftp6ProcessPacket( TFTP *pTftp )
             pTftp->BufferUsed = pTftp->Length;
         }
         else
-            pTftp->BufferUsed = 0;
+        pTftp->BufferUsed = 0;
 
         rc = TFTPERROR_ERRORREPLY;
         break;
 
-   case DATA :
+        case DATA :
         // Received Data, verify BLOCK correct
         ServerBlock = (UINT16) ntohs(ReadBuffer->block);
 
@@ -404,25 +403,25 @@ static int tftp6ProcessPacket( TFTP *pTftp )
 
         // If this is the first block, reset our port number.
         if( pTftp->NextBlock == 1 )
-            pTftp->peer6addr.sin6_port = pTftp->tmp6addr.sin6_port;  // Update TID
+        pTftp->peer6addr.sin6_port = pTftp->tmp6addr.sin6_port;// Update TID
 
         //  Block is for me!
-        pTftp->MaxSyncError = MAX_SYNC_TRIES;  // reset Sync Counter
-        pTftp->Length -= TFTP_HEADER;          // Get payload length
-        CopySize = pTftp->Length;              // Copy length
-        pTftp->FileSize += CopySize;           // Track the file length
+        pTftp->MaxSyncError = MAX_SYNC_TRIES;// reset Sync Counter
+        pTftp->Length -= TFTP_HEADER;// Get payload length
+        CopySize = pTftp->Length;// Copy length
+        pTftp->FileSize += CopySize;// Track the file length
 
         // Copy file data if room left in buffer is large enough
         if( pTftp->BufferSize > pTftp->BufferUsed )
         {
             if( (pTftp->BufferSize - pTftp->BufferUsed) < CopySize)
-               CopySize = pTftp->BufferSize - pTftp->BufferUsed;
+            CopySize = pTftp->BufferSize - pTftp->BufferUsed;
 
             if( CopySize )
             {
                 // Add it to our receive buffer
                 bcopy( ReadBuffer->data, (pTftp->Buffer+pTftp->BufferUsed),
-                       (int)CopySize );
+                        (int)CopySize );
 
                 // Track the number of bytes used
                 pTftp->BufferUsed += CopySize;
@@ -431,13 +430,13 @@ static int tftp6ProcessPacket( TFTP *pTftp )
 
         // If we received a partial block, we're done
         if( pTftp->Length < SEGSIZE )
-            done = 1;
+        done = 1;
 
         // Need to acknowledge this block
         tftp6ACKBuild( pTftp );
         rc = tftp6Send( pTftp );
         if( rc < 0 )
-            break;
+        break;
 
         //  Increment next expected BLOCK
         pTftp->NextBlock++;
@@ -446,7 +445,7 @@ static int tftp6ProcessPacket( TFTP *pTftp )
         rc = done;
         break;
 
-    default:
+        default:
         rc = TFTPERROR_FAILED;
         break;
     }
@@ -479,38 +478,38 @@ static int tftp6GetFile( TFTP *pTftp )
     // Send the request packet
     rc = tftp6Send( pTftp );
     if( rc < 0 )
-       goto ABORT;
+    goto ABORT;
 
     //
     // Now look for response packets
     //
-    pTftp->MaxSyncError   = MAX_SYNC_TRIES;  // set sync error counter
-    pTftp->NextBlock      = 1;               // first block expected is "1"
+    pTftp->MaxSyncError = MAX_SYNC_TRIES;// set sync error counter
+    pTftp->NextBlock = 1;// first block expected is "1"
 
     for(;;)
     {
         // Try and get a reply packet
         rc = tftp6ReadPacket( pTftp );
         if( rc < 0 )
-            goto ABORT;
+        goto ABORT;
 
         // Process the reply packet
         rc = tftp6ProcessPacket( pTftp );
         if( rc < 0 )
-            goto ABORT;
+        goto ABORT;
 
         // If done, break out of loop
         if( rc == 1 )
-            break;
+        break;
     }
 
     // If the receive buffer was too small, return 0, else return 1
     if( pTftp->BufferUsed < pTftp->FileSize )
-       rc = 0;
+    rc = 0;
     else
-       rc = 1;
+    rc = 1;
 
-ABORT:
+    ABORT:
     return(rc);
 }
 
@@ -543,18 +542,18 @@ ABORT:
  *      Error                           -   <0
  */
 int Nt6TftpRecv (IP6N TftpIP, UINT32 scope_id, char *szFileName, char *FileBuffer,
-                 UINT32 *FileSize, UINT16 *pErrorCode)
+        UINT32 *FileSize, UINT16 *pErrorCode)
 {
     TFTP *pTftp;
     int rc;          // Return Code
 
     // Quick parameter validation
     if( !szFileName || !FileSize || (*FileSize != 0 && !FileBuffer) )
-        return( TFTPERROR_BADPARAM );
+    return( TFTPERROR_BADPARAM );
 
     // Malloc Parameter Structure
     if( !(pTftp = mmAlloc( sizeof(TFTP) )) )
-        return( TFTPERROR_RESOURCES );
+    return( TFTPERROR_RESOURCES );
 
     // Initialize parameters to "NULL"
     bzero( pTftp, sizeof(TFTP) );
@@ -573,12 +572,12 @@ int Nt6TftpRecv (IP6N TftpIP, UINT32 scope_id, char *szFileName, char *FileBuffe
     // Setup initial socket
     rc = tftp6SocketSetup( pTftp, scope_id);
     if( rc < 0 )
-        goto ABORT;
+    goto ABORT;
 
     //  Socket now registered and available for use. Get the data
-    pTftp->szFileName  = szFileName;
-    pTftp->Buffer      = FileBuffer;
-    pTftp->BufferSize  = *FileSize;   // Do not read more than can fit in file
+    pTftp->szFileName = szFileName;
+    pTftp->Buffer = FileBuffer;
+    pTftp->BufferSize = *FileSize;// Do not read more than can fit in file
 
     // Get the requested file
     rc = tftp6GetFile( pTftp );
@@ -591,7 +590,7 @@ int Nt6TftpRecv (IP6N TftpIP, UINT32 scope_id, char *szFileName, char *FileBuffe
 
         // If the ErrorCode pointer is valid, copy it
         if( pErrorCode )
-            *pErrorCode = pTftp->ErrorCode;
+        *pErrorCode = pTftp->ErrorCode;
     }
     else
     {
@@ -601,11 +600,11 @@ int Nt6TftpRecv (IP6N TftpIP, UINT32 scope_id, char *szFileName, char *FileBuffe
         *FileSize = pTftp->FileSize;
     }
 
-ABORT:
+    ABORT:
     if( pTftp->Sock != INVALID_SOCKET )
-        close( pTftp->Sock );
+    close( pTftp->Sock );
     if( pTftp->PacketBuffer )
-        mmFree( pTftp->PacketBuffer );
+    mmFree( pTftp->PacketBuffer );
     mmFree( pTftp );
 
     return(rc);

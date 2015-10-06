@@ -58,7 +58,6 @@ extern "C"
 #define DRIVERLIB_RELEASE_MONTH          3
 #define DRIVERLIB_RELEASE_YEAR           2015
 
-
 //*****************************************************************************
 //
 // Mark the end of the C bindings section for C++ compilers.

@@ -69,9 +69,7 @@
 //! \return None.
 //
 //*****************************************************************************
-void
-SysTickEnable(void)
-{
+void SysTickEnable(void) {
     //
     // Enable SysTick.
     //
@@ -88,9 +86,7 @@ SysTickEnable(void)
 //! \return None.
 //
 //*****************************************************************************
-void
-SysTickDisable(void)
-{
+void SysTickDisable(void) {
     //
     // Disable SysTick.
     //
@@ -113,9 +109,7 @@ SysTickDisable(void)
 //! \return None.
 //
 //*****************************************************************************
-void
-SysTickIntRegister(void (*pfnHandler)(void))
-{
+void SysTickIntRegister(void (*pfnHandler)(void)) {
     //
     // Register the interrupt handler, returning an error if an error occurs.
     //
@@ -140,9 +134,7 @@ SysTickIntRegister(void (*pfnHandler)(void))
 //! \return None.
 //
 //*****************************************************************************
-void
-SysTickIntUnregister(void)
-{
+void SysTickIntUnregister(void) {
     //
     // Disable the SysTick interrupt.
     //
@@ -168,9 +160,7 @@ SysTickIntUnregister(void)
 //! \return None.
 //
 //*****************************************************************************
-void
-SysTickIntEnable(void)
-{
+void SysTickIntEnable(void) {
     //
     // Enable the SysTick interrupt.
     //
@@ -187,9 +177,7 @@ SysTickIntEnable(void)
 //! \return None.
 //
 //*****************************************************************************
-void
-SysTickIntDisable(void)
-{
+void SysTickIntDisable(void) {
     //
     // Disable the SysTick interrupt.
     //
@@ -215,9 +203,7 @@ SysTickIntDisable(void)
 //! \return None.
 //
 //*****************************************************************************
-void
-SysTickPeriodSet(unsigned long ulPeriod)
-{
+void SysTickPeriodSet(unsigned long ulPeriod) {
     //
     // Check the arguments.
     //
@@ -239,13 +225,11 @@ SysTickPeriodSet(unsigned long ulPeriod)
 //! \return Returns the period of the SysTick counter.
 //
 //*****************************************************************************
-unsigned long
-SysTickPeriodGet(void)
-{
+unsigned long SysTickPeriodGet(void) {
     //
     // Return the period of the SysTick counter.
     //
-    return(HWREG(NVIC_ST_RELOAD) + 1);
+    return (HWREG(NVIC_ST_RELOAD) + 1);
 }
 
 //*****************************************************************************
@@ -258,13 +242,11 @@ SysTickPeriodGet(void)
 //! \return Returns the current value of the SysTick counter.
 //
 //*****************************************************************************
-unsigned long
-SysTickValueGet(void)
-{
+unsigned long SysTickValueGet(void) {
     //
     // Return the current value of the SysTick counter.
     //
-    return(HWREG(NVIC_ST_CURRENT));
+    return (HWREG(NVIC_ST_CURRENT));
 }
 
 //*****************************************************************************

@@ -281,7 +281,7 @@ extern "C"
 // Prototypes for the APIs.
 //
 //*****************************************************************************
-extern void I2CIntRegister(uint32_t ui32Base, void(pfnHandler)(void));
+extern void I2CIntRegister(uint32_t ui32Base, void (pfnHandler)(void));
 extern void I2CIntUnregister(uint32_t ui32Base);
 extern void I2CTxFIFOConfigSet(uint32_t ui32Base, uint32_t ui32Config);
 extern void I2CTxFIFOFlush(uint32_t ui32Base);
@@ -289,16 +289,13 @@ extern void I2CRxFIFOConfigSet(uint32_t ui32Base, uint32_t ui32Config);
 extern void I2CRxFIFOFlush(uint32_t ui32Base);
 extern uint32_t I2CFIFOStatus(uint32_t ui32Base);
 extern void I2CFIFODataPut(uint32_t ui32Base, uint8_t ui8Data);
-extern uint32_t I2CFIFODataPutNonBlocking(uint32_t ui32Base,
-                                          uint8_t ui8Data);
+extern uint32_t I2CFIFODataPutNonBlocking(uint32_t ui32Base, uint8_t ui8Data);
 extern uint32_t I2CFIFODataGet(uint32_t ui32Base);
-extern uint32_t I2CFIFODataGetNonBlocking(uint32_t ui32Base,
-                                          uint8_t *pui8Data);
-extern void I2CMasterBurstLengthSet(uint32_t ui32Base,
-                                    uint8_t ui8Length);
+extern uint32_t I2CFIFODataGetNonBlocking(uint32_t ui32Base, uint8_t *pui8Data);
+extern void I2CMasterBurstLengthSet(uint32_t ui32Base, uint8_t ui8Length);
 extern uint32_t I2CMasterBurstCountGet(uint32_t ui32Base);
 extern void I2CMasterGlitchFilterConfigSet(uint32_t ui32Base,
-                                           uint32_t ui32Config);
+        uint32_t ui32Config);
 extern void I2CSlaveFIFOEnable(uint32_t ui32Base, uint32_t ui32Config);
 extern void I2CSlaveFIFODisable(uint32_t ui32Base);
 extern bool I2CMasterBusBusy(uint32_t ui32Base);
@@ -310,43 +307,36 @@ extern void I2CMasterDisable(uint32_t ui32Base);
 extern void I2CMasterEnable(uint32_t ui32Base);
 extern uint32_t I2CMasterErr(uint32_t ui32Base);
 extern void I2CMasterInitExpClk(uint32_t ui32Base, uint32_t ui32I2CClk,
-                                bool bFast);
+        bool bFast);
 extern void I2CMasterIntClear(uint32_t ui32Base);
 extern void I2CMasterIntDisable(uint32_t ui32Base);
 extern void I2CMasterIntEnable(uint32_t ui32Base);
 extern bool I2CMasterIntStatus(uint32_t ui32Base, bool bMasked);
-extern void I2CMasterIntEnableEx(uint32_t ui32Base,
-                                 uint32_t ui32IntFlags);
-extern void I2CMasterIntDisableEx(uint32_t ui32Base,
-                                  uint32_t ui32IntFlags);
-extern uint32_t I2CMasterIntStatusEx(uint32_t ui32Base,
-                                       bool bMasked);
-extern void I2CMasterIntClearEx(uint32_t ui32Base,
-                                uint32_t ui32IntFlags);
+extern void I2CMasterIntEnableEx(uint32_t ui32Base, uint32_t ui32IntFlags);
+extern void I2CMasterIntDisableEx(uint32_t ui32Base, uint32_t ui32IntFlags);
+extern uint32_t I2CMasterIntStatusEx(uint32_t ui32Base, bool bMasked);
+extern void I2CMasterIntClearEx(uint32_t ui32Base, uint32_t ui32IntFlags);
 extern void I2CMasterTimeoutSet(uint32_t ui32Base, uint32_t ui32Value);
 extern void I2CSlaveACKOverride(uint32_t ui32Base, bool bEnable);
 extern void I2CSlaveACKValueSet(uint32_t ui32Base, bool bACK);
 extern uint32_t I2CMasterLineStateGet(uint32_t ui32Base);
-extern void I2CMasterSlaveAddrSet(uint32_t ui32Base,
-                                  uint8_t ui8SlaveAddr,
-                                  bool bReceive);
+extern void I2CMasterSlaveAddrSet(uint32_t ui32Base, uint8_t ui8SlaveAddr,
+        bool bReceive);
 extern uint32_t I2CSlaveDataGet(uint32_t ui32Base);
 extern void I2CSlaveDataPut(uint32_t ui32Base, uint8_t ui8Data);
 extern void I2CSlaveDisable(uint32_t ui32Base);
 extern void I2CSlaveEnable(uint32_t ui32Base);
 extern void I2CSlaveInit(uint32_t ui32Base, uint8_t ui8SlaveAddr);
 extern void I2CSlaveAddressSet(uint32_t ui32Base, uint8_t ui8AddrNum,
-                                 uint8_t ui8SlaveAddr);
+        uint8_t ui8SlaveAddr);
 extern void I2CSlaveIntClear(uint32_t ui32Base);
 extern void I2CSlaveIntDisable(uint32_t ui32Base);
 extern void I2CSlaveIntEnable(uint32_t ui32Base);
 extern void I2CSlaveIntClearEx(uint32_t ui32Base, uint32_t ui32IntFlags);
-extern void I2CSlaveIntDisableEx(uint32_t ui32Base,
-                                 uint32_t ui32IntFlags);
+extern void I2CSlaveIntDisableEx(uint32_t ui32Base, uint32_t ui32IntFlags);
 extern void I2CSlaveIntEnableEx(uint32_t ui32Base, uint32_t ui32IntFlags);
 extern bool I2CSlaveIntStatus(uint32_t ui32Base, bool bMasked);
-extern uint32_t I2CSlaveIntStatusEx(uint32_t ui32Base,
-                                      bool bMasked);
+extern uint32_t I2CSlaveIntStatusEx(uint32_t ui32Base, bool bMasked);
 extern uint32_t I2CSlaveStatus(uint32_t ui32Base);
 
 //*****************************************************************************

@@ -59,33 +59,32 @@
 /*
  *  ======== xassert ========
  */
-static inline void xassert(int expr)
-{
+static inline void xassert(int expr) {
     //assert(expr);
-  if(!(expr)) {while(1);}
+    if (!(expr)) {
+        while (1)
+            ;
+    }
 }
 
 /*
  *  ======== xfree ========
  */
-static inline void xfree(void *ptr)
-{
+static inline void xfree(void *ptr) {
     free(ptr);
 }
 
 /*
  *  ======== xmalloc ========
  */
-static inline void *xmalloc(size_t size)
-{
+static inline void *xmalloc(size_t size) {
     return (malloc(size));
 }
 
 /*
  *  ======== xvsnprintf ========
  */
-static inline int xvsnprintf(char *s, size_t n, const char *fmt, va_list arg)
-{
+static inline int xvsnprintf(char *s, size_t n, const char *fmt, va_list arg) {
 #if defined(__SL__) || defined (__NDK__) || defined(__SLP__)
     //return (System_vsnprintf(s, n, fmt, arg)); //Aashish: Commented for Simplelink with FreeRTOS or NON-OS environment 
     return (vsnprintf(s, n, fmt, arg));

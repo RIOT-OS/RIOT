@@ -54,9 +54,7 @@
 #define RAM_RETAIN_256KB        (RAM_RETAIN_256KB | PRCM_SRAM_COL_4)
 
 enum power_modes {
-        POWER_POLICY_SLEEP,
-        POWER_POLICY_STANDBY,
-        POWER_POLICY_HIBERNATE
+    POWER_POLICY_SLEEP, POWER_POLICY_STANDBY, POWER_POLICY_HIBERNATE
 };
 
 #define NVIC_PEND0_MASK         0x01FFC16F
@@ -76,21 +74,21 @@ i32 cc_handle_S3_wakeup();
 bool cc_are_irqs_pending(void);
 
 /* Coarsely, can system go to a Lower Power? TRUE -> yes else no.
-   This decision is based on the user input
-   */
+ This decision is based on the user input
+ */
 bool cc_can_try_pm_state(enum soc_pm target);
 
 /* Must push system to low power state of S4 (Hibernate) */
 i32 cc_enter_S4(void);
 
 /* Must push system to low power state of S3 (LPDS) */
-i32 cc_enter_S3(void(*resume_fn)(void), u32 stack_ptr);
+i32 cc_enter_S3(void (*resume_fn)(void), u32 stack_ptr);
 
 /* Must push system to low power state of S2 (Deepsleep) */
 i32 cc_enter_S2(void);
 
 /* Must push system to low power state of S1 */
-i32  cc_enter_S1(void);
+i32 cc_enter_S1(void);
 
 /* S3 (LPDS): Back-up system regs & data */
 void cc_back_up_soc_data(u32 ram_retention);

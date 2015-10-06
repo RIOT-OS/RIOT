@@ -50,27 +50,23 @@ long glFileHandle;							// file handle
  *                 Note: The resource string exists ONLY during the call to this function. The string pointer should not be copied by this function.
  * @return nonzero if request is to be handled by this module. zero if not.
  */
-int HttpStatic_InitRequest(UINT16 uConnection, struct HttpBlob resource)
-{
-	char *pcWWWFsDir = "www";
-	memset(g_cFileName,'\0',40);
+int HttpStatic_InitRequest(UINT16 uConnection, struct HttpBlob resource) {
+    char *pcWWWFsDir = "www";
+    memset(g_cFileName, '\0', 40);
 
-	if(resource.uLength ==1 && *(resource.pData)=='/')
-	{
-		strcpy(g_cFileName,"www/main.html");
-	}
-	else
-	{	
-		strcpy(g_cFileName,pcWWWFsDir);
-		strncat(g_cFileName,(char*)resource.pData,resource.uLength);
-	}
+    if (resource.uLength == 1 && *(resource.pData) == '/') {
+        strcpy(g_cFileName, "www/main.html");
+    } else {
+        strcpy(g_cFileName, pcWWWFsDir);
+        strncat(g_cFileName, (char*) resource.pData, resource.uLength);
+    }
 
-	if(sl_FsOpen((unsigned char*)g_cFileName,FS_MODE_OPEN_READ,NULL,&glFileHandle)<0)
-		return 0;
-	else
-	{
-		return 1;
-	}
+    if (sl_FsOpen((unsigned char*) g_cFileName, FS_MODE_OPEN_READ, NULL,
+            &glFileHandle) < 0)
+        return 0;
+    else {
+        return 1;
+    }
 }
 
 /**
@@ -80,108 +76,93 @@ int HttpStatic_InitRequest(UINT16 uConnection, struct HttpBlob resource)
  * @param request Pointer to all data available about the request
  * @return nonzero if request was handled. zero if not.
  */
-int HttpStatic_ProcessRequest(struct HttpRequest* request)
-{
-	struct HttpBlob location,contentType;
-	struct HttpBlob* content = (struct HttpBlob*)malloc(sizeof(struct HttpBlob));
-	unsigned long Offset = 0;
-	SlFsFileInfo_t pFsFileInfo;
-	UINT32 TotalLength;
-	UINT8 HeaderFlag =0;
-	UINT8 bRetVal = 1;
-	UINT8 *buffer = NULL;
+int HttpStatic_ProcessRequest(struct HttpRequest* request) {
+    struct HttpBlob location, contentType;
+    struct HttpBlob* content = (struct HttpBlob*) malloc(
+            sizeof(struct HttpBlob));
+    unsigned long Offset = 0;
+    SlFsFileInfo_t pFsFileInfo;
+    UINT32 TotalLength;
+    UINT8 HeaderFlag = 0;
+    UINT8 bRetVal = 1;
+    UINT8 *buffer = NULL;
 
+    if (content == NULL) {
+        return 0;
+    }
+    location.pData = NULL;
+    location.uLength = 0;
+    contentType = location;
 
-	if(content == NULL)
-	{
-		return 0;
-	}
-	location.pData = NULL;
-	location.uLength = 0;
-	contentType = location;
+    /*  if HTTP_REQUEST_FLAG_METHOD_POST==1 (i.e. it is POST)
+     HttpResponse_CannedError() responds to client with status HTTP_STATUS_ERROR_INTERNAL
+     POST method is not supported for static pages	*/
+    if (request->uFlags & HTTP_REQUEST_FLAG_METHOD_POST) {
+        /* HttpResponse_CannedError responds to client with 500 ERROR_INTERNAL  */
+        if (!HttpResponse_CannedError(request->uConnection,
+                HTTP_STATUS_ERROR_INTERNAL)) {
+            bRetVal = 0;
+            goto end;
+        } else {
+            bRetVal = 1;
+            goto end;
+        }
+    }
 
-	/*  if HTTP_REQUEST_FLAG_METHOD_POST==1 (i.e. it is POST)
-		HttpResponse_CannedError() responds to client with status HTTP_STATUS_ERROR_INTERNAL
-		POST method is not supported for static pages	*/
-	if (request->uFlags & HTTP_REQUEST_FLAG_METHOD_POST)
-	{
-		 /* HttpResponse_CannedError responds to client with 500 ERROR_INTERNAL  */
-   		 if(!HttpResponse_CannedError(request->uConnection, HTTP_STATUS_ERROR_INTERNAL))
-   		 {
-   			bRetVal = 0;
-   			goto end;
-   		 }
-   		 else
-   		 {
-   			bRetVal = 1;
-   			goto end;
-   		 }
-	}
+    sl_FsGetInfo((unsigned char *) g_cFileName, NULL, &pFsFileInfo);
+    TotalLength = (&pFsFileInfo)->FileLen;
 
-	sl_FsGetInfo((unsigned char *)g_cFileName, NULL, &pFsFileInfo);
-	TotalLength = (&pFsFileInfo)->FileLen;
+    while (TotalLength > 0) {
+        content->uLength = ((TotalLength < 1000) ? (TotalLength) : (1000));
 
-	while(TotalLength > 0)
-	{
-		content->uLength = ((TotalLength < 1000) ? (TotalLength):(1000));
+        buffer = (UINT8*) realloc(buffer, content->uLength);
+        if (buffer == NULL) {
+            bRetVal = 0;
+            goto end;
+        }
+        content->pData = buffer;
 
-		buffer = (UINT8*)realloc(buffer, content->uLength);
-		if(buffer == NULL)
-		{
-			bRetVal = 0;
-			goto end;
-		}
-		content->pData = buffer;
+        /* if got here than it is a GET method
+         HttpResponse_Headers() responds to client with status HTTP_STATUS_OK */
+        if (sl_FsRead(glFileHandle, Offset, (unsigned char *) content->pData,
+                content->uLength) < 0) {
+            /* call HttpResponse_CannedError responds to client with 500 ERROR_INTERNAL  */
+            if (!HttpResponse_CannedError(request->uConnection,
+                    HTTP_STATUS_ERROR_NOT_ACCEPTED)) {
+                bRetVal = 0;
+                goto end;
+            } else {
+                bRetVal = 1;
+                goto end;
+            }
+        } else {
+            if (!HeaderFlag) {
+                if (!HttpResponse_Headers(request->uConnection, HTTP_STATUS_OK,
+                        NULL, TotalLength, contentType, location)) {
+                    bRetVal = 0;
+                    goto end;
+                }
+                HeaderFlag = 1;
+            }
 
-		/* if got here than it is a GET method
-		HttpResponse_Headers() responds to client with status HTTP_STATUS_OK */
-		if(sl_FsRead(glFileHandle, Offset, (unsigned char *) content->pData, content->uLength) < 0)
-		{
-			/* call HttpResponse_CannedError responds to client with 500 ERROR_INTERNAL  */
-			if(!HttpResponse_CannedError(request->uConnection, HTTP_STATUS_ERROR_NOT_ACCEPTED))
-			{
-				bRetVal = 0;
-				goto end;
-			}
-			else
-			{
-				bRetVal = 1;
-				goto end;
-			}
-		}
-		else
-		{
-			if(!HeaderFlag)
-			{
-				if(!HttpResponse_Headers(request->uConnection, HTTP_STATUS_OK, NULL,TotalLength, contentType, location))
-				{
-					bRetVal = 0;
-					goto end;
-				}
-				HeaderFlag = 1;
-			}
+            /* HttpResponse_Content() sends requested page to the client */
+            if (!HttpResponse_Content(request->uConnection, *content)) {
+                bRetVal = 0;
+                goto end;
+            }
+        }
 
-			/* HttpResponse_Content() sends requested page to the client */
-			if(!HttpResponse_Content(request->uConnection, *content))
-			{
-				bRetVal = 0;
-				goto end;
-			}
-		}
+        TotalLength -= content->uLength;
+        Offset += content->uLength;
+    }
 
-		TotalLength -= content->uLength;
-		Offset += content->uLength;
-	}
+    sl_FsClose(glFileHandle, 0, 0, 0);
+    end: if (buffer != NULL) {
+        free(buffer);
+    }
+    free(content);
 
-	sl_FsClose(glFileHandle,0,0,0);
-end:
-	if(buffer != NULL)
-	{
-		free(buffer);
-	}
-	free(content);
-
-	return bRetVal;
+    return bRetVal;
 }
 
 /// @}

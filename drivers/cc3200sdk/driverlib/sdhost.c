@@ -52,7 +52,6 @@
 #include <inc/hw_mmchs.h>
 #include <inc/hw_types.h>
 
-
 //*****************************************************************************
 //
 //! Configures SDHost module.
@@ -64,66 +63,60 @@
 //! \return None.
 //
 //*****************************************************************************
-void
-SDHostInit(unsigned long ulBase)
-{
-  //
-  // Assert module reset
-  //
-  HWREG(ulBase + MMCHS_O_SYSCONFIG) = 0x2;
+void SDHostInit(unsigned long ulBase) {
+    //
+    // Assert module reset
+    //
+    HWREG(ulBase + MMCHS_O_SYSCONFIG) = 0x2;
 
-  //
-  // Wait for soft reset to complete
-  //
-  while( !(HWREG(ulBase + MMCHS_O_SYSCONFIG) & 0x1) )
-  {
+    //
+    // Wait for soft reset to complete
+    //
+    while (!(HWREG(ulBase + MMCHS_O_SYSCONFIG) & 0x1)) {
 
-  }
+    }
 
-  //
-  // Assert internal reset
-  //
-  HWREG(ulBase + MMCHS_O_SYSCTL) |= (1 << 24);
+    //
+    // Assert internal reset
+    //
+    HWREG(ulBase + MMCHS_O_SYSCTL) |= (1 << 24);
 
-  //
-  // Wait for Reset to complete
-  //
-  while( (HWREG(ulBase + MMCHS_O_SYSCTL) & (0x1 << 24)) )
-  {
+    //
+    // Wait for Reset to complete
+    //
+    while ((HWREG(ulBase + MMCHS_O_SYSCTL) & (0x1 << 24))) {
 
-  }
+    }
 
-  //
-  // Set capability register, 1.8 and 3.0 V
-  //
-  HWREG(ulBase + MMCHS_O_CAPA) = (0x7 <<24);
+    //
+    // Set capability register, 1.8 and 3.0 V
+    //
+    HWREG(ulBase + MMCHS_O_CAPA) = (0x7 << 24);
 
-  //
-  // Select bus voltage, 3.0 V
-  //
-  HWREG(ulBase + MMCHS_O_HCTL) |= 0x7 << 9;
+    //
+    // Select bus voltage, 3.0 V
+    //
+    HWREG(ulBase + MMCHS_O_HCTL) |= 0x7 << 9;
 
-  //
-  // Power up the bus
-  //
-  HWREG(ulBase + MMCHS_O_HCTL) |= 1 << 8;
+    //
+    // Power up the bus
+    //
+    HWREG(ulBase + MMCHS_O_HCTL) |= 1 << 8;
 
-  //
-  // Wait for power on
-  //
-  while( !(HWREG(ulBase + MMCHS_O_HCTL) & (1<<8)) )
-  {
+    //
+    // Wait for power on
+    //
+    while (!(HWREG(ulBase + MMCHS_O_HCTL) & (1 << 8))) {
 
-  }
+    }
 
-  HWREG(ulBase + MMCHS_O_CON) |= 1 << 21;
+    HWREG(ulBase + MMCHS_O_CON) |= 1 << 21;
 
-  //
-  // Un-mask all events
-  //
-  HWREG(ulBase + MMCHS_O_IE) = 0xFFFFFFFF;
+    //
+    // Un-mask all events
+    //
+    HWREG(ulBase + MMCHS_O_IE) = 0xFFFFFFFF;
 }
-
 
 //*****************************************************************************
 //
@@ -136,14 +129,11 @@ SDHostInit(unsigned long ulBase)
 //! \return None.
 //
 //*****************************************************************************
-void
-SDHostCmdReset(unsigned long ulBase)
-{
-  HWREG(ulBase + MMCHS_O_SYSCTL) |= 1 << 25;
-  while( (HWREG(ulBase + MMCHS_O_SYSCTL) & (1 << 25)) )
-  {
+void SDHostCmdReset(unsigned long ulBase) {
+    HWREG(ulBase + MMCHS_O_SYSCTL) |= 1 << 25;
+    while ((HWREG(ulBase + MMCHS_O_SYSCTL) & (1 << 25))) {
 
-  }
+    }
 }
 
 //*****************************************************************************
@@ -171,33 +161,30 @@ SDHostCmdReset(unsigned long ulBase)
 //! \return Returns 0 on success, -1 otherwise.
 //
 //*****************************************************************************
-long
-SDHostCmdSend(unsigned long ulBase, unsigned long ulCmd, unsigned ulArg)
-{
-  //
-  // Set Data Timeout
-  //
-  HWREG(ulBase + MMCHS_O_SYSCTL) |= 0x000E0000;
+long SDHostCmdSend(unsigned long ulBase, unsigned long ulCmd, unsigned ulArg) {
+    //
+    // Set Data Timeout
+    //
+    HWREG(ulBase + MMCHS_O_SYSCTL) |= 0x000E0000;
 
-  //
-  // Check for cmd inhabit
-  //
-  if( (HWREG(ulBase + MMCHS_O_PSTATE) & 0x1))
-  {
-    return -1;
-  }
+    //
+    // Check for cmd inhabit
+    //
+    if ((HWREG(ulBase + MMCHS_O_PSTATE) & 0x1)) {
+        return -1;
+    }
 
-  //
-  // Set the argument
-  //
-  HWREG(ulBase + MMCHS_O_ARG) = ulArg;
+    //
+    // Set the argument
+    //
+    HWREG(ulBase + MMCHS_O_ARG) = ulArg;
 
-  //
-  // Send the command
-  //
-  HWREG(ulBase + MMCHS_O_CMD) = ulCmd;
+    //
+    // Send the command
+    //
+    HWREG(ulBase + MMCHS_O_CMD) = ulCmd;
 
-  return 0;
+    return 0;
 }
 
 //*****************************************************************************
@@ -214,32 +201,27 @@ SDHostCmdSend(unsigned long ulBase, unsigned long ulCmd, unsigned ulArg)
 //! \return Return \b true on success, \b false otherwise.
 //
 //*****************************************************************************
-tBoolean
-SDHostDataNonBlockingWrite(unsigned long ulBase, unsigned long ulData)
-{
-
-  //
-  // See if there is a space in the write buffer
-  //
-  if( (HWREG(ulBase + MMCHS_O_PSTATE) & (1<<10)) )
-  {
-    //
-    // Write the data into the buffer
-    //
-    HWREG(ulBase + MMCHS_O_DATA) = ulData;
+tBoolean SDHostDataNonBlockingWrite(unsigned long ulBase, unsigned long ulData) {
 
     //
-    // Success.
+    // See if there is a space in the write buffer
     //
-    return(true);
-  }
-  else
-  {
-    //
-    // No free sapce, failure.
-    //
-    return(false);
-  }
+    if ((HWREG(ulBase + MMCHS_O_PSTATE) & (1 << 10))) {
+        //
+        // Write the data into the buffer
+        //
+        HWREG(ulBase + MMCHS_O_DATA) = ulData;
+
+        //
+        // Success.
+        //
+        return (true);
+    } else {
+        //
+        // No free sapce, failure.
+        //
+        return (false);
+    }
 }
 
 //*****************************************************************************
@@ -256,23 +238,19 @@ SDHostDataNonBlockingWrite(unsigned long ulBase, unsigned long ulData)
 //! \return None.
 //
 //*****************************************************************************
-void
-SDHostDataWrite(unsigned long ulBase, unsigned long ulData)
-{
-  //
-  // Wait until space is available
-  //
-  while( !(HWREG(ulBase + MMCHS_O_PSTATE) & (1<<10)) )
-  {
+void SDHostDataWrite(unsigned long ulBase, unsigned long ulData) {
+    //
+    // Wait until space is available
+    //
+    while (!(HWREG(ulBase + MMCHS_O_PSTATE) & (1 << 10))) {
 
-  }
+    }
 
-  //
-  // Write the data
-  //
-  HWREG(ulBase + MMCHS_O_DATA) = ulData;
+    //
+    // Write the data
+    //
+    HWREG(ulBase + MMCHS_O_DATA) = ulData;
 }
-
 
 //*****************************************************************************
 //
@@ -288,21 +266,18 @@ SDHostDataWrite(unsigned long ulBase, unsigned long ulData)
 //! \return None.
 //
 //*****************************************************************************
-void
-SDHostDataRead(unsigned long ulBase, unsigned long *pulData)
-{
-  //
-  // Wait until data is available
-  //
-  while( !(HWREG(ulBase + MMCHS_O_PSTATE) & (1<<11)) )
-  {
+void SDHostDataRead(unsigned long ulBase, unsigned long *pulData) {
+    //
+    // Wait until data is available
+    //
+    while (!(HWREG(ulBase + MMCHS_O_PSTATE) & (1 << 11))) {
 
-  }
+    }
 
-  //
-  // Read the data
-  //
-  *pulData = HWREG(ulBase + MMCHS_O_DATA);
+    //
+    // Read the data
+    //
+    *pulData = HWREG(ulBase + MMCHS_O_DATA);
 }
 
 //*****************************************************************************
@@ -319,34 +294,28 @@ SDHostDataRead(unsigned long ulBase, unsigned long *pulData)
 //! \return Return \b true on success, \b false otherwise.
 //
 //*****************************************************************************
-tBoolean
-SDHostDataNonBlockingRead(unsigned long ulBase, unsigned long *pulData)
-{
-
-  //
-  // See if there is any data in the read buffer.
-  //
-  if( (HWREG(ulBase + MMCHS_O_PSTATE) & (1<11)) )
-  {
-    //
-    // Read the data word.
-    //
-    *pulData = HWREG(ulBase + MMCHS_O_DATA);
+tBoolean SDHostDataNonBlockingRead(unsigned long ulBase, unsigned long *pulData) {
 
     //
-    // Success
+    // See if there is any data in the read buffer.
     //
-    return(true);
-  }
-  else
-  {
-    //
-    // No data available, failure.
-    //
-    return(false);
-  }
+    if ((HWREG(ulBase + MMCHS_O_PSTATE) & (1 < 11))) {
+        //
+        // Read the data word.
+        //
+        *pulData = HWREG(ulBase + MMCHS_O_DATA);
+
+        //
+        // Success
+        //
+        return (true);
+    } else {
+        //
+        // No data available, failure.
+        //
+        return (false);
+    }
 }
-
 
 //*****************************************************************************
 //
@@ -367,18 +336,16 @@ SDHostDataNonBlockingRead(unsigned long ulBase, unsigned long *pulData)
 //! \return None.
 //
 //*****************************************************************************
-void
-SDHostIntRegister(unsigned long ulBase, void (*pfnHandler)(void))
-{
-  //
-  // Register the interrupt handler.
-  //
-  IntRegister(INT_MMCHS, pfnHandler);
+void SDHostIntRegister(unsigned long ulBase, void (*pfnHandler)(void)) {
+    //
+    // Register the interrupt handler.
+    //
+    IntRegister(INT_MMCHS, pfnHandler);
 
-  //
-  // Enable the SDHost interrupt.
-  //
-  IntEnable(INT_MMCHS);
+    //
+    // Enable the SDHost interrupt.
+    //
+    IntEnable(INT_MMCHS);
 }
 
 //*****************************************************************************
@@ -398,18 +365,16 @@ SDHostIntRegister(unsigned long ulBase, void (*pfnHandler)(void))
 //! \return None.
 //
 //*****************************************************************************
-void
-SDHostIntUnregister(unsigned long ulBase)
-{
-  //
-  // Disable the SDHost interrupt.
-  //
-  IntDisable(INT_MMCHS);
+void SDHostIntUnregister(unsigned long ulBase) {
+    //
+    // Disable the SDHost interrupt.
+    //
+    IntDisable(INT_MMCHS);
 
-  //
-  // Unregister the interrupt handler.
-  //
-  IntUnregister(INT_MMCHS);
+    //
+    // Unregister the interrupt handler.
+    //
+    IntUnregister(INT_MMCHS);
 }
 
 //*****************************************************************************
@@ -446,19 +411,17 @@ SDHostIntUnregister(unsigned long ulBase)
 //! \return None.
 //
 //*****************************************************************************
-void
-SDHostIntEnable(unsigned long ulBase,unsigned long ulIntFlags)
-{
-  //
-  // Enable DMA done interrupts
-  //
-  HWREG(APPS_CONFIG_BASE + APPS_CONFIG_O_DMA_DONE_INT_MASK_CLR) =
-                                                          (ulIntFlags >> 30);
+void SDHostIntEnable(unsigned long ulBase, unsigned long ulIntFlags) {
+    //
+    // Enable DMA done interrupts
+    //
+    HWREG(APPS_CONFIG_BASE + APPS_CONFIG_O_DMA_DONE_INT_MASK_CLR) =
+            (ulIntFlags >> 30);
 
-  //
-  // Enable the individual interrupt sources
-  //
-  HWREG(ulBase + MMCHS_O_ISE) |= (ulIntFlags & 0x3FFFFFFF);
+    //
+    // Enable the individual interrupt sources
+    //
+    HWREG(ulBase + MMCHS_O_ISE) |= (ulIntFlags & 0x3FFFFFFF);
 }
 
 //*****************************************************************************
@@ -478,18 +441,16 @@ SDHostIntEnable(unsigned long ulBase,unsigned long ulIntFlags)
 //! \return None.
 //
 //*****************************************************************************
-void
-SDHostIntDisable(unsigned long ulBase,unsigned long ulIntFlags)
-{
-  //
-  // Disable DMA done interrupts
-  //
-  HWREG(APPS_CONFIG_BASE + APPS_CONFIG_O_DMA_DONE_INT_MASK_SET) =
-                                                          (ulIntFlags >> 30);
-  //
-  // Disable the individual interrupt sources
-  //
-  HWREG(ulBase + MMCHS_O_ISE) &= ~(ulIntFlags & 0x3FFFFFFF);
+void SDHostIntDisable(unsigned long ulBase, unsigned long ulIntFlags) {
+    //
+    // Disable DMA done interrupts
+    //
+    HWREG(APPS_CONFIG_BASE + APPS_CONFIG_O_DMA_DONE_INT_MASK_SET) =
+            (ulIntFlags >> 30);
+    //
+    // Disable the individual interrupt sources
+    //
+    HWREG(ulBase + MMCHS_O_ISE) &= ~(ulIntFlags & 0x3FFFFFFF);
 }
 
 //*****************************************************************************
@@ -504,23 +465,21 @@ SDHostIntDisable(unsigned long ulBase,unsigned long ulIntFlags)
 //! values described in SDHostIntEnable().
 //
 //*****************************************************************************
-unsigned long
-SDHostIntStatus(unsigned long ulBase)
-{
-  unsigned long ulIntStatus;
+unsigned long SDHostIntStatus(unsigned long ulBase) {
+    unsigned long ulIntStatus;
 
-  //
-  // Get DMA done interrupt status
-  //
-  ulIntStatus = HWREG(APPS_CONFIG_BASE + APPS_CONFIG_O_DMA_DONE_INT_STS_RAW);
-  ulIntStatus = (ulIntStatus << 30);
+    //
+    // Get DMA done interrupt status
+    //
+    ulIntStatus = HWREG(APPS_CONFIG_BASE + APPS_CONFIG_O_DMA_DONE_INT_STS_RAW);
+    ulIntStatus = (ulIntStatus << 30);
 
-  //
-  // Return the status of individual interrupt sources
-  //
-  ulIntStatus |= (HWREG(ulBase + MMCHS_O_STAT) & 0x3FFFFFFF);
+    //
+    // Return the status of individual interrupt sources
+    //
+    ulIntStatus |= (HWREG(ulBase + MMCHS_O_STAT) & 0x3FFFFFFF);
 
-  return(ulIntStatus);
+    return (ulIntStatus);
 }
 
 //*****************************************************************************
@@ -540,18 +499,16 @@ SDHostIntStatus(unsigned long ulBase)
 //! \return None.
 //
 //*****************************************************************************
-void
-SDHostIntClear(unsigned long ulBase,unsigned long ulIntFlags)
-{
-  //
-  // Clear DMA done interrupts
-  //
-  HWREG(APPS_CONFIG_BASE + APPS_CONFIG_O_DMA_DONE_INT_ACK) =
-                                                          (ulIntFlags >> 30);
-  //
-  // Clear the individual interrupt sources
-  //
-  HWREG(ulBase + MMCHS_O_STAT) = (ulIntFlags & 0x3FFFFFFF);
+void SDHostIntClear(unsigned long ulBase, unsigned long ulIntFlags) {
+    //
+    // Clear DMA done interrupts
+    //
+    HWREG(APPS_CONFIG_BASE + APPS_CONFIG_O_DMA_DONE_INT_ACK) = (ulIntFlags
+            >> 30);
+    //
+    // Clear the individual interrupt sources
+    //
+    HWREG(ulBase + MMCHS_O_STAT) = (ulIntFlags & 0x3FFFFFFF);
 }
 
 //*****************************************************************************
@@ -571,15 +528,12 @@ SDHostIntClear(unsigned long ulBase,unsigned long ulIntFlags)
 //! \return None
 //
 //*****************************************************************************
-void
-SDHostCardErrorMaskSet(unsigned long ulBase, unsigned long ulErrMask)
-{
-  //
-  // Set the card status error mask
-  //
-  HWREG(ulBase + MMCHS_O_CSRE) = ulErrMask;
+void SDHostCardErrorMaskSet(unsigned long ulBase, unsigned long ulErrMask) {
+    //
+    // Set the card status error mask
+    //
+    HWREG(ulBase + MMCHS_O_CSRE) = ulErrMask;
 }
-
 
 //*****************************************************************************
 //
@@ -593,13 +547,11 @@ SDHostCardErrorMaskSet(unsigned long ulBase, unsigned long ulErrMask)
 //! \return Returns the current card status error.
 //
 //*****************************************************************************
-unsigned long
-SDHostCardErrorMaskGet(unsigned long ulBase)
-{
-  //
-  // Return the card status error mask
-  //
-  return(HWREG(ulBase + MMCHS_O_CSRE));
+unsigned long SDHostCardErrorMaskGet(unsigned long ulBase) {
+    //
+    // Return the card status error mask
+    //
+    return (HWREG(ulBase + MMCHS_O_CSRE));
 }
 
 //*****************************************************************************
@@ -616,42 +568,39 @@ SDHostCardErrorMaskGet(unsigned long ulBase)
 //! \return None.
 //
 //*****************************************************************************
-void
-SDHostSetExpClk(unsigned long ulBase, unsigned long ulSDHostClk,
-             unsigned long ulCardClk)
-{
-  unsigned long ulDiv;
+void SDHostSetExpClk(unsigned long ulBase, unsigned long ulSDHostClk,
+        unsigned long ulCardClk) {
+    unsigned long ulDiv;
 
-  //
-  // Disable card clock
-  //
-  HWREG(ulBase + MMCHS_O_SYSCTL) &= ~0x4;
+    //
+    // Disable card clock
+    //
+    HWREG(ulBase + MMCHS_O_SYSCTL) &= ~0x4;
 
-  //
-  // Enable internal clock
-  //
-  HWREG(ulBase + MMCHS_O_SYSCTL) |= 0x1;
+    //
+    // Enable internal clock
+    //
+    HWREG(ulBase + MMCHS_O_SYSCTL) |= 0x1;
 
-  ulDiv = ((ulSDHostClk/ulCardClk) & 0x3FF);
+    ulDiv = ((ulSDHostClk / ulCardClk) & 0x3FF);
 
-  //
-  // Set clock divider,
-  //
-  HWREG(ulBase + MMCHS_O_SYSCTL) = ((HWREG(ulBase + MMCHS_O_SYSCTL) &
-                                     ~0x0000FFC0)| (ulDiv) << 6);
+    //
+    // Set clock divider,
+    //
+    HWREG(ulBase + MMCHS_O_SYSCTL) = ((HWREG(ulBase + MMCHS_O_SYSCTL)
+            & ~0x0000FFC0) | (ulDiv) << 6);
 
-  //
-  // Wait for clock to stablize
-  //
-  while( !(HWREG(ulBase + MMCHS_O_SYSCTL) & 0x2) )
-  {
+    //
+    // Wait for clock to stablize
+    //
+    while (!(HWREG(ulBase + MMCHS_O_SYSCTL) & 0x2)) {
 
-  }
+    }
 
-  //
-  // Enable card clock
-  //
-  HWREG(ulBase + MMCHS_O_SYSCTL) |= 0x4;
+    //
+    // Enable card clock
+    //
+    HWREG(ulBase + MMCHS_O_SYSCTL) |= 0x4;
 }
 
 //*****************************************************************************
@@ -667,17 +616,15 @@ SDHostSetExpClk(unsigned long ulBase, unsigned long ulSDHostClk,
 //! \return None.
 //
 //*****************************************************************************
-void
-SDHostRespGet(unsigned long ulBase, unsigned long ulRespnse[4])
-{
+void SDHostRespGet(unsigned long ulBase, unsigned long ulRespnse[4]) {
 
-  //
-  // Read the responses.
-  //
-  ulRespnse[0] = HWREG(ulBase + MMCHS_O_RSP10);
-  ulRespnse[1] = HWREG(ulBase + MMCHS_O_RSP32);
-  ulRespnse[2] = HWREG(ulBase + MMCHS_O_RSP54);
-  ulRespnse[3] = HWREG(ulBase + MMCHS_O_RSP76);
+    //
+    // Read the responses.
+    //
+    ulRespnse[0] = HWREG(ulBase + MMCHS_O_RSP10);
+    ulRespnse[1] = HWREG(ulBase + MMCHS_O_RSP32);
+    ulRespnse[2] = HWREG(ulBase + MMCHS_O_RSP54);
+    ulRespnse[3] = HWREG(ulBase + MMCHS_O_RSP76);
 
 }
 
@@ -696,14 +643,12 @@ SDHostRespGet(unsigned long ulBase, unsigned long ulRespnse[4])
 //! \return None.
 //
 //*****************************************************************************
-void
-SDHostBlockSizeSet(unsigned long ulBase, unsigned short ulBlkSize)
-{
-  //
-  // Set the block size
-  //
-  HWREG(ulBase + MMCHS_O_BLK) = ((HWREG(ulBase + MMCHS_O_BLK) & 0x00000FFF)|
-                                  (ulBlkSize & 0xFFF));
+void SDHostBlockSizeSet(unsigned long ulBase, unsigned short ulBlkSize) {
+    //
+    // Set the block size
+    //
+    HWREG(ulBase + MMCHS_O_BLK) = ((HWREG(ulBase + MMCHS_O_BLK) & 0x00000FFF)
+            | (ulBlkSize & 0xFFF));
 }
 
 //*****************************************************************************
@@ -719,21 +664,19 @@ SDHostBlockSizeSet(unsigned long ulBase, unsigned short ulBlkSize)
 //! \return None.
 //
 //*****************************************************************************
-void
-SDHostBlockCountSet(unsigned long ulBase, unsigned short ulBlkCount)
-{
-  unsigned long ulRegVal;
+void SDHostBlockCountSet(unsigned long ulBase, unsigned short ulBlkCount) {
+    unsigned long ulRegVal;
 
-  //
-  // Read the current value
-  //
-  ulRegVal = HWREG(ulBase + MMCHS_O_BLK);
+    //
+    // Read the current value
+    //
+    ulRegVal = HWREG(ulBase + MMCHS_O_BLK);
 
-  //
-  // Set the number of blocks
-  //
-  HWREG(ulBase + MMCHS_O_BLK) = ((ulRegVal & 0x0000FFFF)|
-                                  (ulBlkCount << 16));
+    //
+    // Set the number of blocks
+    //
+    HWREG(ulBase + MMCHS_O_BLK) = ((ulRegVal & 0x0000FFFF)
+            | (ulBlkCount << 16));
 }
 
 //*****************************************************************************

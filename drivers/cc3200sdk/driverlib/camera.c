@@ -63,21 +63,19 @@
 //! \return None.
 //
 //******************************************************************************
-void CameraReset(unsigned long ulBase)
-{
-  //
-  // Reset the camera
-  //
-  HWREG(ulBase + CAMERA_O_CC_SYSCONFIG) = CAMERA_CC_SYSCONFIG_SOFT_RESET;
+void CameraReset(unsigned long ulBase) {
+    //
+    // Reset the camera
+    //
+    HWREG(ulBase + CAMERA_O_CC_SYSCONFIG) = CAMERA_CC_SYSCONFIG_SOFT_RESET;
 
-  //
-  // Wait for reset completion
-  //
-  while(!(HWREG(ulBase + CAMERA_O_CC_SYSSTATUS)&
-          CAMERA_CC_SYSSTATUS_RESET_DONE2))
-  {
+    //
+    // Wait for reset completion
+    //
+    while (!(HWREG(ulBase + CAMERA_O_CC_SYSSTATUS) &
+    CAMERA_CC_SYSSTATUS_RESET_DONE2)) {
 
-  }
+    }
 
 }
 
@@ -112,32 +110,30 @@ void CameraReset(unsigned long ulBase)
 //
 //******************************************************************************
 void CameraParamsConfig(unsigned long ulBase, unsigned long ulHSPol,
-                        unsigned long ulVSPol, unsigned long ulFlags)
-{
-  unsigned long ulReg;
+        unsigned long ulVSPol, unsigned long ulFlags) {
+    unsigned long ulReg;
 
-  //
-  // Read the register
-  //
-  ulReg = HWREG(ulBase + CAMERA_O_CC_CTRL);
+    //
+    // Read the register
+    //
+    ulReg = HWREG(ulBase + CAMERA_O_CC_CTRL);
 
-  //
-  // Set the requested parameter
-  //
-  ulFlags = (ulFlags|ulHSPol|ulVSPol);
-  ulReg = ((ulReg & ~(CAMERA_CC_CTRL_NOBT_SYNCHRO |
-                   CAMERA_CC_CTRL_NOBT_HS_POL |
-                   CAMERA_CC_CTRL_NOBT_VS_POL |
-                   CAMERA_CC_CTRL_BT_CORRECT  |
-                   CAMERA_CC_CTRL_PAR_ORDERCAM |
-                   CAMERA_CC_CTRL_PAR_CLK_POL )) | ulFlags);
+    //
+    // Set the requested parameter
+    //
+    ulFlags = (ulFlags | ulHSPol | ulVSPol);
+    ulReg = ((ulReg & ~(CAMERA_CC_CTRL_NOBT_SYNCHRO |
+    CAMERA_CC_CTRL_NOBT_HS_POL |
+    CAMERA_CC_CTRL_NOBT_VS_POL |
+    CAMERA_CC_CTRL_BT_CORRECT |
+    CAMERA_CC_CTRL_PAR_ORDERCAM |
+    CAMERA_CC_CTRL_PAR_CLK_POL)) | ulFlags);
 
-  //
-  // Write the configuration
-  //
-  HWREG(ulBase + CAMERA_O_CC_CTRL)=ulReg;
+    //
+    // Write the configuration
+    //
+    HWREG(ulBase + CAMERA_O_CC_CTRL) = ulReg;
 }
-
 
 //******************************************************************************
 //
@@ -154,41 +150,38 @@ void CameraParamsConfig(unsigned long ulBase, unsigned long ulHSPol,
 //
 //******************************************************************************
 void CameraXClkConfig(unsigned long ulBase, unsigned long ulCamClkIn,
-                      unsigned long ulXClk)
-{
-  unsigned long ulReg;
-  unsigned long ucDiv;
+        unsigned long ulXClk) {
+    unsigned long ulReg;
+    unsigned long ucDiv;
 
-  //
-  // Read the register
-  //
-  ulReg = HWREG(ulBase + CAMERA_O_CC_CTRL_XCLK);
+    //
+    // Read the register
+    //
+    ulReg = HWREG(ulBase + CAMERA_O_CC_CTRL_XCLK);
 
-  //
-  // Mask XCLK divider value
-  //
-  ulReg &= ~(CAMERA_CC_CTRL_XCLK_XCLK_DIV_M);
+    //
+    // Mask XCLK divider value
+    //
+    ulReg &= ~(CAMERA_CC_CTRL_XCLK_XCLK_DIV_M);
 
-  //
-  // Compute the divider
-  //
-  ucDiv = ((ulCamClkIn)/ulXClk);
+    //
+    // Compute the divider
+    //
+    ucDiv = ((ulCamClkIn) / ulXClk);
 
-  //
-  // Max supported division is 30
-  //
-  if(ucDiv > 30)
-  {
-      return;
-  }
+    //
+    // Max supported division is 30
+    //
+    if (ucDiv > 30) {
+        return;
+    }
 
-  //
-  // Set and write back the configuration
-  //
-  ulReg |= ucDiv;
-  HWREG(ulBase + CAMERA_O_CC_CTRL_XCLK) = ulReg;
+    //
+    // Set and write back the configuration
+    //
+    ulReg |= ucDiv;
+    HWREG(ulBase + CAMERA_O_CC_CTRL_XCLK) = ulReg;
 }
-
 
 //******************************************************************************
 //
@@ -208,35 +201,34 @@ void CameraXClkConfig(unsigned long ulBase, unsigned long ulCamClkIn,
 //! \return None.
 //
 //******************************************************************************
-void CameraXClkSet(unsigned long ulBase, unsigned char bXClkFlags)
-{
-  unsigned long ulReg;
+void CameraXClkSet(unsigned long ulBase, unsigned char bXClkFlags) {
+    unsigned long ulReg;
 
-  //
-  // Read and Mask XTAL Divider config.
-  //
-  ulReg = (HWREG(ulBase + CAMERA_O_CC_CTRL_XCLK) &
-    ~(CAMERA_CC_CTRL_XCLK_XCLK_DIV_M));
+    //
+    // Read and Mask XTAL Divider config.
+    //
+    ulReg = (HWREG(ulBase + CAMERA_O_CC_CTRL_XCLK)
+            & ~(CAMERA_CC_CTRL_XCLK_XCLK_DIV_M));
 
-  //
-  // Set config. base on parameter flag
-  //
-  switch(bXClkFlags)
-  {
+    //
+    // Set config. base on parameter flag
+    //
+    switch (bXClkFlags) {
 
-  case CAM_XCLK_STABLE_HI : ulReg |= 0x00000001;
-                            break;
+    case CAM_XCLK_STABLE_HI:
+        ulReg |= 0x00000001;
+        break;
 
-  case CAM_XCLK_DIV_BYPASS: ulReg |= 0x0000000F;
-                            break;
-  }
+    case CAM_XCLK_DIV_BYPASS:
+        ulReg |= 0x0000000F;
+        break;
+    }
 
-  //
-  // Write the config.
-  //
-  HWREG(ulBase + CAMERA_O_CC_CTRL_XCLK) = ulReg;
+    //
+    // Write the config.
+    //
+    HWREG(ulBase + CAMERA_O_CC_CTRL_XCLK) = ulReg;
 }
-
 
 //******************************************************************************
 //
@@ -250,14 +242,12 @@ void CameraXClkSet(unsigned long ulBase, unsigned char bXClkFlags)
 //! \return None.
 //
 //******************************************************************************
-void CameraDMAEnable(unsigned long ulBase)
-{
-  //
-  // Enable DMA
-  //
-  HWREG(ulBase + CAMERA_O_CC_CTRL_DMA) |= CAMERA_CC_CTRL_DMA_DMA_EN;
+void CameraDMAEnable(unsigned long ulBase) {
+    //
+    // Enable DMA
+    //
+    HWREG(ulBase + CAMERA_O_CC_CTRL_DMA) |= CAMERA_CC_CTRL_DMA_DMA_EN;
 }
-
 
 //******************************************************************************
 //
@@ -270,15 +260,12 @@ void CameraDMAEnable(unsigned long ulBase)
 //! \return None.
 //
 //******************************************************************************
-void CameraDMADisable(unsigned long ulBase)
-{
-  //
-  // Disable DMA
-  //
-  HWREG(ulBase + CAMERA_O_CC_CTRL_DMA) &= ~CAMERA_CC_CTRL_DMA_DMA_EN;
+void CameraDMADisable(unsigned long ulBase) {
+    //
+    // Disable DMA
+    //
+    HWREG(ulBase + CAMERA_O_CC_CTRL_DMA) &= ~CAMERA_CC_CTRL_DMA_DMA_EN;
 }
-
-
 
 //******************************************************************************
 //
@@ -293,18 +280,17 @@ void CameraDMADisable(unsigned long ulBase)
 //! \return None.
 //
 //******************************************************************************
-void CameraThresholdSet(unsigned long ulBase, unsigned long ulThreshold)
-{
-  //
-  // Read and Mask DMA threshold field
-  //
-  HWREG(ulBase + CAMERA_O_CC_CTRL_DMA) &= ~CAMERA_CC_CTRL_DMA_FIFO_THRESHOLD_M;
-  //
-  // Write the new threshold value
-  //
-  HWREG(ulBase + CAMERA_O_CC_CTRL_DMA) |= (ulThreshold -1);
+void CameraThresholdSet(unsigned long ulBase, unsigned long ulThreshold) {
+    //
+    // Read and Mask DMA threshold field
+    //
+    HWREG(ulBase + CAMERA_O_CC_CTRL_DMA) &=
+            ~CAMERA_CC_CTRL_DMA_FIFO_THRESHOLD_M;
+    //
+    // Write the new threshold value
+    //
+    HWREG(ulBase + CAMERA_O_CC_CTRL_DMA) |= (ulThreshold - 1);
 }
-
 
 //******************************************************************************
 //
@@ -320,8 +306,7 @@ void CameraThresholdSet(unsigned long ulBase, unsigned long ulThreshold)
 //! \return None.
 //
 //******************************************************************************
-void CameraIntRegister(unsigned long ulBase, void (*pfnHandler)(void))
-{
+void CameraIntRegister(unsigned long ulBase, void (*pfnHandler)(void)) {
     //
     // Register the interrupt handler.
     //
@@ -332,7 +317,6 @@ void CameraIntRegister(unsigned long ulBase, void (*pfnHandler)(void))
     //
     IntEnable(INT_CAMERA);
 }
-
 
 //******************************************************************************
 //
@@ -346,8 +330,7 @@ void CameraIntRegister(unsigned long ulBase, void (*pfnHandler)(void))
 //! \return None.
 //
 //******************************************************************************
-void CameraIntUnregister(unsigned long ulBase)
-{
+void CameraIntUnregister(unsigned long ulBase) {
     //
     // Disable the interrupt.
     //
@@ -358,7 +341,6 @@ void CameraIntUnregister(unsigned long ulBase)
     //
     IntUnregister(INT_CAMERA);
 }
-
 
 //******************************************************************************
 //! Enables individual camera interrupt sources.
@@ -383,22 +365,20 @@ void CameraIntUnregister(unsigned long ulBase)
 //! \return None.
 //
 //******************************************************************************
-void CameraIntEnable(unsigned long ulBase, unsigned long ulIntFlags)
-{
-  //
-  // unmask Camera DMA done interrupt
-  //
-  if(ulIntFlags & CAM_INT_DMA)
-  {
-    HWREG(APPS_CONFIG_BASE + APPS_CONFIG_O_DMA_DONE_INT_MASK_CLR) = ((1<<8));
-  }
+void CameraIntEnable(unsigned long ulBase, unsigned long ulIntFlags) {
+    //
+    // unmask Camera DMA done interrupt
+    //
+    if (ulIntFlags & CAM_INT_DMA) {
+        HWREG(APPS_CONFIG_BASE + APPS_CONFIG_O_DMA_DONE_INT_MASK_CLR) = ((1
+                << 8));
+    }
 
-  //
-  // Enable specific camera interrupts
-  //
-  HWREG(ulBase + CAMERA_O_CC_IRQENABLE) |= ulIntFlags;
+    //
+    // Enable specific camera interrupts
+    //
+    HWREG(ulBase + CAMERA_O_CC_IRQENABLE) |= ulIntFlags;
 }
-
 
 //******************************************************************************
 //! Disables individual camera interrupt sources.
@@ -414,20 +394,19 @@ void CameraIntEnable(unsigned long ulBase, unsigned long ulIntFlags)
 //! \return None.
 //
 //******************************************************************************
-void CameraIntDisable(unsigned long ulBase, unsigned long ulIntFlags)
-{
-  //
-  // Mask Camera DMA done interrupt
-  //
-  if(ulIntFlags & CAM_INT_DMA)
-  {
-    HWREG(APPS_CONFIG_BASE + APPS_CONFIG_O_DMA_DONE_INT_MASK_SET) = ((1<<8));
-  }
+void CameraIntDisable(unsigned long ulBase, unsigned long ulIntFlags) {
+    //
+    // Mask Camera DMA done interrupt
+    //
+    if (ulIntFlags & CAM_INT_DMA) {
+        HWREG(APPS_CONFIG_BASE + APPS_CONFIG_O_DMA_DONE_INT_MASK_SET) = ((1
+                << 8));
+    }
 
-  //
-  // Disable specific camera interrupts
-  //
-  HWREG(ulBase + CAMERA_O_CC_IRQENABLE) &= ~ulIntFlags;
+    //
+    // Disable specific camera interrupts
+    //
+    HWREG(ulBase + CAMERA_O_CC_IRQENABLE) &= ~ulIntFlags;
 }
 
 //******************************************************************************
@@ -442,30 +421,28 @@ void CameraIntDisable(unsigned long ulBase, unsigned long ulIntFlags)
 //! \return Returns the current interrupt status, enumerated as a bit field of
 //! values described in CameraIntEnable().
 //******************************************************************************
-unsigned long CameraIntStatus(unsigned long ulBase)
-{
-  unsigned ulIntFlag;
+unsigned long CameraIntStatus(unsigned long ulBase) {
+    unsigned ulIntFlag;
 
-  //
-  // Read camera interrupt
-  //
-  ulIntFlag = HWREG(ulBase + CAMERA_O_CC_IRQSTATUS);
+    //
+    // Read camera interrupt
+    //
+    ulIntFlag = HWREG(ulBase + CAMERA_O_CC_IRQSTATUS);
 
-  //
-  //
-  // Read camera DMA doner interrupt
-  //
-  if(HWREG(APPS_CONFIG_BASE + APPS_CONFIG_O_DMA_DONE_INT_STS_MASKED) & (1<<8))
-  {
-    ulIntFlag |= CAM_INT_DMA;
-  }
+    //
+    //
+    // Read camera DMA doner interrupt
+    //
+    if (HWREG(APPS_CONFIG_BASE + APPS_CONFIG_O_DMA_DONE_INT_STS_MASKED)
+            & (1 << 8)) {
+        ulIntFlag |= CAM_INT_DMA;
+    }
 
-  //
-  // Return status
-  //
-  return(ulIntFlag);
+    //
+    // Return status
+    //
+    return (ulIntFlag);
 }
-
 
 //******************************************************************************
 //! Clears individual camera interrupt sources.
@@ -481,20 +458,18 @@ unsigned long CameraIntStatus(unsigned long ulBase)
 //! \return None.
 //
 //******************************************************************************
-void CameraIntClear(unsigned long ulBase, unsigned long ulIntFlags)
-{
-  //
-  // Clear DMA done int  status
-  //
-  if(ulIntFlags & CAM_INT_DMA)
-  {
-    HWREG(APPS_CONFIG_BASE + APPS_CONFIG_O_DMA_DONE_INT_ACK) = ((1<<8));
-  }
+void CameraIntClear(unsigned long ulBase, unsigned long ulIntFlags) {
+    //
+    // Clear DMA done int  status
+    //
+    if (ulIntFlags & CAM_INT_DMA) {
+        HWREG(APPS_CONFIG_BASE + APPS_CONFIG_O_DMA_DONE_INT_ACK) = ((1 << 8));
+    }
 
-  //
-  // Clear the interrupts
-  //
-  HWREG(ulBase + CAMERA_O_CC_IRQSTATUS) = ulIntFlags;
+    //
+    // Clear the interrupts
+    //
+    HWREG(ulBase + CAMERA_O_CC_IRQSTATUS) = ulIntFlags;
 }
 
 //******************************************************************************
@@ -510,17 +485,16 @@ void CameraIntClear(unsigned long ulBase, unsigned long ulIntFlags)
 //! \return None.
 //
 //******************************************************************************
-void CameraCaptureStart(unsigned long ulBase)
-{
-  //
-  // Set the mode
-  //
-  HWREG(ulBase + CAMERA_O_CC_CTRL) &= ~0xF;
+void CameraCaptureStart(unsigned long ulBase) {
+    //
+    // Set the mode
+    //
+    HWREG(ulBase + CAMERA_O_CC_CTRL) &= ~0xF;
 
-  //
-  // Enable image capture
-  //
-  HWREG(ulBase + CAMERA_O_CC_CTRL) |= CAMERA_CC_CTRL_CC_EN;
+    //
+    // Enable image capture
+    //
+    HWREG(ulBase + CAMERA_O_CC_CTRL) |= CAMERA_CC_CTRL_CC_EN;
 }
 
 //******************************************************************************
@@ -537,29 +511,24 @@ void CameraCaptureStart(unsigned long ulBase)
 //! \return None.
 //
 //******************************************************************************
-void CameraCaptureStop(unsigned long ulBase, tBoolean bImmediate)
-{
-  if(bImmediate)
-  {
-    //
-    // Stop capture immediately
-    //
-    HWREG(ulBase + CAMERA_O_CC_CTRL) &= ~CAMERA_CC_CTRL_CC_FRAME_TRIG;
-  }
-  else
-  {
-    //
-    // Stop capture at the end of frame
-    //
-    HWREG(ulBase + CAMERA_O_CC_CTRL) |= CAMERA_CC_CTRL_CC_FRAME_TRIG;
-  }
+void CameraCaptureStop(unsigned long ulBase, tBoolean bImmediate) {
+    if (bImmediate) {
+        //
+        // Stop capture immediately
+        //
+        HWREG(ulBase + CAMERA_O_CC_CTRL) &= ~CAMERA_CC_CTRL_CC_FRAME_TRIG;
+    } else {
+        //
+        // Stop capture at the end of frame
+        //
+        HWREG(ulBase + CAMERA_O_CC_CTRL) |= CAMERA_CC_CTRL_CC_FRAME_TRIG;
+    }
 
-  //
-  // Request camera to stop capture
-  //
-  HWREG(ulBase + CAMERA_O_CC_CTRL) &= ~CAMERA_CC_CTRL_CC_EN;
+    //
+    // Request camera to stop capture
+    //
+    HWREG(ulBase + CAMERA_O_CC_CTRL) &= ~CAMERA_CC_CTRL_CC_EN;
 }
-
 
 //******************************************************************************
 //
@@ -575,23 +544,21 @@ void CameraCaptureStop(unsigned long ulBase, tBoolean bImmediate)
 //
 //******************************************************************************
 void CameraBufferRead(unsigned long ulBase, unsigned long *pBuffer,
-                   unsigned char ucSize)
-{
-  unsigned char *pCamBuff;
-  unsigned char i;
+        unsigned char ucSize) {
+    unsigned char *pCamBuff;
+    unsigned char i;
 
-  //
-  // Initilize a pointer to ecamera buffer
-  //
-  pCamBuff = (unsigned char *)CAM_BUFFER_ADDR;
+    //
+    // Initilize a pointer to ecamera buffer
+    //
+    pCamBuff = (unsigned char *) CAM_BUFFER_ADDR;
 
-  //
-  // Read out requested data
-  //
-  for(i=0; i < ucSize; i++)
-  {
-    *(pBuffer+i) = *(pCamBuff + i);
-  }
+    //
+    // Read out requested data
+    //
+    for (i = 0; i < ucSize; i++) {
+        *(pBuffer + i) = *(pCamBuff + i);
+    }
 }
 
 //*****************************************************************************

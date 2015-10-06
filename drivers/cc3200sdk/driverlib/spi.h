@@ -65,7 +65,6 @@ extern "C"
 #define SPI_SUB_MODE_2     0x00000002
 #define SPI_SUB_MODE_3     0x00000003
 
-
 //*****************************************************************************
 // Values that can be passed to SPIConfigSetExpClk() as ulConfigFlags parameter
 //*****************************************************************************
@@ -120,23 +119,21 @@ extern "C"
 extern void SPIEnable(unsigned long ulBase);
 extern void SPIDisable(unsigned long ulBase);
 extern void SPIReset(unsigned long ulBase);
-extern void SPIConfigSetExpClk(unsigned long ulBase,unsigned long ulSPIClk,
-            unsigned long ulBitRate, unsigned long ulMode,
-            unsigned long ulSubMode, unsigned long ulConfig);
-extern long SPIDataGetNonBlocking(unsigned long ulBase,
-                                        unsigned long * pulData);
+extern void SPIConfigSetExpClk(unsigned long ulBase, unsigned long ulSPIClk,
+        unsigned long ulBitRate, unsigned long ulMode, unsigned long ulSubMode,
+        unsigned long ulConfig);
+extern long SPIDataGetNonBlocking(unsigned long ulBase, unsigned long * pulData);
 extern void SPIDataGet(unsigned long ulBase, unsigned long *pulData);
-extern long SPIDataPutNonBlocking(unsigned long ulBase,
-                                        unsigned long ulData);
+extern long SPIDataPutNonBlocking(unsigned long ulBase, unsigned long ulData);
 extern void SPIDataPut(unsigned long ulBase, unsigned long ulData);
 extern void SPIFIFOEnable(unsigned long ulBase, unsigned long ulFlags);
 extern void SPIFIFODisable(unsigned long ulBase, unsigned long ulFlags);
 extern void SPIFIFOLevelSet(unsigned long ulBase, unsigned long ulTxLevel,
-                   unsigned long ulRxLevel);
+        unsigned long ulRxLevel);
 extern void SPIFIFOLevelGet(unsigned long ulBase, unsigned long *pulTxLevel,
-                 unsigned long *pulRxLevel);
+        unsigned long *pulRxLevel);
 extern void SPIWordCountSet(unsigned long ulBase, unsigned long ulWordCount);
-extern void SPIIntRegister(unsigned long ulBase, void(*pfnHandler)(void));
+extern void SPIIntRegister(unsigned long ulBase, void (*pfnHandler)(void));
 extern void SPIIntUnregister(unsigned long ulBase);
 extern void SPIIntEnable(unsigned long ulBase, unsigned long ulIntFlags);
 extern void SPIIntDisable(unsigned long ulBase, unsigned long ulIntFlags);
@@ -147,9 +144,7 @@ extern void SPIDmaDisable(unsigned long ulBase, unsigned long ulFlags);
 extern void SPICSEnable(unsigned long ulBase);
 extern void SPICSDisable(unsigned long ulBase);
 extern long SPITransfer(unsigned long ulBase, unsigned char *ucDout,
-                   unsigned char *ucDin, unsigned long ulSize,
-                   unsigned long ulFlags);
-
+        unsigned char *ucDin, unsigned long ulSize, unsigned long ulFlags);
 
 //*****************************************************************************
 //
