@@ -8,8 +8,8 @@
  */
 
 /**
- * @defgroup    cpu_cc3200 ARM CC3200 Cortex-M
- * @ingroup     cpu
+ *
+ * @ingroup     cpu_cc3200
  * @brief       Common implementations and headers for CC3200
  *              micro-controller
  * @{

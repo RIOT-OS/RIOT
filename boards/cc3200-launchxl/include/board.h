@@ -14,11 +14,11 @@
  *
  * @file
  *
- * @author      Attilio Dona' <@attiliodona>
+ * @author      Attilio Dona'
  */
 
 #ifndef BOARD_H_
-#define BOARD_H
+#define BOARD_H_
 
 #include <stdint.h>
 #include "cpu.h"
@@ -27,22 +27,64 @@
 extern "C" {
 #endif
 
+/**
+ * for requesting an IRQ when PIN value changes
+ */
 #define CHANGE 4
+
+/**
+ * for requesting an IRQ when PIN value goes high to low
+ */
 #define FALLING 3
+
+/**
+ * for requesting an IRQ when PIN value goes low to high
+ */
 #define RISING 2
-#define HIGH 0x1
-#define LOW  0x0
 
+/**
+ * for requesting an IRQ when PIN value goes high
+ */
+#define HIGH 1
+
+/**
+ * for requesting an IRQ when PIN value goes low
+ */
+#define LOW  0
+
+/**
+ * red led id
+ */
 #define RED_LED 29
+
+/**
+ * green led id
+ */
 #define GREEN_LED 10
+
+/**
+ * yellow led id
+ */
 #define YELLOW_LED 9
+
+/**
+ * SW2 button id
+ */
 #define PUSH1 3
-#define PUSH2 11 // SW3
 
-#define DEBUG_PIN 10 // P1.10 on launchpad (bottom pin on left side)
+/**
+ * SW3 button id
+ */
+#define PUSH2 11
 
-/*
- * for easy porting of TI examples
+/**
+ * P1.10 on launchpad (bottom pin on left side)
+ */
+#define DEBUG_PIN 10
+
+/**
+ * @name Macro for easy porting of TI examples
+ * @{
  */
 #define GPIO_IF_LedOn     gpio_set
 #define GPIO_IF_LedOff    gpio_clear
@@ -51,10 +93,16 @@ extern "C" {
 #define MCU_RED_LED_GPIO    RED_LED
 #define MCU_GREEN_LED_GPIO  GREEN_LED
 
-// sometimes I suspect to be daltonic
+/**
+ * sometimes I suspect to be daltonic
+ */
 #define MCU_ORANGE_LED_GPIO YELLOW_LED
 
 #define Report printf
+
+/** @} */
+
+
 
 /**
  * Define the nominal CPU core clock in this board
@@ -62,16 +110,20 @@ extern "C" {
 #define F_CPU               80000000
 
 /**
- * Assign the hardware timer
+ * hardware timers modules
  */
-#define HW_TIMER            TIMER_3
-#define HWTIMER_WAIT_OVERHEAD (1430)
-#define HWTIMER_SPIN_BARRIER HWTIMER_WAIT_OVERHEAD
-
 #define TIMER_NUM_CHANNELS 4
 
+/**
+ * timer module allocated for xtimer
+ */
 #define XTIMER  TIMER_0
+
+/**
+ * xtimer fixed channel value
+ */
 #define XTIMER_CHAN (0)
+
 
 #if TIMER_0_MAX_VALUE == 0xffffff
 #define XTIMER_MASK 0xff000000
