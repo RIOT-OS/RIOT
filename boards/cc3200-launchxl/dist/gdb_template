@@ -12,7 +12,7 @@ end
 load
 
 #*****************************************************************************
-# Initialize the SP and PC values from the application's 
+# Initialize the SP and PC values from the application's
 # vector table
 #*****************************************************************************
 set $sp = g_pfnVectors[0]

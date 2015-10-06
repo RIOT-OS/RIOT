@@ -33,7 +33,7 @@ function RemoveAllProfiles()
 	if (confirm("Warning!\nYou are about to remove all configured profiles...\nDo you wish to proceed?\n"))
 	{
 		var xmlhttp;
-		
+
 		if (window.XMLHttpRequest)
 		  {// code for IE7+, Firefox, Chrome, Opera, Safari
 			xmlhttp=new XMLHttpRequest();
@@ -42,18 +42,18 @@ function RemoveAllProfiles()
 		  {// code for IE6, IE5
 			xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
 		  }
-		  
+
 		xmlhttp.onreadystatechange= function()
 		  {
-			if (xmlhttp.readyState==4) 
+			if (xmlhttp.readyState==4)
 			{
 				if ((xmlhttp.status==200) || (xmlhttp.status==204) || (xmlhttp.status==302) || (xmlhttp.status==1223))
 				{
 					location.reload(true);
 				}
-			}		  
+			}
 		  }
-		  
+
 		xmlhttp.open("POST","remove_all_profiles",true);
 		xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
 		xmlhttp.send("remove_profiles=remove"); //Name and value not important since NWP check only the action in this case
@@ -70,7 +70,7 @@ function RemoveAllProfiles()
 
 <div id="safe_bar" style="visibility: hidden">
  <div class="safe_bar_style">
-	<div class="safe-text"> Safe Mode </div> 
+	<div class="safe-text"> Safe Mode </div>
 	<div> <button class="safe-button" type="button" onclick="RemoveAllProfiles()" >Reset All Profiles</button> </div>
 </div>
 </div>
@@ -84,7 +84,7 @@ function RemoveAllProfiles()
 			<li><a href="profiles_config.html" target="config_frame">Profiles</a></li>
 			<li><a href="tools.html" target="config_frame">Tools</a></li>
 			<li><a href="led_demo.html" target="config_frame">Demo</a></li>
-		</ul>	
+		</ul>
 </div>
 
 <div class ="iframe" >

@@ -7,18 +7,18 @@
 <style>
 
 .lightSwitch {
-    background: url("images/demo-lightswitch.jpg") no-repeat scroll 0 -72px rgba(0, 0, 0, 0);    
+    background: url("images/demo-lightswitch.jpg") no-repeat scroll 0 -72px rgba(0, 0, 0, 0);
     height: 70px;
-    width: 30px;    
+    width: 30px;
 }
 .lightOn {
-    margin-top: -10px; 
+    margin-top: -10px;
    }
 .lightOff{
 margin-top: 0px;
 }
 .lightOn, .lightOff{
-    
+
     cursor:pointer;
     font-weight:bold;
 }
@@ -43,7 +43,7 @@ function ToggleLED(whichOne)
 {
 var LEDnum = "1";
 var params = "__SL_P_ULD=LED"+LEDnum;
-	if (whichOne == "on") 
+	if (whichOne == "on")
 		params = params+"_ON";
 	else
 		params = params+"_OFF";
@@ -62,11 +62,11 @@ var params = "__SL_P_ULD=LED"+LEDnum;
 }
 
 function toggleSwitch (whichOne) {
-	
+
 	var toggle = "lightSwitch";
 	var lightImage = "light";
 	if (whichOne == "on") {
-		document.getElementById(toggle).style.backgroundPosition = '0 0';		
+		document.getElementById(toggle).style.backgroundPosition = '0 0';
 
 	} else {
 		document.getElementById(toggle).style.backgroundPosition = '0 -72px';
@@ -83,7 +83,7 @@ ToggleLED(whichOne);
 
 <table border="0"  width="100%" cellpadding="3" cellspacing="0">
 
-<tr>  
+<tr>
 <td class="page-title" colspan=2 >
 	LED Demo</td>
 </tr>
@@ -104,7 +104,7 @@ ToggleLED(whichOne);
 <tr>
   <td class="in-a-box" colspan=2 align=center> Click the Button to Control Red LED On SimpleLink Device</td>
  </tr>
- 
+
  <tr >
   <td class = "border-l-top" colspan=2 >
   </td>

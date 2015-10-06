@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# cc3200 launchpad flash with Energia cc3200prog  
+# cc3200 launchpad flash with Energia cc3200prog
 #
 # @author Attilio Dona' <@AttilioDona>
 

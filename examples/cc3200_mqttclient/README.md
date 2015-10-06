@@ -60,11 +60,11 @@ Running the `ps` command on an iotlab-m3:
 
 ```
 2015-09-16 16:57:57,634 - INFO # ps
-2015-09-16 16:57:57,637 - INFO #    pid | name                 | state    Q | pri | stack ( used) | location   
-2015-09-16 16:57:57,640 - INFO #      1 | idle                 | pending  Q |  15 |   256 (  140) | 0x20000200 
-2015-09-16 16:57:57,642 - INFO #      2 | main                 | pending  Q |   7 |  1536 (  640) | 0x20000300 
-2015-09-16 16:57:57,645 - INFO #      3 | pktdump              | bl rx    _ |   6 |  1536 (  544) | 0x200025e0 
-2015-09-16 16:57:57,647 - INFO #      4 | at86rfxx             | bl rx    _ |   3 |  1024 (  360) | 0x2000099c 
+2015-09-16 16:57:57,637 - INFO #    pid | name                 | state    Q | pri | stack ( used) | location
+2015-09-16 16:57:57,640 - INFO #      1 | idle                 | pending  Q |  15 |   256 (  140) | 0x20000200
+2015-09-16 16:57:57,642 - INFO #      2 | main                 | pending  Q |   7 |  1536 (  640) | 0x20000300
+2015-09-16 16:57:57,645 - INFO #      3 | pktdump              | bl rx    _ |   6 |  1536 (  544) | 0x200025e0
+2015-09-16 16:57:57,647 - INFO #      4 | at86rfxx             | bl rx    _ |   3 |  1024 (  360) | 0x2000099c
 2015-09-16 16:57:57,649 - INFO #        | SUM                  |            |     |  4352 ( 1684)
 ```
 
@@ -82,9 +82,9 @@ The `ifconfig` command will help you to configure all available network
 interfaces. On an iolab-m3 it will print something like:
 ```
 2015-09-16 16:58:37,762 - INFO # ifconfig
-2015-09-16 16:58:37,766 - INFO # Iface  4   HWaddr: 9e:72  Channel: 26  NID: 0x23  TX-Power: 0dBm  State: IDLE CSMA Retries: 4 
-2015-09-16 16:58:37,768 - INFO #            Long HWaddr: 36:32:48:33:46:da:9e:72 
-2015-09-16 16:58:37,769 - INFO #            AUTOACK  CSMA  
+2015-09-16 16:58:37,766 - INFO # Iface  4   HWaddr: 9e:72  Channel: 26  NID: 0x23  TX-Power: 0dBm  State: IDLE CSMA Retries: 4
+2015-09-16 16:58:37,768 - INFO #            Long HWaddr: 36:32:48:33:46:da:9e:72
+2015-09-16 16:58:37,769 - INFO #            AUTOACK  CSMA
 2015-09-16 16:58:37,770 - INFO #            Source address length: 2
 ```
 

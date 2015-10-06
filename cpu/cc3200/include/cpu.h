@@ -68,7 +68,7 @@ extern "C" {
 
 /**
  * @brief   UART0 buffer size definition for compatibility reasons
- * 
+ *
  * Needed by ng_networking example shell_init() for configuring shell->shell_buffer_size
  * @todo remove once the remodeling of the uart0 driver is done
  * @{

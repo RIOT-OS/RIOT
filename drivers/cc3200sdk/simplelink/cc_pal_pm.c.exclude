@@ -150,7 +150,7 @@ int spi_Close(Fd_t fd)
     \warning
 */
 int spi_Read(Fd_t fd, unsigned char *pBuff, int len)
-{    
+{
     int read_size = 0;
     if(fd < 0)
         return -1;
@@ -165,7 +165,7 @@ int spi_Read(Fd_t fd, unsigned char *pBuff, int len)
         }
         else
         {
-                spi_read((void *)fd, (char *)&pBuff[read_size], 
+                spi_read((void *)fd, (char *)&pBuff[read_size],
                         MAX_DMA_RECV_TRANSACTION_SIZE);
                 read_size += MAX_DMA_RECV_TRANSACTION_SIZE;
                 len -= MAX_DMA_RECV_TRANSACTION_SIZE;
@@ -243,7 +243,7 @@ int NwpRegisterInterruptHandler(P_EVENT_HANDLER InterruptHdl , void* pValue)    
           	  MAP_IntPendClear(INT_NWPIC);
              osi_InterruptRegister(INT_NWPIC, (P_OSI_INTR_ENTRY)InterruptHdl,
             		 	 	 	   INT_PRIORITY_LVL_1);
-          #else             
+          #else
              MAP_IntRegister(INT_NWPIC, InterruptHdl);
              MAP_IntPrioritySet(INT_NWPIC, INT_PRIORITY_LVL_1);
              MAP_IntPendClear(INT_NWPIC);
@@ -258,10 +258,10 @@ int NwpRegisterInterruptHandler(P_EVENT_HANDLER InterruptHdl , void* pValue)    
 /*!
     \brief 				Masks host IRQ
 
-					
+
     \sa             		NwpUnMaskInterrupt
 
-    \warning        
+    \warning
 */
 void NwpMaskInterrupt()
 {
@@ -272,10 +272,10 @@ void NwpMaskInterrupt()
 /*!
     \brief 				Unmasks host IRQ
 
-					
+
     \sa             		NwpMaskInterrupt
 
-    \warning        
+    \warning
 */
 void NwpUnMaskInterrupt()
 {
@@ -300,7 +300,7 @@ void NwpPowerOnPreamble(void)
 #define MAX_RETRY_COUNT         1000
     unsigned int sl_stop_ind, apps_int_sts_raw, nwp_lpds_wake_cfg;
     unsigned int retry_count;
-    /* Perform the sl_stop equivalent to ensure network services 
+    /* Perform the sl_stop equivalent to ensure network services
        are turned off if active */
     HWREG(0x400F70B8) = 1;   /* APPs to NWP interrupt */
     UtilsDelay(800000/5);
@@ -308,7 +308,7 @@ void NwpPowerOnPreamble(void)
     retry_count = 0;
     nwp_lpds_wake_cfg = HWREG(0x4402D404);
     sl_stop_ind = HWREG(0x4402E16C);
-    
+
     if((nwp_lpds_wake_cfg != 0x20) && /* Check for NWP POR condition */
             !(sl_stop_ind & 0x2))     /* Check if sl_stop was executed */
     {
@@ -352,7 +352,7 @@ void NwpPowerOn(void)
 
     //WLAN PD ON
     HWREG(OCP_SHARED_MAC_RESET_REG) &= ~(0xC00);
-    
+
     //Remove NWP Reset
     HWREG(APPS_SOFT_RESET_REG) &= ~4;
 #else
@@ -383,12 +383,12 @@ void NwpPowerOff(void)
 
     //Mask Host Interrupt
     NwpMaskInterrupt();
-    
+
     //Switch to PFM Mode
     HWREG(0x4402F024) &= 0xF7FFFFFF;
 #ifdef CC3200_ES_1_2_1
     //Reset NWP
-    HWREG(APPS_SOFT_RESET_REG) |= 4; 
+    HWREG(APPS_SOFT_RESET_REG) |= 4;
     //WLAN PD OFF
     HWREG(OCP_SHARED_MAC_RESET_REG) |= 0xC00;
 #else

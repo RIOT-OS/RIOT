@@ -74,4 +74,3 @@ all:
 # Rule to generate assembly listings from ELF files:
 %.lst: %.elf
 	$(OBJDUMP) $(OBJDUMPFLAGS) $< > $@
-
