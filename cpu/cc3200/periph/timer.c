@@ -479,18 +479,16 @@ int timer_set(tim_t dev, int channel, unsigned int timeout) {
     switch (dev) {
     case TIMER_0:
         return timer_set_absolute(dev, channel,
-                HWREG(TIMERA0_BASE + TIMER_O_TAR) + timeout);
+        HWREG(TIMERA0_BASE + TIMER_O_TAR) + timeout);
     case TIMER_1:
         return timer_set_absolute(dev, channel,
-                HWREG(TIMERA1_BASE + TIMER_O_TAR) + timeout);
+        HWREG(TIMERA1_BASE + TIMER_O_TAR) + timeout);
     case TIMER_2:
         return set_absolute(dev, channel,
-                HWREG(TIMERA2_BASE + TIMER_O_TAR)
-                        + (unsigned long long) timeout);
+        HWREG(TIMERA2_BASE + TIMER_O_TAR) + (unsigned long long) timeout);
     case TIMER_3:
         return set_absolute(dev, channel,
-                HWREG(TIMERA3_BASE + TIMER_O_TAR)
-                        + (unsigned long long) timeout);
+        HWREG(TIMERA3_BASE + TIMER_O_TAR) + (unsigned long long) timeout);
     default:
         break;
     }

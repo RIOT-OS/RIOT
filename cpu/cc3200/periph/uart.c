@@ -61,7 +61,7 @@ void UART_0_ISR(void) {
     long data;
 
     MAP_UARTIntClear(UARTA0_BASE,
-            UART_INT_RX | UART_INT_OE | UART_INT_BE | UART_INT_PE | UART_INT_FE);
+    UART_INT_RX | UART_INT_OE | UART_INT_BE | UART_INT_PE | UART_INT_FE);
 
     if (UARTRxErrorGet(UARTA0_BASE)) {
         reset(UARTA0_BASE);
@@ -119,8 +119,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb,
 #if UART_0_EN
     case UART_0:
         MAP_UARTIntEnable(UARTA0_BASE,
-                UART_INT_RX | UART_INT_OE | UART_INT_BE | UART_INT_PE
-                        | UART_INT_FE);
+        UART_INT_RX | UART_INT_OE | UART_INT_BE | UART_INT_PE | UART_INT_FE);
         MAP_IntPrioritySet(INT_UARTA0, UART_IRQ_PRIO);
         MAP_IntEnable(INT_UARTA0);
         break;

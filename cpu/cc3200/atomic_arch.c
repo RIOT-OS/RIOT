@@ -36,7 +36,7 @@
  \param [in]    ptr  Pointer to data
  \return        value of type uint32_t at (*ptr)
  */
-__attribute__((always_inline))  __STATIC_INLINE uint32_t __LDREXW(
+__attribute__((always_inline))   __STATIC_INLINE uint32_t __LDREXW(
         volatile uint32_t *addr) {
     uint32_t result;
 
@@ -53,7 +53,7 @@ __attribute__((always_inline))  __STATIC_INLINE uint32_t __LDREXW(
  \return          0  Function succeeded
  \return          1  Function failed
  */
-__attribute__((always_inline))  __STATIC_INLINE uint32_t __STREXW(uint32_t value,
+__attribute__((always_inline))   __STATIC_INLINE uint32_t __STREXW(uint32_t value,
         volatile uint32_t *addr) {
     uint32_t result;
 
