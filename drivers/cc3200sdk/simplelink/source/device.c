@@ -94,7 +94,7 @@ _i16 sl_Start(const void* pIfHdl, _i8* pDevName,
     }
 
     ObjIdx = _SlDrvProtectAsyncRespSetting((_u8 *) &AsyncRsp, START_STOP_ID,
-            SL_MAX_SOCKETS);
+    SL_MAX_SOCKETS);
 
     if (MAX_CONCURRENT_ACTIONS == ObjIdx) {
         return SL_POOL_IS_EMPTY;

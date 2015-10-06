@@ -194,7 +194,7 @@ static i32 vh_msg_send(struct client_ctx *cl_ctx, u8 msg_type,
 }
 
 static i32 _mqtt_vh_msg_send(void *ctx_cl, u8 msg_type, enum mqtt_qos qos,
-        bool has_vh, u16 vh_data) {
+bool has_vh, u16 vh_data) {
     struct client_ctx *cl_ctx = (struct client_ctx*) ctx_cl;
 
     return cl_ctx ? vh_msg_send(ctx_cl, msg_type, qos, has_vh, vh_data) : -1;
@@ -229,7 +229,7 @@ i32 mqtt_connack_send(void *ctx_cl, u8 *vh_buf) {
 }
 
 static i32 _mqtt_server_pub_dispatch(void *ctx_cl, struct mqtt_packet *mqp,
-        bool dup) {
+bool dup) {
     i32 rv = 0;
     u8 *buf = MQP_FHEADER_BUF(mqp);
 
@@ -248,7 +248,7 @@ i32 mqtt_server_pub_dispatch(void *ctx_cl, struct mqtt_packet *mqp, bool dup) {
 }
 
 i32 mqtt_server_pub_dispatch_locked(void *ctx_cl, struct mqtt_packet *mqp,
-        bool dup) {
+bool dup) {
     i32 rv;
 
     MUTEX_LOCKIN();
@@ -772,7 +772,7 @@ static u8 rxb[MQP_SERVER_RX_LEN];
 static u16 listener_port = 0;
 
 static inline i32 net_recv(i32 net, struct mqtt_packet *mqp, u32 wait_secs,
-        bool *timed_out) {
+bool *timed_out) {
     i32 rv = mqp_recv(net, net_ops, mqp, wait_secs, timed_out, NULL);
     if (rv <= 0)
         rv = MQP_ERR_NETWORK;
@@ -852,7 +852,7 @@ i32 mqtt_server_run(u32 wait_secs)   // TBD break into two functions
 
     if (loopback_port) {
         loopb_net = net_ops->open(DEV_NETCONN_OPT_UDP, NULL, loopback_port,
-                NULL);
+        NULL);
         if (-1 == loopb_net)
             return MQP_ERR_LIBQUIT;
     }

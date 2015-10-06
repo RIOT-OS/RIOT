@@ -141,7 +141,7 @@ void UARTParityModeSet(unsigned long ulBase, unsigned long ulParity) {
     //
     // Check the arguments.
     //
-    ASSERT(UARTBaseValid(ulBase)); ASSERT((ulParity == UART_CONFIG_PAR_NONE) ||
+    ASSERT(UARTBaseValid(ulBase));ASSERT((ulParity == UART_CONFIG_PAR_NONE) ||
             (ulParity == UART_CONFIG_PAR_EVEN) ||
             (ulParity == UART_CONFIG_PAR_ODD) ||
             (ulParity == UART_CONFIG_PAR_ONE) ||
@@ -205,11 +205,11 @@ void UARTFIFOLevelSet(unsigned long ulBase, unsigned long ulTxLevel,
     //
     // Check the arguments.
     //
-    ASSERT(UARTBaseValid(ulBase)); ASSERT((ulTxLevel == UART_FIFO_TX1_8) ||
+    ASSERT(UARTBaseValid(ulBase));ASSERT((ulTxLevel == UART_FIFO_TX1_8) ||
             (ulTxLevel == UART_FIFO_TX2_8) ||
             (ulTxLevel == UART_FIFO_TX4_8) ||
             (ulTxLevel == UART_FIFO_TX6_8) ||
-            (ulTxLevel == UART_FIFO_TX7_8)); ASSERT((ulRxLevel == UART_FIFO_RX1_8) ||
+            (ulTxLevel == UART_FIFO_TX7_8));ASSERT((ulRxLevel == UART_FIFO_RX1_8) ||
             (ulRxLevel == UART_FIFO_RX2_8) ||
             (ulRxLevel == UART_FIFO_RX4_8) ||
             (ulRxLevel == UART_FIFO_RX6_8) ||
@@ -300,7 +300,7 @@ void UARTConfigSetExpClk(unsigned long ulBase, unsigned long ulUARTClk,
     //
     // Check the arguments.
     //
-    ASSERT(UARTBaseValid(ulBase)); ASSERT(ulBaud != 0);
+    ASSERT(UARTBaseValid(ulBase));ASSERT(ulBaud != 0);
 
     //
     // Stop the UART.
@@ -557,7 +557,7 @@ void UARTModemControlSet(unsigned long ulBase, unsigned long ulControl) {
     // Check the arguments.
     //
 
-    ASSERT(ulBase == UARTA1_BASE); ASSERT((ulControl & ~(UART_OUTPUT_RTS)) == 0);
+    ASSERT(ulBase == UARTA1_BASE);ASSERT((ulControl & ~(UART_OUTPUT_RTS)) == 0);
 
     //
     // Set the appropriate modem control output bits.
@@ -595,7 +595,7 @@ void UARTModemControlClear(unsigned long ulBase, unsigned long ulControl) {
     //
     // Check the arguments.
     //
-    ASSERT(ulBase == UARTA1_BASE); ASSERT((ulControl & ~(UART_OUTPUT_RTS)) == 0);
+    ASSERT(ulBase == UARTA1_BASE);ASSERT((ulControl & ~(UART_OUTPUT_RTS)) == 0);
 
     //
     // Set the appropriate modem control output bits.
@@ -686,7 +686,7 @@ void UARTFlowControlSet(unsigned long ulBase, unsigned long ulMode) {
     // Check the arguments.
     //
 
-    ASSERT(UARTBaseValid(ulBase)); ASSERT((ulMode & ~(UART_FLOWCONTROL_TX | UART_FLOWCONTROL_RX)) == 0);
+    ASSERT(UARTBaseValid(ulBase));ASSERT((ulMode & ~(UART_FLOWCONTROL_TX | UART_FLOWCONTROL_RX)) == 0);
 
     //
     // Set the flow control mode as requested.
@@ -755,7 +755,7 @@ void UARTTxIntModeSet(unsigned long ulBase, unsigned long ulMode) {
     //
     // Check the arguments.
     //
-    ASSERT(UARTBaseValid(ulBase)); ASSERT((ulMode == UART_TXINT_MODE_EOT) ||
+    ASSERT(UARTBaseValid(ulBase));ASSERT((ulMode == UART_TXINT_MODE_EOT) ||
             (ulMode == UART_TXINT_MODE_FIFO));
 
     //

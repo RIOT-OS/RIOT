@@ -179,7 +179,7 @@ void SHAMD5IntEnable(uint32_t ui32Base, uint32_t ui32IntFlags) {
     //
     // Check the arguments.
     //
-    ASSERT(ui32Base == SHAMD5_BASE); ASSERT((ui32IntFlags == SHAMD5_INT_CONTEXT_READY) ||
+    ASSERT(ui32Base == SHAMD5_BASE);ASSERT((ui32IntFlags == SHAMD5_INT_CONTEXT_READY) ||
             (ui32IntFlags == SHAMD5_INT_PARTHASH_READY) ||
             (ui32IntFlags == SHAMD5_INT_INPUT_READY) ||
             (ui32IntFlags == SHAMD5_INT_OUTPUT_READY));
@@ -219,7 +219,7 @@ void SHAMD5IntDisable(uint32_t ui32Base, uint32_t ui32IntFlags) {
     //
     // Check the arguments.
     //
-    ASSERT(ui32Base == SHAMD5_BASE); ASSERT((ui32IntFlags == SHAMD5_INT_CONTEXT_READY) ||
+    ASSERT(ui32Base == SHAMD5_BASE);ASSERT((ui32IntFlags == SHAMD5_INT_CONTEXT_READY) ||
             (ui32IntFlags == SHAMD5_INT_PARTHASH_READY) ||
             (ui32IntFlags == SHAMD5_INT_INPUT_READY) ||
             (ui32IntFlags == SHAMD5_INT_OUTPUT_READY));
@@ -261,7 +261,7 @@ void SHAMD5IntClear(uint32_t ui32Base, uint32_t ui32IntFlags) {
     //
     // Check the arguments.
     //
-    ASSERT(ui32Base == SHAMD5_BASE); ASSERT((ui32IntFlags == SHAMD5_INT_CONTEXT_READY) ||
+    ASSERT(ui32Base == SHAMD5_BASE);ASSERT((ui32IntFlags == SHAMD5_INT_CONTEXT_READY) ||
             (ui32IntFlags == SHAMD5_INT_PARTHASH_READY) ||
             (ui32IntFlags == SHAMD5_INT_INPUT_READY) ||
             (ui32IntFlags == SHAMD5_INT_OUTPUT_READY));
@@ -401,7 +401,7 @@ void SHAMD5ConfigSet(uint32_t ui32Base, uint32_t ui32Mode) {
     //
     // Check the arguments.
     //
-    ASSERT(ui32Base == SHAMD5_BASE); ASSERT((ui32Mode == SHAMD5_ALGO_MD5) ||
+    ASSERT(ui32Base == SHAMD5_BASE);ASSERT((ui32Mode == SHAMD5_ALGO_MD5) ||
             (ui32Mode == SHAMD5_ALGO_SHA1) ||
             (ui32Mode == SHAMD5_ALGO_SHA224) ||
             (ui32Mode == SHAMD5_ALGO_SHA256) ||
@@ -743,7 +743,7 @@ bool SHAMD5DataProcess(uint32_t ui32Base, uint8_t *pui8DataSrc,
     //
     // Check the arguments.
     //
-    ASSERT(ui32Base == SHAMD5_BASE); ASSERT((ui32DataLength % 64) == 0);
+    ASSERT(ui32Base == SHAMD5_BASE);ASSERT((ui32DataLength % 64) == 0);
 
     //
     // Wait for the context to be ready before writing the mode.

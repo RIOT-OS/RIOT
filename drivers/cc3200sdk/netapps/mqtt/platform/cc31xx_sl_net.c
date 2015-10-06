@@ -91,7 +91,7 @@ static _i32 create_socket(_u32 nwconn_opts,
 
         if (nw_security_opts->n_file < 1 || nw_security_opts->n_file > 4) {
             PRINTF("\n\r ERROR: security files missing or wrong number of\
-                   security files\n\r"); PRINTF("\n\r ERROR: Did not create socket\n\r");
+                   security files\n\r");PRINTF("\n\r ERROR: Did not create socket\n\r");
             return (-1);
         }
 
@@ -112,7 +112,7 @@ static _i32 create_socket(_u32 nwconn_opts,
 
         if (nw_security_opts->n_file == 1) {
             Status = sl_SetSockOpt(MqttSocketFd, SL_SOL_SOCKET,
-                    SL_SO_SECURE_FILES_CA_FILE_NAME, nw_security_opts->files[0],
+            SL_SO_SECURE_FILES_CA_FILE_NAME, nw_security_opts->files[0],
                     strlen(nw_security_opts->files[0]));
             if (Status < 0) {
                 sl_Close(MqttSocketFd);
@@ -171,7 +171,7 @@ static _u32 svr_addr_NB_order_IPV4(char *svr_addr_str) {
         return 0;
     strcpy(svr_addr_cpy, svr_addr_str);
 
-    PRINTF("\n\r server address = %s\n\r", svr_addr_cpy); PRINTF("\n\r server address string length = %d\n\r", strlen(svr_addr_cpy));
+    PRINTF("\n\r server address = %s\n\r", svr_addr_cpy);PRINTF("\n\r server address string length = %d\n\r", strlen(svr_addr_cpy));
 
     /* get the first token */
     token = strtok((char*) svr_addr_cpy, ".");

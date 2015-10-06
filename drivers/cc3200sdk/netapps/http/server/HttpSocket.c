@@ -56,14 +56,14 @@ int OpenTCPServerSocket(unsigned int uiPortNum) {
 
     if (443 == uiPortNum) {
         iRetVal = sl_SetSockOpt(iSockDesc, SL_SOL_SOCKET,
-                SL_SO_SECURE_FILES_PRIVATE_KEY_FILE_NAME, SL_SSL_SRV_KEY,
+        SL_SO_SECURE_FILES_PRIVATE_KEY_FILE_NAME, SL_SSL_SRV_KEY,
                 strlen(SL_SSL_SRV_KEY));
         if (iRetVal < 0) {
             CloseTCPServerSocket(iSockDesc);
             return -1;
         }
         iRetVal = sl_SetSockOpt(iSockDesc, SL_SOL_SOCKET,
-                SL_SO_SECURE_FILES_CERTIFICATE_FILE_NAME, SL_SSL_SRV_CERT,
+        SL_SO_SECURE_FILES_CERTIFICATE_FILE_NAME, SL_SSL_SRV_CERT,
                 strlen(SL_SSL_SRV_CERT));
         if (iRetVal < 0) {
             CloseTCPServerSocket(iSockDesc);

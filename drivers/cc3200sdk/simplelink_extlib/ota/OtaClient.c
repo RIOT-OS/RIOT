@@ -89,7 +89,7 @@ _i32 OtaClient_UpdateCheck(void *pvOtaClient, _u8 *pVendorStr) {
     }
 
     len = sl_Recv_eagain(pOtaClient->serverSockId, response_buf,
-            HTTP_RECV_BUF_LEN, 0, MAX_EAGAIN_RETRIES);
+    HTTP_RECV_BUF_LEN, 0, MAX_EAGAIN_RETRIES);
     if (len <= 0) {
         Report("OtaClient_UpdateCheck: ERROR metadata sl_Recv status=%ld\r\n", len);
         return OTA_STATUS_ERROR;
@@ -97,7 +97,7 @@ _i32 OtaClient_UpdateCheck(void *pvOtaClient, _u8 *pVendorStr) {
 
     while (len < HTTP_HEADER_SIZE) {
         status = sl_Recv_eagain(pOtaClient->serverSockId, &response_buf[len],
-                HTTP_RECV_BUF_LEN, 0, MAX_EAGAIN_RETRIES);
+        HTTP_RECV_BUF_LEN, 0, MAX_EAGAIN_RETRIES);
         if (status <= 0) {
             Report("OtaClient_UpdateCheck: ERROR metadata sl_Recv status=%ld\r\n", status);
             return OTA_STATUS_ERROR;
@@ -187,7 +187,7 @@ _i32 OtaClient_ResourceMetadata(void *pvOtaClient, _u8 *resource_file_name,
     }
 
     len = sl_Recv_eagain(pOtaClient->serverSockId, response_buf,
-            HTTP_RECV_BUF_LEN, 0, MAX_EAGAIN_RETRIES);
+    HTTP_RECV_BUF_LEN, 0, MAX_EAGAIN_RETRIES);
     if (len <= 0) {
         Report("OtaClient_ResourceMetadata: Error media sl_Recv_eagain status=%ld\r\n", len);
         return OTA_STATUS_ERROR;
@@ -195,7 +195,7 @@ _i32 OtaClient_ResourceMetadata(void *pvOtaClient, _u8 *resource_file_name,
 
     while (len < HTTP_HEADER_SIZE) {
         status = sl_Recv_eagain(pOtaClient->serverSockId, &response_buf[len],
-                HTTP_RECV_BUF_LEN, 0, MAX_EAGAIN_RETRIES);
+        HTTP_RECV_BUF_LEN, 0, MAX_EAGAIN_RETRIES);
         if (status <= 0) {
             Report("OtaClient_ResourceMetadata: ERROR metadata sl_Recv status=%ld\r\n", status);
             return OTA_STATUS_ERROR;
@@ -272,7 +272,7 @@ _i32 OtaClient_ResourceNameConvert(void *pvOtaClient, _u8 *resource_file_name,
         pMetadata->flags |= METADATA_FLAGS_RESET_NWP;
     if (file_flags & 0x80)
         pMetadata->flags |= METADATA_FLAGS_RESET_MCU;
-    Report("OtaClient_ResourceMetadata: file flags=%x,", file_flags); Report("metadata flags=%x\r\n", pMetadata->flags);
+    Report("OtaClient_ResourceMetadata: file flags=%x,", file_flags);Report("metadata flags=%x\r\n", pMetadata->flags);
     /* skip file flags */
     pMetadata->p_file_name += 4; /* skip "/f00" of /f00_sys_file.ext" */
     pMetadata->p_file_name[0] = '/'; /* convert "_sys" to "/sys_file.ext" */

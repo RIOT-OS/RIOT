@@ -113,7 +113,7 @@ _i32 _ReadFileHeaders(_i16 fileSockId, _u8 *domian_name, _u8 *file_name) {
 
     Report("_ReadFileHeaders: domain=%s, file=%s\r\n", domian_name, file_name);
     http_build_request(send_buf, "GET ", domian_name, NULL, file_name, NULL,
-            NULL);
+    NULL);
 
     len = sl_Send(fileSockId, send_buf, (_i16) strlen((const char *) send_buf),
             0);

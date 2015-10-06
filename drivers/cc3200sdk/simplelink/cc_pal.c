@@ -361,7 +361,7 @@ Fd_t spi_Open(char *ifName, unsigned long flags) {
 
     //Enable MCSPIA2
     MAP_PRCMPeripheralClkEnable(PRCM_LSPI,
-            PRCM_RUN_MODE_CLK | PRCM_SLP_MODE_CLK);
+    PRCM_RUN_MODE_CLK | PRCM_SLP_MODE_CLK);
 
     //Disable Chip Select
     MAP_SPICSDisable(ulBase);
@@ -478,7 +478,7 @@ int spi_Close(Fd_t fd) {
 
     // Enable SPI Peripheral
     MAP_PRCMPeripheralClkDisable(PRCM_LSPI,
-            PRCM_RUN_MODE_CLK | PRCM_SLP_MODE_CLK);
+    PRCM_RUN_MODE_CLK | PRCM_SLP_MODE_CLK);
 
     return 0;
 }
@@ -522,7 +522,7 @@ int spi_Read(Fd_t fd, unsigned char *pBuff, int len) {
                 len = 0;
             } else {
                 SetupDMAReceive(&pBuff[read_size],
-                        MAX_DMA_RECV_TRANSACTION_SIZE);
+                MAX_DMA_RECV_TRANSACTION_SIZE);
                 MAP_SPICSEnable(LSPI_BASE);
 #if defined(SL_PLATFORM_MULTI_THREADED)
                 osi_MsgQRead(&DMAMsgQ,temp,OSI_WAIT_FOREVER);

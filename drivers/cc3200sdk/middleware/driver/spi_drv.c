@@ -324,7 +324,7 @@ i32 spi_handle_pm_cmd(struct module_drv *mod_drv, const enum mod_pm pm_state) {
     if ((e_pm_M0 == mod_drv->pm_state) && (e_pm_M4 == pm_state)) {
         /* Save the peripheral context */
         retval = cc_spi_control(rtos_drv->hal_handle, SPI_CTL_CONTEXT_SAVE,
-                NULL);
+        NULL);
         if (retval < 0) {
             goto exit1;
         }
@@ -333,7 +333,7 @@ i32 spi_handle_pm_cmd(struct module_drv *mod_drv, const enum mod_pm pm_state) {
     } else if ((e_pm_M4 == mod_drv->pm_state) && (e_pm_M0 == pm_state)) {
         /* Restore the peripheral context */
         retval = cc_spi_control(rtos_drv->hal_handle, SPI_CTL_CONTEXT_RESTORE,
-                NULL);
+        NULL);
         if (retval < 0) {
             goto exit1;
         }

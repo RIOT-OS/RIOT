@@ -802,7 +802,7 @@ extern int HTTPCli_getResponseStatus(HTTPCli_Handle cli);
  *          @ref HTTPCli_FIELD_ID_DUMMY, or error code on failure.
  */
 extern int HTTPCli_getResponseField(HTTPCli_Handle cli, char *value, int len,
-        bool *moreFlag);
+bool *moreFlag);
 
 /*!
  *  @brief  Read the parsed response body data from the HTTP server
@@ -825,7 +825,7 @@ extern int HTTPCli_getResponseField(HTTPCli_Handle cli, char *value, int len,
  *  @return The number of characters read on success or error code on failure
  */
 extern int HTTPCli_readResponseBody(HTTPCli_Handle cli, char *body, int len,
-        bool *moreFlag);
+bool *moreFlag);
 
 /*!
  *  @brief  Read the raw response message body from the HTTP server

@@ -125,7 +125,7 @@ _i32 http_skip_headers(_i16 sockId) {
 
     /* First thing - look for success code 200 */
     len = sl_Recv_eagain(sockId, pHeader_string, HTTP_HEADER_SIZE, 0,
-            MAX_EAGAIN_RETRIES); /*Get beginning of server response http header */
+    MAX_EAGAIN_RETRIES); /*Get beginning of server response http header */
     if (len < 0) {
         Report("http_skip_headers: ERROR sl_Recv_eagain, status=%ld\r\n", len);
         return OTA_STATUS_ERROR;
@@ -135,7 +135,7 @@ _i32 http_skip_headers(_i16 sockId) {
     if (len != HTTP_HEADER_SIZE) {
         /* second chance */
         len += sl_Recv_eagain(sockId, &pHeader_string[len],
-                HTTP_HEADER_SIZE - len, 0, MAX_EAGAIN_RETRIES); /*Get beginning of server response http header */
+        HTTP_HEADER_SIZE - len, 0, MAX_EAGAIN_RETRIES); /*Get beginning of server response http header */
         if (len < 0) {
             Report("http_skip_headers: ERROR sl_Recv_eagain, status=%ld\r\n", len);
             return OTA_STATUS_ERROR;
@@ -156,7 +156,7 @@ _i32 http_skip_headers(_i16 sockId) {
     /* look for end of response header*/
     while (1) {
         len = sl_Recv_eagain(sockId, &header_string[0], 2, 0,
-                MAX_EAGAIN_RETRIES);
+        MAX_EAGAIN_RETRIES);
         if (len < 0) {
             Report("http_skip_headers: ERROR sl_Recv_eagain, status=%ld\r\n", len);
             return OTA_STATUS_ERROR;
@@ -263,7 +263,7 @@ _i32 json_parse_dropbox_metadata(_i16 sockId, RsrcData_t *pRsrcData,
             strncpy((char *) read_buf, (const char *) pBuf, left_len); /* copy current file to start of read buffer */
             memset(&read_buf[left_len], 0, HTTP_RECV_BUF_LEN - left_len); /* copy current file to start of read buffer */
             size = sl_Recv_eagain(sockId, &read_buf[left_len],
-                    HTTP_RECV_BUF_LEN - left_len, 0, MAX_EAGAIN_RETRIES); /*Get media link */
+            HTTP_RECV_BUF_LEN - left_len, 0, MAX_EAGAIN_RETRIES); /*Get media link */
             size += left_len;
             pBuf = read_buf;
             if ((_u8 *) strstr((const char *) read_buf, "}") <= pBuf) /* still not found, exit */
@@ -374,7 +374,7 @@ _i32 json_parse_update_check_resp(_i16 sockId, RsrcData_t *pRsrcData,
             _i32 left_len = read_buf + size - pBuf;
             strncpy((char *) read_buf, (const char *) pBuf, left_len); /* copy current file to start of read buffer */
             size = sl_Recv_eagain(sockId, &read_buf[left_len],
-                    HTTP_RECV_BUF_LEN - left_len, 0, MAX_EAGAIN_RETRIES); /*Get media link */
+            HTTP_RECV_BUF_LEN - left_len, 0, MAX_EAGAIN_RETRIES); /*Get media link */
             pBuf = read_buf;
             if ((_u8 *) strstr((const char *) pBuf, "}") <= pBuf) /* still not found, exit */
             {

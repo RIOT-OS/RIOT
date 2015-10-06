@@ -1439,7 +1439,7 @@ int HTTPCli_sendRequest(HTTPCli_Handle cli, const char *method,
  *  ======== HTTPCli_sendField ========
  */
 int HTTPCli_sendField(HTTPCli_Handle cli, const char *name, const char *value,
-        bool lastFlag) {
+bool lastFlag) {
     int ret;
 
     xassert(cli != NULL);

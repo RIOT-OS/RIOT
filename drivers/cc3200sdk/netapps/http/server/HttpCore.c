@@ -268,7 +268,7 @@ void RunHttpServer(void) {
 
                         // Receive the data into the global packet-receive buffer
                         memset(g_state.packetRecv, 0,
-                                HTTP_CORE_MAX_PACKET_SIZE_RECEIVED);
+                        HTTP_CORE_MAX_PACKET_SIZE_RECEIVED);
                         iRecvLen = (int) recv(
                                 g_state.connections[uConnection].dataSocket,
                                 (char *) (g_state.packetRecv),
@@ -688,7 +688,7 @@ static int HttpCore_HandleMethodLine(UINT16 uConnection, struct HttpBlob line) {
                 sizeof(HTTP_METHOD_POST) - 1, line);
         uMethodLength = sizeof(HTTP_METHOD_POST) - 1;
         g_state.connections[uConnection].request.uFlags |=
-                HTTP_REQUEST_FLAG_METHOD_POST;
+        HTTP_REQUEST_FLAG_METHOD_POST;
         method = POST; 	// This means POST
     } else {
         // Method is GET
@@ -702,7 +702,7 @@ static int HttpCore_HandleMethodLine(UINT16 uConnection, struct HttpBlob line) {
                 sizeof(HTTP_METHOD_POST) - 1, line);
         uMethodLength = sizeof(HTTP_METHOD_POST) - 1;
         g_state.connections[uConnection].request.uFlags |=
-                HTTP_REQUEST_FLAG_METHOD_POST;
+        HTTP_REQUEST_FLAG_METHOD_POST;
         if (methodLocation == NULL || methodLocation != line.pData) {
             // Header does not begin line with GET or POST as it should
             HttpDebug("Unsupported method\n\r");
@@ -803,7 +803,7 @@ static int HttpCore_HandleHeaderLine(UINT16 uConnection, struct HttpBlob line) {
         pFound = HttpString_nextToken(HTTP_GZIP, sizeof(HTTP_GZIP) - 1, line);
         if (pFound != NULL)
             g_state.connections[uConnection].request.uFlags |=
-                    HTTP_REQUEST_FLAG_ACCEPT_GZIP;
+            HTTP_REQUEST_FLAG_ACCEPT_GZIP;
         else
             g_state.connections[uConnection].request.uFlags &=
                     ~HTTP_REQUEST_FLAG_ACCEPT_GZIP;
@@ -824,7 +824,7 @@ static int HttpCore_HandleHeaderLine(UINT16 uConnection, struct HttpBlob line) {
         if (g_state.connections[uConnection].uContentLeft
                 > HTTP_CORE_MAX_HEADER_LINE_LENGTH)
             g_state.connections[uConnection].request.uFlags |=
-                    HTTP_REQUEST_CONTENT_IGNORED;
+            HTTP_REQUEST_CONTENT_IGNORED;
         // Prepare the request blob to buffer the content
         g_state.connections[uConnection].request.requestContent.pData =
                 g_state.connections[uConnection].headerStart;
@@ -841,7 +841,7 @@ static int HttpCore_HandleHeaderLine(UINT16 uConnection, struct HttpBlob line) {
         pFound = HttpString_nextToken(HTTP_CLOSE, sizeof(HTTP_CLOSE) - 1, line);
         if (pFound != 0)
             g_state.connections[uConnection].request.uFlags |=
-                    HTTP_REQUEST_FLAG_CLOSE;
+            HTTP_REQUEST_FLAG_CLOSE;
         else
             g_state.connections[uConnection].request.uFlags &=
                     ~HTTP_REQUEST_FLAG_CLOSE;
@@ -981,7 +981,7 @@ static int WSCore_HandshakeRequest(UINT16 uConnection, struct HttpBlob line) {
             line.pData += sizeof(WS_ORIGIN) + 1;
             line.uLength -= sizeof(WS_ORIGIN) + 1;
             g_state.connections[uConnection].request.uFlags |=
-                    WS_REQUEST_BROWSER;
+            WS_REQUEST_BROWSER;
             WS_ORIGIN_NAME = (char *) realloc(WS_ORIGIN_NAME, line.uLength + 1);
             if (WS_ORIGIN_NAME == NULL) {
                 bRetVal = 0;
@@ -1079,7 +1079,7 @@ static int HttpCore_SendPacket(UINT16 uConnection, struct HttpBlob buffer) {
         if (buffer.uLength > HTTP_CORE_MAX_PACKET_SIZE_SEND) {
             if (buffer.pData != g_state.packetSend) {
                 memcpy((void *) &g_state.packetSend[0], (void *) buffer.pData,
-                        HTTP_CORE_MAX_PACKET_SIZE_SEND);
+                HTTP_CORE_MAX_PACKET_SIZE_SEND);
             } else {
                 HttpAssert(0);
             }
@@ -1520,15 +1520,16 @@ int WS_SendPacket(UINT16 uConnection) {
 int HttpResponse_CannedRedirect(UINT16 uConnection, struct HttpBlob location,
         UINT16 bPermanent) {
     struct HttpBlob status;
-    HttpStatusString(
-            (bPermanent == 1 ?
-                    HTTP_STATUS_REDIRECT_PERMANENT :
-                    HTTP_STATUS_REDIRECT_TEMPORARY), &status);
+    HttpStatusString((bPermanent == 1 ?
+    HTTP_STATUS_REDIRECT_PERMANENT :
+                                        HTTP_STATUS_REDIRECT_TEMPORARY),
+            &status);
 
     if (!HttpResponse_Headers(uConnection,
             (bPermanent == 1 ?
-                    HTTP_STATUS_REDIRECT_PERMANENT :
-                    HTTP_STATUS_REDIRECT_TEMPORARY), 0, 0, nullBlob, location))
+            HTTP_STATUS_REDIRECT_PERMANENT :
+                               HTTP_STATUS_REDIRECT_TEMPORARY), 0, 0, nullBlob,
+            location))
         return 0;
     else
         return 1;

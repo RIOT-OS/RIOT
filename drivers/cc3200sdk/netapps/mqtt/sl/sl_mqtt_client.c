@@ -176,7 +176,7 @@ static void process_notify_ack_cb(void *app, u8 msg_type, u16 msg_id, u8 *buf,
 // process_publish_rx_cb 
 //*****************************************************************************
 static bool process_publish_rx_cb(void *app, bool dup, enum mqtt_qos qos,
-        bool retain, struct mqtt_packet *mqp) {
+bool retain, struct mqtt_packet *mqp) {
     struct sl_client_ctx *client_ctx = (struct sl_client_ctx *) app;
     /*If incoming message is a publish message from broker */
     /* Invokes the event handler with topic,topic length,payload and 

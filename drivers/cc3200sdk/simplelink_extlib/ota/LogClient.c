@@ -118,7 +118,7 @@ _i32 LogClient_Print(void *pvLogClient, _u8 *pFilename,
 
     /* recv json */
     len = sl_Recv_eagain(pLogClient->serverSockId, response_buf,
-            HTTP_RECV_BUF_LEN, 0, MAX_EAGAIN_RETRIES);
+    HTTP_RECV_BUF_LEN, 0, MAX_EAGAIN_RETRIES);
     if (len <= 0) {
         Report("LogClient_UpdateCheck: ERROR metadata sl_Recv status=%ld\r\n", status);
         return OTA_STATUS_ERROR;

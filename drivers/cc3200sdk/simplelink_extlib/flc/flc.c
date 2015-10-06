@@ -103,7 +103,7 @@ _i32 _McuImageGetNewIndex(void) {
     default:
         newImageIndex = IMG_ACT_USER1;
         break;
-    } Report("_McuImageGetNewIndex: active image is %d, return new image %ld \n\r", sBootInfo.ucActiveImg, newImageIndex);
+    }Report("_McuImageGetNewIndex: active image is %d, return new image %ld \n\r", sBootInfo.ucActiveImg, newImageIndex);
 
     return newImageIndex;
 }

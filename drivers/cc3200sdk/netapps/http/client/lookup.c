@@ -193,6 +193,7 @@ static const struct Lookup_Field wordlist[] = {
 #ifdef __GNUC__
 __inline
 
+
 #if defined __GNUC_STDC_INLINE__ || defined __GNUC_GNU_INLINE__
 __attribute__ ((__gnu_inline__))
 #endif

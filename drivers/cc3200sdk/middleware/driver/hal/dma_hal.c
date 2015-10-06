@@ -403,7 +403,7 @@ i32 cc_dma_submit_pp_endp(cc_hndl hndl, struct cc_dma_buf *buf1,
 }
 
 i32 cc_dma_submit_endp(cc_hndl hndl, void *src_endp, void *dst_endp, i32 n_item,
-        bool pp_last) {
+bool pp_last) {
     i32 ret_val = 0;
 
     struct dma_chan_desc *desc = (struct dma_chan_desc*) hndl;

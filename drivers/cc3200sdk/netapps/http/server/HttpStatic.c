@@ -100,7 +100,7 @@ int HttpStatic_ProcessRequest(struct HttpRequest* request) {
     if (request->uFlags & HTTP_REQUEST_FLAG_METHOD_POST) {
         /* HttpResponse_CannedError responds to client with 500 ERROR_INTERNAL  */
         if (!HttpResponse_CannedError(request->uConnection,
-                HTTP_STATUS_ERROR_INTERNAL)) {
+        HTTP_STATUS_ERROR_INTERNAL)) {
             bRetVal = 0;
             goto end;
         } else {
@@ -128,7 +128,7 @@ int HttpStatic_ProcessRequest(struct HttpRequest* request) {
                 content->uLength) < 0) {
             /* call HttpResponse_CannedError responds to client with 500 ERROR_INTERNAL  */
             if (!HttpResponse_CannedError(request->uConnection,
-                    HTTP_STATUS_ERROR_NOT_ACCEPTED)) {
+            HTTP_STATUS_ERROR_NOT_ACCEPTED)) {
                 bRetVal = 0;
                 goto end;
             } else {
@@ -138,7 +138,7 @@ int HttpStatic_ProcessRequest(struct HttpRequest* request) {
         } else {
             if (!HeaderFlag) {
                 if (!HttpResponse_Headers(request->uConnection, HTTP_STATUS_OK,
-                        NULL, TotalLength, contentType, location)) {
+                NULL, TotalLength, contentType, location)) {
                     bRetVal = 0;
                     goto end;
                 }

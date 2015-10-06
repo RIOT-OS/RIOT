@@ -146,10 +146,10 @@ void AESConfigSet(uint32_t ui32Base, uint32_t ui32Config) {
     //
     // Check the arguments.
     //
-    ASSERT(ui32Base == AES_BASE); ASSERT((ui32Config & AES_CFG_DIR_ENCRYPT) ||
-            (ui32Config & AES_CFG_DIR_DECRYPT)); ASSERT((ui32Config & AES_CFG_KEY_SIZE_128BIT) ||
+    ASSERT(ui32Base == AES_BASE);ASSERT((ui32Config & AES_CFG_DIR_ENCRYPT) ||
+            (ui32Config & AES_CFG_DIR_DECRYPT));ASSERT((ui32Config & AES_CFG_KEY_SIZE_128BIT) ||
             (ui32Config & AES_CFG_KEY_SIZE_192BIT) ||
-            (ui32Config & AES_CFG_KEY_SIZE_256BIT)); ASSERT((ui32Config & AES_CFG_MODE_ECB) ||
+            (ui32Config & AES_CFG_KEY_SIZE_256BIT));ASSERT((ui32Config & AES_CFG_MODE_ECB) ||
             (ui32Config & AES_CFG_MODE_CBC) ||
             (ui32Config & AES_CFG_MODE_CTR) ||
             (ui32Config & AES_CFG_MODE_ICM) ||
@@ -164,7 +164,7 @@ void AESConfigSet(uint32_t ui32Base, uint32_t ui32Config) {
             (ui32Config & AES_CFG_MODE_GCM_HLY0ZERO) ||
             (ui32Config & AES_CFG_MODE_GCM_HLY0CALC) ||
             (ui32Config & AES_CFG_MODE_GCM_HY0CALC) ||
-            (ui32Config & AES_CFG_MODE_CCM)); ASSERT(((ui32Config & AES_CFG_MODE_CTR) ||
+            (ui32Config & AES_CFG_MODE_CCM));ASSERT(((ui32Config & AES_CFG_MODE_CTR) ||
                     (ui32Config & AES_CFG_MODE_GCM_HLY0ZERO) ||
                     (ui32Config & AES_CFG_MODE_GCM_HLY0CALC) ||
                     (ui32Config & AES_CFG_MODE_GCM_HY0CALC) ||
@@ -172,7 +172,7 @@ void AESConfigSet(uint32_t ui32Base, uint32_t ui32Config) {
             ((ui32Config & AES_CFG_CTR_WIDTH_32) ||
                     (ui32Config & AES_CFG_CTR_WIDTH_64) ||
                     (ui32Config & AES_CFG_CTR_WIDTH_96) ||
-                    (ui32Config & AES_CFG_CTR_WIDTH_128))); ASSERT((ui32Config & AES_CFG_MODE_CCM) &&
+                    (ui32Config & AES_CFG_CTR_WIDTH_128)));ASSERT((ui32Config & AES_CFG_MODE_CCM) &&
             ((ui32Config & AES_CFG_CCM_L_2) ||
                     (ui32Config & AES_CFG_CCM_L_4) ||
                     (ui32Config & AES_CFG_CCM_L_8)) &&
@@ -219,7 +219,7 @@ void AESKey1Set(uint32_t ui32Base, uint8_t *pui8Key, uint32_t ui32Keysize) {
     //
     // Check the arguments.
     //
-    ASSERT(ui32Base == AES_BASE); ASSERT((ui32Keysize == AES_CFG_KEY_SIZE_128BIT) ||
+    ASSERT(ui32Base == AES_BASE);ASSERT((ui32Keysize == AES_CFG_KEY_SIZE_128BIT) ||
             (ui32Keysize == AES_CFG_KEY_SIZE_192BIT) ||
             (ui32Keysize == AES_CFG_KEY_SIZE_256BIT));
 
@@ -270,7 +270,7 @@ void AESKey2Set(uint32_t ui32Base, uint8_t *pui8Key, uint32_t ui32Keysize) {
     //
     // Check the arguments.
     //
-    ASSERT(ui32Base == AES_BASE); ASSERT((ui32Keysize == AES_CFG_KEY_SIZE_128BIT) ||
+    ASSERT(ui32Base == AES_BASE);ASSERT((ui32Keysize == AES_CFG_KEY_SIZE_128BIT) ||
             (ui32Keysize == AES_CFG_KEY_SIZE_192BIT) ||
             (ui32Keysize == AES_CFG_KEY_SIZE_256BIT));
 
@@ -1024,7 +1024,7 @@ void AESIntEnable(uint32_t ui32Base, uint32_t ui32IntFlags) {
     //
     // Check the arguments.
     //
-    ASSERT(ui32Base == AES_BASE); ASSERT((ui32IntFlags == AES_INT_CONTEXT_IN) ||
+    ASSERT(ui32Base == AES_BASE);ASSERT((ui32IntFlags == AES_INT_CONTEXT_IN) ||
             (ui32IntFlags == AES_INT_CONTEXT_OUT) ||
             (ui32IntFlags == AES_INT_DATA_IN) ||
             (ui32IntFlags == AES_INT_DATA_OUT) ||
@@ -1070,7 +1070,7 @@ void AESIntDisable(uint32_t ui32Base, uint32_t ui32IntFlags) {
     //
     // Check the arguments.
     //
-    ASSERT(ui32Base == AES_BASE); ASSERT((ui32IntFlags == AES_INT_CONTEXT_IN) ||
+    ASSERT(ui32Base == AES_BASE);ASSERT((ui32IntFlags == AES_INT_CONTEXT_IN) ||
             (ui32IntFlags == AES_INT_CONTEXT_OUT) ||
             (ui32IntFlags == AES_INT_DATA_IN) ||
             (ui32IntFlags == AES_INT_DATA_OUT) ||
@@ -1112,7 +1112,7 @@ void AESIntClear(uint32_t ui32Base, uint32_t ui32IntFlags) {
     //
     // Check the arguments.
     //
-    ASSERT(ui32Base == AES_BASE); ASSERT((ui32IntFlags == AES_INT_DMA_CONTEXT_IN) ||
+    ASSERT(ui32Base == AES_BASE);ASSERT((ui32IntFlags == AES_INT_DMA_CONTEXT_IN) ||
             (ui32IntFlags == AES_INT_DMA_CONTEXT_OUT) ||
             (ui32IntFlags == AES_INT_DMA_DATA_IN) ||
             (ui32IntFlags == AES_INT_DMA_DATA_OUT));
@@ -1216,7 +1216,7 @@ void AESDMAEnable(uint32_t ui32Base, uint32_t ui32Flags) {
     //
     // Check the arguments.
     //
-    ASSERT(ui32Base == AES_BASE); ASSERT((ui32Flags == AES_DMA_DATA_IN) ||
+    ASSERT(ui32Base == AES_BASE);ASSERT((ui32Flags == AES_DMA_DATA_IN) ||
             (ui32Flags == AES_DMA_DATA_OUT) ||
             (ui32Flags == AES_DMA_CONTEXT_IN) ||
             (ui32Flags == AES_DMA_CONTEXT_OUT));
@@ -1250,7 +1250,7 @@ void AESDMADisable(uint32_t ui32Base, uint32_t ui32Flags) {
     //
     // Check the arguments.
     //
-    ASSERT(ui32Base == AES_BASE); ASSERT((ui32Flags == AES_DMA_DATA_IN) ||
+    ASSERT(ui32Base == AES_BASE);ASSERT((ui32Flags == AES_DMA_DATA_IN) ||
             (ui32Flags == AES_DMA_DATA_OUT) ||
             (ui32Flags == AES_DMA_CONTEXT_IN) ||
             (ui32Flags == AES_DMA_CONTEXT_OUT));

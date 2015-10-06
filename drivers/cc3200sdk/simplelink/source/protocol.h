@@ -872,8 +872,7 @@ _u8 padding2;
 _u32 ip0;
 } _GetHostByNameIPv4AsyncResponse_t;
 
-typedef enum {
-CTST_BSD_UDP_TX,
+typedef enum {CTST_BSD_UDP_TX,
 CTST_BSD_UDP_RX,
 CTST_BSD_TCP_TX,
 CTST_BSD_TCP_RX,

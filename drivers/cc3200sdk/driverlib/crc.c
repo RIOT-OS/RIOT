@@ -99,7 +99,7 @@ void CRCConfigSet(uint32_t ui32Base, uint32_t ui32CRCConfig) {
     //
     // Check the arguments.
     //
-    ASSERT(ui32Base == DTHE_BASE); ASSERT((ui32CRCConfig & CRC_CFG_INIT_SEED) ||
+    ASSERT(ui32Base == DTHE_BASE);ASSERT((ui32CRCConfig & CRC_CFG_INIT_SEED) ||
             (ui32CRCConfig & CRC_CFG_INIT_0) ||
             (ui32CRCConfig & CRC_CFG_INIT_1) ||
             (ui32CRCConfig & CRC_CFG_SIZE_8BIT) ||

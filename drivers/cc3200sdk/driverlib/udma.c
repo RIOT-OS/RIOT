@@ -228,7 +228,7 @@ void uDMAControlBaseSet(void *pControlTable) {
     // Check the arguments.
     //
     ASSERT(((unsigned long)pControlTable & ~0x3FF) ==
-            (unsigned long)pControlTable); ASSERT((unsigned long)pControlTable >= 0x20000000);
+            (unsigned long)pControlTable);ASSERT((unsigned long)pControlTable >= 0x20000000);
 
     //
     // Program the base address into the register.
@@ -335,7 +335,7 @@ void uDMAChannelAttributeEnable(unsigned long ulChannelNum,
     //
     // Check the arguments.
     //
-    ASSERT((ulChannelNum & 0xffff) < 32); ASSERT((ulAttr & ~(UDMA_ATTR_USEBURST | UDMA_ATTR_ALTSELECT |
+    ASSERT((ulChannelNum & 0xffff) < 32);ASSERT((ulAttr & ~(UDMA_ATTR_USEBURST | UDMA_ATTR_ALTSELECT |
                             UDMA_ATTR_HIGH_PRIORITY | UDMA_ATTR_REQMASK)) == 0);
 
     //
@@ -402,7 +402,7 @@ void uDMAChannelAttributeDisable(unsigned long ulChannelNum,
     //
     // Check the arguments.
     //
-    ASSERT((ulChannelNum & 0xffff) < 32); ASSERT((ulAttr & ~(UDMA_ATTR_USEBURST | UDMA_ATTR_ALTSELECT |
+    ASSERT((ulChannelNum & 0xffff) < 32);ASSERT((ulAttr & ~(UDMA_ATTR_USEBURST | UDMA_ATTR_ALTSELECT |
                             UDMA_ATTR_HIGH_PRIORITY | UDMA_ATTR_REQMASK)) == 0);
 
     //
@@ -566,7 +566,7 @@ void uDMAChannelControlSet(unsigned long ulChannelStructIndex,
     //
     // Check the arguments.
     //
-    ASSERT((ulChannelStructIndex & 0xffff) < 64); ASSERT(HWREG(UDMA_BASE + UDMA_O_CTLBASE) != 0);
+    ASSERT((ulChannelStructIndex & 0xffff) < 64);ASSERT(HWREG(UDMA_BASE + UDMA_O_CTLBASE) != 0);
 
     //
     // In case a channel selector macro (like UDMA_CH0_USB0EP1RX) was
@@ -673,7 +673,7 @@ void uDMAChannelTransferSet(unsigned long ulChannelStructIndex,
     //
     // Check the arguments.
     //
-    ASSERT((ulChannelStructIndex & 0xffff) < 64); ASSERT(HWREG(UDMA_BASE + UDMA_O_CTLBASE) != 0); ASSERT(ulMode <= UDMA_MODE_PER_SCATTER_GATHER); ASSERT((unsigned long)pvSrcAddr >= 0x20000000); ASSERT((unsigned long)pvDstAddr >= 0x20000000); ASSERT((ulTransferSize != 0) && (ulTransferSize <= 1024));
+    ASSERT((ulChannelStructIndex & 0xffff) < 64);ASSERT(HWREG(UDMA_BASE + UDMA_O_CTLBASE) != 0);ASSERT(ulMode <= UDMA_MODE_PER_SCATTER_GATHER);ASSERT((unsigned long)pvSrcAddr >= 0x20000000);ASSERT((unsigned long)pvDstAddr >= 0x20000000);ASSERT((ulTransferSize != 0) && (ulTransferSize <= 1024));
 
     //
     // In case a channel selector macro (like UDMA_CH0_USB0EP1RX) was
@@ -808,7 +808,7 @@ void uDMAChannelScatterGatherSet(unsigned long ulChannelNum,
     //
     // Check the parameters
     //
-    ASSERT((ulChannelNum & 0xffff) < 32); ASSERT(HWREG(UDMA_BASE + UDMA_O_CTLBASE) != 0); ASSERT(pvTaskList != 0); ASSERT(ulTaskCount <= 1024); ASSERT(ulTaskCount != 0);
+    ASSERT((ulChannelNum & 0xffff) < 32);ASSERT(HWREG(UDMA_BASE + UDMA_O_CTLBASE) != 0);ASSERT(pvTaskList != 0);ASSERT(ulTaskCount <= 1024);ASSERT(ulTaskCount != 0);
 
     //
     // In case a channel selector macro (like UDMA_CH0_USB0EP1RX) was
@@ -879,7 +879,7 @@ unsigned long uDMAChannelSizeGet(unsigned long ulChannelStructIndex) {
     //
     // Check the arguments.
     //
-    ASSERT((ulChannelStructIndex & 0xffff) < 64); ASSERT(HWREG(UDMA_BASE + UDMA_O_CTLBASE) != 0);
+    ASSERT((ulChannelStructIndex & 0xffff) < 64);ASSERT(HWREG(UDMA_BASE + UDMA_O_CTLBASE) != 0);
 
     //
     // In case a channel selector macro (like UDMA_CH0_USB0EP1RX) was
@@ -944,7 +944,7 @@ unsigned long uDMAChannelModeGet(unsigned long ulChannelStructIndex) {
     //
     // Check the arguments.
     //
-    ASSERT((ulChannelStructIndex & 0xffff) < 64); ASSERT(HWREG(UDMA_O_CTLBASE) != 0);
+    ASSERT((ulChannelStructIndex & 0xffff) < 64);ASSERT(HWREG(UDMA_O_CTLBASE) != 0);
 
     //
     // In case a channel selector macro (like UDMA_CH0_USB0EP1RX) was
@@ -1011,7 +1011,7 @@ void uDMAIntRegister(unsigned long ulIntChannel, void (*pfnHandler)(void)) {
     //
     // Check the arguments.
     //
-    ASSERT(pfnHandler); ASSERT((ulIntChannel == UDMA_INT_SW) || (ulIntChannel == UDMA_INT_ERR));
+    ASSERT(pfnHandler);ASSERT((ulIntChannel == UDMA_INT_SW) || (ulIntChannel == UDMA_INT_ERR));
 
     //
     // Register the interrupt handler.

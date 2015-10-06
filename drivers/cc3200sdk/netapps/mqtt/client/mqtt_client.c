@@ -765,7 +765,7 @@ static i32 _msg_dispatch(struct client_ctx *cl_ctx, struct mqtt_packet *mqp,
 
     /* Tries to free-up MQP either on error or if full pkt is sent */
     rv = cl_ctx_seg1_send(cl_ctx, MQP_FHEADER_BUF(mqp), MQP_CONTENT_LEN(mqp),
-            false, mqp);
+    false, mqp);
 
     /* At this point, error or not, QoS0 MQP would have been freed */
 
@@ -1637,7 +1637,7 @@ static i32 grp_net_setup_create() {
 
     if (-1 == loopb_net) {
         loopb_net = net_ops->open(DEV_NETCONN_OPT_UDP, NULL, loopb_portid,
-                NULL);
+        NULL);
         if (-1 == loopb_net)
             return MQP_ERR_LIBQUIT;
 

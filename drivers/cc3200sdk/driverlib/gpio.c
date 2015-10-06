@@ -166,7 +166,7 @@ void GPIODirModeSet(unsigned long ulPort, unsigned char ucPins,
     //
     // Check the arguments.
     //
-    ASSERT(GPIOBaseValid(ulPort)); ASSERT((ulPinIO == GPIO_DIR_MODE_IN) || (ulPinIO == GPIO_DIR_MODE_OUT));
+    ASSERT(GPIOBaseValid(ulPort));ASSERT((ulPinIO == GPIO_DIR_MODE_IN) || (ulPinIO == GPIO_DIR_MODE_OUT));
 
     //
     // Set the pin direction and mode.
@@ -199,7 +199,7 @@ unsigned long GPIODirModeGet(unsigned long ulPort, unsigned char ucPin) {
     //
     // Check the arguments.
     //
-    ASSERT(GPIOBaseValid(ulPort)); ASSERT(ucPin < 8);
+    ASSERT(GPIOBaseValid(ulPort));ASSERT(ucPin < 8);
 
     //
     // Convert from a pin number to a bit position.
@@ -249,7 +249,7 @@ void GPIOIntTypeSet(unsigned long ulPort, unsigned char ucPins,
     //
     // Check the arguments.
     //
-    ASSERT(GPIOBaseValid(ulPort)); ASSERT((ulIntType == GPIO_FALLING_EDGE) ||
+    ASSERT(GPIOBaseValid(ulPort));ASSERT((ulIntType == GPIO_FALLING_EDGE) ||
             (ulIntType == GPIO_RISING_EDGE) || (ulIntType == GPIO_BOTH_EDGES) ||
             (ulIntType == GPIO_LOW_LEVEL) || (ulIntType == GPIO_HIGH_LEVEL));
 
@@ -293,7 +293,7 @@ unsigned long GPIOIntTypeGet(unsigned long ulPort, unsigned char ucPin) {
     //
     // Check the arguments.
     //
-    ASSERT(GPIOBaseValid(ulPort)); ASSERT(ucPin < 8);
+    ASSERT(GPIOBaseValid(ulPort));ASSERT(ucPin < 8);
 
     //
     // Convert from a pin number to a bit position.

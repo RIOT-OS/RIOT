@@ -393,20 +393,21 @@ _volatile _u8 RxIrqCnt;
 
 #ifndef SL_TINY_EXT
 const _SlActionLookup_t _SlActionLookupTable[] = { { ACCEPT_ID,
-        SL_OPCODE_SOCKET_ACCEPTASYNCRESPONSE,
+SL_OPCODE_SOCKET_ACCEPTASYNCRESPONSE,
         (_SlSpawnEntryFunc_t) _sl_HandleAsync_Accept }, { CONNECT_ID,
-        SL_OPCODE_SOCKET_CONNECTASYNCRESPONSE,
+SL_OPCODE_SOCKET_CONNECTASYNCRESPONSE,
         (_SlSpawnEntryFunc_t) _sl_HandleAsync_Connect }, { SELECT_ID,
-        SL_OPCODE_SOCKET_SELECTASYNCRESPONSE,
+SL_OPCODE_SOCKET_SELECTASYNCRESPONSE,
         (_SlSpawnEntryFunc_t) _sl_HandleAsync_Select }, { GETHOSYBYNAME_ID,
-        SL_OPCODE_NETAPP_DNSGETHOSTBYNAMEASYNCRESPONSE,
+SL_OPCODE_NETAPP_DNSGETHOSTBYNAMEASYNCRESPONSE,
         (_SlSpawnEntryFunc_t) _sl_HandleAsync_DnsGetHostByName }, {
         GETHOSYBYSERVICE_ID, SL_OPCODE_NETAPP_MDNSGETHOSTBYSERVICEASYNCRESPONSE,
         (_SlSpawnEntryFunc_t) _sl_HandleAsync_DnsGetHostByService }, { PING_ID,
-        SL_OPCODE_NETAPP_PINGREPORTREQUESTRESPONSE,
-        (_SlSpawnEntryFunc_t) _sl_HandleAsync_PingResponse }, { START_STOP_ID,
+SL_OPCODE_NETAPP_PINGREPORTREQUESTRESPONSE,
+        (_SlSpawnEntryFunc_t) _sl_HandleAsync_PingResponse },
+        { START_STOP_ID,
         SL_OPCODE_DEVICE_STOP_ASYNC_RESPONSE,
-        (_SlSpawnEntryFunc_t) _sl_HandleAsync_Stop } };
+                (_SlSpawnEntryFunc_t) _sl_HandleAsync_Stop } };
 #else
 const _SlActionLookup_t _SlActionLookupTable[] =
 {
@@ -422,33 +423,33 @@ typedef struct {
 } OpcodeKeyVal_t;
 
 /* The table translates opcode to user's event type */
-const OpcodeKeyVal_t OpcodeTranslateTable[] =
-        { { SL_OPCODE_WLAN_SMART_CONFIG_START_ASYNC_RESPONSE,
-                SL_WLAN_SMART_CONFIG_COMPLETE_EVENT }, {
-                SL_OPCODE_WLAN_SMART_CONFIG_STOP_ASYNC_RESPONSE,
-                SL_WLAN_SMART_CONFIG_STOP_EVENT }, {
-                SL_OPCODE_WLAN_STA_CONNECTED, SL_WLAN_STA_CONNECTED_EVENT },
-                { SL_OPCODE_WLAN_STA_DISCONNECTED,
-                        SL_WLAN_STA_DISCONNECTED_EVENT }, {
-                        SL_OPCODE_WLAN_P2P_DEV_FOUND,
-                        SL_WLAN_P2P_DEV_FOUND_EVENT }, {
-                        SL_OPCODE_WLAN_P2P_NEG_REQ_RECEIVED,
-                        SL_WLAN_P2P_NEG_REQ_RECEIVED_EVENT }, {
-                        SL_OPCODE_WLAN_CONNECTION_FAILED,
-                        SL_WLAN_CONNECTION_FAILED_EVENT }, {
-                        SL_OPCODE_WLAN_WLANASYNCCONNECTEDRESPONSE,
-                        SL_WLAN_CONNECT_EVENT }, {
-                        SL_OPCODE_WLAN_WLANASYNCDISCONNECTEDRESPONSE,
-                        SL_WLAN_DISCONNECT_EVENT }, {
-                        SL_OPCODE_NETAPP_IPACQUIRED,
-                        SL_NETAPP_IPV4_IPACQUIRED_EVENT }, {
-                        SL_OPCODE_NETAPP_IPACQUIRED_V6,
-                        SL_NETAPP_IPV6_IPACQUIRED_EVENT }, {
-                        SL_OPCODE_NETAPP_IP_LEASED, SL_NETAPP_IP_LEASED_EVENT },
-                { SL_OPCODE_NETAPP_IP_RELEASED, SL_NETAPP_IP_RELEASED_EVENT }, {
-                        SL_OPCODE_SOCKET_TXFAILEDASYNCRESPONSE,
-                        SL_SOCKET_TX_FAILED_EVENT },
-                { SL_OPCODE_SOCKET_SOCKETASYNCEVENT, SL_SOCKET_ASYNC_EVENT } };
+const OpcodeKeyVal_t OpcodeTranslateTable[] = { {
+        SL_OPCODE_WLAN_SMART_CONFIG_START_ASYNC_RESPONSE,
+        SL_WLAN_SMART_CONFIG_COMPLETE_EVENT }, {
+SL_OPCODE_WLAN_SMART_CONFIG_STOP_ASYNC_RESPONSE,
+SL_WLAN_SMART_CONFIG_STOP_EVENT }, {
+SL_OPCODE_WLAN_STA_CONNECTED, SL_WLAN_STA_CONNECTED_EVENT }, {
+        SL_OPCODE_WLAN_STA_DISCONNECTED,
+        SL_WLAN_STA_DISCONNECTED_EVENT }, {
+SL_OPCODE_WLAN_P2P_DEV_FOUND,
+SL_WLAN_P2P_DEV_FOUND_EVENT }, {
+SL_OPCODE_WLAN_P2P_NEG_REQ_RECEIVED,
+SL_WLAN_P2P_NEG_REQ_RECEIVED_EVENT }, {
+SL_OPCODE_WLAN_CONNECTION_FAILED,
+SL_WLAN_CONNECTION_FAILED_EVENT }, {
+SL_OPCODE_WLAN_WLANASYNCCONNECTEDRESPONSE,
+SL_WLAN_CONNECT_EVENT }, {
+SL_OPCODE_WLAN_WLANASYNCDISCONNECTEDRESPONSE,
+SL_WLAN_DISCONNECT_EVENT }, {
+SL_OPCODE_NETAPP_IPACQUIRED,
+SL_NETAPP_IPV4_IPACQUIRED_EVENT }, {
+SL_OPCODE_NETAPP_IPACQUIRED_V6,
+SL_NETAPP_IPV6_IPACQUIRED_EVENT }, {
+SL_OPCODE_NETAPP_IP_LEASED, SL_NETAPP_IP_LEASED_EVENT }, {
+        SL_OPCODE_NETAPP_IP_RELEASED, SL_NETAPP_IP_RELEASED_EVENT }, {
+SL_OPCODE_SOCKET_TXFAILEDASYNCRESPONSE,
+SL_SOCKET_TX_FAILED_EVENT }, { SL_OPCODE_SOCKET_SOCKETASYNCEVENT,
+        SL_SOCKET_ASYNC_EVENT } };
 
 _SlDriverCb_t* g_pCB = NULL;
 P_SL_DEV_PING_CALLBACK pPingCallBackFunc = NULL;
@@ -501,7 +502,7 @@ void _SlDrvDriverCBInit(void) {
 
     /* Init Drv object */
     _SlDrvMemZero(&g_pCB->ObjPool[0],
-            MAX_CONCURRENT_ACTIONS * sizeof(_SlPoolObj_t));
+    MAX_CONCURRENT_ACTIONS * sizeof(_SlPoolObj_t));
 
     /* place all Obj in the free list*/
     g_pCB->FreePoolIdx = 0;
@@ -1363,7 +1364,7 @@ _SlReturnVal_t _SlDrvRxHdrRead(_u8 *pBuf, _u8 *pAlignSize) {
 #endif
 
     /*  2. Read 4 bytes (protocol aligned) */
-    NWP_IF_READ_CHECK(g_pCB->FD, &pBuf[0], 4); _SL_DBG_SYNC_LOG(SyncCnt,pBuf);
+    NWP_IF_READ_CHECK(g_pCB->FD, &pBuf[0], 4);_SL_DBG_SYNC_LOG(SyncCnt,pBuf);
 
     /* Wait for SYNC_PATTERN_LEN from the device */
     while (!N2H_SYNC_PATTERN_MATCH(pBuf, g_pCB->TxSeqNum)) {
@@ -1372,7 +1373,7 @@ _SlReturnVal_t _SlDrvRxHdrRead(_u8 *pBuf, _u8 *pAlignSize) {
 
         /*  4. Read next 4 bytes to Low 4 bytes of buffer */
         if (0 == (SyncCnt % (_u32) SYNC_PATTERN_LEN )) {
-            NWP_IF_READ_CHECK(g_pCB->FD, &pBuf[4], 4); _SL_DBG_SYNC_LOG(SyncCnt,pBuf);
+            NWP_IF_READ_CHECK(g_pCB->FD, &pBuf[4], 4);_SL_DBG_SYNC_LOG(SyncCnt,pBuf);
         }
 
         /*  5. Shift Buffer Up for checking if the sync is shifted */

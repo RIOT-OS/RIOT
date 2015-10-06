@@ -264,7 +264,7 @@ i32 cc_dma_desc_config(cc_hndl hndl, const struct cc_dma_cmd_desc *cmd_desc);
  Return 0 on success otherwise -1
  */
 i32 cc_dma_submit_endp(cc_hndl hndl, void *src_endp, void *dst_endp, i32 n_item,
-        bool pp_last);
+bool pp_last);
 
 struct cc_dma_buf {
 

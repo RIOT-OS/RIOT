@@ -513,7 +513,7 @@ void _sl_HandleAsync_Connect(void *pVoidBuf) {
 
     _SlDrvProtectionObjLockWaitForever();
 
-    VERIFY_PROTOCOL((pMsgArgs->sd & BSD_SOCKET_ID_MASK) <= SL_MAX_SOCKETS); VERIFY_SOCKET_CB(NULL != g_pCB->ObjPool[g_pCB->FunctionParams.AsyncExt.ActionIndex].pRespArgs);
+    VERIFY_PROTOCOL((pMsgArgs->sd & BSD_SOCKET_ID_MASK) <= SL_MAX_SOCKETS);VERIFY_SOCKET_CB(NULL != g_pCB->ObjPool[g_pCB->FunctionParams.AsyncExt.ActionIndex].pRespArgs);
 
     ((_SocketResponse_t *) (g_pCB->ObjPool[g_pCB->FunctionParams.AsyncExt.ActionIndex].pRespArgs))->sd =
             pMsgArgs->sd;
@@ -763,7 +763,7 @@ void _sl_HandleAsync_Accept(void *pVoidBuf) {
 
     _SlDrvProtectionObjLockWaitForever();
 
-    VERIFY_PROTOCOL(( pMsgArgs->IpV4.sd & BSD_SOCKET_ID_MASK) <= SL_MAX_SOCKETS); VERIFY_SOCKET_CB(NULL != g_pCB->ObjPool[g_pCB->FunctionParams.AsyncExt.ActionIndex].pRespArgs);
+    VERIFY_PROTOCOL(( pMsgArgs->IpV4.sd & BSD_SOCKET_ID_MASK) <= SL_MAX_SOCKETS);VERIFY_SOCKET_CB(NULL != g_pCB->ObjPool[g_pCB->FunctionParams.AsyncExt.ActionIndex].pRespArgs);
 
     sl_Memcpy(
             g_pCB->ObjPool[g_pCB->FunctionParams.AsyncExt.ActionIndex].pRespArgs,
@@ -982,7 +982,7 @@ _i16 sl_Select(_i16 nfds, SlFdSet_t *readsds, SlFdSet_t *writesds,
 
     /* Use Obj to issue the command, if not available try later */
     ObjIdx = _SlDrvProtectAsyncRespSetting((_u8*) &AsyncRsp, SELECT_ID,
-            SL_MAX_SOCKETS);
+    SL_MAX_SOCKETS);
 
     if (MAX_CONCURRENT_ACTIONS == ObjIdx) {
         return SL_POOL_IS_EMPTY;

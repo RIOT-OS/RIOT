@@ -702,7 +702,7 @@ signed long _smtpStateMachine(void) {
 
             // End Message
             lRetVal = _sendSMTPCommand(g_lSmtpSocket, (char *) cSmtpDataEnd,
-                    NULL, g_cBuf);
+            NULL, g_cBuf);
             if (lRetVal < 0) {
                 g_uiSmtpStatus = smtpERROR;
                 g_uiEmailErrorInfo = SL_EMAIL_ERROR_MESSAGE;

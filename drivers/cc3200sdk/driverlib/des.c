@@ -456,7 +456,7 @@ bool DESDataProcess(uint32_t ui32Base, uint8_t *pui8Src, uint8_t *pui8Dest,
     //
     // Check the arguments.
     //
-    ASSERT(ui32Base == DES_BASE); ASSERT((ui32Length % 8) == 0);
+    ASSERT(ui32Base == DES_BASE);ASSERT((ui32Length % 8) == 0);
 
     //
     // Write the length register first. This triggers the engine to start
@@ -594,7 +594,7 @@ void DESIntEnable(uint32_t ui32Base, uint32_t ui32IntFlags) {
     //
     // Check the arguments.
     //
-    ASSERT(ui32Base == DES_BASE); ASSERT((ui32IntFlags & DES_INT_CONTEXT_IN) ||
+    ASSERT(ui32Base == DES_BASE);ASSERT((ui32IntFlags & DES_INT_CONTEXT_IN) ||
             (ui32IntFlags & DES_INT_DATA_IN) ||
             (ui32IntFlags & DES_INT_DATA_OUT) ||
             (ui32IntFlags & DES_INT_DMA_CONTEXT_IN) ||
@@ -633,7 +633,7 @@ void DESIntDisable(uint32_t ui32Base, uint32_t ui32IntFlags) {
     //
     // Check the arguments.
     //
-    ASSERT(ui32Base == DES_BASE); ASSERT((ui32IntFlags & DES_INT_CONTEXT_IN) ||
+    ASSERT(ui32Base == DES_BASE);ASSERT((ui32IntFlags & DES_INT_CONTEXT_IN) ||
             (ui32IntFlags & DES_INT_DATA_IN) ||
             (ui32IntFlags & DES_INT_DATA_OUT) ||
             (ui32IntFlags & DES_INT_DMA_CONTEXT_IN) ||
@@ -672,7 +672,7 @@ void DESIntClear(uint32_t ui32Base, uint32_t ui32IntFlags) {
     //
     // Check the arguments.
     //
-    ASSERT(ui32Base == DES_BASE); ASSERT((ui32IntFlags & DES_INT_DMA_CONTEXT_IN) ||
+    ASSERT(ui32Base == DES_BASE);ASSERT((ui32IntFlags & DES_INT_DMA_CONTEXT_IN) ||
             (ui32IntFlags & DES_INT_DMA_DATA_IN) ||
             (ui32IntFlags & DES_INT_DMA_DATA_OUT));
 
@@ -774,7 +774,7 @@ void DESDMAEnable(uint32_t ui32Base, uint32_t ui32Flags) {
     //
     // Check the arguments.
     //
-    ASSERT(ui32Base == DES_BASE); ASSERT((ui32Flags & DES_DMA_CONTEXT_IN) ||
+    ASSERT(ui32Base == DES_BASE);ASSERT((ui32Flags & DES_DMA_CONTEXT_IN) ||
             (ui32Flags & DES_DMA_DATA_OUT) ||
             (ui32Flags & DES_DMA_DATA_IN));
 
@@ -805,7 +805,7 @@ void DESDMADisable(uint32_t ui32Base, uint32_t ui32Flags) {
     //
     // Check the arguments.
     //
-    ASSERT(ui32Base == DES_BASE); ASSERT((ui32Flags & DES_DMA_CONTEXT_IN) ||
+    ASSERT(ui32Base == DES_BASE);ASSERT((ui32Flags & DES_DMA_CONTEXT_IN) ||
             (ui32Flags & DES_DMA_DATA_OUT) ||
             (ui32Flags & DES_DMA_DATA_IN));
 

@@ -364,7 +364,7 @@ _i16 sl_NetAppMDNSRegisterUnregisterService(const _i8* pServiceName,
     }
 
     _SlDrvMemZero(ServiceNameAndTextBuffer,
-            NETAPP_MDNS_MAX_SERVICE_NAME_AND_TEXT_LENGTH);
+    NETAPP_MDNS_MAX_SERVICE_NAME_AND_TEXT_LENGTH);
 
     /*Copy the service name*/
     sl_Memcpy(ServiceNameAndTextBuffer, pServiceName, ServiceNameLen);
@@ -820,7 +820,8 @@ _i16 sl_NetAppDnsGetHostByName(_i8 * hostname, const _u16 usNameLen,
         if (SL_OS_RET_CODE_OK == (_i16) Msg.Rsp.status) {
             sl_Memcpy((_i8 *) out_ip_addr, (_i8 *) &AsyncRsp.IpV4.ip0,
                     (SL_AF_INET == family) ?
-                            SL_IPV4_ADDRESS_SIZE : SL_IPV6_ADDRESS_SIZE);
+                    SL_IPV4_ADDRESS_SIZE :
+                                             SL_IPV6_ADDRESS_SIZE);
         }
     }
     _SlDrvReleasePoolObj(ObjIdx);

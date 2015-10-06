@@ -225,7 +225,7 @@ void I2CSlaveInit(uint32_t ui32Base, uint8_t ui8SlaveAddr) {
     //
     // Check the arguments.
     //
-    ASSERT(_I2CBaseValid(ui32Base)); ASSERT(!(ui8SlaveAddr & 0x80));
+    ASSERT(_I2CBaseValid(ui32Base));ASSERT(!(ui8SlaveAddr & 0x80));
 
     //
     // Must enable the device before doing anything else.
@@ -259,7 +259,7 @@ void I2CSlaveAddressSet(uint32_t ui32Base, uint8_t ui8AddrNum,
     //
     // Check the arguments.
     //
-    ASSERT(_I2CBaseValid(ui32Base)); ASSERT(!(ui8AddrNum > 1)); ASSERT(!(ui8SlaveAddr & 0x80));
+    ASSERT(_I2CBaseValid(ui32Base));ASSERT(!(ui8AddrNum > 1));ASSERT(!(ui8SlaveAddr & 0x80));
 
     //
     // Determine which slave address is being set.
@@ -1012,7 +1012,7 @@ bool bReceive) {
     //
     // Check the arguments.
     //
-    ASSERT(_I2CBaseValid(ui32Base)); ASSERT(!(ui8SlaveAddr & 0x80));
+    ASSERT(_I2CBaseValid(ui32Base));ASSERT(!(ui8SlaveAddr & 0x80));
 
     //
     // Set the address of the slave with which the master will communicate.
@@ -1147,7 +1147,7 @@ void I2CMasterControl(uint32_t ui32Base, uint32_t ui32Cmd) {
     //
     // Check the arguments.
     //
-    ASSERT(_I2CBaseValid(ui32Base)); ASSERT((ui32Cmd == I2C_MASTER_CMD_SINGLE_SEND) ||
+    ASSERT(_I2CBaseValid(ui32Base));ASSERT((ui32Cmd == I2C_MASTER_CMD_SINGLE_SEND) ||
             (ui32Cmd == I2C_MASTER_CMD_BURST_SEND_START) ||
             (ui32Cmd == I2C_MASTER_CMD_SINGLE_RECEIVE) ||
             (ui32Cmd == I2C_MASTER_CMD_BURST_SEND_CONT) ||

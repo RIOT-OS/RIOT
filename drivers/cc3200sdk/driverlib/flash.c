@@ -354,7 +354,7 @@ long FlashProgram(unsigned long *pulData, unsigned long ulAddress,
     //
     // Check the arguments.
     //
-    ASSERT(!(ulAddress & 3)); ASSERT(!(ulCount & 3));
+    ASSERT(!(ulAddress & 3));ASSERT(!(ulCount & 3));
 
     //
     // Clear the flash access and error interrupts.
@@ -398,7 +398,7 @@ long FlashProgram(unsigned long *pulData, unsigned long ulAddress,
             // Program the contents of the write buffer into flash.
             //
             HWREG(FLASH_CONTROL_BASE + FLASH_CTRL_O_FMC2) =
-                    FLASH_CTRL_FMC2_WRKEY | FLASH_CTRL_FMC2_WRBUF;
+            FLASH_CTRL_FMC2_WRKEY | FLASH_CTRL_FMC2_WRBUF;
 
             //
             // Wait until the write buffer has been programmed.
@@ -494,7 +494,7 @@ long FlashProgramNonBlocking(unsigned long *pulData, unsigned long ulAddress,
     //
     // Check the arguments.
     //
-    ASSERT(!(ulAddress & 3)); ASSERT(!(ulCount & 3));
+    ASSERT(!(ulAddress & 3));ASSERT(!(ulCount & 3));
 
     //
     // Clear the flash access and error interrupts.
@@ -546,7 +546,7 @@ long FlashProgramNonBlocking(unsigned long *pulData, unsigned long ulAddress,
             // Program the contents of the write buffer into flash.
             //
             HWREG(FLASH_CONTROL_BASE + FLASH_CTRL_O_FMC2) =
-                    FLASH_CTRL_FMC2_WRKEY | FLASH_CTRL_FMC2_WRBUF;
+            FLASH_CTRL_FMC2_WRKEY | FLASH_CTRL_FMC2_WRBUF;
         }
     }
 #else

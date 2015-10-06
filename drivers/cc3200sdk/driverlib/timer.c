@@ -92,7 +92,7 @@ void TimerEnable(unsigned long ulBase, unsigned long ulTimer) {
     //
     // Check the arguments.
     //
-    ASSERT(TimerBaseValid(ulBase)); ASSERT((ulTimer == TIMER_A) || (ulTimer == TIMER_B) ||
+    ASSERT(TimerBaseValid(ulBase));ASSERT((ulTimer == TIMER_A) || (ulTimer == TIMER_B) ||
             (ulTimer == TIMER_BOTH));
 
     //
@@ -119,7 +119,7 @@ void TimerDisable(unsigned long ulBase, unsigned long ulTimer) {
     //
     // Check the arguments.
     //
-    ASSERT(TimerBaseValid(ulBase)); ASSERT((ulTimer == TIMER_A) || (ulTimer == TIMER_B) ||
+    ASSERT(TimerBaseValid(ulBase));ASSERT((ulTimer == TIMER_A) || (ulTimer == TIMER_B) ||
             (ulTimer == TIMER_BOTH));
 
     //
@@ -180,7 +180,7 @@ void TimerConfigure(unsigned long ulBase, unsigned long ulConfig) {
             (ulConfig == TIMER_CFG_ONE_SHOT_UP) ||
             (ulConfig == TIMER_CFG_PERIODIC) ||
             (ulConfig == TIMER_CFG_PERIODIC_UP) ||
-            ((ulConfig & 0xff000000) == TIMER_CFG_SPLIT_PAIR)); ASSERT(((ulConfig & 0xff000000) != TIMER_CFG_SPLIT_PAIR) ||
+            ((ulConfig & 0xff000000) == TIMER_CFG_SPLIT_PAIR));ASSERT(((ulConfig & 0xff000000) != TIMER_CFG_SPLIT_PAIR) ||
             ((((ulConfig & 0x000000ff) == TIMER_CFG_A_ONE_SHOT) ||
                             ((ulConfig & 0x000000ff) == TIMER_CFG_A_ONE_SHOT_UP) ||
                             ((ulConfig & 0x000000ff) == TIMER_CFG_A_PERIODIC) ||
@@ -240,7 +240,7 @@ void TimerControlLevel(unsigned long ulBase, unsigned long ulTimer,
     //
     // Check the arguments.
     //
-    ASSERT(TimerBaseValid(ulBase)); ASSERT((ulTimer == TIMER_A) || (ulTimer == TIMER_B) ||
+    ASSERT(TimerBaseValid(ulBase));ASSERT((ulTimer == TIMER_A) || (ulTimer == TIMER_B) ||
             (ulTimer == TIMER_BOTH));
 
     //
@@ -275,7 +275,7 @@ void TimerControlEvent(unsigned long ulBase, unsigned long ulTimer,
     //
     // Check the arguments.
     //
-    ASSERT(TimerBaseValid(ulBase)); ASSERT((ulTimer == TIMER_A) || (ulTimer == TIMER_B) ||
+    ASSERT(TimerBaseValid(ulBase));ASSERT((ulTimer == TIMER_A) || (ulTimer == TIMER_B) ||
             (ulTimer == TIMER_BOTH));
 
     //
@@ -309,7 +309,7 @@ void TimerControlStall(unsigned long ulBase, unsigned long ulTimer,
     //
     // Check the arguments.
     //
-    ASSERT(TimerBaseValid(ulBase)); ASSERT((ulTimer == TIMER_A) || (ulTimer == TIMER_B) ||
+    ASSERT(TimerBaseValid(ulBase));ASSERT((ulTimer == TIMER_A) || (ulTimer == TIMER_B) ||
             (ulTimer == TIMER_BOTH));
 
     //
@@ -344,8 +344,8 @@ void TimerPrescaleSet(unsigned long ulBase, unsigned long ulTimer,
     //
     // Check the arguments.
     //
-    ASSERT(TimerBaseValid(ulBase)); ASSERT((ulTimer == TIMER_A) || (ulTimer == TIMER_B) ||
-            (ulTimer == TIMER_BOTH)); ASSERT(ulValue < 256);
+    ASSERT(TimerBaseValid(ulBase));ASSERT((ulTimer == TIMER_A) || (ulTimer == TIMER_B) ||
+            (ulTimer == TIMER_BOTH));ASSERT(ulValue < 256);
 
     //
     // Set the timer A prescaler if requested.
@@ -382,7 +382,7 @@ unsigned long TimerPrescaleGet(unsigned long ulBase, unsigned long ulTimer) {
     //
     // Check the arguments.
     //
-    ASSERT(TimerBaseValid(ulBase)); ASSERT((ulTimer == TIMER_A) || (ulTimer == TIMER_B) ||
+    ASSERT(TimerBaseValid(ulBase));ASSERT((ulTimer == TIMER_A) || (ulTimer == TIMER_B) ||
             (ulTimer == TIMER_BOTH));
 
     //
@@ -418,8 +418,8 @@ void TimerPrescaleMatchSet(unsigned long ulBase, unsigned long ulTimer,
     //
     // Check the arguments.
     //
-    ASSERT(TimerBaseValid(ulBase)); ASSERT((ulTimer == TIMER_A) || (ulTimer == TIMER_B) ||
-            (ulTimer == TIMER_BOTH)); ASSERT(ulValue < 256);
+    ASSERT(TimerBaseValid(ulBase));ASSERT((ulTimer == TIMER_A) || (ulTimer == TIMER_B) ||
+            (ulTimer == TIMER_BOTH));ASSERT(ulValue < 256);
 
     //
     // Set the timer A prescale match if requested.
@@ -459,7 +459,7 @@ unsigned long TimerPrescaleMatchGet(unsigned long ulBase, unsigned long ulTimer)
     //
     // Check the arguments.
     //
-    ASSERT(TimerBaseValid(ulBase)); ASSERT((ulTimer == TIMER_A) || (ulTimer == TIMER_B) ||
+    ASSERT(TimerBaseValid(ulBase));ASSERT((ulTimer == TIMER_A) || (ulTimer == TIMER_B) ||
             (ulTimer == TIMER_BOTH));
 
     //
@@ -493,7 +493,7 @@ void TimerLoadSet(unsigned long ulBase, unsigned long ulTimer,
     //
     // Check the arguments.
     //
-    ASSERT(TimerBaseValid(ulBase)); ASSERT((ulTimer == TIMER_A) || (ulTimer == TIMER_B) ||
+    ASSERT(TimerBaseValid(ulBase));ASSERT((ulTimer == TIMER_A) || (ulTimer == TIMER_B) ||
             (ulTimer == TIMER_BOTH));
 
     //
@@ -533,7 +533,7 @@ unsigned long TimerLoadGet(unsigned long ulBase, unsigned long ulTimer) {
     //
     // Check the arguments.
     //
-    ASSERT(TimerBaseValid(ulBase)); ASSERT((ulTimer == TIMER_A) || (ulTimer == TIMER_B));
+    ASSERT(TimerBaseValid(ulBase));ASSERT((ulTimer == TIMER_A) || (ulTimer == TIMER_B));
 
     //
     // Return the appropriate load value.
@@ -560,7 +560,7 @@ unsigned long TimerValueGet(unsigned long ulBase, unsigned long ulTimer) {
     //
     // Check the arguments.
     //
-    ASSERT(TimerBaseValid(ulBase)); ASSERT((ulTimer == TIMER_A) || (ulTimer == TIMER_B));
+    ASSERT(TimerBaseValid(ulBase));ASSERT((ulTimer == TIMER_A) || (ulTimer == TIMER_B));
 
     //
     // Return the appropriate timer value.
@@ -589,7 +589,7 @@ void TimerValueSet(unsigned long ulBase, unsigned long ulTimer,
     //
     // Check the arguments.
     //
-    ASSERT(TimerBaseValid(ulBase)); ASSERT((ulTimer == TIMER_A) || (ulTimer == TIMER_B));
+    ASSERT(TimerBaseValid(ulBase));ASSERT((ulTimer == TIMER_A) || (ulTimer == TIMER_B));
 
     //
     // Set the appropriate timer value.
@@ -623,7 +623,7 @@ void TimerMatchSet(unsigned long ulBase, unsigned long ulTimer,
     //
     // Check the arguments.
     //
-    ASSERT(TimerBaseValid(ulBase)); ASSERT((ulTimer == TIMER_A) || (ulTimer == TIMER_B) ||
+    ASSERT(TimerBaseValid(ulBase));ASSERT((ulTimer == TIMER_A) || (ulTimer == TIMER_B) ||
             (ulTimer == TIMER_BOTH));
 
     //
@@ -659,7 +659,7 @@ unsigned long TimerMatchGet(unsigned long ulBase, unsigned long ulTimer) {
     //
     // Check the arguments.
     //
-    ASSERT(TimerBaseValid(ulBase)); ASSERT((ulTimer == TIMER_A) || (ulTimer == TIMER_B));
+    ASSERT(TimerBaseValid(ulBase));ASSERT((ulTimer == TIMER_A) || (ulTimer == TIMER_B));
 
     //
     // Return the appropriate match value.
@@ -695,7 +695,7 @@ void TimerIntRegister(unsigned long ulBase, unsigned long ulTimer,
     //
     // Check the arguments.
     //
-    ASSERT(TimerBaseValid(ulBase)); ASSERT((ulTimer == TIMER_A) || (ulTimer == TIMER_B) ||
+    ASSERT(TimerBaseValid(ulBase));ASSERT((ulTimer == TIMER_A) || (ulTimer == TIMER_B) ||
             (ulTimer == TIMER_BOTH));
 
     ulBase = (
@@ -704,7 +704,8 @@ void TimerIntRegister(unsigned long ulBase, unsigned long ulTimer,
                     ((ulBase == TIMERA1_BASE) ?
                             INT_TIMERA1A :
                             ((ulBase == TIMERA2_BASE) ?
-                                    INT_TIMERA2A : INT_TIMERA3A)));
+                            INT_TIMERA2A :
+                                                        INT_TIMERA3A)));
 
     //
     // Register an interrupt handler for timer A if requested.
@@ -759,7 +760,7 @@ void TimerIntUnregister(unsigned long ulBase, unsigned long ulTimer) {
     //
     // Check the arguments.
     //
-    ASSERT(TimerBaseValid(ulBase)); ASSERT((ulTimer == TIMER_A) || (ulTimer == TIMER_B) ||
+    ASSERT(TimerBaseValid(ulBase));ASSERT((ulTimer == TIMER_A) || (ulTimer == TIMER_B) ||
             (ulTimer == TIMER_BOTH));
 
     //
@@ -772,7 +773,8 @@ void TimerIntUnregister(unsigned long ulBase, unsigned long ulTimer) {
                     ((ulBase == TIMERA1_BASE) ?
                             INT_TIMERA1A :
                             ((ulBase == TIMERA2_BASE) ?
-                                    INT_TIMERA2A : INT_TIMERA3A)));
+                            INT_TIMERA2A :
+                                                        INT_TIMERA3A)));
 
     //
     // Unregister the interrupt handler for timer A if requested.

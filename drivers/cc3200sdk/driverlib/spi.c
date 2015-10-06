@@ -67,14 +67,10 @@ static const unsigned long g_ppulSPIIntMap[][3] = { { SSPI_BASE, INT_SSPI }, // 
 // A mapping of SPI base address to DMA done interrupt mask bit(s).
 //
 //*****************************************************************************
-static const unsigned long g_ulSPIDmaMaskMap[][2] =
-        {
-                { SSPI_BASE,
-                        APPS_CONFIG_DMA_DONE_INT_MASK_SHSPI_WR_DMA_DONE_INT_MASK },
-                { LSPI_BASE,
-                        APPS_CONFIG_DMA_DONE_INT_MASK_HOSTSPI_WR_DMA_DONE_INT_MASK },
-                { GSPI_BASE,
-                        APPS_CONFIG_DMA_DONE_INT_MASK_APPS_SPI_WR_DMA_DONE_INT_MASK }, };
+static const unsigned long g_ulSPIDmaMaskMap[][2] = { { SSPI_BASE,
+APPS_CONFIG_DMA_DONE_INT_MASK_SHSPI_WR_DMA_DONE_INT_MASK }, { LSPI_BASE,
+APPS_CONFIG_DMA_DONE_INT_MASK_HOSTSPI_WR_DMA_DONE_INT_MASK }, { GSPI_BASE,
+APPS_CONFIG_DMA_DONE_INT_MASK_APPS_SPI_WR_DMA_DONE_INT_MASK }, };
 
 //*****************************************************************************
 //

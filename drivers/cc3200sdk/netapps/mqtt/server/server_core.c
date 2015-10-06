@@ -592,7 +592,7 @@ static struct topic_node *pub_hier_search(const c8 *topSUB,
 }
 
 static bool is_node_PUB_subtop(const struct topic_node *node, const c8 *subtop,
-        bool endtop) {
+bool endtop) {
     /* Assumes that subtop hasn't got any wildcard characater */
     return ((0 == strcmp(subtop, node->subtop))
             || (!endtop && (0 == strcmp("+/", node->subtop)))
@@ -996,7 +996,8 @@ static u16 proc_forward_slash(c8 *buf, u16 len) {
 static inline bool is_valid_char_order(c8 prev, c8 curr) {
     return ((('/' != prev) && ('+' == curr)) || (('+' == prev) && ('/' != curr))
             || (('/' != prev) && ('#' == curr)) || (('#' == prev))) ?
-            false : true;
+    false :
+                                                                      true;
 }
 
 static bool is_valid_SUB_top(const c8 *buf, u16 len) {
@@ -1137,7 +1138,7 @@ static void leaf_msg_send(const struct topic_node *leaf,
 }
 
 static void node_data_set(struct topic_node *node, u8 *data, u32 dlen, u8 qid,
-        bool retain) {
+bool retain) {
     node->my_data = data;
     node->my_dlen = dlen;
 
