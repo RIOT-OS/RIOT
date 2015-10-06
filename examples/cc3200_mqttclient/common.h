@@ -168,4 +168,3 @@ typedef enum {
 }
 #endif
 #endif //__COMMON__H__
-
