@@ -1,35 +1,35 @@
 /*
  * socket.h - CC31xx/CC32xx Host Driver Implementation
  *
- * Copyright (C) 2014 Texas Instruments Incorporated - http://www.ti.com/ 
- * 
- * 
- *  Redistribution and use in source and binary forms, with or without 
- *  modification, are permitted provided that the following conditions 
+ * Copyright (C) 2014 Texas Instruments Incorporated - http://www.ti.com/
+ *
+ *
+ *  Redistribution and use in source and binary forms, with or without
+ *  modification, are permitted provided that the following conditions
  *  are met:
  *
- *    Redistributions of source code must retain the above copyright 
+ *    Redistributions of source code must retain the above copyright
  *    notice, this list of conditions and the following disclaimer.
  *
  *    Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the 
- *    documentation and/or other materials provided with the   
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the
  *    distribution.
  *
  *    Neither the name of Texas Instruments Incorporated nor the names of
  *    its contributors may be used to endorse or promote products derived
  *    from this software without specific prior written permission.
  *
- *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
- *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- *  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT 
- *  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
- *  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT 
+ *  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ *  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ *  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
  *  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
  *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
- *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+ *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
@@ -72,7 +72,7 @@ extern "C" {
 #define     SL_AF_INET                         (2)                       /* IPv4 socket (UDP, TCP, etc)                                          */
 #define     SL_AF_INET6                        (3)                       /* IPv6 socket (UDP, TCP, etc)                                          */
 #define     SL_AF_INET6_EUI_48                 (9)
-#define     SL_AF_RF                           (6)                       /* data include RF parameter, All layer by user (Wifi could be disconnected) */ 
+#define     SL_AF_RF                           (6)                       /* data include RF parameter, All layer by user (Wifi could be disconnected) */
 #define     SL_AF_PACKET                       (17)
     /* Protocol families, same as address families.  */
 #define     SL_PF_INET                         AF_INET
@@ -107,12 +107,12 @@ extern "C" {
 #define SL_EADDRNOTAVAIL                      (-99)  /* Cannot assign requested address */
 #define SL_ENETUNREACH                        (-101) /* Network is unreachable */
 #define SL_ENOBUFS                            (-105) /* No buffer space available */
-#define SL_EOBUFF                             SL_ENOBUFS 
+#define SL_EOBUFF                             SL_ENOBUFS
 #define SL_EISCONN                            (-106) /* Transport endpoint is already connected */
 #define SL_ENOTCONN                           (-107) /* Transport endpoint is not connected */
 #define SL_ETIMEDOUT                          (-110) /* Connection timed out */
 #define SL_ECONNREFUSED                       (-111) /* Connection refused */
-#define SL_EALREADY                           (-114) /* Non blocking connect in progress, try again */ 
+#define SL_EALREADY                           (-114) /* Non blocking connect in progress, try again */
 
 #define SL_ESEC_RSA_WRONG_TYPE_E              (-130)  /* RSA wrong block type for RSA function */
 #define SL_ESEC_RSA_BUFFER_E                  (-131)  /* RSA buffer error, output too small or */
@@ -209,35 +209,35 @@ extern "C" {
 #define SL_ESEC_MATCH_SUITE_ERROR      (-291 )            /* can't match cipher suite */
 
     /* ssl tls security start with -300 offset */
-#define SL_ESEC_CLOSE_NOTIFY                  (-300) /* ssl/tls alerts */   
-#define SL_ESEC_UNEXPECTED_MESSAGE            (-310) /* ssl/tls alerts */   
-#define SL_ESEC_BAD_RECORD_MAC                (-320) /* ssl/tls alerts */                 
-#define SL_ESEC_DECRYPTION_FAILED             (-321) /* ssl/tls alerts */   
-#define SL_ESEC_RECORD_OVERFLOW               (-322) /* ssl/tls alerts */    
-#define SL_ESEC_DECOMPRESSION_FAILURE         (-330) /* ssl/tls alerts */                 
-#define SL_ESEC_HANDSHAKE_FAILURE             (-340) /* ssl/tls alerts */    
-#define SL_ESEC_NO_CERTIFICATE                (-341) /* ssl/tls alerts */    
-#define SL_ESEC_BAD_CERTIFICATE               (-342) /* ssl/tls alerts */          
-#define SL_ESEC_UNSUPPORTED_CERTIFICATE       (-343) /* ssl/tls alerts */     
-#define SL_ESEC_CERTIFICATE_REVOKED           (-344) /* ssl/tls alerts */                 
-#define SL_ESEC_CERTIFICATE_EXPIRED           (-345) /* ssl/tls alerts */                 
-#define SL_ESEC_CERTIFICATE_UNKNOWN           (-346) /* ssl/tls alerts */                 
-#define SL_ESEC_ILLEGAL_PARAMETER             (-347) /* ssl/tls alerts */                 
-#define SL_ESEC_UNKNOWN_CA                    (-348) /* ssl/tls alerts */                
-#define SL_ESEC_ACCESS_DENIED                 (-349) /* ssl/tls alerts */                
-#define SL_ESEC_DECODE_ERROR                  (-350) /* ssl/tls alerts */   
-#define SL_ESEC_DECRYPT_ERROR                 (-351) /* ssl/tls alerts */   
-#define SL_ESEC_EXPORT_RESTRICTION            (-360) /* ssl/tls alerts */    
-#define SL_ESEC_PROTOCOL_VERSION              (-370) /* ssl/tls alerts */    
-#define SL_ESEC_INSUFFICIENT_SECURITY         (-371) /* ssl/tls alerts */   
-#define SL_ESEC_INTERNAL_ERROR                (-380) /* ssl/tls alerts */   
-#define SL_ESEC_USER_CANCELLED                (-390) /* ssl/tls alerts */   
-#define SL_ESEC_NO_RENEGOTIATION              (-400) /* ssl/tls alerts */   
-#define SL_ESEC_UNSUPPORTED_EXTENSION         (-410) /* ssl/tls alerts */   
-#define SL_ESEC_CERTIFICATE_UNOBTAINABLE      (-411) /* ssl/tls alerts */         
-#define SL_ESEC_UNRECOGNIZED_NAME             (-412) /* ssl/tls alerts */   
-#define SL_ESEC_BAD_CERTIFICATE_STATUS_RESPONSE  (-413) /* ssl/tls alerts */   
-#define SL_ESEC_BAD_CERTIFICATE_HASH_VALUE    (-414) /* ssl/tls alerts */   
+#define SL_ESEC_CLOSE_NOTIFY                  (-300) /* ssl/tls alerts */
+#define SL_ESEC_UNEXPECTED_MESSAGE            (-310) /* ssl/tls alerts */
+#define SL_ESEC_BAD_RECORD_MAC                (-320) /* ssl/tls alerts */
+#define SL_ESEC_DECRYPTION_FAILED             (-321) /* ssl/tls alerts */
+#define SL_ESEC_RECORD_OVERFLOW               (-322) /* ssl/tls alerts */
+#define SL_ESEC_DECOMPRESSION_FAILURE         (-330) /* ssl/tls alerts */
+#define SL_ESEC_HANDSHAKE_FAILURE             (-340) /* ssl/tls alerts */
+#define SL_ESEC_NO_CERTIFICATE                (-341) /* ssl/tls alerts */
+#define SL_ESEC_BAD_CERTIFICATE               (-342) /* ssl/tls alerts */
+#define SL_ESEC_UNSUPPORTED_CERTIFICATE       (-343) /* ssl/tls alerts */
+#define SL_ESEC_CERTIFICATE_REVOKED           (-344) /* ssl/tls alerts */
+#define SL_ESEC_CERTIFICATE_EXPIRED           (-345) /* ssl/tls alerts */
+#define SL_ESEC_CERTIFICATE_UNKNOWN           (-346) /* ssl/tls alerts */
+#define SL_ESEC_ILLEGAL_PARAMETER             (-347) /* ssl/tls alerts */
+#define SL_ESEC_UNKNOWN_CA                    (-348) /* ssl/tls alerts */
+#define SL_ESEC_ACCESS_DENIED                 (-349) /* ssl/tls alerts */
+#define SL_ESEC_DECODE_ERROR                  (-350) /* ssl/tls alerts */
+#define SL_ESEC_DECRYPT_ERROR                 (-351) /* ssl/tls alerts */
+#define SL_ESEC_EXPORT_RESTRICTION            (-360) /* ssl/tls alerts */
+#define SL_ESEC_PROTOCOL_VERSION              (-370) /* ssl/tls alerts */
+#define SL_ESEC_INSUFFICIENT_SECURITY         (-371) /* ssl/tls alerts */
+#define SL_ESEC_INTERNAL_ERROR                (-380) /* ssl/tls alerts */
+#define SL_ESEC_USER_CANCELLED                (-390) /* ssl/tls alerts */
+#define SL_ESEC_NO_RENEGOTIATION              (-400) /* ssl/tls alerts */
+#define SL_ESEC_UNSUPPORTED_EXTENSION         (-410) /* ssl/tls alerts */
+#define SL_ESEC_CERTIFICATE_UNOBTAINABLE      (-411) /* ssl/tls alerts */
+#define SL_ESEC_UNRECOGNIZED_NAME             (-412) /* ssl/tls alerts */
+#define SL_ESEC_BAD_CERTIFICATE_STATUS_RESPONSE  (-413) /* ssl/tls alerts */
+#define SL_ESEC_BAD_CERTIFICATE_HASH_VALUE    (-414) /* ssl/tls alerts */
     /* propierty secure */
 #define SL_ESECGENERAL                        (-450)  /* error secure level general error */
 #define SL_ESECDECRYPT                        (-451)  /* error secure level, decrypt recv packet fail */
@@ -267,8 +267,8 @@ extern "C" {
 #define SL_SOCKET_PAYLOAD_TYPE_TCP_IPV6_SECURE (0x70)  /*            */
 #define SL_SOCKET_PAYLOAD_TYPE_RAW_TRANCEIVER  (0x80)  /* 1536 bytes */
 #define SL_SOCKET_PAYLOAD_TYPE_RAW_PACKET      (0x90)  /* 1536 bytes */
-#define SL_SOCKET_PAYLOAD_TYPE_RAW_IP4         (0xa0)  
-#define SL_SOCKET_PAYLOAD_TYPE_RAW_IP6         (SL_SOCKET_PAYLOAD_TYPE_RAW_IP4 )  
+#define SL_SOCKET_PAYLOAD_TYPE_RAW_IP4         (0xa0)
+#define SL_SOCKET_PAYLOAD_TYPE_RAW_IP6         (SL_SOCKET_PAYLOAD_TYPE_RAW_IP4 )
 
 #define SL_SOL_SOCKET          (1)   /* Define the socket option category. */
 #define SL_IPPROTO_IP          (2)   /* Define the IP option category.     */
@@ -296,7 +296,7 @@ extern "C" {
 #define SL_IP_RAW_IPV6_HDRINCL (69) /* Transmitted buffer over IPv6 socket contains IPv6 header. */
 
 #define SL_SO_PHY_RATE              (100)   /* WLAN Transmit rate */
-#define SL_SO_PHY_TX_POWER          (101)   /* TX Power level */  
+#define SL_SO_PHY_TX_POWER          (101)   /* TX Power level */
 #define SL_SO_PHY_NUM_FRAMES_TO_TX  (102)   /* Number of frames to transmit */
 #define SL_SO_PHY_PREAMBLE          (103)   /* Preamble for transmission */
 
@@ -336,61 +336,61 @@ extern "C" {
 
 //#define FD_SETSIZE                          SL_FD_SETSIZE
 
-#define SOCK_STREAM                         SL_SOCK_STREAM        
-#define SOCK_DGRAM                          SL_SOCK_DGRAM         
-#define SOCK_RAW                            SL_SOCK_RAW           
-#define IPPROTO_TCP                         SL_IPPROTO_TCP        
-#define IPPROTO_UDP                         SL_IPPROTO_UDP        
-#define IPPROTO_RAW                         SL_IPPROTO_RAW        
+#define SOCK_STREAM                         SL_SOCK_STREAM
+#define SOCK_DGRAM                          SL_SOCK_DGRAM
+#define SOCK_RAW                            SL_SOCK_RAW
+#define IPPROTO_TCP                         SL_IPPROTO_TCP
+#define IPPROTO_UDP                         SL_IPPROTO_UDP
+#define IPPROTO_RAW                         SL_IPPROTO_RAW
 
-#define AF_INET                             SL_AF_INET            
-#define AF_INET6                            SL_AF_INET6           
+#define AF_INET                             SL_AF_INET
+#define AF_INET6                            SL_AF_INET6
 #define AF_INET6_EUI_48                     SL_AF_INET6_EUI_48
-#define AF_RF                               SL_AF_RF              
-#define AF_PACKET                           SL_AF_PACKET              
+#define AF_RF                               SL_AF_RF
+#define AF_PACKET                           SL_AF_PACKET
 
-#define PF_INET                             SL_PF_INET            
-#define PF_INET6                            SL_PF_INET6           
+#define PF_INET                             SL_PF_INET
+#define PF_INET6                            SL_PF_INET6
 
-#define INADDR_ANY                          SL_INADDR_ANY                                                   
-#define ERROR                               SL_SOC_ERROR                                                                                                                
-#define INEXE                               SL_INEXE                 
-#define EBADF                               SL_EBADF                 
-#define ENSOCK                              SL_ENSOCK                
-#define EAGAIN                              SL_EAGAIN                
-#define EWOULDBLOCK                         SL_EWOULDBLOCK           
-#define ENOMEM                              SL_ENOMEM                
-#define EACCES                              SL_EACCES                
-#define EFAULT                              SL_EFAULT                
-#define EINVAL                              SL_EINVAL                
-#define EDESTADDRREQ                        SL_EDESTADDRREQ          
-#define EPROTOTYPE                          SL_EPROTOTYPE            
-#define ENOPROTOOPT                         SL_ENOPROTOOPT           
-#define EPROTONOSUPPORT                     SL_EPROTONOSUPPORT       
-#define ESOCKTNOSUPPORT                     SL_ESOCKTNOSUPPORT       
-#define EOPNOTSUPP                          SL_EOPNOTSUPP            
-#define EAFNOSUPPORT                        SL_EAFNOSUPPORT          
-#define EADDRINUSE                          SL_EADDRINUSE            
-#define EADDRNOTAVAIL                       SL_EADDRNOTAVAIL         
-#define ENETUNREACH                         SL_ENETUNREACH           
-#define ENOBUFS                             SL_ENOBUFS               
-#define EOBUFF                              SL_EOBUFF                
-#define EISCONN                             SL_EISCONN               
-#define ENOTCONN                            SL_ENOTCONN              
-#define ETIMEDOUT                           SL_ETIMEDOUT             
-#define ECONNREFUSED                        SL_ECONNREFUSED          
+#define INADDR_ANY                          SL_INADDR_ANY
+#define ERROR                               SL_SOC_ERROR
+#define INEXE                               SL_INEXE
+#define EBADF                               SL_EBADF
+#define ENSOCK                              SL_ENSOCK
+#define EAGAIN                              SL_EAGAIN
+#define EWOULDBLOCK                         SL_EWOULDBLOCK
+#define ENOMEM                              SL_ENOMEM
+#define EACCES                              SL_EACCES
+#define EFAULT                              SL_EFAULT
+#define EINVAL                              SL_EINVAL
+#define EDESTADDRREQ                        SL_EDESTADDRREQ
+#define EPROTOTYPE                          SL_EPROTOTYPE
+#define ENOPROTOOPT                         SL_ENOPROTOOPT
+#define EPROTONOSUPPORT                     SL_EPROTONOSUPPORT
+#define ESOCKTNOSUPPORT                     SL_ESOCKTNOSUPPORT
+#define EOPNOTSUPP                          SL_EOPNOTSUPP
+#define EAFNOSUPPORT                        SL_EAFNOSUPPORT
+#define EADDRINUSE                          SL_EADDRINUSE
+#define EADDRNOTAVAIL                       SL_EADDRNOTAVAIL
+#define ENETUNREACH                         SL_ENETUNREACH
+#define ENOBUFS                             SL_ENOBUFS
+#define EOBUFF                              SL_EOBUFF
+#define EISCONN                             SL_EISCONN
+#define ENOTCONN                            SL_ENOTCONN
+#define ETIMEDOUT                           SL_ETIMEDOUT
+#define ECONNREFUSED                        SL_ECONNREFUSED
 
-#define SOL_SOCKET                          SL_SOL_SOCKET         
-#define IPPROTO_IP                          SL_IPPROTO_IP                     
-#define SO_KEEPALIVE                        SL_SO_KEEPALIVE            
+#define SOL_SOCKET                          SL_SOL_SOCKET
+#define IPPROTO_IP                          SL_IPPROTO_IP
+#define SO_KEEPALIVE                        SL_SO_KEEPALIVE
 
-#define SO_RCVTIMEO                         SL_SO_RCVTIMEO        
-#define SO_NONBLOCKING                      SL_SO_NONBLOCKING     
+#define SO_RCVTIMEO                         SL_SO_RCVTIMEO
+#define SO_NONBLOCKING                      SL_SO_NONBLOCKING
 
-#define IP_MULTICAST_IF                     SL_IP_MULTICAST_IF    
-#define IP_MULTICAST_TTL                    SL_IP_MULTICAST_TTL   
-#define IP_ADD_MEMBERSHIP                   SL_IP_ADD_MEMBERSHIP  
-#define IP_DROP_MEMBERSHIP                  SL_IP_DROP_MEMBERSHIP 
+#define IP_MULTICAST_IF                     SL_IP_MULTICAST_IF
+#define IP_MULTICAST_TTL                    SL_IP_MULTICAST_TTL
+#define IP_ADD_MEMBERSHIP                   SL_IP_ADD_MEMBERSHIP
+#define IP_DROP_MEMBERSHIP                  SL_IP_DROP_MEMBERSHIP
 
 #define socklen_t                           SlSocklen_t
 #define timeval                             SlTimeval_t
@@ -400,7 +400,7 @@ extern "C" {
 #define in_addr                             SlInAddr_t
 #define sockaddr_in                         SlSockAddrIn_t
 
-#define MSG_DONTWAIT                        SL_MSG_DONTWAIT       
+#define MSG_DONTWAIT                        SL_MSG_DONTWAIT
 
 //#define FD_SET                              SL_FD_SET
 //#define FD_CLR                              SL_FD_CLR
@@ -436,7 +436,7 @@ extern "C" {
     /* Internet address   */
     typedef struct SlInAddr_t
     {
-#ifndef s_addr 
+#ifndef s_addr
         _u32 s_addr; /* Internet address 32 bits */
 #else
         union S_un {
@@ -638,17 +638,17 @@ extern "C" {
     /*!
 
      \brief create an endpoint for communication
-     
-     The socket function creates a new socket of a certain socket type, identified 
+
+     The socket function creates a new socket of a certain socket type, identified
      by an integer number, and allocates system resources to it.
      This function is called by the application layer to obtain a socket handle.
-     
+
      \param[in] domain           specifies the protocol family of the created socket.
      For example:
      AF_INET for network protocol IPv4
-     AF_RF for starting transceiver mode. Notes: 
+     AF_RF for starting transceiver mode. Notes:
      - sending and receiving any packet overriding 802.11 header
-     - for optimized power consumption the socket will be started in TX 
+     - for optimized power consumption the socket will be started in TX
      only mode until receive command is activated
      AF_INET6 for IPv6
 
@@ -661,27 +661,27 @@ extern "C" {
      SOCK_DGRAM - L2 socket
      SOCK_RAW - L1 socket - bypass WLAN CCA (Clear Channel Assessment)
 
-     \param[in] protocol         specifies a particular transport to be used with 
+     \param[in] protocol         specifies a particular transport to be used with
      the socket.
-     The most common are IPPROTO_TCP, IPPROTO_SCTP, IPPROTO_UDP, 
+     The most common are IPPROTO_TCP, IPPROTO_SCTP, IPPROTO_UDP,
      IPPROTO_DCCP.
-     The value 0 may be used to select a default 
+     The value 0 may be used to select a default
      protocol from the selected domain and type
 
-     
-     \return                     On success, socket handle that is used for consequent socket operations. 
+
+     \return                     On success, socket handle that is used for consequent socket operations.
      A successful return code should be a positive number (int16)
      On error, a negative (int16) value will be returned specifying the error code.
      SL_EAFNOSUPPORT  - illegal domain parameter
      SL_EPROTOTYPE  - illegal type parameter
      SL_EACCES   - permission denied
-     SL_ENSOCK  - exceeded maximal number of socket 
+     SL_ENSOCK  - exceeded maximal number of socket
      SL_ENOMEM  - memory allocation error
      SL_EINVAL  - error in socket configuration
      SL_EPROTONOSUPPORT  - illegal protocol parameter
      SL_EOPNOTSUPP  - illegal combination of protocol and type parameters
-     
-     
+
+
      \sa                         sl_Close
      \note                       belongs to \ref basic_api
      \warning
@@ -698,8 +698,8 @@ extern "C" {
 
      \param[in] sd               socket handle (received in sl_Socket)
 
-     \return                        On success, zero is returned. 
-     On error, a negative number is returned.                               
+     \return                        On success, zero is returned.
+     On error, a negative number is returned.
 
      \sa                         sl_Socket
      \note                       belongs to \ref ext_api
@@ -711,27 +711,27 @@ extern "C" {
 
     /*!
      \brief Accept a connection on a socket
-     
+
      This function is used with connection-based socket types (SOCK_STREAM).
-     It extracts the first connection request on the queue of pending 
-     connections, creates a new connected socket, and returns a new file 
+     It extracts the first connection request on the queue of pending
+     connections, creates a new connected socket, and returns a new file
      descriptor referring to that socket.
-     The newly created socket is not in the listening state. The 
-     original socket sd is unaffected by this call. 
-     The argument sd is a socket that has been created with 
-     sl_Socket(), bound to a local address with sl_Bind(), and is 
-     listening for connections after a sl_Listen(). The argument \b 
-     \e addr is a pointer to a sockaddr structure. This structure 
-     is filled in with the address of the peer socket, as known to 
-     the communications layer. The exact format of the address 
-     returned addr is determined by the socket's address family. 
-     The \b \e addrlen argument is a value-result argument: it 
-     should initially contain the size of the structure pointed to 
-     by addr, on return it will contain the actual length (in 
+     The newly created socket is not in the listening state. The
+     original socket sd is unaffected by this call.
+     The argument sd is a socket that has been created with
+     sl_Socket(), bound to a local address with sl_Bind(), and is
+     listening for connections after a sl_Listen(). The argument \b
+     \e addr is a pointer to a sockaddr structure. This structure
+     is filled in with the address of the peer socket, as known to
+     the communications layer. The exact format of the address
+     returned addr is determined by the socket's address family.
+     The \b \e addrlen argument is a value-result argument: it
+     should initially contain the size of the structure pointed to
+     by addr, on return it will contain the actual length (in
      bytes) of the address returned.
-     
+
      \param[in] sd               socket descriptor (handle)
-     \param[out] addr            the argument addr is a pointer 
+     \param[out] addr            the argument addr is a pointer
      to a sockaddr structure. This
      structure is filled in with the
      address of the peer socket, as
@@ -745,16 +745,16 @@ extern "C" {
      only AF_INET is supported.\n -
      socket address, the length
      depends on the code format
-     \param[out] addrlen         the addrlen argument is a value-result 
+     \param[out] addrlen         the addrlen argument is a value-result
      argument: it should initially contain the
      size of the structure pointed to by addr
-     
+
      \return                        On success, a socket handle.
      On a non-blocking accept a possible negative value is SL_EAGAIN.
      On failure, negative value.
      SL_POOL_IS_EMPTY may be return in case there are no resources in the system
      In this case try again later or increase MAX_CONCURRENT_ACTIONS
-     
+
      \sa                         sl_Socket  sl_Bind  sl_Listen
      \note                       belongs to \ref server_side
      \warning
@@ -765,16 +765,16 @@ extern "C" {
 
     /*!
      \brief assign a name to a socket
-     
+
      This function gives the socket the local address addr.
      addr is addrlen bytes long. Traditionally, this is called
      When a socket is created with socket, it exists in a name
      space (address family) but has no name assigned.
      It is necessary to assign a local address before a SOCK_STREAM
      socket may receive connections.
-     
+
      \param[in] sd                socket descriptor (handle)
-     \param[in] addr              specifies the destination 
+     \param[in] addr              specifies the destination
      addrs\n sockaddr:\n - code for
      the address format. On this
      version only AF_INET is
@@ -782,9 +782,9 @@ extern "C" {
      the length depends on the code
      format
      \param[in] addrlen          contains the size of the structure pointed to by addr
-     
+
      \return                        On success, zero is returned. On error, a negative error code is returned.
-     
+
      \sa                         sl_Socket  sl_Accept sl_Listen
      \note                       belongs to \ref basic_api
      \warning
@@ -795,20 +795,20 @@ extern "C" {
 
     /*!
      \brief listen for connections on a socket
-     
+
      The willingness to accept incoming connections and a queue
      limit for incoming connections are specified with listen(),
      and then the connections are accepted with accept.
      The listen() call applies only to sockets of type SOCK_STREAM
      The backlog parameter defines the maximum length the queue of
-     pending connections may grow to. 
-     
+     pending connections may grow to.
+
      \param[in] sd               socket descriptor (handle)
-     \param[in] backlog          specifies the listen queue depth. 
-     
-     
+     \param[in] backlog          specifies the listen queue depth.
+
+
      \return                    On success, zero is returned. On error, a negative error code is returned.
-     
+
      \sa                         sl_Socket  sl_Accept  sl_Bind
      \note                       belongs to \ref server_side
      \warning
@@ -818,22 +818,22 @@ extern "C" {
 #endif
 
     /*!
-     \brief Initiate a connection on a socket 
-     
-     Function connects the socket referred to by the socket 
-     descriptor sd, to the address specified by addr. The addrlen 
-     argument specifies the size of addr. The format of the 
-     address in addr is determined by the address space of the 
-     socket. If it is of type SOCK_DGRAM, this call specifies the 
-     peer with which the socket is to be associated; this address 
-     is that to which datagrams are to be sent, and the only 
-     address from which datagrams are to be received.  If the 
-     socket is of type SOCK_STREAM, this call attempts to make a 
-     connection to another socket. The other socket is specified 
-     by address, which is an address in the communications space 
-     of the socket. 
-     
-     
+     \brief Initiate a connection on a socket
+
+     Function connects the socket referred to by the socket
+     descriptor sd, to the address specified by addr. The addrlen
+     argument specifies the size of addr. The format of the
+     address in addr is determined by the address space of the
+     socket. If it is of type SOCK_DGRAM, this call specifies the
+     peer with which the socket is to be associated; this address
+     is that to which datagrams are to be sent, and the only
+     address from which datagrams are to be received.  If the
+     socket is of type SOCK_STREAM, this call attempts to make a
+     connection to another socket. The other socket is specified
+     by address, which is an address in the communications space
+     of the socket.
+
+
      \param[in] sd               socket descriptor (handle)
      \param[in] addr             specifies the destination addr\n
      sockaddr:\n - code for the
@@ -841,16 +841,16 @@ extern "C" {
      only AF_INET is supported.\n -
      socket address, the length
      depends on the code format
-     
-     \param[in] addrlen          contains the size of the structure pointed 
+
+     \param[in] addrlen          contains the size of the structure pointed
      to by addr
-     
+
      \return                     On success, a socket handle.
      On a non-blocking connect a possible negative value is SL_EALREADY.
      On failure, negative value.
      SL_POOL_IS_EMPTY may be return in case there are no resources in the system
      In this case try again later or increase MAX_CONCURRENT_ACTIONS
-     
+
      \sa                         sl_Socket
      \note                       belongs to \ref client_side
      \warning
@@ -861,23 +861,23 @@ extern "C" {
 
     /*!
      \brief Monitor socket activity
-     
+
      Select allow a program to monitor multiple file descriptors,
-     waiting until one or more of the file descriptors become 
-     "ready" for some class of I/O operation 
-     
-     
+     waiting until one or more of the file descriptors become
+     "ready" for some class of I/O operation
+
+
      \param[in]  nfds        the highest-numbered file descriptor in any of the
      three sets, plus 1.
      \param[out] readsds     socket descriptors list for read monitoring and accept monitoring
      \param[out] writesds    socket descriptors list for connect monitoring only, write monitoring is not supported, non blocking connect is supported
      \param[out] exceptsds   socket descriptors list for exception monitoring, not supported.
      \param[in]  timeout     is an upper bound on the amount of time elapsed
-     before select() returns. Null or above 0xffff seconds means 
+     before select() returns. Null or above 0xffff seconds means
      infinity timeout. The minimum timeout is 10 milliseconds,
-     less than 10 milliseconds will be set automatically to 10 milliseconds. 
+     less than 10 milliseconds will be set automatically to 10 milliseconds.
      Max microseconds supported is 0xfffc00.
-     
+
      \return                    On success, select()  returns the number of
      file descriptors contained in the three returned
      descriptor sets (that is, the total number of bits that
@@ -886,25 +886,25 @@ extern "C" {
      happens. On error, a negative value is returned.
      readsds - return the sockets on which Read request will
      return without delay with valid data.
-     writesds - return the sockets on which Write request 
+     writesds - return the sockets on which Write request
      will return without delay.
-     exceptsds - return the sockets closed recently. 
+     exceptsds - return the sockets closed recently.
      SL_POOL_IS_EMPTY may be return in case there are no resources in the system
      In this case try again later or increase MAX_CONCURRENT_ACTIONS
-     
+
      \sa     sl_Socket
-     \note   If the timeout value set to less than 5ms it will automatically set 
+     \note   If the timeout value set to less than 5ms it will automatically set
      to 5ms to prevent overload of the system
      belongs to \ref basic_api
-     
+
      Only one sl_Select can be handled at a time.
      Calling this API while the same command is called from another thread, may result
      in one of the two scenarios:
      1. The command will wait (internal) until the previous command finish, and then be executed.
-     2. There are not enough resources and SL_POOL_IS_EMPTY error will return. 
+     2. There are not enough resources and SL_POOL_IS_EMPTY error will return.
      In this case, MAX_CONCURRENT_ACTIONS can be increased (result in memory increase) or try
      again later to issue the command.
-     
+
      \warning
      */
 #if _SL_INCLUDE_FUNC(sl_Select)
@@ -912,21 +912,21 @@ extern "C" {
 
     /*!
      \brief Select's SlFdSet_t SET function
-     
+
      Sets current socket descriptor on SlFdSet_t container
      */
     void SL_FD_SET(_i16 fd, SlFdSet_t *fdset);
 
     /*!
      \brief Select's SlFdSet_t CLR function
-     
+
      Clears current socket descriptor on SlFdSet_t container
      */
     void SL_FD_CLR(_i16 fd, SlFdSet_t *fdset);
 
     /*!
      \brief Select's SlFdSet_t ISSET function
-     
+
      Checks if current socket descriptor is set (TRUE/FALSE)
 
      \return            Returns TRUE if set, FALSE if unset
@@ -936,7 +936,7 @@ extern "C" {
 
     /*!
      \brief Select's SlFdSet_t ZERO function
-     
+
      Clears all socket descriptors from SlFdSet_t
      */
     void SL_FD_ZERO(SlFdSet_t *fdset);
@@ -945,29 +945,29 @@ extern "C" {
 
     /*!
      \brief set socket options
-     
+
      This function manipulate the options associated with a socket.
      Options may exist at multiple protocol levels; they are always
      present at the uppermost socket level.
-     
+
      When manipulating socket options the level at which the option resides
      and the name of the option must be specified.  To manipulate options at
      the socket level, level is specified as SOL_SOCKET.  To manipulate
      options at any other level the protocol number of the appropriate proto-
      col controlling the option is supplied.  For example, to indicate that an
      option is to be interpreted by the TCP protocol, level should be set to
-     the protocol number of TCP; 
-     
-     The parameters optval and optlen are used to access optval - 
-     ues for setsockopt().  For getsockopt() they identify a 
-     buffer in which the value for the requested option(s) are to 
-     be returned.  For getsockopt(), optlen is a value-result 
-     parameter, initially containing the size of the buffer 
-     pointed to by option_value, and modified on return to 
-     indicate the actual size of the value returned.  If no option 
-     value is to be supplied or returned, option_value may be 
+     the protocol number of TCP;
+
+     The parameters optval and optlen are used to access optval -
+     ues for setsockopt().  For getsockopt() they identify a
+     buffer in which the value for the requested option(s) are to
+     be returned.  For getsockopt(), optlen is a value-result
+     parameter, initially containing the size of the buffer
+     pointed to by option_value, and modified on return to
+     indicate the actual size of the value returned.  If no option
+     value is to be supplied or returned, option_value may be
      NULL.
-     
+
      \param[in] sd               socket handle
      \param[in] level            defines the protocol level for this option
      - <b>SL_SOL_SOCKET</b>   Socket level configurations (L4, transport layer)
@@ -1002,30 +1002,30 @@ extern "C" {
      This options takes SlSockSecureMask struct as parameter
      - <b>SL_SO_SECURE_FILES_CA_FILE_NAME</b> \n
      Map secured socket to CA file by name \n
-     This options takes <b>_u8</b> buffer as parameter 
+     This options takes <b>_u8</b> buffer as parameter
      - <b>SL_SO_SECURE_FILES_PRIVATE_KEY_FILE_NAME</b> \n
      Map secured socket to private key by name \n
-     This options takes <b>_u8</b> buffer as parameter 
+     This options takes <b>_u8</b> buffer as parameter
      - <b>SL_SO_SECURE_FILES_CERTIFICATE_FILE_NAME</b> \n
      Map secured socket to certificate file by name \n
-     This options takes <b>_u8</b> buffer as parameter 
+     This options takes <b>_u8</b> buffer as parameter
      - <b>SL_SO_SECURE_FILES_DH_KEY_FILE_NAME</b> \n
      Map secured socket to Diffie Hellman file by name \n
-     This options takes <b>_u8</b> buffer as parameter 
+     This options takes <b>_u8</b> buffer as parameter
      - <b>SL_SO_CHANGE_CHANNEL</b> \n
      Sets channel in transceiver mode.
      This options takes <b>_u32</b> as channel number parameter
-     - <b>SL_IPPROTO_IP</b> 
+     - <b>SL_IPPROTO_IP</b>
      - <b>SL_IP_MULTICAST_TTL</b> \n
      Set the time-to-live value of outgoing multicast packets for this socket. \n
-     This options takes <b>_u8</b> as parameter 
+     This options takes <b>_u8</b> as parameter
      - <b>SL_IP_ADD_MEMBERSHIP</b> \n
      UDP socket, Join a multicast group. \n
      This options takes SlSockIpMreq struct as parameter
      - <b>SL_IP_DROP_MEMBERSHIP</b> \n
      UDP socket, Leave a multicast group \n
      This options takes SlSockIpMreq struct as parameter
-     - <b>SL_IP_RAW_RX_NO_HEADER</b> \n                 
+     - <b>SL_IP_RAW_RX_NO_HEADER</b> \n
      Raw socket remove IP header from received data. \n
      Default: data includes ip header \n
      This options takes <b>_u32</b> as parameter
@@ -1056,47 +1056,47 @@ extern "C" {
      - <b>SL_SO_PHY_PREAMBLE</b> \n
      RAW socket, set WLAN PHY preamble for Long/Short\n
      This options takes <b>_u32</b> as parameter
-     
+
      \param[in] optval           specifies a value for the option
-     \param[in] optlen           specifies the length of the 
+     \param[in] optlen           specifies the length of the
      option value
-     
-     \return                     On success, zero is returned. 
-     On error, a negative value is returned. 
+
+     \return                     On success, zero is returned.
+     On error, a negative value is returned.
      \sa     sl_getsockopt
-     \note   belongs to \ref basic_api  
+     \note   belongs to \ref basic_api
      \warning
      \par   Examples:
-     \par   
+     \par
      <b> SL_SO_KEEPALIVE: </b>(disable Keepalive)
-     \code		
+     \code
      SlSockKeepalive_t enableOption;
      enableOption.KeepaliveEnabled = 0;
-     sl_SetSockOpt(SockID,SL_SOL_SOCKET,SL_SO_KEEPALIVE, (_u8 *)&enableOption,sizeof(enableOption));  
+     sl_SetSockOpt(SockID,SL_SOL_SOCKET,SL_SO_KEEPALIVE, (_u8 *)&enableOption,sizeof(enableOption));
      \endcode
-     \par   
+     \par
      <b> SL_SO_RCVTIMEO: </b>
      \code
      struct SlTimeval_t timeVal;
      timeVal.tv_sec =  1;             // Seconds
      timeVal.tv_usec = 0;             // Microseconds. 10000 microseconds resolution
-     sl_SetSockOpt(SockID,SL_SOL_SOCKET,SL_SO_RCVTIMEO, (_u8 *)&timeVal, sizeof(timeVal));    // Enable receive timeout 
+     sl_SetSockOpt(SockID,SL_SOL_SOCKET,SL_SO_RCVTIMEO, (_u8 *)&timeVal, sizeof(timeVal));    // Enable receive timeout
      \endcode
-     \par   
+     \par
      <b>    SL_SO_RCVBUF: </b>
      \code
      SlSockWinsize_t size;
      size.Winsize = 3000;  // bytes
      sl_SetSockOpt(SockID,SL_SOL_SOCKET,SL_SO_RCVBUF, (_u8 *)&size, sizeof(size));
      \endcode
-     \par   
+     \par
      <b>    SL_SO_NONBLOCKING: </b>
      \code
      SlSockNonblocking_t enableOption;
      enableOption.NonblockingEnabled = 1;
      sl_SetSockOpt(SockID,SL_SOL_SOCKET,SL_SO_NONBLOCKING, (_u8 *)&enableOption,sizeof(enableOption)); // Enable/disable nonblocking mode
      \endcode
-     \par   
+     \par
      <b>    SL_SO_SECMETHOD:</b>
      \code
      SlSockSecureMethod method;
@@ -1104,108 +1104,108 @@ extern "C" {
      SockID = sl_Socket(SL_AF_INET,SL_SOCK_STREAM, SL_SEC_SOCKET);
      sl_SetSockOpt(SockID, SL_SOL_SOCKET, SL_SO_SECMETHOD, (_u8 *)&method, sizeof(method));
      \endcode
-     \par   
+     \par
      <b>   SL_SO_SECURE_MASK:</b>
-     \code 
+     \code
      SlSockSecureMask cipher;
      cipher.secureMask = SL_SEC_MASK_SSL_RSA_WITH_RC4_128_SHA;                   // cipher type
      SockID = sl_Socket(SL_AF_INET,SL_SOCK_STREAM, SL_SEC_SOCKET);
      sl_SetSockOpt(SockID, SL_SOL_SOCKET, SL_SO_SEC_MASK,(_u8 *)&cipher, sizeof(cipher));
      \endcode
-     \par   
+     \par
      <b>   SL_SO_SECURE_FILES_CA_FILE_NAME:</b>
-     \code           
+     \code
      sl_SetSockOpt(SockID,SL_SOL_SOCKET,SL_SO_SECURE_FILES_CA_FILE_NAME,"exuifaxCaCert.der",strlen("exuifaxCaCert.der"));
      \endcode
 
-     \par   
+     \par
      <b>   SL_SO_SECURE_FILES_PRIVATE_KEY_FILE_NAME:</b>
-     \code           
+     \code
      sl_SetSockOpt(SockID,SL_SOL_SOCKET,SL_SO_SECURE_FILES_PRIVATE_KEY_FILE_NAME,"myPrivateKey.der",strlen("myPrivateKey.der"));
      \endcode
 
-     \par   
+     \par
      <b>   SL_SO_SECURE_FILES_CERTIFICATE_FILE_NAME:</b>
      \code
      sl_SetSockOpt(SockID,SL_SOL_SOCKET,SL_SO_SECURE_FILES_CERTIFICATE_FILE_NAME,"myCertificate.der",strlen("myCertificate.der"));
      \endcode
 
-     \par   
+     \par
      <b>   SL_SO_SECURE_FILES_DH_KEY_FILE_NAME:</b>
      \code
      sl_SetSockOpt(SockID,SL_SOL_SOCKET,SL_SO_SECURE_FILES_DH_KEY_FILE_NAME,"myDHinServerMode.der",strlen("myDHinServerMode.der"));
      \endcode
 
-     \par   
+     \par
      <b>   SL_IP_MULTICAST_TTL:</b>
      \code
      _u8 ttl = 20;
      sl_SetSockOpt(SockID, SL_IPPROTO_IP, SL_IP_MULTICAST_TTL, &ttl, sizeof(ttl));
      \endcode
 
-     \par   
+     \par
      <b>   SL_IP_ADD_MEMBERSHIP:</b>
      \code
      SlSockIpMreq mreq;
      sl_SetSockOpt(SockID, SL_IPPROTO_IP, SL_IP_ADD_MEMBERSHIP, &mreq, sizeof(mreq));
      \endcode
 
-     \par   
+     \par
      <b>   SL_IP_DROP_MEMBERSHIP:</b>
      \code
      SlSockIpMreq mreq;
      sl_SetSockOpt(SockID, SL_IPPROTO_IP, SL_IP_DROP_MEMBERSHIP, &mreq, sizeof(mreq));
      \endcode
 
-     \par   
+     \par
      <b>   SL_SO_CHANGE_CHANNEL:</b>
      \code
      _u32 newChannel = 6; // range is 1-13
-     sl_SetSockOpt(SockID, SL_SOL_SOCKET, SL_SO_CHANGE_CHANNEL, &newChannel, sizeof(newChannel));  
+     sl_SetSockOpt(SockID, SL_SOL_SOCKET, SL_SO_CHANGE_CHANNEL, &newChannel, sizeof(newChannel));
      \endcode
 
-     \par   
+     \par
      <b>   SL_IP_RAW_RX_NO_HEADER:</b>
      \code
      _u32 header = 1;  // remove ip header
      sl_SetSockOpt(SockID, SL_IPPROTO_IP, SL_IP_RAW_RX_NO_HEADER, &header, sizeof(header));
      \endcode
 
-     \par   
+     \par
      <b>   SL_IP_HDRINCL:</b>
      \code
      _u32 header = 1;
      sl_SetSockOpt(SockID, SL_IPPROTO_IP, SL_IP_HDRINCL, &header, sizeof(header));
      \endcode
-     \par   
+     \par
      <b>   SL_IP_RAW_IPV6_HDRINCL:</b>
      \code
      _u32 header = 1;
      sl_SetSockOpt(SockID, SL_IPPROTO_IP, SL_IP_RAW_IPV6_HDRINCL, &header, sizeof(header));
      \endcode
 
-     \par   
+     \par
      <b>   SL_SO_PHY_RATE:</b>
      \code
      _u32 rate = 6; // see wlan.h RateIndex_e for values
-     sl_SetSockOpt(SockID, SL_SOL_PHY_OPT, SL_SO_PHY_RATE, &rate, sizeof(rate));  
+     sl_SetSockOpt(SockID, SL_SOL_PHY_OPT, SL_SO_PHY_RATE, &rate, sizeof(rate));
      \endcode
 
-     \par   
+     \par
      <b>   SL_SO_PHY_TX_POWER:</b>
      \code
      _u32 txpower = 1; // valid range is 1-15
      sl_SetSockOpt(SockID, SL_SOL_PHY_OPT, SL_SO_PHY_TX_POWER, &txpower, sizeof(txpower));
      \endcode
 
-     \par   
+     \par
      <b>   SL_SO_PHY_NUM_FRAMES_TO_TX:</b>
      \code
      _u32 numframes = 1;
      sl_SetSockOpt(SockID, SL_SOL_PHY_OPT, SL_SO_PHY_NUM_FRAMES_TO_TX, &numframes, sizeof(numframes));
      \endcode
 
-     \par   
+     \par
      <b>   SL_SO_PHY_PREAMBLE:</b>
      \code
      _u32 preamble = 1;
@@ -1219,38 +1219,38 @@ extern "C" {
 
     /*!
      \brief Get socket options
-     
+
      This function manipulate the options associated with a socket.
      Options may exist at multiple protocol levels; they are always
      present at the uppermost socket level.
-     
+
      When manipulating socket options the level at which the option resides
      and the name of the option must be specified.  To manipulate options at
      the socket level, level is specified as SOL_SOCKET.  To manipulate
      options at any other level the protocol number of the appropriate proto-
      col controlling the option is supplied.  For example, to indicate that an
      option is to be interpreted by the TCP protocol, level should be set to
-     the protocol number of TCP; 
-     
-     The parameters optval and optlen are used to access optval - 
-     ues for setsockopt().  For getsockopt() they identify a 
-     buffer in which the value for the requested option(s) are to 
-     be returned.  For getsockopt(), optlen is a value-result 
-     parameter, initially containing the size of the buffer 
-     pointed to by option_value, and modified on return to 
-     indicate the actual size of the value returned.  If no option 
-     value is to be supplied or returned, option_value may be 
-     NULL. 
-     
-     
+     the protocol number of TCP;
+
+     The parameters optval and optlen are used to access optval -
+     ues for setsockopt().  For getsockopt() they identify a
+     buffer in which the value for the requested option(s) are to
+     be returned.  For getsockopt(), optlen is a value-result
+     parameter, initially containing the size of the buffer
+     pointed to by option_value, and modified on return to
+     indicate the actual size of the value returned.  If no option
+     value is to be supplied or returned, option_value may be
+     NULL.
+
+
      \param[in]  sd              socket handle
      \param[in]  level           defines the protocol level for this option
      \param[in]  optname         defines the option name to interrogate
      \param[out] optval          specifies a value for the option
-     \param[out] optlen          specifies the length of the 
+     \param[out] optlen          specifies the length of the
      option value
-     
-     \return                        On success, zero is returned. 
+
+     \return                        On success, zero is returned.
      On error, a negative value is returned.
      \sa     sl_SetSockOpt
      \note   See sl_SetSockOpt
@@ -1263,31 +1263,31 @@ extern "C" {
 
     /*!
      \brief read data from TCP socket
-     
+
      function receives a message from a connection-mode socket
-     
+
      \param[in]  sd              socket handle
-     \param[out] buf             Points to the buffer where the 
+     \param[out] buf             Points to the buffer where the
      message should be stored.
-     \param[in]  Len             Specifies the length in bytes of 
-     the buffer pointed to by the buffer argument. 
+     \param[in]  Len             Specifies the length in bytes of
+     the buffer pointed to by the buffer argument.
      Range: 1-16000 bytes
-     \param[in]  flags           Specifies the type of message 
+     \param[in]  flags           Specifies the type of message
      reception. On this version, this parameter is not
      supported.
-     
-     \return                     return the number of bytes received, 
+
+     \return                     return the number of bytes received,
      or a negative value if an error occurred.
      using a non-blocking recv a possible negative value is SL_EAGAIN.
      SL_POOL_IS_EMPTY may be return in case there are no resources in the system
      In this case try again later or increase MAX_CONCURRENT_ACTIONS
-     
+
      \sa     sl_RecvFrom
      \note                       belongs to \ref recv_api
      \warning
      \par        Examples:
      \code       An example of receiving data using TCP socket:
-     
+
      SlSockAddrIn_t  Addr;
      SlSockAddrIn_t  LocalAddr;
      _i16 AddrSize = sizeof(SlSockAddrIn_t);
@@ -1320,7 +1320,7 @@ extern "C" {
      size = sl_Recv(sd,buffer,1536,0);
      transHeader = (SlTransceiverRxOverHead_t *)buffer;
      printf("RSSI is %d frame type is 0x%x size %d\n",transHeader->rssi,buffer[sizeof(SlTransceiverRxOverHead_t)],size);
-     }      
+     }
      \endcode
      */
 #if _SL_INCLUDE_FUNC(sl_Recv)
@@ -1329,18 +1329,18 @@ extern "C" {
 
     /*!
      \brief read data from socket
-     
+
      function receives a message from a connection-mode or
      connectionless-mode socket
-     
-     \param[in]  sd              socket handle 
+
+     \param[in]  sd              socket handle
      \param[out] buf             Points to the buffer where the message should be stored.
      \param[in]  Len             Specifies the length in bytes of the buffer pointed to by the buffer argument.
      Range: 1-16000 bytes
      \param[in]  flags           Specifies the type of message
      reception. On this version, this parameter is not
      supported.
-     \param[in]  from            pointer to an address structure 
+     \param[in]  from            pointer to an address structure
      indicating the source
      address.\n sockaddr:\n - code
      for the address format. On this
@@ -1350,21 +1350,21 @@ extern "C" {
      format
      \param[in]  fromlen         source address structure
      size. This parameter MUST be set to the size of the structure pointed to by addr.
-     
-     
-     \return                     return the number of bytes received, 
+
+
+     \return                     return the number of bytes received,
      or a negative value if an error occurred.
      using a non-blocking recv a possible negative value is SL_EAGAIN.
-     SL_RET_CODE_INVALID_INPUT (-2) will be returned if fromlen has incorrect length. 
+     SL_RET_CODE_INVALID_INPUT (-2) will be returned if fromlen has incorrect length.
      SL_POOL_IS_EMPTY may be return in case there are no resources in the system
      In this case try again later or increase MAX_CONCURRENT_ACTIONS
-     
+
      \sa     sl_Recv
      \note                       belongs to \ref recv_api
      \warning
      \par        Example:
      \code       An example of receiving data:
-     
+
      SlSockAddrIn_t  Addr;
      SlSockAddrIn_t  LocalAddr;
      _i16 AddrSize = sizeof(SlSockAddrIn_t);
@@ -1388,34 +1388,34 @@ extern "C" {
 
     /*!
      \brief write data to TCP socket
-     
+
      This function is used to transmit a message to another socket.
      Returns immediately after sending data to device.
      In case of TCP failure an async event SL_SOCKET_TX_FAILED_EVENT is going to
      be received.
-     In case of a RAW socket (transceiver mode), extra 4 bytes should be reserved at the end of the 
-     frame data buffer for WLAN FCS 
-     
+     In case of a RAW socket (transceiver mode), extra 4 bytes should be reserved at the end of the
+     frame data buffer for WLAN FCS
+
      \param[in] sd               socket handle
-     \param[in] buf              Points to a buffer containing 
+     \param[in] buf              Points to a buffer containing
      the message to be sent
      \param[in] Len              message size in bytes. Range: 1-1460 bytes
-     \param[in] flags            Specifies the type of message 
+     \param[in] flags            Specifies the type of message
      transmission. On this version, this parameter is not
      supported for TCP.
      For transceiver mode, the SL_RAW_RF_TX_PARAMS macro can be used to determine
      transmission parameters (channel,rate,tx_power,preamble)
-     
-     
-     \return                     Return the number of bytes transmitted, 
+
+
+     \return                     Return the number of bytes transmitted,
      or -1 if an error occurred
-     
-     \sa     sl_SendTo 
+
+     \sa     sl_SendTo
      \note                       belongs to \ref send_api
-     \warning   
+     \warning
      \par        Example:
      \code       An example of sending data:
-     
+
      SlSockAddrIn_t  Addr;
      _i16 AddrSize = sizeof(SlSockAddrIn_t);
      _i16 SockID;
@@ -1429,7 +1429,7 @@ extern "C" {
      SockID = sl_Socket(SL_AF_INET,SL_SOCK_STREAM, 0);
      Status = sl_Connect(SockID, (SlSockAddr_t *)&Addr, AddrSize);
      Status = sl_Send(SockID, Buf, 1460, 0 );
-     
+
      \endcode
      */
 #if _SL_INCLUDE_FUNC(sl_Send )
@@ -1438,21 +1438,21 @@ extern "C" {
 
     /*!
      \brief write data to socket
-     
+
      This function is used to transmit a message to another socket
      (connection less socket SOCK_DGRAM,  SOCK_RAW).
      Returns immediately after sending data to device.
      In case of transmission failure an async event SL_SOCKET_TX_FAILED_EVENT is going to
      be received.
-     
+
      \param[in] sd               socket handle
-     \param[in] buf              Points to a buffer containing 
+     \param[in] buf              Points to a buffer containing
      the message to be sent
      \param[in] Len              message size in bytes. Range: 1-1460 bytes
-     \param[in] flags            Specifies the type of message 
+     \param[in] flags            Specifies the type of message
      transmission. On this version, this parameter is not
-     supported 
-     \param[in] to               pointer to an address structure 
+     supported
+     \param[in] to               pointer to an address structure
      indicating the destination
      address.\n sockaddr:\n - code
      for the address format. On this
@@ -1460,17 +1460,17 @@ extern "C" {
      supported.\n - socket address,
      the length depends on the code
      format
-     \param[in] tolen            destination address structure size 
-     
-     \return                     Return the number of transmitted bytes, 
+     \param[in] tolen            destination address structure size
+
+     \return                     Return the number of transmitted bytes,
      or -1 if an error occurred
-     
+
      \sa     sl_Send
      \note                       belongs to \ref send_api
      \warning
      \par        Example:
      \code       An example of sending data:
-     
+
      SlSockAddrIn_t  Addr;
      _i16 AddrSize = sizeof(SlSockAddrIn_t);
      _i16 SockID;
@@ -1492,16 +1492,16 @@ extern "C" {
 
     /*!
      \brief Reorder the bytes of a 32-bit unsigned value
-     
+
      This function is used to Reorder the bytes of a 32-bit unsigned value from processor order to network order.
-     
-     \param[in] var              variable to reorder 
-     
-     \return                     Return the reorder variable, 
-     
+
+     \param[in] var              variable to reorder
+
+     \return                     Return the reorder variable,
+
      \sa     sl_SendTo  sl_Bind  sl_Connect  sl_RecvFrom  sl_Accept
      \note                       belongs to \ref send_api
-     \warning   
+     \warning
      */
 #if _SL_INCLUDE_FUNC(sl_Htonl )
     _u32 sl_Htonl( _u32 val );
@@ -1511,16 +1511,16 @@ extern "C" {
 
     /*!
      \brief Reorder the bytes of a 16-bit unsigned value
-     
+
      This function is used to Reorder the bytes of a 16-bit unsigned value from processor order to network order.
-     
-     \param[in] var              variable to reorder 
-     
-     \return                     Return the reorder variable, 
-     
+
+     \param[in] var              variable to reorder
+
+     \return                     Return the reorder variable,
+
      \sa     sl_SendTo  sl_Bind    sl_Connect  sl_RecvFrom  sl_Accept
      \note                       belongs to \ref send_api
-     \warning   
+     \warning
      */
 #if _SL_INCLUDE_FUNC(sl_Htons )
     _u16 sl_Htons( _u16 val );

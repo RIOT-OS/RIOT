@@ -35,8 +35,8 @@ extern "C" {
 #define SOCKET_PORT_HTTPS         443
 
 /* service buffers */
-#define HTTP_SEND_BUF_LEN   512  
-#define HTTP_RECV_BUF_LEN  1440  
+#define HTTP_SEND_BUF_LEN   512
+#define HTTP_RECV_BUF_LEN  1440
 _u8 *http_send_buf(void);
 _u8 *http_recv_buf(void);
 

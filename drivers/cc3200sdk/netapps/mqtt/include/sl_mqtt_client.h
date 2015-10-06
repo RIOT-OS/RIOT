@@ -2,51 +2,51 @@
  Copyright (c) (2014) Texas Instruments Incorporated
  All rights reserved not granted herein.
 
- Limited License.  
+ Limited License.
 
- Texas Instruments Incorporated grants a world-wide, royalty-free, non-exclusive 
- license under copyrights and patents it now or hereafter owns or controls to make, 
- have made, use, import, offer to sell and sell ("Utilize") this software subject 
- to the terms herein.  With respect to the foregoing patent license, such license 
- is granted  solely to the extent that any such patent is necessary to Utilize the 
- software alone.  The patent license shall not apply to any combinations which 
- include this software, other than combinations with devices manufactured by or 
+ Texas Instruments Incorporated grants a world-wide, royalty-free, non-exclusive
+ license under copyrights and patents it now or hereafter owns or controls to make,
+ have made, use, import, offer to sell and sell ("Utilize") this software subject
+ to the terms herein.  With respect to the foregoing patent license, such license
+ is granted  solely to the extent that any such patent is necessary to Utilize the
+ software alone.  The patent license shall not apply to any combinations which
+ include this software, other than combinations with devices manufactured by or
  for TI (�TI Devices�).  No hardware patent is licensed hereunder.
 
- Redistributions must preserve existing copyright notices and reproduce this license 
- (including the above copyright notice and the disclaimer and (if applicable) source 
- code license limitations below) in the documentation and/or other materials provided 
+ Redistributions must preserve existing copyright notices and reproduce this license
+ (including the above copyright notice and the disclaimer and (if applicable) source
+ code license limitations below) in the documentation and/or other materials provided
  with the distribution
 
- Redistribution and use in binary form, without modification, are permitted provided 
+ Redistribution and use in binary form, without modification, are permitted provided
  that the following conditions are met:
- * No reverse engineering, decompilation, or disassembly of this software is 
+ * No reverse engineering, decompilation, or disassembly of this software is
  permitted with respect to any software provided in binary form.
  * any redistribution and use are licensed by TI for use only with TI Devices.
- * Nothing shall obligate TI to provide you with source code for the software 
+ * Nothing shall obligate TI to provide you with source code for the software
  licensed and provided to you in object code.
 
- If software source code is provided to you, modification and redistribution of the 
+ If software source code is provided to you, modification and redistribution of the
  source code are permitted provided that the following conditions are met;
- * any redistribution and use of the source code, including any resulting derivative 
+ * any redistribution and use of the source code, including any resulting derivative
  works, are licensed by TI for use only with TI Devices.
- * any redistribution and use of any object code compiled from the source code and 
+ * any redistribution and use of any object code compiled from the source code and
  any resulting derivative works, are licensed by TI for use only with TI Devices.
 
- Neither the name of Texas Instruments Incorporated nor the names of its suppliers 
- may be used to endorse or promote products derived from this software without 
+ Neither the name of Texas Instruments Incorporated nor the names of its suppliers
+ may be used to endorse or promote products derived from this software without
  specific prior written permission.
 
  DISCLAIMER.
 
- THIS SOFTWARE IS PROVIDED BY TI AND TI�S LICENSORS "AS IS" AND ANY EXPRESS OR IMPLIED 
- WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY 
- AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL TI AND TI�S 
- LICENSORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
- CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE 
- GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) 
- HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, 
- OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF 
+ THIS SOFTWARE IS PROVIDED BY TI AND TI�S LICENSORS "AS IS" AND ANY EXPRESS OR IMPLIED
+ WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+ AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL TI AND TI�S
+ LICENSORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+ GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
  ******************************************************************************/
@@ -65,7 +65,7 @@ extern "C"
 #endif
 /**
  \mainpage SimpleLink MQTT Client Layer
- 
+
  * \section intro_sec Introduction
 
  The SimpleLink MQTT Client Layer provides an easy-to-use API(s) to enable
@@ -78,7 +78,7 @@ extern "C"
  The following figure outlines the composition of the SL MQTT Client Layer.
 
  * \image html ./sl_mqtt_client_view.png
- 
+
  * \section descrypt_sec Description
 
  The SL MQTT Client Layer, in addition to providing services to the application,
@@ -89,8 +89,8 @@ extern "C"
  the SL MQTT Layer can not be disabled anytime, however its system wide priority
  is configurable and can be set.
 
- Some of the salient features of the SL MQTT Layer are 
- 
+ Some of the salient features of the SL MQTT Layer are
+
  - Easy-to-use, intuitive and small set of MQTT API
  - App can indicate its choice to await ACK for a message transaction
  - Supports MQTT 3.1 protocol
@@ -115,13 +115,13 @@ extern "C"
  pursue other activities to make overall progress in the system. However,
  an attempt to schedule another transaction with the server, while the
  previous one is still active, will depend on the availability of buffers for transaction.
- 
+
 
  \subsection seq_subsec Typical Sequences:
- 
+
  - Publishers:  INIT --> CONTEXT_CREATE --> CONNECT --> PUBLISH (TX) --> DISCONNECT --> CONTEXT_DELETE --> EXIT
  - Subscribers: INIT --> CONTEXT_CREATE --> CONNECT --> SUBSCRIBE --> PUBLISH (RX) --> UNSUBSCRIBE --> DISCONNECT --> CONTEXT_DELETE --> EXIT
- 
+
  */
 
 /** @defgroup sl_mqtt_cl_api SL MQTT Client API
@@ -129,7 +129,7 @@ extern "C"
  */
 
 /** @defgroup sl_mqtt_cl_evt SL MQTT Client Events
- @{ 
+ @{
  */
 #define SL_MQTT_CL_EVT_PUBACK   0x04  /**< PUBACK has been received from the server */
 #define SL_MQTT_CL_EVT_PUBCOMP  0x07  /**< PUBCOMP has been received from the server */
@@ -143,11 +143,11 @@ extern "C"
 /** Callbacks Routines
  The routines are invoked by SL Implementation onto Client application
 
- * \note The user applications implement the callbacks that are registered 
- with the libraries. While using the MQTT library, invoking the 
- core library APIs from a callback should be avoided and 
- can lead to lockup scenarios. It is recommended to signal another 
- task from the callback routines invoked from the library 
+ * \note The user applications implement the callbacks that are registered
+ with the libraries. While using the MQTT library, invoking the
+ core library APIs from a callback should be avoided and
+ can lead to lockup scenarios. It is recommended to signal another
+ task from the callback routines invoked from the library
  and invoke the core library API calls from that task.
  */
 typedef struct {
@@ -156,7 +156,7 @@ typedef struct {
      The client app must provide this routine for the instances where it has
      subscribed to certain set of topics from the server. The callback is
      invoked in the context of the internal SL Receive Task.
-     
+
      \param[in] app_hndl application handle returned
      \param[in] topstr name of topic published by the server. Not NUL terminated.
      \param[in] toplen length of the topic name published by the server.
@@ -176,16 +176,16 @@ typedef struct {
      These events are notified as part of the processing carried out by the
      internal recv task of the SL implementation. The application must populate
      the callback to receive events about the progress made by the SL Mqtt layer.
-     
+
      This handler is used by the SL Mqtt Layer to report acknowledgements from the
      server, in case, the application has chosen not to block the service invokes
      till the arrival of the corresponding ACK.
-     
+
      \param[in] app_hndl application handle returned
      \param[in] evt identifier to the reported event. Refer to @ref sl_mqtt_cl_evt
      \param[in] buf points to buffer
      \param[in] len length of buffer
-     
+
      \note
      */
     void (*sl_ExtLib_MqttEvent)(void *app_hndl, _i32 evt, const void *buf,
@@ -221,7 +221,7 @@ typedef struct {
  3.  CA File Name
  4.  DH Key File Name
 
- example: 
+ example:
  If you want to provide only CA File Name, following are the two way of doing it:
  for n_files = 1
  char *security_file_list[] = {"/cert/testcacert.der"};
@@ -248,7 +248,7 @@ typedef struct {
 
 /** MQTT Lib structure which holds Initialization Data */
 typedef struct {
-    /**< Loopback port is used to manage lib internal functioning in case of connections to 
+    /**< Loopback port is used to manage lib internal functioning in case of connections to
      multiple servers simultaneously is desired. */
     _u16 loopback_port; /**< Loopback port = 0, implies connection to only single server */
     /**< Loopback port != 0, implies connection to multiple servers */
@@ -269,14 +269,14 @@ typedef struct {
 
 /** Initialize the SL MQTT Implementation.
  A caller must initialize the MQTT implementation prior to using its services.
- 
+
  \param[in] cfg refers to client lib configuration parameters
  \return Success (0) or Failure (-1)
  */
 _i32 sl_ExtLib_MqttClientInit(const SlMqttClientLibCfg_t *cfg);
 
 /** Exit the SL MQTT Implementation.
- 
+
  \return Success (0) or Failure (-1)
  */
 _i32 sl_ExtLib_MqttClientExit();
@@ -312,15 +312,15 @@ _i32 sl_ExtLib_MqttClientCtxDelete(void *cli_ctx);
 /** Set parameters in SL MQTT implementation.
  The caller must configure these paramters prior to invoking any MQTT
  transaction.
- 
+
  \note The implementation does not copy the contents referred. Therefore,
  the caller must ensure that contents are persistent in the memory.
- 
+
  \param[in] cli_ctx refers to the handle to the client context
  \param[in] param identifies parameter to set. Refer to @ref sl_mqtt_cl_params
  \param[in] value refers to the place-holder of value to be set
  \param[in] len length of the value of the parameter
- \return Success (0) or Failure (-1)          
+ \return Success (0) or Failure (-1)
  */
 _i32 sl_ExtLib_MqttClientSet(void *cli_ctx, _i32 param, const void *value,
         _u32 len);
@@ -329,29 +329,29 @@ _i32 sl_ExtLib_MqttClientSet(void *cli_ctx, _i32 param, const void *value,
  */
 _i32 sl_ExtLib_MqttClientGet(void *cli_ctx, _i32 param, void *value, _u32 len);
 
-/** CONNECT to the server. 
+/** CONNECT to the server.
  This routine establishes a connection with the server for MQTT transactions.
  The caller should specify a time-period with-in which the implementation
  should send a message to the server to keep-alive the connection.
- 
+
  \param[in] cli_ctx refers to the handle to the client context
  \param[in] clean assert to make a clean start and purge the previous session
  \param[in] keep_alive_time the maximum time within which client should send
  a message to server. The unit of the interval is in seconds.
  \return on success, variable header of CONNACK message in network byte
- order. Lowest Byte[Byte0] contains CONNACK Return Code. Byte1 Contains 
- Session Present Bit.  
+ order. Lowest Byte[Byte0] contains CONNACK Return Code. Byte1 Contains
+ Session Present Bit.
  on failure  returns(-1)
  */
 _i32 sl_ExtLib_MqttClientConnect(void *cli_ctx, bool clean,
         _u16 keep_alive_time);
 
 /** DISCONNECT from the server.
- The caller must use this service to close the connection with the 
+ The caller must use this service to close the connection with the
  server.
 
  \param[in] cli_ctx refers to the handle to the client context
- 
+
  \return Success (0) or Failure (< 0)
  */
 _i32 sl_ExtLib_MqttClientDisconnect(void *cli_ctx);
@@ -362,10 +362,10 @@ _i32 sl_ExtLib_MqttClientDisconnect(void *cli_ctx);
  caller can indicate whether the routine should block until a time, the
  message has been acknowledged by the server.
 
- In case, the app has chosen not to await for the ACK from the server, 
+ In case, the app has chosen not to await for the ACK from the server,
  the SL MQTT implementation will notify the app about the subscription
  through the callback routine.
- 
+
  \param[in] cli_ctx refers to the handle to the client context
  \param[in] topics set of topic names to subscribe. It is an array of
  pointers to NUL terminated strings.
@@ -373,7 +373,7 @@ _i32 sl_ExtLib_MqttClientDisconnect(void *cli_ctx);
  of the topic array. If configured to await for SUB-ACK from server, the
  array will contain qos responses for topics from the server.
  \param[in] count number of such topics
- 
+
  \return Success(transaction Message ID) or Failure(< 0)
  */
 _i32 sl_ExtLib_MqttClientSub(void *cli_ctx, char* const *topics, _u8 *qos,
@@ -385,16 +385,16 @@ _i32 sl_ExtLib_MqttClientSub(void *cli_ctx, char* const *topics, _u8 *qos,
  should block until a time, the message has been acknowleged by the
  server.
 
- In case, the app has chosen not to await for the ACK from the server, 
+ In case, the app has chosen not to await for the ACK from the server,
  the SL MQTT implementation will notify the app about the subscription
  through the callback routine.
- 
+
  \param[in] cli_ctx refers to the handle to the client context
  \param[in] topics set of topics to be unsubscribed. It is an array of
  pointers to NUL terminated strings.
  \param[in] count number of topics to be unsubscribed
 
- \return Success(transaction Message ID) or Failure(< 0) 
+ \return Success(transaction Message ID) or Failure(< 0)
  */
 _i32 sl_ExtLib_MqttClientUnsub(void *cli_ctx, char* const *topics, _i32 count);
 
@@ -402,8 +402,8 @@ _i32 sl_ExtLib_MqttClientUnsub(void *cli_ctx, char* const *topics, _i32 count);
  In addition to the PUBLISH specific parameters, the caller can indicate
  whether the routine should block until the time, the message has been
  acknowleged by the server. This is applicable only for non-QoS0 messages.
- 
- In case, the app has chosen not to await for the ACK from the server, 
+
+ In case, the app has chosen not to await for the ACK from the server,
  the SL MQTT implementation will notify the app about the subscription
  through the callback routine.
 
@@ -411,7 +411,7 @@ _i32 sl_ExtLib_MqttClientUnsub(void *cli_ctx, char* const *topics, _i32 count);
  \param[in] topic  topic of the data to be published. It is NULL terminated.
  \param[in] data   binary data to be published
  \param[in] len    length of the data
- \param[in] qos    QoS for the publish message 
+ \param[in] qos    QoS for the publish message
  \param[in] retain assert if server should retain the message
  \param[in] flags Command flag. Refer to @ref sl_mqtt_cl_cmdflags
  \return Success(transaction Message ID) or Failure(< 0)
@@ -428,8 +428,8 @@ static inline _i32 sl_ExtLib_MqttClientPub(void *cli_ctx, const char *topic,
 
 /** @} *//* End Client API */
 
-#ifdef __cplusplus  
+#ifdef __cplusplus
 }
-#endif  
+#endif
 
 #endif // __SL_MQTT_H__

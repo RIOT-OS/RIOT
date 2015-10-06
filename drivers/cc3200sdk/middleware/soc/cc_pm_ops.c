@@ -1,34 +1,34 @@
 //*****************************************************************************
 //
-// Copyright (C) 2014 Texas Instruments Incorporated - http://www.ti.com/ 
-// 
-// 
-//  Redistribution and use in source and binary forms, with or without 
-//  modification, are permitted provided that the following conditions 
+// Copyright (C) 2014 Texas Instruments Incorporated - http://www.ti.com/
+//
+//
+//  Redistribution and use in source and binary forms, with or without
+//  modification, are permitted provided that the following conditions
 //  are met:
 //
-//    Redistributions of source code must retain the above copyright 
+//    Redistributions of source code must retain the above copyright
 //    notice, this list of conditions and the following disclaimer.
 //
 //    Redistributions in binary form must reproduce the above copyright
-//    notice, this list of conditions and the following disclaimer in the 
-//    documentation and/or other materials provided with the   
+//    notice, this list of conditions and the following disclaimer in the
+//    documentation and/or other materials provided with the
 //    distribution.
 //
 //    Neither the name of Texas Instruments Incorporated nor the names of
 //    its contributors may be used to endorse or promote products derived
 //    from this software without specific prior written permission.
 //
-//  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
-//  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+//  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+//  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 //  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-//  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT 
-//  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
-//  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT 
+//  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+//  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+//  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
 //  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
 //  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-//  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
-//  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+//  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+//  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 //*****************************************************************************
@@ -155,7 +155,7 @@ static i32 check_n_setup_S3_wakeup_from_timer() {
             /* Get the time remaining in terms of slow clocks */
             scc_remaining = (scc_match - scc_curr);
             if (scc_remaining > WAKEUP_TIME_LPDS) {
-                /* Subtract the time it takes for wakeup 
+                /* Subtract the time it takes for wakeup
                  from S3 (LPDS) */
                 scc_remaining -= WAKEUP_TIME_LPDS;
                 scc_remaining =
@@ -253,7 +253,7 @@ static i32 check_n_setup_S4_wakeup_from_timer() {
             /* Get the time remaining in terms of slow clocks */
             scc_remaining = (scc_match - scc_curr);
             if (scc_remaining > WAKEUP_TIME_HIB) {
-                /* Subtract the time it takes for wakeup 
+                /* Subtract the time it takes for wakeup
                  from S4 (HIB) */
                 scc_remaining -= WAKEUP_TIME_HIB;
                 /* Setup the HIB wake time */
@@ -285,7 +285,7 @@ i32 cc_set_up_wkup_srcs(enum soc_pm target) {
     case e_pm_S1:
     case e_pm_S2:
         /* These handle the cases of run, sleep, deepsleep.
-         Wake source is configured outside this scope in 
+         Wake source is configured outside this scope in
          individual peripherals */
         break;
     case e_pm_S3:
@@ -334,7 +334,7 @@ void wake_interrupt_handler() {
     case PRCM_LPDS_HOST_IRQ:
         break;
     case PRCM_LPDS_GPIO:
-        /* Invoke the callback with the last GPIO num 
+        /* Invoke the callback with the last GPIO num
          used to enter LPDS (S3) */
         gpio_wake_interrupt_handler(&cc_pm_ctrl.spl_gpio_wakefrom_lpds);
         break;

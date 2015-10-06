@@ -1,34 +1,34 @@
 //*****************************************************************************
 //
-// Copyright (C) 2014 Texas Instruments Incorporated - http://www.ti.com/ 
-// 
-// 
-//  Redistribution and use in source and binary forms, with or without 
-//  modification, are permitted provided that the following conditions 
+// Copyright (C) 2014 Texas Instruments Incorporated - http://www.ti.com/
+//
+//
+//  Redistribution and use in source and binary forms, with or without
+//  modification, are permitted provided that the following conditions
 //  are met:
 //
-//    Redistributions of source code must retain the above copyright 
+//    Redistributions of source code must retain the above copyright
 //    notice, this list of conditions and the following disclaimer.
 //
 //    Redistributions in binary form must reproduce the above copyright
-//    notice, this list of conditions and the following disclaimer in the 
-//    documentation and/or other materials provided with the   
+//    notice, this list of conditions and the following disclaimer in the
+//    documentation and/or other materials provided with the
 //    distribution.
 //
 //    Neither the name of Texas Instruments Incorporated nor the names of
 //    its contributors may be used to endorse or promote products derived
 //    from this software without specific prior written permission.
 //
-//  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
-//  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+//  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+//  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 //  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-//  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT 
-//  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
-//  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT 
+//  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+//  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+//  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
 //  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
 //  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-//  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
-//  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+//  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+//  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 //*****************************************************************************
@@ -116,7 +116,7 @@ static i32 do_try_S4_no_irq() {
     /* Attempt to push HW modules into M4 state */
     i32 n_M4_drv = push_modules_to_M4_no_irq();
     if (pform->used_list_len != n_M4_drv) {
-        /* Failed to move all drivers to M4 state to enable system to 
+        /* Failed to move all drivers to M4 state to enable system to
          get to S4; now restore peripherals to their active state.
          */
         make_modules_to_M0_no_irq(pform->used_list_len);
@@ -290,7 +290,7 @@ static i32 do_try_S3_no_irq() {
     i32 retval;
 
     if (pform->used_list_len != n_M4_drv) {
-        /* Failed to move all drivers to M4 state to enable system to 
+        /* Failed to move all drivers to M4 state to enable system to
          get to S3; now restore peripherals to their active state.
          */
         make_modules_to_M0_no_irq(pform->used_list_len);
@@ -349,21 +349,21 @@ i32 try_S1_no_irq(void) {
 i32 idle_trace = 0;
 
 void cc_idle_task_pm(void) {
-    /* 
+    /*
      1. Interrupts are disabled to ensure atomic operations in system for
-     checking status and perform follow-up configurations. In other words, 
+     checking status and perform follow-up configurations. In other words,
      this arrangement avoids race conditions & supports synchronized flow
      for system commands such as WFI (from ARM) and custom ones (from TI).
      Of course, interrupts are enabled before function returns.
-     
-     2. Follows a orderly approach of trying to push system, first, into 
-     most least power state and if not possible, then to the next higher 
+
+     2. Follows a orderly approach of trying to push system, first, into
+     most least power state and if not possible, then to the next higher
      power state. Specifically, sequence is S4 -> S3 -> S2 -> S1.
 
      3. Importantly, this function will return, no sooner, SOC is woken-up
      from a low power state. This modus operandi ensures that a renewed or
      fresh assessment is made to push system to least possible power state,
-     after 
+     after
      */
     u32 intr_mask;
     intr_mask = pform->pm_ops->dsbl_sys_irq(); /* Disable interrupts */
@@ -397,7 +397,7 @@ i32 cc_pm_platform_ops_register(struct platform_pm_ops *pm_ops) {
         return -1; /* No low power state, then don't use framework */
     }
 
-    /* Atleast, one low power state is supported on platform, ensure 
+    /* Atleast, one low power state is supported on platform, ensure
      that all required operations have been provided */
     if ((NULL == pm_ops->set_up_wkup_srcs) || (NULL == pm_ops->handle_S3_wakeup)
             || (NULL == pm_ops->are_irqs_pending)

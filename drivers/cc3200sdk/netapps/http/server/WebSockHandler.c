@@ -261,9 +261,9 @@ int WSCore_DataRecv(UINT16 uConnection, struct HttpBlob * pData) {
 }
 
 /*!
- * 	\brief 						 Sends data to a websocket client								
+ * 	\brief 						 Sends data to a websocket client
  *
- * 	\param[in] uConnection			Connection number on HTTP server. 
+ * 	\param[in] uConnection			Connection number on HTTP server.
  * 	\param[in] PayLoad			Structure holding the payload data and the size of the data
  * 	\param[in] Opcode				User provides data type (text/binary/ping/pong/close).
  *

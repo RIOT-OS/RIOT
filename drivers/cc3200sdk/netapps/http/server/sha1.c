@@ -50,7 +50,7 @@ void GenerateHash(unsigned int uiConfig, unsigned char *puiKey1,
 
 //*****************************************************************************
 //
-//! SHAMD5IntHandler - Interrupt Handler which handles different interrupts from 
+//! SHAMD5IntHandler - Interrupt Handler which handles different interrupts from
 //! different sources
 //!
 //! \param None
@@ -92,7 +92,7 @@ void SHAMD5IntHandler(void) {
 //! GenerateHash - Generates the Hash value of the Plain Text
 //!
 //! \param uiConfig - Configuration Value
-//! \param puiKey1 - Key Used 
+//! \param puiKey1 - Key Used
 //! \param puiData - Plain Text used
 //! \param puiResult - Hash Value Generated
 //! \param uiDataLength - DataLength Used

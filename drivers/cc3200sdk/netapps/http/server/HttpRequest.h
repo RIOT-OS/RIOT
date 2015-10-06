@@ -51,7 +51,7 @@
 #define WS_BINARY						(0x02)
 ///Close connection with client
 #define WS_CLOSE						(0x08)
-///Ping 
+///Ping
 #define WS_PING							(0x09)
 ///Pong
 #define WS_PONG							(0x0A)

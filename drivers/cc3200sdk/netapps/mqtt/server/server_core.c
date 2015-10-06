@@ -38,14 +38,14 @@
  "abc/", "x/" and "1". Further, the association between the nodes is indicated
  as following.
 
- -- down link hierarchy -->      -- down link hierarchy --> 
+ -- down link hierarchy -->      -- down link hierarchy -->
  "abc/"                            "x/"                            "1"
  <-- up   link hierarchy --      <-- up   link hierarchy --
 
  To extend this example, another topic having a name "abc/y/2" will be managed
  as following.
- 
- -- down link hierarchy -->      -- down link hierarchy --> 
+
+ -- down link hierarchy -->      -- down link hierarchy -->
  "abc/"                            "x/"                            "1"
  <-- up   link hierarchy --      <-- up   link hierarchy --
  |   ^
@@ -54,7 +54,7 @@
  |   |
  V   |
  -- down link hierarchy -->
- "y/"                            "2" 
+ "y/"                            "2"
  <-- up   link hierarchy --
 
  To reduce wasted in byte alignments, the structure has been hand packed.
@@ -85,7 +85,7 @@ static struct topic_node {
 
 } nodes[MAX_TOP_NODES];
 
-/* 
+/*
  Housekeeping to manage subtopics (nodes) at run-time.
  */
 static struct _node_stack {
@@ -295,7 +295,7 @@ struct topic_node *nhbr_node_find(const struct topic_node *root_nh,
     return subtop_nhbr_node_find(root_nh, subtop, &next_subtop);
 }
 
-/* Find leaf node of branch-combo that matches complete 'topstr'. 
+/* Find leaf node of branch-combo that matches complete 'topstr'.
  Modus Operandi:  For each sub topic in 'topstr', go across neighbour list,
  then for matching neighbour node, make its child node as root of neighbour
  list for another iteration for next sub topic.
@@ -337,7 +337,7 @@ struct topic_node *leaf_node_find(const c8 *topstr) {
 
 static void try_node_delete(struct topic_node *node); /* Forward declaration */
 
-/* Create 'child only' hierarchy of nodes to hold all sub topics in 'topstr'. 
+/* Create 'child only' hierarchy of nodes to hold all sub topics in 'topstr'.
  The routine returns a start node of hierarchy and also provides leaf node.
  */
 static struct topic_node *hier_nodes_create(const c8 *topstr,
@@ -407,8 +407,8 @@ static inline void install_topic_root_node(struct topic_node *node) {
 }
 
 /* Create or update tree to create branch-combo to refer to 'topstr'.
- Modus operandi: 
- 
+ Modus operandi:
+
  */
 struct topic_node *topic_node_create(const c8 *topstr) {
     struct topic_node *base, *node, *leaf;

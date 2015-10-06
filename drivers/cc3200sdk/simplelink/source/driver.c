@@ -1,35 +1,35 @@
 /*
  * driver.c - CC31xx/CC32xx Host Driver Implementation
  *
- * Copyright (C) 2014 Texas Instruments Incorporated - http://www.ti.com/ 
- * 
- * 
- *  Redistribution and use in source and binary forms, with or without 
- *  modification, are permitted provided that the following conditions 
+ * Copyright (C) 2014 Texas Instruments Incorporated - http://www.ti.com/
+ *
+ *
+ *  Redistribution and use in source and binary forms, with or without
+ *  modification, are permitted provided that the following conditions
  *  are met:
  *
- *    Redistributions of source code must retain the above copyright 
+ *    Redistributions of source code must retain the above copyright
  *    notice, this list of conditions and the following disclaimer.
  *
  *    Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the 
- *    documentation and/or other materials provided with the   
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the
  *    distribution.
  *
  *    Neither the name of Texas Instruments Incorporated nor the names of
  *    its contributors may be used to endorse or promote products derived
  *    from this software without specific prior written permission.
  *
- *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
- *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- *  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT 
- *  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
- *  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT 
+ *  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ *  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ *  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
  *  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
  *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
- *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+ *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
@@ -48,7 +48,7 @@
 
 #define          _SL_PENDING_RX_MSG(pDriverCB)   (RxIrqCnt != (pDriverCB)->RxDoneCnt)
 
-/*  2 LSB of the N2H_SYNC_PATTERN are for sequence number 
+/*  2 LSB of the N2H_SYNC_PATTERN are for sequence number
  only in SPI interface
  support backward sync pattern */
 #define N2H_SYNC_PATTERN_SEQ_NUM_BITS            ((_u32)0x00000003) /* Bits 0..1    - use the 2 LBS for seq num */
@@ -68,8 +68,8 @@ _u8 _SlDrvProtectAsyncRespSetting(_u8 *pAsyncRsp, _u8 ActionID, _u8 SocketID);
     ( !(*((_u32 *)pBuf) & N2H_SYNC_PATTERN_SEQ_NUM_EXISTS) && ( MATCH_WOUT_SEQ_NUM(pBuf          ) ) )	   \
     )
 
-#define OPCODE(_ptr)          (((_SlResponseHeader_t *)(_ptr))->GenHeader.Opcode)         
-#define RSP_PAYLOAD_LEN(_ptr) (((_SlResponseHeader_t *)(_ptr))->GenHeader.Len - _SL_RESP_SPEC_HDR_SIZE)         
+#define OPCODE(_ptr)          (((_SlResponseHeader_t *)(_ptr))->GenHeader.Opcode)
+#define RSP_PAYLOAD_LEN(_ptr) (((_SlResponseHeader_t *)(_ptr))->GenHeader.Len - _SL_RESP_SPEC_HDR_SIZE)
 #define SD(_ptr)              (((_SocketAddrResponse_u *)(_ptr))->IpV4.sd)
 /*  Actual size of Recv/Recvfrom response data  */
 #define ACT_DATA_SIZE(_ptr)   (((_SocketAddrResponse_u *)(_ptr))->IpV4.statusOrLen)
@@ -566,7 +566,7 @@ void _SlDrvDriverCBDeinit() {
 }
 
 /*****************************************************************************
- _SlDrvRxIrqHandler - Interrupt handler 
+ _SlDrvRxIrqHandler - Interrupt handler
  *****************************************************************************/
 void _SlDrvRxIrqHandler(void *pValue) {
     sl_IfMaskIntHdlr();
@@ -598,7 +598,7 @@ _SlReturnVal_t _SlDrvCmdOp(_SlCmdCtrl_t *pCmdCtrl, void *pTxRxDescBuff,
 
     if (SL_OS_RET_CODE_OK == RetVal) {
 
-#ifndef SL_IF_TYPE_UART    
+#ifndef SL_IF_TYPE_UART
         /* Waiting for SPI to stabilize after first command */
         if (0 == gFirstCmdMode) {
             volatile _u32 CountVal = 0;
@@ -607,7 +607,7 @@ _SlReturnVal_t _SlDrvCmdOp(_SlCmdCtrl_t *pCmdCtrl, void *pTxRxDescBuff,
             while (CountVal--)
                 ;
         }
-#endif 
+#endif
         /* wait for respond */
         RetVal = _SlDrvMsgReadCmdCtx(); /* will free global lock */
         SL_TRACE0(DBG_MSG, MSG_314, "_SlDrvCmdOp: exited _SlDrvMsgReadCmdCtx");
@@ -907,10 +907,10 @@ _SlReturnVal_t _SlDrvMsgRead(void) {
         _SlDrvProtectionObjLockWaitForever();
 
         if (
-#ifndef SL_TINY_EXT               
+#ifndef SL_TINY_EXT
         (SL_OPCODE_SOCKET_ACCEPTASYNCRESPONSE == OpCode)
                 || (SL_OPCODE_SOCKET_ACCEPTASYNCRESPONSE_V6 == OpCode) ||
-#endif                
+#endif
                 (SL_OPCODE_SOCKET_CONNECTASYNCRESPONSE == OpCode)) {
             /* go over the active list if exist to find obj waiting for this Async event */
             sd = ((((_SocketResponse_t *) (pAsyncBuf + _SL_RESP_HDR_SIZE))->sd)
@@ -928,11 +928,11 @@ _SlReturnVal_t _SlDrvMsgRead(void) {
         case SL_OPCODE_SOCKET_RECVFROMASYNCRESPONSE:
             ExpArgSize = RECVFROM_IPV4_ARGS_SIZE;
             break;
-#ifndef SL_TINY_EXT                        
+#ifndef SL_TINY_EXT
         case SL_OPCODE_SOCKET_RECVFROMASYNCRESPONSE_V6:
             ExpArgSize = RECVFROM_IPV6_ARGS_SIZE;
             break;
-#endif                        
+#endif
         default:
             /* SL_OPCODE_SOCKET_RECVASYNCRESPONSE: */
             ExpArgSize = RECV_ARGS_SIZE;
@@ -1311,9 +1311,9 @@ void _SlDrvClassifyRxMsg(_SlOpcode_t Opcode) {
             RxMsgClass = DUMMY_MSG_CLASS;
         } else if ((SL_OPCODE_SOCKET_RECVASYNCRESPONSE == Opcode)
                 || (SL_OPCODE_SOCKET_RECVFROMASYNCRESPONSE == Opcode)
-#ifndef SL_TINY_EXT                      
+#ifndef SL_TINY_EXT
                 || (SL_OPCODE_SOCKET_RECVFROMASYNCRESPONSE_V6 == Opcode)
-#endif                    
+#endif
                 ) {
             RxMsgClass = RECV_RESP_CLASS;
         } else {
@@ -1336,7 +1336,7 @@ void _SlDrvClassifyRxMsg(_SlOpcode_t Opcode) {
                     || (SL_OPCODE_NETAPP_HTTPPOSTTOKENVALUE == Opcode)) {
                 AsyncEvtHandler = _SlDrvNetAppEventHandler;
             }
-#ifndef SL_TINY_EXT            
+#ifndef SL_TINY_EXT
             else if (SL_OPCODE_NETAPP_PINGREPORTREQUESTRESPONSE == Opcode) {
                 AsyncEvtHandler =
                         (_SlSpawnEntryFunc_t) _sl_HandleAsync_PingResponse;
@@ -1436,9 +1436,9 @@ _i16 _SlDrvBasicCmd(_SlOpcode_t Opcode) {
 }
 
 /*****************************************************************************
- _SlDrvCmdSend 
- Send SL command without waiting for command response 
- This function is unprotected and the caller should make 
+ _SlDrvCmdSend
+ Send SL command without waiting for command response
+ This function is unprotected and the caller should make
  sure global lock is active
  *****************************************************************************/
 _SlReturnVal_t _SlDrvCmdSend(_SlCmdCtrl_t *pCmdCtrl, void *pTxRxDescBuff,
@@ -1490,7 +1490,7 @@ _u8 _SlDrvWaitForPoolObj(_u8 ActionID, _u8 SocketID) {
         if (MAX_CONCURRENT_ACTIONS > g_pCB->ObjPool[CurrObjIndex].NextIndex) {
             g_pCB->FreePoolIdx = g_pCB->ObjPool[CurrObjIndex].NextIndex;
         } else
-#endif           
+#endif
         {
             /* No further free actions available */
             g_pCB->FreePoolIdx = MAX_CONCURRENT_ACTIONS;
@@ -1540,7 +1540,7 @@ _u8 _SlDrvWaitForPoolObj(_u8 ActionID, _u8 SocketID) {
 /*  _SlDrvReleasePoolObj */
 /* ******************************************************************************/
 void _SlDrvReleasePoolObj(_u8 ObjIdx) {
-#ifndef SL_TINY_EXT        
+#ifndef SL_TINY_EXT
     _u8 PendingIndex;
 #endif
 
@@ -1603,9 +1603,9 @@ void _SlDrvReleasePoolObj(_u8 ObjIdx) {
 /* _SlRemoveFromList  */
 /* ******************************************************************************/
 void _SlRemoveFromList(_u8 *ListIndex, _u8 ItemIndex) {
-#ifndef SL_TINY_EXT  
+#ifndef SL_TINY_EXT
     _u8 Idx;
-#endif        
+#endif
 
     if (MAX_CONCURRENT_ACTIONS == g_pCB->ObjPool[*ListIndex].NextIndex) {
         *ListIndex = MAX_CONCURRENT_ACTIONS;
@@ -1629,7 +1629,7 @@ void _SlRemoveFromList(_u8 *ListIndex, _u8 ItemIndex) {
             Idx = g_pCB->ObjPool[Idx].NextIndex;
         }
     }
-#endif    
+#endif
 }
 
 /* ******************************************************************************/
@@ -1640,7 +1640,7 @@ _SlReturnVal_t _SlFindAndSetActiveObj(_SlOpcode_t Opcode, _u8 Sd) {
 
     ActiveIndex = g_pCB->ActivePoolIdx;
     /* go over the active list if exist to find obj waiting for this Async event */
-#ifndef SL_TINY_EXT    
+#ifndef SL_TINY_EXT
     while (MAX_CONCURRENT_ACTIONS > ActiveIndex)
 #else
     /* Only one Active action is availabe in tiny mode, so we can replace the loop with if condition */

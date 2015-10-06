@@ -466,7 +466,7 @@ OsiReturnVal_e osi_Spawn(P_OSI_SPAWN_ENTRY pEntry, void* pValue,
 }
 
 /*!
- \brief 	This is the simplelink spawn task to call SL callback from a different context 
+ \brief 	This is the simplelink spawn task to call SL callback from a different context
 
  \param	pvParameters		-	pointer to the task parameter
 
@@ -631,8 +631,8 @@ void * mem_Malloc(unsigned long Size)
  \brief 	This function to call the memory de-allocation function of the FREERTOS
 
  \param	pMem		-	pointer to the memory which needs to be freed
- 
- \return - void 
+
+ \return - void
  \note
  \warning
  */
@@ -646,7 +646,7 @@ void mem_Free(void *pMem)
  \param	pBuf	     -	 pointer to the memory to be fill
  \param  Val          -   Value to be fill
  \param  Size         -   Size of the memory which needs to be fill
- \return - void 
+ \return - void
  \note
  \warning
  */
@@ -662,8 +662,8 @@ void mem_set(void *pBuf,int Val,size_t Size)
  \param	pDst	-	pointer to the destination
  \param pSrc     -   pointer to the source
  \param Size     -   Size of the memory which needs to be copy
- 
- \return - void 
+
+ \return - void
  \note
  \warning
  */
@@ -674,8 +674,8 @@ void mem_copy(void *pDst, void *pSrc,size_t Size)
 
 /*!
  \brief 	This function use to entering into critical section
- \param	void		
- \return - void 
+ \param	void
+ \return - void
  \note
  \warning
  */

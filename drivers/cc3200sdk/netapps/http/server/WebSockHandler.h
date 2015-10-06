@@ -45,9 +45,9 @@ int WSCore_DataRecv(UINT16 uConnection, struct HttpBlob* pData);
 void WSStatusString(UINT32 WSStatus, struct HttpBlob* status);
 
 /*!
- * 	\brief 						 Sends data to a websocket client . * 								
+ * 	\brief 						 Sends data to a websocket client . *
  *
- * 	\param[in] uConnection			Connection number on HTTP server. 
+ * 	\param[in] uConnection			Connection number on HTTP server.
  * 	\param[in] PayLoad			Structure holding the payload data and the size of the data
  * 	\param[in] Opcode				User provides data type (text/binary/ping/pong/close).
  *
@@ -78,7 +78,7 @@ long long Payloadlength(struct HttpBlob * pData, UINT8 iter);
  * 	\param[in] *ReadBuffer		Pointer to the buffer that holds the payload.
  *
  * 	\return					none.
- *     					
+ *
  */
 
 void WebSocketRecvEventHandler(UINT16 uConnection, char *ReadBuffer);

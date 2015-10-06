@@ -25,9 +25,9 @@ static int tftp6ReadPacket( TFTP *pTftp );
 static int tftp6ProcessPacket( TFTP *pTftp );
 static int tftp6Send( TFTP *pTftp);
 
-/** 
+/**
  *  @b Description
- *  @n  
+ *  @n
  *      The function sets up the initial socket for the TFTP transfer.
  *
  *  @param[in]  pTFTP
@@ -94,9 +94,9 @@ static int tftp6SocketSetup( TFTP *pTftp, UINT32 scope_id )
     return(rc);
 }
 
-/** 
+/**
  *  @b Description
- *  @n  
+ *  @n
  *      The function build an initial file request packet.
  *
  *  @param[in]  pTFTP
@@ -138,9 +138,9 @@ static void tftp6RRQBuild(TFTP *pTftp)
     return;
 }
 
-/** 
+/**
  *  @b Description
- *  @n  
+ *  @n
  *      The function build a TFTP Block ACK Packet.
  *
  *  @param[in]  pTFTP
@@ -166,9 +166,9 @@ static void tftp6ACKBuild(TFTP *pTftp)
     pTftp->Length = 4;//  Opcode + Block
 }
 
-/** 
+/**
  *  @b Description
- *  @n  
+ *  @n
  *      The function sends a pre-built packet to the peer.
  *
  *  @param[in]  pTFTP
@@ -194,9 +194,9 @@ static int tftp6Send( TFTP *pTftp)
     return(rc);
 }
 
-/** 
+/**
  *  @b Description
- *  @n  
+ *  @n
  *      The function reads a data packet from the peer.
  *
  *  @param[in]  pTFTP
@@ -263,9 +263,9 @@ static int tftp6ReadPacket( TFTP *pTftp )
     return(rc);
 }
 
-/** 
+/**
  *  @b Description
- *  @n  
+ *  @n
  *      The function flushes all packets which are pending on the receive
  *      socket.
  *
@@ -289,9 +289,9 @@ static void tftp6FlushPackets(TFTP *pTftp)
     }while( bytesread > 0 );
 }
 
-/** 
+/**
  *  @b Description
- *  @n  
+ *  @n
  *      The function attempts to resyn after a failed transfer.
  *
  *  @param[in]  pTftp
@@ -340,7 +340,7 @@ static int tftp6ReSync( TFTP *pTftp )
 
 /**
  *  @b Description
- *  @n  
+ *  @n
  *      The function processes a received data packet.
  *
  *  @param[in]  pTFTP
@@ -455,7 +455,7 @@ static int tftp6ProcessPacket( TFTP *pTftp )
 
 /**
  *  @b Description
- *  @n  
+ *  @n
  *      The function receives a file using TFTP.
  *
  *  @param[in]  pTFTP
@@ -515,7 +515,7 @@ static int tftp6GetFile( TFTP *pTftp )
 
 /**
  *  @b Description
- *  @n  
+ *  @n
  *      The function retreives a file using TFTP.
  *
  *  @param[in]  TftpIP

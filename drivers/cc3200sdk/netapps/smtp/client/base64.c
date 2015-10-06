@@ -29,7 +29,7 @@ static const char g_ccB64Tbl[64] =
 //!			pccInStr - Pointer to input string
 //!			iLen - Lenght of input string
 //!
-//! return 0 on success else -1 on failure 
+//! return 0 on success else -1 on failure
 //
 //****************************************************************************
 long ConvertToBase64(char *pcOutStr, const char *pccInStr, int iLen) {
@@ -42,7 +42,7 @@ long ConvertToBase64(char *pcOutStr, const char *pccInStr, int iLen) {
         return -1;
     }
 
-    //Loop in for Multiple of 24Bits and Convert to Base 64    
+    //Loop in for Multiple of 24Bits and Convert to Base 64
     for (iCount = 0; iLen - iCount >= 3; iCount += 3, pccIn += 3) {
         *pcOut++ = g_ccB64Tbl[pccIn[0] >> 2];
         *pcOut++ = g_ccB64Tbl[((pccIn[0] & 0x03) << 4) | (pccIn[1] >> 4)];

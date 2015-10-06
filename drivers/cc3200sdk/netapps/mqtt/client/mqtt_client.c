@@ -748,7 +748,7 @@ i32 mqtt_connect_msg_send(void *ctx, bool clean_session, u16 ka_secs) {
  To be used for the following messages: PUBLISH, SUBSCRIBE, UNSUBSCRIBE
  Dispatches msg to broker over socket. Frees-up MQP, in case, MSG has QoS0 or
  if client-lib allocated MQP encounters an error in dispatch.
- Returns, on success, number of bytes transfered, otherwise -1 
+ Returns, on success, number of bytes transfered, otherwise -1
  */
 static i32 _msg_dispatch(struct client_ctx *cl_ctx, struct mqtt_packet *mqp,
         enum mqtt_qos qos, bool retain) {
@@ -924,7 +924,7 @@ i32 mqtt_unsub_dispatch(void *ctx, struct mqtt_packet *mqp) {
 }
 
 /* Note: in this revision of implementation, vh_msg_send() is being invoked
- from a locked RX context. Should this situation change, so should the 
+ from a locked RX context. Should this situation change, so should the
  'locking' considerations in the routine. */
 static i32 vh_msg_send(struct client_ctx *cl_ctx, u8 msg_type,
         enum mqtt_qos qos, bool has_vh, u16 vh_data) {

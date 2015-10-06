@@ -1,35 +1,35 @@
 /*
  * netapp.h - CC31xx/CC32xx Host Driver Implementation
  *
- * Copyright (C) 2014 Texas Instruments Incorporated - http://www.ti.com/ 
- * 
- * 
- *  Redistribution and use in source and binary forms, with or without 
- *  modification, are permitted provided that the following conditions 
+ * Copyright (C) 2014 Texas Instruments Incorporated - http://www.ti.com/
+ *
+ *
+ *  Redistribution and use in source and binary forms, with or without
+ *  modification, are permitted provided that the following conditions
  *  are met:
  *
- *    Redistributions of source code must retain the above copyright 
+ *    Redistributions of source code must retain the above copyright
  *    notice, this list of conditions and the following disclaimer.
  *
  *    Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the 
- *    documentation and/or other materials provided with the   
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the
  *    distribution.
  *
  *    Neither the name of Texas Instruments Incorporated nor the names of
  *    its contributors may be used to endorse or promote products derived
  *    from this software without specific prior written permission.
  *
- *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
- *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- *  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT 
- *  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
- *  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT 
+ *  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ *  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ *  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
  *  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
  *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
- *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+ *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
@@ -73,7 +73,7 @@ extern "C" {
 
 #define MAX_ACTION_LEN                                (30)
     /* Important: in case the max len is changed, make sure the struct sl_NetAppHttpServerSendToken_t in protocol.h is padded correctly! */
-#define MAX_TOKEN_NAME_LEN                            (20)  
+#define MAX_TOKEN_NAME_LEN                            (20)
 #define MAX_TOKEN_VALUE_LEN        MAX_INPUT_STRING
 
 #define NETAPP_MAX_SERVICE_TEXT_SIZE                  (256)
@@ -112,13 +112,13 @@ extern "C" {
     /********************************************************************************************************/
     /* sl_NetAppDnsGetHostByName error codes     */
 
-#define SL_NET_APP_DNS_QUERY_NO_RESPONSE              (-159)  /* DNS query failed, no response                        */ 
-#define SL_NET_APP_DNS_NO_SERVER                      (-161)  /* No DNS server was specified                          */ 
+#define SL_NET_APP_DNS_QUERY_NO_RESPONSE              (-159)  /* DNS query failed, no response                        */
+#define SL_NET_APP_DNS_NO_SERVER                      (-161)  /* No DNS server was specified                          */
 #define SL_NET_APP_DNS_PARAM_ERROR                    (-162)  /* mDNS parameters error                                */
-#define SL_NET_APP_DNS_QUERY_FAILED                   (-163)  /* DNS query failed; no DNS server sent an 'answer'     */ 
+#define SL_NET_APP_DNS_QUERY_FAILED                   (-163)  /* DNS query failed; no DNS server sent an 'answer'     */
 #define SL_NET_APP_DNS_INTERNAL_1                     (-164)
 #define SL_NET_APP_DNS_INTERNAL_2                     (-165)
-#define SL_NET_APP_DNS_MALFORMED_PACKET               (-166)  /* Improperly formed or corrupted DNS packet received   */ 
+#define SL_NET_APP_DNS_MALFORMED_PACKET               (-166)  /* Improperly formed or corrupted DNS packet received   */
 #define SL_NET_APP_DNS_INTERNAL_3                     (-167)
 #define SL_NET_APP_DNS_INTERNAL_4                     (-168)
 #define SL_NET_APP_DNS_INTERNAL_5                     (-169)
@@ -147,7 +147,7 @@ extern "C" {
 #define SL_NET_APP_DNS_NO_CONFIGURATION_ERROR         (-209)
 
     /* Set Dev name error codes  (NETAPP_SET_GET_DEV_CONF_OPT_DEVICE_URN) */
-#define SL_ERROR_DEVICE_NAME_LEN_ERR                   (-117) 
+#define SL_ERROR_DEVICE_NAME_LEN_ERR                   (-117)
 #define SL_ERROR_DEVICE_NAME_INVALID                   (-118)
     /* Set domain name error codes (NETAPP_SET_GET_DEV_CONF_OPT_DOMAIN_NAME) */
 #define SL_ERROR_DOMAIN_NAME_LEN_ERR                   (-119)
@@ -162,7 +162,7 @@ extern "C" {
 #define SL_NET_APP_DNS_SERVER_ID                      (8)
 #define SL_NET_APP_DEVICE_CONFIG_ID                   (16)
     /* NetApp application set/get options */
-#define NETAPP_SET_DHCP_SRV_BASIC_OPT                 (0)             
+#define NETAPP_SET_DHCP_SRV_BASIC_OPT                 (0)
     /* HTTP server set/get options */
 #define NETAPP_SET_GET_HTTP_OPT_PORT_NUMBER           (0)
 #define NETAPP_SET_GET_HTTP_OPT_AUTH_CHECK            (1)
@@ -334,20 +334,20 @@ extern "C" {
      Gets and starts network application for the current WLAN mode
 
      \param[in] AppBitMap      application bitmap, could be one or combination of the following: \n
-     - SL_NET_APP_HTTP_SERVER_ID   
-     - SL_NET_APP_DHCP_SERVER_ID   
-     - SL_NET_APP_MDNS_ID          
+     - SL_NET_APP_HTTP_SERVER_ID
+     - SL_NET_APP_DHCP_SERVER_ID
+     - SL_NET_APP_MDNS_ID
 
      \return                   On error, negative number is returned
 
      \sa                       Stop one or more the above started applications using sl_NetAppStop
      \note                     This command activates the application for the current WLAN mode (AP or STA)
      \warning
-     \par                 Example:  
-     \code                
-     For example: Starting internal HTTP server + DHCP server: 
+     \par                 Example:
+     \code
+     For example: Starting internal HTTP server + DHCP server:
      sl_NetAppStart(SL_NET_APP_HTTP_SERVER_ID | SL_NET_APP_DHCP_SERVER_ID)
-     
+
      \endcode
      */
 #if _SL_INCLUDE_FUNC(sl_NetAppStart)
@@ -359,9 +359,9 @@ extern "C" {
      Gets and stops network application for the current WLAN mode
 
      \param[in] AppBitMap    application id, could be one of the following: \n
-     - SL_NET_APP_HTTP_SERVER_ID 
-     - SL_NET_APP_DHCP_SERVER_ID 
-     - SL_NET_APP_MDNS_ID 
+     - SL_NET_APP_HTTP_SERVER_ID
+     - SL_NET_APP_DHCP_SERVER_ID
+     - SL_NET_APP_MDNS_ID
 
      \return                 On error, negative number is returned
 
@@ -369,11 +369,11 @@ extern "C" {
      \note                This command disables the application for the current active WLAN mode (AP or STA)
      \warning
      \par                 Example:
-     \code                
-     
-     For example: Stopping internal HTTP server: 
-     sl_NetAppStop(SL_NET_APP_HTTP_SERVER_ID); 
-     
+     \code
+
+     For example: Stopping internal HTTP server:
+     sl_NetAppStop(SL_NET_APP_HTTP_SERVER_ID);
+
      \endcode
      */
 #if _SL_INCLUDE_FUNC(sl_NetAppStop)
@@ -397,23 +397,23 @@ extern "C" {
      SL_POOL_IS_EMPTY may be return in case there are no resources in the system
      In this case try again later or increase MAX_CONCURRENT_ACTIONS
      Possible DNS error codes:
-     - SL_NET_APP_DNS_QUERY_NO_RESPONSE       
-     - SL_NET_APP_DNS_NO_SERVER               
-     - SL_NET_APP_DNS_QUERY_FAILED            
-     - SL_NET_APP_DNS_MALFORMED_PACKET        
-     - SL_NET_APP_DNS_MISMATCHED_RESPONSE     
+     - SL_NET_APP_DNS_QUERY_NO_RESPONSE
+     - SL_NET_APP_DNS_NO_SERVER
+     - SL_NET_APP_DNS_QUERY_FAILED
+     - SL_NET_APP_DNS_MALFORMED_PACKET
+     - SL_NET_APP_DNS_MISMATCHED_RESPONSE
 
      \sa
      \note   Only one sl_NetAppDnsGetHostByName can be handled at a time.
      Calling this API while the same command is called from another thread, may result
      in one of the two scenarios:
      1. The command will wait (internal) until the previous command finish, and then be executed.
-     2. There are not enough resources and POOL_IS_EMPTY error will return. 
+     2. There are not enough resources and POOL_IS_EMPTY error will return.
      In this case, MAX_CONCURRENT_ACTIONS can be increased (result in memory increase) or try
      again later to issue the command.
      \warning
-     In case an IP address in a string format is set as input, without any prefix (e.g. "1.2.3.4") the device will not 
-     try to access the DNS and it will return the input address on the 'out_ip_addr' field 
+     In case an IP address in a string format is set as input, without any prefix (e.g. "1.2.3.4") the device will not
+     try to access the DNS and it will return the input address on the 'out_ip_addr' field
      \par  Example:
      \code
      _u32 DestinationIP;
@@ -474,12 +474,12 @@ extern "C" {
      \note         The returns attributes belongs to the first service found.
      There may be other services with the same service name that will response to the query.
      The results of these responses are saved in the peer cache of the Device and should be read by another API.
-     
+
      Only one sl_NetAppDnsGetHostByService can be handled at a time.
      Calling this API while the same command is called from another thread, may result
      in one of the two scenarios:
      1. The command will wait (internal) until the previous command finish, and then be executed.
-     2. There are not enough resources and SL_POOL_IS_EMPTY error will return. 
+     2. There are not enough resources and SL_POOL_IS_EMPTY error will return.
      In this case, MAX_CONCURRENT_ACTIONS can be increased (result in memory increase) or try
      again later to issue the command.
 
@@ -506,10 +506,10 @@ extern "C" {
      - Full service parameters.
      - Short service parameters (port and IP only) especially for tiny hosts.
 
-     The different types of struct are made to give the 
-     Possibility to save memory in the host 
+     The different types of struct are made to give the
+     Possibility to save memory in the host
 
-     
+
      The user also chose how many max services to get and start point index
      NWP peer cache.
      For example:
@@ -521,27 +521,27 @@ extern "C" {
      from index 6 are inserted into pBuffer (services that are in indexes 6,7).
 
      See below - command parameters.
-     
+
      \param[in] indexOffset - The start index in the peer cache that from it the first service is returned.
-     \param[in] MaxServiceCount - The Max services that can be returned if existed or if not exceed the max index 
+     \param[in] MaxServiceCount - The Max services that can be returned if existed or if not exceed the max index
      in the peer cache
-     \param[in] Flags - an ENUM number that means which service struct to use (means which types of service to fill)                                            
+     \param[in] Flags - an ENUM number that means which service struct to use (means which types of service to fill)
      - use SlNetAppGetFullServiceWithTextIpv4List_t
      - use SlNetAppGetFullServiceIpv4List_t
      - use SlNetAppGetShortServiceIpv4List_t
 
-     \param[out]  Buffer - The Services are inserted into this buffer. In the struct form according to the bit that is set in the Flags 
+     \param[out]  Buffer - The Services are inserted into this buffer. In the struct form according to the bit that is set in the Flags
      input parameter.
-     
-     \return    ServiceFoundCount - The number of the services that were inserted into the buffer. zero means no service is found 
+
+     \return    ServiceFoundCount - The number of the services that were inserted into the buffer. zero means no service is found
      negative number means an error
      \sa           sl_NetAppMDNSRegisterService
-     \note        
-     \warning 
+     \note
+     \warning
      if the out pBuffer size is bigger than an RX packet(1480), than
      an error is returned because there
      is no place in the RX packet.
-     The size is a multiply of MaxServiceCount and size of service struct(that is set 
+     The size is a multiply of MaxServiceCount and size of service struct(that is set
      according to flag value).
      */
 
@@ -562,7 +562,7 @@ extern "C" {
      The mDNS service that is to be unregistered is a service that the application no longer wishes to provide. \n
      The service name should be the full service name according to RFC
      of the DNS-SD - meaning the value in name field in the SRV answer.
-     
+
      Examples for service names:
      1. PC1._ipp._tcp.local
      2. PC2_server._ftp._tcp.local
@@ -571,11 +571,11 @@ extern "C" {
      Example for service name:
      1. PC1._ipp._tcp.local
      2. PC2_server._ftp._tcp.local
-     \param[in]    ServiceLen              The length of the service. 
-     \return    On success, zero is returned 
+     \param[in]    ServiceLen              The length of the service.
+     \return    On success, zero is returned
      \sa          sl_NetAppMDNSRegisterService
-     \note        
-     \warning 
+     \note
+     \warning
      The size of the service length should be smaller than 255.
      */
 #if _SL_INCLUDE_FUNC(sl_NetAppMDNSUnRegisterService)
@@ -586,7 +586,7 @@ extern "C" {
      \brief Register a new mDNS service
      \par
      This function registers a new mDNS service to the mDNS package and the DB.
-     
+
      This registered service is a service offered by the application.
      The service name should be full service name according to RFC
      of the DNS-SD - meaning the value in name field in the SRV answer.
@@ -618,7 +618,7 @@ extern "C" {
 
      \return     On success, zero is returned
      Possible error codes:
-     - Maximum advertise services are already configured. 
+     - Maximum advertise services are already configured.
      Delete another existed service that is registered and then register again the new service
      - Trying to register a service that is already exists
      - Trying to delete service that does not existed
@@ -630,11 +630,11 @@ extern "C" {
      - mDNS internal cache error
      - mDNS internal error
      - Adding a service is not allowed as it is already exist (duplicate service)
-     - mDNS is not running                    
+     - mDNS is not running
      - Host name error. Host name format is not allowed according to RFC 1033,1034,1035, 6763
      - List size buffer is bigger than internally allowed in the NWP (API get service list),
      change the APIs� parameters to decrease the size of the list
-     
+
 
      \sa              sl_NetAppMDNSUnRegisterService
 
@@ -664,9 +664,9 @@ extern "C" {
      \param[in]   pPingParams     Pointer to the ping request structure: \n
      - if flags parameter is set to 0, ping will report back once all requested pings are done (as defined by TotalNumberOfAttempts). \n
      - if flags parameter is set to 1, ping will report back after every ping, for TotalNumberOfAttempts.
-     - if flags parameter is set to 2, ping will stop after the first successful ping, and report back for the successful ping, as well as any preceding failed ones. 
+     - if flags parameter is set to 2, ping will stop after the first successful ping, and report back for the successful ping, as well as any preceding failed ones.
      For stopping an ongoing ping activity, set parameters IP address to 0
-     
+
      \param[in]   family          SL_AF_INET or  SL_AF_INET6
      \param[out]  pReport         Ping pReport
      \param[out]  pCallback       Callback function upon completion.
@@ -682,35 +682,35 @@ extern "C" {
      Calling this API while the same command is called from another thread, may result
      in one of the two scenarios:
      1. The command will wait (internal) until the previous command finish, and then be executed.
-     2. There are not enough resources and SL_POOL_IS_EMPTY error will return. 
+     2. There are not enough resources and SL_POOL_IS_EMPTY error will return.
      In this case, MAX_CONCURRENT_ACTIONS can be increased (result in memory increase) or try
      again later to issue the command.
-     \warning  
+     \warning
      \par      Example:
-     \code     
-     
-     An example of sending 20 ping requests and reporting results to a callback routine when 
+     \code
+
+     An example of sending 20 ping requests and reporting results to a callback routine when
      all requests are sent:
 
      // callback routine
      void pingRes(SlPingReport_t* pReport)
      {
-     // handle ping results 
+     // handle ping results
      }
-     
+
      // ping activation
      void PingTest()
      {
      SlPingReport_t report;
      SlPingStartCommand_t pingCommand;
-     
+
      pingCommand.Ip = SL_IPV4_VAL(10,1,1,200);     // destination IP address is 10.1.1.200
-     pingCommand.PingSize = 150;                   // size of ping, in bytes 
+     pingCommand.PingSize = 150;                   // size of ping, in bytes
      pingCommand.PingIntervalTime = 100;           // delay between pings, in milliseconds
      pingCommand.PingRequestTimeout = 1000;        // timeout for every ping in milliseconds
-     pingCommand.TotalNumberOfAttempts = 20;       // max number of ping requests. 0 - forever 
+     pingCommand.TotalNumberOfAttempts = 20;       // max number of ping requests. 0 - forever
      pingCommand.Flags = 0;                        // report only when finished
-     
+
      sl_NetAppPingStart( &pingCommand, SL_AF_INET, &report, pingRes ) ;
      }
 
@@ -760,9 +760,9 @@ extern "C" {
      \par
      \code
      Set DHCP Server (AP mode) parameters example:
-     
-     SlNetAppDhcpServerBasicOpt_t dhcpParams; 
-     _u8 outLen = sizeof(SlNetAppDhcpServerBasicOpt_t); 
+
+     SlNetAppDhcpServerBasicOpt_t dhcpParams;
+     _u8 outLen = sizeof(SlNetAppDhcpServerBasicOpt_t);
      dhcpParams.lease_time      = 4096;                         // lease time (in seconds) of the IP Address
      dhcpParams.ipv4_addr_start =  SL_IPV4_VAL(192,168,1,10);   // first IP Address for allocation. IP Address should be set as Hex number - i.e. 0A0B0C01 for (10.11.12.1)
      dhcpParams.ipv4_addr_last  =  SL_IPV4_VAL(192,168,1,16);   // last IP Address for allocation. IP Address should be set as Hex number - i.e. 0A0B0C01 for (10.11.12.1)
@@ -772,10 +772,10 @@ extern "C" {
      \endcode
      \code
      Set Device URN name example:
-     
-     Device name, maximum length of 33 characters 
+
+     Device name, maximum length of 33 characters
      Device name affects URN name, own SSID name in AP mode, and WPS file "device name" in WPS I.E (STA-WPS / P2P)
-     In case no device URN name set, the default name is "mysimplelink" 
+     In case no device URN name set, the default name is "mysimplelink"
      Allowed characters in device name are: 'a - z' , 'A - Z' , '0-9' and '-'
 
      _u8 *my_device = "MY-SIMPLELINK-DEV";
@@ -837,22 +837,22 @@ extern "C" {
      SlNetAppDhcpServerBasicOpt_t dhcpParams;
      _u8 outLen = sizeof(SlNetAppDhcpServerBasicOpt_t);
      sl_NetAppGet(SL_NET_APP_DHCP_SERVER_ID, NETAPP_SET_DHCP_SRV_BASIC_OPT, &outLen, (_u8* )&dhcpParams);
-     
-     printf("DHCP Start IP %d.%d.%d.%d End IP %d.%d.%d.%d Lease time seconds %d\n",                                                           
+
+     printf("DHCP Start IP %d.%d.%d.%d End IP %d.%d.%d.%d Lease time seconds %d\n",
      SL_IPV4_BYTE(dhcpParams.ipv4_addr_start,3),SL_IPV4_BYTE(dhcpParams.ipv4_addr_start,2),
-     SL_IPV4_BYTE(dhcpParams.ipv4_addr_start,1),SL_IPV4_BYTE(dhcpParams.ipv4_addr_start,0), 
+     SL_IPV4_BYTE(dhcpParams.ipv4_addr_start,1),SL_IPV4_BYTE(dhcpParams.ipv4_addr_start,0),
      SL_IPV4_BYTE(dhcpParams.ipv4_addr_last,3),SL_IPV4_BYTE(dhcpParams.ipv4_addr_last,2),
-     SL_IPV4_BYTE(dhcpParams.ipv4_addr_last,1),SL_IPV4_BYTE(dhcpParams.ipv4_addr_last,0),         
-     dhcpParams.lease_time);    
+     SL_IPV4_BYTE(dhcpParams.ipv4_addr_last,1),SL_IPV4_BYTE(dhcpParams.ipv4_addr_last,0),
+     dhcpParams.lease_time);
      \endcode
      \code
      Get Device URN name example:
-     Maximum length of 33 characters of device name. 
+     Maximum length of 33 characters of device name.
      Device name affects URN name, own SSID name in AP mode, and WPS file "device name" in WPS I.E (STA-WPS / P2P)
-     in case no device URN name set, the default name is "mysimplelink" 
+     in case no device URN name set, the default name is "mysimplelink"
 
      _u8 my_device_name[35];
-     sl_NetAppGet (SL_NET_APP_DEVICE_CONFIG_ID, NETAPP_SET_GET_DEV_CONF_OPT_DEVICE_URN, strlen(my_device_name), (_u8 *)my_device_name); 
+     sl_NetAppGet (SL_NET_APP_DEVICE_CONFIG_ID, NETAPP_SET_GET_DEV_CONF_OPT_DEVICE_URN, strlen(my_device_name), (_u8 *)my_device_name);
      \endcode
      */
 #if _SL_INCLUDE_FUNC(sl_NetAppGet)

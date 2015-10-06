@@ -16,7 +16,7 @@
 // Protocol Overview -  The Hypertext Transfer Protocol (HTTP) is an application-level
 //                                            protocol for distributed, collaborative, hypermedia information
 //                                           systems.
-//                           Refer: https://www.ietf.org/rfc/rfc2616.txt 
+//                           Refer: https://www.ietf.org/rfc/rfc2616.txt
 //*****************************************************************************
 
 /**
@@ -52,7 +52,7 @@
 
 OsiSyncObj_t g_WaitSyncObj;
 
-#define OSI_DELAY(x)    osi_Sleep(x) 
+#define OSI_DELAY(x)    osi_Sleep(x)
 
 /**
  * @addtogroup HttpCore

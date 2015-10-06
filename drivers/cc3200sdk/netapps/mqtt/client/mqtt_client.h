@@ -15,7 +15,7 @@
 
 /*
  mqtt_client.h
- 
+
  This module enumerates the public interfaces / API of the MQTT Client
  Library.
  */
@@ -42,7 +42,7 @@
  networking world, and can be easily adapted to the target platforms.
 
  The services of the library are multi-task safe. Platform specific atomicity
- constructs are used, through abstractions, by the library to maintain data 
+ constructs are used, through abstractions, by the library to maintain data
  coherency and synchronization. In addition, the library can be configured to
  support several in-flight messages.
 
@@ -61,14 +61,14 @@
  packets to / from the server. Among several features supported by the client
  LIB, the 'context' manages the keep-alive mechanism by automatically sending
  PING request to the server, if there has been no other packet send to the
- server with the keep-alive duration. 
- 
+ server with the keep-alive duration.
+
  @note Any future extensions & development must follow the following guidelines.
  A new API or an extension to the existing API
  a) must be rudimentary
  b) must not imply a rule or policy (including a state machine)
  b) must ensure simple design and implementation
- 
+
  */
 
 #include "mqtt_common.h"
@@ -93,11 +93,11 @@ u16 mqtt_client_new_msg_id(void);
 /** Ascertain whether connection / session with the server is active or not.
  Prior to sending out any information any message to server, the application
  can use this routine to check the status of the connection. If connection
- does not exist, then client should first CONNECT to the broker. 
+ does not exist, then client should first CONNECT to the broker.
 
  A connection to server could have been closed unsolicitedly either due to
  keep alive time-out or due to error in RX / TX transactions.
- 
+
  @note this API does not refer to network layer connection
 
  @param[in] ctx handle to the underlying network context in the LIB
@@ -169,7 +169,7 @@ i32 mqtt_client_pub_msg_send(void *ctx, const struct utf8_string *topic,
 /** Dispatch application constructed PUBLISH message to the server.
  Prior to sending the message to the server, this routine will prepare a fixed
  header to account for the size of the contents and the flags that have been
- indicated by the caller. 
+ indicated by the caller.
 
  After the packet has been sent to the server, if the associated QoS of the
  dispatched packet is ether level 1 or 2, the client LIB 'context' will then
@@ -186,7 +186,7 @@ i32 mqtt_client_pub_msg_send(void *ctx, const struct utf8_string *topic,
  dropped.
 
  The caller must populate the payload information with topic and data before
- invoking this service. 
+ invoking this service.
 
  This service facilitates direct writing of topic and (real-time) payload data
  into the buffer, thereby, avoiding power consuming and wasteful intermediate
@@ -210,7 +210,7 @@ i32 mqtt_client_pub_dispatch(void *ctx, struct mqtt_packet *mqp,
 /** Send a SUBSCRIBE message to the server (and don't wait for SUBACK).
  This routine creates a SUBSCRIBE message in an internally allocated packet
  buffer by embedding the 'qos_topics', then prepares the message header and
- finally, dispatches the packet to the server. 
+ finally, dispatches the packet to the server.
 
  After the packet has been dispatched to the server, the library will store
  the packet until the time, a corresponding SUB-ACK has been received from
@@ -241,7 +241,7 @@ i32 mqtt_sub_msg_send(void *ctx, const struct utf8_strqos *qos_topics,
 
 /** Dispatch application constructed SUSBSCRIBE message to the server.
  Prior to sending the message to the server, this routine will prepare a fixed
- header to account for the size of the size of the contents. 
+ header to account for the size of the size of the contents.
 
  After the packet has been dispatched to the server, the library will store
  the packet until the time, a corresponding SUB-ACK has been received from
@@ -261,7 +261,7 @@ i32 mqtt_sub_msg_send(void *ctx, const struct utf8_strqos *qos_topics,
  then references to all the stored SUBSCRIBE messages, if any, are dropped.
 
  The caller must populate the payload information of topic along with qos
- before invoking this service. 
+ before invoking this service.
 
  This service facilitates direct writing of topic and (real-time) payload data
  into the buffer, thereby, avoiding power consuming and wasteful intermediate
@@ -281,7 +281,7 @@ i32 mqtt_sub_dispatch(void *ctx, struct mqtt_packet *mqp);
 
 /** Send an UNSUBSCRIBE message to the server (and don't wait for UNSUBACK).
  This routine creates an UNSUBSCRIBE message in an internally allocated packet
- buffer by embedding the 'topics', then prepares the message header and 
+ buffer by embedding the 'topics', then prepares the message header and
  finally, dispatches the packet to the server.
 
  After the packet has been dispatched to the server, the library will store
@@ -311,9 +311,9 @@ i32 mqtt_sub_dispatch(void *ctx, struct mqtt_packet *mqp);
  */
 i32 mqtt_unsub_msg_send(void *ctx, const struct utf8_string *topics, u32 count);
 
-/** Dispatch application constructed UNSUSBSCRIBE message to the server. 
+/** Dispatch application constructed UNSUSBSCRIBE message to the server.
  Prior to sending the message to the server, this routine will prepare a fixed
- header to account for the size of the size of the contents. 
+ header to account for the size of the size of the contents.
 
  After the packet has been dispatched to the server, the library will store
  the packet until the time, a corresponding UNSUB-ACK has been received from
@@ -334,7 +334,7 @@ i32 mqtt_unsub_msg_send(void *ctx, const struct utf8_string *topics, u32 count);
  are dropped.
 
  The caller must populate the payload information of topics before invoking
- this service. 
+ this service.
 
  This service facilitates direct writing of topic and (real-time) payload data
  into the buffer, thereby, avoiding power consuming and wasteful intermediate
@@ -377,7 +377,7 @@ i32 mqtt_disconn_send(void *ctx);
  dispatch the next packet. In such a scenario, the network layer sends the
  first part (segment) of the scheduled message in the mqtt_xxx_send() API and
  the subsequent parts or the segments are sent using this routine.
- 
+
  This routine is not applicable to the platforms or the scenarios, where the
  implementation of the platform can segment the MQTT message in a manner to
  schedule consercutive or back-to-back blocking socket transactions.
@@ -430,7 +430,7 @@ i32 mqtt_client_send_progress(void *ctx);
  This service is valid only for the configuration, where the application has
  not provided the callbacks to the client LIB 'context'. The caller must
  provide a packet buffer of adequate size to hold the expected message from
- the server. 
+ the server.
 
  The wait time implies the maximum intermediate duration between the reception
  of two successive messages from the server. If no message is received before
@@ -475,7 +475,7 @@ static inline i32 mqtt_client_ctx_recv(void *ctx, struct mqtt_packet *mqp,
 
  This routine yields the control back to the application after the duration
  of the wait time. Such an arrangement enable the application to make overall
- progress to meet its intended functionality. 
+ progress to meet its intended functionality.
 
  The wait time implies the maximum intermediate duration between the reception
  of two successive messages from the server. If no message is received before
@@ -487,7 +487,7 @@ static inline i32 mqtt_client_ctx_recv(void *ctx, struct mqtt_packet *mqp,
  @see mqtt_client_ctx_create
  @param[in] wait_secs maximum time to wait for a message from the server
 
- @return MQP_ERR_NOTCONN if MQTT connection is closed by the application, 
+ @return MQP_ERR_NOTCONN if MQTT connection is closed by the application,
  MQP_ERR_TIMEOUT if there was no MQTT transaction in the interval of wait time
  and other values (@ref lib_err_group)
  */
@@ -527,7 +527,7 @@ i32 mqtt_client_await_msg(struct mqtt_packet *mqp, u32 wait_secs, void **app);
 
  This routine yields the control back to the application after the specified
  duration of wait time. Such an arrangement enable the application to
- make overall progress to meet it intended functionality. 
+ make overall progress to meet it intended functionality.
 
  The wait time implies the maximum intermediate duration between the reception
  of two successive messages from the server. If no message is received before
@@ -583,7 +583,7 @@ static inline struct mqtt_packet *mqp_client_recv_alloc(u8 msg_type) {
     return mqp_client_alloc(msg_type, 0);
 }
 
-/** Create a pool of MQTT Packet Buffers for the client library. 
+/** Create a pool of MQTT Packet Buffers for the client library.
  This routine creates a pool of free MQTT Packet Buffers by attaching a buffer
  (buf) to a packet holder (mqp). The count of mqp elements and buf elements in
  the routine are same. And the size of the buffer in constant across all the
@@ -691,7 +691,7 @@ i32 mqtt_client_net_svc_register(const struct device_net_services *net);
 #define MQP_CONNACK_SP(mqp)    (mqp->buffer[2] & 0x1) /**< CONNACK MQP:: \
                                                          Session Bit */
 
-#define VHB_CONNACK_VH16(vh_buf)((vh_buf[0] << 8) | vh_buf[1]) 
+#define VHB_CONNACK_VH16(vh_buf)((vh_buf[0] << 8) | vh_buf[1])
 #define MQP_CONNACK_VH16(mqp)   ((mqp->buffer[2] << 8) | mqp->buffer[3])
 
 /** Callbacks to be invoked by MQTT Client library onto Client application */
@@ -742,7 +742,7 @@ struct mqtt_client_ctx_cbs {
 
      @param[in] app application to which this ACK message is targeted
      @see mqtt_client_ctx_create
-     @param[in] msg_type Type of the MQTT messsage 
+     @param[in] msg_type Type of the MQTT messsage
      @param[in] msg_id transaction identity of the message
      @param[in] buf refers to contents of message and depends on msg_type
      @param[in] len length of the buf
@@ -751,8 +751,8 @@ struct mqtt_client_ctx_cbs {
      @note The size of the buf parameter i.e len is non-zero for the
      SUBACK and CONNACK messages. For SUBACK the buf carries an array of
      QOS responses provided by the server. For CONNACK, the buf carries
-     variable header contents. Helper macro VHB_CONNACK_RC( ) and 
-     VHB_CONNACK_SP( ) can be used to access contents provided by the 
+     variable header contents. Helper macro VHB_CONNACK_RC( ) and
+     VHB_CONNACK_SP( ) can be used to access contents provided by the
      server. For all other messages, the value of len parameter is zero.
 
      @note The parameter msg_id is not relevant for the messages CONNACK
@@ -762,7 +762,7 @@ struct mqtt_client_ctx_cbs {
 
     /** Notifies the client application about the termination of connection
      with the server. After servicing this callback, the application can
-     destroy associated context if it no longer required 
+     destroy associated context if it no longer required
 
      @param[in] app application whose connection got terminated
      @see mqtt_client_ctx_create
@@ -804,7 +804,7 @@ struct mqtt_client_ctx_cfg {
  the network connection with a MQTT server / broker. As part of the creation
  of a context, the implementation also records the handle, if provided, by
  the application. In addition, the invoker of the routine must facilitate a
- place holder to enable the client LIB to provision the reference to the 
+ place holder to enable the client LIB to provision the reference to the
  'context', so created.
 
  Specifically, this routine associates or ties-up, in an one-to-one manner,
@@ -831,7 +831,7 @@ struct mqtt_client_ctx_cfg {
  the application, as and when, packets arrive from the server. And such
  applications must provide the callback routines.
 
- @param[in] ctx_cfg configuration information for the Network Context. 
+ @param[in] ctx_cfg configuration information for the Network Context.
  @param[in] ctx_cbs callback routines. Must be set to NULL, if the application
  intends to operate the context in the sync-wait / explicit receive mode.
  @param[in] app     handle to application. Returned by LIB in other routines

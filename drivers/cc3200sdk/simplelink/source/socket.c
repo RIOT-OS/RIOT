@@ -1,35 +1,35 @@
 /*
  * socket.c - CC31xx/CC32xx Host Driver Implementation
  *
- * Copyright (C) 2014 Texas Instruments Incorporated - http://www.ti.com/ 
- * 
- * 
- *  Redistribution and use in source and binary forms, with or without 
- *  modification, are permitted provided that the following conditions 
+ * Copyright (C) 2014 Texas Instruments Incorporated - http://www.ti.com/
+ *
+ *
+ *  Redistribution and use in source and binary forms, with or without
+ *  modification, are permitted provided that the following conditions
  *  are met:
  *
- *    Redistributions of source code must retain the above copyright 
+ *    Redistributions of source code must retain the above copyright
  *    notice, this list of conditions and the following disclaimer.
  *
  *    Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the 
- *    documentation and/or other materials provided with the   
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the
  *    distribution.
  *
  *    Neither the name of Texas Instruments Incorporated nor the names of
  *    its contributors may be used to endorse or promote products derived
  *    from this software without specific prior written permission.
  *
- *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
- *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- *  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT 
- *  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
- *  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT 
+ *  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ *  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ *  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
  *  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
  *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
- *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+ *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
@@ -105,7 +105,7 @@ void _sl_BuildAddress(const SlSockAddr_t *addr, _SocketAddrCommand_u *pCmd) {
 }
 
 /*****************************************************************************
- _sl_TruncatePayloadByProtocol 
+ _sl_TruncatePayloadByProtocol
  *****************************************************************************/
 _u16 _sl_TruncatePayloadByProtocol(const _i16 sd, const _u16 length) {
     unsigned int maxLength;
@@ -239,7 +239,7 @@ _i16 sl_Bind(_i16 sd, const SlSockAddr_t *addr, _i16 addrlen)
         CmdCtrl.Opcode = SL_OPCODE_SOCKET_BIND;
         CmdCtrl.TxDescLen = sizeof(_SocketAddrIPv4Command_t);
         break;
-#ifndef SL_TINY_EXT            
+#ifndef SL_TINY_EXT
         case SL_AF_INET6_EUI_48:
         CmdCtrl.Opcode = SL_OPCODE_SOCKET_BIND_V6;
         CmdCtrl.TxDescLen = sizeof(_SocketAddrIPv6EUI48Command_t);
@@ -296,7 +296,7 @@ _i16 sl_SendTo(_i16 sd, const void *pBuf, _i16 Len, _i16 flags, const SlSockAddr
         CmdCtrl.Opcode = SL_OPCODE_SOCKET_SENDTO;
         CmdCtrl.TxDescLen = sizeof(_SocketAddrIPv4Command_t);
         break;
-#ifndef SL_TINY_EXT            
+#ifndef SL_TINY_EXT
         case SL_AF_INET6_EUI_48:
         CmdCtrl.Opcode = SL_OPCODE_SOCKET_BIND_V6;
         CmdCtrl.TxDescLen = sizeof(_SocketAddrIPv6EUI48Command_t);
@@ -708,7 +708,7 @@ _i16 sl_Accept(_i16 sd, SlSockAddr_t *addr, SlSocklen_t *addrlen) {
                 }
             }
 #endif
-#endif			
+#endif
         }
     }
 

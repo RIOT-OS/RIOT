@@ -79,7 +79,7 @@
 #include "xmpp.h"
 
 //****************************************************************************
-//                          LOCAL DEFINES                                   
+//                          LOCAL DEFINES
 //****************************************************************************
 #define XMPP_RESOURCE "Work"
 
@@ -152,7 +152,7 @@ int g_FirstClientConnect = 0;
 //*****************************************************************************
 
 //****************************************************************************
-//                      LOCAL FUNCTION PROTOTYPES                           
+//                      LOCAL FUNCTION PROTOTYPES
 //****************************************************************************
 void _SlXmppConnectionSM(void);
 int _SlValidateServerInfo(void);
@@ -169,7 +169,7 @@ int _SlXMPPSessionConfig(void);
 //!		2. XMPP user's password
 //!		3. XMPP domian
 //!		4. XMPP resources
-//!		5. Advance options like security method, port		
+//!		5. Advance options like security method, port
 //!
 //! \param 	AppId - Application ID
 //!			Option - Option that need to set

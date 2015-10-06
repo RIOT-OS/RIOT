@@ -43,22 +43,22 @@ extern "C" {
 
 /*!
  \brief Commits the newly downloaded images (MCU and NWP)
- 
- \param[in] CommitFlag     Commit flag 
- 
- This function Commits the newly downloaded images for MCU and NWP. After 
- downloading new images, the system is booted in test mode with newly 
- downloaded images. The image(s) should self test and call this function 
+
+ \param[in] CommitFlag     Commit flag
+
+ This function Commits the newly downloaded images for MCU and NWP. After
+ downloading new images, the system is booted in test mode with newly
+ downloaded images. The image(s) should self test and call this function
  with appropriate \e CommitFlag to commit or reject the update.
 
  The parameter \e CommitFlag can be one of the following: \
-	
+
  \b FLC_COMMITED \n
  \b FLC_NOT_COMMITED \n
- 
+
  \return  Bitmap of reset recommendation to the host: \b FLC_TEST_RESET_MCU
  or \b FLC_TEST_RESET_NWP
- 
+
  \sa
  \note
  \warning
@@ -92,18 +92,18 @@ _i32 sl_extlib_FlcCommit(_i32 CommitFlag);
  \brief Set the system to boot in test mode for new downloaded images
 
  \param[in] flags     Test flags
- 
- This function sets the system to boot in test mode during next boot. The 
+
+ This function sets the system to boot in test mode during next boot. The
  parameter \e flags can be logical OR of one or more of the following:
  \b FLC_TEST_RESET_MCU - There is a new image for testing require a restart
  \b FLC_TEST_RESET_MCU_WITH_APP - There is a new MCU for testing.
  \b FLC_TEST_RESET_NWP - There is a new NWP for testing.
- 
- Use FLC_TEST_RESET_MCU when there is a new image/file but no update to  
- MCU application image is required, use FLC_TEST_RESET_MCU_WITH_APP 
+
+ Use FLC_TEST_RESET_MCU when there is a new image/file but no update to
+ MCU application image is required, use FLC_TEST_RESET_MCU_WITH_APP
  otherwise.
 
- \return	Bitmap of reset recommendation to the host: \b FLC_TEST_RESET_MCU 
+ \return	Bitmap of reset recommendation to the host: \b FLC_TEST_RESET_MCU
  or \b FLC_TEST_RESET_NWP
 
  \sa
@@ -145,18 +145,18 @@ _i32 sl_extlib_FlcIsPendingCommit(void);
 
 /*!
  \brief Open file for write
- 
+
  \param[in]  file_name	 File name
  \param[in]  file_size	 Max size to be allocated for this file
  \param[in]  ulToken		 Reserved for future use. Use NULL
  \param[out] lFileHandle  File handle
  \param[in]  open_flags   File open flags
- 
- 
- Opens a file for write. In case of OTA MCU (mcuimgA.bin), this function 
- takes care of renaming it to alternate image (mcuimg2.bin or mcuimg3.bin ) 
+
+
+ Opens a file for write. In case of OTA MCU (mcuimgA.bin), this function
+ takes care of renaming it to alternate image (mcuimg2.bin or mcuimg3.bin )
  name base on the boot info file.
- 
+
  See SL_HOST sl_FsOpen documentation for more details on flags
 
  \return  Returns 0 on success, negative error number otherwise.
@@ -171,7 +171,7 @@ _i32 sl_extlib_FlcOpenFile(_u8 *file_name, _i32 file_size, _u32 *ulToken,
  \param[in] offset		Offset to specific block to be read
  \param[in] buf			Pointer the data to be read
  \param[in] len			Length of the data in bytes
- 
+
  This function reads \e len bytes into \e buf from the file specified by the`
  \e fileHandle.
 
@@ -189,7 +189,7 @@ _i32 sl_extlib_FlcReadFile(_i32 fileHandle, _i32 offset, _u8 *buf, _i32 len);
 
  This function writes \e len bytes from \e buf to the file specified by the`
  \e fileHandle.
- 
+
  \return  Returns the number of bytes written or negative error number.
  */
 _i32 sl_extlib_FlcWriteFile(_i32 fileHandle, _i32 offset, _u8 *buf, _i32 len);
@@ -211,10 +211,10 @@ _i32 sl_extlib_FlcCloseFile(_i32 fileHandle, _u8 *pCeritificateFileName,
  \brief Abort a file update
 
  \param[in]      fileHandle   Pointer to the file (assigned from sl_FsOpen)
- 
- Abort a file update by closing the file with signature 'A', rolling back to 
+
+ Abort a file update by closing the file with signature 'A', rolling back to
  the old file (mirror).
- 
+
  \return  Returns 0 on success or negative error number.
  */
 _i32 sl_extlib_FlcAbortFile(_i32 fileHandle);

@@ -28,7 +28,7 @@
 #include "email.h"
 
 //****************************************************************************
-//                          LOCAL DEFINES                                   
+//                          LOCAL DEFINES
 //****************************************************************************
 #define EMAIL_APP_VERSION "v1.1.0"
 #define SUCCESS 	(0)
@@ -110,7 +110,7 @@ SlNetAppEmailSubject_t g_sSubject;
 extern long ConvertToBase64(char *pcOutStr, const char *pccInStr, int iLen);
 
 //****************************************************************************
-//                      LOCAL FUNCTION PROTOTYPES                           
+//                      LOCAL FUNCTION PROTOTYPES
 //****************************************************************************
 signed long _smtpConnect(void);
 signed long _smtpStateMachine(void);
@@ -128,7 +128,7 @@ long _generateBase64Key(char * basekey1, char * basekey2);
 //!		2. Destination email address
 //!		3. password
 //!		4. Email subject
-//!		5. Advance options like security method, port		
+//!		5. Advance options like security method, port
 //!
 //! \param 	AppId - Application ID
 //!			Option - Option that need to set
@@ -217,7 +217,7 @@ long sl_NetAppEmailSet(unsigned char AppId, unsigned char Option,
 //!		2. Destination email address
 //!		3. password
 //!		4. Email subject
-//!		5. Advance options like security method, port		
+//!		5. Advance options like security method, port
 //!
 //! \param 	AppId - Application ID
 //!			Option - Option that want to get
@@ -416,7 +416,7 @@ signed long _smtpConnect(void) {
 //!     @param  None
 //!
 //!     @return 0 if success, -1 if error
-//!  
+//!
 //
 //****************************************************************************
 signed long _smtpStateMachine(void) {
@@ -632,7 +632,7 @@ signed long _smtpStateMachine(void) {
             }
             break;
 
-            // Send the "DATA" message to the server, indicates client is ready to 
+            // Send the "DATA" message to the server, indicates client is ready to
             // construct  the body of the email
             // DATA <CRLF>
         case smtpDATA:
@@ -761,7 +761,7 @@ signed long _smtpStateMachine(void) {
 //! GenerateBase64Key
 //!
 //! @brief  Generates Base64 Key needed for authentication
-//! 
+//!
 //! @param  input is the string to be converted to base64
 //! @param  basekey1 is the base64 converted output
 //!
@@ -794,7 +794,7 @@ long _generateBase64Key(char* input, char* basekey1) {
 
 //****************************************************************************
 //
-//!	sendSMTPCommand 
+//!	sendSMTPCommand
 //!
 //! @brief  Sends an SMTP command and provides the server response.
 //! 		If cmd or cmd param are NULL, it only ends up sending a <CR><LF>

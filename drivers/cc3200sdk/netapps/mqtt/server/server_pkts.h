@@ -32,7 +32,7 @@
  for user's server application(s) to exchange the MQTT packets with one or
  more remote clients. The Server Packet LIB is a simple and easy-to-use
  implementation to support both un-packing of the messages received from the
- remote clients and formation of packets to be sent to the remote clients. 
+ remote clients and formation of packets to be sent to the remote clients.
 
  The library is targeted to conform to MQTT 3.1.1 specification.
 
@@ -133,7 +133,7 @@ bool has_vh, u16 vh_data);
 i32 mqtt_vh_msg_send_locked(void *ctx_cl, u8 msg_type, enum mqtt_qos qos,
 bool has_vh, u16 vh_data);
 
-/** Dispatch application constructed PUBLISH message to the client. 
+/** Dispatch application constructed PUBLISH message to the client.
  Prior to sending the message to the client, this routine shall update the
  fixed-header to account for the duplicate flag that has been indicated by
  the caller.
@@ -173,7 +173,7 @@ bool dup);
 /** Run the server packet LIB for the specified wait time.
  This routine yields the control back to the application after the specified
  duration of wait time. Such an arrangement enable the application to make
- overall progress to meet it intended functionality. 
+ overall progress to meet it intended functionality.
 
  The wait time implies the maximum intermediate duration between the reception
  of two successive messages from the server. If no message is received before

@@ -1,35 +1,35 @@
 /*
  * netapp.c - CC31xx/CC32xx Host Driver Implementation
  *
- * Copyright (C) 2014 Texas Instruments Incorporated - http://www.ti.com/ 
- * 
- * 
- *  Redistribution and use in source and binary forms, with or without 
- *  modification, are permitted provided that the following conditions 
+ * Copyright (C) 2014 Texas Instruments Incorporated - http://www.ti.com/
+ *
+ *
+ *  Redistribution and use in source and binary forms, with or without
+ *  modification, are permitted provided that the following conditions
  *  are met:
  *
- *    Redistributions of source code must retain the above copyright 
+ *    Redistributions of source code must retain the above copyright
  *    notice, this list of conditions and the following disclaimer.
  *
  *    Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the 
- *    documentation and/or other materials provided with the   
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the
  *    distribution.
  *
  *    Neither the name of Texas Instruments Incorporated nor the names of
  *    its contributors may be used to endorse or promote products derived
  *    from this software without specific prior written permission.
  *
- *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
- *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- *  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT 
- *  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
- *  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT 
+ *  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ *  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ *  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
  *  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
  *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
- *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+ *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
@@ -254,13 +254,13 @@ const _SlCmdCtrl_t _SlRegisterServiceCtrl =
  Add/delete  service
  The function manipulates the command that register the service and call
  to the NWP in order to add/delete the service to/from the mDNS package and to/from the DB.
- 
+
  This register service is a service offered by the application.
  This unregister service is a service offered by the application before.
- 
+
  The service name should be full service name according to RFC
  of the DNS-SD - means the value in name field in SRV answer.
- 
+
  Example for service name:
  1. PC1._ipp._tcp.local
  2. PC2_server._ftp._tcp.local
@@ -269,7 +269,7 @@ const _SlCmdCtrl_t _SlRegisterServiceCtrl =
  it is unique before starting to announce the service on the network.
  Instance is the instance portion of the service name.
 
- 
+
 
 
  PARAMETERS:
@@ -312,7 +312,7 @@ const _SlCmdCtrl_t _SlRegisterServiceCtrl =
 
 
  RETURNS:        Status - the immediate response of the command status.
- 0 means success. 
+ 0 means success.
 
 
 
@@ -447,7 +447,7 @@ _i16 sl_NetAppMDNSUnRegisterService(const _i8* pServiceName,
     _u32 Options = 0;
 
     /*
-     
+
      NOTE - pay attention
 
      The size of the service length  should be smaller than 255,
@@ -500,7 +500,7 @@ typedef struct {
  the text is cut to inout_TextLen value.
  Output: Contain the length of the text that is returned. Can be full text or part
  of the text (see above).
- 
+
  *
  */
 typedef struct {
@@ -523,7 +523,7 @@ typedef union {
 } _GetHostByServiceAsyncResponseAttribute_u;
 
 /*
- * The below struct contains pointers to the output parameters that the user gives 
+ * The below struct contains pointers to the output parameters that the user gives
  *
  */
 typedef struct {
@@ -574,7 +574,7 @@ _i8 *pText) {
 
      4.No rolling option!!! - only PTR type is sent.
 
-     
+
      */
     /*build the attribute part of the command.
      It contains the constant parameters of the command */
@@ -636,8 +636,8 @@ _i8 *pText) {
  CALLER          NWP - Async event on sl_DnsGetHostByService with IPv4 Family
 
 
- DESCRIPTION: 
- 
+ DESCRIPTION:
+
  Async event on sl_DnsGetHostByService command with IPv4 Family.
  Return service attributes like IP address, port and text according to service name.
  The user sets a service name Full/Part (see example below), and should get the:
@@ -658,7 +658,7 @@ _i8 *pText) {
  the query. The results of these responses are saved in the peer cache of the NWP, and
  should be read by another API.
 
- 
+
  PARAMETERS:
 
  pVoidBuf - is point to opcode of the event.
@@ -673,7 +673,7 @@ _i8 *pText) {
  the text is cut to inout_TextLen value.
  Output: Contain the length of the text that is returned. Can be full text or part
  of the text (see above).
- 
+
  4.out_pText						- Contain the text of the service (full or part see above- inout_TextLen description).
 
  *
@@ -710,7 +710,7 @@ void _sl_HandleAsync_DnsGetHostByService(void *pVoidBuf) {
     /*IPv4*/
     else {
         /*************************************************************************************************
-         
+
          1. Copy the attribute part of the evnt to the attribute part of the response
          sl_Memcpy(g_pCB->GetHostByServiceCB.pAsyncRsp, pMsgArgs, sizeof(_GetHostByServiceIPv4AsyncResponse_t));
 
@@ -1122,7 +1122,7 @@ void _SlDrvNetAppEventHandler(void* pArgs) {
     case SL_OPCODE_NETAPP_DNSGETHOSTBYNAMEASYNCRESPONSE_V6:
         _sl_HandleAsync_DnsGetHostByName(pArgs);
         break;
-#ifndef SL_TINY_EXT            
+#ifndef SL_TINY_EXT
     case SL_OPCODE_NETAPP_MDNSGETHOSTBYSERVICEASYNCRESPONSE:
     case SL_OPCODE_NETAPP_MDNSGETHOSTBYSERVICEASYNCRESPONSE_V6:
         _sl_HandleAsync_DnsGetHostByService(pArgs);

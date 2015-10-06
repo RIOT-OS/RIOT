@@ -90,7 +90,7 @@ struct mqtt_server_app_cbs {
      client. It is set to NULL if the client did not provide a pass-word
      @param[out] app_usr place-holder for application to provide a handle
      to the user of this specific connection / client.
-     
+
      @return 16bit value for the variable header in the CONNACK message.
      The MSB in the return value refers to the 8bit parameter of the
      acknowledge flags and must be set 0. The LSB in the return value
@@ -106,11 +106,11 @@ struct mqtt_server_app_cbs {
      data along with other qualifiers  published by one of the clients
      associated with this server. The application must enroll with the
      server the particular topic for which the data should be notified.
-     
+
      @param[in] topic UTF8 topic Name for which data has been published
      @param[in] data_buf the published binary data for the topic
      @param[in] data_len the length of the binary data
-     @param[in] dup is this a duplicate data from remote client? 
+     @param[in] dup is this a duplicate data from remote client?
      @param[in] qos quality of service of the message / data
      @param[in] retain should the server retain the data?
 
@@ -135,7 +135,7 @@ struct mqtt_server_app_cbs {
     void (*disconn)(const void *app_usr, bool due2err);
 };
 
-/** Enroll with server to receive data for a topic 
+/** Enroll with server to receive data for a topic
  This routine registers with the server, the specified topic for which the
  application should receive any published data from the network. Whenever,
  any of the remote clients that are connected to the server or applications,

@@ -58,8 +58,8 @@ _i32 tcp_accept(_i32 listen_hnd, u8 *client_ip, _u32 *ip_length);
 
 /*----------------- adding functions for udp functionalities -------------------*/
 
-/** Send a UDP packet 
- 
+/** Send a UDP packet
+
  @param[in] comm communication entity handle; socket handle in this case
  @param[in] buf buf to be sent in the udp packet
  @param[in] len length of the buffer buf
@@ -73,15 +73,15 @@ _i32 send_dest(_i32, const u8 *buf, _u32 len, _u16 dest_port, const u8 *dest_ip,
         _u32 ip_len);
 
 /** Recieve a UDP packet
- 
+
  @param[in] comm communication entity handle; socket handle in this case
  @param[out] buf buf into which received UDP packet is written
  @param[in] maximum len length of the buffer buf
  @param[out] from_port port number of UDP packet source
- @param[out] from_ip ip address of the UDP packet source. 
+ @param[out] from_ip ip address of the UDP packet source.
  The ip address is to be interpreted as a _u32 number in network byte ordering
  Only IPV4 is supported currently.
- @param[out] ip_len length of string from_ip; 
+ @param[out] ip_len length of string from_ip;
  currently always populated with 4 as the address is a IPV4 address
  @return number of bytes received or error returned by sl_RecvFrom call
  */

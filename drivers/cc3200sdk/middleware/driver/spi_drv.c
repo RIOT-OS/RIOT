@@ -1,34 +1,34 @@
 //*****************************************************************************
 //
-// Copyright (C) 2014 Texas Instruments Incorporated - http://www.ti.com/ 
-// 
-// 
-//  Redistribution and use in source and binary forms, with or without 
-//  modification, are permitted provided that the following conditions 
+// Copyright (C) 2014 Texas Instruments Incorporated - http://www.ti.com/
+//
+//
+//  Redistribution and use in source and binary forms, with or without
+//  modification, are permitted provided that the following conditions
 //  are met:
 //
-//    Redistributions of source code must retain the above copyright 
+//    Redistributions of source code must retain the above copyright
 //    notice, this list of conditions and the following disclaimer.
 //
 //    Redistributions in binary form must reproduce the above copyright
-//    notice, this list of conditions and the following disclaimer in the 
-//    documentation and/or other materials provided with the   
+//    notice, this list of conditions and the following disclaimer in the
+//    documentation and/or other materials provided with the
 //    distribution.
 //
 //    Neither the name of Texas Instruments Incorporated nor the names of
 //    its contributors may be used to endorse or promote products derived
 //    from this software without specific prior written permission.
 //
-//  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
-//  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+//  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+//  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 //  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-//  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT 
-//  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
-//  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT 
+//  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+//  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+//  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
 //  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
 //  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-//  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
-//  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+//  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+//  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 //*****************************************************************************
@@ -109,7 +109,7 @@ static void reset_spi_rtosdrv() {
     i32 loop_cnt;
 
     spi_reset = 1;
-    /* Clear the inuse pointers to indicate availability 
+    /* Clear the inuse pointers to indicate availability
      * of all control structure */
     for (loop_cnt = 0; loop_cnt < MAX_SPI_MODULES; loop_cnt++) {
         /* Clear the SPI control structure */
@@ -118,7 +118,7 @@ static void reset_spi_rtosdrv() {
 }
 
 /*
- Check if the requested SPI module is already in use. This is 
+ Check if the requested SPI module is already in use. This is
  acheived by comparing the base address.
  */
 static struct spi_rtos_driver* check_spi_rtosdrv_inuse(u32 dev_id) {
@@ -280,8 +280,8 @@ static void setup_dma_transfer(struct spi_rtos_driver *rtos_hndl,
     }
 }
 
-/* 
- Trigger the SPI DMA transfer. The parameters passed is used to identify the 
+/*
+ Trigger the SPI DMA transfer. The parameters passed is used to identify the
  mode of operation.
  tx_data: !NULL, rx_data: NULL --> Half duplex write
  tx_data: NULL, rx_data: !NULL --> Half duplex read
@@ -314,7 +314,7 @@ i32 spi_handle_pm_cmd(struct module_drv *mod_drv, const enum mod_pm pm_state) {
     if (rtos_drv->lock_obj) {
         retval = RTOS_MUTEX_ACQUIRE_IMM(&rtos_drv->lock_obj);
         if (retval < 0) {
-            /* Cannot transition power modes as transaction 
+            /* Cannot transition power modes as transaction
              in progress */
             goto exit;
         }
@@ -376,13 +376,13 @@ static u8 map_moduleid_to_dmach(u32 moduleid, i8 is_tx) {
     }
 }
 
-/* 
+/*
  This function should be called from centralized & RTOS specific initialization
- sequence. 
+ sequence.
 
- Goal of this function is to extend information about SOC module to SW driver 
- enable it to initialize hardware through HAL. Driver could use private field 
- called 'hw_detail', if provisioned, to configure hardware. 
+ Goal of this function is to extend information about SOC module to SW driver
+ enable it to initialize hardware through HAL. Driver could use private field
+ called 'hw_detail', if provisioned, to configure hardware.
 
  Driver instance must enroll / register itself with PM / platfrom framework.
 

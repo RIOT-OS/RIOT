@@ -25,11 +25,11 @@
 #include "HttpRequest.h"
 #ifdef HTTP_CORE_ENABLE_AUTH
 
-/** 
+/**
  * @defgroup HttpAuth HTTP Authentication
  * This module implements the HTTP digest access authentication routines.
  * Note this module is only compiled if HTTP_CORE_ENABLE_AUTH is defined in HttpConfig.h
- * 
+ *
  * When a "not authorized" response is sent to the client, the WWW-Authenticate header is built using HttpAuth_ResponseAuthenticate()
  * This in turn generates new nonce and opaque values which will be used for authentication.
  * Note that since only a single nonce is kept, only one client may ever be authenticated simultaneously.
@@ -43,7 +43,7 @@
  * Initialize the authentication module, so that it accepts the specified username and password
  * This function should be called during server initialization in order to set initial user credentials
  * This function may then be called at any time during the operation of the server in order to set different user credentials
- * @param username The authorized user's username 
+ * @param username The authorized user's username
  * @param password The authorized user's password
  */
 void HttpAuth_Init(struct HttpBlob username, struct HttpBlob password);

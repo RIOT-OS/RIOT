@@ -88,14 +88,14 @@ typedef struct {
 
 /*!
  \brief Configures Email Parameters
- 
+
  \param[in]      AppId: SL_NET_APP_EMAIL_ID
- \param[in]      Option, NETAPP_ADVANCED_OPT, NETAPP_SOURCE_EMAIL etc                  
- \param[in]      OptionLen, Length of the Option Value 
+ \param[in]      Option, NETAPP_ADVANCED_OPT, NETAPP_SOURCE_EMAIL etc
+ \param[in]      OptionLen, Length of the Option Value
  \param[in]      pOptionValue, Depends on Option
  For Ex. NETAPP_ADVANCED_OPT, Email Server Info(SlNetAppEmailOpt_t)
- \return         On success, zero is returned. On error, -1 is 
- returned   
+ \return         On success, zero is returned. On error, -1 is
+ returned
  \sa             sl_NetAppEmailGet
  */
 long sl_NetAppEmailSet(unsigned char AppId, unsigned char Option,
@@ -103,37 +103,37 @@ long sl_NetAppEmailSet(unsigned char AppId, unsigned char Option,
 
 /*!
  \brief Configures Email Parameters
- 
+
  \param[in]      AppId: SL_NET_APP_EMAIL_ID
- \param[in]      Option, NETAPP_ADVANCED_OPT, NETAPP_SOURCE_EMAIL etc                  
- \param[out]     OptionLen, Length of the Option Value 
+ \param[in]      Option, NETAPP_ADVANCED_OPT, NETAPP_SOURCE_EMAIL etc
+ \param[out]     OptionLen, Length of the Option Value
  \param[out]      pOptionValue, Depends on Option
  For Ex. NETAPP_ADVANCED_OPT, Email Server Info(SlNetAppEmailOpt_t)
- \return         On success, zero is returned. On error, -1 is 
- returned   
+ \return         On success, zero is returned. On error, -1 is
+ returned
  \sa             sl_NetAppEmailSet
  */
 long sl_NetAppEmailGet(unsigned char AppId, unsigned char Option,
         unsigned char *pOptionLen, unsigned char *pOptionValue);
 
 /*!
- \brief connect to Email Server    
- 
- \return         On success, zero is returned. On error, negative is 
+ \brief connect to Email Server
+
+ \return         On success, zero is returned. On error, negative is
 
  */
 long sl_NetAppEmailConnect();
 
 /*!
  \brief Configures Email Parameters
- 
+
  \param[in]      Destination: Recipient Email Address (ex. abc@xyz.com)
- \param[in]      Subject - Email Subject                  
- \param[in]      Message - Content of Email 
+ \param[in]      Subject - Email Subject
+ \param[in]      Message - Content of Email
  \param[out]      out_server_err, Server Error Message
  For Ex. Authentication Failed etc
- 
- \return         SlNetAppEmailERROR_e(On success, zero is returned)   
+
+ \return         SlNetAppEmailERROR_e(On success, zero is returned)
  */
 long sl_NetAppEmailSend(char* Destination, char* Subject, char* Message,
         SlNetAppServerError_t* out_server_err);

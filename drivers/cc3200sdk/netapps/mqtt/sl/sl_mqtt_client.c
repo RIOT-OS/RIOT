@@ -115,7 +115,7 @@ struct device_net_services net = { comm_open, tcp_send, tcp_recv, send_dest,
 /*Defining QOS value. Getting QOS value from fixed header*/
 #define MQP_PUB_QOS(mqp)        ((mqp->fh_byte1 >>1)  & 0x03)
 
-#define ACK_RX_SIGNAL_WAIT(ack_sync_obj)     sl_SyncObjWait(ack_sync_obj,SL_OS_WAIT_FOREVER)    
+#define ACK_RX_SIGNAL_WAIT(ack_sync_obj)     sl_SyncObjWait(ack_sync_obj,SL_OS_WAIT_FOREVER)
 #define ACK_RX_SIGNAL_POST(ack_sync_obj)     sl_SyncObjSignal(ack_sync_obj)
 
 #define STR2UTF_CONV(utf_s, str) {utf_s.buffer = (char *)str; utf_s.length = strlen(str);}
@@ -125,7 +125,7 @@ struct device_net_services net = { comm_open, tcp_send, tcp_recv, send_dest,
 #define MQTT_ERROR "Connection Lost with broker"
 
 //*****************************************************************************
-// process_notify_ack_cb 
+// process_notify_ack_cb
 //*****************************************************************************
 static void process_notify_ack_cb(void *app, u8 msg_type, u16 msg_id, u8 *buf,
         u32 len) {
@@ -173,13 +173,13 @@ static void process_notify_ack_cb(void *app, u8 msg_type, u16 msg_id, u8 *buf,
 }
 
 //*****************************************************************************
-// process_publish_rx_cb 
+// process_publish_rx_cb
 //*****************************************************************************
 static bool process_publish_rx_cb(void *app, bool dup, enum mqtt_qos qos,
 bool retain, struct mqtt_packet *mqp) {
     struct sl_client_ctx *client_ctx = (struct sl_client_ctx *) app;
     /*If incoming message is a publish message from broker */
-    /* Invokes the event handler with topic,topic length,payload and 
+    /* Invokes the event handler with topic,topic length,payload and
      payload length values*/
     client_ctx->app_cbs.sl_ExtLib_MqttRecv(client_ctx->app_hndl,
             (char _const*) MQP_PUB_TOP_BUF(mqp), MQP_PUB_TOP_LEN(mqp),
@@ -207,7 +207,7 @@ static void process_disconn_cb(void *app, _i32 cause) {
 }
 
 //*****************************************************************************
-// Receive Task. Invokes in the context of a task 
+// Receive Task. Invokes in the context of a task
 //*****************************************************************************
 void VMqttRecvTask(void *pArgs) {
     _i32 retval;

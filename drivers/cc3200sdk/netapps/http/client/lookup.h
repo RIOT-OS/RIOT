@@ -47,7 +47,7 @@ struct Lookup_Field {
  *  @brief  Compares string (case insensitive) and returns id in constant time
  *
  *  @param  str  Response field name string
- *                 
+ *
  *  @param  len  Length of the string
  *
  *  @return Field id on success or -1 on failure

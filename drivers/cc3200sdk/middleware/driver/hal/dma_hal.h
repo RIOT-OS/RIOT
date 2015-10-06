@@ -1,34 +1,34 @@
 //*****************************************************************************
 //
-// Copyright (C) 2014 Texas Instruments Incorporated - http://www.ti.com/ 
-// 
-// 
-//  Redistribution and use in source and binary forms, with or without 
-//  modification, are permitted provided that the following conditions 
+// Copyright (C) 2014 Texas Instruments Incorporated - http://www.ti.com/
+//
+//
+//  Redistribution and use in source and binary forms, with or without
+//  modification, are permitted provided that the following conditions
 //  are met:
 //
-//    Redistributions of source code must retain the above copyright 
+//    Redistributions of source code must retain the above copyright
 //    notice, this list of conditions and the following disclaimer.
 //
 //    Redistributions in binary form must reproduce the above copyright
-//    notice, this list of conditions and the following disclaimer in the 
-//    documentation and/or other materials provided with the   
+//    notice, this list of conditions and the following disclaimer in the
+//    documentation and/or other materials provided with the
 //    distribution.
 //
 //    Neither the name of Texas Instruments Incorporated nor the names of
 //    its contributors may be used to endorse or promote products derived
 //    from this software without specific prior written permission.
 //
-//  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
-//  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+//  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+//  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 //  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-//  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT 
-//  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
-//  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT 
+//  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+//  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+//  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
 //  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
 //  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-//  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
-//  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+//  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+//  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 //*****************************************************************************
@@ -83,15 +83,15 @@
  Chan# 30: |  SPI1_RX   |  MOD_NONE  |  I2C0_RX   |  SW_PROG  |
  Chan# 31: |  SPI1_TX   |  MOD_NONE  |  I2C0_TX   |  SW_PROG  |
 
- Steps: 
- 
+ Steps:
+
  1. Initialize DMA Module by using cc_dma_init().
 
- 2. After reviewing afore-mentioned channel table, allocate an appropriate 
+ 2. After reviewing afore-mentioned channel table, allocate an appropriate
  DMA channel for module of interest by using cc_dma_alloc( ). For e.g.,
- 
 
- 3. Set-up or configure properties for operation of DMA channel by invoking 
+
+ 3. Set-up or configure properties for operation of DMA channel by invoking
  cc_dma_chan_config().
 
  4. Set-up or configure descriptor for a DMA data transaction by invoking
@@ -99,7 +99,7 @@
 
  5. Depening up-on mode of transaction indicated in cc_dma_desc_config(),
  invoke applicable API to submit buffers to DMA for processing. Specifically,
- for initiating a ping-pong transaction, cc_dma_submit_pp_endp() must be 
+ for initiating a ping-pong transaction, cc_dma_submit_pp_endp() must be
  used. Similarly, for scatter-gather transaction cc_dma_submit_sg_bvec()
  API must be invoked. For all other transactions, cc_dma_submit_endp()
  must be used.
@@ -110,10 +110,10 @@
  completion of individual transactions. Therefore, users of DMA channel, on
  completion of DMA transaction, must invoke cc_dma_done() API to enable
  DMA HAL complete certain house-keeping and set-up the channel for followup
- operation. 
+ operation.
 
  Note: There can be only one software initiated DMA transaction in system.
- 
+
  */
 
 struct cc_dma_cfg {
@@ -168,9 +168,9 @@ void cc_dma_exit();
 
 #define DMA_USER_SW_PROG         0xFF
 
-/* 
+/*
  Allocate a DMA channel. User ID and Channel ID should be commensurate with
- hardware connection. Refer to CC3200 datasheet for details. 
+ hardware connection. Refer to CC3200 datasheet for details.
 
  Returns a valid handle on success otherwise NULL
  */
@@ -186,7 +186,7 @@ struct cc_dma_chan_cfg {
     bool alt_cblk; /* Use alternate cntl blk? */
 };
 
-/* 
+/*
  Configure channel centric parameters.
 
  Returns 0 on success otherwise -1
@@ -208,8 +208,8 @@ enum dma_type {
  Auto  Mode: SW initiated single & contiguous transfer from memory to memory
  Ping  Pong: HW triggered continous tranfer through memory replenishment
  SG  Memory: SW initiated scatter gather transfer from memory to memory
- SG  Periph: HW triggered scatter gather transfer b/w peripheral & memory 
- 
+ SG  Periph: HW triggered scatter gather transfer b/w peripheral & memory
+
  */
 
 enum dma_mode {
@@ -253,14 +253,14 @@ struct cc_dma_cmd_desc {
 
 /*
  Set-up nuances for a DMA transaction to be scheduled later.
- 
+
  Returns 0 on success otherwise -1
  */
 i32 cc_dma_desc_config(cc_hndl hndl, const struct cc_dma_cmd_desc *cmd_desc);
 
-/* 
+/*
  Schedule a transaction for 'basic mode', 'auto mode', 'ping-pong replishment'
- 
+
  Return 0 on success otherwise -1
  */
 i32 cc_dma_submit_endp(cc_hndl hndl, void *src_endp, void *dst_endp, i32 n_item,
@@ -268,9 +268,9 @@ bool pp_last);
 
 struct cc_dma_buf {
 
-    /* Size of this construct must be 16 Bytes and its composition is tied 
+    /* Size of this construct must be 16 Bytes and its composition is tied
      to underlying hardware - do not change without good considerations.
-     
+
      Provider of construct must provide values for 'src_endp', 'dst_endp'
      & 'num_item'
      */
@@ -286,16 +286,16 @@ struct cc_dma_buf {
     u32 reserved;
 };
 
-/* 
- Buffer Vector (array) for scatter-gather, depending upon intended use, can 
- be prepared in two ways. a) Explicit configuration of each element of buff 
+/*
+ Buffer Vector (array) for scatter-gather, depending upon intended use, can
+ be prepared in two ways. a) Explicit configuration of each element of buff
  vector by creating hardware control word b) Use of a common descriptor for
  all element of buffer vector (array).
 
  This routine serves option (a), where hardware control word is configured
  for specified vector element. All elements of vector must be set-up using
  this routine. Further, for option (a), parameter 'has_ctlw' must be set as
- true in function cc_dma_submit_sg_bvec(). 
+ true in function cc_dma_submit_sg_bvec().
 
  Note: Callee must provide correct values for each member of each element.
 
@@ -303,7 +303,7 @@ struct cc_dma_buf {
 i32 cc_dma_prep_sg_elem_ctlw(const struct cc_dma_cmd_desc *cmd_desc,
         struct cc_dma_buf *vec_elem);
 
-/* 
+/*
  Schedule a transaction for 'scatter gather mode'.
 
  If buffer vector (array) has been configured for DMA control word in each of
@@ -314,13 +314,13 @@ i32 cc_dma_prep_sg_elem_ctlw(const struct cc_dma_cmd_desc *cmd_desc,
  a common DMA control word, created from configuration info provided by API
  cc_dma_desc_config(), to all elements of vector / array. However, callee
  must provide correct values for each member of each element of buffer vector.
- 
+
  Return 0 on success otherwise -1
  */
 i32 cc_dma_submit_sg_bvec(cc_hndl hndl, i32 n_bvec, struct cc_dma_buf *buf_vec,
 bool has_ctlw);
 
-/* 
+/*
  Schedule a transaction for 'ping-pong mode'
 
  Return 0 on success otherwise -1

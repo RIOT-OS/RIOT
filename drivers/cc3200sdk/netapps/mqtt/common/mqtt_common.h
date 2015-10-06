@@ -24,14 +24,14 @@
 #ifndef __MQTT_COMMON_H__
 #define __MQTT_COMMON_H__
 
-/** @file mqtt_common.h 
+/** @file mqtt_common.h
  This file incorporates constructs that are common to both client and server
- implementation. 
+ implementation.
 
  The applications are not expected to utlize the routines made available in
- this module module. 
+ this module module.
 
- @note the routines in this module do not check for availability and 
+ @note the routines in this module do not check for availability and
  correctness of the input parameters
 
  @warning The module is expected to under-go changes whilst incorporating
@@ -69,7 +69,7 @@
 #define MAX_FH_LEN        0x05    /**< MAX Length of Fixed Header */
 
 /** Max number of bytes in remaining length field */
-#define MAX_REMLEN_BYTES  (MAX_FH_LEN - 1)  
+#define MAX_REMLEN_BYTES  (MAX_FH_LEN - 1)
 
 #define MAKE_FH_BYTE1(msg_type,  flags) (u8)((msg_type << 4) | flags)
 
@@ -242,9 +242,9 @@ struct mqtt_packet {
  *---------------------------------------------------------------------
  */
 
-/** Free a MQTT Packet Buffer 
+/** Free a MQTT Packet Buffer
  Puts back the packet buffer in to the appropriate pool.
- 
+
  @param[in] mqp packet buffer to be freed
  @return none
  */
@@ -292,7 +292,7 @@ struct utf8_string {
     u16 length; /**< Length of UTF8 content */
 };
 
-/** Write UTF8 information into the buffer. 
+/** Write UTF8 information into the buffer.
  The UTF8 information includes content and its length.
 
  @warning The routine does not check for correctness of the paramters.
@@ -305,12 +305,12 @@ i32 mqp_buf_wr_utf8(u8 *buf, const struct utf8_string *utf8);
 
 /** Write the MQTT construct 'Remaining Length' into trailing end of buffer.
  The 'remaining length' is written in the format as outlined in the MQTT
- specification. 
+ specification.
 
  The implementation assumes availability of at-least 4 bytes in the buffer.
  Depending on the value of 'Remaining Length' appropriate trailing bytes in
  the buffer would be used.
- 
+
  @param[in] buf refers to memory to tail-write 'Remaining Length' into
  @param[in] remlen The 'Remaining Length' value
  @return in success, number of trailing bytes used, otherwise -1 on error
@@ -320,7 +320,7 @@ i32 mqp_buf_tail_wr_remlen(u8 *buf, u32 remlen);
 /** Read MQTT construct 'Remaining Length' from leading bytes of the buffer.
  The 'remaining length' is written in the format as outlined in the MQTT
  specification.
- 
+
  @param[in] buf refers to memory to head-read 'Remaining Length' from
  @param[in] remlen place-holder for The 'Remaining Length' value
  @return in success, number of header bytes read, otherwise -1 on error
@@ -350,7 +350,7 @@ mqp_pub_append_topic(struct mqtt_packet *mqp, const struct utf8_string *topic,
 
 /** Include payload data for publishing
  The payload data is associated with a topic.
- 
+
  @warning This routine does not check for correctness of the input
  parameters.
 
@@ -366,10 +366,10 @@ i32 mqp_pub_append_data(struct mqtt_packet *mqp, const u8 *data_buf,
 
 /** Construct a packet for Message ID enabled ACK received from network
  Process the raw ACK message information to update the packet holder.
- 
+
  @warning This routine does not check for correctness of the input
  parameters.
- 
+
  @param[in] mqp_raw holds a raw buffer from the network
  @param[in] has_payload asserted, if ACK message should have a payload
  @return on success, true, otherwise false
@@ -408,14 +408,14 @@ static inline bool mqp_ack_wlist_is_empty(struct mqtt_ack_wlist *list) {
 bool mqp_ack_wlist_append(struct mqtt_ack_wlist *list, struct mqtt_packet *elem);
 
 /*
- Removes element that has specified msg_id from list. 
+ Removes element that has specified msg_id from list.
 
  Returns, on success, pointer to removed element, otherwise NULL.
  */
 struct mqtt_packet *mqp_ack_wlist_remove(struct mqtt_ack_wlist *list,
         u16 msg_id);
-/* 
- Removes and frees all elements in list. 
+/*
+ Removes and frees all elements in list.
  */
 void mqp_ack_wlist_purge(struct mqtt_ack_wlist *list);
 
@@ -429,12 +429,12 @@ static inline bool is_wlist_empty(const struct mqtt_ack_wlist *list) {
  among others, significant internal fields such as 'remaining length' and
  'fixed header length' in the packet construct and embeds the fixed header,
  so created, in the packet buffer.
- 
+
  This service must be utilized on a packet that has been already populated
  with all the payload data, topics and other contents. The fixed header
  must be the final step in the compostion of MQTT packet prior to its
  dispatch to the server.
- 
+
  Returns size, in bytes, of the fixed-header, otherwise -1 on error.
  */
 i32 mqp_prep_fh(struct mqtt_packet *mqp, u8 flags);
@@ -470,7 +470,7 @@ struct utf8_strqos {
  3.  CA File Name
  4.  DH Key File Name
 
- example: 
+ example:
  If you want to provide only CA File Name, following are the two way of doing it:
  for n_file = 1
  char *security_file_list[] = {"/cert/testcacert.der"};
@@ -495,9 +495,9 @@ void secure_conn_struct_init(struct secure_conn *nw_security);
 
 /** @defgroup net_ops_group Abstraction of Network Services on a platform
  Services to enable the MQTT Client-Server communication over network
- 
+
  These services are invoked by the MQTT Library.
- 
+
  @{
  */
 struct device_net_services {
@@ -602,7 +602,7 @@ struct device_net_services {
      routine to indicate the length of the remote network entity's IP
      address.
      @return on success, number of bytes received, 0 on connection reset,
-     otherwise -1 on errir. 
+     otherwise -1 on errir.
      */
     i32 (*recv_from)(i32 comm, u8 *buf, u32 len, u16 *from_port, u8 *from_ip,
             u32 *ip_len);
@@ -657,12 +657,12 @@ struct device_net_services {
      provide a vector of the handles for which activity was observed.
 
      @param[in, out] recv_hvec a vector of handles which must be
-     monitored for receive activities. 
+     monitored for receive activities.
      @param[in, out] send_hvec a vector of handles which must be
      monitored for send activities.
      @param[in, out] rsvd_hvec reserved for future use.
      @param[in] wait_secs time to wait and monitor activity on
-     communication handles provided in one or more sets. If set 
+     communication handles provided in one or more sets. If set
      to 0, the routine returns immediately.
      @return on success, the total number of handles for which activity
      was observed. This number can be 0, if no activity was observed on
@@ -679,7 +679,7 @@ struct device_net_services {
      Library is able to track the Keep-Alive time across the cycles of
      low power states. It would be typical of battery operated systems
      to transition to low power states during the period of inactivity
-     or otherwise to conserve battery. 
+     or otherwise to conserve battery.
 
      In the absence of a sustained time reference across the low power
      states, if the system transitions away from the active state, the

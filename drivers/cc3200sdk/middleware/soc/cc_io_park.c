@@ -1,34 +1,34 @@
 //*****************************************************************************
 //
-// Copyright (C) 2014 Texas Instruments Incorporated - http://www.ti.com/ 
-// 
-// 
-//  Redistribution and use in source and binary forms, with or without 
-//  modification, are permitted provided that the following conditions 
+// Copyright (C) 2014 Texas Instruments Incorporated - http://www.ti.com/
+//
+//
+//  Redistribution and use in source and binary forms, with or without
+//  modification, are permitted provided that the following conditions
 //  are met:
 //
-//    Redistributions of source code must retain the above copyright 
+//    Redistributions of source code must retain the above copyright
 //    notice, this list of conditions and the following disclaimer.
 //
 //    Redistributions in binary form must reproduce the above copyright
-//    notice, this list of conditions and the following disclaimer in the 
-//    documentation and/or other materials provided with the   
+//    notice, this list of conditions and the following disclaimer in the
+//    documentation and/or other materials provided with the
 //    distribution.
 //
 //    Neither the name of Texas Instruments Incorporated nor the names of
 //    its contributors may be used to endorse or promote products derived
 //    from this software without specific prior written permission.
 //
-//  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
-//  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+//  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+//  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 //  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-//  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT 
-//  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
-//  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT 
+//  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+//  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+//  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
 //  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
 //  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-//  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
-//  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+//  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+//  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 //*****************************************************************************
@@ -46,7 +46,7 @@ static void apply_io_park(u8 pin_num, enum io_park_state park_value) {
     if (DONT_CARE != park_value) {
         /* Change the pin mode to GPIO to be safe */
         //MAP_PinModeSet(pin_num, PIN_MODE_0);
-        /* First apply PullUp/PullDn (or no pull) according 
+        /* First apply PullUp/PullDn (or no pull) according
          to the default levels specified in the user supplied
          parking table */
         MAP_PinConfigGet(pin_num, &pin_strength, &pin_type);
@@ -57,16 +57,16 @@ static void apply_io_park(u8 pin_num, enum io_park_state park_value) {
             MAP_PinConfigSet(pin_num, pin_strength, PIN_TYPE_STD);
         }
 
-        /* One by one HiZ all the IOs, 
-         by writing the register that drives IOEN_N control 
-         pin of the IOs. This register and the signal path is 
+        /* One by one HiZ all the IOs,
+         by writing the register that drives IOEN_N control
+         pin of the IOs. This register and the signal path is
          always-on and hence not get lost during True-LPDS */
         MAP_PinDirModeSet(pin_num, PIN_DIR_MODE_IN);
 
-        /* Once all the digital IOs has been made HiZ, 
-         the desired default PAD levels would be held by 
-         the weak-pulls. Input buffers would be alive 
-         (such as auto-SPI or wake-GPIOs) and would not 
+        /* Once all the digital IOs has been made HiZ,
+         the desired default PAD levels would be held by
+         the weak-pulls. Input buffers would be alive
+         (such as auto-SPI or wake-GPIOs) and would not
          have Iddq issue since pulls are present. */
     }
     return;
@@ -94,7 +94,7 @@ i32 cc_io_park_safe(struct soc_io_park *io_park_choice, u8 num_pins) {
             case PIN_19:
             case PIN_20:
 #endif
-            /* Do not park these pins as they may 
+            /* Do not park these pins as they may
              have external dependencies */
             break;
         default:

@@ -989,7 +989,7 @@ static int threadCreate(ThreadFxnPtr fxn, void *cli) {
 static void threadExit() {
 #if defined(__linux__)
     pthread_exit(NULL);
-#elif defined(__OSI__)    
+#elif defined(__OSI__)
     osi_TaskDelete(NULL);
 #else
     Task_exit();

@@ -1,35 +1,35 @@
 /*
  * wlan_rx_filters.h - CC31xx/CC32xx Host Driver Implementation
  *
- * Copyright (C) 2014 Texas Instruments Incorporated - http://www.ti.com/ 
- * 
- * 
- *  Redistribution and use in source and binary forms, with or without 
- *  modification, are permitted provided that the following conditions 
+ * Copyright (C) 2014 Texas Instruments Incorporated - http://www.ti.com/
+ *
+ *
+ *  Redistribution and use in source and binary forms, with or without
+ *  modification, are permitted provided that the following conditions
  *  are met:
  *
- *    Redistributions of source code must retain the above copyright 
+ *    Redistributions of source code must retain the above copyright
  *    notice, this list of conditions and the following disclaimer.
  *
  *    Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the 
- *    documentation and/or other materials provided with the   
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the
  *    distribution.
  *
  *    Neither the name of Texas Instruments Incorporated nor the names of
  *    its contributors may be used to endorse or promote products derived
  *    from this software without specific prior written permission.
  *
- *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
- *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- *  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT 
- *  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
- *  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT 
+ *  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ *  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ *  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
  *  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
  *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
- *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+ *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
@@ -86,7 +86,7 @@ extern "C" {
 #define RXFL_OK                                                (0) /*  O.K */
 #define RXFL_OUTPUT_OR_INPUT_BUFFER_LENGTH_TOO_SMALL           (76) /* ! The output buffer length is smaller than required for that operation */
 #define RXFL_DEPENDENT_FILTER_SOFTWARE_FILTER_NOT_FIT          (75) /* Node filter can't be child of software filter and vice_versa */
-#define RXFL_DEPENDENCY_IS_NOT_PERSISTENT                      (74) /*  Dependency filter is not persistent */ 
+#define RXFL_DEPENDENCY_IS_NOT_PERSISTENT                      (74) /*  Dependency filter is not persistent */
 #define RXFL_SYSTEM_STATE_NOT_SUPPORTED_FOR_THIS_FILTER        (72) /*  System state is not supported */
 #define RXFL_TRIGGER_USE_REG5_TO_REG8                          (71) /*  Only counters 5 - 8 are allowed, for Tigger */
 #define RXFL_TRIGGER_USE_REG1_TO_REG4                          (70) /*  Only counters 1 - 4 are allowed, for trigger */
@@ -239,11 +239,11 @@ extern "C" {
          */
         /* _u8 Binary: 1; */
         /*!
-         * 
+         *
          */
         /* _u8 AutoSort : 1; */
         /*!
-         * 
+         *
          */
         /* _u8 AutoFaultDetect : 1; */
         /*!
