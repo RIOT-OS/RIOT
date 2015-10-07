@@ -482,6 +482,11 @@ overflow:
     if (timer_list_head) {
         /* schedule callback on next timer target time */
         next_target = timer_list_head->target - XTIMER_OVERHEAD;
+
+        /* make sure we're not setting a time in the past */
+        if (next_target < (_xtimer_now() + XTIMER_ISR_BACKOFF)) {
+            goto overflow;
+        }
     }
     else {
         /* there's no timer planned for this timer period */
