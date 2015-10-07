@@ -56,7 +56,7 @@ typedef struct {
         cc2538_reg_t TAMR;                  /**< GPTIMER Timer A mode */
         struct {
             cc2538_reg_t TAMR2     :  2;    /**< GPTM Timer A mode */
-            cc2538_reg_t TACRM     :  1;    /**< GPTM Timer A capture mode */
+            cc2538_reg_t TACMR     :  1;    /**< GPTM Timer A capture mode */
             cc2538_reg_t TAAMS     :  1;    /**< GPTM Timer A alternate mode */
             cc2538_reg_t TACDIR    :  1;    /**< GPTM Timer A count direction */
             cc2538_reg_t TAMIE     :  1;    /**< GPTM Timer A match interrupt enable */
@@ -77,7 +77,7 @@ typedef struct {
         cc2538_reg_t TBMR;                  /**< GPTIMER Timer B mode */
         struct {
             cc2538_reg_t TBMR2     :  2;    /**< GPTM Timer B mode */
-            cc2538_reg_t TBCRM     :  1;    /**< GPTM Timer B capture mode */
+            cc2538_reg_t TBCMR     :  1;    /**< GPTM Timer B capture mode */
             cc2538_reg_t TBAMS     :  1;    /**< GPTM Timer B alternate mode */
             cc2538_reg_t TBCDIR    :  1;    /**< GPTM Timer B count direction */
             cc2538_reg_t TBMIE     :  1;    /**< GPTM Timer B match interrupt enable */
@@ -156,6 +156,7 @@ typedef struct {
     cc2538_reg_t TBPV;                      /**< GPTIMER Timer B Prescale Value */
     cc2538_reg_t RESERVED[981];             /**< Reserved */
     cc2538_reg_t PP;                        /**< GPTIMER Peripheral Properties */
+    cc2538_reg_t RESERVED4[15];             /**< Reserved */
 } cc2538_gptimer_t;
 
 #define GPTIMER0 ( (cc2538_gptimer_t*)0x40030000 )       /**< GPTIMER0 Instance */
