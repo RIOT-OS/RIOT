@@ -33,15 +33,15 @@ extern "C" {
 #define TIMER_IRQ_PRIO      1
 
 /* Timer 0 configuration */
-#define TIMER_0_DEV         LPC_CT32B0
+#define TIMER_0_DEV         LPC_CT32B1
 #define TIMER_0_CHANNELS    4
 #define TIMER_0_PRESCALER   (48U)
 #define TIMER_0_MAX_VALUE   (0xffffffff)
-#define TIMER_0_CLKEN()     (LPC_SYSCON->SYSAHBCLKCTRL |= (1 << 9))
-#define TIMER_0_CLKDIS()    (LPC_SYSCON->SYSAHBCLKCTRL &= ~(1 << 9))
-#define TIMER_0_ISR         isr_ct32b0
-#define TIMER_0_IRQ         TIMER_32_0_IRQn
-/** @} */
+#define TIMER_0_CLKEN()     (LPC_SYSCON->SYSAHBCLKCTRL |= (1 << 10))
+#define TIMER_0_CLKDIS()    (LPC_SYSCON->SYSAHBCLKCTRL &= ~(1 << 10))
+#define TIMER_0_ISR         isr_ct32b1
+#define TIMER_0_IRQ         TIMER_32_1_IRQn
+/* @} */
 
 /**
  * @brief UART configuration
@@ -205,6 +205,50 @@ extern "C" {
 #define GPIO_31_PORT        0
 #define GPIO_31_PIN         23
 /** @} */
+
+/**
+ * @brief PWM configuration
+ * @{
+ */
+#define PWM_0_EN            1
+#define PWM_0_CHANNELS      3
+#define PWM_1_EN            1
+#define PWM_1_CHANNELS      3
+#define PWM_NUMOF           (2U)
+
+/* PWM0 common configuration */
+#define PWM_0_DEV           LPC_CT16B0
+#define PWM_0_CLK           BIT7
+/* PWM_0 channel configuration */
+#define PWM_0_CH0_EN        1
+#define PWM_0_CH0_IOCON     LPC_IOCON->PIO1_13
+#define PWM_0_CH0_AF        0x82
+
+#define PWM_0_CH1_EN        1
+#define PWM_0_CH1_IOCON     LPC_IOCON->PIO1_14
+#define PWM_0_CH1_AF        0x82
+
+#define PWM_0_CH2_EN        1
+#define PWM_0_CH2_IOCON     LPC_IOCON->PIO1_15
+#define PWM_0_CH2_AF        0x82
+
+/* PWM1 common configuration */
+#define PWM_1_DEV           LPC_CT32B0
+#define PWM_1_CLK           BIT9
+/* PWM_1 channel configuration */
+
+#define PWM_1_CH0_EN        1
+#define PWM_1_CH0_IOCON     LPC_IOCON->PIO1_24
+#define PWM_1_CH0_AF        0x81
+
+#define PWM_1_CH1_EN        1
+#define PWM_1_CH1_IOCON     LPC_IOCON->PIO1_25
+#define PWM_1_CH1_AF        0x81
+
+#define PWM_1_CH2_EN        1
+#define PWM_1_CH2_IOCON     LPC_IOCON->PIO1_26
+#define PWM_1_CH2_AF        0x81
+/* @} */
 
 #ifdef __cplusplus
 }
