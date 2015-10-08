@@ -18,66 +18,35 @@
 #include <stdbool.h>
 
 #include "bloom.h"
+#include "bitfield.h"
+#include "string.h"
 
-#define SETBIT(a,n) (a[n/CHAR_BIT] |= (1<<(n%CHAR_BIT)))
-#define GETBIT(a,n) (a[n/CHAR_BIT] &  (1<<(n%CHAR_BIT)))
 #define ROUND(size) ((size + CHAR_BIT - 1) / CHAR_BIT)
 
-bloom_t *bloom_new(size_t size, size_t num_hashes, ...)
+void bloom_init(bloom_t *bloom, size_t size, uint8_t *bitfield, hashfp_t *hashes, int hashes_numof)
 {
-    bloom_t *bloom;
-    va_list hashes;
-    size_t n;
-
-    /* Allocate Bloom filter container */
-    if (!(bloom = malloc(sizeof(bloom_t)))) {
-        return NULL;
-    }
-
-    /* Allocate Bloom array */
-    if (!(bloom->a = calloc(ROUND(size), sizeof(uint8_t)))) {
-        free(bloom);
-        return NULL;
-    }
-
-    /* Allocate Bloom filter hash function pointers */
-    if (!(bloom->hash = (hashfp_t *)malloc(num_hashes * sizeof(hashfp_t)))) {
-        free(bloom->a);
-        free(bloom);
-        return NULL;
-    }
-
-    /* Assign hash functions to pointers in the Bloom filter */
-    va_start(hashes, num_hashes);
-
-    for (n = 0; n < num_hashes; n++) {
-        bloom->hash[n] = va_arg(hashes, hashfp_t);
-    }
-
-    va_end(hashes);
-
-    /*
-     * Record the number of hash functions (k) and the number of bytes
-     * in the Bloom array (m).
-     */
-    bloom->k = num_hashes;
     bloom->m = size;
-
-    return bloom;
+    bloom->a = bitfield;
+    bloom->hash = hashes;
+    bloom->k = hashes_numof;
 }
 
 void bloom_del(bloom_t *bloom)
 {
-    free(bloom->a);
-    free(bloom->hash);
-    free(bloom);
+    if (bloom->a) {
+        memset(bloom->a, 0, ROUND(bloom->m));
+    }
+    bloom->a = NULL;
+    bloom->m = 0;
+    bloom->hash = NULL;
+    bloom->k = 0;
 }
 
 void bloom_add(bloom_t *bloom, const uint8_t *buf, size_t len)
 {
     for (size_t n = 0; n < bloom->k; n++) {
         uint32_t hash = bloom->hash[n](buf, len);
-        SETBIT(bloom->a, (hash % bloom->m));
+        bf_set(bloom->a, (hash % bloom->m));
     }
 }
 
@@ -86,7 +55,7 @@ bool bloom_check(bloom_t *bloom, const uint8_t *buf, size_t len)
     for (size_t n = 0; n < bloom->k; n++) {
         uint32_t hash = bloom->hash[n](buf, len);
 
-        if (!(GETBIT(bloom->a, (hash % bloom->m)))) {
+        if (!(bf_isset(bloom->a, (hash % bloom->m)))) {
             return false;
         }
     }
