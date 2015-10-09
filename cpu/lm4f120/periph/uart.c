@@ -77,7 +77,7 @@ static const unsigned long g_ulUARTBase[2] =
 int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, uart_tx_cb_t tx_cb, void *arg)
 {
     /* Check the arguments */
-    ASSERT((uart == 0) || (uart == 1));
+    assert((uart == 0) || (uart == 1));
     /* Check to make sure the UART peripheral is present */
     if(!ROM_SysCtlPeripheralPresent(g_ulUARTPeriph[uart])){
         return -1;
