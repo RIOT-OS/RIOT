@@ -15,7 +15,7 @@
  * @brief       Crash handling functions implementation for ARM Cortex-based MCUs
  *
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
- * @author      Joakim Gebart <joakim.gebart@eistec.se>
+ * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
 #include "cpu.h"
@@ -23,7 +23,7 @@
 
 void panic_arch(void)
 {
-#if DEVELHELP
+#ifdef DEVELHELP
     /* The bkpt instruction will signal to the debugger to break here. */
     __ASM("bkpt #0");
     /* enter infinite loop, into deepest possible sleep mode */

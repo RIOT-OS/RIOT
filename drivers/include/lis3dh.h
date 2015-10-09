@@ -8,7 +8,7 @@
 
 /**
  * @defgroup    driver_lis3dh LIS3DH accelerometer
- * @ingroup     drivers
+ * @ingroup     drivers_sensors
  * @brief       Device driver for the LIS3DH accelerometer
  * @{
  *
@@ -16,7 +16,7 @@
  * @brief       Device driver interface for the LIS3DH accelerometer
  *
  *
- * @author      Joakim Gebart <joakim.gebart@eistec.se>
+ * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
 #ifndef LIS3DH_H_

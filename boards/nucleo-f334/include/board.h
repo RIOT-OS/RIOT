@@ -45,11 +45,6 @@ extern "C" {
 /** @} */
 
 /**
- * @name Assign the hardware timer
- */
-#define HW_TIMER            TIMER_0
-
-/**
  * @name LED pin definitions
  * @{
  */
@@ -72,6 +67,14 @@ extern "C" {
 #define LED_ORANGE_ON
 #define LED_ORANGE_OFF
 #define LED_ORANGE_TOGGLE
+/** @} */
+
+/**
+ * @name xtimer tuning values
+ * @{
+ */
+#define XTIMER_OVERHEAD     5
+#define XTIMER_SHOOT_EARLY  2
 /** @} */
 
 /**

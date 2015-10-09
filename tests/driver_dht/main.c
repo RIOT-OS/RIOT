@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Ludwig Ortmann, Christian Mehlis
+ * Copyright (C) 2015 Ludwig Knüpfer, Christian Mehlis
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -13,7 +13,7 @@
  * @file
  * @brief       Test application for the dht humidity and temperature sensor driver
  *
- * @author      Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ * @author      Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  * @author      Christian Mehlis <mehlis@inf.fu-berlin.de>
  *
  * @}
@@ -29,8 +29,7 @@
 
 #include <stdio.h>
 
-#include "hwtimer.h"
-#include "timex.h"
+#include "xtimer.h"
 
 #include "dht.h"
 
@@ -59,7 +58,7 @@ int main(void)
         dht_parse(&dev, &data, &hum, &temp);
         printf("raw relative humidity: %i\nraw temperature: %i C\n", data.humidity, data.temperature);
         printf("relative humidity: %i\ntemperature: %i C\n", (int) hum, (int) temp);
-        hwtimer_wait(HWTIMER_TICKS(2000 * MS_IN_USEC));
+        xtimer_usleep(2000 * MS_IN_USEC);
     }
 
     return 0;

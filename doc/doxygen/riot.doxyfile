@@ -824,6 +824,7 @@ EXCLUDE_PATTERNS       = */board/*/tools/* \
                          */drivers/nrf24l01p/include/nrf24l01p_settings.h \
                          */cpu/nrf51/include/nrf51*.h \
                          */cpu/lpc1768/include/LPC17xx.h \
+                         */cpu/lpc11u34/include/LPC11Uxx.h \
                          */boards/*/include/periph_conf.h \
                          */cpu/x86/include/x86_pci.h \
                          */cpu/stm32l1/include/stm32l1xx.h \
@@ -2000,7 +2001,13 @@ PREDEFINED             = DOXYGEN \
                          DEVELHELP \
                          ENABLE_DEBUG \
                          TEST_SUITES \
-                         MODULE_GNRC_NDP_ROUTER
+                         MODULE_GNRC_ICMPV6 \
+                         MODULE_GNRC_IPV6 \
+                         MODULE_GNRC_NDP_ROUTER \
+                         MODULE_GNRC_SIXLOWPAN \
+                         MODULE_GNRC_SIXLOWPAN_ND_ROUTER \
+                         MODULE_GNRC_SIXLOWPAN_ND_BORDER_ROUTER \
+                         MODULE_GNRC_UDP
 
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this

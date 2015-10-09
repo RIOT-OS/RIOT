@@ -4,7 +4,7 @@
  * Wrap system calls and system call invoking library calls to make
  * sure no context switches happen during a system call.
  *
- * Copyright (C) 2013 Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ * Copyright (C) 2013 Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -13,7 +13,7 @@
  * @ingroup native_cpu
  * @{
  * @file
- * @author  Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ * @author  Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  */
 
 #ifndef _GNU_SOURCE
@@ -121,7 +121,7 @@ void _native_syscall_leave(void)
        )
     {
         _native_in_isr = 1;
-        disableIRQ();
+        unsigned int mask = disableIRQ();
         _native_cur_ctx = (ucontext_t *)sched_active_thread->sp;
         native_isr_context.uc_stack.ss_sp = __isr_stack;
         native_isr_context.uc_stack.ss_size = SIGSTKSZ;
@@ -130,12 +130,29 @@ void _native_syscall_leave(void)
         if (swapcontext(_native_cur_ctx, &native_isr_context) == -1) {
             err(EXIT_FAILURE, "_native_syscall_leave: swapcontext");
         }
-        enableIRQ();
+        restoreIRQ(mask);
     }
 }
 
+int _native_in_malloc = 0;
 void *malloc(size_t size)
 {
+    /* dynamically load malloc when it's needed - this is necessary to
+     * support g++ 5.2.0 as it uses malloc before startup runs */
+    if (!real_malloc) {
+        if (_native_in_malloc) {
+            /* XXX: This is a dirty hack for behaviour that came along
+             * with g++ 5.2.0.
+             * Throw it out when whatever made it necessary it is fixed. */
+            return NULL;
+        }
+        else {
+            _native_in_malloc = 1;
+            *(void **)(&real_malloc) = dlsym(RTLD_NEXT, "malloc");
+            _native_in_malloc = 0;
+        }
+    }
+
     void *r;
     _native_syscall_enter();
     r = real_malloc(size);

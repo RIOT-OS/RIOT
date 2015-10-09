@@ -31,70 +31,19 @@
 #include <string.h>
 
 #include "byteorder.h"
+#include "net/ipv4/addr.h"
 #include "net/ipv6/addr.h"
 
-#define DEC     "0123456789"
 #define HEX_L   "0123456789abcdef"
 #define HEX_U   "0123456789ABCDEF"
-
-/* XXX: move this to IPv4 when we have it */
-/* based on inet_pton4() by Paul Vixie */
-static network_uint32_t *ipv4_addr_from_str(network_uint32_t *result,
-        const char *addr)
-{
-    uint8_t saw_digit, octets, ch;
-    uint8_t tmp[sizeof(network_uint32_t)], *tp;
-
-    saw_digit = 0;
-    octets = 0;
-    *(tp = tmp) = 0;
-
-    while ((ch = *addr++) != '\0') {
-        const char *pch;
-
-        if ((pch = strchr(DEC, ch)) != NULL) {
-            uint16_t new = *tp * 10 + (uint16_t)(pch - DEC);
-
-            if (new > 255) {
-                return NULL;
-            }
-
-            *tp = new;
-
-            if (!saw_digit) {
-                if (++octets > 4) {
-                    return NULL;
-                }
-
-                saw_digit = 1;
-            }
-        }
-        else if (ch == '.' && saw_digit) {
-            if (octets == 4) {
-                return NULL;
-            }
-
-            *++tp = 0;
-            saw_digit = 0;
-        }
-        else {
-            return NULL;
-        }
-    }
-
-    if (octets < 4) {
-        return NULL;
-    }
-
-    memcpy(result, tmp, sizeof(network_uint32_t));
-    return result;
-}
 
 /* based on inet_pton6() by Paul Vixie */
 ipv6_addr_t *ipv6_addr_from_str(ipv6_addr_t *result, const char *addr)
 {
     uint8_t *colonp = 0;
+#ifdef MODULE_IPV4_ADDR
     const char *curtok = addr;
+#endif
     uint32_t val = 0;
     char ch;
     uint8_t saw_xdigit = 0;
@@ -134,7 +83,9 @@ ipv6_addr_t *ipv6_addr_from_str(ipv6_addr_t *result, const char *addr)
         }
 
         if (ch == ':') {
+#ifdef MODULE_IPV4_ADDR
             curtok = addr;
+#endif
 
             if (!saw_xdigit) {
                 if (colonp != NULL) {
@@ -156,13 +107,15 @@ ipv6_addr_t *ipv6_addr_from_str(ipv6_addr_t *result, const char *addr)
             continue;
         }
 
+#ifdef MODULE_IPV4_ADDR
         if (ch == '.' && (i <= sizeof(ipv6_addr_t)) &&
-            ipv4_addr_from_str((network_uint32_t *)(&(result->u8[i])),
+            ipv4_addr_from_str((ipv4_addr_t *)(&(result->u8[i])),
                                curtok) != NULL) {
-            i += sizeof(network_uint32_t);
+            i += sizeof(ipv4_addr_t);
             saw_xdigit = 0;
             break;  /* '\0' was seen by ipv4_addr_from_str(). */
         }
+#endif
 
         return NULL;
     }

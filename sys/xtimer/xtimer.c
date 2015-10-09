@@ -45,6 +45,7 @@ void _xtimer_sleep(uint32_t offset, uint32_t long_offset)
 
     timer.callback = _callback_unlock_mutex;
     timer.arg = (void*) &mutex;
+    timer.target = timer.long_target = 0;
 
     mutex_lock(&mutex);
     _xtimer_set64(&timer, offset, long_offset);
@@ -72,15 +73,29 @@ void xtimer_usleep_until(uint32_t *last_wakeup, uint32_t interval) {
         goto out;
     }
 
+    /* For large offsets, set an absolute target time, as
+     * it is more exact.
+     *
+     * As that might cause an underflow, for small offsets,
+     * use a relative offset, as that can never underflow.
+     *
+     * For very small offsets, spin.
+     */
     uint32_t offset = target - now;
 
-    if (offset > XTIMER_BACKOFF+XTIMER_USLEEP_UNTIL_OVERHEAD+1) {
+    if (offset > (XTIMER_BACKOFF * 2)) {
         mutex_lock(&mutex);
-        _xtimer_set_absolute(&timer, target - XTIMER_USLEEP_UNTIL_OVERHEAD);
+        if (offset >> 9) { /* >= 512 */
+            offset = target;
+        }
+        else {
+            offset += xtimer_now();
+        }
+        _xtimer_set_absolute(&timer, offset);
         mutex_lock(&mutex);
     }
     else {
-        xtimer_spin_until(target);
+        xtimer_spin(offset);
     }
 
 out:
@@ -127,21 +142,29 @@ void xtimer_set_wakeup(xtimer_t *timer, uint32_t offset, kernel_pid_t pid)
     xtimer_set(timer, offset);
 }
 
+void xtimer_set_wakeup64(xtimer_t *timer, uint64_t offset, kernel_pid_t pid)
+{
+    timer->callback = _callback_wakeup;
+    timer->arg = (void*) ((intptr_t)pid);
+
+    _xtimer_set64(timer, offset, offset >> 32);
+}
+
 /**
  * see http://www.hackersdelight.org/magic.htm.
  * This is to avoid using long integer division functions
  * the compiler otherwise links in.
  */
-static inline uint64_t _ms_to_sec(uint64_t ms)
+static inline uint64_t _us_to_sec(uint64_t us)
 {
-    return (unsigned long long)(ms * 0x431bde83) >> (0x12 + 32);
+    return (unsigned long long)(us * 0x431bde83) >> (0x12 + 32);
 }
 
 void xtimer_now_timex(timex_t *out)
 {
     uint64_t now = xtimer_now64();
 
-    out->seconds = _ms_to_sec(now);
+    out->seconds = _us_to_sec(now);
     out->microseconds = now - (out->seconds * SEC_IN_USEC);
 }
 
@@ -151,6 +174,7 @@ int xtimer_msg_receive_timeout64(msg_t *m, uint64_t timeout) {
     tmsg.content.ptr = (char *) &tmsg;
 
     xtimer_t t;
+    t.target = t.long_target = 0;
     xtimer_set_msg64(&t, timeout, &tmsg, sched_active_pid);
 
     msg_receive(m);

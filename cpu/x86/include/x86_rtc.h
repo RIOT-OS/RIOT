@@ -147,7 +147,7 @@ typedef void (*x86_rtc_callback_t)(uint8_t reg_c);
  * where `reg_c` is the value of CMOS register C.
  *
  * You should not call this function directly.
- * You should use hwtimer -- or better yet -- vtimer instead.
+ * You should use xtimer instead.
  */
 bool x86_rtc_set_alarm(const x86_rtc_data_t *when, uint32_t msg_content, kernel_pid_t target_pid, bool allow_replace);
 
@@ -162,7 +162,7 @@ bool x86_rtc_set_alarm(const x86_rtc_data_t *when, uint32_t msg_content, kernel_
  * where `reg_c` is the value of CMOS register C.
  *
  * You should not call this function directly.
- * You should use hwtimer -- or better yet -- vtimer instead.
+ * You should use xtimer instead.
  */
 bool x86_rtc_set_periodic(uint8_t hz, uint32_t msg_content, kernel_pid_t target_pid, bool allow_replace);
 
@@ -176,7 +176,7 @@ bool x86_rtc_set_periodic(uint8_t hz, uint32_t msg_content, kernel_pid_t target_
  * where `reg_c` is the value of CMOS register C.
  *
  * You should not call this function directly.
- * You should use hwtimer -- or better yet -- vtimer instead.
+ * You should use xtimer instead.
  */
 bool x86_rtc_set_update(uint32_t msg_content, kernel_pid_t target_pid, bool allow_replace);
 

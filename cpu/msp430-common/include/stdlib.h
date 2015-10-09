@@ -14,7 +14,7 @@
  * @brief       stdlib.h wrapper for MSP430
  * @see http://www.cplusplus.com/reference/cstdlib/
  *
- * @author      Joakim Gebart <joakim.gebart@eistec.se
+ * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se
  */
 
 #ifndef RIOT_MSP430_STDLIB_H_

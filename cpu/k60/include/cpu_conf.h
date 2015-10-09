@@ -15,7 +15,7 @@
  * @file
  * @brief           Implementation specific CPU configuration options
  *
- * @author          Joakim Gebart <joakim.gebart@eistec.se>
+ * @author          Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
 #ifndef CPU_CONF_H_

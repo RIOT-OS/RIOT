@@ -34,11 +34,6 @@ extern "C" {
 #define F_CPU               (CLOCK_CORECLOCK)
 
 /**
- * @brief   Assign the hardware timer
- */
-#define HW_TIMER            TIMER_0
-
-/**
  * @name    Define the boards STDIO
  * @{
  */

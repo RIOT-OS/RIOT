@@ -184,6 +184,9 @@ int msg_try_receive(msg_t *m);
  *
  * @note    CAUTION! Use this function only when receiver is already waiting.
  *          If not use simple msg_send()
+ *
+ * @pre     @p target_pid is not the PID of the current thread.
+ *
  * @param[in] m             Pointer to preallocated ``msg_t`` structure with
  *                          the message to send, must not be NULL.
  * @param[out] reply        Pointer to preallocated msg. Reply will be written

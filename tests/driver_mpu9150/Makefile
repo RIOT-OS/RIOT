@@ -11,7 +11,7 @@ ifneq (,$(filter msbiot,$(BOARD)))
 endif
 
 USEMODULE += mpu9150
-USEMODULE += vtimer
+USEMODULE += xtimer
 
 ifneq (,$(TEST_I2C))
   CFLAGS += -DTEST_I2C=$(TEST_I2C)

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>,
+ * Copyright (C) 2015 Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>,
  *                    Martine Lenders <mlenders@inf.fu-berlin.de>
  *                    Kaspar Schleiser <kaspar@schleiser.de>
  *                    Ell-i open source co-operative
@@ -159,6 +159,9 @@ int _get(netdev2_t *dev, netopt_t opt, void *value, size_t max_len)
             break;
         case NETOPT_IPV6_IID:
             return _get_iid(dev, value, max_len);
+        case NETOPT_IS_WIRED:
+            res = 1;
+            break;
         default:
             res = -ENOTSUP;
             break;
@@ -221,7 +224,7 @@ static int _recv(netdev2_t *netdev2, char *buf, int len)
     if (!buf) {
         /* no way of figuring out packet size without racey buffering,
          * so we return the maximum possible size */
-        return 576;
+        return ETHERNET_FRAME_LEN;
     }
 
     int nread = real_read(dev->tap_fd, buf, len);

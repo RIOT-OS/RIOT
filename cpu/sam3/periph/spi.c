@@ -16,7 +16,7 @@
  * @author      Maxime Blanloeil <maxime.blanloeil@phelma.grenoble-inp.fr>
  * @author      Peter Kietzmann  <peter.kietzmann@haw-hamburg.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
- * @author      Joakim Gebart <joakim.gebart@eistec.se>
+ * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  *
  * @}
  */

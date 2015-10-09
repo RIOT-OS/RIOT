@@ -9,7 +9,7 @@
 
 /**
  * @defgroup    drivers_xbee XBee driver
- * @ingroup     drivers
+ * @ingroup     drivers_netdev
  * @brief       High-level driver for the XBee S1 802.15.4 modem
  * @{
  *

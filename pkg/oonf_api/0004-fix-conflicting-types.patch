@@ -1,7 +1,7 @@
-From 67f5a991886c09b652848a97017b4bb6cfcaa7e2 Mon Sep 17 00:00:00 2001
+From 228ac53093365c7c02feeb420fa6189e932e5a9f Mon Sep 17 00:00:00 2001
 From: Benjamin Valentin <benpicco@zedat.fu-berlin.de>
 Date: Sun, 18 May 2014 22:48:40 +0200
-Subject: [PATCH] fix conflicting types
+Subject: [PATCH 04/10] fix conflicting types
 
 ---
  src-api/rfc5444/rfc5444_reader.c | 10 +++++-----
@@ -40,12 +40,11 @@ index 6962741..c1ca7f6 100644
 @@ -309,7 +309,7 @@ EXPORT void rfc5444_reader_remove_packet_consumer(
  EXPORT void rfc5444_reader_remove_message_consumer(
      struct rfc5444_reader *, struct rfc5444_reader_tlvblock_consumer *);
- 
+
 -EXPORT int rfc5444_reader_handle_packet(
 +EXPORT enum rfc5444_result rfc5444_reader_handle_packet(
      struct rfc5444_reader *parser, uint8_t *buffer, size_t length);
- 
- EXPORT uint8_t *rfc5444_reader_get_tlv_value(
--- 
-1.9.1
 
+ EXPORT uint8_t *rfc5444_reader_get_tlv_value(
+--
+1.9.1

@@ -13,7 +13,7 @@
  * @file
  * @brief       Implementation of the kernel's power management interface
  *
- * @author      Joakim Gebart <joakim.gebart@eistec.se>
+ * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  *
  * @}
  */

@@ -118,7 +118,10 @@ void gnrc_icmpv6_echo_req_handle(kernel_pid_t iface, ipv6_hdr_t *ipv6_hdr,
     gnrc_pktbuf_hold(pkt, gnrc_netreg_num(GNRC_NETTYPE_IPV6, GNRC_NETREG_DEMUX_CTX_ALL) - 1);
 
     while (sendto != NULL) {
-        gnrc_netapi_send(sendto->pid, pkt);
+        if (gnrc_netapi_send(sendto->pid, pkt) < 1) {
+            DEBUG("icmpv6_echo: unable to send packet\n");
+            gnrc_pktbuf_release(pkt);
+        }
         sendto = gnrc_netreg_getnext(sendto);
     }
 }

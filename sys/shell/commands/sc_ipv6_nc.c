@@ -72,11 +72,11 @@ static void _print_nc_type(gnrc_ipv6_nc_t *entry)
             break;
 
         case GNRC_IPV6_NC_TYPE_TENTATIVE:
-            printf("T");
+            printf("TENT");
             break;
 
         case GNRC_IPV6_NC_TYPE_REGISTERED:
-            printf("R");
+            printf("REG");
             break;
 
         default:
@@ -141,7 +141,7 @@ static int _ipv6_nc_add(int argc, char **argv)
     kernel_pid_t iface = KERNEL_PID_UNDEF;
     ipv6_addr_t ipv6_addr;
     uint8_t l2_addr[MAX_L2_ADDR_LEN];
-    size_t l2_addr_len;
+    size_t l2_addr_len = 0;
 
     switch (argc) {
         case 1:

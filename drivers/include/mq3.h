@@ -8,7 +8,7 @@
 
 /**
  * @defgroup    driver_mq3 MQ-3 Alcohol Tester
- * @ingroup     drivers
+ * @ingroup     drivers_sensors
  * @brief       Device driver for the MQ-3 alcohol sensor
  * @{
  *

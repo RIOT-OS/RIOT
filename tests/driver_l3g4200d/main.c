@@ -33,7 +33,7 @@
 
 #include <stdio.h>
 
-#include "vtimer.h"
+#include "xtimer.h"
 #include "l3g4200d.h"
 
 #define MODE        L3G4200D_MODE_100_25
@@ -62,7 +62,7 @@ int main(void)
         printf("Gyro data [dps] - X: %6i   Y: %6i   Z: %6i\n",
                acc_data.acc_x, acc_data.acc_y, acc_data.acc_z);
 
-        vtimer_usleep(SLEEP);
+        xtimer_usleep(SLEEP);
     }
 
     return 0;

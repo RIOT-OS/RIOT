@@ -5,4 +5,4 @@ ifeq ($(BUILDOSXNATIVE),1)
     export NATIVEINCLUDES += -I$(RIOTBASE)/sys/malloc/include
 endif
 
-export USEMODULE += periph hwtimer_compat
+export USEMODULE += periph

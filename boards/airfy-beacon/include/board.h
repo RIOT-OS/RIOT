@@ -33,6 +33,17 @@
 #define F_CPU               (16000000UL)
 
 /**
+ * @brief   Xtimer configuration
+ * @{
+ */
+#define XTIMER                      (0)
+#define XTIMER_CHAN                 (0)
+#define XTIMER_MASK                 (0xff000000)
+#define XTIMER_SHIFT_ON_COMPARE     (2)
+#define XTIMER_BACKOFF              (40)
+/** @} */
+
+/**
  * @name Define the boards stdio
  * @{
  */
@@ -40,11 +51,6 @@
 #define STDIO_BAUDRATE      (115200U)
 #define STDIO_RX_BUFSIZE    (64U)
 /** @} */
-
-/**
- * @name Assign the hardware timer
- */
-#define HW_TIMER            TIMER_0
 
 /**
  * @name Macros for controlling the on-board LEDs.

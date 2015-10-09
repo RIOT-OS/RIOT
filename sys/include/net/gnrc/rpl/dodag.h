@@ -198,6 +198,20 @@ void gnrc_rpl_parent_update(gnrc_rpl_dodag_t *dodag, gnrc_rpl_parent_t *parent);
  * @param[in] dodag     Pointer to the DODAG
  */
 void gnrc_rpl_local_repair(gnrc_rpl_dodag_t *dodag);
+
+/**
+ * @brief   Operate as leaf.
+ *
+ * @param[in] dodag     Pointer to the DODAG
+ */
+void gnrc_rpl_leaf_operation(gnrc_rpl_dodag_t *dodag);
+
+/**
+ * @brief   Operate as router.
+ *
+ * @param[in] dodag     Pointer to the DODAG
+ */
+void gnrc_rpl_router_operation(gnrc_rpl_dodag_t *dodag);
 #ifdef __cplusplus
 }
 #endif

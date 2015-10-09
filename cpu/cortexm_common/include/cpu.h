@@ -22,13 +22,15 @@
  *
  * @author      Stefan Pfeiffer <stefan.pfeiffer@fu-berlin.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
- * @author      Joakim Gebart <joakim.gebart@eistec.se>
+ * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  *
  * @todo        remove include irq.h once core was adjusted
  */
 
 #ifndef CPU_H_
 #define CPU_H_
+
+#include <stdio.h>
 
 #include "cpu_conf.h"
 #include "irq.h"
@@ -63,14 +65,6 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Deprecated interrupt control function for backward compatibility
- * @{
- */
-#define eINT                            enableIRQ
-#define dINT                            disableIRQ
-/** @} */
-
-/**
  * @brief   Some members of the Cortex-M family have architecture specific
  *          atomic operations in atomic_arch.c
  */
@@ -78,22 +72,6 @@ extern "C" {
     defined(CPU_ARCH_CORTEX_M4F)
 #define ARCH_HAS_ATOMIC_COMPARE_AND_SWAP 1
 #endif
-
-/**
- * @brief Definition of available panic modes
- */
-typedef enum {
-    PANIC_NMI_HANDLER,       /**< non maskable interrupt */
-    PANIC_HARD_FAULT,        /**< hard fault */
-#if defined(CPU_ARCH_CORTEX_M3) || defined(CPU_ARCH_CORTEX_M4) || \
-    defined(CPU_ARCH_CORTEX_M4F)
-    PANIC_MEM_MANAGE,        /**< memory controller interrupt */
-    PANIC_BUS_FAULT,         /**< bus fault */
-    PANIC_USAGE_FAULT,       /**< undefined instruction or unaligned access */
-    PANIC_DEBUG_MON,         /**< debug interrupt */
-#endif
-    PANIC_DUMMY_HANDLER,     /**< unhandled interrupt */
-} panic_t;
 
 /**
  * @brief   Initialization of the CPU
@@ -104,6 +82,16 @@ void cpu_init(void);
  * @brief   Initialize Cortex-M specific core parts of the CPU
  */
 void cortexm_init(void);
+
+/**
+ * @brief   Prints the current content of the link register (lr)
+ */
+static inline void cpu_print_last_instruction(void)
+{
+    register uint32_t *lr_ptr;
+    __asm__ __volatile__("mov %0, lr" : "=r"(lr_ptr));
+    printf("%p\n", lr_ptr);
+}
 
 #ifdef __cplusplus
 }

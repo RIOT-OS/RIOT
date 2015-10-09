@@ -38,6 +38,9 @@ endif
 ifneq (,$(filter lsm303dlhc,$(USEMODULE)))
   SRC += sc_lsm303dlhc.c
 endif
+ifneq (,$(filter at30tse75x,$(USEMODULE)))
+    SRC += sc_at30tse75x.c
+endif
 ifneq (,$(filter gnrc_netif,$(USEMODULE)))
   SRC += sc_netif.c
 endif
@@ -47,6 +50,9 @@ endif
 ifneq (,$(filter gnrc_ipv6_nc,$(USEMODULE)))
   SRC += sc_ipv6_nc.c
 endif
+ifneq (,$(filter gnrc_ipv6_whitelist,$(USEMODULE)))
+  SRC += sc_whitelist.c
+endif
 ifneq (,$(filter gnrc_icmpv6_echo vtimer,$(USEMODULE)))
   SRC += sc_icmpv6_echo.c
 endif
@@ -55,6 +61,11 @@ ifneq (,$(filter gnrc_zep ipv6_addr,$(USEMODULE)))
 endif
 ifneq (,$(filter gnrc_rpl,$(USEMODULE)))
     SRC += sc_gnrc_rpl.c
+endif
+ifneq (,$(filter gnrc_sixlowpan_ctx,$(USEMODULE)))
+ifneq (,$(filter gnrc_sixlowpan_nd_border_router,$(USEMODULE)))
+    SRC += sc_gnrc_6ctx.c
+endif
 endif
 
 # TODO

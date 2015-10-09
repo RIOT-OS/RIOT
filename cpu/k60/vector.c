@@ -14,7 +14,7 @@
  *
  * @brief Interrupt vector for K60 MCU.
  *
- * @author Joakim Gebart <joakim.gebart@eistec.se>
+ * @author Joakim Nohlgård <joakim.nohlgard@eistec.se>
  *
  * @note It is not necessary to modify this file to define custom interrupt
  * service routines. All symbols are defined weak, it is only necessary to

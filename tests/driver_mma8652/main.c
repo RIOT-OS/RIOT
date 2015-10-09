@@ -29,7 +29,7 @@
 
 #include <stdio.h>
 
-#include "vtimer.h"
+#include "xtimer.h"
 #include "mma8652.h"
 
 #define SLEEP       (1000 * 1000U)
@@ -68,7 +68,7 @@ int main(void)
     while (1) {
         mma8652_read(&dev, &x, &y, &z, &status);
         printf("Acceleration, raw: X: %d Y: %d Z: %d S: %2x\n", x, y, z, status);
-        vtimer_usleep(SLEEP);
+        xtimer_usleep(SLEEP);
     }
 
     return 0;

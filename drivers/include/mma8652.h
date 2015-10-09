@@ -8,7 +8,7 @@
 
 /**
  * @defgroup    drivers_mma8652 MMA8652 Accelerometer
- * @ingroup     drivers
+ * @ingroup     drivers_sensors
  * @brief       Driver for the Freescale MMA8652 3-Axis accelerometer.
  *              The driver will initialize the accelerometer for
  *              best resolution (12 bit).

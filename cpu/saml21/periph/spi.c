@@ -18,7 +18,7 @@
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  * @author      Troels Hoffmeyer <troels.d.hoffmeyer@gmail.com>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
- * @author      Joakim Gebart <joakim.gebart@eistec.se>
+ * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  *
  * @}
@@ -173,7 +173,7 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
 int spi_init_slave(spi_t dev, spi_conf_t conf, char (*cb)(char))
 {
     /* TODO */
-    return 0;
+    return -1;
 }
 
 void spi_transmission_begin(spi_t dev, char reset_val)

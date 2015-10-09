@@ -11,6 +11,6 @@ BOARD_INSUFFICIENT_MEMORY :=  stm32f0discovery
 # Modules to include.
 USEMODULE += pthread
 USEMODULE += random
-USEMODULE += vtimer
+USEMODULE += xtimer
 
 include $(RIOTBASE)/Makefile.include

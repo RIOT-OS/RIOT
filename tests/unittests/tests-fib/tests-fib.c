@@ -13,7 +13,7 @@
 #include <errno.h>
 #include "embUnit.h"
 #include "tests-fib.h"
-#include "vtimer.h"
+#include "xtimer.h"
 
 #include "thread.h"
 #include "net/fib.h"
@@ -37,7 +37,7 @@ static void _fill_FIB_unique(size_t entries)
     for (size_t i = 0; i < entries; ++i) {
         /* construct "addresses" for the FIB */
         snprintf(addr_dst, add_buf_size, "Test address %02d", (int)i);
-        snprintf(addr_nxt, add_buf_size, "Test address %02d", entries + i);
+        snprintf(addr_nxt, add_buf_size, "Test address %02d", (int)(entries + i));
         /* the terminating \0 is unnecessary here */
         fib_add_entry(&test_fib_table, 42,
                       (uint8_t *)addr_dst, add_buf_size - 1, addr_dst_flags,
@@ -61,7 +61,7 @@ static void _fill_FIB_multiple(size_t entries, size_t modulus)
     for (size_t i = 0; i < entries; ++i) {
         /* construct "addresses" for the FIB */
         snprintf(addr_dst, add_buf_size, "Test address %02d", (int)i);
-        snprintf(addr_nxt, add_buf_size, "Test address %02d", i % modulus);
+        snprintf(addr_nxt, add_buf_size, "Test address %02d", (int)(i % modulus));
         fib_add_entry(&test_fib_table, 42,
                       (uint8_t *)addr_dst, add_buf_size - 1, addr_dst_flags,
                       (uint8_t *)addr_nxt, add_buf_size - 1, addr_nxt_flags,
@@ -190,7 +190,7 @@ static void test_fib_05_remove_upper_half(void)
 
     for (size_t i = 0; i < entries / 2; ++i) {
         /* construct "addresses" to remove */
-        snprintf(addr_dst, add_buf_size, "Test address %02d", ((entries / 2) + i));
+        snprintf(addr_dst, add_buf_size, "Test address %02d", (int)((entries / 2) + i));
         fib_remove_entry(&test_fib_table, (uint8_t *)addr_dst, add_buf_size - 1);
     }
 
@@ -550,7 +550,7 @@ static void test_fib_14_exact_and_prefix_match(void)
 
 static void test_fib_15_get_lifetime(void)
 {
-    timex_t lifetime, now;
+    uint64_t lifetime, now;
     kernel_pid_t iface_id = 1;
     char addr_dst[] = "Test address151";
     char addr_nxt[] = "Test address152";
@@ -568,12 +568,13 @@ static void test_fib_15_get_lifetime(void)
                                                     add_buf_size - 1));
 
     /* assuming some ms passed during these operations... */
-    vtimer_now(&now);
-    timex_t cmp_lifetime = timex_add(now, timex_set(0, 900000));
-    timex_t cmp_max_lifetime = timex_add(now, timex_set(1,1));
-    TEST_ASSERT_EQUAL_INT(1, timex_cmp(lifetime, cmp_lifetime));
+    now = xtimer_now64();
+    uint64_t cmp_lifetime = now + 900000lU;
+    uint64_t cmp_max_lifetime = now + 1100000lU;
+
+    TEST_ASSERT_EQUAL_INT(1, (lifetime > cmp_lifetime));
     /* make sure lifetime hasn't grown magically either */
-    TEST_ASSERT_EQUAL_INT(-1, timex_cmp(lifetime, cmp_max_lifetime));
+    TEST_ASSERT_EQUAL_INT(1, (lifetime < cmp_max_lifetime));
 
     fib_deinit(&test_fib_table);
 }
@@ -672,7 +673,7 @@ static void test_fib_17_get_entry_set(void)
     for (size_t i = 0; i < 20; ++i) {
         /* construct "addresses" for the FIB */
         snprintf(addr_dst, addr_buf_size, "Test address %02d", (int)i);
-        snprintf(addr_nxt, addr_buf_size, "Test address %02d", i % 11);
+        snprintf(addr_nxt, addr_buf_size, "Test address %02d", (int)(i % 11));
         fib_add_entry(&test_fib_table, 42,
                       (uint8_t *)addr_dst, addr_buf_size - 1, 0x0,
                       (uint8_t *)addr_nxt, addr_buf_size - 1, 0x0, 100000);

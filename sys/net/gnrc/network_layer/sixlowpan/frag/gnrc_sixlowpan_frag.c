@@ -126,7 +126,10 @@ static uint16_t _send_1st_fragment(gnrc_sixlowpan_netif_t *iface, gnrc_pktsnip_t
     DEBUG("6lo frag: send first fragment (datagram size: %u, "
           "datagram tag: %" PRIu16 ", fragment size: %" PRIu16 ")\n",
           (unsigned int)datagram_size, _tag, local_offset);
-    gnrc_netapi_send(iface->pid, frag);
+    if (gnrc_netapi_send(iface->pid, frag) < 1) {
+        DEBUG("6lo frag: unable to send first fragment\n");
+        gnrc_pktbuf_release(frag);
+    }
 
     return local_offset;
 }
@@ -201,7 +204,10 @@ static uint16_t _send_nth_fragment(gnrc_sixlowpan_netif_t *iface, gnrc_pktsnip_t
           "fragment size: %" PRIu16 ")\n",
           (unsigned int)datagram_size, _tag, hdr->offset, hdr->offset << 3,
           local_offset);
-    gnrc_netapi_send(iface->pid, frag);
+    if (gnrc_netapi_send(iface->pid, frag) < 1) {
+        DEBUG("6lo frag: unable to send subsequent fragment\n");
+        gnrc_pktbuf_release(frag);
+    }
 
     return local_offset;
 }

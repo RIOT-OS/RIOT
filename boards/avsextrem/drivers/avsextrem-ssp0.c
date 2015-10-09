@@ -27,7 +27,6 @@
 #include "smb380-board.h"
 //#include "mma7455l-board.h"
 #include "gpioint.h"
-#include "hwtimer.h"
 #include <stdio.h>
 #include "lpm.h"
 

@@ -19,7 +19,7 @@
  * @author      Hauke Petersen <mail@haukepetersen.de>
  * @author      Johann Fischer <j.fischer@phytec.de>
  * @author      Jonas Remmert <j.remmert@phytec.de>
- * @author      Joakim Gebart <joakim.gebart@eistec.se
+ * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se
  *
  * @}
  */

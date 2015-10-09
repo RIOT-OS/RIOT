@@ -44,11 +44,6 @@ extern "C" {
 /** @} */
 
 /**
- * @name Assign the hardware timer
- */
-#define HW_TIMER            TIMER_0
-
-/**
  * @name    LED pin definitions
  * @{
  */

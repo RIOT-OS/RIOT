@@ -138,7 +138,6 @@ void rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
     }
 
     if (entry->cur_size == entry->pkt->size) {
-        kernel_pid_t iface = netif_hdr->if_pid;
         gnrc_pktsnip_t *netif = gnrc_netif_hdr_build(entry->src, entry->src_len,
                                                      entry->dst, entry->dst_len);
 
@@ -149,8 +148,15 @@ void rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
             return;
         }
 
-        netif_hdr = netif->data;
-        netif_hdr->if_pid = iface;
+        /* copy the transmit information of the latest fragment into the newly
+         * created header to have some link_layer information. The link_layer
+         * info of the previous fragments is discarded.
+         */
+        gnrc_netif_hdr_t *new_netif_hdr = netif->data;
+        new_netif_hdr->if_pid = netif_hdr->if_pid;
+        new_netif_hdr->flags = netif_hdr->flags;
+        new_netif_hdr->lqi = netif_hdr->lqi;
+        new_netif_hdr->rssi = netif_hdr->rssi;
         LL_APPEND(entry->pkt, netif);
 
         if (!gnrc_netapi_dispatch_receive(GNRC_NETTYPE_IPV6, GNRC_NETREG_DEMUX_CTX_ALL,

@@ -34,11 +34,6 @@
 #define F_CPU               (32000000UL)
 
 /**
- * @name Assign the peripheral timer to be used as hardware timer
- */
-#define HW_TIMER            TIMER_0
-
-/**
  * @name Assign the UART interface to be used for stdio
  * @{
  */

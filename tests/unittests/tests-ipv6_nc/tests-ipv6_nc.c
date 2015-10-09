@@ -18,6 +18,7 @@
 
 #include "net/ipv6/addr.h"
 #include "net/gnrc/ipv6/nc.h"
+#include "net/gnrc/ipv6/netif.h"
 
 #include "unittests-constants.h"
 #include "tests-ipv6_nc.h"
@@ -50,6 +51,7 @@
 static void set_up(void)
 {
     gnrc_ipv6_nc_init();
+    gnrc_ipv6_netif_add(DEFAULT_TEST_NETIF);
 }
 
 static void test_ipv6_nc_add__address_registered(void)

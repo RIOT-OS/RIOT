@@ -6,7 +6,7 @@
 # Public License v2.1. See the file LICENSE in the top level directory for more
 # details.
 
-# Author: Joakim Gebart <joakim.gebart@eistec.se>
+# Author: Joakim Nohlgård <joakim.nohlgard@eistec.se>
 
 # Convert a GCC command line to Eclipse settings for import in
 # Project->Properties->C/C++ General->Paths and Symbols

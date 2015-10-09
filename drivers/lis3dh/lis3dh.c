@@ -19,7 +19,7 @@
  * @file
  * @brief  Implementation of LIS3DH SPI driver
  *
- * @author Joakim Gebart <joakim.gebart@eistec.se>
+ * @author Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
 

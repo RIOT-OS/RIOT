@@ -97,7 +97,8 @@ gnrc_pktsnip_t *gnrc_pktbuf_mark(gnrc_pktsnip_t *pkt, size_t size, gnrc_nettype_
     if ((size == 0) || (pkt == NULL) || (size > pkt->size) || (pkt->data == NULL)) {
         DEBUG("pktbuf: size == 0 (was %u) or pkt == NULL (was %p) or "
               "size > pkt->size (was %u) or pkt->data == NULL (was %p)\n",
-              (unsigned)size, (void *)pkt, (unsigned)pkt->size, pkt->data);
+              (unsigned)size, (void *)pkt, (pkt ? (unsigned)pkt->size : 0),
+              (pkt ? pkt->data : NULL));
         mutex_unlock(&_mutex);
         return NULL;
     }
@@ -112,7 +113,8 @@ gnrc_pktsnip_t *gnrc_pktbuf_mark(gnrc_pktsnip_t *pkt, size_t size, gnrc_nettype_
         mutex_unlock(&_mutex);
         return NULL;
     }
-    if (size < required_new_size) { /* would not fit unused marker => move data around */
+    /* would not fit unused marker => move data around */
+    if ((size < required_new_size) || ((pkt->size - size) < sizeof(_unused_t))) {
         void *new_data_marked, *new_data_rest;
         new_data_marked = _pktbuf_alloc(size);
         if (new_data_marked == NULL) {
@@ -272,7 +274,7 @@ static inline void _print_chunk(void *chunk, size_t size, int num)
 {
     printf("================ chunk %3d (size: %4u) ================\n", num,
            (unsigned int)size);
-    od(chunk, GNRC_PKTBUF_SIZE, OD_WIDTH_DEFAULT,
+    od(chunk, size, OD_WIDTH_DEFAULT,
        OD_FLAGS_ADDRESS_HEX | OD_FLAGS_BYTES_HEX | OD_FLAGS_LENGTH_1);
 }
 
@@ -311,8 +313,8 @@ void gnrc_pktbuf_stats(void)
         }
         _print_chunk(chunk, size, count++);
         chunk += (size + ptr->size);
-        ptr = ptr->next;
         _print_unused(ptr);
+        ptr = ptr->next;
     }
 
     if (chunk <= &_pktbuf[GNRC_PKTBUF_SIZE - 1]) {
@@ -393,7 +395,7 @@ static void *_pktbuf_alloc(size_t size)
 {
     _unused_t *prev = NULL, *ptr = _first_unused;
     size = (size < sizeof(_unused_t)) ? _align(sizeof(_unused_t)) : _align(size);
-    while (ptr && size > ptr->size) {
+    while (ptr && (size > ptr->size)) {
         prev = ptr;
         ptr = ptr->next;
     }

@@ -1,5 +1,5 @@
-ifneq (,$(filter pnet,$(USEMODULE)))
-    DIRS += posix/pnet
+ifneq (,$(filter posix_sockets,$(USEMODULE)))
+    DIRS += posix/sockets
 endif
 ifneq (,$(filter pthread,$(USEMODULE)))
     DIRS += posix/pthread
@@ -15,6 +15,9 @@ ifneq (,$(filter routing,$(USEMODULE)))
 endif
 ifneq (,$(filter oneway_malloc,$(USEMODULE)))
     DIRS += oneway-malloc
+endif
+ifneq (,$(filter ipv4_addr,$(USEMODULE)))
+    DIRS += net/network_layer/ipv4/addr
 endif
 ifneq (,$(filter ipv6_addr,$(USEMODULE)))
     DIRS += net/network_layer/ipv6/addr
@@ -49,11 +52,11 @@ endif
 ifneq (,$(filter sixlowpan,$(USEMODULE)))
     DIRS += net/network_layer/sixlowpan
 endif
-ifneq (,$(filter hwtimer_compat,$(USEMODULE)))
-    DIRS += compat/hwtimer
-endif
 ifneq (,$(filter log_%,$(USEMODULE)))
     DIRS += log
+endif
+ifneq (,$(filter vtimer,$(USEMODULE)))
+    DIRS += compat/vtimer
 endif
 ifneq (,$(filter cpp11-compat,$(USEMODULE)))
     DIRS += cpp11-compat

@@ -41,7 +41,7 @@ void lifo_insert(int *array, int i)
 
     int index = i + 1;
 
-#if DEVELHELP
+#ifdef DEVELHELP
     if ((array[index] != -1) && (array[0] != -1)) {
         LOG_WARNING("lifo_insert: overwriting array[%i] == %i with %i\n\n\n\t\tThe lifo is broken now.\n\n\n", index, array[index], array[0]);
     }
@@ -60,7 +60,7 @@ int lifo_get(int *array)
         array[0] = array[head + 1];
     }
 
-#if DEVELHELP
+#ifdef DEVELHELP
     /* make sure a double insert does not result in an infinite
      * resource of values */
     array[head+1] = -1;

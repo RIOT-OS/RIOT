@@ -81,7 +81,7 @@ static void send(char *addr_str, char *port_str, char *data, unsigned int num,
             gnrc_pktbuf_release(ip);
             return;
         }
-        printf("Success: send %u byte to %s:%u\n", (unsigned)payload->size,
+        printf("Success: send %u byte to [%s]:%u\n", (unsigned)payload->size,
                addr_str, tmp);
         vtimer_usleep(delay);
     }

@@ -3,6 +3,6 @@ include ../Makefile.tests_common
 
 FEATURES_REQUIRED = periph_rtc
 
-DISABLE_MODULE += auto_init
+USEMODULE += xtimer
 
 include $(RIOTBASE)/Makefile.include

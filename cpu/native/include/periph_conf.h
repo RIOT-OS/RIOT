@@ -1,7 +1,7 @@
 /**
  * Native CPU peripheral configuration
  *
- * Copyright (C) 2014 Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ * Copyright (C) 2014 Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -10,7 +10,7 @@
  * @ingroup native_cpu
  * @{
  * @file
- * @author  Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ * @author  Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  */
 
 #ifndef PERIPH_CONF_H
@@ -48,8 +48,12 @@
 #define TIMER_NUMOF        (1U)
 #define TIMER_0_EN         1
 
-/** @def set TIMER0 for hwtimer wrapper */
-#define HW_TIMER TIMER_0
+/**
+ * @brief xtimer configuration
+ * @{
+ */
+#define XTIMER_OVERHEAD 14
+#define XTIMER_USLEEP_UNTIL_OVERHEAD 1
 /** @} */
 
 #ifdef __cplusplus

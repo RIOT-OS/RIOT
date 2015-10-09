@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ * Copyright (C) 2013 Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,19 +14,27 @@
  * @ingroup     cpu
  * @brief       CPU abstraction for the native port
  * @{
- * @author  Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ * @author  Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  */
 
 #ifndef _CPU_H
 #define _CPU_H
 
+#include <stdio.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/* TODO: remove once these have been removed from RIOT: */
-void dINT(void);
-void eINT(void);
+/**
+ * @brief   Prints the last instruction's address
+ */
+static inline void cpu_print_last_instruction(void)
+{
+    void *p;
+    __asm__("1: mov 1b, %0" : "=r" (p));
+    printf("%p\n", p);
+}
 
 #ifdef __cplusplus
 }

@@ -1,37 +1,32 @@
 ## the cpu to build for
 export CPU = msp430fxyz
-export MCU = msp430f1612
+export CPU_MODEL = msp430f1612
 
-# toolchain config
-export PREFIX = msp430-
-export CC = $(PREFIX)gcc
-export AR = $(PREFIX)ar
-export CFLAGS += -Wstrict-prototypes -gdwarf-2 -Os -Wall -mmcu=$(MCU)
-export ASFLAGS += -mmcu=$(MCU) --defsym $(MCU)=1 --gdwarf-2
-export AS = $(PREFIX)as
-export LINK = $(PREFIX)gcc
-export SIZE = $(PREFIX)size
-export OBJCOPY = $(PREFIX)objcopy
-export LINKFLAGS += -mmcu=$(MCU) -lgcc
-TERMPROG = $(RIOTBASE)/dist/tools/pyterm/pyterm
+# set default port depending on operating system
+PORT_LINUX ?= /dev/ttyUSB0
+PORT_DARWIN ?= $(shell ls -1 /dev/tty.SLAB_USBtoUART* | head -n 1)
+# setup serial terminal
+include $(RIOTBOARD)/Makefile.include.serial
 
-export FLASHER ?= mspdebug
-export PORT ?= /dev/ttyUSB0
+# setup flash tool
+export OFLAGS = -O ihex
 export PROGRAMMER ?= olimex
 export MSPDEBUGFLAGS += -j $(PROGRAMMER)
 ifeq ($(strip $(PROGRAMMER)),uif)
-	export MSPDEBUGFLAGS += -d $(PORT)
+    export MSPDEBUGFLAGS += -d $(PORT)
 endif
+export FLASHER ?= mspdebug
+export FFLAGS = $(MSPDEBUGFLAGS) "prog $(HEXFILE)"
+
+# setup debugger
 export DEBUGSERVER = $(FLASHER)
 export DEBUGSERVER_FLAGS = $(MSPDEBUGFLAGS) gdb
 export DEBUGGER = $(PREFIX)gdb
 export DEBUGGER_FLAGS = --tui --ex="target remote localhost:2000" --ex "monitor reset halt" --ex load -ex "monitor reset halt"  $(ELFFILE)
-export TERMFLAGS += -p "$(PORT)"
 
-export FFLAGS = $(MSPDEBUGFLAGS) "prog $(HEXFILE)"
+# include msp430 base makefile
+include $(RIOTBOARD)/Makefile.include.msp430_common
 
-export USEMODULE += msp430_common
-export INCLUDES += -I$(RIOTCPU)/msp430-common/include/ -I$(RIOTBOARD)/msb-430-common/include -I$(RIOTBOARD)/msb-430-common/drivers/include
-export OFLAGS = -O ihex
-
-export UNDEF += $(BINDIR)msp430_common/startup.o
+# export msb-430-common includes
+export INCLUDES += -I$(RIOTBOARD)/msb-430-common/include
+export INCLUDES += -I$(RIOTBOARD)/msb-430-common/drivers/include

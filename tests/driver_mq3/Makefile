@@ -10,7 +10,7 @@ ifneq (,$(filter stm32f4discovery,$(BOARD)))
 endif
 
 USEMODULE += mq3
-USEMODULE += vtimer
+USEMODULE += xtimer
 
 ifneq (,$(MQ3_ADC))
   CFLAGS += -DMQ3_ADC=$(MQ3_ADC)

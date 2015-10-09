@@ -53,13 +53,6 @@ extern "C" {
 /** @} */
 
 /**
- * @name Assign the hardware timer
- * @{
- */
-#define HW_TIMER            TIMER_0
-/** @} */
-
-/**
  * @name Define the interface to the AT86RF231 radio
  * @{
  */
@@ -149,6 +142,14 @@ extern "C" {
 #define LED_ORANGE_ON       (LED_ORANGE_PORT->ODR &= ~(1<<LED_ORANGE_PIN))
 #define LED_ORANGE_OFF      (LED_ORANGE_PORT->ODR |= (1<<LED_ORANGE_PIN))
 #define LED_ORANGE_TOGGLE   (LED_ORANGE_PORT->ODR ^= (1<<LED_ORANGE_PIN))
+/** @} */
+
+/**
+ * @name xtimer tuning values
+ * @{
+ */
+#define XTIMER_OVERHEAD     6
+#define XTIMER_SHOOT_EARLY  3
 /** @} */
 
 /**
