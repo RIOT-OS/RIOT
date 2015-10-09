@@ -300,9 +300,8 @@ int _gnrc_rpl_dodag_show(void)
                    "TR(I=[%d,%d], k=%d, c=%d, TC=%" PRIu64 "s, TI=%" PRIu64 "s)]\n",
                     ipv6_addr_to_str(addr_str, &dodag->dodag_id, sizeof(addr_str)),
                     dodag->my_rank, (dodag->node_status == GNRC_RPL_LEAF_NODE ? "Leaf" : "Router"),
-                    (((int32_t) cleanup < 0) ? 0 : cleanup/SEC_IN_USEC),
-                    (1 << dodag->dio_min), dodag->dio_interval_doubl,
-                    dodag->trickle.k, dodag->trickle.c, tc, ti);
+                    cleanup, (1 << dodag->dio_min), dodag->dio_interval_doubl, dodag->trickle.k,
+                    dodag->trickle.c, tc, ti);
             gnrc_rpl_parent_t *parent;
             LL_FOREACH(dodag->parents, parent) {
                 printf("\t\tparent [addr: %s | rank: %d | lifetime: %" PRIu64 "s]\n",
