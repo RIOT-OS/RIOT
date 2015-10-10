@@ -81,7 +81,12 @@ extern "C"
  * @name UART configuration
  * @{
  */
+#if MODULE_USBDEV
+#define UART_NUMOF          (2U)
+#define UART_ACM_0_EN       1
+#else
 #define UART_NUMOF          (1U)
+#endif
 #define UART_0_EN           1
 #define UART_1_EN           0
 #define UART_IRQ_PRIO       1
