@@ -36,6 +36,13 @@ extern "C" {
 #define CPU_FLASH_BASE                  LPC_FLASH_BASE
 /** @} */
 
+/**
+ * @brief   CPU ID configuration
+ * @{
+ */
+#define CPUID_ID_LEN                    (16U)
+/* @} */
+
 #ifdef __cplusplus
 }
 #endif
