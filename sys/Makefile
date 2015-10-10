@@ -75,6 +75,10 @@ ifneq (,$(filter sem,$(USEMODULE)))
     DIRS += sem
 endif
 
+ifneq (,$(filter uart,$(USEMODULE)))
+    DIRS += uart
+endif
+
 DIRS += $(dir $(wildcard $(addsuffix /Makefile, ${USEMODULE})))
 
 include $(RIOTBASE)/Makefile.base
