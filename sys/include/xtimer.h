@@ -398,16 +398,20 @@ extern volatile uint32_t _high_cnt;
  */
 #define MSG_XTIMER 12345
 
+#ifndef XTIMER_TICKS_TO_US
+#define XTIMER_TICKS_TO_US(val) (val)
+#endif
+
+#ifndef XTIMER_US_TO_TICKS
+#define XTIMER_US_TO_TICKS(val) (val)
+#endif
+
 /**
  * @brief returns the (masked) low-level timer counter value.
  */
 static inline uint32_t _xtimer_now(void)
 {
-#if XTIMER_SHIFT
-    return ((uint32_t)timer_read(XTIMER)) << XTIMER_SHIFT;
-#else
-    return timer_read(XTIMER);
-#endif
+    return XTIMER_TICKS_TO_US(timer_read(XTIMER));
 }
 
 /**
