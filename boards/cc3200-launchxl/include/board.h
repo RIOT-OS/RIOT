@@ -110,6 +110,14 @@ extern "C" {
 #define F_CPU               80000000
 
 /**
+ * Convert time units into clock ticks
+ */
+#define SEC_TO_TICKS(sec)   80000000*sec
+#define MSEC_TO_TICKS(msec) 80000*msec
+#define USEC_TO_TICKS(usec) 80*usec
+
+
+/**
  * hardware timers modules
  */
 #define TIMER_NUM_CHANNELS 4

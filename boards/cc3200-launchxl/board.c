@@ -30,8 +30,6 @@
 
 #include "periph/gpio.h"
 
-extern void (* const g_pfnVectors[])(void);
-
 /**
  * @brief Initialize the SmartRF06's on-board LEDs
  */
@@ -41,14 +39,13 @@ void led_init(void) {
     gpio_init(YELLOW_LED, GPIO_DIR_OUT, GPIO_NOPULL);
 }
 
+extern const void *interrupt_vector[];
+
+
 /**
  * @brief Initialize the board
  */
 void board_init(void) {
-    //
-    // Set vector table base
-    //
-    MAP_IntVTableBaseSet((unsigned long) &g_pfnVectors[0]);
 
     MAP_PRCMPeripheralClkEnable(PRCM_GPIOA0, PRCM_RUN_MODE_CLK);
     MAP_PRCMPeripheralClkEnable(PRCM_GPIOA1, PRCM_RUN_MODE_CLK);

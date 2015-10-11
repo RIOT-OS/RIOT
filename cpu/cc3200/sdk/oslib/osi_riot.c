@@ -4,6 +4,9 @@
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
+ *
+ * @author      Attilio Dona' <attilio.dona>
+ *
  */
 
 #include <hw_types.h>
@@ -689,7 +692,7 @@ void mem_copy(void *pDst, void *pSrc,size_t Size)
  \warning
  */
 void osi_Sleep(unsigned int MilliSecs) {
-    xtimer_usleep(MilliSecs * 1000);
+    xtimer_usleep(MilliSecs * 80000);
 }
 
 #if 0

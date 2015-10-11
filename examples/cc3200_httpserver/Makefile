@@ -28,7 +28,6 @@ CFLAGS += -DDEVELHELP
 QUIET ?= 0
 
 USEMODULE += xtimer
-USEMODULE += cc3200sdk_simplelink
 
 include $(RIOTBASE)/Makefile.include
 

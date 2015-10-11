@@ -1,4 +1,4 @@
-MODULE = cc3200sdk_simplelink_source
+MODULE = cc3200_simplelink
 
 CFLAGS += -Wno-strict-aliasing -Wno-missing-braces
 

@@ -46,7 +46,7 @@ endif
 ifneq (,$(filter encx24j600,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/drivers/encx24j600/include
 endif
-ifneq (,$(filter cc3200sdk_mqtt_client,$(USEMODULE)))
+ifneq (,$(filter cc3200sdk_mqtt_client-xxxxx,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/drivers/cc3200sdk/simplelink/include
     USEMODULE_INCLUDES += $(RIOTBASE)/drivers/cc3200sdk/simplelink
     USEMODULE_INCLUDES += $(RIOTBASE)/drivers/cc3200sdk/driverlib
@@ -66,7 +66,7 @@ ifneq (,$(filter cc3200sdk_mqtt_client,$(USEMODULE)))
     USEMODULE += cc3200sdk_mqtt_platform
 
 endif
-ifneq (,$(filter cc3200sdk_driverlib,$(USEMODULE)))
+ifneq (,$(filter cc3200sdk_driverlib-xxxxx,$(USEMODULE)))
     $(info $(USEMODULE))
     USEMODULE_INCLUDES += $(RIOTBASE)/drivers/cc3200sdk/simplelink/include
     USEMODULE_INCLUDES += $(RIOTBASE)/drivers/cc3200sdk/simplelink

@@ -1,4 +1,4 @@
-MODULE = cc3200sdk_oslib
+MODULE = cc3200_simplelink
 
 CFLAGS += -Wno-strict-aliasing -Wno-missing-braces
 
