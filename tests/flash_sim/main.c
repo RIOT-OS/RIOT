@@ -95,6 +95,19 @@ static void test_basic_read_write(void) {
 }
 
 
+static void test_erase(void) {
+    _reset();
+
+    ret = flash_sim_erase(&fs, 0);
+    TEST_ASSERT_EQUAL_INT(E_SUCCESS, ret);
+
+    ret = flash_sim_read(&fs, read_buffer, 0);
+    TEST_ASSERT_EQUAL_INT(E_SUCCESS, ret);
+    memset(expect_buffer, 0xFF, 512);
+    TEST_ASSERT_EQUAL_INT(0, strcmp(read_buffer, expect_buffer));
+}
+
+
 static void test_multiple_writes(void) {
     _reset();
 
@@ -150,6 +163,7 @@ Test *testsrunner(void) {
         new_TestFixture(test_init),
         new_TestFixture(test_format),
         new_TestFixture(test_basic_read_write),
+        new_TestFixture(test_erase),
         new_TestFixture(test_multiple_writes),
         new_TestFixture(test_multiple_writes_to_zero),
         new_TestFixture(test_erroneous_reads),
