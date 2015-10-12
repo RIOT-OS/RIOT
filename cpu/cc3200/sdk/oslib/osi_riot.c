@@ -17,6 +17,7 @@
 #include "mutex.h"
 #include "thread.h"
 #include "xtimer.h"
+#include "lifo.h"
 
 #include <osi.h>
 
@@ -27,7 +28,33 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#define DYNAMIC_MEM
+#ifndef MALLOC_SL_OBJECTS
+
+#define MAX_SYNC_OBJS 64
+
+#define MUTEX_LOCK(id) mutex_lock(&osi_mutexes[(int)id])
+#define MUTEX_TRYLOCK(id) mutex_trylock(&osi_mutexes[(int)id])
+#define MUTEX_UNLOCK(id) mutex_unlock(&osi_mutexes[(int)id])
+
+int synchronizer[MAX_SYNC_OBJS + 1];
+
+mutex_t osi_mutexes[MAX_SYNC_OBJS];
+
+void init_sync_pool() {
+    lifo_init(synchronizer, MAX_SYNC_OBJS);
+
+    for(int i=0; i<MAX_SYNC_OBJS; i++) {
+        lifo_insert(synchronizer, i);
+        mutex_init(&osi_mutexes[i]);
+    }
+}
+#else
+
+#define MUTEX_LOCK(id) mutex_lock(id)
+#define MUTEX_TRYLOCK(id) mutex_trylock(id)
+#define MUTEX_UNLOCK(id) mutex_unlock(id)
+
+#endif
 
 #define OSI_MSG_TYPE 0xBEEF
 
@@ -45,6 +72,9 @@ typedef struct osi_task_list {
 } osi_task_list_t;
 
 static kernel_pid_t sl_spawn_id;
+
+static char *simplelink_stack;
+
 
 //Local function definition
 static void vSimpleLinkSpawnTask(void *pvParameters);
@@ -94,7 +124,6 @@ OsiReturnVal_e osi_InterruptRegister(int iIntrNum, P_OSI_INTR_ENTRY pEntry,
  \note
  \warning
  */
-
 void osi_InterruptDeRegister(int iIntrNum) {
     MAP_IntDisable(iIntrNum);
     MAP_IntUnregister(iIntrNum);
@@ -119,11 +148,12 @@ OsiReturnVal_e osi_SyncObjCreate(OsiSyncObj_t* pSyncObj) {
         return OSI_INVALID_PARAMS;
     }
 
-#ifdef DYNAMIC_MEM
+#ifdef MALLOC_SL_OBJECTS
     mutex_t *mutex = malloc(sizeof(mutex_t));
     mutex_init(mutex);
     *pSyncObj = mutex;
 #else
+    *pSyncObj = (OsiSyncObj_t)lifo_get(synchronizer);
 #endif
     return OSI_OK;
 }
@@ -144,9 +174,11 @@ OsiReturnVal_e osi_SyncObjDelete(OsiSyncObj_t* pSyncObj) {
         return OSI_INVALID_PARAMS;
     }
 
-#ifdef DYNAMIC_MEM
+#ifdef MALLOC_SL_OBJECTS
     free(*pSyncObj);
 #else
+    mutex_init(&osi_mutexes[(int)*pSyncObj]);
+    lifo_insert(synchronizer, (int)*pSyncObj);
 #endif
     return OSI_OK;
 }
@@ -169,7 +201,7 @@ OsiReturnVal_e osi_SyncObjSignal(OsiSyncObj_t* pSyncObj) {
         return OSI_INVALID_PARAMS;
     }
 
-    mutex_unlock(*pSyncObj);
+    MUTEX_UNLOCK(*pSyncObj);
 
     return OSI_OK;
 }
@@ -192,7 +224,7 @@ OsiReturnVal_e osi_SyncObjSignalFromISR(OsiSyncObj_t* pSyncObj) {
         return OSI_INVALID_PARAMS;
     }
 
-    mutex_unlock(*pSyncObj);
+    MUTEX_UNLOCK(*pSyncObj);
 
     if (sched_context_switch_request) {
         thread_yield();
@@ -223,11 +255,11 @@ OsiReturnVal_e osi_SyncObjWait(OsiSyncObj_t* pSyncObj, OsiTime_t Timeout) {
     }
 
     if (Timeout == OSI_NO_WAIT) {
-        if (!mutex_trylock(*pSyncObj)) {
+        if (!MUTEX_TRYLOCK(*pSyncObj)) {
             return OSI_OPERATION_FAILED;
         }
     } else {
-        mutex_lock(*pSyncObj);
+        MUTEX_LOCK(*pSyncObj);
     }
 
     return OSI_OK;
@@ -276,11 +308,12 @@ OsiReturnVal_e osi_LockObjCreate(OsiLockObj_t* pLockObj) {
         return OSI_INVALID_PARAMS;
     }
 
-#ifdef DYNAMIC_MEM
+#ifdef MALLOC_SL_OBJECTS
     mutex_t *mutex = malloc(sizeof(mutex_t));
     mutex_init(mutex);
     *pLockObj = mutex;
 #else
+    *pLockObj = (OsiSyncObj_t)lifo_get(synchronizer);
 #endif
     return OSI_OK;
 
@@ -363,9 +396,11 @@ void osi_TaskDelete(OsiTaskHandle* pTaskHandle) {
  */
 OsiReturnVal_e osi_LockObjDelete(OsiLockObj_t* pLockObj) {
     //vSemaphoreDelete((SemaphoreHandle_t)*pLockObj );
-#ifdef DYNAMIC_MEM
+#ifdef MALLOC_SL_OBJECTS
     free(*pLockObj);
 #else
+    mutex_init(&osi_mutexes[(int)*pLockObj]);
+    lifo_insert(synchronizer, (int)*pLockObj);
 #endif
     return OSI_OK;
 }
@@ -396,11 +431,11 @@ OsiReturnVal_e osi_LockObjLock(OsiLockObj_t* pLockObj, OsiTime_t Timeout) {
     }
 
     if (Timeout == OSI_NO_WAIT) {
-        if (!mutex_trylock(*pLockObj)) {
+        if (!MUTEX_TRYLOCK(*pLockObj)) {
             return OSI_OPERATION_FAILED;
         }
     } else {
-        mutex_lock(*pLockObj);
+        MUTEX_LOCK(*pLockObj);
     }
 
     return OSI_OK;
@@ -423,7 +458,7 @@ OsiReturnVal_e osi_LockObjUnlock(OsiLockObj_t* pLockObj) {
         return OSI_INVALID_PARAMS;
     }
 
-    mutex_unlock(*pLockObj);
+    MUTEX_UNLOCK(*pLockObj);
 
     return OSI_OK;
 
@@ -446,7 +481,6 @@ OsiReturnVal_e osi_LockObjUnlock(OsiLockObj_t* pLockObj) {
  \note
  \warning
  */
-
 OsiReturnVal_e osi_Spawn(P_OSI_SPAWN_ENTRY pEntry, void* pValue,
         unsigned long flags) {
     tSimpleLinkSpawnMsg* msg_ptr;
@@ -481,7 +515,7 @@ void vSimpleLinkSpawnTask(void *pvParameters) {
     msg_t msg, msg_queue[QUEUE_SIZE_SLSPAWN];
     tSimpleLinkSpawnMsg* msg_ptr;
 
-    /* setup the mqttclient message queue */
+    /* setup the message queue */
     msg_init_queue(msg_queue, QUEUE_SIZE_SLSPAWN);
 
     for (;;) {
@@ -504,10 +538,14 @@ void vSimpleLinkSpawnTask(void *pvParameters) {
  \warning
  */
 OsiReturnVal_e VStartSimpleLinkSpawnTask(unsigned long uxPriority) {
-    char *stack;
-    stack = malloc(THREAD_STACKSIZE_SLSPAWN);
 
-    sl_spawn_id = thread_create(stack, THREAD_STACKSIZE_SLSPAWN, uxPriority,
+#ifndef MALLOC_SL_OBJECTS
+    init_sync_pool();
+#endif
+
+    simplelink_stack = malloc(THREAD_STACKSIZE_SLSPAWN);
+
+    sl_spawn_id = thread_create(simplelink_stack, THREAD_STACKSIZE_SLSPAWN, uxPriority,
             CREATE_STACKTEST, (thread_task_func_t) vSimpleLinkSpawnTask, NULL,
             (const char*) "SLSPAWN");
 
@@ -516,7 +554,7 @@ OsiReturnVal_e VStartSimpleLinkSpawnTask(unsigned long uxPriority) {
     return OSI_OK;
 }
 
-#if 0
+
 /*!
  \brief 	This is the API to delete SL spawn task and delete the SL queue
 
@@ -528,9 +566,9 @@ OsiReturnVal_e VStartSimpleLinkSpawnTask(unsigned long uxPriority) {
  */
 void VDeleteSimpleLinkSpawnTask( void )
 {
-    while(1) {};
+    free(simplelink_stack);
 }
-#endif
+
 
 /*!
  \brief 	This function is used to create the MsgQ
@@ -550,6 +588,7 @@ OsiReturnVal_e osi_MsgQCreate(OsiMsgQ_t* pMsgQ, char* pMsgQName,
 
     return OSI_OK;
 }
+
 /*!
  \brief 	This function is used to delete the MsgQ
 
@@ -569,6 +608,7 @@ OsiReturnVal_e osi_MsgQDelete(OsiMsgQ_t* pMsgQ) {
 
     return OSI_OK;
 }
+
 /*!
  \brief 	This function is used to write data to the MsgQ
 
@@ -580,7 +620,6 @@ OsiReturnVal_e osi_MsgQDelete(OsiMsgQ_t* pMsgQ) {
  \note
  \warning
  */
-
 OsiReturnVal_e osi_MsgQWrite(OsiMsgQ_t* pMsgQ, void* pMsg, OsiTime_t Timeout) {
     //Check for NULL
     if (NULL == pMsgQ) {
@@ -590,6 +629,7 @@ OsiReturnVal_e osi_MsgQWrite(OsiMsgQ_t* pMsgQ, void* pMsg, OsiTime_t Timeout) {
     msg_send(pMsg, *(kernel_pid_t*) pMsgQ);
     return OSI_OK;
 }
+
 /*!
  \brief 	This function is used to read data from the MsgQ
 
@@ -601,7 +641,6 @@ OsiReturnVal_e osi_MsgQWrite(OsiMsgQ_t* pMsgQ, void* pMsg, OsiTime_t Timeout) {
  \note
  \warning
  */
-
 OsiReturnVal_e osi_MsgQRead(OsiMsgQ_t* pMsgQ, void* pMsg, OsiTime_t Timeout) {
     //Check for NULL
     if (NULL == pMsgQ) {
@@ -613,109 +652,13 @@ OsiReturnVal_e osi_MsgQRead(OsiMsgQ_t* pMsgQ, void* pMsg, OsiTime_t Timeout) {
     return OSI_OK;
 }
 
-#if 0
 /*!
- \brief 	This function to call the memory de-allocation function of the FREERTOS
-
- \param	Size	-	size of memory to alloc in bytes
-
- \return - void *
- \note
- \warning
- */
-
-void * mem_Malloc(unsigned long Size)
-{
-
-    return ( void * ) malloc( (size_t)Size );
-}
-
-/*!
- \brief 	This function to call the memory de-allocation function of the FREERTOS
-
- \param	pMem		-	pointer to the memory which needs to be freed
-
+ \brief        This function used to suspend the task for the specified number of milli secs
+ \param        MilliSecs       -       Time in millisecs to suspend the task
  \return - void
  \note
  \warning
- */
-void mem_Free(void *pMem)
-{
-    free( pMem );
-}
-
-/*!
- \brief 	This function call the memset function
- \param	pBuf	     -	 pointer to the memory to be fill
- \param  Val          -   Value to be fill
- \param  Size         -   Size of the memory which needs to be fill
- \return - void
- \note
- \warning
- */
-
-void mem_set(void *pBuf,int Val,size_t Size)
-{
-    memset( pBuf,Val,Size);
-
-}
-
-/*!
- \brief 	This function call the memcopy function
- \param	pDst	-	pointer to the destination
- \param pSrc     -   pointer to the source
- \param Size     -   Size of the memory which needs to be copy
-
- \return - void
- \note
- \warning
- */
-void mem_copy(void *pDst, void *pSrc,size_t Size)
-{
-    memcpy(pDst,pSrc,Size);
-}
-
-/*!
- \brief 	This function use to entering into critical section
- \param	void
- \return - void
- \note
- \warning
- */
-#endif
-
-/*!
- \brief 	This function used to suspend the task for the specified number of milli secs
- \param	MilliSecs	-	Time in millisecs to suspend the task
- \return - void
- \note
- \warning
- */
+*/
 void osi_Sleep(unsigned int MilliSecs) {
     xtimer_usleep(MilliSecs * 80000);
 }
-
-#if 0
-/*!
- \brief 	This function used to save the OS context before sleep
- \param	void
- \return - void
- \note
- \warning
- */
-void osi_ContextSave()
-{
-
-}
-/*!
- \brief 	This function used to restore the OS context after sleep
- \param	void
- \return - void
- \note
- \warning
- */
-void osi_ContextRestore()
-{
-
-}
-#endif
