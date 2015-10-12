@@ -77,6 +77,28 @@ static inline uint32_t div_u32_by_15625div512(uint32_t val)
     return ((uint64_t)(val) * 0x431bde83ul) >> (12 + 32 - 9);
 }
 
+/**
+ * @brief Integer divide val by 44488
+ *
+ * @param[in]   val     dividend
+ * @return      (val / 44488)
+ */
+static inline uint32_t div_u32_by_44488(uint32_t val)
+{
+    return ((uint64_t)val * 0xBC8F1391UL) >> (15 + 32);
+}
+
+/**
+ * @brief Modulo 44488
+ *
+ * @param[in]   val     dividend
+ * @return      (val % 44488)
+ */
+static inline uint32_t div_u32_mod_44488(uint32_t val)
+{
+    return val - (div_u32_by_44488(val)*44488);
+}
+
 #ifdef __cplusplus
 }
 #endif
