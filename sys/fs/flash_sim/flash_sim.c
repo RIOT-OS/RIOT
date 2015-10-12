@@ -79,6 +79,8 @@ flash_sim_error_t flash_sim_format(flash_sim *fs) {
 }
 
 flash_sim_error_t flash_sim_read(flash_sim *fs, void *buffer, uint32_t page) {
+    MYDEBUG("page = %u\n", page);
+
     if(fs->_fp == NULL) {
         MYDEBUG("struct was not initialized\n");
         return E_NOT_INITIALIZED;
@@ -100,6 +102,8 @@ flash_sim_error_t flash_sim_read(flash_sim *fs, void *buffer, uint32_t page) {
 }
 
 flash_sim_error_t flash_sim_write(flash_sim *fs, const void *buffer, uint32_t page) {
+    MYDEBUG("page = %u\n", page);
+
     if(fs->_fp == NULL) {
         MYDEBUG("struct was not initialized\n");
         return E_NOT_INITIALIZED;
@@ -126,11 +130,17 @@ flash_sim_error_t flash_sim_write(flash_sim *fs, const void *buffer, uint32_t pa
         return E_INVALID_WRITE;
     }
 
+
     ret = fseek(fs->_fp, page * fs->page_size, SEEK_SET);
     if(ret != 0) {
         MYDEBUG("seek failed: out of range\n");
         return E_OUT_OF_RANGE;
     }
+
+#if ENABLE_DEBUG
+    long pos = ftell(fs->_fp);
+    MYDEBUG("writing to offset %ld\n", pos);
+#endif
 
     ret = fwrite(buffer, fs->page_size, 1, fs->_fp);
     if(ret != 1) {
@@ -142,6 +152,8 @@ flash_sim_error_t flash_sim_write(flash_sim *fs, const void *buffer, uint32_t pa
 }
 
 flash_sim_error_t flash_sim_erase(flash_sim *fs, uint32_t block) {
+    MYDEBUG("block = %u\n", block);
+
     if(fs->_fp == NULL) {
         MYDEBUG("struct was not initialized\n");
         return E_NOT_INITIALIZED;
