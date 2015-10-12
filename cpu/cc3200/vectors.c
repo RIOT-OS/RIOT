@@ -13,7 +13,7 @@
  * @file        vectors.c
  * @brief       Interrupt vector definitions
  *
- * @author      Attilio Dona' <attilio.dona>
+ * @author      Attilio Dona'
  */
 
 #include <stdint.h>

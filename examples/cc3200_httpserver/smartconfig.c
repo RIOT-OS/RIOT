@@ -78,8 +78,8 @@ long SmartConfigConnect(void) {
     // This is of course not a must, it is used in this example to make sure
     // we will connect to the new profile added by SmartConfig
     //
-    lRetVal = sl_WlanProfileDel(WLAN_DEL_ALL_PROFILES);
-    ASSERT_ON_ERROR(lRetVal);
+    //lRetVal = sl_WlanProfileDel(WLAN_DEL_ALL_PROFILES);
+    //ASSERT_ON_ERROR(lRetVal);
 
     //set AUTO policy
     lRetVal = sl_WlanPolicySet(SL_POLICY_CONNECTION,

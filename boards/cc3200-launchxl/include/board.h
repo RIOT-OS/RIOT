@@ -33,22 +33,22 @@ extern "C" {
 #define CHANGE 4
 
 /**
- * for requesting an IRQ when PIN value goes high to low
+ * PIN value high to low IRQ trigger
  */
 #define FALLING 3
 
 /**
- * for requesting an IRQ when PIN value goes low to high
+ * PIN value low to high IRQ trigger
  */
 #define RISING 2
 
 /**
- * for requesting an IRQ when PIN value goes high
+ * PIN value high IRQ trigger
  */
 #define HIGH 1
 
 /**
- * for requesting an IRQ when PIN value goes low
+ * PIN value low IRQ trigger
  */
 #define LOW  0
 
@@ -83,38 +83,13 @@ extern "C" {
 #define DEBUG_PIN 10
 
 /**
- * @name Macro for easy porting of TI examples
- * @{
- */
-#define GPIO_IF_LedOn     gpio_set
-#define GPIO_IF_LedOff    gpio_clear
-#define GPIO_IF_LedStatus gpio_read
-
-#define MCU_RED_LED_GPIO    RED_LED
-#define MCU_GREEN_LED_GPIO  GREEN_LED
-
-/**
- * sometimes I suspect to be daltonic
- */
-#define MCU_ORANGE_LED_GPIO YELLOW_LED
-
-#define Report printf
-
-/** @} */
-
-
-
-/**
  * Define the nominal CPU core clock in this board
  */
 #define F_CPU               80000000
 
-/**
- * Convert time units into clock ticks
- */
-#define SEC_TO_TICKS(sec)   80000000*sec
-#define MSEC_TO_TICKS(msec) 80000*msec
-#define USEC_TO_TICKS(usec) 80*usec
+#define SEC_TO_TICKS(sec)   80000000*sec /**< Convert seconds to  clock ticks */
+#define MSEC_TO_TICKS(msec) 80000*msec /**< Convert millisecs to  clock ticks */
+#define USEC_TO_TICKS(usec) 80*usec /**< Convert microseconds to  clock ticks */
 
 
 /**

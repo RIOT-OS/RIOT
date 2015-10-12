@@ -13,7 +13,7 @@
  * @file
  * @brief       Implementation of the CPU initialization
  *
- * @author      Attilio Dona' <attilio.dona>
+ * @author      Attilio Dona'
  * @}
  */
 

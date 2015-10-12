@@ -26,6 +26,7 @@
  * @author      Joakim Gebart <joakim.gebart@eistec.se>
  * @author      Attilio Dona'
  *
+ *
  * @todo        remove include irq.h once core was adjusted
  */
 

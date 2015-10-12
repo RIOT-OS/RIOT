@@ -93,6 +93,28 @@
 #define WIFI_MODE_PIN 2 // PIN_58
 #endif
 
+
+/**
+ * @name Macro for easy porting of TI examples
+ * @{
+ */
+#define GPIO_IF_LedOn     gpio_set
+#define GPIO_IF_LedOff    gpio_clear
+#define GPIO_IF_LedStatus gpio_read
+
+#define MCU_RED_LED_GPIO    RED_LED
+#define MCU_GREEN_LED_GPIO  GREEN_LED
+
+/**
+ * sometimes I suspect to be daltonic
+ */
+#define MCU_ORANGE_LED_GPIO YELLOW_LED
+
+#define Report printf
+
+/** @} */
+
+
 #define APPLICATION_NAME        "HTTP Server"
 #define APPLICATION_VERSION     "1.1.1"
 #define AP_SSID_LEN_MAX         (33)

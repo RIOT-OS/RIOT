@@ -12,8 +12,7 @@
  * @file
  * @brief       CC3200 MCU definitions
  *
- * @author      Attilio Dona'
- * @}
+ * @author      Attilio Dona' <attilio.dona>
  *
  */
 
@@ -42,11 +41,12 @@ extern "C" {
 #define __Vendor_SysTickConfig    0       /*! Set to 1 if different SysTick Config is used */
 #define __FPU_PRESENT             0       /*! FPU notpresent                  */
 
-
 #define __ASM            __asm
 #define __STATIC_INLINE  static inline
 
 #define SW_TIMERS_EXAUSTED 111
+
+#define SYSTEM_RESET PRCMMCUReset(1)
 
 typedef enum {
     /******  Cortex-M4 Processor Exceptions Numbers ***************************/
@@ -60,45 +60,44 @@ typedef enum {
     SysTick_IRQn = -1, /*!< 15 Cortex-M4 System Tick Interrupt                */
 
     /******  CC3200 specific Interrupt Numbers ********************************/
-    GPIO_PORT_A0_IRQn     =   0, /**<    GPIO port A                          */
-    GPIO_PORT_A1_IRQn     =   1, /**<    GPIO port B                          */
-    GPIO_PORT_A2_IRQn     =   2, /**<    GPIO port C                          */
-    GPIO_PORT_A3_IRQn     =   3, /**<    GPIO port D                          */
-    UART0_IRQn            =   5, /**<    UART0                                */
-    UART1_IRQn            =   6, /**<    UART1                                */
-    I2C_IRQn              =   8, /**<    I2C                                  */
-    ADC0_IRQn             =  14, /**<    ADC Sequence 0                       */
-    ADC1_IRQn             =  15, /**<    ADC Sequence 1                       */
-    ADC2_IRQn             =  16, /**<    ADC Sequence 2                       */
-    ADC3_IRQn             =  17, /**<    ADC Sequence 3                       */
-    WDT_IRQn              =  18, /**<    Watchdog Timer                       */
-    GPTIMER_0A_IRQn       =  19, /**<    GPTimer 0A                           */
-    GPTIMER_0B_IRQn       =  20, /**<    GPTimer 0B                           */
-    GPTIMER_1A_IRQn       =  21, /**<    GPTimer 1A                           */
-    GPTIMER_1B_IRQn       =  22, /**<    GPTimer 1B                           */
-    GPTIMER_2A_IRQn       =  23, /**<    GPTimer 2A                           */
-    GPTIMER_2B_IRQn       =  24, /**<    GPTimer 2B                           */
-    FLASH_CTRL_IRQn       =  29, /**<    Flash memory control                 */
-    GPTIMER_3A_IRQn       =  35, /**<    GPTimer 3A                           */
-    GPTIMER_3B_IRQn       =  36, /**<    GPTimer 3B                           */
-    UDMA_IRQn             =  46, /**<    uDMA software                        */
-    UDMA_ERR_IRQn         =  47, /**<    uDMA error                           */
-    SHA_IRQn              = 148, /**<    SHA                                  */
-    AES_IRQn              = 151, /**<    AES                                  */
-    DES_IRQn              = 153, /**<    DES                                  */
-    MMCHS_IRQn            = 159,  /**<    SDIO                                */
-    I2S_IRQn              = 161, /**<    McAPS                                */
-    CAMERA_IRQn           = 163, /**<    Camera                               */
-    NWPIC_IRQn            = 171, /**<    AES                                  */
-    PRCM_IRQn             = 172, /**<    Power, Reset and Clock Module        */
-    SSPI_IRQn             = 175, /**<    Shared SPI                           */
-    GSPI_IRQn             = 176, /**<    Generic SPI                          */
-    LSPI_IRQn             = 177, /**<    Link SPI                             */
+    GPIO_PORT_A0_IRQn = 0, /**<    GPIO port A                          */
+    GPIO_PORT_A1_IRQn = 1, /**<    GPIO port B                          */
+    GPIO_PORT_A2_IRQn = 2, /**<    GPIO port C                          */
+    GPIO_PORT_A3_IRQn = 3, /**<    GPIO port D                          */
+    UART0_IRQn = 5, /**<    UART0                                */
+    UART1_IRQn = 6, /**<    UART1                                */
+    I2C_IRQn = 8, /**<    I2C                                  */
+    ADC0_IRQn = 14, /**<    ADC Sequence 0                       */
+    ADC1_IRQn = 15, /**<    ADC Sequence 1                       */
+    ADC2_IRQn = 16, /**<    ADC Sequence 2                       */
+    ADC3_IRQn = 17, /**<    ADC Sequence 3                       */
+    WDT_IRQn = 18, /**<    Watchdog Timer                       */
+    GPTIMER_0A_IRQn = 19, /**<    GPTimer 0A                           */
+    GPTIMER_0B_IRQn = 20, /**<    GPTimer 0B                           */
+    GPTIMER_1A_IRQn = 21, /**<    GPTimer 1A                           */
+    GPTIMER_1B_IRQn = 22, /**<    GPTimer 1B                           */
+    GPTIMER_2A_IRQn = 23, /**<    GPTimer 2A                           */
+    GPTIMER_2B_IRQn = 24, /**<    GPTimer 2B                           */
+    FLASH_CTRL_IRQn = 29, /**<    Flash memory control                 */
+    GPTIMER_3A_IRQn = 35, /**<    GPTimer 3A                           */
+    GPTIMER_3B_IRQn = 36, /**<    GPTimer 3B                           */
+    UDMA_IRQn = 46, /**<    uDMA software                        */
+    UDMA_ERR_IRQn = 47, /**<    uDMA error                           */
+    SHA_IRQn = 148, /**<    SHA                                  */
+    AES_IRQn = 151, /**<    AES                                  */
+    DES_IRQn = 153, /**<    DES                                  */
+    MMCHS_IRQn = 159, /**<    SDIO                                */
+    I2S_IRQn = 161, /**<    McAPS                                */
+    CAMERA_IRQn = 163, /**<    Camera                               */
+    NWPIC_IRQn = 171, /**<    AES                                  */
+    PRCM_IRQn = 172, /**<    Power, Reset and Clock Module        */
+    SSPI_IRQn = 175, /**<    Shared SPI                           */
+    GSPI_IRQn = 176, /**<    Generic SPI                          */
+    LSPI_IRQn = 177, /**<    Link SPI                             */
 
-    PERIPH_COUNT_IRQn     = (LSPI_IRQn + 1) /**< Number of peripheral IDs */
+    PERIPH_COUNT_IRQn = (LSPI_IRQn + 1) /**< Number of peripheral IDs */
 
 } IRQn_Type;
-
 
 #ifdef __cplusplus
 } /* end extern "C" */
@@ -107,13 +106,14 @@ typedef enum {
 #include "core_cm4.h"
 
 /** @addtogroup cpu_specific_Peripheral_memory_map
-  * @{
-  */
+ * @{
+ */
 
 #define START_OF_RAM                0x20004000 /**< SRAM base address */
 #define PERIPH_BASE                 0x40000000 /**< Peripheral base address */
 
 /** @} */
 
-
 #endif /* CPU_INCLUDE_CC3200_H_ */
+/** @} */
+

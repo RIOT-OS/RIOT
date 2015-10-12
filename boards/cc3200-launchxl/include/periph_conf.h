@@ -13,7 +13,7 @@
  * @file
  * @brief       Peripheral MCU configuration for the CC3200 board
  *
- * @author      Attilio Dona' <attilio.dona>
+ * @author      Attilio Dona'
  */
 
 #ifndef PERIPH_CONF_H_
