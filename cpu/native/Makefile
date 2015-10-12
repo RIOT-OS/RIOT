@@ -6,6 +6,10 @@ ifneq (,$(filter netdev2_tap,$(USEMODULE)))
 	DIRS += netdev2_tap
 endif
 
+ifneq (,$(filter mci,$(USEMODULE)))
+	DIRS += mci
+endif
+
 include $(RIOTBASE)/Makefile.base
 
 INCLUDES = $(NATIVEINCLUDES)
