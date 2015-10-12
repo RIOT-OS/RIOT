@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/stat.h>
 
 #include "fs/flash_sim.h"
 
@@ -29,7 +30,13 @@ flash_sim_error_t flash_sim_init(flash_sim *fs) {
     }
 
     fs->pages = fs->storage_size / fs->page_size;
-    fs->_fp = fopen(FLASH_SIM_FILENAME, "a+");
+    struct stat buffer;
+    if(stat(FLASH_SIM_FILENAME, &buffer) == 0) {
+        fs->_fp = fopen(FLASH_SIM_FILENAME, "r+");
+    } else {
+        fs->_fp = fopen(FLASH_SIM_FILENAME, "w+");
+    }
+
     if(fs->_fp == NULL) {
         MYDEBUG("failed opening file %s\n", FLASH_SIM_FILENAME);
         return E_FILE_ERROR;
