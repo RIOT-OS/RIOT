@@ -115,7 +115,7 @@ volatile char g_cDummy;
 //****************************************************************************
 static int spi_Read_CPU(unsigned char *pBuff, int len);
 static int spi_Write_CPU(unsigned char *pBuff, int len);
-void DmaSpiSwIntHandler();
+void DmaSpiSwIntHandler(void);
 static void SetupDMAReceive(unsigned char *ucBuff, int len);
 static void SetupDMASend(unsigned char *ucBuff, int len);
 static void cc_UDMAChannelSelect(unsigned int uiChannel);
@@ -247,7 +247,7 @@ int spi_Write_CPU(unsigned char *pBuff, int len) {
  1. Invoked when SPI Transaction Completes
  \warning
  */
-void DmaSpiSwIntHandler() {
+void DmaSpiSwIntHandler(void) {
     MAP_SPIIntClear(LSPI_BASE, SPI_INT_EOW);
     MAP_SPICSDisable(LSPI_BASE);
 
@@ -644,7 +644,7 @@ int NwpRegisterInterruptHandler(P_EVENT_HANDLER InterruptHdl, void* pValue) {
 
  \warning
  */
-void NwpMaskInterrupt() {
+void NwpMaskInterrupt(void) {
     (*(unsigned long *) REG_INT_MASK_SET) = 0x1;
 }
 
@@ -656,7 +656,7 @@ void NwpMaskInterrupt() {
 
  \warning
  */
-void NwpUnMaskInterrupt() {
+void NwpUnMaskInterrupt(void) {
     (*(unsigned long *) REG_INT_MASK_CLR) = 0x1;
 }
 

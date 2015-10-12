@@ -449,7 +449,7 @@ OsiReturnVal_e osi_MsgQRead(OsiMsgQ_t* pMsgQ, void* pMsg, OsiTime_t Timeout);
  \note
  \warning
  */
-void osi_start();
+void osi_start(void);
 
 /*!
  \brief			  		Allocates Memory on Heap
@@ -515,7 +515,7 @@ void osi_ExitCritical(unsigned long ulKey);
  \note
  \warning
  */
-void osi_ContextSave();
+void osi_ContextSave(void);
 /*!
  \brief 	This function used to retrieve the context after sleep
  \param	void
@@ -523,7 +523,7 @@ void osi_ContextSave();
  \note
  \warning
  */
-void osi_ContextRestore();
+void osi_ContextRestore(void);
 
 /*!
  \brief 	This function used to suspend the task for the specified number of milli secs

@@ -210,9 +210,9 @@ extern void _SlDrvSyncObjWaitForever(_SlSyncObj_t *pSyncObj);
 extern void _SlDrvSyncObjSignal(_SlSyncObj_t *pSyncObj);
 extern void _SlDrvObjLock(_SlLockObj_t *pLockObj, _SlTime_t Timeout);
 extern void _SlDrvObjLockWaitForever(_SlLockObj_t *pLockObj);
-extern void _SlDrvProtectionObjLockWaitForever();
+extern void _SlDrvProtectionObjLockWaitForever(void);
 extern void _SlDrvObjUnLock(_SlLockObj_t *pLockObj);
-extern void _SlDrvProtectionObjUnLock();
+extern void _SlDrvProtectionObjUnLock(void);
 
 extern void _SlDrvMemZero(void* Addr, _u16 size);
 extern void _SlDrvResetCmdExt(_SlCmdExt_t* pCmdExt);

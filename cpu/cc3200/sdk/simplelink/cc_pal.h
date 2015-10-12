@@ -168,7 +168,7 @@ int NwpRegisterInterruptHandler(P_EVENT_HANDLER InterruptHdl, void* pValue);
 
  \warning
  */
-void NwpMaskInterrupt();
+void NwpMaskInterrupt(void);
 
 /*!
  \brief 				Unmasks host IRQ
@@ -178,7 +178,7 @@ void NwpMaskInterrupt();
 
  \warning
  */
-void NwpUnMaskInterrupt();
+void NwpUnMaskInterrupt(void);
 
 void NwpPowerOnPreamble(void);
 

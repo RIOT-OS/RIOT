@@ -533,7 +533,7 @@ void _SlDrvDriverCBInit(void) {
 /*****************************************************************************
  _SlDrvDriverCBDeinit - De init Driver Control Block
  *****************************************************************************/
-void _SlDrvDriverCBDeinit() {
+void _SlDrvDriverCBDeinit(void) {
     _u8 Idx = 0;
 
     /* Flow control de-init */
@@ -1702,7 +1702,7 @@ void _SlDrvObjLockWaitForever(_SlLockObj_t *pLockObj) {
     OSI_RET_OK_CHECK(sl_LockObjLock(pLockObj, SL_OS_WAIT_FOREVER));
 }
 
-void _SlDrvProtectionObjLockWaitForever() {
+void _SlDrvProtectionObjLockWaitForever(void) {
     OSI_RET_OK_CHECK(
             sl_LockObjLock(&g_pCB->ProtectionLockObj, SL_OS_WAIT_FOREVER));
 
@@ -1713,7 +1713,7 @@ void _SlDrvObjUnLock(_SlLockObj_t *pLockObj) {
 
 }
 
-void _SlDrvProtectionObjUnLock() {
+void _SlDrvProtectionObjUnLock(void) {
     OSI_RET_OK_CHECK(sl_LockObjUnlock(&g_pCB->ProtectionLockObj));
 }
 

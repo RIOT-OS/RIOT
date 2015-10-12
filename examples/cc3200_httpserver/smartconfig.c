@@ -68,7 +68,7 @@
 //!                      IP address,We will be stuck in this function forever.
 //!
 //*****************************************************************************
-long SmartConfigConnect() {
+long SmartConfigConnect(void) {
     unsigned char policyVal;
 
     long lRetVal;
@@ -119,7 +119,7 @@ long SmartConfigConnect() {
 //!   \note
 //!
 //*****************************************************************************
-long SmartConfigStop() {
+long SmartConfigStop(void) {
     long lRetVal;
     lRetVal = sl_WlanSmartConfigStop();
     ASSERT_ON_ERROR(lRetVal);

@@ -40,7 +40,7 @@ int synchronizer[MAX_SYNC_OBJS + 1];
 
 mutex_t osi_mutexes[MAX_SYNC_OBJS];
 
-void init_sync_pool() {
+void init_sync_pool(void) {
     lifo_init(synchronizer, MAX_SYNC_OBJS);
 
     for(int i=0; i<MAX_SYNC_OBJS; i++) {

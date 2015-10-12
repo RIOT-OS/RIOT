@@ -48,7 +48,7 @@ extern "C"
 {
 #endif
 
-long SmartConfigConnect();
+long SmartConfigConnect(void);
 //*****************************************************************************
 //
 // Mark the end of the C bindings section for C++ compilers.

@@ -542,7 +542,7 @@ void SimpleLinkHttpServerCallback(SlHttpServerEvent_t *pSlHttpServerEvent,
 //! \return None
 //!
 //*****************************************************************************
-static void InitializeAppVariables() {
+static void InitializeAppVariables(void) {
     g_ulStatus = 0;
     g_uiIpAddress = 0;
 }
@@ -562,7 +562,7 @@ static void InitializeAppVariables() {
 //! \param   none
 //! \return  On success, zero is returned. On error, negative is returned
 //*****************************************************************************
-static long ConfigureSimpleLinkToDefaultState() {
+static long ConfigureSimpleLinkToDefaultState(void) {
     SlVersionFull ver;
     _WlanRxFilterOperationCommandBuff_t RxFilterIdMask;
 
@@ -698,7 +698,7 @@ static long ConfigureSimpleLinkToDefaultState() {
 //! \return                        0 on success else error code
 //
 //****************************************************************************
-long ConnectToNetwork() {
+long ConnectToNetwork(void) {
     unsigned short len, config_opt;
     long lRetVal = -1;
 
@@ -830,7 +830,7 @@ long ConnectToNetwork() {
 //! \return                        None
 //
 //****************************************************************************
-static void ReadDeviceConfiguration() {
+static void ReadDeviceConfiguration(void) {
 #ifdef ORIGINAL_EXAMPLE
     unsigned int uiGPIOPort;
     unsigned char pucGPIOPin;
@@ -979,7 +979,7 @@ BoardInit(void)
 //****************************************************************************
 //                            MAIN FUNCTION
 //****************************************************************************
-int main() {
+int main(void) {
     long lRetVal;
 
 #ifdef ORIGINAL_EXAMPLE
