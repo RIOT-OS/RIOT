@@ -102,7 +102,6 @@ void rtt_init(void)
     while (rtcMode0->STATUS.bit.SYNCBUSY);
 
     /* Setup interrupt */
-    NVIC_SetPriority(RTT_IRQ, RTT_IRQ_PRIO);
     NVIC_EnableIRQ(RTT_IRQ);
 
     /* Enable RTC */
