@@ -170,7 +170,7 @@ flash_sim_error_t flash_sim_erase(flash_sim *fs, uint32_t block) {
     }
 
     ret = fwrite(buffer, fs->block_size, 1, fs->_fp);
-    if(ret != (int) fs->block_size) {
+    if(ret != 1) {
         free(buffer);
         MYDEBUG("write failed\n");
         return E_FILE_ERROR;
