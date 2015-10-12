@@ -228,13 +228,7 @@ int msg_reply(msg_t *m, msg_t *reply)
     unsigned state = disableIRQ();
 
     tcb_t *target = (tcb_t*) sched_threads[m->sender_pid];
-
-    if (!target) {
-        DEBUG("msg_reply(): %" PRIkernel_pid ": Target \"%" PRIkernel_pid
-              "\" not existing...dropping msg!\n", sched_active_thread->pid,
-              m->sender_pid);
-        return -1;
-    }
+    assert(target != NULL);
 
     if (target->status != STATUS_REPLY_BLOCKED) {
         DEBUG("msg_reply(): %" PRIkernel_pid ": Target \"%" PRIkernel_pid
