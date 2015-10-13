@@ -21,6 +21,7 @@
 #include "mutex.h"
 #include "thread.h"
 #include "irq.h"
+#include "div.h"
 
 #include "timex.h"
 
@@ -150,21 +151,11 @@ void xtimer_set_wakeup64(xtimer_t *timer, uint64_t offset, kernel_pid_t pid)
     _xtimer_set64(timer, offset, offset >> 32);
 }
 
-/**
- * see http://www.hackersdelight.org/magic.htm.
- * This is to avoid using long integer division functions
- * the compiler otherwise links in.
- */
-static inline uint64_t _us_to_sec(uint64_t us)
-{
-    return (unsigned long long)(us * 0x431bde83) >> (0x12 + 32);
-}
-
 void xtimer_now_timex(timex_t *out)
 {
     uint64_t now = xtimer_now64();
 
-    out->seconds = _us_to_sec(now);
+    out->seconds = div_u64_by_1000000(now);
     out->microseconds = now - (out->seconds * SEC_IN_USEC);
 }
 
