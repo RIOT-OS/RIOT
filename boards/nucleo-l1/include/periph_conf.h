@@ -72,8 +72,8 @@ static const timer_conf_t timer_config[] = {
 #define UART_0_ISR          isr_usart2
 #define UART_0_BUS_FREQ     32000000
 /* UART 0 pin configuration */
-#define UART_0_RX_PIN       GPIO(PORT_A, 3)
-#define UART_0_TX_PIN       GPIO(PORT_A, 2)
+#define UART_0_RX_PIN       GPIO_PIN(PORT_A, 3)
+#define UART_0_TX_PIN       GPIO_PIN(PORT_A, 2)
 #define UART_0_AF           GPIO_AF7
 
 /**

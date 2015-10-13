@@ -38,22 +38,22 @@ endif
 ifneq (,$(ATRF_CS))
   CFLAGS += -DATRF_CS=$(ATRF_CS)
 else
-  CFLAGS += -DATRF_CS=GPIO\(0,0\)           # set default
+  CFLAGS += -DATRF_CS=GPIO_PIN\(0,0\)           # set default
 endif
 ifneq (,$(ATRF_INT))
   CFLAGS += -DATRF_INT=$(ATRF_INT)
 else
-  CFLAGS += -DATRF_INT=GPIO\(0,1\)          # set default
+  CFLAGS += -DATRF_INT=GPIO_PIN\(0,1\)          # set default
 endif
 ifneq (,$(ATRF_SLEEP))
   CFLAGS += -DATRF_SLEEP=$(ATRF_SLEEP)
 else
-  CFLAGS += -DATRF_SLEEP=GPIO\(0,2\)        # set default
+  CFLAGS += -DATRF_SLEEP=GPIO_PIN\(0,2\)        # set default
 endif
 ifneq (,$(ATRF_RESET))
   CFLAGS += -DATRF_RESET=$(ATRF_RESET)
 else
-  CFLAGS += -DATRF_RESET=GPIO\(0,3\)        # set default
+  CFLAGS += -DATRF_RESET=GPIO_PIN\(0,3\)        # set default
 endif
 ifneq (,$(ATRF_SPI_SPEED))
   CFLAGS += -DATRF_SPI_SPEED=$(ATRF_SPI_SPEED)

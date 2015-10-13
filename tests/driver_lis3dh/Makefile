@@ -16,19 +16,19 @@ ifneq (,$(TEST_LIS3DH_CS))
   CFLAGS += -DTEST_LIS3DH_CS=$(TEST_LIS3DH_CS)
 else
   # set arbitrary default
-  CFLAGS += -DTEST_LIS3DH_CS=GPIO\(0,0\)
+  CFLAGS += -DTEST_LIS3DH_CS=GPIO_PIN\(0,0\)
 endif
 ifneq (,$(TEST_LIS3DH_INT1))
   CFLAGS += -DTEST_LIS3DH_INT1=$(TEST_LIS3DH_INT1)
 else
   # set arbitrary default
-  CFLAGS += -DTEST_LIS3DH_INT1=GPIO\(0,1\)
+  CFLAGS += -DTEST_LIS3DH_INT1=GPIO_PIN\(0,1\)
 endif
 ifneq (,$(TEST_LIS3DH_INT2))
   CFLAGS += -DTEST_LIS3DH_INT2=$(TEST_LIS3DH_INT2)
 else
   # set arbitrary default
-  CFLAGS += -DTEST_LIS3DH_INT2=GPIO\(0,2\)
+  CFLAGS += -DTEST_LIS3DH_INT2=GPIO_PIN\(0,2\)
 endif
 
 include $(RIOTBASE)/Makefile.include

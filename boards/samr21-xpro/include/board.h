@@ -45,23 +45,23 @@ extern "C" {
 * @name AT86RF233 configuration
 * @{
 */
-#define AT86RF233_SPI        (SPI_0)
-#define AT86RF233_CS         GPIO(PB, 31)
-#define AT86RF233_INT        GPIO(PB, 0)
-#define AT86RF233_RESET      GPIO(PB, 15)
-#define AT86RF233_SLEEP      GPIO(PA, 20)
-#define AT86RF233_SPI_CLK    (SPI_SPEED_1MHZ)
+#define AT86RF233_SPI       (SPI_0)
+#define AT86RF233_CS        GPIO_PIN(PB, 31)
+#define AT86RF233_INT       GPIO_PIN(PB, 0)
+#define AT86RF233_RESET     GPIO_PIN(PB, 15)
+#define AT86RF233_SLEEP     GPIO_PIN(PA, 20)
+#define AT86RF233_SPI_CLK   (SPI_SPEED_1MHZ)
 /** @}*/
 
 /**
 * @name AT86RF231 config
 * @{
 */
-#define AT86RF231_SPI      SPI_0
-#define AT86RF231_CS       GPIO(PB, 31)
-#define AT86RF231_INT      GPIO(PB, 0)
-#define AT86RF231_RESET    GPIO(PB, 15)
-#define AT86RF231_SLEEP    GPIO(PA, 20)
+#define AT86RF231_SPI       SPI_0
+#define AT86RF231_CS        GPIO_PIN(PB, 31)
+#define AT86RF231_INT       GPIO_PIN(PB, 0)
+#define AT86RF231_RESET     GPIO_PIN(PB, 15)
+#define AT86RF231_SLEEP     GPIO_PIN(PA, 20)
 
 #define AT86RF231_SPI_SPEED SPI_SPEED_1MHZ
 /** @} */

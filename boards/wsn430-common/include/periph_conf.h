@@ -82,9 +82,9 @@ extern "C" {
 #define SPI_IE_TX_BIT       (1 << 7)
 #define SPI_ME              (SFR->ME1)
 #define SPI_ME_BIT          (1 << 6)
-#define SPI_PIN_MISO        GPIO(P5,2)
-#define SPI_PIN_MOSI        GPIO(P5,1)
-#define SPI_PIN_CLK         GPIO(P5,3)
+#define SPI_PIN_MISO        GPIO_PIN(P5,2)
+#define SPI_PIN_MOSI        GPIO_PIN(P5,1)
+#define SPI_PIN_CLK         GPIO_PIN(P5,3)
 /** @} */
 
 
