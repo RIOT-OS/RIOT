@@ -187,10 +187,14 @@ static gnrc_pktsnip_t *_make_netif_hdr(uint8_t *mhr)
     hdr = (gnrc_netif_hdr_t *)snip->data;
     gnrc_netif_hdr_init(hdr, src_len, dst_len);
     if (dst_len > 0) {
+        hdr->flags |= GNRC_NETIF_HDR_FLAGS_BROADCAST;
         tmp = 5 + dst_len;
         addr = gnrc_netif_hdr_get_dst_addr(hdr);
         for (int i = 0; i < dst_len; i++) {
             addr[i] = mhr[5 + (dst_len - i) - 1];
+            if(addr[i] != 0xff) {
+                hdr->flags &= ~(GNRC_NETIF_HDR_FLAGS_BROADCAST);
+            }
         }
     }
     else {
