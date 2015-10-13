@@ -32,7 +32,7 @@
 #define GPIO_OFFSET_PORT_H      (0xCB)
 #define GPIO_OFFSET_PIN_PORT    (0x02)
 #define GPIO_OFFSET_PIN_PIN     (0x03)
-#define GPIO_EXT_INT_NUMOF      (7U)
+#define GPIO_EXT_INT_NUMOF      (8U)
 
 typedef struct {
     gpio_cb_t cb;
