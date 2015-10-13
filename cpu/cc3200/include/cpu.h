@@ -26,6 +26,7 @@
  * @author      Joakim Gebart <joakim.gebart@eistec.se>
  * @author      Attilio Dona'
  *
+ *
  * @todo        remove include irq.h once core was adjusted
  */
 
@@ -95,6 +96,7 @@ extern "C" {
 #define ARCH_HAS_ATOMIC_COMPARE_AND_SWAP 1
 #endif
 
+#if 0
 /**
  * @brief Definition of available panic modes
  */
@@ -110,6 +112,7 @@ typedef enum {
 #endif
     PANIC_DUMMY_HANDLER, /**< unhandled interrupt */
 } panic_t;
+#endif
 
 /**
  * @brief   Initialization of the CPU

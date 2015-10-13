@@ -24,6 +24,7 @@
 #include "cpu.h"
 #include "sched.h"
 #include "thread.h"
+#include "xtimer.h"
 #include "periph/uart.h"
 #include "periph_conf.h"
 
@@ -57,7 +58,7 @@ static void reset(unsigned long uart_base) {
 /*---------------------------------------------------------------------------*/
 
 #if UART_0_EN
-void UART_0_ISR(void) {
+void isr_uart0(void) {
 
     MAP_UARTIntClear(UARTA0_BASE,
     UART_INT_RX | UART_INT_OE | UART_INT_BE | UART_INT_PE | UART_INT_FE);
@@ -80,7 +81,7 @@ void UART_0_ISR(void) {
 #endif /* UART_0_EN */
 
 #if UART_1_EN
-void UART_1_ISR(void)
+void isr_uart1(void)
 {
     MAP_UARTIntClear(UARTA1_BASE, UART_INT_RX|UART_INT_OE|UART_INT_BE|UART_INT_PE|UART_INT_FE);
 
@@ -290,9 +291,7 @@ int uart_read_line(uart_t uart, char *pcBuffer, unsigned int uiBufLen) {
     // Wait to receive a character over UART
     //
     while (MAP_UARTCharsAvail(CONSOLE) == false) {
-#if defined(USE_FREERTOS) || defined(USE_TI_RTOS)
-        osi_Sleep(1);
-#endif
+        xtimer_usleep(MSEC_TO_TICKS(1));
     }
     cChar = MAP_UARTCharGetNonBlocking(CONSOLE);
 
@@ -331,9 +330,7 @@ int uart_read_line(uart_t uart, char *pcBuffer, unsigned int uiBufLen) {
         // Wait to receive a character over UART
         //
         while (MAP_UARTCharsAvail(CONSOLE) == false) {
-#if defined(USE_FREERTOS) || defined(USE_TI_RTOS)
-            osi_Sleep(1);
-#endif
+            xtimer_usleep(MSEC_TO_TICKS(1));
         }
         cChar = MAP_UARTCharGetNonBlocking(CONSOLE);
         //

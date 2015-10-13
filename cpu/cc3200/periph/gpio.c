@@ -34,7 +34,7 @@
  * @file
  * @brief       Low-level GPIO driver implementation
  *
- * @author      Attilio Dona'
+ * @author      Attilio Dona' <attilio.dona>
  *
  * @}
  */
@@ -229,7 +229,7 @@ int gpio_init(gpio_t dev, gpio_dir_t dir, gpio_pp_t pushpull) {
 
     switch (pushpull) {
     case GPIO_NOPULL:
-        //MAP_PinConfigSet(pinNum, PIN_STRENGTH_2MA, PIN_TYPE_STD_PU);
+        MAP_PinConfigSet(pinNum, PIN_STRENGTH_2MA, PIN_TYPE_STD);
         break;
     case GPIO_PULLUP:
         MAP_PinConfigSet(pinNum, PIN_STRENGTH_2MA, PIN_TYPE_STD_PU);
@@ -302,6 +302,7 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank,
 
     switch (flank) {
 #if 0
+    // not supported by RIOT
     case LOW:
     cc3200Mode = GPIO_LOW_LEVEL;
     break;
@@ -399,26 +400,10 @@ int gpio_read(gpio_t dev) {
 }
 
 void gpio_set(gpio_t dev) {
-//	uint8_t bit = digitalPinToBitMask(dev);
-//	uint8_t port = digitalPinToPort(dev);
-//
-//	if (port == NOT_A_PORT) return;
-//
-//	uint32_t portBase = (uint32_t) portBASERegister(port);
-//
-//	MAP_GPIOPinWrite(portBase, bit, HIGH);
     gpio_write(dev, HIGH);
 }
 
 void gpio_clear(gpio_t dev) {
-//	uint8_t bit = digitalPinToBitMask(dev);
-//	uint8_t port = digitalPinToPort(dev);
-//
-//	if (port == NOT_A_PORT) return;
-//
-//	uint32_t portBase = (uint32_t) portBASERegister(port);
-//
-//	MAP_GPIOPinWrite(portBase, bit, LOW);
     gpio_write(dev, LOW);
 }
 
@@ -441,11 +426,4 @@ void gpio_write(gpio_t dev, int value) {
     uint32_t portBase = (uint32_t) portBASERegister(port);
 
     MAP_GPIOPinWrite(portBase, bit, mask);
-
-//    if (value) {
-//        gpio_set(dev);
-//    }
-//    else {
-//        gpio_clear(dev);
-//    }
 }

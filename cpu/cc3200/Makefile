@@ -2,7 +2,6 @@
 MODULE = cpu
 
 # Add a list of subdirectories, that should also be built:
-#DIRS = driverlib $(RIOTCPU)/cortexm_common
-DIRS = periph
+DIRS = periph sdk $(RIOTCPU)/cortexm_common
 
 include $(RIOTBASE)/Makefile.base

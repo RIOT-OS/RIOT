@@ -1,76 +1,16 @@
-export CPU_ARCH := cortex-m4
+export CPU_ARCH = cortex-m4
 
-# Include cc3200 driverlib specific includes:
-export INCLUDES += -I$(RIOTBASE)/drivers/cc3200sdk
+export CFLAGS += -DPART_CC3200
+export CFLAGS += -DSL_PLATFORM_MULTI_THREADED
 
-DEFAULT_MODULE += cc3200sdk_driverlib
+USEMODULE += cc3200_driverlib cc3200_simplelink
 
-# include $(RIOTCPU)/Makefile.include.cortexm_common
-# This CPU implementation is using the new core/CPU interface:
-export CFLAGS += -Dgcc -DCOREIF_NG=1 -DPART_CC3200 -march=armv7e-m
+INCLUDES += -I$(RIOTCPU)/$(CPU)/sdk/simplelink/include
+INCLUDES += -I$(RIOTCPU)/$(CPU)/sdk/simplelink
+INCLUDES += -I$(RIOTCPU)/$(CPU)/sdk/oslib
+INCLUDES += -I$(RIOTCPU)/$(CPU)/sdk
+INCLUDES += -I$(RIOTCPU)/$(CPU)/sdk/inc
 
-# Tell the build system that the CPU depends on the Cortex-M common files:
-# export USEMODULE += cortexm_common
-# Export the peripheral drivers to be linked into the final binary:
-export USEMODULE += periph
+include $(RIOTCPU)/Makefile.include.cortexm_common
 
-# all cortex MCU's use newlib as libc
-export USEMODULE += newlib
-
-# set default for CPU_MODEL
-export CPU_MODEL ?= $(CPU)
-
-# export the CPU model and architecture
-MODEL = $(shell echo $(CPU_MODEL) | tr 'a-z' 'A-Z')
-export CFLAGS += -DCPU_MODEL_$(MODEL)
-ARCH = $(shell echo $(CPU_ARCH) | tr 'a-z-' 'A-Z_')
-export CFLAGS += -DCPU_ARCH_$(ARCH)
-
-# set the compiler specific CPU and FPU options
-ifeq ($(CPU_ARCH),cortex-m4f)
-# TODO: enable hard floating points for the M4F once the context save/restore
-#       code is adjusted to take care of FPU registers
-#export CFLAGS_FPU += -mfloat-abi=hard -mfpu=fpv4-sp-d16
-export MCPU := cortex-m4
-endif
-CFLAGS_FPU ?= -mfloat-abi=soft
-export MCPU ?= $(CPU_ARCH)
-
-# CMSIS DSP needs to know about the CPU core
-ifneq (,$(filter cmsis-dsp,$(USEPKG)))
-# definition needed to use cmsis-dsp headers
-ifeq ($(CPU_ARCH),cortex-m0)
-export CFLAGS += -DARM_MATH_CM0
-else ifeq ($(CPU_ARCH),cortex-m0plus)
-export CFLAGS += -DARM_MATH_CM0PLUS
-else ifeq ($(CPU_ARCH),cortex-m3)
-export CFLAGS += -DARM_MATH_CM3
-else ifeq ($(CPU_ARCH),cortex-m4)
-export CFLAGS += -DARM_MATH_CM4
-else ifeq ($(CPU_ARCH),cortex-m4f)
-export CFLAGS += -DARM_MATH_CM4
-else ifeq ($(CPU_ARCH),cortex-m7)
-export CFLAGS += -DARM_MATH_CM7
-endif
-endif
-
-# Include CPU specific includes:
-export INCLUDES += -I$(RIOTCPU)/$(CPU)/include
-
-# Explicitly tell the linker to link the startup code.
-#   Without this the interrupt vectors will not be linked correctly!
-ifeq ($(COMMON_STARTUP),)
-export UNDEF += $(BINDIR)cpu/startup.o
-endif
-
-export LINKFLAGS += --entry ResetISR
-
-# CPU depends on the cortex-m common module, so include it:
-# include $(RIOTCPU)/cortexm_common/Makefile.include
-
-# Avoid overriding the default rule:
-all:
-
-# Rule to generate assembly listings from ELF files:
-%.lst: %.elf
-	$(OBJDUMP) $(OBJDUMPFLAGS) $< > $@
+INCLUDES += -I$(RIOTCPU)/$(CPU)/sdk/driverlib

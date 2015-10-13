@@ -20,31 +20,19 @@
 #include <assert.h>
 #include "cpu.h"
 
+void cortexm_init(void);
+
 /**
  * @brief Initialize the CPU, set IRQ priorities
  */
 void cpu_init(void) {
-    //
-    // Enable Processor
-    //
-    MAP_IntMasterEnable();
-    MAP_IntEnable(FAULT_SYSTICK);
+
+    /* initializes the Cortex-M core */
+    cortexm_init();
 
     PRCMCC3200MCUInit();
 
     /* 1 priority group */
     MAP_IntPriorityGroupingSet(0);
-
-    /* initialize the interrupt priorities */
-    /* set pendSV interrupt to lower priority as the rest */
-    MAP_IntPrioritySet(FAULT_PENDSV, INT_PRIORITY_LVL_7);
-
-    /* set SVC interrupt to same priority as the rest */
-    MAP_IntPrioritySet(FAULT_SVCALL, CPU_DEFAULT_IRQ_PRIO);
-
-    /* initialize all vendor specific interrupts with the same value */
-    for (unsigned long i = INT_GPIOA0; i < NUM_INTERRUPTS; i++) {
-        MAP_IntPrioritySet(i, CPU_DEFAULT_IRQ_PRIO);
-    }
 
 }

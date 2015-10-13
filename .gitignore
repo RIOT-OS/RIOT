@@ -12,8 +12,6 @@ doc/doxygen/*.tmp
 # Backup files
 *~
 *.orig
-*.old
-*.sav
 .*.swp
 cachegrind.out*
 # Eclipse workspace files
@@ -30,14 +28,3 @@ cachegrind.out*
 # Eclipse symbol file (output from make eclipsesym)
 eclipsesym.xml
 /toolchain
-
-#ccsstudio
-.ccsproject
-.launches
-targetConfigs
-.gitignore
-/Debug
-/Release
-
-#log files
-*.log
