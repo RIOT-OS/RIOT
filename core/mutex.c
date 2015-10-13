@@ -34,8 +34,6 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-static void mutex_wait(struct mutex_t *mutex);
-
 int mutex_trylock(struct mutex_t *mutex)
 {
     DEBUG("%s: trylocking to get mutex. val: %u\n", sched_active_thread->name, ATOMIC_VALUE(mutex->val));
@@ -44,25 +42,18 @@ int mutex_trylock(struct mutex_t *mutex)
 
 void mutex_lock(struct mutex_t *mutex)
 {
+    unsigned irqstate;
+
     DEBUG("%s: trying to get mutex. val: %u\n", sched_active_thread->name, ATOMIC_VALUE(mutex->val));
 
-    if (atomic_set_to_one(&mutex->val) == 0) {
-        /* mutex was locked. */
-        mutex_wait(mutex);
-    }
-}
-
-static void mutex_wait(struct mutex_t *mutex)
-{
-    unsigned irqstate = disableIRQ();
-    DEBUG("%s: Mutex in use. %u\n", sched_active_thread->name, ATOMIC_VALUE(mutex->val));
-
     if (atomic_set_to_one(&mutex->val)) {
-        /* somebody released the mutex. return. */
-        DEBUG("%s: mutex_wait early out. %u\n", sched_active_thread->name, ATOMIC_VALUE(mutex->val));
-        restoreIRQ(irqstate);
+        /* mutex was free. */
+        DEBUG("%s: mutex_lock early out. %u\n", sched_active_thread->name, ATOMIC_VALUE(mutex->val));
         return;
     }
+
+    DEBUG("%s: Mutex in use. %u\n", sched_active_thread->name, ATOMIC_VALUE(mutex->val));
+    irqstate = disableIRQ();
 
     sched_set_status((tcb_t*) sched_active_thread, STATUS_MUTEX_BLOCKED);
 
@@ -89,6 +80,7 @@ void mutex_unlock(struct mutex_t *mutex)
 
     if (ATOMIC_VALUE(mutex->val) == 0) {
         /* the mutex was not locked */
+        DEBUG("mutex_unlock(): the mutex was not locked \n");
         restoreIRQ(irqstate);
         return;
     }
