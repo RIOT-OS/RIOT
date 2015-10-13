@@ -21,6 +21,8 @@
 #ifndef CIB_H
 #define CIB_H
 
+#include "assert.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -45,6 +47,7 @@ typedef struct {
  * @param[out] cib      Buffer to initialize.
  *                      Must not be NULL.
  * @param[in]  size     Size of the buffer, must not exceed MAXINT/2.
+ *                      Should be equal to 0 or power of 2.
  */
 static inline void cib_init(cib_t *__restrict cib, unsigned int size)
 {
