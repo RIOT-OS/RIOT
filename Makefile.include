@@ -290,13 +290,6 @@ term: $(filter flash, $(MAKECMDGOALS))
 doc:
 	make -BC $(RIOTBASE) doc
 
-btest:
-	$(AD)command -v $(DEBUGGER) >/dev/null 2>&1 || \
-		{ $(COLOR_ECHO) \
-		'${COLOR_RED} Debug program $(DEBUGGER) not found. Aborting.${COLOR_RESET}'; \
-		exit 1; }
-	$(BOARD_TEST_SCRIPT) $(BTEST_FLAGS)
-
 debug:
 	$(AD)command -v $(DEBUGGER) >/dev/null 2>&1 || \
 		{ $(COLOR_ECHO) \
