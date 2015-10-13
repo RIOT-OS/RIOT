@@ -256,9 +256,6 @@ static int readline(char *buf, size_t size)
         else {
             *line_buf_ptr++ = c;
             _putchar(c);
-#ifdef MODULE_NEWLIB
-            fflush(stdout);
-#endif
         }
     }
 }
