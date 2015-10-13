@@ -24,6 +24,7 @@
 
 #include "periph/spi.h"
 #include "periph/gpio.h"
+#include "xtimer.h"
 #include "at86rf2xx_internal.h"
 #include "at86rf2xx_registers.h"
 
@@ -101,8 +102,38 @@ void at86rf2xx_fb_read(const at86rf2xx_t *dev,
 
 uint8_t at86rf2xx_get_status(const at86rf2xx_t *dev)
 {
-    return (at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_STATUS)
-            & AT86RF2XX_TRX_STATUS_MASK__TRX_STATUS);
+    /* if sleeping immediately return state */
+    if(dev->state == AT86RF2XX_STATE_SLEEP)
+        return dev->state;
+
+    return at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_STATUS)
+                & AT86RF2XX_TRX_STATUS_MASK__TRX_STATUS;
+}
+
+void at86rf2xx_assert_awake(at86rf2xx_t *dev)
+{
+    if(at86rf2xx_get_status(dev) == AT86RF2XX_STATE_SLEEP) {
+
+        /* wake up and wait for transition to TRX_OFF */
+        gpio_clear(dev->sleep_pin);
+        xtimer_usleep(AT86RF2XX_WAKEUP_DELAY);
+
+        /* update state */
+        dev->state = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_STATUS)
+                         & AT86RF2XX_TRX_STATUS_MASK__TRX_STATUS;
+    }
+}
+
+void at86rf2xx_hardware_reset(at86rf2xx_t *dev)
+{
+    /* wake up from sleep in case radio is sleeping */
+    at86rf2xx_assert_awake(dev);
+
+    /* trigger hardware reset */
+    gpio_clear(dev->reset_pin);
+    xtimer_usleep(AT86RF2XX_RESET_PULSE_WIDTH);
+    gpio_set(dev->reset_pin);
+    xtimer_usleep(AT86RF2XX_RESET_DELAY);
 }
 
 void at86rf2xx_force_trx_off(const at86rf2xx_t *dev)
