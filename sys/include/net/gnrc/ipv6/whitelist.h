@@ -7,9 +7,8 @@
  */
 
 /**
- * @defgroup    gnrc_ipv6_whitelist Allows to whitelist certain IPv6 source addresses for
- *                                  reception.
- * @ingroup     gnrc_ipv6
+ * @defgroup    net_gnrc_ipv6_whitelist IPv6 address whitelist
+ * @ingroup     net_gnrc_ipv6
  * @brief       This allows you to only accept IPv6 addresses that are defined in this list.
  * @{
  *
