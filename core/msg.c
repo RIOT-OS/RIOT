@@ -207,7 +207,7 @@ int msg_send_int(msg_t *m, kernel_pid_t target_pid)
         return 1;
     }
     else {
-        DEBUG("msg_send_int: Receiver %d not waiting.\n", target->pid);
+        DEBUG("msg_send_int: Receiver not waiting.\n");
         return (queue_msg(target, m));
     }
 }
