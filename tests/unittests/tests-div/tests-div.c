@@ -25,11 +25,13 @@ static uint32_t u32_test_values[] = {
     (15625LU*5)+1,
     0xffff,
     0xffff<<10,
-    0xffffffff
+    0xffffffff,
 };
 
 static uint64_t u64_test_values[] = {
-    0xffffffffULL+1
+    16383999997ull,
+    11111111111ull,
+    0xffffffffull+1,
 };
 
 #define N_U32_VALS (sizeof(u32_test_values)/sizeof(uint32_t))
@@ -40,15 +42,15 @@ static void test_div_u64_by_15625(void)
     for (unsigned i = 0; i < N_U32_VALS; i++) {
         DEBUG("Dividing %"PRIu32" by 15625...\n", u32_test_values[i]);
         TEST_ASSERT_EQUAL_INT(
-                div_u64_by_15625(u32_test_values[i]),
-                u32_test_values[i]/15625);
+            u32_test_values[i] / 15625,
+            div_u64_by_15625(u32_test_values[i]));
     }
 
     for (unsigned i = 0; i < N_U64_VALS; i++) {
         DEBUG("Dividing %"PRIu64" by 15625...\n", u64_test_values[i]);
         TEST_ASSERT_EQUAL_INT(
-                div_u64_by_15625(u64_test_values[i]),
-                u64_test_values[i]/15625);
+            (uint64_t)u64_test_values[i] / 15625,
+            div_u64_by_15625(u64_test_values[i]));
     }
 }
 
@@ -57,8 +59,8 @@ static void test_div_u32_by_15625div512(void)
     for (unsigned i = 0; i < N_U32_VALS; i++) {
         DEBUG("Dividing %"PRIu32" by (15625/512)...\n", u32_test_values[i]);
         TEST_ASSERT_EQUAL_INT(
-                div_u32_by_15625div512(u32_test_values[i]),
-                (uint64_t)u32_test_values[i]*512LU/15625);
+            (uint64_t)u32_test_values[i] * 512lu / 15625,
+            div_u32_by_15625div512(u32_test_values[i]));
     }
 }
 
@@ -67,15 +69,32 @@ static void test_div_u64_by_1000000(void)
     for (unsigned i = 0; i < N_U32_VALS; i++) {
         DEBUG("Dividing %"PRIu32" by 1000000...\n", u32_test_values[i]);
         TEST_ASSERT_EQUAL_INT(
-                div_u64_by_1000000(u32_test_values[i]),
-                u32_test_values[i]/1000000);
+            u32_test_values[i] / 1000000lu,
+            div_u64_by_1000000(u32_test_values[i]));
     }
 
     for (unsigned i = 0; i < N_U64_VALS; i++) {
         DEBUG("Dividing %"PRIu64" by 1000000...\n", u64_test_values[i]);
         TEST_ASSERT_EQUAL_INT(
-                div_u64_by_1000000(u64_test_values[i]),
-                u64_test_values[i]/1000000U);
+            u64_test_values[i] / 1000000lu,
+            div_u64_by_1000000(u64_test_values[i]));
+    }
+}
+
+static void test_div_u64_by_15625div512(void)
+{
+    for (unsigned i = 0; i < N_U32_VALS; i++) {
+        DEBUG("Dividing %"PRIu32" by (15625/512)...\n", u32_test_values[i]);
+        TEST_ASSERT_EQUAL_INT(
+            (uint64_t)u32_test_values[i] * 512lu / 15625,
+            div_u64_by_15625div512(u32_test_values[i]));
+    }
+
+    for (unsigned i = 0; i < N_U64_VALS; i++) {
+        DEBUG("Dividing %"PRIu64" by (15625/512)...\n", u64_test_values[i]);
+        TEST_ASSERT_EQUAL_INT(
+            (uint64_t)u64_test_values[i] * 512lu / 15625,
+            div_u64_by_15625div512(u64_test_values[i]));
     }
 }
 
@@ -84,6 +103,7 @@ Test *tests_div_tests(void)
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(test_div_u64_by_15625),
         new_TestFixture(test_div_u32_by_15625div512),
+        new_TestFixture(test_div_u64_by_15625div512),
         new_TestFixture(test_div_u64_by_1000000),
     };
 
