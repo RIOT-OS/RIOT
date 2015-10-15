@@ -225,7 +225,9 @@ void isr_eic(void)
     for (int i = 0; i < NUMOF_IRQS; i++) {
         if (EIC->INTFLAG.reg & (1 << i)) {
             EIC->INTFLAG.reg = (1 << i);
-            gpio_config[i].cb(gpio_config[i].arg);
+            if(EIC->INTENSET.reg & (1 << i)) {
+                gpio_config[i].cb(gpio_config[i].arg);
+            }
         }
     }
     if (sched_context_switch_request) {
