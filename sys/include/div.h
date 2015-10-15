@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2015 Kaspar Schleiser <kaspar@schleiser.de>
+ * Copyright (C) 2016 Eistec AB
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,7 +15,8 @@
  *
  * @file
  * @ingroup   sys_util
- * @author  Kaspar Schleiser <kaspar@schleiser.de>
+ * @author    Kaspar Schleiser <kaspar@schleiser.de>
+ * @author    Joakim Nohlgård <joakim.nohlgard@eistec.se>
  * @{
  */
 
@@ -39,7 +41,7 @@ extern "C" {
 static inline uint64_t div_u64_by_15625(uint64_t val)
 {
     /* a higher value would overflow 2^64 in the multiplication that follows */
-    assert(val <= 16383999997LLU);
+    assert(val <= 16383999997ull);
 
     return (val * 0x431bde83UL) >> (12 + 32);
 }
@@ -55,7 +57,7 @@ static inline uint64_t div_u64_by_15625(uint64_t val)
 static inline uint64_t div_u64_by_1000000(uint64_t val)
 {
     /* a higher value would overflow 2^64 in the multiplication that follows */
-    assert(val <= 1048575999808LLU);
+    assert(val <= 1048575999808ull);
 
     return div_u64_by_15625(val>>6);
 }
@@ -74,6 +76,31 @@ static inline uint64_t div_u64_by_1000000(uint64_t val)
  */
 static inline uint32_t div_u32_by_15625div512(uint32_t val)
 {
+    return ((uint64_t)(val) * 0x431bde83ul) >> (12 + 32 - 9);
+}
+
+/**
+ * @brief Divide val by (15625/512)
+ *
+ * This is used to quantize a 1MHz value to the closest 32768Hz value,
+ * e.g., for timers.
+ *
+ * The algorithm actually multiplies by 512 first, then divides by 15625,
+ * keeping the result closer to a floored floating point division.
+ *
+ * @pre val <= 16383999997
+ *
+ * @param[in]   val     dividend
+ * @return      (val / (15625/512))
+ */
+static inline uint64_t div_u64_by_15625div512(uint64_t val)
+{
+    /* a higher value would overflow 2^64 in the multiplication that follows */
+    assert(val <= 16383999997ull);
+    /*
+     * This saves around 1400 bytes of ROM on Cortex-M platforms (both ARMv6 and
+     * ARMv7) from avoiding linking against __aeabi_uldivmod and related helpers
+     */
     return ((uint64_t)(val) * 0x431bde83ul) >> (12 + 32 - 9);
 }
 
