@@ -399,12 +399,7 @@ static inline void _set_state(at86rf2xx_t *dev, uint8_t state)
 {
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_STATE, state);
     while (at86rf2xx_get_status(dev) != state);
-}
-
-static inline void _force_trx_off(at86rf2xx_t *dev)
-{
-    at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_STATE, AT86RF2XX_TRX_STATE__FORCE_TRX_OFF);
-    while (at86rf2xx_get_status(dev) != AT86RF2XX_STATE_TRX_OFF);
+    dev->state = state;
 }
 
 void at86rf2xx_set_state(at86rf2xx_t *dev, uint8_t state)
@@ -432,15 +427,17 @@ void at86rf2xx_set_state(at86rf2xx_t *dev, uint8_t state)
     /* check if we need to wake up from sleep mode */
     else if (old_state == AT86RF2XX_STATE_SLEEP) {
         DEBUG("at86rf2xx: waking up from sleep mode\n");
-        gpio_clear(dev->sleep_pin);
-        while (at86rf2xx_get_status(dev) != AT86RF2XX_STATE_TRX_OFF);
+        at86rf2xx_assert_awake(dev);
     }
 
     if (state == AT86RF2XX_STATE_SLEEP) {
         /* First go to TRX_OFF */
-        _force_trx_off(dev);
+        at86rf2xx_force_trx_off(dev);
+        /* Discard all IRQ flags, framebuffer is lost anyway */
+        at86rf2xx_reg_read(dev, AT86RF2XX_REG__IRQ_STATUS);
         /* Go to SLEEP mode from TRX_OFF */
         gpio_set(dev->sleep_pin);
+        dev->state = state;
     } else {
         _set_state(dev, state);
     }
@@ -450,13 +447,12 @@ void at86rf2xx_reset_state_machine(at86rf2xx_t *dev)
 {
     uint8_t old_state;
 
-    /* Wake up */
-    gpio_clear(dev->sleep_pin);
+    at86rf2xx_assert_awake(dev);
 
     /* Wait for any state transitions to complete before forcing TRX_OFF */
     do {
         old_state = at86rf2xx_get_status(dev);
     } while (old_state == AT86RF2XX_STATE_IN_PROGRESS);
 
-    _force_trx_off(dev);
+    at86rf2xx_force_trx_off(dev);
 }

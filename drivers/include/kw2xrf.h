@@ -8,7 +8,7 @@
 
 /**
  * @defgroup    drivers_kw2xrf kw2x radio-driver
- * @ingroup     drivers
+ * @ingroup     drivers_netdev
  * @brief       Device driver for the Freescale KW2xD radio
  * @{
  *

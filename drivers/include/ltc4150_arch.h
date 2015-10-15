@@ -15,7 +15,7 @@ extern "C" {
 
 /**
  * @defgroup    ltc4150 LTC4150
- * @ingroup     drivers
+ * @ingroup     drivers_sensors
  * @brief       Driver for the Linear Technology LTC4150 Coulomb Counter
  * @{
  *

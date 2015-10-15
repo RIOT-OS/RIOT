@@ -8,7 +8,7 @@
 
 /**
  * @defgroup    driver_lsm303dlhc LSM303DLHC 3D accelerometer/magnetometer
- * @ingroup     drivers
+ * @ingroup     drivers_sensors
  * @brief       Device driver for the LSM303DLHC 3D accelerometer/magnetometer
  * @{
  *

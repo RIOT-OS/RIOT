@@ -133,6 +133,11 @@ extern "C" {
 #define GNRC_RPL_DEFAULT_OCP (0)
 
 /**
+ * @brief   Default Instance ID
+ */
+#define GNRC_RPL_DEFAULT_INSTANCE (0)
+
+/**
  * @name RPL Mode of Operations
  * @{
  */
@@ -347,11 +352,16 @@ kernel_pid_t gnrc_rpl_init(kernel_pid_t if_pid);
  *
  * @param[in] instance_id       Id of the instance
  * @param[in] dodag_id          Id of the DODAG
+ * @param[in] gen_inst_id       Flag indicating whether to generate an instance id.
+ *                              If true, @p instance_id will be ignored
+ * @param[in] local_inst_id     Flag indicating whether a local or global instance id
+ *                              should be generatad
  *
  * @return  Pointer to the new DODAG, on success.
  * @return  NULL, otherwise.
  */
-gnrc_rpl_dodag_t *gnrc_rpl_root_init(uint8_t instance_id, ipv6_addr_t *dodag_id);
+gnrc_rpl_dodag_t *gnrc_rpl_root_init(uint8_t instance_id, ipv6_addr_t *dodag_id, bool gen_inst_id,
+                                     bool local_inst_id);
 
 /**
  * @brief   Send a DIO of the @p dodag to the @p destination.
@@ -458,6 +468,16 @@ gnrc_rpl_dodag_t *gnrc_rpl_root_dodag_init(uint8_t instance_id, ipv6_addr_t *dod
  * @param[in] dodag_id          Id of the DODAG
  */
 void gnrc_rpl_send(gnrc_pktsnip_t *pkt, ipv6_addr_t *src, ipv6_addr_t *dst, ipv6_addr_t *dodag_id);
+
+/**
+ * @brief Generate a local or global instance id
+ *
+ * @param[in] local             flag to indicate whether a local or global instance id is requested
+ *
+ * @return  Local instance id, if @p local is true
+ * @return  Global instance id, otherwise.
+ */
+uint8_t gnrc_rpl_gen_instance_id(bool local);
 #ifdef __cplusplus
 }
 #endif

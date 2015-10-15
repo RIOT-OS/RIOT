@@ -8,7 +8,7 @@
 
 /**
  * @defgroup    driver_ina220 INA220 current/power monitor
- * @ingroup     drivers
+ * @ingroup     drivers_sensors
  * @brief       Device driver for Texas Instruments INA220 High or Low Side,
  *              Bi-Directional CURRENT/POWER MONITOR with Two-Wire Interface
  * @{

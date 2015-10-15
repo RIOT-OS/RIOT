@@ -1,9 +1,9 @@
 /*
- * Copyright (C) 2014 Freie Universität Berlin
+ * Copyright (C) 2014-2015 Freie Universität Berlin
  *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**
@@ -15,32 +15,34 @@
  * @file
  * @brief       Low-level I2C peripheral driver interface definition
  *
- *              The I2C signal lines SDA/SCL need external pull-up resistors which connect
- *              the lines to the positive voltage supply Vcc. The I2C driver implementation
- *              should enable the pin's internal pull-up resistors. There are however some
- *              use cases for which the internal pull resistors are not strong enough and the
- *              I2C bus will show faulty behavior. This can for example happen when connecting
- *              a logic analyzer which will raise the capacitance of the bus. In this case you
- *              should make sure you connect external pull-up resistors to both I2C bus lines.
+ * The I2C signal lines SDA/SCL need external pull-up resistors which connect
+ * the lines to the positive voltage supply Vcc. The I2C driver implementation
+ * should enable the pin's internal pull-up resistors. There are however some
+ * use cases for which the internal pull resistors are not strong enough and the
+ * I2C bus will show faulty behavior. This can for example happen when
+ * connecting a logic analyzer which will raise the capacitance of the bus. In
+ * this case you should make sure you connect external pull-up resistors to both
+ * I2C bus lines.
  *
- *              The minimum and maximum resistances are computed by:
- *              \f{eqnarray*}{
- *              R_{min} &=& \frac{V_{DD} - V_{OL(max)}} {I_{OL}}\\
- *              R_{max} &=& \frac{t_r} {(0.8473 \cdot C_b)}
- *              \f}<br>
- *              where:<br>
- *              \f$ V_{DD} =\f$ Supply voltage,
- *              \f$ V_{OL(max)} =\f$ Low level voltage,
- *              \f$ I_{OL} =\f$ Low level output current,
- *              \f$ t_r =\f$ Signal rise time,
- *              \f$ C_b =\f$ Bus capacitance <br>
- *              <br>The pull-up resistors depend on the bus speed. Some typical values are:<br>
- *              Normal mode:       10k&Omega;<br>
- *              Fast mode:          2k&Omega;<br>
- *              Fast plus mode:     2k&Omega;
+ * The minimum and maximum resistances are computed by:
+ * \f{eqnarray*}{
+ * R_{min} &=& \frac{V_{DD} - V_{OL(max)}} {I_{OL}}\\
+ * R_{max} &=& \frac{t_r} {(0.8473 \cdot C_b)}
+ * \f}<br>
+ * where:<br>
+ * \f$ V_{DD} =\f$ Supply voltage,
+ * \f$ V_{OL(max)} =\f$ Low level voltage,
+ * \f$ I_{OL} =\f$ Low level output current,
+ * \f$ t_r =\f$ Signal rise time,
+ * \f$ C_b =\f$ Bus capacitance <br>
+ * <br>The pull-up resistors depend on the bus speed.
+ * Some typical values are:<br>
+ * Normal mode:       10k&Omega;<br>
+ * Fast mode:          2k&Omega;<br>
+ * Fast plus mode:     2k&Omega;
  *
- *              For more details refer to section 7.1 in:<br>
- *              http://www.nxp.com/documents/user_manual/UM10204.pdf
+ * For more details refer to section 7.1 in:<br>
+ * http://www.nxp.com/documents/user_manual/UM10204.pdf
  *
  * @note        The current version of this interface only supports the
                 7-bit addressing mode.
@@ -54,41 +56,59 @@
 
 #include <stdint.h>
 
-#include "periph_conf.h"
+#include "periph_cpu.h"
+/**
+ * @todo    Remove dev_enums.h include once all platforms are ported to the
+ *          updated periph interface
+ */
+#include "periph/dev_enums.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/* guard this file in case no I2C device is defined */
-#if I2C_NUMOF
-
-/** @brief Flag to use for reading from the I2C bus */
+/**
+ * @brief   Flag signaling a write operation on the bus
+ */
 #define I2C_FLAG_WRITE      0
-/** @brief Flag to use for writing to the I2C bus */
+
+/**
+ * @brief   Flag signaling a read operation on the bus
+ */
 #define I2C_FLAG_READ       1
 
 /**
- * @brief define I2C device identifiers
+ * @brief   Default I2C device access macro
+ * @{
  */
-typedef enum {
-#if I2C_0_EN
-    I2C_0 = 0,              /**< I2C device 0 */
+#ifndef I2C_DEV
+#define I2C_DEV(x)          (x)
 #endif
-#if I2C_1_EN
-    I2C_1,                  /**< I2C device 1 */
-#endif
-#if I2C_2_EN
-    I2C_2,                  /**< I2C device 2 */
-#endif
-#if I2C_3_EN
-    I2C_3,                  /**< I2C device 3 */
-#endif
-} i2c_t;
+/** @} */
 
 /**
- * @brief define I2C bus speed values
+ * @brief   Default I2C undefined value
+ * @{
  */
+#ifndef I2C_UNDEF
+#define I2C_UNDEF           (-1)
+#endif
+/** @} */
+
+/**
+ * @brief   Default i2c_t type definition
+ * @{
+ */
+#ifndef HAVE_I2C_T
+typedef unsigned int i2c_t;
+#endif
+/**  @} */
+
+/**
+ * @brief   Default mapping of I2C bus speed values
+ * @{
+ */
+#ifndef HAVE_I2C_SPEED_T
 typedef enum {
     I2C_SPEED_LOW = 0,      /**< low speed mode:    ~10kbit/s */
     I2C_SPEED_NORMAL,       /**< normal mode:       ~100kbit/s */
@@ -96,9 +116,11 @@ typedef enum {
     I2C_SPEED_FAST_PLUS,    /**< fast plus mode:    ~1Mbit/s */
     I2C_SPEED_HIGH,         /**< high speed mode:   ~3.4Mbit/s */
 } i2c_speed_t;
+#endif
+/** @} */
 
 /**
- * @brief Initialize an I2C device to run as bus master
+ * @brief   Initialize an I2C device to run as bus master
  *
  * @param[in] dev           the device to initialize
  * @param[in] speed         the selected bus speed
@@ -110,7 +132,7 @@ typedef enum {
 int i2c_init_master(i2c_t dev, i2c_speed_t speed);
 
 /**
- * @brief Initialize an I2C device to run in slave mode
+ * @brief   Initialize an I2C device to run in slave mode
  *
  * @param[in] dev           the device to initialize
  * @param[in] address       the devices I2C address
@@ -121,9 +143,10 @@ int i2c_init_master(i2c_t dev, i2c_speed_t speed);
 int i2c_init_slave(i2c_t dev, uint8_t address);
 
 /**
- * @brief Get mutually exclusive access to the given I2C bus
+ * @brief   Get mutually exclusive access to the given I2C bus
  *
- * In case the I2C device is busy, this function will block until the bus is free again.
+ * In case the I2C device is busy, this function will block until the bus is
+ * free again.
  *
  * @param[in] dev       I2C device to access
  *
@@ -133,7 +156,7 @@ int i2c_init_slave(i2c_t dev, uint8_t address);
 int i2c_acquire(i2c_t dev);
 
 /**
- * @brief Release the given I2C device to be used by others
+ * @brief   Release the given I2C device to be used by others
  *
  * @param[in] dev       I2C device to release
  *
@@ -143,7 +166,7 @@ int i2c_acquire(i2c_t dev);
 int i2c_release(i2c_t dev);
 
 /**
- * @brief Read one byte from an I2C device with the given address
+ * @brief   Read one byte from an I2C device with the given address
  *
  * @param[in]  dev          I2C peripheral device
  * @param[in]  address      bus address of the target device
@@ -156,7 +179,7 @@ int i2c_release(i2c_t dev);
 int i2c_read_byte(i2c_t dev, uint8_t address, char *data);
 
 /**
- * @brief Read multiple bytes from an I2C device with the given address
+ * @brief   Read multiple bytes from an I2C device with the given address
  *
  * @param[in]  dev          I2C peripheral device
  * @param[in]  address      bus address of the target device
@@ -169,7 +192,8 @@ int i2c_read_byte(i2c_t dev, uint8_t address, char *data);
 int i2c_read_bytes(i2c_t dev, uint8_t address, char *data, int length);
 
 /**
- * @brief Read one byte from a register at the I2C slave with the given address
+ * @brief   Read one byte from a register at the I2C slave with the given
+ *          address
  *
  * @param[in]  dev          I2C peripheral device
  * @param[in]  address      bus address of the target device
@@ -182,7 +206,8 @@ int i2c_read_bytes(i2c_t dev, uint8_t address, char *data, int length);
 int i2c_read_reg(i2c_t dev, uint8_t address, uint8_t reg, char *data);
 
 /**
- * @brief Read multiple bytes from a register at the I2C slave with the given address
+ * @brief   Read multiple bytes from a register at the I2C slave with the given
+ *          address
  *
  * @param[in]  dev          I2C peripheral device
  * @param[in]  address      bus address of the target device
@@ -193,10 +218,11 @@ int i2c_read_reg(i2c_t dev, uint8_t address, uint8_t reg, char *data);
  * @return                  the number of bytes that were read
  * @return                  -1 on undefined device given
  */
-int i2c_read_regs(i2c_t dev, uint8_t address, uint8_t reg, char *data, int length);
+int i2c_read_regs(i2c_t dev, uint8_t address, uint8_t reg,
+                  char *data, int length);
 
 /**
- * @brief Write one byte to an I2C device with the given address
+ * @brief   Write one byte to an I2C device with the given address
  *
  * @param[in] dev           I2C peripheral device
  * @param[in] address       bus address of the target device
@@ -208,7 +234,7 @@ int i2c_read_regs(i2c_t dev, uint8_t address, uint8_t reg, char *data, int lengt
 int i2c_write_byte(i2c_t dev, uint8_t address, char data);
 
 /**
- * @brief Write multiple bytes to an I2C device with the given address
+ * @brief   Write multiple bytes to an I2C device with the given address
  *
  * @param[in] dev           I2C peripheral device
  * @param[in] address       bus address of the target device
@@ -221,7 +247,7 @@ int i2c_write_byte(i2c_t dev, uint8_t address, char data);
 int i2c_write_bytes(i2c_t dev, uint8_t address, char *data, int length);
 
 /**
- * @brief Write one byte to a register at the I2C slave with the given address
+ * @brief   Write one byte to a register at the I2C slave with the given address
  *
  * @param[in] dev           I2C peripheral device
  * @param[in] address       bus address of the target device
@@ -234,7 +260,8 @@ int i2c_write_bytes(i2c_t dev, uint8_t address, char *data, int length);
 int i2c_write_reg(i2c_t dev, uint8_t address, uint8_t reg, char data);
 
 /**
- * @brief Write multiple bytes to a register at the I2C slave with the given address
+ * @brief   Write multiple bytes to a register at the I2C slave with the given
+ *          address
  *
  * @param[in] dev           I2C peripheral device
  * @param[in] address       bus address of the target device
@@ -245,23 +272,22 @@ int i2c_write_reg(i2c_t dev, uint8_t address, uint8_t reg, char data);
  * @return                  the number of bytes that were written
  * @return                  -1 on undefined device given
  */
-int i2c_write_regs(i2c_t dev, uint8_t address, uint8_t reg, char *data, int length);
+int i2c_write_regs(i2c_t dev, uint8_t address, uint8_t reg,
+                   char *data, int length);
 
 /**
- * @brief Power on the given I2C peripheral
+ * @brief   Power on the given I2C peripheral
  *
  * @param[in] dev           the I2C device to power on
  */
 void i2c_poweron(i2c_t dev);
 
 /**
- * @brief Power off the given I2C peripheral
+ * @brief   Power off the given I2C peripheral
  *
  * @param[in] dev           the I2C device to power off
  */
 void i2c_poweroff(i2c_t dev);
-
-#endif /* I2C_NUMOF */
 
 #ifdef __cplusplus
 }

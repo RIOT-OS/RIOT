@@ -7,8 +7,8 @@
  */
 
 /**
- * @defgroup    gnrc_sixlowpan_nd_border_router Border router part of 6LoWPAN-ND
- * @ingroup     gnrc_sixlowpan_nd
+ * @defgroup    net_gnrc_sixlowpan_nd_border_router Border router part of 6LoWPAN-ND
+ * @ingroup     net_gnrc_sixlowpan_nd
  * @brief       Border router part of 6LoWPAN-ND
  * @{
  *

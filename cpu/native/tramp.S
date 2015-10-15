@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013, 2014 Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ * Copyright (C) 2013, 2014 Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  * Copyright (C) 2014 Thomas Eichinger <thomas.eichinger1@gmail.com>
  *
  * This file is subject to the terms and conditions of the GNU Lesser

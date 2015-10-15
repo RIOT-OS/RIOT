@@ -54,7 +54,7 @@ typedef struct {
 int gpio_init_mux(unsigned pin, unsigned mux);
 void gpio_init_states(void);
 
-#define GPIO(port, pin) (port*32 + pin)
+#define GPIO_PIN(port, pin) (port*32 + pin)
 
 #define HAVE_GPIO_PP_T
 typedef enum {

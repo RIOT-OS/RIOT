@@ -8,7 +8,7 @@
 
 /**
  * @defgroup        drivers_nrf51822_nrfmin NRF Minimal Radio Driver
- * @ingroup         drivers
+ * @ingroup         drivers_netdev
  * @brief           Minimal driver for the NRF51822 radio
  *
  * This driver enables the use of the NRF51822 radio in a IEEE802.15.4 like

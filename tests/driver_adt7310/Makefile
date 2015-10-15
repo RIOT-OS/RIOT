@@ -16,7 +16,7 @@ ifneq (,$(TEST_ADT7310_CS))
   CFLAGS += -DTEST_ADT7310_CS=$(TEST_ADT7310_CS)
 else
   # set arbitrary default
-  CFLAGS += -DTEST_ADT7310_CS=GPIO\(0,0\)
+  CFLAGS += -DTEST_ADT7310_CS=GPIO_PIN\(0,0\)
 endif
 
 include $(RIOTBASE)/Makefile.include

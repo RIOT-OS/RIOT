@@ -10,7 +10,7 @@
  * @file
  * @brief       Check if the libcoap package builds.
  *
- * @author      Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ * @author      Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  *
  */
 

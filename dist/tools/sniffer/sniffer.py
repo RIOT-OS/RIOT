@@ -1,9 +1,11 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 '''
 (C) 2012, Mariano Alvira <mar@devl.org>
 (C) 2014, Oliver Hahm <oliver.hahm@inria.fr>
 (C) 2015, Hauke Petersen <hauke.petersen@fu-berlin.de>
 (C) 2015, Martine Lenders <mlenders@inf.fu-berlin.de>
+(C) 2015, Cenk Gündoğan <cnkgndgn@gmail.com>
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -33,6 +35,7 @@ SUCH DAMAGE.
 from __future__ import print_function
 import sys
 import re
+import socket
 from time import sleep, time
 from struct import pack
 from serial import Serial
@@ -103,29 +106,53 @@ def generate_pcap(port, out):
             out.flush()
 
 
+def connect(argv):
+    connType = argv[1]
+
+    conn = None
+    if connType == "serial":
+        # open serial port
+        try:
+            conn = Serial(argv[2], argv[3], dsrdtr=0, rtscts=0,
+                          timeout=1)
+        except IOError:
+            print("error opening serial port", file=sys.stderr)
+            sys.exit(2)
+    elif connType == "socket":
+        host = argv[2]
+        port = int(argv[3])
+
+        try:
+            sock = socket.socket()
+            sock.connect((host, port))
+            conn = sock.makefile("r+b", bufsize=0)
+        except IOError:
+            print("error connecting to %s:%s" % (host, port), file=sys.stderr)
+            sys.exit(2)
+    else:
+        print("error: unsupported connection type. Use \"serial\" or \"socket\"")
+        sys.exit(2)
+
+    return conn
+
 def main(argv):
-    if len(argv) < 4:
-        print("Usage: %s tty baudrate channel [outfile]" % (argv[0]),
+    if len(argv) < 5:
+        print("Usage: %s serial tty baudrate channel [outfile]\n"
+              "       %s socket host port channel [outfile]" % (argv[0], argv[0]),
               file=sys.stderr)
         print("       channel = 11-26", file=sys.stderr)
         sys.exit(2)
 
-    # open serial port
-    try:
-        serport = Serial(argv[1], argv[2], dsrdtr=0, rtscts=0,
-                         timeout=1)
-    except IOError:
-        print("error opening port", file=sys.stderr)
-        sys.exit(2)
+    conn = connect(argv)
 
     sleep(1)
-    configure_interface(serport, int(argv[3]))
+    configure_interface(conn, int(argv[4]))
     sleep(1)
 
     # figure out where to write
     try:
-        sys.stderr.write('trying to open file %s\n' % argv[4])
-        outfile = open(argv[4], 'w+b')
+        sys.stderr.write('trying to open file %s\n' % argv[5])
+        outfile = open(argv[5], 'w+b')
     except IndexError:
         if sys.version_info > (3,):
             outfile = sys.stdout.buffer
@@ -133,8 +160,9 @@ def main(argv):
             outfile = sys.stdout
 
     try:
-        generate_pcap(serport, outfile)
+        generate_pcap(conn, outfile)
     except KeyboardInterrupt:
+        conn.close()
         print()
         sys.exit(2)
 

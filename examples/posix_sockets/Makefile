@@ -8,8 +8,8 @@ BOARD ?= native
 RIOTBASE ?= $(CURDIR)/../..
 
 BOARD_INSUFFICIENT_MEMORY := airfy-beacon chronos msb-430 msb-430h nrf51dongle nrf6310 \
-                             nucleo-f334 pca10000 pca10005 stm32f0discovery telosb wsn430-v1_3b \
-                             wsn430-v1_4 yunjia-nrf51822 z1
+                             nucleo-f334 pca10000 pca10005 stm32f0discovery telosb weio \
+                             wsn430-v1_3b wsn430-v1_4 yunjia-nrf51822 z1
 
 # Include packages that pull up and auto-init the link layer.
 # NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present

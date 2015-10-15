@@ -89,7 +89,7 @@ cc2538_uart_t * const UART1 = (cc2538_uart_t *)0x4000d000;
 static void reset(cc2538_uart_t *u)
 {
     /* Make sure the UART is disabled before trying to configure it */
-    u->CTL = 0;
+    u->CTLbits.UARTEN = 0;
 
     u->CTLbits.RXE = 1;
     u->CTLbits.TXE = 1;
@@ -197,16 +197,11 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, uart_tx_cb_t t
 int uart_init_blocking(uart_t uart, uint32_t baudrate)
 {
     cc2538_uart_t *u;
-    unsigned int uart_num;
-    uint32_t divisor;
 
     switch (uart) {
 #if UART_0_EN
         case UART_0:
             u = UART_0_DEV;
-
-            /* Run on SYS_DIV */
-            u->CC = 0;
 
             /*
              * Select the UARTx RX pin by writing to the IOC_UARTRXD_UARTn register
@@ -230,9 +225,6 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
         case UART_1:
             u = UART_1_DEV;
 
-            /* Run on SYS_DIV */
-            u->CC = 0;
-
             /*
              * Select the UARTx RX pin by writing to the IOC_UARTRXD_UARTn register
              */
@@ -249,26 +241,42 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
             /* Set RX and TX pins to peripheral mode */
             gpio_hardware_control(UART_1_TX_PIN);
             gpio_hardware_control(UART_1_RX_PIN);
-
-#if ( defined(UART_1_RTS_PORT) && defined(UART_1_RTS_PIN) )
-            IOC_PXX_SEL[UART_1_RTS_PIN] = UART1_RTS;
-            gpio_hardware_control(UART_1_RTS_PIN);
-            IOC_PXX_OVER[UART_1_RTS_PIN] = IOC_OVERRIDE_OE;
-            u->CTLbits.RTSEN = 1;
-#endif
-
-#if ( defined(UART_1_CTS_PORT) && defined(UART_1_CTS_PIN) )
-            IOC_UARTCTS_UART1 = UART_1_CTS_PIN;
-            gpio_hardware_control(UART_1_CTS_PIN);
-            IOC_PXX_OVER[UART_1_CTS_PIN] = IOC_OVERRIDE_DIS;
-            u->CTLbits.CTSEN = 1;
-#endif
-
             break;
 #endif
 
         default:
+            (void)u;
             return -1;
+    }
+
+#if UART_0_EN || UART_1_EN
+    /* Enable clock for the UART while Running, in Sleep and Deep Sleep */
+    unsigned int uart_num = ( (uintptr_t)u - (uintptr_t)UART0 ) / 0x1000;
+    SYS_CTRL_RCGCUART |= (1 << uart_num);
+    SYS_CTRL_SCGCUART |= (1 << uart_num);
+    SYS_CTRL_DCGCUART |= (1 << uart_num);
+
+    /* Make sure the UART is disabled before trying to configure it */
+    u->CTL = 0;
+
+    /* Run on SYS_DIV */
+    u->CC = 0;
+
+    /* On the CC2538, hardware flow control is supported only on UART1 */
+    if (u == UART1) {
+#ifdef UART_1_RTS_PIN
+        IOC_PXX_SEL[UART_1_RTS_PIN] = UART1_RTS;
+        gpio_hardware_control(UART_1_RTS_PIN);
+        IOC_PXX_OVER[UART_1_RTS_PIN] = IOC_OVERRIDE_OE;
+        u->CTLbits.RTSEN = 1;
+#endif
+
+#ifdef UART_1_CTS_PIN
+        IOC_UARTCTS_UART1 = UART_1_CTS_PIN;
+        gpio_hardware_control(UART_1_CTS_PIN);
+        IOC_PXX_OVER[UART_1_CTS_PIN] = IOC_OVERRIDE_DIS;
+        u->CTLbits.CTSEN = 1;
+#endif
     }
 
     /* Enable clock for the UART while Running, in Sleep and Deep Sleep */
@@ -293,16 +301,14 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
     u->IFLSbits.RXIFLSEL = FIFO_LEVEL_1_8TH;
     u->IFLSbits.TXIFLSEL = FIFO_LEVEL_4_8TH;
 
-    /* Make sure the UART is disabled before trying to configure it */
-    u->CTL = 0;
-
     u->CTLbits.RXE = 1;
     u->CTLbits.TXE = 1;
     u->CTLbits.HSE = UART_CTL_HSE_VALUE;
 
     /* Set the divisor for the baud rate generator */
-    divisor = sys_clock_freq();
+    uint32_t divisor = sys_clock_freq();
     divisor <<= UART_CTL_HSE_VALUE + 2;
+    divisor += baudrate / 2; /**< Avoid a rounding error */
     divisor /= baudrate;
     u->IBRD = divisor >> DIVFRAC_NUM_BITS;
     u->FBRD = divisor & DIVFRAC_MASK;
@@ -317,6 +323,7 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
     u->CTLbits.UARTEN = 1;
 
     return 0;
+#endif /* UART_0_EN || UART_1_EN */
 }
 
 void uart_tx_begin(uart_t uart)

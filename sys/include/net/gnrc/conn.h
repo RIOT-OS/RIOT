@@ -7,9 +7,11 @@
  */
 
 /**
- * @defgroup    net_gnrc_conn   GNRC-specific @ref net_conn implementation
+ * @defgroup    net_gnrc_conn   GNRC-specific implementation of the connection API
  * @ingroup     net_gnrc
- * @brief       GNRC-specific @ref net_conn implementation
+ * @brief       Provides an implementation of the @ref net_conn by the
+ *              @ref net_gnrc
+ *
  * @{
  *
  * @file

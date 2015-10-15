@@ -42,7 +42,7 @@ typedef uint32_t gpio_t;
  * @brief   Mandatory function for defining a GPIO pins
  * @{
  */
-#define GPIO(x, y)          (((gpio_t)(&PORT->Group[x])) | y)
+#define GPIO_PIN(x, y)      (((gpio_t)(&PORT->Group[x])) | y)
 
 /**
  * @brief   Available ports on the SAMD21

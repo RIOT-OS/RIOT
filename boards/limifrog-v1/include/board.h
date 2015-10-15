@@ -49,9 +49,9 @@ extern "C" {
  * @name LED pin definitions
  * @{
  */
-#define LED_RED_PORT      (GPIOC)
-#define LED_RED_PIN       (3)
-#define LED_RED_GPIO GPIO(PORT_C,3)
+#define LED_RED_PORT        (GPIOC)
+#define LED_RED_PIN         (3)
+#define LED_RED_GPIO        GPIO_PIN(PORT_C,3)
 /** @} */
 
 /**

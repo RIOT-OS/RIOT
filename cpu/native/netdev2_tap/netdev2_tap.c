@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>,
+ * Copyright (C) 2015 Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>,
  *                    Martine Lenders <mlenders@inf.fu-berlin.de>
  *                    Kaspar Schleiser <kaspar@schleiser.de>
  *                    Ell-i open source co-operative

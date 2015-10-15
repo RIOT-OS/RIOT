@@ -14,7 +14,7 @@
  * @brief       Hello World application
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
- * @author      Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ * @author      Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  *
  * @}
  */

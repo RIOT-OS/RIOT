@@ -7,7 +7,7 @@
  */
 
 /**
- * @addtogroup  pnet
+ * @addtogroup  posix_sockets
  * @{
  */
 

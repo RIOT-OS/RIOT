@@ -434,7 +434,7 @@ static inline void xtimer_spin_until(uint32_t value);
 /**
  * @brief ignore some bits when comparing timer values
  *
- * (only relevant when XTIMER_MASK != 0, e.g., timers < 16bit.)
+ * (only relevant when XTIMER_MASK != 0, e.g., timers < 32bit.)
  *
  * When combining _xtimer_now() and _high_cnt, we have to get the same value in
  * order to work around a race between overflowing _xtimer_now() and OR'ing the

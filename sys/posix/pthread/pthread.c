@@ -206,7 +206,7 @@ void pthread_exit(void *retval)
             }
         }
 
-        dINT();
+        disableIRQ();
         if (self->stack) {
             msg_t m;
             m.content.ptr = self->stack;

@@ -225,6 +225,10 @@ ifneq (,$(filter gnrc_ipv6_ext,$(USEMODULE)))
   USEMODULE += gnrc_ipv6
 endif
 
+ifneq (,$(filter gnrc_ipv6_whitelist,$(USEMODULE)))
+  USEMODULE += ipv6_addr
+endif
+
 ifneq (,$(filter gnrc_ipv6_router,$(USEMODULE)))
   USEMODULE += gnrc_ipv6
 endif
@@ -419,6 +423,10 @@ endif
 
 ifneq (,$(filter ltc4150,$(USEMODULE)))
     USEMODULE += xtimer
+endif
+
+ifneq (,$(filter at30tse75x,$(USEMODULE)))
+  USEMODULE += xtimer
 endif
 
 ifneq (,$(filter pthread,$(USEMODULE)))

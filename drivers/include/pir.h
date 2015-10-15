@@ -8,14 +8,14 @@
 
 /**
  * @defgroup    driver_pir PIR Motion Sensor
- * @ingroup     drivers
+ * @ingroup     drivers_sensors
  * @brief       Device driver interface for the PIR motion sensor
  * @{
  *
  * @file
  * @brief       Device driver interface for the PIR motion sensor
  *
- * @author      Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ * @author      Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  */
 
 #ifndef PIR_H

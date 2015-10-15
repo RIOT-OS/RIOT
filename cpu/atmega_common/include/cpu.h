@@ -43,9 +43,6 @@
 extern "C" {
 #endif
 
-#define eINT            enableIRQ
-#define dINT            disableIRQ
-
 /**
  * @brief global in-ISR state variable
  */
