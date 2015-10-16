@@ -69,6 +69,15 @@ extern "C" {
 /* @} */
 
 /**
+ * @brief SPI configuration
+ * @{
+ */
+#define SPI_NUMOF           (2U)
+#define SPI_0_EN            1
+#define SPI_1_EN            1
+/* @} */
+
+/**
  *  * @name GPIO configuration
  *   * @{
  */
