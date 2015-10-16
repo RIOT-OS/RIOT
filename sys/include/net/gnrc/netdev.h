@@ -118,6 +118,10 @@ typedef struct {
     /**
      * @brief   Get an option value from a given network device
      *
+     * @note    This function does not check for proper alignment of the memory
+     *          region accessed. It is the responsibility of the caller to
+     *          assure aligned memory access.
+     *
      * @param[in] dev           network device descriptor
      * @param[in] opt           option type
      * @param[out] value        pointer to store the option's value in
@@ -134,6 +138,10 @@ typedef struct {
 
     /**
      * @brief   Set an option value for a given network device
+     *
+     * @note    This function does not check for proper alignment of the memory
+     *          region accessed. It is the responsibility of the caller to
+     *          assure aligned memory access.
      *
      * @param[in] dev       network device descriptor
      * @param[in] opt       option type
