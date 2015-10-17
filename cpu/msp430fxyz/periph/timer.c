@@ -119,11 +119,6 @@ void timer_irq_disable(tim_t dev)
     /* TODO: not supported, yet */
 }
 
-void timer_reset(tim_t dev)
-{
-    TIMER_BASE->R = 0;
-}
-
 ISR(TIMER_ISR_CC0, isr_timer_a_cc0)
 {
     __enter_isr();
