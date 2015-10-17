@@ -133,14 +133,6 @@ void timer_irq_disable(tim_t dev)
     }
 }
 
-void timer_reset(tim_t dev)
-{
-    if (dev == TIMER_0) {
-        /* Performs a software reset of a peripheral */
-        ROM_SysCtlPeripheralReset(SYSCTL_PERIPH_WTIMER0);
-    }
-}
-
 #if TIMER_0_EN
 void isr_timer0a(void)
 {

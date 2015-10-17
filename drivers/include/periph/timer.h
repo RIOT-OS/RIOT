@@ -170,17 +170,6 @@ void timer_irq_enable(tim_t dev);
  */
 void timer_irq_disable(tim_t dev);
 
-/**
- * @brief Reset the up-counting value to zero for the given timer
- *
- * Note that this function effects all currently set channels and it can lead to
- * non-deterministic timeouts if any channel is active when this function is
- * called.
- *
- * @param[in] dev           the timer to reset
- */
-void timer_reset(tim_t dev);
-
 #ifdef __cplusplus
 }
 #endif

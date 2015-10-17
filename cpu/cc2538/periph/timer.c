@@ -380,13 +380,6 @@ void timer_irq_disable(tim_t dev)
     }
 }
 
-void timer_reset(tim_t dev)
-{
-    timer_set_absolute(dev, 0, 0);
-    timer_set_absolute(dev, 1, 0);
-}
-
-
 #if TIMER_0_EN
 void TIMER_0_ISR_1(void)
 {

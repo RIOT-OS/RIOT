@@ -192,14 +192,6 @@ void timer_stop(tim_t dev)
     DEBUG("%s\n", __func__);
 }
 
-
-void timer_reset(tim_t dev)
-{
-    if (dev < TIMER_NUMOF) {
-        time_null = timer_read(dev);
-    }
-}
-
 unsigned int timer_read(tim_t dev)
 {
     if (dev >= TIMER_NUMOF) {

@@ -132,11 +132,6 @@ void timer_irq_disable(tim_t dev)
     NVIC_DisableIRQ(timer_config[dev].irqn);
 }
 
-void timer_reset(tim_t dev)
-{
-    _tim(dev)->CNT = 0;
-}
-
 static inline void irq_handler(tim_t num, TIM_TypeDef *tim)
 {
     for (int i = 0; i < CHANNEL_NUMOF; i++) {

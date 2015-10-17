@@ -174,14 +174,6 @@ void timer_stop(tim_t tim)
     get_dev(tim)->TCR = 0;
 }
 
-void timer_reset(tim_t tim)
-{
-    lpc23xx_timer_t *dev = get_dev(tim);
-    dev->TCR |= 2;
-    asm("nop");
-    dev->TCR &= ~(2);
-}
-
 void timer_irq_enable(tim_t tim)
 {
     /* TODO */
