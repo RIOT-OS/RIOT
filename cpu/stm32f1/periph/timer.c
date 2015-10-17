@@ -336,27 +336,6 @@ void timer_irq_disable(tim_t dev)
     }
 }
 
-void timer_reset(tim_t dev)
-{
-    switch (dev) {
-#if TIMER_0_EN
-        case TIMER_0:
-            TIMER_0_DEV_0->CNT = 0;
-            TIMER_0_DEV_1->CNT = 0;
-            break;
-#endif
-#if TIMER_1_EN
-        case TIMER_1:
-            TIMER_1_DEV_0->CNT = 0;
-            TIMER_1_DEV_1->CNT = 0;
-            break;
-#endif
-        case TIMER_UNDEFINED:
-            break;
-    }
-}
-
-
 #if TIMER_0_EN
 void TIMER_0_ISR_0(void)
 {

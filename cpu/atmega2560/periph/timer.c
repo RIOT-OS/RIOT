@@ -414,29 +414,6 @@ void timer_irq_disable(tim_t dev)
     }
 }
 
-void timer_reset(tim_t dev)
-{
-    switch (dev) {
-#if TIMER_0_EN
-        case TIMER_0:
-            TIMER0_COUNTER = 0;
-            break;
-#endif
-#if TIMER_1_EN
-        case TIMER_1:
-            TIMER1_COUNTER = 0;
-            break;
-#endif
-#if TIMER_2_EN
-        case TIMER_2:
-            TIMER2_COUNTER = 0;
-            break;
-#endif
-        case TIMER_UNDEFINED:
-            break;
-    }
-}
-
 static inline void _isr(int timer, int chan)
 {
     __enter_isr();
