@@ -37,6 +37,7 @@ static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 #define GNRC_RPL_OPT_DODAG_CONF_LEN         (14)
 #define GNRC_RPL_OPT_PREFIX_INFO_LEN        (30)
 #define GNRC_RPL_OPT_TARGET_LEN             (18)
+#define GNRC_RPL_OPT_TRANSIT_E_FLAG         (1 << 7)
 #define GNRC_RPL_OPT_TRANSIT_INFO_LEN       (4)
 #define GNRC_RPL_SHIFTED_MOP_MASK           (0x7)
 #define GNRC_RPL_PRF_MASK                   (0x7)
@@ -415,8 +416,8 @@ bool _parse_options(int msg_type, gnrc_rpl_dodag_t *dodag, gnrc_rpl_opt_t *opt, 
                 }
 
                 fib_add_entry(&gnrc_ipv6_fib_table, if_id, target->target.u8,
-                              sizeof(ipv6_addr_t), AF_INET6, src->u8,
-                              sizeof(ipv6_addr_t), AF_INET6,
+                              sizeof(ipv6_addr_t), 0x0, src->u8,
+                              sizeof(ipv6_addr_t), FIB_FLAG_RPL_ROUTE,
                               (dodag->default_lifetime * dodag->lifetime_unit) *
                               SEC_IN_MS);
                 break;
@@ -435,7 +436,9 @@ a preceding RPL TARGET DAO option\n");
                     fib_update_entry(&gnrc_ipv6_fib_table,
                                      first_target->target.u8,
                                      sizeof(ipv6_addr_t), src->u8,
-                                     sizeof(ipv6_addr_t), AF_INET6,
+                                     sizeof(ipv6_addr_t),
+                                     ((transit->e_flags & GNRC_RPL_OPT_TRANSIT_E_FLAG) ?
+                                      0x0 : FIB_FLAG_RPL_ROUTE),
                                      (transit->path_lifetime *
                                       dodag->lifetime_unit * SEC_IN_MS));
                     first_target = (gnrc_rpl_opt_target_t *) (((uint8_t *) (first_target)) +
