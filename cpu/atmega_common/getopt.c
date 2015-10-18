@@ -29,7 +29,7 @@ optarg = NULL;
         if(!scanptr || *scanptr =='\0')
         {
             scanptr = argv[optind]+1;
-            optind++;   
+            optind++;
         }
         if (optind == 0 || argv[optind][0] != '-' || !argv[optind][1])
         {
