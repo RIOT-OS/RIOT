@@ -60,7 +60,7 @@ static mutex_t mtx_access = MUTEX_INIT;
 
 /**
  * @brief maximum number of handled routing protocols (RP)
- *        used to notify the saved kernel_pid_t on ureachable destination
+ *        used to notify the saved kernel_pid_t on unreachable destination
  */
 #define FIB_MAX_REGISTERED_RP (5)
 
