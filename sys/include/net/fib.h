@@ -81,6 +81,7 @@ void fib_deinit(fib_table_t *table);
 /**
  * @brief Registration of a routing protocol handler function
  *
+ * @param[in] table                 the fib table the RP should be registered to
  * @param[in] prefix                the prefix handled by the according RP
  * @param[in] prefix_addr_type_size the size of the address type used for the prefix
  *
@@ -89,7 +90,7 @@ void fib_deinit(fib_table_t *table);
  *           -EINVAL if the prefix is NULL or the provided size is 0
  *
  */
-int fib_register_rp(uint8_t *prefix, size_t prefix_addr_type_size);
+int fib_register_rp(fib_table_t *table, uint8_t *prefix, size_t prefix_addr_type_size);
 
 /**
  * @brief Adds a new entry in the corresponding FIB table for global destination and next hop
