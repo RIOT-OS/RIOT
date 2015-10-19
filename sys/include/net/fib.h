@@ -63,6 +63,11 @@ typedef struct fib_destination_set_entry_t {
 #define FIB_LIFETIME_NO_EXPIRE (0xFFFFFFFFffffffff)
 
 /**
+ * @brief flag to identify if a route was set by RPL
+ */
+#define FIB_FLAG_RPL_ROUTE (1UL << 0)
+
+/**
  * @brief initializes all FIB entries with 0
  *
  * @param[in] table         the fib instance to initialize

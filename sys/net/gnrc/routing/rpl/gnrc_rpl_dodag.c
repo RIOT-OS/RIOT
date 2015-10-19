@@ -274,9 +274,9 @@ bool gnrc_rpl_parent_add_by_addr(gnrc_rpl_dodag_t *dodag, ipv6_addr_t *addr, gnr
                 return false;
             }
             if (fib_add_entry(&gnrc_ipv6_fib_table, if_id, def.u8,
-                              sizeof(ipv6_addr_t), AF_INET6,
+                              sizeof(ipv6_addr_t), 0x0,
                               dodag->parents->addr.u8, sizeof(ipv6_addr_t),
-                              AF_INET6, (dodag->default_lifetime *
+                              FIB_FLAG_RPL_ROUTE, (dodag->default_lifetime *
                                          dodag->lifetime_unit) * SEC_IN_MS) != 0) {
                 DEBUG("RPL: error adding parent to FIB\n");
                 gnrc_rpl_parent_remove(*parent);
@@ -355,9 +355,9 @@ void gnrc_rpl_parent_update(gnrc_rpl_dodag_t *dodag, gnrc_rpl_parent_t *parent)
             kernel_pid_t if_id;
             if ((if_id = gnrc_ipv6_netif_find_by_addr(NULL, &all_RPL_nodes)) != KERNEL_PID_UNDEF) {
                 fib_add_entry(&gnrc_ipv6_fib_table, if_id, def.u8,
-                              sizeof(ipv6_addr_t), AF_INET6,
+                              sizeof(ipv6_addr_t), 0x0,
                               dodag->parents->addr.u8, sizeof(ipv6_addr_t),
-                              AF_INET6, (dodag->default_lifetime *
+                              FIB_FLAG_RPL_ROUTE, (dodag->default_lifetime *
                                          dodag->lifetime_unit) * SEC_IN_MS);
             }
         }
@@ -422,8 +422,8 @@ static gnrc_rpl_parent_t *_gnrc_rpl_find_preferred_parent(gnrc_rpl_dodag_t *doda
         }
 
         fib_add_entry(&gnrc_ipv6_fib_table, if_id, def.u8, sizeof(ipv6_addr_t),
-                      AF_INET6, dodag->parents->addr.u8, sizeof(ipv6_addr_t),
-                      AF_INET6, (dodag->default_lifetime *
+                      0x0, dodag->parents->addr.u8, sizeof(ipv6_addr_t),
+                      FIB_FLAG_RPL_ROUTE, (dodag->default_lifetime *
                                  dodag->lifetime_unit) * SEC_IN_MS);
     }
 
