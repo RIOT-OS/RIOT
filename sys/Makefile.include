@@ -18,6 +18,9 @@ ifneq (,$(filter posix,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/sys/posix/include
     USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/include
 endif
+ifneq (,$(filter posix_semaphore,$(USEMODULE)))
+    USEMODULE_INCLUDES += $(RIOTBASE)/sys/posix/include
+endif
 ifneq (,$(filter posix_sockets,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/sys/posix/include
 endif
