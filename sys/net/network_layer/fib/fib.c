@@ -54,32 +54,6 @@ static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 #define FIB_ADDR_PRINT_LENS         FIB_ADDR_PRINT_LENS2(FIB_ADDR_PRINT_LEN)
 
 /**
- * @brief access mutex to control exclusive operations on calls
- */
-static mutex_t mtx_access = MUTEX_INIT;
-
-/**
- * @brief maximum number of handled routing protocols (RP)
- *        used to notify the saved kernel_pid_t on ureachable destination
- */
-#define FIB_MAX_REGISTERED_RP (5)
-
-/**
- * @brief registered RPs for notifications about unreachable destinations
- */
-static size_t notify_rp_pos = 0;
-
-/**
- * @brief the kernel_pid_t for notifying the RPs
- */
-static kernel_pid_t notify_rp[FIB_MAX_REGISTERED_RP];
-
-/**
- * @brief the prefix handled by the RP
- */
-static universal_address_container_t* prefix_rp[FIB_MAX_REGISTERED_RP];
-
-/**
  * @brief convert an offset given in ms to abolute time in time in us
  * @param[in]  ms       the milliseconds to be converted
  * @param[out] target   the converted point in time
@@ -302,7 +276,7 @@ static int fib_remove(fib_entry_t *entry)
  * @return 0 on a new available entry,
  *         -ENOENT if no suiting entry is provided.
  */
-static int fib_signal_rp(uint8_t *dst, size_t dst_size, uint32_t dst_flags)
+static int fib_signal_rp(fib_table_t *table, uint8_t *dst, size_t dst_size, uint32_t dst_flags)
 {
     msg_t msg, reply;
     rp_address_msg_t content;
@@ -315,18 +289,18 @@ static int fib_signal_rp(uint8_t *dst, size_t dst_size, uint32_t dst_flags)
     msg.content.ptr = (void *)&content;
 
     for (size_t i = 0; i < FIB_MAX_REGISTERED_RP; ++i) {
-        if (notify_rp[i] != KERNEL_PID_UNDEF) {
+        if (table->notify_rp[i] != KERNEL_PID_UNDEF) {
             DEBUG("[fib_signal_rp] send msg@: %p to pid[%d]: %d\n", \
-                  msg.content.ptr, (int)i, (int)notify_rp[i]);
+                  msg.content.ptr, (int)i, (int)(table->notify_rp[i]));
 
             /* do only signal a RP if its registered prefix matches */
             size_t dst_size_in_bits = dst_size<<3;
-            if (universal_address_compare(prefix_rp[i], dst, &dst_size_in_bits) == 1) {
+            if (universal_address_compare(table->prefix_rp[i], dst, &dst_size_in_bits) == 1) {
                 /* the receiver, i.e. the RP, MUST copy the content value.
                  * using the provided pointer after replying this message
                  * will lead to errors
                  */
-                msg_send_receive(&msg, &reply, notify_rp[i]);
+                msg_send_receive(&msg, &reply, table->notify_rp[i]);
                 DEBUG("[fib_signal_rp] got reply.\n");
             }
         }
@@ -340,14 +314,14 @@ int fib_add_entry(fib_table_t *table,
                   uint32_t dst_flags, uint8_t *next_hop, size_t next_hop_size,
                   uint32_t next_hop_flags, uint32_t lifetime)
 {
-    mutex_lock(&mtx_access);
+    mutex_lock(&(table->mtx_access));
     DEBUG("[fib_add_entry]\n");
     size_t count = 1;
     fib_entry_t *entry[count];
 
     /* check if dst and next_hop are valid pointers */
     if ((dst == NULL) || (next_hop == NULL)) {
-        mutex_unlock(&mtx_access);
+        mutex_unlock(&(table->mtx_access));
         return -EFAULT;
     }
 
@@ -362,7 +336,7 @@ int fib_add_entry(fib_table_t *table,
                                next_hop, next_hop_size, next_hop_flags, lifetime);
     }
 
-    mutex_unlock(&mtx_access);
+    mutex_unlock(&(table->mtx_access));
     return ret;
 }
 
@@ -370,7 +344,7 @@ int fib_update_entry(fib_table_t *table, uint8_t *dst, size_t dst_size,
                      uint8_t *next_hop, size_t next_hop_size,
                      uint32_t next_hop_flags, uint32_t lifetime)
 {
-    mutex_lock(&mtx_access);
+    mutex_lock(&(table->mtx_access));
     DEBUG("[fib_update_entry]\n");
     size_t count = 1;
     fib_entry_t *entry[count];
@@ -378,7 +352,7 @@ int fib_update_entry(fib_table_t *table, uint8_t *dst, size_t dst_size,
 
     /* check if dst and next_hop are valid pointers */
     if ((dst == NULL) || (next_hop == NULL)) {
-        mutex_unlock(&mtx_access);
+        mutex_unlock(&(table->mtx_access));
         return -EFAULT;
     }
 
@@ -394,13 +368,13 @@ int fib_update_entry(fib_table_t *table, uint8_t *dst, size_t dst_size,
         DEBUG("[fib_update_entry] ambigious entries detected!!!\n");
     }
 
-    mutex_unlock(&mtx_access);
+    mutex_unlock(&(table->mtx_access));
     return ret;
 }
 
 void fib_remove_entry(fib_table_t *table, uint8_t *dst, size_t dst_size)
 {
-    mutex_lock(&mtx_access);
+    mutex_lock(&(table->mtx_access));
     DEBUG("[fib_remove_entry]\n");
     size_t count = 1;
     fib_entry_t *entry[count];
@@ -418,7 +392,7 @@ void fib_remove_entry(fib_table_t *table, uint8_t *dst, size_t dst_size)
         DEBUG("[fib_update_entry] ambigious entries detected!!!\n");
     }
 
-    mutex_unlock(&mtx_access);
+    mutex_unlock(&(table->mtx_access));
 }
 
 int fib_get_next_hop(fib_table_t *table, kernel_pid_t *iface_id,
@@ -426,7 +400,7 @@ int fib_get_next_hop(fib_table_t *table, kernel_pid_t *iface_id,
                      uint32_t *next_hop_flags, uint8_t *dst, size_t dst_size,
                      uint32_t dst_flags)
 {
-    mutex_lock(&mtx_access);
+    mutex_lock(&(table->mtx_access));
     DEBUG("[fib_get_next_hop]\n");
     size_t count = 1;
     fib_entry_t *entry[count];
@@ -434,19 +408,19 @@ int fib_get_next_hop(fib_table_t *table, kernel_pid_t *iface_id,
     if ((iface_id == NULL)
         || (next_hop_size == NULL)
         || (next_hop_flags == NULL)) {
-            mutex_unlock(&mtx_access);
+            mutex_unlock(&(table->mtx_access));
             return -EINVAL;
         }
 
     if ((dst == NULL) || (next_hop == NULL)) {
-        mutex_unlock(&mtx_access);
+        mutex_unlock(&(table->mtx_access));
         return -EFAULT;
     }
 
     int ret = fib_find_entry(table, dst, dst_size, &(entry[0]), &count);
     if (!(ret == 0 || ret == 1)) {
         /* notify all responsible RPs for unknown  next-hop for the destination address */
-        if (fib_signal_rp(dst, dst_size, dst_flags) == 0) {
+        if (fib_signal_rp(table, dst, dst_size, dst_flags) == 0) {
             count = 1;
             /* now lets see if the RRPs have found a valid next-hop */
             ret = fib_find_entry(table, dst, dst_size, &(entry[0]), &count);
@@ -459,18 +433,18 @@ int fib_get_next_hop(fib_table_t *table, kernel_pid_t *iface_id,
                                next_hop, next_hop_size);
 
         if (address_ret == NULL) {
-            mutex_unlock(&mtx_access);
+            mutex_unlock(&(table->mtx_access));
             return -ENOBUFS;
         }
     }
     else {
-        mutex_unlock(&mtx_access);
+        mutex_unlock(&(table->mtx_access));
         return -EHOSTUNREACH;
     }
 
     *iface_id = entry[0]->iface_id;
     *next_hop_flags = entry[0]->next_hop_flags;
-    mutex_unlock(&mtx_access);
+    mutex_unlock(&(table->mtx_access));
     return 0;
 }
 
@@ -479,7 +453,7 @@ int fib_get_destination_set(fib_table_t *table, uint8_t *prefix,
                             fib_destination_set_entry_t *dst_set,
                             size_t* dst_set_size)
 {
-    mutex_lock(&mtx_access);
+    mutex_lock(&(table->mtx_access));
     int ret = -EHOSTUNREACH;
     size_t found_entries = 0;
 
@@ -505,7 +479,7 @@ int fib_get_destination_set(fib_table_t *table, uint8_t *prefix,
 
     *dst_set_size = found_entries;
 
-    mutex_unlock(&mtx_access);
+    mutex_unlock(&(table->mtx_access));
 
     return ret;
 }
@@ -513,91 +487,94 @@ int fib_get_destination_set(fib_table_t *table, uint8_t *prefix,
 void fib_init(fib_table_t *table)
 {
     DEBUG("[fib_init] hello. Initializing some stuff.\n");
-    mutex_lock(&mtx_access);
+    mutex_init(&(table->mtx_access));
+    mutex_lock(&(table->mtx_access));
 
     for (size_t i = 0; i < FIB_MAX_REGISTERED_RP; ++i) {
-        notify_rp[i] = KERNEL_PID_UNDEF;
-        prefix_rp[i] = NULL;
+        table->notify_rp[i] = KERNEL_PID_UNDEF;
+        table->prefix_rp[i] = NULL;
     }
+
+    table->notify_rp_pos = 0;
 
     memset(table->entries, 0, (table->size * sizeof(fib_entry_t)));
 
     universal_address_init();
-    mutex_unlock(&mtx_access);
+    mutex_unlock(&(table->mtx_access));
 }
 
 void fib_deinit(fib_table_t *table)
 {
     DEBUG("[fib_deinit] hello. De-Initializing stuff.\n");
-    mutex_lock(&mtx_access);
+    mutex_lock(&(table->mtx_access));
 
     for (size_t i = 0; i < FIB_MAX_REGISTERED_RP; ++i) {
-        notify_rp[i] = KERNEL_PID_UNDEF;
-        prefix_rp[i] = NULL;
+        table->notify_rp[i] = KERNEL_PID_UNDEF;
+        table->prefix_rp[i] = NULL;
     }
 
-    notify_rp_pos = 0;
+    table->notify_rp_pos = 0;
 
     memset(table->entries, 0, (table->size * sizeof(fib_entry_t)));
 
     universal_address_reset();
-    mutex_unlock(&mtx_access);
+    mutex_unlock(&(table->mtx_access));
 }
 
-int fib_register_rp(uint8_t *prefix, size_t prefix_addr_type_size)
+int fib_register_rp(fib_table_t *table, uint8_t *prefix, size_t prefix_addr_type_size)
 {
-    mutex_lock(&mtx_access);
+    mutex_lock(&(table->mtx_access));
 
-    if (notify_rp_pos >= FIB_MAX_REGISTERED_RP) {
-        mutex_unlock(&mtx_access);
+    if (table->notify_rp_pos >= FIB_MAX_REGISTERED_RP) {
+        mutex_unlock(&(table->mtx_access));
         return -ENOMEM;
     }
 
     if ((prefix == NULL) || (prefix_addr_type_size == 0)) {
-        mutex_unlock(&mtx_access);
+        mutex_unlock(&(table->mtx_access));
         return -EINVAL;
     }
 
-    if (notify_rp_pos < FIB_MAX_REGISTERED_RP) {
-        notify_rp[notify_rp_pos] = sched_active_pid;
+    if (table->notify_rp_pos < FIB_MAX_REGISTERED_RP) {
+        table->notify_rp[table->notify_rp_pos] = sched_active_pid;
         universal_address_container_t *container = universal_address_add(prefix, prefix_addr_type_size);
-        prefix_rp[notify_rp_pos] = container;
-        notify_rp_pos++;
+        table->prefix_rp[table->notify_rp_pos] = container;
+        table->notify_rp_pos++;
     }
 
-    mutex_unlock(&mtx_access);
+    mutex_unlock(&(table->mtx_access));
     return 0;
 }
 
 int fib_get_num_used_entries(fib_table_t *table)
 {
-    mutex_lock(&mtx_access);
+    mutex_lock(&(table->mtx_access));
     size_t used_entries = 0;
 
     for (size_t i = 0; i < table->size; ++i) {
         used_entries += (size_t)(table->entries[i].global != NULL);
     }
 
-    mutex_unlock(&mtx_access);
+    mutex_unlock(&(table->mtx_access));
     return used_entries;
 }
 
 /* print functions */
 
-void fib_print_notify_rp(void)
+void fib_print_notify_rp(fib_table_t *table)
 {
-    mutex_lock(&mtx_access);
+    mutex_lock(&(table->mtx_access));
 
     for (size_t i = 0; i < FIB_MAX_REGISTERED_RP; ++i) {
-        printf("[fib_print_notify_rp] pid[%d]: %d\n", (int)i, (int)notify_rp[i]);
+        printf("[fib_print_notify_rp] pid[%d]: %d\n", (int)i, (int)(table->notify_rp[i]));
     }
 
-    mutex_unlock(&mtx_access);
+    mutex_unlock(&(table->mtx_access));
 }
 
 void fib_print_fib_table(fib_table_t *table)
 {
-    mutex_lock(&mtx_access);
+    mutex_lock(&(table->mtx_access));
 
     for (size_t i = 0; i < table->size; ++i) {
         printf("[fib_print_table] %d) iface_id: %d, global: %p, next hop: %p, lifetime: %"PRIu32"\n",
@@ -607,7 +584,7 @@ void fib_print_fib_table(fib_table_t *table)
                (uint32_t)(table->entries[i].lifetime / 1000));
     }
 
-    mutex_unlock(&mtx_access);
+    mutex_unlock(&(table->mtx_access));
 }
 
 static void fib_print_address(universal_address_container_t *entry)
@@ -643,7 +620,7 @@ static void fib_print_address(universal_address_container_t *entry)
 
 void fib_print_routes(fib_table_t *table)
 {
-    mutex_lock(&mtx_access);
+    mutex_lock(&(table->mtx_access));
     printf("%-" FIB_ADDR_PRINT_LENS "s %-6s %-" FIB_ADDR_PRINT_LENS "s %-6s %-16s Interface\n"
            , "Destination", "Flags", "Next Hop", "Flags", "Expires");
 
@@ -676,7 +653,7 @@ void fib_print_routes(fib_table_t *table)
         }
     }
 
-    mutex_unlock(&mtx_access);
+    mutex_unlock(&(table->mtx_access));
 }
 
 #if FIB_DEVEL_HELPER
