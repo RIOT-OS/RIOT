@@ -170,6 +170,34 @@ enum {
     I2C_UNDEFINED           /**< Deprecated symbol, use I2C_UNDEF instead */
 };
 
+/**
+ * @brief   Legacy definition of UART devices
+ */
+enum {
+#if UART_0_EN
+    UART_0 = 0,             /**< UART 0 */
+#endif
+#if UART_1_EN
+    UART_1,                 /**< UART 1 */
+#endif
+#if UART_2_EN
+    UART_2,                 /**< UART 2 */
+#endif
+#if UART_3_EN
+    UART_3,                 /**< UART 3 */
+#endif
+#if UART_4_EN
+    UART_4,                 /**< UART 4 */
+#endif
+#if UART_5_EN
+    UART_5,                 /**< UART 5 */
+#endif
+#if UART_6_EN
+    UART_6,                 /**< UART 6 */
+#endif
+    UART_UNDEFINED          /**< Deprecated symbol, use UART_UNDEF instead */
+};
+
 #ifdef __cplusplus
 }
 #endif
