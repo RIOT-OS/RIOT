@@ -42,7 +42,7 @@ int sem_timedwait(sem_t *sem, const struct timespec *abstime)
         return -ETIMEDOUT;
     }
     timeout = timex_sub(timeout, now);
-    res = sem_wait_timed(sem, &timeout);
+    res = sema_wait_timed(sem, &timeout);
     if (res < 0) {
         errno = -res;
     }

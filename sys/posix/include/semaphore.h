@@ -32,6 +32,8 @@
 extern "C" {
 #endif
 
+typedef sema_t sem_t;
+
 /**
  * @brief Value returned if `sem_open' failed.
  */
@@ -58,7 +60,11 @@ extern "C" {
  * @return  0 on success.
  * @return  -EINVAL, if semaphore is invalid.
  */
-#define sem_init(sem, pshared, value)   sem_create(sem, value)
+#define sem_init(sem, pshared, value)   sema_create((sema_t *)(sem), (value))
+
+#define sem_destroy(sem)                sema_destroy((sema_t *)(sem))
+#define sem_post(sem)                   sema_post((sema_t *)(sem))
+#define sem_wait(sem)                   sema_wait((sema_t *)(sem))
 
 /**
  * @brief Open a named semaphore @p name with open flags @p oflag.
