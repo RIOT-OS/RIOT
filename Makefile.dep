@@ -283,11 +283,11 @@ ifneq (,$(filter posix,$(USEMODULE)))
 endif
 
 ifneq (,$(filter posix_semaphore,$(USEMODULE)))
-  USEMODULE += sem
+  USEMODULE += sema
   USEMODULE += vtimer
 endif
 
-ifneq (,$(filter sem,$(USEMODULE)))
+ifneq (,$(filter sema,$(USEMODULE)))
   USEMODULE += vtimer
 endif
 

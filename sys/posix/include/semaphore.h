@@ -26,7 +26,7 @@
 #include <errno.h>
 #include <time.h>
 
-#include "sem.h"
+#include "sema.h"
 
 #ifdef __cplusplus
 extern "C" {

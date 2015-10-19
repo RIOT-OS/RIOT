@@ -71,8 +71,8 @@ endif
 ifneq (,$(filter netopt,$(USEMODULE)))
     DIRS += net/crosslayer/netopt
 endif
-ifneq (,$(filter sem,$(USEMODULE)))
-    DIRS += sem
+ifneq (,$(filter sema,$(USEMODULE)))
+    DIRS += sema
 endif
 
 DIRS += $(dir $(wildcard $(addsuffix /Makefile, ${USEMODULE})))

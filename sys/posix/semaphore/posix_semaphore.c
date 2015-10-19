@@ -21,7 +21,7 @@
 
 #include "irq.h"
 #include "sched.h"
-#include "sem.h"
+#include "sema.h"
 #include "tcb.h"
 #include "timex.h"
 #include "thread.h"

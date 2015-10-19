@@ -24,7 +24,7 @@
 #include "msg.h"
 #include "vtimer.h"
 
-#include "sem.h"
+#include "sema.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
