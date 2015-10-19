@@ -23,11 +23,11 @@
  */
 
 #include <stdio.h>
+#include <semaphore.h>
 
 #include "msg.h"
 #include "timex.h"
 #include "thread.h"
-#include "semaphore.h"
 #include "vtimer.h"
 
 #define SEMAPHORE_MSG_QUEUE_SIZE        (8)

@@ -39,14 +39,15 @@ int sem_timedwait(sem_t *sem, const struct timespec *abstime)
     vtimer_now(&now);
     if (timex_cmp(now, timeout) > 0) {
         errno = ETIMEDOUT;
-        return -ETIMEDOUT;
+        return -1;
     }
     timeout = timex_sub(timeout, now);
-    res = sema_wait_timed(sem, &timeout);
+    res = sema_wait_timed((sema_t *)sem, &timeout);
     if (res < 0) {
         errno = -res;
+        return -1;
     }
-    return res;
+    return 0;
 }
 
 int sem_trywait(sem_t *sem)
@@ -55,13 +56,13 @@ int sem_trywait(sem_t *sem)
     int result;
     if (sem == NULL) {
         errno = EINVAL;
-        return -EINVAL;
+        return -1;
     }
     old_state = disableIRQ();
     value = sem->value;
     if (value == 0) {
         errno = EAGAIN;
-        result = -EAGAIN;
+        result = -1;
     }
     else {
         result = 0;

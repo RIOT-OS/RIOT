@@ -40,7 +40,7 @@ typedef sema_t sem_t;
 #define SEM_FAILED      ((sem_t *) 0)
 
 /**
- * @brief Initialize semaphore.
+ * @brief Initialize an unnamed semaphore.
  *
  * @see <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_init.html">
  *          The Open Group Base Specifications Issue 7, sem_init()
@@ -58,13 +58,108 @@ typedef sema_t sem_t;
  * @param[in] value     Value to set.
  *
  * @return  0 on success.
- * @return  -EINVAL, if semaphore is invalid.
+ * @return  -1, on error and errno set to indicate the error.
  */
-#define sem_init(sem, pshared, value)   sema_create((sema_t *)(sem), (value))
+static inline int sem_init(sem_t *sem, int pshared, unsigned value)
+{
+    int res = sema_create((sema_t *)sem, value);
+    (void)pshared;
+    if (res < 0) {
+        errno = -res;
+        return -1;
+    }
+    return 0;
+}
 
-#define sem_destroy(sem)                sema_destroy((sema_t *)(sem))
-#define sem_post(sem)                   sema_post((sema_t *)(sem))
-#define sem_wait(sem)                   sema_wait((sema_t *)(sem))
+/**
+ * @brief destroy an unnamed semaphore
+ *
+ * @see <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_destroy.html">
+ *          The Open Group Base Specifications Issue 7, sem_destroy()
+ *      </a>
+ *
+ * The sem_destroy() function shall destroy the unnamed semaphore indicated by @p sem. Only a
+ * semaphore that was created using sem_init() may be destroyed using sem_destroy(); the effect of
+ * calling sem_destroy() with a named semaphore is undefined. The effect of subsequent use of the
+ * semaphore @p sem is undefined until sem is reinitialized by another call to sem_init().
+ *
+ * It is safe to destroy an initialized semaphore upon which no threads are currently blocked.
+ * The effect of destroying a semaphore upon which other threads are currently blocked is
+ * undefined.
+ *
+ * @param sem   A semaphore.
+ *
+ * @return  0 on success.
+ * @return  -1, on error and errno set to indicate the error.
+ */
+static inline int sem_destroy(sem_t *sem)
+{
+    int res = sema_destroy((sema_t *)sem);
+    if (res < 0) {
+        errno = -res;
+        return -1;
+    }
+    return 0;
+}
+
+/**
+ * @brief Unlock a semaphore.
+ *
+ * @see <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_post.html">
+ *          The Open Group Base Specifications Issue 7, sem_post()
+ *      </a>
+ *
+ * The sem_post() function shall unlock the semaphore referenced by @p sem by performing a
+ * semaphore unlock operation on that semaphore.
+ *
+ * If the semaphore value resulting from this operation is positive, then no threads were blocked
+ * waiting for the semaphore to become unlocked; the semaphore value is simply incremented.
+ *
+ * If the value of the semaphore resulting from this operation is zero, then one of the threads
+ * blocked waiting for the semaphore shall be allowed to return successfully from its call to
+ * sem_wait().
+ *
+ * @param sem   A semaphore
+ *
+ * @return  0 on success.
+ * @return  -1, on error and errno set to indicate the error.
+ */
+static inline int sem_post(sem_t *sem)
+{
+    int res = sema_post((sema_t *)sem);
+    if (res < 0) {
+        errno = -res;
+        return -1;
+    }
+    return 0;
+}
+
+/**
+ * @brief Lock a semaphore.
+ *
+ * @see <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_wait.html">
+ *          The Open Group Base Specifications Issue 7, sem_wait()
+ *      </a>
+ *
+ * The sem_wait() function shall lock the semaphore referenced by @p sem by performing a semaphore
+ * lock operation on that semaphore. If the semaphore value is currently zero, then the calling
+ * thread shall not return from the call to sem_wait() until it either locks the semaphore or the
+ * call is interrupted by a signal.
+ *
+ * @param sem   A semaphore.
+ *
+ * @return  0 on success.
+ * @return  -1, on error and errno set to indicate the error.
+ */
+static inline int sem_wait(sem_t *sem)
+{
+    int res = sema_wait((sema_t *)sem);
+    if (res < 0) {
+        errno = -res;
+        return -1;
+    }
+    return 0;
+}
 
 /**
  * @brief Open a named semaphore @p name with open flags @p oflag.
@@ -80,7 +175,13 @@ typedef sema_t sem_t;
  *
  * @return  Always @ref SEM_FAILED, since it is not implemented currently.
  */
-#define sem_open(name, oflag, ...)      (SEM_FAILED)
+static inline sem_t *sem_open(const char *name, int oflag, ...)
+{
+    (void)name;
+    (void)oflag;
+    errno = ENOMEM;
+    return SEM_FAILED;
+}
 
 /**
  * @brief Close descriptor for named semaphore @p sem.
@@ -95,7 +196,12 @@ typedef sema_t sem_t;
  *
  * @return  Always -1, since it is not implemented currently.
  */
-#define sem_close(sem)                  (-1)
+static inline int sem_close(sem_t *sem)
+{
+    (void)sem;
+    errno = EINVAL;
+    return -1;
+}
 
 /**
  * @brief Remove named semaphore @p name.
@@ -110,7 +216,12 @@ typedef sema_t sem_t;
  *
  * @return  Always -1, since it is not implemented currently.
  */
-#define sem_unlink(name)                (-1)
+static inline int sem_unlink(const char *name)
+{
+    (void)name;
+    errno = ENOENT;
+    return -1;
+}
 
 /**
  * @brief Similar to `sem_wait' but wait only until @p abstime.
@@ -129,15 +240,13 @@ typedef sema_t sem_t;
  *                      this value) the timeout for the wait shall expire. If the value specified
  *                      has already passed the timeout expires immediately.
  *
- * @return  0 on success
- * @return  -EINVAL, if semaphore is invalid.
- * @return  -ETIMEDOUT, if the semaphore times out.
- * @return  -ECANCELED, if the semaphore was destroyed.
+ * @return  0 on success.
+ * @return  -1, on error and errno set to indicate the error.
  */
 int sem_timedwait(sem_t *sem, const struct timespec *abstime);
 
 /**
- * @brief Test whether SEM is posted.
+ * @brief Test whether @p sem is posted.
  *
  * @see <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_trywait.html">
  *          The Open Group Base Specifications Issue 7, sem_trywait()
@@ -145,14 +254,13 @@ int sem_timedwait(sem_t *sem, const struct timespec *abstime);
  *
  * @param[in] sem   Semaphore to try to wait on
  *
- * @return  0 on success
- * @return  -EINVAL, if semaphore is invalid.
- * @return  -EAGAIN, if the semaphore was already locked.
+ * @return  0 on success.
+ * @return  -1, on error and errno set to indicate the error.
  */
 int sem_trywait(sem_t *sem);
 
 /**
- * @brief Get current value of SEM and store it in *SVAL.
+ * @brief Get current value of @p sem and store it in @p sval.
  *
  * @see <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_getvalue.html">
  *          The Open Group Base Specifications Issue 7, sem_getvalue()
@@ -161,8 +269,8 @@ int sem_trywait(sem_t *sem);
  * @param[in] sem   Semaphore to get the value from.
  * @param[out] sval Place where value goes to.
  *
- * @return  0 on success
- * @return  -EINVAL, if semaphore is invalid.
+ * @return  0 on success.
+ * @return  -1, on error and errno set to indicate the error.
  */
 static inline int sem_getvalue(sem_t *sem, int *sval)
 {
@@ -170,7 +278,8 @@ static inline int sem_getvalue(sem_t *sem, int *sval)
         *sval = (int)sem->value;
         return 0;
     }
-    return -EINVAL;
+    errno = EINVAL;
+    return -1;
 }
 
 #ifdef __cplusplus
