@@ -151,7 +151,8 @@ typedef struct {
     msg_t nbr_adv_msg;                          /**< msg_t for gnrc_ipv6_nc_t::nbr_adv_timer */
 
 #ifdef MODULE_GNRC_SIXLOWPAN_ND
-    vtimer_t rtr_sol_timer; /**< Retransmission timer for unicast router solicitations */
+    xtimer_t rtr_sol_timer; /**< Retransmission timer for unicast router solicitations */
+    msg_t rtr_sol_msg;                          /**< msg_t for gnrc_ipv6_nc_t::rtr_sol_timer */
 #endif
 #ifdef MODULE_GNRC_SIXLOWPAN_ND_ROUTER
     vtimer_t type_timeout;                  /**< Timer for type transissions */

@@ -390,7 +390,7 @@ void gnrc_sixlowpan_nd_wakeup(void)
 {
     gnrc_ipv6_nc_t *router = gnrc_ipv6_nc_get_next_router(NULL);
     while (router) {
-        vtimer_remove(&router->rtr_sol_timer);
+        xtimer_remove(&router->rtr_sol_timer);
         gnrc_sixlowpan_nd_uc_rtr_sol(router);
         gnrc_ndp_internal_send_nbr_sol(router->iface, NULL, &router->ipv6_addr, &router->ipv6_addr);
         gnrc_ipv6_set_timer(&router->nbr_sol_timer, GNRC_NDP_RETRANS_TIMER,
