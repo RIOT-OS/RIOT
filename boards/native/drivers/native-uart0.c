@@ -171,33 +171,33 @@ int init_unix_socket(void)
     return s;
 }
 
-void handle_uart_in(void)
+void handle_uart0_in(void)
 {
     char buf[42];
     int nread;
 
-    DEBUG("handle_uart_in\n");
+    DEBUG("handle_uart0_in\n");
 
     nread = _native_read(STDIN_FILENO, buf, sizeof(buf));
     if (nread == -1) {
-        err(EXIT_FAILURE, "handle_uart_in(): read()");
+        err(EXIT_FAILURE, "handle_uart0_in(): read()");
     }
     else if (nread == 0) {
         /* end of file / socket closed */
         if (_native_uart_conn != 0) {
             if (_native_null_out_file != -1) {
                 if (real_dup2(_native_null_out_file, STDOUT_FILENO) == -1) {
-                    err(EXIT_FAILURE, "handle_uart_in: dup2(STDOUT_FILENO)");
+                    err(EXIT_FAILURE, "handle_uart0_in: dup2(STDOUT_FILENO)");
                 }
             }
             if (real_dup2(_native_null_in_pipe[0], STDIN_FILENO) == -1) {
-                err(EXIT_FAILURE, "handle_uart_in: dup2(STDIN_FILENO)");
+                err(EXIT_FAILURE, "handle_uart0_in: dup2(STDIN_FILENO)");
             }
             _native_uart_conn = 0;
             warnx("closed stdio");
         }
         else {
-            errx(EXIT_FAILURE, "handle_uart_in: unhandled situation!");
+            errx(EXIT_FAILURE, "handle_uart0_in: unhandled situation!");
         }
     }
     for (int pos = 0; pos < nread; pos++) {
@@ -208,7 +208,7 @@ void handle_uart_in(void)
     thread_yield();
 }
 
-void handle_uart_sock(void)
+void handle_uart0_sock(void)
 {
     int s;
     socklen_t t;
@@ -218,22 +218,22 @@ void handle_uart_sock(void)
 
     _native_syscall_enter();
     if ((s = real_accept(_native_uart_sock, &remote, &t)) == -1) {
-        err(EXIT_FAILURE, "handle_uart_sock: accept");
+        err(EXIT_FAILURE, "handle_uart0_sock: accept");
     }
     else {
-        warnx("handle_uart_sock: successfully accepted socket");
+        warnx("handle_uart0_sock: successfully accepted socket");
     }
 
     if (real_dup2(s, STDOUT_FILENO) == -1) {
-        err(EXIT_FAILURE, "handle_uart_sock: dup2()");
+        err(EXIT_FAILURE, "handle_uart0_sock: dup2()");
     }
     if (real_dup2(s, STDIN_FILENO) == -1) {
-        err(EXIT_FAILURE, "handle_uart_sock: dup2()");
+        err(EXIT_FAILURE, "handle_uart0_sock: dup2()");
     }
 
     /* play back log from last position */
     if (_native_replay_enabled) {
-        warnx("handle_uart_sock: replaying buffer");
+        warnx("handle_uart0_sock: replaying buffer");
         size_t nread;
         char buf[200];
         while ((nread = real_fread(buf, 1, sizeof(buf), _native_replay_buffer)) != 0) {
@@ -247,14 +247,14 @@ void handle_uart_sock(void)
                 }
             }
             if (nwritten == -1) {
-                err(EXIT_FAILURE, "handle_uart_sock: write");
+                err(EXIT_FAILURE, "handle_uart0_sock: write");
             }
         }
         if (real_feof(_native_replay_buffer) != 0) {
             real_clearerr(_native_replay_buffer);
         }
         else if (real_ferror(_native_replay_buffer) != 0) {
-            err(EXIT_FAILURE, "handle_uart_sock(): fread()");
+            err(EXIT_FAILURE, "handle_uart0_sock(): fread()");
         }
     }
 
@@ -267,28 +267,16 @@ void handle_uart_sock(void)
 void _native_handle_uart0_input(void)
 {
     if (FD_ISSET(STDIN_FILENO, &_native_rfds)) {
-        handle_uart_in();
+        handle_uart0_in();
     }
     else if ((_native_uart_sock != -1) && (FD_ISSET(_native_uart_sock, &_native_rfds))) {
-        handle_uart_sock();
+        handle_uart0_sock();
     }
     else {
         DEBUG("_native_handle_uart0_input - nothing to do\n");
     }
 }
 
-int _native_set_uart_fds(void)
-{
-    DEBUG("_native_set_uart_fds\n");
-    FD_SET(STDIN_FILENO, &_native_rfds);
-    if (_native_uart_sock == -1) {
-        return (STDIN_FILENO);
-    }
-    else {
-        FD_SET(_native_uart_sock, &_native_rfds);
-        return ((STDIN_FILENO > _native_uart_sock) ? STDIN_FILENO : _native_uart_sock);
-    }
-}
 #endif
 
 void _native_init_uart0(char *stdiotype, char *ioparam, int replay)

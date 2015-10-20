@@ -16,6 +16,10 @@
 #ifndef PERIPH_CONF_H
 #define PERIPH_CONF_H
 
+#ifdef HAVE_NATIVE_PERIPH_CONF_H
+#include "native_periph_conf.h"
+#endif
+
 #ifdef __cplusplus
  extern "C" {
 #endif

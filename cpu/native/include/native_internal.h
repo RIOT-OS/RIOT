@@ -155,7 +155,7 @@ extern unsigned _native_rng_seed;
 extern int _native_rng_mode; /**< 0 = /dev/random, 1 = random(3) */
 extern const char *_native_unix_socket_path;
 
-#ifdef MODULE_UART0
+#if defined(MODULE_UART0) || defined(MODULE_NATIVE_UART)
 #include <sys/select.h>
 extern fd_set _native_rfds;
 #endif

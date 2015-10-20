@@ -62,7 +62,7 @@ extern netdev2_tap_t netdev2_tap;
 ucontext_t end_context;
 char __end_stack[SIGSTKSZ];
 
-#ifdef MODULE_UART0
+#if defined(MODULE_UART0) || defined(MODULE_NATIVE_UART)
 fd_set _native_rfds;
 #endif
 
