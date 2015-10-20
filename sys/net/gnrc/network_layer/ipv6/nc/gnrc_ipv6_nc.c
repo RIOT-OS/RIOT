@@ -21,6 +21,7 @@
 #include "net/gnrc/ipv6/netif.h"
 #include "net/gnrc/ndp.h"
 #include "net/gnrc/pktbuf.h"
+#include "net/gnrc/sixlowpan/nd.h"
 #include "thread.h"
 #include "timex.h"
 #include "vtimer.h"
@@ -127,6 +128,11 @@ gnrc_ipv6_nc_t *gnrc_ipv6_nc_add(kernel_pid_t iface, const ipv6_addr_t *ipv6_add
         free_entry->probes_remaining = GNRC_NDP_MAX_MC_NBR_SOL_NUMOF;
     }
 
+#ifdef MODULE_GNRC_SIXLOWPAN_ND_ROUTER
+    free_entry->type_timeout_msg.type = GNRC_SIXLOWPAN_ND_MSG_AR_TIMEOUT;
+    free_entry->type_timeout_msg.content.ptr = (char *) free_entry;
+#endif
+
     return free_entry;
 }
 
@@ -147,7 +153,7 @@ void gnrc_ipv6_nc_remove(kernel_pid_t iface, const ipv6_addr_t *ipv6_addr)
         }
 #endif
 #ifdef MODULE_GNRC_SIXLOWPAN_ND_ROUTER
-        vtimer_remove(&entry->type_timeout);
+        xtimer_remove(&entry->type_timeout);
 #endif
 
         ipv6_addr_set_unspecified(&(entry->ipv6_addr));

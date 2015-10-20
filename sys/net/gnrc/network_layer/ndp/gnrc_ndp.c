@@ -59,14 +59,14 @@ static void _stale_nc(kernel_pid_t iface, ipv6_addr_t *ipaddr, uint8_t *l2addr,
             gnrc_ipv6_netif_t *ipv6_iface = gnrc_ipv6_netif_get(iface);
             if ((ipv6_iface->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN) &&
                 (ipv6_iface->flags & GNRC_IPV6_NETIF_FLAGS_ROUTER)) {
-                timex_t t = { GNRC_SIXLOWPAN_ND_TENTATIVE_NCE_LIFETIME, 0 };
                 if ((nc_entry = gnrc_ipv6_nc_add(iface, ipaddr, l2addr,
                                                  (uint16_t)l2addr_len,
                                                  GNRC_IPV6_NC_STATE_STALE |
                                                  GNRC_IPV6_NC_TYPE_TENTATIVE)) != NULL) {
-                    vtimer_remove(&nc_entry->type_timeout);
-                    vtimer_set_msg(&nc_entry->type_timeout, t, gnrc_ipv6_pid,
-                                   GNRC_SIXLOWPAN_ND_MSG_AR_TIMEOUT, nc_entry);
+                    xtimer_set_msg(&nc_entry->type_timeout,
+                                   (GNRC_SIXLOWPAN_ND_TENTATIVE_NCE_LIFETIME * SEC_IN_USEC),
+                                   &nc_entry->type_timeout_msg,
+                                   gnrc_ipv6_pid);
                 }
                 return;
             }
