@@ -23,7 +23,6 @@
 #include "net/gnrc/pktbuf.h"
 #include "thread.h"
 #include "timex.h"
-#include "vtimer.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
@@ -150,7 +149,7 @@ void gnrc_ipv6_nc_remove(kernel_pid_t iface, const ipv6_addr_t *ipv6_addr)
         xtimer_remove(&entry->rtr_sol_timer);
 #endif
 #ifdef MODULE_GNRC_SIXLOWPAN_ND_ROUTER
-        vtimer_remove(&entry->type_timeout);
+        xtimer_remove(&entry->type_timeout);
 #endif
 
         ipv6_addr_set_unspecified(&(entry->ipv6_addr));
