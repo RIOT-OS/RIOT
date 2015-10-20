@@ -135,6 +135,8 @@ static int init_base(uart_t uart, uint32_t baudrate)
             UART3_BAUD_RATE_H = (clock_divider >> 8);
             break;
 #endif /* UART_3 */
+        default:
+            (void)clock_divider;    /* this makes cppcheck happy */
     }
 
     return 0;
