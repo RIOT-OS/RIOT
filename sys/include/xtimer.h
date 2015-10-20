@@ -502,6 +502,44 @@ static inline void xtimer_nanosleep(uint32_t nanoseconds)
     _xtimer_sleep(nanoseconds/1000, 0);
 }
 
+/**
+ * @brief   Initializes the @p msg and sets the @p timer.
+ *
+ * @param[in] timer     The pointer to a xtimer.
+ * @param[in] offset    Offset for the timer.
+ * @param[in] msg       The pointer to the msg_t of the timer.
+ * @param[in] msg_type  The type of the message.
+ * @param[in] msg_data  The data of the message.
+ * @param[in] pid       The pid that the timer will send a message to.
+ */
+static inline void xtimer_set_msg_init(xtimer_t *timer, uint32_t offset, msg_t *msg,
+                                       uint16_t msg_type, char *msg_data, kernel_pid_t pid)
+{
+    xtimer_remove(timer);
+    msg->type = msg_type;
+    msg->content.ptr = msg_data;
+    xtimer_set_msg(timer, offset, msg, pid);
+}
+
+/**
+ * @brief   Initializes the @p msg and sets the @p timer, 64-bit version.
+ *
+ * @param[in] timer     The pointer to a xtimer.
+ * @param[in] offset    Offset for the timer.
+ * @param[in] msg       The pointer to the msg_t of the timer.
+ * @param[in] msg_type  The type of the message.
+ * @param[in] msg_data  The data of the message.
+ * @param[in] pid       The pid that the timer will send a message to.
+ */
+static inline void xtimer_set_msg64_init(xtimer_t *timer, uint64_t offset, msg_t *msg,
+                                         uint16_t msg_type, char *msg_data, kernel_pid_t pid)
+{
+    xtimer_remove(timer);
+    msg->type = msg_type;
+    msg->content.ptr = msg_data;
+    xtimer_set_msg64(timer, offset, msg, pid);
+}
+
 #ifdef __cplusplus
 }
 #endif
