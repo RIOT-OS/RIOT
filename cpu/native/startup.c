@@ -35,6 +35,7 @@
 
 #include "board_internal.h"
 #include "native_internal.h"
+#include "periph_conf.h"
 
 int _native_null_in_pipe[2];
 int _native_null_out_file;
@@ -365,8 +366,13 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
     _native_init_uart0(stdiotype, ioparam, replay);
 #endif
 
+#ifdef MODULE_NATIVE_UART
+    _native_init_uarts();
+#endif
+
     native_cpu_init();
     native_interrupt_init();
+
 #ifdef MODULE_NETDEV2_TAP
     netdev2_tap_setup(&netdev2_tap, argv[1]);
 #endif

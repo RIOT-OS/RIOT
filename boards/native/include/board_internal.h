@@ -23,8 +23,17 @@ void _native_handle_uart0_input(void);
  * @param ioparam: a string containing a port number if stdiotype is tcp
  */
 void _native_init_uart0(char *stdiotype, char *ioparam, int replay);
-int _native_set_uart_fds(void);
 #endif /* MODULE_UART0 */
+
+#ifdef MODULE_NATIVE_UART
+void _native_handle_uart_input(void);
+void _native_init_uart(int uart, char *path);
+void _native_init_uarts(void);
+#endif /* MODULE_NATIVE_UART */
+
+#if defined(MODULE_UART0) || defined(MODULE_NATIVE_UART)
+int _native_set_uart_fds(void);
+#endif
 
 extern int _native_null_out_file;
 extern int _native_null_in_pipe[2];

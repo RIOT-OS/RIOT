@@ -19,7 +19,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#ifdef MODULE_UART0
+#if defined(MODULE_UART0) || defined(MODULE_NATIVE_UART)
 #include <sys/select.h>
 #include <errno.h>
 #endif
@@ -30,7 +30,7 @@
 #include "cpu.h"
 
 #include "native_internal.h"
-#ifdef MODULE_UART0
+#if defined(MODULE_UART0) || defined(MODULE_NATIVE_UART)
 #include "board_internal.h"
 #endif
 
@@ -45,7 +45,7 @@ void lpm_init(void)
 
 void _native_lpm_sleep(void)
 {
-#ifdef MODULE_UART0
+#if defined(MODULE_UART0) || defined(MODULE_NATIVE_UART)
     int nfds;
 
     /* set fds */
@@ -63,7 +63,13 @@ void _native_lpm_sleep(void)
     if (nfds != -1) {
         /* uart ready, handle input */
         /* TODO: switch to ISR context */
+#ifdef MODULE_UART0
         _native_handle_uart0_input();
+#endif
+
+#ifdef MODULE_NATIVE_UART
+        _native_handle_uart_input();
+#endif
     }
     else if ((_errno == EAGAIN) || (_errno == EWOULDBLOCK)) {
         /* would block / resource unavailable .. it appears a
