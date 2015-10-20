@@ -192,8 +192,6 @@ void gnrc_sixlowpan_nd_opt_abr_handle(kernel_pid_t iface, ndp_rtr_adv_t *rtr_adv
     uint16_t opt_offset = 0;
     uint8_t *buf = (uint8_t *)(rtr_adv + 1);
     gnrc_sixlowpan_nd_router_abr_t *abr;
-    timex_t t = { 0, 0 };
-
     if (_is_me(&abr_opt->braddr)) {
         return;
     }
@@ -239,10 +237,9 @@ void gnrc_sixlowpan_nd_opt_abr_handle(kernel_pid_t iface, ndp_rtr_adv_t *rtr_adv
     memset(abr->ctxs, 0, sizeof(abr->ctxs));
     abr->prfs = NULL;
 
-    t.seconds = abr->ltime * 60;
-
-    vtimer_set_msg(&abr->ltimer, t, gnrc_ipv6_pid,
-                   GNRC_SIXLOWPAN_ND_MSG_ABR_TIMEOUT, abr);
+    gnrc_ipv6_set_timer(&abr->ltimer, abr->ltime * 60 * SEC_IN_USEC,
+                        &abr->ltimer_msg, GNRC_SIXLOWPAN_ND_MSG_ABR_TIMEOUT,
+                        (char *) abr, gnrc_ipv6_pid);
 }
 
 gnrc_pktsnip_t *gnrc_sixlowpan_nd_opt_6ctx_build(uint8_t prefix_len, uint8_t flags, uint16_t ltime,
