@@ -30,7 +30,6 @@
 #include "random.h"
 #include "utlist.h"
 #include "thread.h"
-#include "vtimer.h"
 
 #include "net/gnrc/ndp/internal.h"
 
@@ -59,14 +58,15 @@ static void _stale_nc(kernel_pid_t iface, ipv6_addr_t *ipaddr, uint8_t *l2addr,
             gnrc_ipv6_netif_t *ipv6_iface = gnrc_ipv6_netif_get(iface);
             if ((ipv6_iface->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN) &&
                 (ipv6_iface->flags & GNRC_IPV6_NETIF_FLAGS_ROUTER)) {
-                timex_t t = { GNRC_SIXLOWPAN_ND_TENTATIVE_NCE_LIFETIME, 0 };
                 if ((nc_entry = gnrc_ipv6_nc_add(iface, ipaddr, l2addr,
                                                  (uint16_t)l2addr_len,
                                                  GNRC_IPV6_NC_STATE_STALE |
                                                  GNRC_IPV6_NC_TYPE_TENTATIVE)) != NULL) {
-                    vtimer_remove(&nc_entry->type_timeout);
-                    vtimer_set_msg(&nc_entry->type_timeout, t, gnrc_ipv6_pid,
-                                   GNRC_SIXLOWPAN_ND_MSG_AR_TIMEOUT, nc_entry);
+                    gnrc_ipv6_set_timer(&nc_entry->type_timeout,
+                                        GNRC_SIXLOWPAN_ND_TENTATIVE_NCE_LIFETIME * SEC_IN_USEC,
+                                        &nc_entry->type_timeout_msg,
+                                        GNRC_SIXLOWPAN_ND_MSG_AR_TIMEOUT,
+                                        (char *) nc_entry, gnrc_ipv6_pid);
                 }
                 return;
             }
@@ -430,30 +430,34 @@ void gnrc_ndp_rtr_sol_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
             }
 #endif
             delay = timex_set(0, genrand_uint32_range(0, ms));
-            vtimer_remove(&if_entry->rtr_adv_timer);
+            xtimer_remove(&if_entry->rtr_adv_timer);
 #ifdef MODULE_GNRC_SIXLOWPAN_ND_ROUTER
             /* in case of a 6LBR we have to check if the interface is actually
              * the 6lo interface */
             if (if_entry->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN) {
                 gnrc_ipv6_nc_t *nc_entry = gnrc_ipv6_nc_get(iface, &ipv6->src);
                 if (nc_entry != NULL) {
-                    vtimer_set_msg(&if_entry->rtr_adv_timer, delay, gnrc_ipv6_pid,
-                            GNRC_NDP_MSG_RTR_ADV_SIXLOWPAN_DELAY, nc_entry);
+                    gnrc_ipv6_set_timer(&if_entry->rtr_adv_timer, (uint32_t) timex_uint64(delay),
+                                        &if_entry->rtr_adv_msg,
+                                        GNRC_NDP_MSG_RTR_ADV_SIXLOWPAN_DELAY,
+                                        (char *) nc_entry, gnrc_ipv6_pid);
                 }
             }
 #elif defined(MODULE_GNRC_NDP_ROUTER) || defined(MODULE_GNRC_SIXLOWPAN_ND_BORDER_ROUTER)
             if (ipv6_addr_is_unspecified(&ipv6->src)) {
                 /* either multicast, if source unspecified */
-                vtimer_set_msg(&if_entry->rtr_adv_timer, delay, gnrc_ipv6_pid,
-                               GNRC_NDP_MSG_RTR_ADV_RETRANS, if_entry);
+                gnrc_ipv6_set_timer(&if_entry->rtr_adv_timer, (uint32_t) timex_uint64(delay),
+                                    &if_entry->rtr_adv_msg, GNRC_NDP_MSG_RTR_ADV_RETRANS,
+                                    (char *) if_entry, gnrc_ipv6_pid);
             }
             else {
                 /* or unicast, if source is known */
                 /* XXX: can't just use GNRC_NETAPI_MSG_TYPE_SND, since the next retransmission
                  * must also be set. */
                 gnrc_ipv6_nc_t *nc_entry = gnrc_ipv6_nc_get(iface, &ipv6->src);
-                vtimer_set_msg(&if_entry->rtr_adv_timer, delay, gnrc_ipv6_pid,
-                               GNRC_NDP_MSG_RTR_ADV_DELAY, nc_entry);
+                gnrc_ipv6_set_timer(&if_entry->rtr_adv_timer, (uint32_t) timex_uint64(delay),
+                                    &if_entry->rtr_adv_msg, GNRC_NDP_MSG_RTR_ADV_DELAY,
+                                    (char *) nc_entry, gnrc_ipv6_pid);
             }
 #endif
         }
@@ -518,9 +522,9 @@ void gnrc_ndp_rtr_adv_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt, ipv6_hdr_t
 #ifdef MODULE_GNRC_SIXLOWPAN_ND
         next_rtr_sol = ltime;
 #endif
-        vtimer_remove(&nc_entry->rtr_timeout);
-        vtimer_set_msg(&nc_entry->rtr_timeout, timex_set(ltime, 0),
-                       thread_getpid(), GNRC_NDP_MSG_RTR_TIMEOUT, nc_entry);
+        gnrc_ipv6_set_timer(&nc_entry->rtr_timeout, (uint32_t) (ltime * SEC_IN_USEC),
+                            &nc_entry->rtr_timeout_msg, GNRC_NDP_MSG_RTR_TIMEOUT,
+                            (char *) nc_entry, thread_getpid());
     }
     /* set current hop limit from message if available */
     if (rtr_adv->cur_hl != 0) {
@@ -613,7 +617,7 @@ void gnrc_ndp_rtr_adv_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt, ipv6_hdr_t
 #ifdef MODULE_GNRC_SIXLOWPAN_ND
     if (if_entry->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN) {
         /* stop multicast router solicitation retransmission timer */
-        vtimer_remove(&if_entry->rtr_sol_timer);
+        xtimer_remove(&if_entry->rtr_sol_timer);
         /* 3/4 of the time should be "well before" enough the respective timeout
          * not to run out; see https://tools.ietf.org/html/rfc6775#section-5.4.3 */
         next_rtr_sol *= 3;
@@ -655,7 +659,6 @@ void gnrc_ndp_retrans_nbr_sol(gnrc_ipv6_nc_t *nc_entry)
             nc_entry->probes_remaining--;
 
             if (nc_entry->iface == KERNEL_PID_UNDEF) {
-                timex_t t = { 0, GNRC_NDP_RETRANS_TIMER };
                 kernel_pid_t ifs[GNRC_NETIF_NUMOF];
                 size_t ifnum = gnrc_netif_get(ifs);
 
@@ -663,9 +666,9 @@ void gnrc_ndp_retrans_nbr_sol(gnrc_ipv6_nc_t *nc_entry)
                     gnrc_ndp_internal_send_nbr_sol(ifs[i], NULL, &nc_entry->ipv6_addr, &dst);
                 }
 
-                vtimer_remove(&nc_entry->nbr_sol_timer);
-                vtimer_set_msg(&nc_entry->nbr_sol_timer, t, gnrc_ipv6_pid,
-                               GNRC_NDP_MSG_NBR_SOL_RETRANS, nc_entry);
+                gnrc_ipv6_set_timer(&nc_entry->nbr_sol_timer, GNRC_NDP_RETRANS_TIMER,
+                                    &nc_entry->nbr_sol_msg, GNRC_NDP_MSG_NBR_SOL_RETRANS,
+                                    (char *) nc_entry, gnrc_ipv6_pid);
             }
             else {
                 gnrc_ipv6_netif_t *ipv6_iface = gnrc_ipv6_netif_get(nc_entry->iface);
@@ -673,10 +676,10 @@ void gnrc_ndp_retrans_nbr_sol(gnrc_ipv6_nc_t *nc_entry)
                 gnrc_ndp_internal_send_nbr_sol(nc_entry->iface, NULL, &nc_entry->ipv6_addr, &dst);
 
                 mutex_lock(&ipv6_iface->mutex);
-                vtimer_remove(&nc_entry->nbr_sol_timer);
-                vtimer_set_msg(&nc_entry->nbr_sol_timer,
-                               ipv6_iface->retrans_timer, gnrc_ipv6_pid,
-                               GNRC_NDP_MSG_NBR_SOL_RETRANS, nc_entry);
+                gnrc_ipv6_set_timer(&nc_entry->nbr_sol_timer,
+                                    (uint32_t) timex_uint64(ipv6_iface->retrans_timer),
+                                    &nc_entry->nbr_sol_msg, GNRC_NDP_MSG_NBR_SOL_RETRANS,
+                                    (char *) nc_entry, gnrc_ipv6_pid);
                 mutex_unlock(&ipv6_iface->mutex);
             }
         }

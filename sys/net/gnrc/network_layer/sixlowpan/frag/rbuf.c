@@ -24,7 +24,6 @@
 #include "net/sixlowpan.h"
 #include "thread.h"
 #include "timex.h"
-#include "vtimer.h"
 #include "utlist.h"
 
 #define ENABLE_DEBUG    (0)
@@ -234,7 +233,7 @@ static void _rbuf_gc(void)
     timex_t now;
     unsigned int i;
 
-    vtimer_now(&now);
+    xtimer_now_timex(&now);
 
     for (i = 0; i < RBUF_SIZE; i++) {
         if (rbuf[i].pkt == NULL) { /* leave GC early if there is still room */
@@ -271,7 +270,7 @@ static rbuf_t *_rbuf_get(const void *src, size_t src_len,
     rbuf_t *res = NULL;
     timex_t now;
 
-    vtimer_now(&now);
+    xtimer_now_timex(&now);
 
     for (unsigned int i = 0; i < RBUF_SIZE; i++) {
         /* check first if entry already available */

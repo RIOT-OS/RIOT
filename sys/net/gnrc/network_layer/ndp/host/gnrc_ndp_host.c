@@ -17,7 +17,6 @@
 #include "net/gnrc/ipv6.h"
 #include "net/gnrc/ndp.h"
 #include "net/gnrc/ndp/internal.h"
-#include "vtimer.h"
 
 #include "net/gnrc/ndp/host.h"
 
@@ -26,9 +25,9 @@
 
 static inline void _reschedule_rtr_sol(gnrc_ipv6_netif_t *iface, timex_t delay)
 {
-    vtimer_remove(&iface->rtr_sol_timer);
-    vtimer_set_msg(&iface->rtr_sol_timer, delay, gnrc_ipv6_pid, GNRC_NDP_MSG_RTR_SOL_RETRANS,
-                   iface);
+    gnrc_ipv6_set_timer(&iface->rtr_sol_timer, (uint32_t) timex_uint64(delay),
+                        &iface->rtr_sol_msg, GNRC_NDP_MSG_RTR_SOL_RETRANS,
+                        (char *) iface, gnrc_ipv6_pid);
 }
 
 void gnrc_ndp_host_init(gnrc_ipv6_netif_t *iface)

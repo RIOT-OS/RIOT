@@ -23,7 +23,6 @@
 #include "net/gnrc/pktbuf.h"
 #include "thread.h"
 #include "timex.h"
-#include "vtimer.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
@@ -147,10 +146,10 @@ void gnrc_ipv6_nc_remove(kernel_pid_t iface, const ipv6_addr_t *ipv6_addr)
         }
 #endif
 #ifdef MODULE_GNRC_SIXLOWPAN_ND
-        vtimer_remove(&entry->rtr_sol_timer);
+        xtimer_remove(&entry->rtr_sol_timer);
 #endif
 #ifdef MODULE_GNRC_SIXLOWPAN_ND_ROUTER
-        vtimer_remove(&entry->type_timeout);
+        xtimer_remove(&entry->type_timeout);
 #endif
 
         ipv6_addr_set_unspecified(&(entry->ipv6_addr));
@@ -225,13 +224,13 @@ gnrc_ipv6_nc_t *gnrc_ipv6_nc_still_reachable(const ipv6_addr_t *ipv6_addr)
 
     if ((gnrc_ipv6_nc_get_state(entry) != GNRC_IPV6_NC_STATE_INCOMPLETE) &&
         (gnrc_ipv6_nc_get_state(entry) != GNRC_IPV6_NC_STATE_UNMANAGED)) {
-#if defined(MODULE_GNRC_IPV6_NETIF) && defined(MODULE_VTIMER) && defined(MODULE_GNRC_IPV6)
+#if defined(MODULE_GNRC_IPV6_NETIF) && defined(MODULE_XTIMER) && defined(MODULE_GNRC_IPV6)
         gnrc_ipv6_netif_t *iface = gnrc_ipv6_netif_get(entry->iface);
         timex_t t = iface->reach_time;
 
-        vtimer_remove(&entry->nbr_sol_timer);
-        vtimer_set_msg(&entry->nbr_sol_timer, t, gnrc_ipv6_pid,
-                       GNRC_NDP_MSG_NC_STATE_TIMEOUT, entry);
+        gnrc_ipv6_set_timer(&entry->nbr_sol_timer, (uint32_t) timex_uint64(t),
+                            &entry->nbr_sol_msg, GNRC_NDP_MSG_NC_STATE_TIMEOUT,
+                            (char *) entry, gnrc_ipv6_pid);
 #endif
 
         DEBUG("ipv6_nc: Marking entry %s as reachable\n",

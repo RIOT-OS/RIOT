@@ -30,6 +30,7 @@
 #include "mutex.h"
 #include "net/ipv6.h"
 #include "net/ipv6/addr.h"
+#include "xtimer.h"
 #include "vtimer.h"
 
 #ifdef __cplusplus
@@ -258,7 +259,12 @@ typedef struct {
     /**
      * @brief   Validity timeout timer.
      */
-    vtimer_t valid_timeout;
+    xtimer_t valid_timeout;
+
+    /**
+     * @brief   msg_t for gnrc_ipv6_netif_addr_t::valid_timeout
+     */
+    msg_t valid_timeout_msg;
     /**
      * @}
      */
@@ -337,9 +343,11 @@ typedef struct {
      *          The default value is @ref GNRC_NDP_RETRANS_TIMER.
      */
     timex_t retrans_timer;
-    vtimer_t rtr_sol_timer; /**< Timer for periodic router solicitations */
+    xtimer_t rtr_sol_timer; /**< Timer for periodic router solicitations */
+    msg_t rtr_sol_msg;      /**< msg_t for gnrc_ipv6_netif_t::rtr_sol_timer */
 #if defined (MODULE_GNRC_NDP_ROUTER) || defined (MODULE_GNRC_SIXLOWPAN_ND_ROUTER)
-    vtimer_t rtr_adv_timer; /**< Timer for periodic router advertisements */
+    xtimer_t rtr_adv_timer; /**< Timer for periodic router advertisements */
+    msg_t rtr_adv_msg;      /**< msg_t for gnrc_ipv6_netif_t::rtr_adv_timer */
 #endif
 } gnrc_ipv6_netif_t;
 
@@ -577,6 +585,25 @@ static inline bool gnrc_ipv6_netif_addr_is_non_unicast(const ipv6_addr_t *addr)
  *          be called in an interface's thread (will otherwise hang up).
  */
 void gnrc_ipv6_netif_init_by_dev(void);
+
+/**
+ * @brief   Sets a xtimer.
+ *
+ * @param[in] timer     The pointer to a xtimer.
+ * @param[in] offset    Offset for the timer.
+ * @param[in] msg       The pointer to the msg_t of the timer.
+ * @param[in] msg_type  The type of the message.
+ * @param[in] msg_data  The data of the message.
+ * @param[in] pid       The pid that the timer will send a message to.
+ */
+static inline void gnrc_ipv6_set_timer(xtimer_t *timer, uint32_t offset, msg_t *msg,
+                                       uint16_t msg_type, char *msg_data, kernel_pid_t pid)
+{
+    xtimer_remove(timer);
+    msg->type = msg_type;
+    msg->content.ptr = msg_data;
+    xtimer_set_msg(timer, offset, msg, pid);
+}
 
 #ifdef __cplusplus
 }
