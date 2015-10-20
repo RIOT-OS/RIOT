@@ -28,15 +28,6 @@
 #include "periph/gpio.h"
 
 /**
- * @brief   Each UART device has to store two callbacks
- */
-typedef struct {
-    uart_rx_cb_t rx_cb;
-    uart_tx_cb_t tx_cb;
-    void *arg;
-} uart_isr_ctx_t;
-
-/**
  * @brief   Allocate memory to store the callback functions
  */
 static uart_isr_ctx_t uart_ctx[UART_NUMOF];
@@ -53,18 +44,18 @@ static inline SercomUsart *_uart(uart_t dev)
     return uart_config[dev].dev;
 }
 
-int uart_init(uart_t uart, uint32_t baudrate,
-              uart_rx_cb_t rx_cb, uart_tx_cb_t tx_cb, void *arg)
+static int init_base(uart_t uart, uint32_t baudrate);
+
+int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 {
     /* initialize basic functionality */
-    int res = uart_init_blocking(uart, baudrate);
+    int res = init_base(uart, baudrate);
     if (res != 0) {
         return res;
     }
 
     /* register callbacks */
     uart_ctx[uart].rx_cb = rx_cb;
-    uart_ctx[uart].tx_cb = tx_cb;
     uart_ctx[uart].arg = arg;
     /* configure interrupts and enable RX interrupt */
     _uart(uart)->INTENSET.reg = SERCOM_USART_INTENSET_RXC;
@@ -72,7 +63,7 @@ int uart_init(uart_t uart, uint32_t baudrate,
     return 0;
 }
 
-int uart_init_blocking(uart_t uart, uint32_t baudrate)
+static int init_base(uart_t uart, uint32_t baudrate)
 {
     uint32_t baud;
     SercomUsart *dev;
@@ -112,29 +103,12 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
     return 0;
 }
 
-void uart_tx_begin(uart_t uart)
+void uart_write(uart_t uart, const uint8_t *data, size_t len)
 {
-    _uart(uart)->INTENSET.reg = SERCOM_USART_INTENSET_TXC;
-}
-
-int uart_read_blocking(uart_t uart, char *data)
-{
-    while(!(_uart(uart)->INTFLAG.reg & SERCOM_USART_INTFLAG_RXC));
-    *data = (char)_uart(uart)->DATA.reg;
-    return 1;
-}
-
-int uart_write(uart_t uart, char data)
-{
-    _uart(uart)->DATA.reg = (uint8_t)data;
-    return 1;
-}
-
-int uart_write_blocking(uart_t uart, char data)
-{
-    while (!(_uart(uart)->INTFLAG.reg & SERCOM_USART_INTFLAG_DRE));
-    _uart(uart)->DATA.reg = (uint8_t)data;
-    return 1;
+    for (size_t i = 0; i < len; i++) {
+        while (!(_uart(uart)->INTFLAG.reg & SERCOM_USART_INTFLAG_DRE));
+        _uart(uart)->DATA.reg = data[i];
+    }
 }
 
 void uart_poweron(uart_t uart)
@@ -162,11 +136,6 @@ static inline void irq_handler(int dev)
     if (uart->INTFLAG.reg & SERCOM_USART_INTFLAG_RXC) {
         /* interrupt flag is cleared by reading the data register */
         uart_ctx[dev].rx_cb(uart_ctx[dev].arg, (char)(uart->DATA.reg));
-    }
-    else if (uart->INTFLAG.reg & SERCOM_USART_INTFLAG_TXC) {
-        if (uart_ctx[dev].tx_cb(uart_ctx[dev].arg) == 0) {
-            uart->INTENCLR.reg = SERCOM_USART_INTENCLR_TXC;
-        }
     }
     else if (uart->INTFLAG.reg & SERCOM_USART_INTFLAG_ERROR) {
         /* clear error flag */
