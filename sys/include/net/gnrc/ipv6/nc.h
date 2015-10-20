@@ -147,7 +147,8 @@ typedef struct {
      *          RFC 4861, section 7.2.7
      *      </a>
      */
-    vtimer_t nbr_adv_timer;
+    xtimer_t nbr_adv_timer;
+    msg_t nbr_adv_msg;                          /**< msg_t for gnrc_ipv6_nc_t::nbr_adv_timer */
 
 #ifdef MODULE_GNRC_SIXLOWPAN_ND
     vtimer_t rtr_sol_timer; /**< Retransmission timer for unicast router solicitations */

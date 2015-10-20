@@ -40,20 +40,6 @@ static gnrc_pktsnip_t *_build_headers(kernel_pid_t iface, gnrc_pktsnip_t *payloa
                                       ipv6_addr_t *dst, ipv6_addr_t *src);
 static size_t _get_l2src(kernel_pid_t iface, uint8_t *l2src, size_t l2src_maxlen);
 
-/**
- * @brief   Sends @ref GNRC_NETAPI_MSG_TYPE_SND delayed.
- *
- * @param[in] t         Timer for the delay.
- * @param[in] interval  Delay interval.
- * @param[in] pkt       Packet to send delayed.
- */
-static inline void _send_delayed(vtimer_t *t, timex_t interval, gnrc_pktsnip_t *pkt)
-{
-    vtimer_remove(t);
-    vtimer_set_msg(t, interval, gnrc_ipv6_pid, GNRC_NETAPI_MSG_TYPE_SND, pkt);
-}
-
-
 ipv6_addr_t *gnrc_ndp_internal_default_router(void)
 {
     gnrc_ipv6_nc_t *router = gnrc_ipv6_nc_get_next_router(NULL);
@@ -221,7 +207,9 @@ void gnrc_ndp_internal_send_nbr_adv(kernel_pid_t iface, ipv6_addr_t *tgt, ipv6_a
               delay.seconds);
 
         /* nc_entry must be set so no need to check it */
-        _send_delayed(&nc_entry->nbr_adv_timer, delay, hdr);
+        gnrc_ipv6_set_timer(&nc_entry->nbr_adv_timer, (uint32_t) timex_uint64(delay),
+                            &nc_entry->nbr_adv_msg, GNRC_NETAPI_MSG_TYPE_SND,
+                            (char *) hdr, gnrc_ipv6_pid);
     }
     else if (gnrc_netapi_send(gnrc_ipv6_pid, hdr) < 1) {
         DEBUG("ndp internal: unable to send neighbor advertisement\n");

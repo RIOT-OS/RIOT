@@ -519,8 +519,8 @@ void gnrc_ndp_rtr_adv_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt, ipv6_hdr_t
         next_rtr_sol = ltime;
 #endif
         gnrc_ipv6_set_timer(&nc_entry->rtr_timeout, (uint32_t) (ltime * SEC_IN_USEC),
-                               &nc_entry->rtr_timeout_msg, GNRC_NDP_MSG_RTR_TIMEOUT,
-                               (char *) nc_entry, thread_getpid());
+                            &nc_entry->rtr_timeout_msg, GNRC_NDP_MSG_RTR_TIMEOUT,
+                            (char *) nc_entry, thread_getpid());
     }
     /* set current hop limit from message if available */
     if (rtr_adv->cur_hl != 0) {
