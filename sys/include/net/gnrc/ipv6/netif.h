@@ -31,6 +31,7 @@
 #include "net/ipv6.h"
 #include "net/ipv6/addr.h"
 #include "vtimer.h"
+#include "xtimer.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -258,7 +259,8 @@ typedef struct {
     /**
      * @brief   Validity timeout timer.
      */
-    vtimer_t valid_timeout;
+    xtimer_t valid_timeout;
+    msg_t valid_timeout_msg;    /**< msg_t for gnrc_ipv6_netif_addr_t::valid_timeout */
     /**
      * @}
      */
