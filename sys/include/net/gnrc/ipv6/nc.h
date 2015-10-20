@@ -30,6 +30,7 @@
 #include "net/gnrc/netif.h"
 #include "net/gnrc/pktqueue.h"
 #include "vtimer.h"
+#include "xtimer.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -147,7 +148,8 @@ typedef struct {
     vtimer_t nbr_adv_timer;
 
 #ifdef MODULE_GNRC_SIXLOWPAN_ND_ROUTER
-    vtimer_t type_timeout;                  /**< Timer for type transmissions */
+    xtimer_t type_timeout;                  /**< Timer for type transmissions */
+    msg_t type_timeout_msg;                 /**< msg_t for gnrc_ipv6_nc_t::type_timeout */
     eui64_t eui64;                          /**< the unique EUI-64 of the neighbor (might be
                                              *   different from L2 address, if l2_addr_len == 2) */
 #endif
