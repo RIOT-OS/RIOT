@@ -34,7 +34,7 @@ int servo_init(servo_t *dev, pwm_t pwm, int pwm_channel, unsigned int min, unsig
 {
     int actual_frequency;
 
-    actual_frequency = pwm_init(dev->device, PWM_LEFT, FREQUENCY, RESOLUTION);
+    actual_frequency = pwm_init(pwm, PWM_LEFT, FREQUENCY, RESOLUTION);
 
     DEBUG("servo: requested %d hz, got %d hz\n", FREQUENCY, actual_frequency);
 
