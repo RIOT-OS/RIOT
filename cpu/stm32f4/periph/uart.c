@@ -186,6 +186,8 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
             dev = UART_2_DEV;
             break;
 #endif
+        default:
+            return;
     }
 
     for (size_t i = 0; i < len; i++) {
