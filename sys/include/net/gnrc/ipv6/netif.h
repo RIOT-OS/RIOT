@@ -578,6 +578,25 @@ static inline bool gnrc_ipv6_netif_addr_is_non_unicast(const ipv6_addr_t *addr)
  */
 void gnrc_ipv6_netif_init_by_dev(void);
 
+/**
+ * @brief   Sets a xtimer.
+ *
+ * @param[in] timer     The pointer to a xtimer.
+ * @param[in] offset    Offset for the timer.
+ * @param[in] msg       The pointer to the msg_t of the timer.
+ * @param[in] msg_type  The type of the message.
+ * @param[in] msg_data  The data of the message.
+ * @param[in] pid       The pid that the timer will send a message to.
+ */
+static inline void gnrc_ipv6_set_timer(xtimer_t *timer, uint32_t offset, msg_t *msg,
+                                       uint16_t msg_type, char *msg_data, kernel_pid_t pid)
+{
+    xtimer_remove(timer);
+    msg->type = msg_type;
+    msg->content.ptr = msg_data;
+    xtimer_set_msg(timer, offset, msg, pid);
+}
+
 #ifdef __cplusplus
 }
 #endif

@@ -518,9 +518,9 @@ void gnrc_ndp_rtr_adv_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt, ipv6_hdr_t
 #ifdef MODULE_GNRC_SIXLOWPAN_ND
         next_rtr_sol = ltime;
 #endif
-        vtimer_remove(&nc_entry->rtr_timeout);
-        vtimer_set_msg(&nc_entry->rtr_timeout, timex_set(ltime, 0),
-                       thread_getpid(), GNRC_NDP_MSG_RTR_TIMEOUT, nc_entry);
+        gnrc_ipv6_set_timer(&nc_entry->rtr_timeout, (uint32_t) (ltime * SEC_IN_USEC),
+                               &nc_entry->rtr_timeout_msg, GNRC_NDP_MSG_RTR_TIMEOUT,
+                               (char *) nc_entry, thread_getpid());
     }
     /* set current hop limit from message if available */
     if (rtr_adv->cur_hl != 0) {
@@ -655,7 +655,6 @@ void gnrc_ndp_retrans_nbr_sol(gnrc_ipv6_nc_t *nc_entry)
             nc_entry->probes_remaining--;
 
             if (nc_entry->iface == KERNEL_PID_UNDEF) {
-                timex_t t = { 0, GNRC_NDP_RETRANS_TIMER };
                 kernel_pid_t ifs[GNRC_NETIF_NUMOF];
                 size_t ifnum = gnrc_netif_get(ifs);
 
@@ -663,9 +662,9 @@ void gnrc_ndp_retrans_nbr_sol(gnrc_ipv6_nc_t *nc_entry)
                     gnrc_ndp_internal_send_nbr_sol(ifs[i], NULL, &nc_entry->ipv6_addr, &dst);
                 }
 
-                vtimer_remove(&nc_entry->nbr_sol_timer);
-                vtimer_set_msg(&nc_entry->nbr_sol_timer, t, gnrc_ipv6_pid,
-                               GNRC_NDP_MSG_NBR_SOL_RETRANS, nc_entry);
+                gnrc_ipv6_set_timer(&nc_entry->nbr_sol_timer, GNRC_NDP_RETRANS_TIMER,
+                                    &nc_entry->nbr_sol_msg, GNRC_NDP_MSG_NBR_SOL_RETRANS,
+                                    (char *) nc_entry, gnrc_ipv6_pid);
             }
             else {
                 gnrc_ipv6_netif_t *ipv6_iface = gnrc_ipv6_netif_get(nc_entry->iface);
@@ -673,10 +672,10 @@ void gnrc_ndp_retrans_nbr_sol(gnrc_ipv6_nc_t *nc_entry)
                 gnrc_ndp_internal_send_nbr_sol(nc_entry->iface, NULL, &nc_entry->ipv6_addr, &dst);
 
                 mutex_lock(&ipv6_iface->mutex);
-                vtimer_remove(&nc_entry->nbr_sol_timer);
-                vtimer_set_msg(&nc_entry->nbr_sol_timer,
-                               ipv6_iface->retrans_timer, gnrc_ipv6_pid,
-                               GNRC_NDP_MSG_NBR_SOL_RETRANS, nc_entry);
+                gnrc_ipv6_set_timer(&nc_entry->nbr_sol_timer,
+                                    (uint32_t) timex_uint64(ipv6_iface->retrans_timer),
+                                    &nc_entry->nbr_sol_msg, GNRC_NDP_MSG_NBR_SOL_RETRANS,
+                                    (char *) nc_entry, gnrc_ipv6_pid);
                 mutex_unlock(&ipv6_iface->mutex);
             }
         }
