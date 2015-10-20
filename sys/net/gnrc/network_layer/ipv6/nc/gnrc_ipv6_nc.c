@@ -146,9 +146,6 @@ void gnrc_ipv6_nc_remove(kernel_pid_t iface, const ipv6_addr_t *ipv6_addr)
             gnrc_pktqueue_remove_head(&entry->pkts);
         }
 #endif
-#ifdef MODULE_GNRC_SIXLOWPAN_ND
-        vtimer_remove(&entry->rtr_sol_timer);
-#endif
 #ifdef MODULE_GNRC_SIXLOWPAN_ND_ROUTER
         vtimer_remove(&entry->type_timeout);
 #endif
