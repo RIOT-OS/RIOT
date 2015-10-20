@@ -354,9 +354,8 @@ uint8_t gnrc_sixlowpan_nd_opt_ar_handle(kernel_pid_t iface, ipv6_hdr_t *ipv6,
                 nc_entry->flags |= GNRC_IPV6_NC_TYPE_REGISTERED;
                 reg_ltime = byteorder_ntohs(ar_opt->ltime);
                 /* TODO: notify routing protocol */
-                vtimer_remove(&nc_entry->type_timeout);
-                vtimer_set_msg(&nc_entry->type_timeout, timex_set(reg_ltime * 60, 0),
-                               gnrc_ipv6_pid, GNRC_SIXLOWPAN_ND_MSG_AR_TIMEOUT, nc_entry);
+                xtimer_set_msg(&nc_entry->type_timeout, (reg_ltime * 60 * SEC_IN_USEC),
+                               &nc_entry->type_timeout_msg, gnrc_ipv6_pid);
             }
             break;
 #endif
