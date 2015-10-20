@@ -17,7 +17,7 @@
 
 #include "mutex.h"
 #include "net/gnrc/sixlowpan/ctx.h"
-#include "vtimer.h"
+#include "xtimer.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
@@ -133,7 +133,7 @@ gnrc_sixlowpan_ctx_t *gnrc_sixlowpan_ctx_update(uint8_t id, const ipv6_addr_t *p
 static uint32_t _current_minute(void)
 {
     timex_t now;
-    vtimer_now(&now);
+    xtimer_now_timex(&now);
     return now.seconds / 60;
 }
 
