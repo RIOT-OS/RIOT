@@ -750,11 +750,10 @@ bool gnrc_ndp_internal_pi_opt_handle(kernel_pid_t iface, uint8_t icmpv6_type,
     }
     netif_addr->valid = byteorder_ntohl(pi_opt->valid_ltime);
     netif_addr->preferred = byteorder_ntohl(pi_opt->pref_ltime);
-    vtimer_remove(&netif_addr->valid_timeout);
     if (netif_addr->valid != UINT32_MAX) {
-        vtimer_set_msg(&netif_addr->valid_timeout,
-                       timex_set(byteorder_ntohl(pi_opt->valid_ltime), 0),
-                       thread_getpid(), GNRC_NDP_MSG_ADDR_TIMEOUT, &netif_addr->addr);
+        xtimer_set_msg(&netif_addr->valid_timeout,
+                       (byteorder_ntohl(pi_opt->valid_ltime) * SEC_IN_USEC),
+                       &netif_addr->valid_timeout_msg, thread_getpid());
     }
     /* TODO: preferred lifetime for address auto configuration */
     /* on-link flag MUST stay set if it was */
