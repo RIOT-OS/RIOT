@@ -31,14 +31,11 @@
 
 /* for now, we only support one UART device... */
 static uart_rx_cb_t _rx_cb;
-static uart_tx_cb_t _tx_cb;
 static void * _cb_arg;
 
 void UART0_IRQHandler(void) __attribute__((interrupt("IRQ")));
 
-
-int uart_init(uart_t dev, uint32_t baudrate,
-              uart_rx_cb_t rx_cb, uart_tx_cb_t tx_cb, void *arg)
+int uart_init(uart_t dev, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 {
     /* for now, we only support one UART device and only the RX interrupt */
     if (dev != 0) {
@@ -47,7 +44,6 @@ int uart_init(uart_t dev, uint32_t baudrate,
 
     /* save interrupt context */
     _rx_cb = rx_cb;
-    _tx_cb = tx_cb;
     _cb_arg = arg;
 
     /* power on the UART device */
@@ -73,39 +69,17 @@ int uart_init(uart_t dev, uint32_t baudrate,
     return 0;
 }
 
-void uart_tx_begin(uart_t uart)
+void uart_write(uart_t uart, const uint8_t *data, size_t len)
 {
-    (void)uart;
-
-    /* enable THRE interrupt */
-    U0IER |= BIT1;
-}
-
-int uart_write(uart_t uart, char c)
-{
-    (void)uart;
-
-    U0THR = (char)c;
-    return 1;
-}
-
-int uart_write_blocking(uart_t dev, char c)
-{
-    while (!(U0LSR & BIT5));
-    U0THR = (char)c;
-
-    return 1;
+    for (size_t i = 0; i < len; i++) {
+        while (!(U0LSR & BIT5));
+        U0THR = data[i];
+    }
 }
 
 void UART0_IRQHandler(void)
 {
     switch (U0IIR & UIIR_ID_MASK) {
-        case UIIR_THRE_INT:             /* Transmit Holding Register Empty */
-            if (_tx_cb(_cb_arg) == 0) {
-                U0IER &= ~BIT1;         /* clear TX interrupt */
-            }
-            break;
-
         case UIIR_CTI_INT:              /* Character Timeout Indicator */
         case UIIR_RDA_INT:              /* Receive Data Available */
                 do {
