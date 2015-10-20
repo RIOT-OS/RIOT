@@ -133,6 +133,9 @@ gnrc_ipv6_nc_t *gnrc_ipv6_nc_add(kernel_pid_t iface, const ipv6_addr_t *ipv6_add
     free_entry->type_timeout_msg.content.ptr = (char *) free_entry;
 #endif
 
+    free_entry->rtr_timeout_msg.type = GNRC_NDP_MSG_RTR_TIMEOUT;
+    free_entry->rtr_timeout_msg.content.ptr = (char *) free_entry;
+
     return free_entry;
 }
 
