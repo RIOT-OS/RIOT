@@ -44,13 +44,16 @@ static size_t _get_l2src(kernel_pid_t iface, uint8_t *l2src, size_t l2src_maxlen
  * @brief   Sends @ref GNRC_NETAPI_MSG_TYPE_SND delayed.
  *
  * @param[in] t         Timer for the delay.
+ * @param[in] msg       Msg for the timer.
  * @param[in] interval  Delay interval.
  * @param[in] pkt       Packet to send delayed.
  */
-static inline void _send_delayed(vtimer_t *t, timex_t interval, gnrc_pktsnip_t *pkt)
+static inline void _send_delayed(xtimer_t *t, msg_t *msg, uint32_t interval, gnrc_pktsnip_t *pkt)
 {
-    vtimer_remove(t);
-    vtimer_set_msg(t, interval, gnrc_ipv6_pid, GNRC_NETAPI_MSG_TYPE_SND, pkt);
+    xtimer_remove(t);
+    msg->type = GNRC_NETAPI_MSG_TYPE_SND;
+    msg->content.ptr = (char *) pkt;
+    xtimer_set_msg(t, interval, msg, gnrc_ipv6_pid);
 }
 
 
@@ -214,16 +217,15 @@ void gnrc_ndp_internal_send_nbr_adv(kernel_pid_t iface, ipv6_addr_t *tgt, ipv6_a
     if (gnrc_ipv6_netif_addr_is_non_unicast(tgt)) {
         /* avoid collision for anycast addresses
          * (see https://tools.ietf.org/html/rfc4861#section-7.2.7) */
-        timex_t delay = { 0, genrand_uint32_range(0, GNRC_NDP_MAX_AC_TGT_DELAY * SEC_IN_USEC) };
-        timex_normalize(&delay);
+        uint32_t delay = genrand_uint32_range(0, GNRC_NDP_MAX_AC_TGT_DELAY * SEC_IN_USEC);
         gnrc_ipv6_nc_t *nc_entry = gnrc_ipv6_nc_get(iface, dst);
         DEBUG("ndp internal: delay neighbor advertisement for %" PRIu32 " sec.",
-              delay.seconds);
+              (delay / SEC_IN_USEC));
 
         /* nc_entry must be set so no need to check it */
         assert(nc_entry);
 
-        _send_delayed(&nc_entry->nbr_adv_timer, delay, hdr);
+        _send_delayed(&nc_entry->nbr_adv_timer, &nc_entry->nbr_adv_msg, delay, hdr);
     }
     else if (gnrc_netapi_send(gnrc_ipv6_pid, hdr) < 1) {
         DEBUG("ndp internal: unable to send neighbor advertisement\n");
