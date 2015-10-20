@@ -27,26 +27,17 @@
 #include "periph/uart.h"
 #include "periph_conf.h"
 
-#if UART_0_EN || UART_1_EN || UART2_EN || UART_3_EN
-
-/**
- * @brief Each UART device has to store two callbacks.
- */
-typedef struct {
-    uart_rx_cb_t rx_cb;
-    uart_tx_cb_t tx_cb;
-    void *arg;
-} uart_conf_t;
-
 /**
  * @brief Allocate memory to store the callback functions.
  */
-static uart_conf_t config[UART_NUMOF];
+static uart_isr_ctx_t config[UART_NUMOF];
 
-int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, uart_tx_cb_t tx_cb, void *arg)
+static int init_base(uart_t uart, uint32_t baudrate);
+
+int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 {
     /* initialize basic functionality */
-    int res = uart_init_blocking(uart, baudrate);
+    int res = init_base(uart, baudrate);
 
     if (res != 0) {
         return res;
@@ -54,7 +45,6 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, uart_tx_cb_t t
 
     /* register callbacks */
     config[uart].rx_cb = rx_cb;
-    config[uart].tx_cb = tx_cb;
     config[uart].arg = arg;
 
     /* configure interrupts and enable RX interrupt */
@@ -88,7 +78,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, uart_tx_cb_t t
     return 0;
 }
 
-int uart_init_blocking(uart_t uart, uint32_t baudrate)
+static int init_base(uart_t uart, uint32_t baudrate)
 {
     uint16_t clock_divider = F_CPU / (16 * baudrate);
 
@@ -150,126 +140,42 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
     return 0;
 }
 
-void uart_tx_begin(uart_t uart)
-{
-
-}
-
-void uart_tx_end(uart_t uart)
-{
-
-}
-
-int uart_write(uart_t uart, char data)
+void uart_write(uart_t uart, const uint8_t *data, size_t len)
 {
     switch (uart) {
 #if UART_0_EN
-
         case UART_0:
-            UART0_DATA_REGISTER = data;
+            for (int i = 0; i < len; i++) {
+                while (!UART0_DTREG_EMPTY);
+                UART0_DATA_REGISTER = data[i];
+            }
             break;
 #endif /* UART_0_EN */
 #if UART_1_EN
-
         case UART_1:
-            UART1_DATA_REGISTER = data;
+            for (int i = 0; i < len; i++) {
+                while (!UART1_DTREG_EMPTY);
+                UART1_DATA_REGISTER = data[i];
+            }
             break;
 #endif /* UART_1_EN */
 #if UART_2_EN
-
         case UART_2:
-            UART2_DATA_REGISTER = data;
+            for (int i = 0; i < len; i++) {
+                while (!UART2_DTREG_EMPTY);
+                UART2_DATA_REGISTER = data[i];
+            }
             break;
 #endif /* UART_2_EN */
 #if UART_3_EN
-
         case UART_3:
-            UART3_DATA_REGISTER = data;
+            for (int i = 0; i < len; i++) {
+                while (!UART3_DTREG_EMPTY);
+                UART3_DATA_REGISTER = data[i];
+            }
             break;
 #endif /* UART_3_EN */
     }
-
-    return 1;
-}
-
-int uart_read_blocking(uart_t uart, char *data)
-{
-    switch (uart) {
-#if UART_0_EN
-
-        case UART_0:
-            while (!UART0_RECEIVED_DATA);
-
-            *data = (char) UART0_DATA_REGISTER;
-            break;
-#endif /* UART_0_EN */
-#if UART_1_EN
-
-        case UART_1:
-            while (!UART1_RECEIVED_DATA);
-
-            *data = (char) UART1_DATA_REGISTER;
-            break;
-#endif /* UART_1_EN */
-#if UART_2_EN
-
-        case UART_2:
-            while (!UART2_RECEIVED_DATA);
-
-            *data = (char) UART2_DATA_REGISTER;
-            break;
-#endif /* UART_2_EN */
-#if UART_3_EN
-
-        case UART_3:
-            while (!UART3_RECEIVED_DATA);
-
-            *data = (char) UART3_DATA_REGISTER;
-            break;
-#endif /* UART_3_EN */
-    }
-
-    return 1;
-}
-
-int uart_write_blocking(uart_t uart, char data)
-{
-    switch (uart) {
-#if UART_0_EN
-
-        case UART_0:
-            while (!UART0_DTREG_EMPTY);
-
-            UART0_DATA_REGISTER = data;
-            break;
-#endif /* UART_0_EN */
-#if UART_1_EN
-
-        case UART_1:
-            while (!UART1_DTREG_EMPTY);
-
-            UART1_DATA_REGISTER = data;
-            break;
-#endif /* UART_1_EN */
-#if UART_2_EN
-
-        case UART_2:
-            while (!UART2_DTREG_EMPTY);
-
-            UART2_DATA_REGISTER = data;
-            break;
-#endif /* UART_2_EN */
-#if UART_3_EN
-
-        case UART_3:
-            while (!UART3_DTREG_EMPTY);
-
-            UART3_DATA_REGISTER = data;
-            break;
-#endif /* UART_3_EN */
-    }
-
-    return 1;
 }
 
 
@@ -324,4 +230,3 @@ ISR(USART2_RX_vect, ISR_BLOCK)
     __exit_isr();
 }
 #endif /* UART_3_EN */
-#endif /* UART_0_EN || UART_1_EN |UART_2_EN| UART3 */
