@@ -65,7 +65,6 @@ extern "C" {
 #define UART_1_EN           1
 #define UART_2_EN           1
 #define UART_3_EN           1
-#define UART_IRQ_PRIO       1
 
 /* UART 0 device configuration */
 #define UART_0_DEV          UART
