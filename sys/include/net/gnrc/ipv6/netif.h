@@ -259,7 +259,12 @@ typedef struct {
     /**
      * @brief   Validity timeout timer.
      */
-    vtimer_t valid_timeout;
+    xtimer_t valid_timeout;
+
+    /**
+     * @brief   msg_t for gnrc_ipv6_netif_addr_t::valid_timeout
+     */
+    msg_t valid_timeout_msg;
     /**
      * @}
      */
