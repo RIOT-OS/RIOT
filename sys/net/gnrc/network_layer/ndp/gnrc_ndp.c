@@ -431,30 +431,34 @@ void gnrc_ndp_rtr_sol_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
             }
 #endif
             delay = timex_set(0, genrand_uint32_range(0, ms));
-            vtimer_remove(&if_entry->rtr_adv_timer);
+            xtimer_remove(&if_entry->rtr_adv_timer);
 #ifdef MODULE_GNRC_SIXLOWPAN_ND_ROUTER
             /* in case of a 6LBR we have to check if the interface is actually
              * the 6lo interface */
             if (if_entry->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN) {
                 gnrc_ipv6_nc_t *nc_entry = gnrc_ipv6_nc_get(iface, &ipv6->src);
                 if (nc_entry != NULL) {
-                    vtimer_set_msg(&if_entry->rtr_adv_timer, delay, gnrc_ipv6_pid,
-                            GNRC_NDP_MSG_RTR_ADV_SIXLOWPAN_DELAY, nc_entry);
+                    gnrc_ipv6_set_timer(&if_entry->rtr_adv_timer, (uint32_t) timex_uint64(delay),
+                                        &if_entry->rtr_adv_msg,
+                                        GNRC_NDP_MSG_RTR_ADV_SIXLOWPAN_DELAY,
+                                        (char *) nc_entry, gnrc_ipv6_pid);
                 }
             }
 #elif defined(MODULE_GNRC_NDP_ROUTER) || defined(MODULE_GNRC_SIXLOWPAN_ND_BORDER_ROUTER)
             if (ipv6_addr_is_unspecified(&ipv6->src)) {
                 /* either multicast, if source unspecified */
-                vtimer_set_msg(&if_entry->rtr_adv_timer, delay, gnrc_ipv6_pid,
-                               GNRC_NDP_MSG_RTR_ADV_RETRANS, if_entry);
+                gnrc_ipv6_set_timer(&if_entry->rtr_adv_timer, (uint32_t) timex_uint64(delay),
+                                    &if_entry->rtr_adv_msg, GNRC_NDP_MSG_RTR_ADV_RETRANS,
+                                    (char *) if_entry, gnrc_ipv6_pid);
             }
             else {
                 /* or unicast, if source is known */
                 /* XXX: can't just use GNRC_NETAPI_MSG_TYPE_SND, since the next retransmission
                  * must also be set. */
                 gnrc_ipv6_nc_t *nc_entry = gnrc_ipv6_nc_get(iface, &ipv6->src);
-                vtimer_set_msg(&if_entry->rtr_adv_timer, delay, gnrc_ipv6_pid,
-                               GNRC_NDP_MSG_RTR_ADV_DELAY, nc_entry);
+                gnrc_ipv6_set_timer(&if_entry->rtr_adv_timer, (uint32_t) timex_uint64(delay),
+                                    &if_entry->rtr_adv_msg, GNRC_NDP_MSG_RTR_ADV_DELAY,
+                                    (char *) nc_entry, gnrc_ipv6_pid);
             }
 #endif
         }
