@@ -26,10 +26,7 @@
 #include "periph/pwm.h"
 #include "periph_conf.h"
 
-/* ignore file in case no PWM devices are defined */
-#if PWM_0_EN || PWM_1_EN
-
-int pwm_init(pwm_t dev, pwm_mode_t mode, unsigned int frequency, unsigned int resolution)
+uint32_t pwm_init(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
 {
     TIM_TypeDef *tim = NULL;
     GPIO_TypeDef *port = NULL;
@@ -114,12 +111,13 @@ int pwm_init(pwm_t dev, pwm_mode_t mode, unsigned int frequency, unsigned int re
             break;
     }
 
-    /* set prescale and auto-reload registers to matching values for resolution and frequency */
-    if (resolution > 0xffff || (resolution * frequency) > pwm_clk) {
-        return -2;
+    /* set prescale and auto-reload registers to matching values for resolution
+     * and frequency */
+    if (res > 0xffff || (res * freq) > pwm_clk) {
+        return 0;
     }
-    tim->PSC = (pwm_clk / (resolution * frequency)) - 1;
-    tim->ARR = resolution - 1;
+    tim->PSC = (pwm_clk / (res * freq)) - 1;
+    tim->ARR = res - 1;
 
     /* set PWM mode */
     switch (mode) {
@@ -157,10 +155,26 @@ int pwm_init(pwm_t dev, pwm_mode_t mode, unsigned int frequency, unsigned int re
     /* enable timer ergo the PWM generation */
     pwm_start(dev);
 
-    return frequency;
+    return freq;
 }
 
-int pwm_set(pwm_t dev, int channel, unsigned int value)
+uint8_t pwm_channels(pwm_t dev)
+{
+    switch (dev) {
+#if PWM_0_EN
+        case PWM_0:
+            return PWM_0_CHANNELS;
+#endif
+#if PWM_1_EN
+        case PWM_1:
+            return PWM_1_CHANNELS;
+#endif
+        default:
+            return 0;
+    }
+}
+
+void pwm_set(pwm_t dev, uint8_t channel, uint16_t value)
 {
     TIM_TypeDef *tim = NULL;
 
@@ -169,7 +183,7 @@ int pwm_set(pwm_t dev, int channel, unsigned int value)
         case PWM_0:
             tim = PWM_0_DEV;
             if (channel >= PWM_0_CHANNELS) {
-                return -1;
+                return;
             }
             break;
 #endif
@@ -177,7 +191,7 @@ int pwm_set(pwm_t dev, int channel, unsigned int value)
         case PWM_1:
             tim = PWM_1_DEV;
             if (channel >= PWM_1_CHANNELS) {
-                return -1;
+                return;
             }
             break;
 #endif
@@ -185,7 +199,7 @@ int pwm_set(pwm_t dev, int channel, unsigned int value)
 
     /* norm value to maximum possible value */
     if (value > tim->ARR) {
-        value = (unsigned int) tim->ARR;
+        value = (uint32_t)tim->ARR;
     }
 
     switch (channel) {
@@ -202,10 +216,8 @@ int pwm_set(pwm_t dev, int channel, unsigned int value)
             tim->CCR4 = value;
             break;
         default:
-            return -1;
+            return;
     }
-
-    return 0;
 }
 
 void pwm_start(pwm_t dev)
@@ -271,5 +283,3 @@ void pwm_poweroff(pwm_t dev)
 #endif
     }
 }
-
-#endif /* PWM_0_EN || PWM_1_EN */
