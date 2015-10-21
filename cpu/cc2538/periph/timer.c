@@ -83,7 +83,7 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
      * so the only frequency available is 16 MHz.
      */
     if (ticks_per_us != 16) {
-        return -1;
+        printf("%s(): Invalid ticks_per_us=%u. Using 16 instead.\n", __FUNCTION__, ticks_per_us);
     }
 
     gptimer_num = ((uintptr_t)gptimer - (uintptr_t)GPTIMER0) / 0x1000;
