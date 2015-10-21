@@ -1,9 +1,9 @@
 /*
- * Copyright (C) 2014 Freie Universität Berlin
+ * Copyright (C) 2014-2015 Freie Universität Berlin
  *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**
@@ -18,101 +18,127 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef PWM_H
-#define PWM_H
+#ifndef PERIPH_PWM_H
+#define PERIPH_PWM_H
 
+#include <stdint.h>
+
+#include "periph_cpu.h"
 #include "periph_conf.h"
+/* TODO: remove once all platforms are ported to this interface */
+#include "periph/dev_enums.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/* ignore file in case no PWM devices are defined */
-#if PWM_NUMOF
+/**
+ * @brief   Make sure the number of available PWM devices is defined
+ */
+#ifndef PWM_NUMOF
+#error "PWM_NUMOF undefined for the target platform"
+#endif
 
 /**
- * @brief Definition of available PWM devices
- *
- * To this point a maximum of four PWM device is available.
+ * @brief   Default PWM access macro
+ * @{
  */
-typedef enum {
-#if PWM_0_EN
-    PWM_0,              /*< 1st PWM device */
+#ifndef PWM_DEV
+#define PWM_DEV(x)          (x)
 #endif
-#if PWM_1_EN
-    PWM_1,              /*< 2nd PWM device */
-#endif
-#if PWM_2_EN
-    PWM_2,              /*< 3rd PWM device */
-#endif
-#if PWM_3_EN
-    PWM_3,              /*< 4th PWM device */
-#endif
-} pwm_t;
+/** @} */
 
 /**
- * @brief Definition of available PWM modes
+ * @brief  Default PWM undefined value
+ * @{
  */
+#ifndef PWM_UNDEF
+#define PWM_UNDEF           (-1)
+#endif
+/** @} */
+
+/**
+ * @brief   Default PWM type definition
+ * @{
+ */
+#ifndef HAVE_PWM_T
+typedef int pwm_t;
+#endif
+/** @} */
+
+/**
+ * @brief   Default PWM mode definition
+ * @{
+ */
+#ifndef HAVE_PWM_MODE_T
 typedef enum {
     PWM_LEFT,           /*< use left aligned PWM */
     PWM_RIGHT,          /*< use right aligned PWM */
     PWM_CENTER          /*< use center aligned PWM */
 } pwm_mode_t;
+#endif
+/** @} */
 
 /**
- * @brief Initialize a PWM device
+ * @brief   Initialize a PWM device
  *
- * The PWM module is based on virtual PWM devices, which can have one or more channels.
- * The PWM devices can be configured to run with a given frequency and resolution, which
- * are always identical for the complete device, hence for every channel on a device.
+ * The PWM module is based on virtual PWM devices, which can have one or more
+ * channels. The PWM devices can be configured to run with a given frequency and
+ * resolution, which are always identical for the complete device, hence for
+ * every channel on a device.
  *
- * The desired frequency and resolution may not be possible on a given device when chosen
- * too large. In this case the PWM driver will always keep the resolution and decrease the
- * frequency if needed. To verify the correct settings compare the returned value which
- * is the actually set frequency.
+ * The desired frequency and resolution may not be possible on a given device
+ * when chosen too large. In this case the PWM driver will always keep the
+ * resolution and decrease the frequency if needed. To verify the correct
+ * settings compare the returned value which is the actually set frequency.
  *
- * @param[in] dev           PWM channel to initialize
+ * @param[in] dev           PWM device to initialize
  * @param[in] mode          PWM mode, left, right or center aligned
- * @param[in] frequency     the PWM frequency in Hz
- * @param[in] resolution    the PWM resolution
+ * @param[in] freq          PWM frequency in Hz
+ * @param[in] res           PWM resolution
  *
- * @return                  Actual PWM frequency on success
- * @return                  -1 on mode not applicable
- * @return                  -2 on frequency and resolution not applicable
+ * @return                  actual PWM frequency on success
+ * @return                  0 on error
  */
-int pwm_init(pwm_t dev, pwm_mode_t mode, unsigned int frequency, unsigned int resolution);
+uint32_t pwm_init(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res);
 
 /**
- * @brief Set the duty-cycle for a given channel of the given PWM device
+ * @brief   Get the number of available channels
  *
- * The duty-cycle is set in relation to the chosen resolution of the given device. If
- * value > resolution, value is set to resolution.
+ * @param[in] dev           PWM device
+ *
+ * @return                  Number of channels available for the given device
+ */
+uint8_t pwm_channels(pwm_t dev);
+
+/**
+ * @brief   Set the duty-cycle for a given channel of the given PWM device
+ *
+ * The duty-cycle is set in relation to the chosen resolution of the given
+ * device. If value > resolution, value is set to resolution.
  *
  * @param[in] dev           the PWM device to set
  * @param[in] channel       the channel of the given device to set
  * @param[in] value         the desired duty-cycle to set
- *
- * @return                  0 on success
- * @return                  -1 on invalid channel
  */
-int pwm_set(pwm_t dev, int channel, unsigned int value);
+void pwm_set(pwm_t dev, uint8_t channel, uint16_t value);
 
 /**
- * @brief Start PWM generation on the given device
+ * @brief   Start PWM generation on the given device
  *
  * @param[in] dev           device to start
  */
 void pwm_start(pwm_t dev);
 
 /**
- * @brief Stop PWM generation on the given device
+ * @brief   Stop PWM generation on the given device
  *
  * @param[in] dev           device to stop
  */
 void pwm_stop(pwm_t dev);
 
 /**
- * @brief Power on the PWM device
+ * @brief   Power on the PWM device
  *
  * The PWM deice is powered on. It is dependent on the implementing platform,
  * if the previously set configuration is still available after power on.
@@ -122,7 +148,7 @@ void pwm_stop(pwm_t dev);
 void pwm_poweron(pwm_t dev);
 
 /**
- * @brief Power off the given PWM device
+ * @brief   Power off the given PWM device
  *
  * The given PWM is completely powered off. On most platform this means, that
  * the clock for the PWM device is disabled.
@@ -131,11 +157,9 @@ void pwm_poweron(pwm_t dev);
  */
 void pwm_poweroff(pwm_t dev);
 
-#endif /* PWM_NUMOF */
-
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* PWM_H */
+#endif /* PERIPH_PWM_H */
 /** @} */
