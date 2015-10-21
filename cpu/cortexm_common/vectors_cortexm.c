@@ -153,11 +153,11 @@ void hard_fault_default(void)
         " out:                              \n" /* }                          */
 #if (__CORTEX_M == 0)
         "push {r4-r7}                       \n" /* save r4..r7 to the stack   */
-        "mov r4, r8                         \n" /*                            */
-        "mov r5, r9                         \n" /*                            */
-        "mov r6, r10                        \n" /*                            */
-        "mov r7, r11                        \n" /*                            */
-        "push {r4-r7}                       \n" /* save r8..r11 to the stack  */
+        "mov r3, r8                         \n" /*                            */
+        "mov r4, r9                         \n" /*                            */
+        "mov r5, r10                        \n" /*                            */
+        "mov r6, r11                        \n" /*                            */
+        "push {r3-r6}                       \n" /* save r8..r11 to the stack  */
 #else
         "push {r4-r11}                      \n" /* save r4..r11 to the stack  */
 #endif
@@ -167,7 +167,7 @@ void hard_fault_default(void)
           : [sram]   "r" (&_sram + HARDFAULT_HANDLER_REQUIRED_STACK_SPACE),
             [eram]   "r" (&_eram),
             [estack] "r" (&_estack)
-          : "r4","r5","r6","r7","r8","r9","r10","r11","lr"
+          : "r0","r4","r5","r6","r8","r9","r10","r11","lr"
     );
 }
 
