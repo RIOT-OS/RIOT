@@ -44,7 +44,7 @@ extern "C" {
 /**
  * @brief PWM device and pinout configuration
  */
-#define PWM_NUMOF           (1)
+#define PWM_NUMOF           (1U)
 #define PWM_0_EN            (1)
 
 /* PWM_0 device configuration */
