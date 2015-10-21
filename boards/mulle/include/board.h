@@ -23,6 +23,7 @@
 
 #include "cpu.h"
 #include "periph_conf.h"
+#include "mulle-nvram.h"
 
 /* Use the on board RTC 32kHz clock for LPTMR clocking. */
 #undef LPTIMER_CLKSRC
@@ -118,6 +119,17 @@ void board_init(void);
 #define MULLE_POWER_AVDD    GPIO_6 /**< AVDD enable pin */
 #define MULLE_POWER_VPERIPH GPIO_7 /**< VPERIPH enable pin */
 #define MULLE_POWER_VSEC    GPIO_5 /**< VSEC enable pin */
+/** @} */
+
+/**
+ * @name Mulle NVRAM hardware configuration
+ */
+/** @{ */
+/** FRAM SPI bus, SPI_2 in RIOT is mapped to hardware bus SPI0, see periph_conf.h */
+#define MULLE_NVRAM_SPI_DEV           SPI_2
+#define MULLE_NVRAM_SPI_CS            GPIO_16 /**< FRAM CS pin */
+#define MULLE_NVRAM_CAPACITY          512     /**< FRAM size, in bytes */
+#define MULLE_NVRAM_SPI_ADDRESS_COUNT 1       /**< FRAM addressing size, in bytes */
 /** @} */
 
 /**
