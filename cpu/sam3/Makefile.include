@@ -1,6 +1,6 @@
 export CPU_ARCH = cortex-m3
 
 # include common SPI functions
-USEMODULE += periph_common
+USEMODULE += common_periph
 
 include $(RIOTCPU)/Makefile.include.cortexm_common
