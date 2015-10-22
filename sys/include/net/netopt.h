@@ -182,6 +182,23 @@ typedef enum {
      */
     NETOPT_CHANNEL_PAGE,
 
+    /**
+     * @brief get/set the CCA threshold for the radio transceiver
+     *
+     * This is the value, in dBm, that the radio transceiver uses to decide
+     * if the channel is clear or not (CCA). If the current signal strength
+     * (RSSI/ED) is stronger than this CCA threshold value, the transceiver
+     * usually considers that the radio medium is busy. Otherwise, i.e.
+     * if RSSI/ED value is less than the CCA threshold value, the radio
+     * medium is supposed to be free (the possibly received weak signal
+     * is considered to be background, meaningless noise).
+     *
+     * Most transceivers allow to set this CCA threshold value.
+     * Some research work has proven that dynamically adapting it
+     * to network environment can improve QoS, especially in WSN.
+     */
+    NETOPT_CCA_THRESHOLD,
+
     /* add more options if needed */
 
     /**
