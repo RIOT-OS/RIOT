@@ -320,6 +320,14 @@ static inline bool GNRC_RPL_COUNTER_GREATER_THAN(uint8_t A, uint8_t B)
 #define GNRC_RPL_LIFETIME_UPDATE_STEP (2)
 
 /**
+ *  @brief Rank part of the DODAG
+ *  @see <a href="https://tools.ietf.org/html/rfc6550#section-3.5.1">
+ *          RFC 6550, section 3.5.1, Rank Comparison (DAGRank())
+ *      </a>
+ */
+#define DAGRANK(rank,mhri)   (rank/mhri)
+
+/**
  *  @name   Global / Local instance id masks
  *  @see <a href="https://tools.ietf.org/html/rfc6550#section-5.1">
  *          RFC 6550, section 5.1, RPL Instance ID
@@ -357,45 +365,45 @@ kernel_pid_t gnrc_rpl_init(kernel_pid_t if_pid);
  * @param[in] local_inst_id     Flag indicating whether a local or global instance id
  *                              should be generatad
  *
- * @return  Pointer to the new DODAG, on success.
+ * @return  Pointer to the new RPL Instance, on success.
  * @return  NULL, otherwise.
  */
-gnrc_rpl_dodag_t *gnrc_rpl_root_init(uint8_t instance_id, ipv6_addr_t *dodag_id, bool gen_inst_id,
-                                     bool local_inst_id);
+gnrc_rpl_instance_t *gnrc_rpl_root_init(uint8_t instance_id, ipv6_addr_t *dodag_id,
+                                        bool gen_inst_id, bool local_inst_id);
 
 /**
- * @brief   Send a DIO of the @p dodag to the @p destination.
+ * @brief   Send a DIO of the @p instance to the @p destination.
  *
- * @param[in] dodag             Pointer to the DODAG.
+ * @param[in] instance          Pointer to the RPL instance.
  * @param[in] destination       IPv6 addres of the destination.
  */
-void gnrc_rpl_send_DIO(gnrc_rpl_dodag_t *dodag, ipv6_addr_t *destination);
+void gnrc_rpl_send_DIO(gnrc_rpl_instance_t *instance, ipv6_addr_t *destination);
 
 /**
- * @brief   Send a DIS of the @p dodag to the @p destination.
+ * @brief   Send a DIS of the @p instace to the @p destination.
  *
- * @param[in] dodag             Pointer to the DODAG, optional.
+ * @param[in] instance          Pointer to the RPL instance, optional.
  * @param[in] destination       IPv6 addres of the destination.
  */
-void gnrc_rpl_send_DIS(gnrc_rpl_dodag_t *dodag, ipv6_addr_t *destination);
+void gnrc_rpl_send_DIS(gnrc_rpl_instance_t *instance, ipv6_addr_t *destination);
 
 /**
  * @brief   Send a DAO of the @p dodag to the @p destination.
  *
- * @param[in] dodag             Pointer to the DODAG.
+ * @param[in] instance          Pointer to the instance.
  * @param[in] destination       IPv6 addres of the destination.
  * @param[in] lifetime          Lifetime of the route to announce.
  */
-void gnrc_rpl_send_DAO(gnrc_rpl_dodag_t *dodag, ipv6_addr_t *destination, uint8_t lifetime);
+void gnrc_rpl_send_DAO(gnrc_rpl_instance_t *instance, ipv6_addr_t *destination, uint8_t lifetime);
 
 /**
- * @brief   Send a DAO-ACK of the @p dodag to the @p destination.
+ * @brief   Send a DAO-ACK of the @p instance to the @p destination.
  *
- * @param[in] dodag             Pointer to the DODAG, optional.
+ * @param[in] instance          Pointer to the RPL instance.
  * @param[in] destination       IPv6 addres of the destination.
  * @param[in] seq				Sequence number to be acknowledged.
  */
-void gnrc_rpl_send_DAO_ACK(gnrc_rpl_dodag_t *dodag, ipv6_addr_t *destination, uint8_t seq);
+void gnrc_rpl_send_DAO_ACK(gnrc_rpl_instance_t *instance, ipv6_addr_t *destination, uint8_t seq);
 
 /**
  * @brief   Parse a DIS.
@@ -448,16 +456,17 @@ void gnrc_rpl_delay_dao(gnrc_rpl_dodag_t *dodag);
 void gnrc_rpl_long_delay_dao(gnrc_rpl_dodag_t *dodag);
 
 /**
- * @brief Creation of a RPL DODAG as root. Creates a new instance if necessary.
+ * @brief Create a new RPL instance and RPL DODAG.
  *
  * @param[in] instance_id       Id of the instance
  * @param[in] dodag_id          Id of the DODAG
  * @param[in] mop               Mode of Operation
  *
- * @return  Pointer to the new DODAG, on success.
+ * @return  Pointer to the new RPL instance, on success.
  * @return  NULL, otherwise.
  */
-gnrc_rpl_dodag_t *gnrc_rpl_root_dodag_init(uint8_t instance_id, ipv6_addr_t *dodag_id, uint8_t mop);
+gnrc_rpl_instance_t *gnrc_rpl_root_instance_init(uint8_t instance_id, ipv6_addr_t *dodag_id,
+                                                 uint8_t mop);
 
 /**
  * @brief Send a control message
