@@ -26,8 +26,9 @@
 #include "log.h"
 #include "cpu.h"
 #include "board.h"
+#include "periph/gpio.h"
 #include "periph/pwm.h"
-#include "periph_conf.h"
+
 
 /* ignore file in case no PWM devices are defined */
 #if PWM_NUMOF
@@ -109,14 +110,8 @@ int pwm_init(pwm_t dev, pwm_mode_t mode,
 
     /* configure the used pins */
     for (int i = 0; i < PWM_MAX_CHANNELS; i++) {
-        PortGroup *port = pwm_config[dev].chan[i].port;
-        int pin = pwm_config[dev].chan[i].pin;
-        int fnct = pwm_config[dev].chan[i].fnct;
-        /* set pin as output and enable the MUX */
-        port->DIRSET.reg = (1 << pin);
-        port->PINCFG[pin].reg = (PORT_PINCFG_PMUXEN);
-        port->PMUX[pin >> 1].reg &= ~(0xf << (4 * (pin & 0x1)));
-        port->PMUX[pin >> 1].reg |=  (fnct << (4 * (pin & 0x1)));
+        gpio_init(pwm_config[dev].chan[i].pin, GPIO_DIR_OUT, GPIO_NOPULL);
+        gpio_init_mux(pwm_config[dev].chan[i].pin, pwm_config[dev].chan[i].mux);
     }
 
     /* power on the device */
