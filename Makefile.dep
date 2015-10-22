@@ -35,6 +35,10 @@ ifneq (,$(filter netdev2_tap,$(USEMODULE)))
   USEMODULE += netif
 endif
 
+ifneq (,$(filter cc2420,$(USEMODULE)))
+  USEMODULE += ieee802154
+endif
+
 ifneq (,$(filter gnrc_zep,$(USEMODULE)))
   USEMODULE += hashes
   USEMODULE += ieee802154

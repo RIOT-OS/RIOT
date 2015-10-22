@@ -33,7 +33,7 @@
  */
 static mutex_t spi_lock = MUTEX_INIT;
 
-/* per default, we use the legacy MSP430 USART module for UART functionality */
+/* per default, we use the legacy MSP430 USART module for SPI functionality */
 #ifndef SPI_USE_USIC
 
 int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
