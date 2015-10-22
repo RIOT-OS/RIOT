@@ -17,6 +17,7 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Baptiste Clenet <bapclenet@gmail.com>
  * @author      Daniel Krebs <github@daniel-krebs.net>
+ * @author      Kévin Roussel <Kevin.Roussel@inria.fr>
  *
  * @}
  */
@@ -308,6 +309,31 @@ void at86rf2xx_set_csma_seed(at86rf2xx_t *dev, uint8_t entropy[2])
     tmp &= ~(AT86RF2XX_CSMA_SEED_1__CSMA_SEED_1);
     tmp |= entropy[1] & AT86RF2XX_CSMA_SEED_1__CSMA_SEED_1;
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__CSMA_SEED_1, tmp);
+}
+
+int8_t at86rf2xx_get_cca_threshold(at86rf2xx_t *dev)
+{
+    int8_t tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__CCA_THRES);
+    tmp &= AT86RF2XX_CCA_THRES_MASK__CCA_ED_THRES;
+    tmp <<= 1;
+    return (RSSI_BASE_VAL + tmp);
+}
+
+void at86rf2xx_set_cca_threshold(at86rf2xx_t *dev, int8_t value)
+{
+    /* ensure the given value is negative, since a CCA threshold > 0 is
+       just impossible: thus, any positive value given is considered
+       to be the absolute value of the actually wanted threshold */
+    if (value > 0) {
+        value = -value;
+    }
+    /* transform the dBm value in the form
+       that will fit in the AT86RF2XX_REG__CCA_THRES register */
+    value -= RSSI_BASE_VAL;
+    value >>= 1;
+    value &= AT86RF2XX_CCA_THRES_MASK__CCA_ED_THRES;
+    value |= AT86RF2XX_CCA_THRES_MASK__RSVD_HI_NIBBLE;
+    at86rf2xx_reg_write(dev, AT86RF2XX_REG__CCA_THRES, value);
 }
 
 void at86rf2xx_set_option(at86rf2xx_t *dev, uint16_t option, bool state)

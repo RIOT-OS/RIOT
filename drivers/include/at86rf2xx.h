@@ -22,6 +22,7 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @author      Daniel Krebs <github@daniel-krebs.net>
+ * @author      Kévin Roussel <Kevin.Roussel@inria.fr>
  */
 
 #ifndef AT86RF2XX_H_
@@ -79,6 +80,11 @@ extern "C" {
  * @brief   Default TX power (0dBm)
  */
 #define AT86RF2XX_DEFAULT_TXPOWER       (0U)
+
+/**
+ * @brief   Base (minimal) RSSI value in dBm
+ */
+#define RSSI_BASE_VAL                   (-91)
 
 /**
  * @brief   Flags for device internal states (see datasheet)
@@ -376,6 +382,23 @@ void at86rf2xx_set_csma_backoff_exp(at86rf2xx_t *dev, uint8_t min, uint8_t max);
  * @param[in] entropy       11 bit of entropy as seed for random backoff
  */
 void at86rf2xx_set_csma_seed(at86rf2xx_t *dev, uint8_t entropy[2]);
+
+/**
+ * @brief   Get the CCA threshold value
+ *
+ * @param[in] dev           device to read value from
+ *
+ * @return                  the current CCA threshold value
+ */
+int8_t at86rf2xx_get_cca_threshold(at86rf2xx_t *dev);
+
+/**
+ * @brief   Set the CCA threshold value
+ *
+ * @param[in] dev           device to write to
+ * @param[in] value         the new CCA threshold value
+ */
+void at86rf2xx_set_cca_threshold(at86rf2xx_t *dev, int8_t value);
 
 /**
  * @brief   Enable or disable driver specific options
