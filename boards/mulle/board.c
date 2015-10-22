@@ -28,6 +28,7 @@
 #include "periph/rtt.h"
 #include "periph/spi.h"
 #include "nvram-spi.h"
+#include "xtimer.h"
 
 static nvram_t mulle_nvram_dev;
 nvram_t *mulle_nvram = &mulle_nvram_dev;
@@ -119,6 +120,9 @@ void board_init(void)
     cpu_init();
 
     LED_YELLOW_ON;
+
+    /* NVRAM requires xtimer for timing */
+    xtimer_init();
 
     /* Initialize NVRAM */
     status = mulle_nvram_init();
