@@ -32,8 +32,6 @@
 
 #include "semaphore.h"
 
-#define USEC_IN_NS  (1000)
-
 int sem_timedwait(sem_t *sem, const struct timespec *abstime)
 {
     timex_t now, timeout = { abstime->tv_sec, abstime->tv_nsec / USEC_IN_NS };
