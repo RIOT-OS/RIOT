@@ -37,7 +37,6 @@ extern "C" {
 #ifndef TIMER_DEV
 #define TIMER_DEV(x)        (x)
 #endif
-/** @} */
 
 /**
  * @brief   Default value for timer not defined
