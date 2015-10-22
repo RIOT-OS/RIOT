@@ -134,7 +134,7 @@ static inline int _stack_size_left(uint32_t required)
 }
 
 /* Trampoline function to save stack pointer before calling hard fault handler */
-void hard_fault_default(void)
+__attribute__((naked)) void hard_fault_default(void)
 {
     /* Get stack pointer where exception stack frame lies */
     __ASM volatile
