@@ -64,6 +64,10 @@ ifneq (,$(filter srf02,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
+ifneq (,$(filter srf08,$(USEMODULE)))
+  USEMODULE += xtimer
+endif
+
 ifneq (,$(filter xbee,$(USEMODULE)))
   USEMODULE += ieee802154
   USEMODULE += xtimer
