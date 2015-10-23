@@ -23,6 +23,7 @@
 
 #include "driverlib/rom_map.h"
 #include "driverlib/interrupt.h"
+#include "driverlib/utils.h"
 
 #include "board.h"
 #include "cpu.h"
@@ -30,13 +31,18 @@
 
 #include "periph/gpio.h"
 
+
 /**
- * @brief Initialize the SmartRF06's on-board LEDs
+ * @brief Initialize on-board LEDs
  */
 void led_init(void) {
     gpio_init(RED_LED, GPIO_DIR_OUT, GPIO_NOPULL);
     gpio_init(GREEN_LED, GPIO_DIR_OUT, GPIO_NOPULL);
     gpio_init(YELLOW_LED, GPIO_DIR_OUT, GPIO_NOPULL);
+
+    gpio_clear(RED_LED);
+    gpio_clear(GREEN_LED);
+    gpio_clear(YELLOW_LED);
 }
 
 extern const void *interrupt_vector[];

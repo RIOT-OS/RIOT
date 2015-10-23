@@ -46,7 +46,7 @@ extern "C" {
 
 #define SW_TIMERS_EXAUSTED 111
 
-#define SYSTEM_RESET PRCMMCUReset(1)
+#define SYSTEM_RESET  cc3200_reset()
 
 typedef enum {
     /******  Cortex-M4 Processor Exceptions Numbers ***************************/
@@ -113,6 +113,18 @@ typedef enum {
 #define PERIPH_BASE                 0x40000000 /**< Peripheral base address */
 
 /** @} */
+
+/**
+ * reset the chip
+ */
+void cc3200_reset(void);
+
+
+/**
+ * network processor status
+ */
+extern unsigned long nwp_status;
+
 
 #endif /* CPU_INCLUDE_CC3200_H_ */
 /** @} */

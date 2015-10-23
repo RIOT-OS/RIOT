@@ -28,6 +28,8 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
+#include "device.h"
+
 #ifndef MALLOC_SL_OBJECTS
 
 #define MAX_SYNC_OBJS 64
@@ -36,9 +38,31 @@
 #define MUTEX_TRYLOCK(id) mutex_trylock(&osi_mutexes[(int)id])
 #define MUTEX_UNLOCK(id) mutex_unlock(&osi_mutexes[(int)id])
 
-int synchronizer[MAX_SYNC_OBJS + 1];
+/**
+ * network processor status byte
+ */
+unsigned long nwp_status = 0;
 
-mutex_t osi_mutexes[MAX_SYNC_OBJS];
+
+static int synchronizer[MAX_SYNC_OBJS + 1];
+
+static mutex_t osi_mutexes[MAX_SYNC_OBJS];
+
+
+static char simplelink_started;
+
+
+#ifdef CC3200_MCU_ONLY
+void SimpleLinkWlanEventHandler(SlWlanEvent_t* pSlWlanEvent) {};
+
+void SimpleLinkSockEventHandler(SlSockEvent_t* pSlSockEvent) {};
+
+void SimpleLinkNetAppEventHandler(SlNetAppEvent_t* pSlNetApp) {};
+
+void SimpleLinkHttpServerCallback(SlHttpServerEvent_t *pSlHttpServerEvent,
+        SlHttpServerResponse_t *pSlHttpServerResponse) {};
+#endif
+
 
 void init_sync_pool(void) {
     lifo_init(synchronizer, MAX_SYNC_OBJS);
@@ -515,6 +539,8 @@ void vSimpleLinkSpawnTask(void *pvParameters) {
     msg_t msg, msg_queue[QUEUE_SIZE_SLSPAWN];
     tSimpleLinkSpawnMsg* msg_ptr;
 
+    simplelink_started = 1;
+
     /* setup the message queue */
     msg_init_queue(msg_queue, QUEUE_SIZE_SLSPAWN);
 
@@ -662,3 +688,16 @@ OsiReturnVal_e osi_MsgQRead(OsiMsgQ_t* pMsgQ, void* pMsg, OsiTime_t Timeout) {
 void osi_Sleep(unsigned int MilliSecs) {
     xtimer_usleep(MilliSecs * 80000);
 }
+
+
+void cc3200_reset(void) {
+    if (nwp_status & (1<<STATUS_BIT_CONNECTION)) {
+        sl_Stop(SL_STOP_TIMEOUT);
+        MAP_PRCMHibernateIntervalSet(330);
+        MAP_PRCMHibernateWakeupSourceEnable(PRCM_HIB_SLOW_CLK_CTR);
+        MAP_PRCMHibernateEnter();
+    } else {
+        MAP_PRCMMCUReset(1);
+    }
+}
+

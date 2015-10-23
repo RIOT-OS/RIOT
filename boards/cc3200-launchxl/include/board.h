@@ -22,6 +22,7 @@
 
 #include <stdint.h>
 #include "cpu.h"
+#include "nwp_conf.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -128,22 +129,22 @@ extern "C" {
  * @{
  */
 
-#define LED_RED_ON          gpio_set(RED_LED)
-#define LED_RED_OFF         gpio_clear(RED_LED)
-#define LED_RED_TOGGLE      gpio_toggle(RED_LED)
+#define RED_LED_ON          gpio_set(RED_LED)
+#define RED_LED_OFF         gpio_clear(RED_LED)
+#define RED_LED_TOGGLE      gpio_toggle(RED_LED)
 
-#define LED_YELLOW_ON       gpio_set(YELLOW_LED)
-#define LED_YELLOW_OFF      gpio_clear(YELLOW_LED)
-#define LED_YELLOW_TOGGLE   gpio_toggle(YELLOW_LED)
+#define YELLOW_LED_ON       gpio_set(YELLOW_LED)
+#define YELLOW_LED_OFF      gpio_clear(YELLOW_LED)
+#define YELLOW_LED_TOGGLE   gpio_toggle(YELLOW_LED)
 
-#define LED_GREEN_ON        gpio_set(GREEN_LED)
-#define LED_GREEN_OFF       gpio_clear(GREEN_LED)
-#define LED_GREEN_TOGGLE    gpio_toggle(GREEN_LED)
+#define GREEN_LED_ON        gpio_set(GREEN_LED)
+#define GREEN_LED_OFF       gpio_clear(GREEN_LED)
+#define GREEN_LED_TOGGLE    gpio_toggle(GREEN_LED)
 
 /* Default to red if the color is not specified: */
-#define LED_ON              LED_RED_ON
-#define LED_OFF             LED_RED_OFF
-#define LED_TOGGLE          LED_RED_TOGGLE
+#define LED_ON              RED_LED_ON
+#define LED_OFF             RED_LED_OFF
+#define LED_TOGGLE          RED_LED_TOGGLE
 /** @} */
 
 /**
