@@ -103,17 +103,18 @@ int stdimpl_strcmp(const char *s1, const char *s2)
     if (s1 == s2) {
         return 0;
     }
-    else if (s1 && !s2) {
+    else if (s1 == NULL) {
+        return -1;
+    }
+    else if (s2 == NULL) {
         return +1;
     }
-    else if (!s1 && s2) {
-        return -1;
-    } else {
-        char c1,c2;
+    else {
+        char c1, c2;
         do {
             c1 = *s1++;
             c2 = *s2++;
-        } while (c1 && c2 && (c1==c2));
+        } while ((c1 == c2) && (c1 != '\0'));
         return c1 - c2;
     }
 }

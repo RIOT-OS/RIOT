@@ -6,117 +6,170 @@
  * directory for more details.
  */
 
-#ifndef _SEMAPHORE_H
-#define _SEMAPHORE_H    1
+/**
+ * @defgroup    posix_semaphore POSIX semaphores
+ * @ingroup     posix
+ * @{
+ * @file
+ * @brief   Semaphores
+ * @see     <a href="http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/semaphore.h.html">
+ *              The Open Group Base Specifications Issue 7, <semaphore.h>
+ *          </a>
+ * @author  Christian Mehlis <mehlis@inf.fu-berlin.de>
+ * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
+ * @author  René Kijewski <kijewski@inf.fu-berlin.de>
+ */
 
+#ifndef POSIX_SEMAPHORE_H_
+#define POSIX_SEMAPHORE_H_
+
+#include <errno.h>
 #include <time.h>
 
-#include "priority_queue.h"
+#include "sem.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/** Value returned if `sem_open' failed.  */
+/**
+ * @brief Value returned if `sem_open' failed.
+ */
 #define SEM_FAILED      ((sem_t *) 0)
 
 /**
- * @brief Semaphore struct
+ * @brief Initialize semaphore.
+ *
+ * @see <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_init.html">
+ *          The Open Group Base Specifications Issue 7, sem_init()
+ *      </a>
+ *
+ * The sem_init() function shall initialize the unnamed semaphore referred to by @p sem. The value
+ * of the initialized semaphore shall be @p value. Following a successful call to sem_init(),
+ * the semaphore may be used in subsequent calls to sem_wait(), sem_timedwait(),
+ * sem_trywait(), sem_post(), and sem_destroy(). This semaphore shall remain usable until the
+ * semaphore is destroyed.
+ *
+ * @param[out] sem      Semaphore to initialize.
+ * @param[in] pshared   **(unused, since RIOT only has threads)**
+ *                      Semaphore is shared between processes not threads.
+ * @param[in] value     Value to set.
+ *
+ * @return  0 on success.
+ * @return  -EINVAL, if semaphore is invalid.
  */
-typedef struct sem {
-    /** the value of the semaphore */
-    volatile unsigned int value;
-    /** list of threads waiting for the semaphore */
-    priority_queue_t queue;
-} sem_t;
+#define sem_init(sem, pshared, value)   sem_create(sem, value)
 
 /**
- * @brief Initialize semaphore object SEM to VALUE.
+ * @brief Open a named semaphore @p name with open flags @p oflag.
  *
- * @param sem Semaphore to initialize
- * @param pshared unused
- * @param value Value to set
+ * @see <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_open.html">
+ *          The Open Group Base Specifications Issue 7, sem_open()
+ *      </a>
+ *
+ * @todo  named semaphore are currently not supported
+ *
+ * @param[in] name  Name to set.
+ * @param[in] oflag Flags to set.
+ *
+ * @return  Always @ref SEM_FAILED, since it is not implemented currently.
  */
-int sem_init(sem_t *sem, int pshared, unsigned int value);
+#define sem_open(name, oflag, ...)      (SEM_FAILED)
 
 /**
- * @brief Free resources associated with semaphore object SEM.
+ * @brief Close descriptor for named semaphore @p sem.
  *
- * @param sem Semaphore to destroy
+ * @see <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_close.html">
+ *          The Open Group Base Specifications Issue 7, sem_close()
+ *      </a>
+ *
+ * @todo  named semaphore are currently not supported
+ *
+ * @param[in] sem   Semaphore to close.
+ *
+ * @return  Always -1, since it is not implemented currently.
  */
-int sem_destroy(sem_t *sem);
-
-/*
- * @brief Open a named semaphore NAME with open flags OFLAG.
- *
- * @brief WARNING: named semaphore are currently not supported
- *
- * @param name Name to set
- * @param oflag Flags to set
- */
-sem_t *sem_open(const char *name, int oflag, ...);
+#define sem_close(sem)                  (-1)
 
 /**
- * @brief Close descriptor for named semaphore SEM.
+ * @brief Remove named semaphore @p name.
  *
- * @brief WARNING: named semaphore are currently not supported
+ * @see <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_unlink.html">
+ *          The Open Group Base Specifications Issue 7, sem_unlink()
+ *      </a>
  *
- * @param sem Semaphore to close
+ * @todo  named semaphore are currently not supported
+ *
+ * @param[in] name  Name to unlink.
+ *
+ * @return  Always -1, since it is not implemented currently.
  */
-int sem_close(sem_t *sem);
+#define sem_unlink(name)                (-1)
 
 /**
- * @brief Remove named semaphore NAME.
+ * @brief Similar to `sem_wait' but wait only until @p abstime.
  *
- * @brief WARNING: named semaphore are currently not supported
+ * @see <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_timedwait.html">
+ *          The Open Group Base Specifications Issue 7, sem_timedwait()
+ *      </a>
  *
- * @param name Name to unlink
- */
-int sem_unlink(const char *name);
-
-/**
- * @brief Wait for SEM being posted.
+ * The sem_timedwait() function shall lock the semaphore referenced by @p sem as in the sem_wait()
+ * function. However, if the semaphore cannot be locked without waiting for another process or
+ * thread to unlock the semaphore by performing a sem_post() function, this wait shall be
+ * terminated when the specified timeout expires.
  *
- * @param sem Semaphore to wait
- */
-int sem_wait(sem_t *sem);
-
-/**
- * @brief Similar to `sem_wait' but wait only until ABSTIME.
+ * @param[in] sem       Semaphore to wait on.
+ * @param[in] abstime   Absolute time (that is when the clock on which temouts are based equals
+ *                      this value) the timeout for the wait shall expire. If the value specified
+ *                      has already passed the timeout expires immediately.
  *
- * @brief WARNING: currently not supported
- *
- * @param sem Semaphore to wait on
- * @param abstime Max time to wait for a post
- *
+ * @return  0 on success
+ * @return  -EINVAL, if semaphore is invalid.
+ * @return  -ETIMEDOUT, if the semaphore times out.
+ * @return  -ECANCELED, if the semaphore was destroyed.
  */
 int sem_timedwait(sem_t *sem, const struct timespec *abstime);
 
 /**
  * @brief Test whether SEM is posted.
  *
- * @param sem Semaphore to trywait on
+ * @see <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_trywait.html">
+ *          The Open Group Base Specifications Issue 7, sem_trywait()
+ *      </a>
  *
+ * @param[in] sem   Semaphore to try to wait on
+ *
+ * @return  0 on success
+ * @return  -EINVAL, if semaphore is invalid.
+ * @return  -EAGAIN, if the semaphore was already locked.
  */
 int sem_trywait(sem_t *sem);
 
 /**
- * @brief Post SEM.
- *
- * @param sem Semaphore to post on
- */
-int sem_post(sem_t *sem);
-
-/**
  * @brief Get current value of SEM and store it in *SVAL.
  *
- * @param sem Semaphore to get value from
- * @param sval place whre value goes to
+ * @see <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_getvalue.html">
+ *          The Open Group Base Specifications Issue 7, sem_getvalue()
+ *      </a>
+ *
+ * @param[in] sem   Semaphore to get the value from.
+ * @param[out] sval Place where value goes to.
+ *
+ * @return  0 on success
+ * @return  -EINVAL, if semaphore is invalid.
  */
-int sem_getvalue(sem_t *sem, int *sval);
+static inline int sem_getvalue(sem_t *sem, int *sval)
+{
+    if (sem != NULL) {
+        *sval = (int)sem->value;
+        return 0;
+    }
+    return -EINVAL;
+}
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif  /* semaphore.h */
+#endif  /* POSIX_SEMAPHORE_H_ */
+/** @} */

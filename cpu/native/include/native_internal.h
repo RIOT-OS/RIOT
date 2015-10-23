@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013, 2014 Ludwig Ortmann
+ * Copyright (C) 2013, 2014 Ludwig Knüpfer
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -13,7 +13,7 @@
 /**
  * @addtogroup    native_cpu
  * @{
- * @author  Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ * @author  Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  */
 
 #ifndef _NATIVE_INTERNAL_H
@@ -65,7 +65,6 @@ typedef void (*_native_callback_t)(void);
  */
 void native_cpu_init(void);
 void native_interrupt_init(void);
-extern void native_hwtimer_pre_init(void);
 
 void native_irq_handler(void);
 extern void _native_sig_leave_tramp(void);

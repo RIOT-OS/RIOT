@@ -4,7 +4,7 @@ include ../Makefile.tests_common
 FEATURES_REQUIRED = periph_i2c periph_gpio
 
 USEMODULE += l3g4200d
-USEMODULE += vtimer
+USEMODULE += xtimer
 
 ifneq (,$(TEST_L3G4200D_I2C))
   CFLAGS += -DTEST_L3G4200D_I2C=$(TEST_L3G4200D_I2C)
@@ -22,13 +22,13 @@ ifneq (,$(TEST_L3G4200D_INT))
   CFLAGS += -DTEST_L3G4200D_INT=$(TEST_L3G4200D_INT)
 else
   # set random default
-  CFLAGS += -DTEST_L3G4200D_INT=GPIO\(0,0\)
+  CFLAGS += -DTEST_L3G4200D_INT=GPIO_PIN\(0,0\)
 endif
 ifneq (,$(TEST_L3G4200D_DRDY))
   CFLAGS += -DTEST_L3G4200D_DRDY=$(TEST_L3G4200D_DRDY)
 else
   # set random default
-  CFLAGS += -DTEST_L3G4200D_DRDY=GPIO\(0,1\)
+  CFLAGS += -DTEST_L3G4200D_DRDY=GPIO_PIN\(0,1\)
 endif
 
 include $(RIOTBASE)/Makefile.include

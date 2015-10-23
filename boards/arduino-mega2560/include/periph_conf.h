@@ -64,6 +64,8 @@ extern "C" {
 #define TIMER0_COMP_B_EN    OCIE1B
 #define TIMER0_COMP_C_EN    OCIE1C
 #define TIMER0_FREQ_16MHZ   (0 << CS12) | (0 << CS11) | (1 << CS10)
+#define TIMER0_FREQ_2MHZ    (0 << CS12) | (1 << CS11) | (0 << CS10)
+#define TIMER0_FREQ_250KHZ  (0 << CS12) | (1 << CS11) | (1 << CS10)
 #define TIMER0_FREQ_DISABLE (0 << CS12) | (0 << CS11) | (0 << CS10)
 #define TIMER0_COMPA_ISR    TIMER1_COMPA_vect
 #define TIMER0_COMPB_ISR    TIMER1_COMPB_vect
@@ -90,6 +92,8 @@ extern "C" {
 #define TIMER1_COMP_B_EN    OCIE3B
 #define TIMER1_COMP_C_EN    OCIE3C
 #define TIMER1_FREQ_16MHZ   (0 << CS32) | (0 << CS31) | (1 << CS30)
+#define TIMER1_FREQ_2MHZ    (0 << CS32) | (1 << CS31) | (0 << CS30)
+#define TIMER1_FREQ_250KHZ  (0 << CS32) | (1 << CS31) | (1 << CS30)
 #define TIMER1_FREQ_DISABLE (0 << CS32) | (0 << CS31) | (0 << CS30)
 #define TIMER1_COMPA_ISR    TIMER3_COMPA_vect
 #define TIMER1_COMPB_ISR    TIMER3_COMPB_vect
@@ -116,6 +120,8 @@ extern "C" {
 #define TIMER2_COMP_B_EN    OCIE4B
 #define TIMER2_COMP_C_EN    OCIE4C
 #define TIMER2_FREQ_16MHZ   (0 << CS42) | (0 << CS41) | (1 << CS40)
+#define TIMER2_FREQ_2MHZ    (0 << CS42) | (1 << CS41) | (0 << CS40)
+#define TIMER2_FREQ_250KHZ  (0 << CS42) | (1 << CS41) | (1 << CS40)
 #define TIMER2_FREQ_DISABLE (0 << CS42) | (0 << CS41) | (0 << CS40)
 #define TIMER2_COMPA_ISR    TIMER4_COMPA_vect
 #define TIMER2_COMPB_ISR    TIMER4_COMPB_vect

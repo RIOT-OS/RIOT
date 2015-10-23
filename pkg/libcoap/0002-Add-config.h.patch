@@ -1,7 +1,7 @@
 From 8be22676f13bd7d254378e2c04119e1632ed55d7 Mon Sep 17 00:00:00 2001
 From: Martine Lenders <mlenders@inf.fu-berlin.de>
 Date: Thu, 31 Oct 2013 14:02:07 +0100
-Subject: [PATCH 2/8] Add config.h
+Subject: [PATCH 2/9] Add config.h
 
 ---
  config.h | 131 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

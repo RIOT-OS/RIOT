@@ -15,7 +15,7 @@
  * @file
  * @brief           Implementation of stack smashing protection helper functions used by GCC's -fstack-protector
  *
- * @author          Joakim Gebart <joakim.gebart@eistec.se>
+ * @author          Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
 void *__stack_chk_guard = 0;

@@ -15,7 +15,7 @@
  * @file
  * @brief       Board specific definitions for the Eistec Mulle IoT board
  *
- * @author      Joakim Gebart <joakim.gebart@eistec.se>
+ * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
 #ifndef BOARD_H_
@@ -23,6 +23,7 @@
 
 #include "cpu.h"
 #include "periph_conf.h"
+#include "mulle-nvram.h"
 
 /* Use the on board RTC 32kHz clock for LPTMR clocking. */
 #undef LPTIMER_CLKSRC
@@ -31,18 +32,6 @@
 
 /** Disable hardware watchdog, for debugging purposes, don't use this on production builds. */
 #define DISABLE_WDOG    1
-
-/**
- * @name Assign the first hardware timer.
- * This timer will be used to implement an absolute reference for hwtimer_now() et al.
- */
-#define HW_TIMER            TIMER_0
-
-/**
- * @name Number of subsequent channels of the PIT to assign to the RIOT hardware
- * timer library, starting after the HW_TIMER above.
- */
-#define HW_TIMERS_COUNT      1
 
 /**
  * @name Define UART device and baudrate for stdio
@@ -130,6 +119,17 @@ void board_init(void);
 #define MULLE_POWER_AVDD    GPIO_6 /**< AVDD enable pin */
 #define MULLE_POWER_VPERIPH GPIO_7 /**< VPERIPH enable pin */
 #define MULLE_POWER_VSEC    GPIO_5 /**< VSEC enable pin */
+/** @} */
+
+/**
+ * @name Mulle NVRAM hardware configuration
+ */
+/** @{ */
+/** FRAM SPI bus, SPI_2 in RIOT is mapped to hardware bus SPI0, see periph_conf.h */
+#define MULLE_NVRAM_SPI_DEV           SPI_2
+#define MULLE_NVRAM_SPI_CS            GPIO_16 /**< FRAM CS pin */
+#define MULLE_NVRAM_CAPACITY          512     /**< FRAM size, in bytes */
+#define MULLE_NVRAM_SPI_ADDRESS_COUNT 1       /**< FRAM addressing size, in bytes */
 /** @} */
 
 /**

@@ -32,7 +32,7 @@
 #define GPIO_OFFSET_PORT_H      (0xCB)
 #define GPIO_OFFSET_PIN_PORT    (0x02)
 #define GPIO_OFFSET_PIN_PIN     (0x03)
-#define GPIO_EXT_INT_NUMOF      (7U)
+#define GPIO_EXT_INT_NUMOF      (8U)
 
 typedef struct {
     gpio_cb_t cb;
@@ -215,7 +215,9 @@ void gpio_write(gpio_t pin, int value)
 
 static inline void irq_handler(uint8_t pin_num)
 {
+    __enter_isr();
     config[pin_num].cb(config[pin_num].arg);
+    __exit_isr();
 }
 
 ISR(INT0_vect, ISR_BLOCK)

@@ -102,7 +102,6 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
     USART_TypeDef *dev;
     uint32_t bus_freq;
     gpio_t rx_pin, tx_pin;
-    float divider;
     uint16_t mantissa;
     uint8_t fraction;
 
@@ -136,9 +135,9 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
     gpio_init(rx_pin, GPIO_DIR_IN, GPIO_NOPULL);
 
     /* configure UART to mode 8N1 with given baudrate */
-    divider = ((float)bus_freq) / (16 * baudrate);
-    mantissa = (uint16_t)floorf(divider);
-    fraction = (uint8_t)floorf((divider - mantissa) * 16);
+    bus_freq /= baudrate;
+    mantissa = (uint16_t)(bus_freq / 16);
+    fraction = (uint8_t)(bus_freq - (mantissa * 16));
     dev->BRR = 0;
     dev->BRR |= ((mantissa & 0x0fff) << 4) | (0x0f & fraction);
 

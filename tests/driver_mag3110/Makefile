@@ -4,7 +4,7 @@ include ../Makefile.tests_common
 FEATURES_REQUIRED = periph_i2c
 
 USEMODULE += mag3110
-USEMODULE += vtimer
+USEMODULE += xtimer
 
 ifneq (,$(TEST_MAG3110_I2C))
   CFLAGS += -DTEST_MAG3110_I2C=$(TEST_MAG3110_I2C)

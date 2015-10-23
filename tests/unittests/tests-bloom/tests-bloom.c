@@ -13,6 +13,7 @@
 
 #include "hashes.h"
 #include "bloom.h"
+#include "bitfield.h"
 
 #include "tests-bloom-sets.h"
 
@@ -22,33 +23,40 @@
 #define TESTS_BLOOM_NOT_IN_FILTER (996)
 #define TESTS_BLOOM_FALSE_POS_RATE_THR (0.005)
 
-static bloom_t *bloom;
+static bloom_t bloom;
+BITFIELD(bf, TESTS_BLOOM_BITS);
+hashfp_t hashes[TESTS_BLOOM_HASHF] = {
+                     (hashfp_t) fnv_hash,
+                     (hashfp_t) sax_hash,
+                     (hashfp_t) sdbm_hash,
+                     (hashfp_t) djb2_hash,
+                     (hashfp_t) kr_hash,
+                     (hashfp_t) dek_hash,
+                    };
 
 static void load_dictionary_fixture(void)
 {
     for (int i = 0; i < lenB; i++)
     {
-        bloom_add(bloom, (const uint8_t *) B[i], strlen(B[i]));
+        bloom_add(&bloom, (const uint8_t *) B[i], strlen(B[i]));
     }
 
 }
 
 static void set_up_bloom(void)
 {
-    bloom = bloom_new(TESTS_BLOOM_BITS, TESTS_BLOOM_HASHF, fnv_hash, sax_hash,
-            sdbm_hash, djb2_hash, kr_hash, dek_hash, rotating_hash,
-            one_at_a_time_hash);
+    bloom_init(&bloom, TESTS_BLOOM_BITS, bf, hashes, TESTS_BLOOM_HASHF);
 }
 
 static void tear_down_bloom(void)
 {
-    bloom_del(bloom);
+    bloom_del(&bloom);
 }
 
 static void test_bloom_parameters_bytes_hashf(void)
 {
-    TEST_ASSERT_EQUAL_INT(TESTS_BLOOM_BITS, bloom->m);
-    TEST_ASSERT_EQUAL_INT(TESTS_BLOOM_HASHF, bloom->k);
+    TEST_ASSERT_EQUAL_INT(TESTS_BLOOM_BITS, bloom.m);
+    TEST_ASSERT_EQUAL_INT(TESTS_BLOOM_HASHF, bloom.k);
 }
 
 static void test_bloom_based_on_dictionary_fixture(void)
@@ -61,7 +69,7 @@ static void test_bloom_based_on_dictionary_fixture(void)
 
     for (int i = 0; i < lenA; i++)
     {
-        if (bloom_check(bloom, (const uint8_t *) A[i], strlen(A[i])))
+        if (bloom_check(&bloom, (const uint8_t *) A[i], strlen(A[i])))
         {
             in++;
         }

@@ -97,7 +97,7 @@ static void _mtu_usage(char *cmd_name)
 
 static void _flag_usage(char *cmd_name)
 {
-    printf("usage: %s <if_id> [-]{promisc|autoack|csma|autocca|preload|6lo|iphc}\n", cmd_name);
+    printf("usage: %s <if_id> [-]{promisc|autoack|csma|autocca|preload|iphc}\n", cmd_name);
 }
 
 static void _add_usage(char *cmd_name)
@@ -326,6 +326,11 @@ static void _netif_list(kernel_pid_t dev)
     }
 
 #ifdef MODULE_GNRC_IPV6_NETIF
+    if (entry == NULL) {
+        puts("");
+        return;
+    }
+
     printf("Link type: %s", (entry->flags & GNRC_IPV6_NETIF_FLAGS_IS_WIRED) ?
            "wired" : "wireless");
     printf("\n           ");
@@ -584,37 +589,6 @@ static int _netif_flag(char *cmd, kernel_pid_t dev, char *flag)
     else if (strcmp(flag, "autocca") == 0) {
         return _netif_set_flag(dev, NETOPT_AUTOCCA, set);
     }
-    else if (strcmp(flag, "6lo") == 0) {
-#ifdef MODULE_GNRC_IPV6_NETIF
-        gnrc_ipv6_netif_t *entry = gnrc_ipv6_netif_get(dev);
-
-        if (entry == NULL) {
-            puts("error: unable to (un)set 6LoWPAN support");
-            return 1;
-        }
-
-        mutex_lock(&entry->mutex);
-
-        if (set) {
-            entry->flags |= GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN;
-            printf("success: set 6LoWPAN support on interface %" PRIkernel_pid
-                   "\n", dev);
-        }
-        else {
-            entry->flags &= ~GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN;
-            printf("success: unset 6LoWPAN support on interface %" PRIkernel_pid
-                   "\n", dev);
-        }
-
-        mutex_unlock(&entry->mutex);
-
-        return 0;
-#else
-        puts("error: unable to (un)set 6LoWPAN support");
-
-        return 1;
-#endif
-    }
     else if (strcmp(flag, "iphc") == 0) {
 #if defined(MODULE_GNRC_SIXLOWPAN_NETIF) && defined(MODULE_GNRC_SIXLOWPAN_IPHC)
         gnrc_sixlowpan_netif_t *entry = gnrc_sixlowpan_netif_get(dev);
@@ -708,8 +682,7 @@ static int _netif_add(char *cmd_name, kernel_pid_t dev, int argc, char **argv)
         return 1;
     }
 
-    if (gnrc_ipv6_netif_add_addr(dev, &addr, prefix_len,
-                                 (type == _ANYCAST) ?
+    if (gnrc_ipv6_netif_add_addr(dev, &addr, prefix_len, (type == _ANYCAST) ?
                                  GNRC_IPV6_NETIF_ADDR_FLAGS_NON_UNICAST :
                                  GNRC_IPV6_NETIF_ADDR_FLAGS_UNICAST) == NULL) {
         printf("error: unable to add IPv6 address\n");
@@ -827,7 +800,11 @@ int _netif_send(int argc, char **argv)
     gnrc_netif_hdr_set_dst_addr(nethdr, addr, addr_len);
     nethdr->flags = flags;
     /* and send it */
-    gnrc_netapi_send(dev, pkt);
+    if (gnrc_netapi_send(dev, pkt) < 1) {
+        puts("error: unable to send\n");
+        gnrc_pktbuf_release(pkt);
+        return 1;
+    }
 
     return 0;
 }

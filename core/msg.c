@@ -22,6 +22,7 @@
 
 #include <stddef.h>
 #include <inttypes.h>
+#include <assert.h>
 #include "kernel.h"
 #include "sched.h"
 #include "msg.h"
@@ -77,7 +78,7 @@ int msg_try_send(msg_t *m, kernel_pid_t target_pid)
 
 static int _msg_send(msg_t *m, kernel_pid_t target_pid, bool block, unsigned state)
 {
-#if DEVELHELP
+#ifdef DEVELHELP
     if (!pid_is_valid(target_pid)) {
         DEBUG("msg_send(): target_pid is invalid, continuing anyways\n");
     }
@@ -94,17 +95,17 @@ static int _msg_send(msg_t *m, kernel_pid_t target_pid, bool block, unsigned sta
     }
 
     DEBUG("msg_send() %s:%i: Sending from %" PRIkernel_pid " to %" PRIkernel_pid
-          ". block=%i src->state=%i target->state=%i\n", __FILE__, __LINE__,
-          sched_active_pid, target_pid,
+          ". block=%i src->state=%i target->state=%i\n", RIOT_FILE_RELATIVE,
+          __LINE__, sched_active_pid, target_pid,
           block, sched_active_thread->status, target->status);
 
     if (target->status != STATUS_RECEIVE_BLOCKED) {
         DEBUG("msg_send() %s:%i: Target %" PRIkernel_pid " is not RECEIVE_BLOCKED.\n",
-              __FILE__, __LINE__, target_pid);
+              RIOT_FILE_RELATIVE, __LINE__, target_pid);
 
         if (queue_msg(target, m)) {
             DEBUG("msg_send() %s:%i: Target %" PRIkernel_pid
-                  " has a msg_queue. Queueing message.\n", __FILE__,
+                  " has a msg_queue. Queueing message.\n", RIOT_FILE_RELATIVE,
                   __LINE__, target_pid);
             restoreIRQ(state);
             if (sched_active_thread->status == STATUS_REPLY_BLOCKED) {
@@ -179,7 +180,7 @@ int msg_send_to_self(msg_t *m)
 
 int msg_send_int(msg_t *m, kernel_pid_t target_pid)
 {
-#if DEVELHELP
+#ifdef DEVELHELP
     if (!pid_is_valid(target_pid)) {
         DEBUG("msg_send(): target_pid is invalid, continuing anyways\n");
     }
@@ -214,6 +215,7 @@ int msg_send_int(msg_t *m, kernel_pid_t target_pid)
 
 int msg_send_receive(msg_t *m, msg_t *reply, kernel_pid_t target_pid)
 {
+    assert(sched_active_pid != target_pid);
     unsigned state = disableIRQ();
     tcb_t *me = (tcb_t*) sched_threads[sched_active_pid];
     sched_set_status(me, STATUS_REPLY_BLOCKED);

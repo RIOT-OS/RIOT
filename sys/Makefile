@@ -1,5 +1,8 @@
-ifneq (,$(filter pnet,$(USEMODULE)))
-    DIRS += posix/pnet
+ifneq (,$(filter posix_semaphore,$(USEMODULE)))
+    DIRS += posix/semaphore
+endif
+ifneq (,$(filter posix_sockets,$(USEMODULE)))
+    DIRS += posix/sockets
 endif
 ifneq (,$(filter pthread,$(USEMODULE)))
     DIRS += posix/pthread
@@ -52,11 +55,11 @@ endif
 ifneq (,$(filter sixlowpan,$(USEMODULE)))
     DIRS += net/network_layer/sixlowpan
 endif
-ifneq (,$(filter hwtimer_compat,$(USEMODULE)))
-    DIRS += compat/hwtimer
-endif
 ifneq (,$(filter log_%,$(USEMODULE)))
     DIRS += log
+endif
+ifneq (,$(filter vtimer,$(USEMODULE)))
+    DIRS += compat/vtimer
 endif
 ifneq (,$(filter cpp11-compat,$(USEMODULE)))
     DIRS += cpp11-compat
@@ -67,6 +70,9 @@ endif
 
 ifneq (,$(filter netopt,$(USEMODULE)))
     DIRS += net/crosslayer/netopt
+endif
+ifneq (,$(filter sem,$(USEMODULE)))
+    DIRS += sem
 endif
 
 DIRS += $(dir $(wildcard $(addsuffix /Makefile, ${USEMODULE})))

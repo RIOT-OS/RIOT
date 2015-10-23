@@ -195,6 +195,7 @@ gnrc_pktsnip_t *gnrc_sixlowpan_nd_opt_ar_build(uint8_t status, uint16_t ltime, e
  * @param[in] ipv6          The IPv6 header the ARO was received in.
  * @param[in] icmpv6_type   Message type of the ICMPv6 message that contained.
  *                          this message.
+ * @param[in] addr          The IPv6 address to register.
  * @param[in] ar_opt        The address registration option.
  * @param[in] sl2a          The link-layer source address contained in SL2A accompanying this
  *                          option. May be NULL for icmpv6_type == ICMPV6_NBR_ADV.
@@ -203,7 +204,8 @@ gnrc_pktsnip_t *gnrc_sixlowpan_nd_opt_ar_build(uint8_t status, uint16_t ltime, e
  * @return  Status for the ARO in the replying NA (always 0 if icmpv6_type == ICMPV6_NBR_ADV).
  */
 uint8_t gnrc_sixlowpan_nd_opt_ar_handle(kernel_pid_t iface, ipv6_hdr_t *ipv6,
-                                        uint8_t icmpv6_type, sixlowpan_nd_opt_ar_t *ar_opt,
+                                        uint8_t icmpv6_type, ipv6_addr_t *addr,
+                                        sixlowpan_nd_opt_ar_t *ar_opt,
                                         uint8_t *sl2a, size_t sl2a_len);
 
 /**

@@ -8,7 +8,7 @@
 
 /**
  * @defgroup    drivers_hdc1000 HDC1000 Humidity and Temperature Sensor
- * @ingroup     drivers
+ * @ingroup     drivers_sensors
  * @brief       Driver for the Texas Instruments HDC1000
  *              Humidity and Temperature Sensor.
  *              The driver will initialize the sensor for best

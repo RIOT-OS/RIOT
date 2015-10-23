@@ -43,7 +43,7 @@ typedef uint16_t gpio_t;
  * @brief   Mandatory function for defining a GPIO pins
  * @{
  */
-#define GPIO(x, y)          ((gpio_t)(((x & 0xff) << 8) | (1 << (y & 0xff))))
+#define GPIO_PIN(x, y)      ((gpio_t)(((x & 0xff) << 8) | (1 << (y & 0xff))))
 
 /**
  * @brief   Override direction values
@@ -88,6 +88,14 @@ enum {
  */
 void gpio_periph_mode(gpio_t pin, bool enable);
 
+/**
+ * @brief declare needed generic SPI functions
+ * @{
+ */
+#define PERIPH_SPI_NEEDS_TRANSFER_BYTES
+#define PERIPH_SPI_NEEDS_TRANSFER_REG
+#define PERIPH_SPI_NEEDS_TRANSFER_REGS
+/** @} */
 
 #ifdef __cplusplus
 }

@@ -146,11 +146,8 @@ typedef struct {
      */
     vtimer_t nbr_adv_timer;
 
-#ifdef MODULE_GNRC_SIXLOWPAN_ND
-    vtimer_t rtr_sol_timer; /**< Retransmission timer for unicast router solicitations */
-#endif
 #ifdef MODULE_GNRC_SIXLOWPAN_ND_ROUTER
-    vtimer_t type_timeout;                  /**< Timer for type transissions */
+    vtimer_t type_timeout;                  /**< Timer for type transmissions */
     eui64_t eui64;                          /**< the unique EUI-64 of the neighbor (might be
                                              *   different from L2 address, if l2_addr_len == 2) */
 #endif

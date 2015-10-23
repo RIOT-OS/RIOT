@@ -35,7 +35,7 @@ extern "C" {
 
 /**
  * @brief           Protype of a shell callback handler.
- * @details         The functions supplied to shell_init() must use this signature.
+ * @details         The functions supplied to shell_run() must use this signature.
  *                  The argument list is terminated with a NULL, i.e ``argv[argc] == NULL`.
  *                  ``argv[0]`` is the function name.
  *

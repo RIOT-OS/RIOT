@@ -36,6 +36,16 @@ extern "C" {
 #define F_CPU               CLOCK_CORECLOCK
 
 /**
+ * @name xtimer configuration
+ * @{
+ */
+#define XTIMER              TIMER_DEV(0)
+#define XTIMER_CHAN         (0)
+#define XTIMER_OVERHEAD     (6)
+#define XTIMER_BACKOFF      (3)
+/** @} */
+
+/**
  * @name Define the UART to be used as stdio and its baudrate
  * @{
  */
@@ -43,11 +53,6 @@ extern "C" {
 #define STDIO_BAUDRATE      (115200U)
 #define STDIO_RX_BUFSIZE    (64U)
 /** @} */
-
-/**
- * @name Assign the hardware timer
- */
-#define HW_TIMER            TIMER_0
 
 /**
  * @name LED pin definitions

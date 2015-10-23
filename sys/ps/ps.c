@@ -18,10 +18,13 @@
 #include <stdio.h>
 
 #include "thread.h"
-#include "hwtimer.h"
 #include "sched.h"
 #include "tcb.h"
 #include "kernel_types.h"
+
+#ifdef MODULE_SCHEDSTATISTICS
+#include "xtimer.h"
+#endif
 
 /* list of states copied from tcb.h */
 const char *state_names[] = {
@@ -53,7 +56,7 @@ void ps(void)
 #ifdef DEVELHELP
            "| stack ( used) | location   "
 #endif
-#if SCHEDSTATISTICS
+#ifdef MODULE_SCHEDSTATISTICS
            "| runtime | switches"
 #endif
            "\n",
@@ -75,8 +78,8 @@ void ps(void)
             stacksz -= thread_measure_stack_free(p->stack_start);
             overall_used += stacksz;
 #endif
-#if SCHEDSTATISTICS
-            double runtime_ticks =  sched_pidlist[i].runtime_ticks / (double) hwtimer_now() * 100;
+#ifdef MODULE_SCHEDSTATISTICS
+            double runtime_ticks =  sched_pidlist[i].runtime_ticks / (double) xtimer_now() * 100;
             int switches = sched_pidlist[i].schedules;
 #endif
             printf("\t%3" PRIkernel_pid
@@ -87,7 +90,7 @@ void ps(void)
 #ifdef DEVELHELP
                    " | %5i (%5i) | %p "
 #endif
-#if SCHEDSTATISTICS
+#ifdef MODULE_SCHEDSTATISTICS
                    " | %6.3f%% |  %8d"
 #endif
                    "\n",
@@ -99,7 +102,7 @@ void ps(void)
 #ifdef DEVELHELP
                    , p->stack_size, stacksz, p->stack_start
 #endif
-#if SCHEDSTATISTICS
+#ifdef MODULE_SCHEDSTATISTICS
                    , runtime_ticks, switches
 #endif
                   );

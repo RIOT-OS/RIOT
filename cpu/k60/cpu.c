@@ -17,7 +17,7 @@
  * @file
  * @brief       Implementation of K60 CPU initialization.
  *
- * @author      Joakim Gebart <joakim.gebart@eistec.se>
+ * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
 /** @brief Current core clock frequency */

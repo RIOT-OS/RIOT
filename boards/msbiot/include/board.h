@@ -36,19 +36,14 @@ extern "C" {
 #define F_CPU               CLOCK_CORECLOCK
 
 /**
- * @name Assign the hardware timer
- */
-#define HW_TIMER            TIMER_0
-
-/**
  * @name Configure connected CC1101 (radio) device
  * @{
  */
 #define CC110X_SPI          SPI_0
-#define CC110X_CS           GPIO(PORT_B, 12)
-#define CC110X_GDO0         GPIO(PORT_C, 4)
-#define CC110X_GDO1         GPIO(PORT_A, 6)
-#define CC110X_GDO2         GPIO(PORT_C, 5)
+#define CC110X_CS           GPIO_PIN(PORT_B, 12)
+#define CC110X_GDO0         GPIO_PIN(PORT_C, 4)
+#define CC110X_GDO1         GPIO_PIN(PORT_A, 6)
+#define CC110X_GDO2         GPIO_PIN(PORT_C, 5)
 /** @} */
 
 /**

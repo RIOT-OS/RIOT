@@ -23,9 +23,10 @@
 #ifndef FIB_H_
 #define FIB_H_
 
+#include <stdint.h>
+
 #include "net/fib/table.h"
 #include "kernel_types.h"
-#include "timex.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -59,7 +60,12 @@ typedef struct fib_destination_set_entry_t {
 /**
  * @brief indicator of a lifetime that does not expire (2^32 - 1)
  */
-#define FIB_LIFETIME_NO_EXPIRE (0xFFFFFFFF)
+#define FIB_LIFETIME_NO_EXPIRE (0xFFFFFFFFffffffff)
+
+/**
+ * @brief flag to identify if a route was set by RPL
+ */
+#define FIB_FLAG_RPL_ROUTE (1UL << 0)
 
 /**
  * @brief initializes all FIB entries with 0
@@ -80,6 +86,7 @@ void fib_deinit(fib_table_t *table);
 /**
  * @brief Registration of a routing protocol handler function
  *
+ * @param[in] table                 the fib table the RP should be registered to
  * @param[in] prefix                the prefix handled by the according RP
  * @param[in] prefix_addr_type_size the size of the address type used for the prefix
  *
@@ -88,7 +95,7 @@ void fib_deinit(fib_table_t *table);
  *           -EINVAL if the prefix is NULL or the provided size is 0
  *
  */
-int fib_register_rp(uint8_t *prefix, size_t prefix_addr_type_size);
+int fib_register_rp(fib_table_t *table, uint8_t *prefix, size_t prefix_addr_type_size);
 
 /**
  * @brief Adds a new entry in the corresponding FIB table for global destination and next hop
@@ -227,7 +234,7 @@ void fib_print_routes(fib_table_t *table);
  * @return 0             on success: entry for dst found and lifetime copied
  *         -EHOSTUNREACH if no fitting entry is available
  */
-int fib_devel_get_lifetime(fib_table_t *table, timex_t *lifetime, uint8_t *dst,
+int fib_devel_get_lifetime(fib_table_t *table, uint64_t *lifetime, uint8_t *dst,
                            size_t dst_size);
 
 #endif

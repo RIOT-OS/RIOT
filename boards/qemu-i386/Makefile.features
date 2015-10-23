@@ -1,1 +1,6 @@
+# Put defined MCU peripherals here (in alphabetical order)
+
+# Various other features (if any)
+
+# The board MPU family (used for grouping by the CI system)
 FEATURES_MCU_GROUP = x86

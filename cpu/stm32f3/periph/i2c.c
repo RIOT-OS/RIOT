@@ -227,12 +227,6 @@ static void _pin_config(GPIO_TypeDef *port_scl, GPIO_TypeDef *port_sda,
     }
 }
 
-int i2c_init_slave(i2c_t dev, uint8_t address)
-{
-    /* TODO: implement slave mode */
-    return -1;
-}
-
 int i2c_acquire(i2c_t dev)
 {
     if (dev >= I2C_NUMOF) {
@@ -539,7 +533,7 @@ void I2C_0_ERR_ISR(void)
     if (state & I2C_ISR_ALERT) {
         DEBUG("SMBALERT\n");
     }
-    core_panic(0x0,"I2C FAULT");
+    core_panic(PANIC_GENERAL_ERROR, "I2C FAULT");
 }
 #endif /* I2C_0_EN */
 

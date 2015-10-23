@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Ludwig Ortmann
+ * Copyright 2015 Ludwig Knüpfer
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -13,7 +13,7 @@
  * @file
  * @brief       Test application for the ISL29125 RGB light sensor
  *
- * @author      Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ * @author      Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  *
  * @}
  */
@@ -29,7 +29,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "vtimer.h"
+#include "xtimer.h"
 #include "isl29125.h"
 
 #define SLEEP       (250 * 1000U)
@@ -66,7 +66,7 @@ int main(void)
     for (int i = 0; i < sizeof(modes); i++) {
         printf("Setting mode %s\n", mode_names[i]);
         isl29125_set_mode(&dev, modes[i]);
-        vtimer_usleep(SLEEP);
+        xtimer_usleep(SLEEP);
         isl29125_read_rgb_color(&dev, &data8bit);
         printf("RGB value: (%3i / %3i / %3i) 8 bit\n",
                 data8bit.r, data8bit.g, data8bit.b);
@@ -74,12 +74,12 @@ int main(void)
 
     puts("Resetting mode to RGB and reading continuously");
     isl29125_set_mode(&dev, ISL29125_MODE_RGB);
-    vtimer_usleep(SLEEP);
+    xtimer_usleep(SLEEP);
     while (1) {
         isl29125_read_rgb_lux(&dev, &data);
         printf("RGB value: (%5i / %5i / %5i) lux\n",
                 (int)data.red, (int)data.green, (int)data.blue);
-        vtimer_usleep(SLEEP);
+        xtimer_usleep(SLEEP);
     }
 
     return 0;

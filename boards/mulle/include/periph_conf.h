@@ -14,7 +14,7 @@
  * @file
  * @name        Peripheral MCU configuration for the Eistec Mulle
  *
- * @author      Joakim Gebart <joakim.gebart@eistec.se>
+ * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
 #ifndef MULLE_PERIPH_CONF_H_
@@ -64,7 +64,7 @@ extern "C"
 #define TIMER_0_EN              1
 #define TIMER_1_EN              0
 #define TIMER_IRQ_PRIO          1
-#define TIMER_DEV               PIT
+#define TIMER_BASE              PIT
 #define TIMER_MAX_VALUE         (0xffffffff)
 #define TIMER_CLOCK             SystemBusClock
 #define TIMER_CLKEN()           (BITBAND_REG32(SIM->SCGC6, SIM_SCGC6_PIT_SHIFT) = 1)

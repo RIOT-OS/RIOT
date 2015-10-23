@@ -1,7 +1,7 @@
-From b2ad2073ac282f1bc6315e47ffbd12c3f6a9ae1a Mon Sep 17 00:00:00 2001
+From 8395cf4c5753569ed964794ab98ba2fcb8af250b Mon Sep 17 00:00:00 2001
 From: Hinnerk van Bruinehsen <h.v.bruinehsen@fu-berlin.de>
 Date: Wed, 29 Oct 2014 11:37:05 +0100
-Subject: [PATCH] Use RIOT's container_of implementation
+Subject: [PATCH 07/10] Use RIOT's container_of implementation
 
 ---
  src-api/common/container_of.h | 22 ++++++++++++++++++----
@@ -41,4 +41,4 @@ index fcb38fe..b49d836 100644
 
  /**
 --
-2.1.2
+1.9.1

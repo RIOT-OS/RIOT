@@ -35,7 +35,6 @@ extern "C" {
 #include "hw_types.h"
 #include "cortex-m4-def.h"
 #include "stellaris_periph/cpu.h"
-#include "stellaris_periph/debug.h"
 #include "stellaris_periph/interrupt.h"
 #include "stellaris_periph/sysctl.h"
 #include "stellaris_periph/adc.h"
@@ -45,7 +44,6 @@ extern "C" {
 #include "stellaris_periph/uart.h"
 #include "stellaris_periph/fpu.h"
 #include "stellaris_periph/rom.h"
-#include "hwtimer_cpu.h"
 #include "periph/uart.h"
 
 #ifdef CPU_MODEL_LM4F120H5QR

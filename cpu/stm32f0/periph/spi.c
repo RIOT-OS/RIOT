@@ -16,7 +16,7 @@
  * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
  * @author      Hauke Petersen <mail@haukepetersen.de>
  * @author      Fabian Nack <nack@inf.fu-berlin.de>
- * @author      Joakim Gebart <joakim.gebart@eistec.se>
+ * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  *
  * @}
  */
@@ -151,6 +151,7 @@ int spi_conf_pins(spi_t dev)
     for (int i = 0; i < 3; i++) {
         port->MODER &= ~(3 << (pin[i] * 2));
         port->MODER |= (2 << (pin[i] * 2));
+        port->OSPEEDR |= (3 << (pin[i] * 2));
         int hl = (pin[i] < 8) ? 0 : 1;
         port->AFR[hl] &= ~(0xf << ((pin[i] - (hl * 8)) * 4));
         port->AFR[hl] |= (af << ((pin[i] - (hl * 8)) * 4));

@@ -12,7 +12,7 @@
  * @file
  * @author      Jason Linehan <patientulysses@gmail.com>
  * @author      Christian Mehlis <mehlis@inf.fu-berlin.de>
- * @author      Joakim Gebart <joakim.gebart@eistec.se>
+ * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
 #include "hashes.h"

@@ -4,7 +4,7 @@ include ../Makefile.tests_common
 FEATURES_REQUIRED = periph_i2c
 
 USEMODULE += isl29125
-USEMODULE += vtimer
+USEMODULE += xtimer
 
 ifneq (,$(TEST_ISL29125_I2C))
   CFLAGS += -DTEST_ISL29125_I2C=$(TEST_ISL29125_I2C)
@@ -16,7 +16,7 @@ ifneq (,$(TEST_ISL29125_IRQ_PIN))
   CFLAGS += -DTEST_ISL29125_IRQ_PIN=$(TEST_ISL29125_IRQ_PIN)
 else
   # set random default
-  CFLAGS += -DTEST_ISL29125_IRQ_PIN=GPIO\(0,0\)
+  CFLAGS += -DTEST_ISL29125_IRQ_PIN=GPIO_PIN\(0,0\)
 endif
 
 include $(RIOTBASE)/Makefile.include

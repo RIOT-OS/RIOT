@@ -8,7 +8,7 @@
 
 /**
  * @defgroup    driver_encx24j600 ENCX24J600
- * @ingroup     drivers
+ * @ingroup     drivers_netdev
  * @brief       Driver for the ENCX24J600 Ethernet Adapter
  * @{
  *

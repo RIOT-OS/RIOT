@@ -38,7 +38,7 @@
 
 #if defined(MODULE_MSP430_COMMON)
 #   include "msp430_types.h"
-#elif !defined(CPU_NATIVE)
+#elif !defined(__linux__)
 #   include <sys/types.h>
 #endif
 

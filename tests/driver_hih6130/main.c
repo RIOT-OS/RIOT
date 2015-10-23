@@ -13,7 +13,7 @@
  * @file
  * @brief       Test application for the HIH6130 sensor driver
  *
- * @author      Joakim Gebart <joakim.gebart@eistec.se>
+ * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  *
  * @}
  */
@@ -29,7 +29,7 @@
 #include <stdlib.h>
 #include <math.h>
 
-#include "vtimer.h"
+#include "xtimer.h"
 #include "hih6130.h"
 
 #define SLEEP    (100 * 1000U)
@@ -58,7 +58,7 @@ int main(void)
         float integral = 0.f;
         float fractional;
 
-        vtimer_usleep(SLEEP);
+        xtimer_usleep(SLEEP);
 
         status = hih6130_get_humidity_temperature_float(&dev, &hum, &temp);
         if (status < 0) {

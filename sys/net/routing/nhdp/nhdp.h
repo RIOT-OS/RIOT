@@ -23,7 +23,6 @@
 
 #include "timex.h"
 #include "kernel_types.h"
-#include "socket_base/socket.h"
 
 #include "nhdp_metric.h"
 #include "rfc5444/rfc5444_writer.h"

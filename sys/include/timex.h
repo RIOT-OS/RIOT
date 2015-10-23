@@ -44,6 +44,11 @@ extern "C" {
 #define MS_IN_USEC  (1000U)
 
 /**
+ * @brief The number of nanoseconds per microsecond
+ */
+#define USEC_IN_NS  (1000)
+
+/**
  * @brief The maximum length of the string representation of a timex timestamp
  */
 #define TIMEX_MAX_STR_LEN   (20)

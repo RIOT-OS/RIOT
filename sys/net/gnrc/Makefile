@@ -1,3 +1,12 @@
+ifneq (,$(filter gnrc_conn,$(USEMODULE)))
+    DIRS += conn
+endif
+ifneq (,$(filter gnrc_conn_ip,$(USEMODULE)))
+    DIRS += conn/ip
+endif
+ifneq (,$(filter gnrc_conn_udp,$(USEMODULE)))
+    DIRS += conn/udp
+endif
 ifneq (,$(filter gnrc_icmpv6,$(USEMODULE)))
     DIRS += network_layer/icmpv6
 endif
@@ -18,6 +27,9 @@ ifneq (,$(filter gnrc_ipv6_nc,$(USEMODULE)))
 endif
 ifneq (,$(filter gnrc_ipv6_netif,$(USEMODULE)))
     DIRS += network_layer/ipv6/netif
+endif
+ifneq (,$(filter gnrc_ipv6_whitelist,$(USEMODULE)))
+    DIRS += network_layer/ipv6/whitelist
 endif
 ifneq (,$(filter gnrc_ndp,$(USEMODULE)))
     DIRS += network_layer/ndp

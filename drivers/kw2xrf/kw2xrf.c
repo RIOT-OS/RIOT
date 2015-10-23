@@ -14,6 +14,7 @@
  *
  * @author      Johann Fischer <j.fischer@phytec.de>
  * @author      Jonas Remmert <j.remmert@phytec.de>
+ * @author      Oliver Hahm <oliver.hahm@inria.fr>
  * @}
  */
 #include "panic.h"
@@ -170,7 +171,7 @@ void kw2xrf_set_sequence(kw2xrf_t *dev, kw2xrf_physeq_t seq)
         /* At 10MHz SPI-Clock, 40000 should be in the magnitue of 0.1s */
         if (max_tries == 40000) {
             DEBUG("kw2xrf_error: device does not finish sequence\n");
-            core_panic(-EBUSY, "kw2xrf_error: device does not finish sequence");
+            core_panic(PANIC_GENERAL_ERROR, "kw2xrf_error: device does not finish sequence");
         }
 
 #endif
@@ -397,7 +398,7 @@ int kw2xrf_init(kw2xrf_t *dev, spi_t spi, spi_speed_t spi_speed,
     kw2xrf_spi_init(spi, spi_speed, cs_pin);
 
     if (kw2xrf_on(dev) != 0) {
-        core_panic(0x42, "Could not start MKW2XD radio transceiver");
+        core_panic(PANIC_GENERAL_ERROR, "Could not start MKW2XD radio transceiver");
     }
 
     /* General initialization of interrupt sources.
@@ -434,7 +435,7 @@ int kw2xrf_init(kw2xrf_t *dev, spi_t spi, spi_speed_t spi_speed,
     /* copy and set long address */
     memcpy(&addr_long, cpuid, 8);
     kw2xrf_set_addr_long(dev, NTOHLL(addr_long.uint64.u64));
-    kw2xrf_set_addr(dev, NTOHS(addr_long.uint16[3].u16));
+    kw2xrf_set_addr(dev, NTOHS(addr_long.uint16[0].u16));
 #else
     kw2xrf_set_addr_long(dev, KW2XRF_DEFAULT_SHORT_ADDR);
     kw2xrf_set_addr(dev, KW2XRF_DEFAULT_ADDR_LONG);
@@ -496,6 +497,11 @@ int kw2xrf_rem_cb(gnrc_netdev_t *dev, gnrc_netdev_event_cb_t cb)
     return 0;
 }
 
+uint16_t kw2xrf_get_addr_short(kw2xrf_t *dev)
+{
+    return (dev->addr_short[0] << 8) | dev->addr_short[1];
+}
+
 uint64_t kw2xrf_get_addr_long(kw2xrf_t *dev)
 {
     uint64_t addr;
@@ -522,7 +528,7 @@ int kw2xrf_get(gnrc_netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
                 return -EOVERFLOW;
             }
 
-            *((uint16_t *)value) = ((dev->addr_short[0] << 8) | dev->addr_short[1]);
+            *((uint16_t *)value) = kw2xrf_get_addr_short(dev);
             return sizeof(uint16_t);
 
         case NETOPT_ADDRESS_LONG:
@@ -562,6 +568,20 @@ int kw2xrf_get(gnrc_netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
 
             *((uint16_t *)value) = dev->radio_pan;
             return sizeof(uint16_t);
+
+        case NETOPT_IPV6_IID:
+            if (max_len < sizeof(eui64_t)) {
+                return -EOVERFLOW;
+            }
+            if (dev->option & KW2XRF_OPT_SRC_ADDR_LONG) {
+                uint64_t addr = kw2xrf_get_addr_long(dev);
+                ieee802154_get_iid(value, (uint8_t *)&addr, 8);
+            }
+            else {
+                uint16_t addr = kw2xrf_get_addr_short(dev);
+                ieee802154_get_iid(value, (uint8_t *)&addr, 2);
+            }
+            return sizeof(eui64_t);
 
         case NETOPT_CHANNEL:
             return kw2xrf_get_channel(dev, (uint8_t *)value, max_len);
@@ -1044,7 +1064,6 @@ void kw2xrf_isr_event(gnrc_netdev_t *netdev, uint32_t event_type)
 int _assemble_tx_buf(kw2xrf_t *dev, gnrc_pktsnip_t *pkt)
 {
     gnrc_netif_hdr_t *hdr;
-    hdr = (gnrc_netif_hdr_t *)pkt->data;
     int index = 0;
 
     if (dev == NULL) {
@@ -1068,9 +1087,6 @@ int _assemble_tx_buf(kw2xrf_t *dev, gnrc_pktsnip_t *pkt)
     }*/
     dev->buf[1] = 0x51;
 
-    /* set sequence number */
-    dev->buf[3] = dev->seq_nr++;
-
     index = 4;
 
     /* set destination pan_id */
@@ -1080,45 +1096,57 @@ int _assemble_tx_buf(kw2xrf_t *dev, gnrc_pktsnip_t *pkt)
     /* fill in destination address */
     if (hdr->flags &
         (GNRC_NETIF_HDR_FLAGS_BROADCAST | GNRC_NETIF_HDR_FLAGS_MULTICAST)) {
-        dev->buf[2] = 0x88;
+        dev->buf[2] = IEEE802154_FCF_DST_ADDR_SHORT;
         dev->buf[index++] = 0xff;
         dev->buf[index++] = 0xff;
-        /* set source address */
-        dev->buf[index++] = (uint8_t)(dev->addr_short[0]);
-        dev->buf[index++] = (uint8_t)(dev->addr_short[1]);
     }
     else if (hdr->dst_l2addr_len == 2) {
         /* set to short addressing mode */
-        dev->buf[2] = 0x88;
+        dev->buf[2] = IEEE802154_FCF_DST_ADDR_SHORT;
         /* set destination address, byte order is inverted */
-        dev->buf[index++] = (gnrc_netif_hdr_get_dst_addr(hdr))[1];
-        dev->buf[index++] = (gnrc_netif_hdr_get_dst_addr(hdr))[0];
-        /* set source pan_id */
-        //dev->buf[index++] = (uint8_t)((dev->radio_pan) >> 8);
-        //dev->buf[index++] = (uint8_t)((dev->radio_pan) & 0xff);
-        /* set source address */
-        dev->buf[index++] = (uint8_t)(dev->addr_short[0]);
-        dev->buf[index++] = (uint8_t)(dev->addr_short[1]);
+        uint8_t *dst_addr = gnrc_netif_hdr_get_dst_addr(hdr);
+        dev->buf[index++] = dst_addr[1];
+        dev->buf[index++] = dst_addr[0];
     }
     else if (hdr->dst_l2addr_len == 8) {
         /* default to use long address mode for src and dst */
-        dev->buf[2] |= 0xcc;
+        dev->buf[2] |= IEEE802154_FCF_DST_ADDR_LONG;
         /* set destination address located directly after gnrc_ifhrd_t in memory */
-        memcpy(&(dev->buf)[index], gnrc_netif_hdr_get_dst_addr(hdr), 8);
-        index += 8;
-        /* set source pan_id, wireshark expects it there */
-        //dev->buf[index++] = (uint8_t)((dev->radio_pan) >> 8);
-        //dev->buf[index++] = (uint8_t)((dev->radio_pan) & 0xff);
-
-        /* set source address */
-        memcpy(&(dev->buf[index]), dev->addr_long, 8);
-        index += 8;
+        uint8_t *dst_addr = gnrc_netif_hdr_get_dst_addr(hdr);
+        for (int i = 7;  i >= 0; i--) {
+            dev->buf[index++] = dst_addr[i];
+        }
     }
     else {
         gnrc_pktbuf_release(pkt);
         return -ENOMSG;
     }
 
+    /* fill in source PAN ID (if applicable */
+    /* FIXME: compare with at86rf2xx, currently not working
+    if (dev->option & KW2XRF_OPT_USE_SRC_PAN) {
+        dev->buf[index++] = (uint8_t)((dev->radio_pan) & 0xff);
+        dev->buf[index++] = (uint8_t)((dev->radio_pan) >> 8);
+    } else {
+        dev->buf[1] |= IEEE802154_FCF_PAN_COMP;
+    }
+    */
+
+    /* insert source address according to length */
+    if (hdr->src_l2addr_len == 2) {
+        dev->buf[2] |= IEEE802154_FCF_SRC_ADDR_SHORT;
+        dev->buf[index++] = (uint8_t)(dev->addr_short[0]);
+        dev->buf[index++] = (uint8_t)(dev->addr_short[1]);
+    }
+    else {
+        dev->buf[2] |= IEEE802154_FCF_SRC_ADDR_LONG;
+        memcpy(&(dev->buf[index]), dev->addr_long, 8);
+        index += 8;
+    }
+    /* set sequence number */
+    dev->buf[3] = dev->seq_nr++;
+
+    /* return header size */
     return index;
 }
 

@@ -4,7 +4,7 @@ include ../Makefile.tests_common
 FEATURES_REQUIRED = periph_spi periph_gpio
 
 USEMODULE += nvram_spi
-USEMODULE += vtimer
+USEMODULE += xtimer
 
 ifneq (,$(TEST_NVRAM_SPI_DEV))
   CFLAGS += -DTEST_NVRAM_SPI_DEV=$(TEST_NVRAM_SPI_DEV)
@@ -16,7 +16,7 @@ ifneq (,$(TEST_NVRAM_SPI_CS))
   CFLAGS += -DTEST_NVRAM_SPI_CS=$(TEST_NVRAM_SPI_CS)
 else
   # set arbitrary default
-  CFLAGS += -DTEST_NVRAM_SPI_CS=GPIO\(0,0\)
+  CFLAGS += -DTEST_NVRAM_SPI_CS=GPIO_PIN\(0,0\)
 endif
 ifneq (,$(TEST_NVRAM_SPI_SIZE))
   CFLAGS += -DTEST_NVRAM_SPI_SIZE=$(TEST_NVRAM_SPI_SIZE)

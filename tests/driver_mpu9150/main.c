@@ -32,7 +32,7 @@
 #include <inttypes.h>
 
 #include "mpu9150.h"
-#include "vtimer.h"
+#include "xtimer.h"
 #include "board.h"
 
 #define SLEEP   (1000 * 1000u)
@@ -45,8 +45,6 @@ int main(void)
     int result;
 
     puts("MPU-9150 test application\n");
-
-    vtimer_init();
 
     printf("+------------Initializing------------+\n");
     result = mpu9150_init(&dev, TEST_I2C, TEST_HW_ADDR, TEST_COMP_ADDR);
@@ -100,7 +98,7 @@ int main(void)
         printf("Temperature [milli deg] : %ld\n", temperature);
         printf("\n+-------------------------------------+\n");
 
-        vtimer_usleep(SLEEP);
+        xtimer_usleep(SLEEP);
     }
 
     return 0;

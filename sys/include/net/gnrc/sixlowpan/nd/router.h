@@ -7,8 +7,8 @@
  */
 
 /**
- * @defgroup    gnrc_sixlowpan_nd_router    Router-part of 6LoWPAN-ND
- * @ingroup     gnrc_sixlowpan_nd
+ * @defgroup    net_gnrc_sixlowpan_nd_router    Router-part of 6LoWPAN-ND
+ * @ingroup     net_gnrc_sixlowpan_nd
  * @brief       Router-part of 6LoWPAN-ND
  * @{
  *
@@ -46,7 +46,9 @@ extern "C" {
  *          at maximum.
  */
 #ifndef GNRC_SIXLOWPAN_ND_ROUTER_ABR_PRF_NUMOF
-#define GNRC_SIXLOWPAN_ND_ROUTER_ABR_PRF_NUMOF   (GNRC_SIXLOWPAN_ND_ROUTER_ABR_NUMOF)
+/* One prefix per interface */
+#define GNRC_SIXLOWPAN_ND_ROUTER_ABR_PRF_NUMOF   \
+        (GNRC_SIXLOWPAN_ND_ROUTER_ABR_NUMOF * GNRC_NETIF_NUMOF)
 #endif
 
 /**
@@ -118,15 +120,7 @@ static inline void gnrc_sixlowpan_nd_router_set_router(gnrc_ipv6_netif_t *netif,
  * @param[in] netif     An IPv6 interface. Must not be NULL.
  * @param[in] enable    Status for the GNRC_IPV6_NETIF_FLAGS_RTR_ADV flag.
  */
-static inline void gnrc_sixlowpan_nd_router_set_rtr_adv(gnrc_ipv6_netif_t *netif, bool enable)
-{
-    if (enable) {
-        netif->flags |= GNRC_IPV6_NETIF_FLAGS_RTR_ADV;
-    }
-    else {
-        netif->flags &= ~GNRC_IPV6_NETIF_FLAGS_RTR_ADV;
-    }
-}
+void gnrc_sixlowpan_nd_router_set_rtr_adv(gnrc_ipv6_netif_t *netif, bool enable);
 
 /**
  * @brief   Get's the border router for this router.

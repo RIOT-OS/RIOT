@@ -29,7 +29,7 @@
 
 #include <stdio.h>
 
-#include "vtimer.h"
+#include "xtimer.h"
 #include "mag3110.h"
 
 #define SLEEP       (1000 * 1000U)
@@ -64,7 +64,7 @@ int main(void)
     }
 
     while (1) {
-        vtimer_usleep(SLEEP);
+        xtimer_usleep(SLEEP);
         mag3110_read(&dev, &x, &y, &z, &status);
         printf("Field strength: X: %d Y: %d Z: %d S: %2x\n", x, y, z, status);
         mag3110_read_dtemp(&dev, &temp);
