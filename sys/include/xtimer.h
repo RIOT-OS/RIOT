@@ -396,14 +396,90 @@ int xtimer_msg_receive_timeout64(msg_t *msg, uint64_t us);
 #define XTIMER_HZ (1000000ul)
 #endif
 
+#ifndef XTIMER_SHIFT
+/**
+ * @brief XTIMER_SHIFT is used when the timer frequency is a direct power-of-two
+ * multiple/division of 1000000
+ *
+ * Choose XTIMER_SHIFT so that
+ *
+ * XTIMER_HZ == 1000000 << XTIMER_SHIFT (if XTIMER_HZ > 1000000)
+ *
+ *  or
+ *
+ * XTIMER_HZ << XTIMER_SHIFT == 1000000 (if XTIMER_HZ < 1000000)
+ */
+
+#define XTIMER_SHIFT (0)
+#endif
+
 /* Some optimizations for common timer frequencies */
-#if XTIMER_HZ == (1000000ul)
+#if (XTIMER_SHIFT != 0)
+#if (XTIMER_HZ % 15625 != 0)
+#error XTIMER_HZ must be a multiple of 15625 (5^6) when using XTIMER_SHIFT
+#endif
+#if (XTIMER_HZ > 1000000ul)
+#if (XTIMER_HZ != (1000000ul << XTIMER_SHIFT))
+#error XTIMER_HZ != (1000000ul << XTIMER_SHIFT)
+#endif
+/* XTIMER_HZ is a power-of-two multiple of 1 MHz */
+/* e.g. cc2538 uses a 16 MHz timer */
+inline static uint32_t _xtimer_us_to_ticks(uint32_t us) {
+    return (us << XTIMER_SHIFT); /* multiply by power of two */
+}
+
+inline static uint64_t _xtimer_us_to_ticks64(uint64_t us) {
+    return (us << XTIMER_SHIFT); /* multiply by power of two */
+}
+
+inline static uint32_t _xtimer_ticks_to_us(uint32_t ticks) {
+    return (ticks >> XTIMER_SHIFT); /* divide by power of two */
+}
+
+inline static uint64_t _xtimer_ticks_to_us64(uint64_t ticks) {
+    return (ticks >> XTIMER_SHIFT); /* divide by power of two */
+}
+
+#else /* !(XTIMER_HZ > 1000000ul) */
+#if ((XTIMER_HZ << XTIMER_SHIFT) != 1000000ul)
+#error (XTIMER_HZ << XTIMER_SHIFT) != 1000000ul
+#endif
+/* 1 MHz is a power-of-two multiple of XTIMER_HZ */
+/* e.g. ATMega2560 uses a 250 kHz timer */
+inline static uint32_t _xtimer_us_to_ticks(uint32_t us) {
+    return (us >> XTIMER_SHIFT); /* divide by power of two */
+}
+
+inline static uint64_t _xtimer_us_to_ticks64(uint64_t us) {
+    return (us >> XTIMER_SHIFT); /* divide by power of two */
+}
+
+inline static uint32_t _xtimer_ticks_to_us(uint32_t ticks) {
+    return (ticks << XTIMER_SHIFT); /* multiply by power of two */
+}
+
+inline static uint64_t _xtimer_ticks_to_us64(uint64_t ticks) {
+    return (ticks << XTIMER_SHIFT); /* multiply by power of two */
+}
+#endif /* defined(XTIMER_SHIFT) && (XTIMER_SHIFT != 0) */
+#elif XTIMER_HZ == (1000000ul)
 /* This is the most straightforward as the xtimer API is based around
  * microseconds for representing time values. */
-#define _xtimer_us_to_ticks(us)    (us) /* no-op */
-#define _xtimer_ticks_to_us(ticks) (ticks) /* no-op */
-#define _xtimer_us_to_ticks64(us)    (us) /* no-op */
-#define _xtimer_ticks_to_us64(ticks) (ticks) /* no-op */
+inline static uint32_t _xtimer_us_to_ticks(uint32_t ticks) {
+    return ticks; /* no-op */
+}
+
+inline static uint32_t _xtimer_ticks_to_us(uint32_t ticks) {
+    return ticks; /* no-op */
+}
+
+inline static uint64_t _xtimer_us_to_ticks64(uint64_t us) {
+    return us; /* no-op */
+}
+
+inline static uint64_t _xtimer_ticks_to_us64(uint64_t us) {
+    return us; /* no-op */
+}
 
 #elif XTIMER_HZ == (32768ul)
 /* This is a common frequency for RTC crystals. We use the fact that the
@@ -430,26 +506,14 @@ inline static uint64_t _xtimer_ticks_to_us64(uint64_t ticks) {
     uint64_t us = (uint64_t)ticks * 15625ul;
     return (us >> 9); /* equivalent to (us / 512) */
 }
-#elif XTIMER_HZ == (250000ul)
-/* ATMega2560 uses 250 kHz timer ticks */
 
-inline static uint32_t _xtimer_us_to_ticks(uint32_t us) {
-    return (us >> 2); /* divide by four */
-}
-
-inline static uint64_t _xtimer_us_to_ticks64(uint64_t us) {
-    return (us >> 2); /* divide by four */
-}
-
-inline static uint32_t _xtimer_ticks_to_us(uint32_t ticks) {
-    return (us << 2); /* multiply by four */
-}
-
-inline static uint64_t _xtimer_ticks_to_us64(uint64_t ticks) {
-    return (us << 2); /* multiply by four */
-}
 #else
-#error Unknown hardware timer frequency (XTIMER_HZ), check periph_conf.h and/or add an implementation in xtimer.h
+/* No matching implementation found, try to give meaningful error messages */
+#if ((XTIMER_HZ % 15625) == 0)
+#error Unknown hardware timer frequency (XTIMER_HZ), missing XTIMER_SHIFT in board.h? See xtimer.h documentation for more info
+#else
+#error Unknown hardware timer frequency (XTIMER_HZ), check board.h and/or add an implementation in xtimer.h
+#endif
 #endif
 
 #if XTIMER_MASK
