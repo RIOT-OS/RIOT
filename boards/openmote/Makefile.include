@@ -21,8 +21,5 @@ export RESET_FLAGS = $(BINDIR)
 # setup serial terminal
 include $(RIOTBOARD)/Makefile.include.serial
 
-# this board uses openocd
-include $(RIOTBOARD)/Makefile.include.openocd
-
 # include cortex defaults
 include $(RIOTBOARD)/Makefile.include.cortexm_common
