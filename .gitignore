@@ -13,6 +13,7 @@ doc/doxygen/*.tmp
 *~
 *.orig
 .*.swp
+.tag*
 cachegrind.out*
 # Eclipse workspace files
 .project
