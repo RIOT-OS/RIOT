@@ -35,8 +35,6 @@ BOARD_PROVIDES_NETIF := airfy-beacon fox iotlab-m3 mulle native nrf51dongle \
 GNRC_NETIF_NUMOF = 2
 
 
-USEMODULE += shell
-USEMODULE += shell_commands
 USEMODULE += ps
 USEMODULE += config
 
@@ -49,7 +47,8 @@ USEMODULE += gnrc_pktdump
 USEMODULE += gnrc_sixlowpan_border_router_default
 USEMODULE += gnrc_icmpv6_echo
 
-
+USEMODULE += shell
+USEMODULE += shell_commands
 FEATURES_OPTIONAL += config
 FEATURES_OPTIONAL += periph_rtc
 
@@ -65,12 +64,12 @@ ifneq (,$(filter iotlab-m3,$(BOARD)))
 	USEMODULE += isl29020
 	USEMODULE += lps331ap
 	USEMODULE += l3g4200d
-	USEMODULE += lsm303dlhc
+    USEMODULE += lsm303dlhc
 endif
 ifneq (,$(filter fox,$(BOARD)))
         USEMODULE += lps331ap
         USEMODULE += l3g4200d
-	USEMODULE += lsm303dlhc
+        USEMODULE += lsm303dlhc
 endif
 
 include $(RIOTBASE)/Makefile.include

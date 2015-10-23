@@ -482,6 +482,9 @@ static int ksz8851snl_reset(ksz8851snl_t *dev)
 
 	/* Check for a valid Chip */
 	dev_id = reg_get(dev, CHIP_ID_REG);
+
+    DEBUG(SECT_NAME"Chip id: 0x%04X\n", dev_id);
+
 	if ((dev_id & 0xFFF0) == CHIP_ID_8851_16)
 		return 0;
 
