@@ -143,51 +143,30 @@ int _icmpv6_ping(int argc, char **argv)
     timex_t min_rtt = { UINT32_MAX, UINT32_MAX }, max_rtt = { 0, 0 };
     timex_t sum_rtt = { 0, 0 };
     timex_t start, stop;
+    int param_offset = 0;
 
-    switch (argc) {
-        case 0:
-        case 1:
+    if (argc < 2) {
+        usage(argv);
+        return 1;
+    }
+    else if ((count = atoi(argv[1])) > 0) {
+        if (argc < 3) {
             usage(argv);
             return 1;
+        }
+        param_offset = 1;
+    }
+    else {
+        count = 3;
+    }
 
-        case 2:
-            addr_str = argv[1];
-            break;
+    addr_str = argv[1 + param_offset];
 
-        case 3:
-            count = atoi(argv[1]);
-            if (count > 0) {
-                addr_str = argv[2];
-            }
-            else {
-                count = 3;
-                addr_str = argv[1];
-                payload_len = atoi(argv[2]);
-            }
-
-            break;
-
-        case 4:
-            count = atoi(argv[1]);
-            if (count > 0) {
-                addr_str = argv[2];
-                payload_len = atoi(argv[3]);
-            }
-            else {
-                count = 3;
-                addr_str = argv[1];
-                payload_len = atoi(argv[2]);
-                _a_to_timex(&delay, argv[3]);
-            }
-            break;
-
-        case 5:
-        default:
-            count = atoi(argv[1]);
-            addr_str = argv[2];
-            payload_len = atoi(argv[3]);
-            _a_to_timex(&delay, argv[4]);
-            break;
+    if (argc > (2 + param_offset)) {
+        payload_len = atoi(argv[2 + param_offset]);
+    }
+    if (argc > (3 + param_offset)) {
+        _a_to_timex(&delay, argv[3 + param_offset]);
     }
 
     if ((ipv6_addr_from_str(&addr, addr_str) == NULL) || (((int)payload_len) < 0)) {
