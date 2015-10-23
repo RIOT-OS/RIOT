@@ -80,6 +80,23 @@ typedef enum {
 } gpio_mux_t;
 
 /**
+ * @brief   PWM channel configuration data structure
+ */
+typedef struct {
+    gpio_t pin;                 /**< GPIO pin */
+    gpio_mux_t mux;             /**< pin function multiplex value */
+    uint8_t chan;               /**< TCC channel to use */
+} pwm_conf_chan_t;
+
+/**
+ * @brief   PWM device configuration data structure
+ */
+typedef struct {
+    Tcc *dev;                   /*< TCC device to use */
+    pwm_conf_chan_t chan[2];    /**< channel configuration */
+} pwm_conf_t;
+
+/**
  * @brief   UART device configuration
  */
 typedef struct {
