@@ -13,7 +13,7 @@
  * @file
  * @brief       LWM2M example implementation
  *
- * @author      Alexandru Razvan Caciulescu <alex.darredevil@gmail.com>
+ * @author      Alexandru Razvan Caciulescu <alexandru.razvan.c@gmail.com>
  * @author      Hauke Petersen <mail@haukepetersen.de>
  *
  * @}
@@ -21,16 +21,14 @@
 
 #include <stdio.h>
 
-#include "board_uart0.h"
 #include "shell.h"
 
 int main(void)
 {
-    shell_t shell;
 
     /* run the shell */
-    shell_init(&shell, NULL, UART0_BUFSIZE, getchar, putchar);
-    shell_run(&shell);
+    char line_buf[SHELL_DEFAULT_BUFSIZE];
+    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
 
     return 0;
 }

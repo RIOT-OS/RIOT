@@ -8,7 +8,6 @@ BOARD ?= native
 RIOTBASE ?= $(CURDIR)/../..
 
 # include the shell and shell commands
-USEMODULE += uart0
 USEMODULE += shell
 USEMODULE += shell_commands
 # include the LWM2M client adaption layer
