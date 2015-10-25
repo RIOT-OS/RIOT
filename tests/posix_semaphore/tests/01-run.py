@@ -89,6 +89,7 @@ def test4(term):
     term.expect_exact("######################### TEST4:")
     term.expect_exact("first: sem_init s1")
     term.expect_exact("first: wait 1 sec for s1")
+    term.expect_exact("first: timed out")
     term.expect(r"first: waited 1\.\d{6} s")
 
 if __name__ == "__main__":

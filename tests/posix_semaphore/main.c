@@ -46,7 +46,7 @@ static void *test1_second_thread(void *arg)
     msg_init_queue(test1_msg_queue, SEMAPHORE_MSG_QUEUE_SIZE);
     puts("second: sem_trywait");
 
-    if (sem_trywait(&s1) == 0) {
+    if (sem_trywait(&s1) < 0) {
         puts("second: sem_trywait failed");
     }
 
@@ -54,7 +54,7 @@ static void *test1_second_thread(void *arg)
 
     puts("second: wait for post");
 
-    if (sem_wait(&s1) != 1) {
+    if (sem_wait(&s1) < 0) {
         puts("second: sem_wait failed");
     }
 
@@ -68,7 +68,7 @@ static void test1(void)
 {
     puts("first: sem_init");
 
-    if (sem_init(&s1, 0, 0) != 0) {
+    if (sem_init(&s1, 0, 0) < 0) {
         puts("first: sem_init failed");
     }
 
@@ -88,7 +88,7 @@ static void test1(void)
     puts("first: sem_getvalue");
     int val;
 
-    if (sem_getvalue(&s1, &val) != 0 || val != 0) {
+    if (sem_getvalue(&s1, &val) < 0 || val != 0) {
         puts("first: sem_getvalue FAILED");
     }
 
@@ -102,7 +102,7 @@ static void test1(void)
 
     puts("first: sem_trywait");
 
-    if (sem_trywait(&s1) != -1) {
+    if (sem_trywait(&s1) < 0) {
         puts("first: sem_trywait FAILED");
     }
 
@@ -110,7 +110,7 @@ static void test1(void)
 
     puts("first: sem_post");
 
-    if (sem_post(&s1) != 1) {
+    if (sem_post(&s1) < 0) {
         puts("first: sem_post FAILED");
     }
 
@@ -120,7 +120,7 @@ static void test1(void)
 
     puts("first: sem_destroy");
 
-    if (sem_destroy(&s1) != 0) {
+    if (sem_destroy(&s1) < 0) {
         puts("first: sem_destroy FAILED");
     }
 
@@ -141,7 +141,7 @@ void test2(void)
 {
     puts("first: sem_init");
 
-    if (sem_init(&s1, 0, 0) != 0) {
+    if (sem_init(&s1, 0, 0) < 0) {
         puts("first: sem_init FAILED");
     }
 
@@ -201,11 +201,11 @@ static void *test3_two_one_thread(void *arg)
 void test3(void)
 {
     puts("first: sem_init s1");
-    if (sem_init(&s1, 0, 0) != 0) {
+    if (sem_init(&s1, 0, 0) < 0) {
         puts("first: sem_init FAILED");
     }
     puts("first: sem_init s2");
-    if (sem_init(&s2, 0, 0) != 0) {
+    if (sem_init(&s2, 0, 0) < 0) {
         puts("first: sem_init FAILED");
     }
     puts("first: create thread 1");
@@ -242,12 +242,20 @@ void test4(void)
     abs.tv_sec = now.seconds + 1;
     abs.tv_nsec = now.microseconds * 1000;
     puts("first: sem_init s1");
-    if (sem_init(&s1, 0, 0) != 0) {
+    if (sem_init(&s1, 0, 0) < 0) {
         puts("first: sem_init FAILED");
     }
     vtimer_now(&start);
     puts("first: wait 1 sec for s1");
-    sem_timedwait(&s1, &abs);
+    if (sem_timedwait(&s1, &abs) != 0) {
+        if (errno != ETIMEDOUT) {
+            printf("error waiting: %d\n", errno);
+            return;
+        }
+        else {
+            puts("first: timed out");
+        }
+    }
     vtimer_now(&stop);
     stop = timex_sub(stop, start);
     if (timex_cmp(stop, exp) < 0) {
