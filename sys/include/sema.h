@@ -73,7 +73,7 @@ int sema_destroy(sema_t *sema);
  * @pre Message queue of active thread is initialized (see @ref msg_init_queue()).
  *
  * @param[in]  sema     A semaphore.
- * @param[in]  timeout  Time until the semaphore times out. NULL for no timeout.
+ * @param[in]  timeout  Time in microseconds until the semaphore times out. 0 for no timeout.
  * @param[out] msg      Container for a spurious message during the timed wait (result == -EAGAIN).
  *
  * @return  0 on success
@@ -82,7 +82,7 @@ int sema_destroy(sema_t *sema);
  * @return  -ECANCELED, if the semaphore was destroyed.
  * @return  -EAGAIN, if the thread received a message while waiting for the lock.
  */
-int sema_wait_timed_msg(sema_t *sema, timex_t *timeout, msg_t *msg);
+int sema_wait_timed_msg(sema_t *sema, uint64_t timeout, msg_t *msg);
 
 /**
  * @brief   Wait for a semaphore being posted (without timeout).
@@ -97,7 +97,7 @@ int sema_wait_timed_msg(sema_t *sema, timex_t *timeout, msg_t *msg);
  */
 static inline int sema_wait_msg(sema_t *sema, msg_t *msg)
 {
-    return sema_wait_timed_msg(sema, NULL, msg);
+    return sema_wait_timed_msg(sema, 0, msg);
 }
 
 /**
@@ -105,14 +105,14 @@ static inline int sema_wait_msg(sema_t *sema, msg_t *msg)
  * @details Any spurious messages received while waiting for the semaphore are silently dropped.
  *
  * @param[in]  sema     A semaphore.
- * @param[in]  timeout  Time until the semaphore times out. NULL for no timeout.
+ * @param[in]  timeout  Time in microseconds until the semaphore times out. 0 for no timeout.
  *
  * @return  0 on success
  * @return  -EINVAL, if semaphore is invalid.
  * @return  -ETIMEDOUT, if the semaphore times out.
  * @return  -ECANCELED, if the semaphore was destroyed.
  */
-int sema_wait_timed(sema_t *sema, timex_t *timeout);
+int sema_wait_timed(sema_t *sema, uint64_t timeout);
 
 /**
  * @brief   Wait for a semaphore being posted (without timeout, dropping spurious messages).
@@ -125,7 +125,7 @@ int sema_wait_timed(sema_t *sema, timex_t *timeout);
  */
 static inline int sema_wait(sema_t *sema)
 {
-    return sema_wait_timed(sema, NULL);
+    return sema_wait_timed(sema, 0);
 }
 
 /**

@@ -22,7 +22,7 @@
 
 #include "irq.h"
 #include "msg.h"
-#include "vtimer.h"
+#include "xtimer.h"
 
 #include "sema.h"
 
@@ -63,7 +63,7 @@ int sema_destroy(sema_t *sema)
     return 0;
 }
 
-int sema_wait_timed_msg(sema_t *sema, timex_t *timeout, msg_t *msg)
+int sema_wait_timed_msg(sema_t *sema, uint64_t timeout, msg_t *msg)
 {
     if (sema == NULL) {
         return -EINVAL;
@@ -71,7 +71,8 @@ int sema_wait_timed_msg(sema_t *sema, timex_t *timeout, msg_t *msg)
     while (1) {
         unsigned old_state = disableIRQ();
         priority_queue_node_t n;
-        vtimer_t timeout_timer;
+        xtimer_t timeout_timer;
+        msg_t timeout_msg;
 
         unsigned value = sema->value;
         if (value != 0) {
@@ -89,19 +90,21 @@ int sema_wait_timed_msg(sema_t *sema, timex_t *timeout, msg_t *msg)
         DEBUG("sema_wait: %" PRIkernel_pid ": Adding node to semaphore queue: prio: %" PRIu32 "\n",
               sched_active_thread->pid, sched_active_thread->priority);
 
-        if (timeout != NULL) {
-            vtimer_set_msg(&timeout_timer, *timeout, sched_active_pid,
-                           MSG_TIMEOUT, sema);
+        if (timeout != 0) {
+            timeout_msg.type = MSG_TIMEOUT;
+            timeout_msg.content.ptr = (char *)sema;
+            /* we will stay in the same stack context so we can use timeout_msg */
+            xtimer_set_msg64(&timeout_timer, timeout, &timeout_msg, sched_active_pid);
         }
 
         restoreIRQ(old_state);
         msg_receive(msg);
 
-        if (timeout != NULL) {
-            vtimer_remove(&timeout_timer);  /* remove timer just to be sure */
+        if (timeout != 0) {
+            xtimer_remove(&timeout_timer);
         }
-
-        if (msg->content.ptr != (void *) sema) {
+        priority_queue_remove(&sema->queue, &n);
+        if (msg->content.ptr != (void *)sema) {
             return -EAGAIN;
         }
 
@@ -118,7 +121,7 @@ int sema_wait_timed_msg(sema_t *sema, timex_t *timeout, msg_t *msg)
     }
 }
 
-int sema_wait_timed(sema_t *sema, timex_t *timeout)
+int sema_wait_timed(sema_t *sema, uint64_t timeout)
 {
     int result;
     do {
