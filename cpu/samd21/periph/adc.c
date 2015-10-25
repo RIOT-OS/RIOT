@@ -91,14 +91,32 @@ int adc_sample(adc_t dev, int channel)
       return -1;
   }
 
-  /* select the input pin (and GND as negative mux) */
-  ADC->INPUTCTRL.reg = ADC_0_GAIN_FACTOR_DEFAULT | adc_config[channel].muxpos | ADC_INPUTCTRL_MUXNEG_IOGND;
+  // Select the inputs.
+  #if ADC_0_DIFFERENTIAL_MODE
+    /*  In differential mode, use ADC_0_POS_INPUT & ADC_0_NEG_INPUT
+     */
+    ADC->INPUTCTRL.reg = ADC_0_GAIN_FACTOR_DEFAULT
+                          /*| (ADC_0_PIN_SCAN_OFFSET_START << ADC_INPUTCTRL_INPUTOFFSET_Pos)
+                          | (ADC_0_PIN_SCAN_INPUT_TO_SCAN << ADC_INPUTCTRL_INPUTSCAN_Pos)*/
+                          | ADC_0_NEG_INPUT
+                          | ADC_0_POS_INPUT;
+  #else
+    /*  Otherwise, use the positive input corresponding to the provided arg
+     *  "channel", and use GND as the negative input.
+     */
+    ADC->INPUTCTRL.reg = ADC_0_GAIN_FACTOR_DEFAULT | adc_config[channel].muxpos | ADC_INPUTCTRL_MUXNEG_IOGND;
+  #endif
+
+  // Wait for sync.
   while (ADC->STATUS.reg & ADC_STATUS_SYNCBUSY);
-  /* start the conversion */
+
+  // Start the conversion.
   ADC->SWTRIG.reg = ADC_SWTRIG_START;
-  /* wait for the result */
+
+  // Wait for the result.
   while (!(ADC->INTFLAG.reg & ADC_INTFLAG_RESRDY));
-  /* read result */
+
+  // Read & return result.
   return (int)ADC->RESULT.reg;
 }
 
@@ -174,6 +192,22 @@ int adc_configure_with_resolution(Adc* adc, uint32_t precision)
                           | (ADC_GCLK_ID << GCLK_CLKCTRL_ID_Pos)));
 
     /* Pin Muxing */
+    #if ADC_0_DIFFERENTIAL_MODE
+    ADC_0_PORT.PINCFG[ ADC_0_POS_INPUT ].bit.PMUXEN = 1;
+    ADC_0_PORT.PMUX[ ADC_0_POS_INPUT / 2].bit.PMUXE = 1;
+
+    /* ADC_0_POS_INPUT Input */
+    ADC_0_PORT.DIRCLR.reg = (1 << ADC_0_POS_INPUT);
+    ADC_0_PORT.PINCFG[ADC_0_POS_INPUT].bit.INEN = true;
+    ADC_0_PORT.PINCFG[ADC_0_POS_INPUT].bit.PULLEN = false;
+
+    if(ADC_0_NEG_INPUT != ADC_INPUTCTRL_MUXNEG_GND)
+    {
+        ADC_0_PORT.DIRCLR.reg = (1 << ADC_0_NEG_INPUT);
+        ADC_0_PORT.PINCFG[ADC_0_NEG_INPUT].bit.INEN = true;
+        ADC_0_PORT.PINCFG[ADC_0_NEG_INPUT].bit.PULLEN = false;
+    }
+    #else
     for (int i = 0; i < ADC_0_CHANNELS; i++) {
        PortGroup *port = adc_config[i].port;
        int pin = adc_config[i].pin;
@@ -182,21 +216,8 @@ int adc_configure_with_resolution(Adc* adc, uint32_t precision)
        port->PMUX[pin >> 1].reg = ~(0xf << (4 * (pin & 0x1)));
        port->PMUX[pin >> 1].reg =  (1 << (4 * (pin & 0x1)));
     }
+    #endif
 
-    //ADC_0_PORT.PINCFG[ ADC_0_POS_INPUT ].bit.PMUXEN = 1;
-    //ADC_0_PORT.PMUX[ ADC_0_POS_INPUT / 2].bit.PMUXE = 1;
-
-    /* ADC_0_POS_INPUT Input */
-    //ADC_0_PORT.DIRCLR.reg = (1 << ADC_0_POS_INPUT);
-    //ADC_0_PORT.PINCFG[ADC_0_POS_INPUT].bit.INEN = true;
-    //ADC_0_PORT.PINCFG[ADC_0_POS_INPUT].bit.PULLEN = false;
-
-    /*if(ADC_0_NEG_INPUT != ADC_INPUTCTRL_MUXNEG_GND)
-    {
-        ADC_0_PORT.DIRCLR.reg = (1 << ADC_0_NEG_INPUT);
-        ADC_0_PORT.PINCFG[ADC_0_NEG_INPUT].bit.INEN = true;
-        ADC_0_PORT.PINCFG[ADC_0_NEG_INPUT].bit.PULLEN = false;
-    } */
 
     /* Set RUN_IN_STANDBY */
     adc->CTRLA.reg = (ADC_0_RUN_IN_STANDBY << ADC_CTRLA_RUNSTDBY_Pos);

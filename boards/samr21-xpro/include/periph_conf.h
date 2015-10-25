@@ -269,6 +269,12 @@ static const pwm_conf_t pwm_config[] = {
  * @ ADC Configuration
  * @{
  */
+typedef struct {
+    PortGroup *port;
+    uint8_t pin;
+    uint8_t muxpos;                 /* see datasheet sec 30.8.8 */
+} adc_conf_t;
+
 #define ADC_NUMOF                          (1U)
 #define ADC_0_EN                           1
 #define ADC_MAX_CHANNELS                   8
@@ -278,26 +284,6 @@ static const pwm_conf_t pwm_config[] = {
 #define ADC_0_PORT                         (PORT->Group[0])
 #define ADC_0_IRQ                          ADC_IRQn
 #define ADC_0_CHANNELS                     6 // ignore PA04 & PA05 due to EDBG UART conflict
-
-typedef struct {
-    PortGroup *port;
-    uint8_t pin;
-    uint8_t muxpos;                 /* see datasheet sec 30.8.8 */
-} adc_conf_t;
-
-#if ADC_0_CHANNELS
-static const adc_conf_t adc_config[] = {
-    /* port, pin, muxpos */
-    //{&PORT->Group[0], 4, 0x4}, // we cannot use these as well as use EDBG serial TX/RX
-    //{&PORT->Group[0], 5, 0x5}, // because PA04 & PA05 read/write directly to EDBG serial port.
-    {&PORT->Group[0], ADC_INPUTCTRL_MUXPOS_PIN6, 0x6},    // PA06
-    {&PORT->Group[0], ADC_INPUTCTRL_MUXPOS_PIN7, 0x7},    // PA07
-    {&PORT->Group[0], ADC_INPUTCTRL_MUXPOS_PIN16, 0x10},   // PA08
-    {&PORT->Group[0], ADC_INPUTCTRL_MUXPOS_PIN17, 0x11},   // PA09
-    {&PORT->Group[0], ADC_INPUTCTRL_MUXPOS_PIN10, 0xA},    // PB02
-    {&PORT->Group[0], ADC_INPUTCTRL_MUXPOS_PIN11, 0xB},    // PB03
-};
-#endif
 
 /* ADC 0 Default values */
 #define ADC_0_CLK_SOURCE                   0 /* GCLK_GENERATOR_0 */
@@ -323,11 +309,32 @@ static const adc_conf_t adc_config[] = {
 #define ADC_0_STATUS_WINDOW                (1UL << 1)
 #define ADC_0_STATUS_OVERRUN               (1UL << 2)
 
-/* ADC 0 Positive Input Pins */
-//#define ADC_0_POS_INPUT                    ADC_INPUTCTRL_MUXPOS_PIN6
+#if ADC_0_CHANNELS
+#if ADC_0_DIFFERENTIAL_MODE
+/*  In differential mode, we can only pick one positive
+ *  and one negative input.
+ */
+#define ADC_0_POS_INPUT                    ADC_INPUTCTRL_MUXPOS_PIN6
+#define ADC_0_NEG_INPUT                    ADC_INPUTCTRL_MUXNEG_PIN7
+#else
+/*  If we're not in differential mode, we can use any of
+ *  ADC positive input pins the SAMR21-XPRO provides.  Each pin is
+ *  a separate ADC "channel".
+ */
+static const adc_conf_t adc_config[] = {
+    /* port, pin, muxpos */
+    //{&PORT->Group[0], 4, 0x4}, // we cannot use these as well as use EDBG serial TX/RX
+    //{&PORT->Group[0], 5, 0x5}, // because PA04 & PA05 read/write directly to EDBG serial port.
+    {&PORT->Group[0], ADC_INPUTCTRL_MUXPOS_PIN6, 0x6},    // PA06
+    {&PORT->Group[0], ADC_INPUTCTRL_MUXPOS_PIN7, 0x7},    // PA07
+    {&PORT->Group[0], ADC_INPUTCTRL_MUXPOS_PIN16, 0x10},   // PA08
+    {&PORT->Group[0], ADC_INPUTCTRL_MUXPOS_PIN17, 0x11},   // PA09
+    {&PORT->Group[0], ADC_INPUTCTRL_MUXPOS_PIN10, 0xA},    // PB02
+    {&PORT->Group[0], ADC_INPUTCTRL_MUXPOS_PIN11, 0xB},    // PB03
+};
+#endif
+#endif
 
-/* ADC 0 Negative Input Pins */
-//#define ADC_0_NEG_INPUT                    ADC_INPUTCTRL_MUXNEG_GND
 
 /* ADC 0 Gain Factor */
 #define ADC_0_GAIN_FACTOR_1X               ADC_INPUTCTRL_GAIN_1X
