@@ -276,25 +276,46 @@ static const pwm_conf_t pwm_config[] = {
 /* ADC 0 device configuration */
 #define ADC_0_DEV                          ADC
 #define ADC_0_PORT                         (PORT->Group[0])
-#define ADC_0_IRQ                          ADC_IRQn     
-#define ADC_0_CHANNELS                     8
+#define ADC_0_IRQ                          ADC_IRQn
+#define ADC_0_CHANNELS                     6 // ignore PA04 & PA05 due to EDBG UART conflict
+
+typedef struct {
+    PortGroup *port;
+    uint8_t pin;
+    uint8_t muxpos;                 /* see datasheet sec 30.8.8 */
+} adc_conf_t;
+
+#if ADC_0_CHANNELS
+static const adc_conf_t adc_config[] = {
+    /* port, pin, muxpos */
+    //{&PORT->Group[0], 4, 0x4}, // we cannot use these as well as use EDBG serial TX/RX
+    //{&PORT->Group[0], 5, 0x5}, // because PA04 & PA05 read/write directly to EDBG serial port.
+    {&PORT->Group[0], ADC_INPUTCTRL_MUXPOS_PIN6, 0x6},    // PA06
+    {&PORT->Group[0], ADC_INPUTCTRL_MUXPOS_PIN7, 0x7},    // PA07
+    {&PORT->Group[0], ADC_INPUTCTRL_MUXPOS_PIN16, 0x10},   // PA08
+    {&PORT->Group[0], ADC_INPUTCTRL_MUXPOS_PIN17, 0x11},   // PA09
+    {&PORT->Group[0], ADC_INPUTCTRL_MUXPOS_PIN10, 0xA},    // PB02
+    {&PORT->Group[0], ADC_INPUTCTRL_MUXPOS_PIN11, 0xB},    // PB03
+};
+#endif
+
 /* ADC 0 Default values */
 #define ADC_0_CLK_SOURCE                   0 /* GCLK_GENERATOR_0 */
-#define ADC_0_PRESCALER                    ADC_CTRLB_PRESCALER_DIV4
+#define ADC_0_PRESCALER                    ADC_CTRLB_PRESCALER_DIV512
 #define ADC_0_WINDOW_MODE                  ADC_WINCTRL_WINMODE_DISABLE
 #define ADC_0_WINDOW_LOWER                 0
-#define ADC_0_WINDOW_HIGHER                0     
+#define ADC_0_WINDOW_HIGHER                0
 
 #define ADC_0_CORRECTION_EN                0 /* disabled */
 #define ADC_0_GAIN_CORRECTION              ADC_GAINCORR_RESETVALUE
 #define ADC_0_OFFSET_CORRECTION            ADC_OFFSETCORR_RESETVALUE
 #define ADC_0_SAMPLE_LENGTH                0
 #define ADC_0_PIN_SCAN_OFFSET_START        0 /* disabled */
-#define ADC_0_PIN_SCAN_INPUT_TO_SCAN       0 /* disabled */    
+#define ADC_0_PIN_SCAN_INPUT_TO_SCAN       0 /* disabled */
 #define ADC_0_LEFT_ADJUST                  0 /* disabled */
 #define ADC_0_DIFFERENTIAL_MODE            0 /* disabled */
 #define ADC_0_FREE_RUNNING                 0 /* disabled */
-#define ADC_0_EVENT_ACTION                 0 /* disabled */    
+#define ADC_0_EVENT_ACTION                 0 /* disabled */
 #define ADC_0_RUN_IN_STANDBY               0 /* disabled */
 
 /* ADC 0 Module Status flags */
@@ -303,10 +324,10 @@ static const pwm_conf_t pwm_config[] = {
 #define ADC_0_STATUS_OVERRUN               (1UL << 2)
 
 /* ADC 0 Positive Input Pins */
-#define ADC_0_POS_INPUT                    ADC_INPUTCTRL_MUXPOS_PIN6
+//#define ADC_0_POS_INPUT                    ADC_INPUTCTRL_MUXPOS_PIN6
 
-/* ADC 0 Negative Input Pins */     
-#define ADC_0_NEG_INPUT                    ADC_INPUTCTRL_MUXNEG_GND
+/* ADC 0 Negative Input Pins */
+//#define ADC_0_NEG_INPUT                    ADC_INPUTCTRL_MUXNEG_GND
 
 /* ADC 0 Gain Factor */
 #define ADC_0_GAIN_FACTOR_1X               ADC_INPUTCTRL_GAIN_1X
@@ -317,17 +338,17 @@ static const pwm_conf_t pwm_config[] = {
 /* Use this to define the value used */
 #define ADC_0_GAIN_FACTOR_DEFAULT          ADC_0_GAIN_FACTOR_1X
 
-/* ADC 0 Resolutions */    
+/* ADC 0 Resolutions */
 #define ADC_0_RES_8BIT                     ADC_CTRLB_RESSEL_8BIT
 #define ADC_0_RES_10BIT                    ADC_CTRLB_RESSEL_10BIT
 #define ADC_0_RES_12BIT                    ADC_CTRLB_RESSEL_12BIT
-#define ADC_0_RES_16BIT                    ADC_CTRLB_RESSEL_16BIT 
+#define ADC_0_RES_16BIT                    ADC_CTRLB_RESSEL_16BIT
 
 /* ADC 0 Voltage reference */
 #define ADC_0_REF_INT_1V                   ADC_REFCTRL_REFSEL_INT1V
 #define ADC_0_REF_EXT_B                    ADC_REFCTRL_REFSEL_AREFB
 #define ADC_0_REF_COM_EN                   0
-/* Use this to define the value used */ 
+/* Use this to define the value used */
 #define ADC_0_REF_DEFAULT                  ADC_0_REF_INT_1V
 
 /* ADC 0 ACCUMULATE */
@@ -343,9 +364,9 @@ static const pwm_conf_t pwm_config[] = {
 #define ADC_0_ACCUM_512                    ADC_AVGCTRL_SAMPLENUM_512
 #define ADC_0_ACCUM_1024                   ADC_AVGCTRL_SAMPLENUM_1024
 /* Use this to define the value used */
-#define ADC_0_ACCUM_DEFAULT                ADC_0_ACCUM_DISABLE 
+#define ADC_0_ACCUM_DEFAULT                ADC_0_ACCUM_DISABLE
 
-/* ADC 0 DEVIDE RESULT */
+/* ADC 0 DIVIDE RESULT */
 #define ADC_0_DIV_RES_DISABLE              0
 #define ADC_0_DIV_RES_2                    1
 #define ADC_0_DIV_RES_4                    2
@@ -355,7 +376,7 @@ static const pwm_conf_t pwm_config[] = {
 #define ADC_0_DIV_RES_64                   6
 #define ADC_0_DIV_RES_128                  7
 /* Use this to define the value used */
-#define ADC_0_DIV_RES_DEFAULT             ADC_0_DIV_RES_DISABLE 
+#define ADC_0_DIV_RES_DEFAULT             ADC_0_DIV_RES_DISABLE
 /** @} */
 
 #ifdef __cplusplus
