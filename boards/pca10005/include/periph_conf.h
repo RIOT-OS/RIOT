@@ -60,7 +60,7 @@ extern "C" {
 #define TIMER_1_DEV         NRF_TIMER1
 #define TIMER_1_CHANNELS    3
 #define TIMER_1_MAX_VALUE   (0xffff)
-#define TIEMR_1_BITMODE     TIMER_BITMODE_BITMODE_16Bit
+#define TIMER_1_BITMODE     TIMER_BITMODE_BITMODE_16Bit
 #define TIMER_1_ISR         isr_timer1
 #define TIMER_1_IRQ         TIMER1_IRQn
 
