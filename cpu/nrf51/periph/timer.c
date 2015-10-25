@@ -85,7 +85,7 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
 #endif
 #if TIMER_1_EN
         case TIMER_1:
-            TIMER_1_DEV->BITMODE = TIEMR_1_BITMODE;
+            TIMER_1_DEV->BITMODE = TIMER_1_BITMODE;
             NVIC_SetPriority(TIMER_1_IRQ, TIMER_IRQ_PRIO);
             NVIC_EnableIRQ(TIMER_1_IRQ);
             break;
