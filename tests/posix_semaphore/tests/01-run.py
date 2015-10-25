@@ -32,7 +32,6 @@ def test1(term):
     term.expect_exact("first: sem_trywait FAILED")
     term.expect_exact("first: sem_trywait done")
     term.expect_exact("first: sem_post")
-    term.expect_exact("second: sem_wait failed")
     term.expect_exact("second: sem was posted")
     term.expect_exact("second: end")
     term.expect_exact("first: sem_post done")
@@ -90,7 +89,7 @@ def test4(term):
     term.expect_exact("first: sem_init s1")
     term.expect_exact("first: wait 1 sec for s1")
     term.expect_exact("first: timed out")
-    term.expect(r"first: waited 1\.\d{6} s")
+    term.expect(r"first: waited 1\d{6} usec")
 
 if __name__ == "__main__":
     TERM = init()

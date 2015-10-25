@@ -22,13 +22,14 @@
  * @}
  */
 
+#include <errno.h>
 #include <stdio.h>
 #include <semaphore.h>
 
 #include "msg.h"
 #include "timex.h"
 #include "thread.h"
-#include "vtimer.h"
+#include "xtimer.h"
 
 #define SEMAPHORE_MSG_QUEUE_SIZE        (8)
 #define SEMAPHORE_TEST_THREADS          (5)
@@ -236,16 +237,16 @@ void test3(void)
 void test4(void)
 {
     struct timespec abs;
-    char timestamp[TIMEX_MAX_STR_LEN];
-    timex_t now, start, stop, exp = { 1, 0 };
-    vtimer_now(&now);
-    abs.tv_sec = now.seconds + 1;
-    abs.tv_nsec = now.microseconds * 1000;
+    uint64_t now, start, stop;
+    const uint64_t exp = 1000000;
+    now = xtimer_now64();
+    abs.tv_sec = (time_t)((now / SEC_IN_USEC) + 1);
+    abs.tv_nsec = (long)((now % SEC_IN_USEC) * 1000);
     puts("first: sem_init s1");
     if (sem_init(&s1, 0, 0) < 0) {
         puts("first: sem_init FAILED");
     }
-    vtimer_now(&start);
+    start = xtimer_now64();
     puts("first: wait 1 sec for s1");
     if (sem_timedwait(&s1, &abs) != 0) {
         if (errno != ETIMEDOUT) {
@@ -256,18 +257,17 @@ void test4(void)
             puts("first: timed out");
         }
     }
-    vtimer_now(&stop);
-    stop = timex_sub(stop, start);
-    if (timex_cmp(stop, exp) < 0) {
-        printf("first: waited only %s => FAILED\n",
-               timex_to_str(stop, timestamp));
+    stop = xtimer_now64() - start;
+    if (stop < exp) {
+        printf("first: waited only %" PRIu64 " usec => FAILED\n", stop);
     }
-    printf("first: waited %s\n", timex_to_str(stop, timestamp));
+    printf("first: waited %" PRIu64 " usec\n", stop);
 }
 
 int main(void)
 {
     msg_init_queue(main_msg_queue, SEMAPHORE_MSG_QUEUE_SIZE);
+    xtimer_init();
     puts("######################### TEST1:");
     test1();
     puts("######################### TEST2:");
