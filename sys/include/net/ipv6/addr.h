@@ -471,6 +471,17 @@ uint8_t ipv6_addr_match_prefix(const ipv6_addr_t *a, const ipv6_addr_t *b);
 void ipv6_addr_init_prefix(ipv6_addr_t *out, const ipv6_addr_t *prefix, uint8_t bits);
 
 /**
+ * @brief   Sets the last @p bits of IPv6 address @p out to @p iid.
+ *          Leading bits of @p out stay untouched.
+ *
+ * @param[out]  out     IPv6 address to be set.
+ * @param[in]   iid     buffer representing the iid.
+ * @param[in]   bits    Bits to be copied from @p iid to @p out
+ *                      (set to 128 when greater than 128).
+ */
+void ipv6_addr_init_iid(ipv6_addr_t *out, const uint8_t *iid, uint8_t bits);
+
+/**
  * @brief   Sets @p addr dynamically to the unspecified IPv6 address (::).
  *
  * @see <a href="http://tools.ietf.org/html/rfc4291#section-2.5.2">
