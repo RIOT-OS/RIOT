@@ -116,9 +116,8 @@ void gnrc_ndp_internal_set_state(gnrc_ipv6_nc_t *nc_entry, uint8_t state)
                       GNRC_NDP_FIRST_PROBE_DELAY);
             }
 #endif
-            vtimer_remove(&nc_entry->nbr_sol_timer);
-            vtimer_set_msg(&nc_entry->nbr_sol_timer, t, gnrc_ipv6_pid,
-                           GNRC_NDP_MSG_NC_STATE_TIMEOUT, nc_entry);
+            gnrc_ndp_internal_reset_nbr_sol_timer(nc_entry, (uint32_t) timex_uint64(t),
+                                                  GNRC_NDP_MSG_NC_STATE_TIMEOUT, gnrc_ipv6_pid);
             break;
 
         case GNRC_IPV6_NC_STATE_PROBE:
@@ -134,10 +133,10 @@ void gnrc_ndp_internal_set_state(gnrc_ipv6_nc_t *nc_entry, uint8_t state)
                                            &nc_entry->ipv6_addr);
 
             mutex_lock(&ipv6_iface->mutex);
-            vtimer_remove(&nc_entry->nbr_sol_timer);
-            vtimer_set_msg(&nc_entry->nbr_sol_timer,
-                           ipv6_iface->retrans_timer, gnrc_ipv6_pid,
-                           GNRC_NDP_MSG_NBR_SOL_RETRANS, nc_entry);
+            gnrc_ndp_internal_reset_nbr_sol_timer(nc_entry, (uint32_t) timex_uint64(
+                                                    ipv6_iface->retrans_timer
+                                                  ),
+                                                  GNRC_NDP_MSG_NBR_SOL_RETRANS, gnrc_ipv6_pid);
             mutex_unlock(&ipv6_iface->mutex);
             break;
 

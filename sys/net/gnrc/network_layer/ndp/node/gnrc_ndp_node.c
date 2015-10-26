@@ -164,7 +164,6 @@ kernel_pid_t gnrc_ndp_node_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_len,
         ipv6_addr_set_solicited_nodes(&dst_sol, next_hop_ip);
 
         if (iface == KERNEL_PID_UNDEF) {
-            timex_t t = { 0, GNRC_NDP_RETRANS_TIMER };
             kernel_pid_t ifs[GNRC_NETIF_NUMOF];
             size_t ifnum = gnrc_netif_get(ifs);
 
@@ -172,9 +171,8 @@ kernel_pid_t gnrc_ndp_node_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_len,
                 gnrc_ndp_internal_send_nbr_sol(ifs[i], NULL, next_hop_ip, &dst_sol);
             }
 
-            vtimer_remove(&nc_entry->nbr_sol_timer);
-            vtimer_set_msg(&nc_entry->nbr_sol_timer, t, gnrc_ipv6_pid,
-                           GNRC_NDP_MSG_NBR_SOL_RETRANS, nc_entry);
+            gnrc_ndp_internal_reset_nbr_sol_timer(nc_entry, GNRC_NDP_RETRANS_TIMER,
+                                                  GNRC_NDP_MSG_NBR_SOL_RETRANS, gnrc_ipv6_pid);
         }
         else {
             gnrc_ipv6_netif_t *ipv6_iface = gnrc_ipv6_netif_get(iface);
@@ -182,10 +180,10 @@ kernel_pid_t gnrc_ndp_node_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_len,
             gnrc_ndp_internal_send_nbr_sol(iface, NULL, next_hop_ip, &dst_sol);
 
             mutex_lock(&ipv6_iface->mutex);
-            vtimer_remove(&nc_entry->nbr_sol_timer);
-            vtimer_set_msg(&nc_entry->nbr_sol_timer,
-                           ipv6_iface->retrans_timer, gnrc_ipv6_pid,
-                           GNRC_NDP_MSG_NBR_SOL_RETRANS, nc_entry);
+            gnrc_ndp_internal_reset_nbr_sol_timer(nc_entry, (uint32_t) timex_uint64(
+                                                    ipv6_iface->retrans_timer
+                                                  ),
+                                                  GNRC_NDP_MSG_NBR_SOL_RETRANS, gnrc_ipv6_pid);
             mutex_unlock(&ipv6_iface->mutex);
         }
     }
