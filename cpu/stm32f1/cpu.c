@@ -32,11 +32,19 @@
 #elif CLOCK_HSI
 #define CLOCK_CR_SOURCE            RCC_CR_HSION
 #define CLOCK_CR_SOURCE_RDY        RCC_CR_HSIRDY
+<<<<<<< 0290a1813c6b0b7b8d0831a621408c9d71f7315d
 #define CLOCK_PLL_SOURCE           (0)
 #elif CLOCK_HSE
 #define CLOCK_CR_SOURCE            RCC_CR_HSEON
 #define CLOCK_CR_SOURCE_RDY        RCC_CR_HSERDY
 #define CLOCK_PLL_SOURCE           RCC_CFGR_PLLSRC
+=======
+#define CLOCK_PLL_SOURCE           RCC_CFGR_PLLSRC_HSI_Div2
+#elif CLOCK_HSE
+#define CLOCK_CR_SOURCE            RCC_CR_HSEON
+#define CLOCK_CR_SOURCE_RDY        RCC_CR_HSERDY
+#define CLOCK_PLL_SOURCE           RCC_CFGR_PLLSRC_HSE
+>>>>>>> cpu: Add clock source selection based on CLOCK_HSE or CLOCK_HSI for STM32F1
 #else
 #error "Please provide CLOCK_HSI or CLOCK_HSE in boards/NAME/includes/perhip_cpu.h"
 #endif
