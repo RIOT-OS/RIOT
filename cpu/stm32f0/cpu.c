@@ -20,6 +20,28 @@
 #include "cpu.h"
 #include "periph_conf.h"
 
+/* Check the source to be used for the PLL */
+#if defined(CLOCK_HSI) && defined(CLOCK_HSE)
+#error "Only provide one of two CLOCK_HSI/CLOCK_HSE"
+#elif CLOCK_HSI
+#define CLOCK_CR_SOURCE            RCC_CR_HSION
+#define CLOCK_CR_SOURCE_RDY        RCC_CR_HSIRDY
+#define CLOCK_PLL_SOURCE           (RCC_CFGR_PLLSRC_HSI_DIV2)
+#define CLOCK_PLL_MUL_MUL          2
+#define CLOCK_DISABLE_HSI          0
+
+#if (RCC_PLL_MUL * RCC_PLL_MUL_MUL) > 6
+#error PLL with HSI as clock source cant extend 6 times multiplier
+#endif
+#elif CLOCK_HSE
+#define CLOCK_CR_SOURCE            RCC_CR_HSEON
+#define CLOCK_CR_SOURCE_RDY        RCC_CR_HSERDY
+#define CLOCK_PLL_SOURCE           (RCC_CFGR_PLLSRC_HSE_PREDIV | RCC_CFGR_PLLXTPRE_HSE_PREDIV_DIV1)
+#define CLOCK_PLL_MUL_MUL          1
+#define CLOCK_DISABLE_HSI          1
+#else
+#error "Please provide CLOCK_HSI or CLOCK_HSE in boards/NAME/includes/perhip_cpu.h"
+#endif
 
 static void clock_init(void);
 
@@ -53,11 +75,6 @@ void cpu_init(void)
  */
 static void clock_init(void)
 {
-    /* configure the HSE clock */
-
-    /* enable the HSI clock */
-    RCC->CR |= RCC_CR_HSION;
-
     /* reset clock configuration register */
     RCC->CFGR = 0;
     RCC->CFGR2 = 0;
@@ -68,11 +85,11 @@ static void clock_init(void)
     /* disable all clock interrupts */
     RCC->CIR = 0;
 
-    /* enable the HSE clock */
-    RCC->CR |= RCC_CR_HSEON;
+    /* enable the high speed clock source */
+    RCC->CR |= CLOCK_CR_SOURCE;
 
-    /* wait for HSE to be ready */
-    while (!(RCC->CR & RCC_CR_HSERDY)) {}
+    /* wait for the high speed clock to be ready */
+    while (!(RCC->CR & CLOCK_CR_SOURCE_RDY)) {}
 
     /* setup the peripheral bus prescalers */
 
@@ -86,8 +103,7 @@ static void clock_init(void)
     /* reset PLL configuration bits */
     RCC->CFGR &= ~(RCC_CFGR_PLLSRC | RCC_CFGR_PLLXTPRE | RCC_CFGR_PLLMUL);
     /* set PLL configuration */
-    RCC->CFGR |= RCC_CFGR_PLLSRC_HSE_PREDIV | RCC_CFGR_PLLXTPRE_HSE_PREDIV_DIV1 |
-                 (((CLOCK_PLL_MUL - 2) & 0xf) << 18);
+    RCC->CFGR |= CLOCK_PLL_SOURCE | ((((CLOCK_PLL_MUL * CLOCK_PLL_MUL_MUL) - 2) & 0xf) << 18);
 
     /* enable PLL again */
     RCC->CR |= RCC_CR_PLLON;
@@ -107,4 +123,10 @@ static void clock_init(void)
 
     /* wait for sysclock to be stable */
     while (!(RCC->CFGR & RCC_CFGR_SWS_PLL)) {}
+
+#if CLOCK_DISABLE_HSI
+    /* disable the HSI if we use the HSE */
+    RCC->CR &= ~(RCC_CR_HSION);
+    while (RCC->CR & RCC_CR_HSIRDY) {}
+#endif
 }
