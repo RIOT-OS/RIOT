@@ -422,38 +422,42 @@ void gnrc_ndp_rtr_sol_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
         _stale_nc(iface, &ipv6->src, l2src, l2src_len);
         /* send delayed */
         if (if_entry->flags & GNRC_IPV6_NETIF_FLAGS_RTR_ADV) {
-            timex_t delay;
+            uint32_t delay;
             uint32_t ms = GNRC_NDP_MAX_RTR_ADV_DELAY;
 #ifdef MODULE_GNRC_SIXLOWPAN_ND_ROUTER
             if (if_entry->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN) {
                 ms = GNRC_SIXLOWPAN_ND_MAX_RTR_ADV_DELAY;
             }
 #endif
-            delay = timex_set(0, genrand_uint32_range(0, ms));
-            vtimer_remove(&if_entry->rtr_adv_timer);
+            delay = genrand_uint32_range(0, ms);
+            xtimer_remove(&if_entry->rtr_adv_timer);
 #ifdef MODULE_GNRC_SIXLOWPAN_ND_ROUTER
             /* in case of a 6LBR we have to check if the interface is actually
              * the 6lo interface */
             if (if_entry->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN) {
                 gnrc_ipv6_nc_t *nc_entry = gnrc_ipv6_nc_get(iface, &ipv6->src);
                 if (nc_entry != NULL) {
-                    vtimer_set_msg(&if_entry->rtr_adv_timer, delay, gnrc_ipv6_pid,
-                            GNRC_NDP_MSG_RTR_ADV_SIXLOWPAN_DELAY, nc_entry);
+                    if_entry->rtr_adv_msg.type = GNRC_NDP_MSG_RTR_ADV_SIXLOWPAN_DELAY;
+                    if_entry->rtr_adv_msg.content.ptr = (char *) nc_entry;
+                    xtimer_set_msg(&if_entry->rtr_adv_timer, delay, &if_entry->rtr_adv_msg,
+                                   gnrc_ipv6_pid);
                 }
             }
 #elif defined(MODULE_GNRC_NDP_ROUTER) || defined(MODULE_GNRC_SIXLOWPAN_ND_BORDER_ROUTER)
             if (ipv6_addr_is_unspecified(&ipv6->src)) {
                 /* either multicast, if source unspecified */
-                vtimer_set_msg(&if_entry->rtr_adv_timer, delay, gnrc_ipv6_pid,
-                               GNRC_NDP_MSG_RTR_ADV_RETRANS, if_entry);
+                if_entry->rtr_adv_msg.type = GNRC_NDP_MSG_RTR_ADV_RETRANS;
+                if_entry->rtr_adv_msg.content.ptr = (char *) if_entry;
+                xtimer_set_msg(&if_entry->rtr_adv_timer, delay, &if_entry->rtr_adv_msg,
+                               gnrc_ipv6_pid);
             }
             else {
                 /* or unicast, if source is known */
                 /* XXX: can't just use GNRC_NETAPI_MSG_TYPE_SND, since the next retransmission
                  * must also be set. */
                 gnrc_ipv6_nc_t *nc_entry = gnrc_ipv6_nc_get(iface, &ipv6->src);
-                xtimer_set_msg(&nc_entry->rtr_adv_timer, (uint32_t) timex_uint64(delay),
-                               &nc_entry->rtr_adv_msg, gnrc_ipv6_pid);
+                xtimer_set_msg(&nc_entry->rtr_adv_timer, delay, &nc_entry->rtr_adv_msg,
+                               gnrc_ipv6_pid);
             }
 #endif
         }
