@@ -29,9 +29,11 @@
 
 static inline void _rtr_sol_reschedule(gnrc_ipv6_netif_t *iface, uint32_t sec_delay)
 {
-    vtimer_remove(&iface->rtr_sol_timer);
-    vtimer_set_msg(&iface->rtr_sol_timer, timex_set(sec_delay, 0), gnrc_ipv6_pid,
-                   GNRC_SIXLOWPAN_ND_MSG_MC_RTR_SOL, iface);
+    xtimer_remove(&iface->rtr_sol_timer);
+    iface->rtr_sol_msg.type = GNRC_SIXLOWPAN_ND_MSG_MC_RTR_SOL;
+    iface->rtr_sol_msg.content.ptr = (char *) iface;
+    xtimer_set_msg(&iface->rtr_sol_timer, sec_delay * SEC_IN_USEC, &iface->rtr_sol_msg,
+                   gnrc_ipv6_pid);
 }
 
 static inline uint32_t _binary_exp_backoff(uint32_t base_sec, unsigned int exp)
@@ -226,9 +228,11 @@ void gnrc_sixlowpan_nd_rtr_sol_reschedule(gnrc_ipv6_nc_t *nce, uint32_t sec_dela
     assert(nce != NULL);
     assert(sec_delay != 0U);
     gnrc_ipv6_netif_t *iface = gnrc_ipv6_netif_get(nce->iface);
-    vtimer_remove(&iface->rtr_sol_timer);
-    vtimer_set_msg(&iface->rtr_sol_timer, timex_set(sec_delay, 0), gnrc_ipv6_pid,
-                   GNRC_SIXLOWPAN_ND_MSG_MC_RTR_SOL, iface);
+    xtimer_remove(&iface->rtr_sol_timer);
+    iface->rtr_sol_msg.type = GNRC_SIXLOWPAN_ND_MSG_MC_RTR_SOL;
+    iface->rtr_sol_msg.content.ptr = (char *) iface;
+    xtimer_set_msg(&iface->rtr_sol_timer, sec_delay * SEC_IN_USEC, &iface->rtr_sol_msg,
+                   gnrc_ipv6_pid);
 }
 
 gnrc_pktsnip_t *gnrc_sixlowpan_nd_opt_ar_build(uint8_t status, uint16_t ltime, eui64_t *eui64,
