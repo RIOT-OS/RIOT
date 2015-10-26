@@ -221,6 +221,8 @@ void gnrc_ndp_internal_send_nbr_adv(kernel_pid_t iface, ipv6_addr_t *tgt, ipv6_a
               delay.seconds);
 
         /* nc_entry must be set so no need to check it */
+        assert(nc_entry);
+
         _send_delayed(&nc_entry->nbr_adv_timer, delay, hdr);
     }
     else if (gnrc_netapi_send(gnrc_ipv6_pid, hdr) < 1) {
