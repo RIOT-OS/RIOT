@@ -315,7 +315,7 @@ typedef struct {
  *  and one negative input.
  */
 #define ADC_0_POS_INPUT                    ADC_INPUTCTRL_MUXPOS_PIN6
-#define ADC_0_NEG_INPUT                    ADC_INPUTCTRL_MUXNEG_PIN7
+#define ADC_0_NEG_INPUT                    ADC_INPUTCTRL_MUXNEG_IOGND
 #else
 /*  If we're not in differential mode, we can use any of
  *  ADC positive input pins the SAMR21-XPRO provides.  Each pin is

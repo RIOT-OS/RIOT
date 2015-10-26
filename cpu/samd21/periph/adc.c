@@ -193,29 +193,32 @@ int adc_configure_with_resolution(Adc* adc, uint32_t precision)
 
     /* Pin Muxing */
     #if ADC_0_DIFFERENTIAL_MODE
-    ADC_0_PORT.PINCFG[ ADC_0_POS_INPUT ].bit.PMUXEN = 1;
-    ADC_0_PORT.PMUX[ ADC_0_POS_INPUT / 2].bit.PMUXE = 1;
+      /*  Configure ADC_0_POS_INPUT and ADC_0_NEG_INPUT */
+      ADC_0_PORT.PINCFG[ ADC_0_POS_INPUT ].bit.PMUXEN = 1;
+      ADC_0_PORT.PMUX[ ADC_0_POS_INPUT / 2].bit.PMUXE = 1;
 
-    /* ADC_0_POS_INPUT Input */
-    ADC_0_PORT.DIRCLR.reg = (1 << ADC_0_POS_INPUT);
-    ADC_0_PORT.PINCFG[ADC_0_POS_INPUT].bit.INEN = true;
-    ADC_0_PORT.PINCFG[ADC_0_POS_INPUT].bit.PULLEN = false;
+      /* ADC_0_POS_INPUT Input */
+      ADC_0_PORT.DIRCLR.reg = (1UL << ADC_0_POS_INPUT);
+      ADC_0_PORT.PINCFG[ADC_0_POS_INPUT].bit.INEN = true;
+      ADC_0_PORT.PINCFG[ADC_0_POS_INPUT].bit.PULLEN = false;
 
-    if(ADC_0_NEG_INPUT != ADC_INPUTCTRL_MUXNEG_GND)
-    {
-        ADC_0_PORT.DIRCLR.reg = (1 << ADC_0_NEG_INPUT);
-        ADC_0_PORT.PINCFG[ADC_0_NEG_INPUT].bit.INEN = true;
-        ADC_0_PORT.PINCFG[ADC_0_NEG_INPUT].bit.PULLEN = false;
-    }
+      /* ADC_0_NEG_INPUT Input */
+      if(ADC_0_NEG_INPUT != ADC_INPUTCTRL_MUXNEG_GND)
+      {
+          ADC_0_PORT.DIRCLR.reg = (1UL << ADC_0_NEG_INPUT);
+          ADC_0_PORT.PINCFG[ADC_0_NEG_INPUT].bit.INEN = true;
+          ADC_0_PORT.PINCFG[ADC_0_NEG_INPUT].bit.PULLEN = false;
+      }
     #else
-    for (int i = 0; i < ADC_0_CHANNELS; i++) {
-       PortGroup *port = adc_config[i].port;
-       int pin = adc_config[i].pin;
-       port->DIRCLR.reg = (1 << pin);
-       port->PINCFG[pin].reg = (PORT_PINCFG_PMUXEN | PORT_PINCFG_INEN);
-       port->PMUX[pin >> 1].reg = ~(0xf << (4 * (pin & 0x1)));
-       port->PMUX[pin >> 1].reg =  (1 << (4 * (pin & 0x1)));
-    }
+      /*  Configure all positive inputs enumerated in adc_config  */
+      for (int i = 0; i < ADC_0_CHANNELS; i++) {
+         PortGroup *port = adc_config[i].port;
+         int pin = adc_config[i].pin;
+         port->DIRCLR.reg = (1 << pin);
+         port->PINCFG[pin].reg = (PORT_PINCFG_PMUXEN | PORT_PINCFG_INEN);
+         port->PMUX[pin >> 1].reg = ~(0xf << (4 * (pin & 0x1)));
+         port->PMUX[pin >> 1].reg =  (1 << (4 * (pin & 0x1)));
+      }
     #endif
 
 
@@ -257,7 +260,7 @@ int adc_configure_with_resolution(Adc* adc, uint32_t precision)
         return -1;
     }
 
-    /* Set the accumlation and devide result */
+    /* Set the accumlation and divide result */
     adc->AVGCTRL.reg = ADC_AVGCTRL_ADJRES(divideResult) | accumulate;
 
     /* Set Sample length */
@@ -336,8 +339,7 @@ int adc_configure_with_resolution(Adc* adc, uint32_t precision)
 
     /* Load the fixed device calibration constants*/
     adc->CALIB.reg = ADC_CALIB_BIAS_CAL((*(uint32_t*)ADC_FUSES_BIASCAL_ADDR >> ADC_FUSES_BIASCAL_Pos))
-                    |
-                    ADC_CALIB_LINEARITY_CAL((*(uint64_t*)ADC_FUSES_LINEARITY_0_ADDR >> ADC_FUSES_LINEARITY_0_Pos));
+                    | ADC_CALIB_LINEARITY_CAL((*(uint64_t*)ADC_FUSES_LINEARITY_0_ADDR >> ADC_FUSES_LINEARITY_0_Pos));
 
     return 1;
 }
