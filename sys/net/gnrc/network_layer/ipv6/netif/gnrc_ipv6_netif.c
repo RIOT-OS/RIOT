@@ -151,6 +151,9 @@ static ipv6_addr_t *_add_addr_to_entry(gnrc_ipv6_netif_t *entry, const ipv6_addr
          *       source address. */
     }
 
+    tmp_addr->valid_timeout_msg.type = GNRC_NDP_MSG_ADDR_TIMEOUT;
+    tmp_addr->valid_timeout_msg.content.ptr = (char *) &tmp_addr->addr;
+
     return &(tmp_addr->addr);
 }
 
