@@ -518,9 +518,8 @@ void gnrc_ndp_rtr_adv_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt, ipv6_hdr_t
 #ifdef MODULE_GNRC_SIXLOWPAN_ND
         next_rtr_sol = ltime;
 #endif
-        vtimer_remove(&nc_entry->rtr_timeout);
-        vtimer_set_msg(&nc_entry->rtr_timeout, timex_set(ltime, 0),
-                       thread_getpid(), GNRC_NDP_MSG_RTR_TIMEOUT, nc_entry);
+        xtimer_set_msg(&nc_entry->rtr_timeout, (ltime * SEC_IN_USEC),
+                       &nc_entry->rtr_timeout_msg, thread_getpid());
     }
     /* set current hop limit from message if available */
     if (rtr_adv->cur_hl != 0) {

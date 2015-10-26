@@ -128,7 +128,8 @@ typedef struct {
     uint8_t l2_addr_len;                        /**< Length of gnrc_ipv6_nc_t::l2_addr */
     uint8_t flags;                              /**< Flags as defined above */
     kernel_pid_t iface;                         /**< PID to the interface where the neighbor is */
-    vtimer_t rtr_timeout;                       /**< timeout timer for router flag */
+    xtimer_t rtr_timeout;                       /**< timeout timer for router flag */
+    msg_t rtr_timeout_msg;                      /**< msg_t for gnrc_ipv6_nc_t::rtr_timeout */
 
     /**
      * @brief (Re)Transmission timer for neighbor solicitations of this entry and
