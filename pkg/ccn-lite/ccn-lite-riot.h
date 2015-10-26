@@ -111,24 +111,33 @@ extern "C" {
 #define CONSTSTR(s)                     s
 
 /**
+ * Stack size for CCN-Lite event loop
+ */
+#define CCNL_STACK_SIZE (THREAD_STACKSIZE_MAIN)
+
+/**
+ * Size of the message queue of CCN-Lite's event loop
+ */
+#define CCNL_QUEUE_SIZE     (8)
+
+/**
  * Struct holding CCN-Lite's central relay information
  */
 extern struct ccnl_relay_s theRelay;
 
 /**
- * @brief   The main CCN-Lite event-loop
+ * @brief   Start the main CCN-Lite event-loop
  *
- * @note This function does not terminate
- *
- * @param[in] ccnl  Reference to the CCN-Lite relay
+ * @return  The PID of the event-loop's thread
  */
-void ccnl_event_loop(struct ccnl_relay_s *ccnl);
+kernel_pid_t ccnl_start(void);
 
 /**
- * @brief Opens a @ref gnrc_netif_t device for use with CCN-Lite
+ * @brief Opens a @ref net_gnrc_netif device for use with CCN-Lite
  *
- * @param[in] if_pid        The pid of the @ref gnrc_netif_t device driver
- * @param[in] netreg_type   The @ref gnrc_nettype_t @p if_pid should be configured to use
+ * @param[in] if_pid        The pid of the @ref net_gnrc_netif device driver
+ * @param[in] netreg_type   The @ref net_gnrc_nettype @p if_pid should be
+ *                          configured to use
  *
  * @return 0 on success,
  * @return -EINVAL if eventloop could not be registered for @p netreg_type
