@@ -102,6 +102,24 @@ int gpio_init(gpio_t pin, gpio_dir_t dir, gpio_pp_t pullup)
     else {
         _SFR_MEM8(_ddr_addr(pin)) &= ~(1 << _pin_num(pin));
         res = bit_is_clear(_SFR_MEM8(_ddr_addr(pin)), _pin_num(pin));
+
+        if (res == 0) {
+            return -1;
+        }
+
+        switch (pullup) {
+            case GPIO_NOPULL:
+                _SFR_MEM8(_port_addr(pin)) &= ~(1 << _pin_num(pin));
+                res = bit_is_clear(_SFR_MEM8(_port_addr(pin)), _pin_num(pin));
+                break;
+            case GPIO_PULLUP:
+                _SFR_MEM8(_port_addr(pin)) |= (1 << _pin_num(pin));
+                res = bit_is_set(_SFR_MEM8(_port_addr(pin)), _pin_num(pin));
+                break;
+            case GPIO_PULLDOWN:
+                /* Not supported by atmega2560 */
+                return -1;
+        }
     }
 
     return (res == 0) ? -1 : 0;
@@ -120,8 +138,6 @@ int gpio_init_int(gpio_t pin, gpio_pp_t pullup, gpio_flank_t flank,
     if (gpio_init(pin, GPIO_DIR_IN, pullup) < 0) {
         return -1;
     }
-
-    gpio_set(pin);
 
     /* clear global interrupt flag */
     cli();
