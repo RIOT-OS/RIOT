@@ -311,27 +311,6 @@ void timer_irq_disable(tim_t dev)
     }
 }
 
-void timer_reset(tim_t dev)
-{
-    switch (dev) {
-#if TIMER_0_EN
-
-        case TIMER_0:
-            pit_timer_set_max(TIMER_0_COUNTER_CH);
-            break;
-#endif
-#if TIMER_1_EN
-
-        case TIMER_1:
-            pit_timer_set_max(TIMER_1_COUNTER_CH);
-            break;
-#endif
-
-        case TIMER_UNDEFINED:
-            break;
-    }
-}
-
 inline static void pit_timer_irq_handler(tim_t dev, uint8_t ch)
 {
     cu_timer[dev] += TIMER_BASE->CHANNEL[ch].LDVAL + 1;

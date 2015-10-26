@@ -267,13 +267,6 @@ void timer_irq_disable(tim_t dev)
     }
 }
 
-void timer_reset(tim_t dev)
-{
-    if (dev < TIMER_NUMOF) {
-        timer[dev]->TASKS_CLEAR = 1;
-    }
-}
-
 #if TIMER_0_EN
 void TIMER_0_ISR(void)
 {

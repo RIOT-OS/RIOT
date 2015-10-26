@@ -150,15 +150,6 @@ void timer_irq_disable(tim_t dev)
     }
 }
 
-void timer_reset(tim_t dev)
-{
-    if (dev == TIMER_0) {
-        TIMER_0_DEV->TCR |= (1 << 1);
-        asm("nop");                     /* just wait a cycle */
-        TIMER_0_DEV->TCR &= ~(1 << 1);
-    }
-}
-
 void TIMER_0_ISR(void)
 {
     if (TIMER_0_DEV->IR & MR0_FLAG) {
