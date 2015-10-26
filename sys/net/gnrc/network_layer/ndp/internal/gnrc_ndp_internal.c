@@ -216,7 +216,7 @@ void gnrc_ndp_internal_send_nbr_adv(kernel_pid_t iface, ipv6_addr_t *tgt, ipv6_a
          * (see https://tools.ietf.org/html/rfc4861#section-7.2.7) */
         timex_t delay = { 0, genrand_uint32_range(0, GNRC_NDP_MAX_AC_TGT_DELAY * SEC_IN_USEC) };
         timex_normalize(&delay);
-        gnrc_ipv6_nc_t *nc_entry = gnrc_ipv6_nc_get(iface, tgt);
+        gnrc_ipv6_nc_t *nc_entry = gnrc_ipv6_nc_get(iface, dst);
         DEBUG("ndp internal: delay neighbor advertisement for %" PRIu32 " sec.",
               delay.seconds);
 
