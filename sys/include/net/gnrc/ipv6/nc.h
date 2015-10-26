@@ -29,7 +29,6 @@
 #include "net/ipv6/addr.h"
 #include "net/gnrc/netif.h"
 #include "net/gnrc/pktqueue.h"
-#include "vtimer.h"
 #include "xtimer.h"
 
 #ifdef __cplusplus
@@ -135,7 +134,8 @@ typedef struct {
      * @brief (Re)Transmission timer for neighbor solicitations of this entry and
      *        timeout for states.
      */
-    vtimer_t nbr_sol_timer;
+    xtimer_t nbr_sol_timer;
+    msg_t nbr_sol_msg;                          /**< msg_t for gnrc_ipv6_nc_t::nbr_sol_timer */
 
     /**
      * @brief Delay timer for neighbor advertisements of this entry.
