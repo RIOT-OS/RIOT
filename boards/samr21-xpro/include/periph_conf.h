@@ -138,8 +138,8 @@ static const pwm_conf_t pwm_config[] = {
 #if PWM_0_EN
     {TCC1, {
         /* GPIO pin, MUX value, TCC channel */
-        {GPIO_PIN(PA,6), GPIO_MUX_E, 0},
-        {GPIO_PIN(PA,7), GPIO_MUX_E, 1}
+        {GPIO_PIN(PA, 6), GPIO_MUX_E, 0},
+        {GPIO_PIN(PA, 7), GPIO_MUX_E, 1}
     }},
 #endif
 #if PWM_1_EN
