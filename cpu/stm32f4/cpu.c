@@ -14,6 +14,7 @@
  * @brief       Implementation of the CPU initialization
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Nick van IJzendoorn <nijzendoorn@engineering-spirit.nl>
  * @}
  */
 
@@ -21,7 +22,22 @@
 #include "cpu.h"
 #include "periph_conf.h"
 
-
+/* Check the source to be used for the PLL */
+#if defined(CLOCK_HSI) && defined(CLOCK_HSE)
+#error "Only provide one of two CLOCK_HSI/CLOCK_HSE"
+#elif CLOCK_HSI
+#define CLOCK_CR_SOURCE            RCC_CR_HSION
+#define CLOCK_CR_SOURCE_RDY        RCC_CR_HSIRDY
+#define CLOCK_PLL_SOURCE           RCC_PLLCFGR_PLLSRC_HSI
+#define CLOCK_DISABLE_HSI          0
+#elif CLOCK_HSE
+#define CLOCK_CR_SOURCE            RCC_CR_HSEON
+#define CLOCK_CR_SOURCE_RDY        RCC_CR_HSERDY
+#define CLOCK_PLL_SOURCE           RCC_PLLCFGR_PLLSRC_HSE
+#define CLOCK_DISABLE_HSI          1
+#else
+#error "Please provide CLOCK_HSI or CLOCK_HSE in boards/NAME/includes/perhip_cpu.h"
+#endif
 
 static void cpu_clock_init(void);
 
@@ -45,8 +61,8 @@ void cpu_init(void)
  *
  * Use the following formulas to calculate the needed values:
  *
- * SYSCLK = ((HSE_VALUE / CLOCK_PLL_M) * CLOCK_PLL_N) / CLOCK_PLL_P
- * USB, SDIO and RNG Clock =  ((HSE_VALUE / CLOCK_PLL_M) * CLOCK_PLL_N) / CLOCK_PLL_Q
+ * SYSCLK = ((XTAL_SPEED / CLOCK_PLL_M) * CLOCK_PLL_N) / CLOCK_PLL_P
+ * USB, SDIO and RNG Clock =  ((XTAL_SPEED / CLOCK_PLL_M) * CLOCK_PLL_N) / CLOCK_PLL_Q
  *
  * The actual used values are specified in the board's `periph_conf.h` file.
  *
@@ -55,11 +71,6 @@ void cpu_init(void)
  */
 static void cpu_clock_init(void)
 {
-    /* configure the HSE clock */
-
-    /* enable the HSI clock */
-    RCC->CR |= RCC_CR_HSION;
-
     /* reset clock configuration register */
     RCC->CFGR = 0;
 
@@ -69,11 +80,11 @@ static void cpu_clock_init(void)
     /* disable all clock interrupts */
     RCC->CIR = 0;
 
-    /* enable the HSE clock */
-    RCC->CR |= RCC_CR_HSEON;
+    /* enable the high speed clock */
+    RCC->CR |= CLOCK_CR_SOURCE;
 
-    /* wait for HSE to be ready */
-    while (!(RCC->CR & RCC_CR_HSERDY)) {}
+    /* wait for the high speed clock source to be ready */
+    while (!(RCC->CR & CLOCK_CR_SOURCE_RDY)) {}
 
     /* setup power module */
 
@@ -98,8 +109,8 @@ static void cpu_clock_init(void)
 
     /* reset PLL config register */
     RCC->PLLCFGR = 0;
-    /* set HSE as source for the PLL */
-    RCC->PLLCFGR |= RCC_PLLCFGR_PLLSRC_HSE;
+    /* set high speed clock as source for the PLL */
+    RCC->PLLCFGR |= CLOCK_PLL_SOURCE;
     /* set division factor for main PLL input clock */
     RCC->PLLCFGR |= (CLOCK_PLL_M & 0x3F);
     /* set main PLL multiplication factor for VCO */
@@ -136,4 +147,10 @@ static void cpu_clock_init(void)
 
     /* wait for sysclock to be stable */
     while (!(RCC->CFGR & RCC_CFGR_SWS_PLL)) {}
+
+#if CLOCK_DISABLE_HSI
+    /* disable the HSI if we use the HSE */
+    RCC->CR &= ~(RCC_CR_HSION);
+    while (RCC->CR & RCC_CR_HSIRDY) {}
+#endif
 }
