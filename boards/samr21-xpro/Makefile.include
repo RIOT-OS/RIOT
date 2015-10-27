@@ -16,8 +16,12 @@ include $(RIOTBOARD)/Makefile.include.serial
 # Use /dist/tools/usb-serial/list-ttys.sh to find out serial number.
 #   Usage: SERIAL="ATML..." BOARD="samr21-xpro" make flash
 ifneq (,$(SERIAL))
-export OPENOCD_EXTRA_INIT += "-c cmsis_dap_serial $(SERIAL)"
-PORT_LINUX := $(shell $(RIOTBASE)/dist/tools/usb-serial/find-tty.sh $(SERIAL))
+    export OPENOCD_EXTRA_INIT += "-c cmsis_dap_serial $(SERIAL)"
+    SERIAL_TTY = $(shell $(RIOTBASE)/dist/tools/usb-serial/find-tty.sh $(SERIAL))
+    ifeq (,$(SERIAL_TTY))
+        $(error Did not find a device with serial $(SERIAL))
+    endif
+    PORT_LINUX := $(SERIAL_TTY)
 endif
 
 # this board uses openocd
