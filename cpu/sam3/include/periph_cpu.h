@@ -30,11 +30,6 @@ extern "C" {
 #endif
 
 /**
- * @brief Define the the base-adress of the gpio
- */
-#define PIO_BASE_ADRESS 0x400E0E00U
-
-/**
  * @brief Overwrite the default gpio_t type definition
  */
 #define HAVE_GPIO_T
@@ -49,7 +44,7 @@ typedef uint32_t gpio_t;
 /**
  * @brief Define a CPU specific GPIO pin generator macro
  */
-#define GPIO_PIN(x, y)          ((PIO_BASE_ADRESS + (x << 9)) | y)
+#define GPIO_PIN(x, y)      (((uint32_t)PIOA + (x << 9)) | y)
 
 /**
  * @brief Declare needed generic SPI functions
@@ -88,10 +83,10 @@ typedef enum {
  * @brief Available ports on the SAM3X8E
  */
 enum {
-    PORT_A = 0,             /**< port A */
-    PORT_B = 1,             /**< port B */
-    PORT_C = 2,             /**< port C */
-    PORT_D = 3,             /**< port D */
+    PA = 0,                 /**< port A */
+    PB = 1,                 /**< port B */
+    PC = 2,                 /**< port C */
+    PD = 3,                 /**< port D */
 };
 
 #ifdef __cplusplus

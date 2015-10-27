@@ -115,43 +115,44 @@ int gpio_init(gpio_t pin, gpio_dir_t dir, gpio_pp_t pushpull)
 {
     Pio *port = _port(pin);
     int pin_num = _pin_num(pin);
-	int port_num = _port_num(pin);
+    int port_num = _port_num(pin);
 
-	PMC->PMC_PCER0 = (1 << (port_num+11));
+    PMC->PMC_PCER0 = (1 << (port_num + 11));
 
-	 /* give the PIO module the power over the corresponding pin */
-    port->PIO_PER = (1<<pin_num);
+     /* give the PIO module the power over the corresponding pin */
+    port->PIO_PER = (1 << pin_num);
     /* configure the pin's pull resistor state */
     switch (pushpull) {
         case GPIO_PULLDOWN:
             return -1;
         case GPIO_PULLUP:
-            port->PIO_PUER = (1<<pin_num);
+            port->PIO_PUER = (1 << pin_num);
             break;
         case GPIO_NOPULL:
-            port->PIO_PUDR = (1<<pin_num);
+            port->PIO_PUDR = (1 << pin_num);
             break;
     }
     if (dir == GPIO_DIR_OUT) {
         /* configure pin as output */
-        port->PIO_OER = (1<<pin_num);
-        port->PIO_CODR = (1<<pin_num);
+        port->PIO_OER = (1 << pin_num);
+        port->PIO_CODR = (1 << pin_num);
     }
     else {
         /* configure pin as input */
-        port->PIO_ODR = (1<<pin_num);
+        port->PIO_ODR = (1 << pin_num);
     }
 
     return 0;
 }
 
-int gpio_init_int(gpio_t pin, gpio_pp_t pushpull, gpio_flank_t flank, gpio_cb_t cb, void *arg)
+int gpio_init_int(gpio_t pin, gpio_pp_t pushpull, gpio_flank_t flank,
+                  gpio_cb_t cb, void *arg)
 {
-	Pio *port = _port(pin);
-	int pin_num = _pin_num(pin);
+    Pio *port = _port(pin);
+    int pin_num = _pin_num(pin);
     int port_num = _port_num(pin);
 
-	port->PIO_IDR = (1<<pin_num);
+    port->PIO_IDR = (1<<pin_num);
 
     /* try go grab a free spot in the context array */
     int ctx_num = get_free_ctx();
@@ -166,60 +167,49 @@ int gpio_init_int(gpio_t pin, gpio_pp_t pushpull, gpio_flank_t flank, gpio_cb_t 
     /* set the active flank */
     switch (flank) {
         case GPIO_FALLING:
-            port->PIO_AIMER = (1<<pin_num);
-            port->PIO_ESR = (1<<pin_num);
-            port->PIO_FELLSR =(1<<pin_num);
+            port->PIO_AIMER = (1 << pin_num);
+            port->PIO_ESR = (1 << pin_num);
+            port->PIO_FELLSR =(1 << pin_num);
             break;
         case GPIO_RISING:
-            port->PIO_AIMER = (1<<pin_num);
-            port->PIO_ESR = (1<<pin_num);
-            port->PIO_REHLSR = (1<<pin_num);
+            port->PIO_AIMER = (1 << pin_num);
+            port->PIO_ESR = (1 << pin_num);
+            port->PIO_REHLSR = (1 << pin_num);
             break;
         case GPIO_BOTH:
-            port->PIO_AIMDR = (1<<pin_num);
+            port->PIO_AIMDR = (1 << pin_num);
             break;
     }
-
-	NVIC_EnableIRQ((1 << (port_num+11)));
-
     /* clean interrupt status register */
     port->PIO_ISR;
-
     /* enable the interrupt for the given channel */
-    port->PIO_IER = (1<<pin_num);
+    NVIC_EnableIRQ(1 << (port_num + PIOA_IRQn));
+    port->PIO_IER = (1 << pin_num);
 
     return 0;
 }
 
 void gpio_irq_enable(gpio_t pin)
 {
-    NVIC_EnableIRQ((1 << (_port_num(pin)+11)));
+    NVIC_EnableIRQ((1 << (_port_num(pin) + PIOA_IRQn)));
 }
 
 void gpio_irq_disable(gpio_t pin)
 {
-    NVIC_DisableIRQ((1 << (_port_num(pin)+11)));
+    NVIC_DisableIRQ((1 << (_port_num(pin) + PIOA_IRQn)));
 }
 
 int gpio_read(gpio_t pin)
 {
     Pio *port = _port(pin);
     int pin_num = _pin_num(pin);
-	int res;
 
-     if (port->PIO_OSR & (1<<pin_num)) {
-        res = port->PIO_ODSR & (1<<pin_num);
+     if (port->PIO_OSR & (1 << pin_num)) {
+        return (port->PIO_ODSR & (1 << pin_num)) ? 1 : 0;
     }
     else {
-        res = port->PIO_PDSR & (1<<pin_num);
+        return (port->PIO_PDSR & (1 << pin_num)) ? 1 : 0;
     }
-
-    /* make sure we are not returning a negative value if bit 31 is set */
-    if (res < -1) {
-        res = 1;
-    }
-
-	return res;
 }
 
 void gpio_set(gpio_t pin)
@@ -235,18 +225,18 @@ void gpio_clear(gpio_t pin)
 void gpio_toggle(gpio_t pin)
 {
     if (gpio_read(pin)) {
-        gpio_clear(pin);
+        _port(pin)->PIO_CODR = (1 << _pin_num(pin));
     } else {
-        gpio_set(pin);
+        _port(pin)->PIO_SODR = (1 << _pin_num(pin));
     }
 }
 
 void gpio_write(gpio_t pin, int value)
 {
     if (value) {
-        gpio_set(pin);
+        _port(pin)->PIO_SODR = (1 << _pin_num(pin));
     } else {
-        gpio_clear(pin);
+        _port(pin)->PIO_CODR = (1 << _pin_num(pin));
     }
 }
 
