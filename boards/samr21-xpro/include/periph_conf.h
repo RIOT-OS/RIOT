@@ -289,7 +289,7 @@ typedef struct {
 
 /* ADC 0 Default values */
 #define ADC_0_CLK_SOURCE                   0 /* GCLK_GENERATOR_0 */
-#define ADC_0_PRESCALER                    ADC_CTRLB_PRESCALER_DIV512
+#define ADC_0_PRESCALER                    ADC_CTRLB_PRESCALER_DIV4
 #define ADC_0_WINDOW_MODE                  ADC_WINCTRL_WINMODE_DISABLE
 #define ADC_0_WINDOW_LOWER                 0
 #define ADC_0_WINDOW_HIGHER                0
@@ -312,16 +312,8 @@ typedef struct {
 #define ADC_0_STATUS_OVERRUN               (1UL << 2)
 
 #if ADC_0_CHANNELS
-#if ADC_0_DIFFERENTIAL_MODE
-/*  In differential mode, we can only pick one positive
- *  and one negative input.
- */
-#define ADC_0_POS_INPUT                    ADC_INPUTCTRL_MUXPOS_PIN6
-#define ADC_0_NEG_INPUT                    ADC_INPUTCTRL_MUXNEG_IOGND
-#else
-/*  If we're not in differential mode, we can use any of
- *  ADC positive input pins the SAMR21-XPRO provides.  Each pin is
- *  a separate ADC "channel".
+/*  An array listing all possible positive input
+ *  ADC channels for the SAMR21-XPRO.
  */
 static const adc_channel_t adc_channels[] = {
     /* port, pin, muxpos */
@@ -334,7 +326,12 @@ static const adc_channel_t adc_channels[] = {
     {&PORT->Group[0], ADC_INPUTCTRL_MUXPOS_PIN10, 0xA},    // PB02
     {&PORT->Group[0], ADC_INPUTCTRL_MUXPOS_PIN11, 0xB},    // PB03
 };
-#endif
+
+/*  In differential mode, we can only pick one positive
+ *  and one negative input.  These are the default values.
+ */
+#define ADC_0_POS_INPUT                    ADC_INPUTCTRL_MUXPOS_PIN6
+#define ADC_0_NEG_INPUT                    ADC_INPUTCTRL_MUXNEG_IOGND
 #endif
 
 /* ADC 0 Gain Factor */
@@ -372,7 +369,7 @@ static const adc_channel_t adc_channels[] = {
 #define ADC_0_ACCUM_512                    ADC_AVGCTRL_SAMPLENUM_512
 #define ADC_0_ACCUM_1024                   ADC_AVGCTRL_SAMPLENUM_1024
 /* Use this to define the value used */
-#define ADC_0_ACCUM_DEFAULT                ADC_0_ACCUM_4//DISABLE
+#define ADC_0_ACCUM_DEFAULT                ADC_0_ACCUM_DISABLE
 
 /* ADC 0 DIVIDE RESULT */
 #define ADC_0_DIV_RES_DISABLE              0
@@ -384,7 +381,19 @@ static const adc_channel_t adc_channels[] = {
 #define ADC_0_DIV_RES_64                   6
 #define ADC_0_DIV_RES_128                  7
 /* Use this to define the value used */
-#define ADC_0_DIV_RES_DEFAULT             ADC_0_DIV_RES_4//DISABLE
+#define ADC_0_DIV_RES_DEFAULT             ADC_0_DIV_RES_DISABLE
+
+/*  Declare ADC Configuration object */
+#define ADC_CONF_TYPE_DEFINED 1
+typedef struct {
+  uint32_t precision;
+  uint32_t prescaler;
+  uint32_t gain;
+  uint32_t accumulate;
+  uint8_t  divide;
+  int differential_mode;
+  int run_in_standby;
+} adc_conf_t;
 
 /** @} */
 
