@@ -146,6 +146,10 @@ typedef struct {
      */
     vtimer_t nbr_adv_timer;
 
+#if defined(MODULE_GNRC_NDP_ROUTER) || defined(MODULE_GNRC_SIXLOWPAN_ND_BORDER_ROUTER)
+    vtimer_t rtr_adv_timer;                     /**< Timer for periodic router advertisements */
+#endif
+
 #ifdef MODULE_GNRC_SIXLOWPAN_ND
     vtimer_t rtr_sol_timer; /**< Retransmission timer for unicast router solicitations */
 #endif
