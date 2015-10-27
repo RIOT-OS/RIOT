@@ -14,12 +14,37 @@
  * @brief       Implementation of the CPU initialization
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Nick van IJzendoorn <nijzendoorn@engineering-spirit.nl>
  * @}
  */
 
 #include <stdint.h>
 #include "cpu.h"
 #include "periph_conf.h"
+
+/* Check the source to be used for the PLL */
+#if defined(CLOCK_HSI) && defined(CLOCK_HSE)
+#error "Only provide one of two CLOCK_HSI/CLOCK_HSE"
+#elif CLOCK_HSI
+#define CLOCK_CR_SOURCE             RCC_CR_HSION
+#define CLOCK_CR_SOURCE_RDY         RCC_CR_HSIRDY
+#ifdef RCC_CFGR_PLLSRC_HSI_DIV2
+#define CLOCK_PLL_SOURCE            (RCC_CFGR_PLLSRC_HSI_DIV2)
+#define CLOCK_PLL_MUL_MULTIPLIER    2
+#else
+#define CLOCK_PLL_SOURCE            (RCC_CFGR_PLLSRC_HSI_PREDIV)
+#define CLOCK_PLL_MUL_MULTIPLIER    1
+#endif
+#define CLOCK_DISABLE_HSI           0
+#elif CLOCK_HSE
+#define CLOCK_CR_SOURCE             RCC_CR_HSEON
+#define CLOCK_CR_SOURCE_RDY         RCC_CR_HSERDY
+#define CLOCK_PLL_SOURCE            (RCC_CFGR_PLLSRC_HSE_PREDIV | RCC_CFGR_PLLXTPRE_HSE_PREDIV_DIV1)
+#define CLOCK_PLL_MUL_MULTIPLIER    1
+#define CLOCK_DISABLE_HSI           1
+#else
+#error "Please provide CLOCK_HSI or CLOCK_HSE in boards/NAME/includes/perhip_cpu.h"
+#endif
 
 static void cpu_clock_init(void);
 
@@ -38,7 +63,7 @@ void cpu_init(void)
  * @brief Configure the controllers clock system
  *
  * The clock initialization make the following assumptions:
- * - the external HSE clock from an external oscillator is used as base clock
+ * - the HSI and HSE selection is based on the CLOCK_HSI or CLOCK_HSE define in the periph_conf.h
  * - the internal PLL circuit is used for clock refinement
  *
  * The actual used values are specified in the board's `periph_conf.h` file.
@@ -48,10 +73,7 @@ void cpu_init(void)
  */
 static void cpu_clock_init(void)
 {
-    /* configure the HSE clock */
-
-    /* enable the HSI clock */
-    RCC->CR |= RCC_CR_HSION;
+    /* configure the high speed clock */
 
     /* reset clock configuration register */
     RCC->CFGR = 0;
@@ -62,11 +84,11 @@ static void cpu_clock_init(void)
     /* disable all clock interrupts */
     RCC->CIR = 0;
 
-    /* enable the HSE clock */
-    RCC->CR |= RCC_CR_HSEON;
+    /* enable the high speed clock */
+    RCC->CR |= CLOCK_CR_SOURCE;
 
-    /* wait for HSE to be ready */
-    while (!(RCC->CR & RCC_CR_HSERDY)) {}
+    /* wait for high speed clock to be ready */
+    while (!(RCC->CR & CLOCK_CR_SOURCE_RDY)) {}
 
     /* setup the peripheral bus prescalers */
 
@@ -84,9 +106,8 @@ static void cpu_clock_init(void)
 
     /* reset PLL configuration */
     RCC->CFGR &= ~(RCC_CFGR_PLLSRC | RCC_CFGR_PLLXTPRE | RCC_CFGR_PLLMUL);
-    /* set PLL to use HSE clock with prescaler 1 as input */
-    RCC->CFGR |= RCC_CFGR_PLLSRC_HSE_PREDIV | RCC_CFGR_PLLXTPRE_HSE_PREDIV_DIV1 |
-                 (((CLOCK_PLL_MUL - 2) & 0xf) << 18);
+    /* set PLL to use high speed clock with prescaler 1 as input */
+    RCC->CFGR |= CLOCK_PLL_SOURCE | ((((CLOCK_PLL_MUL * CLOCK_PLL_MUL_MULTIPLIER) - 2) & 0xf) << 18);
 
     /* enable PLL again */
     RCC->CR |= RCC_CR_PLLON;
@@ -111,4 +132,10 @@ static void cpu_clock_init(void)
 
     /* wait for sysclock to be stable */
     while (!(RCC->CFGR & RCC_CFGR_SWS_PLL)) {}
+
+#if CLOCK_DISABLE_HSI
+    /* disable the HSI if we use the HSE */
+    RCC->CR &= ~(RCC_CR_HSION);
+    while (RCC->CR & RCC_CR_HSIRDY) {}
+#endif
 }
