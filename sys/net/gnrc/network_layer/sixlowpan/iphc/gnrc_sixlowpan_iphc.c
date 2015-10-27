@@ -178,8 +178,6 @@ size_t gnrc_sixlowpan_iphc_decode(gnrc_pktsnip_t *ipv6, gnrc_pktsnip_t *pkt, siz
     }
 
     switch (iphc_hdr[IPHC2_IDX] & (SIXLOWPAN_IPHC2_SAC | SIXLOWPAN_IPHC2_SAM)) {
-        /* should be asserted by line 168 anyway */
-        assert(ctx != NULL);
 
         case IPHC_SAC_SAM_FULL:
             /* take full 128 from inline */
@@ -213,6 +211,7 @@ size_t gnrc_sixlowpan_iphc_decode(gnrc_pktsnip_t *ipv6, gnrc_pktsnip_t *pkt, siz
             break;
 
         case IPHC_SAC_SAM_CTX_64:
+            assert(ctx != NULL);
             memcpy(ipv6_hdr->src.u8 + 8, iphc_hdr + payload_offset, 8);
             ipv6_addr_init_prefix(&ipv6_hdr->src, &ctx->prefix,
                                   ctx->prefix_len);
@@ -220,6 +219,7 @@ size_t gnrc_sixlowpan_iphc_decode(gnrc_pktsnip_t *ipv6, gnrc_pktsnip_t *pkt, siz
             break;
 
         case IPHC_SAC_SAM_CTX_16:
+            assert(ctx != NULL);
             ipv6_hdr->src.u32[2] = byteorder_htonl(0x000000ff);
             ipv6_hdr->src.u16[6] = byteorder_htons(0xfe00);
             memcpy(ipv6_hdr->src.u8 + 14, iphc_hdr + payload_offset, 2);
@@ -229,6 +229,7 @@ size_t gnrc_sixlowpan_iphc_decode(gnrc_pktsnip_t *ipv6, gnrc_pktsnip_t *pkt, siz
             break;
 
         case IPHC_SAC_SAM_CTX_L2:
+            assert(ctx != NULL);
             ieee802154_get_iid((eui64_t *)(&ipv6_hdr->src.u64[1]),
                                gnrc_netif_hdr_get_src_addr(netif_hdr),
                                netif_hdr->src_l2addr_len);
