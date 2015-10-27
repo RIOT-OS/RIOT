@@ -18,8 +18,9 @@
  *
  */
 
-#ifndef PERIPH_CPU_H_
-#define PERIPH_CPU_H_
+#ifndef PERIPH_CPU_H
+#define PERIPH_CPU_H
+
 #include "cpu.h"
 #include "periph/dev_enums.h"
 
@@ -48,7 +49,15 @@ typedef uint32_t gpio_t;
  * @brief Define a CPU specific GPIO pin generator macro
  */
 #define GPIO_PIN(x, y)          ((PIO_BASE_ADRESS + (x << 9)) | y)
-#define GPIO2(i)            ((PIOA + (i << 9)))
+
+/**
+ * @brief Declare needed generic SPI functions
+ * @{
+ */
+#define PERIPH_SPI_NEEDS_TRANSFER_BYTES
+#define PERIPH_SPI_NEEDS_TRANSFER_REG
+#define PERIPH_SPI_NEEDS_TRANSFER_REGS
+/** @} */
 
 /**
  * @brief Override values for pull register configuration
@@ -84,18 +93,9 @@ enum {
     PORT_D = 3,             /**< port D */
 };
 
-/**
- * @brief Declare needed generic SPI functions
- * @{
- */
-#define PERIPH_SPI_NEEDS_TRANSFER_BYTES
-#define PERIPH_SPI_NEEDS_TRANSFER_REG
-#define PERIPH_SPI_NEEDS_TRANSFER_REGS
-/** @} */
-
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* PERIPH_CPU_H_ */
+#endif /* PERIPH_CPU_H */
 /** @} */
