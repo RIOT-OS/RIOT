@@ -621,7 +621,7 @@ int gnrc_ndp_internal_sl2a_opt_handle(gnrc_pktsnip_t *pkt, ipv6_hdr_t *ipv6, uin
         case ICMPV6_RTR_ADV:
         case ICMPV6_NBR_SOL:
             if (sl2a_len == 0) {  /* in case there was no source address in l2 */
-                sl2a_len = (sl2a_opt->len / 8) - sizeof(ndp_opt_t);
+                sl2a_len = (sl2a_opt->len * 8) - sizeof(ndp_opt_t);
 
                 /* ignore all zeroes at the end for length */
                 for (; sl2a[sl2a_len - 1] == 0x00; sl2a_len--);
