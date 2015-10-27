@@ -185,6 +185,16 @@ static void _slip_send(gnrc_slip_dev_t *dev, gnrc_pktsnip_t *pkt)
     gnrc_pktbuf_release(pkt);
 }
 
+static inline int _slip_get(gnrc_netapi_opt_t *opt)
+{
+    switch (opt->opt) {
+        case NETOPT_IS_WIRED:
+            return 1;
+        default:
+            return -ENOTSUP;
+    }
+}
+
 static void *_slip(void *args)
 {
     gnrc_slip_dev_t *dev = _SLIP_DEV(args);
@@ -213,11 +223,17 @@ static void *_slip(void *args)
                 break;
 
             case GNRC_NETAPI_MSG_TYPE_GET:
+                DEBUG("slip: GNRC_NETAPI_MSG_TYPE_GET received\n");
+                reply.type = GNRC_NETAPI_MSG_TYPE_ACK;
+                reply.content.value = (uint32_t)_slip_get((gnrc_netapi_opt_t *)msg.content.ptr);
+                msg_reply(&msg, &reply);
+                break;
+
             case GNRC_NETAPI_MSG_TYPE_SET:
-                DEBUG("slip: GNRC_NETAPI_MSG_TYPE_GET or GNRC_NETAPI_MSG_TYPE_SET received\n");
+                DEBUG("slip: GNRC_NETAPI_MSG_TYPE_SET received\n");
                 reply.type = GNRC_NETAPI_MSG_TYPE_ACK;
                 reply.content.value = (uint32_t)(-ENOTSUP);
-                DEBUG("slip: I don't support these but have to reply.\n");
+                DEBUG("slip: I don't support this but have to reply.\n");
                 msg_reply(&msg, &reply);
                 break;
         }
