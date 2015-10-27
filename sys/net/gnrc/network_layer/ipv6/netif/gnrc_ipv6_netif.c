@@ -838,15 +838,13 @@ void gnrc_ipv6_netif_init_by_dev(void)
 #endif
 
         /* set link-local address */
-        if ((gnrc_netapi_get(ifs[i], NETOPT_IPV6_IID, 0, &iid,
-                             sizeof(eui64_t)) < 0)) {
-            mutex_unlock(&ipv6_if->mutex);
-            continue;
-        }
+        if (gnrc_netapi_get(ifs[i], NETOPT_IPV6_IID, 0, &iid,
+                            sizeof(eui64_t)) >= 0) {
+            ipv6_addr_set_aiid(&addr, iid.uint8);
+            ipv6_addr_set_link_local_prefix(&addr);
+            _add_addr_to_entry(ipv6_if, &addr, 64, 0);
 
-        ipv6_addr_set_aiid(&addr, iid.uint8);
-        ipv6_addr_set_link_local_prefix(&addr);
-        _add_addr_to_entry(ipv6_if, &addr, 64, 0);
+        }
 
         /* set link MTU */
         if ((gnrc_netapi_get(ifs[i], NETOPT_MAX_PACKET_SIZE, 0, &tmp,
