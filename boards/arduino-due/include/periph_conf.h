@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Freie Universität Berlin
+ * Copyright (C) 2014-2015 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -20,6 +20,8 @@
 
 #ifndef PERIPH_CONF_H_
 #define PERIPH_CONF_H_
+
+#include "periph_cpu.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -60,51 +62,21 @@ extern "C" {
  * @name UART configuration
  * @{
  */
-#define UART_NUMOF          (4U)
-#define UART_0_EN           1
-#define UART_1_EN           1
-#define UART_2_EN           1
-#define UART_3_EN           1
+static const uart_conf_t uart_config[] = {
+    /* device, rx port, tx port, rx pin, tx pin, mux, PMC bit, IRGn line */
+    {(Uart *)UART,   PIOA, PIOA,  8,  9, GPIO_MUX_A, ID_UART,   UART_IRQn},
+    {(Uart *)USART0, PIOA, PIOA, 10, 11, GPIO_MUX_A, ID_USART0, USART0_IRQn},
+    {(Uart *)USART1, PIOA, PIOA, 12, 13, GPIO_MUX_A, ID_USART1, USART1_IRQn},
+    {(Uart *)USART3, PIOD, PIOD,  4,  5, GPIO_MUX_B, ID_USART3, USART3_IRQn}
+};
 
-/* UART 0 device configuration */
-#define UART_0_DEV          UART
-#define UART_0_CLKEN()      (PMC->PMC_PCER0 |= (1 << ID_UART))
-#define UART_0_CLKDIS()     (PMC->PMC_PCER0 &= ~(1 << ID_UART))
-#define UART_0_IRQ          UART_IRQn
+/* define interrupt vectors */
 #define UART_0_ISR          isr_uart
-/* UART 0 pin configuration */
-#define UART_0_PORT         PIOA
-#define UART_0_PINS         (PIO_PA8 | PIO_PA9)
-
-/* UART 1 device configuration */
-#define UART_1_DEV          USART0
-#define UART_1_CLKEN()      (PMC->PMC_PCER0 |= (1 << ID_USART0))
-#define UART_1_CLKDIS()     (PMC->PMC_PCER0 &= ~(1 << ID_USART0))
-#define UART_1_IRQ          USART0_IRQn
 #define UART_1_ISR          isr_usart0
-/* UART 1 pin configuration */
-#define UART_1_PORT         PIOA
-#define UART_1_PINS         (PIO_PA10 | PIO_PA11)
-
-/* UART 1 device configuration */
-#define UART_2_DEV          USART1
-#define UART_2_CLKEN()      (PMC->PMC_PCER0 |= (1 << ID_USART1))
-#define UART_2_CLKDIS()     (PMC->PMC_PCER0 &= ~(1 << ID_USART1))
-#define UART_2_IRQ          USART1_IRQn
 #define UART_2_ISR          isr_usart1
-/* UART 1 pin configuration */
-#define UART_2_PORT         PIOA
-#define UART_2_PINS         (PIO_PA12 | PIO_PA13)
-
-/* UART 1 device configuration */
-#define UART_3_DEV          USART3
-#define UART_3_CLKEN()      (PMC->PMC_PCER0 |= (1 << ID_USART3))
-#define UART_3_CLKDIS()     (PMC->PMC_PCER0 &= ~(1 << ID_USART3))
-#define UART_3_IRQ          USART3_IRQn
 #define UART_3_ISR          isr_usart3
-/* UART 1 pin configuration */
-#define UART_3_PORT         PIOD
-#define UART_3_PINS         (PIO_PD4 | PIO_PD5)
+
+#define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
 /** @} */
 
 /**
