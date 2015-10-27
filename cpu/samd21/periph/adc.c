@@ -14,6 +14,8 @@
  * @brief       ADC driver implementation
  *
  * @author      Rane Balslev (SAMR21) <ranebalslev@gmail.com>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Mark Solters <msolters@driblet.io>
  *
  * @}
  */
@@ -27,6 +29,12 @@
 
 /* guard in case that no ADC device is defined */
 #if ADC_NUMOF
+
+/*  Declare ADC Configuration object */
+typedef struct {
+  adc_precision_t precision;
+} adc_conf_t;
+adc_conf_t adc_conf;
 
 /* Prototypes */
 bool adc_syncing(Adc*);
@@ -46,6 +54,7 @@ int adc_init(adc_t dev, adc_precision_t precision)
             while(adc_syncing(adc));
             /*Disable adc before init*/
             adc->CTRLA.reg &= ~ADC_CTRLA_ENABLE;
+            adc_conf.precision = precision;
             switch (precision)
             {
                 case ADC_RES_8BIT:
@@ -104,7 +113,9 @@ int adc_sample(adc_t dev, int channel)
     /*  Otherwise, use the positive input corresponding to the provided arg
      *  "channel", and use GND as the negative input.
      */
-    ADC->INPUTCTRL.reg = ADC_0_GAIN_FACTOR_DEFAULT | adc_config[channel].muxpos | ADC_INPUTCTRL_MUXNEG_IOGND;
+    ADC->INPUTCTRL.reg = ADC_0_GAIN_FACTOR_DEFAULT
+                          | adc_channels[channel].muxpos
+                          | ADC_INPUTCTRL_MUXNEG_IOGND;
   #endif
 
   // Wait for sync.
@@ -156,14 +167,30 @@ void adc_poweroff(adc_t dev)
 
 int adc_map(adc_t dev, int value, int min, int max)
 {
-    DEBUG("adc_map Not implemented!\n");
-    return 0;
+    return (int)adc_mapf(dev, value, (float)min, (float)max);
 }
 
 float adc_mapf(adc_t dev, int value, float min, float max)
 {
-    DEBUG("adc_mapf Not implemented!\n");
-    return 0.0;
+    int resolution_bits;
+    switch (adc_conf.precision)
+    {
+        case ADC_RES_8BIT:
+            resolution_bits = 8;
+            break;
+        case ADC_RES_10BIT:
+            resolution_bits = 10;
+            break;
+        case ADC_RES_12BIT:
+            resolution_bits = 12;
+            break;
+        case ADC_RES_16BIT:
+            resolution_bits = 16;
+            break;
+        default:
+            return -1;
+    }
+    return ((max - min) / ((float)(1 << resolution_bits) - 1)) * value;
 }
 
 bool adc_syncing(Adc* adc)
@@ -210,10 +237,10 @@ int adc_configure_with_resolution(Adc* adc, uint32_t precision)
           ADC_0_PORT.PINCFG[ADC_0_NEG_INPUT].bit.PULLEN = false;
       }
     #else
-      /*  Configure all positive inputs enumerated in adc_config  */
+      /*  Configure all positive inputs enumerated in adc_channels  */
       for (int i = 0; i < ADC_0_CHANNELS; i++) {
-         PortGroup *port = adc_config[i].port;
-         int pin = adc_config[i].pin;
+         PortGroup *port = adc_channels[i].port;
+         int pin = adc_channels[i].pin;
          port->DIRCLR.reg = (1 << pin);
          port->PINCFG[pin].reg = (PORT_PINCFG_PMUXEN | PORT_PINCFG_INEN);
          port->PMUX[pin >> 1].reg = ~(0xf << (4 * (pin & 0x1)));

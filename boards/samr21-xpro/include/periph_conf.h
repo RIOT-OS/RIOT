@@ -17,6 +17,7 @@
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
+ * @author      Mark Solters <msolters@driblet.io>
  */
 
 #ifndef PERIPH_CONF_H_
@@ -269,11 +270,6 @@ static const pwm_conf_t pwm_config[] = {
  * @ ADC Configuration
  * @{
  */
-typedef struct {
-    PortGroup *port;
-    uint8_t pin;
-    uint8_t muxpos;                 /* see datasheet sec 30.8.8 */
-} adc_conf_t;
 
 #define ADC_NUMOF                          (1U)
 #define ADC_0_EN                           1
@@ -284,6 +280,12 @@ typedef struct {
 #define ADC_0_PORT                         (PORT->Group[0])
 #define ADC_0_IRQ                          ADC_IRQn
 #define ADC_0_CHANNELS                     6 // ignore PA04 & PA05 due to EDBG UART conflict
+
+typedef struct {
+  PortGroup *port;
+  uint8_t pin;
+  uint8_t muxpos;                 /* see datasheet sec 30.8.8 */
+} adc_channel_t;
 
 /* ADC 0 Default values */
 #define ADC_0_CLK_SOURCE                   0 /* GCLK_GENERATOR_0 */
@@ -321,7 +323,7 @@ typedef struct {
  *  ADC positive input pins the SAMR21-XPRO provides.  Each pin is
  *  a separate ADC "channel".
  */
-static const adc_conf_t adc_config[] = {
+static const adc_channel_t adc_channels[] = {
     /* port, pin, muxpos */
     //{&PORT->Group[0], 4, 0x4}, // we cannot use these as well as use EDBG serial TX/RX
     //{&PORT->Group[0], 5, 0x5}, // because PA04 & PA05 read/write directly to EDBG serial port.
@@ -334,7 +336,6 @@ static const adc_conf_t adc_config[] = {
 };
 #endif
 #endif
-
 
 /* ADC 0 Gain Factor */
 #define ADC_0_GAIN_FACTOR_1X               ADC_INPUTCTRL_GAIN_1X
@@ -371,7 +372,7 @@ static const adc_conf_t adc_config[] = {
 #define ADC_0_ACCUM_512                    ADC_AVGCTRL_SAMPLENUM_512
 #define ADC_0_ACCUM_1024                   ADC_AVGCTRL_SAMPLENUM_1024
 /* Use this to define the value used */
-#define ADC_0_ACCUM_DEFAULT                ADC_0_ACCUM_DISABLE
+#define ADC_0_ACCUM_DEFAULT                ADC_0_ACCUM_4//DISABLE
 
 /* ADC 0 DIVIDE RESULT */
 #define ADC_0_DIV_RES_DISABLE              0
@@ -383,7 +384,8 @@ static const adc_conf_t adc_config[] = {
 #define ADC_0_DIV_RES_64                   6
 #define ADC_0_DIV_RES_128                  7
 /* Use this to define the value used */
-#define ADC_0_DIV_RES_DEFAULT             ADC_0_DIV_RES_DISABLE
+#define ADC_0_DIV_RES_DEFAULT             ADC_0_DIV_RES_4//DISABLE
+
 /** @} */
 
 #ifdef __cplusplus
