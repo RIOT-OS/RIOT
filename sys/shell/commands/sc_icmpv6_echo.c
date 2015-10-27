@@ -194,8 +194,8 @@ int _icmpv6_ping(int argc, char **argv)
         gnrc_pktsnip_t *pkt;
         timex_t start, stop, timeout = { 1, 0 };
 
-        pkt = gnrc_icmpv6_echo_req_build(id, ++max_seq_expected, NULL,
-                                         payload_len);
+        pkt = gnrc_icmpv6_echo_build(ICMPV6_ECHO_REQ, id, ++max_seq_expected,
+                                     NULL, payload_len);
 
         if (pkt == NULL) {
             puts("error: packet buffer full");
