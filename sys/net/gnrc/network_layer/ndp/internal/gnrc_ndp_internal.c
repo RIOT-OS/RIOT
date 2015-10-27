@@ -387,10 +387,8 @@ static inline bool _check_prefixes(gnrc_ipv6_netif_addr_t *a, gnrc_ipv6_netif_ad
     return false;
 }
 
-static gnrc_pktsnip_t *_add_pios(gnrc_ipv6_netif_t *ipv6_iface, gnrc_pktsnip_t *pkt)
+static bool _add_pios(gnrc_pktsnip_t **res, gnrc_ipv6_netif_t *ipv6_iface, gnrc_pktsnip_t *pkt)
 {
-    gnrc_pktsnip_t *tmp;
-
     for (int i = 0; i < GNRC_IPV6_NETIF_ADDR_NUMOF; i++) {
         /* skip if prefix has been processed already */
         bool processed_before = false;
@@ -406,24 +404,24 @@ static gnrc_pktsnip_t *_add_pios(gnrc_ipv6_netif_t *ipv6_iface, gnrc_pktsnip_t *
             continue;
         }
 
-        if (_pio_from_iface_addr(&tmp, &ipv6_iface->addrs[i], pkt)) {
-            if (tmp != NULL) {
-                pkt = tmp;
+        if (_pio_from_iface_addr(res, &ipv6_iface->addrs[i], pkt)) {
+            if (*res != NULL) {
+                pkt = *res;
             }
             else {
                 DEBUG("ndp rtr: error allocating PIO\n");
                 gnrc_pktbuf_release(pkt);
-                return NULL;
+                return false;
             }
         }
     }
-    return pkt;
+    return true;
 }
 
 void gnrc_ndp_internal_send_rtr_adv(kernel_pid_t iface, ipv6_addr_t *src, ipv6_addr_t *dst,
                                     bool fin)
 {
-    gnrc_pktsnip_t *hdr, *pkt = NULL;
+    gnrc_pktsnip_t *hdr = NULL, *pkt = NULL;
     ipv6_addr_t all_nodes = IPV6_ADDR_ALL_NODES_LINK_LOCAL;
     gnrc_ipv6_netif_t *ipv6_iface = gnrc_ipv6_netif_get(iface);
     uint32_t reach_time = 0, retrans_timer = 0;
@@ -439,8 +437,7 @@ void gnrc_ndp_internal_send_rtr_adv(kernel_pid_t iface, ipv6_addr_t *src, ipv6_a
 #ifdef MODULE_GNRC_SIXLOWPAN_ND_ROUTER
     if (!(ipv6_iface->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN)) {
 #endif
-    hdr = _add_pios(ipv6_iface, pkt);
-    if (hdr == NULL) {
+    if (!_add_pios(&hdr, ipv6_iface, pkt)) {
         /* pkt already released in _add_pios */
         mutex_unlock(&ipv6_iface->mutex);
         return;
