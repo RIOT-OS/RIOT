@@ -152,6 +152,9 @@ void gnrc_ipv6_nc_remove(kernel_pid_t iface, const ipv6_addr_t *ipv6_addr)
 #ifdef MODULE_GNRC_SIXLOWPAN_ND_ROUTER
         vtimer_remove(&entry->type_timeout);
 #endif
+#if defined(MODULE_GNRC_NDP_ROUTER) || defined(MODULE_GNRC_SIXLOWPAN_ND_BORDER_ROUTER)
+        vtimer_remove(&entry->rtr_adv_timer);
+#endif
 
         ipv6_addr_set_unspecified(&(entry->ipv6_addr));
         entry->iface = KERNEL_PID_UNDEF;
