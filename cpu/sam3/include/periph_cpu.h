@@ -8,13 +8,14 @@
  */
 
 /**
- * @ingroup         cpu_sam3
+ * @ingroup     cpu_sam3
  * @{
  *
  * @file
- * @brief           CPU specific definitions for internal peripheral handling
+ * @brief       CPU specific definitions for internal peripheral handling
  *
- * @author          Hauke Petersen <hauke.peterse@fu-berlin.de>
+ * @author      Hauke Petersen <hauke.peterse@fu-berlin.de>
+ * @author      Tobias Fredersdorf <tobias.fredersdorf@haw-hamburg.de>
  *
  */
 
