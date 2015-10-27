@@ -339,7 +339,8 @@ typedef struct {
      *          The default value is @ref GNRC_NDP_RETRANS_TIMER.
      */
     timex_t retrans_timer;
-    vtimer_t rtr_sol_timer; /**< Timer for periodic router solicitations */
+    xtimer_t rtr_sol_timer; /**< Timer for periodic router solicitations */
+    msg_t rtr_sol_msg;      /**< msg_t for gnrc_ipv6_netif_t::rtr_sol_timer */
 #if defined (MODULE_GNRC_NDP_ROUTER) || defined (MODULE_GNRC_SIXLOWPAN_ND_ROUTER)
     vtimer_t rtr_adv_timer; /**< Timer for periodic router advertisements */
 #endif

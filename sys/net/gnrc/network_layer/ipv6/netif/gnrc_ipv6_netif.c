@@ -234,7 +234,7 @@ void gnrc_ipv6_netif_remove(kernel_pid_t pid)
 #endif
 
     mutex_lock(&entry->mutex);
-    vtimer_remove(&entry->rtr_sol_timer);
+    xtimer_remove(&entry->rtr_sol_timer);
 #ifdef MODULE_GNRC_NDP_ROUTER
     vtimer_remove(&entry->rtr_adv_timer);
 #endif
