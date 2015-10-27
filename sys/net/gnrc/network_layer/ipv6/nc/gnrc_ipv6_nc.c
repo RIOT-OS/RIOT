@@ -136,6 +136,11 @@ gnrc_ipv6_nc_t *gnrc_ipv6_nc_add(kernel_pid_t iface, const ipv6_addr_t *ipv6_add
     free_entry->rtr_timeout_msg.type = GNRC_NDP_MSG_RTR_TIMEOUT;
     free_entry->rtr_timeout_msg.content.ptr = (char *) free_entry;
 
+#if defined(MODULE_GNRC_NDP_ROUTER) || defined(MODULE_GNRC_SIXLOWPAN_ND_BORDER_ROUTER)
+    free_entry->rtr_adv_msg.type = GNRC_NDP_MSG_RTR_ADV_DELAY;
+    free_entry->rtr_adv_msg.content.ptr = (char *) free_entry;
+#endif
+
     return free_entry;
 }
 
@@ -157,6 +162,9 @@ void gnrc_ipv6_nc_remove(kernel_pid_t iface, const ipv6_addr_t *ipv6_addr)
 #endif
 #ifdef MODULE_GNRC_SIXLOWPAN_ND_ROUTER
         xtimer_remove(&entry->type_timeout);
+#endif
+#if defined(MODULE_GNRC_NDP_ROUTER) || defined(MODULE_GNRC_SIXLOWPAN_ND_BORDER_ROUTER)
+        xtimer_remove(&entry->rtr_adv_timer);
 #endif
 
         ipv6_addr_set_unspecified(&(entry->ipv6_addr));

@@ -149,6 +149,11 @@ typedef struct {
     xtimer_t nbr_adv_timer;
     msg_t nbr_adv_msg;                          /**< msg_t for gnrc_ipv6_nc_t::nbr_adv_timer */
 
+#if defined(MODULE_GNRC_NDP_ROUTER) || defined(MODULE_GNRC_SIXLOWPAN_ND_BORDER_ROUTER)
+    xtimer_t rtr_adv_timer;                     /**< Timer for periodic router advertisements */
+    msg_t rtr_adv_msg;                          /**< msg_t for gnrc_ipv6_nc_t::rtr_adv_timer */
+#endif
+
 #ifdef MODULE_GNRC_SIXLOWPAN_ND_ROUTER
     xtimer_t type_timeout;                  /**< Timer for type transmissions */
     msg_t type_timeout_msg;                 /**< msg_t for gnrc_ipv6_nc_t::type_timeout */
