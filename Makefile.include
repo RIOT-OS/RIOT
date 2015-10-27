@@ -287,6 +287,9 @@ term: $(filter flash, $(MAKECMDGOALS))
 		exit 1; }
 	$(TERMPROG) $(TERMFLAGS)
 
+list-ttys:
+	$(AD)$(RIOTBASE)/dist/tools/usb-serial/list-ttys.sh
+
 doc:
 	make -BC $(RIOTBASE) doc
 
