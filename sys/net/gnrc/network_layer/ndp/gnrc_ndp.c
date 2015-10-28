@@ -452,8 +452,8 @@ void gnrc_ndp_rtr_sol_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
                 /* XXX: can't just use GNRC_NETAPI_MSG_TYPE_SND, since the next retransmission
                  * must also be set. */
                 gnrc_ipv6_nc_t *nc_entry = gnrc_ipv6_nc_get(iface, &ipv6->src);
-                vtimer_set_msg(&if_entry->rtr_adv_timer, delay, gnrc_ipv6_pid,
-                               GNRC_NDP_MSG_RTR_ADV_DELAY, nc_entry);
+                xtimer_set_msg(&nc_entry->rtr_adv_timer, (uint32_t) timex_uint64(delay),
+                               &nc_entry->rtr_adv_msg, gnrc_ipv6_pid);
             }
 #endif
         }
@@ -612,7 +612,7 @@ void gnrc_ndp_rtr_adv_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt, ipv6_hdr_t
 #ifdef MODULE_GNRC_SIXLOWPAN_ND
     if (if_entry->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN) {
         /* stop multicast router solicitation retransmission timer */
-        vtimer_remove(&if_entry->rtr_sol_timer);
+        xtimer_remove(&if_entry->rtr_sol_timer);
         /* 3/4 of the time should be "well before" enough the respective timeout
          * not to run out; see https://tools.ietf.org/html/rfc6775#section-5.4.3 */
         next_rtr_sol *= 3;

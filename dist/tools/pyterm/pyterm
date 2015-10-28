@@ -241,7 +241,10 @@ class SerCmd(cmd.Cmd):
                           "out" % line)
         for tok in line.split(';'):
             tok = self.get_alias(tok)
-            self.ser.write((tok.strip() + "\n").encode("utf-8"))
+            if sys.version_info[0] == 2:
+                self.ser.write((tok.strip() + "\n").decode("utf-8").encode("utf-8"))
+            else:
+                self.ser.write((tok.strip() + "\n").encode("utf-8"))
 
     def do_help(self, line):
         """Do not use Cmd's internal help function, but redirect to the

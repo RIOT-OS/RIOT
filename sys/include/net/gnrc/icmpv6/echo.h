@@ -47,49 +47,6 @@ gnrc_pktsnip_t *gnrc_icmpv6_echo_build(uint8_t type, uint16_t id, uint16_t seq,
                                        uint8_t *data, size_t data_len);
 
 /**
- * @brief   Builds an ICMPv6 echo request for sending.
- *
- * @see <a href="https://tools.ietf.org/html/rfc4443#section-4.1">
- *          RFC 4443, section 4.1
- *      </a>
- *
- * @param[in] id        ID for the echo request in host byte-order
- * @param[in] seq       Sequence number for the echo request in host byte-order
- * @param[in] data      Payload for the echo request
- * @param[in] data_len  Length of @p data
- *
- * @return  The echo request message on success
- * @return  NULL, on failure
- */
-static inline gnrc_pktsnip_t *gnrc_icmpv6_echo_req_build(uint16_t id, uint16_t seq,
-        uint8_t *data, size_t data_len)
-{
-    return gnrc_icmpv6_echo_build(ICMPV6_ECHO_REQ, id, seq, data, data_len);
-}
-
-/**
- * @brief   Builds an ICMPv6 echo reply for sending.
- *
- * @see <a href="https://tools.ietf.org/html/rfc4443#section-4.2">
- *          RFC 4443, section 4.2
- *      </a>
- *
- * @param[in] id        ID for the echo reply in host byte-order
- * @param[in] seq       Sequence number for the echo reply in host byte-order
- * @param[in] data      Payload for the echo reply
- * @param[in] data_len  Length of @p data
- *
- * @return  The echo reply message on success
- * @return  NULL, on failure
- */
-static inline gnrc_pktsnip_t *gnrc_icmpv6_echo_rep_build(uint16_t id, uint16_t seq,
-        uint8_t *data, size_t data_len)
-{
-    return gnrc_icmpv6_echo_build(ICMPV6_ECHO_REP, id, seq, data, data_len);
-}
-
-
-/**
  * @brief   ICMPv6 echo request handler
  *
  * @param[in] iface     The interface the echo requuest was received on.

@@ -61,10 +61,8 @@ typedef struct {
 socket_t _pool[SOCKET_POOL_SIZE];
 mutex_t _pool_mutex = MUTEX_INIT;
 
-const struct sockaddr_in6 in6addr_any = {AF_INET6, 0, 0, IN6ADDR_ANY_INIT, 0};
-const struct sockaddr_in6 in6addr_loopback = {
-    AF_INET6, 0, 0, IN6ADDR_LOOPBACK_INIT, 0
-};
+const struct in6_addr in6addr_any = IN6ADDR_ANY_INIT;
+const struct in6_addr in6addr_loopback = IN6ADDR_LOOPBACK_INIT;
 
 static socket_t *_get_free_socket(void)
 {
