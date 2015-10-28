@@ -469,12 +469,12 @@ static inline uint32_t xtimer_now(void)
 #endif
 }
 
-static inline void xtimer_spin_until(uint32_t value) {
+static inline void xtimer_spin_until(uint32_t target) {
 #if XTIMER_MASK
-    value = _mask(value);
+    target = _mask(target);
 #endif
-    while (_xtimer_now() > value);
-    while (_xtimer_now() < value);
+    while (_xtimer_now() > target);
+    while (_xtimer_now() < target);
 }
 
 static inline void xtimer_spin(uint32_t offset) {
