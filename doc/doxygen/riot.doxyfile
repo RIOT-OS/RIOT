@@ -832,6 +832,7 @@ EXCLUDE_PATTERNS       = */board/*/tools/* \
                          */cpu/k60/include/MK60DZ10.h \
                          */cpu/kw2x/include/MKW22D5.h \
                          */cpu/k64f/include/MK64F12.h \
+                         */cpu/ezr32wg/include/ezr* \
 
 
 # The EXCLUDE_SYMBOLS tag can be used to specify one or more symbol names
