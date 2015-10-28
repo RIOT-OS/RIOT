@@ -106,9 +106,11 @@ static void _send_rtr_adv(gnrc_ipv6_netif_t *iface, ipv6_addr_t *dst)
     }
     if (!fin || (iface->rtr_adv_count > 1)) {   /* regard for off-by-one-error */
         /* reset timer for next router advertisement */
-        vtimer_remove(&iface->rtr_adv_timer);
-        vtimer_set_msg(&iface->rtr_adv_timer, timex_set(interval, 0),
-                       gnrc_ipv6_pid, GNRC_NDP_MSG_RTR_ADV_RETRANS, iface);
+        xtimer_remove(&iface->rtr_adv_timer);
+        iface->rtr_adv_msg.type = GNRC_NDP_MSG_RTR_ADV_RETRANS;
+        iface->rtr_adv_msg.content.ptr = (char *) iface;
+        xtimer_set_msg(&iface->rtr_adv_timer, interval * SEC_IN_USEC, &iface->rtr_adv_msg,
+                       gnrc_ipv6_pid);
     }
     mutex_unlock(&iface->mutex);
     for (int i = 0; i < GNRC_IPV6_NETIF_ADDR_NUMOF; i++) {
