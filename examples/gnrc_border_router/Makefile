@@ -7,12 +7,14 @@ BOARD ?= samr21-xpro
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
 
-BOARD_INSUFFICIENT_MEMORY := airfy-beacon nrf51dongle nrf6310 pca10000 pca10005 nucleo-f334 \
-                             spark-core stm32f0discovery weio yunjia-nrf51822
+BOARD_INSUFFICIENT_MEMORY := airfy-beacon msb-430 msb-430h pca10000 pca10005 \
+                             nrf51dongle nrf6310  nucleo-f334 spark-core \
+                             stm32f0discovery telosb weio wsn430-v1_3b \
+                             wsn430-v1_4 yunjia-nrf51822 z1
 
 ifeq (,$(SLIP_UART))
   # set default (last available UART)
-  SLIP_UART="(UART_NUMOF-1)"
+  SLIP_UART="UART_DEV(UART_NUMOF-1)"
 endif
 ifeq (,$(SLIP_BAUDRATE))
   # set default

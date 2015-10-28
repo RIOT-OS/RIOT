@@ -3,6 +3,7 @@ FEATURES_PROVIDED += periph_gpio
 FEATURES_PROVIDED += periph_rtc
 FEATURES_PROVIDED += periph_spi
 FEATURES_PROVIDED += periph_timer
+FEATURES_PROVIDED += periph_uart
 
 # Various other features (if any)
 

@@ -99,9 +99,7 @@ static void _at_cmd(xbee_t *dev, const char *cmd)
 {
     DEBUG("xbee: AT_CMD: %s", cmd);
 
-    for (int i = 0; cmd[i] != '\0'; i++) {
-        uart_write_blocking(dev->uart, cmd[i]);
-    }
+    uart_write(dev->uart, (uint8_t *)cmd, strlen(cmd));
 }
 
 static void _api_at_cmd(xbee_t *dev, uint8_t *cmd, uint8_t size, resp_t *resp)
@@ -117,12 +115,10 @@ static void _api_at_cmd(xbee_t *dev, uint8_t *cmd, uint8_t size, resp_t *resp)
     memcpy(dev->tx_buf + 5, cmd, size);
     dev->tx_buf[size + 5] = _cksum(dev->tx_buf, size + 5);
 
-    /* prepare UART for sending out the data and receiving the response */
-    dev->tx_limit = size + 6;
-    dev->tx_count = 0;
+    /* reset the response data counter */
     dev->resp_count = 0;
     /* start send data */
-    uart_tx_begin(dev->uart);
+    uart_write(dev->uart, dev->tx_buf, size + 6);
 
     /* wait for results */
     while (dev->resp_limit != dev->resp_count) {
@@ -140,20 +136,6 @@ static void _api_at_cmd(xbee_t *dev, uint8_t *cmd, uint8_t size, resp_t *resp)
 /*
  * Interrupt callbacks
  */
-static int _tx_cb(void *arg)
-{
-    xbee_t *dev = (xbee_t *)arg;
-    if (dev->tx_count < dev->tx_limit) {
-        /* more data to send */
-        char c = (char)(dev->tx_buf[dev->tx_count++]);
-        uart_write(dev->uart, c);
-        return 1;
-    }
-    /* release TX lock */
-    mutex_unlock(&(dev->tx_lock));
-    return 0;
-}
-
 static void _rx_cb(void *arg, char c)
 {
     xbee_t *dev = (xbee_t *)arg;
@@ -434,7 +416,7 @@ int xbee_init(xbee_t *dev, uart_t uart, uint32_t baudrate,
     dev->resp_limit = 1;    /* needs to be greater then 0 initially */
     dev->rx_count = 0;
     /* initialize UART and GPIO pins */
-    if (uart_init(uart, baudrate, _rx_cb, _tx_cb, dev) < 0) {
+    if (uart_init(uart, baudrate, _rx_cb, dev) < 0) {
         DEBUG("xbee: Error initializing UART\n");
         return -ENXIO;
     }
@@ -564,11 +546,8 @@ static int _send(gnrc_netdev_t *netdev, gnrc_pktsnip_t *pkt)
     }
     /* set checksum */
     dev->tx_buf[pos] = _cksum(dev->tx_buf, pos);
-    /* prepare transmission */
-    dev->tx_limit = (uint16_t)pos + 1;
-    dev->tx_count = 0;
     /* start transmission */
-    uart_tx_begin(dev->uart);
+    uart_write(dev->uart, dev->tx_buf, pos + 1);
     /* release data */
     gnrc_pktbuf_release(pkt);
     /* return number of payload byte */

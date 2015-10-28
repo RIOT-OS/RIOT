@@ -40,26 +40,9 @@
 #endif
 
 /**
- * @brief Each UART device has to store two callbacks.
- */
-typedef struct {
-    uart_rx_cb_t rx_cb;
-    uart_tx_cb_t tx_cb;
-    void *arg;
-} uart_conf_t;
-
-/**
- * @brief Unified interrupt handler for all UART devices
- *
- * @param uartnum       the number of the UART that triggered the ISR
- * @param uart          the UART device that triggered the ISR
- */
-static inline void irq_handler(uart_t uartnum, KINETIS_UART *uart);
-
-/**
  * @brief Allocate memory to store the callback functions.
  */
-static uart_conf_t config[UART_NUMOF];
+static uart_isr_ctx_t config[UART_NUMOF];
 
 static inline void kinetis_set_brfa(KINETIS_UART *dev, uint32_t baudrate, uint32_t clk)
 {
@@ -70,10 +53,12 @@ static inline void kinetis_set_brfa(KINETIS_UART *dev, uint32_t baudrate, uint32
 #endif
 }
 
-int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, uart_tx_cb_t tx_cb, void *arg)
+static int init_base(uart_t uart, uint32_t baudrate);
+
+int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 {
     /* do basic initialization */
-    int res = uart_init_blocking(uart, baudrate);
+    int res = init_base(uart, baudrate);
 
     if (res < 0) {
         return res;
@@ -81,7 +66,6 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, uart_tx_cb_t t
 
     /* remember callback addresses */
     config[uart].rx_cb = rx_cb;
-    config[uart].tx_cb = tx_cb;
     config[uart].arg = arg;
 
     /* enable receive interrupt */
@@ -111,7 +95,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, uart_tx_cb_t t
     return 0;
 }
 
-int uart_init_blocking(uart_t uart, uint32_t baudrate)
+static int init_base(uart_t uart, uint32_t baudrate)
 {
     KINETIS_UART *dev;
     PORT_Type *port;
@@ -198,147 +182,30 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
     return 0;
 }
 
-void uart_tx_begin(uart_t uart)
+void uart_write(uart_t uart, const uint8_t *data, size_t len)
 {
+    KINETIS_UART *dev;
+
     switch (uart) {
 #if UART_0_EN
-
         case UART_0:
-            UART_0_DEV->C2 |= (1 << UART_C2_TIE_SHIFT);
+            dev = UART_0_DEV;
             break;
 #endif
 #if UART_1_EN
-
         case UART_1:
-            UART_1_DEV->C2 |= (1 << UART_C2_TIE_SHIFT);
+            dev = UART_1_DEV;
             break;
 #endif
-
         default:
-            break;
-    }
-}
-
-void uart_tx_end(uart_t uart)
-{
-    switch (uart) {
-#if UART_0_EN
-
-        case UART_0:
-            UART_0_DEV->C2 &= ~(1 << UART_C2_TIE_SHIFT);
-            break;
-#endif
-#if UART_1_EN
-
-        case UART_1:
-            UART_1_DEV->C2 &= ~(1 << UART_C2_TIE_SHIFT);
-            break;
-#endif
-
-        default:
-            break;
-    }
-}
-
-int uart_write(uart_t uart, char data)
-{
-    switch (uart) {
-#if UART_0_EN
-
-        case UART_0:
-            if (UART_0_DEV->S1 & UART_S1_TDRE_MASK) {
-                UART_0_DEV->D = (uint8_t)data;
-            }
-
-            break;
-#endif
-#if UART_1_EN
-
-        case UART_1:
-            if (UART_1_DEV->S1 & UART_S1_TDRE_MASK) {
-                UART_1_DEV->D = (uint8_t)data;
-            }
-
-            break;
-#endif
-
-        default:
-            return -2;
-            break;
+            return;
     }
 
-    return 0;
-}
-
-int uart_read_blocking(uart_t uart, char *data)
-{
-    switch (uart) {
-#if UART_0_EN
-
-        case UART_0:
-            while (!(UART_0_DEV->S1 & UART_S1_RDRF_MASK));
-
-            *data = (char)UART_0_DEV->D;
-            break;
-#endif
-#if UART_1_EN
-
-        case UART_1:
-            while (!(UART_1_DEV->S1 & UART_S1_RDRF_MASK));
-
-            *data = (char)UART_1_DEV->D;
-            break;
-#endif
-
-        default:
-            return -2;
-            break;
+    for (size_t i = 0; i < len; i++) {
+        while (!(dev->S1 & UART_S1_TDRE_MASK));
+        dev->D = data[i];
     }
-
-    return 1;
 }
-
-int uart_write_blocking(uart_t uart, char data)
-{
-    switch (uart) {
-#if UART_0_EN
-
-        case UART_0:
-            while (!(UART_0_DEV->S1 & UART_S1_TDRE_MASK));
-
-            UART_0_DEV->D = (uint8_t)data;
-            break;
-#endif
-#if UART_1_EN
-
-        case UART_1:
-            while (!(UART_1_DEV->S1 & UART_S1_TDRE_MASK));
-
-            UART_1_DEV->D = (uint8_t)data;
-            break;
-#endif
-
-        default:
-            return -2;
-            break;
-    }
-
-    return 1;
-}
-
-#if UART_0_EN
-void UART_0_ISR(void)
-{
-    irq_handler(UART_0, UART_0_DEV);
-}
-#endif
-
-#if UART_1_EN
-void UART_1_ISR(void)
-{
-    irq_handler(UART_1, UART_1_DEV);
-}
-#endif
 
 static inline void irq_handler(uart_t uartnum, KINETIS_UART *dev)
 {
@@ -360,15 +227,6 @@ static inline void irq_handler(uart_t uartnum, KINETIS_UART *dev)
         }
     }
 
-    if (dev->S1 & UART_S1_TDRE_MASK) {
-        if (config[uartnum].tx_cb == NULL) {
-            dev->C2 &= ~(UART_C2_TIE_MASK);
-        }
-        else if (config[uartnum].tx_cb(config[uartnum].arg) == 0) {
-            dev->C2 &= ~(UART_C2_TIE_MASK);
-        }
-    }
-
 #if (KINETIS_UART_ADVANCED == 0)
     /* clear overrun flag */
     if (dev->S1 & UART_S1_OR_MASK) {
@@ -381,3 +239,17 @@ static inline void irq_handler(uart_t uartnum, KINETIS_UART *dev)
     }
 
 }
+
+#if UART_0_EN
+void UART_0_ISR(void)
+{
+    irq_handler(UART_0, UART_0_DEV);
+}
+#endif
+
+#if UART_1_EN
+void UART_1_ISR(void)
+{
+    irq_handler(UART_1, UART_1_DEV);
+}
+#endif

@@ -71,7 +71,7 @@ void uart_stdio_rx_cb(void *arg, char data)
 void uart_stdio_init(void)
 {
     mutex_lock(&_rx_mutex);
-    uart_init(STDIO, STDIO_BAUDRATE, uart_stdio_rx_cb, 0, 0);
+    uart_init(STDIO, STDIO_BAUDRATE, uart_stdio_rx_cb, NULL);
 }
 
 int uart_stdio_read(char* buffer, int count)
@@ -85,11 +85,6 @@ int uart_stdio_read(char* buffer, int count)
 
 int uart_stdio_write(const char* buffer, int len)
 {
-    unsigned int i = len;
-
-    while (i--) {
-        uart_write_blocking(STDIO, *buffer++);
-    }
-
+    uart_write(STDIO, (uint8_t *)buffer, (size_t)len);
     return len;
 }

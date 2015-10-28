@@ -17,41 +17,30 @@
  * @}
  */
 
-#include <stdint.h>
-
 #include "cpu.h"
 #include "sched.h"
 #include "thread.h"
 #include "periph/uart.h"
-#include "periph_conf.h"
-
-/* guard the file in case no UART is defined */
-#if (UART_0_EN)
-
-/**
- * @brief Struct holding the configuration data for a UART device
- */
-typedef struct {
-    uart_rx_cb_t rx_cb;         /**< receive callback */
-    uart_tx_cb_t tx_cb;         /**< transmit callback */
-    void *arg;                  /**< callback argument */
-} uart_conf_t;
 
 /**
  * @brief UART device configurations
  */
-static uart_conf_t config[UART_NUMOF];
+static uart_isr_ctx_t config[UART_NUMOF];
 
-int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, uart_tx_cb_t tx_cb, void *arg)
+/**
+ * @todo   Merge with uart_init()
+ */
+static int init_base(uart_t uart, uint32_t baudrate);
+
+int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 {
-    int res = uart_init_blocking(uart, baudrate);
+    int res = init_base(uart, baudrate);
     if (res < 0) {
         return res;
     }
 
     /* save callbacks */
     config[uart].rx_cb = rx_cb;
-    config[uart].tx_cb = tx_cb;
     config[uart].arg = arg;
 
     switch (uart) {
@@ -69,7 +58,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, uart_tx_cb_t t
     return 0;
 }
 
-int uart_init_blocking(uart_t uart, uint32_t baudrate)
+static int init_base(uart_t uart, uint32_t baudrate)
 {
     switch (uart) {
 #if UART_0_EN
@@ -108,65 +97,14 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
     return 0;
 }
 
-void uart_tx_begin(uart_t uart)
+void uart_write(uart_t uart, const uint8_t *data, size_t len)
 {
-    switch (uart) {
-#if UART_0_EN
-        case UART_0:
-            /* enable TX interrupt */
-            UART_0_DEV->IER |= (1 << 1);
-            break;
-#endif
+    if (uart == UART_0) {
+        for (size_t i = 0; i < len; i++) {
+            while (!(UART_0_DEV->LSR & (1 << 5)));
+            UART_0_DEV->THR = data[i];
+        }
     }
-}
-
-int uart_write(uart_t uart, char data)
-{
-    switch (uart) {
-#if UART_0_EN
-        case UART_0:
-            UART_0_DEV->THR = (uint8_t)data;;
-            break;
-#endif
-        default:
-            return -1;
-    }
-
-    return 1;
-}
-
-int uart_read_blocking(uart_t uart, char *data)
-{
-    switch (uart) {
-#if UART_0_EN
-        case UART_0:
-            while (!(UART_0_DEV->LSR & (1 << 0)));      /* wait for RDR bit to be set */
-
-            *data = (char)UART_0_DEV->RBR;
-            break;
-#endif
-        default:
-            return -1;
-    }
-
-    return 1;
-}
-
-int uart_write_blocking(uart_t uart, char data)
-{
-    switch (uart) {
-#if UART_0_EN
-        case UART_0:
-            while (!(UART_0_DEV->LSR & (1 << 5)));       /* wait for THRE bit to be set */
-
-            UART_0_DEV->THR = (uint8_t)data;
-            break;
-#endif
-        default:
-            return -1;
-    }
-
-    return 1;
 }
 
 void uart_poweron(uart_t uart)
@@ -198,21 +136,8 @@ void UART_0_ISR(void)
         char data = (char)UART_0_DEV->RBR;
         config[UART_0].rx_cb(config[UART_0].arg, data);
     }
-
-    if (UART_0_DEV->LSR & (1 << 5)) {       /* THRE flag set? */
-        if (UART_0_DEV->IER & (1 << 1)) {
-            if (config[UART_0].tx_cb(config[UART_0].arg) == 0) {
-                /* disable TX interrupt */
-                UART_0_DEV->IER &= ~(1 << 1);
-            }
-        }
-    }
-
     if (sched_context_switch_request) {
         thread_yield();
     }
 }
 #endif
-
-
-#endif /* (UART_0_EN) */

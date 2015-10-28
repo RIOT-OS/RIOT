@@ -7,13 +7,13 @@ BOARD_INSUFFICIENT_MEMORY := stm32f0discovery weio
 
 # Define default pin mappings for some boards:
 ifneq (,$(filter stm32f0discovery,$(BOARD)))
-  export XBEE_UART ?= UART_1
+  export XBEE_UART ?= "UART_DEV(0)"
 endif
 ifneq (,$(filter stm32f4discovery,$(BOARD)))
-  export XBEE_UART ?= UART_1
+  export XBEE_UART ?= "UART_DEV(0)"
 endif
 ifneq (,$(filter nucleo-f091,$(BOARD)))
-  export XBEE_UART ?= UART_1
+  export XBEE_UART ?= "UART_DEV(0)"
 endif
 
 USEMODULE += xbee
@@ -28,7 +28,7 @@ ifneq (,$(XBEE_UART))
   CFLAGS += -DXBEE_UART=$(XBEE_UART)
 else
   # set default
-  CFLAGS += -DXBEE_UART=UART_0
+  CFLAGS += -DXBEE_UART="UART_DEV(0)"
 endif
 
 # add current directory to the include path. Putting it in CFLAGS will make

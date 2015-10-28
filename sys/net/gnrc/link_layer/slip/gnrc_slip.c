@@ -142,7 +142,7 @@ static void _slip_receive(gnrc_slip_dev_t *dev, size_t bytes)
 
 static inline void _slip_send_char(gnrc_slip_dev_t *dev, char c)
 {
-    uart_write_blocking(dev->uart, c);
+    uart_write(dev->uart, (uint8_t *)&c, 1);
 }
 
 /* SLIP send handler */
@@ -244,7 +244,7 @@ kernel_pid_t gnrc_slip_init(gnrc_slip_dev_t *dev, uart_t uart, uint32_t baudrate
     /* initialize UART */
     DEBUG("slip: initialize UART_%d with baudrate %" PRIu32 "\n", uart,
           baudrate);
-    if (uart_init(uart, baudrate, _slip_rx_cb, NULL, dev) < 0) {
+    if (uart_init(uart, baudrate, _slip_rx_cb, dev) < 0) {
         DEBUG("slip: error initializing UART_%i with baudrate %" PRIu32 "\n",
               uart, baudrate);
         return -ENODEV;
