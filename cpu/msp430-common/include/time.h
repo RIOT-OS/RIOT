@@ -9,6 +9,9 @@
 #ifndef MSPGCC_TIME_H
 #define MSPGCC_TIME_H
 
+#include <sys/types.h>
+#include "msp430_types.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
