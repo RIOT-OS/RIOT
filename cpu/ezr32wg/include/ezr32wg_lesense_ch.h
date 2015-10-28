@@ -29,6 +29,11 @@
  * any third party, arising from your use of this Software.
  *
  *****************************************************************************/
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**************************************************************************//**
  * @brief LESENSE_CH EZR32WG LESENSE CH
  *****************************************************************************/
@@ -39,3 +44,7 @@ typedef struct
   __IO uint32_t EVAL;         /**< Scan configuration  */
   uint32_t      RESERVED0[1]; /**< Reserved future */
 } LESENSE_CH_TypeDef;
+
+#ifdef __cplusplus
+}
+#endif

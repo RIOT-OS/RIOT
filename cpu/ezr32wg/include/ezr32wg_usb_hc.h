@@ -29,6 +29,11 @@
  * any third party, arising from your use of this Software.
  *
  *****************************************************************************/
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**************************************************************************//**
  * @brief USB_HC EZR32WG USB HC
  *****************************************************************************/
@@ -42,3 +47,7 @@ typedef struct
   __IO uint32_t DMAADDR;      /**< Host Channel x DMA Address Register  */
   uint32_t      RESERVED1[2]; /**< Reserved future */
 } USB_HC_TypeDef;
+
+#ifdef __cplusplus
+}
+#endif

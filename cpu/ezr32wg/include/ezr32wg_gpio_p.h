@@ -29,6 +29,11 @@
  * any third party, arising from your use of this Software.
  *
  *****************************************************************************/
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**************************************************************************//**
  * @brief GPIO_P EZR32WG GPIO P
  *****************************************************************************/
@@ -43,3 +48,7 @@ typedef struct
   __I uint32_t  DIN;      /**< Port Data In Register  */
   __IO uint32_t PINLOCKN; /**< Port Unlocked Pins Register  */
 } GPIO_P_TypeDef;
+
+#ifdef __cplusplus
+}
+#endif

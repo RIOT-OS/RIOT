@@ -29,6 +29,11 @@
  * any third party, arising from your use of this Software.
  *
  *****************************************************************************/
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**************************************************************************//**
  * @defgroup EZR32WG_RMU
  * @{
@@ -154,3 +159,7 @@ typedef struct
 #define RMU_CMD_RCCLR_DEFAULT                 (_RMU_CMD_RCCLR_DEFAULT << 0) /**< Shifted mode DEFAULT for RMU_CMD */
 
 /** @} End of group EZR32WG_RMU */
+
+#ifdef __cplusplus
+}
+#endif

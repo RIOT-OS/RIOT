@@ -29,6 +29,11 @@
  * any third party, arising from your use of this Software.
  *
  *****************************************************************************/
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**************************************************************************//**
  * @defgroup EZR32WG_VCMP
  * @{
@@ -192,3 +197,7 @@ typedef struct
 #define VCMP_IFC_WARMUP_DEFAULT             (_VCMP_IFC_WARMUP_DEFAULT << 1) /**< Shifted mode DEFAULT for VCMP_IFC */
 
 /** @} End of group EZR32WG_VCMP */
+
+#ifdef __cplusplus
+}
+#endif

@@ -29,6 +29,11 @@
  * any third party, arising from your use of this Software.
  *
  *****************************************************************************/
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**************************************************************************//**
  * @defgroup EZR32WG_FPUEH
  * @{
@@ -184,3 +189,7 @@ typedef struct
 #define FPUEH_IEN_FPIXC_DEFAULT     (_FPUEH_IEN_FPIXC_DEFAULT << 5) /**< Shifted mode DEFAULT for FPUEH_IEN */
 
 /** @} End of group EZR32WG_FPUEH */
+
+#ifdef __cplusplus
+}
+#endif

@@ -29,6 +29,11 @@
  * any third party, arising from your use of this Software.
  *
  *****************************************************************************/
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**************************************************************************//**
  * @defgroup EZR32WG_LETIMER
  * @{
@@ -404,3 +409,7 @@ typedef struct
 #define LETIMER_ROUTE_LOCATION_LOC3          (_LETIMER_ROUTE_LOCATION_LOC3 << 8)    /**< Shifted mode LOC3 for LETIMER_ROUTE */
 
 /** @} End of group EZR32WG_LETIMER */
+
+#ifdef __cplusplus
+}
+#endif

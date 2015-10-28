@@ -29,6 +29,11 @@
  * any third party, arising from your use of this Software.
  *
  *****************************************************************************/
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**************************************************************************//**
  * @brief LESENSE_BUF EZR32WG LESENSE BUF
  *****************************************************************************/
@@ -36,3 +41,7 @@ typedef struct
 {
   __IO uint32_t DATA; /**< Scan results  */
 } LESENSE_BUF_TypeDef;
+
+#ifdef __cplusplus
+}
+#endif

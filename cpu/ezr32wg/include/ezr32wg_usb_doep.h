@@ -29,6 +29,11 @@
  * any third party, arising from your use of this Software.
  *
  *****************************************************************************/
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**************************************************************************//**
  * @brief USB_DOEP EZR32WG USB DOEP
  *****************************************************************************/
@@ -42,3 +47,7 @@ typedef struct
   __IO uint32_t DMAADDR;      /**< Device OUT Endpoint x+1 DMA Address Register  */
   uint32_t      RESERVED2[2]; /**< Reserved future */
 } USB_DOEP_TypeDef;
+
+#ifdef __cplusplus
+}
+#endif

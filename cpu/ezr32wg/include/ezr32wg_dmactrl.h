@@ -30,6 +30,10 @@
  *
  *****************************************************************************/
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**************************************************************************//**
  * @defgroup EZR32WG_DMACTRL_BitFields
  * @{
@@ -132,3 +136,7 @@
 #define DMA_CTRL_CYCLE_CTRL_PER_SCATTER_GATHER_ALT     0x000000007UL /**< Peripheral scatter gather cycle type using alternate structure */
 
 /** @} End of group EZR32WG_DMA */
+
+#ifdef __cplusplus
+}
+#endif

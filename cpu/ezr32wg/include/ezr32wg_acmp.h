@@ -29,6 +29,11 @@
  * any third party, arising from your use of this Software.
  *
  *****************************************************************************/
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**************************************************************************//**
  * @defgroup EZR32WG_ACMP
  * @{
@@ -327,3 +332,7 @@ typedef struct
 #define ACMP_ROUTE_LOCATION_LOC2           (_ACMP_ROUTE_LOCATION_LOC2 << 8)    /**< Shifted mode LOC2 for ACMP_ROUTE */
 
 /** @} End of group EZR32WG_ACMP */
+
+#ifdef __cplusplus
+}
+#endif

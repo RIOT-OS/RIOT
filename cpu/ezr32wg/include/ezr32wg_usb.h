@@ -29,6 +29,11 @@
  * any third party, arising from your use of this Software.
  *
  *****************************************************************************/
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**************************************************************************//**
  * @defgroup EZR32WG_USB
  * @{
@@ -2649,3 +2654,7 @@ typedef struct
 #define USB_FIFORAM_FIFORAM_DEFAULT                (_USB_FIFORAM_FIFORAM_DEFAULT << 0) /**< Shifted mode DEFAULT for USB_FIFORAM */
 
 /** @} End of group EZR32WG_USB */
+
+#ifdef __cplusplus
+}
+#endif

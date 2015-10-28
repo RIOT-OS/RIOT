@@ -29,6 +29,11 @@
  * any third party, arising from your use of this Software.
  *
  *****************************************************************************/
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**************************************************************************//**
  * @brief BURTC_RET EZR32WG BURTC RET
  *****************************************************************************/
@@ -36,3 +41,7 @@ typedef struct
 {
   __IO uint32_t REG; /**< Retention Register  */
 } BURTC_RET_TypeDef;
+
+#ifdef __cplusplus
+}
+#endif

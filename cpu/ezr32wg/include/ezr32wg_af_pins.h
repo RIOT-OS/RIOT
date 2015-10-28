@@ -29,6 +29,11 @@
  * any third party, arising from your use of this Software.
  *
  *****************************************************************************/
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**************************************************************************//**
  * @defgroup EZR32WG_AF_Pins
  * @{
@@ -121,3 +126,7 @@
 #define AF_ETM_TD3_PIN(i)          ((i) == 0 ? 5 : (i) == 1 ? -1 : (i) == 2 ? 5 : (i) == 3 ? -1 :  -1)
 
 /** @} End of group EZR32WG_AF_Pins */
+
+#ifdef __cplusplus
+}
+#endif

@@ -29,6 +29,11 @@
  * any third party, arising from your use of this Software.
  *
  *****************************************************************************/
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**************************************************************************//**
  * @defgroup EZR32WG_USART
  * @{
@@ -1145,3 +1150,7 @@ typedef struct
 #define USART_I2SCTRL_FORMAT_W8D8             (_USART_I2SCTRL_FORMAT_W8D8 << 8)      /**< Shifted mode W8D8 for USART_I2SCTRL */
 
 /** @} End of group EZR32WG_USART */
+
+#ifdef __cplusplus
+}
+#endif

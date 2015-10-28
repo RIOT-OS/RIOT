@@ -29,6 +29,11 @@
  * any third party, arising from your use of this Software.
  *
  *****************************************************************************/
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**************************************************************************//**
  * @defgroup EZR32WG_LESENSE
  * @{
@@ -1922,3 +1927,7 @@ typedef struct
 #define LESENSE_CH_EVAL_SCANRESINV_DEFAULT             (_LESENSE_CH_EVAL_SCANRESINV_DEFAULT << 19) /**< Shifted mode DEFAULT for LESENSE_CH_EVAL */
 
 /** @} End of group EZR32WG_LESENSE */
+
+#ifdef __cplusplus
+}
+#endif

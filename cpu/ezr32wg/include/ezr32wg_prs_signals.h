@@ -29,6 +29,11 @@
  * any third party, arising from your use of this Software.
  *
  *****************************************************************************/
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**************************************************************************//**
  * @addtogroup EZR32WG_PRS_Signals
  * @{
@@ -118,3 +123,7 @@
 #define PRS_LESENSE_DEC2         ((59 << 16) + 2) /**< PRS LESENSE Decoder PRS out 2 */
 
 /** @} End of group EZR32WG_PRS */
+
+#ifdef __cplusplus
+}
+#endif

@@ -29,6 +29,11 @@
  * any third party, arising from your use of this Software.
  *
  *****************************************************************************/
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**************************************************************************//**
  * @defgroup EZR32WG_DAC
  * @{
@@ -788,3 +793,7 @@ typedef struct
 #define DAC_OPA2MUX_RESSEL_RES7               (_DAC_OPA2MUX_RESSEL_RES7 << 28)     /**< Shifted mode RES7 for DAC_OPA2MUX */
 
 /** @} End of group EZR32WG_DAC */
+
+#ifdef __cplusplus
+}
+#endif

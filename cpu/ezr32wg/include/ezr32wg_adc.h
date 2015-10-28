@@ -29,6 +29,11 @@
  * any third party, arising from your use of this Software.
  *
  *****************************************************************************/
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**************************************************************************//**
  * @defgroup EZR32WG_ADC
  * @{
@@ -666,3 +671,7 @@ typedef struct
 #define ADC_BIASPROG_COMPBIAS_DEFAULT           (_ADC_BIASPROG_COMPBIAS_DEFAULT << 8) /**< Shifted mode DEFAULT for ADC_BIASPROG */
 
 /** @} End of group EZR32WG_ADC */
+
+#ifdef __cplusplus
+}
+#endif

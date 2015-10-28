@@ -29,6 +29,11 @@
  * any third party, arising from your use of this Software.
  *
  *****************************************************************************/
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**************************************************************************//**
  * @defgroup EZR32WG_AES
  * @{
@@ -235,3 +240,7 @@ typedef struct
 #define AES_KEYHD_KEYHD_DEFAULT         (_AES_KEYHD_KEYHD_DEFAULT << 0) /**< Shifted mode DEFAULT for AES_KEYHD */
 
 /** @} End of group EZR32WG_AES */
+
+#ifdef __cplusplus
+}
+#endif

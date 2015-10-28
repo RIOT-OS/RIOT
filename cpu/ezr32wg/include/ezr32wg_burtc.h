@@ -29,6 +29,11 @@
  * any third party, arising from your use of this Software.
  *
  *****************************************************************************/
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**************************************************************************//**
  * @defgroup EZR32WG_BURTC
  * @{
@@ -372,3 +377,7 @@ typedef struct
 #define BURTC_RET_REG_REG_DEFAULT             (_BURTC_RET_REG_REG_DEFAULT << 0) /**< Shifted mode DEFAULT for BURTC_RET_REG */
 
 /** @} End of group EZR32WG_BURTC */
+
+#ifdef __cplusplus
+}
+#endif
