@@ -98,7 +98,7 @@ endif
 
 ifneq (,$(filter gnrc_sixlowpan_frag,$(USEMODULE)))
   USEMODULE += gnrc_sixlowpan
-  USEMODULE += vtimer
+  USEMODULE += xtimer
 endif
 
 ifneq (,$(filter gnrc_sixlowpan_iphc,$(USEMODULE)))
@@ -114,7 +114,7 @@ endif
 
 ifneq (,$(filter gnrc_sixlowpan_ctx,$(USEMODULE)))
   USEMODULE += ipv6_addr
-  USEMODULE += vtimer
+  USEMODULE += xtimer
 endif
 
 ifneq (,$(filter gnrc_sixlowpan_nd_border_router,$(USEMODULE)))
@@ -130,7 +130,7 @@ ifneq (,$(filter gnrc_sixlowpan_nd,$(USEMODULE)))
   USEMODULE += gnrc_ndp_internal
   USEMODULE += gnrc_sixlowpan_ctx
   USEMODULE += random
-  USEMODULE += vtimer
+  USEMODULE += xtimer
 endif
 
 ifneq (,$(filter gnrc_ipv6_default,$(USEMODULE)))
@@ -160,13 +160,13 @@ endif
 ifneq (,$(filter gnrc_ndp_host,$(USEMODULE)))
   USEMODULE += gnrc_ndp_node
   USEMODULE += random
-  USEMODULE += vtimer
+  USEMODULE += xtimer
 endif
 
 ifneq (,$(filter gnrc_ndp_router,$(USEMODULE)))
   USEMODULE += gnrc_ndp_node
   USEMODULE += random
-  USEMODULE += vtimer
+  USEMODULE += xtimer
 endif
 
 ifneq (,$(filter gnrc_ndp_node,$(USEMODULE)))
@@ -181,7 +181,7 @@ ifneq (,$(filter gnrc_ndp,$(USEMODULE)))
   USEMODULE += gnrc_icmpv6
   USEMODULE += random
   USEMODULE += timex
-  USEMODULE += vtimer
+  USEMODULE += xtimer
 endif
 
 ifneq (,$(filter gnrc_icmpv6_echo,$(USEMODULE)))
@@ -243,7 +243,7 @@ ifneq (,$(filter gnrc_ipv6_netif,$(USEMODULE)))
   USEMODULE += ipv6_addr
   USEMODULE += gnrc_netif
   USEMODULE += bitfield
-  USEMODULE += vtimer
+  USEMODULE += xtimer
 endif
 
 ifneq (,$(filter gnrc_udp,$(USEMODULE)))
