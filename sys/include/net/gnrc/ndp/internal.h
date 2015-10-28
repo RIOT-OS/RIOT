@@ -189,6 +189,24 @@ bool gnrc_ndp_internal_mtu_opt_handle(kernel_pid_t iface, uint8_t icmpv6_type,
 bool gnrc_ndp_internal_pi_opt_handle(kernel_pid_t iface, uint8_t icmpv6_type,
                                      ndp_opt_pi_t *pi_opt);
 
+/**
+ * @brief   Resets the gnrc_ipv6_nc_t::nbr_sol_timer.
+ *
+ * @internal
+ *
+ * @param[in] nc_entry      A neighbor cache entry.
+ * @param[in] delay         The delay when the timer should fire.
+ * @param[in] type          The msg_t::type for the timer.
+ * @param[in] pid           The pid of the receiver thread of the msg_t
+ */
+static inline void gnrc_ndp_internal_reset_nbr_sol_timer(gnrc_ipv6_nc_t *nc_entry, uint32_t delay,
+                                                         uint16_t type, kernel_pid_t pid)
+{
+    xtimer_remove(&nc_entry->nbr_sol_timer);
+    nc_entry->nbr_sol_msg.type = type;
+    xtimer_set_msg(&nc_entry->nbr_sol_timer, delay, &nc_entry->nbr_sol_msg, pid);
+}
+
 #ifdef __cplusplus
 }
 #endif

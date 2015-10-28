@@ -141,6 +141,8 @@ gnrc_ipv6_nc_t *gnrc_ipv6_nc_add(kernel_pid_t iface, const ipv6_addr_t *ipv6_add
     free_entry->rtr_adv_msg.content.ptr = (char *) free_entry;
 #endif
 
+    free_entry->nbr_sol_msg.content.ptr = (char *) free_entry;
+
     return free_entry;
 }
 
@@ -243,9 +245,8 @@ gnrc_ipv6_nc_t *gnrc_ipv6_nc_still_reachable(const ipv6_addr_t *ipv6_addr)
         gnrc_ipv6_netif_t *iface = gnrc_ipv6_netif_get(entry->iface);
         timex_t t = iface->reach_time;
 
-        vtimer_remove(&entry->nbr_sol_timer);
-        vtimer_set_msg(&entry->nbr_sol_timer, t, gnrc_ipv6_pid,
-                       GNRC_NDP_MSG_NC_STATE_TIMEOUT, entry);
+        gnrc_ndp_internal_reset_nbr_sol_timer(entry, (uint32_t) timex_uint64(t),
+                                              GNRC_NDP_MSG_NC_STATE_TIMEOUT, gnrc_ipv6_pid);
 #endif
 
         DEBUG("ipv6_nc: Marking entry %s as reachable\n",
