@@ -232,15 +232,15 @@ __attribute__((used)) void hard_fault_handler(uint32_t* sp, uint32_t corrupted, 
         puts("\nContext before hardfault:");
 
         /* TODO: printf in ISR context might be a bad idea */
-        printf("   r0: 0x%08lx\n"
-               "   r1: 0x%08lx\n"
-               "   r2: 0x%08lx\n"
-               "   r3: 0x%08lx\n",
+        printf("   r0: 0x%08" PRIx32 "\n"
+               "   r1: 0x%08" PRIx32 "\n"
+               "   r2: 0x%08" PRIx32 "\n"
+               "   r3: 0x%08" PRIx32 "\n",
                r0, r1, r2, r3);
-        printf("  r12: 0x%08lx\n"
-               "   lr: 0x%08lx\n"
-               "   pc: 0x%08lx\n"
-               "  psr: 0x%08lx\n\n",
+        printf("  r12: 0x%08" PRIx32 "\n"
+               "   lr: 0x%08" PRIx32 "\n"
+               "   pc: 0x%08" PRIx32 "\n"
+               "  psr: 0x%08" PRIx32 "\n\n",
                r12, lr, pc, psr);
 #if CPU_HAS_EXTENDED_FAULT_REGISTERS
         puts("FSR/FAR:");
@@ -260,7 +260,7 @@ __attribute__((used)) void hard_fault_handler(uint32_t* sp, uint32_t corrupted, 
         puts("Misc");
         printf("EXC_RET: 0x%08" PRIx32 "\n", exc_return);
         puts("Attempting to reconstruct state for debugging...");
-        printf("In GDB:\n  set $pc=0x%lx\n  frame 0\n  bt\n", pc);
+        printf("In GDB:\n  set $pc=0x%" PRIx32 "\n  frame 0\n  bt\n", pc);
         int stack_left = _stack_size_left(HARDFAULT_HANDLER_REQUIRED_STACK_SPACE);
         if(stack_left < 0) {
             printf("\nISR stack overflowed by at least %d bytes.\n", (-1 * stack_left));
