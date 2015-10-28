@@ -1,0 +1,20 @@
+# define the cpu used by WSTK6220
+export CPU = ezr32wg
+export CPU_MODEL = ezr32wg330f256r60
+
+# set default port depending on operating system
+PORT_LINUX ?= /dev/ttyACM0
+PORT_DARWIN ?= $(shell ls -1 /dev/tty.usbmodem* | head -n 1)
+
+# setup the boards dependencies
+include $(RIOTBOARD)/$(BOARD)/Makefile.dep
+
+# setup JLink for flashing
+export JLINK_DEVICE := ezr32wg330f256
+include $(RIOTBOARD)/Makefile.include.jlink
+
+# setup serial terminal
+include $(RIOTBOARD)/Makefile.include.serial
+
+# include cortex defaults
+include $(RIOTBOARD)/Makefile.include.cortexm_common
