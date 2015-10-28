@@ -499,7 +499,7 @@ static inline void xtimer_sleep(uint32_t seconds)
 
 static inline void xtimer_nanosleep(uint32_t nanoseconds)
 {
-    _xtimer_sleep(nanoseconds/1000, 0);
+    _xtimer_sleep(nanoseconds / USEC_IN_NS, 0);
 }
 
 #ifdef __cplusplus
