@@ -413,7 +413,7 @@ static inline uint32_t _xtimer_now(void)
 /**
  * @brief drop bits of a value that don't fit into the low-level timer.
  */
-static inline uint32_t _mask(uint32_t val)
+static inline uint32_t _lltimer_mask(uint32_t val)
 {
     return val & ~XTIMER_MASK_SHIFTED;
 }
@@ -471,7 +471,7 @@ static inline uint32_t xtimer_now(void)
 
 static inline void xtimer_spin_until(uint32_t target) {
 #if XTIMER_MASK
-    target = _mask(target);
+    target = _lltimer_mask(target);
 #endif
     while (_xtimer_now() > target);
     while (_xtimer_now() < target);
