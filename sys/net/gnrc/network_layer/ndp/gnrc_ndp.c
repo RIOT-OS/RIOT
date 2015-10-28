@@ -613,10 +613,10 @@ void gnrc_ndp_rtr_adv_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt, ipv6_hdr_t
     }
 #endif
     _stale_nc(iface, &ipv6->src, l2src, l2src_len);
+    /* stop multicast router solicitation retransmission timer */
+    xtimer_remove(&if_entry->rtr_sol_timer);
 #ifdef MODULE_GNRC_SIXLOWPAN_ND
     if (if_entry->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN) {
-        /* stop multicast router solicitation retransmission timer */
-        xtimer_remove(&if_entry->rtr_sol_timer);
         /* 3/4 of the time should be "well before" enough the respective timeout
          * not to run out; see https://tools.ietf.org/html/rfc6775#section-5.4.3 */
         next_rtr_sol *= 3;
