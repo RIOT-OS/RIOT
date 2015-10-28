@@ -29,6 +29,11 @@
  * any third party, arising from your use of this Software.
  *
  *****************************************************************************/
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**************************************************************************//**
  * @defgroup EZR32WG_PRS
  * @{
@@ -447,3 +452,7 @@ typedef struct
 #define PRS_CH_CTRL_ASYNC_DEFAULT               (_PRS_CH_CTRL_ASYNC_DEFAULT << 28)          /**< Shifted mode DEFAULT for PRS_CH_CTRL */
 
 /** @} End of group EZR32WG_PRS */
+
+#ifdef __cplusplus
+}
+#endif

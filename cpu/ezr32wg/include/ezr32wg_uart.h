@@ -30,6 +30,10 @@
  *
  *****************************************************************************/
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**************************************************************************//**
  * @defgroup EZR32WG_UART_BitFields
  * @{
@@ -1113,3 +1117,7 @@
 #define UART_I2SCTRL_FORMAT_W8D8             (_UART_I2SCTRL_FORMAT_W8D8 << 8)      /**< Shifted mode W8D8 for UART_I2SCTRL */
 
 /** @} End of group EZR32WG_UART */
+
+#ifdef __cplusplus
+}
+#endif

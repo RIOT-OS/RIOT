@@ -29,6 +29,11 @@
  * any third party, arising from your use of this Software.
  *
  *****************************************************************************/
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**************************************************************************//**
  * @defgroup EZR32WG_CALIBRATE
  * @{
@@ -40,3 +45,7 @@ typedef struct
   __I uint32_t ADDRESS; /**< Address of calibration register */
   __I uint32_t VALUE;   /**< Default value for calibration register */
 } CALIBRATE_TypeDef;    /** @} */
+
+#ifdef __cplusplus
+}
+#endif

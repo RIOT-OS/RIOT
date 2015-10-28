@@ -29,6 +29,11 @@
  * any third party, arising from your use of this Software.
  *
  *****************************************************************************/
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**************************************************************************//**
  * @brief TIMER_CC EZR32WG TIMER CC
  *****************************************************************************/
@@ -39,3 +44,7 @@ typedef struct
   __I uint32_t  CCVP; /**< CC Channel Value Peek Register  */
   __IO uint32_t CCVB; /**< CC Channel Buffer Register  */
 } TIMER_CC_TypeDef;
+
+#ifdef __cplusplus
+}
+#endif

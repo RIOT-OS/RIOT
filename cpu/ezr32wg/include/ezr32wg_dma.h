@@ -29,6 +29,11 @@
  * any third party, arising from your use of this Software.
  *
  *****************************************************************************/
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**************************************************************************//**
  * @defgroup EZR32WG_DMA
  * @{
@@ -1614,3 +1619,7 @@ typedef struct
 #define DMA_CH_CTRL_SOURCESEL_LESENSE                   (_DMA_CH_CTRL_SOURCESEL_LESENSE << 16)        /**< Shifted mode LESENSE for DMA_CH_CTRL */
 
 /** @} End of group EZR32WG_DMA */
+
+#ifdef __cplusplus
+}
+#endif

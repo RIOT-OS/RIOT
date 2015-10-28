@@ -29,6 +29,11 @@
  * any third party, arising from your use of this Software.
  *
  *****************************************************************************/
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**************************************************************************//**
  * @defgroup EZR32WG_PCNT
  * @{
@@ -413,3 +418,7 @@ typedef struct
 #define PCNT_INPUT_S1PRSEN_DEFAULT        (_PCNT_INPUT_S1PRSEN_DEFAULT << 10) /**< Shifted mode DEFAULT for PCNT_INPUT */
 
 /** @} End of group EZR32WG_PCNT */
+
+#ifdef __cplusplus
+}
+#endif

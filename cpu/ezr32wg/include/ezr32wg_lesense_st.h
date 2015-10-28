@@ -29,6 +29,11 @@
  * any third party, arising from your use of this Software.
  *
  *****************************************************************************/
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**************************************************************************//**
  * @brief LESENSE_ST EZR32WG LESENSE ST
  *****************************************************************************/
@@ -37,3 +42,7 @@ typedef struct
   __IO uint32_t TCONFA; /**< State transition configuration A  */
   __IO uint32_t TCONFB; /**< State transition configuration B  */
 } LESENSE_ST_TypeDef;
+
+#ifdef __cplusplus
+}
+#endif

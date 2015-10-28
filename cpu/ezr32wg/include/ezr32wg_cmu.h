@@ -29,6 +29,11 @@
  * any third party, arising from your use of this Software.
  *
  *****************************************************************************/
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**************************************************************************//**
  * @defgroup EZR32WG_CMU
  * @{
@@ -1192,3 +1197,7 @@ typedef struct
 #define CMU_LOCK_LOCKKEY_UNLOCK                     (_CMU_LOCK_LOCKKEY_UNLOCK << 0)   /**< Shifted mode UNLOCK for CMU_LOCK */
 
 /** @} End of group EZR32WG_CMU */
+
+#ifdef __cplusplus
+}
+#endif

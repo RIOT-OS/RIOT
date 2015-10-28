@@ -29,6 +29,11 @@
  * any third party, arising from your use of this Software.
  *
  *****************************************************************************/
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**************************************************************************//**
  * @defgroup EZR32WG_EMU
  * @{
@@ -335,3 +340,7 @@ typedef struct
 #define EMU_BUBODUNREGCAL_RANGE_DEFAULT     (_EMU_BUBODUNREGCAL_RANGE_DEFAULT << 3) /**< Shifted mode DEFAULT for EMU_BUBODUNREGCAL */
 
 /** @} End of group EZR32WG_EMU */
+
+#ifdef __cplusplus
+}
+#endif

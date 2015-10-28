@@ -29,6 +29,11 @@
  * any third party, arising from your use of this Software.
  *
  *****************************************************************************/
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**************************************************************************//**
  * @brief DMA_CH EZR32WG DMA CH
  *****************************************************************************/
@@ -36,3 +41,7 @@ typedef struct
 {
   __IO uint32_t CTRL; /**< Channel Control Register  */
 } DMA_CH_TypeDef;
+
+#ifdef __cplusplus
+}
+#endif

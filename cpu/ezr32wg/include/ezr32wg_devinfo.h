@@ -29,6 +29,11 @@
  * any third party, arising from your use of this Software.
  *
  *****************************************************************************/
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**************************************************************************//**
  * @defgroup EZR32WG_DEVINFO
  * @{
@@ -181,3 +186,7 @@ typedef struct
 #define _DEVINFO_PART_DEVICE_NUMBER_SHIFT          0            /**< Bit position for device number */
 
 /** @} End of group EZR32WG_DEVINFO */
+
+#ifdef __cplusplus
+}
+#endif

@@ -29,6 +29,11 @@
  * any third party, arising from your use of this Software.
  *
  *****************************************************************************/
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**************************************************************************//**
  * @defgroup EZR32WG_LEUART
  * @{
@@ -695,3 +700,7 @@ typedef struct
 #define LEUART_INPUT_RXPRS_DEFAULT               (_LEUART_INPUT_RXPRS_DEFAULT << 4)    /**< Shifted mode DEFAULT for LEUART_INPUT */
 
 /** @} End of group EZR32WG_LEUART */
+
+#ifdef __cplusplus
+}
+#endif

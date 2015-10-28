@@ -29,6 +29,11 @@
  * any third party, arising from your use of this Software.
  *
  *****************************************************************************/
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**************************************************************************//**
  * @defgroup EZR32WG_TIMER
  * @{
@@ -960,3 +965,7 @@ typedef struct
 #define TIMER_DTLOCK_LOCKKEY_UNLOCK                (_TIMER_DTLOCK_LOCKKEY_UNLOCK << 0)   /**< Shifted mode UNLOCK for TIMER_DTLOCK */
 
 /** @} End of group EZR32WG_TIMER */
+
+#ifdef __cplusplus
+}
+#endif

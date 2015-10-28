@@ -29,6 +29,11 @@
  * any third party, arising from your use of this Software.
  *
  *****************************************************************************/
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**************************************************************************//**
  * @defgroup EZR32WG_DMA_DESCRIPTOR
  * @{
@@ -42,3 +47,7 @@ typedef struct
   __IO uint32_t    CTRL;       /**< DMA control register */
   __IO uint32_t    USER;       /**< DMA padding register, available for user */
 } DMA_DESCRIPTOR_TypeDef;      /** @} */
+
+#ifdef __cplusplus
+}
+#endif

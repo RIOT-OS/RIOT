@@ -29,6 +29,11 @@
  * any third party, arising from your use of this Software.
  *
  *****************************************************************************/
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**************************************************************************//**
  * @defgroup EZR32WG_I2C
  * @{
@@ -697,3 +702,7 @@ typedef struct
 #define I2C_ROUTE_LOCATION_LOC6           (_I2C_ROUTE_LOCATION_LOC6 << 8)    /**< Shifted mode LOC6 for I2C_ROUTE */
 
 /** @} End of group EZR32WG_I2C */
+
+#ifdef __cplusplus
+}
+#endif

@@ -29,6 +29,11 @@
  * any third party, arising from your use of this Software.
  *
  *****************************************************************************/
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**************************************************************************//**
  * @brief USB_DIEP EZR32WG USB DIEP
  *****************************************************************************/
@@ -43,3 +48,7 @@ typedef struct
   __I uint32_t  TXFSTS;       /**< Device IN Endpoint x+1 Transmit FIFO Status Register  */
   uint32_t      RESERVED2[1]; /**< Reserved future */
 } USB_DIEP_TypeDef;
+
+#ifdef __cplusplus
+}
+#endif

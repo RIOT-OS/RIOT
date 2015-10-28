@@ -29,6 +29,11 @@
  * any third party, arising from your use of this Software.
  *
  *****************************************************************************/
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**************************************************************************//**
  * @brief PRS_CH EZR32WG PRS CH
  *****************************************************************************/
@@ -36,3 +41,7 @@ typedef struct
 {
   __IO uint32_t CTRL; /**< Channel Control Register  */
 } PRS_CH_TypeDef;
+
+#ifdef __cplusplus
+}
+#endif

@@ -29,6 +29,11 @@
  * any third party, arising from your use of this Software.
  *
  *****************************************************************************/
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**************************************************************************//**
  * @defgroup EZR32WG_GPIO
  * @{
@@ -1187,3 +1192,7 @@ typedef struct
 #define GPIO_EM4WUCAUSE_EM4WUCAUSE_E13                    (_GPIO_EM4WUCAUSE_EM4WUCAUSE_E13 << 0)     /**< Shifted mode E13 for GPIO_EM4WUCAUSE */
 
 /** @} End of group EZR32WG_GPIO */
+
+#ifdef __cplusplus
+}
+#endif

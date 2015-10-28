@@ -29,6 +29,11 @@
  * any third party, arising from your use of this Software.
  *
  *****************************************************************************/
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**************************************************************************//**
  * @defgroup EZR32WG_ROMTABLE
  * @{
@@ -64,3 +69,7 @@ typedef struct
 #define _ROMTABLE_PID3_REVMINORLSB_SHIFT    4            /**< Least Significant Bits [3:0] of CHIP MINOR revision, shift */
 
 /** @} End of group EZR32WG_ROMTABLE */
+
+#ifdef __cplusplus
+}
+#endif

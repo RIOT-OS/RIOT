@@ -30,6 +30,10 @@
  *
  *****************************************************************************/
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**************************************************************************//**
  * @defgroup EZR32WG_USARTRF_BitFields
  * @{
@@ -1113,3 +1117,7 @@
 #define USARTRF_I2SCTRL_FORMAT_W8D8             (_USARTRF_I2SCTRL_FORMAT_W8D8 << 8)      /**< Shifted mode W8D8 for USARTRF_I2SCTRL */
 
 /** @} End of group EZR32WG_USARTRF */
+
+#ifdef __cplusplus
+}
+#endif

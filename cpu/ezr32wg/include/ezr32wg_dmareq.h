@@ -30,6 +30,10 @@
  *
  *****************************************************************************/
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**************************************************************************//**
  * @defgroup EZR32WG_DMAREQ_BitFields
  * @{
@@ -91,3 +95,7 @@
 #define DMAREQ_LESENSE_BUFDATAV       ((50 << 16) + 0) /**< DMA channel select for LESENSE_BUFDATAV */
 
 /** @} End of group EZR32WG_DMAREQ */
+
+#ifdef __cplusplus
+}
+#endif

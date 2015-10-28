@@ -29,6 +29,11 @@
  * any third party, arising from your use of this Software.
  *
  *****************************************************************************/
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**************************************************************************//**
  * @defgroup EZR32WG_ETM
  * @{
@@ -778,3 +783,7 @@ typedef struct
 #define ETM_ETMCIDR3_PREAMB_DEFAULT                   (_ETM_ETMCIDR3_PREAMB_DEFAULT << 0) /**< Shifted mode DEFAULT for ETM_ETMCIDR3 */
 
 /** @} End of group EZR32WG_ETM */
+
+#ifdef __cplusplus
+}
+#endif
