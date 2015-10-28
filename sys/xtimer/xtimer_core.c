@@ -167,7 +167,7 @@ int _xtimer_set_absolute(xtimer_t *timer, uint32_t target)
     timer->next = NULL;
     if ((target >= now) && ((target - XTIMER_BACKOFF) < now)) {
         /* backoff */
-        xtimer_spin_until(target+XTIMER_BACKOFF);
+        xtimer_spin_until(target + XTIMER_BACKOFF);
         _shoot(timer);
         return 0;
     }
