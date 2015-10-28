@@ -434,23 +434,18 @@ static void _timer_callback(void)
          */
         _next_period();
 
-        reference = 0;
-
         /* make sure the timer counter also arrived
          * in the next timer period */
         while (_lltimer_now() == _lltimer_mask(0xFFFFFFFF));
     }
-    else {
-        /* we ended up in _timer_callback and there is
-         * a timer waiting.
-         */
-        /* set our period reference to the current time. */
-        reference = _lltimer_now();
-    }
 
 overflow:
+    /* set our period reference to the current time. */
+    reference = _lltimer_now();
+
     /* check if next timers are close to expiring */
-    while (timer_list_head && (_time_left(_lltimer_mask(timer_list_head->target), reference) < XTIMER_ISR_BACKOFF)) {
+    while (timer_list_head &&
+        (_time_left(_lltimer_mask(timer_list_head->target), reference) < XTIMER_ISR_BACKOFF)) {
         /* make sure we don't fire too early */
         while (_time_left(_lltimer_mask(timer_list_head->target), reference));
 
@@ -468,23 +463,20 @@ overflow:
         _shoot(timer);
     }
 
-    /* possibly executing all callbacks took enough
-     * time to overflow.  In that case we advance to
-     * next timer period and check again for expired
-     * timers.*/
+    /* possibly executing all callbacks took enough time to overflow. In that
+     * case we advance to next timer period and check again for expired timers.*/
     if (reference > _lltimer_now()) {
         DEBUG("_timer_callback: overflowed while executing callbacks. %i\n", timer_list_head != 0);
         _next_period();
-        reference = 0;
         goto overflow;
     }
 
     if (timer_list_head) {
         /* schedule callback on next timer target time */
-        next_target = timer_list_head->target - XTIMER_OVERHEAD;
-
-        /* make sure we're not setting a time in the past */
-        if (next_target < (_lltimer_now() + XTIMER_ISR_BACKOFF)) {
+        next_target = _lltimer_mask(timer_list_head->target - XTIMER_OVERHEAD);
+        if (next_target > _lltimer_mask(timer_list_head->target)) {
+            /* lltimer would underflow, spin instead */
+            while (_time_left(_lltimer_mask(timer_list_head->target), reference));
             goto overflow;
         }
     }
@@ -492,28 +484,29 @@ overflow:
         /* there's no timer planned for this timer period */
         /* schedule callback on next overflow */
         next_target = _lltimer_mask(0xFFFFFFFF);
-        uint32_t now = _lltimer_now();
+    }
 
+    uint32_t now = _lltimer_now();
+    /* check if the end of this period is very soon */
+    if (_lltimer_mask(now + XTIMER_ISR_BACKOFF) < now) {
+        /* spin until next period, then advance */
+        while (_lltimer_now() >= now);
+        _next_period();
+        goto overflow;
+    }
+
+    /* check if the next timer target is very soon */
+    if (_time_left(next_target, reference) < XTIMER_ISR_BACKOFF) {
+        /* spin until target */
+        while (_time_left(next_target, reference));
         /* check for overflow again */
-        if (now < reference) {
+        if (_lltimer_now() < reference) {
             _next_period();
-            reference = 0;
-            goto overflow;
         }
-        else {
-            /* check if the end of this period is very soon */
-            if (_lltimer_mask(now + XTIMER_ISR_BACKOFF) < now) {
-                /* spin until next period, then advance */
-                while (_lltimer_now() >= now);
-                _next_period();
-                reference = 0;
-                goto overflow;
-            }
-        }
+        goto overflow;
     }
 
     _in_handler = 0;
-
     /* set low level timer */
     _lltimer_set(next_target);
 }
