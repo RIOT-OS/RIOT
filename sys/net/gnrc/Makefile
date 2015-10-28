@@ -1,3 +1,6 @@
+ifneq (,$(filter gnrc_802154_basic_mac,$(USEMODULE)))
+    DIRS += link_layer/ieee_802154_basic_mac
+endif
 ifneq (,$(filter gnrc_conn,$(USEMODULE)))
     DIRS += conn
 endif
