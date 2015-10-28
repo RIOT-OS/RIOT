@@ -307,10 +307,10 @@ static inline int _this_high_period(uint32_t target) {
 static inline xtimer_t *_compare(xtimer_t *a, xtimer_t *b)
 {
     if (a && b) {
-        return a->target <= b->target ? a : b;
+        return ((a->target <= b->target) ? a : b);
     }
     else {
-        return a ? a : b;
+        return (a ? a : b);
     }
 }
 
