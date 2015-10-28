@@ -21,6 +21,8 @@
 #ifndef PERIPH_CONF_H_
 #define PERIPH_CONF_H_
 
+#include "periph_cpu.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -41,6 +43,11 @@ extern "C" {
 #define CLOCK_APB2_DIV      RCC_CFGR_PPRE2_DIV2
 #define CLOCK_APB1_DIV      RCC_CFGR_PPRE1_DIV4
 #define CLOCK_FLASH_LATENCY FLASH_ACR_LATENCY_5WS
+
+/* bus clocks for simplified peripheral initialization, UPDATE MANUALLY! */
+#define CLOCK_AHB           (CLOCK_CORECLOCK / 1)
+#define CLOCK_APB2          (CLOCK_CORECLOCK / 2)
+#define CLOCK_APB1          (CLOCK_CORECLOCK / 4)
 /** @} */
 
 /**
@@ -75,24 +82,26 @@ extern "C" {
  * @name UART configuration
  * @{
  */
-#define UART_NUMOF          (1U)
-#define UART_0_EN           1
-#define UART_1_EN           0
-#define UART_IRQ_PRIO       1
+static const uart_conf_t uart_config[] = {
+    /* device, RCC mask, RX pin, TX pin, pin AF, IRQ channel, DMA stream, DMA  */
+    {
+        USART6,                     /* device base register */
+        RCC_APB2ENR_USART6EN,       /* RCC mask */
+        GPIO_PIN(PORT_C,7),         /* RX pin */
+        GPIO_PIN(PORT_C,6),         /* TX pin */
+        GPIO_AF8,                   /* pin AF */
+        USART6_IRQn,                /* IRQ channel */
+        14,                         /* DMA stream */
+        5                           /* DMA channel */
+    },
+};
 
-/* UART 0 device configuration */
-#define UART_0_DEV          USART6
-#define UART_0_CLKEN()      (RCC->APB2ENR |= RCC_APB2ENR_USART6EN)
-#define UART_0_CLKDIS()     (RCC->APB2ENR &= ~(RCC_APB2ENR_USART6EN))
-#define UART_0_CLK          (84000000)          /* UART clock runs with 84MHz (F_CPU / 2) */
-#define UART_0_IRQ_CHAN     USART6_IRQn
+/* assign ISR vector names */
 #define UART_0_ISR          isr_usart6
-/* UART 0 pin configuration */
-#define UART_0_PORT_CLKEN() (RCC->AHB1ENR |= RCC_AHB1ENR_GPIOCEN)
-#define UART_0_PORT         GPIOC
-#define UART_0_TX_PIN       6
-#define UART_0_RX_PIN       7
-#define UART_0_AF           8
+#define UART_0_DMA_ISR      isr_dma2_stream6
+
+/* deduct number of defined UART interfaces */
+#define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
 /** @} */
 
 #ifdef __cplusplus
