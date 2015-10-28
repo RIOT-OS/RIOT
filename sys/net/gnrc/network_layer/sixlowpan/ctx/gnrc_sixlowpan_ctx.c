@@ -17,7 +17,6 @@
 
 #include "mutex.h"
 #include "net/gnrc/sixlowpan/ctx.h"
-#include "vtimer.h"
 #include "xtimer.h"
 
 #define ENABLE_DEBUG    (0)

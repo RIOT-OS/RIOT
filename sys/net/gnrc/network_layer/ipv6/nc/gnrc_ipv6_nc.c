@@ -24,7 +24,7 @@
 #include "net/gnrc/sixlowpan/nd.h"
 #include "thread.h"
 #include "timex.h"
-#include "vtimer.h"
+#include "xtimer.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"

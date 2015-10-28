@@ -24,7 +24,7 @@
 #include "net/sixlowpan.h"
 #include "thread.h"
 #include "timex.h"
-#include "vtimer.h"
+#include "xtimer.h"
 #include "utlist.h"
 
 #define ENABLE_DEBUG    (0)
