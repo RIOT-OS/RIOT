@@ -398,6 +398,15 @@ extern volatile uint32_t _high_cnt;
  */
 #define MSG_XTIMER 12345
 
+
+#if (XTIMER_BACKOFF < XTIMER_OVERHEAD)
+#warning XTIMER_BACKOFF < XTIMER_OVERHEAD will cause timer underruns on short timeouts.
+#endif
+
+#if (XTIMER_ISR_BACKOFF < XTIMER_OVERHEAD)
+#warning XTIMER_ISR_BACKOFF < XTIMER_OVERHEAD will cause timer underruns on short timeouts.
+#endif
+
 /**
  * @brief returns the (masked) low-level timer counter value.
  */
