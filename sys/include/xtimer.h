@@ -484,7 +484,12 @@ static inline void xtimer_spin_until(uint32_t target) {
 
 static inline void xtimer_spin(uint32_t offset) {
     uint32_t start = _lltimer_now();
+#if XTIMER_MASK
+    offset = _lltimer_mask(offset);
+    while (_lltimer_mask(_lltimer_now() - start) < offset);
+#else
     while ((_lltimer_now() - start) < offset);
+#endif
 }
 
 static inline void xtimer_usleep(uint32_t microseconds)
