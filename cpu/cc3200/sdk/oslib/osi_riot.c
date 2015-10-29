@@ -29,6 +29,7 @@
 #include "debug.h"
 
 #include "device.h"
+#include "nwp_conf.h"
 
 #ifndef MALLOC_SL_OBJECTS
 

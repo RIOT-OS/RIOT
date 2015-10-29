@@ -27,6 +27,7 @@
 #include "driverlib/uart.h"
 #include "driverlib/pin.h"
 #include "driverlib/gpio.h"
+#include "driverlib/spi.h"
 #include "driverlib/prcm.h"
 
 #include "board.h"
@@ -34,6 +35,17 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+extern const uint32_t port_to_base[];
+extern const uint8_t digital_pin_to_port[];
+extern const uint16_t digital_pin_to_pin_num[];
+extern const uint8_t digital_pin_to_bit_mask[];
+
+#define digitalPinToPort(P)       ( digital_pin_to_port[P] )
+#define digitalPinToPinNum(P)     ( digital_pin_to_pin_num[P] )
+#define digitalPinToBitMask(P)    ( digital_pin_to_bit_mask[P] )
+#define portBASERegister(P)       ((volatile uint32_t *) port_to_base[P])
+
 
 #define __CM4_REV                 0x0001  /*! Core revision r0p1              */
 #define __MPU_PRESENT             1       /*! CC3200 does not provides an MPU */

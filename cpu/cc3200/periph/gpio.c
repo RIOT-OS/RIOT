@@ -204,11 +204,6 @@ BV(2), /*  39 - GPIO_10 */
 BV(3) /*  40 - GPIO_11 */
 };
 
-#define digitalPinToPort(P)       ( digital_pin_to_port[P] )
-#define digitalPinToPinNum(P)     ( digital_pin_to_pin_num[P] )
-#define digitalPinToBitMask(P)    ( digital_pin_to_bit_mask[P] )
-#define portBASERegister(P)       ((volatile uint32_t *) port_to_base[P])
-
 int gpio_init(gpio_t dev, gpio_dir_t dir, gpio_pp_t pushpull) {
     uint8_t bit = digitalPinToBitMask(dev);
     uint8_t port = digitalPinToPort(dev);
@@ -228,15 +223,15 @@ int gpio_init(gpio_t dev, gpio_dir_t dir, gpio_pp_t pushpull) {
     }
 
     switch (pushpull) {
-    case GPIO_NOPULL:
-        MAP_PinConfigSet(pinNum, PIN_STRENGTH_2MA, PIN_TYPE_STD);
-        break;
-    case GPIO_PULLUP:
-        MAP_PinConfigSet(pinNum, PIN_STRENGTH_2MA, PIN_TYPE_STD_PU);
-        break;
-    case GPIO_PULLDOWN:
-        MAP_PinConfigSet(pinNum, PIN_STRENGTH_2MA, PIN_TYPE_STD_PD);
-        break;
+        case GPIO_NOPULL:
+            MAP_PinConfigSet(pinNum, PIN_STRENGTH_2MA, PIN_TYPE_STD);
+            break;
+        case GPIO_PULLUP:
+            MAP_PinConfigSet(pinNum, PIN_STRENGTH_2MA, PIN_TYPE_STD_PU);
+            break;
+        case GPIO_PULLDOWN:
+            MAP_PinConfigSet(pinNum, PIN_STRENGTH_2MA, PIN_TYPE_STD_PD);
+            break;
     }
 
     return 0;
@@ -302,22 +297,22 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank,
 
     switch (flank) {
 #if 0
-    // not supported by RIOT
-    case LOW:
-    cc3200Mode = GPIO_LOW_LEVEL;
-    break;
+        // not supported by RIOT
+        case LOW:
+        cc3200Mode = GPIO_LOW_LEVEL;
+        break;
 #endif
-    case GPIO_BOTH:
-        cc3200Mode = GPIO_BOTH_EDGES;
-        break;
-    case GPIO_RISING:
-        cc3200Mode = GPIO_RISING_EDGE;
-        break;
-    case GPIO_FALLING:
-        cc3200Mode = GPIO_FALLING_EDGE;
-        break;
-    default:
-        return -1;
+        case GPIO_BOTH:
+            cc3200Mode = GPIO_BOTH_EDGES;
+            break;
+        case GPIO_RISING:
+            cc3200Mode = GPIO_RISING_EDGE;
+            break;
+        case GPIO_FALLING:
+            cc3200Mode = GPIO_FALLING_EDGE;
+            break;
+        default:
+            return -1;
     }
 
     MAP_IntMasterDisable();
@@ -331,30 +326,30 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank,
     }
 
     switch (portBase) {
-    case GPIOA0_BASE:
-        cbFuncsA0[i] = cb;
-        cbArgA0[i] = arg;
-        MAP_GPIOIntRegister(GPIOA0_BASE, GPIOA0IntHandler);
-        IntEnable(INT_GPIOA0);
-        break;
-    case GPIOA1_BASE:
-        cbFuncsA1[i] = cb;
-        cbArgA1[i] = arg;
-        MAP_GPIOIntRegister(GPIOA1_BASE, GPIOA1IntHandler);
-        IntEnable(INT_GPIOA1);
-        break;
-    case GPIOA2_BASE:
-        cbFuncsA2[i] = cb;
-        cbArgA2[i] = arg;
-        MAP_GPIOIntRegister(GPIOA2_BASE, GPIOA2IntHandler);
-        IntEnable(INT_GPIOA2);
-        break;
-    case GPIOA3_BASE:
-        cbFuncsA3[i] = cb;
-        cbArgA3[i] = arg;
-        MAP_GPIOIntRegister(GPIOA3_BASE, GPIOA3IntHandler);
-        IntEnable(INT_GPIOA3);
-        break;
+        case GPIOA0_BASE:
+            cbFuncsA0[i] = cb;
+            cbArgA0[i] = arg;
+            MAP_GPIOIntRegister(GPIOA0_BASE, GPIOA0IntHandler);
+            IntEnable(INT_GPIOA0);
+            break;
+        case GPIOA1_BASE:
+            cbFuncsA1[i] = cb;
+            cbArgA1[i] = arg;
+            MAP_GPIOIntRegister(GPIOA1_BASE, GPIOA1IntHandler);
+            IntEnable(INT_GPIOA1);
+            break;
+        case GPIOA2_BASE:
+            cbFuncsA2[i] = cb;
+            cbArgA2[i] = arg;
+            MAP_GPIOIntRegister(GPIOA2_BASE, GPIOA2IntHandler);
+            IntEnable(INT_GPIOA2);
+            break;
+        case GPIOA3_BASE:
+            cbFuncsA3[i] = cb;
+            cbArgA3[i] = arg;
+            MAP_GPIOIntRegister(GPIOA3_BASE, GPIOA3IntHandler);
+            IntEnable(INT_GPIOA3);
+            break;
     }
 
     MAP_IntMasterEnable();

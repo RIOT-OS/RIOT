@@ -52,6 +52,25 @@ extern "C" {
 
 #define UART_IRQ_PRIO       INT_PRIORITY_LVL_3
 
+
+/**
+ * @name SPI configuration
+ * @{
+ */
+#define SPI_NUMOF           (1U)
+#define SPI_0_EN            1
+#define SPI_IRQ_PRIO        1
+
+/* SPI_0 device configuration */
+//#define SPI_0_DEV           GSPI_BASE
+#define SPI_0_PIN_SCK       7         // PIN_05
+#define SPI_0_PIN_MISO      14        // PIN_06
+#define SPI_0_PIN_MOSI      15        // PIN_07
+#define SPI_0_PIN_CS        18        // PIN_08
+
+/** @} */
+
+
 #ifdef __cplusplus
 } /* end extern "C" */
 #endif
