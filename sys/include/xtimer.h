@@ -401,7 +401,7 @@ extern volatile uint32_t _high_cnt;
 /**
  * @brief returns the (masked) low-level timer counter value.
  */
-static inline uint32_t _xtimer_now(void)
+static inline uint32_t _lltimer_now(void)
 {
 #if XTIMER_SHIFT
     return ((uint32_t)timer_read(XTIMER)) << XTIMER_SHIFT;
@@ -413,7 +413,7 @@ static inline uint32_t _xtimer_now(void)
 /**
  * @brief drop bits of a value that don't fit into the low-level timer.
  */
-static inline uint32_t _mask(uint32_t val)
+static inline uint32_t _lltimer_mask(uint32_t val)
 {
     return val & ~XTIMER_MASK_SHIFTED;
 }
@@ -436,8 +436,8 @@ static inline void xtimer_spin_until(uint32_t value);
  *
  * (only relevant when XTIMER_MASK != 0, e.g., timers < 32bit.)
  *
- * When combining _xtimer_now() and _high_cnt, we have to get the same value in
- * order to work around a race between overflowing _xtimer_now() and OR'ing the
+ * When combining _lltimer_now() and _high_cnt, we have to get the same value in
+ * order to work around a race between overflowing _lltimer_now() and OR'ing the
  * resulting values.
  * But some platforms are too slow to get the same timer
  * value twice, so we use this define to ignore some of the bits.
@@ -460,31 +460,31 @@ static inline uint32_t xtimer_now(void)
 #if XTIMER_MASK
     uint32_t a, b;
     do {
-        a = _xtimer_now() | _high_cnt;
-        b = _xtimer_now() | _high_cnt;
+        a = _lltimer_now() | _high_cnt;
+        b = _lltimer_now() | _high_cnt;
     } while ((a >> XTIMER_SHIFT_ON_COMPARE) != (b >> XTIMER_SHIFT_ON_COMPARE));
     return b;
 #else
-    return _xtimer_now();
+    return _lltimer_now();
 #endif
 }
 
-static inline void xtimer_spin_until(uint32_t value) {
+static inline void xtimer_spin_until(uint32_t target) {
 #if XTIMER_MASK
-    value = _mask(value);
+    target = _lltimer_mask(target);
 #endif
-    while (_xtimer_now() > value);
-    while (_xtimer_now() < value);
+    while (_lltimer_now() > target);
+    while (_lltimer_now() < target);
 }
 
 static inline void xtimer_spin(uint32_t offset) {
-    uint32_t start = _xtimer_now();
-    while ((_xtimer_now() - start) < offset);
+    uint32_t start = _lltimer_now();
+    while ((_lltimer_now() - start) < offset);
 }
 
-static inline void xtimer_usleep(uint32_t offset)
+static inline void xtimer_usleep(uint32_t microseconds)
 {
-    _xtimer_sleep(offset, 0);
+    _xtimer_sleep(microseconds, 0);
 }
 
 static inline void xtimer_usleep64(uint64_t microseconds)
@@ -494,12 +494,12 @@ static inline void xtimer_usleep64(uint64_t microseconds)
 
 static inline void xtimer_sleep(uint32_t seconds)
 {
-    xtimer_usleep64((uint64_t)seconds*SEC_IN_USEC);
+    xtimer_usleep64((uint64_t)seconds * SEC_IN_USEC);
 }
 
 static inline void xtimer_nanosleep(uint32_t nanoseconds)
 {
-    _xtimer_sleep(nanoseconds/1000, 0);
+    _xtimer_sleep(nanoseconds / USEC_IN_NS, 0);
 }
 
 #ifdef __cplusplus
