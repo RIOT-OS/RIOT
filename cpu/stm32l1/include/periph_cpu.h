@@ -43,7 +43,7 @@ typedef uint32_t gpio_t;
 /**
  * @brief   Define a CPU specific GPIO pin generator macro
  */
-#define GPIO(x, y)          ((GPIOA_BASE + (x << 10)) | y)
+#define GPIO_PIN(x, y)      ((GPIOA_BASE + (x << 10)) | y)
 
 /**
  * @brief   Available ports on the STM32L1 family
@@ -79,6 +79,16 @@ typedef enum {
     GPIO_AF13,              /**< use alternate function 13 */
     GPIO_AF14               /**< use alternate function 14 */
 } gpio_af_t;
+
+/**
+ * @brief   Configure the alternate function for the given pin
+ *
+ * @note    This is meant for internal use in STM32L1 peripheral drivers only
+ *
+ * @param[in] pin       pin to configure
+ * @param[in] af        alternate function to use
+ */
+void gpio_init_af(gpio_t pin, gpio_af_t af);
 
 /**
  * @brief   Timer configuration data structure

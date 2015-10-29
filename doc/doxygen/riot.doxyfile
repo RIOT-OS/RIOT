@@ -824,6 +824,7 @@ EXCLUDE_PATTERNS       = */board/*/tools/* \
                          */drivers/nrf24l01p/include/nrf24l01p_settings.h \
                          */cpu/nrf51/include/nrf51*.h \
                          */cpu/lpc1768/include/LPC17xx.h \
+                         */cpu/lpc11u34/include/LPC11Uxx.h \
                          */boards/*/include/periph_conf.h \
                          */cpu/x86/include/x86_pci.h \
                          */cpu/stm32l1/include/stm32l1xx.h \
@@ -831,7 +832,7 @@ EXCLUDE_PATTERNS       = */board/*/tools/* \
                          */cpu/k60/include/MK60DZ10.h \
                          */cpu/kw2x/include/MKW22D5.h \
                          */cpu/k64f/include/MK64F12.h \
-                         */drivers/cc3200sdk
+                         */cpu/cc3200/sdk/*
 
 
 # The EXCLUDE_SYMBOLS tag can be used to specify one or more symbol names

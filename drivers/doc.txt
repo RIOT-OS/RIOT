@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2013 Freie Universität Berlin
+ * Copyright (C) 2015 INRIA
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -11,4 +12,19 @@
  * @brief       Drivers for external devices as radios, sensors, memory etc.
  *
  * The module contains all kind of drivers for specific devices.
+ */
+
+/**
+ * @defgroup    drivers_netdev Network Device Drivers
+ * @ingroup     drivers
+ * @brief       Drivers for external network devices.
+ */
+
+/**
+ * @defgroup    drivers_sensors Sensor Device Drivers
+ * @ingroup     drivers
+ * @brief       Drivers for external sensors.
+ *
+ * Most of these drivers will be connected over some bus or serial connection
+ * to the MCU.
  */

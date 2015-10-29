@@ -50,7 +50,7 @@ SECTIONS
     .text :
     {
         _text = .;
-        KEEP(*(.intvecs))
+        KEEP(*(.vectors))
         *(.text*)
         *(.rodata*)
 	*(.ARM.extab* .gnu.linkonce.armextab.*)
@@ -65,22 +65,23 @@ SECTIONS
     } > SRAM
 
     __init_data = .;
+    _etext = .;
 
     .data : AT(__init_data)
     {
-        _data = .;
+        _srelocate = .;
         *(.data*)
-	. = ALIGN (8);
-	    KEEP (*(.openocd .openocd.*))
-        _edata = .;
+        KEEP (*(.openocd .openocd.*))
+        . = ALIGN (8);
+        _erelocate = .;
     } > SRAM
 
     .bss :
     {
-        _bss = .;
+        _szero = .;
         *(.bss*)
         *(COMMON)
-        _ebss = .;
+        _ezero = .;
     } > SRAM
 
     .heap :
@@ -91,4 +92,19 @@ SECTIONS
 	_eheap = .;
 
     }
+
+    /* stack section */
+    .stack (NOLOAD):
+    {
+        . = ALIGN(8);
+        _sstack = .;
+        . = ORIGIN(SRAM) + LENGTH(SRAM);
+        . = ALIGN(8);
+        _estack = .;
+    } > SRAM
+
+    /* Populate information abour ram size */
+    _sram = ORIGIN(SRAM);
+    _eram = ORIGIN(SRAM) + LENGTH(SRAM);
+
 }

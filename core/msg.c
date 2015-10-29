@@ -22,6 +22,7 @@
 
 #include <stddef.h>
 #include <inttypes.h>
+#include <assert.h>
 #include "kernel.h"
 #include "sched.h"
 #include "msg.h"
@@ -207,13 +208,14 @@ int msg_send_int(msg_t *m, kernel_pid_t target_pid)
         return 1;
     }
     else {
-        DEBUG("msg_send_int: Receiver %d not waiting.\n", target->pid);
+        DEBUG("msg_send_int: Receiver not waiting.\n");
         return (queue_msg(target, m));
     }
 }
 
 int msg_send_receive(msg_t *m, msg_t *reply, kernel_pid_t target_pid)
 {
+    assert(sched_active_pid != target_pid);
     unsigned state = disableIRQ();
     tcb_t *me = (tcb_t*) sched_threads[sched_active_pid];
     sched_set_status(me, STATUS_REPLY_BLOCKED);

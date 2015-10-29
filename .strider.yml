@@ -1,0 +1,40 @@
+language: c
+
+os:
+    - linux
+    - freebsd
+    - darwin
+
+env:
+    - NPROC_MAX=8 BUILDTEST_MCU_GROUP=static-tests
+    - NPROC_MAX=8 BUILDTEST_MCU_GROUP=cortex_m4
+    - NPROC_MAX=8 BUILDTEST_MCU_GROUP=cortex_m0
+    - NPROC_MAX=8 BUILDTEST_MCU_GROUP=x86
+    - NPROC_MAX=8 BUILDTEST_MCU_GROUP=cortex_m3_2
+    - NPROC_MAX=8 BUILDTEST_MCU_GROUP=cortex_m3_1
+    - NPROC_MAX=8 BUILDTEST_MCU_GROUP=avr8
+    - NPROC_MAX=8 BUILDTEST_MCU_GROUP=msp430
+    - NPROC_MAX=8 BUILDTEST_MCU_GROUP=arm7
+
+allowed_to_fail:
+    - darwin
+    - freebsd
+
+before_install:
+    - source ./dist/tools/pr_check/check_labels.sh
+    - test -z "$TRAVIS_PULL_REQUEST" || test "$BUILDTEST_MCU_GROUP" = "static-tests" || check_gh_label "Ready for CI build" || exit 1
+
+install:
+    - git config --global user.email "no@spam.com"
+    - git config --global user.name "Strider CD"
+
+    - git remote add riot https://github.com/RIOT-OS/RIOT.git
+    - git fetch riot master
+    - git log -1 --pretty=format:%H riot/master
+    - wget -nv -O ./pkg/libcoap/libcoap.tar.gz http://download.riot-os.org/libcoap.tar.gz; tar -xzf ./pkg/libcoap/libcoap.tar.gz -C ./pkg/libcoap; rm ./pkg/libcoap/libcoap.tar.gz
+    - wget -nv -O ./pkg/libfixmath/libfixmath.tar.gz http://download.riot-os.org/libfixmath.tar.gz; tar -xzf ./pkg/libfixmath/libfixmath.tar.gz -C ./pkg/libfixmath/; rm ./pkg/libfixmath/libfixmath.tar.gz
+    - wget -nv -O ./pkg/oonf_api/oonf_api.tar.gz http://download.riot-os.org/oonf_api.tar.gz; tar -xzf ./pkg/oonf_api/oonf_api.tar.gz; rm ./pkg/oonf_api/oonf_api.tar.gz
+    - wget -nv -O ./pkg/tlsf/tlsf-3.0.zip http://download.riot-os.org/tlsf-3.0.zip
+
+script:
+    - ./dist/tools/travis-scripts/build_and_test.sh

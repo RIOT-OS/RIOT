@@ -46,38 +46,3 @@ endif
 ifneq (,$(filter encx24j600,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/drivers/encx24j600/include
 endif
-ifneq (,$(filter cc3200sdk_mqtt_client,$(USEMODULE)))
-    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/cc3200sdk/simplelink/include
-    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/cc3200sdk/simplelink
-    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/cc3200sdk/driverlib
-    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/cc3200sdk/netapps/mqtt/include
-    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/cc3200sdk/inc
-    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/cc3200sdk/oslib
-    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/cc3200sdk/middleware/driver
-
-    CFLAGS += -DSL_PLATFORM_MULTI_THREADED
-
-    USEMODULE += cc3200sdk
-    USEMODULE += cc3200sdk_simplelink
-    USEMODULE += cc3200sdk_simplelink_source
-    USEMODULE += cc3200sdk_oslib
-    USEMODULE += cc3200sdk_mqtt_sl
-    USEMODULE += cc3200sdk_mqtt_common
-    USEMODULE += cc3200sdk_mqtt_platform
-
-endif
-ifneq (,$(filter cc3200sdk_driverlib,$(USEMODULE)))
-    $(info $(USEMODULE))
-    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/cc3200sdk/simplelink/include
-    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/cc3200sdk/simplelink
-    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/cc3200sdk/driverlib
-    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/cc3200sdk/inc
-    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/cc3200sdk/oslib
-    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/cc3200sdk/middleware/driver
-
-    CFLAGS += -DSL_PLATFORM_MULTI_THREADED
-
-    USEMODULE += cc3200sdk
-    USEMODULE += cc3200sdk_simplelink_source
-    USEMODULE += cc3200sdk_oslib
-endif

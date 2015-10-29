@@ -18,15 +18,12 @@
 #include "net/ipv6.h"
 #include "net/gnrc/ipv6/netif.h"
 #include "net/gnrc.h"
+#include "mutex.h"
 
 #include "net/gnrc/rpl.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
-
-#if ENABLE_DEBUG && defined(MODULE_IPV6_ADDR)
-static char addr_str[IPV6_ADDR_MAX_STR_LEN];
-#endif
 
 static char _stack[GNRC_RPL_STACK_SIZE];
 kernel_pid_t gnrc_rpl_pid = KERNEL_PID_UNDEF;
@@ -35,6 +32,8 @@ static xtimer_t _lt_timer;
 static msg_t _lt_msg = { .type = GNRC_RPL_MSG_TYPE_LIFETIME_UPDATE };
 static msg_t _msg_q[GNRC_RPL_MSG_QUEUE_SIZE];
 static gnrc_netreg_entry_t _me_reg;
+static mutex_t _inst_id_mutex = MUTEX_INIT;
+static uint8_t _instance_id;
 
 gnrc_rpl_instance_t gnrc_rpl_instances[GNRC_RPL_INSTANCES_NUMOF];
 gnrc_rpl_dodag_t gnrc_rpl_dodags[GNRC_RPL_DODAGS_NUMOF];
@@ -49,6 +48,7 @@ kernel_pid_t gnrc_rpl_init(kernel_pid_t if_pid)
 {
     /* check if RPL was initialized before */
     if (gnrc_rpl_pid == KERNEL_PID_UNDEF) {
+        _instance_id = 0;
         /* start the event loop */
         gnrc_rpl_pid = thread_create(_stack, sizeof(_stack), GNRC_RPL_PRIO, CREATE_STACKTEST,
                 _event_loop, NULL, "RPL");
@@ -75,8 +75,13 @@ kernel_pid_t gnrc_rpl_init(kernel_pid_t if_pid)
     return gnrc_rpl_pid;
 }
 
-gnrc_rpl_dodag_t *gnrc_rpl_root_init(uint8_t instance_id, ipv6_addr_t *dodag_id)
+gnrc_rpl_dodag_t *gnrc_rpl_root_init(uint8_t instance_id, ipv6_addr_t *dodag_id, bool gen_inst_id,
+                                     bool local_inst_id)
 {
+    if (gen_inst_id) {
+        instance_id = gnrc_rpl_gen_instance_id(local_inst_id);
+    }
+
     gnrc_rpl_dodag_t *dodag = gnrc_rpl_root_dodag_init(instance_id, dodag_id, GNRC_RPL_DEFAULT_MOP);
 
     if (!dodag) {
@@ -94,6 +99,8 @@ gnrc_rpl_dodag_t *gnrc_rpl_root_init(uint8_t instance_id, ipv6_addr_t *dodag_id)
     dodag->grounded = GNRC_RPL_GROUNDED;
     dodag->node_status = GNRC_RPL_ROOT_NODE;
     dodag->my_rank = GNRC_RPL_ROOT_RANK;
+    dodag->dodag_conf_requested = true;
+    dodag->prefix_info_requested = true;
 
     trickle_start(gnrc_rpl_pid, &dodag->trickle, GNRC_RPL_MSG_TYPE_TRICKLE_INTERVAL,
                   GNRC_RPL_MSG_TYPE_TRICKLE_CALLBACK, (1 << dodag->dio_min),
@@ -265,6 +272,22 @@ void _dao_handle_send(gnrc_rpl_dodag_t *dodag)
     else if (dodag->dao_ack_received == false) {
         gnrc_rpl_long_delay_dao(dodag);
     }
+}
+
+uint8_t gnrc_rpl_gen_instance_id(bool local)
+{
+    mutex_lock(&_inst_id_mutex);
+    uint8_t instance_id = GNRC_RPL_DEFAULT_INSTANCE;
+
+    if (local) {
+        instance_id = ((_instance_id++) | GNRC_RPL_INSTANCE_ID_MSB);
+        mutex_unlock(&_inst_id_mutex);
+        return instance_id;
+    }
+
+    instance_id = ((_instance_id++) & GNRC_RPL_GLOBAL_INSTANCE_MASK);
+    mutex_unlock(&_inst_id_mutex);
+    return instance_id;
 }
 
 /**

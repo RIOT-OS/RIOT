@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Copyright 2014 Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+# Copyright 2014 Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
 # Copyright 2014 Hinnerk van Bruinehsen <h.v.bruinehsen@fu-berlin.de>
 #
 # This file is subject to the terms and conditions of the GNU Lesser
@@ -18,7 +18,7 @@ fi
 
 BRANCH=${1}
 FILEREGEX='\.([sScHh]|cpp)$'
-EXCLUDE='^(cpu/saml21/include/atmel/|cpu/cc3200/startup.c|drivers/cc3200sdk)'
+EXCLUDE='^(cpu/saml21/include/atmel/|cpu/cc3200/startup.c|cpu/cc3200/sdk/)'
 
 # If no branch but an option is given, unset BRANCH.
 # Otherwise, consume this parameter.

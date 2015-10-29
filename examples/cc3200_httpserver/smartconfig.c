@@ -68,7 +68,7 @@
 //!                      IP address,We will be stuck in this function forever.
 //!
 //*****************************************************************************
-long SmartConfigConnect() {
+long SmartConfigConnect(void) {
     unsigned char policyVal;
 
     long lRetVal;
@@ -78,8 +78,8 @@ long SmartConfigConnect() {
     // This is of course not a must, it is used in this example to make sure
     // we will connect to the new profile added by SmartConfig
     //
-    lRetVal = sl_WlanProfileDel(WLAN_DEL_ALL_PROFILES);
-    ASSERT_ON_ERROR(lRetVal);
+    //lRetVal = sl_WlanProfileDel(WLAN_DEL_ALL_PROFILES);
+    //ASSERT_ON_ERROR(lRetVal);
 
     //set AUTO policy
     lRetVal = sl_WlanPolicySet(SL_POLICY_CONNECTION,
@@ -119,7 +119,7 @@ long SmartConfigConnect() {
 //!   \note
 //!
 //*****************************************************************************
-long SmartConfigStop() {
+long SmartConfigStop(void) {
     long lRetVal;
     lRetVal = sl_WlanSmartConfigStop();
     ASSERT_ON_ERROR(lRetVal);

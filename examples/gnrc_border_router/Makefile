@@ -8,7 +8,7 @@ BOARD ?= samr21-xpro
 RIOTBASE ?= $(CURDIR)/../..
 
 BOARD_INSUFFICIENT_MEMORY := airfy-beacon nrf51dongle nrf6310 pca10000 pca10005 nucleo-f334 \
-                             spark-core stm32f0discovery yunjia-nrf51822
+                             spark-core stm32f0discovery weio yunjia-nrf51822
 
 ifeq (,$(SLIP_UART))
   # set default (last available UART)

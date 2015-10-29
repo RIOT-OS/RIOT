@@ -22,6 +22,7 @@
 
 #include <stdint.h>
 #include "cpu.h"
+#include "nwp_conf.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -33,22 +34,22 @@ extern "C" {
 #define CHANGE 4
 
 /**
- * for requesting an IRQ when PIN value goes high to low
+ * PIN value high to low IRQ trigger
  */
 #define FALLING 3
 
 /**
- * for requesting an IRQ when PIN value goes low to high
+ * PIN value low to high IRQ trigger
  */
 #define RISING 2
 
 /**
- * for requesting an IRQ when PIN value goes high
+ * PIN value high IRQ trigger
  */
 #define HIGH 1
 
 /**
- * for requesting an IRQ when PIN value goes low
+ * PIN value low IRQ trigger
  */
 #define LOW  0
 
@@ -77,37 +78,51 @@ extern "C" {
  */
 #define PUSH2 11
 
-/**
- * P1.10 on launchpad (bottom pin on left side)
- */
-#define DEBUG_PIN 10
+#define GDO0_PIN 19
+#define GDO2_PIN 2
 
+/*
+ * debug pin
+ *
+ *    gpio_init(DEBUG_PIN, GPIO_DIR_OUT, GPIO_NOPULL);
+ *
+ */
+#define DEBUG_PIN 5 // P1.5 on launchpad
+
+#define ALARM_PIN 8
+
+/*
+ * RF settings
+ */
+#define FREQ868_BR1200_DEV5200
+//#define A110LR09_ETSI_M7_GFSK_38_KBAUD
+
+#if 0
 /**
- * @name Macro for easy porting of TI examples
+ * @name Define the interface to the CC110X radio
  * @{
  */
-#define GPIO_IF_LedOn     gpio_set
-#define GPIO_IF_LedOff    gpio_clear
-#define GPIO_IF_LedStatus gpio_read
-
-#define MCU_RED_LED_GPIO    RED_LED
-#define MCU_GREEN_LED_GPIO  GREEN_LED
-
-/**
- * sometimes I suspect to be daltonic
- */
-#define MCU_ORANGE_LED_GPIO YELLOW_LED
-
-#define Report printf
-
+#define CC110X_SPI       SPI_0
+#define CC110X_CS        18
+#define CC110X_MOSI      15
+#define CC110X_MISO      14
+#define CC110X_CLK       7
+#define CC110X_INT       GDO0_PIN
+#define CC110X_RESET     1
+#define CC110X_SLEEP     1
+#define CC110X_SPI_CLK   SPI_SPEED_100KHZ
 /** @} */
-
-
+#endif
 
 /**
  * Define the nominal CPU core clock in this board
  */
 #define F_CPU               80000000
+
+#define SEC_TO_TICKS(sec)   80000000*sec /**< Convert seconds to  clock ticks */
+#define MSEC_TO_TICKS(msec) 80000*msec /**< Convert millisecs to  clock ticks */
+#define USEC_TO_TICKS(usec) 80*usec /**< Convert microseconds to  clock ticks */
+
 
 /**
  * hardware timers modules
@@ -145,22 +160,22 @@ extern "C" {
  * @{
  */
 
-#define LED_RED_ON          gpio_set(RED_LED)
-#define LED_RED_OFF         gpio_clear(RED_LED)
-#define LED_RED_TOGGLE      gpio_toggle(RED_LED)
+#define RED_LED_ON          gpio_set(RED_LED)
+#define RED_LED_OFF         gpio_clear(RED_LED)
+#define RED_LED_TOGGLE      gpio_toggle(RED_LED)
 
-#define LED_YELLOW_ON       gpio_set(YELLOW_LED)
-#define LED_YELLOW_OFF      gpio_clear(YELLOW_LED)
-#define LED_YELLOW_TOGGLE   gpio_toggle(YELLOW_LED)
+#define YELLOW_LED_ON       gpio_set(YELLOW_LED)
+#define YELLOW_LED_OFF      gpio_clear(YELLOW_LED)
+#define YELLOW_LED_TOGGLE   gpio_toggle(YELLOW_LED)
 
-#define LED_GREEN_ON        gpio_set(GREEN_LED)
-#define LED_GREEN_OFF       gpio_clear(GREEN_LED)
-#define LED_GREEN_TOGGLE    gpio_toggle(GREEN_LED)
+#define GREEN_LED_ON        gpio_set(GREEN_LED)
+#define GREEN_LED_OFF       gpio_clear(GREEN_LED)
+#define GREEN_LED_TOGGLE    gpio_toggle(GREEN_LED)
 
 /* Default to red if the color is not specified: */
-#define LED_ON              LED_RED_ON
-#define LED_OFF             LED_RED_OFF
-#define LED_TOGGLE          LED_RED_TOGGLE
+#define LED_ON              RED_LED_ON
+#define LED_OFF             RED_LED_OFF
+#define LED_TOGGLE          RED_LED_TOGGLE
 /** @} */
 
 /**

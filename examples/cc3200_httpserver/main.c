@@ -93,6 +93,28 @@
 #define WIFI_MODE_PIN 2 // PIN_58
 #endif
 
+
+/**
+ * @name Macro for easy porting of TI examples
+ * @{
+ */
+#define GPIO_IF_LedOn     gpio_set
+#define GPIO_IF_LedOff    gpio_clear
+#define GPIO_IF_LedStatus gpio_read
+
+#define MCU_RED_LED_GPIO    RED_LED
+#define MCU_GREEN_LED_GPIO  GREEN_LED
+
+/**
+ * sometimes I suspect to be daltonic
+ */
+#define MCU_ORANGE_LED_GPIO YELLOW_LED
+
+#define Report printf
+
+/** @} */
+
+
 #define APPLICATION_NAME        "HTTP Server"
 #define APPLICATION_VERSION     "1.1.1"
 #define AP_SSID_LEN_MAX         (33)
@@ -542,7 +564,7 @@ void SimpleLinkHttpServerCallback(SlHttpServerEvent_t *pSlHttpServerEvent,
 //! \return None
 //!
 //*****************************************************************************
-static void InitializeAppVariables() {
+static void InitializeAppVariables(void) {
     g_ulStatus = 0;
     g_uiIpAddress = 0;
 }
@@ -562,7 +584,7 @@ static void InitializeAppVariables() {
 //! \param   none
 //! \return  On success, zero is returned. On error, negative is returned
 //*****************************************************************************
-static long ConfigureSimpleLinkToDefaultState() {
+static long ConfigureSimpleLinkToDefaultState(void) {
     SlVersionFull ver;
     _WlanRxFilterOperationCommandBuff_t RxFilterIdMask;
 
@@ -698,7 +720,7 @@ static long ConfigureSimpleLinkToDefaultState() {
 //! \return                        0 on success else error code
 //
 //****************************************************************************
-long ConnectToNetwork() {
+long ConnectToNetwork(void) {
     unsigned short len, config_opt;
     long lRetVal = -1;
 
@@ -830,7 +852,7 @@ long ConnectToNetwork() {
 //! \return                        None
 //
 //****************************************************************************
-static void ReadDeviceConfiguration() {
+static void ReadDeviceConfiguration(void) {
 #ifdef ORIGINAL_EXAMPLE
     unsigned int uiGPIOPort;
     unsigned char pucGPIOPin;
@@ -979,7 +1001,7 @@ BoardInit(void)
 //****************************************************************************
 //                            MAIN FUNCTION
 //****************************************************************************
-int main() {
+int main(void) {
     long lRetVal;
 
 #ifdef ORIGINAL_EXAMPLE

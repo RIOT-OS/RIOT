@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Ludwig Ortmann, Christian Mehlis
+ * Copyright 2015 Ludwig Knüpfer, Christian Mehlis
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -8,7 +8,7 @@
 
 /**
  * @defgroup    driver_dht DHT Family of Humidity and Temperature Sensors
- * @ingroup     drivers
+ * @ingroup     drivers_sensors
  * @brief       Device driver for the DHT Family of humidity
  *              and temperature sensors
  *
@@ -18,7 +18,7 @@
  * @brief       Device driver interface for the DHT family of humidity
  *              and temperature sensors
  *
- * @author      Ludwig Ortmann <ludwig.ortmann@fu-berlin.de
+ * @author      Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de
  * @author      Christian Mehlis <mehlis@inf.fu-berlin.de>
  */
 

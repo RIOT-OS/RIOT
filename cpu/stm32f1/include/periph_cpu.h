@@ -42,7 +42,7 @@ typedef uint32_t gpio_t;
 /**
  * @brief   Define a CPU specific GPIO pin generator macro
  */
-#define GPIO(x, y)          ((GPIOA_BASE + (x << 10)) | y)
+#define GPIO_PIN(x, y)      ((GPIOA_BASE + (x << 10)) | y)
 
 /**
  * @brief   Override values for pull register configuration

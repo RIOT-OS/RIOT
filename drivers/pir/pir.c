@@ -13,7 +13,7 @@
  * @file
  * @brief       Device driver implementation for the PIR motion sensor
  *
- * @author      Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ * @author      Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  *
  * @}
  */

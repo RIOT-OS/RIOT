@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013, 2014 Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ * Copyright (C) 2013, 2014 Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -12,7 +12,7 @@
  * The implementation uses POSIX system calls to emulate a real-time
  * clock based on the system clock.
  *
- * @author Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ * @author Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  *
  * @ingroup _native_cpu
  * @defgroup _native_rtc

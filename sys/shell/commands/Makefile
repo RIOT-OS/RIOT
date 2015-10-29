@@ -38,6 +38,9 @@ endif
 ifneq (,$(filter lsm303dlhc,$(USEMODULE)))
   SRC += sc_lsm303dlhc.c
 endif
+ifneq (,$(filter at30tse75x,$(USEMODULE)))
+    SRC += sc_at30tse75x.c
+endif
 ifneq (,$(filter gnrc_netif,$(USEMODULE)))
   SRC += sc_netif.c
 endif
@@ -46,6 +49,9 @@ ifneq (,$(filter fib,$(USEMODULE)))
 endif
 ifneq (,$(filter gnrc_ipv6_nc,$(USEMODULE)))
   SRC += sc_ipv6_nc.c
+endif
+ifneq (,$(filter gnrc_ipv6_whitelist,$(USEMODULE)))
+  SRC += sc_whitelist.c
 endif
 ifneq (,$(filter gnrc_icmpv6_echo vtimer,$(USEMODULE)))
   SRC += sc_icmpv6_echo.c

@@ -15,7 +15,7 @@
  *
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  * @author      Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
- * @author      Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ * @author      Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  *
  * @}
  */
@@ -69,6 +69,10 @@ extern int _get_current_handler(int argc, char **argv);
 extern int _reset_current_handler(int argc, char **argv);
 #endif
 
+#ifdef MODULE_AT30TSE75X
+extern int _at30tse75x_handler(int argc, char **argv);
+#endif
+
 #if FEATURE_PERIPH_RTC
 extern int _rtc_handler(int argc, char **argv);
 #endif
@@ -108,6 +112,10 @@ extern int _fib_route_handler(int argc, char **argv);
 #ifdef MODULE_GNRC_IPV6_NC
 extern int _ipv6_nc_manage(int argc, char **argv);
 extern int _ipv6_nc_routers(int argc, char **argv);
+#endif
+
+#ifdef MODULE_GNRC_IPV6_WHITELIST
+extern int _whitelist(int argc, char **argv);
 #endif
 
 #ifdef MODULE_GNRC_ZEP
@@ -163,6 +171,9 @@ const shell_command_t _shell_command_list[] = {
     {"cur", "Prints current and average power consumption.", _get_current_handler},
     {"rstcur", "Resets coulomb counter.", _reset_current_handler},
 #endif
+#ifdef MODULE_AT30TSE75X
+    {"at30tse75x", "Test AT30TSE75X temperature sensor", _at30tse75x_handler},
+#endif
 #ifdef MODULE_MCI
     {DISK_READ_SECTOR_CMD, "Reads the specified sector of inserted memory card", _read_sector},
     {DISK_READ_BYTES_CMD, "Reads the specified bytes from inserted memory card", _read_bytes},
@@ -195,6 +206,9 @@ const shell_command_t _shell_command_list[] = {
 #ifdef MODULE_GNRC_IPV6_NC
     {"ncache", "manage neighbor cache by hand", _ipv6_nc_manage },
     {"routers", "IPv6 default router list", _ipv6_nc_routers },
+#endif
+#ifdef MODULE_GNRC_IPV6_WHITELIST
+    {"whitelist", "whitelists an address for receival ('whitelist [add|del|help]')", _whitelist },
 #endif
 #ifdef MODULE_GNRC_ZEP
 #ifdef MODULE_IPV6_ADDR

@@ -9,7 +9,7 @@
 
 /**
  * @defgroup    drivers_cc110x CC110x
- * @ingroup     drivers
+ * @ingroup     drivers_netdev
  * @brief       TI CC110x
  * @{
  * @file

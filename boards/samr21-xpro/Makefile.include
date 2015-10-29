@@ -17,6 +17,7 @@ include $(RIOTBOARD)/Makefile.include.serial
 #   Usage: SERIAL="ATML..." BOARD="samr21-xpro" make flash
 ifneq (,$(SERIAL))
 export OPENOCD_EXTRA_INIT += "-c cmsis_dap_serial $(SERIAL)"
+PORT_LINUX := $(shell $(RIOTBASE)/dist/tools/usb-serial/find-tty.sh $(SERIAL))
 endif
 
 # this board uses openocd

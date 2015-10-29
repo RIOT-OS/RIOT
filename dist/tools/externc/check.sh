@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Copyright 2014 Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+# Copyright 2014 Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
 # Copyright 2014 DangNhat Pham-Huu <51002279@hcmut.edu.vn>
 #
 # This file is subject to the terms and conditions of the GNU Lesser
@@ -28,7 +28,7 @@ else
     FILES="$(git diff --diff-filter=${DIFFFILTER} --name-only ${BRANCH} | grep -E '\.h$')"
 fi
 
-FILES=$(echo "${FILES}" | grep -v -E '^(dist/tools|boards/msba2-common/tools/|cpu/saml21/include/atmel/|drivers/cc3200sdk)')
+FILES=$(echo "${FILES}" | grep -v -E '^(dist/tools|boards/msba2-common/tools/|cpu/saml21/include/atmel/|cpu/cc3200/sdk/)')
 
 # check files
 for FILE in ${FILES}; do

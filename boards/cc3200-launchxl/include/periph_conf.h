@@ -23,10 +23,10 @@
 extern "C" {
 #endif
 
-    /**
-     * @name Timer peripheral configuration
-     * @{
-     */
+/**
+ * @name Timer peripheral configuration
+ * @{
+ */
 
 #include "cc3200.h"
 
@@ -38,14 +38,11 @@ extern "C" {
 #define TIMER_2_EN 1
 #define TIMER_3_EN 1
 
-#define SEC_TO_TICKS(sec)   80000000*sec
-#define MSEC_TO_TICKS(msec) 80000*msec
-#define USEC_TO_TICKS(usec) 80*usec
 
-    /**
-     * @name UART configuration
-     * @{
-     */
+/**
+ * @name UART configuration
+ * @{
+ */
 #define UART_NUMOF          1
 
 #define UART_0_EN           1
@@ -54,6 +51,25 @@ extern "C" {
 #define UART_3_EN           0
 
 #define UART_IRQ_PRIO       INT_PRIORITY_LVL_3
+
+
+/**
+ * @name SPI configuration
+ * @{
+ */
+#define SPI_NUMOF           (1U)
+#define SPI_0_EN            1
+#define SPI_IRQ_PRIO        1
+
+/* SPI_0 device configuration */
+//#define SPI_0_DEV           GSPI_BASE
+#define SPI_0_PIN_SCK       7         // PIN_05
+#define SPI_0_PIN_MISO      14        // PIN_06
+#define SPI_0_PIN_MOSI      15        // PIN_07
+#define SPI_0_PIN_CS        18        // PIN_08
+
+/** @} */
+
 
 #ifdef __cplusplus
 } /* end extern "C" */

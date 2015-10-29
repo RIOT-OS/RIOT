@@ -54,7 +54,7 @@ typedef enum {
  *
  * The port definition is used (and zeroed) to suppress compiler warnings
  */
-#define GPIO(x,y)           ((x & 0) | y)
+#define GPIO_PIN(x,y)       ((x & 0) | y)
 
 #ifdef __cplusplus
 }

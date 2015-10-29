@@ -14,7 +14,7 @@
  * @brief       low-power mode implementation for MSP430 MCUs
  *
  * @author      Kévin Roussel <Kevin.Roussel@inria.fr>
- * @author      Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ * @author      Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  *
  * @}

@@ -37,12 +37,12 @@ endif
 ifneq (,$(KWRF_CS))
   CFLAGS += -DKWRF_CS=$(KWRF_CS)
 else
-  CFLAGS += -DKWRF_CS=GPIO\(0,0\)       # set default
+  CFLAGS += -DKWRF_CS=GPIO_PIN\(0,0\)       # set default
 endif
 ifneq (,$(KWRF_INT))
   CFLAGS += -DKWRF_INT=$(KWRF_INT)
 else
-  CFLAGS += -DKWRF_INT=GPIO\(0,1\)      # set default
+  CFLAGS += -DKWRF_INT=GPIO_PIN\(0,1\)      # set default
 endif
 ifneq (,$(KWRF_SPI_SPEED))
   CFLAGS += -DKWRF_SPI_SPEED=$(KWRF_SPI_SPEED)

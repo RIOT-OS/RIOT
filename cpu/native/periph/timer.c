@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013 Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ * Copyright (C) 2013 Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  *               2015 Kaspar Schleiser <kaspar@schleiser.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
@@ -9,14 +9,14 @@
  * @ingroup timer
  * @ingroup native_cpu
  * @{
- * @author  Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ * @author  Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
  * @file
  * @brief Native CPU periph/timer.h implementation
  *
  * Uses POSIX realtime clock and POSIX itimer to mimic hardware.
  *
- * This is based on native's hwtimer implementation by Ludwig Ortmann.
+ * This is based on native's hwtimer implementation by Ludwig Knüpfer.
  * I removed the multiplexing, as xtimer does the same. (kaspar)
  *
  * @}

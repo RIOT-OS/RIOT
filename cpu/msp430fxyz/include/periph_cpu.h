@@ -43,7 +43,7 @@ typedef uint16_t gpio_t;
  * @brief   Mandatory function for defining a GPIO pins
  * @{
  */
-#define GPIO(x, y)          ((gpio_t)(((x & 0xff) << 8) | (1 << (y & 0xff))))
+#define GPIO_PIN(x, y)      ((gpio_t)(((x & 0xff) << 8) | (1 << (y & 0xff))))
 
 /**
  * @brief   Override direction values
