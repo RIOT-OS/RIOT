@@ -71,6 +71,7 @@ SECTIONS
         _data = .;
         *(.data*)
 	. = ALIGN (8);
+	    KEEP (*(.openocd .openocd.*))
         _edata = .;
     } > SRAM
 
