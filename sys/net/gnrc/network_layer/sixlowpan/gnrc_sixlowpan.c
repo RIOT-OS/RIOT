@@ -152,7 +152,12 @@ static void _receive(gnrc_pktsnip_t *pkt)
         /* Remove IPHC dispatch */
         gnrc_pktbuf_remove_snip(pkt, sixlowpan);
         /* Insert IPv6 header instead */
-        ipv6->next = pkt->next;
+        if (ipv6->next != NULL) {
+            ipv6->next->next = pkt->next;
+        }
+        else {
+            ipv6->next = pkt->next;
+        }
         pkt->next = ipv6;
     }
 #endif
