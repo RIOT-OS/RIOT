@@ -21,7 +21,8 @@
 
 #define TEST_FIB_TABLE_SIZE (20)
 static fib_entry_t _entries[TEST_FIB_TABLE_SIZE];
-static fib_table_t test_fib_table = { .entries = _entries,
+static fib_table_t test_fib_table = { .data.entries = _entries,
+                                      .table_type = FIB_TABLE_TYPE_SH,
                                       .size = TEST_FIB_TABLE_SIZE,
                                       .mtx_access = MUTEX_INIT,
                                       .notify_rp_pos = 0 };
