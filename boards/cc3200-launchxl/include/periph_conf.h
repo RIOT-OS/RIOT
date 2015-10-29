@@ -32,6 +32,11 @@ extern "C" {
 
 #define CLOCK_CORECLOCK     (80000000U)      /* desired core clock frequency */
 
+/*
+ * about 30 usec in cc3200 ticks
+ */
+#define XTIMER_BACKOFF 2000
+
 // CC3200 has 4 timer blocks
 #define TIMER_0_EN 1
 #define TIMER_1_EN 1

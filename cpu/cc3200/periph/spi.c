@@ -197,7 +197,7 @@ int spi_transfer_regs(spi_t dev, uint8_t reg, char *out, char *in, unsigned int 
     //MAP_SPITransfer(GSPI_BASE, &reg, 0, 1, SPI_CS_ENABLE);
     MAP_SPITransfer(GSPI_BASE, &reg, 0, 1, 0);
     //if(MAP_SPITransfer(GSPI_BASE, (unsigned char*)&out, (unsigned char*)in, length, SPI_CS_DISABLE)) {
-    if(MAP_SPITransfer(GSPI_BASE, (unsigned char*)&out, (unsigned char*)in, length, 0)) {
+    if(MAP_SPITransfer(GSPI_BASE, (unsigned char*)out, (unsigned char*)in, length, 0)) {
     	return -1;
     }
     return length+1;
