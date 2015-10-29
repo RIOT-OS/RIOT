@@ -18,6 +18,9 @@
 #include <stdint.h>
 #include <unistd.h>
 
+/* work around broken sys/posix/unistd.h */
+ssize_t write(int fildes, const void *buf, size_t nbyte);
+
 #include "div.h"
 #include "fmt.h"
 
