@@ -40,14 +40,10 @@ uint32_t adc_get_status(Adc*);
 
 int adc_init(adc_t dev, adc_precision_t precision)
 {
-  //Adc *adc = 0;
   int init = 0;
   switch (dev) {
 #if ADC_0_EN
     case ADC_0:
-      //  Define ADC device.
-      //adc = ADC_0_DEV;
-
       //  Initialize adc_config defaults.
       if (!adc_config.prescaler)
         adc_config.prescaler = ADC_0_PRESCALER;
@@ -57,6 +53,8 @@ int adc_init(adc_t dev, adc_precision_t precision)
         adc_config.accumulate = ADC_0_ACCUM_DEFAULT;
       if (!adc_config.divide)
         adc_config.divide = ADC_0_DIV_RES_DEFAULT;
+      if (!adc_config.vref)
+        adc_config.vref = ADC_0_REF_DEFAULT;
       if (!adc_config.differential_mode)
         adc_config.differential_mode = ADC_0_DIFFERENTIAL_MODE;
       if (!adc_config.run_in_standby)
@@ -292,7 +290,7 @@ int adc_configure(adc_t dev)
   adc->CTRLA.reg = (adc_config.run_in_standby << ADC_CTRLA_RUNSTDBY_Pos);
 
   /* Set Voltage Reference */
-  adc->REFCTRL.reg = (ADC_0_REF_COM_EN << ADC_REFCTRL_REFCOMP_Pos) | ADC_0_REF_DEFAULT;
+  adc->REFCTRL.reg = (ADC_0_REF_COM_EN << ADC_REFCTRL_REFCOMP_Pos) | adc_config.vref;
 
   /* Configure Hardware Averaging */
   uint32_t resolution = adc_config.precision;
@@ -327,11 +325,11 @@ int adc_configure(adc_t dev)
   while(adc_syncing(adc));
 
   /* If external vref. Pin setup */
-  if(ADC_0_REF_DEFAULT == ADC_0_REF_EXT_B)
+  if(adc_config.vref == ADC_0_REF_EXT_B)
   {
-    ADC_0_PORT.DIRCLR.reg = (1 << ADC_0_REF_DEFAULT);
-    ADC_0_PORT.PINCFG[ADC_0_REF_DEFAULT].bit.INEN = true;
-    ADC_0_PORT.PINCFG[ADC_0_REF_DEFAULT].bit.PULLEN = false;
+    ADC_0_PORT.DIRCLR.reg = (1 << adc_config.vref);
+    ADC_0_PORT.PINCFG[adc_config.vref].bit.INEN = true;
+    ADC_0_PORT.PINCFG[adc_config.vref].bit.PULLEN = false;
   }
 
   /* Configure CTRLB Register HERE IS THE RESOLUTION SET!*/
@@ -395,7 +393,7 @@ int adc_configure(adc_t dev)
   while(adc_syncing(adc));
 
   //  Enable bandgap if VREF is internal 1V.
-  if(ADC_0_REF_DEFAULT == ADC_0_REF_INT_1V)
+  if(adc_config.vref == ADC_0_REF_INT_1V)
   {
     SYSCTRL->VREF.reg |= SYSCTRL_VREF_BGOUTEN;
   }

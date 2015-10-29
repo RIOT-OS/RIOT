@@ -349,7 +349,12 @@ static const adc_channel_t adc_channels[] = {
 #define ADC_0_RES_12BIT                    ADC_CTRLB_RESSEL_12BIT
 #define ADC_0_RES_16BIT                    ADC_CTRLB_RESSEL_16BIT
 
-/* ADC 0 Voltage reference */
+/* ADC 0 Voltage reference
+ * Note: ADC_0_REF_EXT_B is PA04 on the SAMR21-xpro.
+ *       PA04 is also hardwired to the USB EDBG serial.
+ *       If you use ADC_0_REF_EXT_B while also using
+ *       EDBG serial, the serial connection will freeze.
+ */
 #define ADC_0_REF_INT_1V                   ADC_REFCTRL_REFSEL_INT1V
 #define ADC_0_REF_EXT_B                    ADC_REFCTRL_REFSEL_AREFB
 #define ADC_0_REF_COM_EN                   0
@@ -391,6 +396,7 @@ typedef struct {
   uint32_t gain;
   uint32_t accumulate;
   uint8_t  divide;
+  int vref;
   int differential_mode;
   int run_in_standby;
 } adc_conf_t;
