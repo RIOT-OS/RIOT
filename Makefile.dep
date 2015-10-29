@@ -37,6 +37,7 @@ endif
 
 ifneq (,$(filter cc110x,$(USEMODULE)))
   USEMODULE += ieee802154
+  USEMODULE += xtimer
 endif
 
 ifneq (,$(filter kw2xrf,$(USEMODULE)))
