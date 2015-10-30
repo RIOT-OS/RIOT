@@ -177,6 +177,11 @@ typedef enum {
      */
     NETOPT_DEVICE_TYPE,
 
+    /**
+     * @brief get/set the channel page as defined by IEEE 802.15.4
+     */
+    NETOPT_CHANNEL_PAGE,
+
     /* add more options if needed */
 
     /**

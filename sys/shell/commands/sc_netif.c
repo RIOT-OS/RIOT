@@ -83,6 +83,7 @@ static void _set_usage(char *cmd_name)
          "       * \"chan\" - alias for \"channel\"\n"
          "       * \"csma_retries\" - set max. number of channel access attempts\n"
          "       * \"nid\" - sets the network identifier (or the PAN ID)\n"
+         "       * \"page\" - set the channel page (IEEE 802.15.4)\n"
          "       * \"pan\" - alias for \"nid\"\n"
          "       * \"pan_id\" - alias for \"nid\"\n"
          "       * \"power\" - TX power in dBm\n"
@@ -129,6 +130,10 @@ static void _print_netopt(netopt_t opt)
 
         case NETOPT_CHANNEL:
             printf("channel");
+            break;
+
+        case NETOPT_CHANNEL_PAGE:
+            printf("page");
             break;
 
         case NETOPT_NID:
@@ -208,6 +213,12 @@ static void _netif_list(kernel_pid_t dev)
 
     if (res >= 0) {
         printf(" Channel: %" PRIu16 " ", u16);
+    }
+
+    res = gnrc_netapi_get(dev, NETOPT_CHANNEL_PAGE, 0, &u16, sizeof(u16));
+
+    if (res >= 0) {
+        printf(" Page: %" PRIu16 " ", u16);
     }
 
     res = gnrc_netapi_get(dev, NETOPT_NID, 0, &u16, sizeof(u16));
@@ -540,6 +551,9 @@ static int _netif_set(char *cmd_name, kernel_pid_t dev, char *key, char *value)
     }
     else if ((strcmp("channel", key) == 0) || (strcmp("chan", key) == 0)) {
         return _netif_set_u16(dev, NETOPT_CHANNEL, value);
+    }
+    else if (strcmp("page", key) == 0) {
+        return _netif_set_u16(dev, NETOPT_CHANNEL_PAGE, value);
     }
     else if ((strcmp("nid", key) == 0) || (strcmp("pan", key) == 0) ||
              (strcmp("pan_id", key) == 0)) {
