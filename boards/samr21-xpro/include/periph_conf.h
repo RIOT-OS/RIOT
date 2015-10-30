@@ -314,17 +314,20 @@ typedef struct {
 #if ADC_0_CHANNELS
 /*  An array listing all possible positive input
  *  ADC channels for the SAMR21-XPRO.
+ *
+ *  Note: Enabling PA04/PA05 will cause EDBG serial communication
+ *  to freeze, so they are disabled by default!
  */
 static const adc_channel_t adc_channels[] = {
     /* port, pin, muxpos */
-    //{&PORT->Group[0], 4, 0x4}, // we cannot use these as well as use EDBG serial TX/RX
-    //{&PORT->Group[0], 5, 0x5}, // because PA04 & PA05 read/write directly to EDBG serial port.
-    {&PORT->Group[0], ADC_INPUTCTRL_MUXPOS_PIN6, 0x6},    // PA06
-    {&PORT->Group[0], ADC_INPUTCTRL_MUXPOS_PIN7, 0x7},    // PA07
-    {&PORT->Group[0], ADC_INPUTCTRL_MUXPOS_PIN16, 0x10},   // PA08
-    {&PORT->Group[0], ADC_INPUTCTRL_MUXPOS_PIN17, 0x11},   // PA09
-    {&PORT->Group[0], ADC_INPUTCTRL_MUXPOS_PIN10, 0xA},    // PB02
-    {&PORT->Group[0], ADC_INPUTCTRL_MUXPOS_PIN11, 0xB},    // PB03
+    //{&PORT->Group[0], ADC_INPUTCTRL_MUXPOS_PIN4, 0x4},      // PA04
+    //{&PORT->Group[0], ADC_INPUTCTRL_MUXPOS_PIN5, 0x5},      // PA05
+    {&PORT->Group[0], ADC_INPUTCTRL_MUXPOS_PIN6, 0x6},      // PA06
+    {&PORT->Group[0], ADC_INPUTCTRL_MUXPOS_PIN7, 0x7},      // PA07
+    {&PORT->Group[0], ADC_INPUTCTRL_MUXPOS_PIN16, 0x10},    // PA08
+    {&PORT->Group[0], ADC_INPUTCTRL_MUXPOS_PIN17, 0x11},    // PA09
+    {&PORT->Group[0], ADC_INPUTCTRL_MUXPOS_PIN10, 0xA},     // PB02
+    {&PORT->Group[0], ADC_INPUTCTRL_MUXPOS_PIN11, 0xB},     // PB03
 };
 
 /*  In differential mode, we can only pick one positive
@@ -350,6 +353,7 @@ static const adc_channel_t adc_channels[] = {
 #define ADC_0_RES_16BIT                    ADC_CTRLB_RESSEL_16BIT
 
 /* ADC 0 Voltage reference
+ *
  * Note: ADC_0_REF_EXT_B is PA04 on the SAMR21-xpro.
  *       PA04 is also hardwired to the USB EDBG serial.
  *       If you use ADC_0_REF_EXT_B while also using
