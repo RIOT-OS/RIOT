@@ -131,6 +131,14 @@ void at86rf2xx_assert_awake(at86rf2xx_t *dev);
 void at86rf2xx_hardware_reset(at86rf2xx_t *dev);
 
 
+/**
+ * @brief   Set PHY parameters based on channel and page number
+ *
+ * @param[in] dev       device to configure
+ */
+void at86rf2xx_configure_phy(at86rf2xx_t *dev);
+
+
 #ifdef __cplusplus
 }
 #endif

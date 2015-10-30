@@ -47,7 +47,7 @@ static const uint8_t dbm_to_tx_pow_915[] = {0x1d, 0x1c, 0x1b, 0x1a, 0x19, 0x17,
                                             0x04, 0x03, 0x02, 0x01, 0x00, 0x86,
                                             0x40, 0x84, 0x83, 0x82, 0x80, 0xc1,
                                             0xc0};
-int16_t tx_pow_to_dbm_212b(uint8_t channel, uint8_t page, uint8_t reg) {
+static int16_t _tx_pow_to_dbm_212b(uint8_t channel, uint8_t page, uint8_t reg) {
     const uint8_t *dbm_to_tx_pow;
     size_t nelem;
 
@@ -137,42 +137,15 @@ uint8_t at86rf2xx_get_chan(at86rf2xx_t *dev)
 
 void at86rf2xx_set_chan(at86rf2xx_t *dev, uint8_t channel)
 {
-    uint8_t phy_cc_cca;
-    int16_t txpower;
-
     if ((channel < AT86RF2XX_MIN_CHANNEL) ||
         (channel > AT86RF2XX_MAX_CHANNEL) ||
         (dev->chan == channel)) {
         return;
     }
 
-    if ((dev->chan == 0) || (channel == 0)) {
-        /* Moving between European (868 MHz) and North American (915 MHz) bands */
-        uint8_t trx_ctrl2 = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_CTRL_2);
-        if (channel != 0) {
-            /* Set sub mode bit on 915 MHz as recommended by the data sheet */
-            trx_ctrl2 |= AT86RF2XX_TRX_CTRL_2_MASK__SUB_MODE;
-        }
-        else {
-            /* Clear sub mode bit on 868.3 MHz as recommended by the data sheet */
-            trx_ctrl2 &= ~(AT86RF2XX_TRX_CTRL_2_MASK__SUB_MODE);
-        }
-        at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_CTRL_2, trx_ctrl2);
-    }
-
-    /* The TX power register must be updated after changing the channel if
-     * moving between bands. */
-    txpower = at86rf2xx_get_txpower(dev);
-
-    /* Update the channel register */
     dev->chan = channel;
-    phy_cc_cca = at86rf2xx_reg_read(dev, AT86RF2XX_REG__PHY_CC_CCA);
-    phy_cc_cca &= ~(AT86RF2XX_PHY_CC_CCA_MASK__CHANNEL);
-    phy_cc_cca |= (channel & AT86RF2XX_PHY_CC_CCA_MASK__CHANNEL);
-    at86rf2xx_reg_write(dev, AT86RF2XX_REG__PHY_CC_CCA, phy_cc_cca);
 
-    /* Update the TX power register to achieve the same power (in dBm) */
-    at86rf2xx_set_txpower(dev, txpower);
+    at86rf2xx_configure_phy(dev);
 }
 
 uint8_t at86rf2xx_get_page(at86rf2xx_t *dev)
@@ -182,42 +155,12 @@ uint8_t at86rf2xx_get_page(at86rf2xx_t *dev)
 
 void at86rf2xx_set_page(at86rf2xx_t *dev, uint8_t page)
 {
-    uint8_t trx_ctrl2, rf_ctrl0;
-
-    switch (page) {
-        case 0: /* BPSK */
-        case 2: /* O-QPSK */
-            dev->page = page;
-            break;
-        default:
-            return;
+    if ((page != 0) && (page != 2)) {
+        return;
     }
-    trx_ctrl2 = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_CTRL_2);
-    rf_ctrl0 = at86rf2xx_reg_read(dev, AT86RF2XX_REG__RF_CTRL_0);
-    /* Clear previous configuration for PHY mode */
-    trx_ctrl2 &= ~(AT86RF2XX_TRX_CTRL_2_MASK__FREQ_MODE);
-    /* Clear previous configuration for GC_TX_OFFS */
-    rf_ctrl0 &= ~AT86RF2XX_RF_CTRL_0_MASK__GC_TX_OFFS;
+    dev->page = page;
 
-    if (dev->chan != 0) {
-        /* Set sub mode bit on 915 MHz as recommended by the data sheet */
-        trx_ctrl2 |= AT86RF2XX_TRX_CTRL_2_MASK__SUB_MODE;
-    }
-
-    if (dev->page == 0) {
-        /* BPSK coding */
-        /* Data sheet recommends using a +2 dB setting for BPSK */
-        rf_ctrl0 |= AT86RF2XX_RF_CTRL_0_GC_TX_OFFS__2DB;
-    }
-    else if (dev->page == 2) {
-        /* O-QPSK coding */
-        trx_ctrl2 |= AT86RF2XX_TRX_CTRL_2_MASK__BPSK_OQPSK;
-        /* Data sheet recommends using a +1 dB setting for O-QPSK */
-        rf_ctrl0 |= AT86RF2XX_RF_CTRL_0_GC_TX_OFFS__1DB;
-    }
-
-    at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_CTRL_2, trx_ctrl2);
-    at86rf2xx_reg_write(dev, AT86RF2XX_REG__RF_CTRL_0, rf_ctrl0);
+    at86rf2xx_configure_phy(dev);
 }
 
 uint16_t at86rf2xx_get_pan(at86rf2xx_t *dev)
@@ -238,7 +181,7 @@ int16_t at86rf2xx_get_txpower(at86rf2xx_t *dev)
 #ifdef MODULE_AT86RF212B
     uint8_t txpower = at86rf2xx_reg_read(dev, AT86RF2XX_REG__PHY_TX_PWR);
     DEBUG("txpower value: %x\n", txpower);
-    return tx_pow_to_dbm_212b(dev->chan, dev->page, txpower);
+    return _tx_pow_to_dbm_212b(dev->chan, dev->page, txpower);
 #else
     uint8_t txpower = at86rf2xx_reg_read(dev, AT86RF2XX_REG__PHY_TX_PWR)
                 & AT86RF2XX_PHY_TX_PWR_MASK__TX_PWR;
