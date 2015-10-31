@@ -38,11 +38,12 @@ static char ipv6_str[IPV6_ADDR_MAX_STR_LEN];
 
 static void usage(char **argv)
 {
-    printf("%s [<count>] <ipv6 addr> [<payload_len>] [<delay in ms>]\n", argv[0]);
+    printf("%s [<count>] <ipv6 addr> [<payload_len>] [<delay in ms>] [<stats interval>]\n", argv[0]);
     puts("defaults:");
     puts("    count = 3");
     puts("    payload_len = 4");
     puts("    delay = 1000");
+    puts("    stats interval = count");
 }
 
 void _set_payload(icmpv6_echo_t *hdr, size_t payload_len)
@@ -129,9 +130,36 @@ static inline void _a_to_timex(timex_t *delay, const char *a)
     }
 }
 
+static void _print_stats(char *addr_str, int success, int count, timex_t stop,
+                        timex_t sum_rtt, timex_t min_rtt, timex_t max_rtt)
+{
+    printf("--- %s ping statistics ---\n", addr_str);
+
+    if (success > 0) {
+        timex_normalize(&sum_rtt);
+        printf("%d packets transmitted, %d received, %d%% packet loss, time %"
+                PRIu32 ".06%" PRIu32 " s\n", count, success,
+                (100 - ((success * 100) / count)), stop.seconds, stop.microseconds);
+        timex_t avg_rtt = timex_from_uint64(timex_uint64(sum_rtt) / count);  /* get average */
+        printf("rtt min/avg/max = "
+                "%" PRIu32 ".%03" PRIu32 "/"
+                "%" PRIu32 ".%03" PRIu32 "/"
+                "%" PRIu32 ".%03" PRIu32 " ms\n",
+                (min_rtt.seconds * SEC_IN_MS) + (min_rtt.microseconds / MS_IN_USEC),
+                min_rtt.microseconds % MS_IN_USEC,
+                (avg_rtt.seconds * SEC_IN_MS) + (avg_rtt.microseconds / MS_IN_USEC),
+                avg_rtt.microseconds % MS_IN_USEC,
+                (max_rtt.seconds * SEC_IN_MS) + (max_rtt.microseconds / MS_IN_USEC),
+                max_rtt.microseconds % MS_IN_USEC);
+    }
+    else {
+        printf("%d packets transmitted, 0 received, 100%% packet loss\n", count);
+    }
+}
+
 int _icmpv6_ping(int argc, char **argv)
 {
-    int count = 3, success = 0, remaining;
+    int count = 3, success = 0, remaining, stat_interval = 0, stat_counter = 0;
     size_t payload_len = 4;
     timex_t delay = { 1, 0 };
     char *addr_str;
@@ -142,7 +170,7 @@ int _icmpv6_ping(int argc, char **argv)
                                                 };
     timex_t min_rtt = { UINT32_MAX, UINT32_MAX }, max_rtt = { 0, 0 };
     timex_t sum_rtt = { 0, 0 };
-    timex_t start, stop;
+    timex_t ping_start;
     int param_offset = 0;
 
     if (argc < 2) {
@@ -160,6 +188,8 @@ int _icmpv6_ping(int argc, char **argv)
         count = 3;
     }
 
+    stat_interval = count;
+
     addr_str = argv[1 + param_offset];
 
     if (argc > (2 + param_offset)) {
@@ -167,6 +197,9 @@ int _icmpv6_ping(int argc, char **argv)
     }
     if (argc > (3 + param_offset)) {
         _a_to_timex(&delay, argv[3 + param_offset]);
+    }
+    if (argc > (4 + param_offset)) {
+        stat_interval = atoi(argv[4 + param_offset]);
     }
 
     if ((ipv6_addr_from_str(&addr, addr_str) == NULL) || (((int)payload_len) < 0)) {
@@ -188,7 +221,7 @@ int _icmpv6_ping(int argc, char **argv)
 
     remaining = count;
 
-    vtimer_now(&start);
+    vtimer_now(&ping_start);
 
     while ((remaining--) > 0) {
         gnrc_pktsnip_t *pkt;
@@ -262,13 +295,17 @@ int _icmpv6_ping(int argc, char **argv)
         if (remaining > 0) {
             vtimer_sleep(delay);
         }
-    }
+        if ((++stat_counter == stat_interval) || (remaining == 0)) {
+            vtimer_now(&stop);
+            stop = timex_sub(stop, ping_start);
+            _print_stats(addr_str, success, (count - remaining), stop, sum_rtt, min_rtt, max_rtt);
+            stat_counter = 0;
+        }
 
-    vtimer_now(&stop);
+    }
 
     max_seq_expected = 0;
     id++;
-    stop = timex_sub(stop, start);
 
     gnrc_netreg_unregister(GNRC_NETTYPE_ICMPV6, &my_entry);
     while(msg_try_receive(&msg) > 0) {
@@ -279,31 +316,7 @@ int _icmpv6_ping(int argc, char **argv)
         }
     }
 
-    printf("--- %s ping statistics ---\n", addr_str);
-
-    if (success > 0) {
-        timex_normalize(&sum_rtt);
-        printf("%d packets transmitted, %d received, %d%% packet loss, time %"
-               PRIu32 ".06%" PRIu32 " s\n", count, success,
-               (100 - ((success * 100) / count)), stop.seconds, stop.microseconds);
-        timex_t avg_rtt = timex_from_uint64(timex_uint64(sum_rtt) / count);  /* get average */
-        printf("rtt min/avg/max = "
-               "%" PRIu32 ".%03" PRIu32 "/"
-               "%" PRIu32 ".%03" PRIu32 "/"
-               "%" PRIu32 ".%03" PRIu32 " ms\n",
-               (min_rtt.seconds * SEC_IN_MS) + (min_rtt.microseconds / MS_IN_USEC),
-               min_rtt.microseconds % MS_IN_USEC,
-               (avg_rtt.seconds * SEC_IN_MS) + (avg_rtt.microseconds / MS_IN_USEC),
-               avg_rtt.microseconds % MS_IN_USEC,
-               (max_rtt.seconds * SEC_IN_MS) + (max_rtt.microseconds / MS_IN_USEC),
-               max_rtt.microseconds % MS_IN_USEC);
-    }
-    else {
-        printf("%d packets transmitted, 0 received, 100%% packet loss\n", count);
-        return 1;
-    }
-
-    return 0;
+    return success ? 0 : 1;
 }
 
 #endif
