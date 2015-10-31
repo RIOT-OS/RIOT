@@ -644,6 +644,16 @@ static int _set(gnrc_netdev_t *device, netopt_t opt, void *val, size_t len)
             }
             break;
 
+        case NETOPT_PROTO:
+            if (len != sizeof(gnrc_nettype_t)) {
+                res = -EINVAL;
+            }
+            else {
+                dev->proto = (gnrc_nettype_t) val;
+                res = sizeof(gnrc_nettype_t);
+            }
+            break;
+
         case NETOPT_CHANNEL:
             if (len != sizeof(uint16_t)) {
                 res = -EINVAL;
