@@ -33,6 +33,12 @@ brackets):
  * IOTLAB_EXP_ID (taken from first experiment in running state)
  * IOTLAB_EXP_NAME (RIOT_EXP)
  * IOTLAB_PHY_NODES
+ * IOTLAB_EXCLUDE_NODES
+
+### Format of a Resource ID
+Both variables `IOTLAB_PHY_NODES` and `IOTLAB_EXCLUDE_NODES` use the resource id
+string format as specified in the output of `experiment-cli submit --help`.
+An example would be: 1-3+7+10-13
 
 ### Targets
 
@@ -51,8 +57,8 @@ if `IOTLAB_EXP_ID` is not set.
 This schedules a new experiment on the FIT IoT-LAB and waits until it enters
 "Running" state. It will request `IOTLAB_NODES` nodes of type `IOTLAB_TYPE`
 for `IOTLAB_DURATION` minutes at site `IOTLAB_SITE`. With `IOTLAB_PHY_NODES`
-it is possible to choose specific nodes for this experiment by using the resourceid
-string format defined in `experiment-cli submit --help` (example: 1-3+7+10-13).
+it is possible to choose specific nodes for this experiment by using the resource id
+string format as described above.
 Note that the usage of `IOTLAB_PHY_NODES` ignores `IOTLAB_NODES`. It will also flash the
 binary of the current application to all registered nodes. The name of the
 experiment is set to "RIOT_EXP" or "RIOT_EXP_$(IOTLAB_EXP_NAME)"
@@ -62,10 +68,16 @@ if `IOTLAB_EXP_NAME` is defined.
 
 This target updates the application on all registered nodes of the given
 experiment to the current version of the application.
+Certain nodes can be excluded by listing them in the `IOTLAB_EXCLUDE_NODES` variable
+using the resource id string format as described above. If you do not use the default site,
+then you must specify the site with `IOTLAB_SITE`.
 
 #### iotlab-reset
 
 This target resets all registered nodes of the given experiment.
+Certain nodes can be excluded by listing them in the `IOTLAB_EXCLUDE_NODES` variable
+using the resource id string format as described above. If you do not use the default site,
+then you must specify the site with `IOTLAB_SITE`.
 
 #### iotlab-term
 
