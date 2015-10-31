@@ -15,6 +15,14 @@ else
 	BINARY := $(HEXFILE)
 endif
 
+ifdef IOTLAB_PHY_NODES
+    NODES_PARAM := "-l$(IOTLAB_SITE),$(firstword $(subst :, ,$(IOTLAB_TYPE))),$(IOTLAB_PHY_NODES),$(BINARY),$(IOTLAB_PROFILE)"
+endif
+
+ifdef IOTLAB_EXCLUDE_NODES
+    EXCLUDE_PARAM := "-e$(IOTLAB_SITE),$(firstword $(subst :, ,$(IOTLAB_TYPE))),$(IOTLAB_EXCLUDE_NODES)"
+endif
+
 $(IOTLAB_AUTH):
 	auth-cli -u $(IOTLAB_USER)
 
@@ -23,23 +31,21 @@ iotlab-exp: $(IOTLAB_AUTH) all
 	    $(eval IOTLAB_EXP_NAME := RIOT_EXP_$(IOTLAB_EXP_NAME))
     endif
 
-    ifndef IOTLAB_PHY_NODES
-	    $(eval NODES_LIST := "$(IOTLAB_NODES),archi=$(IOTLAB_TYPE)+site=$(IOTLAB_SITE),$(BINARY),$(IOTLAB_PROFILE)")
-    else
-	    $(eval NODES_LIST := "$(IOTLAB_SITE),$(firstword $(subst :, ,$(IOTLAB_TYPE))),$(IOTLAB_PHY_NODES),$(BINARY),$(IOTLAB_PROFILE)")
+    ifndef NODES_PARAM
+	    $(eval NODES_PARAM := "-l$(IOTLAB_NODES),archi=$(IOTLAB_TYPE)+site=$(IOTLAB_SITE),$(BINARY),$(IOTLAB_PROFILE)")
     endif
 
     ifeq (,$(AD))
-	    @echo "experiment-cli submit -d $(IOTLAB_DURATION) -l $(NODES_LIST) -n $(IOTLAB_EXP_NAME)"
+	    @echo "experiment-cli submit -d $(IOTLAB_DURATION) $(NODES_PARAM) -n $(IOTLAB_EXP_NAME)"
     endif
-	$(eval NEW_ID := $(shell experiment-cli submit -d $(IOTLAB_DURATION) -l $(NODES_LIST) -n $(IOTLAB_EXP_NAME) | grep -Eo '[[:digit:]]+'))
+	$(eval NEW_ID := $(shell experiment-cli submit -d $(IOTLAB_DURATION) $(NODES_PARAM) -n $(IOTLAB_EXP_NAME) | grep -Eo '[[:digit:]]+'))
 	$(AD)experiment-cli wait -i $(NEW_ID)
 
 iotlab-flash: $(IOTLAB_AUTH) all
-	$(AD)node-cli --update $(BINARY) -i $(IOTLAB_EXP_ID)
+	$(AD)node-cli --update $(BINARY) -i $(IOTLAB_EXP_ID) $(NODES_PARAM) $(EXCLUDE_PARAM)
 
 iotlab-reset: $(IOTLAB_AUTH)
-	$(AD)node-cli --reset -i $(IOTLAB_EXP_ID)
+	$(AD)node-cli --reset -i $(IOTLAB_EXP_ID) $(NODES_PARAM) $(EXCLUDE_PARAM)
 
 iotlab-term:
 	$(AD)ssh -t $(IOTLAB_USER)@$(IOTLAB_SITE).iot-lab.info "test -f ~/.iotlabrc || auth-cli -u $(IOTLAB_USER)"
