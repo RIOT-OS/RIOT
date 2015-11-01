@@ -820,6 +820,7 @@ EXCLUDE_PATTERNS       = */board/*/tools/* \
                          */cpu/sam3/include/system_sam*.h \
                          */cpu/lpc*/include/core_cm*.h \
                          */cpu/cortexm_common/include/core_cm*.h \
+                         *cpu/atmega_common/include/getopt.h \
                          */cpu/stm32f*/include/stm32f* \
                          */drivers/nrf24l01p/include/nrf24l01p_settings.h \
                          */cpu/nrf51/include/nrf51*.h \
