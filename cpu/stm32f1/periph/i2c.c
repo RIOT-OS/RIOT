@@ -98,6 +98,9 @@ int i2c_init_master(i2c_t dev, i2c_speed_t speed)
             return -1;
     }
 
+    /* disable peripheral */
+    i2c->CR1 &= ~I2C_CR1_PE;
+
     /* configure pins */
     _pin_config(pin_scl, pin_sda);
     /* configure device */
