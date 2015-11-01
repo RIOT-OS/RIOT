@@ -799,6 +799,7 @@ void gnrc_rpl_send_DAO(gnrc_rpl_instance_t *inst, ipv6_addr_t *destination, uint
     if ((tmp = gnrc_icmpv6_build(pkt, ICMPV6_RPL_CTRL, GNRC_RPL_ICMPV6_CODE_DAO,
                                  sizeof(icmpv6_hdr_t))) == NULL) {
         DEBUG("RPL: Send DAO - no space left in packet buffer\n");
+        gnrc_pktbuf_release(pkt);
         return;
     }
     pkt = tmp;
