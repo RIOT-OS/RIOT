@@ -84,6 +84,11 @@ typedef enum {
      * @}
      */
 
+#ifdef MODULE_CCN_LITE
+    GNRC_NETTYPE_CCN,           /**< Protocol is CCN */
+    GNRC_NETTYPE_CCN_CHUNK,     /**< Protocol is CCN, packet contains a content
+                                     chunk */
+#endif
 
     /**
      * @{
