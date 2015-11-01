@@ -52,3 +52,6 @@ endif
 ifneq (,$(filter tcs37727,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/drivers/tcs37727/include
 endif
+ifneq (,$(filter enc28j60,$(USEMODULE)))
+    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/enc28j60/include
+endif
