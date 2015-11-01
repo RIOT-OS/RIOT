@@ -142,7 +142,7 @@ int gpio_init_int(gpio_t pin, gpio_pp_t pullup, gpio_flank_t flank,
     /* save callback */
     gpio_config[exti].cb = cb;
     gpio_config[exti].arg = arg;
-    /* configure ping as input and set MUX to peripheral function A */
+    /* configure pin as input and set MUX to peripheral function A */
     gpio_init(pin, GPIO_DIR_IN, pullup);
     gpio_init_mux(pin, GPIO_MUX_A);
     /* enable clocks for the EIC module */
