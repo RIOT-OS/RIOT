@@ -153,6 +153,11 @@ void auto_init(void)
     auto_init_encx24j600();
 #endif
 
+#ifdef MODULE_ENC28J60
+    extern void auto_init_enc28j60(void);
+    auto_init_enc28j60();
+#endif
+
 #ifdef MODULE_GNRC_SLIP
     extern void auto_init_slip(void);
     auto_init_slip();
