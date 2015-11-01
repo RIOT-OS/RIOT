@@ -89,6 +89,57 @@ void gnrc_rpl_send(gnrc_pktsnip_t *pkt, ipv6_addr_t *src, ipv6_addr_t *dst, ipv6
 
 }
 
+gnrc_pktsnip_t *_dio_dodag_conf_build(gnrc_pktsnip_t *pkt, gnrc_rpl_dodag_t *dodag)
+{
+    gnrc_rpl_opt_dodag_conf_t *dodag_conf;
+    gnrc_pktsnip_t *opt_snip;
+    if ((opt_snip = gnrc_pktbuf_add(pkt, NULL, sizeof(gnrc_rpl_opt_dodag_conf_t),
+                                    GNRC_NETTYPE_UNDEF)) == NULL) {
+        DEBUG("RPL: BUILD DODAG CONF - no space left in packet buffer\n");
+        gnrc_pktbuf_release(pkt);
+        return NULL;
+    }
+    dodag_conf = opt_snip->data;
+    dodag_conf->type = GNRC_RPL_OPT_DODAG_CONF;
+    dodag_conf->length = GNRC_RPL_OPT_DODAG_CONF_LEN;
+    dodag_conf->flags_a_pcs = 0;
+    dodag_conf->dio_int_doubl = dodag->dio_interval_doubl;
+    dodag_conf->dio_int_min = dodag->dio_min;
+    dodag_conf->dio_redun = dodag->dio_redun;
+    dodag_conf->max_rank_inc = byteorder_htons(dodag->instance->max_rank_inc);
+    dodag_conf->min_hop_rank_inc = byteorder_htons(dodag->instance->min_hop_rank_inc);
+    dodag_conf->ocp = byteorder_htons(dodag->instance->of->ocp);
+    dodag_conf->reserved = 0;
+    dodag_conf->default_lifetime = dodag->default_lifetime;
+    dodag_conf->lifetime_unit = byteorder_htons(dodag->lifetime_unit);
+    return opt_snip;
+}
+
+gnrc_pktsnip_t *_dio_prefix_info_build(gnrc_pktsnip_t *pkt, gnrc_rpl_dodag_t *dodag)
+{
+    gnrc_rpl_opt_prefix_info_t *prefix_info;
+    gnrc_pktsnip_t *opt_snip;
+    if ((opt_snip = gnrc_pktbuf_add(pkt, NULL, sizeof(gnrc_rpl_opt_prefix_info_t),
+                                    GNRC_NETTYPE_UNDEF)) == NULL) {
+        DEBUG("RPL: BUILD PREFIX INFO - no space left in packet buffer\n");
+        gnrc_pktbuf_release(pkt);
+        return NULL;
+    }
+    prefix_info = opt_snip->data;
+    prefix_info->type = GNRC_RPL_OPT_PREFIX_INFO;
+    prefix_info->length = GNRC_RPL_OPT_PREFIX_INFO_LEN;
+    /* auto-address configuration */
+    prefix_info->LAR_flags = GNRC_RPL_PREFIX_AUTO_ADDRESS_BIT;
+    prefix_info->valid_lifetime = dodag->addr_valid;
+    prefix_info->pref_lifetime = dodag->addr_preferred;
+    prefix_info->prefix_len = dodag->prefix_len;
+    prefix_info->reserved = 0;
+
+    memset(&prefix_info->prefix, 0, sizeof(prefix_info->prefix));
+    ipv6_addr_init_prefix(&prefix_info->prefix, &dodag->dodag_id, dodag->prefix_len);
+    return opt_snip;
+}
+
 void gnrc_rpl_send_DIO(gnrc_rpl_instance_t *inst, ipv6_addr_t *destination)
 {
     if (inst == NULL) {
@@ -97,28 +148,30 @@ void gnrc_rpl_send_DIO(gnrc_rpl_instance_t *inst, ipv6_addr_t *destination)
     }
 
     gnrc_rpl_dodag_t *dodag = &inst->dodag;
-    gnrc_pktsnip_t *pkt;
-    icmpv6_hdr_t *icmp;
+    gnrc_pktsnip_t *pkt = NULL, *tmp = NULL;
     gnrc_rpl_dio_t *dio;
-    uint8_t *pos;
-    int size = sizeof(icmpv6_hdr_t) + sizeof(gnrc_rpl_dio_t);
-
-    if (dodag->dodag_conf_requested) {
-        size += sizeof(gnrc_rpl_opt_dodag_conf_t);
-    }
 
     if (dodag->prefix_info_requested) {
-        size += sizeof(gnrc_rpl_opt_prefix_info_t);
+        if ((pkt = _dio_prefix_info_build(pkt, dodag)) == NULL) {
+            return;
+        }
+        dodag->prefix_info_requested = false;
     }
 
-    if ((pkt = gnrc_icmpv6_build(NULL, ICMPV6_RPL_CTRL, GNRC_RPL_ICMPV6_CODE_DIO, size)) == NULL) {
+    if (dodag->dodag_conf_requested) {
+        if ((pkt = _dio_dodag_conf_build(pkt, dodag)) == NULL) {
+            return;
+        }
+        dodag->dodag_conf_requested = false;
+    }
+
+    if ((tmp = gnrc_pktbuf_add(pkt, NULL, sizeof(gnrc_rpl_dio_t), GNRC_NETTYPE_UNDEF)) == NULL) {
         DEBUG("RPL: Send DIO - no space left in packet buffer\n");
+        gnrc_pktbuf_release(pkt);
         return;
     }
-
-    icmp = (icmpv6_hdr_t *)pkt->data;
-    dio = (gnrc_rpl_dio_t *)(icmp + 1);
-    pos = (uint8_t *) dio;
+    pkt = tmp;
+    dio = pkt->data;
     dio->instance_id = inst->id;
     dio->version_number = dodag->version;
     /* a leaf node announces an INFINITE_RANK */
@@ -131,43 +184,13 @@ void gnrc_rpl_send_DIO(gnrc_rpl_instance_t *inst, ipv6_addr_t *destination)
     dio->reserved = 0;
     dio->dodag_id = dodag->dodag_id;
 
-    pos += sizeof(*dio);
-
-    if (dodag->dodag_conf_requested) {
-        gnrc_rpl_opt_dodag_conf_t *dodag_conf;
-        dodag_conf = (gnrc_rpl_opt_dodag_conf_t *) pos;
-        dodag_conf->type = GNRC_RPL_OPT_DODAG_CONF;
-        dodag_conf->length = GNRC_RPL_OPT_DODAG_CONF_LEN;
-        dodag_conf->flags_a_pcs = 0;
-        dodag_conf->dio_int_doubl = dodag->dio_interval_doubl;
-        dodag_conf->dio_int_min = dodag->dio_min;
-        dodag_conf->dio_redun = dodag->dio_redun;
-        dodag_conf->max_rank_inc = byteorder_htons(inst->max_rank_inc);
-        dodag_conf->min_hop_rank_inc = byteorder_htons(inst->min_hop_rank_inc);
-        dodag_conf->ocp = byteorder_htons(inst->of->ocp);
-        dodag_conf->reserved = 0;
-        dodag_conf->default_lifetime = dodag->default_lifetime;
-        dodag_conf->lifetime_unit = byteorder_htons(dodag->lifetime_unit);
-        pos += sizeof(*dodag_conf);
-        dodag->dodag_conf_requested = false;
+    if ((tmp = gnrc_icmpv6_build(pkt, ICMPV6_RPL_CTRL, GNRC_RPL_ICMPV6_CODE_DIO,
+                                 sizeof(icmpv6_hdr_t))) == NULL) {
+        DEBUG("RPL: Send DIO - no space left in packet buffer\n");
+        gnrc_pktbuf_release(pkt);
+        return;
     }
-
-    if (dodag->prefix_info_requested) {
-        gnrc_rpl_opt_prefix_info_t *prefix_info;
-        prefix_info = (gnrc_rpl_opt_prefix_info_t *) pos;
-        prefix_info->type = GNRC_RPL_OPT_PREFIX_INFO;
-        prefix_info->length = GNRC_RPL_OPT_PREFIX_INFO_LEN;
-        /* auto-address configuration */
-        prefix_info->LAR_flags = GNRC_RPL_PREFIX_AUTO_ADDRESS_BIT;
-        prefix_info->valid_lifetime = dodag->addr_valid;
-        prefix_info->pref_lifetime = dodag->addr_preferred;
-        prefix_info->prefix_len = dodag->prefix_len;
-        prefix_info->reserved = 0;
-
-        memset(&prefix_info->prefix, 0, sizeof(prefix_info->prefix));
-        ipv6_addr_init_prefix(&prefix_info->prefix, &dodag->dodag_id, dodag->prefix_len);
-        dodag->prefix_info_requested = false;
-    }
+    pkt = tmp;
 
     gnrc_rpl_send(pkt, NULL, destination, &dodag->dodag_id);
 }
