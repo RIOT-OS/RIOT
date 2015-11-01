@@ -138,6 +138,20 @@ void at86rf2xx_hardware_reset(at86rf2xx_t *dev)
 
 void at86rf2xx_configure_phy(at86rf2xx_t *dev)
 {
+    /* make sure device is not sleeping */
+    at86rf2xx_assert_awake(dev);
+
+    uint8_t state;
+
+    /* make sure ongoing transmissions are finished */
+    do {
+        state = at86rf2xx_get_status(dev);
+    }
+    while ((state == AT86RF2XX_STATE_BUSY_TX_ARET) || (state == AT86RF2XX_STATE_BUSY_RX_AACK));
+
+    /* we must be in TRX_OFF before changing the PHY configuration */
+    at86rf2xx_force_trx_off(dev);
+
     uint8_t phy_cc_cca = at86rf2xx_reg_read(dev, AT86RF2XX_REG__PHY_CC_CCA);
 
 #ifdef MODULE_AT86RF212B
@@ -184,6 +198,9 @@ void at86rf2xx_configure_phy(at86rf2xx_t *dev)
     /* Update the TX power register to achieve the same power (in dBm) */
     at86rf2xx_set_txpower(dev, txpower);
 #endif
+
+    /* Return to the state we had before reconfiguring */
+    at86rf2xx_set_state(dev, state);
 }
 
 void at86rf2xx_force_trx_off(const at86rf2xx_t *dev)
