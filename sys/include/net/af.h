@@ -31,6 +31,8 @@ enum {
 #define AF_UNSPEC   AF_UNSPEC   /**< unspecified address family (as macro) */
     AF_UNIX,                    /**< local to host (pipes, portals) address family. */
 #define AF_UNIX     AF_UNIX     /**< unspecified address family (as macro) */
+    AF_PACKET,                  /**< packet family */
+#define AF_PACKET   AF_PACKET   /**< packet family (as macro) */
     AF_INET,                    /**< internetwork address family: UDP, TCP, etc. */
 #define AF_INET     AF_INET     /**< internetwork address family: UDP, TCP, etc. (as macro) */
     AF_INET6,                   /**< internetwork address family with IPv6: UDP, TCP, etc. */
