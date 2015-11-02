@@ -103,19 +103,36 @@ typedef struct fib_sr_meta_t {
 #define FIB_TABLE_TYPE_SR (FIB_TABLE_TYPE_SH + 1)
 
 /**
- * @brief Meta information about the FIB table
- */
+* @brief Meta information of a FIB table
+*/
 typedef struct {
+    /** A single hop OR source route data array */
     union{
-        fib_entry_t *entries;    /**< array holding the FIB entries */
-        fib_sr_meta_t *source_routes; /**< array holding the FIB source routes */
+        /** array holding the FIB entries for single hops */
+        fib_entry_t *entries;
+        /** array holding the FIB entries for source routes */
+        fib_sr_meta_t *source_routes;
     }data;
-    uint8_t table_type;     /**< the table kind SR or single hop */
-    size_t size;            /**< number of entries in this table */
-    mutex_t mtx_access;     /** access mutex to control exclusive operations on calls */
-    size_t notify_rp_pos;   /** registered RPs for notifications about unreachable destinations */
-    kernel_pid_t notify_rp[FIB_MAX_REGISTERED_RP]; /** the kernel_pid_t for notifying the RPs */
-    universal_address_container_t* prefix_rp[FIB_MAX_REGISTERED_RP]; /** prefix handled by the RP */
+    /** the kind of this FIB table, single hop or source route.
+    *   This value indicates what is stored in `data` of this table
+    */
+    uint8_t table_type;
+    /** the maximim number of entries in this FIB table */
+    size_t size;
+    /** table access mutex to grant exclusive operations on calls */
+    mutex_t mtx_access;
+    /** current number of registered RPs. */
+    size_t notify_rp_pos;
+    /** the kernel_pid_t of the registered RPs.
+    *   Used to notify the RPs by the FIB on certain conditions,
+    *   e.g. when a destination is unreachable
+    */
+    kernel_pid_t notify_rp[FIB_MAX_REGISTERED_RP];
+    /** the prefix handled by each registered RP.
+    *   Used to dispatch if the RP is responsible for the condition,
+    *   e.g. when the unreachable destination is covered by the prefix
+    */
+    universal_address_container_t* prefix_rp[FIB_MAX_REGISTERED_RP];
 } fib_table_t;
 
 #ifdef __cplusplus
