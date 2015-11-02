@@ -179,7 +179,12 @@ static int ksz8851snl_get(netdev2_t *dev, netopt_t opt, void *value, size_t max_
 		case NETOPT_IPV6_IID: //7
 			return ksz8851snl_get_iid(dev, value, max_len);
 		case NETOPT_TX_POWER: //8
+            res = -EINVAL;
+            break;
 		case NETOPT_MAX_PACKET_SIZE: //9
+            *tgt = 1500;
+            res=sizeof(uint16_t);
+            break;
 		case NETOPT_PRELOADING: //10
 		case NETOPT_PROMISCUOUSMODE:  //11
 		case NETOPT_AUTOACK: //12
@@ -409,7 +414,7 @@ static void ksz8851snl_pIsr(void *netdev)
 
 	/* disable interrupt line TODO: Check if I need both or either the MCU or KSZ will do */
 	gpio_irq_disable(dev->int_pin);
-	reg_set(dev, KSZ8851_IER_REG, 0x0000);
+//	reg_set(dev, KSZ8851_IER_REG, 0x0000);
 
 	/* call netdev2 even to init frame receive process */
 	dev->netdev.event_callback((netdev2_t*)dev, NETDEV2_EVENT_ISR, NULL);
@@ -471,7 +476,7 @@ static void ksz8851snl_isr(netdev2_t *netdev)
 	/* Restore IRQs and Release Mutex */
 	gpio_irq_enable(dev->int_pin);
 	reg_set(dev, KSZ8851_IER_REG, IER_DEFAULT_CONFIG);
-	unlock(dev);
+    unlock(dev);
 }
 
 static int ksz8851snl_reset(ksz8851snl_t *dev)
