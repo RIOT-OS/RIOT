@@ -25,7 +25,7 @@ cachegrind.out*
 # Codelite (among others) project files
 *.project
 # ctags index files
-tags
+*tag*
 # GDB initialization scripts
 .gdbinit
 

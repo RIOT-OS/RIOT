@@ -152,6 +152,11 @@ void auto_init(void)
     extern void auto_init_encx24j600(void);
     auto_init_encx24j600();
 #endif
+	
+#ifdef  MODULE_KSZ8851SNL
+	extern void auto_init_ksz8851snl(void);
+	auto_init_ksz8851snl();
+#endif
 
 #ifdef MODULE_GNRC_SLIP
     extern void auto_init_slip(void);
