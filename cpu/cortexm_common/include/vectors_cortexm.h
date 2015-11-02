@@ -62,7 +62,7 @@ void nmi_default(void);
  * causes of hard faults are access to un-aligned pointers on Cortex-M0 CPUs
  * and calls of function pointers that are set to NULL.
  */
-void hard_fault_default(void) __attribute__((naked));
+void hard_fault_default(void);
 
 /* The following four exceptions are only present for Cortex-M3 and -M4 CPUs */
 #if defined(CPU_ARCH_CORTEX_M3) || defined(CPU_ARCH_CORTEX_M4) || \
