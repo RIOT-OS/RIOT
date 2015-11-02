@@ -59,16 +59,10 @@ typedef struct rp_address_msg_t {
 #define FIB_MSG_RP_SIGNAL_SOURCE_ROUTE_CREATED (0x97)
 
 /**
- * @brief the size in bytes of a full address
- * @todo replace with UNIVERSAL_ADDRESS_SIZE (#3022)
-*/
-#define FIB_DESTINATION_SIZE_SUBSTITUTE (16)
-
-/**
  * @brief entry used to collect available destinations
  */
 typedef struct fib_destination_set_entry_t {
-    uint8_t dest[FIB_DESTINATION_SIZE_SUBSTITUTE]; /**< The destination address */
+    uint8_t dest[UNIVERSAL_ADDRESS_SIZE]; /**< The destination address */
     size_t dest_size;    /**< The destination address size */
 } fib_destination_set_entry_t;
 
