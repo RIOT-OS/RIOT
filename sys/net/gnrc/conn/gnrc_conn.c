@@ -56,6 +56,7 @@ int gnrc_conn_recvfrom(conn_t *conn, void *data, size_t max_len, void *addr, siz
     int timeout = 3;
     while ((timeout--) > 0) {
         gnrc_pktsnip_t *pkt, *l3hdr;
+        size_t size = 0;
         msg_receive(&msg);
         switch (msg.type) {
             case GNRC_NETAPI_MSG_TYPE_RCV:
@@ -83,7 +84,9 @@ int gnrc_conn_recvfrom(conn_t *conn, void *data, size_t max_len, void *addr, siz
                     *addr_len = _srcaddr(addr, l3hdr);
                 }
                 memcpy(data, pkt->data, pkt->size);
-                return pkt->size;
+                size = pkt->size;
+                gnrc_pktbuf_release(pkt);
+                return (int)size;
             default:
                 (void)port;
                 msg_send_to_self(&msg); /* requeue invalid messages */
