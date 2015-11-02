@@ -209,6 +209,9 @@ static int ksz8851snl_get(netdev2_t *dev, netopt_t opt, void *value, size_t max_
 			*tgt = NETDEV2_TYPE_ETHERNET;
 			res = 2;
 		 	break;
+        case NETOPT_CHANNEL_PAGE: //26
+            res = -EINVAL;
+            break;
 		default:
 			DEBUG(SECT_NAME"Device Get Opt Called and not handled: %d\n", opt);
 			res = -ENOTSUP;
