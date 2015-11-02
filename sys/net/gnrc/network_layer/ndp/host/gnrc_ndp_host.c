@@ -17,7 +17,7 @@
 #include "net/gnrc/ipv6.h"
 #include "net/gnrc/ndp.h"
 #include "net/gnrc/ndp/internal.h"
-#include "vtimer.h"
+#include "xtimer.h"
 
 #include "net/gnrc/ndp/host.h"
 

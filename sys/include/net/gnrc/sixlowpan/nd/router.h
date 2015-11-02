@@ -70,7 +70,8 @@ typedef struct {
     uint16_t ltime;                         /**< the time in minutes until deletion */
     BITFIELD(ctxs, GNRC_SIXLOWPAN_CTX_SIZE);/**< contexts associated with BR */
     gnrc_sixlowpan_nd_router_prf_t *prfs;   /**< prefixes associated with BR */
-    vtimer_t ltimer;                        /**< timer for deletion */
+    xtimer_t ltimer;                        /**< timer for deletion */
+    msg_t ltimer_msg;                       /**< msg_t for gnrc_sixlowpan_nd_router_abr_t::ltimer */
 } gnrc_sixlowpan_nd_router_abr_t;
 
 /**

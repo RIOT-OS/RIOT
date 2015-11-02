@@ -30,7 +30,7 @@
 #include "random.h"
 #include "utlist.h"
 #include "thread.h"
-#include "vtimer.h"
+#include "xtimer.h"
 
 #include "net/gnrc/ndp/internal.h"
 
