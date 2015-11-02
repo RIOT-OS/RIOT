@@ -90,7 +90,7 @@ extern int _read_bytes(int argc, char **argv);
 #endif
 
 #ifdef MODULE_GNRC_ICMPV6_ECHO
-#ifdef MODULE_VTIMER
+#ifdef MODULE_XTIMER
 extern int _icmpv6_ping(int argc, char **argv);
 #endif
 #endif
@@ -182,7 +182,7 @@ const shell_command_t _shell_command_list[] = {
     {DISK_GET_BLOCK_SIZE, "Get the block size of inserted memory card", _get_blocksize},
 #endif
 #ifdef MODULE_GNRC_ICMPV6_ECHO
-#ifdef MODULE_VTIMER
+#ifdef MODULE_XTIMER
     { "ping6", "Ping via ICMPv6", _icmpv6_ping },
 #endif
 #endif
