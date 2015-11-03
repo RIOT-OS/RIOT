@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2015 Ell-i open source co-operative
- *                    Kaspar Schleiser <kaspar@schleiser.de>
+ * Copyright (C) 2015 Matt Poppe <matt@poppe.me>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,7 +13,7 @@
  * @file
  * @brief       Internal functions for the ksz8851snl driver
  *
- * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @author       Matt Poppe <matt@poppe.me>
  *
  * @}
  */
@@ -37,15 +36,18 @@
 
 #define SECT_NAME "[KSZ8851 Driver]:"
 
-static void lock(ksz8851snl_t *dev) {
+static void lock(ksz8851snl_t *dev)
+{
 	mutex_lock(&dev->mutex);
 }
 
-static void unlock(ksz8851snl_t *dev) {
+static void unlock(ksz8851snl_t *dev)
+{
 	mutex_unlock(&dev->mutex);
 }
 
-static void ksz_spi_transfer(ksz8851snl_t *dev, char *out, char *in, int len) {
+static void ksz_spi_transfer(ksz8851snl_t *dev, char *out, char *in, int len)
+{
 	spi_acquire(dev->spi);
 	gpio_clear(dev->cs);
 	spi_transfer_bytes(dev->spi, out, in, len);
@@ -53,8 +55,10 @@ static void ksz_spi_transfer(ksz8851snl_t *dev, char *out, char *in, int len) {
 	spi_release(dev->spi);
 }
 
-static void reg_set(ksz8851snl_t *dev, uint16_t reg, uint16_t value) {
-	uint16_t cmd = (reg << 2) & 0x3F0;//might add addr mask
+static void reg_set(ksz8851snl_t *dev, uint16_t reg, uint16_t value)
+{
+    /* TODO: Make any changes that could be needed from Byte Order */
+	uint16_t cmd = (reg << 2) & 0x3F0;
 
 	if (reg & 0x02)
 		cmd |= IO_REG_WRITE | KSZ8851_CMD_B3 | KSZ8851_CMD_B2;
@@ -66,7 +70,8 @@ static void reg_set(ksz8851snl_t *dev, uint16_t reg, uint16_t value) {
 	ksz_spi_transfer(dev, cmdChain, NULL, 4);
 }
 
-static uint16_t reg_get(ksz8851snl_t *dev, uint16_t reg) {
+static uint16_t reg_get(ksz8851snl_t *dev, uint16_t reg)
+{
 	uint16_t cmd = (reg << 2) & 0x3F0;
 
 	if (reg & 0x2)
@@ -83,14 +88,16 @@ static uint16_t reg_get(ksz8851snl_t *dev, uint16_t reg) {
 	return result[2] | (result[3] << 8);
 }
 
-static void reg_bits_set(ksz8851snl_t *dev, uint16_t reg, uint16_t bit_mask) {
+static void reg_bits_set(ksz8851snl_t *dev, uint16_t reg, uint16_t bit_mask)
+{
 	uint16_t reg_preValue = reg_get(dev, reg);
 	uint16_t reg_value = reg_preValue | bit_mask;
 
 	reg_set(dev, reg, reg_value);
 }
 
-static void reg_bits_clear(ksz8851snl_t *dev, uint16_t reg, uint16_t bit_mask) {
+static void reg_bits_clear(ksz8851snl_t *dev, uint16_t reg, uint16_t bit_mask)
+{
 	uint16_t reg_value;
 
 	reg_value = reg_get(dev, reg);
@@ -98,8 +105,8 @@ static void reg_bits_clear(ksz8851snl_t *dev, uint16_t reg, uint16_t bit_mask) {
 	reg_set(dev, reg, reg_value);
 }
 
-static uint8_t reg_get8(ksz8851snl_t *dev, uint16_t reg) {
-
+static uint8_t reg_get8(ksz8851snl_t *dev, uint16_t reg)
+{
 	uint16_t cmd = (reg << 2) & 0x3F0;
 
 	if (reg & 0x2)
@@ -129,15 +136,19 @@ static void ksz8851snl_get_mac_addr(netdev2_t *encdev, uint8_t* buf)
 	ksz8851snl_t * dev = (ksz8851snl_t*)encdev;
 
 	lock(dev);
-	for (uint8_t x = 0; x < 6; x++)
-		*buf++ = reg_get8(dev, 0x15 - x);
-	unlock(dev);
+	for (uint8_t s = 0; s < ETHERNET_ADDR_LEN; s++)
+    {
+		*buf++ = reg_get8(dev, 0x15 - s);
+    }
+    unlock(dev);
 }
 
 static int ksz8851snl_get_iid(netdev2_t *netdev, eui64_t *value, size_t max_len)
 {
 	if (max_len < sizeof(eui64_t))
+    {
 		return -EOVERFLOW;
+    }
 
 	uint8_t addr[ETHERNET_ADDR_LEN];
 	ksz8851snl_get_mac_addr(netdev, addr);
@@ -152,10 +163,6 @@ static int ksz8851snl_get(netdev2_t *dev, netopt_t opt, void *value, size_t max_
 	uint16_t *tgt = (uint16_t *)value;
 
 	switch (opt) {
-		case NETOPT_CHANNEL: //0
-		case NETOPT_IS_CHANNEL_CLR: //1
-			res = -EINVAL;
-			break;
 		case NETOPT_ADDRESS: //2
 			if (max_len < ETHERNET_ADDR_LEN)
 				res = -EINVAL;
@@ -164,48 +171,21 @@ static int ksz8851snl_get(netdev2_t *dev, netopt_t opt, void *value, size_t max_
 				res = ETHERNET_ADDR_LEN;
 			}
 			break;
-		case NETOPT_ADDRESS_LONG: //3
-			res = -EINVAL;
-			break;
 		case NETOPT_ADDR_LEN: //4
 		case NETOPT_SRC_LEN: //5
 			assert(max_len == 2);
 			*tgt = 6;
 			res = sizeof(uint16_t);
 			break;
-		case NETOPT_NID: //6
-			res = -EINVAL;
-			break;
 		case NETOPT_IPV6_IID: //7
 			return ksz8851snl_get_iid(dev, value, max_len);
-		case NETOPT_TX_POWER: //8
-            res = -EINVAL;
-            break;
 		case NETOPT_MAX_PACKET_SIZE: //9
             *tgt = 1500;
             res=sizeof(uint16_t);
             break;
-		case NETOPT_PRELOADING: //10
-		case NETOPT_PROMISCUOUSMODE:  //11
-		case NETOPT_AUTOACK: //12
-		case NETOPT_RETRANS: //13
-			break;
-		case NETOPT_PROTO:  //14
-			res = -EINVAL;
-			break;
 		case NETOPT_STATE: //15
 			res = 0;
 			*tgt = NETOPT_STATE_IDLE;
-			break;
-		case NETOPT_RAWMODE:  //16
-		case NETOPT_RX_START_IRQ:  //17
-		case NETOPT_RX_END_IRQ:  //18
-		case NETOPT_TX_START_IRQ:  //19
-		case NETOPT_TX_END_IRQ:  //20
-		case NETOPT_AUTOCCA:  //21
-		case NETOPT_CSMA:  //22
-		case NETOPT_CSMA_RETRIES: //23
-			res = -EINVAL;
 			break;
 		case NETOPT_IS_WIRED: //24
 			res = 1;
@@ -214,15 +194,11 @@ static int ksz8851snl_get(netdev2_t *dev, netopt_t opt, void *value, size_t max_
 			*tgt = NETDEV2_TYPE_ETHERNET;
 			res = 2;
 		 	break;
-        case NETOPT_CHANNEL_PAGE: //26
-            res = -EINVAL;
-            break;
 		default:
 			DEBUG(SECT_NAME"Device Get Opt Called and not handled: %d\n", opt);
 			res = -ENOTSUP;
 			break;
 	}
-
 	return res;
 }
 
@@ -262,6 +238,7 @@ static int ksz8851snl_send(netdev2_t *netdev, const struct iovec *vector, int co
 
 	/* Lock the device and clear IRQ */
 	lock(dev);
+    /* TODO: Decide if it is better to clear IRQ Enable on interface or disable IRQ Pin */
 	reg_set(dev, KSZ8851_IER_REG, 0x0000);
 
 	/* Get total len of frame */
@@ -269,11 +246,10 @@ static int ksz8851snl_send(netdev2_t *netdev, const struct iovec *vector, int co
 		frame_len += vector[i].iov_len;
 	}
 
-	len_avail = reg_get(dev, KSZ8851_TXMIR_REG);
-
 	/* Check if there is available room addition 8 bytes is needed for KSZ header */
- 	if (len_avail >= frame_len + 8) {
-
+	len_avail = reg_get(dev, KSZ8851_TXMIR_REG);
+ 	if (len_avail >= frame_len + 8)
+    {
  		char tx[2];
  		/* Write fifo command */
 		tx[0] = 0xc0;
@@ -306,12 +282,11 @@ static int ksz8851snl_send(netdev2_t *netdev, const struct iovec *vector, int co
 		gpio_set(dev->cs);
 		spi_release(dev->spi);
 
-	} else {
-
+	} else
+    {
 		DEBUG(SECT_NAME"Tx buffer to small to handle request\n");
-
-		/* TODO: Setup an IRQ or loop for when there is room */
 	}
+
 	/* Disable queue write access and enable Tx of Queue */
     reg_bits_clear(dev, KSZ8851_RXQCR_REG, RXQCR_QUEUE_ACCESS_EN);
 	reg_bits_set(dev, KSZ8851_TXQCR_REG, TXQCR_TX_CMD);
@@ -407,14 +382,13 @@ static int ksz8851snl_recv(netdev2_t *netdev, char* buf, int len)
 	return frame_size;
 }
 
-/* This is IRQ Handler for KSZ8851SNL privileged IRQ keep short */
+/* This is IRQ Handler for KSZ8851SNL: privileged IRQ keep short */
 static void ksz8851snl_pIsr(void *netdev)
 {
 	ksz8851snl_t *dev = (ksz8851snl_t*)netdev;
 
-	/* disable interrupt line TODO: Check if I need both or either the MCU or KSZ will do */
+	/* disable interrupt line */
 	gpio_irq_disable(dev->int_pin);
-//	reg_set(dev, KSZ8851_IER_REG, 0x0000);
 
 	/* call netdev2 even to init frame receive process */
 	dev->netdev.event_callback((netdev2_t*)dev, NETDEV2_EVENT_ISR, NULL);
@@ -430,9 +404,8 @@ static void ksz8851snl_isr(netdev2_t *netdev)
 	/* Read interrupt status register */
 	isr_mask = reg_get(dev, KSZ8851_ISR_REG);//TODO: DO I need to do this before I reset the isr
 
-	/* Interrupt Handlers */
-
-	/*  IRQ */
+	/** Interrupt Handlers **/
+	/*  IRQ Linkup Detect IRQ */
 	if (isr_mask & ISR_LDIS) {
 		uint16_t temp_irq = reg_get(dev, KSZ8851_PMECR_REG);
 		temp_irq |= (1 << 3);
@@ -445,27 +418,27 @@ static void ksz8851snl_isr(netdev2_t *netdev)
 		/* Check and report what the current status of the link */
 		uint16_t link = reg_get(dev, KSZ8851_P1SR_REG);
 
+        /* TODO Send link is up after grnc_netdev2 supports the call
 		netdev2_event_t event = (link & P1SR_LINK_GOOD) ?
 					NETDEV2_EVENT_LINK_UP :
 					NETDEV2_EVENT_LINK_DOWN;
+        dev->netdev.event_callback(netdev, event, NULL);
+        */
 		if (link & P1SR_LINK_GOOD)
 			DEBUG(SECT_NAME "Link Status is Up\n");
 		else
 			DEBUG(SECT_NAME "Link Status is Down\n");
 
-		reg_set(dev, KSZ8851_ISR_REG, ISR_LCIS);           //TODO I need to look into unlocking here
-		dev->netdev.event_callback(netdev, event, NULL);        //could be wrong first variable
+		reg_set(dev, KSZ8851_ISR_REG, ISR_LCIS);
+
 	}
-	/* Packet Transmited IRQ */
-	if (isr_mask & ISR_TXIS) { /* TODO: Get rid of the Tx Irq */
-		reg_set(dev, KSZ8851_ISR_REG, ISR_TXIS);
-	}
+
 	/* Packet Received IRQ */
 	if (isr_mask & ISR_RXIS) {
 		/* Reset the IRQ Flag */
 		reg_set(dev, KSZ8851_ISR_REG, ISR_RXIS);
-		uint16_t frames_avail = (reg_get(dev, KSZ8851_RXFCTR_REG) >> 8);
 
+		uint16_t frames_avail = (reg_get(dev, KSZ8851_RXFCTR_REG) >> 8);
 		while (frames_avail) {
 			unlock(dev);
 			netdev->event_callback(netdev, NETDEV2_EVENT_RX_COMPLETE, NULL);
@@ -474,9 +447,9 @@ static void ksz8851snl_isr(netdev2_t *netdev)
 		}
 	}
 	/* Restore IRQs and Release Mutex */
-	gpio_irq_enable(dev->int_pin);
-	reg_set(dev, KSZ8851_IER_REG, IER_DEFAULT_CONFIG);
     unlock(dev);
+	gpio_irq_enable(dev->int_pin);
+
 }
 
 static int ksz8851snl_reset(ksz8851snl_t *dev)
@@ -540,7 +513,7 @@ static int ksz8851snl_init(netdev2_t *encdev)
 	/* Set Power Mode */
 	reg_set(dev, KSZ8851_PMECR_REG, PMECR_NORMAL);
 
-	/* Prototype Mac Address is 00:04:25:19:1A:3E */
+	/* Setup MAC from config file TODO: Create a better way to setup MAC*/
 	reg_set(dev, KSZ8851_MARL_REG, KSZ8851_MAC_LOW);
 	reg_set(dev, KSZ8851_MARM_REG, KSZ8851_MAC_MID);
 	reg_set(dev, KSZ8851_MARH_REG, KSZ8851_MAC_HIGH);
@@ -599,8 +572,8 @@ static int ksz8851snl_init(netdev2_t *encdev)
 
 	DEBUG(SECT_NAME "initialization complete.\n");
 
-	gpio_irq_enable(dev->int_pin);
 	unlock(dev);
+	gpio_irq_enable(dev->int_pin);
 
 	return 0;
 }
@@ -615,12 +588,12 @@ const static netdev2_driver_t netdev2_driver_ksz8851snl = {
 };
 
 void ksz8851snl_setup(ksz8851snl_t *dev, spi_t spi, gpio_t cs, gpio_t int_pin,
-		      gpio_t rst)
+		      gpio_t rst_pin)
 {
 	dev->netdev.driver = &netdev2_driver_ksz8851snl;
 	dev->spi = spi;
 	dev->cs = cs;
-	dev->rst = rst;
+	dev->rst = rst_pin;
 	dev->int_pin = int_pin;
 
 	mutex_init(&dev->mutex);

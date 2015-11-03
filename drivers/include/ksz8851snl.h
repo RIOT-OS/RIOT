@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Kaspar Schleiser <kaspar@schleiser.de>
+ * Copyright (C) 2015 Matt Poppe <matt@poppe.me>
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -39,11 +39,11 @@ extern "C" {
  */
 typedef struct {
     netdev2_t netdev;       /**< extended netdev2 structure */
-    spi_t spi;              /**< SPI device the enc is connected to*/
+    spi_t spi;              /**< SPI interface*/
     gpio_t cs;              /**< SPI chip select pin */
-    gpio_t rst;             /**< Reset Ethernet chip pin */
-    gpio_t int_pin;         /**< SPI interrupt pin */
-    mutex_t mutex;          /**< mutex used to lock device access */
+    gpio_t rst;             /**< Reset KSZ chip pin */
+    gpio_t int_pin;         /**< KSZ interrupt pin */
+    mutex_t mutex;          /**< KSZ mutex */
 } ksz8851snl_t;
 
 /**
@@ -56,9 +56,11 @@ typedef struct {
  * @param[in]   spi     SPI device the device is connected to
  * @param[in]   cs_pin  SPI chip select pin used to select the device
  * @param[in]   int_pin pin the device will trigger an interrupt on
+ * @param[in]   rst_pin pin used to reset the device.  Pin low to reset.
  */
+ 
  void ksz8851snl_setup(ksz8851snl_t *dev, spi_t spi, gpio_t cs, gpio_t int_pin,
-     gpio_t rst);
+     gpio_t rst_pin);
 #ifdef __cplusplus
 }
 #endif
