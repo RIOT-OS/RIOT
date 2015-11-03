@@ -86,6 +86,11 @@ void at86rf2xx_set_addr_short(at86rf2xx_t *dev, uint16_t addr)
 {
     dev->addr_short[0] = addr >> 8;
     dev->addr_short[1] = addr;
+#ifdef MODULE_SIXLOWPAN
+    /* https://tools.ietf.org/html/rfc4944#section-12 requires the first bit to
+     * 0 for unicast addresses */
+    dev->addr_short[1] &= 0x7F;
+#endif
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__SHORT_ADDR_0,
                         dev->addr_short[0]);
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__SHORT_ADDR_1,

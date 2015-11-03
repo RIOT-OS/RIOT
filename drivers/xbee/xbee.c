@@ -264,6 +264,13 @@ static int _set_addr(xbee_t *dev, uint8_t *val, size_t len)
     cmd[1] = 'Y';
     cmd[2] = val[0];
     cmd[3] = val[1];
+
+#ifdef MODULE_SIXLOWPAN
+    /* https://tools.ietf.org/html/rfc4944#section-12 requires the first bit to
+     * 0 for unicast addresses */
+    val[1] &= 0x7F;
+#endif
+
     _api_at_cmd(dev, cmd, 4, &resp);
     if (resp.status == 0) {
         memcpy(dev->addr_short, val, 2);
