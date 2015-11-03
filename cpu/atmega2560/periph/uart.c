@@ -198,7 +198,7 @@ ISR(USART0_RX_vect, ISR_BLOCK)
 ISR(USART1_RX_vect, ISR_BLOCK)
 {
     __enter_isr();
-    config[UART_1].rx_cb(config[UART_1].arg, UART0_DATA_REGISTER);
+    config[UART_1].rx_cb(config[UART_1].arg, UART1_DATA_REGISTER);
 
     if (sched_context_switch_request) {
         thread_yield();
@@ -207,11 +207,11 @@ ISR(USART1_RX_vect, ISR_BLOCK)
 }
 #endif /* UART_1_EN */
 
-#if UART_1_EN
+#if UART_2_EN
 ISR(USART2_RX_vect, ISR_BLOCK)
 {
     __enter_isr();
-    config[UART_2].rx_cb(config[UART_2].arg, UART0_DATA_REGISTER);
+    config[UART_2].rx_cb(config[UART_2].arg, UART2_DATA_REGISTER);
 
     if (sched_context_switch_request) {
         thread_yield();
@@ -220,11 +220,11 @@ ISR(USART2_RX_vect, ISR_BLOCK)
 }
 #endif /* UART_2_EN */
 
-#if UART_2_EN
-ISR(USART2_RX_vect, ISR_BLOCK)
+#if UART_3_EN
+ISR(USART3_RX_vect, ISR_BLOCK)
 {
     __enter_isr();
-    config[UART_3].rx_cb(config[UART_3].arg, UART0_DATA_REGISTER);
+    config[UART_3].rx_cb(config[UART_3].arg, UART3_DATA_REGISTER);
 
     if (sched_context_switch_request) {
         thread_yield();
