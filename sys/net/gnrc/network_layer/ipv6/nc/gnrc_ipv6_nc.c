@@ -23,7 +23,6 @@
 #include "net/gnrc/pktbuf.h"
 #include "net/gnrc/sixlowpan/nd.h"
 #include "thread.h"
-#include "timex.h"
 #include "xtimer.h"
 
 #define ENABLE_DEBUG    (0)

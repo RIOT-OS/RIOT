@@ -23,7 +23,6 @@
 #include "net/gnrc/sixlowpan/frag.h"
 #include "net/sixlowpan.h"
 #include "thread.h"
-#include "timex.h"
 #include "xtimer.h"
 #include "utlist.h"
 

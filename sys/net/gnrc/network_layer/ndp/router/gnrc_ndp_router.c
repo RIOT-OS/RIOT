@@ -16,7 +16,6 @@
 #include "net/gnrc/ndp.h"
 #include "net/gnrc/ndp/internal.h"
 #include "random.h"
-#include "timex.h"
 #include "xtimer.h"
 
 #include "net/gnrc/ndp/router.h"

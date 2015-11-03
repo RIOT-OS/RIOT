@@ -23,7 +23,6 @@
 
 #include "net/gnrc/netif/hdr.h"
 #include "net/gnrc/pkt.h"
-#include "timex.h"
 
 #include "net/gnrc/sixlowpan/frag.h"
 #ifdef __cplusplus
