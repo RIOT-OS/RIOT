@@ -540,8 +540,7 @@ void gnrc_ndp_rtr_adv_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt, ipv6_hdr_t
     }
     /* set retransmission timer from message */
     if (rtr_adv->retrans_timer.u32 != 0) {
-        if_entry->retrans_timer = timex_set(0, byteorder_ntohl(rtr_adv->retrans_timer));
-        timex_normalize(&if_entry->retrans_timer);
+        if_entry->retrans_timer = byteorder_ntohl(rtr_adv->retrans_timer);
     }
     mutex_unlock(&if_entry->mutex);
     sicmpv6_size -= sizeof(ndp_rtr_adv_t);
@@ -673,9 +672,7 @@ void gnrc_ndp_retrans_nbr_sol(gnrc_ipv6_nc_t *nc_entry)
                 gnrc_ndp_internal_send_nbr_sol(nc_entry->iface, NULL, &nc_entry->ipv6_addr, &dst);
 
                 mutex_lock(&ipv6_iface->mutex);
-                gnrc_ndp_internal_reset_nbr_sol_timer(nc_entry, (uint32_t) timex_uint64(
-                                                       ipv6_iface->retrans_timer
-                                                      ),
+                gnrc_ndp_internal_reset_nbr_sol_timer(nc_entry, ipv6_iface->retrans_timer,
                                                       GNRC_NDP_MSG_NBR_SOL_RETRANS, gnrc_ipv6_pid);
                 mutex_unlock(&ipv6_iface->mutex);
             }
@@ -722,8 +719,7 @@ void gnrc_ndp_netif_add(gnrc_ipv6_netif_t *iface)
     /* set default values */
     mutex_lock(&iface->mutex);
     _set_reach_time(iface, GNRC_NDP_REACH_TIME);
-    iface->retrans_timer = timex_set(0, GNRC_NDP_RETRANS_TIMER);
-    timex_normalize(&iface->retrans_timer);
+    iface->retrans_timer = GNRC_NDP_RETRANS_TIMER;
     mutex_unlock(&iface->mutex);
 }
 

@@ -122,18 +122,14 @@ void gnrc_ndp_internal_set_state(gnrc_ipv6_nc_t *nc_entry, uint8_t state)
             ipv6_iface = gnrc_ipv6_netif_get(nc_entry->iface);
 
             nc_entry->probes_remaining = GNRC_NDP_MAX_UC_NBR_SOL_NUMOF;
-            DEBUG("PROBE (probe with %" PRIu8 " unicast NS every %" PRIu32
-                  ".%06" PRIu32 " seconds)\n", nc_entry->probes_remaining,
-                  ipv6_iface->retrans_timer.seconds,
-                  ipv6_iface->retrans_timer.microseconds);
+            DEBUG("PROBE (probe with %" PRIu8 " unicast NS every %" PRIu32 " us)\n",
+                  nc_entry->probes_remaining, ipv6_iface->retrans_timer);
 
             gnrc_ndp_internal_send_nbr_sol(nc_entry->iface, NULL, &nc_entry->ipv6_addr,
                                            &nc_entry->ipv6_addr);
 
             mutex_lock(&ipv6_iface->mutex);
-            gnrc_ndp_internal_reset_nbr_sol_timer(nc_entry, (uint32_t) timex_uint64(
-                                                    ipv6_iface->retrans_timer
-                                                  ),
+            gnrc_ndp_internal_reset_nbr_sol_timer(nc_entry, ipv6_iface->retrans_timer,
                                                   GNRC_NDP_MSG_NBR_SOL_RETRANS, gnrc_ipv6_pid);
             mutex_unlock(&ipv6_iface->mutex);
             break;
@@ -557,11 +553,7 @@ void gnrc_ndp_internal_send_rtr_adv(kernel_pid_t iface, ipv6_addr_t *src, ipv6_a
         }
     }
     if (ipv6_iface->flags & GNRC_IPV6_NETIF_FLAGS_ADV_RETRANS_TIMER) {
-        uint64_t tmp = timex_uint64(ipv6_iface->retrans_timer) / MS_IN_USEC;
-        if (tmp > UINT32_MAX) {
-            tmp = UINT32_MAX;
-        }
-        retrans_timer = (uint32_t)tmp;
+        retrans_timer = ipv6_iface->retrans_timer / MS_IN_USEC;
     }
     if (!fin) {
         adv_ltime = ipv6_iface->adv_ltime;

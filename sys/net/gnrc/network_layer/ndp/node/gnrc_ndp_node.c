@@ -180,9 +180,7 @@ kernel_pid_t gnrc_ndp_node_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_len,
             gnrc_ndp_internal_send_nbr_sol(iface, NULL, next_hop_ip, &dst_sol);
 
             mutex_lock(&ipv6_iface->mutex);
-            gnrc_ndp_internal_reset_nbr_sol_timer(nc_entry, (uint32_t) timex_uint64(
-                                                    ipv6_iface->retrans_timer
-                                                  ),
+            gnrc_ndp_internal_reset_nbr_sol_timer(nc_entry, ipv6_iface->retrans_timer,
                                                   GNRC_NDP_MSG_NBR_SOL_RETRANS, gnrc_ipv6_pid);
             mutex_unlock(&ipv6_iface->mutex);
         }
