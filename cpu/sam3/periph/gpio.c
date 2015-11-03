@@ -38,21 +38,35 @@
 #define EXTI_MAP_LENGTH     (16U)
 
 /**
- * @brief We allow for 8 concurrent external interrupts to be set
+ * @brief We allow for 7 (4-bit - 1) concurrent external interrupts to be set
  */
-#define CTX_NUMOF           (8U)
+#define CTX_NUMOF           (7U)
 
+/**
+ * @brief Context information needed for interrupts
+ */
 typedef struct {
     gpio_cb_t cb;       /**< callback called from GPIO interrupt */
     void *arg;          /**< argument passed to the callback */
 } exti_ctx_t;
 
+/**
+ * @brief Allocation of memory for 7 independent interrupt slots
+ */
 static exti_ctx_t exti_ctx[CTX_NUMOF] = {
     {NULL, NULL}, {NULL, NULL}, {NULL, NULL}, {NULL, NULL},
-    {NULL, NULL}, {NULL, NULL}, {NULL, NULL}, {NULL, NULL}
+    {NULL, NULL}, {NULL, NULL}, {NULL, NULL}
 };
 
-static uint32_t exti_map[EXTI_MAP_LENGTH];
+/**
+ * @brief Allocation of 4 bit per pin to map a pin to an interrupt context
+ */
+static uint32_t exti_map[EXTI_MAP_LENGTH] = {
+    0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff,
+    0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff,
+    0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff,
+    0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff
+};
 
 /**
  * @brief Extract the pin's port base address from the given pin identifier
@@ -74,6 +88,17 @@ static inline int _port_num(gpio_t pin)
 }
 
 /**
+ * @brief Test if the given port is valid
+ */
+static bool _port_valid(Pio *port)
+{
+    if (port == PIOA || port == PIOB || port == PIOC || port == PIOD) {
+        return true;
+    }
+    return false;
+}
+
+/**
  * @brief Get the pin number from the pin identifier, encoded in the LSB 5 bit
  */
 static inline int _pin_num(gpio_t pin)
@@ -92,7 +117,7 @@ static inline int _ctx(int port, int pin)
 /**
  * @brief Write an entry to the context map array
  */
-static inline void write_map(int port, int pin, int ctx)
+static void _write_map(int port, int pin, int ctx)
 {
     exti_map[(port * 4) + (pin >> 3)] &= ~(0xf << ((pin & 0x7) * 4));
     exti_map[(port * 4) + (pin >> 3)] |=  (ctx << ((pin & 0x7) * 4));
@@ -101,7 +126,7 @@ static inline void write_map(int port, int pin, int ctx)
 /**
  * @brief Find a free spot in the array containing the interrupt contexts
  */
-static int get_free_ctx(void)
+static int _get_free_ctx(void)
 {
     for (int i = 0; i < CTX_NUMOF; i++) {
         if (exti_ctx[i].cb == NULL) {
@@ -111,13 +136,35 @@ static int get_free_ctx(void)
     return -1;
 }
 
+/**
+ * @brief Clear the context of the given pin
+ */
+static void _ctx_clear(int port, int pin)
+{
+    int ctx = _ctx(port, pin);
+    if (ctx < CTX_NUMOF) {
+        exti_ctx[ctx].cb = NULL;
+        _write_map(port, pin, CTX_NUMOF);
+    }
+}
+
 int gpio_init(gpio_t pin, gpio_dir_t dir, gpio_pp_t pushpull)
 {
     Pio *port = _port(pin);
     int pin_num = _pin_num(pin);
     int port_num = _port_num(pin);
 
+    /* make sure port is valid */
+    if (!_port_valid(port)) {
+        return -1;
+    }
+
+    /* power on the corresponding port */
     PMC->PMC_PCER0 = (1 << (port_num + 11));
+
+    /* disable interrupt and clear context (to be safe) */
+    port->PIO_IDR = (1 << pin_num);
+    _ctx_clear(port_num, pin_num);
 
      /* give the PIO module the power over the corresponding pin */
     port->PIO_PER = (1 << pin_num);
@@ -152,17 +199,23 @@ int gpio_init_int(gpio_t pin, gpio_pp_t pushpull, gpio_flank_t flank,
     int pin_num = _pin_num(pin);
     int port_num = _port_num(pin);
 
-    port->PIO_IDR = (1<<pin_num);
+    /* make sure pin is valid */
+    if (!_port_valid(port)) {
+        return -1;
+    }
+
+    /* configure pin as input */
+    gpio_init(pin, GPIO_DIR_IN, pushpull);
 
     /* try go grab a free spot in the context array */
-    int ctx_num = get_free_ctx();
+    int ctx_num = _get_free_ctx();
     if (ctx_num < 0) {
         return -1;
     }
     /* save context */
     exti_ctx[ctx_num].cb = cb;
     exti_ctx[ctx_num].arg = arg;
-    write_map(port_num, pin_num, ctx_num);
+    _write_map(port_num, pin_num, ctx_num);
 
     /* set the active flank */
     switch (flank) {
@@ -183,7 +236,7 @@ int gpio_init_int(gpio_t pin, gpio_pp_t pushpull, gpio_flank_t flank,
     /* clean interrupt status register */
     port->PIO_ISR;
     /* enable the interrupt for the given channel */
-    NVIC_EnableIRQ(1 << (port_num + PIOA_IRQn));
+    NVIC_EnableIRQ(port_num + PIOA_IRQn);
     port->PIO_IER = (1 << pin_num);
 
     return 0;
