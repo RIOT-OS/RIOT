@@ -96,6 +96,11 @@ static void _mtu_usage(char *cmd_name)
     printf("usage: %s <if_id> mtu <n>\n", cmd_name);
 }
 
+static void _hl_usage(char *cmd_name)
+{
+    printf("usage: %s <if_id> hl <n>\n", cmd_name);
+}
+
 static void _flag_usage(char *cmd_name)
 {
     printf("usage: %s <if_id> [-]{promisc|autoack|csma|autocca|preload|iphc}\n", cmd_name);
@@ -310,10 +315,12 @@ static void _netif_list(kernel_pid_t dev)
 #ifdef MODULE_GNRC_IPV6_NETIF
     if (entry != NULL) {
         printf("MTU:%" PRIu16 "  ", entry->mtu);
+        printf("HL:%" PRIu8 " ", entry->cur_hl);
         if (entry->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN) {
             printf("6LO  ");
         }
         linebreak = true;
+
     }
 #endif
 
@@ -875,6 +882,29 @@ int _netif_config(int argc, char **argv)
 
                 return _netif_mtu((kernel_pid_t)dev, argv[3]);
             }
+#ifdef MODULE_GNRC_IPV6_NETIF
+            else if (strcmp(argv[2], "hl") == 0) {
+                if (argc < 4) {
+                    _hl_usage(argv[0]);
+                    return 1;
+                }
+                int hl;
+                gnrc_ipv6_netif_t *entry;
+                if (((hl = atoi(argv[3])) < 0) || (hl > UINT8_MAX)) {
+                    printf("error: Hop limit must be between %" PRIu16 " and %" PRIu16 "\n",
+                            0, UINT16_MAX);
+                    return 1;
+                }
+                if ((entry = gnrc_ipv6_netif_get(dev)) == NULL) {
+                    puts("error: unable to set hop limit.");
+                    return 1;
+                }
+                entry->cur_hl = hl;
+                printf("success: set hop limit %u interface %" PRIkernel_pid "\n", hl, dev);
+
+                return 0;
+            }
+#endif
             else {
                 return _netif_flag(argv[0], dev, argv[2]);
             }
@@ -888,6 +918,7 @@ int _netif_config(int argc, char **argv)
     printf("usage: %s [<if_id>]\n", argv[0]);
     _set_usage(argv[0]);
     _mtu_usage(argv[0]);
+    _hl_usage(argv[0]);
     _flag_usage(argv[0]);
     _add_usage(argv[0]);
     _del_usage(argv[0]);
