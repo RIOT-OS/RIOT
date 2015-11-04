@@ -756,7 +756,7 @@ static int _netif_mtu(kernel_pid_t dev, char *mtu_str)
         puts("error: unable to set MTU.");
         return 1;
     }
-    entry->mtu = IPV6_MIN_MTU;
+    entry->mtu = mtu;
     printf("success: set MTU %u interface %" PRIkernel_pid "\n", mtu,
            dev);
     return 0;
