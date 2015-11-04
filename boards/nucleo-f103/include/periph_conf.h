@@ -89,6 +89,21 @@ static const timer_conf_t timer_config[] = {
 /** @} */
 
 /**
+ * @brief PWM configuration
+ * @{
+ */
+#define PWM_EN              1
+
+static const pwm_conf_t pwm_config[] =
+{
+    { TIM1, AFIO_MAPR_TIM1_REMAP_NOREMAP, RCC_APB2ENR_TIM1EN, APB2, {
+            { GPIO_PIN(PORT_A, 8), 0 },
+    } }
+};
+#define PWM_NUMOF           (sizeof(pwm_config) / sizeof(pwm_config[0]))
+/** @} */
+
+/**
  * @brief UART configuration
  * @{
  */
