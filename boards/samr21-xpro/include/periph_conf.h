@@ -132,43 +132,21 @@ static const uart_conf_t uart_config[] = {
 #define PWM_0_CHANNELS      PWM_MAX_CHANNELS
 #define PWM_1_CHANNELS      PWM_MAX_CHANNELS
 
-/**
- * @brief PWM channel configuration data structure
- *
- * TODO: this should be moved into the CPU folder
- */
-typedef struct {
-    PortGroup *port;            /**< GPIO port */
-    uint8_t pin;                /**< GPIO pin */
-    uint8_t fnct;               /**< pin function multiplex value */
-    uint8_t chan;               /**< TCC channel to use */
-} pwm_conf_chan_t;
-
-/**
- * @brief PWM device configuration data structure
- *
- * TODO: this should be moved into the CPU folder
- */
-typedef struct {
-    Tcc *dev;                   /*< TCC device to use */
-    pwm_conf_chan_t chan[2];    /**< channel configuration */
-} pwm_conf_t;
-
 /* PWM device configuration */
 #if PWM_NUMOF
 static const pwm_conf_t pwm_config[] = {
 #if PWM_0_EN
     {TCC1, {
-        /* port , pin, AF, chan */
-        {(PortGroup *)0x41004400, 6, 4, 0},
-        {(PortGroup *)0x41004400, 7, 4, 1}
+        /* GPIO pin, MUX value, TCC channel */
+        {GPIO_PIN(PA, 6), GPIO_MUX_E, 0},
+        {GPIO_PIN(PA, 7), GPIO_MUX_E, 1}
     }},
 #endif
 #if PWM_1_EN
     {TCC0, {
-        /* port , pin, AF, chan */
-        {(PortGroup *)0x41004400, 18, 5, 2},
-        {(PortGroup *)0x41004400, 19, 5, 3}
+        /* GPIO pin, MUX value, TCC channel */
+        {GPIO_PIN(PA, 18), GPIO_MUX_F, 2},
+        {GPIO_PIN(PA, 19), GPIO_MUX_F, 3}
     }},
 #endif
 };
