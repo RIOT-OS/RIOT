@@ -2,7 +2,7 @@
 APPLICATION = gnrc_border_router
 
 # If no BOARD is found in the environment, use this default:
-BOARD ?= samr21-xpro
+BOARD ?= pba-d-01-kw2x
 
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
@@ -42,6 +42,9 @@ USEMODULE += gnrc_icmpv6_echo
 USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += ps
+USEMODULE += uart
+USEMODULE += usbdev
+USEMODULE += usbdev-acm
 
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the
