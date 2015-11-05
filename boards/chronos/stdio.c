@@ -23,16 +23,17 @@
 
 #include <stdio.h>
 
-static void _dummy(int c)
+#define EOF (-1)
+
+static void _dummy(char c)
 {
 }
 
-void (*_putchar)(int c) = _dummy;
+void (*_putchar)(char c) = _dummy;
 
-int putchar(int c)
+void tinyputchar(void*p, char c)
 {
     _putchar(c);
-    return c;
 }
 
 int getchar(void)

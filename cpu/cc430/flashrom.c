@@ -69,6 +69,6 @@ static inline void busy_wait(void)
 {
     /* Wait for BUSY = 0, not needed unless run from RAM */
     while (FCTL3 & 0x0001) {
-        nop();
+        _no_operation();
     }
 }

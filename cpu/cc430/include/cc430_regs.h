@@ -99,13 +99,6 @@ typedef struct {
 #define CCTL_CM_MASK            (0xc000)
 /** @} */
 
-/**
- * @brief   Base register address definitions
- * @{
- */
-#define TIMER_A0_BASE           ((uint16_t)0x0340)
-#define TIMER_A1_BASE           ((uint16_t)0x0380)
-/** @} */
 
 /**
  * @brief   Typing of base register objects
