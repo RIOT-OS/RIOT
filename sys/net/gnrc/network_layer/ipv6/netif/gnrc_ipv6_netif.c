@@ -806,7 +806,7 @@ void gnrc_ipv6_netif_init_by_dev(void)
         if ((gnrc_netapi_get(ifs[i], NETOPT_PROTO, 0, &if_type,
                              sizeof(if_type)) != -ENOTSUP) &&
             (if_type == GNRC_NETTYPE_SIXLOWPAN)) {
-            uint16_t src_len = 8;
+            uint16_t src_dst_len = 8;
             uint16_t max_frag_size = UINT16_MAX;
 
             DEBUG("ipv6 netif: Set 6LoWPAN flag\n");
@@ -823,8 +823,10 @@ void gnrc_ipv6_netif_init_by_dev(void)
 #endif
             /* use EUI-64 (8-byte address) for IID generation and for sending
              * packets */
-            gnrc_netapi_set(ifs[i], NETOPT_SRC_LEN, 0, &src_len,
-                            sizeof(src_len)); /* don't care for result */
+            gnrc_netapi_set(ifs[i], NETOPT_SRC_LEN, 0, &src_dst_len,
+                            sizeof(src_dst_len)); /* don't care for result */
+            gnrc_netapi_set(ifs[i], NETOPT_DST_LEN, 0, &src_dst_len,
+                            sizeof(src_dst_len)); /* don't care for result */
 
             if (gnrc_netapi_get(ifs[i], NETOPT_MAX_PACKET_SIZE,
                                 0, &max_frag_size, sizeof(max_frag_size)) < 0) {
