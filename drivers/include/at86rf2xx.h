@@ -248,7 +248,6 @@ uint8_t at86rf2xx_get_chan(at86rf2xx_t *dev);
  */
 void at86rf2xx_set_chan(at86rf2xx_t *dev, uint8_t chan);
 
-#ifdef MODULE_AT86RF212B
 /**
  * @brief   Get the configured channel page of the given device
  *
@@ -265,7 +264,6 @@ uint8_t at86rf2xx_get_page(at86rf2xx_t *dev);
  * @param[in] page          channel page to set
  */
 void at86rf2xx_set_page(at86rf2xx_t *dev, uint8_t page);
-#endif
 
 /**
  * @brief   Get the configured PAN ID of the given device

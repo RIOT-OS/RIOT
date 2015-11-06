@@ -150,17 +150,23 @@ void at86rf2xx_set_chan(at86rf2xx_t *dev, uint8_t channel)
 
 uint8_t at86rf2xx_get_page(at86rf2xx_t *dev)
 {
+#ifdef MODULE_AT86RF212B
     return dev->page;
+#else
+    return 0;
+#endif
 }
 
 void at86rf2xx_set_page(at86rf2xx_t *dev, uint8_t page)
 {
+#ifdef MODULE_AT86RF212B
     if ((page != 0) && (page != 2)) {
         return;
     }
     dev->page = page;
 
     at86rf2xx_configure_phy(dev);
+#endif
 }
 
 uint16_t at86rf2xx_get_pan(at86rf2xx_t *dev)
