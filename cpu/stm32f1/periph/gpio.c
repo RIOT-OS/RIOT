@@ -170,7 +170,7 @@ int gpio_read(gpio_t pin)
     GPIO_TypeDef *port = _port(pin);
     int pin_num = _pin_num(pin);
 
-    if (port->CR[pin_num >> 3] & (0x3 << (pin_num & 0x7))) {
+    if (port->CR[pin_num >> 3] & (0x3 << ((pin_num & 0x7) << 2))) {
         /* pin is output */
         return (port->ODR & (1 << pin_num));
     }
