@@ -115,7 +115,9 @@ extern "C" {
                                                      *   upper layer */
 #define AT86RF2XX_OPT_SRC_ADDR_LONG  (0x0200)       /**< send data using long
                                                      *   source address */
-#define AT86RF2XX_OPT_USE_SRC_PAN    (0x0400)       /**< do not compress source
+#define AT86RF2XX_OPT_DST_ADDR_LONG  (0x0400)       /**< send data using long
+                                                     *   destination address */
+#define AT86RF2XX_OPT_USE_SRC_PAN    (0x0800)       /**< do not compress source
                                                      *   PAN ID */
 /** @} */
 

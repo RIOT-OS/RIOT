@@ -592,6 +592,7 @@ static int _get(gnrc_netdev_t *netdev, netopt_t opt, void *value, size_t max_len
             return _get_addr_long(dev, (uint8_t *)value, max_len);
         case NETOPT_ADDR_LEN:
         case NETOPT_SRC_LEN:
+        case NETOPT_DST_LEN:
             if (max_len < sizeof(uint16_t)) {
                 return -EOVERFLOW;
             }
@@ -643,6 +644,7 @@ static int _set(gnrc_netdev_t *netdev, netopt_t opt, void *value, size_t value_l
             return _set_addr(dev, (uint8_t *)value, value_len);
         case NETOPT_ADDR_LEN:
         case NETOPT_SRC_LEN:
+        case NETOPT_DST_LEN:
             return _set_addr_len(dev, value, value_len);
         case NETOPT_CHANNEL:
             return _set_channel(dev, (uint8_t *)value, value_len);

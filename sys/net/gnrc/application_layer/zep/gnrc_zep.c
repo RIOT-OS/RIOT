@@ -482,7 +482,7 @@ static int _set(gnrc_netdev_t *netdev, netopt_t opt, void *value, size_t value_l
                 return sizeof(be_uint64_t);
             }
 
-        case NETOPT_ADDR_LEN:
+        case NETOPT_DST_LEN:
             if (value_len < sizeof(uint16_t)) {
                 return -EOVERFLOW;
             }
