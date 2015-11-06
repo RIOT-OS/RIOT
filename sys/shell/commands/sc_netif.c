@@ -25,6 +25,7 @@
 #include <inttypes.h>
 
 #include "thread.h"
+#include "net/eui64.h"
 #include "net/ipv6/addr.h"
 #include "net/gnrc/ipv6/netif.h"
 #include "net/gnrc/netif.h"
@@ -581,7 +582,26 @@ static int _netif_set(char *cmd_name, kernel_pid_t dev, char *key, char *value)
         return _netif_set_i16(dev, NETOPT_TX_POWER, value);
     }
     else if (strcmp("src_len", key) == 0) {
-        return _netif_set_u16(dev, NETOPT_SRC_LEN, value);
+#ifdef MODULE_GNRC_IPV6_NETIF
+        /* remove old link-local address based on the old src_len */
+        eui64_t iid;
+        ipv6_addr_t addr;
+        if (gnrc_netapi_get(dev, NETOPT_IPV6_IID, 0, &iid, sizeof(eui64_t)) >= 0) {
+            ipv6_addr_set_aiid(&addr, iid.uint8);
+            ipv6_addr_set_link_local_prefix(&addr);
+            gnrc_ipv6_netif_remove_addr(dev, &addr);
+        }
+#endif
+        int res = _netif_set_u16(dev, NETOPT_SRC_LEN, value);
+#ifdef MODULE_GNRC_IPV6_NETIF
+        /* add an updated link-local address based on the new src_len */
+        if (gnrc_netapi_get(dev, NETOPT_IPV6_IID, 0, &iid, sizeof(eui64_t)) >= 0) {
+            ipv6_addr_set_aiid(&addr, iid.uint8);
+            ipv6_addr_set_link_local_prefix(&addr);
+            gnrc_ipv6_netif_add_addr(dev, &addr, 64, 0);
+        }
+#endif
+        return res;
     }
     else if (strcmp("dst_len", key) == 0) {
         return _netif_set_u16(dev, NETOPT_DST_LEN, value);
