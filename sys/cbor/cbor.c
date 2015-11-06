@@ -456,7 +456,7 @@ size_t cbor_deserialize_int(const cbor_stream_t *stream, size_t offset, int *val
         *val = buf; /* resolve as CBOR_UINT */
     }
     else {
-        *val = -1 - buf; /* resolve as CBOR_NEGINT */
+        *val = -1U - buf; /* resolve as CBOR_NEGINT */
     }
 
     return read_bytes;
@@ -501,7 +501,7 @@ size_t cbor_deserialize_int64_t(const cbor_stream_t *stream, size_t offset, int6
         *val = buf; /* resolve as CBOR_UINT */
     }
     else {
-        *val = -1 - buf; /* resolve as CBOR_NEGINT */
+        *val = INT64_C(-1) - buf; /* resolve as CBOR_NEGINT */
     }
 
     return read_bytes;
