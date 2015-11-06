@@ -88,6 +88,7 @@ static void _set_usage(char *cmd_name)
          "       * \"pan_id\" - alias for \"nid\"\n"
          "       * \"power\" - TX power in dBm\n"
          "       * \"src_len\" - sets the source address length in byte\n"
+         "       * \"dst_len\" - sets the destination address length in byte\n"
          "       * \"state\" - set the device state\n");
 }
 
@@ -131,6 +132,10 @@ static void _print_netopt(netopt_t opt)
 
         case NETOPT_SRC_LEN:
             printf("source address length");
+            break;
+
+        case NETOPT_DST_LEN:
+            printf("destination address length");
             break;
 
         case NETOPT_CHANNEL:
@@ -341,6 +346,12 @@ static void _netif_list(kernel_pid_t dev)
 
     if (res >= 0) {
         printf("Source address length: %" PRIu16 "\n           ", u16);
+    }
+
+    res = gnrc_netapi_get(dev, NETOPT_DST_LEN, 0, &u16, sizeof(u16));
+
+    if (res >= 0) {
+        printf("Destination address length: %" PRIu16 "\n           ", u16);
     }
 
 #ifdef MODULE_GNRC_IPV6_NETIF
@@ -571,6 +582,9 @@ static int _netif_set(char *cmd_name, kernel_pid_t dev, char *key, char *value)
     }
     else if (strcmp("src_len", key) == 0) {
         return _netif_set_u16(dev, NETOPT_SRC_LEN, value);
+    }
+    else if (strcmp("dst_len", key) == 0) {
+        return _netif_set_u16(dev, NETOPT_DST_LEN, value);
     }
     else if (strcmp("state", key) == 0) {
         return _netif_set_state(dev, value);
