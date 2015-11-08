@@ -5,13 +5,12 @@
 #
 # Start the GDB server first using the 'make debugserver' target
 
-# @author Hauke Petersen <hauke.petersen@fu-berlin.de>
+# @author Attilio Dona'
 
-BINDIR=$1
+CFGDIR=$1
 ELFFILE=$2
 
-# write GDB config file
-echo "target extended-remote 127.0.0.1:2331" > $BINDIR/gdb.cfg
+cd $CFGDIR
 
 # run GDB
-arm-none-eabi-gdb -tui -command=$BINDIR/gdb.cfg $ELFFILE
+arm-none-eabi-gdb -tui -command=gdbinit $ELFFILE

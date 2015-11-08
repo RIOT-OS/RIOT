@@ -2,6 +2,10 @@
 export CPU = nrf51
 export CPU_MODEL = nrf51x22xxaa
 
+ifneq (,$(filter gnrc_netif_default,$(USEMODULE)))
+	USEMODULE += cc110x gnrc_netdev2 gnrc_cc110x
+endif
+
 # define the default port depending on the host OS
 PORT_LINUX ?= /dev/ttyACM0
 PORT_DARWIN ?= $(shell ls -1 /dev/tty.SLAB_USBtoUART* | head -n 1)
@@ -16,7 +20,9 @@ export OFLAGS = -O binary
 export HEXFILE = $(ELFFILE:.elf=.bin)
 export TERMFLAGS += -p "$(PORT)"
 export FFLAGS = $(BINDIR) $(HEXFILE)
-export DEBUGGER_FLAGS = $(BINDIR) $(ELFFILE)
+
+export DEBUGGER_FLAGS = $(RIOTBOARD)/$(BOARD)/dist $(ELFFILE)
+
 export RESET_FLAGS = $(BINDIR)
 
 # setup serial terminal

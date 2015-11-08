@@ -103,6 +103,23 @@ extern "C" {
 /** @} */
 
 /**
+ * @name SPI configuration
+ * @{
+ */
+#define SPI_NUMOF           (1U)
+#define SPI_0_EN            1
+#define SPI_IRQ_PRIO        1
+
+/* SPI_0 device configuration */
+#define SPI_0_DEV           NRF_SPI0
+#define SPI_0_PIN_MOSI      5
+#define SPI_0_PIN_MISO      3
+#define SPI_0_PIN_SCK       1
+
+/** @} */
+
+
+/**
  * @name Random Number Generator configuration
  * @{
  */
