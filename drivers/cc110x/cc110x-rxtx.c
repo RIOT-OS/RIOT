@@ -40,7 +40,7 @@
 
 #include "log.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG (1)
 #include "debug.h"
 
 static void _rx_abort(cc110x_t *dev)
@@ -200,6 +200,7 @@ static void _tx_continue(cc110x_t *dev)
 
     if (left == size) {
         /* Switch to TX mode */
+        DEBUG("now in TX\n");
         cc110x_strobe(dev, CC110X_STX);
     }
 
@@ -244,17 +245,31 @@ void cc110x_isr_handler(cc110x_t *dev, void(*callback)(void*), void*arg)
     }
 }
 
+
+void debug_registers(cc110x_t *dev) {
+    printf("CC110X_SYNC1: 0x%x\n", cc110x_read_reg(dev, CC110X_SYNC1));
+    printf("CC110X_SYNC0: 0x%x\n", cc110x_read_reg(dev, CC110X_SYNC0));
+    printf("CC110X_CHANNR: 0x%x\n", cc110x_read_reg(dev, CC110X_CHANNR));
+    printf("CC110X_FREQ2: 0x%x\n", cc110x_read_reg(dev, CC110X_FREQ2));
+    printf("CC110X_FREQ1: 0x%x\n", cc110x_read_reg(dev, CC110X_FREQ1));
+    printf("CC110X_FREQ0: 0x%x\n", cc110x_read_reg(dev, CC110X_FREQ0));
+}
+
 int cc110x_send(cc110x_t *dev, cc110x_pkt_t *packet)
 {
     DEBUG("cc110x: snd pkt to %u payload_length=%u\n",
             (unsigned)packet->address, (unsigned)packet->length-3);
     uint8_t size;
 
+    debug_registers(dev);
+
     switch (dev->radio_state) {
         case RADIO_RX_BUSY:
         case RADIO_TX_BUSY:
-            DEBUG("cc110x: invalid state for sending: %s\n",
-                    cc110x_state_to_text(dev->radio_state));
+//            DEBUG("cc110x: invalid state for sending: %s\n",
+//                    cc110x_state_to_text(dev->radio_state));
+            DEBUG("cc110x: invalid state for sending: %d\n",
+                    dev->radio_state);
             return -EAGAIN;
     }
 

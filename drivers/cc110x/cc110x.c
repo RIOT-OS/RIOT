@@ -35,7 +35,7 @@
 #include "cc110x/cc110x-internal.h"
 #include "cc110x/cc110x-spi.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG    (1)
 #include "debug.h"
 
 /* Internal function prototypes */
@@ -78,7 +78,10 @@ int cc110x_setup(cc110x_t *dev, const cc110x_params_t *params)
     cc110x_writeburst_reg(dev, 0x00, cc110x_default_conf, cc110x_default_conf_size);
 
     /* Write PATABLE (power settings) */
-    cc110x_writeburst_reg(dev, CC110X_PATABLE, CC110X_DEFAULT_PATABLE, 8);
+    // todo: use a MACRO
+    //cc110x_writeburst_reg(dev, CC110X_PATABLE, CC110X_DEFAULT_PATABLE, 8);
+    cc110x_write_reg(dev, CC110X_PATABLE, 0xc5);
+
 
     /* set base frequency */
     cc110x_set_base_freq_raw(dev, CC110X_DEFAULT_FREQ);

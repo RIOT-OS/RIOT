@@ -18,7 +18,10 @@ extern const char* sl_err_descr[];
 enum error_types {
     NO_ERROR = 0,
     SIMPLELINK_START_ERROR,
-    SMARTCONFIG_ERROR
+    SMARTCONFIG_ERROR,
+    WLAN_SET_POLICY_ERROR,
+    SOCKET_OPEN_FAIL,
+    SOCKET_CONNECT_FAIL
 };
 
 
