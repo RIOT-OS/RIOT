@@ -331,14 +331,14 @@ typedef struct {
      *          gnrc_ipv6_netif_t::reach_time_base microseconds devided by 10.
      *          Can't be greater than 1 hour.
      */
-    timex_t reach_time;
+    uint32_t reach_time;
 
     /**
      * @brief   Time between retransmissions of neighbor solicitations to a
      *          neighbor.
      *          The default value is @ref GNRC_NDP_RETRANS_TIMER.
      */
-    timex_t retrans_timer;
+    uint32_t retrans_timer;
     xtimer_t rtr_sol_timer; /**< Timer for periodic router solicitations */
     msg_t rtr_sol_msg;      /**< msg_t for gnrc_ipv6_netif_t::rtr_sol_timer */
 #if defined (MODULE_GNRC_NDP_ROUTER) || defined (MODULE_GNRC_SIXLOWPAN_ND_ROUTER)

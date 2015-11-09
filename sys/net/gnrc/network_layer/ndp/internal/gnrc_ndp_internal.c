@@ -20,7 +20,6 @@
 #include "net/gnrc/sixlowpan/ctx.h"
 #include "net/gnrc/sixlowpan/nd.h"
 #include "random.h"
-#include "timex.h"
 #include "xtimer.h"
 
 #include "net/gnrc/ndp/internal.h"
@@ -92,7 +91,7 @@ ipv6_addr_t *gnrc_ndp_internal_default_router(void)
 void gnrc_ndp_internal_set_state(gnrc_ipv6_nc_t *nc_entry, uint8_t state)
 {
     gnrc_ipv6_netif_t *ipv6_iface;
-    timex_t t = { GNRC_NDP_FIRST_PROBE_DELAY, 0 };
+    uint32_t t = GNRC_NDP_FIRST_PROBE_DELAY * SEC_IN_USEC;
 
     nc_entry->flags &= ~GNRC_IPV6_NC_STATE_MASK;
     nc_entry->flags |= state;
@@ -103,9 +102,7 @@ void gnrc_ndp_internal_set_state(gnrc_ipv6_nc_t *nc_entry, uint8_t state)
     switch (state) {
         case GNRC_IPV6_NC_STATE_REACHABLE:
             ipv6_iface = gnrc_ipv6_netif_get(nc_entry->iface);
-            DEBUG("REACHABLE (reachable time = %" PRIu32 ".%06" PRIu32 ")\n",
-                  ipv6_iface->reach_time.seconds,
-                  ipv6_iface->reach_time.microseconds);
+            DEBUG("REACHABLE (reachable time = %" PRIu32 " us)\n", ipv6_iface->reach_time);
             t = ipv6_iface->reach_time;
 
             /* we intentionally fall through here to set the desired timeout t */
@@ -116,26 +113,22 @@ void gnrc_ndp_internal_set_state(gnrc_ipv6_nc_t *nc_entry, uint8_t state)
                       GNRC_NDP_FIRST_PROBE_DELAY);
             }
 #endif
-            gnrc_ndp_internal_reset_nbr_sol_timer(nc_entry, (uint32_t) timex_uint64(t),
-                                                  GNRC_NDP_MSG_NC_STATE_TIMEOUT, gnrc_ipv6_pid);
+            gnrc_ndp_internal_reset_nbr_sol_timer(nc_entry, t, GNRC_NDP_MSG_NC_STATE_TIMEOUT,
+                                                  gnrc_ipv6_pid);
             break;
 
         case GNRC_IPV6_NC_STATE_PROBE:
             ipv6_iface = gnrc_ipv6_netif_get(nc_entry->iface);
 
             nc_entry->probes_remaining = GNRC_NDP_MAX_UC_NBR_SOL_NUMOF;
-            DEBUG("PROBE (probe with %" PRIu8 " unicast NS every %" PRIu32
-                  ".%06" PRIu32 " seconds)\n", nc_entry->probes_remaining,
-                  ipv6_iface->retrans_timer.seconds,
-                  ipv6_iface->retrans_timer.microseconds);
+            DEBUG("PROBE (probe with %" PRIu8 " unicast NS every %" PRIu32 " us)\n",
+                  nc_entry->probes_remaining, ipv6_iface->retrans_timer);
 
             gnrc_ndp_internal_send_nbr_sol(nc_entry->iface, NULL, &nc_entry->ipv6_addr,
                                            &nc_entry->ipv6_addr);
 
             mutex_lock(&ipv6_iface->mutex);
-            gnrc_ndp_internal_reset_nbr_sol_timer(nc_entry, (uint32_t) timex_uint64(
-                                                    ipv6_iface->retrans_timer
-                                                  ),
+            gnrc_ndp_internal_reset_nbr_sol_timer(nc_entry, ipv6_iface->retrans_timer,
                                                   GNRC_NDP_MSG_NBR_SOL_RETRANS, gnrc_ipv6_pid);
             mutex_unlock(&ipv6_iface->mutex);
             break;
@@ -550,20 +543,16 @@ void gnrc_ndp_internal_send_rtr_adv(kernel_pid_t iface, ipv6_addr_t *src, ipv6_a
         cur_hl = ipv6_iface->cur_hl;
     }
     if (ipv6_iface->flags & GNRC_IPV6_NETIF_FLAGS_ADV_REACH_TIME) {
-        uint64_t tmp = timex_uint64(ipv6_iface->reach_time) / MS_IN_USEC;
 
-        if (tmp > (3600 * SEC_IN_MS)) { /* tmp > 1 hour */
-            tmp = (3600 * SEC_IN_MS);
+        if (ipv6_iface->reach_time > (3600 * SEC_IN_USEC)) { /* reach_time > 1 hour */
+            reach_time = (3600 * SEC_IN_MS);
         }
-
-        reach_time = (uint32_t)tmp;
+        else {
+            reach_time = ipv6_iface->reach_time / MS_IN_USEC;
+        }
     }
     if (ipv6_iface->flags & GNRC_IPV6_NETIF_FLAGS_ADV_RETRANS_TIMER) {
-        uint64_t tmp = timex_uint64(ipv6_iface->retrans_timer) / MS_IN_USEC;
-        if (tmp > UINT32_MAX) {
-            tmp = UINT32_MAX;
-        }
-        retrans_timer = (uint32_t)tmp;
+        retrans_timer = ipv6_iface->retrans_timer / MS_IN_USEC;
     }
     if (!fin) {
         adv_ltime = ipv6_iface->adv_ltime;

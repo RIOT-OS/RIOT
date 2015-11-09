@@ -20,7 +20,6 @@
 #include "net/gnrc/sixlowpan.h"
 #include "net/gnrc/sixlowpan/ctx.h"
 #include "random.h"
-#include "timex.h"
 
 #include "net/gnrc/sixlowpan/nd.h"
 
