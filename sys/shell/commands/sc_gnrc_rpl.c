@@ -159,13 +159,10 @@ int _gnrc_rpl_dodag_show(void)
         else {
             printf("[X]");
         }
-        if (i < (GNRC_RPL_INSTANCES_NUMOF - 1)) {
-            printf("\t");
-        }
-        else {
-            printf("\n");
-        }
+        putchar('\t');
     }
+
+    putchar('\n');
 
     printf("parent table:\t");
     for (uint8_t i = 0; i < GNRC_RPL_PARENTS_NUMOF; ++i) {
@@ -175,9 +172,7 @@ int _gnrc_rpl_dodag_show(void)
         else {
             printf("[X]");
         }
-        if (i < (GNRC_RPL_PARENTS_NUMOF - 1)) {
-            putchar('\t');
-        }
+        putchar('\t');
     }
     putchar('\n');
     putchar('\n');
