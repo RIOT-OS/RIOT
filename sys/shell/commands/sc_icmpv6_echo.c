@@ -29,7 +29,7 @@
 #include "net/gnrc.h"
 #include "thread.h"
 #include "utlist.h"
-#include "vtimer.h"
+#include "xtimer.h"
 
 static uint16_t id = 0x53;
 static uint16_t min_seq_expected = 0;
@@ -78,7 +78,7 @@ static inline bool _expected_seq(uint16_t seq)
     }
 }
 
-int _handle_reply(gnrc_pktsnip_t *pkt, uint64_t time)
+int _handle_reply(gnrc_pktsnip_t *pkt, uint32_t time)
 {
     gnrc_pktsnip_t *ipv6, *icmpv6;
     ipv6_hdr_t *ipv6_hdr;
@@ -102,13 +102,11 @@ int _handle_reply(gnrc_pktsnip_t *pkt, uint64_t time)
             min_seq_expected++;
         }
 
-        timex_t rt = timex_from_uint64(time);
         printf("%u bytes from %s: id=%" PRIu16 " seq=%" PRIu16 " hop limit=%" PRIu8
                " time = %" PRIu32 ".%03" PRIu32 " ms\n", (unsigned) icmpv6->size,
                ipv6_addr_to_str(ipv6_str, &(ipv6_hdr->src), sizeof(ipv6_str)),
                byteorder_ntohs(icmpv6_hdr->id), seq, ipv6_hdr->hl,
-               (rt.seconds * SEC_IN_MS) + (rt.microseconds / MS_IN_USEC),
-               rt.microseconds % MS_IN_USEC);
+               time / MS_IN_USEC, time % MS_IN_USEC);
         gnrc_ipv6_nc_still_reachable(&ipv6_hdr->src);
     }
     else {
@@ -119,38 +117,24 @@ int _handle_reply(gnrc_pktsnip_t *pkt, uint64_t time)
     return 1;
 }
 
-static inline void _a_to_timex(timex_t *delay, const char *a)
-{
-    int ms = atoi(a);
-
-    if (ms >= 0) {
-        delay->seconds = 0;
-        delay->microseconds = ms * 1000;
-        timex_normalize(delay);
-    }
-}
-
-static void _print_stats(char *addr_str, int success, int count, timex_t stop,
-                        timex_t sum_rtt, timex_t min_rtt, timex_t max_rtt)
+static void _print_stats(char *addr_str, int success, int count, uint64_t total_time,
+                         uint64_t sum_rtt, uint32_t min_rtt, uint32_t max_rtt)
 {
     printf("--- %s ping statistics ---\n", addr_str);
 
     if (success > 0) {
-        timex_normalize(&sum_rtt);
+        uint32_t avg_rtt = (uint32_t)sum_rtt / count;  /* get average */
         printf("%d packets transmitted, %d received, %d%% packet loss, time %"
-                PRIu32 ".06%" PRIu32 " s\n", count, success,
-                (100 - ((success * 100) / count)), stop.seconds, stop.microseconds);
-        timex_t avg_rtt = timex_from_uint64(timex_uint64(sum_rtt) / count);  /* get average */
+               PRIu32 ".06%" PRIu32 " s\n", count, success,
+               (100 - ((success * 100) / count)),
+               (uint32_t)total_time / SEC_IN_USEC, (uint32_t)total_time % SEC_IN_USEC);
         printf("rtt min/avg/max = "
-                "%" PRIu32 ".%03" PRIu32 "/"
-                "%" PRIu32 ".%03" PRIu32 "/"
-                "%" PRIu32 ".%03" PRIu32 " ms\n",
-                (min_rtt.seconds * SEC_IN_MS) + (min_rtt.microseconds / MS_IN_USEC),
-                min_rtt.microseconds % MS_IN_USEC,
-                (avg_rtt.seconds * SEC_IN_MS) + (avg_rtt.microseconds / MS_IN_USEC),
-                avg_rtt.microseconds % MS_IN_USEC,
-                (max_rtt.seconds * SEC_IN_MS) + (max_rtt.microseconds / MS_IN_USEC),
-                max_rtt.microseconds % MS_IN_USEC);
+               "%" PRIu32 ".%03" PRIu32 "/"
+               "%" PRIu32 ".%03" PRIu32 "/"
+               "%" PRIu32 ".%03" PRIu32 " ms\n",
+               min_rtt / MS_IN_USEC, min_rtt % MS_IN_USEC,
+               avg_rtt / MS_IN_USEC, avg_rtt % MS_IN_USEC,
+               max_rtt / MS_IN_USEC, max_rtt % MS_IN_USEC);
     }
     else {
         printf("%d packets transmitted, 0 received, 100%% packet loss\n", count);
@@ -161,16 +145,16 @@ int _icmpv6_ping(int argc, char **argv)
 {
     int count = 3, success = 0, remaining, stat_interval = 0, stat_counter = 0;
     size_t payload_len = 4;
-    timex_t delay = { 1, 0 };
+    uint32_t delay = 1 * SEC_IN_MS;
     char *addr_str;
     ipv6_addr_t addr;
     msg_t msg;
     gnrc_netreg_entry_t *ipv6_entry, my_entry = { NULL, ICMPV6_ECHO_REP,
                                                   thread_getpid()
                                                 };
-    timex_t min_rtt = { UINT32_MAX, UINT32_MAX }, max_rtt = { 0, 0 };
-    timex_t sum_rtt = { 0, 0 };
-    timex_t ping_start;
+    uint32_t min_rtt = UINT32_MAX, max_rtt = 0;
+    uint64_t sum_rtt = 0;
+    uint64_t ping_start;
     int param_offset = 0;
 
     if (argc < 2) {
@@ -196,7 +180,7 @@ int _icmpv6_ping(int argc, char **argv)
         payload_len = atoi(argv[2 + param_offset]);
     }
     if (argc > (3 + param_offset)) {
-        _a_to_timex(&delay, argv[3 + param_offset]);
+        delay = atoi(argv[3 + param_offset]);
     }
     if (argc > (4 + param_offset)) {
         stat_interval = atoi(argv[4 + param_offset]);
@@ -221,11 +205,11 @@ int _icmpv6_ping(int argc, char **argv)
 
     remaining = count;
 
-    vtimer_now(&ping_start);
+    ping_start = xtimer_now64();
 
     while ((remaining--) > 0) {
         gnrc_pktsnip_t *pkt;
-        timex_t start, stop, timeout = { 1, 0 };
+        uint32_t start, stop, timeout = 1 * SEC_IN_USEC;
 
         pkt = gnrc_icmpv6_echo_build(ICMPV6_ECHO_REQ, id, ++max_seq_expected,
                                      NULL, payload_len);
@@ -245,32 +229,32 @@ int _icmpv6_ping(int argc, char **argv)
             continue;
         }
 
-        vtimer_now(&start);
+        start = xtimer_now();
         if (gnrc_netapi_send(ipv6_entry->pid, pkt) < 1) {
             puts("error: unable to send ICMPv6 echo request\n");
             gnrc_pktbuf_release(pkt);
             continue;
         }
 
-        if (vtimer_msg_receive_timeout(&msg, timeout) >= 0) {
+        /* TODO: replace when #4219 was fixed */
+        if (xtimer_msg_receive_timeout64(&msg, (uint64_t)timeout) >= 0) {
             switch (msg.type) {
                 case GNRC_NETAPI_MSG_TYPE_RCV:
-                    vtimer_now(&stop);
-                    stop = timex_sub(stop, start);
+                    stop = xtimer_now() - start;
 
                     gnrc_pktsnip_t *pkt = (gnrc_pktsnip_t *)msg.content.ptr;
-                    success += _handle_reply(pkt, timex_uint64(stop));
+                    success += _handle_reply(pkt, stop);
                     gnrc_pktbuf_release(pkt);
 
-                    if (timex_cmp(stop, max_rtt) > 0) {
+                    if (stop > max_rtt) {
                         max_rtt = stop;
                     }
 
-                    if (timex_cmp(stop, min_rtt) < 1) {
+                    if (stop < min_rtt) {
                         min_rtt = stop;
                     }
 
-                    sum_rtt = timex_add(sum_rtt, stop);
+                    sum_rtt += stop;
 
                     break;
 
@@ -284,7 +268,7 @@ int _icmpv6_ping(int argc, char **argv)
             puts("ping timeout");
         }
 
-        while(msg_try_receive(&msg) > 0) {
+        while (msg_try_receive(&msg) > 0) {
             if (msg.type == GNRC_NETAPI_MSG_TYPE_RCV) {
                 printf("dropping additional response packet (probably caused by duplicates)\n");
                 gnrc_pktsnip_t *pkt = (gnrc_pktsnip_t *)msg.content.ptr;
@@ -293,12 +277,12 @@ int _icmpv6_ping(int argc, char **argv)
         }
 
         if (remaining > 0) {
-            vtimer_sleep(delay);
+            xtimer_usleep64(delay * MS_IN_USEC);
         }
         if ((++stat_counter == stat_interval) || (remaining == 0)) {
-            vtimer_now(&stop);
-            stop = timex_sub(stop, ping_start);
-            _print_stats(addr_str, success, (count - remaining), stop, sum_rtt, min_rtt, max_rtt);
+            uint64_t total_time = xtimer_now64() - ping_start;
+            _print_stats(addr_str, success, (count - remaining), total_time, sum_rtt, min_rtt,
+                         max_rtt);
             stat_counter = 0;
         }
 
@@ -308,7 +292,7 @@ int _icmpv6_ping(int argc, char **argv)
     id++;
 
     gnrc_netreg_unregister(GNRC_NETTYPE_ICMPV6, &my_entry);
-    while(msg_try_receive(&msg) > 0) {
+    while (msg_try_receive(&msg) > 0) {
         if (msg.type == GNRC_NETAPI_MSG_TYPE_RCV) {
             printf("dropping additional response packet (probably caused by duplicates)\n");
             gnrc_pktsnip_t *pkt = (gnrc_pktsnip_t *)msg.content.ptr;
