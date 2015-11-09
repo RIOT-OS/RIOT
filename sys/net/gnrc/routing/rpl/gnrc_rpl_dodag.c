@@ -232,12 +232,12 @@ void gnrc_rpl_local_repair(gnrc_rpl_dodag_t *dodag)
 void gnrc_rpl_parent_update(gnrc_rpl_dodag_t *dodag, gnrc_rpl_parent_t *parent)
 {
     uint16_t old_rank = dodag->my_rank;
-    uint64_t now = xtimer_now64();
+    uint32_t now = xtimer_now();
     ipv6_addr_t def = IPV6_ADDR_UNSPECIFIED;
 
     /* update Parent lifetime */
     if (parent != NULL) {
-        parent->lifetime = now + ((dodag->default_lifetime * dodag->lifetime_unit) * SEC_IN_USEC);
+        parent->lifetime = (now / SEC_IN_USEC) + ((dodag->default_lifetime * dodag->lifetime_unit));
         if (parent == dodag->parents) {
             ipv6_addr_t all_RPL_nodes = GNRC_RPL_ALL_NODES_ADDR;
             kernel_pid_t if_id;

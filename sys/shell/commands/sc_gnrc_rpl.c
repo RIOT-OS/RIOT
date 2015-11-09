@@ -212,10 +212,10 @@ int _gnrc_rpl_dodag_show(void)
 
         gnrc_rpl_parent_t *parent;
         LL_FOREACH(gnrc_rpl_instances[i].dodag.parents, parent) {
-            printf("\t\tparent [addr: %s | rank: %d | lifetime: %" PRIu64 "s]\n",
+            printf("\t\tparent [addr: %s | rank: %d | lifetime: %" PRIu32 "s]\n",
                     ipv6_addr_to_str(addr_str, &parent->addr, sizeof(addr_str)),
-                    parent->rank, ((int64_t) (parent->lifetime - xnow) < 0 ? 0
-                    : (parent->lifetime - xnow) / SEC_IN_USEC));
+                    parent->rank, ((int32_t) (parent->lifetime - (((uint32_t) xnow / SEC_IN_USEC))))
+                    < 0 ? 0 : (parent->lifetime - ((uint32_t) xnow / SEC_IN_USEC)));
         }
     }
     return 0;
