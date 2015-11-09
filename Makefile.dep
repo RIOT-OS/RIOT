@@ -180,7 +180,6 @@ endif
 ifneq (,$(filter gnrc_ndp,$(USEMODULE)))
   USEMODULE += gnrc_icmpv6
   USEMODULE += random
-  USEMODULE += timex
   USEMODULE += xtimer
 endif
 
