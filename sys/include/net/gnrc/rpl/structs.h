@@ -177,7 +177,7 @@ struct gnrc_rpl_parent {
     uint16_t rank;                  /**< rank of the parent */
     uint8_t dtsn;                   /**< last seen dtsn of this parent */
     gnrc_rpl_dodag_t *dodag;        /**< DODAG the parent belongs to */
-    uint64_t lifetime;              /**< lifetime of this parent */
+    uint32_t lifetime;              /**< lifetime of this parent in seconds */
     double  link_metric;            /**< metric of the link */
     uint8_t link_metric_type;       /**< type of the metric */
 };
