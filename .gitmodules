@@ -1,0 +1,3 @@
+[submodule "dist/tools/cc2538-bsl"]
+	path = dist/tools/cc2538-bsl
+	url = https://github.com/JelmerT/cc2538-bsl.git
