@@ -36,14 +36,14 @@ extern "C" {
  * @brief   Number of RPL instances
  */
 #ifndef GNRC_RPL_INSTANCES_NUMOF
-#define GNRC_RPL_INSTANCES_NUMOF (2)
+#define GNRC_RPL_INSTANCES_NUMOF (1)
 #endif
 
 /**
  * @brief   Number of RPL parents
  */
 #ifndef GNRC_RPL_PARENTS_NUMOF
-#define GNRC_RPL_PARENTS_NUMOF (6)
+#define GNRC_RPL_PARENTS_NUMOF (3)
 #endif
 
 /**
