@@ -474,8 +474,7 @@ static inline void _set_reach_time(gnrc_ipv6_netif_t *if_entry, uint32_t mean)
     /* to avoid floating point number computation and have higher value entropy, the
      * boundaries for the random value are multiplied by 10 and we need to account for that */
     reach_time = (reach_time * if_entry->reach_time_base) / 10;
-    if_entry->reach_time = timex_set(0, reach_time);
-    timex_normalize(&if_entry->reach_time);
+    if_entry->reach_time = reach_time;
 }
 
 void gnrc_ndp_rtr_adv_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt, ipv6_hdr_t *ipv6,

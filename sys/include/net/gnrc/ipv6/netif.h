@@ -331,7 +331,7 @@ typedef struct {
      *          gnrc_ipv6_netif_t::reach_time_base microseconds devided by 10.
      *          Can't be greater than 1 hour.
      */
-    timex_t reach_time;
+    uint32_t reach_time;
 
     /**
      * @brief   Time between retransmissions of neighbor solicitations to a

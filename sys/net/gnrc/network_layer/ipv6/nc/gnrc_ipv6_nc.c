@@ -243,9 +243,8 @@ gnrc_ipv6_nc_t *gnrc_ipv6_nc_still_reachable(const ipv6_addr_t *ipv6_addr)
         (gnrc_ipv6_nc_get_state(entry) != GNRC_IPV6_NC_STATE_UNMANAGED)) {
 #if defined(MODULE_GNRC_IPV6_NETIF) && defined(MODULE_VTIMER) && defined(MODULE_GNRC_IPV6)
         gnrc_ipv6_netif_t *iface = gnrc_ipv6_netif_get(entry->iface);
-        timex_t t = iface->reach_time;
 
-        gnrc_ndp_internal_reset_nbr_sol_timer(entry, (uint32_t) timex_uint64(t),
+        gnrc_ndp_internal_reset_nbr_sol_timer(entry, iface->reach_time,
                                               GNRC_NDP_MSG_NC_STATE_TIMEOUT, gnrc_ipv6_pid);
 #endif
 
