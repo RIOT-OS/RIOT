@@ -174,8 +174,8 @@ struct gnrc_rpl_parent {
     gnrc_rpl_parent_t *next;        /**< pointer to the next parent */
     uint8_t state;                  /**< 0 for unsued, 1 for used */
     ipv6_addr_t addr;               /**< link-local IPv6 address of this parent */
-    uint16_t rank;                  /**< rank of the parent */
     uint8_t dtsn;                   /**< last seen dtsn of this parent */
+    uint16_t rank;                  /**< rank of the parent */
     gnrc_rpl_dodag_t *dodag;        /**< DODAG the parent belongs to */
     uint32_t lifetime;              /**< lifetime of this parent in seconds */
     double  link_metric;            /**< metric of the link */
