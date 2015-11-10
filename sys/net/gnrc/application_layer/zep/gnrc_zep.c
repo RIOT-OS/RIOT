@@ -30,7 +30,6 @@
 #include "net/gnrc/udp.h"
 #include "periph/cpuid.h"
 #include "random.h"
-#include "vtimer.h"
 
 #include "net/gnrc/zep.h"
 
