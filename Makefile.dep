@@ -255,7 +255,7 @@ ifneq (,$(filter gnrc_nettest,$(USEMODULE)))
   USEMODULE += gnrc_netreg
   USEMODULE += gnrc_netif
   USEMODULE += gnrc_pktbuf
-  USEMODULE += vtimer
+  USEMODULE += xtimer
 endif
 
 ifneq (,$(filter gnrc_pktdump,$(USEMODULE)))

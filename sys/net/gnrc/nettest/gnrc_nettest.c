@@ -22,9 +22,8 @@
 #include "net/netopt.h"
 #include "net/gnrc/netreg.h"
 #include "net/gnrc/pktbuf.h"
-#include "timex.h"
 #include "thread.h"
-#include "vtimer.h"
+#include "xtimer.h"
 
 #include "net/gnrc/nettest.h"
 
@@ -55,14 +54,12 @@ static gnrc_nettest_res_t _pkt_test(uint16_t cmd_type, kernel_pid_t pid,
                                     const gnrc_pktsnip_t **exp_out)
 {
     msg_t msg;
-    timex_t t = { 0, GNRC_NETTEST_TIMEOUT };
     gnrc_nettest_res_t res = GNRC_NETTEST_SUCCESS;
 
     msg.type = cmd_type;
     msg.content.ptr = (char *)in;
 
     msg_send(&msg, pid);
-    timex_normalize(&t);
 
     if (exp_pkts == 0) {
         thread_yield();
@@ -72,7 +69,7 @@ static gnrc_nettest_res_t _pkt_test(uint16_t cmd_type, kernel_pid_t pid,
         gnrc_pktsnip_t *out;
         const gnrc_pktsnip_t *exp = exp_out[i];
 
-        if (vtimer_msg_receive_timeout(&msg, t) < 0) {
+        if (xtimer_msg_receive_timeout(&msg, GNRC_NETTEST_TIMEOUT) < 0) {
             return GNRC_NETTEST_TIMED_OUT;
         }
 
