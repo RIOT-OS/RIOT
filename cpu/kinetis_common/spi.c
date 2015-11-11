@@ -16,7 +16,6 @@
 #include "periph_conf.h"
 #include "thread.h"
 #include "sched.h"
-#include "vtimer.h"
 #include "mutex.h"
 
 #define ENABLE_DEBUG (0)
