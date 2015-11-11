@@ -51,6 +51,9 @@ typedef enum {
     NETOPT_SRC_LEN,             /**< get/set the address length to choose
                                  *   for the network device's source address
                                  *   as uint16_t in host byte order */
+    NETOPT_DST_LEN,             /**< get/set the address length to choose
+                                 *   for the network device's destination address
+                                 *   as uint16_t in host byte order */
     /**
      * @brief    get/set the network ID as uint16_t in host byte order
      *

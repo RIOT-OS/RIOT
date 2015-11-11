@@ -148,6 +148,7 @@ int _get(netdev2_t *dev, netopt_t opt, void *value, size_t max_len)
             break;
         case NETOPT_ADDR_LEN:
         case NETOPT_SRC_LEN:
+        case NETOPT_DST_LEN:
             assert(max_len == 2);
             uint16_t *tgt = (uint16_t*)value;
             *tgt=6;

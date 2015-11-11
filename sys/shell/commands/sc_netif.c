@@ -25,6 +25,7 @@
 #include <inttypes.h>
 
 #include "thread.h"
+#include "net/eui64.h"
 #include "net/ipv6/addr.h"
 #include "net/gnrc/ipv6/netif.h"
 #include "net/gnrc/netif.h"
@@ -88,6 +89,7 @@ static void _set_usage(char *cmd_name)
          "       * \"pan_id\" - alias for \"nid\"\n"
          "       * \"power\" - TX power in dBm\n"
          "       * \"src_len\" - sets the source address length in byte\n"
+         "       * \"dst_len\" - sets the destination address length in byte\n"
          "       * \"state\" - set the device state\n");
 }
 
@@ -131,6 +133,10 @@ static void _print_netopt(netopt_t opt)
 
         case NETOPT_SRC_LEN:
             printf("source address length");
+            break;
+
+        case NETOPT_DST_LEN:
+            printf("destination address length");
             break;
 
         case NETOPT_CHANNEL:
@@ -341,6 +347,12 @@ static void _netif_list(kernel_pid_t dev)
 
     if (res >= 0) {
         printf("Source address length: %" PRIu16 "\n           ", u16);
+    }
+
+    res = gnrc_netapi_get(dev, NETOPT_DST_LEN, 0, &u16, sizeof(u16));
+
+    if (res >= 0) {
+        printf("Destination address length: %" PRIu16 "\n           ", u16);
     }
 
 #ifdef MODULE_GNRC_IPV6_NETIF
@@ -570,7 +582,29 @@ static int _netif_set(char *cmd_name, kernel_pid_t dev, char *key, char *value)
         return _netif_set_i16(dev, NETOPT_TX_POWER, value);
     }
     else if (strcmp("src_len", key) == 0) {
-        return _netif_set_u16(dev, NETOPT_SRC_LEN, value);
+#ifdef MODULE_GNRC_IPV6_NETIF
+        /* remove old link-local address based on the old src_len */
+        eui64_t iid;
+        ipv6_addr_t addr;
+        if (gnrc_netapi_get(dev, NETOPT_IPV6_IID, 0, &iid, sizeof(eui64_t)) >= 0) {
+            ipv6_addr_set_aiid(&addr, iid.uint8);
+            ipv6_addr_set_link_local_prefix(&addr);
+            gnrc_ipv6_netif_remove_addr(dev, &addr);
+        }
+#endif
+        int res = _netif_set_u16(dev, NETOPT_SRC_LEN, value);
+#ifdef MODULE_GNRC_IPV6_NETIF
+        /* add an updated link-local address based on the new src_len */
+        if (gnrc_netapi_get(dev, NETOPT_IPV6_IID, 0, &iid, sizeof(eui64_t)) >= 0) {
+            ipv6_addr_set_aiid(&addr, iid.uint8);
+            ipv6_addr_set_link_local_prefix(&addr);
+            gnrc_ipv6_netif_add_addr(dev, &addr, 64, 0);
+        }
+#endif
+        return res;
+    }
+    else if (strcmp("dst_len", key) == 0) {
+        return _netif_set_u16(dev, NETOPT_DST_LEN, value);
     }
     else if (strcmp("state", key) == 0) {
         return _netif_set_state(dev, value);

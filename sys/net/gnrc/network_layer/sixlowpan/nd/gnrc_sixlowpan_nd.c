@@ -191,17 +191,25 @@ kernel_pid_t gnrc_sixlowpan_nd_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_
 #endif
         kernel_pid_t ifs[GNRC_NETIF_NUMOF];
         size_t ifnum = gnrc_netif_get(ifs);
-        /* we don't need address resolution, the EUI-64 is in next_hop's IID */
-        *l2addr_len = sizeof(eui64_t);
-        memcpy(l2addr, &next_hop->u8[8], sizeof(eui64_t));
-        _revert_iid(l2addr);
         if (iface == KERNEL_PID_UNDEF) {
             for (unsigned i = 0; i < ifnum; i++) {
                 gnrc_ipv6_netif_t *ipv6_if = gnrc_ipv6_netif_get(ifs[i]);
                 if ((ipv6_if != NULL) && (ipv6_if->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN)) {
                     /* always take the first 6LoWPAN interface we can find */
-                    return ifs[i];
+                    iface = ifs[i];
+                    break;
                 }
+            }
+        }
+        if (iface != KERNEL_PID_UNDEF) {
+            gnrc_netapi_get(iface, NETOPT_DST_LEN, 0, l2addr_len, sizeof(uint16_t));
+            /* we don't need address resolution, the EUI-64 is in next_hop's IID */
+            if (*l2addr_len == 8) {
+                memcpy(l2addr, &next_hop->u8[8], *l2addr_len);
+                _revert_iid(l2addr);
+            }
+            else {
+                memcpy(l2addr, &next_hop->u8[14], *l2addr_len);
             }
         }
         return iface;

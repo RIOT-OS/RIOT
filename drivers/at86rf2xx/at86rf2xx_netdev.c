@@ -405,6 +405,18 @@ static int _get(gnrc_netdev_t *device, netopt_t opt, void *val, size_t max_len)
             }
             return sizeof(uint16_t);
 
+        case NETOPT_DST_LEN:
+            if (max_len < sizeof(uint16_t)) {
+                return -EOVERFLOW;
+            }
+            if (dev->options & AT86RF2XX_OPT_DST_ADDR_LONG) {
+                *((uint16_t *)val) = 8;
+            }
+            else {
+                *((uint16_t *)val) = 2;
+            }
+            return sizeof(uint16_t);
+
         case NETOPT_NID:
             if (max_len < sizeof(uint16_t)) {
                 return -EOVERFLOW;
@@ -625,6 +637,26 @@ static int _set(gnrc_netdev_t *device, netopt_t opt, void *val, size_t len)
                 }
                 else if (*((uint16_t *)val) == 8) {
                     at86rf2xx_set_option(dev, AT86RF2XX_OPT_SRC_ADDR_LONG,
+                                         true);
+                }
+                else {
+                    res = -ENOTSUP;
+                    break;
+                }
+                res = sizeof(uint16_t);
+            }
+            break;
+
+        case NETOPT_DST_LEN:
+            if (len > sizeof(uint16_t)) {
+                res = -EOVERFLOW;
+            } else {
+                if (*((uint16_t *)val) == 2) {
+                    at86rf2xx_set_option(dev, AT86RF2XX_OPT_DST_ADDR_LONG,
+                                         false);
+                }
+                else if (*((uint16_t *)val) == 8) {
+                    at86rf2xx_set_option(dev, AT86RF2XX_OPT_DST_ADDR_LONG,
                                          true);
                 }
                 else {

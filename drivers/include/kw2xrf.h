@@ -96,6 +96,7 @@ extern "C" {
 #define KW2XRF_OPT_TELL_RX_END   (0x0080)  /**< notify MAC layer on RX finished */
 #define KW2XRF_OPT_RAWDUMP       (0x0100)  /**< pass RAW frame data to upper layer */
 #define KW2XRF_OPT_SRC_ADDR_LONG (0x0200)  /**< send data using long source address */
+#define KW2XRF_OPT_DST_ADDR_LONG (0x0400)  /**< send data using long destination address */
 #define KW2XRF_OPT_USE_SRC_PAN   (0x0400)  /**< do not compress source PAN ID */
 /** @} */
 

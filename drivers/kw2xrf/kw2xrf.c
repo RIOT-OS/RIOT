@@ -566,6 +566,20 @@ int kw2xrf_get(gnrc_netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
 
             return sizeof(uint16_t);
 
+        case NETOPT_DST_LEN:
+            if (max_len < sizeof(uint16_t)) {
+                return -EOVERFLOW;
+            }
+
+            if (dev->option & KW2XRF_OPT_DST_ADDR_LONG) {
+                *((uint16_t *)value) = 8;
+            }
+            else {
+                *((uint16_t *)value) = 2;
+            }
+
+            return sizeof(uint16_t);
+
         case NETOPT_NID:
             if (max_len < sizeof(uint16_t)) {
                 return -EOVERFLOW;
@@ -765,6 +779,25 @@ int kw2xrf_set(gnrc_netdev_t *netdev, netopt_t opt, void *value, size_t value_le
             }
 
             return sizeof(uint16_t);
+
+        case NETOPT_DST_LEN:
+            if (len > sizeof(uint16_t)) {
+                res = -EOVERFLOW;
+            } else {
+                if (*((uint16_t *)val) == 2) {
+                    kw2xrf_set_option(dev, KW2XRF_OPT_DST_ADDR_LONG, false);
+                }
+                else if (*((uint16_t *)val) == 8) {
+                    kw2xrf_set_option(dev, KW2XRF_OPT_DST_ADDR_LONG, true);
+                }
+                else {
+                    res = -ENOTSUP;
+                    break;
+                }
+                res = sizeof(uint16_t);
+            }
+            break;
+
 
         case NETOPT_NID:
             if (value_len > sizeof(uint16_t)) {

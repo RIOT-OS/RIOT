@@ -30,6 +30,7 @@ static const char *_netopt_strmap[] = {
     [NETOPT_ADDRESS_LONG]    = "NETOPT_ADDRESS_LONG",
     [NETOPT_ADDR_LEN]        = "NETOPT_ADDR_LEN",
     [NETOPT_SRC_LEN]         = "NETOPT_SRC_LEN",
+    [NETOPT_DST_LEN]         = "NETOPT_DST_LEN",
     [NETOPT_NID]             = "NETOPT_NID",
     [NETOPT_IPV6_IID]        = "NETOPT_IPV6_IID",
     [NETOPT_TX_POWER]        = "NETOPT_TX_POWER",
