@@ -222,7 +222,7 @@ void gnrc_rpl_send_DIO(gnrc_rpl_instance_t *inst, ipv6_addr_t *destination)
     gnrc_rpl_send(pkt, dodag->iface, NULL, destination, &dodag->dodag_id);
 }
 
-void gnrc_rpl_send_DIS(gnrc_rpl_instance_t *inst, ipv6_addr_t *destination)
+void gnrc_rpl_send_DIS(gnrc_rpl_instance_t *inst, ipv6_addr_t *destination, uint8_t flags)
 {
     gnrc_pktsnip_t *pkt;
     icmpv6_hdr_t *icmp;
@@ -244,7 +244,13 @@ void gnrc_rpl_send_DIS(gnrc_rpl_instance_t *inst, ipv6_addr_t *destination)
 
     icmp = (icmpv6_hdr_t *)pkt->data;
     dis = (gnrc_rpl_dis_t *)(icmp + 1);
+
     dis->flags = 0;
+
+    if (ipv6_addr_is_multicast(destination)) {
+        dis->flags = flags;
+    }
+
     dis->reserved = 0;
 
     /* TODO add padding may be removed if packet size grows */
@@ -276,6 +282,8 @@ void gnrc_rpl_recv_DIS(gnrc_rpl_dis_t *dis, kernel_pid_t iface, ipv6_addr_t *src
         return;
     }
 
+    ipv6_addr_t all_RPL_nodes = GNRC_RPL_ALL_NODES_ADDR;
+
     if (ipv6_addr_is_multicast(dst)) {
         for (uint8_t i = 0; i < GNRC_RPL_INSTANCES_NUMOF; ++i) {
             if ((gnrc_rpl_instances[i].state != 0)
@@ -287,7 +295,19 @@ void gnrc_rpl_recv_DIS(gnrc_rpl_dis_t *dis, kernel_pid_t iface, ipv6_addr_t *src
                     continue;
                 }
 #endif
-                trickle_reset_timer(&(gnrc_rpl_instances[i].dodag.trickle));
+                if (dis->flags & GNRC_RPL_DIS_N) {
+                    if (dis->flags & GNRC_RPL_DIS_T) {
+                        gnrc_rpl_instances[i].dodag.dio_opts |= GNRC_RPL_REQ_DIO_OPT_DODAG_CONF;
+                        gnrc_rpl_send_DIO(&gnrc_rpl_instances[i], src);
+                    }
+                    else {
+                        gnrc_rpl_instances[i].dodag.dio_opts |= GNRC_RPL_REQ_DIO_OPT_DODAG_CONF;
+                        gnrc_rpl_send_DIO(&gnrc_rpl_instances[i], &all_RPL_nodes);
+                    }
+                }
+                else {
+                    trickle_reset_timer(&(gnrc_rpl_instances[i].dodag.trickle));
+                }
             }
         }
     }
@@ -605,7 +625,7 @@ void gnrc_rpl_recv_DIO(gnrc_rpl_dio_t *dio, kernel_pid_t iface, ipv6_addr_t *src
 #ifndef GNRC_RPL_DODAG_CONF_OPTIONAL_ON_JOIN
             DEBUG("RPL: DIO without DODAG_CONF option - remove DODAG and request new DIO\n");
             gnrc_rpl_instance_remove(inst);
-            gnrc_rpl_send_DIS(NULL, src);
+            gnrc_rpl_send_DIS(NULL, src, 0);
             return;
 #else
             DEBUG("RPL: DIO without DODAG_CONF option - use default trickle parameters\n");

@@ -99,7 +99,7 @@ typedef struct __attribute__((packed)) {
  *      </a>
  */
 typedef struct __attribute__((packed)) {
-    uint8_t flags;      /**< unused */
+    uint8_t flags;      /**< see @ref GNRC_RPL_DIS_FLAGS */
     uint8_t reserved;   /**< reserved */
 } gnrc_rpl_dis_t;
 

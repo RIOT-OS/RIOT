@@ -382,6 +382,21 @@ static inline bool GNRC_RPL_COUNTER_GREATER_THAN(uint8_t A, uint8_t B)
 /** @} */
 
 /**
+ * @anchor  GNRC_RPL_DIS_FLAGS
+ * @name    DIS Flags
+ * @see     <a href="https://tools.ietf.org/html/rfc6550#section-6.2.1">
+ *              RFC 6550, section 6.2.1, Format of the DIS Base Object
+ *          </a>
+ * @see     <a href="https://tools.ietf.org/html/draft-zhong-roll-dis-modifications-00">
+ *              DIS Modifications, draft-zhong-roll-dis-modifications-00
+ *          </a>
+ * @{
+ */
+#define GNRC_RPL_DIS_N                      (1 << 1)
+#define GNRC_RPL_DIS_T                      (1 << 0)
+/**  @} */
+
+/**
  * @brief PID of the RPL thread.
  */
 extern kernel_pid_t gnrc_rpl_pid;
@@ -430,8 +445,9 @@ void gnrc_rpl_send_DIO(gnrc_rpl_instance_t *instance, ipv6_addr_t *destination);
  *
  * @param[in] instance          Pointer to the RPL instance, optional.
  * @param[in] destination       IPv6 addres of the destination.
+ * @param[in] flags             Flags of the DIS message
  */
-void gnrc_rpl_send_DIS(gnrc_rpl_instance_t *instance, ipv6_addr_t *destination);
+void gnrc_rpl_send_DIS(gnrc_rpl_instance_t *instance, ipv6_addr_t *destination, uint8_t flags);
 
 /**
  * @brief   Send a DAO of the @p dodag to the @p destination.
