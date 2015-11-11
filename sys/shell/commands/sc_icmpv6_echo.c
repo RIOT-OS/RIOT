@@ -161,11 +161,7 @@ int _icmpv6_ping(int argc, char **argv)
         usage(argv);
         return 1;
     }
-    else if ((count = atoi(argv[1])) > 0) {
-        if (argc < 3) {
-            usage(argv);
-            return 1;
-        }
+    else if ((argc > 2) &&  ((count = atoi(argv[1])) > 0)) {
         param_offset = 1;
     }
     else {
