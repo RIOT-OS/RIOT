@@ -98,9 +98,9 @@ int main() {
     condition_variable cv;
     timex_t before, after;
     unique_lock<mutex> lk(m);
-    vtimer_now(&before);
+    xtimer_now_timex(&before);
     cv.wait_for(lk, chrono::seconds(timeout));
-    vtimer_now(&after);
+    xtimer_now_timex(&after);
     auto diff = timex_sub(after, before);
     assert(diff.seconds >= timeout);
   }
@@ -114,10 +114,10 @@ int main() {
     condition_variable cv;
     timex_t before, after;
     unique_lock<mutex> lk(m);
-    vtimer_now(&before);
+    xtimer_now_timex(&before);
     auto time = riot::now() += chrono::seconds(timeout);
     cv.wait_until(lk, time);
-    vtimer_now(&after);
+    xtimer_now_timex(&after);
     auto diff = timex_sub(after, before);
     assert(diff.seconds >= timeout);
   }
