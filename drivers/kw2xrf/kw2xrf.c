@@ -364,6 +364,11 @@ int kw2xrf_set_addr(kw2xrf_t *dev, uint16_t addr)
     val_ar[1] = (uint8_t)addr;
     dev->addr_short[0] = val_ar[0];
     dev->addr_short[1] = val_ar[1];
+#ifdef MODULE_SIXLOWPAN
+    /* https://tools.ietf.org/html/rfc4944#section-12 requires the first bit to
+     * 0 for unicast addresses */
+    dev->addr_short[1] &= 0x7F;
+#endif
     kw2xrf_write_iregs(MKW2XDMI_MACSHORTADDRS0_LSB, val_ar, 2);
     return sizeof(uint16_t);
 }
