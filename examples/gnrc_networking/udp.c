@@ -27,7 +27,7 @@
 #include "net/gnrc/udp.h"
 #include "net/gnrc/pktdump.h"
 #include "timex.h"
-#include "vtimer.h"
+#include "xtimer.h"
 
 static gnrc_netreg_entry_t server = { NULL, GNRC_NETREG_DEMUX_CTX_ALL, KERNEL_PID_UNDEF };
 
@@ -83,7 +83,7 @@ static void send(char *addr_str, char *port_str, char *data, unsigned int num,
         }
         printf("Success: send %u byte to [%s]:%u\n", (unsigned)payload->size,
                addr_str, tmp);
-        vtimer_usleep(delay);
+        xtimer_usleep(delay);
     }
 }
 
