@@ -65,16 +65,26 @@ int sema_destroy(sema_t *sema)
 
 int sema_wait_timed_msg(sema_t *sema, uint64_t timeout, msg_t *msg)
 {
+    unsigned old_state;
+    msg_t timeout_msg;
+    xtimer_t timeout_timer;
     if (sema == NULL) {
         return -EINVAL;
     }
+    if (timeout != 0) {
+        old_state = disableIRQ();
+        timeout_msg.type = MSG_TIMEOUT;
+        timeout_msg.content.ptr = (char *)sema;
+        /* we will stay in the same stack context so we can use timeout_msg */
+        xtimer_set_msg64(&timeout_timer, timeout, &timeout_msg, sched_active_pid);
+        restoreIRQ(old_state);
+    }
     while (1) {
-        unsigned old_state = disableIRQ();
         priority_queue_node_t n;
-        xtimer_t timeout_timer;
-        msg_t timeout_msg;
+        unsigned value;
 
-        unsigned value = sema->value;
+        old_state = disableIRQ();
+        value = sema->value;
         if (value != 0) {
             sema->value = value - 1;
             restoreIRQ(old_state);
@@ -89,13 +99,6 @@ int sema_wait_timed_msg(sema_t *sema, uint64_t timeout, msg_t *msg)
 
         DEBUG("sema_wait: %" PRIkernel_pid ": Adding node to semaphore queue: prio: %" PRIu32 "\n",
               sched_active_thread->pid, sched_active_thread->priority);
-
-        if (timeout != 0) {
-            timeout_msg.type = MSG_TIMEOUT;
-            timeout_msg.content.ptr = (char *)sema;
-            /* we will stay in the same stack context so we can use timeout_msg */
-            xtimer_set_msg64(&timeout_timer, timeout, &timeout_msg, sched_active_pid);
-        }
 
         restoreIRQ(old_state);
         msg_receive(msg);
