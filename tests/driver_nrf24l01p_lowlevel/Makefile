@@ -4,7 +4,7 @@ include ../Makefile.tests_common
 USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += ps
-USEMODULE += vtimer
+USEMODULE += xtimer
 USEMODULE += nrf24l01p
 
 FEATURES_REQUIRED = periph_spi
