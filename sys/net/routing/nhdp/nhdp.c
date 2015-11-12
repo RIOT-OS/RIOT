@@ -18,13 +18,15 @@
  * @}
  */
 
-#include "conn/udp.h"
+#include "net/gnrc/conn.h"
+#include "net/conn/udp.h"
 #include "msg.h"
-#include "netapi.h"
+#include "net/gnrc/netapi.h"
 #include "net/gnrc/netif.h"
 #include "thread.h"
 #include "utlist.h"
 #include "mutex.h"
+#include "net/ipv6/addr.h"
 
 #include "rfc5444/rfc5444_writer.h"
 
