@@ -220,13 +220,9 @@ void at86rf2xx_tx_prepare(at86rf2xx_t *dev)
     do {
         state = at86rf2xx_get_status(dev);
     }
-    while (state == AT86RF2XX_STATE_BUSY_TX_ARET);
-
-    /* if receiving cancel */
-    if(state == AT86RF2XX_STATE_BUSY_RX_AACK) {
-        at86rf2xx_force_trx_off(dev);
-        dev->idle_state = AT86RF2XX_STATE_RX_AACK_ON;
-    } else if (state != AT86RF2XX_STATE_TX_ARET_ON) {
+    while (state == AT86RF2XX_STATE_BUSY_RX_AACK ||
+           state == AT86RF2XX_STATE_BUSY_TX_ARET);
+    if (state != AT86RF2XX_STATE_TX_ARET_ON) {
         dev->idle_state = state;
     }
     at86rf2xx_set_state(dev, AT86RF2XX_STATE_TX_ARET_ON);
