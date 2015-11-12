@@ -21,6 +21,7 @@
 #ifndef NHDP_H_
 #define NHDP_H_
 
+#include "xtimer.h"
 #include "timex.h"
 #include "kernel_types.h"
 
@@ -89,8 +90,9 @@ extern "C" {
  */
 typedef struct nhdp_if_entry_t {
     kernel_pid_t if_pid;                        /**< PID of the interface's handling thread */
-    vtimer_t if_timer;                          /**< Vtimer used for the periodic signaling */
-    timex_t hello_interval;                     /**< Interval time for periodic HELLOs */
+    xtimer_t if_timer;                          /**< xtimer used for the periodic signaling */
+    msg_t if_timer_msg;                         /**< msg_t for nhdp_if_entry_t::if_timer */
+    uint32_t hello_interval;                    /**< Interval time for periodic HELLOs in us */
     timex_t validity_time;                      /**< Validity time for propagated information */
     uint16_t seq_no;                            /**< Sequence number of last send RFC5444 packet */
     struct rfc5444_writer_target wr_target;     /**< Interface specific writer target */

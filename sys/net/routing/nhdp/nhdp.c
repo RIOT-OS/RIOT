@@ -176,11 +176,9 @@ int nhdp_register_if(kernel_pid_t if_pid, uint8_t *addr, size_t addr_size, uint8
     /* Set Interface's PID */
     if_entry->if_pid = if_pid;
     /* Set HELLO_INTERVAL and H_HOLD_TIME (validity time) */
-    if_entry->hello_interval.seconds = 0;
-    if_entry->hello_interval.microseconds = MS_IN_USEC * hello_int_ms;
+    if_entry->hello_interval = MS_IN_USEC * hello_int_ms;
     if_entry->validity_time.seconds = 0;
     if_entry->validity_time.microseconds = MS_IN_USEC * val_time_ms;
-    timex_normalize(&if_entry->hello_interval);
     timex_normalize(&if_entry->validity_time);
     /* Reset sequence number */
     if_entry->seq_no = 0;
@@ -255,8 +253,10 @@ static void *_nhdp_runner(void *arg)
                 /* TODO: Add jitter */
 
                 /* Schedule next sending */
-                vtimer_set_msg(&if_entry->if_timer, if_entry->hello_interval,
-                               thread_getpid(), MSG_TIMER, (void *) if_entry);
+                if_entry->if_timer_msg.type = NHDP_MSG_TIMER;
+                if_entry->if_timer_msg.content.ptr = (char *) if_entry;
+                xtimer_set_msg(&if_entry->if_timer, if_entry->hello_interval,
+                               &if_entry->if_timer_msg, thread_getpid());
                 mutex_unlock(&send_rcv_mutex);
                 break;
 
