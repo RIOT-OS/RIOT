@@ -304,9 +304,10 @@ static void *_nhdp_receiver(void *arg __attribute__((unused)))
     while (1) {
         ipv6_addr_t rcv_addr;
         uint16_t rcv_port;
+        size_t addr_len = sizeof(rcv_addr);
         int32_t rcv_size = conn_udp_recvfrom(&conn, (void *)nhdp_rcv_buf,
                                              NHDP_MAX_RFC5444_PACKET_SZ, &rcv_addr,
-                                             sizeof(rcv_addr), &rcv_port);
+                                             &addr_len, &rcv_port);
 
         if (rcv_size > 0) {
             /* Packet received, let the reader handle it */
