@@ -286,7 +286,6 @@ static void *_nhdp_runner(void *arg)
  */
 static void *_nhdp_receiver(void *arg __attribute__((unused)))
 {
-    uint32_t fromlen;
     char nhdp_rcv_buf[NHDP_MAX_RFC5444_PACKET_SZ];
     msg_t msg_q[NHDP_MSG_QUEUE_SIZE];
 
