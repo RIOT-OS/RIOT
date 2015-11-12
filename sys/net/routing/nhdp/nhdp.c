@@ -52,8 +52,9 @@ static mutex_t send_rcv_mutex = MUTEX_INIT;
 static conn_udp_t conn;
 
 #if (NHDP_METRIC_NEEDS_TIMER)
-static vtimer_t metric_timer;
-static timex_t metric_interval;
+static xtimer_t metric_timer;
+static uint32_t metric_interval;
+static msg_t metric_msg = { .type = NHDP_METRIC_TIMER };
 #endif
 
 /* Internal function prototypes */
@@ -97,8 +98,8 @@ kernel_pid_t nhdp_start(void)
 #if (NHDP_METRIC_NEEDS_TIMER)
         /* Configure periodic timer message to refresh metric values */
         if (nhdp_pid != KERNEL_PID_UNDEF) {
-            metric_interval = timex_from_uint64(DAT_REFRESH_INTERVAL * SEC_IN_USEC);
-            vtimer_set_msg(&metric_timer, metric_interval, nhdp_pid, NHDP_METRIC_TIMER, NULL);
+            metric_interval = DAT_REFRESH_INTERVAL * SEC_IN_USEC;
+            xtimer_set_msg(&metric_timer, metric_interval, &metric_msg, nhdp_pid);
         }
 #endif
     }
@@ -194,7 +195,7 @@ int nhdp_register_if(kernel_pid_t if_pid, uint8_t *addr, size_t addr_size, uint8
                                  CREATE_STACKTEST, _nhdp_receiver, NULL, "nhdp_rcv_thread");
 
     /* Start sending periodic HELLO */
-    signal_msg.type = MSG_TIMER;
+    signal_msg.type = NHDP_MSG_TIMER;
     signal_msg.content.ptr = (char *) if_entry;
     /* TODO: msg_send or msg_try_send? */
     msg_try_send(&signal_msg, nhdp_pid);
@@ -245,7 +246,7 @@ static void *_nhdp_runner(void *arg)
         msg_receive(&msg_rcvd);
 
         switch (msg_rcvd.type) {
-            case MSG_TIMER:
+            case NHDP_MSG_TIMER:
                 mutex_lock(&send_rcv_mutex);
                 if_entry = (nhdp_if_entry_t *) msg_rcvd.content.ptr;
 
@@ -266,8 +267,7 @@ static void *_nhdp_runner(void *arg)
                 iib_process_metric_refresh();
 
                 /* Schedule next sending */
-                vtimer_set_msg(&metric_timer, metric_interval,
-                               thread_getpid(), NHDP_METRIC_TIMER, NULL);
+                xtimer_set_msg(&metric_timer, metric_interval, &metric_msg, thread_getpid());
                 mutex_unlock(&send_rcv_mutex);
                 break;
 #endif
