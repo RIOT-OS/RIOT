@@ -317,7 +317,7 @@ static void *_nhdp_receiver(void *arg __attribute__((unused)))
         }
     }
 
-    gnrc_udp_close(&conn);
+    conn_udp_close(&conn);
     return 0;
 }
 
