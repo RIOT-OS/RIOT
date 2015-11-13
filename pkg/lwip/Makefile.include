@@ -4,3 +4,6 @@ INCLUDES += -I$(RIOTBASE)/pkg/lwip/include \
 ifneq (,$(filter lwip_contrib,$(USEMODULE)))
   DIRS += $(RIOTBASE)/pkg/lwip/contrib
 endif
+ifneq (,$(filter lwip_netdev2,$(USEMODULE)))
+  DIRS += $(RIOTBASE)/pkg/lwip/contrib/netdev2
+endif
