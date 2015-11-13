@@ -56,6 +56,7 @@ extern "C" {
 #define AT86RF231_INT       GPIO_PIN(PORT_C,2)
 #define AT86RF231_RESET     GPIO_PIN(PORT_C,1)
 #define AT86RF231_SLEEP     GPIO_PIN(PORT_A,0)
+#define AT86RF231_SPI_CLK   SPI_SPEED_5MHZ
 /** @} */
 
 /**
