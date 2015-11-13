@@ -45,6 +45,11 @@ static mutex_t _mutex = MUTEX_INIT;
 static uint8_t _pktbuf[GNRC_PKTBUF_SIZE];
 static _unused_t *_first_unused;
 
+#ifdef DEVELHELP
+/* maximum number of bytes allocated */
+static uint16_t max_byte_count = 0;
+#endif
+
 /* internal gnrc_pktbuf functions */
 static gnrc_pktsnip_t *_create_snip(gnrc_pktsnip_t *next, void *data, size_t size,
                                     gnrc_nettype_t type);
@@ -296,6 +301,7 @@ void gnrc_pktbuf_stats(void)
 
     printf("packet buffer: first byte: %p, last byte: %p (size: %u)\n",
            (void *)&_pktbuf[0], (void *)&_pktbuf[GNRC_PKTBUF_SIZE], GNRC_PKTBUF_SIZE);
+    printf("  position of last byte used: %" PRIu16 "\n", max_byte_count);
     if (ptr == NULL) {  /* packet buffer is completely full */
         _print_chunk(chunk, GNRC_PKTBUF_SIZE, count++);
     }
@@ -424,6 +430,12 @@ static void *_pktbuf_alloc(size_t size)
         new->next = ptr->next;
         new->size = ptr->size - size;
     }
+#ifdef DEVELHELP
+    uint16_t last_byte = (uint16_t)((((uint8_t *)ptr) + size) - &(_pktbuf[0]));
+    if (last_byte > max_byte_count) {
+        max_byte_count = last_byte;
+    }
+#endif
     return (void *)ptr;
 }
 
