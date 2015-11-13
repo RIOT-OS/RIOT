@@ -41,6 +41,8 @@
 #include "net/gnrc/pktdump.h"
 #include "net/gnrc.h"
 
+#define MSG_QUEUE_SIZE 1
+msg_t msgq[MSG_QUEUE_SIZE];
 
 int main(void)
 {
@@ -59,6 +61,7 @@ int main(void)
 //    dump.demux_ctx = GNRC_NETREG_DEMUX_CTX_ALL;
 //    gnrc_netreg_register(GNRC_NETTYPE_UNDEF, &dump);
 
+    msg_init_queue(msgq, MSG_QUEUE_SIZE);
 
     (void) puts("Welcome to RIOT!");
 
