@@ -40,6 +40,16 @@ typedef uint32_t gpio_t;
     PORT_F = 5,       /**< port F */
   };
 
+/**
+ * @brief declare needed generic SPI functions
+ * @{
+ */
+#define PERIPH_SPI_NEEDS_TRANSFER_BYTES
+#define PERIPH_SPI_NEEDS_TRANSFER_REG
+#define PERIPH_SPI_NEEDS_TRANSFER_REGS
+/** @} */
+
+  
 #ifdef __cplusplus
 }
 #endif
