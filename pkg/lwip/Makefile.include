@@ -1,2 +1,6 @@
 INCLUDES += -I$(RIOTBASE)/pkg/lwip/include \
             -I$(BINDIRBASE)/pkg/$(BOARD)/lwip/src/include
+
+ifneq (,$(filter lwip_contrib,$(USEMODULE)))
+  DIRS += $(RIOTBASE)/pkg/lwip/contrib
+endif

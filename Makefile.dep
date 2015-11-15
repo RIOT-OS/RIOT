@@ -356,7 +356,12 @@ endif
 
 ifneq (,$(filter lwip,$(USEMODULE)))
   USEPKG += lwip
+  USEMODULE += lwip_contrib
   USEMODULE += lwip_core
+endif
+
+ifneq (,$(filter lwip_contrib,$(USEMODULE)))
+  USEMODULE += sema
 endif
 
 ifneq (,$(filter sema,$(USEMODULE)))
