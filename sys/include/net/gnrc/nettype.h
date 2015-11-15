@@ -119,6 +119,10 @@ static inline gnrc_nettype_t gnrc_nettype_from_ethertype(uint16_t type)
         case ETHERTYPE_IPV6:
             return GNRC_NETTYPE_IPV6;
 #endif
+#ifdef MODULE_CCN_LITE
+        case ETHERTYPE_NDN:
+            return GNRC_NETTYPE_CCN;
+#endif
         default:
             return GNRC_NETTYPE_UNDEF;
     }
@@ -141,6 +145,10 @@ static inline uint16_t gnrc_nettype_to_ethertype(gnrc_nettype_t type)
 #ifdef MODULE_GNRC_IPV6
         case GNRC_NETTYPE_IPV6:
             return ETHERTYPE_IPV6;
+#endif
+#ifdef MODULE_CCN_LITE
+        case GNRC_NETTYPE_CCN:
+            return ETHERTYPE_NDN;
 #endif
         default:
             return ETHERTYPE_UNKNOWN;
