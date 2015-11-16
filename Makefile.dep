@@ -178,6 +178,12 @@ ifneq (,$(filter gnrc_ndp_%,$(USEMODULE)))
 endif
 
 ifneq (,$(filter gnrc_ndp,$(USEMODULE)))
+  ifneq (,$(filter gnrc_sixlowpan,$(USEMODULE)))
+    USEMODULE += gnrc_sixlowpan_nd
+  else
+    USEMODULE += gnrc_ndp_node
+  endif
+  USEMODULE += gnrc_ndp_internal
   USEMODULE += gnrc_icmpv6
   USEMODULE += random
   USEMODULE += xtimer
