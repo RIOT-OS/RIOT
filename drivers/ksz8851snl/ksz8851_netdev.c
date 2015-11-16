@@ -31,7 +31,7 @@
 #include "net/eui64.h"
 #include "net/ethernet.h"
 
-#define ENABLE_DEBUG (1)
+#define ENABLE_DEBUG (0)
 #include "debug.h"
 
 #define SECT_NAME "[KSZ8851 Driver]:"
