@@ -131,6 +131,7 @@ static void _api_at_cmd(xbee_t *dev, uint8_t *cmd, uint8_t size, resp_t *resp)
     if (resp->data_len > 0) {
         memcpy(resp->data, &(dev->resp_buf[4]), resp->data_len);
     }
+    mutex_unlock(&(dev->tx_lock));
 }
 
 /*
@@ -569,6 +570,8 @@ static int _send(gnrc_netdev_t *netdev, gnrc_pktsnip_t *pkt)
     uart_write(dev->uart, dev->tx_buf, pos + 1);
     /* release data */
     gnrc_pktbuf_release(pkt);
+    /* release TX lock */
+    mutex_unlock(&(dev->tx_lock));
     /* return number of payload byte */
     return (int)size;
 }
