@@ -45,6 +45,10 @@ extern "C" {
 
 /** @brief Randomly chosen number for NHDP's metric timer event */
 #define NHDP_METRIC_TIMER           (5445)
+
+/** @brief Randomly chosen number for NHDP's sending timer event */
+#define NHDP_MSG_TIMER              (5446)
+
 /** @brief Macro controlling the start of a periodic timer event for matric computation */
 #define NHDP_METRIC_NEEDS_TIMER     (NHDP_METRIC == NHDP_LMT_DAT)
 

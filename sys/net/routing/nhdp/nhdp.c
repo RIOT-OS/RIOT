@@ -18,13 +18,15 @@
  * @}
  */
 
-#include "conn/udp.h"
+#include "net/gnrc/conn.h"
+#include "net/conn/udp.h"
 #include "msg.h"
-#include "netapi.h"
+#include "net/gnrc/netapi.h"
 #include "net/gnrc/netif.h"
 #include "thread.h"
 #include "utlist.h"
 #include "mutex.h"
+#include "net/ipv6/addr.h"
 
 #include "rfc5444/rfc5444_writer.h"
 
@@ -52,8 +54,9 @@ static mutex_t send_rcv_mutex = MUTEX_INIT;
 static conn_udp_t conn;
 
 #if (NHDP_METRIC_NEEDS_TIMER)
-static vtimer_t metric_timer;
-static timex_t metric_interval;
+static xtimer_t metric_timer;
+static uint32_t metric_interval;
+static msg_t metric_msg = { .type = NHDP_METRIC_TIMER };
 #endif
 
 /* Internal function prototypes */
@@ -97,8 +100,8 @@ kernel_pid_t nhdp_start(void)
 #if (NHDP_METRIC_NEEDS_TIMER)
         /* Configure periodic timer message to refresh metric values */
         if (nhdp_pid != KERNEL_PID_UNDEF) {
-            metric_interval = timex_from_uint64(DAT_REFRESH_INTERVAL * SEC_IN_USEC);
-            vtimer_set_msg(&metric_timer, metric_interval, nhdp_pid, NHDP_METRIC_TIMER, NULL);
+            metric_interval = DAT_REFRESH_INTERVAL * SEC_IN_USEC;
+            xtimer_set_msg(&metric_timer, metric_interval, &metric_msg, nhdp_pid);
         }
 #endif
     }
@@ -175,11 +178,9 @@ int nhdp_register_if(kernel_pid_t if_pid, uint8_t *addr, size_t addr_size, uint8
     /* Set Interface's PID */
     if_entry->if_pid = if_pid;
     /* Set HELLO_INTERVAL and H_HOLD_TIME (validity time) */
-    if_entry->hello_interval.seconds = 0;
-    if_entry->hello_interval.microseconds = MS_IN_USEC * hello_int_ms;
+    if_entry->hello_interval = MS_IN_USEC * hello_int_ms;
     if_entry->validity_time.seconds = 0;
     if_entry->validity_time.microseconds = MS_IN_USEC * val_time_ms;
-    timex_normalize(&if_entry->hello_interval);
     timex_normalize(&if_entry->validity_time);
     /* Reset sequence number */
     if_entry->seq_no = 0;
@@ -194,7 +195,7 @@ int nhdp_register_if(kernel_pid_t if_pid, uint8_t *addr, size_t addr_size, uint8
                                  CREATE_STACKTEST, _nhdp_receiver, NULL, "nhdp_rcv_thread");
 
     /* Start sending periodic HELLO */
-    signal_msg.type = MSG_TIMER;
+    signal_msg.type = NHDP_MSG_TIMER;
     signal_msg.content.ptr = (char *) if_entry;
     /* TODO: msg_send or msg_try_send? */
     msg_try_send(&signal_msg, nhdp_pid);
@@ -245,7 +246,7 @@ static void *_nhdp_runner(void *arg)
         msg_receive(&msg_rcvd);
 
         switch (msg_rcvd.type) {
-            case MSG_TIMER:
+            case NHDP_MSG_TIMER:
                 mutex_lock(&send_rcv_mutex);
                 if_entry = (nhdp_if_entry_t *) msg_rcvd.content.ptr;
 
@@ -254,8 +255,10 @@ static void *_nhdp_runner(void *arg)
                 /* TODO: Add jitter */
 
                 /* Schedule next sending */
-                vtimer_set_msg(&if_entry->if_timer, if_entry->hello_interval,
-                               thread_getpid(), MSG_TIMER, (void *) if_entry);
+                if_entry->if_timer_msg.type = NHDP_MSG_TIMER;
+                if_entry->if_timer_msg.content.ptr = (char *) if_entry;
+                xtimer_set_msg(&if_entry->if_timer, if_entry->hello_interval,
+                               &if_entry->if_timer_msg, thread_getpid());
                 mutex_unlock(&send_rcv_mutex);
                 break;
 
@@ -266,8 +269,7 @@ static void *_nhdp_runner(void *arg)
                 iib_process_metric_refresh();
 
                 /* Schedule next sending */
-                vtimer_set_msg(&metric_timer, metric_interval,
-                               thread_getpid(), NHDP_METRIC_TIMER, NULL);
+                xtimer_set_msg(&metric_timer, metric_interval, &metric_msg, thread_getpid());
                 mutex_unlock(&send_rcv_mutex);
                 break;
 #endif
@@ -284,7 +286,6 @@ static void *_nhdp_runner(void *arg)
  */
 static void *_nhdp_receiver(void *arg __attribute__((unused)))
 {
-    uint32_t fromlen;
     char nhdp_rcv_buf[NHDP_MAX_RFC5444_PACKET_SZ];
     msg_t msg_q[NHDP_MSG_QUEUE_SIZE];
 
@@ -302,9 +303,10 @@ static void *_nhdp_receiver(void *arg __attribute__((unused)))
     while (1) {
         ipv6_addr_t rcv_addr;
         uint16_t rcv_port;
+        size_t addr_len = sizeof(rcv_addr);
         int32_t rcv_size = conn_udp_recvfrom(&conn, (void *)nhdp_rcv_buf,
                                              NHDP_MAX_RFC5444_PACKET_SZ, &rcv_addr,
-                                             sizeof(rcv_addr), &rcv_port);
+                                             &addr_len, &rcv_port);
 
         if (rcv_size > 0) {
             /* Packet received, let the reader handle it */
@@ -314,7 +316,7 @@ static void *_nhdp_receiver(void *arg __attribute__((unused)))
         }
     }
 
-    gnrc_udp_close(&conn);
+    conn_udp_close(&conn);
     return 0;
 }
 
