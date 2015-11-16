@@ -89,7 +89,7 @@ typedef struct {
 static uint8_t _cksum(uint8_t *buf, size_t size)
 {
     uint8_t res = 0xff;
-    for (int i = 3; i < size; i++) {
+    for (size_t i = 3; i < size; i++) {
         res -= buf[i];
     }
     return res;
@@ -136,8 +136,9 @@ static void _api_at_cmd(xbee_t *dev, uint8_t *cmd, uint8_t size, resp_t *resp)
 /*
  * Interrupt callbacks
  */
-static void _rx_cb(void *arg, char c)
+static void _rx_cb(void *arg, char _c)
 {
+    unsigned char c = _c;
     xbee_t *dev = (xbee_t *)arg;
     msg_t msg;
 

@@ -54,7 +54,7 @@ int _gnrc_6ctx_list(void)
             char addr_str[IPV6_ADDR_MAX_STR_LEN];
             printf(" %2" PRIu8 "|%39s/%-3" PRIu8 "|%" PRIx8 "|%5" PRIu16 " min\n", i,
                    ipv6_addr_to_str(addr_str, &ctx->prefix, sizeof(addr_str)), ctx->prefix_len,
-                   (ctx->flags_id & 0xf0) >> 4, ctx->ltime);
+                   (uint8_t) ((ctx->flags_id & 0xf0) >> 4), ctx->ltime);
         }
     }
     return 0;

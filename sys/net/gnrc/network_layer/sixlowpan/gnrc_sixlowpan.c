@@ -303,7 +303,7 @@ static void _send(gnrc_pktsnip_t *pkt)
     }
     else {
         DEBUG("6lo: packet too big (%u > %" PRIu16 ")\n",
-              (unsigned int)datagram_size, SIXLOWPAN_FRAG_MAX_LEN);
+              (unsigned int)datagram_size, (uint16_t)SIXLOWPAN_FRAG_MAX_LEN);
         gnrc_pktbuf_release(pkt2);
     }
 #else
