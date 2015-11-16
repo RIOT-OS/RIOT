@@ -111,17 +111,6 @@ typedef struct {
     REG8    BTXBUF;     /**< B transmit buffer */
 } msp_usci_t;
 
-typedef struct {
-    REG8    CTL0;      /**< control 0 */
-    REG8    CTL1;      /**< control 1 */
-    REG8    BR0;       /**< baud rate 0 */
-    REG8    BR1;       /**< baud rate 1 */
-    REG8    reserved;  /**< reserved */
-    REG8    STAT;      /**< status */
-    REG8    RXBUF;     /**< receive buffer */
-    REG8    TXBUF;     /**< transmit buffer */
-} msp_usci_spi_t;
-
 /**
  * @brief   USCI SPI specific registers
  */
