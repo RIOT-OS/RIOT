@@ -33,7 +33,7 @@
 
 #define INFO1_TXT "fibroute add <destination> via <next hop> [dev <device>]"
 #define INFO2_TXT " [lifetime <lifetime>]"
-#define INFO3_TXT "       <destination> - the destination address\n" \
+#define INFO3_TXT "       <destination> - the destination address with optional prefix size, e.g. /116\n" \
                   "       <next hop>    - the address of the next-hop towards the <destination>\n" \
                   "       <device>      - the device id of the Interface to use." \
                   " Optional if only one interface is available.\n"
@@ -79,15 +79,33 @@ static void _fib_usage(int info)
 
 static void _fib_add(const char *dest, const char *next, kernel_pid_t pid, uint32_t lifetime)
 {
-    unsigned char *dst = (unsigned char *)dest;
-    size_t dst_size = (strlen(dest));
+    uint32_t prefix = 0;
+    /* Get the prefix length */
+    size_t i = 0;
+    for (i = strlen(dest); i > 0; --i) {
+        if (dest[i] == '/') {
+           prefix = atoi(&dest[i+1]);
+           break;
+        }
+        if (dest[i] == ':' || dest[i] == '.') {
+           i = strlen(dest);
+           break;
+        }
+    }
+
+    size_t dst_size = (i+1);
+    unsigned char dst_arr[dst_size];
+    memset(dst_arr, 0, dst_size);
+    memcpy(dst_arr, dest, i);
+    unsigned char *dst = &dst_arr[0];
     uint32_t dst_flags = 0;
+
     unsigned char *nxt = (unsigned char *)next;
     size_t nxt_size = (strlen(next));
     uint32_t nxt_flags = 0;
 
     /* determine destination address */
-    if (inet_pton(AF_INET6, dest, tmp_ipv6_dst)) {
+    if (inet_pton(AF_INET6, (char*)dst, tmp_ipv6_dst)) {
         dst = tmp_ipv6_dst;
         dst_size = IN6ADDRSZ;
     }
@@ -106,16 +124,7 @@ static void _fib_add(const char *dest, const char *next, kernel_pid_t pid, uint3
         nxt_size = INADDRSZ;
     }
 
-    /* Set the prefix flag for a network */
-    dst_flags |= FIB_FLAG_NET_PREFIX;
-    for (size_t i = 0; i < dst_size; ++i) {
-        if (dst[i] != 0) {
-            /* and clear the bit if its not the default route */
-            dst_flags = (dst_flags & ~FIB_FLAG_NET_PREFIX);
-            break;
-        }
-    }
-
+    dst_flags |= (prefix << FIB_FLAG_NET_PREFIX_SHIFT);
     fib_add_entry(&gnrc_ipv6_fib_table, pid, dst, dst_size, dst_flags, nxt,
                   nxt_size, nxt_flags, lifetime);
 }
