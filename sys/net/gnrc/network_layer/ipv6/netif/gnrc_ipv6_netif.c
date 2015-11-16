@@ -745,7 +745,7 @@ static ipv6_addr_t *_source_address_selection(gnrc_ipv6_netif_t *iface, const ip
     }
 
     /* reset candidate set to mark winners */
-    memset(candidate_set, 0, (GNRC_IPV6_NETIF_ADDR_NUMOF / 8) + 1);
+    memset(candidate_set, 0, (GNRC_IPV6_NETIF_ADDR_NUMOF + 7) / 8);
     /* check if we have a clear winner */
     /* collect candidates with maximum points */
     for (int i = 0; i < GNRC_IPV6_NETIF_ADDR_NUMOF; i++) {
