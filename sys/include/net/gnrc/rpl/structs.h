@@ -225,9 +225,6 @@ struct gnrc_rpl_dodag {
     msg_t dao_msg;                  /**< msg_t for firing a dao */
     uint32_t dao_time;              /**< time to schedule the next DAO */
     xtimer_t dao_timer;             /**< timer to schedule the next DAO */
-    msg_t cleanup_msg;              /**< msg_t for firing a cleanup */
-    uint32_t cleanup_time;          /**< time to schedula a DODAG cleanup */
-    xtimer_t cleanup_timer;         /**< timer to schedula a DODAG cleanup */
     trickle_t trickle;              /**< trickle representation */
 };
 
@@ -242,6 +239,7 @@ struct gnrc_rpl_instance {
     gnrc_rpl_of_t *of;              /**< configured Objective Function */
     uint16_t min_hop_rank_inc;      /**< minimum hop rank increase */
     uint16_t max_rank_inc;          /**< max increase in the rank */
+    int8_t cleanup;                 /**< cleanup time in seconds */
 };
 
 #ifdef __cplusplus
