@@ -100,7 +100,6 @@ bool gnrc_rpl_instance_remove(gnrc_rpl_instance_t *inst)
     gnrc_rpl_dodag_t *dodag = &inst->dodag;
     gnrc_rpl_dodag_remove_all_parents(dodag);
     trickle_stop(&dodag->trickle);
-    xtimer_remove(&dodag->dao_timer);
     memset(inst, 0, sizeof(gnrc_rpl_instance_t));
     return true;
 }
@@ -143,8 +142,6 @@ bool gnrc_rpl_dodag_init(gnrc_rpl_instance_t *instance, ipv6_addr_t *dodag_id)
     dodag->dtsn = 0;
     dodag->dao_ack_received = false;
     dodag->dao_counter = 0;
-    dodag->dao_msg.type = GNRC_RPL_MSG_TYPE_DAO_HANDLE;
-    dodag->dao_msg.content.ptr = (char *) instance;
     dodag->instance = instance;
 
     return true;
@@ -156,7 +153,6 @@ void gnrc_rpl_dodag_remove_all_parents(gnrc_rpl_dodag_t *dodag)
     LL_FOREACH_SAFE(dodag->parents, elt, tmp) {
         gnrc_rpl_parent_remove(elt);
     }
-    dodag->instance->cleanup = GNRC_RPL_CLEANUP_TIME;
 }
 
 bool gnrc_rpl_parent_add_by_addr(gnrc_rpl_dodag_t *dodag, ipv6_addr_t *addr,
