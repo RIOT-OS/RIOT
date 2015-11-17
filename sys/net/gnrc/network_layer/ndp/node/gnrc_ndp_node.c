@@ -130,12 +130,7 @@ kernel_pid_t gnrc_ndp_node_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_len,
         if (gnrc_ipv6_nc_get_state(nc_entry) == GNRC_IPV6_NC_STATE_STALE) {
             gnrc_ndp_internal_set_state(nc_entry, GNRC_IPV6_NC_STATE_DELAY);
         }
-        if (nc_entry->l2_addr_len > 0) {
-            memcpy(l2addr, nc_entry->l2_addr, nc_entry->l2_addr_len);
-        }
-        *l2addr_len = nc_entry->l2_addr_len;
-        /* TODO: unreachability check */
-        return nc_entry->iface;
+        return gnrc_ipv6_nc_get_l2_addr(l2addr, l2addr_len, nc_entry);
     }
     else if (nc_entry == NULL) {
         gnrc_pktqueue_t *pkt_node;
