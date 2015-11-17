@@ -21,8 +21,10 @@
 #ifndef GNRC_IPV6_NC_H_
 #define GNRC_IPV6_NC_H_
 
+#include <assert.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <string.h>
 
 #include "kernel_types.h"
 #include "net/eui64.h"
@@ -292,6 +294,21 @@ static inline bool gnrc_ipv6_nc_is_reachable(const gnrc_ipv6_nc_t *entry)
  * @return  NULL, if none is found.
  */
 gnrc_ipv6_nc_t *gnrc_ipv6_nc_still_reachable(const ipv6_addr_t *ipv6_addr);
+
+/**
+ * @brief   Gets link-layer address from neighbor cache entry if neighbor is reachable.
+ *
+ * @pre (l2_addr != NULL) && (l2_addr_len != NULL)
+ *
+ * @param[out] l2_addr      The link layer address of @p entry. Must not be NULL.
+ * @param[out] l2_addr_len  Length of @p l2_addr. Must not be NULL.
+ * @param[in] entry         A neighbor cache entry
+ *
+ * @return  PID to the interface where the neighbor is.
+ * @return  KERNEL_PID_UNDEF, if @p entry == NULL or the neighbor is not reachable.
+ */
+kernel_pid_t gnrc_ipv6_nc_get_l2_addr(uint8_t *l2_addr, uint8_t *l2_addr_len,
+                                      const gnrc_ipv6_nc_t *entry);
 
 #ifdef __cplusplus
 }
