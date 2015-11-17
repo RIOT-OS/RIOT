@@ -76,33 +76,29 @@ static void _fib_add(const char *dest, const char *next, kernel_pid_t pid, uint3
 {
     unsigned char *dst = (unsigned char *)dest;
     size_t dst_size = (strlen(dest));
-    uint32_t dst_flags = 0xffff;
+    uint32_t dst_flags = 0;
     unsigned char *nxt = (unsigned char *)next;
     size_t nxt_size = (strlen(next));
-    uint32_t nxt_flags = 0xffff;
+    uint32_t nxt_flags = 0;
 
     /* determine destination address */
     if (inet_pton(AF_INET6, dest, tmp_ipv6_dst)) {
         dst = tmp_ipv6_dst;
         dst_size = IN6ADDRSZ;
-        dst_flags = AF_INET6;
     }
     else if (inet_pton(AF_INET, dest, tmp_ipv4_dst)) {
         dst = tmp_ipv4_dst;
         dst_size = INADDRSZ;
-        dst_flags = AF_INET;
     }
 
     /* determine next-hop address */
     if (inet_pton(AF_INET6, next, tmp_ipv6_nxt)) {
         nxt = tmp_ipv6_nxt;
         nxt_size = IN6ADDRSZ;
-        nxt_flags = AF_INET6;
     }
     else if (inet_pton(AF_INET, next, tmp_ipv4_nxt)) {
         nxt = tmp_ipv4_nxt;
         nxt_size = INADDRSZ;
-        nxt_flags = AF_INET;
     }
 
     fib_add_entry(&gnrc_ipv6_fib_table, pid, dst, dst_size, dst_flags, nxt,
