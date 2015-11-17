@@ -758,8 +758,8 @@ INPUT                  = ../../doc.txt \
                          ../../cpu \
                          ../../boards \
                          ../../drivers \
-                         ../../sys \
                          ../../pkg \
+                         ../../sys \
                          src/ \
                          src/mainpage.md \
                          src/getting-started.md
