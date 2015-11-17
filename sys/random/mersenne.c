@@ -55,6 +55,10 @@
 static uint32_t mt[N]; /** the array for the state vector  */
 static uint16_t mti = MTI_UNINITIALIZED;
 
+#ifdef MODULE_ENTROPY
+#include "entropy.h"
+#endif
+
 void genrand_init(uint32_t s)
 {
     mt[0] = s;
@@ -129,7 +133,12 @@ uint32_t genrand_uint32(void)
     y ^= (y << 7) & 0x9d2c5680UL;
     y ^= (y << 15) & 0xefc60000UL;
     y ^= y >> 18;
+
+#ifdef MODULE_ENTROPY
+    return y + entropy;
+#else
     return y;
+#endif
 }
 
 #if PRNG_FLOAT
