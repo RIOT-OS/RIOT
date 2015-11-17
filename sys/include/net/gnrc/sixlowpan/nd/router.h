@@ -68,7 +68,9 @@ typedef struct {
     uint32_t version;                       /**< version of the information dissiminated by the
                                              *   BR */
     uint16_t ltime;                         /**< the time in minutes until deletion */
+#ifdef MODULE_GNRC_SIXLOWPAN_CTX
     BITFIELD(ctxs, GNRC_SIXLOWPAN_CTX_SIZE);/**< contexts associated with BR */
+#endif
     gnrc_sixlowpan_nd_router_prf_t *prfs;   /**< prefixes associated with BR */
     xtimer_t ltimer;                        /**< timer for deletion */
     msg_t ltimer_msg;                       /**< msg_t for gnrc_sixlowpan_nd_router_abr_t::ltimer */

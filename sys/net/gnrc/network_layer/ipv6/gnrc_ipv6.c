@@ -24,6 +24,7 @@
 #include "net/gnrc/ndp.h"
 #include "net/gnrc/sixlowpan/ctx.h"
 #include "net/gnrc/sixlowpan/nd.h"
+#include "net/gnrc/sixlowpan/nd/router.h"
 #include "net/protnum.h"
 #include "thread.h"
 #include "utlist.h"
@@ -241,11 +242,13 @@ static void *_event_loop(void *args)
                 DEBUG("ipv6: Unicast router solicitation event received\n");
                 gnrc_sixlowpan_nd_uc_rtr_sol((gnrc_ipv6_nc_t *)msg.content.ptr);
                 break;
+#   ifdef MODULE_GNRC_SIXLOWPAN_CTX
             case GNRC_SIXLOWPAN_ND_MSG_DELETE_CTX:
                 DEBUG("ipv6: Delete 6LoWPAN context event received\n");
                 gnrc_sixlowpan_ctx_remove(((((gnrc_sixlowpan_ctx_t *)msg.content.ptr)->flags_id) &
                                            GNRC_SIXLOWPAN_CTX_FLAGS_CID_MASK));
                 break;
+#   endif
 #endif
 #ifdef MODULE_GNRC_SIXLOWPAN_ND_ROUTER
             case GNRC_SIXLOWPAN_ND_MSG_ABR_TIMEOUT:

@@ -113,6 +113,7 @@ gnrc_sixlowpan_ctx_t *gnrc_sixlowpan_ctx_update(uint8_t id, const ipv6_addr_t *p
                                                 uint8_t prefix_len, uint16_t ltime,
                                                 bool comp);
 
+#ifdef MODULE_GNRC_SIXLOWPAN_CTX
 /**
  * @brief   Removes context.
  *
@@ -122,6 +123,7 @@ static inline void gnrc_sixlowpan_ctx_remove(uint8_t id)
 {
     gnrc_sixlowpan_ctx_lookup_id(id)->prefix_len = 0;
 }
+#endif
 
 #ifdef TEST_SUITES
 /**
