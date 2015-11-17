@@ -104,7 +104,7 @@ static void reg_bits_clear(ksz8851snl_t *dev, uint16_t reg, uint16_t bit_mask)
 	reg_value &= ~bit_mask;
 	reg_set(dev, reg, reg_value);
 }
-
+#if 0
 static uint8_t reg_get8(ksz8851snl_t *dev, uint16_t reg)
 {
 	uint16_t cmd = (reg << 2) & 0x3F0;
@@ -130,10 +130,10 @@ static uint8_t reg_get8(ksz8851snl_t *dev, uint16_t reg)
 	return result[2];
 }
 
-
-static void ksz8851snl_get_mac_addr(netdev2_t *encdev, uint8_t* buf)
+//#if 0
+static void ksz8851snl_get_mac_addr(netdev2_t *netdev, uint8_t* buf)
 {
-	ksz8851snl_t * dev = (ksz8851snl_t*)encdev;
+	ksz8851snl_t *dev = (ksz8851snl_t*)netdev;
 
 	lock(dev);
 	for (uint8_t s = 0; s < ETHERNET_ADDR_LEN; s++)
@@ -141,6 +141,26 @@ static void ksz8851snl_get_mac_addr(netdev2_t *encdev, uint8_t* buf)
 		*buf++ = reg_get8(dev, 0x15 - s);
     }
     unlock(dev);
+}
+#endif
+
+static void ksz8851snl_get_mac_addr(netdev2_t *netdev, uint8_t* buf)
+{
+    ksz8851snl_t *dev = (ksz8851snl_t*)netdev;
+    uint16_t mac_data;
+
+    lock(dev);
+    mac_data = reg_get(dev, KSZ8851_MARH_REG);
+    *buf++ = (uint8_t)((mac_data >>8) & 0xff);
+    *buf++ = (uint8_t)mac_data & 0xff;
+    mac_data = reg_get(dev, KSZ8851_MARM_REG);
+    *buf++ = (uint8_t)((mac_data >>8) & 0xff);
+    *buf++ = (uint8_t)mac_data & 0xff;
+    mac_data = reg_get(dev, KSZ8851_MARL_REG);
+    *buf++ = (uint8_t)((mac_data >>8) & 0xff);
+    *buf++ = (uint8_t)mac_data & 0xff;
+    unlock(dev);
+
 }
 
 static int ksz8851snl_get_iid(netdev2_t *netdev, eui64_t *value, size_t max_len)
