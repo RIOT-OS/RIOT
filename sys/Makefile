@@ -70,6 +70,9 @@ endif
 ifneq (,$(filter udp,$(USEMODULE)))
     DIRS += net/transport_layer/udp
 endif
+ifneq (,$(filter tinydtls,$(USEMODULE)))
+    DIRS += net/transport_layer/tinydtls
+endif
 
 ifneq (,$(filter hamming256,$(USEMODULE)))
     DIRS += ecc/hamming256

@@ -1,0 +1,1 @@
+INCLUDES += -I$(RIOTBASE)/pkg/tinydtls -I$(RIOTBASE)/pkg/tinydtls/tinydtls
