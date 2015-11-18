@@ -717,6 +717,7 @@ static int _netif_add(char *cmd_name, kernel_pid_t dev, int argc, char **argv)
     } type = _UNICAST;
     char *addr_str = argv[0];
     ipv6_addr_t addr;
+    ipv6_addr_t *ifaddr;
     uint8_t prefix_len, flags = 0;
 
     if (argc > 1) {
@@ -758,10 +759,15 @@ static int _netif_add(char *cmd_name, kernel_pid_t dev, int argc, char **argv)
         flags |= GNRC_IPV6_NETIF_ADDR_FLAGS_UNICAST;
     }
 
-    if (gnrc_ipv6_netif_add_addr(dev, &addr, prefix_len, flags) == NULL) {
+    if ((ifaddr = gnrc_ipv6_netif_add_addr(dev, &addr, prefix_len, flags)) == NULL) {
         printf("error: unable to add IPv6 address\n");
         return 1;
     }
+
+    /* Address shall be valid infinitely */
+    gnrc_ipv6_netif_addr_get(ifaddr)->valid = UINT32_MAX;
+    /* Address shall be preferred infinitely */
+    gnrc_ipv6_netif_addr_get(ifaddr)->preferred = UINT32_MAX;
 
     printf("success: added %s/%d to interface %" PRIkernel_pid "\n", addr_str,
            prefix_len, dev);
