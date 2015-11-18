@@ -138,6 +138,7 @@ typedef struct {
     gnrc_netdev_event_cb_t event_cb;    /**< netdev event callback */
     kernel_pid_t mac_pid;               /**< the driver's thread's PID */
     /* device specific fields */
+    uint8_t idle_state;                 /**< state to return to after sending */
     spi_t spi;                          /**< used SPI device */
     gpio_t cs_pin;                      /**< chip select pin */
     gpio_t sleep_pin;                   /**< sleep pin */
@@ -155,7 +156,6 @@ typedef struct {
     uint8_t addr_short[2];              /**< the radio's short address */
     uint8_t addr_long[8];               /**< the radio's long address */
     uint16_t options;                   /**< state of used options */
-    uint8_t idle_state;                 /**< state to return to after sending */
 } at86rf2xx_t;
 
 /**
