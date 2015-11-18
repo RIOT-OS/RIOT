@@ -69,7 +69,7 @@ uint32_t genrand_uint32(void)
     uint32_t res = (((uint32_t)A) << 16) | B;
 
 #ifdef MODULE_ENTROPY
-    return res + entropy;
+    return res ^ entropy;
 #else
     return res;
 #endif
