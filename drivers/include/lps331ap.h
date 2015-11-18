@@ -54,6 +54,15 @@ typedef enum {
 } lps331ap_rate_t;
 
 /**
+ * @brief   Struct holding all parameters needed for device initialization
+ */
+typedef struct {
+    i2c_t i2c;                  /**< I2C bus the sensor is connected to */
+    uint8_t addr;               /**< the devices address on the bus */
+    lps331ap_rate_t rate;       /**< tell sensor to sample with this rate */
+} lps331ap_params_t;
+
+/**
  * @brief Initialize a given LPS331AP pressure sensor
  *
  * @param[out] dev      device descriptor of the sensor
