@@ -61,6 +61,16 @@ typedef enum {
 } isl29020_range_t;
 
 /**
+ * @brief Data structure holding the full set of configuration parameters
+ */
+typedef struct {
+    i2c_t i2c;                  /**< I2C bus the device is connected to */
+    uint8_t addr;               /**< address on that bus */
+    isl29020_range_t range;     /**< range setting to use */
+    isl29020_mode_t mode;       /**< measurement mode to use */
+} isl29020_params_t;
+
+/**
  * @brief Initialize a new ISL29020 device
  *
  * @param[in] dev       device descriptor of an ISL29020 device
