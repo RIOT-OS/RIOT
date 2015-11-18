@@ -204,6 +204,9 @@ struct gnrc_rpl_dodag {
     gnrc_rpl_parent_t *parents;     /**< pointer to the parents list of this DODAG */
     gnrc_rpl_instance_t *instance;  /**< pointer to the instance that this dodag is part of */
     uint8_t prefix_len;             /**< length of the prefix for the DODAG id */
+    bool prefix_info_requested;     /**< flag to send PREFIX_INFO options */
+    bool dodag_conf_requested;      /**< flag to send DODAG_CONF options */
+    bool dao_ack_received;          /**< flag to check for DAO-ACK */
     uint32_t addr_preferred;        /**< time in seconds the DODAG id is preferred */
     uint32_t addr_valid;            /**< time in seconds the DODAG id is valid */
     uint8_t dtsn;                   /**< DAO Trigger Sequence Number */
@@ -219,9 +222,6 @@ struct gnrc_rpl_dodag {
     uint8_t node_status;            /**< leaf, normal, or root node */
     uint8_t dao_seq;                /**< dao sequence number */
     uint8_t dao_counter;            /**< amount of retried DAOs */
-    bool dao_ack_received;          /**< flag to check for DAO-ACK */
-    bool dodag_conf_requested;      /**< flag to send DODAG_CONF options */
-    bool prefix_info_requested;     /**< flag to send PREFIX_INFO options */
     msg_t dao_msg;                  /**< msg_t for firing a dao */
     uint32_t dao_time;              /**< time to schedule the next DAO */
     xtimer_t dao_timer;             /**< timer to schedule the next DAO */
