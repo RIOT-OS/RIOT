@@ -237,11 +237,11 @@ struct gnrc_rpl_dodag {
 struct gnrc_rpl_instance {
     uint8_t id;                     /**< id of the instance */
     uint8_t state;                  /**< 0 for unused, 1 for used */
-    gnrc_rpl_dodag_t dodag;         /**< DODAG of this instance */
     uint8_t mop;                    /**< configured Mode of Operation */
-    gnrc_rpl_of_t *of;              /**< configured Objective Function */
     uint16_t min_hop_rank_inc;      /**< minimum hop rank increase */
     uint16_t max_rank_inc;          /**< max increase in the rank */
+    gnrc_rpl_of_t *of;              /**< configured Objective Function */
+    gnrc_rpl_dodag_t dodag;         /**< DODAG of this instance */
 };
 
 #ifdef __cplusplus
