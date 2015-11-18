@@ -15,6 +15,7 @@
 #include <errno.h>
 #include <string.h>
 
+#include "assert.h"
 #include "clist.h"
 #include "utlist.h"
 #include "net/gnrc/netreg.h"

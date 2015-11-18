@@ -18,6 +18,7 @@
 #include <errno.h>
 #include <string.h>
 
+#include "assert.h"
 #include "byteorder.h"
 #include "net/fib.h"
 #include "net/ieee802154.h"

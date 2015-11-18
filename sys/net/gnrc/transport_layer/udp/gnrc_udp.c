@@ -20,6 +20,7 @@
 #include <stdint.h>
 #include <errno.h>
 
+#include "assert.h"
 #include "byteorder.h"
 #include "msg.h"
 #include "thread.h"

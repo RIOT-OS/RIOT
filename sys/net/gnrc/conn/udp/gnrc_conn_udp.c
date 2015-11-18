@@ -16,6 +16,7 @@
  */
 
 #include <errno.h>
+#include "assert.h"
 #include "net/af.h"
 #include "net/gnrc/conn.h"
 #include "net/gnrc/ipv6.h"
