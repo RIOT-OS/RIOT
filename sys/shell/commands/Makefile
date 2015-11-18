@@ -26,18 +26,6 @@ endif
 ifeq ($(CPU),x86)
   SRC += sc_x86_lspci.c
 endif
-ifneq (,$(filter isl29020,$(USEMODULE)))
-  SRC += sc_isl29020.c
-endif
-ifneq (,$(filter lps331ap,$(USEMODULE)))
-  SRC += sc_lps331ap.c
-endif
-ifneq (,$(filter l3g4200d,$(USEMODULE)))
-  SRC += sc_l3g4200d.c
-endif
-ifneq (,$(filter lsm303dlhc,$(USEMODULE)))
-  SRC += sc_lsm303dlhc.c
-endif
 ifneq (,$(filter at30tse75x,$(USEMODULE)))
     SRC += sc_at30tse75x.c
 endif
