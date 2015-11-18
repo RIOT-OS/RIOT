@@ -40,6 +40,16 @@ typedef struct {
 
 /** @brief all state variables for a trickle timer */
 typedef struct {
+    xtimer_t msg_callback_timer;    /**< xtimer to send a msg_t to the target thread
+                                         for a callback */
+    xtimer_t msg_interval_timer;    /**< xtimer to send a msg_t to the target thread
+                                         for a new interval */
+    msg_t msg_callback;             /**< the msg_t to use for callbacks */
+    msg_t msg_interval;             /**< the msg_t to use for intervals */
+    uint64_t msg_callback_time;     /**< callback interval in ms */
+    uint64_t msg_interval_time;     /**< interval in ms */
+    trickle_callback_t callback;    /**< the callback function and parameter that trickle is calling
+                                         after each interval */
     uint8_t k;                      /**< redundancy constant */
     uint8_t Imax;                   /**< maximum interval size, described as doublings */
     uint16_t c;                     /**< counter */
@@ -47,16 +57,6 @@ typedef struct {
     uint32_t I;                     /**< current interval size */
     uint32_t t;                     /**< time within the current interval */
     kernel_pid_t pid;               /**< pid of trickles target thread */
-    trickle_callback_t callback;    /**< the callback function and parameter that trickle is calling
-                                         after each interval */
-    msg_t msg_interval;             /**< the msg_t to use for intervals */
-    uint64_t msg_interval_time;     /**< interval in ms */
-    xtimer_t msg_interval_timer;    /**< xtimer to send a msg_t to the target thread
-                                         for a new interval */
-    msg_t msg_callback;             /**< the msg_t to use for callbacks */
-    uint64_t msg_callback_time;     /**< callback interval in ms */
-    xtimer_t msg_callback_timer;    /**< xtimer to send a msg_t to the target thread
-                                         for a callback */
 } trickle_t;
 
 /**
