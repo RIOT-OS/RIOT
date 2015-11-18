@@ -32,6 +32,10 @@
 
 #include "div.h"
 
+#ifdef MODULE_ENTROPY
+#include "entropy.h"
+#endif
+
 #define a 48271
 #define m 2147483647
 #define q (m / a) /* 44488 */
@@ -61,7 +65,14 @@ uint32_t genrand_uint32(void)
      * so run it two times to get 32bits */
     uint16_t A = (rand_minstd() >> 15);
     uint16_t B = (rand_minstd() >> 15);
-    return  (((uint32_t)A) << 16) | B;
+
+    uint32_t res = (((uint32_t)A) << 16) | B;
+
+#ifdef MODULE_ENTROPY
+    return res + entropy;
+#else
+    return res;
+#endif
 }
 
 void genrand_init(uint32_t val)

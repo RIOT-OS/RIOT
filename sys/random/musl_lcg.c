@@ -31,6 +31,10 @@
 
 #include <stdint.h>
 
+#ifdef MODULE_ENTROPY
+#include "entropy.h"
+#endif
+
 static uint64_t _seed;
 
 void genrand_init(uint32_t s)
@@ -41,5 +45,9 @@ void genrand_init(uint32_t s)
 uint32_t genrand_uint32(void)
 {
     _seed = 6364136223846793005ULL*_seed + 1;
+#ifdef MODULE_ENTROPY
+    return (_seed>>31) + entropy;
+#else
     return _seed>>31;
+#endif
 }
