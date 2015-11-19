@@ -89,16 +89,18 @@ void board_init(void);
 
 /**
  * @name Define the interface to the AT86RF212B radio
- * @{
+ *
+ * @todo Work around missing RESET pin on Mulle v0.6x
+ *
+ * {spi bus, spi speed, cs pin, int pin, reset pin, sleep pin}
  */
-#define AT86RF231_SPI       SPI_0
-#define AT86RF231_CS        GPIO_PIN(PORT_D, 4)
-#define AT86RF231_INT       GPIO_PIN(PORT_B, 9)
-/** @todo work around missing RESET pin on Mulle v0.6x */
-#define AT86RF231_RESET     GPIO_PIN(PORT_C, 12)
-#define AT86RF231_SLEEP     GPIO_PIN(PORT_E, 6)
-#define AT86RF231_SPI_CLK   SPI_SPEED_5MHZ
-/** @} */
+#define AT86RF2XX_PARAMS_BOARD      {.spi = SPI_0, \
+                                     .spi_speed = SPI_SPEED_5MHZ, \
+                                     .cs_pin = GPIO_PIN(PORT_D, 4), \
+                                     .int_pin = GPIO_PIN(PORT_B, 9), \
+                                     .sleep_pin = GPIO_PIN(PORT_E, 6), \
+                                     .reset_pin = GPIO_PIN(PORT_C, 12)}
+
 
 /**
  * @name LIS3DH configuration

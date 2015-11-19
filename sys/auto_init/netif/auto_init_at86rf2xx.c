@@ -55,7 +55,7 @@ void auto_init_at86rf2xx(void)
                                  p->reset_pin);
 
         if (res < 0) {
-            DEBUG("Error initializing AT86RF2xx radio device!");
+            DEBUG("Error initializing AT86RF2xx radio device!\n");
         }
         else {
             gnrc_nomac_init(_nomac_stacks[i],
