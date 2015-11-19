@@ -38,10 +38,15 @@ typedef uint16_t gpio_t;
  */
 #define GPIO_UNDEF          (0xffff)
 
+/**
+ * @brief   Definition of pin and port positions in the gpio_t type
+ * @{
+ */
 #define GPIO_PORT_SHIFT     (8)
 #define GPIO_PORT_MASK      (0xff << (GPIO_PORT_SHIFT))
 #define GPIO_PIN_SHIFT      (0)
 #define GPIO_PIN_MASK       (0xff << (GPIO_PIN_SHIFT))
+/** @} */
 
 /**
  * @brief   Define a CPU specific GPIO pin generator macro
