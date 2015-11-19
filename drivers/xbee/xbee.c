@@ -729,7 +729,7 @@ static void _isr_event(gnrc_netdev_t *netdev, uint32_t event_type)
     hdr->src_l2addr_len = (uint8_t)addr_len;
     hdr->dst_l2addr_len = (uint8_t)addr_len;
     hdr->if_pid = dev->mac_pid;
-    hdr->rssi = dev->rx_buf[2 + addr_len];
+    hdr->rssi = dev->rx_buf[1 + addr_len]; /* API ID + source address */
     hdr->lqi = 0;
     gnrc_netif_hdr_set_src_addr(hdr, &(dev->rx_buf[1]), addr_len);
     if (addr_len == 2) {
