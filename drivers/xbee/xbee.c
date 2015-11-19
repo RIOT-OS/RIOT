@@ -104,6 +104,8 @@ static void _at_cmd(xbee_t *dev, const char *cmd)
 
 static void _api_at_cmd(xbee_t *dev, uint8_t *cmd, uint8_t size, resp_t *resp)
 {
+    DEBUG("xbee: AT_CMD: %s\n", cmd);
+
     /* acquire TX lock */
     mutex_lock(&(dev->tx_lock));
     /* construct API frame */
@@ -560,6 +562,7 @@ static int _send(gnrc_netdev_t *netdev, gnrc_pktsnip_t *pkt)
     dev->tx_buf[4] = 0;         /* set to zero to disable response frame */
     /* set size, API id and address field depending on dst address length  */
     if (_is_broadcast(hdr)) {
+        DEBUG("xbee: sending broadcast");
         dev->tx_buf[1] = (uint8_t)((size + 5) >> 8);
         dev->tx_buf[2] = (uint8_t)(size + 5);
         dev->tx_buf[3] = API_ID_TX_SHORT_ADDR;
@@ -568,24 +571,44 @@ static int _send(gnrc_netdev_t *netdev, gnrc_pktsnip_t *pkt)
         pos = 7;
     }
     else if (hdr->dst_l2addr_len == IEEE802154_SHORT_ADDRESS_LEN) {
+        uint8_t *destination = gnrc_netif_hdr_get_dst_addr(hdr);
+
+        DEBUG("xbee: sending unicast to %02x:%02x",
+              (uint8_t) destination[0], (uint8_t) destination[1]);
+
         dev->tx_buf[1] = (uint8_t)((size + 5) >> 8);
         dev->tx_buf[2] = (uint8_t)(size + 5);
         dev->tx_buf[3] = API_ID_TX_SHORT_ADDR;
-        memcpy(dev->tx_buf + 5, gnrc_netif_hdr_get_dst_addr(hdr), IEEE802154_SHORT_ADDRESS_LEN);
+        memcpy(dev->tx_buf + 5, destination, IEEE802154_SHORT_ADDRESS_LEN);
         pos = 7;
     }
     else {
+        uint8_t *destination = gnrc_netif_hdr_get_dst_addr(hdr);
+
+        DEBUG("xbee: sending unicast to %02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x",
+              (uint8_t) destination[0], (uint8_t) destination[1],
+              (uint8_t) destination[2], (uint8_t) destination[3],
+              (uint8_t) destination[4], (uint8_t) destination[5],
+              (uint8_t) destination[6], (uint8_t) destination[7]);
+
         dev->tx_buf[1] = (uint8_t)((size + 11) >> 8);
         dev->tx_buf[2] = (uint8_t)(size + 11);
         dev->tx_buf[3] = API_ID_TX_LONG_ADDR;
-        memcpy(dev->tx_buf + 5, gnrc_netif_hdr_get_dst_addr(hdr), IEEE802154_LONG_ADDRESS_LEN);
+        memcpy(dev->tx_buf + 5, destination, IEEE802154_LONG_ADDRESS_LEN);
         pos = 13;
     }
     /* set options */
+    DEBUG(", option: %02x", dev->options);
     dev->tx_buf[pos++] = dev->options;
     /* copy payload */
+    DEBUG(", payload:");
     payload = pkt->next;
     while (payload) {
+#if ENABLE_DEBUG
+        for (size_t i = 0; i < payload->size; i++) {
+            DEBUG(" %02x", ((uint8_t *) payload->data)[i]);
+        }
+#endif
         memcpy(&(dev->tx_buf[pos]), payload->data, payload->size);
         pos += payload->size;
         payload = payload->next;
@@ -599,6 +622,7 @@ static int _send(gnrc_netdev_t *netdev, gnrc_pktsnip_t *pkt)
     /* release TX lock */
     mutex_unlock(&(dev->tx_lock));
     /* return number of payload byte */
+    DEBUG("\n");
     return (int)size;
 }
 
@@ -790,6 +814,22 @@ static void _isr_event(gnrc_netdev_t *netdev, uint32_t event_type)
         dev->rx_count = 0;
         return;
     }
+
+#if ENABLE_DEBUG
+    DEBUG("xbee: received packet from");
+    for (size_t i = 0; i < addr_len; i++) {
+        DEBUG(" %02x", (uint8_t) gnrc_netif_hdr_get_src_addr(hdr)[i]);
+    }
+
+    DEBUG(", RSSI: -%d dBm", hdr->rssi);
+    DEBUG(", options: %02x", (uint8_t) dev->rx_buf[1 + addr_len + 1]); /* API ID + source address + RSSI */
+    DEBUG(", payload:");
+
+    for (size_t i = 0; i < pkt->size; i++) {
+        DEBUG(" %02x", ((uint8_t *) pkt->data)[i]);
+    }
+    DEBUG("\n");
+#endif
 
     /* pass on the received packet */
     dev->event_cb(NETDEV_EVENT_RX_COMPLETE, pkt);
