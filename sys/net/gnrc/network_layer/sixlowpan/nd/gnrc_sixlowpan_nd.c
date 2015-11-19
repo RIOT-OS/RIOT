@@ -170,6 +170,11 @@ kernel_pid_t gnrc_sixlowpan_nd_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_
         next_hop = gnrc_ndp_internal_default_router();
     }
 
+    /* no routers found */
+    if (next_hop == NULL) {
+        return KERNEL_PID_UNDEF;
+    }
+
     /* address resolution of next_hop: https://tools.ietf.org/html/rfc6775#section-5.7 */
     if ((nc_entry == NULL) || (next_hop != dst)) {
         /* get if not gotten from previous check */
