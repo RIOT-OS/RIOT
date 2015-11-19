@@ -113,26 +113,26 @@ typedef struct {
         /** array holding the FIB entries for source routes */
         fib_sr_meta_t *source_routes;
     }data;
-    /** the kind of this FIB table, single hop or source route.
-    *   This value indicates what is stored in `data` of this table
-    */
-    uint8_t table_type;
-    /** the maximim number of entries in this FIB table */
-    size_t size;
     /** table access mutex to grant exclusive operations on calls */
     mutex_t mtx_access;
+    /** the maximim number of entries in this FIB table */
+    size_t size;
     /** current number of registered RPs. */
     size_t notify_rp_pos;
-    /** the kernel_pid_t of the registered RPs.
-    *   Used to notify the RPs by the FIB on certain conditions,
-    *   e.g. when a destination is unreachable
-    */
-    kernel_pid_t notify_rp[FIB_MAX_REGISTERED_RP];
     /** the prefix handled by each registered RP.
     *   Used to dispatch if the RP is responsible for the condition,
     *   e.g. when the unreachable destination is covered by the prefix
     */
     universal_address_container_t* prefix_rp[FIB_MAX_REGISTERED_RP];
+    /** the kernel_pid_t of the registered RPs.
+    *   Used to notify the RPs by the FIB on certain conditions,
+    *   e.g. when a destination is unreachable
+    */
+    kernel_pid_t notify_rp[FIB_MAX_REGISTERED_RP];
+    /** the kind of this FIB table, single hop or source route.
+    *   This value indicates what is stored in `data` of this table
+    */
+    uint8_t table_type;
 } fib_table_t;
 
 #ifdef __cplusplus
