@@ -538,10 +538,11 @@ static int _send(gnrc_netdev_t *netdev, gnrc_pktsnip_t *pkt)
         dev->tx_buf[1] = (uint8_t)((size + 5) >> 8);
         dev->tx_buf[2] = (uint8_t)(size + 5);
         dev->tx_buf[3] = API_ID_TX_SHORT_ADDR;
-        dev->tx_buf[4] = 0xff;
         dev->tx_buf[5] = 0xff;
+        dev->tx_buf[6] = 0xff;
+        pos = 7;
     }
-    if (hdr->dst_l2addr_len == IEEE802154_SHORT_ADDRESS_LEN) {
+    else if (hdr->dst_l2addr_len == IEEE802154_SHORT_ADDRESS_LEN) {
         dev->tx_buf[1] = (uint8_t)((size + 5) >> 8);
         dev->tx_buf[2] = (uint8_t)(size + 5);
         dev->tx_buf[3] = API_ID_TX_SHORT_ADDR;
