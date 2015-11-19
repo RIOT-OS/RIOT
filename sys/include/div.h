@@ -77,34 +77,6 @@ static inline uint32_t div_u32_by_15625div512(uint32_t val)
     return ((uint64_t)(val) * 0x431bde83ul) >> (12 + 32 - 9);
 }
 
-/**
- * @brief Integer divide val by 10
- *
- * @param[in]   n     dividend
- * @return      (n / 10)
- */
-static inline uint32_t div_u32_by_10(uint32_t n) {
-    uint32_t q, r;
-    q = (n >> 1) + (n >> 2);
-    q = q + (q >> 4);
-    q = q + (q >> 8);
-    q = q + (q >> 16);
-    q = q >> 3;
-    r = n - (((q << 2) + q) << 1);
-    return q + (r > 9);
-}
-
-/**
- * @brief Modulo 10
- *
- * @param[in]   n     dividend
- * @return      (n % 10)
- */
-static inline uint32_t div_u32_mod_10(uint32_t n)
-{
-    return n - (div_u32_by_10(n)*10);
-}
-
 #ifdef __cplusplus
 }
 #endif
