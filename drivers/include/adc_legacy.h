@@ -10,8 +10,8 @@
  * @defgroup    drivers_adc ADC
  * @ingroup     drivers
  * @brief       Generic interface for ADC drivers
- * @deprecated  This interface is obsolete. Use the @ref driver_periph_adc
- *              interface in @ref driver_periph instead.
+ * @deprecated  This interface is obsolete. Use the @ref drivers_periph_adc
+ *              interface in @ref drivers_periph instead.
  *
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  *

@@ -138,7 +138,7 @@ switching) code. For most CPUs you will also find the linker scripts in the
 `ldscripts` sub-directory.
 
 In the `periph` sub-directory of each CPU you can find the implementations of
-the CPU's peripheral drivers like SPI, UART, GPIO, etc.  See @ref driver_periph
+the CPU's peripheral drivers like SPI, UART, GPIO, etc.  See @ref drivers_periph
 for their API documentation.
 
 Many CPUs share a certain amount of their code (e.g. all ARM Cortex-M based
