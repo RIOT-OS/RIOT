@@ -283,8 +283,7 @@ ifneq (,$(filter uart_stdio,$(USEMODULE)))
 endif
 
 ifneq (,$(filter posix,$(USEMODULE)))
-  USEMODULE += timex
-  USEMODULE += vtimer
+  USEMODULE += xtimer
 endif
 
 ifneq (,$(filter posix_semaphore,$(USEMODULE)))
