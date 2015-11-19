@@ -7,8 +7,8 @@
  */
 
 /**
- * @defgroup    driver_periph_dac DAC
- * @ingroup     driver_periph
+ * @defgroup    drivers_periph_dac DAC
+ * @ingroup     drivers_periph
  * @brief       Low-level DAC peripheral driver
  *
  * @{

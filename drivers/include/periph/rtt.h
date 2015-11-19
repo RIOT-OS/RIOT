@@ -7,8 +7,8 @@
  */
 
 /**
- * @defgroup    driver_periph_rtt RTT
- * @ingroup     driver_periph
+ * @defgroup    drivers_periph_rtt RTT
+ * @ingroup     drivers_periph
  * @brief       Low-level RTT (Real Time Timer) peripheral driver
  *
  * @{

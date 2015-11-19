@@ -7,8 +7,8 @@
  */
 
 /**
- * @defgroup    driver_periph_gpio GPIO
- * @ingroup     driver_periph
+ * @defgroup    drivers_periph_gpio GPIO
+ * @ingroup     drivers_periph
  * @brief       Low-level GPIO peripheral driver
  *
  * @{

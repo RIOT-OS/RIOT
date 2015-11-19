@@ -7,8 +7,8 @@
  */
 
 /**
- * @defgroup    driver_periph_uart UART
- * @ingroup     driver_periph
+ * @defgroup    drivers_periph_uart UART
+ * @ingroup     drivers_periph
  * @brief       Low-level UART peripheral driver
  * @{
  *

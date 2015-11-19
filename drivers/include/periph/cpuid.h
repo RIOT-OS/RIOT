@@ -7,8 +7,8 @@
  */
 
 /**
- * @defgroup    driver_periph_cpuid CPUID
- * @ingroup     driver_periph
+ * @defgroup    drivers_periph_cpuid CPUID
+ * @ingroup     drivers_periph
  * @brief       Low-level CPU ID peripheral driver
  *
  * Provides access the CPU's serial number
