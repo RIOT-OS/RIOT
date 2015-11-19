@@ -56,7 +56,7 @@ call this the `native` port). Try it right now in your terminal window:
 git clone git://github.com/RIOT-OS/RIOT.git # assumption: git is pre-installed
 git checkout <LATEST_RELEASE>
 cd RIOT
-./dist/tools//tapsetup/tapsetup             # create virtual Ethernet
+./dist/tools/tapsetup/tapsetup              # create virtual Ethernet
                                             # interfaces to connect to RIOT
 cd examples/default/
 make all
