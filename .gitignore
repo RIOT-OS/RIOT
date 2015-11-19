@@ -32,3 +32,6 @@ tags
 # Eclipse symbol file (output from make eclipsesym)
 eclipsesym.xml
 /toolchain
+
+# local override files
+Makefile.local

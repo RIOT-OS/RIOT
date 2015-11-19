@@ -1,3 +1,6 @@
+# include Makefile.local if it exists
+-include Makefile.local
+
 all:
 
 # set undefined variables
