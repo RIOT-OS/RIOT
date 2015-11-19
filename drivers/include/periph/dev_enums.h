@@ -7,15 +7,15 @@
  */
 
 /**
- * @ingroup     driver_periph
+ * @ingroup     drivers_periph
  *
  * @{
  * @file
  * @brief       Device enumerations for backward compatibility with existing
  *              peripheral driver implementations
  *
- * TODO: Remove this file once all peripheral drivers are ported to the more
- *       efficient implementations style
+ * @todo        Remove this file once all peripheral drivers are ported to the
+ *              more efficient implementations style
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */

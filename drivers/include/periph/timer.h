@@ -7,8 +7,8 @@
  */
 
 /**
- * @defgroup    driver_periph_timer Timer
- * @ingroup     driver_periph
+ * @defgroup    drivers_periph_timer Timer
+ * @ingroup     drivers_periph
  * @brief       Low-level timer peripheral driver
  * @{
  *

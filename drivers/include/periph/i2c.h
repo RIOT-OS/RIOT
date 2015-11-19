@@ -7,8 +7,8 @@
  */
 
 /**
- * @defgroup    driver_periph_i2c I2C
- * @ingroup     driver_periph
+ * @defgroup    drivers_periph_i2c I2C
+ * @ingroup     drivers_periph
  * @brief       Low-level I2C peripheral driver
  *
  * @{

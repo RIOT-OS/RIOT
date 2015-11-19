@@ -92,7 +92,7 @@ typedef struct {
  * @brief   PWM device configuration data structure
  */
 typedef struct {
-    Tcc *dev;                   /*< TCC device to use */
+    Tcc *dev;                   /**< TCC device to use */
     pwm_conf_chan_t chan[2];    /**< channel configuration */
 } pwm_conf_t;
 
