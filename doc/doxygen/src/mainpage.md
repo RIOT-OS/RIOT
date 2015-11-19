@@ -68,7 +68,7 @@ Type `help` to discover available commands. For further information see the
 [README of the `default` example](https://github.com/RIOT-OS/RIOT/tree/).
 
 To use RIOT directly on your embedded platform, and for more hands-on details
-with RIOT, see [TODO: link to getting started guide].
+with RIOT, see @ref getting-started.
 
 Before that, skimming through the next section is recommended (but not
 mandatory).
