@@ -56,6 +56,11 @@ extern uint32_t _eram;
 #define STACK_CANARY_WORD 0xE7FEE7FEu
 
 /**
+ * @brief   Allocation of the interrupt stack
+ */
+__attribute__((used,section(".isr_stack"))) uint8_t isr_stack[ISR_STACKSIZE];
+
+/**
  * @brief   Pre-start routine for CPU-specific settings
  */
 __attribute__((weak)) void pre_startup (void)
