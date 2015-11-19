@@ -97,11 +97,6 @@ extern "C" {
 #define GNRC_RPL_MSG_TYPE_DAO_HANDLE  (0x0903)
 
 /**
- * @brief   Message type for handling DODAG cleanup
- */
-#define GNRC_RPL_MSG_TYPE_CLEANUP_HANDLE  (0x0904)
-
-/**
  * @brief   Infinite rank
  * @see <a href="https://tools.ietf.org/html/rfc6550#section-17">
  *          RFC 6550, section 17

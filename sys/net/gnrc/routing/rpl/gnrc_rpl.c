@@ -199,16 +199,6 @@ static void *_event_loop(void *args)
                     _dao_handle_send(dodag);
                 }
                 break;
-            case GNRC_RPL_MSG_TYPE_CLEANUP_HANDLE:
-                DEBUG("RPL: GNRC_RPL_MSG_TYPE_CLEANUP received\n");
-                inst = (gnrc_rpl_instance_t *) msg.content.ptr;
-                dodag = &inst->dodag;
-                if (inst && (inst->state != 0) && (dodag->parents == NULL)
-                    && (dodag->my_rank == GNRC_RPL_INFINITE_RANK)) {
-                    /* no parents - delete this instance and DODAG */
-                    gnrc_rpl_instance_remove(inst);
-                }
-                break;
             case GNRC_NETAPI_MSG_TYPE_RCV:
                 DEBUG("RPL: GNRC_NETAPI_MSG_TYPE_RCV received\n");
                 _receive((gnrc_pktsnip_t *)msg.content.ptr);
@@ -231,23 +221,38 @@ static void *_event_loop(void *args)
 void _update_lifetime(void)
 {
     uint32_t now = xtimer_now();
+    uint16_t now_sec = now / SEC_IN_USEC;
+
     gnrc_rpl_parent_t *parent;
+    gnrc_rpl_instance_t *inst;
+
     for (uint8_t i = 0; i < GNRC_RPL_PARENTS_NUMOF; ++i) {
         parent = &gnrc_rpl_parents[i];
         if (parent->state != 0) {
-            if ((int32_t)(parent->lifetime - (now / SEC_IN_USEC)) <=
-                GNRC_RPL_LIFETIME_UPDATE_STEP) {
+            if ((int32_t)(parent->lifetime - now_sec) <= GNRC_RPL_LIFETIME_UPDATE_STEP) {
                 gnrc_rpl_dodag_t *dodag = parent->dodag;
                 gnrc_rpl_parent_remove(parent);
                 gnrc_rpl_parent_update(dodag, NULL);
                 continue;
             }
-            else if ((int32_t)(parent->lifetime - (now / SEC_IN_USEC))
-                    <= (GNRC_RPL_LIFETIME_UPDATE_STEP * 2)) {
+            else if ((int32_t)(parent->lifetime - now_sec) <= (GNRC_RPL_LIFETIME_UPDATE_STEP * 2)) {
                 gnrc_rpl_send_DIS(parent->dodag->instance, &parent->addr);
             }
         }
     }
+
+    for (int i = 0; i < GNRC_RPL_INSTANCES_NUMOF; ++i) {
+        inst = &gnrc_rpl_instances[i];
+        if ((inst->state != 0) && (inst->cleanup > 0) && (inst->dodag.parents == NULL) &&
+            (inst->dodag.my_rank == GNRC_RPL_INFINITE_RANK)) {
+            inst->cleanup -= GNRC_RPL_LIFETIME_UPDATE_STEP;
+            if (inst->cleanup <= 0) {
+                /* no parents - delete this instance and DODAG */
+                gnrc_rpl_instance_remove(inst);
+            }
+        }
+    }
+
     xtimer_set_msg(&_lt_timer, _lt_time, &_lt_msg, gnrc_rpl_pid);
 }
 

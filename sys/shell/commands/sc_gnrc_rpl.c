@@ -179,7 +179,7 @@ int _gnrc_rpl_dodag_show(void)
 
     gnrc_rpl_dodag_t *dodag = NULL;
     char addr_str[IPV6_ADDR_MAX_STR_LEN];
-    uint32_t cleanup;
+    int8_t cleanup;
     uint64_t tc, ti, xnow = xtimer_now64();
 
     for (uint8_t i = 0; i < GNRC_RPL_INSTANCES_NUMOF; ++i) {
@@ -200,10 +200,9 @@ int _gnrc_rpl_dodag_show(void)
                 | dodag->trickle.msg_interval_timer.target) - xnow;
         ti = (int64_t) ti < 0 ? 0 : ti / SEC_IN_USEC;
 
-        cleanup = dodag->cleanup_timer.target - xtimer_now();
-        cleanup = (int32_t) cleanup < 0 ? 0 : cleanup / SEC_IN_USEC;
+        cleanup = dodag->instance->cleanup < 0 ? 0 : dodag->instance->cleanup;
 
-        printf("\tdodag [%s | R: %d | OP: %s | CL: %" PRIu32 "s | "
+        printf("\tdodag [%s | R: %d | OP: %s | CL: %" PRIi8 "s | "
                "TR(I=[%d,%d], k=%d, c=%d, TC=%" PRIu64 "s, TI=%" PRIu64 "s)]\n",
                ipv6_addr_to_str(addr_str, &dodag->dodag_id, sizeof(addr_str)),
                dodag->my_rank, (dodag->node_status == GNRC_RPL_LEAF_NODE ? "Leaf" : "Router"),
