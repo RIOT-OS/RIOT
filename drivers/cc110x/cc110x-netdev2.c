@@ -24,9 +24,9 @@
 #include <errno.h>
 
 #include "cc110x.h"
-#include "cc110x/cc110x-netdev2.h"
-#include "cc110x/cc110x-internal.h"
-#include "cc110x/cc110x-interface.h"
+#include "cc110x-netdev2.h"
+#include "cc110x-internal.h"
+#include "cc110x-interface.h"
 #include "net/eui64.h"
 
 #include "periph/cpuid.h"

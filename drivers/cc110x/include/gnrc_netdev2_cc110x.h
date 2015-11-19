@@ -17,7 +17,7 @@
  */
 
 #include "net/gnrc/gnrc_netdev2.h"
-#include "cc110x/cc110x-netdev2.h"
+#include "cc110x-netdev2.h"
 
 #ifndef GNRC_CC110X_H
 #define GNRC_CC110X_H
