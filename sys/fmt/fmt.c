@@ -21,7 +21,6 @@
 /* work around broken sys/posix/unistd.h */
 ssize_t write(int fildes, const void *buf, size_t nbyte);
 
-#include "div.h"
 #include "fmt.h"
 
 static const char _hex_chars[16] = "0123456789ABCDEF";
@@ -89,14 +88,14 @@ size_t fmt_u32_dec(char *out, uint32_t val)
 
     /* count needed characters */
     for (uint32_t tmp = val; (tmp > 9); len++) {
-        tmp = div_u32_by_10(tmp);
+        tmp /= 10;
     }
 
     if (out) {
         char *ptr = out + len;
         while(val) {
-            *--ptr = div_u32_mod_10(val) + '0';
-            val = div_u32_by_10(val);
+            *--ptr = (val % 10) + '0';
+            val /= 10;
         }
     }
 
