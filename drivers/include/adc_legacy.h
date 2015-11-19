@@ -10,17 +10,19 @@
  * @defgroup    drivers_adc ADC
  * @ingroup     drivers
  * @brief       Generic interface for ADC drivers
+ *
  * @deprecated  This interface is obsolete. Use the @ref drivers_periph_adc
  *              interface in @ref drivers_periph instead.
+ * @{
+ *
+ * @file
+ * @brief       Legacy ADC driver interface
  *
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
- *
- * @{
- * @file
  */
 
-#ifndef ADC_H
-#define ADC_H
+#ifndef ADC_LEGACY_H
+#define ADC_LEGACY_H
 
 #include <stdint.h>
 
@@ -46,5 +48,5 @@ uint16_t adc_read(uint8_t channel);
 }
 #endif
 
+#endif /* ADC_LEGACY_H */
 /** @} */
-#endif /* ADC_H */

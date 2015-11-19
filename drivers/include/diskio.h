@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    diskio Disk IO Driver
+ * @defgroup    drivers_diskio Disk IO Driver
  * @ingroup     drivers
  * @brief       Low level disk interface
  *
