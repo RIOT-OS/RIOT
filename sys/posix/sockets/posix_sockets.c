@@ -120,11 +120,6 @@ static inline int _choose_ipproto(int type, int protocol)
     return -1;
 }
 
-static inline void _htons_port(uint16_t *port)
-{
-    *port = htons(*port);
-}
-
 static inline ipv4_addr_t *_in_addr_ptr(struct sockaddr_storage *addr)
 {
     return (ipv4_addr_t *)(&((struct sockaddr_in *)addr)->sin_addr);
@@ -366,8 +361,8 @@ int accept(int socket, struct sockaddr *restrict address,
                     res = -1;
                     break;
                 }
-                _htons_port(port);  /* XXX: sin(6)_port is supposed to be network byte
-                                     *      order */
+                *port = htons(*port); /* XXX: sin(6)_port is supposed to be
+                                         network byte order */
                 *address_len = _addr_truncate(address, *address_len, &tmp, tmp_len);
             }
             break;
@@ -542,8 +537,8 @@ int getpeername(int socket, struct sockaddr *__restrict address,
             return -1;
     }
     tmp.ss_family = s->domain;
-    _htons_port(port);  /* XXX: sin(6)_port is supposed to be network byte
-                         *      order */
+    *port = htons(*port); /* XXX: sin(6)_port is supposed to be network byte
+                             order */
     *address_len = _addr_truncate(address, *address_len, &tmp, tmp_len);
     return 0;
 }
@@ -626,8 +621,8 @@ int getsockname(int socket, struct sockaddr *__restrict address,
             return -1;
     }
     tmp.ss_family = AF_INET;
-    _htons_port(port);  /* XXX: sin(6)_port is supposed to be network byte
-                         *      order */
+    *port = htons(*port); /* XXX: sin(6)_port is supposed to be network byte
+                             order */
     *address_len = _addr_truncate(address, *address_len, &tmp, tmp_len);
     return 0;
 }
@@ -762,8 +757,8 @@ ssize_t recvfrom(int socket, void *restrict buffer, size_t length, int flags,
     }
     if ((address != NULL) && (address_len != NULL)) {
         tmp.ss_family = s->domain;
-        _htons_port(port);  /* XXX: sin_port is supposed to be network byte
-                             *      order */
+        *port = htons(*port); /* XXX: sin(6)_port is supposed to be network
+                                 byte order */
         *address_len = _addr_truncate(address, *address_len, &tmp, tmp_len);
     }
     return res;
