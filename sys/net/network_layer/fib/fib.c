@@ -1504,13 +1504,13 @@ void fib_print_routes(fib_table_t *table)
     uint64_t now = xtimer_now64();
 
     if (table->table_type == FIB_TABLE_TYPE_SH) {
-        printf("%-" FIB_ADDR_PRINT_LENS "s %-6s %-" FIB_ADDR_PRINT_LENS "s %-6s %-16s Interface\n"
-               , "Destination", "Flags", "Next Hop", "Flags", "Expires");
+        printf("%-" FIB_ADDR_PRINT_LENS "s %-10s   %-" FIB_ADDR_PRINT_LENS "s %-10s %-16s"
+                " Interface\n" , "Destination", "Flags", "Next Hop", "Flags", "Expires");
 
         for (size_t i = 0; i < table->size; ++i) {
             if (table->data.entries[i].lifetime != 0) {
                 fib_print_address(table->data.entries[i].global);
-                printf(" 0x%04"PRIx32" ", table->data.entries[i].global_flags);
+                printf(" 0x%08"PRIx32" ", table->data.entries[i].global_flags);
                 if(table->data.entries[i].global_flags & FIB_FLAG_NET_PREFIX) {
                     printf("N ");
                 } else {
@@ -1518,7 +1518,7 @@ void fib_print_routes(fib_table_t *table)
                 }
 
                 fib_print_address(table->data.entries[i].next_hop);
-                printf(" 0x%04"PRIx32" ", table->data.entries[i].next_hop_flags);
+                printf(" 0x%08"PRIx32" ", table->data.entries[i].next_hop_flags);
                 if (table->data.entries[i].lifetime != FIB_LIFETIME_NO_EXPIRE) {
 
                     uint64_t tm = table->data.entries[i].lifetime - now;
