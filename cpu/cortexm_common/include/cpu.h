@@ -65,6 +65,15 @@ extern "C" {
 /** @} */
 
 /**
+ * @brief   Stack size used for the exception (ISR) stack
+ * @{
+ */
+#ifndef ISR_STACKSIZE
+#define ISR_STACKSIZE                   (512U)
+#endif
+/** @} */
+
+/**
  * @brief   Some members of the Cortex-M family have architecture specific
  *          atomic operations in atomic_arch.c
  */
