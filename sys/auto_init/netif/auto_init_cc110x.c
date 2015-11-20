@@ -21,7 +21,7 @@
 
 #include "board.h"
 #include "net/gnrc/gnrc_netdev2.h"
-#include "cc110x/gnrc_netdev2_cc110x.h"
+#include "gnrc_netdev2_cc110x.h"
 #include "net/gnrc.h"
 
 #include "cc110x.h"
