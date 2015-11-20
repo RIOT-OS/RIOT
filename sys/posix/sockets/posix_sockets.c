@@ -728,12 +728,11 @@ ssize_t recvfrom(int socket, void *restrict buffer, size_t length, int flags,
     switch (s->type) {
 #ifdef MODULE_CONN_UDP
         case SOCK_DGRAM:
-            if ((res = conn_udp_recvfrom(&s->conn.udp, buffer, length, addr, &addr_len,
-                                         port)) < 0) {
+            if ((res = conn_udp_recvfrom(&s->conn.udp, buffer, length, addr,
+                                         &addr_len, port)) < 0) {
                 errno = -res;
                 return -1;
             }
-
             break;
 #endif
 #ifdef MODULE_CONN_IP
