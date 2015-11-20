@@ -56,6 +56,7 @@ typedef struct {
     int protocol;
     bool bound;
     socket_conn_t conn;
+    uint16_t src_port;
 } socket_t;
 
 socket_t _pool[SOCKET_POOL_SIZE];
@@ -225,6 +226,7 @@ static int socket_close(int socket)
         }
     }
     s->domain = AF_UNSPEC;
+    s->src_port = 0;
     mutex_unlock(&_pool_mutex);
     return res;
 }
@@ -278,6 +280,7 @@ int socket(int domain, int type, int protocol)
         }
     }
     s->bound = false;
+    s->src_port = 0;
     mutex_unlock(&_pool_mutex);
     return res;
 }
@@ -433,6 +436,7 @@ int bind(int socket, const struct sockaddr *address, socklen_t address_len)
             errno = EOPNOTSUPP;
             return -1;
     }
+    s->src_port = byteorder_ntohs(port);
     s->bound = true;
     return 0;
 }
@@ -729,6 +733,7 @@ ssize_t recvfrom(int socket, void *restrict buffer, size_t length, int flags,
                 errno = -res;
                 return -1;
             }
+
             break;
 #endif
 #ifdef MODULE_CONN_IP
@@ -860,9 +865,18 @@ ssize_t sendto(int socket, const void *buffer, size_t length, int flags,
                                       sport, port);
             }
             else if (address != NULL) {
-                uint16_t sport = (uint16_t)genrand_uint32_range(1LU << 10U, 1LU << 16U);
+                ipv6_addr_t local;
+                s->src_port = (uint16_t)genrand_uint32_range(1LU << 10U, 1LU << 16U);
+                /* implicitly bind the socket here */
+                ipv6_addr_set_unspecified(&local);
+                if ((res = conn_udp_create(&s->conn.udp, &local, sizeof(local),
+                                           s->domain, s->src_port)) < 0) {
+                    errno = -res;
+                    return -1;
+                }
+                s->bound = true;
                 res = conn_udp_sendto(buffer, length, NULL, 0, addr, addr_len, s->domain,
-                                      sport, port);
+                                      s->src_port, port);
             }
             else {
                 errno = ENOTCONN;
