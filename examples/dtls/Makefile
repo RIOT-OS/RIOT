@@ -29,7 +29,9 @@ USEMODULE += gnrc_icmpv6_echo
 USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += ps
-USEMODULE += pthread
+ifeq (,$(filter native,$(BOARD)))
+  USEMODULE += pthread
+endif
 USEPKG += tinydtls
 
 # Comment this out to disable code in RIOT that does safety checking
