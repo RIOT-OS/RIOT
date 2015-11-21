@@ -149,7 +149,7 @@ static inline socklen_t _addr_truncate(struct sockaddr *out, socklen_t out_len,
 }
 
 static inline int _get_data_from_sockaddr(const struct sockaddr *address, size_t address_len,
-                                          void **addr, size_t *addr_len, uint16_t *port)
+                                          void **addr, size_t *addr_len, network_uint16_t *port)
 {
     switch (address->sa_family) {
         case AF_INET:
@@ -160,8 +160,7 @@ static inline int _get_data_from_sockaddr(const struct sockaddr *address, size_t
             struct sockaddr_in *in_addr = (struct sockaddr_in *)address;
             *addr = &in_addr->sin_addr;
             *addr_len = sizeof(ipv4_addr_t);
-            /* XXX sin_port is in network byteorder */
-            *port = ntohs(in_addr->sin_port);
+            port->u16 = in_addr->sin_port;
             break;
         case AF_INET6:
             if (address_len < sizeof(struct sockaddr_in6)) {
@@ -171,8 +170,7 @@ static inline int _get_data_from_sockaddr(const struct sockaddr *address, size_t
             struct sockaddr_in6 *in6_addr = (struct sockaddr_in6 *)address;
             *addr = &in6_addr->sin6_addr;
             *addr_len = sizeof(ipv6_addr_t);
-            /* XXX sin6_port is in network byteorder */
-            *port = ntohs(in6_addr->sin6_port);
+            port->u16 = in6_addr->sin6_port;
             break;
         default:
             errno = EAFNOSUPPORT;
@@ -382,7 +380,7 @@ int bind(int socket, const struct sockaddr *address, socklen_t address_len)
     int res = 0;
     void *addr;
     size_t addr_len;
-    uint16_t port;
+    network_uint16_t port = { 0 };
     mutex_lock(&_pool_mutex);
     s = _get_socket(socket);
     mutex_unlock(&_pool_mutex);
@@ -409,7 +407,8 @@ int bind(int socket, const struct sockaddr *address, socklen_t address_len)
 #endif
 #ifdef MODULE_CONN_TCP
         case SOCK_STREAM:
-            if ((res = conn_tcp_create(&s->conn.tcp, addr, addr_len, s->domain, port)) < 0) {
+            if ((res = conn_tcp_create(&s->conn.tcp, addr, addr_len, s->domain,
+                                       byteorder_ntohs(port))) < 0) {
                 errno = -res;
                 return -1;
             }
@@ -417,7 +416,9 @@ int bind(int socket, const struct sockaddr *address, socklen_t address_len)
 #endif
 #ifdef MODULE_CONN_UDP
         case SOCK_DGRAM:
-            if ((res = conn_udp_create(&s->conn.udp, addr, addr_len, s->domain, port)) < 0) {
+            if ((res = conn_udp_create(&s->conn.udp, addr, addr_len, s->domain,
+                                       byteorder_ntohs(port))) < 0) {
+
                 errno = -res;
                 return -1;
             }
@@ -442,7 +443,7 @@ int connect(int socket, const struct sockaddr *address, socklen_t address_len)
     int res = 0;
     void *addr;
     size_t addr_len;
-    uint16_t port;
+    network_uint16_t port;
     mutex_lock(&_pool_mutex);
     s = _get_socket(socket);
     mutex_unlock(&_pool_mutex);
@@ -464,8 +465,9 @@ int connect(int socket, const struct sockaddr *address, socklen_t address_len)
     switch (s->type) {
 #ifdef MODULE_CONN_TCP
         case SOCK_STREAM:
-            /* XXX sin_port is in network byteorder */
-            if ((res = conn_tcp_connect(&s->conn.tcp, addr, addr_len, port)) < 0) {
+            if ((res = conn_tcp_connect(&s->conn.tcp, addr, addr_len,
+                                        byteorder_ntohs(port))) < 0) {
+
                 errno = -res;
                 return -1;
             }
@@ -776,7 +778,8 @@ ssize_t sendto(int socket, const void *buffer, size_t length, int flags,
     int res = 0;
     void *addr = NULL;
     size_t addr_len = 0;
-    uint16_t port = 0;
+    network_uint16_t port;
+    port.u16 = 0;
     (void)flags;
     mutex_lock(&_pool_mutex);
     s = _get_socket(socket);
@@ -856,7 +859,7 @@ ssize_t sendto(int socket, const void *buffer, size_t length, int flags,
                 /* cppcheck bug? res is read below in l824 */
                 /* cppcheck-suppress unreadVariable */
                 res = conn_udp_sendto(buffer, length, src_addr, src_len, addr, addr_len, s->domain,
-                                      sport, port);
+                                      sport, byteorder_ntohs(port));
             }
             else if (address != NULL) {
                 ipv6_addr_t local;
@@ -870,7 +873,7 @@ ssize_t sendto(int socket, const void *buffer, size_t length, int flags,
                 }
                 s->bound = true;
                 res = conn_udp_sendto(buffer, length, NULL, 0, addr, addr_len, s->domain,
-                                      s->src_port, port);
+                                      s->src_port, byteorder_ntohs(port));
             }
             else {
                 errno = ENOTCONN;
