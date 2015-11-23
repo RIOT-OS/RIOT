@@ -12,7 +12,7 @@
  * @{
  *
  * @file
- * @brief       Shell commands for mersenne twister
+ * @brief       Shell commands for random generators
  *
  * @author      Christian Mehlis <mehlis@inf.fu-berlin.de>
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
@@ -30,7 +30,7 @@
 
 #include "random.h"
 
-int _mersenne_init(int argc, char **argv)
+int _random_init(int argc, char **argv)
 {
     int initval;
 
@@ -53,7 +53,7 @@ int _mersenne_init(int argc, char **argv)
     return 0;
 }
 
-int _mersenne_get(int argc, char **argv)
+int _random_get(int argc, char **argv)
 {
     (void) argc;
     (void) argv;
