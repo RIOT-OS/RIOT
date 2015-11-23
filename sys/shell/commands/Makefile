@@ -21,7 +21,7 @@ ifneq (,$(filter lpc2387,$(USEMODULE)))
   SRC += sc_heap.c
 endif
 ifneq (,$(filter random,$(USEMODULE)))
-  SRC += sc_mersenne.c
+  SRC += sc_random.c
 endif
 ifeq ($(CPU),x86)
   SRC += sc_x86_lspci.c
