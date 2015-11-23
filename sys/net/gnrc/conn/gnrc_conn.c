@@ -42,12 +42,14 @@ int gnrc_conn_recvfrom(conn_t *conn, void *data, size_t max_len, void *addr, siz
 {
     msg_t msg;
     int timeout = 3;
+    unsigned enqueued_msgs = cib_avail(&_conn_buf_cib);
     while ((timeout--) > 0) {
         gnrc_pktsnip_t *pkt, *l3hdr;
         size_t size = 0;
         int idx = -1;
-        /* first check if there's packet waiting in the queue */
-        if ((idx = cib_get(&_conn_buf_cib)) != -1) {
+        /* first check if there's packet waiting in the queue (and we have not
+         * already iterated through all of them */
+        if ((enqueued_msgs-- > 0) && (idx = cib_get(&_conn_buf_cib)) != -1) {
             DEBUG("Found queued message\n");
             memcpy(&msg, &_conn_buf[idx], sizeof(msg_t));
         }
@@ -71,6 +73,15 @@ int gnrc_conn_recvfrom(conn_t *conn, void *data, size_t max_len, void *addr, siz
                     LL_SEARCH_SCALAR(pkt, l4hdr, type, conn->l4_type);
                     if (l4hdr == NULL) {
                         msg_send_to_self(&msg); /* requeue invalid messages */
+                        continue;
+                    }
+                    else if (byteorder_ntohs(((udp_hdr_t *)l4hdr->data)->dst_port) !=
+                             (uint16_t)conn->netreg_entry.demux_ctx) {
+                        /* if the packet in the queue does not match port
+                         * number, we enqueue it again */
+                        gnrc_conn_enqueue(&msg);
+                        /* reset the timeout value to the previous one */
+                        timeout++;
                         continue;
                     }
                     *port = byteorder_ntohs(((udp_hdr_t *)l4hdr->data)->src_port);
