@@ -103,12 +103,6 @@ extern "C" {
  * @name UART configuration
  * @{
  */
-/* deprecated UART enable defines (to be removed) */
-#define UART_NUMOF          (2U)
-#define UART_0_EN           1
-#define UART_1_EN           1
-
-/* UART device configuration */
 static const uart_conf_t uart_config[] = {
     /* device, RX pin, TX pin, mux */
     {&SERCOM0->USART, GPIO_PIN(PA,5), GPIO_PIN(PA,4), GPIO_MUX_D},
@@ -118,6 +112,8 @@ static const uart_conf_t uart_config[] = {
 /* interrupt function name mapping */
 #define UART_0_ISR          isr_sercom0
 #define UART_1_ISR          isr_sercom5
+
+#define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
 /** @} */
 
 /**
