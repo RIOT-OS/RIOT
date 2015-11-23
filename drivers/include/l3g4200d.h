@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    driver_l3g4200d L3G4200D gyroscope
+ * @defgroup    drivers_l3g4200d L3G4200D gyroscope
  * @ingroup     drivers_sensors
  * @brief       Device driver for the L3G4200D gyroscope
  * @{

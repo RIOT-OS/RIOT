@@ -28,3 +28,12 @@
  * Most of these drivers will be connected over some bus or serial connection
  * to the MCU.
  */
+
+/**
+ * @defgroup    drivers_actuators Actuator Device Drivers
+ * @ingroup     drivers
+ * @brief       Drivers for actuating devices
+ *
+ * The group of actuators includes all kind of devices that can actively
+ * interact with the physical world, as e.g. motors, lights, sound devices, etc.
+ */

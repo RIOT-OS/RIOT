@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    flashrom Flash memory driver
+ * @defgroup    drivers_flashrom Flash memory driver
  * @ingroup     drivers
  * @brief       Generic flash memory driver
  * @{

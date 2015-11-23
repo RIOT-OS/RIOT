@@ -8,8 +8,7 @@
 
 /**
  * @defgroup    drivers_tcs37727 TCS37727 Light-To-Digital Converter
- *
- * @ingroup     drivers
+ * @ingroup     drivers_sensors
  * @brief       Driver for the AMS TCS37727 Color Light-To-Digital Converter
  *
  *

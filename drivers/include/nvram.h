@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    nvram Non-volatile RAM
+ * @defgroup    drivers_nvram Non-volatile RAM
  * @ingroup     drivers
  * @brief       Non-volatile RAM interface
  *

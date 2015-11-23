@@ -8,7 +8,7 @@
 
 /**
  * @defgroup    driver_pcd8544 PCD8544 LCD driver
- * @ingroup     drivers
+ * @ingroup     drivers_actuators
  * @brief       Driver for PCD8544 LCD displays
  *
  * @{

@@ -7,8 +7,8 @@
  */
 
 /**
- * @defgroup    at30tse75x AT30TSE75x temperature sensor with EEPROM
- * @ingroup     drivers
+ * @defgroup    drivers_at30tse75x AT30TSE75x temperature sensor with EEPROM
+ * @ingroup     drivers_sensors
  *
  * The connection between the MCU and the AT30TSE75x is based on the
  * I2C-interface. There are 3 versions of this IC, with either 2/4/8 Kb of
