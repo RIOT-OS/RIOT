@@ -13,12 +13,29 @@
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 
+#include "cib.h"
 #include "net/conn.h"
 #include "net/ipv6/hdr.h"
 #include "net/gnrc/conn.h"
 #include "net/gnrc/ipv6/hdr.h"
 #include "net/gnrc/ipv6/netif.h"
 #include "net/udp.h"
+
+#define ENABLE_DEBUG    (0)
+#include "debug.h"
+
+/**
+ * Queue for buffering packets while conn is not read from
+ */
+#define CONN_BUFFER_QUEUE (8)
+
+static msg_t _conn_buf[CONN_BUFFER_QUEUE];
+static cib_t _conn_buf_cib;
+
+void gnrc_conn_init(void)
+{
+    cib_init(&_conn_buf_cib, CONN_BUFFER_QUEUE);
+}
 
 int gnrc_conn_recvfrom(conn_t *conn, void *data, size_t max_len, void *addr, size_t *addr_len,
                        uint16_t *port)
@@ -28,7 +45,15 @@ int gnrc_conn_recvfrom(conn_t *conn, void *data, size_t max_len, void *addr, siz
     while ((timeout--) > 0) {
         gnrc_pktsnip_t *pkt, *l3hdr;
         size_t size = 0;
-        msg_receive(&msg);
+        int idx = -1;
+        /* first check if there's packet waiting in the queue */
+        if ((idx = cib_get(&_conn_buf_cib)) != -1) {
+            DEBUG("Found queued message\n");
+            memcpy(&msg, &_conn_buf[idx], sizeof(msg_t));
+        }
+        else {
+            msg_receive(&msg);
+        }
         switch (msg.type) {
             case GNRC_NETAPI_MSG_TYPE_RCV:
                 pkt = (gnrc_pktsnip_t *)msg.content.ptr;
@@ -86,5 +111,19 @@ bool gnrc_conn6_set_local_addr(uint8_t *conn_addr, const ipv6_addr_t *addr)
     return true;
 }
 #endif
+
+int gnrc_conn_enqueue(msg_t *m)
+{
+    int n = cib_put(&_conn_buf_cib);
+    if (n < 0) {
+        DEBUG("gnrc_conn_enqueue(): conn buffer queue is full\n");
+        return n;
+    }
+
+    DEBUG("gnrc_conn_enqueue(): queuing message\n");
+    msg_t *q = &_conn_buf[n];
+    *q = *m;
+    return n;
+}
 
 /** @} */
