@@ -26,6 +26,8 @@ if [ $# -ne 0 ]; then
     exit 2
 fi
 
+readlink () { echo $(cd $(dirname $1); pwd)/$(basename $1); }
+
 XML_INSTRUCTIONS='
 <!--
 Instrucions:
@@ -59,7 +61,7 @@ INCLUDES=$(${ECHO} "${GCCCOMMANDLINE}" | sed -e 's/ /\n/g' | egrep '^-I' | cut -
 INCLUDES_REL=""
 for p in ${INCLUDES}; do
     #ABSPATH=$(readlink -m "$p")
-    RELPATH=$(readlink -m "$p" | sed -e "s,^${RIOTBASE},/${ECLIPSE_PROJECT_NAME}/,")
+    RELPATH=$(readlink "$p" | sed -e "s,^${RIOTBASE},/${ECLIPSE_PROJECT_NAME}/,")
     INCLUDES_REL=${INCLUDES_REL}$'\n'${RELPATH}
 done
 
