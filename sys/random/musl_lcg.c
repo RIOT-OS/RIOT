@@ -41,5 +41,5 @@ void genrand_init(uint32_t s)
 uint32_t genrand_uint32(void)
 {
     _seed = 6364136223846793005ULL*_seed + 1;
-    return _seed>>33;
+    return _seed>>31;
 }
