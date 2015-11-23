@@ -1283,7 +1283,7 @@ int fib_sr_get_route(fib_table_t *table, uint8_t *dst, size_t dst_size, kernel_p
         }
 
         if( skip ) {
-            if((*fib_sr == &table->data.source_routes->headers[i])) {
+            if(*fib_sr == &table->data.source_routes->headers[i]) {
                 skip = false;
             }
             /* we skip all entries upon the consecutive one to start search */

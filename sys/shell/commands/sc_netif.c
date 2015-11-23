@@ -892,7 +892,7 @@ int _netif_config(int argc, char **argv)
                 gnrc_ipv6_netif_t *entry;
                 if (((hl = atoi(argv[3])) < 0) || (hl > UINT8_MAX)) {
                     printf("error: Hop limit must be between %" PRIu16 " and %" PRIu16 "\n",
-                            0, UINT16_MAX);
+                            (uint16_t)0, (uint16_t)UINT16_MAX);
                     return 1;
                 }
                 if ((entry = gnrc_ipv6_netif_get(dev)) == NULL) {
