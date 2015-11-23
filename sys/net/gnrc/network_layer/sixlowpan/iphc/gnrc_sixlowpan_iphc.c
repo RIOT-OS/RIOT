@@ -313,11 +313,8 @@ size_t gnrc_sixlowpan_iphc_decode(gnrc_pktsnip_t *ipv6, gnrc_pktsnip_t *pkt, siz
             ipv6_addr_set_unspecified(&ipv6_hdr->dst);
             ipv6_hdr->dst.u8[0] = 0xff;
             ipv6_hdr->dst.u8[1] = iphc_hdr[payload_offset++];
-            ipv6_hdr->dst.u8[11] = iphc_hdr[payload_offset++];
-            ipv6_hdr->dst.u8[12] = iphc_hdr[payload_offset++];
-            ipv6_hdr->dst.u8[13] = iphc_hdr[payload_offset++];
-            ipv6_hdr->dst.u8[14] = iphc_hdr[payload_offset++];
-            ipv6_hdr->dst.u8[15] = iphc_hdr[payload_offset++];
+            memcpy(ipv6_hdr->dst.u8 + 11, iphc_hdr + payload_offset, 5);
+            payload_offset += 5;
             break;
 
         case IPHC_M_DAC_DAM_M_32:
@@ -325,9 +322,8 @@ size_t gnrc_sixlowpan_iphc_decode(gnrc_pktsnip_t *ipv6, gnrc_pktsnip_t *pkt, siz
             ipv6_addr_set_unspecified(&ipv6_hdr->dst);
             ipv6_hdr->dst.u8[0] = 0xff;
             ipv6_hdr->dst.u8[1] = iphc_hdr[payload_offset++];
-            ipv6_hdr->dst.u8[13] = iphc_hdr[payload_offset++];
-            ipv6_hdr->dst.u8[14] = iphc_hdr[payload_offset++];
-            ipv6_hdr->dst.u8[15] = iphc_hdr[payload_offset++];
+            memcpy(ipv6_hdr->dst.u8 + 13, iphc_hdr + payload_offset, 3);
+            payload_offset += 3;
             break;
 
         case IPHC_M_DAC_DAM_M_8:
