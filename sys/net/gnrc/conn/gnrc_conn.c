@@ -20,35 +20,6 @@
 #include "net/gnrc/ipv6/netif.h"
 #include "net/udp.h"
 
-static inline size_t _srcaddr(void *addr, gnrc_pktsnip_t *hdr)
-{
-    switch (hdr->type) {
-#ifdef MODULE_GNRC_IPV6
-        case GNRC_NETTYPE_IPV6:
-            memcpy(addr, &((ipv6_hdr_t *)hdr->data)->src, sizeof(ipv6_addr_t));
-            return sizeof(ipv6_addr_t);
-#endif
-        default:
-            (void)addr;
-            return 0;
-    }
-}
-
-static inline void _srcport(uint16_t *port, gnrc_pktsnip_t *hdr)
-{
-    switch (hdr->type) {
-#ifdef MODULE_GNRC_UDP
-        case GNRC_NETTYPE_UDP:
-            memcpy(port, &((udp_hdr_t *)hdr->data)->src_port, sizeof(uint16_t));
-            break;
-#endif
-        default:
-            (void)port;
-            (void)hdr;
-            break;
-    }
-}
-
 int gnrc_conn_recvfrom(conn_t *conn, void *data, size_t max_len, void *addr, size_t *addr_len,
                        uint16_t *port)
 {
@@ -77,11 +48,12 @@ int gnrc_conn_recvfrom(conn_t *conn, void *data, size_t max_len, void *addr, siz
                         msg_send_to_self(&msg); /* requeue invalid messages */
                         continue;
                     }
-                    _srcport(port, l4hdr);
+                    *port = byteorder_ntohs(((udp_hdr_t *)l4hdr->data)->src_port);
                 }
 #endif  /* defined(MODULE_CONN_UDP) */
                 if (addr != NULL) {
-                    *addr_len = _srcaddr(addr, l3hdr);
+                    memcpy(addr, &((ipv6_hdr_t *)l3hdr->data)->src, sizeof(ipv6_addr_t));
+                    *addr_len = sizeof(ipv6_addr_t);
                 }
                 memcpy(data, pkt->data, pkt->size);
                 size = pkt->size;
