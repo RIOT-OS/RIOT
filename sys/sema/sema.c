@@ -102,11 +102,12 @@ int sema_wait_timed_msg(sema_t *sema, uint64_t timeout, msg_t *msg)
 
         restoreIRQ(old_state);
         msg_receive(msg);
-
+        old_state = disableIRQ();
         if (timeout != 0) {
             xtimer_remove(&timeout_timer);
         }
         priority_queue_remove(&sema->queue, &n);
+        restoreIRQ(old_state);
         if (msg->content.ptr != (void *)sema) {
             return -EAGAIN;
         }
