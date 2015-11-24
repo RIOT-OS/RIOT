@@ -123,7 +123,7 @@ gnrc_ipv6_nc_t *gnrc_ipv6_nc_add(kernel_pid_t iface, const ipv6_addr_t *ipv6_add
     DEBUG(" with flags = 0x%0x\n", flags);
 
     if (gnrc_ipv6_nc_get_state(free_entry) == GNRC_IPV6_NC_STATE_INCOMPLETE) {
-        DEBUG("ipv6_nc: Set remaining probes to %" PRIu8 "\n", GNRC_NDP_MAX_MC_NBR_SOL_NUMOF);
+        DEBUG("ipv6_nc: Set remaining probes to %" PRIu8 "\n", (uint8_t) GNRC_NDP_MAX_MC_NBR_SOL_NUMOF);
         free_entry->probes_remaining = GNRC_NDP_MAX_MC_NBR_SOL_NUMOF;
     }
 
@@ -163,6 +163,13 @@ void gnrc_ipv6_nc_remove(kernel_pid_t iface, const ipv6_addr_t *ipv6_addr)
 #endif
 #ifdef MODULE_GNRC_SIXLOWPAN_ND_ROUTER
         xtimer_remove(&entry->type_timeout);
+
+        gnrc_ipv6_netif_t *if_entry = gnrc_ipv6_netif_get(iface);
+
+        if ((if_entry != NULL) && (if_entry->rtr_adv_msg.content.ptr == (char *) entry)) {
+            /* cancel timer set by gnrc_ndp_rtr_sol_handle */
+            xtimer_remove(&if_entry->rtr_adv_timer);
+        }
 #endif
 #if defined(MODULE_GNRC_NDP_ROUTER) || defined(MODULE_GNRC_SIXLOWPAN_ND_BORDER_ROUTER)
         xtimer_remove(&entry->rtr_adv_timer);

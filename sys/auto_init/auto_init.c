@@ -76,6 +76,10 @@
 #include "net/gnrc/udp.h"
 #endif
 
+#ifdef MODULE_GNRC_TCP
+#include "net/gnrc/tcp.h"
+#endif
+
 #ifdef MODULE_FIB
 #include "net/fib.h"
 #endif
@@ -138,7 +142,10 @@ void auto_init(void)
     DEBUG("Auto init UDP module.\n");
     gnrc_udp_init();
 #endif
-
+#ifdef MODULE_GNRC_TCP
+    DEBUG("Auto init TCP module.\n");
+    gnrc_tcp_init();
+#endif
 
 /* initialize network devices */
 #ifdef MODULE_AUTO_INIT_GNRC_NETIF
@@ -151,6 +158,11 @@ void auto_init(void)
 #ifdef MODULE_ENCX24J600
     extern void auto_init_encx24j600(void);
     auto_init_encx24j600();
+#endif
+
+#ifdef MODULE_ENC28J60
+    extern void auto_init_enc28j60(void);
+    auto_init_enc28j60();
 #endif
 
 #ifdef MODULE_GNRC_SLIP
@@ -183,4 +195,31 @@ void auto_init(void)
 #ifdef MODULE_GNRC_IPV6_NETIF
     gnrc_ipv6_netif_init_by_dev();
 #endif
+
+/* initialize sensors and actuators */
+#ifdef MODULE_AUTO_INIT_SAUL
+    DEBUG("auto_init SAUL\n");
+
+#ifdef MODULE_SAUL_GPIO
+    extern void auto_init_gpio(void);
+    auto_init_gpio();
+#endif
+#ifdef MODULE_LSM303DLHC
+    extern void auto_init_lsm303dlhc(void);
+    auto_init_lsm303dlhc();
+#endif
+#ifdef MODULE_LPS331AP
+    extern void auto_init_lps331ap(void);
+    auto_init_lps331ap();
+#endif
+#ifdef MODULE_ISL29020
+    extern void auto_init_isl29020(void);
+    auto_init_isl29020();
+#endif
+#ifdef MODULE_L3G4200D
+    extern void auto_init_l3g4200d(void);
+    auto_init_l3g4200d();
+#endif
+
+#endif /* MODULE_AUTO_INIT_SAUL */
 }

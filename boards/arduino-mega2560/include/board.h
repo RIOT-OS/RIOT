@@ -22,6 +22,7 @@
 #define BOARD_H_
 
 #include "cpu.h"
+#include "arduino_pinmap.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -33,13 +34,10 @@ extern "C" {
 #define F_CPU               (16000000L)
 
 /**
-* @name Define UART device and baudrate for stdio
-* @{
+* @brief As the CPU is too slow to handle 115200 baud, we set the default
+*        baudrate to 9600 for this board
 */
-#define STDIO               UART_0
 #define STDIO_BAUDRATE      (9600U)
-#define STDIO_RX_BUFSIZE    (64U)
-/** @} */
 
 /**
  * @name LED pin definitions

@@ -19,7 +19,13 @@ ifneq (,$(filter dht,$(USEMODULE)))
     USEMODULE += xtimer
 endif
 
+ifneq (,$(filter enc28j60,$(USEMODULE)))
+  USEMODULE += netdev2_eth
+  USEMODULE += xtimer
+endif
+
 ifneq (,$(filter encx24j600,$(USEMODULE)))
+  USEMODULE += netdev2_eth
   USEMODULE += xtimer
 endif
 

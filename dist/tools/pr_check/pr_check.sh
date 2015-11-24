@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/usr/bin/env bash
 #
 # Copyright (C) 2014 Martine Lenders <mlenders@inf.fu-berlin.de>
 #

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 sleep 2
 setsid -w avarice $1 &
 #sleep 2 && $2/avr-gdb-wrapper -ex "target remote localhost:$3" $4

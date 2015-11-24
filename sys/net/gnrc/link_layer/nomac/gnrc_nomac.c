@@ -138,7 +138,7 @@ kernel_pid_t gnrc_nomac_init(char *stack, int stacksize, char priority,
         return -ENODEV;
     }
     /* create new NOMAC thread */
-    res = thread_create(stack, stacksize, priority, CREATE_STACKTEST,
+    res = thread_create(stack, stacksize, priority, THREAD_CREATE_STACKTEST,
                         _nomac_thread, (void *)dev, name);
     if (res <= 0) {
         return -EINVAL;

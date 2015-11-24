@@ -140,7 +140,7 @@ int main(void)
         slacker_stack1,
         sizeof(slacker_stack1),
         THREAD_PRIORITY_MAIN - 1,
-        CREATE_STACKTEST,
+        THREAD_CREATE_STACKTEST,
         slacker_thread,
         NULL,
         "slacker1");
@@ -157,7 +157,7 @@ int main(void)
         slacker_stack2,
         sizeof(slacker_stack2),
         THREAD_PRIORITY_MAIN - 1,
-        CREATE_STACKTEST,
+        THREAD_CREATE_STACKTEST,
         slacker_thread,
         NULL,
         "slacker2");
@@ -174,7 +174,7 @@ int main(void)
                    worker_stack,
                    sizeof(worker_stack),
                    THREAD_PRIORITY_MAIN - 1,
-                   CREATE_STACKTEST,
+                   THREAD_CREATE_STACKTEST,
                    worker_thread,
                    NULL,
                    "worker");

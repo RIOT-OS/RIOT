@@ -229,21 +229,6 @@ typedef union {
 /** @} */
 
 /**
- * @brief   Checks if two IPv6 addresses are equal.
- *
- * @param[in] a     An IPv6 address.
- * @param[in] b     Another IPv6 address.
- *
- * @return  true, if @p a and @p b are equal
- * @return  false, otherwise.
- */
-static inline bool ipv6_addr_equal(const ipv6_addr_t *a, const ipv6_addr_t *b)
-{
-    return (a->u64[0].u64 == b->u64[0].u64) &&
-           (a->u64[1].u64 == b->u64[1].u64);
-}
-
-/**
  * @brief   Checks if @p addr is unspecified (all zero).
  *
  * @see <a href="http://tools.ietf.org/html/rfc4291#section-2.5.2">
@@ -447,6 +432,17 @@ static inline bool ipv6_addr_is_solicited_node(const ipv6_addr_t *addr)
            (addr->u8[12] == 0xff);
 }
 
+
+/**
+ * @brief   Checks if two IPv6 addresses are equal.
+ *
+ * @param[in] a     An IPv6 address.
+ * @param[in] b     Another IPv6 address.
+ *
+ * @return  true, if @p a and @p b are equal
+ * @return  false, otherwise.
+ */
+bool ipv6_addr_equal(const ipv6_addr_t *a, const ipv6_addr_t *b);
 
 /**
  * @brief   Checks up to which bit-count two IPv6 addresses match in their

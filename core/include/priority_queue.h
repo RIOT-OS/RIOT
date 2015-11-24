@@ -98,6 +98,8 @@ priority_queue_node_t *priority_queue_remove_head(priority_queue_t *root);
  *
  * @param[in,out]   root    the queue's root
  * @param[in]       new_obj the object to prepend
+ *
+ * @pre The queue does not already contain @p new_obj.
  */
 void priority_queue_add(priority_queue_t *root, priority_queue_node_t *new_obj);
 

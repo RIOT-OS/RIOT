@@ -159,6 +159,22 @@ static void test_ng_netif_get__full(void)
     TEST_ASSERT_EQUAL_INT(GNRC_NETIF_NUMOF, size);
 }
 
+static void test_ng_netif_exist(void)
+{
+    TEST_ASSERT_EQUAL_INT(0, gnrc_netif_add(0));
+    TEST_ASSERT_EQUAL_INT(0, gnrc_netif_add(1));
+    TEST_ASSERT_EQUAL_INT(0, gnrc_netif_add(TEST_UINT8));
+
+    for (int i = 0; i < UINT8_MAX; i++) {
+        if ((i == 0) || (i == 1) || (i == TEST_UINT8)) {
+            TEST_ASSERT(gnrc_netif_exist(i));
+        }
+        else {
+            TEST_ASSERT(!gnrc_netif_exist(i));
+        }
+    }
+}
+
 static void test_ng_netif_addr_to_str__out_too_short(void)
 {
     static const uint8_t addr[] = {0x05, 0xcd};
@@ -280,6 +296,7 @@ Test *tests_netif_tests(void)
         new_TestFixture(test_ng_netif_get__empty),
         new_TestFixture(test_ng_netif_get__success_3_minus_one),
         new_TestFixture(test_ng_netif_get__full),
+        new_TestFixture(test_ng_netif_exist),
         new_TestFixture(test_ng_netif_addr_to_str__out_too_short),
         new_TestFixture(test_ng_netif_addr_to_str__success),
         new_TestFixture(test_ng_netif_addr_from_str__out_too_short),

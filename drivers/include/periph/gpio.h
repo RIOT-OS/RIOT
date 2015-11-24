@@ -11,6 +11,38 @@
  * @ingroup     drivers_periph
  * @brief       Low-level GPIO peripheral driver
  *
+ * This is a basic GPIO (General-purpose input/output) interface to allow
+ * platform independent access to a MCU's input/output pins. This interface is
+ * intentionally designed to be as simple as possible, to allow for easy
+ * implementation and maximum portability.
+ *
+ * The interface provides capabilities to initialize a pin as output-,
+ * input- and interrupt pin. With the API you can basically set/clear/toggle the
+ * digital signal at the hardware pin when in output mode. Configured as input you can
+ * read a digital value that is being applied to the pin externally. When initializing
+ * an external interrupt pin, you can register a callback function that is executed
+ * in interrupt context once the interrupt condition applies to the pin. Usually you
+ * can react to rising or falling signal flanks (or both).
+ *
+ * In addition the API provides to set standard input/output circuit modes such as
+ * e.g. internal push-pull configurations.
+ *
+ * All modern micro controllers organize their GPIOs in some form of ports,
+ * often named 'PA', 'PB', 'PC'..., or 'P0', 'P1', 'P2'..., or similar. Each of
+ * these ports is then assigned a number of pins, often 8, 16, or 32. A hardware
+ * pin can thus be described by its port/pin tuple. To access a pin, the
+ * @p GPIO_PIN(port, pin) macro should be used. For example: If your platform has
+ * a pin PB22, it will be port=1 and pin=22. The @p GPIO_PIN macro should be
+ * overridden by a MCU, to allow for efficient encoding of the the port/pin tuple.
+ * For example, on many platforms it is possible to `OR` the pin number with the
+ * corresponding ports base register address. This allows for efficient decoding
+ * of pin number and base address without the need of any address lookup.
+ *
+ * In case the driver does not define it, the below macro definition is used to
+ * simply map the port/pin tuple to the pin value. In that case, predefined GPIO
+ * definitions in `RIOT/boards/ * /include/periph_conf.h` will define the selected
+ * GPIO pin.
+ *
  * @{
  * @file
  * @brief       Low-level GPIO peripheral driver interface definitions
@@ -57,7 +89,7 @@ typedef int gpio_t;
 #ifndef HAVE_GPIO_DIR_T
 typedef enum {
     GPIO_DIR_IN = 0,        /**< configure pin as input */
-    GPIO_DIR_OUT = 1,       /**< configure pin as output */
+    GPIO_DIR_OUT = 1        /**< configure pin as output */
 } gpio_dir_t;
 #endif
 

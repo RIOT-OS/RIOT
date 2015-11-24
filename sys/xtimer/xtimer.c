@@ -159,22 +159,44 @@ void xtimer_now_timex(timex_t *out)
     out->microseconds = now - (out->seconds * SEC_IN_USEC);
 }
 
-int xtimer_msg_receive_timeout64(msg_t *m, uint64_t timeout) {
-    msg_t tmsg;
-    tmsg.type = MSG_XTIMER;
-    tmsg.content.ptr = (char *) &tmsg;
+/* Prepares the message to trigger the timeout.
+ * Additionally, the xtimer_t struct gets initialized.
+ */
+static void _setup_timer_msg(msg_t *m, xtimer_t *t)
+{
+    m->type = MSG_XTIMER;
+    m->content.ptr = (char *) m;
 
-    xtimer_t t;
-    t.target = t.long_target = 0;
-    xtimer_set_msg64(&t, timeout, &tmsg, sched_active_pid);
+    t->target = t->long_target = 0;
+}
 
+/* Waits for incoming message or timeout. */
+static int _msg_wait(msg_t *m, msg_t *tmsg, xtimer_t *t)
+{
     msg_receive(m);
-    if (m->type == MSG_XTIMER && m->content.ptr == (char *) &tmsg) {
+    if (m->type == MSG_XTIMER && m->content.ptr == (char *) tmsg) {
         /* we hit the timeout */
         return -1;
     }
     else {
-        xtimer_remove(&t);
+        xtimer_remove(t);
         return 1;
     }
+}
+
+int xtimer_msg_receive_timeout64(msg_t *m, uint64_t timeout) {
+    msg_t tmsg;
+    xtimer_t t;
+    _setup_timer_msg(&tmsg, &t);
+    xtimer_set_msg64(&t, timeout, &tmsg, sched_active_pid);
+    return _msg_wait(m, &tmsg, &t);
+}
+
+int xtimer_msg_receive_timeout(msg_t *msg, uint32_t us)
+{
+    msg_t tmsg;
+    xtimer_t t;
+    _setup_timer_msg(&tmsg, &t);
+    xtimer_set_msg(&t, us, &tmsg, sched_active_pid);
+    return _msg_wait(msg, &tmsg, &t);
 }

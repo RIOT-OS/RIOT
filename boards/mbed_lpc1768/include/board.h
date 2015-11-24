@@ -38,15 +38,6 @@ extern "C" {
 #define F_CPU               (96000000)
 
 /**
- * @name Assign the UART interface to be used for stdio
- * @{
- */
-#define STDIO               UART_0
-#define STDIO_BAUDRATE      (115200U)
-#define STDIO_RX_BUFSIZE    (64U)
-/** @} */
-
-/**
  * @name LED pin definitions
  * @{
  */

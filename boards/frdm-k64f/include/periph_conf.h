@@ -17,8 +17,8 @@
  * @author      Johann Fischer <j.fischer@phytec.de>
  */
 
-#ifndef __PERIPH_CONF_H
-#define __PERIPH_CONF_H
+#ifndef PERIPH_CONF_H
+#define PERIPH_CONF_H
 
 #include "cpu_conf.h"
 
@@ -284,12 +284,11 @@ extern "C"
 #define KINETIS_RNGA                 RNG
 #define RANDOM_CLKEN()               (SIM->SCGC6 |= (1 << 9))
 #define RANDOM_CLKDIS()              (SIM->SCGC6 &= ~(1 << 9))
-
 /** @} */
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __PERIPH_CONF_H */
+#endif /* PERIPH_CONF_H */
 /** @} */

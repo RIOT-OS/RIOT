@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2015 Martine Lenders <mlenders@inf.fu-berlin.de>
+ * Copyright (C) 2015 INRIA
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -11,8 +12,6 @@
  *
  * @file
  */
-
-#include <stdio.h>
 
 #include <errno.h>
 #include "kernel_types.h"
@@ -96,6 +95,16 @@ size_t gnrc_netif_get(kernel_pid_t *netifs)
     }
 
     return size;
+}
+
+bool gnrc_netif_exist(kernel_pid_t pid)
+{
+    for (int i = 0; i < GNRC_NETIF_NUMOF; i++) {
+        if (ifs[i] == pid) {
+            return true;
+        }
+    }
+    return false;
 }
 
 /** @} */

@@ -30,7 +30,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
-#ifdef MODULE_VTIMER
+#ifdef MODULE_XTIMER
 #include <sys/time.h>
 #endif
 #include <ifaddrs.h>
@@ -39,7 +39,7 @@
 #include "kernel.h"
 #include "cpu.h"
 #include "irq.h"
-#include "vtimer.h"
+#include "xtimer.h"
 
 #include "native_internal.h"
 
@@ -134,6 +134,10 @@ void _native_syscall_leave(void)
     }
 }
 
+/* make use of TLSF if it is included, except when building with valgrind
+ * support, where one probably wants to make use of valgrind's memory leak
+ * detection abilities*/
+#if !(defined MODULE_TLSF) || (defined(HAVE_VALGRIND_H))
 int _native_in_malloc = 0;
 void *malloc(size_t size)
 {
@@ -204,6 +208,7 @@ void *realloc(void *ptr, size_t size)
     _native_syscall_leave();
     return r;
 }
+#endif /* !(defined MODULE_TLSF) || (defined(HAVE_VALGRIND_H)) */
 
 ssize_t _native_read(int fd, void *buf, size_t count)
 {
@@ -402,7 +407,10 @@ int getpid(void)
 int _gettimeofday(struct timeval *tp, void *restrict tzp)
 {
     (void) tzp;
-    vtimer_gettimeofday(tp);
+    timex_t now;
+    xtimer_now_timex(&now);
+    tp->tv_sec = now.seconds;
+    tp->tv_usec = now.microseconds;
     return 0;
 }
 #endif

@@ -28,7 +28,7 @@
 
 #define TEST_SECONDS        (10U)
 #define TEST_TIME           (TEST_SECONDS * SEC_IN_USEC)
-#define STACKSIZE_TIMER     (1024)
+#define STACKSIZE_TIMER     (THREAD_STACKSIZE_DEFAULT)
 
 char stack_timer1[STACKSIZE_TIMER];
 char stack_timer2[STACKSIZE_TIMER];
@@ -64,7 +64,7 @@ int main(void)
     thread_create(stack_timer1,
                   STACKSIZE_TIMER,
                   2,
-                  CREATE_STACKTEST,
+                  THREAD_CREATE_STACKTEST,
                   timer_func1,
                   NULL,
                   "timer1");
@@ -72,7 +72,7 @@ int main(void)
     thread_create(stack_timer2,
                   STACKSIZE_TIMER,
                   3,
-                  CREATE_STACKTEST,
+                  THREAD_CREATE_STACKTEST,
                   timer_func2,
                   NULL,
                   "timer2");

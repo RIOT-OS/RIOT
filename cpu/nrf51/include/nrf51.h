@@ -1077,7 +1077,7 @@ typedef struct {                                    /*!< NVMC Structure         
   union {
     __IO uint32_t  ERASEPCR1;                       /*!< Register for erasing a non-protected non-volatile memory page.        */
     __IO uint32_t  ERASEPAGE;                       /*!< Register for erasing a non-protected non-volatile memory page.        */
-  };
+  } nrf51_unnamed1;
   __IO uint32_t  ERASEALL;                          /*!< Register for erasing all non-volatile user memory.                    */
   __IO uint32_t  ERASEPCR0;                         /*!< Register for erasing a protected non-volatile memory page.            */
   __IO uint32_t  ERASEUICR;                         /*!< Register for start erasing User Information Congfiguration Registers. */
@@ -1130,7 +1130,7 @@ typedef struct {                                    /*!< FICR Structure         
                                                          kept for backward compatinility purposes. Use SIZERAMBLOCKS
                                                           instead.                                                             */
     __I  uint32_t  SIZERAMBLOCKS;                   /*!< Size of RAM blocks in bytes.                                          */
-  };
+  } nrf51_unnamed2;
   __I  uint32_t  RESERVED3[5];
   __I  uint32_t  CONFIGID;                          /*!< Configuration identifier.                                             */
   __I  uint32_t  DEVICEID[2];                       /*!< Device identifier.                                                    */
@@ -1167,7 +1167,7 @@ typedef struct {                                    /*!< UICR Structure         
   union {
     __IO uint32_t  NRFFW[15];                       /*!< Reserved for Nordic firmware design.                                  */
     __IO uint32_t  BOOTLOADERADDR;                  /*!< Bootloader start address.                                             */
-  };
+  } nrf51_unnamed3;
   __IO uint32_t  NRFHW[12];                         /*!< Reserved for Nordic hardware design.                                  */
   __IO uint32_t  CUSTOMER[32];                      /*!< Reserved for customer.                                                */
 } NRF_UICR_Type;

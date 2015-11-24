@@ -397,12 +397,15 @@ void gnrc_ndp_rtr_sol_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
 
             switch (opt->type) {
                 case NDP_OPT_SL2A:
-                    if ((l2src_len = gnrc_ndp_internal_sl2a_opt_handle(pkt, ipv6, rtr_sol->type, opt,
-                                                                       l2src)) < 0) {
+                    l2src_len = gnrc_ndp_internal_sl2a_opt_handle(pkt, ipv6,
+                                                                  rtr_sol->type,
+                                                                  opt, l2src);
+                    if (l2src_len < 0) {
                         /* -ENOTSUP can not happen */
                         /* invalid source link-layer address option */
                         return;
                     }
+                    _stale_nc(iface, &ipv6->src, l2src, l2src_len);
                     break;
 
                 default:
@@ -419,7 +422,7 @@ void gnrc_ndp_rtr_sol_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
             }
 #endif
         }
-        _stale_nc(iface, &ipv6->src, l2src, l2src_len);
+
         /* send delayed */
         if (if_entry->flags & GNRC_IPV6_NETIF_FLAGS_RTR_ADV) {
             uint32_t delay;

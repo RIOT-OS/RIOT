@@ -51,22 +51,6 @@ extern "C" {
 /** @} */
 
 /**
- * @brief Disable interrupts
- */
-static inline void __attribute__((always_inline)) dINT(void)
-{
-    asm volatile ("cli");
-}
-
-/**
- * @brief Enable interrupts
- */
-static inline void __attribute__((always_inline)) eINT(void)
-{
-    asm volatile ("sti");
-}
-
-/**
  * @brief   Disable interrupts and halt forever.
  *
  * This function is the last resort in case of an unrecoverable error.

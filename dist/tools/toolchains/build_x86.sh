@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # directory to download source files and store intermediates
 [[ -z $TARGET ]] && TARGET=i586-none-elf

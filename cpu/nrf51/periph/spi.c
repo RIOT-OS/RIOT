@@ -123,6 +123,9 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
 
 int spi_init_slave(spi_t dev, spi_conf_t conf, char (*cb)(char data))
 {
+    (void) dev;
+    (void) conf;
+    (void) cb;
     /* This API is incompatible with nRF51 SPIS */
     return -1;
 }
@@ -189,7 +192,7 @@ int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length)
         return -1;
     }
 
-    for (int i = 0; i < length; i++) {
+    for (unsigned i = 0; i < length; i++) {
         char tmp = (out) ? out[i] : 0;
         spi[dev]->EVENTS_READY = 0;
         spi[dev]->TXD = (uint8_t)tmp;
@@ -217,6 +220,8 @@ int spi_transfer_regs(spi_t dev, uint8_t reg, char *out, char *in, unsigned int 
 
 void spi_transmission_begin(spi_t dev, char reset_val)
 {
+    (void) dev;
+    (void) reset_val;
     /* spi slave is not implemented */
 }
 

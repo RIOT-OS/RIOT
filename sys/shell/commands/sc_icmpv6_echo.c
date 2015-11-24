@@ -102,10 +102,10 @@ int _handle_reply(gnrc_pktsnip_t *pkt, uint32_t time)
             min_seq_expected++;
         }
 
-        printf("%u bytes from %s: id=%" PRIu16 " seq=%" PRIu16 " hop limit=%" PRIu8
-               " time = %" PRIu32 ".%03" PRIu32 " ms\n", (unsigned) icmpv6->size,
+        printf("%u bytes from %s: id=%" PRIu16 " seq=%" PRIu16 " hop limit=%u time = %"
+               PRIu32 ".%03" PRIu32 " ms\n", (unsigned) icmpv6->size,
                ipv6_addr_to_str(ipv6_str, &(ipv6_hdr->src), sizeof(ipv6_str)),
-               byteorder_ntohs(icmpv6_hdr->id), seq, ipv6_hdr->hl,
+               byteorder_ntohs(icmpv6_hdr->id), seq, (unsigned)ipv6_hdr->hl,
                time / MS_IN_USEC, time % MS_IN_USEC);
         gnrc_ipv6_nc_still_reachable(&ipv6_hdr->src);
     }
@@ -150,8 +150,7 @@ int _icmpv6_ping(int argc, char **argv)
     ipv6_addr_t addr;
     msg_t msg;
     gnrc_netreg_entry_t *ipv6_entry, my_entry = { NULL, ICMPV6_ECHO_REP,
-                                                  thread_getpid()
-                                                };
+                                                  thread_getpid() };
     uint32_t min_rtt = UINT32_MAX, max_rtt = 0;
     uint64_t sum_rtt = 0;
     uint64_t ping_start;
@@ -182,8 +181,13 @@ int _icmpv6_ping(int argc, char **argv)
         stat_interval = atoi(argv[4 + param_offset]);
     }
 
-    if ((ipv6_addr_from_str(&addr, addr_str) == NULL) || (((int)payload_len) < 0)) {
+    if ((int)payload_len < 0) {
         usage(argv);
+        return 1;
+    }
+
+    if (ipv6_addr_from_str(&addr, addr_str) == NULL) {
+        puts("error: malformed address");
         return 1;
     }
 

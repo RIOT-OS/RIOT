@@ -49,8 +49,9 @@ kernel_pid_t gnrc_rpl_init(kernel_pid_t if_pid)
     if (gnrc_rpl_pid == KERNEL_PID_UNDEF) {
         _instance_id = 0;
         /* start the event loop */
-        gnrc_rpl_pid = thread_create(_stack, sizeof(_stack), GNRC_RPL_PRIO, CREATE_STACKTEST,
-                _event_loop, NULL, "RPL");
+        gnrc_rpl_pid = thread_create(_stack, sizeof(_stack), GNRC_RPL_PRIO,
+                                     THREAD_CREATE_STACKTEST,
+                                     _event_loop, NULL, "RPL");
 
         if (gnrc_rpl_pid == KERNEL_PID_UNDEF) {
             DEBUG("RPL: could not start the event loop\n");
@@ -194,9 +195,10 @@ static void *_event_loop(void *args)
                 _receive((gnrc_pktsnip_t *)msg.content.ptr);
                 break;
             case GNRC_NETAPI_MSG_TYPE_SND:
+                break;
             case GNRC_NETAPI_MSG_TYPE_GET:
             case GNRC_NETAPI_MSG_TYPE_SET:
-                DEBUG("RPL: reply to unsupported recv/get/set\n");
+                DEBUG("RPL: reply to unsupported get/set\n");
                 reply.content.value = -ENOTSUP;
                 msg_reply(&msg, &reply);
                 break;

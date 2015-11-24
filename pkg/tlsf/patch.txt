@@ -1,18 +1,110 @@
-diff -NdaU0 tlsf.c tlsf.c
+diff --git Makefile Makefile
+new file mode 100644
+index 0000000..a51d6c2
+--- /dev/null
++++ Makefile
+@@ -0,0 +1,3 @@
++MODULE = tlsf
++
++include $(RIOTBASE)/Makefile.base
+diff --git tlsf-malloc.c tlsf-malloc.c
+new file mode 100644
+index 0000000..cb16af8
+--- /dev/null
++++ tlsf-malloc.c
+@@ -0,0 +1,44 @@
++#include "irq.h"
++#include "tlsf-malloc.h"
++
++#include <string.h>
++
++void *TLSF_MALLOC_NAME(malloc)(size_t bytes)
++{
++    unsigned old_state = disableIRQ();
++    void *result = tlsf_malloc(bytes);
++    restoreIRQ(old_state);
++    return result;
++}
++
++void *TLSF_MALLOC_NAME(calloc)(size_t count, size_t bytes)
++{
++    void *result = tlsf_malloc(count * bytes);
++    if (result) {
++        memset(result, 0, count * bytes);
++    }
++    return result;
++}
++
++void *TLSF_MALLOC_NAME(memalign)(size_t align, size_t bytes)
++{
++    unsigned old_state = disableIRQ();
++    void *result = tlsf_memalign(align, bytes);
++    restoreIRQ(old_state);
++    return result;
++}
++
++void *TLSF_MALLOC_NAME(realloc)(void *ptr, size_t size)
++{
++    unsigned old_state = disableIRQ();
++    void *result = tlsf_realloc(ptr, size);
++    restoreIRQ(old_state);
++    return result;
++}
++
++void TLSF_MALLOC_NAME(free)(void *ptr)
++{
++    unsigned old_state = disableIRQ();
++    tlsf_free(ptr);
++    restoreIRQ(old_state);
++}
+diff --git tlsf-malloc.h tlsf-malloc.h
+new file mode 100644
+index 0000000..2d8bb4d
+--- /dev/null
++++ tlsf-malloc.h
+@@ -0,0 +1,26 @@
++#ifndef __TLSF_MALLOC_H
++#define __TLSF_MALLOC_H
++
++#include <stdbool.h>
++#include <stddef.h>
++
++#include "tlsf.h"
++
++#ifndef TLSF_MALLOC_PREFIX
++#   define TLSF_MALLOC_PREFIX
++#endif
++#define __TLSF_MALLOC_NAME(A, B) A ## B
++#define _TLSF_MALLOC_NAME(A, B) __TLSF_MALLOC_NAME(A, B)
++#define TLSF_MALLOC_NAME(NAME) _TLSF_MALLOC_NAME(TLSF_MALLOC_PREFIX, NAME)
++
++void *TLSF_MALLOC_NAME(malloc)(size_t bytes);
++
++void *TLSF_MALLOC_NAME(calloc)(size_t count, size_t bytes);
++
++void *TLSF_MALLOC_NAME(memalign)(size_t align, size_t bytes);
++
++void *TLSF_MALLOC_NAME(realloc)(void *ptr, size_t size);
++
++void TLSF_MALLOC_NAME(free)(void *ptr);
++
++#endif
+diff --git tlsf.c tlsf.c
+index 3fb5ebd..4225213 100644
 --- tlsf.c
 +++ tlsf.c
-@@ -25,4 +24,0 @@
+@@ -25,4 +24,0 @@ enum tlsf_private
 -#if defined (TLSF_64BIT)
 -	/* All allocation sizes and addresses are aligned to 8 bytes. */
 -	ALIGN_SIZE_LOG2 = 3,
 -#else
-@@ -30,3 +26,2 @@
+@@ -30,3 +26,2 @@ enum tlsf_private
 -	ALIGN_SIZE_LOG2 = 2,
 -#endif
 -	ALIGN_SIZE = (1 << ALIGN_SIZE_LOG2),
 +#define ALIGN_SIZE_LOG2 (2)
 +#define ALIGN_SIZE (1 << ALIGN_SIZE_LOG2)
-@@ -45,7 +39,0 @@
+@@ -45,7 +39,0 @@ enum tlsf_private
 -#if defined (TLSF_64BIT)
 -	/*
 -	** TODO: We can increase this to support larger sizes, at the expense
@@ -20,157 +112,88 @@ diff -NdaU0 tlsf.c tlsf.c
 -	*/
 -	FL_INDEX_MAX = 32,
 -#else
-@@ -53 +40,0 @@
+@@ -53 +40,0 @@ enum tlsf_private
 -#endif
-@@ -73 +60 @@
+@@ -73 +60 @@ enum tlsf_private
 -#define tlsf_assert assert
 +#define tlsf_assert(X) do { if (0) { (void) (X); } } while (0)
-@@ -165,0 +153,14 @@
-+static control_t control __attribute__ ((aligned(ALIGN_SIZE))) = {
-+	.block_null = {
-+		.next_free = &control.block_null,
-+		.prev_free = &control.block_null,
-+	},
-+	.fl_bitmap = 0,
-+	.sl_bitmap = {0},
-+	.blocks = {
-+		[0 ... FL_INDEX_COUNT-1] = {
-+			[0 ... SL_INDEX_COUNT-1] = &control.block_null
-+		}
-+	}
-+};
-+
-@@ -345 +346 @@
+@@ -147 +134 @@ static const size_t block_start_offset =
+-static const size_t block_size_min = 
++static const size_t block_size_min =
+@@ -165,0 +153 @@ typedef struct control_t
++static control_t *control;
+@@ -345 +333 @@ static void mapping_search(size_t size, int* fli, int* sli)
 -static block_header_t* search_suitable_block(control_t* control, int* fli, int* sli)
 +static block_header_t* search_suitable_block(int* fli, int* sli)
-@@ -354 +355 @@
--	unsigned int sl_map = control->sl_bitmap[fl] & (~0 << sl);
-+	unsigned int sl_map = control.sl_bitmap[fl] & (~0 << sl);
-@@ -358 +359 @@
--		const unsigned int fl_map = control->fl_bitmap & (~0 << (fl + 1));
-+		const unsigned int fl_map = control.fl_bitmap & (~0 << (fl + 1));
-@@ -367 +368 @@
--		sl_map = control->sl_bitmap[fl];
-+		sl_map = control.sl_bitmap[fl];
-@@ -374 +375 @@
--	return control->blocks[fl][sl];
-+	return control.blocks[fl][sl];
-@@ -378 +379 @@
+@@ -378 +366 @@ static block_header_t* search_suitable_block(control_t* control, int* fli, int*
 -static void remove_free_block(control_t* control, block_header_t* block, int fl, int sl)
 +static void remove_free_block(block_header_t* block, int fl, int sl)
-@@ -388 +389 @@
--	if (control->blocks[fl][sl] == block)
-+	if (control.blocks[fl][sl] == block)
-@@ -390 +391 @@
--		control->blocks[fl][sl] = next;
-+		control.blocks[fl][sl] = next;
-@@ -393 +394 @@
--		if (next == &control->block_null)
-+		if (next == &control.block_null)
-@@ -395 +396 @@
--			control->sl_bitmap[fl] &= ~(1 << sl);
-+			control.sl_bitmap[fl] &= ~(1 << sl);
-@@ -398 +399 @@
--			if (!control->sl_bitmap[fl])
-+			if (!control.sl_bitmap[fl])
-@@ -400 +401 @@
--				control->fl_bitmap &= ~(1 << fl);
-+				control.fl_bitmap &= ~(1 << fl);
-@@ -407 +408 @@
+@@ -407 +395 @@ static void remove_free_block(control_t* control, block_header_t* block, int fl,
 -static void insert_free_block(control_t* control, block_header_t* block, int fl, int sl)
 +static void insert_free_block(block_header_t* block, int fl, int sl)
-@@ -409 +410 @@
--	block_header_t* current = control->blocks[fl][sl];
-+	block_header_t* current = control.blocks[fl][sl];
-@@ -413 +414 @@
--	block->prev_free = &control->block_null;
-+	block->prev_free = &control.block_null;
-@@ -422,3 +423,3 @@
--	control->blocks[fl][sl] = block;
--	control->fl_bitmap |= (1 << fl);
--	control->sl_bitmap[fl] |= (1 << sl);
-+	control.blocks[fl][sl] = block;
-+	control.fl_bitmap |= (1 << fl);
-+	control.sl_bitmap[fl] |= (1 << sl);
-@@ -428 +429 @@
+@@ -428 +416 @@ static void insert_free_block(control_t* control, block_header_t* block, int fl,
 -static void block_remove(control_t* control, block_header_t* block)
 +static void block_remove(block_header_t* block)
-@@ -432 +433 @@
+@@ -432 +420 @@ static void block_remove(control_t* control, block_header_t* block)
 -	remove_free_block(control, block, fl, sl);
 +	remove_free_block(block, fl, sl);
-@@ -436 +437 @@
+@@ -436 +424 @@ static void block_remove(control_t* control, block_header_t* block)
 -static void block_insert(control_t* control, block_header_t* block)
 +static void block_insert(block_header_t* block)
-@@ -440 +441 @@
+@@ -440 +428 @@ static void block_insert(control_t* control, block_header_t* block)
 -	insert_free_block(control, block, fl, sl);
 +	insert_free_block(block, fl, sl);
-@@ -481 +482 @@
+@@ -481 +469 @@ static block_header_t* block_absorb(block_header_t* prev, block_header_t* block)
 -static block_header_t* block_merge_prev(control_t* control, block_header_t* block)
 +static block_header_t* block_merge_prev(block_header_t* block)
-@@ -488 +489 @@
+@@ -488 +476 @@ static block_header_t* block_merge_prev(control_t* control, block_header_t* bloc
 -		block_remove(control, prev);
 +		block_remove(prev);
-@@ -496 +497 @@
+@@ -496 +484 @@ static block_header_t* block_merge_prev(control_t* control, block_header_t* bloc
 -static block_header_t* block_merge_next(control_t* control, block_header_t* block)
 +static block_header_t* block_merge_next(block_header_t* block)
-@@ -504 +505 @@
+@@ -504 +492 @@ static block_header_t* block_merge_next(control_t* control, block_header_t* bloc
 -		block_remove(control, next);
 +		block_remove(next);
-@@ -512 +513 @@
+@@ -512 +500 @@ static block_header_t* block_merge_next(control_t* control, block_header_t* bloc
 -static void block_trim_free(control_t* control, block_header_t* block, size_t size)
 +static void block_trim_free(block_header_t* block, size_t size)
-@@ -520 +521 @@
+@@ -520 +508 @@ static void block_trim_free(control_t* control, block_header_t* block, size_t si
 -		block_insert(control, remaining_block);
 +		block_insert(remaining_block);
-@@ -525 +526 @@
+@@ -525 +513 @@ static void block_trim_free(control_t* control, block_header_t* block, size_t si
 -static void block_trim_used(control_t* control, block_header_t* block, size_t size)
 +static void block_trim_used(block_header_t* block, size_t size)
-@@ -534,2 +535,2 @@
+@@ -534,2 +522,2 @@ static void block_trim_used(control_t* control, block_header_t* block, size_t si
 -		remaining_block = block_merge_next(control, remaining_block);
 -		block_insert(control, remaining_block);
 +		remaining_block = block_merge_next(remaining_block);
 +		block_insert(remaining_block);
-@@ -539 +540 @@
+@@ -539 +527 @@ static void block_trim_used(control_t* control, block_header_t* block, size_t si
 -static block_header_t* block_trim_free_leading(control_t* control, block_header_t* block, size_t size)
 +static block_header_t* block_trim_free_leading(block_header_t* block, size_t size)
-@@ -549 +550 @@
+@@ -549 +537 @@ static block_header_t* block_trim_free_leading(control_t* control, block_header_
 -		block_insert(control, block);
 +		block_insert(block);
-@@ -555 +556 @@
+@@ -555 +543 @@ static block_header_t* block_trim_free_leading(control_t* control, block_header_
 -static block_header_t* block_locate_free(control_t* control, size_t size)
 +static block_header_t* block_locate_free(size_t size)
-@@ -563 +564 @@
+@@ -563 +551 @@ static block_header_t* block_locate_free(control_t* control, size_t size)
 -		block = search_suitable_block(control, &fl, &sl);
 +		block = search_suitable_block(&fl, &sl);
-@@ -569 +570 @@
+@@ -569 +557 @@ static block_header_t* block_locate_free(control_t* control, size_t size)
 -		remove_free_block(control, block, fl, sl);
 +		remove_free_block(block, fl, sl);
-@@ -575 +576 @@
+@@ -575 +563 @@ static block_header_t* block_locate_free(control_t* control, size_t size)
 -static void* block_prepare_used(control_t* control, block_header_t* block, size_t size)
 +static void* block_prepare_used(block_header_t* block, size_t size)
-@@ -580 +581 @@
+@@ -580 +568 @@ static void* block_prepare_used(control_t* control, block_header_t* block, size_
 -		block_trim_free(control, block, size);
 +		block_trim_free(block, size);
-@@ -587,184 +588 @@
--/* Clear structure and point all empty lists at the null block. */
+@@ -588 +576 @@ static void* block_prepare_used(control_t* control, block_header_t* block, size_
 -static void control_construct(control_t* control)
--{
--	int i, j;
--
--	control->block_null.next_free = &control->block_null;
--	control->block_null.prev_free = &control->block_null;
--
--	control->fl_bitmap = 0;
--	for (i = 0; i < FL_INDEX_COUNT; ++i)
--	{
--		control->sl_bitmap[i] = 0;
--		for (j = 0; j < SL_INDEX_COUNT; ++j)
--		{
--			control->blocks[i][j] = &control->block_null;
--		}
--	}
--}
--
++static void control_construct(void)
+@@ -606,165 +594 @@ static void control_construct(control_t* control)
 -/*
 -** Debugging utilities.
 -*/
@@ -337,21 +360,23 @@ diff -NdaU0 tlsf.c tlsf.c
 -
 -pool_t tlsf_add_pool(tlsf_t tlsf, void* mem, size_t bytes)
 +int tlsf_add_pool(void* mem, size_t bytes)
-@@ -775 +593 @@
+@@ -775 +599 @@ pool_t tlsf_add_pool(tlsf_t tlsf, void* mem, size_t bytes)
 -	const size_t pool_overhead = tlsf_pool_overhead();
 +	const size_t pool_overhead = 2 * block_header_overhead;
-@@ -787,5 +604,0 @@
+@@ -787,6 +611 @@ pool_t tlsf_add_pool(tlsf_t tlsf, void* mem, size_t bytes)
 -#if defined (TLSF_64BIT)
 -		printf("tlsf_add_pool: Memory size must be between 0x%x and 0x%x00 bytes.\n", 
 -			(unsigned int)(pool_overhead + block_size_min),
 -			(unsigned int)((pool_overhead + block_size_max) / 256));
 -#else
-@@ -795 +607,0 @@
+-		printf("tlsf_add_pool: Memory size must be between %u and %u bytes.\n", 
++		printf("tlsf_add_pool: Memory size must be between %u and %u bytes.\n",
+@@ -795 +613,0 @@ pool_t tlsf_add_pool(tlsf_t tlsf, void* mem, size_t bytes)
 -#endif
-@@ -808 +620 @@
+@@ -808 +626 @@ pool_t tlsf_add_pool(tlsf_t tlsf, void* mem, size_t bytes)
 -	block_insert(tlsf_cast(control_t*, tlsf), block);
 +	block_insert(block);
-@@ -816,16 +628 @@
+@@ -816,16 +634 @@ pool_t tlsf_add_pool(tlsf_t tlsf, void* mem, size_t bytes)
 -	return mem;
 -}
 -
@@ -369,10 +394,11 @@ diff -NdaU0 tlsf.c tlsf.c
 -	mapping_insert(block_size(block), &fl, &sl);
 -	remove_free_block(control, block, fl, sl);
 +	return 1;
-@@ -838,68 +635 @@
+@@ -838,2 +641 @@ void tlsf_remove_pool(tlsf_t tlsf, pool_t pool)
 -#if _DEBUG
 -int test_ffs_fls()
--{
++void tlsf_create(void* mem)
+@@ -841,34 +642,0 @@ int test_ffs_fls()
 -	/* Verify ffs/fls work properly. */
 -	int rv = 0;
 -	rv += (tlsf_ffs(0) == -1) ? 0 : 0x1;
@@ -407,15 +433,13 @@ diff -NdaU0 tlsf.c tlsf.c
 -	}
 -#endif
 -
--	if (((tlsfptr_t)mem % ALIGN_SIZE) != 0)
--	{
--		printf("tlsf_create: Memory must be aligned to %u bytes.\n",
--			(unsigned int)ALIGN_SIZE);
+@@ -879 +647 @@ tlsf_t tlsf_create(void* mem)
 -		return 0;
--	}
--
++		return;
+@@ -882 +650 @@ tlsf_t tlsf_create(void* mem)
 -	control_construct(tlsf_cast(control_t*, mem));
--
++    control = tlsf_cast(control_t*, mem);
+@@ -884,14 +652 @@ tlsf_t tlsf_create(void* mem)
 -	return tlsf_cast(tlsf_t, mem);
 -}
 -
@@ -430,95 +454,95 @@ diff -NdaU0 tlsf.c tlsf.c
 -{
 -	/* Nothing to do. */
 -	(void)tlsf;
--}
--
++	control_construct();
+@@ -900 +655 @@ void tlsf_destroy(tlsf_t tlsf)
 -pool_t tlsf_get_pool(tlsf_t tlsf)
--{
++void tlsf_create_with_pool(void* mem, size_t bytes)
+@@ -902 +657,2 @@ pool_t tlsf_get_pool(tlsf_t tlsf)
 -	return tlsf_cast(pool_t, (char*)tlsf + tlsf_size());
--}
--
++	tlsf_create(mem);
++	tlsf_add_pool((char*)mem + sizeof(control_t), bytes - sizeof(control_t));
+@@ -905 +661 @@ pool_t tlsf_get_pool(tlsf_t tlsf)
 -void* tlsf_malloc(tlsf_t tlsf, size_t size)
 +void* tlsf_malloc(size_t size)
-@@ -907 +636,0 @@
+@@ -907 +662,0 @@ void* tlsf_malloc(tlsf_t tlsf, size_t size)
 -	control_t* control = tlsf_cast(control_t*, tlsf);
-@@ -909,2 +638,2 @@
+@@ -909,2 +664,2 @@ void* tlsf_malloc(tlsf_t tlsf, size_t size)
 -	block_header_t* block = block_locate_free(control, adjust);
 -	return block_prepare_used(control, block, adjust);
 +	block_header_t* block = block_locate_free(adjust);
 +	return block_prepare_used(block, adjust);
-@@ -913 +642 @@
+@@ -913 +668 @@ void* tlsf_malloc(tlsf_t tlsf, size_t size)
 -void* tlsf_memalign(tlsf_t tlsf, size_t align, size_t size)
 +void* tlsf_memalign(size_t align, size_t size)
-@@ -915 +643,0 @@
+@@ -915 +669,0 @@ void* tlsf_memalign(tlsf_t tlsf, size_t align, size_t size)
 -	control_t* control = tlsf_cast(control_t*, tlsf);
-@@ -932 +660 @@
+@@ -932 +686 @@ void* tlsf_memalign(tlsf_t tlsf, size_t align, size_t size)
 -	block_header_t* block = block_locate_free(control, aligned_size);
 +	block_header_t* block = block_locate_free(aligned_size);
-@@ -960 +688 @@
+@@ -960 +714 @@ void* tlsf_memalign(tlsf_t tlsf, size_t align, size_t size)
 -			block = block_trim_free_leading(control, block, gap);
 +			block = block_trim_free_leading(block, gap);
-@@ -964 +692 @@
+@@ -964 +718 @@ void* tlsf_memalign(tlsf_t tlsf, size_t align, size_t size)
 -	return block_prepare_used(control, block, adjust);
 +	return block_prepare_used(block, adjust);
-@@ -967 +695 @@
+@@ -967 +721 @@ void* tlsf_memalign(tlsf_t tlsf, size_t align, size_t size)
 -void tlsf_free(tlsf_t tlsf, void* ptr)
 +void tlsf_free(void* ptr)
-@@ -972 +699,0 @@
+@@ -972 +725,0 @@ void tlsf_free(tlsf_t tlsf, void* ptr)
 -		control_t* control = tlsf_cast(control_t*, tlsf);
-@@ -976,3 +703,3 @@
+@@ -976,3 +729,3 @@ void tlsf_free(tlsf_t tlsf, void* ptr)
 -		block = block_merge_prev(control, block);
 -		block = block_merge_next(control, block);
 -		block_insert(control, block);
 +		block = block_merge_prev(block);
 +		block = block_merge_next(block);
 +		block_insert(block);
-@@ -995 +722 @@
+@@ -995 +748 @@ void tlsf_free(tlsf_t tlsf, void* ptr)
 -void* tlsf_realloc(tlsf_t tlsf, void* ptr, size_t size)
 +void* tlsf_realloc(void* ptr, size_t size)
-@@ -997 +723,0 @@
+@@ -997 +749,0 @@ void* tlsf_realloc(tlsf_t tlsf, void* ptr, size_t size)
 -	control_t* control = tlsf_cast(control_t*, tlsf);
-@@ -1003 +729 @@
+@@ -1003 +755 @@ void* tlsf_realloc(tlsf_t tlsf, void* ptr, size_t size)
 -		tlsf_free(tlsf, ptr);
 +		tlsf_free(ptr);
-@@ -1008 +734 @@
+@@ -1008 +760 @@ void* tlsf_realloc(tlsf_t tlsf, void* ptr, size_t size)
 -		p = tlsf_malloc(tlsf, size);
 +		p = tlsf_malloc(size);
-@@ -1027 +753 @@
+@@ -1027 +779 @@ void* tlsf_realloc(tlsf_t tlsf, void* ptr, size_t size)
 -			p = tlsf_malloc(tlsf, size);
 +			p = tlsf_malloc(size);
-@@ -1032 +758 @@
+@@ -1032 +784 @@ void* tlsf_realloc(tlsf_t tlsf, void* ptr, size_t size)
 -				tlsf_free(tlsf, ptr);
 +				tlsf_free(ptr);
-@@ -1040 +766 @@
+@@ -1040 +792 @@ void* tlsf_realloc(tlsf_t tlsf, void* ptr, size_t size)
 -				block_merge_next(control, block);
 +				block_merge_next(block);
-@@ -1045 +771 @@
+@@ -1045 +797 @@ void* tlsf_realloc(tlsf_t tlsf, void* ptr, size_t size)
 -			block_trim_used(control, block, adjust);
 +			block_trim_used(block, adjust);
-diff -NdaU0 tlsf.h tlsf.h
+diff --git tlsf.h tlsf.h
+index 72496a1..da6a30f 100644
 --- tlsf.h
 +++ tlsf.h
-@@ -21,15 +20,0 @@
--#if defined(__cplusplus)
--extern "C" {
--#endif
--
+@@ -25,5 +24,0 @@ extern "C" {
 -/* tlsf_t: a TLSF structure. Can contain 1 to N pools. */
 -/* pool_t: a block of memory that TLSF can manage. */
 -typedef void* tlsf_t;
 -typedef void* pool_t;
 -
--/* Create/destroy a memory pool. */
+@@ -31,4 +26,2 @@ typedef void* pool_t;
 -tlsf_t tlsf_create(void* mem);
 -tlsf_t tlsf_create_with_pool(void* mem, size_t bytes);
 -void tlsf_destroy(tlsf_t tlsf);
 -pool_t tlsf_get_pool(tlsf_t tlsf);
--
-@@ -37,2 +22 @@
++void tlsf_create(void* mem);
++void tlsf_create_with_pool(void* mem, size_t bytes);
+@@ -37,2 +30 @@ pool_t tlsf_get_pool(tlsf_t tlsf);
 -pool_t tlsf_add_pool(tlsf_t tlsf, void* mem, size_t bytes);
 -void tlsf_remove_pool(tlsf_t tlsf, pool_t pool);
 +int tlsf_add_pool(void* mem, size_t bytes);
-@@ -41,26 +25,4 @@
+@@ -41,22 +33,4 @@ void tlsf_remove_pool(tlsf_t tlsf, pool_t pool);
 -void* tlsf_malloc(tlsf_t tlsf, size_t bytes);
 -void* tlsf_memalign(tlsf_t tlsf, size_t align, size_t bytes);
 -void* tlsf_realloc(tlsf_t tlsf, void* ptr, size_t size);
@@ -541,96 +565,7 @@ diff -NdaU0 tlsf.h tlsf.h
 -/* Returns nonzero if any internal consistency check fails. */
 -int tlsf_check(tlsf_t tlsf);
 -int tlsf_check_pool(pool_t pool);
--
--#if defined(__cplusplus)
--};
--#endif
 +void* tlsf_malloc(size_t bytes);
 +void* tlsf_memalign(size_t align, size_t bytes);
 +void* tlsf_realloc(void* ptr, size_t size);
 +void tlsf_free(void* ptr);
-diff -NdaU0 Makefile Makefile
---- Makefile
-+++ Makefile
-@@ -0,0 +1,3 @@
-+MODULE = tlsf
-+
-+include $(RIOTBASE)/Makefile.base
-diff -NdaU0 tlsf-malloc.c tlsf-malloc.c
---- tlsf-malloc.c
-+++ tlsf-malloc.c
-@@ -0,0 +1,44 @@
-+#include "irq.h"
-+#include "tlsf-malloc.h"
-+
-+#include <string.h>
-+
-+void *TLSF_MALLOC_NAME(malloc)(size_t bytes)
-+{
-+    unsigned old_state = disableIRQ();
-+    void *result = tlsf_malloc(bytes);
-+    restoreIRQ(old_state);
-+    return result;
-+}
-+
-+void *TLSF_MALLOC_NAME(calloc)(size_t count, size_t bytes)
-+{
-+    void *result = tlsf_malloc(count * bytes);
-+    if (result) {
-+        memset(result, 0, count * bytes);
-+    }
-+    return result;
-+}
-+
-+void *TLSF_MALLOC_NAME(memalign)(size_t align, size_t bytes)
-+{
-+    unsigned old_state = disableIRQ();
-+    void *result = tlsf_memalign(align, bytes);
-+    restoreIRQ(old_state);
-+    return result;
-+}
-+
-+void *TLSF_MALLOC_NAME(realloc)(void *ptr, size_t size)
-+{
-+    unsigned old_state = disableIRQ();
-+    void *result = tlsf_realloc(ptr, size);
-+    restoreIRQ(old_state);
-+    return result;
-+}
-+
-+void TLSF_MALLOC_NAME(free)(void *ptr)
-+{
-+    unsigned old_state = disableIRQ();
-+    tlsf_free(ptr);
-+    restoreIRQ(old_state);
-+}
-diff -NdaU0 tlsf-malloc.h tlsf-malloc.h
---- tlsf-malloc.h
-+++ tlsf-malloc.h
-@@ -0,0 +1,26 @@
-+#ifndef __TLSF_MALLOC_H
-+#define __TLSF_MALLOC_H
-+
-+#include <stdbool.h>
-+#include <stddef.h>
-+
-+#include "tlsf.h"
-+
-+#ifndef TLSF_MALLOC_PREFIX
-+#   define TLSF_MALLOC_PREFIX
-+#endif
-+#define __TLSF_MALLOC_NAME(A, B) A ## B
-+#define _TLSF_MALLOC_NAME(A, B) __TLSF_MALLOC_NAME(A, B)
-+#define TLSF_MALLOC_NAME(NAME) _TLSF_MALLOC_NAME(TLSF_MALLOC_PREFIX, NAME)
-+
-+void *TLSF_MALLOC_NAME(malloc)(size_t bytes);
-+
-+void *TLSF_MALLOC_NAME(calloc)(size_t count, size_t bytes);
-+
-+void *TLSF_MALLOC_NAME(memalign)(size_t align, size_t bytes);
-+
-+void *TLSF_MALLOC_NAME(realloc)(void *ptr, size_t size);
-+
-+void TLSF_MALLOC_NAME(free)(void *ptr);
-+
-+#endif

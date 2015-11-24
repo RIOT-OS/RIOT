@@ -28,11 +28,14 @@ CFLAGS += -DDEVELHELP
 QUIET ?= 1
 
 # Modules to include:
-
 USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += ps
 USEMODULE += config
+# include and auto-initialize all available sensors
+USEMODULE += saul_reg
+USEMODULE += saul_default
+USEMODULE += auto_init_saul
 
 BOARD_PROVIDES_NETIF := airfy-beacon fox iotlab-m3 mulle native nrf51dongle \
 	nrf6310 pba-d-01-kw2x pca10000 pca10005 saml21-xpro samr21-xpro spark-core \
@@ -60,17 +63,6 @@ ifneq (,$(filter msba2,$(BOARD)))
   USEMODULE += sht11
   USEMODULE += mci
   USEMODULE += random
-endif
-ifneq (,$(filter iotlab-m3,$(BOARD)))
-  USEMODULE += isl29020
-  USEMODULE += lps331ap
-  USEMODULE += l3g4200d
-  USEMODULE += lsm303dlhc
-endif
-ifneq (,$(filter fox,$(BOARD)))
-  USEMODULE += lps331ap
-  USEMODULE += l3g4200d
-  USEMODULE += lsm303dlhc
 endif
 
 include $(RIOTBASE)/Makefile.include

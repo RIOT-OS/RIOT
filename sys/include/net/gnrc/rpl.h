@@ -46,7 +46,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   Default stack size to use for the IPv6 thread
+ * @brief   Default stack size to use for the RPL thread
  */
 #ifndef GNRC_RPL_STACK_SIZE
 #define GNRC_RPL_STACK_SIZE     (THREAD_STACKSIZE_DEFAULT)

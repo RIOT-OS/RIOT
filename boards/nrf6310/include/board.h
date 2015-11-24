@@ -20,8 +20,8 @@
  * @author      Frank Holtz <frank-riot2015@holtznet.de>
  */
 
-#ifndef __BOARD_H
-#define __BOARD_H
+#ifndef BOARD_H
+#define BOARD_H
 
 #include "cpu.h"
 
@@ -33,15 +33,6 @@ extern "C" {
  * @name Define the nominal CPU core clock in this board
  */
 #define F_CPU               (16000000UL)
-
-/**
- * @name Define the boards stdio
- * @{
- */
-#define STDIO               UART_0
-#define STDIO_BAUDRATE      (115200U)
-#define STDIO_RX_BUFSIZE    (64U)
-/** @} */
 
 /**
  * @name    LED pin definitions
@@ -77,5 +68,5 @@ void board_init(void);
 }
 #endif
 
-#endif /** __BOARD_H */
+#endif /** BOARD_H */
 /** @} */

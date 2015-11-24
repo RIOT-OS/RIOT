@@ -19,6 +19,8 @@
 #ifndef PERIPH_CONF_H_
 #define PERIPH_CONF_H_
 
+#include "periph_cpu.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -39,6 +41,11 @@ extern "C" {
 #define CLOCK_APB2_DIV      RCC_CFGR_PPRE2_DIV2
 #define CLOCK_APB1_DIV      RCC_CFGR_PPRE1_DIV4
 #define CLOCK_FLASH_LATENCY FLASH_ACR_LATENCY_5WS
+
+/* bus clocks for simplified peripheral initialization, UPDATE MANUALLY! */
+#define CLOCK_AHB           (CLOCK_CORECLOCK / 1)
+#define CLOCK_APB2          (CLOCK_CORECLOCK / 2)
+#define CLOCK_APB1          (CLOCK_CORECLOCK / 4)
 /** @} */
 
 
@@ -145,53 +152,50 @@ extern "C" {
  * @name UART configuration
  * @{
  */
-#define UART_NUMOF          (3U)
-#define UART_0_EN           1
-#define UART_1_EN           1
-#define UART_2_EN           1
-#define UART_IRQ_PRIO       1
+static const uart_conf_t uart_config[] = {
+    /* device, RCC mask, RX pin, TX pin, pin AF, IRQ channel, DMA stream, DMA  */
+    {
+        USART2,                     /* device base register */
+        RCC_APB1ENR_USART2EN,       /* RCC mask */
+        GPIO_PIN(PORT_A,3),         /* RX pin */
+        GPIO_PIN(PORT_A,2),         /* TX pin */
+        GPIO_AF7,                   /* pin AF */
+        USART2_IRQn,                /* IRQ channel */
+        6,                          /* DMA stream */
+        4                           /* DMA channel */
+    },
+    {
+        USART1,                     /* device base register */
+        RCC_APB2ENR_USART1EN,       /* RCC mask */
+        GPIO_PIN(PORT_A,10),        /* RX pin */
+        GPIO_PIN(PORT_A,9),         /* TX pin */
+        GPIO_AF7,                   /* pin AF */
+        USART1_IRQn,                /* IRQ channel */
+        15,                         /* DMA stream */
+        4                           /* DMA channel */
+    },
+    {
+        USART3,                     /* device base register */
+        RCC_APB1ENR_USART3EN,       /* RCC mask */
+        GPIO_PIN(PORT_D,9),         /* RX pin */
+        GPIO_PIN(PORT_D,8),         /* TX pin */
+        GPIO_AF7,                   /* pin AF */
+        USART3_IRQn,                /* IRQ channel */
+        3,                          /* DMA stream */
+        4                           /* DMA channel */
+    },
+};
 
-/* UART 0 device configuration */
-#define UART_0_DEV          USART2
-#define UART_0_CLKEN()      (RCC->APB1ENR |= RCC_APB1ENR_USART2EN)
-#define UART_0_CLKDIS()     (RCC->APB1ENR &= ~(RCC_APB1ENR_USART2EN))
-#define UART_0_CLK          (42000000)          /* UART clock runs with 42MHz (F_CPU / 4) */
-#define UART_0_IRQ_CHAN     USART2_IRQn
+/* assign ISR vector names */
 #define UART_0_ISR          isr_usart2
-/* UART 0 pin configuration */
-#define UART_0_PORT_CLKEN() (RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN)
-#define UART_0_PORT         GPIOA
-#define UART_0_TX_PIN       2
-#define UART_0_RX_PIN       3
-#define UART_0_AF           7
-
-/* UART 1 device configuration */
-#define UART_1_DEV          USART1
-#define UART_1_CLKEN()      (RCC->APB2ENR |= RCC_APB2ENR_USART1EN)
-#define UART_1_CLKDIS()     (RCC->APB2ENR &= ~(RCC_APB2ENR_USART1EN))
-#define UART_1_CLK          (84000000)          /* UART clock runs with 84MHz (F_CPU / 2) */
-#define UART_1_IRQ_CHAN     USART1_IRQn
+#define UART_0_DMA_ISR      isr_dma1_stream6
 #define UART_1_ISR          isr_usart1
-/* UART 1 pin configuration */
-#define UART_1_PORT_CLKEN() (RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN)
-#define UART_1_PORT         GPIOA
-#define UART_1_TX_PIN       9
-#define UART_1_RX_PIN       10
-#define UART_1_AF           7
-
-/* UART 2 device configuration */
-#define UART_2_DEV          USART3
-#define UART_2_CLKEN()      (RCC->APB1ENR |= RCC_APB1ENR_USART3EN)
-#define UART_2_CLKDIS()     (RCC->APB1ENR &= ~(RCC_APB1ENR_USART3EN))
-#define UART_2_CLK          (42000000)          /* UART clock runs with 42MHz (F_CPU / 4) */
-#define UART_2_IRQ_CHAN     USART3_IRQn
+#define UART_1_DMA_ISR      isr_dma2_stream7
 #define UART_2_ISR          isr_usart3
-/* UART 2 pin configuration */
-#define UART_2_PORT_CLKEN() (RCC->AHB1ENR |= RCC_AHB1ENR_GPIODEN)
-#define UART_2_PORT         GPIOD
-#define UART_2_TX_PIN       8
-#define UART_2_RX_PIN       9
-#define UART_2_AF           7
+#define UART_2_DMA_ISR      isr_dma1_stream3
+
+/* deduct number of defined UART interfaces */
+#define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
 /** @} */
 
 /**

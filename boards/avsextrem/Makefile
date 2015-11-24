@@ -1,4 +1,4 @@
-MODULE =$(BOARD)_base
+MODULE = board
 
 DIRS = drivers $(RIOTBOARD)/msba2-common
 

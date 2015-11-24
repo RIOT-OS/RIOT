@@ -42,15 +42,6 @@ extern "C" {
 #define XTIMER_CHAN         (0)
 
 /**
- * @name Define UART device and baudrate for stdio
- * @{
- */
-#define STDIO               UART_DEV(0)
-#define STDIO_BAUDRATE      (115200U)
-#define STDIO_RX_BUFSIZE    (64U)
-/** @} */
-
-/**
  * @name AT86RF233 configuration
  *
  * {spi bus, spi speed, cs pin, int pin, reset pin, sleep pin}
@@ -68,6 +59,7 @@ extern "C" {
  */
 #define LED_PORT            PORT->Group[0]
 #define LED_PIN             (19)
+#define LED_GPIO            GPIO_PIN(0, 19)
 /** @} */
 
 /**

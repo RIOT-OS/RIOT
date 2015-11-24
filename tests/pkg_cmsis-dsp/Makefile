@@ -14,10 +14,12 @@ BOARD_WHITELIST := \
   msbiot \
   mulle \
   nucleo-f091 \
+  nucleo-f103 \
   nucleo-f303 \
   nucleo-f334 \
+  nucleo-f401 \
   nucleo-l1 \
-  openmote \
+  openmote-cc2538 \
   pba-d-01-kw2x \
   pca10000 \
   pca10005 \

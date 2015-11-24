@@ -29,7 +29,8 @@
 #ifdef PERIPH_SPI_NEEDS_TRANSFER_BYTES
 int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length)
 {
-    int trans_ret, trans_bytes = 0;
+    int trans_ret;
+    unsigned trans_bytes = 0;
     char in_temp;
 
     for (trans_bytes = 0; trans_bytes < length; trans_bytes++) {

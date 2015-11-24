@@ -154,10 +154,11 @@ kernel_pid_t gnrc_sixlowpan_nd_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_
     if (nc_entry != NULL) {
         gnrc_ipv6_netif_t *ipv6_if = gnrc_ipv6_netif_get(nc_entry->iface);
         /* and interface is not 6LoWPAN */
-        if (!(ipv6_if->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN) ||
+        if (!((ipv6_if == NULL) ||
+                (ipv6_if->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN)) ||
                 /* or entry is registered */
-                (gnrc_ipv6_nc_get_type(nc_entry) == GNRC_IPV6_NC_TYPE_REGISTERED)) {
-        next_hop = dst;
+              (gnrc_ipv6_nc_get_type(nc_entry) == GNRC_IPV6_NC_TYPE_REGISTERED)) {
+            next_hop = dst;
         }
     }
 #endif
@@ -168,6 +169,11 @@ kernel_pid_t gnrc_sixlowpan_nd_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_
     }
     else if (next_hop == NULL) {                                /* prefix is off-link */
         next_hop = gnrc_ndp_internal_default_router();
+    }
+
+    /* no routers found */
+    if (next_hop == NULL) {
+        return KERNEL_PID_UNDEF;
     }
 
     /* address resolution of next_hop: https://tools.ietf.org/html/rfc6775#section-5.7 */

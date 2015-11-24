@@ -77,23 +77,23 @@ cc2538_uart_t * const UART1 = (cc2538_uart_t *)0x4000d000;
 static void reset(cc2538_uart_t *u)
 {
     /* Make sure the UART is disabled before trying to configure it */
-    u->CTLbits.UARTEN = 0;
+    u->cc2538_uart_ctl.CTLbits.UARTEN = 0;
 
-    u->CTLbits.RXE = 1;
-    u->CTLbits.TXE = 1;
-    u->CTLbits.HSE = UART_CTL_HSE_VALUE;
+    u->cc2538_uart_ctl.CTLbits.RXE = 1;
+    u->cc2538_uart_ctl.CTLbits.TXE = 1;
+    u->cc2538_uart_ctl.CTLbits.HSE = UART_CTL_HSE_VALUE;
 
     /* Clear error status */
-    u->ECR = 0xFF;
+    u->cc2538_uart_dr.ECR = 0xFF;
 
     /* Flush FIFOs by clearing LCHR.FEN */
-    u->LCRHbits.FEN = 0;
+    u->cc2538_uart_lcrh.LCRHbits.FEN = 0;
 
     /* Restore LCHR configuration */
-    u->LCRHbits.FEN = 1;
+    u->cc2538_uart_lcrh.LCRHbits.FEN = 1;
 
     /* UART Enable */
-    u->CTLbits.UARTEN = 1;
+    u->cc2538_uart_ctl.CTLbits.UARTEN = 1;
 }
 /*---------------------------------------------------------------------------*/
 
@@ -104,11 +104,11 @@ void UART_0_ISR(void)
 
     /* Store the current MIS and clear all flags early, except the RTM flag.
      * This will clear itself when we read out the entire FIFO contents */
-    mis = UART_0_DEV->MIS;
+    mis = UART_0_DEV->cc2538_uart_mis.MIS;
 
     UART_0_DEV->ICR = 0x0000FFBF;
 
-    while (UART_0_DEV->FRbits.RXFE == 0) {
+    while (UART_0_DEV->cc2538_uart_fr.FRbits.RXFE == 0) {
         uart_config[0].rx_cb(uart_config[0].arg, UART_0_DEV->DR);
     }
 
@@ -246,7 +246,7 @@ static int init_base(uart_t uart, uint32_t baudrate)
     SYS_CTRL_DCGCUART |= (1 << uart_num);
 
     /* Make sure the UART is disabled before trying to configure it */
-    u->CTL = 0;
+    u->cc2538_uart_ctl.CTL = 0;
 
     /* Run on SYS_DIV */
     u->CC = 0;
@@ -257,14 +257,14 @@ static int init_base(uart_t uart, uint32_t baudrate)
         IOC_PXX_SEL[UART_1_RTS_PIN] = UART1_RTS;
         gpio_hardware_control(UART_1_RTS_PIN);
         IOC_PXX_OVER[UART_1_RTS_PIN] = IOC_OVERRIDE_OE;
-        u->CTLbits.RTSEN = 1;
+        u->cc2538_uart_ctl.CTLbits.RTSEN = 1;
 #endif
 
 #ifdef UART_1_CTS_PIN
         IOC_UARTCTS_UART1 = UART_1_CTS_PIN;
         gpio_hardware_control(UART_1_CTS_PIN);
         IOC_PXX_OVER[UART_1_CTS_PIN] = IOC_OVERRIDE_DIS;
-        u->CTLbits.CTSEN = 1;
+        u->cc2538_uart_ctl.CTLbits.CTSEN = 1;
 #endif
     }
 
@@ -279,20 +279,20 @@ static int init_base(uart_t uart, uint32_t baudrate)
      * Acknowledge RX and RX Timeout
      * Acknowledge Framing, Overrun and Break Errors
      */
-    u->IM = 0;
-    u->IMbits.RXIM = 1; /**< UART receive interrupt mask */
-    u->IMbits.RTIM = 1; /**< UART receive time-out interrupt mask */
-    u->IMbits.OEIM = 1; /**< UART overrun error interrupt mask */
-    u->IMbits.BEIM = 1; /**< UART break error interrupt mask */
-    u->IMbits.FEIM = 1; /**< UART framing error interrupt mask */
+    u->cc2538_uart_im.IM = 0;
+    u->cc2538_uart_im.IMbits.RXIM = 1; /**< UART receive interrupt mask */
+    u->cc2538_uart_im.IMbits.RTIM = 1; /**< UART receive time-out interrupt mask */
+    u->cc2538_uart_im.IMbits.OEIM = 1; /**< UART overrun error interrupt mask */
+    u->cc2538_uart_im.IMbits.BEIM = 1; /**< UART break error interrupt mask */
+    u->cc2538_uart_im.IMbits.FEIM = 1; /**< UART framing error interrupt mask */
 
     /* Set FIFO interrupt levels: */
-    u->IFLSbits.RXIFLSEL = FIFO_LEVEL_1_8TH;
-    u->IFLSbits.TXIFLSEL = FIFO_LEVEL_4_8TH;
+    u->cc2538_uart_ifls.IFLSbits.RXIFLSEL = FIFO_LEVEL_1_8TH;
+    u->cc2538_uart_ifls.IFLSbits.TXIFLSEL = FIFO_LEVEL_4_8TH;
 
-    u->CTLbits.RXE = 1;
-    u->CTLbits.TXE = 1;
-    u->CTLbits.HSE = UART_CTL_HSE_VALUE;
+    u->cc2538_uart_ctl.CTLbits.RXE = 1;
+    u->cc2538_uart_ctl.CTLbits.TXE = 1;
+    u->cc2538_uart_ctl.CTLbits.HSE = UART_CTL_HSE_VALUE;
 
     /* Set the divisor for the baud rate generator */
     uint32_t divisor = sys_clock_freq();
@@ -303,13 +303,13 @@ static int init_base(uart_t uart, uint32_t baudrate)
     u->FBRD = divisor & DIVFRAC_MASK;
 
     /* Configure line control for 8-bit, no parity, 1 stop bit and enable  */
-    u->LCRH = 0;
-    u->LCRHbits.WLEN = UART_WORD_LENGTH - 5;
-    u->LCRHbits.FEN  = 1;                    /**< Enable FIFOs */
-    u->LCRHbits.PEN  = 0;                    /**< No parity */
+    u->cc2538_uart_lcrh.LCRH = 0;
+    u->cc2538_uart_lcrh.LCRHbits.WLEN = UART_WORD_LENGTH - 5;
+    u->cc2538_uart_lcrh.LCRHbits.FEN  = 1;                    /**< Enable FIFOs */
+    u->cc2538_uart_lcrh.LCRHbits.PEN  = 0;                    /**< No parity */
 
     /* UART Enable */
-    u->CTLbits.UARTEN = 1;
+    u->cc2538_uart_ctl.CTLbits.UARTEN = 1;
 
     return 0;
 #endif /* UART_0_EN || UART_1_EN */
@@ -336,17 +336,18 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
 
     /* Block if the TX FIFO is full */
     for (size_t i = 0; i < len; i++) {
-        while (u->FRbits.TXFF);
+        while (u->cc2538_uart_fr.FRbits.TXFF);
         u->DR = data[i];
     }
 }
 
 void uart_poweron(uart_t uart)
 {
+    (void) uart;
 
 }
 
 void uart_poweroff(uart_t uart)
 {
-
+    (void) uart;
 }

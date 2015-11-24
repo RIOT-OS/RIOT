@@ -88,6 +88,14 @@ static int fib_find_entry(fib_table_t *table, uint8_t *dst, size_t dst_size,
     int ret = -EHOSTUNREACH;
     bool is_all_zeros_addr = true;
 
+#if ENABLE_DEBUG
+    DEBUG("[fib_find_entry] dst =");
+    for (size_t i = 0; i < dst_size; i++) {
+        DEBUG(" %02x", dst[i]);
+    }
+    DEBUG("\n");
+#endif
+
     for (size_t i = 0; i < dst_size; ++i) {
         if (dst[i] != 0) {
             is_all_zeros_addr = false;
@@ -125,6 +133,7 @@ static int fib_find_entry(fib_table_t *table, uint8_t *dst, size_t dst_size,
             int ret_comp = universal_address_compare(table->data.entries[i].global, dst, &match_size);
             /* If we found an exact match */
             if (ret_comp == 0 || (is_all_zeros_addr && match_size == 0)) {
+                DEBUG("[fib_find_entry] found an exact match");
                 entry_arr[0] = &(table->data.entries[i]);
                 *entry_arr_size = 1;
                 /* we will not find a better one so we return */
@@ -147,6 +156,16 @@ static int fib_find_entry(fib_table_t *table, uint8_t *dst, size_t dst_size,
             }
         }
     }
+
+#if ENABLE_DEBUG
+    if (count > 0) {
+        DEBUG("[fib_find_entry] found prefix on interface %d:", entry_arr[0]->iface_id);
+        for (size_t i = 0; i < entry_arr[0]->global->address_size; i++) {
+            DEBUG(" %02x", entry_arr[0]->global->address[i]);
+        }
+        DEBUG("\n");
+    }
+#endif
 
     *entry_arr_size = count;
     return ret;
@@ -1504,13 +1523,13 @@ void fib_print_routes(fib_table_t *table)
     uint64_t now = xtimer_now64();
 
     if (table->table_type == FIB_TABLE_TYPE_SH) {
-        printf("%-" FIB_ADDR_PRINT_LENS "s %-6s %-" FIB_ADDR_PRINT_LENS "s %-6s %-16s Interface\n"
-               , "Destination", "Flags", "Next Hop", "Flags", "Expires");
+        printf("%-" FIB_ADDR_PRINT_LENS "s %-10s   %-" FIB_ADDR_PRINT_LENS "s %-10s %-16s"
+                " Interface\n" , "Destination", "Flags", "Next Hop", "Flags", "Expires");
 
         for (size_t i = 0; i < table->size; ++i) {
             if (table->data.entries[i].lifetime != 0) {
                 fib_print_address(table->data.entries[i].global);
-                printf(" 0x%04"PRIx32" ", table->data.entries[i].global_flags);
+                printf(" 0x%08"PRIx32" ", table->data.entries[i].global_flags);
                 if(table->data.entries[i].global_flags & FIB_FLAG_NET_PREFIX) {
                     printf("N ");
                 } else {
@@ -1518,7 +1537,7 @@ void fib_print_routes(fib_table_t *table)
                 }
 
                 fib_print_address(table->data.entries[i].next_hop);
-                printf(" 0x%04"PRIx32" ", table->data.entries[i].next_hop_flags);
+                printf(" 0x%08"PRIx32" ", table->data.entries[i].next_hop_flags);
                 if (table->data.entries[i].lifetime != FIB_LIFETIME_NO_EXPIRE) {
 
                     uint64_t tm = table->data.entries[i].lifetime - now;

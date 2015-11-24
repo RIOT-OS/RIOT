@@ -15,6 +15,7 @@
  *
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Kévin Roussel <Kevin.Roussel@inria.fr>
  *
  * @}
  */
@@ -265,15 +266,24 @@ static int _send(gnrc_netdev_t *netdev, gnrc_pktsnip_t *pkt)
 static void _receive_data(at86rf2xx_t *dev)
 {
     uint8_t mhr[IEEE802154_MAX_HDR_LEN];
+    uint8_t phr;
     size_t pkt_len, hdr_len;
     gnrc_pktsnip_t *hdr, *payload = NULL;
     gnrc_netif_hdr_t *netif;
 
-    /* get the size of the received packet (unlocks frame buffer protection) */
-    pkt_len = at86rf2xx_rx_len(dev);
+    /* frame buffer protection will be unlocked as soon as at86rf2xx_fb_stop()
+     * is called*/
+    at86rf2xx_fb_start(dev);
+
+    /* get the size of the received packet */
+    at86rf2xx_fb_read(dev, &phr, 1);
+
+    /* Ignore FCS for packet length */
+    pkt_len = phr - 2;
 
     /* abort here already if no event callback is registered */
     if (!dev->event_cb) {
+        at86rf2xx_fb_stop(dev);
         return;
     }
 
@@ -281,43 +291,63 @@ static void _receive_data(at86rf2xx_t *dev)
     if (dev->options & AT86RF2XX_OPT_RAWDUMP) {
         payload = gnrc_pktbuf_add(NULL, NULL, pkt_len, GNRC_NETTYPE_UNDEF);
         if (payload == NULL ) {
+            at86rf2xx_fb_stop(dev);
             DEBUG("[at86rf2xx] error: unable to allocate RAW data\n");
             return;
         }
-        at86rf2xx_rx_read(dev, payload->data, pkt_len, 0);
+        at86rf2xx_fb_read(dev, payload->data, pkt_len);
+        at86rf2xx_fb_stop(dev);
         dev->event_cb(NETDEV_EVENT_RX_COMPLETE, payload);
         return;
     }
 
     /* get FCF field and compute 802.15.4 header length */
-    at86rf2xx_rx_read(dev, mhr, 2, 0);
+    at86rf2xx_fb_read(dev, mhr, 2);
+
     hdr_len = _get_frame_hdr_len(mhr);
     if (hdr_len == 0) {
+        at86rf2xx_fb_stop(dev);
         DEBUG("[at86rf2xx] error: unable parse incoming frame header\n");
         return;
     }
+
     /* read the rest of the header and parse the netif header from it */
-    at86rf2xx_rx_read(dev, &(mhr[2]), hdr_len - 2, 2);
+    at86rf2xx_fb_read(dev, &(mhr[2]), hdr_len - 2);
     hdr = _make_netif_hdr(mhr);
     if (hdr == NULL) {
+        at86rf2xx_fb_stop(dev);
         DEBUG("[at86rf2xx] error: unable to allocate netif header\n");
         return;
     }
+
     /* fill missing fields in netif header */
     netif = (gnrc_netif_hdr_t *)hdr->data;
     netif->if_pid = dev->mac_pid;
-    at86rf2xx_rx_read(dev, &(netif->lqi), 1, pkt_len);
-    netif->rssi = at86rf2xx_reg_read(dev, AT86RF2XX_REG__PHY_ED_LEVEL);
 
     /* allocate payload */
     payload = gnrc_pktbuf_add(hdr, NULL, (pkt_len - hdr_len), dev->proto);
     if (payload == NULL) {
+        at86rf2xx_fb_stop(dev);
         DEBUG("[at86rf2xx] error: unable to allocate incoming payload\n");
         gnrc_pktbuf_release(hdr);
         return;
     }
     /* copy payload */
-    at86rf2xx_rx_read(dev, payload->data, payload->size, hdr_len);
+    at86rf2xx_fb_read(dev, payload->data, payload->size);
+
+    /* Ignore FCS but advance fb read */
+    at86rf2xx_fb_read(dev, NULL, 2);
+
+    at86rf2xx_fb_read(dev, &(netif->lqi), 1);
+
+#ifndef MODULE_AT86RF231
+    at86rf2xx_fb_read(dev, &(netif->rssi), 1);
+    at86rf2xx_fb_stop(dev);
+#else
+    at86rf2xx_fb_stop(dev);
+    netif->rssi = at86rf2xx_reg_read(dev, AT86RF2XX_REG__PHY_ED_LEVEL);
+#endif
+
     /* finish up and send data to upper layers */
     dev->event_cb(NETDEV_EVENT_RX_COMPLETE, payload);
 }
@@ -439,6 +469,14 @@ static int _get(gnrc_netdev_t *device, netopt_t opt, void *val, size_t max_len)
             }
             ((uint8_t *)val)[1] = 0;
             ((uint8_t *)val)[0] = at86rf2xx_get_chan(dev);
+            return sizeof(uint16_t);
+
+        case NETOPT_CHANNEL_PAGE:
+            if (max_len < sizeof(uint16_t)) {
+                return -EOVERFLOW;
+            }
+            ((uint8_t *)val)[1] = 0;
+            ((uint8_t *)val)[0] = at86rf2xx_get_page(dev);
             return sizeof(uint16_t);
 
         case NETOPT_MAX_PACKET_SIZE:
@@ -569,6 +607,15 @@ static int _get(gnrc_netdev_t *device, netopt_t opt, void *val, size_t max_len)
             }
             break;
 
+        case NETOPT_CCA_THRESHOLD:
+            if (max_len < sizeof(int8_t)) {
+                res = -EOVERFLOW;
+            } else {
+                *((int8_t *)val) = at86rf2xx_get_cca_threshold(dev);
+                res = sizeof(int8_t);
+            }
+            break;
+
         default:
             res = -ENOTSUP;
     }
@@ -649,7 +696,7 @@ static int _set(gnrc_netdev_t *device, netopt_t opt, void *val, size_t len)
                 res = -EINVAL;
             }
             else {
-                dev->proto = (gnrc_nettype_t) val;
+                dev->proto = *((gnrc_nettype_t*) val);
                 res = sizeof(gnrc_nettype_t);
             }
             break;
@@ -666,6 +713,29 @@ static int _set(gnrc_netdev_t *device, netopt_t opt, void *val, size_t len)
                 }
                 at86rf2xx_set_chan(dev, chan);
                 res = sizeof(uint16_t);
+            }
+            break;
+
+        case NETOPT_CHANNEL_PAGE:
+            if (len != sizeof(uint16_t)) {
+                res = -EINVAL;
+            } else {
+                uint8_t page = ((uint8_t *)val)[0];
+#ifdef MODULE_AT86RF212B
+                if ((page != 0) && (page != 2)) {
+                    res = -ENOTSUP;
+                } else {
+                    at86rf2xx_set_page(dev, page);
+                    res = sizeof(uint16_t);
+                }
+#else
+                /* rf23x only supports page 0, no need to configure anything in the driver. */
+                if (page != 0) {
+                    res = -ENOTSUP;
+                } else {
+                    res = sizeof(uint16_t);
+                }
+#endif
             }
             break;
 
@@ -762,6 +832,15 @@ static int _set(gnrc_netdev_t *device, netopt_t opt, void *val, size_t len)
             }
             break;
 
+        case NETOPT_CCA_THRESHOLD:
+            if (len > sizeof(int8_t)) {
+                res = -EOVERFLOW;
+            } else {
+                at86rf2xx_set_cca_threshold(dev, *((int8_t *)val));
+                res = sizeof(int8_t);
+            }
+            break;
+
         default:
             res = -ENOTSUP;
     }
@@ -803,6 +882,7 @@ static int _rem_event_cb(gnrc_netdev_t *dev, gnrc_netdev_event_cb_t cb)
 
 static void _isr_event(gnrc_netdev_t *device, uint32_t event_type)
 {
+    (void) event_type;
     at86rf2xx_t *dev = (at86rf2xx_t *) device;
     uint8_t irq_mask;
     uint8_t state;

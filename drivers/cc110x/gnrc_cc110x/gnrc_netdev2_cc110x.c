@@ -14,7 +14,7 @@
 #include "net/gnrc.h"
 #include "cc110x.h"
 #include "cc110x-netdev2.h"
-#include "net/gnrc/gnrc_netdev2.h"
+#include "net/gnrc/netdev2.h"
 #include "od.h"
 
 #define ENABLE_DEBUG    (0)

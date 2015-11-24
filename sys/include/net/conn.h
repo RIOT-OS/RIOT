@@ -31,6 +31,7 @@
  * @brief   Application connection API definitions
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
+ * @author  Oliver Hahm <oliver.hahm@inria.fr>
  */
 #ifndef NET_CONN_H_
 #define NET_CONN_H_
@@ -38,10 +39,23 @@
 #include "net/conn/ip.h"
 #include "net/conn/tcp.h"
 #include "net/conn/udp.h"
+#include "net/ipv6/addr.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/**
+ * @brief   Find the best matching source address for a given prefix
+ *
+ * @param[in] dst   Pointer to the IPv6 address to find a match for
+ *                  Must not be NULL
+ *
+ * @return NULL if no matching address on any interface could be found
+ * @return pointer to an IPv6 address configured on an interface with the best
+ *         match to @p dst
+ */
+ipv6_addr_t *conn_find_best_source(const ipv6_addr_t *dst);
 
 #ifdef __cplusplus
 }

@@ -101,6 +101,16 @@ static void _fib_add(const char *dest, const char *next, kernel_pid_t pid, uint3
         nxt_size = INADDRSZ;
     }
 
+    /* Set the prefix flag for a network */
+    dst_flags |= FIB_FLAG_NET_PREFIX;
+    for (size_t i = 0; i < dst_size; ++i) {
+        if (dst[i] != 0) {
+            /* and clear the bit if its not the default route */
+            dst_flags = (dst_flags & ~FIB_FLAG_NET_PREFIX);
+            break;
+        }
+    }
+
     fib_add_entry(&gnrc_ipv6_fib_table, pid, dst, dst_size, dst_flags, nxt,
                   nxt_size, nxt_flags, lifetime);
 }

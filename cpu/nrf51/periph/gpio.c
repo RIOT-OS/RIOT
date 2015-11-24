@@ -78,11 +78,13 @@ int gpio_init_int(gpio_t pin, gpio_pp_t pullup, gpio_flank_t flank,
 
 void gpio_irq_enable(gpio_t pin)
 {
+    (void) pin;
     NRF_GPIOTE->INTENSET |= GPIOTE_INTENSET_IN0_Msk;
 }
 
 void gpio_irq_disable(gpio_t dev)
 {
+    (void) dev;
     NRF_GPIOTE->INTENCLR |= GPIOTE_INTENSET_IN0_Msk;
 }
 

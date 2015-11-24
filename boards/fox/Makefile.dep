@@ -2,3 +2,9 @@ ifneq (,$(filter gnrc_netif_default,$(USEMODULE)))
   USEMODULE += at86rf231
   USEMODULE += gnrc_nomac
 endif
+
+ifneq (,$(filter saul_default,$(USEMODULE)))
+  USEMODULE += lps331ap
+  USEMODULE += l3g4200d
+  USEMODULE += lsm303dlhc
+endif

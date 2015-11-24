@@ -75,10 +75,10 @@ static void cpu_clock_init(void)
 #endif
 
     /* Configure the clock settings: */
-    SYS_CTRL->CLOCK_CTRL = CLOCK_CTRL_VALUE;
+    SYS_CTRL->cc2538_sys_ctrl_clk_ctrl.CLOCK_CTRL = CLOCK_CTRL_VALUE;
 
     /* Wait for the new clock settings to take effect: */
-    while ( (SYS_CTRL->CLOCK_STA ^ CLOCK_CTRL_VALUE) & CLOCK_STA_MASK );
+    while ((SYS_CTRL->cc2538_sys_ctrl_clk_sta.CLOCK_STA ^ CLOCK_CTRL_VALUE) & CLOCK_STA_MASK);
 
 #if SYS_CTRL_OSC32K_USE_XTAL
     /* Wait for the 32-kHz crystal oscillator to stabilize: */

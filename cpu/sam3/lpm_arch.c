@@ -27,6 +27,7 @@ void lpm_arch_init(void)
 
 enum lpm_mode lpm_arch_set(enum lpm_mode target)
 {
+    (void) target;
     // TODO
     return 0;
 }

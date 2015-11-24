@@ -106,8 +106,14 @@ endif
 ifneq (,$(filter gnrc_udp,$(USEMODULE)))
     DIRS += transport_layer/udp
 endif
+ifneq (,$(filter gnrc_tcp,$(USEMODULE)))
+    DIRS += transport_layer/tcp
+endif
 ifneq (,$(filter gnrc_zep,$(USEMODULE)))
     DIRS += application_layer/zep
+endif
+ifneq (,$(filter gnrc_tftp,$(USEMODULE)))
+    DIRS += application_layer/tftp
 endif
 
 include $(RIOTBASE)/Makefile.base

@@ -94,7 +94,7 @@ kernel_pid_t nhdp_start(void)
 
         /* Start the NHDP thread */
         nhdp_pid = thread_create(nhdp_stack, sizeof(nhdp_stack), THREAD_PRIORITY_MAIN - 1,
-                                 CREATE_STACKTEST, _nhdp_runner, NULL, "NHDP");
+                                 THREAD_CREATE_STACKTEST, _nhdp_runner, NULL, "NHDP");
 
 #if (NHDP_METRIC_NEEDS_TIMER)
         /* Configure periodic timer message to refresh metric values */
@@ -193,7 +193,7 @@ int nhdp_register_if(kernel_pid_t if_pid, uint8_t *addr, size_t addr_size, uint8
 
     /* Start the receiving thread */
     nhdp_rcv_pid = thread_create(nhdp_rcv_stack, sizeof(nhdp_rcv_stack), THREAD_PRIORITY_MAIN - 1,
-                                 CREATE_STACKTEST, _nhdp_receiver, NULL, "nhdp_rcv_thread");
+                                 THREAD_CREATE_STACKTEST, _nhdp_receiver, NULL, "nhdp_rcv_thread");
 
     /* Start sending periodic HELLO */
     signal_msg.type = MSG_TIMER;

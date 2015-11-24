@@ -22,6 +22,7 @@
 #define BOARD_H_
 
 #include "cpu.h"
+#include "arduino_pinmap.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -31,15 +32,6 @@ extern "C" {
  * Define the nominal CPU core clock in this board
  */
 #define F_CPU               (84000000UL)
-
-/**
- * @name Define UART device and baudrate for stdio
- * @{
- */
-#define STDIO               UART_DEV(0)
-#define STDIO_BAUDRATE      (115200U)
-#define STDIO_RX_BUFSIZE    (64U)
-/** @} */
 
 /**
  * @name LED pin definitions

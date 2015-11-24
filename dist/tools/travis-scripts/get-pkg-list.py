@@ -20,7 +20,8 @@
 
 import os
 
-arm_mcu_groups = ["arm7", "cortex_m0", "cortex_m3_1", "cortex_m3_2", "cortex_m4"]
+arm_mcu_groups = ["arm7", "cortex_m0_2", "cortex_m0_1", "cortex_m3_1",
+                  "cortex_m3_2", "cortex_m4_1", "cortex_m4_2"]
 msp_mcu_groups = ["msp430"]
 x86_mcu_groups = ["x86"]
 avr8_mcu_groups = ["avr8"]
@@ -29,6 +30,10 @@ known_mcu_groups = arm_mcu_groups + msp_mcu_groups + x86_mcu_groups + \
     avr8_mcu_groups + static_tests_groups
 
 common_pkgs = ["pcregrep", "libpcre3", "python3"]
+
+# testing the relic pkg and its RIOT specific unit test requires cmake
+common_pkgs = common_pkgs + ["cmake"]
+
 arm_pkgs = ["gcc-arm-none-eabi"]
 msp_pkgs = ["gcc-msp430"]
 x86_pkgs = ["qemu-system-x86", "g++-multilib", "gcc-multilib",

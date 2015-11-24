@@ -50,6 +50,7 @@ static mutex_t locks[] =  {
 
 int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
 {
+    (void ) conf;
     if (dev) {
         return -1;
     }
@@ -170,6 +171,7 @@ int spi_release(spi_t dev)
 
 int spi_transfer_byte(spi_t dev, char out, char *in)
 {
+    (void) dev;
     while (!SPI_TX_EMPTY);
     SSP0DR = out;
     while (SPI_BUSY);
@@ -186,10 +188,13 @@ int spi_transfer_byte(spi_t dev, char out, char *in)
 
 void spi_poweron(spi_t dev)
 {
+    (void) dev;
 }
 
 void spi_poweroff(spi_t dev)
 {
+    (void) dev;
+    (void) dev;
 }
 
 int spi_conf_pins(spi_t dev)

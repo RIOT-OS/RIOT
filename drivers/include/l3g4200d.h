@@ -38,22 +38,11 @@
 #define L3G4200D_DEFAULT_ADDRESS        0x68
 
 /**
- * @brief Device descriptor for L3G4200D sensors
- */
-typedef struct {
-    i2c_t i2c;              /**< I2C device the sensor is connected to */
-    uint8_t addr;           /**< the sensors slave address on the I2C bus */
-    gpio_t int1;            /**< INT1 pin */
-    gpio_t int2;            /**< INT2 (DRDY) pin */
-    int32_t scale;          /**< scaling factor to normalize results */
-} l3g4200d_t;
-
-/**
  * @brief Result vector for gyro measurement
  */
 typedef struct {
     int16_t acc_x;          /**< roll rate in dgs (degree per second) */
-     int16_t acc_y;         /**< pitch rate in dgs */
+    int16_t acc_y;          /**< pitch rate in dgs */
     int16_t acc_z;          /**< yaw rate in dgs */
 } l3g4200d_data_t;
 
@@ -85,6 +74,29 @@ typedef enum {
     L3G4200D_MODE_800_50  = 0xe,        /**< data rate: 800Hz, cut-off: 50Hz */
     L3G4200D_MODE_800_110 = 0xf         /**< data rate: 800Hz, cut-off: 110Hz */
 } l3g4200d_mode_t;
+
+/**
+ * @brief Device descriptor for L3G4200D sensors
+ */
+typedef struct {
+    i2c_t i2c;              /**< I2C device the sensor is connected to */
+    uint8_t addr;           /**< the sensors slave address on the I2C bus */
+    gpio_t int1;            /**< INT1 pin */
+    gpio_t int2;            /**< INT2 (DRDY) pin */
+    int32_t scale;          /**< scaling factor to normalize results */
+} l3g4200d_t;
+
+/**
+ * @brief Data structure holding the device parameters needed for initialization
+ */
+typedef struct {
+    i2c_t i2c;              /**< I2C bus the device is connected to */
+    uint8_t addr;           /**< the address on that bus */
+    gpio_t int1_pin;        /**< GPIO pin connected to the INT1 line */
+    gpio_t int2_pin;        /**< GPIO pin connected to the INT2 line */
+    l3g4200d_mode_t mode;   /**< sampling mode to use */
+    l3g4200d_scale_t scale; /**< scaling to use */
+} l3g4200d_params_t;
 
 /**
  * @brief Initialize a gyro

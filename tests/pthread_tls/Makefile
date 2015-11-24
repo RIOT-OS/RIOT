@@ -7,6 +7,4 @@ BOARD_BLACKLIST := arduino-mega2560
 USEMODULE += posix
 USEMODULE += pthread
 
-DISABLE_MODULE += auto_init
-
 include $(RIOTBASE)/Makefile.include

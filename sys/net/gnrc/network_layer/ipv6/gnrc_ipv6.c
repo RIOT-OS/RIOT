@@ -85,7 +85,8 @@ kernel_pid_t gnrc_ipv6_init(void)
 {
     if (gnrc_ipv6_pid == KERNEL_PID_UNDEF) {
         gnrc_ipv6_pid = thread_create(_stack, sizeof(_stack), GNRC_IPV6_PRIO,
-                                      CREATE_STACKTEST, _event_loop, NULL, "ipv6");
+                                      THREAD_CREATE_STACKTEST,
+                                      _event_loop, NULL, "ipv6");
     }
 
 #ifdef MODULE_FIB
@@ -719,25 +720,14 @@ static void _receive(gnrc_pktsnip_t *pkt)
         iface = ((gnrc_netif_hdr_t *)netif->data)->if_pid;
     }
 
-    if ((pkt->next != NULL) && (pkt->next->type == GNRC_NETTYPE_IPV6) &&
-        (pkt->next->size == sizeof(ipv6_hdr_t))) {
-        /* IP header was already marked. Take it. */
-        ipv6 = pkt->next;
-
-        if (!ipv6_hdr_is(ipv6->data)) {
-            DEBUG("ipv6: Received packet was not IPv6, dropping packet\n");
-            gnrc_pktbuf_release(pkt);
-            return;
+    for (ipv6 = pkt; ipv6 != NULL; ipv6 = ipv6->next) { /* find IPv6 header if already marked */
+        if ((ipv6->type == GNRC_NETTYPE_IPV6) && (ipv6->size == sizeof(ipv6_hdr_t)) &&
+            (ipv6_hdr_is(ipv6->data))) {
+            break;
         }
-#ifdef MODULE_GNRC_IPV6_WHITELIST
-        if (!gnrc_ipv6_whitelisted(&((ipv6_hdr_t *)(ipv6->data))->src)) {
-            DEBUG("ipv6: Source address not whitelisted, dropping packet\n");
-            gnrc_pktbuf_release(pkt);
-            return;
-        }
-#endif
     }
-    else {
+
+    if (ipv6 == NULL) {
         if (!ipv6_hdr_is(pkt->data)) {
             DEBUG("ipv6: Received packet was not IPv6, dropping packet\n");
             gnrc_pktbuf_release(pkt);
@@ -769,6 +759,14 @@ static void _receive(gnrc_pktsnip_t *pkt)
             return;
         }
     }
+#ifdef MODULE_GNRC_IPV6_WHITELIST
+    else if (!gnrc_ipv6_whitelisted(&((ipv6_hdr_t *)(ipv6->data))->src)) {
+        /* if ipv6 header already marked*/
+        DEBUG("ipv6: Source address not whitelisted, dropping packet\n");
+        gnrc_pktbuf_release(pkt);
+        return;
+    }
+#endif
 
     /* extract header */
     hdr = (ipv6_hdr_t *)ipv6->data;
@@ -790,7 +788,7 @@ static void _receive(gnrc_pktsnip_t *pkt)
 
 #ifdef MODULE_GNRC_IPV6_ROUTER    /* only routers redirect */
         /* redirect to next hop */
-        DEBUG("ipv6: decrement hop limit to %" PRIu8 "\n", hdr->hl - 1);
+        DEBUG("ipv6: decrement hop limit to %" PRIu8 "\n", (uint8_t) (hdr->hl - 1));
 
         /* RFC 4291, section 2.5.6 states: "Routers must not forward any
          * packets with Link-Local source or destination addresses to other
@@ -804,24 +802,33 @@ static void _receive(gnrc_pktsnip_t *pkt)
         }
         /* TODO: check if receiving interface is router */
         else if (--(hdr->hl) > 0) {  /* drop packets that *reach* Hop Limit 0 */
-            gnrc_pktsnip_t *tmp = pkt;
+            gnrc_pktsnip_t *reversed_pkt = NULL, *ptr = pkt;
 
             DEBUG("ipv6: forward packet to next hop\n");
 
             /* pkt might not be writable yet, if header was given above */
-            pkt = gnrc_pktbuf_start_write(tmp);
             ipv6 = gnrc_pktbuf_start_write(ipv6);
-
-            if ((ipv6 == NULL) || (pkt == NULL)) {
+            if (ipv6 == NULL) {
                 DEBUG("ipv6: unable to get write access to packet: dropping it\n");
-                gnrc_pktbuf_release(tmp);
+                gnrc_pktbuf_release(pkt);
                 return;
             }
-
-            gnrc_pktbuf_release(ipv6->next);    /* remove headers around IPV6 */
-            ipv6->next = pkt;                   /* reorder for sending */
-            pkt->next = NULL;
-            _send(ipv6, false);
+            gnrc_pktbuf_remove_snip(pkt, ipv6->next);   /* remove L2 headers around IPV6 */
+            while (ptr != NULL) {                       /* reverse packet order */
+                gnrc_pktsnip_t *next;
+                ptr = gnrc_pktbuf_start_write(ptr);     /* duplicate if not already done */
+                if (ptr == NULL) {
+                    DEBUG("ipv6: unable to get write access to packet: dropping it\n");
+                    gnrc_pktbuf_release(reversed_pkt);
+                    gnrc_pktbuf_release(pkt);
+                    return;
+                }
+                next = ptr->next;
+                ptr->next = reversed_pkt;
+                reversed_pkt = ptr;
+                ptr = next;
+            }
+            _send(reversed_pkt, false);
             return;
         }
         else {

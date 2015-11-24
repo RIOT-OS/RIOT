@@ -140,7 +140,7 @@ int timer_set(tim_t tim, int channel, unsigned int timeout)
 
 int timer_set_absolute(tim_t tim, int channel, unsigned int value)
 {
-    if (tim >= TIMER_NUMOF || channel >= TIMER_CHAN_NUMOF) {
+    if (((unsigned) tim >= TIMER_NUMOF) || ((unsigned) channel >= TIMER_CHAN_NUMOF)) {
         return -1;
     }
 
@@ -152,7 +152,7 @@ int timer_set_absolute(tim_t tim, int channel, unsigned int value)
 
 int timer_clear(tim_t tim, int channel)
 {
-    if (tim >= TIMER_NUMOF || channel >= TIMER_CHAN_NUMOF) {
+    if (((unsigned) tim >= TIMER_NUMOF) || ((unsigned) channel >= TIMER_CHAN_NUMOF)) {
         return -1;
     }
     get_dev(tim)->MCR &= ~(1 << (channel * 3));
@@ -176,17 +176,19 @@ void timer_stop(tim_t tim)
 
 void timer_irq_enable(tim_t tim)
 {
+    (void) tim;
     /* TODO */
 }
 
 void timer_irq_disable(tim_t tim)
 {
+    (void) tim;
     /* TODO */
 }
 
 static inline void isr_handler(lpc23xx_timer_t *dev, int tim_num)
 {
-    for (int i = 0; i < TIMER_CHAN_NUMOF; i++) {
+    for (unsigned i = 0; i < TIMER_CHAN_NUMOF; i++) {
         if (dev->IR & (1 << i)) {
             dev->IR |= (1 << i);
             dev->MCR &= ~(1 << (i * 3));

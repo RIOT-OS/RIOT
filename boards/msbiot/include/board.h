@@ -23,8 +23,6 @@
 
 #include "cpu.h"
 #include "periph_conf.h"
-#include "periph/gpio.h"
-#include "periph/spi.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -53,15 +51,6 @@ extern "C" {
 #define MPU9150_I2C         I2C_0
 #define MPU9150_HW_ADDR     (0x68)
 #define MPU9150_COMP_ADDR   (0x0E)
-/** @} */
-
-/**
- * @name Define UART device and baudrate for stdio
- * @{
- */
-#define STDIO               UART_0
-#define STDIO_BAUDRATE      (115200U)
-#define STDIO_RX_BUFSIZE    (64U)
 /** @} */
 
 /**

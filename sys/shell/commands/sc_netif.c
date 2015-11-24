@@ -82,6 +82,7 @@ static void _set_usage(char *cmd_name)
          "       * \"channel\" - sets the frequency channel\n"
          "       * \"chan\" - alias for \"channel\"\n"
          "       * \"csma_retries\" - set max. number of channel access attempts\n"
+         "       * \"cca_threshold\" - set ED threshold during CCA in dBm\n"
          "       * \"nid\" - sets the network identifier (or the PAN ID)\n"
          "       * \"page\" - set the channel page (IEEE 802.15.4)\n"
          "       * \"pan\" - alias for \"nid\"\n"
@@ -103,7 +104,7 @@ static void _hl_usage(char *cmd_name)
 
 static void _flag_usage(char *cmd_name)
 {
-    printf("usage: %s <if_id> [-]{promisc|autoack|csma|autocca|preload|iphc}\n", cmd_name);
+    printf("usage: %s <if_id> [-]{promisc|autoack|csma|autocca|cca_threshold|preload|iphc|rtr_adv}\n", cmd_name);
 }
 
 static void _add_usage(char *cmd_name)
@@ -153,6 +154,10 @@ static void _print_netopt(netopt_t opt)
             printf("CSMA retries");
             break;
 
+        case NETOPT_CCA_THRESHOLD:
+            printf("CCA threshold [in dBm]");
+            break;
+
         default:
             /* we don't serve these options here */
             break;
@@ -194,8 +199,9 @@ static void _netif_list(kernel_pid_t dev)
     uint8_t u8;
     int res;
     netopt_state_t state;
-    netopt_enable_t enable;
+    netopt_enable_t enable = NETOPT_DISABLE;
     bool linebreak = false;
+
 #ifdef MODULE_GNRC_IPV6_NETIF
     gnrc_ipv6_netif_t *entry = gnrc_ipv6_netif_get(dev);
     char ipv6_addr[IPV6_ADDR_MAX_STR_LEN];
@@ -250,7 +256,7 @@ static void _netif_list(kernel_pid_t dev)
     if (res >= 0) {
         res = gnrc_netapi_get(dev, NETOPT_CSMA, 0, &enable, sizeof(enable));
         if ((res >= 0) && (enable == NETOPT_ENABLE)) {
-            printf(" CSMA Retries: %" PRIu8 " ", *((uint8_t *) &u8));
+            printf(" CSMA Retries: %u ", (unsigned)u8);
         }
     }
 
@@ -315,9 +321,15 @@ static void _netif_list(kernel_pid_t dev)
 #ifdef MODULE_GNRC_IPV6_NETIF
     if (entry != NULL) {
         printf("MTU:%" PRIu16 "  ", entry->mtu);
-        printf("HL:%" PRIu8 " ", entry->cur_hl);
+        printf("HL:%u  ", (unsigned)entry->cur_hl);
         if (entry->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN) {
             printf("6LO  ");
+        }
+        if (entry->flags & GNRC_IPV6_NETIF_FLAGS_ROUTER) {
+            printf("RTR  ");
+        }
+        if (entry->flags & GNRC_IPV6_NETIF_FLAGS_RTR_ADV) {
+            printf("RTR_ADV  ");
         }
         linebreak = true;
 
@@ -359,8 +371,7 @@ static void _netif_list(kernel_pid_t dev)
 
             if (ipv6_addr_to_str(ipv6_addr, &entry->addrs[i].addr,
                                  IPV6_ADDR_MAX_STR_LEN)) {
-                printf("%s/%" PRIu8 "  scope: ", ipv6_addr,
-                       entry->addrs[i].prefix_len);
+                printf("%s/%u  scope: ", ipv6_addr, (unsigned)entry->addrs[i].prefix_len);
 
                 if ((ipv6_addr_is_link_local(&entry->addrs[i].addr))) {
                     printf("local");
@@ -515,6 +526,7 @@ static int _netif_set_addr(kernel_pid_t dev, netopt_t opt, char *addr_str)
 static int _netif_set_state(kernel_pid_t dev, char *state_str)
 {
     netopt_state_t state;
+
     if ((strcmp("off", state_str) == 0) || (strcmp("OFF", state_str) == 0)) {
         state = NETOPT_STATE_OFF;
     }
@@ -578,6 +590,9 @@ static int _netif_set(char *cmd_name, kernel_pid_t dev, char *key, char *value)
     else if (strcmp("csma_retries", key) == 0) {
         return _netif_set_u8(dev, NETOPT_CSMA_RETRIES, value);
     }
+    else if (strcmp("cca_threshold", key) == 0) {
+        return _netif_set_u8(dev, NETOPT_CCA_THRESHOLD, value);
+    }
 
     _set_usage(cmd_name);
     return 1;
@@ -630,6 +645,30 @@ static int _netif_flag(char *cmd, kernel_pid_t dev, char *flag)
         return 0;
 #else
         puts("error: unable to (un)set IPHC.");
+        return 1;
+#endif
+    }
+    else if (strcmp(flag, "rtr_adv") == 0) {
+#if defined(MODULE_GNRC_NDP_ROUTER) || defined(MODULE_GNRC_SIXLOWPAN_ND_ROUTER)
+        gnrc_ipv6_netif_t *entry = gnrc_ipv6_netif_get(dev);
+
+        if (entry == NULL) {
+            puts("error: unable to (un)set router advertisement flag.");
+            return 1;
+        }
+
+        if (set) {
+            gnrc_ipv6_netif_set_rtr_adv(entry, true);
+            printf("success: enable router advertisements on interface %" PRIkernel_pid "\n", dev);
+        }
+        else {
+            gnrc_ipv6_netif_set_rtr_adv(entry, false);
+            printf("success: disable router advertisements on interface %" PRIkernel_pid "\n",
+                   dev);
+        }
+        return 0;
+#else
+        puts("error: unable to (un)set router advertisement flag.");
         return 1;
 #endif
     }
@@ -892,7 +931,7 @@ int _netif_config(int argc, char **argv)
                 gnrc_ipv6_netif_t *entry;
                 if (((hl = atoi(argv[3])) < 0) || (hl > UINT8_MAX)) {
                     printf("error: Hop limit must be between %" PRIu16 " and %" PRIu16 "\n",
-                            (uint16_t)0, (uint16_t)UINT16_MAX);
+                           (uint16_t)0, (uint16_t)UINT16_MAX);
                     return 1;
                 }
                 if ((entry = gnrc_ipv6_netif_get(dev)) == NULL) {

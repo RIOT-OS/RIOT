@@ -18,6 +18,9 @@
  * @}
  */
 
+#include <sys/types.h>
+#include <unistd.h>
+
 #include "uart_stdio.h"
 
 /**
@@ -37,6 +40,18 @@ int getchar(void)
 int putchar(int c)
 {
     char _c = c;
-    uart_stdio_write(&_c, 1);
-    return 1;
+    return uart_stdio_write(&_c, 1);
+}
+
+/**
+ * @brief   Write nbyte characters to the STDIO UART interface
+ */
+ssize_t write(int fildes, const void *buf, size_t nbyte)
+{
+    if (fildes == STDOUT_FILENO) {
+        return uart_stdio_write(buf, nbyte);
+    }
+    else {
+        return -1;
+    }
 }

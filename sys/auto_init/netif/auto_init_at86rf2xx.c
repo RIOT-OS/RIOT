@@ -43,7 +43,7 @@ static char _nomac_stacks[AT86RF2XX_MAC_STACKSIZE][AT86RF2XX_NUM];
 
 void auto_init_at86rf2xx(void)
 {
-    for (int i = 0; i < AT86RF2XX_NUM; i++) {
+    for (unsigned i = 0; i < AT86RF2XX_NUM; i++) {
         DEBUG("Initializing AT86RF2xx radio at SPI_%i\n", i);
         const at86rf2xx_params_t *p = &at86rf2xx_params[i];
         int res = at86rf2xx_init(&at86rf2xx_devs[i],

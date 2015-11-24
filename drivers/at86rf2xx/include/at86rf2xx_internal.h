@@ -95,10 +95,19 @@ void at86rf2xx_sram_write(const at86rf2xx_t *dev,
                           const size_t len);
 
 /**
- * @brief   Read the internal frame buffer of the given device
+ * @brief   Start a read transcation internal frame buffer of the given device
  *
  * Reading the frame buffer returns some extra bytes that are not accessible
- * through reading the RAM directly.
+ * through reading the RAM directly. This locks the used SPI.
+ *
+ * @param[in]  dev      device to start read
+ */
+void at86rf2xx_fb_start(const at86rf2xx_t *dev);
+
+/**
+ * @brief   Read the internal frame buffer of the given device
+ *
+ * Each read advances the position in the buffer by @p len.
  *
  * @param[in]  dev      device to read from
  * @param[out] data     buffer to copy the data to
@@ -106,6 +115,22 @@ void at86rf2xx_sram_write(const at86rf2xx_t *dev,
  */
 void at86rf2xx_fb_read(const at86rf2xx_t *dev,
                        uint8_t *data, const size_t len);
+
+/**
+ * @brief   Stop a read transcation internal frame buffer of the given device
+ *
+ * Release the SPI device and unlock frame buffer protection.
+ *
+ * @param[in]  dev      device to stop read
+ */
+void at86rf2xx_fb_stop(const at86rf2xx_t *dev);
+
+/**
+ * @brief   Cancel ongoing transactions and switch to TRX_OFF state
+ *
+ * @param[in] dev       device to manipulate
+ */
+void at86rf2xx_force_trx_off(const at86rf2xx_t *dev);
 
 /**
  * @brief   Convenience function for reading the status of the given device
@@ -129,6 +154,14 @@ void at86rf2xx_assert_awake(at86rf2xx_t *dev);
  * @param[in] dev       device to reset
  */
 void at86rf2xx_hardware_reset(at86rf2xx_t *dev);
+
+
+/**
+ * @brief   Set PHY parameters based on channel and page number
+ *
+ * @param[in] dev       device to configure
+ */
+void at86rf2xx_configure_phy(at86rf2xx_t *dev);
 
 
 #ifdef __cplusplus

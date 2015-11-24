@@ -47,7 +47,7 @@ static char _nomac_stacks[XBEE_MAC_STACKSIZE][XBEE_NUM];
 
 void auto_init_xbee(void)
 {
-    for (int i = 0; i < XBEE_NUM; i++) {
+    for (size_t i = 0; i < XBEE_NUM; i++) {
         const xbee_params_t *p = &xbee_params[i];
         DEBUG("Initializing XBee radio at UART_%i\n", p->uart);
         int res = xbee_init(&xbee_devs[i],

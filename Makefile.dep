@@ -23,16 +23,13 @@ ifneq (,$(filter gnrc_conn_udp,$(USEMODULE)))
   USEMODULE += gnrc_udp
 endif
 
-ifneq (,$(filter schedstatistics,$(USEMODULE)))
-  USEMODULE += xtimer
-endif
-
 ifneq (,$(filter gnrc_netif_default,$(USEMODULE)))
   USEMODULE += gnrc_netif
 endif
 
 ifneq (,$(filter netdev2_tap,$(USEMODULE)))
   USEMODULE += netif
+  USEMODULE += netdev2_eth
 endif
 
 ifneq (,$(filter gnrc_zep,$(USEMODULE)))
@@ -41,6 +38,11 @@ ifneq (,$(filter gnrc_zep,$(USEMODULE)))
   USEMODULE += gnrc_udp
   USEMODULE += random
   USEMODULE += vtimer
+endif
+
+ifneq (,$(filter gnrc_tftp,$(USEMODULE)))
+  USEMODULE += gnrc_udp
+  USEMODULE += xtimer
 endif
 
 ifneq (,$(filter gnrc_rpl,$(USEMODULE)))
@@ -104,6 +106,8 @@ endif
 ifneq (,$(filter gnrc_sixlowpan_iphc,$(USEMODULE)))
   USEMODULE += gnrc_sixlowpan
   USEMODULE += gnrc_sixlowpan_ctx
+  # NHC is broken, so disable it for now. See #4544 and #4462.
+  #USEMODULE += gnrc_sixlowpan_iphc_nhc
 endif
 
 ifneq (,$(filter gnrc_sixlowpan,$(USEMODULE)))
@@ -238,6 +242,7 @@ endif
 
 ifneq (,$(filter ipv6_hdr,$(USEMODULE)))
   USEMODULE += inet_csum
+  USEMODULE += ipv6_addr
 endif
 
 ifneq (,$(filter gnrc_ipv6_nc,$(USEMODULE)))
@@ -283,8 +288,7 @@ ifneq (,$(filter uart_stdio,$(USEMODULE)))
 endif
 
 ifneq (,$(filter posix,$(USEMODULE)))
-  USEMODULE += timex
-  USEMODULE += vtimer
+  USEMODULE += xtimer
 endif
 
 ifneq (,$(filter posix_semaphore,$(USEMODULE)))
@@ -341,7 +345,7 @@ ifneq (,$(filter log_%,$(USEMODULE)))
 endif
 
 ifneq (,$(filter cpp11-compat,$(USEMODULE)))
-  USEMODULE += vtimer
+  USEMODULE += xtimer
   USEMODULE += timex
   FEATURES_REQUIRED += cpp
 endif
@@ -382,6 +386,28 @@ ifneq (,$(filter schedstatistics,$(USEMODULE)))
     USEMODULE += xtimer
 endif
 
+ifneq (,$(filter arduino,$(USEMODULE)))
+    FEATURES_REQUIRED += arduino
+    FEATURES_REQUIRED += cpp
+    USEMODULE += xtimer
+endif
+
 ifneq (,$(filter xtimer,$(USEMODULE)))
     FEATURES_REQUIRED += periph_timer
+endif
+
+ifneq (,$(filter saul_reg,$(USEMODULE)))
+  USEMODULE += saul
+endif
+
+ifneq (,$(filter saul_default,$(USEMODULE)))
+  USEMODULE += saul
+endif
+
+ifneq (,$(filter saul,$(USEMODULE)))
+  USEMODULE += phydat
+endif
+
+ifneq (,$(filter phydat,$(USEMODULE)))
+  USEMODULE += fmt
 endif

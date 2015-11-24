@@ -502,10 +502,7 @@ kernel_pid_t gnrc_ipv6_netif_find_by_prefix(ipv6_addr_t **out, const ipv6_addr_t
         match = _find_by_prefix_unsafe(&tmp_res, ipv6_ifs + i, prefix, NULL);
 
         if (match > best_match) {
-            if (out != NULL) {
-                *out = tmp_res;
-            }
-
+            *out = tmp_res;
             res = ipv6_ifs[i].pid;
             best_match = match;
         }
@@ -745,7 +742,7 @@ static ipv6_addr_t *_source_address_selection(gnrc_ipv6_netif_t *iface, const ip
     }
 
     /* reset candidate set to mark winners */
-    memset(candidate_set, 0, (GNRC_IPV6_NETIF_ADDR_NUMOF / 8) + 1);
+    memset(candidate_set, 0, (GNRC_IPV6_NETIF_ADDR_NUMOF + 7) / 8);
     /* check if we have a clear winner */
     /* collect candidates with maximum points */
     for (int i = 0; i < GNRC_IPV6_NETIF_ADDR_NUMOF; i++) {

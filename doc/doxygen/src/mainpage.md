@@ -79,9 +79,9 @@ Structure                                                          {#structure}
 This section walks you through RIOT's structure. Once you understand this
 structure, you will easily find your way around in RIOT's code base.
 
-RIOT's code base is structured into five groups.
+![Overview](riot-structure.svg)
 
-<!-- TODO: add graphic -->
+RIOT's code base is structured into five groups.
 
  - The kernel (`core`)
  - Platform specific code (`cpu`; `boards`)
@@ -178,7 +178,7 @@ sys/net
 -------
 The `sys/net` sub-directory needs to be explicitly mentioned, as this is where
 all the networking code in RIOT resides. Here you can find the network stack
-implementations (e.g. the GNRC stack) as well as network stack agnostic code as
+implementations (e.g. the @ref net_gnrc "GNRC" stack) as well as network stack agnostic code as
 header definitions or network types.
 
 See @ref net for more details on networking code.
@@ -204,6 +204,8 @@ starting point for anyone who is new to RIOT.
 For more information best browse that directory and have a look at the
 `README.md` files that ship with each example.
 
+To create your own application — here or anywhere else — see @ref creating-an-application
+
 tests
 -----
 Many features/modules in RIOT come with their own test application, which are
@@ -226,11 +228,13 @@ debugging, reseting (e.g. support for [OpenOCD](http://openocd.org/),
 integration to open testbeds such as the [IoT-LAB](https://www.iot-lab.info/).
 Furthermore you can find here scripts to do all kind of code and style checks.
 
-<!--
 Further information                                      {#further-information}
 ===================
-*TBD*
+ - @ref getting-started
+ - @ref creating-an-application
+ - @ref creating-modules
 
+<!--
 Idea for this section: just name each of RIOT's main features/concepts and link
 to an appropriate page with further information:
     - Create an application

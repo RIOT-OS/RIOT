@@ -19,8 +19,8 @@
  * @author      Johann Fischer <j.fischer@phytec.de>
  */
 
-#ifndef __BOARD_H
-#define __BOARD_H
+#ifndef BOARD_H
+#define BOARD_H
 
 #include "cpu.h"
 #include "periph_conf.h"
@@ -34,15 +34,6 @@ extern "C"
  * Define the nominal CPU core clock in this board
  */
 #define F_CPU               CLOCK_CORECLOCK
-
-/**
- * @name Define UART device and baudrate for stdio
- * @{
- */
-#define STDIO               UART_0
-#define STDIO_RX_BUFSIZE    (64U)
-#define STDIO_BAUDRATE      (115200U)
-/** @} */
 
 /**
  * @name LED pin definitions
@@ -94,5 +85,5 @@ void board_init(void);
 }
 #endif
 
-#endif /** __BOARD_H */
+#endif /** BOARD_H */
 /** @} */

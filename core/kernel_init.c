@@ -25,7 +25,6 @@
 #include "kernel.h"
 #include "kernel_internal.h"
 #include "sched.h"
-#include "flags.h"
 #include "cpu.h"
 #include "lpm.h"
 #include "thread.h"
@@ -95,12 +94,12 @@ void kernel_init(void)
 
     thread_create(idle_stack, sizeof(idle_stack),
             THREAD_PRIORITY_IDLE,
-            CREATE_WOUT_YIELD | CREATE_STACKTEST,
+            THREAD_CREATE_WOUT_YIELD | THREAD_CREATE_STACKTEST,
             idle_thread, NULL, idle_name);
 
     thread_create(main_stack, sizeof(main_stack),
             THREAD_PRIORITY_MAIN,
-            CREATE_WOUT_YIELD | CREATE_STACKTEST,
+            THREAD_CREATE_WOUT_YIELD | THREAD_CREATE_STACKTEST,
             main_trampoline, NULL, main_name);
 
     cpu_switch_context_exit();

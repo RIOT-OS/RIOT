@@ -1,4 +1,4 @@
-#/bin/bash
+#/usr/bin/env bash
 
 if [ $# -le 0 ]; then
     echo "usage: $0 [openocd interface name] [openocd args]" >&2

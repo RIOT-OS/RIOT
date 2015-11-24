@@ -40,3 +40,8 @@ int getchar(void)
     /* dummy implementation */
     return EOF;
 }
+
+ssize_t write(int fildes, const void *buf, size_t nbyte)
+{
+    return -1;
+}

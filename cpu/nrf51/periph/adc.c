@@ -127,6 +127,7 @@ int adc_map(adc_t dev, int value, int min, int max)
 
 float adc_mapf(adc_t dev, int value, float min, float max)
 {
+    (void) dev;
     return ((max - min) / ((float)adc_max_value)) * value;
 }
 

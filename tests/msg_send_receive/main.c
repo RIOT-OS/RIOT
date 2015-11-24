@@ -24,7 +24,6 @@
 
 #include "cpu_conf.h"
 #include "thread.h"
-#include "xtimer.h"
 
 #define THREAD1_STACKSIZE   (THREAD_STACKSIZE_MAIN)
 #define THREAD2_STACKSIZE   (THREAD_STACKSIZE_MAIN)
@@ -58,7 +57,6 @@ static void *thread1(void *args)
             success = 0;
             break;
         }
-        xtimer_usleep(200);
     }
 
     if (success) {
@@ -96,9 +94,9 @@ static void *thread2(void *args)
 
 int main(void)
 {
-    thread2_pid = thread_create(thread2_stack, THREAD2_STACKSIZE, THREAD_PRIORITY_MAIN - 1,
+    thread2_pid = thread_create(thread2_stack, THREAD2_STACKSIZE, THREAD_PRIORITY_MAIN - 2,
                                 0, thread2, NULL, "thread2");
-    thread1_pid = thread_create(thread1_stack, THREAD1_STACKSIZE, THREAD_PRIORITY_MAIN - 2,
+    thread1_pid = thread_create(thread1_stack, THREAD1_STACKSIZE, THREAD_PRIORITY_MAIN - 1,
                                 0, thread1, NULL, "thread1");
     return 0;
 }
