@@ -1,0 +1,110 @@
+From 7fc320bdc8d6e6d30cf4684889fb88acab9ab7b2 Mon Sep 17 00:00:00 2001
+From: Cenk Gündoğan <cnkgndgn@gmail.com>
+Date: Mon, 23 Nov 2015 16:21:37 +0100
+Subject: [PATCH] remove error: array subscript has type 'char'
+ [-Werror=char-subscripts]
+
+---
+ src-api/common/netaddr.c |  6 +++---
+ src-api/common/string.c  | 18 +++++++++---------
+ 2 files changed, 12 insertions(+), 12 deletions(-)
+
+diff --git a/src-api/common/netaddr.c b/src-api/common/netaddr.c
+index 0b8fc1d..55868da 100644
+--- a/src-api/common/netaddr.c
++++ b/src-api/common/netaddr.c
+@@ -453,7 +453,7 @@ netaddr_from_string(struct netaddr *dst, const char *src) {
+   ptr1 = str_trim(ptr1);
+
+   ptr2 = ptr1;
+-  while (*ptr2 != 0 && !isspace(*ptr2) && *ptr2 != '/') {
++  while (*ptr2 != 0 && !isspace((unsigned char) *ptr2) && *ptr2 != '/') {
+     switch (*ptr2) {
+       case ':':
+         if (last_was_colon) {
+@@ -478,11 +478,11 @@ netaddr_from_string(struct netaddr *dst, const char *src) {
+
+   if (*ptr2) {
+     /* split strings */
+-    while (isspace(*ptr2)) *ptr2++ = 0;
++    while (isspace((unsigned char) *ptr2)) *ptr2++ = 0;
+     if (*ptr2 == '/') {
+       *ptr2++ = 0;
+     }
+-    while (isspace(*ptr2)) *ptr2++ = 0;
++    while (isspace((unsigned char) *ptr2)) *ptr2++ = 0;
+
+     if (*ptr2 == 0) {
+       /* prefixlength is missing */
+diff --git a/src-api/common/string.c b/src-api/common/string.c
+index 422ec1c..f099ec6 100644
+--- a/src-api/common/string.c
++++ b/src-api/common/string.c
+@@ -125,7 +125,7 @@ str_trim (char *ptr) {
+   }
+
+   /* skip leading whitespaces */
+-  while (isspace(*ptr)) {
++  while (isspace((unsigned char) *ptr)) {
+     ptr++;
+   }
+
+@@ -133,7 +133,7 @@ str_trim (char *ptr) {
+   end = ptr + strlen(ptr) - 1;
+
+   /* remove trailing whitespaces */
+-  while (end > ptr && isspace(*end)) {
++  while (end > ptr && isspace((unsigned char) *end)) {
+     *end-- = 0;
+   }
+   return ptr;
+@@ -154,18 +154,18 @@ str_hasnextword (const char *buffer, const char *word) {
+   }
+
+   /* skip whitespace prefix */
+-  while (isblank(*buffer)) {
++  while (isblank((unsigned char) *buffer)) {
+     buffer++;
+   }
+
+-  while (*word != 0 && *buffer != 0 && !isblank(*buffer) && tolower(*word) == tolower(*buffer)) {
++  while (*word != 0 && *buffer != 0 && !isblank((unsigned char) *buffer) && tolower((unsigned char) *word) == tolower((unsigned char) *buffer)) {
+     word++;
+     buffer++;
+   }
+
+   /* complete match ? */
+-  if (*word == 0 && (*buffer == 0 || isblank(*buffer))) {
+-    while (isblank(*buffer)) {
++  if (*word == 0 && (*buffer == 0 || isblank((unsigned char) *buffer))) {
++    while (isblank((unsigned char) *buffer)) {
+       buffer++;
+     }
+     return buffer;
+@@ -192,13 +192,13 @@ str_cpynextword (char *dst, const char *src, size_t len) {
+   }
+
+   /* skip whitespace prefix */
+-  while (isblank(*src)) {
++  while (isblank((unsigned char) *src)) {
+     src++;
+   }
+
+   /* copy next word */
+   i = 0;
+-  while (*src != 0 && !isblank(*src) && i < len-1) {
++  while (*src != 0 && !isblank((unsigned char) *src) && i < len-1) {
+     dst[i++] = *src++;
+   }
+
+@@ -206,7 +206,7 @@ str_cpynextword (char *dst, const char *src, size_t len) {
+   dst[i] = 0;
+
+   /* skip ahead in src */
+-  while (isblank(*src)) {
++  while (isblank((unsigned char) *src)) {
+     src++;
+   }
+
+--
+2.6.2
