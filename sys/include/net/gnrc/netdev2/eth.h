@@ -19,7 +19,7 @@
 #ifndef GNRC_NETDEV2_ETH_H
 #define GNRC_NETDEV2_ETH_H
 
-#include "net/gnrc/gnrc_netdev2.h"
+#include "net/gnrc/netdev2.h"
 
 #ifdef __cplusplus
 extern "C" {

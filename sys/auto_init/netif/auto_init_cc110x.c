@@ -20,7 +20,7 @@
 #ifdef MODULE_CC110X
 
 #include "board.h"
-#include "net/gnrc/gnrc_netdev2.h"
+#include "net/gnrc/netdev2.h"
 #include "gnrc_netdev2_cc110x.h"
 #include "net/gnrc.h"
 
