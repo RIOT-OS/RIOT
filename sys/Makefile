@@ -67,6 +67,9 @@ endif
 ifneq (,$(filter udp,$(USEMODULE)))
     DIRS += net/transport_layer/udp
 endif
+ifneq (,$(filter flash_sim,$(USEMODULE)))
+    DIRS += storage/flash_sim
+endif
 
 ifneq (,$(filter hamming256,$(USEMODULE)))
     DIRS += ecc/hamming256
