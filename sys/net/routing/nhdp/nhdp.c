@@ -18,13 +18,15 @@
  * @}
  */
 
-#include "conn/udp.h"
+#include "net/gnrc/conn.h"
+#include "net/conn/udp.h"
 #include "msg.h"
-#include "netapi.h"
+#include "net/gnrc/netapi.h"
 #include "net/gnrc/netif.h"
 #include "thread.h"
 #include "utlist.h"
 #include "mutex.h"
+#include "net/ipv6/addr.h"
 
 #include "rfc5444/rfc5444_writer.h"
 
@@ -284,7 +286,6 @@ static void *_nhdp_runner(void *arg)
  */
 static void *_nhdp_receiver(void *arg __attribute__((unused)))
 {
-    uint32_t fromlen;
     char nhdp_rcv_buf[NHDP_MAX_RFC5444_PACKET_SZ];
     msg_t msg_q[NHDP_MSG_QUEUE_SIZE];
 
@@ -302,9 +303,10 @@ static void *_nhdp_receiver(void *arg __attribute__((unused)))
     while (1) {
         ipv6_addr_t rcv_addr;
         uint16_t rcv_port;
+        size_t addr_len = sizeof(rcv_addr);
         int32_t rcv_size = conn_udp_recvfrom(&conn, (void *)nhdp_rcv_buf,
                                              NHDP_MAX_RFC5444_PACKET_SZ, &rcv_addr,
-                                             sizeof(rcv_addr), &rcv_port);
+                                             &addr_len, &rcv_port);
 
         if (rcv_size > 0) {
             /* Packet received, let the reader handle it */
@@ -314,7 +316,7 @@ static void *_nhdp_receiver(void *arg __attribute__((unused)))
         }
     }
 
-    gnrc_udp_close(&conn);
+    conn_udp_close(&conn);
     return 0;
 }
 
