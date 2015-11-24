@@ -21,11 +21,11 @@
 
 #include "irq.h"
 #include "sched.h"
-#include "sem.h"
+#include "sema.h"
 #include "tcb.h"
 #include "timex.h"
 #include "thread.h"
-#include "vtimer.h"
+#include "xtimer.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -34,19 +34,21 @@
 
 int sem_timedwait(sem_t *sem, const struct timespec *abstime)
 {
-    timex_t now, timeout = { abstime->tv_sec, abstime->tv_nsec / USEC_IN_NS };
+    uint64_t now, timeout = (((uint64_t)abstime->tv_sec) * SEC_IN_USEC) +
+                            (abstime->tv_nsec / USEC_IN_NS);
     int res;
-    vtimer_now(&now);
-    if (timex_cmp(now, timeout) > 0) {
+    now = xtimer_now64();
+    if (now > timeout) {
         errno = ETIMEDOUT;
-        return -ETIMEDOUT;
+        return -1;
     }
-    timeout = timex_sub(timeout, now);
-    res = sem_wait_timed(sem, &timeout);
+    timeout = timeout - now;
+    res = sema_wait_timed((sema_t *)sem, timeout);
     if (res < 0) {
         errno = -res;
+        return -1;
     }
-    return res;
+    return 0;
 }
 
 int sem_trywait(sem_t *sem)
@@ -55,13 +57,13 @@ int sem_trywait(sem_t *sem)
     int result;
     if (sem == NULL) {
         errno = EINVAL;
-        return -EINVAL;
+        return -1;
     }
     old_state = disableIRQ();
     value = sem->value;
     if (value == 0) {
         errno = EAGAIN;
-        result = -EAGAIN;
+        result = -1;
     }
     else {
         result = 0;
