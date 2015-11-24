@@ -22,6 +22,15 @@
 #include "board.h"
 #include "net/gnrc/netdev2.h"
 #include "net/gnrc/netdev2/ieee802154.h"
+#ifdef MODULE_GNRC_S_COSENS_NODE
+#include "net/gnrc/s_cosens_node.h"
+#else
+#ifdef MODULE_GNRC_S_COSENS_ROUTER
+#include "net/gnrc/s_cosens_router.h"
+#else
+#include "net/gnrc/nomac.h"
+#endif
+#endif
 #include "net/gnrc.h"
 
 #include "at86rf2xx.h"
@@ -63,6 +72,23 @@ void auto_init_at86rf2xx(void)
                               AT86RF2XX_MAC_PRIO,
                               "at86rf2xx",
                               &gnrc_adpt[i]);
+#ifdef MODULE_GNRC_S_COSENS_NODE
+            /* start the 'gnrc_802154_basic_mac' module */
+            gnrc_s_cosens_node_init(_at86rf2xx_stacks[i],
+                             AT86RF2XX_MAC_STACKSIZE, AT86RF2XX_MAC_PRIO,
+                             "at86rfxx", (gnrc_netdev_t *)&at86rf2xx_devs[i]);
+#else
+#ifdef MODULE_GNRC_S_COSENS_ROUTER
+            /* start the 'gnrc_802154_basic_mac' module */
+            gnrc_s_cosens_router_init(_at86rf2xx_stacks[i],
+                             AT86RF2XX_MAC_STACKSIZE, AT86RF2XX_MAC_PRIO,
+                             "at86rfxx", (gnrc_netdev_t *)&at86rf2xx_devs[i]);
+#else
+            gnrc_nomac_init(_at86rf2xx_stacks[i],
+                            AT86RF2XX_MAC_STACKSIZE, AT86RF2XX_MAC_PRIO,
+                            "at86rfxx", (gnrc_netdev_t *)&at86rf2xx_devs[i]);
+#endif
+#endif
         }
     }
 }
