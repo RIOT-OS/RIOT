@@ -87,6 +87,15 @@ int gnrc_conn_recvfrom(conn_t *conn, void *data, size_t max_len, void *addr, siz
                     *port = byteorder_ntohs(((udp_hdr_t *)l4hdr->data)->src_port);
                 }
 #endif  /* defined(MODULE_CONN_UDP) */
+                if (((ipv6_hdr_t *)l3hdr->data)->nh != (uint8_t)conn->netreg_entry.demux_ctx) {
+                    /* if the packet in the queue does not match protocol
+                     * number, we enqueue it again */
+                    gnrc_conn_enqueue(&msg);
+                    /* reset the timeout value to the previous one */
+                    timeout++;
+                    continue;
+                }
+
                 if (addr != NULL) {
                     memcpy(addr, &((ipv6_hdr_t *)l3hdr->data)->src, sizeof(ipv6_addr_t));
                     *addr_len = sizeof(ipv6_addr_t);
