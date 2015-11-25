@@ -41,7 +41,7 @@ int gnrc_conn_recvfrom(conn_t *conn, void *data, size_t max_len, void *addr, siz
                        uint16_t *port)
 {
     msg_t msg;
-    /* TODO: this is a rather arbirtrary value and creates the risk of starvation. */
+    /* TODO: this is a rather arbitrary value and creates the risk of starvation. */
     int timeout = 3;
     unsigned enqueued_msgs = cib_avail(&_conn_buf_cib);
     while ((timeout--) > 0) {
