@@ -136,6 +136,10 @@ int gnrc_conn_recvfrom(conn_t *conn, void *data, size_t max_len, void *addr, siz
  * the packet can be enqueued in conn. This is required for APIs like POSIX
  * sockets (e.g., @ref recvfrom()).
  *
+ * @todo This is a workaround and creates the risk of starvation if there are
+ * multiple open connections. In order to have a better solution, a more
+ * fundamental change, e.g. an IPC with various endpoints, is required.
+ *
  * @param[in] m Pointer to message to be queued.
  *
  * @return -1 if the buffer is full
