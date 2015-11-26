@@ -187,7 +187,7 @@ static int _init(netdev2_t *dev)
 
     cc110x_t *cc110x = &((netdev2_cc110x_t*) dev)->cc110x;
 
-    gpio_init_int(cc110x->params.gdo2, GPIO_IN, GPIO_BOTH,
+    gpio_init_int(cc110x->params.gdo2, GPIO_IN, GPIO_RISING,
             &_netdev2_cc110x_isr, (void*)dev);
 
     gpio_set(cc110x->params.gdo2);

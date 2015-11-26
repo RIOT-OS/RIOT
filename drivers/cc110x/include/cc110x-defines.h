@@ -35,6 +35,14 @@ extern "C" {
 #define VARIABLE_PKTLEN     (0x01)
 
 /**
+ * @brief   Time needed for transmission of a single byte
+ *
+ * (used to sleep when receiving the last fragment of a packet when
+ * packet is larger than RX FIFO threshold)
+ */
+#define CC110X_USEC_PER_BYTE    (100)
+
+/**
  * @name    Bitmasks for reading out status register values
  * @{
  */

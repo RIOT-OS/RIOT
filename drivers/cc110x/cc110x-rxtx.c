@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2014 Freie Universität Berlin
+ * Copyright (C) Kaspar Schleiser <kaspar@schleiser.de>
+ *               2014 Freie Universität Berlin
  * Copyright (C) 2013 INRIA
  *
  * This file is subject to the terms and conditions of the GNU Lesser
@@ -37,21 +38,19 @@
 
 #include "cpu_conf.h"
 #include "cpu.h"
+#include "xtimer.h"
 
 #include "log.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-static void _rx_abort(cc110x_t *dev)
-{
-    gpio_irq_disable(dev->params.gdo2);
-
-    cc110x_strobe(dev, CC110X_SIDLE);    /* Switch to IDLE (should already be)... */
-    cc110x_strobe(dev, CC110X_SFRX);     /* ...for flushing the RX FIFO */
-
-    cc110x_switch_to_rx(dev);
-}
+static void _rx_start(cc110x_t *dev);
+static void _rx_continue(cc110x_t *dev, void(*callback)(void*), void*arg);
+static void _rx_read_data(cc110x_t *dev, void(*callback)(void*), void*arg);
+static void _rx_stop(cc110x_t *dev);
+static void _tx_continue(cc110x_t *dev);
+static void _tx_abort(cc110x_t *dev);
 
 static void _rx_start(cc110x_t *dev)
 {
@@ -59,9 +58,21 @@ static void _rx_start(cc110x_t *dev)
 
     cc110x_pkt_buf_t *pkt_buf = &dev->pkt_buf;
     pkt_buf->pos = 0;
+}
 
+static void _rx_continue(cc110x_t *dev, void(*callback)(void*), void*arg)
+{
     gpio_irq_disable(dev->params.gdo2);
-    cc110x_write_reg(dev, CC110X_IOCFG2, 0x01);
+    if (dev->radio_state != RADIO_RX_BUSY) {
+        DEBUG("%s:%s:%u _rx_continue in invalid state\n", RIOT_FILE_RELATIVE,
+                __func__, __LINE__);
+        _rx_stop(dev);
+        return;
+    }
+
+    do {
+        _rx_read_data(dev, callback, arg);
+    } while (gpio_read(dev->params.gdo2));
     gpio_irq_enable(dev->params.gdo2);
 }
 
@@ -71,7 +82,7 @@ static void _rx_read_data(cc110x_t *dev, void(*callback)(void*), void*arg)
 
     if (fifo & 0x80) {
         DEBUG("%s:%s:%u rx overflow\n", RIOT_FILE_RELATIVE, __func__, __LINE__);
-        _rx_abort(dev);
+        _rx_stop(dev);
         return;
     }
 
@@ -92,7 +103,7 @@ static void _rx_read_data(cc110x_t *dev, void(*callback)(void*), void*arg)
     int left = pkt_buf->packet.length+1 - pkt_buf->pos;
 
     /* if the fifo doesn't contain the rest of the packet,
-     * leav at least one byte as per spec sheet. */
+     * leave at least one byte as per spec sheet. */
     int to_read = (fifo < left) ? (fifo-1) : fifo;
     if (to_read > left) {
         to_read = left;
@@ -117,46 +128,43 @@ static void _rx_read_data(cc110x_t *dev, void(*callback)(void*), void*arg)
         pkt_buf->lqi = status[I_LQI] & LQI_EST;
 
         /* MSB of LQI is the CRC_OK bit */
-        int crc_ok = (status[I_LQI] & CRC_OK) >> 7;
+        int crc_ok = status[I_LQI] & CRC_OK;
 
         if (crc_ok) {
-                    LOG_DEBUG("cc110x: received packet from=%u to=%u payload "
-                            "len=%u\n",
+            LOG_DEBUG("cc110x: received packet from=%u to=%u payload "
+                    "len=%u\n",
                     (unsigned)pkt_buf->packet.phy_src,
                     (unsigned)pkt_buf->packet.address,
                     pkt_buf->packet.length-3);
             /* let someone know that we've got a packet */
             callback(arg);
-
-            cc110x_switch_to_rx(dev);
         }
         else {
-            DEBUG("%s:%s:%u crc-error\n", RIOT_FILE_RELATIVE, __func__, __LINE__);
+            DEBUG("%s:%s:%u crc-error\n", RIOT_FILE_RELATIVE, __func__,
+                    __LINE__);
             dev->cc110x_statistic.packets_in_crc_fail++;
-            _rx_abort(dev);
+        }
+
+        /* we're done. */
+        _rx_stop(dev);
+
+    } else {
+        left -= to_read;
+        if (left > 32) {
+            /* assert gdo2 when RX FIFO over threshold, deassert when below */
+            cc110x_write_reg(dev, CC110X_IOCFG2, 0x0);
+        } else {
+            /* assert gdo2 when RX FIFO over threshold, deassert atpacket end */
+            cc110x_write_reg(dev, CC110X_IOCFG2, 0x1);
+            left -= 2;
+            if (left > 0) {
+                xtimer_usleep(left * CC110X_USEC_PER_BYTE);
+            }
         }
     }
 }
 
-static void _rx_continue(cc110x_t *dev, void(*callback)(void*), void*arg)
-{
-
-    if (dev->radio_state != RADIO_RX_BUSY) {
-        DEBUG("%s:%s:%u _rx_continue in invalid state\n", RIOT_FILE_RELATIVE,
-                __func__, __LINE__);
-        _rx_abort(dev);
-        return;
-    }
-
-    gpio_irq_disable(dev->params.gdo2);
-
-    do {
-        _rx_read_data(dev, callback, arg);
-    }
-    while (gpio_read(dev->params.gdo2));
-}
-
-static void _tx_abort(cc110x_t *dev)
+static void _rx_stop(cc110x_t *dev)
 {
     cc110x_switch_to_rx(dev);
 }
@@ -204,39 +212,55 @@ static void _tx_continue(cc110x_t *dev)
     }
 
     if (to_send < left) {
-        /* set GDO2 to 0x2 -> will deassert at TX FIFO below threshold */
-        gpio_irq_enable(dev->params.gdo2);
-        cc110x_write_reg(dev, CC110X_IOCFG2, 0x02);
+        /* set GDO2 to 0x2 + invert -> will assert at TX FIFO below threshold */
+        cc110x_write_reg(dev, CC110X_IOCFG2, 0x02 | (0x1 << 6));
     }
     else {
-        /* set GDO2 to 0x6 -> will deassert at packet end */
-        cc110x_write_reg(dev, CC110X_IOCFG2, 0x06);
-        gpio_irq_enable(dev->params.gdo2);
+        /* set GDO2 to 0x6 + invert -> will assert at packet end */
+        cc110x_write_reg(dev, CC110X_IOCFG2, 0x06 | (0x1 << 6));
     }
+
+    gpio_irq_enable(dev->params.gdo2);
+}
+
+static void _tx_abort(cc110x_t *dev)
+{
+    cc110x_switch_to_rx(dev);
+}
+
+void cc110x_switch_to_rx(cc110x_t *dev)
+{
+    DEBUG("%s:%s:%u\n", RIOT_FILE_RELATIVE, __func__, __LINE__);
+
+    gpio_irq_disable(dev->params.gdo2);
+
+#ifdef MODULE_CC110X_HOOKS
+    cc110x_hook_rx();
+#endif
+
+    /* flush RX fifo */
+    cc110x_strobe(dev, CC110X_SIDLE);
+    cc110x_strobe(dev, CC110X_SFRX);
+
+    dev->radio_state = RADIO_RX;
+
+    cc110x_write_reg(dev, CC110X_IOCFG2, 0x1);
+    cc110x_strobe(dev, CC110X_SRX);
+
+    gpio_irq_enable(dev->params.gdo2);
 }
 
 void cc110x_isr_handler(cc110x_t *dev, void(*callback)(void*), void*arg)
 {
     switch (dev->radio_state) {
         case RADIO_RX:
-            if (gpio_read(dev->params.gdo2)) {
-                _rx_start(dev);
-            }
-            else {
-                DEBUG("cc110x_isr_handler((): isr handled too slow?\n");
-                _rx_abort(dev);
-            }
-            break;
+            _rx_start(dev);
         case RADIO_RX_BUSY:
             _rx_continue(dev, callback, arg);
             break;
         case RADIO_TX_BUSY:
-            if (!gpio_read(dev->params.gdo2)) {
-                _tx_continue(dev);
-            }
-            else {
-                DEBUG("cc110x_isr_handler() RADIO_TX_BUSY + GDO2\n");
-            }
+            cc110x_switch_to_rx(dev);
+            _tx_continue(dev);
             break;
         default:
             DEBUG("%s:%s:%u: unhandled mode\n", RIOT_FILE_RELATIVE,
@@ -281,8 +305,6 @@ int cc110x_send(cc110x_t *dev, cc110x_pkt_t *packet)
 #ifdef MODULE_CC110X_HOOKS
     cc110x_hook_tx();
 #endif
-
-    cc110x_write_reg(dev, CC110X_IOCFG2, 0x02);
 
     /* Put CC110x in IDLE mode to flush the FIFO */
     cc110x_strobe(dev, CC110X_SIDLE);

@@ -146,28 +146,6 @@ void cc110x_setup_rx_mode(cc110x_t *dev)
     cc110x_switch_to_rx(dev);
 }
 
-void cc110x_switch_to_rx(cc110x_t *dev)
-{
-    DEBUG("%s:%s:%u\n", RIOT_FILE_RELATIVE, __func__, __LINE__);
-
-#ifdef MODULE_CC110X_HOOKS
-    cc110x_hook_rx();
-#endif
-
-    gpio_irq_disable(dev->params.gdo2);
-
-    /* flush RX fifo */
-    cc110x_strobe(dev, CC110X_SIDLE);
-    cc110x_strobe(dev, CC110X_SFRX);
-
-    dev->radio_state = RADIO_RX;
-
-    cc110x_write_reg(dev, CC110X_IOCFG2, 0x6);
-    cc110x_strobe(dev, CC110X_SRX);
-
-    gpio_irq_enable(dev->params.gdo2);
-}
-
 void cc110x_wakeup_from_rx(cc110x_t *dev)
 {
     if (dev->radio_state != RADIO_RX) {
