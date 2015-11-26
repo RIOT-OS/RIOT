@@ -59,6 +59,21 @@ extern "C" {
  */
 
 /**
+ * @brief   Option parameter to be used with @ref NETOPT_CCA_MODE to set
+ *          the mode of the clear channel assessment (CCA) defined
+ *          in Std 802.15.4.
+ */
+typedef enum {
+    NETDEV2_IEEE802154_CCA_MODE_1 = 1,  /**< Energy above threshold */
+    NETDEV2_IEEE802154_CCA_MODE_2,      /**< Carrier sense only */
+    NETDEV2_IEEE802154_CCA_MODE_3,      /**< Carrier sense with energy above threshold */
+    NETDEV2_IEEE802154_CCA_MODE_4,      /**< ALOHA */
+    NETDEV2_IEEE802154_CCA_MODE_5,      /**< UWB preamble sense based on the SHR of a frame */
+    NETDEV2_IEEE802154_CCA_MODE_6,      /**< UWB preamble sense based on the packet
+                                         *   with the multiplexed preamble */
+} netdev2_ieee802154_cca_mode_t;
+
+/**
  * @brief Extended structure to hold IEEE 802.15.4 driver state
  *
  * @extends netdev2_t
