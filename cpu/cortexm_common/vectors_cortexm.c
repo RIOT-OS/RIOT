@@ -31,6 +31,14 @@
 #include "vectors_cortexm.h"
 
 /**
+ * @brief Interrupt stack canary value
+ *
+ * @note 0xe7fe is the ARM Thumb machine code equivalent of asm("bl #-2\n") or
+ * 'while (1);', i.e. an infinite loop.
+ */
+#define STACK_CANARY_WORD 0xE7FEE7FEu
+
+/**
  * @brief   Memory markers, defined in the linker script
  * @{
  */
@@ -46,14 +54,6 @@ extern uint32_t _estack;
 extern uint32_t _sram;
 extern uint32_t _eram;
 /** @} */
-
-/**
- * @brief Interrupt stack canary value
- *
- * @note 0xe7fe is the ARM Thumb machine code equivalent of asm("bl #-2\n") or
- * 'while (1);', i.e. an infinite loop.
- */
-#define STACK_CANARY_WORD 0xE7FEE7FEu
 
 /**
  * @brief   Allocation of the interrupt stack
@@ -81,6 +81,7 @@ void reset_handler_default(void)
 
     pre_startup();
 
+#ifdef DEVELHELP
     uint32_t *top;
     /* Fill stack space with canary values up until the current stack pointer */
     /* Read current stack pointer from CPU register */
@@ -89,6 +90,7 @@ void reset_handler_default(void)
     while (dst < top) {
         *(dst++) = STACK_CANARY_WORD;
     }
+#endif
 
     /* load data section from flash to ram */
     for (dst = &_srelocate; dst < &_erelocate; ) {
