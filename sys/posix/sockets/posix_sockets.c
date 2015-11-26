@@ -695,6 +695,7 @@ ssize_t recvfrom(int socket, void *restrict buffer, size_t length, int flags,
         errno = EINVAL;
         return -1;
     }
+    memset(&tmp, 0, sizeof(struct sockaddr_storage));
     switch (s->domain) {
         case AF_INET:
             addr = _in_addr_ptr(&tmp);
