@@ -7,12 +7,11 @@
  */
 
 /**
- * @defgroup    boards_xmc1000-common Common files for XMC 2Go and XMC 1100 Boot Kit
- * @ingroup     boards
- * @brief       Support for the Infineon XMC1100 based boards
+ * @ingroup     boards_xmc2go
  * @{
  *
  * @file
+ * @brief       Board specific initialization
  *
  * @author      Sebastian Sontberg <sebastian@sontberg.de>
  * @}
