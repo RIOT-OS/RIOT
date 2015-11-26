@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief           Memory definitions for the XMC1100
+ * @brief           Memory definitions for the XMC1300
  *
  * @author          Sebastian Sontberg <sebastian@sontberg.de>
  *
