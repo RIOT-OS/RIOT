@@ -20,7 +20,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "posix_io.h"
 #include "unistd.h"
 
 #include "fd.h"
