@@ -24,7 +24,6 @@
 #include "mutex.h"
 #include "periph/gpio.h"
 #include "periph/spi.h"
-#include "periph/usic_ssc.h"
 #include "periph/usic.h"
 #include "periph/gating.h"
 #include "periph_conf.h"

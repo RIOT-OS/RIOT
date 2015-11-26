@@ -21,7 +21,7 @@
 #ifndef USIC_SSC_H_
 #define USIC_SSC_H_
 
-#include "periph/usic_defs.h"
+#include "periph/usic.h"
 
 #ifdef __cplusplus
 extern "C" {
