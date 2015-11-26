@@ -49,10 +49,10 @@ extern "C" {
  * @name ADC configuration
  * @{
  */
-#define ADC_NUMOF          (2U)
-#define ADC_0_EN           1
-#define ADC_1_EN           0
-#define ADC_MAX_CHANNELS   8
+#define ADC_NUMOF          (1U)
+#define ADC_0_EN           (1)
+#define ADC_1_EN           (0)
+#define ADC_MAX_CHANNELS   (8)
 /** @} */
 
 /**
