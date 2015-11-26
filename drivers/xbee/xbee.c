@@ -252,31 +252,41 @@ static int _get_addr_long(xbee_t *dev, uint8_t *val, size_t len)
     return -ECANCELED;
 }
 
-static int _set_addr(xbee_t *dev, uint8_t *val, size_t len)
+static int _set_short_addr(xbee_t *dev, uint8_t *address)
 {
     uint8_t cmd[4];
     resp_t resp;
 
+    cmd[0] = 'M';
+    cmd[1] = 'Y';
+    cmd[2] = address[0];
+    cmd[3] = address[1];
+    _api_at_cmd(dev, cmd, 4, &resp);
+
+    return resp.status;
+}
+
+static int _set_addr(xbee_t *dev, uint8_t *val, size_t len)
+{
     /* device only supports setting the short address */
     if (len != 2) {
         return -ENOTSUP;
     }
-    cmd[0] = 'M';
-    cmd[1] = 'Y';
-    cmd[2] = val[0];
-    cmd[3] = val[1];
+
+    if (dev->addr_flags & XBEE_ADDR_FLAGS_LONG ||
+          _set_short_addr(dev, val) == 0) {
 
 #ifdef MODULE_SIXLOWPAN
-    /* https://tools.ietf.org/html/rfc4944#section-12 requires the first bit to
-     * 0 for unicast addresses */
-    val[1] &= 0x7F;
+        /* https://tools.ietf.org/html/rfc4944#section-12 requires the first bit
+         * to 0 for unicast addresses */
+        val[1] &= 0x7F;
 #endif
 
-    _api_at_cmd(dev, cmd, 4, &resp);
-    if (resp.status == 0) {
         memcpy(dev->addr_short, val, 2);
+
         return 2;
     }
+
     return -ECANCELED;
 }
 
@@ -289,9 +299,19 @@ static int _set_addr_len(xbee_t *dev, uint16_t *val, size_t len)
     switch (*val) {
         case IEEE802154_LONG_ADDRESS_LEN:
             dev->addr_flags |= XBEE_ADDR_FLAGS_LONG;
+
+            /* disable short address */
+            uint8_t disabled_addr[] = { 0xFF, 0xFF };
+
+            _set_short_addr(dev, disabled_addr);
+
             break;
         case IEEE802154_SHORT_ADDRESS_LEN:
             dev->addr_flags &= ~XBEE_ADDR_FLAGS_LONG;
+
+            /* restore short address */
+            _set_short_addr(dev, dev->addr_short);
+
             break;
         default:
             return -EINVAL;
