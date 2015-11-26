@@ -56,19 +56,20 @@ int spi_conf_pins(spi_t spi)
 
 int spi_init_master(spi_t spi, spi_conf_t conf, spi_speed_t speed)
 {
-    usic_fdr_t fdr = { 0 };
-    usic_brg_t brg = { 0 };
+    const usic_fdr_t fdr = {
+        /* STEP value: (640/1024) * 32Mhz = 20Mhz base clock */
+        .field.step = 640,
+        /* DM: fractional divider mode */
+        .field.dm   = 2
+    };
 
-    /* STEP value: (640/1024) * 32Mhz = 20Mhz base clock */
-    fdr.field.step = 640;
-    /* DM: fractional divider mode */
-    fdr.field.dm   = 2;
-
-    /* (DCTQ+1) x (PCTQ+1) / f[SCLK]: one full phase of clock signal
-     * for leading/trailing word delay */
-    brg.field.ctqsel  = USIC_CTQIN_SCLK;
-    brg.field.dctq    = 0;
-    brg.field.pctq    = 0;
+    usic_brg_t brg = {
+        /* (DCTQ+1) x (PCTQ+1) / f[SCLK]: one full phase of clock signal
+         * for leading/trailing word delay */
+        .field.ctqsel  = USIC_CTQIN_SCLK,
+        .field.dctq    = 0,
+        .field.pctq    = 0
+    };
 
     /* polarity & phase setting */
     switch (conf) {
@@ -110,9 +111,12 @@ int spi_init_master(spi_t spi, spi_conf_t conf, spi_speed_t speed)
     }
 
     /* setup & start the USIC channel */
-    usic_init((usic_channel_t *)&spi_instance[spi],
-              &_xmc_usic_ssc_master_controls,
-              brg, fdr, USIC_MODE_SSC);
+    usic_init((usic_channel_t *)&spi_instance[spi], brg, fdr);
+
+    spi_instance[spi].usic->DX0CR |= (1 << USIC_CH_DX0CR_INSW_Pos);
+
+    gpio_init(spi_instance[spi].sclk_pin & 0xff,
+              GPIO_DIR_OUT | (spi_instance[spi].sclk_pin >> 8), GPIO_NOPULL);
 
     return 0;
 }
@@ -132,7 +136,7 @@ static void _spi_get(USIC_CH_TypeDef *usic, char *in)
     while (!(usic->RBUFSR & (USIC_CH_RBUFSR_RDV0_Msk | USIC_CH_RBUFSR_RDV1_Msk))) ;
 
     /* read received byte */
-    *in = usic->RBUF;
+    *(in) = usic->RBUF;
 }
 
 int spi_transfer_byte(spi_t spi, char out, char *in)
@@ -177,8 +181,7 @@ int spi_transfer_bytes(spi_t spi, char *out, char *in, unsigned int length)
 
         spi_transfer_byte(spi, *(out + fini), &in[fini]);
 
-    }
-    else {
+    } else {
 
         for (unsigned int i = 0; i < fini; i++) {
             _spi_put(usic, *(out + i), false);

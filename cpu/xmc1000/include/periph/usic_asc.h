@@ -38,7 +38,7 @@ extern "C" {
  *        channel as UART.
  * @{
  */
-static const usic_controls_t _xmc_usic_asc_controls = {
+static const usic_mode_t _xmc_usic_asc_mode = {
 
     .ccr =
         /* mode: ASC (UART) */

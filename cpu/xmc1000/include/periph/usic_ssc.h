@@ -38,7 +38,7 @@ extern "C" {
  *        channel as SPI master.
  * @{
  */
-static const usic_controls_t _xmc_usic_ssc_master_controls = {
+static const usic_mode_t _xmc_usic_ssc_master_mode = {
 
     .ccr =
         /* mode: SSC (SPI) */

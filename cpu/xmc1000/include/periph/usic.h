@@ -40,12 +40,12 @@ extern "C" {
  * @{
  */
 static inline void usic_init(const usic_channel_t *usic_ch,
-                             const usic_controls_t *controls,
                              const usic_brg_t brg,
-                             const usic_fdr_t fdr,
-                             const int mode)
+                             const usic_fdr_t fdr)
 {
     USIC_CH_TypeDef *usic = usic_ch->usic;
+
+    const usic_mode_t *controls = usic_ch->mode;
 
     /* initialize input pin */
     gpio_init(usic_ch->rx_pin & 0xff, GPIO_DIR_IN, GPIO_NOPULL);
@@ -68,11 +68,8 @@ static inline void usic_init(const usic_channel_t *usic_ch,
     usic->BRG = brg.reg;
 
     /* configure input stages DX0 & DX2 */
-    usic->DX0CR =
-        ((usic_ch->rx_pin >> 8) << USIC_CH_DX0CR_DSEL_Pos) |
-        (mode << USIC_CH_DX0CR_INSW_Pos);
-
-    usic->DX2CR = (controls->dx2_dsel << USIC_CH_DX2CR_DSEL_Pos);
+    usic->DX0CR = (usic_ch->rx_pin >> 8) << USIC_CH_DX0CR_DSEL_Pos;
+    usic->DX2CR =  controls->dx2_dsel << USIC_CH_DX2CR_DSEL_Pos;
 
     /* interrupt node point register */
     usic->INPR = controls->inpr;
@@ -86,13 +83,7 @@ static inline void usic_init(const usic_channel_t *usic_ch,
     usic->CCR  = controls->ccr;
 
     /* ready to activate output pins */
-    gpio_init(usic_ch->tx_pin & 0xff, GPIO_DIR_OUT | (usic_ch->rx_pin >> 8), GPIO_NOPULL);
-
-    /* for SPI only, enable SCLK */
-    if (mode == USIC_MODE_SSC) {
-        gpio_init(usic_ch->sclk_pin & 0xff,
-                  (GPIO_DIR_OUT | (usic_ch->sclk_pin >> 8)), GPIO_NOPULL);
-    }
+    gpio_init(usic_ch->tx_pin & 0xff, GPIO_DIR_OUT | (usic_ch->tx_pin >> 8), GPIO_NOPULL);
 }
 /** @} */
 

@@ -33,27 +33,27 @@ extern "C" {
  * @{
  */
 
-#define USIC_CTQIN_PDIV  (0) /**< f<sub>CTQIN</sub> is provided by f<sub>PDIV</sub> */
-#define USIC_CTQIN_PPP   (1) /**< f<sub>CTQIN</sub> is provided by f<sub>PPP</sub>  */
-#define USIC_CTQIN_SCLK  (2) /**< f<sub>CTQIN</sub> is provided by f<sub>SCLK</sub> */
-#define USIC_CTQIN_MCLK  (3) /**< f<sub>CTQIN</sub> is provided by f<sub>MCLK</sub> */
+#define USIC_CTQIN_PDIV  (0)    /**< f<sub>CTQIN</sub> is provided by f<sub>PDIV</sub> */
+#define USIC_CTQIN_PPP   (1)    /**< f<sub>CTQIN</sub> is provided by f<sub>PPP</sub>  */
+#define USIC_CTQIN_SCLK  (2)    /**< f<sub>CTQIN</sub> is provided by f<sub>SCLK</sub> */
+#define USIC_CTQIN_MCLK  (3)    /**< f<sub>CTQIN</sub> is provided by f<sub>MCLK</sub> */
 
-#define USIC_MODE_ASC    (0) /**< select ASC/UART mode */
-#define USIC_MODE_SSC    (1) /**< select SSC/SPI mode  */
+#define USIC_MODE_ASC    (0)    /**< select ASC/UART mode */
+#define USIC_MODE_SSC    (1)    /**< select SSC/SPI mode  */
 
 /**
  * @brief Struct to hold the configuration values necessary to
- *        initialize a USIC channel 
+ *        initialize a USIC channel
  * @{
  */
 typedef struct {
-    uint32_t ccr;      /**< channel control register           */
-    uint32_t sctr;     /**< shift control register             */
-    uint32_t tcsr;     /**< transmit control/status register   */
-    uint32_t pcr;      /**< protocol control register          */
-    uint32_t inpr;     /**< interrupt node pointer register    */
-    uint8_t dx2_dsel;  /**< data selection for input stage DX2 */
-} usic_controls_t;
+    uint32_t ccr;       /**< channel control register           */
+    uint32_t sctr;      /**< shift control register             */
+    uint32_t tcsr;      /**< transmit control/status register   */
+    uint32_t pcr;       /**< protocol control register          */
+    uint32_t inpr;      /**< interrupt node pointer register    */
+    uint8_t dx2_dsel;   /**< data selection for input stage DX2 */
+} usic_mode_t;
 /** @} */
 
 /**
@@ -102,24 +102,40 @@ typedef struct {
 /** @} */
 
 /**
+ * @brief   USIC channel FIFO configuration
+ * @{
+ */
+typedef struct __attribute__((packed)) {
+    uint8_t rx_dptr;
+    uint8_t rx_size;
+    uint8_t tx_dptr;
+    uint8_t tx_size;
+} usic_fifo_t;
+/** @} */
+
+/**
  * @brief   UART device configuration
  * @{
  */
-typedef struct {
+typedef struct __attribute__((packed)) {
     USIC_CH_TypeDef *usic;          /**< pointer to USIC channel                             */
-    const usic_controls_t *mode;    /**< pointer to the control mode for this USIC           */
+    const usic_mode_t *mode;        /**< pointer to the control mode for this channel        */
+    const usic_fifo_t fifo;         /**< configuration of the FIFOs used by this channel     */
     const gpio_alt_t tx_pin;        /**< the primary data output pin (MOSI/TX)               */
     const gpio_alt_t rx_pin;        /**< the primary data input pin (MISO/RX)                */
 } uart_instance_t;
+
+#define UART_NUMOF         ((sizeof(uart_instance) / sizeof(uart_instance[0])))
 /** @} */
 
 /**
  * @brief   SPI device configuration
  * @{
  */
-typedef struct {
+typedef struct __attribute__((packed)) {
     USIC_CH_TypeDef *usic;          /**< pointer to USIC channel                             */
-    const usic_controls_t *mode;    /**< pointer to the control mode for this USIC           */
+    const usic_mode_t *mode;        /**< pointer to the control mode for this USIC           */
+    const usic_fifo_t fifo;         /**< configuration of the FIFOs used by this channel     */
     const gpio_alt_t mosi_pin;      /**< MOSI pin                                            */
     const gpio_alt_t miso_pin;      /**< MISO pin                                            */
     const gpio_alt_t sclk_pin;      /**< master shift clock pin (SCLK)                       */
@@ -131,9 +147,10 @@ typedef struct {
  * @brief   USIC channel configuration
  * @{
  */
-typedef struct {
+typedef struct __attribute__((packed)) {
     USIC_CH_TypeDef *usic;          /**< pointer to USIC channel                             */
-    const usic_controls_t *mode;    /**< pointer to the control mode for this USIC           */
+    const usic_mode_t *mode;        /**< pointer to the control mode for this USIC           */
+    const usic_fifo_t fifo;         /**< configuration of the FIFOs used by this channel     */
     const gpio_alt_t tx_pin;        /**< the primary data output pin (MOSI/TX)               */
     const gpio_alt_t rx_pin;        /**< the primary data input pin (MISO/RX)                */
     const gpio_alt_t sclk_pin;      /**< supplementary pin for master/slave SSC/SPI (clock)  */
