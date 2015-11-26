@@ -39,9 +39,13 @@
 #include "cpu_conf.h"
 #include "cpu.h"
 #include "xtimer.h"
+#include "random.h"
 
 #include "log.h"
 
+/* WARNING: make sure the thread running cc110x has enough stack space
+ * for debugging. When using gnrc, e.g., also enable debug in
+ * auto_init_cc110x.c. */
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
@@ -279,7 +283,7 @@ int cc110x_send(cc110x_t *dev, cc110x_pkt_t *packet)
         case RADIO_TX_BUSY:
             DEBUG("cc110x: invalid state for sending: %s\n",
                     cc110x_state_to_text(dev->radio_state));
-            return -EAGAIN;
+            return -EBUSY;
     }
 
     /*
@@ -305,6 +309,25 @@ int cc110x_send(cc110x_t *dev, cc110x_pkt_t *packet)
 #ifdef MODULE_CC110X_HOOKS
     cc110x_hook_tx();
 #endif
+
+    /* set GDO2 to CCA */
+    cc110x_write_reg(dev, CC110X_IOCFG2, 0x09);
+
+    unsigned retries;
+    for (retries = 0; retries < CC110X_CCA_MAXTRIES; retries++) {
+        if (gpio_read(dev->params.gdo2)) {
+            break;
+        }
+        xtimer_usleep(CC110X_CCA_RETRY_DELAY * (genrand_uint32() >> 24));
+    }
+
+    if(retries == CC110X_CCA_MAXTRIES) {
+        DEBUG("cc110x: cca failed.");
+        cc110x_switch_to_rx(dev);
+        return -EAGAIN;
+    } else {
+        DEBUG("cc110x: cca ok, needed %u tries.\n", retries);
+    }
 
     /* Put CC110x in IDLE mode to flush the FIFO */
     cc110x_strobe(dev, CC110X_SIDLE);

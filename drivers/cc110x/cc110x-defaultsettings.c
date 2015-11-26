@@ -73,7 +73,7 @@ const char cc110x_default_conf[] = {
     0xF8, /* MDMCFG0 */
     0x44, /* DEVIATN */
     0x07, /* MCSM2 */
-    0x03, /* MCSM1 */
+    (0x03 | (0x3 << 4 /* CCA_MODE */)), /* MCSM1 */
     0x18, /* MCSM0 */
     0x16, /* FOCCFG */
     0x6C, /* BSCFG */

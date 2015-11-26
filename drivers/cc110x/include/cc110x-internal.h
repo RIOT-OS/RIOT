@@ -61,6 +61,10 @@ extern "C" {
 #endif
 #define CC110X_MIN_CHANNR           (0)     /**< lowest possible channel number */
 #define CC110X_MAX_CHANNR           (0)     /**< highest possible channel number */
+#define CC110X_CCA_MAXTRIES         (10)    /**< Max TX retries if CCA not clear */
+#define CC110X_CCA_RETRY_DELAY      (10)    /**< time in us to wait between CCA
+                                                 retries, will get multiplied by
+                                                 a random value (0..255) */
 
 /**
  * @name    State values for state machine
