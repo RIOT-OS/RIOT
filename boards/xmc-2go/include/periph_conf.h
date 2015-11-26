@@ -70,19 +70,45 @@ extern "C" {
 /** @} */
 
 /**
+ * @name UART instance declaration
+ * @{
+ */
+static const uart_instance_t uart_instance[] = {
+    {
+        .usic    = USIC0_CH0,
+        .fifo    = {
+            .rx_dptr = 0,
+            .rx_size = 5,
+            .tx_dptr = 31,
+            .tx_size = 5,
+        },
+        .mode    = &_xmc_usic_asc_mode,
+        .tx_pin  = GPIO_ALT(P2, 1, GPIO_ALT_OUT_6),
+        .rx_pin  = GPIO_ALT(P2, 2, 6)
+    }
+};
+/** @} */
+
+/**
  * @name UART configuration
  * @{
  */
-#define UART_NUMOF         (1U)
-#define UART_0_EN          (1)
 #define UART_IRQ_PRIO      CPU_DEFAULT_IRQ_PRIO
+#define UART_ENABLE_FIFOS  (1)
+/** @} */
 
-static const uart_instance_t uart_instance[] = {
+/**
+ * @name SPI instance declaration
+ * @{
+ */
+static const spi_instance_t spi_instance[] = {
     {
-        .usic   = USIC0_CH0,
-        .mode   = &_xmc_usic_asc_controls,
-        .tx_pin = GPIO_ALT(P2, 1, GPIO_ALT_OUT_6),
-        .rx_pin = GPIO_ALT(P2, 2, 6)
+        .usic     = USIC0_CH1,
+        .mode     = &_xmc_usic_ssc_master_mode,
+        .mosi_pin = GPIO_ALT(P0, 7, GPIO_ALT_OUT_7),
+        .miso_pin = GPIO_ALT(P0, 6, 6),
+        .sclk_pin = GPIO_ALT(P0, 8, 7),
+        .msls_pin = GPIO_PIN(P0, 9)
     }
 };
 /** @} */
@@ -91,19 +117,9 @@ static const uart_instance_t uart_instance[] = {
  * @name SPI configuration
  * @{
  */
-#define SPI_NUMOF          (1)
+#define SPI_IRQ_PRIO       CPU_DEFAULT_IRQ_PRIO
+#define SPI_NUMOF          (1U)
 #define SPI_0_EN           (1)
-
-static const spi_instance_t spi_instance[] = {
-    {
-        .usic     = USIC0_CH1,
-        .mode     = &_xmc_usic_ssc_master_controls,
-        .mosi_pin = GPIO_ALT(P0, 7, GPIO_ALT_OUT_7),
-        .miso_pin = GPIO_ALT(P0, 6, 6),
-        .sclk_pin = GPIO_ALT(P0, 8, 7),
-        .msls_pin = GPIO_PIN(P0, 9)
-    }
-};
 /** @} */
 
 /**
