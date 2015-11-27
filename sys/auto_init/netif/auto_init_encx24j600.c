@@ -23,7 +23,7 @@
 #include "debug.h"
 
 #include "encx24j600.h"
-#include "net/gnrc/gnrc_netdev2_eth.h"
+#include "net/gnrc/netdev2/eth.h"
 
 static encx24j600_t encx24j600;
 

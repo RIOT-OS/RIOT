@@ -16,7 +16,7 @@
  * @author    Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-#include "net/gnrc/gnrc_netdev2.h"
+#include "net/gnrc/netdev2.h"
 #include "cc110x-netdev2.h"
 
 #ifndef GNRC_CC110X_H

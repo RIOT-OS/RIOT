@@ -17,7 +17,7 @@
  */
 
 #include "net/gnrc.h"
-#include "net/gnrc/gnrc_netdev2.h"
+#include "net/gnrc/netdev2.h"
 #include "net/ethernet/hdr.h"
 
 #include "od.h"
