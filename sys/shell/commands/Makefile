@@ -69,6 +69,9 @@ ifneq (,$(filter gnrc_sixlowpan_nd_border_router,$(USEMODULE)))
     SRC += sc_gnrc_6ctx.c
 endif
 endif
+ifneq (,$(filter lwm2m_cli,$(USEMODULE)))
+  SRC += sc_lwm2m_cli.c
+endif
 
 # TODO
 # Conditional building not possible at the moment due to
