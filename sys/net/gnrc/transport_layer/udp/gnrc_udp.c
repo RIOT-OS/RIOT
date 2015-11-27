@@ -29,7 +29,7 @@
 #include "net/gnrc/udp.h"
 #include "net/gnrc.h"
 #include "net/inet_csum.h"
-
+#include "net/gnrc/conn.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
@@ -90,8 +90,9 @@ static uint16_t _calc_csum(gnrc_pktsnip_t *hdr, gnrc_pktsnip_t *pseudo_hdr,
     return ~csum;
 }
 
-static void _receive(gnrc_pktsnip_t *pkt)
+static void _receive(msg_t *msg)
 {
+    gnrc_pktsnip_t *pkt = (gnrc_pktsnip_t *)msg->content.ptr;
     gnrc_pktsnip_t *udp, *ipv6;
     udp_hdr_t *hdr;
     uint32_t port;
@@ -132,7 +133,15 @@ static void _receive(gnrc_pktsnip_t *pkt)
     /* send payload to receivers */
     if (!gnrc_netapi_dispatch_receive(GNRC_NETTYPE_UDP, port, pkt)) {
         DEBUG("udp: unable to forward packet as no one is interested in it\n");
+#ifdef MODULE_GNRC_CONN
+        if (gnrc_conn_enqueue(msg) < 0) {
+            DEBUG("udp: enqueueing failed\n");
+            gnrc_pktbuf_release(pkt);
+        }
+        DEBUG("udp: enqueueing packet instead\n");
+#else
         gnrc_pktbuf_release(pkt);
+#endif
     }
 }
 
@@ -207,7 +216,7 @@ static void *_event_loop(void *arg)
         switch (msg.type) {
             case GNRC_NETAPI_MSG_TYPE_RCV:
                 DEBUG("udp: GNRC_NETAPI_MSG_TYPE_RCV\n");
-                _receive((gnrc_pktsnip_t *)msg.content.ptr);
+                _receive(&msg);
                 break;
             case GNRC_NETAPI_MSG_TYPE_SND:
                 DEBUG("udp: GNRC_NETAPI_MSG_TYPE_SND\n");

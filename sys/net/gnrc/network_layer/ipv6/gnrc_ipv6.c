@@ -32,6 +32,7 @@
 #include "net/gnrc/ipv6/nc.h"
 #include "net/gnrc/ipv6/netif.h"
 #include "net/gnrc/ipv6/whitelist.h"
+#include "net/gnrc/conn.h"
 
 #include "net/gnrc/ipv6.h"
 
@@ -141,7 +142,18 @@ void gnrc_ipv6_demux(kernel_pid_t iface, gnrc_pktsnip_t *pkt, uint8_t nh)
 
     if (receiver_num == 0) {
         DEBUG("ipv6: unable to forward packet as no one is interested in it\n");
+#ifdef MODULE_GNRC_CONN
+        msg_t msg;
+        msg.type = GNRC_NETAPI_MSG_TYPE_RCV;
+        msg.content.ptr = (void *)pkt;
+        if (gnrc_conn_enqueue(&msg) < 0) {
+            DEBUG("ipv6: enqueueing failed\n");
+            gnrc_pktbuf_release(pkt);
+        }
+        DEBUG("ipv6: enqueueing packet instead\n");
+#else
         gnrc_pktbuf_release(pkt);
+#endif
         return;
     }
 

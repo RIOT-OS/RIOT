@@ -76,6 +76,10 @@
 #include "net/gnrc/udp.h"
 #endif
 
+#ifdef MODULE_GNRC_CONN
+#include "net/gnrc/conn.h"
+#endif
+
 #ifdef MODULE_FIB
 #include "net/fib.h"
 #endif
@@ -137,6 +141,10 @@ void auto_init(void)
 #ifdef MODULE_GNRC_UDP
     DEBUG("Auto init UDP module.\n");
     gnrc_udp_init();
+#endif
+#ifdef MODULE_GNRC_CONN
+    DEBUG("Auto init gnrc_conn module.\n");
+    gnrc_conn_init();
 #endif
 
 

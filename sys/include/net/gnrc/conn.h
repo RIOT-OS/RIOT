@@ -72,6 +72,11 @@ struct conn_udp {
 };
 
 /**
+ * @brief  Initialize conn's queue
+ */
+void gnrc_conn_init(void);
+
+/**
  * @brief  Bind connection to demux context
  *
  * @internal
@@ -123,6 +128,24 @@ bool gnrc_conn6_set_local_addr(uint8_t *conn_addr, const ipv6_addr_t *addr);
  */
 int gnrc_conn_recvfrom(conn_t *conn, void *data, size_t max_len, void *addr, size_t *addr_len,
                        uint16_t *port);
+
+/**
+ * @brief   Enqueue a new receiption message
+ *
+ * If a packet is received, but currently no application is waiting for it,
+ * the packet can be enqueued in conn. This is required for APIs like POSIX
+ * sockets (e.g., @ref recvfrom()).
+ *
+ * @todo This is a workaround and creates the risk of starvation if there are
+ * multiple open connections. In order to have a better solution, a more
+ * fundamental change, e.g. an IPC with various endpoints, is required.
+ *
+ * @param[in] m Pointer to message to be queued.
+ *
+ * @return -1 if the buffer is full
+ * @return position of queued item
+ */
+int gnrc_conn_enqueue(msg_t *m);
 
 #ifdef __cplusplus
 }
