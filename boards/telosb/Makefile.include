@@ -4,7 +4,7 @@ export CPU_MODEL = msp430f1611
 
 # set default port depending on operating system
 PORT_LINUX ?= /dev/ttyUSB0
-PORT_DARWIN ?= $(shell ls -1 /dev/tty.SLAB_USBtoUART* | head -n 1)
+PORT_DARWIN ?= $(shell ls -1 /dev/tty.usbserial-MXV* | head -n 1)
 # setup serial terminal
 include $(RIOTBOARD)/Makefile.include.serial
 
