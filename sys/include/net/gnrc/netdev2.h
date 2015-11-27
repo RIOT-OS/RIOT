@@ -39,8 +39,6 @@ extern "C" {
 
 #define NETDEV2_MSG_TYPE_EVENT 0x1234
 
-typedef struct gnrc_netdev2 gnrc_netdev2_t;
-
 /**
  * @brief Structure holding gnrc netdev2 adapter state
  *
@@ -49,14 +47,14 @@ typedef struct gnrc_netdev2 gnrc_netdev2_t;
  *
  * It can be extended
  */
-struct gnrc_netdev2 {
+typedef struct gnrc_netdev2 {
     /**
      * @brief Send a pktsnip using this device
      *
      * This function should convert the pktsnip into a format
      * the underlying device understands and send it.
      */
-    int (*send)(gnrc_netdev2_t *dev, gnrc_pktsnip_t *snip);
+    int (*send)(struct gnrc_netdev2 *dev, gnrc_pktsnip_t *snip);
 
     /**
      * @brief Receive a pktsnip from this device
@@ -65,7 +63,7 @@ struct gnrc_netdev2 {
      * device and convert it into a pktsnip while adding a netif header
      * and possibly marking out higher-layer headers.
      */
-    gnrc_pktsnip_t * (*recv)(gnrc_netdev2_t *dev);
+    gnrc_pktsnip_t * (*recv)(struct gnrc_netdev2 *dev);
 
     /**
      * @brief netdev2 handle this adapter is working with
@@ -76,7 +74,7 @@ struct gnrc_netdev2 {
      * @brief PID of this adapter for netapi messages
      */
     kernel_pid_t pid;
-};
+} gnrc_netdev2_t;
 
 /**
  * @brief Initialize gnrc netdev2 handler thread
