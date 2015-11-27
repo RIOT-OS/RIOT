@@ -32,6 +32,8 @@ tags
 # Eclipse symbol file (output from make eclipsesym)
 eclipsesym.xml
 /toolchain
+# Ignore created Arduino sketch files
+_sketches.cpp
 
 # local override files
 Makefile.local

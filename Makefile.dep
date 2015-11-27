@@ -381,6 +381,12 @@ ifneq (,$(filter schedstatistics,$(USEMODULE)))
     USEMODULE += xtimer
 endif
 
+ifneq (,$(filter arduino,$(USEMODULE)))
+    FEATURES_REQUIRED += arduino
+    FEATURES_REQUIRED += cpp
+    USEMODULE += xtimer
+endif
+
 ifneq (,$(filter xtimer,$(USEMODULE)))
     FEATURES_REQUIRED += periph_timer
 endif
