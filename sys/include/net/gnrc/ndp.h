@@ -492,9 +492,9 @@ gnrc_pktsnip_t *gnrc_ndp_opt_tl2a_build(const uint8_t *l2addr, uint8_t l2addr_le
  * @param[in] prefix_len    The length of @p prefix in bits. Must be between
  *                          0 and 128.
  * @param[in] flags         Flags as defined above.
- *                          @ref GNRC_NDP_OPT_PI_FLAGS_L == 1 indicates, that
+ *                          @ref NDP_OPT_PI_FLAGS_L == 1 indicates, that
  *                          @p prefix can be used for on-link determination,
- *                          @ref GNRC_NDP_OPT_PI_FLAGS_A == 1 indicates, that
+ *                          @ref NDP_OPT_PI_FLAGS_A == 1 indicates, that
  *                          @p prefix can be used for stateless address
  *                          configuration.
  * @param[in] valid_ltime   Length of time in seconds that @p prefix is valid.
