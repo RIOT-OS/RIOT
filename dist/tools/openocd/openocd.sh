@@ -153,7 +153,12 @@ do_flash() {
             -c 'verify_image \"${HEXFILE}\"' \
             -c 'reset run' \
             -c 'shutdown'"
-    echo 'Done flashing'
+    if [ $? == "0" ]; then
+        echo 'Done flashing'
+    else
+        echo 'Error while flashing'
+        exit 1
+    fi
 }
 
 do_flash_elf() {
@@ -183,7 +188,12 @@ do_flash_elf() {
             -c 'verify_image \"${ELFFILE}\"' \
             -c 'reset run' \
             -c 'shutdown'"
-    echo 'Done flashing'
+    if [ $? == "0" ]; then
+        echo 'Done flashing'
+    else
+        echo 'Error while flashing'
+        exit 1
+    fi
 }
 
 do_debug() {
