@@ -746,7 +746,7 @@ bool gnrc_ndp_internal_pi_opt_handle(kernel_pid_t iface, uint8_t icmpv6_type,
     }
     /* TODO: preferred lifetime for address auto configuration */
     /* on-link flag MUST stay set if it was */
-    netif_addr->flags &= ~NDP_OPT_PI_FLAGS_A;
+    netif_addr->flags &= NDP_OPT_PI_FLAGS_L;
     netif_addr->flags |= (pi_opt->flags & NDP_OPT_PI_FLAGS_MASK);
     return true;
 }
