@@ -79,9 +79,9 @@ Structure                                                          {#structure}
 This section walks you through RIOT's structure. Once you understand this
 structure, you will easily find your way around in RIOT's code base.
 
-RIOT's code base is structured into five groups.
+![Overview](riot-structure.svg)
 
-<!-- TODO: add graphic -->
+RIOT's code base is structured into five groups.
 
  - The kernel (`core`)
  - Platform specific code (`cpu`; `boards`)
