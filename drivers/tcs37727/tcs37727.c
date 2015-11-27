@@ -81,8 +81,8 @@ int tcs37727_init(tcs37727_t *dev, i2c_t i2c, uint8_t address, int atime_us)
     }
     dev->again = 4;
 
-    if (i2c_write_reg(dev->i2c, dev->addr,
-                      TCS37727_ATIME_TO_REG(atime_us), 0) != 1) {
+    if (i2c_write_reg(dev->i2c, dev->addr, TCS37727_ATIME,
+                      TCS37727_ATIME_TO_REG(atime_us)) != 1) {
         i2c_release(dev->i2c);
         return -3;
     }
