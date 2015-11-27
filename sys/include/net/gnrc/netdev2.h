@@ -9,14 +9,14 @@
 /**
  * @defgroup  net_gnrc_netdev2   Adaption layer for GNRC on top of Netdev2
  * @ingroup   net_gnrc
- * @brief     Provides the glue code for @ref gnrc on top of @ref drivers_netdev_netdev2
+ * @brief     Provides the glue code for @ref net_gnrc on top of @ref drivers_netdev_netdev2
  * @{
  *
  * @file
- * @brief     netdev2 gnrc glue code interface
+ * @brief     netdev2-GNRC glue code interface
  *
  * This interface is supposed to provide common adaption code between the
- * low-level network device interface "netdev2" and the gnrc network stack.
+ * low-level network device interface "netdev2" and the GNRC network stack.
  *
  * GNRC sends around "gnrc_pktsnip_t" structures, but netdev can only handle
  * "struct iovec" structures when sending, or a flat buffer when receiving.
@@ -37,13 +37,16 @@
 extern "C" {
 #endif
 
+/**
+ * @brief   Type for @ref msg_t if device fired an event
+ */
 #define NETDEV2_MSG_TYPE_EVENT 0x1234
 
 /**
- * @brief Structure holding gnrc netdev2 adapter state
+ * @brief Structure holding GNRC netdev2 adapter state
  *
  * This structure is supposed to hold any state parameters needed
- * to use a netdev2 device from gnrc.
+ * to use a netdev2 device from GNRC.
  *
  * It can be extended
  */
@@ -77,7 +80,7 @@ typedef struct gnrc_netdev2 {
 } gnrc_netdev2_t;
 
 /**
- * @brief Initialize gnrc netdev2 handler thread
+ * @brief Initialize GNRC netdev2 handler thread
  *
  * @param[in] stack         ptr to preallocated stack buffer
  * @param[in] stacksize     size of stack buffer
@@ -89,7 +92,7 @@ typedef struct gnrc_netdev2 {
  * @return KERNEL_PID_UNDEF on error
  */
 kernel_pid_t gnrc_netdev2_init(char *stack, int stacksize, char priority,
-                        const char *name, gnrc_netdev2_t *gnrc_netdev2);
+                               const char *name, gnrc_netdev2_t *gnrc_netdev2);
 
 #ifdef __cplusplus
 }
