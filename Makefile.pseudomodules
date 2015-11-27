@@ -19,7 +19,6 @@ PSEUDOMODULES += log
 PSEUDOMODULES += log_printfnoformat
 PSEUDOMODULES += lwip_arp
 PSEUDOMODULES += lwip_autoip
-PSEUDOMODULES += lwip_conn
 PSEUDOMODULES += lwip_dhcp
 PSEUDOMODULES += lwip_ethernet
 PSEUDOMODULES += lwip_igmp
