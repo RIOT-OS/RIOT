@@ -103,7 +103,7 @@ static void _hl_usage(char *cmd_name)
 
 static void _flag_usage(char *cmd_name)
 {
-    printf("usage: %s <if_id> [-]{promisc|autoack|csma|autocca|preload|iphc}\n", cmd_name);
+    printf("usage: %s <if_id> [-]{promisc|autoack|csma|autocca|preload|iphc|rtr_adv}\n", cmd_name);
 }
 
 static void _add_usage(char *cmd_name)
@@ -315,9 +315,15 @@ static void _netif_list(kernel_pid_t dev)
 #ifdef MODULE_GNRC_IPV6_NETIF
     if (entry != NULL) {
         printf("MTU:%" PRIu16 "  ", entry->mtu);
-        printf("HL:%" PRIu8 " ", entry->cur_hl);
+        printf("HL:%" PRIu8 "  ", entry->cur_hl);
         if (entry->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN) {
             printf("6LO  ");
+        }
+        if (entry->flags & GNRC_IPV6_NETIF_FLAGS_ROUTER) {
+            printf("RTR  ");
+        }
+        if (entry->flags & GNRC_IPV6_NETIF_FLAGS_RTR_ADV) {
+            printf("RTR_ADV  ");
         }
         linebreak = true;
 
@@ -630,6 +636,30 @@ static int _netif_flag(char *cmd, kernel_pid_t dev, char *flag)
         return 0;
 #else
         puts("error: unable to (un)set IPHC.");
+        return 1;
+#endif
+    }
+    else if (strcmp(flag, "rtr_adv") == 0) {
+#if defined(MODULE_GNRC_NDP_ROUTER) || defined(MODULE_GNRC_SIXLOWPAN_ND_ROUTER)
+        gnrc_ipv6_netif_t *entry = gnrc_ipv6_netif_get(dev);
+
+        if (entry == NULL) {
+            puts("error: unable to (un)set router advertisement flag.");
+            return 1;
+        }
+
+        if (set) {
+            gnrc_ipv6_netif_set_rtr_adv(entry, true);
+            printf("success: enable router advertisements on interface %" PRIkernel_pid "\n", dev);
+        }
+        else {
+            gnrc_ipv6_netif_set_rtr_adv(entry, false);
+            printf("success: disable router advertisements on interface %" PRIkernel_pid "\n",
+                   dev);
+        }
+        return 0;
+#else
+        puts("error: unable to (un)set router advertisement flag.");
         return 1;
 #endif
     }
