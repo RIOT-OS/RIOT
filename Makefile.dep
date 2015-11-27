@@ -373,6 +373,14 @@ ifneq (,$(filter lwip_udplite,$(USEMODULE)))
   USEMODULE += lwip_udp
 endif
 
+ifneq (,$(filter lwip_conn_%,$(USEMODULE)))
+  USEMODULE += lwip_conn
+endif
+
+ifneq (,$(filter lwip_conn_ip,$(USEMODULE)))
+  USEMODULE += lwip_raw
+endif
+
 ifneq (,$(filter lwip_%,$(USEMODULE)))
   USEMODULE += lwip
 endif
