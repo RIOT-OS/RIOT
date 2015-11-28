@@ -97,11 +97,6 @@ float SMB380_getSampleRatio(void)
             100000);
 }
 
-uint8_t smb380emptyfunction(int16_t *value)
-{
-    return 1;
-}
-
 uint8_t SMB380_HystereseFunctionSample(int16_t *value)
 {
     static int16_t x = 0, y = 0, z = 0;
@@ -192,7 +187,7 @@ uint8_t SMB380_init(uint8_t (*func)(int16_t *))
 
 #if SMB380_EXTINT_MODE
 
-    if (gpioint_set(0, BIT1, GPIOINT_RISING_EDGE, &SMB380_extIntHandler));
+    gpioint_set(0, BIT1, GPIOINT_RISING_EDGE, &SMB380_extIntHandler);
 
 #endif
 
@@ -202,10 +197,8 @@ uint8_t SMB380_init(uint8_t (*func)(int16_t *))
         smb380function = func;
     }
     else {
-        smb380function = smb380emptyfunction;
+        smb380function = NULL;
     }
-
-    //smb380function = SMB380_HystereseFunctionSample;  //placeholder
 
     SMB380_softReset();
     xtimer_usleep(100000);
@@ -426,10 +419,9 @@ uint8_t writeRingBuff(int16_t *value)
             smb380function = smb380emptyfunction;
         }
 
-        smb380function(value);
-
-        //printf("Werte: x=%i, y=%i, z=%i\n\r",value[0], value[1], value[2]);
-        //vgpio_toggle(&gpio_led_green);
+        if (smb380function != NULL) {
+            smb380function(value);
+        }
 
         settings.writePointerPos += 1;
 

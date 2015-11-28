@@ -147,7 +147,7 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
     switch (uart) {
 #if UART_0_EN
         case UART_0:
-            for (int i = 0; i < len; i++) {
+            for (unsigned i = 0; i < len; i++) {
                 while (!UART0_DTREG_EMPTY);
                 UART0_DATA_REGISTER = data[i];
             }
@@ -155,7 +155,7 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
 #endif /* UART_0_EN */
 #if UART_1_EN
         case UART_1:
-            for (int i = 0; i < len; i++) {
+            for (unsigned i = 0; i < len; i++) {
                 while (!UART1_DTREG_EMPTY);
                 UART1_DATA_REGISTER = data[i];
             }
@@ -163,7 +163,7 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
 #endif /* UART_1_EN */
 #if UART_2_EN
         case UART_2:
-            for (int i = 0; i < len; i++) {
+            for (unsigned i = 0; i < len; i++) {
                 while (!UART2_DTREG_EMPTY);
                 UART2_DATA_REGISTER = data[i];
             }
@@ -171,7 +171,7 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
 #endif /* UART_2_EN */
 #if UART_3_EN
         case UART_3:
-            for (int i = 0; i < len; i++) {
+            for (unsigned i = 0; i < len; i++) {
                 while (!UART3_DTREG_EMPTY);
                 UART3_DATA_REGISTER = data[i];
             }
