@@ -69,7 +69,7 @@ static uint16_t _calc_csum(gnrc_pktsnip_t *hdr, gnrc_pktsnip_t *pseudo_hdr,
 
     /* process the payload */
     while (payload && payload != hdr) {
-        csum = inet_csum(csum, (uint8_t *)(payload->data), payload->size);
+        csum = inet_csum_slice(csum, (uint8_t *)(payload->data), payload->size, len);
         len += (uint16_t)payload->size;
         payload = payload->next;
     }
