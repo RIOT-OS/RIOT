@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014 Freie Universität Berlin, Hinnerk van Bruinehsen
+ *               2015 Kaspar Schleiser <kaspar@schleiser.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -18,6 +19,7 @@ extern "C" {
 
 typedef int16_t suseconds_t;
 typedef signed int ssize_t;
+typedef unsigned int off_t;
 
 #ifdef __cplusplus
 }

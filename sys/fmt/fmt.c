@@ -137,6 +137,10 @@ uint32_t scn_u32_dec(const char *str, size_t n)
 
 void print(const char *s, size_t n)
 {
+#ifdef __WITH_AVRLIBC__
+    /* AVR's libc doesn't offer write(), so use fwrite() instead */
+    fwrite(s, n, 1, stdout);
+#else
     while (n > 0) {
         ssize_t written = write(STDOUT_FILENO, s, n);
         if (written < 0) {
@@ -145,6 +149,7 @@ void print(const char *s, size_t n)
         n -= written;
         s += written;
     }
+#endif /* __WITH_AVRLIBC__ */
 }
 
 void print_u32_dec(uint32_t val)
