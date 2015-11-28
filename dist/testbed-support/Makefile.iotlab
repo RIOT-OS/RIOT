@@ -9,6 +9,8 @@ IOTLAB_USER         ?= $(shell cut -f1 -d: $(IOTLAB_AUTH))
 IOTLAB_EXP_ID       ?= $(shell experiment-cli get -l --state Running | grep -m 1 '"id"' | grep -Eo '[[:digit:]]+')
 IOTLAB_EXP_NAME     ?= RIOT_EXP
 IOTLAB_DEBUG_PORT   ?= 3333
+IOTLAB_DEBUG_NODE   ?= $(shell experiment-cli get -i $(IOTLAB_EXP_ID) --resources | \
+                         grep -m 1 "network_address" | sed 's/.*: "\(.*\)".*/\1/')
 
 IOTLAB_AUTHORITY    := "$(IOTLAB_USER)@$(IOTLAB_SITE).iot-lab.info"
 
@@ -25,6 +27,8 @@ endif
 ifdef IOTLAB_EXCLUDE_NODES
     EXCLUDE_PARAM := "-e$(IOTLAB_SITE),$(firstword $(subst :, ,$(IOTLAB_TYPE))),$(IOTLAB_EXCLUDE_NODES)"
 endif
+
+.PHONY: iotlab-exp iotlab-flash iotlab-reset iotlab-debug-server iotlab-term
 
 $(IOTLAB_AUTH):
 	auth-cli -u $(IOTLAB_USER)
@@ -50,11 +54,6 @@ iotlab-flash: $(IOTLAB_AUTH) all
 iotlab-reset: $(IOTLAB_AUTH)
 	$(AD)node-cli --reset -i $(IOTLAB_EXP_ID) $(NODES_PARAM) $(EXCLUDE_PARAM)
 
-ifeq (,$(IOTLAB_DEBUG_NODE))
-iotlab-debug-server: IOTLAB_DEBUG_NODE := $(shell experiment-cli get -i $(IOTLAB_EXP_ID) --resources | \
-                                            grep -m 1 "network_address" | \
-                                            sed 's/.*: "\(.*\)".*/\1/')
-endif
 iotlab-debug-server: $(IOTLAB_AUTH)
 	$(AD)node-cli --debug-start -i $(IOTLAB_EXP_ID)
 	@echo "Debug on node $(IOTLAB_DEBUG_NODE)"
