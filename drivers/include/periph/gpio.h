@@ -57,7 +57,7 @@ typedef int gpio_t;
 #ifndef HAVE_GPIO_DIR_T
 typedef enum {
     GPIO_DIR_IN = 0,        /**< configure pin as input */
-    GPIO_DIR_OUT = 1,       /**< configure pin as output */
+    GPIO_DIR_OUT = 1        /**< configure pin as output */
 } gpio_dir_t;
 #endif
 

@@ -45,7 +45,7 @@ enum {
 #if TIMER_3_EN
     TIMER_3,                /**< 4th timer */
 #endif
-    TIMER_UNDEFINED,        /**< deprecated legacy undefined values */
+    TIMER_UNDEFINED         /**< deprecated legacy undefined values */
 };
 
 /**
