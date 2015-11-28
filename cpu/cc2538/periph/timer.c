@@ -86,11 +86,11 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
     SYS_CTRL_RCGCGPT |= (1 << gptimer_num);
 
     /* Disable this timer before configuring it: */
-    gptimer->CTL = 0;
+    gptimer->cc2538_gptimer_ctl.CTL = 0;
 
     gptimer->CFG  = GPTMCFG_16_BIT_TIMER;
-    gptimer->TAMR = GPTIMER_PERIODIC_MODE;
-    gptimer->TAMRbits.TACDIR = 1; /**< Count up */
+    gptimer->cc2538_gptimer_tamr.TAMR = GPTIMER_PERIODIC_MODE;
+    gptimer->cc2538_gptimer_tamr.TAMRbits.TACDIR = 1; /**< Count up */
 
     /* Set the prescale register for the desired frequency: */
     gptimer->TAPR = RCOSC16M_FREQ / (ticks_per_us * USEC_PER_SEC) - 1;
@@ -99,7 +99,7 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
     timer_irq_enable(dev);
 
     /* Enable the timer: */
-    gptimer->CTLbits.TAEN = 1;
+    gptimer->cc2538_gptimer_ctl.CTLbits.TAEN = 1;
 
     return 0;
 }
@@ -191,11 +191,11 @@ int timer_clear(tim_t dev, int channel)
 
     switch (channel) {
         case 0:
-            gptimer->CTLbits.TAEN = 0;
+            gptimer->cc2538_gptimer_ctl.CTLbits.TAEN = 0;
             break;
 
         case 1:
-            gptimer->CTLbits.TBEN = 0;
+            gptimer->cc2538_gptimer_ctl.CTLbits.TBEN = 0;
             break;
 
         default:
@@ -243,26 +243,26 @@ void timer_stop(tim_t dev)
     switch (dev) {
 #if TIMER_0_EN
         case TIMER_0:
-            TIMER_0_DEV->CTLbits.TAEN = 0;
-            TIMER_0_DEV->CTLbits.TBEN = 0;
+            TIMER_0_DEV->cc2538_gptimer_ctl.CTLbits.TAEN = 0;
+            TIMER_0_DEV->cc2538_gptimer_ctl.CTLbits.TBEN = 0;
             break;
 #endif
 #if TIMER_1_EN
         case TIMER_1:
-            TIMER_1_DEV->CTLbits.TAEN = 0;
-            TIMER_1_DEV->CTLbits.TBEN = 0;
+            TIMER_1_DEV->cc2538_gptimer_ctl.CTLbits.TAEN = 0;
+            TIMER_1_DEV->cc2538_gptimer_ctl.CTLbits.TBEN = 0;
             break;
 #endif
 #if TIMER_2_EN
         case TIMER_2:
-            TIMER_2_DEV->CTLbits.TAEN = 0;
-            TIMER_2_DEV->CTLbits.TBEN = 0;
+            TIMER_2_DEV->cc2538_gptimer_ctl.CTLbits.TAEN = 0;
+            TIMER_2_DEV->cc2538_gptimer_ctl.CTLbits.TBEN = 0;
             break;
 #endif
 #if TIMER_3_EN
         case TIMER_3:
-            TIMER_3_DEV->CTLbits.TAEN = 0;
-            TIMER_3_DEV->CTLbits.TBEN = 0;
+            TIMER_3_DEV->cc2538_gptimer_ctl.CTLbits.TAEN = 0;
+            TIMER_3_DEV->cc2538_gptimer_ctl.CTLbits.TBEN = 0;
             break;
 #endif
 
@@ -276,26 +276,26 @@ void timer_start(tim_t dev)
     switch (dev) {
 #if TIMER_0_EN
         case TIMER_0:
-            TIMER_0_DEV->CTLbits.TAEN = 1;
-            TIMER_0_DEV->CTLbits.TBEN = 1;
+            TIMER_0_DEV->cc2538_gptimer_ctl.CTLbits.TAEN = 1;
+            TIMER_0_DEV->cc2538_gptimer_ctl.CTLbits.TBEN = 1;
             break;
 #endif
 #if TIMER_1_EN
         case TIMER_1:
-            TIMER_1_DEV->CTLbits.TAEN = 1;
-            TIMER_1_DEV->CTLbits.TBEN = 1;
+            TIMER_1_DEV->cc2538_gptimer_ctl.CTLbits.TAEN = 1;
+            TIMER_1_DEV->cc2538_gptimer_ctl.CTLbits.TBEN = 1;
             break;
 #endif
 #if TIMER_2_EN
         case TIMER_2:
-            TIMER_2_DEV->CTLbits.TAEN = 1;
-            TIMER_2_DEV->CTLbits.TBEN = 1;
+            TIMER_2_DEV->cc2538_gptimer_ctl.CTLbits.TAEN = 1;
+            TIMER_2_DEV->cc2538_gptimer_ctl.CTLbits.TBEN = 1;
             break;
 #endif
 #if TIMER_3_EN
         case TIMER_3:
-            TIMER_3_DEV->CTLbits.TAEN = 1;
-            TIMER_3_DEV->CTLbits.TBEN = 1;
+            TIMER_3_DEV->cc2538_gptimer_ctl.CTLbits.TAEN = 1;
+            TIMER_3_DEV->cc2538_gptimer_ctl.CTLbits.TBEN = 1;
             break;
 #endif
 
