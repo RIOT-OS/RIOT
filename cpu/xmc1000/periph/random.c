@@ -30,49 +30,8 @@
 #include "debug.h"
 
 #if RANDOM_NUMOF
-static size_t _seed_from_temperature(uint16_t *buf, size_t size);
 
-/* Number of 16Bit values used as seed. Manual recommends 80Bit */
-#define SEED_NUM (5)
-
-#define RANDOM_WAIT()                           \
-    do { /* wait for random bits */ }           \
-    while (!(PRNG->CHK & PRNG_CHK_RDV_Msk))
-
-void random_init(void)
-{
-    uint64_t discard;
-
-    /* Use
-     * $>RIOT_XMC_EXTERNAL_SEED=/dev/urandom make
-     * to generate a static random seed at build time
-     */
-#ifdef RIOT_XMC_SEED
-    uint16_t seed[SEED_NUM] = { RIOT_XMC_SEED };
-#else
-    uint16_t seed[SEED_NUM];
-    _seed_from_temperature(&seed[0], SEED_NUM);
-#endif
-
-    /* Start key loading mode (KLD) and feed with 16bit words */
-    PRNG->CTRL = (1 << PRNG_CTRL_KLD_Pos) | (2 << PRNG_CTRL_RDBS_Pos);
-
-    /* Load seed as 16bit words */
-    for (int i = 0; i < SEED_NUM; i++) {
-        RANDOM_WAIT();
-        PRNG->WORD = seed[i];
-        DEBUG("random: loaded seed value 0x%04x\n", (unsigned)PRNG->WORD);
-    }
-
-    /* Start streaming mode with 8bit word size */
-    PRNG->CTRL = (0 << PRNG_CTRL_KLD_Pos) | (1 << PRNG_CTRL_RDBS_Pos);
-
-    /* "The warm-up phase provides a thorough diffusion of the key
-       bits. For this purpose the user must read and discard 64 random
-       bits from the register PRNG_WORD." */
-    random_read((char *)&discard, sizeof(discard));
-}
-
+#ifndef RIOT_XMC_SEED
 /* This gets the 80 Bit seed from readings of the temperature
  * sensor. It's a comfortable way to get some entropy of questionable
  * quality. */
@@ -114,7 +73,48 @@ static size_t _seed_from_temperature(uint16_t *buf, size_t size)
 
     return size;
 }
+#endif
 
+/* Number of 16Bit values used as seed. Manual recommends 80Bit */
+#define SEED_NUM (5)
+
+#define RANDOM_WAIT()                           \
+    do { /* wait for random bits */ }           \
+    while (!(PRNG->CHK & PRNG_CHK_RDV_Msk))
+
+void random_init(void)
+{
+    uint64_t discard;
+
+    /* Use
+     * $>RIOT_XMC_EXTERNAL_SEED=/dev/urandom make
+     * to generate a static random seed at build time
+     */
+#ifdef RIOT_XMC_SEED
+    uint16_t seed[SEED_NUM] = { RIOT_XMC_SEED };
+#else
+    uint16_t seed[SEED_NUM];
+    _seed_from_temperature(&seed[0], SEED_NUM);
+#endif
+
+    /* Start key loading mode (KLD) and feed with 16bit words */
+    PRNG->CTRL = (1 << PRNG_CTRL_KLD_Pos) | (2 << PRNG_CTRL_RDBS_Pos);
+
+    /* Load seed as 16bit words */
+    for (int i = 0; i < SEED_NUM; i++) {
+        RANDOM_WAIT();
+        PRNG->WORD = seed[i];
+        DEBUG("random: loaded seed value 0x%04x\n", (unsigned)PRNG->WORD);
+    }
+
+    /* Start streaming mode with 8bit word size */
+    PRNG->CTRL = (0 << PRNG_CTRL_KLD_Pos) | (1 << PRNG_CTRL_RDBS_Pos);
+
+    /* "The warm-up phase provides a thorough diffusion of the key
+       bits. For this purpose the user must read and discard 64 random
+       bits from the register PRNG_WORD." */
+    random_read((char *)&discard, sizeof(discard));
+}
 
 int random_read(char *buf, unsigned int num)
 {
