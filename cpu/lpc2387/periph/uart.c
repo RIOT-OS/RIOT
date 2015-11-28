@@ -37,6 +37,7 @@ void UART0_IRQHandler(void) __attribute__((interrupt("IRQ")));
 
 int uart_init(uart_t dev, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 {
+    (void) baudrate;
     /* for now, we only support one UART device and only the RX interrupt */
     if (dev != 0) {
         return -1;
@@ -71,6 +72,7 @@ int uart_init(uart_t dev, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 
 void uart_write(uart_t uart, const uint8_t *data, size_t len)
 {
+    (void) uart;
     for (size_t i = 0; i < len; i++) {
         while (!(U0LSR & BIT5));
         U0THR = data[i];
