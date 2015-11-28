@@ -436,5 +436,7 @@ info-modules:
 	@for i in $(sort $(USEMODULE)); do echo $$i; done
 
 ifneq (,$(filter iotlab-m3 wsn430-v1_3b wsn430-v1_4,$(BOARD)))
-  include $(RIOTBASE)/dist/testbed-support/Makefile.iotlab
+  ifneq (,$(filter iotlab-%,$(MAKECMDGOALS)))
+    include $(RIOTBASE)/dist/testbed-support/Makefile.iotlab
+  endif
 endif
