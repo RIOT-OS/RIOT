@@ -34,7 +34,7 @@ extern "C" {
 enum {
     INPUT,              /**< configure pin as input */
     OUTPUT,             /**< configure pin as output */
-    INPUT_PULLUP,       /**< configure pin as input with pull-up resistor */
+    INPUT_PULLUP        /**< configure pin as input with pull-up resistor */
 };
 
 /**
@@ -42,7 +42,7 @@ enum {
  */
 enum {
     LOW = 0,            /**< pin is cleared */
-    HIGH = 1,           /**< pin is set */
+    HIGH = 1            /**< pin is set */
 };
 
 /**
