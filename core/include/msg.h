@@ -182,9 +182,6 @@ int msg_try_receive(msg_t *m);
  * This function sends a message to *target_pid* and then blocks until target
  * has sent a reply which is then stored in *reply*.
  *
- * @note    CAUTION! Use this function only when receiver is already waiting.
- *          If not use simple msg_send()
- *
  * @pre     @p target_pid is not the PID of the current thread.
  *
  * @param[in] m             Pointer to preallocated ``msg_t`` structure with
