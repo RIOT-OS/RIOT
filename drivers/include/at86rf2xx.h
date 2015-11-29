@@ -22,6 +22,7 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @author      Daniel Krebs <github@daniel-krebs.net>
+ * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
 #ifndef AT86RF2XX_H_
@@ -120,16 +121,6 @@ extern "C" {
 /** @} */
 
 /**
-  * @brief   Frequency configuration for sub-GHz devices.
-  * @{
-  */
-typedef enum {
-    AT86RF2XX_FREQ_915MHZ,       /**< frequency 915MHz enabled */
-    AT86RF2XX_FREQ_868MHZ,       /**< frequency 868MHz enabled */
-} at86rf2xx_freq_t;
-/** @} */
-
-/**
  * @brief   Device descriptor for AT86RF2XX radio devices
  */
 typedef struct {
@@ -148,9 +139,10 @@ typedef struct {
     uint8_t seq_nr;                     /**< sequence number to use next */
     uint8_t frame_len;                  /**< length of the current TX frame */
     uint16_t pan;                       /**< currently used PAN ID */
-    uint8_t chan;                       /**< currently used channel */
+    uint8_t chan;                       /**< currently used channel number */
 #ifdef MODULE_AT86RF212B
-    at86rf2xx_freq_t freq;              /**< currently used frequency */
+    /* Only AT86RF212B supports multiple pages (PHY modes) */
+    uint8_t page;                       /**< currently used channel page */
 #endif
     uint8_t addr_short[2];              /**< the radio's short address */
     uint8_t addr_long[8];               /**< the radio's long address */
@@ -240,40 +232,38 @@ uint64_t at86rf2xx_get_addr_long(at86rf2xx_t *dev);
 void at86rf2xx_set_addr_long(at86rf2xx_t *dev, uint64_t addr);
 
 /**
- * @brief   Get the configured channel of the given device
+ * @brief   Get the configured channel number of the given device
  *
  * @param[in] dev           device to read from
  *
- * @return                  the currently set channel
+ * @return                  the currently set channel number
  */
 uint8_t at86rf2xx_get_chan(at86rf2xx_t *dev);
 
 /**
- * @brief   Set the channel of the given device
+ * @brief   Set the channel number of the given device
  *
  * @param[in] dev           device to write to
- * @param[in] chan          channel to set
+ * @param[in] chan          channel number to set
  */
 void at86rf2xx_set_chan(at86rf2xx_t *dev, uint8_t chan);
 
-#ifdef MODULE_AT86RF212B
 /**
- * @brief   Get the configured frequency of the given device
+ * @brief   Get the configured channel page of the given device
  *
  * @param[in] dev           device to read from
  *
- * @return                  the currently set frequency
+ * @return                  the currently set channel page
  */
-at86rf2xx_freq_t at86rf2xx_get_freq(at86rf2xx_t *dev);
+uint8_t at86rf2xx_get_page(at86rf2xx_t *dev);
 
 /**
- * @brief   Set the frequency of the given device
+ * @brief   Set the channel page of the given device
  *
  * @param[in] dev           device to write to
- * @param[in] chan          frequency to set
+ * @param[in] page          channel page to set
  */
-void at86rf2xx_set_freq(at86rf2xx_t *dev, at86rf2xx_freq_t freq);
-#endif
+void at86rf2xx_set_page(at86rf2xx_t *dev, uint8_t page);
 
 /**
  * @brief   Get the configured PAN ID of the given device
