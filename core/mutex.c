@@ -57,8 +57,10 @@ static void mutex_wait(struct mutex_t *mutex)
     unsigned irqstate = disableIRQ();
     DEBUG("%s: Mutex in use. %u\n", sched_active_thread->name, ATOMIC_VALUE(mutex->val));
 
-    if (atomic_set_to_one(&mutex->val)) {
-        /* somebody released the mutex. return. */
+    if (ATOMIC_VALUE(mutex->val) == 0) {
+        /* somebody released the mutex. lock it and return. */
+        ATOMIC_VALUE(mutex->val) = 1;
+
         DEBUG("%s: mutex_wait early out. %u\n", sched_active_thread->name, ATOMIC_VALUE(mutex->val));
         restoreIRQ(irqstate);
         return;
