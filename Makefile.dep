@@ -340,7 +340,7 @@ ifneq (,$(filter log_%,$(USEMODULE)))
 endif
 
 ifneq (,$(filter cpp11-compat,$(USEMODULE)))
-  USEMODULE += vtimer
+  USEMODULE += xtimer
   USEMODULE += timex
   FEATURES_REQUIRED += cpp
 endif

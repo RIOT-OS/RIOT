@@ -30,7 +30,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
-#ifdef MODULE_VTIMER
+#ifdef MODULE_XTIMER
 #include <sys/time.h>
 #endif
 #include <ifaddrs.h>
@@ -39,7 +39,7 @@
 #include "kernel.h"
 #include "cpu.h"
 #include "irq.h"
-#include "vtimer.h"
+#include "xtimer.h"
 
 #include "native_internal.h"
 
@@ -402,7 +402,10 @@ int getpid(void)
 int _gettimeofday(struct timeval *tp, void *restrict tzp)
 {
     (void) tzp;
-    vtimer_gettimeofday(tp);
+    timex_t now;
+    xtimer_now_timex(&now);
+    tp->tv_sec = now.seconds;
+    tp->tv_usec = now.microseconds;
     return 0;
 }
 #endif

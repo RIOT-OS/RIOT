@@ -25,7 +25,7 @@
 #define RIOT_CONDITION_VARIABLE_HPP
 
 #include "sched.h"
-#include "vtimer.h"
+#include "xtimer.h"
 
 #include "riot/mutex.hpp"
 #include "riot/chrono.hpp"
@@ -114,12 +114,12 @@ cv_status condition_variable::wait_for(unique_lock<mutex>& lock,
   timeout.seconds = s.count();
   timeout.microseconds
     = (duration_cast<microseconds>(timeout_duration - s)).count();
-  vtimer_now(&before);
-  vtimer_t timer;
-  vtimer_set_wakeup(&timer, timeout, sched_active_pid);
+  xtimer_now_timex(&before);
+  xtimer_t timer;
+  xtimer_set_wakeup(&timer, timex_uint64(timeout), sched_active_pid);
   wait(lock);
-  vtimer_now(&after);
-  vtimer_remove(&timer);
+  xtimer_now_timex(&after);
+  xtimer_remove(&timer);
   auto passed = timex_sub(after, before);
   auto cmp = timex_cmp(passed, timeout);
   return cmp < 1 ? cv_status::no_timeout : cv_status::timeout;
