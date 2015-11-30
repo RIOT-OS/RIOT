@@ -1,4 +1,4 @@
-#/bin/bash
+#/usr/bin/env bash
 
 linux_checkid() {
     udevinfo -a -n ${1} | grep -q "ATTRS{product}==\"${2}\""

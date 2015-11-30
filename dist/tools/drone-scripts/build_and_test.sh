@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Copyright (C) 2015 Eistec AB
 #
 # This file is subject to the terms and conditions of the GNU Lesser General

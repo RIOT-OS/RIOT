@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 if [ -z "${PKG_URL}" ]; then
     echo 'export PKG_URL before running this script' >&2
     exit 2
