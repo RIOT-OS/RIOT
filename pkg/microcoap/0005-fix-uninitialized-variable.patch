@@ -1,0 +1,30 @@
+From ac2d404d32d96a50a779ded7ad007f15bcf2b4b0 Mon Sep 17 00:00:00 2001
+From: Kaspar Schleiser <kaspar@schleiser.de>
+Date: Mon, 30 Nov 2015 02:11:12 +0100
+Subject: [PATCH] fix uninitialized variable
+
+coap.c: In function 'coap_build':
+coap.c:298:17: error: 'len' may be used uninitialized in this function
+[-Werror=maybe-uninitialized]
+         uint8_t len, delta = 0;
+                          ^
+---
+ coap.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/coap.c b/coap.c
+index ada66c2..b6b05af 100644
+--- a/coap.c
++++ b/coap.c
+@@ -295,7 +295,7 @@ int coap_build(uint8_t *buf, size_t *buflen, const coap_packet_t *pkt)
+     for (i=0;i<pkt->numopts;i++)
+     {
+         uint32_t optDelta;
+-        uint8_t len, delta = 0;
++        uint8_t len = 0, delta = 0;
+ 
+         if (((size_t)(p-buf)) > *buflen)
+              return COAP_ERR_BUFFER_TOO_SMALL;
+-- 
+2.6.2
+
