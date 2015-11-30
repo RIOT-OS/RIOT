@@ -68,6 +68,10 @@ ifneq (,$(filter udp,$(USEMODULE)))
     DIRS += net/transport_layer/udp
 endif
 
+ifneq (,$(filter hamming256,$(USEMODULE)))
+    DIRS += ecc/hamming256
+endif
+
 ifneq (,$(filter netopt,$(USEMODULE)))
     DIRS += net/crosslayer/netopt
 endif
