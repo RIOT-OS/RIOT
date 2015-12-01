@@ -7,6 +7,9 @@ endif
 ifneq (,$(filter lwip_conn_ip,$(USEMODULE)))
   DIRS += $(RIOTBASE)/pkg/lwip/contrib/conn/ip
 endif
+ifneq (,$(filter lwip_conn_udp,$(USEMODULE)))
+  DIRS += $(RIOTBASE)/pkg/lwip/contrib/conn/udp
+endif
 ifneq (,$(filter lwip_contrib,$(USEMODULE)))
   DIRS += $(RIOTBASE)/pkg/lwip/contrib
 endif
