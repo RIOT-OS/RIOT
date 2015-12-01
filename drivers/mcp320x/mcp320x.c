@@ -36,8 +36,8 @@
  * @brief enum representation of the available modes
  */
 typedef enum {
-    Single = 0x2,
-    Diff = 0x00
+    single = 0x2,
+    diff = 0x00
 } _mcp320x_mt_t;
 
 int mcp320x_init(mcp320x_t *dev, spi_t spi, gpio_t cs, mcp320x_chip_t type)
@@ -94,7 +94,7 @@ int mcp320x_read_single(mcp320x_t *dev, int channel)
     }
 
     /* read a single ADC channel */
-    return _mcp320x_read(dev, Single, channel);
+    return _mcp320x_read(dev, single, channel);
 }
 
 int mcp320x_read_differential(mcp320x_t *dev, mcp320x_diff_mode_t mode)
@@ -105,5 +105,5 @@ int mcp320x_read_differential(mcp320x_t *dev, mcp320x_diff_mode_t mode)
     }
 
     /* make an differential ADC readout in the given mode */
-    return _mcp320x_read(dev, Diff, mode);
+    return _mcp320x_read(dev, diff, mode);
 }
