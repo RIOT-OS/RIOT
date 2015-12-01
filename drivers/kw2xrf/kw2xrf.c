@@ -519,6 +519,25 @@ uint64_t kw2xrf_get_addr_long(kw2xrf_t *dev)
     return addr;
 }
 
+int8_t kw2xrf_get_cca_threshold(kw2xrf_t *dev)
+{
+    uint8_t tmp;
+    kw2xrf_read_iregs(MKW2XDMI_CCA1_THRESH, &tmp, 1);
+    /* KW2x register value represents absolute value in dBm
+     * default value: -75 dBm
+     */
+    return (-tmp);
+}
+
+void kw2xrf_set_cca_threshold(kw2xrf_t *dev, int8_t value)
+{
+    /* normalize to absolute value */
+    if (value < 0) {
+        value = -value;
+    }
+    kw2xrf_write_iregs(MKW2XDMI_CCA1_THRESH, (uint8_t*)&value, 1);
+}
+
 int kw2xrf_get(gnrc_netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
 {
     kw2xrf_t *dev = (kw2xrf_t *)netdev;
@@ -608,6 +627,14 @@ int kw2xrf_get(gnrc_netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
             }
 
             *(int16_t *)value = dev->tx_power;
+            return 0;
+
+        case NETOPT_CCA_THRESHOLD:
+            if (max_len < sizeof(uint8_t)) {
+                return -EOVERFLOW;
+            } else {
+            *(int8_t *)value = kw2xrf_get_cca_threshold(dev);
+            }
             return 0;
 
         case NETOPT_MAX_PACKET_SIZE:
@@ -780,6 +807,14 @@ int kw2xrf_set(gnrc_netdev_t *netdev, netopt_t opt, void *value, size_t value_le
 
             kw2xrf_set_tx_power(dev, (int8_t *)value, value_len);
             return sizeof(uint16_t);
+
+        case NETOPT_CCA_THRESHOLD:
+            if (value_len < sizeof(uint8_t)) {
+                return -EOVERFLOW;
+            } else {
+                kw2xrf_set_cca_threshold(dev, *((int8_t*)value));
+            }
+            return sizeof(uint8_t);
 
         case NETOPT_PROTO:
             return kw2xrf_set_proto(dev, (uint8_t *)value, value_len);

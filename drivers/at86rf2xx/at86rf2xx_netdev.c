@@ -15,6 +15,7 @@
  *
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Kévin Roussel <Kevin.Roussel@inria.fr>
  *
  * @}
  */
@@ -569,6 +570,15 @@ static int _get(gnrc_netdev_t *device, netopt_t opt, void *val, size_t max_len)
             }
             break;
 
+        case NETOPT_CCA_THRESHOLD:
+            if (max_len < sizeof(int8_t)) {
+                res = -EOVERFLOW;
+            } else {
+                *((int8_t *)val) = at86rf2xx_get_cca_threshold(dev);
+                res = sizeof(int8_t);
+            }
+            break;
+
         default:
             res = -ENOTSUP;
     }
@@ -759,6 +769,15 @@ static int _set(gnrc_netdev_t *device, netopt_t opt, void *val, size_t len)
             } else {
                 at86rf2xx_set_csma_max_retries(dev, *((uint8_t *)val));
                 res = sizeof(uint8_t);
+            }
+            break;
+
+        case NETOPT_CCA_THRESHOLD:
+            if (len > sizeof(int8_t)) {
+                res = -EOVERFLOW;
+            } else {
+                at86rf2xx_set_cca_threshold(dev, *((int8_t *)val));
+                res = sizeof(int8_t);
             }
             break;
 
