@@ -112,13 +112,13 @@ enum {
 /**
  * @brief   Generic data structure for expressing physical values
  *
- * Physical data is express in a 3-dimensional touple of values. In addition to
- * the data fields, this struct contains further the (physical) unit and the
+ * Physical data is expressed in a 3-dimensional touple of values. In addition
+ * to the data fields, this struct contains further the (physical) unit and the
  * scale factor of the data. The unit is expressed as constant. The scale factor
  * is expressed as power of 10 (10^factor).
  *
  * The combination of signed 16-bit numbers with and the scale factor gives us a
- * very high dynamic range (from -32*10^-131 to 32*10^130). I a wider sense we
+ * very high dynamic range (from -32*10^-131 to 32*10^130). In a wider sense we
  * are saving the values as fixed floating points...
  *
  * The scale factor is identical for all 3 values.
