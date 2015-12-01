@@ -183,4 +183,31 @@ void auto_init(void)
 #ifdef MODULE_GNRC_IPV6_NETIF
     gnrc_ipv6_netif_init_by_dev();
 #endif
+
+/* initialize sensors and actuators */
+#ifdef MODULE_AUTO_INIT_SAUL
+    DEBUG("auto_init SAUL\n");
+
+#ifdef MODULE_SAUL_GPIO
+    extern void auto_init_gpio(void);
+    auto_init_gpio();
+#endif
+#ifdef MODULE_LSM303DLHC
+    extern void auto_init_lsm303dlhc(void);
+    auto_init_lsm303dlhc();
+#endif
+#ifdef MODULE_LPS331AP
+    extern void auto_init_lps331ap(void);
+    auto_init_lps331ap();
+#endif
+#ifdef MODULE_ISL29020
+    extern void auto_init_isl29020(void);
+    auto_init_isl29020();
+#endif
+#ifdef MODULE_L3G4200D
+    extern void auto_init_l3g4200d(void);
+    auto_init_l3g4200d();
+#endif
+
+#endif /* MODULE_AUTO_INIT_SAUL */
 }

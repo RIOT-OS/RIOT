@@ -68,6 +68,7 @@ extern "C" {
  */
 #define LED_PORT            PORT->Group[0]
 #define LED_PIN             (19)
+#define LED_GPIO            GPIO_PIN(0, 19)
 /** @} */
 
 /**

@@ -390,3 +390,19 @@ endif
 ifneq (,$(filter xtimer,$(USEMODULE)))
     FEATURES_REQUIRED += periph_timer
 endif
+
+ifneq (,$(filter saul_reg,$(USEMODULE)))
+  USEMODULE += saul
+endif
+
+ifneq (,$(filter saul_default,$(USEMODULE)))
+  USEMODULE += saul
+endif
+
+ifneq (,$(filter saul,$(USEMODULE)))
+  USEMODULE += phydat
+endif
+
+ifneq (,$(filter phydat,$(USEMODULE)))
+  USEMODULE += fmt
+endif

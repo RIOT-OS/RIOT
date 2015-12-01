@@ -36,26 +36,6 @@ extern "C" {
 #define LSM303DLHC_MAG_DEFAULT_ADDRESS        (0x1e)
 
 /**
- * @brief 3d data container
- */
-typedef struct {
-    int16_t x_axis;
-    int16_t y_axis;
-    int16_t z_axis;
-} lsm303dlhc_3d_data_t;
-
-/**
- * @brief Device descriptor for LSM303DLHC sensors
- */
-typedef struct {
-    i2c_t i2c;              /**< I2C device                  */
-    uint8_t acc_address;    /**< accelerometer's I2C address */
-    uint8_t mag_address;    /**< magnetometer's I2C address  */
-    gpio_t  acc_pin;        /**< accelerometer's data ready pin */
-    gpio_t  mag_pin;        /**< magnetometer's data ready pin  */
-} lsm303dlhc_t;
-
-/**
  * @brief Possible accelerometer sample rates
  */
 typedef enum {
@@ -107,6 +87,41 @@ typedef enum {
     LSM303DLHC_MAG_GAIN_330_295_GAUSS  = 0xc0, /**<  330Gauss XYZ 295Gauss Z */
     LSM303DLHC_MAG_GAIN_230_205_GAUSS  = 0xe0, /**<  230Gauss XYZ 205Gauss Z */
  } lsm303dlhc_mag_gain_t;
+
+/**
+ * @brief 3d data container
+ */
+typedef struct {
+    int16_t x_axis;
+    int16_t y_axis;
+    int16_t z_axis;
+} lsm303dlhc_3d_data_t;
+
+/**
+ * @brief Device descriptor for LSM303DLHC sensors
+ */
+typedef struct {
+    i2c_t i2c;              /**< I2C device                  */
+    uint8_t acc_address;    /**< accelerometer's I2C address */
+    uint8_t mag_address;    /**< magnetometer's I2C address  */
+    gpio_t  acc_pin;        /**< accelerometer's data ready pin */
+    gpio_t  mag_pin;        /**< magnetometer's data ready pin  */
+} lsm303dlhc_t;
+
+/**
+ * @brief Data structure holding all the information needed for initialization
+ */
+typedef struct {
+    i2c_t i2c;                              /**< I2C bus used */
+    uint8_t acc_addr;                       /**< accelerometer I2C address */
+    gpio_t acc_pin;                         /**< accelerometer EXTI pin */
+    lsm303dlhc_acc_sample_rate_t acc_rate;  /**< accelerometer sample rate */
+    lsm303dlhc_acc_scale_t acc_scale;       /**< accelerometer scale factor */
+    uint8_t mag_addr;                       /**< magnetometer I2C address */
+    gpio_t mag_pin;                         /**< magnetometer EXTI pin */
+    lsm303dlhc_mag_sample_rate_t mag_rate;  /**< magnetometer sample rate */
+    lsm303dlhc_mag_gain_t mag_gain;         /**< magnetometer gain */
+} lsm303dlhc_params_t;
 
 /**
  * @brief Initialize a new LSM303DLHC device
