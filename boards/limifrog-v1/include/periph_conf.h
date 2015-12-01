@@ -73,25 +73,23 @@ static const timer_conf_t timer_config[] = {
 #define UART_0_CLK          (CLOCK_CORECLOCK)
 #define UART_0_IRQ          USART3_IRQn
 #define UART_0_ISR          isr_usart3
+#define UART_0_BUS_FREQ     32000000
 /* UART 0 pin configuration */
-#define UART_0_PORT         GPIOC
-#define UART_0_PORT_CLKEN() (RCC->AHBENR |= RCC_AHBENR_GPIOCEN)
-#define UART_0_RX_PIN       11
-#define UART_0_TX_PIN       10
-#define UART_0_AF           7
+#define UART_0_RX_PIN       GPIO_PIN(PORT_C, 11)
+#define UART_0_TX_PIN       GPIO_PIN(PORT_C, 10)
+#define UART_0_AF           GPIO_AF7
 
 /* UART 1 device configuration */
-#define UART_1_DEV          USART3        /* Panasonic PAN1740 BLE module */
+#define UART_1_DEV          USART1        /* Panasonic PAN1740 BLE module */
 #define UART_1_CLKEN()      (RCC->APB2ENR |= RCC_APB2ENR_USART1EN)
 #define UART_1_CLK          (CLOCK_CORECLOCK)
 #define UART_1_IRQ          USART1_IRQn
 #define UART_1_ISR          isr_usart1
+#define UART_0_BUS_FREQ     32000000
 /* UART 1 pin configuration */
-#define UART_1_PORT         GPIOA
-#define UART_1_PORT_CLKEN() (RCC->AHBENR |= RCC_AHBENR_GPIOAEN)
-#define UART_1_RX_PIN       10
-#define UART_1_TX_PIN       9
-#define UART_1_AF           7
+#define UART_1_RX_PIN       GPIO_PIN(PORT_A, 10)
+#define UART_1_TX_PIN       GPIO_PIN(PORT_A, 9)
+#define UART_1_AF           GPIO_AF7
 /** @} */
 
 /**
