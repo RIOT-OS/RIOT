@@ -73,6 +73,7 @@ int sema_wait_timed_msg(sema_t *sema, uint64_t timeout, msg_t *msg)
     }
     if (timeout != 0) {
         old_state = disableIRQ();
+        timeout_timer.target = 0, timeout_timer.long_target = 0;
         timeout_msg.type = MSG_TIMEOUT;
         timeout_msg.content.ptr = (char *)sema;
         /* we will stay in the same stack context so we can use timeout_msg */
