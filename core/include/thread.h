@@ -100,23 +100,23 @@
 /**
  * @brief Set the new thread to sleeping
  **/
-#define CREATE_SLEEPING     (1)
+#define THREAD_CREATE_SLEEPING          (1)
 
 /**
  * @brief Currently not implemented
  */
-#define AUTO_FREE           (2)
+#define THREAD_AUTO_FREE                (2)
 
 /**
  * @brief Do not automatically call thread_yield() after creation
  */
-#define CREATE_WOUT_YIELD   (4)
+#define THREAD_CREATE_WOUT_YIELD        (4)
 
  /**
   * @brief Write markers into the thread's stack to measure stack usage (for
   *        debugging)
   */
-#define CREATE_STACKTEST    (8)
+#define THREAD_CREATE_STACKTEST         (8)
 /** @} */
 
 /**
@@ -139,11 +139,13 @@
  *
  * In addition to the priority, the *flags* argument can be used to alter the
  * newly created threads behavior after creation. The following flags are available:
- *  - CREATE_SLEEPING       the newly created thread will be put to sleeping state and
- *                          must be waken up manually
- *  - CREATE_WOUT_YIELD     the newly created thread will not run immediately after creation
- *  - CREATE_STACKTEST      write markers into the thread's stack to measure the stack's memory
- *                          usage (for debugging and profiling purposes)
+ *  - THREAD_CREATE_SLEEPING    the newly created thread will be put to sleeping
+ *                              state and must be waken up manually
+ *  - THREAD_CREATE_WOUT_YIELD  the newly created thread will not run
+ *                              immediately after creation
+ *  - THREAD_CREATE_STACKTEST   write markers into the thread's stack to measure
+ *                              the stack's memory usage (for debugging and
+ *                              profiling purposes)
  *
  * @note Currently we support creating threads from within an ISR, however it is considered
  *       to be a bad programming practice and we strongly discourage it.
@@ -255,7 +257,7 @@ const char *thread_getname(kernel_pid_t pid);
 /**
  * @brief Measures the stack usage of a stack
  *
- * Only works if the thread was created with the flag CREATE_STACKTEST.
+ * Only works if the thread was created with the flag THREAD_CREATE_STACKTEST.
  *
  * @param[in] stack the stack you want to measure. try `sched_active_thread->stack_start`
  *
