@@ -1,4 +1,4 @@
-MODULE =$(BOARD)_base
+MODULE = board
 
 INCLUDES += -I$(RIOTBOARD)/$(BOARD)/drivers/include
 DIRS = drivers

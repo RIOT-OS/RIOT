@@ -1,4 +1,4 @@
-MODULE = qemu-i386_base
+MODULE = board
 
 DIRS = $(RIOTBOARD)/x86-multiboot-common
 

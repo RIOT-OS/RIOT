@@ -46,7 +46,7 @@ LINKFLAGS += -m32 -nostdlib -nostdinc -nostartfiles -nodefaultlibs \
              --prefix=$(NEWLIB_BASE) \
              -Wl,-rpath,$(NEWLIB_BASE)/lib \
              -T$(RIOTBASE)/boards/x86-multiboot-common/linker.ld
-UNDEF += $(BINDIR)x86-multiboot-common_base/startup.o
+UNDEF += $(BINDIR)board/startup.o
 
 BASELIBS += $(NEWLIB_BASE)/lib/libc.a \
             $(NEWLIB_BASE)/lib/libm.a
