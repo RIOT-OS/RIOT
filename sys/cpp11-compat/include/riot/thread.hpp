@@ -228,7 +228,7 @@ thread::thread(F&& f, Args&&... args)
   std::unique_ptr<func_and_args> p(
     new func_and_args(m_data.get(), forward<F>(f), forward<Args>(args)...));
   m_handle = thread_create(
-    m_data->stack, stack_size, THREAD_PRIORITY_MAIN - 1, 0, // CREATE_WOUT_YIELD
+    m_data->stack, stack_size, THREAD_PRIORITY_MAIN - 1, 0,
     &thread_proxy<func_and_args>, p.get(), "riot_cpp_thread");
   if (m_handle >= 0) {
     p.release();

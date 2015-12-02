@@ -268,7 +268,7 @@ kernel_pid_t gnrc_slip_init(gnrc_slip_dev_t *dev, uart_t uart, uint32_t baudrate
 
     /* start SLIP thread */
     DEBUG("slip: starting SLIP thread\n");
-    pid = thread_create(stack, stack_size, priority, CREATE_STACKTEST,
+    pid = thread_create(stack, stack_size, priority, THREAD_CREATE_STACKTEST,
                         _slip, dev, _SLIP_NAME);
     if (pid < 0) {
         DEBUG("slip: unable to create SLIP thread\n");

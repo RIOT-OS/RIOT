@@ -55,7 +55,7 @@ kernel_pid_t gnrc_sixlowpan_init(void)
     }
 
     _pid = thread_create(_stack, sizeof(_stack), GNRC_SIXLOWPAN_PRIO,
-                         CREATE_STACKTEST, _event_loop, NULL, "6lo");
+                         THREAD_CREATE_STACKTEST, _event_loop, NULL, "6lo");
 
     return _pid;
 }
