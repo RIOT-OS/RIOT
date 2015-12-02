@@ -94,6 +94,32 @@
 #define THREAD_PRIORITY_MAIN           (THREAD_PRIORITY_MIN - (SCHED_PRIO_LEVELS/2))
 
 /**
+ * @name Optional flags for controlling a threads initial state
+ * @{
+ */
+/**
+ * @brief Set the new thread to sleeping
+ **/
+#define CREATE_SLEEPING     (1)
+
+/**
+ * @brief Currently not implemented
+ */
+#define AUTO_FREE           (2)
+
+/**
+ * @brief Do not automatically call thread_yield() after creation
+ */
+#define CREATE_WOUT_YIELD   (4)
+
+ /**
+  * @brief Write markers into the thread's stack to measure stack usage (for
+  *        debugging)
+  */
+#define CREATE_STACKTEST    (8)
+/** @} */
+
+/**
  * @brief Creates a new thread
  *
  * Creating a new thread is done in two steps:

@@ -25,7 +25,6 @@
 #include "kernel.h"
 #include "kernel_internal.h"
 #include "sched.h"
-#include "flags.h"
 #include "cpu.h"
 #include "lpm.h"
 #include "thread.h"
