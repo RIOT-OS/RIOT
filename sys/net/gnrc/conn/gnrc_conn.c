@@ -11,6 +11,7 @@
  *
  * @file
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
+ * @author  Oliver Hahm <oliver.hahm@inria.fr>
  */
 
 #include "net/conn.h"
@@ -84,6 +85,13 @@ bool gnrc_conn6_set_local_addr(uint8_t *conn_addr, const ipv6_addr_t *addr)
         memcpy(conn_addr, addr, sizeof(ipv6_addr_t));
     }
     return true;
+}
+
+ipv6_addr_t *conn_find_best_source(const ipv6_addr_t *dst)
+{
+    ipv6_addr_t *local = NULL;
+    gnrc_ipv6_netif_find_by_prefix(&local, dst);
+    return local;
 }
 #endif
 
