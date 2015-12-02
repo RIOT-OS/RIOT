@@ -181,6 +181,46 @@ static inline int _get_data_from_sockaddr(const struct sockaddr *address, size_t
     return 0;
 }
 
+static int _implicit_bind(socket_t *s, void *addr)
+{
+    ipv6_addr_t unspec;
+    ipv6_addr_t *best_match;
+    int res;
+
+    /* TODO: ensure that this port hasn't been used yet */
+    s->src_port = (uint16_t)genrand_uint32_range(1LU << 10U, 1LU << 16U);
+
+    /* find the best matching source address */
+    if ((best_match = conn_find_best_source(addr)) == NULL) {
+        ipv6_addr_set_unspecified(&unspec);
+        best_match = &unspec;
+    }
+    switch (s->type) {
+#ifdef MODULE_CONN_TCP
+        case SOCK_STREAM:
+            res = conn_tcp_create(&s->conn.udp, &best_match, sizeof(unspec),
+                                  s->domain, s->src_port);
+            break;
+#endif
+#ifdef MODULE_CONN_UDP
+        case SOCK_DGRAM:
+            res = conn_udp_create(&s->conn.udp, &best_match, sizeof(unspec),
+                                  s->domain, s->src_port);
+            break;
+#endif
+        default:
+            res = -1;
+            break;
+    }
+    if (res < 0) {
+        errno = -res;
+    }
+    else {
+        s->bound = true;
+    }
+    return res;
+}
+
 static int socket_close(int socket)
 {
     socket_t *s;
@@ -453,10 +493,6 @@ int connect(int socket, const struct sockaddr *address, socklen_t address_len)
         errno = ENOTSOCK;
         return -1;
     }
-    if (!s->bound) {
-        errno = EINVAL;
-        return -1;
-    }
     if (address->sa_family != s->domain) {
         errno = EAFNOSUPPORT;
         return -1;
@@ -467,6 +503,17 @@ int connect(int socket, const struct sockaddr *address, socklen_t address_len)
     switch (s->type) {
 #ifdef MODULE_CONN_TCP
         case SOCK_STREAM:
+            /* "If the socket has not already been bound to a local address,
+             * connect() shall bind it to an address which, unless the socket's
+             * address family is AF_UNIX, is an unused local address." (see
+             * http://pubs.opengroup.org/onlinepubs/009695399/functions/connect.html)
+             */
+            if (!s->bound) {
+                if ((res = _implicit_bind(s, addr)) < 0) {
+                    return res;
+                }
+            }
+
             if ((res = conn_tcp_connect(&s->conn.tcp, addr, addr_len,
                                         byteorder_ntohs(port))) < 0) {
 
@@ -864,20 +911,9 @@ ssize_t sendto(int socket, const void *buffer, size_t length, int flags,
                                       sport, byteorder_ntohs(port));
             }
             else if (address != NULL) {
-                ipv6_addr_t unspec;
-                ipv6_addr_t *best_match;
-                s->src_port = (uint16_t)genrand_uint32_range(1LU << 10U, 1LU << 16U);
-                /* find the best matching source address */
-                if ((best_match = conn_find_best_source(addr)) == NULL) {
-                    ipv6_addr_set_unspecified(&unspec);
-                    best_match = &unspec;
+                if ((res = _implicit_bind(s, addr)) < 0) {
+                    return res;
                 }
-                if ((res = conn_udp_create(&s->conn.udp, best_match, sizeof(unspec),
-                                           s->domain, s->src_port)) < 0) {
-                    errno = -res;
-                    return -1;
-                }
-                s->bound = true;
                 res = conn_udp_sendto(buffer, length, NULL, 0, addr, addr_len, s->domain,
                                       s->src_port, byteorder_ntohs(port));
             }
