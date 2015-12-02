@@ -100,8 +100,9 @@ static size_t psk_key_length = 0;
  * retrieve a key for the given identity within this particular
  * session. */
 static int get_psk_info(struct dtls_context_t *ctx, const session_t *session,
-             dtls_credentials_type_t type, const unsigned char *id,
-             size_t id_len, unsigned char *result, size_t result_length)
+                        dtls_credentials_type_t type, const unsigned char *id,
+                        size_t id_len, unsigned char *result,
+                        size_t result_length)
 {
     (void) ctx;
     (void) session;
