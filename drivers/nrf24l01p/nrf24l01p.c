@@ -44,7 +44,7 @@ int nrf24l01p_read_reg(nrf24l01p_t *dev, char reg, char *answer)
 
     xtimer_spin(DELAY_AFTER_FUNC_TICKS);
 
-    return status;
+    return (status < 0) ? status : 0;
 }
 
 int nrf24l01p_write_reg(nrf24l01p_t *dev, char reg, char write)
@@ -64,7 +64,7 @@ int nrf24l01p_write_reg(nrf24l01p_t *dev, char reg, char write)
 
     xtimer_spin(DELAY_AFTER_FUNC_TICKS);
 
-    return status;
+    return (status < 0) ? status : 0;
 }
 
 
@@ -406,7 +406,7 @@ int nrf24l01p_set_tx_address(nrf24l01p_t *dev, char *saddr, unsigned int length)
 
     xtimer_spin(DELAY_AFTER_FUNC_TICKS);
 
-    return status;
+    return (status < 0) ? status : length;
 }
 
 int nrf24l01p_set_tx_address_long(nrf24l01p_t *dev, uint64_t saddr, unsigned int length)
@@ -437,7 +437,7 @@ int nrf24l01p_set_tx_address_long(nrf24l01p_t *dev, uint64_t saddr, unsigned int
 
     xtimer_spin(DELAY_AFTER_FUNC_TICKS);
 
-    return status;
+    return (status < 0) ? status : length;
 }
 
 uint64_t nrf24l01p_get_tx_address_long(nrf24l01p_t *dev)
@@ -520,7 +520,7 @@ int nrf24l01p_set_rx_address(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, char *s
 
     /* Enable this pipe */
     nrf24l01p_enable_pipe(dev, pipe);
-    return status;
+    return (status < 0) ? status : length;
 }
 
 int nrf24l01p_set_rx_address_long(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, uint64_t saddr, unsigned int length)
@@ -983,7 +983,7 @@ int nrf24l01p_flush_tx_fifo(nrf24l01p_t *dev)
 
     xtimer_spin(DELAY_AFTER_FUNC_TICKS);
 
-    return status;
+    return (status < 0) ? status : 0;
 }
 
 int nrf24l01p_flush_rx_fifo(nrf24l01p_t *dev)
@@ -1003,7 +1003,7 @@ int nrf24l01p_flush_rx_fifo(nrf24l01p_t *dev)
 
     xtimer_spin(DELAY_AFTER_FUNC_TICKS);
 
-    return status;
+    return (status < 0) ? status : 0;
 }
 
 void nrf24l01p_rx_cb(void *arg)
