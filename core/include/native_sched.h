@@ -18,7 +18,6 @@
  * @brief       Add definitions required on the native board
  *
  * @author      Raphael Hiesgen <raphael.hiesgen@haw-hamburg.de>
- * @}
  */
 
 #ifndef NATIVE_SCHEDULER_H
@@ -30,6 +29,7 @@ extern "C" {
 
 #ifdef BOARD_NATIVE
 #include <stdio.h>
+
 /*
  * Required to use some C++11 headers with g++ on the native board.
  */
@@ -48,10 +48,11 @@ inline int sched_yield(void)
     puts("[ERROR] sched_yield called (defined in sched.h)\n");
     return 0;
 }
-#endif // BOARD_NATIVE
+#endif /* BOARD_NATIVE */
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif /* NATIVE_SCHEDULER_H */
+/** @} */
