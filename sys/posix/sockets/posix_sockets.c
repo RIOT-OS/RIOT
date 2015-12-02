@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2015 Freie Universität Berlin
+ * Copyright (C) 2015 INRIA
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -11,6 +12,7 @@
  * @file
  * @brief   Providing implementation for POSIX socket wrapper.
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
+ * @author  Oliver Hahm <oliver.hahm@inria.fr>
  * @todo
  */
 
@@ -862,11 +864,15 @@ ssize_t sendto(int socket, const void *buffer, size_t length, int flags,
                                       sport, byteorder_ntohs(port));
             }
             else if (address != NULL) {
-                ipv6_addr_t local;
+                ipv6_addr_t unspec;
+                ipv6_addr_t *best_match;
                 s->src_port = (uint16_t)genrand_uint32_range(1LU << 10U, 1LU << 16U);
-                /* implicitly bind the socket here */
-                ipv6_addr_set_unspecified(&local);
-                if ((res = conn_udp_create(&s->conn.udp, &local, sizeof(local),
+                /* find the best matching source address */
+                if ((best_match = conn_find_best_source(addr)) == NULL) {
+                    ipv6_addr_set_unspecified(&unspec);
+                    best_match = &unspec;
+                }
+                if ((res = conn_udp_create(&s->conn.udp, best_match, sizeof(unspec),
                                            s->domain, s->src_port)) < 0) {
                     errno = -res;
                     return -1;
