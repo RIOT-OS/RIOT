@@ -15,6 +15,20 @@ else
     UNIT_TESTS := $(filter tests-%, $(MAKECMDGOALS))
 endif
 
+AVR_BOARDS := arduino-mega2560
+DISABLE_TEST_FOR_AVR := tests-relic
+
+MSP430_BOARDS :=  chronos msb-430 msb-430h telosb wsn430-v1_3b wsn430-v1_4 z1
+DISABLE_TEST_FOR_MSP430 := tests-relic
+
+ifneq (, $(filter $(AVR_BOARDS), $(BOARD)))
+UNIT_TESTS := $(filter-out $(DISABLE_TEST_FOR_AVR), $(UNIT_TESTS))
+endif
+
+ifneq (, $(filter $(MSP430_BOARDS), $(BOARD)))
+UNIT_TESTS := $(filter-out $(DISABLE_TEST_FOR_AVR), $(UNIT_TESTS))
+endif
+
 DISABLE_MODULE += auto_init
 
 # Pull in `Makefile.include`s from the test suites:
