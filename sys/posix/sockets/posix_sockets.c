@@ -56,6 +56,7 @@ typedef struct {
     int protocol;
     bool bound;
     socket_conn_t conn;
+    uint16_t src_port;
 } socket_t;
 
 socket_t _pool[SOCKET_POOL_SIZE];
@@ -119,11 +120,6 @@ static inline int _choose_ipproto(int type, int protocol)
     return -1;
 }
 
-static inline void _htons_port(uint16_t *port)
-{
-    *port = htons(*port);
-}
-
 static inline ipv4_addr_t *_in_addr_ptr(struct sockaddr_storage *addr)
 {
     return (ipv4_addr_t *)(&((struct sockaddr_in *)addr)->sin_addr);
@@ -153,7 +149,7 @@ static inline socklen_t _addr_truncate(struct sockaddr *out, socklen_t out_len,
 }
 
 static inline int _get_data_from_sockaddr(const struct sockaddr *address, size_t address_len,
-                                          void **addr, size_t *addr_len, uint16_t *port)
+                                          void **addr, size_t *addr_len, network_uint16_t *port)
 {
     switch (address->sa_family) {
         case AF_INET:
@@ -164,8 +160,7 @@ static inline int _get_data_from_sockaddr(const struct sockaddr *address, size_t
             struct sockaddr_in *in_addr = (struct sockaddr_in *)address;
             *addr = &in_addr->sin_addr;
             *addr_len = sizeof(ipv4_addr_t);
-            /* XXX sin_port is in network byteorder */
-            *port = ntohs(in_addr->sin_port);
+            port->u16 = in_addr->sin_port;
             break;
         case AF_INET6:
             if (address_len < sizeof(struct sockaddr_in6)) {
@@ -175,8 +170,7 @@ static inline int _get_data_from_sockaddr(const struct sockaddr *address, size_t
             struct sockaddr_in6 *in6_addr = (struct sockaddr_in6 *)address;
             *addr = &in6_addr->sin6_addr;
             *addr_len = sizeof(ipv6_addr_t);
-            /* XXX sin6_port is in network byteorder */
-            *port = ntohs(in6_addr->sin6_port);
+            port->u16 = in6_addr->sin6_port;
             break;
         default:
             errno = EAFNOSUPPORT;
@@ -225,6 +219,7 @@ static int socket_close(int socket)
         }
     }
     s->domain = AF_UNSPEC;
+    s->src_port = 0;
     mutex_unlock(&_pool_mutex);
     return res;
 }
@@ -278,6 +273,7 @@ int socket(int domain, int type, int protocol)
         }
     }
     s->bound = false;
+    s->src_port = 0;
     mutex_unlock(&_pool_mutex);
     return res;
 }
@@ -363,8 +359,8 @@ int accept(int socket, struct sockaddr *restrict address,
                     res = -1;
                     break;
                 }
-                _htons_port(port);  /* XXX: sin(6)_port is supposed to be network byte
-                                     *      order */
+                *port = htons(*port); /* XXX: sin(6)_port is supposed to be
+                                         network byte order */
                 *address_len = _addr_truncate(address, *address_len, &tmp, tmp_len);
             }
             break;
@@ -384,7 +380,7 @@ int bind(int socket, const struct sockaddr *address, socklen_t address_len)
     int res = 0;
     void *addr;
     size_t addr_len;
-    uint16_t port;
+    network_uint16_t port = { 0 };
     mutex_lock(&_pool_mutex);
     s = _get_socket(socket);
     mutex_unlock(&_pool_mutex);
@@ -411,7 +407,8 @@ int bind(int socket, const struct sockaddr *address, socklen_t address_len)
 #endif
 #ifdef MODULE_CONN_TCP
         case SOCK_STREAM:
-            if ((res = conn_tcp_create(&s->conn.tcp, addr, addr_len, s->domain, port)) < 0) {
+            if ((res = conn_tcp_create(&s->conn.tcp, addr, addr_len, s->domain,
+                                       byteorder_ntohs(port))) < 0) {
                 errno = -res;
                 return -1;
             }
@@ -419,7 +416,9 @@ int bind(int socket, const struct sockaddr *address, socklen_t address_len)
 #endif
 #ifdef MODULE_CONN_UDP
         case SOCK_DGRAM:
-            if ((res = conn_udp_create(&s->conn.udp, addr, addr_len, s->domain, port)) < 0) {
+            if ((res = conn_udp_create(&s->conn.udp, addr, addr_len, s->domain,
+                                       byteorder_ntohs(port))) < 0) {
+
                 errno = -res;
                 return -1;
             }
@@ -433,6 +432,7 @@ int bind(int socket, const struct sockaddr *address, socklen_t address_len)
             errno = EOPNOTSUPP;
             return -1;
     }
+    s->src_port = byteorder_ntohs(port);
     s->bound = true;
     return 0;
 }
@@ -443,7 +443,7 @@ int connect(int socket, const struct sockaddr *address, socklen_t address_len)
     int res = 0;
     void *addr;
     size_t addr_len;
-    uint16_t port;
+    network_uint16_t port;
     mutex_lock(&_pool_mutex);
     s = _get_socket(socket);
     mutex_unlock(&_pool_mutex);
@@ -465,8 +465,9 @@ int connect(int socket, const struct sockaddr *address, socklen_t address_len)
     switch (s->type) {
 #ifdef MODULE_CONN_TCP
         case SOCK_STREAM:
-            /* XXX sin_port is in network byteorder */
-            if ((res = conn_tcp_connect(&s->conn.tcp, addr, addr_len, port)) < 0) {
+            if ((res = conn_tcp_connect(&s->conn.tcp, addr, addr_len,
+                                        byteorder_ntohs(port))) < 0) {
+
                 errno = -res;
                 return -1;
             }
@@ -538,8 +539,8 @@ int getpeername(int socket, struct sockaddr *__restrict address,
             return -1;
     }
     tmp.ss_family = s->domain;
-    _htons_port(port);  /* XXX: sin(6)_port is supposed to be network byte
-                         *      order */
+    *port = htons(*port); /* XXX: sin(6)_port is supposed to be network byte
+                             order */
     *address_len = _addr_truncate(address, *address_len, &tmp, tmp_len);
     return 0;
 }
@@ -622,8 +623,8 @@ int getsockname(int socket, struct sockaddr *__restrict address,
             return -1;
     }
     tmp.ss_family = AF_INET;
-    _htons_port(port);  /* XXX: sin(6)_port is supposed to be network byte
-                         *      order */
+    *port = htons(*port); /* XXX: sin(6)_port is supposed to be network byte
+                             order */
     *address_len = _addr_truncate(address, *address_len, &tmp, tmp_len);
     return 0;
 }
@@ -724,8 +725,8 @@ ssize_t recvfrom(int socket, void *restrict buffer, size_t length, int flags,
     switch (s->type) {
 #ifdef MODULE_CONN_UDP
         case SOCK_DGRAM:
-            if ((res = conn_udp_recvfrom(&s->conn.udp, buffer, length, addr, &addr_len,
-                                         port)) < 0) {
+            if ((res = conn_udp_recvfrom(&s->conn.udp, buffer, length, addr,
+                                         &addr_len, port)) < 0) {
                 errno = -res;
                 return -1;
             }
@@ -758,8 +759,8 @@ ssize_t recvfrom(int socket, void *restrict buffer, size_t length, int flags,
     }
     if ((address != NULL) && (address_len != NULL)) {
         tmp.ss_family = s->domain;
-        _htons_port(port);  /* XXX: sin_port is supposed to be network byte
-                             *      order */
+        *port = htons(*port); /* XXX: sin(6)_port is supposed to be network
+                                 byte order */
         *address_len = _addr_truncate(address, *address_len, &tmp, tmp_len);
     }
     return res;
@@ -777,7 +778,8 @@ ssize_t sendto(int socket, const void *buffer, size_t length, int flags,
     int res = 0;
     void *addr = NULL;
     size_t addr_len = 0;
-    uint16_t port = 0;
+    network_uint16_t port;
+    port.u16 = 0;
     (void)flags;
     mutex_lock(&_pool_mutex);
     s = _get_socket(socket);
@@ -857,12 +859,21 @@ ssize_t sendto(int socket, const void *buffer, size_t length, int flags,
                 /* cppcheck bug? res is read below in l824 */
                 /* cppcheck-suppress unreadVariable */
                 res = conn_udp_sendto(buffer, length, src_addr, src_len, addr, addr_len, s->domain,
-                                      sport, port);
+                                      sport, byteorder_ntohs(port));
             }
             else if (address != NULL) {
-                uint16_t sport = (uint16_t)genrand_uint32_range(1LU << 10U, 1LU << 16U);
+                ipv6_addr_t local;
+                s->src_port = (uint16_t)genrand_uint32_range(1LU << 10U, 1LU << 16U);
+                /* implicitly bind the socket here */
+                ipv6_addr_set_unspecified(&local);
+                if ((res = conn_udp_create(&s->conn.udp, &local, sizeof(local),
+                                           s->domain, s->src_port)) < 0) {
+                    errno = -res;
+                    return -1;
+                }
+                s->bound = true;
                 res = conn_udp_sendto(buffer, length, NULL, 0, addr, addr_len, s->domain,
-                                      sport, port);
+                                      s->src_port, byteorder_ntohs(port));
             }
             else {
                 errno = ENOTCONN;
