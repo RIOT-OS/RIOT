@@ -54,7 +54,7 @@ int main(void)
     busy = 1;
     k = 23;
     thread_create(busy_stack, sizeof(busy_stack),
-                  THREAD_PRIORITY_MAIN + 1, CREATE_WOUT_YIELD,
+                  THREAD_PRIORITY_MAIN + 1, THREAD_CREATE_WOUT_YIELD,
                   busy_thread, NULL, "busy_thread");
     puts("busy_thread created");
 

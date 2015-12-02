@@ -109,7 +109,8 @@ static void tests_core_ringbuffer(void)
 {
     pid_add = sched_active_pid;
     pid_get = thread_create(stack_get, sizeof (stack_get),
-                            THREAD_PRIORITY_MAIN, CREATE_SLEEPING | CREATE_STACKTEST,
+                            THREAD_PRIORITY_MAIN,
+                            THREAD_CREATE_SLEEPING | THREAD_CREATE_STACKTEST,
                             run_get, NULL, "get");
     run_add();
 }

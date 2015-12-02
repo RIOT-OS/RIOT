@@ -100,10 +100,12 @@ int main(void)
     }
 
     thread_create(stacks[0], sizeof (stacks[0]),
-                  THREAD_PRIORITY_MAIN, CREATE_WOUT_YIELD | CREATE_STACKTEST,
+                  THREAD_PRIORITY_MAIN,
+                  THREAD_CREATE_WOUT_YIELD | THREAD_CREATE_STACKTEST,
                   run_middle, NULL, "middle");
     thread_create(stacks[1], sizeof (stacks[1]),
-                  THREAD_PRIORITY_MAIN, CREATE_WOUT_YIELD | CREATE_STACKTEST,
+                  THREAD_PRIORITY_MAIN,
+                  THREAD_CREATE_WOUT_YIELD | THREAD_CREATE_STACKTEST,
                   run_end, NULL, "end");
 
     unsigned total = 0;
