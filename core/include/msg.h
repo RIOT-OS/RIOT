@@ -222,6 +222,14 @@ int msg_reply(msg_t *m, msg_t *reply);
 int msg_reply_int(msg_t *m, msg_t *reply);
 
 /**
+ * @brief Check how many messages are available in the message queue
+ *
+ * @return Number of messages available in our queue on success
+ * @return -1, if no caller's message queue is initialized
+ */
+int msg_avail(void);
+
+/**
  * @brief Initialize the current thread's message queue.
  *
  * @param[in] array Pointer to preallocated array of ``msg_t`` structures, must
