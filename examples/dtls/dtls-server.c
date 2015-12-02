@@ -98,7 +98,7 @@ static int get_psk_info(struct dtls_context_t *ctx,
           (unsigned char *)"secretPSK", 9 },
         { (unsigned char *)"default identity", 16,
           (unsigned char *)"\x11\x22\x33", 3 },
-        { (unsigned char *)"\0",			   2,
+        { (unsigned char *)"\0",               2,
           (unsigned char *)"", 1 }
     };
 
@@ -134,10 +134,10 @@ static int get_ecdsa_key(struct dtls_context_t *ctx,
     (void) ctx;
     (void) session;
     static const dtls_ecdsa_key_t ecdsa_key = {
-        .curve		= DTLS_ECDH_CURVE_SECP256R1,
-        .priv_key	= ecdsa_priv_key,
-        .pub_key_x	= ecdsa_pub_key_x,
-        .pub_key_y	= ecdsa_pub_key_y
+        .curve      = DTLS_ECDH_CURVE_SECP256R1,
+        .priv_key   = ecdsa_priv_key,
+        .pub_key_x  = ecdsa_pub_key_x,
+        .pub_key_y  = ecdsa_pub_key_y
     };
 
     *result = &ecdsa_key;
@@ -186,15 +186,15 @@ static int read_from_peer(struct dtls_context_t *ctx,
 }
 
 static dtls_handler_t cb = {
-    .write				= send_to_peer,
-    .read				= read_from_peer,
-    .event				= NULL,
+    .write              = send_to_peer,
+    .read               = read_from_peer,
+    .event              = NULL,
 #ifdef DTLS_PSK
-    .get_psk_info		= get_psk_info,
+    .get_psk_info       = get_psk_info,
 #endif /* DTLS_PSK */
 #ifdef DTLS_ECC
-    .get_ecdsa_key		= get_ecdsa_key,
-    .verify_ecdsa_key	= verify_ecdsa_key
+    .get_ecdsa_key      = get_ecdsa_key,
+    .verify_ecdsa_key   = verify_ecdsa_key
 #endif /* DTLS_ECC */
 };
 
