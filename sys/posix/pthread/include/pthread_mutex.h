@@ -28,7 +28,7 @@ extern "C" {
 /**
  * Static initializer for @ref pthread_mutex_t struct
  */
-#define PTHREAD_MUTEX_INITIALIZER  MUTEX_INIT;
+#define PTHREAD_MUTEX_INITIALIZER  MUTEX_INIT
 
 /**
  * @brief           Pthread mutexes are quite the same as RIOT mutexes.
