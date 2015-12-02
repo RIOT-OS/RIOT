@@ -171,4 +171,4 @@ void usic_init(const usic_channel_t *usic_ch,
 }
 #endif
 
-#endif /* USIC_DEFS_H_ */
+#endif /* USIC_H_ */
