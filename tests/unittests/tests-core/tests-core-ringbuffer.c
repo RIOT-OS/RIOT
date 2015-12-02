@@ -17,7 +17,6 @@
  */
 
 #include "thread.h"
-#include "flags.h"
 #include "kernel.h"
 #include "ringbuffer.h"
 #include "mutex.h"
