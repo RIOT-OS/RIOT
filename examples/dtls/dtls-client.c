@@ -279,7 +279,7 @@ int dtls_client_cmd(int argc, char **argv)
 int dtls_send_cmd(int argc, char **argv)
 {
     if (argc < 2) {
-        printf("Usage: %s <data>\n", argv[1]);
+        printf("Usage: %s <data>\n", argv[0]);
         return -1;
     }
     try_send(dtls_context, &dst, argv[1], strlen(argv[1]));
