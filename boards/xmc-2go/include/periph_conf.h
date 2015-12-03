@@ -24,6 +24,7 @@
 
 #include "periph/usic_asc.h"
 #include "periph/usic_ssc.h"
+#include "periph/usic_i2c.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -76,15 +77,23 @@ extern "C" {
 static const uart_instance_t uart_instance[] = {
     {
         .usic    = USIC0_CH0,
+
         .fifo    = {
             .rx_dptr = 0,
             .rx_size = 5,
             .tx_dptr = 31,
             .tx_size = 5,
         },
+
+        .inputs = {
+            .dx0 = USIC_DXG,
+            .dx3 = USIC_DXA
+        },
+
         .mode    = &_xmc_usic_asc_mode,
+
         .tx_pin  = GPIO_ALT(P2, 1, GPIO_ALT_OUT_6),
-        .rx_pin  = GPIO_ALT(P2, 2, 6)
+        .rx_pin  = GPIO_PIN(P2, 2)
     }
 };
 /** @} */
@@ -104,10 +113,18 @@ static const uart_instance_t uart_instance[] = {
 static const spi_instance_t spi_instance[] = {
     {
         .usic     = USIC0_CH1,
+
+        .inputs = {
+            .dx0 = USIC_DXC | USIC_CH_DX0CR_INSW_Msk,
+            .dx2 = USIC_DX_HIGH
+        },
+
         .mode     = &_xmc_usic_ssc_master_mode,
+
         .mosi_pin = GPIO_ALT(P0, 7, GPIO_ALT_OUT_7),
-        .miso_pin = GPIO_ALT(P0, 6, 6),
-        .sclk_pin = GPIO_ALT(P0, 8, 7),
+        .miso_pin = GPIO_PIN(P0, 6),
+
+        .sclk_pin = GPIO_PIN(P0, 8),
         .msls_pin = GPIO_PIN(P0, 9)
     }
 };
@@ -121,6 +138,37 @@ static const spi_instance_t spi_instance[] = {
 #define SPI_NUMOF          (1U)
 #define SPI_0_EN           (1)
 /** @} */
+
+/**
+ * @name I2C instance declaration
+ * @{
+ */
+static const i2c_instance_t i2c_instance[] = {
+    {
+        .usic     = USIC0_CH1,
+
+        .inputs = {
+            .dx0 = USIC_DXC,
+            .dx1 = USIC_DXB
+        },
+
+        .mode     = &_xmc_usic_i2c_master_mode,
+
+        .sda_pin  = GPIO_ALT(P0, 6, GPIO_ALT_OUT_7 | GPIO_DIR_OPEN_DRAIN),
+        .scl_pin  = GPIO_ALT(P0, 8, GPIO_ALT_OUT_7 | GPIO_DIR_OPEN_DRAIN),
+    }
+};
+/** @} */
+
+/**
+ * @name I2C configuration
+ * @{
+ */
+#define I2C_IRQ_PRIO       CPU_DEFAULT_IRQ_PRIO
+#define I2C_NUMOF          (1U)
+#define I2C_0_EN           (1)
+/** @} */
+
 
 /**
  * @name GPIO mapping to Event Request Unit (ERU) inputs
