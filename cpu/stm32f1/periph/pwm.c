@@ -89,9 +89,10 @@ int pwm_init(pwm_t dev, pwm_mode_t mode, unsigned int frequency, unsigned int re
     }
 
     /* timer 12 to 14 and timer 9 to 15 must be re-mapped on MAPR2 register of AFIO */
-    __IO uint32_t* MAPR = &(AFIO->MAPR);
-    if ((tim > TIM12_BASE && tim < TIM14_BASE) || (tim > TIM15 && tim < TIM11))
+    __IO uint32_t *MAPR = &(AFIO->MAPR);
+    if ((tim > TIM12_BASE && tim < TIM14_BASE) || (tim > TIM15 && tim < TIM11)) {
         MAPR = &(AFIO->MAPR2);
+    }
 
 #if PWM_0_PERIPH_AF
     /* clear re-mapping of the peripheral and set the new re-mapping */
@@ -109,14 +110,14 @@ int pwm_init(pwm_t dev, pwm_mode_t mode, unsigned int frequency, unsigned int re
     switch (channels) {
         case 4:
             tim->CCR4 = 0;
-            /* no break */
+        /* no break */
         case 3:
             tim->CCR3 = 0;
             tim->CR2 = 0;
-            /* no break */
+        /* no break */
         case 2:
             tim->CCR2 = 0;
-            /* no break */
+        /* no break */
         case 1:
             tim->CCR1 = 0;
             tim->CR1 = 0;
@@ -134,16 +135,16 @@ int pwm_init(pwm_t dev, pwm_mode_t mode, unsigned int frequency, unsigned int re
     switch (mode) {
         case PWM_LEFT:
             tim->CCMR1 = (TIM_CCMR1_OC1M_1 | TIM_CCMR1_OC1M_2 |
-                           TIM_CCMR1_OC2M_1 | TIM_CCMR1_OC2M_2);
+                          TIM_CCMR1_OC2M_1 | TIM_CCMR1_OC2M_2);
             tim->CCMR2 = (TIM_CCMR2_OC3M_1 | TIM_CCMR2_OC3M_2 |
-                           TIM_CCMR2_OC4M_1 | TIM_CCMR2_OC4M_2);
+                          TIM_CCMR2_OC4M_1 | TIM_CCMR2_OC4M_2);
             break;
 
         case PWM_RIGHT:
             tim->CCMR1 = (TIM_CCMR1_OC1M_0 | TIM_CCMR1_OC1M_1 | TIM_CCMR1_OC1M_2 |
-                           TIM_CCMR1_OC2M_0 | TIM_CCMR1_OC2M_1 | TIM_CCMR1_OC2M_2);
+                          TIM_CCMR1_OC2M_0 | TIM_CCMR1_OC2M_1 | TIM_CCMR1_OC2M_2);
             tim->CCMR2 = (TIM_CCMR2_OC3M_0 | TIM_CCMR2_OC3M_1 | TIM_CCMR2_OC3M_2 |
-                           TIM_CCMR2_OC4M_0 | TIM_CCMR2_OC4M_1 | TIM_CCMR2_OC4M_2);
+                          TIM_CCMR2_OC4M_0 | TIM_CCMR2_OC4M_1 | TIM_CCMR2_OC4M_2);
             break;
 
         case PWM_CENTER:
@@ -194,22 +195,21 @@ int pwm_set(pwm_t dev, int channel, unsigned int value)
     }
 
     /* set the PWM value to the channel comperator */
-    switch (channel)
-    {
-    case 0:
-        tim->CCR1 = value;
-        break;
-    case 1:
-        tim->CCR2 = value;
-        break;
-    case 2:
-        tim->CCR3 = value;
-        break;
-    case 3:
-        tim->CCR4 = value;
-        break;
-    default:
-        return -1;
+    switch (channel) {
+        case 0:
+            tim->CCR1 = value;
+            break;
+        case 1:
+            tim->CCR2 = value;
+            break;
+        case 2:
+            tim->CCR3 = value;
+            break;
+        case 3:
+            tim->CCR4 = value;
+            break;
+        default:
+            return -1;
     }
 
     return 0;
