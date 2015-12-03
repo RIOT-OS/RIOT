@@ -15,7 +15,7 @@ FEATURES_PROVIDED += cpp
 FEATURES_PROVIDED += arduino
 
 # The board MPU family (used for grouping by the CI system)
-FEATURES_MCU_GROUP = cortex_m4
+FEATURES_MCU_GROUP = cortex_m4_2
 
 # TODO: re-think concept for conflicts based on actual used peripherals...
 FEATURES_CONFLICT += periph_spi:periph_dac
