@@ -88,13 +88,21 @@ int pwm_init(pwm_t dev, pwm_mode_t mode, unsigned int frequency, unsigned int re
         port->CR[pins[i] >= 8] |= (0xbl << (4 * (pins[i] - ((pins[i] >= 8) * 8))));
     }
 
+    /* timer 12 to 14 and timer 9 to 15 must be re-mapped on MAPR2 register of AFIO */
+    __IO uint32_t* MAPR = &(AFIO->MAPR);
+    if ((tim > TIM12_BASE && tim < TIM14_BASE) || (tim > TIM15 && tim < TIM11))
+        MAPR = &(AFIO->MAPR2);
+
 #if PWM_0_PERIPH_AF
     /* clear re-mapping of the peripheral and set the new re-mapping */
-    AFIO->MAPR &= ~(PWM_0_AFIO_MAPR_BITMASK << PWM_0_AFIO_MAPR_OFFSET);
-    AFIO->MAPR |= (PWM_0_PERIPH_AF << PWM_0_AFIO_MAPR_OFFSET);
+    *MAPR &= ~(PWM_0_AFIO_MAPR_BITMASK << PWM_0_AFIO_MAPR_OFFSET);
+    *MAPR |= (PWM_0_PERIPH_AF << PWM_0_AFIO_MAPR_OFFSET);
 #endif
 
 #if PWM_1_PERIPH_AF
+    /* clear re-mapping of the peripheral and set the new re-mapping */
+    *MAPR &= ~(PWM_1_AFIO_MAPR_BITMASK << PWM_1_AFIO_MAPR_OFFSET);
+    *MAPR |= (PWM_1_PERIPH_AF << PWM_1_AFIO_MAPR_OFFSET);
 #endif
 
     /* reset the c/c and timer configuration register */
