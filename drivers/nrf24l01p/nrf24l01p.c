@@ -11,6 +11,7 @@
  * @{
  * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
+ * @author      Marc Poulhiès <dkm@kataplop.net>
  * @}
  */
 #include "nrf24l01p.h"
@@ -743,6 +744,12 @@ int nrf24l01p_set_rxmode(nrf24l01p_t *dev)
     return status;
 }
 
+
+int nrf24l01p_reset_interrupts(nrf24l01p_t *dev, char intrs)
+{
+    return nrf24l01p_write_reg(dev, REG_STATUS, intrs);
+}
+
 int nrf24l01p_reset_all_interrupts(nrf24l01p_t *dev)
 {
     return nrf24l01p_write_reg(dev, REG_STATUS, ALL_INT_MASK);
@@ -766,6 +773,81 @@ int nrf24l01p_unmask_interrupt(nrf24l01p_t *dev, char intr)
     conf &= ~intr;
 
     return nrf24l01p_write_reg(dev, REG_CONFIG, conf);
+}
+
+int nrf24l01p_enable_dynamic_payload(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe)
+{
+    char feature_val;
+    char en_aa_val;
+    char dynpd_val;
+    int pipe_mask = 0;
+    int dpl_mask = 0;
+
+    if (nrf24l01p_read_reg(dev, REG_FEATURE, &feature_val) < 0) {
+        DEBUG("Can't read REG_FEATURE\n");
+        return -1;
+    }
+    if (!(feature_val & FEATURE_EN_DPL)){
+        feature_val |= FEATURE_EN_DPL;
+        if (nrf24l01p_write_reg(dev, REG_FEATURE, feature_val) < 0){
+            DEBUG("Can't write REG_FEATURE\n");
+            return -1;
+        }
+    }
+
+    if (nrf24l01p_read_reg(dev, REG_EN_AA, &en_aa_val) < 0){
+        DEBUG("Can't read REG_EN_AA\n");
+        return -1;
+    }
+    switch (pipe){
+    case NRF24L01P_PIPE0:
+        pipe_mask = ENAA_P0;
+        dpl_mask = DYNPD_DPL_P0;
+        break;
+    case NRF24L01P_PIPE1:
+        pipe_mask = ENAA_P1;
+        dpl_mask = DYNPD_DPL_P1;
+        break;
+    case NRF24L01P_PIPE2:
+        pipe_mask = ENAA_P2;
+        dpl_mask = DYNPD_DPL_P2;
+        break;
+    case NRF24L01P_PIPE3:
+        pipe_mask = ENAA_P3;
+        dpl_mask = DYNPD_DPL_P3;
+        break;
+    case NRF24L01P_PIPE4:
+        pipe_mask = ENAA_P4;
+        dpl_mask = DYNPD_DPL_P4;
+        break;
+    case NRF24L01P_PIPE5:
+        pipe_mask = ENAA_P5;
+        dpl_mask = DYNPD_DPL_P5;
+        break;
+    }
+
+    if (!(en_aa_val & pipe_mask)){
+        en_aa_val |= pipe_mask;
+        if (nrf24l01p_write_reg(dev, REG_EN_AA, en_aa_val) < 0){
+            DEBUG("Can't write REG_EN_AA\n");
+            return -1;
+        }
+    }
+
+    if (nrf24l01p_read_reg(dev, REG_DYNPD, &dynpd_val) < 0){
+        DEBUG("Can't read REG_DYNPD\n");
+        return -1;
+    }
+
+    if (!(dynpd_val & dpl_mask)){
+        dynpd_val |= dpl_mask;
+        if (nrf24l01p_write_reg(dev, REG_DYNPD, dynpd_val) < 0){
+            DEBUG("Can't write REG_DYNPD\n");
+            return -1;
+        }
+    }
+
+    return 0;
 }
 
 int nrf24l01p_enable_pipe(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe)
@@ -858,6 +940,24 @@ int nrf24l01p_setup_auto_ack(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, nrf24l0
 
     /* setup auto retransmit delay and count */
     return nrf24l01p_write_reg(dev, REG_SETUP_RETR, ((delay_retrans << 4) | count_retrans));
+}
+
+int nrf24l01p_enable_dynamic_ack(nrf24l01p_t *dev)
+{
+    char feature;
+
+    if (nrf24l01p_read_reg(dev, REG_FEATURE, &feature) < 0){
+        DEBUG("Can't read FEATURE reg\n");
+       return -1;
+    }
+    if (!(feature & FEATURE_EN_DYN_ACK)){
+        feature |= FEATURE_EN_DYN_ACK;
+        if (nrf24l01p_write_reg(dev, REG_FEATURE, feature) < 0){
+            DEBUG("Can't write FEATURE reg\n");
+            return -1;
+        }
+    }
+    return 0;
 }
 
 int nrf24l01p_disable_all_auto_ack(nrf24l01p_t *dev)

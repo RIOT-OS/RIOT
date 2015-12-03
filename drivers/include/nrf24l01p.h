@@ -214,6 +214,27 @@ int nrf24l01p_read_payload(nrf24l01p_t *dev, char *answer, unsigned int size);
 void nrf24l01p_register(nrf24l01p_t *dev, unsigned int *pid);
 
 /**
+* @brief Enable dynamic payload for the pipe on give nrf24l01+ transceiver.
+*
+* @param[in] dev    Transceiver device to use.
+* @param[in] pipe   RX pipe for which dynamic payload is enabled
+*
+* @return           0 on success.
+* @return           -1 on error.
+*/
+int nrf24l01p_enable_dynamic_payload(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe);
+
+/**
+* @brief Enable dynamic ack for the nrf24l01+ transceiver.
+*
+* @param[in] dev    Transceiver device to use.
+*
+* @return           0 on success.
+* @return           -1 on error.
+*/
+int nrf24l01p_enable_dynamic_ack(nrf24l01p_t *dev);
+
+/**
 * @brief Unregister the nrf24l01+ transceiver from his ID.
 *
 * @param[in] dev    Transceiver device to use.
@@ -457,6 +478,17 @@ int nrf24l01p_set_rxmode(nrf24l01p_t *dev);
 * @return           -1 on error.
 */
 int nrf24l01p_reset_all_interrupts(nrf24l01p_t *dev);
+
+/**
+* @brief Reset interrupts on the nrf24l01+ transceiver.
+*
+* @param[in] dev    Transceiver device to use.
+* @param[in] intrs  Interrupt mask to reset
+*
+* @return           1 on success.
+* @return           -1 on error.
+*/
+int nrf24l01p_reset_interrupts(nrf24l01p_t *dev, char intrs);
 
 /**
 * @brief Mask one interrupt on the nrf24l01+ transceiver.
