@@ -34,7 +34,6 @@
 #include "periph/spi.h"
 #include "periph/gpio.h"
 #include "net/gnrc/netdev.h"
-#include "at86rf2xx.h"
 
 #ifdef __cplusplus
 extern "C" {
