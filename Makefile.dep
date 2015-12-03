@@ -406,3 +406,7 @@ endif
 ifneq (,$(filter phydat,$(USEMODULE)))
   USEMODULE += fmt
 endif
+
+ifneq (,$(filter prng_%,$(USEMODULE)))
+  USEMODULE += random 
+endif
