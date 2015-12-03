@@ -20,7 +20,8 @@
 
 import os
 
-arm_mcu_groups = ["arm7", "cortex_m0", "cortex_m3_1", "cortex_m3_2", "cortex_m4"]
+arm_mcu_groups = ["arm7", "cortex_m0", "cortex_m3_1", "cortex_m3_2",
+                  "cortex_m4_1", "cortex_m4_2"]
 msp_mcu_groups = ["msp430"]
 x86_mcu_groups = ["x86"]
 avr8_mcu_groups = ["avr8"]

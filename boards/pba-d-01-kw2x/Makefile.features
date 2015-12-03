@@ -14,4 +14,4 @@ FEATURES_PROVIDED += periph_uart
 # Various other features (if any)
 
 # The board MPU family (used for grouping by the CI system)
-FEATURES_MCU_GROUP = cortex_m4
+FEATURES_MCU_GROUP = cortex_m4_1
