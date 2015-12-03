@@ -41,17 +41,29 @@ extern "C" {
 #define USIC_MODE_SSC    (1)    /**< select SSC/SPI mode  */
 
 /**
+ * @brief Input selections
+ * @{
+ */
+#define USIC_DXA     (0)        /**< select data input DXnA  */
+#define USIC_DXB     (1)        /**< select data input DXnB  */
+#define USIC_DXC     (2)        /**< select data input DXnC  */
+#define USIC_DXD     (3)        /**< select data input DXnD  */
+#define USIC_DXE     (4)        /**< select data input DXnE  */
+#define USIC_DXF     (5)        /**< select data input DXnF  */
+#define USIC_DXG     (6)        /**< select data input DXnG  */
+#define USIC_DX_HIGH (7)        /**< select constant 1 input */
+
+/**
  * @brief Struct to hold the configuration values necessary to
  *        initialize a USIC channel
  * @{
  */
 typedef struct {
-    uint32_t ccr;       /**< channel control register           */
-    uint32_t sctr;      /**< shift control register             */
-    uint32_t tcsr;      /**< transmit control/status register   */
-    uint32_t pcr;       /**< protocol control register          */
-    uint32_t inpr;      /**< interrupt node pointer register    */
-    uint8_t dx2_dsel;   /**< data selection for input stage DX2 */
+    uint32_t ccr;           /**< channel control register           */
+    uint32_t sctr;          /**< shift control register             */
+    uint32_t tcsr;          /**< transmit control/status register   */
+    uint32_t pcr;           /**< protocol control register          */
+    uint32_t inpr;          /**< interrupt node pointer register    */
 } usic_mode_t;
 /** @} */
 
@@ -113,6 +125,19 @@ typedef struct __attribute__((packed)) {
 /** @} */
 
 /**
+ * @brief   USIC channel input stages configuration
+ * @{
+ */
+typedef struct __attribute__((packed)) {
+    uint8_t dx0;                    /**< to be written into the lowest byte of DX0CR */
+    uint8_t dx1;                    /**< to be written into the lowest byte of DX1CR */
+    uint8_t dx2;                    /**< to be written into the lowest byte of DX2CR */
+    uint8_t dx3;                    /**< to be written into the lowest byte of DX3CR */
+} usic_dx_t;
+/** @} */
+
+
+/**
  * @brief   UART device configuration
  * @{
  */
@@ -120,6 +145,7 @@ typedef struct __attribute__((packed)) {
     USIC_CH_TypeDef *usic;          /**< pointer to USIC channel                             */
     const usic_mode_t *mode;        /**< pointer to the control mode for this channel        */
     const usic_fifo_t fifo;         /**< configuration of the FIFOs used by this channel     */
+    const usic_dx_t inputs;         /**< configuration of the input stages 0 - 4             */
     const gpio_alt_t tx_pin;        /**< the primary data output pin (MOSI/TX)               */
     const gpio_alt_t rx_pin;        /**< the primary data input pin (MISO/RX)                */
 } uart_instance_t;
@@ -135,12 +161,28 @@ typedef struct __attribute__((packed)) {
     USIC_CH_TypeDef *usic;          /**< pointer to USIC channel                             */
     const usic_mode_t *mode;        /**< pointer to the control mode for this USIC           */
     const usic_fifo_t fifo;         /**< configuration of the FIFOs used by this channel     */
+    const usic_dx_t inputs;         /**< configuration of the input stages 0 - 4             */
     const gpio_alt_t mosi_pin;      /**< MOSI pin                                            */
     const gpio_alt_t miso_pin;      /**< MISO pin                                            */
     const gpio_alt_t sclk_pin;      /**< master shift clock pin (SCLK)                       */
     const gpio_alt_t msls_pin;      /**< master-slave-select pin (slave select)              */
 } spi_instance_t;
 /** @} */
+
+/**
+ * @brief   I2C device configuration
+ * @{
+ */
+typedef struct __attribute__((packed)) {
+    USIC_CH_TypeDef *usic;          /**< pointer to USIC channel                             */
+    const usic_mode_t *mode;        /**< pointer to the control mode for this USIC           */
+    const usic_fifo_t fifo;         /**< configuration of the FIFOs used by this channel     */
+    const usic_dx_t inputs;         /**< configuration of the input stages 0 - 4             */
+    const gpio_alt_t sda_pin;       /**< MOSI pin                                            */
+    const gpio_alt_t scl_pin;       /**< MISO pin                                            */
+} i2c_instance_t;
+/** @} */
+
 
 /**
  * @brief   USIC channel configuration
@@ -150,10 +192,9 @@ typedef struct __attribute__((packed)) {
     USIC_CH_TypeDef *usic;          /**< pointer to USIC channel                             */
     const usic_mode_t *mode;        /**< pointer to the control mode for this USIC           */
     const usic_fifo_t fifo;         /**< configuration of the FIFOs used by this channel     */
+    const usic_dx_t inputs;         /**< configuration of the input stages 0 - 4             */
     const gpio_alt_t tx_pin;        /**< the primary data output pin (MOSI/TX)               */
     const gpio_alt_t rx_pin;        /**< the primary data input pin (MISO/RX)                */
-    const gpio_alt_t sclk_pin;      /**< supplementary pin for master/slave SSC/SPI (clock)  */
-    const gpio_alt_t msls_pin;      /**< supplementary pin for master SSC/SPI (slave select) */
 } usic_channel_t;
 /** @} */
 

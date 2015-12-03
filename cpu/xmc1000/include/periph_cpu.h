@@ -54,7 +54,7 @@ typedef uint16_t gpio_alt_t;
  * @brief   Macro for defining a gpio_alt_t
  * @{
  */
-#define GPIO_ALT(Port, Pin, Out)    ((Out << 8) | (GPIO_PIN(Port, Pin)))
+#define GPIO_ALT(Port, Pin, Out)    (((Out) << 8) | (GPIO_PIN(Port, Pin)))
 /** @} */
 
 /**
@@ -81,9 +81,10 @@ enum {
  */
 #define HAVE_GPIO_DIR_T
 typedef enum {
-    GPIO_DIR_IN      = 0,           /**< configure pin as input */
-    GPIO_DIR_IN_INV  = 4,           /**< configure pin as inverted input */
-    GPIO_DIR_OUT     = 16,          /**< configure pin as output */
+    GPIO_DIR_IN         = 0,    /**< configure pin as input */
+    GPIO_DIR_IN_INV     = 4,    /**< configure pin as inverted input */
+    GPIO_DIR_OUT        = 16,   /**< configure pin as output */
+    GPIO_DIR_OPEN_DRAIN = 24,   /**< configure pin as open-drain output */
 } gpio_dir_t;
 /** @} */
 
@@ -115,7 +116,7 @@ typedef enum {
 typedef enum {
     GPIO_NOPULL   = 0,      /**< do not use internal pull resistors */
     GPIO_PULLDOWN = 1,      /**< enable internal pull-down resistor */
-    GPIO_PULLUP   = 2,      /**< enable internal pull-up resistor */
+    GPIO_PULLUP   = 2,      /**< enable internal pull-up resistor   */
 } gpio_pp_t;
 /** @} */
 

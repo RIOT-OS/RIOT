@@ -32,9 +32,6 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-/* guard file in case no SPI device was specified */
-#if SPI_NUMOF
-
 /**
  * @brief Array holding one pre-initialized mutex for each SPI device
  */
@@ -59,15 +56,15 @@ int spi_init_master(spi_t spi, spi_conf_t conf, spi_speed_t speed)
         /* STEP value: (640/1024) * 32Mhz = 20Mhz base clock */
         .field.step = 640,
         /* DM: fractional divider mode */
-        .field.dm   = 2
+        .field.dm	= 2
     };
 
     usic_brg_t brg = {
         /* (DCTQ+1) x (PCTQ+1) / f[SCLK]: one full phase of clock signal
          * for leading/trailing word delay */
-        .field.ctqsel  = USIC_CTQIN_SCLK,
-        .field.dctq    = 0,
-        .field.pctq    = 0
+        .field.ctqsel	= USIC_CTQIN_SCLK,
+        .field.dctq		= 0,
+        .field.pctq		= 0
     };
 
     /* polarity & phase setting */
@@ -180,7 +177,8 @@ int spi_transfer_bytes(spi_t spi, char *out, char *in, unsigned int length)
 
         spi_transfer_byte(spi, *(out + fini), &in[fini]);
 
-    } else {
+    }
+    else {
 
         for (unsigned int i = 0; i < fini; i++) {
             _spi_put(usic, *(out + i), false);
@@ -274,5 +272,3 @@ int spi_init_slave(spi_t dev, spi_conf_t conf, char (*cb)(char))
 {
     return 0;
 }
-
-#endif /* SPI_NUMOF */

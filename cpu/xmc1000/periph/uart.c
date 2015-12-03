@@ -50,19 +50,19 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
         /* STEP value: (944/1024) * 32Mhz = 29.5Mhz (16 x 1.8432 Mhz) */
         .field.step = 944,
         /* DM: fractional divider mode */
-        .field.dm = 2
+        .field.dm	= 2
     };
 
     const usic_brg_t brg = {
         /* CTQIN: values below relate to f[PDIV] */
-        .field.ctqsel = USIC_CTQIN_PDIV,
+        .field.ctqsel	= USIC_CTQIN_PDIV,
         /* DCTQ: denominator for time quanta counter (8 pulses) */
-        .field.dctq   = 7,
+        .field.dctq		= 7,
         /* PCTQ: pre-divider for time quanta counter (1) */
-        .field.pctq   = 0,
+        .field.pctq		= 0,
         /* PDIV: divider factor to generate f[PDIV] */
-        .field.pdiv   = ((((DCO1_FREQUENCY / 2) / 1024) * fdr.field.step) /
-                         (baudrate * (brg.field.dctq + 1)))
+        .field.pdiv		= ((((DCO1_FREQUENCY / 2) / 1024) * fdr.field.step) /
+                           (baudrate * (brg.field.dctq + 1)))
     };
 
     /* register receive callback */

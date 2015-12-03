@@ -85,8 +85,6 @@ static const usic_mode_t _xmc_usic_ssc_master_mode = {
         /* select output: the corresponding SELOx line can be activated */
         (1 <<  USIC_CH_PCR_SSCMode_SELO_Pos),
 
-    .dx2_dsel = 7,
-
     .inpr =
         /* no interrupts for SPI */
         0
