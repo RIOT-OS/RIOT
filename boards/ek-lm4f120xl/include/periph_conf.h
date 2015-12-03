@@ -93,6 +93,41 @@ extern "C" {
 #define UART_1_ISR          isr_uart1
 /** @} */
 
+/**
+ * @name PWM configuration
+ * @{
+ */
+#define PWM_NUMOF           (8)
+#define PWM_0_EN            1
+#define PWM_1_EN            1
+#define PWM_2_EN            1
+#define PWM_3_EN            1
+#define PWM_4_EN            1
+#define PWM_5_EN            1
+#define PWM_6_EN            1
+#define PWM_7_EN            1
+#define PWM_MAX_CHANNELS    1
+/** @} */
+
+/**
+ * @name ADC configuration
+ * @{
+ */
+#define ADC_NUMOF 1
+#define ADC_0_EN 1
+#define ADC_MAX_CHANNELS    12
+/** @} */
+
+/**
+ * @name SPI configuration
+ * @{
+ */
+#define SPI_NUMOF 1
+#define SPI_0_EN 1
+
+/** @} */
+
+
 #ifdef __cplusplus
 }
 #endif
