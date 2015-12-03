@@ -41,7 +41,7 @@ static void set_system_clock(void)
     }
     while ((HSE_status == 0) && (startup_counter != HSE_STARTUP_TIMEOUT));
 
-    if ((RCC->CR & RCC_CR_HSERDY) != RESET) {
+    if (!(RCC->CR & RCC_CR_HSERDY)) {
         HSE_status = (uint32_t)0x01;
     }
     else {
