@@ -193,8 +193,24 @@ int pwm_set(pwm_t dev, int channel, unsigned int value)
         value = (unsigned int) tim->ARR;
     }
 
-    /* calculate the c/c offset, and set the value */
-    *((&(tim->CCR1)) + (channel * 2)) = value;
+    /* set the PWM value to the channel comperator */
+    switch (channel)
+    {
+    case 0:
+        tim->CCR1 = value;
+        break;
+    case 1:
+        tim->CCR2 = value;
+        break;
+    case 2:
+        tim->CCR3 = value;
+        break;
+    case 3:
+        tim->CCR4 = value;
+        break;
+    default:
+        return -1;
+    }
 
     return 0;
 }
