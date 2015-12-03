@@ -835,7 +835,7 @@ int _netif_send(int argc, char **argv)
     kernel_pid_t dev;
     uint8_t addr[MAX_ADDR_LEN];
     size_t addr_len;
-    gnrc_pktsnip_t *pkt;
+    gnrc_pktsnip_t *pkt, *hdr;
     gnrc_netif_hdr_t *nethdr;
     uint8_t flags = 0x00;
 
@@ -867,15 +867,22 @@ int _netif_send(int argc, char **argv)
 
     /* put packet together */
     pkt = gnrc_pktbuf_add(NULL, argv[3], strlen(argv[3]), GNRC_NETTYPE_UNDEF);
-    pkt = gnrc_pktbuf_add(pkt, NULL, sizeof(gnrc_netif_hdr_t) + addr_len,
-                          GNRC_NETTYPE_NETIF);
-    nethdr = (gnrc_netif_hdr_t *)pkt->data;
-    gnrc_netif_hdr_init(nethdr, 0, addr_len);
-    gnrc_netif_hdr_set_dst_addr(nethdr, addr, addr_len);
+    if (pkt == NULL) {
+        puts("error: packet buffer full");
+        return 1;
+    }
+    hdr = gnrc_netif_hdr_build(NULL, 0, addr, addr_len);
+    if (hdr == NULL) {
+        puts("error: packet buffer full");
+        gnrc_pktbuf_release(pkt);
+        return 1;
+    }
+    LL_PREPEND(pkt, hdr);
+    nethdr = (gnrc_netif_hdr_t *)hdr->data;
     nethdr->flags = flags;
     /* and send it */
     if (gnrc_netapi_send(dev, pkt) < 1) {
-        puts("error: unable to send\n");
+        puts("error: unable to send");
         gnrc_pktbuf_release(pkt);
         return 1;
     }
