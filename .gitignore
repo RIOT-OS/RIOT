@@ -37,3 +37,15 @@ _sketches.cpp
 
 # local override files
 Makefile.local
+
+# downloaded package sources
+pkg/cmsis-dsp/cmsis-dsp
+pkg/libcoap/libcoap
+pkg/libfixmath/libfixmath
+pkg/microcoap/microcoap
+pkg/micro-ecc/micro-ecc
+pkg/oonf_api/oonf_api
+pkg/openwsn/openwsn
+pkg/relic/relic
+pkg/tlsf/tlsf
+pkg/wakaama/wakaama
