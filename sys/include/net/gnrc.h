@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    net_gnrc    Generic (gnrc) network stack.
+ * @defgroup    net_gnrc    Generic (gnrc) network stack
  * @ingroup     net
  * @brief       RIOT's modular default IP network stack.
  * @{
