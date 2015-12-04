@@ -27,16 +27,21 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-#define FREQUENCY       (100U)
-#define RESOLUTION      (SEC_IN_USEC / FREQUENCY)
+#ifndef SERVO_FREQUENCY
+#define SERVO_FREQUENCY       (100U)
+#endif
+
+#ifndef SERVO_RESOLUTION
+#define SERVO_RESOLUTION      (SEC_IN_USEC / SERVO_FREQUENCY)
+#endif
 
 int servo_init(servo_t *dev, pwm_t pwm, int pwm_channel, unsigned int min, unsigned int max)
 {
     int actual_frequency;
 
-    actual_frequency = pwm_init(pwm, PWM_LEFT, FREQUENCY, RESOLUTION);
+    actual_frequency = pwm_init(pwm, PWM_LEFT, SERVO_FREQUENCY, SERVO_RESOLUTION);
 
-    DEBUG("servo: requested %d hz, got %d hz\n", FREQUENCY, actual_frequency);
+    DEBUG("servo: requested %d hz, got %d hz\n", SERVO_FREQUENCY, actual_frequency);
 
     if (actual_frequency < 0) {
         /* PWM error */
@@ -78,7 +83,7 @@ int servo_init(servo_t *dev, pwm_t pwm, int pwm_channel, unsigned int min, unsig
      * to actual hardware ticks.
      */
     dev->scale_nom = actual_frequency;
-    dev->scale_den = FREQUENCY;
+    dev->scale_den = SERVO_FREQUENCY;
 
     return 0;
 }
