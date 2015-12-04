@@ -150,8 +150,7 @@ int _icmpv6_ping(int argc, char **argv)
     ipv6_addr_t addr;
     msg_t msg;
     gnrc_netreg_entry_t *ipv6_entry, my_entry = { NULL, ICMPV6_ECHO_REP,
-                                                  thread_getpid()
-                                                };
+                                                  thread_getpid() };
     uint32_t min_rtt = UINT32_MAX, max_rtt = 0;
     uint64_t sum_rtt = 0;
     uint64_t ping_start;
@@ -182,8 +181,13 @@ int _icmpv6_ping(int argc, char **argv)
         stat_interval = atoi(argv[4 + param_offset]);
     }
 
-    if ((ipv6_addr_from_str(&addr, addr_str) == NULL) || (((int)payload_len) < 0)) {
+    if ((int)payload_len < 0) {
         usage(argv);
+        return 1;
+    }
+
+    if (ipv6_addr_from_str(&addr, addr_str) == NULL) {
+        puts("error: malformed address");
         return 1;
     }
 
