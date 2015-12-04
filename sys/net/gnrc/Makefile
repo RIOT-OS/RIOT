@@ -109,5 +109,8 @@ endif
 ifneq (,$(filter gnrc_zep,$(USEMODULE)))
     DIRS += application_layer/zep
 endif
+ifneq (,$(filter gnrc_tftp,$(USEMODULE)))
+    DIRS += application_layer/tftp
+endif
 
 include $(RIOTBASE)/Makefile.base
