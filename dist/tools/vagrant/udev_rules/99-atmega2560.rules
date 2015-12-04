@@ -1,0 +1,1 @@
+SUBSYSTEM=="usb", ATTR{idVendor}=="2341", ATTR{idProduct}=="0042", MODE="0666", OWNER="vagrant"

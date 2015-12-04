@@ -49,3 +49,6 @@ pkg/openwsn/openwsn
 pkg/relic/relic
 pkg/tlsf/tlsf
 pkg/wakaama/wakaama
+
+# Vagrant
+.vagrant
