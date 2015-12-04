@@ -20,7 +20,7 @@
  *
  * @section sec_usage General usage
  *
- * To run you Arduino sketch in RIOT, just follow these steps:
+ * To run your Arduino sketch in RIOT, just follow these steps:
  *
  * -# create an empty application
  * -# add the `arduino` module to your application, your `Makefile` should now
@@ -35,7 +35,7 @@
  * include $(RIOTBASE)/Makefile.include
  * @endcode
  *
- * -# copy you Arduino sktech(es) into your application folder. Currently they
+ * -# copy your Arduino sktech(es) into your application folder. Currently they
  *    must have the file ending `*.sketch` to be processed.
  * -# build, flash, and run your application the usual RIOT-way: simply call
  *    `make all`, `make flash`, `make term`, etc.
@@ -87,7 +87,7 @@
  *
  * @note As prerequisite, the board must have support for C++.
  *
- * To add Arduino support to a board, it has to provice the following:
+ * To add Arduino support to a board, it has to provide the following:
  *
  * In `RIOT/board/BOARD/include/arduino_board.h`:
  * - a mapping of GPIO pins to Arduino pin numbers named `arduino_pinmap`, e.g.
@@ -112,9 +112,9 @@
  * @endcode
  *   This links to the third entry in the `arduino_pinmap` array.
  *
- * In addition, you have to add the 'arduino' feature to the board. for this,
+ * In addition, you have to add the 'arduino' feature to the board. For this,
  * just add `FEATURES_PROVIDED += arduino` to the 'other features' section in
- * your boards `Makefile.features'.
+ * your board's `Makefile.features'.
  *
  * That's it, your board can now run Ardunio sketches.
  *
