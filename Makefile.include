@@ -3,6 +3,10 @@
 
 all:
 
+all-debug: export CFLAGS += -g -O0
+
+all-debug: all
+
 # set undefined variables
 RIOTBASE ?= $(shell dirname "$(lastword $(MAKEFILE_LIST))")
 RIOTBASE := $(abspath $(RIOTBASE))
