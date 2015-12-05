@@ -159,6 +159,30 @@ static const uart_conf_t uart_config[] = {
 #define I2C_0_SDA_PIN       GPIO_PIN(PORT_B,7)
 /** @} */
 
+/**
+ * @brief PWM configuration
+ * @{
+ */
+#define PWM_NUMOF           (1U)
+#define PWM_0_EN            1
+
+#define PWM_MAX_CHANNELS    4
+
+/* PWM 0 device configuration */
+#define PWM_0_DEV           TIM4
+#define PWM_0_CHANNELS      4
+#define PWM_0_CLK           (36000000U)
+#define PWM_0_CLKEN()       (RCC->APB1ENR |= RCC_APB1ENR_TIM4EN)
+#define PWM_0_CLKDIS()      (RCC->APB1ENR &= ~(RCC_APB1ENR_TIM4EN))
+/* PWM 0 pin configuration */
+#define PWM_0_PORT          GPIOB
+#define PWM_0_PORT_CLKEN()  (RCC->APB2ENR |= RCC_APB2ENR_IOPBEN)
+#define PWM_0_PIN_CH0       6
+#define PWM_0_PIN_CH1       7
+#define PWM_0_PIN_CH2       8
+#define PWM_0_PIN_CH3       9
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif

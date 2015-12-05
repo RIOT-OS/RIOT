@@ -81,13 +81,21 @@ int pwm_init(pwm_t dev, pwm_mode_t mode, unsigned int frequency, unsigned int re
 #endif
     }
 
-    /* setup pins for high speed alternate function */
+    /* setup pins for high speed alternate function
+     *
+     * The pin configuration can be found on page 171:
+     *  http://www.st.com/web/en/resource/technical/document/reference_manual/CD00171190.pdf
+     */
     for (int i = 0; i < channels; i++) {
+
         /* calculate where the MODE and CNF must be updated */
         port->CR[pins[i] >= 8] &= ~(0xfl << (4 * (pins[i] - ((pins[i] >= 8) * 8))));
         port->CR[pins[i] >= 8] |= (0xbl << (4 * (pins[i] - ((pins[i] >= 8) * 8))));
     }
 
+    /* alternative function mapping can be found on page 178
+     * http://www.st.com/web/en/resource/technical/document/reference_manual/CD00171190.pdf
+     */
 #if PWM_0_PERIPH_AF || PWM_1_PERIPH_AF
     /* timer 12 to 14 and timer 9 to 15 must be re-mapped on MAPR2 register of AFIO */
     __IO uint32_t *MAPR = &(AFIO->MAPR);
