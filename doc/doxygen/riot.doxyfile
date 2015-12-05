@@ -815,27 +815,44 @@ EXCLUDE_SYMLINKS       = NO
 # exclude all test directories for example use the pattern */test/*
 
 EXCLUDE_PATTERNS       = */board/*/tools/* \
+                         */boards/*/include/arduino_pinmap.h \
+                         */boards/chronos/drivers/include/display.h \
+                         */boards/*/include/periph_conf.h \
+                         */boards/*/include/board.h \
                          */cpu/*/include/component/* \
                          */cpu/*/include/instance/* \
                          */cpu/*/include/pio/* \
                          */cpu/*/include/atmel/* \
                          */cpu/sam3/include/sam3* \
                          */cpu/sam3/include/system_sam*.h \
+                         */cpu/arm7_common/include/arm7_common.h \
+                         */cpu/arm7_common/include/VIC.h \
                          */cpu/lpc*/include/core_cm*.h \
                          */cpu/cortexm_common/include/core_cm*.h \
+                         */cpu/stellaris_common/include/* \
                          */cpu/stm32f*/include/stm32f* \
-                         */drivers/nrf24l01p/include/nrf24l01p_settings.h \
                          */cpu/nrf51/include/nrf51*.h \
                          */cpu/lpc1768/include/LPC17xx.h \
                          */cpu/lpc11u34/include/LPC11Uxx.h \
-                         */boards/*/include/periph_conf.h \
+                         */cpu/lpc2387/include/lpc23xx.h \
+                         */cpu/lpc2387/include/lpc2387.h \
                          */cpu/x86/include/x86_pci.h \
+                         */cpu/x86/include/x86_registers.h \
                          */cpu/stm32l1/include/stm32l1xx.h \
+                         */cpu/stm32f0/include/stm32f091xc.h \
                          */cpu/k60/include/MK60D10.h \
                          */cpu/k60/include/MK60DZ10.h \
                          */cpu/kw2x/include/MKW22D5.h \
                          */cpu/k64f/include/MK64F12.h \
                          */cpu/ezr32wg/include/ezr* \
+                         */cpu/*/include/*[_-]regs.h \
+                         */cpu/native/include/native_internal.h \
+                         */drivers/nrf24l01p/include/nrf24l01p_settings.h \
+                         */drivers/at86rf2xx/include/at86rf2xx_registers.h \
+                         */drivers/*/include/*[_-]internal.h \
+                         */drivers/*/include/*[_-]reg.h \
+                         */drivers/*/include/*[_-]regs.h \
+                         */drivers/encx24j600/include/encx24j600_defines.h \
 
 
 # The EXCLUDE_SYMBOLS tag can be used to specify one or more symbol names

@@ -10,6 +10,10 @@ html:
 man:
 	( cat riot.doxyfile ; echo "GENERATE_MAN = yes" ) | doxygen -
 
+.PHONY: xml
+xml:
+	( cat riot.doxyfile ; echo "GENERATE_XML = yes" ) | doxygen -
+
 .PHONY:
 latex:
 	( cat riot.doxyfile ; echo "GENERATE_LATEX= yes" ) | doxygen -

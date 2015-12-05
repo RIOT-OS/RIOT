@@ -15,6 +15,9 @@ doc-man:
 doc-latex:
 	"$(MAKE)" -BC doc/doxygen latex
 
+doc-xml:
+	"$(MAKE)" -BC doc/doxygen xml
+
 docclean:
 	"$(MAKE)" -BC doc/doxygen clean
 
