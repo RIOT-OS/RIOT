@@ -759,6 +759,7 @@ INPUT                  = ../../doc.txt \
                          ../../boards \
                          ../../drivers \
                          ../../sys \
+                         ../../pkg \
                          src/ \
                          src/mainpage.md \
                          src/getting-started.md
@@ -836,6 +837,8 @@ EXCLUDE_PATTERNS       = */board/*/tools/* \
                          */cpu/kw2x/include/MKW22D5.h \
                          */cpu/k64f/include/MK64F12.h \
                          */cpu/ezr32wg/include/ezr* \
+                         */pkg/*/*/* \
+                         */pkg/tlsf/patch.txt \
 
 
 # The EXCLUDE_SYMBOLS tag can be used to specify one or more symbol names
