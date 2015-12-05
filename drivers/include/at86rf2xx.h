@@ -358,7 +358,7 @@ uint8_t at86rf2xx_get_csma_max_retries(at86rf2xx_t *dev);
  * Valid values: 0 to 5, -1 means CSMA disabled
  *
  * @param[in] dev           device to write to
- * @param[in] max           the maximum number of retries
+ * @param[in] retries       the maximum number of retries
  */
 void at86rf2xx_set_csma_max_retries(at86rf2xx_t *dev, int8_t retries);
 
