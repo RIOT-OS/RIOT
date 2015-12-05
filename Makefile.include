@@ -3,6 +3,9 @@
 
 all:
 
+all-debug: export ALL_DEBUG_BUILD=1
+all-debug: all
+
 # set undefined variables
 RIOTBASE ?= $(shell dirname "$(lastword $(MAKEFILE_LIST))")
 RIOTBASE := $(abspath $(RIOTBASE))

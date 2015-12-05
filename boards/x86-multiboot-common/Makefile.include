@@ -53,5 +53,4 @@ BASELIBS += $(NEWLIB_BASE)/lib/libc.a \
 
 all:
 
-all-debug: export CFLAGS += -ggdb3 -O0
-all-debug: all
+all-debug: export CFLAGS += -ggdb3

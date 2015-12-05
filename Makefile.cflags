@@ -66,3 +66,20 @@ endif
 ifeq ($(origin ARFLAGS),default)
   ARFLAGS = rcs
 endif
+
+# check if we want to make a build without any optimization
+ifeq (1,$(ALL_DEBUG_BUILD))
+  CFLAGS += -g3 -gdwarf-3
+
+  # we may only disable optimization if it's not prohibited
+  ifneq (1,$(MUST_OPTIMIZE))
+    # check if the compiler supports optimize for debug
+    ifeq ($(shell $(CC) -Og -E - 2>/dev/null >/dev/null </dev/null; echo $$?),0)
+      CFLAGS += -Og
+      LINKFLAGS += -Og
+    else
+      CFLAGS += -O0
+      LINKFLAGS += -O0
+    endif
+  endif
+endif
