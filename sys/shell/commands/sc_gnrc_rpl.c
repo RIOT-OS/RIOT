@@ -203,12 +203,11 @@ int _gnrc_rpl_dodag_show(void)
         cleanup = dodag->instance->cleanup < 0 ? 0 : dodag->instance->cleanup;
 
         printf("\tdodag [%s | R: %d | OP: %s | CL: %" PRIi8 "s | "
-               "TR(I=[%d,%d], k=%d, c=%d, TC=%" PRIu32 "%" PRIu32 "s, TI=%" PRIu32 "%" PRIu32 "s)]\n",
+               "TR(I=[%d,%d], k=%d, c=%d, TC=%" PRIu32 "s, TI=%" PRIu32 "s)]\n",
                ipv6_addr_to_str(addr_str, &dodag->dodag_id, sizeof(addr_str)),
                dodag->my_rank, (dodag->node_status == GNRC_RPL_LEAF_NODE ? "Leaf" : "Router"),
                cleanup, (1 << dodag->dio_min), dodag->dio_interval_doubl, dodag->trickle.k,
-               dodag->trickle.c, (uint32_t) (tc >> 32), (uint32_t) (tc & 0xFFFFFFFF),
-               (uint32_t) (ti >> 32), (uint32_t) (ti & 0xFFFFFFFF));
+               dodag->trickle.c, (uint32_t) (tc & 0xFFFFFFFF), (uint32_t) (ti & 0xFFFFFFFF));
 
         gnrc_rpl_parent_t *parent;
         LL_FOREACH(gnrc_rpl_instances[i].dodag.parents, parent) {
