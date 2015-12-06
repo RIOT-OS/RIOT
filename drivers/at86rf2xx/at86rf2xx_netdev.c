@@ -234,12 +234,11 @@ static int _get(netdev2_t *netdev, netopt_t opt, void *val, size_t max_len)
     /* getting these options doesn't require the transceiver to be responsive */
     switch (opt) {
         case NETOPT_CHANNEL_PAGE:
-            if (max_len < sizeof(uint16_t)) {
+            if (max_len < sizeof(uint8_t)) {
                 return -EOVERFLOW;
             }
-            ((uint8_t *)val)[1] = 0;
-            ((uint8_t *)val)[0] = at86rf2xx_get_page(dev);
-            return sizeof(uint16_t);
+            *((uint8_t *)val) = at86rf2xx_get_page(dev);
+            return sizeof(uint8_t);
 
         case NETOPT_MAX_PACKET_SIZE:
             if (max_len < sizeof(int16_t)) {
@@ -445,7 +444,7 @@ static int _set(netdev2_t *netdev, netopt_t opt, void *val, size_t len)
             break;
 
         case NETOPT_CHANNEL_PAGE:
-            if (len != sizeof(uint16_t)) {
+            if (len != sizeof(uint8_t)) {
                 res = -EINVAL;
             }
             else {
@@ -456,7 +455,7 @@ static int _set(netdev2_t *netdev, netopt_t opt, void *val, size_t len)
                 }
                 else {
                     at86rf2xx_set_page(dev, page);
-                    res = sizeof(uint16_t);
+                    res = sizeof(uint8_t);
                 }
 #else
                 /* rf23x only supports page 0, no need to configure anything in the driver. */
@@ -464,7 +463,7 @@ static int _set(netdev2_t *netdev, netopt_t opt, void *val, size_t len)
                     res = -EINVAL;
                 }
                 else {
-                    res = sizeof(uint16_t);
+                    res = sizeof(uint8_t);
                 }
 #endif
             }
