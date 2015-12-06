@@ -1,5 +1,5 @@
 # name of your application
-APPLICATION = gnrc_networking
+APPLICATION = dtls
 
 # If no BOARD is found in the environment, use this default:
 BOARD ?= native
