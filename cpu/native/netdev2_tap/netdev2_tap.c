@@ -162,6 +162,12 @@ int _get(netdev2_t *dev, netopt_t opt, void *value, size_t max_len)
         case NETOPT_IS_WIRED:
             res = 1;
             break;
+        case NETOPT_MAX_PACKET_SIZE:
+            assert(max_len >= 2);
+            uint16_t *val = (uint16_t*) value;
+            *val = ETHERNET_DATA_LEN;
+            res = sizeof(uint16_t);
+            break;
         default:
             res = -ENOTSUP;
             break;
