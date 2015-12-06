@@ -426,6 +426,9 @@ int _get(netdev2_t *dev, netopt_t opt, void *value, size_t max_len)
             break;
         case NETOPT_IPV6_IID:
             return _get_iid(dev, value, max_len);
+        case NETOPT_IS_WIRED:
+            res = 1;
+            break;
         case NETOPT_MAX_PACKET_SIZE:
             assert(max_len >= 2);
             uint16_t *val = (uint16_t*) value;
