@@ -203,7 +203,7 @@ static int spi_init(spi_t dev, spi_conf_t conf, spi_speed_t speed,
 
     /* Set GPIO config to slave */
     gpio_dir_t gpioModeMosi = GPIO_DIR_INPUT;
-    gpio_dir_t gpioModeMiso = GPIO_DIR_PUSH_PULL;
+    gpio_dir_t gpioModeMiso = GPIO_DIR_PUSH_PULL_DRIVE;
 //	gpio_dir_t gpioModeCs = GPIO_DIR_INPUT;
     gpio_dir_t gpioModeClk = GPIO_DIR_INPUT;
 
@@ -215,10 +215,10 @@ static int spi_init(spi_t dev, spi_conf_t conf, spi_speed_t speed,
         /* CS should be manually triggered */
 //		spi->CTRL |= USART_CTRL_AUTOCS;
         /* Set GPIO config to master */
-        gpioModeMosi = GPIO_DIR_PUSH_PULL;
+        gpioModeMosi = GPIO_DIR_PUSH_PULL_DRIVE;
         gpioModeMiso = GPIO_DIR_INPUT;
 //		gpioModeCs = GPIO_DIR_PUSH_PULL;
-        gpioModeClk = GPIO_DIR_PUSH_PULL;
+        gpioModeClk = GPIO_DIR_PUSH_PULL_DRIVE;
     } else {
         /* Enabling TX and RX */
         spi->CMD = USART_CMD_MASTERDIS | USART_CMD_TXEN | USART_CMD_RXEN;

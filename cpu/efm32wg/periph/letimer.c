@@ -26,13 +26,12 @@
 #include "thread.h"
 #include "periph_conf.h"
 #include "periph/timer.h"
+#include "cpu_conf.h"
 #include "../emlib/inc/em_letimer.h"
 #include "../emlib/inc/em_cmu.h"
 #include "../emlib/inc/em_usart.h"
+#define ENABLE_DEBUG (1)
 #include "debug.h"
-
-#define ENABLE_DEBUG 1
-
 
 volatile uint16_t CNT;
 volatile uint32_t CC0;
@@ -53,7 +52,7 @@ timer_conf_t config[TIMER_NUMOF];
 
 int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
 {
-	DEBUG(" timer_init() ticks_per_us=%u\n", ticks_per_us);
+    DEBUG("%s: ticks_per_us=%u\n", __func__, ticks_per_us);
 	CC0 = 0;
 	CC1 = 0;
 	CC0_FLAG = 0;
@@ -132,7 +131,7 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
 
 int timer_clear(tim_t dev, int channel)
 {
-	DEBUG(" timer_clear() channel=%i\n", channel);
+	DEBUG("%s: channel=%i\n", __func__, channel);
 	switch (channel){
 	case 0:
 		LETIMER0->IEN &= ~_LETIMER_IEN_COMP0_MASK;
@@ -156,32 +155,32 @@ unsigned int timer_read(tim_t dev)
 
 void timer_start(tim_t dev)
 {
-    DEBUG(" timer_start()\n");
+    DEBUG("%s: \n", __func__);
 	LETIMER0->CMD |= _LETIMER_CMD_START_MASK;
 }
 
 void timer_stop(tim_t dev)
 {
-	DEBUG(" timer_stop()\n");
+	DEBUG("%s:\n", __func__);
     LETIMER0->CMD |= _LETIMER_CMD_STOP_MASK;
 }
 
 void timer_irq_enable(tim_t dev)
 {
-	DEBUG(" timer_irq_enable()\n");
+	DEBUG("%s:\n", __func__);
 	NVIC_EnableIRQ(LETIMER0_IRQn);
 
 }
 
 void timer_irq_disable(tim_t dev)
 {
-	DEBUG(" timer_irq_disable()\n");
+	DEBUG("%s:\n", __func__);
 	NVIC_DisableIRQ(LETIMER0_IRQn);
 }
 
 void timer_reset(tim_t dev)
 {
-	DEBUG(" timer_reset()\n");
+	DEBUG("%s:\n", __func__);
 	CNT = 0;
 	LETIMER0->CNT = 0xffff;
 }
@@ -190,40 +189,43 @@ void LETIMER0_IRQHandler(void){
 	if(LETIMER0->IF & _LETIMER_IF_UF_MASK){
 		LETIMER0->IFC |= _LETIMER_IF_UF_MASK;
 		++CNT;
+		puts("interrupt");
 		uint32_t cnt = timer_read(0);
 		if(CC0_FLAG){
 			if((CC0 - cnt) >= 0xffff){
 				CC0 -= 0xffff;
-				DEBUG(" cc0 set");
+				DEBUG("%s: cc0 set\n", __func__);
 			} else {
 				LETIMER0->COMP0 = (CC0^0xffff)&0xffff;
 				LETIMER0->IFC |= _LETIMER_IFC_COMP0_MASK;
 				LETIMER0->IEN |= _LETIMER_IEN_COMP0_MASK;
 				CC0_FLAG = 0;
-				DEBUG(" comp0 set");
+				DEBUG("%s: comp0 set\n", __func__);
 			}
 		}
 		if(CC1_FLAG){
 			if((CC1 - cnt) >= 0xffff){
 				CC1 -= 0xffff;
-				DEBUG(" cc1 set");
+				DEBUG("%s: cc1 set\n", __func__);
 			} else {
 				LETIMER0->COMP1 = (CC1^0xffff)&0xffff;
 				LETIMER0->IFC |= _LETIMER_IFC_COMP1_MASK;
 				LETIMER0->IEN |= _LETIMER_IEN_COMP1_MASK;
 				CC1_FLAG = 0;
-				DEBUG(" comp1 set");
+				DEBUG("%s: comp1 set\n", __func__);
 			}
 		}
 	} else if (LETIMER0->IF & _LETIMER_IF_COMP0_MASK){
 		LETIMER0->IFC |= _LETIMER_IFC_COMP0_MASK;
 		LETIMER0->IEN &= ~_LETIMER_IEN_COMP0_MASK;
 		CC0_FLAG = 0;
+		DEBUG("%s: callback\n", __func__);
 		config[TIMER_0].cb(0);
 	} else if (LETIMER0->IF & _LETIMER_IF_COMP1_MASK){
 		LETIMER0->IFC |= _LETIMER_IFC_COMP1_MASK;
 		LETIMER0->IEN &= ~_LETIMER_IEN_COMP1_MASK;
 		CC1_FLAG = 0;
+		DEBUG("%s: callback\n", __func__);
 		config[TIMER_0].cb(1);
 	}
 	if (sched_context_switch_request) {

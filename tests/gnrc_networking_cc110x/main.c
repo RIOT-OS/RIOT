@@ -24,16 +24,24 @@
 #include "msg.h"
 
 #include "cpu_conf.h"
+#include "xtimer.h"
+
 
 #define MAIN_QUEUE_SIZE     (20)
 static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
 
 extern int udp_cmd(int argc, char **argv);
 
+int timer_sleep(__attribute__((unused)) int argc, __attribute__((unused)) char **argv){
+    xtimer_sleep(1);
+    return 0;
+}
+
 extern char ajdi[CPUID_ID_LEN];
 
 static const shell_command_t shell_commands[] = {
     { "udp", "send data over UDP and listen on UDP ports", udp_cmd },
+    { "timer", "sleep loop", timer_sleep },
     { NULL, NULL, NULL }
 };
 
@@ -43,6 +51,17 @@ int main(void)
      * receive potentially fast incoming networking packets */
     msg_init_queue(_main_msg_queue, MAIN_QUEUE_SIZE);
     puts("\n\tRIOT network stack example application\n");
+
+    xtimer_usleep(100000);
+    xtimer_usleep(100000);
+    xtimer_usleep(100000);
+    xtimer_usleep(100000);
+    xtimer_usleep(100000);
+    xtimer_usleep(100000);
+    xtimer_usleep(100000);
+    xtimer_usleep(100000);
+    xtimer_usleep(100000);
+    xtimer_usleep(100000);
 
     /* start shell */
     puts("All up, running the shell now");
