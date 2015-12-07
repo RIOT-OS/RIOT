@@ -22,19 +22,13 @@
 #include "periph/dac.h"
 #include "periph_conf.h"
 
-/* guard in case that no DAC device is defined */
-#if DAC_NUMOF
-
-#define DAC_MAX_12BIT 0x0fff
-
-typedef struct {
-    uint8_t shift_mod;
-} dac_config_t;
-
-dac_config_t dac_config[DAC_NUMOF];
-
-int8_t dac_init(dac_t dev, dac_precision_t precision)
+int8_t dac_init(dac_t dev)
 {
+    if (line >= DAC_NUMOF) {
+        return -1;
+    }
+
+
     DAC_TypeDef *dac = 0;
     dac_poweron(dev);
 
@@ -160,7 +154,3 @@ uint16_t dac_mapf(dac_t dev, float value, float min, float max)
     uint16_t val_12_bit = ((value - min) * DAC_MAX_12BIT)/(max-min);
     return val_12_bit >> dac_config[dev].shift_mod;
 }
-
-#undef DAC_MAX_12BIT
-
-#endif /* DAC_NUMOF */

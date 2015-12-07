@@ -218,6 +218,26 @@ enum {
     ADC_UNDEFINED           /**< Deprecated symbol, use ADC_UNDEF instead */
 };
 
+/**
+ * @brief   Legacy definition of DAC devices
+ * @deprecated
+ */
+enum {
+#if DAC_0_EN
+    DAC_0 = 0,              /**< DAC device 0 */
+#endif
+#if DAC_1_EN
+    DAC_1 = 1,              /**< DAC device 1 */
+#endif
+#if DAC_2_EN
+    DAC_2 = 2,              /**< DAC device 2 */
+#endif
+#if DAC_3_EN
+    DAC_3 = 3,              /**< DAC device 3 */
+#endif
+    DAC_UNDEFINED           /**< Deprecated symbol, use DAC_UNDEF instead */
+} dac_t;
+
 #ifdef __cplusplus
 }
 #endif

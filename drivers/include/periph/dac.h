@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014 Simon Brummer
+ *               2015 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -13,59 +14,64 @@
  *
  * @{
  * @file
- * @brief       Low-level DAC peripheral driver interface definitions
+ * @brief       Low-level DAC peripheral driver interface definition
  *
  * @author      Simon Brummer <simon.brummer@haw-hamburg.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef DAC_H
-#define DAC_H
+#ifndef PERIPH_DAC_H
+#define PERIPH_DAC_H
 
 #include <stdint.h>
+
+#include "periph_cpu.h"
 #include "periph_conf.h"
+/* TODO: remove once all platforms are ported to this interface */
+#include "periph/dev_enums.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/* guard file in case no DAC device is defined */
-#if DAC_NUMOF
-
 /**
- * @brief Definition avialable DAC devices
- *
- * Each DAC device is based on a hardware DAC which can have one or more
- * independet channels.
+ * @brief   Make sure the number of available DAC lines is defined
+ * @{
  */
-typedef enum {
-#if DAC_0_EN
-    DAC_0 = 0,             /**< DAC device 0 */
+#ifndef DAC_NUMOF
+#define "DAC_NUMOF undefined"
 #endif
-#if DAC_1_EN
-    DAC_1 = 1,             /**< DAC device 1 */
-#endif
-#if DAC_2_EN
-    DAC_2 = 2,             /**< DAC device 2 */
-#endif
-#if DAC_3_EN
-    DAC_3 = 3,             /**< DAC device 3 */
-#endif
-} dac_t;
+/** @} */
 
 /**
- * @brief Possilbe DAC precision settings
+ * @brief   Define default DAC type identifier
+ * @{
  */
-typedef enum {
-    DAC_RES_6BIT = 0,      /**< DAC precision: 6 bit */
-    DAC_RES_8BIT,          /**< DAC precision: 8 bit */
-    DAC_RES_10BIT,         /**< DAC precision: 10 bit */
-    DAC_RES_12BIT,         /**< DAC precision: 12 bit */
-    DAC_RES_14BIT,         /**< DAC precision: 14 bit */
-    DAC_RES_16BIT,         /**< DAC precision: 16 bit */
-} dac_precision_t;
+#ifndef HAVE_DAC_T
+typedef unsigned int dac_t;
+#endif
+/** @} */
 
 /**
- * @brief Initialization of a given DAC device
+ * @brief   Default DAC undefined value
+ * @{
+ */
+#ifndef DAC_UNDEF
+#define DAC_UNDEF           (0xffff)
+#endif
+/** @} */
+
+/**
+ * @brief   Default DAC access macro
+ * @{
+ */
+#ifndef DAC_LINE
+#define DAC_LINE(x)         (x)
+#endif
+/** @} */
+
+/**
+ * @brief   Initialize the given DAC line
  *
  * The DAC will be initialized with all possilble channels active.
  * On each channel will be initialized with a Zero on it.
@@ -77,7 +83,7 @@ typedef enum {
  * @return                 -1 on unknown DAC Device
  * @return                 -2 on precision not available
  */
-int8_t dac_init(dac_t dev, dac_precision_t precision);
+int8_t dac_init(dac_t dev);
 
 /**
  * @brief Write a value onto DAC Device on a given Channel.
@@ -144,9 +150,9 @@ uint16_t dac_map(dac_t dev, int value, int min, int max);
  */
 uint16_t dac_mapf(dac_t dev, float value, float min, float max);
 
-#endif/* DAC_NUMOF */
 #ifdef __cplusplus
 }
 #endif
-#endif /* DAC_H */
+
+#endif /* PERIPH_DAC_H */
 /** @} */
