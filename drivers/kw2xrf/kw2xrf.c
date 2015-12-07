@@ -1104,30 +1104,25 @@ void kw2xrf_isr_event(gnrc_netdev_t *netdev, uint32_t event_type)
 int _assemble_tx_buf(kw2xrf_t *dev, gnrc_pktsnip_t *pkt)
 {
     gnrc_netif_hdr_t *hdr;
-    int index = 0;
+    int index = 4;
 
     if (dev == NULL) {
-        gnrc_pktbuf_release(pkt);
-        return -ENODEV;
+        return 0;
     }
 
     /* get netif header check address length */
     hdr = (gnrc_netif_hdr_t *)pkt->data;
 
-    /* FCF, set up data frame, request for ack, panid_compression */
-    /* TODO: Currently we don´t request for Ack in this device.
-     * since this is a soft_mac device this has to be
-     * handled in a upcoming CSMA-MAC layer.
-     */
-    /*if (dev->option & KW2XRF_OPT_AUTOACK) {
-        dev->buf[1] = 0x61;
-    }
-    else {
-        dev->buf[1] = 0x51;
-    }*/
-    dev->buf[1] = 0x51;
+    /* we are building a data frame here */
+    dev->buf[1] = IEEE802154_FCF_TYPE_DATA;
+    dev->buf[2] = IEEE802154_FCF_VERS_V0;
 
-    index = 4;
+    /* if AUTOACK is enabled, then we also expect ACKs for this packet */
+    if (!(hdr->flags & GNRC_NETIF_HDR_FLAGS_BROADCAST) &&
+        !(hdr->flags & GNRC_NETIF_HDR_FLAGS_MULTICAST) &&
+        (dev->option & KW2XRF_OPT_AUTOACK)) {
+        dev->buf[1] |= IEEE802154_FCF_ACK_REQ;
+    }
 
     /* set destination pan_id */
     dev->buf[index++] = (uint8_t)((dev->radio_pan) & 0xff);
@@ -1136,13 +1131,13 @@ int _assemble_tx_buf(kw2xrf_t *dev, gnrc_pktsnip_t *pkt)
     /* fill in destination address */
     if (hdr->flags &
         (GNRC_NETIF_HDR_FLAGS_BROADCAST | GNRC_NETIF_HDR_FLAGS_MULTICAST)) {
-        dev->buf[2] = IEEE802154_FCF_DST_ADDR_SHORT;
+        dev->buf[2] |= IEEE802154_FCF_DST_ADDR_SHORT;
         dev->buf[index++] = 0xff;
         dev->buf[index++] = 0xff;
     }
     else if (hdr->dst_l2addr_len == 2) {
         /* set to short addressing mode */
-        dev->buf[2] = IEEE802154_FCF_DST_ADDR_SHORT;
+        dev->buf[2] |= IEEE802154_FCF_DST_ADDR_SHORT;
         /* set destination address, byte order is inverted */
         uint8_t *dst_addr = gnrc_netif_hdr_get_dst_addr(hdr);
         dev->buf[index++] = dst_addr[1];
@@ -1158,19 +1153,17 @@ int _assemble_tx_buf(kw2xrf_t *dev, gnrc_pktsnip_t *pkt)
         }
     }
     else {
-        gnrc_pktbuf_release(pkt);
-        return -ENOMSG;
+        return 0;
     }
 
     /* fill in source PAN ID (if applicable */
-    /* FIXME: compare with at86rf2xx, currently not working
     if (dev->option & KW2XRF_OPT_USE_SRC_PAN) {
         dev->buf[index++] = (uint8_t)((dev->radio_pan) & 0xff);
         dev->buf[index++] = (uint8_t)((dev->radio_pan) >> 8);
-    } else {
+    }
+    else {
         dev->buf[1] |= IEEE802154_FCF_PAN_COMP;
     }
-    */
 
     /* insert source address according to length */
     if (hdr->src_l2addr_len == 2) {
@@ -1209,6 +1202,11 @@ int kw2xrf_send(gnrc_netdev_t *netdev, gnrc_pktsnip_t *pkt)
     if (pkt->type == GNRC_NETTYPE_NETIF) {
         /* Build header and fills this already into the tx-buf */
         index = _assemble_tx_buf(dev, pkt);
+        if (index == 0) {
+            DEBUG("Unable to create 802.15.4 header\n");
+            gnrc_pktbuf_release(pkt);
+            return -ENOMSG;
+        }
         DEBUG("Assembled header for GNRC_NETTYPE_UNDEF to tx-buf, index: %i\n", index);
     }
     else if (pkt->type == GNRC_NETTYPE_UNDEF) {
