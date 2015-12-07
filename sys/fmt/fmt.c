@@ -22,6 +22,7 @@
 #include <stdarg.h>
 #include <stdint.h>
 #include <unistd.h>
+#include <string.h>
 
 #ifdef __WITH_AVRLIBC__
 #include <stdio.h>  /* for fwrite() */
@@ -100,6 +101,60 @@ size_t fmt_u32_hex(char *out, uint32_t val)
 size_t fmt_u64_hex(char *out, uint64_t val)
 {
     return fmt_bytes_hex_reverse(out, (uint8_t*) &val, 8);
+}
+
+size_t fmt_u64_dec(char *out, uint64_t val)
+{
+    uint32_t d[5];
+    uint32_t q;
+    size_t len = 0;
+
+    d[0] = val       & 0xFFFF;
+    d[1] = (val>>16) & 0xFFFF;
+    d[2] = (val>>32) & 0xFFFF;
+    d[3] = (val>>48) & 0xFFFF;
+
+    d[0] = 656 * d[3] + 7296 * d[2] + 5536 * d[1] + d[0];
+    q = d[0] / 10000;
+    d[0] = d[0] % 10000;
+
+    d[1] = q + 7671 * d[3] + 9496 * d[2] + 6 * d[1];
+    q = d[1] / 10000;
+    d[1] = d[1] % 10000;
+
+    d[2] = q + 4749 * d[3] + 42 * d[2];
+    q = d[2] / 10000;
+    d[2] = d[2] % 10000;
+
+    d[3] = q + 281 * d[3];
+    q = d[3] / 10000;
+    d[3] = d[3] % 10000;
+
+    d[4] = q;
+
+    int first = 4;
+
+    while (!d[first] && first) {
+        first--;
+    }
+
+    len = fmt_u32_dec(out, d[first]);
+    int total_len = len + (first * 4);
+
+    if (out) {
+        out += len;
+        memset(out, '0', total_len - len);
+        while(first) {
+            first--;
+            if (d[first]) {
+                size_t tmp = fmt_u32_dec(NULL, d[first]);
+                fmt_u32_dec(out+(4-tmp), d[first]);
+            }
+            out += 4;
+        }
+    }
+
+    return total_len;
 }
 
 size_t fmt_u32_dec(char *out, uint32_t val)
@@ -246,6 +301,13 @@ void print_u64_hex(uint64_t val)
 {
     print_u32_hex(val>>32);
     print_u32_hex(val);
+}
+
+void print_u64_dec(uint64_t val)
+{
+    char buf[18];
+    size_t len = fmt_u64_dec(buf, val);
+    print(buf, len);
 }
 
 void print_str(const char* str)
