@@ -659,7 +659,7 @@ static int _set(gnrc_netdev_t *device, netopt_t opt, void *val, size_t len)
                 res = -EINVAL;
             }
             else {
-                dev->proto = (gnrc_nettype_t) val;
+                dev->proto = *((gnrc_nettype_t*) val);
                 res = sizeof(gnrc_nettype_t);
             }
             break;
