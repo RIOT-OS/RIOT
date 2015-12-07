@@ -93,10 +93,9 @@ size_t fmt_u32_dec(char *out, uint32_t val)
 
     if (out) {
         char *ptr = out + len;
-        while(val) {
+        do {
             *--ptr = (val % 10) + '0';
-            val /= 10;
-        }
+        } while ((val /= 10));
     }
 
     return len;
