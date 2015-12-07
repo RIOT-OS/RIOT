@@ -28,7 +28,7 @@ then
     then
         RESULT=0
 
-        git rebase riot/master || git rebase --abort
+        git rebase master || git rebase --abort
         RESULT=$(set_result $? $RESULT)
 
         ./dist/tools/whitespacecheck/check.sh master
@@ -56,7 +56,7 @@ then
         ./dist/tools/cppcheck/check.sh master --diff-filter=AC
         RESULT=$(set_result $? $RESULT)
 
-        ./dist/tools/pr_check/pr_check.sh riot/master
+        ./dist/tools/pr_check/pr_check.sh master
         RESULT=$(set_result $? $RESULT)
 
         exit $RESULT
@@ -70,5 +70,5 @@ then
         #   resolved:
         #   - make -C ./tests/unittests all test BOARD=qemu-i386 || exit
     fi
-    ./dist/tools/compile_test/compile_test.py riot/master
+    ./dist/tools/compile_test/compile_test.py master
 fi
