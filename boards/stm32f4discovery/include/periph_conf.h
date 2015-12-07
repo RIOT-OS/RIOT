@@ -20,6 +20,8 @@
 #ifndef PERIPH_CONF_H_
 #define PERIPH_CONF_H_
 
+#include "periph_cpu.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -115,39 +117,16 @@ extern "C" {
  * @name ADC configuration
  * @{
  */
-#define ADC_NUMOF           (2U)
-#define ADC_0_EN            1
-#define ADC_1_EN            1
-#define ADC_MAX_CHANNELS    2
+static const adc_conf_t adc_config[] = {
+    /* device, pin, channel, RCC bit */
+    {ADC1, GPIO_PIN(PORT_A, 1), 1, 8},
+    {ADC1, GPIO_PIN(PORT_A, 4), 4, 8},
+    {ADC2, GPIO_PIN(PORT_C, 1), 11, 9},
+    {ADC2, GPIO_PIN(PORT_C, 2), 12, 9}
+};
 
-/* ADC 0 configuration */
-#define ADC_0_DEV           ADC1
-#define ADC_0_CHANNELS      2
-#define ADC_0_CLKEN()       (RCC->APB2ENR |= RCC_APB2ENR_ADC1EN)
-#define ADC_0_CLKDIS()      (RCC->APB2ENR &= ~(RCC_APB2ENR_ADC1EN))
-#define ADC_0_PORT          GPIOA
-#define ADC_0_PORT_CLKEN()  (RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN)
-/* ADC 0 channel 0 pin config */
-#define ADC_0_CH0           1
-#define ADC_0_CH0_PIN       1
-/* ADC 0 channel 1 pin config */
-#define ADC_0_CH1           4
-#define ADC_0_CH1_PIN       4
-
-/* ADC 1 configuration */
-#define ADC_1_DEV           ADC2
-#define ADC_1_CHANNELS      2
-#define ADC_1_CLKEN()       (RCC->APB2ENR |= RCC_APB2ENR_ADC2EN)
-#define ADC_1_CLKDIS()      (RCC->APB2ENR &= ~(RCC_APB2ENR_ADC2EN))
-
-#define ADC_1_PORT          GPIOC
-#define ADC_1_PORT_CLKEN()  (RCC->AHB1ENR |= RCC_AHB1ENR_GPIOCEN)
-/* ADC 1 channel 0 pin config */
-#define ADC_1_CH0           11
-#define ADC_1_CH0_PIN       1
-/* ADC 1 channel 1 pin config */
-#define ADC_1_CH1           12
-#define ADC_1_CH1_PIN       2
+/* deduct the number of available ADC channels from the configuration above */
+#define ADC_NUMOF           (sizeof(adc_config) / sizeof(adc_config[0]))
 /** @} */
 
 /**
