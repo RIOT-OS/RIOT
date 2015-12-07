@@ -20,6 +20,11 @@
 
 #include <stdio.h>
 
+/* TODO: currently TLSF has to be disabled for native because of its stricter
+ *       CFLAGS (-pedantic) */
+#ifndef BOARD_NATIVE
+#   include "tlsf-malloc.h"
+#endif
 #include "msg.h"
 #include "shell.h"
 #include "ccn-lite-riot.h"
@@ -28,8 +33,17 @@
 #define MAIN_QUEUE_SIZE     (8)
 static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
 
+#ifndef BOARD_NATIVE
+    /* some buffer for the heap */
+#   define TLSF_BUFFER     (10240 / sizeof(uint32_t))
+    static uint32_t _tlsf_heap[TLSF_BUFFER];
+#endif
+
 int main(void)
 {
+#ifndef BOARD_NATIVE
+    tlsf_add_pool(_tlsf_heap, sizeof(_tlsf_heap));
+#endif
     msg_init_queue(_main_msg_queue, MAIN_QUEUE_SIZE);
 
     puts("Basic CCN-Lite example");
