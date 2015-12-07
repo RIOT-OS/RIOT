@@ -82,7 +82,7 @@ ifeq ($(PORT),)
       PORT := $(shell $(RIOTBASE)/dist/tools/usb-serial/find-tty.sh)
   endif
   else ifeq ($(OS),Darwin)
-    PORT := $(shell ls -1 /dev/tty.usbserial* | head -n 1)
+    PORT := $(shell ls -1 /dev/tty.usbserial* 2> /dev/null | head -n 1)
   endif
 endif
 ifeq ($(PORT),)

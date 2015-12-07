@@ -4,7 +4,7 @@ export CPU_MODEL = stm32f303re
 
 #define the default port depending on the host OS
 PORT_LINUX ?= /dev/ttyUSB0
-PORT_DARWIN ?= $(shell ls -1 /dev/tty.usbmodem* | head -n 1)
+PORT_DARWIN ?= $(shell ls -1 /dev/tty.usbmodem* 2> /dev/null | head -n 1)
 
 # setup serial terminal
 include $(RIOTBOARD)/Makefile.include.serial
