@@ -156,7 +156,7 @@ void *tftp_server_wrapper(void *arg)
 void tftp_server_start(void)
 {
     thread_create(_tftp_stack, sizeof(_tftp_stack),
-                  1, CREATE_WOUT_YIELD | CREATE_STACKTEST,
+                  1, THREAD_CREATE_WOUT_YIELD | THREAD_CREATE_STACKTEST,
                   tftp_server_wrapper, NULL, "TFTP Server");
 }
 
