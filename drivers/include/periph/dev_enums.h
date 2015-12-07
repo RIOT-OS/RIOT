@@ -198,6 +198,26 @@ enum {
     UART_UNDEFINED          /**< Deprecated symbol, use UART_UNDEF instead */
 };
 
+/**
+ * @brief   Legacy definition of ADC devices
+ * @deprecated
+ */
+enum {
+#if ADC_0_EN
+    ADC_0 = 0,              /**< ADC device 0 */
+#endif
+#if ADC_1_EN
+    ADC_1,                  /**< ADC device 1 */
+#endif
+#if ADC_2_EN
+    ADC_2,                  /**< ADC device 2 */
+#endif
+#if ADC_3_EN
+    ADC_3,                  /**< ADC device 3 */
+#endif
+    ADC_UNDEFINED           /**< Deprecated symbol, use ADC_UNDEF instead */
+};
+
 #ifdef __cplusplus
 }
 #endif
