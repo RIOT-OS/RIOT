@@ -1,4 +1,3 @@
-# Tell the Makefile.base which module to build:
-MODULE = $(BOARD)_base
+MODULE = board
 
 include $(RIOTBASE)/Makefile.base

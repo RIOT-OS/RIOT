@@ -190,7 +190,6 @@ export CFLAGS += -DRIOT_VERSION=\"$(RIOT_VERSION)\"
 endif
 
 # the binaries to link
-BASELIBS += $(BINDIR)$(BOARD)_base.a
 BASELIBS += $(BINDIR)${APPLICATION}.a
 BASELIBS += $(USEPKG:%=${BINDIR}%.a)
 
