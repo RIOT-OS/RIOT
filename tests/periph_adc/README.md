@@ -1,11 +1,11 @@
 Expected result
 ===============
-When running this test, you should see the samples of all configured ADC channels
+When running this test, you should see the samples of all configured ADC lines
 continuously streamed to std-out.
 
 Background
 ==========
-This test application will initialize each configured ADC device to sample with
+This test application will initialize each configured ADC lines to sample with
 10-bit accuracy. Once configured the application will continuously convert each
 available channel and print the conversion results to std-out.
 

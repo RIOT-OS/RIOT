@@ -1,17 +1,17 @@
 /*
- * Copyright (C) 2014 Freie Universität Berlin
+ * Copyright (C) 2014-2015 Freie Universität Berlin
  *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**
- * @ingroup tests
+ * @ingroup     tests
  * @{
  *
  * @file
- * @brief       Test case for the low-level ADC driver
+ * @brief       Test application for peripheral ADC drivers
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
@@ -20,64 +20,43 @@
 
 #include <stdio.h>
 
-#include "cpu.h"
-#include "board.h"
 #include "xtimer.h"
 #include "periph/adc.h"
 
-#if ADC_NUMOF < 1
-#error "Please enable at least 1 ADC device to run this test"
-#endif
 
 #define RES             ADC_RES_10BIT
 #define DELAY           (100 * 1000U)
 
-static int values[ADC_NUMOF][ADC_MAX_CHANNELS];
 
 int main(void)
 {
-    puts("\nRIOT ADC peripheral driver test\n");
-    puts("This test simply converts each available ADC channel about every 10ms\n\n");
+    uint32_t last = xtimer_now();
+    int sample = 0;
 
+    puts("\nRIOT ADC peripheral driver test\n");
+    puts("This test will sample all available ADC lines once every 100ms with\n"
+         "a 10-bit resolution and print the sampled results to STDIO\n\n");
+
+    /* initialize all available ADC lines */
     for (int i = 0; i < ADC_NUMOF; i++) {
-        /* initialize result vector */
-        for (int j = 0; j < ADC_MAX_CHANNELS; j++) {
-            values[i][j] = -1;
-        }
-        /* initialize ADC device */
-        printf("Initializing ADC_%i @ %i bit resolution", i, (6 + (2* RES)));
-        if (adc_init(i, RES) == 0) {
-            puts("    ...[ok]");
-        }
-        else {
-            puts("    ...[failed]");
+        if (adc_init(ADC_LINE(i)) < 0) {
+            printf("Initialization of ADC_LINE(%i) failed\n", i);
             return 1;
+        } else {
+            printf("Successfully initialized ADC_LINE(%i)\n", i);
         }
     }
 
-    puts("\n");
-
     while (1) {
-        /* convert each channel for this ADC device */
         for (int i = 0; i < ADC_NUMOF; i++) {
-            for (int j = 0; j < ADC_MAX_CHANNELS; j++) {
-                values[i][j] = adc_sample(i, j);
+            sample = adc_sample(ADC_LINE(i), RES);
+            if (sample < 0) {
+                printf("ADC_LINE(%i): 10-bit resolution not applicable\n", i);
+            } else {
+                printf("ADC_LINE(%i): %i\n", i, sample);
             }
         }
-
-        /* print the results */
-        printf("Values: ");
-        for (int i = 0; i < ADC_NUMOF; i++) {
-            for (int j = 0; j < ADC_MAX_CHANNELS; j++) {
-                if (values[i][j] >= 0) {
-                    printf("ADC_%i-CH%i: %4i  ", i, j, values[i][j]);
-                }
-            }
-        }
-        printf("\n");
-
-        /* sleep a little while */
-        xtimer_usleep(DELAY);
+        xtimer_usleep_until(&last, DELAY);
     }
 
     return 0;
