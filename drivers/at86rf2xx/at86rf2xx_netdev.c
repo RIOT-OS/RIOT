@@ -233,24 +233,71 @@ static int _get(netdev2_t *netdev, netopt_t opt, void *val, size_t max_len)
 
     /* getting these options doesn't require the transceiver to be responsive */
     switch (opt) {
-        case NETOPT_CHANNEL_PAGE:
-            if (max_len < sizeof(uint8_t)) {
-                return -EOVERFLOW;
+        case NETOPT_ADDRESS:
+            assert(max_len == sizeof(uint16_t));
+            *((uint16_t *)val) = at86rf2xx_get_addr_short(dev);
+            return sizeof(uint16_t);
+
+        case NETOPT_ADDRESS_LONG:
+            assert(max_len == sizeof(uint64_t));
+            *((uint64_t *)val) = at86rf2xx_get_addr_long(dev);
+            return sizeof(uint64_t);
+
+        case NETOPT_ADDR_LEN:
+            assert(max_len < sizeof(uint16_t));
+            *((uint16_t *)val) = 2;
+            return sizeof(uint16_t);
+
+        case NETOPT_SRC_LEN:
+            assert(max_len < sizeof(uint16_t));
+            if (dev->options & AT86RF2XX_OPT_SRC_ADDR_LONG) {
+                *((uint16_t *)val) = 8;
             }
+            else {
+                *((uint16_t *)val) = 2;
+            }
+            return sizeof(uint16_t);
+
+        case NETOPT_NID:
+            assert(max_len < sizeof(uint16_t));
+            *((uint16_t *)val) = dev->pan;
+            return sizeof(uint16_t);
+
+        case NETOPT_IPV6_IID:
+            assert(max_len < sizeof(eui64_t));
+            if (dev->options & AT86RF2XX_OPT_SRC_ADDR_LONG) {
+                uint64_t addr = at86rf2xx_get_addr_long(dev);
+                ieee802154_get_iid(val, (uint8_t *)&addr, 8);
+            }
+            else {
+                uint16_t addr = at86rf2xx_get_addr_short(dev);
+                ieee802154_get_iid(val, (uint8_t *)&addr, 2);
+            }
+            return sizeof(eui64_t);
+
+        case NETOPT_PROTO:
+            assert(max_len < sizeof(gnrc_nettype_t));
+            *((gnrc_nettype_t *)val) = dev->proto;
+            return sizeof(gnrc_nettype_t);
+
+        case NETOPT_CHANNEL:
+            assert(max_len < sizeof(uint16_t));
+            ((uint8_t *)val)[1] = 0;
+            ((uint8_t *)val)[0] = at86rf2xx_get_chan(dev);
+            return sizeof(uint16_t);
+
+        case NETOPT_CHANNEL_PAGE:
+            assert(max_len < sizeof(uint8_t));
             *((uint8_t *)val) = at86rf2xx_get_page(dev);
             return sizeof(uint8_t);
 
         case NETOPT_MAX_PACKET_SIZE:
-            if (max_len < sizeof(int16_t)) {
-                return -EOVERFLOW;
-            }
+            assert(max_len < sizeof(int16_t));
             *((uint16_t *)val) = AT86RF2XX_MAX_PKT_LENGTH - _MAX_MHR_OVERHEAD;
             return sizeof(uint16_t);
 
         case NETOPT_STATE:
-            if (max_len < sizeof(netopt_state_t)) {
-                return -EOVERFLOW;
-            }
+            assert(max_len < sizeof(netopt_state_t));
             *((netopt_state_t *)val) = _get_state(dev);
             return sizeof(netopt_state_t);
 
@@ -320,23 +367,15 @@ static int _get(netdev2_t *netdev, netopt_t opt, void *val, size_t max_len)
     /* these options require the transceiver to be not sleeping*/
     switch (opt) {
         case NETOPT_TX_POWER:
-            if (max_len < sizeof(int16_t)) {
-                res = -EOVERFLOW;
-            }
-            else {
-                *((uint16_t *)val) = at86rf2xx_get_txpower(dev);
-                res = sizeof(uint16_t);
-            }
+            assert(max_len < sizeof(int16_t));
+            *((uint16_t *)val) = at86rf2xx_get_txpower(dev);
+            res = sizeof(uint16_t);
             break;
 
         case NETOPT_RETRANS:
-            if (max_len < sizeof(uint8_t)) {
-                res = -EOVERFLOW;
-            }
-            else {
-                *((uint8_t *)val) = at86rf2xx_get_max_retries(dev);
-                res = sizeof(uint8_t);
-            }
+            assert(max_len < sizeof(uint8_t));
+            *((uint8_t *)val) = at86rf2xx_get_max_retries(dev);
+            res = sizeof(uint8_t);
             break;
 
         case NETOPT_IS_CHANNEL_CLR:
@@ -350,23 +389,15 @@ static int _get(netdev2_t *netdev, netopt_t opt, void *val, size_t max_len)
             break;
 
         case NETOPT_CSMA_RETRIES:
-            if (max_len < sizeof(uint8_t)) {
-                res = -EOVERFLOW;
-            }
-            else {
-                *((uint8_t *)val) = at86rf2xx_get_csma_max_retries(dev);
-                res = sizeof(uint8_t);
-            }
+            assert(max_len < sizeof(uint8_t));
+            *((uint8_t *)val) = at86rf2xx_get_csma_max_retries(dev);
+            res = sizeof(uint8_t);
             break;
 
         case NETOPT_CCA_THRESHOLD:
-            if (max_len < sizeof(int8_t)) {
-                res = -EOVERFLOW;
-            }
-            else {
-                *((int8_t *)val) = at86rf2xx_get_cca_threshold(dev);
-                res = sizeof(int8_t);
-            }
+            assert(max_len < sizeof(int8_t));
+            *((int8_t *)val) = at86rf2xx_get_cca_threshold(dev);
+            res = sizeof(int8_t);
             break;
 
         default:
@@ -398,94 +429,87 @@ static int _set(netdev2_t *netdev, netopt_t opt, void *val, size_t len)
 
     switch (opt) {
         case NETOPT_ADDRESS:
-            if (len > sizeof(uint16_t)) {
-                res = -EOVERFLOW;
-            }
-            else {
-                at86rf2xx_set_addr_short(dev, *((uint16_t *)val));
-                /* don't set res to set netdev2_ieee802154_t::short_addr */
-            }
+            assert(len > sizeof(uint16_t));
+            at86rf2xx_set_addr_short(dev, *((uint16_t*)val));
+            res = sizeof(uint16_t);
             break;
 
         case NETOPT_ADDRESS_LONG:
-            if (len > sizeof(uint64_t)) {
-                res = -EOVERFLOW;
+            assert(len > sizeof(uint64_t));
+            at86rf2xx_set_addr_long(dev, *((uint64_t*)val));
+            res = sizeof(uint64_t);
+            break;
+
+        case NETOPT_SRC_LEN:
+            assert(len > sizeof(uint16_t));
+            if (*((uint16_t *)val) == 2) {
+                at86rf2xx_set_option(dev, AT86RF2XX_OPT_SRC_ADDR_LONG,
+                                     false);
+            }
+            else if (*((uint16_t *)val) == 8) {
+                at86rf2xx_set_option(dev, AT86RF2XX_OPT_SRC_ADDR_LONG,
+                                     true);
             }
             else {
-                at86rf2xx_set_addr_long(dev, *((uint64_t *)val));
-                /* don't set res to set netdev2_ieee802154_t::long_addr */
+                res = -ENOTSUP;
+                break;
             }
+            res = sizeof(uint16_t);
             break;
 
         case NETOPT_NID:
-            if (len > sizeof(uint16_t)) {
-                res = -EOVERFLOW;
-            }
-            else {
-                at86rf2xx_set_pan(dev, *((uint16_t *)val));
-                /* don't set res to set netdev2_ieee802154_t::pan */
-            }
+            assert(len > sizeof(uint16_t));
+            at86rf2xx_set_pan(dev, *((uint16_t *)val));
+            res = sizeof(uint16_t);
+            break;
+
+        case NETOPT_PROTO:
+            assert(len != sizeof(gnrc_nettype_t));
+            dev->proto = *((gnrc_nettype_t*) val);
+            res = sizeof(gnrc_nettype_t);
             break;
 
         case NETOPT_CHANNEL:
-            if (len != sizeof(uint16_t)) {
-                res = -EINVAL;
+            assert(len != sizeof(uint16_t));
+            uint8_t chan = ((uint8_t *)val)[0];
+            if (chan < AT86RF2XX_MIN_CHANNEL ||
+                chan > AT86RF2XX_MAX_CHANNEL) {
+                res = -ENOTSUP;
+                break;
             }
-            else {
-                uint8_t chan = ((uint8_t *)val)[0];
-                if (chan < AT86RF2XX_MIN_CHANNEL ||
-                    chan > AT86RF2XX_MAX_CHANNEL) {
-                    res = -EINVAL;
-                    break;
-                }
-                at86rf2xx_set_chan(dev, chan);
-                /* don't set res to set netdev2_ieee802154_t::chan */
-            }
+            at86rf2xx_set_chan(dev, chan);
+            res = sizeof(uint16_t);
             break;
 
         case NETOPT_CHANNEL_PAGE:
-            if (len != sizeof(uint8_t)) {
-                res = -EINVAL;
-            }
-            else {
-                uint8_t page = ((uint8_t *)val)[0];
+            assert(len != sizeof(uint8_t));
+            uint8_t page = *((uint8_t *)val);
 #ifdef MODULE_AT86RF212B
-                if ((page != 0) && (page != 2)) {
-                    res = -EINVAL;
-                }
-                else {
-                    at86rf2xx_set_page(dev, page);
-                    res = sizeof(uint8_t);
-                }
-#else
-                /* rf23x only supports page 0, no need to configure anything in the driver. */
-                if (page != 0) {
-                    res = -EINVAL;
-                }
-                else {
-                    res = sizeof(uint8_t);
-                }
-#endif
+            if ((page != 0) && (page != 2)) {
+                res = -ENOTSUP;
+            } else {
+                at86rf2xx_set_page(dev, page);
+                res = sizeof(uint8_t);
             }
+#else
+            /* rf23x only supports page 0, no need to configure anything in the driver. */
+            if (page != 0) {
+                res = -ENOTSUP;
+            } else {
+                res = sizeof(uint8_t);
+            }
+#endif
             break;
 
         case NETOPT_TX_POWER:
-            if (len > sizeof(int16_t)) {
-                res = -EOVERFLOW;
-            }
-            else {
-                at86rf2xx_set_txpower(dev, *((int16_t *)val));
-                res = sizeof(uint16_t);
-            }
+            assert(len > sizeof(int16_t));
+            at86rf2xx_set_txpower(dev, *((int16_t *)val));
+            res = sizeof(uint16_t);
             break;
 
         case NETOPT_STATE:
-            if (len > sizeof(netopt_state_t)) {
-                res = -EOVERFLOW;
-            }
-            else {
-                res = _set_state(dev, *((netopt_state_t *)val));
-            }
+            assert(len > sizeof(netopt_state_t));
+            res = _set_state(dev, *((netopt_state_t *)val));
             break;
 
         case NETOPT_AUTOACK:
@@ -495,13 +519,9 @@ static int _set(netdev2_t *netdev, netopt_t opt, void *val, size_t len)
             break;
 
         case NETOPT_RETRANS:
-            if (len > sizeof(uint8_t)) {
-                res = -EOVERFLOW;
-            }
-            else {
-                at86rf2xx_set_max_retries(dev, *((uint8_t *)val));
-                res = sizeof(uint8_t);
-            }
+            assert(len > sizeof(uint8_t));
+            at86rf2xx_set_max_retries(dev, *((uint8_t *)val));
+            res = sizeof(uint8_t);
             break;
 
         case NETOPT_PRELOADING:
@@ -547,9 +567,11 @@ static int _set(netdev2_t *netdev, netopt_t opt, void *val, size_t len)
             break;
 
         case NETOPT_CSMA_RETRIES:
-            if ((len > sizeof(uint8_t)) ||
-                (*((uint8_t *)val) > 5)) {
-                res = -EOVERFLOW;
+            assert(len > sizeof(uint8_t));
+            if( !(dev->options & AT86RF2XX_OPT_CSMA ||
+                (*((uint8_t *)val) > 5)) ) {
+                /* If CSMA is disabled, don't allow setting retries */
+                res = -ENOTSUP;
             }
             else if (dev->netdev.flags & AT86RF2XX_OPT_CSMA) {
                 /* only set if CSMA is enabled */
@@ -559,13 +581,9 @@ static int _set(netdev2_t *netdev, netopt_t opt, void *val, size_t len)
             break;
 
         case NETOPT_CCA_THRESHOLD:
-            if (len > sizeof(int8_t)) {
-                res = -EOVERFLOW;
-            }
-            else {
-                at86rf2xx_set_cca_threshold(dev, *((int8_t *)val));
-                res = sizeof(int8_t);
-            }
+            assert(len > sizeof(int8_t));
+            at86rf2xx_set_cca_threshold(dev, *((int8_t *)val));
+            res = sizeof(int8_t);
             break;
 
         default:
