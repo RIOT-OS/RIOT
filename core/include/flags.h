@@ -16,8 +16,8 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-#ifndef _FLAGS_H
-#define _FLAGS_H
+#ifndef FLAGS_H
+#define FLAGS_H
 
 #ifdef __cplusplus
  extern "C" {
@@ -38,5 +38,5 @@
 }
 #endif
 
-#endif /* _FLAGS_H */
+#endif /* FLAGS_H */
 /** @} */
