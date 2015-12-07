@@ -13,4 +13,4 @@ FEATURES_PROVIDED += cpp
 FEATURES_PROVIDED += radio_nrfmin
 
 # The board MPU family (used for grouping by the CI system)
-FEATURES_MCU_GROUP = cortex_m0
+FEATURES_MCU_GROUP = cortex_m0_1
