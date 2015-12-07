@@ -34,10 +34,13 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
+/* guard file in case no I2C device is defined */
+#if I2C_NUMOF
+
 /* static function definitions */
 static void _i2c_init(I2C_TypeDef *i2c, int ccr);
 static void _toggle_pins(GPIO_TypeDef *port, int pin_scl, int pin_sda);
-static void _pin_config(i2c_t dev, GPIO_TypeDef *port, int pin_scl, int pin_sda);
+static void _pin_config(GPIO_TypeDef *port, int pin_scl, int pin_sda);
 static void _start(I2C_TypeDef *dev, uint8_t address, uint8_t rw_flag);
 static inline void _clear_addr(I2C_TypeDef *dev);
 static inline void _write(I2C_TypeDef *dev, char *data, int length);
@@ -54,16 +57,18 @@ static mutex_t locks[] =  {
     [I2C_1] = MUTEX_INIT,
 #endif
 #if I2C_2_EN
-    [I2C_2] = MUTEX_INIT,
+    [I2C_2] = MUTEX_INIT
 #endif
 #if I2C_3_EN
-    [I2C_3] = MUTEX_INIT,
+    [I2C_3] = MUTEX_INIT
 #endif
 };
 
 int i2c_init_master(i2c_t dev, i2c_speed_t speed)
 {
-    I2C_TypeDef *i2c = i2c_cfg[dev].dev;
+    I2C_TypeDef *i2c;
+    GPIO_TypeDef *port;
+    int pin_scl = 0, pin_sda = 0;
     int ccr;
 
     /* read speed configuration */
@@ -80,16 +85,27 @@ int i2c_init_master(i2c_t dev, i2c_speed_t speed)
             return -2;
     }
 
-    i2c_poweron(dev);
+    /* read static device configuration */
+    switch (dev) {
+#if I2C_0_EN
+        case I2C_0:
+            i2c = I2C_0_DEV;
+            port = I2C_0_PORT;
+            pin_scl = I2C_0_SCL_PIN;
+            pin_sda = I2C_0_SDA_PIN;
+            I2C_0_CLKEN();
+            I2C_0_PORT_CLKEN();
+            NVIC_SetPriority(I2C_0_ERR_IRQ, I2C_IRQ_PRIO);
+            NVIC_EnableIRQ(I2C_0_ERR_IRQ);
+            break;
+#endif
 
-    /* I2C port clk enable */
-    RCC->AHBENR |= RCC_AHBENR_GPIOBEN;
-
-    NVIC_SetPriority(i2c_cfg[dev].er_irqn, I2C_IRQ_PRIO);
-    NVIC_EnableIRQ(i2c_cfg[dev].er_irqn);
+        default:
+            return -1;
+    }
 
     /* configure pins */
-    _pin_config(dev, GPIOB, i2c_cfg[dev].scl_pin, i2c_cfg[dev].sda_pin);
+    _pin_config(port, pin_scl, pin_sda);
 
     /* configure device */
     _i2c_init(i2c, ccr);
@@ -100,9 +116,9 @@ int i2c_init_master(i2c_t dev, i2c_speed_t speed)
         /* disable peripheral */
         i2c->CR1 &= ~I2C_CR1_PE;
         /* toggle both pins to reset analog filter */
-        _toggle_pins(GPIOB, i2c_cfg[dev].scl_pin, i2c_cfg[dev].sda_pin);
+        _toggle_pins(port, pin_scl, pin_sda);
         /* reset pins for alternate function */
-        _pin_config(dev, GPIOB, i2c_cfg[dev].scl_pin, i2c_cfg[dev].sda_pin);
+        _pin_config(port, pin_scl, pin_sda);
         /* make peripheral soft reset */
         i2c->CR1 |= I2C_CR1_SWRST;
         i2c->CR1 &= ~I2C_CR1_SWRST;
@@ -126,7 +142,7 @@ static void _i2c_init(I2C_TypeDef *i2c, int ccr)
     i2c->CR1 |= I2C_CR1_PE;
 }
 
-static void _pin_config(i2c_t dev, GPIO_TypeDef *port, int pin_scl, int pin_sda)
+static void _pin_config(GPIO_TypeDef *port, int pin_scl, int pin_sda)
 {
     /* Set GPIOs to AF mode */
     port->MODER &= ~(3 << (2 * pin_scl));
@@ -151,20 +167,20 @@ static void _pin_config(i2c_t dev, GPIO_TypeDef *port, int pin_scl, int pin_sda)
     /* Configure GPIOs to for the I2C alternate function */
     if (pin_scl < 8) {
         port->AFR[0] &= ~(0xf << (4 * pin_scl));
-        port->AFR[0] |= (i2c_cfg[dev].af_scl_sda << (4 * pin_scl));
+        port->AFR[0] |= (I2C_0_SCL_AF << (4 * pin_scl));
     }
     else {
         port->AFR[1] &= ~(0xf << (4 * (pin_scl - 8)));
-        port->AFR[1] |= (i2c_cfg[dev].af_scl_sda << (4 * (pin_scl - 8)));
+        port->AFR[1] |= (I2C_0_SCL_AF << (4 * (pin_scl - 8)));
     }
 
     if (pin_sda < 8) {
         port->AFR[0] &= ~(0xf << (4 * pin_sda));
-        port->AFR[0] |= (i2c_cfg[dev].af_scl_sda << (4 * pin_sda));
+        port->AFR[0] |= (I2C_0_SDA_AF << (4 * pin_sda));
     }
     else {
         port->AFR[1] &= ~(0xf << (4 * (pin_sda - 8)));
-        port->AFR[1] |= (i2c_cfg[dev].af_scl_sda << (4 * (pin_sda - 8)));
+        port->AFR[1] |= (I2C_0_SDA_AF << (4 * (pin_sda - 8)));
     }
 }
 
@@ -199,12 +215,18 @@ static void _toggle_pins(GPIO_TypeDef *port, int pin_scl, int pin_sda)
 
 int i2c_acquire(i2c_t dev)
 {
+    if (dev >= I2C_NUMOF) {
+        return -1;
+    }
     mutex_lock(&locks[dev]);
     return 0;
 }
 
 int i2c_release(i2c_t dev)
 {
+    if (dev >= I2C_NUMOF) {
+        return -1;
+    }
     mutex_unlock(&locks[dev]);
     return 0;
 }
@@ -218,7 +240,18 @@ int i2c_read_bytes(i2c_t dev, uint8_t address, char *data, int length)
 {
     unsigned int state;
     int i = 0;
-    I2C_TypeDef *i2c = i2c_cfg[dev].dev;
+    I2C_TypeDef *i2c;
+
+    switch (dev) {
+#if I2C_0_EN
+        case I2C_0:
+            i2c = I2C_0_DEV;
+            break;
+#endif
+
+        default:
+            return -1;
+    }
 
     switch (length) {
         case 1:
@@ -336,7 +369,18 @@ int i2c_read_reg(i2c_t dev, uint8_t address, uint8_t reg, char *data)
 
 int i2c_read_regs(i2c_t dev, uint8_t address, uint8_t reg, char *data, int length)
 {
-    I2C_TypeDef *i2c = i2c_cfg[dev].dev;
+    I2C_TypeDef *i2c;
+
+    switch (dev) {
+#if I2C_0_EN
+        case I2C_0:
+            i2c = I2C_0_DEV;
+            break;
+#endif
+
+        default:
+            return -1;
+    }
 
     /* send start condition and slave address */
     DEBUG("Send slave address and clear ADDR flag\n");
@@ -356,7 +400,23 @@ int i2c_write_byte(i2c_t dev, uint8_t address, char data)
 
 int i2c_write_bytes(i2c_t dev, uint8_t address, char *data, int length)
 {
-    I2C_TypeDef *i2c = i2c_cfg[dev].dev;
+    I2C_TypeDef *i2c;
+
+    switch (dev) {
+#if I2C_0_EN
+        case I2C_0:
+            i2c = I2C_0_DEV;
+            break;
+#endif
+#if I2C_1_EN
+        case I2C_1:
+            i2c = I2C_1_DEV;
+            break;
+#endif
+
+        default:
+            return -1;
+    }
 
     /* start transmission and send slave address */
     DEBUG("sending start sequence\n");
@@ -378,7 +438,18 @@ int i2c_write_reg(i2c_t dev, uint8_t address, uint8_t reg, char data)
 
 int i2c_write_regs(i2c_t dev, uint8_t address, uint8_t reg, char *data, int length)
 {
-    I2C_TypeDef *i2c = i2c_cfg[dev].dev;
+    I2C_TypeDef *i2c;
+
+    switch (dev) {
+#if I2C_0_EN
+        case I2C_0:
+            i2c = I2C_0_DEV;
+            break;
+#endif
+
+        default:
+            return -1;
+    }
 
     /* start transmission and send slave address */
     _start(i2c, address, I2C_FLAG_WRITE);
@@ -395,13 +466,36 @@ int i2c_write_regs(i2c_t dev, uint8_t address, uint8_t reg, char *data, int leng
 
 void i2c_poweron(i2c_t dev)
 {
-    RCC->APB1ENR |= i2c_cfg[dev].clk_en;
+    switch (dev) {
+#if I2C_0_EN
+        case I2C_0:
+            I2C_0_CLKEN();
+            break;
+#endif
+#if I2C_1_EN
+        case I2C_1:
+            I2C_1_CLKEN();
+            break;
+#endif
+    }
 }
 
 void i2c_poweroff(i2c_t dev)
 {
-    while (i2c_cfg[dev].dev->SR2 & I2C_SR2_BUSY);
-    RCC->APB1ENR &= ~(i2c_cfg[dev].clk_en);
+    switch (dev) {
+#if I2C_0_EN
+        case I2C_0:
+            while (I2C_0_DEV->SR2 & I2C_SR2_BUSY);
+            I2C_0_CLKDIS();
+            break;
+#endif
+#if I2C_1_EN
+        case I2C_1:
+            while (I2C_0_DEV->SR2 & I2C_SR2_BUSY);
+            I2C_0_CLKDIS();
+            break;
+#endif
+    }
 }
 
 static void _start(I2C_TypeDef *dev, uint8_t address, uint8_t rw_flag)
@@ -461,10 +555,11 @@ static inline void _stop(I2C_TypeDef *dev)
     dev->CR1 |= I2C_CR1_STOP;
 }
 
+#if I2C_0_EN
 void I2C_0_ERR_ISR(void)
 {
-    unsigned state = I2C1->SR1;
-    DEBUG("\n\n### I2C_0 ERROR OCCURED ###\n");
+    unsigned state = I2C_0_DEV->SR1;
+    DEBUG("\n\n### I2C ERROR OCCURED ###\n");
     DEBUG("status: %08x\n", state);
     if (state & I2C_SR1_OVR) {
         DEBUG("OVR\n");
@@ -489,32 +584,6 @@ void I2C_0_ERR_ISR(void)
     }
     while (1);
 }
+#endif /* I2C_0_EN */
 
-void I2C_1_ERR_ISR(void)
-{
-    unsigned state = I2C2->SR1;
-    DEBUG("\n\n### I2C_1 ERROR OCCURED ###\n");
-    DEBUG("status: %08x\n", state);
-    if (state & I2C_SR1_OVR) {
-        DEBUG("OVR\n");
-    }
-    if (state & I2C_SR1_AF) {
-        DEBUG("AF\n");
-    }
-    if (state & I2C_SR1_ARLO) {
-        DEBUG("ARLO\n");
-    }
-    if (state & I2C_SR1_BERR) {
-        DEBUG("BERR\n");
-    }
-    if (state & I2C_SR1_PECERR) {
-        DEBUG("PECERR\n");
-    }
-    if (state & I2C_SR1_TIMEOUT) {
-        DEBUG("TIMEOUT\n");
-    }
-    if (state & I2C_SR1_SMBALERT) {
-        DEBUG("SMBALERT\n");
-    }
-    while (1);
-}
+#endif /* I2C_NUMOF */
