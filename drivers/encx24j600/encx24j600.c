@@ -29,6 +29,7 @@
 #include "xtimer.h"
 
 #include "net/netdev2.h"
+#include "net/netdev2_eth.h"
 #include "net/eui64.h"
 #include "net/ethernet.h"
 //#include "net/ethernet/hdr.h"
@@ -55,7 +56,6 @@ static uint16_t reg_get(encx24j600_t *dev, uint8_t reg);
 static void reg_clear_bits(encx24j600_t *dev, uint8_t reg, uint16_t mask);
 static inline int _packets_available(encx24j600_t *dev);
 
-static int _get_iid(netdev2_t *netdev, eui64_t *value, size_t max_len);
 static void _get_mac_addr(netdev2_t *dev, uint8_t* buf);
 
 /* netdev2 interface */
@@ -64,7 +64,6 @@ static int _recv(netdev2_t *netdev, char* buf, int len);
 static int _init(netdev2_t *dev);
 static void _isr(netdev2_t *dev);
 int _get(netdev2_t *dev, netopt_t opt, void *value, size_t max_len);
-int _set(netdev2_t *dev, netopt_t opt, void *value, size_t value_len);
 
 const static netdev2_driver_t netdev2_driver_encx24j600 = {
     .send = _send,
@@ -72,7 +71,7 @@ const static netdev2_driver_t netdev2_driver_encx24j600 = {
     .init = _init,
     .isr = _isr,
     .get = _get,
-    .set = _set,
+    .set = netdev2_eth_set,
 };
 
 static inline void lock(encx24j600_t *dev) {
@@ -383,31 +382,11 @@ static int _recv(netdev2_t *netdev, char* buf, int len)
     return payload_len;
 }
 
-static int _get_iid(netdev2_t *netdev, eui64_t *value, size_t max_len)
-{
-    if (max_len < sizeof(eui64_t)) {
-        return -EOVERFLOW;
-    }
-
-    uint8_t addr[ETHERNET_ADDR_LEN];
-    _get_mac_addr(netdev, addr);
-    ethernet_get_iid(value, addr);
-
-    return sizeof(eui64_t);
-}
-
 int _get(netdev2_t *dev, netopt_t opt, void *value, size_t max_len)
 {
     int res = 0;
 
     switch (opt) {
-        case NETOPT_DEVICE_TYPE:
-            {
-               uint16_t *tgt = (uint16_t *)value;
-                *tgt = NETDEV2_TYPE_ETHERNET;
-                res = 2;
-                break;
-            }
         case NETOPT_ADDRESS:
             if (max_len < ETHERNET_ADDR_LEN) {
                 res = -EINVAL;
@@ -417,30 +396,9 @@ int _get(netdev2_t *dev, netopt_t opt, void *value, size_t max_len)
                 res = ETHERNET_ADDR_LEN;
             }
             break;
-        case NETOPT_ADDR_LEN:
-        case NETOPT_SRC_LEN:
-            assert(max_len == 2);
-            uint16_t *tgt = (uint16_t*)value;
-            *tgt=6;
-            res = sizeof(uint16_t);
-            break;
-        case NETOPT_IPV6_IID:
-            return _get_iid(dev, value, max_len);
         default:
-            res = -ENOTSUP;
+            res = netdev2_eth_get(dev, opt, value, max_len);
             break;
-    }
-
-    return res;
-}
-
-int _set(netdev2_t *dev, netopt_t opt, void *value, size_t value_len)
-{
-    int res = 0;
-
-    switch (opt) {
-        default:
-            return -ENOTSUP;
     }
 
     return res;

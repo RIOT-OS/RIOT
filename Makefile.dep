@@ -33,6 +33,7 @@ endif
 
 ifneq (,$(filter netdev2_tap,$(USEMODULE)))
   USEMODULE += netif
+  USEMODULE += netdev2_eth
 endif
 
 ifneq (,$(filter gnrc_zep,$(USEMODULE)))

@@ -50,6 +50,7 @@
 
 #include "net/eui64.h"
 #include "net/netdev2.h"
+#include "net/netdev2_eth.h"
 #include "net/ethernet.h"
 #include "net/ethernet/hdr.h"
 #include "netdev2_tap.h"
@@ -97,18 +98,6 @@ static inline int _set_promiscous(netdev2_t *netdev, int value)
     return value;
 }
 
-static inline int _get_iid(netdev2_t *netdev, eui64_t *value, size_t max_len)
-{
-    if (max_len < sizeof(eui64_t)) {
-        return -EOVERFLOW;
-    }
-
-    uint8_t addr[ETHERNET_ADDR_LEN];
-    _get_mac_addr(netdev, addr);
-    ethernet_get_iid(value, addr);
-
-    return sizeof(eui64_t);
-}
 static inline void _isr(netdev2_t *netdev)
 {
     if (netdev->event_callback) {
@@ -130,13 +119,6 @@ int _get(netdev2_t *dev, netopt_t opt, void *value, size_t max_len)
     int res = 0;
 
     switch (opt) {
-        case NETOPT_DEVICE_TYPE:
-            {
-               uint16_t *tgt = (uint16_t *)value;
-                *tgt = NETDEV2_TYPE_ETHERNET;
-                res = 2;
-                break;
-            }
         case NETOPT_ADDRESS:
             if (max_len < ETHERNET_ADDR_LEN) {
                 res = -EINVAL;
@@ -146,24 +128,12 @@ int _get(netdev2_t *dev, netopt_t opt, void *value, size_t max_len)
                 res = ETHERNET_ADDR_LEN;
             }
             break;
-        case NETOPT_ADDR_LEN:
-        case NETOPT_SRC_LEN:
-            assert(max_len == 2);
-            uint16_t *tgt = (uint16_t*)value;
-            *tgt=6;
-            res = sizeof(uint16_t);
-            break;
         case NETOPT_PROMISCUOUSMODE:
             *((bool*)value) = (bool)_get_promiscous(dev);
             res = sizeof(bool);
             break;
-        case NETOPT_IPV6_IID:
-            return _get_iid(dev, value, max_len);
-        case NETOPT_IS_WIRED:
-            res = 1;
-            break;
         default:
-            res = -ENOTSUP;
+            res = netdev2_eth_get(dev, opt, value, max_len);
             break;
     }
 
