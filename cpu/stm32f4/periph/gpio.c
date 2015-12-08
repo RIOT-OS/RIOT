@@ -156,8 +156,11 @@ void gpio_init_af(gpio_t pin, gpio_af_t af)
     port->AFR[(pin_num > 7) ? 1 : 0] |= (af << ((pin_num & 0x07) * 4));
 }
 
-void gpio_init_adc(gpio_t pin)
+void gpio_init_analog(gpio_t pin)
 {
+    /* enable clock */
+    RCC->AHB1ENR |= (RCC_AHB1ENR_GPIOAEN << _port_num(pin));
+    /* set to analog mode */
     _port(pin)->MODER |= (0x3 << (2 * _pin_num(pin)));
 }
 

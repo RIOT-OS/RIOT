@@ -44,7 +44,7 @@ int adc_init(adc_t line)
         return -1;
     }
     /* configure the pin */
-    gpio_init_adc(adc_config[line].pin);
+    gpio_init_analog(adc_config[line].pin);
     /* power on the device for the duration of configuration */
     poweron(line);
     /* set sequence length to 1 conversion and enable the ADC device */

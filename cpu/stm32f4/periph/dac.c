@@ -1,9 +1,10 @@
 /*
  * Copyright (C) 2014 Simon Brummer
+ *               2015 Freie Universität Berlin
  *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**
@@ -13,7 +14,8 @@
  * @file
  * @brief       Low-level DAC driver implementation
  *
- * @author      Simon Brummer<simon.brummer@haw-hamburg.de>
+ * @author      Simon Brummer <simon.brummer@haw-hamburg.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
  * @}
  */
@@ -22,135 +24,40 @@
 #include "periph/dac.h"
 #include "periph_conf.h"
 
-int8_t dac_init(dac_t dev)
+
+int8_t dac_init(dac_t line)
 {
     if (line >= DAC_NUMOF) {
         return -1;
     }
 
-
-    DAC_TypeDef *dac = 0;
-    dac_poweron(dev);
-
-    switch (dev) {
-#if DAC_0_EN
-        case DAC_0:
-            dac = DAC_0_DEV;
-            DAC_0_PORT_CLKEN();
-            /* Set Mode to analoge out, disable Pullup Pulldown Resistors for both channels */
-            DAC_0_PORT->MODER |=  (3 << (DAC_0_CH0_PIN * 2) | 3 << (DAC_0_CH1_PIN * 2));
-            DAC_0_PORT->PUPDR &= ~(3 << (DAC_0_CH0_PIN * 2) | 3 << (DAC_0_CH1_PIN * 2));
-            break;
-#endif
-        default:
-            /* Unknown Device */
-            return -1;
-    }
-
-    /* Select Shift value to normalize given Value */
-    switch(precision) {
-        case DAC_RES_6BIT:
-            dac_config[dev].shift_mod = 0x06;       /* 2^6  << 6 = 2^12 */
-            break;
-        case DAC_RES_8BIT:
-            dac_config[dev].shift_mod = 0x04;       /* 2^8  << 4 = 2^12 */
-            break;
-        case DAC_RES_10BIT:
-            dac_config[dev].shift_mod = 0x02;       /* 2^10 << 2 = 2^12 */
-            break;
-        case DAC_RES_12BIT:
-            dac_config[dev].shift_mod = 0x00;       /* 2^12 << 0 = 2^12 */
-            break;
-        /* Not Supported Resolutions */
-        case DAC_RES_14BIT:
-        case DAC_RES_16BIT:
-        default:
-            dac_poweroff(dev);
-            return -2;
-        break;
-    }
-
-    /* Enable Channels, Clear Output */
-    dac->CR = 0;
-    dac->CR |= (DAC_CR_EN1 | DAC_CR_EN2);
-    dac->DHR12R1 = 0;
-    dac->DHR12R2 = 0;
-
+    /* configure pin */
+    gpio_init_analog(dac_config[line].pin);
+    /* enable the DAC's clock */
+    RCC->APB1ENR |= RCC_APB1ENR_DACEN;
+    /* reset output and enable the line's channel */
+    dac_set(line, 0);
+    dac_poweron(line);
     return 0;
 }
 
-int8_t dac_write(dac_t dev, uint8_t channel, uint16_t value)
+void dac_set(dac_t line, uint16_t value)
 {
-    DAC_TypeDef* __attribute__((unused))  dac = 0;
-    uint16_t     __attribute__((unused))  val = value << dac_config[dev].shift_mod;
-
-    switch(dev){
-#if DAC_0_EN
-    case DAC_0:
-        dac = DAC_0_DEV;
-
-        if( DAC_MAX_12BIT < val ){
-            /* Value out of Range */
-            return -3;
-        }
-
-        switch(channel){
-            case 0:
-                dac->DHR12R1 = val;
-                break;
-            case 1:
-                dac->DHR12R2 = val;
-                break;
-            /* Invalid Channel */
-            default:
-                return -2;
-        }
-        break;
-#endif
-        /* Unknown  Device */
-        default:
-            return -1;
+    value = (value >> 4);       /* scale to 12-bit */
+    if (dac_config[line].chan) {
+        DAC->DHR12R2 = value;
     }
-    return 0;
-}
-
-int8_t dac_poweron(dac_t dev)
-{
-    switch (dev){
-#if DAC_0_EN
-        case DAC_0:
-            DAC_0_CLKEN();
-            break;
-#endif
-        default:
-            /* Unknown Device */
-            return -1;
+    else {
+        DAC->DHR12R1 = value;
     }
-    return 0;
 }
 
-int8_t dac_poweroff(dac_t dev)
+void dac_poweron(dac_t line)
 {
-    switch (dev) {
-#if DAC_0_EN
-        case DAC_0:
-            DAC_0_CLKDIS();
-            break;
-#endif
-        default:
-            /* Unknown Device */
-            return -1;
-    }
-    return 0;
+    DAC->CR |= (1 << (16 * dac_config[line].chan));
 }
 
-uint16_t dac_map(dac_t dev, int value, int min, int max)
+void dac_poweroff(dac_t line)
 {
-    return dac_mapf(dev, (int) value, (int) min, (int) max);
-}
-
-uint16_t dac_mapf(dac_t dev, float value, float min, float max)
-{
-    uint16_t val_12_bit = ((value - min) * DAC_MAX_12BIT)/(max-min);
-    return val_12_bit >> dac_config[dev].shift_mod;
+    DAC->CR &= ~(1 << (16 * dac_config[line].chan));
 }
