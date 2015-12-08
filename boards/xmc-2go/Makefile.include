@@ -1,0 +1,18 @@
+# define the cpu used by the xmc-2go
+export CPU = xmc1000
+export CPU_MODEL = xmc1100
+
+# define the default port depending on the host OS
+PORT_LINUX ?= /dev/ttyACM0
+PORT_DARWIN ?= $(shell ls -1 /dev/tty.usbmodem* | head -n 1)
+
+# setup JLink for flashing
+export JLINK_DEVICE = XMC1100-0064
+export JLINK_FLASH_ADDR = 10001000
+include $(RIOTBOARD)/Makefile.include.jlink
+
+# setup serial terminal
+include $(RIOTBOARD)/Makefile.include.serial
+
+# include cortex defaults
+include $(RIOTBOARD)/Makefile.include.cortexm_common

@@ -105,6 +105,9 @@ SECTIONS
     {
         . = ALIGN(4);
         _srelocate = .;
+        /* The XMC1000 family needs this for their vectors to work.
+         * The segment is set up in cpu/xmc1000/vectors.c */
+        KEEP (*(.veneers .veneers.*));
         *(.ramfunc .ramfunc.*);
         *(.data .data.*);
         . = ALIGN(4);
