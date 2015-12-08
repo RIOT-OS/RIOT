@@ -266,15 +266,24 @@ static int _send(gnrc_netdev_t *netdev, gnrc_pktsnip_t *pkt)
 static void _receive_data(at86rf2xx_t *dev)
 {
     uint8_t mhr[IEEE802154_MAX_HDR_LEN];
+    uint8_t phr;
     size_t pkt_len, hdr_len;
     gnrc_pktsnip_t *hdr, *payload = NULL;
     gnrc_netif_hdr_t *netif;
 
-    /* get the size of the received packet (unlocks frame buffer protection) */
-    pkt_len = at86rf2xx_rx_len(dev);
+    /* frame buffer protection will be unlocked as soon as at86rf2xx_fb_stop()
+     * is called*/
+    at86rf2xx_fb_start(dev);
+
+    /* get the size of the received packet */
+    at86rf2xx_fb_read(dev, &phr, 1);
+
+    /* Ignore FCS for packet length */
+    pkt_len = phr - 2;
 
     /* abort here already if no event callback is registered */
     if (!dev->event_cb) {
+        at86rf2xx_fb_stop(dev);
         return;
     }
 
@@ -282,43 +291,63 @@ static void _receive_data(at86rf2xx_t *dev)
     if (dev->options & AT86RF2XX_OPT_RAWDUMP) {
         payload = gnrc_pktbuf_add(NULL, NULL, pkt_len, GNRC_NETTYPE_UNDEF);
         if (payload == NULL ) {
+            at86rf2xx_fb_stop(dev);
             DEBUG("[at86rf2xx] error: unable to allocate RAW data\n");
             return;
         }
-        at86rf2xx_rx_read(dev, payload->data, pkt_len, 0);
+        at86rf2xx_fb_read(dev, payload->data, pkt_len);
+        at86rf2xx_fb_stop(dev);
         dev->event_cb(NETDEV_EVENT_RX_COMPLETE, payload);
         return;
     }
 
     /* get FCF field and compute 802.15.4 header length */
-    at86rf2xx_rx_read(dev, mhr, 2, 0);
+    at86rf2xx_fb_read(dev, mhr, 2);
+
     hdr_len = _get_frame_hdr_len(mhr);
     if (hdr_len == 0) {
+        at86rf2xx_fb_stop(dev);
         DEBUG("[at86rf2xx] error: unable parse incoming frame header\n");
         return;
     }
+
     /* read the rest of the header and parse the netif header from it */
-    at86rf2xx_rx_read(dev, &(mhr[2]), hdr_len - 2, 2);
+    at86rf2xx_fb_read(dev, &(mhr[2]), hdr_len - 2);
     hdr = _make_netif_hdr(mhr);
     if (hdr == NULL) {
+        at86rf2xx_fb_stop(dev);
         DEBUG("[at86rf2xx] error: unable to allocate netif header\n");
         return;
     }
+
     /* fill missing fields in netif header */
     netif = (gnrc_netif_hdr_t *)hdr->data;
     netif->if_pid = dev->mac_pid;
-    at86rf2xx_rx_read(dev, &(netif->lqi), 1, pkt_len);
-    netif->rssi = at86rf2xx_reg_read(dev, AT86RF2XX_REG__PHY_ED_LEVEL);
 
     /* allocate payload */
     payload = gnrc_pktbuf_add(hdr, NULL, (pkt_len - hdr_len), dev->proto);
     if (payload == NULL) {
+        at86rf2xx_fb_stop(dev);
         DEBUG("[at86rf2xx] error: unable to allocate incoming payload\n");
         gnrc_pktbuf_release(hdr);
         return;
     }
     /* copy payload */
-    at86rf2xx_rx_read(dev, payload->data, payload->size, hdr_len);
+    at86rf2xx_fb_read(dev, payload->data, payload->size);
+
+    /* Ignore FCS but advance fb read */
+    at86rf2xx_fb_read(dev, NULL, 2);
+
+    at86rf2xx_fb_read(dev, &(netif->lqi), 1);
+
+#ifndef MODULE_AT86RF231
+    at86rf2xx_fb_read(dev, &(netif->rssi), 1);
+    at86rf2xx_fb_stop(dev);
+#else
+    at86rf2xx_fb_stop(dev);
+    netif->rssi = at86rf2xx_reg_read(dev, AT86RF2XX_REG__PHY_ED_LEVEL);
+#endif
+
     /* finish up and send data to upper layers */
     dev->event_cb(NETDEV_EVENT_RX_COMPLETE, payload);
 }
