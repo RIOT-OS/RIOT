@@ -7,19 +7,19 @@
  */
 
 /**
- * @defgroup    sys_adc_util ADC utilities
+ * @defgroup    sys_analog_util Analog data conversion utilities
  * @ingroup     sys
- * @brief       Utility functions for handling ADC samples
+ * @brief       Utility functions for converting analog data samples
  *
  * @{
  * @file
- * @brief       ADC utility function interfaces
+ * @brief       Analog utility function interfaces
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef ADC_UTIL_H
-#define ADC_UTIL_H
+#ifndef ANALOG_UTIL_H
+#define ANALOG_UTIL_H
 
 #include "periph/adc.h"
 
@@ -59,9 +59,36 @@ int adc_util_map(int sample, adc_res_t res, int min, int max);
  */
 float adc_util_mapf(int sample, adc_res_t res, float min, float max);
 
+/**
+ * @brief   Map a value out of the given range to a 16-bit unsigned int
+ *
+ * The min value is assumed to be smaller than max value and value is assumed
+ * to be between min and max.
+ *
+ * @param[in] value        value to map to a DAC set value
+ * @param[in] min          the lower bound of the source interval
+ * @param[in] max          the upper bound of the source interval
+ *
+ * @return                 the mapped value
+ */
+uint16_t dac_util_map(int value, int min, int max);
+
+/**
+ * @brief Helper function to map a given float value range to a valid DAC value.
+ *
+ * @see dac_util_map
+ *
+ * @param[in] value        value to map to a DAC set value
+ * @param[in] min          the lower bound of the source interval
+ * @param[in] max          the upper bound of the source interval
+ *
+ * @return                 the mapped value
+ */
+uint16_t dac_mapf(float value, float min, float max);
+
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* ADC_UTIL_H */
+#endif /* ANALOG_UTIL_H */
 /** @} */

@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     sys_adc_util
+ * @ingroup     sys_analog_util
  * @{
  *
  * @file
