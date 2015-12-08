@@ -442,6 +442,14 @@ static int _get(gnrc_netdev_t *device, netopt_t opt, void *val, size_t max_len)
             ((uint8_t *)val)[0] = at86rf2xx_get_chan(dev);
             return sizeof(uint16_t);
 
+        case NETOPT_CHANNEL_PAGE:
+            if (max_len < sizeof(uint16_t)) {
+                return -EOVERFLOW;
+            }
+            ((uint8_t *)val)[1] = 0;
+            ((uint8_t *)val)[0] = at86rf2xx_get_page(dev);
+            return sizeof(uint16_t);
+
         case NETOPT_MAX_PACKET_SIZE:
             if (max_len < sizeof(int16_t)) {
                 return -EOVERFLOW;
@@ -676,6 +684,29 @@ static int _set(gnrc_netdev_t *device, netopt_t opt, void *val, size_t len)
                 }
                 at86rf2xx_set_chan(dev, chan);
                 res = sizeof(uint16_t);
+            }
+            break;
+
+        case NETOPT_CHANNEL_PAGE:
+            if (len != sizeof(uint16_t)) {
+                res = -EINVAL;
+            } else {
+                uint8_t page = ((uint8_t *)val)[0];
+#ifdef MODULE_AT86RF212B
+                if ((page != 0) && (page != 2)) {
+                    res = -ENOTSUP;
+                } else {
+                    at86rf2xx_set_page(dev, page);
+                    res = sizeof(uint16_t);
+                }
+#else
+                /* rf23x only supports page 0, no need to configure anything in the driver. */
+                if (page != 0) {
+                    res = -ENOTSUP;
+                } else {
+                    res = sizeof(uint16_t);
+                }
+#endif
             }
             break;
 

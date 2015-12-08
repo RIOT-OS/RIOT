@@ -148,7 +148,7 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_CTRL_2,
                         AT86RF2XX_TRX_CTRL_2_MASK__RX_SAFE_MODE);
 #ifdef MODULE_AT86RF212B
-    at86rf2xx_set_freq(dev, AT86RF2XX_FREQ_915MHZ);
+    at86rf2xx_set_page(dev, 0);
 #endif
 
     /* don't populate masked interrupt flags to IRQ_STATUS register */
