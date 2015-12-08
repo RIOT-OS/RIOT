@@ -133,20 +133,15 @@ static const adc_conf_t adc_config[] = {
  * @name DAC configuration
  * @{
  */
-#define DAC_NUMOF          (1U)
-#define DAC_0_EN           1
-#define DAC_MAX_CHANNELS   2
+static const dac_conf_t dac_config[] = {
+    /* pin, channel */
+    {GPIO_PIN(PORT_A, 4), 0},
+    {GPIO_PIN(PORT_A, 5), 1}
+};
 
-/* DAC 0 configuration */
-#define DAC_0_DEV            DAC
-#define DAC_0_CHANNELS       2
-#define DAC_0_CLKEN()        (RCC->APB1ENR |=  (RCC_APB1ENR_DACEN))
-#define DAC_0_CLKDIS()       (RCC->APB1ENR &= ~(RCC_APB1ENR_DACEN))
-#define DAC_0_PORT           GPIOA
-#define DAC_0_PORT_CLKEN()   (RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN)
-/* DAC 0 channel config */
-#define DAC_0_CH0_PIN        4
-#define DAC_0_CH1_PIN        5
+/* deduct the number of DAC lines from this configuration */
+#define DAC_NUMOF           (sizeof(dac_config) / sizeof(dac_config[0]))
+/** @} */
 
 /**
  * @name PWM configuration
