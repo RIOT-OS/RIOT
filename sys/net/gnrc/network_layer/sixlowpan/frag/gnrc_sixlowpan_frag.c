@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2015 Martine Lenders <mlenders@inf.fu-berlin.de>
+ * Copyright (C) 2015 Hamburg University of Applied Sciences
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -10,6 +11,9 @@
  * @{
  *
  * @file
+ *
+ * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
+ * @author  Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
  */
 
 #include "kernel_types.h"
@@ -212,51 +216,70 @@ static uint16_t _send_nth_fragment(gnrc_sixlowpan_netif_t *iface, gnrc_pktsnip_t
     return local_offset;
 }
 
-void gnrc_sixlowpan_frag_send(kernel_pid_t pid, gnrc_pktsnip_t *pkt,
-                              size_t datagram_size)
+void gnrc_sixlowpan_frag_send(gnrc_sixlowpan_msg_frag_t *fragment_msg)
 {
-    gnrc_sixlowpan_netif_t *iface = gnrc_sixlowpan_netif_get(pid);
-    uint16_t offset = 0, res;
+    gnrc_sixlowpan_netif_t *iface = gnrc_sixlowpan_netif_get(fragment_msg->pid);
+    uint16_t res;
     /* payload_len: actual size of the packet vs
      * datagram_size: size of the uncompressed IPv6 packet */
-    size_t payload_len = gnrc_pkt_len(pkt->next);
+    size_t payload_len = gnrc_pkt_len(fragment_msg->pkt->next);
+    msg_t msg;
 
 #if defined(DEVELHELP) && defined(ENABLE_DEBUG)
     if (iface == NULL) {
         DEBUG("6lo frag: iface == NULL, expect segmentation fault.\n");
-        gnrc_pktbuf_release(pkt);
+        /* remove original packet from packet buffer */
+        gnrc_pktbuf_release(fragment_msg->pkt);
+        /* 6LoWPAN free for next fragmentation */
+        fragment_msg->pkt = NULL;
         return;
     }
 #endif
 
-    if ((res = _send_1st_fragment(iface, pkt, payload_len, datagram_size)) == 0) {
-        /* error sending first fragment */
-        DEBUG("6lo frag: error sending 1st fragment\n");
-        gnrc_pktbuf_release(pkt);
-        return;
-    }
-
-    offset += res;
-    thread_yield();
-
-    /* (offset + (datagram_size - payload_len) < datagram_size) simplified */
-    while (offset < payload_len) {
-        if ((res = _send_nth_fragment(iface, pkt, payload_len, datagram_size,
-                                      offset)) == 0) {
-            /* error sending subsequent fragment */
-            DEBUG("6lo frag: error sending subsequent fragment (offset = %" PRIu16
-                  ")\n", offset);
-            gnrc_pktbuf_release(pkt);
+    /* Check weater to send the first or an Nth fragment */
+    if (fragment_msg->offset == 0) {
+        /* increment tag for successive, fragmented datagrams */
+        _tag++;
+        if ((res = _send_1st_fragment(iface, fragment_msg->pkt, payload_len, fragment_msg->datagram_size)) == 0) {
+            /* error sending first fragment */
+            DEBUG("6lo frag: error sending 1st fragment\n");
+            gnrc_pktbuf_release(fragment_msg->pkt);
+            fragment_msg->pkt = NULL;
             return;
         }
+        fragment_msg->offset += res;
 
-        offset += res;
+        /* send message to self*/
+        msg.type = GNRC_SIXLOWPAN_MSG_FRAG_SND;
+        msg.content.ptr = (void *)fragment_msg;
+        msg_send_to_self(&msg);
         thread_yield();
     }
+    else {
+        /* (offset + (datagram_size - payload_len) < datagram_size) simplified */
+        if (fragment_msg->offset < payload_len) {
+            if ((res = _send_nth_fragment(iface, fragment_msg->pkt, payload_len, fragment_msg->datagram_size,
+                                          fragment_msg->offset)) == 0) {
+                /* error sending subsequent fragment */
+                DEBUG("6lo frag: error sending subsequent fragment (offset = %" PRIu16
+                      ")\n", fragment_msg->offset);
+                gnrc_pktbuf_release(fragment_msg->pkt);
+                fragment_msg->pkt = NULL;
+                return;
+                }
+            fragment_msg->offset += res;
 
-    /* remove original packet from packet buffer */
-    gnrc_pktbuf_release(pkt);
-    _tag++;
+            /* send message to self*/
+            msg.type = GNRC_SIXLOWPAN_MSG_FRAG_SND;
+            msg.content.ptr = (void *)fragment_msg;
+            msg_send_to_self(&msg);
+            thread_yield();
+        }
+        else {
+            gnrc_pktbuf_release(fragment_msg->pkt);
+            fragment_msg->pkt = NULL;
+        }
+    }
 }
 
 void gnrc_sixlowpan_frag_handle_pkt(gnrc_pktsnip_t *pkt)
