@@ -418,7 +418,17 @@ void at86rf2xx_set_option(at86rf2xx_t *dev, uint16_t option, bool state)
     }
 }
 
-static inline void _set_state(at86rf2xx_t *dev, uint8_t state)
+/**
+ * @brief Internal function to change state
+ * @details For all cases but AT86RF2XX_STATE_FORCE_TRX_OFF state and
+ *          cmd parameter are the same.
+ *
+ * @param dev       device to operate on
+ * @param state     target state
+ * @param cmd       command to initiate state transition
+ */
+
+static inline void _set_state(at86rf2xx_t *dev, uint8_t state, uint8_t cmd)
 {
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_STATE, state);
 
@@ -438,6 +448,14 @@ void at86rf2xx_set_state(at86rf2xx_t *dev, uint8_t state)
 {
     uint8_t old_state = at86rf2xx_get_status(dev);
 
+    if (state == old_state) {
+        return;
+    }
+
+    if (state == AT86RF2XX_STATE_FORCE_TRX_OFF) {
+        _set_state(dev, AT86RF2XX_STATE_TRX_OFF, state);
+        return;
+    }
     /* make sure there is no ongoing transmission, or state transition already
      * in progress */
     while (old_state == AT86RF2XX_STATE_BUSY_RX_AACK ||
@@ -455,7 +473,7 @@ void at86rf2xx_set_state(at86rf2xx_t *dev, uint8_t state)
              state == AT86RF2XX_STATE_TX_ARET_ON) ||
         (old_state == AT86RF2XX_STATE_TX_ARET_ON &&
              state == AT86RF2XX_STATE_RX_AACK_ON)) {
-        _set_state(dev, AT86RF2XX_STATE_PLL_ON);
+        _set_state(dev, AT86RF2XX_STATE_PLL_ON, AT86RF2XX_STATE_PLL_ON);
     }
     /* check if we need to wake up from sleep mode */
     else if (old_state == AT86RF2XX_STATE_SLEEP) {
@@ -472,7 +490,7 @@ void at86rf2xx_set_state(at86rf2xx_t *dev, uint8_t state)
         gpio_set(dev->params.sleep_pin);
         dev->state = state;
     } else {
-        _set_state(dev, state);
+        _set_state(dev, state, state);
     }
 }
 
