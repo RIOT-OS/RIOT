@@ -380,6 +380,7 @@ void timer_start(tim_t dev)
 
 void timer_irq_enable(tim_t dev)
 {
+    (void) dev;
 #ifdef DEVELHELP
     printf("timer_irq_enable not implemented\n");
 #endif

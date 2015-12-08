@@ -822,6 +822,7 @@ static int _rem_event_cb(gnrc_netdev_t *dev, gnrc_netdev_event_cb_t cb)
 
 static void _isr_event(gnrc_netdev_t *device, uint32_t event_type)
 {
+    (void) event_type;
     at86rf2xx_t *dev = (at86rf2xx_t *) device;
     uint8_t irq_mask;
     uint8_t state;

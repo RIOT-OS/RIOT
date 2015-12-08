@@ -97,6 +97,7 @@ int rtc_get_time(struct tm *localt)
 
 int rtc_set_alarm(struct tm *localt, rtc_alarm_cb_t cb, void *arg)
 {
+    (void) arg;
     if (localt != NULL) {
         RTC_ALSEC = localt->tm_sec;
         RTC_ALMIN = localt->tm_min;

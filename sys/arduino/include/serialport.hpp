@@ -36,7 +36,7 @@ enum SerialFormat {
     BIN,            /**< format to binary representation */
     OCT,            /**< format to octal representation */
     DEC,            /**< format to decimal representation */
-    HEX,            /**< format to hex representation */
+    HEX             /**< format to hex representation */
 };
 
 /**

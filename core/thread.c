@@ -42,7 +42,7 @@ volatile tcb_t *thread_get(kernel_pid_t pid)
 int thread_getstatus(kernel_pid_t pid)
 {
     volatile tcb_t *t = thread_get(pid);
-    return t ? t->status : STATUS_NOT_FOUND;
+    return t ? (int) t->status : STATUS_NOT_FOUND;
 }
 
 #ifdef DEVELHELP

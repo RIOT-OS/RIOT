@@ -69,6 +69,7 @@ static int _isr_map_entry(gpio_t pin) {
 
 int gpio_init(gpio_t pin, gpio_dir_t dir, gpio_pp_t pullup)
 {
+    (void) dir;
     unsigned _pin = pin & 31;
     unsigned port = pin >> 5;
 
@@ -88,7 +89,9 @@ int gpio_init(gpio_t pin, gpio_dir_t dir, gpio_pp_t pullup)
     return 0;
 }
 
-int gpio_init_mux(unsigned pin, unsigned mux) {
+int gpio_init_mux(unsigned pin, unsigned mux)
+{
+    (void) mux;
     unsigned _pin = pin & 31;
     PINSEL[pin>>4] &= ~(0x1 << (_pin*2));
     return 0;
