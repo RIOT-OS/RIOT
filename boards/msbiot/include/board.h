@@ -23,8 +23,6 @@
 
 #include "cpu.h"
 #include "periph_conf.h"
-#include "periph/gpio.h"
-#include "periph/spi.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -59,7 +57,7 @@ extern "C" {
  * @name Define UART device and baudrate for stdio
  * @{
  */
-#define STDIO               UART_0
+#define STDIO               UART_DEV(0)
 #define STDIO_BAUDRATE      (115200U)
 #define STDIO_RX_BUFSIZE    (64U)
 /** @} */
