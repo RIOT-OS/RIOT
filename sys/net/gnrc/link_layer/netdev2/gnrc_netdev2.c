@@ -186,7 +186,7 @@ kernel_pid_t gnrc_netdev2_init(char *stack, int stacksize, char priority,
     }
 
     /* create new gnrc_netdev2 thread */
-    res = thread_create(stack, stacksize, priority, CREATE_STACKTEST,
+    res = thread_create(stack, stacksize, priority, THREAD_CREATE_STACKTEST,
                          _gnrc_netdev2_thread, (void *)gnrc_netdev2, name);
     if (res <= 0) {
         return -EINVAL;

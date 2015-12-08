@@ -277,7 +277,7 @@ int gnrc_udp_init(void)
     if (_pid == KERNEL_PID_UNDEF) {
         /* start UDP thread */
         _pid = thread_create(_stack, sizeof(_stack), GNRC_UDP_PRIO,
-                             CREATE_STACKTEST, _event_loop, NULL, "udp");
+                             THREAD_CREATE_STACKTEST, _event_loop, NULL, "udp");
     }
     return _pid;
 }

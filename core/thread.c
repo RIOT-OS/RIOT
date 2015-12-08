@@ -148,7 +148,7 @@ kernel_pid_t thread_create(char *stack, int stacksize, char priority, int flags,
     tcb_t *cb = (tcb_t *) (stack + stacksize);
 
 #if defined(DEVELHELP) || defined(SCHED_TEST_STACK)
-    if (flags & CREATE_STACKTEST) {
+    if (flags & THREAD_CREATE_STACKTEST) {
         /* assign each int of the stack the value of it's address */
         uintptr_t *stackmax = (uintptr_t *) (stack + stacksize);
         uintptr_t *stackp = (uintptr_t *) stack;
@@ -212,13 +212,13 @@ kernel_pid_t thread_create(char *stack, int stacksize, char priority, int flags,
 
     DEBUG("Created thread %s. PID: %" PRIkernel_pid ". Priority: %u.\n", name, cb->pid, priority);
 
-    if (flags & CREATE_SLEEPING) {
+    if (flags & THREAD_CREATE_SLEEPING) {
         sched_set_status(cb, STATUS_SLEEPING);
     }
     else {
         sched_set_status(cb, STATUS_PENDING);
 
-        if (!(flags & CREATE_WOUT_YIELD)) {
+        if (!(flags & THREAD_CREATE_WOUT_YIELD)) {
             restoreIRQ(state);
             sched_switch(priority);
             return pid;

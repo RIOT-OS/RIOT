@@ -64,7 +64,7 @@ int main(void)
     thread_create(stack_timer1,
                   STACKSIZE_TIMER,
                   2,
-                  CREATE_STACKTEST,
+                  THREAD_CREATE_STACKTEST,
                   timer_func1,
                   NULL,
                   "timer1");
@@ -72,7 +72,7 @@ int main(void)
     thread_create(stack_timer2,
                   STACKSIZE_TIMER,
                   3,
-                  CREATE_STACKTEST,
+                  THREAD_CREATE_STACKTEST,
                   timer_func2,
                   NULL,
                   "timer2");

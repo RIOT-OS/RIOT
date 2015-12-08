@@ -187,7 +187,8 @@ int gnrc_nettest_init(void)
 {
     if (_pid <= KERNEL_PID_UNDEF) {
         _pid = thread_create(_stack, sizeof(_stack), GNRC_NETTEST_PRIO,
-                             CREATE_STACKTEST, _event_loop, NULL, "nettest");
+                             THREAD_CREATE_STACKTEST,
+                             _event_loop, NULL, "nettest");
     }
 
     return _pid;
