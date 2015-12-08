@@ -731,6 +731,23 @@ static void _isr_event(gnrc_netdev_t *netdev, uint32_t event_type)
         addr_len = IEEE802154_LONG_ADDRESS_LEN;
     }
 
+#ifdef XBEE_DENIED_ADDRESSES
+    if (addr_len == 8) {
+        uint8_t denied_addresses[] = XBEE_DENIED_ADDRESSES;
+        for (size_t i = 0; i < sizeof(denied_addresses) / 8; i++) {
+            if (memcmp(&(dev->rx_buf[1]),
+                       &denied_addresses[i * 8],
+                       addr_len) == 0) {
+                dev->rx_count = 0;
+
+                DEBUG("xbee: dropping denied packet\n");
+
+                return;
+            }
+        }
+    }
+#endif
+
     /* check checksum for correctness */
     for (int i = 0; i < dev->rx_limit; i++) {
         cksum += dev->rx_buf[i];
