@@ -268,21 +268,26 @@ static int _set_short_addr(xbee_t *dev, uint8_t *address)
 
 static int _set_addr(xbee_t *dev, uint8_t *val, size_t len)
 {
+    uint8_t addr[2];
+
     /* device only supports setting the short address */
     if (len != 2) {
         return -ENOTSUP;
     }
 
-    if (dev->addr_flags & XBEE_ADDR_FLAGS_LONG ||
-          _set_short_addr(dev, val) == 0) {
+    addr[0] = val[0];
+    addr[1] = val[1];
 
 #ifdef MODULE_SIXLOWPAN
-        /* https://tools.ietf.org/html/rfc4944#section-12 requires the first bit
-         * to 0 for unicast addresses */
-        val[1] &= 0x7F;
+    /* https://tools.ietf.org/html/rfc4944#section-12 requires the first bit
+     * to 0 for unicast addresses */
+    addr[1] &= 0x7F;
 #endif
 
-        memcpy(dev->addr_short, val, 2);
+    if (dev->addr_flags & XBEE_ADDR_FLAGS_LONG ||
+          _set_short_addr(dev, addr) == 0) {
+
+        memcpy(dev->addr_short, addr, 2);
 
         return 2;
     }
