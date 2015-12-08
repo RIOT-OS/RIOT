@@ -167,6 +167,8 @@ int _ccnl_interest(int argc, char **argv)
         addr_len = gnrc_netif_addr_from_str(relay_addr, sizeof(relay_addr), argv[2]);
     }
 
+    memset(_int_buf, '\0', BUF_SIZE);
+    memset(_cont_buf, '\0', BUF_SIZE);
     for (int cnt = 0; cnt < CCNL_INTEREST_RETRIES; cnt++) {
         ccnl_send_interest(CCNL_SUITE_NDNTLV, argv[1], relay_addr, addr_len, NULL, _int_buf, BUF_SIZE);
         if (ccnl_wait_for_chunk(_cont_buf, BUF_SIZE) > 0) {
