@@ -159,9 +159,6 @@ int _ccnl_interest(int argc, char **argv)
         return -1;
     }
 
-    /* XXX: https://xkcd.com/221/ */
-    genrand_init(0x4);
-
     /* initialize address with 0xFF for broadcast */
     size_t addr_len = MAX_ADDR_LEN;
     uint8_t relay_addr[MAX_ADDR_LEN];
