@@ -100,26 +100,13 @@ typedef struct {
 } timer_conf_t;
 
 /**
- * @brief   declare needed generic SPI functions
+ * @brief declare needed generic SPI functions
  * @{
  */
 #define PERIPH_SPI_NEEDS_TRANSFER_BYTES
 #define PERIPH_SPI_NEEDS_TRANSFER_REG
 #define PERIPH_SPI_NEEDS_TRANSFER_REGS
 /** @} */
-
-/**
- * @brief   I2C device configuration
- */
-typedef struct {
-    I2C_TypeDef *dev;       /**< Pointer to the used I2C device */
-    gpio_t scl_pin;         /**< Pin used for SCL */
-    gpio_t sda_pin;         /**< Pin used for SDA */
-    uint8_t af_scl_sda;     /**< SCL or SDA AF */
-    uint8_t ev_irqn;        /**< I2C device Event Interrupt */
-    uint8_t er_irqn;        /**< I2C device Error Interrupt */
-    uint32_t clk_en;        /**< Clock enable register */
-} i2c_conf_t;
 
 #ifdef __cplusplus
 }
