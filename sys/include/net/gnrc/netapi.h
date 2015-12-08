@@ -151,7 +151,10 @@ static inline int gnrc_netapi_dispatch_receive(gnrc_nettype_t type, uint32_t dem
  * @param[in] data      pointer to buffer for reading the option's value
  * @param[in] max_len   maximum number of bytes that fit into @p data
  *
- * @return              value returned by the @ref GNRC_NETAPI_MSG_TYPE_ACK message
+ * @return              value returned by the @ref GNRC_NETAPI_MSG_TYPE_ACK message i.e. the actual
+ *                      length of the resulting data on success, a negative errno on error. The
+ *                      actual error value is for the implementation to decide but should be
+ *                      sensible to indicate what went wrong.
  */
 int gnrc_netapi_get(kernel_pid_t pid, netopt_t opt, uint16_t context,
                     void *data, size_t max_len);
@@ -166,7 +169,10 @@ int gnrc_netapi_get(kernel_pid_t pid, netopt_t opt, uint16_t context,
  * @param[in] data      data to set the given option to
  * @param[in] data_len  size of @p data
  *
- * @return              value returned by the @ref GNRC_NETAPI_MSG_TYPE_ACK message
+ * @return              value returned by the @ref GNRC_NETAPI_MSG_TYPE_ACK message i.e. 0 on
+ *                      success, a negative errno on error. The actual error value is for the
+ *                      implementation to decide but should be sensible to indicate what went
+ *                      wrong.
  */
 int gnrc_netapi_set(kernel_pid_t pid, netopt_t opt, uint16_t context,
                     void *data, size_t data_len);
