@@ -236,7 +236,7 @@ enum {
     DAC_3 = 3,              /**< DAC device 3 */
 #endif
     DAC_UNDEFINED           /**< Deprecated symbol, use DAC_UNDEF instead */
-} dac_t;
+};
 
 #ifdef __cplusplus
 }
