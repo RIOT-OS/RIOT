@@ -502,10 +502,7 @@ kernel_pid_t gnrc_ipv6_netif_find_by_prefix(ipv6_addr_t **out, const ipv6_addr_t
         match = _find_by_prefix_unsafe(&tmp_res, ipv6_ifs + i, prefix, NULL);
 
         if (match > best_match) {
-            if (out != NULL) {
-                *out = tmp_res;
-            }
-
+            *out = tmp_res;
             res = ipv6_ifs[i].pid;
             best_match = match;
         }
