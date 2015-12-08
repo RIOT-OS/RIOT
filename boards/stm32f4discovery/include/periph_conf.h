@@ -133,23 +133,19 @@ static const uart_conf_t uart_config[] = {
 /** @} */
 
 /**
- * @name DAC configuration
+ * @brief   DAC configuration
+ *
+ * We need to define the following fields:
+ * PIN, DAC channel
  * @{
  */
-#define DAC_NUMOF          (1U)
-#define DAC_0_EN           1
-#define DAC_MAX_CHANNELS   2
+#define DAC_CONFIG {          \
+    {GPIO_PIN(PORT_A, 4), 0}, \
+    {GPIO_PIN(PORT_A, 5), 1}  \
+}
 
-/* DAC 0 configuration */
-#define DAC_0_DEV            DAC
-#define DAC_0_CHANNELS       2
-#define DAC_0_CLKEN()        (RCC->APB1ENR |=  (RCC_APB1ENR_DACEN))
-#define DAC_0_CLKDIS()       (RCC->APB1ENR &= ~(RCC_APB1ENR_DACEN))
-#define DAC_0_PORT           GPIOA
-#define DAC_0_PORT_CLKEN()   (RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN)
-/* DAC 0 channel config */
-#define DAC_0_CH0_PIN        4
-#define DAC_0_CH1_PIN        5
+#define DAC_NUMOF           (2)
+/** @} */
 
 /**
  * @name PWM configuration
