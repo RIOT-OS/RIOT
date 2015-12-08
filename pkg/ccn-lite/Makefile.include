@@ -1,0 +1,2 @@
+INCLUDES += -I$(RIOTBASE)/pkg/ccn-lite -I$(RIOTBASE)/pkg/ccn-lite/ccn-lite/src
+INCLUDES += -I$(RIOTBASE)/sys/posix/include

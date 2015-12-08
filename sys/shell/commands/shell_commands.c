@@ -118,6 +118,12 @@ extern int _gnrc_6ctx(int argc, char **argv);
 #endif
 #endif
 
+#ifdef MODULE_CCN_LITE_UTILS
+extern int _ccnl_open(int argc, char **argv);
+extern int _ccnl_content(int argc, char **argv);
+extern int _ccnl_interest(int argc, char **argv);
+#endif
+
 const shell_command_t _shell_command_list[] = {
     {"reboot", "Reboot the node", _reboot_handler},
 #ifdef MODULE_CONFIG
@@ -193,6 +199,11 @@ const shell_command_t _shell_command_list[] = {
 #endif
 #ifdef MODULE_SAUL_REG
     {"saul", "interact with sensors and actuators using SAUL", _saul },
+#endif
+#ifdef MODULE_CCN_LITE_UTILS
+    { "ccnl_open", "opens an interface or socket", _ccnl_open},
+    { "ccnl_int", "sends an interest", _ccnl_interest},
+    { "ccnl_cont", "create content and populated it", _ccnl_content},
 #endif
     {NULL, NULL, NULL}
 };

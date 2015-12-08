@@ -1,0 +1,15 @@
+/*
+ * Copyright (C) 2015 INRIA
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
+/**
+ * @defgroup    pkg Packages
+ * @brief       RIOT supports the integration of external libraries. These
+ *              libraries can be used as BSD-like packages, i.e. they are
+ *              downloaded automatically at compile-time (if needed) and linked
+ *              against RIOT.
+ */
