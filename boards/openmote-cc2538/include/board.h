@@ -72,6 +72,19 @@
 /** @} */
 
 /**
+ * @name Flash Customer Configuration Area (CCA) parameters
+ * @{
+ */
+#ifndef UPDATE_CCA
+#define UPDATE_CCA                (1)
+#endif
+
+#define CCA_BACKDOOR_ENABLE       (1)
+#define CCA_BACKDOOR_PORT_A_PIN   (6) /**< ON/SLEEP Pin */
+#define CCA_BACKDOOR_ACTIVE_LEVEL (0) /**< Active low */
+/** @} */
+
+/**
  * @brief Initialize board specific hardware, including clock, LEDs and std-IO
  */
 void board_init(void);
