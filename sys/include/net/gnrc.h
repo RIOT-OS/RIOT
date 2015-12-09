@@ -17,7 +17,7 @@
  * This module is currently the default network stack for RIOT and includes
  * many components ranging from a @ref net_gnrc_nomac "simple MAC protocol"
  * through a fully-featured @ref net_gnrc_ipv6 implementation with @ref
- * net_gnrc_sixlowpan "6LowPAN" extensions to* an @ref net_gnrc_udp "UDP"
+ * net_gnrc_sixlowpan "6LowPAN" extensions to an @ref net_gnrc_udp "UDP"
  * implementation and @ref net_gnrc_rpl.
  *
  * A list of all features contained in the @ref net_gnrc is available in the
@@ -237,7 +237,7 @@
  *   USEMODULE += gnrc_rpl
  *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *   This will include the @ref net_gnrc_rpl module. To provide forwarding
- *   capabilities is necessary to build the application with
+ *   capabilities it is necessary to build the application with
  *   `gnrc_ipv6_router_default` (or `gnrc_ipv6_router`), not
  *   `gnrc_ipv6_default` (or `gnrc_ipv6`).
  *
