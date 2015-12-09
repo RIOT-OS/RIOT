@@ -270,7 +270,7 @@ static rbuf_t *_rbuf_get(const void *src, size_t src_len,
 
     for (unsigned int i = 0; i < RBUF_SIZE; i++) {
         /* check first if entry already available */ 
-	if (rbuf[i].pkt != NULL){
+	if (rbuf[i].pkt != NULL) {
             if ((rbuf[i].tag == tag) && (rbuf[i].pkt->size == size) &&
                 (rbuf[i].src_len == src_len) && (rbuf[i].dst_len == dst_len) &&
                 (memcmp(rbuf[i].src, src, src_len) == 0) &&
@@ -289,7 +289,7 @@ static rbuf_t *_rbuf_get(const void *src, size_t src_len,
 
         /* if there is a free spot: remember it */
 	else if (res == NULL) {
-                res = &(rbuf[i]);
+            res = &(rbuf[i]);
 	}
     }
 
