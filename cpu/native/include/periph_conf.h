@@ -63,6 +63,15 @@
 
 /** @} */
 
+/**
+ * @brief UART configuration
+ * @{
+ */
+#ifndef UART_NUMOF
+#define UART_NUMOF (1U)
+#endif
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
