@@ -20,11 +20,11 @@
 
 #include "bitarithm.h"
 #include "periph/gpio.h"
-#include "periph/pwm.h"
 #include "board.h"
 #include "periph_conf.h"
 
 /* guard file in case no PWM device is defined */
+#include "periph/pwm.h"
 #if (PWM_0_EN || PWM_1_EN)
 
 /**
