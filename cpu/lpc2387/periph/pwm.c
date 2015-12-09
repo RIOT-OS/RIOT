@@ -20,8 +20,14 @@
 
 #include "bitarithm.h"
 #include "lpc2387.h"
-#include "periph/pwm.h"
 #include "periph_conf.h"
+
+/* guard file in case no PWM device is defined */
+#if (PWM_0_EN || PWM_1_EN)
+
+/* pull the PWM header inside the guards for now. Guards will be removed on
+ * adapting this driver implementation... */
+#include "periph/pwm.h"
 
 /**
  * @note The PWM is always initialized with left-aligned mode.
@@ -158,3 +164,5 @@ void pwm_poweroff(pwm_t dev)
 #endif
     }
 }
+
+#endif /* (PWM_0_EN || PWM_1_EN) */
