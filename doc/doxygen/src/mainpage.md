@@ -178,7 +178,7 @@ sys/net
 -------
 The `sys/net` sub-directory needs to be explicitly mentioned, as this is where
 all the networking code in RIOT resides. Here you can find the network stack
-implementations (e.g. the GNRC stack) as well as network stack agnostic code as
+implementations (e.g. the @ref net_gnrc "GNRC" stack) as well as network stack agnostic code as
 header definitions or network types.
 
 See @ref net for more details on networking code.
