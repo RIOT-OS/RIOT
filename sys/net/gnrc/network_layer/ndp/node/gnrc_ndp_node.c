@@ -90,14 +90,8 @@ kernel_pid_t gnrc_ndp_node_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_len,
 
     if (next_hop_ip == NULL) {            /* no route to host */
         if (!dst_link_local) {
-            if (iface == KERNEL_PID_UNDEF) {
-                /* gnrc_ipv6_netif_t doubles as prefix list */
-                iface = gnrc_ipv6_netif_find_by_prefix(&prefix, dst);
-            }
-            else {
-                /* gnrc_ipv6_netif_t doubles as prefix list */
-                prefix = gnrc_ipv6_netif_match_prefix(iface, dst);
-            }
+            /* gnrc_ipv6_netif_t doubles as prefix list */
+            iface = gnrc_ipv6_netif_find_by_prefix(&prefix, dst);
         }
 
         if (dst_link_local || ((prefix != NULL) &&
