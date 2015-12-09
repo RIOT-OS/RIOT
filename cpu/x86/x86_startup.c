@@ -51,7 +51,7 @@ static char early_malloc_pool[0x1000] __attribute__((aligned(4)));
 
 void x86_startup(void)
 {
-    tlsf_add_pool(early_malloc_pool, sizeof early_malloc_pool);
+    tlsf_create_with_pool(early_malloc_pool, sizeof early_malloc_pool);
 
     x86_early_init_uart();
     x86_init_threading();

@@ -42,7 +42,7 @@ static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
 int main(void)
 {
 #ifndef BOARD_NATIVE
-    tlsf_add_pool(_tlsf_heap, sizeof(_tlsf_heap));
+    tlsf_create_with_pool(_tlsf_heap, sizeof(_tlsf_heap));
 #endif
     msg_init_queue(_main_msg_queue, MAIN_QUEUE_SIZE);
 
