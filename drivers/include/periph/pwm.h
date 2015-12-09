@@ -62,7 +62,7 @@ extern "C" {
  * @{
  */
 #ifndef HAVE_PWM_T
-typedef int pwm_t;
+typedef unsigned int pwm_t;
 #endif
 /** @} */
 
@@ -140,8 +140,10 @@ void pwm_stop(pwm_t dev);
 /**
  * @brief   Power on the PWM device
  *
- * The PWM deice is powered on. It is dependent on the implementing platform,
- * if the previously set configuration is still available after power on.
+ * When the device is powered on the first time, not configuration is set. If
+ * the device is powered back on, after having been initialized and powered off
+ * before, the PWM device will continue its operation with the previously set
+ * configuration. So there is no need in re-initializing then.
  *
  * @param[in] dev           device to power on
  */
@@ -150,8 +152,10 @@ void pwm_poweron(pwm_t dev);
 /**
  * @brief   Power off the given PWM device
  *
- * The given PWM is completely powered off. On most platform this means, that
- * the clock for the PWM device is disabled.
+ * This function will power off the given PWM device, which on most platforms
+ * means that it will be disabled using clock gating. The implementation must
+ * make sure, that any previously configuration will hold when the device is
+ * being powered back on.
  *
  * @param[in] dev           device to power off
  */
