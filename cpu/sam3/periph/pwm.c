@@ -19,6 +19,12 @@
  */
 #include <stdint.h>
 #include "board.h"
+
+/* guard file in case no PWM device is defined */
+#if (PWM_0_EN || PWM_1_EN)
+
+/* pull the PWM header inside the guards for now. Guards will be removed on
+ * adapting this driver implementation... */
 #include "periph/pwm.h"
 
 #define MCK_DIV_LB_MAX          (10U)
@@ -269,3 +275,5 @@ void pwm_poweroff(pwm_t dev)
 #endif
     }
 }
+
+#endif /* (PWM_0_EN || PWM_1_EN) */
