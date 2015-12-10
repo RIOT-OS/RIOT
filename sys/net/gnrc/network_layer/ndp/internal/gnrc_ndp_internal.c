@@ -469,6 +469,7 @@ void gnrc_ndp_internal_send_rtr_adv(kernel_pid_t iface, ipv6_addr_t *src, ipv6_a
                     else {
                         DEBUG("ndp rtr: error allocating PIO\n");
                         gnrc_pktbuf_release(pkt);
+                        mutex_unlock(&ipv6_iface->mutex);
                         return;
                     }
                 }
@@ -484,6 +485,7 @@ void gnrc_ndp_internal_send_rtr_adv(kernel_pid_t iface, ipv6_addr_t *src, ipv6_a
                                                        &ctx->prefix, pkt);
                 if (hdr == NULL) {
                     DEBUG("ndp rtr: error allocating 6CO\n");
+                    mutex_unlock(&ipv6_iface->mutex);
                     gnrc_pktbuf_release(pkt);
                     return;
                 }
@@ -492,6 +494,7 @@ void gnrc_ndp_internal_send_rtr_adv(kernel_pid_t iface, ipv6_addr_t *src, ipv6_a
             hdr = gnrc_sixlowpan_nd_opt_abr_build(abr->version, abr->ltime, &abr->addr, pkt);
             if (hdr == NULL) {
                 DEBUG("ndp internal: error allocating ABRO.\n");
+                mutex_unlock(&ipv6_iface->mutex);
                 gnrc_pktbuf_release(pkt);
                 return;
             }
