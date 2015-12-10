@@ -120,6 +120,8 @@ int pwm_init(pwm_t dev, pwm_mode_t mode, unsigned int frequency, unsigned int re
     }
     tim->PSC = (pwm_clk / (resolution * frequency)) - 1;
     tim->ARR = resolution - 1;
+    /* calculate the actual PWM frequency */
+    frequency = (pwm_clk / (resolution * (tim->PSC + 1)));
 
     /* set PWM mode */
     switch (mode) {
