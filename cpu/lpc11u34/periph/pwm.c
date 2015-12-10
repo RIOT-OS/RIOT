@@ -20,17 +20,17 @@
 
 #include "bitarithm.h"
 #include "periph/gpio.h"
-#include "periph/pwm.h"
 #include "board.h"
 #include "periph_conf.h"
 
 /* guard file in case no PWM device is defined */
+#include "periph/pwm.h"
 #if (PWM_0_EN || PWM_1_EN)
 
 /**
  * @note    The LPC11U34 doesn't support centerized alignements
  */
-int pwm_init(pwm_t dev, pwm_mode_t mode, unsigned int frequency, unsigned int resolution)
+uint32_t pwm_init(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
 {
     switch (dev) {
 #if PWM_0_EN
@@ -40,7 +40,7 @@ int pwm_init(pwm_t dev, pwm_mode_t mode, unsigned int frequency, unsigned int re
                 return -1;
             }
             /* Check if the frequency and resolution is applicable */
-            if (F_CPU/(resolution*frequency) <= 0) {
+            if (F_CPU/(res*freq) <= 0) {
                 return -2;
             }
 #if PWM_0_CH0_EN
@@ -57,15 +57,15 @@ int pwm_init(pwm_t dev, pwm_mode_t mode, unsigned int frequency, unsigned int re
             /* Enable timer and keep it in reset state */
             PWM_0_DEV->TCR = BIT0 | BIT1;
             /* Set the prescaler (F_CPU / resolution) */
-            PWM_0_DEV->PR = (F_CPU/(resolution*frequency));
+            PWM_0_DEV->PR = (F_CPU/(res*freq));
             /* Reset timer on MR3 */
             PWM_0_DEV->MCR = BIT10;
 
             /* Set PWM period */
-            PWM_0_DEV->MR0 = (resolution);
-            PWM_0_DEV->MR1 = (resolution);
-            PWM_0_DEV->MR2 = (resolution);
-            PWM_0_DEV->MR3 = (resolution)-1;
+            PWM_0_DEV->MR0 = (res);
+            PWM_0_DEV->MR1 = (res);
+            PWM_0_DEV->MR2 = (res);
+            PWM_0_DEV->MR3 = (res)-1;
 
             /* Set mode for channels 0..2 */
             PWM_0_DEV->EMR |= ((mode+1) << 4);
@@ -82,7 +82,7 @@ int pwm_init(pwm_t dev, pwm_mode_t mode, unsigned int frequency, unsigned int re
                 return -1;
             }
             /* Check if the frequency and resolution is applicable */
-            if (F_CPU/(resolution*frequency) <= 0) {
+            if (F_CPU/(res*freq) <= 0) {
                 return -2;
             }
 #if PWM_1_CH0_EN
@@ -99,15 +99,15 @@ int pwm_init(pwm_t dev, pwm_mode_t mode, unsigned int frequency, unsigned int re
             /* Enable timer and keep it in reset state */
             PWM_1_DEV->TCR = BIT0 | BIT1;
             /* Set the prescaler (F_CPU / resolution) */
-            PWM_1_DEV->PR = (F_CPU/(resolution*frequency));
+            PWM_1_DEV->PR = (F_CPU/(res*freq));
             /* Reset timer on MR3 */
             PWM_1_DEV->MCR = BIT10;
 
             /* Set PWM period */
-            PWM_1_DEV->MR0 = (resolution);
-            PWM_1_DEV->MR1 = (resolution);
-            PWM_1_DEV->MR2 = (resolution);
-            PWM_1_DEV->MR3 = (resolution)-1;
+            PWM_1_DEV->MR0 = (res);
+            PWM_1_DEV->MR1 = (res);
+            PWM_1_DEV->MR2 = (res);
+            PWM_1_DEV->MR3 = (res)-1;
 
             /* Set mode for channels 0..2 */
             PWM_1_DEV->EMR |= ((mode+1) << 4);
@@ -119,10 +119,26 @@ int pwm_init(pwm_t dev, pwm_mode_t mode, unsigned int frequency, unsigned int re
 #endif /* PWM_1_EN */
     }
 
-    return frequency;
+    return freq;
 }
 
-int pwm_set(pwm_t dev, int channel, unsigned int value)
+uint8_t pwm_channels(pwm_t dev)
+{
+    switch (dev) {
+#if PWM_0_EN
+        case PWM_0:
+            return PWM_0_CHANNELS;
+#endif
+#if PWM_1_EN
+        case PWM_1:
+            return PWM_1_CHANNELS;
+#endif
+        default:
+            return 0;
+    }
+}
+
+void pwm_set(pwm_t dev, uint8_t channel, uint16_t value)
 {
     switch (dev) {
 #if PWM_0_EN
@@ -140,8 +156,6 @@ int pwm_set(pwm_t dev, int channel, unsigned int value)
             break;
 #endif
     }
-
-    return 0;
 }
 
 void pwm_start(pwm_t dev)

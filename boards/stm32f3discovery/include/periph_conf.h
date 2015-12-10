@@ -110,7 +110,7 @@ extern "C" {
  * @brief PWM configuration
  * @{
  */
-#define PWM_NUMOF           (1U)
+#define PWM_NUMOF           (2U)
 #define PWM_0_EN            1
 #define PWM_1_EN            1
 

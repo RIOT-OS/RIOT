@@ -19,37 +19,24 @@
  */
 #include <stdint.h>
 #include "board.h"
+
+/* guard file in case no PWM device is defined */
+#if (PWM_0_EN || PWM_1_EN)
+
+/* pull the PWM header inside the guards for now. Guards will be removed on
+ * adapting this driver implementation... */
 #include "periph/pwm.h"
 
-/*
- * guard file in case no PWM device is defined,
- */
-#if PWM_NUMOF && PWM_0_EN
-
-#define ERR_INIT_MODE           (-1)
-#define ERR_INIT_BWTH           (-2)
-#define ERR_SET_CHAN            (-1)
 #define MCK_DIV_LB_MAX          (10U)
 
-int pwm_init(pwm_t dev, pwm_mode_t mode,
-             unsigned int frequency,
-             unsigned int resolution)
+uint32_t pwm_init(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
 {
-
-    int32_t retval = ERR_INIT_MODE;    /* Worst/First case */
     uint32_t pwm_clk = 0;              /* Desired/real pwm_clock */
     uint32_t diva = 1;                 /* Candidate for 8bit divider */
     uint32_t prea = 0;                 /* Candidate for clock select */
 
-    switch (dev) {
-#if PWM_0_EN
-
-        case PWM_0:
-            break;
-#endif
-
-        default:
-            return ERR_INIT_MODE;
+    if (dev != PWM_0) {
+        return 0;
     }
 
     /*
@@ -63,18 +50,18 @@ int pwm_init(pwm_t dev, pwm_mode_t mode,
         case PWM_RIGHT:
         case PWM_CENTER:
         default:
-            return ERR_INIT_MODE;
+            return 0;
     }
 
     /* Should check if "|log_2 frequency|+|log_2 resolution| <= 32" */
-    pwm_clk = frequency * resolution;
+    pwm_clk = freq * res;
 
     /*
      * The pwm provides 11 prescaled clocks with (MCK/2^prea | prea=[0,10])
      * and a divider (diva) with a denominator range [1,255] in line.
      */
     if (F_CPU < pwm_clk) {  /* Have to cut down resulting frequency. */
-        frequency = F_CPU / resolution;
+        freq = F_CPU / res;
     }
     else {   /* Estimate prescaler and divider. */
         diva = F_CPU / pwm_clk;
@@ -84,10 +71,8 @@ int pwm_init(pwm_t dev, pwm_mode_t mode,
             diva = diva >> 1;
         }
 
-        frequency = F_CPU / ((resolution * diva) << prea);
+        freq = F_CPU / ((res * diva) << prea);
     }
-
-    retval = frequency;
 
     /* Activate PWM block by enabling it's clock. */
     PMC->PMC_PCER1 = PMC_PCER1_PID36;
@@ -108,25 +93,25 @@ int pwm_init(pwm_t dev, pwm_mode_t mode,
     /* Set clock source, resolution, duty-cycle and enable */
 #if PWM_0_CHANNELS > 0
     PWM_0_DEV_CH0->PWM_CMR = PWM_CMR_CPRE_CLKA;
-    PWM_0_DEV_CH0->PWM_CPRD = resolution - 1;
+    PWM_0_DEV_CH0->PWM_CPRD = res - 1;
     PWM_0_DEV_CH0->PWM_CDTY = 0;
     PWM_0_DEV->PWM_ENA = PWM_0_ENA_CH0;
 #endif
 #if PWM_0_CHANNELS > 1
     PWM_0_DEV_CH1->PWM_CMR = PWM_CMR_CPRE_CLKA;
-    PWM_0_DEV_CH1->PWM_CPRD = resolution - 1;
+    PWM_0_DEV_CH1->PWM_CPRD = res - 1;
     PWM_0_DEV_CH1->PWM_CDTY = 0;
     PWM_0_DEV->PWM_ENA = PWM_0_ENA_CH1;
 #endif
 #if PWM_0_CHANNELS > 2
     PWM_0_DEV_CH2->PWM_CMR = PWM_CMR_CPRE_CLKA;
-    PWM_0_DEV_CH2->PWM_CPRD = resolution - 1;
+    PWM_0_DEV_CH2->PWM_CPRD = res - 1;
     PWM_0_DEV_CH2->PWM_CDTY = 0;
     PWM_0_DEV->PWM_ENA = PWM_0_ENA_CH2;
 #endif
 #if PWM_0_CHANNELS > 3
     PWM_0_DEV_CH3->PWM_CMR = PWM_CMR_CPRE_CLKA;
-    PWM_0_DEV_CH3->PWM_CPRD = resolution - 1;
+    PWM_0_DEV_CH3->PWM_CPRD = res - 1;
     PWM_0_DEV_CH3->PWM_CDTY = 0;
     PWM_0_DEV->PWM_ENA = PWM_0_ENA_CH3;
 #endif
@@ -154,17 +139,24 @@ int pwm_init(pwm_t dev, pwm_mode_t mode,
     PWM_0_PORT_CH3->PIO_ABSR |= PWM_0_PIN_CH3;
 #endif
 
-    return retval;
+    return freq;
+}
+
+uint8_t pwm_channels(pwm_t dev)
+{
+    if (dev == 0) {
+        return PWM_0_CHANNELS;
+    }
+    return 0;
 }
 
 /*
  * Update duty-cycle in channel with value.
  * If value is larger than resolution set by pwm_init() it is cropped.
  */
-int pwm_set(pwm_t dev, int channel, unsigned int value)
+void pwm_set(pwm_t dev, uint8_t channel, uint16_t value)
 {
 
-    int retval = ERR_SET_CHAN;      /* Worst case */
     uint32_t period = 0;            /* Store pwm period */
     PwmCh_num *chan = (void *)0;    /* Addressed channel. */
 
@@ -176,7 +168,7 @@ int pwm_set(pwm_t dev, int channel, unsigned int value)
 #endif
 
         default:
-            return ERR_SET_CHAN;
+            return;
     }
 
 
@@ -207,7 +199,7 @@ int pwm_set(pwm_t dev, int channel, unsigned int value)
 #endif
 
         default:
-            retval = ERR_SET_CHAN;
+            return;
     }
 
     if (chan) {
@@ -220,11 +212,7 @@ int pwm_set(pwm_t dev, int channel, unsigned int value)
         else {   /* Value Out of range. Clip silent as required by interface. */
             chan->PWM_CDTYUPD = period;
         }
-
-        retval = 0;
     }
-
-    return retval;
 }
 
 /*
@@ -288,4 +276,4 @@ void pwm_poweroff(pwm_t dev)
     }
 }
 
-#endif /* PWM_NUMOF */
+#endif /* (PWM_0_EN || PWM_1_EN) */

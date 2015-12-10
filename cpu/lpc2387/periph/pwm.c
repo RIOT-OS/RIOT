@@ -20,18 +20,21 @@
 
 #include "bitarithm.h"
 #include "lpc2387.h"
-#include "periph/pwm.h"
 #include "periph_conf.h"
 
 /* guard file in case no PWM device is defined */
-#if PWM_NUMOF
+#if (PWM_0_EN || PWM_1_EN)
+
+/* pull the PWM header inside the guards for now. Guards will be removed on
+ * adapting this driver implementation... */
+#include "periph/pwm.h"
 
 /**
  * @note The PWM is always initialized with left-aligned mode.
  *
  * TODO: add center and right aligned modes
  */
-int pwm_init(pwm_t dev, pwm_mode_t mode, unsigned int frequency, unsigned int resolution)
+uint32_t pwm_init(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
 {
     (void) mode; /* unused */
 
@@ -57,10 +60,10 @@ int pwm_init(pwm_t dev, pwm_mode_t mode, unsigned int frequency, unsigned int re
             PWM1TCR = BIT1;
 
             /* set prescaler */
-            PWM1PR = (F_CPU / (frequency * resolution)) - 1;
+            PWM1PR = (F_CPU / (freq * res)) - 1;
 
             /* set match register */
-            PWM1MR0 = resolution;
+            PWM1MR0 = res;
             PWM_0_CH0_MR = 0;
             PWM_0_CH1_MR = 0;
             PWM_0_CH2_MR = 0;
@@ -80,10 +83,18 @@ int pwm_init(pwm_t dev, pwm_mode_t mode, unsigned int frequency, unsigned int re
 #endif
     }
 
-    return frequency;
+    return freq;
 }
 
-int pwm_set(pwm_t dev, int channel, unsigned int value)
+uint8_t pwm_channels(pwm_t dev)
+{
+    if (dev == PWM_0) {
+        return PWM_0_CHANNELS;
+    }
+    return 0;
+}
+
+void pwm_set(pwm_t dev, uint8_t channel, uint16_t value)
 {
     switch (dev) {
 #if PWM_0_EN
@@ -102,14 +113,12 @@ int pwm_set(pwm_t dev, int channel, unsigned int value)
                     PWM1LER |= (1 << PWM_0_CH2);
                     break;
                 default:
-                    return -2;
+                    return;
                     break;
             }
             break;
 #endif
     }
-
-    return 0;
 }
 
 void pwm_start(pwm_t dev)
@@ -156,4 +165,4 @@ void pwm_poweroff(pwm_t dev)
     }
 }
 
-#endif /* PWM_NUMOF */
+#endif /* (PWM_0_EN || PWM_1_EN) */

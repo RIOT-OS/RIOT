@@ -198,6 +198,25 @@ enum {
     UART_UNDEFINED          /**< Deprecated symbol, use UART_UNDEF instead */
 };
 
+/**
+ * @brief   Legacy definitions of PWM devices
+ */
+enum {
+#if PWM_0_EN
+    PWM_0,              /*< 1st PWM device */
+#endif
+#if PWM_1_EN
+    PWM_1,              /*< 2nd PWM device */
+#endif
+#if PWM_2_EN
+    PWM_2,              /*< 3rd PWM device */
+#endif
+#if PWM_3_EN
+    PWM_3,              /*< 4th PWM device */
+#endif
+    PWM_UNDEFINED       /**< Deprecated symbol, use PWM_UNDEF instead */
+};
+
 #ifdef __cplusplus
 }
 #endif

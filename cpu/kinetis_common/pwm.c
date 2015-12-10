@@ -31,9 +31,6 @@
 #include "periph/pwm.h"
 #include "periph_conf.h"
 
-/* ignore file in case no PWM devices are defined */
-#if PWM_NUMOF
-
 /* FTM channel look up tables */
 #if PWM_0_EN
 static const uint8_t ftm0chan[] = {
@@ -92,7 +89,7 @@ static const uint8_t ftm1chan[] = {
 };
 #endif
 
-int pwm_init(pwm_t dev, pwm_mode_t mode, unsigned int frequency, unsigned int resolution)
+uint32_t pwm_init(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
 {
     FTM_Type *ftm;
     int channels = 0;
@@ -120,7 +117,7 @@ int pwm_init(pwm_t dev, pwm_mode_t mode, unsigned int frequency, unsigned int re
 #endif
 
         default:
-            return -1;
+            return 0;
     }
 
     switch (mode) {
@@ -130,25 +127,25 @@ int pwm_init(pwm_t dev, pwm_mode_t mode, unsigned int frequency, unsigned int re
             break;
 
         default:
-            return -1;
+            return 0;
     }
 
-    if (resolution > (PWM_MAX_VALUE + 1) || (resolution * frequency) > pwm_clk) {
-        return -2;
+    if (res > (PWM_MAX_VALUE + 1) || (res * freq) > pwm_clk) {
+        return 0;
     }
 
     /* Try to find a good prescaler value */
     /* The prescaler divides the module clock by a power of two, between 2^0 and 2^7 */
     uint8_t prescaler = 0;
     /* (resolution * frequency) is the number of timer ticks per second */
-    while ((pwm_clk >> prescaler) > (resolution * frequency)) {
+    while ((pwm_clk >> prescaler) > (res * freq)) {
         ++prescaler;
         if (prescaler > 7) {
             /* Module clock is too fast to reach the requested frequency using the
              * hardware supported prescaler values */
             /* Note: The frequency might be reachable if the requested resolution
              * is increased. */
-            return -2;
+            return 0;
         }
     }
     /* The chosen prescaler yields a timer frequency which is the
@@ -220,7 +217,7 @@ int pwm_init(pwm_t dev, pwm_mode_t mode, unsigned int frequency, unsigned int re
 #endif
 
         default:
-            return -1;
+            return 0;
     }
 
     /* disable write protect for changing settings */
@@ -238,7 +235,7 @@ int pwm_init(pwm_t dev, pwm_mode_t mode, unsigned int frequency, unsigned int re
 
     /* set prescale and mod registers to matching values for resolution and frequency */
     ftm->SC = FTM_SC_PS(prescaler);
-    ftm->MOD = resolution - 1;
+    ftm->MOD = res - 1;
 
     /* set PWM mode */
     uint32_t mode_mask = 0;
@@ -268,10 +265,26 @@ int pwm_init(pwm_t dev, pwm_mode_t mode, unsigned int frequency, unsigned int re
     pwm_start(dev);
 
     /* Return actual frequency */
-    return (pwm_clk / (1 << prescaler)) / resolution;
+    return (pwm_clk / (1 << prescaler)) / res;
 }
 
-int pwm_set(pwm_t dev, int channel, unsigned int value)
+uint8_t pwm_channels(pwm_t dev)
+{
+    switch (dev) {
+#if PWM_0_EN
+        case PWM_0:
+            return PWM_0_CHANNELS;
+#endif
+#if PWM_1_EN
+        case PWM_1:
+            return PWM_1_CHANNELS;
+#endif
+        default:
+            return 0;
+    }
+}
+
+void pwm_set(pwm_t dev, uint8_t channel, uint16_t value)
 {
     FTM_Type *ftm;
     const uint8_t *ftmchan = NULL;
@@ -281,7 +294,7 @@ int pwm_set(pwm_t dev, int channel, unsigned int value)
 
         case PWM_0:
             if (channel > PWM_0_CHANNELS) {
-                return -1;
+                return;
             }
             ftm = PWM_0_DEV;
             ftmchan = &ftm0chan[0];
@@ -291,7 +304,7 @@ int pwm_set(pwm_t dev, int channel, unsigned int value)
 
         case PWM_1:
             if (channel > PWM_1_CHANNELS) {
-                return -1;
+                return;
             }
             ftm = PWM_1_DEV;
             ftmchan = &ftm1chan[0];
@@ -299,7 +312,7 @@ int pwm_set(pwm_t dev, int channel, unsigned int value)
 #endif
 
         default:
-            return -1;
+            return;
     }
 
     /* clamp value to maximum possible value */
@@ -312,8 +325,6 @@ int pwm_set(pwm_t dev, int channel, unsigned int value)
      * this function. */
     /* cppcheck-suppress nullPointer */
     ftm->CONTROLS[ftmchan[channel]].CnV = value;
-
-    return 0;
 }
 
 void pwm_start(pwm_t dev)
@@ -387,5 +398,3 @@ void pwm_poweroff(pwm_t dev)
 #endif
     }
 }
-
-#endif /* PWM_NUMOF */
