@@ -295,7 +295,8 @@ void gpio_write(gpio_t pin, int value)
 
 static inline void isr_handler(Pio *port, int port_num)
 {
-    uint32_t status = port->PIO_ISR;
+    /* take interrupt flags only from pins which interrupt is enabled */
+    uint32_t status = (port->PIO_ISR & port->PIO_IMR);
 
     for (int i = 0; i < 32; i++) {
         if (status & (1 << i)) {
