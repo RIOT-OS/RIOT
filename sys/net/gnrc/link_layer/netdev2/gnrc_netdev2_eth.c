@@ -85,7 +85,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netdev2_t *gnrc_netdev2)
         ((gnrc_netif_hdr_t *)netif_hdr->data)->if_pid = thread_getpid();
 
         DEBUG("gnrc_netdev2_eth: received packet from %02x:%02x:%02x:%02x:%02x:%02x "
-                "of length %zu\n",
+                "of length %d\n",
                 hdr->src[0], hdr->src[1], hdr->src[2], hdr->src[3], hdr->src[4],
                 hdr->src[5], nread);
 #if defined(MODULE_OD) && ENABLE_DEBUG
