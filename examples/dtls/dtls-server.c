@@ -204,7 +204,7 @@ void *_server_trampoline(void *args)
     (void) args;
     msg_init_queue(_reader_queue, READER_QUEUE_SIZE);
     dtls_context_t *the_context = NULL;
-    log_t log_level = DTLS_LOG_WARN;
+    log_t log_level = DTLS_LOG_DEBUG;
     struct sockaddr_in6 listen_addr;
 
     memset(&listen_addr, 0, sizeof(struct sockaddr_in6));
