@@ -669,6 +669,22 @@ char *ipv6_addr_to_str(char *result, const ipv6_addr_t *addr, uint8_t result_len
  */
 ipv6_addr_t *ipv6_addr_from_str(ipv6_addr_t *result, const char *addr);
 
+/**
+ * @brief   Extract prefix length from prefix string
+ *          "ip-address/prefix-length"
+ *
+ * @see <a href="https://tools.ietf.org/html/rfc4291#section-2.3">
+ *          RFC 4291 Section 2.3
+ *      </a>
+ *
+ * @param[in] addr      An IPv6 prefix string representation
+ *
+ * @return  prefix length
+ * @return  -1, if @p addr was malformed
+ * @return  -1, if @p addr was NULL
+ */
+int ipv6_prefix_length_from_str(const char *addr);
+
 #ifdef __cplusplus
 }
 #endif
