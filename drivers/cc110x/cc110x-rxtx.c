@@ -210,7 +210,15 @@ static void _tx_continue(cc110x_t *dev)
     cc110x_writeburst_reg(dev, CC110X_TXFIFO, ((char *)pkt)+dev->pkt_buf.pos, to_send);
     dev->pkt_buf.pos += to_send;
 
+    /* did we just start sending this packet? */
     if (left == size) {
+#ifdef MODULE_CC110X_HOOKS
+        cc110x_hook_tx();
+#endif
+
+        /* disable CCA mode */
+        cc110x_write_reg(dev, CC110X_MCSM1, 0x3);
+
         /* Switch to TX mode */
         cc110x_strobe(dev, CC110X_STX);
     }
@@ -234,7 +242,7 @@ static void _tx_abort(cc110x_t *dev)
 
 void cc110x_switch_to_rx(cc110x_t *dev)
 {
-    DEBUG("%s:%s:%u\n", RIOT_FILE_RELATIVE, __func__, __LINE__);
+    DEBUG("cc110x: switching to RX.\n");
 
     gpio_irq_disable(dev->params.gdo2);
 
@@ -259,6 +267,7 @@ void cc110x_isr_handler(cc110x_t *dev, void(*callback)(void*), void*arg)
     switch (dev->radio_state) {
         case RADIO_RX:
             _rx_start(dev);
+            /* fall through */
         case RADIO_RX_BUSY:
             _rx_continue(dev, callback, arg);
             break;
@@ -272,6 +281,33 @@ void cc110x_isr_handler(cc110x_t *dev, void(*callback)(void*), void*arg)
     }
 }
 
+static int cc110x_cca(cc110x_t *dev)
+{
+    char regtmp;
+
+    /* switch to idle and then RX to clear RSSI value */
+    cc110x_strobe(dev, CC110X_SIDLE);
+    cc110x_strobe(dev, CC110X_SRX);
+
+    /* set CCA mode */
+    cc110x_write_reg(dev, CC110X_MCSM1, (0x3 << 4) | 0x3);
+
+    /* wait until device switched to RX */
+    do {
+        cc110x_readburst_reg(dev, CC110X_MARCSTATE, &regtmp, 1);
+    } while (regtmp != 0x0D);
+
+    /* set GDO2 to CCA */
+    cc110x_write_reg(dev, CC110X_IOCFG2, 0x09);
+
+    /* wait until RSSI value is stable */
+    do {
+        cc110x_readburst_reg(dev, CC110X_PKTSTATUS, &regtmp, 1);
+    } while (! (regtmp & 0x50)); /* bit6 = CS, bit4 = CCA */
+
+    return (regtmp & 0x10); /* CCA */
+}
+
 int cc110x_send(cc110x_t *dev, cc110x_pkt_t *packet)
 {
     DEBUG("cc110x: snd pkt to %u payload_length=%u\n",
@@ -281,8 +317,7 @@ int cc110x_send(cc110x_t *dev, cc110x_pkt_t *packet)
     switch (dev->radio_state) {
         case RADIO_RX_BUSY:
         case RADIO_TX_BUSY:
-            DEBUG("cc110x: invalid state for sending: %s\n",
-                    cc110x_state_to_text(dev->radio_state));
+            puts("cc110x: invalid state for sending.\n");
             return -EBUSY;
     }
 
@@ -306,27 +341,22 @@ int cc110x_send(cc110x_t *dev, cc110x_pkt_t *packet)
     gpio_irq_disable(dev->params.gdo2);
     dev->radio_state = RADIO_TX_BUSY;
 
-#ifdef MODULE_CC110X_HOOKS
-    cc110x_hook_tx();
-#endif
-
-    /* set GDO2 to CCA */
-    cc110x_write_reg(dev, CC110X_IOCFG2, 0x09);
-
     unsigned retries;
     for (retries = 0; retries < CC110X_CCA_MAXTRIES; retries++) {
-        if (gpio_read(dev->params.gdo2)) {
+        xtimer_usleep(CC110X_CCA_RETRY_DELAY * (genrand_uint32() >> 22));
+        if (cc110x_cca(dev)) {
             break;
         }
-        xtimer_usleep(CC110X_CCA_RETRY_DELAY * (genrand_uint32() >> 24));
     }
 
     if(retries == CC110X_CCA_MAXTRIES) {
-        DEBUG("cc110x: cca failed.");
+        DEBUG("cc110x: cca failed.\n");
         cc110x_switch_to_rx(dev);
         return -EAGAIN;
     } else {
-        DEBUG("cc110x: cca ok, needed %u tries.\n", retries);
+        if (retries) {
+            DEBUG("cc110x: cca ok, needed %u tries.\n", retries);
+        }
     }
 
     /* Put CC110x in IDLE mode to flush the FIFO */
