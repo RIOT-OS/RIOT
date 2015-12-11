@@ -140,6 +140,10 @@ static void _rx_read_data(cc110x_t *dev, void(*callback)(void*), void*arg)
                     (unsigned)pkt_buf->packet.phy_src,
                     (unsigned)pkt_buf->packet.address,
                     pkt_buf->packet.length-3);
+
+            /* count successful packet */
+            dev->cc110x_statistic.packets_in++;
+
             /* let someone know that we've got a packet */
             callback(arg);
         }

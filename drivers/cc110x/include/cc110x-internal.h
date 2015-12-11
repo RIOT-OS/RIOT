@@ -200,9 +200,8 @@ typedef struct {
  * @brief   Statistic interface for debugging
  */
 typedef struct cc110x_statistic {
-    uint32_t    packets_in;             /**< total nr of packets received */
+    uint32_t    packets_in;             /**< successfully received packets */
     uint32_t    packets_in_crc_fail;    /**< dropped because of invalid crc */
-    uint32_t    packets_in_while_tx;    /**< receive while tx */
     uint32_t    raw_packets_out;        /**< packets sent */
 } cc110x_statistic_t;
 
