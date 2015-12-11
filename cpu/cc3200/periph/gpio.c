@@ -28,7 +28,7 @@
  */
 
 /**
- * @ingroup     driver_periph
+ * @ingroup     driver_cc3200
  * @{
  *
  * @file
