@@ -42,7 +42,7 @@
 
 #define DEFAULT_PORT 20220
 
-char server_stack[THREAD_STACKSIZE_DEFAULT];
+char server_stack[2 * THREAD_STACKSIZE_DEFAULT];
 
 static const unsigned char ecdsa_priv_key[] = {
     0xD9, 0xE2, 0x70, 0x7A, 0x72, 0xDA, 0x6A, 0x05,

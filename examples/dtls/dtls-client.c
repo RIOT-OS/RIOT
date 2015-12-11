@@ -55,7 +55,7 @@
 #define CLIENT_QUEUE_SIZE     (8)
 static msg_t _client_msg_queue[CLIENT_QUEUE_SIZE];
 
-char client_reader[THREAD_STACKSIZE_DEFAULT];
+char client_reader[2 * THREAD_STACKSIZE_DEFAULT];
 
 typedef struct {
     size_t length;              /* length of string */
