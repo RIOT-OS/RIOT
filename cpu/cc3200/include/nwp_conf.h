@@ -51,8 +51,13 @@ extern "C"
 {
 #endif
 
+#include <stdint.h>
+
+
 #define SSID_LEN_MAX        32
 #define BSSID_LEN_MAX       6
+
+
 
 #if 0
 
@@ -93,6 +98,19 @@ extern "C"
 #define SUCCESS                 0
 #define FAILURE                 -1
 
+typedef enum {
+    AUTO_CONNECTION_TIME_SLOT,   // timeout for auto connection slot period
+
+    SMARTCONFIG_ACTIVE,          // waiting password from smartconfig
+
+    IP_ACQUIRED,                 // ip address assignment
+
+    SOCKET_CONNECTION,           // a socket connection event
+
+    LOST_IN_PANIC,               // blocked in an critical condition
+
+} nwp_event;
+
 // Status bits - These are used to set/reset the corresponding bits in
 // given variable
 typedef enum {
@@ -105,7 +123,7 @@ typedef enum {
     STATUS_BIT_IP_LEASED,    // If this bit is set: the device has leased IP to
                              // any connected client
 
-    STATUS_BIT_IP_AQUIRED,  // If this bit is set: the device has acquired an IP
+    STATUS_BIT_IP_ACQUIRED,  // If this bit is set: the device has acquired an IP
 
     STATUS_BIT_SMARTCONFIG_START, // If this bit is set: the SmartConfiguration
                                   // process is started from SmartConfig app
@@ -121,15 +139,6 @@ typedef enum {
 
     STATUS_BIT_PING_DONE,        // If this bit is set: the device has completed
                                  // the ping operation
-
-    AUTO_CONNECTION_TIME_SLOT,   // wait time for auto connection expired
-
-    SMARTCONFIG_ACTIVE,          // waiting password from smartconfig
-
-    SOCKET_CONNECTION,           // socket connected
-
-    LOST_IN_PANIC,               // blocked in an critical condition
-
 } e_StatusBits;
 
 #define CLR_STATUS_BIT_ALL(status_variable)  (status_variable = 0)
@@ -145,7 +154,7 @@ typedef enum {
 #define IS_IP_LEASED(status_variable)        GET_STATUS_BIT(status_variable,\
                                                            STATUS_BIT_IP_LEASED)
 #define IS_IP_ACQUIRED(status_variable)       GET_STATUS_BIT(status_variable,\
-                                                          STATUS_BIT_IP_AQUIRED)
+                                                          STATUS_BIT_IP_ACQUIRED)
 #define IS_SMART_CFG_START(status_variable)  GET_STATUS_BIT(status_variable,\
                                                    STATUS_BIT_SMARTCONFIG_START)
 #define IS_P2P_DEV_FOUND(status_variable)    GET_STATUS_BIT(status_variable,\
@@ -156,6 +165,26 @@ typedef enum {
                                                    STATUS_BIT_CONNECTION_FAILED)
 #define IS_PING_DONE(status_variable)        GET_STATUS_BIT(status_variable,\
                                                            STATUS_BIT_PING_DONE)
+
+// simplelink active role initialization value
+#define ROLE_INVALID            (-5)
+
+
+/**
+ * network processor status and configuration
+ */
+typedef struct nwp_t {
+    uint16_t status;
+    unsigned char ssid[SSID_LEN_MAX + 1];
+    unsigned char bssid[BSSID_LEN_MAX];
+    uint32_t ip;
+    uint32_t gw_ip;
+    uint16_t role;
+} nwp_t;
+
+// network processor status and config handle
+extern nwp_t nwp;
+
 
 //*****************************************************************************
 //

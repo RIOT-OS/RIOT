@@ -29,6 +29,7 @@
 #include "driverlib/gpio.h"
 #include "driverlib/spi.h"
 #include "driverlib/prcm.h"
+#include "nwp_conf.h"
 
 #include "board.h"
 
@@ -132,10 +133,6 @@ typedef enum {
 void cc3200_reset(void);
 
 
-/**
- * network processor status
- */
-extern unsigned long nwp_status;
 
 
 #endif /* CPU_INCLUDE_CC3200_H_ */

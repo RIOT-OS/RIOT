@@ -39,10 +39,11 @@
 #define MUTEX_TRYLOCK(id) mutex_trylock(&osi_mutexes[(int)id])
 #define MUTEX_UNLOCK(id) mutex_unlock(&osi_mutexes[(int)id])
 
-/**
- * network processor status byte
- */
-unsigned long nwp_status = 0;
+
+// network processor status and config handle
+nwp_t nwp = {
+        .role = ROLE_INVALID
+};
 
 
 static int synchronizer[MAX_SYNC_OBJS + 1];
@@ -692,7 +693,7 @@ void osi_Sleep(unsigned int MilliSecs) {
 
 
 void cc3200_reset(void) {
-    if (nwp_status & (1<<STATUS_BIT_CONNECTION)) {
+    if (nwp.status & (1<<STATUS_BIT_CONNECTION)) {
         sl_Stop(SL_STOP_TIMEOUT);
         MAP_PRCMHibernateIntervalSet(330);
         MAP_PRCMHibernateWakeupSourceEnable(PRCM_HIB_SLOW_CLK_CTR);
