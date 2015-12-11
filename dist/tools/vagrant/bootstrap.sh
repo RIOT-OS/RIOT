@@ -22,14 +22,8 @@ if ! hash experiment-cli 2>/dev/null; then
     cd cli-tools-1.6.0 && python setup.py install && cd .. && rm -rf cli-tools-1.6.0
 fi
 
-# create a symbolic link to the RIOT-OS directory
-if ! [ -L /home/vagrant/RIOT-OS ]; then
-    ln -fs /vagrant /home/vagrant/RIOT-OS
-    chown -h vagrant:vagrant /home/vagrant/RIOT-OS
-fi
-
 # copy udev rules
-cp -f RIOT-OS/dist/tools/vagrant/udev_rules/*.rules /etc/udev/rules.d/
+cp -f RIOT/dist/tools/vagrant/udev_rules/*.rules /etc/udev/rules.d/
 udevadm control --reload-rules ; udevadm trigger
 
 # cleanup
