@@ -30,6 +30,11 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Length of an IPv4 address in bit.
+ */
+#define IPV4_ADDR_BIT_LEN           (32)
+
+/**
  * @brief   Maximum length of an IPv4 address as string.
  */
 #define IPV4_ADDR_MAX_STR_LEN       (sizeof("255.255.255.255"))
@@ -82,6 +87,22 @@ char *ipv4_addr_to_str(char *result, const ipv4_addr_t *addr, uint8_t result_len
  * @return  NULL, if @p result or @p addr was NULL
  */
 ipv4_addr_t *ipv4_addr_from_str(ipv4_addr_t *result, const char *addr);
+
+/**
+ * @brief   Extract prefix length from prefix string
+ *          "ip-address/prefix-length"
+ *
+ * @see <a href="https://tools.ietf.org/html/rfc4632">
+ *          RFC 4632
+ *      </a>
+ *
+ * @param[in] addr      An IPv4 prefix string representation
+ *
+ * @return  prefix length
+ * @return  -1, if @p addr was malformed
+ * @return  -1, if @p addr was NULL
+ */
+int ipv4_prefix_length_from_str(const char *addr);
 
 #ifdef __cplusplus
 }

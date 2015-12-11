@@ -62,7 +62,7 @@ ipv6_addr_t *ipv6_addr_from_str(ipv6_addr_t *result, const char *addr)
         }
     }
 
-    while ((ch = *addr++) != '\0') {
+    while ((ch = *addr++) != '\0' && ch != '/') {
         const char *pch;
         const char *xdigits;
 
@@ -149,6 +149,24 @@ ipv6_addr_t *ipv6_addr_from_str(ipv6_addr_t *result, const char *addr)
     }
 
     return result;
+}
+
+int ipv6_prefix_length_from_str(const char *addr) {
+    while ((*addr != '/') && (*addr != '\0')) {
+        addr++;
+    }
+
+    if (*addr == '/') {
+        int prefix_len = atoi(addr + 1);
+
+        if ((prefix_len < 0) || (prefix_len > IPV6_ADDR_BIT_LEN)) {
+            return -1;
+        } else {
+            return prefix_len;
+        }
+    } else {
+        return -1;
+    }
 }
 
 /**

@@ -33,7 +33,7 @@ ipv4_addr_t *ipv4_addr_from_str(ipv4_addr_t *result, const char *addr)
     octets = 0;
     *(tp = tmp) = 0;
 
-    while ((ch = *addr++) != '\0') {
+    while ((ch = *addr++) != '\0' && ch != '/') {
         const char *pch;
 
         if ((pch = strchr(DEC, ch)) != NULL) {
@@ -74,5 +74,23 @@ ipv4_addr_t *ipv4_addr_from_str(ipv4_addr_t *result, const char *addr)
     return result;
 }
 
+
+int ipv4_prefix_length_from_str(const char *addr) {
+    while ((*addr != '/') && (*addr != '\0')) {
+        addr++;
+    }
+
+    if (*addr == '/') {
+        int prefix_len = atoi(addr + 1);
+
+        if ((prefix_len < 0) || (prefix_len > IPV4_ADDR_BIT_LEN)) {
+            return -1;
+        } else {
+            return prefix_len;
+        }
+    } else {
+        return -1;
+    }
+}
 
 /** @} */
