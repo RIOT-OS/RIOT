@@ -198,13 +198,13 @@ static int _implicit_bind(socket_t *s, void *addr)
     switch (s->type) {
 #ifdef MODULE_CONN_TCP
         case SOCK_STREAM:
-            res = conn_tcp_create(&s->conn.udp, &best_match, sizeof(unspec),
+            res = conn_tcp_create(&s->conn.udp, best_match, sizeof(unspec),
                                   s->domain, s->src_port);
             break;
 #endif
 #ifdef MODULE_CONN_UDP
         case SOCK_DGRAM:
-            res = conn_udp_create(&s->conn.udp, &best_match, sizeof(unspec),
+            res = conn_udp_create(&s->conn.udp, best_match, sizeof(unspec),
                                   s->domain, s->src_port);
             break;
 #endif
