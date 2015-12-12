@@ -255,6 +255,7 @@ static int socket_close(int socket)
                         res = -1;
                         break;
                 }
+                break;
             default:
                 res = -1;
                 break;

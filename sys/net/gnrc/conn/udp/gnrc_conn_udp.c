@@ -56,6 +56,7 @@ void conn_udp_close(conn_udp_t *conn)
     assert(conn->l4_type == GNRC_NETTYPE_UDP);
     if (conn->netreg_entry.pid != KERNEL_PID_UNDEF) {
         gnrc_netreg_unregister(GNRC_NETTYPE_UDP, &conn->netreg_entry);
+        conn->netreg_entry.pid = KERNEL_PID_UNDEF;
     }
 }
 
