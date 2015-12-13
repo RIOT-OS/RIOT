@@ -7,13 +7,13 @@
  */
 
 /**
- * @defgroup    boards_openmote OpenMote
+ * @defgroup    boards_openmote-cc2538 OpenMote-cc2538
  * @ingroup     boards
- * @brief       Support for the OpenMote board
+ * @brief       Support for the OpenMote-cc2538 board
  * @{
  *
  * @file
- * @brief       Board specific definitions for the OpenMote board
+ * @brief       Board specific definitions for the OpenMote-cc2538 board
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
