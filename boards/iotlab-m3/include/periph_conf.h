@@ -163,24 +163,15 @@ static const uart_conf_t uart_config[] = {
  * @brief PWM configuration
  * @{
  */
-#define PWM_NUMOF           (1U)
-#define PWM_0_EN            1
+#define PWM_EN              1
 
-#define PWM_MAX_CHANNELS    4
-
-/* PWM 0 device configuration */
-#define PWM_0_DEV           TIM4
-#define PWM_0_CHANNELS      4
-#define PWM_0_CLK           (36000000U)
-#define PWM_0_CLKEN()       (RCC->APB1ENR |= RCC_APB1ENR_TIM4EN)
-#define PWM_0_CLKDIS()      (RCC->APB1ENR &= ~(RCC_APB1ENR_TIM4EN))
-/* PWM 0 pin configuration */
-#define PWM_0_PORT          GPIOB
-#define PWM_0_PORT_CLKEN()  (RCC->APB2ENR |= RCC_APB2ENR_IOPBEN)
-#define PWM_0_PIN_CH0       6
-#define PWM_0_PIN_CH1       7
-#define PWM_0_PIN_CH2       8
-#define PWM_0_PIN_CH3       9
+static const pwm_conf_t pwm_config[] =
+{
+    { TIM4, AFIO_MAPR_TIM4_REMAP_NOREMAP, 2, 1, {
+            { GPIO_PIN(PORT_B, 9), 3 },
+    } }
+};
+#define PWM_NUMOF           (sizeof(pwm_config) / sizeof(pwm_config[0]))
 /** @} */
 
 #ifdef __cplusplus

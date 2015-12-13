@@ -23,270 +23,200 @@
 
 #include "cpu.h"
 #include "periph/pwm.h"
-#include "periph_conf.h"
 
 /* ignore file in case no PWM devices are defined */
-#if PWM_0_EN || PWM_1_EN
+#if PWM_EN
 
-int pwm_init(pwm_t dev, pwm_mode_t mode, unsigned int frequency, unsigned int resolution)
+#define MAX_CHANNELS                (sizeof(((pwm_conf_t*)0)->chan) / sizeof(pwm_conf_chan_t))
+
+static inline TIM_TypeDef* tim(pwm_t dev)
 {
-    TIM_TypeDef *tim = NULL;
-    GPIO_TypeDef *port = NULL;
-    uint32_t pins[PWM_MAX_CHANNELS];
-    uint32_t pwm_clk = 0;
-    int channels = 0;
+    return pwm_config[dev].dev;
+}
 
+static inline const pwm_conf_chan_t* chan(pwm_t dev, int ch)
+{
+    return (pwm_config[dev].chan + ch);
+}
+
+static inline volatile uint16_t* ccr(pwm_t dev, int ch)
+{
+    return (&(tim(dev)->CCR1)) + (chan(dev, ch)->chan << 1);
+}
+
+static inline volatile uint32_t* apb(pwm_t dev)
+{
+    return (&(RCC->APB1ENR)) - (pwm_config[dev].apb - 1);
+}
+
+uint32_t pwm_init(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
+{
+    int channels;
+    uint32_t pwm_clk;
+    const pwm_conf_t *conf = pwm_config + dev;
+
+    /* check arguments */
+    if (dev >= PWM_NUMOF) {
+        return 0;
+    }
+
+    /* power on the timer */
     pwm_poweron(dev);
 
-    switch (dev) {
-#if PWM_0_EN
-        case PWM_0:
-            tim = PWM_0_DEV;
-            port = PWM_0_PORT;
-            pins[0] = PWM_0_PIN_CH0;
-#if (PWM_0_CHANNELS > 1)
-            pins[1] = PWM_0_PIN_CH1;
-#endif
-#if (PWM_0_CHANNELS > 2)
-            pins[2] = PWM_0_PIN_CH2;
-#endif
-#if (PWM_0_CHANNELS > 3)
-            pins[3] = PWM_0_PIN_CH3;
-#endif
-            channels = PWM_0_CHANNELS;
-            pwm_clk = PWM_0_CLK;
-            PWM_0_PORT_CLKEN();
-            break;
-#endif
-
-#if PWM_1_EN
-        case PWM_1:
-            tim = PWM_1_DEV;
-            port = PWM_1_PORT;
-            pins[0] = PWM_1_PIN_CH0;
-#if (PWM_1_CHANNELS > 1)
-            pins[1] = PWM_1_PIN_CH1;
-#endif
-#if (PWM_1_CHANNELS > 2)
-            pins[2] = PWM_1_PIN_CH2;
-#endif
-#if (PWM_1_CHANNELS > 3)
-            pins[3] = PWM_1_PIN_CH3;
-#endif
-            af = PWM_1_PIN_AF;
-            channels = PWM_1_CHANNELS;
-            pwm_clk = PWM_1_CLK;
-            PWM_1_PORT_CLKEN();
-            break;
-#endif
-    }
+    /* calculate the clock source of the timer */
+    pwm_clk = CLOCK_CORECLOCK / conf->apb;
 
     /* setup pins for high speed alternate function
      *
      * The pin configuration can be found on page 171:
      *  http://www.st.com/web/en/resource/technical/document/reference_manual/CD00171190.pdf
      */
-    for (int i = 0; i < channels; i++) {
+    for (channels = 0; channels < MAX_CHANNELS; ++channels) {
+        /* check if pin is used */
+        if (!(conf->chan[channels].pin)) {
+            break;
+        }
 
         /* calculate where the MODE and CNF must be updated */
-        port->CR[pins[i] >= 8] &= ~(0xfl << (4 * (pins[i] - ((pins[i] >= 8) * 8))));
-        port->CR[pins[i] >= 8] |= (0xbl << (4 * (pins[i] - ((pins[i] >= 8) * 8))));
+        gpio_init_af(conf->chan[channels].pin, GPIO_AF_OUT_PP);
     }
 
-    /* alternative function mapping can be found on page 178
-     * http://www.st.com/web/en/resource/technical/document/reference_manual/CD00171190.pdf
-     */
-#if PWM_0_PERIPH_AF || PWM_1_PERIPH_AF
-    /* timer 12 to 14 and timer 9 to 15 must be re-mapped on MAPR2 register of AFIO */
-    __IO uint32_t *MAPR = &(AFIO->MAPR);
-    if ((tim > TIM12 && tim < TIM14) || (tim > TIM15 && tim < TIM11)) {
-        MAPR = &(AFIO->MAPR2);
+    /* configure peripheral remapping */
+    if (conf->remap) {
+        /* alternative function mapping can be found on page 178
+         * http://www.st.com/web/en/resource/technical/document/reference_manual/CD00171190.pdf
+         */
+        /* timer 12 to 14 and timer 9 to 15 must be re-mapped on MAPR2 register of AFIO */
+        volatile uint32_t *MAPR = &(AFIO->MAPR);
+        if ((conf->dev > TIM12 && conf->dev < TIM14) || (conf->dev > TIM15 && conf->dev < TIM11)) {
+            MAPR = &(AFIO->MAPR2);
+        }
+
+        /* clear re-mapping of the peripheral and set the new re-mapping */
+        // TODO add support for not reset ? *MAPR &= ~(PWM_0_AFIO_MAPR_BITMASK << PWM_0_AFIO_MAPR_OFFSET);
+        *MAPR |= (conf->remap);
     }
-#endif
-
-#if PWM_0_PERIPH_AF
-    /* clear re-mapping of the peripheral and set the new re-mapping */
-    *MAPR &= ~(PWM_0_AFIO_MAPR_BITMASK << PWM_0_AFIO_MAPR_OFFSET);
-    *MAPR |= (PWM_0_PERIPH_AF << PWM_0_AFIO_MAPR_OFFSET);
-#endif
-
-#if PWM_1_PERIPH_AF
-    /* clear re-mapping of the peripheral and set the new re-mapping */
-    *MAPR &= ~(PWM_1_AFIO_MAPR_BITMASK << PWM_1_AFIO_MAPR_OFFSET);
-    *MAPR |= (PWM_1_PERIPH_AF << PWM_1_AFIO_MAPR_OFFSET);
-#endif
 
     /* reset the c/c and timer configuration register */
-    switch (channels) {
-        case 4:
-            tim->CCR4 = 0;
-        /* no break */
-        case 3:
-            tim->CCR3 = 0;
-            tim->CR2 = 0;
-        /* no break */
-        case 2:
-            tim->CCR2 = 0;
-        /* no break */
-        case 1:
-            tim->CCR1 = 0;
-            tim->CR1 = 0;
-            break;
+    conf->dev->CR1 = 0;
+    conf->dev->CR2 = 0;
+    for (int idx = 0; idx < channels; ++idx) {
+        *ccr(dev, idx) = 0;
     }
 
-    /* set the prescale and auto-reload register to matching values for resolution and frequency */
-    if (resolution > 0xffff || (resolution * frequency) > pwm_clk) {
+    /* set the pre-scale and auto-reload register to matching values
+     * for resolution and frequency
+     */
+    if (res > UINT16_MAX || (res * freq) > pwm_clk) {
         return -2;
     }
-    tim->PSC = (pwm_clk / (resolution * frequency)) - 1;
-    tim->ARR = resolution - 1;
+    conf->dev->PSC = (pwm_clk / (res * freq)) - 1;
+    conf->dev->ARR = res - 1;
+    /* calculate the actual PWM frequency */
+    freq = (pwm_clk / (res * (conf->dev->PSC + 1)));
 
-    /* set PWM mode */
-    switch (mode) {
-        case PWM_LEFT:
-            tim->CCMR1 = (TIM_CCMR1_OC1M_1 | TIM_CCMR1_OC1M_2 |
-                          TIM_CCMR1_OC2M_1 | TIM_CCMR1_OC2M_2);
-            tim->CCMR2 = (TIM_CCMR2_OC3M_1 | TIM_CCMR2_OC3M_2 |
-                          TIM_CCMR2_OC4M_1 | TIM_CCMR2_OC4M_2);
-            break;
+    /* set PWM mode start assuming (mode == PWM_LEFT) */
+    uint16_t ccmr_val = (TIM_CCMR1_OC1M_1 | TIM_CCMR1_OC1M_2 |
+                        TIM_CCMR1_OC2M_1 | TIM_CCMR1_OC2M_2);
 
-        case PWM_RIGHT:
-            tim->CCMR1 = (TIM_CCMR1_OC1M_0 | TIM_CCMR1_OC1M_1 | TIM_CCMR1_OC1M_2 |
-                          TIM_CCMR1_OC2M_0 | TIM_CCMR1_OC2M_1 | TIM_CCMR1_OC2M_2);
-            tim->CCMR2 = (TIM_CCMR2_OC3M_0 | TIM_CCMR2_OC3M_1 | TIM_CCMR2_OC3M_2 |
-                          TIM_CCMR2_OC4M_0 | TIM_CCMR2_OC4M_1 | TIM_CCMR2_OC4M_2);
-            break;
-
-        case PWM_CENTER:
-            tim->CCMR1 = 0;
-            tim->CCMR2 = 0;
-            tim->CR1 |= (TIM_CR1_CMS_0 | TIM_CR1_CMS_1);
-            break;
+    if (mode == PWM_RIGHT) {
+        ccmr_val |= TIM_CCMR1_OC1M_0 | TIM_CCMR1_OC2M_0;
     }
+    else if (mode == PWM_CENTER) {
+        ccmr_val = 0;
+        conf->dev->CR1 |= TIM_CR1_CMS_0 | TIM_CR1_CMS_1;
+    }
+    conf->dev->CCMR1 = ccmr_val;
+    conf->dev->CCMR2 = ccmr_val;
 
     /* enable output on PWM pins */
-    tim->CCER = (TIM_CCER_CC1E | TIM_CCER_CC2E | TIM_CCER_CC3E | TIM_CCER_CC4E);
+    conf->dev->CCER = (TIM_CCER_CC1E | TIM_CCER_CC2E | TIM_CCER_CC3E | TIM_CCER_CC4E);
 
     /* enable PWM outputs */
-    tim->BDTR = TIM_BDTR_MOE;
+    conf->dev->BDTR = TIM_BDTR_MOE;
 
     /* enable timer ergo the PWM generation */
     pwm_start(dev);
 
-    return frequency;
+    return freq;
 }
 
-int pwm_set(pwm_t dev, int channel, unsigned int value)
+uint8_t pwm_channels(pwm_t dev)
 {
-    TIM_TypeDef *tim = NULL;
+    /* check if valid device */
+    if (dev >= PWM_NUMOF) {
+        return 0;
+    }
 
-    switch (dev) {
-#if PWM_0_EN
-        case PWM_0:
-            tim = PWM_0_DEV;
-            if (channel >= PWM_0_CHANNELS) {
-                return -1;
-            }
-            break;
-#endif
-#if PWM_1_EN
-        case PWM_1:
-            tim = PWM_1_DEV;
-            if (channel >= PWM_1_CHANNELS) {
-                return -1;
-            }
-            break;
-#endif
+    /* count available channels */
+    for (int idx = 0; idx < MAX_CHANNELS; ++idx) {
+        if (!(chan(dev, idx)->pin)) {
+            return idx;
+        }
+    }
+
+    /* all channels are used */
+    return MAX_CHANNELS;
+}
+
+void pwm_set(pwm_t dev, uint8_t channel, uint16_t value)
+{
+    /* check if valid device */
+    if (dev >= PWM_NUMOF || channel >= MAX_CHANNELS
+        || !(chan(dev, channel)->pin)) {
+        return;
     }
 
     /* norm value to maximum possible value */
-    if (value > tim->ARR) {
-        value = (unsigned int) tim->ARR;
+    TIM_TypeDef *htim = tim(dev);
+    if (value > htim->ARR) {
+        value = (unsigned int) htim->ARR;
     }
 
-    /* set the PWM value to the channel comperator */
-    switch (channel) {
-        case 0:
-            tim->CCR1 = value;
-            break;
-        case 1:
-            tim->CCR2 = value;
-            break;
-        case 2:
-            tim->CCR3 = value;
-            break;
-        case 3:
-            tim->CCR4 = value;
-            break;
-        default:
-            return -1;
-    }
-
-    return 0;
+    /* set the timer compare to the value */
+    *ccr(dev, channel) = value;
 }
 
 void pwm_start(pwm_t dev)
 {
-    switch (dev) {
-#if PWM_0_EN
-        case PWM_0:
-            PWM_0_DEV->CR1 |= TIM_CR1_CEN;
-            break;
-#endif
-#if PWM_1_EN
-        case PWM_1:
-            PWM_1_DEV->CR1 |= TIM_CR1_CEN;
-            break;
-#endif
+    /* check if valid device */
+    if (dev >= PWM_NUMOF) {
+        return;
     }
+
+    /* enable the timer */
+    tim(dev)->CR1 |= TIM_CR1_CEN;
 }
 
 void pwm_stop(pwm_t dev)
 {
-    switch (dev) {
-#if PWM_0_EN
-        case PWM_0:
-            PWM_0_DEV->CR1 &= ~(TIM_CR1_CEN);
-            break;
-#endif
-#if PWM_1_EN
-        case PWM_1:
-            PWM_1_DEV->CR1 &= ~(TIM_CR1_CEN);
-            break;
-#endif
+    /* check if valid device */
+    if (dev >= PWM_NUMOF) {
+        return;
     }
+
+    /* disable the timer */
+    tim(dev)->CR1 &= ~(TIM_CR1_CEN);
 }
 
 void pwm_poweron(pwm_t dev)
 {
-    switch (dev) {
-#if PWM_0_EN
-        case PWM_0:
-            PWM_0_CLKEN();
-            break;
-#endif
-#if PWM_1_EN
-        case PWM_1:
-            PWM_1_CLKEN();
-            break;
-#endif
+    /* check if valid device */
+    if (dev >= PWM_NUMOF) {
+        return;
     }
+
+    *apb(dev) |= (1 << pwm_config[dev].rcc);
 }
 
 void pwm_poweroff(pwm_t dev)
 {
-    switch (dev) {
-#if PWM_0_EN
-        case PWM_0:
-            PWM_0_CLKDIS();
-            break;
-#endif
-#if PWM_1_EN
-        case PWM_1:
-            PWM_1_CLKDIS();
-            break;
-#endif
+    /* check if valid device */
+    if (dev >= PWM_NUMOF) {
+        return;
     }
+
+    *apb(dev) &= ~(1 << pwm_config[dev].rcc);
 }
 
 #endif /* PWM_0_EN || PWM_1_EN */
