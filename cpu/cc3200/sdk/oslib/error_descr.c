@@ -12,7 +12,8 @@
 #include "throw.h"
 
 const char* sl_err_descr[] = {
-        [NO_ERROR] = "why to throw if no error?",
+        [NO_ERROR] = "no error",
+        [GEN_ERROR] = "simplelink internal error",
         [SIMPLELINK_START_ERROR] = "unable to start simplelink task",
         [SMARTCONFIG_ERROR] = "unable to setup smart config",
         [WLAN_SET_POLICY_ERROR] = "wlan set policy failed",

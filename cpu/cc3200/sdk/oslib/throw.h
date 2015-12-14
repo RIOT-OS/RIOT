@@ -17,6 +17,7 @@ extern const char* sl_err_descr[];
 
 enum error_types {
     NO_ERROR = 0,
+    GEN_ERROR,
     SIMPLELINK_START_ERROR,
     SMARTCONFIG_ERROR,
     WLAN_SET_POLICY_ERROR,
@@ -29,19 +30,21 @@ enum error_types {
 
 #define ERRORS_THREAD_INIT() errors_thread_init()
 
-#define THROW(ERROR)    throw(ERROR)
+#define THROW(ERROR)    throw(ERROR, 0)
+#define THROW2(ERROR_ID, ERROR_VALUE)    throw(ERROR_ID, ERROR_VALUE)
 
 #else
 
 #define ERRORS_THREAD_INIT()
 
-#define THROW(ERROR)  puts(sl_err_descr[ERROR]); while(1) {}
+#define THROW(ERROR_ID)  puts(sl_err_descr[ERROR_ID]); while(1) {}
+#define THROW2(ERROR_ID, ERROR_VALUE)  printf("%s (%ld)", sl_err_descr[ERROR], ERROR_VALUE); while(1) {}
 
 #endif
 
 void errors_thread_init(void);
 
-void throw(short err_type);
+void throw(short err_type, long err_value);
 
 
 #ifdef __cplusplus

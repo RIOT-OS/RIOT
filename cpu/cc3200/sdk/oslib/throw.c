@@ -29,10 +29,12 @@ char errors_stack[512];
 static void* errors_task(void* arg);
 
 
-void throw(short err_type) {
+void throw(short err_type, long err_value) {
     msg_t m;
 
     m.type = err_type;
+    m.content.value = err_value;
+
     msg_send_receive(&m, &m, errors_pid);
 }
 

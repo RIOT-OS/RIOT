@@ -31,8 +31,6 @@
 #include "driverlib/prcm.h"
 #include "nwp_conf.h"
 
-#include "board.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif

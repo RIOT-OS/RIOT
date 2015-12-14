@@ -75,6 +75,8 @@ extern "C" {
 
 /** @} */
 
+#include "board.h"
+
 
 #ifdef __cplusplus
 } /* end extern "C" */
