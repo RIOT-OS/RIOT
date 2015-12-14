@@ -27,16 +27,6 @@ extern "C" {
 #define F_CPU               CLOCK_CORECLOCK
 
 /**
- * @brief xtimer configuration values
- * @{
- */
-#define XTIMER              		TIMER_0
-#define XTIMER_CHAN					(0)
-#define XTIMER_SHIFT                (5)
-#define XTIMER_SHIFT_ON_COMPARE     (0)
-#define XTIMER_BACKOFF              (40)
-
-/**
  * @name Define UART device and baudrate for stdio
  * @{
  */

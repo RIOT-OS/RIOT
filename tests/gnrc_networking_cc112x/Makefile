@@ -30,10 +30,10 @@ USEMODULE += shell_commands
 USEMODULE += ps
 
 ifneq (,$(filter gnrc_netif_default,$(USEMODULE)))
-    USEMODULE += cc110x gnrc_netdev2 gnrc_cc110x
+    USEMODULE += cc112x gnrc_netdev2 gnrc_cc112x
 endif
 
-ifneq (,$(filter cc110x,$(USEMODULE)))
+ifneq (,$(filter cc112x,$(USEMODULE)))
     DISABLE_MODULE += gnrc_sixlowpan_iphc
 endif
 

@@ -15,6 +15,10 @@ ifneq (,$(filter cc110x,$(USEMODULE)))
   USEMODULE += ieee802154
 endif
 
+ifneq (,$(filter cc112x,$(USEMODULE)))
+  USEMODULE += ieee802154
+endif
+
 ifneq (,$(filter dht,$(USEMODULE)))
     USEMODULE += xtimer
 endif

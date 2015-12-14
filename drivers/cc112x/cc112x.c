@@ -36,7 +36,7 @@
 #include "cc112x-internal.h"
 #include "cc112x-spi.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG    (1)
 #include "debug.h"
 
 /* Internal function prototypes */
@@ -46,7 +46,7 @@ static void _power_up_reset(cc112x_t *dev);
 
 int cc112x_setup(cc112x_t *dev, const cc112x_params_t *params)
 {
-	int ret = 0;
+    int ret = 0;
 
     DEBUG("%s:%s:%u\n", RIOT_FILE_RELATIVE, __func__, __LINE__);
     dev->params = *params;
@@ -60,7 +60,8 @@ int cc112x_setup(cc112x_t *dev, const cc112x_params_t *params)
     /* Configure GPIO1 don't need to be configured. SPI configuration does it. */
     /* Configure SPI */
     ret += spi_acquire(dev->params.spi);
-    ret += spi_init_master(dev->params.spi, SPI_CONF_FIRST_RISING, SPI_SPEED_400KHZ);
+    ret += spi_init_master(dev->params.spi, SPI_CONF_FIRST_RISING,
+            SPI_SPEED_5MHZ);
     ret += spi_release(dev->params.spi);
 
 #ifndef CC112X_DONT_RESET
@@ -75,91 +76,95 @@ int cc112x_setup(cc112x_t *dev, const cc112x_params_t *params)
     dev->radio_state = RADIO_IDLE;
 
     /* Write configuration to configuration registers */
-    for(uint16_t a = 0 ; a < registerSettingsCount ; ++a){
-    	cc112x_write_reg(dev, preferredSettings[a].addr, preferredSettings[a].data);
+    for(uint16_t a = 0; a < registerSettingsCount; ++a) {
+        cc112x_write_reg(dev, preferredSettings[a].addr,
+                preferredSettings[a].data);
     }
 
     /* Perform self calibration */
     uint8_t original_fs_cal2;
-	uint8_t calResults_for_vcdac_start_high[3];
-	uint8_t calResults_for_vcdac_start_mid[3];
-	uint8_t marcstate;
-	uint8_t writeByte;
+    uint8_t calResults_for_vcdac_start_high[3];
+    uint8_t calResults_for_vcdac_start_mid[3];
+    uint8_t marcstate;
+    uint8_t writeByte;
 
-	/* 1) Set VCO cap-array to 0 (FS_VCO2 = 0x00) */
-	cc112x_write_reg(dev, CC112X_FS_VCO2, 0);
+    /* 1) Set VCO cap-array to 0 (FS_VCO2 = 0x00) */
+    cc112x_write_reg(dev, CC112X_FS_VCO2, 0);
 
-	/* 2) Start with high VCDAC (original VCDAC_START + 2): */
-	original_fs_cal2 = cc112x_read_reg(dev, CC112X_FS_CAL2);
-	writeByte = original_fs_cal2 + VCDAC_START_OFFSET;
-	cc112x_write_reg(dev, CC112X_FS_CAL2, writeByte);
+    /* 2) Start with high VCDAC (original VCDAC_START + 2): */
+    original_fs_cal2 = cc112x_read_reg(dev, CC112X_FS_CAL2);
+    writeByte = original_fs_cal2 + VCDAC_START_OFFSET;
+    cc112x_write_reg(dev, CC112X_FS_CAL2, writeByte);
 
-	/* 3) Calibrate and wait for calibration to be done (radio back in IDLE state) */
-	cc112x_strobe(dev, CC112X_SCAL);
+    /* 3) Calibrate and wait for calibration to be done (radio back in IDLE state) */
+    cc112x_strobe(dev, CC112X_SCAL);
 
-	do {
-		marcstate = cc112x_read_reg(dev, CC112X_MARCSTATE);
-	} while (marcstate != 0x41);
+    do {
+        marcstate = cc112x_read_reg(dev, CC112X_MARCSTATE);
+    } while(marcstate != 0x41);
 
-	/* 4) Read FS_VCO2, FS_VCO4 and FS_CHP register obtained with high VCDAC_START value */
-	calResults_for_vcdac_start_high[FS_VCO2_INDEX] = cc112x_read_reg(dev, CC112X_FS_VCO2);
-	calResults_for_vcdac_start_high[FS_VCO4_INDEX] = cc112x_read_reg(dev, CC112X_FS_VCO4);
-	calResults_for_vcdac_start_high[FS_CHP_INDEX] = cc112x_read_reg(dev, CC112X_FS_CHP);
+    /* 4) Read FS_VCO2, FS_VCO4 and FS_CHP register obtained with high VCDAC_START value */
+    calResults_for_vcdac_start_high[FS_VCO2_INDEX] = cc112x_read_reg(dev,
+    CC112X_FS_VCO2);
+    calResults_for_vcdac_start_high[FS_VCO4_INDEX] = cc112x_read_reg(dev,
+    CC112X_FS_VCO4);
+    calResults_for_vcdac_start_high[FS_CHP_INDEX] = cc112x_read_reg(dev,
+    CC112X_FS_CHP);
 
-	/* 5) Set VCO cap-array to 0 (FS_VCO2 = 0x00) */
-	writeByte = 0x00;
-	cc112x_write_reg(dev, CC112X_FS_VCO2, writeByte);
+    /* 5) Set VCO cap-array to 0 (FS_VCO2 = 0x00) */
+    writeByte = 0x00;
+    cc112x_write_reg(dev, CC112X_FS_VCO2, writeByte);
 
-	/* 6) Continue with mid VCDAC (original VCDAC_START): */
-	writeByte = original_fs_cal2;
-	cc112x_write_reg(dev, CC112X_FS_CAL2, writeByte);
+    /* 6) Continue with mid VCDAC (original VCDAC_START): */
+    writeByte = original_fs_cal2;
+    cc112x_write_reg(dev, CC112X_FS_CAL2, writeByte);
 
-	/* 7) Calibrate and wait for calibration to be done (radio back in IDLE state) */
-	cc112x_strobe(dev, CC112X_SCAL);
+    /* 7) Calibrate and wait for calibration to be done (radio back in IDLE state) */
+    cc112x_strobe(dev, CC112X_SCAL);
 
-	do {
-		marcstate = cc112x_read_reg(dev, CC112X_MARCSTATE);
-	} while (marcstate != 0x41);
+    do {
+        marcstate = cc112x_read_reg(dev, CC112X_MARCSTATE);
+    } while(marcstate != 0x41);
 
-	/* 8) Read FS_VCO2, FS_VCO4 and FS_CHP register obtained with mid VCDAC_START value */
-	calResults_for_vcdac_start_mid[FS_VCO2_INDEX] = cc112x_read_reg(dev, CC112X_FS_VCO2);
-	calResults_for_vcdac_start_mid[FS_VCO4_INDEX] = cc112x_read_reg(dev, CC112X_FS_VCO4);
-	calResults_for_vcdac_start_mid[FS_CHP_INDEX] = cc112x_read_reg(dev, CC112X_FS_CHP);
+    /* 8) Read FS_VCO2, FS_VCO4 and FS_CHP register obtained with mid VCDAC_START value */
+    calResults_for_vcdac_start_mid[FS_VCO2_INDEX] = cc112x_read_reg(dev,
+    CC112X_FS_VCO2);
+    calResults_for_vcdac_start_mid[FS_VCO4_INDEX] = cc112x_read_reg(dev,
+    CC112X_FS_VCO4);
+    calResults_for_vcdac_start_mid[FS_CHP_INDEX] = cc112x_read_reg(dev,
+    CC112X_FS_CHP);
 
-	/* 9) Write back highest FS_VCO2 and corresponding FS_VCO and FS_CHP result */
-	if (calResults_for_vcdac_start_high[FS_VCO2_INDEX]
-		> calResults_for_vcdac_start_mid[FS_VCO2_INDEX]) {
-		writeByte = calResults_for_vcdac_start_high[FS_VCO2_INDEX];
-		cc112x_write_reg(dev, CC112X_FS_VCO2, writeByte);
-		writeByte = calResults_for_vcdac_start_high[FS_VCO4_INDEX];
-		cc112x_write_reg(dev, CC112X_FS_VCO4, writeByte);
-		writeByte = calResults_for_vcdac_start_high[FS_CHP_INDEX];
-		cc112x_write_reg(dev, CC112X_FS_CHP, writeByte);
-	} else {
-		writeByte = calResults_for_vcdac_start_mid[FS_VCO2_INDEX];
-		cc112x_write_reg(dev, CC112X_FS_VCO2, writeByte);
-		writeByte = calResults_for_vcdac_start_mid[FS_VCO4_INDEX];
-		cc112x_write_reg(dev, CC112X_FS_VCO4, writeByte);
-		writeByte = calResults_for_vcdac_start_mid[FS_CHP_INDEX];
-		cc112x_write_reg(dev, CC112X_FS_CHP, writeByte);
-	}
+    /* 9) Write back highest FS_VCO2 and corresponding FS_VCO and FS_CHP result */
+    if(calResults_for_vcdac_start_high[FS_VCO2_INDEX]
+            > calResults_for_vcdac_start_mid[FS_VCO2_INDEX]) {
+        writeByte = calResults_for_vcdac_start_high[FS_VCO2_INDEX];
+        cc112x_write_reg(dev, CC112X_FS_VCO2, writeByte);
+        writeByte = calResults_for_vcdac_start_high[FS_VCO4_INDEX];
+        cc112x_write_reg(dev, CC112X_FS_VCO4, writeByte);
+        writeByte = calResults_for_vcdac_start_high[FS_CHP_INDEX];
+        cc112x_write_reg(dev, CC112X_FS_CHP, writeByte);
+    } else {
+        writeByte = calResults_for_vcdac_start_mid[FS_VCO2_INDEX];
+        cc112x_write_reg(dev, CC112X_FS_VCO2, writeByte);
+        writeByte = calResults_for_vcdac_start_mid[FS_VCO4_INDEX];
+        cc112x_write_reg(dev, CC112X_FS_VCO4, writeByte);
+        writeByte = calResults_for_vcdac_start_mid[FS_CHP_INDEX];
+        cc112x_write_reg(dev, CC112X_FS_CHP, writeByte);
+    }
 
     /* Set default channel number */
 //    cc112x_set_channel(dev, CC112X_DEFAULT_CHANNEL);
-
     /* set default node id */
 #ifdef CPUID_ID_LEN
-    if (CPUID_ID_LEN>0) {
+    if(CPUID_ID_LEN > 0) {
         char cpuid[CPUID_ID_LEN];
         cpuid_get(cpuid);
-        cc112x_set_address(dev, (uint8_t) cpuid[0]);
+        cc112x_set_address(dev, (uint8_t)cpuid[0]);
     }
 #endif
 
     LOG_INFO("cc112x: initialized with address=%u and channel=%i\n",
-            (unsigned)dev->radio_address,
-            dev->radio_channel);
-
+            (unsigned )dev->radio_address, dev->radio_channel);
 
     return ret;
 }
@@ -168,8 +173,8 @@ uint8_t cc112x_set_address(cc112x_t *dev, uint8_t address)
 {
     DEBUG("%s:%s:%u setting address %u\n", RIOT_FILE_RELATIVE, __func__,
             __LINE__, (unsigned)address);
-    if (!(address < MIN_UID) || (address > MAX_UID)) {
-        if (dev->radio_state != RADIO_UNKNOWN) {
+    if(!(address < MIN_UID) || (address > MAX_UID)) {
+        if(dev->radio_state != RADIO_UNKNOWN) {
             cc112x_write_register(dev, CC112X_DEV_ADDR, address);
             dev->radio_address = address;
             return address;
@@ -193,7 +198,7 @@ void cc112x_setup_rx_mode(cc112x_t *dev)
 {
     DEBUG("%s:%s:%u\n", RIOT_FILE_RELATIVE, __func__, __LINE__);
 
-    /* Stay in RX mode until end of packet */
+    /* Stay in RX mode until end of packet, RX timeout disabled */
     cc112x_write_reg(dev, CC112X_RFEND_CFG1, 0x0E);
     cc112x_switch_to_rx(dev);
 }
@@ -210,24 +215,24 @@ void cc112x_switch_to_rx(cc112x_t *dev)
 
     dev->radio_state = RADIO_RX;
 
-    /* Assert on received sync word */
-    cc112x_write_reg(dev, CC112X_IOCFG2, 0x6);
+    cc112x_write_reg(dev, CC112X_IOCFG2, 0x06);
     /* Go into receiving mode */
     cc112x_strobe(dev, CC112X_SRX);
+    /* Assert on received sync word, deassert when packed failed or ends */
 
     gpio_irq_enable(dev->params.gpio2);
 }
 
 void cc112x_wakeup_from_rx(cc112x_t *dev)
 {
-    if (dev->radio_state != RADIO_RX) {
+    if(dev->radio_state != RADIO_RX) {
         return;
     }
 
     DEBUG("cc112x: switching to idle mode\n");
 
-	/* Go into transmit mode then back to IDLE mode */
-	cc112x_strobe(dev, CC112X_SIDLE);
+    /* Go into transmit mode then back to IDLE mode */
+    cc112x_strobe(dev, CC112X_SIDLE);
     dev->radio_state = RADIO_IDLE;
 }
 
@@ -243,17 +248,18 @@ int16_t cc112x_set_channel(cc112x_t *dev, uint8_t channr)
 {
     DEBUG("%s:%s:%u\n", RIOT_FILE_RELATIVE, __func__, __LINE__);
 
-    if (channr > CC112X_MAX_CHANNR && channr < CC112X_MIN_CHANNR) {
+    if(channr > CC112X_MAX_CHANNR && channr < CC112X_MIN_CHANNR) {
         return -1;
     }
 
     uint64_t freq = channr * CC112X_CHANNEL_WIDTH + CC112X_CHANNEL0_FREQ;
     uint64_t regval;
-    regval = (uint64_t)((uint64_t)(262144)*(uint64_t)(freq))/(uint64_t)(CC112X_XTAL_FREQ);
+    regval = (uint64_t)((uint64_t)(262144) * (uint64_t)(freq))
+            / (uint64_t)(CC112X_XTAL_FREQ);
 
-    cc112x_write_reg(dev, CC112X_FREQ0, (uint8_t)(regval&0xff));
-    cc112x_write_reg(dev, CC112X_FREQ1, (uint8_t)((regval&0xff00)>>8));
-    cc112x_write_reg(dev, CC112X_FREQ2, (uint8_t)((regval&0xff0000)>>16));
+    cc112x_write_reg(dev, CC112X_FREQ0, (uint8_t)(regval & 0xff));
+    cc112x_write_reg(dev, CC112X_FREQ1, (uint8_t)((regval & 0xff00) >> 8));
+    cc112x_write_reg(dev, CC112X_FREQ2, (uint8_t)((regval & 0xff0000) >> 16));
 
     dev->radio_channel = channr;
 
@@ -290,7 +296,7 @@ void cc112x_write_register(cc112x_t *dev, uint8_t r, uint8_t value)
 
     /* Have to put radio back to RX if old radio state
      * was RX, otherwise no action is necessary */
-    if (old_state == RADIO_RX) {
+    if(old_state == RADIO_RX) {
         cc112x_switch_to_rx(dev);
     }
 }
@@ -302,40 +308,40 @@ int cc112x_rd_set_mode(cc112x_t *dev, cc112x_radio_mode_t mode)
     int result;
 
     /* Get current radio mode */
-    if ((dev->radio_state == RADIO_UNKNOWN) || (dev->radio_state == RADIO_PWD)) {
+    if((dev->radio_state == RADIO_UNKNOWN) || (dev->radio_state == RADIO_PWD)) {
         result = RADIO_MODE_OFF;
-    }
-    else {
+    } else {
         result = RADIO_MODE_ON;
     }
 
     switch(mode) {
-        case RADIO_MODE_ON:
-            DEBUG("cc112x: switching to RX mode\n");
-            cc112x_setup_rx_mode(dev);          /* Set chip to desired mode */
-            break;
+    case RADIO_MODE_ON:
+        DEBUG("cc112x: switching to RX mode\n");
+        cc112x_setup_rx_mode(dev); /* Set chip to desired mode */
+        break;
 
-        case RADIO_MODE_OFF:
-            gpio_irq_disable(dev->params.gpio2); /* Disable interrupts */
-            cc112x_switch_to_pwd(dev);          /* Set chip to power down mode */
-            break;
+    case RADIO_MODE_OFF:
+        gpio_irq_disable(dev->params.gpio2); /* Disable interrupts */
+        cc112x_switch_to_pwd(dev); /* Set chip to power down mode */
+        break;
 
-        case RADIO_MODE_GET:
-            /* do nothing, just return current mode */
-        default:
-            /* do nothing */
-            break;
+    case RADIO_MODE_GET:
+        /* do nothing, just return current mode */
+    default:
+        /* do nothing */
+        break;
     }
 
     /* Return previous mode */
     return result;
 }
 
-bool cc112x_test(cc112x_t *dev){
-	 /* FIFO and strobe test */
-	while(MARC_PIN_IDLE != cc112x_get_marc_state(dev)){
-		cc112x_strobe(dev, CC112X_SIDLE);
-	}
+bool cc112x_test(cc112x_t *dev)
+{
+    /* FIFO and strobe test */
+    while(MARC_PIN_IDLE != cc112x_get_marc_state(dev)) {
+        cc112x_strobe(dev, CC112X_SIDLE);
+    }
 //	gpio_irq_enable(dev->params.gpio2);
 //	printf("MARCSTATE - %x\n", cc112x_read_reg(dev, CC112X_MARCSTATE));
 //	printf("PARTNUM - %x\n", cc112x_read_reg(dev, CC112X_PARTNUMBER));
@@ -343,30 +349,30 @@ bool cc112x_test(cc112x_t *dev){
 //	printf("MARC_STATUS_1 - %x\n", cc112x_read_reg(dev, CC112X_MARC_STATUS1));
 //	cc112x_strobe(dev, CC112X_SFTX);
 
-	printf("Adding 8 bytes...");
-	for(uint32_t a = 0 ; a < 0x08 ; ++a){
-		cc112x_write_reg(dev, CC112X_SINGLE_TXFIFO, 8+a);
-	}
+    printf("Adding 8 bytes...");
+    for(uint32_t a = 0; a < 0x08; ++a) {
+        cc112x_write_reg(dev, CC112X_SINGLE_TXFIFO, 8 + a);
+    }
 
-	if(8 == cc112x_read_reg(dev, CC112X_TXLAST)){
-		puts(" OK");
-	} else {
-		puts(" ERROR");
-		printf("TXFIFO - %d\n", cc112x_read_reg(dev, CC112X_FIFO_NUM_TXBYTES));
-		printf("TXLAST - %d\n", cc112x_read_reg(dev, CC112X_TXLAST));
-		printf("TXfirst - %d\n", cc112x_read_reg(dev, CC112X_TXFIRST));
-		return false;
-	}
+    if(8 == cc112x_read_reg(dev, CC112X_TXLAST)) {
+        puts(" OK");
+    } else {
+        puts(" ERROR");
+        printf("TXFIFO - %d\n", cc112x_read_reg(dev, CC112X_FIFO_NUM_TXBYTES));
+        printf("TXLAST - %d\n", cc112x_read_reg(dev, CC112X_TXLAST));
+        printf("TXfirst - %d\n", cc112x_read_reg(dev, CC112X_TXFIRST));
+        return false;
+    }
 //	printf("TXFIFO - %d\n", cc112x_read_reg(dev, CC112X_FIFO_NUM_TXBYTES));
 //	printf("TXLAST - %d\n", cc112x_read_reg(dev, CC112X_TXLAST));
 //	printf("TXfirst - %d\n", cc112x_read_reg(dev, CC112X_TXFIRST));
 
-	printf("Adding additional 8 bytes...");
-	for(uint32_t a = 0 ; a < 0x08 ; ++a){
-		cc112x_write_reg(dev, CC112X_SINGLE_TXFIFO, 1+a);
-	}
+    printf("Adding additional 8 bytes...");
+    for(uint32_t a = 0; a < 0x08; ++a) {
+        cc112x_write_reg(dev, CC112X_SINGLE_TXFIFO, 1 + a);
+    }
 
-	/* Read the whole registers */
+    /* Read the whole registers */
 //	char in = 0xff;
 //	uint32_t cpsr;
 //	printf("DATA:\n");
@@ -383,60 +389,63 @@ bool cc112x_test(cc112x_t *dev){
 //		printf(" %x", in);
 //	}
 //	puts(" ");
+    if((16 == cc112x_read_reg(dev, CC112X_TXLAST))
+            && (0 == cc112x_read_reg(dev, CC112X_TXFIRST))) {
+        puts(" OK");
+    } else {
+        puts(" ERROR");
+        printf("TXFIFO - %d\n", cc112x_read_reg(dev, CC112X_FIFO_NUM_TXBYTES));
+        printf("TXLAST - %d\n", cc112x_read_reg(dev, CC112X_TXLAST));
+        printf("TXfirst - %d\n", cc112x_read_reg(dev, CC112X_TXFIRST));
+        return false;
+    }
 
-	if((16 == cc112x_read_reg(dev, CC112X_TXLAST)) && (0 == cc112x_read_reg(dev, CC112X_TXFIRST))){
-		puts(" OK");
-	} else {
-		puts(" ERROR");
-		printf("TXFIFO - %d\n", cc112x_read_reg(dev, CC112X_FIFO_NUM_TXBYTES));
-		printf("TXLAST - %d\n", cc112x_read_reg(dev, CC112X_TXLAST));
-		printf("TXfirst - %d\n", cc112x_read_reg(dev, CC112X_TXFIRST));
-		return false;
-	}
+    printf("STX - transmitting 8+1 bytes...");
+    cc112x_strobe(dev, CC112X_STX);
 
-	printf("STX - transmitting 8+1 bytes...");
-	cc112x_strobe(dev, CC112X_STX);
+    xtimer_usleep(500000);
 
-	xtimer_usleep(500000);
+    if((16 == cc112x_read_reg(dev, CC112X_TXLAST))
+            && (9 == cc112x_read_reg(dev, CC112X_TXFIRST))) {
+        puts(" OK");
+    } else {
+        puts(" ERROR");
+        printf("TXFIFO - %d\n", cc112x_read_reg(dev, CC112X_FIFO_NUM_TXBYTES));
+        printf("TXLAST - %d\n", cc112x_read_reg(dev, CC112X_TXLAST));
+        printf("TXfirst - %d\n", cc112x_read_reg(dev, CC112X_TXFIRST));
+        return false;
+    }
 
-	if((16 == cc112x_read_reg(dev, CC112X_TXLAST)) && (9 == cc112x_read_reg(dev, CC112X_TXFIRST))){
-		puts(" OK");
-	} else {
-		puts(" ERROR");
-		printf("TXFIFO - %d\n", cc112x_read_reg(dev, CC112X_FIFO_NUM_TXBYTES));
-		printf("TXLAST - %d\n", cc112x_read_reg(dev, CC112X_TXLAST));
-		printf("TXfirst - %d\n", cc112x_read_reg(dev, CC112X_TXFIRST));
-		return false;
-	}
+    printf("SFTX - flushing data...");
+    cc112x_strobe(dev, CC112X_SFTX);
 
-	printf("SFTX - flushing data...");
-	cc112x_strobe(dev, CC112X_SFTX);
+    if(0 == cc112x_read_reg(dev, CC112X_TXLAST)
+            && 0 == cc112x_read_reg(dev, CC112X_TXFIRST)) {
+        puts(" OK");
+    } else {
+        puts(" ERROR");
+        printf("TXFIFO - %d\n", cc112x_read_reg(dev, CC112X_FIFO_NUM_TXBYTES));
+        printf("TXLAST - %d\n", cc112x_read_reg(dev, CC112X_TXLAST));
+        printf("TXfirst - %d\n", cc112x_read_reg(dev, CC112X_TXFIRST));
+        return false;
+    }
 
-	if(0 == cc112x_read_reg(dev, CC112X_TXLAST) && 0 == cc112x_read_reg(dev, CC112X_TXFIRST)){
-		puts(" OK");
-	} else {
-		puts(" ERROR");
-		printf("TXFIFO - %d\n", cc112x_read_reg(dev, CC112X_FIFO_NUM_TXBYTES));
-		printf("TXLAST - %d\n", cc112x_read_reg(dev, CC112X_TXLAST));
-		printf("TXfirst - %d\n", cc112x_read_reg(dev, CC112X_TXFIRST));
-		return false;
-	}
+    printf("Additional write test...");
 
-	printf("Additional write test...");
+    for(uint32_t a = 0; a < 0x16; ++a) {
+        cc112x_write_reg(dev, CC112X_SINGLE_TXFIFO, 10 + a);
+    }
 
-	for(uint32_t a = 0 ; a < 0x16 ; ++a){
-		cc112x_write_reg(dev, CC112X_SINGLE_TXFIFO, 10+a);
-	}
-
-	if(22 == cc112x_read_reg(dev, CC112X_TXLAST) && 0 == cc112x_read_reg(dev, CC112X_TXFIRST)){
-		puts(" OK");
-	} else {
-		puts(" ERROR");
-		printf("TXFIFO - %d\n", cc112x_read_reg(dev, CC112X_FIFO_NUM_TXBYTES));
-		printf("TXLAST - %d\n", cc112x_read_reg(dev, CC112X_TXLAST));
-		printf("TXfirst - %d\n", cc112x_read_reg(dev, CC112X_TXFIRST));
-		return false;
-	}
+    if(22 == cc112x_read_reg(dev, CC112X_TXLAST)
+            && 0 == cc112x_read_reg(dev, CC112X_TXFIRST)) {
+        puts(" OK");
+    } else {
+        puts(" ERROR");
+        printf("TXFIFO - %d\n", cc112x_read_reg(dev, CC112X_FIFO_NUM_TXBYTES));
+        printf("TXLAST - %d\n", cc112x_read_reg(dev, CC112X_TXLAST));
+        printf("TXfirst - %d\n", cc112x_read_reg(dev, CC112X_TXFIRST));
+        return false;
+    }
 
 //	printf("DATA:\n");
 //	for(uint8_t a = 0 ; a < 0x10 ; a++){
@@ -452,30 +461,31 @@ bool cc112x_test(cc112x_t *dev){
 //		printf(" %x", in);
 //	}
 
-	puts(" ");
+    puts(" ");
 
-	return true;
+    return true;
 }
 
-cc112x_marc_state cc112x_get_marc_state(cc112x_t *dev){
-	uint8_t state = cc112x_read_reg(dev, CC112X_MARCSTATE);
-	printf("%x %x\n", state, (state&(0x60))>>5);
-	cc112x_marc_state ret;
-	switch((state&(0x60))>>5){
-	case 0x00:
-		ret = MARC_PIN_SETTLING;
-		break;
-	case 0x01:
-		ret = MARC_PIN_TX;
-		break;
-	case 0x02:
-		ret = MARC_PIN_IDLE;
-		break;
-	case 0x03:
-		ret = MARC_PIN_RX;
-		break;
-	default:
-		break;
-	}
-	return ret;
+cc112x_marc_state cc112x_get_marc_state(cc112x_t *dev)
+{
+    uint8_t state = cc112x_read_reg(dev, CC112X_MARCSTATE);
+    printf("%x %x\n", state, (state & (0x60)) >> 5);
+    cc112x_marc_state ret;
+    switch((state & (0x60)) >> 5) {
+    case 0x00:
+        ret = MARC_PIN_SETTLING;
+        break;
+    case 0x01:
+        ret = MARC_PIN_TX;
+        break;
+    case 0x02:
+        ret = MARC_PIN_IDLE;
+        break;
+    case 0x03:
+        ret = MARC_PIN_RX;
+        break;
+    default:
+        break;
+    }
+    return ret;
 }

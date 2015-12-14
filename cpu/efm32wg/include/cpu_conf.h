@@ -19,6 +19,8 @@
 extern "C" {
 #endif
 
+#define THREAD_EXTRA_STACKSIZE_PRINTF            (1)
+
 /**
  * @brief   ARM Cortex-M specific CPU configuration
  * @{

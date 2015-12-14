@@ -20,6 +20,15 @@ extern "C" {
 #define EFM32_LFXO_FREQ	(32768UL)		/* External RTC crystal */
 #define CLOCK_CORECLOCK (28000000UL)	/* Core frequency */
 
+/**
+ * @brief xtimer configuration values
+ * @{
+ */
+#define XTIMER                      TIMER_0
+#define XTIMER_CHAN                 (0)
+#define XTIMER_SHIFT                (5)
+#define XTIMER_MASK                 (0xffff0000)
+#define XTIMER_BACKOFF              (40)
 #define LETIMER_EN
 
 /**
@@ -30,7 +39,6 @@ extern "C" {
 #define TIMER_NUMOF			(1U)
 #define TIMER_0_EN			1
 #define TIMER_IRQ_PRIO		20
-
 
 #else
 
@@ -88,24 +96,22 @@ extern "C" {
 
 /* UART 0 device configuration */
 #define UART_0_DEV          USART0
-#define UART_0_CLKEN()      {CMU_ClockEnable(cmuClock_USART0, true);}
-#define UART_0_CLKDIS()		{CMU_ClockEnable(cmuClock_USART0, false);}
-//#define UART_0_CLK          (8000000)
 #define UART_0_IRQ_TX_CHAN  USART0_TX_IRQn
 #define UART_0_IRQ_RX_CHAN	USART0_RX_IRQn
 #define UART_0_TX_ISR		USART0_TX_IRQHandler
 #define UART_0_RX_ISR		USART0_RX_IRQHandler
 /* UART 0 pin configuration */
 #define UART_0_PORT_CLKEN() {CMU_ClockEnable(cmuClock_GPIO, true);}
-#define UART_0_PORT         gpioPortE
+#define UART_0_PORT         GPIO_PORT_E
 #define UART_0_LOC			UART_ROUTE_LOCATION_LOC0
 #define UART_0_TX_PIN       10
 #define UART_0_RX_PIN       11
+/* buffering setting */
+#define UART_0_ENABLE_BUF   1
+#define UART_0_BUFSIZE     512
 
 /* UART 1 device configuration */
 #define UART_1_DEV          USART1
-#define UART_1_CLKEN()     	{CMU_ClockEnable(cmuClock_USART1, true);}
-//#define UART_1_CLK          (8000000)
 #define UART_1_IRQ_TX_CHAN  USART1_TX_IRQn
 #define UART_1_IRQ_RX_CHAN	USART1_RX_IRQn
 #define UART_1_TX_ISR		USART1_TX_IRQHandler
@@ -113,24 +119,28 @@ extern "C" {
 /* UART 1 pin configuration */
 #define UART_1_PORT_CLKEN() {CMU_ClockEnable(cmuClock_GPIO, true);}
 #define UART_1_CLKDIS()		{CMU_ClockEnable(cmuClock_USART1, false);}
-#define UART_1_PORT         gpioPortD
+#define UART_1_PORT         GPIO_PORT_D
 #define UART_1_LOC			UART_ROUTE_LOCATION_LOC2
 #define UART_1_TX_PIN       7
 #define UART_1_RX_PIN       6
+/* buffering setting */
+#define UART_1_ENABLE_BUF   1
+#define UART_1_BUFSIZE     512
 
 /* UART 2 device configuration, it is LEUART device */
 #define UART_2_DEV          LEUART0
-#define UART_2_CLKEN()     	{CMU_ClockEnable(cmuClock_LEUART0, true);}
-//#define UART_2_CLK          (8000000)
 #define UART_2_IRQ 			LEUART0_IRQn
 #define UART_2_ISR			LEUART0_IRQHandler
 /* UART 2 pin configuration */
 #define UART_2_PORT_CLKEN() {CMU_ClockEnable(cmuClock_GPIO, true);}
 #define UART_2_CLKDIS()		{CMU_ClockEnable(cmuClock_LEUART0, false);}
-#define UART_2_PORT         gpioPortD
+#define UART_2_PORT         GPIO_PORT_D
 #define UART_2_LOC			UART_ROUTE_LOCATION_LOC0
 #define UART_2_TX_PIN       4
 #define UART_2_RX_PIN       5
+/* buffering setting */
+#define UART_2_ENABLE_BUF   1
+#define UART_2_BUFSIZE     2048
 /** @} */
 
 ///**
@@ -238,7 +248,6 @@ extern "C" {
 //#define RANDOM_NUMOF        (1U)
 ///** @} */
 //
-
 /**
  * @name SPI configuration
  * @{
@@ -248,7 +257,7 @@ extern "C" {
 #define SPI_1_EN			0
 #define SPI_2_EN			1
 #define SPI_IRQ_PRIO        0
-#define SPI_PERCLK_FREQ		(14000000U)
+#define SPI_PERCLK_FREQ		(14000000UL)
 
 #if defined SPI_0_EN
 #define SPI_0_MASTER			1
@@ -324,7 +333,6 @@ extern "C" {
 //#define I2C_0_SDA_AF        4
 //#define I2C_0_SDA_CLKEN()   (RCC->AHB1ENR |= RCC_AHB1ENR_GPIOBEN)
 ///** @} */
-
 #ifdef __cplusplus
 }
 #endif

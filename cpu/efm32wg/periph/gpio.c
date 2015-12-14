@@ -91,10 +91,7 @@ int gpio_init_int(gpio_t gpio, gpio_pp_t pullup, gpio_flank_t flank,
 		gpio_cb_t cb, void *arg) {
 	uint32_t tmp = 0;
 
-	if(pullup)
-		gpio_init(gpio, GPIO_DIR_INPUT, pullup);
-	else
-		gpio_init(gpio, GPIO_DIR_INPUT_PULL, pullup);
+	gpio_init(gpio, GPIO_DIR_INPUT, pullup);
 
 	/* configure and save exti configuration struct */
 	exti_chan[_pin(gpio)].cb = cb;
@@ -144,6 +141,7 @@ void gpio_irq_enable(gpio_t gpio) {
 }
 
 void gpio_irq_disable(gpio_t gpio) {
+    GPIO->IFC |= (1 << _pin(gpio));
 	GPIO->IEN &= ~(1 <<_pin(gpio));
 }
 

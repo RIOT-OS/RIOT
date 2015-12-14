@@ -18,6 +18,7 @@
  * @}
  */
 
+#include <cc112x_params.h>
 #include <stdio.h>
 
 #include "shell.h"
@@ -27,7 +28,6 @@
 #include "net/gnrc/pktdump.h"
 #include "net/gnrc.h"
 #include "net/netdev2.h"
-#include "cc1125_params.h"
 #include "cc112x-netdev2.h"
 #include "cc112x.h"
 #include "cc112x-spi.h"
@@ -40,25 +40,25 @@ netdev2_event_cb_t callback(netdev2_t *dev, netdev2_event_t event, void* arg){
 	static int rec = 0;
 	switch(event){
 	case NETDEV2_EVENT_ISR:
-		device.netdev.driver->isr(&device.netdev);
+	    puts("NETDEV2_EVENT_ISR");
 		break;
 	case NETDEV2_EVENT_LINK_DOWN:
-		puts("LINK DOWN");
+		//puts("LINK DOWN");
 		break;
 	case NETDEV2_EVENT_LINK_UP:
-		puts("LINK UP");
+		//puts("LINK UP");
 		break;
 	case NETDEV2_EVENT_RX_COMPLETE:
-		printf("REC - %d\n", rec);
+		//printf("REC - %d\n", rec);
 		++rec;
 		break;
 	case NETDEV2_EVENT_RX_STARTED:
-		puts("RX STARTED");
+		//puts("RX STARTED");
 		break;
 	case NETDEV2_EVENT_TX_COMPLETE:
 		break;
 	case NETDEV2_EVENT_TX_STARTED:
-		puts("TX STARTED");
+		//puts("TX STARTED");
 		break;
 	default:
 		break;
@@ -135,8 +135,9 @@ int main(void)
 		while(1){
 //			printf(".");
 //			fflush(stdout);
-			xtimer_usleep(100000);
+			xtimer_usleep(1500000);
 			device.netdev.driver->send(&device.netdev, &vect, 1);
+			xtimer_usleep(1500000);
 		    cc112x_set_channel(&device.cc112x, channel);
 		    ++channel;
 		    if(channel>30)

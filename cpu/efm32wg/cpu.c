@@ -53,7 +53,7 @@ static void cpu_clock_init(void)
 	/* RTC, LESENSE, LETIMER0, LCD is connected to external 36kHz oscillator */
 	CMU_ClockSelectSet(cmuClock_LFA, cmuSelect_LFXO);
 	CMU_ClockSelectSet(cmuClock_LFB, cmuSelect_LFXO);
-	/* HFPER clock is divided by 16 - 1MHz */
+	/* HFPER clock is divided by 2 - 14MHz */
 	CMU_ClockDivSet(cmuClock_HFPER, cmuClkDiv_2);
 	/* core, DMA etc. clock */
 	CMU_ClockDivSet(cmuClock_CORE, cmuClkDiv_1);

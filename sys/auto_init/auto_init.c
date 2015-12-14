@@ -163,6 +163,11 @@ void auto_init(void)
     auto_init_cc110x();
 #endif
 
+#ifdef MODULE_CC112X
+    extern void auto_init_cc112x(void);
+    auto_init_cc112x();
+#endif
+
 #ifdef MODULE_XBEE
     extern void auto_init_xbee(void);
     auto_init_xbee();

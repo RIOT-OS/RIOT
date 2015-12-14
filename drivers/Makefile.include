@@ -7,6 +7,9 @@ endif
 ifneq (,$(filter cc110x,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/drivers/cc110x/include
 endif
+ifneq (,$(filter cc112x,$(USEMODULE)))
+    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/cc112x/include
+endif
 ifneq (,$(filter kw2xrf,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/drivers/kw2xrf/include
 endif

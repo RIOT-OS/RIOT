@@ -28,6 +28,8 @@ extern "C" {
 #include "periph/gpio.h"
 #include "cc110x-internal.h"
 
+#define GPIO_READS_SPI_PINS		1
+
 /**
  * @brief Struct for holding cc110x IO parameters
  */

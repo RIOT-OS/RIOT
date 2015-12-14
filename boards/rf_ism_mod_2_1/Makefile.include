@@ -4,7 +4,7 @@ export CPU_MODEL = efm32wg990f256
 EFM32WG990F256 = 1
 
 ifneq (,$(filter gnrc_netif_default,$(USEMODULE)))
-	USEMODULE += cc110x gnrc_netdev2 gnrc_cc110x
+#	USEMODULE += cc110x gnrc_netdev2 gnrc_cc110
 endif
 
 # set default port depending on operating system

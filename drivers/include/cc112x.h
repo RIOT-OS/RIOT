@@ -20,13 +20,13 @@
 #ifndef CC110X_H
 #define CC110X_H
 
-#include "periph/spi.h"
-#include "periph/gpio.h"
-#include "cc112x-internal.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#include "periph/spi.h"
+#include "periph/gpio.h"
+#include "../cc112x/include/cc112x-internal.h"
 
 /**
  * @brief Struct for holding cc112x IO parameters
