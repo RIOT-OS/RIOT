@@ -170,7 +170,7 @@
 #include "kernel_types.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /**
@@ -184,9 +184,9 @@
 typedef struct msg {
     kernel_pid_t sender_pid;    /**< PID of sending thread. Will be filled in
                                      by msg_send. */
-    uint16_t     type;          /**< Type field. */
+    uint16_t type;              /**< Type field. */
     union {
-        char     *ptr;          /**< Pointer content field. */
+        char *ptr;              /**< Pointer content field. */
         uint32_t value;         /**< Value content field. */
     } content;                  /**< Content of the message. */
 } msg_t;
