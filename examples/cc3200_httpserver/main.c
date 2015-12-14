@@ -102,13 +102,13 @@
 #define GPIO_IF_LedOff    gpio_clear
 #define GPIO_IF_LedStatus gpio_read
 
-#define MCU_RED_LED_GPIO    RED_LED
-#define MCU_GREEN_LED_GPIO  GREEN_LED
+#define MCU_LED_RED_GPIO    LED_RED
+#define MCU_LED_GREEN_GPIO  LED_GREEN
 
 /**
  * sometimes I suspect to be daltonic
  */
-#define MCU_ORANGE_LED_GPIO YELLOW_LED
+#define MCU_ORANGE_LED_GPIO LED_YELLOW
 
 #define Report printf
 
@@ -476,7 +476,7 @@ void SimpleLinkHttpServerCallback(SlHttpServerEvent_t *pSlHttpServerEvent,
         if (memcmp(pSlHttpServerEvent->EventData.httpTokenName.data, GET_token,
                 strlen((const char *) GET_token)) == 0) {
             unsigned char status;
-            status = GPIO_IF_LedStatus(MCU_RED_LED_GPIO);
+            status = GPIO_IF_LedStatus(MCU_LED_RED_GPIO);
             strLenVal = strlen(LED1_STRING);
             memcpy(ptr, LED1_STRING, strLenVal);
             ptr += strLenVal;
@@ -494,7 +494,7 @@ void SimpleLinkHttpServerCallback(SlHttpServerEvent_t *pSlHttpServerEvent,
                 pSlHttpServerResponse->ResponseData.token_value.len +=
                         strLenVal;
             }
-            status = GPIO_IF_LedStatus(MCU_GREEN_LED_GPIO);
+            status = GPIO_IF_LedStatus(MCU_LED_GREEN_GPIO);
             strLenVal = strlen(LED2_STRING);
             memcpy(ptr, LED2_STRING, strLenVal);
             ptr += strLenVal;
@@ -535,15 +535,15 @@ void SimpleLinkHttpServerCallback(SlHttpServerEvent_t *pSlHttpServerEvent,
             ptr += strLenVal;
             if (led == '1') {
                 if (memcmp(ptr, LED_ON_STRING, strLenVal) == 0) {
-                    GPIO_IF_LedOn(MCU_RED_LED_GPIO);
+                    GPIO_IF_LedOn(MCU_LED_RED_GPIO);
                 } else {
-                    GPIO_IF_LedOff(MCU_RED_LED_GPIO);
+                    GPIO_IF_LedOff(MCU_LED_RED_GPIO);
                 }
             } else if (led == '2') {
                 if (memcmp(ptr, LED_ON_STRING, strLenVal) == 0) {
-                    GPIO_IF_LedOn(MCU_GREEN_LED_GPIO);
+                    GPIO_IF_LedOn(MCU_LED_GREEN_GPIO);
                 } else {
-                    GPIO_IF_LedOff(MCU_GREEN_LED_GPIO);
+                    GPIO_IF_LedOff(MCU_LED_GREEN_GPIO);
                 }
             }
 
@@ -784,11 +784,11 @@ long ConnectToNetwork(void) {
         //Blink LED 3 times to Indicate AP Mode
         for (iCount = 0; iCount < 3; iCount++) {
             //Turn RED LED On
-            GPIO_IF_LedOn(MCU_RED_LED_GPIO);
+            GPIO_IF_LedOn(MCU_LED_RED_GPIO);
             osi_Sleep(400);
 
             //Turn RED LED Off
-            GPIO_IF_LedOff(MCU_RED_LED_GPIO);
+            GPIO_IF_LedOff(MCU_LED_RED_GPIO);
             osi_Sleep(400);
         }
 
@@ -805,11 +805,11 @@ long ConnectToNetwork(void) {
         while ((!IS_IP_ACQUIRED(g_ulStatus))
                 && g_ucConnectTimeout < AUTO_CONNECTION_TIMEOUT_COUNT) {
             //Turn RED LED On
-            GPIO_IF_LedOn(MCU_RED_LED_GPIO);
+            GPIO_IF_LedOn(MCU_LED_RED_GPIO);
             osi_Sleep(50);
 
             //Turn RED LED Off
-            GPIO_IF_LedOff(MCU_RED_LED_GPIO);
+            GPIO_IF_LedOff(MCU_LED_RED_GPIO);
             osi_Sleep(50);
 
             g_ucConnectTimeout++;
@@ -817,7 +817,7 @@ long ConnectToNetwork(void) {
         //Couldn't connect Using Auto Profile
         if (g_ucConnectTimeout == AUTO_CONNECTION_TIMEOUT_COUNT) {
             //Blink Red LED to Indicate Connection Error
-            GPIO_IF_LedOn(MCU_RED_LED_GPIO);
+            GPIO_IF_LedOn(MCU_LED_RED_GPIO);
 
             CLR_STATUS_BIT_ALL(g_ulStatus);
 
@@ -833,7 +833,7 @@ long ConnectToNetwork(void) {
 
         }
         //Turn RED LED Off
-        GPIO_IF_LedOff(MCU_RED_LED_GPIO);
+        GPIO_IF_LedOff(MCU_LED_RED_GPIO);
         UART_PRINT("\n\rDevice is in STA Mode, Connect to the AP[%s] and type"
                 "IP address [%d.%d.%d.%d] in the browser \n\r",
                 g_ucConnectionSSID, SL_IPV4_BYTE(g_uiIpAddress, 3),

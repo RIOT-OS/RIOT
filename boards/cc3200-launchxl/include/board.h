@@ -56,17 +56,17 @@ extern "C" {
 /**
  * red led id
  */
-#define RED_LED 29
+#define LED_RED 29
 
 /**
  * green led id
  */
-#define GREEN_LED 10
+#define LED_GREEN 10
 
 /**
  * yellow led id
  */
-#define YELLOW_LED 9
+#define LED_YELLOW 9
 
 /**
  * SW2 button id
@@ -160,22 +160,22 @@ extern "C" {
  * @{
  */
 
-#define RED_LED_ON          gpio_set(RED_LED)
-#define RED_LED_OFF         gpio_clear(RED_LED)
-#define RED_LED_TOGGLE      gpio_toggle(RED_LED)
+#define LED_RED_ON          gpio_set(LED_RED)
+#define LED_RED_OFF         gpio_clear(LED_RED)
+#define LED_RED_TOGGLE      gpio_toggle(LED_RED)
 
-#define YELLOW_LED_ON       gpio_set(YELLOW_LED)
-#define YELLOW_LED_OFF      gpio_clear(YELLOW_LED)
-#define YELLOW_LED_TOGGLE   gpio_toggle(YELLOW_LED)
+#define LED_YELLOW_ON       gpio_set(LED_YELLOW)
+#define LED_YELLOW_OFF      gpio_clear(LED_YELLOW)
+#define LED_YELLOW_TOGGLE   gpio_toggle(LED_YELLOW)
 
-#define GREEN_LED_ON        gpio_set(GREEN_LED)
-#define GREEN_LED_OFF       gpio_clear(GREEN_LED)
-#define GREEN_LED_TOGGLE    gpio_toggle(GREEN_LED)
+#define LED_GREEN_ON        gpio_set(LED_GREEN)
+#define LED_GREEN_OFF       gpio_clear(LED_GREEN)
+#define LED_GREEN_TOGGLE    gpio_toggle(LED_GREEN)
 
 /* Default to red if the color is not specified: */
-#define LED_ON              RED_LED_ON
-#define LED_OFF             RED_LED_OFF
-#define LED_TOGGLE          RED_LED_TOGGLE
+#define LED_ON              LED_RED_ON
+#define LED_OFF             LED_RED_OFF
+#define LED_TOGGLE          LED_RED_TOGGLE
 /** @} */
 
 /**

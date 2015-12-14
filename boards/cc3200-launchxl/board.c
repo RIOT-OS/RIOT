@@ -36,13 +36,13 @@
  * @brief Initialize on-board LEDs
  */
 void led_init(void) {
-    gpio_init(RED_LED, GPIO_DIR_OUT, GPIO_NOPULL);
-    gpio_init(GREEN_LED, GPIO_DIR_OUT, GPIO_NOPULL);
-    gpio_init(YELLOW_LED, GPIO_DIR_OUT, GPIO_NOPULL);
+    gpio_init(LED_RED, GPIO_DIR_OUT, GPIO_NOPULL);
+    gpio_init(LED_GREEN, GPIO_DIR_OUT, GPIO_NOPULL);
+    gpio_init(LED_YELLOW, GPIO_DIR_OUT, GPIO_NOPULL);
 
-    gpio_clear(RED_LED);
-    gpio_clear(GREEN_LED);
-    gpio_clear(YELLOW_LED);
+    gpio_clear(LED_RED);
+    gpio_clear(LED_GREEN);
+    gpio_clear(LED_YELLOW);
 }
 
 extern const void *interrupt_vector[];

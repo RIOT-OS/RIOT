@@ -65,7 +65,7 @@ void* errors_task(void* arg) {
 
         switch (m.type) {
             case LOST_IN_PANIC:
-                RED_LED_TOGGLE;
+                LED_RED_TOGGLE;
                 xtimer_set(&timer, MSEC_TO_TICKS(100));
                 break;
             default:
