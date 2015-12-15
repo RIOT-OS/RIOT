@@ -160,8 +160,6 @@ void at86rf2xx_configure_phy(at86rf2xx_t *dev)
     /* we must be in TRX_OFF before changing the PHY configuration */
     at86rf2xx_force_trx_off(dev);
 
-    uint8_t phy_cc_cca = at86rf2xx_reg_read(dev, AT86RF2XX_REG__PHY_CC_CCA);
-
 #ifdef MODULE_AT86RF212B
     /* The TX power register must be updated after changing the channel if
      * moving between bands. */
@@ -174,8 +172,6 @@ void at86rf2xx_configure_phy(at86rf2xx_t *dev)
     trx_ctrl2 &= ~(AT86RF2XX_TRX_CTRL_2_MASK__FREQ_MODE);
     /* Clear previous configuration for GC_TX_OFFS */
     rf_ctrl0 &= ~AT86RF2XX_RF_CTRL_0_MASK__GC_TX_OFFS;
-    /* Clear previous configuration for channel number */
-    phy_cc_cca &= ~(AT86RF2XX_PHY_CC_CCA_MASK__CHANNEL);
 
     if (dev->chan != 0) {
         /* Set sub mode bit on 915 MHz as recommended by the data sheet */
@@ -197,6 +193,10 @@ void at86rf2xx_configure_phy(at86rf2xx_t *dev)
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_CTRL_2, trx_ctrl2);
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__RF_CTRL_0, rf_ctrl0);
 #endif
+
+    uint8_t phy_cc_cca = at86rf2xx_reg_read(dev, AT86RF2XX_REG__PHY_CC_CCA);
+    /* Clear previous configuration for channel number */
+    phy_cc_cca &= ~(AT86RF2XX_PHY_CC_CCA_MASK__CHANNEL);
 
     /* Update the channel register */
     phy_cc_cca |= (dev->chan & AT86RF2XX_PHY_CC_CCA_MASK__CHANNEL);
