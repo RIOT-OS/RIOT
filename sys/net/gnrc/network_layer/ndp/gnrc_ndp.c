@@ -32,6 +32,10 @@
 #include "thread.h"
 #include "xtimer.h"
 
+#if defined(MODULE_GNRC_RPL) && defined(MODULE_GNRC_SIXLOWPAN_ND_BORDER_ROUTER)
+#include "net/gnrc/rpl/dodag.h"
+#endif
+
 #include "net/gnrc/ndp/internal.h"
 
 #include "net/gnrc/ndp.h"
@@ -477,6 +481,65 @@ static inline void _set_reach_time(gnrc_ipv6_netif_t *if_entry, uint32_t mean)
     if_entry->reach_time = reach_time;
 }
 
+#if defined(MODULE_GNRC_RPL) && defined(MODULE_GNRC_SIXLOWPAN_ND_BORDER_ROUTER)
+/**
+ * @brief Add or remove prefix route to FIB table.
+ *
+ * If given lifetime is 0, the route is removed.
+ *
+ * @param[in] iface interface of the router
+ * @param[in] prefix prefix to match
+ * @param[in] next_hop address of the router
+ * @param[in] lifetime lifetime of the router
+ * @param[in] only_if_root when true, add router only if this device is a root
+ *            node of RPL. When false, add router only if this device is not a
+ *            root node.
+ */
+static void _add_prefix_route(kernel_pid_t iface,
+                              uint8_t *prefix,
+                              uint8_t *next_hop,
+                              uint32_t lifetime,
+                              bool only_if_root) {
+    bool updated = false;
+
+    for (uint8_t i = 0; i < GNRC_RPL_INSTANCES_NUMOF; ++i) {
+        if (gnrc_rpl_instances[i].state == 0) {
+            continue;
+        }
+
+        uint8_t node_status = gnrc_rpl_instances[i].dodag.node_status;
+
+        if ((node_status == GNRC_RPL_ROOT_NODE) != only_if_root) {
+            continue;
+        }
+
+        if (lifetime > 0) {
+            fib_add_entry(&gnrc_ipv6_fib_table, iface,
+                          prefix, sizeof(ipv6_addr_t), FIB_FLAG_NET_PREFIX,
+                          next_hop, sizeof(ipv6_addr_t), 0,
+                          lifetime);
+        }
+        else {
+            fib_remove_entry(&gnrc_ipv6_fib_table, prefix, sizeof(ipv6_addr_t));
+        }
+
+        updated = true;
+
+        break;
+    }
+
+    if (updated) {
+        for (uint8_t i = 0; i < GNRC_RPL_INSTANCES_NUMOF; ++i) {
+            if (gnrc_rpl_instances[i].state == 0) {
+                continue;
+            }
+
+            gnrc_rpl_delay_dao(&(gnrc_rpl_instances[i].dodag));
+        }
+    }
+}
+#endif
+
 void gnrc_ndp_rtr_adv_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt, ipv6_hdr_t *ipv6,
                              ndp_rtr_adv_t *rtr_adv, size_t icmpv6_size)
 {
@@ -573,6 +636,23 @@ void gnrc_ndp_rtr_adv_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt, ipv6_hdr_t
                     next_rtr_sol = valid_ltime;
                 }
 #endif
+
+#if defined(MODULE_GNRC_RPL) && defined(MODULE_GNRC_SIXLOWPAN_ND_BORDER_ROUTER)
+                if (!(if_entry->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN)) {
+                    ndp_opt_pi_t * pi_opt = (ndp_opt_pi_t *)opt;
+                    uint32_t lifetime =
+                        (pi_opt->valid_ltime.u32 == 0xFFFFFFFF) ?
+                          (uint32_t) FIB_LIFETIME_NO_EXPIRE :
+                          byteorder_ntohl(pi_opt->valid_ltime) * 1000;
+
+                    _add_prefix_route(iface,
+                                      pi_opt->prefix.u8,
+                                      ipv6->src.u8,
+                                      lifetime,
+                                      false);
+                }
+#endif
+
                 break;
 #ifdef MODULE_GNRC_SIXLOWPAN_ND
             case NDP_OPT_6CTX:
@@ -630,6 +710,20 @@ void gnrc_ndp_rtr_adv_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt, ipv6_hdr_t
         if (if_entry->flags & GNRC_IPV6_NETIF_FLAGS_ROUTER) {
             gnrc_ipv6_netif_set_rtr_adv(if_entry, true);
         }
+    }
+#endif
+
+#if defined(MODULE_GNRC_RPL) && defined(MODULE_GNRC_SIXLOWPAN_ND_BORDER_ROUTER)
+    if (!(if_entry->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN)) {
+        ipv6_addr_t default_route_prefix;
+
+        memset(default_route_prefix.u8, 0, sizeof(ipv6_addr_t));
+
+        _add_prefix_route(iface,
+                          default_route_prefix.u8,
+                          ipv6->src.u8,
+                          (uint32_t) byteorder_ntohs(rtr_adv->ltime) * 1000,
+                          GNRC_RPL_ROOT_NODE);
     }
 #endif
 }
