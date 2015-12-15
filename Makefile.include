@@ -189,6 +189,16 @@ else
 export CFLAGS += -DRIOT_VERSION=\"$(RIOT_VERSION)\"
 endif
 
+# include definitions for remote packages
+$(BINDIR)Makefile.remote-pkg:
+	@mkdir -p $(@D)
+	$(AD)$(RIOTBASE)/dist/remote-pkg/remote-pkg.py < /dev/null > $@
+
+ifneq (, $(REMOTE_PKG))
+  export REMOTE_PKG
+  -include $(BINDIR)Makefile.remote-pkg
+endif
+
 # the binaries to link
 BASELIBS += $(BINDIR)${APPLICATION}.a
 BASELIBS += $(USEPKG:%=${BINDIR}%.a)
