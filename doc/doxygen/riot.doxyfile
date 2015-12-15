@@ -762,6 +762,7 @@ INPUT                  = ../../doc.txt \
                          ../../pkg \
                          src/ \
                          src/mainpage.md \
+                         src/creating-modules.md \
                          src/creating-an-application.md \
                          src/getting-started.md
 
