@@ -118,6 +118,7 @@ static void _receive(gnrc_pktsnip_t *pkt)
         }
 
         pkt = gnrc_pktbuf_remove_snip(pkt, sixlowpan);
+        payload->type = GNRC_NETTYPE_IPV6;
     }
 #ifdef MODULE_GNRC_SIXLOWPAN_FRAG
     else if (sixlowpan_frag_is((sixlowpan_frag_t *)dispatch)) {
@@ -129,14 +130,14 @@ static void _receive(gnrc_pktsnip_t *pkt)
 #ifdef MODULE_GNRC_SIXLOWPAN_IPHC
     else if (sixlowpan_iphc_is(dispatch)) {
         size_t dispatch_size;
-        gnrc_pktsnip_t *sixlowpan;
-        gnrc_pktsnip_t *ipv6 = gnrc_pktbuf_add(NULL, NULL, sizeof(ipv6_hdr_t),
-                                               GNRC_NETTYPE_IPV6);
-        if ((ipv6 == NULL) ||
-            (dispatch_size = gnrc_sixlowpan_iphc_decode(ipv6, pkt, 0, 0)) == 0) {
+        gnrc_pktsnip_t *sixlowpan, *tmp;
+        gnrc_pktsnip_t *dec_hdr = gnrc_pktbuf_add(NULL, NULL, sizeof(ipv6_hdr_t),
+                                                  GNRC_NETTYPE_IPV6);
+        if ((dec_hdr == NULL) ||
+            (dispatch_size = gnrc_sixlowpan_iphc_decode(&dec_hdr, pkt, 0, 0)) == 0) {
             DEBUG("6lo: error on IPHC decoding\n");
-            if (ipv6 != NULL) {
-                gnrc_pktbuf_release(ipv6);
+            if (dec_hdr != NULL) {
+                gnrc_pktbuf_release(dec_hdr);
             }
             gnrc_pktbuf_release(pkt);
             return;
@@ -144,21 +145,18 @@ static void _receive(gnrc_pktsnip_t *pkt)
         sixlowpan = gnrc_pktbuf_mark(pkt, dispatch_size, GNRC_NETTYPE_SIXLOWPAN);
         if (sixlowpan == NULL) {
             DEBUG("6lo: error on marking IPHC dispatch\n");
-            gnrc_pktbuf_release(ipv6);
+            gnrc_pktbuf_release(dec_hdr);
             gnrc_pktbuf_release(pkt);
             return;
         }
 
-        /* Remove IPHC dispatch */
+        /* Remove IPHC dispatches */
         gnrc_pktbuf_remove_snip(pkt, sixlowpan);
-        /* Insert IPv6 header instead */
-        if (ipv6->next != NULL) {
-            ipv6->next->next = pkt->next;
-        }
-        else {
-            ipv6->next = pkt->next;
-        }
-        pkt->next = ipv6;
+        /* Insert decoded header instead */
+        LL_SEARCH_SCALAR(dec_hdr, tmp, next, NULL); /* search last decoded header */
+        tmp->next = pkt->next;
+        pkt->next = dec_hdr;
+        payload->type = GNRC_NETTYPE_UNDEF;
     }
 #endif
     else {
@@ -167,9 +165,6 @@ static void _receive(gnrc_pktsnip_t *pkt)
         gnrc_pktbuf_release(pkt);
         return;
     }
-
-    payload->type = GNRC_NETTYPE_IPV6;
-
     if (!gnrc_netapi_dispatch_receive(GNRC_NETTYPE_IPV6, GNRC_NETREG_DEMUX_CTX_ALL, pkt)) {
         DEBUG("6lo: No receivers for this packet found\n");
         gnrc_pktbuf_release(pkt);
