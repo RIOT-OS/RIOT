@@ -1,0 +1,16 @@
+# define the cpu used by the stm32f4-discovery board
+export CPU = stm32f2
+export CPU_MODEL = stm32f215rg
+
+# set default port depending on operating system
+PORT_LINUX ?= /dev/ttyUSB0
+PORT_DARWIN ?= $(shell ls -1 /dev/tty.SLAB_USBtoUART* | head -n 1)
+
+# setup serial terminal
+include $(RIOTBOARD)/Makefile.include.serial
+
+# this board uses openocd
+include $(RIOTBOARD)/Makefile.include.openocd
+
+# include cortex defaults
+include $(RIOTBOARD)/Makefile.include.cortexm_common
