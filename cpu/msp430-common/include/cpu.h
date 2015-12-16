@@ -45,14 +45,6 @@ extern "C" {
 #define ISR(a,b)        void __attribute__((naked, interrupt (a))) b(void)
 
 /**
- * @brief   Deprecated interrupt control functions for backward compatibility
- * @{
- */
-#define eINT            enableIRQ
-#define dINT            disableIRQ
-/** @} */
-
-/**
  * @brief Globally disable IRQs
  */
 static inline void __attribute__((always_inline)) __disable_irq(void)
