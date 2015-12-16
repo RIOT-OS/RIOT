@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Freie Universität Berlin
+ * Copyright (C) 2015 Engineering-Spirit
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -35,41 +35,14 @@ enum lpm_mode lpm_arch_set(enum lpm_mode target)
 
     switch (target) {
         case LPM_ON:                    /* STM Run mode */
-            current_mode = LPM_ON;
             break;
         case LPM_IDLE:                  /* STM Sleep mode */
-            current_mode = LPM_IDLE;
-            /* Reset SLEEPDEEP bit of system control block */
-            SCB->SCR &= ~(SCB_SCR_SLEEPDEEP_Msk);
-            /* Enter sleep mode */
-            __WFI();
             break;
         case LPM_SLEEP:                 /* STM Stop mode */
-            current_mode = LPM_SLEEP;
-            /* Clear PDDS and LPDS bits to enter stop mode on */
-            /* deepsleep with voltage regulator on */
-            PWR->CR &= ~(PWR_CR_PDDS | PWR_CR_LPDS);
-            /* Set SLEEPDEEP bit of system control block */
-            SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk;
-            /* Enter stop mode */
-            __WFI();
             break;
         case LPM_POWERDOWN:             /* STM Standby mode */
             /* Fall-through */
         case LPM_OFF:                   /* STM Standby mode */
-            current_mode = LPM_POWERDOWN;
-            /* Set PDDS to enter standby mode on deepsleep and clear flags */
-            PWR->CR |= (PWR_CR_PDDS | PWR_CR_CWUF | PWR_CR_CSBF);
-            /* Enable WKUP pin to use for wakeup from standby mode */
-            PWR->CSR |= PWR_CSR_EWUP;
-            /* Set SLEEPDEEP bit of system control block */
-            SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk;
-#if defined ( __CC_ARM   )
-            /* Ensure that store operations are completed */
-            __force_stores();
-#endif
-            /* Enter standby mode */
-            __WFI();
             break;
         default:
             break;
