@@ -14,6 +14,7 @@
  * @brief       Implementation of the kernels power management interface
  *
  * @author      Fabian Nack <nack@inf.fu-berlin.de>
+ * @author      Nick v. IJzendoorn <nijzndoorn@engineering-spirit.nl>
  *
  * @}
  */

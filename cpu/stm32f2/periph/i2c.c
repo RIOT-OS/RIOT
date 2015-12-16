@@ -15,10 +15,9 @@
  *
  * @note This implementation only implements the 7-bit addressing mode.
  *
- * For implementation details please refer to STM application note AN2824.
- *
+ * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
- * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
+ * @auhtor      Thomas Eichinge <thomas.eichinger@fu-berlin.de>
  *
  * @}
  */
@@ -573,3 +572,5 @@ void I2C_0_ERR_ISR(void)
     while (1);
 }
 #endif /* I2C_0_EN */
+
+#endif /* I2C_NUMOF */
