@@ -430,10 +430,8 @@ typedef struct
 
 typedef struct
 {
-  __IO uint32_t LISR;   /*!< DMA low interrupt status register,      Address offset: 0x00 */
-  __IO uint32_t HISR;   /*!< DMA high interrupt status register,     Address offset: 0x04 */
-  __IO uint32_t LIFCR;  /*!< DMA low interrupt flag clear register,  Address offset: 0x08 */
-  __IO uint32_t HIFCR;  /*!< DMA high interrupt flag clear register, Address offset: 0x0C */
+  __IO uint32_t ISR[2];  /*!< DMA low + high interrupt status register,      Address offset: 0x00 */
+  __IO uint32_t IFCR[2]; /*!< DMA low + high interrupt flag clear register,  Address offset: 0x08 */
 } DMA_TypeDef;
 
 /** 

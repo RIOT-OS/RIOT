@@ -20,7 +20,6 @@
 #define PERIPH_CPU_H_
 
 #include "cpu.h"
-#include "periph/dev_enums.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -90,6 +89,21 @@ typedef enum {
 } gpio_af_t;
 
 /**
+ * @brief   Structure for UART configuration data
+ * @{
+ */
+typedef struct {
+    USART_TypeDef *dev;     /**< UART device base register address */
+    uint32_t rcc_mask;      /**< bit in clock enable register */
+    gpio_t rx_pin;          /**< RX pin */
+    gpio_t tx_pin;          /**< TX pin */
+    gpio_af_t af;           /**< alternate pin function to use */
+    uint8_t irqn;           /**< IRQ channel */
+    uint8_t dma_stream;     /**< DMA stream used for TX */
+    uint8_t dma_chan;       /**< DMA channel used for TX */
+} uart_conf_t;
+/** @} */
+
 /**
  * @brief   Configure the alternate function for the given pin
  *
