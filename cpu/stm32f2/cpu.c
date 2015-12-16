@@ -14,30 +14,20 @@
  * @brief       Implementation of the kernel cpu functions
  *
  * @author      Nick v. IJzendoorn <nijzendoorn@engineering-spirit.nl>
- *
  * @}
  */
 
 #include "cpu.h"
 #include "periph_conf.h"
 
-#define CLOCK_FLASH_LATENCY         FLASH_ACR_LATENCY_3WS
-#define CLOCK_AHB_DIV               RCC_CFGR_HPRE_DIV1
-#define CLOCK_APB2_DIV              RCC_CFGR_PPRE2_DIV2
-#define CLOCK_APB1_DIV              RCC_CFGR_PPRE1_DIV4
-#define CLOCK_PLL_DIV               25
-#define CLOCK_PLL_MUL               240
-#define CLOCK_PLL_SYSCLK_DIV        2
-#define CLOCK_PLL_USB_SDO_RNG_DIV   5
-
 #ifdef HSI_VALUE
 # define RCC_CR_SOURCE          RCC_CR_HSION
 # define RCC_CR_SOURCE_RDY      RCC_CR_HSIRDY
-# define RCC_PLL_SOURCE         RCC_CFGR_PLLSRC_HSE
+# define RCC_PLL_SOURCE         RCC_PLLCFGR_PLLSRC_HSI
 #else
 # define RCC_CR_SOURCE          RCC_CR_HSEON
 # define RCC_CR_SOURCE_RDY      RCC_CR_HSERDY
-# define RCC_PLL_SOURCE         RCC_CFGR_PLLSRC_HSI
+# define RCC_PLL_SOURCE         RCC_PLLCFGR_PLLSRC_HSE
 #endif
 
 static void clk_init(void);
@@ -88,7 +78,7 @@ static void clk_init(void)
     /* PCLK1 = HCLK */
     RCC->CFGR |= (uint32_t)CLOCK_APB1_DIV;
     /*  PLL configuration: PLLCLK = SOURCE_CLOCK / SOURCE_CLOCK_DIV * SOURCE_CLOCK_MUL */
-    RCC->CFGR &= ~((uint32_t)(RCC_CFGR_PLLSRC | RCC_CFGR_PLLXTPRE | RCC_CFGR_PLLMULL));
+    RCC->CFGR &= ~((uint32_t)(RCC_PLLCFGR_PLLSRC | RCC_PLLCFGR_PLLN | RCC_PLLCFGR_PLLM | RCC_PLLCFGR_PLLP | RCC_PLLCFGR_PLLQ));
     RCC->CFGR |= (uint32_t)(RCC_PLL_SOURCE | CLOCK_PLL_DIV | (CLOCK_PLL_MUL << 6)
                  | (((CLOCK_PLL_SYSCLK_DIV >> 1) -1) << 16) | (CLOCK_PLL_USB_SDO_RNG_DIV << 24));
     /* Enable PLL */

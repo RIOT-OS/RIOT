@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Freie Universität Berlin
+ * Copyright (C) 2015 Engineering-Spirit
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -15,6 +15,7 @@
  *
  * @author      Hauke Petersen <mail@haukepetersen.de>
  * @author      Fabian Nack <nack@inf.fu-berlin.de>
+ * @author      Nick v. IJzendoorn <nijzendoorn@engineering-spirit.nl>
  *
  * @}
  */
