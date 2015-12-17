@@ -31,7 +31,7 @@ extern "C" {
 /**
  * @brief Default shell buffer size (maximum line length shell can handle)
  */
-#define SHELL_DEFAULT_BUFSIZE   (128)
+#define SHELL_DEFAULT_BUFSIZE   (256)
 
 /**
  * @brief           Protype of a shell callback handler.

@@ -32,6 +32,13 @@
 extern "C" {
 #endif
 
+/* My own realisation of debug timestamp */
+extern struct timeval time_ref;
+extern char time_stamp[20];
+
+extern void debug_timeref_reset(void);
+extern void debug_timestamp(void);
+
 /**
  * @def ENABLE_DEBUG
  * @brief   This macro can be defined as 0 or other on a file-based level.
@@ -53,6 +60,8 @@ extern "C" {
 #define DEBUG_PRINT(...) \
     do { \
         if ((sched_active_thread == NULL) || (sched_active_thread->stack_size > THREAD_EXTRA_STACKSIZE_PRINTF)) { \
+            debug_timestamp(); \
+            printf("%s", time_stamp); \
             printf(__VA_ARGS__); \
         } \
         else { \

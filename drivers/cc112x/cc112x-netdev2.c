@@ -83,6 +83,7 @@ static inline int _get_iid(netdev2_t *netdev, eui64_t *value, size_t max_len)
 
 static int _get(netdev2_t *dev, netopt_t opt, void *value, size_t value_len)
 {
+    DEBUG("%s:%u\n", __func__, __LINE__);
     cc112x_t *cc112x = &((netdev2_cc112x_t*)dev)->cc112x;
 
     switch(opt) {

@@ -25,6 +25,13 @@
 
 #include "cpu_conf.h"
 #include "xtimer.h"
+#include "debug.h"
+
+#include "periph/gpio.h"
+#include "t_debug.h"
+
+#include "net/gnrc/netapi.h"
+#include "net/gnrc/pkt.h"
 
 #include <time.h>
 #include <sys/time.h>
@@ -40,38 +47,44 @@ int timer_sleep(__attribute__((unused)) int argc,
     xtimer_sleep(1);
     return 0;
 }
+//
+//unsigned char data[] = {53, 0, 22, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2,
+//                3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3,
+//                4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+//
+//int data_test(int argc, char **argv){
+//    gnrc_pktsnip_t pkt;
+//    pkt.next = 0;
+//    pkt.size = 1;
+//    pkt.type = 0;
+//    pkt.users = 1;
+//    pkt.data = (void*)(data);
+//
+//    msg_t msg;
+//    msg.type = GNRC_NETAPI_MSG_TYPE_SND;
+//    msg.content.ptr = (void*)(&pkt);
+//    msg_send(&msg, 7);
+//    return 0;
+//}
 
 extern char ajdi[CPUID_ID_LEN];
 
-static const shell_command_t shell_commands[] = {{"udp",
-        "send data over UDP and listen on UDP ports", udp_cmd}, {"timer",
-        "sleep loop", timer_sleep}, {NULL, NULL, NULL}};
+static const shell_command_t shell_commands[] = {
+//        {"data_test", "transfer test", data_test},
+        {"udp", "send data over UDP and listen on UDP ports", udp_cmd},
+        {"timer", "sleep loop", timer_sleep},
+        {NULL, NULL, NULL}};
 
 int main(void)
 {
+    debug_timeref_init();
+
+
     /* we need a message queue for the thread running the shell in order to
      * receive potentially fast incoming networking packets */
     msg_init_queue(_main_msg_queue, MAIN_QUEUE_SIZE);
     puts("\n\tRIOT network stack example application\n");
 
-    struct timeval t0, t1, t2, t3, t4;
-    gettimeofday(&t0, 0);
-
-    printf("Time %d, %d\n", (int)t0.tv_sec, (int)t0.tv_usec);
-
-    xtimer_sleep(2);
-    /* ... */
-    gettimeofday(&t1, 0);
-    printf("Time %d, %d\n", (int)t1.tv_sec, (int)t1.tv_usec);
-
-    gettimeofday(&t1, 0);
-    printf("Time %d, %d\n", (int)t1.tv_sec, (int)t1.tv_usec);
-
-    gettimeofday(&t1, 0);
-    printf("Time %d, %d\n", (int)t1.tv_sec, (int)t1.tv_usec);
-
-    gettimeofday(&t1, 0);
-    printf("Time %d, %d\n", (int)t1.tv_sec, (int)t1.tv_usec);
 
     /* start shell */
     puts("All up, running the shell now");

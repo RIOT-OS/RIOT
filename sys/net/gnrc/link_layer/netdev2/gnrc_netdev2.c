@@ -31,7 +31,7 @@
 #include "net/gnrc/netdev2.h"
 #include "net/ethernet/hdr.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG    (1)
 #include "debug.h"
 
 #if defined(MODULE_OD) && ENABLE_DEBUG
@@ -191,6 +191,8 @@ kernel_pid_t gnrc_netdev2_init(char *stack, int stacksize, char priority,
     if (res <= 0) {
         return -EINVAL;
     }
+
+    printf("PIDPIO PID - %d\n", res);
 
     return res;
 }

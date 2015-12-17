@@ -85,11 +85,7 @@ static void send(char *addr_str, char *port_str, char *data, unsigned int num,
         printf("Success: send %u byte to [%s]:%u\n", (unsigned)payload->size,
                 addr_str, tmp);
 
-        printf("nbr - %d\n", i);
-
         xtimer_usleep(delay);
-
-        printf("nbr - %d\n", i);
     }
 }
 

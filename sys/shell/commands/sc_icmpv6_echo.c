@@ -226,6 +226,18 @@ int _icmpv6_ping(int argc, char **argv)
         }
 
         start = xtimer_now();
+
+//        pkt->next
+//        pkt->size
+//        pkt->type
+//        pkt->data
+//        pkt->users
+//
+//        printf("next %lx\n", (uint32_t)pkt->next);
+//        printf("size - %d\n", pkt->size);
+//        printf("type - %d\n", pkt->type);
+//        printf("users - %d\n", pkt->users)
+
         if (gnrc_netapi_send(ipv6_entry->pid, pkt) < 1) {
             puts("error: unable to send ICMPv6 echo request\n");
             gnrc_pktbuf_release(pkt);
