@@ -245,6 +245,7 @@ endif
 
 ifneq (,$(filter ipv6_hdr,$(USEMODULE)))
   USEMODULE += inet_csum
+  USEMODULE += ipv6_addr
 endif
 
 ifneq (,$(filter gnrc_ipv6_nc,$(USEMODULE)))
