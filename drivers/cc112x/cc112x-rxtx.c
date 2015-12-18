@@ -114,6 +114,8 @@ static void _rx_read_data(cc112x_t *dev, void (*callback)(void*), void*arg)
         /* Store RSSI value of packet */
         pkt_buf->rssi = cc112x_read_reg(dev, CC112X_RSSI1);
 
+        printf("RSSI - %d\n", (int8_t)(pkt_buf->rssi));
+
         /* Bit 0-6 of LQI indicates the link quality (LQI) */
         pkt_buf->lqi = cc112x_read_reg(dev, CC112X_LQI_VAL);
 

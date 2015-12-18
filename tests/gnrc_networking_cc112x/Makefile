@@ -1,7 +1,7 @@
 # name of your application
 APPLICATION = gnrc_networking
 
-USEMODULE_INCLUDES += $(RIOTBASE)/drivers/cc112x/include
+USEMODULE_INCLUDES += $(RIOTBASE)/drivers/cc112x/include 
 
 # If no BOARD is found in the environment, use this default:
 BOARD ?= native
