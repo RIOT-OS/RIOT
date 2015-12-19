@@ -50,6 +50,34 @@ static fib_sr_meta_t _entries_sr = { .headers = _sr_headers,
 static fib_table_t test_fib_sr_table;
 
 /*
+* @brief helper function to create source routes.
+*        The enrties are constructed with the given prefix and numbers
+*        counted from the given count borders (from and to).
+* @param[in] pre prefix string to use
+* @param[in] from starting index to count from
+* @param[in] to last index to count to
+* @param[in] sr the source route to append the created entries
+* @param[in] buf_size the size in bytes for each address to be created
+*/
+static int _create_sr(const char* pre, size_t from, size_t to, fib_sr_t* sr, size_t buf_size)
+{
+    char addr_nxt[buf_size];
+    strncpy(addr_nxt, pre, strlen(pre));
+
+    for (size_t i = from; i < to; ++i) {
+        int res;
+        snprintf(&(addr_nxt[strlen(pre)]), buf_size, "%d", (int)i);
+        /* append a  hop */
+        res = fib_sr_entry_append(&test_fib_sr_table, sr, (uint8_t *)&addr_nxt, buf_size);
+        if (res != 0) {
+            return res;
+        }
+    }
+    return 0;
+}
+
+
+/*
 * @brief create a new empty source route and check the parameters
 * It is expected to have a new source route with the given parameters
 */
@@ -241,31 +269,6 @@ static void test_fib_sr_05_create_sr_and_append_hop(void)
 }
 
 /*
-* @brief helper function to create source routes.
-*        The enrties are constructed with the given prefix and numbers
-*        counted from the given count borders (from and to).
-* @param[in] pre prefix string to use
-* @param[in] from starting index to count from
-* @param[in] to last index to count to
-* @param[in] sr the source route to append the created entries
-* @param[in] buf_size the size in bytes for each address to be created
-*/
-static void _create_sr(const char* pre, size_t from, size_t to, fib_sr_t* sr, size_t buf_size)
-{
-    char addr_nxt[buf_size];
-    strncpy(addr_nxt, pre, strlen(pre));
-
-    for (size_t i = from; i < to; ++i) {
-    snprintf(&(addr_nxt[strlen(pre)]), buf_size, "%d", (int)i);
-    /* append a  hop */
-    TEST_ASSERT_EQUAL_INT(0, fib_sr_entry_append(&test_fib_sr_table, sr,
-                          (uint8_t *)&addr_nxt,
-                          buf_size)
-                         );
-    }
-}
-
-/*
 * @brief create a new source route with a number of hops on its path
 *        Search entry and add a new entry after the found one
 */
@@ -278,7 +281,7 @@ static void test_fib_sr_06_create_sr_with_hops(void)
     TEST_ASSERT_EQUAL_INT(0, fib_sr_create(&test_fib_sr_table, &local_sourceroutes[0],
                                            42, 0x0, 10000));
 
-    _create_sr("Some address X", 0, 10, local_sourceroutes[0], 16);
+    TEST_ASSERT_EQUAL_INT(0, _create_sr("Some address X", 0, 10, local_sourceroutes[0], 16));
 
     /* now we search for a specific entry, e.g. X6 */
     fib_sr_entry_t *sr_path_entry[1];
@@ -354,7 +357,7 @@ static void test_fib_sr_07_create_sr_with_hops_and_delete_one(void)
     TEST_ASSERT_EQUAL_INT(0, fib_sr_create(&test_fib_sr_table, &local_sourceroutes[0],
                                            42, 0x0, 10000));
 
-    _create_sr("Some address X", 0, 10, local_sourceroutes[0], 16);
+    TEST_ASSERT_EQUAL_INT(0, _create_sr("Some address X", 0, 10, local_sourceroutes[0], 16));
 
     snprintf(addr_nxt, add_buf_size, "Some address X6");
     /* we delete X6 keeping the remaining entries */
@@ -403,7 +406,7 @@ static void test_fib_sr_08_create_sr_with_hops_and_overwrite_one(void)
     TEST_ASSERT_EQUAL_INT(0, fib_sr_create(&test_fib_sr_table, &local_sourceroutes[0],
                                            42, 0x0, 10000));
 
-    _create_sr("Some address X", 0, 10, local_sourceroutes[0], 16);
+    TEST_ASSERT_EQUAL_INT(0, _create_sr("Some address X", 0, 10, local_sourceroutes[0], 16));
 
     /* now we search for a specific entry, e.g. X6 */
     snprintf(addr_nxt, add_buf_size, "Some address X6");
@@ -439,7 +442,7 @@ static void test_fib_sr_09_create_sr_with_hops_and_get_one(void)
     TEST_ASSERT_EQUAL_INT(0, fib_sr_create(&test_fib_sr_table, &local_sourceroutes[0],
                                            42, 0x0, 10000));
 
-    _create_sr("Some address X", 0, 10, local_sourceroutes[0], 16);
+    TEST_ASSERT_EQUAL_INT(0, _create_sr("Some address X", 0, 10, local_sourceroutes[0], 16));
 
     /* first we have an empty iterator */
     fib_sr_entry_t *sr_path_entry[1];
@@ -484,7 +487,7 @@ static void test_fib_sr_10_create_sr_with_hops_and_get_a_route(void)
     TEST_ASSERT_EQUAL_INT(0, fib_sr_create(&test_fib_sr_table, &local_sourceroutes[0],
                                            42, 0x0, 10000));
 
-    _create_sr("Some address X", 0, 10, local_sourceroutes[0], 16);
+    TEST_ASSERT_EQUAL_INT(0, _create_sr("Some address X", 0, 10, local_sourceroutes[0], 16));
 
     size_t addr_list_elements = 10;
     size_t element_size = 16;
@@ -555,7 +558,7 @@ static void test_fib_sr_11_create_sr_with_hops_and_get_a_partial_route(void)
     TEST_ASSERT_EQUAL_INT(0, fib_sr_create(&test_fib_sr_table, &local_sourceroutes[0],
                                            42, 0x0, 10000));
 
-    _create_sr("Some address X", 0, 10, local_sourceroutes[0], 16);
+    TEST_ASSERT_EQUAL_INT(0, _create_sr("Some address X", 0, 10, local_sourceroutes[0], 16));
 
     size_t addr_list_elements = 10;
     size_t element_size = 16;
@@ -623,7 +626,7 @@ static void test_fib_sr_12_get_consecutive_sr(void)
     TEST_ASSERT_EQUAL_INT(0, fib_sr_create(&test_fib_sr_table, &local_sourceroutes[0],
                                            42, 0x0, 10000));
 
-    _create_sr("Some address X", 0, 10, local_sourceroutes[0], 16);
+    TEST_ASSERT_EQUAL_INT(0, _create_sr("Some address X", 0, 10, local_sourceroutes[0], 16));
 
     snprintf(addr_nxt, add_buf_size, "Some address XX");
 
@@ -637,7 +640,7 @@ static void test_fib_sr_12_get_consecutive_sr(void)
     TEST_ASSERT_EQUAL_INT(0, fib_sr_create(&test_fib_sr_table, &local_sourceroutes[1],
                                            42, 0x0, 10000));
 
-    _create_sr("Some address Y", 1, 8, local_sourceroutes[1], 16);
+    TEST_ASSERT_EQUAL_INT(0, _create_sr("Some address Y", 1, 8, local_sourceroutes[1], 16));
 
     snprintf(addr_nxt, add_buf_size, "Some address XX");
     /* append a the last hop, i.e. the destination */
@@ -651,7 +654,7 @@ static void test_fib_sr_12_get_consecutive_sr(void)
      TEST_ASSERT_EQUAL_INT(0, fib_sr_create(&test_fib_sr_table, &local_sourceroutes[2],
                                             42, 0x0, 10000));
 
-    _create_sr("Some address Z", 5, 8, local_sourceroutes[2], 16);
+    TEST_ASSERT_EQUAL_INT(0, _create_sr("Some address Z", 5, 8, local_sourceroutes[2], 16));
 
      snprintf(addr_nxt, add_buf_size, "Some address XX");
      /* append a the last hop, i.e. the destination */
