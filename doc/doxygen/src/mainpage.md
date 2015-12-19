@@ -228,11 +228,13 @@ debugging, reseting (e.g. support for [OpenOCD](http://openocd.org/),
 integration to open testbeds such as the [IoT-LAB](https://www.iot-lab.info/).
 Furthermore you can find here scripts to do all kind of code and style checks.
 
-<!--
 Further information                                      {#further-information}
 ===================
-*TBD*
+ - @ref getting-started
+ - @ref creating-an-application
+ - @ref creating-modules
 
+<!--
 Idea for this section: just name each of RIOT's main features/concepts and link
 to an appropriate page with further information:
     - Create an application
