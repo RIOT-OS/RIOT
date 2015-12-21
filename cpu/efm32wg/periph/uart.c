@@ -73,7 +73,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
         NVIC_EnableIRQ(UART_0_IRQ_RX_CHAN);
         USART_IntEnable(UART_0_DEV, _USART_IEN_RXDATAV_MASK);
 #if UART_0_ENABLE_BUF
-        ringbuffer_init(rb_uart0, buffer0, UART_0_BUFISIZE);
+        ringbuffer_init(&rb_uart0, buffer0, UART_0_BUFISIZE);
         NVIC_SetPriority(UART_0_IRQ_TX_CHAN, UART_0_IRQ_TX_PRIO);
         NVIC_EnableIRQ(UART_0_IRQ_TX_CHAN);
         USART_IntEnable(UART_0_DEV, _USART_IEN_TXC_MASK);
@@ -88,7 +88,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
         NVIC_EnableIRQ(UART_1_IRQ_TX_CHAN);
         USART_IntEnable(UART_1_DEV, _USART_IEN_RXDATAV_MASK);
 #if UART_1_ENABLE_BUF
-        ringbuffer_init(rb_uart1, buffer0, UART_1_BUFISIZE);
+        ringbuffer_init(&rb_uart1, buffer1, UART_1_BUFSIZE);
         NVIC_SetPriority(UART_1_IRQ_TX_CHAN, UART_1_IRQ_TX_PRIO);
         NVIC_EnableIRQ(UART_1_IRQ_TX_CHAN);
         USART_IntEnable(UART_1_DEV, _USART_IEN_TXC_MASK);
@@ -331,6 +331,7 @@ static inline void irq_read(uint8_t uartnum, uint8_t data)
 }
 
 #if UART_0_EN
+#if UART_0_ENABLE_BUF
 void UART_0_TX_ISR(void)
 {
     /* Check TX buffer level status */
@@ -345,6 +346,7 @@ void UART_0_TX_ISR(void)
         thread_yield();
     }
 }
+#endif
 
 void UART_0_RX_ISR(void)
 {
@@ -361,6 +363,7 @@ void UART_0_RX_ISR(void)
 #endif
 
 #if UART_1_EN
+#if UART_1_ENABLE_BUF
 void UART_1_TX_ISR(void)
 {
     /* Check TX buffer level status */
@@ -375,6 +378,7 @@ void UART_1_TX_ISR(void)
         thread_yield();
     }
 }
+#endif
 
 void UART_1_RX_ISR(void)
 {

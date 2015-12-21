@@ -84,9 +84,9 @@ extern "C" {
  * @name UART configuration
  * @{
  */
-#define UART_NUMOF          (1U)
+#define UART_NUMOF          (2U)
 #define UART_0_EN           0
-#define UART_1_EN           0
+#define UART_1_EN           1
 #define UART_2_EN			1
 #define UART_0_IRQ_TX_PRIO  1
 #define UART_0_IRQ_RX_PRIO	2
@@ -124,8 +124,8 @@ extern "C" {
 #define UART_1_TX_PIN       7
 #define UART_1_RX_PIN       6
 /* buffering setting */
-#define UART_1_ENABLE_BUF   1
-#define UART_1_BUFSIZE     512
+#define UART_1_ENABLE_BUF   0
+#define UART_1_BUFSIZE     2048
 
 /* UART 2 device configuration, it is LEUART device */
 #define UART_2_DEV          LEUART0

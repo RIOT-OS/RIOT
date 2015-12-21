@@ -42,9 +42,9 @@ void cpu_init(void)
 
 static void cpu_clock_init(void)
 {
-	SystemHFXOClockSet((uint32_t)EFM32_HFXO_FREQ);
-	SystemLFXOClockSet((uint32_t)EFM32_LFXO_FREQ);
+    SystemLFXOClockSet((uint32_t)EFM32_LFXO_FREQ);
 	CMU_OscillatorEnable(cmuOsc_LFXO, true, true);
+	CMU_OscillatorEnable(cmuOsc_HFRCO, true, true);
 	CMU_HFRCOBandSet(cmuHFRCOBand_28MHz);
 //	/* HF Core clock is connected to external oscillator */
 //	CMU_ClockSelectSet(cmuClock_HF, cmuSelect_HFXO);
