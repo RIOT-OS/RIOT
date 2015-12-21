@@ -85,7 +85,7 @@ def main(argv, lines, stdout=stdout, stderr=stderr, *,
          _ONCE_PORT=0x524f,  # "RO" -- "RIOT-OS"
          _ONCE_TIMEOUT=30,  # seconds
          _PATH=join(dirname(abspath(__file__)), 'cache'),  # git checkout root
-         _REPO='https://github.com/RIOT-OS/',  # default base repo
+         _DEFAULT_GROUP='RIOT-OS',
          _WORKERS=4):  # number of checkouts in parallel
     # Only allow one instance of remote-pkg.py to run at once.
     # Wait for other instance(s) to finish.
@@ -105,14 +105,20 @@ def main(argv, lines, stdout=stdout, stderr=stderr, *,
     # without a git URL, but possibly with a revision.
     # Yields to process_git.
 
-    def process_riot(makefile_strm, argument):
+    def process_github(makefile_strm, argument):
         split_argument = argument.split('@', 1)
         if len(split_argument) == 2:
             name, revision = split_argument
         else:
             name, revision = argument, 'master'
 
-        argument = '{}{}.git@{}'.format(_REPO, name, revision)
+        split_name = name.split('@', 1)
+        if len(split_argument) == 2:
+            group, repo = split_name
+        else:
+            group, repo = _DEFAULT_GROUP, name
+
+        argument = 'https://github.com/{}/{}.git@{}'.format(group, repo, revision)
         process_git(makefile_strm, argument)
 
     # Handle lines that contain a full git repo URL, and possibly a revision.
@@ -177,13 +183,14 @@ def main(argv, lines, stdout=stdout, stderr=stderr, *,
                 split_line = line.split('+', 1)
                 if len(split_line) == 2:
                     function, argument = split_line
-                elif line[0] in './':
+                elif line[0] in './~':
                     function, argument = 'local', line
                 else:
-                    function, argument = 'riot', line
+                    function, argument = 'github', line
 
                 fun = {
-                    'riot': process_riot,
+                    'riot': process_github,
+                    'github': process_github,
                     'git': process_git,
                     'local': process_local,
                 }.get(function)
