@@ -57,7 +57,17 @@ typedef struct {
     cc2538_reg_t FFSM_SHORT_ADDR0;        /**< RF Local address information */
     cc2538_reg_t FFSM_SHORT_ADDR1;        /**< RF Local address information */
     cc2538_reg_t RESERVED1[10];           /**< Reserved bytes */
-    cc2538_reg_t XREG_FRMFILT0;           /**< RF Frame Filter 0 */
+
+    union {
+        cc2538_reg_t XREG_FRMFILT0;       /**< RF Frame Filter 0 */
+        struct {
+            cc2538_reg_t FRAME_FILTER_EN  :  1;
+            cc2538_reg_t PAN_COORDINATOR  :  1;
+            cc2538_reg_t MAX_FRAME_VERSION:  2;
+            cc2538_reg_t RESERVED         : 28;
+        } XREG_FRMFILT0bits;
+    };
+
     cc2538_reg_t XREG_FRMFILT1;           /**< RF Frame Filter 1 */
     cc2538_reg_t XREG_SRCMATCH;           /**< RF Source address matching and pending bits */
     cc2538_reg_t XREG_SRCSHORTEN0;        /**< RF Short address matching */
@@ -66,7 +76,20 @@ typedef struct {
     cc2538_reg_t XREG_SRCEXTEN0;          /**< RF Extended address matching */
     cc2538_reg_t XREG_SRCEXTEN1;          /**< RF Extended address matching */
     cc2538_reg_t XREG_SRCEXTEN2;          /**< RF Extended address matching */
-    cc2538_reg_t XREG_FRMCTRL0;           /**< RF Frame handling */
+
+    union {
+        cc2538_reg_t XREG_FRMCTRL0;       /**< RF Frame handling */
+        struct {
+            cc2538_reg_t TX_MODE          :  2;
+            cc2538_reg_t RX_MODE          :  2;
+            cc2538_reg_t ENERGY_SCAN      :  1;
+            cc2538_reg_t AUTOACK          :  1;
+            cc2538_reg_t AUTOCRC          :  1;
+            cc2538_reg_t APPEND_DATA_MODE :  1;
+            cc2538_reg_t RESERVED         : 24;
+        } XREG_FRMCTRL0bits;
+    };
+
     cc2538_reg_t XREG_FRMCTRL1;           /**< RF Frame handling */
     cc2538_reg_t XREG_RXENABLE;           /**< RF RX enabling */
     cc2538_reg_t XREG_RXMASKSET;          /**< RF RX enabling */
@@ -75,8 +98,32 @@ typedef struct {
     cc2538_reg_t XREG_FREQCTRL;           /**< RF Controls the RF frequency */
     cc2538_reg_t XREG_TXPOWER;            /**< RF Controls the output power */
     cc2538_reg_t XREG_TXCTRL;             /**< RF Controls the TX settings */
-    cc2538_reg_t XREG_FSMSTAT0;           /**< RF Radio status register */
-    cc2538_reg_t XREG_FSMSTAT1;           /**< RF Radio status register */
+
+    union {
+        cc2538_reg_t XREG_FSMSTAT0;       /**< RF Radio status register */
+        struct {
+            cc2538_reg_t FSM_FFCTRL_STATE :  6;
+            cc2538_reg_t CAL_RUNNING      :  1;
+            cc2538_reg_t CAL_DONE         :  1;
+            cc2538_reg_t RESERVED         : 24;
+        } XREG_FSMSTAT0bits;
+    };
+
+    union {
+        cc2538_reg_t XREG_FSMSTAT1;       /**< RF Radio status register */
+        struct {
+            cc2538_reg_t RX_ACTIVE        :  1;
+            cc2538_reg_t TX_ACTIVE        :  1;
+            cc2538_reg_t LOCK_STATUS      :  1;
+            cc2538_reg_t SAMPLED_CCA      :  1;
+            cc2538_reg_t CCA              :  1;
+            cc2538_reg_t SFD              :  1;
+            cc2538_reg_t FIFOP            :  1;
+            cc2538_reg_t FIFO             :  1;
+            cc2538_reg_t RESERVED         : 24;
+        } XREG_FSMSTAT1bits;
+    };
+
     cc2538_reg_t XREG_FIFOPCTRL;          /**< RF FIFOP threshold */
     cc2538_reg_t XREG_FSMCTRL;            /**< RF FSM options */
     cc2538_reg_t XREG_CCACTRL0;           /**< RF CCA threshold */
@@ -100,7 +147,22 @@ typedef struct {
     cc2538_reg_t RESERVED2;               /**< Reserved bytes */
     cc2538_reg_t XREG_TXFIRST_PTR;        /**< RF TX FIFO pointer */
     cc2538_reg_t XREG_TXLAST_PTR;         /**< RF TX FIFO pointer */
-    cc2538_reg_t XREG_RFIRQM0;            /**< RF interrupt masks */
+
+    union {
+        cc2538_reg_t XREG_RFIRQM0;          /**< RF interrupt masks */
+        struct {
+            cc2538_reg_t ACT_UNUSED       :  1;
+            cc2538_reg_t SFD              :  1;
+            cc2538_reg_t FIFOP            :  1;
+            cc2538_reg_t SRC_MATCH_DONE   :  1;
+            cc2538_reg_t SRC_MATCH_FOUND  :  1;
+            cc2538_reg_t FRAME_ACCEPTED   :  1;
+            cc2538_reg_t RXPKTDONE        :  1;
+            cc2538_reg_t RXMASKZERO       :  1;
+            cc2538_reg_t RESERVED         : 24;
+        } XREG_RFIRQM0bits;
+    };
+
     cc2538_reg_t XREG_RFIRQM1;            /**< RF interrupt masks */
     cc2538_reg_t XREG_RFERRM;             /**< RF error interrupt mask */
     cc2538_reg_t RESERVED3;               /**< Reserved bytes */
@@ -163,7 +225,21 @@ typedef struct {
     cc2538_reg_t SFR_MTMOVF1;             /**< RF MAC Timer multiplexed overflow register 1 */
     cc2538_reg_t SFR_MTMOVF0;             /**< RF MAC Timer multiplexed overflow register 0 */
     cc2538_reg_t SFR_RFDATA;              /**< RF Tx/Rx FIFO */
-    cc2538_reg_t SFR_RFERRF;              /**< RF error interrupt flags */
+
+    union {
+        cc2538_reg_t SFR_RFERRF;          /**< RF error interrupt flags */
+        struct {
+            cc2538_reg_t NLOCK            :  1;
+            cc2538_reg_t RXABO            :  1;
+            cc2538_reg_t RXOVERF          :  1;
+            cc2538_reg_t RXUNDERF         :  1;
+            cc2538_reg_t TXOVERF          :  1;
+            cc2538_reg_t TXUNDERF         :  1;
+            cc2538_reg_t STROBEERR        :  1;
+            cc2538_reg_t RESERVED         : 25;
+        } SFR_RFERRFbits;
+    };
+
     cc2538_reg_t SFR_RFIRQF1;             /**< RF interrupt flags */
     cc2538_reg_t SFR_RFIRQF0;             /**< RF interrupt flags */
     cc2538_reg_t SFR_RFST;                /**< RF CSMA-CA/strobe processor */
