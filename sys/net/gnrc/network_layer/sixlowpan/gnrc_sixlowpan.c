@@ -151,7 +151,7 @@ static void _receive(gnrc_pktsnip_t *pkt)
         }
 
         /* Remove IPHC dispatches */
-        gnrc_pktbuf_remove_snip(pkt, sixlowpan);
+        pkt = gnrc_pktbuf_remove_snip(pkt, sixlowpan);
         /* Insert decoded header instead */
         LL_SEARCH_SCALAR(dec_hdr, tmp, next, NULL); /* search last decoded header */
         tmp->next = pkt->next;
