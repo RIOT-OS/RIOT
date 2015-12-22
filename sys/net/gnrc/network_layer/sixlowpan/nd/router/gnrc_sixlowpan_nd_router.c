@@ -42,13 +42,16 @@ static gnrc_sixlowpan_nd_router_abr_t *_get_abr(ipv6_addr_t *addr)
     return abr;
 }
 
-static gnrc_sixlowpan_nd_router_prf_t *_get_free_prefix(ipv6_addr_t *prefix, size_t prefix_len)
+static gnrc_sixlowpan_nd_router_prf_t *_get_free_prefix(gnrc_ipv6_netif_t *ipv6_iface,
+                                                        ipv6_addr_t *prefix,
+                                                        size_t prefix_len)
 {
     gnrc_sixlowpan_nd_router_prf_t *prf = NULL;
 
     for (int i = 0; i < GNRC_SIXLOWPAN_ND_ROUTER_ABR_PRF_NUMOF; i++) {
         if ((ipv6_addr_match_prefix(&_prefixes[i].prefix->addr, prefix) >= prefix_len) &&
-            (_prefixes[i].prefix->prefix_len == prefix_len)) {
+            (_prefixes[i].prefix->prefix_len == prefix_len) &&
+            (_prefixes[i].iface == ipv6_iface)) {
             return &_prefixes[i];
         }
 
@@ -78,14 +81,13 @@ static void _add_prefix(kernel_pid_t iface, gnrc_sixlowpan_nd_router_abr_t *abr,
 
     prefix = gnrc_ipv6_netif_match_prefix(iface, &pi_opt->prefix);
 
-    prf_ent = _get_free_prefix(&pi_opt->prefix, pi_opt->prefix_len);
+    prf_ent = _get_free_prefix(ipv6_iface, &pi_opt->prefix, pi_opt->prefix_len);
 
-    if (prf_ent != NULL) {
+    if ((prf_ent != NULL) && (prf_ent->iface == NULL)) {
         prf_ent->iface = ipv6_iface;
         prf_ent->prefix = container_of(prefix, gnrc_ipv6_netif_addr_t, addr);
+        LL_PREPEND(abr->prfs, prf_ent);
     }
-
-    LL_PREPEND(abr->prfs, prf_ent);
 }
 
 static void _add_ctx(gnrc_sixlowpan_nd_router_abr_t *abr, sixlowpan_nd_opt_6ctx_t *ctx_opt)
@@ -312,14 +314,16 @@ int gnrc_sixlowpan_nd_router_abr_add_prf(gnrc_sixlowpan_nd_router_abr_t* abr,
     if ((abr < _abrs) || (abr > (_abrs + GNRC_SIXLOWPAN_ND_ROUTER_ABR_NUMOF))) {
         return -ENOENT;
     }
-    prf_ent = _get_free_prefix(&prefix->addr, prefix->prefix_len);
+    prf_ent = _get_free_prefix(iface, &prefix->addr, prefix->prefix_len);
     if (prf_ent == NULL) {
         return -ENOMEM;
     }
-    prf_ent->iface = iface;
-    prf_ent->prefix = prefix;
-    LL_PREPEND(abr->prfs, prf_ent);
-    abr->version++; /* TODO: store somewhere stable */
+    if (prf_ent->iface == NULL) {
+        prf_ent->iface = iface;
+        prf_ent->prefix = prefix;
+        LL_PREPEND(abr->prfs, prf_ent);
+        abr->version++; /* TODO: store somewhere stable */
+    }
     return 0;
 }
 
