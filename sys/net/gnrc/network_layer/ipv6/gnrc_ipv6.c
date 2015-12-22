@@ -81,6 +81,11 @@ static void *_event_loop(void *args);
 /* Handles encapsulated IPv6 packets: http://tools.ietf.org/html/rfc2473 */
 static void _decapsulate(gnrc_pktsnip_t *pkt);
 
+#ifdef MODULE_GNRC_ICMPV6
+/* Sends Packet Too Big Message caused by orig_pkt */
+static void _send_packet_too_big(uint16_t mtu, gnrc_pktsnip_t *orig_pkt);
+#endif
+
 kernel_pid_t gnrc_ipv6_init(void)
 {
     if (gnrc_ipv6_pid == KERNEL_PID_UNDEF) {
@@ -284,6 +289,9 @@ static void _send_to_iface(kernel_pid_t iface, gnrc_pktsnip_t *pkt)
     assert(if_entry != NULL);
     if (gnrc_pkt_len(pkt->next) > if_entry->mtu) {
         DEBUG("ipv6: packet too big\n");
+#ifdef MODULE_GNRC_ICMPV6
+        _send_packet_too_big(if_entry->mtu, pkt);
+#endif
         gnrc_pktbuf_release(pkt);
         return;
     }
@@ -859,5 +867,80 @@ static void _decapsulate(gnrc_pktsnip_t *pkt)
 
     _receive(pkt);
 }
+
+#ifdef MODULE_GNRC_ICMPV6
+static void _send_packet_too_big(uint16_t mtu, gnrc_pktsnip_t *orig_pkt) {
+    gnrc_pktsnip_t *pkt, *tmp, *ipv6;
+
+    LL_SEARCH_SCALAR(orig_pkt, ipv6, type, GNRC_NETTYPE_IPV6);
+
+    ipv6_hdr_t *ipv6_hdr = (ipv6_hdr_t *)ipv6->data;
+
+    /* The payload of Packet Too Big Message is "As much of invoking packet as
+     * possible without the ICMPv6 packet exceeding the minimum IPv6 MTU"
+     * https://tools.ietf.org/html/rfc4443#section-3.2 */
+
+    size_t payload_len = 0;
+
+    for (gnrc_pktsnip_t *payload = ipv6; payload; payload = payload->next) {
+        payload_len += payload->size;
+    }
+
+    size_t header_size = sizeof(ipv6_hdr_t) + sizeof(icmpv6_error_pkt_too_big_t);
+
+    if (header_size + payload_len > IPV6_MIN_MTU) {
+        payload_len = IPV6_MIN_MTU - header_size;
+    }
+
+    DEBUG("ipv6: sending Packet Too Big, mtu: %d, payload_len: %d\n", mtu, (int) payload_len);
+
+    /* build ICMPv6 message */
+
+    if ((pkt = gnrc_icmpv6_build(NULL, ICMPV6_PKT_TOO_BIG, 0,
+                                 sizeof(icmpv6_error_pkt_too_big_t) + payload_len)) == NULL) {
+        DEBUG("ipv6: Send Packet Too Big - no space left in packet buffer\n");
+        return;
+    }
+
+    icmpv6_error_pkt_too_big_t *too_big =
+        (icmpv6_error_pkt_too_big_t *)pkt->data;
+
+    too_big->mtu = byteorder_htonl(mtu);
+
+    /* fill payload */
+
+    uint8_t *body = (uint8_t *)(too_big + 1);
+
+    for (gnrc_pktsnip_t *payload = ipv6;
+         payload && payload_len > 0;
+         payload = payload->next) {
+
+        if (payload->size < payload_len) {
+            memcpy(body, payload->data, payload->size);
+        }
+        else {
+            memcpy(body, payload->data, payload_len);
+        }
+
+        body += payload->size;
+        payload_len -= payload->size;
+    }
+
+    /* attach IPv6 header */
+
+    if ((tmp = gnrc_ipv6_hdr_build(pkt,
+                                  NULL, /* inferred by _fill_ipv6_hdr */
+                                  0,
+                                  (uint8_t *)&ipv6_hdr->src,
+                                   sizeof(ipv6_addr_t))) == NULL) {
+        DEBUG("ipv6: Send Packet Too Big - no space left in packet buffer\n");
+        gnrc_pktbuf_release(pkt);
+        return;
+    }
+    pkt = tmp;
+
+    _send(pkt, true);
+}
+#endif
 
 /** @} */
