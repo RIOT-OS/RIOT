@@ -31,7 +31,7 @@
 #include "net/gnrc/netdev2.h"
 #include "net/ethernet/hdr.h"
 
-#define ENABLE_DEBUG    (1)
+#define ENABLE_DEBUG    (0)
 #include "debug.h"
 
 #if defined(MODULE_OD) && ENABLE_DEBUG

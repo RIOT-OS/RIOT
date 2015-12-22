@@ -41,14 +41,16 @@ interface of your RIOT board.
 On the RIOT side you have to configure the SLIP interface by configuring a
 corresponding IPv6 address, e.g.
 ```
-ifconfig 6 add affe::2
+ifconfig 5 add affe::2
 ```
 and adding the SLIP interface to the neighbor cache (because Linux won't
 respond to neighbor solicitations on an interface without a link-layer address)
 by calling
 ```
-ncache add 6 affe::1
+ncache add 5 affe::1
 ```
+
+
 After this you're basically done and should be able to ping between the border
 router and the outside world (assuming that the Linux host is properly
 forwarding your traffic).

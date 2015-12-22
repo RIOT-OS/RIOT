@@ -28,7 +28,7 @@ extern "C" {
 static gnrc_slip_params_t gnrc_slip_params[] = {
     {
         .uart = RF_ISM_MOD_2_1_SLIP,
-        .baudrate = 115200,
+        .baudrate = RF_ISM_MOD_2_1_SLIPBAUDRATE,
     },
 };
 

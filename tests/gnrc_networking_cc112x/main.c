@@ -36,7 +36,10 @@
 #include <time.h>
 #include <sys/time.h>
 
-#define MAIN_QUEUE_SIZE     (20)
+#include "../../cpu/efm32wg/emlib/inc/em_cmu.h"
+#include "../../cpu/efm32wg/emlib/inc/em_gpio.h"
+
+#define MAIN_QUEUE_SIZE     (10)
 static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
 
 extern int udp_cmd(int argc, char **argv);
@@ -47,25 +50,7 @@ int timer_sleep(__attribute__((unused)) int argc,
     xtimer_sleep(1);
     return 0;
 }
-//
-//unsigned char data[] = {53, 0, 22, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2,
-//                3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3,
-//                4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-//
-//int data_test(int argc, char **argv){
-//    gnrc_pktsnip_t pkt;
-//    pkt.next = 0;
-//    pkt.size = 1;
-//    pkt.type = 0;
-//    pkt.users = 1;
-//    pkt.data = (void*)(data);
-//
-//    msg_t msg;
-//    msg.type = GNRC_NETAPI_MSG_TYPE_SND;
-//    msg.content.ptr = (void*)(&pkt);
-//    msg_send(&msg, 7);
-//    return 0;
-//}
+
 
 extern char ajdi[CPUID_ID_LEN];
 
@@ -79,6 +64,8 @@ int main(void)
 {
     debug_timeref_init();
 
+    printf("LFXO - %lu\n", SystemHFClockGet());
+    printf("System core clock - %lu\n", SystemCoreClockGet());
 
     /* we need a message queue for the thread running the shell in order to
      * receive potentially fast incoming networking packets */

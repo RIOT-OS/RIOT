@@ -76,12 +76,12 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
         ringbuffer_init(&rb_uart0, buffer0, UART_0_BUFISIZE);
         NVIC_SetPriority(UART_0_IRQ_TX_CHAN, UART_0_IRQ_TX_PRIO);
         NVIC_EnableIRQ(UART_0_IRQ_TX_CHAN);
-        USART_IntEnable(UART_0_DEV, _USART_IEN_TXC_MASK);
+        USART_IntEnable(UART_0_DEV, _USART_IEN_TXBL_MASK);
 #endif
         break;
 #endif
 #if UART_1_EN
-        case UART_1:
+    case UART_1:
         NVIC_SetPriority(UART_1_IRQ_RX_CHAN, UART_1_IRQ_RX_PRIO);
         NVIC_SetPriority(UART_1_IRQ_TX_CHAN, UART_1_IRQ_TX_PRIO);
         NVIC_EnableIRQ(UART_1_IRQ_RX_CHAN);
@@ -91,7 +91,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
         ringbuffer_init(&rb_uart1, buffer1, UART_1_BUFSIZE);
         NVIC_SetPriority(UART_1_IRQ_TX_CHAN, UART_1_IRQ_TX_PRIO);
         NVIC_EnableIRQ(UART_1_IRQ_TX_CHAN);
-        USART_IntEnable(UART_1_DEV, _USART_IEN_TXC_MASK);
+        USART_IntEnable(UART_1_DEV, _USART_IEN_TXBL_MASK);
 #endif
         break;
 #endif
@@ -156,14 +156,16 @@ static int uart_init_blocking(uart_t _uart, uint32_t baudrate)
 
 #endif
 #if UART_1_EN
-        case UART_1:
+    case UART_1:
         uart = UART_1_DEV;
         /* Enabling clock to USART0 */
         uart = UART_1_DEV;
         CMU_ClockEnable(cmuClock_USART1, true);
         /* Output PIN */
-        gpio_init(GPIO_T(UART_1_PORT, UART_1_TX_PIN), GPIO_DIR_PUSH_PULL, GPIO_PULLUP);
-        gpio_init(GPIO_T(UART_1_PORT, UART_1_RX_PIN), GPIO_DIR_INPUT, GPIO_PULLDOWN);
+        gpio_init(GPIO_T(UART_1_PORT, UART_1_TX_PIN), GPIO_DIR_PUSH_PULL,
+                GPIO_PULLUP);
+        gpio_init(GPIO_T(UART_1_PORT, UART_1_RX_PIN), GPIO_DIR_INPUT,
+                GPIO_PULLDOWN);
         /* Prepare struct for initializing UART in asynchronous mode*/
         uartInit.enable = usartDisable; /* Don't enable UART upon intialization */
         uartInit.refFreq = 0; /* Provide information on reference frequency.
@@ -219,6 +221,7 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
             ringbuffer_add_one(&rb_uart0, data[count]);
             NVIC_EnableIRQ(UART_0_IRQ_TX_CHAN);
         }
+        USART_IntEnable(UART_0_DEV, USART_IF_TXBL);
 #else
         for(size_t i = 0; i < len; i++) {
             /* Check that transmit buffer is empty */
@@ -231,13 +234,14 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
         break;
 #endif
 #if UART_1_EN
-        case UART_1:
+    case UART_1:
 #if UART_1_ENABLE_BUF
         for(int count = 0; count < len; count++) {
             NVIC_DisableIRQ(UART_1_IRQ_TX_CHAN);
             ringbuffer_add_one(&rb_uart1, data[count]);
             NVIC_EnableIRQ(UART_1_IRQ_TX_CHAN);
         }
+        USART_IntEnable(UART_1_DEV, USART_IF_TXBL);
 #else
         for(size_t i = 0; i < len; i++)
         {
@@ -292,7 +296,7 @@ void uart_poweron(uart_t uart)
         break;
 #endif
 #if UART_1_EN
-        case UART_1:
+    case UART_1:
         CMU_ClockEnable(cmuClock_USART1, true);
         break;
 #endif
@@ -313,7 +317,7 @@ void uart_poweroff(uart_t uart)
         break;
 #endif
 #if UART_1_EN
-        case UART_1:
+    case UART_1:
         CMU_ClockEnable(cmuClock_USART1, false);
         break;
 #endif
@@ -335,11 +339,14 @@ static inline void irq_read(uint8_t uartnum, uint8_t data)
 void UART_0_TX_ISR(void)
 {
     /* Check TX buffer level status */
-    if(UART_0_DEV->STATUS & UART_STATUS_TXC) {
+    if(UART_0_DEV->STATUS & UART_STATUS_TXBL) {
         int data = ringbuffer_get_one(&rb_uart0);
-        if(-1 != data)
+        if(-1 != data) {
             /* Write data to buffer */
             UART_0_DEV->TXDATA = (uint32_t)data;
+        } else {
+            USART_IntDisable(UART_0_DEV, USART_IF_TXBL);
+        }
     }
 
     if(sched_context_switch_request) {
@@ -367,11 +374,14 @@ void UART_0_RX_ISR(void)
 void UART_1_TX_ISR(void)
 {
     /* Check TX buffer level status */
-    if(UART_1_DEV->STATUS & UART_STATUS_TXC) {
+    if(UART_1_DEV->STATUS & UART_STATUS_TXBL) {
         int data = ringbuffer_get_one(&rb_uart1);
-        if(-1 != data)
-        /* Write data to buffer */
-        UART_1_DEV->TXDATA = (uint32_t)data;
+        if(-1 != data) {
+            /* Write data to buffer */
+            UART_1_DEV->TXDATA = (uint32_t)data;
+        } else {
+            USART_IntDisable(UART_1_DEV, USART_IF_TXBL);
+        }
     }
 
     if(sched_context_switch_request) {
@@ -383,14 +393,12 @@ void UART_1_TX_ISR(void)
 void UART_1_RX_ISR(void)
 {
     /* Check for RX data valid interrupt */
-    if (UART_1_DEV->STATUS & UART_STATUS_RXDATAV)
-    {
+    if(UART_1_DEV->STATUS & UART_STATUS_RXDATAV) {
         /* Copy data into RX Buffer */
         uint8_t rxData = USART_Rx(UART_1_DEV);
         irq_read(UART_1, rxData);
     }
-    if (sched_context_switch_request)
-    {
+    if(sched_context_switch_request) {
         thread_yield();
     }
 }
@@ -403,6 +411,7 @@ void UART_2_ISR(void)
     if(UART_2_DEV->STATUS & LEUART_STATUS_RXDATAV) {
         /* Copy data into RX Buffer */
         uint8_t rxData = LEUART_Rx(UART_2_DEV);
+
         irq_read(UART_2, rxData);
     }
     /* Check TX buffer level status */
