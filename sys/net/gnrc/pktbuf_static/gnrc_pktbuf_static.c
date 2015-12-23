@@ -179,8 +179,10 @@ int gnrc_pktbuf_realloc_data(gnrc_pktsnip_t *pkt, size_t size)
         pkt->data = new_data;
     }
     else {
-        _pktbuf_free(((uint8_t *)pkt->data) + aligned_size,
-                     pkt->size - aligned_size);
+        if (_align(pkt->size) > aligned_size) {
+            _pktbuf_free(((uint8_t *)pkt->data) + aligned_size,
+                         pkt->size - aligned_size);
+        }
     }
     pkt->size = size;
     mutex_unlock(&_mutex);
