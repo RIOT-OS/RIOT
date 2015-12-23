@@ -542,8 +542,21 @@ inline static size_t iphc_nhc_udp_encode(gnrc_pktsnip_t *udp, ipv6_hdr_t *ipv6_h
 
     /* Set UDP header ID (rfc6282#section-5). */
     ipv6_hdr->nh |= NHC_UDP_ID;
-    /* shrink udp allocation to final size */
-    gnrc_pktbuf_realloc_data(udp, nhc_len);
+
+    if (udp->type == GNRC_NETTYPE_IPV6) {
+        /* forwarded ipv6 packet */
+        size_t diff = sizeof(udp_hdr_t) - nhc_len;
+        for (int i = nhc_len; i < (udp->size - diff); i++) {
+            udp_data[i] = udp_data[i + diff];
+        }
+        /* NOTE: gnrc_pktbuf_realloc_data overflow if (udp->size - diff) < 4 */
+        gnrc_pktbuf_realloc_data(udp, (udp->size - diff));
+    }
+    else {
+        /* shrink udp allocation to final size */
+        gnrc_pktbuf_realloc_data(udp, nhc_len);
+        DEBUG("6lo iphc nhc: set udp len to %d\n", nhc_len);
+    }
 
     return nhc_len;
 }
