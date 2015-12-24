@@ -135,6 +135,9 @@ typedef struct netdev2_driver {
      *
      * Supposed to be called from netdev2_event_handler().
      *
+     * If buf == NULL and len == 0, returns the packet size without dropping it.
+     * If buf == NULL and len > 0, drops the packet and returns the packet size.
+     *
      * @param[in]   dev     network device descriptor
      * @param[out]  buf     buffer to write into or NULL
      * @param[in]   len     maximum nr. of bytes to read

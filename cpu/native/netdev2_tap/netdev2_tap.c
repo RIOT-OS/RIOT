@@ -184,12 +184,58 @@ static inline bool _is_addr_multicast(uint8_t *addr)
     return (addr[0] & 0x01);
 }
 
+static void _continue_reading(netdev2_tap_t *dev)
+{
+    /* work around lost signals */
+    fd_set rfds;
+    struct timeval t;
+    memset(&t, 0, sizeof(t));
+    FD_ZERO(&rfds);
+    FD_SET(dev->tap_fd, &rfds);
+
+    _native_in_syscall++; /* no switching here */
+
+    if (real_select(dev->tap_fd + 1, &rfds, NULL, NULL, &t) == 1) {
+        int sig = SIGIO;
+        extern int _sig_pipefd[2];
+        extern ssize_t (*real_write)(int fd, const void * buf, size_t count);
+        real_write(_sig_pipefd[1], &sig, sizeof(int));
+        _native_sigpend++;
+        DEBUG("netdev2_tap: sigpend++\n");
+    }
+    else {
+        DEBUG("netdev2_tap: native_async_read_continue\n");
+        native_async_read_continue(dev->tap_fd);
+    }
+
+    _native_in_syscall--;
+}
+
 static int _recv(netdev2_t *netdev2, char *buf, int len, void *info)
 {
     netdev2_tap_t *dev = (netdev2_tap_t*)netdev2;
     (void)info;
 
     if (!buf) {
+        if (len > 0) {
+            /* no memory available in pktbuf, discarding the frame */
+            DEBUG("netdev2_tap: discarding the frame\n");
+
+            /* repeating `real_read` for small size on tap device results in
+             * freeze for some reason. Using a large buffer for now. */
+            /*
+            uint8_t buf[4];
+            while (real_read(dev->tap_fd, buf, sizeof(buf)) > 0) {
+            }
+            */
+
+            static uint8_t buf[ETHERNET_FRAME_LEN];
+
+            real_read(dev->tap_fd, buf, sizeof(buf));
+
+            _continue_reading(dev);
+        }
+
         /* no way of figuring out packet size without racey buffering,
          * so we return the maximum possible size */
         return ETHERNET_FRAME_LEN;
@@ -212,28 +258,8 @@ static int _recv(netdev2_t *netdev2, char *buf, int len, void *info)
 
             return 0;
         }
-        /* work around lost signals */
-        fd_set rfds;
-        struct timeval t;
-        memset(&t, 0, sizeof(t));
-        FD_ZERO(&rfds);
-        FD_SET(dev->tap_fd, &rfds);
 
-        _native_in_syscall++; /* no switching here */
-
-        if (real_select(dev->tap_fd + 1, &rfds, NULL, NULL, &t) == 1) {
-            int sig = SIGIO;
-            extern int _sig_pipefd[2];
-            extern ssize_t (*real_write)(int fd, const void * buf, size_t count);
-            real_write(_sig_pipefd[1], &sig, sizeof(int));
-            _native_sigpend++;
-            DEBUG("netdev2_tap: sigpend++\n");
-        }
-        else {
-            native_async_read_continue(dev->tap_fd);
-        }
-
-        _native_in_syscall--;
+        _continue_reading(dev);
 
 #ifdef MODULE_NETSTATS_L2
         netdev2->stats.rx_count++;
@@ -317,7 +343,7 @@ static int _init(netdev2_t *netdev)
     /* initialize device descriptor */
     dev->promiscous = 0;
     /* implicitly create the tap interface */
-    if ((dev->tap_fd = real_open(clonedev , O_RDWR)) == -1) {
+    if ((dev->tap_fd = real_open(clonedev, O_RDWR | O_NONBLOCK)) == -1) {
         err(EXIT_FAILURE, "open(%s)", clonedev);
     }
 #if (defined(__MACH__) || defined(__FreeBSD__)) /* OSX/FreeBSD */
