@@ -31,6 +31,15 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Creates semaphore statically.
+ *
+ * @param[in] value Initial value for the semaphore.
+ *
+ * @return  Statically initialized semaphore.
+ */
+#define SEMA_CREATE(value)      { (value), PRIORITY_QUEUE_INIT }
+
+/**
  * @brief A Semaphore.
  */
 typedef struct {
@@ -39,7 +48,7 @@ typedef struct {
 } sema_t;
 
 /**
- * @brief   Creates semaphore.
+ * @brief   Creates semaphore dynamically.
  *
  * @see <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_init.html">
  *          The Open Group Base Specifications Issue 7, sem_init()
