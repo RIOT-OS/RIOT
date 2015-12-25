@@ -58,6 +58,7 @@ void rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
     /* cppcheck is clearly wrong here */
     /* cppcheck-suppress variableScope */
     unsigned int data_offset = 0;
+    size_t original_size = frag_size;
     sixlowpan_frag_t *frag = pkt->data;
     uint8_t *data = ((uint8_t *)pkt->data) + sizeof(sixlowpan_frag_t);
 
@@ -107,11 +108,25 @@ void rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
         return;
     }
 
+    /* If the fragment overlaps another fragment and differs in either the size
+     * or the offset of the overlapped fragment, discards the datagram
+     * https://tools.ietf.org/html/rfc4944#section-5.3
+     * We check here only for last received offset and size. We should store all
+     * offset/size pairs to be more accurate, but it requires costs */
+    if ((entry->last_offset == offset / 8) && (entry->last_size == frag_size)) {
+        return;
+    }
+
     if (_rbuf_int_in(entry->int_bitmap, offset, offset + frag_size)) {
-        DEBUG("6lo rfrag: overlapping or same intervals (%d, %d), discarding datagram\n",
+        DEBUG("6lo rfrag: overlapping intervals (%d, %d), discarding datagram\n",
               (int) offset, (int) (offset + frag_size - 1));
         gnrc_pktbuf_release(entry->pkt);
         _rbuf_rem(entry);
+
+        /* "A fresh reassembly may be commenced with the most recently received link fragment" */
+
+        rbuf_add(netif_hdr, pkt, original_size, offset);
+
         return;
     }
 
@@ -177,6 +192,9 @@ static void _rbuf_update_ints(rbuf_t *entry, uint16_t offset, size_t frag_size)
     for (int i = offset / 8; i < (end + 7) / 8; i++) {
         bf_set(entry->int_bitmap, i);
     }
+
+    entry->last_offset = (uint8_t) (offset / 8);
+    entry->last_size = (uint8_t) frag_size;
 
     DEBUG("6lo rfrag: add interval (%" PRIu16 ", %d) to entry (%s, ",
           offset, end - 1, gnrc_netif_addr_to_str(l2addr_str,

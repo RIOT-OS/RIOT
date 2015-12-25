@@ -77,6 +77,8 @@ typedef struct {
      *      </a>
      */
     BITFIELD(int_bitmap, RBUF_INT_BITMAP_SIZE);
+    uint8_t last_offset;                /**< offset of last received fragment, divided by 8 */
+    uint8_t last_size;                  /**< size of last received fragment */
 } rbuf_t;
 
 /**
