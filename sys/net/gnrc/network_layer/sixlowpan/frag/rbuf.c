@@ -156,7 +156,7 @@ void rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
 
 static inline bool _rbuf_int_in(uint8_t *bitmap, uint16_t start, uint16_t end)
 {
-    for (int i = start / 8; i < end / 8; i++) {
+    for (int i = start / 8; i < (end + 7) / 8; i++) {
         if (bf_isset(bitmap, i)) {
             return true;
         }
@@ -174,7 +174,7 @@ static void _rbuf_update_ints(rbuf_t *entry, uint16_t offset, size_t frag_size)
 {
     uint16_t end = (uint16_t)(offset + frag_size);
 
-    for (int i = offset / 8; i < end / 8; i++) {
+    for (int i = offset / 8; i < (end + 7) / 8; i++) {
         bf_set(entry->int_bitmap, i);
     }
 
