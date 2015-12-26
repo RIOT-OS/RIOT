@@ -133,6 +133,7 @@ static inline int sema_wait(sema_t *sema)
  *
  * @param[in] sema  A semaphore.
  *
+ * @return  0, on success
  * @return  -EINVAL, if semaphore is invalid.
  * @return  -EOVERFLOW, if the semaphore's value would overflow.
  */
