@@ -48,6 +48,7 @@ int sema_destroy(sema_t *sema)
 {
     unsigned int old_state;
     priority_queue_node_t *next;
+
     if (sema == NULL) {
         return -EINVAL;
     }
@@ -68,6 +69,7 @@ int sema_wait_timed_msg(sema_t *sema, uint64_t timeout, msg_t *msg)
     unsigned old_state;
     msg_t timeout_msg;
     xtimer_t timeout_timer;
+
     if (sema == NULL) {
         return -EINVAL;
     }
@@ -128,13 +130,13 @@ int sema_wait_timed_msg(sema_t *sema, uint64_t timeout, msg_t *msg)
 int sema_wait_timed(sema_t *sema, uint64_t timeout)
 {
     int result;
+
     do {
         msg_t msg;
         result = sema_wait_timed_msg(sema, timeout, &msg);
         DEBUG("sema_wait: %" PRIkernel_pid ": Discarding message from %" PRIkernel_pid "\n",
               sched_active_thread->pid, msg->sender_pid);
-    }
-    while (result == -EAGAIN);
+    } while (result == -EAGAIN);
     return result;
 }
 
@@ -142,6 +144,7 @@ int sema_post(sema_t *sema)
 {
     unsigned int old_state, value;
     priority_queue_node_t *next;
+
     if (sema == NULL) {
         return -EINVAL;
     }
