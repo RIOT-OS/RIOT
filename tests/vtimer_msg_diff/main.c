@@ -108,7 +108,7 @@ int main(void)
                   timer_stack,
                   sizeof(timer_stack),
                   THREAD_PRIORITY_MAIN - 1,
-                  CREATE_STACKTEST,
+                  THREAD_CREATE_STACKTEST,
                   timer_thread,
                   NULL,
                   "timer");

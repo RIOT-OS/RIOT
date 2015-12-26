@@ -24,7 +24,7 @@ void panic_arch(void)
 {
     /* disable watchdog and all possible sources of interrupts */
     WDTCTL = WDTPW | WDTHOLD;
-#if DEVELHELP
+#ifdef DEVELHELP
     /* enter infinite loop, into deepest possible sleep mode */
     while (1) {
         lpm_set(LPM_OFF);

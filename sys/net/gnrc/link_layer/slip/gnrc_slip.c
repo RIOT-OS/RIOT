@@ -95,42 +95,26 @@ static void _slip_rx_cb(void *arg, char data)
     }
 }
 
-int _slip_tx_cb(void *arg)
-{
-    if (_SLIP_DEV(arg)->out_buf.avail > 0) {
-        char c = (char)ringbuffer_get_one(&_SLIP_DEV(arg)->out_buf);
-        uart_write((uart_t)(_SLIP_DEV(arg)->uart), c);
-        return 1;
-    }
-
-    return 0;
-}
-
 /* SLIP receive handler */
 static void _slip_receive(gnrc_slip_dev_t *dev, size_t bytes)
 {
-    gnrc_netif_hdr_t *hdr;
-    gnrc_pktsnip_t *pkt, *netif_hdr;
+    gnrc_pktsnip_t *pkt, *hdr;
 
-    pkt = gnrc_pktbuf_add(NULL, NULL, bytes, GNRC_NETTYPE_UNDEF);
+    hdr = gnrc_netif_hdr_build(NULL, 0, NULL, 0);
+    if (hdr == NULL) {
+        DEBUG("slip: no space left in packet buffer\n");
+        return;
+    }
+
+    ((gnrc_netif_hdr_t *)(hdr->data))->if_pid = thread_getpid();
+
+    pkt = gnrc_pktbuf_add(hdr, NULL, bytes, GNRC_NETTYPE_UNDEF);
 
     if (pkt == NULL) {
         DEBUG("slip: no space left in packet buffer\n");
+        gnrc_pktbuf_release(hdr);
         return;
     }
-
-    netif_hdr = gnrc_pktbuf_add(pkt, NULL, sizeof(gnrc_netif_hdr_t),
-                                GNRC_NETTYPE_NETIF);
-
-    if (netif_hdr == NULL) {
-        DEBUG("slip: no space left in packet buffer\n");
-        gnrc_pktbuf_release(pkt);
-        return;
-    }
-
-    hdr = netif_hdr->data;
-    gnrc_netif_hdr_init(hdr, 0, 0);
-    hdr->if_pid = thread_getpid();
 
     if (ringbuffer_get(&dev->in_buf, pkt->data, bytes) != bytes) {
         DEBUG("slip: could not read %u bytes from ringbuffer\n", (unsigned)bytes);
@@ -158,8 +142,7 @@ static void _slip_receive(gnrc_slip_dev_t *dev, size_t bytes)
 
 static inline void _slip_send_char(gnrc_slip_dev_t *dev, char c)
 {
-    ringbuffer_add_one(&dev->out_buf, c);
-    uart_tx_begin(dev->uart);
+    uart_write(dev->uart, (uint8_t *)&c, 1);
 }
 
 /* SLIP send handler */
@@ -202,6 +185,16 @@ static void _slip_send(gnrc_slip_dev_t *dev, gnrc_pktsnip_t *pkt)
     gnrc_pktbuf_release(pkt);
 }
 
+static inline int _slip_get(gnrc_netapi_opt_t *opt)
+{
+    switch (opt->opt) {
+        case NETOPT_IS_WIRED:
+            return 1;
+        default:
+            return -ENOTSUP;
+    }
+}
+
 static void *_slip(void *args)
 {
     gnrc_slip_dev_t *dev = _SLIP_DEV(args);
@@ -230,11 +223,17 @@ static void *_slip(void *args)
                 break;
 
             case GNRC_NETAPI_MSG_TYPE_GET:
+                DEBUG("slip: GNRC_NETAPI_MSG_TYPE_GET received\n");
+                reply.type = GNRC_NETAPI_MSG_TYPE_ACK;
+                reply.content.value = (uint32_t)_slip_get((gnrc_netapi_opt_t *)msg.content.ptr);
+                msg_reply(&msg, &reply);
+                break;
+
             case GNRC_NETAPI_MSG_TYPE_SET:
-                DEBUG("slip: GNRC_NETAPI_MSG_TYPE_GET or GNRC_NETAPI_MSG_TYPE_SET received\n");
+                DEBUG("slip: GNRC_NETAPI_MSG_TYPE_SET received\n");
                 reply.type = GNRC_NETAPI_MSG_TYPE_ACK;
                 reply.content.value = (uint32_t)(-ENOTSUP);
-                DEBUG("slip: I don't support these but have to reply.\n");
+                DEBUG("slip: I don't support this but have to reply.\n");
                 msg_reply(&msg, &reply);
                 break;
         }
@@ -257,12 +256,11 @@ kernel_pid_t gnrc_slip_init(gnrc_slip_dev_t *dev, uart_t uart, uint32_t baudrate
 
     /* initialize buffers */
     ringbuffer_init(&dev->in_buf, dev->rx_mem, sizeof(dev->rx_mem));
-    ringbuffer_init(&dev->out_buf, dev->tx_mem, sizeof(dev->tx_mem));
 
     /* initialize UART */
     DEBUG("slip: initialize UART_%d with baudrate %" PRIu32 "\n", uart,
           baudrate);
-    if (uart_init(uart, baudrate, _slip_rx_cb, _slip_tx_cb, dev) < 0) {
+    if (uart_init(uart, baudrate, _slip_rx_cb, dev) < 0) {
         DEBUG("slip: error initializing UART_%i with baudrate %" PRIu32 "\n",
               uart, baudrate);
         return -ENODEV;
@@ -270,7 +268,7 @@ kernel_pid_t gnrc_slip_init(gnrc_slip_dev_t *dev, uart_t uart, uint32_t baudrate
 
     /* start SLIP thread */
     DEBUG("slip: starting SLIP thread\n");
-    pid = thread_create(stack, stack_size, priority, CREATE_STACKTEST,
+    pid = thread_create(stack, stack_size, priority, THREAD_CREATE_STACKTEST,
                         _slip, dev, _SLIP_NAME);
     if (pid < 0) {
         DEBUG("slip: unable to create SLIP thread\n");

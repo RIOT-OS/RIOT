@@ -26,8 +26,9 @@
 #include "log.h"
 #include "cpu.h"
 #include "board.h"
+#include "periph/gpio.h"
 #include "periph/pwm.h"
-#include "periph_conf.h"
+
 
 /* ignore file in case no PWM devices are defined */
 #if PWM_NUMOF
@@ -109,23 +110,13 @@ int pwm_init(pwm_t dev, pwm_mode_t mode,
 
     /* configure the used pins */
     for (int i = 0; i < PWM_MAX_CHANNELS; i++) {
-        PortGroup *port = pwm_config[dev].chan[i].port;
-        int pin = pwm_config[dev].chan[i].pin;
-        int fnct = pwm_config[dev].chan[i].fnct;
-        /* set pin as output and enable the MUX */
-        port->DIRSET.reg = (1 << pin);
-        port->PINCFG[pin].reg = (PORT_PINCFG_PMUXEN);
-        port->PMUX[pin >> 1].reg &= ~(0xf << (4 * (pin & 0x1)));
-        port->PMUX[pin >> 1].reg |=  (fnct << (4 * (pin & 0x1)));
+        gpio_init(pwm_config[dev].chan[i].pin, GPIO_DIR_OUT, GPIO_NOPULL);
+        gpio_init_mux(pwm_config[dev].chan[i].pin, pwm_config[dev].chan[i].mux);
     }
 
     /* power on the device */
     pwm_poweron(dev);
-    /* configure generic clock 0 to feed the PWM */
-    GCLK->CLKCTRL.reg = (GCLK_CLKCTRL_CLKEN
-                         | GCLK_CLKCTRL_GEN_GCLK0
-                         | (_clk_id(dev) << GCLK_CLKCTRL_ID_Pos));
-    while (GCLK->STATUS.bit.SYNCBUSY);
+
     /* reset TCC module */
     _tcc(dev)->CTRLA.reg = TCC_CTRLA_SWRST;
     while (_tcc(dev)->SYNCBUSY.reg & TCC_SYNCBUSY_SWRST);
@@ -184,9 +175,11 @@ void pwm_poweron(pwm_t dev)
     if (num < 0) {
         return;
     }
-    GCLK->CLKCTRL.reg = (GCLK_CLKCTRL_CLKEN
-                         | (_clk_id(dev) << GCLK_CLKCTRL_ID_Pos));
     PM->APBCMASK.reg |= (PM_APBCMASK_TCC0 << num);
+    GCLK->CLKCTRL.reg = (GCLK_CLKCTRL_CLKEN |
+                         GCLK_CLKCTRL_GEN_GCLK0 |
+                         GCLK_CLKCTRL_ID(_clk_id(dev)));
+    while (GCLK->STATUS.bit.SYNCBUSY);
 }
 
 void pwm_poweroff(pwm_t dev)
@@ -195,8 +188,10 @@ void pwm_poweroff(pwm_t dev)
     if (num < 0) {
         return;
     }
-    GCLK->CLKCTRL.reg = ((_clk_id(dev) << GCLK_CLKCTRL_ID_Pos));
-    PM->APBCMASK.reg &= ~(1 << num);
+    PM->APBCMASK.reg &= ~(PM_APBCMASK_TCC0 << num);
+    GCLK->CLKCTRL.reg = (GCLK_CLKCTRL_GEN_GCLK7 |
+                         GCLK_CLKCTRL_ID(_clk_id(dev)));
+    while (GCLK->STATUS.bit.SYNCBUSY);
 }
 
 #endif /* PWM_NUMOF */

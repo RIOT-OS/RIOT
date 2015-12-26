@@ -16,7 +16,7 @@
  * @brief       eZ430-chronos board initialization
  *
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
- * @author      Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ * @author      Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  *
  */
 

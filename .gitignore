@@ -24,7 +24,31 @@ cachegrind.out*
 *.kdev4
 # Codelite (among others) project files
 *.project
+# ctags index files
+tags
+# GDB initialization scripts
+.gdbinit
 
 # Eclipse symbol file (output from make eclipsesym)
 eclipsesym.xml
 /toolchain
+# Ignore created Arduino sketch files
+_sketches.cpp
+
+# local override files
+Makefile.local
+
+# downloaded package sources
+pkg/cmsis-dsp/cmsis-dsp
+pkg/libcoap/libcoap
+pkg/libfixmath/libfixmath
+pkg/microcoap/microcoap
+pkg/micro-ecc/micro-ecc
+pkg/oonf_api/oonf_api
+pkg/openwsn/openwsn
+pkg/relic/relic
+pkg/tlsf/tlsf
+pkg/wakaama/wakaama
+
+# Vagrant
+.vagrant

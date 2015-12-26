@@ -23,8 +23,7 @@
 #include "net/gnrc/sixlowpan/frag.h"
 #include "net/sixlowpan.h"
 #include "thread.h"
-#include "timex.h"
-#include "vtimer.h"
+#include "xtimer.h"
 #include "utlist.h"
 
 #define ENABLE_DEBUG    (0)
@@ -93,7 +92,7 @@ void rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
 #ifdef MODULE_GNRC_SIXLOWPAN_IPHC
         else if (sixlowpan_iphc_is(data)) {
             size_t iphc_len;
-            iphc_len = gnrc_sixlowpan_iphc_decode(entry->pkt, pkt, entry->pkt->size,
+            iphc_len = gnrc_sixlowpan_iphc_decode(&entry->pkt, pkt, entry->pkt->size,
                                                   sizeof(sixlowpan_frag_t));
             if (iphc_len == 0) {
                 DEBUG("6lo rfrag: could not decode IPHC dispatch\n");
@@ -138,7 +137,6 @@ void rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
     }
 
     if (entry->cur_size == entry->pkt->size) {
-        kernel_pid_t iface = netif_hdr->if_pid;
         gnrc_pktsnip_t *netif = gnrc_netif_hdr_build(entry->src, entry->src_len,
                                                      entry->dst, entry->dst_len);
 
@@ -149,8 +147,15 @@ void rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
             return;
         }
 
-        netif_hdr = netif->data;
-        netif_hdr->if_pid = iface;
+        /* copy the transmit information of the latest fragment into the newly
+         * created header to have some link_layer information. The link_layer
+         * info of the previous fragments is discarded.
+         */
+        gnrc_netif_hdr_t *new_netif_hdr = netif->data;
+        new_netif_hdr->if_pid = netif_hdr->if_pid;
+        new_netif_hdr->flags = netif_hdr->flags;
+        new_netif_hdr->lqi = netif_hdr->lqi;
+        new_netif_hdr->rssi = netif_hdr->rssi;
         LL_APPEND(entry->pkt, netif);
 
         if (!gnrc_netapi_dispatch_receive(GNRC_NETTYPE_IPV6, GNRC_NETREG_DEMUX_CTX_ALL,
@@ -225,17 +230,15 @@ static bool _rbuf_update_ints(rbuf_t *entry, uint16_t offset, size_t frag_size)
 static void _rbuf_gc(void)
 {
     rbuf_t *oldest = NULL;
-    timex_t now;
+    uint32_t now_sec = xtimer_now() / SEC_IN_USEC;
     unsigned int i;
-
-    vtimer_now(&now);
 
     for (i = 0; i < RBUF_SIZE; i++) {
         if (rbuf[i].pkt == NULL) { /* leave GC early if there is still room */
             return;
         }
         else if ((rbuf[i].pkt != NULL) &&
-                 ((now.seconds - rbuf[i].arrival) > RBUF_TIMEOUT)) {
+                 ((now_sec - rbuf[i].arrival) > RBUF_TIMEOUT)) {
             DEBUG("6lo rfrag: entry (%s, ", gnrc_netif_addr_to_str(l2addr_str,
                     sizeof(l2addr_str), rbuf[i].src, rbuf[i].src_len));
             DEBUG("%s, %u, %u) timed out\n",
@@ -263,9 +266,7 @@ static rbuf_t *_rbuf_get(const void *src, size_t src_len,
                          size_t size, uint16_t tag)
 {
     rbuf_t *res = NULL;
-    timex_t now;
-
-    vtimer_now(&now);
+    uint32_t now_sec = xtimer_now() / SEC_IN_USEC;
 
     for (unsigned int i = 0; i < RBUF_SIZE; i++) {
         /* check first if entry already available */
@@ -281,7 +282,7 @@ static rbuf_t *_rbuf_get(const void *src, size_t src_len,
                   gnrc_netif_addr_to_str(l2addr_str, sizeof(l2addr_str),
                                          rbuf[i].dst, rbuf[i].dst_len),
                   (unsigned)rbuf[i].pkt->size, rbuf[i].tag);
-            rbuf[i].arrival = now.seconds;
+            rbuf[i].arrival = now_sec;
             return &(rbuf[i]);
         }
 
@@ -300,7 +301,7 @@ static rbuf_t *_rbuf_get(const void *src, size_t src_len,
 
         *((uint64_t *)res->pkt->data) = 0;  /* clean first few bytes for later
                                              * look-ups */
-        res->arrival = now.seconds;
+        res->arrival = now_sec;
         memcpy(res->src, src, src_len);
         memcpy(res->dst, dst, dst_len);
         res->src_len = src_len;

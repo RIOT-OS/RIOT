@@ -195,7 +195,7 @@ static void test_ipv6_netif_add_addr__despite_free_entry(void)
     ipv6_addr_t *entry_2;
 
     ipv6_addr_t default_addr = DEFAULT_TEST_IPV6_ADDR;
-    ipv6_addr_t ll_addr;
+    ipv6_addr_t sol_addr;
 
     test_ipv6_netif_add__success(); /* adds DEFAULT_TEST_NETIF as interface */
 
@@ -203,15 +203,14 @@ static void test_ipv6_netif_add_addr__despite_free_entry(void)
     TEST_ASSERT_NOT_NULL((entry_1 = gnrc_ipv6_netif_add_addr(DEFAULT_TEST_NETIF, &default_addr,
                                                              DEFAULT_TEST_PREFIX_LEN, 0)));
 
-    /* remove default_addr, but not the others (corresponding lla, solicited-node addr)
-     * that came with it */
+    /* remove default_addr, but not the corresponding solicited-node addr that
+     * came with it */
     gnrc_ipv6_netif_remove_addr(DEFAULT_TEST_NETIF, &default_addr);
 
-    /* create and re-add corresponding lla and check that it hasn't taken
-     * the old place of default_addr*/
-    ll_addr.u64[1] = default_addr.u64[1];
-    ipv6_addr_set_link_local_prefix(&ll_addr);
-    TEST_ASSERT_NOT_NULL((entry_2 = gnrc_ipv6_netif_add_addr(DEFAULT_TEST_NETIF, &ll_addr,
+    /* create and re-add corresponding solicited node address and check that it
+     * hasn't taken the old place of default_addr*/
+    ipv6_addr_set_solicited_nodes(&sol_addr, &default_addr);
+    TEST_ASSERT_NOT_NULL((entry_2 = gnrc_ipv6_netif_add_addr(DEFAULT_TEST_NETIF, &sol_addr,
                                                              DEFAULT_TEST_PREFIX_LEN, 0)));
 
     TEST_ASSERT(entry_1 != entry_2);
@@ -318,7 +317,7 @@ static void test_ipv6_netif_find_addr__success(void)
     TEST_ASSERT_EQUAL_INT(true, ipv6_addr_equal(out, &addr));
 
     /* also test for link local address */
-    ipv6_addr_set_link_local_prefix(&addr);
+    ipv6_addr_set_solicited_nodes(&addr, &addr);
     TEST_ASSERT_NOT_NULL((out = gnrc_ipv6_netif_find_addr(DEFAULT_TEST_NETIF, &addr)));
     TEST_ASSERT_EQUAL_INT(true, ipv6_addr_equal(out, &addr));
 }

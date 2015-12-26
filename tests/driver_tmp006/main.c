@@ -32,7 +32,7 @@
 
 #include <stdio.h>
 
-#include "vtimer.h"
+#include "xtimer.h"
 #include "tmp006.h"
 
 int main(void)
@@ -70,7 +70,7 @@ int main(void)
         tmp006_convert(rawvolt, rawtemp,  &tamb, &tobj);
         printf("Data Tabm: %d   Tobj: %d\n", (int)(tamb*100), (int)(tobj*100));
 
-        vtimer_usleep(TMP006_CONVERSION_TIME);
+        xtimer_usleep(TMP006_CONVERSION_TIME);
     }
 
     return 0;

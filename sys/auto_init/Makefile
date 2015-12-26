@@ -4,8 +4,8 @@ ifneq (,$(filter auto_init_gnrc_netif,$(USEMODULE)))
 DIRS += netif
 endif
 
-ifneq (,$(filter dev_eth_autoinit,$(USEMODULE)))
-DIRS += $(RIOTBASE)/sys/auto_init/dev_eth
+ifneq (,$(filter auto_init_saul,$(USEMODULE)))
+DIRS += saul
 endif
 
 include $(RIOTBASE)/Makefile.base

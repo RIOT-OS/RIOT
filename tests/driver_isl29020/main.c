@@ -27,7 +27,7 @@
 
 #include <stdio.h>
 
-#include "vtimer.h"
+#include "xtimer.h"
 #include "isl29020.h"
 
 #define MODE        ISL29020_MODE_AMBIENT
@@ -52,7 +52,7 @@ int main(void)
     while (1) {
         value = isl29020_read(&dev);
         printf("Light value: %5i LUX\n", value);
-        vtimer_usleep(SLEEP);
+        xtimer_usleep(SLEEP);
     }
 
     return 0;

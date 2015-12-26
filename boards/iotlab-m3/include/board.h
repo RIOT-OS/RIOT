@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Freie Universität Berlin
+ * Copyright (C) 2014-2015 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -53,32 +53,25 @@ extern "C" {
 /** @} */
 
 /**
- * @name Assign the hardware timer
- * @{
- */
-#define HW_TIMER            TIMER_0
-/** @} */
-
-/**
  * @name Define the interface to the AT86RF231 radio
- * @{
+ *
+ * {spi bus, spi speed, cs pin, int pin, reset pin, sleep pin}
  */
-#define AT86RF231_SPI       SPI_0
-#define AT86RF231_CS        GPIO(PORT_A,4)
-#define AT86RF231_INT       GPIO(PORT_C,4)
-#define AT86RF231_RESET     GPIO(PORT_C,1)
-#define AT86RF231_SLEEP     GPIO(PORT_A,2)
-#define AT86RF231_SPI_CLK   SPI_SPEED_5MHZ
-/** @} */
+#define AT86RF2XX_PARAMS_BOARD      {.spi = SPI_0, \
+                                     .spi_speed = SPI_SPEED_5MHZ, \
+                                     .cs_pin = GPIO_PIN(PORT_A, 4), \
+                                     .int_pin = GPIO_PIN(PORT_C, 4), \
+                                     .sleep_pin = GPIO_PIN(PORT_A, 2), \
+                                     .reset_pin = GPIO_PIN(PORT_C, 1)}
 
 /**
  * @name Define the interface for the connected flash memory
  * @{
  */
 #define EXTFLASH_SPI        SPI_1
-#define EXTFLASH_CS         GPIO(PORT_A,11)
-#define EXTFLASH_WRITE      GPIO(PORT_C,6)
-#define EXTFLASH_HOLD       GPIO(PORT_C,9)
+#define EXTFLASH_CS         GPIO_PIN(PORT_A,11)
+#define EXTFLASH_WRITE      GPIO_PIN(PORT_C,6)
+#define EXTFLASH_HOLD       GPIO_PIN(PORT_C,9)
 /** @} */
 
 /**
@@ -103,8 +96,8 @@ extern "C" {
  */
 #define L3G4200D_I2C        I2C_0
 #define L3G4200D_ADDR       0x68
-#define L3G4200D_DRDY       GPIO(PORT_C,0)
-#define L3G4200D_INT        GPIO(PORT_C,5)
+#define L3G4200D_DRDY       GPIO_PIN(PORT_C,0)
+#define L3G4200D_INT        GPIO_PIN(PORT_C,5)
 /** @} */
 
 /**
@@ -114,9 +107,9 @@ extern "C" {
 #define LSM303DLHC_I2C      I2C_0
 #define LSM303DLHC_ACC_ADDR (0x19)
 #define LSM303DLHC_MAG_ADDR (0x1e)
-#define LSM303DLHC_INT1     GPIO(PORT_B,12)
-#define LSM303DLHC_INT2     GPIO(PORT_B,1)
-#define LSM303DLHC_DRDY     GPIO(PORT_B,2)
+#define LSM303DLHC_INT1     GPIO_PIN(PORT_B,12)
+#define LSM303DLHC_INT2     GPIO_PIN(PORT_B,1)
+#define LSM303DLHC_DRDY     GPIO_PIN(PORT_B,2)
 /** @} */
 
 /**
@@ -125,13 +118,13 @@ extern "C" {
  */
 #define LED_RED_PORT        (GPIOD)
 #define LED_RED_PIN         (2)
-#define LED_RED_GPIO        GPIO(PORT_D,2)
+#define LED_RED_GPIO        GPIO_PIN(PORT_D,2)
 #define LED_GREEN_PORT      (GPIOB)
 #define LED_GREEN_PIN       (5)
-#define LED_GREEN_GPIO      GPIO(PORT_B,5)
+#define LED_GREEN_GPIO      GPIO_PIN(PORT_B,5)
 #define LED_ORANGE_PORT     (GPIOC)
 #define LED_ORANGE_PIN      (10)
-#define LED_ORANGE_GPIO     GPIO(PORT_C,10)
+#define LED_ORANGE_GPIO     GPIO_PIN(PORT_C,10)
 /** @} */
 
 /**
@@ -149,6 +142,14 @@ extern "C" {
 #define LED_ORANGE_ON       (LED_ORANGE_PORT->ODR &= ~(1<<LED_ORANGE_PIN))
 #define LED_ORANGE_OFF      (LED_ORANGE_PORT->ODR |= (1<<LED_ORANGE_PIN))
 #define LED_ORANGE_TOGGLE   (LED_ORANGE_PORT->ODR ^= (1<<LED_ORANGE_PIN))
+/** @} */
+
+/**
+ * @name xtimer tuning values
+ * @{
+ */
+#define XTIMER_OVERHEAD     6
+#define XTIMER_SHOOT_EARLY  3
 /** @} */
 
 /**

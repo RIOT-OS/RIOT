@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Copyright (C) 2015 Eistec AB
 #
@@ -6,7 +6,7 @@
 # Public License v2.1. See the file LICENSE in the top level directory for more
 # details.
 
-# Author: Joakim Gebart <joakim.gebart@eistec.se>
+# Author: Joakim Nohlgård <joakim.nohlgard@eistec.se>
 
 # Convert a GCC command line to Eclipse settings for import in
 # Project->Properties->C/C++ General->Paths and Symbols
@@ -25,6 +25,8 @@ if [ $# -ne 0 ]; then
     ${ECHO} "Note: does not handle spaces inside macros and include paths at all."
     exit 2
 fi
+
+readlink () { echo $(cd $(dirname $1); pwd)/$(basename $1); }
 
 XML_INSTRUCTIONS='
 <!--
@@ -59,7 +61,7 @@ INCLUDES=$(${ECHO} "${GCCCOMMANDLINE}" | sed -e 's/ /\n/g' | egrep '^-I' | cut -
 INCLUDES_REL=""
 for p in ${INCLUDES}; do
     #ABSPATH=$(readlink -m "$p")
-    RELPATH=$(readlink -m "$p" | sed -e "s,^${RIOTBASE},/${ECLIPSE_PROJECT_NAME}/,")
+    RELPATH=$(readlink "$p" | sed -e "s,^${RIOTBASE},/${ECLIPSE_PROJECT_NAME}/,")
     INCLUDES_REL=${INCLUDES_REL}$'\n'${RELPATH}
 done
 

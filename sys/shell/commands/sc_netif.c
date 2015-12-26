@@ -80,8 +80,11 @@ static void _set_usage(char *cmd_name)
          "       * \"addr_long\" - sets long address\n"
          "       * \"addr_short\" - alias for \"addr\"\n"
          "       * \"channel\" - sets the frequency channel\n"
-         "       * \"chan\" - alias for \"channel\""
+         "       * \"chan\" - alias for \"channel\"\n"
+         "       * \"csma_retries\" - set max. number of channel access attempts\n"
+         "       * \"cca_threshold\" - set ED threshold during CCA in dBm\n"
          "       * \"nid\" - sets the network identifier (or the PAN ID)\n"
+         "       * \"page\" - set the channel page (IEEE 802.15.4)\n"
          "       * \"pan\" - alias for \"nid\"\n"
          "       * \"pan_id\" - alias for \"nid\"\n"
          "       * \"power\" - TX power in dBm\n"
@@ -94,9 +97,14 @@ static void _mtu_usage(char *cmd_name)
     printf("usage: %s <if_id> mtu <n>\n", cmd_name);
 }
 
+static void _hl_usage(char *cmd_name)
+{
+    printf("usage: %s <if_id> hl <n>\n", cmd_name);
+}
+
 static void _flag_usage(char *cmd_name)
 {
-    printf("usage: %s <if_id> [-]{promisc|autoack|preload|6lo|iphc}\n", cmd_name);
+    printf("usage: %s <if_id> [-]{promisc|autoack|csma|autocca|cca_threshold|preload|iphc|rtr_adv}\n", cmd_name);
 }
 
 static void _add_usage(char *cmd_name)
@@ -130,12 +138,24 @@ static void _print_netopt(netopt_t opt)
             printf("channel");
             break;
 
+        case NETOPT_CHANNEL_PAGE:
+            printf("page");
+            break;
+
         case NETOPT_NID:
             printf("network identifier");
             break;
 
         case NETOPT_TX_POWER:
             printf("TX power [in dBm]");
+            break;
+
+        case NETOPT_CSMA_RETRIES:
+            printf("CSMA retries");
+            break;
+
+        case NETOPT_CCA_THRESHOLD:
+            printf("CCA threshold [in dBm]");
             break;
 
         default:
@@ -176,6 +196,7 @@ static void _netif_list(kernel_pid_t dev)
     uint8_t hwaddr[MAX_ADDR_LEN];
     uint16_t u16;
     int16_t i16;
+    uint8_t u8;
     int res;
     netopt_state_t state;
     netopt_enable_t enable;
@@ -204,6 +225,12 @@ static void _netif_list(kernel_pid_t dev)
         printf(" Channel: %" PRIu16 " ", u16);
     }
 
+    res = gnrc_netapi_get(dev, NETOPT_CHANNEL_PAGE, 0, &u16, sizeof(u16));
+
+    if (res >= 0) {
+        printf(" Page: %" PRIu16 " ", u16);
+    }
+
     res = gnrc_netapi_get(dev, NETOPT_NID, 0, &u16, sizeof(u16));
 
     if (res >= 0) {
@@ -223,6 +250,15 @@ static void _netif_list(kernel_pid_t dev)
         _print_netopt_state(state);
     }
 
+    res = gnrc_netapi_get(dev, NETOPT_CSMA_RETRIES, 0, &u8, sizeof(u8));
+
+    if (res >= 0) {
+        res = gnrc_netapi_get(dev, NETOPT_CSMA, 0, &enable, sizeof(enable));
+        if ((res >= 0) && (enable == NETOPT_ENABLE)) {
+            printf(" CSMA Retries: %" PRIu8 " ", *((uint8_t *) &u8));
+        }
+    }
+
     printf("\n           ");
 
     res = gnrc_netapi_get(dev, NETOPT_ADDRESS_LONG, 0, hwaddr, sizeof(hwaddr));
@@ -230,8 +266,12 @@ static void _netif_list(kernel_pid_t dev)
     if (res >= 0) {
         char hwaddr_str[res * 3];
         printf("Long HWaddr: ");
-        printf("%s", gnrc_netif_addr_to_str(hwaddr_str, sizeof(hwaddr_str),
-                                            hwaddr, res));
+        printf("%s ", gnrc_netif_addr_to_str(hwaddr_str, sizeof(hwaddr_str),
+                                             hwaddr, res));
+        linebreak = true;
+    }
+
+    if (linebreak) {
         printf("\n           ");
     }
 
@@ -263,13 +303,35 @@ static void _netif_list(kernel_pid_t dev)
         linebreak = true;
     }
 
+    res = gnrc_netapi_get(dev, NETOPT_CSMA, 0, &enable, sizeof(enable));
+
+    if ((res >= 0) && (enable == NETOPT_ENABLE)) {
+        printf("CSMA  ");
+        linebreak = true;
+    }
+
+    res = gnrc_netapi_get(dev, NETOPT_AUTOCCA, 0, &enable, sizeof(enable));
+
+    if ((res >= 0) && (enable == NETOPT_ENABLE)) {
+        printf("AUTOCCA  ");
+        linebreak = true;
+    }
+
 #ifdef MODULE_GNRC_IPV6_NETIF
     if (entry != NULL) {
         printf("MTU:%" PRIu16 "  ", entry->mtu);
+        printf("HL:%" PRIu8 "  ", entry->cur_hl);
         if (entry->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN) {
             printf("6LO  ");
         }
+        if (entry->flags & GNRC_IPV6_NETIF_FLAGS_ROUTER) {
+            printf("RTR  ");
+        }
+        if (entry->flags & GNRC_IPV6_NETIF_FLAGS_RTR_ADV) {
+            printf("RTR_ADV  ");
+        }
         linebreak = true;
+
     }
 #endif
 
@@ -293,6 +355,15 @@ static void _netif_list(kernel_pid_t dev)
     }
 
 #ifdef MODULE_GNRC_IPV6_NETIF
+    if (entry == NULL) {
+        puts("");
+        return;
+    }
+
+    printf("Link type: %s", (entry->flags & GNRC_IPV6_NETIF_FLAGS_IS_WIRED) ?
+           "wired" : "wireless");
+    printf("\n           ");
+
     for (int i = 0; i < GNRC_IPV6_NETIF_ADDR_NUMOF; i++) {
         if (!ipv6_addr_is_unspecified(&entry->addrs[i].addr)) {
             printf("inet6 addr: ");
@@ -397,6 +468,24 @@ static int _netif_set_i16(kernel_pid_t dev, netopt_t opt, char *i16_str)
     return 0;
 }
 
+static int _netif_set_u8(kernel_pid_t dev, netopt_t opt, char *u8_str)
+{
+    uint8_t val = (uint8_t)atoi(u8_str);
+
+    if (gnrc_netapi_set(dev, opt, 0, (uint8_t *)&val, sizeof(uint8_t)) < 0) {
+        printf("error: unable to set ");
+        _print_netopt(opt);
+        puts("");
+        return 1;
+    }
+
+    printf("success: set ");
+    _print_netopt(opt);
+    printf(" on interface %" PRIkernel_pid " to %i\n", dev, val);
+
+    return 0;
+}
+
 static int _netif_set_flag(kernel_pid_t dev, netopt_t opt,
                            netopt_enable_t set)
 {
@@ -481,6 +570,9 @@ static int _netif_set(char *cmd_name, kernel_pid_t dev, char *key, char *value)
     else if ((strcmp("channel", key) == 0) || (strcmp("chan", key) == 0)) {
         return _netif_set_u16(dev, NETOPT_CHANNEL, value);
     }
+    else if (strcmp("page", key) == 0) {
+        return _netif_set_u16(dev, NETOPT_CHANNEL_PAGE, value);
+    }
     else if ((strcmp("nid", key) == 0) || (strcmp("pan", key) == 0) ||
              (strcmp("pan_id", key) == 0)) {
         return _netif_set_u16(dev, NETOPT_NID, value);
@@ -493,6 +585,12 @@ static int _netif_set(char *cmd_name, kernel_pid_t dev, char *key, char *value)
     }
     else if (strcmp("state", key) == 0) {
         return _netif_set_state(dev, value);
+    }
+    else if (strcmp("csma_retries", key) == 0) {
+        return _netif_set_u8(dev, NETOPT_CSMA_RETRIES, value);
+    }
+    else if (strcmp("cca_threshold", key) == 0) {
+        return _netif_set_u8(dev, NETOPT_CCA_THRESHOLD, value);
     }
 
     _set_usage(cmd_name);
@@ -520,36 +618,11 @@ static int _netif_flag(char *cmd, kernel_pid_t dev, char *flag)
     else if (strcmp(flag, "raw") == 0) {
         return _netif_set_flag(dev, NETOPT_RAWMODE, set);
     }
-    else if (strcmp(flag, "6lo") == 0) {
-#ifdef MODULE_GNRC_IPV6_NETIF
-        gnrc_ipv6_netif_t *entry = gnrc_ipv6_netif_get(dev);
-
-        if (entry == NULL) {
-            puts("error: unable to (un)set 6LoWPAN support");
-            return 1;
-        }
-
-        mutex_lock(&entry->mutex);
-
-        if (set) {
-            entry->flags |= GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN;
-            printf("success: set 6LoWPAN support on interface %" PRIkernel_pid
-                   "\n", dev);
-        }
-        else {
-            entry->flags &= ~GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN;
-            printf("success: unset 6LoWPAN support on interface %" PRIkernel_pid
-                   "\n", dev);
-        }
-
-        mutex_unlock(&entry->mutex);
-
-        return 0;
-#else
-        puts("error: unable to (un)set 6LoWPAN support");
-
-        return 1;
-#endif
+    else if (strcmp(flag, "csma") == 0) {
+        return _netif_set_flag(dev, NETOPT_CSMA, set);
+    }
+    else if (strcmp(flag, "autocca") == 0) {
+        return _netif_set_flag(dev, NETOPT_AUTOCCA, set);
     }
     else if (strcmp(flag, "iphc") == 0) {
 #if defined(MODULE_GNRC_SIXLOWPAN_NETIF) && defined(MODULE_GNRC_SIXLOWPAN_IPHC)
@@ -571,6 +644,30 @@ static int _netif_flag(char *cmd, kernel_pid_t dev, char *flag)
         return 0;
 #else
         puts("error: unable to (un)set IPHC.");
+        return 1;
+#endif
+    }
+    else if (strcmp(flag, "rtr_adv") == 0) {
+#if defined(MODULE_GNRC_NDP_ROUTER) || defined(MODULE_GNRC_SIXLOWPAN_ND_ROUTER)
+        gnrc_ipv6_netif_t *entry = gnrc_ipv6_netif_get(dev);
+
+        if (entry == NULL) {
+            puts("error: unable to (un)set router advertisement flag.");
+            return 1;
+        }
+
+        if (set) {
+            gnrc_ipv6_netif_set_rtr_adv(entry, true);
+            printf("success: enable router advertisements on interface %" PRIkernel_pid "\n", dev);
+        }
+        else {
+            gnrc_ipv6_netif_set_rtr_adv(entry, false);
+            printf("success: disable router advertisements on interface %" PRIkernel_pid "\n",
+                   dev);
+        }
+        return 0;
+#else
+        puts("error: unable to (un)set router advertisement flag.");
         return 1;
 #endif
     }
@@ -644,8 +741,7 @@ static int _netif_add(char *cmd_name, kernel_pid_t dev, int argc, char **argv)
         return 1;
     }
 
-    if (gnrc_ipv6_netif_add_addr(dev, &addr, prefix_len,
-                                 (type == _ANYCAST) ?
+    if (gnrc_ipv6_netif_add_addr(dev, &addr, prefix_len, (type == _ANYCAST) ?
                                  GNRC_IPV6_NETIF_ADDR_FLAGS_NON_UNICAST :
                                  GNRC_IPV6_NETIF_ADDR_FLAGS_UNICAST) == NULL) {
         printf("error: unable to add IPv6 address\n");
@@ -698,15 +794,15 @@ static int _netif_mtu(kernel_pid_t dev, char *mtu_str)
     gnrc_ipv6_netif_t *entry;
     if (((mtu = atoi(mtu_str)) < IPV6_MIN_MTU) || (mtu > UINT16_MAX)) {
         printf("error: MTU must be between %" PRIu16 " and %" PRIu16 "\n",
-               IPV6_MIN_MTU, UINT16_MAX);
+               (uint16_t)IPV6_MIN_MTU, (uint16_t)UINT16_MAX);
         return 1;
     }
     if ((entry = gnrc_ipv6_netif_get(dev)) == NULL) {
         puts("error: unable to set MTU.");
         return 1;
     }
-    entry->mtu = IPV6_MIN_MTU;
-    printf("success: set MTU %" PRIu16 " interface %" PRIkernel_pid "\n", mtu,
+    entry->mtu = mtu;
+    printf("success: set MTU %u interface %" PRIkernel_pid "\n", mtu,
            dev);
     return 0;
 #else
@@ -763,7 +859,11 @@ int _netif_send(int argc, char **argv)
     gnrc_netif_hdr_set_dst_addr(nethdr, addr, addr_len);
     nethdr->flags = flags;
     /* and send it */
-    gnrc_netapi_send(dev, pkt);
+    if (gnrc_netapi_send(dev, pkt) < 1) {
+        puts("error: unable to send\n");
+        gnrc_pktbuf_release(pkt);
+        return 1;
+    }
 
     return 0;
 }
@@ -820,6 +920,29 @@ int _netif_config(int argc, char **argv)
 
                 return _netif_mtu((kernel_pid_t)dev, argv[3]);
             }
+#ifdef MODULE_GNRC_IPV6_NETIF
+            else if (strcmp(argv[2], "hl") == 0) {
+                if (argc < 4) {
+                    _hl_usage(argv[0]);
+                    return 1;
+                }
+                int hl;
+                gnrc_ipv6_netif_t *entry;
+                if (((hl = atoi(argv[3])) < 0) || (hl > UINT8_MAX)) {
+                    printf("error: Hop limit must be between %" PRIu16 " and %" PRIu16 "\n",
+                            (uint16_t)0, (uint16_t)UINT16_MAX);
+                    return 1;
+                }
+                if ((entry = gnrc_ipv6_netif_get(dev)) == NULL) {
+                    puts("error: unable to set hop limit.");
+                    return 1;
+                }
+                entry->cur_hl = hl;
+                printf("success: set hop limit %u interface %" PRIkernel_pid "\n", hl, dev);
+
+                return 0;
+            }
+#endif
             else {
                 return _netif_flag(argv[0], dev, argv[2]);
             }
@@ -833,6 +956,7 @@ int _netif_config(int argc, char **argv)
     printf("usage: %s [<if_id>]\n", argv[0]);
     _set_usage(argv[0]);
     _mtu_usage(argv[0]);
+    _hl_usage(argv[0]);
     _flag_usage(argv[0]);
     _add_usage(argv[0]);
     _del_usage(argv[0]);

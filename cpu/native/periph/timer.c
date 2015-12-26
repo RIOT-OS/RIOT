@@ -1,23 +1,23 @@
 /**
- * Copyright (C) 2013 Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ * Copyright (C) 2013 Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  *               2015 Kaspar Schleiser <kaspar@schleiser.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  *
- * @ingroup hwtimer
+ * @ingroup timer
  * @ingroup native_cpu
  * @{
- * @author  Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ * @author  Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
  * @file
  * @brief Native CPU periph/timer.h implementation
  *
  * Uses POSIX realtime clock and POSIX itimer to mimic hardware.
  *
- * This is based on native's hwtimer implementation by Ludwig Ortmann.
- * I removed the multiplexing, as wtimer does the same. (kaspar)
+ * This is based on native's hwtimer implementation by Ludwig Knüpfer.
+ * I removed the multiplexing, as xtimer does the same. (kaspar)
  *
  * @}
  */
@@ -26,6 +26,7 @@
 #include <mach/clock.h>
 #include <mach/mach_init.h>
 #include <mach/mach_port.h>
+#include <mach/mach_host.h>
 #endif
 
 #include <time.h>
@@ -116,8 +117,11 @@ static void do_timer_set(unsigned int offset)
 int timer_set(tim_t dev, int channel, unsigned int offset)
 {
     (void)dev;
-    (void)channel;
     DEBUG("%s\n", __func__);
+
+    if (channel != 0) {
+        return -1;
+    }
 
     if (!offset) {
         offset = NATIVE_TIMER_MIN_RES;
@@ -139,9 +143,7 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
         target = NATIVE_TIMER_MIN_RES;
     }
 
-    timer_set(dev, channel, target);
-
-    return 1;
+    return timer_set(dev, channel, target);
 }
 
 int timer_clear(tim_t dev, int channel)
@@ -188,14 +190,6 @@ void timer_stop(tim_t dev)
 {
     (void)dev;
     DEBUG("%s\n", __func__);
-}
-
-
-void timer_reset(tim_t dev)
-{
-    if (dev < TIMER_NUMOF) {
-        time_null = timer_read(dev);
-    }
 }
 
 unsigned int timer_read(tim_t dev)

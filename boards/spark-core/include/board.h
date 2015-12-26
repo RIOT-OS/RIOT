@@ -50,11 +50,6 @@
 /** @} */
 
 /**
- * @name Assign the hardware timer
- */
-#define HW_TIMER            TIMER_0
-
-/**
  * @name LED pin definitions
  * @{
  */
@@ -86,16 +81,16 @@
 /**
  * @name User button configuration
  */
-#define BUTTON1             GPIO(PORT_B,2)
+#define BUTTON1             GPIO_PIN(PORT_B,2)
 
 /**
  * @name CC3000 pin configuration
  * @{
  */
 #define CC3000_SPI          SPI_0
-#define CC3000_CS           GPIO(PORT_B,12)
-#define CC3000_EN           GPIO(PORT_B,8)
-#define CC3000_INT          GPIO(PORT_B,11)
+#define CC3000_CS           GPIO_PIN(PORT_B,12)
+#define CC3000_EN           GPIO_PIN(PORT_B,8)
+#define CC3000_INT          GPIO_PIN(PORT_B,11)
 /** @} */
 
 /**
@@ -103,7 +98,7 @@
  * @{
  */
 #define EXTFLASH_SPI        SPI_0
-#define EXTFLASH            GPIO(PORT_B,9)
+#define EXTFLASH            GPIO_PIN(PORT_B,9)
 /** @} */
 
 /**

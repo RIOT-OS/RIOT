@@ -1,4 +1,4 @@
-MODULE =$(BOARD)_base
+MODULE = board
 
 include $(RIOTBOARD)/$(BOARD)/Makefile.include
 

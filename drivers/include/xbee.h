@@ -9,7 +9,7 @@
 
 /**
  * @defgroup    drivers_xbee XBee driver
- * @ingroup     drivers
+ * @ingroup     drivers_netdev
  * @brief       High-level driver for the XBee S1 802.15.4 modem
  * @{
  *
@@ -128,8 +128,6 @@ typedef struct {
     mutex_t tx_lock;                    /**< mutex to allow only one
                                          *   transmission at a time */
     uint8_t tx_buf[XBEE_MAX_PKT_LENGTH];/**< transmit data buffer */
-    uint16_t tx_count;                  /**< counter for ongoing transmission */
-    uint16_t tx_limit;                  /**< size of TX frame transferred */
     /* buffer and synchronization for command responses */
     mutex_t resp_lock;                  /**< mutex for waiting for AT command
                                          *   response frames */

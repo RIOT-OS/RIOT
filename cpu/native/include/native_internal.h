@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013, 2014 Ludwig Ortmann
+ * Copyright (C) 2013, 2014 Ludwig Knüpfer
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -13,7 +13,7 @@
 /**
  * @addtogroup    native_cpu
  * @{
- * @author  Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ * @author  Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  */
 
 #ifndef _NATIVE_INTERNAL_H
@@ -47,6 +47,7 @@
 #include <time.h>
 #include <sys/time.h>
 #include <sys/stat.h>
+#include <sys/uio.h>
 
 #include "kernel_types.h"
 
@@ -64,7 +65,6 @@ typedef void (*_native_callback_t)(void);
  */
 void native_cpu_init(void);
 void native_interrupt_init(void);
-extern void native_hwtimer_pre_init(void);
 
 void native_irq_handler(void);
 extern void _native_sig_leave_tramp(void);
@@ -123,6 +123,7 @@ extern long int (*real_random)(void);
 extern const char* (*real_gai_strerror)(int errcode);
 extern FILE* (*real_fopen)(const char *path, const char *mode);
 extern mode_t (*real_umask)(mode_t cmask);
+extern ssize_t (*real_writev)(int fildes, const struct iovec *iov, int iovcnt);
 
 #ifdef __MACH__
 #else
@@ -153,13 +154,9 @@ extern unsigned _native_rng_seed;
 extern int _native_rng_mode; /**< 0 = /dev/random, 1 = random(3) */
 extern const char *_native_unix_socket_path;
 
-#ifdef MODULE_UART0
-#include <sys/select.h>
-extern fd_set _native_rfds;
-#endif
-
 ssize_t _native_read(int fd, void *buf, size_t count);
 ssize_t _native_write(int fd, const void *buf, size_t count);
+ssize_t _native_writev(int fildes, const struct iovec *iov, int iovcnt);
 
 /**
  * register interrupt handler handler for interrupt sig

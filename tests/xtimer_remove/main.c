@@ -24,7 +24,7 @@
 #include "thread.h"
 #include "xtimer.h"
 
-#define N (3U)
+#define NUMOF (3U)
 
 int main(void)
 {
@@ -32,18 +32,18 @@ int main(void)
 
     kernel_pid_t me = thread_getpid();
 
-    for (unsigned int n = 0; n < N; n++) {
-        printf("Setting %u timers, removing timer %u/%u\n", N, n, N);
-        xtimer_t timers[N];
-        msg_t msg[N];
-        for (unsigned int i = 0; i < N; i++) {
+    for (unsigned int n = 0; n < NUMOF; n++) {
+        printf("Setting %u timers, removing timer %u/%u\n", NUMOF, n, NUMOF);
+        xtimer_t timers[NUMOF];
+        msg_t msg[NUMOF];
+        for (unsigned int i = 0; i < NUMOF; i++) {
             msg[i].type = i;
             xtimer_set_msg(&timers[i], 100000*(i+1), &msg[i], me);
         }
 
         xtimer_remove(&timers[n]);
 
-        unsigned int num = N-1;
+        unsigned int num = NUMOF-1;
         while(num--) {
             msg_t m;
             msg_receive(&m);

@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Copyright 2014 Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+# Copyright 2014 Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
 # Copyright 2014 Hinnerk van Bruinehsen <h.v.bruinehsen@fu-berlin.de>
 #
 # This file is subject to the terms and conditions of the GNU Lesser

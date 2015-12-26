@@ -1,3 +1,12 @@
+ifneq (,$(filter gnrc_conn,$(USEMODULE)))
+    DIRS += conn
+endif
+ifneq (,$(filter gnrc_conn_ip,$(USEMODULE)))
+    DIRS += conn/ip
+endif
+ifneq (,$(filter gnrc_conn_udp,$(USEMODULE)))
+    DIRS += conn/udp
+endif
 ifneq (,$(filter gnrc_icmpv6,$(USEMODULE)))
     DIRS += network_layer/icmpv6
 endif
@@ -19,14 +28,23 @@ endif
 ifneq (,$(filter gnrc_ipv6_netif,$(USEMODULE)))
     DIRS += network_layer/ipv6/netif
 endif
+ifneq (,$(filter gnrc_ipv6_whitelist,$(USEMODULE)))
+    DIRS += network_layer/ipv6/whitelist
+endif
 ifneq (,$(filter gnrc_ndp,$(USEMODULE)))
     DIRS += network_layer/ndp
 endif
 ifneq (,$(filter gnrc_ndp_internal,$(USEMODULE)))
     DIRS += network_layer/ndp/internal
 endif
+ifneq (,$(filter gnrc_ndp_host,$(USEMODULE)))
+    DIRS += network_layer/ndp/host
+endif
 ifneq (,$(filter gnrc_ndp_node,$(USEMODULE)))
     DIRS += network_layer/ndp/node
+endif
+ifneq (,$(filter gnrc_ndp_router,$(USEMODULE)))
+    DIRS += network_layer/ndp/router
 endif
 ifneq (,$(filter gnrc_netapi,$(USEMODULE)))
     DIRS += netapi
@@ -73,6 +91,12 @@ endif
 ifneq (,$(filter gnrc_sixlowpan_iphc,$(USEMODULE)))
     DIRS += network_layer/sixlowpan/iphc
 endif
+ifneq (,$(filter gnrc_sixlowpan_nd,$(USEMODULE)))
+    DIRS += network_layer/sixlowpan/nd
+endif
+ifneq (,$(filter gnrc_sixlowpan_nd_router,$(USEMODULE)))
+    DIRS += network_layer/sixlowpan/nd/router
+endif
 ifneq (,$(filter gnrc_sixlowpan_netif,$(USEMODULE)))
     DIRS += network_layer/sixlowpan/netif
 endif
@@ -84,6 +108,9 @@ ifneq (,$(filter gnrc_udp,$(USEMODULE)))
 endif
 ifneq (,$(filter gnrc_zep,$(USEMODULE)))
     DIRS += application_layer/zep
+endif
+ifneq (,$(filter gnrc_tftp,$(USEMODULE)))
+    DIRS += application_layer/tftp
 endif
 
 include $(RIOTBASE)/Makefile.base

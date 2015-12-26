@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    nvram Non-volatile RAM
+ * @defgroup    drivers_nvram Non-volatile RAM
  * @ingroup     drivers
  * @brief       Non-volatile RAM interface
  *
@@ -21,7 +21,7 @@
  * @file
  *
  * @brief       Generic non-volatile RAM driver interface
- * @author      Joakim Gebart <joakim.gebart@eistec.se>
+ * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
 #ifndef DRIVERS_NVRAM_H_

@@ -1,19 +1,18 @@
-From 2c8298434b94506140893c540c49760ad7eb636f Mon Sep 17 00:00:00 2001
+From ccb37ece1a21325bbc1f3efba7d3f0ec0d6b26ac Mon Sep 17 00:00:00 2001
 From: Benjamin Valentin <benpicco@zedat.fu-berlin.de>
 Date: Tue, 23 Jul 2013 21:08:31 +0200
-Subject: [PATCH 2/3] port tests to riot
+Subject: [PATCH 02/10] port tests to riot
 
 ---
- tests/common/.Makefile.template                 | 45 +++++++++++++++++++++++++
- tests/common/bin/.gitignore                     |  0
- tests/common/generate_makefiles.sh              |  8 +++++
- tests/common/test_common_avl.c                  | 10 +++---
- tests/cunit/Makefile                            |  3 ++
- tests/rfc5444/.Makefile.template                | 39 +++++++++++++++++++++
- tests/rfc5444/bin/.gitignore                    |  0
- tests/rfc5444/generate_makefiles.sh             |  8 +++++
- tests/rfc5444/test_rfc5444_reader_dropcontext.c |  2 +-
- 9 files changed, 109 insertions(+), 6 deletions(-)
+ tests/common/.Makefile.template     | 37 +++++++++++++++++++++++++++++++++++++
+ tests/common/bin/.gitignore         |  0
+ tests/common/generate_makefiles.sh  |  8 ++++++++
+ tests/common/test_common_avl.c      | 10 +++++-----
+ tests/cunit/Makefile                |  3 +++
+ tests/rfc5444/.Makefile.template    | 30 ++++++++++++++++++++++++++++++
+ tests/rfc5444/bin/.gitignore        |  0
+ tests/rfc5444/generate_makefiles.sh |  8 ++++++++
+ 8 files changed, 91 insertions(+), 5 deletions(-)
  create mode 100644 tests/common/.Makefile.template
  create mode 100644 tests/common/bin/.gitignore
  create mode 100755 tests/common/generate_makefiles.sh
@@ -24,10 +23,10 @@ Subject: [PATCH 2/3] port tests to riot
 
 diff --git a/tests/common/.Makefile.template b/tests/common/.Makefile.template
 new file mode 100644
-index 0000000..c286ad3
+index 0000000..afbaf0f
 --- /dev/null
 +++ b/tests/common/.Makefile.template
-@@ -0,0 +1,45 @@
+@@ -0,0 +1,37 @@
 +####
 +#### Sample Makefile for building apps with the RIOT OS
 +####
@@ -41,9 +40,7 @@ index 0000000..c286ad3
 +export APPLICATION = %TESTNAME%
 +
 +# for easy switching of boards
-+ifeq ($(strip $(BOARD)),)
-+	export BOARD = native
-+endif
++export BOARD ?= native
 +
 +# this has to be the absolute path of the RIOT-base dir
 +export RIOTBASE =$(CURDIR)/../../../../../..
@@ -52,12 +49,6 @@ index 0000000..c286ad3
 +
 +## Modules to include.
 +
-+USEMODULE += auto_init
-+USEMODULE += config
-+USEMODULE += uart0
-+USEMODULE += posix
-+
-+USEMODULE += net_help
 +USEMODULE += oonf_cunit
 +ifneq (,$(findstring regex,$(APPLICATION)))
 +	USEMODULE += oonf_regex
@@ -68,9 +59,9 @@ index 0000000..c286ad3
 +	error daemonize is not supported on RIOT
 +endif
 +
-+USEPKG += oonf_api
++export INCLUDES += -I$(CURDIR)/../..
 +
-+export INCLUDES += -I$(CURDIR)/../.. -I$(RIOTBASE)/sys/net/include
++QUIET ?= 1
 +
 +include $(RIOTBASE)/Makefile.include
 diff --git a/tests/common/bin/.gitignore b/tests/common/bin/.gitignore
@@ -128,10 +119,10 @@ index 0000000..5e0046d
 +include $(RIOTBASE)/Makefile.base
 diff --git a/tests/rfc5444/.Makefile.template b/tests/rfc5444/.Makefile.template
 new file mode 100644
-index 0000000..8a0452d
+index 0000000..e472545
 --- /dev/null
 +++ b/tests/rfc5444/.Makefile.template
-@@ -0,0 +1,39 @@
+@@ -0,0 +1,30 @@
 +####
 +#### Sample Makefile for building apps with the RIOT OS
 +####
@@ -145,9 +136,7 @@ index 0000000..8a0452d
 +export APPLICATION = %TESTNAME%
 +
 +# for easy switching of boards
-+ifeq ($(strip $(BOARD)),)
-+	export BOARD = native
-+endif
++export BOARD ?= native
 +
 +# this has to be the absolute path of the RIOT-base dir
 +export RIOTBASE =$(CURDIR)/../../../../../..
@@ -155,20 +144,13 @@ index 0000000..8a0452d
 +export CFLAGS = -DOONF_LOG_INFO -DOONF_LOG_DEBUG_INFO
 +
 +## Modules to include.
-+
-+USEMODULE += auto_init
-+USEMODULE += config
-+USEMODULE += uart0
-+USEMODULE += posix
-+
-+USEMODULE += net_help
 +USEMODULE += oonf_cunit
 +USEMODULE += oonf_common
 +USEMODULE += oonf_rfc5444
 +
-+USEPKG += oonf_api
++export INCLUDES += -I$(CURDIR)/../..
 +
-+export INCLUDES += -I$(CURDIR)/../.. -I$(RIOTBASE)/sys/net/include
++QUIET ?= 1
 +
 +include $(RIOTBASE)/Makefile.include
 diff --git a/tests/rfc5444/bin/.gitignore b/tests/rfc5444/bin/.gitignore
@@ -188,19 +170,5 @@ index 0000000..8bf9faa
 +	sed s/%TESTNAME%/$test/ .Makefile.template > $test/Makefile
 +	cp $test\.c $test
 +done
-diff --git a/tests/rfc5444/test_rfc5444_reader_dropcontext.c b/tests/rfc5444/test_rfc5444_reader_dropcontext.c
-index df203fd..29daff6 100644
---- a/tests/rfc5444/test_rfc5444_reader_dropcontext.c
-+++ b/tests/rfc5444/test_rfc5444_reader_dropcontext.c
-@@ -38,7 +38,7 @@
-  * the copyright holders.
-  *
-  */
--#include <arpa/inet.h>
-+
- #include <assert.h>
- #include <stdio.h>
-
 --
-1.8.3.2
-
+1.9.1

@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2013 Christian Mehlis <mehlis@inf.fu-berlin.de>
  * Copyright (C) 2013 René Kijewski <rene.kijewski@fu-berlin.de>
+ * Copyright (C) 2015 Martine Lenders <mlenders@inf.fu-berlin.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -16,27 +17,37 @@
  *
  * @author Christian Mehlis <mehlis@inf.fu-berlin.de>
  * @author René Kijewski <rene.kijewski@fu-berlin.de>
+ * @author Martine Lenders <mlenders@inf.fu-berlin.de>
  *
  * @}
  */
 
+#include <errno.h>
 #include <stdio.h>
+#include <semaphore.h>
 
+#include "msg.h"
+#include "timex.h"
 #include "thread.h"
-#include "semaphore.h"
+#include "xtimer.h"
 
-#define SEMAPHORE_TEST_THREADS 5
-char test1_thread_stack[THREAD_STACKSIZE_MAIN];
-char test2_thread_stack[SEMAPHORE_TEST_THREADS][THREAD_STACKSIZE_MAIN];
+#define SEMAPHORE_MSG_QUEUE_SIZE        (8)
+#define SEMAPHORE_TEST_THREADS          (5)
+static char test1_thread_stack[THREAD_STACKSIZE_MAIN];
+static char test2_thread_stack[SEMAPHORE_TEST_THREADS][THREAD_STACKSIZE_MAIN];
+static msg_t main_msg_queue[SEMAPHORE_MSG_QUEUE_SIZE];
+static msg_t test1_msg_queue[SEMAPHORE_MSG_QUEUE_SIZE];
 
-sem_t s;
+static sem_t s1;
+static sem_t s2;
 
 static void *test1_second_thread(void *arg)
 {
     (void) arg;
+    msg_init_queue(test1_msg_queue, SEMAPHORE_MSG_QUEUE_SIZE);
     puts("second: sem_trywait");
 
-    if (sem_trywait(&s) == 0) {
+    if (sem_trywait(&s1) < 0) {
         puts("second: sem_trywait failed");
     }
 
@@ -44,7 +55,7 @@ static void *test1_second_thread(void *arg)
 
     puts("second: wait for post");
 
-    if (sem_wait(&s) != 1) {
+    if (sem_wait(&s1) < 0) {
         puts("second: sem_wait failed");
     }
 
@@ -58,7 +69,7 @@ static void test1(void)
 {
     puts("first: sem_init");
 
-    if (sem_init(&s, 0, 0) != 0) {
+    if (sem_init(&s1, 0, 0) < 0) {
         puts("first: sem_init failed");
     }
 
@@ -66,7 +77,8 @@ static void test1(void)
     kernel_pid_t pid = thread_create(test1_thread_stack,
                                      sizeof(test1_thread_stack),
                                      THREAD_PRIORITY_MAIN - 1,
-                                     CREATE_STACKTEST | CREATE_WOUT_YIELD,
+                                     THREAD_CREATE_STACKTEST |
+                                     THREAD_CREATE_WOUT_YIELD,
                                      test1_second_thread,
                                      NULL,
                                      "second");
@@ -78,7 +90,7 @@ static void test1(void)
     puts("first: sem_getvalue");
     int val;
 
-    if (sem_getvalue(&s, &val) != 0 || val != 0) {
+    if (sem_getvalue(&s1, &val) < 0 || val != 0) {
         puts("first: sem_getvalue FAILED");
     }
 
@@ -92,7 +104,7 @@ static void test1(void)
 
     puts("first: sem_trywait");
 
-    if (sem_trywait(&s) != -1) {
+    if (sem_trywait(&s1) < 0) {
         puts("first: sem_trywait FAILED");
     }
 
@@ -100,7 +112,7 @@ static void test1(void)
 
     puts("first: sem_post");
 
-    if (sem_post(&s) != 1) {
+    if (sem_post(&s1) < 0) {
         puts("first: sem_post FAILED");
     }
 
@@ -110,7 +122,7 @@ static void test1(void)
 
     puts("first: sem_destroy");
 
-    if (sem_destroy(&s) != 0) {
+    if (sem_destroy(&s1) < 0) {
         puts("first: sem_destroy FAILED");
     }
 
@@ -119,7 +131,9 @@ static void test1(void)
 
 static void *priority_sema_thread(void *name)
 {
-    sem_wait(&s);
+    msg_t msg_queue[SEMAPHORE_MSG_QUEUE_SIZE];
+    msg_init_queue(msg_queue, SEMAPHORE_MSG_QUEUE_SIZE);
+    sem_wait(&s1);
     printf("Thread '%s' woke up.\n", (const char *) name);
     return NULL;
 }
@@ -129,7 +143,7 @@ void test2(void)
 {
     puts("first: sem_init");
 
-    if (sem_init(&s, 0, 0) != 0) {
+    if (sem_init(&s1, 0, 0) < 0) {
         puts("first: sem_init FAILED");
     }
 
@@ -141,7 +155,7 @@ void test2(void)
         kernel_pid_t pid = thread_create(test2_thread_stack[i],
                                          sizeof(test2_thread_stack[i]),
                                          priority,
-                                         CREATE_STACKTEST,
+                                         THREAD_CREATE_STACKTEST,
                                          priority_sema_thread,
                                          names[i],
                                          names[i]);
@@ -157,17 +171,112 @@ void test2(void)
 
     for (int i = 0; i < SEMAPHORE_TEST_THREADS; i++) {
         printf("post no. %d\n", i);
-        sem_post(&s);
+        sem_post(&s1);
         puts("Back in main thread.");
     }
 }
 
+static void *test3_one_two_thread(void *arg)
+{
+    msg_t msg_queue[SEMAPHORE_MSG_QUEUE_SIZE];
+    (void)arg;
+    msg_init_queue(msg_queue, SEMAPHORE_MSG_QUEUE_SIZE);
+    sem_wait(&s1);
+    puts("Thread 1 woke up after waiting for s1.");
+    sem_wait(&s2);
+    puts("Thread 1 woke up after waiting for s2.");
+    return NULL;
+}
+
+static void *test3_two_one_thread(void *arg)
+{
+    msg_t msg_queue[SEMAPHORE_MSG_QUEUE_SIZE];
+    (void)arg;
+    msg_init_queue(msg_queue, SEMAPHORE_MSG_QUEUE_SIZE);
+    sem_wait(&s2);
+    puts("Thread 2 woke up after waiting for s2.");
+    sem_wait(&s1);
+    puts("Thread 2 woke up after waiting for s1.");
+    return NULL;
+}
+
+void test3(void)
+{
+    puts("first: sem_init s1");
+    if (sem_init(&s1, 0, 0) < 0) {
+        puts("first: sem_init FAILED");
+    }
+    puts("first: sem_init s2");
+    if (sem_init(&s2, 0, 0) < 0) {
+        puts("first: sem_init FAILED");
+    }
+    puts("first: create thread 1");
+    if (thread_create(test2_thread_stack[0], sizeof(test2_thread_stack[0]),
+                      THREAD_PRIORITY_MAIN - 1, THREAD_CREATE_STACKTEST,
+                      test3_one_two_thread, NULL, "thread 1") < 0) {
+        puts("first: thread create FAILED");
+        return;
+    }
+    puts("first: create thread 2");
+    if (thread_create(test2_thread_stack[1], sizeof(test2_thread_stack[1]),
+                      THREAD_PRIORITY_MAIN - 1, THREAD_CREATE_STACKTEST,
+                      test3_two_one_thread, NULL, "thread 2") < 0) {
+        puts("first: thread create FAILED");
+        return;
+    }
+    puts("------------------------------------------");
+    puts("post s1");
+    sem_post(&s1);
+    puts("post s2");
+    sem_post(&s2);
+    puts("post s2");
+    sem_post(&s2);
+    puts("post s1");
+    sem_post(&s1);
+}
+
+void test4(void)
+{
+    struct timespec abs;
+    uint64_t now, start, stop;
+    const uint64_t exp = 1000000;
+    now = xtimer_now64();
+    abs.tv_sec = (time_t)((now / SEC_IN_USEC) + 1);
+    abs.tv_nsec = (long)((now % SEC_IN_USEC) * 1000);
+    puts("first: sem_init s1");
+    if (sem_init(&s1, 0, 0) < 0) {
+        puts("first: sem_init FAILED");
+    }
+    start = xtimer_now64();
+    puts("first: wait 1 sec for s1");
+    if (sem_timedwait(&s1, &abs) != 0) {
+        if (errno != ETIMEDOUT) {
+            printf("error waiting: %d\n", errno);
+            return;
+        }
+        else {
+            puts("first: timed out");
+        }
+    }
+    stop = xtimer_now64() - start;
+    if (stop < exp) {
+        printf("first: waited only %" PRIu64 " usec => FAILED\n", stop);
+    }
+    printf("first: waited %" PRIu64 " usec\n", stop);
+}
+
 int main(void)
 {
+    msg_init_queue(main_msg_queue, SEMAPHORE_MSG_QUEUE_SIZE);
+    xtimer_init();
     puts("######################### TEST1:");
     test1();
     puts("######################### TEST2:");
     test2();
+    puts("######################### TEST3:");
+    test3();
+    puts("######################### TEST4:");
+    test4();
     puts("######################### DONE");
     return 0;
 }

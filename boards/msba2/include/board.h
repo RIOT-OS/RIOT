@@ -54,6 +54,14 @@ extern "C" {
 /** @} */
 
 /**
+ * @name xtimer tuning values
+ * @{
+ */
+#define XTIMER_OVERHEAD     7
+#define XTIMER_SHOOT_EARLY  3
+/** @} */
+
+/**
  * @brief initialize the board's clock system
  */
 void init_clks1(void);

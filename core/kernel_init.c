@@ -25,13 +25,15 @@
 #include "kernel.h"
 #include "kernel_internal.h"
 #include "sched.h"
-#include "flags.h"
 #include "cpu.h"
 #include "lpm.h"
 #include "thread.h"
-#include "hwtimer.h"
 #include "irq.h"
 #include "log.h"
+
+#ifdef MODULE_SCHEDSTATISTICS
+#include "sched.h"
+#endif
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -50,6 +52,13 @@ static void *main_trampoline(void *arg)
 #ifdef MODULE_AUTO_INIT
     auto_init();
 #endif
+
+#ifdef MODULE_SCHEDSTATISTICS
+    schedstat *stat = &sched_pidlist[thread_getpid()];
+    stat->laststart = 0;
+#endif
+
+    LOG_INFO("main(): This is RIOT! (Version: " RIOT_VERSION ")\n");
 
     main();
     return NULL;
@@ -82,21 +91,16 @@ static char idle_stack[THREAD_STACKSIZE_IDLE];
 void kernel_init(void)
 {
     (void) disableIRQ();
-    LOG_INFO("kernel_init(): This is RIOT! (Version: %s)\n", RIOT_VERSION);
-
-    hwtimer_init();
 
     thread_create(idle_stack, sizeof(idle_stack),
             THREAD_PRIORITY_IDLE,
-            CREATE_WOUT_YIELD | CREATE_STACKTEST,
+            THREAD_CREATE_WOUT_YIELD | THREAD_CREATE_STACKTEST,
             idle_thread, NULL, idle_name);
 
     thread_create(main_stack, sizeof(main_stack),
             THREAD_PRIORITY_MAIN,
-            CREATE_WOUT_YIELD | CREATE_STACKTEST,
+            THREAD_CREATE_WOUT_YIELD | THREAD_CREATE_STACKTEST,
             main_trampoline, NULL, main_name);
-
-    LOG_INFO("kernel_init(): jumping into first task...\n");
 
     cpu_switch_context_exit();
 }

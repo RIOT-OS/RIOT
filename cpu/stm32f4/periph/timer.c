@@ -63,7 +63,7 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
             NVIC_SetPriority(TIMER_1_IRQ_CHAN, TIMER_IRQ_PRIO);
             /* select timer */
             timer = TIMER_1_DEV;
-            timer->PSC = TIMER_0_PRESCALER * ticks_per_us;
+            timer->PSC = TIMER_1_PRESCALER * ticks_per_us;
             break;
 #endif
         case TIMER_UNDEFINED:
@@ -268,24 +268,6 @@ void timer_irq_disable(tim_t dev)
 #if TIMER_1_EN
         case TIMER_1:
             NVIC_DisableIRQ(TIMER_1_IRQ_CHAN);
-            break;
-#endif
-        case TIMER_UNDEFINED:
-            break;
-    }
-}
-
-void timer_reset(tim_t dev)
-{
-    switch (dev) {
-#if TIMER_0_EN
-        case TIMER_0:
-            TIMER_0_DEV->CNT = 0;
-            break;
-#endif
-#if TIMER_1_EN
-        case TIMER_1:
-            TIMER_1_DEV->CNT = 0;
             break;
 #endif
         case TIMER_UNDEFINED:

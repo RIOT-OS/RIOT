@@ -1,5 +1,8 @@
-ifneq (,$(filter pnet,$(USEMODULE)))
-    DIRS += posix/pnet
+ifneq (,$(filter posix_semaphore,$(USEMODULE)))
+    DIRS += posix/semaphore
+endif
+ifneq (,$(filter posix_sockets,$(USEMODULE)))
+    DIRS += posix/sockets
 endif
 ifneq (,$(filter pthread,$(USEMODULE)))
     DIRS += posix/pthread
@@ -15,6 +18,9 @@ ifneq (,$(filter routing,$(USEMODULE)))
 endif
 ifneq (,$(filter oneway_malloc,$(USEMODULE)))
     DIRS += oneway-malloc
+endif
+ifneq (,$(filter ipv4_addr,$(USEMODULE)))
+    DIRS += net/network_layer/ipv4/addr
 endif
 ifneq (,$(filter ipv6_addr,$(USEMODULE)))
     DIRS += net/network_layer/ipv6/addr
@@ -40,17 +46,20 @@ endif
 ifneq (,$(filter nhdp,$(USEMODULE)))
     DIRS += net/routing/nhdp
 endif
+ifneq (,$(filter gnrc_netdev2,$(USEMODULE)))
+    DIRS += net/gnrc/link_layer/netdev2
+endif
 ifneq (,$(filter fib,$(USEMODULE)))
     DIRS += net/network_layer/fib
 endif
 ifneq (,$(filter sixlowpan,$(USEMODULE)))
     DIRS += net/network_layer/sixlowpan
 endif
-ifneq (,$(filter hwtimer_compat,$(USEMODULE)))
-    DIRS += compat/hwtimer
-endif
 ifneq (,$(filter log_%,$(USEMODULE)))
     DIRS += log
+endif
+ifneq (,$(filter vtimer,$(USEMODULE)))
+    DIRS += compat/vtimer
 endif
 ifneq (,$(filter cpp11-compat,$(USEMODULE)))
     DIRS += cpp11-compat
@@ -59,8 +68,15 @@ ifneq (,$(filter udp,$(USEMODULE)))
     DIRS += net/transport_layer/udp
 endif
 
+ifneq (,$(filter hamming256,$(USEMODULE)))
+    DIRS += ecc/hamming256
+endif
+
 ifneq (,$(filter netopt,$(USEMODULE)))
     DIRS += net/crosslayer/netopt
+endif
+ifneq (,$(filter sema,$(USEMODULE)))
+    DIRS += sema
 endif
 
 DIRS += $(dir $(wildcard $(addsuffix /Makefile, ${USEMODULE})))

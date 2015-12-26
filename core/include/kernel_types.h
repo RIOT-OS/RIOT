@@ -15,7 +15,7 @@
  *
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  * @author      René Kijewski <rene.kijewski@fu-berlin.de>
- * @author      Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ * @author      Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  */
 
 #ifndef KERNEL_TYPES_H

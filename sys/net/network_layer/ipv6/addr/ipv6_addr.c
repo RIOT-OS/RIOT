@@ -19,6 +19,12 @@
 
 #include "net/ipv6/addr.h"
 
+bool ipv6_addr_equal(const ipv6_addr_t *a, const ipv6_addr_t *b)
+{
+    return (a->u64[0].u64 == b->u64[0].u64) &&
+           (a->u64[1].u64 == b->u64[1].u64);
+}
+
 uint8_t ipv6_addr_match_prefix(const ipv6_addr_t *a, const ipv6_addr_t *b)
 {
     uint8_t prefix_len = 0;
@@ -77,6 +83,29 @@ void ipv6_addr_init_prefix(ipv6_addr_t *out, const ipv6_addr_t *prefix,
         out->u8[bytes] |= (prefix->u8[bytes] & mask);
     }
 }
+
+void ipv6_addr_init_iid(ipv6_addr_t *out, const uint8_t *iid, uint8_t bits)
+{
+    uint8_t unaligned_bits, bytes, pos;
+
+    if (bits > 128) {
+        bits = 128;
+    }
+
+    unaligned_bits = bits % 8;
+    bytes = bits / 8;
+    pos = (IPV6_ADDR_BIT_LEN / 8) - bytes;
+
+    if (unaligned_bits) {
+        uint8_t mask = 0xff << unaligned_bits;
+        out->u8[pos - 1] &= mask;
+        out->u8[pos - 1] |= (*iid & ~mask);
+        iid++;
+    }
+
+    memcpy(&(out->u8[pos]), iid, bytes);
+}
+
 /**
  * @}
  */

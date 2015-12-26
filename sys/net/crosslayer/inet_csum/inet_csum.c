@@ -20,7 +20,7 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-uint16_t inet_csum(uint16_t sum, const uint8_t *buf, uint16_t len)
+uint16_t inet_csum_slice(uint16_t sum, const uint8_t *buf, uint16_t len, size_t accum_len)
 {
     uint32_t csum = sum;
 
@@ -34,14 +34,23 @@ uint16_t inet_csum(uint16_t sum, const uint8_t *buf, uint16_t len)
 #endif
 #endif
 
+    if (len == 0)
+        return csum;
+
+    if (accum_len & 1) {      /* if accumulated length is odd */
+        csum += *buf;         /* add first byte as bottom half of 16-byte word */
+        buf++;
+        len--;
+        accum_len++;
+    }
+
     for (int i = 0; i < (len >> 1); buf += 2, i++) {
         csum += (*buf << 8) + *(buf + 1);   /* group bytes by 16-byte words
                                              * and add them*/
     }
 
-    if (len & 1) {                      /* if len is odd */
-        csum += (*buf << 8);            /* add last byte as top half of 16-byte word */
-    }
+    if ((accum_len + len) & 1)      /* if accumulated length is odd */
+        csum += (*buf << 8);        /* add last byte as top half of 16-byte word */
 
     while (csum >> 16) {
         uint16_t carry = csum >> 16;

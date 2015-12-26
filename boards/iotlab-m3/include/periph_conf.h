@@ -95,8 +95,8 @@ extern "C" {
 #define UART_0_ISR          isr_usart1
 #define UART_0_BUS_FREQ     72000000
 /* UART 0 pin configuration */
-#define UART_0_RX_PIN       GPIO(PORT_A,10)
-#define UART_0_TX_PIN       GPIO(PORT_A,9)
+#define UART_0_RX_PIN       GPIO_PIN(PORT_A,10)
+#define UART_0_TX_PIN       GPIO_PIN(PORT_A,9)
 
 /* UART 1 device configuration */
 #define UART_1_DEV          USART2
@@ -105,8 +105,8 @@ extern "C" {
 #define UART_1_ISR          isr_usart2
 #define UART_1_BUS_FREQ     36000000
 /* UART 1 pin configuration */
-#define UART_1_RX_PIN       GPIO(PORT_A,3)
-#define UART_1_TX_PIN       GPIO(PORT_A,2)
+#define UART_1_RX_PIN       GPIO_PIN(PORT_A,3)
+#define UART_1_TX_PIN       GPIO_PIN(PORT_A,2)
 /** @} */
 
 /**
@@ -117,14 +117,14 @@ extern "C" {
 #define SPI_0_EN            1
 
 /* SPI 0 device configuration */
-#define SPI_0_DEV               SPI1
-#define SPI_0_CLKEN()           (RCC->APB2ENR |= RCC_APB2ENR_SPI1EN)
-#define SPI_0_CLKDIS()          (RCC->APB2ENR &= ~(RCC_APB2ENR_SPI1EN))
-#define SPI_0_BUS_DIV           1   /* 1 -> SPI runs with full CPU clock, 0 -> half CPU clock */
+#define SPI_0_DEV           SPI1
+#define SPI_0_CLKEN()       (RCC->APB2ENR |= RCC_APB2ENR_SPI1EN)
+#define SPI_0_CLKDIS()      (RCC->APB2ENR &= ~(RCC_APB2ENR_SPI1EN))
+#define SPI_0_BUS_DIV       1   /* 1 -> SPI runs with full CPU clock, 0 -> half CPU clock */
 /* SPI 0 pin configuration */
-#define SPI_0_CLK_PIN           GPIO(PORT_A,5)
-#define SPI_0_MOSI_PIN          GPIO(PORT_A,7)
-#define SPI_0_MISO_PIN          GPIO(PORT_A,6)
+#define SPI_0_CLK_PIN       GPIO_PIN(PORT_A,5)
+#define SPI_0_MOSI_PIN      GPIO_PIN(PORT_A,7)
+#define SPI_0_MISO_PIN      GPIO_PIN(PORT_A,6)
 /** @} */
 
 /**
@@ -160,8 +160,8 @@ extern "C" {
 #define I2C_0_ERR_IRQ       I2C1_ER_IRQn
 #define I2C_0_ERR_ISR       isr_i2c1_er
 /* I2C 0 pin configuration */
-#define I2C_0_SCL_PIN       GPIO(PORT_B,6)
-#define I2C_0_SDA_PIN       GPIO(PORT_B,7)
+#define I2C_0_SCL_PIN       GPIO_PIN(PORT_B,6)
+#define I2C_0_SDA_PIN       GPIO_PIN(PORT_B,7)
 /** @} */
 
 #ifdef __cplusplus

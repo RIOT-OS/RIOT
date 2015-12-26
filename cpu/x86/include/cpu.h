@@ -51,22 +51,6 @@ extern "C" {
 /** @} */
 
 /**
- * @brief Disable interrupts
- */
-static inline void __attribute__((always_inline)) dINT(void)
-{
-    asm volatile ("cli");
-}
-
-/**
- * @brief Enable interrupts
- */
-static inline void __attribute__((always_inline)) eINT(void)
-{
-    asm volatile ("sti");
-}
-
-/**
  * @brief   Disable interrupts and halt forever.
  *
  * This function is the last resort in case of an unrecoverable error.
@@ -132,6 +116,16 @@ void x86_init_board(void);
  * The regions are expected to contain memory that lies inside the elf sections.
  */
 bool x86_get_memory_region(uint64_t *start, uint64_t *len, unsigned long *cnt);
+
+/**
+ * @brief   Prints the last instruction's address
+ */
+static inline void cpu_print_last_instruction(void)
+{
+    void *p;
+    __asm__("1: mov 1b, %0" : "=r" (p));
+    printf("%p\n", p);
+}
 
 #ifdef __cplusplus
 }

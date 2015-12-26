@@ -220,16 +220,33 @@ int timer_clear(tim_t dev, int channel)
 
 unsigned int timer_read(tim_t dev)
 {
+    unsigned a, b;
     switch (dev) {
 #if TIMER_0_EN
         case TIMER_0:
-            return (((unsigned int)(0xffff & TIMER_0_DEV_0->CNT)) | (TIMER_0_DEV_1->CNT<<16));
-            break;
+            /* do OR'ing two times and only use value if results are equal.
+             * otherwise, the lower 16bit counter could overflow while the
+             * upper counter is read, leading to an incorrect result. */
+            do {
+                a = (((unsigned int)(0xffff & TIMER_0_DEV_0->CNT)) |
+                        (TIMER_0_DEV_1->CNT<<16));
+                b = (((unsigned int)(0xffff & TIMER_0_DEV_0->CNT)) |
+                        (TIMER_0_DEV_1->CNT<<16));
+            } while (a!=b);
+
+            return a;
 #endif
 #if TIMER_1_EN
         case TIMER_1:
-            return (((unsigned int)(0xffff & TIMER_1_DEV_0->CNT)) | (TIMER_1_DEV_1->CNT<<16));
-            break;
+             /* see above about why loop is needed */
+            do {
+                a = (((unsigned int)(0xffff & TIMER_1_DEV_0->CNT)) |
+                        (TIMER_1_DEV_1->CNT<<16));
+                b = (((unsigned int)(0xffff & TIMER_1_DEV_0->CNT)) |
+                        (TIMER_1_DEV_1->CNT<<16));
+            } while (a!=b);
+
+            return a;
 #endif
         case TIMER_UNDEFINED:
         default:
@@ -318,27 +335,6 @@ void timer_irq_disable(tim_t dev)
             break;
     }
 }
-
-void timer_reset(tim_t dev)
-{
-    switch (dev) {
-#if TIMER_0_EN
-        case TIMER_0:
-            TIMER_0_DEV_0->CNT = 0;
-            TIMER_0_DEV_1->CNT = 0;
-            break;
-#endif
-#if TIMER_1_EN
-        case TIMER_1:
-            TIMER_1_DEV_0->CNT = 0;
-            TIMER_1_DEV_1->CNT = 0;
-            break;
-#endif
-        case TIMER_UNDEFINED:
-            break;
-    }
-}
-
 
 #if TIMER_0_EN
 void TIMER_0_ISR_0(void)

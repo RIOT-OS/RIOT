@@ -3,18 +3,7 @@ include ../Makefile.tests_common
 
 FEATURES_REQUIRED = periph_uart periph_gpio
 
-BOARD_INSUFFICIENT_RAM := stm32f0discovery
-
-# Define default pin mappings for some boards:
-ifneq (,$(filter stm32f0discovery,$(BOARD)))
-  export XBEE_UART ?= UART_1
-endif
-ifneq (,$(filter stm32f4discovery,$(BOARD)))
-  export XBEE_UART ?= UART_1
-endif
-ifneq (,$(filter nucleo-f091,$(BOARD)))
-  export XBEE_UART ?= UART_1
-endif
+BOARD_INSUFFICIENT_MEMORY := stm32f0discovery weio
 
 USEMODULE += xbee
 USEMODULE += gnrc_netif
@@ -24,12 +13,11 @@ USEMODULE += gnrc_pktdump
 USEMODULE += shell
 USEMODULE += shell_commands
 
-ifneq (,$(XBEE_UART))
-  CFLAGS += -DXBEE_UART=$(XBEE_UART)
-else
-  # set default
-  CFLAGS += -DXBEE_UART=UART_0
-endif
+# set default UART to use in case none was defined
+XBEE_UART ?= "UART_NUMOF-1"
+
+# export UART to params file
+CFLAGS += -DXBEE_UART=$(XBEE_UART)
 
 # add current directory to the include path. Putting it in CFLAGS will make
 # it go to the beginning, before the standard includes.

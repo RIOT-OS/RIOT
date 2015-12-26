@@ -141,12 +141,15 @@ int gpio_init_int(gpio_t pin, gpio_pp_t pullup, gpio_flank_t flank,
     /* save callback */
     gpio_config[exti].cb = cb;
     gpio_config[exti].arg = arg;
-    /* configure ping as input and set MUX to peripheral function A */
+    /* configure pin as input and set MUX to peripheral function A */
     gpio_init(pin, GPIO_DIR_IN, pullup);
     gpio_init_mux(pin, GPIO_MUX_A);
     /* enable clocks for the EIC module */
     PM->APBAMASK.reg |= PM_APBAMASK_EIC;
-    GCLK->CLKCTRL.reg = (EIC_GCLK_ID | GCLK_CLKCTRL_CLKEN);
+    GCLK->CLKCTRL.reg = (EIC_GCLK_ID |
+                         GCLK_CLKCTRL_CLKEN |
+                         GCLK_CLKCTRL_GEN_GCLK0);
+    while (GCLK->STATUS.bit.SYNCBUSY);
     /* configure the active flank */
     EIC->CONFIG[exti >> 3].reg &= ~(0xf << ((exti & 0x7) * 4));
     EIC->CONFIG[exti >> 3].reg |=  (flank << ((exti & 0x7) * 4));
@@ -222,7 +225,9 @@ void isr_eic(void)
     for (int i = 0; i < NUMOF_IRQS; i++) {
         if (EIC->INTFLAG.reg & (1 << i)) {
             EIC->INTFLAG.reg = (1 << i);
-            gpio_config[i].cb(gpio_config[i].arg);
+            if(EIC->INTENSET.reg & (1 << i)) {
+                gpio_config[i].cb(gpio_config[i].arg);
+            }
         }
     }
     if (sched_context_switch_request) {

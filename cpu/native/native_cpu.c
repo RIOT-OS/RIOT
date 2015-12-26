@@ -4,7 +4,7 @@
  * in-process preemptive context switching utilizes POSIX ucontexts.
  * (ucontext provides for architecture independent stack handling)
  *
- * Copyright (C) 2013 Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ * Copyright (C) 2013 Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -13,7 +13,7 @@
  * @ingroup native_cpu
  * @{
  * @file
- * @author  Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ * @author  Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  */
 
 #include <stdio.h>
@@ -49,9 +49,9 @@
 #include "cpu.h"
 #include "cpu_conf.h"
 
-#ifdef MODULE_DEV_ETH_TAP
-#include "dev_eth_tap.h"
-extern dev_eth_tap_t dev_eth_tap;
+#ifdef MODULE_NETDEV2_TAP
+#include "netdev2_tap.h"
+extern netdev2_tap_t netdev2_tap;
 #endif
 
 #include "native_internal.h"
@@ -62,21 +62,14 @@ extern dev_eth_tap_t dev_eth_tap;
 ucontext_t end_context;
 char __end_stack[SIGSTKSZ];
 
-#ifdef MODULE_UART0
-fd_set _native_rfds;
-#endif
-
 int reboot_arch(int mode)
 {
     (void) mode;
 
     printf("\n\n\t\t!! REBOOT !!\n\n");
-#ifdef MODULE_UART0
-    /* TODO: close stdio fds */
-#endif
 
-#ifdef MODULE_DEV_ETH_TAP
-    dev_eth_tap_cleanup(&dev_eth_tap);
+#ifdef MODULE_NETDEV2_TAP
+    netdev2_tap_cleanup(&netdev2_tap);
 #endif
 
     if (real_execve(_native_argv[0], _native_argv, NULL) == -1) {

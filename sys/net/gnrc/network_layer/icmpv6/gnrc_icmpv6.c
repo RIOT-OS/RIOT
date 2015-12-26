@@ -42,7 +42,7 @@ static inline uint16_t _calc_csum(gnrc_pktsnip_t *hdr,
     uint16_t len = (uint16_t)hdr->size;
 
     while (payload && (payload != hdr)) {
-        csum = inet_csum(csum, payload->data, payload->size);
+        csum = inet_csum_slice(csum, payload->data, payload->size, len);
         len += (uint16_t)payload->size;
         payload = payload->next;
     }
@@ -87,14 +87,19 @@ void gnrc_icmpv6_demux(kernel_pid_t iface, gnrc_pktsnip_t *pkt)
             break;
 #endif
 
+#if (defined(MODULE_GNRC_NDP_ROUTER) || defined(MODULE_GNRC_SIXLOWPAN_ND_ROUTER))
         case ICMPV6_RTR_SOL:
             DEBUG("icmpv6: router solicitation received\n");
-            /* TODO */
+            gnrc_ndp_rtr_sol_handle(iface, pkt, ipv6->data, (ndp_rtr_sol_t *)hdr,
+                                    icmpv6->size);
             break;
+#endif
 
+#ifdef MODULE_GNRC_NDP
         case ICMPV6_RTR_ADV:
             DEBUG("icmpv6: router advertisement received\n");
-            /* TODO */
+            gnrc_ndp_rtr_adv_handle(iface, pkt, ipv6->data, (ndp_rtr_adv_t *)hdr,
+                                    icmpv6->size);
             break;
 
         case ICMPV6_NBR_SOL:
@@ -108,6 +113,7 @@ void gnrc_icmpv6_demux(kernel_pid_t iface, gnrc_pktsnip_t *pkt)
             gnrc_ndp_nbr_adv_handle(iface, pkt, ipv6->data, (ndp_nbr_adv_t *)hdr,
                                     icmpv6->size);
             break;
+#endif
 
         case ICMPV6_REDIRECT:
             DEBUG("icmpv6: redirect message received\n");
@@ -130,11 +136,14 @@ void gnrc_icmpv6_demux(kernel_pid_t iface, gnrc_pktsnip_t *pkt)
         return;
     }
 
-    /* ICMPv6 is not interested anymore so `- 1` */
+    /* IPv6 might still do stuff to the packet, so no `- 1` */
     gnrc_pktbuf_hold(pkt, gnrc_netreg_num(GNRC_NETTYPE_ICMPV6, hdr->type));
 
     while (sendto != NULL) {
-        gnrc_netapi_receive(sendto->pid, pkt);
+        if (gnrc_netapi_receive(sendto->pid, pkt) < 1) {
+            DEBUG("icmpv6: unable to deliver packet\n");
+            gnrc_pktbuf_release(pkt);
+        }
         sendto = gnrc_netreg_getnext(sendto);
     }
 }

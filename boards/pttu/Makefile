@@ -1,4 +1,4 @@
-MODULE =$(BOARD)_base
+MODULE = board
 
 DIRS = $(RIOTBOARD)/msba2-common
 

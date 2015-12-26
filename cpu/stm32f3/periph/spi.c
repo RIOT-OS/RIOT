@@ -18,7 +18,7 @@
  * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
  * @author      Fabian Nack <nack@inf.fu-berlin.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
- * @author      Joakim Gebart <joakim.gebart@eistec.se>
+ * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  *
  * @}
@@ -32,7 +32,6 @@
 #include "periph_conf.h"
 #include "thread.h"
 #include "sched.h"
-#include "vtimer.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"

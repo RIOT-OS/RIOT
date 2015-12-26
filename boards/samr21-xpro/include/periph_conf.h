@@ -23,7 +23,9 @@
 #define PERIPH_CONF_H_
 
 #include <stdint.h>
+
 #include "cpu.h"
+#include "periph_cpu.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -101,19 +103,17 @@ extern "C" {
  * @name UART configuration
  * @{
  */
-#define UART_NUMOF          (1U)
-#define UART_0_EN           1
-#define UART_IRQ_PRIO       1
+static const uart_conf_t uart_config[] = {
+    /* device, RX pin, TX pin, mux */
+    {&SERCOM0->USART, GPIO_PIN(PA,5), GPIO_PIN(PA,4), GPIO_MUX_D},
+    {&SERCOM5->USART, GPIO_PIN(PA,23), GPIO_PIN(PA,22), GPIO_MUX_D},
+};
 
-/* UART 0 device configuration */
-#define UART_0_DEV          SERCOM0->USART
-#define UART_0_IRQ          SERCOM0_IRQn
+/* interrupt function name mapping */
 #define UART_0_ISR          isr_sercom0
-/* UART 0 pin configuration */
-#define UART_0_PORT         (PORT->Group[0])
-#define UART_0_TX_PIN       (4)
-#define UART_0_RX_PIN       (5)
-#define UART_0_PINS         (PORT_PA04 | PORT_PA05)
+#define UART_1_ISR          isr_sercom5
+
+#define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
 /** @} */
 
 /**
@@ -128,43 +128,21 @@ extern "C" {
 #define PWM_0_CHANNELS      PWM_MAX_CHANNELS
 #define PWM_1_CHANNELS      PWM_MAX_CHANNELS
 
-/**
- * @brief PWM channel configuration data structure
- *
- * TODO: this should be moved into the CPU folder
- */
-typedef struct {
-    PortGroup *port;            /**< GPIO port */
-    uint8_t pin;                /**< GPIO pin */
-    uint8_t fnct;               /**< pin function multiplex value */
-    uint8_t chan;               /**< TCC channel to use */
-} pwm_conf_chan_t;
-
-/**
- * @brief PWM device configuration data structure
- *
- * TODO: this should be moved into the CPU folder
- */
-typedef struct {
-    Tcc *dev;                   /*< TCC device to use */
-    pwm_conf_chan_t chan[2];    /**< channel configuration */
-} pwm_conf_t;
-
 /* PWM device configuration */
 #if PWM_NUMOF
 static const pwm_conf_t pwm_config[] = {
 #if PWM_0_EN
     {TCC1, {
-        /* port , pin, AF, chan */
-        {(PortGroup *)0x41004400, 6, 4, 0},
-        {(PortGroup *)0x41004400, 7, 4, 1}
+        /* GPIO pin, MUX value, TCC channel */
+        {GPIO_PIN(PA, 6), GPIO_MUX_E, 0},
+        {GPIO_PIN(PA, 7), GPIO_MUX_E, 1}
     }},
 #endif
 #if PWM_1_EN
     {TCC0, {
-        /* port , pin, AF, chan */
-        {(PortGroup *)0x41004400, 18, 5, 2},
-        {(PortGroup *)0x41004400, 19, 5, 3}
+        /* GPIO pin, MUX value, TCC channel */
+        {GPIO_PIN(PA, 18), GPIO_MUX_F, 2},
+        {GPIO_PIN(PA, 19), GPIO_MUX_F, 3}
     }},
 #endif
 };

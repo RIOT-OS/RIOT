@@ -13,7 +13,7 @@
  * @file
  * @brief       Test application for the ADT7310 accelerometer driver
  *
- * @author      Joakim Gebart <joakim.gebart@eistec.se
+ * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se
  *
  * @}
  */
@@ -23,7 +23,7 @@
 #include <stdlib.h>
 
 #include "board.h"
-#include "vtimer.h"
+#include "xtimer.h"
 #include "periph/spi.h"
 #include "adt7310.h"
 
@@ -126,7 +126,7 @@ int main(void)
             {
                 return 1;
             }
-            vtimer_usleep(SLEEP_CONT);
+            xtimer_usleep(SLEEP_CONT);
         }
         puts("Set mode to 1SPS, 13 bit... ");
         if (adt7310_set_config(&dev, ADT7310_MODE_1SPS) == 0) {
@@ -144,7 +144,7 @@ int main(void)
             {
                 return 1;
             }
-            vtimer_usleep(SLEEP_1SPS);
+            xtimer_usleep(SLEEP_1SPS);
         }
     }
 

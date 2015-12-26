@@ -20,8 +20,8 @@
  * @author      Frank Holtz <frank-riot2015@holtznet.de>
  */
 
-#ifndef __BOARD_H
-#define __BOARD_H
+#ifndef BOARD_H
+#define BOARD_H
 
 #include "cpu.h"
 
@@ -42,11 +42,6 @@ extern "C" {
 #define STDIO_BAUDRATE      (115200U)
 #define STDIO_RX_BUFSIZE    (64U)
 /** @} */
-
-/**
- * @name Assign the hardware timer
- */
-#define HW_TIMER            TIMER_0
 
 /**
  * @name    LED pin definitions
@@ -82,5 +77,5 @@ void board_init(void);
 }
 #endif
 
-#endif /** __BOARD_H */
+#endif /** BOARD_H */
 /** @} */

@@ -8,7 +8,7 @@
 
 /**
  * @defgroup    drivers_at86rf2xx AT86RF2xx based drivers
- * @ingroup     drivers
+ * @ingroup     drivers_netdev
  *
  * This module contains drivers for radio devices in Atmel's AT86RF2xx series.
  * The driver is aimed to work with all devices of this series.
@@ -21,6 +21,9 @@
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      Daniel Krebs <github@daniel-krebs.net>
+ * @author      Kévin Roussel <Kevin.Roussel@inria.fr>
+ * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
 #ifndef AT86RF2XX_H_
@@ -32,7 +35,6 @@
 #include "periph/spi.h"
 #include "periph/gpio.h"
 #include "net/gnrc/netdev.h"
-#include "at86rf2xx.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -80,6 +82,11 @@ extern "C" {
 #define AT86RF2XX_DEFAULT_TXPOWER       (0U)
 
 /**
+ * @brief   Base (minimal) RSSI value in dBm
+ */
+#define RSSI_BASE_VAL                   (-91)
+
+/**
  * @brief   Flags for device internal states (see datasheet)
  * @{
  */
@@ -119,16 +126,6 @@ extern "C" {
 /** @} */
 
 /**
-  * @brief   Frequency configuration for sub-GHz devices.
-  * @{
-  */
-typedef enum {
-    AT86RF2XX_FREQ_915MHZ,       /**< frequency 915MHz enabled */
-    AT86RF2XX_FREQ_868MHZ,       /**< frequency 868MHz enabled */
-} at86rf2xx_freq_t;
-/** @} */
-
-/**
  * @brief   Device descriptor for AT86RF2XX radio devices
  */
 typedef struct {
@@ -147,9 +144,10 @@ typedef struct {
     uint8_t seq_nr;                     /**< sequence number to use next */
     uint8_t frame_len;                  /**< length of the current TX frame */
     uint16_t pan;                       /**< currently used PAN ID */
-    uint8_t chan;                       /**< currently used channel */
+    uint8_t chan;                       /**< currently used channel number */
 #ifdef MODULE_AT86RF212B
-    at86rf2xx_freq_t freq;              /**< currently used frequency */
+    /* Only AT86RF212B supports multiple pages (PHY modes) */
+    uint8_t page;                       /**< currently used channel page */
 #endif
     uint8_t addr_short[2];              /**< the radio's short address */
     uint8_t addr_long[8];               /**< the radio's long address */
@@ -239,40 +237,38 @@ uint64_t at86rf2xx_get_addr_long(at86rf2xx_t *dev);
 void at86rf2xx_set_addr_long(at86rf2xx_t *dev, uint64_t addr);
 
 /**
- * @brief   Get the configured channel of the given device
+ * @brief   Get the configured channel number of the given device
  *
  * @param[in] dev           device to read from
  *
- * @return                  the currently set channel
+ * @return                  the currently set channel number
  */
 uint8_t at86rf2xx_get_chan(at86rf2xx_t *dev);
 
 /**
- * @brief   Set the channel of the given device
+ * @brief   Set the channel number of the given device
  *
  * @param[in] dev           device to write to
- * @param[in] chan          channel to set
+ * @param[in] chan          channel number to set
  */
 void at86rf2xx_set_chan(at86rf2xx_t *dev, uint8_t chan);
 
-#ifdef MODULE_AT86RF212B
 /**
- * @brief   Get the configured frequency of the given device
+ * @brief   Get the configured channel page of the given device
  *
  * @param[in] dev           device to read from
  *
- * @return                  the currently set frequency
+ * @return                  the currently set channel page
  */
-at86rf2xx_freq_t at86rf2xx_get_freq(at86rf2xx_t *dev);
+uint8_t at86rf2xx_get_page(at86rf2xx_t *dev);
 
 /**
- * @brief   Set the frequency of the given device
+ * @brief   Set the channel page of the given device
  *
  * @param[in] dev           device to write to
- * @param[in] chan          frequency to set
+ * @param[in] page          channel page to set
  */
-void at86rf2xx_set_freq(at86rf2xx_t *dev, at86rf2xx_freq_t freq);
-#endif
+void at86rf2xx_set_page(at86rf2xx_t *dev, uint8_t page);
 
 /**
  * @brief   Get the configured PAN ID of the given device
@@ -333,6 +329,65 @@ uint8_t at86rf2xx_get_max_retries(at86rf2xx_t *dev);
  * @param[in] max           the maximum number of retransmissions
  */
 void at86rf2xx_set_max_retries(at86rf2xx_t *dev, uint8_t max);
+
+/**
+ * @brief   Get the maximum number of channel access attempts per frame (CSMA)
+ *
+ * @param[in] dev           device to read from
+ *
+ * @return                  configured number of retries
+ */
+uint8_t at86rf2xx_get_csma_max_retries(at86rf2xx_t *dev);
+
+/**
+ * @brief   Set the maximum number of channel access attempts per frame (CSMA)
+ *
+ * This setting specifies the number of attempts to access the channel to
+ * transmit a frame. If the channel is busy @p retries times, then frame
+ * transmission fails.
+ * Valid values: 0 to 5, -1 means CSMA disabled
+ *
+ * @param[in] dev           device to write to
+ * @param[in] retries       the maximum number of retries
+ */
+void at86rf2xx_set_csma_max_retries(at86rf2xx_t *dev, int8_t retries);
+
+/**
+ * @brief   Set the min and max backoff exponent for CSMA/CA
+ *
+ * - Maximum BE: 0 - 8
+ * - Minimum BE: 0 - [max]
+ *
+ * @param[in] dev           device to write to
+ * @param[in] min           the minimum BE
+ * @param[in] max           the maximum BE
+ */
+void at86rf2xx_set_csma_backoff_exp(at86rf2xx_t *dev, uint8_t min, uint8_t max);
+
+/**
+ * @brief   Set seed for CSMA random backoff
+ *
+ * @param[in] dev           device to write to
+ * @param[in] entropy       11 bit of entropy as seed for random backoff
+ */
+void at86rf2xx_set_csma_seed(at86rf2xx_t *dev, uint8_t entropy[2]);
+
+/**
+ * @brief   Get the CCA threshold value
+ *
+ * @param[in] dev           device to read value from
+ *
+ * @return                  the current CCA threshold value
+ */
+int8_t at86rf2xx_get_cca_threshold(at86rf2xx_t *dev);
+
+/**
+ * @brief   Set the CCA threshold value
+ *
+ * @param[in] dev           device to write to
+ * @param[in] value         the new CCA threshold value
+ */
+void at86rf2xx_set_cca_threshold(at86rf2xx_t *dev, int8_t value);
 
 /**
  * @brief   Enable or disable driver specific options

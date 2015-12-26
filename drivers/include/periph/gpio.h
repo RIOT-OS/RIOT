@@ -7,8 +7,8 @@
  */
 
 /**
- * @defgroup    driver_periph_gpio GPIO
- * @ingroup     driver_periph
+ * @defgroup    drivers_periph_gpio GPIO
+ * @ingroup     drivers_periph
  * @brief       Low-level GPIO peripheral driver
  *
  * @{
@@ -22,6 +22,9 @@
 #define GPIO_H
 
 #include "periph_cpu.h"
+#include "periph_conf.h"
+/* TODO: remove once all platforms are ported to this interface */
+#include "periph/dev_enums.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -30,8 +33,8 @@ extern "C" {
 /**
  * @brief   Default GPIO macro maps port-pin tuples to the pin value
  */
-#ifndef GPIO
-#define GPIO(x,y)       ((x & 0) | y)
+#ifndef GPIO_PIN
+#define GPIO_PIN(x,y)       ((x & 0) | y)
 #endif
 
 /**
@@ -54,7 +57,7 @@ typedef int gpio_t;
 #ifndef HAVE_GPIO_DIR_T
 typedef enum {
     GPIO_DIR_IN = 0,        /**< configure pin as input */
-    GPIO_DIR_OUT = 1,       /**< configure pin as output */
+    GPIO_DIR_OUT = 1        /**< configure pin as output */
 } gpio_dir_t;
 #endif
 

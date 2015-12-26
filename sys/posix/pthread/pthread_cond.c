@@ -26,8 +26,6 @@
 #include "irq.h"
 #include "debug.h"
 
-struct vtimer_t timer;
-
 int pthread_cond_condattr_destroy(struct pthread_condattr_t *attr)
 {
     if (attr != NULL) {

@@ -23,7 +23,6 @@
  * @}
  */
 
-#include "hwtimer.h"
 #include "periph/cpuid.h"
 #include "byteorder.h"
 #include "net/ieee802154.h"
@@ -34,9 +33,6 @@
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
-
-
-#define RESET_DELAY             (1U)        /* must be > 625ns */
 
 
 static void _irq_handler(void *arg)
@@ -62,6 +58,7 @@ int at86rf2xx_init(at86rf2xx_t *dev, spi_t spi, spi_speed_t spi_speed,
     dev->sleep_pin = sleep_pin;
     dev->reset_pin = reset_pin;
     dev->idle_state = AT86RF2XX_STATE_TRX_OFF;
+    dev->state = AT86RF2XX_STATE_SLEEP;
 
     /* initialise SPI */
     spi_init_master(dev->spi, SPI_CONF_FIRST_RISING, spi_speed);
@@ -74,6 +71,9 @@ int at86rf2xx_init(at86rf2xx_t *dev, spi_t spi, spi_speed_t spi_speed,
     gpio_set(dev->reset_pin);
     gpio_init_int(dev->int_pin, GPIO_NOPULL, GPIO_RISING, _irq_handler, dev);
 
+    /* make sure device is not sleeping, so we can query part number */
+    at86rf2xx_assert_awake(dev);
+
     /* test if the SPI is set up correctly and the device is responding */
     if (at86rf2xx_reg_read(dev, AT86RF2XX_REG__PART_NUM) !=
         AT86RF2XX_PARTNUM) {
@@ -83,6 +83,7 @@ int at86rf2xx_init(at86rf2xx_t *dev, spi_t spi, spi_speed_t spi_speed,
 
     /* reset device to default values and put it into RX state */
     at86rf2xx_reset(dev);
+
     return 0;
 }
 
@@ -93,12 +94,7 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
     eui64_t addr_long;
 #endif
 
-    /* wake from sleep in case radio is sleeping */
-    gpio_clear(dev->sleep_pin);
-    /* trigger hardware reset */
-    gpio_clear(dev->reset_pin);
-    hwtimer_wait(HWTIMER_TICKS(RESET_DELAY));
-    gpio_set(dev->reset_pin);
+    at86rf2xx_hardware_reset(dev);
 
     /* Reset state machine to ensure a known state */
     at86rf2xx_reset_state_machine(dev);
@@ -152,13 +148,20 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_CTRL_2,
                         AT86RF2XX_TRX_CTRL_2_MASK__RX_SAFE_MODE);
 #ifdef MODULE_AT86RF212B
-    at86rf2xx_set_freq(dev, AT86RF2XX_FREQ_915MHZ);
+    at86rf2xx_set_page(dev, 0);
 #endif
 
     /* don't populate masked interrupt flags to IRQ_STATUS register */
     uint8_t tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_CTRL_1);
     tmp &= ~(AT86RF2XX_TRX_CTRL_1_MASK__IRQ_MASK_MODE);
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_CTRL_1, tmp);
+
+    /* disable clock output to save power */
+    tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_CTRL_0);
+    tmp &= ~(AT86RF2XX_TRX_CTRL_0_MASK__CLKM_CTRL);
+    tmp &= ~(AT86RF2XX_TRX_CTRL_0_MASK__CLKM_SHA_SEL);
+    tmp |= (AT86RF2XX_TRX_CTRL_0_CLKM_CTRL__OFF);
+    at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_CTRL_0, tmp);
 
     /* enable interrupts */
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK,
@@ -176,6 +179,8 @@ bool at86rf2xx_cca(at86rf2xx_t *dev)
 {
     uint8_t tmp;
     uint8_t status;
+
+    at86rf2xx_assert_awake(dev);
 
     /* trigger CCA measurment */
     tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__PHY_CC_CCA);
@@ -246,9 +251,11 @@ void at86rf2xx_tx_exec(at86rf2xx_t *dev)
 
 size_t at86rf2xx_rx_len(at86rf2xx_t *dev)
 {
-    uint8_t res;
-    at86rf2xx_fb_read(dev, &res, 1);
-    return (size_t)(res - 2);           /* extract the PHR and LQI field */
+    uint8_t phr;
+    at86rf2xx_fb_read(dev, &phr, 1);
+
+    /* ignore MSB (refer p.80) and substract length of FCS field */
+    return (size_t)((phr & 0x7f) - 2);
 }
 
 void at86rf2xx_rx_read(at86rf2xx_t *dev, uint8_t *data, size_t len,

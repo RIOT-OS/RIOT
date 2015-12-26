@@ -19,7 +19,6 @@
  *  * AES-128
  *  * 3DES
  *  * Twofish
- *  * Skipjack
  *  * NULL
  *
  * You can use them directly by adding "crypto" to your USEMODULE-List.

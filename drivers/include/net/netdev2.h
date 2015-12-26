@@ -10,9 +10,10 @@
  */
 
 /**
- * @defgroup    drivers_netdev2 Low-Level Network Driver Interface
- * @ingroup     drivers
- * @brief       Low-level network driver interface
+ * @defgroup    drivers_netdev_netdev2 Generic Low-Level Network Driver Interface v2
+ * @ingroup     drivers_netdev
+ * @brief       This is the second version of a generic low-level network
+ *              driver interface
  * @{
  *
  * This interface is supposed to be a low-level interface for network drivers.
@@ -65,6 +66,8 @@ typedef enum {
     NETDEV2_EVENT_RX_COMPLETE,   /**< finished receiving a packet */
     NETDEV2_EVENT_TX_STARTED,    /**< started to transfer a packet */
     NETDEV2_EVENT_TX_COMPLETE,   /**< finished transferring packet */
+    NETDEV2_EVENT_LINK_UP,       /**< link established */
+    NETDEV2_EVENT_LINK_DOWN,     /**< link gone */
     /* expand this list if needed */
 } netdev2_event_t;
 

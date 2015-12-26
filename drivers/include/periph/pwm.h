@@ -7,8 +7,8 @@
  */
 
 /**
- * @defgroup    driver_periph_pwm PWM
- * @ingroup     driver_periph
+ * @defgroup    drivers_periph_pwm PWM
+ * @ingroup     drivers_periph
  * @brief       Low-level PWM peripheral driver
  *
  * @{

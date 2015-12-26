@@ -20,7 +20,6 @@
 #define CPU_PERIPH_H_
 
 #include "cpu.h"
-#include "periph/dev_enums.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -43,7 +42,7 @@ typedef uint32_t gpio_t;
  * @brief   Mandatory function for defining a GPIO pins
  * @{
  */
-#define GPIO(x, y)          (((gpio_t)(&PORT->Group[x])) | y)
+#define GPIO_PIN(x, y)      (((gpio_t)(&PORT->Group[x])) | y)
 
 /**
  * @brief   Available ports on the SAMD21
@@ -79,6 +78,45 @@ typedef enum {
     GPIO_MUX_G = 0x6,       /**< select peripheral function G */
     GPIO_MUX_H = 0x7,       /**< select peripheral function H */
 } gpio_mux_t;
+
+/**
+ * @brief   PWM channel configuration data structure
+ */
+typedef struct {
+    gpio_t pin;                 /**< GPIO pin */
+    gpio_mux_t mux;             /**< pin function multiplex value */
+    uint8_t chan;               /**< TCC channel to use */
+} pwm_conf_chan_t;
+
+/**
+ * @brief   PWM device configuration data structure
+ */
+typedef struct {
+    Tcc *dev;                   /**< TCC device to use */
+    pwm_conf_chan_t chan[2];    /**< channel configuration */
+} pwm_conf_t;
+
+/**
+ * @brief   UART device configuration
+ */
+typedef struct {
+    SercomUsart *dev;       /**< pointer to the used UART device */
+    gpio_t rx_pin;          /**< pin used for RX */
+    gpio_t tx_pin;          /**< pin used for TX */
+    gpio_mux_t mux;         /**< alternative function for pins */
+} uart_conf_t;
+
+/**
+ * @brief   Return the numeric id of a SERCOM device derived from its address
+ *
+ * @param[in] sercom    SERCOM device
+ *
+ * @return              numeric id of the given SERCOM device
+ */
+static inline int _sercom_id(SercomUsart *sercom)
+{
+    return ((((uint32_t)sercom) >> 10) & 0x7) - 2;
+}
 
 /**
  * @brief   Set up alternate function (PMUX setting) for a PORT pin

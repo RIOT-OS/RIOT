@@ -33,7 +33,7 @@
 
 #include <stdio.h>
 
-#include "vtimer.h"
+#include "xtimer.h"
 #include "srf08.h"
 #include "periph/i2c.h"
 
@@ -73,7 +73,7 @@ int main(void)
             else {
                 puts("An error occured");
             }
-            vtimer_usleep(SLEEP);
+            xtimer_usleep(SLEEP);
         }
     }
 }

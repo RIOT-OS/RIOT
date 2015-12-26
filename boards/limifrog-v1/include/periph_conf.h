@@ -19,6 +19,8 @@
 #ifndef PERIPH_CONF_H_
 #define PERIPH_CONF_H_
 
+#include "periph_cpu.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -46,23 +48,14 @@ extern "C" {
  * @brief Timer configuration
  * @{
  */
-#define TIMER_NUMOF         (1U)
-#define TIMER_0_EN          1
-#define TIMER_IRQ_PRIO      1
-
-/* Timer 0 configuration */
-#define TIMER_0_DEV_0       TIM2
-#define TIMER_0_DEV_1       TIM3
-#define TIMER_0_CHANNELS    4
-#define TIMER_0_PRESCALER   (32U)
-#define TIMER_0_MAX_VALUE   (0xffff)
-#define TIMER_0_CLKEN()     (RCC->APB1ENR |= (RCC_APB1ENR_TIM2EN | RCC_APB1ENR_TIM3EN))
-#define TIMER_0_ISR_0       isr_tim2
-#define TIMER_0_ISR_1       isr_tim3
-#define TIMER_0_IRQ_CHAN_0  TIM2_IRQn
-#define TIMER_0_IRQ_CHAN_1  TIM3_IRQn
-#define TIMER_0_IRQ_PRIO    1
-#define TIMER_0_TRIG_SEL    TIM_SMCR_TS_0
+static const timer_conf_t timer_config[] = {
+    /* device, RCC bit, IRQ bit */
+    {TIM5, 3, TIM5_IRQn},
+};
+/* interrupt routines */
+#define TIMER_0_ISR         (isr_tim5)
+/* number of defined timers */
+#define TIMER_NUMOF         (sizeof(timer_config) / sizeof(timer_config[0]))
 /** @} */
 
 /**
@@ -80,25 +73,23 @@ extern "C" {
 #define UART_0_CLK          (CLOCK_CORECLOCK)
 #define UART_0_IRQ          USART3_IRQn
 #define UART_0_ISR          isr_usart3
+#define UART_0_BUS_FREQ     32000000
 /* UART 0 pin configuration */
-#define UART_0_PORT         GPIOC
-#define UART_0_PORT_CLKEN() (RCC->AHBENR |= RCC_AHBENR_GPIOCEN)
-#define UART_0_RX_PIN       11
-#define UART_0_TX_PIN       10
-#define UART_0_AF           7
+#define UART_0_RX_PIN       GPIO_PIN(PORT_C, 11)
+#define UART_0_TX_PIN       GPIO_PIN(PORT_C, 10)
+#define UART_0_AF           GPIO_AF7
 
 /* UART 1 device configuration */
-#define UART_1_DEV          USART3        /* Panasonic PAN1740 BLE module */
+#define UART_1_DEV          USART1        /* Panasonic PAN1740 BLE module */
 #define UART_1_CLKEN()      (RCC->APB2ENR |= RCC_APB2ENR_USART1EN)
 #define UART_1_CLK          (CLOCK_CORECLOCK)
 #define UART_1_IRQ          USART1_IRQn
 #define UART_1_ISR          isr_usart1
+#define UART_0_BUS_FREQ     32000000
 /* UART 1 pin configuration */
-#define UART_1_PORT         GPIOA
-#define UART_1_PORT_CLKEN() (RCC->AHBENR |= RCC_AHBENR_GPIOAEN)
-#define UART_1_RX_PIN       10
-#define UART_1_TX_PIN       9
-#define UART_1_AF           7
+#define UART_1_RX_PIN       GPIO_PIN(PORT_A, 10)
+#define UART_1_TX_PIN       GPIO_PIN(PORT_A, 9)
+#define UART_1_AF           GPIO_AF7
 /** @} */
 
 /**

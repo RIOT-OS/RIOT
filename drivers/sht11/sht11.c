@@ -25,7 +25,7 @@
 #include <stdio.h>
 #include <stdint.h>
 
-#include "hwtimer.h"
+#include "xtimer.h"
 #include "mutex.h"
 #include "sht11.h"
 #include "sht11-board.h"
@@ -84,9 +84,9 @@ mutex_t sht11_mutex = MUTEX_INIT;
 static inline void clk_signal(void)
 {
     SHT11_SCK_HIGH;
-    hwtimer_wait(SHT11_CLK_WAIT);
+    xtimer_usleep(SHT11_CLK_WAIT);
     SHT11_SCK_LOW;
-    hwtimer_wait(SHT11_CLK_WAIT);
+    xtimer_usleep(SHT11_CLK_WAIT);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -101,11 +101,11 @@ static uint8_t write_byte(uint8_t value)
     for (i = 0; i < 8; i++) {
         if (value & BIT7) {
             SHT11_DATA_HIGH;
-            hwtimer_wait(SHT11_DATA_WAIT);
+            xtimer_usleep(SHT11_DATA_WAIT);
         }
         else {
             SHT11_DATA_LOW;
-            hwtimer_wait(SHT11_DATA_WAIT);
+            xtimer_usleep(SHT11_DATA_WAIT);
         }
 
         /* trigger clock signal */
@@ -117,7 +117,7 @@ static uint8_t write_byte(uint8_t value)
 
     /* wait for ack */
     SHT11_DATA_IN;
-    hwtimer_wait(SHT11_CLK_WAIT);
+    xtimer_usleep(SHT11_CLK_WAIT);
     ack = SHT11_DATA;
 
     clk_signal();
@@ -131,13 +131,13 @@ static uint8_t read_byte(uint8_t ack)
     uint8_t value = 0;
 
     SHT11_DATA_IN;
-    hwtimer_wait(SHT11_DATA_WAIT);
+    xtimer_usleep(SHT11_DATA_WAIT);
 
     /* read value bit by bit */
     for (i = 0; i < 8; i++) {
         value = value << 1;
         SHT11_SCK_HIGH;
-        hwtimer_wait(SHT11_CLK_WAIT);
+        xtimer_usleep(SHT11_CLK_WAIT);
 
         if (SHT11_DATA) {
             /* increase data by one when DATA is high */
@@ -145,7 +145,7 @@ static uint8_t read_byte(uint8_t ack)
         }
 
         SHT11_SCK_LOW;
-        hwtimer_wait(SHT11_CLK_WAIT);
+        xtimer_usleep(SHT11_CLK_WAIT);
     }
 
     /* send ack if necessary */
@@ -153,11 +153,11 @@ static uint8_t read_byte(uint8_t ack)
 
     if (ack) {
         SHT11_DATA_LOW;
-        hwtimer_wait(SHT11_DATA_WAIT);
+        xtimer_usleep(SHT11_DATA_WAIT);
     }
     else {
         SHT11_DATA_HIGH;
-        hwtimer_wait(SHT11_DATA_WAIT);
+        xtimer_usleep(SHT11_DATA_WAIT);
     }
 
     clk_signal();
@@ -179,27 +179,27 @@ static void transmission_start(void)
 
     /* set initial state */
     SHT11_DATA_HIGH;
-    hwtimer_wait(SHT11_DATA_WAIT);
+    xtimer_usleep(SHT11_DATA_WAIT);
     SHT11_SCK_LOW;
-    hwtimer_wait(SHT11_CLK_WAIT);
+    xtimer_usleep(SHT11_CLK_WAIT);
 
     SHT11_SCK_HIGH;
-    hwtimer_wait(SHT11_CLK_WAIT);
+    xtimer_usleep(SHT11_CLK_WAIT);
 
     SHT11_DATA_LOW;
-    hwtimer_wait(SHT11_DATA_WAIT);
+    xtimer_usleep(SHT11_DATA_WAIT);
 
     SHT11_SCK_LOW;
-    hwtimer_wait(SHT11_CLK_WAIT);
+    xtimer_usleep(SHT11_CLK_WAIT);
 
     SHT11_SCK_HIGH;
-    hwtimer_wait(SHT11_CLK_WAIT);
+    xtimer_usleep(SHT11_CLK_WAIT);
 
     SHT11_DATA_HIGH;
-    hwtimer_wait(SHT11_DATA_WAIT);
+    xtimer_usleep(SHT11_DATA_WAIT);
 
     SHT11_SCK_LOW;
-    hwtimer_wait(SHT11_CLK_WAIT);
+    xtimer_usleep(SHT11_CLK_WAIT);
 }
 /*---------------------------------------------------------------------------*/
 static void connection_reset(void)
@@ -211,9 +211,9 @@ static void connection_reset(void)
     */
     uint8_t i;
     SHT11_DATA_HIGH;
-    hwtimer_wait(SHT11_DATA_WAIT);
+    xtimer_usleep(SHT11_DATA_WAIT);
     SHT11_SCK_LOW;
-    hwtimer_wait(SHT11_CLK_WAIT);
+    xtimer_usleep(SHT11_CLK_WAIT);
 
     for (i = 0; i < 9; i++) {
         clk_signal();
@@ -231,7 +231,7 @@ static uint8_t measure(uint8_t *p_value, uint8_t *p_checksum, uint8_t mode)
     transmission_start();
     error = write_byte(mode);
 
-    hwtimer_wait(HWTIMER_TICKS(1000));
+    xtimer_usleep(1000);
 
     /* wait untile sensor has finished measurement or timeout */
     for (i = 0; (i < SHT11_MEASURE_TIMEOUT) && (!error); i++) {
@@ -241,7 +241,7 @@ static uint8_t measure(uint8_t *p_value, uint8_t *p_checksum, uint8_t mode)
             break;
         }
 
-        hwtimer_wait(HWTIMER_TICKS(1000));
+        xtimer_usleep(1000);
     }
 
     error += ack;
@@ -260,7 +260,7 @@ void sht11_init(void)
 {
     sht11_temperature_offset = 0;
     SHT11_INIT;
-    hwtimer_wait(11 * HWTIMER_TICKS(1000));
+    xtimer_usleep(11 * 1000);
 }
 /*---------------------------------------------------------------------------*/
 uint8_t sht11_read_status(uint8_t *p_value, uint8_t *p_checksum)

@@ -29,8 +29,6 @@
 #include "periph/spi.h"
 #include "periph/gpio.h"
 
-#define SHELL_BUFSIZE       (128U)
-
 enum {
     READ = 0,
     WRITE,
@@ -89,7 +87,7 @@ int parse_spi_dev(int argc, char **argv)
     }
     port = atoi(argv[2]);
     pin = atoi(argv[3]);
-    spi_cs = GPIO(port,pin);
+    spi_cs = GPIO_PIN(port,pin);
     if (argc >= 5) {
         spi_mode = argv[4][0] - '0';
         if (spi_mode < 0 || spi_mode > 3) {
@@ -288,15 +286,13 @@ static const shell_command_t shell_commands[] = {
 
 int main(void)
 {
-    shell_t shell;
-
     puts("\nRIOT low-level SPI driver test");
     puts("This application enables you to test a platforms SPI driver implementation.");
     puts("Enter 'help' to get started\n");
 
     /* run the shell */
-    shell_init(&shell, shell_commands, SHELL_BUFSIZE, getchar, putchar);
-    shell_run(&shell);
+    char line_buf[SHELL_DEFAULT_BUFSIZE];
+    shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
 
     return 0;
 }

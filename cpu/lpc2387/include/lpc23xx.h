@@ -12,12 +12,19 @@
  *
 ******************************************************************************/
 
-#ifndef __LPC23xx_H
-#define __LPC23xx_H
+#ifndef LPC23XX_H
+#define LPC23XX_H
+
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/**
+ * @brief   Type for 32-bit registers
+ */
+#define REG32       volatile uint32_t
 
 /* Vectored Interrupt Controller (VIC) */
 #define VIC_BASE_ADDR   0xFFFFF000
@@ -496,8 +503,27 @@ are for LPC24xx only. */
 
 #define EMC_STA_EXT_WAIT  (*(volatile unsigned long *)(EMC_BASE_ADDR + 0x880))
 
+/**
+ * @brief   Generic timer register map
+ */
+typedef struct {
+    REG32   IR;             /**< interrupt register */
+    REG32   TCR;            /**< timer control register */
+    REG32   TC;             /**< timer counter */
+    REG32   PR;             /**< prescale register */
+    REG32   PC;             /**< prescale counter */
+    REG32   MCR;            /**< match control register */
+    REG32   MR[4];          /**< match registers 1-4 */
+    REG32   CCR;            /**< capture control register */
+    REG32   CR[4];          /**< capture register 1-4 */
+    REG32   EMR;            /**< external match register */
+    REG32   reserved[12];   /**< reserved */
+    REG32   CTCR;           /**< count control register */
+} lpc23xx_timer_t;
+
 /* Timer 0 */
 #define TMR0_BASE_ADDR      0xE0004000
+#define TMR0                ((lpc23xx_timer_t *)TMR0_BASE_ADDR)
 #define T0IR           (*(volatile unsigned long *)(TMR0_BASE_ADDR + 0x00))
 #define T0TCR          (*(volatile unsigned long *)(TMR0_BASE_ADDR + 0x04))
 #define T0TC           (*(volatile unsigned long *)(TMR0_BASE_ADDR + 0x08))
@@ -518,6 +544,7 @@ are for LPC24xx only. */
 
 /* Timer 1 */
 #define TMR1_BASE_ADDR      0xE0008000
+#define TMR1                ((lpc23xx_timer_t *)TMR1_BASE_ADDR)
 #define T1IR           (*(volatile unsigned long *)(TMR1_BASE_ADDR + 0x00))
 #define T1TCR          (*(volatile unsigned long *)(TMR1_BASE_ADDR + 0x04))
 #define T1TC           (*(volatile unsigned long *)(TMR1_BASE_ADDR + 0x08))
@@ -538,6 +565,7 @@ are for LPC24xx only. */
 
 /* Timer 2 */
 #define TMR2_BASE_ADDR      0xE0070000
+#define TMR2                ((lpc23xx_timer_t *)TMR2_BASE_ADDR)
 #define T2IR           (*(volatile unsigned long *)(TMR2_BASE_ADDR + 0x00))
 #define T2TCR          (*(volatile unsigned long *)(TMR2_BASE_ADDR + 0x04))
 #define T2TC           (*(volatile unsigned long *)(TMR2_BASE_ADDR + 0x08))
@@ -558,6 +586,7 @@ are for LPC24xx only. */
 
 /* Timer 3 */
 #define TMR3_BASE_ADDR      0xE0074000
+#define TMR3                ((lpc23xx_timer_t *)TMR3_BASE_ADDR)
 #define T3IR           (*(volatile unsigned long *)(TMR3_BASE_ADDR + 0x00))
 #define T3TCR          (*(volatile unsigned long *)(TMR3_BASE_ADDR + 0x04))
 #define T3TC           (*(volatile unsigned long *)(TMR3_BASE_ADDR + 0x08))
@@ -1134,4 +1163,4 @@ with the spec. update in USB Device Section. */
 }
 #endif
 
-#endif  // __LPC23xx_H
+#endif  /* LPC23XX_H */

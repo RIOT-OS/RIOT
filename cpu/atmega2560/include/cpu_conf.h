@@ -40,17 +40,6 @@ extern "C" {
 #define THREAD_STACKSIZE_IDLE      (128)
 /** @} */
 
-/**
- * @name UART0 buffer size definition for compatibility reasons
- *
- * TODO: remove once the remodeling of the uart0 driver is done
- * @{
- */
-#ifndef UART0_BUFSIZE
-#define UART0_BUFSIZE                   (128)
-#endif
-/** @} */
-
 #ifdef __cplusplus
 }
 #endif

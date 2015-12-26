@@ -18,7 +18,7 @@
  * @}
  */
 
-#include "vtimer.h"
+#include "xtimer.h"
 
 #include <cerrno>
 #include <system_error>
@@ -73,23 +73,7 @@ namespace this_thread {
 void sleep_for(const chrono::nanoseconds& ns) {
   using namespace chrono;
   if (ns > nanoseconds::zero()) {
-    seconds s = duration_cast<seconds>(ns);
-    timespec ts;
-    using ts_sec = decltype(ts.tv_sec);
-    constexpr ts_sec ts_sec_max = numeric_limits<ts_sec>::max();
-    if (s.count() < ts_sec_max) {
-      ts.tv_sec = static_cast<ts_sec>(s.count());
-      ts.tv_nsec = static_cast<decltype(ts.tv_nsec)>((ns - s).count());
-    } else {
-      ts.tv_sec = ts_sec_max;
-      ts.tv_nsec = giga::num - 1;
-    }
-    timex_t reltime;
-    reltime.seconds = ts.tv_sec;
-    reltime.microseconds = ts.tv_nsec / 1000u;
-    vtimer_t timer;
-    vtimer_set_wakeup(&timer, reltime, sched_active_pid);
-    thread_sleep();
+    xtimer_usleep64(static_cast<uint64_t>(duration_cast<microseconds>(ns).count()));
   }
 }
 

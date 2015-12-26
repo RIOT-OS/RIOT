@@ -29,7 +29,7 @@
 
 #include <stdio.h>
 
-#include "vtimer.h"
+#include "xtimer.h"
 #include "mpl3115a2.h"
 
 #define SLEEP       (1000 * 1000U)
@@ -58,7 +58,7 @@ int main(void)
     }
 
     while (1) {
-        vtimer_usleep(SLEEP);
+        xtimer_usleep(SLEEP);
         mpl3115a2_read_pressure(&dev, &pressure, &status);
         printf("Pressure: %u Status: %#02x\n", (unsigned int)pressure, status);
         mpl3115a2_read_temp(&dev, &temp);

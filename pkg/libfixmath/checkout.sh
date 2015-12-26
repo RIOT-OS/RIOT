@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 if [ -z "${CHECKOUT_FOLDER}" ]; then
     echo 'export CHECKOUT_FOLDER before running this script' >&2

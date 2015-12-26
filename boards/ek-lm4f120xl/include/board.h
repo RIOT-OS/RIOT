@@ -34,14 +34,9 @@ extern "C" {
  * @{
  */
 #define STDIO               UART_0
-#define STDIO_BAUDRATE      115200
-#define STDIO_RX_BUFSIZE    UART0_BUFSIZE
+#define STDIO_BAUDRATE      (115200U)
+#define STDIO_RX_BUFSIZE    (64U)
 /** @} */
-
-/**
- * @name Assign the hardware timer
- */
-#define HW_TIMER            TIMER_0
 
 /**
  * @name Macros for controlling the on-board LEDs.

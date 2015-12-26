@@ -29,7 +29,6 @@
 #include "debug.h"
 #include "kernel_internal.h"
 #include "bitarithm.h"
-#include "hwtimer.h"
 #include "sched.h"
 
 volatile tcb_t *thread_get(kernel_pid_t pid)
@@ -43,7 +42,7 @@ volatile tcb_t *thread_get(kernel_pid_t pid)
 int thread_getstatus(kernel_pid_t pid)
 {
     volatile tcb_t *t = thread_get(pid);
-    return t ? t->status : STATUS_NOT_FOUND;
+    return t ? (int) t->status : STATUS_NOT_FOUND;
 }
 
 #ifdef DEVELHELP
@@ -148,8 +147,8 @@ kernel_pid_t thread_create(char *stack, int stacksize, char priority, int flags,
     /* allocate our thread control block at the top of our stackspace */
     tcb_t *cb = (tcb_t *) (stack + stacksize);
 
-#ifdef DEVELHELP
-    if (flags & CREATE_STACKTEST) {
+#if defined(DEVELHELP) || defined(SCHED_TEST_STACK)
+    if (flags & THREAD_CREATE_STACKTEST) {
         /* assign each int of the stack the value of it's address */
         uintptr_t *stackmax = (uintptr_t *) (stack + stacksize);
         uintptr_t *stackp = (uintptr_t *) stack;
@@ -187,8 +186,11 @@ kernel_pid_t thread_create(char *stack, int stacksize, char priority, int flags,
     cb->pid = pid;
     cb->sp = thread_stack_init(function, arg, stack, stacksize);
 
-#ifdef DEVELHELP
+#if defined(DEVELHELP) || defined(SCHED_TEST_STACK)
     cb->stack_start = stack;
+#endif
+
+#ifdef DEVELHELP
     cb->stack_size = total_stacksize;
     cb->name = name;
 #endif
@@ -210,13 +212,13 @@ kernel_pid_t thread_create(char *stack, int stacksize, char priority, int flags,
 
     DEBUG("Created thread %s. PID: %" PRIkernel_pid ". Priority: %u.\n", name, cb->pid, priority);
 
-    if (flags & CREATE_SLEEPING) {
+    if (flags & THREAD_CREATE_SLEEPING) {
         sched_set_status(cb, STATUS_SLEEPING);
     }
     else {
         sched_set_status(cb, STATUS_PENDING);
 
-        if (!(flags & CREATE_WOUT_YIELD)) {
+        if (!(flags & THREAD_CREATE_WOUT_YIELD)) {
             restoreIRQ(state);
             sched_switch(priority);
             return pid;

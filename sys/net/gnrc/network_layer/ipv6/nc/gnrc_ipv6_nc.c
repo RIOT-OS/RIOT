@@ -21,9 +21,9 @@
 #include "net/gnrc/ipv6/netif.h"
 #include "net/gnrc/ndp.h"
 #include "net/gnrc/pktbuf.h"
+#include "net/gnrc/sixlowpan/nd.h"
 #include "thread.h"
-#include "timex.h"
-#include "vtimer.h"
+#include "xtimer.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
@@ -102,7 +102,9 @@ gnrc_ipv6_nc_t *gnrc_ipv6_nc_add(kernel_pid_t iface, const ipv6_addr_t *ipv6_add
     /* Otherwise, fill free entry with your fresh information */
     free_entry->iface = iface;
 
+#ifdef MODULE_GNRC_NDP_NODE
     free_entry->pkts = NULL;
+#endif
     memcpy(&(free_entry->ipv6_addr), ipv6_addr, sizeof(ipv6_addr_t));
     DEBUG("ipv6_nc: Register %s for interface %" PRIkernel_pid,
           ipv6_addr_to_str(addr_str, ipv6_addr, sizeof(addr_str)),
@@ -121,9 +123,24 @@ gnrc_ipv6_nc_t *gnrc_ipv6_nc_add(kernel_pid_t iface, const ipv6_addr_t *ipv6_add
     DEBUG(" with flags = 0x%0x\n", flags);
 
     if (gnrc_ipv6_nc_get_state(free_entry) == GNRC_IPV6_NC_STATE_INCOMPLETE) {
-        DEBUG("ipv6_nc: Set remaining probes to %" PRIu8 "\n");
+        DEBUG("ipv6_nc: Set remaining probes to %" PRIu8 "\n", (uint8_t) GNRC_NDP_MAX_MC_NBR_SOL_NUMOF);
         free_entry->probes_remaining = GNRC_NDP_MAX_MC_NBR_SOL_NUMOF;
     }
+
+#ifdef MODULE_GNRC_SIXLOWPAN_ND_ROUTER
+    free_entry->type_timeout_msg.type = GNRC_SIXLOWPAN_ND_MSG_AR_TIMEOUT;
+    free_entry->type_timeout_msg.content.ptr = (char *) free_entry;
+#endif
+
+    free_entry->rtr_timeout_msg.type = GNRC_NDP_MSG_RTR_TIMEOUT;
+    free_entry->rtr_timeout_msg.content.ptr = (char *) free_entry;
+
+#if defined(MODULE_GNRC_NDP_ROUTER) || defined(MODULE_GNRC_SIXLOWPAN_ND_BORDER_ROUTER)
+    free_entry->rtr_adv_msg.type = GNRC_NDP_MSG_RTR_ADV_DELAY;
+    free_entry->rtr_adv_msg.content.ptr = (char *) free_entry;
+#endif
+
+    free_entry->nbr_sol_msg.content.ptr = (char *) free_entry;
 
     return free_entry;
 }
@@ -137,13 +154,19 @@ void gnrc_ipv6_nc_remove(kernel_pid_t iface, const ipv6_addr_t *ipv6_addr)
               ipv6_addr_to_str(addr_str, ipv6_addr, sizeof(addr_str)),
               iface);
 
+#ifdef MODULE_GNRC_NDP_NODE
         while (entry->pkts != NULL) {
-#ifdef MODULE_GNRC_PKTBUF
             gnrc_pktbuf_release(entry->pkts->pkt);
-#endif
             entry->pkts->pkt = NULL;
             gnrc_pktqueue_remove_head(&entry->pkts);
         }
+#endif
+#ifdef MODULE_GNRC_SIXLOWPAN_ND_ROUTER
+        xtimer_remove(&entry->type_timeout);
+#endif
+#if defined(MODULE_GNRC_NDP_ROUTER) || defined(MODULE_GNRC_SIXLOWPAN_ND_BORDER_ROUTER)
+        xtimer_remove(&entry->rtr_adv_timer);
+#endif
 
         ipv6_addr_set_unspecified(&(entry->ipv6_addr));
         entry->iface = KERNEL_PID_UNDEF;
@@ -153,14 +176,14 @@ void gnrc_ipv6_nc_remove(kernel_pid_t iface, const ipv6_addr_t *ipv6_addr)
 
 gnrc_ipv6_nc_t *gnrc_ipv6_nc_get(kernel_pid_t iface, const ipv6_addr_t *ipv6_addr)
 {
-    if (ipv6_addr == NULL) {
-        DEBUG("ipv6_nc: address was NULL\n");
+    if ((ipv6_addr == NULL) || (ipv6_addr_is_unspecified(ipv6_addr))) {
+        DEBUG("ipv6_nc: address was NULL or ::\n");
         return NULL;
     }
 
     for (int i = 0; i < GNRC_IPV6_NC_SIZE; i++) {
-        if (((iface == KERNEL_PID_UNDEF) || (iface == ncache[i].iface)) &&
-            ipv6_addr_equal(&(ncache[i].ipv6_addr), ipv6_addr)) {
+        if (((ncache[i].iface == KERNEL_PID_UNDEF) || (iface == KERNEL_PID_UNDEF) ||
+             (iface == ncache[i].iface)) && ipv6_addr_equal(&(ncache[i].ipv6_addr), ipv6_addr)) {
             DEBUG("ipv6_nc: Found entry for %s on interface %" PRIkernel_pid
                   " (0 = all interfaces) [%p]\n",
                   ipv6_addr_to_str(addr_str, ipv6_addr, sizeof(addr_str)),
@@ -215,14 +238,13 @@ gnrc_ipv6_nc_t *gnrc_ipv6_nc_still_reachable(const ipv6_addr_t *ipv6_addr)
         return NULL;
     }
 
-    if (gnrc_ipv6_nc_get_state(entry) != GNRC_IPV6_NC_STATE_INCOMPLETE) {
+    if ((gnrc_ipv6_nc_get_state(entry) != GNRC_IPV6_NC_STATE_INCOMPLETE) &&
+        (gnrc_ipv6_nc_get_state(entry) != GNRC_IPV6_NC_STATE_UNMANAGED)) {
 #if defined(MODULE_GNRC_IPV6_NETIF) && defined(MODULE_VTIMER) && defined(MODULE_GNRC_IPV6)
         gnrc_ipv6_netif_t *iface = gnrc_ipv6_netif_get(entry->iface);
-        timex_t t = iface->reach_time;
 
-        vtimer_remove(&entry->nbr_sol_timer);
-        vtimer_set_msg(&entry->nbr_sol_timer, t, gnrc_ipv6_pid,
-                       GNRC_NDP_MSG_NC_STATE_TIMEOUT, entry);
+        gnrc_ndp_internal_reset_nbr_sol_timer(entry, iface->reach_time,
+                                              GNRC_NDP_MSG_NC_STATE_TIMEOUT, gnrc_ipv6_pid);
 #endif
 
         DEBUG("ipv6_nc: Marking entry %s as reachable\n",

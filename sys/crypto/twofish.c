@@ -540,8 +540,9 @@ static int twofish_setup_key(twofish_context_t *ctx, const uint8_t *key, uint8_t
 
     /* Check key length. */
     if (((keylen - 16) | 16) != 16) {
-        DEBUGF("[ERROR] invalid key-length!\r\n");
-        return -1;//GPG_ERR_INV_KEYLEN;
+        DEBUG("%s:%d in %s: [ERROR] invalid key-length!\r\n", RIOT_FILE_RELATIVE,
+              __LINE__, DEBUG_FUNC);
+        return -1;
     }
 
 
@@ -660,15 +661,16 @@ int twofish_encrypt(const cipher_context_t *context, const uint8_t *in, uint8_t 
     twofish_context_t *ctx = malloc(sizeof(twofish_context_t));
 
     if (!ctx) {
-        DEBUGF("[ERROR] Could NOT malloc space for the twofish_context_t \
-                struct.\r\n");
+        DEBUG("%s:%d in %s: [ERROR] Could NOT malloc space for the twofish_context_t \
+                struct.\r\n", RIOT_FILE_RELATIVE, __LINE__, DEBUG_FUNC);
         return -1;
     }
 
     res = twofish_setup_key(ctx, context->context, TWOFISH_KEY_SIZE);
 
     if (res < 0) {
-        DEBUGF("[ERROR] twofish_setKey failed with Code %i\r\n", res);
+        DEBUG("%s:%d in %s: [ERROR] twofish_setKey failed with Code %i\r\n",
+              RIOT_FILE_RELATIVE, __LINE__, DEBUG_FUNC, res);
         free(ctx);
         return -2;
     }
@@ -716,15 +718,16 @@ int twofish_decrypt(const cipher_context_t *context, const uint8_t *in, uint8_t 
     twofish_context_t *ctx = malloc(sizeof(twofish_context_t));
 
     if (!ctx) {
-        DEBUGF("[ERROR] Could NOT malloc space for the twofish_context_t \
-                struct.\r\n");
+        DEBUG("%s:%d in %s: [ERROR] Could NOT malloc space for the twofish_context_t \
+                struct.\r\n", RIOT_FILE_RELATIVE, __LINE__, DEBUG_FUNC);
         return -1;
     }
 
     res = twofish_setup_key(ctx, context->context, TWOFISH_KEY_SIZE);
 
     if (res < 0) {
-        DEBUGF("[ERROR] twofish_setKey failed with Code %i\r\n", res);
+        DEBUG("%s:%d in %s: [ERROR] twofish_setKey failed with Code %i\r\n",
+              RIOT_FILE_RELATIVE, __LINE__, DEBUG_FUNC, res);
         free(ctx);
         return -2;
     }

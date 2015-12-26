@@ -194,7 +194,8 @@ void iib_fill_wr_addresses(kernel_pid_t if_pid, struct rfc5444_writer *wr)
 
                                 default:
                                     /* Should not happen */
-                                    DEBUGF("[WARNING] Unknown link tuple status\n");
+                                    DEBUG("%s:%d in %s: [WARNING] Unknown link tuple status\n",
+                                          RIOT_FILE_RELATIVE, __LINE__, DEBUG_FUNC);
                                     break;
                             }
                         }
@@ -260,7 +261,8 @@ void iib_process_metric_msg(iib_link_set_entry_t *ls_entry, uint64_t int_time)
     /* NHDP_METRIC is not set properly */
     (void)ls_entry;
     (void)int_time;
-    DEBUGF("[WARNING] Unknown NHDP_METRIC setting\n");
+    DEBUG("%s:%d in %s: [WARNING] Unknown NHDP_METRIC setting\n",
+          RIOT_FILE_RELATIVE, __LINE__, DEBUG_FUNC);
 #endif
 }
 
@@ -332,7 +334,8 @@ void iib_process_metric_pckt(iib_link_set_entry_t *ls_entry, uint32_t metric_out
     (void)ls_entry;
     (void)metric_out;
     (void)seq_no;
-    DEBUGF("[WARNING] Unknown NHDP_METRIC setting\n");
+    DEBUG("%s:%d in %s: [WARNING] Unknown NHDP_METRIC setting\n",
+          RIOT_FILE_RELATIVE, __LINE__, DEBUG_FUNC);
 #endif
 }
 
@@ -344,7 +347,8 @@ void iib_process_metric_refresh(void)
     dat_metric_refresh();
 #else
     /* NHDP_METRIC is not set properly */
-    DEBUGF("[WARNING] Unknown NHDP_METRIC setting\n");
+    DEBUG("%s:%d in %s: [WARNING] Unknown NHDP_METRIC setting\n",
+          RIOT_FILE_RELATIVE, __LINE__, DEBUG_FUNC);
 #endif
 }
 

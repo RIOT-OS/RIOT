@@ -40,7 +40,7 @@ int random_read(char *buf, unsigned int num)
 {
     /* cppcheck-suppress variableScope */
     uint32_t tmp;
-    int count = 0;
+    unsigned count = 0;
 
     while (count < num) {
         /* wait until new value is generated -> takes up to 84 cycles */

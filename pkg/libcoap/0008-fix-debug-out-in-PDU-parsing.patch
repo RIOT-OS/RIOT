@@ -1,7 +1,7 @@
 From 3409c3834022c9e7cd73ac69e34dfaa101947cf0 Mon Sep 17 00:00:00 2001
 From: Oleg Hahm <oleg@hobbykeller.org>
 Date: Tue, 4 Aug 2015 23:09:27 +0200
-Subject: [PATCH 8/8] fix debug out in PDU parsing
+Subject: [PATCH 8/9] fix debug out in PDU parsing
 
 ---
  net.c | 3 ++-

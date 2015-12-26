@@ -574,6 +574,26 @@ static void test_ipv6_addr_init_prefix(void)
     TEST_ASSERT_EQUAL_INT(true, ipv6_addr_equal(&a, &c));
 }
 
+static void test_ipv6_addr_init_iid(void)
+{
+    ipv6_addr_t a = { {
+            0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
+            0x08, 0x09, 0x0a, 0x0b, 0xff, 0x0d, 0x0e, 0x0f
+        }
+    };
+
+    const uint8_t iid[] = { 0x13, 0x02, 0x01, 0x00 };
+
+    ipv6_addr_t c =  { {
+            0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
+            0x08, 0x09, 0x0a, 0x0b, 0x93, 0x02, 0x01, 0x00
+        }
+    };
+
+    ipv6_addr_init_iid(&a, iid, 31);
+    TEST_ASSERT_EQUAL_INT(true, ipv6_addr_equal(&a, &c));
+}
+
 static void test_ipv6_addr_set_unspecified(void)
 {
     ipv6_addr_t a = { {
@@ -862,8 +882,11 @@ static void test_ipv6_addr_to_str__success5(void)
     };
     char result[IPV6_ADDR_MAX_STR_LEN];
 
-    TEST_ASSERT_EQUAL_STRING("::ffff:192.168.0.1",
-                             ipv6_addr_to_str(result, &a, sizeof(result)));
+#ifdef MODULE_IPV4_ADDR
+    TEST_ASSERT_EQUAL_STRING("::ffff:192.168.0.1", ipv6_addr_to_str(result, &a, sizeof(result)));
+#else
+    TEST_ASSERT_EQUAL_STRING("::ffff:c0a8:1", ipv6_addr_to_str(result, &a, sizeof(result)));
+#endif
 }
 
 static void test_ipv6_addr_from_str__one_colon_start(void)
@@ -980,7 +1003,11 @@ static void test_ipv6_addr_from_str__success6(void)
     };
     ipv6_addr_t result;
 
+#ifdef MODULE_IPV4_ADDR
     TEST_ASSERT_NOT_NULL(ipv6_addr_from_str(&result, "ffff:ffff:ffff:ffff:ffff:ffff:255.255.255.255"));
+#else
+    TEST_ASSERT_NOT_NULL(ipv6_addr_from_str(&result, "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff"));
+#endif
     TEST_ASSERT(ipv6_addr_equal(&a, &result));
 }
 
@@ -1035,6 +1062,7 @@ Test *tests_ipv6_addr_tests(void)
         new_TestFixture(test_ipv6_addr_match_prefix_match_128),
         new_TestFixture(test_ipv6_addr_match_prefix_same_pointer),
         new_TestFixture(test_ipv6_addr_init_prefix),
+        new_TestFixture(test_ipv6_addr_init_iid),
         new_TestFixture(test_ipv6_addr_set_unspecified),
         new_TestFixture(test_ipv6_addr_set_loopback),
         new_TestFixture(test_ipv6_addr_set_link_local_prefix),

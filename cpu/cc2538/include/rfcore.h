@@ -89,7 +89,7 @@ typedef struct {
             cc2538_reg_t RSSI_VALID :  1; /**< RSSI value is valid */
             cc2538_reg_t RESERVED   : 31; /**< Reserved bits */
         } XREG_RSSISTATbits;
-    };
+    } cc2538_rfcore_xreg_rssistat;
 
     cc2538_reg_t XREG_RXFIRST;            /**< RF First byte in RX FIFO */
     cc2538_reg_t XREG_RXFIFOCNT;          /**< RF Number of bytes in RX FIFO */
@@ -112,7 +112,7 @@ typedef struct {
             cc2538_reg_t QRND       :  1; /**< Random bit from the Q channel of the receiver */
             cc2538_reg_t RESERVED   : 30; /**< Reserved bits */
         } XREG_RFRNDbits;
-    };
+    } cc2538_rfcore_xreg_rfrnd;
 
     cc2538_reg_t XREG_MDMCTRL0;           /**< RF Controls modem */
     cc2538_reg_t XREG_MDMCTRL1;           /**< RF Controls modem */

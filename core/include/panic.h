@@ -29,6 +29,29 @@
 #endif
 
 /**
+ * @brief Definition of available panic modes
+ */
+typedef enum {
+    PANIC_GENERAL_ERROR,
+    PANIC_SOFT_REBOOT,
+    PANIC_HARD_REBOOT,
+    PANIC_ASSERT_FAIL,
+#ifdef MODULE_CORTEXM_COMMON
+    PANIC_NMI_HANDLER,       /**< non maskable interrupt */
+    PANIC_HARD_FAULT,        /**< hard fault */
+#if defined(CPU_ARCH_CORTEX_M3) || defined(CPU_ARCH_CORTEX_M4) || \
+    defined(CPU_ARCH_CORTEX_M4F)
+    PANIC_MEM_MANAGE,        /**< memory controller interrupt */
+    PANIC_BUS_FAULT,         /**< bus fault */
+    PANIC_USAGE_FAULT,       /**< undefined instruction or unaligned access */
+    PANIC_DEBUG_MON,         /**< debug interrupt */
+#endif
+    PANIC_DUMMY_HANDLER,     /**< unhandled interrupt */
+#endif
+    PANIC_UNDEFINED
+} core_panic_t;
+
+/**
  * @brief Handle an unrecoverable error by halting or rebooting the system
  *
  * A numeric code indicating the failure reason can be given
@@ -48,7 +71,7 @@
  *
  * @return                  this function never returns
  * */
-NORETURN void core_panic(int crash_code, const char *message);
+NORETURN void core_panic(core_panic_t crash_code, const char *message);
 
 #ifdef __cplusplus
 }

@@ -15,7 +15,7 @@
  * @brief       Functions for atomic handling of variables
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
- * @author      Joakim Gebart <joakim.gebart@eistec.se>
+ * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
 #ifndef ATOMIC_H_
@@ -29,7 +29,7 @@ extern "C" {
  * @brief Integer variable for use in atomic counters.
  */
 typedef struct atomic_int {
-    volatile int value;
+    volatile int value;         /**< the actual value */
 } atomic_int_t;
 
 /**

@@ -18,6 +18,7 @@
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      Kévin Roussel <Kevin.Roussel@inria.fr>
  */
 
 #ifndef AT86RF2XX_REGISTERS_H_
@@ -242,6 +243,15 @@ extern "C" {
 /** @} */
 
 /**
+ * @brief   Bitfield definitions for the CCA_THRES register
+ * @{
+ */
+#define AT86RF2XX_CCA_THRES_MASK__CCA_ED_THRES                  (0x0F)
+
+#define AT86RF2XX_CCA_THRES_MASK__RSVD_HI_NIBBLE                (0xC0)
+/** @} */
+
+/**
  * @brief   Bitfield definitions for the PHY_TX_PWR register
  * @{
  */
@@ -317,6 +327,7 @@ extern "C" {
 #define AT86RF2XX_CSMA_SEED_1__AACK_SET_PD                      (0x20)
 #define AT86RF2XX_CSMA_SEED_1__AACK_DIS_ACK                     (0x10)
 #define AT86RF2XX_CSMA_SEED_1__AACK_I_AM_COORD                  (0x08)
+#define AT86RF2XX_CSMA_SEED_1__CSMA_SEED_1                      (0x07)
 /** @} */
 
 /**

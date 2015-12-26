@@ -23,7 +23,6 @@
 
 #include "net/gnrc/netif/hdr.h"
 #include "net/gnrc/pkt.h"
-#include "timex.h"
 
 #include "net/gnrc/sixlowpan/frag.h"
 #ifdef __cplusplus
@@ -44,6 +43,8 @@ extern "C" {
  * @see <a href="https://tools.ietf.org/html/rfc4944#section-5.3">
  *          RFC 4944, section 5.3
  *      </a>
+ *
+ * @internal
  */
 typedef struct rbuf_int {
     struct rbuf_int *next;  /**< next element in interval list */
@@ -66,6 +67,8 @@ typedef struct rbuf_int {
  * @see <a href="https://tools.ietf.org/html/rfc4944#section-5.3">
  *          RFC 4944, section 5.3
  *      </a>
+ *
+ * @internal
  */
 typedef struct {
     rbuf_int_t *ints;                   /**< intervals of the fragment */
@@ -81,7 +84,9 @@ typedef struct {
 } rbuf_t;
 
 /**
- * @brief   Adds a new fragment to the reassembly buffer.
+ * @brief   Adds a new fragment to the reassembly buffer. If the packet is
+ *          complete, dispatch the packet with the transmit information of
+ *          the last fragment.
  *
  * @param[in] netif_hdr     The interface header of the fragment, with
  *                          gnrc_netif_hdr_t::if_pid and its source and
@@ -89,6 +94,8 @@ typedef struct {
  * @param[in] frag          The fragment to add.
  * @param[in] frag_size     The fragment's size.
  * @param[in] offset        The fragment's offset.
+ *
+ * @internal
  */
 void rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *frag,
               size_t frag_size, size_t offset);

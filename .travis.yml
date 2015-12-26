@@ -4,14 +4,16 @@ cache: apt
 
 env:
     - NPROC_MAX=8 BUILDTEST_MCU_GROUP=static-tests
+    - NPROC_MAX=8 BUILDTEST_MCU_GROUP=cortex_m4_2
+    - NPROC_MAX=8 BUILDTEST_MCU_GROUP=cortex_m4_1
+    - NPROC_MAX=8 BUILDTEST_MCU_GROUP=cortex_m0_2
+    - NPROC_MAX=8 BUILDTEST_MCU_GROUP=cortex_m0_1
+    - NPROC_MAX=8 BUILDTEST_MCU_GROUP=x86
+    - NPROC_MAX=8 BUILDTEST_MCU_GROUP=cortex_m3_2
+    - NPROC_MAX=8 BUILDTEST_MCU_GROUP=cortex_m3_1
     - NPROC_MAX=8 BUILDTEST_MCU_GROUP=avr8
     - NPROC_MAX=8 BUILDTEST_MCU_GROUP=msp430
-    - NPROC_MAX=8 BUILDTEST_MCU_GROUP=x86
     - NPROC_MAX=8 BUILDTEST_MCU_GROUP=arm7
-    - NPROC_MAX=8 BUILDTEST_MCU_GROUP=cortex_m0
-    - NPROC_MAX=8 BUILDTEST_MCU_GROUP=cortex_m3_1
-    - NPROC_MAX=8 BUILDTEST_MCU_GROUP=cortex_m3_2
-    - NPROC_MAX=8 BUILDTEST_MCU_GROUP=cortex_m4
 
 before_install:
     - source ./dist/tools/pr_check/check_labels.sh
@@ -28,10 +30,6 @@ install:
         sudo apt-get install $(./dist/tools/travis-scripts/get-pkg-list.py)
     - git config --global user.email "travis@example.com"
     - git config --global user.name "Travis CI"
-
-    - git remote add riot https://github.com/RIOT-OS/RIOT.git
-    - git fetch riot master
-    - git log -1 --pretty=format:%H riot/master
 
 script:
     - ./dist/tools/travis-scripts/build_and_test.sh

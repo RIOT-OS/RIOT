@@ -758,8 +758,13 @@ INPUT                  = ../../doc.txt \
                          ../../cpu \
                          ../../boards \
                          ../../drivers \
+                         ../../pkg \
                          ../../sys \
-                         src/
+                         src/ \
+                         src/mainpage.md \
+                         src/creating-modules.md \
+                         src/creating-an-application.md \
+                         src/getting-started.md
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses
@@ -780,7 +785,8 @@ INPUT_ENCODING         = UTF-8
 # *.qsf, *.as and *.js.
 
 FILE_PATTERNS          = *.txt \
-                         *.h
+                         *.h \
+                         *.hpp
 
 # The RECURSIVE tag can be used to specify whether or not subdirectories should
 # be searched for input files as well.
@@ -818,12 +824,14 @@ EXCLUDE_PATTERNS       = */board/*/tools/* \
                          */cpu/*/include/atmel/* \
                          */cpu/sam3/include/sam3* \
                          */cpu/sam3/include/system_sam*.h \
+                         */cpu/samd21/include/samd21.h \
                          */cpu/lpc*/include/core_cm*.h \
                          */cpu/cortexm_common/include/core_cm*.h \
                          */cpu/stm32f*/include/stm32f* \
                          */drivers/nrf24l01p/include/nrf24l01p_settings.h \
                          */cpu/nrf51/include/nrf51*.h \
                          */cpu/lpc1768/include/LPC17xx.h \
+                         */cpu/lpc11u34/include/LPC11Uxx.h \
                          */boards/*/include/periph_conf.h \
                          */cpu/x86/include/x86_pci.h \
                          */cpu/stm32l1/include/stm32l1xx.h \
@@ -831,6 +839,9 @@ EXCLUDE_PATTERNS       = */board/*/tools/* \
                          */cpu/k60/include/MK60DZ10.h \
                          */cpu/kw2x/include/MKW22D5.h \
                          */cpu/k64f/include/MK64F12.h \
+                         */cpu/ezr32wg/include/ezr* \
+                         */pkg/*/*/* \
+                         */pkg/tlsf/patch.txt \
 
 
 # The EXCLUDE_SYMBOLS tag can be used to specify one or more symbol names
@@ -1999,7 +2010,14 @@ PREDEFINED             = DOXYGEN \
                          UART_NUMOF \
                          DEVELHELP \
                          ENABLE_DEBUG \
-                         TEST_SUITES
+                         TEST_SUITES \
+                         MODULE_GNRC_ICMPV6 \
+                         MODULE_GNRC_IPV6 \
+                         MODULE_GNRC_NDP_ROUTER \
+                         MODULE_GNRC_SIXLOWPAN \
+                         MODULE_GNRC_SIXLOWPAN_ND_ROUTER \
+                         MODULE_GNRC_SIXLOWPAN_ND_BORDER_ROUTER \
+                         MODULE_GNRC_UDP
 
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this

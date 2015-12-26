@@ -15,7 +15,7 @@
  * @brief       Driver for the ADT7310 ±0.5°C Accurate, 16-Bit Digital SPI
  *              Temperature Sensor from Analog Devices
  *
- * @author      Joakim Gebart <joakim.gebart@eistec.se>
+ * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  *
  * @}
  */

@@ -164,7 +164,8 @@ kernel_pid_t gnrc_pktdump_init(void)
 {
     if (_pid == KERNEL_PID_UNDEF) {
         _pid = thread_create(_stack, sizeof(_stack), GNRC_PKTDUMP_PRIO,
-                             CREATE_STACKTEST, _eventloop, NULL, "pktdump");
+                             THREAD_CREATE_STACKTEST,
+                             _eventloop, NULL, "pktdump");
     }
     return _pid;
 }

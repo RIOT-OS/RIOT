@@ -18,8 +18,8 @@
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  */
 
-#ifndef __BOARD_H
-#define __BOARD_H
+#ifndef BOARD_H
+#define BOARD_H
 
 #include "cpu.h"
 
@@ -31,11 +31,6 @@ extern "C" {
  * Define the nominal CPU core clock in this board
  */
 #define F_CPU               (16000000UL)
-
-/**
- * Assign the hardware timer
- */
-#define HW_TIMER            TIMER_0
 
 /** @}*/
 /**
@@ -84,5 +79,5 @@ void board_init(void);
 }
 #endif
 
-#endif /** __BOARD_H */
+#endif /** BOARD_H */
 /** @} */

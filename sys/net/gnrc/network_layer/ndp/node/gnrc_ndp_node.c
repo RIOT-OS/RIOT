@@ -61,6 +61,7 @@ kernel_pid_t gnrc_ndp_node_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_len,
 {
     gnrc_ipv6_nc_t *nc_entry;
     ipv6_addr_t *next_hop_ip = NULL, *prefix = NULL;
+    bool dst_link_local = ipv6_addr_is_link_local(dst);
 
 #ifdef MODULE_GNRC_IPV6_EXT_RH
     ipv6_hdr_t *hdr;
@@ -71,15 +72,15 @@ kernel_pid_t gnrc_ndp_node_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_len,
     next_hop_ip = ipv6_ext_rh_next_hop(hdr);
 #endif
 #ifdef MODULE_FIB
+    ipv6_addr_t next_hop_actual;    /* FIB copies address into this variable */
     /* don't look-up link local addresses in FIB */
-    if (!ipv6_addr_is_link_local(dst)) {
+    if (!dst_link_local) {
         size_t next_hop_size = sizeof(ipv6_addr_t);
         uint32_t next_hop_flags = 0;
-        ipv6_addr_t next_hop_actual;    /* FIB copies address into this variable */
 
         if ((next_hop_ip == NULL) &&
-            (fib_get_next_hop(gnrc_ipv6_fib_table, &iface, next_hop_actual.u8, &next_hop_size,
-                              &next_hop_flags, (uint8_t *)dst,
+            (fib_get_next_hop(&gnrc_ipv6_fib_table, &iface, next_hop_actual.u8,
+                              &next_hop_size, &next_hop_flags, (uint8_t *)dst,
                               sizeof(ipv6_addr_t), 0) >= 0) &&
             (next_hop_size == sizeof(ipv6_addr_t))) {
             next_hop_ip = &next_hop_actual;
@@ -87,19 +88,21 @@ kernel_pid_t gnrc_ndp_node_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_len,
     }
 #endif
 
-    if ((next_hop_ip == NULL)) {            /* no route to host */
-        if (iface == KERNEL_PID_UNDEF) {
-            /* gnrc_ipv6_netif_t doubles as prefix list */
-            iface = gnrc_ipv6_netif_find_by_prefix(&prefix, dst);
-        }
-        else {
-            /* gnrc_ipv6_netif_t doubles as prefix list */
-            prefix = gnrc_ipv6_netif_match_prefix(iface, dst);
+    if (next_hop_ip == NULL) {            /* no route to host */
+        if (!dst_link_local) {
+            if (iface == KERNEL_PID_UNDEF) {
+                /* gnrc_ipv6_netif_t doubles as prefix list */
+                iface = gnrc_ipv6_netif_find_by_prefix(&prefix, dst);
+            }
+            else {
+                /* gnrc_ipv6_netif_t doubles as prefix list */
+                prefix = gnrc_ipv6_netif_match_prefix(iface, dst);
+            }
         }
 
-        if ((prefix != NULL) &&             /* prefix is on-link */
-            (gnrc_ipv6_netif_addr_get(prefix)->flags &
-             GNRC_IPV6_NETIF_ADDR_FLAGS_NDP_ON_LINK)) {
+        if (dst_link_local || ((prefix != NULL) &&
+                               (gnrc_ipv6_netif_addr_get(prefix)->flags & /* prefix is on-link */
+                                GNRC_IPV6_NETIF_ADDR_FLAGS_NDP_ON_LINK))) {
             next_hop_ip = dst;
         }
     }
@@ -108,7 +111,6 @@ kernel_pid_t gnrc_ndp_node_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_len,
     if (next_hop_ip == NULL) {
         next_hop_ip = gnrc_ndp_internal_default_router();
     }
-
 
     if (next_hop_ip == NULL) {
         next_hop_ip = dst;      /* Just look if it's in the neighbor cache
@@ -128,8 +130,9 @@ kernel_pid_t gnrc_ndp_node_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_len,
         if (gnrc_ipv6_nc_get_state(nc_entry) == GNRC_IPV6_NC_STATE_STALE) {
             gnrc_ndp_internal_set_state(nc_entry, GNRC_IPV6_NC_STATE_DELAY);
         }
-
-        memcpy(l2addr, nc_entry->l2_addr, nc_entry->l2_addr_len);
+        if (nc_entry->l2_addr_len > 0) {
+            memcpy(l2addr, nc_entry->l2_addr, nc_entry->l2_addr_len);
+        }
         *l2addr_len = nc_entry->l2_addr_len;
         /* TODO: unreachability check */
         return nc_entry->iface;
@@ -161,28 +164,24 @@ kernel_pid_t gnrc_ndp_node_next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_len,
         ipv6_addr_set_solicited_nodes(&dst_sol, next_hop_ip);
 
         if (iface == KERNEL_PID_UNDEF) {
-            timex_t t = { 0, GNRC_NDP_RETRANS_TIMER };
             kernel_pid_t ifs[GNRC_NETIF_NUMOF];
             size_t ifnum = gnrc_netif_get(ifs);
 
             for (size_t i = 0; i < ifnum; i++) {
-                gnrc_ndp_internal_send_nbr_sol(ifs[i], next_hop_ip, &dst_sol);
+                gnrc_ndp_internal_send_nbr_sol(ifs[i], NULL, next_hop_ip, &dst_sol);
             }
 
-            vtimer_remove(&nc_entry->nbr_sol_timer);
-            vtimer_set_msg(&nc_entry->nbr_sol_timer, t, gnrc_ipv6_pid,
-                           GNRC_NDP_MSG_NBR_SOL_RETRANS, nc_entry);
+            gnrc_ndp_internal_reset_nbr_sol_timer(nc_entry, GNRC_NDP_RETRANS_TIMER,
+                                                  GNRC_NDP_MSG_NBR_SOL_RETRANS, gnrc_ipv6_pid);
         }
         else {
             gnrc_ipv6_netif_t *ipv6_iface = gnrc_ipv6_netif_get(iface);
 
-            gnrc_ndp_internal_send_nbr_sol(iface, next_hop_ip, &dst_sol);
+            gnrc_ndp_internal_send_nbr_sol(iface, NULL, next_hop_ip, &dst_sol);
 
             mutex_lock(&ipv6_iface->mutex);
-            vtimer_remove(&nc_entry->nbr_sol_timer);
-            vtimer_set_msg(&nc_entry->nbr_sol_timer,
-                           ipv6_iface->retrans_timer, gnrc_ipv6_pid,
-                           GNRC_NDP_MSG_NBR_SOL_RETRANS, nc_entry);
+            gnrc_ndp_internal_reset_nbr_sol_timer(nc_entry, ipv6_iface->retrans_timer,
+                                                  GNRC_NDP_MSG_NBR_SOL_RETRANS, gnrc_ipv6_pid);
             mutex_unlock(&ipv6_iface->mutex);
         }
     }

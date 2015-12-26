@@ -33,11 +33,6 @@ extern "C" {
 #define F_CPU               (72000000UL)
 
 /**
- * @name Assign the hardware timer
- */
-#define HW_TIMER            TIMER_0
-
-/**
  * @name Define the UART used for stdio
  * @{
  */

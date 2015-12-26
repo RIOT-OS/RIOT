@@ -13,7 +13,7 @@
  * @file
  * @brief       Test application for the LIS3DH accelerometer driver
  *
- * @author      Joakim Gebart <joakim.gebart@eistec.se
+ * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se
  *
  * @}
  */
@@ -21,7 +21,7 @@
 #include <stdio.h>
 
 #include "board.h"
-#include "vtimer.h"
+#include "xtimer.h"
 #include "periph/spi.h"
 #include "periph/gpio.h"
 #include "lis3dh.h"
@@ -187,7 +187,7 @@ int main(void)
             --fifo_level;
         }
 
-        vtimer_usleep(SLEEP);
+        xtimer_usleep(SLEEP);
     }
 
     return 0;

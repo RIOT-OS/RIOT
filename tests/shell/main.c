@@ -22,11 +22,7 @@
 #include <string.h>
 
 #include "shell_commands.h"
-#include "posix_io.h"
 #include "shell.h"
-#include "board_uart0.h"
-
-#define SHELL_BUFSIZE   (UART0_BUFSIZE)
 
 static int print_teststart(int argc, char **argv)
 {
@@ -68,20 +64,16 @@ int main(void)
 
     printf("test_shell.\n");
 
-    board_uart0_init();
 
-    posix_open(uart0_handler_pid, 0);
+    /* define buffer to be used by the shell */
+    char line_buf[SHELL_DEFAULT_BUFSIZE];
 
     /* define own shell commands */
-    shell_t shell;
-    shell_init(&shell, shell_commands, SHELL_BUFSIZE, getchar, putchar);
-    shell_run(&shell);
+    shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
 
     /* or use only system shell commands */
     /*
-    shell_t sys_shell;
-    shell_init(&sys_shell, NULL, SHELL_BUFSIZE, shell_readc, shell_putchar);
-    shell_run(&sys_shell);
+    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
     */
 
     return 0;

@@ -45,7 +45,7 @@ typedef struct {
             cc2538_reg_t OSC32K_CADIS  : 1;  /**< Disable calibration 32-kHz RC oscillator */
             cc2538_reg_t RESERVED5     : 6;  /**< Reserved bits */
         } CLOCK_CTRLbits;
-    };
+    } cc2538_sys_ctrl_clk_ctrl;
 
     union {
         cc2538_reg_t CLOCK_STA;              /**< Clock status register */
@@ -66,7 +66,7 @@ typedef struct {
             cc2538_reg_t SYNC_32K      : 1;  /**< 32-kHz clock source synced to undivided system clock (16 or 32 MHz) */
             cc2538_reg_t RESERVED9     : 5;  /**< Reserved bits */
         } CLOCK_STAbits;
-    };
+    } cc2538_sys_ctrl_clk_sta;
 
     cc2538_reg_t RCGCGPT;                    /**< Module clocks for GPT[3:0] when the CPU is in active (run) mode */
     cc2538_reg_t SCGCGPT;                    /**< Module clocks for GPT[3:0] when the CPU is in sleep mode */
@@ -84,7 +84,7 @@ typedef struct {
             cc2538_reg_t UART1         :  1; /**< Enable UART1 clock in active (run) mode */
             cc2538_reg_t RESERVED      : 30; /**< Reserved bits */
         } RCGCUARTbits;
-    };
+    } cc2538_sys_ctrl_unnamed1;
 
     union {
         cc2538_reg_t SCGCUART;               /**< Module clocks for UART[1:0] when the CPU is in sleep mode */
@@ -93,7 +93,7 @@ typedef struct {
             cc2538_reg_t UART1         :  1; /**< Enable UART1 clock in sleep mode */
             cc2538_reg_t RESERVED      : 30; /**< Reserved bits */
         } SCGCUARTbits;
-    };
+    } cc2538_sys_ctrl_unnamed2;
 
     union {
         cc2538_reg_t DCGCUART;               /**< Module clocks for UART[1:0] when the CPU is in PM0 */
@@ -102,7 +102,7 @@ typedef struct {
             cc2538_reg_t UART1         :  1; /**< Enable UART1 clock in PM0 */
             cc2538_reg_t RESERVED      : 30; /**< Reserved bits */
         } DCGCUARTbits;
-    };
+    } cc2538_sys_ctrl_unnamed3;
 
     cc2538_reg_t SRUART;                     /**< Reset for UART[1:0]. */
     cc2538_reg_t RCGCI2C;                    /**< Module clocks for I2C when the CPU is in active (run) mode */
@@ -134,7 +134,9 @@ typedef struct {
 /**
  * @brief Compute the current system clock frequency based on the SYS_CTRL register states
  */
-#define sys_clock_freq() ( (SYS_CTRL->CLOCK_CTRLbits.OSC? RCOSC16M_FREQ : XOSC32M_FREQ) >> SYS_CTRL->CLOCK_CTRLbits.SYS_DIV )
+#define sys_clock_freq() ((SYS_CTRL->cc2538_sys_ctrl_clk_ctrl.CLOCK_CTRLbits.OSC ? \
+                           RCOSC16M_FREQ : XOSC32M_FREQ) >> \
+                                SYS_CTRL->cc2538_sys_ctrl_clk_ctrl.CLOCK_CTRLbits.SYS_DIV )
 
 #ifdef __cplusplus
 } /* end extern "C" */

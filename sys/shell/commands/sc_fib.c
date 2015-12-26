@@ -18,12 +18,12 @@
  * @}
  */
 
+#include <arpa/inet.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
 #include "thread.h"
-#include "inet_pton.h"
 #include "net/af.h"
 #ifdef MODULE_GNRC_NETIF
 #include "net/gnrc/netif.h"
@@ -76,43 +76,40 @@ static void _fib_add(const char *dest, const char *next, kernel_pid_t pid, uint3
 {
     unsigned char *dst = (unsigned char *)dest;
     size_t dst_size = (strlen(dest));
-    uint32_t dst_flags = 0xffff;
+    uint32_t dst_flags = 0;
     unsigned char *nxt = (unsigned char *)next;
     size_t nxt_size = (strlen(next));
-    uint32_t nxt_flags = 0xffff;
+    uint32_t nxt_flags = 0;
 
     /* determine destination address */
     if (inet_pton(AF_INET6, dest, tmp_ipv6_dst)) {
         dst = tmp_ipv6_dst;
         dst_size = IN6ADDRSZ;
-        dst_flags = AF_INET6;
     }
     else if (inet_pton(AF_INET, dest, tmp_ipv4_dst)) {
         dst = tmp_ipv4_dst;
         dst_size = INADDRSZ;
-        dst_flags = AF_INET;
     }
 
     /* determine next-hop address */
     if (inet_pton(AF_INET6, next, tmp_ipv6_nxt)) {
         nxt = tmp_ipv6_nxt;
         nxt_size = IN6ADDRSZ;
-        nxt_flags = AF_INET6;
     }
     else if (inet_pton(AF_INET, next, tmp_ipv4_nxt)) {
         nxt = tmp_ipv4_nxt;
         nxt_size = INADDRSZ;
-        nxt_flags = AF_INET;
     }
 
-    fib_add_entry(gnrc_ipv6_fib_table, pid, dst, dst_size, dst_flags, nxt, nxt_size, nxt_flags, lifetime);
+    fib_add_entry(&gnrc_ipv6_fib_table, pid, dst, dst_size, dst_flags, nxt,
+                  nxt_size, nxt_flags, lifetime);
 }
 
 int _fib_route_handler(int argc, char **argv)
 {
     /* e.g. fibroute right now dont care about the adress/protocol family */
     if (argc == 1) {
-        fib_print_routes(gnrc_ipv6_fib_table);
+        fib_print_routes(&gnrc_ipv6_fib_table);
         return 0;
     }
 
@@ -139,13 +136,14 @@ int _fib_route_handler(int argc, char **argv)
     /* e.g. fibroute del <destination> */
     if (argc == 3) {
         if (inet_pton(AF_INET6, argv[2], tmp_ipv6_dst)) {
-            fib_remove_entry(gnrc_ipv6_fib_table, tmp_ipv6_dst, IN6ADDRSZ);
+            fib_remove_entry(&gnrc_ipv6_fib_table, tmp_ipv6_dst, IN6ADDRSZ);
         }
         else if (inet_pton(AF_INET, argv[2], tmp_ipv4_dst)) {
-            fib_remove_entry(gnrc_ipv6_fib_table, tmp_ipv4_dst, INADDRSZ);
+            fib_remove_entry(&gnrc_ipv6_fib_table, tmp_ipv4_dst, INADDRSZ);
         }
         else {
-            fib_remove_entry(gnrc_ipv6_fib_table, (uint8_t *)argv[2], (strlen(argv[2])));
+            fib_remove_entry(&gnrc_ipv6_fib_table, (uint8_t *)argv[2],
+                             (strlen(argv[2])));
         }
 
         return 0;
@@ -157,7 +155,7 @@ int _fib_route_handler(int argc, char **argv)
         kernel_pid_t ifs[GNRC_NETIF_NUMOF];
         size_t ifnum = gnrc_netif_get(ifs);
         if (ifnum == 1) {
-            _fib_add(argv[2], argv[4], ifs[0], FIB_LIFETIME_NO_EXPIRE);
+            _fib_add(argv[2], argv[4], ifs[0], (uint32_t)FIB_LIFETIME_NO_EXPIRE);
         }
         else {
             _fib_usage(1);
@@ -188,7 +186,7 @@ int _fib_route_handler(int argc, char **argv)
     if (argc == 7) {
         if ((strcmp("add", argv[1]) == 0) && (strcmp("via", argv[3]) == 0)
             && (strcmp("dev", argv[5]) == 0)) {
-            _fib_add(argv[2], argv[4], (kernel_pid_t)atoi(argv[6]), FIB_LIFETIME_NO_EXPIRE);
+            _fib_add(argv[2], argv[4], (kernel_pid_t)atoi(argv[6]), (uint32_t)FIB_LIFETIME_NO_EXPIRE);
         }
         else {
             _fib_usage(1);

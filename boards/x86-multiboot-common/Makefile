@@ -1,3 +1,3 @@
-MODULE = x86-multiboot-common_base
+MODULE = board
 
 include $(RIOTBASE)/Makefile.base

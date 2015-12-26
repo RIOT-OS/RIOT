@@ -43,7 +43,7 @@
  * @brief   eZ430-chronos display driver
  *
  * @author  Oliver Hahm <oliver.hahm@inria.fr>
- * @author  Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ * @author  Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
  * @author  mikoff
  *

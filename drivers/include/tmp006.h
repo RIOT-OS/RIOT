@@ -8,7 +8,7 @@
 
 /**
  * @defgroup    drivers_tmp006 TMP006 Infrared Thermopile Sensor
- * @ingroup     drivers
+ * @ingroup     drivers_sensors
  * @brief       Driver for the Texas Instruments TMP006 sensor.
  *              The sensor measures the temperature of an object
  *              without the need of direct contact with the object.

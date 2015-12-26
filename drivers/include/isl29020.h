@@ -7,8 +7,8 @@
  */
 
 /**
- * @defgroup    driver_isl29020 ISL29020 light sensor
- * @ingroup     drivers
+ * @defgroup    drivers_isl29020 ISL29020 light sensor
+ * @ingroup     drivers_sensors
  * @brief       Device driver for the ISL29020 light sensor
  * @{
  *
@@ -59,6 +59,16 @@ typedef enum {
     ISL29020_RANGE_16K = 2,     /**< set range to 0-16000 lux */
     ISL29020_RANGE_64K = 3      /**< set range to 0-64000 lux */
 } isl29020_range_t;
+
+/**
+ * @brief Data structure holding the full set of configuration parameters
+ */
+typedef struct {
+    i2c_t i2c;                  /**< I2C bus the device is connected to */
+    uint8_t addr;               /**< address on that bus */
+    isl29020_range_t range;     /**< range setting to use */
+    isl29020_mode_t mode;       /**< measurement mode to use */
+} isl29020_params_t;
 
 /**
  * @brief Initialize a new ISL29020 device

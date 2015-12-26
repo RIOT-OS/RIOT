@@ -21,16 +21,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "kernel.h"
 #include "periph_conf.h"
 #include "periph/i2c.h"
 #include "shell.h"
-#ifdef MODULE_NEWLIB
-#   include "uart_stdio.h"
-#else
-#   include "posix_io.h"
-#   include "board_uart0.h"
-#endif
 
 #define BUFSIZE        (128U)
 
@@ -70,41 +63,6 @@ int cmd_init_master(int argc, char **argv)
     }
     else {
         printf("I2C_%i successfully initialized as master!\n", dev);
-        i2c_dev = dev;
-    }
-
-    return 0;
-}
-
-int cmd_init_slave(int argc, char **argv)
-{
-    int dev, addr, res;
-
-    if (argc != 3) {
-        puts("Error: Invalid number of arguments!");
-        printf("Usage:\n%s: [DEVICE] [ADDRESS]\n", argv[0]);
-        puts("    with DEVICE:");
-        for (int i = 0; i < I2C_NUMOF; i++) {
-            printf("          %i -> I2C_%i\n", i, i);
-        }
-        puts("         ADDRESS: value between 0 and 127");
-        return 1;
-    }
-
-    dev = atoi(argv[1]);
-    addr = atoi(argv[1]);
-
-    res = i2c_init_slave(dev, addr);
-    if (res == -1) {
-        puts("Error: Init: Given device not available");
-        return 1;
-    }
-    else if (res == -2) {
-        puts("Error: Init: Invalid address given");
-        return 1;
-    }
-    else {
-        printf("I2C_%i successfully initialized as slave with address %i!\n", dev, addr);
         i2c_dev = dev;
     }
 
@@ -301,7 +259,6 @@ int cmd_read_reg(int argc, char **argv)
 
 static const shell_command_t shell_commands[] = {
     { "init_master", "Initialize I2C as master", cmd_init_master },
-    { "init_slave", "Initialize I2C as slave", cmd_init_slave },
     { "w", "write bytes to given address", cmd_write },
     { "wr", "write to register ", cmd_write_reg },
     { "r", "read bytes from given address", cmd_read },
@@ -311,21 +268,11 @@ static const shell_command_t shell_commands[] = {
 
 int main(void)
 {
-    shell_t shell;
-
     puts("Test for the low-level I2C driver");
 
-#ifndef MODULE_NEWLIB
-    /* prepare I/O for shell */
-    board_uart0_init();
-    (void) posix_open(uart0_handler_pid, 0);
-    shell_init(&shell, shell_commands, UART0_BUFSIZE, uart0_readc, uart0_putc);
-#else
-    shell_init(&shell, shell_commands, UART0_BUFSIZE, getchar, putchar);
-#endif
-
     /* define own shell commands */
-    shell_run(&shell);
+    char line_buf[SHELL_DEFAULT_BUFSIZE];
+    shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
 
     return 0;
 }

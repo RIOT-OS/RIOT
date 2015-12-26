@@ -49,6 +49,8 @@ typedef enum {
     NETDEV_EVENT_RX_COMPLETE    = 0x0002,   /**< finished receiving a packet */
     NETDEV_EVENT_TX_STARTED     = 0x0004,   /**< started to transfer a packet */
     NETDEV_EVENT_TX_COMPLETE    = 0x0008,   /**< finished transferring packet */
+    NETDEV_EVENT_TX_NOACK       = 0x0010,   /**< ACK requested but not received */
+    NETDEV_EVENT_TX_MEDIUM_BUSY = 0x0020,   /**< couldn't transfer packet */
     /* expand this list if needed */
 } gnrc_netdev_event_t;
 
@@ -116,6 +118,10 @@ typedef struct {
     /**
      * @brief   Get an option value from a given network device
      *
+     * @note    This function does not check for proper alignment of the memory
+     *          region accessed. It is the responsibility of the caller to
+     *          assure aligned memory access.
+     *
      * @param[in] dev           network device descriptor
      * @param[in] opt           option type
      * @param[out] value        pointer to store the option's value in
@@ -132,6 +138,10 @@ typedef struct {
 
     /**
      * @brief   Set an option value for a given network device
+     *
+     * @note    This function does not check for proper alignment of the memory
+     *          region accessed. It is the responsibility of the caller to
+     *          assure aligned memory access.
      *
      * @param[in] dev       network device descriptor
      * @param[in] opt       option type

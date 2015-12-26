@@ -21,7 +21,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "vtimer.h"
+#include "xtimer.h"
 #include "periph/random.h"
 
 #define LIMIT       (20U)
@@ -57,7 +57,7 @@ int main(void)
             printf("\n");
         }
 
-        vtimer_usleep(1000 * 1000);
+        xtimer_usleep(1000 * 1000);
     }
 
     return 0;

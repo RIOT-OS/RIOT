@@ -1,4 +1,3 @@
 INCLUDES += -I$(RIOTBASE)/pkg/libcoap/libcoap \
 			-I$(RIOTBASE)/sys/posix/include \
-			-I$(RIOTBASE)/sys/posix/pnet/include \
 			-I$(RIOTBASE)/sys/net/include

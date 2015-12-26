@@ -17,37 +17,46 @@
  *
  * @author      Kévin Roussel <Kevin.Roussel@inria.fr>
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
- * @author      Joakim Gebart <joakim.gebart@eistec.se>
+ * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
 #include <string.h>
 #include <stdio.h>
 
+#include "assert.h"
 #include "cpu.h"
 #include "irq.h"
 #include "lpm.h"
 #include "panic.h"
 #include "arch/panic_arch.h"
 
-#if DEVELHELP && defined MODULE_PS
+#if defined(DEVELHELP) && defined(MODULE_PS)
 #include "ps.h"
 #endif
+
+const char assert_crash_message[] = "FAILED ASSERTION.";
 
 /* flag preventing "recursive crash printing loop" */
 static int crashed = 0;
 
 /* WARNING: this function NEVER returns! */
-NORETURN void core_panic(int crash_code, const char *message)
+NORETURN void core_panic(core_panic_t crash_code, const char *message)
 {
     (void) crash_code;
 
     if (crashed == 0) {
         /* print panic message to console (if possible) */
         crashed = 1;
-        puts("*** RIOT kernel panic");
+#ifndef NDEBUG
+        if (crash_code == PANIC_ASSERT_FAIL) {
+            cpu_print_last_instruction();
+        }
+#endif
+        puts("*** RIOT kernel panic:");
         puts(message);
-#if DEVELHELP
+        puts("");
+#ifdef DEVELHELP
 #ifdef MODULE_PS
         ps();
         puts("");

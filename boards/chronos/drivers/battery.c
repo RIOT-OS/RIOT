@@ -16,7 +16,7 @@
  * @brief       eZ430-chronos battery readout (via ADC)
  *
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
- * @author      Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ * @author      Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  *
  */
 

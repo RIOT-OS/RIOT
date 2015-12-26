@@ -13,7 +13,7 @@
  * @file
  * @brief       Crash handling functions implementation for 'native' port
  *
- * @author      Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ * @author      Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  * @author      Kévin Roussel <Kevin.Roussel@inria.fr>
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  */
@@ -25,7 +25,7 @@
 
 void panic_arch(void)
 {
-#if DEVELHELP
+#ifdef DEVELHELP
     /* since we're atop an Unix-like platform,
        just use the (developer-)friendly core-dump feature */
     kill(_native_pid, SIGTRAP);

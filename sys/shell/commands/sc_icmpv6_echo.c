@@ -29,7 +29,7 @@
 #include "net/gnrc.h"
 #include "thread.h"
 #include "utlist.h"
-#include "vtimer.h"
+#include "xtimer.h"
 
 static uint16_t id = 0x53;
 static uint16_t min_seq_expected = 0;
@@ -38,11 +38,12 @@ static char ipv6_str[IPV6_ADDR_MAX_STR_LEN];
 
 static void usage(char **argv)
 {
-    printf("%s [<count>] <ipv6 addr> [<payload_len>] [<delay in ms>]\n", argv[0]);
+    printf("%s [<count>] <ipv6 addr> [<payload_len>] [<delay in ms>] [<stats interval>]\n", argv[0]);
     puts("defaults:");
     puts("    count = 3");
     puts("    payload_len = 4");
     puts("    delay = 1000");
+    puts("    stats interval = count");
 }
 
 void _set_payload(icmpv6_echo_t *hdr, size_t payload_len)
@@ -77,7 +78,7 @@ static inline bool _expected_seq(uint16_t seq)
     }
 }
 
-int _handle_reply(gnrc_pktsnip_t *pkt, uint64_t time)
+int _handle_reply(gnrc_pktsnip_t *pkt, uint32_t time)
 {
     gnrc_pktsnip_t *ipv6, *icmpv6;
     ipv6_hdr_t *ipv6_hdr;
@@ -101,13 +102,11 @@ int _handle_reply(gnrc_pktsnip_t *pkt, uint64_t time)
             min_seq_expected++;
         }
 
-        timex_t rt = timex_from_uint64(time);
         printf("%u bytes from %s: id=%" PRIu16 " seq=%" PRIu16 " hop limit=%" PRIu8
                " time = %" PRIu32 ".%03" PRIu32 " ms\n", (unsigned) icmpv6->size,
                ipv6_addr_to_str(ipv6_str, &(ipv6_hdr->src), sizeof(ipv6_str)),
                byteorder_ntohs(icmpv6_hdr->id), seq, ipv6_hdr->hl,
-               (rt.seconds * SEC_IN_MS) + (rt.microseconds / MS_IN_USEC),
-               rt.microseconds % MS_IN_USEC);
+               time / MS_IN_USEC, time % MS_IN_USEC);
         gnrc_ipv6_nc_still_reachable(&ipv6_hdr->src);
     }
     else {
@@ -118,79 +117,77 @@ int _handle_reply(gnrc_pktsnip_t *pkt, uint64_t time)
     return 1;
 }
 
-static inline void _a_to_timex(timex_t *delay, const char *a)
+static void _print_stats(char *addr_str, int success, int count, uint64_t total_time,
+                         uint64_t sum_rtt, uint32_t min_rtt, uint32_t max_rtt)
 {
-    int ms = atoi(a);
+    printf("--- %s ping statistics ---\n", addr_str);
 
-    if (ms >= 0) {
-        delay->seconds = 0;
-        delay->microseconds = ms * 1000;
-        timex_normalize(delay);
+    if (success > 0) {
+        uint32_t avg_rtt = (uint32_t)sum_rtt / count;  /* get average */
+        printf("%d packets transmitted, %d received, %d%% packet loss, time %"
+               PRIu32 ".06%" PRIu32 " s\n", count, success,
+               (100 - ((success * 100) / count)),
+               (uint32_t)total_time / SEC_IN_USEC, (uint32_t)total_time % SEC_IN_USEC);
+        printf("rtt min/avg/max = "
+               "%" PRIu32 ".%03" PRIu32 "/"
+               "%" PRIu32 ".%03" PRIu32 "/"
+               "%" PRIu32 ".%03" PRIu32 " ms\n",
+               min_rtt / MS_IN_USEC, min_rtt % MS_IN_USEC,
+               avg_rtt / MS_IN_USEC, avg_rtt % MS_IN_USEC,
+               max_rtt / MS_IN_USEC, max_rtt % MS_IN_USEC);
+    }
+    else {
+        printf("%d packets transmitted, 0 received, 100%% packet loss\n", count);
     }
 }
 
 int _icmpv6_ping(int argc, char **argv)
 {
-    int count = 3, success = 0, remaining;
+    int count = 3, success = 0, remaining, stat_interval = 0, stat_counter = 0;
     size_t payload_len = 4;
-    timex_t delay = { 1, 0 };
+    uint32_t delay = 1 * SEC_IN_MS;
     char *addr_str;
     ipv6_addr_t addr;
+    msg_t msg;
     gnrc_netreg_entry_t *ipv6_entry, my_entry = { NULL, ICMPV6_ECHO_REP,
-                                                  thread_getpid()
-                                                };
-    timex_t min_rtt = { UINT32_MAX, UINT32_MAX }, max_rtt = { 0, 0 };
-    timex_t sum_rtt = { 0, 0 };
-    timex_t start, stop;
+                                                  thread_getpid() };
+    uint32_t min_rtt = UINT32_MAX, max_rtt = 0;
+    uint64_t sum_rtt = 0;
+    uint64_t ping_start;
+    int param_offset = 0;
 
-    switch (argc) {
-        case 0:
-        case 1:
-            usage(argv);
-            return 1;
-
-        case 2:
-            addr_str = argv[1];
-            break;
-
-        case 3:
-            count = atoi(argv[1]);
-            if (count > 0) {
-                addr_str = argv[2];
-            }
-            else {
-                count = 3;
-                addr_str = argv[1];
-                payload_len = atoi(argv[2]);
-            }
-
-            break;
-
-        case 4:
-            count = atoi(argv[1]);
-            if (count > 0) {
-                addr_str = argv[2];
-                payload_len = atoi(argv[3]);
-            }
-            else {
-                count = 3;
-                addr_str = argv[1];
-                payload_len = atoi(argv[2]);
-                _a_to_timex(&delay, argv[3]);
-            }
-            break;
-
-        case 5:
-        default:
-            count = atoi(argv[1]);
-            addr_str = argv[2];
-            payload_len = atoi(argv[3]);
-            _a_to_timex(&delay, argv[4]);
-            break;
+    if (argc < 2) {
+        usage(argv);
+        return 1;
+    }
+    else if ((argc > 2) &&  ((count = atoi(argv[1])) > 0)) {
+        param_offset = 1;
+    }
+    else {
+        count = 3;
     }
 
-    if ((ipv6_addr_from_str(&addr, addr_str) == NULL) || (((int)payload_len) < 0)) {
+    stat_interval = count;
+
+    addr_str = argv[1 + param_offset];
+
+    if (argc > (2 + param_offset)) {
+        payload_len = atoi(argv[2 + param_offset]);
+    }
+    if (argc > (3 + param_offset)) {
+        delay = atoi(argv[3 + param_offset]);
+    }
+    if (argc > (4 + param_offset)) {
+        stat_interval = atoi(argv[4 + param_offset]);
+    }
+
+    if ((int)payload_len < 0) {
         usage(argv);
+        return 1;
+    }
+
+    if (ipv6_addr_from_str(&addr, addr_str) == NULL) {
+        puts("error: malformed address");
         return 1;
     }
 
@@ -208,15 +205,14 @@ int _icmpv6_ping(int argc, char **argv)
 
     remaining = count;
 
-    vtimer_now(&start);
+    ping_start = xtimer_now64();
 
     while ((remaining--) > 0) {
-        msg_t msg;
         gnrc_pktsnip_t *pkt;
-        timex_t start, stop, timeout = { 5, 0 };
+        uint32_t start, stop, timeout = 1 * SEC_IN_USEC;
 
-        pkt = gnrc_icmpv6_echo_req_build(id, ++max_seq_expected, NULL,
-                                         payload_len);
+        pkt = gnrc_icmpv6_echo_build(ICMPV6_ECHO_REQ, id, ++max_seq_expected,
+                                     NULL, payload_len);
 
         if (pkt == NULL) {
             puts("error: packet buffer full");
@@ -233,28 +229,32 @@ int _icmpv6_ping(int argc, char **argv)
             continue;
         }
 
-        vtimer_now(&start);
-        gnrc_netapi_send(ipv6_entry->pid, pkt);
+        start = xtimer_now();
+        if (gnrc_netapi_send(ipv6_entry->pid, pkt) < 1) {
+            puts("error: unable to send ICMPv6 echo request\n");
+            gnrc_pktbuf_release(pkt);
+            continue;
+        }
 
-        if (vtimer_msg_receive_timeout(&msg, timeout) >= 0) {
+        /* TODO: replace when #4219 was fixed */
+        if (xtimer_msg_receive_timeout64(&msg, (uint64_t)timeout) >= 0) {
             switch (msg.type) {
                 case GNRC_NETAPI_MSG_TYPE_RCV:
-                    vtimer_now(&stop);
-                    stop = timex_sub(stop, start);
+                    stop = xtimer_now() - start;
 
                     gnrc_pktsnip_t *pkt = (gnrc_pktsnip_t *)msg.content.ptr;
-                    success += _handle_reply(pkt, timex_uint64(stop));
+                    success += _handle_reply(pkt, stop);
                     gnrc_pktbuf_release(pkt);
 
-                    if (timex_cmp(stop, max_rtt) > 0) {
+                    if (stop > max_rtt) {
                         max_rtt = stop;
                     }
 
-                    if (timex_cmp(stop, min_rtt) < 1) {
+                    if (stop < min_rtt) {
                         min_rtt = stop;
                     }
 
-                    sum_rtt = timex_add(sum_rtt, stop);
+                    sum_rtt += stop;
 
                     break;
 
@@ -268,44 +268,39 @@ int _icmpv6_ping(int argc, char **argv)
             puts("ping timeout");
         }
 
-        if (remaining > 0) {
-            vtimer_sleep(delay);
+        while (msg_try_receive(&msg) > 0) {
+            if (msg.type == GNRC_NETAPI_MSG_TYPE_RCV) {
+                printf("dropping additional response packet (probably caused by duplicates)\n");
+                gnrc_pktsnip_t *pkt = (gnrc_pktsnip_t *)msg.content.ptr;
+                gnrc_pktbuf_release(pkt);
+            }
         }
-    }
 
-    vtimer_now(&stop);
+        if (remaining > 0) {
+            xtimer_usleep64(delay * MS_IN_USEC);
+        }
+        if ((++stat_counter == stat_interval) || (remaining == 0)) {
+            uint64_t total_time = xtimer_now64() - ping_start;
+            _print_stats(addr_str, success, (count - remaining), total_time, sum_rtt, min_rtt,
+                         max_rtt);
+            stat_counter = 0;
+        }
+
+    }
 
     max_seq_expected = 0;
     id++;
-    stop = timex_sub(stop, start);
 
     gnrc_netreg_unregister(GNRC_NETTYPE_ICMPV6, &my_entry);
-
-    printf("--- %s ping statistics ---\n", addr_str);
-
-    if (success > 0) {
-        timex_normalize(&sum_rtt);
-        printf("%d packets transmitted, %d received, %d%% packet loss, time %"
-               PRIu32 ".06%" PRIu32 " s\n", count, success,
-               (100 - ((success * 100) / count)), stop.seconds, stop.microseconds);
-        timex_t avg_rtt = timex_from_uint64(timex_uint64(sum_rtt) / count);  /* get average */
-        printf("rtt min/avg/max = "
-               "%" PRIu32 ".%03" PRIu32 "/"
-               "%" PRIu32 ".%03" PRIu32 "/"
-               "%" PRIu32 ".%03" PRIu32 " ms\n",
-               (min_rtt.seconds * SEC_IN_MS) + (min_rtt.microseconds / MS_IN_USEC),
-               min_rtt.microseconds % MS_IN_USEC,
-               (avg_rtt.seconds * SEC_IN_MS) + (avg_rtt.microseconds / MS_IN_USEC),
-               avg_rtt.microseconds % MS_IN_USEC,
-               (max_rtt.seconds * SEC_IN_MS) + (max_rtt.microseconds / MS_IN_USEC),
-               max_rtt.microseconds % MS_IN_USEC);
-    }
-    else {
-        printf("%d packets transmitted, 0 received, 100%% packet loss\n", count);
-        return 1;
+    while (msg_try_receive(&msg) > 0) {
+        if (msg.type == GNRC_NETAPI_MSG_TYPE_RCV) {
+            printf("dropping additional response packet (probably caused by duplicates)\n");
+            gnrc_pktsnip_t *pkt = (gnrc_pktsnip_t *)msg.content.ptr;
+            gnrc_pktbuf_release(pkt);
+        }
     }
 
-    return 0;
+    return success ? 0 : 1;
 }
 
 #endif

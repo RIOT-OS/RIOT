@@ -33,18 +33,24 @@ extern "C" {
 #define F_CPU               (16000000UL)
 
 /**
- * @name Define the boards stdio
+ * @brief   Xtimer configuration
  * @{
  */
-#define STDIO               UART_0
-#define STDIO_BAUDRATE      (115200U)
-#define STDIO_RX_BUFSIZE    (64U)
+#define XTIMER                      (0)
+#define XTIMER_CHAN                 (0)
+#define XTIMER_MASK                 (0xff000000)
+#define XTIMER_SHIFT_ON_COMPARE     (2)
+#define XTIMER_BACKOFF              (40)
 /** @} */
 
 /**
- * @name Assign the hardware timer
+ * @name Define the boards stdio
+ * @{
  */
-#define HW_TIMER            TIMER_0
+#define STDIO               UART_DEV(0)
+#define STDIO_BAUDRATE      (115200U)
+#define STDIO_RX_BUFSIZE    (64U)
+/** @} */
 
 /**
  * @name Macros for controlling the on-board LEDs.

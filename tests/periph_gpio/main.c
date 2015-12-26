@@ -22,16 +22,7 @@
 #include <stdlib.h>
 
 #include "shell.h"
-#ifdef MODULE_NEWLIB
-#   include "uart_stdio.h"
-#else
-#   include "posix_io.h"
-#   include "board_uart0.h"
-#endif
 #include "periph/gpio.h"
-#include "hwtimer.h"
-
-#define SHELL_BUFSIZE       (64U)
 
 static void cb(void *arg)
 {
@@ -75,7 +66,7 @@ static int init_out(int argc, char **argv)
     else {
         pull = GPIO_NOPULL;
     }
-    if (gpio_init(GPIO(port, pin), GPIO_DIR_OUT, pull) < 0) {
+    if (gpio_init(GPIO_PIN(port, pin), GPIO_DIR_OUT, pull) < 0) {
         printf("Error while initializing  PORT_%i.%i as output\n", port, pin);
         return 1;
     }
@@ -106,7 +97,7 @@ static int init_in(int argc, char **argv)
     else {
         pull = GPIO_NOPULL;
     }
-    if (gpio_init(GPIO(port, pin), GPIO_DIR_IN, pull) < 0) {
+    if (gpio_init(GPIO_PIN(port, pin), GPIO_DIR_IN, pull) < 0) {
         printf("Error while initializing  PORT_%i.%02i as input\n", port, pin);
         return 1;
     }
@@ -155,7 +146,7 @@ static int init_int(int argc, char **argv)
     else {
         pull = GPIO_NOPULL;
     }
-    if (gpio_init_int(GPIO(port, pin), pull, flank, cb, (void *)pin) < 0) {
+    if (gpio_init_int(GPIO_PIN(port, pin), pull, flank, cb, (void *)pin) < 0) {
         printf("Error while initializing  PORT_%i.%02i as external interrupt\n",
                port, pin);
         return 1;
@@ -176,7 +167,7 @@ static int read(int argc, char **argv)
     }
     port = atoi(argv[1]);
     pin = atoi(argv[2]);
-    if (gpio_read(GPIO(port, pin))) {
+    if (gpio_read(GPIO_PIN(port, pin))) {
         printf("PORT_%i.%02i is HIGH\n", port, pin);
     }
     else {
@@ -196,7 +187,7 @@ static int set(int argc, char **argv)
     port = atoi(argv[1]);
     pin = atoi(argv[2]);
 
-    gpio_set(GPIO(port, pin));
+    gpio_set(GPIO_PIN(port, pin));
     return 0;
 }
 
@@ -210,7 +201,7 @@ static int clear(int argc, char **argv)
     }
     port = atoi(argv[1]);
     pin = atoi(argv[2]);
-    gpio_clear(GPIO(port, pin));
+    gpio_clear(GPIO_PIN(port, pin));
     return 0;
 }
 
@@ -224,7 +215,7 @@ static int toggle(int argc, char **argv)
     }
     port = atoi(argv[1]);
     pin = atoi(argv[2]);
-    gpio_toggle(GPIO(port, pin));
+    gpio_toggle(GPIO_PIN(port, pin));
     return 0;
 }
 
@@ -241,8 +232,6 @@ static const shell_command_t shell_commands[] = {
 
 int main(void)
 {
-    shell_t shell;
-
     puts("GPIO peripheral driver test\n");
     puts("In this test, pins are specified by integer port and pin numbers.\n"
          "So if your platform has a pin PA01, it will be port=0 and pin=1,\n"
@@ -251,13 +240,8 @@ int main(void)
          "      behavior for not existing ports/pins is not defined!");
 
     /* start the shell */
-#ifndef MODULE_NEWLIB
-    (void) posix_open(uart0_handler_pid, 0);
-    shell_init(&shell, shell_commands, SHELL_BUFSIZE, uart0_readc, uart0_putc);
-#else
-    shell_init(&shell, shell_commands, SHELL_BUFSIZE, getchar, putchar);
-#endif
-    shell_run(&shell);
+    char line_buf[SHELL_DEFAULT_BUFSIZE];
+    shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
 
     return 0;
 }

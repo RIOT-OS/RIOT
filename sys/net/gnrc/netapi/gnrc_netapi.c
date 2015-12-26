@@ -24,6 +24,9 @@
 #include "net/gnrc/pktbuf.h"
 #include "net/gnrc/netapi.h"
 
+#define ENABLE_DEBUG    (0)
+#include "debug.h"
+
 /**
  * @brief   Unified function for getting and setting netapi options
  *
@@ -63,11 +66,16 @@ static inline int _snd_rcv(kernel_pid_t pid, uint16_t type, gnrc_pktsnip_t *pkt)
     msg.type = type;
     msg.content.ptr = (void *)pkt;
     /* send message */
-    return msg_send(&msg, pid);
+    int ret = msg_try_send(&msg, pid);
+    if (ret < 1) {
+        DEBUG("gnrc_netapi: dropped message to %" PRIkernel_pid " (%s)\n", pid,
+              (ret == 0) ? "receiver queue is full" : "invalid receiver");
+    }
+    return ret;
 }
 
-static inline int _snd_rcv_dispatch(gnrc_nettype_t type, uint32_t demux_ctx,
-                                    uint16_t cmd, gnrc_pktsnip_t *pkt)
+int gnrc_netapi_dispatch(gnrc_nettype_t type, uint32_t demux_ctx,
+                         uint16_t cmd, gnrc_pktsnip_t *pkt)
 {
     int numof = gnrc_netreg_num(type, demux_ctx);
 
@@ -77,33 +85,25 @@ static inline int _snd_rcv_dispatch(gnrc_nettype_t type, uint32_t demux_ctx,
         gnrc_pktbuf_hold(pkt, numof - 1);
 
         while (sendto) {
-            _snd_rcv(sendto->pid, cmd, pkt);
+            if (_snd_rcv(sendto->pid, cmd, pkt) < 1) {
+                /* unable to dispatch packet */
+                gnrc_pktbuf_release(pkt);
+            }
             sendto = gnrc_netreg_getnext(sendto);
         }
     }
 
     return numof;
 }
+
 int gnrc_netapi_send(kernel_pid_t pid, gnrc_pktsnip_t *pkt)
 {
     return _snd_rcv(pid, GNRC_NETAPI_MSG_TYPE_SND, pkt);
 }
 
-int gnrc_netapi_dispatch_send(gnrc_nettype_t type, uint32_t demux_ctx,
-                              gnrc_pktsnip_t *pkt)
-{
-    return _snd_rcv_dispatch(type, demux_ctx, GNRC_NETAPI_MSG_TYPE_SND, pkt);
-}
-
 int gnrc_netapi_receive(kernel_pid_t pid, gnrc_pktsnip_t *pkt)
 {
     return _snd_rcv(pid, GNRC_NETAPI_MSG_TYPE_RCV, pkt);
-}
-
-int gnrc_netapi_dispatch_receive(gnrc_nettype_t type, uint32_t demux_ctx,
-                                 gnrc_pktsnip_t *pkt)
-{
-    return _snd_rcv_dispatch(type, demux_ctx, GNRC_NETAPI_MSG_TYPE_RCV, pkt);
 }
 
 int gnrc_netapi_get(kernel_pid_t pid, netopt_t opt, uint16_t context,

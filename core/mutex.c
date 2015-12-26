@@ -14,7 +14,7 @@
  * @brief       Kernel mutex implementation
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
- * @author      Joakim Gebart <joakim.gebart@eistec.se>
+ * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  *
  * @}
  */
@@ -85,7 +85,7 @@ static void mutex_wait(struct mutex_t *mutex)
 void mutex_unlock(struct mutex_t *mutex)
 {
     unsigned irqstate = disableIRQ();
-    DEBUG("mutex_unlock(): val: %u pid: %" PRIkernel_pid "\n", mutex->val, sched_active_pid);
+    DEBUG("mutex_unlock(): val: %u pid: %" PRIkernel_pid "\n", ATOMIC_VALUE(mutex->val), sched_active_pid);
 
     if (ATOMIC_VALUE(mutex->val) == 0) {
         /* the mutex was not locked */

@@ -19,7 +19,7 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Johann Fischer <j.fischer@phytec.de>
  * @author      Jonas Remmert <j.remmert@phytec.de>
- * @author      Joakim Gebart <joakim.gebart@eistec.se>
+ * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  *
  * @}
  */
@@ -30,8 +30,6 @@
 #include "cpu.h"
 #include "periph/pwm.h"
 #include "periph_conf.h"
-
-#include "hwtimer.h"
 
 /* ignore file in case no PWM devices are defined */
 #if PWM_NUMOF

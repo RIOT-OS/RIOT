@@ -7,8 +7,8 @@
  */
 
 /**
- * @defgroup    driver_lps331ap LPS331AP Pressure Sensor Driver
- * @ingroup     drivers
+ * @defgroup    drivers_lps331ap LPS331AP Pressure Sensor Driver
+ * @ingroup     drivers_sensors
  * @brief       Device driver for the LPS331AP pressure sensor
  * @{
  *
@@ -52,6 +52,15 @@ typedef enum {
     LPS331AP_RATE_12HZ5 = 6,    /**< sample with 12.5Hz */
     LPS331AP_RATE_25HZ = 7      /**< sample with 25Hz */
 } lps331ap_rate_t;
+
+/**
+ * @brief   Struct holding all parameters needed for device initialization
+ */
+typedef struct {
+    i2c_t i2c;                  /**< I2C bus the sensor is connected to */
+    uint8_t addr;               /**< the devices address on the bus */
+    lps331ap_rate_t rate;       /**< tell sensor to sample with this rate */
+} lps331ap_params_t;
 
 /**
  * @brief Initialize a given LPS331AP pressure sensor

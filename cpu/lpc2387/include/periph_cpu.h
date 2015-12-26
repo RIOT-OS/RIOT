@@ -54,7 +54,7 @@ typedef struct {
 int gpio_init_mux(unsigned pin, unsigned mux);
 void gpio_init_states(void);
 
-#define GPIO(port, pin) (port*32 + pin)
+#define GPIO_PIN(port, pin) (port*32 + pin)
 
 #define HAVE_GPIO_PP_T
 typedef enum {
@@ -71,7 +71,12 @@ typedef enum {
 } gpio_flank_t;
 
 /**
- * @brief declare needed generic SPI functions
+ * @brief   Number of available timer channels
+ */
+#define TIMER_CHAN_NUMOF        (4U)
+
+/**
+ * @brief   Declare needed generic SPI functions
  * @{
  */
 #define PERIPH_SPI_NEEDS_TRANSFER_BYTES

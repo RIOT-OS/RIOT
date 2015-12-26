@@ -29,7 +29,7 @@
 
 #include <stdio.h>
 
-#include "vtimer.h"
+#include "xtimer.h"
 #include "hdc1000.h"
 
 #define SLEEP       (1000 * 1000U)
@@ -55,7 +55,7 @@ int main(void)
             puts("Start measure failed.");
             return -1;
         }
-        vtimer_usleep(HDC1000_CONVERSION_TIME);
+        xtimer_usleep(HDC1000_CONVERSION_TIME);
 
         hdc1000_read(&dev, &rawtemp, &rawhum);
         printf("Raw data T: %5i   RH: %5i\n", rawtemp, rawhum);
@@ -63,7 +63,7 @@ int main(void)
         hdc1000_convert(rawtemp, rawhum,  &temp, &hum);
         printf("Data T: %d   RH: %d\n", temp, hum);
 
-        vtimer_usleep(SLEEP);
+        xtimer_usleep(SLEEP);
 
     }
 

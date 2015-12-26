@@ -6,9 +6,6 @@
  * directory for more details.
  */
 
-#ifndef GPIOINT_H_
-#define GPIOINT_H_
-
 /**
  * @defgroup    drivers_gpioint GPIO IRQ Multiplexer
  * @ingroup     drivers
@@ -24,6 +21,9 @@
  * @author      Michael Baar <michael.baar@fu-berlin.de>
  */
 
+#ifndef GPIOINT_H_
+#define GPIOINT_H_
+
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -32,19 +32,21 @@ extern "C" {
 #endif
 
 /*
- * gpioint_flags:
- * Note: - We rely on the exact values for the edges.
- *       - These flags are extended in hal/drivers/device-gpio.h
+ * @brief   GPIO IRQ multiplexer flags
+ *
+ * @note    We rely on the exact values for the edges.
+ * @note    These flags are extended in hal/drivers/device-gpio.h
+ *
+ * @{
  */
-#define GPIOINT_DISABLE         0x00
-#define GPIOINT_RISING_EDGE     0x01            ///< interrupt is generated on rising edge
-#define GPIOINT_FALLING_EDGE    0x02            ///< interrupt is generated on falling edge
-#define GPIOINT_DEBOUNCE        0x04            ///< debounce this interrupt
+#define GPIOINT_DISABLE         0x00    /**< disable interrupt */
+#define GPIOINT_RISING_EDGE     0x01    /**< interrupt is generated on rising edge */
+#define GPIOINT_FALLING_EDGE    0x02    /**< interrupt is generated on falling edge */
+#define GPIOINT_DEBOUNCE        0x04    /**< debounce this interrupt */
+/** @} */
 
 /**
  * @brief   GPIO IRQ callback function type
- * @param[in]       data        User defined callback data passed through gpioint_set
- * @param[in]       edge        A combination of GPIOINT_RISING_EDGE and GPIOINT_FALLING_EDGE
  */
 typedef void(*fp_irqcb)(void);
 
@@ -62,6 +64,9 @@ typedef void(*fp_irqcb)(void);
  */
 bool gpioint_set(int port, uint32_t bitmask, int flags, fp_irqcb callback);
 
+/**
+ * @brief   Initialize the multiplexer
+ */
 void gpioint_init(void);
 
 #ifdef __cplusplus

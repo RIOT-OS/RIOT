@@ -31,11 +31,6 @@ OUTPUT_FORMAT("elf32-littlearm", "elf32-littlearm", "elf32-littlearm")
 OUTPUT_ARCH(arm)
 SEARCH_DIR(.)
 
-/* Define the default stack size for interrupt mode. As no context is
-   saved on this stack and ISRs are supposed to be short, it can be fairly
-   small. 512 byte should be a save assumption here */
-STACK_SIZE = DEFINED(STACK_SIZE) ? STACK_SIZE : 0x200; /* 512 byte */
-
 /* Section Definitions */
 SECTIONS
 {
@@ -134,7 +129,7 @@ SECTIONS
     {
         . = ALIGN(8);
         _sstack = .;
-        . = . + STACK_SIZE;
+        KEEP (*(.isr_stack))
         . = ALIGN(8);
         _estack = .;
     } > ram

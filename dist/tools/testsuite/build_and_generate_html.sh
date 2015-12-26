@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 test -f ~/.buildbot && . ~/.buildbot
 

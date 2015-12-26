@@ -13,7 +13,7 @@
 #include "byteorder.h"
 #include "periph/spi.h"
 #include "periph/gpio.h"
-#include "hwtimer.h"
+#include "xtimer.h"
 
 /**
  * @ingroup     nvram
@@ -26,7 +26,7 @@
  * Tested on:
  * - Cypress/Ramtron FM25L04B.
  *
- * @author      Joakim Gebart <joakim.gebart@eistec.se>
+ * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
 typedef enum {
@@ -143,7 +143,7 @@ static int nvram_spi_write(nvram_t *dev, uint8_t *src, uint32_t dst, size_t len)
     }
     /* Release CS */
     gpio_set(spi_dev->cs);
-    hwtimer_spin(NVRAM_SPI_CS_TOGGLE_TICKS);
+    xtimer_spin(NVRAM_SPI_CS_TOGGLE_TICKS);
     /* Re-assert CS */
     gpio_clear(spi_dev->cs);
     /* Write command and address */
@@ -228,7 +228,7 @@ static int nvram_spi_write_9bit_addr(nvram_t *dev, uint8_t *src, uint32_t dst, s
         return status;
     }
     gpio_set(spi_dev->cs);
-    hwtimer_spin(NVRAM_SPI_CS_TOGGLE_TICKS);
+    xtimer_spin(NVRAM_SPI_CS_TOGGLE_TICKS);
     gpio_clear(spi_dev->cs);
     /* Write command and address */
     status = spi_transfer_reg(spi_dev->spi, cmd, addr, NULL);

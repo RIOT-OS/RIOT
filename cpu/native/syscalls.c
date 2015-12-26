@@ -4,7 +4,7 @@
  * Wrap system calls and system call invoking library calls to make
  * sure no context switches happen during a system call.
  *
- * Copyright (C) 2013 Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ * Copyright (C) 2013 Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -13,7 +13,7 @@
  * @ingroup native_cpu
  * @{
  * @file
- * @author  Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ * @author  Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  */
 
 #ifndef _GNU_SOURCE
@@ -30,7 +30,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
-#ifdef MODULE_VTIMER
+#ifdef MODULE_XTIMER
 #include <sys/time.h>
 #endif
 #include <ifaddrs.h>
@@ -39,7 +39,7 @@
 #include "kernel.h"
 #include "cpu.h"
 #include "irq.h"
-#include "vtimer.h"
+#include "xtimer.h"
 
 #include "native_internal.h"
 
@@ -91,6 +91,7 @@ long int (*real_random)(void);
 const char* (*real_gai_strerror)(int errcode);
 FILE* (*real_fopen)(const char *path, const char *mode);
 mode_t (*real_umask)(mode_t cmask);
+ssize_t (*real_writev)(int fildes, const struct iovec *iov, int iovcnt);
 
 #ifdef __MACH__
 #else
@@ -120,7 +121,7 @@ void _native_syscall_leave(void)
        )
     {
         _native_in_isr = 1;
-        disableIRQ();
+        unsigned int mask = disableIRQ();
         _native_cur_ctx = (ucontext_t *)sched_active_thread->sp;
         native_isr_context.uc_stack.ss_sp = __isr_stack;
         native_isr_context.uc_stack.ss_size = SIGSTKSZ;
@@ -129,12 +130,29 @@ void _native_syscall_leave(void)
         if (swapcontext(_native_cur_ctx, &native_isr_context) == -1) {
             err(EXIT_FAILURE, "_native_syscall_leave: swapcontext");
         }
-        enableIRQ();
+        restoreIRQ(mask);
     }
 }
 
+int _native_in_malloc = 0;
 void *malloc(size_t size)
 {
+    /* dynamically load malloc when it's needed - this is necessary to
+     * support g++ 5.2.0 as it uses malloc before startup runs */
+    if (!real_malloc) {
+        if (_native_in_malloc) {
+            /* XXX: This is a dirty hack for behaviour that came along
+             * with g++ 5.2.0.
+             * Throw it out when whatever made it necessary it is fixed. */
+            return NULL;
+        }
+        else {
+            _native_in_malloc = 1;
+            *(void **)(&real_malloc) = dlsym(RTLD_NEXT, "malloc");
+            _native_in_malloc = 0;
+        }
+    }
+
     void *r;
     _native_syscall_enter();
     r = real_malloc(size);
@@ -204,6 +222,17 @@ ssize_t _native_write(int fd, const void *buf, size_t count)
 
     _native_syscall_enter();
     r = real_write(fd, buf, count);
+    _native_syscall_leave();
+
+    return r;
+}
+
+ssize_t _native_writev(int fd, const struct iovec *iov, int iovcnt)
+{
+    ssize_t r;
+
+    _native_syscall_enter();
+    r = real_writev(fd, iov, iovcnt);
     _native_syscall_leave();
 
     return r;
@@ -373,7 +402,10 @@ int getpid(void)
 int _gettimeofday(struct timeval *tp, void *restrict tzp)
 {
     (void) tzp;
-    vtimer_gettimeofday(tp);
+    timex_t now;
+    xtimer_now_timex(&now);
+    tp->tv_sec = now.seconds;
+    tp->tv_usec = now.microseconds;
     return 0;
 }
 #endif
@@ -424,6 +456,7 @@ void _native_init_syscalls(void)
     *(void **)(&real_ferror) = dlsym(RTLD_NEXT, "ferror");
     *(void **)(&real_clearerr) = dlsym(RTLD_NEXT, "clearerr");
     *(void **)(&real_umask) = dlsym(RTLD_NEXT, "umask");
+    *(void **)(&real_writev) = dlsym(RTLD_NEXT, "writev");
 #ifdef __MACH__
 #else
     *(void **)(&real_clock_gettime) = dlsym(RTLD_NEXT, "clock_gettime");
