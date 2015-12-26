@@ -20,6 +20,8 @@
 #ifndef BITARITHM_H_
 #define BITARITHM_H_
 
+#include <stdint.h>
+
 #ifdef __cplusplus
  extern "C" {
 #endif
@@ -90,6 +92,9 @@
 
 #define ARCH_32_BIT   (__INT_MAX__ == 2147483647) /**< 1 for 32 bit architectures, 0 otherwise */
 
+/** @brief lookup table used by @ref bitarithm_lsb */
+extern const uint8_t MultiplyDeBruijnBitPosition[32];
+
 /**
  * @brief   Returns the number of the highest '1' bit in a value
  * @param[in]   v   Input value
@@ -101,13 +106,16 @@ unsigned bitarithm_msb(unsigned v);
 
 /**
  * @brief   Returns the number of the lowest '1' bit in a value
- * @param[in]   v   Input value - must be unequal to '0', otherwise the
- *                  function will produce an infinite loop
- * @return          Bit Number
+ * @param[in]   v   Input value
  *
- * Source: http://graphics.stanford.edu/~seander/bithacks.html#IntegerLogObvious
+ * @return          Bit Number (or 0 if input was 0)
+ *
+ * Source: http://graphics.stanford.edu/~seander/bithacks.html#ZerosOnRightMultLookup
  */
-unsigned bitarithm_lsb(register unsigned v);
+static inline unsigned bitarithm_lsb(unsigned v)
+{
+    return MultiplyDeBruijnBitPosition[((uint32_t)((v & -v) * 0x077CB531U)) >> 27];
+}
 
 /**
  * @brief   Returns the number of bits set in a value
