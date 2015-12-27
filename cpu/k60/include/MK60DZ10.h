@@ -257,7 +257,6 @@ typedef enum IRQn {
 #define __FPU_PRESENT                  0         /**< FPU present or not */
 
 #include "core_cm4.h"                  /* Core Peripheral Access Layer */
-#include "system_MK60DZ10.h"           /* Device specific configuration file */
 
 /**
  * @}
