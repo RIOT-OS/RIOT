@@ -1,5 +1,13 @@
 #!/usr/bin/env sh
 
+#
+# Copyright (c) 2015 Nick v. IJzendoorn <nijzendoorn@engineering-spirit.nl>
+#
+# A simple script to fetch and build the teensy_loader_cli tool used for the 
+# Teensy boards.
+# For more information see: https://www.pjrc.com/teensy/loader_cli.html
+#
+
 # get sources from repository
 git clone https://github.com/PaulStoffregen/teensy_loader_cli.git
 cd teensy_loader_cli
