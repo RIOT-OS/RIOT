@@ -57,7 +57,7 @@ int _mutex_lock(struct mutex_t *mutex, int non_blocking)
 
         priority_queue_node_t n;
         n.priority = (unsigned int) sched_active_thread->priority;
-        n.data = (unsigned int) sched_active_thread;
+        n.data = sched_active_pid;
         n.next = NULL;
 
         DEBUG("_mutex_wait: add to wait queue, pid=%" PRIkernel_pid " val=%u "
@@ -94,8 +94,8 @@ void mutex_unlock(struct mutex_t *mutex)
         return;
     }
 
-    tcb_t *process = (tcb_t *) next->data;
-    DEBUG("mutex_unlock: waking up %" PRIkernel_pid "\n", process->pid);
+    tcb_t *process = (tcb_t *) sched_threads[next->data];
+    DEBUG("mutex_unlock: waking up %" PRIkernel_pid "\n", next->data);
     sched_set_status(process, STATUS_PENDING);
 
     uint16_t process_priority = process->priority;
@@ -112,9 +112,9 @@ void mutex_unlock_and_sleep(struct mutex_t *mutex)
     if (ATOMIC_VALUE(mutex->val) != 0) {
         priority_queue_node_t *next = priority_queue_remove_head(&(mutex->queue));
         if (next) {
-            tcb_t *process = (tcb_t *) next->data;
+            tcb_t *process = (tcb_t *) sched_threads[next->data];
             DEBUG("mutex_unlock_and_sleep: waking up %" PRIkernel_pid "\n",
-                  process->pid);
+                  next->data);
             sched_set_status(process, STATUS_PENDING);
         }
         else {
