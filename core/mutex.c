@@ -15,6 +15,7 @@
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
+ * @author      René Kijewski <rene.kijewski@fu-berlin.de>
  *
  * @}
  */
@@ -24,12 +25,9 @@
 
 #include "mutex.h"
 #include "tcb.h"
-#include "atomic.h"
-#include "kernel.h"
 #include "sched.h"
 #include "thread.h"
 #include "irq.h"
-#include "thread.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
@@ -37,18 +35,27 @@
 int _mutex_lock(struct mutex_t *mutex, int non_blocking)
 {
     unsigned irqstate = disableIRQ();
-    DEBUG("_mutex_wait: pid=%" PRIkernel_pid " val=%u non-blocking=%u\n",
-          sched_active_pid, ATOMIC_VALUE(mutex->val), non_blocking);
+    DEBUG("_mutex_wait: pid=%" PRIkernel_pid " holder=%" PRIkernel_pid
+          " non-blocking=%u\n", sched_active_pid, mutex->val, non_blocking);
 
-    if (ATOMIC_VALUE(mutex->val) == 0) {
+    if (mutex->val == KERNEL_PID_UNDEF) {
         /* mutex was not locked */
-        ATOMIC_VALUE(mutex->val) = 1;
+        kernel_pid_t pid = sched_active_pid;
+        if (pid == KERNEL_PID_UNDEF) {
+            /* if used by an interrupt handler the pid could be undefined. */
+            /* this might hurt debugging, but won't hurt normal use. */
+            pid = (kernel_pid_t) -1u;
+        }
+        DEBUG("_mutex_wait: locking for holder=%" PRIkernel_pid "\n", pid);
+
+        mutex->val = pid;
         restoreIRQ(irqstate);
         return 1;
     }
     else if (non_blocking) {
         /* mutex was locked and we were asked not to block. */
         /* nothing to do. */
+        DEBUG("_mutex_wait: already locked, aborting\n");
         restoreIRQ(irqstate);
         return 0;
     }
@@ -60,9 +67,7 @@ int _mutex_lock(struct mutex_t *mutex, int non_blocking)
         n.data = sched_active_pid;
         n.next = NULL;
 
-        DEBUG("_mutex_wait: add to wait queue, pid=%" PRIkernel_pid " val=%u "
-              "prio%" PRIu32 "\n", sched_active_pid, ATOMIC_VALUE(mutex->val),
-              n.priority);
+        DEBUG("_mutex_wait: add to wait queue, prio%" PRIu32 "\n", n.priority);
 
         priority_queue_add(&(mutex->queue), &n);
         restoreIRQ(irqstate);
@@ -77,10 +82,10 @@ int _mutex_lock(struct mutex_t *mutex, int non_blocking)
 void mutex_unlock(struct mutex_t *mutex)
 {
     unsigned irqstate = disableIRQ();
-    DEBUG("mutex_unlock: pid=%" PRIkernel_pid " val=%u\n",
-          sched_active_pid, ATOMIC_VALUE(mutex->val));
+    DEBUG("mutex_unlock: pid=%" PRIkernel_pid " holder=%" PRIkernel_pid "\n",
+          sched_active_pid, mutex->val);
 
-    if (ATOMIC_VALUE(mutex->val) == 0) {
+    if (mutex->val == KERNEL_PID_UNDEF) {
         /* the mutex was not locked */
         restoreIRQ(irqstate);
         return;
@@ -89,10 +94,13 @@ void mutex_unlock(struct mutex_t *mutex)
     priority_queue_node_t *next = priority_queue_remove_head(&(mutex->queue));
     if (!next) {
         /* the mutex was locked and no thread was waiting for it */
-        ATOMIC_VALUE(mutex->val) = 0;
+        mutex->val = KERNEL_PID_UNDEF;
         restoreIRQ(irqstate);
         return;
     }
+
+    /* the waked up thread holds the mutex now */
+    mutex->val = next->data;
 
     tcb_t *process = (tcb_t *) sched_threads[next->data];
     DEBUG("mutex_unlock: waking up %" PRIkernel_pid "\n", next->data);
@@ -105,20 +113,23 @@ void mutex_unlock(struct mutex_t *mutex)
 
 void mutex_unlock_and_sleep(struct mutex_t *mutex)
 {
-    DEBUG("mutex_unlock_and_sleep: pid=%" PRIkernel_pid " val=%u\n",
-          sched_active_pid, ATOMIC_VALUE(mutex->val));
+    DEBUG("mutex_unlock_and_sleep: pid=%" PRIkernel_pid " holder=%"
+          PRIkernel_pid "\n", sched_active_pid, mutex->val);
     unsigned irqstate = disableIRQ();
 
-    if (ATOMIC_VALUE(mutex->val) != 0) {
+    if (mutex->val != KERNEL_PID_UNDEF) {
         priority_queue_node_t *next = priority_queue_remove_head(&(mutex->queue));
         if (next) {
+            /* the waked up thread holds the mutex now */
+            mutex->val = next->data;
+
             tcb_t *process = (tcb_t *) sched_threads[next->data];
             DEBUG("mutex_unlock_and_sleep: waking up %" PRIkernel_pid "\n",
                   next->data);
             sched_set_status(process, STATUS_PENDING);
         }
         else {
-            ATOMIC_VALUE(mutex->val) = 0; /* This is safe, interrupts are disabled */
+            mutex->val = KERNEL_PID_UNDEF;
         }
     }
 
