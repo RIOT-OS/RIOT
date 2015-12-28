@@ -66,6 +66,21 @@ static inline void mutex_init(mutex_t *mutex)
 }
 
 /**
+ * @brief Lock a mutex, blocking or non-blocking.
+ *
+ * @details For commit purposes you should probably use mutex_trylock() and
+ *          mutex_lock() instead.
+ *
+ * @param[in] mutex Mutex object to lock. Has to be initialized first. Must not
+ *                  be NULL.
+ * @param[in] non_blocking Use non-blocking API.
+ *
+ * @return 1 if mutex was unlocked, now it is locked.
+ * @return 0 if the mutex was locked.
+ */
+int _mutex_lock(mutex_t *mutex, int non_blocking);
+
+/**
  * @brief Tries to get a mutex, non-blocking.
  *
  * @param[in] mutex Mutex object to lock. Has to be initialized first. Must not
@@ -74,14 +89,20 @@ static inline void mutex_init(mutex_t *mutex)
  * @return 1 if mutex was unlocked, now it is locked.
  * @return 0 if the mutex was locked.
  */
-int mutex_trylock(mutex_t *mutex);
+static inline int mutex_trylock(mutex_t *mutex)
+{
+    return _mutex_lock(mutex, 1);
+}
 
 /**
  * @brief Locks a mutex, blocking.
  *
  * @param[in] mutex Mutex object to lock. Has to be initialized first. Must not be NULL.
  */
-void mutex_lock(mutex_t *mutex);
+static inline void mutex_lock(mutex_t *mutex)
+{
+    _mutex_lock(mutex, 0);
+}
 
 /**
  * @brief Unlocks the mutex.
