@@ -22,7 +22,7 @@
 #define MUTEX_H_
 
 #include "priority_queue.h"
-#include "atomic.h"
+#include "kernel_types.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -38,7 +38,7 @@ typedef struct mutex_t {
      *          never be changed by the user.**
      * @internal
      */
-    atomic_int_t val;
+    kernel_pid_t val;
     /**
      * @brief   The process waiting queue of the mutex. **Must never be changed
      *          by the user.**
@@ -51,7 +51,7 @@ typedef struct mutex_t {
  * @brief Static initializer for mutex_t.
  * @details This initializer is preferable to mutex_init().
  */
-#define MUTEX_INIT { ATOMIC_INIT(0), PRIORITY_QUEUE_INIT }
+#define MUTEX_INIT { KERNEL_PID_UNDEF, PRIORITY_QUEUE_INIT }
 
 /**
  * @brief Initializes a mutex object.
@@ -66,6 +66,21 @@ static inline void mutex_init(mutex_t *mutex)
 }
 
 /**
+ * @brief Lock a mutex, blocking or non-blocking.
+ *
+ * @details For commit purposes you should probably use mutex_trylock() and
+ *          mutex_lock() instead.
+ *
+ * @param[in] mutex Mutex object to lock. Has to be initialized first. Must not
+ *                  be NULL.
+ * @param[in] non_blocking Use non-blocking API.
+ *
+ * @return 1 if mutex was unlocked, now it is locked.
+ * @return 0 if the mutex was locked.
+ */
+int _mutex_lock(mutex_t *mutex, int non_blocking);
+
+/**
  * @brief Tries to get a mutex, non-blocking.
  *
  * @param[in] mutex Mutex object to lock. Has to be initialized first. Must not
@@ -74,14 +89,20 @@ static inline void mutex_init(mutex_t *mutex)
  * @return 1 if mutex was unlocked, now it is locked.
  * @return 0 if the mutex was locked.
  */
-int mutex_trylock(mutex_t *mutex);
+static inline int mutex_trylock(mutex_t *mutex)
+{
+    return _mutex_lock(mutex, 1);
+}
 
 /**
  * @brief Locks a mutex, blocking.
  *
  * @param[in] mutex Mutex object to lock. Has to be initialized first. Must not be NULL.
  */
-void mutex_lock(mutex_t *mutex);
+static inline void mutex_lock(mutex_t *mutex)
+{
+    _mutex_lock(mutex, 0);
+}
 
 /**
  * @brief Unlocks the mutex.
