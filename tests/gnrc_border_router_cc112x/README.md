@@ -33,7 +33,7 @@ the program by calling something like:
 ```bash
 cd dist/tools/tunslip
 make
-sudo ./tunslip6 affe::1/64 -t tun0 -s /dev/ttyUSB0
+sudo ./tunslip6 affe::1/64 -t tun0 -s /dev/ttyUSB1
 ```
 Assuming that `/dev/ttyUSB0` is the device descriptor for the (additional) UART
 interface of your RIOT board.

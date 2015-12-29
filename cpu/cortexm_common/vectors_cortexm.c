@@ -300,6 +300,7 @@ __attribute__((used)) void hard_fault_handler(uint32_t* sp, uint32_t corrupted, 
               [extra_stack] "r" (r4_to_r11_stack)
             : "r0","r1","r2","r3","r12"
             );
+
         __BKPT(1);
     }
 

@@ -27,8 +27,8 @@ USEMODULE += gnrc_slip
 USEMODULE += gnrc_sixlowpan_border_router_default
 # Specify the mandatory networking modules for IPv6 and UDP
 USEMODULE += gnrc_ipv6_router_default
-USEMODULE += gnrc_udp
-# Add a routing protocol
+#USEMODULE += gnrc_udp
+## Add a routing protocol
 USEMODULE += gnrc_rpl
 # This application dumps received packets to STDIO using the pktdump module
 USEMODULE += gnrc_pktdump

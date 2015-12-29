@@ -125,7 +125,7 @@ extern "C" {
 #define UART_1_RX_PIN       6
 /* buffering setting */
 #define UART_1_ENABLE_BUF   0
-#define UART_1_BUFSIZE     120
+#define UART_1_BUFSIZE     1024
 
 /* UART 2 device configuration, it is LEUART device */
 #define UART_2_DEV          LEUART0
