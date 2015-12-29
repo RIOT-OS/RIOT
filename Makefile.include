@@ -198,6 +198,7 @@ BASELIBS += $(USEPKG:%=${BINDIR}%.a)
 
 ELFFILE ?= $(BINDIR)$(APPLICATION).elf
 HEXFILE ?= $(ELFFILE:.elf=.hex)
+BINFILE ?= $(ELFFILE:.elf=.bin)
 
 # variables used to compile and link c++
 CPPMIX ?= $(if $(wildcard *.cpp),1,)
@@ -221,6 +222,7 @@ else
 endif
 	$(AD)$(SIZE) $(ELFFILE)
 	$(AD)$(OBJCOPY) $(OFLAGS) $(ELFFILE) $(HEXFILE)
+	$(AD)$(OBJCOPY) -O binary $(ELFFILE) $(BINFILE)
 endif
 endif # BUILD_IN_DOCKER
 

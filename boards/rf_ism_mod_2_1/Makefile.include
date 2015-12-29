@@ -1,0 +1,21 @@
+# define the cpu used by the stm32f4-discovery board
+export CPU = efm32wg
+export CPU_MODEL = efm32wg990f256
+EFM32WG990F256 = 1
+
+ifneq (,$(filter gnrc_netif_default,$(USEMODULE)))
+#	USEMODULE += cc110x gnrc_netdev2 gnrc_cc110
+endif
+
+# set default port depending on operating system
+PORT_LINUX ?= /dev/ttyUSB0
+PORT_DARWIN ?= $(shell ls -1 /dev/tty.SLAB_USBtoUART* | head -n 1)
+
+# setup serial terminal
+#include $(RIOTBOARD)/Makefile.include.serial
+
+# this board uses openocd
+#include $(RIOTBOARD)/Makefile.include.openocd
+
+# include cortex defaults
+include $(RIOTBOARD)/Makefile.include.cortexm_common

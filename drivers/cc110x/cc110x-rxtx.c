@@ -40,7 +40,7 @@
 
 #include "log.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG (1)
 #include "debug.h"
 
 static void _rx_abort(cc110x_t *dev)
@@ -172,7 +172,7 @@ static void _tx_continue(cc110x_t *dev)
     if (!left) {
         dev->cc110x_statistic.raw_packets_out++;
 
-        LOG_DEBUG("cc110x: packet successfully sent.\n");
+        DEBUG("cc110x: packet successfully sent.\n");
 
         cc110x_switch_to_rx(dev);
         return;
@@ -217,9 +217,11 @@ static void _tx_continue(cc110x_t *dev)
 
 void cc110x_isr_handler(cc110x_t *dev, void(*callback)(void*), void*arg)
 {
+    DEBUG("%s:%s:%u\n", RIOT_FILE_RELATIVE, __func__, __LINE__);
     switch (dev->radio_state) {
         case RADIO_RX:
             if (gpio_read(dev->params.gdo2)) {
+                DEBUG("cc110x_isr_handler((): reading started\n");
                 _rx_start(dev);
             }
             else {
@@ -228,6 +230,7 @@ void cc110x_isr_handler(cc110x_t *dev, void(*callback)(void*), void*arg)
             }
             break;
         case RADIO_RX_BUSY:
+            DEBUG("cc110x_isr_handler((): countinuig receiving\n");
             _rx_continue(dev, callback, arg);
             break;
         case RADIO_TX_BUSY:
@@ -253,8 +256,9 @@ int cc110x_send(cc110x_t *dev, cc110x_pkt_t *packet)
     switch (dev->radio_state) {
         case RADIO_RX_BUSY:
         case RADIO_TX_BUSY:
-            DEBUG("cc110x: invalid state for sending: %s\n",
-                    cc110x_state_to_text(dev->radio_state));
+            DEBUG("cc110x: invalid state for sending...");
+//            DEBUG("cc110x: invalid state for sending: %s\n",
+//                    cc110x_state_to_text(dev->radio_state));
             return -EAGAIN;
     }
 

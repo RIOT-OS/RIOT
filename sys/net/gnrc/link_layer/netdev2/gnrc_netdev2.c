@@ -192,5 +192,7 @@ kernel_pid_t gnrc_netdev2_init(char *stack, int stacksize, char priority,
         return -EINVAL;
     }
 
+    printf("PIDPIO PID - %d\n", res);
+
     return res;
 }

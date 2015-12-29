@@ -1,0 +1,8 @@
+export CPU_ARCH = cortex-m4
+
+USEMODULE += emlib
+
+# include module specific includes
+export INCLUDES += -I$(RIOTCPU)/efm32wg/emlib/inc
+export INCLUDES += -I$(RIOTCPU)/efm32wg/include/ef32wg_headers
+include $(RIOTCPU)/Makefile.include.cortexm_common

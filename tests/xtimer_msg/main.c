@@ -121,7 +121,7 @@ int main(void)
                    "timer local");
 
     while (1) {
-        xtimer_usleep(1*1000000);
+        xtimer_usleep(1*125000);
         msg_try_send(&m, pid2);
     }
 }

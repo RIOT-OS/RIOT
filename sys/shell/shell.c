@@ -31,6 +31,7 @@
 #include <stdlib.h>
 #include "shell.h"
 #include "shell_commands.h"
+#include "vtimer.h"
 
 #ifdef MODULE_NEWLIB
 /* use local copy of putchar, as it seems to be inlined,

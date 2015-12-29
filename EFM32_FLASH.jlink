@@ -1,0 +1,5 @@
+h
+erase
+loadbin ./tests/gnrc_networking_cc112x/bin/rf_ism_mod_2_1/gnrc_networking.bin,0
+r
+q

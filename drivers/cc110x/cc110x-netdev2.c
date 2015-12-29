@@ -34,7 +34,7 @@
 #include "net/netdev2.h"
 #include "net/gnrc/nettype.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG    (1)
 #include "debug.h"
 
 static int _send(netdev2_t *dev, const struct iovec *vector, int count)
