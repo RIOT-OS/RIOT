@@ -26,51 +26,18 @@
 #include "arch/thread_arch.h"
 #include "arch/irq_arch.h"
 
+extern void (* const interrupt_vector[])(void);
+
 /**
  * @brief Initialize the CPU, set IRQ priorities
  */
 void cpu_init(void)
 {
     /* initializes vector table */
-    // MAP_IntVTableBaseSet((unsigned long)&g_pfnVectors[0]);
+    MAP_IntVTableBaseSet((unsigned long)&interrupt_vector[0]);
 
     /* enable processor */
-    // MAP_IntMasterEnable();
-    // MAP_IntEnable(FAULT_SYSTICK);
-
+    MAP_IntMasterEnable();
+    MAP_IntEnable(FAULT_SYSTICK);
     PRCMCC3200MCUInit();
-
-    /* initialize the clock system */
-    // cpu_clock_init(CLOCK_SOURCE);
 }
-
-// void setup_fpu(void)
-// {
-//     ROM_FPUEnable();
-//     ROM_FPULazyStackingEnable();
-// }
-
-// void cpu_clock_init(int clk)
-// {
-//     setup_fpu();
-//     switch(clk){
-//         case CLK80:
-//             ROM_SysCtlClockSet(SYSCTL_SYSDIV_2_5 | SYSCTL_USE_PLL | SYSCTL_XTAL_16MHZ | SYSCTL_OSC_MAIN);
-//             break;
-//         case CLK50:
-//             ROM_SysCtlClockSet(SYSCTL_SYSDIV_4 | SYSCTL_USE_PLL | SYSCTL_XTAL_16MHZ | SYSCTL_OSC_MAIN);
-//             break;
-//         case CLK40:
-//             ROM_SysCtlClockSet(SYSCTL_SYSDIV_5 | SYSCTL_USE_PLL | SYSCTL_XTAL_16MHZ | SYSCTL_OSC_MAIN);
-//             break;
-//         case CLK16:
-//             ROM_SysCtlClockSet(SYSCTL_SYSDIV_1 | SYSCTL_USE_PLL | SYSCTL_XTAL_16MHZ | SYSCTL_OSC_MAIN);
-//             break;
-//         case CLK1:
-//             ROM_SysCtlClockSet(SYSCTL_SYSDIV_1 | SYSCTL_USE_PLL | SYSCTL_XTAL_1MHZ | SYSCTL_OSC_MAIN);
-//             break;
-//         default:
-//             ROM_SysCtlClockSet(SYSCTL_SYSDIV_1 | SYSCTL_USE_PLL | SYSCTL_XTAL_16MHZ | SYSCTL_OSC_MAIN);
-//             break;
-//     }
-// }

@@ -22,12 +22,12 @@
 #define BOARD_H
 
 #include "cpu.h"
-// #include "periph/uart.h"
-// #include "periph/timer.h"
+#include "cc3200_gpio.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 /**
  * @name Define the boards stdio
@@ -42,21 +42,27 @@ extern "C" {
  * @name Macros for controlling the on-board LEDs.
  * @{
  */
-// #define LED_GREEN_PIN       0x08
-// #define LED_BLUE_PIN        0x04
-// #define LED_RED_PIN         0x02
+#define GPIO_LED_RED        9       // red
+#define GPIO_LED_ORANGE     10      // orange
+#define GPIO_LED_GREEN      11      // green
 
-// #define LED_GREEN_ON        GPIO_PORTF_DATA_R |= LED_GREEN_PIN
-// #define LED_GREEN_OFF       GPIO_PORTF_DATA_R &= ~(LED_GREEN_PIN)
-// #define LED_GREEN_TOGGLE    /* not available */
+#define LED_RED_PIN         PIN_64
+#define LED_ORANGE_PIN      PIN_01
+#define LED_GREEN_PIN       PIN_02
 
-// #define LED_BLUE_ON         GPIO_PORTF_DATA_R |= LED_BLUE_PIN
-// #define LED_BLUE_OFF        GPIO_PORTF_DATA_R &= ~(LED_BLUE_PIN)
-// #define LED_BLUE_TOGGLE     /* not available */
+#define PINS_IN_PORT        8
 
-// #define LED_RED_ON          GPIO_PORTF_DATA_R |= LED_RED_PIN
-// #define LED_RED_OFF         GPIO_PORTF_DATA_R &= ~(LED_RED_PIN)
-// #define LED_RED_TOGGLE      /* not available */
+#define LED_RED_ON()        gpio_set(GPIO_LED_RED, 1)
+#define LED_RED_OFF()       gpio_set(GPIO_LED_RED, 0)
+#define LED_RED_TOGGLE()    /* not implemented yet */
+
+#define LED_ORANGE_ON()     gpio_set(GPIO_LED_ORANGE, 1)
+#define LED_ORANGE_OFF()    gpio_set(GPIO_LED_ORANGE, 0)
+#define LED_ORANGE_TOGGLE() /* not implemented yet */
+
+#define LED_GREEN_ON()      gpio_set(GPIO_LED_GREEN, 1)
+#define LED_GREEN_OFF()     gpio_set(GPIO_LED_GREEN, 0)
+#define LED_GREEN_TOGGLE()  /* not implemented yet */
 /* @} */
 
 /**

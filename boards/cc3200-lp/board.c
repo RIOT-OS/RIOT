@@ -19,6 +19,7 @@
  */
 
 #include "board.h"
+
 static void leds_init(void);
 
 void board_init(void)
@@ -35,9 +36,23 @@ void board_init(void)
  */
 static void leds_init(void)
 {
-    /* enable clock for PORTF */
-    // ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
+    /* enable clocks for GPIOA1 */
+    MAP_PRCMPeripheralClkEnable(PRCM_GPIOA1, PRCM_RUN_MODE_CLK);
 
-    /* configure the pins as general output */
-    // ROM_GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3);
+    /* configure PIN_64 red as general output */
+    MAP_PinTypeGPIO(LED_RED_PIN, PIN_MODE_0, false);
+    MAP_GPIODirModeSet(GPIOA1_BASE, 0x2, GPIO_DIR_MODE_OUT);
+
+    /* configure PIN_01 orange as general output */
+    MAP_PinTypeGPIO(LED_ORANGE_PIN, PIN_MODE_0, false);
+    MAP_GPIODirModeSet(GPIOA1_BASE, 0x4, GPIO_DIR_MODE_OUT);
+
+    /* configure PIN_02 green as general output */
+    MAP_PinTypeGPIO(LED_GREEN_PIN, PIN_MODE_0, false);
+    MAP_GPIODirModeSet(GPIOA1_BASE, 0x8, GPIO_DIR_MODE_OUT);
+
+    /* turn off all leds */
+    LED_RED_OFF();
+    LED_ORANGE_OFF();
+    LED_GREEN_OFF();
 }

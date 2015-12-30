@@ -20,16 +20,17 @@
 #ifndef CPU_INCLUDE_CC3200_H_
 #define CPU_INCLUDE_CC3200_H_
 
-#include "hw_ints.h"
-#include "hw_memmap.h"
-#include "hw_types.h"
-#include "driverlib/rom_map.h"
-#include "driverlib/interrupt.h"
-// #include "driverlib/uart.h"
-// #include "driverlib/pin.h"
-// #include "driverlib/gpio.h"
-#include "prcm.h"
+#include "inc/hw_gpio.h"
+#include "inc/hw_ints.h"
+#include "inc/hw_memmap.h"
+#include "inc/hw_types.h"
 
+#include "prcm.h"
+#include "rom_map.h"
+#include "rom.h"
+#include "pin.h"
+#include "gpio.h"
+#include "interrupt.h"
 #include "board.h"
 
 #ifdef __cplusplus
