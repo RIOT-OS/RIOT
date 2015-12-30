@@ -53,7 +53,7 @@
 #include "inc/hw_hib3p3.h"
 #include "prcm.h"
 #include "interrupt.h"
-#include "cpu.h"
+#include "cpuins.h"
 #include "flash.h"
 #include "utils.h"
 

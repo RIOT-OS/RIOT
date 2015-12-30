@@ -1,6 +1,6 @@
 //*****************************************************************************
 //
-//  cpu.h
+//  cpuins.h
 //
 //  Prototypes for the CPU instruction wrapper functions.
 //
