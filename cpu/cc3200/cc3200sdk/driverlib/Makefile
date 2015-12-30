@@ -1,4 +1,4 @@
-MODULE = cc3200_driverlib
+MODULE = cc3200sdk_driverlib
 
 export CFLAGS += -Dgcc
 

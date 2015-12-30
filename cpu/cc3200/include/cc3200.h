@@ -28,7 +28,7 @@
 // #include "driverlib/uart.h"
 // #include "driverlib/pin.h"
 // #include "driverlib/gpio.h"
-#include "driverlib/prcm.h"
+#include "prcm.h"
 
 #include "board.h"
 

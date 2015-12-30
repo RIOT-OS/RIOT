@@ -19,7 +19,7 @@
  */
 
 #include "board.h"
-// static void leds_init(void);
+static void leds_init(void);
 
 void board_init(void)
 {
@@ -27,17 +27,17 @@ void board_init(void)
     cpu_init();
 
     /* initialize the boards LEDs, this is done for debugging purpose */
-    /* leds_init(); */
+    leds_init(); 
 }
 
 /**
  * @brief initialize the boards on-boards LEDS.
  */
-// static void leds_init(void)
-// {
-//     /* enable clock for PORTF */
-//     ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
-//
-//     /* configure the pins as general output */
-//     ROM_GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3);
-// }
+static void leds_init(void)
+{
+    /* enable clock for PORTF */
+    // ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
+
+    /* configure the pins as general output */
+    // ROM_GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3);
+}

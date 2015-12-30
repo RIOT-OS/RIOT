@@ -1,8 +1,10 @@
 export CPU_ARCH = cortex-m4
 
-include $(RIOTCPU)/Makefile.include.cortexm_common
+
+USEMODULE += cc3200sdk_driverlib
 
 INCLUDES += -I$(RIOTCPU)/$(CPU)/cc3200sdk/
 INCLUDES += -I$(RIOTCPU)/$(CPU)/cc3200sdk/inc
 INCLUDES += -I$(RIOTCPU)/$(CPU)/cc3200sdk/driverlib
 
+include $(RIOTCPU)/Makefile.include.cortexm_common

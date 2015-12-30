@@ -26,15 +26,17 @@
 #include "arch/thread_arch.h"
 #include "arch/irq_arch.h"
 
-void cortexm_init(void);
-
 /**
  * @brief Initialize the CPU, set IRQ priorities
  */
 void cpu_init(void)
 {
-    /* initializes the Cortex-M core */
-    cortexm_init();
+    /* initializes vector table */
+    // MAP_IntVTableBaseSet((unsigned long)&g_pfnVectors[0]);
+
+    /* enable processor */
+    // MAP_IntMasterEnable();
+    // MAP_IntEnable(FAULT_SYSTICK);
 
     PRCMCC3200MCUInit();
 
