@@ -56,6 +56,7 @@
 #define STATUS_REPLY_BLOCKED        5   /**< waiting for a message response     */
 #define STATUS_FLAG_BLOCKED_ANY     6   /**< waiting for any flag from flag_mask*/
 #define STATUS_FLAG_BLOCKED_ALL     7   /**< waiting for all flags in flag_mask */
+#define STATUS_MBOX_BLOCKED         8   /**< waiting for get/put on mbox        */
 /** @} */
 
 /**
@@ -63,8 +64,8 @@
  * @{*/
 #define STATUS_ON_RUNQUEUE      STATUS_RUNNING  /**< to check if on run queue:
                                                  `st >= STATUS_ON_RUNQUEUE`             */
-#define STATUS_RUNNING          8               /**< currently running                  */
-#define STATUS_PENDING          9               /**< waiting to be scheduled to run     */
+#define STATUS_RUNNING          9               /**< currently running                  */
+#define STATUS_PENDING         10               /**< waiting to be scheduled to run     */
 /** @} */
 /** @} */
 
@@ -84,8 +85,10 @@ struct _thread {
 
     clist_node_t rq_entry;          /**< run queue entry                */
 
-#if defined(MODULE_CORE_MSG) || defined(MODULE_CORE_THREAD_FLAGS)
-    void *wait_data;                /**< used by msg and thread flags   */
+#if defined(MODULE_CORE_MSG) || defined(MODULE_CORE_THREAD_FLAGS) \
+    || defined(MODULE_CORE_MBOX)
+    void *wait_data;                /**< used by msg, mbox and thread
+                                         flags                          */
 #endif
 #if defined(MODULE_CORE_MSG)
     list_node_t msg_waiters;        /**< threads waiting on message     */
