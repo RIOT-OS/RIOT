@@ -626,7 +626,7 @@ PRCMLPDSRestoreInfoSet(unsigned long ulStackPtr, unsigned long ulProgCntr)
 //
 //*****************************************************************************
 void
-PRCMLPDSEnter()
+PRCMLPDSEnter(void)
 {
   //
   // Check if flash exists
@@ -736,7 +736,7 @@ PRCMLPDSWakeupSourceDisable(unsigned long ulLpdsWakeupSrc)
 //
 //*****************************************************************************
 unsigned long
-PRCMLPDSWakeupCauseGet()
+PRCMLPDSWakeupCauseGet(void)
 {
   return (HWREG(GPRCM_BASE+ GPRCM_O_APPS_LPDS_WAKEUP_SRC));
 }
@@ -826,7 +826,7 @@ PRCMLPDSWakeUpGPIOSelect(unsigned long ulGPIOPin, unsigned long ulType)
 //
 //*****************************************************************************
 void
-PRCMSleepEnter()
+PRCMSleepEnter(void)
 {
   //
   // Request Sleep
@@ -847,7 +847,7 @@ PRCMSleepEnter()
 //
 //*****************************************************************************
 void
-PRCMDeepSleepEnter()
+PRCMDeepSleepEnter(void)
 {
   //
   // Set bandgap duty cycle to 1
@@ -1081,7 +1081,7 @@ PRCMHibernateWakeupSourceDisable(unsigned long ulHIBWakupSrc)
 //
 //*****************************************************************************
 unsigned long
-PRCMHibernateWakeupCauseGet()
+PRCMHibernateWakeupCauseGet(void)
 {
   return ((PRCMHIBRegRead(HIB3P3_BASE + HIB3P3_O_MEM_HIB_WAKE_STATUS)>>1)&0xF);
 }
@@ -1196,7 +1196,7 @@ PRCMHibernateWakeUpGPIOSelect(unsigned long ulGPIOBitMap, unsigned long ulType)
 //
 //*****************************************************************************
 void
-PRCMHibernateEnter()
+PRCMHibernateEnter(void)
 {
 
   //
@@ -1220,7 +1220,7 @@ PRCMHibernateEnter()
 //
 //*****************************************************************************
 unsigned long long
-PRCMSlowClkCtrGet()
+PRCMSlowClkCtrGet(void)
 {
   unsigned long long ullRTCVal;
 
@@ -1302,7 +1302,7 @@ void PRCMSlowClkCtrMatchSet(unsigned long long ullValue)
 //! \return None.
 //
 //*****************************************************************************
-unsigned long long PRCMSlowClkCtrMatchGet()
+unsigned long long PRCMSlowClkCtrMatchGet(void)
 {
   unsigned long long ullValue;
 
@@ -1395,7 +1395,7 @@ void PRCMIntRegister(void (*pfnHandler)(void))
 //! \return None.
 //
 //*****************************************************************************
-void PRCMIntUnregister()
+void PRCMIntUnregister(void)
 {
   //
   // Enable the UART interrupt.
@@ -1489,7 +1489,7 @@ void PRCMIntDisable(unsigned long ulIntFlags)
 //! \return Returns the current interrupt status.
 //
 //*****************************************************************************
-unsigned long PRCMIntStatus()
+unsigned long PRCMIntStatus(void)
 {
     return HWREG(ARCM_BASE + APPS_RCM_O_APPS_RCM_INTERRUPT_STATUS);
 }
@@ -1512,7 +1512,7 @@ unsigned long PRCMIntStatus()
 //! \return None.
 //
 //*****************************************************************************
-void PRCMRTCInUseSet()
+void PRCMRTCInUseSet(void)
 {
         RTC_USE_SET();
         return;
@@ -1535,7 +1535,7 @@ void PRCMRTCInUseSet()
 //! \return None.
 //
 //*****************************************************************************
-tBoolean PRCMRTCInUseGet()
+tBoolean PRCMRTCInUseGet(void)
 {
         return IS_RTC_USED()? true : false;
 }
@@ -1685,7 +1685,7 @@ void PRCMRTCMatchGet(unsigned long *ulSecs, unsigned short *usMsec)
 //! \return None
 //
 //*****************************************************************************
-void PRCMCC3200MCUInit()
+void PRCMCC3200MCUInit(void)
 {
 
 #ifdef CC3200_ES_1_2_1
