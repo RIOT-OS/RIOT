@@ -1,7 +1,7 @@
 /*****************************************************************************
-* cc3200.ld
+* CC3200R1M2.ld
 *
-* GCC Linker script for blinky application.
+* GCC Linker script
 *
 * Copyright (C) 2014 Texas Instruments Incorporated - http://www.ti.com/
 *
