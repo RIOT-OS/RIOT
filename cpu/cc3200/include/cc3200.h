@@ -1,20 +1,19 @@
 /*
- * Copyright (C) 2015 Attilio Dona'
+ * Copyright (C) 2015 Dinh Nguyen
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
- *
- *
- * @ingroup     cpu_cc3200
+ */
+
+/**
+ * @ingroup         cpu_cc3200_definitions
  * @{
  *
  * @file
- * @brief       CC3200 MCU definitions
+ * @brief           cc3200 MCU interrupt and register definitions
  *
- * @author      Attilio Dona'
- * @}
- *
+ * @author          Dinh Nguyen <nqdinhddt@gmail.com>
  */
 
 #ifndef CPU_INCLUDE_CC3200_H_
@@ -38,10 +37,10 @@
 #endif
 
 #define __CM4_REV                 0x0001  /*!< Core revision r0p1                              */
-#define __MPU_PRESENT             1       /*!< LM4F120H5QR provides an MPU                     */
-#define __NVIC_PRIO_BITS          3       /*!< LM4F120H5QR uses 4 Bits for the Priority Levels */
+#define __MPU_PRESENT             0       /*!< CC3200 does not provide an MPU                     */
+#define __NVIC_PRIO_BITS          3       /*!< CC3200 uses 3 Bits for the Priority Levels */
 #define __Vendor_SysTickConfig    0       /*!< Set to 1 if different SysTick Config is used    */
-#define __FPU_PRESENT             1       /*!< FPU present                                     */
+#define __FPU_PRESENT             0       /*!< FPU do not present                              */
 
 #define __ASM            __asm
 #define __STATIC_INLINE  static inline

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Rakendra Thapa <rakendrathapa@gmail.com>
+ * Copyright (C) 2015 Dinh nguyen
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -7,13 +7,13 @@
  */
 
 /**
- * @ingroup         cpu_lm4f120
+ * @ingroup         cpu_cc3200
  * @{
  *
  * @file
  * @brief           CPU specific definitions for internal peripheral handling
  *
- * @author          Rakendra Thapa <rakendrathapa@gmail.com>
+ * @author          Dinh Nguyen <nqdinhddt@gmail.com>
  */
 
 #ifndef PERIPH_CPU_H_

@@ -1,21 +1,19 @@
 /*
- * Copyright (C) 2015 Rakendra Thapa <rakendrathapa@gmail.com
+ * Copyright (C) 2015 Dinh Nguyen
  *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**
- * @defgroup        cpu_lm4f120 LM4F
- * @ingroup         cpu
- * @brief           CPU specific implementations for LM4F120
+ * @ingroup         cpu_cc3200
  * @{
  *
  * @file
- * @brief           Implementation specific CPU configuration options
+ * @brief           cc3200 MCU configuration
  *
- * @author          Rakendra Thapa <rakendrathapa@gmail.com>
+ * @author          Dinh Nguyen <nqdinhddt@gmail.com>
  */
 
 #ifndef CPU_CONF_H
@@ -46,19 +44,6 @@ extern "C" {
  */
 #define CPUID_ID_LEN                    (12)
 #define CPUID_ADDR                      NVIC_CPUID
-/** @} */
-
-// #define THREAD_EXTRA_STACKSIZE_PRINTF   (512)
-// #define THREAD_STACKSIZE_DEFAULT        (1024)
-// #define THREAD_STACKSIZE_IDLE           (256)
-// #define ISR_STACKSIZE                   (512U) 	
-// #define ARCH_HAS_ATOMIC_COMPARE_AND_SWAP 1
-/**
- * @name cpu functions
- * @{
- */
-extern void setup_fpu(void);
-extern void cpu_clock_init(int);
 /** @} */
 
 #ifdef __cplusplus
