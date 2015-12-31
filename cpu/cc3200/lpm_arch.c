@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     cpu_lm4f120
+ * @ingroup     cpu_cc3200
  * @{
  *
  * @file        lpm_arch.c

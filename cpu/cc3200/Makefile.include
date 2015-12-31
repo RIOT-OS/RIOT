@@ -1,6 +1,5 @@
 export CPU_ARCH = cortex-m4
 
-
 USEMODULE += cc3200sdk_driverlib
 
 INCLUDES += -I$(RIOTCPU)/$(CPU)/cc3200sdk/
