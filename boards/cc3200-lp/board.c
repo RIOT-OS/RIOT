@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 nqd
+ * Copyright (C) 2015 Dinh Nguyen
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -13,7 +13,7 @@
  * @file        board.c
  * @brief       Board specific implementations for the CC3200 Launchpad
  *
- * @author      nqd
+ * @author      Dinh Nguyen <nqdinhddt@gmail.com>
  *
  * @}
  */
