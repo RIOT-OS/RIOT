@@ -124,7 +124,11 @@ extern const char* (*real_gai_strerror)(int errcode);
 extern FILE* (*real_fopen)(const char *path, const char *mode);
 extern mode_t (*real_umask)(mode_t cmask);
 extern ssize_t (*real_writev)(int fildes, const struct iovec *iov, int iovcnt);
-
+extern int (*real_timer_create)(clockid_t clockid, struct sigevent *restrict
+                                evp, timer_t *restrict timerid);
+extern int (*real_timer_settime)(timer_t timerid, int flags, const struct
+                                 itimerspec *restrict value, struct itimerspec
+                                 *restrict ovalue);
 #ifdef __MACH__
 #else
 extern int (*real_clock_gettime)(clockid_t clk_id, struct timespec *tp);

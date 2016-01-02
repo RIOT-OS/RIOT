@@ -92,6 +92,10 @@ const char* (*real_gai_strerror)(int errcode);
 FILE* (*real_fopen)(const char *path, const char *mode);
 mode_t (*real_umask)(mode_t cmask);
 ssize_t (*real_writev)(int fildes, const struct iovec *iov, int iovcnt);
+int (*real_timer_create)(clockid_t clockid, struct sigevent *restrict evp,
+                        timer_t *restrict timerid);
+int (*real_timer_settime)(timer_t timerid, int flags, const struct itimerspec
+                         *restrict value, struct itimerspec *restrict ovalue);
 
 #ifdef __MACH__
 #else
@@ -457,6 +461,8 @@ void _native_init_syscalls(void)
     *(void **)(&real_clearerr) = dlsym(RTLD_NEXT, "clearerr");
     *(void **)(&real_umask) = dlsym(RTLD_NEXT, "umask");
     *(void **)(&real_writev) = dlsym(RTLD_NEXT, "writev");
+    *(void **)(&real_timer_create) = dlsym(RTLD_NEXT, "timer_create");
+    *(void **)(&real_timer_settime) = dlsym(RTLD_NEXT, "timer_settime");
 #ifdef __MACH__
 #else
     *(void **)(&real_clock_gettime) = dlsym(RTLD_NEXT, "clock_gettime");
