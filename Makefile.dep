@@ -110,7 +110,8 @@ endif
 ifneq (,$(filter gnrc_sixlowpan_iphc,$(USEMODULE)))
   USEMODULE += gnrc_sixlowpan
   USEMODULE += gnrc_sixlowpan_ctx
-  USEMODULE += gnrc_sixlowpan_iphc_nhc
+  # NHC is broken, so disable it for now. See #4544 and #4462.
+  #USEMODULE += gnrc_sixlowpan_iphc_nhc
 endif
 
 ifneq (,$(filter gnrc_sixlowpan,$(USEMODULE)))
