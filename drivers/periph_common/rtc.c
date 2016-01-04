@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     cpu_kinetis_common_rtt
+ * @ingroup     drivers
  *
  * @{
  *
@@ -21,17 +21,17 @@
 
 #include <stdint.h>
 #include <time.h>
+
+#include "board.h"
 #include "cpu.h"
 #include "periph/rtc.h"
 #include "periph/rtt.h"
-#include "periph_conf.h"
-
-#define ENABLE_DEBUG (0)
-#include "debug.h"
+#include "periph_cpu.h"
 
 #if RTC_NUMOF
+#if RTT_NUMOF
 
-
+#ifdef PERIPH_RTC_NEEDS_RTT_WRAPPER
 typedef struct {
     rtc_alarm_cb_t cb;        /**< callback called from RTC interrupt */
 } rtc_state_t;
@@ -110,5 +110,7 @@ static void rtc_cb(void* arg)
         rtc_callback.cb(arg);
     }
 }
+#endif /* PERIPH_RTC_NEEDS_RTT_WRAPPER */
 
+#endif /* RTT_NUMOF */
 #endif /* RTC_NUMOF */

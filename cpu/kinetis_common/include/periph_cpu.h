@@ -93,6 +93,11 @@ enum {
     PORT_NUMOF
 };
 
+/**
+ * @brief   Include RTT to RTC wrapper interface from common peripheral
+ */
+#define PERIPH_RTC_NEEDS_RTT_WRAPPER
+
 #ifdef __cplusplus
 }
 #endif

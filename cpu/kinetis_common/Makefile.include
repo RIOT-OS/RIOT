@@ -1,6 +1,9 @@
 # include module specific includes
 export INCLUDES += -I$(RIOTCPU)/kinetis_common/include
 
+# include common peripherals module (for RTT to RTC wrapper)
+export USEMODULE += periph_common
+
 # Add search path for linker scripts
 export LINKFLAGS += -L$(RIOTCPU)/kinetis_common/ldscripts
 
