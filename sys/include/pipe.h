@@ -52,13 +52,15 @@ extern "C" {
 /**
  * A generic pipe.
  */
-typedef struct riot_pipe
-{
-    ringbuffer_t *rb;     /**< Wrapped ringbuffer. */
-    tcb_t *read_blocked;  /**< A thread that wants to write to this full pipe. */
-    tcb_t *write_blocked; /**< A thread that wants to read from this empty pipe. */
-    void (*free)(void *); /**< Function to call by pipe_free(). Used like `pipe->free(pipe)`. */
-} pipe_t;
+typedef struct riot_pipe {
+    ringbuffer_t *rb;               /**< Wrapped ringbuffer. */
+    thread_t *read_blocked;         /**< A thread that wants to write to this
+                                         full pipe. */
+    thread_t *write_blocked;        /**< A thread that wants to read from this
+                                         empty pipe. */
+    void (*free)(void *);           /**< Function to call by pipe_free(). Used like
+                                         `pipe->free(pipe)`. */
+    } pipe_t;
 
 /**
  * @brief        Initialize a pipe.

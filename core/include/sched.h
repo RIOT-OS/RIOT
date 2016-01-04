@@ -83,14 +83,19 @@
 #include <stddef.h>
 #include "attributes.h"
 #include "bitarithm.h"
-#include "tcb.h"
 #include "attributes.h"
 #include "kernel_types.h"
 #include "native_sched.h"
+#include "clist.h"
 
 #ifdef __cplusplus
  extern "C" {
 #endif
+
+/**
+ * @brief forward declaration for thread_t, defined in thread.h
+ */
+typedef struct _thread thread_t;
 
 /**
  * @def SCHED_PRIO_LEVELS
@@ -113,7 +118,7 @@ int sched_run(void);
  *                          targeted process
  * @param[in]   status      The new status of this thread
  */
-void sched_set_status(tcb_t *process, unsigned int status);
+void sched_set_status(thread_t *process, unsigned int status);
 
 /**
  * @brief       Yield if approriate.
@@ -143,12 +148,12 @@ extern volatile unsigned int sched_context_switch_request;
 /**
  *  Thread table
  */
-extern volatile tcb_t *sched_threads[KERNEL_PID_LAST + 1];
+extern volatile thread_t *sched_threads[KERNEL_PID_LAST + 1];
 
 /**
  *  Currently active thread
  */
-extern volatile tcb_t *sched_active_thread;
+extern volatile thread_t *sched_active_thread;
 
 /**
  *  Number of running (non-terminated) threads
