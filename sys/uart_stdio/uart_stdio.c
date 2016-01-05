@@ -25,13 +25,10 @@
 
 #include <stdio.h>
 
-#include "cpu_conf.h"
 #include "tsrb.h"
 #include "thread.h"
 #include "mutex.h"
 #include "irq.h"
-
-#include "periph/uart.h"
 
 #include "board.h"
 #include "periph/uart.h"
@@ -40,7 +37,7 @@
 #include "debug.h"
 
 #ifndef STDIO
-#define STDIO               (0)
+#define STDIO               UART_DEV(0)
 #endif
 
 #ifndef STDIO_BAUDRATE
