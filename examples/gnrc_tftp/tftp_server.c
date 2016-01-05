@@ -65,7 +65,7 @@ static bool _tftp_server_start_cb(tftp_action_t action, tftp_mode_t mode,
     }
 
     /* display the action being performed */
-    printf("tftp_server: %s %s %s:%u\n", str_mode, str_action, file_name, *len);
+    printf("tftp_server: %s %s %s:%lu\n", str_mode, str_action, file_name, (unsigned long)*len);
 
     /* return the length of the text, if this is an read action */
     if (action == TFTP_READ) {
@@ -98,7 +98,7 @@ static int _tftp_server_data_cb(uint32_t offset, void *data, size_t data_len)
     }
     else {
         /* we received a data block which we output to the console */
-        printf("\n -- SERVER DATA --\n%.*s\n -- SERVER DATA --\n", data_len, c);
+        printf("\n -- SERVER DATA --\n%.*s\n -- SERVER DATA --\n", (int)data_len, c);
     }
 
     /* return the length of the data block */
