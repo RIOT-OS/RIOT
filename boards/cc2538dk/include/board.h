@@ -33,15 +33,6 @@ extern "C" {
 #define F_CPU               XOSC32M_FREQ
 
 /**
- * @name Define UART device and baudrate for stdio
- * @{
- */
-#define STDIO               UART_0
-#define STDIO_BAUDRATE      115200
-#define STDIO_RX_BUFSIZE    (64U)
-/** @} */
-
-/**
  * @name Macros for controlling the on-board LEDs.
  * @{
  */

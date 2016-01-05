@@ -34,15 +34,6 @@ extern "C" {
 #define F_CPU               (84000000UL)
 
 /**
- * @name Define UART device and baudrate for stdio
- * @{
- */
-#define STDIO               UART_DEV(0)
-#define STDIO_BAUDRATE      (115200U)
-#define STDIO_RX_BUFSIZE    (64U)
-/** @} */
-
-/**
  * @name LED pin definitions
  * @{
  */
