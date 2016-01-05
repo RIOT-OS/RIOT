@@ -28,11 +28,6 @@ extern "C" {
 #endif
 
 /**
- * @name The nominal CPU core clock in this board
- */
-#define F_CPU               (48000000UL)
-
-/**
  * @name LED pin definitions
  * @{
  */

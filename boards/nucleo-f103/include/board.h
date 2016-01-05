@@ -31,14 +31,9 @@ extern "C" {
 #endif
 
 /**
- * @name Define the nominal CPU core clock in this board
- */
-#define F_CPU               CLOCK_CORECLOCK
-
-/**
  * @brief Use the 2nd UART for STDIO on this board
  */
-#define STDIO               UART_1
+#define STDIO               UART_DEV(1)
 
 /**
  * @name LED pin definitions
