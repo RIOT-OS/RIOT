@@ -80,7 +80,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 
 static int init_base(uart_t uart, uint32_t baudrate)
 {
-    uint16_t clock_divider = F_CPU / (16 * baudrate);
+    uint16_t clock_divider = CLOCK_CORECLOCK / (16 * baudrate);
 
     switch (uart) {
 #if UART_0_EN
