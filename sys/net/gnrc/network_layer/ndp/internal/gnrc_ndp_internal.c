@@ -601,6 +601,24 @@ int gnrc_ndp_internal_sl2a_opt_handle(gnrc_pktsnip_t *pkt, ipv6_hdr_t *ipv6, uin
         pkt = pkt->next;
     }
 
+#ifdef MODULE_GNRC_SIXLOWPAN_ND
+    if ((sl2a_len == 2) || (sl2a_len == 8)) {
+        /* The link-layer seems to be IEEE 802.15.4.
+         * Determining address length from the option length:
+         * https://tools.ietf.org/html/rfc4944#section-8 */
+        if (sl2a_opt->len == 1) {
+            sl2a_len = 2;
+        }
+        else if (sl2a_opt->len == 2) {
+            sl2a_len = 8;
+        }
+        else {
+            DEBUG("ndp: invalid source link-layer address option received\n");
+            return -EINVAL;
+        }
+    }
+#endif
+
     DEBUG("ndp: received SL2A (link-layer address: %s)\n",
           gnrc_netif_addr_to_str(addr_str, sizeof(addr_str), sl2a, sl2a_len));
 
@@ -647,6 +665,23 @@ int gnrc_ndp_internal_tl2a_opt_handle(gnrc_pktsnip_t *pkt, ipv6_hdr_t *ipv6,
                 }
                 pkt = pkt->next;
             }
+#ifdef MODULE_GNRC_SIXLOWPAN_ND
+            if ((tl2a_len == 2) || (tl2a_len == 8)) {
+                /* The link-layer seems to be IEEE 802.15.4.
+                 * Determining address length from the option length:
+                 * https://tools.ietf.org/html/rfc4944#section-8 */
+                if (tl2a_opt->len == 1) {
+                    tl2a_len = 2;
+                }
+                else if (tl2a_opt->len == 2) {
+                    tl2a_len = 8;
+                }
+                else {
+                    DEBUG("ndp: invalid target link-layer address option received\n");
+                    return -EINVAL;
+                }
+            }
+#endif
 
             if (tl2a_len == 0) {  /* in case there was no source address in l2 */
                 tl2a_len = (tl2a_opt->len / 8) - sizeof(ndp_opt_t);
