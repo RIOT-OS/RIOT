@@ -1,0 +1,7 @@
+# Makefile for auto-generated bin/$BOARD/snippets directory
+
+# this line concatenates all ??name.c.snip files into name.c
+SRC := $(shell sh -c 'for file in $$(ls *.snip | cut -c 3- | sort -u); do echo $$(basename $$file .snip); \
+		cat *$$file > $$(basename $$file .snip); done')
+
+include $(RIOTBASE)/Makefile.base

@@ -207,12 +207,24 @@ LINKFLAGPREFIX ?= -Wl,
 
 DIRS += $(EXTERNAL_MODULE_DIRS)
 
+# file snippets support
+export SNIPDIR:=$(BINDIR)snippets
+
+prepare-snippets:
+	@rm -f $(SNIPDIR)/*
+	@mkdir -p $(SNIPDIR)
+# if there's nothing in $(SNIPDIR), both Makefile.snippets and the module archiving step fail
+	@echo "void __dummy(void){}" > $(SNIPDIR)/00_dummy.c.snip
+
+all: prepare-snippets
+
 ifeq ($(BUILD_IN_DOCKER),1)
 all: ..in-docker-container
 else
 ## make script for your application. Build RIOT-base here!
 all: ..compiler-check ..build-message $(USEPKG:%=${BINDIR}%.a) $(APPDEPS)
 	$(AD)DIRS="$(DIRS)" "$(MAKE)" -C $(CURDIR) -f $(RIOTBASE)/Makefile.application
+	$(AD)"$(MAKE)" -C $(SNIPDIR) -f $(RIOTBASE)/Makefile.snippets
 ifeq (,$(RIOTNOLINK))
 ifeq ($(BUILDOSXNATIVE),1)
 	$(AD)$(if $(CPPMIX),$(CXX),$(LINK)) $(UNDEF) -o $(ELFFILE) $$(find $(BASELIBS) -size +8c) $(LINKFLAGS) $(LINKFLAGPREFIX)-no_pie

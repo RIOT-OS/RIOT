@@ -7,9 +7,9 @@ DIRS := $(sort $(abspath ${DIRS}))
 
 MODULE ?= $(shell basename $(CURDIR))
 
-.PHONY: all ${DIRS:%=ALL--%} ${DIRS:%=CLEAN--%}
+.PHONY: all snippets ${DIRS:%=ALL--%} ${DIRS:%=CLEAN--%}
 
-all: $(BINDIR)$(MODULE).a ..nothing
+all: $(BINDIR)$(MODULE).a snippets ..nothing
 
 ..nothing:
 	@:
@@ -33,6 +33,9 @@ ifeq ($(strip $(ASMSRC)),)
 endif
 ifeq ($(strip $(ASSMSRC)),)
     ASSMSRC := $(wildcard *.S)
+endif
+ifeq ($(strip $(SNIPPETS)),)
+    SNIPPETS := $(wildcard *.snip)
 endif
 
 OBJC    := $(SRC:%.c=$(BINDIR)$(MODULE)/%.o)
@@ -73,6 +76,20 @@ $(ASMOBJ): $(BINDIR)$(MODULE)/%.o: %.s
 
 $(ASSMOBJ): $(BINDIR)$(MODULE)/%.o: %.S
 	$(AD)$(CC) $(CFLAGS) $(INCLUDES) -MD -MP -c -o $@ $(abspath $<)
+
+snippets: $(SNIPPETS)
+	@if [ ! "$$(pwd)" -ef "$(SNIPDIR)" ]; then \
+		for snip in $(abspath $(SNIPPETS)); do \
+		snipfile=$(SNIPDIR)/$$(basename $$snip);\
+		module_define=$$(echo MODULE_$(MODULE) | tr [:lower:]- [:upper:]_);\
+		{\
+			echo "#line 1 \"$$snip\"";\
+			[ "$(MODULE)" != "$(APPLICATION)" ] && echo "#ifdef $$module_define";\
+			cat $$snip; \
+			[ "$(MODULE)" != "$(APPLICATION)" ] && echo "#endif" || true;\
+		} >> $$snipfile;\
+		done \
+		fi
 
 # pull in dependency info for *existing* .o files
 # deleted header files will be silently ignored

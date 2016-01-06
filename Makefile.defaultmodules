@@ -1,3 +1,4 @@
 DEFAULT_MODULE += board cpu core sys
 
 DEFAULT_MODULE += auto_init
+DEFAULT_MODULE += snippets
