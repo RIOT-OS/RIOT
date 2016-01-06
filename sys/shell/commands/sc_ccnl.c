@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015  INRIA.
+ * Copyright (C) 2015, 2016  INRIA.
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -23,7 +23,7 @@
 #include "ccn-lite-riot.h"
 #include "ccnl-pkt-ndntlv.h"
 
-#define MAX_CONTENT (64)
+#define BUF_SIZE (64)
 
 /**
  * Maximum number of Interest retransmissions
@@ -32,11 +32,10 @@
 
 #define MAX_ADDR_LEN            (8U)
 
-#define BUF_SIZE    (128)
 static unsigned char _int_buf[BUF_SIZE];
 static unsigned char _cont_buf[BUF_SIZE];
 
-static char *_default_content = "Start the RIOT!";
+static const char *_default_content = "Start the RIOT!";
 static unsigned char _out[CCNL_MAX_PACKET_SIZE];
 
 /* check for one-time initialization */
@@ -94,7 +93,7 @@ static void _content_usage(char *argv)
 
 int _ccnl_content(int argc, char **argv)
 {
-    char *body = _default_content;
+    char *body = (char*) _default_content;
     int arg_len = strlen(_default_content) + 1;
     int offs = CCNL_MAX_PACKET_SIZE;
     if (argc < 2) {
@@ -103,13 +102,13 @@ int _ccnl_content(int argc, char **argv)
     }
 
     if (argc > 2) {
-        char buf[MAX_CONTENT];
-        memset(buf, ' ', MAX_CONTENT);
+        char buf[BUF_SIZE];
+        memset(buf, ' ', BUF_SIZE);
         char *buf_ptr = buf;
-        for (int i = 2; (i < argc) && (buf_ptr < (buf + MAX_CONTENT)); i++) {
+        for (int i = 2; (i < argc) && (buf_ptr < (buf + BUF_SIZE)); i++) {
             arg_len = strlen(argv[i]);
-            if ((buf_ptr + arg_len) > (buf + MAX_CONTENT)) {
-                arg_len = (buf + MAX_CONTENT) - buf_ptr;
+            if ((buf_ptr + arg_len) > (buf + BUF_SIZE)) {
+                arg_len = (buf + BUF_SIZE) - buf_ptr;
             }
             strncpy(buf_ptr, argv[i], arg_len);
             buf_ptr += arg_len + 1;
@@ -148,8 +147,9 @@ int _ccnl_content(int argc, char **argv)
 static void _interest_usage(char *arg)
 {
     printf("usage: %s <URI> [relay]\n"
-            "%% %s /riot/peter/schmerzl             (classic lookup)\n",
-            arg, arg);
+            "%% %s /riot/peter/schmerzl                     (classic lookup)\n"
+            "%% %s /riot/peter/schmerzl 01:02:03:04:05:06\n",
+            arg, arg, arg);
 }
 
 int _ccnl_interest(int argc, char **argv)
@@ -179,4 +179,58 @@ int _ccnl_interest(int argc, char **argv)
     printf("Timeout! No content received in response to the Interest for %s.\n", argv[1]);
 
     return -1;
+}
+
+static void _ccnl_fib_usage(char *argv)
+{
+    printf("usage: %s [<URI> <content>]\n"
+            "%% %s                              (prints the current FIB)\n"
+            "%% %s /riot/peter/schmerzl RIOT\n",
+            argv, argv, argv);
+}
+
+int _ccnl_fib(int argc, char **argv)
+{
+    if (argc < 2) {
+        ccnl_show_fib(&ccnl_relay);
+    }
+    else if (argc == 3) {
+        size_t addr_len = MAX_ADDR_LEN;
+        uint8_t relay_addr[MAX_ADDR_LEN];
+        int suite = CCNL_SUITE_NDNTLV;
+        memset(relay_addr, UINT8_MAX, MAX_ADDR_LEN);
+        addr_len = gnrc_netif_addr_from_str(relay_addr, sizeof(relay_addr), argv[2]);
+
+        if (addr_len == 0) {
+            printf("Error: %s is not a valid link layer address\n", argv[2]);
+            return -1;
+        }
+
+        struct ccnl_prefix_s *prefix = ccnl_URItoPrefix(argv[1], suite, NULL, 0);
+
+        if (!prefix) {
+            puts("Error: prefix could not be created!");
+            return -1;
+        }
+
+        sockunion sun;
+        sun.sa.sa_family = AF_PACKET;
+        memcpy(&(sun.linklayer.sll_addr), relay_addr, addr_len);
+        sun.linklayer.sll_halen = addr_len;
+        sun.linklayer.sll_protocol = htons(ETHERTYPE_NDN);
+
+        /* TODO: set correct interface instead of always 0 */
+        struct ccnl_face_s *fibface = ccnl_get_face_or_create(&ccnl_relay, 0, &sun.sa, sizeof(sun.linklayer));
+        fibface->flags |= CCNL_FACE_FLAGS_STATIC;
+
+        if (ccnl_add_fib_entry(&ccnl_relay, prefix, fibface) != 0) {
+            printf("Error adding (%s : %s) to the FIB\n", argv[1], argv[2]);
+            return -1;
+        }
+    }
+    else {
+        _ccnl_fib_usage(argv[0]);
+        return -1;
+    }
+    return 0;
 }
