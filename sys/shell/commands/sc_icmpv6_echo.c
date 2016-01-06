@@ -102,10 +102,10 @@ int _handle_reply(gnrc_pktsnip_t *pkt, uint32_t time)
             min_seq_expected++;
         }
 
-        printf("%u bytes from %s: id=%" PRIu16 " seq=%" PRIu16 " hop limit=%" PRIu8
-               " time = %" PRIu32 ".%03" PRIu32 " ms\n", (unsigned) icmpv6->size,
+        printf("%u bytes from %s: id=%" PRIu16 " seq=%" PRIu16 " hop limit=%u time = %"
+               PRIu32 ".%03" PRIu32 " ms\n", (unsigned) icmpv6->size,
                ipv6_addr_to_str(ipv6_str, &(ipv6_hdr->src), sizeof(ipv6_str)),
-               byteorder_ntohs(icmpv6_hdr->id), seq, ipv6_hdr->hl,
+               byteorder_ntohs(icmpv6_hdr->id), seq, (unsigned)ipv6_hdr->hl,
                time / MS_IN_USEC, time % MS_IN_USEC);
         gnrc_ipv6_nc_still_reachable(&ipv6_hdr->src);
     }
