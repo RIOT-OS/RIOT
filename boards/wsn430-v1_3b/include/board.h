@@ -35,8 +35,8 @@ extern "C" {
 #endif
 
 // for correct inclusion of <msp430.h>
-#ifndef __MSP430F1611__
-#define __MSP430F1611__
+#ifndef MSP430F1611__
+#define MSP430F1611__
 #endif
 
 /**
@@ -92,4 +92,4 @@ extern "C" {
 #include <msp430x16x.h>
 
 /** @} */
-#endif /* WSN_BOARD_H_ */
+#endif /* N_BOARD_H_ */

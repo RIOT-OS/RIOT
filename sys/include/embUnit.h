@@ -16,8 +16,8 @@
  * @author Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 
-#ifndef __SYS__EMB_UNIT__H
-#define __SYS__EMB_UNIT__H
+#ifndef SYS__EMB_UNIT__H
+#define SYS__EMB_UNIT__H
 
 #include "embUnit/embUnit.h"
 

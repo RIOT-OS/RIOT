@@ -33,8 +33,8 @@ extern "C" {
 #endif
 
 /*  for correct inclusion of <msp430.h> */
-#ifndef __MSP430F1611__
-#define __MSP430F1611__
+#ifndef MSP430F1611__
+#define MSP430F1611__
 #endif
 
 /**
@@ -90,4 +90,4 @@ extern "C" {
 #include <stdint.h>
 
 /** @} */
-#endif /*  TELOSB_BOARD_H_ */
+#endif /* ELOSB_BOARD_H_ */

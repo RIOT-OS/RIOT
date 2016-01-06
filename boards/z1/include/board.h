@@ -35,8 +35,8 @@
 extern "C" {
 #endif
 
-#ifndef __MSP430F2617__
-#define __MSP430F2617__
+#ifndef MSP430F2617__
+#define MSP430F2617__
 #endif
 
 /**
@@ -109,4 +109,4 @@ extern "C" {
 #endif
 
 /** @} */
-#endif /*  Z1_BOARD_H_ */
+#endif /* 1_BOARD_H_ */

@@ -37,8 +37,8 @@
 //
 //*****************************************************************************
 
-#ifndef __WATCHDOG_H__
-#define __WATCHDOG_H__
+#ifndef WATCHDOG_H__
+#define WATCHDOG_H__
 
 //*****************************************************************************
 //
@@ -92,4 +92,4 @@ extern void WatchdogStallDisable(unsigned long ulBase);
 }
 #endif
 
-#endif // __WATCHDOG_H__
+#endif // WATCHDOG_H__

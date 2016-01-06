@@ -37,8 +37,8 @@
 //
 //*****************************************************************************
 
-#ifndef __FPU_H__
-#define __FPU_H__
+#ifndef FPU_H__
+#define FPU_H__
 
 //*****************************************************************************
 //
@@ -109,4 +109,4 @@ extern void FPURoundingModeSet(unsigned long ulMode);
 }
 #endif
 
-#endif // __FPU_H__
+#endif // FPU_H__

@@ -14,8 +14,8 @@
  * @note    Do not include this header file directly, but pthread.h.
  */
 
-#ifndef __SYS__POSIX__PTHREAD_MUTEX_ATTR__H
-#define __SYS__POSIX__PTHREAD_MUTEX_ATTR__H
+#ifndef SYS__POSIX__PTHREAD_MUTEX_ATTR__H
+#define SYS__POSIX__PTHREAD_MUTEX_ATTR__H
 
 #include <errno.h>
 

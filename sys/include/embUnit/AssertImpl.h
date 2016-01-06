@@ -32,8 +32,8 @@
  *
  * $Id: AssertImpl.h,v 1.6 2003/09/16 11:09:53 arms22 Exp $
  */
-#ifndef __ASSERTIMPL_H__
-#define __ASSERTIMPL_H__
+#ifndef ASSERTIMPL_H__
+#define ASSERTIMPL_H__
 
 #ifdef  __cplusplus
 extern "C" {

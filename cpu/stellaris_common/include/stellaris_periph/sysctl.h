@@ -37,8 +37,8 @@
 //
 //*****************************************************************************
 
-#ifndef __SYSCTL_H__
-#define __SYSCTL_H__
+#ifndef SYSCTL_H__
+#define SYSCTL_H__
 
 //*****************************************************************************
 //
@@ -639,4 +639,4 @@ extern unsigned long SysCtlI2SMClkSet(unsigned long ulInputClock,
 }
 #endif
 
-#endif // __SYSCTL_H__
+#endif // SYSCTL_H__

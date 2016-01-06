@@ -49,8 +49,8 @@
   * @{
   */
 
-#ifndef __STM32F091xC_H
-#define __STM32F091xC_H
+#ifndef STM32F091xC_H
+#define STM32F091xC_H
 
 #ifdef __cplusplus
  extern "C" {
@@ -63,10 +63,10 @@
 /**
  * @brief Configuration of the Cortex-M0 Processor and Core Peripherals
  */
-#define __CM0_REV                 0 /*!< Core Revision r0p0                            */
-#define __MPU_PRESENT             0 /*!< STM32F0xx do not provide MPU                  */
-#define __NVIC_PRIO_BITS          2 /*!< STM32F0xx uses 2 Bits for the Priority Levels */
-#define __Vendor_SysTickConfig    0 /*!< Set to 1 if different SysTick Config is used  */
+#define __0_REV                 0 /*!< Core Revision r0p0                            */
+#define __MPPRESENT             0 /*!< STM32F0xx do not provide MPU                  */
+#define __NVICRIO_BITS          2 /*!< STM32F0xx uses 2 Bits for the Priority Levels */
+#define __VendorysTickConfig    0 /*!< Set to 1 if different SysTick Config is used  */
 
 /**
   * @}
@@ -5696,7 +5696,7 @@ typedef struct
 }
 #endif /* __cplusplus */
 
-#endif /* __STM32F091xC_H */
+#endif /* STM32F091xC_H */
 
 /**
   * @}
@@ -5707,3 +5707,4 @@ typedef struct
   */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
+/

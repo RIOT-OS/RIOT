@@ -32,8 +32,8 @@
  *
  * $Id: RepeatedTest.h,v 1.7 2004/02/10 16:19:29 arms22 Exp $
  */
-#ifndef __REPEATEDTEST_H__
-#define __REPEATEDTEST_H__
+#ifndef REPEATEDTEST_H__
+#define REPEATEDTEST_H__
 
 #ifdef __cplusplus
 extern "C" {

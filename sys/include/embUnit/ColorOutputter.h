@@ -13,8 +13,8 @@
  *
  * @author Janos Kutscherauer <noshky@gmail.com>
  */
-#ifndef __COLOROUTPUTTER_H__
-#define __COLOROUTPUTTER_H__
+#ifndef COLOROUTPUTTER_H__
+#define COLOROUTPUTTER_H__
 
 #include "Outputter.h"
 

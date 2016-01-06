@@ -32,8 +32,8 @@
  *
  * $Id: stdImpl.h,v 1.4 2004/02/10 16:15:25 arms22 Exp $
  */
-#ifndef __STDIMPL_H__
-#define __STDIMPL_H__
+#ifndef STDIMPL_H__
+#define STDIMPL_H__
 
 #ifdef  __cplusplus
 extern "C" {

@@ -8,7 +8,7 @@
  * directory for more details.
  */
 
-#ifndef __CLANG_COMPAT_H
+#ifndef CLANG_COMPAT_H
 
 #ifdef __cplusplus
 extern "C" {

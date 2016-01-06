@@ -24,8 +24,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef __OD_H_
-#define __OD_H_
+#ifndef OD_H_
+#define OD_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -157,5 +157,5 @@ static inline void od_hex_dump(const void *data, size_t data_len, uint8_t width)
 }
 #endif
 
-#endif /* __OD_H_ */
+#endif /* OD_H_ */
 /** @} */

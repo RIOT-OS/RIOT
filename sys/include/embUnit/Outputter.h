@@ -32,8 +32,8 @@
  *
  * $Id: Outputter.h,v 1.2 2003/09/06 13:28:27 arms22 Exp $
  */
-#ifndef __OUTPUTTER_H__
-#define __OUTPUTTER_H__
+#ifndef OUTPUTTER_H__
+#define OUTPUTTER_H__
 
 #include <embUnit/embUnit.h>
 

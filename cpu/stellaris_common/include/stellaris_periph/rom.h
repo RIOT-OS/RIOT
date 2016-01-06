@@ -37,8 +37,8 @@
 //
 //*****************************************************************************
 
-#ifndef __ROM_H__
-#define __ROM_H__
+#ifndef ROM_H__
+#define ROM_H__
 
 #ifdef __cplusplus
 extern "C" {
@@ -6749,4 +6749,4 @@ extern "C" {
 }
 #endif
 
-#endif // __ROM_H__
+#endif // ROM_H__

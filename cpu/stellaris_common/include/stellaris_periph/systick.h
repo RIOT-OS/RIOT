@@ -37,8 +37,8 @@
 //
 //*****************************************************************************
 
-#ifndef __SYSTICK_H__
-#define __SYSTICK_H__
+#ifndef SYSTICK_H__
+#define SYSTICK_H__
 
 //*****************************************************************************
 //
@@ -75,4 +75,4 @@ extern unsigned long SysTickValueGet(void);
 }
 #endif
 
-#endif // __SYSTICK_H__
+#endif // SYSTICK_H__

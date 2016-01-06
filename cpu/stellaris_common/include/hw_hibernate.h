@@ -37,8 +37,8 @@
 //
 //*****************************************************************************
 
-#ifndef __HW_HIBERNATE_H__
-#define __HW_HIBERNATE_H__
+#ifndef HW_HIBERNATE_H__
+#define HW_HIBERNATE_H__
 
 #ifdef __cplusplus
 extern "C" {
@@ -291,4 +291,4 @@ extern "C" {
 }
 #endif
 
-#endif // __HW_HIBERNATE_H__
+#endif // HW_HIBERNATE_H__

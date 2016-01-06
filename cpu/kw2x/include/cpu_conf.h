@@ -22,8 +22,8 @@
  * @author          Johann Fischer <j.fischer@phytec.de>
  */
 
-#ifndef __CPU_CONF_H
-#define __CPU_CONF_H
+#ifndef CPU_CONF_H
+#define CPU_CONF_H
 
 #ifdef CPU_MODEL_KW21D256
 #include "MKW22D5.h"
@@ -125,5 +125,5 @@ extern "C"
 }
 #endif
 
-#endif /* __CPU_CONF_H */
+#endif /* CPU_CONF_H */
 /** @} */

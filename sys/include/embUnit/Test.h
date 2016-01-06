@@ -32,8 +32,8 @@
  *
  * $Id: Test.h,v 1.4 2004/02/10 16:19:29 arms22 Exp $
  */
-#ifndef __TEST_H__
-#define __TEST_H__
+#ifndef TEST_H__
+#define TEST_H__
 
 #ifdef __cplusplus
 extern "C" {

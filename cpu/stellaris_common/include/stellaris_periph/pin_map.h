@@ -37,8 +37,8 @@
 //
 //*****************************************************************************
 
-#ifndef __PIN_MAP_H__
-#define __PIN_MAP_H__
+#ifndef PIN_MAP_H__
+#define PIN_MAP_H__
 
 #ifdef __cplusplus
 extern "C" {
@@ -192,7 +192,7 @@ extern "C" {
 
 #define GPIO_PF4_T2CCP0         0x00051007
 
-#endif // PART_LM4F120H5QR
+#endif // RT_LM4F120H5QR
 
 //*****************************************************************************
 //
@@ -454,4 +454,5 @@ extern "C" {
 }
 #endif
 
-#endif // __PIN_MAP_H__
+#endif // __N_MAP_H__
+_

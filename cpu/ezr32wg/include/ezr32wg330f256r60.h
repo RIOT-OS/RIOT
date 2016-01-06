@@ -31,8 +31,8 @@
  *
  *****************************************************************************/
 
-#ifndef __SILICON_LABS_EZR32WG330F256R60_H__
-#define __SILICON_LABS_EZR32WG330F256R60_H__
+#ifndef SILICON_LABS_EZR32WG330F256R60_H__
+#define SILICON_LABS_EZR32WG330F256R60_H__
 
 #ifdef __cplusplus
 extern "C" {
@@ -108,10 +108,10 @@ typedef enum IRQn
  * @{
  * @brief Processor and Core Peripheral Section
  *****************************************************************************/
-#define __MPU_PRESENT             1 /**< Presence of MPU  */
-#define __FPU_PRESENT             1 /**< Presence of FPU  */
-#define __NVIC_PRIO_BITS          3 /**< NVIC interrupt priority bits */
-#define __Vendor_SysTickConfig    0 /**< Is 1 if different SysTick counter is used */
+#define __U_PRESENT             1 /**< Presence of MPU  */
+#define __FPPRESENT             1 /**< Presence of FPU  */
+#define __NVICRIO_BITS          3 /**< NVIC interrupt priority bits */
+#define __VendorysTickConfig    0 /**< Is 1 if different SysTick counter is used */
 
 /** @} End of group EZR32WG330F256R60_Core */
 
@@ -172,7 +172,7 @@ typedef enum IRQn
 #define FLASH_PAGE_SIZE      2048           /**< Flash Memory page size */
 #define SRAM_BASE            (0x20000000UL) /**< SRAM Base Address */
 #define SRAM_SIZE            (0x00008000UL) /**< Available SRAM Memory */
-#define __CM4_REV            0x001          /**< Cortex-M4 Core revision r0p1 */
+#define __CM4_REV          0x001          /**< Cortex-M4 Core revision r0p1 */
 #define PRS_CHAN_COUNT       12             /**< Number of PRS channels */
 #define DMA_CHAN_COUNT       12             /**< Number of DMA channels */
 
@@ -492,4 +492,5 @@ typedef enum IRQn
 #ifdef __cplusplus
 }
 #endif
-#endif /* __SILICON_LABS_EZR32WG330F256R60_H__ */
+#endif /* SILICON_LABS_EZR32WG330F256R60_H__ */
+/
