@@ -40,6 +40,8 @@
 #define MKW2XDRF_PA_RANGE_MAX      31       /**< Maximum value of PA Power Control Register */
 #define MKW2XDRF_PA_RANGE_MIN      3        /**< Minimum value of PA Power Control Register */
 
+#define _MAX_MHR_OVERHEAD       (25)
+
 /* PLL integer lookup table */
 static const uint8_t pll_int_lt[16] = {
     11, 11, 11, 11,
@@ -642,7 +644,7 @@ int kw2xrf_get(gnrc_netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
                 return -EOVERFLOW;
             }
 
-            *((uint16_t *)value) = KW2XRF_MAX_PKT_LENGTH;
+            *((uint16_t *)value) = KW2XRF_MAX_PKT_LENGTH - _MAX_MHR_OVERHEAD;
             return sizeof(uint16_t);
 
         case NETOPT_PRELOADING:
