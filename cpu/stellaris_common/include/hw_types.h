@@ -37,8 +37,8 @@
 //
 //*****************************************************************************
 
-#ifndef __HW_TYPES_H__
-#define __HW_TYPES_H__
+#ifndef HW_TYPES_H__
+#define HW_TYPES_H__
 
 #ifdef __cplusplus
 extern "C" {
@@ -223,4 +223,4 @@ typedef unsigned char tBoolean;
 }
 #endif
 
-#endif // __HW_TYPES_H__
+#endif // HW_TYPES_H__

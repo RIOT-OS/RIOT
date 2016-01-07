@@ -25,8 +25,8 @@
  *
  */
 
-#ifndef __LPC11UXX_H__
-#define __LPC11UXX_H__
+#ifndef LPC11UXX_H__
+#define LPC11UXX_H__
 
 #ifdef __cplusplus
 extern "C" {
@@ -90,9 +90,9 @@ typedef enum {
 
 /* Processor and Core Peripheral Section */ /* Configuration of the Cortex-M0 Processor and Core Peripherals */
 
-#define __MPU_PRESENT             0         /*!< MPU present or not                    */
-#define __NVIC_PRIO_BITS          3         /*!< Number of Bits used for Priority Levels */
-#define __Vendor_SysTickConfig    0         /*!< Set to 1 if different SysTick Config is used */
+#define __U_PRESENT             0         /*!< MPU present or not                    */
+#define __NV_PRIO_BITS          3         /*!< Number of Bits used for Priority Levels */
+#define __Vend_SysTickConfig    0         /*!< Set to 1 if different SysTick Config is used */
 /** @} */ /* End of group Configuration_of_CMSIS */
 
 #include "core_cm0.h"                       /*!< Cortex-M0 processor and core peripherals */
@@ -664,3 +664,4 @@ typedef struct {
 
 #endif  // __LPC11UXX_H__
 /** @} */
+/

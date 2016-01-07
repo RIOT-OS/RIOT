@@ -23,8 +23,8 @@
  ******************************************************************************/
 
 
-#ifndef __LPC17xx_H__
-#define __LPC17xx_H__
+#ifndef LPC17xx_H__
+#define LPC17xx_H__
 
 #ifdef __cplusplus
 extern "C" {
@@ -94,9 +94,9 @@ typedef enum IRQn
  */
 
 /* Configuration of the Cortex-M3 Processor and Core Peripherals */
-#define __MPU_PRESENT             1         /*!< MPU present or not                               */
-#define __NVIC_PRIO_BITS          5         /*!< Number of Bits used for Priority Levels          */
-#define __Vendor_SysTickConfig    0         /*!< Set to 1 if different SysTick Config is used     */
+#define __U_PRESENT             1         /*!< MPU present or not                               */
+#define __NV_PRIO_BITS          5         /*!< Number of Bits used for Priority Levels          */
+#define __Vend_SysTickConfig    0         /*!< Set to 1 if different SysTick Config is used     */
 
 #ifdef __cplusplus
 }
@@ -1045,3 +1045,4 @@ typedef struct
 #endif
 
 #endif  // __LPC17xx_H__
+_

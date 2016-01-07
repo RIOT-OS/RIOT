@@ -37,8 +37,8 @@
 //
 //*****************************************************************************
 
-#ifndef __PWM_H__
-#define __PWM_H__
+#ifndef PWM_H__
+#define PWM_H__
 
 //*****************************************************************************
 //
@@ -295,4 +295,4 @@ extern void PWMGenFaultClear(unsigned long ulBase, unsigned long ulGen,
 }
 #endif
 
-#endif // __PWM_H__
+#endif // PWM_H__

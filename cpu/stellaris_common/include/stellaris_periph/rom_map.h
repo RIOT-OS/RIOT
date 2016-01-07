@@ -38,8 +38,8 @@
 //
 //*****************************************************************************
 
-#ifndef __ROM_MAP_H__
-#define __ROM_MAP_H__
+#ifndef ROM_MAP_H__
+#define ROM_MAP_H__
 
 #ifdef __cplusplus
 extern "C" {
@@ -5080,4 +5080,4 @@ extern "C" {
 }
 #endif
 
-#endif // __ROM_MAP_H__
+#endif // ROM_MAP_H__

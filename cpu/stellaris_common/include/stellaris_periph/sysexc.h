@@ -37,8 +37,8 @@
 //
 //*****************************************************************************
 
-#ifndef __SYSEXC_H__
-#define __SYSEXC_H__
+#ifndef SYSEXC_H__
+#define SYSEXC_H__
 
 //*****************************************************************************
 //
@@ -86,4 +86,4 @@ extern void SysExcIntClear(unsigned long ulIntFlags);
 }
 #endif
 
-#endif // __SYSEXC_H__
+#endif // SYSEXC_H__

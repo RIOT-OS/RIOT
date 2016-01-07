@@ -45,7 +45,7 @@
 
 #if !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
 #include <stdint.h>
-#ifndef __cplusplus
+#ifndef cplusplus
 typedef volatile const uint32_t RoReg; /**< Read only 32-bit register (volatile const unsigned int) */
 #else
 typedef volatile       uint32_t RoReg; /**< Read only 32-bit register (volatile const unsigned int) */
@@ -248,10 +248,10 @@ void WDT_Handler        ( void );
  * \brief Configuration of the Cortex-M3 Processor and Core Peripherals
  */
 
-#define __CM3_REV              0x0200 /**< SAM3X8E core revision number ([15:8] revision number, [7:0] patch number) */
-#define __MPU_PRESENT          1      /**< SAM3X8E does provide a MPU */
-#define __NVIC_PRIO_BITS       4      /**< SAM3X8E uses 4 Bits for the Priority Levels */
-#define __Vendor_SysTickConfig 0      /**< Set to 1 if different SysTick Config is used */
+#define CM3_REV              0x0200 /**< SAM3X8E core revision number ([15:8] revision number, [7:0] patch number) */
+#define __U_PRESENT          1      /**< SAM3X8E does provide a MPU */
+#define __NV_PRIO_BITS       4      /**< SAM3X8E uses 4 Bits for the Priority Levels */
+#define __Vend_SysTickConfig 0      /**< Set to 1 if different SysTick Config is used */
 
 /*
  * \brief CMSIS includes
@@ -264,7 +264,7 @@ void WDT_Handler        ( void );
 #include <core_cm3.h>
 #if !defined DONT_USE_CMSIS_INIT
 #include "system_sam3xa.h"
-#endif /* DONT_USE_CMSIS_INIT */
+#endif /* NT_USE_CMSIS_INIT */
 
 /*@}*/
 
@@ -505,7 +505,7 @@ void WDT_Handler        ( void );
 #define WDT        ((Wdt    *)0x400E1A50U) /**< \brief (WDT       ) Base Address */
 #define RTC        ((Rtc    *)0x400E1A60U) /**< \brief (RTC       ) Base Address */
 #define GPBR       ((Gpbr   *)0x400E1A90U) /**< \brief (GPBR      ) Base Address */
-#endif /* (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
+#endif /* (dined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
 /*@}*/
 
 /* ************************************************************************** */
@@ -579,4 +579,6 @@ void WDT_Handler        ( void );
 
 /*@}*/
 
-#endif /* _SAM3X8E_ */
+#endif /* _SAM8E_ */
+/
+/

@@ -33,8 +33,8 @@ extern "C" {
 #endif
 
 /*  for correct inclusion of <msp430.h> */
-#ifndef __MSP430F1612__
-#define __MSP430F1612__
+#ifndef MSP430F1612__
+#define MSP430F1612__
 #endif
 
 /**
@@ -82,4 +82,4 @@ extern "C" {
 #include "board-conf.h"
 
 /** @} */
-#endif /*  MSB_BOARD_H_ */
+#endif /* SB_BOARD_H_ */

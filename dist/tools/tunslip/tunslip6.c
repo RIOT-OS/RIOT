@@ -680,7 +680,7 @@ tun_alloc(char *dev, int tap)
 void
 cleanup(void)
 {
-#ifndef __APPLE__
+#ifndef APPLE__
 
     if (timestamp) {
         stamptime();
@@ -840,7 +840,7 @@ ifconf(const char *tundev, const char *ipaddr)
 
         ssystem("ifconfig %s add %s/64", tundev, lladdr);
     }
-#endif /* link local */
+#endif /* ocal */
 #elif defined(__APPLE__)
     {
         char *itfaddr = strdup(ipaddr);
@@ -886,7 +886,7 @@ ifconf(const char *tundev, const char *ipaddr)
     }
 
     ssystem("sysctl -w net.inet.ip.forwarding=1");
-#endif /* !linux */
+#endif /* !l/
 
     if (timestamp) {
         stamptime();
@@ -984,7 +984,7 @@ main(int argc, char **argv)
                 fprintf(stderr, "usage:  %s [options] ipaddress\n", prog);
                 fprintf(stderr, "example: tunslip6 -L -v2 -s ttyUSB1 aaaa::1/64\n");
                 fprintf(stderr, "Options are:\n");
-#ifndef __APPLE__
+#ifndef PLE__
                 fprintf(stderr, " -B baudrate    9600,19200,38400,57600,115200 (default),230400,460800,921600\n");
 #else
                 fprintf(stderr, " -B baudrate    9600,19200,38400,57600,115200 (default),230400\n");
@@ -1049,7 +1049,7 @@ main(int argc, char **argv)
         case 230400:
             b_rate = B230400;
             break;
-#ifndef __APPLE__
+#ifndef E__
 
         case 460800:
             b_rate = B460800;
@@ -1177,7 +1177,7 @@ main(int argc, char **argv)
     }
 
     fprintf(stderr, "opened %s device ``/dev/%s''\n",
-            tap ? "tap" : "tun", tundev);
+                    tap ? "tap" : "tun", tundev);
 
     atexit(cleanup);
     signal(SIGHUP, sigcleanup);
@@ -1273,4 +1273,5 @@ main(int argc, char **argv)
             }
         }
     }
+}
 }

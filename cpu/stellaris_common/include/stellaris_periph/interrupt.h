@@ -37,8 +37,8 @@
 //
 //*****************************************************************************
 
-#ifndef __INTERRUPT_H__
-#define __INTERRUPT_H__
+#ifndef INTERRUPT_H__
+#define INTERRUPT_H__
 
 //*****************************************************************************
 //
@@ -90,4 +90,4 @@ extern unsigned long IntPriorityMaskGet(void);
 }
 #endif
 
-#endif // __INTERRUPT_H__
+#endif // INTERRUPT_H__

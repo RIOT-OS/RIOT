@@ -37,8 +37,8 @@
 //
 //*****************************************************************************
 
-#ifndef __HW_TIMER_H__
-#define __HW_TIMER_H__
+#ifndef HW_TIMER_H__
+#define HW_TIMER_H__
 
 #ifdef __cplusplus
 extern "C" {
@@ -764,4 +764,4 @@ extern "C" {
 }
 #endif
 
-#endif // __HW_TIMER_H__
+#endif // HW_TIMER_H__

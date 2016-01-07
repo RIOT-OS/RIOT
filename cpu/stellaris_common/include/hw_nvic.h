@@ -37,8 +37,8 @@
 //
 //*****************************************************************************
 
-#ifndef __HW_NVIC_H__
-#define __HW_NVIC_H__
+#ifndef HW_NVIC_H__
+#define HW_NVIC_H__
 
 #ifdef __cplusplus
 extern "C" {
@@ -1722,4 +1722,4 @@ extern "C" {
 }
 #endif
 
-#endif // __HW_NVIC_H__
+#endif // HW_NVIC_H__

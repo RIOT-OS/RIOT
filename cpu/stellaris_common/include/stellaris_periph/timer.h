@@ -37,8 +37,8 @@
 //
 //*****************************************************************************
 
-#ifndef __TIMER_H__
-#define __TIMER_H__
+#ifndef TIMER_H__
+#define TIMER_H__
 
 //*****************************************************************************
 //
@@ -233,4 +233,4 @@ extern void TimerQuiesce(unsigned long ulBase);
 }
 #endif
 
-#endif // __TIMER_H__
+#endif // TIMER_H__

@@ -47,8 +47,8 @@
   * @{
   */
 
-#ifndef __STM32F10x_H
-#define __STM32F10x_H
+#ifndef STM32F10x_H
+#define STM32F10x_H
 
 #ifdef __cplusplus
  extern "C" {
@@ -119,8 +119,8 @@
   #define HSE_VALUE    ((uint32_t)25000000) /*!< Value of the External oscillator in Hz */
  #else
   #define HSE_VALUE    ((uint32_t)8000000) /*!< Value of the External oscillator in Hz */
- #endif /* STM32F10X_CL */
-#endif /* HSE_VALUE */
+ #endif /* M32F10X_CL */
+#endif /* HSVALUE */
 
 
 /**
@@ -134,11 +134,11 @@
 /**
  * @brief STM32F10x Standard Peripheral Library version number
    */
-#define __STM32F10X_STDPERIPH_VERSION_MAIN   (0x03) /*!< [31:24] main version */
-#define __STM32F10X_STDPERIPH_VERSION_SUB1   (0x05) /*!< [23:16] sub1 version */
-#define __STM32F10X_STDPERIPH_VERSION_SUB2   (0x00) /*!< [15:8]  sub2 version */
-#define __STM32F10X_STDPERIPH_VERSION_RC     (0x00) /*!< [7:0]  release candidate */
-#define __STM32F10X_STDPERIPH_VERSION       ( (__STM32F10X_STDPERIPH_VERSION_MAIN << 24)\
+#define __M32F10X_STDPERIPH_VERSION_MAIN   (0x03) /*!< [31:24] main version */
+#define __ST2F10X_STDPERIPH_VERSION_SUB1   (0x05) /*!< [23:16] sub1 version */
+#define __STM310X_STDPERIPH_VERSION_SUB2   (0x00) /*!< [15:8]  sub2 version */
+#define __STM32FX_STDPERIPH_VERSION_RC     (0x00) /*!< [7:0]  release candidate */
+#define __STM32F10STDPERIPH_VERSION       ( (__STM32F10X_STDPERIPH_VERSION_MAIN << 24)\
                                              |(__STM32F10X_STDPERIPH_VERSION_SUB1 << 16)\
                                              |(__STM32F10X_STDPERIPH_VERSION_SUB2 << 8)\
                                              |(__STM32F10X_STDPERIPH_VERSION_RC))
@@ -155,12 +155,12 @@
  * @brief Configuration of the Cortex-M3 Processor and Core Peripherals
  */
 #ifdef STM32F10X_XL
- #define __MPU_PRESENT             1 /*!< STM32 XL-density devices provide an MPU */
+ #define __MPU_PRESEN            1 /*!< STM32 XL-density devices provide an MPU */
 #else
- #define __MPU_PRESENT             0 /*!< Other STM32 devices does not provide an MPU */
-#endif /* STM32F10X_XL */
-#define __NVIC_PRIO_BITS          4 /*!< STM32 uses 4 Bits for the Priority Levels    */
-#define __Vendor_SysTickConfig    0 /*!< Set to 1 if different SysTick Config is used */
+ #define __MPU_PRESENT           0 /*!< Other STM32 devices does not provide an MPU */
+#endif /* STM310X_XL */
+#define __NVIC_PRIO_BITS        4 /*!< STM32 uses 4 Bits for the Priority Levels    */
+#define __Vendor_SysTickCoig    0 /*!< Set to 1 if different SysTick Config is used */
 
 /**
  * @brief STM32F10x Interrupt Number Definition, according to the selected device
@@ -219,7 +219,7 @@ typedef enum IRQn
   EXTI15_10_IRQn              = 40,     /*!< External Line[15:10] Interrupts                      */
   RTCAlarm_IRQn               = 41,     /*!< RTC Alarm through EXTI Line Interrupt                */
   USBWakeUp_IRQn              = 42      /*!< USB Device WakeUp from suspend through EXTI Line Interrupt */
-#endif /* STM32F10X_LD */
+#endif /* STM32FX_LD */
 
 #ifdef STM32F10X_LD_VL
   ADC1_IRQn                   = 18,     /*!< ADC1 global Interrupt                                */
@@ -240,7 +240,7 @@ typedef enum IRQn
   CEC_IRQn                    = 42,     /*!< HDMI-CEC Interrupt                                   */
   TIM6_DAC_IRQn               = 54,     /*!< TIM6 and DAC underrun Interrupt                      */
   TIM7_IRQn                   = 55      /*!< TIM7 Interrupt                                       */
-#endif /* STM32F10X_LD_VL */
+#endif /* STM32F10LD_VL */
 
 #ifdef STM32F10X_MD
   ADC1_2_IRQn                 = 18,     /*!< ADC1 and ADC2 global Interrupt                       */
@@ -268,7 +268,7 @@ typedef enum IRQn
   EXTI15_10_IRQn              = 40,     /*!< External Line[15:10] Interrupts                      */
   RTCAlarm_IRQn               = 41,     /*!< RTC Alarm through EXTI Line Interrupt                */
   USBWakeUp_IRQn              = 42      /*!< USB Device WakeUp from suspend through EXTI Line Interrupt */
-#endif /* STM32F10X_MD */
+#endif /* STM32F10X_ */
 
 #ifdef STM32F10X_MD_VL
   ADC1_IRQn                   = 18,     /*!< ADC1 global Interrupt                                */
@@ -294,7 +294,7 @@ typedef enum IRQn
   CEC_IRQn                    = 42,     /*!< HDMI-CEC Interrupt                                   */
   TIM6_DAC_IRQn               = 54,     /*!< TIM6 and DAC underrun Interrupt                      */
   TIM7_IRQn                   = 55      /*!< TIM7 Interrupt                                       */
-#endif /* STM32F10X_MD_VL */
+#endif /* STM32F10X_MDL */
 
 #ifdef STM32F10X_HD
   ADC1_2_IRQn                 = 18,     /*!< ADC1 and ADC2 global Interrupt                       */
@@ -339,8 +339,7 @@ typedef enum IRQn
   DMA2_Channel2_IRQn          = 57,     /*!< DMA2 Channel 2 global Interrupt                      */
   DMA2_Channel3_IRQn          = 58,     /*!< DMA2 Channel 3 global Interrupt                      */
   DMA2_Channel4_5_IRQn        = 59      /*!< DMA2 Channel 4 and Channel 5 global Interrupt        */
-#endif /* STM32F10X_HD */
-
+#endif /* STM32F10X_HD *
 #ifdef STM32F10X_HD_VL
   ADC1_IRQn                   = 18,     /*!< ADC1 global Interrupt                                */
   EXTI9_5_IRQn                = 23,     /*!< External Line[9:5] Interrupts                        */
@@ -379,7 +378,7 @@ typedef enum IRQn
   DMA2_Channel5_IRQn          = 60      /*!< DMA2 Channel 5 global Interrupt (DMA2 Channel 5 is
                                              mapped at position 60 only if the MISC_REMAP bit in
                                              the AFIO_MAPR2 register is set)                      */
-#endif /* STM32F10X_HD_VL */
+#endif /* STM32F10X_HD_VL 
 
 #ifdef STM32F10X_XL
   ADC1_2_IRQn                 = 18,     /*!< ADC1 and ADC2 global Interrupt                       */
@@ -426,7 +425,7 @@ typedef enum IRQn
   DMA2_Channel4_5_IRQn        = 59      /*!< DMA2 Channel 4 and Channel 5 global Interrupt        */
 #endif /* STM32F10X_XL */
 
-#ifdef STM32F10X_CL
+#def STM32F10X_CL
   ADC1_2_IRQn                 = 18,     /*!< ADC1 and ADC2 global Interrupt                       */
   CAN1_TX_IRQn                = 19,     /*!< USB Device High Priority or CAN1 TX Interrupts       */
   CAN1_RX0_IRQn               = 20,     /*!< USB Device Low Priority or CAN1 RX0 Interrupts       */
@@ -471,7 +470,7 @@ typedef enum IRQn
   CAN2_SCE_IRQn               = 66,     /*!< CAN2 SCE Interrupt                                   */
   OTG_FS_IRQn                 = 67      /*!< USB OTG FS global Interrupt                          */
 #endif /* STM32F10X_CL */
-} IRQn_Type;
+} IR_Type;
 
 /**
   * @}
@@ -685,7 +684,7 @@ typedef struct
 #else
   CAN_FilterRegister_TypeDef sFilterRegister[28];
 #endif /* STM32F10X_CL */
-} CAN_TypeDef;
+} CAN_peDef;
 
 /**
   * @brief Consumer Electronics Control (CEC)
@@ -874,7 +873,7 @@ typedef struct
   __IO uint32_t CR2;
   __IO uint32_t AR2;
 #endif /* STM32F10X_XL */
-} FLASH_TypeDef;
+} FLASH_peDef;
 
 /**
   * @brief Option Bytes Registers
@@ -1047,10 +1046,10 @@ typedef struct
   __IO uint32_t CFGR2;
 #endif /* STM32F10X_CL */
 
-#if defined (STM32F10X_LD_VL) || defined (STM32F10X_MD_VL) || defined (STM32F10X_HD_VL)
+#if defin (STM32F10X_LD_VL) || defined (STM32F10X_MD_VL) || defined (STM32F10X_HD_VL)
   uint32_t RESERVED0;
   __IO uint32_t CFGR2;
-#endif /* STM32F10X_LD_VL || STM32F10X_MD_VL || STM32F10X_HD_VL */
+#endif /* STM32F10X_LD_VL || STM32F10XD_VL || STM32F10X_HD_VL */
 } RCC_TypeDef;
 
 /**
@@ -1652,7 +1651,7 @@ typedef struct
  #define  RCC_CR_PLL3RDY                      ((uint32_t)0x20000000)        /*!< PLL3 clock ready flag */
 #endif /* STM32F10X_CL */
 
-/*******************  Bit definition for RCC_CFGR register  *******************/
+/*****************  Bit definition for RCC_CFGR register  *******************/
 /*!< SW configuration */
 #define  RCC_CFGR_SW                         ((uint32_t)0x00000003)        /*!< SW[1:0] bits (System clock Switch) */
 #define  RCC_CFGR_SW_0                       ((uint32_t)0x00000001)        /*!< Bit 0 */
@@ -1837,7 +1836,7 @@ typedef struct
  #define  RCC_CFGR_MCO_PLL                   ((uint32_t)0x07000000)        /*!< PLL clock divided by 2 selected as MCO source */
 #endif /* STM32F10X_CL */
 
-/*!<******************  Bit definition for RCC_CIR register  ********************/
+/*!<****************  Bit definition for RCC_CIR register  ********************/
 #define  RCC_CIR_LSIRDYF                     ((uint32_t)0x00000001)        /*!< LSI Ready Interrupt flag */
 #define  RCC_CIR_LSERDYF                     ((uint32_t)0x00000002)        /*!< LSE Ready Interrupt flag */
 #define  RCC_CIR_HSIRDYF                     ((uint32_t)0x00000004)        /*!< HSI Ready Interrupt flag */
@@ -1865,7 +1864,7 @@ typedef struct
  #define  RCC_CIR_PLL3RDYC                    ((uint32_t)0x00400000)        /*!< PLL3 Ready Interrupt Clear */
 #endif /* STM32F10X_CL */
 
-/*****************  Bit definition for RCC_APB2RSTR register  *****************/
+/**************** Bit definition for RCC_APB2RSTR register  *****************/
 #define  RCC_APB2RSTR_AFIORST                ((uint32_t)0x00000001)        /*!< Alternate Function I/O reset */
 #define  RCC_APB2RSTR_IOPARST                ((uint32_t)0x00000004)        /*!< I/O port A reset */
 #define  RCC_APB2RSTR_IOPBRST                ((uint32_t)0x00000008)        /*!< I/O port B reset */
@@ -1891,7 +1890,7 @@ typedef struct
  #define  RCC_APB2RSTR_IOPERST               ((uint32_t)0x00000040)        /*!< I/O port E reset */
 #endif /* STM32F10X_LD && STM32F10X_LD_VL */
 
-#if defined (STM32F10X_HD) || defined (STM32F10X_XL)
+f defined (STM32F10X_HD) || defined (STM32F10X_XL)
  #define  RCC_APB2RSTR_IOPFRST               ((uint32_t)0x00000080)        /*!< I/O port F reset */
  #define  RCC_APB2RSTR_IOPGRST               ((uint32_t)0x00000100)        /*!< I/O port G reset */
  #define  RCC_APB2RSTR_TIM8RST               ((uint32_t)0x00002000)        /*!< TIM8 Timer reset */
@@ -1909,7 +1908,7 @@ typedef struct
  #define  RCC_APB2RSTR_TIM11RST              ((uint32_t)0x00200000)         /*!< TIM11 Timer reset */
 #endif /* STM32F10X_XL */
 
-/*****************  Bit definition for RCC_APB1RSTR register  *****************/
+/*****************  B definition for RCC_APB1RSTR register  *****************/
 #define  RCC_APB1RSTR_TIM2RST                ((uint32_t)0x00000001)        /*!< Timer 2 reset */
 #define  RCC_APB1RSTR_TIM3RST                ((uint32_t)0x00000002)        /*!< Timer 3 reset */
 #define  RCC_APB1RSTR_WWDGRST                ((uint32_t)0x00000800)        /*!< Window Watchdog reset */
@@ -1930,7 +1929,7 @@ typedef struct
  #define  RCC_APB1RSTR_I2C2RST               ((uint32_t)0x00400000)        /*!< I2C 2 reset */
 #endif /* STM32F10X_LD && STM32F10X_LD_VL */
 
-#if defined (STM32F10X_HD) || defined (STM32F10X_MD) || defined (STM32F10X_LD) || defined  (STM32F10X_XL)
+#if fined (STM32F10X_HD) || defined (STM32F10X_MD) || defined (STM32F10X_LD) || defined  (STM32F10X_XL)
  #define  RCC_APB1RSTR_USBRST                ((uint32_t)0x00800000)        /*!< USB Device reset */
 #endif
 
@@ -1966,12 +1965,12 @@ typedef struct
 #endif /* STM32F10X_CL */
 
 #ifdef STM32F10X_XL
- #define  RCC_APB1RSTR_TIM12RST               ((uint32_t)0x00000040)         /*!< TIM12 Timer reset */
+ #defe  RCC_APB1RSTR_TIM12RST               ((uint32_t)0x00000040)         /*!< TIM12 Timer reset */
  #define  RCC_APB1RSTR_TIM13RST               ((uint32_t)0x00000080)         /*!< TIM13 Timer reset */
  #define  RCC_APB1RSTR_TIM14RST               ((uint32_t)0x00000100)         /*!< TIM14 Timer reset */
 #endif /* STM32F10X_XL */
 
-/******************  Bit definition for RCC_AHBENR register  ******************/
+/******************  Bit denition for RCC_AHBENR register  ******************/
 #define  RCC_AHBENR_DMA1EN                   ((uint16_t)0x0001)            /*!< DMA1 clock enable */
 #define  RCC_AHBENR_SRAMEN                   ((uint16_t)0x0004)            /*!< SRAM interface clock enable */
 #define  RCC_AHBENR_FLITFEN                  ((uint16_t)0x0010)            /*!< FLITF clock enable */
@@ -1997,7 +1996,7 @@ typedef struct
  #define  RCC_AHBENR_ETHMACRXEN              ((uint32_t)0x00010000)         /*!< ETHERNET MAC Rx clock enable */
 #endif /* STM32F10X_CL */
 
-/******************  Bit definition for RCC_APB2ENR register  *****************/
+/******************  Bit defition for RCC_APB2ENR register  *****************/
 #define  RCC_APB2ENR_AFIOEN                  ((uint32_t)0x00000001)         /*!< Alternate Function I/O clock enable */
 #define  RCC_APB2ENR_IOPAEN                  ((uint32_t)0x00000004)         /*!< I/O port A clock enable */
 #define  RCC_APB2ENR_IOPBEN                  ((uint32_t)0x00000008)         /*!< I/O port B clock enable */
@@ -2023,7 +2022,7 @@ typedef struct
  #define  RCC_APB2ENR_IOPEEN                 ((uint32_t)0x00000040)         /*!< I/O port E clock enable */
 #endif /* STM32F10X_LD && STM32F10X_LD_VL */
 
-#if defined (STM32F10X_HD) || defined (STM32F10X_XL)
+#if defined TM32F10X_HD) || defined (STM32F10X_XL)
  #define  RCC_APB2ENR_IOPFEN                 ((uint32_t)0x00000080)         /*!< I/O port F clock enable */
  #define  RCC_APB2ENR_IOPGEN                 ((uint32_t)0x00000100)         /*!< I/O port G clock enable */
  #define  RCC_APB2ENR_TIM8EN                 ((uint32_t)0x00002000)         /*!< TIM8 Timer clock enable */
@@ -2062,7 +2061,7 @@ typedef struct
  #define  RCC_APB1ENR_I2C2EN                 ((uint32_t)0x00400000)        /*!< I2C 2 clock enable */
 #endif /* STM32F10X_LD && STM32F10X_LD_VL */
 
-#if defined (STM32F10X_HD) || defined (STM32F10X_MD) || defined  (STM32F10X_LD)
+#if defined (S32F10X_HD) || defined (STM32F10X_MD) || defined  (STM32F10X_LD)
  #define  RCC_APB1ENR_USBEN                  ((uint32_t)0x00800000)        /*!< USB Device clock enable */
 #endif
 
@@ -2094,16 +2093,16 @@ typedef struct
 #endif /* STM32F10X_HD_VL */
 
 #ifdef STM32F10X_CL
- #define  RCC_APB1ENR_CAN2EN                  ((uint32_t)0x04000000)        /*!< CAN2 clock enable */
+ #define  RCAPB1ENR_CAN2EN                  ((uint32_t)0x04000000)        /*!< CAN2 clock enable */
 #endif /* STM32F10X_CL */
 
 #ifdef STM32F10X_XL
- #define  RCC_APB1ENR_TIM12EN                ((uint32_t)0x00000040)         /*!< TIM12 Timer clock enable  */
+ #define  RCC_APBNR_TIM12EN                ((uint32_t)0x00000040)         /*!< TIM12 Timer clock enable  */
  #define  RCC_APB1ENR_TIM13EN                ((uint32_t)0x00000080)         /*!< TIM13 Timer clock enable  */
  #define  RCC_APB1ENR_TIM14EN                ((uint32_t)0x00000100)         /*!< TIM14 Timer clock enable */
 #endif /* STM32F10X_XL */
 
-/*******************  Bit definition for RCC_BDCR register  *******************/
+/*******************  Bit definition foRCC_BDCR register  *******************/
 #define  RCC_BDCR_LSEON                      ((uint32_t)0x00000001)        /*!< External Low Speed oscillator enable */
 #define  RCC_BDCR_LSERDY                     ((uint32_t)0x00000002)        /*!< External Low Speed oscillator Ready */
 #define  RCC_BDCR_LSEBYP                     ((uint32_t)0x00000004)        /*!< External Low Speed oscillator Bypass */
@@ -2227,7 +2226,7 @@ typedef struct
  #define  RCC_CFGR2_I2S3SRC                  ((uint32_t)0x00040000)        /*!< I2S3 clock source */
 #endif /* STM32F10X_CL */
 
-#if defined (STM32F10X_LD_VL) || defined (STM32F10X_MD_VL) || defined (STM32F10X_HD_VL)
+#if defined (STM32F10X_LD_VL) || defined TM32F10X_MD_VL) || defined (STM32F10X_HD_VL)
 /*******************  Bit definition for RCC_CFGR2 register  ******************/
 /*!< PREDIV1 configuration */
  #define  RCC_CFGR2_PREDIV1                  ((uint32_t)0x0000000F)        /*!< PREDIV1[3:0] bits */
@@ -8249,7 +8248,7 @@ typedef struct
   * @}
   */
 
-#ifdef __cplusplus
+#ifdef _plusplus
 }
 #endif
 
@@ -8297,4 +8296,6 @@ extern "C" {
   * @}
   */
 
-/******************* (C) COPYRIGHT 2011 STMicroelectronics *****END OF FILE****/
+/***************** (C) COPYRIGHT 2011 STMicroelectronics *****END OF FILE****/
+/
+/

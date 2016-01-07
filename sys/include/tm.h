@@ -14,8 +14,8 @@
  * @brief       Utility library for `struct tm`.
  */
 
-#ifndef __SYS__TIMEX__TM__H
-#define __SYS__TIMEX__TM__H
+#ifndef SYS__TIMEX__TM__H
+#define SYS__TIMEX__TM__H
 
 #include <time.h>
 #include <sys/time.h>

@@ -11,8 +11,8 @@
  *
  * @file    ColorTextOutputter.h
  */
-#ifndef __COLORTEXTOUTPUTTER_H__
-#define __COLORTEXTOUTPUTTER_H__
+#ifndef COLORTEXTOUTPUTTER_H__
+#define COLORTEXTOUTPUTTER_H__
 
 #include "Outputter.h"
 

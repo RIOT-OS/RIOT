@@ -32,8 +32,8 @@
  *
  * $Id: TestRunner.h,v 1.6 2004/02/10 16:19:29 arms22 Exp $
  */
-#ifndef __TESTRUNNER_H__
-#define __TESTRUNNER_H__
+#ifndef TESTRUNNER_H__
+#define TESTRUNNER_H__
 
 #ifdef  __cplusplus
 extern "C" {

@@ -37,8 +37,8 @@
 //
 //*****************************************************************************
 
-#ifndef __HW_PWM_H__
-#define __HW_PWM_H__
+#ifndef HW_PWM_H__
+#define HW_PWM_H__
 
 #ifdef __cplusplus
 extern "C" {
@@ -2025,4 +2025,4 @@ extern "C" {
 }
 #endif
 
-#endif // __HW_PWM_H__
+#endif // HW_PWM_H__

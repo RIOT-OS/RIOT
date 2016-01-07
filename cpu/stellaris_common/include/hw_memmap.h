@@ -37,8 +37,8 @@
 //
 //*****************************************************************************
 
-#ifndef __HW_MEMMAP_H__
-#define __HW_MEMMAP_H__
+#ifndef HW_MEMMAP_H__
+#define HW_MEMMAP_H__
 
 #ifdef __cplusplus
 extern "C" {
@@ -169,4 +169,4 @@ extern "C" {
 }
 #endif
 
-#endif // __HW_MEMMAP_H__
+#endif // HW_MEMMAP_H__

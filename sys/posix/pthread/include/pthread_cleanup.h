@@ -14,8 +14,8 @@
  * @note    Do not include this header file directly, but pthread.h.
  */
 
-#ifndef __SYS__POSIX__PTHREAD_CLEANUP__H
-#define __SYS__POSIX__PTHREAD_CLEANUP__H
+#ifndef SYS__POSIX__PTHREAD_CLEANUP__H
+#define SYS__POSIX__PTHREAD_CLEANUP__H
 
 #ifdef __cplusplus
 extern "C" {

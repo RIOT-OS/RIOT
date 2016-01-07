@@ -35,8 +35,8 @@
    ---------------------------------------------------------------------------*/
 
 
-#ifndef __CORE_CMFUNC_H
-#define __CORE_CMFUNC_H
+#ifndef CORE_CMFUNC_H
+#define CORE_CMFUNC_H
 
 #ifdef __cplusplus
  extern "C" {
@@ -208,7 +208,7 @@ __STATIC_INLINE void __set_PRIMASK(uint32_t priMask)
     This function enables FIQ interrupts by clearing the F-bit in the CPSR.
     Can only be executed in Privileged modes.
  */
-#define __enable_fault_irq                __enable_fiq
+#define __able_fault_irq                __enable_fiq
 
 
 /** \brief  Disable FIQ
@@ -216,7 +216,7 @@ __STATIC_INLINE void __set_PRIMASK(uint32_t priMask)
     This function disables FIQ interrupts by setting the F-bit in the CPSR.
     Can only be executed in Privileged modes.
  */
-#define __disable_fault_irq               __disable_fiq
+#define __dible_fault_irq               __disable_fiq
 
 
 /** \brief  Get Base Priority
@@ -284,7 +284,7 @@ __STATIC_INLINE void __set_FAULTMASK(uint32_t faultMask)
   __regFaultMask = (faultMask & (uint32_t)1);
 }
 
-#endif /* (__CORTEX_M >= 0x03) || (__CORTEX_SC >= 300) */
+#endif /* _CORTEX_M >= 0x03) || (__CORTEX_SC >= 300) */
 
 
 #if       (__CORTEX_M == 0x04) || (__CORTEX_M == 0x07)
@@ -320,7 +320,7 @@ __STATIC_INLINE void __set_FPSCR(uint32_t fpscr)
 #endif
 }
 
-#endif /* (__CORTEX_M == 0x04) || (__CORTEX_M == 0x07) */
+#endif /* (_ORTEX_M == 0x04) || (__CORTEX_M == 0x07) */
 
 
 #elif defined ( __GNUC__ ) /*------------------ GNU Compiler ---------------------*/
@@ -598,7 +598,7 @@ __attribute__( ( always_inline ) ) __STATIC_INLINE void __set_FAULTMASK(uint32_t
   __ASM volatile ("MSR faultmask, %0" : : "r" (faultMask) : "memory");
 }
 
-#endif /* (__CORTEX_M >= 0x03) */
+#endif /* (__CTEX_M >= 0x03) */
 
 
 #if       (__CORTEX_M == 0x04) || (__CORTEX_M == 0x07)
@@ -641,7 +641,7 @@ __attribute__( ( always_inline ) ) __STATIC_INLINE void __set_FPSCR(uint32_t fps
 }
 #endif
 
-#endif /* (__CORTEX_M == 0x04) || (__CORTEX_M == 0x07) */
+#endif /* (__CORX_M == 0x04) || (__CORTEX_M == 0x07) */
 
 
 #elif defined ( __ICCARM__ ) /*------------------ ICC Compiler -------------------*/
@@ -675,4 +675,6 @@ __attribute__( ( always_inline ) ) __STATIC_INLINE void __set_FPSCR(uint32_t fps
 }
 #endif
 
-#endif /* __CORE_CMFUNC_H */
+#endif /* __CORE_CUNC_H */
+/
+/

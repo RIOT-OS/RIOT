@@ -51,8 +51,8 @@
   * @{
   */
 
-#ifndef __STM32L1XX_H
-#define __STM32L1XX_H
+#ifndef STM32L1XX_H
+#define STM32L1XX_H
 
 #ifdef __cplusplus
  extern "C" {
@@ -145,11 +145,11 @@
 /**
  * @brief STM32L1xx Standard Peripheral Library version number V1.3.2
    */
-#define __STM32L1XX_STDPERIPH_VERSION_MAIN   (0x01) /*!< [31:24] main version */
-#define __STM32L1XX_STDPERIPH_VERSION_SUB1   (0x03) /*!< [23:16] sub1 version */
-#define __STM32L1XX_STDPERIPH_VERSION_SUB2   (0x02) /*!< [15:8]  sub2 version */
-#define __STM32L1XX_STDPERIPH_VERSION_RC     (0x00) /*!< [7:0]  release candidate */
-#define __STM32L1XX_STDPERIPH_VERSION       ( (__STM32L1XX_STDPERIPH_VERSION_MAIN << 24)\
+#define __M32L1XX_STDPERIPH_VERSION_MAIN   (0x01) /*!< [31:24] main version */
+#define __ST2L1XX_STDPERIPH_VERSION_SUB1   (0x03) /*!< [23:16] sub1 version */
+#define __STM31XX_STDPERIPH_VERSION_SUB2   (0x02) /*!< [15:8]  sub2 version */
+#define __STM32LX_STDPERIPH_VERSION_RC     (0x00) /*!< [7:0]  release candidate */
+#define __STM32L1XSTDPERIPH_VERSION       ( (__STM32L1XX_STDPERIPH_VERSION_MAIN << 24)\
                                              |(__STM32L1XX_STDPERIPH_VERSION_SUB1 << 16)\
                                              |(__STM32L1XX_STDPERIPH_VERSION_SUB2 << 8)\
                                              |(__STM32L1XX_STDPERIPH_VERSION_RC))
@@ -166,10 +166,10 @@
  * @brief STM32L1xx Interrupt Number Definition, according to the selected device
  *        in @ref Library_configuration_section
  */
-#define __CM3_REV                 0x200 /*!< Cortex-M3 Revision r2p0                      */
-#define __MPU_PRESENT             1     /*!< STM32L1 provides MPU                         */
-#define __NVIC_PRIO_BITS          4     /*!< STM32L1 uses 4 Bits for the Priority Levels  */
-#define __Vendor_SysTickConfig    0     /*!< Set to 1 if different SysTick Config is used */
+#define __CM3_REV               0x200 /*!< Cortex-M3 Revision r2p0                      */
+#define __MPU_PRESENT           1     /*!< STM32L1 provides MPU                         */
+#define __NVIC_PRIO_BITS        4     /*!< STM32L1 uses 4 Bits for the Priority Levels  */
+#define __Vendor_SysTickCoig    0     /*!< Set to 1 if different SysTick Config is used */
 
 /*!< Interrupt Number Definition */
 typedef enum IRQn
@@ -232,7 +232,7 @@ typedef enum IRQn
 
 #ifdef STM32L1XX_MD
   TIM7_IRQn                   = 44      /*!< TIM7 global Interrupt                                   */
-#endif /* STM32L1XX_MD */
+#endif /* M32L1XX_MD */
 
 #ifdef STM32L1XX_MDP
   TIM7_IRQn                   = 44,     /*!< TIM7 global Interrupt                                   */
@@ -245,7 +245,7 @@ typedef enum IRQn
   DMA2_Channel5_IRQn          = 54,     /*!< DMA2 Channel 5 global Interrupt                         */
   AES_IRQn                    = 55,     /*!< AES global Interrupt                                    */
   COMP_ACQ_IRQn               = 56      /*!< Comparator Channel Acquisition global Interrupt         */
-#endif /* STM32L1XX_MDP */
+#endif /* ST2L1XX_MDP */
 
 #ifdef STM32L1XX_HD
   TIM7_IRQn                   = 44,     /*!< TIM7 global Interrupt                                   */
@@ -261,7 +261,7 @@ typedef enum IRQn
   DMA2_Channel5_IRQn          = 54,     /*!< DMA2 Channel 5 global Interrupt                         */
   AES_IRQn                    = 55,     /*!< AES global Interrupt                                    */
   COMP_ACQ_IRQn               = 56      /*!< Comparator Channel Acquisition global Interrupt         */
-#endif /* STM32L1XX_HD */
+#endif /* STM31XX_HD */
 
 #ifdef STM32L1XX_XL
   TIM7_IRQn                   = 44,     /*!< TIM7 global Interrupt                                   */
@@ -276,7 +276,7 @@ typedef enum IRQn
   DMA2_Channel5_IRQn          = 54,     /*!< DMA2 Channel 5 global Interrupt                         */
   AES_IRQn                    = 55,     /*!< AES global Interrupt                                    */
   COMP_ACQ_IRQn               = 56      /*!< Comparator Channel Acquisition global Interrupt         */
-#endif /* STM32L1XX_XL */
+#endif /* STM32LX_XL */
 } IRQn_Type;
 
 /**
@@ -311,14 +311,14 @@ typedef enum {ERROR = 0, SUCCESS = !ERROR} ErrorStatus;
    Available memory areas are declared in the 'Target' tab of the 'Options for Target'
    dialog.
 */
- #define __RAM_FUNC FLASH_Status
+ #define __RAM_FUNC FLASH_Stas
 
 #elif defined ( __ICCARM__ )
 /* ICCARM Compiler
    ---------------
    RAM functions are defined using a specific toolchain keyword "__ramfunc".
 */
- #define __RAM_FUNC __ramfunc FLASH_Status
+ #define __RAM_FUNC __ramfunc FSH_Status
 
 #elif defined   (  __GNUC__  )
 /* GNU Compiler
@@ -326,7 +326,7 @@ typedef enum {ERROR = 0, SUCCESS = !ERROR} ErrorStatus;
    RAM functions are defined using a specific toolchain attribute
    "__attribute__((section(".RamFunc")))".
 */
- #define __RAM_FUNC FLASH_Status __attribute__((section(".RamFunc")))
+ #define __RAM_FUNC FLASH_Status attribute__((section(".RamFunc")))
 
 #elif defined   (  __TASKING__  )
 /* TASKING Compiler
@@ -336,7 +336,7 @@ typedef enum {ERROR = 0, SUCCESS = !ERROR} ErrorStatus;
 */
  #define __RAM_FUNC  FLASH_Status
 
-#endif
+ndif
 
 /**
   * @}
@@ -6661,7 +6661,7 @@ typedef struct
 }
 #endif
 
-#endif /* __STM32L1XX_H */
+#endif /* __STM32LX_H */
 
 /**
   * @}
@@ -6672,3 +6672,5 @@ typedef struct
   */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
+/
+/

@@ -14,8 +14,8 @@
  * @author      Martin Landsmann <martin.landsmann@haw-hamburg.de>
  */
 
-#ifndef __SYS__POSIX__PTHREAD_COND__H
-#define __SYS__POSIX__PTHREAD_COND__H
+#ifndef SYS__POSIX__PTHREAD_COND__H
+#define SYS__POSIX__PTHREAD_COND__H
 
 #include <time.h>
 #include "mutex.h"
@@ -150,4 +150,4 @@ int pthread_cond_broadcast(struct pthread_cond_t *cond);
 #endif
 
 /** @} */
-#endif /* _CONDITION_VARIABLE_H */
+#endif /* ONDITION_VARIABLE_H */

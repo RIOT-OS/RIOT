@@ -39,8 +39,8 @@
  #pragma system_include  /* treat file as system include file for MISRA check */
 #endif
 
-#ifndef __CORE_CM7_H_GENERIC
-#define __CORE_CM7_H_GENERIC
+#ifndef CORE_CM7_H_GENERIC
+#define CORE_CM7_H_GENERIC
 
 #ifdef __cplusplus
  extern "C" {
@@ -68,123 +68,108 @@
  */
 
 /*  CMSIS CM7 definitions */
-#define __CM7_CMSIS_VERSION_MAIN  (0x04)                                   /*!< [31:16] CMSIS HAL main version   */
-#define __CM7_CMSIS_VERSION_SUB   (0x00)                                   /*!< [15:0]  CMSIS HAL sub version    */
-#define __CM7_CMSIS_VERSION       ((__CM7_CMSIS_VERSION_MAIN << 16) | \
+#define 7_CMSIS_VERSION_MAIN  (0x04)                                   /*!< [31:16] CMSIS HAL main version   */
+#define CMSIS_VERSION_SUB   (0x00)                                   /*!< [15:0]  CMSIS HAL sub version    */
+#define SIS_VERSION       ((__CM7_CMSIS_VERSION_MAIN << 16) | \
                                     __CM7_CMSIS_VERSION_SUB          )     /*!< CMSIS HAL version number         */
 
-#define __CORTEX_M                (0x07)                                   /*!< Cortex-M Core                    */
+#define                 (0x07)                                   /*!< Cortex-M Core                    */
 
 
 #if   defined ( __CC_ARM )
-  #define __ASM            __asm                                      /*!< asm keyword for ARM Compiler          */
-  #define __INLINE         __inline                                   /*!< inline keyword for ARM Compiler       */
-  #define __STATIC_INLINE  static __inline
+  #define      __asm                                      /*!< asm keyword for ARM Compiler          */
+  #define    __inline                                   /*!< inline keyword for ARM Compiler       */
+  #define  static __inline
 
 #elif defined ( __GNUC__ )
-  #define __ASM            __asm                                      /*!< asm keyword for GNU Compiler          */
-  #define __INLINE         inline                                     /*!< inline keyword for GNU Compiler       */
-  #define __STATIC_INLINE  static inline
+  #define _asm                                      /*!< asm keyword for GNU Compiler          */
+  #define ine                                     /*!< inline keyword for GNU Compiler       */
+  #define c inline
 
 #elif defined ( __ICCARM__ )
-  #define __ASM            __asm                                      /*!< asm keyword for IAR Compiler          */
-  #define __INLINE         inline                                     /*!< inline keyword for IAR Compiler. Only available in High optimization mode! */
-  #define __STATIC_INLINE  static inline
+  #define __                                    /*!< asm keyword for IAR Compiler          */
+  #define __IN                                  /*!< inline keyword for IAR Compiler. Only available in High optimization mode! */
+  #define __STATne
 
 #elif defined ( __TMS470__ )
-  #define __ASM            __asm                                      /*!< asm keyword for TI CCS Compiler       */
-  #define __STATIC_INLINE  static inline
-
-#elif defined ( __TASKING__ )
-  #define __ASM            __asm                                      /*!< asm keyword for TASKING Compiler      */
-  #define __INLINE         inline                                     /*!< inline keyword for TASKING Compiler   */
-  #define __STATIC_INLINE  static inline
-
-#elif defined ( __CSMC__ )
+  #define __ASM                                 /*!< asm keyword for TI CCS Compiler       */
+  #define __STATIC_I#elif defined ( __TASKING__ )
+  #define __ASM                                 /*!< asm keyword for TASKING Compiler      */
+  #define __INLINE                              /*!< inline keyword for TASKING Compiler   */
+  #define __STATIC_INLINE defined ( __CSMC__ )
   #define __packed
-  #define __ASM            _asm                                      /*!< asm keyword for COSMIC Compiler      */
-  #define __INLINE         inline                                    /*use -pc99 on compile line !< inline keyword for COSMIC Compiler   */
-  #define __STATIC_INLINE  static inline
-
-#endif
-
-/** __FPU_USED indicates whether an FPU is used or not.
+  #define                   *!< asm keyword for COSMIC Compiler      */
+  #define __INLINE         inle                /*use -pc99 on compile line !< inline keyword for COSMIC Compiler   */
+  #define __STATIC_INLINE  statiinFPU_USED indicates whether an FPU is used or not.
     For this, __FPU_PRESENT has to be checked prior to making use of FPU specific registers and functions.
 */
 #if defined ( __CC_ARM )
   #if defined __TARGET_FPU_VFP
     #if (__FPU_PRESENT == 1)
       #define __FPU_USED       1
-    #else
-      #warning "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+    #seompiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
       #define __FPU_USED       0
-    #endif
-  #else
-    #define __FPU_USED         0
+    #enf
+__FPU_USED         0
   #endif
 
-#elif defined ( __GNUC__ )
+#elif defined ( _NUC__ )
   #if defined (__VFP_FP__) && !defined(__SOFTFP__)
     #if (__FPU_PRESENT == 1)
       #define __FPU_USED       1
-    #else
-      #warning "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+    #else  r generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
       #define __FPU_USED       0
     #endif
-  #else
-    #define __FPU_USED         0
+#eU_USED         0
   #endif
 
-#elif defined ( __ICCARM__ )
+#elif defined ( __ICCAR)
   #if defined __ARMVFP__
     #if (__FPU_PRESENT == 1)
       #define __FPU_USED       1
     #else
-      #warning "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+    #r rates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
       #define __FPU_USED       0
     #endif
-  #else
-    #define __FPU_USED         0
+  #ee
+U_         0
   #endif
 
-#elif defined ( __TMS470__ )
-  #if defined __TI_VFP_SUPPORT__
+#elif defined ( __TMS470__ defined __TI_VFP_SUPPORT__
     #if (__FPU_PRESENT == 1)
       #define __FPU_USED       1
     #else
-      #warning "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+      #rnr raFPU instructions for a device without an FPU (check __FPU_PRESENT)"
       #define __FPU_USED       0
     #endif
   #else
-    #define __FPU_USED         0
+  U_     0
   #endif
 
 #elif defined ( __TASKING__ )
-  #if defined __FPU_VFP__
+  __FPU_VFP__
     #if (__FPU_PRESENT == 1)
       #define __FPU_USED       1
     #else
-      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+      #erro"CgeteU ructions for a device without an FPU (check __FPU_PRESENT)"
       #define __FPU_USED       0
     #endif
   #else
-    #define __FPU_USED         0
-  #endif
+    efU_     #endif
 
-#elif defined ( __CSMC__ )      /* Cosmic */
-  #if ( __CSMC__ & 0x400)       /* FPU present for parser */
+#elif defined ( __CSMC__ )      /* ic  #if ( __CSMC__ & 0x400)       /* FPU present for parser */
     #if (__FPU_PRESENT == 1)
       #define __FPU_USED       1
     #else
-      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+      #error "Compines struns for a device without an FPU (check __FPU_PRESENT)"
       #define __FPU_USED       0
     #endif
   #else
-    #define __FPU_USED         0
-  #endif
+    #dine US  
+  #f
 #endif
 
-#include <stdint.h>                      /* standard types definitions                      */
+#include <stdint.h>              types definitions                      */
 #include <core_cmInstr.h>                /* Core Instruction Access                         */
 #include <core_cmFunc.h>                 /* Core Function Access                            */
 #include <core_cmSimd.h>                 /* Compiler specific SIMD Intrinsics               */
@@ -193,57 +178,52 @@
 }
 #endif
 
-#endif /* __CORE_CM7_H_GENERIC */
+#endif /* /
 
-#ifndef __CMSIS_GENERIC
+#ifndef SIS_GENERIC
 
-#ifndef __CORE_CM7_H_DEPENDANT
+#ifndef _CM7_H_DEPENDANT
 #define __CORE_CM7_H_DEPENDANT
 
 #ifdef __cplusplus
- extern "C" {
-#endif
-
-/* check device defines and use defaults */
+ exrn "C"di* ecdeviefines and use defaults */
 #if defined __CHECK_DEVICE_DEFINES
-  #ifndef __CM7_REV
+  #ifndef V
     #define __CM7_REV               0x0000
-    #warning "__CM7_REV not defined in device header file; using default!"
+    #warning "__C_REV ninn  heafile; using default!"
   #endif
 
-  #ifndef __FPU_PRESENT
+  #ifndef ENT
     #define __FPU_PRESENT             0
-    #warning "__FPU_PRESENT not defined in device header file; using default!"
+    #warning "__FPU_PRENT none dicheadile; using default!"
   #endif
 
-  #ifndef __MPU_PRESENT
+  #ifndef T
     #define __MPU_PRESENT             0
-    #warning "__MPU_PRESENT not defined in device header file; using default!"
+    #warning "__MPU_PREST not d ice adere; using default!"
   #endif
 
-  #ifndef __ICACHE_PRESENT
+  #ifndef NT
     #define __ICACHE_PRESENT          0
-    #warning "__ICACHE_PRESENT not defined in device header file; using default!"
+    #warning "__ICACHE_PRENT notedceeadele; using default!"
   #endif
 
-  #ifndef __DCACHE_PRESENT
+  #ifndef 
     #define __DCACHE_PRESENT          0
-    #warning "__DCACHE_PRESENT not defined in device header file; using default!"
+    #warning "__DCACHE_PRESE not d i hder ; using default!"
   #endif
 
-  #ifndef __DTCM_PRESENT
-    #define __DTCM_PRESENT            0
-    #warning "__DTCM_PRESENT        not defined in device header file; using default!"
+  #ifndef  #define __DTCM_PRESENT            0
+    #warning "__DTCM_PRESENT      noneicheadile; using default!"
   #endif
 
-  #ifndef __NVIC_PRIO_BITS
-    #define __NVIC_PRIO_BITS          3
-    #warning "__NVIC_PRIO_BITS not defined in device header file; using default!"
+  #ifndef  #define __NVIC_PRIO_BITS          3
+    #warning "__NVIC_PRIO_BITS n defindedefileing default!"
   #endif
 
-  #ifndef __Vendor_SysTickConfig
+  #ifndef 
     #define __Vendor_SysTickConfig    0
-    #warning "__Vendor_SysTickConfig not defined in device header file; using default!"
+    #warning "__Vendor_SysTickConf not d i hder ; using default!"
   #endif
 #endif
 
@@ -2352,16 +2332,17 @@ __STATIC_INLINE uint32_t ITM_SendChar (uint32_t ch)
 
     The function inputs a character via the external variable \ref ITM_RxBuffer.
 
-    \return             Received character.
+    \return               Received character.
     \return         -1  No character pending.
  */
-__STATIC_INLINE int32_t ITM_ReceiveChar (void) {
-  int32_t ch = -1;                           /* no character available */
+__STATIC_INLINE intnt32_t ITM_ReceiveChar (void) {
+  int32_t ch = -1;                           /* no charactcter available */
 
   if (ITM_RxBuffer != ITM_RXBUFFER_EMPTY) {
-    ch = ITM_RxBuffer;
+    ch = ITM_RxBufferer;
     ITM_RxBuffer = ITM_RXBUFFER_EMPTY;       /* ready for next character */
   }
+}
 
   return (ch);
 }
@@ -2369,21 +2350,22 @@ __STATIC_INLINE int32_t ITM_ReceiveChar (void) {
 
 /** \brief  ITM Check Character
 
-    The function checks whether a character is pending for reading in the variable \ref ITM_RxBuffer.
+    The function checks whehether a character is pending for reading in the variable \ref ITM_RxBuffer.
 
-    \return          0  No character available.
-    \return          1  Character available.
+      \return          0  No character available.
+    \return          1  Chararacter available.
  */
 __STATIC_INLINE int32_t ITM_CheckChar (void) {
 
-  if (ITM_RxBuffer == ITM_RXBUFFER_EMPTY) {
-    return (0);                                 /* no character available */
+  i if (ITM_RxBuffer == ITM_RXBUFFER_EMPTY) {
+    return (0);                                   /* no character available */
   } else {
-    return (1);                                 /*    character available */
+    return (1);                                     /*    chararacter availablele */
   }
 }
 
-/*@} end of CMSIS_core_DebugFunctions */
+/
+/*@} end ofof CMSIS_c_core_DeDebugFgFununctions */
 
 
 
@@ -2392,6 +2374,8 @@ __STATIC_INLINE int32_t ITM_CheckChar (void) {
 }
 #endif
 
-#endif /* __CORE_CM7_H_DEPENDANT */
+#endif /* __/
 
-#endif /* __CMSIS_GENERIC */
+#endif /* __CMS_GENERIC */
+/
+/

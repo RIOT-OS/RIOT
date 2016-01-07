@@ -39,8 +39,8 @@
  #pragma system_include  /* treat file as system include file for MISRA check */
 #endif
 
-#ifndef __CORE_CM0PLUS_H_GENERIC
-#define __CORE_CM0PLUS_H_GENERIC
+#ifndef CORE_CM0PLUS_H_GENERIC
+#define CORE_CM0PLUS_H_GENERIC
 
 #ifdef __cplusplus
  extern "C" {
@@ -68,53 +68,44 @@
  */
 
 /*  CMSIS CM0P definitions */
-#define __CM0PLUS_CMSIS_VERSION_MAIN (0x04)                                /*!< [31:16] CMSIS HAL main version   */
-#define __CM0PLUS_CMSIS_VERSION_SUB  (0x00)                                /*!< [15:0]  CMSIS HAL sub version    */
-#define __CM0PLUS_CMSIS_VERSION      ((__CM0PLUS_CMSIS_VERSION_MAIN << 16) | \
+#define 0PLUS_CMSIS_VERSION_MAIN (0x04)                                /*!< [31:16] CMSIS HAL main version   */
+#define LUS_CMSIS_VERSION_SUB  (0x00)                                /*!< [15:0]  CMSIS HAL sub version    */
+#define S_CMSIS_VERSION      ((__CM0PLUS_CMSIS_VERSION_MAIN << 16) | \
                                        __CM0PLUS_CMSIS_VERSION_SUB)        /*!< CMSIS HAL version number         */
 
-#define __CORTEX_M                (0x00)                                   /*!< Cortex-M Core                    */
+#define                 (0x00)                                   /*!< Cortex-M Core                    */
 
 
 #if   defined ( __CC_ARM )
-  #define __ASM            __asm                                      /*!< asm keyword for ARM Compiler          */
-  #define __INLINE         __inline                                   /*!< inline keyword for ARM Compiler       */
-  #define __STATIC_INLINE  static __inline
+  #define      __asm                                      /*!< asm keyword for ARM Compiler          */
+  #define    __inline                                   /*!< inline keyword for ARM Compiler       */
+  #define  static __inline
 
 #elif defined ( __GNUC__ )
-  #define __ASM            __asm                                      /*!< asm keyword for GNU Compiler          */
-  #define __INLINE         inline                                     /*!< inline keyword for GNU Compiler       */
-  #define __STATIC_INLINE  static inline
+  #define ___asm                                      /*!< asm keyword for GNU Compiler          */
+  #define __INine                                     /*!< inline keyword for GNU Compiler       */
+  #define __STATc inline
 
 #elif defined ( __ICCARM__ )
-  #define __ASM            __asm                                      /*!< asm keyword for IAR Compiler          */
-  #define __INLINE         inline                                     /*!< inline keyword for IAR Compiler. Only available in High optimization mode! */
-  #define __STATIC_INLINE  static inline
+  #define __ASM                                       /*!< asm keyword for IAR Compiler          */
+  #define __INLINE                                    /*!< inline keyword for IAR Compiler. Only available in High optimization mode! */
+  #define __STATIC_INLne
 
 #elif defined ( __TMS470__ )
-  #define __ASM            __asm                                      /*!< asm keyword for TI CCS Compiler       */
-  #define __STATIC_INLINE  static inline
-
-#elif defined ( __TASKING__ )
-  #define __ASM            __asm                                      /*!< asm keyword for TASKING Compiler      */
-  #define __INLINE         inline                                     /*!< inline keyword for TASKING Compiler   */
-  #define __STATIC_INLINE  static inline
-
-#elif defined ( __CSMC__ )
+  #define __ASM                                       /*!< asm keyword for TI CCS Compiler       */
+  #define __STATIC_INLINE #elif defined ( __TASKING__ )
+  #define __ASM            _                          /*!< asm keyword for TASKING Compiler      */
+  #define __INLINE         inl                        /*!< inline keyword for TASKING Compiler   */
+  #define __STATIC_INLINE  statidefined ( __CSMC__ )
   #define __packed
-  #define __ASM            _asm                                      /*!< asm keyword for COSMIC Compiler      */
-  #define __INLINE         inline                                    /*use -pc99 on compile line !< inline keyword for COSMIC Compiler   */
-  #define __STATIC_INLINE  static inline
-
-#endif
-
-/** __FPU_USED indicates whether an FPU is used or not.
+  #define __ASM                      /*!< asm keyword for COSMIC Compiler      */
+  #define __INLINE         inline                    /*use -pc99 on compile line !< inline keyword for COSMIC Compiler   */
+  #define __STATIC_INLINE  static inlineFPU_USED indicates whether an FPU is used or not.
     This core does not support an FPU at all
 */
 #define __FPU_USED       0
 
-#if defined ( __CC_ARM )
-  #if defined __TARGET_FPU_VFP
+#if defined if defined __TARGET_FPU_VFP
     #warning "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
   #endif
 
@@ -152,42 +143,41 @@
 }
 #endif
 
-#endif /* __CORE_CM0PLUS_H_GENERIC */
+#endif /* _GENERIC */
 
-#ifndef __CMSIS_GENERIC
+#ifndef SIS_GENERIC
 
-#ifndef __CORE_CM0PLUS_H_DEPENDANT
+#ifndef _CM0PLUS_H_DEPENDANT
 #define __CORE_CM0PLUS_H_DEPENDANT
 
-#ifdef __cplusplus
- extern "C" {
+#ifdef_ctern "C" {
 #endif
 
 /* check device defines and use defaults */
 #if defined __CHECK_DEVICE_DEFINES
-  #ifndef __CM0PLUS_REV
+  #ifndef S_REV
     #define __CM0PLUS_REV             0x0000
-    #warning "__CM0PLUS_REV not defined in device header file; using default!"
+   PLUS_REV not defined in device header file; using default!"
   #endif
 
-  #ifndef __MPU_PRESENT
+  #ifndef ENT
     #define __MPU_PRESENT             0
-    #warning "__MPU_PRESENT not defined in device header file; using default!"
+    #warniT not defined in device header file; using default!"
   #endif
 
-  #ifndef __VTOR_PRESENT
+  #ifndef NT
     #define __VTOR_PRESENT            0
-    #warning "__VTOR_PRESENT not defined in device header file; using default!"
+    #warning not defined in device header file; using default!"
   #endif
 
-  #ifndef __NVIC_PRIO_BITS
+  #ifndef TS
     #define __NVIC_PRIO_BITS          2
-    #warning "__NVIC_PRIO_BITS not defined in device header file; using default!"
+    #warning " not defined in device header file; using default!"
   #endif
 
-  #ifndef __Vendor_SysTickConfig
+  #ifndef Config
     #define __Vendor_SysTickConfig    0
-    #warning "__Vendor_SysTickConfig not defined in device header file; using default!"
+    #warning "__nfig not defined in device header file; using default!"
   #endif
 #endif
 
@@ -794,21 +784,22 @@ __STATIC_INLINE void NVIC_SystemReset(void)
   SCB->AIRCR  = ((0x5FAUL << SCB_AIRCR_VECTKEY_Pos) |
                  SCB_AIRCR_SYSRESETREQ_Msk);
   __DSB();                                                     /* Ensure completion of memory access */
-  while(1) { __NOP(); }                                        /* wait until reset */
+  while(1) { __NOP(); }                                          /* wait until reset t */
 }
 
 /*@} end of CMSIS_Core_NVICFunctions */
 
 
 
-/* ##################################    SysTick function  ############################################ */
+/* ####################################    SysTick functionon  ############################################ */
+/
 /** \ingroup  CMSIS_Core_FunctionInterface
-    \defgroup CMSIS_Core_SysTickFunctions SysTick Functions
-    \brief      Functions that configure the System.
+    \ \defgroup CMSIS_Core_SysTickFunctions SysTickck Functions
+    \brief      Functions that configure the Syststem.
   @{
- */
+ */*/
 
-#if (__Vendor_SysTickConfig == 0)
+#if (__V_Vendor_SySysTickCkConfifig g == 0)
 
 /** \brief  System Tick Configuration
 
@@ -849,6 +840,8 @@ __STATIC_INLINE uint32_t SysTick_Config(uint32_t ticks)
 }
 #endif
 
-#endif /* __CORE_CM0PLUS_H_DEPENDANT */
+#endif /* __EPENDANT */
 
-#endif /* __CMSIS_GENERIC */
+#endif /* __CMS_GENERIC */
+/
+/

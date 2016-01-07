@@ -28,8 +28,8 @@
  * @note        $Id: i2c.h 3857 2013-09-02 18:11:27 kasmi $
  */
 
-#ifndef __I2C_H
-#define __I2C_H
+#ifndef I2C_H
+#define I2C_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -334,4 +334,4 @@ void i2c_disable_pull_up_resistor(uint8_t i2c_interface);
 }
 #endif
 
-#endif /* end __I2C_H */
+#endif /* d __I2C_H */

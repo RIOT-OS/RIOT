@@ -37,8 +37,8 @@
 //
 //*****************************************************************************
 
-#ifndef __SSI_H__
-#define __SSI_H__
+#ifndef SSI_H__
+#define SSI_H__
 
 //*****************************************************************************
 //
@@ -148,4 +148,4 @@ extern unsigned long SSIClockSourceGet(unsigned long ulBase);
 }
 #endif
 
-#endif // __SSI_H__
+#endif // SSI_H__
