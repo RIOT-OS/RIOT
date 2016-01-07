@@ -430,7 +430,8 @@ bool _parse_options(int msg_type, gnrc_rpl_instance_t *inst, gnrc_rpl_opt_t *opt
             case (GNRC_RPL_OPT_TARGET):
                 DEBUG("RPL: RPL TARGET DAO option parsed\n");
                 *included_opts |= ((uint32_t) 1) << GNRC_RPL_OPT_TARGET;
-                if_id = gnrc_ipv6_netif_find_by_prefix(NULL, &dodag->dodag_id);
+                ipv6_addr_t *prefix = NULL;
+                if_id = gnrc_ipv6_netif_find_by_prefix(&prefix, &dodag->dodag_id);
                 if (if_id == KERNEL_PID_UNDEF) {
                     DEBUG("RPL: no interface found for the configured DODAG id\n");
                     return false;

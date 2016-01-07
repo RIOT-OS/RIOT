@@ -88,6 +88,14 @@ static int fib_find_entry(fib_table_t *table, uint8_t *dst, size_t dst_size,
     int ret = -EHOSTUNREACH;
     bool is_all_zeros_addr = true;
 
+#if ENABLE_DEBUG
+    DEBUG("[fib_find_entry] dst =");
+    for (size_t i = 0; i < dst_size; i++) {
+        DEBUG(" %02x", dst[i]);
+    }
+    DEBUG("\n");
+#endif
+
     for (size_t i = 0; i < dst_size; ++i) {
         if (dst[i] != 0) {
             is_all_zeros_addr = false;
@@ -125,6 +133,7 @@ static int fib_find_entry(fib_table_t *table, uint8_t *dst, size_t dst_size,
             int ret_comp = universal_address_compare(table->data.entries[i].global, dst, &match_size);
             /* If we found an exact match */
             if (ret_comp == 0 || (is_all_zeros_addr && match_size == 0)) {
+                DEBUG("[fib_find_entry] found an exact match");
                 entry_arr[0] = &(table->data.entries[i]);
                 *entry_arr_size = 1;
                 /* we will not find a better one so we return */
@@ -147,6 +156,16 @@ static int fib_find_entry(fib_table_t *table, uint8_t *dst, size_t dst_size,
             }
         }
     }
+
+#if ENABLE_DEBUG
+    if (count > 0) {
+        DEBUG("[fib_find_entry] found prefix on interface %d:", entry_arr[0]->iface_id);
+        for (size_t i = 0; i < entry_arr[0]->global->address_size; i++) {
+            DEBUG(" %02x", entry_arr[0]->global->address[i]);
+        }
+        DEBUG("\n");
+    }
+#endif
 
     *entry_arr_size = count;
     return ret;
