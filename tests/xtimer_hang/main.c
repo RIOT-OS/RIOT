@@ -28,7 +28,7 @@
 
 #define TEST_SECONDS        (10U)
 #define TEST_TIME           (TEST_SECONDS * SEC_IN_USEC)
-#define STACKSIZE_TIMER     (1024)
+#define STACKSIZE_TIMER     (THREAD_STACKSIZE_DEFAULT)
 
 char stack_timer1[STACKSIZE_TIMER];
 char stack_timer2[STACKSIZE_TIMER];
