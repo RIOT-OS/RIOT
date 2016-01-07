@@ -6,8 +6,8 @@
  * directory for more details.
  */
 
-#ifndef __CPU_H
-#define __CPU_H
+#ifndef CPU_H
+#define CPU_H
 
 /**
  * @defgroup    lpc2387     NXP LPC2387
@@ -58,4 +58,4 @@ static inline void cpu_print_last_instruction(void)
 #endif
 
 /** @} */
-#endif /* __CPU_H */
+#endif /* CPU_H */

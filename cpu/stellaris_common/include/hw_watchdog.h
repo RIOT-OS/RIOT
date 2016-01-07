@@ -37,8 +37,8 @@
 //
 //*****************************************************************************
 
-#ifndef __HW_WATCHDOG_H__
-#define __HW_WATCHDOG_H__
+#ifndef HW_WATCHDOG_H
+#define HW_WATCHDOG_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -196,4 +196,4 @@ extern "C" {
 }
 #endif
 
-#endif // __HW_WATCHDOG_H__
+#endif // HW_WATCHDOG_H

@@ -32,8 +32,8 @@
  *
  * $Id: Outputter.h,v 1.2 2003/09/06 13:28:27 arms22 Exp $
  */
-#ifndef __OUTPUTTER_H__
-#define __OUTPUTTER_H__
+#ifndef OUTPUTTER_H
+#define OUTPUTTER_H
 
 #include <embUnit/embUnit.h>
 
@@ -79,4 +79,4 @@ struct __Outputter {
 }
 #endif
 
-#endif/*__OUTPUTTER_H__*/
+#endif/*OUTPUTTER_H*/

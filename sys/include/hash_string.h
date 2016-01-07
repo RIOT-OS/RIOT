@@ -6,8 +6,8 @@
  * directory for more details.
  */
 
-#ifndef __HASH_STRING_H
-#define __HASH_STRING_H
+#ifndef HASH_STRING_H
+#define HASH_STRING_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -20,4 +20,4 @@ int cmp_string(char *a, char *b);
 }
 #endif
 
-#endif /* __HASH_STRING_H */
+#endif /* HASH_STRING_H */

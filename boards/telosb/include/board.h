@@ -25,16 +25,16 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef TELOSB_BOARD_H_
-#define TELOSB_BOARD_H_
+#ifndef TELOSB_BOARD_H
+#define TELOSB_BOARD_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /*  for correct inclusion of <msp430.h> */
-#ifndef __MSP430F1611__
-#define __MSP430F1611__
+#ifndef MSP430F1611
+#define MSP430F1611
 #endif
 
 /**
@@ -90,4 +90,4 @@ extern "C" {
 #include <stdint.h>
 
 /** @} */
-#endif /*  TELOSB_BOARD_H_ */
+#endif /*  TELOSB_BOARD_H */

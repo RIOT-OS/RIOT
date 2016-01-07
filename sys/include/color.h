@@ -18,8 +18,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef __COLOR_H
-#define __COLOR_H
+#ifndef COLOR_H
+#define COLOR_H
 
 #include <stdint.h>
 
@@ -66,5 +66,5 @@ void color_hsv2rgb(color_hsv_t *hsv, color_rgb_t *rgb);
 }
 #endif
 
-#endif /* __COLOR_H */
+#endif /* COLOR_H */
 /** @} */

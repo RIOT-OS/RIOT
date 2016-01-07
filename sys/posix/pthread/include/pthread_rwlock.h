@@ -14,8 +14,8 @@
  * @note    Do not include this header file directly, but pthread.h.
  */
 
-#ifndef __SYS__POSIX__PTHREAD_RWLOCK__H
-#define __SYS__POSIX__PTHREAD_RWLOCK__H
+#ifndef SYS__POSIX__PTHREAD_RWLOCK__H
+#define SYS__POSIX__PTHREAD_RWLOCK__H
 
 #include "priority_queue.h"
 #include "tcb.h"

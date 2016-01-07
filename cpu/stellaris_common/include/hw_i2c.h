@@ -37,8 +37,8 @@
 //
 //*****************************************************************************
 
-#ifndef __HW_I2C_H__
-#define __HW_I2C_H__
+#ifndef HW_I2C_H
+#define HW_I2C_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -494,4 +494,4 @@ extern "C" {
 }
 #endif
 
-#endif // __HW_I2C_H__
+#endif // HW_I2C_H

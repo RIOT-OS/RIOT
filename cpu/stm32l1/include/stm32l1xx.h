@@ -51,8 +51,8 @@
   * @{
   */
 
-#ifndef __STM32L1XX_H
-#define __STM32L1XX_H
+#ifndef STM32L1XX_H
+#define STM32L1XX_H
 
 #ifdef __cplusplus
  extern "C" {
@@ -145,14 +145,14 @@
 /**
  * @brief STM32L1xx Standard Peripheral Library version number V1.3.2
    */
-#define __STM32L1XX_STDPERIPH_VERSION_MAIN   (0x01) /*!< [31:24] main version */
-#define __STM32L1XX_STDPERIPH_VERSION_SUB1   (0x03) /*!< [23:16] sub1 version */
-#define __STM32L1XX_STDPERIPH_VERSION_SUB2   (0x02) /*!< [15:8]  sub2 version */
-#define __STM32L1XX_STDPERIPH_VERSION_RC     (0x00) /*!< [7:0]  release candidate */
-#define __STM32L1XX_STDPERIPH_VERSION       ( (__STM32L1XX_STDPERIPH_VERSION_MAIN << 24)\
-                                             |(__STM32L1XX_STDPERIPH_VERSION_SUB1 << 16)\
-                                             |(__STM32L1XX_STDPERIPH_VERSION_SUB2 << 8)\
-                                             |(__STM32L1XX_STDPERIPH_VERSION_RC))
+#define STM32L1XX_STDPERIPH_VERSION_MAIN   (0x01) /*!< [31:24] main version */
+#define STM32L1XX_STDPERIPH_VERSION_SUB1   (0x03) /*!< [23:16] sub1 version */
+#define STM32L1XX_STDPERIPH_VERSION_SUB2   (0x02) /*!< [15:8]  sub2 version */
+#define STM32L1XX_STDPERIPH_VERSION_RC     (0x00) /*!< [7:0]  release candidate */
+#define STM32L1XX_STDPERIPH_VERSION       ( (STM32L1XX_STDPERIPH_VERSION_MAIN << 24)\
+                                             |(STM32L1XX_STDPERIPH_VERSION_SUB1 << 16)\
+                                             |(STM32L1XX_STDPERIPH_VERSION_SUB2 << 8)\
+                                             |(STM32L1XX_STDPERIPH_VERSION_RC))
 
 /**
   * @}
@@ -166,10 +166,10 @@
  * @brief STM32L1xx Interrupt Number Definition, according to the selected device
  *        in @ref Library_configuration_section
  */
-#define __CM3_REV                 0x200 /*!< Cortex-M3 Revision r2p0                      */
-#define __MPU_PRESENT             1     /*!< STM32L1 provides MPU                         */
-#define __NVIC_PRIO_BITS          4     /*!< STM32L1 uses 4 Bits for the Priority Levels  */
-#define __Vendor_SysTickConfig    0     /*!< Set to 1 if different SysTick Config is used */
+#define CM3_REV                 0x200 /*!< Cortex-M3 Revision r2p0                      */
+#define MPU_PRESENT             1     /*!< STM32L1 provides MPU                         */
+#define NVIC_PRIO_BITS          4     /*!< STM32L1 uses 4 Bits for the Priority Levels  */
+#define Vendor_SysTickConfig    0     /*!< Set to 1 if different SysTick Config is used */
 
 /*!< Interrupt Number Definition */
 typedef enum IRQn
@@ -301,7 +301,7 @@ typedef enum {ERROR = 0, SUCCESS = !ERROR} ErrorStatus;
 /**
   * @brief  __RAM_FUNC definition
   */
-#if defined ( __CC_ARM   )
+#if defined ( CC_ARM   )
 /* ARM Compiler
    ------------
    RAM functions are defined using the toolchain options.
@@ -311,30 +311,30 @@ typedef enum {ERROR = 0, SUCCESS = !ERROR} ErrorStatus;
    Available memory areas are declared in the 'Target' tab of the 'Options for Target'
    dialog.
 */
- #define __RAM_FUNC FLASH_Status
+ #define RAM_FUNC FLASH_Status
 
-#elif defined ( __ICCARM__ )
+#elif defined ( ICCARM )
 /* ICCARM Compiler
    ---------------
-   RAM functions are defined using a specific toolchain keyword "__ramfunc".
+   RAM functions are defined using a specific toolchain keyword "ramfunc".
 */
- #define __RAM_FUNC __ramfunc FLASH_Status
+ #define RAM_FUNC ramfunc FLASH_Status
 
-#elif defined   (  __GNUC__  )
+#elif defined   (  GNUC  )
 /* GNU Compiler
    ------------
    RAM functions are defined using a specific toolchain attribute
    "__attribute__((section(".RamFunc")))".
 */
- #define __RAM_FUNC FLASH_Status __attribute__((section(".RamFunc")))
+ #define RAM_FUNC FLASH_Status attribute((section(".RamFunc")))
 
-#elif defined   (  __TASKING__  )
+#elif defined   (  TASKING  )
 /* TASKING Compiler
    ----------------
    RAM functions are defined using a specific toolchain pragma. This pragma is
    defined in the stm32l1xx_flash_ramfunc.c
 */
- #define __RAM_FUNC  FLASH_Status
+ #define RAM_FUNC  FLASH_Status
 
 #endif
 

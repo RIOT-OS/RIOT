@@ -32,8 +32,8 @@
  *
  * $Id: XMLOutputter.h,v 1.3 2003/09/06 13:28:27 arms22 Exp $
  */
-#ifndef __XMLOUTPUTTER_H__
-#define __XMLOUTPUTTER_H__
+#ifndef XMLOUTPUTTER_H
+#define XMLOUTPUTTER_H
 
 #include "Outputter.h"
 
@@ -48,4 +48,4 @@ OutputterRef XMLOutputter_outputter(void);
 }
 #endif
 
-#endif/*__XMLOUTPUTTER_H__*/
+#endif/*XMLOUTPUTTER_H*/

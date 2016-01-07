@@ -37,8 +37,8 @@
 //
 //*****************************************************************************
 
-#ifndef __CORTEX_M4_DEF_H__
-#define __CORTEX_M4_DEF_H__
+#ifndef CORTEX_M4_DEF_H
+#define CORTEX_M4_DEF_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -10031,4 +10031,4 @@ extern "C" {
 }
 #endif
 
-#endif // __LM4F120H5QR_H__
+#endif // LM4F120H5QR_H

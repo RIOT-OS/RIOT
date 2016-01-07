@@ -41,8 +41,8 @@
  *
  */
 
-#ifndef _SAMR21G18A_
-#define _SAMR21G18A_
+#ifndef SAMR21G18A
+#define SAMR21G18A
 
 /**
  * \ingroup cpu_specific_SAMR21_definitions
@@ -55,7 +55,7 @@
 */
 /*@{*/
 
-#if !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
+#if !(defined(ASSEMBLY) || defined(IAR_SYSTEMS_ASM))
 #include <stdint.h>
 
 #ifdef __cplusplus
@@ -228,11 +228,11 @@ void I2S_Handler                 ( void );
  */
 
 #define LITTLE_ENDIAN          1
-#define __CM0PLUS_REV          1         /*!< Core revision r0p1 */
-#define __MPU_PRESENT          0         /*!< MPU present or not */
-#define __NVIC_PRIO_BITS       2         /*!< Number of bits used for Priority Levels */
-#define __VTOR_PRESENT         1         /*!< VTOR present or not */
-#define __Vendor_SysTickConfig 0         /*!< Set to 1 if different SysTick Config is used */
+#define CM0PLUS_REV          1         /*!< Core revision r0p1 */
+#define MPU_PRESENT          0         /*!< MPU present or not */
+#define NVIC_PRIO_BITS       2         /*!< Number of bits used for Priority Levels */
+#define VTOR_PRESENT         1         /*!< VTOR present or not */
+#define Vendor_SysTickConfig 0         /*!< Set to 1 if different SysTick Config is used */
 
 /**
  * \brief CMSIS includes
@@ -513,7 +513,7 @@ void I2S_Handler                 ( void );
 #define WDT_INST_NUM      1                         /**< \brief (WDT) Number of instances */
 #define WDT_INSTS         { WDT }                   /**< \brief (WDT) Instances List */
 
-#endif /* (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
+#endif /* (defined(ASSEMBLY) || defined(IAR_SYSTEMS_ASM)) */
 /*@}*/
 
 /* ************************************************************************** */

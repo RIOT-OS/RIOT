@@ -13,8 +13,8 @@
  *
  * @author Janos Kutscherauer <noshky@gmail.com>
  */
-#ifndef __COLORTEXTCOLORS_H__
-#define __COLORTEXTCOLORS_H__
+#ifndef COLORTEXTCOLORS_H
+#define COLORTEXTCOLORS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -53,5 +53,5 @@ extern "C" {
 }
 #endif
 
-#endif/*__COLORTEXTCOLORS_H__*/
+#endif/*COLORTEXTCOLORS_H*/
 /** @} */

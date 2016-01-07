@@ -16,8 +16,8 @@
  * @author          Hauke Petersen <hauke.peterse@fu-berlin.de>
  */
 
-#ifndef __CPU_CONF_H
-#define __CPU_CONF_H
+#ifndef CPU_CONF_H
+#define CPU_CONF_H
 
 #include "nrf51.h"
 #include "nrf51_bitfields.h"
@@ -43,5 +43,5 @@ extern "C" {
 }
 #endif
 
-#endif /* __CPU_CONF_H */
+#endif /*_CPU_CONF_H */
 /** @} */

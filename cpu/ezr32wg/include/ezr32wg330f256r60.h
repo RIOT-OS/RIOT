@@ -31,8 +31,8 @@
  *
  *****************************************************************************/
 
-#ifndef __SILICON_LABS_EZR32WG330F256R60_H__
-#define __SILICON_LABS_EZR32WG330F256R60_H__
+#ifndef SILICON_LABS_EZR32WG330F256R60_H
+#define SILICON_LABS_EZR32WG330F256R60_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -108,10 +108,10 @@ typedef enum IRQn
  * @{
  * @brief Processor and Core Peripheral Section
  *****************************************************************************/
-#define __MPU_PRESENT             1 /**< Presence of MPU  */
-#define __FPU_PRESENT             1 /**< Presence of FPU  */
-#define __NVIC_PRIO_BITS          3 /**< NVIC interrupt priority bits */
-#define __Vendor_SysTickConfig    0 /**< Is 1 if different SysTick counter is used */
+#define MPU_PRESENT             1 /**< Presence of MPU  */
+#define FPU_PRESENT             1 /**< Presence of FPU  */
+#define NVIC_PRIO_BITS          3 /**< NVIC interrupt priority bits */
+#define Vendor_SysTickConfig    0 /**< Is 1 if different SysTick counter is used */
 
 /** @} End of group EZR32WG330F256R60_Core */
 
@@ -121,12 +121,12 @@ typedef enum IRQn
 ******************************************************************************/
 
 /** Part family */
-#define _EFM32_WONDER_FAMILY            1 /**< Wonder Gecko EFM32WG MCU Family */
-#define _EFM_DEVICE                       /**< Silicon Labs EFM-type microcontroller */
-#define _EZR32_WONDER_FAMILY            1 /**< Wonder Gecko EZR32WG MCU Family */
-#define _EZR_DEVICE                       /**< Silicon Labs EZR-type microcontroller */
-#define _SILICON_LABS_32B_PLATFORM_1      /**< Silicon Labs platform name */
-#define _SILICON_LABS_32B_PLATFORM      1 /**< Silicon Labs platform name */
+#define EFM32_WONDER_FAMILY            1 /**< Wonder Gecko EFM32WG MCU Family */
+#define EFM_DEVICE                       /**< Silicon Labs EFM-type microcontroller */
+#define EZR32_WONDER_FAMILY            1 /**< Wonder Gecko EZR32WG MCU Family */
+#define EZR_DEVICE                       /**< Silicon Labs EZR-type microcontroller */
+#define SILICON_LABS_32B_PLATFORM_1      /**< Silicon Labs platform name */
+#define SILICON_LABS_32B_PLATFORM      1 /**< Silicon Labs platform name */
 
 /* If part number is not defined as compiler option, define it */
 #if !defined(EZR32WG330F256R60)
@@ -492,4 +492,4 @@ typedef enum IRQn
 #ifdef __cplusplus
 }
 #endif
-#endif /* __SILICON_LABS_EZR32WG330F256R60_H__ */
+#endif /*_SILICON_LABS_EZR32WG330F256R60_H */

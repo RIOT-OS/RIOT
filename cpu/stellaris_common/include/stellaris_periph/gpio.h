@@ -37,8 +37,8 @@
 //
 //*****************************************************************************
 
-#ifndef __GPIO_H__
-#define __GPIO_H__
+#ifndef GPIO_H
+#define GPIO_H
 
 //*****************************************************************************
 //
@@ -196,4 +196,4 @@ extern void GPIOADCTriggerDisable(unsigned long ulPort, unsigned char ucPins);
 }
 #endif
 
-#endif //  __GPIO_H__
+#endif //  GPIO_H

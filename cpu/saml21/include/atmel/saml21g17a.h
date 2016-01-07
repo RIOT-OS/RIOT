@@ -44,8 +44,8 @@
  * Support and FAQ: visit <a href="http://www.atmel.com/design-support/">Atmel Support</a>
  */
 
-#ifndef _SAML21G17A_
-#define _SAML21G17A_
+#ifndef SAML21G17A
+#define SAML21G17A
 
 /**
  * \ingroup SAML21_definitions
@@ -62,7 +62,7 @@
  extern "C" {
 #endif
 
-#if !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
+#if !(defined(ASSEMBLY) || defined(IAR_SYSTEMS_ASM))
 #include <stdint.h>
 #ifndef __cplusplus
 typedef volatile const uint32_t RoReg;   /**< Read only 32-bit register (volatile const unsigned int) */
@@ -236,11 +236,11 @@ void PICOP_Handler               ( void );
  */
 
 #define LITTLE_ENDIAN          1
-#define __CM0PLUS_REV          1         /*!< Core revision r0p1 */
-#define __MPU_PRESENT          0         /*!< MPU present or not */
-#define __NVIC_PRIO_BITS       2         /*!< Number of bits used for Priority Levels */
-#define __VTOR_PRESENT         1         /*!< VTOR present or not */
-#define __Vendor_SysTickConfig 0         /*!< Set to 1 if different SysTick Config is used */
+#define CM0PLUS_REV          1         /*!< Core revision r0p1 */
+#define MPU_PRESENT          0         /*!< MPU present or not */
+#define NVIC_PRIO_BITS       2         /*!< Number of bits used for Priority Levels */
+#define VTOR_PRESENT         1         /*!< VTOR present or not */
+#define Vendor_SysTickConfig 0         /*!< Set to 1 if different SysTick Config is used */
 
 /**
  * \brief CMSIS includes
@@ -400,7 +400,7 @@ void PICOP_Handler               ( void );
 /** \defgroup SAML21G17A_base Peripheral Base Address Definitions */
 /*@{*/
 
-#if defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)
+#if defined(ASSEMBLY) || defined(IAR_SYSTEMS_ASM)
 #define AC                            (0x43001000UL) /**< \brief (AC) APB Base Address */
 #define ADC                           (0x43000C00UL) /**< \brief (ADC) APB Base Address */
 #define AES                           (0x42003400UL) /**< \brief (AES) APB Base Address */
@@ -589,7 +589,7 @@ void PICOP_Handler               ( void );
 #define WDT_INST_NUM      1                          /**< \brief (WDT) Number of instances */
 #define WDT_INSTS         { WDT }                    /**< \brief (WDT) Instances List */
 
-#endif /* (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
+#endif /* (defined(ASSEMBLY) || defined(IAR_SYSTEMS_ASM)) */
 /*@}*/
 
 /* ************************************************************************** */

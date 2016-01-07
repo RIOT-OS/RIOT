@@ -29,8 +29,8 @@
   POSSIBILITY OF SUCH DAMAGE. */
 
 
-#ifndef __ERRNO_H_
-#define __ERRNO_H_ 1
+#ifndef ERRNO_H
+#define ERRNO_H 1
 
 /**
  *  @addtogroup cpu_atmega_common

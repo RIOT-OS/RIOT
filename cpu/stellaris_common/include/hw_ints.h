@@ -37,8 +37,8 @@
 //
 //*****************************************************************************
 
-#ifndef __HW_INTS_H__
-#define __HW_INTS_H__
+#ifndef HW_INTS_H
+#define HW_INTS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -222,4 +222,4 @@ extern "C" {
 }
 #endif
 
-#endif // __HW_INTS_H__
+#endif // HW_INTS_H

@@ -32,8 +32,8 @@
  *
  * $Id: TestResult.h,v 1.7 2004/02/10 16:19:29 arms22 Exp $
  */
-#ifndef __TESTRESULT_H__
-#define __TESTRESULT_H__
+#ifndef TESTRESULT_H
+#define TESTRESULT_H
 
 #ifdef  __cplusplus
 extern "C" {
@@ -67,4 +67,4 @@ void TestResult_addFailure(TestResult* self,Test* test,const char* msg,int line,
 }
 #endif
 
-#endif/*__TESTRESULT_H__*/
+#endif/*TESTRESULT_H*/

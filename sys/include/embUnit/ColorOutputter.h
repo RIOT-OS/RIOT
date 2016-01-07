@@ -13,8 +13,8 @@
  *
  * @author Janos Kutscherauer <noshky@gmail.com>
  */
-#ifndef __COLOROUTPUTTER_H__
-#define __COLOROUTPUTTER_H__
+#ifndef COLOROUTPUTTER_H
+#define COLOROUTPUTTER_H
 
 #include "Outputter.h"
 
@@ -41,5 +41,5 @@ void ColorOutputter_printStatistics(OutputterRef self, TestResultRef result);
 }
 #endif
 
-#endif/*__COLOROUTPUTTER_H__*/
+#endif/*COLOROUTPUTTER_H*/
 /** @} */

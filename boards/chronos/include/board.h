@@ -28,8 +28,8 @@ extern "C" {
 #endif
 
 // for correct inclusion of <msp430.h>
-#ifndef __CC430F6137__
-#define __CC430F6137__
+#ifndef CC430F6137
+#define CC430F6137
 #endif
 
 /**

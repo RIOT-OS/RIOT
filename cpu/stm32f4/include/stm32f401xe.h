@@ -49,8 +49,8 @@
   * @{
   */
 
-#ifndef __STM32F401xE_H
-#define __STM32F401xE_H
+#ifndef STM32F401xE_H
+#define STM32F401xE_H
 
 #ifdef __cplusplus
  extern "C" {
@@ -64,11 +64,11 @@
 /**
   * @brief Configuration of the Cortex-M4 Processor and Core Peripherals
   */
-#define __CM4_REV                 0x0001  /*!< Core revision r0p1                            */
-#define __MPU_PRESENT             1       /*!< STM32F4XX provides an MPU                     */
-#define __NVIC_PRIO_BITS          4       /*!< STM32F4XX uses 4 Bits for the Priority Levels */
-#define __Vendor_SysTickConfig    0       /*!< Set to 1 if different SysTick Config is used  */
-#define __FPU_PRESENT             1       /*!< FPU present                                   */
+#define CM4_REV                 0x0001  /*!< Core revision r0p1                            */
+#define MPU_PRESENT             1       /*!< STM32F4XX provides an MPU                     */
+#define NVIC_PRIO_BITS          4       /*!< STM32F4XX uses 4 Bits for the Priority Levels */
+#define Vendor_SysTickConfig    0       /*!< Set to 1 if different SysTick Config is used  */
+#define FPU_PRESENT             1       /*!< FPU present                                   */
 
 /**
   * @}
@@ -4764,7 +4764,7 @@ USB_OTG_HostChannelTypeDef;
 }
 #endif /* __cplusplus */
 
-#endif /* __STM32F401xE_H */
+#endif /* STM32F401xE_H */
 
 
 
