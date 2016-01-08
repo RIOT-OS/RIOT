@@ -70,5 +70,5 @@ then
         #   resolved:
         #   - make -C ./tests/unittests all test BOARD=qemu-i386 || exit
     fi
-    ./dist/tools/compile_test/compile_test.py master
+    ./dist/tools/compile_test/compile_test.py $TRAVIS_BRANCH
 fi
