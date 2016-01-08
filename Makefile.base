@@ -83,9 +83,8 @@ snippets: $(SNIPPETS)
 		snipfile=$(SNIPDIR)/$$(basename $$snip);\
 		module_define=$$(echo MODULE_$(MODULE) | tr [:lower:]- [:upper:]_);\
 		{\
-			echo "#line 1 \"$$snip\"";\
 			[ "$(MODULE)" != "$(APPLICATION)" ] && echo "#ifdef $$module_define";\
-			cat $$snip; \
+			echo "#include \"$$snip\""; \
 			[ "$(MODULE)" != "$(APPLICATION)" ] && echo "#endif" || true;\
 		} >> $$snipfile;\
 		done \
