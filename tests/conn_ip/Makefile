@@ -21,5 +21,11 @@ QUIET ?= 1
 
 include $(RIOTBASE)/Makefile.include
 
+.PHONY: test
+
+test: PORTS ?= tap0 tap1
+test: TERMFLAGS :=
 test:
-	./tests/01-run.py
+	$(CURDIR)/tests/01-nonxt.py $(PORTS); sleep 2; \
+	$(CURDIR)/tests/02-udp.py $(PORTS); sleep 2; \
+	$(CURDIR)/tests/03-icmpv6.py $(PORTS)
