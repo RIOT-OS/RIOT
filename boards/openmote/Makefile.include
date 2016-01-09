@@ -4,7 +4,7 @@ export CPU_MODEL = cc2538sf53
 
 # define the default port depending on the host OS
 PORT_LINUX ?= /dev/ttyUSB0
-PORT_DARWIN ?= $(shell ls -1 /dev/tty.usbserial-* | head -n 1)
+PORT_DARWIN ?= $(shell ls -1 /dev/tty.usbserial-* 2> /dev/null | head -n 1)
 
 #
 export FLASHER = $(RIOTBOARD)/$(BOARD)/dist/flash.sh

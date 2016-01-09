@@ -12,7 +12,7 @@ export DEBUGGER_FLAGS =
 
 # define the default port depending on the host OS
 PORT_LINUX ?= /dev/ttyACM0
-PORT_DARWIN ?= $(shell ls -1 /dev/tty.SLAB_USBtoUART* | head -n 1)
+PORT_DARWIN ?= $(shell ls -1 /dev/tty.SLAB_USBtoUART* 2> /dev/null | head -n 1)
 
 # setup serial terminal
 include $(RIOTBOARD)/Makefile.include.serial
