@@ -23,19 +23,19 @@ ${DIRS:%=CLEAN--%}:
 	"$(MAKE)" -C ${@:CLEAN--%=%} clean
 
 ifeq ($(strip $(SRC)),)
-    SRC := $(wildcard *.c)
+    SRC := $(filter-out $(wildcard *.snip*),$(wildcard *.c))
 endif
 ifeq ($(strip $(SRCXX)),)
-    SRCXX := $(wildcard *.cpp)
+    SRCXX := $(filter-out $(wildcard *.snip*),$(wildcard *.cpp))
 endif
 ifeq ($(strip $(ASMSRC)),)
-    ASMSRC := $(wildcard *.s)
+    ASMSRC := $(filter-out $(wildcard *.snip*),$(wildcard *.s))
 endif
 ifeq ($(strip $(ASSMSRC)),)
-    ASSMSRC := $(wildcard *.S)
+    ASSMSRC := $(filter-out $(wildcard *.snip*),$(wildcard *.S))
 endif
 ifeq ($(strip $(SNIPPETS)),)
-    SNIPPETS := $(wildcard *.snip)
+    SNIPPETS := $(wildcard *.snip*)
 endif
 
 OBJC    := $(SRC:%.c=$(BINDIR)$(MODULE)/%.o)

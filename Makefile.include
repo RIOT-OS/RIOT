@@ -214,7 +214,7 @@ prepare-snippets:
 	@rm -f $(SNIPDIR)/*
 	@mkdir -p $(SNIPDIR)
 # if there's nothing in $(SNIPDIR), both Makefile.snippets and the module archiving step fail
-	@echo "void __dummy(void){}" > $(SNIPDIR)/00_dummy.c.snip
+	@echo "void __dummy(void){}" > $(SNIPDIR)/dummy.snip00.c
 
 all: prepare-snippets
 
