@@ -1,0 +1,1553 @@
+From de750156c6f7f9d69f6974203b27aa22d5695bbb Mon Sep 17 00:00:00 2001
+From: Martine Lenders <mail@martine-lenders.eu>
+Date: Thu, 4 Feb 2016 22:15:23 +0100
+Subject: [PATCH 2/4] Rename colliding files and functions
+
+---
+ emb6/emb6.c                                    |   2 +-
+ emb6/inc/apl/rest-engine/rest-engine.h         |   2 +-
+ emb6/inc/net/ipv6/uip-ds6-route.h              |   2 +-
+ emb6/inc/net/rpl/rpl-private.h                 |   2 +-
+ emb6/inc/net/rpl/rpl.h                         |   2 +-
+ emb6/src/apl/er-coap/er-coap-observe.c         |   2 +-
+ emb6/src/apl/er-coap/er-coap-transactions.c    |   4 +-
+ emb6/src/apl/er-coap/er-coap.c                 |   2 +-
+ emb6/src/apl/rest-engine/rest-engine.c         |   4 +-
+ emb6/src/mac/framer-802154.c                   |   2 +-
+ emb6/src/mac/sicslowmac.c                      |   2 +-
+ emb6/src/net/ipv6/multicast/roll-tm.c          |   2 +-
+ emb6/src/net/ipv6/multicast/smrf.c             |   2 +-
+ emb6/src/net/ipv6/multicast/uip-mcast6-route.c |   4 +-
+ emb6/src/net/ipv6/nbr-table.c                  |   4 +-
+ emb6/src/net/ipv6/uip-ds6-nbr.c                |   2 +-
+ emb6/src/net/ipv6/uip-ds6-route.c              |   6 +-
+ emb6/src/net/ipv6/uip-ds6.c                    |   6 +-
+ emb6/src/net/ipv6/uip-icmp6.c                  |   4 +-
+ emb6/src/net/ipv6/uip-nameserver.c             |   4 +-
+ emb6/src/net/ipv6/uip-nd6.c                    |   2 +-
+ emb6/src/net/rpl/rpl-dag.c                     |   2 +-
+ emb6/src/net/rpl/rpl-timers.c                  |   2 +-
+ emb6/src/net/sicslowpan/sicslowpan.c           |   2 +-
+ emb6/src/tport/tcp-socket.c                    |   4 +-
+ emb6/src/tport/udp-socket.c                    |   2 +-
+ target/bsp/bsp.c                               |   2 +-
+ target/if/at86rf212b/at86rf212b.c              |   2 +-
+ utils/inc/clist.h                              | 163 -------------------------
+ utils/inc/emb6_clist.h                         | 163 +++++++++++++++++++++++++
+ utils/inc/emb6_random.h                        |  57 +++++++++
+ utils/inc/emb6_ringbuffer.h                    | 162 ++++++++++++++++++++++++
+ utils/inc/random.h                             |  57 ---------
+ utils/inc/ringbuffer.h                         | 162 ------------------------
+ utils/inc/timer.h                              |   4 +-
+ utils/src/ctimer.c                             |   8 +-
+ utils/src/etimer.c                             |   6 +-
+ utils/src/evproc.c                             |   2 +-
+ utils/src/list.c                               |   4 +-
+ utils/src/mmem.c                               |   4 +-
+ utils/src/queuebuf.c                           |   4 +-
+ utils/src/random.c                             |   2 +-
+ utils/src/ringbuffer.c                         |   2 +-
+ utils/src/timer.c                              |   6 +-
+ 44 files changed, 442 insertions(+), 442 deletions(-)
+ delete mode 100644 utils/inc/clist.h
+ create mode 100644 utils/inc/emb6_clist.h
+ create mode 100644 utils/inc/emb6_random.h
+ create mode 100644 utils/inc/emb6_ringbuffer.h
+ delete mode 100644 utils/inc/random.h
+ delete mode 100644 utils/inc/ringbuffer.h
+
+diff --git a/emb6/emb6.c b/emb6/emb6.c
+index 2912049..682b7c2 100644
+--- a/emb6/emb6.c
++++ b/emb6/emb6.c
+@@ -64,7 +64,7 @@
+ #include "queuebuf.h"
+ #include "linkaddr.h"
+ #include "ctimer.h"
+-#include "random.h"
++#include "emb6_random.h"
+
+ #if NETSTACK_CONF_WITH_IPV6
+ #include "uip-ds6.h"
+diff --git a/emb6/inc/apl/rest-engine/rest-engine.h b/emb6/inc/apl/rest-engine/rest-engine.h
+index 2c16c2b..fc0dca5 100644
+--- a/emb6/inc/apl/rest-engine/rest-engine.h
++++ b/emb6/inc/apl/rest-engine/rest-engine.h
+@@ -41,7 +41,7 @@
+ #define REST_ENGINE_H_
+
+
+-#include "clist.h"
++#include "emb6_clist.h"
+ #include "etimer.h"
+
+
+diff --git a/emb6/inc/net/ipv6/uip-ds6-route.h b/emb6/inc/net/ipv6/uip-ds6-route.h
+index 000b327..31ed0e9 100644
+--- a/emb6/inc/net/ipv6/uip-ds6-route.h
++++ b/emb6/inc/net/ipv6/uip-ds6-route.h
+@@ -42,7 +42,7 @@
+ #define UIP_DS6_ROUTE_H
+
+ #include "stimer.h"
+-#include "clist.h"
++#include "emb6_clist.h"
+
+ void uip_ds6_route_init(void);
+
+diff --git a/emb6/inc/net/rpl/rpl-private.h b/emb6/inc/net/rpl/rpl-private.h
+index 9da5744..5ded041 100644
+--- a/emb6/inc/net/rpl/rpl-private.h
++++ b/emb6/inc/net/rpl/rpl-private.h
+@@ -39,7 +39,7 @@
+
+ #include "rpl.h"
+
+-#include "clist.h"
++#include "emb6_clist.h"
+ #include "uip.h"
+ #include "bsp.h"
+ #include "ctimer.h"
+diff --git a/emb6/inc/net/rpl/rpl.h b/emb6/inc/net/rpl/rpl.h
+index 574ca5e..7269948 100644
+--- a/emb6/inc/net/rpl/rpl.h
++++ b/emb6/inc/net/rpl/rpl.h
+@@ -41,7 +41,7 @@
+ #include "emb6_conf.h"
+ #include "emb6.h"
+
+-#include "clist.h"
++#include "emb6_clist.h"
+ #include "uip.h"
+ #include "uip-ds6.h"
+ #include "ctimer.h"
+diff --git a/emb6/src/apl/er-coap/er-coap-observe.c b/emb6/src/apl/er-coap/er-coap-observe.c
+index 57754ac..6be690e 100644
+--- a/emb6/src/apl/er-coap/er-coap-observe.c
++++ b/emb6/src/apl/er-coap/er-coap-observe.c
+@@ -80,7 +80,7 @@ coap_add_observer(uip_ipaddr_t *addr, uint16_t port, const uint8_t *token,
+     PRINTF("Adding observer (%u/%u) for /%s [0x%02X%02X]\n",
+            list_length(observers_list) + 1, COAP_MAX_OBSERVERS,
+            o->url, o->token[0], o->token[1]);
+-    list_add(observers_list, o);
++    emb6_list_add(observers_list, o);
+   }
+
+   return o;
+diff --git a/emb6/src/apl/er-coap/er-coap-transactions.c b/emb6/src/apl/er-coap/er-coap-transactions.c
+index e40f4c9..4b3ffe1 100644
+--- a/emb6/src/apl/er-coap/er-coap-transactions.c
++++ b/emb6/src/apl/er-coap/er-coap-transactions.c
+@@ -43,7 +43,7 @@
+ #include "timer.h"
+ #include "evproc.h"
+ #include "memb.h"
+-#include "random.h"
++#include "emb6_random.h"
+
+ #include "tcpip.h"
+
+@@ -84,7 +84,7 @@ coap_new_transaction(uint16_t mid, uip_ipaddr_t *addr, uint16_t port)
+     t->addr = *addr;
+     t->port = port;
+
+-    list_add(transactions_list, t); /* list itself makes sure same element is not added twice */
++    emb6_list_add(transactions_list, t); /* list itself makes sure same element is not added twice */
+   }
+
+   return t;
+diff --git a/emb6/src/apl/er-coap/er-coap.c b/emb6/src/apl/er-coap/er-coap.c
+index 40f6874..a8125a2 100644
+--- a/emb6/src/apl/er-coap/er-coap.c
++++ b/emb6/src/apl/er-coap/er-coap.c
+@@ -39,7 +39,7 @@
+ #include <string.h>
+ #include <stdio.h>
+
+-#include "random.h"
++#include "emb6_random.h"
+
+ #include "er-coap.h"
+ #include "er-coap-transactions.h"
+diff --git a/emb6/src/apl/rest-engine/rest-engine.c b/emb6/src/apl/rest-engine/rest-engine.c
+index fd8d1ba..818f326 100644
+--- a/emb6/src/apl/rest-engine/rest-engine.c
++++ b/emb6/src/apl/rest-engine/rest-engine.c
+@@ -104,7 +104,7 @@ rest_activate_resource(resource_t *resource, char *path)
+ {
+   resource->url = path;
+   struct periodic_resource_s * periodic = resource->un_handler.periodic;
+-  list_add(restful_services, resource);
++  emb6_list_add(restful_services, resource);
+
+   PRINTF("Activating: %s\n\r", resource->url);
+
+@@ -112,7 +112,7 @@ rest_activate_resource(resource_t *resource, char *path)
+   if((resource->flags & IS_PERIODIC) && periodic->periodic_handler
+      && periodic->period) {
+     PRINTF("Periodic resource: %p (%s)\n", periodic,periodic->resource->url);
+-    list_add(restful_periodic_services, periodic);
++    emb6_list_add(restful_periodic_services, periodic);
+   }
+
+   for(periodic_resource =
+diff --git a/emb6/src/mac/framer-802154.c b/emb6/src/mac/framer-802154.c
+index f99486d..359ee6b 100644
+--- a/emb6/src/mac/framer-802154.c
++++ b/emb6/src/mac/framer-802154.c
+@@ -45,7 +45,7 @@
+ #include "frame802154.h"
+ #include "llsec802154.h"
+ #include "packetbuf.h"
+-#include "random.h"
++#include "emb6_random.h"
+
+
+
+diff --git a/emb6/src/mac/sicslowmac.c b/emb6/src/mac/sicslowmac.c
+index 7219fa8..c741131 100644
+--- a/emb6/src/mac/sicslowmac.c
++++ b/emb6/src/mac/sicslowmac.c
+@@ -51,7 +51,7 @@
+ #include "frame802154.h"
+ #include "packetbuf.h"
+ #include "queuebuf.h"
+-#include "random.h"
++#include "emb6_random.h"
+
+ #define DEBUG DEBUG_NONE
+
+diff --git a/emb6/src/net/ipv6/multicast/roll-tm.c b/emb6/src/net/ipv6/multicast/roll-tm.c
+index 8fb1717..8b36300 100644
+--- a/emb6/src/net/ipv6/multicast/roll-tm.c
++++ b/emb6/src/net/ipv6/multicast/roll-tm.c
+@@ -51,7 +51,7 @@
+ #include "roll-tm.h"
+ #include "bsp.h"
+ #include "ctimer.h"
+-#include "random.h"
++#include "emb6_random.h"
+ //#include "dev/watchdog.h"
+ //#include <string.h>
+
+diff --git a/emb6/src/net/ipv6/multicast/smrf.c b/emb6/src/net/ipv6/multicast/smrf.c
+index 474c41d..9b4a3a5 100644
+--- a/emb6/src/net/ipv6/multicast/smrf.c
++++ b/emb6/src/net/ipv6/multicast/smrf.c
+@@ -52,7 +52,7 @@
+ #include "smrf.h"
+ #include "rpl.h"
+ #include "packetbuf.h"
+-#include "random.h"
++#include "emb6_random.h"
+ //#include "net/netstack.h"
+
+ #define DEBUG DEBUG_NONE
+diff --git a/emb6/src/net/ipv6/multicast/uip-mcast6-route.c b/emb6/src/net/ipv6/multicast/uip-mcast6-route.c
+index aa0caff..55d245d 100644
+--- a/emb6/src/net/ipv6/multicast/uip-mcast6-route.c
++++ b/emb6/src/net/ipv6/multicast/uip-mcast6-route.c
+@@ -43,7 +43,7 @@
+ //#include "contiki.h"
+ #include "emb6_conf.h"
+ #include "emb6.h"
+-#include "clist.h"
++#include "emb6_clist.h"
+ #include "memb.h"
+ #include "uip.h"
+ #include "uip-mcast6-route.h"
+@@ -88,7 +88,7 @@ uip_mcast6_route_add(uip_ipaddr_t *group)
+     if(locmcastrt == NULL) {
+       return NULL;
+     }
+-    list_add(mcast_route_list, locmcastrt);
++    emb6_list_add(mcast_route_list, locmcastrt);
+   }
+
+   /* Reaching here means we either found the prefix or allocated a new one */
+diff --git a/emb6/src/net/ipv6/nbr-table.c b/emb6/src/net/ipv6/nbr-table.c
+index 7dedece..3719135 100644
+--- a/emb6/src/net/ipv6/nbr-table.c
++++ b/emb6/src/net/ipv6/nbr-table.c
+@@ -41,7 +41,7 @@
+ #include <stddef.h>
+ #include <string.h>
+ #include "memb.h"
+-#include "clist.h"
++#include "emb6_clist.h"
+ #include "nbr-table.h"
+
+ /* List of link-layer addresses of the neighbors, used as key in the tables */
+@@ -295,7 +295,7 @@ nbr_table_add_lladdr(nbr_table_t *table, const linkaddr_t *lladdr)
+     }
+
+     /* Add neighbor to list */
+-    list_add(nbr_table_keys, key);
++    emb6_list_add(nbr_table_keys, key);
+
+     /* Get index from newly allocated neighbor */
+     index = index_from_key(key);
+diff --git a/emb6/src/net/ipv6/uip-ds6-nbr.c b/emb6/src/net/ipv6/uip-ds6-nbr.c
+index 360fdbc..53ad8da 100644
+--- a/emb6/src/net/ipv6/uip-ds6-nbr.c
++++ b/emb6/src/net/ipv6/uip-ds6-nbr.c
+@@ -46,7 +46,7 @@
+ #include <string.h>
+ #include <stdlib.h>
+ #include <stddef.h>
+-#include "clist.h"
++#include "emb6_clist.h"
+ #include "linkaddr.h"
+ #include "packetbuf.h"
+ #include "uip-ds6-nbr.h"
+diff --git a/emb6/src/net/ipv6/uip-ds6-route.c b/emb6/src/net/ipv6/uip-ds6-route.c
+index c732f78..0bd1da5 100644
+--- a/emb6/src/net/ipv6/uip-ds6-route.c
++++ b/emb6/src/net/ipv6/uip-ds6-route.c
+@@ -42,7 +42,7 @@
+ #include "uip-ds6.h"
+ #include "uip.h"
+
+-#include "clist.h"
++#include "emb6_clist.h"
+ #include "memb.h"
+ #include "nbr-table.h"
+
+@@ -133,7 +133,7 @@ uip_ds6_notification_add(struct uip_ds6_notification *n,
+ {
+   if(n != NULL && c != NULL) {
+     n->callback = c;
+-    list_add(notificationlist, n);
++    emb6_list_add(notificationlist, n);
+   }
+ }
+ /*---------------------------------------------------------------------------*/
+@@ -375,7 +375,7 @@ uip_ds6_route_add(uip_ipaddr_t *ipaddr, uint8_t length,
+
+     nbrr->route = r;
+     /* Add the route to this neighbor */
+-    list_add(routes->route_list, nbrr);
++    emb6_list_add(routes->route_list, nbrr);
+     r->neighbor_routes = routes;
+     num_routes++;
+
+diff --git a/emb6/src/net/ipv6/uip-ds6.c b/emb6/src/net/ipv6/uip-ds6.c
+index 0e2f16a..ad3f4cd 100644
+--- a/emb6/src/net/ipv6/uip-ds6.c
++++ b/emb6/src/net/ipv6/uip-ds6.c
+@@ -49,7 +49,7 @@
+ #include <string.h>
+ #include <stdlib.h>
+ #include <stddef.h>
+-#include "random.h"
++#include "emb6_random.h"
+ #include "uip-nd6.h"
+ #include "uip-ds6.h"
+ #include "uip-packetqueue.h"
+@@ -343,7 +343,7 @@ uip_ds6_addr_add(uip_ipaddr_t *ipaddr, unsigned long vlifetime, uint8_t type)
+     }
+ #if UIP_ND6_DEF_MAXDADNS > 0
+     locaddr->state = ADDR_TENTATIVE;
+-    timer_set(&locaddr->dadtimer,
++    timer_emb6_set(&locaddr->dadtimer,
+               random_rand() % (UIP_ND6_MAX_RTR_SOLICITATION_DELAY *
+                       bsp_get(E_BSP_GET_TRES)));
+     locaddr->dadnscount = 0;
+@@ -591,7 +591,7 @@ uip_ds6_dad(uip_ds6_addr_t *addr)
+   if(addr->dadnscount < uip_ds6_if.maxdadns) {
+     uip_nd6_ns_output(NULL, NULL, &addr->ipaddr);
+     addr->dadnscount++;
+-    timer_set(&addr->dadtimer,
++    timer_emb6_set(&addr->dadtimer,
+               uip_ds6_if.retrans_timer / 1000 * bsp_get(E_BSP_GET_TRES));
+     return;
+   }
+diff --git a/emb6/src/net/ipv6/uip-icmp6.c b/emb6/src/net/ipv6/uip-icmp6.c
+index 00828a3..484d0bf 100644
+--- a/emb6/src/net/ipv6/uip-icmp6.c
++++ b/emb6/src/net/ipv6/uip-icmp6.c
+@@ -114,7 +114,7 @@ uip_icmp6_input(uint8_t type, uint8_t icode)
+ void
+ uip_icmp6_register_input_handler(uip_icmp6_input_handler_t *handler)
+ {
+-  list_add(input_handler_list, handler);
++  emb6_list_add(input_handler_list, handler);
+ }
+ /*---------------------------------------------------------------------------*/
+ static void
+@@ -393,7 +393,7 @@ uip_icmp6_echo_reply_callback_add(struct uip_icmp6_echo_reply_notification *n,
+ {
+     if(n != NULL && c != NULL) {
+         n->callback = c;
+-        list_add(echo_reply_callback_list, n);
++        emb6_list_add(echo_reply_callback_list, n);
+     }
+ }
+ /*---------------------------------------------------------------------------*/
+diff --git a/emb6/src/net/ipv6/uip-nameserver.c b/emb6/src/net/ipv6/uip-nameserver.c
+index 9701b26..175e2be 100644
+--- a/emb6/src/net/ipv6/uip-nameserver.c
++++ b/emb6/src/net/ipv6/uip-nameserver.c
+@@ -46,7 +46,7 @@
+ #include "uip.h"
+ #include "uip-nameserver.h"
+ #include "bsp.h"
+-#include "clist.h"
++#include "emb6_clist.h"
+ #include "memb.h"
+
+ #include <string.h>
+@@ -113,7 +113,7 @@ uip_nameserver_update(uip_ipaddr_t *nameserver, uint32_t lifetime)
+
+   if(e == NULL) {
+     if((e = memb_alloc(&dnsmemb)) != NULL) {
+-      list_add(dns, e);
++      emb6_list_add(dns, e);
+     } else {
+       uip_nameserver_record *p;
+       for(e = list_head(dns), p = list_head(dns); p != NULL;
+diff --git a/emb6/src/net/ipv6/uip-nd6.c b/emb6/src/net/ipv6/uip-nd6.c
+index 8758a8f..f04b6b3 100644
+--- a/emb6/src/net/ipv6/uip-nd6.c
++++ b/emb6/src/net/ipv6/uip-nd6.c
+@@ -78,7 +78,7 @@
+ #include "uip-ds6.h"
+ #include "uip-nameserver.h"
+ #include "bsp.h"
+-#include "random.h"
++#include "emb6_random.h"
+
+ /*------------------------------------------------------------------*/
+ #define DEBUG DEBUG_NONE
+diff --git a/emb6/src/net/rpl/rpl-dag.c b/emb6/src/net/rpl/rpl-dag.c
+index cc11eab..4a85b70 100644
+--- a/emb6/src/net/rpl/rpl-dag.c
++++ b/emb6/src/net/rpl/rpl-dag.c
+@@ -50,7 +50,7 @@
+ #if UIP_CONF_IPV6_MULTICAST
+ #include "uip-mcast6.h"
+ #endif
+-#include "clist.h"
++#include "emb6_clist.h"
+ #include "memb.h"
+ #include "ctimer.h"
+
+diff --git a/emb6/src/net/rpl/rpl-timers.c b/emb6/src/net/rpl/rpl-timers.c
+index 9b235d4..439b45d 100644
+--- a/emb6/src/net/rpl/rpl-timers.c
++++ b/emb6/src/net/rpl/rpl-timers.c
+@@ -47,7 +47,7 @@
+ #if UIP_CONF_IPV6_MULTICAST
+ #include "uip-mcast6.h"
+ #endif
+-#include "random.h"
++#include "emb6_random.h"
+ #include "ctimer.h"
+
+ #define DEBUG DEBUG_NONE
+diff --git a/emb6/src/net/sicslowpan/sicslowpan.c b/emb6/src/net/sicslowpan/sicslowpan.c
+index 8c909cf..79afefe 100644
+--- a/emb6/src/net/sicslowpan/sicslowpan.c
++++ b/emb6/src/net/sicslowpan/sicslowpan.c
+@@ -1738,7 +1738,7 @@ input(void)
+
+       sicslowpan_len = frag_size;
+       reass_tag = frag_tag;
+-      timer_set(&reass_timer, SICSLOWPAN_REASS_MAXAGE * bsp_get(E_BSP_GET_TRES));
++      timer_emb6_set(&reass_timer, SICSLOWPAN_REASS_MAXAGE * bsp_get(E_BSP_GET_TRES));
+       PRINTFI("sicslowpan input: INIT FRAGMENTATION (len %d, tag %d)\n\r",
+              sicslowpan_len, reass_tag);
+       linkaddr_copy(&frag_sender, packetbuf_addr(PACKETBUF_ADDR_SENDER));
+diff --git a/emb6/src/tport/tcp-socket.c b/emb6/src/tport/tcp-socket.c
+index 3974bad..e5702a6 100644
+--- a/emb6/src/tport/tcp-socket.c
++++ b/emb6/src/tport/tcp-socket.c
+@@ -31,7 +31,7 @@
+
+ #include "emb6.h"
+ #include "bsp.h"
+-#include "clist.h"
++#include "emb6_clist.h"
+ #include "etimer.h"
+
+ #include "tcp-socket.h"
+@@ -276,7 +276,7 @@ tcp_socket_register(struct tcp_socket *s, void *ptr,
+   s->output_data_maxlen = output_databuf_len;
+   s->input_callback = input_callback;
+   s->event_callback = event_callback;
+-  list_add(socketlist, s);
++  emb6_list_add(socketlist, s);
+
+   s->listen_port = 0;
+   s->flags = TCP_SOCKET_FLAGS_NONE;
+diff --git a/emb6/src/tport/udp-socket.c b/emb6/src/tport/udp-socket.c
+index be27a5f..545f6bd 100644
+--- a/emb6/src/tport/udp-socket.c
++++ b/emb6/src/tport/udp-socket.c
+@@ -31,7 +31,7 @@
+
+ #include "emb6.h"
+ #include "bsp.h"
+-#include "clist.h"
++#include "emb6_clist.h"
+ #include "etimer.h"
+ #include "emb6_conf.h"
+ #include "tcpip.h"
+diff --git a/target/bsp/bsp.c b/target/bsp/bsp.c
+index 85c9976..bf266b8 100644
+--- a/target/bsp/bsp.c
++++ b/target/bsp/bsp.c
+@@ -63,7 +63,7 @@
+ #include "board_conf.h"
+
+ #include "etimer.h"
+-#include "random.h"
++#include "emb6_random.h"
+ #include "evproc.h"
+ /*==============================================================================
+                                      MACROS
+diff --git a/target/if/at86rf212b/at86rf212b.c b/target/if/at86rf212b/at86rf212b.c
+index aba87d5..c059568 100644
+--- a/target/if/at86rf212b/at86rf212b.c
++++ b/target/if/at86rf212b/at86rf212b.c
+@@ -67,7 +67,7 @@
+ #include "ctimer.h"
+ #include "packetbuf.h"
+
+-#include "ringbuffer.h"
++#include "emb6_ringbuffer.h"
+
+ /*==============================================================================
+                                      MACROS
+diff --git a/utils/inc/clist.h b/utils/inc/clist.h
+deleted file mode 100644
+index 0e26be8..0000000
+--- a/utils/inc/clist.h
++++ /dev/null
+@@ -1,163 +0,0 @@
+-/*
+- * Copyright (c) 2004, Swedish Institute of Computer Science.
+- * All rights reserved.
+- *
+- * Redistribution and use in source and binary forms, with or without
+- * modification, are permitted provided that the following conditions
+- * are met:
+- * 1. Redistributions of source code must retain the above copyright
+- *    notice, this list of conditions and the following disclaimer.
+- * 2. Redistributions in binary form must reproduce the above copyright
+- *    notice, this list of conditions and the following disclaimer in the
+- *    documentation and/or other materials provided with the distribution.
+- * 3. Neither the name of the Institute nor the names of its contributors
+- *    may be used to endorse or promote products derived from this software
+- *    without specific prior written permission.
+- *
+- * THIS SOFTWARE IS PROVIDED BY THE INSTITUTE AND CONTRIBUTORS ``AS IS'' AND
+- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+- * ARE DISCLAIMED.  IN NO EVENT SHALL THE INSTITUTE OR CONTRIBUTORS BE LIABLE
+- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+- * SUCH DAMAGE.
+- *
+- * This file is part of the Contiki operating system.
+- *
+- * Author: Adam Dunkels <adam@sics.se>
+- *
+- * $Id: clist.h,v 1.5 2010/09/13 13:31:00 adamdunkels Exp $
+- */
+-
+-/**
+- *   \addtogroup utils
+- *   @{ */
+-/** \addtogroup lib
+-    @{ */
+-/**
+- * \defgroup list Linked list library
+- *
+- * The linked list library provides a set of functions for
+- * manipulating linked lists.
+- *
+- * A linked list is made up of elements where the first element \b
+- * must be a pointer. This pointer is used by the linked list library
+- * to form lists of the elements.
+- *
+- * Lists are declared with the LIST() macro. The declaration specifies
+- * the name of the list that later is used with all list functions.
+- *
+- * Lists can be manipulated by inserting or removing elements from
+- * either sides of the list (list_push(), list_add(), list_pop(),
+- * list_chop()). A specified element can also be removed from inside a
+- * list with list_remove(). The head and tail of a list can be
+- * extracted using list_head() and list_tail(), respectively.
+- *
+- * @{
+- */
+-
+-/**
+- * \file
+- * Linked list manipulation routines.
+- * \author Adam Dunkels <adam@sics.se>
+- *
+- *
+- */
+-
+-#ifndef LIST_H_
+-#define LIST_H_
+-
+-#define LIST_CONCAT2(s1, s2) s1##s2
+-#define LIST_CONCAT(s1, s2) LIST_CONCAT2(s1, s2)
+-
+-/**
+- * Declare a linked list.
+- *
+- * This macro declares a linked list with the specified \c type. The
+- * type \b must be a structure (\c struct) with its first element
+- * being a pointer. This pointer is used by the linked list library to
+- * form the linked lists.
+- *
+- * The list variable is declared as static to make it easy to use in a
+- * single C module without unnecessarily exporting the name to other
+- * modules.
+- *
+- * \param name The name of the list.
+- */
+-#define LIST(name) \
+-         static void *LIST_CONCAT(name,_list) = NULL; \
+-         static list_t name = (list_t)&LIST_CONCAT(name,_list)
+-
+-/**
+- * Declare a linked list inside a structure declaraction.
+- *
+- * This macro declares a linked list with the specified \c type. The
+- * type \b must be a structure (\c struct) with its first element
+- * being a pointer. This pointer is used by the linked list library to
+- * form the linked lists.
+- *
+- * Internally, the list is defined as two items: the list itself and a
+- * pointer to the list. The pointer has the name of the parameter to
+- * the macro and the name of the list is a concatenation of the name
+- * and the suffix "_list". The pointer must point to the list for the
+- * list to work. Thus the list must be initialized before using.
+- *
+- * The list is initialized with the LIST_STRUCT_INIT() macro.
+- *
+- * \param name The name of the list.
+- */
+-#define LIST_STRUCT(name) \
+-         void *LIST_CONCAT(name,_list); \
+-         list_t name
+-
+-/**
+- * Initialize a linked list that is part of a structure.
+- *
+- * This macro sets up the internal pointers in a list that has been
+- * defined as part of a struct. This macro must be called before using
+- * the list.
+- *
+- * \param struct_ptr A pointer to the struct
+- * \param name The name of the list.
+- */
+-#define LIST_STRUCT_INIT(struct_ptr, name)                              \
+-    do {                                                                \
+-       (struct_ptr)->name = &((struct_ptr)->LIST_CONCAT(name,_list));   \
+-       (struct_ptr)->LIST_CONCAT(name,_list) = NULL;                    \
+-       list_init((struct_ptr)->name);                                   \
+-    } while(0)
+-
+-/**
+- * The linked list type.
+- *
+- */
+-typedef void ** list_t;
+-
+-void   list_init(list_t list);
+-void * list_head(list_t list);
+-void * list_tail(list_t list);
+-void * list_pop (list_t list);
+-void   list_push(list_t list, void *item);
+-
+-void * list_chop(list_t list);
+-
+-void   list_add(list_t list, void *item);
+-void   list_remove(list_t list, void *item);
+-
+-int    list_length(list_t list);
+-
+-void   list_copy(list_t dest, list_t src);
+-
+-void   list_insert(list_t list, void *previtem, void *newitem);
+-
+-void * list_item_next(void *item);
+-
+-#endif /* LIST_H_ */
+-
+-/** @} */
+-/** @} */
+-/** @} */
+diff --git a/utils/inc/emb6_clist.h b/utils/inc/emb6_clist.h
+new file mode 100644
+index 0000000..f65f01e
+--- /dev/null
++++ b/utils/inc/emb6_clist.h
+@@ -0,0 +1,163 @@
++/*
++ * Copyright (c) 2004, Swedish Institute of Computer Science.
++ * All rights reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions and the following disclaimer.
++ * 2. Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in the
++ *    documentation and/or other materials provided with the distribution.
++ * 3. Neither the name of the Institute nor the names of its contributors
++ *    may be used to endorse or promote products derived from this software
++ *    without specific prior written permission.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE INSTITUTE AND CONTRIBUTORS ``AS IS'' AND
++ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
++ * ARE DISCLAIMED.  IN NO EVENT SHALL THE INSTITUTE OR CONTRIBUTORS BE LIABLE
++ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
++ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
++ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
++ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
++ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++ * SUCH DAMAGE.
++ *
++ * This file is part of the Contiki operating system.
++ *
++ * Author: Adam Dunkels <adam@sics.se>
++ *
++ * $Id: emb6_clist.h,v 1.5 2010/09/13 13:31:00 adamdunkels Exp $
++ */
++
++/**
++ *   \addtogroup utils
++ *   @{ */
++/** \addtogroup lib
++    @{ */
++/**
++ * \defgroup list Linked list library
++ *
++ * The linked list library provides a set of functions for
++ * manipulating linked lists.
++ *
++ * A linked list is made up of elements where the first element \b
++ * must be a pointer. This pointer is used by the linked list library
++ * to form lists of the elements.
++ *
++ * Lists are declared with the LIST() macro. The declaration specifies
++ * the name of the list that later is used with all list functions.
++ *
++ * Lists can be manipulated by inserting or removing elements from
++ * either sides of the list (list_push(), emb6_list_add(), list_pop(),
++ * list_chop()). A specified element can also be removed from inside a
++ * list with list_remove(). The head and tail of a list can be
++ * extracted using list_head() and list_tail(), respectively.
++ *
++ * @{
++ */
++
++/**
++ * \file
++ * Linked list manipulation routines.
++ * \author Adam Dunkels <adam@sics.se>
++ *
++ *
++ */
++
++#ifndef LIST_H_
++#define LIST_H_
++
++#define LIST_CONCAT2(s1, s2) s1##s2
++#define LIST_CONCAT(s1, s2) LIST_CONCAT2(s1, s2)
++
++/**
++ * Declare a linked list.
++ *
++ * This macro declares a linked list with the specified \c type. The
++ * type \b must be a structure (\c struct) with its first element
++ * being a pointer. This pointer is used by the linked list library to
++ * form the linked lists.
++ *
++ * The list variable is declared as static to make it easy to use in a
++ * single C module without unnecessarily exporting the name to other
++ * modules.
++ *
++ * \param name The name of the list.
++ */
++#define LIST(name) \
++         static void *LIST_CONCAT(name,_list) = NULL; \
++         static list_t name = (list_t)&LIST_CONCAT(name,_list)
++
++/**
++ * Declare a linked list inside a structure declaraction.
++ *
++ * This macro declares a linked list with the specified \c type. The
++ * type \b must be a structure (\c struct) with its first element
++ * being a pointer. This pointer is used by the linked list library to
++ * form the linked lists.
++ *
++ * Internally, the list is defined as two items: the list itself and a
++ * pointer to the list. The pointer has the name of the parameter to
++ * the macro and the name of the list is a concatenation of the name
++ * and the suffix "_list". The pointer must point to the list for the
++ * list to work. Thus the list must be initialized before using.
++ *
++ * The list is initialized with the LIST_STRUCT_INIT() macro.
++ *
++ * \param name The name of the list.
++ */
++#define LIST_STRUCT(name) \
++         void *LIST_CONCAT(name,_list); \
++         list_t name
++
++/**
++ * Initialize a linked list that is part of a structure.
++ *
++ * This macro sets up the internal pointers in a list that has been
++ * defined as part of a struct. This macro must be called before using
++ * the list.
++ *
++ * \param struct_ptr A pointer to the struct
++ * \param name The name of the list.
++ */
++#define LIST_STRUCT_INIT(struct_ptr, name)                              \
++    do {                                                                \
++       (struct_ptr)->name = &((struct_ptr)->LIST_CONCAT(name,_list));   \
++       (struct_ptr)->LIST_CONCAT(name,_list) = NULL;                    \
++       list_init((struct_ptr)->name);                                   \
++    } while(0)
++
++/**
++ * The linked list type.
++ *
++ */
++typedef void ** list_t;
++
++void   list_init(list_t list);
++void * list_head(list_t list);
++void * list_tail(list_t list);
++void * list_pop (list_t list);
++void   list_push(list_t list, void *item);
++
++void * list_chop(list_t list);
++
++void   emb6_list_add(list_t list, void *item);
++void   list_remove(list_t list, void *item);
++
++int    list_length(list_t list);
++
++void   list_copy(list_t dest, list_t src);
++
++void   list_insert(list_t list, void *previtem, void *newitem);
++
++void * list_item_next(void *item);
++
++#endif /* LIST_H_ */
++
++/** @} */
++/** @} */
++/** @} */
+diff --git a/utils/inc/emb6_random.h b/utils/inc/emb6_random.h
+new file mode 100644
+index 0000000..e59a500
+--- /dev/null
++++ b/utils/inc/emb6_random.h
+@@ -0,0 +1,57 @@
++/*
++ * Copyright (c) 2005, Swedish Institute of Computer Science
++ * All rights reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions and the following disclaimer.
++ * 2. Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in the
++ *    documentation and/or other materials provided with the distribution.
++ * 3. Neither the name of the Institute nor the names of its contributors
++ *    may be used to endorse or promote products derived from this software
++ *    without specific prior written permission.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE INSTITUTE AND CONTRIBUTORS ``AS IS'' AND
++ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
++ * ARE DISCLAIMED.  IN NO EVENT SHALL THE INSTITUTE OR CONTRIBUTORS BE LIABLE
++ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
++ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
++ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
++ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
++ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++ * SUCH DAMAGE.
++ *
++ * This file is part of the Contiki operating system.
++ *
++ * @(#)$Id: emb6_random.h,v 1.2 2010/12/13 16:52:02 dak664 Exp $
++ */
++/**
++ * \file
++ *         A brief description the file
++ */
++#ifndef RANDOM_H_
++#define RANDOM_H_
++
++/*
++ * Initialize the pseudo-random generator.
++ *
++ */
++void random_init(unsigned short seed);
++
++/*
++ * Calculate a pseudo random number between 0 and 65535.
++ *
++ * \return A pseudo-random number between 0 and 65535.
++ */
++unsigned short random_rand(void);
++
++/* In gcc int rand() uses RAND_MAX and long random() uses RANDOM_MAX */
++/* Since random_rand casts to unsigned short, we'll use this maxmimum */
++#define RANDOM_RAND_MAX 65535U
++
++#endif /* RANDOM_H_ */
+diff --git a/utils/inc/emb6_ringbuffer.h b/utils/inc/emb6_ringbuffer.h
+new file mode 100644
+index 0000000..8b29730
+--- /dev/null
++++ b/utils/inc/emb6_ringbuffer.h
+@@ -0,0 +1,162 @@
++/*============================================================================*/
++/*
++ * The MIT License (MIT)
++ *
++ * Copyright (c) 2014 Anders Kalør
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in all
++ * copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
++ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
++ * SOFTWARE.
++ */
++/*============================================================================*/
++#include <inttypes.h>
++
++/**
++ * @file
++ * Prototypes and structures for the ring buffer module.
++ */
++
++#ifndef RINGBUFFER_H
++#define RINGBUFFER_H
++
++/**
++ * The size of a ring buffer.
++ * Due to the design only <tt> RB_SIZE-1 </tt> items
++ * can be contained in the buffer.
++ * The buffer size must be a power of two.
++ */
++#define RB_BLOCKS       8
++#define RB_CLOCK_SIZE   128
++#define RB_SIZE         RB_BLOCKS * RB_CLOCK_SIZE
++
++#if (RB_SIZE & (RB_SIZE - 1)) != 0
++#error "RB_SIZE must be a power of two"
++#endif
++
++/**
++ * The type which is used to hold the size and the indicies of the buffer.
++ * Must be able to fit \c RB_SIZE .
++ */
++typedef uint16_t ringb_size_t;
++
++/**
++ * The type which is used to hold atomic size of the ring buffer.
++ * Usually it's int8_t
++ */
++typedef uint8_t ringb_atom_t;
++
++/**
++ * Used as a modulo operator as <tt> a % b = (a & (b − 1)) </tt>
++ * where \c a is a positive index in the buffer and b is the (power of two)
++ * size of the buffer.
++ */
++#define RB_MASK (RB_SIZE-1)
++
++/**
++ * Structure which holds a ring buffer. The buffer contains a buffer array
++ * as well as metadata for the ring buffer.
++ */
++typedef struct s_ringb
++{
++    /** Buffer memory. */
++    ringb_atom_t a_buf[RB_SIZE];
++    /** Index of tail. */
++    ringb_size_t sz_tail;
++    /** Index of head. */
++    ringb_size_t sz_head;
++} s_ringb_t;
++
++/**
++ * Initializes the ring buffer pointed to by <em>buffer</em>.
++ * This function can also be used to empty/reset the buffer.
++ * @param ps_buf The ring buffer to initialize.
++ */
++void ringb_init( s_ringb_t *ps_rb );
++
++/**
++ * Adds a atomic to a ring buffer.
++ * @param ps_buf    The buffer in which the data should be placed.
++ * @param data      The atomic to place.
++ */
++void ringb_pusha( s_ringb_t *ps_rb, ringb_atom_t data );
++
++/**
++ * Adds an array of atomics to a ring buffer.
++ * @param ps_buf    The buffer in which the data should be placed.
++ * @param p_data    A pointer to the array of atomics to place in the queue.
++ * @param sz_len    The size of the array.
++ */
++void ringb_push( s_ringb_t *ps_rb, const ringb_atom_t* p_data,
++        ringb_size_t sz_len );
++
++/**
++ * Returns the oldest atomic in a ring buffer.
++ * @param ps_buf The buffer from which the data should be returned.
++ * @param p_data A pointer to the location at which the data should be placed.
++ * @return 1 if data was returned; 0 otherwise.
++ */
++uint8_t ringb_pulla( s_ringb_t *ps_rb, ringb_atom_t* p_data );
++
++/**
++ * Returns the <em>len</em> oldest atomics from a ring buffer.
++ * @param ps_buf The buffer from which the data should be returned.
++ * @param p_data A pointer to the array at which the data should be placed.
++ * @param sz_len The maximum number of atomics to return.
++ * @return The number of atomics returned.
++ */
++ringb_size_t ringb_pull( s_ringb_t *ps_rb, ringb_atom_t* p_data,
++                         ringb_size_t sz_len );
++/**
++ * Peeks a ring buffer, i.e. returns an element without removing it.
++ * @param ps_buf The buffer from which the data should be returned.
++ * @param p_data A pointer to the location at which the data should be placed.
++ * @param index The index to peek.
++ * @return 1 if data was returned; 0 otherwise.
++ */
++uint8_t ringb_peek( s_ringb_t *ps_rb, ringb_atom_t *data, ringb_size_t index );
++
++/**
++ * Returns whether a ring buffer is empty.
++ * @param ps_buf The buffer for which it should be returned whether it is empty.
++ * @return 1 if empty; 0 otherwise.
++ */
++inline uint8_t ringb_empty( s_ringb_t* ps_rb )
++{
++    return ( ps_rb->sz_head == ps_rb->sz_tail );
++}
++
++/**
++ * Returns the number of items in a ring buffer.
++ * @param ps_buf The buffer for which the number of items should be returned.
++ * @return The number of items in the ring buffer.
++ */
++inline uint8_t ringb_full( s_ringb_t* ps_rb )
++{
++    return ( ( ps_rb->sz_head - ps_rb->sz_tail ) & RB_MASK ) == RB_MASK;
++}
++
++/**
++ * Returns whether a ring buffer is full.
++ * @param ps_buf The buffer for which it should be returned whether it is full.
++ * @return 1 if full; 0 otherwise.
++ */
++inline uint8_t ringb_items( s_ringb_t* ps_rb )
++{
++    return ( ( ps_rb->sz_head - ps_rb->sz_tail ) & RB_MASK );
++}
++
++#endif /* RINGBUFFER_H */
+diff --git a/utils/inc/random.h b/utils/inc/random.h
+deleted file mode 100644
+index 3bab934..0000000
+--- a/utils/inc/random.h
++++ /dev/null
+@@ -1,57 +0,0 @@
+-/*
+- * Copyright (c) 2005, Swedish Institute of Computer Science
+- * All rights reserved.
+- *
+- * Redistribution and use in source and binary forms, with or without
+- * modification, are permitted provided that the following conditions
+- * are met:
+- * 1. Redistributions of source code must retain the above copyright
+- *    notice, this list of conditions and the following disclaimer.
+- * 2. Redistributions in binary form must reproduce the above copyright
+- *    notice, this list of conditions and the following disclaimer in the
+- *    documentation and/or other materials provided with the distribution.
+- * 3. Neither the name of the Institute nor the names of its contributors
+- *    may be used to endorse or promote products derived from this software
+- *    without specific prior written permission.
+- *
+- * THIS SOFTWARE IS PROVIDED BY THE INSTITUTE AND CONTRIBUTORS ``AS IS'' AND
+- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+- * ARE DISCLAIMED.  IN NO EVENT SHALL THE INSTITUTE OR CONTRIBUTORS BE LIABLE
+- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+- * SUCH DAMAGE.
+- *
+- * This file is part of the Contiki operating system.
+- *
+- * @(#)$Id: random.h,v 1.2 2010/12/13 16:52:02 dak664 Exp $
+- */
+-/**
+- * \file
+- *         A brief description the file
+- */
+-#ifndef RANDOM_H_
+-#define RANDOM_H_
+-
+-/*
+- * Initialize the pseudo-random generator.
+- *
+- */
+-void random_init(unsigned short seed);
+-
+-/*
+- * Calculate a pseudo random number between 0 and 65535.
+- *
+- * \return A pseudo-random number between 0 and 65535.
+- */
+-unsigned short random_rand(void);
+-
+-/* In gcc int rand() uses RAND_MAX and long random() uses RANDOM_MAX */
+-/* Since random_rand casts to unsigned short, we'll use this maxmimum */
+-#define RANDOM_RAND_MAX 65535U
+-
+-#endif /* RANDOM_H_ */
+diff --git a/utils/inc/ringbuffer.h b/utils/inc/ringbuffer.h
+deleted file mode 100644
+index 8b29730..0000000
+--- a/utils/inc/ringbuffer.h
++++ /dev/null
+@@ -1,162 +0,0 @@
+-/*============================================================================*/
+-/*
+- * The MIT License (MIT)
+- *
+- * Copyright (c) 2014 Anders Kalør
+- *
+- * Permission is hereby granted, free of charge, to any person obtaining a copy
+- * of this software and associated documentation files (the "Software"), to deal
+- * in the Software without restriction, including without limitation the rights
+- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+- * copies of the Software, and to permit persons to whom the Software is
+- * furnished to do so, subject to the following conditions:
+- *
+- * The above copyright notice and this permission notice shall be included in all
+- * copies or substantial portions of the Software.
+- *
+- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+- * SOFTWARE.
+- */
+-/*============================================================================*/
+-#include <inttypes.h>
+-
+-/**
+- * @file
+- * Prototypes and structures for the ring buffer module.
+- */
+-
+-#ifndef RINGBUFFER_H
+-#define RINGBUFFER_H
+-
+-/**
+- * The size of a ring buffer.
+- * Due to the design only <tt> RB_SIZE-1 </tt> items
+- * can be contained in the buffer.
+- * The buffer size must be a power of two.
+- */
+-#define RB_BLOCKS       8
+-#define RB_CLOCK_SIZE   128
+-#define RB_SIZE         RB_BLOCKS * RB_CLOCK_SIZE
+-
+-#if (RB_SIZE & (RB_SIZE - 1)) != 0
+-#error "RB_SIZE must be a power of two"
+-#endif
+-
+-/**
+- * The type which is used to hold the size and the indicies of the buffer.
+- * Must be able to fit \c RB_SIZE .
+- */
+-typedef uint16_t ringb_size_t;
+-
+-/**
+- * The type which is used to hold atomic size of the ring buffer.
+- * Usually it's int8_t
+- */
+-typedef uint8_t ringb_atom_t;
+-
+-/**
+- * Used as a modulo operator as <tt> a % b = (a & (b − 1)) </tt>
+- * where \c a is a positive index in the buffer and b is the (power of two)
+- * size of the buffer.
+- */
+-#define RB_MASK (RB_SIZE-1)
+-
+-/**
+- * Structure which holds a ring buffer. The buffer contains a buffer array
+- * as well as metadata for the ring buffer.
+- */
+-typedef struct s_ringb
+-{
+-    /** Buffer memory. */
+-    ringb_atom_t a_buf[RB_SIZE];
+-    /** Index of tail. */
+-    ringb_size_t sz_tail;
+-    /** Index of head. */
+-    ringb_size_t sz_head;
+-} s_ringb_t;
+-
+-/**
+- * Initializes the ring buffer pointed to by <em>buffer</em>.
+- * This function can also be used to empty/reset the buffer.
+- * @param ps_buf The ring buffer to initialize.
+- */
+-void ringb_init( s_ringb_t *ps_rb );
+-
+-/**
+- * Adds a atomic to a ring buffer.
+- * @param ps_buf    The buffer in which the data should be placed.
+- * @param data      The atomic to place.
+- */
+-void ringb_pusha( s_ringb_t *ps_rb, ringb_atom_t data );
+-
+-/**
+- * Adds an array of atomics to a ring buffer.
+- * @param ps_buf    The buffer in which the data should be placed.
+- * @param p_data    A pointer to the array of atomics to place in the queue.
+- * @param sz_len    The size of the array.
+- */
+-void ringb_push( s_ringb_t *ps_rb, const ringb_atom_t* p_data,
+-        ringb_size_t sz_len );
+-
+-/**
+- * Returns the oldest atomic in a ring buffer.
+- * @param ps_buf The buffer from which the data should be returned.
+- * @param p_data A pointer to the location at which the data should be placed.
+- * @return 1 if data was returned; 0 otherwise.
+- */
+-uint8_t ringb_pulla( s_ringb_t *ps_rb, ringb_atom_t* p_data );
+-
+-/**
+- * Returns the <em>len</em> oldest atomics from a ring buffer.
+- * @param ps_buf The buffer from which the data should be returned.
+- * @param p_data A pointer to the array at which the data should be placed.
+- * @param sz_len The maximum number of atomics to return.
+- * @return The number of atomics returned.
+- */
+-ringb_size_t ringb_pull( s_ringb_t *ps_rb, ringb_atom_t* p_data,
+-                         ringb_size_t sz_len );
+-/**
+- * Peeks a ring buffer, i.e. returns an element without removing it.
+- * @param ps_buf The buffer from which the data should be returned.
+- * @param p_data A pointer to the location at which the data should be placed.
+- * @param index The index to peek.
+- * @return 1 if data was returned; 0 otherwise.
+- */
+-uint8_t ringb_peek( s_ringb_t *ps_rb, ringb_atom_t *data, ringb_size_t index );
+-
+-/**
+- * Returns whether a ring buffer is empty.
+- * @param ps_buf The buffer for which it should be returned whether it is empty.
+- * @return 1 if empty; 0 otherwise.
+- */
+-inline uint8_t ringb_empty( s_ringb_t* ps_rb )
+-{
+-    return ( ps_rb->sz_head == ps_rb->sz_tail );
+-}
+-
+-/**
+- * Returns the number of items in a ring buffer.
+- * @param ps_buf The buffer for which the number of items should be returned.
+- * @return The number of items in the ring buffer.
+- */
+-inline uint8_t ringb_full( s_ringb_t* ps_rb )
+-{
+-    return ( ( ps_rb->sz_head - ps_rb->sz_tail ) & RB_MASK ) == RB_MASK;
+-}
+-
+-/**
+- * Returns whether a ring buffer is full.
+- * @param ps_buf The buffer for which it should be returned whether it is full.
+- * @return 1 if full; 0 otherwise.
+- */
+-inline uint8_t ringb_items( s_ringb_t* ps_rb )
+-{
+-    return ( ( ps_rb->sz_head - ps_rb->sz_tail ) & RB_MASK );
+-}
+-
+-#endif /* RINGBUFFER_H */
+diff --git a/utils/inc/timer.h b/utils/inc/timer.h
+index ca34bf5..ac1e354 100644
+--- a/utils/inc/timer.h
++++ b/utils/inc/timer.h
+@@ -84,7 +84,7 @@
+  * A timer.
+  *
+  * This structure is used for declaring a timer. The timer must be set
+- * with timer_set() before it can be used.
++ * with timer_emb6_set() before it can be used.
+  *
+  * \hideinitializer
+  */
+@@ -93,7 +93,7 @@ struct timer {
+   clock_time_t interval;
+ };
+
+-void timer_set(struct timer *t, clock_time_t interval);
++void timer_emb6_set(struct timer *t, clock_time_t interval);
+ void timer_reset(struct timer *t);
+ void timer_restart(struct timer *t);
+ int timer_expired(struct timer *t);
+diff --git a/utils/src/ctimer.c b/utils/src/ctimer.c
+index 9ef215e..9e0f465 100644
+--- a/utils/src/ctimer.c
++++ b/utils/src/ctimer.c
+@@ -66,7 +66,7 @@
+ #include "evproc.h"
+ #include "ctimer.h"
+ #include "timer.h"
+-#include "clist.h"
++#include "emb6_clist.h"
+
+ /*==============================================================================
+                              LOCAL MACROS
+@@ -143,7 +143,7 @@ void ctimer_set(struct ctimer *c, clock_time_t t,
+         c->etimer.timer.interval = t;
+     }
+
+-    list_add(gp_ctimList, c);
++    emb6_list_add(gp_ctimList, c);
+ }
+ /*============================================================================*/
+ /*  ctimer_reset()                                                     */
+@@ -155,7 +155,7 @@ void ctimer_reset(struct ctimer *c)
+   }
+
+   list_remove(gp_ctimList, c);
+-  list_add(gp_ctimList, c);
++  emb6_list_add(gp_ctimList, c);
+ }
+ /*============================================================================*/
+ /*  ctimer_restart()                                                     */
+@@ -167,7 +167,7 @@ void ctimer_restart(struct ctimer *c)
+   }
+
+   list_remove(gp_ctimList, c);
+-  list_add(gp_ctimList, c);
++  emb6_list_add(gp_ctimList, c);
+ }
+ /*============================================================================*/
+ /*  ctimer_stop()                                                     */
+diff --git a/utils/src/etimer.c b/utils/src/etimer.c
+index e29c533..4661ab0 100644
+--- a/utils/src/etimer.c
++++ b/utils/src/etimer.c
+@@ -62,7 +62,7 @@
+ ==============================================================================*/
+
+ #include "etimer.h"
+-#include "clist.h"
++#include "emb6_clist.h"
+
+ #include "emb6_conf.h"
+ #include "emb6.h"
+@@ -98,7 +98,7 @@ static     char         gc_init = 0;
+ static void _etimer_addTimer(struct etimer *pst_timer)
+ {
+     list_remove(gp_etimList, pst_timer);
+-    list_add(gp_etimList, pst_timer);
++    emb6_list_add(gp_etimList, pst_timer);
+     pst_timer->active = TMR_ACTIVE;
+ }
+
+@@ -164,7 +164,7 @@ void etimer_request_poll(void)
+ /*============================================================================*/
+ void etimer_set(struct etimer *pst_et, clock_time_t l_interval, pfn_callback_t pfn_callback)
+ {
+-    timer_set(&pst_et->timer, l_interval);
++    timer_emb6_set(&pst_et->timer, l_interval);
+     _etimer_addTimer(pst_et);
+     evproc_regCallback(EVENT_TYPE_TIMER_EXP, pfn_callback);
+     LOG_INFO("add new timer %p\n\r",pst_et);
+diff --git a/utils/src/evproc.c b/utils/src/evproc.c
+index 585b027..9544f0f 100644
+--- a/utils/src/evproc.c
++++ b/utils/src/evproc.c
+@@ -62,7 +62,7 @@
+
+ #include "bsp.h"
+ #include "evproc.h"
+-#include "clist.h"
++#include "emb6_clist.h"
+ #include "logger.h"
+
+ /*==============================================================================
+diff --git a/utils/src/list.c b/utils/src/list.c
+index 38d006f..d6fedd8 100644
+--- a/utils/src/list.c
++++ b/utils/src/list.c
+@@ -46,7 +46,7 @@
+  *
+  */
+
+-#include "clist.h"
++#include "emb6_clist.h"
+
+ #define NULL 0
+
+@@ -141,7 +141,7 @@ list_tail(list_t list)
+  *
+  */
+ void
+-list_add(list_t list, void *item)
++emb6_list_add(list_t list, void *item)
+ {
+   struct list *l;
+
+diff --git a/utils/src/mmem.c b/utils/src/mmem.c
+index 795af1d..f2e3ddc 100644
+--- a/utils/src/mmem.c
++++ b/utils/src/mmem.c
+@@ -45,7 +45,7 @@
+
+
+ #include "mmem.h"
+-#include "clist.h"
++#include "emb6_clist.h"
+ //#include "lib_conf.h"
+ #include <string.h>
+
+@@ -89,7 +89,7 @@ mmem_alloc(struct mmem *m, unsigned int size)
+
+   /* We had enough memory so we add this memory block to the end of
+      the list of allocated memory blocks. */
+-  list_add(mmemlist, m);
++  emb6_list_add(mmemlist, m);
+
+   /* Set up the pointer so that it points to the first available byte
+      in the memory block. */
+diff --git a/utils/src/queuebuf.c b/utils/src/queuebuf.c
+index 7a9f13f..8b96816 100644
+--- a/utils/src/queuebuf.c
++++ b/utils/src/queuebuf.c
+@@ -128,7 +128,7 @@ static struct ctimer renew_timer;
+ #endif
+
+ #if QUEUEBUF_DEBUG
+-#include "clist.h"
++#include "emb6_clist.h"
+ LIST(queuebuf_list);
+ #endif /* QUEUEBUF_DEBUG */
+
+@@ -349,7 +349,7 @@ queuebuf_new_from_packetbuf(void)
+     buf = memb_alloc(&bufmem);
+     if(buf != NULL) {
+ #if QUEUEBUF_DEBUG
+-      list_add(queuebuf_list, buf);
++      emb6_list_add(queuebuf_list, buf);
+       buf->file = file;
+       buf->line = line;
+       buf->time = clock_time();
+diff --git a/utils/src/random.c b/utils/src/random.c
+index 72f5d12..00aed18 100644
+--- a/utils/src/random.c
++++ b/utils/src/random.c
+@@ -36,7 +36,7 @@
+  */
+
+
+-#include "random.h"
++#include "emb6_random.h"
+
+ #include <stdlib.h>
+
+diff --git a/utils/src/ringbuffer.c b/utils/src/ringbuffer.c
+index 5736f8f..52216c5 100644
+--- a/utils/src/ringbuffer.c
++++ b/utils/src/ringbuffer.c
+@@ -24,7 +24,7 @@
+  */
+ /*============================================================================*/
+
+-#include "ringbuffer.h"
++#include "emb6_ringbuffer.h"
+ /**
+  * @file
+  * Implementation of ring ac_buf functions.
+diff --git a/utils/src/timer.c b/utils/src/timer.c
+index 95c8426..a774c09 100644
+--- a/utils/src/timer.c
++++ b/utils/src/timer.c
+@@ -61,7 +61,7 @@
+  * \param interval The interval before the timer expires.
+  *
+  */
+-void timer_set(struct timer *t, clock_time_t interval)
++void timer_emb6_set(struct timer *t, clock_time_t interval)
+ {
+     t->interval = interval;
+     t->start = bsp_getTick();
+@@ -71,7 +71,7 @@ void timer_set(struct timer *t, clock_time_t interval)
+  * Reset the timer with the same interval.
+  *
+  * This function resets the timer with the same interval that was
+- * given to the timer_set() function. The start point of the interval
++ * given to the timer_emb6_set() function. The start point of the interval
+  * is the exact time that the timer last expired. Therefore, this
+  * function will cause the timer to be stable over time, unlike the
+  * timer_restart() function.
+@@ -89,7 +89,7 @@ void timer_reset(struct timer *t)
+  * Restart the timer from the current point in time
+  *
+  * This function restarts a timer with the same interval that was
+- * given to the timer_set() function. The timer will start at the
++ * given to the timer_emb6_set() function. The timer will start at the
+  * current time.
+  *
+  * \note A periodic timer will drift if this function is used to reset
+--
+1.9.1
+
