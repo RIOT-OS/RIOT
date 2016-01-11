@@ -28,6 +28,9 @@ cachegrind.out*
 tags
 # GDB initialization scripts
 .gdbinit
+# Python files
+*.pyo
+__pycache__
 
 # Eclipse symbol file (output from make eclipsesym)
 eclipsesym.xml
