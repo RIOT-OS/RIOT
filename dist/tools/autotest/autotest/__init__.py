@@ -40,21 +40,14 @@ class Board(object):
 class TestCase(object):
     def __init__(self, name, build_strategy = None, test_strategy = None):
         self.name = name
-        if build_strategy:
-            self.build_action = build_strategy
-        else:
-            self.build_action = None
-
-        if test_strategy:
-            self.test_action = test_strategy
-        else:
-            self.test_action = None
+        self.build_action = build_strategy
+        self.test_action = test_strategy
 
     def build(self):
         if self.build_action:
             print(' - {} '.format(colorize('Building', TermColor.purple)), end='')
             if self.build_action.build(self.name):
-                print('{}'.format(colorize('successfull', TermColor.green)))
+                print('{}'.format(colorize('successful', TermColor.green)))
                 return True
             else:
                 print('{}'.format(colorize('failed', TermColor.red)))
@@ -64,7 +57,7 @@ class TestCase(object):
         if self.test_action:
             print(' - {} '.format(colorize('Testing', TermColor.purple)), end='')
             if self.test_action.test(self.name):
-                print('{}'.format(colorize('successfull', TermColor.green)))
+                print('{}'.format(colorize('successful', TermColor.green)))
                 return True
             else:
                 print('{}'.format(colorize('failed', TermColor.red)))

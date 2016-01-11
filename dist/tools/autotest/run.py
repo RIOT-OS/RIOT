@@ -19,12 +19,14 @@ TEST_CASES = [
         ('fmt_print', BOARDS, DefaultBuildStrategy, DefaultTestStrategy),
     ]
 
+def run_test(name, boards, build_strategy = None, test_strategy = None):
+    tc = autotest.TestCase(name, build_strategy(boards) if build_strategy else None,
+                           test_strategy(boards) if test_strategy else None)
+    tc.execute()
+
 def run_tests(tests):
     for test in tests:
-        tc = autotest.TestCase(test[0],
-                               build_strategy=test[2](test[1]) if test[2] else None,
-                               test_strategy=test[3](test[1]) if test[3] else None)
-        tc.execute()
+        run_test(*test)
 
 if __name__ == '__main__':
     run_tests(TEST_CASES)

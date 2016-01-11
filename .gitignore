@@ -29,6 +29,8 @@ tags
 # GDB initialization scripts
 .gdbinit
 # Python files
+*.pyc
+*.pyd
 *.pyo
 __pycache__
 
