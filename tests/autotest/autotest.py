@@ -21,19 +21,21 @@ def colorize(string, color):
     return '%s%s%s' % (color, string, Termcolor.end)
 
 class TestCase:
-    def __init__(self, test_name=None, build_strategy=None, test_strategy=None):
+    def __init__(self, test_name=None,
+                 build_strategy=None, build_options=None,
+                 test_strategy=None, test_options=None):
         self.test_name = test_name
         self.build_action = None
         self.test_action = None
         if build_strategy:
-            self.build_action = build_strategy()
+            self.build_action = build_strategy(build_options)
         if test_strategy:
-            self.test_action = test_strategy()
+            self.test_action = test_strategy(test_options)
 
     def build(self, board):
         if self.build_action:
             print('Building: {} '.format(colorize(self.test_name, Termcolor.blue)), end='')
-            if self.build_action.build(self.test_name, board):
+            if self.build_action.build(self.test_name, self.build_action.options):
                 print('{}'.format(colorize('successfull', Termcolor.green)))
             else:
                 print('{}'.format(colorize('failed', Termcolor.red)))
@@ -42,7 +44,7 @@ class TestCase:
     def test(self, board):
         if self.test_action:
             print('Testing: {} '.format(colorize(self.test_name, Termcolor.blue)), end='')
-            if self.test_action.test(self.test_name, board):
+            if self.test_action.test(self.test_name, self.test_action.options):
                 print('{}'.format(colorize('successfull', Termcolor.green)))
             else:
                 print('{}'.format(colorize('failed', Termcolor.red)))
@@ -55,7 +57,9 @@ class TestCase:
 
 def run_tests(tests):
     for test in tests:
-        tc = TestCase(test_name=test[0], build_strategy=test[2], test_strategy=test[3])
+        tc = TestCase(test_name=test[0],
+                      build_strategy=test[1], build_options=test[2],
+                      test_strategy=test[3], test_options=test[4])
         tc.execute(test[1])
 
 if __name__ == '__main__':

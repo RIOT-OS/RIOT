@@ -10,9 +10,11 @@
 from defaultAutoTest import DefaultBuildStrategy
 from defaultAutoTest import DefaultTestStrategy
 
+defaultOptions = { 'board' : 'native' }
+
 tests = [
-        ('bitarithm_timings', 'native', DefaultBuildStrategy, None),
-        ('bloom_bytes', 'native', DefaultBuildStrategy, DefaultTestStrategy),
-        ('coap', 'native', DefaultBuildStrategy, None),
-        ('fmt_print', 'native', DefaultBuildStrategy, DefaultTestStrategy),
+        ('bitarithm_timings', DefaultBuildStrategy, defaultOptions, None, None),
+        ('bloom_bytes', DefaultBuildStrategy, defaultOptions, DefaultTestStrategy, defaultOptions),
+        ('coap', DefaultBuildStrategy, defaultOptions, None, None),
+        ('fmt_print', DefaultBuildStrategy, defaultOptions, DefaultTestStrategy, defaultOptions),
         ]

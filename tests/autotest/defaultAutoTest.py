@@ -14,9 +14,12 @@ from subprocess import CalledProcessError
 import shlex
 
 class DefaultBuildStrategy:
-    def build(self, test_name, board):
+    def __init__(self, options=None):
+        self.options = options
+
+    def build(self, test_name, options):
         try:
-            cmd = 'make -C ../{0} -B clean all BOARD={1}'.format(test_name, board)
+            cmd = 'make -C ../{0} -B clean all BOARD={1}'.format(test_name, options['board'])
             print('({}) '.format(cmd), end='')
             make = check_output(shlex.split(cmd), universal_newlines=True, stderr=STDOUT)
             return True
@@ -26,11 +29,14 @@ class DefaultBuildStrategy:
             return False
 
 class DefaultTestStrategy:
-    def test(self, test_name, board):
+    def __init__(self, options=None):
+        self.options = options
+
+    def test(self, test_name, options):
         flash = ''
-        if not board == 'native':
+        if not options['board'] == 'native':
             flash = 'flash '
-        cmd = 'make -C ../{0} {1}term BOARD={2}'.format(test_name, flash, board)
+        cmd = 'make -C ../{0} {1}term BOARD={2}'.format(test_name, flash, options['board'])
         print('({}) '.format(cmd), end='')
         make = pexpect.spawn(cmd)
         if make.expect([pexpect.TIMEOUT, "TEST: SUCCESS"], timeout=60) != 0:
