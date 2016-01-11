@@ -14,6 +14,9 @@ from subprocess import check_output, STDOUT, CalledProcessError
 import os
 import shlex
 
+RIOT_BASE = '../../../'
+TESTS_BASE = RIOT_BASE + 'tests/'
+
 DEFAULT_TIMEOUT = 60
 
 class DefaultBuildStrategy(object):
@@ -24,7 +27,7 @@ class DefaultBuildStrategy(object):
         for board in self.boards:
             env = os.environ.copy()
             env.update(board.to_env())
-            cmd = 'make -C ../%s -B clean flash' % name
+            cmd = 'make -C %s%s -B clean flash' % (TESTS_BASE, name)
             print('(%s) ' % cmd, end='')
             try:
                 out = check_output(shlex.split(cmd), env=env,
@@ -42,7 +45,7 @@ class DefaultTestStrategy(object):
         for board in self.boards:
             env = os.environ.copy()
             env.update(board.to_env())
-            cmd = 'make -C ../%s term' % name
+            cmd = 'make -C %s%s term' % (TESTS_BASE, name)
             print('(%s) ' % cmd, end='')
             child  = pexpect.spawn(cmd, env=env, timeout=DEFAULT_TIMEOUT)
             try:
