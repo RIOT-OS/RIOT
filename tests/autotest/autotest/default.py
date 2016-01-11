@@ -14,7 +14,7 @@ from subprocess import check_output, STDOUT, CalledProcessError
 import os
 import shlex
 
-DEFAULT_TIMEOUT = 5
+DEFAULT_TIMEOUT = 60
 
 class DefaultBuildStrategy(object):
     def __init__(self, boards):
