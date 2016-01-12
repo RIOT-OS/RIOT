@@ -16,7 +16,7 @@ import shlex
 
 MOD_PATH = os.path.dirname(__file__) + ''
 RIOT_BASE = os.path.realpath(os.path.join(MOD_PATH ,'../../../..'))
-TESTS_BASE = os.path.join(RIOT_BASE, 'tests/')
+TESTS_BASE = os.path.join(RIOT_BASE, 'tests')
 
 DEFAULT_TIMEOUT = 60
 
@@ -28,7 +28,7 @@ class DefaultBuildStrategy(object):
         for board in self.boards:
             env = os.environ.copy()
             env.update(board.to_env())
-            cmd = 'make -C %s%s -B clean flash' % (TESTS_BASE, name)
+            cmd = 'make -C %s -B clean flash' % os.path.join(TESTS_BASE, name)
             print('(%s) ' % cmd, end='')
             sys.stdout.flush()
             try:
@@ -47,7 +47,7 @@ class DefaultTestStrategy(object):
         for board in self.boards:
             env = os.environ.copy()
             env.update(board.to_env())
-            cmd = 'make -C %s%s term' % (TESTS_BASE, name)
+            cmd = 'make -C %s term' % os.path.join(TESTS_BASE, name)
             print('(%s) ' % cmd, end='')
             sys.stdout.flush()
             child  = pexpect.spawn(cmd, env=env, timeout=DEFAULT_TIMEOUT)
