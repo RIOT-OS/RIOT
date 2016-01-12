@@ -42,6 +42,15 @@ struct conn_ip;
 typedef struct conn_ip conn_ip_t;
 
 /**
+ * @brief   Event callback for asynchronous communication
+ *
+ * @param[in] conn  A raw IPv4/IPv6 connection object.
+ * @param[in] event Event type.
+ * @param[in] len   Length of event related data.
+ */
+typedef void (*conn_ip_cb_t)(conn_ip_t *conn, conn_event_t event, unsigned int len);
+
+/**
  * @brief   Creates a new raw IPv4/IPv6 connection object
  *
  * @param[out] conn     Preallocated connection object. Must fill the size of the stack-specific
@@ -56,6 +65,14 @@ typedef struct conn_ip conn_ip_t;
  *          draw inspiration of the errno values from the POSIX' bind() function specification.
  */
 int conn_ip_create(conn_ip_t *conn, const void *addr, size_t addr_len, int family, int proto);
+
+/**
+ * @brief   Sets an event callback for a raw IPv4/IPv6 connection
+ *
+ * @param[in] conn  A raw IPv4/IPv6 connection object.
+ * @param[in] cb    Externally defined event callback. May be NULL to unset.
+ */
+void conn_ip_set_cb(conn_ip_t *conn, conn_ip_cb_t *cb);
 
 /**
  * @brief   Closes a raw IPv4/IPv6 connection

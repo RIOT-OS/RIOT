@@ -23,6 +23,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#include "net/conn/types.h"
+
 #ifdef MODULE_GNRC_CONN_UDP
 #include "net/gnrc/conn.h"
 #endif
@@ -42,6 +44,15 @@ struct conn_udp;
 typedef struct conn_udp conn_udp_t;
 
 /**
+ * @brief   Event callback for asynchronous communication
+ *
+ * @param[in] conn  A UDP connection object.
+ * @param[in] event Event type.
+ * @param[in] len   Length of event related data.
+ */
+typedef void (*conn_udp_cb_t)(conn_udp_t *conn, conn_event_t event, unsigned int len);
+
+/**
  * @brief   Creates a new UDP connection object
  *
  * @param[out] conn     Preallocated connection object. Must fill the size of the stack-specific
@@ -57,6 +68,14 @@ typedef struct conn_udp conn_udp_t;
  */
 int conn_udp_create(conn_udp_t *conn, const void *addr, size_t addr_len, int family,
                     uint16_t port);
+
+/**
+ * @brief   Sets an event callback for a UDP connection
+ *
+ * @param[in] conn  A UDP connection object.
+ * @param[in] cb    Externally defined event callback. May be NULL to unset.
+ */
+void conn_udp_set_cb(conn_ip_t *conn, conn_ip_cb_t *cb);
 
 /**
  * @brief   Closes a UDP connection
