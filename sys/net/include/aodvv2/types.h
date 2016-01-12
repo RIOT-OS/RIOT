@@ -21,6 +21,7 @@
 #define AODVV2_TYPES_H
 
 #include "common/netaddr.h"
+#include "timex.h"
 
 #ifdef __cplusplus
 extern "C" {
