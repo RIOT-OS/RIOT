@@ -30,6 +30,7 @@ class DefaultBuildStrategy(object):
             env.update(board.to_env())
             cmd = 'make -C %s%s -B clean flash' % (TESTS_BASE, name)
             print('(%s) ' % cmd, end='')
+            sys.stdout.flush()
             try:
                 out = check_output(shlex.split(cmd), env=env,
                                    universal_newlines=True, stderr=STDOUT)
@@ -48,6 +49,7 @@ class DefaultTestStrategy(object):
             env.update(board.to_env())
             cmd = 'make -C %s%s term' % (TESTS_BASE, name)
             print('(%s) ' % cmd, end='')
+            sys.stdout.flush()
             child  = pexpect.spawn(cmd, env=env, timeout=DEFAULT_TIMEOUT)
             try:
                 child.expect("TEST: SUCCESS")
