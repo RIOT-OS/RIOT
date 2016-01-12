@@ -101,14 +101,12 @@ int conn_ip_recvfrom(conn_ip_t *conn, void *data, size_t max_len, void *addr, si
 /**
  * @brief   Sends a message over IPv4/IPv6
  *
- * @param[in] data      Pointer where the received data should be stored.
- * @param[in] len       Maximum space available at @p data.
- * @param[in] src       The source address. May be NULL for all any interface address.
- * @param[in] src_len   Length of @p src.
+ * @param[in] conn      A raw IPv4/IPv6 connection object.
+ * @param[in] data      Data to send.
+ * @param[in] len       Length of @p data.
+ * @param[in] max_len   Maximum space available at @p data.
  * @param[in] dst       The receiver's network address.
  * @param[in] dst_len   Length of @p dst.
- * @param[in] family    The family of @p src and @p dst (see @ref net_af).
- * @param[in] proto     @ref net_protnum for the IPv6 packets to set.
  *
  * @note    Function may block.
  *
@@ -117,8 +115,7 @@ int conn_ip_recvfrom(conn_ip_t *conn, void *data, size_t max_len, void *addr, si
  *          draw inspiration of the errno values from the POSIX' send(), sendfrom(), or sendmsg()
  *          function specification.
  */
-int conn_ip_sendto(const void *data, size_t len, const void *src, size_t src_len,
-                   void *dst, size_t dst_len, int family, int proto);
+int conn_ip_sendto(conn_ip_t *conn, const void *data, size_t len, void *dst, size_t dst_len);
 
 #ifdef __cplusplus
 }
