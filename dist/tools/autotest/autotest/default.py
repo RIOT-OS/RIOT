@@ -11,11 +11,12 @@
 from __future__ import print_function
 import pexpect
 from subprocess import check_output, STDOUT, CalledProcessError
-import os
+import os, sys
 import shlex
 
-RIOT_BASE = '../../../'
-TESTS_BASE = RIOT_BASE + 'tests/'
+MOD_PATH = os.path.dirname(__file__) + ''
+RIOT_BASE = os.path.realpath(os.path.join(MOD_PATH ,'../../../..'))
+TESTS_BASE = os.path.join(RIOT_BASE, 'tests/')
 
 DEFAULT_TIMEOUT = 60
 
