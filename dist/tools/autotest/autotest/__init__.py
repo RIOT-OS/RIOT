@@ -32,7 +32,7 @@ class TestCase(object):
 
     def build(self):
         if self.build_action:
-            print(' - {} '.format(colorize('Building', TermColor.purple)), end='')
+            print(' - {}'.format(colorize('Building: ', TermColor.purple)), end='')
             if self.build_action.build(self.name):
                 print('{}'.format(colorize('successful', TermColor.green)))
                 return True
@@ -42,7 +42,7 @@ class TestCase(object):
 
     def test(self):
         if self.test_action:
-            print(' - {} '.format(colorize('Testing', TermColor.purple)), end='')
+            print(' - {}'.format(colorize('Testing: ', TermColor.purple)), end='')
             if self.test_action.test(self.name):
                 print('{}'.format(colorize('successful', TermColor.green)))
                 return True
