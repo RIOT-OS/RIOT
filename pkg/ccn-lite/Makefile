@@ -12,8 +12,8 @@ endif
 export RIOT_CFLAGS = ${CFLAGS} ${INCLUDES}
 
 all: $(PKG_DIR)/Makefile
-	"$(MAKE)" -C $(PKG_DIR)/src lib-ccn-lite.a
-	"$(MAKE)" -C $(PKG_DIR)/src lib-ccn-lite-utils.a
+	"$(MAKE)" -BC $(PKG_DIR)/src lib-ccn-lite.a
+	"$(MAKE)" -BC $(PKG_DIR)/src lib-ccn-lite-utils.a
 	cp $(PKG_DIR)/src/lib-ccn-lite.a ${BINDIR}/ccn-lite.a
 	cp $(PKG_DIR)/src/lib-ccn-lite-utils.a ${BINDIR}/ccn-lite-utils.a
 
