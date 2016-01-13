@@ -11,11 +11,12 @@
 from __future__ import print_function
 import pexpect
 from subprocess import check_output, STDOUT, CalledProcessError
-import os
+import os, sys
 import shlex
 
-RIOT_BASE = '../../../'
-TESTS_BASE = RIOT_BASE + 'tests/'
+MOD_PATH = os.path.dirname(__file__) + ''
+RIOT_BASE = os.path.realpath(os.path.join(MOD_PATH ,'../../../..'))
+TESTS_BASE = os.path.join(RIOT_BASE, 'tests')
 
 DEFAULT_TIMEOUT = 60
 
@@ -27,8 +28,9 @@ class DefaultBuildStrategy(object):
         for board in self.boards:
             env = os.environ.copy()
             env.update(board.to_env())
-            cmd = 'make -C %s%s -B clean flash' % (TESTS_BASE, name)
+            cmd = 'make -C %s -B clean flash' % os.path.join(TESTS_BASE, name)
             print('(%s) ' % cmd, end='')
+            sys.stdout.flush()
             try:
                 out = check_output(shlex.split(cmd), env=env,
                                    universal_newlines=True, stderr=STDOUT)
@@ -45,8 +47,9 @@ class DefaultTestStrategy(object):
         for board in self.boards:
             env = os.environ.copy()
             env.update(board.to_env())
-            cmd = 'make -C %s%s term' % (TESTS_BASE, name)
+            cmd = 'make -C %s term' % os.path.join(TESTS_BASE, name)
             print('(%s) ' % cmd, end='')
+            sys.stdout.flush()
             child  = pexpect.spawn(cmd, env=env, timeout=DEFAULT_TIMEOUT)
             try:
                 child.expect("TEST: SUCCESS")
