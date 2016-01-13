@@ -79,6 +79,8 @@ void gnrc_netreg_init(void);
  * @warning Call gnrc_netreg_unregister() *before* you leave the context you
  *          allocated @p entry in. Otherwise it might get overwritten.
  *
+ * @pre The calling thread must provide a message queue.
+ *
  * @return  0 on success
  * @return  -EINVAL if @p type was < GNRC_NETTYPE_UNDEF or >= GNRC_NETTYPE_NUMOF
  */

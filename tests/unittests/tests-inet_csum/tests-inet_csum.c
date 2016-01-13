@@ -121,6 +121,50 @@ static void test_inet_csum__odd_len(void)
     TEST_ASSERT_EQUAL_INT(0xffff, inet_csum(17 + 39, data, sizeof(data)));
 }
 
+static void test_inet_csum__two_app_snips(void)
+{
+    /* CoAP header with Uri-Path and Content-Format options; odd length */
+    uint8_t data_hdr[] = {
+        0x50, 0x02, 0x00, 0x01, 0xb4, 0x74, 0x65, 0x73,
+        0x74, 0x10, 0xff,
+    };
+    /* Single character payload, 'a' */
+    uint8_t data_pyld[] = {
+        0x61,
+    };
+    uint16_t hdr_sum, pyld_sum, hdr_expected = 0xdcfc;
+
+    /* result unnormalized:
+     * initial sum (0) is arbitrary, and incoming length (0) must be even;
+     * we expect last byte is shifted left for this odd-sized header  */
+    hdr_sum = inet_csum_slice(0, data_hdr, sizeof(data_hdr), 0);
+    TEST_ASSERT_EQUAL_INT(hdr_expected, hdr_sum);
+
+    /* Since header was odd length, we expect the single byte in the payload
+     * snip is not shifted left */
+    pyld_sum = inet_csum_slice(hdr_expected, data_pyld, sizeof(data_pyld), sizeof(data_hdr));
+    TEST_ASSERT_EQUAL_INT(hdr_expected + 0x61, pyld_sum);
+}
+
+static void test_inet_csum__empty_app_buffer(void)
+{
+    /* CoAP header with Uri-Path and Content-Format options; odd length */
+    uint8_t data_hdr[] = {
+        0x50, 0x02, 0x00, 0x01, 0xb4, 0x74, 0x65, 0x73,
+        0x74, 0x10, 0xff,
+    };
+    uint16_t hdr_sum, pyld_sum, hdr_expected = 0xdcfc;
+
+    /* result unnormalized:
+     * explictly using an odd-sized header for the first slice, to setup corner case  */
+    hdr_sum = inet_csum_slice(0, data_hdr, sizeof(data_hdr), 0);
+    TEST_ASSERT_EQUAL_INT(hdr_expected, hdr_sum);
+
+    /* expect an empty buffer simply to reflect the incoming checksum */
+    pyld_sum = inet_csum_slice(hdr_expected, NULL, 0, sizeof(data_hdr));
+    TEST_ASSERT_EQUAL_INT(hdr_expected, pyld_sum);
+}
+
 Test *tests_inet_csum_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -130,6 +174,8 @@ Test *tests_inet_csum_tests(void)
         new_TestFixture(test_inet_csum__wraps_more_than_once),
         new_TestFixture(test_inet_csum__calculate_csum),
         new_TestFixture(test_inet_csum__odd_len),
+        new_TestFixture(test_inet_csum__two_app_snips),
+        new_TestFixture(test_inet_csum__empty_app_buffer),
     };
 
     EMB_UNIT_TESTCALLER(inet_csum_tests, NULL, NULL, fixtures);

@@ -78,31 +78,25 @@ static inline uint32_t div_u32_by_15625div512(uint32_t val)
 }
 
 /**
- * @brief Integer divide val by 10
+ * @brief Integer divide val by 44488
  *
- * @param[in]   n     dividend
- * @return      (n / 10)
+ * @param[in]   val     dividend
+ * @return      (val / 44488)
  */
-static inline uint32_t div_u32_by_10(uint32_t n) {
-    uint32_t q, r;
-    q = (n >> 1) + (n >> 2);
-    q = q + (q >> 4);
-    q = q + (q >> 8);
-    q = q + (q >> 16);
-    q = q >> 3;
-    r = n - (((q << 2) + q) << 1);
-    return q + (r > 9);
+static inline uint32_t div_u32_by_44488(uint32_t val)
+{
+    return ((uint64_t)val * 0xBC8F1391UL) >> (15 + 32);
 }
 
 /**
- * @brief Modulo 10
+ * @brief Modulo 44488
  *
- * @param[in]   n     dividend
- * @return      (n % 10)
+ * @param[in]   val     dividend
+ * @return      (val % 44488)
  */
-static inline uint32_t div_u32_mod_10(uint32_t n)
+static inline uint32_t div_u32_mod_44488(uint32_t val)
 {
-    return n - (div_u32_by_10(n)*10);
+    return val - (div_u32_by_44488(val)*44488);
 }
 
 #ifdef __cplusplus

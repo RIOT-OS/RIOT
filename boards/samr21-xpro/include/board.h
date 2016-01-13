@@ -42,38 +42,25 @@ extern "C" {
 #define XTIMER_CHAN         (0)
 
 /**
-* @name AT86RF233 configuration
-* @{
-*/
-#define AT86RF233_SPI       (SPI_0)
-#define AT86RF233_CS        GPIO_PIN(PB, 31)
-#define AT86RF233_INT       GPIO_PIN(PB, 0)
-#define AT86RF233_RESET     GPIO_PIN(PB, 15)
-#define AT86RF233_SLEEP     GPIO_PIN(PA, 20)
-#define AT86RF233_SPI_CLK   (SPI_SPEED_1MHZ)
-/** @}*/
-
-/**
-* @name AT86RF231 config
-* @{
-*/
-#define AT86RF231_SPI       SPI_0
-#define AT86RF231_CS        GPIO_PIN(PB, 31)
-#define AT86RF231_INT       GPIO_PIN(PB, 0)
-#define AT86RF231_RESET     GPIO_PIN(PB, 15)
-#define AT86RF231_SLEEP     GPIO_PIN(PA, 20)
-
-#define AT86RF231_SPI_SPEED SPI_SPEED_1MHZ
-/** @} */
-
-/**
  * @name Define UART device and baudrate for stdio
  * @{
  */
-#define STDIO               UART_0
+#define STDIO               UART_DEV(0)
 #define STDIO_BAUDRATE      (115200U)
 #define STDIO_RX_BUFSIZE    (64U)
 /** @} */
+
+/**
+ * @name AT86RF233 configuration
+ *
+ * {spi bus, spi speed, cs pin, int pin, reset pin, sleep pin}
+ */
+#define AT86RF2XX_PARAMS_BOARD      {.spi = SPI_0, \
+                                     .spi_speed = SPI_SPEED_5MHZ, \
+                                     .cs_pin = GPIO_PIN(PB, 31), \
+                                     .int_pin = GPIO_PIN(PB, 0), \
+                                     .sleep_pin = GPIO_PIN(PA, 20), \
+                                     .reset_pin = GPIO_PIN(PB, 15)}
 
 /**
  * @name LED pin definitions
@@ -81,6 +68,7 @@ extern "C" {
  */
 #define LED_PORT            PORT->Group[0]
 #define LED_PIN             (19)
+#define LED_GPIO            GPIO_PIN(0, 19)
 /** @} */
 
 /**

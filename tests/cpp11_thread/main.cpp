@@ -122,9 +122,9 @@ int main() {
   puts("Testing sleep_for ...");
   {
     timex_t before, after;
-    vtimer_now(&before);
+    xtimer_now_timex(&before);
     this_thread::sleep_for(chrono::seconds(1));
-    vtimer_now(&after);
+    xtimer_now_timex(&after);
     auto diff = timex_sub(after, before);
     assert(diff.seconds >= 1);
   }
@@ -135,9 +135,9 @@ int main() {
   puts("Testing sleep_until ...");
   {
     timex_t before, after;
-    vtimer_now(&before);
+    xtimer_now_timex(&before);
     this_thread::sleep_until(riot::now() += chrono::seconds(1));
-    vtimer_now(&after);
+    xtimer_now_timex(&after);
     auto diff = timex_sub(after, before);
     assert(diff.seconds >= 1);
   }

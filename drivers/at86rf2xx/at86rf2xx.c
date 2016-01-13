@@ -148,7 +148,7 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_CTRL_2,
                         AT86RF2XX_TRX_CTRL_2_MASK__RX_SAFE_MODE);
 #ifdef MODULE_AT86RF212B
-    at86rf2xx_set_freq(dev, AT86RF2XX_FREQ_915MHZ);
+    at86rf2xx_set_page(dev, 0);
 #endif
 
     /* don't populate masked interrupt flags to IRQ_STATUS register */
@@ -220,13 +220,9 @@ void at86rf2xx_tx_prepare(at86rf2xx_t *dev)
     do {
         state = at86rf2xx_get_status(dev);
     }
-    while (state == AT86RF2XX_STATE_BUSY_TX_ARET);
-
-    /* if receiving cancel */
-    if(state == AT86RF2XX_STATE_BUSY_RX_AACK) {
-        at86rf2xx_force_trx_off(dev);
-        dev->idle_state = AT86RF2XX_STATE_RX_AACK_ON;
-    } else if (state != AT86RF2XX_STATE_TX_ARET_ON) {
+    while (state == AT86RF2XX_STATE_BUSY_RX_AACK ||
+           state == AT86RF2XX_STATE_BUSY_TX_ARET);
+    if (state != AT86RF2XX_STATE_TX_ARET_ON) {
         dev->idle_state = state;
     }
     at86rf2xx_set_state(dev, AT86RF2XX_STATE_TX_ARET_ON);

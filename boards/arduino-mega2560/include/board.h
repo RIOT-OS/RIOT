@@ -22,6 +22,7 @@
 #define BOARD_H_
 
 #include "cpu.h"
+#include "arduino_pinmap.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -21,22 +21,10 @@ ifneq (,$(filter lpc2387,$(USEMODULE)))
   SRC += sc_heap.c
 endif
 ifneq (,$(filter random,$(USEMODULE)))
-  SRC += sc_mersenne.c
+  SRC += sc_random.c
 endif
 ifeq ($(CPU),x86)
   SRC += sc_x86_lspci.c
-endif
-ifneq (,$(filter isl29020,$(USEMODULE)))
-  SRC += sc_isl29020.c
-endif
-ifneq (,$(filter lps331ap,$(USEMODULE)))
-  SRC += sc_lps331ap.c
-endif
-ifneq (,$(filter l3g4200d,$(USEMODULE)))
-  SRC += sc_l3g4200d.c
-endif
-ifneq (,$(filter lsm303dlhc,$(USEMODULE)))
-  SRC += sc_lsm303dlhc.c
 endif
 ifneq (,$(filter at30tse75x,$(USEMODULE)))
     SRC += sc_at30tse75x.c
@@ -53,11 +41,13 @@ endif
 ifneq (,$(filter gnrc_ipv6_whitelist,$(USEMODULE)))
   SRC += sc_whitelist.c
 endif
-ifneq (,$(filter gnrc_icmpv6_echo vtimer,$(USEMODULE)))
+ifneq (,$(filter gnrc_icmpv6_echo xtimer,$(USEMODULE)))
   SRC += sc_icmpv6_echo.c
 endif
-ifneq (,$(filter gnrc_zep ipv6_addr,$(USEMODULE)))
-  SRC += sc_zep.c
+ifneq (,$(filter gnrc_zep,$(USEMODULE)))
+  ifneq (,$(filter ipv6_addr,$(USEMODULE)))
+    SRC += sc_zep.c
+  endif
 endif
 ifneq (,$(filter gnrc_rpl,$(USEMODULE)))
     SRC += sc_gnrc_rpl.c
@@ -66,6 +56,12 @@ ifneq (,$(filter gnrc_sixlowpan_ctx,$(USEMODULE)))
 ifneq (,$(filter gnrc_sixlowpan_nd_border_router,$(USEMODULE)))
     SRC += sc_gnrc_6ctx.c
 endif
+endif
+ifneq (,$(filter saul_reg,$(USEMODULE)))
+  SRC += sc_saul_reg.c
+endif
+ifneq (,$(filter ccn-lite-utils,$(USEMODULE)))
+  SRC += sc_ccnl.c
 endif
 
 # TODO

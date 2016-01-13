@@ -1,3 +1,6 @@
+ifneq (,$(filter posix_semaphore,$(USEMODULE)))
+    DIRS += posix/semaphore
+endif
 ifneq (,$(filter posix_sockets,$(USEMODULE)))
     DIRS += posix/sockets
 endif
@@ -65,8 +68,15 @@ ifneq (,$(filter udp,$(USEMODULE)))
     DIRS += net/transport_layer/udp
 endif
 
+ifneq (,$(filter hamming256,$(USEMODULE)))
+    DIRS += ecc/hamming256
+endif
+
 ifneq (,$(filter netopt,$(USEMODULE)))
     DIRS += net/crosslayer/netopt
+endif
+ifneq (,$(filter sema,$(USEMODULE)))
+    DIRS += sema
 endif
 
 DIRS += $(dir $(wildcard $(addsuffix /Makefile, ${USEMODULE})))

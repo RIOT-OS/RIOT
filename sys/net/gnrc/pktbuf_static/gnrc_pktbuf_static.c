@@ -179,8 +179,10 @@ int gnrc_pktbuf_realloc_data(gnrc_pktsnip_t *pkt, size_t size)
         pkt->data = new_data;
     }
     else {
-        _pktbuf_free(((uint8_t *)pkt->data) + aligned_size,
-                     pkt->size - aligned_size);
+        if (_align(pkt->size) > aligned_size) {
+            _pktbuf_free(((uint8_t *)pkt->data) + aligned_size,
+                         pkt->size - aligned_size);
+        }
     }
     pkt->size = size;
     mutex_unlock(&_mutex);
@@ -272,7 +274,7 @@ gnrc_pktsnip_t *gnrc_pktbuf_get_iovec(gnrc_pktsnip_t *pkt, size_t *len)
 #ifdef MODULE_OD
 static inline void _print_chunk(void *chunk, size_t size, int num)
 {
-    printf("================ chunk %3d (size: %4u) ================\n", num,
+    printf("=========== chunk %3d (%-10p size: %4u) ===========\n", num, chunk,
            (unsigned int)size);
     od(chunk, size, OD_WIDTH_DEFAULT,
        OD_FLAGS_ADDRESS_HEX | OD_FLAGS_BYTES_HEX | OD_FLAGS_LENGTH_1);

@@ -77,8 +77,8 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-#ifndef _SCHEDULER_H
-#define _SCHEDULER_H
+#ifndef SCHEDULER_H
+#define SCHEDULER_H
 
 #include <stddef.h>
 #include "bitarithm.h"
@@ -193,5 +193,5 @@ void sched_register_cb(void (*callback)(uint32_t, uint32_t));
 }
 #endif
 
-#endif // _SCHEDULER_H
+#endif /* SCHEDULER_H */
 /** @} */

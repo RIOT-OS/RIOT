@@ -28,23 +28,22 @@
  * @{
  */
 static uart_rx_cb_t ctx_rx_cb;
-static uart_tx_cb_t ctx_tx_cb;
 static void *ctx_isr_arg;
 /** @} */
+
+static int init_base(uart_t uart, uint32_t baudrate);
 
 /* per default, we use the legacy MSP430 USART module for UART functionality */
 #ifndef UART_USE_USIC
 
-int uart_init(uart_t uart, uint32_t baudrate,
-              uart_rx_cb_t rx_cb, uart_tx_cb_t tx_cb, void *arg)
+int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 {
-    if (uart_init_blocking(uart, baudrate) < 0) {
+    if (init_base(uart, baudrate) < 0) {
         return -1;
     }
 
     /* save interrupt context */
     ctx_rx_cb = rx_cb;
-    ctx_tx_cb = tx_cb;
     ctx_isr_arg = arg;
     /* reset interrupt flags and enable RX interrupt */
     UART_IE &= ~(UART_IE_TX_BIT);
@@ -54,14 +53,14 @@ int uart_init(uart_t uart, uint32_t baudrate,
     return 0;
 }
 
-int uart_init_blocking(uart_t uart, uint32_t baudrate)
+static int init_base(uart_t uart, uint32_t baudrate)
 {
     if (uart != 0) {
         return -1;
     }
 
     /* get the default UART for now -> TODO: enable for multiple devices */
-    msp_usart_t *dev = UART_DEV;
+    msp_usart_t *dev = UART_BASE;
 
     /* power off and reset device */
     uart_poweroff(uart);
@@ -89,40 +88,15 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
     return 0;
 }
 
-void uart_tx_begin(uart_t uart)
+void uart_write(uart_t uart, const uint8_t *data, size_t len)
 {
     (void)uart;
+    msp_usart_t *dev = UART_BASE;
 
-    UART_IE |= UART_IE_TX_BIT;
-}
-
-int uart_write(uart_t uart, char data)
-{
-    (void)uart;
-    msp_usart_t *dev = UART_DEV;
-
-    dev->TXBUF = (uint8_t)data;
-    return 1;
-}
-
-int uart_write_blocking(uart_t uart, char data)
-{
-    (void)uart;
-    msp_usart_t *dev = UART_DEV;
-
-    while (!(dev->TCTL & USART_TCTL_TXEPT));
-    dev->TXBUF = (uint8_t)data;
-    return 1;
-}
-
-int uart_read_blocking(uart_t uart, char *data)
-{
-    (void)uart;
-    msp_usart_t *dev = UART_DEV;
-
-    while (!(UART_IF & UART_IE_RX_BIT));
-    *data = (char)dev->RXBUF;
-    return 1;
+    for (size_t i = 0; i < len; i++) {
+        while (!(dev->TCTL & USART_TCTL_TXEPT));
+        dev->TXBUF = data[i];
+    }
 }
 
 void uart_poweron(uart_t uart)
@@ -140,27 +114,11 @@ ISR(UART_RX_ISR, isr_uart_0_rx)
     __enter_isr();
 
     /* read character (resets interrupt flag) */
-    char c = UART_DEV->RXBUF;
+    char c = UART_BASE->RXBUF;
 
     /* only call callback if there was no receive error */
-    if(! (UART_DEV->RCTL & RXERR)) {
+    if(! (UART_BASE->RCTL & RXERR)) {
         ctx_rx_cb(ctx_isr_arg, c);
-    }
-
-    __exit_isr();
-}
-
-ISR(UART_TX_ISR, isr_uart_0_tx)
-{
-    __enter_isr();
-
-    if (UART_IF & UART_IE_TX_BIT) {
-        if (ctx_tx_cb(ctx_isr_arg) == 0) {
-            UART_IE &= ~(UART_IE_TX_BIT);
-        }
-        else {
-            UART_IF &= ~(UART_IE_TX_BIT);
-        }
     }
 
     __exit_isr();
@@ -170,16 +128,14 @@ ISR(UART_TX_ISR, isr_uart_0_tx)
  * in case of the (older) USART module */
 #else
 
-int uart_init(uart_t uart, uint32_t baudrate,
-              uart_rx_cb_t rx_cb, uart_tx_cb_t tx_cb, void *arg)
+int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 {
-    if (uart_init_blocking(uart, baudrate) < 0) {
+    if (init_base(uart, baudrate) < 0) {
         return -1;
     }
 
     /* save interrupt context */
     ctx_rx_cb = rx_cb;
-    ctx_tx_cb = tx_cb;
     ctx_isr_arg = arg;
     /* reset interrupt flags and enable RX interrupt */
     UART_IF &= ~(UART_IE_RX_BIT);
@@ -189,14 +145,14 @@ int uart_init(uart_t uart, uint32_t baudrate,
     return 0;
 }
 
-int uart_init_blocking(uart_t uart, uint32_t baudrate)
+static int init_base(uart_t uart, uint32_t baudrate)
 {
     if (uart != 0) {
         return -1;
     }
 
     /* get the default UART for now -> TODO: enable for multiple devices */
-    msp_usci_t *dev = UART_DEV;
+    msp_usci_t *dev = UART_BASE;
 
     /* put device in reset mode while configuration is going on */
     dev->ACTL1 = USCI_ACTL1_SWRST;
@@ -221,35 +177,14 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
     return 0;
 }
 
-void uart_tx_begin(uart_t uart)
-{
-    UART_IE |= (UART_IE_TX_BIT);
-}
-
-int uart_write(uart_t uart, char data)
+void uart_write(uart_t uart, const uint8_t *data, size_t len)
 {
     (void)uart;
 
-    UART_DEV->ATXBUF = (uint8_t)data;
-    return 1;
-}
-
-int uart_write_blocking(uart_t uart, char data)
-{
-    (void)uart;
-
-    while (!(UART_IF & UART_IE_TX_BIT));
-    UART_DEV->ATXBUF = (uint8_t)data;
-    return 1;
-}
-
-int uart_read_blocking(uart_t uart, char *data)
-{
-    (void)uart;
-
-    while (!(UART_IF & UART_IE_RX_BIT));
-    *data = (char)UART_DEV->ARXBUF;
-    return 1;
+    for (size_t i = 0; i < len; i++) {
+        while (!(UART_IF & UART_IE_TX_BIT));
+        UART_BASE->ATXBUF = data[i];
+    }
 }
 
 void uart_poweron(uart_t uart)
@@ -268,8 +203,8 @@ ISR(UART_RX_ISR, isr_uart_0_rx)
 {
     __enter_isr();
 
-    uint8_t stat = UART_DEV->ASTAT;
-    char data = (char)UART_DEV->ARXBUF;
+    uint8_t stat = UART_BASE->ASTAT;
+    char data = (char)UART_BASE->ARXBUF;
 
     if (stat & (USCI_ASTAT_FE | USCI_ASTAT_OE | USCI_ASTAT_PE | USCI_ASTAT_BRK)) {
         /* some error which we do not handle, just do a pseudo read to reset the
@@ -278,20 +213,6 @@ ISR(UART_RX_ISR, isr_uart_0_rx)
     }
     else {
         ctx_rx_cb(ctx_isr_arg, data);
-    }
-
-    __exit_isr();
-}
-
-ISR(UART_TX_ISR, isr_uart0_tx)
-{
-    __enter_isr();
-
-    if (ctx_tx_cb(ctx_isr_arg) == 0) {
-        UART_IE &= ~(UART_IE_TX_BIT);
-    }
-    else {
-        UART_IF &= ~(UART_IE_TX_BIT);
     }
 
     __exit_isr();

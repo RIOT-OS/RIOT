@@ -33,7 +33,7 @@ void random_init(void)
     int i;
 
     /* Make sure the RNG is on */
-    SOC_ADC->ADCCON1bits.RCTRL = 0;
+    SOC_ADC->cc2538_adc_adccon1.ADCCON1bits.RCTRL = 0;
 
     /* Enable clock for the RF Core */
     SYS_CTRL_RCGCRFC = 1;
@@ -52,7 +52,7 @@ void random_init(void)
      * have died out. A convenient way to do this is to wait for the RSSI-valid
      * signal to go high."
      */
-    while (!RFCORE->XREG_RSSISTATbits.RSSI_VALID);
+    while (!RFCORE->cc2538_rfcore_xreg_rssistat.XREG_RSSISTATbits.RSSI_VALID);
 
     /*
      * Form the seed by concatenating bits from IF_ADC in the RF receive path.
@@ -62,7 +62,7 @@ void random_init(void)
      */
     for (i = 0; (i < 8) || (seed == 0) || (seed == 0x8003); i++) {
         seed <<= 2;
-        seed ^= RFCORE->XREG_RFRND;
+        seed ^= RFCORE->cc2538_rfcore_xreg_rfrnd.XREG_RFRND;
     }
 
     /* Seed the high byte first: */
@@ -77,11 +77,10 @@ void random_init(void)
 
 int random_read(char *buf, unsigned int num)
 {
-    int count;
-
+    unsigned count;
     for (count = 0; count < num; ) {
         /* Clock the RNG LSFR once: */
-        SOC_ADC->ADCCON1bits.RCTRL = 1;
+        SOC_ADC->cc2538_adc_adccon1.ADCCON1bits.RCTRL = 1;
 
         /* Read up to 2 bytes of random data: */
         buf[count++] = SOC_ADC_RNDL;

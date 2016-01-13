@@ -64,7 +64,7 @@ typedef struct {
             cc2538_reg_t TAPLO     :  1; /**< Legacy PWM operation */
             cc2538_reg_t RESERVED5 : 20; /**< Reserved bits */
         } TAMRbits;
-    };
+    } cc2538_gptimer_tamr;
 
     union {
         cc2538_reg_t TBMR;               /**< GPTIMER Timer B mode */
@@ -82,7 +82,7 @@ typedef struct {
             cc2538_reg_t TBPLO     :  1; /**< Legacy PWM operation */
             cc2538_reg_t RESERVED6 : 20; /**< Reserved bits */
         } TBMRbits;
-    };
+    } cc2538_gptimer_tbmr;
 
     union {
         cc2538_reg_t CTL;                /**< GPTIMER Control */
@@ -102,7 +102,7 @@ typedef struct {
             cc2538_reg_t TBPWML    :  1; /**< GPTM Timer B PWM output level */
             cc2538_reg_t RESERVED4 : 17; /**< Reserved bits */
         } CTLbits;
-    };
+    } cc2538_gptimer_ctl;
 
     cc2538_reg_t SYNC;                   /**< GPTIMER Synchronize */
     cc2538_reg_t RESERVED2;              /**< Reserved word */

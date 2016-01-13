@@ -7,8 +7,8 @@
  */
 
 /**
- * @defgroup    driver_periph_random Random
- * @ingroup     driver_periph
+ * @defgroup    drivers_periph_random Random
+ * @ingroup     drivers_periph
  * @brief       Low-level (pseudo) random number generator driver
  *
  * The quality of the random data read from this interface is highly

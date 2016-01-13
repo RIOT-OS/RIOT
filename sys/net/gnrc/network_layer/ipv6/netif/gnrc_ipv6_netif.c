@@ -151,6 +151,9 @@ static ipv6_addr_t *_add_addr_to_entry(gnrc_ipv6_netif_t *entry, const ipv6_addr
          *       source address. */
     }
 
+    tmp_addr->valid_timeout_msg.type = GNRC_NDP_MSG_ADDR_TIMEOUT;
+    tmp_addr->valid_timeout_msg.content.ptr = (char *) &tmp_addr->addr;
+
     return &(tmp_addr->addr);
 }
 
@@ -231,9 +234,9 @@ void gnrc_ipv6_netif_remove(kernel_pid_t pid)
 #endif
 
     mutex_lock(&entry->mutex);
-    vtimer_remove(&entry->rtr_sol_timer);
+    xtimer_remove(&entry->rtr_sol_timer);
 #ifdef MODULE_GNRC_NDP_ROUTER
-    vtimer_remove(&entry->rtr_adv_timer);
+    xtimer_remove(&entry->rtr_adv_timer);
 #endif
     _reset_addr_from_entry(entry);
     DEBUG("ipv6 netif: Remove IPv6 interface %" PRIkernel_pid "\n", pid);
@@ -499,10 +502,7 @@ kernel_pid_t gnrc_ipv6_netif_find_by_prefix(ipv6_addr_t **out, const ipv6_addr_t
         match = _find_by_prefix_unsafe(&tmp_res, ipv6_ifs + i, prefix, NULL);
 
         if (match > best_match) {
-            if (out != NULL) {
-                *out = tmp_res;
-            }
-
+            *out = tmp_res;
             res = ipv6_ifs[i].pid;
             best_match = match;
         }
@@ -742,7 +742,7 @@ static ipv6_addr_t *_source_address_selection(gnrc_ipv6_netif_t *iface, const ip
     }
 
     /* reset candidate set to mark winners */
-    memset(candidate_set, 0, (GNRC_IPV6_NETIF_ADDR_NUMOF / 8) + 1);
+    memset(candidate_set, 0, (GNRC_IPV6_NETIF_ADDR_NUMOF + 7) / 8);
     /* check if we have a clear winner */
     /* collect candidates with maximum points */
     for (int i = 0; i < GNRC_IPV6_NETIF_ADDR_NUMOF; i++) {
@@ -835,15 +835,13 @@ void gnrc_ipv6_netif_init_by_dev(void)
 #endif
 
         /* set link-local address */
-        if ((gnrc_netapi_get(ifs[i], NETOPT_IPV6_IID, 0, &iid,
-                             sizeof(eui64_t)) < 0)) {
-            mutex_unlock(&ipv6_if->mutex);
-            continue;
-        }
+        if (gnrc_netapi_get(ifs[i], NETOPT_IPV6_IID, 0, &iid,
+                            sizeof(eui64_t)) >= 0) {
+            ipv6_addr_set_aiid(&addr, iid.uint8);
+            ipv6_addr_set_link_local_prefix(&addr);
+            _add_addr_to_entry(ipv6_if, &addr, 64, 0);
 
-        ipv6_addr_set_aiid(&addr, iid.uint8);
-        ipv6_addr_set_link_local_prefix(&addr);
-        _add_addr_to_entry(ipv6_if, &addr, 64, 0);
+        }
 
         /* set link MTU */
         if ((gnrc_netapi_get(ifs[i], NETOPT_MAX_PACKET_SIZE, 0, &tmp,

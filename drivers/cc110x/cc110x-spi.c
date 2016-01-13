@@ -25,9 +25,9 @@
 #include <stdio.h>
 
 #include "cc110x.h"
-#include "cc110x/cc110x-spi.h"
-#include "cc110x/cc110x-internal.h"
-#include "cc110x/cc110x-defines.h"
+#include "cc110x-spi.h"
+#include "cc110x-internal.h"
+#include "cc110x-defines.h"
 
 #include "periph/gpio.h"
 #include "periph/spi.h"

@@ -56,13 +56,13 @@ int main(void)
     p_main = sched_active_pid;
 
     p1 = thread_create(t1_stack, sizeof(t1_stack), THREAD_PRIORITY_MAIN - 1,
-                       CREATE_WOUT_YIELD | CREATE_STACKTEST,
+                       THREAD_CREATE_WOUT_YIELD | THREAD_CREATE_STACKTEST,
                        sub_thread, "nr1", "nr1");
     p2 = thread_create(t2_stack, sizeof(t2_stack), THREAD_PRIORITY_MAIN - 1,
-                       CREATE_WOUT_YIELD | CREATE_STACKTEST,
+                       THREAD_CREATE_WOUT_YIELD | THREAD_CREATE_STACKTEST,
                        sub_thread, "nr2", "nr2");
     p3 = thread_create(t3_stack, sizeof(t3_stack), THREAD_PRIORITY_MAIN - 1,
-                       CREATE_WOUT_YIELD | CREATE_STACKTEST,
+                       THREAD_CREATE_WOUT_YIELD | THREAD_CREATE_STACKTEST,
                        sub_thread, "nr3", "nr3");
 
     puts("THREADS CREATED\n");

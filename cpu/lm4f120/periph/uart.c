@@ -14,6 +14,8 @@
  * @brief       Implementation of the low-level UART driver for the LM4F120
  *
  * @author      Rakendra Thapa <rakendrathapa@gmail.com>
+ *
+ * @}
  */
 
 #include <stdint.h>
@@ -25,24 +27,10 @@
 #include "periph/uart.h"
 #include "periph_conf.h"
 
-/* guard the file in case no UART is defined */
-#if UART_0_EN
-
-/**
- * @brief Struct holding the configuration data for a UART device
- * @{
- */
-typedef struct {
-    uart_rx_cb_t rx_cb;         /**< receive callback */
-    uart_tx_cb_t tx_cb;         /**< transmit callback */
-    void *arg;                  /**< callback argument */
-} uart_conf_t;
-/**@}*/
-
 /**
  * @brief UART device configurations
  */
-static uart_conf_t config[UART_NUMOF];
+static uart_isr_ctx_t config[UART_NUMOF];
 
 /**
  * The list of UART peripherals.
@@ -74,10 +62,12 @@ static const unsigned long g_ulUARTInt[3] =
     INT_UART2
 };
 
+static int init_base(uart_t uart, uint32_t baudrate);
+
 /**
  * Configuring the UART console
  */
-int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, uart_tx_cb_t tx_cb, void *arg)
+int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 {
     /* Check the arguments */
     assert(uart == 0);
@@ -86,22 +76,19 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, uart_tx_cb_t t
         return -1;
     }
 
-    int res = uart_init_blocking(uart, baudrate);
+    int res = init_base(uart, baudrate);
     if(res < 0){
         return res;
     }
 
 /* save callbacks */
     config[uart].rx_cb = rx_cb;
-    config[uart].tx_cb = tx_cb;
     config[uart].arg = arg;
 
 /*  ulBase = g_ulUARTBase[uart]; */
     switch (uart){
 #if UART_0_EN
         case UART_0:
-            NVIC_SetPriority(UART_0_IRQ_CHAN, UART_IRQ_PRIO);
-
             ROM_UARTTxIntModeSet(UART0_BASE, UART_TXINT_MODE_EOT);
             ROM_UARTFIFOLevelSet(UART0_BASE, UART_FIFO_TX4_8, UART_FIFO_RX4_8);
             ROM_UARTFIFOEnable(UART0_BASE);
@@ -114,7 +101,6 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, uart_tx_cb_t t
 #endif
 #if UART_1_EN
         case UART_1:
-            NVIC_SetPriority(UART_1_IRQ_CHAN, UART_IRQ_PRIO);
             /* Enable the UART interrupt */
             NVIC_EnableIRQ(UART_1_IRQ_CHAN);
             break;
@@ -123,7 +109,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, uart_tx_cb_t t
     return 0;
 }
 
-int uart_init_blocking(uart_t uart, uint32_t baudrate)
+static int init_base(uart_t uart, uint32_t baudrate)
 {
     switch(uart){
 #if UART_0_EN
@@ -147,28 +133,11 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
     return 0;
 }
 
-void uart_tx_begin(uart_t uart)
+void uart_write(uart_t uart, const uint8_t *data, size_t len)
 {
-    uart_write(uart, '\0');
-    UART0_IM_R |= UART_IM_TXIM;
-}
-
-int uart_write(uart_t uart, char data)
-{
-    int ret=ROM_UARTCharPutNonBlocking(UART0_BASE, data);
-    return ret;
-}
-
-int uart_read_blocking(uart_t uart, char *data)
-{
-    *data = (char)ROM_UARTCharGet(UART0_BASE);
-    return 1;
-}
-
-int uart_write_blocking(uart_t uart, char data)
-{
-    ROM_UARTCharPut(UART0_BASE, data);
-    return 1;
+    for (size_t i = 0; i < len; i++) {
+        ROM_UARTCharPut(UART0_BASE, (char)data[i]);
+    }
 }
 
 void uart_poweron(uart_t uart)
@@ -191,14 +160,6 @@ void isr_uart0(void)
     ulStatus = ROM_UARTIntStatus(UART0_BASE, true);
     ROM_UARTIntClear(UART0_BASE, ulStatus);
 
-    /* Are we interrupted due to TX done */
-    if(ulStatus & UART_INT_TX)
-    {
-        if (config[UART_0].tx_cb(config[UART_0].arg) == 0){
-            UART0_IM_R &= ~UART_IM_TXIM;
-        }
-    }
-
     /* Are we interrupted due to a recieved character */
     if(ulStatus & (UART_INT_RX | UART_INT_RT))
     {
@@ -215,5 +176,3 @@ void isr_uart0(void)
         thread_yield();
     }
 }
-#endif /*UART_0_EN*/
-/** @} */

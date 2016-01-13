@@ -28,7 +28,7 @@ QUIET ?= 1
 CXXEXFLAGS += -std=c++11
 
 USEMODULE += cpp11-compat
-USEMODULE += vtimer
+USEMODULE += xtimer
 USEMODULE += timex
 
 include $(RIOTBASE)/Makefile.include

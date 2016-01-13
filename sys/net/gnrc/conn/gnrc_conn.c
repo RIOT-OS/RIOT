@@ -11,6 +11,7 @@
  *
  * @file
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
+ * @author  Oliver Hahm <oliver.hahm@inria.fr>
  */
 
 #include "net/conn.h"
@@ -20,35 +21,6 @@
 #include "net/gnrc/ipv6/netif.h"
 #include "net/udp.h"
 
-static inline size_t _srcaddr(void *addr, gnrc_pktsnip_t *hdr)
-{
-    switch (hdr->type) {
-#ifdef MODULE_GNRC_IPV6
-        case GNRC_NETTYPE_IPV6:
-            memcpy(addr, &((ipv6_hdr_t *)hdr->data)->src, sizeof(ipv6_addr_t));
-            return sizeof(ipv6_addr_t);
-#endif
-        default:
-            (void)addr;
-            return 0;
-    }
-}
-
-static inline void _srcport(uint16_t *port, gnrc_pktsnip_t *hdr)
-{
-    switch (hdr->type) {
-#ifdef MODULE_GNRC_UDP
-        case GNRC_NETTYPE_UDP:
-            memcpy(port, &((udp_hdr_t *)hdr->data)->src_port, sizeof(uint16_t));
-            break;
-#endif
-        default:
-            (void)port;
-            (void)hdr;
-            break;
-    }
-}
-
 int gnrc_conn_recvfrom(conn_t *conn, void *data, size_t max_len, void *addr, size_t *addr_len,
                        uint16_t *port)
 {
@@ -56,6 +28,7 @@ int gnrc_conn_recvfrom(conn_t *conn, void *data, size_t max_len, void *addr, siz
     int timeout = 3;
     while ((timeout--) > 0) {
         gnrc_pktsnip_t *pkt, *l3hdr;
+        size_t size = 0;
         msg_receive(&msg);
         switch (msg.type) {
             case GNRC_NETAPI_MSG_TYPE_RCV:
@@ -76,14 +49,17 @@ int gnrc_conn_recvfrom(conn_t *conn, void *data, size_t max_len, void *addr, siz
                         msg_send_to_self(&msg); /* requeue invalid messages */
                         continue;
                     }
-                    _srcport(port, l4hdr);
+                    *port = byteorder_ntohs(((udp_hdr_t *)l4hdr->data)->src_port);
                 }
 #endif  /* defined(MODULE_CONN_UDP) */
                 if (addr != NULL) {
-                    *addr_len = _srcaddr(addr, l3hdr);
+                    memcpy(addr, &((ipv6_hdr_t *)l3hdr->data)->src, sizeof(ipv6_addr_t));
+                    *addr_len = sizeof(ipv6_addr_t);
                 }
                 memcpy(data, pkt->data, pkt->size);
-                return pkt->size;
+                size = pkt->size;
+                gnrc_pktbuf_release(pkt);
+                return (int)size;
             default:
                 (void)port;
                 msg_send_to_self(&msg); /* requeue invalid messages */
@@ -109,6 +85,13 @@ bool gnrc_conn6_set_local_addr(uint8_t *conn_addr, const ipv6_addr_t *addr)
         memcpy(conn_addr, addr, sizeof(ipv6_addr_t));
     }
     return true;
+}
+
+ipv6_addr_t *conn_find_best_source(const ipv6_addr_t *dst)
+{
+    ipv6_addr_t *local = NULL;
+    gnrc_ipv6_netif_find_by_prefix(&local, dst);
+    return local;
 }
 #endif
 

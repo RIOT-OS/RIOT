@@ -65,6 +65,15 @@ extern "C" {
 /** @} */
 
 /**
+ * @brief   Stack size used for the exception (ISR) stack
+ * @{
+ */
+#ifndef ISR_STACKSIZE
+#define ISR_STACKSIZE                   (512U)
+#endif
+/** @} */
+
+/**
  * @brief   Some members of the Cortex-M family have architecture specific
  *          atomic operations in atomic_arch.c
  */
@@ -90,7 +99,7 @@ static inline void cpu_print_last_instruction(void)
 {
     register uint32_t *lr_ptr;
     __asm__ __volatile__("mov %0, lr" : "=r"(lr_ptr));
-    printf("%p\n", lr_ptr);
+    printf("%p\n", (void*) lr_ptr);
 }
 
 #ifdef __cplusplus

@@ -7,8 +7,8 @@
  */
 
 /**
- * @defgroup    driver_periph_spi SPI
- * @ingroup     driver_periph
+ * @defgroup    drivers_periph_spi SPI
+ * @ingroup     drivers_periph
  * @brief       Low-level SPI peripheral driver
  *
  * The current design of this interface targets implementations that use the SPI in blocking mode.

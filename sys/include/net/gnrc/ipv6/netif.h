@@ -31,6 +31,7 @@
 #include "net/ipv6.h"
 #include "net/ipv6/addr.h"
 #include "vtimer.h"
+#include "xtimer.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -258,7 +259,8 @@ typedef struct {
     /**
      * @brief   Validity timeout timer.
      */
-    vtimer_t valid_timeout;
+    xtimer_t valid_timeout;
+    msg_t valid_timeout_msg;    /**< msg_t for gnrc_ipv6_netif_addr_t::valid_timeout */
     /**
      * @}
      */
@@ -329,17 +331,19 @@ typedef struct {
      *          gnrc_ipv6_netif_t::reach_time_base microseconds devided by 10.
      *          Can't be greater than 1 hour.
      */
-    timex_t reach_time;
+    uint32_t reach_time;
 
     /**
      * @brief   Time between retransmissions of neighbor solicitations to a
      *          neighbor.
      *          The default value is @ref GNRC_NDP_RETRANS_TIMER.
      */
-    timex_t retrans_timer;
-    vtimer_t rtr_sol_timer; /**< Timer for periodic router solicitations */
+    uint32_t retrans_timer;
+    xtimer_t rtr_sol_timer; /**< Timer for periodic router solicitations */
+    msg_t rtr_sol_msg;      /**< msg_t for gnrc_ipv6_netif_t::rtr_sol_timer */
 #if defined (MODULE_GNRC_NDP_ROUTER) || defined (MODULE_GNRC_SIXLOWPAN_ND_ROUTER)
-    vtimer_t rtr_adv_timer; /**< Timer for periodic router advertisements */
+    xtimer_t rtr_adv_timer; /**< Timer for periodic router advertisements */
+    msg_t rtr_adv_msg;      /**< msg_t for gnrc_ipv6_netif_t::rtr_adv_timer */
 #endif
 } gnrc_ipv6_netif_t;
 
@@ -475,7 +479,12 @@ ipv6_addr_t *gnrc_ipv6_netif_find_addr(kernel_pid_t pid, const ipv6_addr_t *addr
  *          interfaces.
  *
  * @param[out] out      The reference to the found address on the interface.
+ *                      Must be a pointer to NULL on calling and may stay
+ *                      unchanged if no match can be found.
+ *
  * @param[in] prefix    The prefix you want to search for.
+ *
+ * @pre     @p out must not be NULL.
  *
  * @return  The PID to the interface the address is registered to.
  * @return  KERNEL_PID_UNDEF, if no matching address can not be found on any

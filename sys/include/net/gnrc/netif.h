@@ -20,11 +20,13 @@
  * @brief   Definitions for GNRC's network interfaces
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
+ * @author  Oliver Hahm <oliver.hahm@inria.fr>
  */
 #ifndef GNRC_NETIF_H_
 #define GNRC_NETIF_H_
 
 #include <stdlib.h>
+#include <stdbool.h>
 #include "kernel_types.h"
 
 #ifdef __cplusplus
@@ -89,6 +91,16 @@ void gnrc_netif_remove(kernel_pid_t pid);
  * @return  The number of active interfaces.
  */
 size_t gnrc_netif_get(kernel_pid_t *netifs);
+
+/**
+ * @brief   Check if an interface exist.
+ *
+ * @param[in] pid   The PID to be checked.
+ *
+ * @return  True, if an interface @p pid exists.
+ * @return  False, otherwise
+ */
+bool gnrc_netif_exist(kernel_pid_t pid);
 
 /**
  * @brief   Converts a hardware address to a human readable string.

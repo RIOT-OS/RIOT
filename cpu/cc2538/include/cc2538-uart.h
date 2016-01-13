@@ -34,7 +34,7 @@ typedef struct {
     union {
         cc2538_reg_t RSR;                 /**< UART receive status and error clear */
         cc2538_reg_t ECR;                 /**< UART receive status and error clear */
-    };
+    } cc2538_uart_dr;
 
     cc2538_reg_t RESERVED1[4];            /**< Reserved addresses */
 
@@ -50,7 +50,7 @@ typedef struct {
             cc2538_reg_t TXFE       :  1; /**< UART transmit FIFO empty */
             cc2538_reg_t RESERVED1  : 24; /**< Reserved bits */
         } FRbits;
-    };
+    } cc2538_uart_fr;
 
     cc2538_reg_t RESERVED2;               /**< Reserved byte */
     cc2538_reg_t ILPR;                    /**< UART IrDA Low-Power Register */
@@ -69,7 +69,7 @@ typedef struct {
             cc2538_reg_t SPS        :  1; /**< UART stick parity select */
             cc2538_reg_t RESERVED   : 24; /**< Reserved bits */
         } LCRHbits;
-    };
+    } cc2538_uart_lcrh;
 
     union {
         cc2538_reg_t CTL;                 /**< UART Control */
@@ -89,7 +89,7 @@ typedef struct {
             cc2538_reg_t CTSEN      :  1; /**< U1CTS Hardware flow control enable */
             cc2538_reg_t RESERVED13 : 16; /**< Reserved bits */
         } CTLbits;
-    };
+    } cc2538_uart_ctl;
 
     union {
         cc2538_reg_t IFLS;                /**< UART interrupt FIFO Level Select */
@@ -98,7 +98,7 @@ typedef struct {
             cc2538_reg_t RXIFLSEL   :  3; /**< UART receive interrupt FIFO level select */
             cc2538_reg_t RESERVED   : 26; /**< Reserved bits */
         } IFLSbits;
-    };
+    } cc2538_uart_ifls;
 
     union {
         cc2538_reg_t IM;                  /**< UART Interrupt Mask */
@@ -118,7 +118,7 @@ typedef struct {
             cc2538_reg_t LME5IM     :  1; /**< LIN mode edge 5 interrupt mask */
             cc2538_reg_t RESERVED1  : 16; /**< Reserved bits */
         } IMbits;
-    };
+    } cc2538_uart_im;
 
     cc2538_reg_t RIS;                     /**< UART Raw Interrupt Status */
 
@@ -140,7 +140,7 @@ typedef struct {
             cc2538_reg_t LME5MIS    :  1; /**< LIN mode edge 5 masked interrupt status */
             cc2538_reg_t RESERVED10 : 16; /**< Reserved bits */
         } MISbits;
-    };
+    } cc2538_uart_mis;
 
     cc2538_reg_t ICR;                     /**< UART Interrupt Clear Register */
     cc2538_reg_t DMACTL;                  /**< UART DMA Control */

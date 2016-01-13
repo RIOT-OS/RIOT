@@ -87,7 +87,8 @@ void test_ubjson_test(void (*sender_fun)(void), void (*receiver_fun)(void))
     mutex_lock(&data.mutexes[1]);
 
     kernel_pid_t receiver_pid = thread_create(receiver_stack, sizeof(receiver_stack),
-                                              THREAD_PRIORITY_MAIN, CREATE_WOUT_YIELD,
+                                              THREAD_PRIORITY_MAIN,
+                                              THREAD_CREATE_WOUT_YIELD,
                                               test_ubjson_receiver_trampoline, &data, "receiver");
     TEST_ASSERT(pid_is_valid(receiver_pid));
 

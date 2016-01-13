@@ -29,7 +29,6 @@
 #include "config.h"
 #include "tcb.h"
 #include "cpu.h"
-#include "flags.h"
 #include "sched.h"
 #include "cpu_conf.h"
 

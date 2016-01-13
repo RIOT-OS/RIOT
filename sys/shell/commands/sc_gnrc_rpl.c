@@ -50,9 +50,9 @@ int _gnrc_rpl_dodag_root(char *arg1, char *arg2)
         return 1;
     }
 
-    gnrc_rpl_dodag_t *dodag = NULL;
-    dodag = gnrc_rpl_root_init(instance_id, &dodag_id, false, false);
-    if (dodag == NULL) {
+    gnrc_rpl_instance_t *inst = NULL;
+    inst = gnrc_rpl_root_init(instance_id, &dodag_id, false, false);
+    if (inst == NULL) {
         char addr_str[IPV6_ADDR_MAX_STR_LEN];
         printf("error: could not add DODAG (%s) to instance (%d)\n",
                 ipv6_addr_to_str(addr_str, &dodag_id, sizeof(addr_str)), instance_id);
@@ -82,133 +82,60 @@ int _gnrc_rpl_instance_remove(char *arg1)
     return 0;
 }
 
-int _gnrc_rpl_dodag_remove(char *arg1, char *arg2)
+int _gnrc_rpl_trickle_reset(char *arg1)
 {
     uint8_t instance_id = (uint8_t) atoi(arg1);
-    ipv6_addr_t dodag_id;
     gnrc_rpl_instance_t *inst;
-    gnrc_rpl_dodag_t *dodag = NULL;
     char addr_str[IPV6_ADDR_MAX_STR_LEN];
-
-    if (ipv6_addr_from_str(&dodag_id, arg2) == NULL) {
-        puts("error: <dodag_id> must be a valid IPv6 address");
-        return 1;
-    }
 
     if ((inst = gnrc_rpl_instance_get(instance_id)) == NULL) {
         puts("error: could not find the <instance_id>");
         return 1;
     }
 
-    if ((dodag = gnrc_rpl_dodag_get(inst, &dodag_id)) == NULL) {
-        puts("error: <dodag_id> does not exist for the given <instance_id>");
-        return 1;
-    }
+    trickle_reset_timer(&(inst->dodag.trickle));
 
-    if (gnrc_rpl_dodag_remove(dodag) == false) {
-        printf("error: could not remove DODAG (%s) from instance (%d)\n",
-                ipv6_addr_to_str(addr_str, &dodag_id, sizeof(addr_str)),
-                instance_id);
-        return 1;
-    }
-
-    printf("success: removed DODAG (%s) from instance (%d)\n",
-            ipv6_addr_to_str(addr_str, &dodag_id, sizeof(addr_str)),
+    printf("success: reset trickle timer of DODAG (%s) from instance (%d)\n",
+            ipv6_addr_to_str(addr_str, &(inst->dodag.dodag_id), sizeof(addr_str)),
             instance_id);
     return 0;
 }
 
-int _gnrc_rpl_trickle_reset(char *arg1, char *arg2)
+int _gnrc_rpl_trickle_stop(char *arg1)
 {
     uint8_t instance_id = (uint8_t) atoi(arg1);
-    ipv6_addr_t dodag_id;
     gnrc_rpl_instance_t *inst;
-    gnrc_rpl_dodag_t *dodag = NULL;
     char addr_str[IPV6_ADDR_MAX_STR_LEN];
-
-    if (ipv6_addr_from_str(&dodag_id, arg2) == NULL) {
-        puts("error: <dodag_id> must be a valid IPv6 address");
-        return 1;
-    }
 
     if ((inst = gnrc_rpl_instance_get(instance_id)) == NULL) {
         puts("error: could not find the <instance_id>");
         return 1;
     }
-
-    if ((dodag = gnrc_rpl_dodag_get(inst, &dodag_id)) == NULL) {
-        puts("error: <dodag_id> does not exist for the given <instance_id>");
-        return 1;
-    }
-
-    trickle_reset_timer(&dodag->trickle);
-
-    printf("success: resetted trickle timer of DODAG (%s) from instance (%d)\n",
-            ipv6_addr_to_str(addr_str, &dodag_id, sizeof(addr_str)),
-            instance_id);
-    return 0;
-}
-
-int _gnrc_rpl_trickle_stop(char *arg1, char *arg2)
-{
-    uint8_t instance_id = (uint8_t) atoi(arg1);
-    ipv6_addr_t dodag_id;
-    gnrc_rpl_instance_t *inst;
-    gnrc_rpl_dodag_t *dodag = NULL;
-    char addr_str[IPV6_ADDR_MAX_STR_LEN];
-
-    if (ipv6_addr_from_str(&dodag_id, arg2) == NULL) {
-        puts("error: <dodag_id> must be a valid IPv6 address");
-        return 1;
-    }
-
-    if ((inst = gnrc_rpl_instance_get(instance_id)) == NULL) {
-        puts("error: could not find the <instance_id>");
-        return 1;
-    }
-
-    if ((dodag = gnrc_rpl_dodag_get(inst, &dodag_id)) == NULL) {
-        puts("error: <dodag_id> does not exist for the given <instance_id>");
-        return 1;
-    }
-
-    trickle_stop(&dodag->trickle);
+    trickle_stop(&(inst->dodag.trickle));
 
     printf("success: stopped trickle timer of DODAG (%s) from instance (%d)\n",
-            ipv6_addr_to_str(addr_str, &dodag_id, sizeof(addr_str)),
+            ipv6_addr_to_str(addr_str, &(inst->dodag.dodag_id), sizeof(addr_str)),
             instance_id);
     return 0;
 }
 
-int _gnrc_rpl_trickle_start(char *arg1, char *arg2)
+int _gnrc_rpl_trickle_start(char *arg1)
 {
     uint8_t instance_id = (uint8_t) atoi(arg1);
-    ipv6_addr_t dodag_id;
     gnrc_rpl_instance_t *inst;
-    gnrc_rpl_dodag_t *dodag = NULL;
     char addr_str[IPV6_ADDR_MAX_STR_LEN];
-
-    if (ipv6_addr_from_str(&dodag_id, arg2) == NULL) {
-        puts("error: <dodag_id> must be a valid IPv6 address");
-        return 1;
-    }
 
     if ((inst = gnrc_rpl_instance_get(instance_id)) == NULL) {
         puts("error: could not find the <instance_id>");
         return 1;
     }
 
-    if ((dodag = gnrc_rpl_dodag_get(inst, &dodag_id)) == NULL) {
-        puts("error: <dodag_id> does not exist for the given <instance_id>");
-        return 1;
-    }
-
-    trickle_start(gnrc_rpl_pid, &dodag->trickle, GNRC_RPL_MSG_TYPE_TRICKLE_INTERVAL,
-                  GNRC_RPL_MSG_TYPE_TRICKLE_CALLBACK, (1 << dodag->dio_min),
-                  dodag->dio_interval_doubl, dodag->dio_redun);
+    trickle_start(gnrc_rpl_pid, &(inst->dodag.trickle), GNRC_RPL_MSG_TYPE_TRICKLE_INTERVAL,
+                  GNRC_RPL_MSG_TYPE_TRICKLE_CALLBACK, (1 << inst->dodag.dio_min),
+                  inst->dodag.dio_interval_doubl, inst->dodag.dio_redun);
 
     printf("success: started trickle timer of DODAG (%s) from instance (%d)\n",
-            ipv6_addr_to_str(addr_str, &dodag_id, sizeof(addr_str)),
+            ipv6_addr_to_str(addr_str, &(inst->dodag.dodag_id), sizeof(addr_str)),
             instance_id);
     return 0;
 }
@@ -232,29 +159,10 @@ int _gnrc_rpl_dodag_show(void)
         else {
             printf("[X]");
         }
-        if (i < (GNRC_RPL_INSTANCES_NUMOF - 1)) {
-            printf("\t");
-        }
-        else {
-            printf("\n");
-        }
+        putchar('\t');
     }
 
-    printf("dodag table:\t");
-    for (uint8_t i = 0; i < GNRC_RPL_DODAGS_NUMOF; ++i) {
-        if (gnrc_rpl_dodags[i].state == 0) {
-            printf("[ ]");
-        }
-        else {
-            printf("[X]");
-        }
-        if (i < (GNRC_RPL_DODAGS_NUMOF - 1)) {
-            putchar('\t');
-        }
-        else {
-            printf("\n");
-        }
-    }
+    putchar('\n');
 
     printf("parent table:\t");
     for (uint8_t i = 0; i < GNRC_RPL_PARENTS_NUMOF; ++i) {
@@ -264,16 +172,14 @@ int _gnrc_rpl_dodag_show(void)
         else {
             printf("[X]");
         }
-        if (i < (GNRC_RPL_PARENTS_NUMOF - 1)) {
-            putchar('\t');
-        }
+        putchar('\t');
     }
     putchar('\n');
     putchar('\n');
 
     gnrc_rpl_dodag_t *dodag = NULL;
     char addr_str[IPV6_ADDR_MAX_STR_LEN];
-    uint32_t cleanup;
+    int8_t cleanup;
     uint64_t tc, ti, xnow = xtimer_now64();
 
     for (uint8_t i = 0; i < GNRC_RPL_INSTANCES_NUMOF; ++i) {
@@ -283,77 +189,55 @@ int _gnrc_rpl_dodag_show(void)
         printf("instance [%d | mop: %d | ocp: %d | mhri: %d | mri %d]\n", gnrc_rpl_instances[i].id,
                 gnrc_rpl_instances[i].mop, gnrc_rpl_instances[i].of->ocp,
                 gnrc_rpl_instances[i].min_hop_rank_inc, gnrc_rpl_instances[i].max_rank_inc);
-        LL_FOREACH(gnrc_rpl_instances[i].dodags, dodag) {
 
-            tc = (((uint64_t) dodag->trickle.msg_callback_timer.long_target << 32)
-                    | dodag->trickle.msg_callback_timer.target) - xnow;
-            tc = (int64_t) tc < 0 ? 0 : tc / SEC_IN_USEC;
+        dodag = &gnrc_rpl_instances[i].dodag;
 
-            ti = (((uint64_t) dodag->trickle.msg_interval_timer.long_target << 32)
-                    | dodag->trickle.msg_interval_timer.target) - xnow;
-            ti = (int64_t) ti < 0 ? 0 : ti / SEC_IN_USEC;
+        tc = (((uint64_t) dodag->trickle.msg_callback_timer.long_target << 32)
+                | dodag->trickle.msg_callback_timer.target) - xnow;
+        tc = (int64_t) tc < 0 ? 0 : tc / SEC_IN_USEC;
 
-            cleanup = dodag->cleanup_timer.target - xtimer_now();
-            cleanup = (int32_t) cleanup < 0 ? 0 : cleanup / SEC_IN_USEC;
+        ti = (((uint64_t) dodag->trickle.msg_interval_timer.long_target << 32)
+                | dodag->trickle.msg_interval_timer.target) - xnow;
+        ti = (int64_t) ti < 0 ? 0 : ti / SEC_IN_USEC;
 
-            printf("\tdodag [%s | R: %d | OP: %s | CL: %" PRIu32 "s | "
-                   "TR(I=[%d,%d], k=%d, c=%d, TC=%" PRIu64 "s, TI=%" PRIu64 "s)]\n",
-                    ipv6_addr_to_str(addr_str, &dodag->dodag_id, sizeof(addr_str)),
-                    dodag->my_rank, (dodag->node_status == GNRC_RPL_LEAF_NODE ? "Leaf" : "Router"),
-                    (((int32_t) cleanup < 0) ? 0 : cleanup/SEC_IN_USEC),
-                    (1 << dodag->dio_min), dodag->dio_interval_doubl,
-                    dodag->trickle.k, dodag->trickle.c, tc, ti);
-            gnrc_rpl_parent_t *parent;
-            LL_FOREACH(dodag->parents, parent) {
-                printf("\t\tparent [addr: %s | rank: %d | lifetime: %" PRIu64 "s]\n",
-                        ipv6_addr_to_str(addr_str, &parent->addr, sizeof(addr_str)),
-                        parent->rank, ((int64_t) (parent->lifetime - xnow) < 0 ? 0
-                                       : (parent->lifetime - xnow) / SEC_IN_USEC));
-            }
+        cleanup = dodag->instance->cleanup < 0 ? 0 : dodag->instance->cleanup;
+
+        printf("\tdodag [%s | R: %d | OP: %s | CL: %" PRIi8 "s | "
+               "TR(I=[%d,%d], k=%d, c=%d, TC=%" PRIu32 "s, TI=%" PRIu32 "s)]\n",
+               ipv6_addr_to_str(addr_str, &dodag->dodag_id, sizeof(addr_str)),
+               dodag->my_rank, (dodag->node_status == GNRC_RPL_LEAF_NODE ? "Leaf" : "Router"),
+               cleanup, (1 << dodag->dio_min), dodag->dio_interval_doubl, dodag->trickle.k,
+               dodag->trickle.c, (uint32_t) (tc & 0xFFFFFFFF), (uint32_t) (ti & 0xFFFFFFFF));
+
+        gnrc_rpl_parent_t *parent;
+        LL_FOREACH(gnrc_rpl_instances[i].dodag.parents, parent) {
+            printf("\t\tparent [addr: %s | rank: %d | lifetime: %" PRIu32 "s]\n",
+                    ipv6_addr_to_str(addr_str, &parent->addr, sizeof(addr_str)),
+                    parent->rank, ((int32_t) (parent->lifetime - (((uint32_t) xnow / SEC_IN_USEC))))
+                    < 0 ? 0 : (parent->lifetime - ((uint32_t) xnow / SEC_IN_USEC)));
         }
     }
     return 0;
 }
 
-int _gnrc_rpl_operation(bool leaf, char *arg1, char *arg2)
+int _gnrc_rpl_operation(bool leaf, char *arg1)
 {
-    uint8_t instance_id = 0;
-    ipv6_addr_t dodag_id;
+    uint8_t instance_id = (uint8_t) atoi(arg1);
     gnrc_rpl_instance_t *inst;
-    gnrc_rpl_dodag_t *dodag = NULL;
-    char addr_str[IPV6_ADDR_MAX_STR_LEN];
-
-    instance_id = (uint8_t) atoi(arg1);
-    if (instance_id == 0) {
-        puts("error: <instance_id> must be a positive number greater than zero");
-        return 1;
-    }
-
-    if (ipv6_addr_from_str(&dodag_id, arg2) == NULL) {
-        puts("error: <dodag_id> must be a valid IPv6 address");
-        return 1;
-    }
 
     if ((inst = gnrc_rpl_instance_get(instance_id)) == NULL) {
-        puts("error: could not find the <instance_id>");
-        return 1;
-    }
-
-    if ((dodag = gnrc_rpl_dodag_get(inst, &dodag_id)) == NULL) {
-        puts("error: <dodag_id> does not exist for the given <instance_id>");
+        printf("error: could not find the instance (%d)\n", instance_id);
         return 1;
     }
 
     if (leaf) {
-        gnrc_rpl_leaf_operation(dodag);
+        gnrc_rpl_leaf_operation(&inst->dodag);
     }
     else {
-        gnrc_rpl_router_operation(dodag);
+        gnrc_rpl_router_operation(&inst->dodag);
     }
 
-    printf("success: operate in DODAG (%s) from instance (%d) as %s\n",
-            ipv6_addr_to_str(addr_str, &dodag_id, sizeof(addr_str)),
-            instance_id, leaf ? "leaf" : "router");
+    printf("success: operate in instance (%d) as %s\n", instance_id, leaf ? "leaf" : "router");
     return 0;
 }
 
@@ -369,22 +253,19 @@ int _gnrc_rpl(int argc, char **argv)
         return _gnrc_rpl_dodag_root(argv[2], argv[3]);
     }
     else if (strcmp(argv[1], "rm") == 0) {
-        if (argc == 4) {
-            return _gnrc_rpl_dodag_remove(argv[2], argv[3]);
-        }
-        else if (argc == 3) {
+        if (argc == 3) {
             return _gnrc_rpl_instance_remove(argv[2]);
         }
     }
     else if (strcmp(argv[1], "trickle") == 0) {
-        if ((argc == 5) && (strcmp(argv[2], "reset") == 0)) {
-            return _gnrc_rpl_trickle_reset(argv[3], argv[4]);
+        if ((argc == 4) && (strcmp(argv[2], "reset") == 0)) {
+            return _gnrc_rpl_trickle_reset(argv[3]);
         }
-        else if ((argc == 5) && (strcmp(argv[2], "stop") == 0)) {
-            return _gnrc_rpl_trickle_stop(argv[3], argv[4]);
+        else if ((argc == 4) && (strcmp(argv[2], "stop") == 0)) {
+            return _gnrc_rpl_trickle_stop(argv[3]);
         }
-        else if ((argc == 5) && (strcmp(argv[2], "start") == 0)) {
-            return _gnrc_rpl_trickle_start(argv[3], argv[4]);
+        else if ((argc == 4) && (strcmp(argv[2], "start") == 0)) {
+            return _gnrc_rpl_trickle_start(argv[3]);
         }
     }
     else if (strcmp(argv[1], "send") == 0) {
@@ -393,29 +274,27 @@ int _gnrc_rpl(int argc, char **argv)
         }
     }
     else if (strcmp(argv[1], "leaf") == 0) {
-        if (argc == 4) {
-            return _gnrc_rpl_operation(true, argv[2], argv[3]);
+        if (argc == 3) {
+            return _gnrc_rpl_operation(true, argv[2]);
         }
     }
     else if (strcmp(argv[1], "router") == 0) {
-        if (argc == 4) {
-            return _gnrc_rpl_operation(false, argv[2], argv[3]);
+        if (argc == 3) {
+            return _gnrc_rpl_operation(false, argv[2]);
         }
     }
 
-    printf("usage: %s [help|init|rm|root|show]\n", argv[0]);
-    puts("* help\t\t\t\t\t\t- show usage");
-    puts("* init <if_id>\t\t\t\t\t- initialize RPL on the given interface");
-    puts("* leaf <instance_id> <dodag_id>\t\t\t- operate as leaf in the dodag");
-    puts("* trickle reset <instance_id> <dodag_id>\t- reset the trickle timer");
-    puts("* trickle start <instance_id> <dodag_id>\t- start the trickle timer");
-    puts("* trickle stop <instance_id> <dodag_id>\t\t- stop the trickle timer");
-    puts("* rm <instance_id>\t\t\t\t- delete the given instance and all related dodags");
-    puts("* rm <instance_id> <dodag_id>\t\t\t- delete the dodag in the given instance");
-    puts("* root <instance_id> <dodag_id>\t\t\t- add a dodag to a new or existing instance");
-    puts("* router <instance_id> <dodag_id>\t\t\t- operate as router in the dodag");
-    puts("* send dis\t\t\t\t\t- send a multicast DIS");
-    puts("* show\t\t\t\t\t\t- show instance and dodag tables");
+    puts("* help\t\t\t\t- show usage");
+    puts("* init <if_id>\t\t\t- initialize RPL on the given interface");
+    puts("* leaf <instance_id>\t\t- operate as leaf in the instance");
+    puts("* trickle reset <instance_id>\t- reset the trickle timer");
+    puts("* trickle start <instance_id>\t- start the trickle timer");
+    puts("* trickle stop <instance_id>\t- stop the trickle timer");
+    puts("* rm <instance_id>\t\t- delete the given instance and related dodag");
+    puts("* root <inst_id> <dodag_id>\t- add a dodag to a new or existing instance");
+    puts("* router <instance_id>\t\t- operate as router in the instance");
+    puts("* send dis\t\t\t- send a multicast DIS");
+    puts("* show\t\t\t\t- show instance and dodag tables");
     return 0;
 }
 /**

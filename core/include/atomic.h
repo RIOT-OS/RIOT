@@ -29,7 +29,7 @@ extern "C" {
  * @brief Integer variable for use in atomic counters.
  */
 typedef struct atomic_int {
-    volatile int value;
+    volatile int value;         /**< the actual value */
 } atomic_int_t;
 
 /**

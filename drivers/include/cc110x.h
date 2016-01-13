@@ -26,7 +26,7 @@ extern "C" {
 
 #include "periph/spi.h"
 #include "periph/gpio.h"
-#include "cc110x/cc110x-internal.h"
+#include "cc110x-internal.h"
 
 /**
  * @brief Struct for holding cc110x IO parameters

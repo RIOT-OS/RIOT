@@ -36,10 +36,16 @@
  */
 extern uint32_t _estack;
 
-void pre_startup (void)
+void pre_startup(void)
 {
     /* disable the WDOG */
     wdog_disable();
+
+    /*
+     * Workaround for hardware errata e4218: "SIM/FLEXBUS: SIM_SCGC7[FLEXBUS]
+     * bit should be cleared when the FlexBus is not being used."
+     */
+    BITBAND_REG32(SIM->SCGC7, SIM_SCGC7_FLEXBUS_SHIFT) = 0;
 }
 
 void dummy_handler(void)
@@ -139,11 +145,11 @@ WEAK_DEFAULT void isr_tsi(void);
 WEAK_DEFAULT void isr_mcg(void);
 WEAK_DEFAULT void isr_lptmr0(void);
 /* void dummy_handler(void); */
-WEAK_DEFAULT void isr_porta_pin_detect(void);
-WEAK_DEFAULT void isr_portb_pin_detect(void);
-WEAK_DEFAULT void isr_portc_pin_detect(void);
-WEAK_DEFAULT void isr_portd_pin_detect(void);
-WEAK_DEFAULT void isr_porte_pin_detect(void);
+WEAK_DEFAULT void isr_porta(void);
+WEAK_DEFAULT void isr_portb(void);
+WEAK_DEFAULT void isr_portc(void);
+WEAK_DEFAULT void isr_portd(void);
+WEAK_DEFAULT void isr_porte(void);
 /* void dummy_handler(void); */
 /* void dummy_handler(void); */
 WEAK_DEFAULT void isr_software(void);
@@ -261,11 +267,11 @@ const void *interrupt_vector[] = {
     (void*) isr_mcg,
     (void*) isr_lptmr0,
     (void*) dummy_handler,
-    (void*) isr_porta_pin_detect,
-    (void*) isr_portb_pin_detect,
-    (void*) isr_portc_pin_detect,
-    (void*) isr_portd_pin_detect,
-    (void*) isr_porte_pin_detect,
+    (void*) isr_porta,
+    (void*) isr_portb,
+    (void*) isr_portc,
+    (void*) isr_portd,
+    (void*) isr_porte,
     (void*) dummy_handler,
     (void*) dummy_handler,
     (void*) isr_software, /* Vector 110 */

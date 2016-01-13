@@ -39,7 +39,7 @@ typedef struct {
             cc2538_reg_t EOC       :  1; /**< End of conversion */
             cc2538_reg_t RESERVED1 : 24; /**< Reserved bits */
         } ADCCON1bits;
-    };
+    } cc2538_adc_adccon1;
 
     cc2538_reg_t ADCCON2;                /**< ADC Control Register 2 */
     cc2538_reg_t ADCCON3;                /**< ADC Control Register 3 */

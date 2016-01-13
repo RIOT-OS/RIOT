@@ -23,7 +23,7 @@
 #include "debug.h"
 
 #include "encx24j600.h"
-#include "net/gnrc/gnrc_netdev2_eth.h"
+#include "net/gnrc/netdev2/eth.h"
 
 static encx24j600_t encx24j600;
 
@@ -37,7 +37,7 @@ static encx24j600_t encx24j600;
 /**
  * @brief   Stacks for the MAC layer threads
  */
-static char _netdev2_eth_stack[MAC_STACKSIZE + DEBUG_EXTRA_STACKSIZE];
+static char _netdev2_eth_stack[MAC_STACKSIZE];
 static gnrc_netdev2_t _gnrc_encx24j600;
 
 void auto_init_encx24j600(void)

@@ -58,7 +58,7 @@ extern "C" {
 #define TIMER_1_DEV         NRF_TIMER1
 #define TIMER_1_CHANNELS    3
 #define TIMER_1_MAX_VALUE   (0xffff)
-#define TIEMR_1_BITMODE     TIMER_BITMODE_BITMODE_16Bit
+#define TIMER_1_BITMODE     TIMER_BITMODE_BITMODE_16Bit
 #define TIMER_1_ISR         isr_timer1
 #define TIMER_1_IRQ         TIMER1_IRQn
 
@@ -76,12 +76,9 @@ extern "C" {
  * @{
  */
 #define UART_NUMOF          (1U)
-#define UART_0_EN           1
-#define UART_IRQ_PRIO       1
-
 /* UART pin configuration */
-#define UART_PIN_RX       1
-#define UART_PIN_TX       2
+#define UART_PIN_RX         1
+#define UART_PIN_TX         2
 /** @} */
 
 /**
@@ -126,6 +123,22 @@ extern "C" {
 #define SPI_1_PIN_MOSI      20
 #define SPI_1_PIN_MISO      21
 #define SPI_1_PIN_SCK       22
+/** @} */
+
+/**
+ * @name ADC configuration
+ * @{
+ */
+#define ADC_NUMOF           (1U)
+#define ADC_0_EN            1
+#define ADC_MAX_CHANNELS    4
+
+/* ADC 0 device configuration */
+#define ADC_0_CHANNELS      4
+#define ADC_0_CH0           ADC_CONFIG_PSEL_AnalogInput4
+#define ADC_0_CH1           ADC_CONFIG_PSEL_AnalogInput5
+#define ADC_0_CH2           ADC_CONFIG_PSEL_AnalogInput6
+#define ADC_0_CH3           ADC_CONFIG_PSEL_AnalogInput7
 /** @} */
 
 /**

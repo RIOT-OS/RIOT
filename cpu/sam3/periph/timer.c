@@ -371,33 +371,6 @@ void timer_irq_disable(tim_t dev)
     }
 }
 
-void timer_reset(tim_t dev)
-{
-    switch (dev) {
-#if TIMER_0_EN
-        case TIMER_0:
-            TIMER_0_DEV->TC_CHANNEL[0].TC_CCR = TC_CCR_SWTRG;
-            TIMER_0_DEV->TC_CHANNEL[1].TC_CCR = TC_CCR_SWTRG;
-            break;
-#endif
-#if TIMER_1_EN
-        case TIMER_1:
-            TIMER_1_DEV->TC_CHANNEL[0].TC_CCR = TC_CCR_SWTRG;
-            TIMER_1_DEV->TC_CHANNEL[1].TC_CCR = TC_CCR_SWTRG;
-            break;
-#endif
-#if TIMER_2_EN
-        case TIMER_2:
-            TIMER_2_DEV->TC_CHANNEL[0].TC_CCR = TC_CCR_SWTRG;
-            TIMER_2_DEV->TC_CHANNEL[1].TC_CCR = TC_CCR_SWTRG;
-            break;
-#endif
-        case TIMER_UNDEFINED:
-            break;
-    }
-}
-
-
 #if TIMER_0_EN
 void TIMER_0_ISR1(void)
 {

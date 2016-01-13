@@ -83,7 +83,13 @@ extern kernel_pid_t gnrc_ipv6_pid;
 /**
  * @brief   Maximum number of entries in the IPv6 FIB table.
  */
-#define GNRC_IPV6_FIB_TABLE_SIZE        (20)
+#ifndef GNRC_IPV6_FIB_TABLE_SIZE
+#   ifdef MODULE_GNRC_RPL
+#       define GNRC_IPV6_FIB_TABLE_SIZE     (20)
+#   else
+#       define GNRC_IPV6_FIB_TABLE_SIZE     (5)
+#   endif
+#endif
 
 /**
  * @brief   The forwarding information base (FIB) for the IPv6 stack.

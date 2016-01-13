@@ -1,0 +1,44 @@
+/**
+ * @defgroup pkg   Packages
+ * @{
+ * @brief          External libraries and applications
+ *
+ * Using packages
+ * ==============
+ * To add a package to the list of compiled modules you have to add it to the
+ * `USEPKG` macro in your application's Makefile. If the package provides
+ * header files you might need to update the `INCLUDE` macro, too:
+ *
+ * ~~~~~~~~ {.mk}
+ * USEPKG += <pkg_name>
+ * INCLUDE += $(RIOTBASE)/pkg/<pkg_name>/...
+ * ~~~~~~~~
+ *
+ * Porting an external library
+ * ===========================
+ * Structure of a package
+ * ----------------------
+ * This module provides porting information for libraries and applications to use
+ * with RIOT (to build an external module). If you'd like to add a package to RIOT
+ * you need to add a directory with the name of your package to this directory.
+ * This directory should contain at least two files:
+ *
+ *  * **Zero or more patch files**: Your patches of the upstream application of
+ *    the package to make it build with RIOT.
+ *  * **Makefile**: A Makefile describing how to get the upstream application,
+ *    apply the patch and how to build the package as a RIOT module.
+ *    A rough template for several methods of acquiring a package is provided in
+ *    `pkg/Makefile.git`, `pkg/Makefile.http`, and `pkg/Makefile.svn`
+ *
+ * Creating a patch with git
+ * -------------------------
+ * Assuming your upstream library resides in a git repository, you can create the
+ * patch files as follows:
+ *  * checkout the targeted version of the upstream application
+ *  * create a new branch (e.g. `riot-port`)
+ *  * conduct necessary changes (e.g. edit, add, or remove some files)
+ *  * commit your changes using `git commit`
+ *  * create the patch files using `git format-patch -n riot-port`
+ *  * move the resulting patch files to the corresponding subfolder of pkg
+ * @}
+ */

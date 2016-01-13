@@ -135,15 +135,7 @@ int timer_set(tim_t dev, int channel, unsigned int offset)
 int timer_set_absolute(tim_t dev, int channel, unsigned int value)
 {
     uint32_t now = timer_read(dev);
-    int64_t target = (int32_t)(value - now);
-
-    DEBUG("timer_set_absolute(): delta=%lli\n", target);
-    if (target < 0 && target > -NATIVE_TIMER_MIN_RES) {
-        DEBUG("timer_set_absolute(): preventing underflow.\n");
-        target = NATIVE_TIMER_MIN_RES;
-    }
-
-    return timer_set(dev, channel, target);
+    return timer_set(dev, channel, value - now);
 }
 
 int timer_clear(tim_t dev, int channel)
@@ -190,14 +182,6 @@ void timer_stop(tim_t dev)
 {
     (void)dev;
     DEBUG("%s\n", __func__);
-}
-
-
-void timer_reset(tim_t dev)
-{
-    if (dev < TIMER_NUMOF) {
-        time_null = timer_read(dev);
-    }
 }
 
 unsigned int timer_read(tim_t dev)

@@ -1,8 +1,8 @@
 export NATIVEINCLUDES += -I$(RIOTCPU)/native/include -I$(RIOTBASE)/sys/include
 
-# Local include for malloc.h on OSX
+# Local include for OSX
 ifeq ($(BUILDOSXNATIVE),1)
-    export NATIVEINCLUDES += -I$(RIOTBASE)/sys/malloc/include
+    export NATIVEINCLUDES += -I$(RIOTCPU)/native/osx-libc-extra
 endif
 
 export USEMODULE += periph

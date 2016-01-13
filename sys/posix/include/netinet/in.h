@@ -257,12 +257,12 @@ struct ipv6_mreq {
 /**
  * IPv6 socket address for the wildcard address.
  */
-extern const struct sockaddr_in6 in6addr_any;
+extern const struct in6_addr in6addr_any;
 
 /**
  * IPv6 socket address for the loopback address.
  */
-extern const struct sockaddr_in6 in6addr_loopback;
+extern const struct in6_addr in6addr_loopback;
 
 #ifdef __cplusplus
 }

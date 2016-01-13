@@ -7,8 +7,8 @@
  */
 
 /**
- * @defgroup    driver_periph_timer Timer
- * @ingroup     driver_periph
+ * @defgroup    drivers_periph_timer Timer
+ * @ingroup     drivers_periph
  * @brief       Low-level timer peripheral driver
  * @{
  *
@@ -37,7 +37,6 @@ extern "C" {
 #ifndef TIMER_DEV
 #define TIMER_DEV(x)        (x)
 #endif
-/** @} */
 
 /**
  * @brief   Default value for timer not defined
@@ -169,17 +168,6 @@ void timer_irq_enable(tim_t dev);
  * @param[in] dev           the timer to disable interrupts for
  */
 void timer_irq_disable(tim_t dev);
-
-/**
- * @brief Reset the up-counting value to zero for the given timer
- *
- * Note that this function effects all currently set channels and it can lead to
- * non-deterministic timeouts if any channel is active when this function is
- * called.
- *
- * @param[in] dev           the timer to reset
- */
-void timer_reset(tim_t dev);
 
 #ifdef __cplusplus
 }

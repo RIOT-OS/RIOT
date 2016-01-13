@@ -29,7 +29,7 @@
 #include "net/ipv6/addr.h"
 #include "net/gnrc/netif.h"
 #include "net/gnrc/pktqueue.h"
-#include "vtimer.h"
+#include "xtimer.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -127,13 +127,15 @@ typedef struct {
     uint8_t l2_addr_len;                        /**< Length of gnrc_ipv6_nc_t::l2_addr */
     uint8_t flags;                              /**< Flags as defined above */
     kernel_pid_t iface;                         /**< PID to the interface where the neighbor is */
-    vtimer_t rtr_timeout;                       /**< timeout timer for router flag */
+    xtimer_t rtr_timeout;                       /**< timeout timer for router flag */
+    msg_t rtr_timeout_msg;                      /**< msg_t for gnrc_ipv6_nc_t::rtr_timeout */
 
     /**
      * @brief (Re)Transmission timer for neighbor solicitations of this entry and
      *        timeout for states.
      */
-    vtimer_t nbr_sol_timer;
+    xtimer_t nbr_sol_timer;
+    msg_t nbr_sol_msg;                          /**< msg_t for gnrc_ipv6_nc_t::nbr_sol_timer */
 
     /**
      * @brief Delay timer for neighbor advertisements of this entry.
@@ -144,13 +146,17 @@ typedef struct {
      *          RFC 4861, section 7.2.7
      *      </a>
      */
-    vtimer_t nbr_adv_timer;
+    xtimer_t nbr_adv_timer;
+    msg_t nbr_adv_msg;                          /**< msg_t for gnrc_ipv6_nc_t::nbr_adv_timer */
 
-#ifdef MODULE_GNRC_SIXLOWPAN_ND
-    vtimer_t rtr_sol_timer; /**< Retransmission timer for unicast router solicitations */
+#if defined(MODULE_GNRC_NDP_ROUTER) || defined(MODULE_GNRC_SIXLOWPAN_ND_BORDER_ROUTER)
+    xtimer_t rtr_adv_timer;                     /**< Timer for periodic router advertisements */
+    msg_t rtr_adv_msg;                          /**< msg_t for gnrc_ipv6_nc_t::rtr_adv_timer */
 #endif
+
 #ifdef MODULE_GNRC_SIXLOWPAN_ND_ROUTER
-    vtimer_t type_timeout;                  /**< Timer for type transissions */
+    xtimer_t type_timeout;                  /**< Timer for type transmissions */
+    msg_t type_timeout_msg;                 /**< msg_t for gnrc_ipv6_nc_t::type_timeout */
     eui64_t eui64;                          /**< the unique EUI-64 of the neighbor (might be
                                              *   different from L2 address, if l2_addr_len == 2) */
 #endif

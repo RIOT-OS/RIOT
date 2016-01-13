@@ -22,6 +22,7 @@
 #define NHDP_H_
 
 #include "timex.h"
+#include "vtimer.h"
 #include "kernel_types.h"
 
 #include "nhdp_metric.h"

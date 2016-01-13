@@ -16,8 +16,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef __PERIPH_CONF_H
-#define __PERIPH_CONF_H
+#ifndef PERIPH_CONF_H
+#define PERIPH_CONF_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -58,7 +58,7 @@ extern "C" {
 #define TIMER_1_DEV         NRF_TIMER1
 #define TIMER_1_CHANNELS    3
 #define TIMER_1_MAX_VALUE   (0xffff)
-#define TIEMR_1_BITMODE     TIMER_BITMODE_BITMODE_16Bit
+#define TIMER_1_BITMODE     TIMER_BITMODE_BITMODE_16Bit
 #define TIMER_1_ISR         isr_timer1
 #define TIMER_1_IRQ         TIMER1_IRQn
 
@@ -91,15 +91,12 @@ extern "C" {
  * @{
  */
 #define UART_NUMOF          (1U)
-#define UART_0_EN           1
-#define UART_IRQ_PRIO       1
-
 /* UART pin configuration */
-#define UART_HWFLOWCTRL   1
-#define UART_PIN_RX       11
-#define UART_PIN_TX       9
-#define UART_PIN_RTS      8
-#define UART_PIN_CTS      10
+#define UART_HWFLOWCTRL     1
+#define UART_PIN_RX         11
+#define UART_PIN_TX         9
+#define UART_PIN_RTS        8
+#define UART_PIN_CTS        10
 /** @} */
 
 /**
@@ -123,4 +120,5 @@ extern "C" {
 }
 #endif
 
-#endif /* __PERIPH_CONF_H */
+#endif /* PERIPH_CONF_H */
+/** @} */

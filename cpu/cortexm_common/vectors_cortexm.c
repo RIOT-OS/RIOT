@@ -31,6 +31,14 @@
 #include "vectors_cortexm.h"
 
 /**
+ * @brief Interrupt stack canary value
+ *
+ * @note 0xe7fe is the ARM Thumb machine code equivalent of asm("bl #-2\n") or
+ * 'while (1);', i.e. an infinite loop.
+ */
+#define STACK_CANARY_WORD 0xE7FEE7FEu
+
+/**
  * @brief   Memory markers, defined in the linker script
  * @{
  */
@@ -48,12 +56,9 @@ extern uint32_t _eram;
 /** @} */
 
 /**
- * @brief Interrupt stack canary value
- *
- * @note 0xe7fe is the ARM Thumb machine code equivalent of asm("bl #-2\n") or
- * 'while (1);', i.e. an infinite loop.
+ * @brief   Allocation of the interrupt stack
  */
-#define STACK_CANARY_WORD 0xE7FEE7FEu
+__attribute__((used,section(".isr_stack"))) uint8_t isr_stack[ISR_STACKSIZE];
 
 /**
  * @brief   Pre-start routine for CPU-specific settings
@@ -76,6 +81,7 @@ void reset_handler_default(void)
 
     pre_startup();
 
+#ifdef DEVELHELP
     uint32_t *top;
     /* Fill stack space with canary values up until the current stack pointer */
     /* Read current stack pointer from CPU register */
@@ -84,6 +90,7 @@ void reset_handler_default(void)
     while (dst < top) {
         *(dst++) = STACK_CANARY_WORD;
     }
+#endif
 
     /* load data section from flash to ram */
     for (dst = &_srelocate; dst < &_erelocate; ) {
@@ -119,11 +126,22 @@ void nmi_default(void)
 /* The hard fault handler requires some stack space as a working area for local
  * variables and printf function calls etc. If the stack pointer is located
  * closer than HARDFAULT_HANDLER_REQUIRED_STACK_SPACE from the lowest address of
- * RAM we will reset the stack pointer to the top of available RAM. */
-#define HARDFAULT_HANDLER_REQUIRED_STACK_SPACE (THREAD_EXTRA_STACKSIZE_PRINTF)
+ * RAM we will reset the stack pointer to the top of available RAM.
+ * Measured from trampoline entry to breakpoint:
+ *  - Cortex-M0+ 344 Byte
+ *  - Cortex-M4  344 Byte
+ */
+#define HARDFAULT_HANDLER_REQUIRED_STACK_SPACE          (344U)
+
+static inline int _stack_size_left(uint32_t required)
+{
+    uint32_t* sp;
+    asm volatile ("mov %[sp], sp" : [sp] "=r" (sp) : : );
+    return ((int)((uint32_t)sp - (uint32_t)&_sstack) - required);
+}
 
 /* Trampoline function to save stack pointer before calling hard fault handler */
-void hard_fault_default(void)
+__attribute__((naked)) void hard_fault_default(void)
 {
     /* Get stack pointer where exception stack frame lies */
     __ASM volatile
@@ -153,11 +171,11 @@ void hard_fault_default(void)
         " out:                              \n" /* }                          */
 #if (__CORTEX_M == 0)
         "push {r4-r7}                       \n" /* save r4..r7 to the stack   */
-        "mov r4, r8                         \n" /*                            */
-        "mov r5, r9                         \n" /*                            */
-        "mov r6, r10                        \n" /*                            */
-        "mov r7, r11                        \n" /*                            */
-        "push {r4-r7}                       \n" /* save r8..r11 to the stack  */
+        "mov r3, r8                         \n" /*                            */
+        "mov r4, r9                         \n" /*                            */
+        "mov r5, r10                        \n" /*                            */
+        "mov r6, r11                        \n" /*                            */
+        "push {r3-r6}                       \n" /* save r8..r11 to the stack  */
 #else
         "push {r4-r11}                      \n" /* save r4..r11 to the stack  */
 #endif
@@ -167,7 +185,7 @@ void hard_fault_default(void)
           : [sram]   "r" (&_sram + HARDFAULT_HANDLER_REQUIRED_STACK_SPACE),
             [eram]   "r" (&_eram),
             [estack] "r" (&_estack)
-          : "r4","r5","r6","r7","r8","r9","r10","r11","lr"
+          : "r0","r4","r5","r6","r8","r9","r10","r11","lr"
     );
 }
 
@@ -181,7 +199,11 @@ void hard_fault_default(void)
 
 __attribute__((used)) void hard_fault_handler(uint32_t* sp, uint32_t corrupted, uint32_t exc_return, uint32_t* r4_to_r11_stack)
 {
-
+    /* Check if the ISR stack overflowed previously. Not possible to detect
+     * after output may also have overflowed it. */
+    if(*(&_sstack) != STACK_CANARY_WORD) {
+        puts("\nISR stack overflowed");
+    }
     /* Sanity check stack pointer and give additional feedback about hard fault */
     if( corrupted ) {
         puts("Stack pointer corrupted, reset to top of stack");
@@ -217,15 +239,15 @@ __attribute__((used)) void hard_fault_handler(uint32_t* sp, uint32_t corrupted, 
         puts("\nContext before hardfault:");
 
         /* TODO: printf in ISR context might be a bad idea */
-        printf("   r0: 0x%08lx\n"
-               "   r1: 0x%08lx\n"
-               "   r2: 0x%08lx\n"
-               "   r3: 0x%08lx\n",
+        printf("   r0: 0x%08" PRIx32 "\n"
+               "   r1: 0x%08" PRIx32 "\n"
+               "   r2: 0x%08" PRIx32 "\n"
+               "   r3: 0x%08" PRIx32 "\n",
                r0, r1, r2, r3);
-        printf("  r12: 0x%08lx\n"
-               "   lr: 0x%08lx\n"
-               "   pc: 0x%08lx\n"
-               "  psr: 0x%08lx\n\n",
+        printf("  r12: 0x%08" PRIx32 "\n"
+               "   lr: 0x%08" PRIx32 "\n"
+               "   pc: 0x%08" PRIx32 "\n"
+               "  psr: 0x%08" PRIx32 "\n\n",
                r12, lr, pc, psr);
 #if CPU_HAS_EXTENDED_FAULT_REGISTERS
         puts("FSR/FAR:");
@@ -245,7 +267,11 @@ __attribute__((used)) void hard_fault_handler(uint32_t* sp, uint32_t corrupted, 
         puts("Misc");
         printf("EXC_RET: 0x%08" PRIx32 "\n", exc_return);
         puts("Attempting to reconstruct state for debugging...");
-        printf("In GDB:\n  set $pc=0x%lx\n  frame 0\n  bt\n", pc);
+        printf("In GDB:\n  set $pc=0x%" PRIx32 "\n  frame 0\n  bt\n", pc);
+        int stack_left = _stack_size_left(HARDFAULT_HANDLER_REQUIRED_STACK_SPACE);
+        if(stack_left < 0) {
+            printf("\nISR stack overflowed by at least %d bytes.\n", (-1 * stack_left));
+        }
         __ASM volatile (
             "mov r0, %[sp]\n"
             "ldr r2, [r0, #8]\n"

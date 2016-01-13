@@ -1,3 +1,6 @@
+# include Makefile.local if it exists
+-include Makefile.local
+
 all:
 
 # set undefined variables
@@ -187,7 +190,6 @@ export CFLAGS += -DRIOT_VERSION=\"$(RIOT_VERSION)\"
 endif
 
 # the binaries to link
-BASELIBS += $(BINDIR)$(BOARD)_base.a
 BASELIBS += $(BINDIR)${APPLICATION}.a
 BASELIBS += $(USEPKG:%=${BINDIR}%.a)
 
@@ -286,6 +288,9 @@ term: $(filter flash, $(MAKECMDGOALS))
 		'${COLOR_RED} Terminal program $(TERMPROG) not found. Aborting.${COLOR_RESET}'; \
 		exit 1; }
 	$(TERMPROG) $(TERMFLAGS)
+
+list-ttys:
+	$(AD)$(RIOTBASE)/dist/tools/usb-serial/list-ttys.sh
 
 doc:
 	make -BC $(RIOTBASE) doc
@@ -437,5 +442,7 @@ info-modules:
 	@for i in $(sort $(USEMODULE)); do echo $$i; done
 
 ifneq (,$(filter iotlab-m3 wsn430-v1_3b wsn430-v1_4,$(BOARD)))
-  include $(RIOTBASE)/dist/testbed-support/Makefile.iotlab
+  ifneq (,$(filter iotlab-%,$(MAKECMDGOALS)))
+    include $(RIOTBASE)/dist/testbed-support/Makefile.iotlab
+  endif
 endif

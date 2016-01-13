@@ -44,26 +44,6 @@ extern int _get_weather_handler(int argc, char **argv);
 extern int _set_offset_handler(int argc, char **argv);
 #endif
 
-#ifdef MODULE_ISL29020
-extern int _get_isl29020_init_handler(int argc, char **argv);
-extern int _get_isl29020_read_handler(int argc, char **argv);
-#endif
-
-#ifdef MODULE_LPS331AP
-extern int _get_lps331ap_init_handler(int argc, char **argv);
-extern int _get_lps331ap_read_handler(int argc, char **argv);
-#endif
-
-#ifdef MODULE_L3G4200D
-extern int _get_l3g4200d_init_handler(int argc, char **argv);
-extern int _get_l3g4200d_read_handler(int argc, char **argv);
-#endif
-
-#ifdef MODULE_LSM303DLHC
-extern int _get_lsm303dlhc_init_handler(int argc, char **argv);
-extern int _get_lsm303dlhc_read_handler(int argc, char **argv);
-#endif
-
 #ifdef MODULE_LTC4150
 extern int _get_current_handler(int argc, char **argv);
 extern int _reset_current_handler(int argc, char **argv);
@@ -71,6 +51,10 @@ extern int _reset_current_handler(int argc, char **argv);
 
 #ifdef MODULE_AT30TSE75X
 extern int _at30tse75x_handler(int argc, char **argv);
+#endif
+
+#ifdef MODULE_SAUL_REG
+extern int _saul(int argc, char **argv);
 #endif
 
 #if FEATURE_PERIPH_RTC
@@ -90,14 +74,14 @@ extern int _read_bytes(int argc, char **argv);
 #endif
 
 #ifdef MODULE_GNRC_ICMPV6_ECHO
-#ifdef MODULE_VTIMER
+#ifdef MODULE_XTIMER
 extern int _icmpv6_ping(int argc, char **argv);
 #endif
 #endif
 
 #ifdef MODULE_RANDOM
-extern int _mersenne_init(int argc, char **argv);
-extern int _mersenne_get(int argc, char **argv);
+extern int _random_init(int argc, char **argv);
+extern int _random_get(int argc, char **argv);
 #endif
 
 #ifdef MODULE_GNRC_NETIF
@@ -134,6 +118,12 @@ extern int _gnrc_6ctx(int argc, char **argv);
 #endif
 #endif
 
+#ifdef MODULE_CCN_LITE_UTILS
+extern int _ccnl_open(int argc, char **argv);
+extern int _ccnl_content(int argc, char **argv);
+extern int _ccnl_interest(int argc, char **argv);
+#endif
+
 const shell_command_t _shell_command_list[] = {
     {"reboot", "Reboot the node", _reboot_handler},
 #ifdef MODULE_CONFIG
@@ -151,22 +141,6 @@ const shell_command_t _shell_command_list[] = {
     {"weather", "Prints measured humidity and temperature.", _get_weather_handler},
     {"offset", "Set temperature offset.", _set_offset_handler},
 #endif
-#ifdef MODULE_ISL29020
-    {"isl29020_init", "Initializes the isl29020 sensor driver.", _get_isl29020_init_handler},
-    {"isl29020_read", "Prints data from the isl29020 sensor.", _get_isl29020_read_handler},
-#endif
-#ifdef MODULE_LPS331AP
-    {"lps331ap_init", "Initializes the lps331ap sensor driver.", _get_lps331ap_init_handler},
-    {"lps331ap_read", "Prints data from the lps331ap sensor.", _get_lps331ap_read_handler},
-#endif
-#ifdef MODULE_L3G4200D
-    {"l3g4200d_init", "Initializes the l3g4200d sensor driver.", _get_l3g4200d_init_handler},
-    {"l3g4200d_read", "Prints data from the l3g4200d sensor.", _get_l3g4200d_read_handler},
-#endif
-#ifdef MODULE_LSM303DLHC
-    {"lsm303dlhc_init", "Initializes the lsm303dlhc sensor driver.", _get_lsm303dlhc_init_handler},
-    {"lsm303dlhc_read", "Prints data from the lsm303dlhc sensor.", _get_lsm303dlhc_read_handler},
-#endif
 #ifdef MODULE_LTC4150
     {"cur", "Prints current and average power consumption.", _get_current_handler},
     {"rstcur", "Resets coulomb counter.", _reset_current_handler},
@@ -182,13 +156,13 @@ const shell_command_t _shell_command_list[] = {
     {DISK_GET_BLOCK_SIZE, "Get the block size of inserted memory card", _get_blocksize},
 #endif
 #ifdef MODULE_GNRC_ICMPV6_ECHO
-#ifdef MODULE_VTIMER
+#ifdef MODULE_XTIMER
     { "ping6", "Ping via ICMPv6", _icmpv6_ping },
 #endif
 #endif
 #ifdef MODULE_RANDOM
-    { "mersenne_init", "initializes the PRNG", _mersenne_init },
-    { "mersenne_get", "returns 32 bit of pseudo randomness", _mersenne_get },
+    { "random_init", "initializes the PRNG", _random_init },
+    { "random_get", "returns 32 bit of pseudo randomness", _random_get },
 #endif
 #if FEATURE_PERIPH_RTC
     {"rtc", "control RTC peripheral interface",  _rtc_handler},
@@ -222,6 +196,14 @@ const shell_command_t _shell_command_list[] = {
 #ifdef MODULE_GNRC_SIXLOWPAN_ND_BORDER_ROUTER
     {"6ctx", "6LoWPAN context configuration tool", _gnrc_6ctx },
 #endif
+#endif
+#ifdef MODULE_SAUL_REG
+    {"saul", "interact with sensors and actuators using SAUL", _saul },
+#endif
+#ifdef MODULE_CCN_LITE_UTILS
+    { "ccnl_open", "opens an interface or socket", _ccnl_open},
+    { "ccnl_int", "sends an interest", _ccnl_interest},
+    { "ccnl_cont", "create content and populated it", _ccnl_content},
 #endif
     {NULL, NULL, NULL}
 };

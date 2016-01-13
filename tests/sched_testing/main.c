@@ -34,7 +34,7 @@ int main(void)
     puts("----------------------------------------------------------------");
 
     thread_create(snd_thread_stack, sizeof(snd_thread_stack), THREAD_PRIORITY_MAIN,
-                  CREATE_WOUT_YIELD, snd_thread, NULL, "snd");
+                  THREAD_CREATE_WOUT_YIELD, snd_thread, NULL, "snd");
 
     puts("yield 1");
     thread_yield();

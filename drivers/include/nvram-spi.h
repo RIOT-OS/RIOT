@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     nvram
+ * @ingroup     drivers_nvram
  * @{
  *
  * @file

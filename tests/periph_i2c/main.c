@@ -69,41 +69,6 @@ int cmd_init_master(int argc, char **argv)
     return 0;
 }
 
-int cmd_init_slave(int argc, char **argv)
-{
-    int dev, addr, res;
-
-    if (argc != 3) {
-        puts("Error: Invalid number of arguments!");
-        printf("Usage:\n%s: [DEVICE] [ADDRESS]\n", argv[0]);
-        puts("    with DEVICE:");
-        for (int i = 0; i < I2C_NUMOF; i++) {
-            printf("          %i -> I2C_%i\n", i, i);
-        }
-        puts("         ADDRESS: value between 0 and 127");
-        return 1;
-    }
-
-    dev = atoi(argv[1]);
-    addr = atoi(argv[1]);
-
-    res = i2c_init_slave(dev, addr);
-    if (res == -1) {
-        puts("Error: Init: Given device not available");
-        return 1;
-    }
-    else if (res == -2) {
-        puts("Error: Init: Invalid address given");
-        return 1;
-    }
-    else {
-        printf("I2C_%i successfully initialized as slave with address %i!\n", dev, addr);
-        i2c_dev = dev;
-    }
-
-    return 0;
-}
-
 int cmd_write(int argc, char **argv)
 {
     int res;
@@ -294,7 +259,6 @@ int cmd_read_reg(int argc, char **argv)
 
 static const shell_command_t shell_commands[] = {
     { "init_master", "Initialize I2C as master", cmd_init_master },
-    { "init_slave", "Initialize I2C as slave", cmd_init_slave },
     { "w", "write bytes to given address", cmd_write },
     { "wr", "write to register ", cmd_write_reg },
     { "r", "read bytes from given address", cmd_read },

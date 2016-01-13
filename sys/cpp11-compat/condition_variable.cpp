@@ -24,7 +24,7 @@
 #include "irq.h"
 #include "sched.h"
 #include "timex.h"
-#include "vtimer.h"
+#include "xtimer.h"
 #include "priority_queue.h"
 
 #include "riot/condition_variable.hpp"
@@ -103,16 +103,16 @@ void condition_variable::wait(unique_lock<mutex>& lock) noexcept {
 
 cv_status condition_variable::wait_until(unique_lock<mutex>& lock,
                                          const time_point& timeout_time) {
-  vtimer_t timer;
+  xtimer_t timer;
   // todo: use function to wait for absolute timepoint once available
   timex_t before;
-  vtimer_now(&before);
+  xtimer_now_timex(&before);
   auto diff = timex_sub(timeout_time.native_handle(), before);
-  vtimer_set_wakeup(&timer, diff, sched_active_pid);
+  xtimer_set_wakeup(&timer, timex_uint64(diff), sched_active_pid);
   wait(lock);
   timex_t after;
-  vtimer_now(&after);
-  vtimer_remove(&timer);
+  xtimer_now_timex(&after);
+  xtimer_remove(&timer);
   auto cmp = timex_cmp(after, timeout_time.native_handle());
   return cmp < 1 ? cv_status::no_timeout : cv_status::timeout;
 }

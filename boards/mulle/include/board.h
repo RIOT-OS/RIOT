@@ -23,6 +23,7 @@
 
 #include "cpu.h"
 #include "periph_conf.h"
+#include "mulle-nvram.h"
 
 /* Use the on board RTC 32kHz clock for LPTMR clocking. */
 #undef LPTIMER_CLKSRC
@@ -46,15 +47,15 @@
  * @{
  */
 
-#define LED_RED_GPIO        GPIO_0
-#define LED_RED_PORT        GPIO_0_DEV
-#define LED_RED_PIN         GPIO_0_PIN
-#define LED_YELLOW_GPIO     GPIO_1
-#define LED_YELLOW_PORT     GPIO_1_DEV
-#define LED_YELLOW_PIN      GPIO_1_PIN
-#define LED_GREEN_GPIO      GPIO_2
-#define LED_GREEN_PORT      GPIO_2_DEV
-#define LED_GREEN_PIN       GPIO_2_PIN
+#define LED_RED_PORT        PTC
+#define LED_RED_PIN         15
+#define LED_RED_GPIO        GPIO_PIN(PORT_C, LED_RED_PIN)
+#define LED_YELLOW_PORT     PTC
+#define LED_YELLOW_PIN      14
+#define LED_YELLOW_GPIO     GPIO_PIN(PORT_C, LED_YELLOW_PIN)
+#define LED_GREEN_PORT      PTC
+#define LED_GREEN_PIN       13
+#define LED_GREEN_GPIO      GPIO_PIN(PORT_C, LED_GREEN_PIN)
 
 /** @} */
 
@@ -88,25 +89,27 @@ void board_init(void);
 
 /**
  * @name Define the interface to the AT86RF212B radio
- * @{
+ *
+ * @todo Work around missing RESET pin on Mulle v0.6x
+ *
+ * {spi bus, spi speed, cs pin, int pin, reset pin, sleep pin}
  */
-#define AT86RF231_SPI       SPI_0
-#define AT86RF231_CS        GPIO_14
-#define AT86RF231_INT       GPIO_12
-/** @todo work around missing RESET pin on Mulle v0.6x */
-#define AT86RF231_RESET     GPIO_5
-#define AT86RF231_SLEEP     GPIO_13
-#define AT86RF231_SPI_CLK   SPI_SPEED_5MHZ
-/** @} */
+#define AT86RF2XX_PARAMS_BOARD      {.spi = SPI_0, \
+                                     .spi_speed = SPI_SPEED_5MHZ, \
+                                     .cs_pin = GPIO_PIN(PORT_D, 4), \
+                                     .int_pin = GPIO_PIN(PORT_B, 9), \
+                                     .sleep_pin = GPIO_PIN(PORT_E, 6), \
+                                     .reset_pin = GPIO_PIN(PORT_C, 12)}
+
 
 /**
  * @name LIS3DH configuration
  * @{
  */
 
-#define LIS3DH_INT1   GPIO_3
-#define LIS3DH_INT2   GPIO_4
-#define LIS3DH_CS     GPIO_15
+#define LIS3DH_INT1   GPIO_PIN(PORT_C, 18)
+#define LIS3DH_INT2   GPIO_PIN(PORT_C, 17)
+#define LIS3DH_CS     GPIO_PIN(PORT_D, 0)
 #define LIS3DH_SPI    SPI_2
 
 /** @} */
@@ -115,9 +118,20 @@ void board_init(void);
  * @name Mulle power control configuration
  */
 /** @{ */
-#define MULLE_POWER_AVDD    GPIO_6 /**< AVDD enable pin */
-#define MULLE_POWER_VPERIPH GPIO_7 /**< VPERIPH enable pin */
-#define MULLE_POWER_VSEC    GPIO_5 /**< VSEC enable pin */
+#define MULLE_POWER_AVDD    GPIO_PIN(PORT_B, 17) /**< AVDD enable pin */
+#define MULLE_POWER_VPERIPH GPIO_PIN(PORT_D,  7) /**< VPERIPH enable pin */
+#define MULLE_POWER_VSEC    GPIO_PIN(PORT_B, 16) /**< VSEC enable pin */
+/** @} */
+
+/**
+ * @name Mulle NVRAM hardware configuration
+ */
+/** @{ */
+/** FRAM SPI bus, SPI_2 in RIOT is mapped to hardware bus SPI0, see periph_conf.h */
+#define MULLE_NVRAM_SPI_DEV           SPI_2
+#define MULLE_NVRAM_SPI_CS            GPIO_PIN(PORT_D, 6) /**< FRAM CS pin */
+#define MULLE_NVRAM_CAPACITY          512     /**< FRAM size, in bytes */
+#define MULLE_NVRAM_SPI_ADDRESS_COUNT 1       /**< FRAM addressing size, in bytes */
 /** @} */
 
 /**

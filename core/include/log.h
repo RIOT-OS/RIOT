@@ -10,6 +10,7 @@
  * @addtogroup  core_util
  * @{
  *
+ * @file
  * @brief       System logging header
  *
  * This header offers a bunch of "LOG_*" functions that, with the default
@@ -28,8 +29,8 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-#ifndef __LOG_H
-#define __LOG_H
+#ifndef LOG_H
+#define LOG_H
 
 #ifdef __cplusplus
  extern "C" {
@@ -99,5 +100,5 @@ enum {
 }
 #endif
 
-#endif /* __LOG_H */
+#endif /* LOG_H */
 /** @} */

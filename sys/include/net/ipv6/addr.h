@@ -229,21 +229,6 @@ typedef union {
 /** @} */
 
 /**
- * @brief   Checks if two IPv6 addresses are equal.
- *
- * @param[in] a     An IPv6 address.
- * @param[in] b     Another IPv6 address.
- *
- * @return  true, if @p a and @p b are equal
- * @return  false, otherwise.
- */
-static inline bool ipv6_addr_equal(const ipv6_addr_t *a, const ipv6_addr_t *b)
-{
-    return (a->u64[0].u64 == b->u64[0].u64) &&
-           (a->u64[1].u64 == b->u64[1].u64);
-}
-
-/**
  * @brief   Checks if @p addr is unspecified (all zero).
  *
  * @see <a href="http://tools.ietf.org/html/rfc4291#section-2.5.2">
@@ -449,6 +434,17 @@ static inline bool ipv6_addr_is_solicited_node(const ipv6_addr_t *addr)
 
 
 /**
+ * @brief   Checks if two IPv6 addresses are equal.
+ *
+ * @param[in] a     An IPv6 address.
+ * @param[in] b     Another IPv6 address.
+ *
+ * @return  true, if @p a and @p b are equal
+ * @return  false, otherwise.
+ */
+bool ipv6_addr_equal(const ipv6_addr_t *a, const ipv6_addr_t *b);
+
+/**
  * @brief   Checks up to which bit-count two IPv6 addresses match in their
  *          prefix.
  *
@@ -469,6 +465,17 @@ uint8_t ipv6_addr_match_prefix(const ipv6_addr_t *a, const ipv6_addr_t *b);
  *                      (set to 128 when greater than 128).
  */
 void ipv6_addr_init_prefix(ipv6_addr_t *out, const ipv6_addr_t *prefix, uint8_t bits);
+
+/**
+ * @brief   Sets the last @p bits of IPv6 address @p out to @p iid.
+ *          Leading bits of @p out stay untouched.
+ *
+ * @param[out]  out     IPv6 address to be set.
+ * @param[in]   iid     buffer representing the iid.
+ * @param[in]   bits    Bits to be copied from @p iid to @p out
+ *                      (set to 128 when greater than 128).
+ */
+void ipv6_addr_init_iid(ipv6_addr_t *out, const uint8_t *iid, uint8_t bits);
 
 /**
  * @brief   Sets @p addr dynamically to the unspecified IPv6 address (::).

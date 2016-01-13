@@ -31,8 +31,6 @@
 /**
  * @brief   This function sets the IRQ disable bit in the status register
  *
- * @note    This function should be used in favour of dINT().
- *
  * @return  Previous value of status register. The return value should not
  *          interpreted as a boolean value. The actual value is only
  *          significant for restoreIRQ().
@@ -43,8 +41,6 @@ unsigned disableIRQ(void);
 
 /**
  * @brief   This function clears the IRQ disable bit in the status register
- *
- * @note    This function should be used in favour of eINT().
  *
  * @return  Previous value of status register. The return value should not
  *          interpreted as a boolean value. The actual value is only
@@ -59,8 +55,6 @@ unsigned enableIRQ(void);
  *          to the value contained within passed state
  *
  * @param[in] state   state to restore
- *
- * @note    This function should be used in favour of eINT().
  *
  * @see     enableIRQ
  * @see     disableIRQ

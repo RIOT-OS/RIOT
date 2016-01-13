@@ -129,7 +129,6 @@ int rtc_set_alarm(struct tm *time, rtc_alarm_cb_t cb, void *arg)
     while (rtcMode2->STATUS.bit.SYNCBUSY);
 
     /* Setup interrupt */
-    NVIC_SetPriority(RTC_IRQn, 10);
     NVIC_EnableIRQ(RTC_IRQn);
 
     /* Enable IRQ */

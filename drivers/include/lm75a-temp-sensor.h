@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    lm75a LM75A
+ * @defgroup    drivers_lm75a LM75A
  * @ingroup     drivers_sensors
  * @brief       Driver for the LM75A digital temperature sensor and thermal watchdog
  *

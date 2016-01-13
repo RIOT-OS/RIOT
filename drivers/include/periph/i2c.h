@@ -7,8 +7,8 @@
  */
 
 /**
- * @defgroup    driver_periph_i2c I2C
- * @ingroup     driver_periph
+ * @defgroup    drivers_periph_i2c I2C
+ * @ingroup     drivers_periph
  * @brief       Low-level I2C peripheral driver
  *
  * @{
@@ -130,17 +130,6 @@ typedef enum {
  * @return                  -2 on unsupported speed value
  */
 int i2c_init_master(i2c_t dev, i2c_speed_t speed);
-
-/**
- * @brief   Initialize an I2C device to run in slave mode
- *
- * @param[in] dev           the device to initialize
- * @param[in] address       the devices I2C address
- *
- * @return                  0 on success
- * @return                  -1 on undefined device given
- */
-int i2c_init_slave(i2c_t dev, uint8_t address);
 
 /**
  * @brief   Get mutually exclusive access to the given I2C bus

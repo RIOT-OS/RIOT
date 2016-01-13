@@ -79,34 +79,12 @@ static void test_div_u64_by_1000000(void)
     }
 }
 
-static void test_div_u32_by_10(void)
-{
-    for (unsigned i = 0; i < N_U32_VALS; i++) {
-        DEBUG("Dividing %"PRIu32" by 10...\n", u32_test_values[i]);
-        TEST_ASSERT_EQUAL_INT(
-                div_u32_by_10(u32_test_values[i]),
-                u32_test_values[i]/10);
-    }
-}
-
-static void test_div_u32_mod_10(void)
-{
-    for (unsigned i = 0; i < N_U32_VALS; i++) {
-        DEBUG("Calculating %"PRIu32" % 10...\n", u32_test_values[i]);
-        TEST_ASSERT_EQUAL_INT(
-                div_u32_mod_10(u32_test_values[i]),
-                u32_test_values[i]%10);
-    }
-}
-
 Test *tests_div_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(test_div_u64_by_15625),
         new_TestFixture(test_div_u32_by_15625div512),
         new_TestFixture(test_div_u64_by_1000000),
-        new_TestFixture(test_div_u32_by_10),
-        new_TestFixture(test_div_u32_mod_10),
     };
 
     EMB_UNIT_TESTCALLER(div_tests, NULL, NULL, fixtures);

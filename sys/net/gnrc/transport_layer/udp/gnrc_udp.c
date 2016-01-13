@@ -68,8 +68,8 @@ static uint16_t _calc_csum(gnrc_pktsnip_t *hdr, gnrc_pktsnip_t *pseudo_hdr,
     uint16_t len = (uint16_t)hdr->size;
 
     /* process the payload */
-    while (payload && payload != hdr) {
-        csum = inet_csum(csum, (uint8_t *)(payload->data), payload->size);
+    while (payload && payload != hdr && payload != pseudo_hdr) {
+        csum = inet_csum_slice(csum, (uint8_t *)(payload->data), payload->size, len);
         len += (uint16_t)payload->size;
         payload = payload->next;
     }
@@ -104,20 +104,28 @@ static void _receive(gnrc_pktsnip_t *pkt)
         return;
     }
     pkt = udp;
-    udp = gnrc_pktbuf_mark(pkt, sizeof(udp_hdr_t), GNRC_NETTYPE_UDP);
-    if (udp == NULL) {
-        DEBUG("udp: error marking UDP header, dropping packet\n");
-        gnrc_pktbuf_release(pkt);
-        return;
+
+    LL_SEARCH_SCALAR(pkt, ipv6, type, GNRC_NETTYPE_IPV6);
+
+    assert(ipv6 != NULL);
+
+    if ((pkt->next != NULL) && (pkt->next->type == GNRC_NETTYPE_UDP) &&
+        (pkt->next->size == sizeof(udp_hdr_t))) {
+        /* UDP header was already marked. Take it. */
+        udp = pkt->next;
+    }
+    else {
+        udp = gnrc_pktbuf_mark(pkt, sizeof(udp_hdr_t), GNRC_NETTYPE_UDP);
+        if (udp == NULL) {
+            DEBUG("udp: error marking UDP header, dropping packet\n");
+            gnrc_pktbuf_release(pkt);
+            return;
+        }
     }
     /* mark payload as Type: UNDEF */
     pkt->type = GNRC_NETTYPE_UNDEF;
     /* get explicit pointer to UDP header */
     hdr = (udp_hdr_t *)udp->data;
-
-    LL_SEARCH_SCALAR(pkt, ipv6, type, GNRC_NETTYPE_IPV6);
-
-    assert(ipv6 != NULL);
 
     /* validate checksum */
     if (_calc_csum(udp, ipv6, pkt)) {
@@ -277,7 +285,7 @@ int gnrc_udp_init(void)
     if (_pid == KERNEL_PID_UNDEF) {
         /* start UDP thread */
         _pid = thread_create(_stack, sizeof(_stack), GNRC_UDP_PRIO,
-                             CREATE_STACKTEST, _event_loop, NULL, "udp");
+                             THREAD_CREATE_STACKTEST, _event_loop, NULL, "udp");
     }
     return _pid;
 }

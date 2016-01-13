@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # directory to install compiled binaries into
 PREFIX=${HOME}/gnuarm-naked

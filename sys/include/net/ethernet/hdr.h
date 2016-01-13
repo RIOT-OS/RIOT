@@ -32,6 +32,12 @@ extern "C" {
 
 #define ETHERNET_ADDR_LEN       (6)     /**< Length of an Ethernet address */
 
+#ifndef ETH_ALEN
+#define ETH_ALEN ETHERNET_ADDR_LEN      /**< convenient alias for @ref
+                                             ETHERNET_ADDR_LEN to comply with
+                                             *NIX code */
+#endif
+
 /**
  * @brief   Ethernet header
  */

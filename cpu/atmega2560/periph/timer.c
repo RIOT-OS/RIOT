@@ -380,6 +380,7 @@ void timer_start(tim_t dev)
 
 void timer_irq_enable(tim_t dev)
 {
+    (void) dev;
 #ifdef DEVELHELP
     printf("timer_irq_enable not implemented\n");
 #endif
@@ -407,29 +408,6 @@ void timer_irq_disable(tim_t dev)
             TIMER2_IRQ_MASK_REG &= ~(1 << TIMER2_COMP_A_EN);
             TIMER2_IRQ_MASK_REG &= ~(1 << TIMER2_COMP_B_EN);
             TIMER2_IRQ_MASK_REG &= ~(1 << TIMER2_COMP_C_EN);
-            break;
-#endif
-        case TIMER_UNDEFINED:
-            break;
-    }
-}
-
-void timer_reset(tim_t dev)
-{
-    switch (dev) {
-#if TIMER_0_EN
-        case TIMER_0:
-            TIMER0_COUNTER = 0;
-            break;
-#endif
-#if TIMER_1_EN
-        case TIMER_1:
-            TIMER1_COUNTER = 0;
-            break;
-#endif
-#if TIMER_2_EN
-        case TIMER_2:
-            TIMER2_COUNTER = 0;
             break;
 #endif
         case TIMER_UNDEFINED:
