@@ -11,6 +11,11 @@ ifneq (,$(filter at86rf2%,$(USEMODULE)))
   USEMODULE += netif
 endif
 
+ifneq (,$(filter bh1750fvi,$(USEMODULE)))
+  USEMODULE += xtimer
+  FEATURES_REQUIRED = periph_i2c
+endif
+
 ifneq (,$(filter cc110x,$(USEMODULE)))
   USEMODULE += ieee802154
 endif
