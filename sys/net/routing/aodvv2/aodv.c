@@ -31,7 +31,6 @@
 #define AODVV2_PREFIX {{ 0xbe, 0xe2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }}
 
 static void _init_addresses(void);
-static void _init_sock_snd(void);
 static void *_aodv_receiver_thread(void *arg);
 static void *_aodv_sender_thread(void *arg);
 static void *fib_signal_handler_thread(void *arg);
@@ -57,7 +56,6 @@ static char aodv_fib_stack_buf[THREAD_STACKSIZE_MAIN];
 
 static aodvv2_metric_t _metric_type;
 static int sender_thread;
-static int _sock_snd;
 static struct autobuf _hexbuf;
 static ng_ipv6_addr_t _v6_addr_mcast, _v6_addr_loopback;
 static ng_ipv6_addr_t _v6_addr_local;
@@ -98,7 +96,6 @@ void aodv_init(kernel_pid_t interface)
 
     aodv_set_metric_type(AODVV2_DEFAULT_METRIC_TYPE);
     _init_addresses();
-    _init_sock_snd();
 
     /* init ALL the things! \o, */
     seqnum_init();
@@ -315,16 +312,6 @@ static void _init_addresses(void)
 
     /* TODO: do I need this?*/
     ng_ipv6_addr_set_loopback(&_v6_addr_loopback);
-}
-
-/* init socket communication for sender */
-static void _init_sock_snd(void)
-{
-    _sock_snd = socket_base_socket(PF_INET6, SOCK_DGRAM, IPPROTO_UDP);
-
-    if (-1 == _sock_snd) {
-        AODV_DEBUG("Error Creating Socket!\n");
-    }
 }
 
 /* Build RREQs, RREPs and RERRs from the information contained in the thread's
