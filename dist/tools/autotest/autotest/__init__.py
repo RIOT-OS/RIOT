@@ -9,6 +9,8 @@
 # directory for more details.
 
 from __future__ import print_function
+from autotest.board import Board
+import autotest.args as args
 
 class TermColor(object):
     red = '\033[1;31m'
@@ -21,21 +23,6 @@ class TermColor(object):
 def colorize(string, color):
     return '%s%s%s' % (color, string, TermColor.end)
 
-class Board(object):
-    def __init__(self, name, port=None, serial=None):
-        self.name = name
-        self.port = port
-        self.serial = serial
-
-    def to_env(self):
-        env = {}
-        if self.name:
-            env['BOARD'] = self.name
-        if self.port:
-            env['PORT'] = self.port
-        if self.serial:
-            env['SERIAL'] = self.serial
-        return env
 
 class TestCase(object):
     def __init__(self, name, build_strategy = None, test_strategy = None):
