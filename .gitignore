@@ -53,3 +53,6 @@ pkg/wakaama/wakaama
 
 # Vagrant
 .vagrant
+
+# Python cache files
+__pycache__
