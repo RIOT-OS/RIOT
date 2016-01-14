@@ -12,18 +12,54 @@
  * @brief       Provides a minimal common API for applications to connect to the
  *              different network stacks.
  *
- * This module provides a minimal common API for applications to connect over different network
- * stacks. For each network stack there is supposed to be at least one connection type
- * implementation. Note that this definition gives no restriction on how a connection type should be
- * structured for simplicity and modularity. As a result, it can't give any guarantee that an
- * implementation keeps them compatible to each other. For example, an implementation might allow,
- * that a UDP receive function is called on a raw IPv6 connection object and even choose to do so
- * for valid reasons (e.g. code size), but this definition does not impose this on the
- * implementation. Currently there are the following option types defined:
+ * About
+ * =====
+ *
+ *    +---------------+
+ *    |  Application  |
+ *    +---------------+
+ *            ^
+ *            |
+ *            v
+ *          conn
+ *            ^
+ *            |
+ *            v
+ *    +---------------+
+ *    | Network Stack |
+ *    +---------------+
+ *
+ * This module provides a minimal set of functions to establish a connection using
+ * different types of connections. Together, they serve as a common API
+ * that connects application- and network stack code.
+ *
+ * Currently the following connection types are defined:
  *
  * * @ref conn_ip_t (net/conn/ip.h): raw IP connections
  * * @ref conn_tcp_t (net/conn/tcp.h): TCP connections
  * * @ref conn_udp_t (net/conn/udp.h): UDP connections
+ *
+ * Each network stack must implement at least one connection type.
+ *
+ * Note that there might be no relation between the different connection types.
+ * For simplicity and modularity this API doesn't put any restriction of the actual
+ * implementation of the type. For example, one implementation might choose
+ * to have all connection types have a common base class or use the raw IPv6
+ * connection type to send e.g. UDP packets, while others will keep them
+ * completely separate from each other.
+ *
+ * How To Use
+ * ==========
+ *
+ * A RIOT application uses the functions provided by one or more of the connection types
+ * headers (for example @ref conn_udp_t), regardless of the network stack it uses.
+ * The network stack used under the bonnet is specified by including the appropriate
+ * module (for example USEMODULE += gnrc_conn_udp)
+ *
+ * This allows for network stack agnostic code on the application layer.
+ * The application code to establish a connection is always the same, allowing
+ * the network stack underneath to be switched simply by changing the USEMODULE
+ * definition in the application's Makefile.
  *
  * @{
  *
@@ -33,6 +69,7 @@
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  * @author  Oliver Hahm <oliver.hahm@inria.fr>
  */
+
 #ifndef NET_CONN_H_
 #define NET_CONN_H_
 
