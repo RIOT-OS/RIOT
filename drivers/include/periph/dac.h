@@ -32,10 +32,10 @@ extern "C" {
 #if DAC_NUMOF
 
 /**
- * @brief Definition avialable DAC devices
+ * @brief Definition of available DAC devices
  *
  * Each DAC device is based on a hardware DAC which can have one or more
- * independet channels.
+ * independent channels.
  */
 typedef enum {
 #if DAC_0_EN
@@ -53,7 +53,7 @@ typedef enum {
 } dac_t;
 
 /**
- * @brief Possilbe DAC precision settings
+ * @brief Possible DAC precision settings
  */
 typedef enum {
     DAC_RES_6BIT = 0,      /**< DAC precision: 6 bit */
@@ -67,11 +67,11 @@ typedef enum {
 /**
  * @brief Initialization of a given DAC device
  *
- * The DAC will be initialized with all possilble channels active.
- * On each channel will be initialized with a Zero on it.
+ * The DAC will be initialized with all possible channels active.
+ * Each channel output will be set to 0.
  *
- * @param[in] dev          the device to initialize
- * @param[in] precision    the precision to use for conversion
+ * @param[in] dev          device to initialize
+ * @param[in] precision    precision to use for conversion
  *
  * @return                 0 on success
  * @return                 -1 on unknown DAC Device
@@ -82,9 +82,9 @@ int8_t dac_init(dac_t dev, dac_precision_t precision);
 /**
  * @brief Write a value onto DAC Device on a given Channel.
  *
- * @param[in] dev          the DAC device to use
- * @param[in] channel      the channel used for Digital/Analoge conversion
- * @param[in] value        the value to write onto DAC.
+ * @param[in] dev          DAC device to use
+ * @param[in] channel      channel used for Digital/Analog conversion
+ * @param[in] value        value to write onto DAC
  *
  * @return                 0 on success
  * @return                 -1 on unknown DAC Device
@@ -96,7 +96,7 @@ int8_t dac_write(dac_t dev, uint8_t channel, uint16_t value);
 /**
  * @brief Enable power for the given DAC Device
  *
- * @param[in] dev          the DAC device to power up.
+ * @param[in] dev          DAC device to power up
  *
  * @return                 0 on success
  * @return                 -1 on unknown DAC Device
@@ -106,7 +106,7 @@ int8_t dac_poweron(dac_t dev);
 /**
  * @brief Disable power for the given DAC Device
  *
- * @param[in] dev          the DAC device to power down
+ * @param[in] dev          DAC device to power down
  *
  * @return                 0 on success
  * @return                 -1 on unknown DAC Device
@@ -121,12 +121,12 @@ int8_t dac_poweroff(dac_t dev);
  * The min value is assumed to be smaller than max value and value is assumed
  * to be between min and max.
  *
- * @param[in] dev          the DAC Device to read precision value from
- * @param[in] value        the value to map onto min and max
- * @param[in] min          the lower bound of the target interval
- * @param[in] max          the upper bound of the target interval
+ * @param[in] dev          DAC Device to read precision value from
+ * @param[in] value        value to map onto min and max
+ * @param[in] min          lower bound of the target interval
+ * @param[in] max          upper bound of the target interval
  *
- * @return                 the mapped value, in valid DAC range
+ * @return                 mapped value, in valid DAC range
  */
 uint16_t dac_map(dac_t dev, int value, int min, int max);
 
@@ -135,16 +135,16 @@ uint16_t dac_map(dac_t dev, int value, int min, int max);
  *
  * @see dac_map
  *
- * @param[in] dev          the DAC Device to read precision value from
- * @param[in] value        the value to map onto min and max
- * @param[in] min          the lower bound of the target interval
- * @param[in] max          the upper bound of the target interval
+ * @param[in] dev          DAC Device to read precision value from
+ * @param[in] value        value to map onto min and max
+ * @param[in] min          lower bound of the target interval
+ * @param[in] max          upper bound of the target interval
  *
- * @return                 the mapped value, in valid DAC range
+ * @return                 mapped value, in valid DAC range
  */
 uint16_t dac_mapf(dac_t dev, float value, float min, float max);
 
-#endif/* DAC_NUMOF */
+#endif /* DAC_NUMOF */
 #ifdef __cplusplus
 }
 #endif
