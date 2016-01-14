@@ -564,8 +564,11 @@ static void *_lwmac_thread(void *args)
      * set to NETOPT_STATE_TX */
     dev->driver->set(dev, NETOPT_PRELOADING, &enable, sizeof(enable));
 
+    uint16_t src_len = 8;
+    dev->driver->set(dev, NETOPT_SRC_LEN, &src_len, sizeof(src_len));
+
     /* Get own address from netdev */
-    lwmac.l2_addr.len = dev->driver->get(dev, NETOPT_ADDRESS, &lwmac.l2_addr.addr, sizeof(lwmac.l2_addr.addr));
+    lwmac.l2_addr.len = dev->driver->get(dev, NETOPT_ADDRESS_LONG, &lwmac.l2_addr.addr, sizeof(lwmac.l2_addr.addr));
     assert(lwmac.l2_addr.len > 0);
 
     /* Initialize broadcast sequence number. This at least differs from board

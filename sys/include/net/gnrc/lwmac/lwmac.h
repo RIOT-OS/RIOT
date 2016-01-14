@@ -89,6 +89,11 @@ extern "C" {
 #define LWMAC_BROADCAST_DURATION_US     ((LWMAC_WAKEUP_INTERVAL_US * 1100) / 1000)
 #endif
 
+/* Max link layer address length in bytes */
+#ifndef LWMAC_MAX_L2_ADDR_LEN
+#define LWMAC_MAX_L2_ADDR_LEN           (8U)
+#endif
+
 /* CSMA retries for DATA packet after WR->WA was successful. Too many retries
  * may timeout the receiver, refer LWMAC_DATA_DELAY_US */
 #ifndef LWMAC_DATA_CSMA_RETRIES
@@ -142,12 +147,6 @@ extern "C" {
 #ifndef LWMAC_RX_QUEUE_SIZE
 #define LWMAC_RX_QUEUE_SIZE             (8U)
 #endif
-
-/* Max link layer address length in bytes */
-#ifndef LWMAC_MAX_L2_ADDR_LEN
-#define LWMAC_MAX_L2_ADDR_LEN           (2U)
-#endif
-
 
 #define LWMAC_LPM_MASK					(1 << 17)
 

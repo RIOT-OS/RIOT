@@ -130,6 +130,7 @@ int _dispatch_defer(gnrc_pktsnip_t* buffer[], gnrc_pktsnip_t* pkt);
 
 void _dispatch(gnrc_pktsnip_t* buffer[]);
 
+
 static inline bool _addr_match(l2_addr_t* addr1, l2_addr_t* addr2)
 {
     assert(addr1);
