@@ -281,7 +281,8 @@ ifneq (,$(filter gnrc_ipv6_hdr,$(USEMODULE)))
 endif
 
 ifneq (,$(filter aodvv2,$(USEMODULE)))
-  USEMODULE += ng_sixlowpan_default
+  USEMODULE += gnrc_ipv6_router_default
+  USEMODULE += gnrc_conn_udp
   USEMODULE += vtimer
   USEMODULE += oonf_common
   USEMODULE += oonf_rfc5444
