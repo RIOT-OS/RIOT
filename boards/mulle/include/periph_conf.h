@@ -135,7 +135,6 @@ extern "C"
 
 /** @} */
 
-
 /**
  * @name ADC configuration
  * @{
@@ -162,6 +161,18 @@ static const adc_conf_t adc_config[] = {
 };
 
 #define ADC_NUMOF           (sizeof(adc_config) / sizeof(adc_config[0]))
+/** @} */
+
+/**
+ * @name DAC configuration
+ * @{
+ */
+
+#define DAC_CONFIG { \
+    { DAC0, (uint32_t volatile *)BITBAND_REGADDR(SIM->SCGC2, SIM_SCGC2_DAC0_SHIFT) }, \
+  }
+#define DAC_NUMOF 1
+
 /** @} */
 
 /**
