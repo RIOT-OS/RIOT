@@ -50,7 +50,7 @@ void errors_thread_init(void) {
 
     errors_pid = thread_create(errors_stack,
             sizeof(errors_stack), ERROR_TASK_PRIORITY,
-            CREATE_STACKTEST, errors_task, NULL, "errtrap");
+			THREAD_CREATE_STACKTEST, errors_task, NULL, "errtrap");
 
 }
 

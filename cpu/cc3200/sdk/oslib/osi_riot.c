@@ -373,7 +373,7 @@ OsiReturnVal_e osi_TaskCreate(P_OSI_TASK_ENTRY pEntry,
 
     stack = malloc(usStackDepth);
 
-    tid = thread_create(stack, usStackDepth, uxPriority, CREATE_STACKTEST,
+    tid = thread_create(stack, usStackDepth, uxPriority, THREAD_CREATE_STACKTEST,
             (thread_task_func_t) pEntry, pvParameters, (const char*) pcName);
     if (tid) {
         msg_queue = malloc(sizeof(msg_t) * QUEUE_SIZE_SLSPAWN);
@@ -574,7 +574,7 @@ OsiReturnVal_e VStartSimpleLinkSpawnTask(unsigned long uxPriority) {
     simplelink_stack = malloc(THREAD_STACKSIZE_SLSPAWN);
 
     sl_spawn_id = thread_create(simplelink_stack, THREAD_STACKSIZE_SLSPAWN, uxPriority,
-            CREATE_STACKTEST, (thread_task_func_t) vSimpleLinkSpawnTask, NULL,
+    		THREAD_CREATE_STACKTEST, (thread_task_func_t) vSimpleLinkSpawnTask, NULL,
             (const char*) "SLSPAWN");
 
     DEBUG("spawn tid: %d\n", sl_spawn_id);

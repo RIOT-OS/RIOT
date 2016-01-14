@@ -38,9 +38,10 @@
  */
 typedef struct {
     uart_rx_cb_t rx_cb;
-    uart_tx_cb_t tx_cb;
     void *arg;
 } uart_conf_t;
+
+int uart_init_blocking(uart_t uart, uint32_t baudrate);
 
 /**
  * @brief Allocate memory to store the callback functions.
@@ -102,8 +103,7 @@ void isr_uart1(void)
 }
 #endif /* UART_1_EN */
 
-int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb,
-        uart_tx_cb_t tx_cb, void *arg) {
+int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg) {
     /* initialize basic functionality */
     int res = uart_init_blocking(uart, baudrate);
 
@@ -113,7 +113,6 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb,
 
     /* register callbacks */
     uart_config[uart].rx_cb = rx_cb;
-    uart_config[uart].tx_cb = tx_cb;
     uart_config[uart].arg = arg;
 
     /* configure interrupts and enable RX interrupt */
@@ -210,7 +209,8 @@ void uart_tx_end(uart_t uart) {
 
 }
 
-int uart_write(uart_t uart, char data) {
+//int uart_write(uart_t uart, char data) {
+void uart_write(uart_t uart, const uint8_t *data, size_t len) {
     unsigned long u;
 
     switch (uart) {
@@ -226,10 +226,13 @@ int uart_write(uart_t uart, char data) {
 #endif
 
     default:
-        return -1;
+        return;
     }
 
-    return MAP_UARTCharPutNonBlocking(u, data);;
+    for(size_t i=0; i<len; i++) {
+    	MAP_UARTCharPut(u, data[i]);;
+    }
+
 }
 
 int uart_read_blocking(uart_t uart, char *data) {
