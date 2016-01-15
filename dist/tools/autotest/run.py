@@ -10,8 +10,6 @@
 import autotest
 from autotest.default import DefaultBuildStrategy, DefaultTestStrategy
 
-BOARDS = [autotest.Board("native")]
-
 TEST_CASES = [
         ('bitarithm_timings', DefaultBuildStrategy, None),
         ('bloom_bytes', DefaultBuildStrategy, DefaultTestStrategy),
