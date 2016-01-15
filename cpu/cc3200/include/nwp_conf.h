@@ -103,6 +103,8 @@ typedef enum {
 
     SMARTCONFIG_ACTIVE,          // waiting password from smartconfig
 
+    WLAN_CONNECTED,              // Link established
+
     IP_ACQUIRED,                 // ip address assignment
 
     SOCKET_CONNECTION,           // a socket connection event
@@ -179,7 +181,7 @@ typedef struct nwp_t {
     unsigned char bssid[BSSID_LEN_MAX];
     uint32_t ip;
     uint32_t gw_ip;
-    uint16_t role;
+    uint16_t role;   //< the current active role (STA/AP/P2P) or ROLE_INVALID
 } nwp_t;
 
 // network processor status and config handle

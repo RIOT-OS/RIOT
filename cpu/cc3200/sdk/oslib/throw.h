@@ -26,6 +26,10 @@ enum error_types {
 };
 
 
+enum {
+    SOCKET_CONNECTED = 100,
+};
+
 #ifdef ERROR_THREAD
 
 #define ERRORS_THREAD_INIT() errors_thread_init()
@@ -36,6 +40,8 @@ enum error_types {
 #else
 
 #define ERRORS_THREAD_INIT()
+
+#define PANIC(ERROR_ID)  puts(sl_err_descr[ERROR_ID]); while(1) {}
 
 #define THROW(ERROR_ID)  puts(sl_err_descr[ERROR_ID]); while(1) {}
 #define THROW2(ERROR_ID, ERROR_VALUE)  printf("%s (%ld)", sl_err_descr[ERROR], ERROR_VALUE); while(1) {}
