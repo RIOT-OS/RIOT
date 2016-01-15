@@ -197,11 +197,6 @@ static inline uint16_t *_get_uint16_ptr(void *ptr)
     return ptr;
 }
 
-static inline uint64_t *_get_uint64_ptr(void *ptr)
-{
-    return ptr;
-}
-
 static int _send(gnrc_netdev_t *netdev, gnrc_pktsnip_t *pkt)
 {
     gnrc_zep_t *dev = (gnrc_zep_t *)netdev;
