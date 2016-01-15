@@ -517,6 +517,17 @@ void _dispatch(gnrc_pktsnip_t* buffer[])
 
     for(unsigned i = 0; i < LWMAC_DISPATCH_BUFFER_SIZE; i++) {
         if(buffer[i]) {
+
+            /* save pointer to netif header */
+            gnrc_pktsnip_t* netif = buffer[i]->next->next;
+
+            /* remove lwmac header */
+            buffer[i]->next->next = NULL;
+            gnrc_pktbuf_release(buffer[i]->next);
+
+            /* make append netif header after payload again */
+            buffer[i]->next = netif;
+
             if (!gnrc_netapi_dispatch_receive(buffer[i]->type, GNRC_NETREG_DEMUX_CTX_ALL, buffer[i])) {
                 DEBUG("Unable to forward packet of type %i\n", buffer[i]->type);
                 gnrc_pktbuf_release(buffer[i]);
