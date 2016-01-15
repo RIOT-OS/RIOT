@@ -73,6 +73,10 @@ ifneq (,$(filter ethos,$(USEMODULE)))
     USEMODULE += tsrb
 endif
 
+ifneq (,$(filter hdc1000,$(USEMODULE)))
+  USEMODULE += xtimer
+endif
+
 ifneq (,$(filter hih6130,$(USEMODULE)))
   USEMODULE += xtimer
 endif

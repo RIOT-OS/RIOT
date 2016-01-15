@@ -82,3 +82,6 @@ endif
 ifneq (,$(filter si70xx,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/drivers/si70xx/include
 endif
+ifneq (,$(filter hdc1000,$(USEMODULE)))
+    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/hdc1000/include
+endif
