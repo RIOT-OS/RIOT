@@ -53,3 +53,6 @@ pkg/wakaama/wakaama
 
 # Vagrant
 .vagrant
+
+# clang-complete command line argument lists (Vim: clang-complete, Atom: linter-clang, autocomplete-clang addons)
+.clang_complete
