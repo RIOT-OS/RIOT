@@ -28,16 +28,16 @@ class DefaultBuildStrategy(object):
         for board in self.boards:
             env = os.environ.copy()
             env.update(board.to_env())
-            cmd = 'make -C %s -B clean flash' % os.path.join(TESTS_BASE, name)
-            print('(%s) ' % cmd, end='')
+            cmd = 'make -C %s -B clean all' % os.path.join(TESTS_BASE, name)
+            print("%s," % board.name, end='')
             sys.stdout.flush()
             try:
                 out = check_output(shlex.split(cmd), env=env,
                                    universal_newlines=True, stderr=STDOUT)
-                return True
             except CalledProcessError as e:
                 print(e.output)
                 return False
+        return True
 
 class DefaultTestStrategy(object):
     def __init__(self, boards):
@@ -47,8 +47,8 @@ class DefaultTestStrategy(object):
         for board in self.boards:
             env = os.environ.copy()
             env.update(board.to_env())
-            cmd = 'make -C %s term' % os.path.join(TESTS_BASE, name)
-            print('(%s) ' % cmd, end='')
+            cmd = 'make -C %s flash term' % os.path.join(TESTS_BASE, name)
+            print('%s,' % board.name, end='')
             sys.stdout.flush()
             child  = pexpect.spawn(cmd, env=env, timeout=DEFAULT_TIMEOUT)
             try:
