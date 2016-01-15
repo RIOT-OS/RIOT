@@ -72,6 +72,7 @@ static const uint8_t pow_lt[44] = {
     28, 29, 30, 31
 };
 
+/* TODO: Implement this
 static const int level_lt[29] = {
     -35, -34, -32, -31,
     -29, -28, -26, -25,
@@ -82,6 +83,7 @@ static const int level_lt[29] = {
     1, 2, 4, 5,
     7
 };
+*/
 
 static gpio_t kw2xrf_gpio_int;
 
