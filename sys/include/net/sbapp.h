@@ -69,6 +69,14 @@ int sbapp_init(void);
 uint32_t sbapp_connect(const char* server, uint16_t port);
 
 
+/**
+ *  @brief send data
+ *
+ *  @param[in] fd the demux context (or think it is a file descriptor if you prefer)
+ */
+void sbapp_send(uint32_t fd, const char* data, uint16_t len);
+
+
 #ifdef __cplusplus
 }
 #endif

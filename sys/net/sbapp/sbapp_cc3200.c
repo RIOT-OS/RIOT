@@ -46,7 +46,7 @@ static void *_event_loop(void *arg);
 typedef struct sbapp_t {
     kernel_pid_t main_pid;    /**< the main task (send pkts and control commands */
     kernel_pid_t recv_pid;    /**< the receive data task */
-    xtimer_t sig_tim; /**< a signaling timer that smartconfig is active */
+    xtimer_t sig_tim; /**< a signaling timer for wifi events (smartconfig active, ...) */
 
 } sbapp_t;
 
@@ -599,6 +599,10 @@ int sbapp_init(void) {
                            THREAD_CREATE_STACKTEST, _event_loop, NULL, "nbapp");
     }
     return sbapp.main_pid;
+}
+
+uint32_t sbapp_connect(const char* server, uint16_t port) {
+	return 0;
 }
 
 static void _send(gnrc_pktsnip_t *pkt) {
