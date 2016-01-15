@@ -199,7 +199,7 @@ static void _netif_list(kernel_pid_t dev)
     uint8_t u8;
     int res;
     netopt_state_t state;
-    netopt_enable_t enable;
+    netopt_enable_t enable = NETOPT_DISABLE;
     bool linebreak = false;
 
 #ifdef MODULE_GNRC_IPV6_NETIF
