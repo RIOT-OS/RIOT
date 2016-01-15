@@ -14,12 +14,24 @@
 #include "xtimer.h"
 #include "net/sbapp.h"
 #include "net/gnrc.h"
+#include "nwp_conf.h"
 
 #include "log.h"
 #include "throw.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
+
+
+// check ip acquisition every CONNECTION_CHECK_TIME_SLOT msec
+#define CONN_CHECK_TIME_SLOT (100)
+
+
+// max time in msec waiting for an ip
+#define MAX_CONN_WAIT_TIME (10000)
+
+
+#define MAX_CONN_COUNTER_VAL (MAX_CONN_WAIT_TIME/CONN_CHECK_TIME_SLOT)
 
 
 /**
@@ -32,8 +44,10 @@ static void _send(gnrc_pktsnip_t *pkt);
 static void *_event_loop(void *arg);
 
 typedef struct sbapp_t {
-    kernel_pid_t main_pid; /**< the main task (send pkts and control commands */
-    kernel_pid_t recv_pid; /**< the receive data task */
+    kernel_pid_t main_pid;    /**< the main task (send pkts and control commands */
+    kernel_pid_t recv_pid;    /**< the receive data task */
+    xtimer_t sig_tim; /**< a signaling timer that smartconfig is active */
+
 } sbapp_t;
 
 sbapp_t sbapp = {
@@ -353,6 +367,53 @@ void SimpleLinkSockEventHandler(SlSockEvent_t *pSock) {
 }
 
 
+//*****************************************************************************
+//
+//!   \brief Connecting to a WLAN Accesspoint using SmartConfig provisioning
+//!
+//!    This function enables SmartConfig provisioning for adding a new
+//!    connection profile to CC3200. Since we have set the connection policy
+//!    to Auto, once SmartConfig is complete,CC3200 will connect
+//!    automatically to the new connection profile added by smartConfig.
+//!
+//!   \param[in]               None
+//!
+//!   \return  0 - Success
+//!            -1 - Failure
+//!
+//!   \warning           If the WLAN connection fails or we don't acquire an
+//!                      IP address,We will be stuck in this function forever.
+//!
+//*****************************************************************************
+long SmartConfigConnect() {
+    unsigned char policyVal;
+
+    long sts;
+
+    //set AUTO policy
+    sts = sl_WlanPolicySet(SL_POLICY_CONNECTION,
+            SL_CONNECTION_POLICY(1, 0, 0, 0, 0), &policyVal,
+            1 /* PolicyValLen */);
+
+    if (sts == 0) {
+        //
+        // Start SmartConfig
+        // This example uses the unsecured SmartConfig method
+        //
+        sts = sl_WlanSmartConfigStart(0, /*groupIdBitmask*/
+                    SMART_CONFIG_CIPHER_NONE, /*cipher*/
+                    0, /*publicKeyLen*/
+                    0, /*group1KeyLen*/
+                    0, /*group2KeyLen */
+                    NULL, /*publicKey */
+                    NULL, /*group1Key */
+                    NULL); /*group2Key*/
+    }
+
+    return sts;
+}
+
+
 #if 1
 //*****************************************************************************
 //! \brief This function puts the device in its default state. It:
@@ -502,6 +563,18 @@ long ConfigureSimpleLinkToDefaultState(void) {
 #endif
 
 
+void smartconfig_active(void* arg) {
+    msg_t m = { 0, SMARTCONFIG_ACTIVE, { 0 } };
+
+    msg_send(&m, sbapp.main_pid);
+}
+
+
+void check_connection(void* arg) {
+    msg_t m = { 0, AUTO_CONNECTION_TIME_SLOT, { 0 } };
+
+    msg_send(&m, sbapp.main_pid);
+}
 
 
 /**
@@ -521,7 +594,7 @@ int sbapp_init(void) {
 
     /* check if thread is already running */
     if (sbapp.main_pid == KERNEL_PID_UNDEF) {
-        /* start NBAPP thread */
+        /* start SBAPP thread */
         sbapp.main_pid = thread_create(_stack, sizeof(_stack), GNRC_NBAPP_PRIO,
                            THREAD_CREATE_STACKTEST, _event_loop, NULL, "nbapp");
     }
@@ -532,29 +605,30 @@ static void _send(gnrc_pktsnip_t *pkt) {
 
 }
 
-static void _receive(gnrc_pktsnip_t *pkt)
-{
+static void _receive(gnrc_pktsnip_t *pkt) {
 }
 
 
-static void *_event_loop(void *arg)
-{
+static void *_event_loop(void *arg) {
     (void)arg;
     msg_t msg, reply;
     msg_t msg_queue[GNRC_NBAPP_MSG_QUEUE_SIZE];
     gnrc_netreg_entry_t netreg;
+    int counter = 0;
 
     /* preset reply message */
     reply.type = GNRC_NETAPI_MSG_TYPE_ACK;
     reply.content.value = (uint32_t)-ENOTSUP;
 
+    sbapp.sig_tim.callback = check_connection;
+
     /* initialize message queue */
     msg_init_queue(msg_queue, GNRC_NBAPP_MSG_QUEUE_SIZE);
 
-    /* register NBAPP at netreg */
+    /* register SBAPP at netreg */
     netreg.demux_ctx = GNRC_NETREG_DEMUX_CTX_ALL;
     netreg.pid = thread_getpid();
-    gnrc_netreg_register(GNRC_NETTYPE_NBAPP, &netreg);
+    gnrc_netreg_register(GNRC_NETTYPE_SBAPP, &netreg);
 
     if (VStartSimpleLinkSpawnTask(SPAWN_TASK_PRIORITY) < 0) {
         PANIC(SIMPLELINK_START_ERROR);
@@ -569,7 +643,7 @@ static void *_event_loop(void *arg)
 
             case SMARTCONFIG_ACTIVE:
                 if (!IS_IP_ACQUIRED(nwp.status)) {
-                    xtimer_set(&timer, MSEC_TO_TICKS(200));
+                    xtimer_set(&sbapp.sig_tim, MSEC_TO_TICKS(200));
                     LED_RED_TOGGLE;
                 } else {
                     LED_RED_OFF;
@@ -581,31 +655,24 @@ static void *_event_loop(void *arg)
                 if (counter == MAX_CONN_COUNTER_VAL) {
                     counter = 0;
                     LOG_INFO("Use Smart Config App to configure the device.\n");
-#if 1
                     //Connect Using Smart Config
-                    sts = SmartConfigConnect();
-                    if (sts < 0) {
+                    if (SmartConfigConnect() < 0) {
                         THROW(SMARTCONFIG_ERROR);
                     }
 
-                    timer.callback = smartconfig_active;
-                    xtimer_set(&timer, MSEC_TO_TICKS(200));
-#endif
+                    sbapp.sig_tim.callback = smartconfig_active;
+                    xtimer_set(&sbapp.sig_tim, MSEC_TO_TICKS(200));
                     LED_RED_TOGGLE;
                     LED_YELLOW_OFF;
                 } else if (!IS_IP_ACQUIRED(nwp.status)) {
                     counter++;
-                    xtimer_set(&timer, MSEC_TO_TICKS(100));
+                    xtimer_set(&sbapp.sig_tim, MSEC_TO_TICKS(100));
                     LED_YELLOW_TOGGLE;
                 }
 
                 break;
             case WLAN_CONNECTED:
             {
-                char mac[8];
-                cpuid_get(mac);
-                printf("%x-%x-%x\n", mac[0], mac[1], mac[2]);
-                printf("role: %d - sts: %X\n", nwp.role, nwp.status);
                 break;
             }
             case IP_ACQUIRED:
@@ -620,16 +687,16 @@ static void *_event_loop(void *arg)
                 LED_GREEN_ON;
                 LED_YELLOW_OFF;
 
-                handler_cb();
+                //handler_cb();
                 break;
 
 
             case GNRC_NETAPI_MSG_TYPE_RCV:
-                DEBUG("nbapp: GNRC_NETAPI_MSG_TYPE_RCV\n");
+                DEBUG("sbapp: GNRC_NETAPI_MSG_TYPE_RCV\n");
                 _receive((gnrc_pktsnip_t *)msg.content.ptr);
                 break;
             case GNRC_NETAPI_MSG_TYPE_SND:
-                DEBUG("nbapp: GNRC_NETAPI_MSG_TYPE_SND\n");
+                DEBUG("sbapp: GNRC_NETAPI_MSG_TYPE_SND\n");
                 _send((gnrc_pktsnip_t *)msg.content.ptr);
                 break;
             case GNRC_NETAPI_MSG_TYPE_SET:
@@ -637,7 +704,7 @@ static void *_event_loop(void *arg)
                 msg_reply(&msg, &reply);
                 break;
             default:
-                DEBUG("nbapp: received unidentified message\n");
+                DEBUG("sbapp: received unidentified message\n");
                 break;
         }
     }
