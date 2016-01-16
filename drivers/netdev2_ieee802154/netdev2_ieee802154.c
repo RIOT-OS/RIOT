@@ -101,19 +101,6 @@ int netdev2_ieee802154_get(netdev2_ieee802154_t *dev, netopt_t opt, void *value,
             *((uint16_t *)value) = (uint16_t)dev->chan;
             res = sizeof(dev->chan);
             break;
-        case NETOPT_RAWMODE:
-            if (max_len < sizeof(netopt_enable_t)) {
-                res = -EOVERFLOW;
-                break;
-            }
-            if (dev->flags & NETDEV2_IEEE802154_RAW) {
-                *((netopt_enable_t *)value) = NETOPT_ENABLE;
-            }
-            else {
-                *((netopt_enable_t *)value) = NETOPT_DISABLE;
-            }
-            res = sizeof(netopt_enable_t);
-            break;
         case NETOPT_AUTOACK:
             if (max_len < sizeof(netopt_enable_t)) {
                 res = -EOVERFLOW;
@@ -127,6 +114,29 @@ int netdev2_ieee802154_get(netdev2_ieee802154_t *dev, netopt_t opt, void *value,
             }
             res = sizeof(netopt_enable_t);
             break;
+        case NETOPT_RAWMODE:
+            if (max_len < sizeof(netopt_enable_t)) {
+                res = -EOVERFLOW;
+                break;
+            }
+            if (dev->flags & NETDEV2_IEEE802154_RAW) {
+                *((netopt_enable_t *)value) = NETOPT_ENABLE;
+            }
+            else {
+                *((netopt_enable_t *)value) = NETOPT_DISABLE;
+            }
+            res = sizeof(netopt_enable_t);
+            break;
+#ifdef MODULE_GNRC
+        case NETOPT_PROTO:
+            if (max_len < sizeof(gnrc_nettype_t)) {
+                res = -EOVERFLOW;
+                break;
+            }
+            *((gnrc_nettype_t *)value) = dev->proto;
+            res = sizeof(gnrc_nettype_t);
+            break;
+#endif
         case NETOPT_DEVICE_TYPE:
             if (max_len < sizeof(uint16_t)) {
                 res = -EOVERFLOW;
@@ -214,6 +224,16 @@ int netdev2_ieee802154_set(netdev2_ieee802154_t *dev, netopt_t opt, void *value,
             }
             res = sizeof(uint16_t);
             break;
+#ifdef MODULE_GNRC
+        case NETOPT_PROTO:
+            if (len > sizeof(gnrc_nettype_t)) {
+                res = -EOVERFLOW;
+                break;
+            }
+            dev->proto = *((gnrc_nettype_t *)value);
+            res = sizeof(gnrc_nettype_t);
+            break;
+#endif
         default:
             break;
     }

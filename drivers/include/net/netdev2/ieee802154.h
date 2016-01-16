@@ -20,6 +20,7 @@
 #define NETDEV2_IEEE802154_H_
 
 #include "net/ieee802154.h"
+#include "net/gnrc/nettype.h"
 #include "net/netopt.h"
 #include "net/netdev2.h"
 
@@ -67,6 +68,13 @@ extern "C" {
  */
 typedef struct {
     netdev2_t netdev;                       /**< @ref netdev2_t base class */
+    /**
+     * @brief IEEE 802.15.4 specific fields
+     * @{
+     */
+#ifdef MODULE_GNRC
+    gnrc_nettype_t proto;                   /**< Protocol for upper layer */
+#endif
 
     /**
      * @brief   PAN ID in network byte order
@@ -85,6 +93,7 @@ typedef struct {
     uint8_t seq;                            /**< sequence number */
     uint8_t chan;                           /**< channel */
     uint16_t flags;                         /**< flags as defined above */
+    /** @} */
 } netdev2_ieee802154_t;
 
 /**
