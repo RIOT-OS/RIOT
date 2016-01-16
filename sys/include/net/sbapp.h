@@ -28,22 +28,22 @@ extern "C" {
 /**
  * @brief   Default message queue size for the NBAPP thread
  */
-#ifndef GNRC_NBAPP_MSG_QUEUE_SIZE
-#define GNRC_NBAPP_MSG_QUEUE_SIZE (8U)
+#ifndef GNRC_SBAPP_MSG_QUEUE_SIZE
+#define GNRC_SBAPP_MSG_QUEUE_SIZE (8U)
 #endif
 
 /**
  * @brief   Priority of the NBAPP thread
  */
-#ifndef GNRC_NBAPP_PRIO
-#define GNRC_NBAPP_PRIO           (THREAD_PRIORITY_MAIN - 2)
+#ifndef GNRC_SBAPP_PRIO
+#define GNRC_SBAPP_PRIO           (THREAD_PRIORITY_MAIN - 2)
 #endif
 
 /**
  * @brief   Default stack size to use for the UDP thread
  */
-#ifndef GNRC_NBAPP_STACK_SIZE
-#define GNRC_NBAPP_STACK_SIZE     (THREAD_STACKSIZE_DEFAULT)
+#ifndef GNRC_SBAPP_STACK_SIZE
+#define GNRC_SBAPP_STACK_SIZE     (THREAD_STACKSIZE_DEFAULT)
 #endif
 
 /**
@@ -66,7 +66,7 @@ int sbapp_init(void);
  *
  * @return the demux context
  */
-uint32_t sbapp_connect(const char* server, uint16_t port);
+void* sbapp_connect(const char* server, uint16_t port, kernel_pid_t pid);
 
 
 /**
@@ -74,7 +74,7 @@ uint32_t sbapp_connect(const char* server, uint16_t port);
  *
  *  @param[in] fd the demux context (or think it is a file descriptor if you prefer)
  */
-void sbapp_send(uint32_t fd, const char* data, uint16_t len);
+int sbapp_send(uint32_t fd, void* data, size_t len);
 
 
 #ifdef __cplusplus

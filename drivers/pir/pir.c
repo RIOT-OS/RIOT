@@ -37,11 +37,13 @@ static void pir_send_msg(pir_t *dev, pir_event_t event);
  * public API implementation
  **********************************************************************/
 
-int pir_init(pir_t *dev, gpio_t gpio)
+int pir_init(pir_t *dev, gpio_t gpio, gpio_pp_t pulltype)
 {
     dev->gpio_dev = gpio;
+    dev->gpio_pulltype = pulltype;
     dev->msg_thread_pid = KERNEL_PID_UNDEF;
     return gpio_init(dev->gpio_dev, GPIO_DIR_IN, GPIO_NOPULL);
+
 }
 
 pir_event_t pir_get_status(pir_t *dev)
@@ -106,5 +108,6 @@ static void pir_callback(void *arg)
 
 static int pir_activate_int(pir_t *dev)
 {
-    return gpio_init_int(dev->gpio_dev, GPIO_NOPULL, GPIO_BOTH, pir_callback, dev);
+    return gpio_init_int(dev->gpio_dev, dev->gpio_pulltype,
+    					 GPIO_BOTH, pir_callback, dev);
 }

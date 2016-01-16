@@ -33,6 +33,7 @@ extern "C" {
  */
 typedef struct {
     gpio_t          gpio_dev;       /**< GPIO device which is used */
+    gpio_pp_t       gpio_pulltype;  /**< GPIO pull type */
     kernel_pid_t    msg_thread_pid; /**< thread to msg on irq */
 } pir_t;
 
@@ -61,7 +62,7 @@ typedef enum {
  * @return              0 on success
  * @return              -1 on error
  */
-int pir_init(pir_t *dev, gpio_t gpio);
+int pir_init(pir_t *dev, gpio_t gpio, gpio_pp_t pulltype);
 
 /**
  * @brief               Read the current status of the motion sensor
