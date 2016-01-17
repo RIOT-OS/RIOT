@@ -44,24 +44,24 @@ extern "C" {
  * @{
  */
 #define ONBOARD_LED         1
-#define LED_RED_PIN         (1 << 21)
-#define LED_GREEN_PIN       (1 << 22)
-#define LED_BLUE_PIN        (1 << 23)
+#define LED_RED_PIN         (21)
+#define LED_GREEN_PIN       (22)
+#define LED_BLUE_PIN        (23)
 /** @} */
 
 /**
  * @name Macros for controlling the on-board LEDs.
  * @{
  */
-#define LED_RED_ON          (NRF_GPIO->OUTCLR = LED_RED_PIN)
-#define LED_RED_OFF         (NRF_GPIO->OUTSET = LED_RED_PIN)
-#define LED_RED_TOGGLE      (NRF_GPIO->OUT ^= LED_RED_PIN)
-#define LED_GREEN_ON        (NRF_GPIO->OUTCLR = LED_GREEN_PIN)
-#define LED_GREEN_OFF       (NRF_GPIO->OUTSET = LED_GREEN_PIN)
-#define LED_GREEN_TOGGLE    (NRF_GPIO->OUT ^= LED_GREEN_PIN)
-#define LED_BLUE_ON         (NRF_GPIO->OUTCLR = LED_BLUE_PIN)
-#define LED_BLUE_OFF        (NRF_GPIO->OUTSET = LED_BLUE_PIN)
-#define LED_BLUE_TOGGLE     (NRF_GPIO->OUT ^= LED_BLUE_PIN)
+#define LED_RED_ON          (NRF_GPIO->OUTCLR = (1 << LED_RED_PIN))
+#define LED_RED_OFF         (NRF_GPIO->OUTSET = (1 << LED_RED_PIN))
+#define LED_RED_TOGGLE      (NRF_GPIO->OUT ^= (1 << LED_RED_PIN))
+#define LED_GREEN_ON        (NRF_GPIO->OUTCLR = (1 << LED_GREEN_PIN))
+#define LED_GREEN_OFF       (NRF_GPIO->OUTSET = (1 << LED_GREEN_PIN))
+#define LED_GREEN_TOGGLE    (NRF_GPIO->OUT ^= (1 << LED_GREEN_PIN))
+#define LED_BLUE_ON         (NRF_GPIO->OUTCLR = (1 << LED_BLUE_PIN))
+#define LED_BLUE_OFF        (NRF_GPIO->OUTSET = (1 << LED_BLUE_PIN))
+#define LED_BLUE_TOGGLE     (NRF_GPIO->OUT ^= (1 << LED_BLUE_PIN))
 /** @} */
 
 /**
