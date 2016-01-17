@@ -154,12 +154,12 @@ __attribute__((naked)) void hard_fault_default(void)
         "bhi fix_msp                        \n" /*   goto fix_msp }           */
         "cmp r0, %[sram]                    \n" /* if(msp <= &_sram) {        */
         "bls fix_msp                        \n" /*   goto fix_msp }           */
-        "mov r1, #0                         \n" /* else { corrupted = false   */
+        "movs r1, #0                        \n" /* else { corrupted = false   */
         "b   test_sp                        \n" /*   goto test_sp     }       */
         " fix_msp:                          \n" /*                            */
         "mov r1, %[estack]                  \n" /*     r1 = _estack           */
         "mov sp, r1                         \n" /*     sp = r1                */
-        "mov r1, #1                         \n" /*     corrupted = true       */
+        "movs r1, #1                        \n" /*     corrupted = true       */
         " test_sp:                          \n" /*                            */
         "movs r0, #4                        \n" /* r0 = 0x4                   */
         "mov r2, lr                         \n" /* r2 = lr                    */
