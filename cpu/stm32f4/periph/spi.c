@@ -294,7 +294,7 @@ int spi_conf_pins(spi_t dev)
 
 int spi_acquire(spi_t dev)
 {
-    if (dev >= SPI_NUMOF) {
+    if ((unsigned int)dev >= SPI_NUMOF) {
         return -1;
     }
     mutex_lock(&locks[dev]);
@@ -303,7 +303,7 @@ int spi_acquire(spi_t dev)
 
 int spi_release(spi_t dev)
 {
-    if (dev >= SPI_NUMOF) {
+    if ((unsigned int)dev >= SPI_NUMOF) {
         return -1;
     }
     mutex_unlock(&locks[dev]);

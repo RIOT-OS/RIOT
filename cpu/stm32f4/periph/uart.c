@@ -65,7 +65,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     uint8_t fraction;
 
     /* check if given UART device does exist */
-    if (uart < 0 || uart >= UART_NUMOF) {
+    if ((unsigned int)uart >= UART_NUMOF) {
         return -1;
     }
 
