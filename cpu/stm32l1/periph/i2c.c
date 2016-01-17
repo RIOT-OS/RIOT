@@ -66,16 +66,14 @@ static mutex_t locks[] =  {
 
 int i2c_init_master(i2c_t dev, i2c_speed_t speed)
 {
-    I2C_TypeDef *i2c = i2c_config[dev].dev;
     int ccr;
 
-    if (dev >= I2C_NUMOF) {
+    if ((unsigned int)dev >= I2C_NUMOF) {
         return -1;
     }
 
     /* read speed configuration */
     switch (speed) {
-
         case I2C_SPEED_NORMAL:
             ccr = I2C_APBCLK / 200000;
             break;
@@ -87,6 +85,7 @@ int i2c_init_master(i2c_t dev, i2c_speed_t speed)
         default:
             return -2;
     }
+    I2C_TypeDef *i2c = i2c_config[dev].dev;
 
     /* enable I2C clock */
     i2c_poweron(dev);
@@ -148,14 +147,14 @@ int i2c_read_byte(i2c_t dev, uint8_t address, char *data)
 
 int i2c_read_bytes(i2c_t dev, uint8_t address, char *data, int length)
 {
-    I2C_TypeDef *i2c = i2c_config[dev].dev;
     unsigned int state;
     int i = 0;
 
-    if (dev >= I2C_NUMOF) {
+    if ((unsigned int)dev >= I2C_NUMOF) {
         return -1;
     }
 
+    I2C_TypeDef *i2c = i2c_config[dev].dev;
     switch (length) {
         case 1:
             DEBUG("Send Slave address and wait for ADDR == 1\n");
@@ -272,11 +271,11 @@ int i2c_read_reg(i2c_t dev, uint8_t address, uint8_t reg, char *data)
 
 int i2c_read_regs(i2c_t dev, uint8_t address, uint8_t reg, char *data, int length)
 {
-    I2C_TypeDef *i2c = i2c_config[dev].dev;
-
-    if (dev >= I2C_NUMOF) {
+    if ((unsigned int)dev >= I2C_NUMOF) {
         return -1;
     }
+
+    I2C_TypeDef *i2c = i2c_config[dev].dev;
 
     /* send start condition and slave address */
     DEBUG("Send slave address and clear ADDR flag\n");
@@ -296,11 +295,11 @@ int i2c_write_byte(i2c_t dev, uint8_t address, char data)
 
 int i2c_write_bytes(i2c_t dev, uint8_t address, char *data, int length)
 {
-    I2C_TypeDef *i2c = i2c_config[dev].dev;
-
-    if (dev >= I2C_NUMOF) {
+    if ((unsigned int)dev >= I2C_NUMOF) {
         return -1;
     }
+
+    I2C_TypeDef *i2c = i2c_config[dev].dev;
 
     /* start transmission and send slave address */
     DEBUG("sending start sequence\n");
@@ -322,11 +321,11 @@ int i2c_write_reg(i2c_t dev, uint8_t address, uint8_t reg, char data)
 
 int i2c_write_regs(i2c_t dev, uint8_t address, uint8_t reg, char *data, int length)
 {
-    I2C_TypeDef *i2c = i2c_config[dev].dev;
-
-    if (dev >= I2C_NUMOF) {
+    if ((unsigned int)dev >= I2C_NUMOF) {
         return -1;
     }
+
+    I2C_TypeDef *i2c = i2c_config[dev].dev;
 
     /* start transmission and send slave address */
     _start(i2c, address, I2C_FLAG_WRITE);
@@ -343,14 +342,14 @@ int i2c_write_regs(i2c_t dev, uint8_t address, uint8_t reg, char *data, int leng
 
 void i2c_poweron(i2c_t dev)
 {
-    if (dev < I2C_NUMOF) {
+    if ((unsigned int)dev < I2C_NUMOF) {
         RCC->APB1ENR |= (RCC_APB1ENR_I2C1EN << dev);
     }
 }
 
 void i2c_poweroff(i2c_t dev)
 {
-    if (dev < I2C_NUMOF) {
+    if ((unsigned int)dev < I2C_NUMOF) {
         while (i2c_config[dev].dev->SR2 & I2C_SR2_BUSY);
         RCC->APB1ENR &= ~(RCC_APB1ENR_I2C1EN << dev);
     }
