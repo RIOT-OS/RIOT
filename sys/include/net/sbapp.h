@@ -46,8 +46,20 @@ extern "C" {
 #define GNRC_SBAPP_STACK_SIZE     (THREAD_STACKSIZE_DEFAULT)
 #endif
 
+
 /**
- * south bound app API
+ * @brief @ref core_msg type for passing a @ref net_gnrc_pkt from sbapp up the app
+ */
+#define GNRC_SBAPI_MSG_TYPE_RCV        (0x0301)
+
+/**
+ * @brief @ref core_msg type for passing a @ref net_gnrc_pkt to sbapp adapter
+ */
+#define GNRC_SBAPI_MSG_TYPE_SND        (0x0302)
+
+
+/**
+ * south bound app API methods
  */
 
 /**

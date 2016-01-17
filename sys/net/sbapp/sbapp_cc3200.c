@@ -710,7 +710,7 @@ static void *_receive_handler_task(void* arg) {
 		pkt = gnrc_pktbuf_add(NULL, recv_buffer, size+1, nettype);
 
 		printf("recv: %s (len %d)\n", (char *) pkt->data, size);
-		msg.type = 1000;
+		msg.type = GNRC_SBAPI_MSG_TYPE_RCV;
 		msg.content.ptr = (char*)recv_buffer;
 		msg_send(&msg, cd->pid);
 
