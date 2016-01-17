@@ -9,7 +9,11 @@
 #ifndef SYS_TYPES_H_
 #define SYS_TYPES_H_
 
+#if MODULE_NEWLIB
+#include_next <sys/types.h>
+#else
 #include "msp430_types.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
