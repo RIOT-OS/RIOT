@@ -57,6 +57,10 @@ extern "C" {
  */
 #define GNRC_SBAPI_MSG_TYPE_SND        (0x0302)
 
+#define SBAPI_SEND_FAILED 1
+
+
+typedef void* sbh_t;
 
 /**
  * south bound app API methods
@@ -78,7 +82,7 @@ int sbapp_init(void);
  *
  * @return the demux context
  */
-void* sbapp_connect(const char* server, uint16_t port, kernel_pid_t pid);
+sbh_t sbapp_connect(const char* server, uint16_t port, kernel_pid_t pid);
 
 
 /**
@@ -86,7 +90,7 @@ void* sbapp_connect(const char* server, uint16_t port, kernel_pid_t pid);
  *
  *  @param[in] fd the demux context (or think it is a file descriptor if you prefer)
  */
-int sbapp_send(uint32_t fd, void* data, size_t len);
+int sbapp_send(sbh_t fd, void* data, size_t len);
 
 
 #ifdef __cplusplus

@@ -378,7 +378,7 @@ void SimpleLinkSockEventHandler(SlSockEvent_t *pSock) {
 //!                      IP address,We will be stuck in this function forever.
 //!
 //*****************************************************************************
-long SmartConfigConnect() {
+long SmartConfigConnect(void) {
 	unsigned char policyVal;
 
 	long sts;
@@ -665,8 +665,8 @@ static void *_send_handler_task(void *arg) {
 			DEBUG("sbapp send: GNRC_NETAPI_MSG_TYPE_RCV\n");
 			_receive(conn, (gnrc_pktsnip_t *) msg.content.ptr);
 			break;
-		case GNRC_NETAPI_MSG_TYPE_SND:
-			DEBUG("sbapp send: GNRC_NETAPI_MSG_TYPE_SND\n");
+		case GNRC_SBAPI_MSG_TYPE_SND:
+			DEBUG("sbapp send: GNRC_SBAPI_MSG_TYPE_SND\n");
 			_send(conn, (gnrc_pktsnip_t *) msg.content.ptr);
 			break;
 		case GNRC_NETAPI_MSG_TYPE_SET:
@@ -711,7 +711,8 @@ static void *_receive_handler_task(void* arg) {
 
 		printf("recv: %s (len %d)\n", (char *) pkt->data, size);
 		msg.type = GNRC_SBAPI_MSG_TYPE_RCV;
-		msg.content.ptr = (char*)recv_buffer;
+		//msg.content.ptr = (char*)recv_buffer;
+		msg.content.ptr = (void*)pkt;
 		msg_send(&msg, cd->pid);
 
 #if 0
@@ -734,7 +735,7 @@ static void *_receive_handler_task(void* arg) {
 	return NULL;
 }
 
-void* sbapp_connect(const char* server, uint16_t port, kernel_pid_t pid) {
+sbh_t sbapp_connect(const char* server, uint16_t port, kernel_pid_t pid) {
 
 	// create a connection descriptor
 	// TODO: error mgmt
@@ -761,6 +762,32 @@ void* sbapp_connect(const char* server, uint16_t port, kernel_pid_t pid) {
 
 	return conn;
 }
+
+int sbapp_send(sbh_t fd, void* data, size_t len) {
+    msg_t msg;
+    cd_t *handle = (cd_t *)fd;
+
+    gnrc_pktsnip_t *pkt = gnrc_pktbuf_add(NULL, data, len,
+                                             GNRC_NETTYPE_UNDEF);
+
+    msg.type = GNRC_SBAPI_MSG_TYPE_SND;
+    msg.content.ptr = (void*)pkt;
+    msg_send(&msg, handle->send_pid);
+
+#if 0
+    /* send packet */
+    if (gnrc_netapi_dispatch_send(GNRC_NETTYPE_SBAPP, GNRC_NETREG_DEMUX_CTX_ALL,
+                                  pkt) == 0) {
+        /* if send failed inform the user */
+        DEBUG("sbapp: error unable to locate SBAPP thread");
+        gnrc_pktbuf_release(pkt);
+
+        return SBAPI_SEND_FAILED;
+    }
+#endif
+    return 0;
+}
+
 
 
 static void *_event_loop(void *arg) {
