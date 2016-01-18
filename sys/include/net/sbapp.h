@@ -62,6 +62,11 @@ extern "C" {
  */
 #define SBAPI_MSG_TYPE_ERR             (0x0303)
 
+/**
+ * @brief the connection handler exited because of an error
+ */
+#define SBAPI_MSG_TYPE_HANDLER_EXIT    (0x304)
+
 
 #define SBAPI_SEND_FAILED 1
 
