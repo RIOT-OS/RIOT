@@ -39,7 +39,6 @@ typedef struct cd_t {
 	char *recv_stack;
 } cd_t;
 
-
 /**
  * @brief send a packet
  *
@@ -588,14 +587,13 @@ int sbapp_init(void) {
 	return sbapp.main_pid;
 }
 
-
 int16_t connect_to(const char* server, uint16_t port) {
 	SlSockAddrIn_t addr;
 	int iAddrSize;
 	int16_t fd; // socket file descriptor
 	int sts;
 	unsigned long server_ip;
-
+    puts("1");
 	/* Resolve HOST NAME/IP */
 	sts = sl_NetAppDnsGetHostByName((signed char *) server, strlen(server),
 			&server_ip, SL_AF_INET);
@@ -632,19 +630,20 @@ static void _send(cd_t* cd, gnrc_pktsnip_t *pkt) {
 	int16_t sts;
 
 	sts = sl_Send(cd->fd, pkt->data, pkt->size, 0);
+	if(sts < 0) {
 
+	}
 	DEBUG("%d\n", sts);
 }
 
 static void _receive(cd_t* cd, gnrc_pktsnip_t *pkt) {
 }
 
-
 static void *_send_handler_task(void *arg) {
 	msg_t msg, reply;
 	msg_t msg_queue[GNRC_SBAPP_MSG_QUEUE_SIZE];
 	gnrc_netreg_entry_t netreg;
-	cd_t *conn = (cd_t *)arg;
+	cd_t *conn = (cd_t *) arg;
 
 	/* initialize message queue */
 	msg_init_queue(msg_queue, GNRC_SBAPP_MSG_QUEUE_SIZE);
@@ -692,7 +691,7 @@ static void *_receive_handler_task(void* arg) {
 
 	msg_t msg;   //, msg_queue[8];
 	cd_t *cd = (cd_t *) arg;
-	uint16_t size;
+	int16_t size;
 	gnrc_pktsnip_t *pkt;
 	int nettype;
 
@@ -702,40 +701,37 @@ static void *_receive_handler_task(void* arg) {
 
 	while (1) {
 
-		printf("receiving ...\n");
+		//printf("receiving ...\n");
 		size = sl_Recv(cd->fd, recv_buffer, RECV_BUFF_SIZE, 0);
-		recv_buffer[size] = 0;
+		if (size < 0) {
+			// error condition detected
+			DEBUG("channel %d: error %d\n", cd->fd, size);
+			msg.type = SBAPI_MSG_TYPE_ERR;
+			msg.content.value = size;
 
-		/* copy packet payload into pktbuf */
-		pkt = gnrc_pktbuf_add(NULL, recv_buffer, size+1, nettype);
+		} else {
+			recv_buffer[size] = 0;
 
-		printf("recv: %s (len %d)\n", (char *) pkt->data, size);
-		msg.type = GNRC_SBAPI_MSG_TYPE_RCV;
-		//msg.content.ptr = (char*)recv_buffer;
-		msg.content.ptr = (void*)pkt;
+			/* copy packet payload into pktbuf */
+			pkt = gnrc_pktbuf_add(NULL, recv_buffer, size + 1, nettype);
+
+			DEBUG("channel %d: recv: %s (len %d)\n",
+					cd->fd, (char *) pkt->data, size);
+			msg.type = GNRC_SBAPI_MSG_TYPE_RCV;
+			//msg.content.ptr = (char*)recv_buffer;
+			msg.content.ptr = (void*) pkt;
+		}
 		msg_send(&msg, cd->pid);
 
-#if 0
-		msg_receive(&msg);
-		switch (msg.type) {
-		case SOCKET_CONNECTED:
-			do {
-				printf("receiving ...\n");
-				size = sl_Recv(cd->fd, recv_buffer, RECV_BUFF_SIZE, 0);
-				/* copy packet payload into pktbuf */
-				pkt = gnrc_pktbuf_add(NULL, recv_buffer, size, nettype);
-
-				printf("recv: %s\n", (char *) pkt->data);
-
-			} while (size >= 0);
-			break;
-		}
-#endif
 	}
 	return NULL;
 }
 
 sbh_t sbapp_connect(const char* server, uint16_t port, kernel_pid_t pid) {
+
+	while(!IS_IP_ACQUIRED(nwp.status)) {
+		// wait for ip layer setup
+	}
 
 	// create a connection descriptor
 	// TODO: error mgmt
@@ -764,31 +760,29 @@ sbh_t sbapp_connect(const char* server, uint16_t port, kernel_pid_t pid) {
 }
 
 int sbapp_send(sbh_t fd, void* data, size_t len) {
-    msg_t msg;
-    cd_t *handle = (cd_t *)fd;
+	msg_t msg;
+	cd_t *handle = (cd_t *) fd;
 
-    gnrc_pktsnip_t *pkt = gnrc_pktbuf_add(NULL, data, len,
-                                             GNRC_NETTYPE_UNDEF);
+	gnrc_pktsnip_t *pkt = gnrc_pktbuf_add(NULL, data, len,
+			GNRC_NETTYPE_UNDEF);
 
-    msg.type = GNRC_SBAPI_MSG_TYPE_SND;
-    msg.content.ptr = (void*)pkt;
-    msg_send(&msg, handle->send_pid);
+	msg.type = GNRC_SBAPI_MSG_TYPE_SND;
+	msg.content.ptr = (void*) pkt;
+	msg_send(&msg, handle->send_pid);
 
 #if 0
-    /* send packet */
-    if (gnrc_netapi_dispatch_send(GNRC_NETTYPE_SBAPP, GNRC_NETREG_DEMUX_CTX_ALL,
-                                  pkt) == 0) {
-        /* if send failed inform the user */
-        DEBUG("sbapp: error unable to locate SBAPP thread");
-        gnrc_pktbuf_release(pkt);
+	/* send packet */
+	if (gnrc_netapi_dispatch_send(GNRC_NETTYPE_SBAPP, GNRC_NETREG_DEMUX_CTX_ALL,
+					pkt) == 0) {
+		/* if send failed inform the user */
+		DEBUG("sbapp: error unable to locate SBAPP thread");
+		gnrc_pktbuf_release(pkt);
 
-        return SBAPI_SEND_FAILED;
-    }
+		return SBAPI_SEND_FAILED;
+	}
 #endif
-    return 0;
+	return 0;
 }
-
-
 
 static void *_event_loop(void *arg) {
 	(void) arg;

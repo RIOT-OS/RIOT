@@ -57,6 +57,12 @@ extern "C" {
  */
 #define GNRC_SBAPI_MSG_TYPE_SND        (0x0302)
 
+/**
+ * @brief detected an error condition on the network channel (currently a tcp socket)
+ */
+#define SBAPI_MSG_TYPE_ERR             (0x0303)
+
+
 #define SBAPI_SEND_FAILED 1
 
 
