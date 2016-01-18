@@ -1,6 +1,6 @@
 PKG_NAME=ccn-lite
-PKG_URL=https://github.com/OlegHahm/ccn-lite/
-PKG_VERSION=riot_integration_preparation
+PKG_URL=https://github.com/cn-uofbasel/ccn-lite/
+PKG_VERSION=57be9b1985dc501b26f861b24448b54db37f73f1
 PKG_DIR=$(CURDIR)/$(PKG_NAME)
 
 ifneq ($(RIOTBOARD),)
@@ -12,8 +12,8 @@ endif
 export RIOT_CFLAGS = ${CFLAGS} ${INCLUDES}
 
 all: $(PKG_DIR)/Makefile
-	"$(MAKE)" -C $(PKG_DIR)/src lib-ccn-lite.a
-	"$(MAKE)" -C $(PKG_DIR)/src lib-ccn-lite-utils.a
+	"$(MAKE)" -BC $(PKG_DIR)/src lib-ccn-lite.a
+	"$(MAKE)" -BC $(PKG_DIR)/src lib-ccn-lite-utils.a
 	cp $(PKG_DIR)/src/lib-ccn-lite.a ${BINDIR}/ccn-lite.a
 	cp $(PKG_DIR)/src/lib-ccn-lite-utils.a ${BINDIR}/ccn-lite-utils.a
 

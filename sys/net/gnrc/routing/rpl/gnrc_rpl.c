@@ -195,9 +195,10 @@ static void *_event_loop(void *args)
                 _receive((gnrc_pktsnip_t *)msg.content.ptr);
                 break;
             case GNRC_NETAPI_MSG_TYPE_SND:
+                break;
             case GNRC_NETAPI_MSG_TYPE_GET:
             case GNRC_NETAPI_MSG_TYPE_SET:
-                DEBUG("RPL: reply to unsupported recv/get/set\n");
+                DEBUG("RPL: reply to unsupported get/set\n");
                 reply.content.value = -ENOTSUP;
                 msg_reply(&msg, &reply);
                 break;

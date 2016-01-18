@@ -502,6 +502,27 @@ static void test_pktbuf_realloc_data__nomemenough(void)
     TEST_ASSERT_EQUAL_INT(1, pkt1->users);
 }
 
+static void test_pktbuf_realloc_data__alignment(void)
+{
+    gnrc_pktsnip_t *pkt1, *pkt2, *pkt3;
+
+    /* see: https://github.com/RIOT-OS/RIOT/pull/4602 */
+    pkt1 = gnrc_pktbuf_add(NULL, TEST_STRING8, sizeof(TEST_STRING8), GNRC_NETTYPE_TEST);
+    pkt2 = gnrc_pktbuf_add(NULL, NULL, 23, GNRC_NETTYPE_TEST);
+    pkt3 = gnrc_pktbuf_add(NULL, TEST_STRING16, sizeof(TEST_STRING16), GNRC_NETTYPE_UNDEF);
+
+    TEST_ASSERT_NOT_NULL(pkt1);
+    TEST_ASSERT_NOT_NULL(pkt2);
+    TEST_ASSERT_NOT_NULL(pkt3);
+
+    TEST_ASSERT_EQUAL_INT(0, gnrc_pktbuf_realloc_data(pkt2, 21));
+
+    gnrc_pktbuf_release(pkt1);
+    gnrc_pktbuf_release(pkt2);
+    gnrc_pktbuf_release(pkt3);
+    TEST_ASSERT(gnrc_pktbuf_is_empty());
+}
+
 static void test_pktbuf_realloc_data__success(void)
 {
     char exp_data[] = TEST_STRING16;
@@ -731,6 +752,7 @@ Test *tests_pktbuf_tests(void)
         new_TestFixture(test_pktbuf_realloc_data__nomemenough),
         new_TestFixture(test_pktbuf_realloc_data__shrink),
         new_TestFixture(test_pktbuf_realloc_data__memenough),
+        new_TestFixture(test_pktbuf_realloc_data__alignment),
         new_TestFixture(test_pktbuf_realloc_data__success),
         new_TestFixture(test_pktbuf_realloc_data__success2),
         new_TestFixture(test_pktbuf_hold__pkt_null),

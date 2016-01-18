@@ -12,6 +12,10 @@ QUIET ?= 1
 
 CFLAGS += -DDEVELHELP=1
 
+ifeq ($(shell uname),Darwin)
+CFLAGS += -Wno-language-extension-token
+endif
+
 USEMODULE += xtimer
 
 include $(RIOTBASE)/Makefile.include

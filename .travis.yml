@@ -1,35 +1,37 @@
-language: c
+sudo: required
+dist: trusty
+
+language: generic
 
 cache: apt
 
 env:
-    - NPROC_MAX=8 BUILDTEST_MCU_GROUP=static-tests
-    - NPROC_MAX=8 BUILDTEST_MCU_GROUP=cortex_m4_2
-    - NPROC_MAX=8 BUILDTEST_MCU_GROUP=cortex_m4_1
-    - NPROC_MAX=8 BUILDTEST_MCU_GROUP=cortex_m0_2
-    - NPROC_MAX=8 BUILDTEST_MCU_GROUP=cortex_m0_1
-    - NPROC_MAX=8 BUILDTEST_MCU_GROUP=x86
-    - NPROC_MAX=8 BUILDTEST_MCU_GROUP=cortex_m3_2
-    - NPROC_MAX=8 BUILDTEST_MCU_GROUP=cortex_m3_1
-    - NPROC_MAX=8 BUILDTEST_MCU_GROUP=avr8
-    - NPROC_MAX=8 BUILDTEST_MCU_GROUP=msp430
-    - NPROC_MAX=8 BUILDTEST_MCU_GROUP=arm7
+    global:
+        - NPROC_MAX=8
+    matrix:
+        - BUILDTEST_MCU_GROUP=static-tests
+        - BUILDTEST_MCU_GROUP=cortex_m4_2
+        - BUILDTEST_MCU_GROUP=cortex_m4_1
+        - BUILDTEST_MCU_GROUP=cortex_m0_2
+        - BUILDTEST_MCU_GROUP=cortex_m0_1
+        - BUILDTEST_MCU_GROUP=x86
+        - BUILDTEST_MCU_GROUP=cortex_m3_2
+        - BUILDTEST_MCU_GROUP=cortex_m3_1
+        - BUILDTEST_MCU_GROUP=avr8
+        - BUILDTEST_MCU_GROUP=msp430
+        - BUILDTEST_MCU_GROUP=arm7
 
 before_install:
     - source ./dist/tools/pr_check/check_labels.sh
     - test -z "$TRAVIS_PULL_REQUEST" || test "$BUILDTEST_MCU_GROUP" = "static-tests" || check_gh_label "Ready for CI build" || exit 1
-    - echo 'deb http://us.archive.ubuntu.com/ubuntu trusty           main restricted universe multiverse' | sudo tee    /etc/apt/sources.list.d/trusty.list > /dev/null
-    - echo 'deb http://us.archive.ubuntu.com/ubuntu trusty-backports main restricted universe multiverse' | sudo tee -a /etc/apt/sources.list.d/trusty.list > /dev/null
-    - echo 'deb http://us.archive.ubuntu.com/ubuntu trusty-security  main restricted universe multiverse' | sudo tee -a /etc/apt/sources.list.d/trusty.list > /dev/null
-    - echo 'deb http://us.archive.ubuntu.com/ubuntu trusty-updates   main restricted universe multiverse' | sudo tee -a /etc/apt/sources.list.d/trusty.list > /dev/null
     - sudo add-apt-repository -y ppa:terry.guo/gcc-arm-embedded
-    - sudo apt-get update
+    - sudo apt-get update -qq
 
 install:
-    - >
-        sudo apt-get install $(./dist/tools/travis-scripts/get-pkg-list.py)
+    - sudo apt-get -y install $(./dist/tools/travis-scripts/get-pkg-list.py)
     - git config --global user.email "travis@example.com"
     - git config --global user.name "Travis CI"
+    - test "$TRAVIS_BRANCH" = "master" || git fetch origin $TRAVIS_BRANCH:$TRAVIS_BRANCH
 
 script:
     - ./dist/tools/travis-scripts/build_and_test.sh
