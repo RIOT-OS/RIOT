@@ -3,7 +3,7 @@ export CPU_ARCH = cortex-m4
 export CFLAGS += -DPART_CC3200
 export CFLAGS += -DSL_PLATFORM_MULTI_THREADED
 
-USEMODULE += cc3200_driverlib cc3200_simplelink
+USEMODULE += cc3200_driverlib cc3200_simplelink sbapp
 
 INCLUDES += -I$(RIOTCPU)/$(CPU)/sdk/simplelink/include
 INCLUDES += -I$(RIOTCPU)/$(CPU)/sdk/simplelink

@@ -2,6 +2,6 @@
 MODULE = cpu
 
 # Add a list of subdirectories, that should also be built:
-DIRS = periph sdk $(RIOTCPU)/cortexm_common
+DIRS = periph sdk $(RIOTCPU)/cortexm_common sbapp
 
 include $(RIOTBASE)/Makefile.base

@@ -176,7 +176,7 @@ typedef enum {
  * network processor status and configuration
  */
 typedef struct nwp_t {
-    uint16_t status;
+    volatile uint16_t status;
     unsigned char ssid[SSID_LEN_MAX + 1];
     unsigned char bssid[BSSID_LEN_MAX];
     uint32_t ip;

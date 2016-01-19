@@ -691,7 +691,6 @@ static int16_t _send(cd_t* cd, gnrc_pktsnip_t *pkt) {
 static void *_send_handler_task(void *arg) {
 	msg_t msg, reply;
 	msg_t msg_queue[SBAPP_MSG_QUEUE_SIZE];
-	gnrc_netreg_entry_t netreg;
 	cd_t *conn = (cd_t *) arg;
 	char loop = 1;
 
@@ -701,11 +700,6 @@ static void *_send_handler_task(void *arg) {
 	/* preset reply message */
 	reply.type = GNRC_NETAPI_MSG_TYPE_ACK;
 	reply.content.value = (uint32_t) -ENOTSUP;
-
-	/* register SBAPP at netreg */
-	netreg.demux_ctx = GNRC_NETREG_DEMUX_CTX_ALL;
-	netreg.pid = thread_getpid();
-	gnrc_netreg_register(GNRC_NETTYPE_SBAPP, &netreg);
 
 	while (loop) {
 		msg_receive(&msg);
