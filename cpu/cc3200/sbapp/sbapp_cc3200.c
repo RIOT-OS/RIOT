@@ -26,7 +26,6 @@
  */
 #define RECV_BUFF_SIZE                  (64)
 
-
 // check ip acquisition every CONNECTION_CHECK_TIME_SLOT msec
 #define CONN_CHECK_TIME_SLOT (100)
 
@@ -66,20 +65,21 @@ enum error_types {
 	SOCKET_CONNECT_FAIL
 };
 
-const char* sl_err_descr[] = { [NO_ERROR] = "no error", [GEN_ERROR
-		] = "simplelink internal error", [SIMPLELINK_START_ERR
-		] = "failed to start sl task", [WLAN_START_ERR
-		] = "failed to initialize sl device", [WLAN_STOP_ERR
-		] = "failed to stop sl device", [WLAN_SETMODE_ERR
-		] = "failed to set wlan mode", [WLAN_FILTERSET_ERR
-		] = "unable to set wlan filter", [WLAN_POLICYSET_ERR
-		] = "wlan set policy failed",
-		[WLAN_SET_ERR ] = "unable to set wlan cfg", [NET_CFGSET_ERR
-				] = "failed to set net cfg", [NET_SERVICECFG_ERR
-				] = "unable to exec net service api", [SMARTCONFIG_ERR
-				] = "unable to setup smart config", [SOCKET_OPEN_FAIL
-				] = "socket open failed", [SOCKET_CONNECT_FAIL
-				] = "socket connect failed" };
+const char* sl_err_descr[] = {
+		[NO_ERROR] = "no error",
+		[GEN_ERROR ] = "simplelink internal error",
+		[SIMPLELINK_START_ERR ] = "failed to start sl task",
+		[WLAN_START_ERR ] = "failed to initialize sl device",
+		[WLAN_STOP_ERR ] = "failed to stop sl device",
+		[WLAN_SETMODE_ERR ] = "failed to set wlan mode",
+		[WLAN_FILTERSET_ERR ] = "unable to set wlan filter",
+		[WLAN_POLICYSET_ERR ] = "wlan set policy failed",
+		[WLAN_SET_ERR ] = "unable to set wlan cfg",
+		[NET_CFGSET_ERR ] = "failed to set net cfg",
+		[NET_SERVICECFG_ERR ] = "unable to exec net service api",
+		[SMARTCONFIG_ERR ] = "unable to setup smart config",
+		[SOCKET_OPEN_FAIL ] = "socket open failed",
+		[SOCKET_CONNECT_FAIL ] = "socket connect failed" };
 
 /**
  * @brief describe a communication endpoint
@@ -93,9 +93,7 @@ typedef struct cd_t {
 	char *recv_stack;
 } cd_t;
 
-
 static uint8_t recv_buffer[RECV_BUFF_SIZE];
-
 
 /**
  * @brief send a packet
@@ -838,8 +836,7 @@ sbh_t sbapp_connect(const char* server, uint16_t port, kernel_pid_t pid) {
 
 	// start the receive task
 	conn->recv_pid = thread_create(conn->recv_stack, SBAPP_STACK_SIZE,
-			SBAPP_PRIO, THREAD_CREATE_STACKTEST, _receive_handler_task, conn,
-			server);
+	SBAPP_PRIO, THREAD_CREATE_STACKTEST, _receive_handler_task, conn, server);
 
 	return conn;
 }
