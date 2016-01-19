@@ -28,44 +28,55 @@ extern "C" {
 /**
  * @brief   Default message queue size for the NBAPP thread
  */
-#ifndef GNRC_SBAPP_MSG_QUEUE_SIZE
-#define GNRC_SBAPP_MSG_QUEUE_SIZE (8U)
+#ifndef SBAPP_MSG_QUEUE_SIZE
+#define SBAPP_MSG_QUEUE_SIZE (8U)
 #endif
 
 /**
  * @brief   Priority of the NBAPP thread
  */
-#ifndef GNRC_SBAPP_PRIO
-#define GNRC_SBAPP_PRIO           (THREAD_PRIORITY_MAIN - 2)
+#ifndef SBAPP_PRIO
+#define SBAPP_PRIO           (THREAD_PRIORITY_MAIN - 2)
 #endif
 
 /**
  * @brief   Default stack size to use for the UDP thread
  */
-#ifndef GNRC_SBAPP_STACK_SIZE
-#define GNRC_SBAPP_STACK_SIZE     (THREAD_STACKSIZE_DEFAULT)
+#ifndef SBAPP_STACK_SIZE
+#define SBAPP_STACK_SIZE     (THREAD_STACKSIZE_DEFAULT)
 #endif
 
 
 /**
  * @brief @ref core_msg type for passing a @ref net_gnrc_pkt from sbapp up the app
  */
-#define GNRC_SBAPI_MSG_TYPE_RCV        (0x0301)
+#define SBAPI_MSG_TYPE_RCV        (0x0301)
 
 /**
  * @brief @ref core_msg type for passing a @ref net_gnrc_pkt to sbapp adapter
  */
-#define GNRC_SBAPI_MSG_TYPE_SND        (0x0302)
+#define SBAPI_MSG_TYPE_SND        (0x0302)
+
+/**
+ * @brief   @ref core_msg type for setting options of network modules
+ */
+#define SBAPI_MSG_TYPE_SET        (0x0303)
+
+/**
+ * @brief   @ref core_msg type for getting options from network modules
+ */
+#define SBAPI_MSG_TYPE_GET        (0x0304)
 
 /**
  * @brief detected an error condition on the network channel (currently a tcp socket)
  */
-#define SBAPI_MSG_TYPE_ERR             (0x0303)
+#define SBAPI_MSG_TYPE_ERR             (0x0306)
+
 
 /**
  * @brief the connection handler exited because of an error
  */
-#define SBAPI_MSG_TYPE_HANDLER_EXIT    (0x304)
+#define SBAPI_MSG_TYPE_HANDLER_EXIT    (0x307)
 
 
 #define SBAPI_SEND_FAILED 1

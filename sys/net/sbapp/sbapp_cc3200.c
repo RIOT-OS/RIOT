@@ -21,6 +21,12 @@
 #define ENABLE_DEBUG    (1)
 #include "debug.h"
 
+/**
+ * @brief the recv receive buffer
+ */
+#define RECV_BUFF_SIZE                  (64)
+
+
 // check ip acquisition every CONNECTION_CHECK_TIME_SLOT msec
 #define CONN_CHECK_TIME_SLOT (100)
 
@@ -60,21 +66,20 @@ enum error_types {
 	SOCKET_CONNECT_FAIL
 };
 
-const char* sl_err_descr[] = {
-		[NO_ERROR] = "no error",
-		[GEN_ERROR ] = "simplelink internal error",
-		[SIMPLELINK_START_ERR ] = "failed to start sl task",
-		[WLAN_START_ERR ] = "failed to initialize sl device",
-		[WLAN_STOP_ERR ] = "failed to stop sl device",
-		[WLAN_SETMODE_ERR ] = "failed to set wlan mode",
-		[WLAN_FILTERSET_ERR ] = "unable to set wlan filter",
-		[WLAN_POLICYSET_ERR ] = "wlan set policy failed",
-		[WLAN_SET_ERR ] = "unable to set wlan cfg",
-		[NET_CFGSET_ERR ] = "failed to set net cfg",
-		[NET_SERVICECFG_ERR ] = "unable to exec net service api",
-		[SMARTCONFIG_ERR ] = "unable to setup smart config",
-		[SOCKET_OPEN_FAIL ] = "socket open failed",
-		[SOCKET_CONNECT_FAIL ] = "socket connect failed" };
+const char* sl_err_descr[] = { [NO_ERROR] = "no error", [GEN_ERROR
+		] = "simplelink internal error", [SIMPLELINK_START_ERR
+		] = "failed to start sl task", [WLAN_START_ERR
+		] = "failed to initialize sl device", [WLAN_STOP_ERR
+		] = "failed to stop sl device", [WLAN_SETMODE_ERR
+		] = "failed to set wlan mode", [WLAN_FILTERSET_ERR
+		] = "unable to set wlan filter", [WLAN_POLICYSET_ERR
+		] = "wlan set policy failed",
+		[WLAN_SET_ERR ] = "unable to set wlan cfg", [NET_CFGSET_ERR
+				] = "failed to set net cfg", [NET_SERVICECFG_ERR
+				] = "unable to exec net service api", [SMARTCONFIG_ERR
+				] = "unable to setup smart config", [SOCKET_OPEN_FAIL
+				] = "socket open failed", [SOCKET_CONNECT_FAIL
+				] = "socket connect failed" };
 
 /**
  * @brief describe a communication endpoint
@@ -87,6 +92,10 @@ typedef struct cd_t {
 	char *send_stack;
 	char *recv_stack;
 } cd_t;
+
+
+static uint8_t recv_buffer[RECV_BUFF_SIZE];
+
 
 /**
  * @brief send a packet
@@ -114,9 +123,9 @@ sbapp_t sbapp = { .main_pid = KERNEL_PID_UNDEF };
  * @brief   memory segment for the NBAPP thread's stack
  */
 #if ENABLE_DEBUG
-static char _stack[GNRC_SBAPP_STACK_SIZE + THREAD_EXTRA_STACKSIZE_PRINTF];
+static char _stack[SBAPP_STACK_SIZE + THREAD_EXTRA_STACKSIZE_PRINTF];
 #else
-static char _stack[GNRC_SBAPP_STACK_SIZE];
+static char _stack[SBAPP_STACK_SIZE];
 #endif
 
 #if 0
@@ -624,7 +633,7 @@ int sbapp_init(void) {
 	/* check if thread is already running */
 	if (sbapp.main_pid == KERNEL_PID_UNDEF) {
 		/* start SBAPP thread */
-		sbapp.main_pid = thread_create(_stack, sizeof(_stack), GNRC_SBAPP_PRIO,
+		sbapp.main_pid = thread_create(_stack, sizeof(_stack), SBAPP_PRIO,
 		THREAD_CREATE_STACKTEST, _event_loop, NULL, "sbapp");
 	}
 	return sbapp.main_pid;
@@ -676,18 +685,18 @@ static int16_t _send(cd_t* cd, gnrc_pktsnip_t *pkt) {
 	return sts;
 }
 
-static void _receive(cd_t* cd, gnrc_pktsnip_t *pkt) {
-}
-
+/**
+ * @brief sender task
+ */
 static void *_send_handler_task(void *arg) {
 	msg_t msg, reply;
-	msg_t msg_queue[GNRC_SBAPP_MSG_QUEUE_SIZE];
+	msg_t msg_queue[SBAPP_MSG_QUEUE_SIZE];
 	gnrc_netreg_entry_t netreg;
 	cd_t *conn = (cd_t *) arg;
 	char loop = 1;
 
 	/* initialize message queue */
-	msg_init_queue(msg_queue, GNRC_SBAPP_MSG_QUEUE_SIZE);
+	msg_init_queue(msg_queue, SBAPP_MSG_QUEUE_SIZE);
 
 	/* preset reply message */
 	reply.type = GNRC_NETAPI_MSG_TYPE_ACK;
@@ -701,11 +710,7 @@ static void *_send_handler_task(void *arg) {
 	while (loop) {
 		msg_receive(&msg);
 		switch (msg.type) {
-		case GNRC_NETAPI_MSG_TYPE_RCV:
-			DEBUG("sbapp send: GNRC_NETAPI_MSG_TYPE_RCV\n");
-			_receive(conn, (gnrc_pktsnip_t *) msg.content.ptr);
-			break;
-		case GNRC_SBAPI_MSG_TYPE_SND:
+		case SBAPI_MSG_TYPE_SND:
 			DEBUG("sbapp send: GNRC_SBAPI_MSG_TYPE_SND\n");
 			_send(conn, (gnrc_pktsnip_t *) msg.content.ptr);
 			break;
@@ -713,8 +718,8 @@ static void *_send_handler_task(void *arg) {
 			DEBUG("sbapp send: SBAPI_MSG_TYPE_ERR\n");
 			loop = 0;
 			break;
-		case GNRC_NETAPI_MSG_TYPE_SET:
-		case GNRC_NETAPI_MSG_TYPE_GET:
+		case SBAPI_MSG_TYPE_SET:
+		case SBAPI_MSG_TYPE_GET:
 			msg_reply(&msg, &reply);
 			break;
 		default:
@@ -730,18 +735,15 @@ static void *_send_handler_task(void *arg) {
 	msg_send(&reply, sbapp.main_pid);
 
 	if (conn->recv_stack == NULL) {
-		sl_Close(conn->fd);
+		close(conn->fd);
 		free(conn);
 	}
 
 	return NULL;
 }
 
-#define RECV_BUFF_SIZE                  (64)
-static uint8_t recv_buffer[RECV_BUFF_SIZE];
-
 /**
- * receive data from socket
+ * receive data task
  */
 static void *_receive_handler_task(void* arg) {
 
@@ -753,14 +755,13 @@ static void *_receive_handler_task(void* arg) {
 
 	nettype = GNRC_NETTYPE_UNDEF;
 
-	//msg_init_queue(msg_queue, 8);
-
 	do {
-
-		//printf("receiving ...\n");
-		size = sl_Recv(cd->fd, recv_buffer, RECV_BUFF_SIZE, 0);
+		size = recv(cd->fd, recv_buffer, RECV_BUFF_SIZE, 0);
 		if (size <= 0) {
-			// error condition detected
+			/**
+			 * error condition detected
+			 * when a connection is closed by peer recv return 0
+			 */
 			DEBUG("channel %d: error %d\n", cd->fd, size);
 			msg.type = SBAPI_MSG_TYPE_ERR;
 			msg.content.value = size;
@@ -776,7 +777,7 @@ static void *_receive_handler_task(void* arg) {
 
 			DEBUG("channel %d: recv: %s (len %d)\n",
 					cd->fd, (char *) pkt->data, size);
-			msg.type = GNRC_SBAPI_MSG_TYPE_RCV;
+			msg.type = SBAPI_MSG_TYPE_RCV;
 			//msg.content.ptr = (char*)recv_buffer;
 			msg.content.ptr = (void*) pkt;
 		}
@@ -790,7 +791,7 @@ static void *_receive_handler_task(void* arg) {
 	msg_send(&msg, sbapp.main_pid);
 
 	if (cd->send_stack == NULL) {
-		sl_Close(cd->fd);
+		close(cd->fd);
 		free(cd);
 	}
 
@@ -804,34 +805,47 @@ sbh_t sbapp_connect(const char* server, uint16_t port, kernel_pid_t pid) {
 	}
 
 	// create a connection descriptor
-	// TODO: error mgmt
 	cd_t *conn = malloc(sizeof(cd_t));
+	if (conn == NULL) {
+		return NULL;
+	}
 
 	conn->fd = connect_to(server, port);
 	if (conn->fd < 0) {
 		return NULL;
 	}
+
 	conn->pid = pid;
 
 #if ENABLE_DEBUG
-	conn->send_stack = malloc(
-	GNRC_SBAPP_STACK_SIZE + THREAD_EXTRA_STACKSIZE_PRINTF);
-	conn->recv_stack = malloc(
-	GNRC_SBAPP_STACK_SIZE + THREAD_EXTRA_STACKSIZE_PRINTF);
+	conn->send_stack = malloc(SBAPP_STACK_SIZE + THREAD_EXTRA_STACKSIZE_PRINTF);
 #else
-	conn->send_stack = malloc(GNRC_SBAPP_STACK_SIZE);
-	conn->recv_stack = malloc(GNRC_SBAPP_STACK_SIZE);
+	conn->send_stack = malloc(SBAPP_STACK_SIZE);
 #endif
+	if (conn->send_stack == NULL) {
+		free(conn);
+		return NULL;
+	}
+
+#if ENABLE_DEBUG
+	conn->recv_stack = malloc(SBAPP_STACK_SIZE + THREAD_EXTRA_STACKSIZE_PRINTF);
+#else
+	conn->recv_stack = malloc(SBAPP_STACK_SIZE);
+#endif
+	if (conn->recv_stack == NULL) {
+		free(conn);
+		free(conn->send_stack);
+		return NULL;
+	}
 
 	// start the send task
-	conn->send_pid = thread_create(conn->send_stack, GNRC_SBAPP_STACK_SIZE,
-	GNRC_SBAPP_PRIO,
-	THREAD_CREATE_STACKTEST, _send_handler_task, conn, server);
+	conn->send_pid = thread_create(conn->send_stack, SBAPP_STACK_SIZE,
+	SBAPP_PRIO, THREAD_CREATE_STACKTEST, _send_handler_task, conn, server);
 
 	// start the receive task
-	conn->recv_pid = thread_create(conn->recv_stack, GNRC_SBAPP_STACK_SIZE,
-	GNRC_SBAPP_PRIO,
-	THREAD_CREATE_STACKTEST, _receive_handler_task, conn, server);
+	conn->recv_pid = thread_create(conn->recv_stack, SBAPP_STACK_SIZE,
+			SBAPP_PRIO, THREAD_CREATE_STACKTEST, _receive_handler_task, conn,
+			server);
 
 	return conn;
 }
@@ -839,7 +853,7 @@ sbh_t sbapp_connect(const char* server, uint16_t port, kernel_pid_t pid) {
 void sbapp_close(sbh_t fd) {
 	cd_t *handle = (cd_t *) fd;
 
-	sl_Close(handle->fd);
+	close(handle->fd);
 	free(handle->recv_stack);
 	free(handle->send_stack);
 	free(handle);
@@ -851,7 +865,7 @@ int sbapp_send(sbh_t fd, void* data, size_t len) {
 
 	gnrc_pktsnip_t *pkt = gnrc_pktbuf_add(NULL, data, len, GNRC_NETTYPE_UNDEF);
 
-	msg.type = GNRC_SBAPI_MSG_TYPE_SND;
+	msg.type = SBAPI_MSG_TYPE_SND;
 	msg.content.ptr = (void*) pkt;
 	msg_send(&msg, handle->send_pid);
 
@@ -861,8 +875,7 @@ int sbapp_send(sbh_t fd, void* data, size_t len) {
 static void *_event_loop(void *arg) {
 	(void) arg;
 	msg_t msg, reply;
-	msg_t msg_queue[GNRC_SBAPP_MSG_QUEUE_SIZE];
-	gnrc_netreg_entry_t netreg;
+	msg_t msg_queue[SBAPP_MSG_QUEUE_SIZE];
 	int counter = 0;
 
 	/* preset reply message */
@@ -872,12 +885,7 @@ static void *_event_loop(void *arg) {
 	sbapp.sig_tim.callback = retry_connection;
 
 	/* initialize message queue */
-	msg_init_queue(msg_queue, GNRC_SBAPP_MSG_QUEUE_SIZE);
-
-	/* register SBAPP at netreg */
-	netreg.demux_ctx = GNRC_NETREG_DEMUX_CTX_ALL;
-	netreg.pid = thread_getpid();
-	gnrc_netreg_register(GNRC_NETTYPE_SBAPP, &netreg);
+	msg_init_queue(msg_queue, SBAPP_MSG_QUEUE_SIZE);
 
 	if (VStartSimpleLinkSpawnTask(SPAWN_TASK_PRIORITY) < 0) {
 		PANIC(SIMPLELINK_START_ERR);
@@ -885,7 +893,7 @@ static void *_event_loop(void *arg) {
 
 	wifi_connect();
 
-	/* dispatch NETAPI messages */
+	/* dispatch SBAPI messages and manage simplelink events */
 	while (1) {
 		msg_receive(&msg);
 		switch (msg.type) {
@@ -935,16 +943,8 @@ static void *_event_loop(void *arg) {
 
 			break;
 
-		case GNRC_NETAPI_MSG_TYPE_RCV:
-			DEBUG("sbapp: GNRC_NETAPI_MSG_TYPE_RCV\n");
-			//_receive((gnrc_pktsnip_t *) msg.content.ptr);
-			break;
-		case GNRC_NETAPI_MSG_TYPE_SND:
-			DEBUG("sbapp: GNRC_NETAPI_MSG_TYPE_SND\n");
-			//_send((gnrc_pktsnip_t *) msg.content.ptr);
-			break;
-		case GNRC_NETAPI_MSG_TYPE_SET:
-		case GNRC_NETAPI_MSG_TYPE_GET:
+		case SBAPI_MSG_TYPE_SET:
+		case SBAPI_MSG_TYPE_GET:
 			msg_reply(&msg, &reply);
 			break;
 		case SBAPI_MSG_TYPE_HANDLER_EXIT:
