@@ -479,16 +479,12 @@ static inline void xtimer_spin_until(uint32_t target) {
 
 static inline void xtimer_spin(uint32_t offset) {
     uint32_t start = _lltimer_now();
-    uint32_t target = start + offset;
 #if XTIMER_MASK
-    target = _lltimer_mask(target);
+    offset = _lltimer_mask(offset);
+    while (_lltimer_mask(_lltimer_now() - start) < offset);
+#else
+    while ((_lltimer_now() - start) < offset);
 #endif
-    if (target < start) {
-        /* Target time is less than start time => overflow */
-        /* Spin until timer overflows */
-        while (_lltimer_now() >= start);
-    }
-    while (_lltimer_now() < target);
 }
 
 static inline void xtimer_usleep(uint32_t microseconds)
