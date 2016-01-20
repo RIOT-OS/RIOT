@@ -39,17 +39,12 @@ extern "C" {
 #define F_CPU               CLOCK_CORECLOCK
 
 /**
- * @name Define the UART to be used as stdio, its baudrate, and the size of
- *       receiving ringbuffer
+ * @name Set the default baudrate to 500K for this board
  * @{
  */
-#define STDIO               UART_0
-
 #ifndef STDIO_BAUDRATE
 #   define STDIO_BAUDRATE   (500000U)
 #endif
-
-#define STDIO_RX_BUFSIZE    (64U)
 /** @} */
 
 /**
