@@ -43,7 +43,7 @@ Now, on the Linux host, you can run netcat to connect with RIOT's UDP server:
 
 The `-6` option is necessary to tell netcat to use IPv6 only, the `-u` option tells it to use UDP only, and the `-v` option makes it give more verbose output (this one is optional).
 
-You should now see that UDP messages are received on the RIOT side. Opening a UDP server on the Linux side is also possible. Do do that, write down the IP address of the host (run on Linux):
+You should now see that UDP messages are received on the RIOT side. Opening a UDP server on the Linux side is also possible. To do that, write down the IP address of the host (run on Linux):
 
     ifconfig tap0
     tap0     Link encap:Ethernet  HWaddr ce:f5:e1:c5:f7:59
