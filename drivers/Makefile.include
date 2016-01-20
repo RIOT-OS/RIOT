@@ -61,3 +61,6 @@ endif
 ifneq (,$(filter bmp180,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/drivers/bmp180/include
 endif
+ifneq (,$(filter srf02,$(USEMODULE)))
+    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/srf02/include
+endif

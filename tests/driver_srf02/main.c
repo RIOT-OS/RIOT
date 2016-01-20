@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2014 Hamburg University of Applied Sciences
- *               2015 Freie Universität Berlin
+ *               2015-2016 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -37,14 +37,14 @@
 #endif
 
 #define SAMPLE_PERIOD       (100 * 1000U)
-
-static srf02_t dev;
+#define MODE                (SRF02_MODE_REAL_CM)
 
 static void sample(void)
 {
     uint16_t distance = srf02_get_distance(&dev, TEST_MODE);
     printf("distance = %3i cm\n", distance);
 }
+
 
 static int cmd_init(int argc, char **argv)
 {
@@ -79,6 +79,7 @@ static int cmd_sample(int argc, char **argv)
     while(1) {
         sample();
         xtimer_usleep_until(&wakeup, SAMPLE_PERIOD);
+
     }
 
     return 0;
