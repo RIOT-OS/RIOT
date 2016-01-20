@@ -68,6 +68,7 @@ int srf02_init(srf02_t *dev, i2c_t i2c, uint8_t addr)
     /* initialize i2c interface */
     if (i2c_init_master(dev->i2c, BUS_SPEED) < 0) {
         DEBUG("[srf02] error initializing I2C bus\n");
+        i2c_release(dev->i2c);
         return -1;
     }
     /* try to read the software revision (read the CMD reg) from the device */
@@ -75,6 +76,7 @@ int srf02_init(srf02_t *dev, i2c_t i2c, uint8_t addr)
     if (rev == 0 || rev == 255) {
         i2c_release(dev->i2c);
         DEBUG("[srf02] error reading the devices software revision\n");
+        i2c_release(dev->i2c);
         return -1;
     } else {
         DEBUG("[srf02] software revision: 0x%02x\n", rev);
