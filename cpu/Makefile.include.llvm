@@ -1,5 +1,12 @@
 export GDBPREFIX  ?= $(PREFIX)
 export LLVMPREFIX ?= llvm-
+# Apple XCode doesn't prefix its tools with llvm-, but manually installed LLVM
+# on OSX might have the llvm- prefix, we can't simply test against uname -s.
+# Test if llvm-ar exists
+ifeq (,$(shell command -v $(LLVMPREFIX)ar 2>/dev/null))
+# fall back to system tools
+export LLVMPREFIX :=
+endif
 export CC          = clang
 export CXX         = clang++
 export LINK        = $(CC)
@@ -52,4 +59,31 @@ GCC_CXX_INCLUDES ?= \
         /. /$(TARGET_ARCH)/$(GCC_MULTI_DIR) /backward \
     )
 
-export INCLUDES += $(GCC_CXX_INCLUDES)
+# If nothing was found we will try to fall back to searching for a cross-gcc in
+# the current PATH and use a relative path for the includes
+ifeq (,$(GCC_CXX_INCLUDES))
+  GCC_CXX_INCLUDES := $(addprefix -isystem ,$(wildcard $(dir $(shell which $(PREFIX)gcc))../$(TARGET_TRIPLE)/include))
+endif
+
+# Pass the includes to the C++ compilation rule in Makefile.base
+export CXXINCLUDES += $(GCC_CXX_INCLUDES)
+
+# Some C headers (e.g. limits.h) are located with the GCC libraries
+GCC_C_INCLUDE_PATTERNS ?= \
+  /usr/lib/gcc/$(TARGET_TRIPLE)/*/ \
+  #
+
+GCC_C_INCLUDES ?= \
+    $(addprefix -isystem ,$(wildcard $(addprefix \
+        $(lastword $(sort \
+            $(foreach pat, $(GCC_C_INCLUDE_PATTERNS), $(wildcard $(pat))))), \
+        include include-fixed) \
+    ))
+
+# If nothing was found we will try to fall back to searching for the libgcc used
+# by an installed cross-GCC and use its headers.
+ifeq (,$(GCC_C_INCLUDES))
+  GCC_C_INCLUDES := $(addprefix -isystem ,$(wildcard $(addprefix $(dir $(shell $(PREFIX)gcc -print-libgcc-file-name)), include include-fixed)))
+endif
+
+export INCLUDES += $(GCC_C_INCLUDES)
