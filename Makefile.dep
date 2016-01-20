@@ -223,7 +223,6 @@ ifneq (,$(filter ipv6_ext_rh,$(USEMODULE)))
 endif
 
 ifneq (,$(filter gnrc_ipv6_ext,$(USEMODULE)))
-  USEMODULE += ipv6_ext
   USEMODULE += gnrc_ipv6
 endif
 

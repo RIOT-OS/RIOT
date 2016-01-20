@@ -70,7 +70,6 @@ int gnrc_rpl_srh_process(ipv6_hdr_t *ipv6, gnrc_rpl_srh_t *rh)
         if (k == n - 1) {
             tmp_pref_elided = GNRC_RPL_SRH_COMPRE(rh->compr);
             tmp_addr_len = sizeof(ipv6_addr_t) - tmp_pref_elided;
-            tmp = ipv6->dst;
         }
         memcpy(&tmp.u8[tmp_pref_elided], &addr_vec[k * compri_addr_len], tmp_addr_len);
         if (gnrc_ipv6_netif_find_by_addr(NULL, &tmp) != KERNEL_PID_UNDEF) {
