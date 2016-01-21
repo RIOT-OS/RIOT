@@ -138,6 +138,11 @@ void auto_init(void)
     DEBUG("Auto init UDP module.\n");
     gnrc_udp_init();
 #endif
+#ifdef MODULE_DHT
+    DEBUG("Auto init DHT devices.\n");
+    extern void dht_auto_init(void);
+    dht_auto_init();
+#endif
 
 
 /* initialize network devices */
