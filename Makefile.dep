@@ -7,7 +7,7 @@ endif
 
 ifneq (,$(filter nhdp,$(USEMODULE)))
   USEMODULE += conn_udp
-  USEMODULE += vtimer
+  USEMODULE += xtimer
   USEMODULE += oonf_rfc5444
 endif
 
@@ -37,7 +37,7 @@ ifneq (,$(filter gnrc_zep,$(USEMODULE)))
   USEMODULE += ieee802154
   USEMODULE += gnrc_udp
   USEMODULE += random
-  USEMODULE += vtimer
+  USEMODULE += xtimer
 endif
 
 ifneq (,$(filter gnrc_tftp,$(USEMODULE)))
@@ -300,10 +300,6 @@ ifneq (,$(filter sema,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
-ifneq (,$(filter vtimer,$(USEMODULE)))
-  USEMODULE += xtimer
-  USEMODULE += timex
-endif
 
 ifneq (,$(filter libfixmath-unittests,$(USEMODULE)))
   USEPKG += libfixmath
@@ -378,7 +374,6 @@ endif
 
 ifneq (,$(filter pthread,$(USEMODULE)))
     USEMODULE += xtimer
-    USEMODULE += vtimer
     USEMODULE += timex
 endif
 
