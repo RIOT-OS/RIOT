@@ -36,4 +36,5 @@ ifeq (,$(NEWLIB_INCLUDES))
   NEWLIB_INCLUDES := $(addprefix -isystem ,$(wildcard $(dir $(shell which $(PREFIX)gcc))../$(TARGET_TRIPLE)/include))
 endif
 
-export INCLUDES += $(NEWLIB_INCLUDES)
+# Newlib includes should go before GCC includes.
+export INCLUDES := $(NEWLIB_INCLUDES) $(INCLUDES)
