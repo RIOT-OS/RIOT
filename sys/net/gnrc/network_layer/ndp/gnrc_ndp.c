@@ -715,9 +715,7 @@ void gnrc_ndp_rtr_adv_handle(kernel_pid_t iface, gnrc_pktsnip_t *pkt, ipv6_hdr_t
 
 #if defined(MODULE_GNRC_RPL) && defined(MODULE_GNRC_SIXLOWPAN_ND_BORDER_ROUTER)
     if (!(if_entry->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN)) {
-        ipv6_addr_t default_route_prefix;
-
-        memset(default_route_prefix.u8, 0, sizeof(ipv6_addr_t));
+        ipv6_addr_t default_route_prefix = IPV6_ADDR_UNSPECIFIED;
 
         _add_prefix_route(iface,
                           default_route_prefix.u8,
