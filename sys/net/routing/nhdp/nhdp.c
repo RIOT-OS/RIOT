@@ -103,7 +103,8 @@ kernel_pid_t nhdp_start(void)
             metric_interval = timex_from_uint64(DAT_REFRESH_INTERVAL * SEC_IN_USEC);
             metric_msg.type = NHDP_METRIC_TIMER;
             metric_msg.content.ptr = NULL;
-            xtimer_set_msg64(&metric_timer, timex_uint64(metric_interval), metric_msg, nhdp_pid);
+            xtimer_set_msg64(&metric_timer, timex_uint64(metric_interval),
+                               metric_msg, nhdp_pid);
         }
 #endif
     }
@@ -259,7 +260,9 @@ static void *_nhdp_runner(void *arg)
                 /* TODO: Add jitter */
 
                 /* Schedule next sending */
-                xtimer_set_msg64(&if_entry->if_timer, timex_uint64(if_entry->hello_interval), &msg_rcvd, thread_getpid());
+                xtimer_set_msg64(&if_entry->if_timer,
+                                 timex_uint64(if_entry->hello_interval),
+                                 &msg_rcvd, thread_getpid());
                 mutex_unlock(&send_rcv_mutex);
                 break;
 
@@ -272,7 +275,8 @@ static void *_nhdp_runner(void *arg)
                 /* Schedule next sending */
                 metric_msg.type = NHDP_METRIC_TIMER;
                 metric_msg.content.ptr = NULL;
-                xtimer_set_msg64(&metric_timer, timex_uint64(metric_interval), metric_msg, thread_getpid());
+                xtimer_set_msg64(&metric_timer, timex_uint64(metric_interval),
+                                 metric_msg, thread_getpid());
                 mutex_unlock(&send_rcv_mutex);
                 break;
 #endif
