@@ -1,6 +1,7 @@
 /*
  * Copyright 2015 Ludwig Knüpfer
- * Copyright 2015 Christian Mehlis
+ *           2015 Christian Mehlis
+ *           2016 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -17,17 +18,21 @@
  *
  * @author      Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  * @author      Christian Mehlis <mehlis@inf.fu-berlin.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
  * @}
  */
 
 #include <stdint.h>
+#include <string.h>
 
+#include "log.h"
 #include "xtimer.h"
 #include "timex.h"
 #include "periph/gpio.h"
 
 #include "dht.h"
+#include "dht_params.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
@@ -131,17 +136,27 @@ static void dht_read_data(gpio_t dev, uint32_t *data, uint8_t *checksum)
  * public API implementation
  **********************************************************************/
 
-int dht_init(dht_t *dev, dht_type_t type, gpio_t gpio)
+dht_t dht_devs[DHT_NUMOF];
+
+void dht_auto_init(void)
+{
+    for (unsigned i = 0; i < DHT_NUMOF; i++) {
+        if (dht_init(&dht_devs[i], &dht_params[i]) < 0) {
+            LOG_ERROR("Unable to initialize DHT sensor #%i\n", i);
+        }
+    }
+}
+
+int dht_init(dht_t *dev, const dht_params_t *params)
 {
     DEBUG("dht_init\n");
 
-    dev->gpio = gpio;
-    dev->type = type;
+    memcpy(dev, params, sizeof(dht_t));
 
-    if (gpio_init(gpio, GPIO_DIR_OUT, GPIO_PULLUP) == -1) {
+    if (gpio_init(dev->pin, GPIO_DIR_OUT, GPIO_PULLUP) == -1) {
         return -1;
     }
-    gpio_set(gpio);
+    gpio_set(dev->pin);
 
     xtimer_usleep(2000 * MS_IN_USEC);
 
@@ -149,14 +164,13 @@ int dht_init(dht_t *dev, dht_type_t type, gpio_t gpio)
     return 0;
 }
 
-
 int dht_read_raw(dht_t *dev, dht_data_t *outdata)
 {
     uint32_t data;
     uint8_t checksum;
 
     /* read raw data */
-    dht_read_data(dev->gpio, &data, &checksum);
+    dht_read_data(dev->pin, &data, &checksum);
 
     /* check checksum */
     int ret = dht_test_checksum(data, checksum);

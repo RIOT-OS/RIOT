@@ -22,6 +22,7 @@ endif
 
 ifneq (,$(filter dht,$(USEMODULE)))
     USEMODULE += xtimer
+    FEATURES_REQUIRED = periph_gpio
 endif
 
 ifneq (,$(filter enc28j60,$(USEMODULE)))

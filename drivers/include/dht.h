@@ -1,5 +1,7 @@
 /*
- * Copyright 2015 Ludwig Knüpfer, Christian Mehlis
+ * Copyright 2015 Ludwig Knüpfer,
+ *           2015 Christian Mehlis
+ *           2016 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -20,6 +22,7 @@
  *
  * @author      Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de
  * @author      Christian Mehlis <mehlis@inf.fu-berlin.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
 #ifndef DHT_H
@@ -54,21 +57,30 @@ typedef enum {
  * @brief device descriptor for DHT sensor devices
  */
 typedef struct {
-    gpio_t gpio;            /**< GPIO pin of the device's data pin */
+    gpio_t pin;             /**< GPIO pin of the device's data pin */
     dht_type_t type;        /**< type of the DHT device */
 } dht_t;
 
 /**
+ * @brief configuration parameters for DHT devices
+ */
+typedef dht_t dht_params_t;
+
+/**
+ * @brief auto-initialize all configured DHT devices
+ */
+void dht_auto_init(void);
+
+/**
  * @brief initialize a new DHT device
  *
- * @param[in] dev       device descriptor of a DHT device
- * @param[in] type      type of the DHT device
- * @param[in] gpio      GPIO pin the device's data pin is connected to
+ * @param[out] dev      device descriptor of a DHT device
+ * @param[in]  params   configuration parameters
  *
  * @return              0 on success
  * @return              -1 on error
  */
-int dht_init(dht_t *dev, dht_type_t type, gpio_t gpio);
+int dht_init(dht_t *dev, const dht_params_t *params);
 
  /**
  * @brief   read sensor data from device
