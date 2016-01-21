@@ -35,9 +35,13 @@ extern "C" {
 #ifndef DHT_PARAM_TYPE
 #define DHT_PARAM_TYPE              (DHT11)
 #endif
+#ifndef DHT_PARAM_PULL
+#define DHT_PARAM_PULL              (GPIO_PULLUP)
+#endif
 
 #define DHT_PARAMS_DEFAULT          {.pin = DHT_PARAM_PIN, \
-                                     .type = DHT_PARAM_TYPE}
+                                     .type = DHT_PARAM_TYPE, \
+                                     .pull = DHT_PARAM_PULL}
 /**@}*/
 
 /**

@@ -41,7 +41,6 @@
  * internal API declaration
  **********************************************************************/
 
-static void dht_read_data(gpio_t dev, uint32_t *data, uint8_t *checksum);
 static int dht_test_checksum(uint32_t data, uint8_t checksum);
 void dht_parse_11(dht_data_t *data, float *outhum, float *outtemp);
 void dht_parse_22(dht_data_t *data, float *outhum, float *outtemp);
@@ -80,58 +79,6 @@ static int dht_test_checksum(uint32_t data, uint8_t checksum)
     return ((checksum == sum) && (checksum != 0));
 }
 
-static void dht_read_data(gpio_t dev, uint32_t *data, uint8_t *checksum)
-{
-    /* send init signal to device */
-    gpio_clear(dev);
-    xtimer_usleep(20 * MS_IN_USEC);
-    gpio_set(dev);
-    xtimer_usleep(40);
-
-    /* sync on device */
-    gpio_init(dev, GPIO_DIR_IN, GPIO_PULLUP);
-    while (!gpio_read(dev)) ;
-    while (gpio_read(dev)) ;
-
-    /*
-     * data is read in sequentially, highest bit first:
-     *  40 .. 24  23   ..   8  7  ..  0
-     * [humidity][temperature][checksum]
-     */
-
-    /* read all the bits */
-    uint64_t les_bits = 0x00000000000000;
-    for (int c = 0; c < 40; c++) {
-        les_bits <<= 1; /* this is a nop in the first iteration, but
-                           we must not shift the last bit */
-        /* wait for start of bit */
-        while (!gpio_read(dev)) ;
-        unsigned long start = xtimer_now();
-        /* wait for end of bit */
-        while (gpio_read(dev)) ;
-        /* calculate bit length (long 1, short 0) */
-        unsigned long stop = xtimer_now();
-        /* compensate for overflow if needed */
-        if (stop < start) {
-            stop = UINT32_MAX - stop;
-            start = 0;
-        }
-        if ((stop - start) > 40) {
-            /* read 1, set bit */
-            les_bits |= 0x0000000000000001;
-        }
-        else {
-            /* read 0, don't set bit */
-        }
-    }
-
-    *checksum = les_bits & 0x00000000000000FF;
-    *data = (les_bits >> 8) & 0x00000000FFFFFFFF;
-
-    gpio_init(dev, GPIO_DIR_OUT, GPIO_PULLUP);
-    gpio_set(dev);
-}
-
 /***********************************************************************
  * public API implementation
  **********************************************************************/
@@ -153,7 +100,7 @@ int dht_init(dht_t *dev, const dht_params_t *params)
 
     memcpy(dev, params, sizeof(dht_t));
 
-    if (gpio_init(dev->pin, GPIO_DIR_OUT, GPIO_PULLUP) == -1) {
+    if (gpio_init(dev->pin, GPIO_DIR_OUT, dev->pull) == -1) {
         return -1;
     }
     gpio_set(dev->pin);
@@ -169,8 +116,54 @@ int dht_read_raw(dht_t *dev, dht_data_t *outdata)
     uint32_t data;
     uint8_t checksum;
 
-    /* read raw data */
-    dht_read_data(dev->pin, &data, &checksum);
+    /* send init signal to device */
+    gpio_clear(dev->pin);
+    xtimer_usleep(20 * MS_IN_USEC);
+    gpio_set(dev->pin);
+    xtimer_usleep(40);
+
+    /* sync on device */
+    gpio_init(dev->pin, GPIO_DIR_IN, dev->pull);
+    while (!gpio_read(dev->pin)) ;
+    while (gpio_read(dev->pin)) ;
+
+    /*
+     * data is read in sequentially, highest bit first:
+     *  40 .. 24  23   ..   8  7  ..  0
+     * [humidity][temperature][checksum]
+     */
+
+    /* read all the bits */
+    uint64_t les_bits = 0x00000000000000;
+    for (int c = 0; c < 40; c++) {
+        les_bits <<= 1; /* this is a nop in the first iteration, but
+                           we must not shift the last bit */
+        /* wait for start of bit */
+        while (!gpio_read(dev->pin)) ;
+        unsigned long start = xtimer_now();
+        /* wait for end of bit */
+        while (gpio_read(dev->pin)) ;
+        /* calculate bit length (long 1, short 0) */
+        unsigned long stop = xtimer_now();
+        /* compensate for overflow if needed */
+        if (stop < start) {
+            stop = UINT32_MAX - stop;
+            start = 0;
+        }
+        if ((stop - start) > 40) {
+            /* read 1, set bit */
+            les_bits |= 0x0000000000000001;
+        }
+        else {
+            /* read 0, don't set bit */
+        }
+    }
+
+    checksum = les_bits & 0x00000000000000FF;
+    data = (les_bits >> 8) & 0x00000000FFFFFFFF;
+
+    gpio_init(dev->pin, GPIO_DIR_OUT, dev->pull);
+    gpio_set(dev->pin);
 
     /* check checksum */
     int ret = dht_test_checksum(data, checksum);
