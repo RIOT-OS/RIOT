@@ -779,7 +779,7 @@ void gnrc_rpl_send_DAO(gnrc_rpl_instance_t *inst, ipv6_addr_t *destination, uint
             }
             addr = (ipv6_addr_t *) fentry->global->address;
             if (ipv6_addr_is_global(addr)) {
-                size_t prefix_length = IPV6_ADDR_BIT_LEN;
+                size_t prefix_length;
 
                 if (fentry->global_flags & FIB_FLAG_NET_PREFIX) {
                     universal_address_compare(fentry->global,
