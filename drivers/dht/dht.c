@@ -9,7 +9,7 @@
  */
 
 /**
- * @ingroup     driver_dht
+ * @ingroup     drivers_dht
  * @{
  *
  * @file
@@ -71,6 +71,12 @@ void dht_auto_init(void)
         if (dht_init(&dht_devs[i], &dht_params[i]) < 0) {
             LOG_ERROR("Unable to initialize DHT sensor #%i\n", i);
         }
+#ifdef MODULE_SAUL_REG
+        for (int j = 0; j < 2; j++) {
+            dht_saul_reg[i][j].dev = &dht_devs[i];
+            saul_reg_add(&dht_saul_reg[i][j]);
+        }
+#endif
     }
 }
 

@@ -20,6 +20,8 @@
 #define DHT_PARAMS_H
 
 #include "board.h"
+#include "dht.h"
+#include "saul_reg.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -60,6 +62,25 @@ static const dht_params_t dht_params[] =
  * @brief   Get the number of configured DHT devices
  */
 #define DHT_NUMOF       (sizeof(dht_params) / sizeof(dht_params[0]))
+
+#ifdef MODULE_SAUL_REG
+/**
+ * @brief   Allocate and configure entries to the SAUL registry
+ */
+saul_reg_t dht_saul_reg[][2] =
+{
+    {
+        {
+            .name = "dht-temp",
+            .driver = &dht_temp_saul_driver
+        },
+        {
+            .name = "dht-hum",
+            .driver = &dht_hum_saul_driver
+        }
+    }
+};
+#endif
 
 #ifdef __cplusplus
 }
