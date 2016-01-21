@@ -34,56 +34,36 @@
 #include "dht.h"
 #include "dht_params.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG    (1)
 #include "debug.h"
 
-/***********************************************************************
- * internal API declaration
- **********************************************************************/
+#define PULSE_WIDTH_THRESHOLD       (40U)
 
-static int dht_test_checksum(uint32_t data, uint8_t checksum);
-void dht_parse_11(dht_data_t *data, float *outhum, float *outtemp);
-void dht_parse_22(dht_data_t *data, float *outhum, float *outtemp);
-
-/***********************************************************************
- * internal API implementation
- **********************************************************************/
-
-void dht_parse_11(dht_data_t *data, float *outhum, float *outtemp)
-{
-    *outhum = data->humidity >> 8;
-    *outtemp = data->temperature >> 8;
-}
-
-void dht_parse_22(dht_data_t *data, float *outhum, float *outtemp)
-{
-    *outhum = data->humidity / 10;
-
-    /* the highest bit indicates a negative value */
-    if (data->temperature & 0x8000) {
-        *outtemp = (data->temperature & 0x7FFF) / -10;
-    }
-    else {
-        *outtemp = data->temperature / 10;
-    }
-}
-
-static int dht_test_checksum(uint32_t data, uint8_t checksum)
-{
-    uint8_t sum;
-    sum  = (data >>  0) & 0x000000FF;
-    sum += (data >>  8) & 0x000000FF;
-    sum += (data >> 16) & 0x000000FF;
-    sum += (data >> 24) & 0x000000FF;
-
-    return ((checksum == sum) && (checksum != 0));
-}
-
-/***********************************************************************
- * public API implementation
- **********************************************************************/
-
+/**
+ * @brief   Allocation of memory for device descriptors
+ */
 dht_t dht_devs[DHT_NUMOF];
+
+static uint16_t read(gpio_t pin, int bits)
+{
+    uint32_t start, end;
+    uint16_t res = 0;
+
+    for (int i = 0; i < bits; i++) {
+        res <<= 1;
+        /* measure the length between the next rising and falling flanks (the
+         * time the pin is high - smoke up :-) */
+        while (!gpio_read(pin));
+        start = xtimer_now();
+        while (gpio_read(pin));
+        end = xtimer_now();
+        /* if the high phase was more than 40us, we got a 1 */
+        if ((end - start) > PULSE_WIDTH_THRESHOLD) {
+            res |= 0x0001;
+        }
+    }
+    return res;
+}
 
 void dht_auto_init(void)
 {
@@ -111,10 +91,10 @@ int dht_init(dht_t *dev, const dht_params_t *params)
     return 0;
 }
 
-int dht_read_raw(dht_t *dev, dht_data_t *outdata)
+int dht_read_raw(dht_t *dev, dht_data_t *data)
 {
-    uint32_t data;
-    uint8_t checksum;
+    uint8_t csum, sum;
+    uint16_t hum, temp;
 
     /* send init signal to device */
     gpio_clear(dev->pin);
@@ -133,59 +113,49 @@ int dht_read_raw(dht_t *dev, dht_data_t *outdata)
      * [humidity][temperature][checksum]
      */
 
-    /* read all the bits */
-    uint64_t les_bits = 0x00000000000000;
-    for (int c = 0; c < 40; c++) {
-        les_bits <<= 1; /* this is a nop in the first iteration, but
-                           we must not shift the last bit */
-        /* wait for start of bit */
-        while (!gpio_read(dev->pin)) ;
-        unsigned long start = xtimer_now();
-        /* wait for end of bit */
-        while (gpio_read(dev->pin)) ;
-        /* calculate bit length (long 1, short 0) */
-        unsigned long stop = xtimer_now();
-        /* compensate for overflow if needed */
-        if (stop < start) {
-            stop = UINT32_MAX - stop;
-            start = 0;
-        }
-        if ((stop - start) > 40) {
-            /* read 1, set bit */
-            les_bits |= 0x0000000000000001;
-        }
-        else {
-            /* read 0, don't set bit */
-        }
-    }
+    /* read the humidity, temperature, and checksum bits */
+    hum = read(dev->pin, 16);
+    temp = read(dev->pin, 16);
+    csum = (uint8_t)read(dev->pin, 8);
 
-    checksum = les_bits & 0x00000000000000FF;
-    data = (les_bits >> 8) & 0x00000000FFFFFFFF;
-
+    /* set pin high again - so we can trigger the next reading by pulling it low
+     * again */
     gpio_init(dev->pin, GPIO_DIR_OUT, dev->pull);
     gpio_set(dev->pin);
 
-    /* check checksum */
-    int ret = dht_test_checksum(data, checksum);
-    if (!ret) {
-        DEBUG("checksum fail\n");
+    /* parse the RAW values */
+    DEBUG("RAW:  temp: %7i  hum: %7i\n", (int)temp, (int)hum);
+    data->humidity = hum;
+    data->temperature = temp;
+
+    /* and finally validate the checksum */
+    sum = (temp >> 8) + (temp & 0xff) + (hum >> 8) + (hum & 0xff);
+    if ((sum != csum) || (csum == 0)) {
+        DEBUG("error: checksum invalid\n");
+        return -1;
     }
 
-    outdata->humidity = data >> 16;
-    outdata->temperature = data & 0x0000FFFF;
-
-    return (ret - 1); /* take that logic! */
+    return 0;
 }
 
 void dht_parse(dht_t *dev, dht_data_t *data, float *outrelhum, float *outtemp)
 {
     switch (dev->type) {
-        case (DHT11):
-            dht_parse_11(data, outrelhum, outtemp);
+        case DHT11:
+            *outrelhum = data->humidity >> 8;
+            *outtemp = data->temperature >> 8;
             break;
 
         case DHT22:
-            dht_parse_22(data, outrelhum, outtemp);
+            *outrelhum = data->humidity / 10;
+
+            /* the highest bit indicates a negative value */
+            if (data->temperature & 0x8000) {
+                *outtemp = (data->temperature & 0x7FFF) / -10;
+            }
+            else {
+                *outtemp = data->temperature / 10;
+            }
             break;
 
         default:
