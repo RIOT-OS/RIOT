@@ -84,41 +84,21 @@ void dht_auto_init(void);
  */
 int dht_init(dht_t *dev, const dht_params_t *params);
 
- /**
- * @brief   read sensor data from device
+/**
+ * @brief   get a new temperature and humidity value from the device
+ *
+ * @note    if reading fails or checksum is invalid, no new values will be
+ *          written into the result values
  *
  * @param[in]  dev      device descriptor of a DHT device
- * @param[out] relhum   pointer to relative humidity in g/m^3
- * @param[out] temp     pointer to temperature in degrees Celsius
- *
- * @return              0 on success
- * @return              -1 on error
- */
-int dht_read(dht_t *dev, float *relhum, float *temp);
-
- /**
- * @brief   read sensor data from device
- *
- * @note    When reading fails and the function indicates an error,
- *          data will contain garbage.
- *
- * @param[in] dev       device descriptor of a DHT device
- * @param[in] data      pointer to DHT data object
+ * @param[out] temp     temperature value [in °C * 10^-1]
+ * @param[out] hum      relative humidity value [in percent * 10^-1]
  *
  * @return              0 on success
  * @return              -1 on checksum error
+ * @return              -2 on parsing error
  */
-int dht_read_raw(dht_t *dev, dht_data_t *data);
-
-/**
- * @brief   parse raw sensor data into relative humidity and Celsius
- *
- * @param[in]   dev     device descriptor of a DHT device
- * @param[in]   data    sensor data
- * @param[out]  relhum  pointer to relative humidity in g/m^3
- * @param[out]  temp    pointer to temperature in degrees Celsius
- */
-void dht_parse(dht_t *dev, dht_data_t *data, float *relhum, float *temp);
+int dht_read(dht_t *dev, int16_t *temp, int16_t *hum);
 
 #ifdef __cplusplus
 }

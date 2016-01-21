@@ -34,7 +34,7 @@
 #include "dht.h"
 #include "dht_params.h"
 
-#define ENABLE_DEBUG    (1)
+#define ENABLE_DEBUG    (0)
 #include "debug.h"
 
 #define PULSE_WIDTH_THRESHOLD       (40U)
@@ -91,10 +91,10 @@ int dht_init(dht_t *dev, const dht_params_t *params)
     return 0;
 }
 
-int dht_read_raw(dht_t *dev, dht_data_t *data)
+int dht_read(dht_t *dev, int16_t *temp, int16_t *hum)
 {
     uint8_t csum, sum;
-    uint16_t hum, temp;
+    uint16_t raw_hum, raw_temp;
 
     /* send init signal to device */
     gpio_clear(dev->pin);
@@ -114,8 +114,8 @@ int dht_read_raw(dht_t *dev, dht_data_t *data)
      */
 
     /* read the humidity, temperature, and checksum bits */
-    hum = read(dev->pin, 16);
-    temp = read(dev->pin, 16);
+    raw_hum = read(dev->pin, 16);
+    raw_temp = read(dev->pin, 16);
     csum = (uint8_t)read(dev->pin, 8);
 
     /* set pin high again - so we can trigger the next reading by pulling it low
@@ -123,54 +123,32 @@ int dht_read_raw(dht_t *dev, dht_data_t *data)
     gpio_init(dev->pin, GPIO_DIR_OUT, dev->pull);
     gpio_set(dev->pin);
 
-    /* parse the RAW values */
-    DEBUG("RAW:  temp: %7i  hum: %7i\n", (int)temp, (int)hum);
-    data->humidity = hum;
-    data->temperature = temp;
-
-    /* and finally validate the checksum */
-    sum = (temp >> 8) + (temp & 0xff) + (hum >> 8) + (hum & 0xff);
+    /* validate the checksum */
+    sum = (raw_temp >> 8) + (raw_temp & 0xff) + (raw_hum >> 8) + (raw_hum & 0xff);
     if ((sum != csum) || (csum == 0)) {
         DEBUG("error: checksum invalid\n");
         return -1;
     }
 
-    return 0;
-}
-
-void dht_parse(dht_t *dev, dht_data_t *data, float *outrelhum, float *outtemp)
-{
+    /* parse the RAW values */
+    DEBUG("RAW values: temp: %7i hum: %7i\n", (int)raw_temp, (int)raw_hum);
     switch (dev->type) {
         case DHT11:
-            *outrelhum = data->humidity >> 8;
-            *outtemp = data->temperature >> 8;
+            *temp = (int16_t)((raw_temp >> 8) * 10);
+            *hum = (int16_t)((raw_hum >> 8) * 10);
             break;
-
         case DHT22:
-            *outrelhum = data->humidity / 10;
-
-            /* the highest bit indicates a negative value */
-            if (data->temperature & 0x8000) {
-                *outtemp = (data->temperature & 0x7FFF) / -10;
+            *hum = (int16_t)raw_hum;
+            /* if the high-bit is set, the value is negative */
+            if (raw_temp & 0x8000) {
+                *temp = (int16_t)((raw_temp & ~0x8000) * -1);
             }
             else {
-                *outtemp = data->temperature / 10;
+                *temp = (int16_t)raw_temp;
             }
-            break;
-
         default:
-            DEBUG("unknown DHT type\n");
-    }
-}
-
-int dht_read(dht_t *dev, float *outrelhum, float *outtemp)
-{
-    /* read data, fail on error */
-    dht_data_t data;
-    if (dht_read_raw(dev, &data) == -1) {
-        return -1;
+            return -2;
     }
 
-    dht_parse(dev, &data, outrelhum, outtemp);
     return 0;
 }
