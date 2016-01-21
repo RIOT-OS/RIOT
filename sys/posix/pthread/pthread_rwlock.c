@@ -30,7 +30,7 @@
 
 #include "pthread.h"
 #include "sched.h"
-#include "vtimer.h"
+#include "xtimer.h"
 
 #include <stdint.h>
 #include <string.h>
@@ -191,7 +191,7 @@ static int pthread_rwlock_timedlock(pthread_rwlock_t *rwlock,
     then.microseconds = abstime->tv_nsec / 1000u;
     timex_normalize(&then);
 
-    vtimer_now(&now);
+    xtimer_now_timex(&now);
 
     if (timex_cmp(then, now) <= 0) {
         return ETIMEDOUT;
@@ -199,11 +199,11 @@ static int pthread_rwlock_timedlock(pthread_rwlock_t *rwlock,
     else {
         timex_t reltime = timex_sub(then, now);
 
-        vtimer_t timer;
-        vtimer_set_wakeup(&timer, reltime, sched_active_pid);
+        xtimer_t timer;
+        xtimer_set_wakeup64(&timer, timex_uint64(reltime) , sched_active_pid);
         int result = pthread_rwlock_lock(rwlock, is_blocked, is_writer, incr_when_held, true);
         if (result != ETIMEDOUT) {
-            vtimer_remove(&timer);
+            xtimer_remove(&timer);
         }
 
         return result;
