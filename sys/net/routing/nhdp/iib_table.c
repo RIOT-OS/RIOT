@@ -118,7 +118,7 @@ iib_link_set_entry_t *iib_process_hello(kernel_pid_t if_pid, nib_entry_t *nb_elt
     }
 
     if (base_elt) {
-      xtimer_now_timex(&now);
+        xtimer_now_timex(&now);
 
         /* Create a new link tuple for the neighbor that originated the hello */
         ls_entry = update_link_set(base_elt, nb_elt, &now, validity_time, is_sym_nb, is_lost);
