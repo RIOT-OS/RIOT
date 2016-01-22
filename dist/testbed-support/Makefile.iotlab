@@ -12,7 +12,8 @@ IOTLAB_DEBUG_PORT   ?= 3333
 IOTLAB_DEBUG_NODE   ?= $(shell experiment-cli get -i $(IOTLAB_EXP_ID) --resources | \
                          grep -m 1 "network_address" | sed 's/.*: "\(.*\)".*/\1/')
 
-IOTLAB_AUTHORITY    := "$(IOTLAB_USER)@$(IOTLAB_SITE).iot-lab.info"
+IOTLAB_HOST         = $(shell experiment-cli get -ri -i $(IOTLAB_EXP_ID) | sed -n 4p | cut -d\" -f2)
+IOTLAB_AUTHORITY    = "$(IOTLAB_USER)@$(IOTLAB_HOST).iot-lab.info"
 
 ifneq (,$(findstring m3,$(IOTLAB_TYPE)))
 	BINARY := $(ELFFILE)
