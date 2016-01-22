@@ -7,11 +7,11 @@
  */
 
 /**
- * @ingroup     boards_openmote
+ * @ingroup     boards_openmote-cc2538
  * @{
  *
  * @file
- * @brief       Peripheral MCU configuration for the OpenMote board
+ * @brief       Peripheral MCU configuration for the OpenMote-cc2538 board
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */

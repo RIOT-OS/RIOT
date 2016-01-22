@@ -1,4 +1,4 @@
-# define the cpu used by the OpenMote board
+# define the cpu used by the OpenMote-cc2538 board
 export CPU = cc2538
 export CPU_MODEL = cc2538sf53
 
