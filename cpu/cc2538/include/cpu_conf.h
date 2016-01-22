@@ -48,6 +48,16 @@ extern "C" {
 #define CPUID_ID_LEN                    8
 #endif
 
+/**
+ * @name Buffer size definitions for the cc2538
+ * @{
+ */
+#ifdef MODULE_CC2538
+#define TRANSCEIVER_BUFFER_SIZE         (3)
+#define RX_BUF_SIZE                     (3)
+#endif
+/** @} */
+
 #ifdef __cplusplus
 } /* end extern "C" */
 #endif

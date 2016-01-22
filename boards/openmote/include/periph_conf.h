@@ -176,6 +176,13 @@
 #define GPIO_31_PIN         GPIO_PD7
 /** @} */
 
+/**
+ * @name Radio peripheral configuration
+ * @{
+ */
+#define RADIO_IRQ_PRIO      1
+/** @} */
+
 #ifdef __cplusplus
 } /* end extern "C" */
 #endif

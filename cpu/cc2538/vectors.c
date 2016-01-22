@@ -53,7 +53,7 @@ WEAK_DEFAULT void isr_timer1_chan1(void);
 WEAK_DEFAULT void isr_timer2_chan0(void);
 WEAK_DEFAULT void isr_timer2_chan1(void);
 WEAK_DEFAULT void isr_comp(void);
-WEAK_DEFAULT void isr_rfcoretx(void);
+WEAK_DEFAULT void isr_rfcorerxtx(void);
 WEAK_DEFAULT void isr_rfcoreerr(void);
 WEAK_DEFAULT void isr_icepick(void);
 WEAK_DEFAULT void isr_flash(void);
@@ -117,7 +117,7 @@ ISR_VECTORS const void *interrupt_vector[] = {
     (void*) isr_timer2_chan0,       /* 39 Timer 2 subtimer A */
     (void*) isr_timer2_chan1,       /* 40 Timer 2 subtimer B */
     (void*) isr_comp,               /* 41 Analog Comparator 0 */
-    (void*) isr_rfcoretx,           /* 42 RFCore Rx/Tx */
+    (void*) isr_rfcorerxtx,         /* 42 RFCore Rx/Tx */
     (void*) isr_rfcoreerr,          /* 43 RFCore Error */
     (void*) isr_icepick,            /* 44 IcePick */
     (void*) isr_flash,              /* 45 FLASH Control */

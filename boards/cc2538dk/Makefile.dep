@@ -1,0 +1,4 @@
+ifneq (,$(filter defaulttransceiver,$(USEMODULE)))
+	USEMODULE += cc2538
+	USEMODULE += transceiver
+endif
