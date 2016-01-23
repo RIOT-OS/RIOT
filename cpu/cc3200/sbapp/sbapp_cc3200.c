@@ -43,7 +43,7 @@
 #define PANIC(ERR_ID)  puts(sl_err_descr[ERR_ID]); while(1) {}
 #define PANIC2(ERR_ID, ERR_VAL) printf("%s (%ld)", sl_err_descr[ERR_ID], ERR_VAL); while(1) {}
 
-#define STOP_IF_ERR(ERR_VAL, ERR_ID) if(ERR_VAL < 0) PANIC2(ERR_ID, ERR_VAL)
+#define STOP_IF_ERR(ERR_VAL, ERR_ID) if(ERR_VAL < 0) {PANIC2(ERR_ID, ERR_VAL)}
 
 /**
  * simplelink driver errors
@@ -895,6 +895,8 @@ static void *_event_loop(void *arg) {
 	if (VStartSimpleLinkSpawnTask(SPAWN_TASK_PRIORITY) < 0) {
 		PANIC(SIMPLELINK_START_ERR);
 	}
+
+	simplelink_to_default_state();
 
 	wifi_connect();
 
