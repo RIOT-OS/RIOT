@@ -25,6 +25,12 @@
 extern "C" {
 #endif
 
+
+enum {
+	TCP = 1,
+	UDP
+} conn_type_t;
+
 /**
  * @brief   Default message queue size for the NBAPP thread
  */
@@ -104,7 +110,8 @@ int sbapp_init(void);
  *
  * @return the demux context
  */
-sbh_t sbapp_connect(const char* server, uint16_t port, kernel_pid_t pid);
+sbh_t sbapp_connect(uint8_t conn_type,
+		const char* server, uint16_t port, kernel_pid_t pid);
 
 
 /**
