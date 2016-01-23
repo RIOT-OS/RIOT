@@ -65,6 +65,7 @@ then
     if [ "$BUILDTEST_MCU_GROUP" == "x86" ]
     then
         make -C ./tests/unittests all test BOARD=native || exit
+        make -C ./tests/udp all test BOARD=native || exit
         # TODO:
         #   Reenable once https://github.com/RIOT-OS/RIOT/issues/2300 is
         #   resolved:
