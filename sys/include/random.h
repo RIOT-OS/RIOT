@@ -38,6 +38,13 @@ extern "C" {
 void genrand_init(uint32_t s);
 
 /**
+ * @brief generates a random seed from hardware
+ *
+ * @return a random seed
+ */
+uint32_t genrand_get_seed(void);
+
+/**
  * @brief initialize by an array with array-length
  * init_key is the array for initializing keys
  * key_length is its length
