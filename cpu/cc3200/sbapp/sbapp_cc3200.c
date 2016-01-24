@@ -117,7 +117,8 @@ typedef struct sbapp_t {
 	xtimer_t sig_tim; /**< a signaling timer for wifi events (smartconfig active, ...) */
 } sbapp_t;
 
-sbapp_t sbapp = { .main_pid = KERNEL_PID_UNDEF };
+sbapp_t sbapp = {
+		.main_pid = KERNEL_PID_UNDEF };
 
 /**
  * @brief   memory segment for the NBAPP thread's stack
@@ -604,7 +605,11 @@ long simplelink_to_default_state(void) {
  * @brief signals that smartconfig process is active
  */
 void smartconfig_still_active(void* arg) {
-	msg_t m = { 0, SMARTCONFIG_ACTIVE, { 0 } };
+	msg_t m = {
+			0,
+			SMARTCONFIG_ACTIVE,
+			{
+					0 } };
 
 	msg_send(&m, sbapp.main_pid);
 }
@@ -613,7 +618,11 @@ void smartconfig_still_active(void* arg) {
  * @brief notify that time has come for another connection retry
  */
 void retry_connection(void* arg) {
-	msg_t m = { 0, AUTO_CONNECTION_TIME_SLOT, { 0 } };
+	msg_t m = {
+			0,
+			AUTO_CONNECTION_TIME_SLOT,
+			{
+					0 } };
 
 	msg_send(&m, sbapp.main_pid);
 }
@@ -689,8 +698,8 @@ static int16_t _send(cd_t* cd, gnrc_pktsnip_t *pkt) {
 	if (cd->conn_type == TCP) {
 		sts = sl_Send(cd->fd, pkt->data, pkt->size, 0);
 	} else {
-		sts = sl_SendTo(cd->fd, pkt->data, pkt->size, 0,
-				(sockaddr *)&cd->addr, sizeof(sockaddr_in));
+		sts = sl_SendTo(cd->fd, pkt->data, pkt->size, 0, (sockaddr *) &cd->addr,
+				sizeof(sockaddr_in));
 	}
 	return sts;
 }
@@ -897,6 +906,8 @@ static void *_event_loop(void *arg) {
 	}
 
 	simplelink_to_default_state();
+
+	xtimer_set(&sbapp.sig_tim, MSEC_TO_TICKS(100));
 
 	wifi_connect();
 
