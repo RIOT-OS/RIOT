@@ -23,6 +23,7 @@
 #ifndef GNRC_RPL_SRH_H_
 #define GNRC_RPL_SRH_H_
 
+#include "net/ipv6/hdr.h"
 #include "net/ipv6/addr.h"
 
 #ifdef __cplusplus
@@ -48,17 +49,22 @@ typedef struct __attribute__((packed)) {
     uint8_t len;        /**< length in 8 octets without first octet */
     uint8_t type;       /**< identifier of a particular routing header type */
     uint8_t seg_left;   /**< number of route segments remaining */
+    uint8_t compr;      /**< number of prefix octets (comprI and comprE) */
+    uint8_t pad_resv;   /**< padding and reserved */
+    uint16_t resv;      /**< reserved */
 } gnrc_rpl_srh_t;
 
 /**
- * @brief   Extract next hop from the RPL source routing header.
+ * @brief   Process the RPL source routing header.
  *
+ * @param[in,out] ipv6  The IPv6 header of the incoming packet.
  * @param[in] rh        A RPL source routing header.
  *
- * @return  next hop, on success
- * @return  NULL, if not found.
+ * @return  EXT_RH_CODE_ERROR
+ * @return  EXT_RH_CODE_FORWARD
+ * @return  EXT_RH_CODE_OK
  */
-ipv6_addr_t *gnrc_rpl_srh_next_hop(gnrc_rpl_srh_t *rh);
+int gnrc_rpl_srh_process(ipv6_hdr_t *ipv6, gnrc_rpl_srh_t *rh);
 
 #ifdef __cplusplus
 }

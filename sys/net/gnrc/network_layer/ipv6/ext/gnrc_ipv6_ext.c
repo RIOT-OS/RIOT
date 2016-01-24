@@ -20,12 +20,17 @@
 
 #include "net/gnrc/ipv6/ext.h"
 
+#define ENABLE_DEBUG    (0)
+#include "debug.h"
+
 bool gnrc_ipv6_ext_demux(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
                          uint8_t nh)
 {
-    gnrc_pktsnip_t *ext_snip;
+    gnrc_pktsnip_t *ext_snip, *tmp;
     ipv6_ext_t *ext;
     unsigned int offset = 0;
+    ipv6_hdr_t *hdr;
+    int res;
 
     ext = ((ipv6_ext_t *)(((uint8_t *)pkt->data) + sizeof(ipv6_hdr_t)));
 
@@ -36,6 +41,35 @@ bool gnrc_ipv6_ext_demux(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
             case PROTNUM_IPV6_EXT_HOPOPT:
             case PROTNUM_IPV6_EXT_DST:
             case PROTNUM_IPV6_EXT_RH:
+                if ((tmp = gnrc_pktbuf_start_write(pkt)) == NULL) {
+                    DEBUG("ipv6: could not get a copy of pkt\n");
+                    gnrc_pktbuf_release(pkt);
+                    return false;
+                }
+                pkt = tmp;
+                hdr = pkt->data;
+                ext = (ipv6_ext_t *) (((uint8_t *) pkt->data) + sizeof(ipv6_hdr_t) + offset);
+                res = ipv6_ext_rh_process(hdr, (ipv6_ext_rh_t *)ext);
+                if (res == EXT_RH_CODE_ERROR) {
+                    /* TODO: send ICMPv6 error codes */
+                    gnrc_pktbuf_release(pkt);
+                    return false;
+                }
+                else if (res == EXT_RH_CODE_FORWARD) {
+                    /* forward packet */
+                    if (!gnrc_netapi_dispatch_receive(GNRC_NETTYPE_IPV6, GNRC_NETREG_DEMUX_CTX_ALL,
+                                                      pkt)) {
+                        DEBUG("ipv6: could not dispatch packet to the ipv6 thread\n");
+                        gnrc_pktbuf_release(pkt);
+                    }
+                    return false;
+                }
+                else if (res == EXT_RH_CODE_OK) {
+                    nh = ext->nh;
+                    offset += ((ext->len * IPV6_EXT_LEN_UNIT) + IPV6_EXT_LEN_UNIT);
+                    ext = ipv6_ext_get_next((ipv6_ext_t *)ext);
+                }
+                break;
             case PROTNUM_IPV6_EXT_FRAG:
             case PROTNUM_IPV6_EXT_AH:
             case PROTNUM_IPV6_EXT_ESP:
@@ -57,6 +91,7 @@ bool gnrc_ipv6_ext_demux(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
     ext_snip = gnrc_pktbuf_mark(pkt, offset, GNRC_NETTYPE_IPV6);
 
     if (ext_snip == NULL) {
+        gnrc_pktbuf_release(pkt);
         return false;
     }
 
