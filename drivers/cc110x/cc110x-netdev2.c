@@ -37,7 +37,7 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-static int _send(netdev2_t *dev, const struct iovec *vector, int count)
+static int _send(netdev2_t *dev, struct iovec *vector, int count)
 {
     DEBUG("%s:%u\n", __func__, __LINE__);
 

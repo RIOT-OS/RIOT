@@ -70,7 +70,7 @@ static void _sigio_child(netdev2_tap_t *dev);
 
 /* netdev2 interface */
 static int _init(netdev2_t *netdev);
-static int _send(netdev2_t *netdev, const struct iovec *vector, int n);
+static int _send(netdev2_t *netdev, struct iovec *vector, int n);
 static int _recv(netdev2_t *netdev, char* buf, int n);
 
 static inline void _get_mac_addr(netdev2_t *netdev, uint8_t *dst)
@@ -258,7 +258,7 @@ static int _recv(netdev2_t *netdev2, char *buf, int len)
     return -1;
 }
 
-static int _send(netdev2_t *netdev, const struct iovec *vector, int n)
+static int _send(netdev2_t *netdev, struct iovec *vector, int n)
 {
     netdev2_tap_t *dev = (netdev2_tap_t*)netdev;
     return _native_writev(dev->tap_fd, vector, n);
