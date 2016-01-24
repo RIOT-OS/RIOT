@@ -137,9 +137,12 @@ void _native_rng_init_hq(void)
 {
     DEBUG("_native_rng_init_hq\n");
     _native_syscall_enter();
-    dev_random = real_open("/dev/random", O_RDONLY);
+    dev_random = real_open("/dev/urandom", O_RDONLY | O_CLOEXEC);
     if (dev_random == -1) {
-        err(EXIT_FAILURE, "_native_rng_init_hq: open(/dev/random)");
+        dev_random = real_open("/dev/random", O_RDONLY | O_CLOEXEC);
+        if (dev_random == -1) {
+            err(EXIT_FAILURE, "_native_rng_init_hq: open(/dev/urandom|/dev/random)"");
+        }
     }
     _native_syscall_leave();
 }
