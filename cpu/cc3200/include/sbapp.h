@@ -19,7 +19,7 @@
 #ifndef SYS_INCLUDE_NET_SBAPP_H_
 #define SYS_INCLUDE_NET_SBAPP_H_
 
-#include <stdint.h>
+#include "kernel.h"
 
 #ifdef __cplusplus
 extern "C" {
