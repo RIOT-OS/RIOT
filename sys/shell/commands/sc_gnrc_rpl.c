@@ -241,10 +241,29 @@ int _gnrc_rpl_operation(bool leaf, char *arg1)
     return 0;
 }
 
+int _gnrc_rpl_ignore_node(char *arg1)
+{
+    ipv6_addr_t addr;
+    char addr_str[IPV6_ADDR_MAX_STR_LEN];
+
+    if (ipv6_addr_from_str(&addr, arg1) == NULL) {
+        puts("error: <addr> must be a valid IPv6 address");
+        return 1;
+    }
+    gnrc_rpl_ignore_node(&addr);
+
+    printf("success: RPL messages from node (%s) will be ignored\n",
+           ipv6_addr_to_str(addr_str, &addr, sizeof(addr_str)));
+    return 0;
+}
+
 int _gnrc_rpl(int argc, char **argv)
 {
     if ((argc < 2) || (strcmp(argv[1], "show") == 0)) {
         return _gnrc_rpl_dodag_show();
+    }
+    else if ((argc == 3) && strcmp(argv[1], "ignore") == 0) {
+        return _gnrc_rpl_ignore_node(argv[2]);
     }
     else if ((argc == 3) && strcmp(argv[1], "init") == 0) {
         return _gnrc_rpl_init(argv[2]);
@@ -295,6 +314,7 @@ int _gnrc_rpl(int argc, char **argv)
     puts("* router <instance_id>\t\t- operate as router in the instance");
     puts("* send dis\t\t\t- send a multicast DIS");
     puts("* show\t\t\t\t- show instance and dodag tables");
+    puts("* ignore <addr>\t\t\t- set a node address to ignore received RPL messages");
     return 0;
 }
 /**

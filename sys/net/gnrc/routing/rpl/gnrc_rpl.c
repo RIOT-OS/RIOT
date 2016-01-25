@@ -34,6 +34,8 @@ static msg_t _msg_q[GNRC_RPL_MSG_QUEUE_SIZE];
 static gnrc_netreg_entry_t _me_reg;
 static mutex_t _inst_id_mutex = MUTEX_INIT;
 static uint8_t _instance_id;
+static ipv6_addr_t _ignore = IPV6_ADDR_UNSPECIFIED;
+
 
 gnrc_rpl_instance_t gnrc_rpl_instances[GNRC_RPL_INSTANCES_NUMOF];
 gnrc_rpl_parent_t gnrc_rpl_parents[GNRC_RPL_PARENTS_NUMOF];
@@ -124,7 +126,13 @@ static void _receive(gnrc_pktsnip_t *icmpv6)
     assert(ipv6 != NULL);
 
     ipv6_hdr = (ipv6_hdr_t *)ipv6->data;
-
+    
+    if (ipv6_addr_equal(&ipv6_hdr->src, &_ignore)) {
+        DEBUG("RPL: received message from ignored node. Drop it.\n");
+        gnrc_pktbuf_release(icmpv6);
+        return;
+    }
+	
     icmpv6_hdr = (icmpv6_hdr_t *)icmpv6->data;
     switch (icmpv6_hdr->code) {
         case GNRC_RPL_ICMPV6_CODE_DIS:
@@ -300,6 +308,10 @@ uint8_t gnrc_rpl_gen_instance_id(bool local)
     return instance_id;
 }
 
+void gnrc_rpl_ignore_node(const ipv6_addr_t *node)
+{
+    memcpy(&_ignore, node, sizeof(ipv6_addr_t));
+}
 /**
  * @}
  */
