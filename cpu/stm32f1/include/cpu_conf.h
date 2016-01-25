@@ -20,10 +20,14 @@
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef __CPU_CONF_H
-#define __CPU_CONF_H
+#ifndef CPU_CONF_H
+#define CPU_CONF_H
 
-#include "stm32f10x.h"
+#if defined(CPU_MODEL_STM32F103CB) || defined(CPU_MODEL_STM32F103RB)
+#include "stm32f103xb.h"
+#elif defined(CPU_MODEL_STM32F103RE)
+#include "stm32f103xe.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -56,5 +60,5 @@ void cpu_clock_scale(uint32_t source, uint32_t target, uint32_t *prescale);
 }
 #endif
 
-#endif /* __CPU_CONF_H */
+#endif /* CPU_CONF_H */
 /** @} */
