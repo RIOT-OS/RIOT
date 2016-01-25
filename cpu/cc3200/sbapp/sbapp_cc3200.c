@@ -8,11 +8,11 @@
  * @author      Attilio Dona'
  *
  */
+#include "sbapp.h"
 #include "simplelink.h"
 
 #include "kernel.h"
 #include "xtimer.h"
-#include "net/sbapp.h"
 #include "net/gnrc.h"
 #include "nwp_conf.h"
 
