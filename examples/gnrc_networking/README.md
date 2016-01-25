@@ -10,7 +10,7 @@ IPv6 module automatically.
 On some systems (openSUSE for example), the _firewall_ may interfere, and prevent some packets to arrive at the application (they will
 however show up in Wireshark, which can be confusing). So be sure to adjust your firewall rules, or turn it off (who needs security anyway).
 
-First, create a tap interface (to which RIOT will connect) and a bridge (to which Linux will connect):
+First, create a tap interface:
 
     sudo ip tuntap add tap0 mode tap user ${USER}
     sudo ip link set tap0 up
