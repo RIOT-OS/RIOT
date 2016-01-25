@@ -27,11 +27,11 @@
  * @name Clock system configuration
  * @{
  **/
-#define CLOCK_HSE           (16000000U)             /* frequency of external oscillator */
+#define CLOCK_HSE           (8000000U)             /* frequency of external oscillator */
 #define CLOCK_CORECLOCK     (72000000U)             /* targeted core clock frequency */
 /* configuration of PLL prescaler and multiply values */
 /* CORECLOCK := HSE / PLL_HSE_DIV * PLL_HSE_MUL */
-#define CLOCK_PLL_HSE_DIV   RCC_CFGR_PLLXTPRE_HSE
+#define CLOCK_PLL_HSE_DIV   RCC_CFGR_PLLXTPRE_HSE  /* not divided */
 #define CLOCK_PLL_HSE_MUL   RCC_CFGR_PLLMULL9
 /* configuration of peripheral bus clock prescalers */
 #define CLOCK_AHB_DIV       RCC_CFGR_HPRE_DIV1      /* AHB clock -> 72MHz */
@@ -45,9 +45,8 @@
  * @brief Timer configuration
  * @{
  */
-#define TIMER_NUMOF         (2U)
+#define TIMER_NUMOF         (1U)
 #define TIMER_0_EN          1
-#define TIMER_1_EN          1
 
 /* Timer 0 configuration */
 #define TIMER_0_DEV_0       TIM2
@@ -62,20 +61,6 @@
 #define TIMER_0_IRQ_CHAN_1  TIM3_IRQn
 #define TIMER_0_IRQ_PRIO    1
 #define TIMER_0_TRIG_SEL    TIM_SMCR_TS_0
-
-/* Timer 1 configuration */
-#define TIMER_1_DEV_0       TIM4
-#define TIMER_1_DEV_1       TIM5
-#define TIMER_1_CHANNELS    4
-#define TIMER_1_PRESCALER   (36000U)
-#define TIMER_1_MAX_VALUE   (0xffff)
-#define TIMER_1_CLKEN()     (RCC->APB1ENR |= (RCC_APB1ENR_TIM4EN | RCC_APB1ENR_TIM5EN))
-#define TIMER_1_ISR_0       isr_tim4
-#define TIMER_1_ISR_1       isr_tim5
-#define TIMER_1_IRQ_CHAN_0  TIM4_IRQn
-#define TIMER_1_IRQ_CHAN_1  TIM5_IRQn
-#define TIMER_1_IRQ_PRIO    1
-#define TIMER_1_TRIG_SEL    TIM_SMCR_TS_1
 /** @} */
 
 /**
