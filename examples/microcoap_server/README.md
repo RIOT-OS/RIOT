@@ -4,25 +4,31 @@ microcoap server example
 This application is meant to get you started with impementing a CoAP server on RIOT.
 It uses the gnrc network stack through RIOT's conn socket API.
 
-
 Usage
 =====
 
-To try on native, compile with
+To try out the server on native, compile it with
 
 ```
-# make all
+$ make all
 ```
 
-Then run the resulting binary, e.g.,
+Then, create a tap interface (to which RIOT will connect):
 
 ```
-# make term
+$ sudo ip tuntap add tap0 mode tap user ${USER}
+$ sudo ip link set tap0 up
+```
+
+Run the resulting RIOT binary by invoking:
+
+```
+$ make term
 ```
 
 The application is now listening on all it's configured IP addresses.
 
-Now find out it's link\_layer address:
+Now find out its link\_layer address:
 
 
 ```
