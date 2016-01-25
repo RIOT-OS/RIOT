@@ -482,6 +482,15 @@ void gnrc_rpl_send(gnrc_pktsnip_t *pkt, ipv6_addr_t *src, ipv6_addr_t *dst, ipv6
  * @return  Global instance id, otherwise.
  */
 uint8_t gnrc_rpl_gen_instance_id(bool local);
+
+/**
+ * @brief set an address of which received messages should be ignored
+ * 
+ * @param[in] node the address of the ignored node
+ */
+void gnrc_rpl_ignore_node(const ipv6_addr_t *node);
+
+
 #ifdef __cplusplus
 }
 #endif
