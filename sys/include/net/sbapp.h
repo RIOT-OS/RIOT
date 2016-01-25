@@ -26,10 +26,10 @@ extern "C" {
 #endif
 
 
-enum {
+enum conn_type_t {
 	TCP = 1,
 	UDP
-} conn_type_t;
+};
 
 /**
  * @brief   Default message queue size for the NBAPP thread
