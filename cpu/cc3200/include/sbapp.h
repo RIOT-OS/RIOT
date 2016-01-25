@@ -10,9 +10,10 @@
  */
 
 /**
- * @defgroup    net_gnrc_nbapp NBAPP
- * @ingroup     net_gnrc
- * @brief       GNRC's implementation of the South Bound App protocol
+ * @ingroup     cpu_cc3200
+ *
+ * @file
+ * @brief       implementation of the South Bound App protocol for CC3200
  *
  */
 
@@ -95,7 +96,7 @@ typedef void* sbh_t;
  */
 
 /**
- *  @brief setup ip connection with an AP through the 802.11 interface
+ *  @brief initialize an ip connection with a 802.11 AP
  *
  *  @return  PID of the UDP thread
  *  @return  negative value on error
@@ -103,12 +104,13 @@ typedef void* sbh_t;
 int sbapp_init(void);
 
 /**
- * @brief tcp connect to a tcp server and tcpport @p port)
+ * @brief connect to a TCP or UDP server
  *
+ * @param[in] conn_type  TCP or UDP
  * @param[in] server the hostname or ip address of the server
  * @param[in] port
  *
- * @return the demux context
+ * @return the connection handle
  */
 sbh_t sbapp_connect(uint8_t conn_type,
 		const char* server, uint16_t port, kernel_pid_t pid);
@@ -117,7 +119,8 @@ sbh_t sbapp_connect(uint8_t conn_type,
 /**
  *  @brief send data
  *
- *  @param[in] fd the demux context (or think it is a file descriptor if you prefer)
+ *  @param[in] fd the connection handle
+ *              (or think it is a file descriptor if you prefer)
  */
 int sbapp_send(sbh_t fd, void* data, size_t len);
 

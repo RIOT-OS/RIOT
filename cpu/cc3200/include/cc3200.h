@@ -7,7 +7,7 @@
  *
  *
  * @ingroup     cpu_cc3200
- * @{
+ *
  *
  * @file
  * @brief       CC3200 MCU definitions
@@ -123,7 +123,7 @@ typedef enum {
 #define START_OF_RAM                0x20004000 /**< SRAM base address */
 #define PERIPH_BASE                 0x40000000 /**< Peripheral base address */
 
-/** @} */
+/**  */
 
 /**
  * reset the chip

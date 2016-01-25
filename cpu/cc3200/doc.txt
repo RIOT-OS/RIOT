@@ -3,8 +3,3 @@
  * @ingroup         cpu
  * @brief           Texas Instruments CC3200 Cortex-M4 MCU specific code
  */
-
-/**
- * @defgroup        cpu_cc3200_definitions Texas Instruments CC3200 Definitions
- * @ingroup         cpu_cc3200
- */

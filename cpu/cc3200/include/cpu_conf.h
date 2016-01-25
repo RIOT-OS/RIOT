@@ -12,7 +12,7 @@
  * @addtogroup      cpu_cc3200
  * @{
  *
- *
+ * @file
  * @brief           Implementation specific CPU configuration options
  *
  * @author          Attilio Dona'
@@ -28,7 +28,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   ARM Cortex-M specific CPU configuration
+ * @name Macros
  * @{
  */
 #define CPU_DEFAULT_IRQ_PRIO    (1U)
