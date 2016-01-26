@@ -218,7 +218,7 @@ static void on_int(void *arg)
     netdev->event_callback(arg, NETDEV2_EVENT_ISR, NULL);
 }
 
-static int nd_send(netdev2_t *netdev, const struct iovec *data, int count)
+static int nd_send(netdev2_t *netdev, struct iovec *data, int count)
 {
     enc28j60_t *dev = (enc28j60_t *)netdev;
     uint8_t ctrl = 0;

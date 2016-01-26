@@ -301,7 +301,7 @@ static int _init(netdev2_t *encdev)
     return 0;
 }
 
-static int _send(netdev2_t *netdev, const struct iovec *vector, int count) {
+static int _send(netdev2_t *netdev, struct iovec *vector, int count) {
     encx24j600_t * dev = (encx24j600_t *) netdev;
     lock(dev);
 

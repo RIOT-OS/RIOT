@@ -112,7 +112,7 @@ typedef struct netdev2_driver {
      *
      * @return nr of bytes sent, or <=0 on error
      */
-    int (*send)(netdev2_t *dev, const struct iovec *vector, int count);
+    int (*send)(netdev2_t *dev, struct iovec *vector, int count);
 
     /**
      * @brief Get a received frame
