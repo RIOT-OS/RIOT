@@ -197,6 +197,10 @@ ifneq (,$(filter gnrc_icmpv6_echo,$(USEMODULE)))
   USEMODULE += gnrc_icmpv6
 endif
 
+ifneq (,$(filter gnrc_icmpv6_error,$(USEMODULE)))
+  USEMODULE += gnrc_icmpv6
+endif
+
 ifneq (,$(filter gnrc_icmpv6,$(USEMODULE)))
   USEMODULE += inet_csum
   USEMODULE += gnrc_ipv6

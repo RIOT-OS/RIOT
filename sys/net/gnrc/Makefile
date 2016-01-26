@@ -13,6 +13,9 @@ endif
 ifneq (,$(filter gnrc_icmpv6_echo,$(USEMODULE)))
     DIRS += network_layer/icmpv6/echo
 endif
+ifneq (,$(filter gnrc_icmpv6_error,$(USEMODULE)))
+    DIRS += network_layer/icmpv6/error
+endif
 ifneq (,$(filter gnrc_ipv6,$(USEMODULE)))
     DIRS += network_layer/ipv6
 endif
