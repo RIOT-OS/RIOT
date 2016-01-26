@@ -173,7 +173,7 @@ int sema_post(sema_t *sema)
         restoreIRQ(old_state);
     }
 
-    return 1;
+    return 0;
 }
 
 /** @} */
