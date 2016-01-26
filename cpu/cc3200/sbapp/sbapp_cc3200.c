@@ -129,19 +129,6 @@ static char _stack[SBAPP_STACK_SIZE + THREAD_EXTRA_STACKSIZE_PRINTF];
 static char _stack[SBAPP_STACK_SIZE];
 #endif
 
-#if 0
-/**
- * wifi module return codes
- */
-typedef enum {
-	// Choosing this number to avoid overlap w/ host-driver's error codes
-	LAN_CONNECTION_FAILED = -0x7D0,
-	CLIENT_CONNECTION_FAILED = LAN_CONNECTION_FAILED - 1,
-	DEVICE_NOT_IN_STATION_MODE = CLIENT_CONNECTION_FAILED - 1,
-
-	STATUS_CODE_MAX = -0xBB8
-}app_rc;
-#endif
 
 /**
  * @brief http sl callback, do nothing
@@ -605,11 +592,7 @@ long simplelink_to_default_state(void) {
  * @brief signals that smartconfig process is active
  */
 void smartconfig_still_active(void* arg) {
-	msg_t m = {
-			0,
-			SMARTCONFIG_ACTIVE,
-			{
-					0 } };
+	msg_t m = {0, SMARTCONFIG_ACTIVE, {0}};
 
 	msg_send(&m, sbapp.main_pid);
 }
@@ -618,11 +601,7 @@ void smartconfig_still_active(void* arg) {
  * @brief notify that time has come for another connection retry
  */
 void retry_connection(void* arg) {
-	msg_t m = {
-			0,
-			AUTO_CONNECTION_TIME_SLOT,
-			{
-					0 } };
+	msg_t m = {0, AUTO_CONNECTION_TIME_SLOT, {0}};
 
 	msg_send(&m, sbapp.main_pid);
 }
@@ -650,12 +629,24 @@ int sbapp_init(void) {
 	return sbapp.main_pid;
 }
 
-int16_t connect_to(cd_t *cd, const char* server, uint16_t port) {
+int16_t connect_to(cd_t *cd, const char* server, uint16_t remote_port,
+		uint16_t local_port) {
 	//SlSockAddrIn_t addr;
 	int iAddrSize;
 	int16_t fd; // socket file descriptor
 	int sts;
 	unsigned long server_ip;
+
+	SlSockAddrIn_t  local_addr;
+
+	local_addr.sin_family = SL_AF_INET;
+	if (local_port) {
+		local_addr.sin_port = sl_Htons(local_port);
+	} else {
+		local_addr.sin_port = 0;
+	}
+
+    local_addr.sin_addr.s_addr = 0;
 
 	// resolve HOST NAME/IP
 	sts = sl_NetAppDnsGetHostByName((signed char *) server, strlen(server),
@@ -663,15 +654,21 @@ int16_t connect_to(cd_t *cd, const char* server, uint16_t port) {
 
 	// filling the TCP server socket address
 	cd->addr.sin_family = SL_AF_INET;
-	cd->addr.sin_port = sl_Htons(port);
+	cd->addr.sin_port = sl_Htons(remote_port);
 	cd->addr.sin_addr.s_addr = sl_Htonl(server_ip);
 
 	// creating a TCP or UDP socket
 	fd = sl_Socket(SL_AF_INET, cd->conn_type, 0);
 	if (fd < 0) {
-		DEBUG("%s:%d %s (reason %d)", server, port,
+		DEBUG("%s:%d %s (reason %d)", server, remote_port,
 				sl_err_descr[SOCKET_OPEN_FAIL], fd);
 		return fd;
+	}
+
+	sts = sl_Bind(fd, (SlSockAddr_t *)&local_addr, sizeof(SlSockAddrIn_t));
+	if (sts < 0) {
+		DEBUG("%s:%d bind failed (reason %d)\n", server, remote_port, fd);
+		sl_Close(fd);
 	}
 
 	if (cd->conn_type == TCP) {
@@ -682,7 +679,7 @@ int16_t connect_to(cd_t *cd, const char* server, uint16_t port) {
 		if (sts < 0) {
 			sl_Close(fd);
 			fd = sts;
-			DEBUG("%s:%d %s (reason %d)\n", server, port,
+			DEBUG("%s:%d %s (reason %d)\n", server, remote_port,
 					sl_err_descr[SOCKET_CONNECT_FAIL], fd);
 		}
 	}
@@ -703,6 +700,7 @@ static int16_t _send(cd_t* cd, gnrc_pktsnip_t *pkt) {
 	}
 	return sts;
 }
+
 
 /**
  * @brief sender task
@@ -812,7 +810,7 @@ static void *_receive_handler_task(void* arg) {
 }
 
 sbh_t sbapp_connect(uint8_t conn_type, const char* server, uint16_t port,
-		kernel_pid_t pid) {
+		uint16_t local_port, kernel_pid_t pid) {
 
 	while (!IS_IP_ACQUIRED(nwp.status)) {
 		// wait for ip layer setup
@@ -825,7 +823,7 @@ sbh_t sbapp_connect(uint8_t conn_type, const char* server, uint16_t port,
 	}
 	conn->conn_type = conn_type;
 
-	conn->fd = connect_to(conn, server, port);
+	conn->fd = connect_to(conn, server, port, local_port);
 	if (conn->fd < 0) {
 		return NULL;
 	}
