@@ -64,7 +64,7 @@ void rtc_init(void)
     RCC->BDCR &= ~(RCC_BDCR_LSEON);
     RCC->BDCR &= ~(RCC_BDCR_LSEBYP);
     RCC->BDCR |= RCC_BDCR_LSEON;
-    while ( (RCC->BDCR & RCC_BDCR_LSERDY) == 0 );
+    while ((RCC->BDCR & RCC_BDCR_LSERDY) == 0) {}
 
     /* Switch RTC to LSE clock source */
     RCC->BDCR &= ~(RCC_BDCR_RTCSEL);
@@ -80,7 +80,7 @@ void rtc_init(void)
     /* Enter RTC Init mode */
     RTC->ISR = 0;
     RTC->ISR |= RTC_ISR_INIT;
-    while ( (RTC->ISR & RTC_ISR_INITF) == 0 );
+    while ((RTC->ISR & RTC_ISR_INITF) == 0) {}
 
     /* Set 24-h clock */
     RTC->CR |= RTC_CR_FMT;
@@ -111,7 +111,7 @@ int rtc_set_time(struct tm *time)
 
     /* Enter RTC Init mode */
     RTC->ISR |= RTC_ISR_INIT;
-    while ( (RTC->ISR & RTC_ISR_INITF) == 0 );
+    while ((RTC->ISR & RTC_ISR_INITF) == 0) {}
 
 
     RTC->DR = ( (((uint32_t)byte2bcd(time->tm_year - MCU_YEAR_OFFSET) << 16) & (RTC_DR_YT | RTC_DR_YU) ) |
@@ -155,10 +155,10 @@ int rtc_set_alarm(struct tm *time, rtc_alarm_cb_t cb, void *arg)
 
     /* Enter RTC Init mode */
     RTC->ISR |= RTC_ISR_INIT;
-    while ( (RTC->ISR & RTC_ISR_INITF) == 0 );
+    while ((RTC->ISR & RTC_ISR_INITF) == 0) {}
 
     RTC->CR &= ~(RTC_CR_ALRAE);
-    while ( (RTC->ISR & RTC_ISR_ALRAWF) == 0 );
+    while ((RTC->ISR & RTC_ISR_ALRAWF) == 0) {}
     RTC->ALRMAR &= ~(RTC_ALRMAR_MSK1 | RTC_ALRMAR_MSK2 | RTC_ALRMAR_MSK3 | RTC_ALRMAR_MSK4);
     RTC->ALRMAR = ( (((uint32_t)byte2bcd(time->tm_mday) << 24) & (RTC_ALRMAR_DT | RTC_ALRMAR_DU) ) |
                     (((uint32_t)byte2bcd(time->tm_hour) << 16) & (RTC_ALRMAR_HT | RTC_ALRMAR_HU) ) |
@@ -251,8 +251,7 @@ static uint8_t byte2bcd(uint8_t value)
 {
   uint8_t bcdhigh = 0;
 
-  while (value >= 10)
-  {
+  while (value >= 10) {
     bcdhigh++;
     value -= 10;
   }
