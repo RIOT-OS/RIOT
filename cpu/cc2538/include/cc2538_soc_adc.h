@@ -7,7 +7,8 @@
  */
 
 /**
- * @ingroup         cpu_cc2538
+ * @defgroup        cpu_cc2538_adc CC2538 ADC
+ * @ingroup         cpu_cc2538_regs
  * @{
  *
  * @file
@@ -29,6 +30,10 @@ extern "C" {
  * @brief SOC ADC component registers
  */
 typedef struct {
+
+    /**
+     * @brief ADC control register
+     */
     union {
         cc2538_reg_t ADCCON1;            /**< ADC Control Register 1 */
         struct {

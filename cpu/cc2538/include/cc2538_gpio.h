@@ -7,7 +7,8 @@
  */
 
 /**
- * @addtogroup cpu_cc2538
+ * @defgroup        cpu_cc2538_gpio CC2538 General-Purpose I/O
+ * @ingroup         cpu_cc2538_regs
  * @{
  *
  * @file
@@ -17,7 +18,6 @@
  *
  * @author          Ian Martin <ian@locicontrols.com>
  *
- * @defgroup cc2538-gpio CC2538 General-Purpose I/O
  * @{
  */
 
@@ -216,14 +216,14 @@ typedef struct {
  * @brief IOC port component registers
  */
 typedef struct {
-    cc2538_reg_t PA_SEL[8];
-    cc2538_reg_t PB_SEL[8];
-    cc2538_reg_t PC_SEL[8];
-    cc2538_reg_t PD_SEL[8];
-    cc2538_reg_t PA_OVER[8];
-    cc2538_reg_t PB_OVER[8];
-    cc2538_reg_t PC_OVER[8];
-    cc2538_reg_t PD_OVER[8];
+    cc2538_reg_t PA_SEL[8];         /**< Port A SEL register */
+    cc2538_reg_t PB_SEL[8];         /**< Port B SEL register */
+    cc2538_reg_t PC_SEL[8];         /**< Port C SEL register */
+    cc2538_reg_t PD_SEL[8];         /**< Port D SEL register */
+    cc2538_reg_t PA_OVER[8];        /**< Port A OVER register */
+    cc2538_reg_t PB_OVER[8];        /**< Port B OVER register */
+    cc2538_reg_t PC_OVER[8];        /**< Port C OVER register */
+    cc2538_reg_t PD_OVER[8];        /**< Port D OVER register */
 } cc2538_ioc_t;
 
 /**

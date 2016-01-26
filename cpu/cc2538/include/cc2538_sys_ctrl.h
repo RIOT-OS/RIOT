@@ -7,7 +7,8 @@
  */
 
 /**
- * @ingroup         cpu_cc2538
+ * @defgroup        cpu_cc2538_sysctrl CC2538 System Control
+ * @ingroup         cpu_cc2538_regs
  * @{
  *
  * @file
@@ -29,6 +30,10 @@ extern "C" {
  * @brief System Control component registers
  */
 typedef struct {
+
+    /**
+     * @brief Clock control register
+     */
     union {
         cc2538_reg_t CLOCK_CTRL;             /**< Clock control register */
         struct {
@@ -47,6 +52,9 @@ typedef struct {
         } CLOCK_CTRLbits;
     } cc2538_sys_ctrl_clk_ctrl;
 
+    /**
+     * @brief Clock status register
+     */
     union {
         cc2538_reg_t CLOCK_STA;              /**< Clock status register */
         struct {
@@ -77,6 +85,9 @@ typedef struct {
     cc2538_reg_t DCGCSSI;                    /**< Module clocks for SSI[1:0] when the CPU is in PM0 */
     cc2538_reg_t SRSSI;                      /**< Reset for SSI[1:0]. */
 
+    /**
+     * @brief UART module clock register - active mode
+     */
     union {
         cc2538_reg_t RCGCUART;               /**< Module clocks for UART[1:0] when the CPU is in active (run) mode */
         struct {
@@ -86,6 +97,9 @@ typedef struct {
         } RCGCUARTbits;
     } cc2538_sys_ctrl_unnamed1;
 
+    /**
+     * @brief UART module clock register - sleep mode
+     */
     union {
         cc2538_reg_t SCGCUART;               /**< Module clocks for UART[1:0] when the CPU is in sleep mode */
         struct {
@@ -95,6 +109,9 @@ typedef struct {
         } SCGCUARTbits;
     } cc2538_sys_ctrl_unnamed2;
 
+    /**
+     * @brief UART module clock register - PM0 mode
+     */
     union {
         cc2538_reg_t DCGCUART;               /**< Module clocks for UART[1:0] when the CPU is in PM0 */
         struct {
