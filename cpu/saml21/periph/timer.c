@@ -48,7 +48,7 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
 {
     /* configure GCLK0 to feed TC0 & TC1*/;
     GCLK->PCHCTRL[TC0_GCLK_ID].reg |= GCLK_PCHCTRL_CHEN | GCLK_PCHCTRL_GEN_GCLK0;
-    while (!(GCLK->PCHCTRL[TC0_GCLK_ID].reg & GCLK_PCHCTRL_CHEN));
+    while (!(GCLK->PCHCTRL[TC0_GCLK_ID].reg & GCLK_PCHCTRL_CHEN)) {}
 
     /* select the timer and enable the timer specific peripheral clocks */
     switch (dev) {
@@ -60,7 +60,7 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
         MCLK->APBCMASK.reg |= MCLK_APBCMASK_TC0;
         /* reset timer */
         TIMER_0_DEV.CTRLA.bit.SWRST = 1;
-        while (TIMER_0_DEV.SYNCBUSY.bit.SWRST);
+        while (TIMER_0_DEV.SYNCBUSY.bit.SWRST) {}
         /* choosing 32 bit mode */
         TIMER_0_DEV.CTRLA.bit.MODE = TC_CTRLA_MODE_COUNT32_Val;
         /* sourced by 4MHz with Presc 4 results in 1MHz*/
@@ -159,9 +159,8 @@ unsigned int timer_read(tim_t dev)
     case TIMER_0:
         /* request syncronisation */
         TIMER_0_DEV.CTRLBSET.bit.CMD = TC_CTRLBSET_CMD_READSYNC_Val;
-        while (TIMER_0_DEV.SYNCBUSY.bit.STATUS);
+        while (TIMER_0_DEV.SYNCBUSY.bit.STATUS) {}
         return TIMER_0_DEV.COUNT.reg;
-        break;
 #endif
     default:
         return 0;

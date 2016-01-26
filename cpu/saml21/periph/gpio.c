@@ -153,7 +153,7 @@ int gpio_init_int(gpio_t pin, gpio_pp_t pullup, gpio_flank_t flank,
     EIC->INTENSET.reg = (1 << exti);
     /* enable the EIC module*/
     EIC->CTRLA.reg = EIC_CTRLA_ENABLE;
-    while (EIC->SYNCBUSY.reg & EIC_SYNCBUSY_ENABLE);
+    while (EIC->SYNCBUSY.reg & EIC_SYNCBUSY_ENABLE) {}
     return 0;
 }
 
