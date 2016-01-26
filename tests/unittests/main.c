@@ -37,6 +37,5 @@ int main(void)
 #endif
     TESTS_END();
 
-    lpm_set(LPM_POWERDOWN);
     return 0;
 }

@@ -78,8 +78,5 @@ else
     CFLAGS += -DTEST_SUITES='$(subst $() $(),$(charCOMMA),$(UNIT_TESTS:tests-%=%))'
 endif
 
-test: SHELL=bash
 test:
-	@exec 5>&1 && \
-	LOG=$$("$(MAKE)" -s term | tee >(cat - >&5)) && \
-	grep 'OK ([1-9][0-9]* tests)' <<< $${LOG} > /dev/null
+	./tests/01-run.py
