@@ -29,12 +29,6 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-#ifndef RBUF_INT_SIZE
-#define RBUF_INT_SIZE   (GNRC_IPV6_NETIF_DEFAULT_MTU * RBUF_SIZE / 127)
-#endif
-
-static rbuf_int_t rbuf_int[RBUF_INT_SIZE];
-
 static rbuf_t rbuf[RBUF_SIZE];
 
 #if ENABLE_DEBUG
@@ -44,14 +38,12 @@ static char l2addr_str[3 * RBUF_L2ADDR_MAX_LEN];
 /* ------------------------------------
  * internal function definitions
  * ------------------------------------*/
-/* checks whether start and end are in given interval i */
-static inline bool _rbuf_int_in(rbuf_int_t *i, uint16_t start, uint16_t end);
-/* gets a free entry from interval buffer */
-static rbuf_int_t *_rbuf_int_get_free(void);
+/* checks whether start and end are in given bitmap */
+static inline bool _rbuf_int_in(uint8_t *bitmap, uint16_t start, uint16_t end);
 /* remove entry from reassembly buffer */
-static void _rbuf_rem(rbuf_t *entry);
-/* update interval buffer of entry */
-static bool _rbuf_update_ints(rbuf_t *entry, uint16_t offset, size_t frag_size);
+static inline void _rbuf_rem(rbuf_t *entry);
+/* update interval bitmap of entry */
+static void _rbuf_update_ints(rbuf_t *entry, uint16_t offset, size_t frag_size);
 /* checks timeouts and removes entries if necessary (oldest if full) */
 static void _rbuf_gc(void);
 /* gets an entry identified by its tupel */
@@ -66,8 +58,8 @@ void rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
     /* cppcheck is clearly wrong here */
     /* cppcheck-suppress variableScope */
     unsigned int data_offset = 0;
+    size_t original_size = frag_size;
     sixlowpan_frag_t *frag = pkt->data;
-    rbuf_int_t *ptr;
     uint8_t *data = ((uint8_t *)pkt->data) + sizeof(sixlowpan_frag_t);
 
     _rbuf_gc();
@@ -80,8 +72,6 @@ void rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
         DEBUG("6lo rbuf: reassembly buffer full.\n");
         return;
     }
-
-    ptr = entry->ints;
 
     /* dispatches in the first fragment are ignored */
     if (offset == 0) {
@@ -118,23 +108,34 @@ void rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
         return;
     }
 
-    while (ptr != NULL) {
-        if (_rbuf_int_in(ptr, offset, offset + frag_size - 1)) {
-            DEBUG("6lo rfrag: overlapping or same intervals, discarding datagram\n");
-            gnrc_pktbuf_release(entry->pkt);
-            _rbuf_rem(entry);
-            return;
-        }
-
-        ptr = ptr->next;
+    /* If the fragment overlaps another fragment and differs in either the size
+     * or the offset of the overlapped fragment, discards the datagram
+     * https://tools.ietf.org/html/rfc4944#section-5.3
+     * We check here only for last received offset and size. We should store all
+     * offset/size pairs to be more accurate, but it requires costs */
+    if ((entry->last_offset == offset / 8) && (entry->last_size == frag_size)) {
+        return;
     }
 
-    if (_rbuf_update_ints(entry, offset, frag_size)) {
-        DEBUG("6lo rbuf: add fragment data\n");
-        entry->cur_size += (uint16_t)frag_size;
-        memcpy(((uint8_t *)entry->pkt->data) + offset + data_offset, data,
-               frag_size - data_offset);
+    if (_rbuf_int_in(entry->int_bitmap, offset, offset + frag_size)) {
+        DEBUG("6lo rfrag: overlapping intervals (%d, %d), discarding datagram\n",
+              (int) offset, (int) (offset + frag_size - 1));
+        gnrc_pktbuf_release(entry->pkt);
+        _rbuf_rem(entry);
+
+        /* "A fresh reassembly may be commenced with the most recently received link fragment" */
+
+        rbuf_add(netif_hdr, pkt, original_size, offset);
+
+        return;
     }
+
+    _rbuf_update_ints(entry, offset, frag_size);
+
+    DEBUG("6lo rbuf: add fragment data\n");
+    entry->cur_size += (uint16_t)frag_size;
+    memcpy(((uint8_t *)entry->pkt->data) + offset + data_offset, data,
+           frag_size - data_offset);
 
     if (entry->cur_size == entry->pkt->size) {
         gnrc_pktsnip_t *netif = gnrc_netif_hdr_build(entry->src, entry->src_len,
@@ -168,63 +169,39 @@ void rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
     }
 }
 
-static inline bool _rbuf_int_in(rbuf_int_t *i, uint16_t start, uint16_t end)
+static inline bool _rbuf_int_in(uint8_t *bitmap, uint16_t start, uint16_t end)
 {
-    return (((i->start < start) && (start <= i->end)) ||
-            ((start < i->start) && (i->start <= end)) ||
-            ((i->start == start) && (i->end == end)));
-}
-
-static rbuf_int_t *_rbuf_int_get_free(void)
-{
-    for (unsigned int i = 0; i < RBUF_INT_SIZE; i++) {
-        if (rbuf_int[i].end == 0) { /* start must be smaller than end anyways*/
-            return rbuf_int + i;
+    for (int i = start / 8; i < (end + 7) / 8; i++) {
+        if (bf_isset(bitmap, i)) {
+            return true;
         }
     }
 
-    return NULL;
+    return false;
 }
 
-static void _rbuf_rem(rbuf_t *entry)
+static inline void _rbuf_rem(rbuf_t *entry)
 {
-    while (entry->ints != NULL) {
-        rbuf_int_t *next = entry->ints->next;
-
-        entry->ints->start = 0;
-        entry->ints->end = 0;
-        entry->ints->next = NULL;
-        entry->ints = next;
-    }
-
     entry->pkt = NULL;
 }
 
-static bool _rbuf_update_ints(rbuf_t *entry, uint16_t offset, size_t frag_size)
+static void _rbuf_update_ints(rbuf_t *entry, uint16_t offset, size_t frag_size)
 {
-    rbuf_int_t *new;
-    uint16_t end = (uint16_t)(offset + frag_size - 1);
+    uint16_t end = (uint16_t)(offset + frag_size);
 
-    new = _rbuf_int_get_free();
-
-    if (new == NULL) {
-        DEBUG("6lo rfrag: no space left in rbuf interval buffer.\n");
-        return false;
+    for (int i = offset / 8; i < (end + 7) / 8; i++) {
+        bf_set(entry->int_bitmap, i);
     }
 
-    new->start = offset;
-    new->end = end;
+    entry->last_offset = (uint8_t) (offset / 8);
+    entry->last_size = (uint8_t) frag_size;
 
-    DEBUG("6lo rfrag: add interval (%" PRIu16 ", %" PRIu16 ") to entry (%s, ",
-          new->start, new->end, gnrc_netif_addr_to_str(l2addr_str,
-                  sizeof(l2addr_str), entry->src, entry->src_len));
+    DEBUG("6lo rfrag: add interval (%" PRIu16 ", %d) to entry (%s, ",
+          offset, end - 1, gnrc_netif_addr_to_str(l2addr_str,
+              sizeof(l2addr_str), entry->src, entry->src_len));
     DEBUG("%s, %u, %u)\n", gnrc_netif_addr_to_str(l2addr_str,
             sizeof(l2addr_str), entry->dst, entry->dst_len),
           (unsigned)entry->pkt->size, entry->tag);
-
-    LL_PREPEND(entry->ints, new);
-
-    return true;
 }
 
 static void _rbuf_gc(void)
@@ -308,6 +285,7 @@ static rbuf_t *_rbuf_get(const void *src, size_t src_len,
         res->dst_len = dst_len;
         res->tag = tag;
         res->cur_size = 0;
+        memset(res->int_bitmap, 0, (RBUF_INT_BITMAP_SIZE + 7) / 8);
 
         DEBUG("6lo rfrag: entry %p (%s, ", (void *)res,
               gnrc_netif_addr_to_str(l2addr_str, sizeof(l2addr_str), res->src,

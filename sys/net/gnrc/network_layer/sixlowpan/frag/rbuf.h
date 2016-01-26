@@ -23,8 +23,11 @@
 
 #include "net/gnrc/netif/hdr.h"
 #include "net/gnrc/pkt.h"
+#include "net/gnrc/ipv6.h"
 
 #include "net/gnrc/sixlowpan/frag.h"
+
+#include "bitfield.h"
 #ifdef __cplusplus
 
 extern "C" {
@@ -33,24 +36,7 @@ extern "C" {
 #define RBUF_L2ADDR_MAX_LEN (8U)    /**< maximum length for link-layer addresses */
 #define RBUF_SIZE           (4U)    /**< size of the reassembly buffer */
 #define RBUF_TIMEOUT        (3U)    /**< timeout for reassembly in seconds */
-
-/**
- * @brief   Fragment intervals to identify limits of fragments.
- *
- * @note    Fragments MUST NOT overlap and overlapping fragments are to be
- *          discarded
- *
- * @see <a href="https://tools.ietf.org/html/rfc4944#section-5.3">
- *          RFC 4944, section 5.3
- *      </a>
- *
- * @internal
- */
-typedef struct rbuf_int {
-    struct rbuf_int *next;  /**< next element in interval list */
-    uint16_t start;         /**< start byte of interval */
-    uint16_t end;           /**< end byte of interval */
-} rbuf_int_t;
+#define RBUF_INT_BITMAP_SIZE (IPV6_MIN_MTU / 8) /**< size of the interval bitmap */
 
 /**
  * @brief   An entry in the 6LoWPAN reassembly buffer.
@@ -71,7 +57,6 @@ typedef struct rbuf_int {
  * @internal
  */
 typedef struct {
-    rbuf_int_t *ints;                   /**< intervals of the fragment */
     gnrc_pktsnip_t *pkt;                /**< the reassembled packet in packet buffer */
     uint32_t arrival;                   /**< time in seconds of arrival of last
                                          *   received fragment */
@@ -81,6 +66,19 @@ typedef struct {
     uint8_t dst_len;                    /**< length of destination address */
     uint16_t tag;                       /**< the datagram's tag */
     uint16_t cur_size;                  /**< the datagram's current size */
+    /**
+     * @brief   Bitmap for received intervals.
+     *
+     * @note    Fragments MUST NOT overlap and overlapping fragments are to be
+     *          discarded
+     *
+     * @see <a href="https://tools.ietf.org/html/rfc4944#section-5.3">
+     *          RFC 4944, section 5.3
+     *      </a>
+     */
+    BITFIELD(int_bitmap, RBUF_INT_BITMAP_SIZE);
+    uint8_t last_offset;                /**< offset of last received fragment, divided by 8 */
+    uint8_t last_size;                  /**< size of last received fragment */
 } rbuf_t;
 
 /**
