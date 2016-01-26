@@ -263,4 +263,16 @@ gnrc_ipv6_nc_t *gnrc_ipv6_nc_still_reachable(const ipv6_addr_t *ipv6_addr)
     return entry;
 }
 
+kernel_pid_t gnrc_ipv6_nc_get_l2_addr(uint8_t *l2_addr, uint8_t *l2_addr_len,
+                                      const gnrc_ipv6_nc_t *entry)
+{
+    assert((l2_addr != NULL) && (l2_addr_len != NULL));
+    if ((entry == NULL) || !gnrc_ipv6_nc_is_reachable(entry)) {
+        return KERNEL_PID_UNDEF;
+    }
+    *l2_addr_len = entry->l2_addr_len;
+    memcpy(l2_addr, entry->l2_addr, entry->l2_addr_len);
+    return entry->iface;
+}
+
 /** @} */
