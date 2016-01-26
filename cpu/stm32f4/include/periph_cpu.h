@@ -26,6 +26,11 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Length of the CPU_ID in octets
+ */
+#define CPUID_LEN           (12U)
+
+/**
  * @brief   Overwrite the default gpio_t type definition
  * @{
  */
@@ -42,6 +47,19 @@ typedef uint32_t gpio_t;
  * @brief   Define a CPU specific GPIO pin generator macro
  */
 #define GPIO_PIN(x, y)      ((GPIOA_BASE + (x << 10)) | y)
+
+/**
+ * @brief   Override HWSC macro
+ */
+#define SPI_HWCS(x)         (x)
+
+/*
+ * @brief   Peripheral buses
+ */
+enum {
+    BUS_APB1 = 1,
+    BUS_APB2 = 0
+};
 
 /**
  * @brief   Available ports on the STM32F4 family
@@ -94,6 +112,19 @@ typedef struct {
     uint8_t dma_chan;       /**< DMA channel used for TX */
 } uart_conf_t;
 /** @} */
+
+/**
+ * @brief   Structure for SPI configuration data
+ */
+typedef struct {
+    SPI_TypeDef *dev;       /**< SPI device base register address */
+    gpio_t mosi_pin;        /**< MOSI pin */
+    gpio_t miso_pin;        /**< MISO pin */
+    gpio_t sclk_pin;        /**< SCLK pin */
+    gpio_af_t af;           /**< pin alternate function */
+    uint8_t abpbus;         /**< APB bus, 0 := APB1, 1:= APB2 */
+    uint32_t rccmask;         /**< bit in the RCC peripheral enable register */
+} spi_conf_t;
 
 /**
  * @brief   Configure the alternate function for the given pin

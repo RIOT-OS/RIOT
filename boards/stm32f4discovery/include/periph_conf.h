@@ -217,52 +217,28 @@ static const uart_conf_t uart_config[] = {
  * @name SPI configuration
  * @{
  */
-#define SPI_NUMOF           (2U)
-#define SPI_0_EN            1
-#define SPI_1_EN            1
-#define SPI_IRQ_PRIO        1
+static const spi_conf_t spi_config[] = {
+    {
+        SPI1,
+        GPIO_PIN(PORT_A, 7),
+        GPIO_PIN(PORT_A, 6),
+        GPIO_PIN(PORT_A, 5),
+        5,
+        BUS_APB2,
+        RCC_APB2ENR_SPI1EN
+    },
+    {
+        SPI2,
+        GPIO_PIN(PORT_B, 15),
+        GPIO_PIN(PORT_B, 14),
+        GPIO_PIN(PORT_B, 13),
+        5,
+        BUS_APB1,
+        RCC_APB1ENR_SPI2EN
+    }
+};
 
-/* SPI 0 device config */
-#define SPI_0_DEV               SPI1
-#define SPI_0_CLKEN()           (RCC->APB2ENR |= RCC_APB2ENR_SPI1EN)
-#define SPI_0_CLKDIS()          (RCC->APB2ENR &= ~RCC_APB2ENR_SPI1EN)
-#define SPI_0_BUS_DIV           1   /* 1 -> SPI runs with half CPU clock, 0 -> quarter CPU clock */
-#define SPI_0_IRQ               SPI1_IRQn
-#define SPI_0_IRQ_HANDLER       isr_spi1
-/* SPI 0 pin configuration */
-#define SPI_0_SCK_PORT          GPIOA
-#define SPI_0_SCK_PIN           5
-#define SPI_0_SCK_AF            5
-#define SPI_0_SCK_PORT_CLKEN()  (RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN)
-#define SPI_0_MISO_PORT         GPIOA
-#define SPI_0_MISO_PIN          6
-#define SPI_0_MISO_AF           5
-#define SPI_0_MISO_PORT_CLKEN() (RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN)
-#define SPI_0_MOSI_PORT         GPIOA
-#define SPI_0_MOSI_PIN          7
-#define SPI_0_MOSI_AF           5
-#define SPI_0_MOSI_PORT_CLKEN() (RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN)
-
-/* SPI 1 device config */
-#define SPI_1_DEV               SPI2
-#define SPI_1_CLKEN()           (RCC->APB1ENR |= RCC_APB1ENR_SPI2EN)
-#define SPI_1_CLKDIS()          (RCC->APB1ENR &= ~RCC_APB1ENR_SPI2EN)
-#define SPI_1_BUS_DIV           0   /* 1 -> SPI runs with half CPU clock, 0 -> quarter CPU clock */
-#define SPI_1_IRQ               SPI2_IRQn
-#define SPI_1_IRQ_HANDLER       isr_spi2
-/* SPI 1 pin configuration */
-#define SPI_1_SCK_PORT          GPIOB
-#define SPI_1_SCK_PIN           13
-#define SPI_1_SCK_AF            5
-#define SPI_1_SCK_PORT_CLKEN()  (RCC->AHB1ENR |= RCC_AHB1ENR_GPIOBEN)
-#define SPI_1_MISO_PORT         GPIOB
-#define SPI_1_MISO_PIN          14
-#define SPI_1_MISO_AF           5
-#define SPI_1_MISO_PORT_CLKEN() (RCC->AHB1ENR |= RCC_AHB1ENR_GPIOBEN)
-#define SPI_1_MOSI_PORT         GPIOB
-#define SPI_1_MOSI_PIN          15
-#define SPI_1_MOSI_AF           5
-#define SPI_1_MOSI_PORT_CLKEN() (RCC->AHB1ENR |= RCC_AHB1ENR_GPIOBEN)
+#define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
 /** @} */
 
 /**
