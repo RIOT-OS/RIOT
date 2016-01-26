@@ -1,7 +1,7 @@
 PKG_NAME = tlsf
 PKG_VERSION = 3.0
 PKG_FILE = tlsf-$(PKG_VERSION).zip
-PKG_URL = http://tlsf.baisoku.org/$(PKG_FILE)
+PKG_URL = http://download.riot-os.org/$(PKG_FILE)
 
 .PHONY: all clean distclean
 
