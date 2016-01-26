@@ -41,6 +41,17 @@ extern "C" {
 #define CPUID_ID_LEN                    8
 #endif
 
+
+/**
+ * Define the nominal CPU core clock
+ */
+#define F_CPU               80000000
+
+#define SEC_TO_TICKS(sec)   80000000*sec /**< Convert seconds to  clock ticks */
+#define MSEC_TO_TICKS(msec) 80000*msec /**< Convert millisecs to  clock ticks */
+#define USEC_TO_TICKS(usec) 80*usec /**< Convert microseconds to  clock ticks */
+
+
 #ifdef __cplusplus
 } /* end extern "C" */
 #endif

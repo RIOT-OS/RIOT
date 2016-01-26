@@ -23,16 +23,22 @@
 extern "C" {
 #endif
 
+#define GDO0_PIN 19
+
+#define GDO2_PIN 2
+
 /**
  * @name CC110X configuration
+ * @brief pin mapping for CC110L Anaren Boosterpack
+ * @{
  */
 const cc110x_params_t cc110x_params[] = {
     {
-        .spi  = SPI_0,
-        .cs   = SPI_0_PIN_CS,
-        .gdo0 = 19,
-        .gdo1 = SPI_0_PIN_MISO, // miso pin
-        .gdo2 = 2
+        .spi  = SPI_0,          //<! spi module instance
+        .cs   = SPI_0_PIN_CS,   //<! chip select
+        .gdo0 = GDO0_PIN,       //<! GDO0 pin
+        .gdo1 = SPI_0_PIN_MISO, //<! GDO1 pin is shared with MISO
+        .gdo2 = GDO2_PIN        //<! GDO2 pin
     },
 };
 /** @} */
