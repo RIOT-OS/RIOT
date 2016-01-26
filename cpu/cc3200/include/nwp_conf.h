@@ -36,15 +36,14 @@
 */
 
 /**
+ * @file
  * @ingroup         cpu_cc3200
  * @{
  *
- * @file
  * @brief Contains the common macro/enum definitions used by networking apps
  *
  * @author          Attilio Dona'
  */
-
 
 #ifndef __NWP_CONF__H__
 #define __NWP_CONF__H__
@@ -55,7 +54,6 @@ extern "C"
 #endif
 
 #include <stdint.h>
-
 
 #define SSID_LEN_MAX        32
 #define BSSID_LEN_MAX       6
@@ -81,34 +79,34 @@ typedef enum {
 
 } nwp_event;
 
-// Status bits - These are used to set/reset the corresponding bits in
+// @brief Status bits - These are used to set/reset the corresponding bits in
 // given variable
 typedef enum {
-    STATUS_BIT_NWP_INIT = 0, // If this bit is set: Network Processor is
-                             // powered up
+    STATUS_BIT_NWP_INIT = 0, //!< If this bit is set: Network Processor is
+                             //!< powered up
 
-    STATUS_BIT_CONNECTION,   // If this bit is set: the device is connected to
-                             // the AP or client is connected to device (AP)
+    STATUS_BIT_CONNECTION,   //!< If this bit is set: the device is connected to
+                             //!< the AP or client is connected to device (AP)
 
-    STATUS_BIT_IP_LEASED,    // If this bit is set: the device has leased IP to
-                             // any connected client
+    STATUS_BIT_IP_LEASED,    //!< If this bit is set: the device has leased IP to
+                             //!< any connected client
 
-    STATUS_BIT_IP_ACQUIRED,  // If this bit is set: the device has acquired an IP
+    STATUS_BIT_IP_ACQUIRED,  //!< If this bit is set: the device has acquired an IP
 
-    STATUS_BIT_SMARTCONFIG_START, // If this bit is set: the SmartConfiguration
-                                  // process is started from SmartConfig app
+    STATUS_BIT_SMARTCONFIG_START, //!< If this bit is set: the SmartConfiguration
+                                  //!< process is started from SmartConfig app
 
-    STATUS_BIT_P2P_DEV_FOUND,    // If this bit is set: the device (P2P mode)
-                                 // found any p2p-device in scan
+    STATUS_BIT_P2P_DEV_FOUND,    //!< If this bit is set: the device (P2P mode)
+                                 //!< found any p2p-device in scan
 
-    STATUS_BIT_P2P_REQ_RECEIVED, // If this bit is set: the device (P2P mode)
-                                 // found any p2p-negotiation request
+    STATUS_BIT_P2P_REQ_RECEIVED, //!< If this bit is set: the device (P2P mode)
+                                 //!< found any p2p-negotiation request
 
-    STATUS_BIT_CONNECTION_FAILED, // If this bit is set: the device(P2P mode)
-                                  // connection to client(or reverse way) is failed
+    STATUS_BIT_CONNECTION_FAILED, //!< If this bit is set: the device(P2P mode)
+                                  //!< connection to client(or reverse way) is failed
 
-    STATUS_BIT_PING_DONE,        // If this bit is set: the device has completed
-                                 // the ping operation
+    STATUS_BIT_PING_DONE,        //!< If this bit is set: the device has completed
+                                 //!< the ping operation
 } e_StatusBits;
 
 #define CLR_STATUS_BIT_ALL(status_variable)  (status_variable = 0)
@@ -136,12 +134,12 @@ typedef enum {
 #define IS_PING_DONE(status_variable)        GET_STATUS_BIT(status_variable,\
                                                            STATUS_BIT_PING_DONE)
 
-// simplelink active role initialization value
+// @brief simplelink active role initialization value
 #define ROLE_INVALID            (-5)
 
 
 /**
- * network processor status and configuration
+ * @brief network processor status and configuration
  */
 typedef struct nwp_t {
     volatile uint16_t status;
@@ -156,12 +154,8 @@ typedef struct nwp_t {
 extern nwp_t nwp;
 
 
-//*****************************************************************************
-//
-// Mark the end of the C bindings section for C++ compilers.
-//
-//*****************************************************************************
 #ifdef __cplusplus
 }
 #endif
 #endif //__NWP_CONF__H__
+/** @} */

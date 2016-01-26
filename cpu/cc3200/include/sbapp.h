@@ -11,6 +11,7 @@
 
 /**
  * @ingroup     cpu_cc3200
+ * @{
  *
  * @file
  * @brief       implementation of the South Bound App protocol for CC3200
@@ -108,12 +109,13 @@ int sbapp_init(void);
  *
  * @param[in] conn_type  TCP or UDP
  * @param[in] server the hostname or ip address of the server
- * @param[in] port
+ * @param[in] port remote port
+ * @param[in] local_port  local port, if zero a random port is assigned
  *
  * @return the connection handle
  */
-sbh_t sbapp_connect(uint8_t conn_type,
-		const char* server, uint16_t port, kernel_pid_t pid);
+sbh_t sbapp_connect(uint8_t conn_type, const char* server, uint16_t port,
+		uint16_t local_port, kernel_pid_t pid);
 
 
 /**
@@ -131,3 +133,4 @@ int sbapp_send(sbh_t fd, void* data, size_t len);
 
 
 #endif /* SYS_INCLUDE_NET_SBAPP_H_ */
+/** @} */
