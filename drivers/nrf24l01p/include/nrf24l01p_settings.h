@@ -87,6 +87,14 @@ extern "C" {
 #define REG_DYNPD               0x1c
 #define REG_FEATURE             0x1d
 
+/* Bits in EN_AA register */
+#define ENAA_P0      0x01
+#define ENAA_P1      0x02
+#define ENAA_P2      0x04
+#define ENAA_P3      0x08
+#define ENAA_P4      0x10
+#define ENAA_P5      0x20
+
 /* Bits in CONFIG register */
 #define MASK_RX_DR   0x40
 #define MASK_TX_DS   0x20
