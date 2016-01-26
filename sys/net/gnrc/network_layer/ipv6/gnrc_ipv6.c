@@ -32,6 +32,7 @@
 #include "net/gnrc/ipv6/nc.h"
 #include "net/gnrc/ipv6/netif.h"
 #include "net/gnrc/ipv6/whitelist.h"
+#include "net/gnrc/ipv6/blacklist.h"
 
 #include "net/gnrc/ipv6.h"
 
@@ -735,6 +736,13 @@ static void _receive(gnrc_pktsnip_t *pkt)
             return;
         }
 #endif
+#ifdef MODULE_GNRC_IPV6_BLACKLIST
+        if (gnrc_ipv6_blacklisted(&((ipv6_hdr_t *)(pkt->data))->src)) {
+            DEBUG("ipv6: Source address blacklisted, dropping packet\n");
+            gnrc_pktbuf_release(pkt);
+            return;
+        }
+#endif
         /* seize ipv6 as a temporary variable */
         ipv6 = gnrc_pktbuf_start_write(pkt);
 
@@ -758,6 +766,14 @@ static void _receive(gnrc_pktsnip_t *pkt)
     else if (!gnrc_ipv6_whitelisted(&((ipv6_hdr_t *)(ipv6->data))->src)) {
         /* if ipv6 header already marked*/
         DEBUG("ipv6: Source address not whitelisted, dropping packet\n");
+        gnrc_pktbuf_release(pkt);
+        return;
+    }
+#endif
+#ifdef MODULE_GNRC_IPV6_BLACKLIST
+    else if (gnrc_ipv6_blacklisted(&((ipv6_hdr_t *)(ipv6->data))->src)) {
+        /* if ipv6 header already marked*/
+        DEBUG("ipv6: Source address blacklisted, dropping packet\n");
         gnrc_pktbuf_release(pkt);
         return;
     }
