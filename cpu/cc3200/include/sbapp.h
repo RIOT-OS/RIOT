@@ -22,6 +22,10 @@
 #define SYS_INCLUDE_NET_SBAPP_H_
 
 #include "kernel.h"
+#include "net/gnrc/pktbuf.h"
+#include "net/gnrc/netapi.h"
+#include "net/gnrc/netreg.h"
+#include "net/gnrc/netif/hdr.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -114,7 +118,7 @@ int sbapp_init(void);
  *
  * @return the connection handle
  */
-sbh_t sbapp_connect(uint8_t conn_type, const char* server, uint16_t port,
+sbh_t sbapp_connect(uint8_t conn_type, uint32_t remote_ip, uint16_t port,
 		uint16_t local_port, kernel_pid_t pid);
 
 
@@ -125,6 +129,9 @@ sbh_t sbapp_connect(uint8_t conn_type, const char* server, uint16_t port,
  *              (or think it is a file descriptor if you prefer)
  */
 int sbapp_send(sbh_t fd, void* data, size_t len);
+
+
+uint32_t net_atoi(const char* name);
 
 
 #ifdef __cplusplus
