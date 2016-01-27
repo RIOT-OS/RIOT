@@ -190,7 +190,7 @@ int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length)
         char tmp = (out) ? out[i] : 0;
         spi[dev]->EVENTS_READY = 0;
         spi[dev]->TXD = (uint8_t)tmp;
-        while (spi[dev]->EVENTS_READY != 1);
+        while (spi[dev]->EVENTS_READY != 1) {}
         tmp = (char)spi[dev]->RXD;
         if (in) {
             in[i] = tmp;
