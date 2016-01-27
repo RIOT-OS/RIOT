@@ -15,7 +15,7 @@ export JLINK_PRE_FLASH := erase\nloadfile $(BINDIR)/softdevice.hex
 export JLINK_FLASH_ADDR := 0x1f000
 export LINKER_SCRIPT ?= $(RIOTCPU)/$(CPU)/ldscripts/$(CPU_MODEL)_sd.ld
 endif
-include $(RIOTBOARD)/Makefile.include.jlink
+include $(RIOTMAKE)/tools/jlink.mk
 
 # setup serial terminal
-include $(RIOTBOARD)/Makefile.include.serial
+include $(RIOTMAKE)/tools/serial.mk

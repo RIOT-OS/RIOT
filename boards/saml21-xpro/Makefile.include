@@ -5,7 +5,7 @@ export CFLAGS += -D__SAML21J18A__
 
 # setup serial terminal
 PORT_LINUX ?= /dev/ttyACM0
-include $(RIOTBOARD)/Makefile.include.serial
+include $(RIOTMAKE)/tools/serial.mk
 
 # this board uses openocd
-include $(RIOTBOARD)/Makefile.include.openocd
+include $(RIOTMAKE)/tools/openocd.mk

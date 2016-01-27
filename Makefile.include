@@ -8,6 +8,7 @@ RIOTBASE       ?= $(dir $(lastword $(MAKEFILE_LIST)))
 CCACHE_BASEDIR ?= $(RIOTBASE)
 RIOTCPU        ?= $(RIOTBASE)/cpu
 RIOTBOARD      ?= $(RIOTBASE)/boards
+RIOTMAKE       ?= $(RIOTBASE)/makefiles
 RIOTPKG        ?= $(RIOTBASE)/pkg
 RIOTPROJECT    ?= $(shell git rev-parse --show-toplevel 2>/dev/null || pwd)
 GITCACHE       ?= $(RIOTBASE)/dist/tools/git/git-cache
@@ -16,13 +17,27 @@ BINDIRBASE     ?= $(APPDIR)/bin
 BINDIR         ?= $(BINDIRBASE)/$(BOARD)
 PKGDIRBASE     ?= $(BINDIRBASE)/pkg/$(BOARD)
 
-__DIRECTORY_VARIABLES := RIOTBASE CCACHE_BASEDIR RIOTCPU RIOTBOARD RIOTPKG GITCACHE RIOTPROJECT APPDIR BINDIRBASE BINDIR PKGDIRBASE
+__DIRECTORY_VARIABLES := \
+  RIOTBASE \
+  RIOTCPU \
+  RIOTBOARD \
+  RIOTMAKE \
+  RIOTPKG \
+  RIOTPROJECT \
+  APPDIR \
+  BINDIRBASE \
+  BINDIR \
+  CCACHE_BASEDIR \
+  GITCACHE \
+  PKGDIRBASE \
+  #
 
 # Make all paths absolute.
 override RIOTBASE       := $(abspath $(RIOTBASE))
 override CCACHE_BASEDIR := $(abspath $(CCACHE_BASEDIR))
 override RIOTCPU        := $(abspath $(RIOTCPU))
 override RIOTBOARD      := $(abspath $(RIOTBOARD))
+override RIOTMAKE       := $(abspath $(RIOTMAKE))
 override RIOTPKG        := $(abspath $(RIOTPKG))
 override RIOTPROJECT    := $(abspath $(RIOTPROJECT))
 override GITCACHE       := $(abspath $(GITCACHE))
@@ -47,10 +62,10 @@ BUILDRELPATH ?= ${PWD:${RIOTPROJECT}/%=%}/
 # Include Docker settings near the top because we need to build the environment
 # command line before some of the variable origins are overwritten below when
 # using abspath, strip etc.
-include $(RIOTBASE)/Makefile.docker
+include $(RIOTMAKE)/docker.mk
 
 # Static code analysis tools provided by LLVM
-include $(RIOTBASE)/Makefile.scan-build
+include $(RIOTMAKE)/scan-build.mk
 
 export RIOTBUILD_CONFIG_HEADER_C = $(BINDIR)/riotbuild/riotbuild.h
 
@@ -190,13 +205,13 @@ INCLUDES += -I$(RIOTCPU)/$(CPU)/include
 INCLUDES += -I$(RIOTBOARD)/$(BOARD)/include
 
 # mandatory includes!
-include $(RIOTBASE)/Makefile.pseudomodules
-include $(RIOTBASE)/Makefile.defaultmodules
+include $(RIOTMAKE)/pseudomodules.mk
+include $(RIOTMAKE)/defaultmodules.mk
 include $(RIOTBOARD)/$(BOARD)/Makefile.include
 include $(RIOTCPU)/$(CPU)/Makefile.include
 
 # Import all toolchain settings
-include $(RIOTCPU)/Makefile.include.$(TOOLCHAIN)
+include $(RIOTMAKE)/toolchain/$(TOOLCHAIN).mk
 
 # get number of interfaces straight before resolving dependencies
 GNRC_NETIF_NUMOF ?= 1
@@ -239,7 +254,7 @@ ifneq (0, $(shell mkdir -p $(BINDIR); $(AR) rc $(BINDIR)/empty-archive.a 2> /dev
 endif
 
 # Feature test default CFLAGS and LINKFLAGS for the set compiled.
-include $(RIOTBASE)/Makefile.cflags
+include $(RIOTMAKE)/cflags.mk
 
 # make the RIOT version available to the program
 ifeq ($(origin RIOT_VERSION), undefined)
@@ -279,7 +294,7 @@ all: ..in-docker-container
 else
 ## make script for your application. Build RIOT-base here!
 all: ..compiler-check ..build-message $(RIOTBUILD_CONFIG_HEADER_C) $(USEPKG:%=${BINDIR}/%.a) $(APPDEPS)
-	$(Q)DIRS="$(DIRS)" "$(MAKE)" -C $(APPDIR) -f $(RIOTBASE)/Makefile.application
+	$(Q)DIRS="$(DIRS)" "$(MAKE)" -C $(APPDIR) -f $(RIOTMAKE)/application.mk
 ifeq (,$(RIOTNOLINK))
 ifeq ($(BUILDOSXNATIVE),1)
 	$(Q)$(if $(CPPMIX),$(CXX),$(LINK)) $(UNDEF) -o $(ELFFILE) $$(find $(BASELIBS) -size +8c) $(LINKFLAGS) $(LINKFLAGPREFIX)-no_pie
@@ -407,13 +422,13 @@ $(CURDIR)/eclipsesym.xml:
 		$(RIOTBASE)/dist/tools/eclipsesym/cmdline2xml.sh > $@
 
 # Extra make goals for testing and comparing changes.
-include $(RIOTBASE)/Makefile.buildtests
+include $(RIOTMAKE)/buildtests.mk
 
 # process provided features
-include $(RIOTBASE)/Makefile.features
+include $(RIOTMAKE)/features.mk
 
 # Export variables used throughout the whole make system:
-include $(RIOTBASE)/Makefile.vars
+include $(RIOTMAKE)/vars.mk
 
 # Warn if the selected board and drivers don't provide all needed features:
 ifneq (, $(filter all, $(if $(MAKECMDGOALS), $(MAKECMDGOALS), all)))
@@ -517,10 +532,10 @@ endif
 include $(RIOTBASE)/dist/tools/desvirt/Makefile.desvirt
 
 # include bindist target
-include $(RIOTBASE)/Makefile.bindist
+include $(RIOTMAKE)/bindist.mk
 
 # Add all USEMODULE modules to CFLAGS
-include $(RIOTBASE)/Makefile.modules
+include $(RIOTMAKE)/modules.mk
 
 # Build a header file with all common macro definitions and undefinitions
 # make it phony to force re-run of the script every time even if the file exists

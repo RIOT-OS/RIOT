@@ -22,4 +22,4 @@ export COMMON_STARTUP = $(KINETIS_COMMON)
 export UNDEF += $(BINDIR)/cpu/vectors.o
 export UNDEF += $(BINDIR)/cpu/ssp.o
 
-include $(RIOTCPU)/Makefile.include.cortexm_common
+include $(RIOTMAKE)/arch/cortexm.mk

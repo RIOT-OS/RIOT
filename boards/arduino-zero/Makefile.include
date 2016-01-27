@@ -7,7 +7,7 @@ export PORT_LINUX ?= /dev/ttyACM0
 export PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
 
 # setup serial terminal
-include $(RIOTBOARD)/Makefile.include.serial
+include $(RIOTMAKE)/tools/serial.mk
 
 # Add board selector (USB serial) to OpenOCD options if specified.
 # Use /dist/tools/usb-serial/list-ttys.sh to find out serial number.
@@ -22,4 +22,4 @@ ifneq (,$(SERIAL))
 endif
 
 # this board uses openocd
-include $(RIOTBOARD)/Makefile.include.openocd
+include $(RIOTMAKE)/tools/openocd.mk
