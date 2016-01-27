@@ -34,11 +34,6 @@ extern "C" {
 #endif
 
 /**
- * @name Define the nominal CPU core clock in this board
- */
-#define F_CPU               CLOCK_CORECLOCK
-
-/**
  * @name Set the default baudrate to 500K for this board
  * @{
  */

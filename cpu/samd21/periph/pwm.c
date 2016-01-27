@@ -102,11 +102,11 @@ int pwm_init(pwm_t dev, pwm_mode_t mode,
     }
 
     /* calculate the closest possible clock presacler */
-    prescaler = get_prescaler(F_CPU / (frequency * resolution), &scale);
+    prescaler = get_prescaler(CLOCK_CORECLOCK / (frequency * resolution), &scale);
     if (prescaler == 0xff) {
         return -2;
     }
-    f_real = (F_CPU / (scale * resolution));
+    f_real = (CLOCK_CORECLOCK / (scale * resolution));
 
     /* configure the used pins */
     for (int i = 0; i < PWM_MAX_CHANNELS; i++) {

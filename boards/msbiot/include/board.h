@@ -29,11 +29,6 @@ extern "C" {
 #endif
 
 /**
- * Define the nominal CPU core clock in this board
- */
-#define F_CPU               CLOCK_CORECLOCK
-
-/**
  * @name Configure connected CC1101 (radio) device
  * @{
  */

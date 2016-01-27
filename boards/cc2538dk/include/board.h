@@ -28,11 +28,6 @@ extern "C" {
 #endif
 
 /**
- * Define the nominal CPU core clock in this board
- */
-#define F_CPU               XOSC32M_FREQ
-
-/**
  * @name Macros for controlling the on-board LEDs.
  * @{
  */

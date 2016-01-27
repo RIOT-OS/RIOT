@@ -73,18 +73,18 @@ int pwm_init(pwm_t dev, pwm_mode_t mode,
      * The pwm provides 11 prescaled clocks with (MCK/2^prea | prea=[0,10])
      * and a divider (diva) with a denominator range [1,255] in line.
      */
-    if (F_CPU < pwm_clk) {  /* Have to cut down resulting frequency. */
-        frequency = F_CPU / resolution;
+    if (CLOCK_CORECLOCK < pwm_clk) {  /* Have to cut down resulting frequency. */
+        frequency = CLOCK_CORECLOCK / resolution;
     }
     else {   /* Estimate prescaler and divider. */
-        diva = F_CPU / pwm_clk;
+        diva = CLOCK_CORECLOCK / pwm_clk;
 
         while ((prea < MCK_DIV_LB_MAX) && (~0xff & diva)) {
             prea = prea + 1;
             diva = diva >> 1;
         }
 
-        frequency = F_CPU / ((resolution * diva) << prea);
+        frequency = CLOCK_CORECLOCK / ((resolution * diva) << prea);
     }
 
     retval = frequency;

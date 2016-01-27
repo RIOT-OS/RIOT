@@ -27,7 +27,6 @@ extern "C" {
  * @name Define the nominal CPU core clock in this board
  * @{
  */
-#define F_CPU                           1000000
 #define CLK80                           1
 #define CLK50                           2
 #define CLK40                           3

@@ -26,6 +26,13 @@ extern "C" {
 #endif
 
 /**
+ * @name Clock configuration
+ * @{
+ */
+#define CLOCK_CORECLOCK     (84000000U)
+/** @} */
+
+/**
  * @name Timer peripheral configuration
  * @{
  */

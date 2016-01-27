@@ -57,7 +57,7 @@ int pwm_init(pwm_t dev, pwm_mode_t mode, unsigned int frequency, unsigned int re
             PWM1TCR = BIT1;
 
             /* set prescaler */
-            PWM1PR = (F_CPU / (frequency * resolution)) - 1;
+            PWM1PR = (CLOCK_CORECLOCK / (frequency * resolution)) - 1;
 
             /* set match register */
             PWM1MR0 = resolution;

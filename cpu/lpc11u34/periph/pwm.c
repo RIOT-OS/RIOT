@@ -40,7 +40,7 @@ int pwm_init(pwm_t dev, pwm_mode_t mode, unsigned int frequency, unsigned int re
                 return -1;
             }
             /* Check if the frequency and resolution is applicable */
-            if (F_CPU/(resolution*frequency) <= 0) {
+            if (CLOCK_CORECLOCK/(resolution*frequency) <= 0) {
                 return -2;
             }
 #if PWM_0_CH0_EN
@@ -56,8 +56,8 @@ int pwm_init(pwm_t dev, pwm_mode_t mode, unsigned int frequency, unsigned int re
             pwm_poweron(dev);
             /* Enable timer and keep it in reset state */
             PWM_0_DEV->TCR = BIT0 | BIT1;
-            /* Set the prescaler (F_CPU / resolution) */
-            PWM_0_DEV->PR = (F_CPU/(resolution*frequency));
+            /* Set the prescaler (CLOCK_CORECLOCK / resolution) */
+            PWM_0_DEV->PR = (CLOCK_CORECLOCK/(resolution*frequency));
             /* Reset timer on MR3 */
             PWM_0_DEV->MCR = BIT10;
 
@@ -82,7 +82,7 @@ int pwm_init(pwm_t dev, pwm_mode_t mode, unsigned int frequency, unsigned int re
                 return -1;
             }
             /* Check if the frequency and resolution is applicable */
-            if (F_CPU/(resolution*frequency) <= 0) {
+            if (CLOCK_CORECLOCK/(resolution*frequency) <= 0) {
                 return -2;
             }
 #if PWM_1_CH0_EN
@@ -98,8 +98,8 @@ int pwm_init(pwm_t dev, pwm_mode_t mode, unsigned int frequency, unsigned int re
             pwm_poweron(dev);
             /* Enable timer and keep it in reset state */
             PWM_1_DEV->TCR = BIT0 | BIT1;
-            /* Set the prescaler (F_CPU / resolution) */
-            PWM_1_DEV->PR = (F_CPU/(resolution*frequency));
+            /* Set the prescaler (CLOCK_CORECLOCK / resolution) */
+            PWM_1_DEV->PR = (CLOCK_CORECLOCK/(resolution*frequency));
             /* Reset timer on MR3 */
             PWM_1_DEV->MCR = BIT10;
 

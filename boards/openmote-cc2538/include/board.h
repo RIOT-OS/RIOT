@@ -29,11 +29,6 @@
 #endif
 
 /**
- * @name The nominal CPU core clock in this board
- */
-#define F_CPU               (32000000UL)
-
-/**
  * @name LED pin definitions
  * @{
  */

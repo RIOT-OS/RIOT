@@ -31,11 +31,6 @@ extern "C" {
 #endif
 
 /**
- * Define the nominal CPU core clock in this board
- */
-#define F_CPU               (CLOCK_CORECLOCK)
-
-/**
  * Assign the hardware timer
  */
 #define XTIMER              TIMER_1

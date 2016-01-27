@@ -258,7 +258,7 @@ void i2c_set_baud_rate(uint8_t i2c_interface, uint32_t baud_rate)
 {
     uint32_t pclksel = 0;
     uint32_t prescale = 0;
-    lpc2387_pclk_scale(F_CPU, baud_rate, &pclksel, &prescale);
+    lpc2387_pclk_scale(CLOCK_CORECLOCK, baud_rate, &pclksel, &prescale);
 
     switch (i2c_interface) {
         case I2C0:

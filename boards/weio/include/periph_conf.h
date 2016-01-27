@@ -25,6 +25,13 @@ extern "C" {
 #endif
 
 /**
+ * @brief Clock configuration
+ * @{
+ */
+#define CLOCK_CORECLOCK     (48000000U)
+/** @} */
+
+/**
  * @brief Timer configuration
  * @{
  */
