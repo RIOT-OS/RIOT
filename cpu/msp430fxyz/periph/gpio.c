@@ -33,17 +33,9 @@
 #define PINS_PER_PORT       (8U)
 
 /**
- * @brief   Datatype to use for saving the interrupt contexts
- */
-typedef struct {
-    gpio_cb_t cb;       /**< callback to call on GPIO interrupt */
-    void *arg;          /**< argument passed to the callback */
-} isr_ctx_t;
-
-/**
  * @brief   Interrupt context for each interrupt line
  */
-static isr_ctx_t isr_ctx[ISR_NUMOF];
+static gpio_isr_ctx_t isr_ctx[ISR_NUMOF];
 
 
 static msp_port_t *_port(gpio_t pin)
