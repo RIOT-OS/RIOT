@@ -1,8 +1,8 @@
 microcoap server example
 ========================
 
-This application is meant to get you started with impementing a CoAP server on RIOT.
-It uses the gnrc network stack through RIOT's conn socket API.
+This application is meant to get you started with implementing a CoAP server on RIOT.
+It uses the GNRC network stack through RIOT's conn socket API.
 
 Usage
 =====
@@ -58,11 +58,59 @@ Waiting for incoming UDP packet...
 The link-layer address in this case is "fe80::f8bf:2bff:fe01:9ea3", the only
 "scope: local" address set.
 
-Connect using libcoap CLI
-=========================
+Testing
+=======
+There are multiple external CoAP clients you can use to test the server on native.
+
+libcoap CLI
+-----------
 
 (replace "fe80::f8bf:2bff:fe01:9ea3" with your link-layer address)
 
 ```
-# coap-client coap://[fe80::f8bf:2bff:fe01:9ea3%tap0]/riot/board
+# coap-client "coap://[fe80::f8bf:2bff:fe01:9ea3%tap0]/riot/board"
 ```
+
+Copper (Firefox Plugin)
+-----------------------
+
+The Copper plugin for Firefox provides you with a nice graphical interface, but
+getting it to work with RIOT requires a little setup.
+
+Make sure you've installed
+
+- The [Firefox Copper plugin](https://addons.mozilla.org/en-US/firefox/addon/copper-270430/)
+- The Router Advertisement Daemon (radvd) 
+
+Enter the following into your `/etc/radvd.conf` (if it doesn't exist yet, create one):
+
+```
+interface tap0
+{
+        AdvSendAdvert on;
+        MinRtrAdvInterval 3;
+        MaxRtrAdvInterval 10;
+        prefix fc00::/64
+        {
+                AdvOnLink on;
+                AdvAutonomous on;
+                AdvRouterAddr off;
+        };
+};
+```
+
+(you can use `radvd -c` to check for syntax errors)
+
+and run
+
+```
+/bin/systemctl start radvd.service
+```
+
+Now you can enter
+
+```
+coap://[fc00::1]/riot/board
+```
+
+into your Firefox address bar.
