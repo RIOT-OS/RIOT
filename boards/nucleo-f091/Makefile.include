@@ -12,5 +12,5 @@ include $(RIOTBOARD)/Makefile.include.serial
 # this board uses openocd
 include $(RIOTBOARD)/Makefile.include.openocd
 
-# include cortex defaults
-include $(RIOTBOARD)/Makefile.include.cortexm_common
+# export board specific includes to the global includes-listing
+export INCLUDES += -I$(RIOTBOARD)/$(BOARD)/include

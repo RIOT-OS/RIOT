@@ -19,5 +19,5 @@ export OFLAGS = -O binary
 export FFLAGS = write bin/$(BOARD)/$(APPLICATION).hex 0x8000000
 export DEBUGGER_FLAGS = $(RIOTBOARD)/$(BOARD)/dist/gdb.conf $(BINDIR)/$(APPLICATION).elf
 
-# include cortex defaults
-include $(RIOTBOARD)/Makefile.include.cortexm_common
+# export board specific includes to the global includes-listing
+export INCLUDES += -I$(RIOTBOARD)/$(BOARD)/include

@@ -23,5 +23,5 @@ export FFLAGS = -R -e -w -v -b bin/$(BOARD)/$(APPLICATION).hex
 # setup serial terminal
 include $(RIOTBOARD)/Makefile.include.serial
 
-# include cortex defaults
-include $(RIOTBOARD)/Makefile.include.cortexm_common
+# export board specific includes to the global includes-listing
+export INCLUDES += -I$(RIOTBOARD)/$(BOARD)/include

@@ -29,5 +29,5 @@ export RESET_FLAGS = $(BINDIR)
 
 export OBJDUMPFLAGS += --disassemble --source --disassembler-options=force-thumb
 
-# include cortex defaults
-include $(RIOTBOARD)/Makefile.include.cortexm_common
+# export board specific includes to the global includes-listing
+export INCLUDES += -I$(RIOTBOARD)/$(BOARD)/include
