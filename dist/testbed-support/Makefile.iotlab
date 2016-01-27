@@ -1,4 +1,4 @@
-.PHONY: iotlab-auth iotlab-exp iotlab-flash iotlab-reset iotlab-term check-exp
+.PHONY: iotlab-auth iotlab-exp iotlab-flash iotlab-reset iotlab-term iotlab-check-exp
 
 IOTLAB_NODES        ?= 5
 IOTLAB_DURATION     ?= 30
@@ -49,18 +49,18 @@ iotlab-exp: $(IOTLAB_AUTH) all
 	$(eval NEW_ID := $(shell experiment-cli submit -d $(IOTLAB_DURATION) $(NODES_PARAM) -n $(IOTLAB_EXP_NAME) | grep -Eo '[[:digit:]]+'))
 	$(AD)experiment-cli wait -i $(NEW_ID)
 
-iotlab-flash: $(IOTLAB_AUTH) check-exp all
+iotlab-flash: $(IOTLAB_AUTH) iotlab-check-exp all
 	$(AD)node-cli --update $(BINARY) -i $(IOTLAB_EXP_ID) $(NODES_PARAM_BASE) $(EXCLUDE_PARAM)
 
-iotlab-reset: $(IOTLAB_AUTH) check-exp
+iotlab-reset: $(IOTLAB_AUTH) iotlab-check-exp
 	$(AD)node-cli --reset -i $(IOTLAB_EXP_ID) $(NODES_PARAM_BASE) $(EXCLUDE_PARAM)
 
-iotlab-debug-server: $(IOTLAB_AUTH) check-exp
+iotlab-debug-server: $(IOTLAB_AUTH) iotlab-check-exp
 	$(AD)node-cli --debug-start -i $(IOTLAB_EXP_ID)
 	@echo "Debug on node $(IOTLAB_DEBUG_NODE)"
 	$(AD)ssh -N -L $(IOTLAB_DEBUG_PORT):$(IOTLAB_DEBUG_NODE):3333 $(IOTLAB_AUTHORITY)
 
-iotlab-term: check-exp
+iotlab-term: iotlab-check-exp
 	$(AD)ssh -t $(IOTLAB_AUTHORITY) "test -f ~/.iotlabrc || auth-cli -u $(IOTLAB_USER)"
 
     ifndef NODES_PARAM
@@ -69,7 +69,7 @@ iotlab-term: check-exp
 	    $(AD)ssh -t $(IOTLAB_AUTHORITY) "serial_aggregator $(NODES_PARAM_BASE)"
     endif
 
-check-exp:
+iotlab-check-exp:
 ifndef IOTLAB_SITE
 	$(eval IOTLAB_HOST         := $(shell experiment-cli get -ri -i $(IOTLAB_EXP_ID) | sed -n 4p | cut -d\" -f2))
 else
