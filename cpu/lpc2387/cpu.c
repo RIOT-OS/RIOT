@@ -92,7 +92,7 @@ __attribute__((naked,noreturn)) void arm_reset(void)
     WDMOD = 0x03;
     WDFEED= 0xAA;
     WDFEED= 0x55;
-    while(1);
+    while(1) {}
 }
 
 /** @} */

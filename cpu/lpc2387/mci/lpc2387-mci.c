@@ -555,9 +555,10 @@ DSTATUS MCI_initialize(void)
         /* The card can work at vdd range of 2.7-3.6V */
         DEBUG("SDC Ver. 2\n");
 
-        do {                                    /* Wait while card is busy state (use ACMD41 with HCS bit) */
+        do {
+            /* Wait while card is busy state (use ACMD41 with HCS bit) */
             /* This loop will take a time. Insert wai_tsk(1) here for multitask envilonment. */
-            if (xtimer_now() > start + 1000000/*!Timer[0]*/) {
+            if (xtimer_now() > start + 1000000/* !Timer[0] */) {
                 DEBUG("%s, %d: Timeout #1\n", RIOT_FILE_RELATIVE, __LINE__);
                 goto di_fail;
             }
@@ -578,11 +579,12 @@ DSTATUS MCI_initialize(void)
             cmd = CMD1;         /* ACMD41 is rejected -> MMC */
         }
 
-        do {                                    /* Wait while card is busy state (use ACMD41 or CMD1) */
+        do {
+            /* Wait while card is busy state (use ACMD41 or CMD1) */
             DEBUG("%s, %d: %lX\n", RIOT_FILE_RELATIVE, __LINE__, resp[0]);
 
             /* This loop will take a time. Insert wai_tsk(1) here for multitask envilonment. */
-            if (xtimer_now() > start + 1000000/*!Timer[0]*/) {
+            if (xtimer_now() > start + 1000000/* !Timer[0] */) {
                 DEBUG("now: %lu, started at: %lu\n", xtimer_now(), start);
                 DEBUG("%s, %d: Timeout #2\n", RIOT_FILE_RELATIVE, __LINE__);
                 goto di_fail;
@@ -745,8 +747,7 @@ DRESULT MCI_read(unsigned char *buff, unsigned long sector, unsigned char count)
             }
 
             buff += 512; /* Next user buffer address */
-        }
-        while (--count);
+        } while (--count);
 
         if (cmd == CMD18) { /* Terminate to read (MB) */
             send_cmd(CMD12, 0, 1, &resp);
@@ -846,10 +847,10 @@ DRESULT MCI_write(const unsigned char *buff, unsigned long sector, unsigned char
         }
 
         count--;
-        buff += 512;                        /* Next user buffer address */
+        buff += 512;             /* Next user buffer address */
     }
 
-    while (!(XferStat & 0xC));                  /* Wait for all blocks sent (block underrun) */
+    while (!(XferStat & 0xC)) {} /* Wait for all blocks sent (block underrun) */
 
     if (XferStat & 0x8) {
         count = 1;    /* Abort if any MCI error has occured */
@@ -996,7 +997,7 @@ DRESULT MCI_ioctl(
 
                     if (send_cmd(ACMD13, 0, 1, resp)    /* Start to read */
                        && !(resp[0] & 0xC0580000)) {
-                        while ((XferWp == 0) && !(XferStat & 0xC));
+                        while ((XferWp == 0) && !(XferStat & 0xC)) {}
 
                         if (!(XferStat & 0xC)) {
                             Copy_al2un((unsigned char *)buff, DmaBuff[0], 64);
