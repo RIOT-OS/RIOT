@@ -21,7 +21,7 @@
  * @}
  */
 
-#include "stm32f10x.h"
+#include "cpu.h"
 #include "mutex.h"
 #include "periph/gpio.h"
 #include "periph/spi.h"
