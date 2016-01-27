@@ -37,4 +37,4 @@ welcome:
 	@echo "Or ask questions on our mailing list:"
 	@echo "    users@riot-os.org (http://lists.riot-os.org/mailman/listinfo/users)"
 
--include Makefile.tests
+-include makefiles/tests.inc.mk
