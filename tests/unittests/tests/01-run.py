@@ -13,7 +13,8 @@ DEFAULT_TIMEOUT = 5
 
 def main():
     env = os.environ.copy()
-    child = spawn("make term", env=env, timeout=DEFAULT_TIMEOUT)
+    child = spawn("make term", env=env, timeout=DEFAULT_TIMEOUT,
+                  encoding="utf-8")
     child.logfile = sys.stdout
 
     try:
@@ -23,7 +24,7 @@ def main():
         # make reset yields error on some boards even if successful
         pass
     try:
-        child.expect(r"OK \([0-9]+ tests\)")
+        child.expect(u"OK \\([0-9]+ tests\\)")
     except TIMEOUT:
         print("There where errors in the unittests")
         return 1
