@@ -37,8 +37,8 @@
 //
 //*****************************************************************************
 
-#ifndef __I2C_H__
-#define __I2C_H__
+#ifndef I2C_H
+#define I2C_H
 
 //*****************************************************************************
 //
@@ -221,4 +221,4 @@ extern unsigned long I2CSlaveStatus(unsigned long ulBase);
 }
 #endif
 
-#endif // __I2C_H__
+#endif // I2C_H

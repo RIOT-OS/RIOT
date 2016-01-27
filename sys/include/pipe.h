@@ -32,8 +32,8 @@
  * @author      René Kijewski <rene.kijewski@fu-berlin.de>
  */
 
-#ifndef __PIPE__H
-#define __PIPE__H
+#ifndef PIPE__H
+#define PIPE__H
 
 #include <sys/types.h>
 

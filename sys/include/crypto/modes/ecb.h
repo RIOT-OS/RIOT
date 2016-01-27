@@ -17,8 +17,8 @@
  * @author      Nico von Geyso <nico.geyso@fu-berlin.de>
  */
 
-#ifndef __CRYPTO_MODES_ECB_H_
-#define __CRYPTO_MODES_ECB_H_
+#ifndef CRYPTO_MODES_ECB_H
+#define CRYPTO_MODES_ECB_H
 
 #include "kernel.h"
 #include "crypto/ciphers.h"
@@ -60,4 +60,4 @@ int cipher_decrypt_ecb(cipher_t* cipher, uint8_t* input, size_t length,
 }
 #endif
 
-#endif /* __CRYPTO_MODES_ECB_H_*/
+#endif /* CRYPTO_MODES_ECB_H*/

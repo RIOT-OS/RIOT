@@ -37,8 +37,8 @@
 //
 //*****************************************************************************
 
-#ifndef __PIN_MAP_H__
-#define __PIN_MAP_H__
+#ifndef PIN_MAP_H
+#define PIN_MAP_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -454,4 +454,4 @@ extern "C" {
 }
 #endif
 
-#endif // __PIN_MAP_H__
+#endif // PIN_MAP_H

@@ -23,8 +23,8 @@
  * @author      Freie Universität Berlin, Computer Systems & Telematics, FeuerWhere project
  */
 
-#ifndef MSB_BOARD_H_
-#define MSB_BOARD_H_
+#ifndef MSB_BOARD_H
+#define MSB_BOARD_H
 
 #include "board-conf.h"
 
@@ -33,8 +33,8 @@ extern "C" {
 #endif
 
 /*  for correct inclusion of <msp430.h> */
-#ifndef __MSP430F1612__
-#define __MSP430F1612__
+#ifndef MSP430F1612
+#define MSP430F1612
 #endif
 
 /**

@@ -27,8 +27,8 @@
  * ----------------------------------------------------------------------------
  */
 
-#ifndef _SAM3X8E_
-#define _SAM3X8E_
+#ifndef SAM3X8E
+#define SAM3X8E
 
 /** \addtogroup cpu_sam3x8e_definitions SAM3X8E definitions
   This file defines all structures and symbols for SAM3X8E:
@@ -43,7 +43,7 @@
  extern "C" {
 #endif
 
-#if !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
+#if !(defined(ASSEMBLY) || defined(IAR_SYSTEMS_ASM))
 #include <stdint.h>
 #ifndef __cplusplus
 typedef volatile const uint32_t RoReg; /**< Read only 32-bit register (volatile const unsigned int) */
@@ -248,10 +248,10 @@ void WDT_Handler        ( void );
  * \brief Configuration of the Cortex-M3 Processor and Core Peripherals
  */
 
-#define __CM3_REV              0x0200 /**< SAM3X8E core revision number ([15:8] revision number, [7:0] patch number) */
-#define __MPU_PRESENT          1      /**< SAM3X8E does provide a MPU */
-#define __NVIC_PRIO_BITS       4      /**< SAM3X8E uses 4 Bits for the Priority Levels */
-#define __Vendor_SysTickConfig 0      /**< Set to 1 if different SysTick Config is used */
+#define CM3_REV              0x0200 /**< SAM3X8E core revision number ([15:8] revision number, [7:0] patch number) */
+#define MPU_PRESENT          1      /**< SAM3X8E does provide a MPU */
+#define NVIC_PRIO_BITS       4      /**< SAM3X8E uses 4 Bits for the Priority Levels */
+#define Vendor_SysTickConfig 0      /**< Set to 1 if different SysTick Config is used */
 
 /*
  * \brief CMSIS includes
@@ -579,4 +579,4 @@ void WDT_Handler        ( void );
 
 /*@}*/
 
-#endif /* _SAM3X8E_ */
+#endif /* SAM3X8E */

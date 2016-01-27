@@ -44,8 +44,8 @@
  * Support and FAQ: visit <a href="http://www.atmel.com/design-support/">Atmel Support</a>
  */
 
-#ifndef _SAML21E17A_
-#define _SAML21E17A_
+#ifndef SAML21E17A
+#define SAML21E17A
 
 /**
  * \ingroup SAML21_definitions
@@ -62,7 +62,7 @@
  extern "C" {
 #endif
 
-#if !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
+#if !(defined(ASSEMBLY) || defined(IAR_SYSTEMS_ASM))
 #include <stdint.h>
 #ifndef __cplusplus
 typedef volatile const uint32_t RoReg;   /**< Read only 32-bit register (volatile const unsigned int) */
@@ -577,7 +577,7 @@ void PICOP_Handler               ( void );
 #define WDT_INST_NUM      1                          /**< \brief (WDT) Number of instances */
 #define WDT_INSTS         { WDT }                    /**< \brief (WDT) Instances List */
 
-#endif /* (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
+#endif /* (defined(ASSEMBLY) || defined(IAR_SYSTEMS_ASM)) */
 /*@}*/
 
 /* ************************************************************************** */

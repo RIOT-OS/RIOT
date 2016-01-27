@@ -37,8 +37,8 @@
 //
 //*****************************************************************************
 
-#ifndef __UART_H__
-#define __UART_H__
+#ifndef UART_H
+#define UART_H
 
 //*****************************************************************************
 //
@@ -272,4 +272,4 @@ extern void UART9BitAddrSend(unsigned long ulBase, unsigned char ucAddr);
 }
 #endif
 
-#endif //  __UART_H__
+#endif //  UART_H

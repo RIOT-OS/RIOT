@@ -14,8 +14,8 @@
  * @note    Do not include this header file directly, but pthread.h.
  */
 
-#ifndef __SYS__POSIX__PTHREAD_MUTEX__H
-#define __SYS__POSIX__PTHREAD_MUTEX__H
+#ifndef SYS__POSIX__PTHREAD_MUTEX__H
+#define SYS__POSIX__PTHREAD_MUTEX__H
 
 #include <time.h>
 

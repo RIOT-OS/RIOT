@@ -32,8 +32,8 @@
  *
  * $Id: Test.h,v 1.4 2004/02/10 16:19:29 arms22 Exp $
  */
-#ifndef __TEST_H__
-#define __TEST_H__
+#ifndef TEST_H
+#define TEST_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -70,4 +70,4 @@ struct __Test {
 }
 #endif
 
-#endif/*__TEST_H__*/
+#endif/*TEST_H*/

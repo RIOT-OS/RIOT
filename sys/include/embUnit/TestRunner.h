@@ -32,10 +32,10 @@
  *
  * $Id: TestRunner.h,v 1.6 2004/02/10 16:19:29 arms22 Exp $
  */
-#ifndef __TESTRUNNER_H__
-#define __TESTRUNNER_H__
+#ifndef TESTRUNNER_H
+#define TESTRUNNER_H
 
-#ifdef  __cplusplus
+#ifdef  _cplusplus
 extern "C" {
 #endif
 
@@ -49,4 +49,4 @@ extern int TestRunnerHadErrors;
 }
 #endif
 
-#endif/*__TESTRUNNER_H__*/
+#endif/*TESTRUNNER_H*/

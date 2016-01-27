@@ -17,8 +17,8 @@
  * @author      Nico von Geyso <nico.geyso@fu-berlin.de>
  */
 
-#ifndef __CRYPTO_MODES_CTR_H_
-#define __CRYPTO_MODES_CTR_H_
+#ifndef CRYPTO_MODES_CTR_H
+#define CRYPTO_MODES_CTR_H
 
 #include "kernel.h"
 #include "crypto/ciphers.h"
@@ -71,4 +71,4 @@ int cipher_decrypt_ctr(cipher_t* cipher, uint8_t nonce_counter[16],
 }
 #endif
 
-#endif /* __CRYPTO_MODES_CTR_H_*/
+#endif /* CRYPTO_MODES_CTR_H*/

@@ -37,8 +37,8 @@
 //
 //*****************************************************************************
 
-#ifndef __HW_NVIC_H__
-#define __HW_NVIC_H__
+#ifndef HW_NVIC_H
+#define HW_NVIC_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -1718,8 +1718,8 @@ extern "C" {
                                             // (RM) mode
 #define NVIC_FPDSC_RMODE_RZ     0x00C00000  // Round towards Zero (RZ) mode
 
-#ifdef __cplusplus
+#ifdef cplusplus
 }
 #endif
 
-#endif // __HW_NVIC_H__
+#endif // HW_NVIC_H

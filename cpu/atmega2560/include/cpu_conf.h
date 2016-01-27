@@ -16,8 +16,8 @@
  * @author          Hinnerk van Bruinehsen <h.v.bruinehsen@fu-berlin.de>
  */
 
-#ifndef __CPU_CONF_H
-#define __CPU_CONF_H
+#ifndef CPU_CONF_H
+#define CPU_CONF_H
 
 
 #ifdef __cplusplus
@@ -44,5 +44,5 @@ extern "C" {
 }
 #endif
 
-#endif /* __CPU_CONF_H */
+#endif /* CPU_CONF_H */
 /** @} */

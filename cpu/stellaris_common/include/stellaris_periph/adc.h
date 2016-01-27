@@ -37,8 +37,8 @@
 //
 //*****************************************************************************
 
-#ifndef __ADC_H__
-#define __ADC_H__
+#ifndef ADC_H
+#define ADC_H
 
 //*****************************************************************************
 //
@@ -308,4 +308,4 @@ extern unsigned long ADCPhaseDelayGet(unsigned long ulBase);
 }
 #endif
 
-#endif // __ADC_H__
+#endif // ADC_H

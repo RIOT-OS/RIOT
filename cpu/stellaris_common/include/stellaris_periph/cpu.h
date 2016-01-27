@@ -37,8 +37,8 @@
 //
 //*****************************************************************************
 
-#ifndef __CPU_H__
-#define __CPU_H__
+#ifndef CPU_H
+#define CPU_H
 
 //*****************************************************************************
 //
@@ -72,4 +72,4 @@ extern void CPUbasepriSet(unsigned long ulNewBasepri);
 }
 #endif
 
-#endif // __CPU_H__
+#endif // CPU_H

@@ -32,8 +32,8 @@
  *
  * $Id: TestCase.h,v 1.7 2004/02/10 16:19:29 arms22 Exp $
  */
-#ifndef __TESTCASE_H__
-#define __TESTCASE_H__
+#ifndef TESTCASE_H
+#define TESTCASE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -65,4 +65,4 @@ extern const TestImplement TestCaseImplement;
 }
 #endif
 
-#endif/*__TESTCASE_H__*/
+#endif/*TESTCASE_H*/

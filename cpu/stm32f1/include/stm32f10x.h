@@ -47,8 +47,8 @@
   * @{
   */
 
-#ifndef __STM32F10x_H
-#define __STM32F10x_H
+#ifndef STM32F10x_H
+#define STM32F10x_H
 
 #ifdef __cplusplus
  extern "C" {
@@ -134,14 +134,14 @@
 /**
  * @brief STM32F10x Standard Peripheral Library version number
    */
-#define __STM32F10X_STDPERIPH_VERSION_MAIN   (0x03) /*!< [31:24] main version */
-#define __STM32F10X_STDPERIPH_VERSION_SUB1   (0x05) /*!< [23:16] sub1 version */
-#define __STM32F10X_STDPERIPH_VERSION_SUB2   (0x00) /*!< [15:8]  sub2 version */
-#define __STM32F10X_STDPERIPH_VERSION_RC     (0x00) /*!< [7:0]  release candidate */
-#define __STM32F10X_STDPERIPH_VERSION       ( (__STM32F10X_STDPERIPH_VERSION_MAIN << 24)\
-                                             |(__STM32F10X_STDPERIPH_VERSION_SUB1 << 16)\
-                                             |(__STM32F10X_STDPERIPH_VERSION_SUB2 << 8)\
-                                             |(__STM32F10X_STDPERIPH_VERSION_RC))
+#define STM32F10X_STDPERIPH_VERSION_MAIN   (0x03) /*!< [31:24] main version */
+#define STM32F10X_STDPERIPH_VERSION_SUB1   (0x05) /*!< [23:16] sub1 version */
+#define STM32F10X_STDPERIPH_VERSION_SUB2   (0x00) /*!< [15:8]  sub2 version */
+#define STM32F10X_STDPERIPH_VERSION_RC     (0x00) /*!< [7:0]  release candidate */
+#define STM32F10X_STDPERIPH_VERSION       ( (STM32F10X_STDPERIPH_VERSION_MAIN << 24)\
+                                             |(STM32F10X_STDPERIPH_VERSION_SUB1 << 16)\
+                                             |(STM32F10X_STDPERIPH_VERSION_SUB2 << 8)\
+                                             |(STM32F10X_STDPERIPH_VERSION_RC))
 
 /**
   * @}
@@ -155,12 +155,12 @@
  * @brief Configuration of the Cortex-M3 Processor and Core Peripherals
  */
 #ifdef STM32F10X_XL
- #define __MPU_PRESENT             1 /*!< STM32 XL-density devices provide an MPU */
+ #define MPU_PRESENT             1 /*!< STM32 XL-density devices provide an MPU */
 #else
- #define __MPU_PRESENT             0 /*!< Other STM32 devices does not provide an MPU */
+ #define MPU_PRESENT             0 /*!< Other STM32 devices does not provide an MPU */
 #endif /* STM32F10X_XL */
-#define __NVIC_PRIO_BITS          4 /*!< STM32 uses 4 Bits for the Priority Levels    */
-#define __Vendor_SysTickConfig    0 /*!< Set to 1 if different SysTick Config is used */
+#define NVIC_PRIO_BITS          4 /*!< STM32 uses 4 Bits for the Priority Levels    */
+#define Vendor_SysTickConfig    0 /*!< Set to 1 if different SysTick Config is used */
 
 /**
  * @brief STM32F10x Interrupt Number Definition, according to the selected device
@@ -8287,7 +8287,7 @@ extern "C" {
 }
 #endif
 
-#endif /* __STM32F10x_H */
+#endif /* STM32F10x_H */
 
 /**
   * @}

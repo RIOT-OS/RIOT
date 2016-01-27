@@ -16,8 +16,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef __X86__PCI_INIT__H
-#define __X86__PCI_INIT__H
+#ifndef X86__PCI_INIT__H
+#define X86__PCI_INIT__H
 
 #ifdef __cplusplus
 extern "C" {
