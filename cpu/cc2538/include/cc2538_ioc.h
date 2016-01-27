@@ -7,23 +7,21 @@
  */
 
 /**
+ * @defgroup        cpu_cc2538_ioc CC2538 I/O Control
+ * @ingroup         cpu_cc2538_regs
  * @{
  *
  * @file
  * @brief           CC2538 I/O Control driver
  *
+ * Header file with declarations for the I/O Control module
+ *
  * @author          Ian Martin <ian@locicontrols.com>
  *
- * @addtogroup cpu_cc2538
- * @{
- *
- * @defgroup cc2538-ioc CC2538 I/O Control
- *
- * Header file with declarations for the I/O Control module
- * @{
  */
-#ifndef IOC_H_
-#define IOC_H_
+
+#ifndef CC2538_IOC_H_
+#define CC2538_IOC_H_
 
 #include <stdint.h>
 
@@ -33,8 +31,13 @@
 extern "C" {
 #endif
 
+/**
+ * @name Port control register addresses
+ * @{
+ */
 #define IOC_PXX_SEL  ( (cc2538_reg_t*)0x400d4000 )
 #define IOC_PXX_OVER ( (cc2538_reg_t*)0x400d4080 )
+/** @} */
 
 /** @name Peripheral Signal Select Values (for IOC_Pxx_SEL registers)
  * @{
@@ -64,7 +67,8 @@ enum {
 };
 /** @} */
 
-/** @name Values for IOC_PXX_OVER
+/**
+ * @name Values for IOC_PXX_OVER
  * @{
  */
 #define IOC_OVERRIDE_OE   0x00000008    /**< Output Enable */
@@ -78,8 +82,5 @@ enum {
 } /* end extern "C" */
 #endif
 
-#endif /* IOC_H_ */
-
-/** @} */
-/** @} */
+#endif /* CC2538_IOC_H_ */
 /** @} */

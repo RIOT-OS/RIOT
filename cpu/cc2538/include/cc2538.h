@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup         cpu_cc2538_definitions
+ * @ingroup         cpu_cc2538_regs
  * @{
  *
  * @file

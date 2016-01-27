@@ -7,7 +7,8 @@
  */
 
 /**
- * @addtogroup      cpu_cc2538
+ * @defgroup        cpu_cc2538_uart CC2538 UART
+ * @ingroup         cpu_cc2538_regs
  * @{
  *
  * @file
@@ -31,6 +32,9 @@ extern "C" {
 typedef struct {
     cc2538_reg_t DR;                      /**< UART Data Register */
 
+    /**
+     * @brief Status register
+     */
     union {
         cc2538_reg_t RSR;                 /**< UART receive status and error clear */
         cc2538_reg_t ECR;                 /**< UART receive status and error clear */
@@ -38,6 +42,9 @@ typedef struct {
 
     cc2538_reg_t RESERVED1[4];            /**< Reserved addresses */
 
+    /**
+     * @brief Flag register
+     */
     union {
         cc2538_reg_t FR;                  /**< UART Flag Register */
         struct {
@@ -57,6 +64,9 @@ typedef struct {
     cc2538_reg_t IBRD;                    /**< UART Integer Baud-Rate Divisor */
     cc2538_reg_t FBRD;                    /**< UART Fractional Baud-Rate Divisor */
 
+    /**
+     * @brief Line control register
+     */
     union {
         cc2538_reg_t LCRH;                /**< UART Line Control Register */
         struct {
@@ -71,6 +81,9 @@ typedef struct {
         } LCRHbits;
     } cc2538_uart_lcrh;
 
+    /**
+     * @brief Control register
+     */
     union {
         cc2538_reg_t CTL;                 /**< UART Control */
         struct {
@@ -91,6 +104,9 @@ typedef struct {
         } CTLbits;
     } cc2538_uart_ctl;
 
+    /**
+     * @brief Interrupt FIFO level select register
+     */
     union {
         cc2538_reg_t IFLS;                /**< UART interrupt FIFO Level Select */
         struct {
@@ -100,6 +116,9 @@ typedef struct {
         } IFLSbits;
     } cc2538_uart_ifls;
 
+    /**
+     * @brief Interrupt mask register
+     */
     union {
         cc2538_reg_t IM;                  /**< UART Interrupt Mask */
         struct {
@@ -122,6 +141,9 @@ typedef struct {
 
     cc2538_reg_t RIS;                     /**< UART Raw Interrupt Status */
 
+    /**
+     * @brief Masked interrupt status register
+     */
     union {
         cc2538_reg_t MIS;                 /**< UART Masked Interrupt Status */
         struct {

@@ -7,6 +7,8 @@
  */
 
 /**
+ * @defgroup        cpu_cc2538_rfcore CC2538 RF core interface
+ * @ingroup         cpu_cc2538_regs
  * @{
  *
  * @file
@@ -14,11 +16,6 @@
  *
  * @author          Ian Martin <ian@locicontrols.com>
  *
- * @addtogroup cpu_cc2538
- * @{
- *
- * @defgroup cc2538-rfcore CC2538 RF core interface
- * @{
  */
 
 #ifndef CC2538_RFCORE_H
@@ -83,6 +80,9 @@ typedef struct {
     cc2538_reg_t XREG_CCACTRL1;           /**< RF Other CCA Options */
     cc2538_reg_t XREG_RSSI;               /**< RF RSSI status register */
 
+    /**
+     * @brief RSSI status register
+     */
     union {
         cc2538_reg_t XREG_RSSISTAT;       /**< RF RSSI valid status register */
         struct {
@@ -105,6 +105,9 @@ typedef struct {
     cc2538_reg_t XREG_RFERRM;             /**< RF error interrupt mask */
     cc2538_reg_t RESERVED3;               /**< Reserved bytes */
 
+    /**
+     * @brief RF random data register
+     */
     union {
         cc2538_reg_t XREG_RFRND;          /**< RF Random data */
         struct {
