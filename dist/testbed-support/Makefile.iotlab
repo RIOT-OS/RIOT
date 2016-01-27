@@ -29,8 +29,6 @@ ifdef IOTLAB_EXCLUDE_NODES
     EXCLUDE_PARAM := "-e$(IOTLAB_SITE),$(firstword $(subst :, ,$(IOTLAB_TYPE))),$(IOTLAB_EXCLUDE_NODES)"
 endif
 
-.PHONY: iotlab-exp iotlab-flash iotlab-reset iotlab-debug-server iotlab-term
-
 $(IOTLAB_AUTH):
 	auth-cli -u $(IOTLAB_USER)
 
