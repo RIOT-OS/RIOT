@@ -1,4 +1,4 @@
-.PHONY: iotlab-auth iotlab-exp iotlab-flash iotlab-reset iotlab-term
+.PHONY: iotlab-auth iotlab-exp iotlab-flash iotlab-reset iotlab-term check-exp
 
 IOTLAB_NODES        ?= 5
 IOTLAB_DURATION     ?= 30
@@ -12,7 +12,6 @@ IOTLAB_DEBUG_PORT   ?= 3333
 IOTLAB_DEBUG_NODE   ?= $(shell experiment-cli get -i $(IOTLAB_EXP_ID) --resources | \
                          grep -m 1 "network_address" | sed 's/.*: "\(.*\)".*/\1/')
 
-IOTLAB_HOST         = $(shell experiment-cli get -ri -i $(IOTLAB_EXP_ID) | sed -n 4p | cut -d\" -f2)
 IOTLAB_AUTHORITY    = "$(IOTLAB_USER)@$(IOTLAB_HOST).iot-lab.info"
 
 ifneq (,$(findstring m3,$(IOTLAB_TYPE)))
@@ -22,7 +21,8 @@ else
 endif
 
 ifdef IOTLAB_PHY_NODES
-    NODES_PARAM := "-l$(IOTLAB_SITE),$(firstword $(subst :, ,$(IOTLAB_TYPE))),$(IOTLAB_PHY_NODES),$(BINARY),$(IOTLAB_PROFILE)"
+    NODES_PARAM_BASE = -l$(IOTLAB_SITE),$(firstword $(subst :, ,$(IOTLAB_TYPE))),$(IOTLAB_PHY_NODES)
+    NODES_PARAM = "$(NODES_PARAM_BASE),$(BINARY),$(IOTLAB_PROFILE)"
 endif
 
 ifdef IOTLAB_EXCLUDE_NODES
@@ -49,17 +49,29 @@ iotlab-exp: $(IOTLAB_AUTH) all
 	$(eval NEW_ID := $(shell experiment-cli submit -d $(IOTLAB_DURATION) $(NODES_PARAM) -n $(IOTLAB_EXP_NAME) | grep -Eo '[[:digit:]]+'))
 	$(AD)experiment-cli wait -i $(NEW_ID)
 
-iotlab-flash: $(IOTLAB_AUTH) all
-	$(AD)node-cli --update $(BINARY) -i $(IOTLAB_EXP_ID) $(NODES_PARAM) $(EXCLUDE_PARAM)
+iotlab-flash: $(IOTLAB_AUTH) check-exp all
+	$(AD)node-cli --update $(BINARY) -i $(IOTLAB_EXP_ID) $(NODES_PARAM_BASE) $(EXCLUDE_PARAM)
 
-iotlab-reset: $(IOTLAB_AUTH)
-	$(AD)node-cli --reset -i $(IOTLAB_EXP_ID) $(NODES_PARAM) $(EXCLUDE_PARAM)
+iotlab-reset: $(IOTLAB_AUTH) check-exp
+	$(AD)node-cli --reset -i $(IOTLAB_EXP_ID) $(NODES_PARAM_BASE) $(EXCLUDE_PARAM)
 
-iotlab-debug-server: $(IOTLAB_AUTH)
+iotlab-debug-server: $(IOTLAB_AUTH) check-exp
 	$(AD)node-cli --debug-start -i $(IOTLAB_EXP_ID)
 	@echo "Debug on node $(IOTLAB_DEBUG_NODE)"
 	$(AD)ssh -N -L $(IOTLAB_DEBUG_PORT):$(IOTLAB_DEBUG_NODE):3333 $(IOTLAB_AUTHORITY)
 
-iotlab-term:
+iotlab-term: check-exp
 	$(AD)ssh -t $(IOTLAB_AUTHORITY) "test -f ~/.iotlabrc || auth-cli -u $(IOTLAB_USER)"
-	$(AD)ssh -t $(IOTLAB_AUTHORITY) "serial_aggregator -i $(IOTLAB_EXP_ID)"
+
+    ifndef NODES_PARAM
+	    $(AD)ssh -t $(IOTLAB_AUTHORITY) "serial_aggregator -i $(IOTLAB_EXP_ID)"
+    else
+	    $(AD)ssh -t $(IOTLAB_AUTHORITY) "serial_aggregator $(NODES_PARAM_BASE)"
+    endif
+
+check-exp:
+ifndef IOTLAB_SITE
+	$(eval IOTLAB_HOST         := $(shell experiment-cli get -ri -i $(IOTLAB_EXP_ID) | sed -n 4p | cut -d\" -f2))
+else
+	$(eval IOTLAB_HOST         := $(IOTLAB_SITE))
+endif
