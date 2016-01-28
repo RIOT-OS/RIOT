@@ -58,6 +58,9 @@ iotlab-debug-server: $(IOTLAB_AUTH) iotlab-check-exp
 	@echo "Debug on node $(IOTLAB_DEBUG_NODE)"
 	$(AD)ssh -N -L $(IOTLAB_DEBUG_PORT):$(IOTLAB_DEBUG_NODE):3333 $(IOTLAB_AUTHORITY)
 
+iotlab-stop: $(IOTLAB_AUTH) iotlab-check-exp
+	$(AD)experiment-cli stop -i $(IOTLAB_EXP_ID)
+
 iotlab-term: iotlab-check-exp
 	$(AD)ssh -t $(IOTLAB_AUTHORITY) "test -f ~/.iotlabrc || auth-cli -u $(IOTLAB_USER)"
 
