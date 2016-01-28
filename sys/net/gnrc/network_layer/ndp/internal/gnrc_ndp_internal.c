@@ -349,21 +349,29 @@ void gnrc_ndp_internal_send_rtr_sol(kernel_pid_t iface, ipv6_addr_t *dst)
 }
 
 #if (defined(MODULE_GNRC_NDP_ROUTER) || defined(MODULE_GNRC_SIXLOWPAN_ND_ROUTER))
-static bool _pio_from_iface_addr(gnrc_pktsnip_t **res, gnrc_ipv6_netif_addr_t *addr,
-                                 gnrc_pktsnip_t *next)
+static bool _pio_from_iface_addr(gnrc_pktsnip_t **res, gnrc_ipv6_netif_t *iface,
+                                 gnrc_ipv6_netif_addr_t *addr, gnrc_pktsnip_t *next)
 {
     assert(((uint8_t) addr->prefix_len) <= 128U);
 
     if (!ipv6_addr_is_unspecified(&addr->addr) &&
         !ipv6_addr_is_link_local(&addr->addr) &&
         !gnrc_ipv6_netif_addr_is_non_unicast(&addr->addr)) {
+        uint8_t flags = 0;
         DEBUG(" - PIO for %s/%" PRIu8 "\n", ipv6_addr_to_str(addr_str, &addr->addr,
                                                              sizeof(addr_str)),
               addr->prefix_len);
-        *res = gnrc_ndp_opt_pi_build(addr->prefix_len, (addr->flags &
-                                     (GNRC_IPV6_NETIF_ADDR_FLAGS_NDP_AUTO |
-                                      GNRC_IPV6_NETIF_ADDR_FLAGS_NDP_ON_LINK)),
-                                     addr->valid, addr->preferred, &addr->addr, next);
+
+#ifdef MODULE_GNRC_SIXLOWPAN_ND
+        if (!(iface->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN)) {
+            flags = GNRC_IPV6_NETIF_ADDR_FLAGS_NDP_ON_LINK;
+        }
+#else
+        (void) iface;
+#endif
+
+        *res = gnrc_ndp_opt_pi_build(addr->prefix_len, addr->flags | flags, addr->valid,
+                                     addr->preferred, &addr->addr, next);
         return true;
     }
     return false;
@@ -396,7 +404,7 @@ static bool _add_pios(gnrc_pktsnip_t **res, gnrc_ipv6_netif_t *ipv6_iface, gnrc_
             continue;
         }
 
-        if (_pio_from_iface_addr(res, &ipv6_iface->addrs[i], pkt)) {
+        if (_pio_from_iface_addr(res, ipv6_iface, &ipv6_iface->addrs[i], pkt)) {
             if (*res != NULL) {
                 pkt = *res;
             }
@@ -462,7 +470,7 @@ void gnrc_ndp_internal_send_rtr_adv(kernel_pid_t iface, ipv6_addr_t *src, ipv6_a
                     continue;
                 }
 
-                if (_pio_from_iface_addr(&hdr, prf->prefix, pkt)) {
+                if (_pio_from_iface_addr(&hdr, ipv6_iface, prf->prefix, pkt)) {
                     if (hdr != NULL) {
                         pkt = hdr;
                     }
