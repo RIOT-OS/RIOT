@@ -2,7 +2,6 @@
 
 IOTLAB_NODES        ?= 5
 IOTLAB_DURATION     ?= 30
-IOTLAB_SITE         ?= grenoble
 IOTLAB_TYPE         ?= m3:at86rf231
 IOTLAB_AUTH         ?= $(HOME)/.iotlabrc
 IOTLAB_USER         ?= $(shell cut -f1 -d: $(IOTLAB_AUTH))
@@ -12,7 +11,7 @@ IOTLAB_DEBUG_PORT   ?= 3333
 IOTLAB_DEBUG_NODE   ?= $(shell experiment-cli get -i $(IOTLAB_EXP_ID) --resources | \
                          grep -m 1 "network_address" | sed 's/.*: "\(.*\)".*/\1/')
 
-IOTLAB_AUTHORITY    = "$(IOTLAB_USER)@$(IOTLAB_HOST).iot-lab.info"
+IOTLAB_AUTHORITY    = "$(IOTLAB_USER)@$(IOTLAB_SITE).iot-lab.info"
 
 ifneq (,$(findstring m3,$(IOTLAB_TYPE)))
 	BINARY := $(ELFFILE)
@@ -33,6 +32,8 @@ $(IOTLAB_AUTH):
 	auth-cli -u $(IOTLAB_USER)
 
 iotlab-exp: $(IOTLAB_AUTH) all
+	$(eval IOTLAB_SITE ?= grenoble)
+
     ifneq (RIOT_EXP,$(IOTLAB_EXP_NAME))
 	    $(eval IOTLAB_EXP_NAME := RIOT_EXP_$(IOTLAB_EXP_NAME))
     endif
@@ -69,7 +70,5 @@ iotlab-term: iotlab-check-exp
 
 iotlab-check-exp:
 ifndef IOTLAB_SITE
-	$(eval IOTLAB_HOST         := $(shell experiment-cli get -ri -i $(IOTLAB_EXP_ID) | sed -n 4p | cut -d\" -f2))
-else
-	$(eval IOTLAB_HOST         := $(IOTLAB_SITE))
+	$(eval IOTLAB_SITE         := $(shell experiment-cli get -ri -i $(IOTLAB_EXP_ID) | sed -n 4p | cut -d\" -f2))
 endif
