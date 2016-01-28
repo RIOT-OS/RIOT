@@ -624,11 +624,13 @@ uint32_t net_atoi(const char* name) {
 	uint32_t ip;
 	int sts;
 
+
 	// resolve HOST NAME/IP
 	sts = gethostbyname((signed char *) name, strlen(name), &ip, SL_AF_INET);
 	if (sts < 0) {
 		// TODO
 	}
+	DEBUG("%s ipv4 int value: %lu\n", name, ip);
 	return ip;
 
 }
@@ -673,7 +675,7 @@ int16_t connect_to(cd_t *cd, uint32_t remote_ip, uint16_t remote_port,
 
 	sts = sl_Bind(fd, (SlSockAddr_t *) &cd->local_addr, sizeof(SlSockAddrIn_t));
 	if (sts < 0) {
-		DEBUG("%ld:%d bind failed (reason %d)\n", remote_ip, remote_port, fd);
+		DEBUG("%lu:%d bind failed (reason %d)\n", remote_ip, remote_port, fd);
 		sl_Close(fd);
 	}
 
@@ -685,7 +687,7 @@ int16_t connect_to(cd_t *cd, uint32_t remote_ip, uint16_t remote_port,
 		if (sts < 0) {
 			sl_Close(fd);
 			fd = sts;
-			DEBUG("%ld:%d %s (reason %d)\n", remote_ip, remote_port,
+			DEBUG("%lu:%d %s (reason %d)\n", remote_ip, remote_port,
 					sl_err_descr[SOCKET_CONNECT_FAIL], fd);
 		}
 	}
@@ -766,10 +768,7 @@ static void *_receive_handler_task(void* arg) {
 	msg_t msg;   //, msg_queue[8];
 	cd_t *cd = (cd_t *) arg;
 	int16_t size = 0;
-	gnrc_pktsnip_t *pkt;
-	int nettype;
-
-	nettype = GNRC_NETTYPE_UNDEF;
+	gnrc_pktsnip_t *l4, *l3;
 
 	do {
 		size = recv(cd->fd, recv_buffer, RECV_BUFF_SIZE, 0);
@@ -789,13 +788,15 @@ static void *_receive_handler_task(void* arg) {
 			recv_buffer[size] = 0;
 
 			/* copy packet payload into pktbuf */
-			pkt = gnrc_pktbuf_add(NULL, recv_buffer, size + 1, nettype);
+			l3 = gnrc_pktbuf_add(NULL, cd, sizeof(cd_t*), GNRC_NETTYPE_SBAPP);
+
+			l4 = gnrc_pktbuf_add(l3, recv_buffer, size + 1, GNRC_NETTYPE_UNDEF);
 
 			DEBUG("channel %d: recv: %s (len %d)\n",
-					cd->fd, (char *) pkt->data, size);
+					cd->fd, (char *) l4->data, size);
 			msg.type = SBAPI_MSG_TYPE_RCV;
 			//msg.content.ptr = (char*)recv_buffer;
-			msg.content.ptr = (void*) pkt;
+			msg.content.ptr = (void*) l4;
 		}
 		msg_send(&msg, cd->pid);
 
@@ -881,13 +882,19 @@ int sbapp_send(sbh_t fd, void* data, size_t len) {
 	msg_t msg;
 	cd_t *handle = (cd_t *) fd;
 
+	// NULL if no memory available
 	gnrc_pktsnip_t *pkt = gnrc_pktbuf_add(NULL, data, len, GNRC_NETTYPE_UNDEF);
+	if (pkt == NULL) {
+		return -1;
+	}
 
 	msg.type = SBAPI_MSG_TYPE_SND;
 	msg.content.ptr = (void*) pkt;
-	msg_send(&msg, handle->send_pid);
 
-	return 0;
+	/*
+	 * return 1 on success, -1 on error
+	 */
+	return msg_send(&msg, handle->send_pid);
 }
 
 static void *_event_loop(void *arg) {
@@ -909,7 +916,7 @@ static void *_event_loop(void *arg) {
 		PANIC(SIMPLELINK_START_ERR);
 	}
 
-	simplelink_to_default_state();
+	//simplelink_to_default_state();
 
 	xtimer_set(&sbapp.sig_tim, MSEC_TO_TICKS(100));
 

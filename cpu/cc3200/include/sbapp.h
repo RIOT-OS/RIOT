@@ -127,6 +127,8 @@ sbh_t sbapp_connect(uint8_t conn_type, uint32_t remote_ip, uint16_t port,
  *
  *  @param[in] fd the connection handle
  *              (or think it is a file descriptor if you prefer)
+ *
+ *  @return 1 on success -1 on error
  */
 int sbapp_send(sbh_t fd, void* data, size_t len);
 
