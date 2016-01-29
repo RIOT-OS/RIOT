@@ -19,7 +19,7 @@
 
 #ifdef MODULE_NETDEV2_TAP
 
-#define ENABLE_DEBUG (1)
+#define ENABLE_DEBUG (0)
 #include "debug.h"
 
 #include "netdev2_tap.h"
