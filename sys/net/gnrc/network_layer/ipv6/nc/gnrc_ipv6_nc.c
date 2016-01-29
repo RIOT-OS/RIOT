@@ -190,7 +190,8 @@ gnrc_ipv6_nc_t *gnrc_ipv6_nc_get(kernel_pid_t iface, const ipv6_addr_t *ipv6_add
 
     for (int i = 0; i < GNRC_IPV6_NC_SIZE; i++) {
         if (((ncache[i].iface == KERNEL_PID_UNDEF) || (iface == KERNEL_PID_UNDEF) ||
-             (iface == ncache[i].iface)) && ipv6_addr_equal(&(ncache[i].ipv6_addr), ipv6_addr)) {
+             (iface == ncache[i].iface)) &&
+            ipv6_addr_equal(&(ncache[i].ipv6_addr), ipv6_addr)) {
             DEBUG("ipv6_nc: Found entry for %s on interface %" PRIkernel_pid
                   " (0 = all interfaces) [%p]\n",
                   ipv6_addr_to_str(addr_str, ipv6_addr, sizeof(addr_str)),
