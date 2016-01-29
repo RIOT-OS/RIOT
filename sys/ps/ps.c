@@ -12,6 +12,7 @@
  * @file
  * @brief   UNIX like ps command
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
+ * @author  Mohmmad Ayman <Mohmmad.Salah94@eng-st.cu.edu.eg>
  * @}
  */
 
@@ -54,7 +55,7 @@ void ps(void)
 #endif
             "%-9sQ | pri "
 #ifdef DEVELHELP
-           "| stack ( used) | location   "
+           "| stack ( used) | location "
 #endif
 #ifdef MODULE_SCHEDSTATISTICS
            "| runtime | switches"
@@ -76,19 +77,37 @@ void ps(void)
             int stacksz = p->stack_size;                                           /* get stack size */
             overall_stacksz += stacksz;
             stacksz -= thread_measure_stack_free(p->stack_start);
+            int isr_usage = thread_arch_isr_stack_usage();                         /* ISR stack usage */
             overall_used += stacksz;
 #endif
 #ifdef MODULE_SCHEDSTATISTICS
             double runtime_ticks =  sched_pidlist[i].runtime_ticks / (double) xtimer_now() * 100;
             int switches = sched_pidlist[i].schedules;
 #endif
+
+#ifdef DEVELHELP
+        if(i==1){
+            printf("\t%3s"
+                   " | %-19s "
+                   " | %.8s %.8s | %.3s "
+                   " | %5i (%5i) | %.2s "
+                   "\n",
+                   "-",
+                   "isr_stack", "-", "       -", " -"
+                   , ISR_STACKSIZE, isr_usage, "  -"
+                  );
+            overall_stacksz += ISR_STACKSIZE;
+            overall_used += isr_usage;
+          }
+#endif
+
             printf("\t%3" PRIkernel_pid
 #ifdef DEVELHELP
                    " | %-20s"
 #endif
                    " | %-8s %.1s | %3i"
 #ifdef DEVELHELP
-                   " | %5i (%5i) | %p "
+                   " | %5i (%5i) | %p"
 #endif
 #ifdef MODULE_SCHEDSTATISTICS
                    " | %6.3f%% |  %8d"
@@ -107,6 +126,7 @@ void ps(void)
 #endif
                   );
         }
+
     }
 
 #ifdef DEVELHELP
