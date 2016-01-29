@@ -44,7 +44,4 @@
  *
  * Additional examples can be found in the test suite.
  *
- * @section hashes Hashes
- *
- * RIOT currently supports sha256 as a cryptographic hash implementation.
  */
