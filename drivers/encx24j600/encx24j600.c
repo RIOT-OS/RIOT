@@ -60,7 +60,7 @@ static void _get_mac_addr(netdev2_t *dev, uint8_t* buf);
 
 /* netdev2 interface */
 static int _send(netdev2_t *netdev, const struct iovec *vector, int count);
-static int _recv(netdev2_t *netdev, char* buf, int len);
+static int _recv(netdev2_t *netdev, char* buf, int len, void *info);
 static int _init(netdev2_t *dev);
 static void _isr(netdev2_t *dev);
 int _get(netdev2_t *dev, netopt_t opt, void *value, size_t max_len);
@@ -352,11 +352,12 @@ static void _get_mac_addr(netdev2_t *encdev, uint8_t* buf)
     unlock(dev);
 }
 
-static int _recv(netdev2_t *netdev, char* buf, int len)
+static int _recv(netdev2_t *netdev, char* buf, int len, void *info)
 {
     encx24j600_t * dev = (encx24j600_t *) netdev;
     encx24j600_frame_hdr_t hdr;
 
+    (void)info;
     lock(dev);
 
     /* read frame header */
