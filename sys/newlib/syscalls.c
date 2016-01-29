@@ -33,8 +33,9 @@
 #include "cpu.h"
 #include "board.h"
 #include "thread.h"
-#include "kernel.h"
+#include "reboot.h"
 #include "irq.h"
+#include "log.h"
 
 #include "uart_stdio.h"
 
@@ -77,8 +78,8 @@ void _fini(void)
  */
 void _exit(int n)
 {
-    printf("#! exit %i: resetting\n", n);
-    reboot(n);
+    LOG_INFO("#! exit %i: resetting\n", n);
+    reboot();
     while(1);
 }
 
