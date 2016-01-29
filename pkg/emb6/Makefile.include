@@ -42,6 +42,10 @@ ifneq (,$(filter emb6_mac,$(USEMODULE)))
   INCLUDES += -I$(EMB6_DIR)/emb6/inc/mac
 endif
 
+ifneq (,$(filter emb6_netdev2,$(USEMODULE)))
+  DIRS += $(EMB6_CONTRIB)/netdev2
+endif
+
 ifneq (,$(filter emb6_rpl,$(USEMODULE)))
   DIRS += $(EMB6_DIR)/emb6/src/net/rpl
   INCLUDES += -I$(EMB6_DIR)/emb6/inc/net/rpl
