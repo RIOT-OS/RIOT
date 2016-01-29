@@ -47,11 +47,12 @@ static int _send(netdev2_t *dev, const struct iovec *vector, int count)
     return cc110x_send(&netdev2_cc110x->cc110x, cc110x_pkt);
 }
 
-static int _recv(netdev2_t *dev, char* buf, int len)
+static int _recv(netdev2_t *dev, char* buf, int len, void *info)
 {
     DEBUG("%s:%u\n", __func__, __LINE__);
 
     cc110x_t *cc110x = &((netdev2_cc110x_t*) dev)->cc110x;
+    netdev2_cc110x_rx_info_t *cc110x_info = info;
 
     cc110x_pkt_t *cc110x_pkt = &cc110x->pkt_buf.packet;
     if (cc110x_pkt->length > len) {
@@ -59,6 +60,8 @@ static int _recv(netdev2_t *dev, char* buf, int len)
     }
 
     memcpy(buf, (void*)cc110x_pkt, cc110x_pkt->length);
+    cc110x_info->rssi = cc110x->pkt_buf.rssi;
+    cc110x_info->lqi = cc110x->pkt_buf.lqi;
     return cc110x_pkt->length;
 }
 
