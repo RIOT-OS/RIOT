@@ -88,6 +88,7 @@
  * @author      Stefan Pfeiffer <stefan.pfeiffer@fu-berlin.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
+ * @author      Mohmmad Ayman <mohmmadayman@aucegypt.edu>
  *
  * @}
  */
@@ -100,6 +101,9 @@
 #include "irq.h"
 #include "cpu.h"
 #include "kernel_internal.h"
+
+extern uint32_t _estack;
+extern uint32_t _sstack;
 
 /**
  * @brief   Noticeable marker marking the beginning of a stack segment
@@ -232,6 +236,15 @@ char *thread_arch_stack_init(thread_task_func_t task_func,
      * xPSR and aligned stacking of the hardware-handled registers). */
 
     return (char*) stk;
+}
+
+/* This function returns the number of bytes used on the ISR stack */
+int thread_arch_isr_stack_usage(void)
+{
+    uint32_t  *ptr = &_sstack;
+    while (*(ptr++) == STACK_CANARY_WORD) {
+    }
+    return ISR_STACKSIZE - (ptr - &_sstack);
 }
 
 void thread_arch_stack_print(void)

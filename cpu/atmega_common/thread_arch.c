@@ -14,6 +14,7 @@
  * @brief       Implementation of the kernel's architecture dependent thread interface
  *
  * @author      Hinnerk van Bruinehsen <h.v.bruinehsen@fu-berlin.de>
+ * @author      Mohmmad Ayman <mohmmadayman@aucegypt.edu>
  *
  * @}
  */
@@ -166,6 +167,13 @@ char *thread_arch_stack_init(thread_task_func_t task_func, void *arg,
 
     stk--;
     return (char *) stk;
+}
+
+/* This function calculates the ISR_usage */
+int thread_arch_isr_stack_usage(void)
+{
+/* TODO */
+    return -1;
 }
 
 /**

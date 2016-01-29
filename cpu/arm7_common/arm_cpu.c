@@ -30,6 +30,13 @@ void thread_yield_higher(void)
     asm("svc 0\n");
 }
 
+/* This function calculates the ISR_usage */
+int thread_arch_isr_stack_usage(void)
+{
+/* TODO */
+    return -1;
+}
+
 /*----------------------------------------------------------------------------
  * Processor specific routine - here for ARM7
  * sizeof(void*) = sizeof(int)

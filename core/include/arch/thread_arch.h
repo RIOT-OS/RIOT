@@ -14,6 +14,7 @@
  * @brief       Architecture dependent kernel interface for handling and managing threads
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Mohmmad Ayman <mohmmadayman@aucegypt.edu>
  */
 
 #ifndef THREAD_ARCH_H
@@ -54,6 +55,11 @@
  * @return                  pointer to the new top of the stack
  */
 char *thread_arch_stack_init(thread_task_func_t task_func, void *arg, void *stack_start, int stack_size);
+
+/**
+ * @brief   Get the number of bytes used on the ISR stack
+ */
+int thread_arch_isr_stack_usage(void);
 
 /**
  * @brief Print the current stack to stdout

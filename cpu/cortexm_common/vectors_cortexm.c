@@ -31,14 +31,6 @@
 #include "vectors_cortexm.h"
 
 /**
- * @brief Interrupt stack canary value
- *
- * @note 0xe7fe is the ARM Thumb machine code equivalent of asm("bl #-2\n") or
- * 'while (1);', i.e. an infinite loop.
- */
-#define STACK_CANARY_WORD 0xE7FEE7FEu
-
-/**
  * @brief   Memory markers, defined in the linker script
  * @{
  */

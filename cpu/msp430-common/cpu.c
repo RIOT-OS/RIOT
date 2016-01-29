@@ -25,13 +25,19 @@ __attribute__((naked)) void thread_yield_higher(void)
     __disable_irq();
 
     __save_context();
-
     /* have sched_active_thread point to the next thread */
     sched_run();
 
     __restore_context();
 
     UNREACHABLE();
+}
+
+/* This function calculates the ISR_usage */
+int thread_arch_isr_stack_usage(void)
+{
+/* TODO */
+    return -1;
 }
 
 NORETURN void cpu_switch_context_exit(void)
