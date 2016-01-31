@@ -1,0 +1,4 @@
+export CPU_ARCH = cortex-m4
+
+# include efm32_common
+include $(RIOTCPU)/efm32_common/Makefile.include
