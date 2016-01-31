@@ -1,1 +1,1 @@
-INCLUDES += -I$(BINDIR)tlsf-src
+INCLUDES += -I$(RIOTBASE)/pkg/tlsf/tlsf
